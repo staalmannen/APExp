@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken read-syntax)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_read-syntax.29">Module (chicken read-syntax)</a>
+<ul>
+<li><a href="#sec:define-reader-ctor">define-reader-ctor</a></li>
+<li><a href="#sec:set-read-syntax.21">set-read-syntax!</a></li>
+<li><a href="#sec:set-sharp-read-syntax.21">set-sharp-read-syntax!</a></li>
+<li><a href="#sec:set-parameterized-read-syntax.21">set-parameterized-read-syntax!</a></li>
+<li><a href="#sec:copy-read-table">copy-read-table</a></li>
+<li><a href="#sec:current-read-table">current-read-table</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_read-syntax.29"><a href="#sec:Module_.28chicken_read-syntax.29">Module (chicken read-syntax)</a></h2><p>This module provides procedures which can be used to extend the reader with custom read syntax.</p><h3 id="sec:define-reader-ctor"><a href="#sec:define-reader-ctor">define-reader-ctor</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:define-reader-ctor"><span class="sig"><var class="id">define-reader-ctor</var> <var class="arg">SYMBOL</var> <var class="arg">PROC</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Define new read-time constructor for <tt>#,</tt> read syntax. For further information, see the documentation for <a href="http://srfi.schemers.org/srfi-10/srfi-10.html">SRFI-10</a>.</p></dd></dl><h3 id="sec:set-read-syntax.21"><a href="#sec:set-read-syntax.21">set-read-syntax!</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:set-read-syntax.21"><span class="sig"><var class="id">set-read-syntax!</var> <var class="arg">CHAR-OR-SYMBOL</var> <var class="arg">PROC</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>When the reader encounters the non-whitespace character <tt>CHAR</tt> while reading an expression from a given port, then the procedure <var class="arg">PROC</var> will be called with that port as its argument. The procedure should return a value that will be returned to the reader:</p>
+<pre class="highlight colorize"> <span class="comment">; A simple RGB color syntax:
+</span>
+ <span class="paren1">(<span class="default">set-read-syntax! <span class="character">#\%</span>
+   <span class="paren2">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren3">(<span class="default">port</span>)</span>
+     <span class="paren3">(<span class="default">apply vector
+       <span class="paren4">(<span class="default">map <span class="paren5">(<span class="default">cut string-&gt;number &lt;&gt; 16</span>)</span>
+	    <span class="paren5">(<span class="default">string-chop <span class="paren6">(<span class="default">read-string 6 port</span>)</span> 2</span>)</span> </span>)</span> </span>)</span> </span>)</span> </span>)</span>
+
+ <span class="paren1">(<span class="default"><i><span class="symbol">with-input-from-string</span></i> <span class="string">&quot;(1 2 %f0f0f0 3)&quot;</span> read</span>)</span>
+ <span class="comment">; ==&gt; (1 2 #(240 240 240) 3)</span></pre><p>If <var class="arg">CHAR-OR-SYMBOL</var> is a symbol, then a so-called <i>read-mark</i> handler is defined. In that case the handler procedure will be called when a character-sequence of the form <tt>#!SYMBOL</tt> is encountered.</p><p>You can undo special handling of read-syntax by passing <tt>#f</tt> as the second argument (if the syntax was previously defined via <tt>set-read-syntax!</tt>).</p><p>As a special case, your handler can return zero values, via <tt>(values)</tt>.  This causes the reader to completely ignore whatever input you've read, rather than returning some possibly unspecified value.  This can be useful in macro context, reading comments, conditional compilation, and so forth.  Available in CHICKEN 4.6.6 and later.</p><p>Note that all of CHICKEN's special non-standard read-syntax is handled directly by the reader. To disable built-in read-syntax, define a handler that triggers an error (for example).</p></dd></dl><h3 id="sec:set-sharp-read-syntax.21"><a href="#sec:set-sharp-read-syntax.21">set-sharp-read-syntax!</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:set-sharp-read-syntax.21"><span class="sig"><var class="id">set-sharp-read-syntax!</var> <var class="arg">CHAR-OR-SYMBOL</var> <var class="arg">PROC</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Similar to <tt>set-read-syntax!</tt>, but allows defining new <tt>#&lt;CHAR&gt; ...</tt> reader syntax. If the first argument is a symbol, then this procedure is equivalent to <tt>set-read-syntax!</tt>.</p><p><var class="arg">PROC</var> may be <tt>#f</tt> to disable previously defined &quot;sharp&quot; read syntax.</p></dd></dl><h3 id="sec:set-parameterized-read-syntax.21"><a href="#sec:set-parameterized-read-syntax.21">set-parameterized-read-syntax!</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:set-parameterized-read-syntax.21"><span class="sig"><var class="id">set-parameterized-read-syntax!</var> <var class="arg">CHAR-OR-SYMBOL</var> <var class="arg">PROC</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Similar to <tt>set-sharp-read-syntax!</tt>, but intended for defining reader syntax of the form <tt>#&lt;NUMBER&gt;&lt;CHAR&gt; ...</tt>. The handler procedure <var class="arg">PROC</var> will be called with two arguments: the input port and the number preceding the dispatching character. If the first argument is a symbol, then this procedure is equivalent to <tt>set-read-syntax!</tt>.</p><p><var class="arg">PROC</var> may be <tt>#f</tt> to disable previously defined parameterized read syntax.</p></dd></dl><h3 id="sec:copy-read-table"><a href="#sec:copy-read-table">copy-read-table</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:copy-read-table"><span class="sig"><var class="id">copy-read-table</var> <var class="arg">READ-TABLE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a copy of the given read-table. You can access the currently active read-table with <tt>(current-read-table)</tt>.  This procedure can be useful to restore an old read-table after temporarily introducing new read syntax.</p></dd></dl><h3 id="sec:current-read-table"><a href="#sec:current-read-table">current-read-table</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:current-read-table"><span class="sig"><var class="id">current-read-table</var></span><span class="type">parameter</span></dt>
+<dd class="defsig"><p>A read-table object that holds read-procedures for special non-standard read-syntax (see <tt>set-read-syntax!</tt> for more information).</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20random%29.html">Module (chicken random)</a></p><p>Next: <a href="Module%20%28chicken%20repl%29.html">Module (chicken repl)</a></p></div></div></body></html>

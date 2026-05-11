@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken process-context posix)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_process-context_posix.29">Module (chicken process-context posix)</a>
+<ul>
+<li><a href="#sec:Process_filesystem_context">Process filesystem context</a>
+<ul>
+<li><a href="#sec:change-directory.2a">change-directory*</a></li>
+<li><a href="#sec:set-root-directory.21">set-root-directory!</a></li></ul></li>
+<li><a href="#sec:Retrieving_user_.26_group_information">Retrieving user &amp; group information</a>
+<ul>
+<li><a href="#sec:current-user-id">current-user-id</a></li>
+<li><a href="#sec:current-user-name">current-user-name</a></li>
+<li><a href="#sec:current-effective-user-id">current-effective-user-id</a></li>
+<li><a href="#sec:current-effective-user-name">current-effective-user-name</a></li>
+<li><a href="#sec:current-group-id">current-group-id</a></li>
+<li><a href="#sec:current-effective-group-id">current-effective-group-id</a></li></ul></li>
+<li><a href="#sec:Process_identity">Process identity</a>
+<ul>
+<li><a href="#sec:current-process-id">current-process-id</a></li>
+<li><a href="#sec:parent-process-id">parent-process-id</a></li>
+<li><a href="#sec:process-group-id">process-group-id</a></li>
+<li><a href="#sec:create-session">create-session</a></li>
+<li><a href="#sec:user-information">user-information</a></li></ul></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_process-context_posix.29"><a href="#sec:Module_.28chicken_process-context_posix.29">Module (chicken process-context posix)</a></h2><p>This module provides access to POSIX-specific procedures which deal with the current process context.</p><ul><li>New in CHICKEN 5.4.0: Errors caused by underlying C calls that change errno will produce a condition object with an <tt>errno</tt> property, which can be accessed with <tt>(get-condition-property &lt;the-condition-object&gt; 'exn 'errno)</tt>.</li>
+</ul>
+<h3 id="sec:Process_filesystem_context"><a href="#sec:Process_filesystem_context">Process filesystem context</a></h3><h4 id="sec:change-directory.2a"><a href="#sec:change-directory.2a">change-directory*</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:change-directory.2a"><span class="sig"><var class="id">change-directory*</var> <var class="arg">FD</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><tt>(set! (current-directory) FD)</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Changes the current working directory to the one represented by the file-descriptor <var class="arg">FD</var>, which should be an exact integer.</p><p><b>NOTE</b>: Windows does not allow <tt>{open</tt>} on directories, so while technically it is supported, in practice you cannot use this procedure on native Windows builds (on cygwin it works because cygwin emulates this).</p></dd></dl><h4 id="sec:set-root-directory.21"><a href="#sec:set-root-directory.21">set-root-directory!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:set-root-directory.21"><span class="sig"><var class="id">set-root-directory!</var> <var class="arg">STRING</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Sets the root directory for the current process to the path given in <var class="arg">STRING</var> (using the <tt>chroot</tt> function).  If the current process has no root permissions, the operation will fail.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h3 id="sec:Retrieving_user_.26_group_information"><a href="#sec:Retrieving_user_.26_group_information">Retrieving user &amp; group information</a></h3><h4 id="sec:current-user-id"><a href="#sec:current-user-id">current-user-id</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:current-user-id"><span class="sig"><var class="id">current-user-id</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><tt>(set! (current-user-id) UID)</tt></span><span class="type">setter</span></dt>
+<dd class="defsig"><p>Get or set the real user-id of the current process. The procedure corresponds to the getuid and setuid C functions.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h4 id="sec:current-user-name"><a href="#sec:current-user-name">current-user-name</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:current-user-name"><span class="sig"><var class="id">current-user-name</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Get the login name corresponding to the real user-id of the current process from the system password database.</p><p>On Windows, there's no user-id and no distinction between real and effective user, but this procedure <i>will</i> return the username associated with the current process, so it is safe to use.</p></dd></dl><h4 id="sec:current-effective-user-id"><a href="#sec:current-effective-user-id">current-effective-user-id</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:current-effective-user-id"><span class="sig"><var class="id">current-effective-user-id</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><tt>(set! (current-effective-user-id) UID)</tt></span><span class="type">setter</span></dt>
+<dd class="defsig"><p>Get or set the effective user-id of the current process.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h4 id="sec:current-effective-user-name"><a href="#sec:current-effective-user-name">current-effective-user-name</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:current-effective-user-name"><span class="sig"><var class="id">current-effective-user-name</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Get the login name corresponding to the effective user-id of the current process from the system password database.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h4 id="sec:current-group-id"><a href="#sec:current-group-id">current-group-id</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:current-group-id"><span class="sig"><var class="id">current-group-id</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><tt>(set! (current-group-id) GID)</tt></span><span class="type">setter</span></dt>
+<dd class="defsig"><p>Get or set the real group-id of the current process.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h4 id="sec:current-effective-group-id"><a href="#sec:current-effective-group-id">current-effective-group-id</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:current-effective-group-id"><span class="sig"><var class="id">current-effective-group-id</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><tt>(set! (current-effective-group-id) GID)</tt></span><span class="type">setter</span></dt>
+<dd class="defsig"><p>Get or set the effective group-id of the current process. ID can be found, then <tt>#f</tt> is returned.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h3 id="sec:Process_identity"><a href="#sec:Process_identity">Process identity</a></h3><h4 id="sec:current-process-id"><a href="#sec:current-process-id">current-process-id</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:current-process-id"><span class="sig"><var class="id">current-process-id</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the process ID of the current process.</p></dd></dl><h4 id="sec:parent-process-id"><a href="#sec:parent-process-id">parent-process-id</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:parent-process-id"><span class="sig"><var class="id">parent-process-id</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the process ID of the parent of the current process.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h4 id="sec:process-group-id"><a href="#sec:process-group-id">process-group-id</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:process-group-id"><span class="sig"><var class="id">process-group-id</var> <var class="arg">PID</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><var class="dsssl">set!</var> (<var class="id">process-group-id</var> <var class="arg">PID</var>) <var class="arg">PGID</var></span><span class="type">setter</span></dt>
+<dd class="defsig"><p>Get or set the process group ID of the process specified by <var class="arg">PID</var>.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h4 id="sec:create-session"><a href="#sec:create-session">create-session</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:create-session"><span class="sig"><var class="id">create-session</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Creates a new session with the current process as group leader. Returns current process id on success. Equivalent to setsid(2).</p></dd></dl><h4 id="sec:user-information"><a href="#sec:user-information">user-information</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:user-information"><span class="sig"><var class="id">user-information</var> <var class="arg">USER</var> <var class="dsssl">#!optional</var> <var class="arg">AS-VECTOR</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>If <var class="arg">USER</var> specifes a valid username (as a string) or user ID, then the user database is consulted and a list of 7 values are returned: the user-name, the encrypted password, the user ID, the group ID, a user-specific string, the home directory and the default shell. When <var class="arg">AS-VECTOR</var> is <tt>#t</tt> a vector of 7 elements is returned instead of a list. If no user with this name or id then <tt>#f</tt> is returned.</p><p>Note: on Android systems, the user-specific string is always <tt>&quot;&quot;</tt>, since <tt>pw_gecos</tt> is not available in the C <tt>passwd</tt> struct on that platform.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20process-context%29.html">Module (chicken process-context)</a></p><p>Next: <a href="Module%20%28chicken%20random%29.html">Module (chicken random)</a></p></div></div></body></html>

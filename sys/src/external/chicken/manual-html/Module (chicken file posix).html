@@ -1,0 +1,339 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken file posix)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_file_posix.29">Module (chicken file posix)</a>
+<ul>
+<li><a href="#sec:Constants">Constants</a>
+<ul>
+<li><a href="#sec:File-control_Commands">File-control Commands</a></li>
+<li><a href="#sec:File_positions">File positions</a></li>
+<li><a href="#sec:Standard_I.2fO_file-descriptors">Standard I/O file-descriptors</a></li>
+<li><a href="#sec:Open_flags">Open flags</a></li>
+<li><a href="#sec:Open_flags_for_create-pipe">Open flags for create-pipe</a></li>
+<li><a href="#sec:Permission_bits">Permission bits</a></li></ul></li>
+<li><a href="#sec:Information_about_files">Information about files</a>
+<ul>
+<li><a href="#sec:directory.3f">directory?</a></li>
+<li><a href="#sec:file-type">file-type</a></li>
+<li><a href="#sec:character-device.3f">character-device?</a></li>
+<li><a href="#sec:block-device.3f">block-device?</a></li>
+<li><a href="#sec:socket.3f">socket?</a></li>
+<li><a href="#sec:regular-file.3f">regular-file?</a></li></ul></li>
+<li><a href="#sec:Fifos">Fifos</a>
+<ul>
+<li><a href="#sec:create-fifo">create-fifo</a></li>
+<li><a href="#sec:fifo.3f">fifo?</a></li></ul></li>
+<li><a href="#sec:Retrieving_file_attributes">Retrieving file attributes</a>
+<ul>
+<li><a href="#sec:file-access-time">file-access-time</a></li>
+<li><a href="#sec:file-change-time">file-change-time</a></li>
+<li><a href="#sec:file-modification-time">file-modification-time</a></li>
+<li><a href="#sec:set-file-times.21">set-file-times!</a></li>
+<li><a href="#sec:file-stat">file-stat</a></li>
+<li><a href="#sec:file-position">file-position</a></li>
+<li><a href="#sec:file-size">file-size</a></li>
+<li><a href="#sec:file-owner">file-owner</a></li>
+<li><a href="#sec:set-file-owner.21">set-file-owner!</a></li>
+<li><a href="#sec:file-group">file-group</a></li>
+<li><a href="#sec:set-file-group.21">set-file-group!</a></li>
+<li><a href="#sec:file-permissions">file-permissions</a></li>
+<li><a href="#sec:set-file-permissions.21">set-file-permissions!</a></li>
+<li><a href="#sec:file-truncate">file-truncate</a></li>
+<li><a href="#sec:set-file-position.21">set-file-position!</a></li>
+<li><a href="#sec:file-creation-mode">file-creation-mode</a></li></ul></li>
+<li><a href="#sec:Hard_and_symbolic_links">Hard and symbolic links</a>
+<ul>
+<li><a href="#sec:file-link">file-link</a></li>
+<li><a href="#sec:symbolic-link.3f">symbolic-link?</a></li>
+<li><a href="#sec:create-symbolic-link">create-symbolic-link</a></li>
+<li><a href="#sec:read-symbolic-link">read-symbolic-link</a></li></ul></li>
+<li><a href="#sec:File_descriptors_and_low-level_I.2fO">File descriptors and low-level I/O</a>
+<ul>
+<li><a href="#sec:duplicate-fileno">duplicate-fileno</a></li>
+<li><a href="#sec:file-close">file-close</a></li>
+<li><a href="#sec:file-open">file-open</a></li>
+<li><a href="#sec:file-mkstemp">file-mkstemp</a></li>
+<li><a href="#sec:file-read">file-read</a></li>
+<li><a href="#sec:file-select">file-select</a></li>
+<li><a href="#sec:file-write">file-write</a></li>
+<li><a href="#sec:file-control">file-control</a></li>
+<li><a href="#sec:open-input-file.2a">open-input-file*</a></li>
+<li><a href="#sec:open-output-file.2a">open-output-file*</a></li>
+<li><a href="#sec:port-.3efileno">port-&gt;fileno</a></li></ul></li>
+<li><a href="#sec:Record_locking">Record locking</a>
+<ul>
+<li><a href="#sec:file-lock">file-lock</a></li>
+<li><a href="#sec:file-lock.2fblocking">file-lock/blocking</a></li>
+<li><a href="#sec:file-test-lock">file-test-lock</a></li>
+<li><a href="#sec:file-unlock">file-unlock</a></li></ul></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_file_posix.29"><a href="#sec:Module_.28chicken_file_posix.29">Module (chicken file posix)</a></h2><p>This module provides various operations on files and directories that are more POSIX-oriented than the generic higher-level operations from <a href="Module%20%28chicken%20file%29.html">Module (chicken file)</a>.</p><p>Note that the following definitions are not all available on non-UNIX systems like Windows. See below for Windows specific notes.</p><p>All errors related to failing file-operations will signal a condition of kind <tt>(exn i/o file)</tt>.</p><ul><li>New in CHICKEN 5.4.0: Errors caused by underlying C calls that change errno will produce a condition object with an <tt>errno</tt> property, which can be accessed with <tt>(get-condition-property &lt;the-condition-object&gt; 'exn 'errno)</tt>.</li>
+</ul>
+<h3 id="sec:Constants"><a href="#sec:Constants">Constants</a></h3><h4 id="sec:File-control_Commands"><a href="#sec:File-control_Commands">File-control Commands</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:fcntl.2fdupfd"><span class="sig"><var class="id">fcntl/dupfd</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:fcntl.2fgetfd"><span class="sig"><var class="id">fcntl/getfd</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:fcntl.2fsetfd"><span class="sig"><var class="id">fcntl/setfd</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:fcntl.2fgetfl"><span class="sig"><var class="id">fcntl/getfl</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:fcntl.2fsetfl"><span class="sig"><var class="id">fcntl/setfl</var></span><span class="type">constant</span></dt>
+<dd class="defsig"><p>Operations used with <tt>file-control</tt>.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), these are all defined as zero.  The <tt>file-control</tt> procedure to use these with is also unimplemented and will raise an error when called.</p></dd></dl><h4 id="sec:File_positions"><a href="#sec:File_positions">File positions</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:seek.2fcur"><span class="sig"><var class="id">seek/cur</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:seek.2fset"><span class="sig"><var class="id">seek/set</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:seek.2fend"><span class="sig"><var class="id">seek/end</var></span><span class="type">constant</span></dt>
+<dd class="defsig"><p>File positions for <tt>set-file-position!</tt>.</p></dd></dl><h4 id="sec:Standard_I.2fO_file-descriptors"><a href="#sec:Standard_I.2fO_file-descriptors">Standard I/O file-descriptors</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:fileno.2fstdin"><span class="sig"><var class="id">fileno/stdin</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:fileno.2fstdout"><span class="sig"><var class="id">fileno/stdout</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:fileno.2fstderr"><span class="sig"><var class="id">fileno/stderr</var></span><span class="type">constant</span></dt>
+<dd class="defsig"><p>Standard I/O file descriptor numbers, used with procedures such as <tt>open-input-file*</tt> which take file descriptors.</p></dd></dl><h4 id="sec:Open_flags"><a href="#sec:Open_flags">Open flags</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:open.2frdonly"><span class="sig"><var class="id">open/rdonly</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:open.2fwronly"><span class="sig"><var class="id">open/wronly</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:open.2frdwr"><span class="sig"><var class="id">open/rdwr</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:open.2fread"><span class="sig"><var class="id">open/read</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:open.2fwrite"><span class="sig"><var class="id">open/write</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:open.2fcreat"><span class="sig"><var class="id">open/creat</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:open.2fappend"><span class="sig"><var class="id">open/append</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:open.2fexcl"><span class="sig"><var class="id">open/excl</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:open.2fnoctty"><span class="sig"><var class="id">open/noctty</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:open.2fnonblock"><span class="sig"><var class="id">open/nonblock</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:open.2ftrunc"><span class="sig"><var class="id">open/trunc</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:open.2fsync"><span class="sig"><var class="id">open/sync</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:open.2ffsync"><span class="sig"><var class="id">open/fsync</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:open.2fbinary"><span class="sig"><var class="id">open/binary</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:open.2ftext"><span class="sig"><var class="id">open/text</var></span><span class="type">constant</span></dt>
+<dd class="defsig"><p>Open flags used with the <tt>file-open</tt> procedure.  <tt>open/read</tt> is a convenience synonym for <tt>open/rdonly</tt>, as is <tt>open/write</tt> for <tt>open/wronly</tt>.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), <tt>open/noctty</tt>, <tt>open/nonblock</tt>, <tt>open/fsync</tt> and <tt>open/sync</tt> are defined as zero because the corresponding flag doesn't exist. This means you can safely add these to any set of flags when opening a file or pipe, but it simply won't have an effect.</p></dd></dl><h4 id="sec:Open_flags_for_create-pipe"><a href="#sec:Open_flags_for_create-pipe">Open flags for create-pipe</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:open.2fnoinherit"><span class="sig"><var class="id">open/noinherit</var></span><span class="type">constant</span></dt>
+<dd class="defsig"><p>This variable is a mode value for <tt>create-pipe</tt>. Useful when spawning a child process on Windows.  On UNIX it is defined as zero, so you can safely pass it there, but it will have no effect.</p></dd></dl><h4 id="sec:Permission_bits"><a href="#sec:Permission_bits">Permission bits</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:perm.2firusr"><span class="sig"><var class="id">perm/irusr</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:perm.2fiwusr"><span class="sig"><var class="id">perm/iwusr</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:perm.2fixusr"><span class="sig"><var class="id">perm/ixusr</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:perm.2firgrp"><span class="sig"><var class="id">perm/irgrp</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:perm.2fiwgrp"><span class="sig"><var class="id">perm/iwgrp</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:perm.2fixgrp"><span class="sig"><var class="id">perm/ixgrp</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:perm.2firoth"><span class="sig"><var class="id">perm/iroth</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:perm.2fiwoth"><span class="sig"><var class="id">perm/iwoth</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:perm.2fixoth"><span class="sig"><var class="id">perm/ixoth</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:perm.2firwxu"><span class="sig"><var class="id">perm/irwxu</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:perm.2firwxg"><span class="sig"><var class="id">perm/irwxg</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:perm.2firwxo"><span class="sig"><var class="id">perm/irwxo</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:perm.2fisvtx"><span class="sig"><var class="id">perm/isvtx</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:perm.2fisuid"><span class="sig"><var class="id">perm/isuid</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:perm.2fisgid"><span class="sig"><var class="id">perm/isgid</var></span><span class="type">constant</span></dt>
+<dd class="defsig"><p>Permission bits used with, for example, <tt>file-open</tt>.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), <tt>perm/isvtx</tt>, <tt>perm/isuid</tt> and <tt>perm/isgid</tt> are defined as zero because the corresponding permission doesn't exist.  This means you can safely add these to any set of flags when opening a file or pipe, but it simply won't have an effect.</p></dd></dl><h3 id="sec:Information_about_files"><a href="#sec:Information_about_files">Information about files</a></h3><h4 id="sec:directory.3f"><a href="#sec:directory.3f">directory?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:directory.3f"><span class="sig"><var class="id">directory?</var> <var class="arg">FILE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">FILE</var> designates a directory. Otherwise, it returns <tt>#f</tt>. <var class="arg">FILE</var> may be a pathname, a file-descriptor or a port object.</p></dd></dl><h4 id="sec:file-type"><a href="#sec:file-type">file-type</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-type"><span class="sig"><var class="id">file-type</var> <var class="arg">FILE</var> <var class="dsssl">#!optional</var> <var class="arg">LINK</var> <var class="arg">ERROR</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the file-type for <var class="arg">FILE</var>, which should be a filename, a file-descriptor or a port object. If <var class="arg">LINK</var> is given and true, symbolic-links are not followed:</p><pre> regular-file
+ directory
+ fifo
+ socket
+ symbolic-link
+ character-device
+ block-device</pre><p>Note that not all types are supported on every platform. If <var class="arg">ERROR</var> is given and false, then <tt>file-type</tt> returns <tt>#f</tt> if the file does not exist; otherwise, it signals an error.</p></dd></dl><h4 id="sec:character-device.3f"><a href="#sec:character-device.3f">character-device?</a></h4><h4 id="sec:block-device.3f"><a href="#sec:block-device.3f">block-device?</a></h4><h4 id="sec:socket.3f"><a href="#sec:socket.3f">socket?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:character-device.3f"><span class="sig"><var class="id">character-device?</var> <var class="arg">FILE</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:block-device.3f"><span class="sig"><var class="id">block-device?</var> <var class="arg">FILE</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:socket.3f"><span class="sig"><var class="id">socket?</var> <var class="arg">FILE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These procedures return <tt>#t</tt> if <var class="arg">FILE</var> given is of the appropriate type. <var class="arg">FILE</var> may be a filename, a file-descriptor or a port object. Note that these operations follow symbolic links. If the file does not exist, <tt>#f</tt> is returned.</p></dd></dl><h4 id="sec:regular-file.3f"><a href="#sec:regular-file.3f">regular-file?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:regular-file.3f"><span class="sig"><var class="id">regular-file?</var> <var class="arg">FILE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns true, if <var class="arg">FILE</var> names a regular file (not a directory, socket, etc.)  This operation follows symbolic links; use either <tt>symbolic-link?</tt> or <tt>file-type</tt> if you need to test for symlinks. <var class="arg">FILE</var> may refer to a filename, file descriptor or ports object.</p></dd></dl><h3 id="sec:Fifos"><a href="#sec:Fifos">Fifos</a></h3><h4 id="sec:create-fifo"><a href="#sec:create-fifo">create-fifo</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:create-fifo"><span class="sig"><var class="id">create-fifo</var> <var class="arg">FILENAME</var> <var class="dsssl">#!optional</var> <var class="arg">MODE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Creates a FIFO with the name <var class="arg">FILENAME</var> and the permission bits <var class="arg">MODE</var>, which defaults to</p>
+<pre class="highlight colorize"> <span class="paren1">(<span class="default">+ perm/irwxu perm/irwxg perm/irwxo</span>)</span></pre><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h4 id="sec:fifo.3f"><a href="#sec:fifo.3f">fifo?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:fifo.3f"><span class="sig"><var class="id">fifo?</var> <var class="arg">FILE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">FILE</var> names a FIFO. <var class="arg">FILE</var> may be a filename, a port or a file-descriptor.</p></dd></dl><h3 id="sec:Retrieving_file_attributes"><a href="#sec:Retrieving_file_attributes">Retrieving file attributes</a></h3><h4 id="sec:file-access-time"><a href="#sec:file-access-time">file-access-time</a></h4><h4 id="sec:file-change-time"><a href="#sec:file-change-time">file-change-time</a></h4><h4 id="sec:file-modification-time"><a href="#sec:file-modification-time">file-modification-time</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-access-time"><span class="sig"><var class="id">file-access-time</var> <var class="arg">FILE</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:file-change-time"><span class="sig"><var class="id">file-change-time</var> <var class="arg">FILE</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:file-modification-time"><span class="sig"><var class="id">file-modification-time</var> <var class="arg">FILE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns time (in seconds) of the last access, inode change or content modification of <var class="arg">FILE</var>, respectively. <var class="arg">FILE</var> may be a filename, a file-descriptor or a file-backed port. If the file does not exist, an error is signaled.</p></dd></dl><h4 id="sec:set-file-times.21"><a href="#sec:set-file-times.21">set-file-times!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:set-file-times.21"><span class="sig"><var class="id">set-file-times!</var> <var class="arg">FILE</var> <var class="dsssl">#!optional</var> <var class="arg">MTIME</var> <var class="arg">ATIME</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Sets the time of last modification <var class="arg">MTIME</var> and/or time of last access <var class="arg">ATIME</var> (in seconds) for <var class="arg">FILE</var>. <var class="arg">FILE</var> may be a filename, a file-descriptor or a file-backed port. If the file does not exist, an error is signaled.</p><p>If neither <var class="arg">MTIME</var> nor <var class="arg">ATIME</var> is supplied, the current time is used.  If only <var class="arg">MTIME</var> is supplied, <var class="arg">ATIME</var> will be set to the same value.  If an argument is <tt>#f</tt>, it will not be changed.</p><p>Consequently, if only <var class="arg">MTIME</var> is passed and it is <tt>#f</tt>, <var class="arg">ATIME</var> is assumed to be <tt>#f</tt> as well and neither will be changed.</p></dd></dl><h4 id="sec:file-stat"><a href="#sec:file-stat">file-stat</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-stat"><span class="sig"><var class="id">file-stat</var> <var class="arg">FILE</var> <var class="dsssl">#!optional</var> <var class="arg">LINK</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a 13-element vector with the following contents:</p><table>
+<tr><th>index</th>
+    <th>value</th>
+    <th>field</th>
+    <th>notes</th></tr>
+
+<tr><td>0</td>
+    <td>inode number</td>
+    <td><tt>st_ino</tt></td>
+    <td></td></tr>
+
+<tr><td>1</td>
+    <td>mode</td>
+    <td><tt>st_mode</tt></td>
+    <td>bitfield combining file permissions and file type</td></tr>
+
+<tr><td>2</td>
+    <td>number of hard links</td>
+    <td><tt>st_nlink</tt></td>
+    <td></td></tr>
+
+<tr><td>3</td>
+    <td>UID of owner</td>
+    <td><tt>st_uid</tt></td>
+    <td>as with <tt>file-owner</tt></td></tr>
+
+<tr><td>4</td>
+    <td>GID of owner</td>
+    <td><tt>st_gid</tt></td>
+    <td></td></tr>
+
+<tr><td>5</td>
+    <td>size</td>
+    <td><tt>st_size</tt></td>
+    <td>as with <tt>file-size</tt></td></tr>
+
+<tr><td>6</td>
+    <td>access time</td>
+    <td><tt>st_atime</tt></td>
+    <td>as with <tt>file-access-time</tt></td></tr>
+
+<tr><td>7</td>
+    <td>change time</td>
+    <td><tt>st_ctime</tt></td>
+    <td>as with <tt>file-change-time</tt></td></tr>
+
+<tr><td>8</td>
+    <td>modification time</td>
+    <td><tt>st_mtime</tt></td>
+    <td>as with <tt>file-modification-time</tt></td></tr>
+
+<tr><td>9</td>
+    <td>parent device ID </td>
+    <td><tt>st_dev</tt></td>
+    <td>ID of device on which this file resides</td></tr>
+
+<tr><td>10</td>
+    <td>device ID</td>
+    <td><tt>st_rdev</tt></td>
+    <td>device ID for special files (i.e. the raw major/minor number)</td></tr>
+
+<tr><td>11</td>
+    <td>block size</td>
+    <td><tt>st_blksize</tt></td>
+    <td></td></tr>
+
+<tr><td>12</td>
+    <td>number of blocks allocated</td>
+    <td><tt>st_blocks</tt></td>
+    <td></td></tr>
+</table>
+<p>On Windows systems, the last 4 values are undefined.</p><p>By default, symbolic links are followed and the status of the referenced file is returned; however, if the optional argument <var class="arg">LINK</var> is given and not <tt>#f</tt>, the status of the link itself is returned.</p><p><var class="arg">FILE</var> may be a filename, port or file-descriptor.</p><p>Note that for very large files, the <tt>file-size</tt> value may be an inexact integer.</p></dd></dl><h4 id="sec:file-position"><a href="#sec:file-position">file-position</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-position"><span class="sig"><var class="id">file-position</var> <var class="arg">FILE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the current file position of <var class="arg">FILE</var>, which should be a port or a file-descriptor.</p></dd></dl><h4 id="sec:file-size"><a href="#sec:file-size">file-size</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-size"><span class="sig"><var class="id">file-size</var> <var class="arg">FILE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the size of the file designated by <var class="arg">FILE</var>.  <var class="arg">FILE</var> may be a filename, a file-descriptor or a port object.  If the file does not exist, an error is signaled. Note that for very large files, <tt>file-size</tt> may return an inexact integer.</p></dd></dl><h4 id="sec:file-owner"><a href="#sec:file-owner">file-owner</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-owner"><span class="sig"><var class="id">file-owner</var> <var class="arg">FILE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the user-id of <var class="arg">FILE</var> (an exact integer).  <var class="arg">FILE</var> may be a filename, a file-descriptor or a port object.</p></dd></dl><h4 id="sec:set-file-owner.21"><a href="#sec:set-file-owner.21">set-file-owner!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:set-file-owner.21"><span class="sig"><var class="id">set-file-owner!</var> <var class="arg">FILE</var> <var class="arg">UID</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><var class="dsssl">set!</var> (<var class="id">file-owner</var> <var class="arg">FILE</var>) <var class="arg">UID</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Changes the ownership of <var class="arg">FILE</var> to user-id <var class="arg">UID</var> (which should be an exact integer) using the <tt>chown()</tt> system call.  <var class="arg">FILE</var> may be a filename, a file-descriptor or a port object.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h4 id="sec:file-group"><a href="#sec:file-group">file-group</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-group"><span class="sig"><var class="id">file-group</var> <var class="arg">FILE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the group-id of <var class="arg">FILE</var>.  <var class="arg">FILE</var> may be a filename, a file-descriptor or a port object.</p></dd></dl><h4 id="sec:set-file-group.21"><a href="#sec:set-file-group.21">set-file-group!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:set-file-group.21"><span class="sig"><var class="id">set-file-group!</var> <var class="arg">FILE</var> <var class="arg">GID</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><var class="dsssl">set!</var> (<var class="id">file-group</var> <var class="arg">FILE</var>) <var class="arg">GID</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Changes the group ownership of <var class="arg">FILE</var> to group-id <var class="arg">GID</var> (which should be an exact integer) using the <tt>chgrp()</tt> system call. <var class="arg">FILE</var> may be a filename, a file-descriptor or a port object.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h4 id="sec:file-permissions"><a href="#sec:file-permissions">file-permissions</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-permissions"><span class="sig"><var class="id">file-permissions</var> <var class="arg">FILE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the permission bits for <var class="arg">FILE</var>. You can test this value by performing bitwise operations on the result and the <tt>perm/...</tt> values.  <var class="arg">FILE</var> may be a filename, a file-descriptor or a port object.</p></dd></dl><h4 id="sec:set-file-permissions.21"><a href="#sec:set-file-permissions.21">set-file-permissions!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:set-file-permissions.21"><span class="sig"><var class="id">set-file-permissions!</var> <var class="arg">FILE</var> <var class="arg">MODE</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><var class="dsssl">set!</var> (<var class="id">file-permissions</var> <var class="arg">FILE</var>) <var class="arg">MODE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Changes the current permission bits for <var class="arg">FILE</var> to <var class="arg">MODE</var> using the <tt>chmod()</tt> system call.  The <tt>perm/...</tt> variables contain the various permission bits and can be combinded with the <tt>bitwise-ior</tt> procedure.  <var class="arg">FILE</var> may be a filename, a file-descriptor or a port object, <var class="arg">MODE</var> should be a fixnum.</p></dd></dl><h4 id="sec:file-truncate"><a href="#sec:file-truncate">file-truncate</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-truncate"><span class="sig"><var class="id">file-truncate</var> <var class="arg">FILE</var> <var class="arg">OFFSET</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Truncates the file <var class="arg">FILE</var> to the length <var class="arg">OFFSET</var>, which should be an integer. If the file-size is smaller or equal to <var class="arg">OFFSET</var> then nothing is done.  <var class="arg">FILE</var> should be a filename, a file-descriptor or a port object.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h4 id="sec:set-file-position.21"><a href="#sec:set-file-position.21">set-file-position!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:set-file-position.21"><span class="sig"><var class="id">set-file-position!</var> <var class="arg">FILE</var> <var class="arg">POSITION</var> <var class="dsssl">#!optional</var> <var class="arg">WHENCE</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><var class="dsssl">set!</var> (<var class="id">file-position</var> <var class="arg">FILE</var>) <var class="arg">POSITION</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Sets the current read/write position of <var class="arg">FILE</var> to <var class="arg">POSITION</var>, which should be an exact integer. <var class="arg">FILE</var> should be a port or a file-descriptor.  <var class="arg">WHENCE</var> specifies how the position is to interpreted and should be one of the values <tt>seek/set, seek/cur</tt> and <tt>seek/end</tt>. It defaults to <tt>seek/set</tt>.</p><p>Exceptions: <tt>(exn bounds)</tt>, <tt>(exn i/o file)</tt></p></dd></dl><h4 id="sec:file-creation-mode"><a href="#sec:file-creation-mode">file-creation-mode</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-creation-mode"><span class="sig"><var class="id">file-creation-mode</var> <var class="dsssl">#!optional</var> <var class="arg">MODE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the initial file permissions used for newly created files (as with <tt>umask(2)</tt>).  If <var class="arg">MODE</var> is supplied, the mode is changed to this value.  You can set the mode by executing</p><pre> (set! (file-creation-mode) MODE)</pre><p>or</p><pre> (file-creation-mode MODE)</pre><p>where <var class="arg">MODE</var> is a bitwise combination of one or more of the <tt>perm/...</tt> flags.</p></dd></dl><h3 id="sec:Hard_and_symbolic_links"><a href="#sec:Hard_and_symbolic_links">Hard and symbolic links</a></h3><h4 id="sec:file-link"><a href="#sec:file-link">file-link</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-link"><span class="sig"><var class="id">file-link</var> <var class="arg">OLDNAME</var> <var class="arg">NEWNAME</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Creates a hard link from <var class="arg">OLDNAME</var> to <var class="arg">NEWNAME</var> (both strings).</p></dd></dl><h4 id="sec:symbolic-link.3f"><a href="#sec:symbolic-link.3f">symbolic-link?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:symbolic-link.3f"><span class="sig"><var class="id">symbolic-link?</var> <var class="arg">FILE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns true, if <var class="arg">FILE</var> names a symbolic link. If no such file exists, <tt>#f</tt> is returned.  This operation does not follow symbolic links itself. <var class="arg">FILE</var> could be a filename, file descriptor or port object.</p></dd></dl><h4 id="sec:create-symbolic-link"><a href="#sec:create-symbolic-link">create-symbolic-link</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:create-symbolic-link"><span class="sig"><var class="id">create-symbolic-link</var> <var class="arg">OLDNAME</var> <var class="arg">NEWNAME</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Creates a symbolic link with the filename <var class="arg">NEWNAME</var> that points to the file named <var class="arg">OLDNAME</var>.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h4 id="sec:read-symbolic-link"><a href="#sec:read-symbolic-link">read-symbolic-link</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:read-symbolic-link"><span class="sig"><var class="id">read-symbolic-link</var> <var class="arg">FILENAME</var> <var class="dsssl">#!optional</var> <var class="arg">CANONICALIZE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the filename to which the symbolic link <var class="arg">FILENAME</var> points. If <var class="arg">CANONICALIZE</var> is given and true, then symbolic links are resolved repeatedly until the result is not a link.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h3 id="sec:File_descriptors_and_low-level_I.2fO"><a href="#sec:File_descriptors_and_low-level_I.2fO">File descriptors and low-level I/O</a></h3><h4 id="sec:duplicate-fileno"><a href="#sec:duplicate-fileno">duplicate-fileno</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:duplicate-fileno"><span class="sig"><var class="id">duplicate-fileno</var> <var class="arg">OLD</var> <var class="dsssl">#!optional</var> <var class="arg">NEW</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>If <var class="arg">NEW</var> is given, then the file-descriptor <var class="arg">NEW</var> is opened to access the file with the file-descriptor <var class="arg">OLD</var>. Otherwise a fresh file-descriptor accessing the same file as <var class="arg">OLD</var> is returned.</p></dd></dl><h4 id="sec:file-close"><a href="#sec:file-close">file-close</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-close"><span class="sig"><var class="id">file-close</var> <var class="arg">FILENO</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Closes the input/output file with the file-descriptor <var class="arg">FILENO</var>.</p></dd></dl><h4 id="sec:file-open"><a href="#sec:file-open">file-open</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-open"><span class="sig"><var class="id">file-open</var> <var class="arg">FILENAME</var> <var class="arg">FLAGS</var> <var class="dsssl">#!optional</var> <var class="arg">MODE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Opens the file specified with the string <var class="arg">FILENAME</var> and open-flags <var class="arg">FLAGS</var> using the C function <tt>open(2)</tt>. On success a file-descriptor for the opened file is returned.</p><p><var class="arg">FLAGS</var> is a bitmask of <tt>open/...</tt> values <b>or</b>ed together using <tt>bitwise-ior</tt> (or simply added together).  You must provide exactly one of the access flags <tt>open/rdonly</tt>, <tt>open/wronly</tt>, or <tt>open/rdwr</tt>.  Additionally, you may provide zero or more creation flags (<tt>open/creat</tt>, <tt>open/excl</tt>, <tt>open/trunc</tt>, and <tt>open/noctty</tt>) and status flags (the remaining <tt>open/...</tt> values).  For example, to open a possibly new output file for appending:</p><pre>(file-open &quot;/tmp/hen.txt&quot; (+ open/wronly open/append open/creat))</pre><p>The optional <var class="arg">MODE</var> should be a bitmask composed of one or more permission values like <tt>perm/irusr</tt> and is only relevant when a new file is created. The default mode is <tt>perm/irwxu | perm/irgrp | perm/iroth</tt>.</p></dd></dl><h4 id="sec:file-mkstemp"><a href="#sec:file-mkstemp">file-mkstemp</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-mkstemp"><span class="sig"><var class="id">file-mkstemp</var> <var class="arg">TEMPLATE-FILENAME</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Create a file based on the given <var class="arg">TEMPLATE-FILENAME</var>, in which the six last characters must be <i>XXXXXX</i>.  These will be replaced with a string that makes the filename unique.  The file descriptor of the created file and the generated filename is returned.  See the <tt>mkstemp(3)</tt> manual page for details on how this function works.  The template string given is not modified.</p><p>Example usage:</p>
+<pre class="highlight colorize"> <span class="paren1">(<span class="default">let-values <span class="paren2">(<span class="default"><span class="paren3">(<span class="default"><span class="paren4">(<span class="default">fd temp-path</span>)</span> <span class="paren4">(<span class="default">file-mkstemp <span class="string">&quot;/tmp/mytemporary.XXXXXX&quot;</span></span>)</span></span>)</span></span>)</span>
+  <span class="paren2">(<span class="default"><i><span class="symbol">let</span></i> <span class="paren3">(<span class="default"><span class="paren4">(<span class="default">temp-port <span class="paren5">(<span class="default">open-output-file* fd</span>)</span></span>)</span></span>)</span>
+    <span class="paren3">(<span class="default">format temp-port <span class="string">&quot;This file is ~A.~%&quot;</span> temp-path</span>)</span>
+    <span class="paren3">(<span class="default">close-output-port temp-port</span>)</span></span>)</span></span>)</span></pre></dd></dl><h4 id="sec:file-read"><a href="#sec:file-read">file-read</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-read"><span class="sig"><var class="id">file-read</var> <var class="arg">FILENO</var> <var class="arg">SIZE</var> <var class="dsssl">#!optional</var> <var class="arg">BUFFER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Reads <var class="arg">SIZE</var> bytes from the file with the file-descriptor <var class="arg">FILENO</var>.  If a string or bytevector is passed in the optional argument <var class="arg">BUFFER</var>, then this string will be destructively modified to contain the read data. This procedure returns a list with two values: the buffer containing the data and the number of bytes read.</p></dd></dl><h4 id="sec:file-select"><a href="#sec:file-select">file-select</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-select"><span class="sig"><var class="id">file-select</var> <var class="arg">READFDLIST</var> <var class="arg">WRITEFDLIST</var> <var class="dsssl">#!optional</var> <var class="arg">TIMEOUT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Waits until any of the file-descriptors given in the lists <var class="arg">READFDLIST</var> and <var class="arg">WRITEFDLIST</var> is ready for input or output, respectively. If the optional argument <var class="arg">TIMEOUT</var> is given and not false, then it should specify the number of seconds after which the wait is to be aborted (the value may be a float). This procedure returns two values: the lists of file-descriptors ready for input and output, respectively. <var class="arg">READFDLIST</var> and <var class="arg">WRITEFDLIST</var> may also be file-descriptors instead of lists.  In this case the returned values are booleans indicating whether input/output is ready by <tt>#t</tt> or <tt>#f</tt> otherwise.  You can also pass <tt>#f</tt> as <var class="arg">READFDLIST</var> or <var class="arg">WRITEFDLIST</var> argument, which is equivalent to <tt>()</tt>.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h4 id="sec:file-write"><a href="#sec:file-write">file-write</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-write"><span class="sig"><var class="id">file-write</var> <var class="arg">FILENO</var> <var class="arg">BUFFER</var> <var class="dsssl">#!optional</var> <var class="arg">SIZE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Writes the contents of the string or bytevector <var class="arg">BUFFER</var> into the file with the file-descriptor <var class="arg">FILENO</var>. If the optional argument <var class="arg">SIZE</var> is given, then only the specified number of bytes are written.</p></dd></dl><h4 id="sec:file-control"><a href="#sec:file-control">file-control</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-control"><span class="sig"><var class="id">file-control</var> <var class="arg">FILENO</var> <var class="arg">COMMAND</var> <var class="dsssl">#!optional</var> <var class="arg">ARGUMENT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Performs the fcntl operation <var class="arg">COMMAND</var> with the given <var class="arg">FILENO</var> and optional <var class="arg">ARGUMENT</var>. The return value is meaningful depending on the <var class="arg">COMMAND</var>.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h4 id="sec:open-input-file.2a"><a href="#sec:open-input-file.2a">open-input-file*</a></h4><h4 id="sec:open-output-file.2a"><a href="#sec:open-output-file.2a">open-output-file*</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:open-input-file.2a"><span class="sig"><var class="id">open-input-file*</var> <var class="arg">FILENO</var> <var class="dsssl">#!optional</var> <var class="arg">OPENMODE</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:open-output-file.2a"><span class="sig"><var class="id">open-output-file*</var> <var class="arg">FILENO</var> <var class="dsssl">#!optional</var> <var class="arg">OPENMODE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Opens file for the file-descriptor <var class="arg">FILENO</var> for input or output and returns a port.  <var class="arg">FILENO</var> should be a positive exact integer. <var class="arg">OPENMODE</var> specifies an additional mode for opening the file (currently only the keyword <tt>#:append</tt> is supported, which opens an output-file for appending).</p></dd></dl><h4 id="sec:port-.3efileno"><a href="#sec:port-.3efileno">port-&gt;fileno</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:port-.3efileno"><span class="sig"><var class="id">port-&gt;fileno</var> <var class="arg">PORT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>If <var class="arg">PORT</var> is a file- or tcp-port, then a file-descriptor is returned for this port. Otherwise an error is signaled.</p></dd></dl><h3 id="sec:Record_locking"><a href="#sec:Record_locking">Record locking</a></h3><p>These procedures are all unsupported on native Windows builds (all except cygwin).</p><h4 id="sec:file-lock"><a href="#sec:file-lock">file-lock</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-lock"><span class="sig"><var class="id">file-lock</var> <var class="arg">PORT</var> <var class="dsssl">#!optional</var> <var class="arg">START</var> <var class="arg">LEN</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Locks the file associated with <var class="arg">PORT</var> for reading or writing (according to whether <var class="arg">PORT</var> is an input- or output-port). <var class="arg">START</var> specifies the starting position in the file to be locked and defaults to 0. <var class="arg">LEN</var> specifies the length of the portion to be locked and defaults to <tt>#t</tt>, which means the complete file. <tt>file-lock</tt> returns a <i>lock</i>-object.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h4 id="sec:file-lock.2fblocking"><a href="#sec:file-lock.2fblocking">file-lock/blocking</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-lock.2fblocking"><span class="sig"><var class="id">file-lock/blocking</var> <var class="arg">PORT</var> <var class="dsssl">#!optional</var> <var class="arg">START</var> <var class="arg">LEN</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Similar to <tt>file-lock</tt>, but if a lock is held on the file, the current process blocks (including all threads) until the lock is released.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h4 id="sec:file-test-lock"><a href="#sec:file-test-lock">file-test-lock</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-test-lock"><span class="sig"><var class="id">file-test-lock</var> <var class="arg">PORT</var> <var class="dsssl">#!optional</var> <var class="arg">START</var> <var class="arg">LEN</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Tests whether the file associated with <var class="arg">PORT</var> is locked for reading or writing (according to whether <var class="arg">PORT</var> is an input- or output-port) and returns either <tt>#f</tt> or the process-id of the locking process.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h4 id="sec:file-unlock"><a href="#sec:file-unlock">file-unlock</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-unlock"><span class="sig"><var class="id">file-unlock</var> <var class="arg">LOCK</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Unlocks the previously locked portion of a file given in <var class="arg">LOCK</var>.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20file%29.html">Module (chicken file)</a></p><p>Next: <a href="Module%20%28chicken%20fixnum%29.html">Module (chicken fixnum)</a></p></div></div></body></html>

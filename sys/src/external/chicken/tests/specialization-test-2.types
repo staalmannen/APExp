@@ -1,0 +1,3 @@
+;; -*- Scheme -*-
+(specialize-me (procedure specialize-me (fixnum) fixnum)
+	       ((fixnum) #(1)))

@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken string)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_string.29">Module (chicken string)</a>
+<ul>
+<li><a href="#sec:conc">conc</a></li>
+<li><a href="#sec:-.3estring">-&gt;string</a></li>
+<li><a href="#sec:string-chop">string-chop</a></li>
+<li><a href="#sec:string-chomp">string-chomp</a></li>
+<li><a href="#sec:string-compare3">string-compare3</a></li>
+<li><a href="#sec:string-intersperse">string-intersperse</a></li>
+<li><a href="#sec:string-split">string-split</a></li>
+<li><a href="#sec:string-translate">string-translate</a></li>
+<li><a href="#sec:string-translate.2a">string-translate*</a></li>
+<li><a href="#sec:substring.3d.3f">substring=?</a></li>
+<li><a href="#sec:substring-index">substring-index</a></li>
+<li><a href="#sec:reverse-list-.3estring">reverse-list-&gt;string</a></li>
+<li><a href="#sec:reverse-string-append">reverse-string-append</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_string.29"><a href="#sec:Module_.28chicken_string.29">Module (chicken string)</a></h2><p>This module contains procedures which can perform various useful string operations.</p><h3 id="sec:conc"><a href="#sec:conc">conc</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:conc"><span class="sig"><var class="id">conc</var> <var class="arg">X</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a string with the string-represenation of all arguments concatenated together. <tt>conc</tt> could be implemented as</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> <span class="paren2">(<span class="default">conc . args</span>)</span>
+  <span class="paren2">(<span class="default">apply string-append <span class="paren3">(<span class="default">map -&gt;string args</span>)</span></span>)</span> </span>)</span></pre></dd></dl><h3 id="sec:-.3estring"><a href="#sec:-.3estring">-&gt;string</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:-.3estring"><span class="sig"><var class="id">-&gt;string</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a string-representation of <var class="arg">X</var>.</p></dd></dl><h3 id="sec:string-chop"><a href="#sec:string-chop">string-chop</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:string-chop"><span class="sig"><var class="id">string-chop</var> <var class="arg">STRING</var> <var class="arg">LENGTH</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a list of substrings taken by <i>chopping</i> <var class="arg">STRING</var> every <var class="arg">LENGTH</var> characters:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">string-chop <span class="string">&quot;one two three&quot;</span> 4</span>)</span>  ==&gt;  <span class="paren1">(<span class="default"><span class="string">&quot;one &quot;</span> <span class="string">&quot;two &quot;</span> <span class="string">&quot;thre&quot;</span> <span class="string">&quot;e&quot;</span></span>)</span></pre></dd></dl><h3 id="sec:string-chomp"><a href="#sec:string-chomp">string-chomp</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:string-chomp"><span class="sig"><var class="id">string-chomp</var> <var class="arg">STRING</var> <var class="dsssl">#!optional</var> <var class="arg">SUFFIX</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>If <var class="arg">STRING</var> ends with <var class="arg">SUFFIX</var>, then this procedure returns a copy of its first argument with the suffix removed, otherwise returns <var class="arg">STRING</var> unchanged. <var class="arg">SUFFIX</var> defaults to <tt>&quot;\n&quot;</tt>.</p></dd></dl><h3 id="sec:string-compare3"><a href="#sec:string-compare3">string-compare3</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:string-compare3"><span class="sig"><var class="id">string-compare3</var> <var class="arg">STRING1</var> <var class="arg">STRING2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:string-compare3-ci"><span class="sig"><var class="id">string-compare3-ci</var> <var class="arg">STRING1</var> <var class="arg">STRING2</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Perform a three-way comparison between the <var class="arg">STRING1</var> and <var class="arg">STRING2</var>, returning either <tt>-1</tt> if <var class="arg">STRING1</var> is lexicographically less than <var class="arg">STRING2</var>, <tt>0</tt> if it is equal, or <tt>1</tt> if it s greater. <tt>string-compare3-ci</tt> performs a case-insensitive comparison.</p></dd></dl><h3 id="sec:string-intersperse"><a href="#sec:string-intersperse">string-intersperse</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:string-intersperse"><span class="sig"><var class="id">string-intersperse</var> <var class="arg">LIST</var> <var class="dsssl">#!optional</var> <var class="arg">STRING</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a string that contains all strings in <var class="arg">LIST</var> concatenated together.  <var class="arg">STRING</var> is placed between each concatenated string and defaults to <tt>&quot; &quot;</tt>.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">string-intersperse &#x27;<span class="paren2">(<span class="default"><span class="string">&quot;one&quot;</span> <span class="string">&quot;two&quot;</span></span>)</span> <span class="string">&quot;three&quot;</span></span>)</span></pre><p>is equivalent to</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">apply string-append <span class="paren2">(<span class="default">intersperse &#x27;<span class="paren3">(<span class="default"><span class="string">&quot;one&quot;</span> <span class="string">&quot;two&quot;</span></span>)</span> <span class="string">&quot;three&quot;</span></span>)</span></span>)</span></pre></dd></dl><h3 id="sec:string-split"><a href="#sec:string-split">string-split</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:string-split"><span class="sig"><var class="id">string-split</var> <var class="arg">STRING</var> <var class="dsssl">#!optional</var> <var class="arg">DELIMITER-STRING</var> <var class="arg">KEEPEMPTY</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Split string into substrings delimited by any of the characters given in the delimiter string. If no delimiters are specified, a string comprising the tab, newline and space characters is assumed. If the parameter <var class="arg">KEEPEMPTY</var> is given and not <tt>#f</tt>, then empty substrings are retained:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">string-split <span class="string">&quot;one  two  three&quot;</span></span>)</span> ==&gt; <span class="paren1">(<span class="default"><span class="string">&quot;one&quot;</span> <span class="string">&quot;two&quot;</span> <span class="string">&quot;three&quot;</span></span>)</span>
+<span class="paren1">(<span class="default">string-split <span class="string">&quot;foo:bar::baz:&quot;</span> <span class="string">&quot;:&quot;</span> #t</span>)</span> ==&gt; <span class="paren1">(<span class="default"><span class="string">&quot;foo&quot;</span> <span class="string">&quot;bar&quot;</span> <span class="string">&quot;&quot;</span> <span class="string">&quot;baz&quot;</span> <span class="string">&quot;&quot;</span></span>)</span>
+<span class="paren1">(<span class="default">string-split <span class="string">&quot;foo:bar:baz,quux,zot&quot;</span> <span class="string">&quot;:,&quot;</span> </span>)</span> ==&gt; <span class="paren1">(<span class="default"><span class="string">&quot;foo&quot;</span> <span class="string">&quot;bar&quot;</span> <span class="string">&quot;baz&quot;</span> <span class="string">&quot;quux&quot;</span> <span class="string">&quot;zot&quot;</span></span>)</span></pre></dd></dl><h3 id="sec:string-translate"><a href="#sec:string-translate">string-translate</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:string-translate"><span class="sig"><var class="id">string-translate</var> <var class="arg">STRING</var> <var class="arg">FROM</var> <var class="dsssl">#!optional</var> <var class="arg">TO</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a fresh copy of <var class="arg">STRING</var> with characters matching <var class="arg">FROM</var> translated to <var class="arg">TO</var>.  If <var class="arg">TO</var> is omitted, then matching characters are removed. <var class="arg">FROM</var> and <var class="arg">TO</var> may be a character, a string or a list. If both <var class="arg">FROM</var> and <var class="arg">TO</var> are strings, then the character at the same position in <var class="arg">TO</var> as the matching character in <var class="arg">FROM</var> is substituted.</p></dd></dl><h3 id="sec:string-translate.2a"><a href="#sec:string-translate.2a">string-translate*</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:string-translate.2a"><span class="sig"><var class="id">string-translate*</var> <var class="arg">STRING</var> <var class="arg">SMAP</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Substitutes elements of <var class="arg">STRING</var> according to <var class="arg">SMAP</var>. <var class="arg">SMAP</var> should be an association-list where each element of the list is a pair of the form <tt>(MATCH . REPLACEMENT)</tt>. Every occurrence of the string <tt>MATCH</tt> in <var class="arg">STRING</var> will be replaced by the string <tt>REPLACEMENT</tt>:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">string-translate*
+  <span class="string">&quot;&lt;h1&gt;this is a </span><span class="string">\&quot;</span><span class="string">string</span><span class="string">\&quot;</span><span class="string">&lt;/h1&gt;&quot;</span>
+  &#x27;<span class="paren2">(<span class="default"><span class="paren3">(<span class="default"><span class="string">&quot;&lt;&quot;</span> . <span class="string">&quot;&amp;lt;&quot;</span></span>)</span> <span class="paren3">(<span class="default"><span class="string">&quot;&gt;&quot;</span> . <span class="string">&quot;&amp;gt;&quot;</span></span>)</span> <span class="paren3">(<span class="default"><span class="string">&quot;</span><span class="string">\&quot;</span><span class="string">&quot;</span> . <span class="string">&quot;&amp;quot;&quot;</span></span>)</span></span>)</span> </span>)</span>
+=&gt;  <span class="string">&quot;&amp;lt;h1&amp;gt;this is a &amp;quot;string&amp;quot;&amp;lt;/h1&amp;gt;&quot;</span></pre></dd></dl><h3 id="sec:substring.3d.3f"><a href="#sec:substring.3d.3f">substring=?</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:substring.3d.3f"><span class="sig"><var class="id">substring=?</var> <var class="arg">STRING1</var> <var class="arg">STRING2</var> <var class="dsssl">#!optional</var> <var class="arg">START1</var> <var class="arg">START2</var> <var class="arg">LENGTH</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:substring-ci.3d.3f"><span class="sig"><var class="id">substring-ci=?</var> <var class="arg">STRING1</var> <var class="arg">STRING2</var> <var class="dsssl">#!optional</var> <var class="arg">START1</var> <var class="arg">START2</var> <var class="arg">LENGTH</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if the strings <var class="arg">STRING1</var> and <var class="arg">STRING2</var> are equal, or <tt>#f</tt> otherwise.  The comparison starts at the positions <var class="arg">START1</var> and <var class="arg">START2</var> (which default to 0), comparing <var class="arg">LENGTH</var> characters (which defaults to the minimum of the remaining length of both strings).</p></dd></dl><h3 id="sec:substring-index"><a href="#sec:substring-index">substring-index</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:substring-index"><span class="sig"><var class="id">substring-index</var> <var class="arg">MAYBE-SUBSTRING</var> <var class="arg">STRING</var> <var class="dsssl">#!optional</var> <var class="arg">START</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:substring-index-ci"><span class="sig"><var class="id">substring-index-ci</var> <var class="arg">MAYBE-SUBSTRING</var> <var class="arg">STRING</var> <var class="dsssl">#!optional</var> <var class="arg">START</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Searches for first index in string <var class="arg">STRING</var> where string <var class="arg">MAYBE-SUBSTRING</var> occurs.  If the optional argument <var class="arg">START</var> is given, then the search starts at that index.  <tt>substring-index-ci</tt> is a case-insensitive version of <tt>substring-index</tt>.</p></dd></dl><h3 id="sec:reverse-list-.3estring"><a href="#sec:reverse-list-.3estring">reverse-list-&gt;string</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:reverse-list-.3estring"><span class="sig"><var class="id">reverse-list-&gt;string</var> <var class="arg">LIST</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a string with the characters in <var class="arg">LIST</var> in reverse order. This is equivalent to <tt>(list-&gt;string (reverse LIST))</tt>, but much more efficient.</p></dd></dl><h3 id="sec:reverse-string-append"><a href="#sec:reverse-string-append">reverse-string-append</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:reverse-string-append"><span class="sig"><var class="id">reverse-string-append</var> <var class="arg">LIST</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p><tt>(apply string-append (reverse LIST))</tt></p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20sort%29.html">Module (chicken sort)</a></p><p>Next: <a href="Module%20%28chicken%20syntax%29.html">Module (chicken syntax)</a></p></div></div></body></html>

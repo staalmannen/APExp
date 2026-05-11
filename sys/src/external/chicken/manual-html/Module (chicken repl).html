@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken repl)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_repl.29">Module (chicken repl)</a>
+<ul>
+<li><a href="#sec:repl">repl</a></li>
+<li><a href="#sec:repl-prompt">repl-prompt</a></li>
+<li><a href="#sec:quit">quit</a></li>
+<li><a href="#sec:reset">reset</a></li>
+<li><a href="#sec:reset-handler">reset-handler</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_repl.29"><a href="#sec:Module_.28chicken_repl.29">Module (chicken repl)</a></h2><p>This module provides procedures you can use to create your own Read-Eval-Print Loop (REPL).</p><h3 id="sec:repl"><a href="#sec:repl">repl</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:repl"><span class="sig"><var class="id">repl</var> <var class="dsssl">#!optional</var> <var class="arg">EVALUATOR</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Start a new read-eval-print loop. Sets the <tt>reset-handler</tt> so that any invocation of <tt>reset</tt> restarts the read-eval-print loop. Also changes the current exception-handler to display a message, write any arguments to the value of <tt>(current-error-port)</tt> and reset.</p><p>If <var class="arg">EVALUATOR</var> is given, it should be a procedure of one argument that is used in place of <tt>eval</tt> to evaluate each entered expression.</p><p>You can use <tt>quit</tt> to terminate the current read-eval-print loop. Encountering end-of-file also terminates the current REPL.</p></dd></dl><h3 id="sec:repl-prompt"><a href="#sec:repl-prompt">repl-prompt</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:repl-prompt"><span class="sig"><var class="id">repl-prompt</var></span><span class="type">parameter</span></dt>
+<dd class="defsig"><p>A procedure that should evaluate to a string that will be printed before reading interactive input from the user in a read-eval-print loop. Defaults to <tt>(lambda () &quot;#;N&gt; &quot;)</tt>.</p></dd></dl><h3 id="sec:quit"><a href="#sec:quit">quit</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:quit"><span class="sig"><var class="id">quit</var> <var class="dsssl">#!optional</var> <var class="arg">RESULT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>In the interpreter <tt>quit</tt> exits the currently active read-eval-print loop.  In compiled code, it is equivalent to calling <tt>exit</tt>. See also the <tt>repl</tt> procedure.</p></dd></dl><h3 id="sec:reset"><a href="#sec:reset">reset</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:reset"><span class="sig"><var class="id">reset</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Reset program (Invokes <tt>reset-handler</tt>).</p></dd></dl><h3 id="sec:reset-handler"><a href="#sec:reset-handler">reset-handler</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:reset-handler"><span class="sig"><var class="id">reset-handler</var></span><span class="type">parameter</span></dt>
+<dd class="defsig"><p>A procedure of zero arguments that is called via <tt>reset</tt>. The default behavior in compiled code is to invoke the value of <tt>(exit-handler)</tt>. The default behavior in the interpreter is to abort the current computation and to restart the read-eval-print loop.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20read-syntax%29.html">Module (chicken read-syntax)</a></p><p>Next: <a href="Module%20%28chicken%20sort%29.html">Module (chicken sort)</a></p></div></div></body></html>

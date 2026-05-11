@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken port)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_port.29">Module (chicken port)</a>
+<ul>
+<li><a href="#sec:Port_attributes">Port attributes</a>
+<ul>
+<li><a href="#sec:port-name">port-name</a></li>
+<li><a href="#sec:port-position">port-position</a></li>
+<li><a href="#sec:set-port-name.21">set-port-name!</a></li></ul></li>
+<li><a href="#sec:Setting_the_file_buffering_mode">Setting the file buffering mode</a>
+<ul>
+<li><a href="#sec:set-buffering-mode.21">set-buffering-mode!</a></li></ul></li>
+<li><a href="#sec:Terminal_ports">Terminal ports</a>
+<ul>
+<li><a href="#sec:terminal-name">terminal-name</a></li>
+<li><a href="#sec:terminal-port.3f">terminal-port?</a></li>
+<li><a href="#sec:terminal-size">terminal-size</a></li></ul></li>
+<li><a href="#sec:Input.2foutput_port_extensions">Input/output port extensions</a>
+<ul>
+<li><a href="#sec:with-output-to-port">with-output-to-port</a></li>
+<li><a href="#sec:make-input-port">make-input-port</a></li>
+<li><a href="#sec:make-output-port">make-output-port</a></li>
+<li><a href="#sec:with-error-output-to-port">with-error-output-to-port</a></li>
+<li><a href="#sec:with-input-from-port">with-input-from-port</a></li></ul></li>
+<li><a href="#sec:String-port_extensions">String-port extensions</a>
+<ul>
+<li><a href="#sec:call-with-input-string">call-with-input-string</a></li>
+<li><a href="#sec:call-with-output-string">call-with-output-string</a></li>
+<li><a href="#sec:with-input-from-string">with-input-from-string</a></li>
+<li><a href="#sec:with-output-to-string">with-output-to-string</a></li>
+<li><a href="#sec:with-error-output-to-string">with-error-output-to-string</a></li></ul></li>
+<li><a href="#sec:Port_iterators">Port iterators</a>
+<ul>
+<li><a href="#sec:port-for-each">port-for-each</a></li>
+<li><a href="#sec:port-map">port-map</a></li>
+<li><a href="#sec:port-fold">port-fold</a></li>
+<li><a href="#sec:copy-port">copy-port</a></li></ul></li>
+<li><a href="#sec:Funky_ports">Funky ports</a>
+<ul>
+<li><a href="#sec:make-bidirectional-port">make-bidirectional-port</a></li>
+<li><a href="#sec:make-broadcast-port">make-broadcast-port</a></li>
+<li><a href="#sec:make-concatenated-port">make-concatenated-port</a></li></ul></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_port.29"><a href="#sec:Module_.28chicken_port.29">Module (chicken port)</a></h2><p>This module contains various extended port definitions.</p><p>All errors related to failing port operations will signal a condition of kind <tt>exn</tt>.</p><ul><li>New in CHICKEN 5.4.0: Errors caused by underlying C calls that change errno will produce a condition object with an <tt>errno</tt> property, which can be accessed with <tt>(get-condition-property &lt;the-condition-object&gt; 'exn 'errno)</tt>.</li>
+</ul>
+<h3 id="sec:Port_attributes"><a href="#sec:Port_attributes">Port attributes</a></h3><h4 id="sec:port-name"><a href="#sec:port-name">port-name</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:port-name"><span class="sig"><var class="id">port-name</var> <var class="dsssl">#!optional</var> <var class="arg">PORT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Fetch filename from <var class="arg">PORT</var>. This returns the filename that was used to open this file. Returns a special tag string, enclosed into parentheses for non-file ports. <var class="arg">PORT</var> defaults to the value of <tt>(current-input-port)</tt>.</p></dd></dl><h4 id="sec:port-position"><a href="#sec:port-position">port-position</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:port-position"><span class="sig"><var class="id">port-position</var> <var class="dsssl">#!optional</var> <var class="arg">PORT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the current position of <var class="arg">PORT</var> as two values: row and column number. If the port does not support such an operation an error is signaled. This procedure is currently only available for input ports. <var class="arg">PORT</var> defaults to the value of <tt>(current-input-port)</tt>.</p></dd></dl><h4 id="sec:set-port-name.21"><a href="#sec:set-port-name.21">set-port-name!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:set-port-name.21"><span class="sig"><var class="id">set-port-name!</var> <var class="arg">PORT</var> <var class="arg">STRING</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Sets the name of <var class="arg">PORT</var> to <var class="arg">STRING</var>.</p></dd></dl><h3 id="sec:Setting_the_file_buffering_mode"><a href="#sec:Setting_the_file_buffering_mode">Setting the file buffering mode</a></h3><h4 id="sec:set-buffering-mode.21"><a href="#sec:set-buffering-mode.21">set-buffering-mode!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:set-buffering-mode.21"><span class="sig"><var class="id">set-buffering-mode!</var> <var class="arg">PORT</var> <var class="arg">MODE</var> <var class="dsssl">#!optional</var> <var class="arg">BUFSIZE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Sets the buffering-mode for the file associated with <var class="arg">PORT</var> to <var class="arg">MODE</var>, which should be one of the keywords <tt>#:full</tt>, <tt>#:line</tt> or <tt>#:none</tt>. If <var class="arg">BUFSIZE</var> is specified it determines the size of the buffer to be used (if any).</p><p>This procedure doesn't work on custom ports, such as those created with <tt>make-input-port</tt> or <tt>make-output-port</tt>.</p></dd></dl><h3 id="sec:Terminal_ports"><a href="#sec:Terminal_ports">Terminal ports</a></h3><h4 id="sec:terminal-name"><a href="#sec:terminal-name">terminal-name</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:terminal-name"><span class="sig"><var class="id">terminal-name</var> <var class="arg">PORT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the name of the terminal that is connected to <var class="arg">PORT</var>.</p><p>On Windows, this procedure always raises an exception.</p></dd></dl><h4 id="sec:terminal-port.3f"><a href="#sec:terminal-port.3f">terminal-port?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:terminal-port.3f"><span class="sig"><var class="id">terminal-port?</var> <var class="arg">PORT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">PORT</var> is connected to a terminal and <tt>#f</tt> otherwise.</p></dd></dl><h4 id="sec:terminal-size"><a href="#sec:terminal-size">terminal-size</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:terminal-size"><span class="sig"><var class="id">terminal-size</var> <var class="arg">PORT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns two values, the number of rows and columns of the terminal that is connected to <var class="arg">PORT</var> or <tt>0</tt>, <tt>0</tt> if the terminal size can not be obtained.</p><p>On Windows, this procedure always raises an exception.</p></dd></dl><h3 id="sec:Input.2foutput_port_extensions"><a href="#sec:Input.2foutput_port_extensions">Input/output port extensions</a></h3><h4 id="sec:with-output-to-port"><a href="#sec:with-output-to-port">with-output-to-port</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:with-output-to-port"><span class="sig"><var class="id">with-output-to-port</var> <var class="arg">PORT</var> <var class="arg">THUNK</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Call procedure <var class="arg">THUNK</var> with the current output-port temporarily bound to <var class="arg">PORT</var>.</p></dd></dl><h4 id="sec:make-input-port"><a href="#sec:make-input-port">make-input-port</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:make-input-port"><span class="sig"><var class="id">make-input-port</var> <var class="arg">READ-CHAR</var> <var class="arg">CHAR-READY?</var> <var class="arg">CLOSE</var> <var class="dsssl">#!optional</var> <var class="arg">PEEK-CHAR</var> <var class="arg">READ-STRING!</var> <var class="arg">READ-LINE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a custom input port. Common operations on this port are handled by the given parameters, which should be procedures of no arguments.  The following arguments are all different kinds of reader procedures:</p><ul><li><var class="arg">READ-CHAR</var> is the most fundamental reader, and must always be present.  It is a thunk which is called when the next character is to be read and it should return a character or <tt>#!eof</tt>.</li>
+<li><var class="arg">CHAR-READY?</var> is a thunk which is called when <tt>char-ready?</tt> is called on this port and should return <tt>#t</tt> or <tt>#f</tt>.</li>
+<li><var class="arg">CLOSE</var> is a thunk which is called when the port is closed.</li>
+<li><var class="arg">PEEK-CHAR</var> is a thunk which is called when <tt>peek-char</tt> is called on this port and should return a character or <tt>#!eof</tt>. If it is not provided or <tt>#f</tt>, <var class="arg">READ-CHAR</var> will be used instead and the created port object handles peeking automatically (by calling <tt>READ</tt> and buffering the character).</li>
+<li><var class="arg">READ-STRING!</var> is called when <tt>read-string!</tt> is called (or the higher-level non-mutating <tt>read-string</tt>).  It will be invoked with 4 arguments: the port created by <tt>make-input-port</tt>, the number of bytes to read, a string (or sometimes a blob) to read into (which may be assumed to be big enough to hold the data) and the offset into the buffer at which to put the data to read.  It should return the number of bytes that have successfully been read, which should always be equal to the requested bytes unless EOF was hit, in which case it can be less.  If this procedure is not provided or <tt>#f</tt>, the buffer will be filled by repeated reads to <var class="arg">READ-CHAR</var>.</li>
+<li><var class="arg">READ-LINE</var> is called when <tt>read-line</tt> is called.  It will be invoked with two arguments: the port created by <tt>make-input-port</tt> and the maximum number of characters to read (or <tt>#f</tt>).  If this procedure is not provided or <tt>#f</tt>, the buffer will be filled by repeated reads to <var class="arg">READ-CHAR</var>.</li>
+</ul>
+<p>All the optional procedures except for <var class="arg">PEEK-CHAR</var> are responsible for updating the port's position, which currently can only be done via low-level slot accessors like <tt>##sys#setslot</tt>; slot 4 is the row number (ie, the line) and slot 5 is the column number (ie, the character on the line).  If the port's positions are not updated, <tt>port-position</tt> won't work.</p></dd></dl><h4 id="sec:make-output-port"><a href="#sec:make-output-port">make-output-port</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:make-output-port"><span class="sig"><var class="id">make-output-port</var> <var class="arg">WRITE</var> <var class="arg">CLOSE</var> <var class="dsssl">#!optional</var> <var class="arg">FLUSH</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a custom output port. Common operations on this port are handled by the given parameters, which should be procedures.  <var class="arg">WRITE</var> is called when output is sent to the port and receives a single argument, a string.  <var class="arg">CLOSE</var> is called when the port is closed and should be a procedure of no arguments. <var class="arg">FLUSH</var> (if provided) is called for flushing the output port.</p></dd></dl><h4 id="sec:with-error-output-to-port"><a href="#sec:with-error-output-to-port">with-error-output-to-port</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:with-error-output-to-port"><span class="sig"><var class="id">with-error-output-to-port</var> <var class="arg">PORT</var> <var class="arg">THUNK</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Call procedure <var class="arg">THUNK</var> with the current error output-port temporarily bound to <var class="arg">PORT</var>.</p></dd></dl><h4 id="sec:with-input-from-port"><a href="#sec:with-input-from-port">with-input-from-port</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:with-input-from-port"><span class="sig"><var class="id">with-input-from-port</var> <var class="arg">PORT</var> <var class="arg">THUNK</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Call procedure <var class="arg">THUNK</var> with the current input-port temporarily bound to <var class="arg">PORT</var>.</p></dd></dl><h3 id="sec:String-port_extensions"><a href="#sec:String-port_extensions">String-port extensions</a></h3><h4 id="sec:call-with-input-string"><a href="#sec:call-with-input-string">call-with-input-string</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:call-with-input-string"><span class="sig"><var class="id">call-with-input-string</var> <var class="arg">STRING</var> <var class="arg">PROC</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Calls the procedure <var class="arg">PROC</var> with a single argument that is a string-input-port with the contents of <var class="arg">STRING</var>.</p></dd></dl><h4 id="sec:call-with-output-string"><a href="#sec:call-with-output-string">call-with-output-string</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:call-with-output-string"><span class="sig"><var class="id">call-with-output-string</var> <var class="arg">PROC</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Calls the procedure <var class="arg">PROC</var> with a single argument that is a string-output-port.  Returns the accumulated output-string.</p></dd></dl><h4 id="sec:with-input-from-string"><a href="#sec:with-input-from-string">with-input-from-string</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:with-input-from-string"><span class="sig"><var class="id">with-input-from-string</var> <var class="arg">STRING</var> <var class="arg">THUNK</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Call procedure <var class="arg">THUNK</var> with the current input-port temporarily bound to an input-string-port with the contents of <var class="arg">STRING</var>.</p></dd></dl><h4 id="sec:with-output-to-string"><a href="#sec:with-output-to-string">with-output-to-string</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:with-output-to-string"><span class="sig"><var class="id">with-output-to-string</var> <var class="arg">THUNK</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Call procedure <var class="arg">THUNK</var> with the current output-port temporarily bound to a string-output-port and return the accumulated output string.</p></dd></dl><h4 id="sec:with-error-output-to-string"><a href="#sec:with-error-output-to-string">with-error-output-to-string</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:with-error-output-to-string"><span class="sig"><var class="id">with-error-output-to-string</var> <var class="arg">THUNK</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Call procedure <var class="arg">THUNK</var> with the current error output-port temporarily bound to a string-output-port and return the accumulated output string.</p></dd></dl><h3 id="sec:Port_iterators"><a href="#sec:Port_iterators">Port iterators</a></h3><h4 id="sec:port-for-each"><a href="#sec:port-for-each">port-for-each</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:port-for-each"><span class="sig"><var class="id">port-for-each</var> <var class="arg">FN</var> <var class="arg">THUNK</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Apply <var class="arg">FN</var> to successive results of calling the zero argument procedure <var class="arg">THUNK</var> (typically <tt>read</tt>) until it returns <tt>#!eof</tt>, discarding the results.</p></dd></dl><h4 id="sec:port-map"><a href="#sec:port-map">port-map</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:port-map"><span class="sig"><var class="id">port-map</var> <var class="arg">FN</var> <var class="arg">THUNK</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Apply <var class="arg">FN</var> to successive results of calling the zero argument procedure <var class="arg">THUNK</var> (typically <tt>read</tt>) until it returns <tt>#!eof</tt>, returning a list of the collected results.</p></dd></dl><h4 id="sec:port-fold"><a href="#sec:port-fold">port-fold</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:port-fold"><span class="sig"><var class="id">port-fold</var> <var class="arg">FN</var> <var class="arg">ACC</var> <var class="arg">THUNK</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Apply <var class="arg">FN</var> to successive results of calling the zero argument procedure <var class="arg">THUNK</var>, (typically <tt>read</tt>) passing the <var class="arg">ACC</var> value as the second argument. The <var class="arg">FN</var> result becomes the new <var class="arg">ACC</var> value. When <var class="arg">THUNK</var> returns <tt>#!eof</tt>, the last <var class="arg">FN</var> result is returned.</p></dd></dl><h4 id="sec:copy-port"><a href="#sec:copy-port">copy-port</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:copy-port"><span class="sig"><var class="id">copy-port</var> <var class="arg">FROM</var> <var class="arg">TO</var> <var class="dsssl">#!optional</var> <var class="arg">READ</var> <var class="arg">WRITE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Reads all remaining data from port <var class="arg">FROM</var> using the reader procedure <var class="arg">READ</var> and writes it to port <var class="arg">TO</var> using the writer procedure <var class="arg">WRITE</var>. <var class="arg">READ</var> defaults to <tt>read-char</tt> and <var class="arg">WRITE</var> to <tt>write-char</tt>. Note that this procedure does not check <var class="arg">FROM</var> and <var class="arg">TO</var> for being ports, so the reader and writer procedures may perform arbitrary operations as long as they can be invoked as <tt>(READ FROM)</tt> and <tt>(WRITE X TO)</tt>, respectively. <tt>copy-port</tt> returns an undefined value.</p><p><tt>copy-port</tt> was introduced in CHICKEN 4.6.0.</p></dd></dl><h3 id="sec:Funky_ports"><a href="#sec:Funky_ports">Funky ports</a></h3><h4 id="sec:make-bidirectional-port"><a href="#sec:make-bidirectional-port">make-bidirectional-port</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:make-bidirectional-port"><span class="sig"><var class="id">make-bidirectional-port</var> <var class="arg">INPUT-PORT</var> <var class="arg">OUTPUT-PORT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a joint input/output port that proxies port operations to the given <var class="arg">INPUT-PORT</var> and <var class="arg">OUTPUT-PORT</var>, respectively. This port satisfies both <tt>input-port?</tt> and <tt>output-port?</tt>, and its two directions may be closed independently.</p></dd></dl><h4 id="sec:make-broadcast-port"><a href="#sec:make-broadcast-port">make-broadcast-port</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:make-broadcast-port"><span class="sig"><var class="id">make-broadcast-port</var> <var class="arg">PORT</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a custom output port that emits everything written into it to the ports given as <tt>PORT ...</tt>. Closing the broadcast port does not close any of the argument ports.</p></dd></dl><h4 id="sec:make-concatenated-port"><a href="#sec:make-concatenated-port">make-concatenated-port</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:make-concatenated-port"><span class="sig"><var class="id">make-concatenated-port</var> <var class="arg">PORT1</var> <var class="arg">PORT2</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a custom input port that reads its input from <var class="arg">PORT1</var>, until it is empty, then from <var class="arg">PORT2</var> and so on. Closing the concatenated port does not close any of the argument ports.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20plist%29.html">Module (chicken plist)</a></p><p>Next: <a href="Module%20%28chicken%20pretty-print%29.html">Module (chicken pretty-print)</a></p></div></div></body></html>

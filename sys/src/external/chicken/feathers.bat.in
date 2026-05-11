@@ -1,0 +1,26 @@
+@echo off
+
+rem loader for feathers.tcl, the CHICKEN debugger
+rem
+rem Copyright (c) 2015-2022, The CHICKEN Team
+rem All rights reserved.
+rem
+rem Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
+rem conditions are met:
+rem
+rem   Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+rem     disclaimer.
+rem   Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+rem     disclaimer in the documentation and/or other materials provided with the distribution.
+rem   Neither the name of the author nor the names of its contributors may be used to endorse or promote
+rem     products derived from this software without specific prior written permission.
+rem
+rem THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
+rem OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+rem AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR
+rem CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+rem CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+rem SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+rem THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+rem OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+rem POSSIBILITY OF SUCH DAMAGE.

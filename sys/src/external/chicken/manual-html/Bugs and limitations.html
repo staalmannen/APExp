@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Bugs and limitations</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main"><h2 id="sec:Bugs_and_limitations"><a href="#sec:Bugs_and_limitations">Bugs and limitations</a></h2><ul><li>Compiling large files takes too much time.</li>
+<li>If a known procedure has unused arguments, but is always called without those parameters, then the optimizer <i>repairs</i> the procedure in certain situations and removes the parameter from the lambda-list.</li>
+<li><tt>port-position</tt> currently works only for input ports.</li>
+<li>Leaf routine optimization can theoretically result in code that thrashes, if tight loops perform excessively many mutations. In practice this doesn't happen.</li>
+<li>Due to the header representation of block objects, the maximum size of a bytevector-like object (strings, blobs, srfi-4 vectors etc) is 2^24 bytes or 16MiB.  On 64-bit machines the limit is less relevant, at 2^56 bytes, or 65536 TiB (64 PiB).</li>
+<li>Like above, the maximum size of vector-like objects is 2^24 slots on 32 bit machines and 2^56 slots on 64-bit machines.</li>
+<li>Bignums are represented by bytevector objects instead of vector-like objects due to the need to treat digits as opaque data.  This limits bignums to a maximum value of 2^(2^27) on 32-bit machines and 2^(2^59) on 64-bit machines.</li>
+</ul>
+<hr /><p>Previous: <a href="Cross%20development.html">Cross development</a></p><p>Next: <a href="Acknowledgements.html">Acknowledgements</a></p></div></div></body></html>

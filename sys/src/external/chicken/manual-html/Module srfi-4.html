@@ -1,0 +1,243 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module srfi-4</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_srfi-4">Module srfi-4</a>
+<ul>
+<li><a href="#sec:CHICKEN_implementation_specifics_and_extensions">CHICKEN implementation specifics and extensions</a></li>
+<li><a href="#sec:Blob_conversions">Blob conversions</a></li>
+<li><a href="#sec:Subvectors">Subvectors</a></li>
+<li><a href="#sec:Vector_I.2fO">Vector I/O</a></li></ul></li>
+<li><a href="#sec:SRFI-4_specification">SRFI-4 specification</a>
+<ul>
+<li><a href="#sec:Datatypes">Datatypes</a></li>
+<li><a href="#sec:External_representation">External representation</a></li>
+<li><a href="#sec:Predicates">Predicates</a></li>
+<li><a href="#sec:Constructors">Constructors</a></li>
+<li><a href="#sec:Length">Length</a></li>
+<li><a href="#sec:Getters">Getters</a></li>
+<li><a href="#sec:Setters">Setters</a></li>
+<li><a href="#sec:Conversions">Conversions</a></li>
+<li><a href="#sec:Release_number_vectors_allocated_in_static_memory">Release number vectors allocated in static memory</a></li></ul></li></ul></div><h2 id="sec:Module_srfi-4"><a href="#sec:Module_srfi-4">Module srfi-4</a></h2><p>Homogeneous numeric vector datatypes.  Also see the <a href="http://srfi.schemers.org/srfi-4/srfi-4.html">original SRFI-4 document</a>.</p><p>When loaded, the feature identifier <tt>srfi-4</tt> is defined.</p><h3 id="sec:CHICKEN_implementation_specifics_and_extensions"><a href="#sec:CHICKEN_implementation_specifics_and_extensions">CHICKEN implementation specifics and extensions</a></h3><ul><li>Procedures for <a href="Module%20%28chicken%20blob%29.html">blob</a> conversion, subvectors and vector I/O are provided.</li>
+<li>SRFI-17 setters for <tt>XXXvector-ref</tt> are defined.</li>
+<li>Constructors allow allocating the storage in non garbage collected memory.</li>
+</ul>
+<h3 id="sec:Blob_conversions"><a href="#sec:Blob_conversions">Blob conversions</a></h3><p>As a SRFI-4 vector is basically just a <a href="Module%20%28chicken%20blob%29.html">blob</a> wrapped by a SRFI-4 type &quot;header object&quot; to structure its contents, there are several procedures which can convert between blobs and SRFI-4 vectors.</p>
+<dl class="defsig">
+<dt class="defsig" id="def:u8vector-.3eblob"><span class="sig"><var class="id">u8vector-&gt;blob</var> <var class="arg">U8VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s8vector-.3eblob"><span class="sig"><var class="id">s8vector-&gt;blob</var> <var class="arg">S8VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u16vector-.3eblob"><span class="sig"><var class="id">u16vector-&gt;blob</var> <var class="arg">U16VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s16vector-.3eblob"><span class="sig"><var class="id">s16vector-&gt;blob</var> <var class="arg">S16VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u32vector-.3eblob"><span class="sig"><var class="id">u32vector-&gt;blob</var> <var class="arg">U32VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s32vector-.3eblob"><span class="sig"><var class="id">s32vector-&gt;blob</var> <var class="arg">S32VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u64vector-.3eblob"><span class="sig"><var class="id">u64vector-&gt;blob</var> <var class="arg">U64VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s64vector-.3eblob"><span class="sig"><var class="id">s64vector-&gt;blob</var> <var class="arg">S64VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:f32vector-.3eblob"><span class="sig"><var class="id">f32vector-&gt;blob</var> <var class="arg">F32VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:f64vector-.3eblob"><span class="sig"><var class="id">f64vector-&gt;blob</var> <var class="arg">F64VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u8vector-.3eblob.2fshared"><span class="sig"><var class="id">u8vector-&gt;blob/shared</var> <var class="arg">U8VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s8vector-.3eblob.2fshared"><span class="sig"><var class="id">s8vector-&gt;blob/shared</var> <var class="arg">S8VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u16vector-.3eblob.2fshared"><span class="sig"><var class="id">u16vector-&gt;blob/shared</var> <var class="arg">U16VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s16vector-.3eblob.2fshared"><span class="sig"><var class="id">s16vector-&gt;blob/shared</var> <var class="arg">S16VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u32vector-.3eblob.2fshared"><span class="sig"><var class="id">u32vector-&gt;blob/shared</var> <var class="arg">U32VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s32vector-.3eblob.2fshared"><span class="sig"><var class="id">s32vector-&gt;blob/shared</var> <var class="arg">S32VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u64vector-.3eblob.2fshared"><span class="sig"><var class="id">u64vector-&gt;blob/shared</var> <var class="arg">U64VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s64vector-.3eblob.2fshared"><span class="sig"><var class="id">s64vector-&gt;blob/shared</var> <var class="arg">S64VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:f32vector-.3eblob.2fshared"><span class="sig"><var class="id">f32vector-&gt;blob/shared</var> <var class="arg">F32VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:f64vector-.3eblob.2fshared"><span class="sig"><var class="id">f64vector-&gt;blob/shared</var> <var class="arg">F64VECTOR</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Each of these procedures return the contents of the given vector as a 'packed' blob. The byte order in that vector is platform-dependent (for example little-endian on an <b>Intel</b> processor). The <tt>/shared</tt> variants return a blob that shares memory with the contents of the vector, the others will copy the contents of the SRFI-4 vector's internal blob object.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:blob-.3eu8vector"><span class="sig"><var class="id">blob-&gt;u8vector</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:blob-.3es8vector"><span class="sig"><var class="id">blob-&gt;s8vector</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:blob-.3eu16vector"><span class="sig"><var class="id">blob-&gt;u16vector</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:blob-.3es16vector"><span class="sig"><var class="id">blob-&gt;s16vector</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:blob-.3eu32vector"><span class="sig"><var class="id">blob-&gt;u32vector</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:blob-.3es32vector"><span class="sig"><var class="id">blob-&gt;s32vector</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:blob-.3eu64vector"><span class="sig"><var class="id">blob-&gt;u64vector</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:blob-.3es64vector"><span class="sig"><var class="id">blob-&gt;s64vector</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:blob-.3ef32vector"><span class="sig"><var class="id">blob-&gt;f32vector</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:blob-.3ef64vector"><span class="sig"><var class="id">blob-&gt;f64vector</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:blob-.3eu8vector.2fshared"><span class="sig"><var class="id">blob-&gt;u8vector/shared</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:blob-.3es8vector.2fshared"><span class="sig"><var class="id">blob-&gt;s8vector/shared</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:blob-.3eu16vector.2fshared"><span class="sig"><var class="id">blob-&gt;u16vector/shared</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:blob-.3es16vector.2fshared"><span class="sig"><var class="id">blob-&gt;s16vector/shared</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:blob-.3eu32vector.2fshared"><span class="sig"><var class="id">blob-&gt;u32vector/shared</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:blob-.3es32vector.2fshared"><span class="sig"><var class="id">blob-&gt;s32vector/shared</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:blob-.3eu64vector.2fshared"><span class="sig"><var class="id">blob-&gt;u64vector/shared</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:blob-.3es64vector.2fshared"><span class="sig"><var class="id">blob-&gt;s64vector/shared</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:blob-.3ef32vector.2fshared"><span class="sig"><var class="id">blob-&gt;f32vector/shared</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:blob-.3ef64vector.2fshared"><span class="sig"><var class="id">blob-&gt;f64vector/shared</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Each of these procedures return a vector where the argument <var class="arg">BLOB</var> is taken as a 'packed' representation of the contents of the vector. The <tt>/shared</tt> variants return a vector that shares memory with the contents of the blob, the others will copy the blob.</p></dd></dl><h3 id="sec:Subvectors"><a href="#sec:Subvectors">Subvectors</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:subu8vector"><span class="sig"><var class="id">subu8vector</var> <var class="arg">U8VECTOR</var> <var class="arg">FROM</var> <var class="arg">TO</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:subu16vector"><span class="sig"><var class="id">subu16vector</var> <var class="arg">U16VECTOR</var> <var class="arg">FROM</var> <var class="arg">TO</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:subu32vector"><span class="sig"><var class="id">subu32vector</var> <var class="arg">U32VECTOR</var> <var class="arg">FROM</var> <var class="arg">TO</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:subu64vector"><span class="sig"><var class="id">subu64vector</var> <var class="arg">U32VECTOR</var> <var class="arg">FROM</var> <var class="arg">TO</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:subs8vector"><span class="sig"><var class="id">subs8vector</var> <var class="arg">S8VECTOR</var> <var class="arg">FROM</var> <var class="arg">TO</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:subs16vector"><span class="sig"><var class="id">subs16vector</var> <var class="arg">S16VECTOR</var> <var class="arg">FROM</var> <var class="arg">TO</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:subs32vector"><span class="sig"><var class="id">subs32vector</var> <var class="arg">S32VECTOR</var> <var class="arg">FROM</var> <var class="arg">TO</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:subs64vector"><span class="sig"><var class="id">subs64vector</var> <var class="arg">S32VECTOR</var> <var class="arg">FROM</var> <var class="arg">TO</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:subf32vector"><span class="sig"><var class="id">subf32vector</var> <var class="arg">F32VECTOR</var> <var class="arg">FROM</var> <var class="arg">TO</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:subf64vector"><span class="sig"><var class="id">subf64vector</var> <var class="arg">F64VECTOR</var> <var class="arg">FROM</var> <var class="arg">TO</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Creates a fresh number vector of the same type as the argument vector with the elements at the positions <var class="arg">FROM</var> up to but not including <var class="arg">TO</var>.</p></dd></dl><h3 id="sec:Vector_I.2fO"><a href="#sec:Vector_I.2fO">Vector I/O</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:read-u8vector"><span class="sig"><var class="id">read-u8vector</var> <var class="dsssl">#!optional</var> <var class="arg">LENGTH</var> <var class="arg">PORT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Reads <var class="arg">LENGTH</var> bytes from the <var class="arg">PORT</var> and returns a fresh <tt>u8vector</tt>, or as many as are available before end-of-file is encountered. <var class="arg">PORT</var> defaults to the value of <tt>(current-input-port)</tt>. If no bytes are available before the end-of-file, <tt>#!eof</tt> is returned.</p><p>If <var class="arg">LENGTH</var> is <tt>#f</tt>, the vector will be filled completely until end-of-file is reached.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:read-u8vector.21"><span class="sig"><var class="id">read-u8vector!</var> <var class="arg">LENGTH</var> <var class="arg">U8VECTOR</var> <var class="dsssl">#!optional</var> <var class="arg">PORT</var> <var class="arg">START</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Reads <var class="arg">LENGTH</var> bytes from the <var class="arg">PORT</var> writing the read input into <var class="arg">U8VECTOR</var> beginning at <var class="arg">START</var> (or 0 if not given). <var class="arg">PORT</var> defaults to the value of <tt>(current-input-port)</tt>.</p><p>If <var class="arg">LENGTH</var> is <tt>#f</tt>, the vector will be filled completely until end-of-file is reached. This procedure returns the number of bytes read.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:write-u8vector"><span class="sig"><var class="id">write-u8vector</var> <var class="arg">U8VECTOR</var> <var class="dsssl">#!optional</var> <var class="arg">PORT</var> <var class="arg">START</var> <var class="arg">END</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Writes the bytes <var class="arg">U8VECTOR</var> between the indices <var class="arg">START</var> (inclusive) and <var class="arg">END</var> (exclusive) to <var class="arg">PORT</var>.</p><p><var class="arg">PORT</var> defaults to the value of <tt>(current-output-port)</tt>.</p></dd></dl><h2 id="sec:SRFI-4_specification"><a href="#sec:SRFI-4_specification">SRFI-4 specification</a></h2><p>SRFI-4 describes a set of datatypes for vectors whose elements are of the same numeric type (signed or unsigned exact integer or inexact real of a given precision). These datatypes support operations analogous to the Scheme vector type, but they are distinct datatypes. An external representation is specified which must be supported by the <tt>read</tt> and <tt>write</tt> procedures and by the program parser (i.e. programs can contain references to literal homogeneous vectors).</p><h3 id="sec:Datatypes"><a href="#sec:Datatypes">Datatypes</a></h3><p>There are 8 datatypes of exact integer homogeneous vectors (which will be called integer vectors):</p><table>
+<tr><th>Datatype</th><th>Type of elements</th></tr>
+
+<tr><td><tt>s8vector</tt></td><td>signed exact integer in the range -(2^7) to (2^7)-1</td></tr>
+
+<tr><td><tt>u8vector</tt></td><td>unsigned exact integer in the range 0 to (2^8)-1</td></tr>
+
+<tr><td><tt>s16vector</tt></td><td>signed exact integer in the range -(2^15) to (2^15)-1</td></tr>
+
+<tr><td><tt>u16vector</tt></td><td>unsigned exact integer in the range 0 to (2^16)-1</td></tr>
+
+<tr><td><tt>s32vector</tt></td><td>signed exact integer in the range -(2^31) to (2^31)-1</td></tr>
+
+<tr><td><tt>u32vector</tt></td><td>unsigned exact integer in the range 0 to (2^32)-1</td></tr>
+
+<tr><td><tt>s64vector</tt></td><td>signed exact integer in the range -(2^31) to (2^31)-1</td></tr>
+
+<tr><td><tt>u64vector</tt></td><td>unsigned exact integer in the range 0 to (2^64)-1</td></tr>
+
+<tr><td><tt>s64vector</tt></td><td>signed exact integer in the range -(2^63) to (2^63)-1</td></tr>
+
+<tr><td><tt>u64vector</tt></td><td>unsigned exact integer in the range 0 to (2^64)-1</td></tr>
+</table>
+<p>There are 2 datatypes of inexact real homogeneous vectors (which will be called float vectors):</p><table>
+<tr><th>Datatype</th><th>Type of elements</th></tr>
+
+<tr><td><tt>f32vector</tt></td><td>inexact real</td></tr>
+
+<tr><td><tt>f64vector</tt></td><td>inexact real</td></tr>
+</table>
+<p>The only difference between the two float vector types is that <tt>f64vector</tt>s preserve at least as much precision as <tt>f32vector</tt>s.</p><p>Each homogeneous vector datatype has an external representation which is supported by the <tt>read</tt> and <tt>write</tt> procedures and by the program parser. Each datatype also has a set of associated predefined procedures analogous to those available for Scheme's heterogeneous vectors.</p><h3 id="sec:External_representation"><a href="#sec:External_representation">External representation</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:.23u8"><span class="sig"><tt>#u8</tt></span><span class="type">read</span></dt>
+<dt class="defsig" id="def:.23u16"><span class="sig"><tt>#u16</tt></span><span class="type">read</span></dt>
+<dt class="defsig" id="def:.23u32"><span class="sig"><tt>#u32</tt></span><span class="type">read</span></dt>
+<dt class="defsig" id="def:.23s8"><span class="sig"><tt>#s8</tt></span><span class="type">read</span></dt>
+<dt class="defsig" id="def:.23s16"><span class="sig"><tt>#s16</tt></span><span class="type">read</span></dt>
+<dt class="defsig" id="def:.23s32"><span class="sig"><tt>#s32</tt></span><span class="type">read</span></dt>
+<dt class="defsig" id="def:.23f32"><span class="sig"><tt>#f32</tt></span><span class="type">read</span></dt>
+<dt class="defsig" id="def:.23f64"><span class="sig"><tt>#f64</tt></span><span class="type">read</span></dt>
+<dd class="defsig"><p>The external representation of instances of the datatype <tt>XXXvector</tt> is <tt>#XXX( ...elements... )</tt>.</p><p>For example,</p><pre>#u8(0 #e1e2 #xff)  ; a u8vector of length 3 containing 0, 100, 255
+#f64(-1.5)         ; a f64vector of length 1 containing -1.5.</pre><p>This external representation is also available in program source code. For example,</p><pre>(set! x '#u8(1 2 3))</pre><p>will set <tt>x</tt> to the object <tt>#u8(1 2 3)</tt>. Since CHICKEN 4.9.0, literal homogeneous vectors do not have to be quoted. Homogeneous vectors can appear in quasiquotations but must not contain <tt>unquote</tt> or <tt>unquote-splicing</tt> forms.  <i>I.e.</i>,</p><pre>`(,x #u8(1 2))        ; legal
+`#u8(1 ,x 2)          ; illegal</pre><p>Elements may also be characters or strings, in that case they are interpreted as a sequence of numerical character codes. For example,</p><pre>'#u8(#\x7f &quot;EL&quot; #\F 2 1)</pre><p>is equivalent to</p><pre>'#u8(#\x7f #\x45 #\x4c #\x46 2 1)</pre><p>Character literals inside numeric vectors expand into the UTF-8 sequence of the characters they represent, for strings the contained characters are interpreted in whatever encoding is used for the text file or stream in which the literal appears.</p><p>Note that <tt>#u8&quot;...&quot;</tt> can be used as an abbreviation for the special case <tt>#u8(&quot;...&quot;)</tt>.</p></dd></dl><h3 id="sec:Predicates"><a href="#sec:Predicates">Predicates</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:u8vector.3f"><span class="sig"><var class="id">u8vector?</var> <var class="arg">OBJ</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s8vector.3f"><span class="sig"><var class="id">s8vector?</var> <var class="arg">OBJ</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u16vector.3f"><span class="sig"><var class="id">u16vector?</var> <var class="arg">OBJ</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s16vector.3f"><span class="sig"><var class="id">s16vector?</var> <var class="arg">OBJ</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u32vector.3f"><span class="sig"><var class="id">u32vector?</var> <var class="arg">OBJ</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s32vector.3f"><span class="sig"><var class="id">s32vector?</var> <var class="arg">OBJ</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u64vector.3f"><span class="sig"><var class="id">u64vector?</var> <var class="arg">OBJ</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s64vector.3f"><span class="sig"><var class="id">s64vector?</var> <var class="arg">OBJ</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:f32vector.3f"><span class="sig"><var class="id">f32vector?</var> <var class="arg">OBJ</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:f64vector.3f"><span class="sig"><var class="id">f64vector?</var> <var class="arg">OBJ</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Return <tt>#t</tt> if <tt>obj</tt> is an object of the specified type or <tt>#f</tt> if not.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:number-vector.3f"><span class="sig"><var class="id">number-vector?</var> <var class="arg">OBJ</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Return <tt>#t</tt> if <tt>obj</tt> is a number vector, <tt>#f</tt> if not.  A &quot;number vector&quot; is any of the homogeneous number vector types defined by SRFI-4, ie it's one of <tt>u8vector</tt>, <tt>s8vector</tt>, <tt>u16vector</tt>, <tt>s16vector</tt>, <tt>u32vector</tt>, <tt>s32vector</tt>, <tt>u64vector</tt>, <tt>s64vector</tt>, <tt>f32vector</tt> or <tt>f64vector</tt>).</p></dd></dl><h3 id="sec:Constructors"><a href="#sec:Constructors">Constructors</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:make-u8vector"><span class="sig"><tt>(make-u8vector N [U8VALUE NONGC FINALIZE])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:make-s8vector"><span class="sig"><tt>(make-s8vector N [S8VALUE NONGC FINALIZE])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:make-u16vector"><span class="sig"><tt>(make-u16vector N [U16VALUE NONGC FINALIZE])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:make-s16vector"><span class="sig"><tt>(make-s16vector N [S16VALUE NONGC FINALIZE])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:make-u32vector"><span class="sig"><tt>(make-u32vector N [U32VALUE NONGC FINALIZE])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:make-s32vector"><span class="sig"><tt>(make-s32vector N [S32VALUE NONGC FINALIZE])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:make-u64vector"><span class="sig"><tt>(make-u64vector N [U64VALUE NONGC FINALIZE])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:make-s64vector"><span class="sig"><tt>(make-s64vector N [S64VALUE NONGC FINALIZE])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:make-f32vector"><span class="sig"><tt>(make-f32vector N [F32VALUE NONGC FINALIZE])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:make-f64vector"><span class="sig"><tt>(make-f64vector N [F64VALUE NONGC FINALIZE])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Return a newly-allocated SRFI-4 homogeneous number vector of length N.</p><p>If the optional fill VALUE is specified, it specifies the initial value for each slot in the vector.  If not, the content of the vector is unspecified as the underlying memory is uninitialized. Particularly this means that entries in <tt>f32vector</tt> or <tt>f64vector</tt> may be i.e. a NaN-value.</p><p>The type of the fill value must be compatible with the elements of the vector datatype.  It is an error if otherwise -- for example, if an inexact integer is passed to <tt>make-u8vector</tt>.</p><p>On CHICKEN, these procedures have been extended to allow allocating the storage in non-garbage collected memory, as follows:</p><p>The optional arguments <tt>NONGC</tt> and <tt>FINALIZE</tt> define whether the vector should be allocated in a memory area not subject to garbage collection and whether the associated storage should be automatically freed (using finalization) when there are no references from Scheme variables and data.  <tt>NONGC</tt> defaults to <tt>#f</tt> (the vector will be located in normal garbage collected memory) and <tt>FINALIZE</tt> defaults to <tt>#t</tt>. Note that the <tt>FINALIZE</tt> argument is only used when <tt>NONGC</tt> is true.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:u8vector"><span class="sig"><var class="id">u8vector</var> <var class="arg">U8VALUE</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s8vector"><span class="sig"><var class="id">s8vector</var> <var class="arg">S8VALUE</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u16vector"><span class="sig"><var class="id">u16vector</var> <var class="arg">U16VALUE</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s16vector"><span class="sig"><var class="id">s16vector</var> <var class="arg">S16VALUE</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u32vector"><span class="sig"><var class="id">u32vector</var> <var class="arg">U32VALUE</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s32vector"><span class="sig"><var class="id">s32vector</var> <var class="arg">S32VALUE</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u64vector"><span class="sig"><var class="id">u64vector</var> <var class="arg">U64VALUE</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s64vector"><span class="sig"><var class="id">s64vector</var> <var class="arg">S64VALUE</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:f32vector"><span class="sig"><var class="id">f32vector</var> <var class="arg">F32VALUE</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:f64vector"><span class="sig"><var class="id">f64vector</var> <var class="arg">F64VALUE</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Return a newly-allocated SRFI-4 homogeneous number vector of the specified type, composed of the arguments.</p></dd></dl><h3 id="sec:Length"><a href="#sec:Length">Length</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:u8vector-length"><span class="sig"><var class="id">u8vector-length</var> <var class="arg">U8VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s8vector-length"><span class="sig"><var class="id">s8vector-length</var> <var class="arg">S8VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u16vector-length"><span class="sig"><var class="id">u16vector-length</var> <var class="arg">U16VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s16vector-length"><span class="sig"><var class="id">s16vector-length</var> <var class="arg">S16VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u32vector-length"><span class="sig"><var class="id">u32vector-length</var> <var class="arg">U32VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s32vector-length"><span class="sig"><var class="id">s32vector-length</var> <var class="arg">S32VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u64vector-length"><span class="sig"><var class="id">u64vector-length</var> <var class="arg">U64VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s64vector-length"><span class="sig"><var class="id">s64vector-length</var> <var class="arg">S64VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:f32vector-length"><span class="sig"><var class="id">f32vector-length</var> <var class="arg">F32VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:f64vector-length"><span class="sig"><var class="id">f64vector-length</var> <var class="arg">F64VECTOR</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the length of the SRFI-4 homogeneous number VECTOR.</p></dd></dl><h3 id="sec:Getters"><a href="#sec:Getters">Getters</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:u8vector-ref"><span class="sig"><var class="id">u8vector-ref</var> <var class="arg">U8VECTOR</var> <var class="arg">I</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s8vector-ref"><span class="sig"><var class="id">s8vector-ref</var> <var class="arg">S8VECTOR</var> <var class="arg">i</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u16vector-ref"><span class="sig"><var class="id">u16vector-ref</var> <var class="arg">U16VECTOR</var> <var class="arg">I</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s16vector-ref"><span class="sig"><var class="id">s16vector-ref</var> <var class="arg">S16VECTOR</var> <var class="arg">I</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u32vector-ref"><span class="sig"><var class="id">u32vector-ref</var> <var class="arg">U32VECTOR</var> <var class="arg">I</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s32vector-ref"><span class="sig"><var class="id">s32vector-ref</var> <var class="arg">S32VECTOR</var> <var class="arg">I</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u64vector-ref"><span class="sig"><var class="id">u64vector-ref</var> <var class="arg">U64VECTOR</var> <var class="arg">I</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s64vector-ref"><span class="sig"><var class="id">s64vector-ref</var> <var class="arg">S64VECTOR</var> <var class="arg">I</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:f32vector-ref"><span class="sig"><var class="id">f32vector-ref</var> <var class="arg">F32VECTOR</var> <var class="arg">I</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:f64vector-ref"><span class="sig"><var class="id">f64vector-ref</var> <var class="arg">F64VECTOR</var> <var class="arg">I</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Return the value of the <i>i</i>th element of the SRFI-4 homogeneous number vector, where <var class="arg">I</var> is a nonnegative exact integer less than the length of the vector.</p></dd></dl><h3 id="sec:Setters"><a href="#sec:Setters">Setters</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:u8vector-set.21"><span class="sig"><var class="id">u8vector-set!</var> <var class="arg">U8VECTOR</var> <var class="arg">I</var> <var class="arg">U8VALUE</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s8vector-set.21"><span class="sig"><var class="id">s8vector-set!</var> <var class="arg">S8VECTOR</var> <var class="arg">I</var> <var class="arg">S8VALUE</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u16vector-set.21"><span class="sig"><var class="id">u16vector-set!</var> <var class="arg">U16VECTOR</var> <var class="arg">I</var> <var class="arg">U16VALUE</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s16vector-set.21"><span class="sig"><var class="id">s16vector-set!</var> <var class="arg">S16VECTOR</var> <var class="arg">I</var> <var class="arg">S16VALUE</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u32vector-set.21"><span class="sig"><var class="id">u32vector-set!</var> <var class="arg">U32VECTOR</var> <var class="arg">I</var> <var class="arg">U32VALUE</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s32vector-set.21"><span class="sig"><var class="id">s32vector-set!</var> <var class="arg">S32VECTOR</var> <var class="arg">I</var> <var class="arg">S32VALUE</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u64vector-set.21"><span class="sig"><var class="id">u64vector-set!</var> <var class="arg">U64VECTOR</var> <var class="arg">I</var> <var class="arg">U64VALUE</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s64vector-set.21"><span class="sig"><var class="id">s64vector-set!</var> <var class="arg">S64VECTOR</var> <var class="arg">I</var> <var class="arg">S64VALUE</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:f32vector-set.21"><span class="sig"><var class="id">f32vector-set!</var> <var class="arg">F32VECTOR</var> <var class="arg">I</var> <var class="arg">F32VALUE</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:f64vector-set.21"><span class="sig"><var class="id">f64vector-set!</var> <var class="arg">F64VECTOR</var> <var class="arg">I</var> <var class="arg">F64VALUE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Set the <tt>i</tt>th element of the SRFI-4 homogeneous number VECTOR to VALUE.  <var class="arg">I</var> is a nonnegative exact integer less than the length of the vector and VALUE must be the same type as the elements of the vector datatype.</p><p>Additionally, SRFI-17 setters are defined on all <tt>xxxvector-ref</tt> procedures.  For example, to set the <tt>i</tt>th element of SRFI-4 <tt>u8vector</tt> to <tt>u8value</tt>:</p><pre>(set! (u8vector-ref u8vector i) u8value)</pre></dd></dl><h3 id="sec:Conversions"><a href="#sec:Conversions">Conversions</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:u8vector-.3elist"><span class="sig"><var class="id">u8vector-&gt;list</var> <var class="arg">U8VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s8vector-.3elist"><span class="sig"><var class="id">s8vector-&gt;list</var> <var class="arg">S8VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u16vector-.3elist"><span class="sig"><var class="id">u16vector-&gt;list</var> <var class="arg">U16VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s16vector-.3elist"><span class="sig"><var class="id">s16vector-&gt;list</var> <var class="arg">S16VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u32vector-.3elist"><span class="sig"><var class="id">u32vector-&gt;list</var> <var class="arg">U32VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s32vector-.3elist"><span class="sig"><var class="id">s32vector-&gt;list</var> <var class="arg">S32VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:u64vector-.3elist"><span class="sig"><var class="id">u64vector-&gt;list</var> <var class="arg">U64VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:s64vector-.3elist"><span class="sig"><var class="id">s64vector-&gt;list</var> <var class="arg">S64VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:f32vector-.3elist"><span class="sig"><var class="id">f32vector-&gt;list</var> <var class="arg">F32VECTOR</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:f64vector-.3elist"><span class="sig"><var class="id">f64vector-&gt;list</var> <var class="arg">F64VECTOR</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Return a list consisting of the elements of SRFI-4 homogeneous number VECTOR.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:list-.3eu8vector"><span class="sig"><var class="id">list-&gt;u8vector</var> <var class="arg">U8LIST</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:list-.3es8vector"><span class="sig"><var class="id">list-&gt;s8vector</var> <var class="arg">S8LIST</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:list-.3eu16vector"><span class="sig"><var class="id">list-&gt;u16vector</var> <var class="arg">U16LIST</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:list-.3es16vector"><span class="sig"><var class="id">list-&gt;s16vector</var> <var class="arg">S16LIST</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:list-.3eu32vector"><span class="sig"><var class="id">list-&gt;u32vector</var> <var class="arg">U32LIST</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:list-.3es32vector"><span class="sig"><var class="id">list-&gt;s32vector</var> <var class="arg">S32LIST</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:list-.3eu64vector"><span class="sig"><var class="id">list-&gt;u64vector</var> <var class="arg">U64LIST</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:list-.3es64vector"><span class="sig"><var class="id">list-&gt;s64vector</var> <var class="arg">S64LIST</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:list-.3ef32vector"><span class="sig"><var class="id">list-&gt;f32vector</var> <var class="arg">F32LIST</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:list-.3ef64vector"><span class="sig"><var class="id">list-&gt;f64vector</var> <var class="arg">F64LIST</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Return a newly-allocated SRFI-4 homogeneous number VECTOR consisting of the elements of LIST.  Each element of LIST must be compatible with the datatype of VECTOR.</p></dd></dl><h3 id="sec:Release_number_vectors_allocated_in_static_memory"><a href="#sec:Release_number_vectors_allocated_in_static_memory">Release number vectors allocated in static memory</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:release-number-vector"><span class="sig"><var class="id">release-number-vector</var> <var class="arg">NVECTOR</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Release the storage of a SRFI-4 vector that was allocated in non-garbage collected memory (for example using the <tt>NONGC</tt> argument for one of the <tt>make-XXXvector</tt> constructor procedures). The effect of calling this procedure with a number vector allocated in normal garbage collected memory is undefined.</p></dd></dl><hr /><p>Previous: <a href="Module%20r4rs.html">Module r4rs</a></p><p>Next: <a href="Module%20%28chicken%20base%29.html">Module (chicken base)</a></p></div></div></body></html>

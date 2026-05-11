@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken continuation)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_continuation.29">Module (chicken continuation)</a>
+<ul>
+<li><a href="#sec:Continuations_API">Continuations API</a>
+<ul>
+<li><a href="#sec:continuation-capture">continuation-capture</a></li>
+<li><a href="#sec:continuation.3f">continuation?</a></li>
+<li><a href="#sec:continuation-graft">continuation-graft</a></li>
+<li><a href="#sec:continuation-return">continuation-return</a></li></ul></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_continuation.29"><a href="#sec:Module_.28chicken_continuation.29">Module (chicken continuation)</a></h2><p>This module provides a more powerful interface for continuations than that provided by <tt>call/cc</tt>.</p><p>More information about this continuation API can be found in the paper <a href="http://www.iro.umontreal.ca/~feeley/papers/FeeleySW01.pdf">A Better API for First-Class Continuations</a> by Marc Feeley.</p><h3 id="sec:Continuations_API"><a href="#sec:Continuations_API">Continuations API</a></h3><h4 id="sec:continuation-capture"><a href="#sec:continuation-capture">continuation-capture</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:continuation-capture"><span class="sig"><var class="id">continuation-capture</var> <var class="arg">PROCEDURE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Creates a continuation object representing the current continuation and tail-calls <var class="arg">PROCEDURE</var> with this continuation as the single argument.</p></dd></dl><h4 id="sec:continuation.3f"><a href="#sec:continuation.3f">continuation?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:continuation.3f"><span class="sig"><var class="id">continuation?</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">X</var> is a continuation object, or <tt>#f</tt> otherwise. Please note that this applies only to continuations created by the Continuation API, but not by call/cc, i.e.: <tt>(call-with-current-continuation continuation?)</tt> returns <tt>#f</tt>, whereas <tt>(continuation-capture continuation?)</tt> returns <tt>#t</tt>.</p></dd></dl><h4 id="sec:continuation-graft"><a href="#sec:continuation-graft">continuation-graft</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:continuation-graft"><span class="sig"><var class="id">continuation-graft</var> <var class="arg">CONT</var> <var class="arg">THUNK</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Calls the procedure <var class="arg">THUNK</var> with no arguments and the implicit continuation <var class="arg">CONT</var>.</p></dd></dl><h4 id="sec:continuation-return"><a href="#sec:continuation-return">continuation-return</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:continuation-return"><span class="sig"><var class="id">continuation-return</var> <var class="arg">CONT</var> <var class="arg">VALUE</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the value(s) to the continuation <var class="arg">CONT</var>. <tt>continuation-return</tt> could be implemented like this:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> <span class="paren2">(<span class="default">continuation-return k . vals</span>)</span>
+  <span class="paren2">(<span class="default">continuation-graft
+    k
+    <span class="paren3">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren4">(<span class="default"></span>)</span> <span class="paren4">(<span class="default">apply values vals</span>)</span></span>)</span></span>)</span></span>)</span></pre></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20condition%29.html">Module (chicken condition)</a></p><p>Next: <a href="Module%20%28chicken%20csi%29.html">Module (chicken csi)</a></p></div></div></body></html>

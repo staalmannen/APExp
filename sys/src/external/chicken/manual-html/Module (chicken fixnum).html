@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken fixnum)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_fixnum.29">Module (chicken fixnum)</a>
+<ul>
+<li><a href="#sec:Arithmetic_fixnum_operations">Arithmetic fixnum operations</a></li>
+<li><a href="#sec:Overflow-aware_fixnum_operations">Overflow-aware fixnum operations</a></li>
+<li><a href="#sec:Fixnum_comparison_and_predicates">Fixnum comparison and predicates</a></li>
+<li><a href="#sec:Fixnum_limits">Fixnum limits</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_fixnum.29"><a href="#sec:Module_.28chicken_fixnum.29">Module (chicken fixnum)</a></h2><p>Because CHICKEN supports a full numeric tower, operations can sometimes incur a substantial overhead to simply detect the type of numbers you're passing in.  When you know you're definitely dealing only with fixnums, you can choose to use fixnum-specific operations to avoid this overhead.</p><p>This is purely a performance hack.  You might want to consider adding <a href="Types.html">type annotations</a> instead, this often gives the same performance boost without having to rewrite all numeric operators in your code.</p><h3 id="sec:Arithmetic_fixnum_operations"><a href="#sec:Arithmetic_fixnum_operations">Arithmetic fixnum operations</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:fx.2b"><span class="sig"><var class="id">fx+</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fx-"><span class="sig"><var class="id">fx-</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fx.2a"><span class="sig"><var class="id">fx*</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fx.2f"><span class="sig"><var class="id">fx/</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fxmod"><span class="sig"><var class="id">fxmod</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fxrem"><span class="sig"><var class="id">fxrem</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fxneg"><span class="sig"><var class="id">fxneg</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fxmin"><span class="sig"><var class="id">fxmin</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fxmax"><span class="sig"><var class="id">fxmax</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fxand"><span class="sig"><var class="id">fxand</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fxior"><span class="sig"><var class="id">fxior</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fxxor"><span class="sig"><var class="id">fxxor</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fxnot"><span class="sig"><var class="id">fxnot</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fxshl"><span class="sig"><var class="id">fxshl</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fxshr"><span class="sig"><var class="id">fxshr</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fxgcd"><span class="sig"><var class="id">fxgcd</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p><tt>fx+</tt> and friends are arithmetic fixnum operations.  These procedures do not check their arguments, so non-fixnum parameters will result in incorrect results. <tt>fxneg</tt> negates its argument.</p><p>On division by zero, <tt>fx/</tt>, <tt>fxmod</tt> and <tt>fxrem</tt> signal a condition of kind <tt>(exn arithmetic)</tt>.</p><p><tt>fxshl</tt> and <tt>fxshr</tt> perform arithmetic shift left and right, respectively.</p></dd></dl><h3 id="sec:Overflow-aware_fixnum_operations"><a href="#sec:Overflow-aware_fixnum_operations">Overflow-aware fixnum operations</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:fx.2b.3f"><span class="sig"><var class="id">fx+?</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fx-.3f"><span class="sig"><var class="id">fx-?</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fx.2a.3f"><span class="sig"><var class="id">fx*?</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fx.2f.3f"><span class="sig"><var class="id">fx/?</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These procedures behave similarly to their standard counterparts with the exception that <tt>#f</tt> is returned if an argument is not a fixnum or the result of the operation overflows.</p><p>Chaining of such procedures is well-defined and causes the overflow error to be propagated.</p></dd></dl><h3 id="sec:Fixnum_comparison_and_predicates"><a href="#sec:Fixnum_comparison_and_predicates">Fixnum comparison and predicates</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:fxodd.3f"><span class="sig"><var class="id">fxodd?</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fxeven.3f"><span class="sig"><var class="id">fxeven?</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fx.3d"><span class="sig"><var class="id">fx=</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fx.3e"><span class="sig"><var class="id">fx&gt;</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fx.3c"><span class="sig"><var class="id">fx&lt;</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fx.3e.3d"><span class="sig"><var class="id">fx&gt;=</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fx.3c.3d"><span class="sig"><var class="id">fx&lt;=</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Comparison of fixnums and predicates on them.</p></dd></dl><h3 id="sec:Fixnum_limits"><a href="#sec:Fixnum_limits">Fixnum limits</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:most-positive-fixnum"><span class="sig"><var class="id">most-positive-fixnum</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:most-negative-fixnum"><span class="sig"><var class="id">most-negative-fixnum</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:fixnum-bits"><span class="sig"><var class="id">fixnum-bits</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:fixnum-precision"><span class="sig"><var class="id">fixnum-precision</var></span><span class="type">constant</span></dt>
+<dd class="defsig"><p>Platform-specific fixnum limits.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20file%20posix%29.html">Module (chicken file posix)</a></p><p>Next: <a href="Module%20%28chicken%20flonum%29.html">Module (chicken flonum)</a></p></div></div></body></html>

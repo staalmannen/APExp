@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken memory representation)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_memory_representation.29">Module (chicken memory representation)</a>
+<ul>
+<li><a href="#sec:Extending_procedures_with_data">Extending procedures with data</a>
+<ul>
+<li><a href="#sec:extend-procedure">extend-procedure</a></li>
+<li><a href="#sec:extended-procedure.3f">extended-procedure?</a></li>
+<li><a href="#sec:procedure-data">procedure-data</a></li>
+<li><a href="#sec:set-procedure-data.21">set-procedure-data!</a></li></ul></li>
+<li><a href="#sec:Low-level_data_access">Low-level data access</a>
+<ul>
+<li><a href="#sec:vector-like.3f">vector-like?</a></li>
+<li><a href="#sec:block-ref">block-ref</a></li>
+<li><a href="#sec:block-set.21">block-set!</a></li>
+<li><a href="#sec:number-of-slots">number-of-slots</a></li>
+<li><a href="#sec:number-of-bytes">number-of-bytes</a></li>
+<li><a href="#sec:object-copy">object-copy</a></li></ul></li>
+<li><a href="#sec:Record_instance">Record instance</a>
+<ul>
+<li><a href="#sec:make-record-instance">make-record-instance</a></li>
+<li><a href="#sec:record-instance.3f">record-instance?</a></li>
+<li><a href="#sec:record-instance-type">record-instance-type</a></li>
+<li><a href="#sec:record-instance-length">record-instance-length</a></li>
+<li><a href="#sec:record-instance-slot">record-instance-slot</a></li>
+<li><a href="#sec:record-instance-slot-set.21">record-instance-slot-set!</a></li>
+<li><a href="#sec:record-.3evector">record-&gt;vector</a></li></ul></li>
+<li><a href="#sec:Magic">Magic</a>
+<ul>
+<li><a href="#sec:object-become.21">object-become!</a></li>
+<li><a href="#sec:mutate-procedure.21">mutate-procedure!</a></li></ul></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_memory_representation.29"><a href="#sec:Module_.28chicken_memory_representation.29">Module (chicken memory representation)</a></h2><p>The procedures from this module operate on the in-memory representation of Scheme objects.  These procedures <i>are</i> safe, so, for example, unlike the procedures from <tt>(chicken memory)</tt> these procedures <i>will</i> type-check and range-check their arguments, but you still need to know what you're doing because the effects may be surprising for the uninitiated.</p><h3 id="sec:Extending_procedures_with_data"><a href="#sec:Extending_procedures_with_data">Extending procedures with data</a></h3><h4 id="sec:extend-procedure"><a href="#sec:extend-procedure">extend-procedure</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:extend-procedure"><span class="sig"><var class="id">extend-procedure</var> <var class="arg">PROCEDURE</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a copy of the procedure <var class="arg">PROCEDURE</var> which contains an additional data slot initialized to <var class="arg">X</var>. If <var class="arg">PROCEDURE</var> is already an extended procedure, then its data slot is changed to contain <var class="arg">X</var> and the same procedure is returned. Signals an error when <var class="arg">PROCEDURE</var> is not a procedure.</p></dd></dl><h4 id="sec:extended-procedure.3f"><a href="#sec:extended-procedure.3f">extended-procedure?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:extended-procedure.3f"><span class="sig"><var class="id">extended-procedure?</var> <var class="arg">PROCEDURE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">PROCEDURE</var> is an extended procedure, or <tt>#f</tt> otherwise.</p></dd></dl><h4 id="sec:procedure-data"><a href="#sec:procedure-data">procedure-data</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:procedure-data"><span class="sig"><var class="id">procedure-data</var> <var class="arg">PROCEDURE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the data object contained in the extended procedure <var class="arg">PROCEDURE</var>, or <tt>#f</tt> if it is not an extended procedure.</p></dd></dl><h4 id="sec:set-procedure-data.21"><a href="#sec:set-procedure-data.21">set-procedure-data!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:set-procedure-data.21"><span class="sig"><var class="id">set-procedure-data!</var> <var class="arg">PROCEDURE</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Changes the data object contained in the extended procedure <var class="arg">PROCEDURE</var> to <var class="arg">X</var>. Signals an error when <var class="arg">PROCEDURE</var> is not an extended procedure.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> foo
+  <span class="paren2">(<span class="default">letrec <span class="paren3">(<span class="default"><span class="paren4">(<span class="default">f <span class="paren5">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren6">(<span class="default"></span>)</span> <span class="paren6">(<span class="default">procedure-data x</span>)</span></span>)</span></span>)</span>
+           <span class="paren4">(<span class="default">x #f</span>)</span> </span>)</span>
+    <span class="paren3">(<span class="default">set! x <span class="paren4">(<span class="default">extend-procedure f 123</span>)</span></span>)</span>
+    x</span>)</span> </span>)</span>
+<span class="paren1">(<span class="default">foo</span>)</span>                                         ==&gt; 123
+<span class="paren1">(<span class="default">set-procedure-data! foo &#x27;hello</span>)</span>
+<span class="paren1">(<span class="default">foo</span>)</span>                                         ==&gt; hello</pre></dd></dl><h3 id="sec:Low-level_data_access"><a href="#sec:Low-level_data_access">Low-level data access</a></h3><p>These procedures operate with what are known as <i>vector-like objects</i>. A <i>vector-like object</i> is a vector, record structure, pair, symbol or keyword: it is an aggregation of other Scheme objects.</p><p>Note that strings and blobs are not considered vector-like (they are considered to be <i>byte vectors</i>, which are objects of mostly unstructured binary data).</p><h4 id="sec:vector-like.3f"><a href="#sec:vector-like.3f">vector-like?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:vector-like.3f"><span class="sig"><var class="id">vector-like?</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> when <var class="arg">X</var> is a vector-like object, returns <tt>#f</tt> otherwise.</p></dd></dl><h4 id="sec:block-ref"><a href="#sec:block-ref">block-ref</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:block-ref"><span class="sig"><var class="id">block-ref</var> <var class="arg">VECTOR*</var> <var class="arg">INDEX</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the contents of the <var class="arg">INDEX</var>th slot of the vector-like object <var class="arg">VECTOR*</var>.</p></dd></dl><h4 id="sec:block-set.21"><a href="#sec:block-set.21">block-set!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:block-set.21"><span class="sig"><var class="id">block-set!</var> <var class="arg">VECTOR*</var> <var class="arg">INDEX</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><tt>(set! (block-ref VECTOR* INDEX) X)</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Sets the contents of the <var class="arg">INDEX</var>th slot of the vector-like object <var class="arg">VECTOR*</var> to the value of <var class="arg">X</var>.</p></dd></dl><h4 id="sec:number-of-slots"><a href="#sec:number-of-slots">number-of-slots</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:number-of-slots"><span class="sig"><var class="id">number-of-slots</var> <var class="arg">VECTOR*</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the number of slots that the vector-like object <var class="arg">VECTOR*</var> contains.</p></dd></dl><h4 id="sec:number-of-bytes"><a href="#sec:number-of-bytes">number-of-bytes</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:number-of-bytes"><span class="sig"><var class="id">number-of-bytes</var> <var class="arg">BLOCK</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the number of bytes that the object <var class="arg">BLOCK</var> contains. <var class="arg">BLOCK</var> may be any non-immediate value.</p></dd></dl><h4 id="sec:object-copy"><a href="#sec:object-copy">object-copy</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:object-copy"><span class="sig"><var class="id">object-copy</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Copies <var class="arg">X</var> recursively and returns the fresh copy. Objects allocated in static memory are copied back into garbage collected storage.</p></dd></dl><h3 id="sec:Record_instance"><a href="#sec:Record_instance">Record instance</a></h3><h4 id="sec:make-record-instance"><a href="#sec:make-record-instance">make-record-instance</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:make-record-instance"><span class="sig"><var class="id">make-record-instance</var> <var class="arg">SYMBOL</var> <var class="arg">ARG1</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a new instance of the record type <var class="arg">SYMBOL</var>, with its slots initialized to <tt>ARG1 ...</tt>.  To illustrate:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define-record-type</span></i> point <span class="paren2">(<span class="default">make-point x y</span>)</span> point?
+  <span class="paren2">(<span class="default">x point-x point-x-set!</span>)</span>
+  <span class="paren2">(<span class="default">y point-y point-y-set!</span>)</span></span>)</span></pre><p>expands into something quite similar to:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">begin
+  <span class="paren2">(<span class="default"><i><span class="symbol">define</span></i> <span class="paren3">(<span class="default">make-point x y</span>)</span>
+    <span class="paren3">(<span class="default">make-record-instance &#x27;point x y</span>)</span> </span>)</span>
+  <span class="paren2">(<span class="default"><i><span class="symbol">define</span></i> <span class="paren3">(<span class="default">point? x</span>)</span>
+    <span class="paren3">(<span class="default">and <span class="paren4">(<span class="default">record-instance? x</span>)</span>
+         <span class="paren4">(<span class="default">eq? &#x27;point <span class="paren5">(<span class="default">block-ref x 0</span>)</span></span>)</span> </span>)</span> </span>)</span>
+  <span class="paren2">(<span class="default"><i><span class="symbol">define</span></i> <span class="paren3">(<span class="default">point-x p</span>)</span> <span class="paren3">(<span class="default">block-ref p 1</span>)</span></span>)</span>
+  <span class="paren2">(<span class="default"><i><span class="symbol">define</span></i> <span class="paren3">(<span class="default">point-x-set! p x</span>)</span> <span class="paren3">(<span class="default">block-set! p 1 x</span>)</span></span>)</span>
+  <span class="paren2">(<span class="default"><i><span class="symbol">define</span></i> <span class="paren3">(<span class="default">point-y p</span>)</span> <span class="paren3">(<span class="default">block-ref p 2</span>)</span></span>)</span>
+  <span class="paren2">(<span class="default"><i><span class="symbol">define</span></i> <span class="paren3">(<span class="default">point-y-set! p y</span>)</span> <span class="paren3">(<span class="default">block-set! p 1 y</span>)</span></span>)</span> </span>)</span></pre></dd></dl><h4 id="sec:record-instance.3f"><a href="#sec:record-instance.3f">record-instance?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:record-instance.3f"><span class="sig"><var class="id">record-instance?</var> <var class="arg">X</var> <var class="dsssl">#!optional</var> <var class="arg">SYMBOL</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">X</var> is a record structure, or <tt>#f</tt> otherwise.</p><p>Further, returns <tt>#t</tt> if <var class="arg">X</var> is of type <var class="arg">SYMBOL</var>, or <tt>#f</tt> otherwise.</p></dd></dl><h4 id="sec:record-instance-type"><a href="#sec:record-instance-type">record-instance-type</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:record-instance-type"><span class="sig"><var class="id">record-instance-type</var> <var class="arg">RECORD</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns type symbol of the record structure <var class="arg">RECORD</var>. Signals an error if <var class="arg">RECORD</var> is not a record structure.</p></dd></dl><h4 id="sec:record-instance-length"><a href="#sec:record-instance-length">record-instance-length</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:record-instance-length"><span class="sig"><var class="id">record-instance-length</var> <var class="arg">RECORD</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns number of slots for the record structure <var class="arg">RECORD</var>. The record-instance type is not counted. Signals an error if <var class="arg">RECORD</var> is not a record structure.</p></dd></dl><h4 id="sec:record-instance-slot"><a href="#sec:record-instance-slot">record-instance-slot</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:record-instance-slot"><span class="sig"><var class="id">record-instance-slot</var> <var class="arg">RECORD</var> <var class="arg">INDEX</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the contents of the <var class="arg">INDEX</var>th slot of the record structure <var class="arg">RECORD</var>. The slot index range is the open interval <tt>[0 record-instance-length)</tt>. Signals an error if <var class="arg">RECORD</var> is not a record structure.</p></dd></dl><h4 id="sec:record-instance-slot-set.21"><a href="#sec:record-instance-slot-set.21">record-instance-slot-set!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:record-instance-slot-set.21"><span class="sig"><var class="id">record-instance-slot-set!</var> <var class="arg">RECORD</var> <var class="arg">INDEX</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><tt>(set! (record-instance-slot RECORD INDEX) X)</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Sets the <var class="arg">INDEX</var>th slot of the record structure <var class="arg">RECORD</var> to <var class="arg">X</var>. The slot index range is the open interval <tt>[0 record-instance-length)</tt>. Signals an error if <var class="arg">RECORD</var> is not a record structure.</p></dd></dl><h4 id="sec:record-.3evector"><a href="#sec:record-.3evector">record-&gt;vector</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:record-.3evector"><span class="sig"><var class="id">record-&gt;vector</var> <var class="arg">RECORD</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a new vector with the type and the elements of the record structure <var class="arg">RECORD</var>. Signals an error if <var class="arg">RECORD</var> is not a record structure.</p></dd></dl><h3 id="sec:Magic"><a href="#sec:Magic">Magic</a></h3><h4 id="sec:object-become.21"><a href="#sec:object-become.21">object-become!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:object-become.21"><span class="sig"><var class="id">object-become!</var> <var class="arg">ALIST</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Changes the identity of the value of the car of each pair in <var class="arg">ALIST</var> to the value of the cdr. Neither value may be immediate (i.e. exact integers, characters, booleans or the empty list).</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> x <span class="string">&quot;i used to be a string&quot;</span></span>)</span>
+<span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> y &#x27;#<span class="paren2">(<span class="default">and now i am a vector</span>)</span></span>)</span>
+<span class="paren1">(<span class="default">object-become! <span class="paren2">(<span class="default">list <span class="paren3">(<span class="default">cons x y</span>)</span></span>)</span></span>)</span>
+x                                    ==&gt; #<span class="paren1">(<span class="default">and now i am a vector</span>)</span>
+y                                    ==&gt; #<span class="paren1">(<span class="default">and now i am a vector</span>)</span>
+<span class="paren1">(<span class="default">eq? x y</span>)</span>                            ==&gt; #t</pre><p>Note: this operation invokes a major garbage collection.</p><p>The effect of using <tt>object-become!</tt> on evicted data (see <tt>object-evict</tt>) is undefined.</p></dd></dl><h4 id="sec:mutate-procedure.21"><a href="#sec:mutate-procedure.21">mutate-procedure!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:mutate-procedure.21"><span class="sig"><var class="id">mutate-procedure!</var> <var class="arg">OLD</var> <var class="arg">PROC</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Replaces the procedure <var class="arg">OLD</var> with the result of calling the one-argument procedure <var class="arg">PROC</var>. <var class="arg">PROC</var> will receive a copy of <var class="arg">OLD</var> that will be identical in behaviour to the result of <var class="arg">OLD</var>:</p>
+<pre class="highlight colorize"> <span class="comment">;;; Replace arbitrary procedure with tracing one:
+</span>
+ <span class="paren1">(<span class="default">mutate-procedure! my-proc
+   <span class="paren2">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren3">(<span class="default">new</span>)</span>
+     <span class="paren3">(<span class="default"><i><span class="symbol">lambda</span></i> args
+       <span class="paren4">(<span class="default">printf <span class="string">&quot;~s called with arguments: ~s~%&quot;</span> new args</span>)</span>
+       <span class="paren4">(<span class="default">apply new args</span>)</span> </span>)</span> </span>)</span> </span>)</span></pre></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20memory%29.html">Module (chicken memory)</a></p><p>Next: <a href="Module%20%28chicken%20module%29.html">Module (chicken module)</a></p></div></div></body></html>

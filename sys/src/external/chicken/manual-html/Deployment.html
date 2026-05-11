@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Deployment</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Deployment">Deployment</a>
+<ul>
+<li><a href="#sec:Static_linking">Static linking</a></li>
+<li><a href="#sec:Shipping_the_runtime_library">Shipping the runtime library</a></li>
+<li><a href="#sec:Distributing_compiled_C_files">Distributing compiled C files</a></li>
+<li><a href="#sec:Platform_specific_notes">Platform specific notes</a>
+<ul>
+<li><a href="#sec:Windows">Windows</a></li>
+<li><a href="#sec:MacOS_X">MacOS X</a></li></ul></li></ul></li></ul></div><h2 id="sec:Deployment"><a href="#sec:Deployment">Deployment</a></h2><p>CHICKEN generates fully native binaries that can be distributed like normal C/C++ programs. There are various methods of deployment, depending on platform, linkage, external dependencies and whether the application should be built from sources or precompiled and whether the CHICKEN runtime-libraries are expected on the destination system or if the application should be completely self-contained.</p><p>There are several options for distributing software written in CHICKEN for use on other machines or by other people:</p><ul><li>Distribute source code, which requires that the target system has a compatible version of CHICKEN installed</li>
+<li>Distribute C files generated from Scheme source code and compile them to binaries on the target system - this also requires a matching CHICKEN installation on the target</li>
+<li>Distribute compiled binaries, either statically linked or built in such a way that all required extensions and libraries are included in the distribution</li>
+</ul>
+<p>The rest of this chapter addresses the third option, for which several options exist, depending on your needs and how self-contained you want your deployed binary to be.</p><p>The simplest form of deployment is the single executable. The runtime library (<tt>libchicken.so</tt>, <tt>libchicken.dylib</tt> or <tt>libchicken.dll</tt>) is required for these programs to run, unless you link your application statically:</p><pre> % csc myprogram.scm
+ % ldd myprogram               # on linux
+           linux-gate.so.1 =&gt;  (0xb805c000)
+           libchicken.so.9 =&gt; /home/felix/chicken/core/lib/libchicken.so.9 (0xb7c22000)
+           libm.so.6 =&gt; /lib/tls/i686/cmov/libm.so.6 (0xb7bec000)
+           libdl.so.2 =&gt; /lib/tls/i686/cmov/libdl.so.2 (0xb7be7000)
+           libc.so.6 =&gt; /lib/tls/i686/cmov/libc.so.6 (0xb7a84000)
+           /lib/ld-linux.so.2 (0xb805d000)
+ % ls -l myprogram
+ -rwxr-xr-x 1 felix felix   34839 2010-02-22 20:19 x</pre><h3 id="sec:Static_linking"><a href="#sec:Static_linking">Static linking</a></h3><p>Linking your application statically will include the runtime library in the executable:</p><pre> % csc -static myprogram.scm
+ % ldd myprogram
+           linux-gate.so.1 =&gt;  (0xb805c000)
+           libm.so.6 =&gt; /lib/tls/i686/cmov/libm.so.6 (0xb7bec000)
+           libdl.so.2 =&gt; /lib/tls/i686/cmov/libdl.so.2 (0xb7be7000)
+           libc.so.6 =&gt; /lib/tls/i686/cmov/libc.so.6 (0xb7a84000)
+           /lib/ld-linux.so.2 (0xb805d000)</pre><p><a href="Extensions.html">Extensions</a> are transparently linked in statically, if you provide the <tt>-static</tt> option to <tt>csc</tt>, provided the extension is avaiable as a static object file (this applies to most extensions by default).</p><h3 id="sec:Shipping_the_runtime_library"><a href="#sec:Shipping_the_runtime_library">Shipping the runtime library</a></h3><p>An alternate way of distributing compiled code is to ship the runtime library <tt>libchicken.so</tt> together with the executable, possibly including any extensions that you use. To make this work, any runtime linker paths compiled into binary objects need to be deleted or changed by using a tool like <tt>chrpath(1)</tt> or <tt>patchelf(1)</tt>, to a value that indicates that the library lookup should start in the same location as the main program. (e.g. <tt>$ORIGIN</tt> on Linux). Don't forget to copy any extensions from the extension repository (<tt>$PREFIX/lib/chicken/$BINARYVERSION</tt>).</p><p>Alternatively start your program through a separate script that sets <tt>LD_LIBRARY_PATH</tt> (or <tt>DYLD_LIBRARY_PATH</tt> on MacOS X). For more details, consult the documentation of the operating system that you use to build your deployed binaries.</p><p>A directory containing all binaries is fully &quot;portable&quot; in the sense that it will run directly from an USB-stick or any other removable media. At runtime the program can find out its location by invoking the <tt>repository-path</tt> procedure, which will return the full pathname in which the application is located.</p><p>Should the program depend on more libraries which are not available by default on the intended target systems, and which you would like to include in your application, you will have to track them down yourself and place them in the application directory.</p><h3 id="sec:Distributing_compiled_C_files"><a href="#sec:Distributing_compiled_C_files">Distributing compiled C files</a></h3><p>It is possible to create distributions of Scheme projects that have been compiled to C.  The runtime system of CHICKEN consists of only two handcoded C files (<tt>runtime.c</tt> and <tt>chicken.h</tt>), plus the files <tt>chicken-config.h</tt> and <tt>buildtag.h</tt>, which are generated by the build process. All other modules of the runtime system and the extension libraries are just compiled Scheme code. The following example shows a minimal application, which should run without changes on most operating systems, like Windows, Linux or FreeBSD (note however that static binaries are not supported on Mac OS X).</p><p>Take the following &quot;Hello World&quot; program:</p>
+<pre class="highlight colorize"><span class="comment">; hello.scm
+</span>
+<span class="paren1">(<span class="default">print <span class="string">&quot;Hello, world!&quot;</span></span>)</span></pre><pre> % csc -t hello.scm -optimize-level 3 -output-file hello.c</pre><p>Compiled to C, we get <tt>hello.c</tt>. We need the files <tt>chicken.h</tt>, <tt>chicken-config.h</tt>, <tt>buildtag.h</tt> and <tt>runtime.c</tt>, which contain the basic runtime system, plus the library files <tt>build-version.c</tt>, <tt>chicken-syntax.c</tt>, <tt>eval.c</tt>, <tt>expand.c</tt>, <tt>internal.c</tt>, <tt>library.c</tt> and <tt>modules.c</tt>, which contain the same functionality as the library that is linked into plain CHICKEN-compiled applications:</p><pre> % cd /tmp
+ % echo '(print &quot;Hello World.&quot;)' &gt; hello.scm
+ % csc -t hello.scm
+ % cp $CHICKEN_BUILD/build-version.c .
+ % cp $CHICKEN_BUILD/chicken-syntax.c .
+ % cp $CHICKEN_BUILD/eval.c .
+ % cp $CHICKEN_BUILD/expand.c .
+ % cp $CHICKEN_BUILD/internal.c .
+ % cp $CHICKEN_BUILD/library.c .
+ % cp $CHICKEN_BUILD/modules.c .
+ % cp $CHICKEN_BUILD/runtime.c .
+ % cp $CHICKEN_BUILD/chicken.h .
+ % cp $CHICKEN_BUILD/chicken-config.h .
+ % cp $CHICKEN_BUILD/buildtag.h .
+ % gcc -Os -fomit-frame-pointer -DHAVE_CHICKEN_CONFIG_H hello.c \
+   build-version.c chicken-syntax.c eval.c expand.c internal.c \
+   library.c modules.c runtime.c \
+   -o hello -lm</pre><p>Once we have all the files together, we can create a tarball:</p><pre>% tar czf hello.tar.gz hello.c build-version.c chicken-syntax.c eval.c \
+  expand.c internal.c library.c modules.c runtime.c chicken.h \
+  chicken-config.h buildtag.h</pre><p>This is naturally rather simplistic. Things like enabling dynamic loading and selecting supported features of the host system would need more configuration- and build-time support. All this can be addressed using more elaborate build-scripts, makefiles or by using autoconf/automake.</p><p>The <tt>chicken-config.h</tt> file may contain incorrect settings for your deployment target. Especially when the architecture is different. In that case you will have to adjust the values as needed.</p><p>For more information, study the CHICKEN source code and/or ask on the CHICKEN mailing lists to understand the implications and difficulties of this deployment method in more detail.</p><h3 id="sec:Platform_specific_notes"><a href="#sec:Platform_specific_notes">Platform specific notes</a></h3><h4 id="sec:Windows"><a href="#sec:Windows">Windows</a></h4><p>Deployment is fully supported on Windows. Since Windows looks up dynamic link libraries in the programs original location by default, adding third-party libraries to the application directory is no problem. The freely available <a href="http://dependencywalker.com">Dependency Walker</a> tool is helpful to find out what DLLs your application depends on.</p><h4 id="sec:MacOS_X"><a href="#sec:MacOS_X">MacOS X</a></h4><p>The <tt>otool(1)</tt> program will show you dynamic libraries that your application requires. <tt>DYLD_LIBRARY_PATH</tt> can be set to override runtime linker paths and <tt>install_name_tool(1)</tt> is available to patch runtime linker paths directly. All of these tools require the Xcode command-line tools too be installed.</p><hr /><p>Previous: <a href="Units%20and%20linking%20model.html">Units and linking model</a></p><p>Next: <a href="Cross%20development.html">Cross development</a></p></div></div></body></html>

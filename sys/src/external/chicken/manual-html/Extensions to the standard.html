@@ -1,0 +1,136 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Extensions to the standard</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Extensions_to_the_R5RS_standard">Extensions to the R5RS standard</a>
+<ul>
+<li><a href="#sec:Identifiers">Identifiers</a></li>
+<li><a href="#sec:Brackets_and_braces">Brackets and braces</a></li>
+<li><a href="#sec:Non-standard_procedures_and_syntax">Non-standard procedures and syntax</a>
+<ul>
+<li><a href="#sec:cond-expand">cond-expand</a></li></ul></li>
+<li><a href="#sec:User_defined_character_names">User defined character names</a></li>
+<li><a href="#sec:Special_characters_in_strings">Special characters in strings</a></li></ul></li>
+<li><a href="#sec:Non-standard_read_syntax">Non-standard read syntax</a>
+<ul>
+<li><a href="#sec:Escapes_in_symbols">Escapes in symbols</a></li>
+<li><a href="#sec:Multiline_Block_Comment">Multiline Block Comment</a></li>
+<li><a href="#sec:Expression_Comment">Expression Comment</a></li>
+<li><a href="#sec:External_Representation">External Representation</a></li>
+<li><a href="#sec:Location_Expression">Location Expression</a></li>
+<li><a href="#sec:Blob_literals">Blob literals</a></li>
+<li><a href="#sec:Keyword">Keyword</a></li>
+<li><a href="#sec:Multiline_String_Constant">Multiline String Constant</a></li>
+<li><a href="#sec:Multiline_String_Constant_with_Embedded_Expressions">Multiline String Constant with Embedded Expressions</a></li>
+<li><a href="#sec:Foreign_Declare">Foreign Declare</a></li>
+<li><a href="#sec:String_escape_sequences">String escape sequences</a></li>
+<li><a href="#sec:Bang">Bang</a></li>
+<li><a href="#sec:Case_Sensitive_Expression">Case Sensitive Expression</a></li>
+<li><a href="#sec:Case_Insensitive_Expression">Case Insensitive Expression</a></li>
+<li><a href="#sec:Conditional_Expansion">Conditional Expansion</a></li></ul></li></ul></div><h2 id="sec:Extensions_to_the_R5RS_standard"><a href="#sec:Extensions_to_the_R5RS_standard">Extensions to the R5RS standard</a></h2><h3 id="sec:Identifiers"><a href="#sec:Identifiers">Identifiers</a></h3><p>Identifiers may contain special characters if delimited with <tt>| ... |</tt>.</p><h3 id="sec:Brackets_and_braces"><a href="#sec:Brackets_and_braces">Brackets and braces</a></h3><p>The brackets <tt>[ ... ]</tt> and the braces <tt> { ... } </tt> are provided as an alternative syntax for <tt>( ... )</tt>.  A number of reader extensions is provided.</p><h3 id="sec:Non-standard_procedures_and_syntax"><a href="#sec:Non-standard_procedures_and_syntax">Non-standard procedures and syntax</a></h3><p>CHICKEN provides numerous non-standard procedures. See the manual sections on the included library modules (<a href="Included%20modules.html">Included modules</a>) for more information.  Here we only document <tt>cond-expand</tt> because it is always present in a module, even without imports.</p><h4 id="sec:cond-expand"><a href="#sec:cond-expand">cond-expand</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:cond-expand"><span class="sig"><tt>(cond-expand FEATURE-CLAUSE ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Expands by selecting feature clauses. This form is allowed to appear in non-toplevel expressions.</p><p>Predefined feature-identifiers are &quot;situation&quot; specific:</p><dl><dt>compile</dt>
+<dd><tt>chicken</tt>, <tt>chicken-5</tt>, <tt>compiling</tt>, <tt>library</tt>, <tt>eval</tt>, <tt>extras</tt>, <tt>regex</tt>, <tt>srfi-0</tt>, <tt>srfi-2</tt>, <tt>srfi-4</tt>, <tt>srfi-6</tt>, <tt>srfi-8</tt>, <tt>srfi-9</tt>, <tt>srfi-10</tt>, <tt>srfi-11</tt>, <tt>srfi-12</tt>, <tt>srfi-15</tt>, <tt>srfi-16</tt>, <tt>srfi-17</tt>, <tt>srfi-23</tt>, <tt>srfi-26</tt>, <tt>srfi-28</tt>, <tt>srfi-30</tt>, <tt>srfi-31</tt>, <tt>srfi-39</tt>, <tt>srfi-55</tt>, <tt>srfi-61</tt>, <tt>srfi-62</tt></dd><dt>load</dt>
+<dd><tt>chicken</tt>, <tt>chicken-5</tt>, <tt>extras</tt>, <tt>srfi-0</tt>, <tt>srfi-2</tt>, <tt>srfi-6</tt>, <tt>srfi-8</tt>, <tt>srfi-9</tt>, <tt>srfi-10</tt>, <tt>srfi-12</tt>, <tt>srfi-17</tt>, <tt>srfi-23</tt>, <tt>srfi-28</tt>, <tt>srfi-30</tt>, <tt>srfi-39</tt>, <tt>srfi-55</tt>, <tt>srfi-61</tt>, <tt>srfi-62</tt>. <tt>library</tt> is implicit.</dd><dt>eval</dt>
+<dd><tt>csi</tt>, <tt>chicken</tt>, <tt>chicken-5</tt>, <tt>extras</tt>, <tt>srfi-0</tt>, <tt>srfi-2</tt>, <tt>srfi-6</tt>, <tt>srfi-8</tt>, <tt>srfi-9</tt>, <tt>srfi-10</tt>, <tt>srfi-11</tt>, <tt>srfi-12</tt>, <tt>srfi-15</tt>, <tt>srfi-16</tt>, <tt>srfi-17</tt>, <tt>srfi-23</tt>, <tt>srfi-26</tt>, <tt>srfi-28</tt>, <tt>srfi-30</tt>, <tt>srfi-31</tt>, <tt>srfi-39</tt>, <tt>srfi-55</tt>, <tt>srfi-61</tt>, <tt>srfi-62</tt>. <tt>library</tt> is implicit.</dd></dl>
+<p>Also, features of the form <tt>chicken-5.X</tt>, where <tt>X</tt> denotes the minor version, are available.</p><p>The symbols returned by the following procedures from <a href="Module%20%28chicken%20platform%29.html">(chicken platform)</a> are also available as feature-identifiers in all situations: <tt>(machine-byte-order)</tt>, <tt>(machine-type)</tt>, <tt>(software-type)</tt>, <tt>(software-version)</tt>. For example, the <tt>machine-type</tt> class of feature-identifiers include <tt>arm</tt>, <tt>alpha</tt>, <tt>mips</tt>, etc.</p><p>The <a href="Module%20%28chicken%20platform%29.html">(chicken platform)</a> module also provides a function <tt>(features)</tt> that returns a list of all registered features.</p><p>In addition the following feature-identifiers may exist: <tt>cross-chicken</tt>, <tt>dload</tt>, <tt>manyargs</tt>, <tt>ptables</tt>.</p><p>For further information, see the documentation for <a href="http://srfi.schemers.org/srfi-0/srfi-0.html">SRFI-0</a>.</p></dd></dl><h3 id="sec:User_defined_character_names"><a href="#sec:User_defined_character_names">User defined character names</a></h3><p>User defined character names are supported. See <tt>char-name</tt>. Characters can be given in hexadecimal notation using the <i>#\xXX</i> syntax where <i>XX</i> specifies the character code. Character codes above 255 are supported and can be read (and are written) using the <i>#\uXXXX</i> and <i>#\UXXXXXXXX</i> notations.</p><p>Non-standard characters names supported are <tt>#\tab</tt>, <tt>#\linefeed</tt>, <tt>#\return</tt>, <tt>#\alarm</tt>, <tt>#\vtab</tt>, <tt>#\nul</tt>, <tt>#\page</tt>, <tt>#\esc</tt>, <tt>#\delete</tt> and <tt>#\backspace</tt>.</p><h3 id="sec:Special_characters_in_strings"><a href="#sec:Special_characters_in_strings">Special characters in strings</a></h3><p>CHICKEN supports special characters preceded with a backslash <i>\</i> in quoted string constants. <i>\n</i> denotes the newline-character, <i>\r</i> carriage return, <i>\b</i> backspace, <i>\t</i> TAB, <i>\v</i> vertical TAB, <i>\a</i> alarm, <i>\f</i> formfeed, <i>\xXX</i> a character with the code <tt>XX</tt> in hex and <i>\uXXXX</i> (and <i>\UXXXXXXXX</i>) a unicode character with the code <tt>XXXX</tt>. The latter is encoded in UTF-8 format.</p><h2 id="sec:Non-standard_read_syntax"><a href="#sec:Non-standard_read_syntax">Non-standard read syntax</a></h2><h3 id="sec:Escapes_in_symbols"><a href="#sec:Escapes_in_symbols">Escapes in symbols</a></h3><p><tt>| ... |</tt> may be used to escape a sequence of characters when reading a symbol. <tt>\X</tt> escapes a single character in a symbols name:</p><pre> (symbol-&gt;string '|abc def|)       =&gt;   &quot;abc def&quot;
+ (symbol-&gt;string '|abc||def|)      =&gt;   &quot;abcdef&quot;
+ (symbol-&gt;string '|abc|xyz|def|)   =&gt;   &quot;abcxyzdef&quot;
+ (symbol-&gt;string '|abc\|def|)      =&gt;   &quot;abc|def&quot;
+ (symbol-&gt;string 'abc\ def)        =&gt;   &quot;abc def&quot;</pre><h3 id="sec:Multiline_Block_Comment"><a href="#sec:Multiline_Block_Comment">Multiline Block Comment</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:.23.7c"><span class="sig"><tt>#|</tt></span><span class="type">read</span></dt>
+<dd class="defsig"><pre>#| ... |# </pre><p>A multiline <i>block</i> comment. May be nested. Implements <a href="http://srfi.schemers.org/srfi-30/srfi-30.html">SRFI-30</a>.</p></dd></dl><h3 id="sec:Expression_Comment"><a href="#sec:Expression_Comment">Expression Comment</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:.23.3b"><span class="sig"><tt>#;</tt></span><span class="type">read</span></dt>
+<dd class="defsig"><pre>#;EXPRESSION</pre><p>Treats <tt>EXPRESSION</tt> as a comment.  That is, the comment runs through the whole S-expression, regardless of newlines, which saves you from having to comment out every line, or add a newline in the middle of your parens to make the commenting of the last line work, or other things like that. Implements <a href="http://srfi.schemers.org/srfi-62/srfi-62.html">SRFI-62</a>.</p></dd></dl><h3 id="sec:External_Representation"><a href="#sec:External_Representation">External Representation</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:.23.2c"><span class="sig"><tt>#,</tt></span><span class="type">read</span></dt>
+<dd class="defsig"><pre>#,(CONSTRUCTORNAME DATUM ...)</pre><p>Allows user-defined extension of external representations. (For more information see the documentation for <a href="http://srfi.schemers.org/srfi-10/srfi-10.html">SRFI-10</a>)</p></dd></dl><h3 id="sec:Location_Expression"><a href="#sec:Location_Expression">Location Expression</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:.20.23.24EXPRESSION"><span class="sig"><tt> #$EXPRESSION</tt></span><span class="type">read</span></dt>
+<dd class="defsig"><p>An abbreviation for <tt>(location EXPRESSION)</tt>.</p></dd></dl><h3 id="sec:Blob_literals"><a href="#sec:Blob_literals">Blob literals</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:.23.24.7b"><span class="sig"><tt>#${</tt></span><span class="type">read</span></dt>
+<dd class="defsig"><pre> #${ HEX ... }</pre><p>Syntax for literal &quot;blobs&quot; (byte-sequences). Expects hexadecimal digits and ignores any whitespace characters:</p><pre> #;1&gt; ,d '#${deadbee f}
+ blob of size 4:
+    0: de ad be ef                                     ....</pre></dd></dl><h3 id="sec:Keyword"><a href="#sec:Keyword">Keyword</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:.23:"><span class="sig"><tt>#:</tt></span><span class="type">read</span></dt>
+<dd class="defsig"><pre>#:SYMBOL
+SYMBOL:
+:SYMBOL</pre><p>Syntax for keywords. Keywords are symbol-like objects that evaluate to themselves, and as such don't have to be quoted.  Either <tt>SYMBOL:</tt> or <tt>:SYMBOL</tt> is accepted, depending on the setting of the <tt>keyword-style</tt> parameter, but never both.  <tt>#:SYMBOL</tt> is always accepted.</p></dd></dl><h3 id="sec:Multiline_String_Constant"><a href="#sec:Multiline_String_Constant">Multiline String Constant</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:.23.3c.3c"><span class="sig"><tt>#&lt;&lt;</tt></span><span class="type">read</span></dt>
+<dd class="defsig"><pre>#&lt;&lt;TAG</pre><p>Specifies a multiline string constant. Anything up to a line equal to <tt>TAG</tt> (or end of file) will be returned as a single string:</p><pre>(define msg #&lt;&lt;END
+ &quot;Hello, world!&quot;, she said.
+END
+)</pre><p>is equivalent to</p><pre>(define msg &quot;\&quot;Hello, world!\&quot;, she said.&quot;)</pre></dd></dl><h3 id="sec:Multiline_String_Constant_with_Embedded_Expressions"><a href="#sec:Multiline_String_Constant_with_Embedded_Expressions">Multiline String Constant with Embedded Expressions</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:.23.3c.23"><span class="sig"><tt>#&lt;#</tt></span><span class="type">read</span></dt>
+<dd class="defsig"><pre>#&lt;#TAG</pre><p>Similar to <tt>#&lt;&lt;</tt>, but allows substitution of embedded Scheme expressions prefixed with <tt>#</tt> and optionally enclosed in curly brackets. Two consecutive <tt>#</tt>s are translated to a single <tt>#</tt>:</p><pre>(define three 3)
+(display #&lt;#EOF
+This is a simple string with an embedded `##' character
+and substituted expressions: (+ three 99) ==&gt; #(+ three 99)
+(three is &quot;#{three}&quot;)
+EOF
+)</pre><p>prints</p><pre>This is a simple string with an embedded `#' character
+and substituted expressions: (+ three 99) ==&gt; 102
+(three is &quot;3&quot;)</pre></dd></dl><h3 id="sec:Foreign_Declare"><a href="#sec:Foreign_Declare">Foreign Declare</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:.23.3e"><span class="sig"><tt>#&gt;</tt></span><span class="type">read</span></dt>
+<dd class="defsig"><pre>#&gt; ... &lt;#</pre><p>Abbreviation for <tt>(foreign-declare &quot; ... &quot;)</tt>.</p></dd></dl><h3 id="sec:String_escape_sequences"><a href="#sec:String_escape_sequences">String escape sequences</a></h3><p>String-literals may contain the following escape sequences:</p><table>
+<tr><th>Escape sequence</th><th>Character</th></tr>
+
+<tr><td><tt>\n</tt></td><td>line feed / newline</td></tr>
+
+<tr><td><tt>\t</tt></td><td>tab</td></tr>
+
+<tr><td><tt>\r</tt></td><td>carriage return</td></tr>
+
+<tr><td><tt>\b</tt></td><td>backspace</td></tr>
+
+<tr><td><tt>\a</tt></td><td>bell</td></tr>
+
+<tr><td><tt>\v</tt></td><td>vertical tab</td></tr>
+
+<tr><td><tt>\f</tt></td><td>form feed</td></tr>
+
+<tr><td><tt>\x</tt><i>XX</i></td><td>hexadecimal 8-bit character code</td></tr>
+
+<tr><td><tt>\u</tt><i>XXXX</i></td><td>hexadecimal 16-bit Unicode character code</td></tr>
+
+<tr><td><tt>\U</tt><i>XXXXXXXX</i></td><td>hexadecimal 32-bit Unicode character code</td></tr>
+
+<tr><td><tt>\</tt><i>OOO</i></td><td>octal 8-bit character code</td></tr>
+
+<tr><td><tt>\|</tt>   <tt>\&quot;</tt>    <tt>\\</tt>    <tt>\'</tt></td><td>the escaped character</td></tr>
+</table>
+<h3 id="sec:Bang"><a href="#sec:Bang">Bang</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:.23.21"><span class="sig"><tt>#!</tt></span><span class="type">read</span></dt>
+<dd class="defsig"><pre>#!... </pre><p>Interpretation depends on the directly following characters. Only the following are recognized. Any other case results in a read error.</p><dl><dt>Line Comment</dt>
+<dd>If followed by whitespace or a slash, then everything up the end of the current line is ignored</dd><dt>Eof Object</dt>
+<dd>If followed by the character sequence <tt>eof</tt>, then the (self-evaluating) end-of-file object is returned</dd><dt>DSSSL Formal Parameter List Annotation</dt>
+<dd>If followed by any of the character sequences <tt>optional</tt>, <tt>rest</tt> or <tt>key</tt>, then a symbol with the same name (and prefixed with <tt>#!</tt>) is returned</dd><dt>Read Mark Invocation</dt>
+<dd>If a <i>read mark</i> with the same name as the token is registered, then its procedure is called and the result of the read-mark procedure will be returned</dd></dl>
+</dd></dl><h3 id="sec:Case_Sensitive_Expression"><a href="#sec:Case_Sensitive_Expression">Case Sensitive Expression</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:.23cs"><span class="sig"><tt>#cs</tt></span><span class="type">read</span></dt>
+<dd class="defsig"><pre>#cs...</pre><p>Read the next expression in case-sensitive mode (regardless of the current global setting).</p></dd></dl><h3 id="sec:Case_Insensitive_Expression"><a href="#sec:Case_Insensitive_Expression">Case Insensitive Expression</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:.23ci"><span class="sig"><tt>#ci</tt></span><span class="type">read</span></dt>
+<dd class="defsig"><pre>#ci...</pre><p>Read the next expression in case-insensitive mode (regardless of the current global setting).</p></dd></dl><h3 id="sec:Conditional_Expansion"><a href="#sec:Conditional_Expansion">Conditional Expansion</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:.23.2b"><span class="sig"><tt>#+</tt></span><span class="type">read</span></dt>
+<dd class="defsig"><pre>#+FEATURE EXPR</pre><p>Rewrites to</p><pre>(cond-expand (FEATURE EXPR) (else))</pre><p>and performs the feature test at macroexpansion time.  Therefore, it may not work as expected when used within a macro form.</p></dd></dl><hr /><p>Previous: <a href="Deviations%20from%20the%20standard.html">Deviations from the standard</a></p><p>Next: <a href="Debugging.html">Debugging</a></p></div></div></body></html>

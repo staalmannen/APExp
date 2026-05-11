@@ -1,0 +1,88 @@
+# -*- Makefile -*-
+#
+# Detect the PLATFORM with uname.
+# Based on Chibi Scheme auto-detector
+# Heavily revamped by John Cowan
+# Copyright (c) 2009-2018 Alex Shinn, John Cowan
+# BSD license at <https://github.com/ashinn/chibi-scheme/blob/master/COPYING>
+
+ifndef PLATFORM
+
+# First check is for pure MinGW, which doesn't have uname.
+# In cmd.exe, echo "test" outputs "test", with quotes.
+test:=$(shell echo "test")
+quote:=$(findstring ",$(test))
+
+ifeq ($(quote),")
+PLATFORM=mingw
+else
+
+# Now we can use uname tests
+uname_s:=$(shell uname)
+uname_o:=$(shell uname -o 2>/dev/null)
+
+# Check for specific platforms
+ifeq ($(uname_o),Msys)
+PLATFORM=mingw-msys
+endif
+
+ifeq ($(uname_s),Darwin)
+PLATFORM=macosx
+endif
+
+ifeq ($(uname_s),FreeBSD)
+PLATFORM=bsd
+endif
+
+ifeq ($(uname_s),NetBSD)
+PLATFORM=bsd
+endif
+
+ifeq ($(uname_s),OpenBSD)
+PLATFORM=bsd
+endif
+
+ifeq ($(uname_s),DragonFly)
+PLATFORM=bsd
+endif
+
+ifeq ($(uname_o),Cygwin)
+PLATFORM=cygwin
+endif
+
+ifeq ($(uname_o),Android)
+PLATFORM=android
+endif
+
+ifeq ($(uname_o),GNU/Linux)
+PLATFORM=linux
+endif
+
+ifeq ($(uname_o),Linux)
+PLATFORM=linux
+endif
+
+ifeq ($(uname_s),SunOS)
+PLATFORM=solaris
+endif
+
+ifeq ($(uname_s),Haiku)
+PLATFORM=haiku
+endif
+
+ifeq ($(uname_s),BeOS)
+PLATFORM=haiku
+endif
+
+ifeq ($(uname_s),GNU)
+PLATFORM=hurd
+endif
+
+ifeq ($(uname_s),AIX)
+PLATFORM=aix
+endif
+
+# add more options here
+
+endif # have uname
+endif # undef PLATFORM

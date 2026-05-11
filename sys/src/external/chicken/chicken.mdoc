@@ -1,0 +1,281 @@
+.\"  Copyright (c) 2007-2022, The CHICKEN Team
+.\"  All rights reserved.
+.\"
+.\"  Redistribution and use in source and binary forms, with or without
+.\"  modification, are permitted provided that the following conditions
+.\"  are met:
+.\"  1. Redistributions of source code must retain the above copyright
+.\"     notice, this list of conditions and the following disclaimer.
+.\"  2. Redistributions in binary form must reproduce the above copyright
+.\"     notice, this list of conditions and the following disclaimer in the
+.\"     documentation and/or other materials provided with the distribution.
+.\"  3. The name of the authors may not be used to endorse or promote products
+.\"     derived from this software without specific prior written permission.
+.\"
+.\"  THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS OR
+.\"  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+.\"  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+.\"  IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+.\"  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+.\"  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+.\"  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+.\"  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+.\"  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+.\"  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+.\"
+.\"
+.Dd Apr 26, 2017
+.Dt CHICKEN 1
+.Os
+.Sh NAME
+.Nm chicken
+.Nd A Scheme-to-C translator
+.Sh SYNOPSIS
+.Nm
+.Op Ar OPTION ...
+.Op Ar FILENAME ...
+.Sh DESCRIPTION
+.Nm
+is a compiler and interpreter for the programming language Scheme
+supporting most of the features as described in the
+Revised^5 Report on the Algorithmic Language Scheme.
+The
+.Nm
+program is the basic Scheme-to-C translator used in this system.
+For a more convenient interface, see
+.Xr csc 1 .
+.Pp
+.Ar FILENAME
+should be a complete source file name with extension, or
+.Dq -
+for standard input.
+.Ar OPTION
+may be one of the following:
+.Pp
+General options:
+.Bl -tag -width Ds
+.It Fl help
+Display usage and exit.
+.It Fl version
+Display compiler version and exit.
+.It Fl release
+Print release number and exit.
+.It Fl verbose
+Display information on compilation progress.
+.El
+.Pp
+File and pathname options:
+.Bl -tag -width Ds
+.It Fl output-file Ar FILENAME
+Specifies output-filename, default is
+.Dq out.c .
+.It Fl include-path Ar PATHNAME
+Specifies alternative path for included files.
+.It Fl to-stdout
+Write compiled file to stdout instead of file.
+.El
+.Pp
+Language options:
+.Bl -tag -width Ds
+.It Fl feature Ar SYMBOL
+Register feature identifier.
+.It Fl no-feature Ar SYMBOL
+Disable built-in feature identifier.
+.El
+.Pp
+Syntax related options:
+.Bl -tag -width Ds
+.It Fl case-insensitive
+Don't preserve case of read symbols.
+.It Fl keyword-style Ar STYLE
+Allow alternative keyword syntax
+.Po prefix, suffix or none Pc .
+.It Fl no-parentheses-synonyms
+Disables list delimiter synonyms.
+.It Fl no-symbol-escape
+Disables support for escaped symbols.
+.It Fl r5rs-syntax
+Disables the CHICKEN extensions to R5RS syntax.
+.It Fl compile-syntax
+Macros are made available at run-time.
+.It Fl emit-import-library Ar MODULE
+Write compile-time module information into separate file.
+.It Fl emit-all-import-libraries
+Emit import-libraries for all defined modules.
+.It Fl no-compiler-syntax
+Disable expansion of compiler-macros.
+.It Fl module Ar NAME
+Wrap compiled code in module of the given name.
+.It Fl module-registration
+Always generate module registration code, even when import libraries are emitted.
+.It Fl no-module-registration
+Do not generate module registration code. Overrides
+.Fl module-registration .
+.El
+.Pp
+Translation options:
+.Bl -tag -width Ds
+.It Fl explicit-use
+Do not use units
+.Sq library
+and
+.Sq eval
+by default.
+.It Fl static
+Link extensions statically.
+.It Fl check-syntax
+Stop compilation after macro-expansion.
+.It Fl analyze-only
+Stop compilation after first analysis pass.
+.El
+.Pp
+Debugging options:
+.Bl -tag -width Ds
+.It Fl no-warnings
+Disable warnings.
+.It Fl debug-level Ar NUMBER
+Set level of available debugging information.
+.It Fl no-trace
+Disable tracing information.
+.It Fl profile
+Executable emits profiling information.
+.It Fl profile-name Ar FILENAME
+Name of the generated profile information file.
+.It Fl accumulate-profile
+Executable emits profiling information in append mode.
+.It Fl no-lambda-info
+Omit additional procedure-information.
+.It Fl types Ar FILENAME
+Load additional type database.
+.It Fl emit-types-file Ar FILENAME
+Write type-declaration information into file.
+.El
+.Pp
+Optimization options:
+.Bl -tag -width Ds
+.It Fl optimize-level Ar NUMBER
+Enable certain sets of optimization options.
+.It Fl optimize-leaf-routines
+Enable leaf routine optimization.
+.It Fl no-usual-integrations
+Standard procedures may be redefined.
+.It Fl unsafe
+Disable all safety checks.
+.It Fl local
+Assume globals are only modified in current file.
+.It Fl block
+Enable block-compilation.
+.It Fl disable-interrupts
+Disable interrupts in compiled code.
+.It Fl fixnum-arithmetic
+Assume all numbers are fixnums.
+.It Fl disable-stack-overflow-checks
+Disables detection of stack-overflows.
+.It Fl inline
+Enable inlining.
+.It Fl inline-limit Ar LIMIT
+Set inlining threshold.
+.It Fl inline-global
+Enable cross-module inlining.
+.It Fl specialize
+Perform type-based specialization of primitive calls.
+.It Fl emit-inline-file Ar FILENAME
+Generate file with globally inlinable procedures
+.Po implies Fl inline Fl local Pc .
+.It Fl consult-inline-file Ar FILENAME
+Explicitly load inline file.
+.It Fl no-argc-checks
+Disable argument count checks.
+.It Fl no-bound-checks
+Disable bound variable checks.
+.It Fl no-procedure-checks
+Disable procedure call checks.
+.It Fl no-procedure-checks-for-usual-bindings
+Disable procedure call checks only for usual bindings.
+.It Fl no-procedure-checks-for-toplevel-bindings
+Disable procedure call checks for toplevel bindings.
+.It Fl strict-types
+Assume variable do not change their type.
+.It Fl clustering
+Combine groups of local procedures into dispatch loop.
+.It Fl lfa2
+Perform additional lightweight flow-analysis pass.
+.It Fl unroll-limit Ar LIMIT
+Specifies inlining limit for self-recursive calls.
+.El
+.Pp
+Configuration options:
+.Bl -tag -width Ds
+.It Fl unit Ar NAME
+Compile file as a library unit.
+.It Fl uses Ar NAME
+Declare library unit as used.
+.It Fl heap-size Ar NUMBER
+Specifies heap-size of compiled executable.
+.It Fl nursery Ar NUMBER Fl stack-size Ar NUMBER
+Specifies nursery size of compiled executable.
+.It Fl extend Ar FILENAME
+Load file before compilation commences.
+.It Fl prelude Ar EXPRESSION
+Add expression to front of source file.
+.It Fl postlude Ar EXPRESSION
+Add expression to end of source file.
+.It Fl prologue Ar FILENAME
+Include file before main source file.
+.It Fl epilogue Ar FILENAME
+Include file after main source file.
+.It Fl dynamic
+Compile as dynamically loadable code.
+.It Fl require-extension Ar NAME
+Require and import extension
+.Ar NAME .
+.It Fl emit-link-file Ar FILENAME
+Write a list of statically linked extensions to
+.Ar FILENAME ,
+used for identifying the static objects that need to be linked to an
+executable.
+.El
+.Pp
+Obscure options:
+.Bl -tag -width Ds
+.It Fl debug Ar MODES
+Display debugging output for the given modes.
+.It Fl raw
+Do not generate implicit init- and exit code.
+.It Fl emit-external-prototypes-first
+Emit prototypes for callbacks before foreign declarations.
+.It Fl regenerate-import-libraries
+Always emit import libraries, even when their contents haven't changed.
+The default behaviour is to preserve existing import libraries.
+.It Fl ignore-repository
+Do not refer to repository for extensions.
+.It Fl setup-mode
+Prefer the current directory when locating extensions.
+.El
+.Sh ENVIRONMENT
+The following environment variables change the behaviour of
+.Nm Ns :
+.Bl -tag -width CHICKEN_INCLUDE_PATH
+.It Ev CHICKEN_INCLUDE_PATH
+Contains one or more pathnames where the compiler should additionally look for
+include-files, separated by
+.Sq \&;
+characters.
+.It Ev CHICKEN_OPTIONS
+Holds a string of default compiler options that should apply to every invocation of
+.Nm .
+.El
+.Sh EXIT STATUS
+.Ex -std
+.Sh SEE ALSO
+.Xr chicken 1 ,
+.Xr chicken-install 1 ,
+.Xr chicken-uninstall 1
+.Pp
+More information can be found in the
+.Lk http://wiki.call-cc.org/manual/index "CHICKEN User's Manual".
+.Sh AUTHORS
+.An The CHICKEN Team
+.Sh BUGS
+Submit bug reports by e-mail to
+.Mt chicken-janitors@nongnu.org

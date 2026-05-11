@@ -1,0 +1,6 @@
+
+Warning: (messages-test.scm:9) - assignment to syntax `bar'
+
+Warning: (messages-test.scm:10) - assignment to imported value binding `var'
+
+Warning: (messages-test.scm:13) - assignment to syntax `m'

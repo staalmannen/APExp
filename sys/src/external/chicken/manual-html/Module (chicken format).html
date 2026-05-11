@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken format)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_format.29">Module (chicken format)</a>
+<ul>
+<li><a href="#sec:The_printf_family_of_procedures">The printf family of procedures</a>
+<ul>
+<li><a href="#sec:printf">printf</a></li>
+<li><a href="#sec:fprintf">fprintf</a></li>
+<li><a href="#sec:sprintf">sprintf</a></li></ul></li>
+<li><a href="#sec:format">format</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_format.29"><a href="#sec:Module_.28chicken_format.29">Module (chicken format)</a></h2><p>This module provides procedures for formatting output to ports and strings.</p><h3 id="sec:The_printf_family_of_procedures"><a href="#sec:The_printf_family_of_procedures">The printf family of procedures</a></h3><h4 id="sec:printf"><a href="#sec:printf">printf</a></h4><h4 id="sec:fprintf"><a href="#sec:fprintf">fprintf</a></h4><h4 id="sec:sprintf"><a href="#sec:sprintf">sprintf</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:fprintf"><span class="sig"><var class="id">fprintf</var> <var class="arg">PORT</var> <var class="arg">FORMATSTRING</var> <var class="dsssl">#!optional</var> <var class="arg">ARG...</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:printf"><span class="sig"><var class="id">printf</var> <var class="arg">FORMATSTRING</var> <var class="dsssl">#!optional</var> <var class="arg">ARG...</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:sprintf"><span class="sig"><var class="id">sprintf</var> <var class="arg">FORMATSTRING</var> <var class="dsssl">#!optional</var> <var class="arg">ARG...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Simple formatted output to a given port (<tt>fprintf</tt>), the value of <tt>(current-output-port)</tt> (<tt>printf</tt>), or a string (<tt>sprintf</tt>).  The <var class="arg">FORMATSTRING</var> can contain any sequence of characters.  There must be at least as many <tt>ARG</tt> arguments given as there are format directives that require an argument in <var class="arg">FORMATSTRING</var>.  Extra <tt>ARG</tt> arguments are ignored.  The character `~' prefixes special formatting directives:</p><table>
+<tr><td>~%</td><td>
+write newline character
+</td></tr>
+<tr><td> ~N</td><td>
+the same as <tt>~%</tt>
+</td></tr>
+<tr><td> ~S</td><td>
+write the next argument
+</td></tr>
+<tr><td> ~A</td><td>
+display the next argument
+</td></tr>
+<tr><td> ~\n</td><td>
+skip all whitespace in the format-string until the next non-whitespace character
+</td></tr>
+<tr><td> ~B</td><td>
+write the next argument as a binary number
+</td></tr>
+<tr><td> ~O</td><td>
+write the next argument as an octal number
+</td></tr>
+<tr><td> ~X</td><td>
+write the next argument as a hexadecimal number
+</td></tr>
+<tr><td> ~C</td><td>
+write the next argument as a character
+</td></tr>
+<tr><td> ~~</td><td>
+display `~'
+</td></tr>
+<tr><td> ~!</td><td>
+flush all pending output
+</td></tr>
+<tr><td> ~?</td><td>
+invoke formatted output routine recursively with the next two arguments as format-string and list of parameters
+</td></tr>
+</table>
+</dd></dl><h3 id="sec:format"><a href="#sec:format">format</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:format"><span class="sig"><tt>(format [DESTINATION] FORMATSTRING [ARG...])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>The parameters <tt>FORMATSTRING</tt> and <tt>ARG...</tt> are as for <tt>printf</tt>.</p><p>The optional <tt>DESTINATION</tt>, when supplied, performs:</p><dl><dt><tt>#f</tt></dt>
+<dd><tt>sprintf</tt></dd><dt><tt>#t</tt></dt>
+<dd><tt>printf</tt></dd><dt><tt>output-port</tt></dt>
+<dd><tt>fprintf</tt></dd><dt></dt>
+<dd><tt>sprintf</tt></dd></dl>
+</dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20foreign%29.html">Module (chicken foreign)</a></p><p>Next: <a href="Module%20%28chicken%20gc%29.html">Module (chicken gc)</a></p></div></div></body></html>

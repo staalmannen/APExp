@@ -1,0 +1,132 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken foreign)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_foreign.29">Module (chicken foreign)</a></li>
+<li><a href="#sec:Accessing_external_objects">Accessing external objects</a>
+<ul>
+<li><a href="#sec:foreign-code">foreign-code</a></li>
+<li><a href="#sec:foreign-value">foreign-value</a></li>
+<li><a href="#sec:foreign-declare">foreign-declare</a></li>
+<li><a href="#sec:define-foreign-type">define-foreign-type</a></li>
+<li><a href="#sec:foreign-type-size">foreign-type-size</a></li>
+<li><a href="#sec:define-foreign-variable">define-foreign-variable</a></li>
+<li><a href="#sec:foreign-lambda">foreign-lambda</a></li>
+<li><a href="#sec:foreign-lambda.2a">foreign-lambda*</a></li>
+<li><a href="#sec:foreign-safe-lambda">foreign-safe-lambda</a></li>
+<li><a href="#sec:foreign-safe-lambda.2a">foreign-safe-lambda*</a></li>
+<li><a href="#sec:foreign-primitive">foreign-primitive</a></li></ul></li>
+<li><a href="#sec:Callbacks">Callbacks</a>
+<ul>
+<li><a href="#sec:define-external">define-external</a></li>
+<li><a href="#sec:C_callback">C_callback</a></li>
+<li><a href="#sec:C_callback_adjust_stack">C_callback_adjust_stack</a></li></ul></li>
+<li><a href="#sec:Locations">Locations</a>
+<ul>
+<li><a href="#sec:define-location">define-location</a></li>
+<li><a href="#sec:let-location">let-location</a></li>
+<li><a href="#sec:location">location</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_foreign.29"><a href="#sec:Module_.28chicken_foreign.29">Module (chicken foreign)</a></h2><p>This module provides a <i>foreign function interface</i> to access externally defined functions and variables in C-compatible languages, as well as operating-system specific functionality.</p><p>Note that this interface is source-based, since CHICKEN translates Scheme code to C. It is not binary, as in many other Scheme implementations.</p><p>Several special forms of this interface refer to <i>foreign type specifiers</i>, consult the <a href="Foreign%20type%20specifiers.html">relevant chapter</a> of this manual for more information.</p><h2 id="sec:Accessing_external_objects"><a href="#sec:Accessing_external_objects">Accessing external objects</a></h2><h3 id="sec:foreign-code"><a href="#sec:foreign-code">foreign-code</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:foreign-code"><span class="sig"><tt>(foreign-code STRING ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Executes the embedded C/C++ code <tt>STRING ...</tt>, which should be a sequence of C statements, which are executed and return an unspecified result.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">foreign-code <span class="string">&quot;doSomeInitStuff();&quot;</span></span>)</span>     =&gt;  #&lt;unspecified&gt;</pre><p>Code wrapped inside <tt>foreign-code</tt> may not invoke callbacks into Scheme.</p></dd></dl><h3 id="sec:foreign-value"><a href="#sec:foreign-value">foreign-value</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:foreign-value"><span class="sig"><tt>(foreign-value CODE TYPE)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Evaluates the embedded C/C++ expression <tt>CODE</tt> (which may be a string or symbol), returning a value of type given in the foreign-type specifier <tt>TYPE</tt>.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">print <span class="paren2">(<span class="default">foreign-value <span class="string">&quot;my_version_string&quot;</span> c-string</span>)</span></span>)</span></pre></dd></dl><h3 id="sec:foreign-declare"><a href="#sec:foreign-declare">foreign-declare</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:foreign-declare"><span class="sig"><tt>(foreign-declare STRING ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Include given strings verbatim into header of generated file.</p></dd></dl><h3 id="sec:define-foreign-type"><a href="#sec:define-foreign-type">define-foreign-type</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:define-foreign-type"><span class="sig"><tt>(define-foreign-type NAME TYPE [ARGCONVERT [RETCONVERT]])</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Defines an alias for <tt>TYPE</tt> with the name <tt>NAME</tt> (a symbol). <tt>TYPE</tt> may be a type-specifier or a string naming a C type. The namespace of foreign type specifiers is separate from the normal Scheme namespace.  The optional arguments <tt>ARGCONVERT</tt> and <tt>RETCONVERT</tt> should evaluate to procedures that map argument- and result-values to a value that can be transformed to <tt>TYPE</tt>:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define-foreign-type</span></i> char-vector 
+  nonnull-c-string
+  <span class="paren2">(<span class="default">compose list-&gt;string vector-&gt;list</span>)</span>
+  <span class="paren2">(<span class="default">compose list-&gt;vector string-&gt;list</span>)</span> </span>)</span>
+
+<span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> strlen
+  <span class="paren2">(<span class="default">foreign-lambda int <span class="string">&quot;strlen&quot;</span> char-vector</span>)</span> </span>)</span>
+
+<span class="paren1">(<span class="default">strlen &#x27;#<span class="paren2">(<span class="default"><span class="character">#\a</span> <span class="character">#\b</span> <span class="character">#\c</span></span>)</span></span>)</span>                      ==&gt; 3
+
+<span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> memset
+  <span class="paren2">(<span class="default">foreign-lambda char-vector <span class="string">&quot;memset&quot;</span> char-vector char int</span>)</span> </span>)</span>
+
+<span class="paren1">(<span class="default">memset &#x27;#<span class="paren2">(<span class="default">#_ #_ #_</span>)</span> <span class="character">#\X</span> 3</span>)</span>                ==&gt; #<span class="paren1">(<span class="default"><span class="character">#\X</span> <span class="character">#\X</span> <span class="character">#\X</span></span>)</span></pre><p>Foreign type-definitions are only visible in the compilation-unit in which they are defined, so use <tt>include</tt> to use the same definitions in multiple files.</p></dd></dl><h3 id="sec:foreign-type-size"><a href="#sec:foreign-type-size">foreign-type-size</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:foreign-type-size"><span class="sig"><tt>(foreign-type-size TYPE)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Returns the size of the storage required to hold values of the given foreign type <tt>TYPE</tt>. This is basically equivalent to</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">foreign-value <span class="string">&quot;sizeof(TYPE)&quot;</span> size_t</span>)</span></pre><p>but also handles user-defined types and allows &quot;TYPE&quot; to be a string, which will be given literally to the <tt>sizeof</tt> operator.</p></dd></dl><h3 id="sec:define-foreign-variable"><a href="#sec:define-foreign-variable">define-foreign-variable</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:define-foreign-variable"><span class="sig"><tt>(define-foreign-variable NAME TYPE [STRING])</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Defines a foreign variable of name <tt>NAME</tt> (a symbol). <tt>STRING</tt> should be the real name of a foreign variable or parameterless macro. If <tt>STRING</tt> is not given, then the variable name <tt>NAME</tt> will be converted to a string and used instead. All references and assignments (via <tt>set!</tt>) are modified to correctly convert values between Scheme and C representation. This foreign variable can only be accessed in the current compilation unit, but the name can be lexically shadowed.  Note that <tt>STRING</tt> can name an arbitrary C expression. If no assignments are performed, then <tt>STRING</tt> doesn't even have to specify an lvalue. See that <tt>define-foreign-variable</tt> will not generate C declarations or memory allocation code; use it to include references to variables in external C code. To actually create Scheme variables visible from C, use <tt>define-external</tt> (see the Manual section on <a href="Module%20%28chicken%20foreign%29.html#sec:Callbacks">Callbacks</a>). For example, the following code:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">import <span class="paren2">(<span class="default">chicken foreign</span>)</span></span>)</span>
+<span class="paren1">(<span class="default"><i><span class="symbol">define-foreign-variable</span></i> x double <span class="string">&quot;var_x&quot;</span></span>)</span>
+<span class="paren1">(<span class="default">print x</span>)</span></pre><p>will not work, because a reference to <tt>var_x</tt> will be inserted in the C code, but no declaration will be included (this can be easily verified by translating the program into C with <tt>csc -t program.scm</tt>). Changing the second line to <tt>(define-external x double 0.5)</tt> will work (and the value 0.5 will be printed).</p></dd></dl><h3 id="sec:foreign-lambda"><a href="#sec:foreign-lambda">foreign-lambda</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:foreign-lambda"><span class="sig"><tt>(foreign-lambda RETURNTYPE NAME ARGTYPE ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Represents a binding to an external routine. This form can be used in the position of an ordinary <tt>lambda</tt> expression. <tt>NAME</tt> specifies the name of the external procedure and should be a string or a symbol.</p></dd></dl><h3 id="sec:foreign-lambda.2a"><a href="#sec:foreign-lambda.2a">foreign-lambda*</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:foreign-lambda.2a"><span class="sig"><tt>(foreign-lambda* RETURNTYPE ((ARGTYPE VARIABLE) ...) STRING ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Similar to <tt>foreign-lambda</tt>, but instead of generating code to call an external function, the body of the C procedure is directly given in <tt>STRING ...</tt>:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> my-strlen
+  <span class="paren2">(<span class="default">foreign-lambda* int <span class="paren3">(<span class="default"><span class="paren4">(<span class="default">c-string str</span>)</span></span>)</span>
+    <span class="string">&quot;int n = 0;
+     while(*(str++)) ++n;
+     C_return(n);&quot;</span></span>)</span> </span>)</span>
+
+<span class="paren1">(<span class="default">my-strlen <span class="string">&quot;one two three&quot;</span></span>)</span>             ==&gt; 13</pre><p>For obscure technical reasons you should use the <tt>C_return</tt> macro instead of the normal <tt>return</tt> statement to return a result from the foreign lambda body as some cleanup code has to be run before execution commences in the calling code.</p></dd></dl><h3 id="sec:foreign-safe-lambda"><a href="#sec:foreign-safe-lambda">foreign-safe-lambda</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:foreign-safe-lambda"><span class="sig"><tt>(foreign-safe-lambda RETURNTYPE NAME ARGTYPE ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>This is similar to <tt>foreign-lambda</tt>, but also allows the called function to call Scheme functions. See <a href="Module%20%28chicken%20foreign%29.html#sec:Callbacks">Callbacks</a>.</p></dd></dl><h3 id="sec:foreign-safe-lambda.2a"><a href="#sec:foreign-safe-lambda.2a">foreign-safe-lambda*</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:foreign-safe-lambda.2a"><span class="sig"><tt>(foreign-safe-lambda* RETURNTYPE ((ARGTYPE VARIABLE)...) STRING ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>This is similar to <tt>foreign-lambda*</tt>, but also allows the called function to call Scheme functions and allocate Scheme data-objects. See <a href="Module%20%28chicken%20foreign%29.html#sec:Callbacks">Callbacks</a>.</p></dd></dl><h3 id="sec:foreign-primitive"><a href="#sec:foreign-primitive">foreign-primitive</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:foreign-primitive"><span class="sig"><tt>(foreign-primitive [RETURNTYPE] ((ARGTYPE VARIABLE) ...) STRING ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>This is also similar to <tt>foreign-lambda*</tt> but the code will be executed in a <i>primitive</i> CPS context, which means it will not actually return, but call its continuation on exit. This means that code inside this form may allocate Scheme data on the C stack (the <i>nursery</i>) with <tt>C_alloc</tt> (see below). You can return multiple values inside the body of the <tt>foreign-primitive</tt> form by using the following C code:</p>
+<pre class="highlight colorize">C_word av<span class="paren1">[<span class="default">N + 2</span>]</span> = { C_SCHEME_UNDEFINED, C_k, X1, ... }<span class="comment">;
+</span>C_values<span class="paren1">(<span class="default">N + 2, av</span>)</span><span class="comment">;</span></pre><p>where <tt>N</tt> is the number of values to be returned, and <tt>X1, ...</tt> are the results, which should be Scheme data objects. See <a href="C%20interface.html#sec:constructors">Constructors</a> for the APIs to construct Scheme data objects from C primitives. When returning multiple values, the return-type should be omitted. Of course, if you have to dynamically compute the values, you do not have to use C's array initialization syntax, but you can just assign them one by one.</p><p>Returning just a single value can still be done via the <tt>C_return(...)</tt> macro.</p></dd></dl><h2 id="sec:Callbacks"><a href="#sec:Callbacks">Callbacks</a></h2><p>To enable an external C function to call back to Scheme, the form <tt>foreign-safe-lambda</tt> (or <tt>foreign-safe-lambda*</tt>) has to be used. This generates special code to save and restore important state information during execution of C code. There are two ways of calling Scheme procedures from C: the first is to invoke the runtime function <tt>C_callback</tt> with the closure to be called and the number of arguments.  The second is to define an externally visible wrapper function around a Scheme procedure with the <tt>define-external</tt> form.</p><p>Note: the names of all functions, variables and macros exported by the CHICKEN runtime system start with <tt>C_</tt>. It is advisable to use a different naming scheme for your own code to avoid name clashes. Callbacks (defined by <tt>define-external</tt>) do not capture the lexical environment.</p><p>Non-local exits leaving the scope of the invocation of a callback from Scheme into C will not remove the C call-frame from the stack (and will result in a memory leak).  <b>Note:</b> The same applies to SRFI-18 threading, which is implemented with <tt>call/cc</tt>; additionally, if you enter one callback, switch threads and then exit a different callback, your program is likely to crash.</p><h3 id="sec:define-external"><a href="#sec:define-external">define-external</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:define-external"><span class="sig"><tt>(define-external [QUALIFIERS] (NAME (ARGUMENTTYPE1 VARIABLE1) ...) RETURNTYPE BODY ...)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:define-external"><span class="sig"><tt>(define-external NAME TYPE [INIT])</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>The first form defines an externally callable Scheme procedure. <tt>NAME</tt> should be a symbol, which, when converted to a string, represents a legal C identifier. <tt>ARGUMENTTYPE1 ...</tt> and <tt>RETURNTYPE</tt> are foreign type specifiers for the argument variables <tt>VAR1 ...</tt> and the result, respectively.  <tt>QUALIFIERS</tt> is an optional qualifier for the foreign procedure definition, like <tt>__stdcall</tt>.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define-external</span></i> <span class="paren2">(<span class="default">foo <span class="paren3">(<span class="default">c-string x</span>)</span></span>)</span> int <span class="paren2">(<span class="default">string-length x</span>)</span></span>)</span></pre><p>You can use <a href="Module%20%28chicken%20foreign%29.html#sec:location"><tt>location</tt></a> to get a pointer to the defined C function, which can be passed to a C function that takes a callback function pointer argument, for example.</p><p>The second form of <tt>define-external</tt> can be used to define variables that are accessible from foreign code. It declares a global variable named by the symbol <tt>NAME</tt> that has the type <tt>TYPE</tt>. <tt>INIT</tt> can be an arbitrary expression that is used to initialize the variable. <tt>NAME</tt> is accessible from Scheme just like any other foreign variable defined by <tt>define-foreign-variable</tt>.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define-external</span></i> foo int 42</span>)</span>
+<span class="paren1">(<span class="default"><span class="paren2">(<span class="default">foreign-lambda* int <span class="paren3">(<span class="default"></span>)</span>
+  <span class="string">&quot;C_return(foo);&quot;</span></span>)</span></span>)</span>           ==&gt; 42</pre><p><b>Note:</b> don't be tempted to assign strings or bytevectors to external variables. Garbage collection moves those objects around, so it is a very bad idea to assign pointers to heap-data. If you have to do so, then copy the data object into statically allocated memory (for example by using <tt>object-evict</tt>).</p><p>Results of type <tt>scheme-object</tt> returned by <tt>define-external</tt> are always allocated in the secondary heap, that is, not in the stack.</p></dd></dl><h3 id="sec:C_callback"><a href="#sec:C_callback">C_callback</a></h3><pre>[C function] C_word C_callback (C_word closure, int argc)</pre><p>This function can be used to invoke the Scheme procedure <tt>closure</tt>. <tt>argc</tt> should contain the number of arguments that are passed to the procedure on the temporary stack. Values are put onto the temporary stack with the <tt>C_save</tt> macro.</p><h3 id="sec:C_callback_adjust_stack"><a href="#sec:C_callback_adjust_stack">C_callback_adjust_stack</a></h3><pre>[C function] void C_callback_adjust_stack (C_word *ptr, int size)</pre><p>The runtime-system uses the stack as a special allocation area and internally holds pointers to estimated limits to distinguish between Scheme data objects inside the stack from objects outside of it.  If you invoke callbacks at wildly differing stack-levels, these limits may shift from invocation to invocation. Callbacks defined with <tt>define-external</tt> will perform appropriate adjustments automatically, but if you invoke <tt>C_callback</tt> manually, you should perform a <tt>C_callback_adjust_stack</tt> to make sure the internal limits are set properly. <tt>ptr</tt> should point to some data object on the stack and <tt>size</tt> is the number of words contained in the data object (or some estimate). The call will make sure the limits are adjusted so that the value pointed to by <tt>ptr</tt> is located in the stack.</p><h2 id="sec:Locations"><a href="#sec:Locations">Locations</a></h2><p>It is also possible to define variables containing unboxed C data, so called <i>locations</i>. It should be noted that locations may only contain simple data, that is: everything that fits into a machine word, and double-precision floating point values.</p><h3 id="sec:define-location"><a href="#sec:define-location">define-location</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:define-location"><span class="sig"><tt>(define-location NAME TYPE [INIT])</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Identical to <tt>(define-external NAME TYPE [INIT])</tt>, but the variable is not accessible from outside of the current compilation unit (it is declared <tt>static</tt>).</p></dd></dl><h3 id="sec:let-location"><a href="#sec:let-location">let-location</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:let-location"><span class="sig"><tt>(let-location ((NAME TYPE [INIT]) ...) BODY ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Defines a lexically bound location.</p></dd></dl><h3 id="sec:location"><a href="#sec:location">location</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:location"><span class="sig"><tt>(location NAME)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:location"><span class="sig"><tt>(location X)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:.23.24"><span class="sig"><tt>#$</tt></span><span class="type">read</span></dt>
+<dd class="defsig"><p>This form returns a pointer object that contains the address of the variable <tt>NAME</tt>. If the argument to <tt>location</tt> is not a location defined by <tt>define-location</tt>, <tt>define-external</tt> or <tt>let-location</tt>, then</p><pre>(location X)</pre><p>is essentially equivalent to</p><pre>(make-locative X)</pre><p>(See the <a href="Module%20%28chicken%20locative%29.html">manual section on locatives</a> for more information about locatives)</p><p>Note that <tt>(location X)</tt> may be abbreviated as <tt>#$X</tt>.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define-external</span></i> foo int</span>)</span>
+<span class="paren1">(<span class="default"><span class="paren2">(<span class="default">foreign-lambda* void <span class="paren3">(<span class="default"><span class="paren4">(<span class="default"><span class="paren5">(<span class="default">c-pointer int</span>)</span> ip</span>)</span></span>)</span> <span class="string">&quot;*ip = 123;&quot;</span></span>)</span>
+  <span class="paren2">(<span class="default">location foo</span>)</span></span>)</span>
+foo                                                                    ==&gt; 123</pre><p>This facility is especially useful in situations, where a C function returns more than one result value:</p>
+<pre class="highlight colorize">#&gt;
+#include &lt;math.h&gt;
+&lt;#
+
+<span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> modf
+  <span class="paren2">(<span class="default">foreign-lambda double <span class="string">&quot;modf&quot;</span> double <span class="paren3">(<span class="default">c-pointer double</span>)</span></span>)</span> </span>)</span>
+
+<span class="paren1">(<span class="default">let-location <span class="paren2">(<span class="default"><span class="paren3">[<span class="default">i double</span>]</span></span>)</span>
+  <span class="paren2">(<span class="default"><i><span class="symbol">let</span></i> <span class="paren3">(<span class="default"><span class="paren4">[<span class="default">f <span class="paren5">(<span class="default">modf 1.99 <span class="paren6">(<span class="default">location i</span>)</span></span>)</span></span>]</span></span>)</span>
+    <span class="paren3">(<span class="default">print <span class="string">&quot;i=&quot;</span> i <span class="string">&quot;, f=&quot;</span> f</span>)</span> </span>)</span> </span>)</span></pre><p>See <a href="http://wiki.call-cc.org/location-and-c-string-star">location and c-string*</a> for a tip on returning a <tt>c-string*</tt> type.</p><p><tt>location</tt> returns a value of type <tt>c-pointer</tt>, when given the name of a callback-procedure defined with <tt>define-external</tt>.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20flonum%29.html">Module (chicken flonum)</a></p><p>Next: <a href="Module%20%28chicken%20format%29.html">Module (chicken format)</a></p></div></div></body></html>

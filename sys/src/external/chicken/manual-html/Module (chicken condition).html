@@ -1,0 +1,251 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken condition)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_condition.29">Module (chicken condition)</a></li>
+<li><a href="#sec:CHICKEN_implementation">CHICKEN implementation</a>
+<ul>
+<li><a href="#sec:System_conditions">System conditions</a></li>
+<li><a href="#sec:Notes">Notes</a></li>
+<li><a href="#sec:Additional_API">Additional API</a>
+<ul>
+<li><a href="#sec:condition-case">condition-case</a></li>
+<li><a href="#sec:get-condition-property">get-condition-property</a></li>
+<li><a href="#sec:condition">condition</a></li>
+<li><a href="#sec:condition-.3elist">condition-&gt;list</a></li>
+<li><a href="#sec:print-error-message">print-error-message</a></li></ul></li></ul></li>
+<li><a href="#sec:SRFI-12_specification">SRFI-12 specification</a>
+<ul>
+<li><a href="#sec:Exception_Handlers">Exception Handlers</a>
+<ul>
+<li><a href="#sec:current-exception-handler">current-exception-handler</a></li>
+<li><a href="#sec:with-exception-handler">with-exception-handler</a></li>
+<li><a href="#sec:handle-exceptions">handle-exceptions</a></li></ul></li>
+<li><a href="#sec:Raising_Exceptions">Raising Exceptions</a>
+<ul>
+<li><a href="#sec:abort">abort</a></li>
+<li><a href="#sec:signal">signal</a></li></ul></li>
+<li><a href="#sec:Condition_Objects">Condition Objects</a>
+<ul>
+<li><a href="#sec:condition.3f">condition?</a></li>
+<li><a href="#sec:make-property-condition">make-property-condition</a></li>
+<li><a href="#sec:make-composite-condition">make-composite-condition</a></li>
+<li><a href="#sec:condition-predicate">condition-predicate</a></li>
+<li><a href="#sec:condition-property-accessor">condition-property-accessor</a></li></ul></li>
+<li><a href="#sec:More_Examples">More Examples</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_condition.29"><a href="#sec:Module_.28chicken_condition.29">Module (chicken condition)</a></h2><p>This module provides various procedures and special forms for raising and handling exceptions with &quot;condition objects&quot;.  Condition objects provide a structured and composable way to encode the kind of exception that took place, and provide the necessary context.</p><p>CHICKEN's exception handling is based on the <a href="http://srfi.schemers.org/srfi-12/srfi-12.html">SRFI-12</a> exception system.  This document contains the core of the SRFI-12 spec as well as CHICKEN implementation specifics.</p><p>There is also a <tt>srfi-12</tt> or <tt>(srfi 12)</tt> module which only includes the standard procedures and macros from the SRFI document, without the CHICKEN extensions.  <tt>(chicken condition)</tt> offers the complete set of procedures and macros, both CHICKEN-specific and standard SRFI-12.</p><h2 id="sec:CHICKEN_implementation"><a href="#sec:CHICKEN_implementation">CHICKEN implementation</a></h2><h3 id="sec:System_conditions"><a href="#sec:System_conditions">System conditions</a></h3><p>All error-conditions signaled by the system are of kind <tt>exn</tt>. The following composite conditions are additionally defined:</p><table>
+
+<tr><td> (exn arity) </td><td>
+
+Signaled when a procedure is called with the wrong number of arguments.
+
+</td></tr>
+<tr><td> (exn type) </td><td>
+
+Signaled on type-mismatch errors, for example when an argument of the wrong
+type is passed to a built-in procedure.
+
+</td></tr>
+<tr><td> (exn arithmetic) </td><td>
+
+Signaled on arithmetic errors, like division by zero.
+
+</td></tr>
+<tr><td> (exn i/o) </td><td>
+
+Signaled on input/output errors.
+
+</td></tr>
+<tr><td> (exn i/o file) </td><td>
+
+Signaled on file-related errors.
+
+</td></tr>
+<tr><td> (exn i/o net) </td><td>
+
+Signaled on network errors.
+
+</td></tr>
+<tr><td> (exn bounds) </td><td>
+
+Signaled on errors caused by accessing non-existent elements of a collection.
+
+</td></tr>
+<tr><td> (exn runtime) </td><td>
+
+Signaled on low-level runtime-system error-situations.
+
+</td></tr>
+<tr><td> (exn runtime limit) </td><td>
+
+Signaled when an internal limit is exceeded (like running out of memory).
+
+</td></tr>
+<tr><td> (exn match) </td><td>
+
+Signaled on errors raised by failed matches (see the section on <tt>match</tt>).
+
+</td></tr>
+<tr><td> (exn syntax) </td><td>
+
+Signaled on syntax errors.
+
+</td></tr>
+
+</table>
+<h3 id="sec:Notes"><a href="#sec:Notes">Notes</a></h3><ul><li>All error-exceptions (of the kind <tt>exn</tt>) are non-continuable.</li>
+<li>Error-exceptions of the <tt>exn</tt> kind have additional <tt>arguments</tt> and <tt>location</tt> properties that contain the arguments passed to the exception-handler and the name of the procedure where the error occurred (if available).</li>
+<li>Within the interpreter (csi), a user-interrupt (<tt>signal/int</tt>) signals an exception of the kind <tt>user-interrupt</tt>.</li>
+<li>The procedure <tt>condition-property-accessor</tt> accepts an optional third argument. If the condition does not have a value for the desired property and if the optional argument is given, no error is signaled and the accessor returns the third argument.</li>
+<li>On platforms that support the <tt>sigprocmask(3)</tt> POSIX API function, the signals <tt>SIGSEGV</tt>, <tt>SIGFPE</tt>, <tt>SIGBUS</tt> and <tt>SIGILL</tt> will be caught and trigger an exception instead of aborting the process, if possible. If the unwinding and handling of the signal raises one of these signals once again, the process will abort with an error message.</li>
+<li>New in CHICKEN 5.4.0: condition objects produced by procedures that change errno have an <tt>errno</tt> property.  To access it, use <tt>(get-condition-property &lt;the-condition-object&gt; 'exn 'errno)</tt>.</li>
+</ul>
+<h3 id="sec:Additional_API"><a href="#sec:Additional_API">Additional API</a></h3><h4 id="sec:condition-case"><a href="#sec:condition-case">condition-case</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:condition-case"><span class="sig"><tt>(condition-case EXPRESSION CLAUSE ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Evaluates <tt>EXPRESSION</tt> and handles any exceptions that are covered by <tt>CLAUSE ...</tt>, where <tt>CLAUSE</tt> should be of the following form:</p><pre> CLAUSE = ([VARIABLE] (KIND ...) BODY ...)</pre><p>If provided, <tt>VARIABLE</tt> will be bound to the signaled exception object. <tt>BODY ...</tt> is executed when the exception is a property- or composite condition with the kinds given <tt>KIND ...</tt> (unevaluated). If no clause applies, the exception is re-signaled in the same dynamic context as the <tt>condition-case</tt> form.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> <span class="paren2">(<span class="default">check thunk</span>)</span>
+  <span class="paren2">(<span class="default">condition-case <span class="paren3">(<span class="default">thunk</span>)</span>
+    <span class="paren3">[<span class="default"><span class="paren4">(<span class="default">exn file</span>)</span> <span class="paren4">(<span class="default">print <span class="string">&quot;file error&quot;</span></span>)</span></span>]</span>
+    <span class="paren3">[<span class="default"><span class="paren4">(<span class="default">exn</span>)</span> <span class="paren4">(<span class="default">print <span class="string">&quot;other error&quot;</span></span>)</span></span>]</span>
+    <span class="paren3">[<span class="default">var <span class="paren4">(<span class="default"></span>)</span> <span class="paren4">(<span class="default">print <span class="string">&quot;something else&quot;</span></span>)</span></span>]</span> </span>)</span> </span>)</span>
+
+<span class="paren1">(<span class="default">check <span class="paren2">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren3">(<span class="default"></span>)</span> <span class="paren3">(<span class="default">open-input-file <span class="string">&quot;&quot;</span></span>)</span></span>)</span></span>)</span>   <span class="comment">; -&gt; &quot;file error&quot;
+</span><span class="paren1">(<span class="default">check <span class="paren2">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren3">(<span class="default"></span>)</span> some-unbound-variable</span>)</span></span>)</span>  <span class="comment">; -&gt; &quot;othererror&quot;
+</span><span class="paren1">(<span class="default">check <span class="paren2">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren3">(<span class="default"></span>)</span> <span class="paren3">(<span class="default">signal 99</span>)</span></span>)</span></span>)</span>            <span class="comment">; -&gt; &quot;something else&quot;
+</span>
+<span class="paren1">(<span class="default">condition-case some-unbound-variable
+  <span class="paren2">(<span class="default"><span class="paren3">(<span class="default">exn file</span>)</span> <span class="paren3">(<span class="default">print <span class="string">&quot;ignored&quot;</span></span>)</span></span>)</span> </span>)</span>      <span class="comment">; -&gt; signals error</span></pre></dd></dl><h4 id="sec:get-condition-property"><a href="#sec:get-condition-property">get-condition-property</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:get-condition-property"><span class="sig"><var class="id">get-condition-property</var> <var class="arg">CONDITION</var> <var class="arg">KIND</var> <var class="arg">PROPERTY</var> <var class="dsssl">#!optional</var> <var class="arg">DEFAULT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>A slightly more convenient condition property accessor, equivalent to</p><pre>((condition-property-accessor KIND PROPERTY [DEFAULT]) CONDITION)</pre></dd></dl><h4 id="sec:condition"><a href="#sec:condition">condition</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:condition"><span class="sig"><var class="id">condition</var> <var class="arg">LST1</var> <var class="arg">LST2</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>This is a more convenient constructor for conditions.  Each of <var class="arg">LST1</var>, <var class="arg">LST2</var> etc is a list of the following form:</p><pre> (KIND PROPERTY1 VALUE1 PROPERTY2 VALUE2 ...)</pre><p>In other words, the following:</p><pre> (signal (condition '(exn location foo message &quot;hi&quot;) '(file bar 1)))</pre><p>is equivalent to the SRFI-12 code:</p><pre> (signal (make-composite-condition
+           (make-property-condition 'exn 'location 'foo 'message &quot;hi&quot;)
+           (make-property-condition 'file 'bar 2)))</pre></dd></dl><h4 id="sec:condition-.3elist"><a href="#sec:condition-.3elist">condition-&gt;list</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:condition-.3elist"><span class="sig"><var class="id">condition-&gt;list</var> <var class="arg">CONDITION</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>This procedure converts a condition object into a list holding all the conditions that are represented by the <i>CONDITION</i> object.  It is formatted as follows:</p><pre>((KIND1 PROPERTY1 VALUE1 PROPERTY2 VALUE2 ...) (KIND2 ... ) ... )</pre><p>There is no guaranteed order within the list.</p></dd></dl><h4 id="sec:print-error-message"><a href="#sec:print-error-message">print-error-message</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:print-error-message"><span class="sig"><var class="id">print-error-message</var> <var class="arg">EXN</var> <var class="dsssl">#!optional</var> <var class="arg">PORT</var> <var class="arg">HEADER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Prints an appropriate error message to <var class="arg">PORT</var> (which defaults to the value of <tt>(current-output-port)</tt> for the object <var class="arg">EXN</var>. <var class="arg">EXN</var> may be a condition, a string or any other object. The output is prefixed by the <var class="arg">HEADER</var>, which defaults to <tt>&quot;Error:&quot;</tt>.</p></dd></dl><h2 id="sec:SRFI-12_specification"><a href="#sec:SRFI-12_specification">SRFI-12 specification</a></h2><p>A Scheme implementation (&quot;the system&quot;) raises an exception whenever an error is to be signaled or whenever the system determines that evaluation cannot proceed in a manner consistent with the semantics of Scheme. A program may also explicitly raise an exception.</p><p>Whenever the system raises an exception, it invokes the current exception handler with a condition object (encapsulating information about the exception) as its only argument. Any procedure accepting one argument may serve as an exception handler. When a program explicitly raises an exception, it may supply any object to the exception handler.</p><p>An exception is either continuable or non-continuable. When the current exception handler is invoked for a continuable exception, the continuation uses the handler's result(s) in an exception-specific way to continue. When an exception handler is invoked for a non-continuable exception, the continuation raises a non-continuable exception indicating that the exception handler returned.  On CHICKEN, system error exceptions (of kind <tt>exn</tt>) are non-continuable.</p><h3 id="sec:Exception_Handlers"><a href="#sec:Exception_Handlers">Exception Handlers</a></h3><h4 id="sec:current-exception-handler"><a href="#sec:current-exception-handler">current-exception-handler</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:current-exception-handler"><span class="sig"><var class="id">current-exception-handler</var> <var class="dsssl">#!optional</var> <var class="arg">PROCEDURE</var></span><span class="type">parameter</span></dt>
+<dd class="defsig"><p>Sets or returns the current exception handler, a procedure of one argument, the exception object.</p></dd></dl><h4 id="sec:with-exception-handler"><a href="#sec:with-exception-handler">with-exception-handler</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:with-exception-handler"><span class="sig"><var class="id">with-exception-handler</var> <var class="arg">handler</var> <var class="arg">thunk</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the result(s) of invoking <i>thunk</i>. The <i>handler</i> procedure is installed as the current exception handler in the dynamic context of invoking <i>thunk</i>.</p><p>Example:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">call-with-current-continuation
+ <span class="paren2">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren3">(<span class="default">k</span>)</span>
+  <span class="paren3">(<span class="default"><i><span class="symbol">with-exception-handler</span></i> <span class="paren4">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren5">(<span class="default">x</span>)</span> <span class="paren5">(<span class="default">k &#x27;<span class="paren6">(<span class="default"></span>)</span></span>)</span></span>)</span>
+                          <span class="paren4">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren5">(<span class="default"></span>)</span> <span class="paren5">(<span class="default">car &#x27;<span class="paren6">(<span class="default"></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+<span class="comment">;=&gt; &#x27;()</span></pre><p>Note that the handler procedure must somehow return non-locally out of the dynamic extent of the <tt>with-exception-handler</tt> form, because returning normally will signal yet another exception and thus result in non-termination.</p></dd></dl><h4 id="sec:handle-exceptions"><a href="#sec:handle-exceptions">handle-exceptions</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:handle-exceptions"><span class="sig"><tt>(handle-exceptions var handle-expr expr1 expr2 ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Evaluates the body expressions <i>expr1</i>, <i>expr2</i>, ... in sequence with an exception handler constructed from <i>var</i> and <i>handle-expr</i>. Assuming no exception is raised, the result(s) of the last body expression is(are) the result(s) of the <tt>handle-exceptions</tt> expression.</p><p>The exception handler created by <tt>handle-exceptions</tt> restores the dynamic context (continuation, exception handler, etc.) of the <tt>handle-exceptions</tt> expression, and then evaluates <i>handle-expr</i> with <i>var</i> bound to the value provided to the handler.</p><p>Examples:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">handle-exceptions exn
+		   <span class="paren2">(<span class="default">begin
+		     <span class="paren3">(<span class="default">display <span class="string">&quot;Went wrong&quot;</span></span>)</span>
+		     <span class="paren3">(<span class="default">newline</span>)</span></span>)</span>
+ <span class="paren2">(<span class="default">car &#x27;<span class="paren3">(<span class="default"></span>)</span></span>)</span></span>)</span>
+<span class="comment">; displays &quot;Went wrong&quot;
+</span> 
+<span class="paren1">(<span class="default">handle-exceptions exn 
+		   <span class="paren2">(<span class="default"><i><span class="symbol">cond</span></i>
+		    <span class="paren3">(<span class="default"><span class="paren4">(<span class="default">eq? exn &#x27;one</span>)</span> 1</span>)</span>
+		     <span class="paren3">(<span class="default">else <span class="paren4">(<span class="default">abort exn</span>)</span></span>)</span></span>)</span>
+  <span class="paren2">(<span class="default">case <span class="paren3">(<span class="default">random 3</span>)</span>
+   <span class="paren3">[<span class="default"><span class="paren4">(<span class="default">0</span>)</span> &#x27;zero</span>]</span>
+   <span class="paren3">[<span class="default"><span class="paren4">(<span class="default">1</span>)</span> <span class="paren4">(<span class="default">abort &#x27;one</span>)</span></span>]</span>
+   <span class="paren3">[<span class="default">else <span class="paren4">(<span class="default">abort <span class="string">&quot;Something else&quot;</span></span>)</span></span>]</span></span>)</span></span>)</span>
+<span class="comment">;=&gt; &#x27;zero, 1, or (abort &quot;Something else&quot;)</span></pre></dd></dl><h3 id="sec:Raising_Exceptions"><a href="#sec:Raising_Exceptions">Raising Exceptions</a></h3><h4 id="sec:abort"><a href="#sec:abort">abort</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:abort"><span class="sig"><var class="id">abort</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Raises a non-continuable exception represented by <i>obj</i>. The <tt>abort</tt> procedure can be implemented as follows:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> <span class="paren2">(<span class="default">abort obj</span>)</span>
+  <span class="paren2">(<span class="default"><span class="paren3">(<span class="default">current-exception-handler</span>)</span> obj</span>)</span>
+  <span class="paren2">(<span class="default">abort <span class="paren3">(<span class="default">make-property-condition
+	   &#x27;exn
+	   &#x27;message
+	   <span class="string">&quot;Exception handler returned&quot;</span></span>)</span></span>)</span></span>)</span></pre><p>The <tt>abort</tt> procedure does not ensure that its argument is a condition. If its argument is a condition, <tt>abort</tt> does not ensure that the condition indicates a non-continuable exception.</p></dd></dl><h4 id="sec:signal"><a href="#sec:signal">signal</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:signal"><span class="sig"><var class="id">signal</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Raises a continuable exception represented by <i>obj</i>. The <tt>signal</tt> procedure can be implemented as follows:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> <span class="paren2">(<span class="default">signal exn</span>)</span>
+ <span class="paren2">(<span class="default"><span class="paren3">(<span class="default">current-exception-handler</span>)</span> exn</span>)</span></span>)</span></pre><p>The <tt>signal</tt> procedure does not ensure that its argument is a condition. If its argument is a condition, <tt>signal</tt> does not ensure that the condition indicates a continuable exception.</p></dd></dl><h3 id="sec:Condition_Objects"><a href="#sec:Condition_Objects">Condition Objects</a></h3><h4 id="sec:condition.3f"><a href="#sec:condition.3f">condition?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:condition.3f"><span class="sig"><var class="id">condition?</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns #t if <i>obj</i> is a condition, otherwise returns #f. If any of the predicates listed in Section 3.2 of the R5RS is true of <i>obj</i>, then <tt>condition?</tt> is false of <i>obj</i>.</p><p>Rationale: Any Scheme object may be passed to an exception handler. This would cause ambiguity if conditions were not disjoint from all of Scheme's standard types.</p></dd></dl><h4 id="sec:make-property-condition"><a href="#sec:make-property-condition">make-property-condition</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:make-property-condition"><span class="sig"><var class="id">make-property-condition</var> <var class="arg">kind-key</var> <var class="arg">prop-key</var> <var class="arg">value</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>This procedure accepts any even number of arguments after <i>kind-key</i>, which are regarded as a sequence of alternating <i>prop-key</i> and <i>value</i> objects. Each <i>prop-key</i> is regarded as the name of a property, and each <i>value</i> is regarded as the value associated with the <i>key</i> that precedes it. Returns a <i>kind-key</i> condition that associates the given <i>prop-key</i>s with the given <i>value</i>s.</p></dd></dl><h4 id="sec:make-composite-condition"><a href="#sec:make-composite-condition">make-composite-condition</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:make-composite-condition"><span class="sig"><var class="id">make-composite-condition</var> <var class="arg">condition</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a newly-allocated condition whose components correspond to the the given <i>condition</i>s. A predicate created by <tt>condition-predicate</tt> returns true for the new condition if and only if it returns true for one or more of its component conditions.</p></dd></dl><h4 id="sec:condition-predicate"><a href="#sec:condition-predicate">condition-predicate</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:condition-predicate"><span class="sig"><var class="id">condition-predicate</var> <var class="arg">kind-key</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a predicate that can be called with any object as its argument. Given a condition that was created by <tt>make-property-condition</tt>, the predicate returns #t if and only if <i>kind-key</i> is EQV? to the kind key that was passed to <tt>make-property-condition</tt>. Given a composite condition created with <tt>make-composite-condition</tt>, the predicate returns #t if and only if the predicate returns #t for at least one of its components.</p></dd></dl><h4 id="sec:condition-property-accessor"><a href="#sec:condition-property-accessor">condition-property-accessor</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:condition-property-accessor"><span class="sig"><var class="id">condition-property-accessor</var> <var class="arg">kind-key</var> <var class="arg">prop-key</var> <var class="dsssl">#!optional</var> <var class="arg">default</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a procedure that can be called with any condition that satisfies <tt>(condition-predicate ''kind-key'')</tt>. Given a condition that was created by <tt>make-property-condition</tt> and <i>kind-key</i>, the procedure returns the value that is associated with <i>prop-key</i>. Given a composite condition created with <tt>make-composite-condition</tt>, the procedure returns the value that is associated with <i>prop-key</i> in one of the components that satisfies <tt>(condition-predicate ''kind-key'')</tt>.</p><p>On CHICKEN, this procedure accepts an optional third argument DEFAULT. If the condition does not have a value for the desired property and if the optional argument is given, no error is signaled and the accessor returns the third argument.</p><p>When the system raises an exception, the condition it passes to the exception handler includes the <tt>'exn</tt> kind with the following properties:</p><dl><dt>message</dt>
+<dd>the error message</dd><dt>arguments</dt>
+<dd>the arguments passed to the exception handler</dd><dt>location</dt>
+<dd>the name of the procedure where the error occurred (if available)</dd></dl>
+<p>Thus, if <i>exn</i> is a condition representing a system exception, then</p>
+<pre class="highlight colorize"> <span class="paren1">(<span class="default"><span class="paren2">(<span class="default">condition-property-accessor &#x27;exn &#x27;message</span>)</span> exn</span>)</span></pre><p>extracts the error message from <i>exn</i>. Example:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">handle-exceptions exn 
+		   <span class="paren2">(<span class="default">begin
+		     <span class="paren3">(<span class="default">display <span class="string">&quot;Went wrong: &quot;</span></span>)</span>
+		     <span class="paren3">(<span class="default">display
+		      <span class="paren4">(<span class="default"><span class="paren5">(<span class="default">condition-property-accessor &#x27;exn &#x27;message</span>)</span> exn</span>)</span></span>)</span>
+		     <span class="paren3">(<span class="default">newline</span>)</span></span>)</span>
+ <span class="paren2">(<span class="default">car &#x27;<span class="paren3">(<span class="default"></span>)</span></span>)</span></span>)</span>
+<span class="comment">; displays something like &quot;Went wrong: can&#x27;t take car of nil&quot;</span></pre></dd></dl><h3 id="sec:More_Examples"><a href="#sec:More_Examples">More Examples</a></h3>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> <span class="paren2">(<span class="default">try-car v</span>)</span>
+ <span class="paren2">(<span class="default"><i><span class="symbol">let</span></i> <span class="paren3">(<span class="default"><span class="paren4">(<span class="default">orig <span class="paren5">(<span class="default">current-exception-handler</span>)</span></span>)</span></span>)</span>
+   <span class="paren3">(<span class="default"><i><span class="symbol">with-exception-handler</span></i>
+    <span class="paren4">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren5">(<span class="default">exn</span>)</span>
+      <span class="paren5">(<span class="default">orig <span class="paren6">(<span class="default">make-composite-condition
+	     <span class="paren1">(<span class="default">make-property-condition
+	      &#x27;not-a-pair
+	      &#x27;value
+	      v</span>)</span>
+	     exn</span>)</span></span>)</span></span>)</span>
+    <span class="paren4">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren5">(<span class="default"></span>)</span> <span class="paren5">(<span class="default">car v</span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+ 
+<span class="paren1">(<span class="default">try-car &#x27;<span class="paren2">(<span class="default">1</span>)</span></span>)</span>
+<span class="comment">;=&gt; 1
+</span>
+<span class="paren1">(<span class="default">handle-exceptions exn
+		   <span class="paren2">(<span class="default"><i><span class="symbol">if</span></i> <span class="paren3">(<span class="default"><span class="paren4">(<span class="default">condition-predicate &#x27;not-a-pair</span>)</span> exn</span>)</span>
+		       <span class="paren3">(<span class="default">begin
+			<span class="paren4">(<span class="default">display <span class="string">&quot;Not a pair: &quot;</span></span>)</span>
+			<span class="paren4">(<span class="default">display
+			 <span class="paren5">(<span class="default"><span class="paren6">(<span class="default">condition-property-accessor &#x27;not-a-pair &#x27;value</span>)</span> exn</span>)</span></span>)</span>
+			<span class="paren4">(<span class="default">newline</span>)</span></span>)</span>
+		       <span class="paren3">(<span class="default">abort exn</span>)</span></span>)</span>
+  <span class="paren2">(<span class="default">try-car 0</span>)</span></span>)</span>
+<span class="comment">; displays &quot;Not a pair: 0&quot;
+</span>
+<span class="paren1">(<span class="default"><i><span class="symbol">let*</span></i> <span class="paren2">(<span class="default"><span class="paren3">(<span class="default">cs-key <span class="paren4">(<span class="default">list &#x27;color-scheme</span>)</span></span>)</span>
+       <span class="paren3">(<span class="default">bg-key <span class="paren4">(<span class="default">list &#x27;background</span>)</span></span>)</span>
+       <span class="paren3">(<span class="default">color-scheme? <span class="paren4">(<span class="default">condition-predicate cs-key</span>)</span></span>)</span>
+       <span class="paren3">(<span class="default">color-scheme-background 
+	<span class="paren4">(<span class="default">condition-property-accessor cs-key bg-key</span>)</span></span>)</span>
+       <span class="paren3">(<span class="default">condition1 <span class="paren4">(<span class="default">make-property-condition cs-key bg-key &#x27;green</span>)</span></span>)</span>
+       <span class="paren3">(<span class="default">condition2 <span class="paren4">(<span class="default">make-property-condition cs-key bg-key &#x27;blue</span>)</span></span>)</span>
+       <span class="paren3">(<span class="default">condition3 <span class="paren4">(<span class="default">make-composite-condition condition1 condition2</span>)</span></span>)</span></span>)</span>
+  <span class="paren2">(<span class="default">and <span class="paren3">(<span class="default">color-scheme? condition1</span>)</span>
+       <span class="paren3">(<span class="default">color-scheme? condition2</span>)</span>
+       <span class="paren3">(<span class="default">color-scheme? condition3</span>)</span>
+       <span class="paren3">(<span class="default">color-scheme-background condition3</span>)</span></span>)</span></span>)</span>
+<span class="comment">; =&gt; &#x27;green or &#x27;blue</span></pre><hr /><p>Previous: <a href="Module%20%28chicken%20blob%29.html">Module (chicken blob)</a></p><p>Next: <a href="Module%20%28chicken%20continuation%29.html">Module (chicken continuation)</a></p></div></div></body></html>

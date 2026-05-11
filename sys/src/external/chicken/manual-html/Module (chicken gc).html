@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken gc)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_gc.29">Module (chicken gc)</a>
+<ul>
+<li><a href="#sec:gc">gc</a></li>
+<li><a href="#sec:current-gc-milliseconds">current-gc-milliseconds</a></li>
+<li><a href="#sec:memory-statistics">memory-statistics</a></li>
+<li><a href="#sec:set-finalizer.21">set-finalizer!</a></li>
+<li><a href="#sec:make-finalizer">make-finalizer</a></li>
+<li><a href="#sec:add-to-finalizer">add-to-finalizer</a></li>
+<li><a href="#sec:force-finalizers">force-finalizers</a></li>
+<li><a href="#sec:set-gc-report.21">set-gc-report!</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_gc.29"><a href="#sec:Module_.28chicken_gc.29">Module (chicken gc)</a></h2><p>This module provides some control over the garbage collector.</p><h3 id="sec:gc"><a href="#sec:gc">gc</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:gc"><span class="sig"><var class="id">gc</var> <var class="dsssl">#!optional</var> <var class="arg">FLAG</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Invokes a garbage-collection and returns the number of free bytes in the heap. The flag specifies whether a minor (<tt>#f</tt>) or major (<tt>#t</tt>) GC is to be triggered. If no argument is given, <tt>#t</tt> is assumed. An explicit <tt>#t</tt> argument will cause all pending finalizers to be executed.</p></dd></dl><h3 id="sec:current-gc-milliseconds"><a href="#sec:current-gc-milliseconds">current-gc-milliseconds</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:current-gc-milliseconds"><span class="sig"><var class="id">current-gc-milliseconds</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the number of milliseconds spent in major garbage collections since the last call of <tt>current-gc-milliseconds</tt> and returns an exact integer.</p></dd></dl><h3 id="sec:memory-statistics"><a href="#sec:memory-statistics">memory-statistics</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:memory-statistics"><span class="sig"><var class="id">memory-statistics</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Performs a major garbage collection and returns a three element vector containing the total heap size in bytes, the number of bytes currently used and the size of the nursery (the first heap generation). Note that the actual heap is actually twice the size given in the heap size, because CHICKEN uses a copying semi-space collector.</p></dd></dl><h3 id="sec:set-finalizer.21"><a href="#sec:set-finalizer.21">set-finalizer!</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:set-finalizer.21"><span class="sig"><var class="id">set-finalizer!</var> <var class="arg">X</var> <var class="arg">PROC</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Registers a procedure of one argument <var class="arg">PROC</var>, that will be called as soon as the non-immediate data object <var class="arg">X</var> is about to be garbage-collected (with that object as its argument). This procedure returns <var class="arg">X</var>.</p><p>Finalizers installed using <tt>set-finalizer!</tt> are invoked asynchronously, in the thread that happens to be currently running. Finalizers for data that has become garbage are called on normal program exit. Finalizers are not run on abnormal program exit. A normal program exit does not run finalizers that are still reachable from global data.</p><p>Multiple finalizers can be registered for the same object. The order in which the finalizers run is undefined. Execution of finalizers may be nested.</p><p>NOTE 1: The finalizer will <b>not</b> be called while interrupts are disabled.</p><p>NOTE 2: When a finalizable object has any weak references (i.e., weak locatives or weak pairs) to objects that are only reachable through it or other finalizable objects, those references will be broken like when the objects had already been collected.  This is done in order to avoid user code from accessing objects that are possibly in an invalid state.</p></dd></dl><h3 id="sec:make-finalizer"><a href="#sec:make-finalizer">make-finalizer</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:make-finalizer"><span class="sig"><var class="id">make-finalizer</var> <var class="arg">OBJECT</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Registers the set of non-immediate argument objects for finalization and returns a procedure of zero or one arguments. Invoking this procedure will return the first object from the set that is not referenced from any other globally reachable data and can be garbage collected. Non-immediate objects are anything that is not a small integer (&quot;fixnum&quot;), a character, a boolean, the empty list, the undefined value, the end-of-file value (<tt>#!eof</tt>) or the broken-weak-pair object (<tt>#!bwp</tt>).</p><p>Note that you can pass procedures created by <tt>make-finalizer</tt> to <tt>make-finalizer</tt> itself, implying that a finalizer procedure is finalized when all associated objects are.</p><p>The procedure returned by <tt>make-finalizer</tt> behaves differently depending on the argument given: If the argument is missing or <tt>#f</tt>, then it returns <tt>#f</tt> when no object has as yet been finalized. When the argument is <tt>#t</tt>, execution of the current thread suspends until a finalization occurs. If no other threads are executing then execution pauses for eternity.</p><p>The same caveat regarding weak references applies to finalizers registered with <tt>make-finalizer</tt>.  See <tt>NOTE 2</tt> in <tt>set-finalizer!</tt>.</p></dd></dl><h3 id="sec:add-to-finalizer"><a href="#sec:add-to-finalizer">add-to-finalizer</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:add-to-finalizer"><span class="sig"><var class="id">add-to-finalizer</var> <var class="arg">FINALIZER</var> <var class="arg">OBJECT</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Add further objects to the finalization procedure <var class="arg">FINALIZER</var>, in addition to the objects already supplied when invoking <tt>make-finalizer</tt>.</p></dd></dl><h3 id="sec:force-finalizers"><a href="#sec:force-finalizers">force-finalizers</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:force-finalizers"><span class="sig"><var class="id">force-finalizers</var></span><span class="type">parameter</span></dt>
+<dd class="defsig"><p>If true, force and execute all pending finalizers before exiting the program (either explicitly by <tt>exit</tt> or implicitly when the last toplevel expression has been executed). Default is <tt>#t</tt>.</p></dd></dl><h3 id="sec:set-gc-report.21"><a href="#sec:set-gc-report.21">set-gc-report!</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:set-gc-report.21"><span class="sig"><var class="id">set-gc-report!</var> <var class="arg">FLAG</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Print statistics after every GC, depending on <var class="arg">FLAG</var>. A value of <tt>#t</tt> shows statistics after every major GC. A true value different from <tt>#t</tt> shows statistics after every minor GC. <tt>#f</tt> switches statistics off.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20format%29.html">Module (chicken format)</a></p><p>Next: <a href="Module%20%28chicken%20io%29.html">Module (chicken io)</a></p></div></div></body></html>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken blob)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_blob.29">Module (chicken blob)</a>
+<ul>
+<li><a href="#sec:make-blob">make-blob</a></li>
+<li><a href="#sec:blob.3f">blob?</a></li>
+<li><a href="#sec:blob-size">blob-size</a></li>
+<li><a href="#sec:blob-.3estring">blob-&gt;string</a></li>
+<li><a href="#sec:string-.3eblob">string-&gt;blob</a></li>
+<li><a href="#sec:blob.3d.3f">blob=?</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_blob.29"><a href="#sec:Module_.28chicken_blob.29">Module (chicken blob)</a></h2><p>This module contains procedures for dealing with &quot;blobs&quot;.  Blobs are unstructured byte arrays (basically &quot;binary strings&quot;). You can't do much with them, but they allow conversion to and from <a href="Module%20srfi-4.html">SRFI-4 number vectors</a> which define how to access a blob's byte contents.</p><h3 id="sec:make-blob"><a href="#sec:make-blob">make-blob</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:make-blob"><span class="sig"><var class="id">make-blob</var> <var class="arg">SIZE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a blob object of <var class="arg">SIZE</var> bytes, aligned on an 8-byte boundary, uninitialized.</p></dd></dl><h3 id="sec:blob.3f"><a href="#sec:blob.3f">blob?</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:blob.3f"><span class="sig"><var class="id">blob?</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">X</var> is a blob object, or <tt>#f</tt> otherwise.</p></dd></dl><h3 id="sec:blob-size"><a href="#sec:blob-size">blob-size</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:blob-size"><span class="sig"><var class="id">blob-size</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the number of bytes in <var class="arg">BLOB</var>.</p></dd></dl><h3 id="sec:blob-.3estring"><a href="#sec:blob-.3estring">blob-&gt;string</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:blob-.3estring"><span class="sig"><var class="id">blob-&gt;string</var> <var class="arg">BLOB</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a string with the contents of <var class="arg">BLOB</var>.</p></dd></dl><h3 id="sec:string-.3eblob"><a href="#sec:string-.3eblob">string-&gt;blob</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:string-.3eblob"><span class="sig"><var class="id">string-&gt;blob</var> <var class="arg">STRING</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a blob with the contents of <var class="arg">STRING</var>.</p></dd></dl><h3 id="sec:blob.3d.3f"><a href="#sec:blob.3d.3f">blob=?</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:blob.3d.3f"><span class="sig"><var class="id">blob=?</var> <var class="arg">BLOB1</var> <var class="arg">BLOB2</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if the two argument blobs are of the same size and have the same content.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20bitwise%29.html">Module (chicken bitwise)</a></p><p>Next: <a href="Module%20%28chicken%20condition%29.html">Module (chicken condition)</a></p></div></div></body></html>

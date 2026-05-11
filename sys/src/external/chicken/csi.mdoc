@@ -1,0 +1,146 @@
+.\"  Copyright (c) 2007-2022, The CHICKEN Team
+.\"  All rights reserved.
+.\"
+.\"  Redistribution and use in source and binary forms, with or without
+.\"  modification, are permitted provided that the following conditions
+.\"  are met:
+.\"  1. Redistributions of source code must retain the above copyright
+.\"     notice, this list of conditions and the following disclaimer.
+.\"  2. Redistributions in binary form must reproduce the above copyright
+.\"     notice, this list of conditions and the following disclaimer in the
+.\"     documentation and/or other materials provided with the distribution.
+.\"  3. The name of the authors may not be used to endorse or promote products
+.\"     derived from this software without specific prior written permission.
+.\"
+.\"  THIS SOFTWARE IS PROVIDED BY THE AUTHORS ``AS IS'' AND ANY EXPRESS OR
+.\"  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+.\"  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+.\"  IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+.\"  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+.\"  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+.\"  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+.\"  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+.\"  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+.\"  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+.\"
+.\"
+.Dd Apr 26, 2017
+.Dt CSI 1
+.Os
+.Sh NAME
+.Nm csi
+.Nd The CHICKEN Scheme interpreter
+.Sh SYNOPSIS
+.Nm
+.Op Ar OPTION  ...
+.Op Ar FILENAME ...
+.Sh DESCRIPTION
+.Nm
+is an interpreter for the programming language Scheme supporting most of
+the features as described in the Revised^5 Report on the Algorithmic
+Language Scheme.
+.Nm
+is implemented as a program compiled with the CHICKEN compiler.
+.Pp
+.Ar FILENAME
+is a Scheme source file name with optional extension.
+.Ar OPTION
+may be  one of the following:
+.Bl -tag -width Ds
+.It Fl h , Fl help
+Display usage and exit.
+.It Fl version
+Display version and exit.
+.It Fl release
+Print release number and exit.
+.It Fl i , Fl case-insensitive
+Enable case-insensitive reading.
+.It Fl e Ar EXPRESSION , Fl eval Ar EXPRESSION
+Evaluate the given expression.
+.It Fl p Ar EXPRESSION , Fl print Ar EXPRESSION
+Evaluate and print the result(s) of the given expression.
+.It Fl P Ar EXPRESSION , Fl pretty-print Ar EXPRESSION
+Evaluate and print result(s) prettily.
+.It Fl D Ar SYMBOL , Fl feature Ar SYMBOL
+Register feature identifier.
+.It Fl no-feature Ar SYMBOL
+Disable built-in feature identifier.
+.It Fl q , Fl quiet
+Do not print banner.
+.It Fl n , Fl no-init
+Do not load initialization file.
+.Sq .csirc
+.It Fl b , Fl batch
+Terminate after command-line processing.
+.It Fl w , Fl no-warnings
+Disable all warnings.
+.It Fl K Ar STYLE , Fl keyword-style Ar STYLE
+Enable alternative keyword-syntax
+.Po prefix, suffix or none Pc
+.It Fl no-parentheses-synonyms
+Disable list delimiter synonyms.
+.It Fl no-symbol-escape
+Disables support for escaped symbols.
+.It Fl r5rs-syntax
+Disable the CHICKEN extensions to R5RS syntax.
+.It Fl s Ar PATHNAME , Fl script Ar PATHNAME
+Use interpreter for shell scripts.
+.It Fl ss Ar PATHNAME
+Run a script with a
+.Sq main
+procedure
+.It Fl sx Ar PATHNAME
+Same as
+.Fl s ,
+but print each expression as it is evaluated.
+.It Fl setup-mode
+Prefer the current directory when locating extensions.
+.It Fl R Ar NAME , Fl require-extension Ar NAME
+Import extension before executing code.
+.It Fl I Ar PATHNAME , Fl include-path Ar PATHNAME
+Add
+.Ar PATHNAME
+to the include path.
+.It Fl -
+Ignore all following options.
+.El
+.Sh ENVIRONMENT
+The following environment variables change the behaviour of
+.Nm Ns :
+.Bl -tag -width CHICKEN_INCLUDE_PATH
+.It Ev CSI_OPTIONS
+When set to a string of command-line options, then the options are
+passed implicitly to every direct or indirect invocation of
+.Nm . Note that runtime options of the form
+.Sq \&-: Ns Aq OPTIONS
+cannot be passed using this method.
+.It Ev CHICKEN_INCLUDE_PATH
+Contains one or more pathnames where the interpreter should also look
+for include files, separated by
+.Sq \&;
+characters.
+.El
+.Sh FILES
+.Bl -tag -width 4n
+.It Pa $XDG_CONFIG_HOME/chicken/csirc
+Scheme file loaded on startup. (
+.Ev $XDG_CONFIG_HOME
+defaults to
+.Pa $HOME/.config
+)
+.It Pa $HOME/.csirc
+Scheme file loaded on startup if the previous one doesn’t exists.
+.El
+.Sh EXIT STATUS
+.Ex -std
+.Sh SEE ALSO
+.Xr chicken 1 ,
+.Xr csc 1
+.Pp
+More information can be found in the
+.Lk http://wiki.call-cc.org/manual/index "CHICKEN User's Manual".
+.Sh AUTHORS
+.An The CHICKEN Team
+.Sh BUGS
+Submit bug reports by e-mail to
+.Mt chicken-janitors@nongnu.org

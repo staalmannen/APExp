@@ -1,0 +1,263 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Foreign type specifiers</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Foreign_type_specifiers">Foreign type specifiers</a>
+<ul>
+<li><a href="#sec:Void">Void</a></li>
+<li><a href="#sec:Boolean">Boolean</a></li>
+<li><a href="#sec:Characters">Characters</a></li>
+<li><a href="#sec:Integers">Integers</a></li>
+<li><a href="#sec:Floating-point">Floating-point</a></li>
+<li><a href="#sec:Strings">Strings</a></li>
+<li><a href="#sec:Bytevectors">Bytevectors</a></li>
+<li><a href="#sec:Pointers">Pointers</a></li>
+<li><a href="#sec:Scheme_objects">Scheme objects</a></li>
+<li><a href="#sec:User-defined_C_types">User-defined C types</a></li>
+<li><a href="#sec:C.2b.2b_types">C++ types</a></li>
+<li><a href="#sec:Type_qualifiers">Type qualifiers</a></li>
+<li><a href="#sec:Map_of_foreign_types_to_C_types">Map of foreign types to C types</a></li></ul></li></ul></div><h2 id="sec:Foreign_type_specifiers"><a href="#sec:Foreign_type_specifiers">Foreign type specifiers</a></h2><p>Here is a list of valid foreign type specifiers for use in <a href="Accessing%20external%20objects.html">accessing external objects</a>.</p><h3 id="sec:Void"><a href="#sec:Void">Void</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:void"><span class="sig"><tt>void</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>Specifies an undefined return value.  Not allowed as argument type.</p></dd></dl><h3 id="sec:Boolean"><a href="#sec:Boolean">Boolean</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:bool"><span class="sig"><tt>bool</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>As argument: any value (<tt>#f</tt> is false (zero), anything else is true (non-zero).</p><p>As result: anything different from 0 and the <tt>NULL</tt> pointer is <tt>#t</tt>.</p><p>This type maps to <tt>int</tt> in both C and C++.</p></dd></dl><h3 id="sec:Characters"><a href="#sec:Characters">Characters</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:char"><span class="sig"><tt>char</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:unsigned-char"><span class="sig"><tt>unsigned-char</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>A signed or unsigned character.</p><p>As an argument, the input Scheme character is cast to C <tt>char</tt> or <tt>unsigned char</tt>, resulting in an 8-bit value.  A Scheme character with an integer value outside 0-127 (signed) or 0-255 (unsigned) will be silently truncated to fit; in other words, don't feed it UTF-8 data.</p><p>As a return type, accepts any valid Unicode code point; the return type is treated as a C int, and converted to a Scheme character.</p></dd></dl><h3 id="sec:Integers"><a href="#sec:Integers">Integers</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:byte"><span class="sig"><tt>byte</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:unsigned-byte"><span class="sig"><tt>unsigned-byte</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>An 8-bit integer value in range -128 - 127 (byte) or 0 - 255 (unsigned byte).  Values are cast to and from C <tt>char</tt> or <tt>unsigned char</tt> type, so values outside this 8-bit range will be unceremoniously truncated.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:short"><span class="sig"><tt>short</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:unsigned-short"><span class="sig"><tt>unsigned-short</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>A short integer number in 16-bit range.  Maps to C <tt>short</tt> or <tt>unsigned short</tt>.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:int"><span class="sig"><tt>int</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:unsigned-int"><span class="sig"><tt>unsigned-int</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:int32"><span class="sig"><tt>int32</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:unsigned-int32"><span class="sig"><tt>unsigned-int32</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>An integer number in fixnum range (-1073741824 to 1073741823, i.e. 31 bit signed).  <tt>unsigned-int</tt> further restricts this range to 30 bit unsigned (0 to 1073741823).  <tt>int</tt> maps to C type <tt>int</tt> and <tt>int32</tt> maps to <tt>int32_t</tt>.</p><p>As an argument type, these expect a fixnum value, and as a return type they return a fixnum.  Values outside the ranges prescribed above are silently truncated; you should use e.g. <tt>integer</tt> if you need the full 32-bit range.  Note: <tt>int32</tt> is not recognized as an argument type prior to CHICKEN 4.7.2.</p><p>Notes for 64-bit architectures:</p><ul><li>C's <tt>int</tt> is 32 bits on most 64-bit systems (<a href="https://en.wikipedia.org/wiki/64-bit_computing#64-bit_data_models">LP64</a>), so <tt>int</tt> and <tt>int32</tt> are functionally (if not semantically) equivalent.</li>
+<li>The fixnum type is larger than 32 bits and consequently the entire signed or unsigned 32-bit range is available for this type on 64-bit systems.  However, for compatibility with 32-bit systems it is probably unwise to rely on this.  If you need a 32-bit range, you should use (unsigned) <tt>integer</tt> or <tt>integer32</tt>.</li>
+</ul>
+</dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:integer"><span class="sig"><tt>integer</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:unsigned-integer"><span class="sig"><tt>unsigned-integer</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:integer32"><span class="sig"><tt>integer32</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:unsigned-integer32"><span class="sig"><tt>unsigned-integer32</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>A fixnum or bignum, mapping to <tt>int</tt> or <tt>int32_t</tt> or their unsigned variants.  When outside of fixnum range the value will overflow into a bignum. Prior to CHICKEN 5, the value would overflow into a flonum.</p><p>C's <tt>int</tt> is 32 bits on most 64-bit systems (<a href="https://en.wikipedia.org/wiki/64-bit_computing#64-bit_data_models">LP64</a>), so <tt>integer</tt> and <tt>integer32</tt> are functionally (if not semantically) equivalent.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:integer64"><span class="sig"><tt>integer64</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:unsigned-integer64"><span class="sig"><tt>unsigned-integer64</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>A fixnum or bignum, mapping to <tt>int64_t</tt> or <tt>uint64_t</tt>. When outside of fixnum range the value will overflow into a bignum. Prior to CHICKEN 5, the value would overflow into a flonum.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:long"><span class="sig"><tt>long</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:unsigned-long"><span class="sig"><tt>unsigned-long</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>A fixnum or bignum, mapping to <tt>long</tt> or <tt>unsigned long</tt>. Similar to <tt>integer32</tt> on 32-bit systems or <tt>integer64</tt> on 64-bit.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:size_t"><span class="sig"><tt>size_t</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:ssize_t"><span class="sig"><tt>ssize_t</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>A direct mapping to C's <tt>size_t</tt> and <tt>ssize_t</tt>.</p></dd></dl><h3 id="sec:Floating-point"><a href="#sec:Floating-point">Floating-point</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:float"><span class="sig"><tt>float</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:double"><span class="sig"><tt>double</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>A floating-point number. If an exact integer is passed as an argument, then it is automatically converted to a float.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:number"><span class="sig"><tt>number</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>A floating-point number. Similar to <tt>double</tt>, but when used as a result type, then either an exact integer or a floating-point number is returned, depending on whether the result fits into an exact integer or not.</p></dd></dl><h3 id="sec:Strings"><a href="#sec:Strings">Strings</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:c-string"><span class="sig"><tt>c-string</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:nonnull-c-string"><span class="sig"><tt>nonnull-c-string</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>A zero-terminated C string. The argument value <tt>#f</tt> is allowed and is passed as a <tt>NULL</tt> pointer; similarly, a NULL pointer is returned as <tt>#f</tt>.  Note that the string contents are copied into (automatically managed) temporary storage with a zero byte appended when passed as an argument. Also, a return value of this type is copied into garbage collected memory using <tt>strcpy(3)</tt>.</p><p>For the <tt>nonnull-</tt> variant, passing <tt>#f</tt> will raise an exception, and returning a NULL pointer will result in undefined behavior (e.g. a segfault).</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:c-string.2a"><span class="sig"><tt>c-string*</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:nonnull-c-string.2a"><span class="sig"><tt>nonnull-c-string*</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>Similar to <tt>c-string</tt> and <tt>nonnull-c-string</tt>, but if used as a result type, the pointer returned by the foreign code will be freed (using the C library's <tt>free(3)</tt>) after copying. This type specifier is not valid as a result type for callbacks defined with <tt>define-external</tt>.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:unsigned-c-string"><span class="sig"><tt>unsigned-c-string</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:nonnull-unsigned-c-string"><span class="sig"><tt>nonnull-unsigned-c-string</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:unsigned-c-string.2a"><span class="sig"><tt>unsigned-c-string*</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:nonnull-unsigned-c-string.2a"><span class="sig"><tt>nonnull-unsigned-c-string*</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>Same as <tt>c-string</tt>, <tt>nonnull-c-string</tt>, etc. but mapping to C's <tt>unsigned char *</tt> type.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:c-string-list"><span class="sig"><tt>c-string-list</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:c-string-list.2a"><span class="sig"><tt>c-string-list*</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>Takes a pointer to an array of C strings terminated by a <tt>NULL</tt> pointer and returns a list of strings.  The starred version <tt>c-string-list*</tt> also releases the storage of each string and the pointer array afterward using <tt>free(1)</tt>.</p><p>Only valid as a result type, and can only be used with non-callback functions.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:symbol"><span class="sig"><tt>symbol</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>A symbol, which will be passed to foreign code as a zero-terminated string.</p><p>When declared as the result of foreign code, the result should be a string and a symbol with the same name will be interned in the symbol table (and returned to the caller).  Attempting to return a NULL string will raise an exception.</p></dd></dl><h3 id="sec:Bytevectors"><a href="#sec:Bytevectors">Bytevectors</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:blob"><span class="sig"><tt>blob</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:nonnull-blob"><span class="sig"><tt>nonnull-blob</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>A blob object, passed as a pointer to its contents.  Permitted only as argument type, not return type.</p><p>Arguments of type <tt>blob</tt> may optionally be <tt>#f</tt>, which is passed as a NULL pointer.  For the <tt>nonnull-</tt> variant, passing a <tt>#f</tt> value will raise an exception.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:u8vector"><span class="sig"><tt>u8vector</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:u16vector"><span class="sig"><tt>u16vector</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:u32vector"><span class="sig"><tt>u32vector</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:u64vector"><span class="sig"><tt>u64vector</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:s8vector"><span class="sig"><tt>s8vector</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:s16vector"><span class="sig"><tt>s16vector</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:s32vector"><span class="sig"><tt>s32vector</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:s64vector"><span class="sig"><tt>s64vector</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:f32vector"><span class="sig"><tt>f32vector</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:f64vector"><span class="sig"><tt>f64vector</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:nonnull-u8vector"><span class="sig"><tt>nonnull-u8vector </tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:nonnull-u16vector"><span class="sig"><tt>nonnull-u16vector </tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:nonnull-u32vector"><span class="sig"><tt>nonnull-u32vector </tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:nonnull-u64vector"><span class="sig"><tt>nonnull-u64vector </tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:nonnull-s8vector"><span class="sig"><tt>nonnull-s8vector </tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:nonnull-s16vector"><span class="sig"><tt>nonnull-s16vector</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:nonnull-s32vector"><span class="sig"><tt>nonnull-s32vector</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:nonnull-s64vector"><span class="sig"><tt>nonnull-s64vector</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:nonnull-f32vector"><span class="sig"><tt>nonnull-f32vector</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:nonnull-f64vector"><span class="sig"><tt>nonnull-f64vector</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>A <a href="Module%20srfi-4.html">SRFI-4</a> number-vector object, passed as a pointer to its contents. These are allowed only as argument types, not as return types.</p><p>The value <tt>#f</tt> is also allowed and is passed to C as a NULL pointer. For the <tt>nonnull-</tt> variants, passing <tt>#f</tt> will raise an exception.</p></dd></dl><h3 id="sec:Pointers"><a href="#sec:Pointers">Pointers</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:c-pointer"><span class="sig"><tt>c-pointer</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:c-pointer"><span class="sig"><tt>(c-pointer TYPE)</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:nonnull-c-pointer"><span class="sig"><tt>nonnull-c-pointer</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:nonnull-c-pointer"><span class="sig"><tt>(nonnull-c-pointer TYPE)</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>An operating-system pointer or a locative.  <tt>c-pointer</tt> is untyped, whereas <tt>(c-pointer TYPE)</tt> points to an object of foreign type TYPE.</p><p>The value <tt>#f</tt> is allowed and is passed to C as a <tt>NULL</tt> pointer; similarly, NULL is returned as <tt>#f</tt>.  For the two <tt>nonnull-</tt> variants, passing <tt>#f</tt> will raise an exception, and returning NULL will result in a null <tt>pointer</tt> object.</p><p>(Note: It is still possible to deliberately pass a null pointer through a <tt>nonnull-c-pointer</tt> by manually creating a null pointer object, e.g. via <tt>(address-&gt;pointer 0)</tt>.)</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-vector"><span class="sig"><tt>pointer-vector</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:nonnull-pointer-vector"><span class="sig"><tt>nonnull-pointer-vector</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>A vector of foreign pointer objects; see <a href="http://wiki.call-cc.org/man/5/Module (chicken memory)#pointer-vectors">Pointer vectors</a>. Permitted only as an argument type, not as return type.  This type was introduced in CHICKEN 4.6.3.</p><p>A pointer vector contains a C array of void pointers, and the argument is passed as a <tt>void **</tt> pointer to these contents.  Just as for bytevector types, you must somehow communicate the length of this array to the callee; there is no sentinel node or NULL terminator.</p><p><tt>#f</tt> is allowed and passed as a <tt>NULL</tt> pointer.  For the <tt>nonnull-</tt> variant, passing a <tt>#f</tt> value will raise an exception.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:ref"><span class="sig"><tt>(ref TYPE)</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>A C++ reference type. Reference types are handled the same way as pointers inside Scheme code.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:function"><span class="sig"><tt>(function RESULTTYPE (ARGUMENTTYPE1 ... [...]) [CALLCONV])</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>A function pointer. <tt>CALLCONV</tt> specifies an optional calling convention and should be a string. The meaning of this string is entirely platform dependent. The value <tt>#f</tt> is also allowed and is passed as a <tt>NULL</tt> pointer.</p></dd></dl><h3 id="sec:Scheme_objects"><a href="#sec:Scheme_objects">Scheme objects</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:scheme-object"><span class="sig"><tt>scheme-object</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>An arbitrary, raw Scheme data object (immediate or non-immediate).  A <tt>scheme-object</tt> is passed or returned as a <tt>C_word</tt>, the internal CHICKEN type for objects.  Typically, this consists of an object header and tag bits.  It is up to you to build or take apart such objects using the core library routines in <tt>chicken.h</tt> and <tt>runtime.c</tt>.</p><p>More information on object structure can be found in <a href="Data%20representation.html">Data representation</a>.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:scheme-pointer"><span class="sig"><tt>scheme-pointer</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:scheme-pointer"><span class="sig"><tt>(scheme-pointer TYPE)</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:nonnull-scheme-pointer"><span class="sig"><tt>nonnull-scheme-pointer</tt></span><span class="type">type</span></dt>
+<dt class="defsig" id="def:nonnull-scheme-pointer"><span class="sig"><tt>(nonnull-scheme-pointer TYPE)</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>An untyped pointer to the <i>contents</i> of a non-immediate Scheme object; for example, the raw byte contents of a string. Only allowed as an argument type, not a return type.</p><p>The optional element type <tt>TYPE</tt> may be used to specify what C type should be used in the generated code. This avoids the need to cast the argument.</p><p>The value <tt>#f</tt> is also allowed and is passed as a <tt>NULL</tt> pointer. For the <tt>nonnull-</tt> variant, passing <tt>#f</tt> will raise an exception.</p><p>Don't confuse this type with <tt>(c-pointer ...)</tt> which means something different (a machine-pointer object).</p><p><tt>scheme-pointer</tt> is typically used to get a pointer to the raw byte content of strings and blobs.  But if you pass in a SRFI-4 vector, you will get a pointer to a blob object header (<i>not</i> the blob's contents), which is almost certainly wrong.  Instead, convert to a blob beforehand, or use a SRFI-4 specific type.</p></dd></dl><h3 id="sec:User-defined_C_types"><a href="#sec:User-defined_C_types">User-defined C types</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:struct"><span class="sig"><tt>(struct NAME)</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>A struct of the name <tt>NAME</tt>, which should be a string.</p><p>Structs cannot be directly passed as arguments to foreign functions, nor can they be result values.  However, pointers to structs are allowed.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:union"><span class="sig"><tt>(union NAME)</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>A union of the name <tt>NAME</tt>, which should be a string.</p><p>Unions cannot be directly passed as arguments to foreign functions, nor can they be result values. However, pointers to unions are allowed.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:enum"><span class="sig"><tt>(enum NAME)</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>An enumeration type. Handled internally as an <tt>integer</tt>.</p></dd></dl><h3 id="sec:C.2b.2b_types"><a href="#sec:C.2b.2b_types">C++ types</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:instance"><span class="sig"><tt>(instance CNAME SCHEMECLASS)</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>A pointer to a C++ class instance wrapped into a Scheme object instance. <tt>CNAME</tt> should designate the name of the C++ class, and <tt>SCHEMECLASS</tt> should be the class that wraps the instance pointer.</p><p>To use this, an extension will be required that provides an object-creation- and access-interface compatible to <a href="http://wiki.call-cc.org/egg/coops">coops</a> or <a href="http://wiki.call-cc.org/egg/tinyclos">tinyclos</a>. Specifically, it should provide the following operations:</p><pre> (make SCHEMECLASS 'this POINTER)
+ (slot-ref INSTANCE 'this)</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:instance-ref"><span class="sig"><tt>(instance-ref CNAME SCHEMECLASS)</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>A reference to a C++ class instance.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:template"><span class="sig"><tt>(template TYPE ARGTYPE ...)</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>A C++ template type. For example <tt>vector&lt;int&gt;</tt> would be specified as <tt>(template &quot;vector&quot; int)</tt>.</p><p>Template types cannot be directly passed as arguments or returned as results. However, pointers to template types are allowed.</p></dd></dl><h3 id="sec:Type_qualifiers"><a href="#sec:Type_qualifiers">Type qualifiers</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:const"><span class="sig"><tt>(const TYPE)</tt></span><span class="type">type</span></dt>
+<dd class="defsig"><p>The foreign type <tt>TYPE</tt> with an additional <tt>const</tt> qualifier.</p></dd></dl><h3 id="sec:Map_of_foreign_types_to_C_types"><a href="#sec:Map_of_foreign_types_to_C_types">Map of foreign types to C types</a></h3><table>
+<tr><th>Foreign type</th><th>C type</th></tr>
+
+<tr><td><tt>bool</tt></td><td><tt>int</tt></td></tr>
+
+<tr><td><tt>[unsigned-]char</tt></td><td><tt>[unsigned] char</tt></td></tr>
+
+<tr><td><tt>[unsigned-]byte</tt></td><td><tt>[unsigned] char</tt></td></tr>
+
+<tr><td><tt>[unsigned-]short</tt></td><td><tt>[unsigned] short</tt></td></tr>
+
+<tr><td><tt>[unsigned-]int</tt></td><td><tt>[unsigned] int</tt></td></tr>
+
+<tr><td><tt>[unsigned-]int32</tt></td><td><tt>[unsigned] int32_t</tt></td></tr>
+
+<tr><td><tt>[unsigned-]integer</tt></td><td><tt>[unsigned] int</tt></td></tr>
+
+<tr><td><tt>[unsigned-]integer32</tt></td><td><tt>[unsigned] int32_t</tt></td></tr>
+
+<tr><td><tt>[unsigned-]integer64</tt></td><td><tt>[unsigned] int64_t</tt></td></tr>
+
+<tr><td><tt>[unsigned-]long</tt></td><td><tt>[unsigned] long</tt></td></tr>
+
+<tr><td><tt>size_t</tt></td><td><tt>size_t</tt></td></tr>
+
+<tr><td><tt>ssize_t</tt></td><td><tt>ssize_t</tt></td></tr>
+
+<tr><td><tt>float</tt></td><td><tt>float</tt></td></tr>
+
+<tr><td><tt>double</tt></td><td><tt>double</tt></td></tr>
+
+<tr><td><tt>number</tt></td><td><tt>double</tt></td></tr>
+
+<tr><td><tt>[nonnull-]c-pointer</tt></td><td><tt>void *</tt></td></tr>
+
+<tr><td><tt>[nonnull-]pointer-vector</tt></td><td><tt>void **</tt></td></tr>
+
+<tr><td><tt>[nonnull-]blob</tt></td><td><tt>unsigned char *</tt></td></tr>
+
+<tr><td><tt>[nonnull-]u8vector</tt></td><td><tt>unsigned char *</tt></td></tr>
+
+<tr><td><tt>[nonnull-]s8vector</tt></td><td><tt>char *</tt></td></tr>
+
+<tr><td><tt>[nonnull-]u16vector</tt></td><td><tt>unsigned short *</tt></td></tr>
+
+<tr><td><tt>[nonnull-]s16vector</tt></td><td><tt>short *</tt></td></tr>
+
+<tr><td><tt>[nonnull-]u32vector</tt></td><td><tt>uint32_t *</tt></td></tr>
+
+<tr><td><tt>[nonnull-]s32vector</tt></td><td><tt>int32_t *</tt></td></tr>
+
+<tr><td><tt>[nonnull-]u64vector</tt></td><td><tt>uint64_t *</tt></td></tr>
+
+<tr><td><tt>[nonnull-]s64vector</tt></td><td><tt>int64_t *</tt></td></tr>
+
+<tr><td><tt>[nonnull-]f32vector</tt></td><td><tt>float *</tt></td></tr>
+
+<tr><td><tt>[nonnull-]f64vector</tt></td><td><tt>double *</tt></td></tr>
+
+<tr><td><tt>[nonnull-]c-string</tt></td><td><tt>char *</tt></td></tr>
+
+<tr><td><tt>[nonnull-]unsigned-c-string</tt></td><td><tt>unsigned char *</tt></td></tr>
+
+<tr><td><tt>c-string-list</tt></td><td><tt>char **</tt></td></tr>
+
+<tr><td><tt>symbol</tt></td><td><tt>char *</tt></td></tr>
+
+<tr><td><tt>void</tt></td><td><tt>void</tt></td></tr>
+
+<tr><td><tt>([nonnull-]c-pointer TYPE)</tt></td><td><tt>TYPE *</tt></td></tr>
+
+<tr><td><tt>([nonnull-]scheme-pointer TYPE)</tt></td><td><tt>TYPE *</tt></td></tr>
+
+<tr><td><tt>(enum NAME)</tt></td><td><tt>enum NAME</tt></td></tr>
+
+<tr><td><tt>(struct NAME)</tt></td><td><tt>struct NAME</tt></td></tr>
+
+<tr><td><tt>(ref TYPE)</tt></td><td><tt>TYPE &amp;</tt></td></tr>
+
+<tr><td><tt>(template T1 T2 ...)</tt></td><td><tt>T1&lt;T2, ...&gt;</tt></td></tr>
+
+<tr><td><tt>(union NAME)</tt></td><td><tt>union NAME</tt></td></tr>
+
+<tr><td><tt>(function RTYPE (ATYPE ...) [CALLCONV])</tt></td><td><tt>[CALLCONV] RTYPE (*)(ATYPE, ...)</tt></td></tr>
+
+<tr><td><tt>(instance CNAME SNAME)</tt></td><td><tt>CNAME *</tt></td></tr>
+
+<tr><td><tt>(instance-ref CNAME SNAME)</tt></td><td><tt>CNAME &amp;</tt></td></tr>
+</table>
+<hr /><p>Previous: <a href="Accessing%20external%20objects.html">Accessing external objects</a></p><p>Next: <a href="Embedding.html">Embedding</a></p></div></div></body></html>

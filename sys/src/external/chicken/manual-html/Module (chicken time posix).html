@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken time posix)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_time_posix.29">Module (chicken time posix)</a>
+<ul>
+<li><a href="#sec:seconds-.3elocal-time">seconds-&gt;local-time</a></li>
+<li><a href="#sec:local-time-.3eseconds">local-time-&gt;seconds</a></li>
+<li><a href="#sec:local-timezone-abbreviation">local-timezone-abbreviation</a></li>
+<li><a href="#sec:seconds-.3estring">seconds-&gt;string</a></li>
+<li><a href="#sec:seconds-.3eutc-time">seconds-&gt;utc-time</a></li>
+<li><a href="#sec:utc-time-.3eseconds">utc-time-&gt;seconds</a></li>
+<li><a href="#sec:time-.3estring">time-&gt;string</a></li>
+<li><a href="#sec:string-.3etime">string-&gt;time</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_time_posix.29"><a href="#sec:Module_.28chicken_time_posix.29">Module (chicken time posix)</a></h2><p>This module provides procedures for conversion between seconds since the epoch (&quot;POSIX time&quot;), strings and a 10-element vector type containing the distinct time units.</p><h3 id="sec:seconds-.3elocal-time"><a href="#sec:seconds-.3elocal-time">seconds-&gt;local-time</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:seconds-.3elocal-time"><span class="sig"><var class="id">seconds-&gt;local-time</var> <var class="dsssl">#!optional</var> <var class="arg">SECONDS</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Breaks down the time value represented in <var class="arg">SECONDS</var> into a 10 element vector of the form <tt>#(seconds minutes hours mday month year wday yday dstflag timezone)</tt>, in the following format:</p><dl><dt>seconds (0)</dt>
+<dd>the number of seconds after the minute (0 - 59)</dd><dt>minutes (1)</dt>
+<dd>the number of minutes after the hour (0 - 59)</dd><dt>hours (2)</dt>
+<dd>the number of hours past midnight (0 - 23)</dd><dt>mday (3)</dt>
+<dd>the day of the month (1 - 31)</dd><dt>month (4)</dt>
+<dd>the number of months since january (0 - 11)</dd><dt>year (5)</dt>
+<dd>the number of years since 1900</dd><dt>wday (6)</dt>
+<dd>the number of days since Sunday (0 - 6)</dd><dt>yday (7)</dt>
+<dd>the number of days since January 1 (0 - 365)</dd><dt>dstflag (8)</dt>
+<dd>a flag that is true if Daylight Saving Time is in effect at the time described.</dd><dt>timezone (9)</dt>
+<dd>the difference between UTC and the latest local standard time, in seconds west of UTC.</dd></dl>
+<p><var class="arg">SECONDS</var> defaults to the value of <tt>(current-seconds)</tt>.</p></dd></dl><h3 id="sec:local-time-.3eseconds"><a href="#sec:local-time-.3eseconds">local-time-&gt;seconds</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:local-time-.3eseconds"><span class="sig"><var class="id">local-time-&gt;seconds</var> <var class="arg">VECTOR</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Converts the ten-element vector <var class="arg">VECTOR</var> representing the time value relative to the current timezone into the number of seconds since the first of January, 1970 UTC.</p></dd></dl><h3 id="sec:local-timezone-abbreviation"><a href="#sec:local-timezone-abbreviation">local-timezone-abbreviation</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:local-timezone-abbreviation"><span class="sig"><var class="id">local-timezone-abbreviation</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the abbreviation for the local timezone as a string.</p></dd></dl><h3 id="sec:seconds-.3estring"><a href="#sec:seconds-.3estring">seconds-&gt;string</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:seconds-.3estring"><span class="sig"><var class="id">seconds-&gt;string</var> <var class="dsssl">#!optional</var> <var class="arg">SECONDS</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Converts the time represented in <var class="arg">SECONDS</var> into a local-time string of the form <tt>&quot;Tue May 21 13:46:22 1991&quot;</tt>. <var class="arg">SECONDS</var> defaults to the value of <tt>(current-seconds)</tt>.</p></dd></dl><h3 id="sec:seconds-.3eutc-time"><a href="#sec:seconds-.3eutc-time">seconds-&gt;utc-time</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:seconds-.3eutc-time"><span class="sig"><var class="id">seconds-&gt;utc-time</var> <var class="dsssl">#!optional</var> <var class="arg">SECONDS</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Similar to <tt>seconds-&gt;local-time</tt>, but interpretes <var class="arg">SECONDS</var> as UTC time. <var class="arg">SECONDS</var> defaults to the value of <tt>(current-seconds)</tt>.</p></dd></dl><h3 id="sec:utc-time-.3eseconds"><a href="#sec:utc-time-.3eseconds">utc-time-&gt;seconds</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:utc-time-.3eseconds"><span class="sig"><var class="id">utc-time-&gt;seconds</var> <var class="arg">VECTOR</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Converts the ten-element vector <var class="arg">VECTOR</var> representing the UTC time value into the number of seconds since the first of January, 1970 UTC.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h3 id="sec:time-.3estring"><a href="#sec:time-.3estring">time-&gt;string</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:time-.3estring"><span class="sig"><var class="id">time-&gt;string</var> <var class="arg">VECTOR</var> <var class="dsssl">#!optional</var> <var class="arg">FORMAT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Converts the broken down time represented in the 10 element vector <var class="arg">VECTOR</var> into a string of the form represented by the <var class="arg">FORMAT</var> string. The default time form produces something like <tt>&quot;Tue May 21 13:46:22 1991&quot;</tt>.</p><p>The <var class="arg">FORMAT</var> string follows the rules for the C library procedure <tt>strftime</tt>. The default <var class="arg">FORMAT</var> string is <tt>&quot;%a %b %e %H:%M:%S %Z %Y&quot;</tt>.</p></dd></dl><h3 id="sec:string-.3etime"><a href="#sec:string-.3etime">string-&gt;time</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:string-.3etime"><span class="sig"><var class="id">string-&gt;time</var> <var class="arg">TIME</var> <var class="dsssl">#!optional</var> <var class="arg">FORMAT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Converts a string of the form represented by the <var class="arg">FORMAT</var> string into the broken down time represented in a 10 element vector. The default time form understands something like <tt>&quot;Tue May 21 13:46:22 1991&quot;</tt>.</p><p>The <var class="arg">FORMAT</var> string follows the rules for the C library procedure <tt>strptime</tt>. The default <var class="arg">FORMAT</var> string is <tt>&quot;%a %b %e %H:%M:%S %Z %Y&quot;</tt>.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20time%29.html">Module (chicken time)</a></p><p>Next: <a href="Module%20%28chicken%20type%29.html">Module (chicken type)</a></p></div></div></body></html>

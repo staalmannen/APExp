@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Extensions</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Introduction_to_extensions">Introduction to extensions</a>
+<ul>
+<li><a href="#sec:Extension_libraries">Extension libraries</a></li>
+<li><a href="#sec:Installing_eggs">Installing eggs</a>
+<ul>
+<li><a href="#sec:Installing_eggs_that_use_libraries">Installing eggs that use libraries</a></li></ul></li>
+<li><a href="#sec:Creating_eggs">Creating eggs</a></li>
+<li><a href="#sec:Examples_for_extensions">Examples for extensions</a>
+<ul>
+<li><a href="#sec:A_simple_library">A simple library</a></li>
+<li><a href="#sec:An_application">An application</a></li>
+<li><a href="#sec:A_module_exporting_syntax">A module exporting syntax</a></li></ul></li></ul></li></ul></div><h2 id="sec:Introduction_to_extensions"><a href="#sec:Introduction_to_extensions">Introduction to extensions</a></h2><h3 id="sec:Extension_libraries"><a href="#sec:Extension_libraries">Extension libraries</a></h3><p>Extension libraries (<i>eggs</i>) are extensions to the core functionality provided by the basic CHICKEN system, to be built and installed separately.  The mechanism for loading compiled extensions is based on dynamically loadable code and as such is only available on systems on which loading compiled code at runtime is supported. Currently these are most UNIX-compatible platforms that provide the <tt>libdl</tt> functionality like Linux, Solaris, BSD, Mac OS X and Windows using Cygwin.</p><p>On systems where dynamic loading is not available, extensions can still be built and linked as static object files.</p><p>Note: eggs may also be normal applications or shell scripts, but are usually libraries.</p><p>Extensions are technically nothing but dynamically loadable compiled files with added meta-data that describes dependencies to other eggs, version information and things like the author/maintainer of the egg. Three tools provide an easy to use interface for installing eggs, removing them and querying the current status of installed eggs.</p><h3 id="sec:Installing_eggs"><a href="#sec:Installing_eggs">Installing eggs</a></h3><p>To install an egg, run the <tt>chicken-install</tt> program with the egg name as argument. The egg archive is downloaded, its contents extracted and the contained egg description file is analyzed and the appropriate commands executed. This file is an abstract description of the contents of the egg and will be translated by <tt>chicken-install</tt> into build- and installation scripts for the current platform. After running these scripts (and if all goes well), the egg is installed and will be available like a built-in library. The format and meaning of the file will be described below.</p><p>Installation will copy a number of given files into the local egg repository or in the path where the CHICKEN executables are located (in the case of executable programs or scripts). Additionally the list of installed files, and user-defined metadata is stored in the repository.</p><p>If no egg name is given on the command-line, then all <tt>.egg</tt> files in the current directory are processed, including all <tt>.egg</tt> files in a subdirectory <tt>chicken</tt> (if such a directory exists), in some arbitrary order, unless the egg descriptions specify dependencies.</p><h4 id="sec:Installing_eggs_that_use_libraries"><a href="#sec:Installing_eggs_that_use_libraries">Installing eggs that use libraries</a></h4><p>Sometimes an egg requires a C library to compile. Compilation can fail when your system has this library in a nonstandard location. Normally the C compiler searches in the default locations <tt>/usr</tt> and <tt>/usr/local</tt>, and in the prefix where CHICKEN itself was installed. Sometimes this is not enough, so you'll need to supply <tt>chicken-install</tt> with some extra hints to the C compiler/linker. Here's an example:</p><pre> CSC_OPTIONS='-I/usr/pkg/include/mysql -L/usr/pkg/lib/mysql -L -R/usr/pkg/lib/mysql' chicken-install mysql</pre><p>This installs the mysql egg with the extra compiler options -I and -L to set the include path and the library search path. The second -L switch passes the -R option directly to the linker, which causes the library path to get hardcoded into the resulting extension file (for systems that do not use <tt>ld.so.conf</tt>).</p><p>The environment variables <tt>CHICKEN_C_INCLUDE_PATH</tt> and <tt>CHICKEN_C_LIBRARY_PATH</tt> can also be used to override include- and linker-paths. Each of these variables may contain one or more directory names, separated by <tt>:</tt> or <tt>;</tt> and will be passed using <tt>-I</tt> and <tt>-L</tt> to the C compiler.</p><p>Finally, you can use the <tt>custom-build</tt> egg file property to use a custom script to compile your extension's code. See below for more information.</p><h3 id="sec:Creating_eggs"><a href="#sec:Creating_eggs">Creating eggs</a></h3><p>An egg can be created by placing the code and some special files in a directory of its own. For example, if your egg is called <tt>foo</tt>, create a directory called <tt>foo</tt> and put the egg code there (the directory's name is not actually important).</p><p>Eggs need an egg description file <tt>&lt;egg name&gt;.egg</tt>.  This file indicates how the egg is to be compiled and provides some information about the egg (author, license, dependencies etc).</p><p>The format of these files is described in full in the chapter entitled &quot;<a href="Egg%20specification%20format.html">Egg specification format</a>&quot;.  Below we'll give a few brief examples of simple eggs.</p><h3 id="sec:Examples_for_extensions"><a href="#sec:Examples_for_extensions">Examples for extensions</a></h3><h4 id="sec:A_simple_library"><a href="#sec:A_simple_library">A simple library</a></h4><p>The simplest case is a single file that does not export any syntax. For example</p>
+<pre class="highlight colorize"><span class="comment">;;;; hello.scm
+</span>
+<span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> <span class="paren2">(<span class="default">hello name</span>)</span>
+  <span class="paren2">(<span class="default">print <span class="string">&quot;Hello, &quot;</span> name <span class="string">&quot; !&quot;</span></span>)</span> </span>)</span></pre><p>We need an <tt>.egg</tt> file to build and install our nifty extension:</p>
+<pre class="highlight colorize"><span class="comment">;;;; hello.egg
+</span>
+<span class="paren1">(<span class="default"><span class="paren2">(<span class="default">author <span class="string">&quot;Me&quot;</span></span>)</span>
+ <span class="paren2">(<span class="default">synopsis <span class="string">&quot;A cool hello-world library&quot;</span></span>)</span>
+ <span class="paren2">(<span class="default">license <span class="string">&quot;GPLv3&quot;</span></span>)</span>
+ <span class="paren2">(<span class="default">components <span class="paren3">(<span class="default">extension hello</span>)</span></span>)</span></span>)</span></pre><p>After entering</p><pre>$ chicken-install</pre><p>at the shell prompt (and in the same directory where the two files exist), the file <tt>hello.scm</tt> will be compiled into a dynamically loadable library and a statically linkable object. If the compilation succeeds, <tt>hello.so</tt> and <tt>hello.o</tt> will be stored in the repository, together with a file named <tt>hello.egg-info</tt> containing an a-list with metadata (what you stored above in <tt>hello.egg</tt> plus some additional metadata). If no extension name is given to <tt>chicken-install</tt>, it will simply process any files with the <tt>.egg</tt> extension it can find.</p><p>Use it like any other CHICKEN extension:</p><pre>$ csi -q
+#;1&gt; (require-library hello)
+; loading /usr/local/lib/chicken/8/hello.so ...
+#;2&gt; (hello &quot;me&quot;)
+Hello, me!
+#;3&gt;</pre><h4 id="sec:An_application"><a href="#sec:An_application">An application</a></h4><p>Here we create a simple application:</p>
+<pre class="highlight colorize"><span class="comment">;;;; hello2.scm
+</span><span class="paren1">(<span class="default">import scheme chicken.format chicken.process-context</span>)</span>
+<span class="paren1">(<span class="default">print <span class="string">&quot;Hello, &quot;</span></span>)</span>
+<span class="paren1">(<span class="default">for-each <span class="paren2">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren3">(<span class="default">x</span>)</span> <span class="paren3">(<span class="default">printf <span class="string">&quot;~A &quot;</span> x</span>)</span></span>)</span> <span class="paren2">(<span class="default">command-line-arguments</span>)</span></span>)</span>
+<span class="paren1">(<span class="default">print <span class="string">&quot;!&quot;</span></span>)</span></pre><p>We also need an egg file:</p>
+<pre class="highlight colorize"><span class="comment">;;;; hello2.egg
+</span><span class="paren1">(<span class="default"><span class="paren2">(<span class="default">author <span class="string">&quot;Me&quot;</span></span>)</span>
+ <span class="paren2">(<span class="default">synopsis <span class="string">&quot;A cool hello-world application&quot;</span></span>)</span>
+ <span class="paren2">(<span class="default">license <span class="string">&quot;proprietary&quot;</span></span>)</span>
+ <span class="paren2">(<span class="default">components <span class="paren3">(<span class="default">program hello2</span>)</span></span>)</span></span>)</span></pre><p>To use it, just run <tt>chicken-install</tt> in the same directory:</p><pre>$ chicken-install</pre><p>(Here we omit the extension name)</p><p>Now the program <tt>hello2</tt> will be installed in the same location as the other CHICKEN tools (like <tt>chicken</tt>, <tt>csi</tt>, etc.), which will normally be <tt>/usr/local/bin</tt>.  Note that you need write-permissions for those locations and may have to run <tt>chicken-install</tt> with administrative rights or use the <tt>-sudo</tt> option.</p><p>The extension can be used from the command line:</p><pre>$ hello2 one two three
+Hello, 
+one two three !</pre><p>De-installation is just as easy - use the <tt>chicken-uninstall</tt> program to remove one or more extensions from the local repository:</p><pre>$ chicken-uninstall hello2</pre><h4 id="sec:A_module_exporting_syntax"><a href="#sec:A_module_exporting_syntax">A module exporting syntax</a></h4><p>The hello module was just a shared library, and not a module.</p><p>To create an extension that exports syntax see the chapter on <a href="Modules.html">Modules</a>.  We will show a simple example here: a module <tt>my-lib</tt> that exports one macro (<tt>prog1</tt>) and one procedure (<tt>my-sum</tt>):</p>
+<pre class="highlight colorize"><span class="comment">;;; my-lib.scm
+</span>
+<span class="paren1">(<span class="default">module my-lib
+  *
+  <span class="paren2">(<span class="default">import scheme <span class="paren3">(<span class="default">chicken base</span>)</span></span>)</span>
+
+<span class="paren2">(<span class="default"><i><span class="symbol">define-syntax</span></i> prog1
+  <span class="paren3">(<span class="default">syntax-rules <span class="paren4">(<span class="default"></span>)</span>
+    <span class="paren4">(<span class="default"><span class="paren5">(<span class="default">_ e1 e2 ...</span>)</span>
+     <span class="paren5">(<span class="default"><i><span class="symbol">let</span></i> <span class="paren6">(<span class="default"><span class="paren1">(<span class="default">result e1</span>)</span></span>)</span>
+       <span class="paren6">(<span class="default">begin e2 ...</span>)</span>
+       result</span>)</span></span>)</span></span>)</span></span>)</span>
+
+<span class="paren2">(<span class="default"><i><span class="symbol">define</span></i> my-sum
+  <span class="paren3">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren4">(<span class="default">numbers</span>)</span>
+    <span class="paren4">(<span class="default">prog1
+      <span class="paren5">(<span class="default">apply + numbers</span>)</span>
+      <span class="paren5">(<span class="default">display <span class="string">&quot;my-sum used one more time!&quot;</span></span>)</span>
+      <span class="paren5">(<span class="default">newline</span>)</span></span>)</span></span>)</span></span>)</span>
+
+</span>)</span></pre><p>The <tt>prog1</tt> macro is similar to Common Lisp's <tt>prog1</tt>: it evaluates a list of forms, but returns the value of the first form.</p><p>The egg file:</p>
+<pre class="highlight colorize"><span class="comment">;;; my-lib.egg
+</span>
+<span class="paren1">(<span class="default"><span class="paren2">(<span class="default">components <span class="paren3">(<span class="default">extension my-lib</span>)</span></span>)</span>
+ <span class="paren2">(<span class="default">version 1.0</span>)</span>
+ <span class="paren2">(<span class="default">license <span class="string">&quot;BSD&quot;</span></span>)</span>
+ <span class="paren2">(<span class="default">author <span class="string">&quot;Me again&quot;</span></span>)</span>
+ <span class="paren2">(<span class="default">synopsis <span class="string">&quot;My own cool libraries&quot;</span></span>)</span></span>)</span></pre><p>Running <tt>chicken-install</tt> on the same directory will install the extension.</p><p>Next, it should be possible to load the library:</p><pre>$ csi -q
+#;1&gt; (import my-lib)
+; loading /usr/local/lib/chicken/6/my-lib.import.so ...
+; loading /usr/local/lib/chicken/6/scheme.import.so ...
+; loading /usr/local/lib/chicken/6/chicken.import.so ...
+; loading /usr/local/lib/chicken/6/my-lib.so ...
+#;2&gt; (my-sum '(10 20 30))
+my-sum used one more time!
+60
+#;3&gt; (my-sum '(-1 1 0))
+my-sum used one more time!
+0
+#;4&gt; (prog1 (+ 2 2) (print &quot;---&quot;))
+---
+4</pre><p>To query the list of currently installed extensions, use <tt>chicken-status</tt>. It can list what extensions are installed and what files belong to a particular installed extension.</p><p>For more information about the available tools and the various options they provide, consult the <a href="Extension%20tools.html">Extension tools</a> chapter.  Again, for a full list of allowed declarations in the <tt>.egg</tt> file, see the <a href="Egg%20specification%20format.html">Egg specification format</a> chapter.</p><hr /><p>Previous: <a href="Declarations.html">Declarations</a></p><p>Next: <a href="Extension%20tools.html">Extension tools</a></p></div></div></body></html>

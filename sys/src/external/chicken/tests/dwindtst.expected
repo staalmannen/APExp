@@ -1,0 +1,41 @@
+testing escape from thunk1
+visiting:
+thunk1
+testing escape from thunk2
+visiting:
+thunk1
+thunk2
+thunk3
+testing escape from thunk3
+visiting:
+thunk1
+thunk2
+thunk3
+creating continuation thunk
+visiting:
+thunk1
+thunk2
+thunk3
+testing escape from continuation thunk1
+visiting:
+thunk1
+creating continuation thunk
+visiting:
+thunk1
+thunk2
+thunk3
+testing escape from continuation thunk2
+visiting:
+thunk1
+thunk2
+thunk3
+creating continuation thunk
+visiting:
+thunk1
+thunk2
+thunk3
+testing escape from continuation thunk3
+visiting:
+thunk1
+thunk2
+thunk3

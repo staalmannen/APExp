@@ -1,0 +1,120 @@
+# Makefile.cross-linux-mingw - configuration for MinGW (crosscompiled from Linux) -*- Makefile -*-
+#
+# Copyright (c) 2008-2022, The CHICKEN Team
+# Copyright (c) 2007, Felix L. Winkelmann
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
+# conditions are met:
+#
+#   Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+#     disclaimer. 
+#   Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+#     disclaimer in the documentation and/or other materials provided with the distribution. 
+#   Neither the name of the author nor the names of its contributors may be used to endorse or promote
+#     products derived from this software without specific prior written permission. 
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
+# OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+# AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+SRCDIR ?= ./
+
+# platform configuration
+
+DLLSINPATH = 1
+ARCH ?= x86
+WINDOWS = 1
+
+# file extensions
+
+SO = .dll
+EXE = .exe
+
+# commands
+
+HOSTSYSTEM ?= mingw32
+
+# options
+
+C_COMPILER_OPTIONS ?= -fno-strict-aliasing -fwrapv -DHAVE_CHICKEN_CONFIG_H
+ifdef DEBUGBUILD
+C_COMPILER_OPTIMIZATION_OPTIONS ?= -g -Wall -Wno-unused
+else
+ifdef OPTIMIZE_FOR_SPEED
+C_COMPILER_OPTIMIZATION_OPTIONS ?= -O3 -fomit-frame-pointer
+else
+C_COMPILER_OPTIMIZATION_OPTIONS ?= -Os -fomit-frame-pointer
+endif
+endif
+C_COMPILER_SHARED_OPTIONS = -DPIC
+LINKER_LINK_SHARED_LIBRARY_OPTIONS = -shared
+LIBRARIES = -lm -lws2_32
+LIBCHICKEN_SO_LINKER_OPTIONS = -Wl,--out-implib,lib$(PROGRAM_PREFIX)chicken$(PROGRAM_SUFFIX).dll.a
+LIBCHICKEN_SO_LIBRARIES = -lws2_32 
+LIBUCHICKEN_SO_LIBRARIES = -lws2_32 
+LIBCHICKEN_IMPORT_LIBRARY = lib$(PROGRAM_PREFIX)chicken$(PROGRAM_SUFFIX).dll.a
+TARGET_C_COMPILER = gcc
+TARGET_CXX_COMPILER = g++
+
+# special files
+
+POSIXFILE = posixwin
+
+# select default and internal settings
+
+include $(SRCDIR)/defaults.make
+
+# main target
+
+ifndef BUILD_SETUP_TOOLS
+TARGETS = libchicken$(A) $(CHICKEN_PROGRAM)$(EXE) $(CSI_PROGRAM)$(EXE) \
+	$(CHICKEN_PROFILE_PROGRAM)$(EXE) $(CSC_PROGRAM)$(EXE) lib$(PROGRAM_PREFIX)chicken$(PROGRAM_SUFFIX)$(SO) \
+	$(CHICKEN_DO_PROGRAM)$(EXE)
+else
+TARGETS = libchicken$(A) $(CHICKEN_PROGRAM)$(EXE) $(CSI_PROGRAM)$(EXE) \
+	$(CHICKEN_PROFILE_PROGRAM)$(EXE) $(CSC_PROGRAM)$(EXE) lib$(PROGRAM_PREFIX)chicken$(PROGRAM_SUFFIX)$(SO) \
+	$(CHICKEN_INSTALL_PROGRAM)$(EXE) $(CHICKEN_UNINSTALL_PROGRAM)$(EXE) \
+	$(CHICKEN_STATUS_PROGRAM)$(EXE) \
+	$(CHICKEN_DO_PROGRAM)$(EXE)
+endif
+
+chicken-config.h: chicken-defaults.h
+	echo "/* GENERATED */" >$@
+	echo "#define HAVE_DIRENT_H 1" >>$@
+	echo "#define HAVE_INTTYPES_H 1" >>$@
+	echo "#define HAVE_LIMITS_H 1" >>$@
+	echo "#define HAVE_LONG_LONG 1" >>$@
+	echo "#define HAVE_MEMMOVE 1" >>$@
+	echo "#define HAVE_MEMORY_H 1" >>$@
+	echo "#define NO_POSIX_POLL 1" >>$@
+	echo "#define HAVE_STDINT_H 1" >>$@
+	echo "#define HAVE_STDLIB_H 1" >>$@
+	echo "#define HAVE_STRERROR 1" >>$@
+	echo "#define HAVE_STRINGS_H 1" >>$@
+	echo "#define HAVE_STRING_H 1" >>$@
+	echo "#define HAVE_STRTOLL 1" >>$@
+	echo "#define HAVE_SYS_STAT_H 1" >>$@
+	echo "#define HAVE_SYS_TYPES_H 1" >>$@
+	echo "#define HAVE_UNISTD_H 1" >>$@
+	echo "#define HAVE_UNSIGNED_LONG_LONG 1" >>$@
+	echo "#define STDC_HEADERS 1" >>$@
+	echo "#define HAVE_ALLOCA 1" >>$@
+	echo "#define HAVE_DIRECT_H 1" >>$@
+	echo "#define HAVE_ERRNO_H 1" >>$@
+	echo "#define HAVE_LOADLIBRARY 1" >>$@
+	echo "#define HAVE_GETPROCADDRESS 1" >>$@
+	echo "#define C_STACK_GROWS_DOWNWARD 1" >>$@
+ifdef GCHOOKS
+	echo "#define C_GC_HOOKS" >>$@
+endif
+	echo "#define C_USE_STD_FEATURE_MACROS" >>$@
+	cat chicken-defaults.h >>$@
+
+include $(SRCDIR)rules.make

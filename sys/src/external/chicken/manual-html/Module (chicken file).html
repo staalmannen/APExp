@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken file)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_file.29">Module (chicken file)</a>
+<ul>
+<li><a href="#sec:Basic_file_operations">Basic file operations</a>
+<ul>
+<li><a href="#sec:create-directory">create-directory</a></li>
+<li><a href="#sec:copy-file">copy-file</a></li>
+<li><a href="#sec:move-file">move-file</a></li>
+<li><a href="#sec:delete-file">delete-file</a></li>
+<li><a href="#sec:delete-file.2a">delete-file*</a></li>
+<li><a href="#sec:delete-directory">delete-directory</a></li>
+<li><a href="#sec:directory">directory</a></li>
+<li><a href="#sec:directory-exists.3f">directory-exists?</a></li>
+<li><a href="#sec:file-exists.3f">file-exists?</a></li>
+<li><a href="#sec:rename-file">rename-file</a></li>
+<li><a href="#sec:file-readable.3f">file-readable?</a></li>
+<li><a href="#sec:file-writable.3f">file-writable?</a></li>
+<li><a href="#sec:file-executable.3f">file-executable?</a></li></ul></li>
+<li><a href="#sec:Temporary_files_and_directories">Temporary files and directories</a>
+<ul>
+<li><a href="#sec:create-temporary-file">create-temporary-file</a></li>
+<li><a href="#sec:create-temporary-directory">create-temporary-directory</a></li></ul></li>
+<li><a href="#sec:Finding_files">Finding files</a>
+<ul>
+<li><a href="#sec:find-files">find-files</a></li>
+<li><a href="#sec:glob">glob</a></li></ul></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_file.29"><a href="#sec:Module_.28chicken_file.29">Module (chicken file)</a></h2><p>This module provides various generic operations on files and directories.  For more specific operations, see also <a href="Module%20%28chicken%20file%20posix%29.html">Module (chicken file posix)</a>.</p><p>All errors related to failing file-operations will signal a condition of kind <tt>(exn i/o file)</tt>.</p><ul><li>New in CHICKEN 5.4.0: Errors caused by underlying C calls that change errno will produce a condition object with an <tt>errno</tt> property, which can be accessed with <tt>(get-condition-property &lt;the-condition-object&gt; 'exn 'errno)</tt>.</li>
+</ul>
+<h3 id="sec:Basic_file_operations"><a href="#sec:Basic_file_operations">Basic file operations</a></h3><h4 id="sec:create-directory"><a href="#sec:create-directory">create-directory</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:create-directory"><span class="sig"><var class="id">create-directory</var> <var class="arg">NAME</var> <var class="dsssl">#!optional</var> <var class="arg">PARENTS?</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Creates a directory with the pathname <var class="arg">NAME</var>.  If the <var class="arg">PARENTS?</var> argument is given and not false, any nonexistent parent directories are also created.</p><p>Notice that if <var class="arg">NAME</var> exists, <tt>create-directory</tt> won't try to create it and will return <var class="arg">NAME</var> (i.e., it won't raise an error when given a <var class="arg">NAME</var> that already exists).</p></dd></dl><h4 id="sec:copy-file"><a href="#sec:copy-file">copy-file</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:copy-file"><span class="sig"><var class="id">copy-file</var> <var class="arg">ORIGFILE</var> <var class="arg">NEWFILE</var> <var class="dsssl">#!optional</var> <var class="arg">CLOBBER</var> <var class="arg">BLOCKSIZE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Copies <var class="arg">ORIGFILE</var> (a string denoting some filename) to <var class="arg">NEWFILE</var>, <var class="arg">BLOCKSIZE</var> bytes at a time.  <var class="arg">BLOCKSIZE</var> defaults to 1024, and must be a positive integer.  Returns the number of bytes copied on success, or errors on failure.  <var class="arg">CLOBBER</var> determines the behaviour of <tt>copy-file</tt> when <var class="arg">NEWFILE</var> is already extant.  When set to <tt>#f</tt> (default), an error is signaled.  When set to any other value, <var class="arg">NEWFILE</var> is overwritten.  <tt>copy-file</tt> will work across filesystems and devices and is not platform-dependent.</p></dd></dl><h4 id="sec:move-file"><a href="#sec:move-file">move-file</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:move-file"><span class="sig"><var class="id">move-file</var> <var class="arg">ORIGFILE</var> <var class="arg">NEWFILE</var> <var class="dsssl">#!optional</var> <var class="arg">CLOBBER</var> <var class="arg">BLOCKSIZE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Moves <var class="arg">ORIGFILE</var> (a string denoting some filename) to <var class="arg">NEWFILE</var>, with the same semantics as <tt>copy-file</tt>, above.  <tt>move-file</tt> is safe across filesystems and devices (unlike <tt>rename-file</tt>).  It is possible for an error to be signaled despite partial success if <var class="arg">NEWFILE</var> could be created and fully written but removing <var class="arg">ORIGFILE</var> fails.</p><p>If <var class="arg">CLOBBER</var> is given and not <tt>#f</tt>, <var class="arg">NEWFILE</var> will be replaced when it already exists, otherwise an error is signaled.</p><p>The <var class="arg">BLOCKSIZE</var> argument indicates the block size to use when copying the file a block at a time.  It must be a positive integer, and it defaults to 1024.</p></dd></dl><h4 id="sec:delete-file"><a href="#sec:delete-file">delete-file</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:delete-file"><span class="sig"><var class="id">delete-file</var> <var class="arg">STRING</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Deletes the file with the pathname <var class="arg">STRING</var>. If the file does not exist, an error is signaled.</p></dd></dl><h4 id="sec:delete-file.2a"><a href="#sec:delete-file.2a">delete-file*</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:delete-file.2a"><span class="sig"><var class="id">delete-file*</var> <var class="arg">STRING</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>If the file with pathname <var class="arg">STRING</var> exists, it is deleted and <tt>#t</tt> is returned.  If the file does not exist, nothing happens and <tt>#f</tt> is returned.</p></dd></dl><h4 id="sec:delete-directory"><a href="#sec:delete-directory">delete-directory</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:delete-directory"><span class="sig"><var class="id">delete-directory</var> <var class="arg">NAME</var> <var class="dsssl">#!optional</var> <var class="arg">RECURSIVE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Deletes the directory with the pathname <var class="arg">NAME</var>. If <var class="arg">RECURSIVE</var> is not given or false, then the directory has to be empty.</p></dd></dl><h4 id="sec:directory"><a href="#sec:directory">directory</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:directory"><span class="sig"><var class="id">directory</var> <var class="dsssl">#!optional</var> <var class="arg">PATHNAME</var> <var class="arg">SHOW-DOTFILES?</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a list with all files that are contained in the directory with the name <var class="arg">PATHNAME</var> (which defaults to the value of <tt>(current-directory)</tt>). Files beginning with <tt>.</tt> are included only if <var class="arg">SHOW-DOTFILES?</var> is given and not <tt>#f</tt>.</p></dd></dl><h4 id="sec:directory-exists.3f"><a href="#sec:directory-exists.3f">directory-exists?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:directory-exists.3f"><span class="sig"><var class="id">directory-exists?</var> <var class="arg">STRING</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <var class="arg">STRING</var> if a directory with the given pathname exists, or <tt>#f</tt> otherwise.</p></dd></dl><h4 id="sec:file-exists.3f"><a href="#sec:file-exists.3f">file-exists?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-exists.3f"><span class="sig"><var class="id">file-exists?</var> <var class="arg">STRING</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <var class="arg">STRING</var> if a file or directory with the given pathname exists, or <tt>#f</tt> otherwise.</p></dd></dl><h4 id="sec:rename-file"><a href="#sec:rename-file">rename-file</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:rename-file"><span class="sig"><var class="id">rename-file</var> <var class="arg">OLD</var> <var class="arg">NEW</var> <var class="dsssl">#!optional</var> <var class="arg">CLOBBER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Renames the file or directory with the pathname <var class="arg">OLD</var> to <var class="arg">NEW</var>. If the operation does not succeed, an error is signaled.</p><p>If <var class="arg">CLOBBER</var> is given and not <tt>#f</tt>, <var class="arg">NEW</var> will be replaced when it already exists, otherwise an error is signaled.</p></dd></dl><h4 id="sec:file-readable.3f"><a href="#sec:file-readable.3f">file-readable?</a></h4><h4 id="sec:file-writable.3f"><a href="#sec:file-writable.3f">file-writable?</a></h4><h4 id="sec:file-executable.3f"><a href="#sec:file-executable.3f">file-executable?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:file-readable.3f"><span class="sig"><var class="id">file-readable?</var> <var class="arg">FILENAME</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:file-writable.3f"><span class="sig"><var class="id">file-writable?</var> <var class="arg">FILENAME</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:file-executable.3f"><span class="sig"><var class="id">file-executable?</var> <var class="arg">FILENAME</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These procedures return <tt>#t</tt> if the current user has read, write or execute permissions on the file named <var class="arg">FILENAME</var>.</p></dd></dl><h3 id="sec:Temporary_files_and_directories"><a href="#sec:Temporary_files_and_directories">Temporary files and directories</a></h3><h4 id="sec:create-temporary-file"><a href="#sec:create-temporary-file">create-temporary-file</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:create-temporary-file"><span class="sig"><var class="id">create-temporary-file</var> <var class="dsssl">#!optional</var> <var class="arg">EXTENSION</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Creates an empty temporary file and returns its pathname. If <var class="arg">EXTENSION</var> is not given, then <tt>.tmp</tt> is used. If the environment variable <tt>TMPDIR</tt>, <tt>TEMP</tt> or <tt>TMP</tt> is set, then the pathname names a file in that directory. If none of the environment variables is given, the location of the temporary file defaults to <tt>/tmp</tt>.</p><p>Note that <tt>TMPDIR</tt>, <tt>TEMP</tt> and <tt>TMP</tt> are checked in this order. It means that, for example, if both <tt>TMPDIR</tt> and <tt>TEMP</tt> are set, the value of <tt>TMPDIR</tt> will be used.</p><p>Changed in CHICKEN 5.4.0: the values of the <tt>TMPDIR</tt>, <tt>TEMP</tt> and <tt>TMP</tt> environment variables are no longer memoized (see <a href="#sec:1830">https://bugs.call-cc.org/ticket/1830</a>).</p></dd></dl><h4 id="sec:create-temporary-directory"><a href="#sec:create-temporary-directory">create-temporary-directory</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:create-temporary-directory"><span class="sig"><var class="id">create-temporary-directory</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Creates an empty temporary directory and returns its pathname. If the environment variable <tt>TMPDIR</tt>, <tt>TEMP</tt> or <tt>TMP</tt> is set, then the temporary directory is created at that location. If none of the environment variables is given, the location of the temporary directory defaults to <tt>/tmp</tt>.</p><p>Note that <tt>TMPDIR</tt>, <tt>TEMP</tt> and <tt>TMP</tt> are checked in this order. It means that, for example, if both <tt>TMPDIR</tt> and <tt>TEMP</tt> are set, the value of <tt>TMPDIR</tt> will be used.</p><p>Changed in CHICKEN 5.4.0: the values of the <tt>TMPDIR</tt>, <tt>TEMP</tt> and <tt>TMP</tt> environment variables are no longer memoized (see <a href="#sec:1830">https://bugs.call-cc.org/ticket/1830</a>).</p></dd></dl><h3 id="sec:Finding_files"><a href="#sec:Finding_files">Finding files</a></h3><h4 id="sec:find-files"><a href="#sec:find-files">find-files</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:find-files"><span class="sig"><var class="id">find-files</var> <var class="arg">DIRECTORY</var> <var class="dsssl">#!key</var> <var class="arg">test</var> <var class="arg">action</var> <var class="arg">seed</var> <var class="arg">limit</var> <var class="arg">dotfiles</var> <var class="arg">follow-symlinks</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Recursively traverses the contents of <var class="arg">DIRECTORY</var> (which should be a string) and invokes the procedure <var class="arg">action</var> for all files in which the procedure <var class="arg">test</var> is true.</p><p><var class="arg">test</var> may be a procedure of one argument or an irregex object, regex string or SRE expression that will be matched with a full pathname using <tt>irregex-match</tt>. <var class="arg">test</var> defaults to <tt>(constantly #t)</tt>.</p><p><var class="arg">action</var> should be a procedure of two arguments: the currently encountered file and the result of the previous invocation of <var class="arg">action</var>, or, if this is the first invocation, the value of <var class="arg">seed</var>. <var class="arg">action</var> defaults to <tt>cons</tt>, <var class="arg">seed</var> defaults to <tt>()</tt>.</p><p><var class="arg">limit</var> should be a procedure of one argument that is called for each nested directory and which should return true, if that directory is to be traversed recursively. <var class="arg">limit</var> may also be an exact integer that gives the maximum recursion depth. For example, a depth of <tt>0</tt> means that only files in the top-level, specified directory are to be traversed. In this case, all nested directories are ignored. <var class="arg">limit</var> may also be <tt>#f</tt> (the default), which is equivalent to <tt>(constantly #t)</tt>.</p><p>If <var class="arg">dotfiles</var> is given and true, then files starting with a &quot;<tt>.</tt>&quot; character will not be ignored (but note that &quot;<tt>.</tt>&quot; and &quot;<tt>..</tt>&quot;  are always ignored). if <var class="arg">follow-symlinks</var> is given and true, then the traversal of a symbolic link that points to a directory will recursively traverse the latter. By default, symbolic links are not followed.</p><p>Note that <var class="arg">action</var> is called with the full pathname of each file, including the directory prefix.</p></dd></dl><h4 id="sec:glob"><a href="#sec:glob">glob</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:glob"><span class="sig"><var class="id">glob</var> <var class="arg">PATTERN1</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a list of the pathnames of all existing files matching <tt>PATTERN1 ...</tt>, which should be strings containing the usual file-patterns (with <tt>*</tt> matching zero or more characters and <tt>?</tt> matching zero or one character).</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20eval%29.html">Module (chicken eval)</a></p><p>Next: <a href="Module%20%28chicken%20file%20posix%29.html">Module (chicken file posix)</a></p></div></div></body></html>

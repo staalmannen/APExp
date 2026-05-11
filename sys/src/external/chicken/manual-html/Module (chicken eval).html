@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken eval)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_eval.29">Module (chicken eval)</a>
+<ul>
+<li><a href="#sec:Custom_eval_handlers">Custom eval handlers</a>
+<ul>
+<li><a href="#sec:eval-handler">eval-handler</a></li></ul></li>
+<li><a href="#sec:Using_modules_as_evaluation_environments">Using modules as evaluation environments</a>
+<ul>
+<li><a href="#sec:module-environment">module-environment</a></li></ul></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_eval.29"><a href="#sec:Module_.28chicken_eval.29">Module (chicken eval)</a></h2><p>This module provides a handful of hooks that allow more fine-grained control over how the standard procedure <tt>eval</tt> behaves.</p><h3 id="sec:Custom_eval_handlers"><a href="#sec:Custom_eval_handlers">Custom eval handlers</a></h3><h4 id="sec:eval-handler"><a href="#sec:eval-handler">eval-handler</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:eval-handler"><span class="sig"><var class="id">eval-handler</var></span><span class="type">parameter</span></dt>
+<dd class="defsig"><p>A procedure of one or two arguments. When <tt>eval</tt> is invoked, it calls the value of this parameter with the same arguments. The default behavior is to evaluate the argument expression and to ignore the second parameter.</p></dd></dl><h3 id="sec:Using_modules_as_evaluation_environments"><a href="#sec:Using_modules_as_evaluation_environments">Using modules as evaluation environments</a></h3><h4 id="sec:module-environment"><a href="#sec:module-environment">module-environment</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:module-environment"><span class="sig"><var class="id">module-environment</var> <var class="arg">MODULENAME</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Locates the module with the name <var class="arg">MODULENAME</var> and returns an environment that can be passed as the second argument to <tt>eval</tt>. The evaluated expressions have only access to the bindings that are visible inside the module. Note that the environment is not mutable.</p><p>If the module is not registered in the current process, <tt>module-environment</tt> will try to locate meta-information about the module by loading any existing import library with the name <tt>MODULENAME.import.[scm|so]</tt>, if possible.</p><p>In compiled modules, only exported bindings will be visible to interactively entered code. In interpreted modules all bindings are visible.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20errno%29.html">Module (chicken errno)</a></p><p>Next: <a href="Module%20%28chicken%20file%29.html">Module (chicken file)</a></p></div></div></body></html>

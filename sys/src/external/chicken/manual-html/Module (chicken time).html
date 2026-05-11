@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken time)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_time.29">Module (chicken time)</a>
+<ul>
+<li><a href="#sec:Retrieving_timestamp_information">Retrieving timestamp information</a>
+<ul>
+<li><a href="#sec:cpu-time">cpu-time</a></li>
+<li><a href="#sec:current-process-milliseconds">current-process-milliseconds</a></li>
+<li><a href="#sec:current-seconds">current-seconds</a></li></ul></li>
+<li><a href="#sec:Benchmarking_macros">Benchmarking macros</a>
+<ul>
+<li><a href="#sec:time">time</a></li></ul></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_time.29"><a href="#sec:Module_.28chicken_time.29">Module (chicken time)</a></h2><p>This module provides a few basic procedures for measuring time. For representation and manipulation of calendar time, see <a href="Module%20%28chicken%20time%20posix%29.html">Module (chicken time posix)</a>.</p><h3 id="sec:Retrieving_timestamp_information"><a href="#sec:Retrieving_timestamp_information">Retrieving timestamp information</a></h3><h4 id="sec:cpu-time"><a href="#sec:cpu-time">cpu-time</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:cpu-time"><span class="sig"><var class="id">cpu-time</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the used CPU time of the current process in milliseconds as two values: the time spent in user code, and the time spent in system code. On platforms where user and system time can not be differentiated, system time is always 0.</p></dd></dl><h4 id="sec:current-process-milliseconds"><a href="#sec:current-process-milliseconds">current-process-milliseconds</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:current-process-milliseconds"><span class="sig"><var class="id">current-process-milliseconds</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the number of milliseconds since process startup.</p></dd></dl><h4 id="sec:current-seconds"><a href="#sec:current-seconds">current-seconds</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:current-seconds"><span class="sig"><var class="id">current-seconds</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the number of seconds since midnight, Jan. 1, 1970.</p></dd></dl><h3 id="sec:Benchmarking_macros"><a href="#sec:Benchmarking_macros">Benchmarking macros</a></h3><h4 id="sec:time"><a href="#sec:time">time</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:time"><span class="sig"><tt>(time EXP1 ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Performs a major garbage collection, evaluates <tt>EXP1 ...</tt> and prints elapsed CPU time and some values about GC use, like time spent in major GCs, number of minor and major GCs. The output is sent to the port that is the current value of <tt>(current-error-port)</tt>. Nested invocations of this form will give incorrect results for all output but the innermost.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20tcp%29.html">Module (chicken tcp)</a></p><p>Next: <a href="Module%20%28chicken%20time%20posix%29.html">Module (chicken time posix)</a></p></div></div></body></html>

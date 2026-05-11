@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken platform)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_platform.29">Module (chicken platform)</a>
+<ul>
+<li><a href="#sec:Build_information">Build information</a>
+<ul>
+<li><a href="#sec:build-platform">build-platform</a></li>
+<li><a href="#sec:chicken-version">chicken-version</a></li>
+<li><a href="#sec:include-path">include-path</a></li>
+<li><a href="#sec:repository-path">repository-path</a></li>
+<li><a href="#sec:installation-repository">installation-repository</a></li></ul></li>
+<li><a href="#sec:system-config-directory">system-config-directory</a></li>
+<li><a href="#sec:system-cache-directory">system-cache-directory</a></li>
+<li><a href="#sec:Machine_information">Machine information</a>
+<ul>
+<li><a href="#sec:machine-byte-order">machine-byte-order</a></li>
+<li><a href="#sec:machine-type">machine-type</a></li></ul></li>
+<li><a href="#sec:Software_information">Software information</a>
+<ul>
+<li><a href="#sec:software-type">software-type</a></li>
+<li><a href="#sec:software-version">software-version</a></li></ul></li>
+<li><a href="#sec:Feature_identifiers">Feature identifiers</a>
+<ul>
+<li><a href="#sec:features">features</a></li>
+<li><a href="#sec:feature.3f">feature?</a></li>
+<li><a href="#sec:register-feature.21">register-feature!</a></li>
+<li><a href="#sec:unregister-feature.21">unregister-feature!</a></li></ul></li>
+<li><a href="#sec:Returning_to_the_host_program">Returning to the host program</a></li>
+<li><a href="#sec:return-to-host">return-to-host</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_platform.29"><a href="#sec:Module_.28chicken_platform.29">Module (chicken platform)</a></h2><p>This module provides procedures for obtaining information about the platform on which the program is currently running.</p><h3 id="sec:Build_information"><a href="#sec:Build_information">Build information</a></h3><p>These procedures return information about options that can be specified at build time.</p><h4 id="sec:build-platform"><a href="#sec:build-platform">build-platform</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:build-platform"><span class="sig"><var class="id">build-platform</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a symbol specifying the toolset which has been used for building the executing system, which is one of the following:</p><pre>cygwin
+mingw32
+gnu
+intel
+clang
+sun
+unknown</pre></dd></dl><h4 id="sec:chicken-version"><a href="#sec:chicken-version">chicken-version</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:chicken-version"><span class="sig"><var class="id">chicken-version</var> <var class="dsssl">#!optional</var> <var class="arg">FULL</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a string containing the version number of the CHICKEN runtime system. If the optional argument <var class="arg">FULL</var> is given and true, then a full version string is returned.</p></dd></dl><h4 id="sec:include-path"><a href="#sec:include-path">include-path</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:include-path"><span class="sig"><var class="id">include-path</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a list of strings representing directory names where included files are located, which defaults to the value of the environment variable <tt>CHICKEN_INCLUDE_PATH</tt>, split on <tt>:</tt> (or <tt>;</tt> on Windows). If the variable is not set, the list is initialized to contain the installation directory (usually <tt>/usr/local/share/chicken</tt> on UNIX-like systems).</p></dd></dl><h4 id="sec:repository-path"><a href="#sec:repository-path">repository-path</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:repository-path"><span class="sig"><var class="id">repository-path</var></span><span class="type">parameter</span></dt>
+<dd class="defsig"><p>Contains a list of strings naming the paths to the extension repository, which defaults to the value of the environment variable <tt>CHICKEN_REPOSITORY_PATH</tt>, split on <tt>:</tt> (or <tt>;</tt> on Windows).  If the environment variable is not set, it will be a list containing the default library path (usually <tt>/usr/local/lib/chicken</tt> on UNIX systems).</p></dd></dl><h4 id="sec:installation-repository"><a href="#sec:installation-repository">installation-repository</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:installation-repository"><span class="sig"><var class="id">installation-repository</var></span><span class="type">parameter</span></dt>
+<dd class="defsig"><p>Contains the name of the directory where extensions are installed (as opposed to the possible locations where they can be loaded or linked at runtime.)</p></dd></dl><h3 id="sec:system-config-directory"><a href="#sec:system-config-directory">system-config-directory</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:system-config-directory"><span class="sig"><var class="id">system-config-directory</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the location of the directory for configuration files.  This obeys the XDG specification, so when the <tt>XDG_CONFIG_HOME</tt> environment variable is set, its value is used.  When it's not set, it will default to <tt>$HOME/.config</tt> on UNIX and <tt>$APPDATA</tt> on Windows.</p></dd></dl><h3 id="sec:system-cache-directory"><a href="#sec:system-cache-directory">system-cache-directory</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:system-cache-directory"><span class="sig"><var class="id">system-cache-directory</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the location of the directory for caches.  This obeys the XDG specification, so when the <tt>XDG_CACHE_HOME</tt> environment variable is set, its value is used.  When it's not set, it will default to <tt>$HOME/.cache</tt> on UNIX and <tt>$LOCALAPPDATA</tt> or <tt>$APPDATA</tt> on Windows.</p></dd></dl><h3 id="sec:Machine_information"><a href="#sec:Machine_information">Machine information</a></h3><p>These procedures return information about the type of CPU/architecture the program is running on.</p><h4 id="sec:machine-byte-order"><a href="#sec:machine-byte-order">machine-byte-order</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:machine-byte-order"><span class="sig"><var class="id">machine-byte-order</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the symbol <tt>little-endian</tt> or <tt>big-endian</tt>, depending on the machine's byte-order.</p></dd></dl><h4 id="sec:machine-type"><a href="#sec:machine-type">machine-type</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:machine-type"><span class="sig"><var class="id">machine-type</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a symbol specifying the processor on which this process is currently running, which is one of the following:</p><pre>arm
+alpha
+mips
+hppa
+ultrasparc
+sparc
+ppc
+ppc64
+ia64
+x86
+x86-64
+unknown</pre></dd></dl><h3 id="sec:Software_information"><a href="#sec:Software_information">Software information</a></h3><p>These procedures return information about the type of operating system the program is running on.</p><h4 id="sec:software-type"><a href="#sec:software-type">software-type</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:software-type"><span class="sig"><var class="id">software-type</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a symbol specifying the operating system on which this process is currently running, which is one of the following:</p><pre>android
+windows
+unix
+ecos
+unknown</pre></dd></dl><h4 id="sec:software-version"><a href="#sec:software-version">software-version</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:software-version"><span class="sig"><var class="id">software-version</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a symbol specifying the operating system version on which this process is currently running, which is one of the following:</p><pre>linux
+freebsd
+netbsd
+openbsd
+macosx
+hpux
+dragonfly
+haiku
+solaris
+sunos
+aix
+hurd
+unknown</pre></dd></dl><h3 id="sec:Feature_identifiers"><a href="#sec:Feature_identifiers">Feature identifiers</a></h3><p>CHICKEN maintains a global list of <i>features</i> naming functionality available in the current system. Additionally the <tt>cond-expand</tt> form accesses this feature list to infer what features are provided. Predefined features are <tt>chicken</tt>, and the SRFIs (Scheme Request For Implementation) provided by the base system: <tt>srfi-23, srfi-30, srfi-39</tt>. If the <tt>eval</tt> unit is used (the default), the features <tt>srfi-0, srfi-2, srfi-6, srfi-8, srfi-9</tt> and <tt>srfi-10</tt> are defined. When compiling code (during compile-time) the feature <tt>compiling</tt> is registered. When evaluating code in the interpreter (csi), the feature <tt>csi</tt> is registered.</p><h4 id="sec:features"><a href="#sec:features">features</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:features"><span class="sig"><var class="id">features</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a list of all registered features that will be accepted as valid feature-identifiers by <tt>cond-expand</tt>.</p></dd></dl><h4 id="sec:feature.3f"><a href="#sec:feature.3f">feature?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:feature.3f"><span class="sig"><var class="id">feature?</var> <var class="arg">ID</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if all features with the given feature-identifiers <tt>ID ...</tt> are registered.</p></dd></dl><h4 id="sec:register-feature.21"><a href="#sec:register-feature.21">register-feature!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:register-feature.21"><span class="sig"><var class="id">register-feature!</var> <var class="arg">FEATURE</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Register one or more features that will be accepted as valid feature-identifiers by <tt>cond-expand</tt>. <tt>FEATURE ...</tt> may be a keyword, string or symbol.</p></dd></dl><h4 id="sec:unregister-feature.21"><a href="#sec:unregister-feature.21">unregister-feature!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:unregister-feature.21"><span class="sig"><var class="id">unregister-feature!</var> <var class="arg">FEATURE</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Unregisters the specified feature-identifiers. <tt>FEATURE ...</tt> may be a keyword, string or symbol.</p></dd></dl><h3 id="sec:Returning_to_the_host_program"><a href="#sec:Returning_to_the_host_program">Returning to the host program</a></h3><h3 id="sec:return-to-host"><a href="#sec:return-to-host">return-to-host</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:return-to-host"><span class="sig"><var class="id">return-to-host</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Exits the Scheme code and returns to the invoking context that called <tt>CHICKEN_run</tt> or <tt>CHICKEN_continue</tt>.</p><p>After <tt>return-to-host</tt> has been executed and once <tt>CHICKEN_run</tt> returns, you can invoke callbacks which have been defined with <tt>define-external</tt>.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20pathname%29.html">Module (chicken pathname)</a></p><p>Next: <a href="Module%20%28chicken%20plist%29.html">Module (chicken plist)</a></p></div></div></body></html>

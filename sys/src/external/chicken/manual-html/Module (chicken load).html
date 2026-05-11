@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken load)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_load.29">Module (chicken load)</a>
+<ul>
+<li><a href="#sec:A_note_on_loading_of_shared_extension_libraries">A note on loading of shared extension libraries</a></li>
+<li><a href="#sec:load-relative">load-relative</a></li>
+<li><a href="#sec:load-noisily">load-noisily</a></li>
+<li><a href="#sec:load-library">load-library</a></li>
+<li><a href="#sec:require">require</a></li>
+<li><a href="#sec:provide">provide</a></li>
+<li><a href="#sec:provided.3f">provided?</a></li>
+<li><a href="#sec:Tuning_how_code_is_loaded">Tuning how code is loaded</a>
+<ul>
+<li><a href="#sec:dynamic-load-libraries">dynamic-load-libraries</a></li>
+<li><a href="#sec:load-verbose">load-verbose</a></li>
+<li><a href="#sec:set-dynamic-load-mode.21">set-dynamic-load-mode!</a></li></ul></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_load.29"><a href="#sec:Module_.28chicken_load.29">Module (chicken load)</a></h2><p>This module contains various procedures for loading code.  Note that the main procedure for loading code, <tt>load</tt>, is part of <a href="Module%20scheme.html">Module scheme</a>; the <tt>chicken load</tt> module only contains <i>extensions</i> to the standard.</p><h3 id="sec:A_note_on_loading_of_shared_extension_libraries"><a href="#sec:A_note_on_loading_of_shared_extension_libraries">A note on loading of shared extension libraries</a></h3><p>The functionality of loading shared objects into the runtime is only available on platforms that support dynamic loading of compiled code. Currently Linux, BSD, Solaris, Windows (with Cygwin) and HP/UX are supported.  Loading source files works everywhere.</p><h3 id="sec:load-relative"><a href="#sec:load-relative">load-relative</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:load-relative"><span class="sig"><var class="id">load-relative</var> <var class="arg">FILE</var> <var class="dsssl">#!optional</var> <var class="arg">EVALPROC</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Similar to <tt>load</tt>, but loads <var class="arg">FILE</var> relative to the path of the currently loaded file.</p></dd></dl><h3 id="sec:load-noisily"><a href="#sec:load-noisily">load-noisily</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:load-noisily"><span class="sig"><var class="id">load-noisily</var> <var class="arg">FILE</var> <var class="dsssl">#!key</var> <var class="arg">EVALUATOR</var> <var class="arg">TIME</var> <var class="arg">PRINTER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>As <tt>load</tt> but the result(s) of each evaluated toplevel-expression is written to standard output. If <var class="arg">EVALUATOR</var> is given and not <tt>#f</tt>, then each expression is evaluated by calling this argument with the read expression as argument. If <var class="arg">TIME</var> is given and not false, then the execution time of each expression is shown (as with the <tt>time</tt> macro). If <var class="arg">PRINTER</var> is given and not false, then each expression is printed before evaluation by applying the expression to the value of this argument, which should be a one-argument procedure.</p><p>See also the <a href="#sec:load-verbose">load-verbose</a> parameter.</p></dd></dl><h3 id="sec:load-library"><a href="#sec:load-library">load-library</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:load-library"><span class="sig"><var class="id">load-library</var> <var class="arg">UNIT</var> <var class="dsssl">#!optional</var> <var class="arg">LIBRARYFILE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>On platforms that support dynamic loading, <tt>load-library</tt> loads the compiled library unit <var class="arg">UNIT</var> (which should be a symbol). If the string <var class="arg">LIBRARYFILE</var> is given, then the given shared library will be loaded and the toplevel code of the specified unit will be executed. If no <var class="arg">LIBRARYFILE</var> argument is given, then the libraries given in the parameter <tt>dynamic-load-libraries</tt> are searched for the required unit. If the unit is not found, an error is signaled.</p><p>Note that <var class="arg">LIBRARYFILE</var> is considered relative to the <tt>dlopen(3)</tt> search path by default. In order to use a file relative to the current working directory, a relative or absolute pathname must be used, i.e. <var class="arg">LIBRARYFILE</var> must contain at least one slash (<tt>&quot;/&quot;</tt>).</p></dd></dl><h3 id="sec:require"><a href="#sec:require">require</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:require"><span class="sig"><var class="id">require</var> <var class="arg">ID</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>If any of the named extension libraries <var class="arg">ID</var> are not already loaded into the system, then <tt>require</tt> will look up the location of the shared extension library and load it.  If <var class="arg">ID</var> names a library-unit of the base system, then it is loaded via <tt>load-library</tt>. If no extension library is available for the given ID, then an attempt is made to load the file <tt>ID.so</tt> or <tt>ID.scm</tt> (in that order) from one of the following locations:</p><ul><li>the current directory</li>
+<li>the current repository path (see <tt>repository-path</tt>)</li>
+</ul>
+<p>Each <var class="arg">ID</var> should be a symbol.</p></dd></dl><h3 id="sec:provide"><a href="#sec:provide">provide</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:provide"><span class="sig"><var class="id">provide</var> <var class="arg">ID</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Registers the extension IDs <tt>ID ...</tt> as loaded. This is mainly intended to provide aliases for certain library identifiers.</p></dd></dl><h3 id="sec:provided.3f"><a href="#sec:provided.3f">provided?</a></h3><p>procedure: (provided? ID ...)</p><p>Returns <tt>#t</tt> if extension with the IDs <tt>ID ...</tt> are currently loaded, or <tt>#f</tt> otherwise.</p><h3 id="sec:Tuning_how_code_is_loaded"><a href="#sec:Tuning_how_code_is_loaded">Tuning how code is loaded</a></h3><h4 id="sec:dynamic-load-libraries"><a href="#sec:dynamic-load-libraries">dynamic-load-libraries</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:dynamic-load-libraries"><span class="sig"><var class="id">dynamic-load-libraries</var></span><span class="type">parameter</span></dt>
+<dd class="defsig"><p>A list of strings containing shared libraries that should be checked for explicitly loaded library units (this facility is not available on all platforms). See <tt>load-library</tt>.</p></dd></dl><h4 id="sec:load-verbose"><a href="#sec:load-verbose">load-verbose</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:load-verbose"><span class="sig"><var class="id">load-verbose</var></span><span class="type">parameter</span></dt>
+<dd class="defsig"><p>A boolean indicating whether loading of source files, compiled code (if available) and compiled libraries should display a message.</p></dd></dl><h4 id="sec:set-dynamic-load-mode.21"><a href="#sec:set-dynamic-load-mode.21">set-dynamic-load-mode!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:set-dynamic-load-mode.21"><span class="sig"><var class="id">set-dynamic-load-mode!</var> <var class="arg">MODELIST</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>On systems that support dynamic loading of compiled code via the <tt>dlopen(3)</tt> interface (for example Linux and Solaris), some options can be specified to fine-tune the behaviour of the dynamic linker. <tt>MODE</tt> should be a list of symbols (or a single symbol) taken from the following set:</p><dl><dt><tt>local</tt></dt>
+<dd>If <tt>local</tt> is given, then any C/C++ symbols defined in the dynamically loaded file are not available for subsequently loaded files and libraries. Use this if you have linked foreign code into your dynamically loadable file and if you don't want to export them (for example because you want to load another file that defines the same symbols).</dd><dt><tt>global</tt></dt>
+<dd>The default is <tt>global</tt>, which means all C/C++ symbols are available to code loaded at a later stage.</dd><dt><tt>now</tt></dt>
+<dd>If <tt>now</tt> is specified, all symbols are resolved immediately.</dd><dt><tt>lazy</tt></dt>
+<dd>Unresolved symbols are resolved as code from the file is executed. This is the default. </dd></dl>
+<p>Note that this procedure does not control the way Scheme variables are handled - this facility is mainly of interest when accessing foreign code.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20keyword%29.html">Module (chicken keyword)</a></p><p>Next: <a href="Module%20%28chicken%20locative%29.html">Module (chicken locative)</a></p></div></div></body></html>

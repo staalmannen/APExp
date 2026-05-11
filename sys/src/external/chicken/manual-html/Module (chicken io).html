@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken io)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_io.29">Module (chicken io)</a>
+<ul>
+<li><a href="#sec:read-list">read-list</a></li>
+<li><a href="#sec:read-buffered">read-buffered</a></li>
+<li><a href="#sec:read-byte">read-byte</a></li>
+<li><a href="#sec:write-byte">write-byte</a></li>
+<li><a href="#sec:read-line">read-line</a></li>
+<li><a href="#sec:write-line">write-line</a></li>
+<li><a href="#sec:read-lines">read-lines</a></li>
+<li><a href="#sec:read-string">read-string</a></li>
+<li><a href="#sec:read-string.21">read-string!</a></li>
+<li><a href="#sec:write-string">write-string</a></li>
+<li><a href="#sec:read-token">read-token</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_io.29"><a href="#sec:Module_.28chicken_io.29">Module (chicken io)</a></h2><p>This module provides various Input/Output extensions.</p><h3 id="sec:read-list"><a href="#sec:read-list">read-list</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:read-list"><span class="sig"><var class="id">read-list</var> <var class="dsssl">#!optional</var> <var class="arg">PORT</var> <var class="arg">READER</var> <var class="arg">MAX</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Call <var class="arg">READER</var> up to <var class="arg">MAX</var> times and collect its output in a list. If <var class="arg">MAX</var> is <tt>#f</tt>, read until end of file.</p><p>The reader is called with one argument: <var class="arg">PORT</var>.</p><p><var class="arg">READER</var> defaults to <tt>read</tt>, <var class="arg">MAX</var> to <tt>#f</tt> and <var class="arg">PORT</var> to <tt>current-input-port</tt>, so if you call it with no arguments, it will read all remaining s-expressions from the current input port.</p></dd></dl><h3 id="sec:read-buffered"><a href="#sec:read-buffered">read-buffered</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:read-buffered"><span class="sig"><var class="id">read-buffered</var> <var class="dsssl">#!optional</var> <var class="arg">PORT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Reads any remaining data buffered after previous read operations on <var class="arg">PORT</var>. If no remaining data is currently buffered, an empty string is returned. This procedure will never block. Currently only useful for string-, process- and tcp ports.</p></dd></dl><h3 id="sec:read-byte"><a href="#sec:read-byte">read-byte</a></h3><h3 id="sec:write-byte"><a href="#sec:write-byte">write-byte</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:read-byte"><span class="sig"><var class="id">read-byte</var> <var class="dsssl">#!optional</var> <var class="arg">PORT</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:write-byte"><span class="sig"><var class="id">write-byte</var> <var class="arg">BYTE</var> <var class="dsssl">#!optional</var> <var class="arg">PORT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Read/write a byte to the port given in <var class="arg">PORT</var>, which default to the values of <tt>(current-input-port)</tt> and <tt>(current-output-port)</tt>, respectively.</p></dd></dl><h3 id="sec:read-line"><a href="#sec:read-line">read-line</a></h3><h3 id="sec:write-line"><a href="#sec:write-line">write-line</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:read-line"><span class="sig"><var class="id">read-line</var> <var class="dsssl">#!optional</var> <var class="arg">PORT</var> <var class="arg">LIMIT</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:write-line"><span class="sig"><var class="id">write-line</var> <var class="arg">STRING</var> <var class="dsssl">#!optional</var> <var class="arg">PORT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Line-input and -output. <var class="arg">PORT</var> defaults to the value of <tt>(current-input-port)</tt> and <tt>(current-output-port)</tt>, respectively. If the optional argument <var class="arg">LIMIT</var> is given and not <tt>#f</tt>, then <tt>read-line</tt> reads at most <var class="arg">LIMIT</var> characters per line. <tt>read-line</tt> returns a string without the terminating newline and <tt>write-line</tt> adds a terminating newline  before outputting.</p></dd></dl><h3 id="sec:read-lines"><a href="#sec:read-lines">read-lines</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:read-lines"><span class="sig"><var class="id">read-lines</var> <var class="dsssl">#!optional</var> <var class="arg">PORT</var> <var class="arg">MAX</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Read <var class="arg">MAX</var> or fewer lines from <var class="arg">PORT</var>. <var class="arg">MAX</var> defaults to <tt>most-positive-fixnum</tt> and <var class="arg">PORT</var> defaults to the value of <tt>(current-input-port)</tt>. Returns a list of strings, each string representing a line read, not including any line separation character(s).</p></dd></dl><h3 id="sec:read-string"><a href="#sec:read-string">read-string</a></h3><h3 id="sec:read-string.21"><a href="#sec:read-string.21">read-string!</a></h3><h3 id="sec:write-string"><a href="#sec:write-string">write-string</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:read-string"><span class="sig"><var class="id">read-string</var> <var class="dsssl">#!optional</var> <var class="arg">NUM</var> <var class="arg">PORT</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:read-string.21"><span class="sig"><var class="id">read-string!</var> <var class="arg">NUM</var> <var class="arg">STRING</var> <var class="dsssl">#!optional</var> <var class="arg">PORT</var> <var class="arg">START</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:write-string"><span class="sig"><var class="id">write-string</var> <var class="arg">STRING</var> <var class="dsssl">#!optional</var> <var class="arg">NUM</var> <var class="arg">PORT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Read or write <var class="arg">NUM</var> characters from/to <var class="arg">PORT</var>, which defaults to the value of <tt>(current-input-port)</tt> or <tt>(current-output-port)</tt>, respectively.</p><p>If <var class="arg">NUM</var> is <tt>#f</tt> or not given, then all data up to the end-of-file is read, or, in the case of <tt>write-string</tt> the whole string is written. If no more input is available, <tt>read-string</tt> returns <tt>#!eof</tt>.</p><p><tt>read-string!</tt> reads destructively into the given <var class="arg">STRING</var> argument, but never more characters than would fit into <var class="arg">STRING</var>. If <var class="arg">START</var> is given, then the read characters are stored starting at that position. <tt>read-string!</tt> returns the actual number of characters read.</p></dd></dl><h3 id="sec:read-token"><a href="#sec:read-token">read-token</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:read-token"><span class="sig"><var class="id">read-token</var> <var class="arg">PREDICATE</var> <var class="dsssl">#!optional</var> <var class="arg">PORT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Reads characters from <var class="arg">PORT</var> (which defaults to the value of <tt>(current-input-port)</tt>) and calls the procedure <var class="arg">PREDICATE</var> with each character until <var class="arg">PREDICATE</var> returns false. Returns a string with the accumulated characters.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20gc%29.html">Module (chicken gc)</a></p><p>Next: <a href="Module%20%28chicken%20irregex%29.html">Module (chicken irregex)</a></p></div></div></body></html>

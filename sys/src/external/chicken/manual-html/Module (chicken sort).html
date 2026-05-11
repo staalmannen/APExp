@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken sort)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_sort.29">Module (chicken sort)</a>
+<ul>
+<li><a href="#sec:merge">merge</a></li>
+<li><a href="#sec:sort">sort</a></li>
+<li><a href="#sec:sorted.3f">sorted?</a></li>
+<li><a href="#sec:topological-sort">topological-sort</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_sort.29"><a href="#sec:Module_.28chicken_sort.29">Module (chicken sort)</a></h2><p>This module contains several procedures which deal with sorting of <i>sequences</i> (i.e., lists and vectors).</p><h3 id="sec:merge"><a href="#sec:merge">merge</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:merge"><span class="sig"><var class="id">merge</var> <var class="arg">LIST1</var> <var class="arg">LIST2</var> <var class="arg">LESS?</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:merge.21"><span class="sig"><var class="id">merge!</var> <var class="arg">LIST1</var> <var class="arg">LIST2</var> <var class="arg">LESS?</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Joins two lists in sorted order. <tt>merge!</tt> is the destructive version of merge. <tt>LESS?  </tt> should be a procedure of two arguments, that returns true if the first argument is to be ordered before the second argument.</p></dd></dl><h3 id="sec:sort"><a href="#sec:sort">sort</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:sort"><span class="sig"><var class="id">sort</var> <var class="arg">SEQUENCE</var> <var class="arg">LESS?</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:sort.21"><span class="sig"><var class="id">sort!</var> <var class="arg">SEQUENCE</var> <var class="arg">LESS?</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Sort <var class="arg">SEQUENCE</var>, which should be a list or a vector. <tt>sort!</tt> is the destructive version of sort.</p></dd></dl><h3 id="sec:sorted.3f"><a href="#sec:sorted.3f">sorted?</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:sorted.3f"><span class="sig"><var class="id">sorted?</var> <var class="arg">SEQUENCE</var> <var class="arg">LESS?</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns true if the list or vector <var class="arg">SEQUENCE</var> is already sorted.</p></dd></dl><h3 id="sec:topological-sort"><a href="#sec:topological-sort">topological-sort</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:topological-sort"><span class="sig"><var class="id">topological-sort</var> <var class="arg">DAG</var> <var class="arg">PRED</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Sorts the directed acyclic graph dag <var class="arg">DAG</var> so that for every edge from vertex u to v, u will come before v in the resulting list of vertices.</p><p><var class="arg">DAG</var> is a list of sublists. The car of each sublist is a vertex. The cdr is the adjacency list of that vertex, i.e. a list of all vertices to which there exists an edge from the car vertex. <tt>pred</tt> is procedure of two arguments that should compare vertices for equality.</p><p>Time complexity: O (|V| + |E|)</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">topological-sort
+       &#x27;<span class="paren2">(<span class="default"><span class="paren3">(<span class="default">shirt tie belt</span>)</span>
+         <span class="paren3">(<span class="default">tie jacket</span>)</span>
+         <span class="paren3">(<span class="default">belt jacket</span>)</span>
+         <span class="paren3">(<span class="default">watch</span>)</span>
+         <span class="paren3">(<span class="default">pants shoes belt</span>)</span>
+         <span class="paren3">(<span class="default">undershorts pants shoes</span>)</span>
+         <span class="paren3">(<span class="default">socks shoes</span>)</span></span>)</span>
+       eq?</span>)</span>
+
+=&gt;
+
+<span class="paren1">(<span class="default">socks undershorts pants shoes watch shirt belt tie jacket</span>)</span></pre><p>If a cycle is detected during the sorting process, an exception of the condition kinds <tt>(exn runtime cycle)</tt> is thrown.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20repl%29.html">Module (chicken repl)</a></p><p>Next: <a href="Module%20%28chicken%20string%29.html">Module (chicken string)</a></p></div></div></body></html>

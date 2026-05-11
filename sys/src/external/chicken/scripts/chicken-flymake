@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+# usage: chicken-flymake OPTION-OR-FILENAME ...
+
+csc -SAv "$@" || true

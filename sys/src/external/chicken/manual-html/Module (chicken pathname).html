@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken pathname)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_pathname.29">Module (chicken pathname)</a>
+<ul>
+<li><a href="#sec:absolute-pathname.3f">absolute-pathname?</a></li>
+<li><a href="#sec:decompose-pathname">decompose-pathname</a></li>
+<li><a href="#sec:make-pathname">make-pathname</a></li>
+<li><a href="#sec:make-absolute-pathname">make-absolute-pathname</a></li>
+<li><a href="#sec:pathname-directory">pathname-directory</a></li>
+<li><a href="#sec:pathname-file">pathname-file</a></li>
+<li><a href="#sec:pathname-extension">pathname-extension</a></li>
+<li><a href="#sec:pathname-replace-directory">pathname-replace-directory</a></li>
+<li><a href="#sec:pathname-replace-file">pathname-replace-file</a></li>
+<li><a href="#sec:pathname-replace-extension">pathname-replace-extension</a></li>
+<li><a href="#sec:pathname-strip-directory">pathname-strip-directory</a></li>
+<li><a href="#sec:pathname-strip-extension">pathname-strip-extension</a></li>
+<li><a href="#sec:normalize-pathname">normalize-pathname</a></li>
+<li><a href="#sec:directory-null.3f">directory-null?</a></li>
+<li><a href="#sec:decompose-directory">decompose-directory</a></li>
+<li><a href="#sec:Windows_specific_notes">Windows specific notes</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_pathname.29"><a href="#sec:Module_.28chicken_pathname.29">Module (chicken pathname)</a></h2><p>This module provides procedures for manipulating paths.  If you want to operate on the files and directories which the paths represent, see <a href="Module%20%28chicken%20file%29.html">Module (chicken file)</a>.</p><h3 id="sec:absolute-pathname.3f"><a href="#sec:absolute-pathname.3f">absolute-pathname?</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:absolute-pathname.3f"><span class="sig"><var class="id">absolute-pathname?</var> <var class="arg">PATHNAME</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if the string <var class="arg">PATHNAME</var> names an absolute pathname, and returns <tt>#f</tt> otherwise.</p></dd></dl><h3 id="sec:decompose-pathname"><a href="#sec:decompose-pathname">decompose-pathname</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:decompose-pathname"><span class="sig"><var class="id">decompose-pathname</var> <var class="arg">PATHNAME</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns three values: the directory-, filename- and extension-components of the file named by the string <var class="arg">PATHNAME</var>. For any component that is not contained in <var class="arg">PATHNAME</var>, <tt>#f</tt> is returned.</p></dd></dl><h3 id="sec:make-pathname"><a href="#sec:make-pathname">make-pathname</a></h3><h3 id="sec:make-absolute-pathname"><a href="#sec:make-absolute-pathname">make-absolute-pathname</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:make-pathname"><span class="sig"><var class="id">make-pathname</var> <var class="arg">DIRECTORY</var> <var class="arg">FILENAME</var> <var class="dsssl">#!optional</var> <var class="arg">EXTENSION</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:make-absolute-pathname"><span class="sig"><var class="id">make-absolute-pathname</var> <var class="arg">DIRECTORY</var> <var class="arg">FILENAME</var> <var class="dsssl">#!optional</var> <var class="arg">EXTENSION</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a string that names the file with the components <tt>DIRECTORY, FILENAME</tt> and (optionally) <var class="arg">EXTENSION</var> with <tt>SEPARATOR</tt> being the directory separation indicator (usually <tt>/</tt> on UNIX systems and <tt>\</tt> on Windows, defaulting to whatever platform this is running on). <var class="arg">DIRECTORY</var> can be <tt>#f</tt> (meaning no directory component), a string or a list of strings. <var class="arg">FILENAME</var> and <var class="arg">EXTENSION</var> should be strings or <tt>#f</tt>. <tt>make-absolute-pathname</tt> returns always an absolute pathname.</p></dd></dl><h3 id="sec:pathname-directory"><a href="#sec:pathname-directory">pathname-directory</a></h3><h3 id="sec:pathname-file"><a href="#sec:pathname-file">pathname-file</a></h3><h3 id="sec:pathname-extension"><a href="#sec:pathname-extension">pathname-extension</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:pathname-directory"><span class="sig"><var class="id">pathname-directory</var> <var class="arg">PATHNAME</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:pathname-file"><span class="sig"><var class="id">pathname-file</var> <var class="arg">PATHNAME</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:pathname-extension"><span class="sig"><var class="id">pathname-extension</var> <var class="arg">PATHNAME</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Accessors for the components of <var class="arg">PATHNAME</var>. If the pathname does not contain the accessed component, then <tt>#f</tt> is returned.</p></dd></dl><h3 id="sec:pathname-replace-directory"><a href="#sec:pathname-replace-directory">pathname-replace-directory</a></h3><h3 id="sec:pathname-replace-file"><a href="#sec:pathname-replace-file">pathname-replace-file</a></h3><h3 id="sec:pathname-replace-extension"><a href="#sec:pathname-replace-extension">pathname-replace-extension</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:pathname-replace-directory"><span class="sig"><var class="id">pathname-replace-directory</var> <var class="arg">PATHNAME</var> <var class="arg">DIRECTORY</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:pathname-replace-file"><span class="sig"><var class="id">pathname-replace-file</var> <var class="arg">PATHNAME</var> <var class="arg">FILENAME</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:pathname-replace-extension"><span class="sig"><var class="id">pathname-replace-extension</var> <var class="arg">PATHNAME</var> <var class="arg">EXTENSION</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Return a new pathname with the specified component of <var class="arg">PATHNAME</var> replaced by a new value.</p></dd></dl><h3 id="sec:pathname-strip-directory"><a href="#sec:pathname-strip-directory">pathname-strip-directory</a></h3><h3 id="sec:pathname-strip-extension"><a href="#sec:pathname-strip-extension">pathname-strip-extension</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:pathname-strip-directory"><span class="sig"><var class="id">pathname-strip-directory</var> <var class="arg">PATHNAME</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:pathname-strip-extension"><span class="sig"><var class="id">pathname-strip-extension</var> <var class="arg">PATHNAME</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Return a new pathname with the specified component of <var class="arg">PATHNAME</var> stripped.</p></dd></dl><h3 id="sec:normalize-pathname"><a href="#sec:normalize-pathname">normalize-pathname</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:normalize-pathname"><span class="sig"><var class="id">normalize-pathname</var> <var class="arg">PATHNAME</var> <var class="dsssl">#!optional</var> <var class="arg">PLATFORM</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Performs a simple &quot;normalization&quot; on the <var class="arg">PATHNAME</var>, suitably for <var class="arg">PLATFORM</var>, which should be one of the symbols <tt>windows</tt> or <tt>unix</tt> and defaults to on whatever platform is currently in use. All relative path elements and duplicate separators are processed and removed.  If <tt>NAME</tt> ends with a <tt>/</tt> or is empty, the appropriate slash is appended to the tail.</p><p>No directories or files are actually tested for existence; this procedure only canonicalises path syntax.</p></dd></dl><h3 id="sec:directory-null.3f"><a href="#sec:directory-null.3f">directory-null?</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:directory-null.3f"><span class="sig"><var class="id">directory-null?</var> <var class="arg">DIRECTORY</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Does the <var class="arg">DIRECTORY</var> consist only of path separators and the period?</p><p><var class="arg">DIRECTORY</var> may be a string or a list of strings.</p></dd></dl><h3 id="sec:decompose-directory"><a href="#sec:decompose-directory">decompose-directory</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:decompose-directory"><span class="sig"><var class="id">decompose-directory</var> <var class="arg">DIRECTORY</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns 3 values: the <tt>base-origin</tt>, <tt>base-directory</tt>, and the <tt>directory-elements</tt> for the <var class="arg">DIRECTORY</var>.</p><dl><dt><tt>base-origin</tt></dt>
+<dd>a <tt>string</tt> or <tt>#f</tt>. The drive, if any.</dd><dt><tt>base-directory</tt></dt>
+<dd>a <tt>string</tt> or <tt>#f</tt>. A directory-separator when <var class="arg">DIRECTORY</var> is an <tt>absolute-pathname</tt>.</dd><dt><tt>directory-elements</tt></dt>
+<dd>a <tt>list-of string</tt> or <tt>#f</tt>. The non-directory-separator bits.</dd></dl>
+<p><var class="arg">DIRECTORY</var> is a <tt>string</tt>.</p><ul><li>On Windows <tt>(decompose-directory &quot;c:foo/bar&quot;)</tt> =&gt; <tt>&quot;c:&quot; #f (&quot;foo&quot; &quot;bar&quot;)</tt></li>
+</ul>
+</dd></dl><h3 id="sec:Windows_specific_notes"><a href="#sec:Windows_specific_notes">Windows specific notes</a></h3><p>Use of UTF8 encoded strings for pathnames is not supported. Windows uses a 16-bit UNICODE encoding with special system calls for wide-character support.  Only single-byte string encoding can be used.</p><hr /><p>Previous: <a href="Module%20%28chicken%20module%29.html">Module (chicken module)</a></p><p>Next: <a href="Module%20%28chicken%20platform%29.html">Module (chicken platform)</a></p></div></div></body></html>

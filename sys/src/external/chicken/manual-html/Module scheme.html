@@ -1,0 +1,1304 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module scheme</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_scheme">Module scheme</a></li>
+<li><a href="#sec:Expressions">Expressions</a>
+<ul>
+<li><a href="#sec:Primitive_expression_types">Primitive expression types</a>
+<ul>
+<li><a href="#sec:Variable_references">Variable references</a></li>
+<li><a href="#sec:Literal_expressions">Literal expressions</a></li>
+<li><a href="#sec:Procedure_calls">Procedure calls</a></li>
+<li><a href="#sec:Procedures">Procedures</a></li>
+<li><a href="#sec:Conditionals">Conditionals</a></li>
+<li><a href="#sec:Assignments">Assignments</a></li></ul></li>
+<li><a href="#sec:Derived_expression_types">Derived expression types</a>
+<ul>
+<li><a href="#sec:Derived_Conditionals">Derived Conditionals</a></li>
+<li><a href="#sec:Binding_constructs">Binding constructs</a></li>
+<li><a href="#sec:Sequencing">Sequencing</a></li>
+<li><a href="#sec:Iteration">Iteration</a></li>
+<li><a href="#sec:Delayed_evaluation">Delayed evaluation</a></li>
+<li><a href="#sec:Quasiquotation">Quasiquotation</a></li></ul></li>
+<li><a href="#sec:Macros">Macros</a>
+<ul>
+<li><a href="#sec:Binding_constructs_for_syntactic_keywords">Binding constructs for syntactic keywords</a></li>
+<li><a href="#sec:Pattern_language">Pattern language</a></li></ul></li></ul></li>
+<li><a href="#sec:Program_structure">Program structure</a>
+<ul>
+<li><a href="#sec:Programs">Programs</a></li>
+<li><a href="#sec:Definitions">Definitions</a>
+<ul>
+<li><a href="#sec:Top_level_definitions">Top level definitions</a></li>
+<li><a href="#sec:Internal_definitions">Internal definitions</a></li></ul></li>
+<li><a href="#sec:Syntax_definitions">Syntax definitions</a></li></ul></li>
+<li><a href="#sec:Standard_procedures">Standard procedures</a>
+<ul>
+<li><a href="#sec:Equivalence_predicates">Equivalence predicates</a></li>
+<li><a href="#sec:Numbers">Numbers</a>
+<ul>
+<li><a href="#sec:Numerical_types">Numerical types</a></li>
+<li><a href="#sec:Exactness">Exactness</a></li>
+<li><a href="#sec:Implementation_restrictions">Implementation restrictions</a></li>
+<li><a href="#sec:Syntax_of_numerical_constants">Syntax of numerical constants</a></li>
+<li><a href="#sec:Numerical_operations">Numerical operations</a></li>
+<li><a href="#sec:Numerical_input_and_output">Numerical input and output</a></li></ul></li>
+<li><a href="#sec:Other_data_types">Other data types</a>
+<ul>
+<li><a href="#sec:Booleans">Booleans</a></li>
+<li><a href="#sec:Pairs_and_lists">Pairs and lists</a></li>
+<li><a href="#sec:Symbols">Symbols</a></li>
+<li><a href="#sec:Characters">Characters</a></li>
+<li><a href="#sec:Strings">Strings</a></li>
+<li><a href="#sec:Vectors">Vectors</a></li></ul></li>
+<li><a href="#sec:Control_features">Control features</a></li>
+<li><a href="#sec:Eval">Eval</a></li>
+<li><a href="#sec:Input_and_output">Input and output</a>
+<ul>
+<li><a href="#sec:Ports">Ports</a></li>
+<li><a href="#sec:Input">Input</a></li>
+<li><a href="#sec:Output">Output</a></li>
+<li><a href="#sec:System_interface">System interface</a></li></ul></li></ul></li></ul></div><h2 id="sec:Module_scheme"><a href="#sec:Module_scheme">Module scheme</a></h2><p>This module provides all of CHICKEN's R5RS procedures and macros. These descriptions are based directly on the <i>Revised^5 Report on the Algorithmic Language Scheme</i>.</p><p>This module is used by default, unless a program is compiled with the <tt>-explicit-use</tt> option.</p><h2 id="sec:Expressions"><a href="#sec:Expressions">Expressions</a></h2><p>Expression types are categorized as primitive or derived. Primitive expression types include variables and procedure calls. Derived expression types are not semantically primitive, but can instead be defined as macros. With the exception of quasiquote, whose macro definition is complex, the derived expressions are classified as library features.  The distinction which R5RS makes between primitive and derived is unimportant and does not necessarily reflect how it's implemented in CHICKEN itself.</p><h3 id="sec:Primitive_expression_types"><a href="#sec:Primitive_expression_types">Primitive expression types</a></h3><h4 id="sec:Variable_references"><a href="#sec:Variable_references">Variable references</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:.3cvariable.3e"><span class="sig"><tt>&lt;variable&gt;</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>An expression consisting of a variable is a variable reference. The value of the variable reference is the value stored in the location to which the variable is bound. It is an error to reference an unbound variable.</p><pre>(define x 28)
+x           ===&gt;  28</pre></dd></dl><h4 id="sec:Literal_expressions"><a href="#sec:Literal_expressions">Literal expressions</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:quote"><span class="sig"><tt>(quote &lt;datum&gt;)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:quote"><span class="sig"><tt>'&lt;datum&gt;</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:.3cconstant.3e"><span class="sig"><tt>&lt;constant&gt;</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>(quote &lt;datum&gt;) evaluates to &lt;datum&gt;. &lt;Datum&gt; may be any external representation of a Scheme object. This notation is used to include literal constants in Scheme code.</p><pre>(quote a)                    ===&gt;  a
+(quote #(a b c))             ===&gt;  #(a b c)
+(quote (+ 1 2))              ===&gt;  (+ 1 2)</pre><p>(quote &lt;datum&gt;) may be abbreviated as '&lt;datum&gt;. The two notations are equivalent in all respects.</p><pre>'a                           ===&gt;  a
+'#(a b c)                    ===&gt;  #(a b c)
+'()                          ===&gt;  ()
+'(+ 1 2)                     ===&gt;  (+ 1 2)
+'(quote a)                   ===&gt;  (quote a)
+''a                          ===&gt;  (quote a)</pre><p>Numerical constants, string constants, character constants, and boolean constants evaluate &quot;to themselves&quot;; they need not be quoted.</p><pre>'&quot;abc&quot;             ===&gt;  &quot;abc&quot;
+&quot;abc&quot;              ===&gt;  &quot;abc&quot;
+'145932            ===&gt;  145932
+145932             ===&gt;  145932
+'#t                ===&gt;  #t
+#t                 ===&gt;  #t</pre><p>It is an error to alter a constant (i.e. the value of a literal expression) using a mutation procedure like set-car! or string-set!. In the current implementation of CHICKEN, identical constants don't share memory and it is possible to mutate them, but this may change in the future.</p></dd></dl><h4 id="sec:Procedure_calls"><a href="#sec:Procedure_calls">Procedure calls</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:.3coperator.3e"><span class="sig"><tt>(&lt;operator&gt; &lt;operand[1]&gt; ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>A procedure call is written by simply enclosing in parentheses expressions for the procedure to be called and the arguments to be passed to it. The operator and operand expressions are evaluated (in an unspecified order) and the resulting procedure is passed the resulting arguments.</p><pre>(+ 3 4)                           ===&gt;  7
+((if #f + *) 3 4)                 ===&gt;  12</pre><p>A number of procedures are available as the values of variables in the initial environment; for example, the addition and multiplication procedures in the above examples are the values of the variables + and *.  New procedures are created by evaluating lambda expressions. Procedure calls may return any number of values (see the <tt>values</tt> procedure <a href="#sec:Control_features">below</a>).</p><p>Procedure calls are also called combinations.</p><p>Note:   In contrast to other dialects of Lisp, the order of evaluation is unspecified, and the operator expression and the operand expressions are always evaluated with the same evaluation rules.</p><p>Note:   Although the order of evaluation is otherwise unspecified, the effect of any concurrent evaluation of the operator and operand expressions is constrained to be consistent with some sequential order of evaluation. The order of evaluation may be chosen differently for each procedure call.</p><p>Note:   In many dialects of Lisp, the empty combination, (), is a legitimate expression. In Scheme, combinations must have at least one subexpression, so () is not a syntactically valid expression.</p></dd></dl><h4 id="sec:Procedures"><a href="#sec:Procedures">Procedures</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:lambda"><span class="sig"><tt>(lambda &lt;formals&gt; &lt;body&gt;)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Syntax: &lt;Formals&gt; should be a formal arguments list as described below, and &lt;body&gt; should be a sequence of one or more expressions.</p><p>Semantics: A lambda expression evaluates to a procedure. The environment in effect when the lambda expression was evaluated is remembered as part of the procedure. When the procedure is later called with some actual arguments, the environment in which the lambda expression was evaluated will be extended by binding the variables in the formal argument list to fresh locations, the corresponding actual argument values will be stored in those locations, and the expressions in the body of the lambda expression will be evaluated sequentially in the extended environment. The result(s) of the last expression in the body will be returned as the result(s) of the procedure call.</p><pre>(lambda (x) (+ x x))              ===&gt;  a procedure
+((lambda (x) (+ x x)) 4)          ===&gt;  8
+
+(define reverse-subtract
+  (lambda (x y) (- y x)))
+(reverse-subtract 7 10)           ===&gt;  3
+
+(define add4
+  (let ((x 4))
+    (lambda (y) (+ x y))))
+(add4 6)                          ===&gt;  10</pre><p>&lt;Formals&gt; should have one of the following forms:</p><ul><li>(&lt;variable[1]&gt; ...): The procedure takes a fixed number of arguments; when the procedure is called, the arguments will be stored in the bindings of the corresponding variables.</li>
+<li>&lt;variable&gt;: The procedure takes any number of arguments; when the procedure is called, the sequence of actual arguments is converted into a newly allocated list, and the list is stored in the binding of the &lt;variable&gt;.</li>
+<li>(&lt;variable[1]&gt; ... &lt;variable[n]&gt; . &lt;variable[n+1]&gt;): If a space-delimited period precedes the last variable, then the procedure takes n or more arguments, where n is the number of formal arguments before the period (there must be at least one). The value stored in the binding of the last variable will be a newly allocated list of the actual arguments left over after all the other actual arguments have been matched up against the other formal arguments.</li>
+</ul>
+<p>It is an error for a &lt;variable&gt; to appear more than once in &lt;formals&gt;.</p><pre>((lambda x x) 3 4 5 6)                  ===&gt;  (3 4 5 6)
+((lambda (x y . z) z)
+ 3 4 5 6)                               ===&gt;  (5 6)</pre><p>Each procedure created as the result of evaluating a lambda expression is (conceptually) tagged with a storage location, in order to make eqv? and eq? work on procedures.</p><p>As an extension to R5RS, CHICKEN also supports &quot;extended&quot; DSSSL style parameter lists, which allows embedded special keywords.  Such a keyword gives a special meaning to the <tt>&lt;formal&gt;</tt> it precedes. DSSSL parameter lists are defined by the following grammar:</p><pre>&lt;parameter-list&gt; ==&gt; &lt;required-parameter&gt;*
+                     [#!optional &lt;optional-parameter&gt;*]
+                     [#!rest &lt;rest-parameter&gt;]
+                     [#!key &lt;keyword-parameter&gt;*]
+&lt;required-parameter&gt; ==&gt; &lt;ident&gt;
+&lt;optional-parameter&gt; ==&gt; &lt;ident&gt;
+                         | (&lt;ident&gt; &lt;initializer&gt;)
+&lt;rest-parameter&gt; ==&gt; &lt;ident&gt;
+&lt;keyword-parameter&gt; ==&gt; &lt;ident&gt;
+                        | (&lt;ident&gt; &lt;initializer&gt;)
+&lt;initializer&gt; ==&gt; &lt;expr&gt;</pre><p>When a procedure is applied to a list of arguments, the parameters and arguments are processed from left to right as follows:</p><ul><li>Required-parameters are bound to successive arguments starting with the first argument. It shall be an error if there are fewer arguments than required-parameters.</li>
+<li>Next, the optional-parameters are bound with the remaining arguments. If there are fewer arguments than optional-parameters, then the remaining optional-parameters are bound to the result of the evaluation of their corresponding &lt;initializer&gt;, if one was specified, otherwise <tt>#f</tt>. The corresponding &lt;initializer&gt; is evaluated in an environment in which all previous parameters have been bound.</li>
+<li>If there is a rest-parameter, then it is bound to a list containing all the remaining arguments left over after the argument bindings with required-parameters and optional-parameters have been made. </li>
+<li>If <tt>#!key</tt> was specified in the parameter-list, there should be an even number of remaining arguments. These are interpreted as a series of pairs, where the first member of each pair is a keyword specifying the parameter name, and the second member is the corresponding value. If the same keyword occurs more than once in the list of arguments, then the corresponding value of the first keyword is the binding value. If there is no argument for a particular keyword-parameter, then the variable is bound to the result of evaluating &lt;initializer&gt;, if one was specified, otherwise <tt>#f</tt>. The corresponding &lt;initializer&gt; is evaluated in an environment in which all previous parameters have been bound. </li>
+</ul>
+<p>Needing a special mention is the close relationship between the rest-parameter and possible keyword-parameters.  Declaring a rest-parameter binds up all remaining arguments in a list, as described above. These same remaining arguments are also used for attempted matches with declared keyword-parameters, as described above, in which case a matching keyword-parameter binds to the corresponding value argument at the same time that both the keyword and value arguments are added to the rest parameter list.  Note that for efficiency reasons, the keyword-parameter matching does nothing more than simply attempt to match with pairs that may exist in the remaining arguments.  Extra arguments that don't match are simply unused and forgotten if no rest-parameter has been declared.  Because of this, the caller of a procedure containing one or more keyword-parameters cannot rely on any kind of system error to report wrong keywords being passed in.</p><p>It shall be an error for an <tt>&lt;ident&gt;</tt> to appear more than once in a parameter-list.</p><p>If there is no rest-parameter and no keyword-parameters in the parameter-list, then it shall be an error for any extra arguments to be passed to the procedure.</p><p>Example:</p><pre>((lambda x x) 3 4 5 6)       =&gt; (3 4 5 6)
+((lambda (x y #!rest z) z)
+ 3 4 5 6)                    =&gt; (5 6)
+((lambda (x y #!optional z #!rest r #!key i (j 1)) 
+    (list x y z i: i j: j))
+ 3 4 5 i: 6 i: 7)            =&gt; (3 4 5 i: 6 j: 1)</pre></dd></dl><h4 id="sec:Conditionals"><a href="#sec:Conditionals">Conditionals</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:if"><span class="sig"><tt>(if &lt;test&gt; &lt;consequent&gt; &lt;alternate&gt;)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:if"><span class="sig"><tt>(if &lt;test&gt; &lt;consequent&gt;)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Syntax: &lt;Test&gt;, &lt;consequent&gt;, and &lt;alternate&gt; may be arbitrary expressions.</p><p>Semantics: An if expression is evaluated as follows: first, &lt;test&gt; is evaluated. If it yields a true value (see <a href="#sec:Booleans">the section about booleans</a> below), then &lt;consequent&gt; is evaluated and its value(s) is(are) returned. Otherwise &lt;alternate&gt; is evaluated and its value(s) is(are) returned. If &lt;test&gt; yields a false value and no &lt;alternate&gt; is specified, then the result of the expression is unspecified.</p><pre>(if (&gt; 3 2) 'yes 'no)                   ===&gt;  yes
+(if (&gt; 2 3) 'yes 'no)                   ===&gt;  no
+(if (&gt; 3 2)
+    (- 3 2)
+    (+ 3 2))                            ===&gt;  1</pre></dd></dl><h4 id="sec:Assignments"><a href="#sec:Assignments">Assignments</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:set.21"><span class="sig"><tt>(set! &lt;variable&gt; &lt;expression&gt;)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>&lt;Expression&gt; is evaluated, and the resulting value is stored in the location to which &lt;variable&gt; is bound. &lt;Variable&gt; must be bound either in some region enclosing the set! expression or at top level. The result of the set! expression is unspecified.</p><pre>(define x 2)
+(+ x 1)                         ===&gt;  3
+(set! x 4)                      ===&gt;  unspecified
+(+ x 1)                         ===&gt;  5</pre><p>As an extension to R5RS, <tt>set!</tt> for unbound toplevel variables is allowed.  Also, <tt>(set! (PROCEDURE ...) ...)</tt> is supported, as CHICKEN implements <a href="http://srfi.schemers.org/srfi-17/srfi-17.html">SRFI-17</a>.</p></dd></dl><h3 id="sec:Derived_expression_types"><a href="#sec:Derived_expression_types">Derived expression types</a></h3><p>The constructs in this section are hygienic.  For reference purposes, these macro definitions will convert most of the constructs described in this section into the primitive constructs described in the previous section.  This does not necessarily mean that's exactly how it's implemented in CHICKEN.</p><h4 id="sec:Derived_Conditionals"><a href="#sec:Derived_Conditionals">Derived Conditionals</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:cond"><span class="sig"><tt>(cond &lt;clause[1]&gt; &lt;clause[2]&gt; ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Syntax: Each &lt;clause&gt; should be of the form</p><pre>(&lt;test&gt; &lt;expression[1]&gt; ...)</pre><p>where &lt;test&gt; is any expression. Alternatively, a &lt;clause&gt; may be of the form</p><pre>(&lt;test&gt; =&gt; &lt;expression&gt;)</pre><p>The last &lt;clause&gt; may be an &quot;else clause,&quot; which has the form</p><pre>(else &lt;expression[1]&gt; &lt;expression[2]&gt; ...).</pre><p>Semantics: A cond expression is evaluated by evaluating the &lt;test&gt; expressions of successive &lt;clause&gt;s in order until one of them evaluates to a true value (see <a href="#sec:Booleans">the section about booleans</a> below). When a &lt;test&gt; evaluates to a true value, then the remaining &lt;expression&gt;s in its &lt;clause&gt; are evaluated in order, and the result(s) of the last &lt;expression&gt; in the &lt;clause&gt; is(are) returned as the result(s) of the entire cond expression. If the selected &lt;clause&gt; contains only the &lt;test&gt; and no &lt;expression&gt;s, then the value of the &lt;test&gt; is returned as the result.  If the selected &lt;clause&gt; uses the =&gt; alternate form, then the &lt;expression&gt; is evaluated. Its value must be a procedure that accepts one argument; this procedure is then called on the value of the &lt;test&gt; and the value(s) returned by this procedure is(are) returned by the cond expression. If all &lt;test&gt;s evaluate to false values, and there is no else clause, then the result of the conditional expression is unspecified; if there is an else clause, then its &lt;expression&gt;s are evaluated, and the value(s) of the last one is(are) returned.</p><pre>(cond ((&gt; 3 2) 'greater)
+      ((&lt; 3 2) 'less))           ===&gt;  greater
+(cond ((&gt; 3 3) 'greater)
+      ((&lt; 3 3) 'less)
+      (else 'equal))             ===&gt;  equal
+(cond ((assv 'b '((a 1) (b 2))) =&gt; cadr)
+      (else #f))                 ===&gt;  2</pre><p>As an extension to R5RS, CHICKEN also supports the <a href="http://srfi.schemers.org/srfi-61">SRFI-61</a> syntax:</p><pre>(&lt;generator&gt; &lt;guard&gt; =&gt; &lt;expression&gt;)</pre><p>In this situation, <tt>generator</tt> is <i>always</i> evaluated.  Its resulting value(s) are used as argument(s) for the <tt>guard</tt> procedure.  Finally, if <tt>guard</tt> returns a non-<tt>#f</tt> value, the <tt>expression</tt> is evaluated by calling it with the result of <tt>guard</tt>.  Otherwise, evaluation procedes to the next clause.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:case"><span class="sig"><tt>(case &lt;key&gt; &lt;clause[1]&gt; &lt;clause[2]&gt; ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Syntax: &lt;Key&gt; may be any expression. Each &lt;clause&gt; should have the form</p><pre>((&lt;datum[1]&gt; ...) &lt;expression[1]&gt; &lt;expression[2]&gt; ...),</pre><p>where each &lt;datum&gt; is an external representation of some object. Alternatively, as per R7RS, a &lt;clause&gt; may be of the form</p><pre>((&lt;datum[1]&gt; ...) =&gt; &lt;expression&gt;).</pre><p>All the &lt;datum&gt;s must be distinct. The last &lt;clause&gt; may be an &quot;else clause,&quot; which has one of the following two forms:</p><pre>(else &lt;expression[1]&gt; &lt;expression[2]&gt; ...)
+(else =&gt; &lt;expression&gt;).      ; R7RS extension</pre><p>Semantics: A case expression is evaluated as follows. &lt;Key&gt; is evaluated and its result is compared against each &lt;datum&gt;. If the result of evaluating &lt;key&gt; is equivalent (in the sense of <tt>eqv?</tt>; see <a href="#sec:Equivalence_predicates">below</a>) to a &lt;datum&gt;, then the expressions in the corresponding &lt;clause&gt; are evaluated from left to right and the result(s) of the last expression in the &lt;clause&gt; is(are) returned as the result(s) of the case expression. If the selected &lt;clause&gt; uses the =&gt; alternate form (an R7RS extension), then the &lt;expression&gt; is evaluated. Its value must be a procedure that accepts one argument; this procedure is then called on the value of the &lt;key&gt; and the value(s) returned by this procedure is(are) returned by the case expression.  If the result of evaluating &lt;key&gt; is different from every &lt;datum&gt;, then if there is an else clause its expressions are evaluated and the result(s) of the last is(are) the result(s) of the case expression; otherwise the result of the case expression is unspecified.</p><pre>(case (* 2 3)
+  ((2 3 5 7) 'prime)
+  ((1 4 6 8 9) 'composite))             ===&gt;  composite
+(case (car '(c d))
+  ((a) 'a)
+  ((b) 'b))                             ===&gt;  unspecified
+(case (car '(c d))
+  ((a e i o u) 'vowel)
+  ((w y) 'semivowel)
+  (else 'consonant))                    ===&gt;  consonant</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:and"><span class="sig"><tt>(and &lt;test[1]&gt; ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>The &lt;test&gt; expressions are evaluated from left to right, and the value of the first expression that evaluates to a false value (see <a href="#sec:Booleans">the section about booleans</a>) is returned. Any remaining expressions are not evaluated. If all the expressions evaluate to true values, the value of the last expression is returned. If there are no expressions then #t is returned.</p><pre>(and (= 2 2) (&gt; 2 1))                   ===&gt;  #t
+(and (= 2 2) (&lt; 2 1))                   ===&gt;  #f
+(and 1 2 'c '(f g))                     ===&gt;  (f g)
+(and)                                   ===&gt;  #t</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:or"><span class="sig"><tt>(or &lt;test[1]&gt; ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>The &lt;test&gt; expressions are evaluated from left to right, and the value of the first expression that evaluates to a true value (see <a href="#sec:Booleans">the section about booleans</a>) is returned. Any remaining expressions are not evaluated. If all expressions evaluate to false values, the value of the last expression is returned. If there are no expressions then #f is returned.</p><pre>(or (= 2 2) (&gt; 2 1))                    ===&gt;  #t
+(or (= 2 2) (&lt; 2 1))                    ===&gt;  #t
+(or #f #f #f)         ===&gt;  #f
+(or (memq 'b '(a b c)) 
+    (/ 3 0))                            ===&gt;  (b c)</pre></dd></dl><h4 id="sec:Binding_constructs"><a href="#sec:Binding_constructs">Binding constructs</a></h4><p>The three binding constructs let, let*, and letrec give Scheme a block structure, like Algol 60. The syntax of the three constructs is identical, but they differ in the regions they establish for their variable bindings. In a let expression, the initial values are computed before any of the variables become bound; in a let* expression, the bindings and evaluations are performed sequentially; while in a letrec expression, all the bindings are in effect while their initial values are being computed, thus allowing mutually recursive definitions.</p>
+<dl class="defsig">
+<dt class="defsig" id="def:let"><span class="sig"><tt>(let &lt;bindings&gt; &lt;body&gt;)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Syntax: &lt;Bindings&gt; should have the form</p><pre>((&lt;variable[1]&gt; &lt;init[1]&gt;) ...),</pre><p>where each &lt;init&gt; is an expression, and &lt;body&gt; should be a sequence of one or more expressions. It is an error for a &lt;variable&gt; to appear more than once in the list of variables being bound.</p><p>Semantics: The &lt;init&gt;s are evaluated in the current environment (in some unspecified order), the &lt;variable&gt;s are bound to fresh locations holding the results, the &lt;body&gt; is evaluated in the extended environment, and the value(s) of the last expression of &lt;body&gt; is(are) returned. Each binding of a &lt;variable&gt; has &lt;body&gt; as its region.</p><pre>(let ((x 2) (y 3))
+  (* x y))                              ===&gt;  6
+
+(let ((x 2) (y 3))
+  (let ((x 7)
+        (z (+ x y)))
+    (* z x)))                           ===&gt;  35</pre><p>See also &quot;named let&quot;, <a href="#sec:Iteration">below</a>.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:let.2a"><span class="sig"><tt>(let* &lt;bindings&gt; &lt;body&gt;)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Syntax: &lt;Bindings&gt; should have the form</p><pre>((&lt;variable[1]&gt; &lt;init[1]&gt;) ...),</pre><p>and &lt;body&gt; should be a sequence of one or more expressions.</p><p>Semantics: Let* is similar to let, but the bindings are performed sequentially from left to right, and the region of a binding indicated by (&lt;variable&gt; &lt;init&gt;) is that part of the let* expression to the right of the binding. Thus the second binding is done in an environment in which the first binding is visible, and so on.</p><pre>(let ((x 2) (y 3))
+  (let* ((x 7)
+         (z (+ x y)))
+    (* z x)))                     ===&gt;  70</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:letrec"><span class="sig"><tt>(letrec &lt;bindings&gt; &lt;body&gt;)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Syntax: &lt;Bindings&gt; should have the form</p><pre>((&lt;variable[1]&gt; &lt;init[1]&gt;) ...),</pre><p>and &lt;body&gt; should be a sequence of one or more expressions. It is an error for a &lt;variable&gt; to appear more than once in the list of variables being bound.</p><p>Semantics: The &lt;variable&gt;s are bound to fresh locations holding undefined values, the &lt;init&gt;s are evaluated in the resulting environment (in some unspecified order), each &lt;variable&gt; is assigned to the result of the corresponding &lt;init&gt;, the &lt;body&gt; is evaluated in the resulting environment, and the value(s) of the last expression in &lt;body&gt; is(are) returned. Each binding of a &lt;variable&gt; has the entire letrec expression as its region, making it possible to define mutually recursive procedures.</p><pre>(letrec ((even?
+          (lambda (n)
+            (if (zero? n)
+                #t
+                (odd? (- n 1)))))
+         (odd?
+          (lambda (n)
+            (if (zero? n)
+                #f
+                (even? (- n 1))))))
+  (even? 88))
+                        ===&gt;  #t</pre><p>One restriction on letrec is very important: it must be possible to evaluate each &lt;init&gt; without assigning or referring to the value of any &lt;variable&gt;. If this restriction is violated, then it is an error. The restriction is necessary because Scheme passes arguments by value rather than by name. In the most common uses of letrec, all the &lt;init&gt;s are lambda expressions and the restriction is satisfied automatically.</p></dd></dl><h4 id="sec:Sequencing"><a href="#sec:Sequencing">Sequencing</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:begin"><span class="sig"><tt>(begin &lt;expression[1]&gt; &lt;expression[2]&gt; ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>The &lt;expression&gt;s are evaluated sequentially from left to right, and the value(s) of the last &lt;expression&gt; is(are) returned. This expression type is used to sequence side effects such as input and output.</p><pre>(define x 0)
+
+(begin (set! x 5)
+       (+ x 1))                          ===&gt;  6
+
+(begin (display &quot;4 plus 1 equals &quot;)
+       (display (+ 4 1)))                ===&gt;  unspecified
+  and prints  4 plus 1 equals 5</pre><p>As an extension to R5RS, CHICKEN also allows <tt>(begin)</tt> without body expressions in any context, not just at toplevel.  This simply evaluates to the unspecified value.</p></dd></dl><h4 id="sec:Iteration"><a href="#sec:Iteration">Iteration</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:do"><span class="sig"><tt>(do ((&lt;variable[1]&gt; &lt;init[1]&gt; &lt;step[1]&gt;) ...) (&lt;test&gt; &lt;expression&gt; ...) &lt;command&gt; ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Do is an iteration construct. It specifies a set of variables to be bound, how they are to be initialized at the start, and how they are to be updated on each iteration. When a termination condition is met, the loop exits after evaluating the &lt;expression&gt;s.</p><p>Do expressions are evaluated as follows: The &lt;init&gt; expressions are evaluated (in some unspecified order), the &lt;variable&gt;s are bound to fresh locations, the results of the &lt;init&gt; expressions are stored in the bindings of the &lt;variable&gt;s, and then the iteration phase begins.</p><p>Each iteration begins by evaluating &lt;test&gt;; if the result is false (see <a href="#sec:Booleans">the section about booleans</a>), then the &lt;command&gt; expressions are evaluated in order for effect, the &lt;step&gt; expressions are evaluated in some unspecified order, the &lt;variable&gt;s are bound to fresh locations, the results of the &lt;step&gt;s are stored in the bindings of the &lt;variable&gt;s, and the next iteration begins.</p><p>If &lt;test&gt; evaluates to a true value, then the &lt;expression&gt;s are evaluated from left to right and the value(s) of the last &lt;expression&gt; is(are) returned. If no &lt;expression&gt;s are present, then the value of the do expression is unspecified.</p><p>The region of the binding of a &lt;variable&gt; consists of the entire do expression except for the &lt;init&gt;s. It is an error for a &lt;variable&gt; to appear more than once in the list of do variables.</p><p>A &lt;step&gt; may be omitted, in which case the effect is the same as if (&lt;variable&gt; &lt;init&gt; &lt;variable&gt;) had been written instead of (&lt;variable&gt; &lt;init&gt;).</p><pre>(do ((vec (make-vector 5))
+     (i 0 (+ i 1)))
+    ((= i 5) vec)
+  (vector-set! vec i i))                    ===&gt;  #(0 1 2 3 4)
+
+(let ((x '(1 3 5 7 9)))
+  (do ((x x (cdr x))
+       (sum 0 (+ sum (car x))))
+      ((null? x) sum)))                     ===&gt;  25</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:let"><span class="sig"><tt>(let &lt;variable&gt; &lt;bindings&gt; &lt;body&gt;)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>&quot;Named let&quot; is a variant on the syntax of let which provides a more general looping construct than do and may also be used to express recursions. It has the same syntax and semantics as ordinary let except that &lt;variable&gt; is bound within &lt;body&gt; to a procedure whose formal arguments are the bound variables and whose body is &lt;body&gt;. Thus the execution of &lt;body&gt; may be repeated by invoking the procedure named by &lt;variable&gt;.</p><pre>(let loop ((numbers '(3 -2 1 6 -5))
+           (nonneg '())
+           (neg '()))
+  (cond ((null? numbers) (list nonneg neg))
+        ((&gt;= (car numbers) 0)
+         (loop (cdr numbers)
+               (cons (car numbers) nonneg)
+               neg))
+        ((&lt; (car numbers) 0)
+         (loop (cdr numbers)
+               nonneg
+               (cons (car numbers) neg)))))
+                ===&gt;  ((6 1 3) (-5 -2))</pre></dd></dl><h4 id="sec:Delayed_evaluation"><a href="#sec:Delayed_evaluation">Delayed evaluation</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:delay"><span class="sig"><tt>(delay &lt;expression&gt;)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>The delay construct is used together with the procedure force to implement lazy evaluation or call by need. <tt>(delay &lt;expression&gt;)</tt> returns an object called a promise which at some point in the future may be asked (by the force procedure) to evaluate <tt>&lt;expression&gt;</tt>, and deliver the resulting value. The <tt>&lt;expression&gt;</tt> may return multiple values, which will be correctly memoized and returned by subsequent calls to <tt>force</tt>.  This is a CHICKEN extension to R5RS.</p><p>See the description of <tt>force</tt> (under <a href="#sec:control-features">Control features</a>, below) for a more complete description of <tt>delay</tt>.</p><p>CHICKEN also supports the R7RS <tt>delay-force</tt> syntax which allows for iterative lazy algorithms to be expressed in bounded space.  See the <a href="Module%20%28chicken%20base%29.html#sec:lazy-evaluation">Lazy evaluation section</a> in the (chicken base) module documentation for more information.</p></dd></dl><h4 id="sec:Quasiquotation"><a href="#sec:Quasiquotation">Quasiquotation</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:quasiquote"><span class="sig"><tt>(quasiquote &lt;qq template&gt;)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:quasiquote"><span class="sig"><tt>`&lt;qq template&gt;</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>&quot;Backquote&quot; or &quot;quasiquote&quot; expressions are useful for constructing a list or vector structure when most but not all of the desired structure is known in advance. If no commas appear within the &lt;qq template&gt;, the result of evaluating `&lt;qq template&gt; is equivalent to the result of evaluating '&lt;qq template&gt;. If a comma appears within the &lt;qq template&gt;, however, the expression following the comma is evaluated (&quot;unquoted&quot;) and its result is inserted into the structure instead of the comma and the expression. If a comma appears followed immediately by an at-sign (@), then the following expression must evaluate to a list; the opening and closing parentheses of the list are then &quot;stripped away&quot; and the elements of the list are inserted in place of the comma at-sign expression sequence. A comma at-sign should only appear within a list or vector &lt;qq template&gt;.</p><pre>`(list ,(+ 1 2) 4)          ===&gt;  (list 3 4)
+(let ((name 'a)) `(list ,name ',name))           
+                ===&gt;  (list a (quote a))
+`(a ,(+ 1 2) ,@(map abs '(4 -5 6)) b)           
+                ===&gt;  (a 3 4 5 6 b)
+`(( foo ,(- 10 3)) ,@(cdr '(c)) . ,(car '(cons)))           
+                ===&gt;  ((foo 7) . cons)
+`#(10 5 ,(sqrt 4) ,@(map sqrt '(16 9)) 8)           
+                ===&gt;  #(10 5 2 4 3 8)</pre><p>Quasiquote forms may be nested. Substitutions are made only for unquoted components appearing at the same nesting level as the outermost backquote. The nesting level increases by one inside each successive quasiquotation, and decreases by one inside each unquotation.</p><pre>`(a `(b ,(+ 1 2) ,(foo ,(+ 1 3) d) e) f)           
+                ===&gt;  (a `(b ,(+ 1 2) ,(foo 4 d) e) f)
+(let ((name1 'x)
+      (name2 'y))
+  `(a `(b ,,name1 ,',name2 d) e))           
+                ===&gt;  (a `(b ,x ,'y d) e)</pre><p>The two notations `&lt;qq template&gt; and (quasiquote &lt;qq template&gt;) are identical in all respects. ,&lt;expression&gt; is identical to (unquote &lt;expression&gt;), and ,@&lt;expression&gt; is identical to (unquote-splicing &lt;expression&gt;). The external syntax generated by write for two-element lists whose car is one of these symbols may vary between implementations.</p><pre>(quasiquote (list (unquote (+ 1 2)) 4))           
+                ===&gt;  (list 3 4)
+'(quasiquote (list (unquote (+ 1 2)) 4))           
+                ===&gt;  `(list ,(+ 1 2) 4)
+     i.e., (quasiquote (list (unquote (+ 1 2)) 4))</pre><p>Unpredictable behavior can result if any of the symbols quasiquote, unquote, or unquote-splicing appear in positions within a &lt;qq template&gt; otherwise than as described above.</p></dd></dl><h3 id="sec:Macros"><a href="#sec:Macros">Macros</a></h3><p>Scheme programs can define and use new derived expression types, called macros. Program-defined expression types have the syntax</p><pre>(&lt;keyword&gt; &lt;datum&gt; ...)</pre><p>where &lt;keyword&gt; is an identifier that uniquely determines the expression type. This identifier is called the syntactic keyword, or simply keyword, of the macro. The number of the &lt;datum&gt;s, and their syntax, depends on the expression type.</p><p>Each instance of a macro is called a use of the macro. The set of rules that specifies how a use of a macro is transcribed into a more primitive expression is called the transformer of the macro.</p><p>The macro definition facility consists of two parts:</p><ul><li>A set of expressions used to establish that certain identifiers are macro keywords, associate them with macro transformers, and control the scope within which a macro is defined, and</li>
+<li>a pattern language for specifying macro transformers.</li>
+</ul>
+<p>The syntactic keyword of a macro may shadow variable bindings, and local variable bindings may shadow keyword bindings. All macros defined using the pattern language are &quot;hygienic&quot; and &quot;referentially transparent&quot; and thus preserve Scheme's lexical scoping:</p><ul><li>If a macro transformer inserts a binding for an identifier (variable or keyword), the identifier will in effect be renamed throughout its scope to avoid conflicts with other identifiers. Note that a define at top level may or may not introduce a binding; this depends on whether the binding already existed before (in which case its value will be overridden).</li>
+<li>If a macro transformer inserts a free reference to an identifier, the reference refers to the binding that was visible where the transformer was specified, regardless of any local bindings that may surround the use of the macro.</li>
+</ul>
+<h4 id="sec:Binding_constructs_for_syntactic_keywords"><a href="#sec:Binding_constructs_for_syntactic_keywords">Binding constructs for syntactic keywords</a></h4><p>Let-syntax and letrec-syntax are analogous to let and letrec, but they bind syntactic keywords to macro transformers instead of binding variables to locations that contain values. Syntactic keywords may also be bound at top level.</p>
+<dl class="defsig">
+<dt class="defsig" id="def:let-syntax"><span class="sig"><tt>(let-syntax &lt;bindings&gt; &lt;body&gt;)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Syntax: &lt;Bindings&gt; should have the form</p><pre>((&lt;keyword&gt; &lt;transformer spec&gt;) ...)</pre><p>Each &lt;keyword&gt; is an identifier, each &lt;transformer spec&gt; is an instance of syntax-rules, and &lt;body&gt; should be a sequence of one or more expressions. It is an error for a &lt;keyword&gt; to appear more than once in the list of keywords being bound.</p><p>Semantics: The &lt;body&gt; is expanded in the syntactic environment obtained by extending the syntactic environment of the let-syntax expression with macros whose keywords are the &lt;keyword&gt;s, bound to the specified transformers. Each binding of a &lt;keyword&gt; has &lt;body&gt; as its region.</p><pre>(let-syntax ((when (syntax-rules ()
+                     ((when test stmt1 stmt2 ...)
+                      (if test
+                          (begin stmt1
+                                 stmt2 ...))))))
+  (let ((if #t))
+    (when if (set! if 'now))
+    if))                                   ===&gt;  now
+
+(let ((x 'outer))
+  (let-syntax ((m (syntax-rules () ((m) x))))
+    (let ((x 'inner))
+      (m))))                               ===&gt;  outer</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:letrec-syntax"><span class="sig"><tt>(letrec-syntax &lt;bindings&gt; &lt;body&gt;)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Syntax: Same as for let-syntax.</p><p>Semantics: The &lt;body&gt; is expanded in the syntactic environment obtained by extending the syntactic environment of the letrec-syntax expression with macros whose keywords are the &lt;keyword&gt;s, bound to the specified transformers. Each binding of a &lt;keyword&gt; has the &lt;bindings&gt; as well as the &lt;body&gt; within its region, so the transformers can transcribe expressions into uses of the macros introduced by the letrec-syntax expression.</p><pre>(letrec-syntax
+  ((my-or (syntax-rules ()
+            ((my-or) #f)
+            ((my-or e) e)
+            ((my-or e1 e2 ...)
+             (let ((temp e1))
+               (if temp
+                   temp
+                   (my-or e2 ...)))))))
+  (let ((x #f)
+        (y 7)
+        (temp 8)
+        (let odd?)
+        (if even?))
+    (my-or x
+           (let temp)
+           (if y)
+           y)))                ===&gt;  7</pre></dd></dl><h4 id="sec:Pattern_language"><a href="#sec:Pattern_language">Pattern language</a></h4><p>A &lt;transformer spec&gt; has the following form:</p><pre>(syntax-rules &lt;literals&gt; &lt;syntax rule&gt; ...)</pre><p>Syntax: &lt;Literals&gt; is a list of identifiers and each &lt;syntax rule&gt; should be of the form</p><pre>(&lt;pattern&gt; &lt;template&gt;)</pre><p>The &lt;pattern&gt; in a &lt;syntax rule&gt; is a list &lt;pattern&gt; that begins with the keyword for the macro.</p><p>A &lt;pattern&gt; is either an identifier, a constant, or one of the following</p><pre>(&lt;pattern&gt; ...)
+(&lt;pattern&gt; &lt;pattern&gt; ... . &lt;pattern&gt;)
+(&lt;pattern&gt; ... &lt;pattern&gt; &lt;ellipsis&gt;)
+#(&lt;pattern&gt; ...)
+#(&lt;pattern&gt; ... &lt;pattern&gt; &lt;ellipsis&gt;)</pre><p>and a template is either an identifier, a constant, or one of the following</p><pre>(&lt;element&gt; ...)
+(&lt;element&gt; &lt;element&gt; ... . &lt;template&gt;)
+#(&lt;element&gt; ...)</pre><p>where an &lt;element&gt; is a &lt;template&gt; optionally followed by an &lt;ellipsis&gt; and an &lt;ellipsis&gt; is the identifier &quot;...&quot; (which cannot be used as an identifier in either a template or a pattern).</p><p>Semantics: An instance of syntax-rules produces a new macro transformer by specifying a sequence of hygienic rewrite rules. A use of a macro whose keyword is associated with a transformer specified by syntax-rules is matched against the patterns contained in the &lt;syntax rule&gt;s, beginning with the leftmost &lt;syntax rule&gt;. When a match is found, the macro use is transcribed hygienically according to the template.</p><p>An identifier that appears in the pattern of a &lt;syntax rule&gt; is a pattern variable, unless it is the keyword that begins the pattern, is listed in &lt;literals&gt;, or is the identifier &quot;...&quot;. Pattern variables match arbitrary input elements and are used to refer to elements of the input in the template. It is an error for the same pattern variable to appear more than once in a &lt;pattern&gt;.</p><p>The keyword at the beginning of the pattern in a &lt;syntax rule&gt; is not involved in the matching and is not considered a pattern variable or literal identifier.</p><p>Rationale:   The scope of the keyword is determined by the expression or syntax definition that binds it to the associated macro transformer. If the keyword were a pattern variable or literal identifier, then the template that follows the pattern would be within its scope regardless of whether the keyword were bound by let-syntax or by letrec-syntax.</p><p>Identifiers that appear in &lt;literals&gt; are interpreted as literal identifiers to be matched against corresponding subforms of the input. A subform in the input matches a literal identifier if and only if it is an identifier and either both its occurrence in the macro expression and its occurrence in the macro definition have the same lexical binding, or the two identifiers are equal and both have no lexical binding.</p><p>A subpattern followed by ... can match zero or more elements of the input. It is an error for ... to appear in &lt;literals&gt;. Within a pattern the identifier ... must follow the last element of a nonempty sequence of subpatterns.</p><p>More formally, an input form F matches a pattern P if and only if:</p><ul><li>P is a non-literal identifier; or</li>
+<li>P is a literal identifier and F is an identifier with the same binding; or</li>
+<li>P is a list (P[1] ... P[n]) and F is a list of n forms that match P [1] through P[n], respectively; or</li>
+<li>P is an improper list (P[1] P[2] ... P[n] . P[n+1]) and F is a list or improper list of n or more forms that match P[1] through P[n], respectively, and whose nth &quot;cdr&quot; matches P[n+1]; or</li>
+<li>P is of the form (P[1] ... P[n] P[n+1] &lt;ellipsis&gt;) where &lt;ellipsis&gt; is the identifier ... and F is a proper list of at least n forms, the first n of which match P[1] through P[n], respectively, and each remaining element of F matches P[n+1]; or</li>
+<li>P is a vector of the form #(P[1] ... P[n]) and F is a vector of n forms that match P[1] through P[n]; or</li>
+<li>P is of the form #(P[1] ... P[n] P[n+1] &lt;ellipsis&gt;) where &lt;ellipsis&gt; is the identifier ... and F is a vector of n or more forms the first n of which match P[1] through P[n], respectively, and each remaining element of F matches P[n+1]; or</li>
+<li>P is a datum and F is equal to P in the sense of the equal? procedure.</li>
+</ul>
+<p>It is an error to use a macro keyword, within the scope of its binding, in an expression that does not match any of the patterns.</p><p>When a macro use is transcribed according to the template of the matching &lt;syntax rule&gt;, pattern variables that occur in the template are replaced by the subforms they match in the input. Pattern variables that occur in subpatterns followed by one or more instances of the identifier ... are allowed only in subtemplates that are followed by as many instances of .... They are replaced in the output by all of the subforms they match in the input, distributed as indicated. It is an error if the output cannot be built up as specified.</p><p>Identifiers that appear in the template but are not pattern variables or the identifier ... are inserted into the output as literal identifiers. If a literal identifier is inserted as a free identifier then it refers to the binding of that identifier within whose scope the instance of syntax-rules appears. If a literal identifier is inserted as a bound identifier then it is in effect renamed to prevent inadvertent captures of free identifiers.</p><p>As an example, if let and cond are defined as usual, then they are hygienic (as required) and the following is not an error.</p><pre>(let ((=&gt; #f))
+  (cond (#t =&gt; 'ok)))                   ===&gt; ok</pre><p>The macro transformer for cond recognizes =&gt; as a local variable, and hence an expression, and not as the top-level identifier =&gt;, which the macro transformer treats as a syntactic keyword. Thus the example expands into</p><pre>(let ((=&gt; #f))
+  (if #t (begin =&gt; 'ok)))</pre><p>instead of</p><pre>(let ((=&gt; #f))
+  (let ((temp #t))
+    (if temp ('ok temp))))</pre><p>which would result in an invalid procedure call.</p><h2 id="sec:Program_structure"><a href="#sec:Program_structure">Program structure</a></h2><h3 id="sec:Programs"><a href="#sec:Programs">Programs</a></h3><p>A Scheme program consists of a sequence of expressions, definitions, and syntax definitions. Expressions are described in chapter 4; definitions and syntax definitions are the subject of the rest of the present chapter.</p><p>Programs are typically stored in files or entered interactively to a running Scheme system, although other paradigms are possible; questions of user interface lie outside the scope of this report. (Indeed, Scheme would still be useful as a notation for expressing computational methods even in the absence of a mechanical implementation.)</p><p>Definitions and syntax definitions occurring at the top level of a program can be interpreted declaratively. They cause bindings to be created in the top level environment or modify the value of existing top-level bindings. Expressions occurring at the top level of a program are interpreted imperatively; they are executed in order when the program is invoked or loaded, and typically perform some kind of initialization.</p><p>At the top level of a program (begin &lt;form1&gt; ...) is equivalent to the sequence of expressions, definitions, and syntax definitions that form the body of the begin.</p><h3 id="sec:Definitions"><a href="#sec:Definitions">Definitions</a></h3><p>Definitions are valid in some, but not all, contexts where expressions are allowed. They are valid only at the top level of a &lt;program&gt; and at the beginning of a &lt;body&gt;.</p><p>A definition should have one of the following forms:</p>
+<dl class="defsig">
+<dt class="defsig" id="def:define"><span class="sig"><tt>(define &lt;variable&gt; &lt;expression&gt;)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:define"><span class="sig"><tt>(define (&lt;variable&gt; &lt;formals&gt;) &lt;body&gt;)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>&lt;Formals&gt; should be either a sequence of zero or more variables, or a sequence of one or more variables followed by a space-delimited period and another variable (as in a lambda expression). This form is equivalent to</p><pre>(define &lt;variable&gt;
+  (lambda (&lt;formals&gt;) &lt;body&gt;)).</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:define"><span class="sig"><tt>(define &lt;variable&gt;)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>This form is a CHICKEN extension to R5RS, and is equivalent to</p><pre>(define &lt;variable&gt; (void))</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:define"><span class="sig"><tt>(define (&lt;variable&gt; . &lt;formal&gt;) &lt;body&gt;)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>&lt;Formal&gt; should be a single variable. This form is equivalent to</p><pre>(define &lt;variable&gt;
+  (lambda &lt;formal&gt; &lt;body&gt;)).</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:define"><span class="sig"><tt>(define ((&lt;variable&gt; &lt;formal&gt; ...) ...) &lt;body&gt;)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>As an extension to R5RS, CHICKEN allows <i>curried</i> definitions, where the variable name may also be a list specifying a name and a nested lambda list. For example,</p><pre>(define ((make-adder x) y) (+ x y))</pre><p>is equivalent to</p><pre>(define (make-adder x) (lambda (y) (+ x y))).</pre><p>This type of curried definition can be nested arbitrarily and combined with dotted tail notation or DSSSL keywords.</p></dd></dl><h4 id="sec:Top_level_definitions"><a href="#sec:Top_level_definitions">Top level definitions</a></h4><p>At the top level of a program, a definition</p><pre>(define &lt;variable&gt; &lt;expression&gt;)</pre><p>has essentially the same effect as the assignment expression</p><pre>(set! &lt;variable&gt; &lt;expression&gt;)</pre><p>if &lt;variable&gt; is bound. If &lt;variable&gt; is not bound, however, then the definition will bind &lt;variable&gt; to a new location before performing the assignment, whereas it would be an error to perform a set! on an unbound variable in standard Scheme.  In CHICKEN, <tt>set!</tt> at toplevel has the same effect as a definition, unless inside a module, in which case it is an error.</p><pre>(define add3
+  (lambda (x) (+ x 3)))
+(add3 3)                         ===&gt;  6
+(define first car)
+(first '(1 2))                   ===&gt;  1</pre><p>Some implementations of Scheme use an initial environment in which all possible variables are bound to locations, most of which contain undefined values. Top level definitions in such an implementation are truly equivalent to assignments.  In CHICKEN, attempting to evaluate an unbound identifier will result in an error, but you <i>can</i> use <tt>set!</tt> to bind an initial value to it.</p><h4 id="sec:Internal_definitions"><a href="#sec:Internal_definitions">Internal definitions</a></h4><p>Definitions may occur at the beginning of a &lt;body&gt; (that is, the body of a lambda, let, let*, letrec, let-syntax, or letrec-syntax expression or that of a definition of an appropriate form). Such definitions are known as internal definitions as opposed to the top level definitions described above. The variable defined by an internal definition is local to the &lt;body&gt;. That is, &lt;variable&gt; is bound rather than assigned, and the region of the binding is the entire &lt;body&gt;. For example,</p><pre>(let ((x 5))
+  (define foo (lambda (y) (bar x y)))
+  (define bar (lambda (a b) (+ (* a b) a)))
+  (foo (+ x 3)))                        ===&gt;  45</pre><p>A &lt;body&gt; containing internal definitions can always be converted into a completely equivalent letrec expression. For example, the let expression in the above example is equivalent to</p><pre>(let ((x 5))
+  (letrec ((foo (lambda (y) (bar x y)))
+           (bar (lambda (a b) (+ (* a b) a))))
+    (foo (+ x 3))))</pre><p>Just as for the equivalent letrec expression, it must be possible to evaluate each &lt;expression&gt; of every internal definition in a &lt;body&gt; without assigning or referring to the value of any &lt;variable&gt; being defined.</p><p>Wherever an internal definition may occur (begin &lt;definition1&gt; ...) is equivalent to the sequence of definitions that form the body of the begin.</p><p>CHICKEN extends the R5RS semantics by allowing internal definitions everywhere, and not only at the beginning of a body. A set of internal definitions is equivalent to a <tt>letrec</tt> form enclosing all following expressions in the body:</p><pre>(let ((foo 123))
+  (bar)
+  (define foo 456)
+  (baz foo) )</pre><p>expands into</p><pre>(let ((foo 123))
+  (bar)
+  (letrec ((foo 456))
+    (baz foo) ) )</pre><p>Local sequences of <tt>define-syntax</tt> forms are translated into equivalent <tt>letrec-syntax</tt> forms that enclose the following forms as the body of the expression.</p><h3 id="sec:Syntax_definitions"><a href="#sec:Syntax_definitions">Syntax definitions</a></h3><p>Syntax definitions are valid only at the top level of a &lt;program&gt;. They have the following form:</p>
+<dl class="defsig">
+<dt class="defsig" id="def:define-syntax"><span class="sig"><tt>(define-syntax &lt;keyword&gt; &lt;transformer spec&gt;)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p><tt>&lt;Keyword&gt;</tt> is an identifier, and the <tt>&lt;transformer spec&gt;</tt> should be an instance of <tt>syntax-rules</tt>.  Note that CHICKEN also supports <tt>er-macro-transformer</tt> and <tt>ir-macro-transformer</tt> here.  For more information see <a href="Module%20%28chicken%20syntax%29.html">the (chicken syntax) module</a>.</p><p>The top-level syntactic environment is extended by binding the &lt;keyword&gt; to the specified transformer.</p><p>In standard Scheme, there is no define-syntax analogue of internal definitions in, but CHICKEN allows these as an extension to the standard.  This means <tt>define-syntax</tt> may be used to define local macros that are visible throughout the rest of the body in which the definition occurred, i.e.</p><pre> (let ()
+   ...
+   (define-syntax foo ...)
+   (define-syntax bar ...)
+   ...)</pre><p>is expanded into</p><pre> (let ()
+   ...
+   (letrec-syntax ((foo ...) (bar ...))
+     ...) )</pre><p><tt>syntax-rules</tt> supports <a href="http://srfi.schemers.org/srfi-46/">SRFI-46</a> in allowing the ellipsis identifier to be user-defined by passing it as the first argument to the <tt>syntax-rules</tt> form. Also, &quot;tail&quot; patterns of the form</p><pre> (syntax-rules ()
+   ((_ (a b ... c) 
+     ...</pre><p>are supported.</p><p>The effect of destructively modifying the s-expression passed to a transformer procedure is undefined.</p><p>Although macros may expand into definitions and syntax definitions in any context that permits them, it is an error for a definition or syntax definition to shadow a syntactic keyword whose meaning is needed to determine whether some form in the group of forms that contains the shadowing definition is in fact a definition, or, for internal definitions, is needed to determine the boundary between the group and the expressions that follow the group. For example, the following are errors:</p><pre>(define define 3)
+
+(begin (define begin list))
+
+(let-syntax
+  ((foo (syntax-rules ()
+          ((foo (proc args ...) body ...)
+           (define proc
+             (lambda (args ...)
+               body ...))))))
+  (let ((x 3))
+    (foo (plus x y) (+ x y))
+    (define foo x)
+    (plus foo x)))</pre></dd></dl><h2 id="sec:Standard_procedures"><a href="#sec:Standard_procedures">Standard procedures</a></h2><p>This chapter describes Scheme's built-in procedures. The initial (or &quot;top level&quot;) Scheme environment starts out with a number of variables bound to locations containing useful values, most of which are primitive procedures that manipulate data. For example, the variable abs is bound to (a location initially containing) a procedure of one argument that computes the absolute value of a number, and the variable + is bound to a procedure that computes sums. Built-in procedures that can easily be written in terms of other built-in procedures are identified as &quot;library procedures&quot;.</p><p>A program may use a top-level definition to bind any variable. It may subsequently alter any such binding by an assignment (see <a href="#sec:assignments">assignments</a>, above). These operations do not modify the behavior of Scheme's built-in procedures. Altering any top-level binding that has not been introduced by a definition has an unspecified effect on the behavior of the built-in procedures.</p><h3 id="sec:Equivalence_predicates"><a href="#sec:Equivalence_predicates">Equivalence predicates</a></h3><p>A predicate is a procedure that always returns a boolean value (#t or #f). An equivalence predicate is the computational analogue of a mathematical equivalence relation (it is symmetric, reflexive, and transitive). Of the equivalence predicates described in this section, eq? is the finest or most discriminating, and equal? is the coarsest. eqv? is slightly less discriminating than eq?.</p>
+<dl class="defsig">
+<dt class="defsig" id="def:eqv.3f"><span class="sig"><tt>(eqv? obj[1] obj[2])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>The eqv? procedure defines a useful equivalence relation on objects. Briefly, it returns #t if obj[1] and obj[2] should normally be regarded as the same object. This relation is left slightly open to interpretation, but the following partial specification of eqv? holds for all implementations of Scheme.</p><p>The eqv? procedure returns #t if:</p><ul><li>obj[1] and obj[2] are both #t or both #f.</li>
+<li>obj[1] and obj[2] are both symbols and</li>
+</ul>
+<pre>   (string=? (symbol-&gt;string obj1)
+             (symbol-&gt;string obj2))
+               ===&gt;  #t</pre><p>Note: This assumes that neither obj[1] nor obj[2] is an &quot;uninterned symbol&quot; as alluded to in the section on <a href="#sec:symbols">symbols</a>. This report does not presume to specify the behavior of eqv? on implementation-dependent extensions.</p><ul><li>obj[1] and obj[2] are both numbers, are numerically equal (see =, under <a href="#sec:numerical-operations">numerical operations</a>), and are either both exact or both inexact.</li>
+<li>obj[1] and obj[2] are both characters and are the same character according to the char=? procedure (see &quot;<a href="#sec:characters">characters</a>&quot;).</li>
+<li>both obj[1] and obj[2] are the empty list.</li>
+<li>obj[1] and obj[2] are pairs, vectors, or strings that denote the same locations in the store.</li>
+<li>obj[1] and obj[2] are procedures whose location tags are equal (see &quot;<a href="#sec:procedures">procedures</a>&quot;).</li>
+</ul>
+<p>The eqv? procedure returns #f if:</p><ul><li>obj[1] and obj[2] are of different types.</li>
+<li>one of obj[1] and obj[2] is #t but the other is #f.</li>
+<li>obj[1] and obj[2] are symbols but</li>
+</ul>
+<pre>   (string=? (symbol-&gt;string obj[1])
+             (symbol-&gt;string obj[2]))
+               ===&gt;  #f</pre><ul><li>one of obj[1] and obj[2] is an exact number but the other is an inexact number.</li>
+<li>obj[1] and obj[2] are numbers for which the = procedure returns #f.</li>
+<li>obj[1] and obj[2] are characters for which the char=? procedure returns #f.</li>
+<li>one of obj[1] and obj[2] is the empty list but the other is not.</li>
+<li>obj[1] and obj[2] are pairs, vectors, or strings that denote distinct locations.</li>
+<li>obj[1] and obj[2] are procedures that would behave differently (return different value(s) or have different side effects) for some arguments.</li>
+</ul>
+<pre>(eqv? 'a 'a)                             ===&gt;  #t
+(eqv? 'a 'b)                             ===&gt;  #f
+(eqv? 2 2)                               ===&gt;  #t
+(eqv? '() '())                           ===&gt;  #t
+(eqv? 100000000 100000000)               ===&gt;  #t
+(eqv? (cons 1 2) (cons 1 2))             ===&gt;  #f
+(eqv? (lambda () 1)
+      (lambda () 2))                     ===&gt;  #f
+(eqv? #f 'nil)                           ===&gt;  #f
+(let ((p (lambda (x) x)))
+  (eqv? p p))                            ===&gt;  #t</pre><p>The following examples illustrate cases in which the above rules do not fully specify the behavior of eqv?. All that can be said about such cases is that the value returned by eqv? must be a boolean.</p><pre>(eqv? &quot;&quot; &quot;&quot;)                     ===&gt;  unspecified
+(eqv? '#() '#())                 ===&gt;  unspecified
+(eqv? (lambda (x) x)
+      (lambda (x) x))            ===&gt;  unspecified
+(eqv? (lambda (x) x)
+      (lambda (y) y))            ===&gt;  unspecified</pre><p>The next set of examples shows the use of eqv? with procedures that have local state. Gen-counter must return a distinct procedure every time, since each procedure has its own internal counter. Gen-loser, however, returns equivalent procedures each time, since the local state does not affect the value or side effects of the procedures.</p><pre>(define gen-counter
+  (lambda ()
+    (let ((n 0))
+      (lambda () (set! n (+ n 1)) n))))
+(let ((g (gen-counter)))
+  (eqv? g g))                   ===&gt;  #t
+(eqv? (gen-counter) (gen-counter))
+                                ===&gt;  #f
+(define gen-loser
+  (lambda ()
+    (let ((n 0))
+      (lambda () (set! n (+ n 1)) 27))))
+(let ((g (gen-loser)))
+  (eqv? g g))                   ===&gt;  #t
+(eqv? (gen-loser) (gen-loser))
+                                ===&gt;  unspecified
+
+(letrec ((f (lambda () (if (eqv? f g) 'both 'f)))
+         (g (lambda () (if (eqv? f g) 'both 'g))))
+  (eqv? f g))
+                                ===&gt;  unspecified
+
+(letrec ((f (lambda () (if (eqv? f g) 'f 'both)))
+         (g (lambda () (if (eqv? f g) 'g 'both))))
+  (eqv? f g))
+                                ===&gt;  #f</pre><p>Since it is an error to modify constant objects (those returned by literal expressions), implementations are permitted, though not required, to share structure between constants where appropriate. Thus the value of eqv? on constants is sometimes implementation-dependent.</p><pre>(eqv? '(a) '(a))                         ===&gt;  unspecified
+(eqv? &quot;a&quot; &quot;a&quot;)                           ===&gt;  unspecified
+(eqv? '(b) (cdr '(a b)))                 ===&gt;  unspecified
+(let ((x '(a)))
+  (eqv? x x))                            ===&gt;  #t</pre><p>Rationale:   The above definition of eqv? allows implementations latitude in their treatment of procedures and literals: implementations are free either to detect or to fail to detect that two procedures or two literals are equivalent to each other, and can decide whether or not to merge representations of equivalent objects by using the same pointer or bit pattern to represent both.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:eq.3f"><span class="sig"><tt>(eq? obj[1] obj[2])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Eq? is similar to eqv? except that in some cases it is capable of discerning distinctions finer than those detectable by eqv?.</p><p>Eq? and eqv? are guaranteed to have the same behavior on symbols, booleans, the empty list, pairs, procedures, and non-empty strings and vectors. Eq?'s behavior on numbers and characters is implementation-dependent, but it will always return either true or false, and will return true only when eqv? would also return true. Eq? may also behave differently from eqv? on empty vectors and empty strings.</p><pre>(eq? 'a 'a)                             ===&gt;  #t
+(eq? '(a) '(a))                         ===&gt;  unspecified
+(eq? (list 'a) (list 'a))               ===&gt;  #f
+(eq? &quot;a&quot; &quot;a&quot;)                           ===&gt;  unspecified
+(eq? &quot;&quot; &quot;&quot;)                             ===&gt;  unspecified
+(eq? '() '())                           ===&gt;  #t
+(eq? 2 2)                               ===&gt;  unspecified
+(eq? #\A #\A)                           ===&gt;  unspecified
+(eq? car car)                           ===&gt;  #t
+(let ((n (+ 2 3)))
+  (eq? n n))              ===&gt;  unspecified
+(let ((x '(a)))
+  (eq? x x))              ===&gt;  #t
+(let ((x '#()))
+  (eq? x x))              ===&gt;  #t
+(let ((p (lambda (x) x)))
+  (eq? p p))              ===&gt;  #t</pre><p>Rationale:   It will usually be possible to implement eq? much more efficiently than eqv?, for example, as a simple pointer comparison instead of as some more complicated operation. One reason is that it may not be possible to compute eqv? of two numbers in constant time, whereas eq? implemented as pointer comparison will always finish in constant time. Eq? may be used like eqv? in applications using procedures to implement objects with state since it obeys the same constraints as eqv?.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:equal.3f"><span class="sig"><tt>(equal? obj[1] obj[2])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Equal? recursively compares the contents of pairs, vectors, and strings, applying eqv? on other objects such as numbers and symbols. A rule of thumb is that objects are generally equal? if they print the same. Equal? may fail to terminate if its arguments are circular data structures.</p><pre>(equal? 'a 'a)                          ===&gt;  #t
+(equal? '(a) '(a))                      ===&gt;  #t
+(equal? '(a (b) c)
+        '(a (b) c))                     ===&gt;  #t
+(equal? &quot;abc&quot; &quot;abc&quot;)                    ===&gt;  #t
+(equal? 2 2)                            ===&gt;  #t
+(equal? (make-vector 5 'a)
+        (make-vector 5 'a))             ===&gt;  #t
+(equal? (lambda (x) x)
+        (lambda (y) y))          ===&gt;  unspecified</pre></dd></dl><h3 id="sec:Numbers"><a href="#sec:Numbers">Numbers</a></h3><p>Numerical computation has traditionally been neglected by the Lisp community. Until Common Lisp there was no carefully thought out strategy for organizing numerical computation, and with the exception of the MacLisp system [20] little effort was made to execute numerical code efficiently. This report recognizes the excellent work of the Common Lisp committee and accepts many of their recommendations. In some ways this report simplifies and generalizes their proposals in a manner consistent with the purposes of Scheme.</p><p>It is important to distinguish between the mathematical numbers, the Scheme numbers that attempt to model them, the machine representations used to implement the Scheme numbers, and notations used to write numbers. This report uses the types number, complex, real, rational, and integer to refer to both mathematical numbers and Scheme numbers. Machine representations such as fixed point and floating point are referred to by names such as fixnum and flonum.</p><h4 id="sec:Numerical_types"><a href="#sec:Numerical_types">Numerical types</a></h4><p>Mathematically, numbers may be arranged into a tower of subtypes in which each level is a subset of the level above it:</p><pre>   number
+   complex
+   real
+   rational
+   integer</pre><p>For example, 3 is an integer. Therefore 3 is also a rational, a real, and a complex. The same is true of the Scheme numbers that model 3. For Scheme numbers, these types are defined by the predicates number?, complex?, real?, rational?, and integer?.</p><p>There is no simple relationship between a number's type and its representation inside a computer. Although most implementations of Scheme will offer at least two different representations of 3, these different representations denote the same integer.</p><p>Scheme's numerical operations treat numbers as abstract data, as independent of their representation as possible. Although an implementation of Scheme may use fixnum, flonum, and perhaps other representations for numbers, this should not be apparent to a casual programmer writing simple programs.</p><p>It is necessary, however, to distinguish between numbers that are represented exactly and those that may not be. For example, indexes into data structures must be known exactly, as must some polynomial coefficients in a symbolic algebra system. On the other hand, the results of measurements are inherently inexact, and irrational numbers may be approximated by rational and therefore inexact approximations. In order to catch uses of inexact numbers where exact numbers are required, Scheme explicitly distinguishes exact from inexact numbers. This distinction is orthogonal to the dimension of type.</p><h4 id="sec:Exactness"><a href="#sec:Exactness">Exactness</a></h4><p>Scheme numbers are either exact or inexact. A number is exact if it was written as an exact constant or was derived from exact numbers using only exact operations. A number is inexact if it was written as an inexact constant, if it was derived using inexact ingredients, or if it was derived using inexact operations. Thus inexactness is a contagious property of a number. If two implementations produce exact results for a computation that did not involve inexact intermediate results, the two ultimate results will be mathematically equivalent. This is generally not true of computations involving inexact numbers since approximate methods such as floating point arithmetic may be used, but it is the duty of each implementation to make the result as close as practical to the mathematically ideal result.</p><p>Rational operations such as + should always produce exact results when given exact arguments. If the operation is unable to produce an exact result, then it may either report the violation of an implementation restriction or it may silently coerce its result to an inexact value. See <a href="#sec:Implementation_restrictions">the next section</a>.</p><p>With the exception of inexact-&gt;exact, the operations described in this section must generally return inexact results when given any inexact arguments. An operation may, however, return an exact result if it can prove that the value of the result is unaffected by the inexactness of its arguments. For example, multiplication of any number by an exact zero may produce an exact zero result, even if the other argument is inexact.</p><h4 id="sec:Implementation_restrictions"><a href="#sec:Implementation_restrictions">Implementation restrictions</a></h4><p>Implementations of Scheme are not required to implement the whole tower of subtypes given under &quot;<a href="#sec:Numerical_types">Numerical types</a>&quot;, but they must implement a coherent subset consistent with both the purposes of the implementation and the spirit of the Scheme language. For example, an implementation in which all numbers are real may still be quite useful.</p><p>Implementations may also support only a limited range of numbers of any type, subject to the requirements of this section. The supported range for exact numbers of any type may be different from the supported range for inexact numbers of that type. For example, an implementation that uses flonums to represent all its inexact real numbers may support a practically unbounded range of exact integers and rationals while limiting the range of inexact reals (and therefore the range of inexact integers and rationals) to the dynamic range of the flonum format. Furthermore the gaps between the representable inexact integers and rationals are likely to be very large in such an implementation as the limits of this range are approached.</p><p>An implementation of Scheme must support exact integers throughout the range of numbers that may be used for indexes of lists, vectors, and strings or that may result from computing the length of a list, vector, or string. The length, vector-length, and string-length procedures must return an exact integer, and it is an error to use anything but an exact integer as an index. Furthermore any integer constant within the index range, if expressed by an exact integer syntax, will indeed be read as an exact integer, regardless of any implementation restrictions that may apply outside this range. Finally, the procedures listed below will always return an exact integer result provided all their arguments are exact integers and the mathematically expected result is representable as an exact integer within the implementation:</p><pre>+            -             *
+quotient     remainder     modulo
+max          min           abs
+numerator    denominator   gcd
+lcm          floor         ceiling
+truncate     round         rationalize
+expt</pre><p>Implementations are encouraged, but not required, to support exact integers and exact rationals of practically unlimited size and precision, and to implement the above procedures and the / procedure in such a way that they always return exact results when given exact arguments. If one of these procedures is unable to deliver an exact result when given exact arguments, then it may either report a violation of an implementation restriction or it may silently coerce its result to an inexact number. Such a coercion may cause an error later.</p><p>An implementation may use floating point and other approximate representation strategies for inexact numbers. This report recommends, but does not require, that the IEEE 32-bit and 64-bit floating point standards be followed by implementations that use flonum representations, and that implementations using other representations should match or exceed the precision achievable using these floating point standards [12].</p><p>In particular, implementations that use flonum representations must follow these rules: A flonum result must be represented with at least as much precision as is used to express any of the inexact arguments to that operation. It is desirable (but not required) for potentially inexact operations such as sqrt, when applied to exact arguments, to produce exact answers whenever possible (for example the square root of an exact 4 ought to be an exact 2). If, however, an exact number is operated upon so as to produce an inexact result (as by sqrt), and if the result is represented as a flonum, then the most precise flonum format available must be used; but if the result is represented in some other way then the representation must have at least as much precision as the most precise flonum format available.</p><p>Although Scheme allows a variety of written notations for numbers, any particular implementation may support only some of them. For example, an implementation in which all numbers are real need not support the rectangular and polar notations for complex numbers. If an implementation encounters an exact numerical constant that it cannot represent as an exact number, then it may either report a violation of an implementation restriction or it may silently represent the constant by an inexact number.</p><h4 id="sec:Syntax_of_numerical_constants"><a href="#sec:Syntax_of_numerical_constants">Syntax of numerical constants</a></h4><p>For a complete formal description of the syntax of the written representations for numbers, see the R5RS report. Note that case is not significant in numerical constants.</p><p>A number may be written in binary, octal, decimal, or hexadecimal by the use of a radix prefix. The radix prefixes are #b (binary), #o (octal), #d (decimal), and #x (hexadecimal). With no radix prefix, a number is assumed to be expressed in decimal.</p><p>A numerical constant may be specified to be either exact or inexact by a prefix. The prefixes are #e for exact, and #i for inexact. An exactness prefix may appear before or after any radix prefix that is used. If the written representation of a number has no exactness prefix, the constant may be either inexact or exact. It is inexact if it contains a decimal point, an exponent, or a &quot;#&quot; character in the place of a digit, otherwise it is exact. In systems with inexact numbers of varying precisions it may be useful to specify the precision of a constant. For this purpose, numerical constants may be written with an exponent marker that indicates the desired precision of the inexact representation. The letters s, f, d, and l specify the use of short, single, double, and long precision, respectively. (When fewer than four internal inexact representations exist, the four size specifications are mapped onto those available. For example, an implementation with two internal representations may map short and single together and long and double together.) In addition, the exponent marker e specifies the default precision for the implementation. The default precision has at least as much precision as double, but implementations may wish to allow this default to be set by the user.</p><pre>3.14159265358979F0
+        Round to single --- 3.141593
+0.6L0
+        Extend to long --- .600000000000000</pre><h4 id="sec:Numerical_operations"><a href="#sec:Numerical_operations">Numerical operations</a></h4><p>The numerical routines described below have argument restrictions, which are encoded in the naming conventions of the arguments as given in the procedure's signature.  The conventions are as follows:</p><dl><dt><tt>obj</tt></dt>
+<dd>any object</dd><dt>{{list, list1, ... listj, ...	list</dt>
+<dd>(see &quot;<a href="#sec:Pairs_and_lists">Pairs and lists</a>&quot; below)</dd><dt><tt>z, z1, ... zj, ...</tt></dt>
+<dd>complex number</dd><dt><tt>x, x1, ... xj, ...</tt></dt>
+<dd>real number</dd><dt><tt>y, y1, ... yj, ...</tt></dt>
+<dd>real number</dd><dt><tt>q, q1, ... qj, ...</tt></dt>
+<dd>rational number </dd><dt><tt>n, n1, ... nj, ...</tt></dt>
+<dd>integer</dd><dt><tt>k, k1, ... kj, ...</tt></dt>
+<dd>exact non-negative integer</dd></dl>
+<p>The examples used in this section assume that any numerical constant written using an exact notation is indeed represented as an exact number. Some examples also assume that certain numerical constants written using an inexact notation can be represented without loss of accuracy; the inexact constants were chosen so that this is likely to be true in implementations that use flonums to represent inexact numbers.</p>
+<dl class="defsig">
+<dt class="defsig" id="def:number.3f"><span class="sig"><var class="id">number?</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:complex.3f"><span class="sig"><var class="id">complex?</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:real.3f"><span class="sig"><var class="id">real?</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:rational.3f"><span class="sig"><var class="id">rational?</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:integer.3f"><span class="sig"><var class="id">integer?</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These numerical type predicates can be applied to any kind of argument, including non-numbers. They return #t if the object is of the named type, and otherwise they return #f. In general, if a type predicate is true of a number then all higher type predicates are also true of that number. Consequently, if a type predicate is false of a number, then all lower type predicates are also false of that number. If z is an inexact complex number, then (real? z) is true if and only if (zero? (imag-part z)) is true. If x is an inexact real number, then (integer? x) is true if and only if (= x (round x)).</p><pre>(complex? 3+4i)                 ===&gt;  #t
+(complex? 3)                    ===&gt;  #t
+(real? 3)                       ===&gt;  #t
+(real? -2.5+0.0i)               ===&gt;  #t
+(real? #e1e10)                  ===&gt;  #t
+(rational? 6/10)                ===&gt;  #t
+(rational? 6/3)                 ===&gt;  #t
+(integer? 3+0i)                 ===&gt;  #t
+(integer? 3.0)                  ===&gt;  #t
+(integer? 8/4)                  ===&gt;  #t</pre><p>Note:   The behavior of these type predicates on inexact numbers is unreliable, since any inaccuracy may affect the result.</p><p>Note:   In many implementations the rational? procedure will be the same as real?, and the complex? procedure will be the same as number?, but unusual implementations may be able to represent some irrational numbers exactly or may extend the number system to support some kind of non-complex numbers.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:exact.3f"><span class="sig"><var class="id">exact?</var> <var class="arg">z</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:inexact.3f"><span class="sig"><var class="id">inexact?</var> <var class="arg">z</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These numerical predicates provide tests for the exactness of a quantity. For any Scheme number, precisely one of these predicates is true.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:.3d"><span class="sig"><tt>(= z[1] z[2] z[3] ...)</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:.3c"><span class="sig"><tt>(&lt; x[1] x[2] x[3] ...)</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:.3e"><span class="sig"><tt>(&gt; x[1] x[2] x[3] ...)</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:.3c.3d"><span class="sig"><tt>(&lt;= x[1] x[2] x[3] ...)</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:.3e.3d"><span class="sig"><tt>(&gt;= x[1] x[2] x[3] ...)</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These procedures return #t if their arguments are (respectively): equal, monotonically increasing, monotonically decreasing, monotonically nondecreasing, or monotonically nonincreasing.</p><p>These predicates are required to be transitive.</p><p>Note:   The traditional implementations of these predicates in Lisp-like languages are not transitive.</p><p>Note:   While it is not an error to compare inexact numbers using these predicates, the results may be unreliable because a small inaccuracy may affect the result; this is especially true of = and zero?. When in doubt, consult a numerical analyst.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:zero.3f"><span class="sig"><var class="id">zero?</var> <var class="arg">z</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:positive.3f"><span class="sig"><var class="id">positive?</var> <var class="arg">x</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:negative.3f"><span class="sig"><var class="id">negative?</var> <var class="arg">x</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:odd.3f"><span class="sig"><var class="id">odd?</var> <var class="arg">n</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:even.3f"><span class="sig"><var class="id">even?</var> <var class="arg">n</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These numerical predicates test a number for a particular property, returning #t or #f. See note above.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:max"><span class="sig"><tt>(max x[1] x[2] ...)</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:min"><span class="sig"><tt>(min x[1] x[2] ...)</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These procedures return the maximum or minimum of their arguments.</p><pre>(max 3 4)                      ===&gt;  4    ; exact
+(max 3.9 4)                    ===&gt;  4.0  ; inexact</pre><p>Note:   If any argument is inexact, then the result will also be inexact (unless the procedure can prove that the inaccuracy is not large enough to affect the result, which is possible only in unusual implementations). If min or max is used to compare numbers of mixed exactness, and the numerical value of the result cannot be represented as an inexact number without loss of accuracy, then the procedure may report a violation of an implementation restriction.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:.2b"><span class="sig"><tt>(+ z[1] ...)</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:.2a"><span class="sig"><tt>(* z[1] ...)</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These procedures return the sum or product of their arguments.</p><pre>(+ 3 4)                         ===&gt;  7
+(+ 3)                           ===&gt;  3
+(+)                             ===&gt;  0
+(* 4)                           ===&gt;  4
+(*)                             ===&gt;  1</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:-"><span class="sig"><tt>(- z[1] z[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:-"><span class="sig"><var class="id">-</var> <var class="arg">z</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:-"><span class="sig"><tt>(- z[1] z[2] ...)</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:.2f"><span class="sig"><tt>(/ z[1] z[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:.2f"><span class="sig"><var class="id">/</var> <var class="arg">z</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:.2f"><span class="sig"><tt>(/ z[1] z[2] ...)</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>With two or more arguments, these procedures return the difference or quotient of their arguments, associating to the left. With one argument, however, they return the additive or multiplicative inverse of their argument.</p><pre>(- 3 4)                         ===&gt;  -1
+(- 3 4 5)                       ===&gt;  -6
+(- 3)                           ===&gt;  -3
+(/ 3 4 5)                       ===&gt;  3/20
+(/ 3)                           ===&gt;  1/3</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:abs"><span class="sig"><var class="id">abs</var> <var class="arg">x</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Abs returns the absolute value of its argument.</p><pre>(abs -7)                        ===&gt;  7</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:quotient"><span class="sig"><tt>(quotient n[1] n[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:remainder"><span class="sig"><tt>(remainder n[1] n[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:modulo"><span class="sig"><tt>(modulo n[1] n[2])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These procedures implement number-theoretic (integer) division. n[2] should be non-zero. All three procedures return integers. If n[1]/n[2] is an integer:</p><pre>   (quotient n[1] n[2])           ===&gt; n[1]/n[2]
+   (remainder n[1] n[2])          ===&gt; 0
+   (modulo n[1] n[2])             ===&gt; 0</pre><p>If n[1]/n[2] is not an integer:</p><pre>   (quotient n[1] n[2])           ===&gt; n[q]
+   (remainder n[1] n[2])          ===&gt; n[r]
+   (modulo n[1] n[2])             ===&gt; n[m]</pre><p>where n[q] is n[1]/n[2] rounded towards zero, 0 &lt; |n[r]| &lt; |n[2]|, 0 &lt; |n[m]| &lt; |n[2]|, n[r] and n[m] differ from n[1] by a multiple of n[2], n[r] has the same sign as n[1], and n[m] has the same sign as n[2].</p><p>From this we can conclude that for integers n[1] and n[2] with n[2] not equal to 0,</p><pre>    (= n[1] (+ (* n[2] (quotient n[1] n[2]))
+          (remainder n[1] n[2])))
+                                        ===&gt;  #t</pre><p>provided all numbers involved in that computation are exact.</p><pre>(modulo 13 4)                   ===&gt;  1
+(remainder 13 4)                ===&gt;  1
+
+(modulo -13 4)                  ===&gt;  3
+(remainder -13 4)               ===&gt;  -1
+
+(modulo 13 -4)                  ===&gt;  -3
+(remainder 13 -4)               ===&gt;  1
+
+(modulo -13 -4)                 ===&gt;  -1
+(remainder -13 -4)              ===&gt;  -1
+
+(remainder -13 -4.0)            ===&gt;  -1.0  ; inexact</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:gcd"><span class="sig"><tt>(gcd n[1] ...)</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:lcm"><span class="sig"><tt>(lcm n[1] ...)</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These procedures return the greatest common divisor or least common multiple of their arguments. The result is always non-negative.</p><pre>(gcd 32 -36)                    ===&gt;  4
+(gcd)                           ===&gt;  0
+(lcm 32 -36)                    ===&gt;  288
+(lcm 32.0 -36)                  ===&gt;  288.0  ; inexact
+(lcm)                           ===&gt;  1</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:numerator"><span class="sig"><var class="id">numerator</var> <var class="arg">q</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:denominator"><span class="sig"><var class="id">denominator</var> <var class="arg">q</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These procedures return the numerator or denominator of their argument; the result is computed as if the argument was represented as a fraction in lowest terms. The denominator is always positive. The denominator of 0 is defined to be 1.</p><pre>(numerator (/ 6 4))            ===&gt;  3
+(denominator (/ 6 4))          ===&gt;  2
+(denominator
+  (exact-&gt;inexact (/ 6 4)))    ===&gt; 2.0</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:floor"><span class="sig"><var class="id">floor</var> <var class="arg">x</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:ceiling"><span class="sig"><var class="id">ceiling</var> <var class="arg">x</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:truncate"><span class="sig"><var class="id">truncate</var> <var class="arg">x</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:round"><span class="sig"><var class="id">round</var> <var class="arg">x</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These procedures return integers. Floor returns the largest integer not larger than x. Ceiling returns the smallest integer not smaller than x. Truncate returns the integer closest to x whose absolute value is not larger than the absolute value of x. Round returns the closest integer to x, rounding to even when x is halfway between two integers.</p><p>Rationale:   Round rounds to even for consistency with the default rounding mode specified by the IEEE floating point standard.</p><p>Note:   If the argument to one of these procedures is inexact, then the result will also be inexact. If an exact value is needed, the result should be passed to the inexact-&gt;exact procedure.</p><pre>(floor -4.3)                  ===&gt;  -5.0
+(ceiling -4.3)                ===&gt;  -4.0
+(truncate -4.3)               ===&gt;  -4.0
+(round -4.3)                  ===&gt;  -4.0
+
+(floor 3.5)                   ===&gt;  3.0
+(ceiling 3.5)                 ===&gt;  4.0
+(truncate 3.5)                ===&gt;  3.0
+(round 3.5)                   ===&gt;  4.0  ; inexact
+
+(round 7/2)                   ===&gt;  4    ; exact
+(round 7)                     ===&gt;  7</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:rationalize"><span class="sig"><var class="id">rationalize</var> <var class="arg">x</var> <var class="arg">y</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Rationalize returns the simplest rational number differing from x by no more than y. A rational number r[1] is simpler than another rational number r[2] if r[1] = p[1]/q[1] and r[2] = p[2]/q[2] (in lowest terms) and |p[1]| &lt; |p[2]| and |q[1]| &lt; |q[2]|. Thus 3/5 is simpler than 4/7. Although not all rationals are comparable in this ordering (consider 2/ 7 and 3/5) any interval contains a rational number that is simpler than every other rational number in that interval (the simpler 2/5 lies between 2/7 and 3/5). Note that 0 = 0/1 is the simplest rational of all.</p><pre>(rationalize
+  (inexact-&gt;exact .3) 1/10)          ===&gt; 1/3    ; exact
+(rationalize .3 1/10)                ===&gt; #i1/3  ; inexact</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:exp"><span class="sig"><var class="id">exp</var> <var class="arg">z</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:log"><span class="sig"><var class="id">log</var> <var class="arg">z</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:sin"><span class="sig"><var class="id">sin</var> <var class="arg">z</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:cos"><span class="sig"><var class="id">cos</var> <var class="arg">z</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:tan"><span class="sig"><var class="id">tan</var> <var class="arg">z</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:asin"><span class="sig"><var class="id">asin</var> <var class="arg">z</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:acos"><span class="sig"><var class="id">acos</var> <var class="arg">z</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:atan"><span class="sig"><var class="id">atan</var> <var class="arg">z</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:atan"><span class="sig"><var class="id">atan</var> <var class="arg">y</var> <var class="arg">x</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These procedures are part of every implementation that supports general real numbers; they compute the usual transcendental functions. Log computes the natural logarithm of z (not the base ten logarithm). Asin, acos, and atan compute arcsine (sin^-1), arccosine (cos^-1), and arctangent (tan^-1), respectively. The two-argument variant of atan computes (angle (make-rectangular x y)) (see below), even in implementations that don't support general complex numbers.</p><p>In general, the mathematical functions log, arcsine, arccosine, and arctangent are multiply defined. The value of log z is defined to be the one whose imaginary part lies in the range from -pi (exclusive) to pi (inclusive). log 0 is undefined. With log defined this way, the values of sin^-1 z, cos^-1 z, and tan^-1 z are according to the following formulae:</p><pre>sin^-1 z = - i log (i z + (1 - z^2)^1/2)
+
+cos^-1 z = pi / 2 - sin^-1 z
+
+tan^-1 z = (log (1 + i z) - log (1 - i z)) / (2 i)</pre><p>The above specification follows [27], which in turn cites [19]; refer to these sources for more detailed discussion of branch cuts, boundary conditions, and implementation of these functions. When it is possible these procedures produce a real result from a real argument.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:sqrt"><span class="sig"><var class="id">sqrt</var> <var class="arg">z</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the principal square root of z. The result will have either positive real part, or zero real part and non-negative imaginary part.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:expt"><span class="sig"><tt>(expt z[1] z[2])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns z[1] raised to the power z[2]. For z[1] != 0</p><pre>z[1]^z[2] = e^z[2] log z[1]</pre><p>0^z is 1 if z = 0 and 0 otherwise.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:make-rectangular"><span class="sig"><tt>(make-rectangular x[1] x[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:make-polar"><span class="sig"><tt>(make-polar x[3] x[4])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:real-part"><span class="sig"><var class="id">real-part</var> <var class="arg">z</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:imag-part"><span class="sig"><var class="id">imag-part</var> <var class="arg">z</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:magnitude"><span class="sig"><var class="id">magnitude</var> <var class="arg">z</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:angle"><span class="sig"><var class="id">angle</var> <var class="arg">z</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These procedures are part of every implementation that supports general complex numbers. Suppose x[1], x[2], x[3], and x[4] are real numbers and z is a complex number such that</p><pre>z = x[1] + x[2]i = x[3] . e^i x[4]</pre><p>Then</p><pre>(make-rectangular x[1] x[2])         ===&gt; z
+(make-polar x[3] x[4])             ===&gt; z
+(real-part z)                          ===&gt; x[1]
+(imag-part z)                          ===&gt; x[2]
+(magnitude z)                          ===&gt; |x[3]|
+(angle z)                              ===&gt; x[angle]</pre><p>where - pi &lt; x[angle] &lt; pi with x[angle] = x[4] + 2 pi n for some integer n.</p><p>Rationale:   Magnitude is the same as abs for a real argument, but abs must be present in all implementations, whereas magnitude need only be present in implementations that support general complex numbers.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:exact-.3einexact"><span class="sig"><var class="id">exact-&gt;inexact</var> <var class="arg">z</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:inexact-.3eexact"><span class="sig"><var class="id">inexact-&gt;exact</var> <var class="arg">z</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Exact-&gt;inexact returns an inexact representation of z. The value returned is the inexact number that is numerically closest to the argument. If an exact argument has no reasonably close inexact equivalent, then a violation of an implementation restriction may be reported.</p><p>Inexact-&gt;exact returns an exact representation of z. The value returned is the exact number that is numerically closest to the argument. If an inexact argument has no reasonably close exact equivalent, then a violation of an implementation restriction may be reported.</p><p>These procedures implement the natural one-to-one correspondence between exact and inexact integers throughout an implementation-dependent range. See &quot;<a href="#sec:implementation-restrictions">Implementation restrictions</a>&quot;.</p></dd></dl><h4 id="sec:Numerical_input_and_output"><a href="#sec:Numerical_input_and_output">Numerical input and output</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:number-.3estring"><span class="sig"><var class="id">number-&gt;string</var> <var class="arg">z</var> <var class="dsssl">#!optional</var> <var class="arg">radix</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Radix must be an exact integer.  The R5RS standard only requires implementations to support 2, 8, 10, or 16, but CHICKEN allows any radix between 2 and 36, inclusive (note: a bug in CHICKEN 5 currently limits the upper bound to 16).  If omitted, radix defaults to 10. The procedure number-&gt;string takes a number and a radix and returns as a string an external representation of the given number in the given radix such that</p><pre>(let ((number number)
+      (radix radix))
+  (eqv? number
+        (string-&gt;number (number-&gt;string number
+                                        radix)
+                        radix)))</pre><p>is true. It is an error if no possible result makes this expression true.</p><p>If z is inexact, the radix is 10, and the above expression can be satisfied by a result that contains a decimal point, then the result contains a decimal point and is expressed using the minimum number of digits (exclusive of exponent and trailing zeroes) needed to make the above expression true [3, 5]; otherwise the format of the result is unspecified.</p><p>The result returned by number-&gt;string never contains an explicit radix prefix.</p><p>Note:   The error case can occur only when z is not a complex number or is a complex number with a non-rational real or imaginary part.</p><p>Rationale:   If z is an inexact number represented using flonums, and the radix is 10, then the above expression is normally satisfied by a result containing a decimal point. The unspecified case allows for infinities, NaNs, and non-flonum representations.</p><p>As an extension to R5RS, CHICKEN supports reading and writing the special IEEE floating-point numbers <i>+nan</i>, <i>+inf</i> and <i>-inf</i>, as well as negative zero.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:string-.3enumber"><span class="sig"><var class="id">string-&gt;number</var> <var class="arg">string</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:string-.3enumber"><span class="sig"><var class="id">string-&gt;number</var> <var class="arg">string</var> <var class="arg">radix</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a number of the maximally precise representation expressed by the given string.  Radix must be an exact integer.  The R5RS standard only requires implementations to support 2, 8, 10, or 16, but CHICKEN allows any radix between 2 and 36, inclusive.  If supplied, radix is a default radix that may be overridden by an explicit radix prefix in string (e.g. &quot;#o177&quot;). If radix is not supplied, then the default radix is 10. If string is not a syntactically valid notation for a number, then string-&gt;number returns #f.</p><pre>(string-&gt;number &quot;100&quot;)                ===&gt;  100
+(string-&gt;number &quot;100&quot; 16)             ===&gt;  256
+(string-&gt;number &quot;1e2&quot;)                ===&gt;  100.0
+(string-&gt;number &quot;15##&quot;)               ===&gt;  1500.0</pre><p>Note:   The domain of string-&gt;number may be restricted by implementations in the following ways. String-&gt;number is permitted to return #f whenever string contains an explicit radix prefix. If all numbers supported by an implementation are real, then string-&gt; number is permitted to return #f whenever string uses the polar or rectangular notations for complex numbers. If all numbers are integers, then string-&gt;number may return #f whenever the fractional notation is used. If all numbers are exact, then string-&gt;number may return #f whenever an exponent marker or explicit exactness prefix is used, or if a # appears in place of a digit. If all inexact numbers are integers, then string-&gt;number may return #f whenever a decimal point is used.</p><p>As an extension to R5RS, CHICKEN supports reading and writing the special IEEE floating-point numbers <i>+nan</i>, <i>+inf</i> and <i>-inf</i>, as well as negative zero.</p></dd></dl><h3 id="sec:Other_data_types"><a href="#sec:Other_data_types">Other data types</a></h3><p>This section describes operations on some of Scheme's non-numeric data types: booleans, pairs, lists, symbols, characters, strings and vectors.</p><h4 id="sec:Booleans"><a href="#sec:Booleans">Booleans</a></h4><p>The standard boolean objects for true and false are written as #t and #f. What really matters, though, are the objects that the Scheme conditional expressions (if, cond, and, or, do) treat as true or false. The phrase &quot;a true value&quot; (or sometimes just &quot;true&quot;) means any object treated as true by the conditional expressions, and the phrase &quot;a false value&quot; (or &quot;false&quot;) means any object treated as false by the conditional expressions.</p><p>Of all the standard Scheme values, only #f counts as false in conditional expressions. Except for #f, all standard Scheme values, including #t, pairs, the empty list, symbols, numbers, strings, vectors, and procedures, count as true.</p><p>Note:   Programmers accustomed to other dialects of Lisp should be aware that Scheme distinguishes both #f and the empty list from the symbol nil.</p><p>Boolean constants evaluate to themselves, so they do not need to be quoted in programs.</p><pre>#t                ===&gt;  #t
+#f                ===&gt;  #f
+'#f               ===&gt;  #f</pre>
+<dl class="defsig">
+<dt class="defsig" id="def:not"><span class="sig"><var class="id">not</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Not returns #t if obj is false, and returns #f otherwise.</p><pre>(not #t)           ===&gt;  #f
+(not 3)            ===&gt;  #f
+(not (list 3))     ===&gt;  #f
+(not #f)           ===&gt;  #t
+(not '())          ===&gt;  #f
+(not (list))       ===&gt;  #f
+(not 'nil)         ===&gt;  #f</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:boolean.3f"><span class="sig"><var class="id">boolean?</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Boolean? returns #t if obj is either #t or #f and returns #f otherwise.</p><pre>(boolean? #f)                 ===&gt;  #t
+(boolean? 0)                  ===&gt;  #f
+(boolean? '())                ===&gt;  #f</pre></dd></dl><h4 id="sec:Pairs_and_lists"><a href="#sec:Pairs_and_lists">Pairs and lists</a></h4><p>A pair (sometimes called a dotted pair) is a record structure with two fields called the car and cdr fields (for historical reasons). Pairs are created by the procedure cons. The car and cdr fields are accessed by the procedures car and cdr. The car and cdr fields are assigned by the procedures set-car! and set-cdr!.</p><p>Pairs are used primarily to represent lists. A list can be defined recursively as either the empty list or a pair whose cdr is a list. More precisely, the set of lists is defined as the smallest set X such that</p><ul><li>The empty list is in X.</li>
+<li>If list is in X, then any pair whose cdr field contains list is also in X.</li>
+</ul>
+<p>The objects in the car fields of successive pairs of a list are the elements of the list. For example, a two-element list is a pair whose car is the first element and whose cdr is a pair whose car is the second element and whose cdr is the empty list. The length of a list is the number of elements, which is the same as the number of pairs.</p><p>The empty list is a special object of its own type (it is not a pair); it has no elements and its length is zero.</p><p>Note:   The above definitions imply that all lists have finite length and are terminated by the empty list.</p><p>The most general notation (external representation) for Scheme pairs is the &quot;dotted&quot; notation (c[1] . c[2]) where c[1] is the value of the car field and c[2] is the value of the cdr field. For example (4 . 5) is a pair whose car is 4 and whose cdr is 5. Note that (4 . 5) is the external representation of a pair, not an expression that evaluates to a pair.</p><p>A more streamlined notation can be used for lists: the elements of the list are simply enclosed in parentheses and separated by spaces. The empty list is written () . For example,</p><pre>(a b c d e)</pre><p>and</p><pre>(a . (b . (c . (d . (e . ())))))</pre><p>are equivalent notations for a list of symbols.</p><p>A chain of pairs not ending in the empty list is called an improper list. Note that an improper list is not a list. The list and dotted notations can be combined to represent improper lists:</p><pre>(a b c . d)</pre><p>is equivalent to</p><pre>(a . (b . (c . d)))</pre><p>Whether a given pair is a list depends upon what is stored in the cdr field. When the set-cdr! procedure is used, an object can be a list one moment and not the next:</p><pre>(define x (list 'a 'b 'c))
+(define y x)
+y                               ===&gt;  (a b c)
+(list? y)                       ===&gt;  #t
+(set-cdr! x 4)                  ===&gt;  unspecified
+x                               ===&gt;  (a . 4)
+(eqv? x y)                      ===&gt;  #t
+y                               ===&gt;  (a . 4)
+(list? y)                       ===&gt;  #f
+(set-cdr! x x)                  ===&gt;  unspecified
+(list? x)                       ===&gt;  #f</pre><p>Within literal expressions and representations of objects read by the read procedure, the forms '&lt;datum&gt;, `&lt;datum&gt;, ,&lt;datum&gt;, and ,@&lt;datum&gt; denote two-element lists whose first elements are the symbols quote, quasiquote, unquote, and unquote-splicing, respectively. The second element in each case is &lt;datum&gt;. This convention is supported so that arbitrary Scheme programs may be represented as lists. That is, according to Scheme's grammar, every &lt;expression&gt; is also a &lt;datum&gt;. Among other things, this permits the use of the read procedure to parse Scheme programs.</p>
+<dl class="defsig">
+<dt class="defsig" id="def:pair.3f"><span class="sig"><var class="id">pair?</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Pair? returns #t if obj is a pair, and otherwise returns #f. NOTE: <a href="Module%20%28chicken%20base%29.html#sec:weak-pairs">Weak pairs</a> are regarded as pairs by this procedure.</p><pre>(pair? '(a . b))                ===&gt;  #t
+(pair? '(a b c))                ===&gt;  #t
+(pair? '())                     ===&gt;  #f
+(pair? '#(a b))                 ===&gt;  #f
+(pair? (cons 1 2))              ===&gt;  #t
+
+(import (chicken base))
+(pair? (weak-cons 1 2))         ===&gt;  #t</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:cons"><span class="sig"><tt>(cons obj[1] obj[2])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a newly allocated pair whose car is obj[1] and whose cdr is obj[2]. The pair is guaranteed to be different (in the sense of eqv?) from every existing object.</p><pre>(cons 'a '())                   ===&gt;  (a)
+(cons '(a) '(b c d))            ===&gt;  ((a) b c d)
+(cons &quot;a&quot; '(b c))               ===&gt;  (&quot;a&quot; b c)
+(cons 'a 3)                     ===&gt;  (a . 3)
+(cons '(a b) 'c)                ===&gt;  ((a b) . c)</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:car"><span class="sig"><var class="id">car</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the contents of the car field of pair. Note that it is an error to take the car of the empty list.</p><pre>(car '(a b c))                  ===&gt;  a
+(car '((a) b c d))              ===&gt;  (a)
+(car '(1 . 2))                  ===&gt;  1
+(car '())                       ===&gt;  error
+(car (cons 1 2))                ===&gt;  1
+
+(import (chicken base))
+(car (weak-cons 1 2))           ===&gt;  1</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:cdr"><span class="sig"><var class="id">cdr</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the contents of the cdr field of pair. Note that it is an error to take the cdr of the empty list.</p><pre>(cdr '((a) b c d))              ===&gt;  (b c d)
+(cdr '(1 . 2))                  ===&gt;  2
+(cdr '())                       ===&gt;  error
+(cdr (cons 1 2))                ===&gt;  2
+
+(import (chicken base))
+(cdr (weak-cons 1 2))           ===&gt;  2</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:set-car.21"><span class="sig"><var class="id">set-car!</var> <var class="arg">pair</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Stores obj in the car field of pair. The value returned by set-car! is unspecified.</p><pre>(define (f) (list 'not-a-constant-list))
+(define (g) '(constant-list))
+(set-car! (f) 3)                     ===&gt;  unspecified
+(set-car! (g) 3)                     ===&gt;  error</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:set-cdr.21"><span class="sig"><var class="id">set-cdr!</var> <var class="arg">pair</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Stores obj in the cdr field of pair. The value returned by set-cdr! is unspecified.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:caar"><span class="sig"><var class="id">caar</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:cadr"><span class="sig"><var class="id">cadr</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:cdar"><span class="sig"><var class="id">cdar</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:cddr"><span class="sig"><var class="id">cddr</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:caaar"><span class="sig"><var class="id">caaar</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:caadr"><span class="sig"><var class="id">caadr</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:cadar"><span class="sig"><var class="id">cadar</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:caddr"><span class="sig"><var class="id">caddr</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:cdaar"><span class="sig"><var class="id">cdaar</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:cdadr"><span class="sig"><var class="id">cdadr</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:cddar"><span class="sig"><var class="id">cddar</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:cdddr"><span class="sig"><var class="id">cdddr</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:caaaar"><span class="sig"><var class="id">caaaar</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:caaadr"><span class="sig"><var class="id">caaadr</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:caadar"><span class="sig"><var class="id">caadar</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:caaddr"><span class="sig"><var class="id">caaddr</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:cadaar"><span class="sig"><var class="id">cadaar</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:cadadr"><span class="sig"><var class="id">cadadr</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:caddar"><span class="sig"><var class="id">caddar</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:cadddr"><span class="sig"><var class="id">cadddr</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:cdaaar"><span class="sig"><var class="id">cdaaar</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:cdaadr"><span class="sig"><var class="id">cdaadr</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:cdadar"><span class="sig"><var class="id">cdadar</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:cdaddr"><span class="sig"><var class="id">cdaddr</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:cddaar"><span class="sig"><var class="id">cddaar</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:cddadr"><span class="sig"><var class="id">cddadr</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:cdddar"><span class="sig"><var class="id">cdddar</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:cddddr"><span class="sig"><var class="id">cddddr</var> <var class="arg">pair</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These procedures are compositions of car and cdr, where for example caddr could be defined by</p><pre>(define caddr (lambda (x) (car (cdr (cdr x))))).</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:null.3f"><span class="sig"><var class="id">null?</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns #t if obj is the empty list, otherwise returns #f.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:list.3f"><span class="sig"><var class="id">list?</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns #t if obj is a list, otherwise returns #f. By definition, all lists have finite length and are terminated by the empty list.</p><pre>(list? '(a b c))             ===&gt;  #t
+(list? '())                  ===&gt;  #t
+(list? '(a . b))             ===&gt;  #f
+(let ((x (list 'a)))
+  (set-cdr! x x)
+  (list? x))                 ===&gt;  #f</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:list"><span class="sig"><var class="id">list</var> <var class="arg">obj</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a newly allocated list of its arguments.</p><pre>(list 'a (+ 3 4) 'c)                    ===&gt;  (a 7 c)
+(list)                                  ===&gt;  ()</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:length"><span class="sig"><var class="id">length</var> <var class="arg">list</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the length of list.</p><pre>(length '(a b c))                       ===&gt;  3
+(length '(a (b) (c d e)))               ===&gt;  3
+(length '())                            ===&gt;  0</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:append"><span class="sig"><var class="id">append</var> <var class="arg">list</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a list consisting of the elements of the first list followed by the elements of the other lists.</p><pre>(append '(x) '(y))                      ===&gt;  (x y)
+(append '(a) '(b c d))                  ===&gt;  (a b c d)
+(append '(a (b)) '((c)))                ===&gt;  (a (b) (c))</pre><p>The resulting list is always newly allocated, except that it shares structure with the last list argument. The last argument may actually be any object; an improper list results if the last argument is not a proper list.</p><pre>(append '(a b) '(c . d))                ===&gt;  (a b c . d)
+(append '() 'a)                         ===&gt;  a</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:reverse"><span class="sig"><var class="id">reverse</var> <var class="arg">list</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a newly allocated list consisting of the elements of list in reverse order.</p><pre>(reverse '(a b c))                      ===&gt;  (c b a)
+(reverse '(a (b c) d (e (f))))
+                ===&gt;  ((e (f)) d (b c) a)</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:list-tail"><span class="sig"><var class="id">list-tail</var> <var class="arg">list</var> <var class="arg">k</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the sublist of list obtained by omitting the first k elements. It is an error if list has fewer than k elements. List-tail could be defined by</p><pre>(define list-tail
+  (lambda (x k)
+    (if (zero? k)
+        x
+        (list-tail (cdr x) (- k 1)))))</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:list-ref"><span class="sig"><var class="id">list-ref</var> <var class="arg">list</var> <var class="arg">k</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the kth element of list. (This is the same as the car of (list-tail list k).) It is an error if list has fewer than k elements.</p><pre>(list-ref '(a b c d) 2)                ===&gt;  c
+(list-ref '(a b c d)
+          (inexact-&gt;exact (round 1.8))) 
+                ===&gt;  c</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:memq"><span class="sig"><var class="id">memq</var> <var class="arg">obj</var> <var class="arg">list</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:memv"><span class="sig"><var class="id">memv</var> <var class="arg">obj</var> <var class="arg">list</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:member"><span class="sig"><var class="id">member</var> <var class="arg">obj</var> <var class="arg">list</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These procedures return the first sublist of list whose car is obj, where the sublists of list are the non-empty lists returned by (list-tail list k) for k less than the length of list. If obj does not occur in list, then #f (not the empty list) is returned. Memq uses eq? to compare obj with the elements of list, while memv uses eqv? and member uses equal?.</p><pre>(memq 'a '(a b c))                      ===&gt;  (a b c)
+(memq 'b '(a b c))                      ===&gt;  (b c)
+(memq 'a '(b c d))                      ===&gt;  #f
+(memq (list 'a) '(b (a) c))             ===&gt;  #f
+(member (list 'a)
+        '(b (a) c))                     ===&gt;  ((a) c)
+(memq 101 '(100 101 102))               ===&gt;  unspecified
+(memv 101 '(100 101 102))               ===&gt;  (101 102)</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:assq"><span class="sig"><var class="id">assq</var> <var class="arg">obj</var> <var class="arg">alist</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:assv"><span class="sig"><var class="id">assv</var> <var class="arg">obj</var> <var class="arg">alist</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:assoc"><span class="sig"><var class="id">assoc</var> <var class="arg">obj</var> <var class="arg">alist</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Alist (for &quot;association list&quot;) must be a list of pairs. These procedures find the first pair in alist whose car field is obj, and returns that pair. If no pair in alist has obj as its car, then #f (not the empty list) is returned. Assq uses eq? to compare obj with the car fields of the pairs in alist, while assv uses eqv? and assoc uses equal?.</p><pre>(define e '((a 1) (b 2) (c 3)))
+(assq 'a e)             ===&gt;  (a 1)
+(assq 'b e)             ===&gt;  (b 2)
+(assq 'd e)             ===&gt;  #f
+(assq (list 'a) '(((a)) ((b)) ((c))))
+                        ===&gt;  #f
+(assoc (list 'a) '(((a)) ((b)) ((c))))   
+                                   ===&gt;  ((a))
+(assq 5 '((2 3) (5 7) (11 13)))    
+                                   ===&gt;  unspecified
+(assv 5 '((2 3) (5 7) (11 13)))    
+                                   ===&gt;  (5 7)</pre><p>Rationale:   Although they are ordinarily used as predicates, memq, memv, member, assq, assv, and assoc do not have question marks in their names because they return useful values rather than just #t or #f.</p></dd></dl><h4 id="sec:Symbols"><a href="#sec:Symbols">Symbols</a></h4><p>Symbols are objects whose usefulness rests on the fact that two symbols are identical (in the sense of eqv?) if and only if their names are spelled the same way. This is exactly the property needed to represent identifiers in programs, and so most implementations of Scheme use them internally for that purpose. Symbols are useful for many other applications; for instance, they may be used the way enumerated values are used in Pascal.</p><p>The rules for writing a symbol are exactly the same as the rules for writing an identifier.</p><p>It is guaranteed that any symbol that has been returned as part of a literal expression, or read using the read procedure, and subsequently written out using the write procedure, will read back in as the identical symbol (in the sense of eqv?). The string-&gt;symbol procedure, however, can create symbols for which this write/read invariance may not hold because their names contain special characters or letters in the non-standard case.</p><p>Note:   Some implementations of Scheme have a feature known as &quot;slashification&quot; in order to guarantee write/read invariance for all symbols, but historically the most important use of this feature has been to compensate for the lack of a string data type.</p><p>Some implementations also have &quot;uninterned symbols&quot;, which defeat write/read invariance even in implementations with slashification, and also generate exceptions to the rule that two symbols are the same if and only if their names are spelled the same.</p>
+<dl class="defsig">
+<dt class="defsig" id="def:symbol.3f"><span class="sig"><var class="id">symbol?</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns #t if obj is a symbol, otherwise returns #f.</p><pre>(symbol? 'foo)                  ===&gt;  #t
+(symbol? (car '(a b)))          ===&gt;  #t
+(symbol? &quot;bar&quot;)                 ===&gt;  #f
+(symbol? 'nil)                  ===&gt;  #t
+(symbol? '())                   ===&gt;  #f
+(symbol? #f)                    ===&gt;  #f</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:symbol-.3estring"><span class="sig"><var class="id">symbol-&gt;string</var> <var class="arg">symbol</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the name of symbol as a string. If the symbol was part of an object returned as the value of a literal expression (see &quot;<a href="#sec:literal-expressions">literal expressions</a>&quot;) or by a call to the read procedure, and its name contains alphabetic characters, then the string returned will contain characters in the implementation's preferred standard case -- some implementations will prefer upper case, others lower case. If the symbol was returned by string-&gt;symbol, the case of characters in the string returned will be the same as the case in the string that was passed to string-&gt;symbol.  It is an error to apply mutation procedures like string-set! to strings returned by this procedure.</p><p>The following examples assume that the implementation's standard case is lower case:</p><pre>(symbol-&gt;string 'flying-fish)     
+                                          ===&gt;  &quot;flying-fish&quot;
+(symbol-&gt;string 'Martin)                  ===&gt;  &quot;martin&quot;
+(symbol-&gt;string
+   (string-&gt;symbol &quot;Malvina&quot;))     
+                                          ===&gt;  &quot;Malvina&quot;</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:string-.3esymbol"><span class="sig"><var class="id">string-&gt;symbol</var> <var class="arg">string</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the symbol whose name is string. This procedure can create symbols with names containing special characters or letters in the non-standard case, but it is usually a bad idea to create such symbols because in some implementations of Scheme they cannot be read as themselves. See symbol-&gt;string.</p><p>The following examples assume that the implementation's standard case is lower case:</p><pre>(eq? 'mISSISSIppi 'mississippi)  
+                ===&gt;  #t
+(string-&gt;symbol &quot;mISSISSIppi&quot;)  
+                ===&gt;  the symbol with name &quot;mISSISSIppi&quot;
+(eq? 'bitBlt (string-&gt;symbol &quot;bitBlt&quot;))     
+                ===&gt;  #f
+(eq? 'JollyWog
+     (string-&gt;symbol
+       (symbol-&gt;string 'JollyWog)))  
+                ===&gt;  #t
+(string=? &quot;K. Harper, M.D.&quot;
+          (symbol-&gt;string
+            (string-&gt;symbol &quot;K. Harper, M.D.&quot;)))  
+                ===&gt;  #t</pre></dd></dl><h4 id="sec:Characters"><a href="#sec:Characters">Characters</a></h4><p>Characters are objects that represent printed characters such as letters and digits. Characters are written using the notation #\ &lt;character&gt; or #\&lt;character name&gt;. For example:</p><pre>#\a       ; lower case letter
+#\A       ; upper case letter
+#\(       ; left parenthesis
+#\        ; the space character
+#\space   ; the preferred way to write a space
+#\newline ; the newline character</pre><p>Case is significant in #\&lt;character&gt;, but not in #\&lt;character name&gt;. If &lt;character&gt; in #\&lt;character&gt; is alphabetic, then the character following &lt;character&gt; must be a delimiter character such as a space or parenthesis. This rule resolves the ambiguous case where, for example, the sequence of characters &quot;#\space&quot; could be taken to be either a representation of the space character or a representation of the character &quot;#\s&quot; followed by a representation of the symbol &quot;pace.&quot;</p><p>Characters written in the #\ notation are self-evaluating. That is, they do not have to be quoted in programs. Some of the procedures that operate on characters ignore the difference between upper case and lower case. The procedures that ignore case have &quot;-ci&quot; (for &quot;case insensitive&quot;) embedded in their names.</p>
+<dl class="defsig">
+<dt class="defsig" id="def:char.3f"><span class="sig"><var class="id">char?</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns #t if obj is a character, otherwise returns #f.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:char.3d.3f"><span class="sig"><tt>(char=? char[1] char[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:char.3c.3f"><span class="sig"><tt>(char&lt;? char[1] char[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:char.3e.3f"><span class="sig"><tt>(char&gt;? char[1] char[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:char.3c.3d.3f"><span class="sig"><tt>(char&lt;=? char[1] char[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:char.3e.3d.3f"><span class="sig"><tt>(char&gt;=? char[1] char[2])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These procedures impose a total ordering on the set of characters. It is guaranteed that under this ordering:</p><ul><li>The upper case characters are in order. For example, (char&lt;? #\A #\ B) returns #t.</li>
+<li>The lower case characters are in order. For example, (char&lt;? #\a #\ b) returns #t.</li>
+<li>The digits are in order. For example, (char&lt;? #\0 #\9) returns #t.</li>
+<li>Either all the digits precede all the upper case letters, or vice versa.</li>
+<li>Either all the digits precede all the lower case letters, or vice versa.</li>
+</ul>
+<p>Some implementations may generalize these procedures to take more than two arguments, as with the corresponding numerical predicates.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:char-ci.3d.3f"><span class="sig"><tt>(char-ci=? char[1] char[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:char-ci.3c.3f"><span class="sig"><tt>(char-ci&lt;? char[1] char[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:char-ci.3e.3f"><span class="sig"><tt>(char-ci&gt;? char[1] char[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:char-ci.3c.3d.3f"><span class="sig"><tt>(char-ci&lt;=? char[1] char[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:char-ci.3e.3d.3f"><span class="sig"><tt>(char-ci&gt;=? char[1] char[2])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These procedures are similar to char=? et cetera, but they treat upper case and lower case letters as the same. For example, (char-ci=? #\A #\ a) returns #t. Some implementations may generalize these procedures to take more than two arguments, as with the corresponding numerical predicates.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:char-alphabetic.3f"><span class="sig"><var class="id">char-alphabetic?</var> <var class="arg">char</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:char-numeric.3f"><span class="sig"><var class="id">char-numeric?</var> <var class="arg">char</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:char-whitespace.3f"><span class="sig"><var class="id">char-whitespace?</var> <var class="arg">char</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:char-upper-case.3f"><span class="sig"><var class="id">char-upper-case?</var> <var class="arg">letter</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:char-lower-case.3f"><span class="sig"><var class="id">char-lower-case?</var> <var class="arg">letter</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These procedures return #t if their arguments are alphabetic, numeric, whitespace, upper case, or lower case characters, respectively, otherwise they return #f. The following remarks, which are specific to the ASCII character set, are intended only as a guide: The alphabetic characters are the 52 upper and lower case letters. The numeric characters are the ten decimal digits. The whitespace characters are space, tab, line feed, form feed, and carriage return.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:char-.3einteger"><span class="sig"><var class="id">char-&gt;integer</var> <var class="arg">char</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:integer-.3echar"><span class="sig"><var class="id">integer-&gt;char</var> <var class="arg">n</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Given a character, char-&gt;integer returns an exact integer representation of the character. Given an exact integer that is the image of a character under char-&gt;integer, integer-&gt;char returns that character. These procedures implement order-preserving isomorphisms between the set of characters under the char&lt;=? ordering and some subset of the integers under the &lt;= ordering. That is, if</p><pre>(char&lt;=? a b) ===&gt; #t  and  (&lt;= x y) ===&gt; #t</pre><p>and x and y are in the domain of integer-&gt;char, then</p><pre>(&lt;= (char-&gt;integer a)
+    (char-&gt;integer b))                  ===&gt;  #t
+
+(char&lt;=? (integer-&gt;char x)
+         (integer-&gt;char y))             ===&gt;  #t</pre><p>Note that <tt>integer-&gt;char</tt> does currently not detect a negative argument and will quietly convert <tt>-1</tt> to <tt>#x1ffff</tt> in CHICKEN.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:char-upcase"><span class="sig"><var class="id">char-upcase</var> <var class="arg">char</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:char-downcase"><span class="sig"><var class="id">char-downcase</var> <var class="arg">char</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These procedures return a character char[2] such that (char-ci=? char char[2]). In addition, if char is alphabetic, then the result of char-upcase is upper case and the result of char-downcase is lower case.</p></dd></dl><h4 id="sec:Strings"><a href="#sec:Strings">Strings</a></h4><p>Strings are sequences of characters. Strings are written as sequences of characters enclosed within doublequotes (&quot;). A doublequote can be written inside a string only by escaping it with a backslash (\), as in</p><p>&quot;The word \&quot;recursion\&quot; has many meanings.&quot;</p><p>A backslash can be written inside a string only by escaping it with another backslash. Scheme does not specify the effect of a backslash within a string that is not followed by a doublequote or backslash.</p><p>A string constant may continue from one line to the next, but the exact contents of such a string are unspecified. The length of a string is the number of characters that it contains. This number is an exact, non-negative integer that is fixed when the string is created. The valid indexes of a string are the exact non-negative integers less than the length of the string. The first character of a string has index 0, the second has index 1, and so on.</p><p>In phrases such as &quot;the characters of string beginning with index start and ending with index end,&quot; it is understood that the index start is inclusive and the index end is exclusive. Thus if start and end are the same index, a null substring is referred to, and if start is zero and end is the length of string, then the entire string is referred to.</p><p>Some of the procedures that operate on strings ignore the difference between upper and lower case. The versions that ignore case have &quot;-ci&quot; (for &quot;case insensitive&quot;) embedded in their names.</p>
+<dl class="defsig">
+<dt class="defsig" id="def:string.3f"><span class="sig"><var class="id">string?</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns #t if obj is a string, otherwise returns #f.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:make-string"><span class="sig"><var class="id">make-string</var> <var class="arg">k</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:make-string"><span class="sig"><var class="id">make-string</var> <var class="arg">k</var> <var class="arg">char</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Make-string returns a newly allocated string of length k. If char is given, then all elements of the string are initialized to char, otherwise the contents of the string are unspecified.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:string"><span class="sig"><var class="id">string</var> <var class="arg">char</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a newly allocated string composed of the arguments.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:string-length"><span class="sig"><var class="id">string-length</var> <var class="arg">string</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the number of characters in the given string.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:string-ref"><span class="sig"><var class="id">string-ref</var> <var class="arg">string</var> <var class="arg">k</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>k must be a valid index of string. String-ref returns character k of string using zero-origin indexing.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:string-set.21"><span class="sig"><var class="id">string-set!</var> <var class="arg">string</var> <var class="arg">k</var> <var class="arg">char</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>k must be a valid index of string. String-set! stores char in element k of string and returns an unspecified value.</p><pre>(define (f) (make-string 3 #\*))
+(define (g) &quot;***&quot;)
+(string-set! (f) 0 #\?)          ===&gt;  unspecified
+(string-set! (g) 0 #\?)          ===&gt;  error
+(string-set! (symbol-&gt;string 'immutable)
+             0
+             #\?)          ===&gt;  error</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:string.3d.3f"><span class="sig"><tt>(string=? string[1] string[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:string-ci.3d.3f"><span class="sig"><tt>(string-ci=? string[1] string[2])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns #t if the two strings are the same length and contain the same characters in the same positions, otherwise returns #f. String-ci=? treats upper and lower case letters as though they were the same character, but string=? treats upper and lower case as distinct characters.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:string.3c.3f"><span class="sig"><tt>(string&lt;? string[1] string[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:string.3e.3f"><span class="sig"><tt>(string&gt;? string[1] string[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:string.3c.3d.3f"><span class="sig"><tt>(string&lt;=? string[1] string[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:string.3e.3d.3f"><span class="sig"><tt>(string&gt;=? string[1] string[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:string-ci.3c.3f"><span class="sig"><tt>(string-ci&lt;? string[1] string[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:string-ci.3e.3f"><span class="sig"><tt>(string-ci&gt;? string[1] string[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:string-ci.3c.3d.3f"><span class="sig"><tt>(string-ci&lt;=? string[1] string[2])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:string-ci.3e.3d.3f"><span class="sig"><tt>(string-ci&gt;=? string[1] string[2])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These procedures are the lexicographic extensions to strings of the corresponding orderings on characters. For example, string&lt;? is the lexicographic ordering on strings induced by the ordering char&lt;? on characters. If two strings differ in length but are the same up to the length of the shorter string, the shorter string is considered to be lexicographically less than the longer string.</p><p>Implementations may generalize these and the string=? and string-ci=? procedures to take more than two arguments, as with the corresponding numerical predicates.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:substring"><span class="sig"><var class="id">substring</var> <var class="arg">string</var> <var class="arg">start</var> <var class="dsssl">#!optional</var> <var class="arg">end</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>String must be a string, and start and end must be exact integers satisfying</p><pre>0 &lt;= start &lt;= end &lt;= (string-length string)</pre><p>Substring returns a newly allocated string formed from the characters of string beginning with index start (inclusive) and ending with index end (exclusive). The <var class="arg">end</var> argument is optional and defaults to the length of the string, this is a non-standard extension in CHICKEN.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:string-append"><span class="sig"><var class="id">string-append</var> <var class="arg">string</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a newly allocated string whose characters form the concatenation of the given strings.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:string-.3elist"><span class="sig"><var class="id">string-&gt;list</var> <var class="arg">string</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:list-.3estring"><span class="sig"><var class="id">list-&gt;string</var> <var class="arg">list</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>String-&gt;list returns a newly allocated list of the characters that make up the given string. List-&gt;string returns a newly allocated string formed from the characters in the list list, which must be a list of characters. String-&gt;list and list-&gt;string are inverses so far as equal? is concerned.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:string-copy"><span class="sig"><var class="id">string-copy</var> <var class="arg">string</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a newly allocated copy of the given string.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:string-fill.21"><span class="sig"><var class="id">string-fill!</var> <var class="arg">string</var> <var class="arg">char</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Stores char in every element of the given string and returns an unspecified value.</p></dd></dl><h4 id="sec:Vectors"><a href="#sec:Vectors">Vectors</a></h4><p>Vectors are heterogenous structures whose elements are indexed by integers. A vector typically occupies less space than a list of the same length, and the average time required to access a randomly chosen element is typically less for the vector than for the list.</p><p>The length of a vector is the number of elements that it contains. This number is a non-negative integer that is fixed when the vector is created. The valid indexes of a vector are the exact non-negative integers less than the length of the vector. The first element in a vector is indexed by zero, and the last element is indexed by one less than the length of the vector.</p><p>Vectors are written using the notation #(obj ...). For example, a vector of length 3 containing the number zero in element 0, the list (2 2 2 2) in element 1, and the string &quot;Anna&quot; in element 2 can be written as following:</p><pre>#(0 (2 2 2 2) &quot;Anna&quot;)</pre><p>Note that this is the external representation of a vector, not an expression evaluating to a vector. Like list constants, vector constants must be quoted:</p><pre>'#(0 (2 2 2 2) &quot;Anna&quot;)  
+                ===&gt;  #(0 (2 2 2 2) &quot;Anna&quot;)</pre>
+<dl class="defsig">
+<dt class="defsig" id="def:vector.3f"><span class="sig"><var class="id">vector?</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns #t if obj is a vector, otherwise returns #f.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:make-vector"><span class="sig"><var class="id">make-vector</var> <var class="arg">k</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:make-vector"><span class="sig"><var class="id">make-vector</var> <var class="arg">k</var> <var class="arg">fill</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a newly allocated vector of k elements. If a second argument is given, then each element is initialized to fill. Otherwise the initial contents of each element is unspecified.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:vector"><span class="sig"><var class="id">vector</var> <var class="arg">obj</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a newly allocated vector whose elements contain the given arguments. Analogous to list.</p><pre>(vector 'a 'b 'c)                       ===&gt;  #(a b c)</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:vector-length"><span class="sig"><var class="id">vector-length</var> <var class="arg">vector</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the number of elements in vector as an exact integer.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:vector-ref"><span class="sig"><var class="id">vector-ref</var> <var class="arg">vector</var> <var class="arg">k</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>k must be a valid index of vector. Vector-ref returns the contents of element k of vector.</p><pre>(vector-ref '#(1 1 2 3 5 8 13 21)
+            5)  
+                ===&gt;  8
+(vector-ref '#(1 1 2 3 5 8 13 21)
+            (let ((i (round (* 2 (acos -1)))))
+              (if (inexact? i)
+                  (inexact-&gt;exact i)
+                  i))) 
+                ===&gt; 13</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:vector-set.21"><span class="sig"><var class="id">vector-set!</var> <var class="arg">vector</var> <var class="arg">k</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>k must be a valid index of vector. Vector-set! stores obj in element k of vector. The value returned by vector-set! is unspecified.</p><pre>(let ((vec (vector 0 '(2 2 2 2) &quot;Anna&quot;)))
+  (vector-set! vec 1 '(&quot;Sue&quot; &quot;Sue&quot;))
+  vec)      
+                ===&gt;  #(0 (&quot;Sue&quot; &quot;Sue&quot;) &quot;Anna&quot;)
+
+(vector-set! '#(0 1 2) 1 &quot;doe&quot;)  
+                ===&gt;  error  ; constant vector</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:vector-.3elist"><span class="sig"><var class="id">vector-&gt;list</var> <var class="arg">vector</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:list-.3evector"><span class="sig"><var class="id">list-&gt;vector</var> <var class="arg">list</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Vector-&gt;list returns a newly allocated list of the objects contained in the elements of vector. List-&gt;vector returns a newly created vector initialized to the elements of the list list.</p><pre>(vector-&gt;list '#(dah dah didah))  
+                ===&gt;  (dah dah didah)
+(list-&gt;vector '(dididit dah))   
+                ===&gt;  #(dididit dah)</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:vector-fill.21"><span class="sig"><var class="id">vector-fill!</var> <var class="arg">vector</var> <var class="arg">fill</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Stores fill in every element of vector. The value returned by vector-fill! is unspecified.</p></dd></dl><h3 id="sec:Control_features"><a href="#sec:Control_features">Control features</a></h3><p>This chapter describes various primitive procedures which control the flow of program execution in special ways. The procedure? predicate is also described here.</p>
+<dl class="defsig">
+<dt class="defsig" id="def:procedure.3f"><span class="sig"><var class="id">procedure?</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns #t if obj is a procedure, otherwise returns #f.</p><pre>(procedure? car)                    ===&gt;  #t
+(procedure? 'car)                   ===&gt;  #f
+(procedure? (lambda (x) (* x x)))   
+                                    ===&gt;  #t
+(procedure? '(lambda (x) (* x x)))  
+                                    ===&gt;  #f
+(call-with-current-continuation procedure?)
+                                    ===&gt;  #t</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:apply"><span class="sig"><tt>(apply proc arg[1] ... args)</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Proc must be a procedure and args must be a list. Calls proc with the elements of the list (append (list arg[1] ...) args) as the actual arguments.</p><pre>(apply + (list 3 4))                      ===&gt;  7
+
+(define compose
+  (lambda (f g)
+    (lambda args
+      (f (apply g args)))))
+
+((compose sqrt *) 12 75)                      ===&gt;  30</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:map"><span class="sig"><tt>(map proc list[1] list[2] ...)</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>The lists must be lists, and proc must be a procedure taking as many arguments as there are lists and returning a single value. Map applies proc element-wise to the elements of the lists and returns a list of the results, in order. The dynamic order in which proc is applied to the elements of the lists is unspecified.</p><p>Like in SRFI-1, this procedure allows the arguments to be of unequal length; it terminates when the shortest list runs out.  This is a CHICKEN extension to R5RS.</p><pre>(map cadr '((a b) (d e) (g h)))   
+                ===&gt;  (b e h)
+
+(map (lambda (n) (expt n n))
+     '(1 2 3 4 5))                
+                ===&gt;  (1 4 27 256 3125)
+
+(map + '(1 2 3) '(4 5 6))                 ===&gt;  (5 7 9)
+
+(let ((count 0))
+  (map (lambda (ignored)
+         (set! count (+ count 1))
+         count)
+       '(a b)))                         ===&gt;  (1 2) or (2 1)</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:for-each"><span class="sig"><tt>(for-each proc list[1] list[2] ...)</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>The arguments to for-each are like the arguments to map, but for-each calls proc for its side effects rather than for its values. Unlike map, for-each is guaranteed to call proc on the elements of the lists in order from the first element(s) to the last, and the value returned by for-each is unspecified.</p><pre>(let ((v (make-vector 5)))
+  (for-each (lambda (i)
+              (vector-set! v i (* i i)))
+            '(0 1 2 3 4))
+  v)                                        ===&gt;  #(0 1 4 9 16)</pre><p>Like in SRFI-1, this procedure allows the arguments to be of unequal length; it terminates when the shortest list runs out.  This is a CHICKEN extension to R5RS.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:force"><span class="sig"><var class="id">force</var> <var class="arg">promise</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Forces the value of promise (see &quot;<a href="#sec:delayed-evaluation">delayed evaluation</a>&quot;). If no value has been computed for the promise, then a value is computed and returned.  The value of the promise is cached (or &quot;memoized&quot;) so that if it is forced a second time, the previously computed value is returned.</p><pre>(force (delay (+ 1 2)))           ===&gt;  3
+(let ((p (delay (+ 1 2))))
+  (list (force p) (force p)))  
+                                       ===&gt;  (3 3)
+
+(define a-stream
+  (letrec ((next
+            (lambda (n)
+              (cons n (delay (next (+ n 1)))))))
+    (next 0)))
+(define head car)
+(define tail
+  (lambda (stream) (force (cdr stream))))
+
+(head (tail (tail a-stream)))  
+                                       ===&gt;  2</pre><p>Force and delay are mainly intended for programs written in functional style. The following examples should not be considered to illustrate good programming style, but they illustrate the property that only one value is computed for a promise, no matter how many times it is forced.</p><pre>(define count 0)
+(define p
+  (delay (begin (set! count (+ count 1))
+                (if (&gt; count x)
+                    count
+                    (force p)))))
+(define x 5)
+p                             ===&gt;  a promise
+(force p)                     ===&gt;  6
+p                             ===&gt;  a promise, still
+(begin (set! x 10)
+       (force p))             ===&gt;  6</pre><p>Here is a possible implementation of delay and force. Promises are implemented here as procedures of no arguments, and force simply calls its argument:</p><pre>(define force
+  (lambda (object)
+    (object)))</pre><p>We define the expression</p><pre>(delay &lt;expression&gt;)</pre><p>to have the same meaning as the procedure call</p><pre>(make-promise (lambda () &lt;expression&gt;))</pre><p>as follows</p><pre>(define-syntax delay
+  (syntax-rules ()
+    ((delay expression)
+     (make-promise (lambda () expression))))),</pre><p>where make-promise is defined as follows:</p><pre>(define make-promise
+  (lambda (proc)
+    (let ((result-ready? #f)
+          (result #f))
+      (lambda ()
+        (if result-ready?
+            result
+            (let ((x (proc)))
+              (if result-ready?
+                  result
+                  (begin (set! result-ready? #t)
+                         (set! result x)
+                         result))))))))</pre><p>Rationale:   A promise may refer to its own value, as in the last example above. Forcing such a promise may cause the promise to be forced a second time before the value of the first force has been computed. This complicates the definition of make-promise.</p><p>Various extensions to this semantics of delay and force are supported in some implementations:</p><ul><li>Calling force on an object that is not a promise may simply return the object (this is the case in CHICKEN).</li>
+<li>It may be the case that there is no means by which a promise can be operationally distinguished from its forced value. That is, expressions like the following may evaluate to either #t or to #f, depending on the implementation:</li>
+</ul>
+<pre>   (eqv? (delay 1) 1)                  ===&gt;  unspecified
+   (pair? (delay (cons 1 2)))          ===&gt;  unspecified
+
+   In CHICKEN, promises are separate objects, so the above expressions
+   will both evaluate to {{#f}}.</pre><ul><li>Some implementations may implement &quot;implicit forcing,&quot; where the value of a promise is forced by primitive procedures like cdr and +:</li>
+</ul>
+<pre>   (+ (delay (* 3 7)) 13)          ===&gt;  34
+
+   This is '''not''' the case in CHICKEN.</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:call-with-current-continuation"><span class="sig"><var class="id">call-with-current-continuation</var> <var class="arg">proc</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Proc must be a procedure of one argument. The procedure call-with-current-continuation packages up the current continuation (see the rationale below) as an &quot;escape procedure&quot; and passes it as an argument to proc. The escape procedure is a Scheme procedure that, if it is later called, will abandon whatever continuation is in effect at that later time and will instead use the continuation that was in effect when the escape procedure was created. Calling the escape procedure may cause the invocation of before and after thunks installed using dynamic-wind.</p><p>The escape procedure accepts the same number of arguments as the continuation to the original call to call-with-current-continuation. Except for continuations created by the call-with-values procedure, all continuations take exactly one value. The effect of passing no value or more than one value to continuations that were not created by call-with-values is unspecified.</p><p>The escape procedure that is passed to proc has unlimited extent just like any other procedure in Scheme. It may be stored in variables or data structures and may be called as many times as desired.</p><p>The following examples show only the most common ways in which call-with-current-continuation is used. If all real uses were as simple as these examples, there would be no need for a procedure with the power of call-with-current-continuation.</p><pre>(call-with-current-continuation
+  (lambda (exit)
+    (for-each (lambda (x)
+                (if (negative? x)
+                    (exit x)))
+              '(54 0 37 -3 245 19))
+    #t))                                ===&gt;  -3
+
+(define list-length
+  (lambda (obj)
+    (call-with-current-continuation
+      (lambda (return)
+        (letrec ((r
+                  (lambda (obj)
+                    (cond ((null? obj) 0)
+                          ((pair? obj)
+                           (+ (r (cdr obj)) 1))
+                          (else (return #f))))))
+          (r obj))))))
+
+(list-length '(1 2 3 4))                    ===&gt;  4
+
+(list-length '(a b . c))                    ===&gt;  #f</pre><p>Rationale:</p><p>A common use of call-with-current-continuation is for structured, non-local exits from loops or procedure bodies, but in fact call-with-current-continuation is extremely useful for implementing a wide variety of advanced control structures.</p><p>Whenever a Scheme expression is evaluated there is a continuation wanting the result of the expression. The continuation represents an entire (default) future for the computation. If the expression is evaluated at top level, for example, then the continuation might take the result, print it on the screen, prompt for the next input, evaluate it, and so on forever. Most of the time the continuation includes actions specified by user code, as in a continuation that will take the result, multiply it by the value stored in a local variable, add seven, and give the answer to the top level continuation to be printed. Normally these ubiquitous continuations are hidden behind the scenes and programmers do not think much about them. On rare occasions, however, a programmer may need to deal with continuations explicitly. Call-with-current-continuation allows Scheme programmers to do that by creating a procedure that acts just like the current continuation.</p><p>Most programming languages incorporate one or more special-purpose escape constructs with names like exit, return, or even goto. In 1965, however, Peter Landin [16] invented a general purpose escape operator called the J-operator. John Reynolds [24] described a simpler but equally powerful construct in 1972. The catch special form described by Sussman and Steele in the 1975 report on Scheme is exactly the same as Reynolds's construct, though its name came from a less general construct in MacLisp. Several Scheme implementors noticed that the full power of the catch construct could be provided by a procedure instead of by a special syntactic construct, and the name call-with-current-continuation was coined in 1982. This name is descriptive, but opinions differ on the merits of such a long name, and some people use the name call/cc instead.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:values"><span class="sig"><var class="id">values</var> <var class="arg">obj</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Delivers all of its arguments to its continuation. Except for continuations created by the call-with-values procedure, all continuations take exactly one value. Values might be defined as follows:</p><pre>(define (values . things)
+  (call-with-current-continuation 
+    (lambda (cont) (apply cont things))))</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:call-with-values"><span class="sig"><var class="id">call-with-values</var> <var class="arg">producer</var> <var class="arg">consumer</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Calls its producer argument with no values and a continuation that, when passed some values, calls the consumer procedure with those values as arguments. The continuation for the call to consumer is the continuation of the call to call-with-values.</p><pre>(call-with-values (lambda () (values 4 5))
+                  (lambda (a b) b))
+                                                           ===&gt;  5
+
+(call-with-values * -)                                     ===&gt;  -1</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:dynamic-wind"><span class="sig"><var class="id">dynamic-wind</var> <var class="arg">before</var> <var class="arg">thunk</var> <var class="arg">after</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Calls thunk without arguments, returning the result(s) of this call. Before and after are called, also without arguments, as required by the following rules (note that in the absence of calls to continuations captured using call-with-current-continuation the three arguments are called once each, in order). Before is called whenever execution enters the dynamic extent of the call to thunk and after is called whenever it exits that dynamic extent. The dynamic extent of a procedure call is the period between when the call is initiated and when it returns. In Scheme, because of call-with-current-continuation, the dynamic extent of a call may not be a single, connected time period. It is defined as follows:</p><ul><li>The dynamic extent is entered when execution of the body of the called procedure begins.</li>
+<li>The dynamic extent is also entered when execution is not within the dynamic extent and a continuation is invoked that was captured (using call-with-current-continuation) during the dynamic extent.</li>
+<li>It is exited when the called procedure returns.</li>
+<li>It is also exited when execution is within the dynamic extent and a continuation is invoked that was captured while not within the dynamic extent.</li>
+</ul>
+<p>If a second call to dynamic-wind occurs within the dynamic extent of the call to thunk and then a continuation is invoked in such a way that the afters from these two invocations of dynamic-wind are both to be called, then the after associated with the second (inner) call to dynamic-wind is called first.</p><p>If a second call to dynamic-wind occurs within the dynamic extent of the call to thunk and then a continuation is invoked in such a way that the befores from these two invocations of dynamic-wind are both to be called, then the before associated with the first (outer) call to dynamic-wind is called first.</p><p>If invoking a continuation requires calling the before from one call to dynamic-wind and the after from another, then the after is called first.</p><p>The effect of using a captured continuation to enter or exit the dynamic extent of a call to before or after is undefined.  However, in CHICKEN it is safe to do this, and they will execute in the outer dynamic context of the <tt>dynamic-wind</tt> form.</p><pre>(let ((path '())
+      (c #f))
+  (let ((add (lambda (s)
+               (set! path (cons s path)))))
+    (dynamic-wind
+      (lambda () (add 'connect))
+      (lambda ()
+        (add (call-with-current-continuation
+               (lambda (c0)
+                 (set! c c0)
+                 'talk1))))
+      (lambda () (add 'disconnect)))
+    (if (&lt; (length path) 4)
+        (c 'talk2)
+        (reverse path))))
+
+                ===&gt; (connect talk1 disconnect
+                      connect talk2 disconnect)</pre></dd></dl><h3 id="sec:Eval"><a href="#sec:Eval">Eval</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:eval"><span class="sig"><var class="id">eval</var> <var class="arg">expression</var> <var class="dsssl">#!optional</var> <var class="arg">environment-specifier</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Evaluates expression in the specified environment and returns its value. Expression must be a valid Scheme expression represented as data, and environment-specifier must be a value returned by one of the three procedures described below. Implementations may extend eval to allow non-expression programs (definitions) as the first argument and to allow other values as environments, with the restriction that eval is not allowed to create new bindings in the environments associated with null-environment or scheme-report-environment.</p><pre>(eval '(* 7 3) (scheme-report-environment 5))
+                                                           ===&gt;  21
+
+(let ((f (eval '(lambda (f x) (f x x))
+               (null-environment 5))))
+  (f + 10))
+                                                           ===&gt;  20</pre><p>The <var class="arg">environment-specifier</var> is optional, and if not provided it defaults to the value of <tt>(interaction-environment)</tt>.  This is a CHICKEN extension to R5RS, which, though strictly nonportable, is very common among Scheme implementations.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:scheme-report-environment"><span class="sig"><var class="id">scheme-report-environment</var> <var class="arg">version</var> <var class="dsssl">#!optional</var> <var class="arg">mutable</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:null-environment"><span class="sig"><var class="id">null-environment</var> <var class="arg">version</var> <var class="dsssl">#!optional</var> <var class="arg">mutable</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Version must be either the exact integer 4 or 5, corresponding to the respective revisions of the Scheme report (the Revised^N Report on Scheme).  Scheme-report-environment returns a specifier for an environment that is empty except for all bindings defined in this report that are either required or both optional and supported by the implementation.  Null-environment returns a specifier for an environment that is empty except for the (syntactic) bindings for all syntactic keywords defined in this report that are either required or both optional and supported by the implementation.</p><p>The environments specified by scheme-report-environment and null-environment are immutable by default.  In CHICKEN, as an extension to R5RS, an extra <var class="arg">mutable</var> argument can be passed, which makes the environments mutable when non-<tt>#f</tt>.  Mutability means new top-level definitions are accepted and the values of existing top-level bindings can be mutated.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:interaction-environment"><span class="sig"><var class="id">interaction-environment</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>This procedure returns a specifier for the environment that contains implementation-defined bindings, typically a superset of those listed in the report. The intent is that this procedure will return the environment in which the implementation would evaluate expressions dynamically typed by the user.</p></dd></dl><h3 id="sec:Input_and_output"><a href="#sec:Input_and_output">Input and output</a></h3><h4 id="sec:Ports"><a href="#sec:Ports">Ports</a></h4><p>Ports represent input and output devices. To Scheme, an input port is a Scheme object that can deliver characters upon command, while an output port is a Scheme object that can accept characters.</p>
+<dl class="defsig">
+<dt class="defsig" id="def:call-with-input-file"><span class="sig"><tt>(call-with-input-file string proc [mode ...])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:call-with-output-file"><span class="sig"><tt>(call-with-output-file string proc [mode ...])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>String should be a string naming a file, and proc should be a procedure that accepts one argument. For call-with-input-file, the file should already exist; for call-with-output-file, the effect is unspecified if the file already exists. These procedures call proc with one argument: the port obtained by opening the named file for input or output. If the file cannot be opened, an error is signalled. If proc returns, then the port is closed automatically and the value(s) yielded by the proc is (are) returned. If proc does not return, then the port will not be closed automatically unless it is possible to prove that the port will never again be used for a read or write operation.</p><p>Rationale:   Because Scheme's escape procedures have unlimited extent, it is possible to escape from the current continuation but later to escape back in. If implementations were permitted to close the port on any escape from the current continuation, then it would be impossible to write portable code using both call-with-current-continuation and call-with-input-file or call-with-output-file.</p><p>Additional <tt>mode</tt> arguments can be passed in, which should be any of the keywords <tt>#:text</tt>, <tt>#:binary</tt> or <tt>#:append</tt>.  <tt>#:text</tt> and <tt>#:binary</tt> indicate the mode in which to open the file (this has an effect on non-UNIX platforms only), while <tt>#:append</tt> indicates that instead of truncating the file on open, data written to it should be appended at the end (only for output files).  The extra <tt>mode</tt> arguments are CHICKEN extensions to the R5RS standard.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:input-port.3f"><span class="sig"><var class="id">input-port?</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:output-port.3f"><span class="sig"><var class="id">output-port?</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns #t if obj is an input port or output port respectively, otherwise returns #f.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:current-input-port"><span class="sig"><var class="id">current-input-port</var> <var class="dsssl">#!optional</var> <var class="arg">port</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:current-output-port"><span class="sig"><var class="id">current-output-port</var> <var class="dsssl">#!optional</var> <var class="arg">port</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the current default input or output port.</p><p>If the optional <var class="arg">port</var> argument is passed, the current input or output port is changed to the provided port.  It can also be used with <tt>parameterize</tt> to temporarily bind the port to another value.  This is a CHICKEN extension to the R5RS standard.</p><p>Note that the default output port is not buffered. Use <a href="Module%20%28chicken%20port%29.html#sec:set-buffering-mode.21"><tt>set-buffering-mode!</tt></a> if you need a different behavior.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:with-input-from-file"><span class="sig"><tt>(with-input-from-file string thunk [mode ...])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:with-output-to-file"><span class="sig"><tt>(with-output-to-file string thunk [mode ...])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>String should be a string naming a file, and thunk should be a procedure of no arguments. For with-input-from-file, the file should already exist; for with-output-to-file, the effect is unspecified if the file already exists. The file is opened for input or output, an input or output port connected to it is made the default value returned by current-input-port or current-output-port (and is used by (read), (write obj), and so forth), and the thunk is called with no arguments. When the thunk returns, the port is closed and the previous default is restored. With-input-from-file and with-output-to-file return(s) the value(s) yielded by thunk. If an escape procedure is used to escape from the continuation of these procedures, their behavior is implementation dependent.</p><p>Additional <tt>mode</tt> arguments can be passed in, which should be any of the keywords <tt>#:text</tt>, <tt>#:binary</tt> or <tt>#:append</tt>.  <tt>#:text</tt> and <tt>#:binary</tt> indicate the mode in which to open the file (this has an effect on non-UNIX platforms only), while <tt>#:append</tt> indicates that instead of truncating the file on open, data written to it should be appended at the end (only for output files).  The extra <tt>mode</tt> arguments are CHICKEN extensions to the R5RS standard.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:open-input-file"><span class="sig"><tt>(open-input-file filename [mode ...])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Takes a string naming an existing file and returns an input port capable of delivering characters from the file. If the file cannot be opened, an error is signalled.</p><p>Additional <tt>mode</tt> arguments can be passed in, which should be any of the keywords <tt>#:text</tt> or <tt>#:binary</tt>.  These indicate the mode in which to open the file (this has an effect on non-UNIX platforms only).  The extra <tt>mode</tt> arguments are CHICKEN extensions to the R5RS standard.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:open-output-file"><span class="sig"><tt>(open-output-file filename [mode ...])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Takes a string naming an output file to be created and returns an output port capable of writing characters to a new file by that name. If the file cannot be opened, an error is signalled. If a file with the given name already exists, the effect is unspecified.</p><p>Additional <tt>mode</tt> arguments can be passed in, which should be any of the keywords <tt>#:text</tt>, <tt>#:binary</tt> or <tt>#:append</tt>.  <tt>#:text</tt> and <tt>#:binary</tt> indicate the mode in which to open the file (this has an effect on non-UNIX platforms only), while <tt>#:append</tt> indicates that instead of truncating the file on open, data written to it should be appended at the end.  The extra <tt>mode</tt> arguments are CHICKEN extensions to the R5RS standard.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:close-input-port"><span class="sig"><var class="id">close-input-port</var> <var class="arg">port</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:close-output-port"><span class="sig"><var class="id">close-output-port</var> <var class="arg">port</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Closes the file associated with port, rendering the port incapable of delivering or accepting characters. These routines have no effect if the file has already been closed. The value returned is unspecified.</p></dd></dl><h4 id="sec:Input"><a href="#sec:Input">Input</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:read"><span class="sig"><var class="id">read</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:read"><span class="sig"><var class="id">read</var> <var class="arg">port</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Read converts external representations of Scheme objects into the objects themselves. That is, it is a parser for the nonterminal &lt;datum&gt; (see also &quot;<a href="#sec:pairs-and-lists">pairs and lists</a>&quot;). Read returns the next object parsable from the given input port, updating port to point to the first character past the end of the external representation of the object.</p><p>If an end of file is encountered in the input before any characters are found that can begin an object, then an end of file object is returned. The port remains open, and further attempts to read will also return an end of file object. If an end of file is encountered after the beginning of an object's external representation, but the external representation is incomplete and therefore not parsable, an error is signalled.</p><p>The port argument may be omitted, in which case it defaults to the value returned by current-input-port. It is an error to read from a closed port.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:read-char"><span class="sig"><var class="id">read-char</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:read-char"><span class="sig"><var class="id">read-char</var> <var class="arg">port</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the next character available from the input port, updating the port to point to the following character. If no more characters are available, an end of file object is returned. Port may be omitted, in which case it defaults to the value returned by current-input-port.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:peek-char"><span class="sig"><var class="id">peek-char</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:peek-char"><span class="sig"><var class="id">peek-char</var> <var class="arg">port</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the next character available from the input port, without updating the port to point to the following character. If no more characters are available, an end of file object is returned. Port may be omitted, in which case it defaults to the value returned by current-input-port.</p><p>Note:   The value returned by a call to peek-char is the same as the value that would have been returned by a call to read-char with the same port. The only difference is that the very next call to read-char or peek-char on that port will return the value returned by the preceding call to peek-char. In particular, a call to peek-char on an interactive port will hang waiting for input whenever a call to read-char would have hung.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:eof-object.3f"><span class="sig"><var class="id">eof-object?</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns #t if obj is an end of file object, otherwise returns #f. The precise set of end of file objects will vary among implementations, but in any case no end of file object will ever be an object that can be read in using read.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:char-ready.3f"><span class="sig"><var class="id">char-ready?</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:char-ready.3f"><span class="sig"><var class="id">char-ready?</var> <var class="arg">port</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns #t if a character is ready on the input port and returns #f otherwise. If char-ready returns #t then the next read-char operation on the given port is guaranteed not to hang. If the port is at end of file then char-ready? returns #t. Port may be omitted, in which case it defaults to the value returned by current-input-port.</p><p>Rationale:   Char-ready? exists to make it possible for a program to accept characters from interactive ports without getting stuck waiting for input. Any input editors associated with such ports must ensure that characters whose existence has been asserted by char-ready? cannot be rubbed out. If char-ready? were to return #f at end of file, a port at end of file would be indistinguishable from an interactive port that has no ready characters.</p></dd></dl><h4 id="sec:Output"><a href="#sec:Output">Output</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:write"><span class="sig"><var class="id">write</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:write"><span class="sig"><var class="id">write</var> <var class="arg">obj</var> <var class="arg">port</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Writes a written representation of obj to the given port. Strings that appear in the written representation are enclosed in doublequotes, and within those strings backslash and doublequote characters are escaped by backslashes. Character objects are written using the #\ notation. Write returns an unspecified value. The port argument may be omitted, in which case it defaults to the value returned by current-output-port.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:display"><span class="sig"><var class="id">display</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:display"><span class="sig"><var class="id">display</var> <var class="arg">obj</var> <var class="arg">port</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Writes a representation of obj to the given port. Strings that appear in the written representation are not enclosed in doublequotes, and no characters are escaped within those strings. Character objects appear in the representation as if written by write-char instead of by write. Display returns an unspecified value. The port argument may be omitted, in which case it defaults to the value returned by current-output-port.</p><p>Rationale:   Write is intended for producing machine-readable output and display is for producing human-readable output. Implementations that allow &quot;slashification&quot; within symbols will probably want write but not display to slashify funny characters in symbols.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:newline"><span class="sig"><var class="id">newline</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:newline"><span class="sig"><var class="id">newline</var> <var class="arg">port</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Writes an end of line to port. Exactly how this is done differs from one operating system to another. Returns an unspecified value. The port argument may be omitted, in which case it defaults to the value returned by current-output-port.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:write-char"><span class="sig"><var class="id">write-char</var> <var class="arg">char</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:write-char"><span class="sig"><var class="id">write-char</var> <var class="arg">char</var> <var class="arg">port</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Writes the character char (not an external representation of the character) to the given port and returns an unspecified value. The port argument may be omitted, in which case it defaults to the value returned by current-output-port.</p></dd></dl><h4 id="sec:System_interface"><a href="#sec:System_interface">System interface</a></h4><p>Questions of system interface generally fall outside of the domain of this report. However, the following operations are important enough to deserve description here.</p>
+<dl class="defsig">
+<dt class="defsig" id="def:load"><span class="sig"><var class="id">load</var> <var class="arg">filename</var> <var class="dsssl">#!optional</var> <var class="arg">evalproc</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Filename should be a string naming an existing file containing Scheme source code. The load procedure reads expressions and definitions from the file and evaluates them sequentially. It is unspecified whether the results of the expressions are printed. The load procedure does not affect the values returned by current-input-port and current-output-port. Load returns an unspecified value.</p><p>CHICKEN offers a few extensions to the R5RS definition of <tt>load</tt>:</p><ul><li>The <var class="arg">filename</var> may also be an input port.</li>
+<li>The expressions which are read one by one from the source file are passed to the procedure indicated by the extra optional <var class="arg">evalproc</var> argument, which defaults to <tt>eval</tt>.</li>
+<li>On platforms that support it (currently BSD, Haiku, MacOS X, Linux, Solaris, and Windows), <tt>load</tt> can be used to load shared objects.</li>
+</ul>
+<p>Example for loading compiled programs:</p><pre>% cat x.scm
+(define (hello) (print &quot;Hello!&quot;))
+% csc -s x.scm
+% csi -q
+#;1&gt; (load &quot;x.so&quot;)
+; loading x.so ...
+#;2&gt; (hello)
+Hello!
+#;3&gt;</pre><p>There are some limitations and caveats to the CHICKEN extensions you need to be aware of:</p><ul><li>The second argument to <tt>load</tt> is ignored when loading compiled code.</li>
+<li>If source code is loaded from a port, then that port is closed after all expressions have been read.</li>
+<li>A compiled file can only be loaded once. Subsequent attempts to load the same file have no effect.</li>
+</ul>
+</dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:transcript-on"><span class="sig"><var class="id">transcript-on</var> <var class="arg">filename</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:transcript-off"><span class="sig"><var class="id">transcript-off</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>(These procedures are not implemented in CHICKEN.)</p><p>Filename must be a string naming an output file to be created. The effect of transcript-on is to open the named file for output, and to cause a transcript of subsequent interaction between the user and the Scheme system to be written to the file. The transcript is ended by a call to transcript-off, which closes the transcript file. Only one transcript may be in progress at any time, though some implementations may relax this restriction. The values returned by these procedures are unspecified.</p></dd></dl><hr /><p>Previous: <a href="Included%20modules.html">Included modules</a></p><p>Next: <a href="Module%20r5rs.html">Module r5rs</a></p></div></div></body></html>

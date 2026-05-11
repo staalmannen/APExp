@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken bitwise)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_bitwise.29">Module (chicken bitwise)</a>
+<ul>
+<li><a href="#sec:Binary_integer_operations">Binary integer operations</a>
+<ul>
+<li><a href="#sec:bit-.3eboolean">bit-&gt;boolean</a></li>
+<li><a href="#sec:integer-length">integer-length</a></li></ul></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_bitwise.29"><a href="#sec:Module_.28chicken_bitwise.29">Module (chicken bitwise)</a></h2><p>Binary integer operations are provided by the <tt>(chicken bitwise)</tt> module.</p><h3 id="sec:Binary_integer_operations"><a href="#sec:Binary_integer_operations">Binary integer operations</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:bitwise-and"><span class="sig"><var class="id">bitwise-and</var> <var class="arg">N1</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:bitwise-ior"><span class="sig"><var class="id">bitwise-ior</var> <var class="arg">N1</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:bitwise-xor"><span class="sig"><var class="id">bitwise-xor</var> <var class="arg">N1</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:bitwise-not"><span class="sig"><var class="id">bitwise-not</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:arithmetic-shift"><span class="sig"><var class="id">arithmetic-shift</var> <var class="arg">N1</var> <var class="arg">N2</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Binary integer operations. <tt>arithmetic-shift</tt> shifts the argument <var class="arg">N1</var> by <var class="arg">N2</var> bits to the left. If <var class="arg">N2</var> is negative, then <var class="arg">N1</var> is shifted to the right. These operations only accept exact integers.</p></dd></dl><h4 id="sec:bit-.3eboolean"><a href="#sec:bit-.3eboolean">bit-&gt;boolean</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:bit-.3eboolean"><span class="sig"><var class="id">bit-&gt;boolean</var> <var class="arg">N</var> <var class="arg">INDEX</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if the bit at the position <var class="arg">INDEX</var> in the integer <var class="arg">N</var> is set, or <tt>#f</tt> otherwise. The rightmost/least-significant bit is bit 0.</p></dd></dl><h4 id="sec:integer-length"><a href="#sec:integer-length">integer-length</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:integer-length"><span class="sig"><var class="id">integer-length</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the number of bits needed to represent the exact integer N in 2's complement notation.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20base%29.html">Module (chicken base)</a></p><p>Next: <a href="Module%20%28chicken%20blob%29.html">Module (chicken blob)</a></p></div></div></body></html>

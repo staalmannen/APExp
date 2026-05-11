@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken random)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_random.29">Module (chicken random)</a>
+<ul>
+<li><a href="#sec:set-pseudo-random-seed.21">set-pseudo-random-seed!</a></li>
+<li><a href="#sec:pseudo-random-integer">pseudo-random-integer</a></li>
+<li><a href="#sec:pseudo-random-real">pseudo-random-real</a></li>
+<li><a href="#sec:random-bytes">random-bytes</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_random.29"><a href="#sec:Module_.28chicken_random.29">Module (chicken random)</a></h2><p>This module provides access to entropy (as provided by the operating system) and a pseudo random number generator.</p><p>On UNIX systems entropy is by default obtained from <tt>/dev/urandom</tt>. On Linux, the <tt>getrandom(2)</tt> system call is used instead, if available. On OpenBSD it is <tt>arc4random_buf(3)</tt>, on Windows <tt>RtlGenRandom</tt>.</p><p>The pseudo random number generator is an implementation of the <a href="https://en.wikipedia.org/wiki/Well_equidistributed_long-period_linear">WELL</a> algorithm.</p><h4 id="sec:set-pseudo-random-seed.21"><a href="#sec:set-pseudo-random-seed.21">set-pseudo-random-seed!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:set-pseudo-random-seed.21"><span class="sig"><var class="id">set-pseudo-random-seed!</var> <var class="arg">SEED</var> <var class="dsssl">#!optional</var> <var class="arg">SIZE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Set seed for the PRNG from the at most <var class="arg">SIZE</var> bytes of <var class="arg">SEED</var>. which should be a byte vector or a string containing random data. If <var class="arg">SIZE</var> is not given, it defaults to the size of <var class="arg">SEED</var>. If <var class="arg">SIZE</var> (or the size of <var class="arg">SEED</var>) is below the required size of the random state used by the PRNG, then it will necessarily be initialized in a less random manner as possible.</p></dd></dl><h4 id="sec:pseudo-random-integer"><a href="#sec:pseudo-random-integer">pseudo-random-integer</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pseudo-random-integer"><span class="sig"><var class="id">pseudo-random-integer</var> <var class="arg">RANGE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a uniformly distributed pseudo random integer between 0 and <tt>RANGE-1</tt>, which may be a big integer.</p></dd></dl><h4 id="sec:pseudo-random-real"><a href="#sec:pseudo-random-real">pseudo-random-real</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pseudo-random-real"><span class="sig"><var class="id">pseudo-random-real</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a uniformly distributed pseudo-random inexact number between 0 and 1.</p></dd></dl><h4 id="sec:random-bytes"><a href="#sec:random-bytes">random-bytes</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:random-bytes"><span class="sig"><var class="id">random-bytes</var> <var class="dsssl">#!optional</var> <var class="arg">BUF</var> <var class="arg">SIZE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns random bytes from the available entropy source. If <var class="arg">BUF</var> is given, it should be a string or byte vector which will be filled with up to <var class="arg">SIZE</var> random bytes. <var class="arg">SIZE</var> defaults to the size of the <var class="arg">BUF</var> argument. If no arguments are given, <tt>random-bytes</tt> returns a freshly allocated byte vector of sufficient size to be used as a seed for <tt>set-pseudo-random-seed!</tt>.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20process-context%29.html">Module (chicken process-context)</a></p><p>Next: <a href="Module%20%28chicken%20read-syntax%29.html">Module (chicken read-syntax)</a></p></div></div></body></html>

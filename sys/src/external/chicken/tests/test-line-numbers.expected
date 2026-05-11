@@ -1,0 +1,23 @@
+
+Warning: Invalid argument
+  In file `test-line-numbers.scm:19',
+  In procedure `f',
+  In procedure call:
+
+    (scheme#+ 'a)
+
+  Argument #1 to procedure `+' has an invalid type:
+
+    symbol
+
+  The expected type is:
+
+    number
+
+  This is the expression:
+
+    'a
+
+  Procedure `+' from module `scheme' has this type:
+
+    (#!rest number -> number)

@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Using the interpreter</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Using_the_interpreter">Using the interpreter</a>
+<ul>
+<li><a href="#sec:Writing_Scheme_scripts">Writing Scheme scripts</a></li>
+<li><a href="#sec:Toplevel_commands">Toplevel commands</a></li>
+<li><a href="#sec:Getting_error_information">Getting error information</a></li>
+<li><a href="#sec:Running_an_external_editor">Running an external editor</a></li>
+<li><a href="#sec:History_access">History access</a></li>
+<li><a href="#sec:Auto-completion_and_editing">Auto-completion and editing</a></li>
+<li><a href="#sec:csi_command_line_format">csi command line format</a></li></ul></li></ul></div><h2 id="sec:Using_the_interpreter"><a href="#sec:Using_the_interpreter">Using the interpreter</a></h2><p>CHICKEN provides an interpreter named <tt>csi</tt> for evaluating Scheme programs and expressions interactively.</p><h3 id="sec:Writing_Scheme_scripts"><a href="#sec:Writing_Scheme_scripts">Writing Scheme scripts</a></h3><p>Since UNIX shells use the <tt>#!</tt> notation for starting scripts, anything following the characters <tt>#!</tt> is ignored, with the exception of the special symbols <tt>#!optional, #!key, #!rest</tt> and <tt>#!eof</tt>.</p><p>The easiest way is to use the <tt>-script</tt> option like this:</p><pre>% cat foo
+#! /usr/local/bin/csi -script
+(import (chicken port)
+        (chicken process-context))
+(print (eval (with-input-from-string
+                (car (command-line-arguments))
+                 read)))
+
+% chmod +x foo
+% ./foo &quot;(+ 3 4)&quot;
+7</pre><p>The parameter <tt>command-line-arguments</tt> is set to a list of the parameters that were passed to the Scheme script.  Scripts can be compiled to standalone executables.</p><p>CHICKEN supports writing shell scripts in Scheme for other platforms as well, using a slightly different approach. The first example would look like this on Windows:</p><pre>C:&gt;type foo.bat
+@;csibatch %0 %1 %2 %3 %4 %5 %6 %7 %8 %9
+(import (chicken port)
+        (chicken process-context))
+(print (eval (with-input-from-string
+                (car (command-line-arguments))
+                read)))
+
+C:&gt;foo &quot;(+ 3 4)&quot;
+7</pre><p>Like UNIX scripts, batch files can be compiled. Windows batch scripts do not accept more than 8 arguments.</p><p>Since it is sometimes useful to run a script in the interpreter without actually executing it (for example to test specific parts of it), the option <tt>-ss</tt> can be used as an alternative to <tt>-script</tt>. <tt>-ss PATHNAME</tt> is equivalent to <tt>-script PATHNAME</tt> but invokes <tt>(main (command-line-arguments))</tt> after loading all top-level forms of the script file. The result of <tt>main</tt> is returned as the exit status to the shell. Any non-numeric result exits with status zero:</p><pre>% cat hi.scm
+(define (main args)
+  (print &quot;Hi, &quot; (car args))
+  0)
+% csi -ss hi.scm you
+Hi, you
+% csi -q
+#;1&gt; ,l hi.scm
+#;2&gt; (main (list &quot;ye all&quot;))
+Hi, ye all
+0
+#;3&gt;</pre><p>When <tt>csi</tt> is started with the <tt>-script</tt> option, the feature identifier <tt>chicken-script</tt> is defined, so can conditionally execute code depending on whether the file is executed as a script or normally loaded into the interpreter, say for debugging purposes:</p>
+<pre class="highlight colorize">#!/bin/sh
+<span class="comment">#| demonstrates a slightly different way to run a script on UNIX systems
+exec csi -s &quot;$0&quot; &quot;$@&quot;
+|#</span>
+<span class="paren1">(<span class="default">import <span class="paren2">(<span class="default">chicken process-context</span>)</span></span>)</span>
+
+<span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> <span class="paren2">(<span class="default">main args</span>)</span> ...</span>)</span>
+
+<span class="paren1">(<span class="default">cond-expand
+  <span class="paren2">(<span class="default">chicken-script
+    <span class="paren3">(<span class="default">main <span class="paren4">(<span class="default">command-line-arguments</span>)</span></span>)</span></span>)</span>
+  <span class="paren2">(<span class="default">else</span>)</span></span>)</span></pre><p>See also the documentation for the <tt>-ss</tt> option above.</p><p>You can also have a look at <a href="http://wiki.call-cc.org/writing portable scripts">/writing portable scripts</a>.</p><h3 id="sec:Toplevel_commands"><a href="#sec:Toplevel_commands">Toplevel commands</a></h3><p>The toplevel loop understands a number of special commands:</p><dl><dt>,?</dt>
+<dd>Show summary of available toplevel commands.</dd><dt>,c</dt>
+<dd>Show call-trace items of the most recent error</dd><dt>,ch</dt>
+<dd>Clears stored expression results of previously evaluated expressions.</dd><dt>,d EXP</dt>
+<dd>Describe result of evaluated expression <tt>EXP</tt>.</dd><dt>,du EXP</dt>
+<dd>Dump contents of the result of evaluated expression <tt>EXP</tt>.</dd><dt>,dur EXP N</dt>
+<dd>Dump <tt>N</tt> bytes of the result of evaluated expression <tt>EXP</tt>.</dd><dt>,e FILENAME</dt>
+<dd>Runs an external editor to edit the given <tt>FILENAME</tt> (see below for more information).</dd><dt>,exn</dt>
+<dd>Describes the last exception that occurred and adds it to the result history (it can be accessed using the <tt>#</tt> notation).</dd><dt>,f N</dt>
+<dd>Select call-trace item with the given number, where the number <tt>0</tt> indicates the last item in the trace</dd><dt>,g NAME</dt>
+<dd>Returns the value of the local variable with the given name (which may be a symbol or string); you don't have to give the complete name - <tt>,g</tt> will return the first variable that matches the prefix given</dd><dt>,h</dt>
+<dd>Shows all previously evaluated expression results.</dd><dt>,l FILENAME ...</dt>
+<dd>Load files with given <tt>FILENAME</tt>s</dd><dt>,ln FILENAME ...</dt>
+<dd>Load files and print result(s) of each top-level expression.</dd><dt>,m MODULENAME</dt>
+<dd>switches the &quot;current module&quot; to <tt>MODULENAME</tt>, so expressions will be evaluated in the context of the given module.  To switch back to toplevel, use <tt>#f</tt> as a MODULENAME.  In compiled modules, only exported bindings will be visible to interactively entered code. In interpreted modules all bindings are visible.</dd><dt>,p EXP</dt>
+<dd>Pretty-print evaluated expression <tt>EXP</tt>.</dd><dt>,q</dt>
+<dd>Quit the interpreter.</dd><dt>,r</dt>
+<dd>Show system information.</dd><dt>,s TEXT ...</dt>
+<dd>Execute shell-command.</dd><dt>,t EXP</dt>
+<dd>Evaluate form and print elapsed time.</dd><dt>,x EXP</dt>
+<dd>Pretty-print macroexpanded expression <tt>EXP</tt> (the expression is not evaluated).</dd></dl>
+<p>You can define your own toplevel commands using the <tt>toplevel-command</tt> procedure (see <a href="Module%20%28chicken%20csi%29.html">Module (chicken csi)</a>).</p><h3 id="sec:Getting_error_information"><a href="#sec:Getting_error_information">Getting error information</a></h3><p>Interpreted code has some extended debugging information available that can be used to locate errors and obtain information about the lexical environment that was effective at the point of error. When an error occurs in an evaluated expression, a &quot;call trace&quot; is printed - the list of calls up to the error location. Note that this does not follow a stack model: it is merely a list of recently made procedure calls where the last one in the list is (probably) the call of whatever procedure was executing before the error happened. You can use the <tt>,c</tt> command to show the call-trace of the last error. Depending on whether compiled or interpreted code was executing and how much debugging information is available, the call trace shows trace-buffer entries of the following shape:</p><pre> &lt;frame-number&gt;:&lt;environment?&gt; &lt;mode&gt; &lt;procedure-name&gt; &lt;form&gt; </pre><p><tt>&lt;frame-number&gt;</tt> gives the number of the call-trace entry, counting from zero and beginning with the most recent entry. If a <tt>[]</tt> follows the frame-number, then this frame contains the lexical environment in effect when that procedure call took place. <tt>&lt;mode&gt;</tt> is optional and is either <tt>&lt;syntax&gt;</tt> or <tt>&lt;eval&gt;</tt> indicating whether this trace-buffer entry represents a syntax-expansion or an evaluation and is not given for compiled code. <tt>&lt;form&gt;</tt> is also only available for interpreted code and shows the procedure call expression, possibly following the name of the procedure containing the call expression.</p><p>If the trace-buffer entry contains lexical environment information then the complete environment of the call site is shown.</p><p>Use <tt>,f</tt> to select a frame by number, if you want to inspect the lexical environment of an earlier frame. The <tt>,g</tt> command lets you retrieve the value of a local or lexical variable from the currently selected frame. Note that the variables are renamed to simplify the variable lookup done internally by the interpreter.</p><h3 id="sec:Running_an_external_editor"><a href="#sec:Running_an_external_editor">Running an external editor</a></h3><p>The <tt>,e</tt> command runs the editor given by:</p><ul><li>The parameter <tt>editor-command</tt> in the <tt>(chicken csi)</tt> module should  return a string naming an external editor and defaults to <tt>#f</tt>, which means no editor is currently selected (so the following alternatives are tried).</li>
+<li>The contents of the environment variables <tt>EDITOR</tt> or <tt>VISUAL</tt>.</li>
+<li>If the environment variable <tt>EMACS</tt> is set, the editor chosen is <tt>emacsclient</tt>.</li>
+<li>In a desparate attempt to find an editor, <tt>vi</tt> is used.</li>
+</ul>
+<h3 id="sec:History_access"><a href="#sec:History_access">History access</a></h3><p>The interpreter toplevel accepts the special object <tt>#INDEX</tt> which returns the result of entry number <tt>INDEX</tt> in the history list. If the expression for that entry resulted in multiple values, the first result (or an unspecified value for no values) is returned. If no <tt>INDEX</tt> is given (and if a whitespace or closing paranthesis character follows the <tt>#</tt>, then the result of the last expression is returned.  Note that the value that <tt>#INDEX</tt> stands for is an expression, not a literal, and so is implicitly quoted, so</p><pre>#;1&gt; 123
+123
+#;2&gt; '(1 2 #)</pre><p>will not return the result you expected.</p><h3 id="sec:Auto-completion_and_editing"><a href="#sec:Auto-completion_and_editing">Auto-completion and editing</a></h3><p>On platforms that support it, it is possible to get auto-completion of symbols, history (over different <tt>csi</tt> sessions) and a more feature-full editor for the expressions you type using the <a href="http://wiki.call-cc.org/eggref/5/breadline">breadline</a> egg by Vasilij Schneidermann. It is very useful for interactive use of csi. See the egg's documentation on how to set it up. If readline is not available on your system consider using the self-contained <a href="http://wiki.call-cc.org/eggref/5/linenoise">linenoise</a> egg instead. It should work on almost any system but is not as feature-rich as readline (e.g. it lacks reverse-i-search and auto-completion).</p><h3 id="sec:csi_command_line_format"><a href="#sec:csi_command_line_format">csi command line format</a></h3><p><tt>csi {FILENAME|OPTION</tt>}</p><p>where <tt>FILENAME</tt> specifies a file with Scheme source-code.  If the extension of the source file is <tt>.scm</tt>, it may be omitted. The runtime options described in <a href="Using%20the%20compiler.html#sec:Compiler_command_line_format">Compiler command line format</a> are also available for the interpreter.  If the environment variable <tt>CSI_OPTIONS</tt> is set to a list of options, then these options are additionally passed to every direct or indirect invocation of <tt>csi</tt>. Please note that runtime options (like <tt>-:...</tt>) can not be passed using this method. The options recognized by the interpreter are:</p><dl><dt>--</dt>
+<dd>Ignore everything on the command-line following this marker. Runtime options (<tt>-:...</tt>) are still recognized.</dd><dt>-i  -case-insensitive</dt>
+<dd>Enables the reader to read symbols case insensitive. The default is to read case sensitive (in violation of R5RS).  This option registers the <tt>case-insensitive</tt> feature identifier.</dd><dt>-b  -batch</dt>
+<dd>Quit the interpreter after processing all command line options.</dd><dt>-e  -eval EXPRESSIONS</dt>
+<dd>Evaluate <tt>EXPRESSIONS</tt>. This option implies <tt>-batch</tt>, <tt>-no-init</tt> and <tt>-quiet</tt>, so no startup message will be printed and the interpreter exits after processing all <tt>-eval</tt> options and/or loading files given on the command-line.</dd><dt>-p  -print EXPRESSIONS</dt>
+<dd>Evaluate <tt>EXPRESSIONS</tt> and print the results of each expression using <tt>print</tt>. Implies <tt>-batch</tt>, <tt>-no-init</tt> and <tt>-quiet</tt>.</dd><dt>-P  -pretty-print EXPRESSIONS</dt>
+<dd>Evaluate <tt>EXPRESSIONS</tt> and print the results of each expression using <tt>pretty-print</tt>. Implies <tt>-batch</tt>, <tt>-no-init</tt> and <tt>-quiet</tt>.</dd><dt>-D  -feature SYMBOL</dt>
+<dd>Registers <tt>SYMBOL</tt> to be a valid feature identifier for <tt>cond-expand</tt> and <tt>feature?</tt>.</dd><dt>-h  -help</dt>
+<dd>Write a summary of the available command line options to standard output and exit.</dd><dt>-I  -include-path PATHNAME</dt>
+<dd>Specifies an alternative search-path for files included via the <tt>include</tt> special form. This option may be given multiple times. If the environment variable <tt>CHICKEN_INCLUDE_PATH</tt> is set, it should contain a list of alternative include pathnames separated by <tt>:</tt> (UNIX) or <tt>;</tt> (Windows).</dd><dt>-K  -keyword-style STYLE</dt>
+<dd>Enables alternative keyword syntax, where <tt>STYLE</tt> may be either <tt>prefix</tt> (as in Common Lisp) or <tt>suffix</tt> (as in DSSSL). Any other value is ignored.</dd><dt>-n  -no-init</dt>
+<dd>Do not load initialization-file. If this option is not given and the file <tt>$HOME/.csirc</tt> exists, then it is loaded before the read-eval-print loop commences.</dd><dt>-no-parentheses-synonyms</dt>
+<dd>Disables list delimiter synonyms, [..] and {...} for (...).</dd><dt>-no-symbol-escape</dt>
+<dd>Disables support for escaped symbols, the |...| form.</dd><dt>-w  -no-warnings</dt>
+<dd>Disables any warnings that might be issued by the reader or evaluated code.</dd><dt>-q  -quiet</dt>
+<dd>Do not print a startup message. Also disables generation of call-trace information for interpreted code.</dd><dt>-r5rs-syntax</dt>
+<dd>Disables the CHICKEN extensions to R5RS syntax. Does not disable non-standard read syntax.</dd><dt>-s  -script PATHNAME</dt>
+<dd>This is equivalent to <tt>-batch -quiet -no-init PATHNAME</tt>. Arguments following <tt>PATHNAME</tt> are available by using  <tt>command-line-arguments</tt> and are not processed as interpreter options. Extra options in the environment variable <tt>CSI_OPTIONS</tt> are ignored.</dd><dt>-sx PATHNAME</dt>
+<dd>The same as <tt>-s PATHNAME</tt> but prints each expression to <tt>(current-error-port)</tt> before it is evaluated.</dd><dt>-ss PATHNAME</dt>
+<dd>The same as <tt>-s PATHNAME</tt> but invokes the procedure <tt>main</tt> with the value of <tt>(command-line-arguments)</tt> as its single argument. If the main procedure returns an integer result, then the interpreter is terminated, returning the integer as the status code back to the invoking process. Any other result terminates the interpreter with a zero exit status.</dd><dt>-setup-mode</dt>
+<dd>When locating extensions, search the current directory first. By default, extensions are located first in the <i>extension repository</i>, where <tt>chicken-install</tt> stores compiled extensions and their associated metadata.</dd><dt>-R  -require-extension NAME</dt>
+<dd>Equivalent to evaluating <tt>(import NAME)</tt>. <tt>NAME</tt> may be given in list notation, e.g. <tt>&quot;(srfi 1)&quot;</tt>.</dd><dt>-v  -version</dt>
+<dd>Write the banner with version information to standard output and exit.</dd></dl>
+<hr /><p>Previous: <a href="Getting%20started.html">Getting started</a></p><p>Next: <a href="Using%20the%20compiler.html">Using the compiler</a></p></div></div></body></html>

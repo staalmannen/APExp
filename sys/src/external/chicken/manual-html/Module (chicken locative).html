@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken locative)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_locative.29">Module (chicken locative)</a>
+<ul>
+<li><a href="#sec:make-locative">make-locative</a></li>
+<li><a href="#sec:make-weak-locative">make-weak-locative</a></li>
+<li><a href="#sec:locative.3f">locative?</a></li>
+<li><a href="#sec:locative-ref">locative-ref</a></li>
+<li><a href="#sec:locative-set.21">locative-set!</a></li>
+<li><a href="#sec:locative-.3eobject">locative-&gt;object</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_locative.29"><a href="#sec:Module_.28chicken_locative.29">Module (chicken locative)</a></h2><p>A <i>locative</i> is an object that points to an element of a containing object, much like a <i>pointer</i> in low-level, imperative programming languages like <i>C</i>. The element can be accessed and changed indirectly, by performing access or change operations on the locative. The container object can be computed by calling the <tt>locative-&gt;object</tt> procedure.</p><p>Locatives may be passed to foreign procedures that expect pointer arguments.</p><p>The following procedures are provided by the <tt>(chicken locative)</tt> module.</p><h3 id="sec:make-locative"><a href="#sec:make-locative">make-locative</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:make-locative"><span class="sig"><var class="id">make-locative</var> <var class="arg">OBJ</var> <var class="dsssl">#!optional</var> <var class="arg">INDEX</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Creates a locative that refers to the element of the non-immediate object <var class="arg">OBJ</var> at position <var class="arg">INDEX</var>. <var class="arg">OBJ</var> may be a vector, pair, string, blob, SRFI-4 number-vector, or record structure. <var class="arg">INDEX</var> should be a fixnum. <var class="arg">INDEX</var> defaults to 0.</p></dd></dl><h3 id="sec:make-weak-locative"><a href="#sec:make-weak-locative">make-weak-locative</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:make-weak-locative"><span class="sig"><var class="id">make-weak-locative</var> <var class="arg">OBJ</var> <var class="dsssl">#!optional</var> <var class="arg">INDEX</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Creates a <i>weak</i> locative. Even though the locative refers to an element of a container object, the container object will still be reclaimed by garbage collection if no other references to it exist.</p></dd></dl><h3 id="sec:locative.3f"><a href="#sec:locative.3f">locative?</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:locative.3f"><span class="sig"><var class="id">locative?</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">X</var> is a locative, or <tt>#f</tt> otherwise.</p></dd></dl><h3 id="sec:locative-ref"><a href="#sec:locative-ref">locative-ref</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:locative-ref"><span class="sig"><var class="id">locative-ref</var> <var class="arg">LOC</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the element to which the locative <var class="arg">LOC</var> refers. If the containing object has been reclaimed by garbage collection, an error is signalled.</p><pre>(locative-ref (make-locative &quot;abc&quot; 1)) ==&gt; #\b</pre></dd></dl><h3 id="sec:locative-set.21"><a href="#sec:locative-set.21">locative-set!</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:locative-set.21"><span class="sig"><var class="id">locative-set!</var> <var class="arg">LOC</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><var class="dsssl">set!</var> (<var class="id">locative-ref</var> <var class="arg">LOC</var>) <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Changes the element to which the locative <var class="arg">LOC</var> refers to <var class="arg">X</var>. If the containing object has been reclaimed by garbage collection, an error is signalled.</p></dd></dl><h3 id="sec:locative-.3eobject"><a href="#sec:locative-.3eobject">locative-&gt;object</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:locative-.3eobject"><span class="sig"><var class="id">locative-&gt;object</var> <var class="arg">LOC</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the object that contains the element referred to by <var class="arg">LOC</var> or <tt>#f</tt> if the container has been reclaimed by garbage collection.</p><pre>(locative-&gt;object (make-locative &quot;abc&quot; 1)) ==&gt; &quot;abc&quot;</pre></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20load%29.html">Module (chicken load)</a></p><p>Next: <a href="Module%20%28chicken%20memory%29.html">Module (chicken memory)</a></p></div></div></body></html>

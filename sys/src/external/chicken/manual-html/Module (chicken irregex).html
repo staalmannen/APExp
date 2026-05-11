@@ -1,0 +1,377 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken irregex)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_irregex.29">Module (chicken irregex)</a>
+<ul>
+<li><a href="#sec:Procedures">Procedures</a>
+<ul>
+<li><a href="#sec:irregex">irregex</a></li>
+<li><a href="#sec:string-.3eirregex">string-&gt;irregex</a></li>
+<li><a href="#sec:sre-.3eirregex">sre-&gt;irregex</a></li>
+<li><a href="#sec:string-.3esre">string-&gt;sre</a></li>
+<li><a href="#sec:maybe-string-.3esre">maybe-string-&gt;sre</a></li>
+<li><a href="#sec:glob-.3esre">glob-&gt;sre</a></li>
+<li><a href="#sec:irregex.3f">irregex?</a></li>
+<li><a href="#sec:irregex-search">irregex-search</a></li>
+<li><a href="#sec:irregex-match">irregex-match</a></li>
+<li><a href="#sec:irregex-match.3f">irregex-match?</a></li>
+<li><a href="#sec:irregex-match-data.3f">irregex-match-data?</a></li>
+<li><a href="#sec:irregex-num-submatches">irregex-num-submatches</a></li>
+<li><a href="#sec:irregex-match-num-submatches">irregex-match-num-submatches</a></li>
+<li><a href="#sec:irregex-names">irregex-names</a></li>
+<li><a href="#sec:irregex-match-names">irregex-match-names</a></li>
+<li><a href="#sec:irregex-match-valid-index.3f">irregex-match-valid-index?</a></li>
+<li><a href="#sec:irregex-match-substring">irregex-match-substring</a></li>
+<li><a href="#sec:irregex-match-start-index">irregex-match-start-index</a></li>
+<li><a href="#sec:irregex-match-end-index">irregex-match-end-index</a></li>
+<li><a href="#sec:irregex-match-subchunk">irregex-match-subchunk</a></li>
+<li><a href="#sec:irregex-match-start-chunk">irregex-match-start-chunk</a></li>
+<li><a href="#sec:irregex-match-end-chunk">irregex-match-end-chunk</a></li>
+<li><a href="#sec:irregex-replace">irregex-replace</a></li>
+<li><a href="#sec:irregex-replace.2fall">irregex-replace/all</a></li>
+<li><a href="#sec:irregex-split">irregex-split</a></li>
+<li><a href="#sec:irregex-extract">irregex-extract</a></li>
+<li><a href="#sec:irregex-fold">irregex-fold</a></li></ul></li>
+<li><a href="#sec:Extended_SRE_Syntax">Extended SRE Syntax</a>
+<ul>
+<li><a href="#sec:Basic_SRE_Patterns">Basic SRE Patterns</a></li>
+<li><a href="#sec:SRE_Repetition_Patterns">SRE Repetition Patterns</a></li>
+<li><a href="#sec:SRE_Character_Sets">SRE Character Sets</a></li>
+<li><a href="#sec:SRE_Assertion_Patterns">SRE Assertion Patterns</a></li>
+<li><a href="#sec:SRE_Utility_Patterns">SRE Utility Patterns</a></li></ul></li>
+<li><a href="#sec:Supported_PCRE_Syntax">Supported PCRE Syntax</a></li>
+<li><a href="#sec:Chunked_String_Matching">Chunked String Matching</a>
+<ul>
+<li><a href="#sec:make-irregex-chunker">make-irregex-chunker</a></li>
+<li><a href="#sec:irregex-search.2fchunked">irregex-search/chunked</a></li>
+<li><a href="#sec:irregex-match.2fchunked">irregex-match/chunked</a></li>
+<li><a href="#sec:irregex-fold.2fchunked">irregex-fold/chunked</a></li></ul></li>
+<li><a href="#sec:Utilities">Utilities</a>
+<ul>
+<li><a href="#sec:irregex-quote">irregex-quote</a></li>
+<li><a href="#sec:irregex-opt">irregex-opt</a></li>
+<li><a href="#sec:sre-.3estring">sre-&gt;string</a></li></ul></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_irregex.29"><a href="#sec:Module_.28chicken_irregex.29">Module (chicken irregex)</a></h2><p>This module provides support for regular expressions, using the powerful <i>irregex</i> regular expression engine by Alex Shinn.  It supports both POSIX syntax with various (irregular) PCRE extensions, as well as SCSH's SRE syntax, with various aliases for commonly used patterns.  DFA matching is used when possible, otherwise a closure-compiled NFA approach is used.  Matching may be performed over standard Scheme strings, or over arbitrarily chunked streams of strings.</p><p>On systems that support dynamic loading, the <tt>irregex</tt> module can be made available in the CHICKEN interpreter (<tt>csi</tt>) by entering</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">import <span class="paren2">(<span class="default">chicken irregex</span>)</span></span>)</span></pre><h3 id="sec:Procedures"><a href="#sec:Procedures">Procedures</a></h3><h4 id="sec:irregex"><a href="#sec:irregex">irregex</a></h4><h4 id="sec:string-.3eirregex"><a href="#sec:string-.3eirregex">string-&gt;irregex</a></h4><h4 id="sec:sre-.3eirregex"><a href="#sec:sre-.3eirregex">sre-&gt;irregex</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:irregex"><span class="sig"><tt>(irregex &lt;posix-string-or-sre&gt; [&lt;options&gt; ...])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:string-.3eirregex"><span class="sig"><tt>(string-&gt;irregex &lt;posix-string&gt; [&lt;options&gt; ...])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:sre-.3eirregex"><span class="sig"><tt>(sre-&gt;irregex &lt;sre&gt; [&lt;options&gt; ...])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Compiles a regular expression from either a POSIX-style regular expression string (with most PCRE extensions) or an SCSH-style SRE. There is no <tt>(rx ...)</tt> syntax - just use normal Scheme lists, with <tt>quasiquote</tt> if you like.</p><p>Technically a string by itself could be considered a valid (though rather silly) SRE, so if you want to just match a literal string you should use something like <tt>(irregex `(: ,str))</tt>, or use the explicit <tt>(sre-&gt;irregex str)</tt>.</p><p>The options are a list of any of the following symbols:</p><dl><dt><tt>'i</tt>, <tt>'case-insensitive</tt></dt>
+<dd>match case-insensitively</dd><dt><tt>'m</tt>, <tt>'multi-line</tt></dt>
+<dd>treat string as multiple lines (effects <tt>^</tt> and <tt>$</tt>)</dd><dt><tt>'s</tt>, <tt>'single-line</tt></dt>
+<dd>treat string as a single line (<tt>.</tt> can match newline)</dd><dt><tt>'utf8</tt></dt>
+<dd>utf8-mode (assumes strings are byte-strings)</dd><dt><tt>'fast</tt></dt>
+<dd>try to optimize the regular expression</dd><dt><tt>'small</tt></dt>
+<dd>try to compile a smaller regular expression</dd><dt><tt>'backtrack</tt></dt>
+<dd>enforce a backtracking implementation</dd></dl>
+<p>The <tt>'fast</tt> and <tt>'small</tt> options are heuristic guidelines and will not necessarily make the compiled expression faster or smaller.</p></dd></dl><h4 id="sec:string-.3esre"><a href="#sec:string-.3esre">string-&gt;sre</a></h4><h4 id="sec:maybe-string-.3esre"><a href="#sec:maybe-string-.3esre">maybe-string-&gt;sre</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:string-.3esre"><span class="sig"><var class="id">string-&gt;sre</var> <var class="arg">&lt;str&gt;</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:maybe-string-.3esre"><span class="sig"><var class="id">maybe-string-&gt;sre</var> <var class="arg">&lt;obj&gt;</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>For backwards compatibility, procedures to convert a POSIX string into an SRE.</p><p><tt>maybe-string-&gt;sre</tt> does the same thing, but only if the argument is a string, otherwise it assumes <var class="arg">&lt;obj&gt;</var> is an SRE and returns it as-is.  This is useful when you want to provide an API that allows either a POSIX string or SRE (like <tt>irregex</tt> or <tt>irregex-search</tt> below) - it ensures the result is an SRE.</p></dd></dl><h4 id="sec:glob-.3esre"><a href="#sec:glob-.3esre">glob-&gt;sre</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:glob-.3esre"><span class="sig"><var class="id">glob-&gt;sre</var> <var class="arg">&lt;str&gt;</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Converts a basic shell-style glob to an SRE which matches only strings which the glob would match.  The glob characters <tt>[</tt>, <tt>]</tt> <tt>*</tt> and <tt>?</tt>  are supported.</p></dd></dl><h4 id="sec:irregex.3f"><a href="#sec:irregex.3f">irregex?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:irregex.3f"><span class="sig"><var class="id">irregex?</var> <var class="arg">&lt;obj&gt;</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> iff the object is a regular expression.</p></dd></dl><h4 id="sec:irregex-search"><a href="#sec:irregex-search">irregex-search</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:irregex-search"><span class="sig"><tt>(irregex-search &lt;irx&gt; &lt;str&gt; [&lt;start&gt; &lt;end&gt;])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Searches for any instances of the pattern <tt>&lt;irx&gt;</tt> (a POSIX string, SRE sexp, or pre-compiled regular expression) in <tt>&lt;str&gt;</tt>, optionally between the given range.  If a match is found, returns a match object, otherwise returns <tt>#f</tt>.</p><p>Match objects can be used to query the original range of the string or its submatches using the <tt>irregex-match-*</tt> procedures below.</p><p>Examples:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">irregex-search <span class="string">&quot;foobar&quot;</span> <span class="string">&quot;abcFOOBARdef&quot;</span></span>)</span> =&gt; #f
+
+<span class="paren1">(<span class="default">irregex-search <span class="paren2">(<span class="default">irregex <span class="string">&quot;foobar&quot;</span> &#x27;i</span>)</span> <span class="string">&quot;abcFOOBARdef&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default">w/nocase <span class="string">&quot;foobar&quot;</span></span>)</span> <span class="string">&quot;abcFOOBARdef&quot;</span></span>)</span> =&gt; #&lt;match&gt;</pre><p>Note, the actual match result is represented by a vector in the default implementation.  Throughout this manual, we'll just write <tt>#&lt;match&gt;</tt> to show that a successful match was returned when the details are not important.</p><p>Matching follows the POSIX leftmost, longest semantics, when searching.  That is, of all possible matches in the string, <tt>irregex-search</tt> will return the match at the first position (leftmost).  If multiple matches are possible from that same first position, the longest match is returned.</p></dd></dl><h4 id="sec:irregex-match"><a href="#sec:irregex-match">irregex-match</a></h4><h4 id="sec:irregex-match.3f"><a href="#sec:irregex-match.3f">irregex-match?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:irregex-match"><span class="sig"><tt>(irregex-match &lt;irx&gt; &lt;str&gt; [&lt;start&gt; &lt;end&gt;])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:irregex-match.3f"><span class="sig"><tt>(irregex-match? &lt;irx&gt; &lt;str&gt; [&lt;start&gt; &lt;end&gt;])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Like <tt>irregex-search</tt>, but performs an anchored match against the beginning and end of the substring specified by <tt>&lt;start&gt;</tt> and <tt>&lt;end&gt;</tt>, without searching.</p><p>Where <tt>irregex-match</tt> returns a match object, <tt>irregex-match?</tt> just returns a boolean indicating whether it matched or not.</p><p>Examples:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">irregex-match &#x27;<span class="paren2">(<span class="default">w/nocase <span class="string">&quot;foobar&quot;</span></span>)</span> <span class="string">&quot;abcFOOBARdef&quot;</span></span>)</span> =&gt; #f
+
+<span class="paren1">(<span class="default">irregex-match &#x27;<span class="paren2">(<span class="default">w/nocase <span class="string">&quot;foobar&quot;</span></span>)</span> <span class="string">&quot;FOOBAR&quot;</span></span>)</span> =&gt; #&lt;match&gt;</pre></dd></dl><h4 id="sec:irregex-match-data.3f"><a href="#sec:irregex-match-data.3f">irregex-match-data?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:irregex-match-data.3f"><span class="sig"><var class="id">irregex-match-data?</var> <var class="arg">&lt;obj&gt;</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> iff the object is a successful match result from <tt>irregex-search</tt> or <tt>irregex-match</tt>.</p></dd></dl><h4 id="sec:irregex-num-submatches"><a href="#sec:irregex-num-submatches">irregex-num-submatches</a></h4><h4 id="sec:irregex-match-num-submatches"><a href="#sec:irregex-match-num-submatches">irregex-match-num-submatches</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:irregex-num-submatches"><span class="sig"><var class="id">irregex-num-submatches</var> <var class="arg">&lt;irx&gt;</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:irregex-match-num-submatches"><span class="sig"><var class="id">irregex-match-num-submatches</var> <var class="arg">&lt;match&gt;</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the number of numbered submatches that are defined in the irregex or match object.</p></dd></dl><h4 id="sec:irregex-names"><a href="#sec:irregex-names">irregex-names</a></h4><h4 id="sec:irregex-match-names"><a href="#sec:irregex-match-names">irregex-match-names</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:irregex-names"><span class="sig"><var class="id">irregex-names</var> <var class="arg">&lt;irx&gt;</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:irregex-match-names"><span class="sig"><var class="id">irregex-match-names</var> <var class="arg">&lt;match&gt;</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns an association list of named submatches that are defined in the irregex or match object.  The <tt>car</tt> of each item in this list is the name of a submatch, the <tt>cdr</tt> of each item is the numerical submatch corresponding to this name.  If a named submatch occurs multiple times in the irregex, it will also occur multiple times in this list.</p></dd></dl><h4 id="sec:irregex-match-valid-index.3f"><a href="#sec:irregex-match-valid-index.3f">irregex-match-valid-index?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:irregex-match-valid-index.3f"><span class="sig"><var class="id">irregex-match-valid-index?</var> <var class="arg">&lt;match&gt;</var> <var class="arg">&lt;index-or-name&gt;</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> iff the <tt>index-or-name</tt> named submatch or index is defined in the <tt>match</tt> object.</p></dd></dl><h4 id="sec:irregex-match-substring"><a href="#sec:irregex-match-substring">irregex-match-substring</a></h4><h4 id="sec:irregex-match-start-index"><a href="#sec:irregex-match-start-index">irregex-match-start-index</a></h4><h4 id="sec:irregex-match-end-index"><a href="#sec:irregex-match-end-index">irregex-match-end-index</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:irregex-match-substring"><span class="sig"><var class="id">irregex-match-substring</var> <var class="arg">&lt;match&gt;</var> <var class="dsssl">#!optional</var> <var class="arg">&lt;index-or-name&gt;</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:irregex-match-start-index"><span class="sig"><var class="id">irregex-match-start-index</var> <var class="arg">&lt;match&gt;</var> <var class="dsssl">#!optional</var> <var class="arg">&lt;index-or-name&gt;</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:irregex-match-end-index"><span class="sig"><var class="id">irregex-match-end-index</var> <var class="arg">&lt;match&gt;</var> <var class="dsssl">#!optional</var> <var class="arg">&lt;index-or-name&gt;</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Fetches the matched substring (or its start or end offset) at the given submatch index, or named submatch.  The entire match is index 0, the first 1, etc.  The default is index 0.</p><p>Returns <tt>#f</tt> if the given submatch did not match the source string (can happen when you have the submatch inside an <tt>or</tt> alternative, for example).</p></dd></dl><h4 id="sec:irregex-match-subchunk"><a href="#sec:irregex-match-subchunk">irregex-match-subchunk</a></h4><h4 id="sec:irregex-match-start-chunk"><a href="#sec:irregex-match-start-chunk">irregex-match-start-chunk</a></h4><h4 id="sec:irregex-match-end-chunk"><a href="#sec:irregex-match-end-chunk">irregex-match-end-chunk</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:irregex-match-subchunk"><span class="sig"><var class="id">irregex-match-subchunk</var> <var class="arg">&lt;match&gt;</var> <var class="dsssl">#!optional</var> <var class="arg">&lt;index-or-name&gt;</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:irregex-match-start-chunk"><span class="sig"><var class="id">irregex-match-start-chunk</var> <var class="arg">&lt;match&gt;</var> <var class="dsssl">#!optional</var> <var class="arg">&lt;index-or-name&gt;</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:irregex-match-end-chunk"><span class="sig"><var class="id">irregex-match-end-chunk</var> <var class="arg">&lt;match&gt;</var> <var class="dsssl">#!optional</var> <var class="arg">&lt;index-or-name&gt;</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Access the chunks delimiting the submatch index, or named submatch.</p><p><tt>irregex-match-subchunk</tt> generates a chunked data-type for the given match item, of the same type as the underlying chunk type (see Chunked String Matching below).  This is only available if the chunk type specifies the get-subchunk API, otherwise an error is raised.</p><p>Returns <tt>#f</tt> if the given submatch did not match the source string (can happen when you have the submatch inside an <tt>or</tt> alternative, for example).</p></dd></dl><h4 id="sec:irregex-replace"><a href="#sec:irregex-replace">irregex-replace</a></h4><h4 id="sec:irregex-replace.2fall"><a href="#sec:irregex-replace.2fall">irregex-replace/all</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:irregex-replace"><span class="sig"><tt>(irregex-replace &lt;irx&gt; &lt;str&gt; [&lt;replacements&gt; ...])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:irregex-replace.2fall"><span class="sig"><tt>(irregex-replace/all &lt;irx&gt; &lt;str&gt; [&lt;replacements&gt; ...])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Matches a pattern in a string, and replaces it with a (possibly empty) list of substitutions.  Each <tt>&lt;replacement&gt;</tt> can be either a string literal, a numeric index, a symbol (as a named submatch), or a procedure which takes one argument (the match object) and returns a string.</p><p>Examples:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">irregex-replace <span class="string">&quot;[aeiou]&quot;</span> <span class="string">&quot;hello world&quot;</span> <span class="string">&quot;*&quot;</span></span>)</span> =&gt; <span class="string">&quot;h*llo world&quot;</span>
+
+<span class="paren1">(<span class="default">irregex-replace/all <span class="string">&quot;[aeiou]&quot;</span> <span class="string">&quot;hello world&quot;</span> <span class="string">&quot;*&quot;</span></span>)</span> =&gt; <span class="string">&quot;h*ll* w*rld&quot;</span>
+
+<span class="paren1">(<span class="default">irregex-replace/all &#x27;<span class="paren2">(<span class="default">* <span class="string">&quot;foo &quot;</span></span>)</span> <span class="string">&quot;foo foo platter&quot;</span> <span class="string">&quot;*&quot;</span></span>)</span> =&gt; <span class="string">&quot;**p*l*a*t*t*e*r&quot;</span>
+
+<span class="paren1">(<span class="default">irregex-replace <span class="string">&quot;(.)(.)&quot;</span> <span class="string">&quot;ab&quot;</span> 2 1 <span class="string">&quot;*&quot;</span></span>)</span>  =&gt; <span class="string">&quot;ba*&quot;</span>
+
+<span class="paren1">(<span class="default">irregex-replace <span class="string">&quot;...bar&quot;</span> <span class="string">&quot;xxfoobar&quot;</span> <span class="paren2">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren3">(<span class="default">m</span>)</span> 
+              <span class="paren3">(<span class="default">string-reverse <span class="paren4">(<span class="default">irregex-match-substring m</span>)</span></span>)</span></span>)</span></span>)</span> =&gt; <span class="string">&quot;xxraboof&quot;</span>
+
+<span class="paren1">(<span class="default">irregex-replace <span class="string">&quot;(...)(bar)&quot;</span> <span class="string">&quot;xxfoobar&quot;</span>  2 <span class="paren2">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren3">(<span class="default">m</span>)</span> 
+              <span class="paren3">(<span class="default">string-reverse <span class="paren4">(<span class="default">irregex-match-substring m 1</span>)</span></span>)</span></span>)</span></span>)</span> =&gt; <span class="string">&quot;xxbaroof&quot;</span></pre></dd></dl><h4 id="sec:irregex-split"><a href="#sec:irregex-split">irregex-split</a></h4><h4 id="sec:irregex-extract"><a href="#sec:irregex-extract">irregex-extract</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:irregex-split"><span class="sig"><tt>(irregex-split &lt;irx&gt; &lt;str&gt; [&lt;start&gt; &lt;end&gt;])</tt></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:irregex-extract"><span class="sig"><tt>(irregex-extract &lt;irx&gt; &lt;str&gt; [&lt;start&gt; &lt;end&gt;])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p><tt>irregex-split</tt> splits the string <tt>&lt;str&gt;</tt> into substrings divided by the pattern in <tt>&lt;irx&gt;</tt>.  <tt>irregex-extract</tt> does the opposite, returning a list of each instance of the pattern matched disregarding the substrings in between.</p><p>Empty matches will result in subsequent single character string in <tt>irregex-split</tt>, or empty strings in <tt>irregex-extract</tt>.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">irregex-split <span class="string">&quot;[aeiou]*&quot;</span> <span class="string">&quot;foobarbaz&quot;</span></span>)</span> =&gt; &#x27;<span class="paren1">(<span class="default"><span class="string">&quot;f&quot;</span> <span class="string">&quot;b&quot;</span> <span class="string">&quot;r&quot;</span> <span class="string">&quot;b&quot;</span> <span class="string">&quot;z&quot;</span></span>)</span>
+
+<span class="paren1">(<span class="default">irregex-extract <span class="string">&quot;[aeiou]*&quot;</span> <span class="string">&quot;foobarbaz&quot;</span></span>)</span> =&gt; &#x27;<span class="paren1">(<span class="default"><span class="string">&quot;&quot;</span> <span class="string">&quot;oo&quot;</span> <span class="string">&quot;&quot;</span> <span class="string">&quot;a&quot;</span> <span class="string">&quot;&quot;</span> <span class="string">&quot;&quot;</span> <span class="string">&quot;a&quot;</span> <span class="string">&quot;&quot;</span></span>)</span></pre></dd></dl><h4 id="sec:irregex-fold"><a href="#sec:irregex-fold">irregex-fold</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:irregex-fold"><span class="sig"><tt>(irregex-fold &lt;irx&gt; &lt;kons&gt; &lt;knil&gt; &lt;str&gt; [&lt;finish&gt; &lt;start&gt; &lt;end&gt;])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>This performs a fold operation over every non-overlapping place <tt>&lt;irx&gt;</tt> occurs in the string <tt>str</tt>.</p><p>The <tt>&lt;kons&gt;</tt> procedure takes the following signature:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">&lt;kons&gt; &lt;from-index&gt; &lt;match&gt; &lt;seed&gt;</span>)</span></pre><p>where <tt>&lt;from-index&gt;</tt> is the index from where we started searching (initially <tt>&lt;start&gt;</tt> and thereafter the end index of the last match), <tt>&lt;match&gt;</tt> is the resulting match-data object, and <tt>&lt;seed&gt;</tt> is the accumulated fold result starting with <tt>&lt;knil&gt;</tt>.</p><p>The rationale for providing the <tt>&lt;from-index&gt;</tt> (which is not provided in the SCSH <tt>regexp-fold</tt> utility), is because this information is useful (e.g. for extracting the unmatched portion of the string before the current match, as needed in <tt>irregex-replace/all</tt>), and not otherwise directly accessible.</p><p>Note when the pattern matches an empty string, to avoid an infinite loop we continue from one char after the end of the match (as opposed to the end in the normal case).  The <tt>&lt;from-index&gt;</tt> passed to the subsequent \scheme{&lt;kons&gt;} or <tt>&lt;finish&gt;</tt> still refers to the original previous match end, however, so <tt>irregex-split</tt> and <tt>irregex-replace/all</tt>, etc. do the right thing.</p><p>The optional <tt>&lt;finish&gt;</tt> takes two arguments:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">&lt;finish&gt; &lt;from-index&gt; &lt;seed&gt;</span>)</span></pre><p>which simiarly allows you to pick up the unmatched tail of the string, and defaults to just returning the <tt>&lt;seed&gt;</tt>.</p><p><tt>&lt;start&gt;</tt> and <tt>&lt;end&gt;</tt> are numeric indices letting you specify the boundaries of the string on which you want to fold.</p><p>To extract all instances of a match out of a string, you can use</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">map irregex-match-substring
+     <span class="paren2">(<span class="default">irregex-fold &lt;irx&gt;
+                   <span class="paren3">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren4">(<span class="default">i m s</span>)</span> <span class="paren4">(<span class="default">cons m s</span>)</span></span>)</span>
+		   &#x27;<span class="paren3">(<span class="default"></span>)</span>
+		   &lt;str&gt;
+		   <span class="paren3">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren4">(<span class="default">i s</span>)</span> <span class="paren4">(<span class="default">reverse s</span>)</span></span>)</span></span>)</span></span>)</span></pre><p>Note if an empty match is found <tt>&lt;kons&gt;</tt> will be called on that empty string, and to avoid an infinite loop matching will resume at the next char.  It is up to the programmer to do something sensible with the skipped char in this case.</p></dd></dl><h3 id="sec:Extended_SRE_Syntax"><a href="#sec:Extended_SRE_Syntax">Extended SRE Syntax</a></h3><p>Irregex provides the first native implementation of SREs (Scheme Regular Expressions), and includes many extensions necessary both for minimal POSIX compatibility, as well as for modern extensions found in libraries such as PCRE.</p><p>The following table summarizes the SRE syntax, with detailed explanations following.</p><pre> ;; basic patterns
+ &lt;string&gt;                          ; literal string
+ (seq &lt;sre&gt; ...)                   ; sequence
+ (: &lt;sre&gt; ...)
+ (or &lt;sre&gt; ...)                    ; alternation
+ 
+ ;; optional/multiple patterns
+ (? &lt;sre&gt; ...)                     ; 0 or 1 matches
+ (* &lt;sre&gt; ...)                     ; 0 or more matches
+ (+ &lt;sre&gt; ...)                     ; 1 or more matches
+ (= &lt;n&gt; &lt;sre&gt; ...)                 ; exactly &lt;n&gt; matches
+ (&gt;= &lt;n&gt; &lt;sre&gt; ...)                ; &lt;n&gt; or more matches
+ (** &lt;from&gt; &lt;to&gt; &lt;sre&gt; ...)        ; &lt;n&gt; to &lt;m&gt; matches
+ (?? &lt;sre&gt; ...)                    ; non-greedy (non-greedy) pattern: (0 or 1)
+ (*? &lt;sre&gt; ...)                    ; non-greedy kleene star
+ (**? &lt;from&gt; &lt;to&gt; &lt;sre&gt; ...)       ; non-greedy range
+ 
+ ;; submatch patterns
+ (submatch &lt;sre&gt; ...)              ; numbered submatch
+ ($ &lt;sre&gt; ...)
+ (submatch-named &lt;name&gt; &lt;sre&gt; ...) ; named submatch
+ (=&gt; &lt;name&gt; &lt;sre&gt; ...)
+ (backref &lt;n-or-name&gt;)             ; match a previous submatch
+ 
+ ;; toggling case-sensitivity
+ (w/case &lt;sre&gt; ...)                ; enclosed &lt;sre&gt;s are case-sensitive
+ (w/nocase &lt;sre&gt; ...)              ; enclosed &lt;sre&gt;s are case-insensitive
+ 
+ ;; character sets
+ &lt;char&gt;                            ; singleton char set
+ (&lt;string&gt;)                        ; set of chars
+ (or &lt;cset-sre&gt; ...)               ; set union
+ (~ &lt;cset-sre&gt; ...)                ; set complement (i.e. [^...])
+ (- &lt;cset-sre&gt; ...)                ; set difference
+ (&amp; &lt;cset-sre&gt; ...)                ; set intersection
+ (/ &lt;range-spec&gt; ...)              ; pairs of chars as ranges
+ 
+ ;; named character sets
+ any
+ nonl
+ ascii
+ lower-case     lower
+ upper-case     upper
+ alphabetic     alpha
+ numeric        num
+ alphanumeric   alphanum  alnum
+ punctuation    punct
+ graphic        graph
+ whitespace     white     space
+ printing       print
+ control        cntrl
+ hex-digit      xdigit
+ 
+ ;; assertions and conditionals
+ bos eos                           ; beginning/end of string
+ bol eol                           ; beginning/end of line
+ bow eow                           ; beginning/end of word
+ nwb                               ; non-word-boundary
+ (look-ahead &lt;sre&gt; ...)            ; zero-width look-ahead assertion
+ (look-behind &lt;sre&gt; ...)           ; zero-width look-behind assertion
+ (neg-look-ahead &lt;sre&gt; ...)        ; zero-width negative look-ahead assertion
+ (neg-look-behind &lt;sre&gt; ...)       ; zero-width negative look-behind assertion
+ (atomic &lt;sre&gt; ...)                ; for (?&gt;...) independent patterns
+ (if &lt;test&gt; &lt;pass&gt; [&lt;fail&gt;])       ; conditional patterns
+ commit                            ; don't backtrack beyond this (i.e. cut)
+ 
+ ;; backwards compatibility
+ (posix-string &lt;string&gt;)           ; embed a POSIX string literal</pre><h4 id="sec:Basic_SRE_Patterns"><a href="#sec:Basic_SRE_Patterns">Basic SRE Patterns</a></h4><p>The simplest SRE is a literal string, which matches that string exactly.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">irregex-search <span class="string">&quot;needle&quot;</span> <span class="string">&quot;hayneedlehay&quot;</span></span>)</span> =&gt; #&lt;match&gt;</pre><p>By default the match is case-sensitive, though you can control this either with the compiler flags or local overrides:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">irregex-search <span class="string">&quot;needle&quot;</span> <span class="string">&quot;haynEEdlehay&quot;</span></span>)</span> =&gt; #f
+
+<span class="paren1">(<span class="default">irregex-search <span class="paren2">(<span class="default">irregex <span class="string">&quot;needle&quot;</span> &#x27;i</span>)</span> <span class="string">&quot;haynEEdlehay&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default">w/nocase <span class="string">&quot;needle&quot;</span></span>)</span> <span class="string">&quot;haynEEdlehay&quot;</span></span>)</span> =&gt; #&lt;match&gt;</pre><p>You can use <tt>w/case</tt> to switch back to case-sensitivity inside a <tt>w/nocase</tt> or when the SRE was compiled with <tt>'i</tt>:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default">w/nocase <span class="string">&quot;SMALL&quot;</span> <span class="paren3">(<span class="default">w/case <span class="string">&quot;BIG&quot;</span></span>)</span></span>)</span> <span class="string">&quot;smallBIGsmall&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default">w/nocase <span class="string">&quot;small&quot;</span> <span class="paren3">(<span class="default">w/case <span class="string">&quot;big&quot;</span></span>)</span></span>)</span> <span class="string">&quot;smallBIGsmall&quot;</span></span>)</span> =&gt; #f</pre><p><i>Important:</i> characters outside the ASCII range (ie, UTF8 chars) are <b>not</b> matched case insensitively!</p><p>Of course, literal strings by themselves aren't very interesting regular expressions, so we want to be able to compose them.  The most basic way to do this is with the <tt>seq</tt> operator (or its abbreviation <tt>:</tt>), which matches one or more patterns consecutively:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="string">&quot;one&quot;</span> space <span class="string">&quot;two&quot;</span> space <span class="string">&quot;three&quot;</span></span>)</span> <span class="string">&quot;one two three&quot;</span></span>)</span> =&gt; #&lt;match&gt;</pre><p>As you may have noticed above, the <tt>w/case</tt> and <tt>w/nocase</tt> operators allowed multiple SREs in a sequence - other operators that take any number of arguments (e.g. the repetition operators below) allow such implicit sequences.</p><p>To match any one of a set of patterns use the <tt>or</tt> alternation operator:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default">or <span class="string">&quot;eeney&quot;</span> <span class="string">&quot;meeney&quot;</span> <span class="string">&quot;miney&quot;</span></span>)</span> <span class="string">&quot;meeney&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default">or <span class="string">&quot;eeney&quot;</span> <span class="string">&quot;meeney&quot;</span> <span class="string">&quot;miney&quot;</span></span>)</span> <span class="string">&quot;moe&quot;</span></span>)</span> =&gt; #f</pre><h4 id="sec:SRE_Repetition_Patterns"><a href="#sec:SRE_Repetition_Patterns">SRE Repetition Patterns</a></h4><p>There are also several ways to control the number of times a pattern is matched.  The simplest of these is <tt>?</tt> which just optionally matches the pattern:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="string">&quot;match&quot;</span> <span class="paren3">(<span class="default">? <span class="string">&quot;es&quot;</span></span>)</span> <span class="string">&quot;!&quot;</span></span>)</span> <span class="string">&quot;matches!&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="string">&quot;match&quot;</span> <span class="paren3">(<span class="default">? <span class="string">&quot;es&quot;</span></span>)</span> <span class="string">&quot;!&quot;</span></span>)</span> <span class="string">&quot;match!&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="string">&quot;match&quot;</span> <span class="paren3">(<span class="default">? <span class="string">&quot;es&quot;</span></span>)</span> <span class="string">&quot;!&quot;</span></span>)</span> <span class="string">&quot;matche!&quot;</span></span>)</span> =&gt; #f</pre><p>To optionally match any number of times, use <tt>*</tt>, the Kleene star:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="string">&quot;&lt;&quot;</span> <span class="paren3">(<span class="default">* <span class="paren4">(<span class="default">~ <span class="character">#\&gt;</span></span>)</span></span>)</span> <span class="string">&quot;&gt;&quot;</span></span>)</span> <span class="string">&quot;&lt;html&gt;&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="string">&quot;&lt;&quot;</span> <span class="paren3">(<span class="default">* <span class="paren4">(<span class="default">~ <span class="character">#\&gt;</span></span>)</span></span>)</span> <span class="string">&quot;&gt;&quot;</span></span>)</span> <span class="string">&quot;&lt;&gt;&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="string">&quot;&lt;&quot;</span> <span class="paren3">(<span class="default">* <span class="paren4">(<span class="default">~ <span class="character">#\&gt;</span></span>)</span></span>)</span> <span class="string">&quot;&gt;&quot;</span></span>)</span> <span class="string">&quot;&lt;html&quot;</span></span>)</span> =&gt; #f</pre><p>Often you want to match any number of times, but at least one time is required, and for that you use <tt>+</tt>:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="string">&quot;&lt;&quot;</span> <span class="paren3">(<span class="default">+ <span class="paren4">(<span class="default">~ <span class="character">#\&gt;</span></span>)</span></span>)</span> <span class="string">&quot;&gt;&quot;</span></span>)</span> <span class="string">&quot;&lt;html&gt;&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="string">&quot;&lt;&quot;</span> <span class="paren3">(<span class="default">+ <span class="paren4">(<span class="default">~ <span class="character">#\&gt;</span></span>)</span></span>)</span> <span class="string">&quot;&gt;&quot;</span></span>)</span> <span class="string">&quot;&lt;a&gt;&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="string">&quot;&lt;&quot;</span> <span class="paren3">(<span class="default">+ <span class="paren4">(<span class="default">~ <span class="character">#\&gt;</span></span>)</span></span>)</span> <span class="string">&quot;&gt;&quot;</span></span>)</span> <span class="string">&quot;&lt;&gt;&quot;</span></span>)</span> =&gt; #f</pre><p>More generally, to match at least a given number of times, use <tt>&gt;=</tt>:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="string">&quot;&lt;&quot;</span> <span class="paren3">(<span class="default">&gt;= 3 <span class="paren4">(<span class="default">~ <span class="character">#\&gt;</span></span>)</span></span>)</span> <span class="string">&quot;&gt;&quot;</span></span>)</span> <span class="string">&quot;&lt;table&gt;&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="string">&quot;&lt;&quot;</span> <span class="paren3">(<span class="default">&gt;= 3 <span class="paren4">(<span class="default">~ <span class="character">#\&gt;</span></span>)</span></span>)</span> <span class="string">&quot;&gt;&quot;</span></span>)</span> <span class="string">&quot;&lt;pre&gt;&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="string">&quot;&lt;&quot;</span> <span class="paren3">(<span class="default">&gt;= 3 <span class="paren4">(<span class="default">~ <span class="character">#\&gt;</span></span>)</span></span>)</span> <span class="string">&quot;&gt;&quot;</span></span>)</span> <span class="string">&quot;&lt;tr&gt;&quot;</span></span>)</span> =&gt; #f</pre><p>To match a specific number of times exactly, use <tt>=</tt>:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="string">&quot;&lt;&quot;</span> <span class="paren3">(<span class="default">= 4 <span class="paren4">(<span class="default">~ <span class="character">#\&gt;</span></span>)</span></span>)</span> <span class="string">&quot;&gt;&quot;</span></span>)</span> <span class="string">&quot;&lt;html&gt;&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="string">&quot;&lt;&quot;</span> <span class="paren3">(<span class="default">= 4 <span class="paren4">(<span class="default">~ <span class="character">#\&gt;</span></span>)</span></span>)</span> <span class="string">&quot;&gt;&quot;</span></span>)</span> <span class="string">&quot;&lt;table&gt;&quot;</span></span>)</span> =&gt; #f</pre><p>And finally, the most general form is <tt>**</tt> which specifies a range of times to match.  All of the earlier forms are special cases of this.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="paren3">(<span class="default">= 3 <span class="paren4">(<span class="default">** 1 3 numeric</span>)</span> <span class="string">&quot;.&quot;</span></span>)</span> <span class="paren3">(<span class="default">** 1 3 numeric</span>)</span></span>)</span> <span class="string">&quot;192.168.1.10&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="paren3">(<span class="default">= 3 <span class="paren4">(<span class="default">** 1 3 numeric</span>)</span> <span class="string">&quot;.&quot;</span></span>)</span> <span class="paren3">(<span class="default">** 1 3 numeric</span>)</span></span>)</span> <span class="string">&quot;192.0168.1.10&quot;</span></span>)</span> =&gt; #f</pre><p>There are also so-called &quot;non-greedy&quot; variants of these repetition operators, by convention suffixed with an additional <tt>?</tt>.  Since the normal repetition patterns can match any of the allotted repetition range, these operators will match a string if and only if the normal versions matched.  However, when the endpoints of which submatch matched where are taken into account (specifically, all matches when using irregex-search since the endpoints of the match itself matter), the use of a non-greedy repetition can change the result.</p><p>So, whereas <tt>?</tt> can be thought to mean &quot;match or don't match,&quot; <tt>??</tt> means &quot;don't match or match.&quot;  <tt>*</tt> typically consumes as much as possible, but <tt>*?</tt> tries first to match zero times, and only consumes one at a time if that fails.  If you have a greedy operator followed by a non-greedy operator in the same pattern, they can produce surprisins results as they compete to make the match longer or shorter.  If this seems confusing, that's because it is.  Non-greedy repetitions are defined only in terms of the specific backtracking algorithm used to implement them, which for compatibility purposes always means the Perl algorithm.  Thus, when using these patterns you force IrRegex to use a backtracking engine, and can't rely on efficient execution.</p><h4 id="sec:SRE_Character_Sets"><a href="#sec:SRE_Character_Sets">SRE Character Sets</a></h4><p>Perhaps more common than matching specific strings is matching any of a set of characters.  You can use the <tt>or</tt> alternation pattern on a list of single-character strings to simulate a character set, but this is too clumsy for everyday use so SRE syntax allows a number of shortcuts.</p><p>A single character matches that character literally, a trivial character class.  More conveniently, a list holding a single element which is a string refers to the character set composed of every character in the string.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">irregex-match &#x27;<span class="paren2">(<span class="default">* <span class="character">#\-</span></span>)</span> <span class="string">&quot;---&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-match &#x27;<span class="paren2">(<span class="default">* <span class="character">#\-</span></span>)</span> <span class="string">&quot;-_-&quot;</span></span>)</span> =&gt; #f
+
+<span class="paren1">(<span class="default">irregex-match &#x27;<span class="paren2">(<span class="default">* <span class="paren3">(<span class="default"><span class="string">&quot;aeiou&quot;</span></span>)</span></span>)</span> <span class="string">&quot;oui&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-match &#x27;<span class="paren2">(<span class="default">* <span class="paren3">(<span class="default"><span class="string">&quot;aeiou&quot;</span></span>)</span></span>)</span> <span class="string">&quot;ouais&quot;</span></span>)</span> =&gt; #f</pre><p>Ranges are introduced with the <tt>/</tt> operator.  Any strings or characters in the <tt>/</tt> are flattened and then taken in pairs to represent the start and end points, inclusive, of character ranges.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">irregex-match &#x27;<span class="paren2">(<span class="default">* <span class="paren3">(<span class="default">/ <span class="string">&quot;AZ09&quot;</span></span>)</span></span>)</span> <span class="string">&quot;R2D2&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-match &#x27;<span class="paren2">(<span class="default">* <span class="paren3">(<span class="default">/ <span class="string">&quot;AZ09&quot;</span></span>)</span></span>)</span> <span class="string">&quot;C-3PO&quot;</span></span>)</span> =&gt; #f</pre><p>In addition, a number of set algebra operations are provided.  <tt>or</tt>, of course, has the same meaning, but when all the options are character sets it can be thought of as the set union operator.  This is further extended by the <tt>&amp;</tt> set intersection, <tt>-</tt> set difference, and <tt>~</tt> set complement operators.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">irregex-match &#x27;<span class="paren2">(<span class="default">* <span class="paren3">(<span class="default">&amp; <span class="paren4">(<span class="default">/ <span class="string">&quot;az&quot;</span></span>)</span> <span class="paren4">(<span class="default">~ <span class="paren5">(<span class="default"><span class="string">&quot;aeiou&quot;</span></span>)</span></span>)</span></span>)</span></span>)</span> <span class="string">&quot;xyzzy&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-match &#x27;<span class="paren2">(<span class="default">* <span class="paren3">(<span class="default">&amp; <span class="paren4">(<span class="default">/ <span class="string">&quot;az&quot;</span></span>)</span> <span class="paren4">(<span class="default">~ <span class="paren5">(<span class="default"><span class="string">&quot;aeiou&quot;</span></span>)</span></span>)</span></span>)</span></span>)</span> <span class="string">&quot;vowels&quot;</span></span>)</span> =&gt; #f
+
+<span class="paren1">(<span class="default">irregex-match &#x27;<span class="paren2">(<span class="default">* <span class="paren3">(<span class="default">- <span class="paren4">(<span class="default">/ <span class="string">&quot;az&quot;</span></span>)</span> <span class="paren4">(<span class="default"><span class="string">&quot;aeiou&quot;</span></span>)</span></span>)</span></span>)</span> <span class="string">&quot;xyzzy&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-match &#x27;<span class="paren2">(<span class="default">* <span class="paren3">(<span class="default">- <span class="paren4">(<span class="default">/ <span class="string">&quot;az&quot;</span></span>)</span> <span class="paren4">(<span class="default"><span class="string">&quot;aeiou&quot;</span></span>)</span></span>)</span></span>)</span> <span class="string">&quot;vowels&quot;</span></span>)</span> =&gt; #f</pre><h4 id="sec:SRE_Assertion_Patterns"><a href="#sec:SRE_Assertion_Patterns">SRE Assertion Patterns</a></h4><p>There are a number of times it can be useful to assert something about the area around a pattern without explicitly making it part of the pattern.  The most common cases are specifically anchoring some pattern to the beginning or end of a word or line or even the whole string.  For example, to match on the end of a word:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="string">&quot;foo&quot;</span> eow</span>)</span> <span class="string">&quot;foo&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="string">&quot;foo&quot;</span> eow</span>)</span> <span class="string">&quot;foo!&quot;</span></span>)</span> =&gt; #&lt;match&gt;
+
+<span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="string">&quot;foo&quot;</span> eow</span>)</span> <span class="string">&quot;foof&quot;</span></span>)</span> =&gt; #f</pre><p>The <tt>bow</tt>, <tt>bol</tt>, <tt>eol</tt>, <tt>bos</tt> and <tt>eos</tt> work similarly. <tt>nwb</tt> asserts that you are not in a word-boundary - if replaced for <tt>eow</tt> in the above examples it would reverse all the results.</p><p>There is no <tt>wb</tt>, since you tend to know from context whether it would be the beginning or end of a word, but if you need it you can always use <tt>(or bow eow)</tt>.</p><p>Somewhat more generally, Perl introduced positive and negative look-ahead and look-behind patterns.  Perl look-behind patterns are limited to a fixed length, however the IrRegex versions have no such limit.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">irregex-search &#x27;<span class="paren2">(<span class="default"><span class="keyword">:</span> <span class="string">&quot;regular&quot;</span> <span class="paren3">(<span class="default">look-ahead <span class="string">&quot; expression&quot;</span></span>)</span></span>)</span>
+                <span class="string">&quot;regular expression&quot;</span></span>)</span>
+ =&gt; #&lt;match&gt;</pre><p>The most general case, of course, would be an <tt>and</tt> pattern to complement the <tt>or</tt> pattern - all the patterns must match or the whole pattern fails.  This may be provided in a future release, although it (and look-ahead and look-behind assertions) are unlikely to be compiled efficiently.</p><h4 id="sec:SRE_Utility_Patterns"><a href="#sec:SRE_Utility_Patterns">SRE Utility Patterns</a></h4><p>The following utility regular expressions are also provided for common patterns that people are eternally reinventing.  They are not necessarily the official patterns matching the RFC definitions of the given data, because of the way that such patterns tend to be used. There are three general usages for regexps:</p><dl><dt>searching</dt>
+<dd>search for a pattern matching a desired object in a larger text</dd><dt>validation</dt>
+<dd>determine whether an entire string matches a pattern</dd><dt>extraction</dt>
+<dd>given a string already known to be valid, extract certain fields from it as submatches</dd></dl>
+<p>In some cases, but not always, these will overlap.  When they are different, <tt>irregex-search</tt> will naturally always want the searching version, so IrRegex provides that version.</p><p>As an example where these might be different, consider a URL.  If you want to match all the URLs in some arbitrary text, you probably want to exclude a period or comma at the tail end of a URL, since it's more likely being used as punctuation rather than part of the URL, despite the fact that it would be valid URL syntax.</p><p>Another problem with the RFC definitions is the standard itself may have become irrelevant.  For example, the pattern IrRegex provides for email addresses doesn't match quoted local parts (e.g. <tt>&quot;first last&quot;@domain.com</tt>) because these are increasingly rare, and unsupported by enough software that it's better to discourage their use. Conversely, technically consecutive periods (e.g. <tt>first..last@domain.com</tt>) are not allowed in email addresses, but most email software does allow this, and in fact such addresses are quite common in Japan.</p><p>The current patterns provided are:</p><pre> newline                        ; general newline pattern (crlf, cr, lf)
+ integer                        ; an integer
+ real                           ; a real number (including scientific)
+ string                         ; a &quot;quoted&quot; string
+ symbol                         ; an R5RS Scheme symbol
+ ipv4-address                   ; a numeric decimal ipv4 address
+ ipv6-address                   ; a numeric hexadecimal ipv6 address
+ domain                         ; a domain name
+ email                          ; an email address
+ http-url                       ; a URL beginning with https?://</pre><p>Because of these issues the exact definitions of these patterns are subject to be changed, but will be documented clearly when they are finalized.  More common patterns are also planned, but as what you want increases in complexity it's probably better to use a real parser.</p><h3 id="sec:Supported_PCRE_Syntax"><a href="#sec:Supported_PCRE_Syntax">Supported PCRE Syntax</a></h3><p>Since the PCRE syntax is so overwhelming complex, it's easier to just list what we *don't* support for now.  Refer to the <a href="http://pcre.org/pcre.txt">PCRE documentation</a> for details.  You should be using the SRE syntax anyway!</p><p>Unicode character classes (<tt>\P</tt>) are not supported, but will be in an upcoming release.  <tt>\C</tt> named characters are not supported.</p><p>Callbacks, subroutine patterns and recursive patterns are not supported.  (<tt>*FOO</tt>) patterns are not supported and may never be.</p><p><tt>\G</tt> and <tt>\K</tt> are not supported.</p><p>Octal character escapes are not supported because they are ambiguous with back-references - just use hex character escapes.</p><p>Other than that everything should work, including named submatches, zero-width assertions, conditional patterns, etc.</p><p>In addition, <tt>\&lt;</tt> and <tt>\&gt;</tt> act as beginning-of-word and end-of-word marks, respectively, as in Emacs regular expressions.</p><p>Also, two escapes are provided to embed SRE patterns inside PCRE strings, <tt>&quot;\'&lt;sre&gt;&quot;</tt> and <tt>&quot;(*'&lt;sre&gt;)&quot;</tt>.  For example, to match a comma-delimited list of integers you could use</p>
+<pre class="highlight colorize"><span class="string">&quot;</span><span class="string">\\</span><span class="string">&#x27;integer(,</span><span class="string">\\</span><span class="string">&#x27;integer)*&quot;</span></pre><p>and to match a URL in angle brackets you could use</p>
+<pre class="highlight colorize"><span class="string">&quot;&lt;(&#x27;*http-url)&gt;&quot;</span></pre><p>Note in the second example the enclosing <tt>&quot;('*...)&quot;</tt> syntax is needed because the Scheme reader would consider the closing <tt>&quot;&gt;&quot;</tt> as part of the SRE symbol.</p><p>The following chart gives a quick reference from PCRE form to the SRE equivalent:</p><pre> ;; basic syntax
+ &quot;^&quot;                     ;; bos (or eos inside (?m: ...))
+ &quot;$&quot;                     ;; eos (or eos inside (?m: ...))
+ &quot;.&quot;                     ;; nonl
+ &quot;a?&quot;                    ;; (? a)
+ &quot;a*&quot;                    ;; (* a)
+ &quot;a+&quot;                    ;; (+ a)
+ &quot;a??&quot;                   ;; (?? a)
+ &quot;a*?&quot;                   ;; (*? a)
+ &quot;a+?&quot;                   ;; (+? a)
+ &quot;a{n,m}&quot;                ;; (** n m a)
+
+ ;; grouping
+ &quot;(...)&quot;                 ;; (submatch ...)
+ &quot;(?:...)&quot;               ;; (: ...)
+ &quot;(?i:...)&quot;              ;; (w/nocase ...)
+ &quot;(?-i:...)&quot;             ;; (w/case ...)
+ &quot;(?&lt;name&gt;...)&quot;          ;; (=&gt; &lt;name&gt;...)
+
+ ;; character classes
+ &quot;[aeiou]&quot;               ;; (&quot;aeiou&quot;)
+ &quot;[^aeiou]&quot;              ;; (~ &quot;aeiou&quot;)
+ &quot;[a-z]&quot;                 ;; (/ &quot;az&quot;) or (/ &quot;a&quot; &quot;z&quot;)
+ &quot;[[:alpha:]]&quot;           ;; alpha
+
+ ;; assertions
+ &quot;(?=...)&quot;               ;; (look-ahead ...)
+ &quot;(?!...)&quot;               ;; (neg-look-ahead ...)
+ &quot;(?&lt;=...)&quot;              ;; (look-behind ...)
+ &quot;(?&lt;!...)&quot;              ;; (neg-look-behind ...)
+ &quot;(?(test)pass|fail)&quot;    ;; (if test pass fail)
+ &quot;(*COMMIT)&quot;             ;; commit</pre><h3 id="sec:Chunked_String_Matching"><a href="#sec:Chunked_String_Matching">Chunked String Matching</a></h3><p>It's often desirable to perform regular expression matching over sequences of characters not represented as a single string.  The most obvious example is a text-buffer data structure, but you may also want to match over lists or trees of strings (i.e. ropes), over only certain ranges within a string, over an input port, etc.  With existing regular expression libraries, the only way to accomplish this is by converting the abstract sequence into a freshly allocated string.  This can be expensive, or even impossible if the object is a text-buffer opened onto a 500MB file.</p><p>IrRegex provides a chunked string API specifically for this purpose. You define a chunking API with <tt>make-irregex-chunker</tt>:</p><h4 id="sec:make-irregex-chunker"><a href="#sec:make-irregex-chunker">make-irregex-chunker</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:make-irregex-chunker"><span class="sig"><tt>(make-irregex-chunker &lt;get-next&gt; &lt;get-string&gt; [&lt;get-start&gt; &lt;get-end&gt; &lt;get-substring&gt; &lt;get-subchunk&gt;])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>where</p><p><tt>(&lt;get-next&gt; chunk) =&gt; </tt> returns the next chunk, or <tt>#f</tt> if there are no more chunks</p><p><tt>(&lt;get-string&gt; chunk) =&gt; </tt> a string source for the chunk</p><p><tt>(&lt;get-start&gt; chunk) =&gt; </tt> the start index of the result of <tt>&lt;get-string&gt;</tt> (defaults to always 0)</p><p><tt>(&lt;get-end&gt; chunk) =&gt; </tt> the end (exclusive) of the string (defaults to <tt>string-length</tt> of the source string)</p><p><tt>(&lt;get-substring&gt; cnk1 i cnk2 j) =&gt; </tt> a substring for the range between the chunk <tt>cnk1</tt> starting at index <tt>i</tt> and ending at <tt>cnk2</tt> at index <tt>j</tt></p><p><tt>(&lt;get-subchunk&gt; cnk1 i cnk2 j) =&gt; </tt> as above but returns a new chunked data type instead of a string (optional)</p><p>There are two important constraints on the <tt>&lt;get-next&gt;</tt> procedure. It must return an <tt>eq?</tt> identical object when called multiple times on the same chunk, and it must not return a chunk with an empty string (start == end).  This second constraint is for performance reasons - we push the work of possibly filtering empty chunks to the chunker since there are many chunk types for which empty strings aren't possible, and this work is thus not needed.  Note that the initial chunk passed to match on is allowed to be empty.</p><p><tt>&lt;get-substring&gt;</tt> is provided for possible performance improvements - without it a default is used.  <tt>&lt;get-subchunk&gt;</tt> is optional - without it you may not use <tt>irregex-match-subchunk</tt> described above.</p><p>You can then match chunks of these types with the following procedures:</p></dd></dl><h4 id="sec:irregex-search.2fchunked"><a href="#sec:irregex-search.2fchunked">irregex-search/chunked</a></h4><h4 id="sec:irregex-match.2fchunked"><a href="#sec:irregex-match.2fchunked">irregex-match/chunked</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:irregex-search.2fchunked"><span class="sig"><var class="id">irregex-search/chunked</var> <var class="arg">&lt;irx&gt;</var> <var class="arg">&lt;chunker&gt;</var> <var class="arg">&lt;chunk&gt;</var> <var class="dsssl">#!optional</var> <var class="arg">&lt;start&gt;</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:irregex-match.2fchunked"><span class="sig"><var class="id">irregex-match/chunked</var> <var class="arg">&lt;irx&gt;</var> <var class="arg">&lt;chunker&gt;</var> <var class="arg">&lt;chunk&gt;</var> <var class="dsssl">#!optional</var> <var class="arg">&lt;start&gt;</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>These return normal match-data objects.</p><p>Example:</p><p>To match against a simple, flat list of strings use:</p>
+<pre class="highlight colorize">  <span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> <span class="paren2">(<span class="default">rope-&gt;string rope1 start rope2 end</span>)</span>
+    <span class="paren2">(<span class="default"><i><span class="symbol">if</span></i> <span class="paren3">(<span class="default">eq? rope1 rope2</span>)</span>
+        <span class="paren3">(<span class="default">substring <span class="paren4">(<span class="default">car rope1</span>)</span> start end</span>)</span>
+        <span class="paren3">(<span class="default"><i><span class="symbol">let</span></i> <i><span class="symbol">loop</span></i> <span class="paren4">(<span class="default"><span class="paren5">(<span class="default">rope <span class="paren6">(<span class="default">cdr rope1</span>)</span></span>)</span>
+                   <span class="paren5">(<span class="default">res <span class="paren6">(<span class="default">list <span class="paren1">(<span class="default">substring <span class="paren2">(<span class="default">car rope1</span>)</span> start</span>)</span></span>)</span></span>)</span></span>)</span>
+           <span class="paren4">(<span class="default"><i><span class="symbol">if</span></i> <span class="paren5">(<span class="default">eq? rope rope2</span>)</span>
+               <span class="paren5">(<span class="default">string-concatenate-reverse      <span class="comment">; from SRFI-13
+</span>                <span class="paren6">(<span class="default">cons <span class="paren1">(<span class="default">substring <span class="paren2">(<span class="default">car rope</span>)</span> 0 end</span>)</span> res</span>)</span></span>)</span>
+               <span class="paren5">(<span class="default"><i><span class="symbol">loop</span></i> <span class="paren6">(<span class="default">cdr rope</span>)</span> <span class="paren6">(<span class="default">cons <span class="paren1">(<span class="default">car rope</span>)</span> res</span>)</span></span>)</span></span>)</span></span>)</span></span>)</span></span>)</span>
+
+  <span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> rope-chunker
+    <span class="paren2">(<span class="default">make-irregex-chunker <span class="paren3">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren4">(<span class="default">x</span>)</span> <span class="paren4">(<span class="default">and <span class="paren5">(<span class="default">pair? <span class="paren6">(<span class="default">cdr x</span>)</span></span>)</span> <span class="paren5">(<span class="default">cdr x</span>)</span></span>)</span></span>)</span>
+                          car
+                          <span class="paren3">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren4">(<span class="default">x</span>)</span> 0</span>)</span>
+                          <span class="paren3">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren4">(<span class="default">x</span>)</span> <span class="paren4">(<span class="default">string-length <span class="paren5">(<span class="default">car x</span>)</span></span>)</span></span>)</span>
+                          rope-&gt;string</span>)</span></span>)</span>
+
+  <span class="paren1">(<span class="default">irregex-search/chunked &lt;pat&gt; rope-chunker &lt;list-of-strings&gt;</span>)</span></pre><p>Here we are just using the default start, end and substring behaviors, so the above chunker could simply be defined as:</p>
+<pre class="highlight colorize">  <span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> rope-chunker
+    <span class="paren2">(<span class="default">make-irregex-chunker <span class="paren3">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren4">(<span class="default">x</span>)</span> <span class="paren4">(<span class="default">and <span class="paren5">(<span class="default">pair? <span class="paren6">(<span class="default">cdr x</span>)</span></span>)</span> <span class="paren5">(<span class="default">cdr x</span>)</span></span>)</span></span>)</span> car</span>)</span></span>)</span></pre></dd></dl><h4 id="sec:irregex-fold.2fchunked"><a href="#sec:irregex-fold.2fchunked">irregex-fold/chunked</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:irregex-fold.2fchunked"><span class="sig"><var class="id">irregex-fold/chunked</var> <var class="arg">&lt;irx&gt;</var> <var class="arg">&lt;kons&gt;</var> <var class="arg">&lt;knil&gt;</var> <var class="arg">&lt;chunker&gt;</var> <var class="arg">&lt;chunk&gt;</var> <var class="dsssl">#!optional</var> <var class="arg">&lt;finish&gt;</var> <var class="arg">&lt;start-index&gt;</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Chunked version of <tt>irregex-fold</tt>.</p></dd></dl><h3 id="sec:Utilities"><a href="#sec:Utilities">Utilities</a></h3><p>The following procedures are also available.</p><h4 id="sec:irregex-quote"><a href="#sec:irregex-quote">irregex-quote</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:irregex-quote"><span class="sig"><var class="id">irregex-quote</var> <var class="arg">&lt;str&gt;</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a new string with any special regular expression characters escaped, to match the original string literally in POSIX regular expressions.</p></dd></dl><h4 id="sec:irregex-opt"><a href="#sec:irregex-opt">irregex-opt</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:irregex-opt"><span class="sig"><var class="id">irregex-opt</var> <var class="arg">&lt;list-of-strings&gt;</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns an optimized SRE matching any of the literal strings in the list, like Emacs' <tt>regexp-opt</tt>.  Note this optimization doesn't help when irregex is able to build a DFA.</p></dd></dl><h4 id="sec:sre-.3estring"><a href="#sec:sre-.3estring">sre-&gt;string</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:sre-.3estring"><span class="sig"><var class="id">sre-&gt;string</var> <var class="arg">&lt;sre&gt;</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Convert an SRE to a PCRE-style regular expression string, if possible.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20io%29.html">Module (chicken io)</a></p><p>Next: <a href="Module%20%28chicken%20keyword%29.html">Module (chicken keyword)</a></p></div></div></body></html>

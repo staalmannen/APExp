@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken syntax)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_syntax.29">Module (chicken syntax)</a>
+<ul>
+<li><a href="#sec:Macro_transformers">Macro transformers</a>
+<ul>
+<li><a href="#sec:Explicit_renaming_macros">Explicit renaming macros</a>
+<ul>
+<li><a href="#sec:er-macro-transformer">er-macro-transformer</a></li></ul></li></ul></li>
+<li><a href="#sec:Implicit_renaming_macros">Implicit renaming macros</a>
+<ul>
+<li><a href="#sec:ir-macro-transformer">ir-macro-transformer</a></li></ul></li>
+<li><a href="#sec:Expanding_macros">Expanding macros</a>
+<ul>
+<li><a href="#sec:expand">expand</a></li></ul></li>
+<li><a href="#sec:Macro_helper_procedures">Macro helper procedures</a>
+<ul>
+<li><a href="#sec:begin-for-syntax">begin-for-syntax</a></li>
+<li><a href="#sec:define-for-syntax">define-for-syntax</a></li>
+<li><a href="#sec:syntax">syntax</a></li>
+<li><a href="#sec:strip-syntax">strip-syntax</a></li>
+<li><a href="#sec:read-with-source-info">read-with-source-info</a></li>
+<li><a href="#sec:get-line-number">get-line-number</a></li>
+<li><a href="#sec:syntax-error">syntax-error</a></li></ul></li>
+<li><a href="#sec:Compiler_macros">Compiler macros</a>
+<ul>
+<li><a href="#sec:define-compiler-syntax">define-compiler-syntax</a></li>
+<li><a href="#sec:let-compiler-syntax">let-compiler-syntax</a></li></ul></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_syntax.29"><a href="#sec:Module_.28chicken_syntax.29">Module (chicken syntax)</a></h2><p>This module has support for syntax- and module handling. This module is used by default, unless a program is compiled with the <tt>-explicit-use</tt> option.</p><h3 id="sec:Macro_transformers"><a href="#sec:Macro_transformers">Macro transformers</a></h3><p>Macro transformers are procedures you can use in a <tt>define-syntax</tt> context to register a procedure that can transform s-expressions into other s-expressions.  Only use these when you need to break hygiene in a controlled way; for many use cases <tt>syntax-rules</tt> is more appropriate, as it offers stronger guarantees of hygiene, is more high-level and is standard R5RS Scheme.</p><p>For those situations where you need more control, however, CHICKEN supports two kinds of low-level macros: so-called explicit renaming and implicit renaming macros.</p><h4 id="sec:Explicit_renaming_macros"><a href="#sec:Explicit_renaming_macros">Explicit renaming macros</a></h4><p>The low-level macro facility that CHICKEN provides is called &quot;explicit renaming&quot; and allows writing hygienic or non-hygienic macros procedurally.  When given the return value of one of the procedures <tt>er-macro-transformer</tt> or <tt>ir-macro-transformer</tt> instead of a <tt>syntax-rules</tt> form, <tt>define-syntax</tt> evaluates the procedure in a distinct expansion environment (initially having access to the exported identifiers of the <tt>scheme</tt> module). The procedure takes an expression and two other arguments and returns a transformed expression.</p><p>For example, the transformation procedure for a <tt>call</tt> macro such that <tt>(call proc arg ...)</tt> expands into <tt>(proc arg ...)</tt> can be written as</p><pre> (er-macro-transformer
+   (lambda (exp rename compare)
+     (cdr exp)))</pre><p>Expressions are represented as lists in the traditional manner, except that identifiers are represented as special uninterned symbols.</p><p>The second argument to a transformation procedure is a renaming procedure that takes the representation of an identifier as its argument and returns the representation of a fresh identifier that occurs nowhere else in the program.  For example, the transformation procedure for a simplified version of the <tt>let</tt> macro might be written as</p><pre> (er-macro-transformer
+   (lambda (exp rename compare)
+     (let ((vars (map car (cadr exp)))
+           (inits (map cadr (cadr exp)))
+           (body (cddr exp)))
+       `((lambda ,vars ,@body)
+         ,@inits))))</pre><p>This would not be hygienic, however.  A hygienic <tt>let</tt> macro must rename the identifier <tt>lambda</tt> to protect it from being captured by a local binding.  The renaming effectively creates a fresh alias for <tt>lambda</tt>, one that cannot be captured by any subsequent binding:</p><pre> (er-macro-transformer
+   (lambda (exp rename compare)
+     (let ((vars (map car (cadr exp)))
+           (inits (map cadr (cadr exp)))
+           (body (cddr exp)))
+       `((,(rename 'lambda) ,vars ,@body)
+         ,@inits))))</pre><p>The expression returned by the transformation procedure will be expanded in the syntactic environment obtained from the syntactic environment of the macro application by binding any fresh identifiers generated by the renaming procedure to the denotations of the original identifiers in the syntactic environment in which the macro was defined.  This means that a renamed identifier will denote the same thing as the original identifier unless the transformation procedure that renamed the identifier placed an occurrence of it in a binding position.</p><p>Identifiers obtained from any two calls to the renaming procedure with the same argument will necessarily be the same, but will denote the same syntactical binding. It is an error if the renaming procedure is called after the transformation procedure has returned.</p><p>The third argument to a transformation procedure is a comparison predicate that takes the representations of two identifiers as its arguments and returns true if and only if they denote the same thing in the syntactic environment that will be used to expand the transformed macro application.  For example, the transformation procedure for a simplified version of the <tt>cond</tt> macro can be written as</p><pre> (er-macro-transformer
+   (lambda (exp rename compare)
+     (let ((clauses (cdr exp)))
+       (if (null? clauses)
+           `(,(rename 'quote) unspecified)
+           (let* ((first (car clauses))
+                  (rest (cdr clauses))
+                  (test (car first)))
+             (cond ((and (symbol? test)
+                         (compare test (rename 'else)))
+                    `(,(rename 'begin) ,@(cdr first)))
+                   (else `(,(rename 'if)
+                           ,test
+                            (,(rename 'begin) ,@(cdr first))
+                            (,(rename 'cond) ,@rest)))))))))</pre><p>In this example the identifier <tt>else</tt> is renamed before being passed to the comparison predicate, so the comparison will be true if and only if the test expression is an identifier that denotes the same thing in the syntactic environment of the expression being transformed as <tt>else</tt> denotes in the syntactic environment in which the <tt>cond</tt> macro was defined.  If <tt>else</tt> were not renamed before being passed to the comparison predicate, then it would match a local variable that happened to be named <tt>else</tt>, and the macro would not be hygienic. The final recursive call to <tt>cond</tt> also needs to be renamed because someone might create an alias for this macro and use it in a <tt>let</tt> where <tt>cond</tt> is an ordinary variable.</p><p>Some macros are non-hygienic by design.  For example, the following defines a <tt>loop</tt> macro that implicitly binds <tt>exit</tt> to an escape procedure.  The binding of <tt>exit</tt> is intended to capture free references to <tt>exit</tt> in the body of the loop, so <tt>exit</tt> is not renamed.</p><pre> (define-syntax loop
+   (er-macro-transformer
+     (lambda (x r c)
+       (let ((body (cdr x)))
+         `(,(r 'call-with-current-continuation)
+           (,(r 'lambda) (exit)
+            (,(r 'let) ,(r 'f) () ,@body (,(r 'f)))))))))</pre><p>Suppose a <tt>while</tt> macro is implemented using <tt>loop</tt>, with the intent that <tt>exit</tt> may be used to escape from the <tt>while</tt> loop.  The <tt>while</tt> macro cannot be written as</p><pre> (define-syntax while
+   (syntax-rules ()
+     ((while test body ...)
+      (loop (if (not test) (exit #f))
+            body ...))))</pre><p>because the reference to <tt>exit</tt> that is inserted by the <tt>while</tt> macro is intended to be captured by the binding of <tt>exit</tt> that will be inserted by the <tt>loop</tt> macro.  In other words, this <tt>while</tt> macro is not hygienic.  Like <tt>loop</tt>, it must be written using procedurally:</p><pre> (define-syntax while
+   (er-macro-transformer
+     (lambda (x r c)
+       (let ((test (cadr x))
+             (body (cddr x)))
+         `(,(r 'loop)
+           (,(r 'if) (,(r 'not) ,test) (exit #f))
+           ,@body)))))</pre><p>Think about it: If we <i>did</i> rename <tt>exit</tt>, it would refer to an <tt>exit</tt> procedure existing in the context of the macro's definition. That one <a href="Unit%20library.html#sec:exit">actually exists</a>; it is the procedure that exits the Scheme interpreter.  Definitely <i>not</i> the one we want :) So now we make it refer to an <tt>exit</tt> that's locally bound in the environment where the macro is expanded.</p><p>Note: this implementation of explicit-renaming macros allows passing arbitrary expressions to the renaming and comparison procedures. When being renamed, a fresh copy of the expression will be produced, with all identifiers renamed appropriately. Comparison also supports arbitrary expressions as arguments.</p><h5 id="sec:er-macro-transformer"><a href="#sec:er-macro-transformer">er-macro-transformer</a></h5>
+<dl class="defsig">
+<dt class="defsig" id="def:er-macro-transformer"><span class="sig"><var class="id">er-macro-transformer</var> <var class="arg">TRANSFORMER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns an explicit-renaming macro transformer procedure created from the procedural macro body <var class="arg">TRANSFORMER</var>, which is a procedure of three arguments.</p><p>This procedure will be called on expansion with the complete s-expression of the macro invocation, a rename procedure that hygienically renames identifiers and a comparison procedure that compares (possibly renamed) identifiers (see the section &quot;Explicit renaming macros&quot; below for a detailed explanation on non-R5RS macros).</p><p>Implementation note: this procedure currently just returns its argument unchanged and is available for writing low-level macros in a more portable fashion, without hard-coding the signature of a transformer procedure.</p></dd></dl><h3 id="sec:Implicit_renaming_macros"><a href="#sec:Implicit_renaming_macros">Implicit renaming macros</a></h3><p>Explicit renaming macros generally require the user to perform quite a few renames, because most identifiers that aren't taken from the input expression should generally be inserted hygienically.  It would make more sense to give the output expression as-is, and only explicitly convert those identifiers that you want to treat as <i>unhygienic</i>.</p><p>This can be done with implicit renaming macros.  They just swap the default insertion &quot;mode&quot; from unhygienic to hygienic, so to speak. Here's the <tt>cond</tt> example from the previous section as an ir-macro:</p><pre> (ir-macro-transformer
+   (lambda (exp inject compare)
+     (let ((clauses (cdr exp)))
+       (if (null? clauses)
+           `(quote unspecified)
+           (let* ((first (car clauses))
+                  (rest (cdr clauses))
+                  (test (car first)))
+             (cond ((and (symbol? test)
+                         (compare test 'else))
+                    `(begin ,@(cdr first)))
+                   (else `(if ,test
+                              (begin ,@(cdr first))
+                              (cond ,@rest)))))))))</pre><p>In this example the identifier <tt>else</tt> does <i>not</i> need to be renamed before being passed to the comparison predicate because it is already <i>implicitly</i> renamed.  This comparison will also be true if and only if the test expression is an identifier that denotes the same thing in the syntactic environment of the expression being transformed as <tt>else</tt> denotes in the syntactic environment in which the <tt>cond</tt> macro was defined.  If <tt>else</tt> were not renamed before being passed to the comparison predicate, then it would match a local variable that happened to be named <tt>else</tt>, and the macro would not be hygienic.</p><p>As you can see, the code is a lot clearer because it isn't obscured by excessive renaming.</p><p>Here's the <tt>loop</tt> macro so you can see how hygiene can be broken with implicit renaming macros:</p><pre> (define-syntax loop
+   (ir-macro-transformer
+     (lambda (expr inject compare)
+       (let ((body (cdr expr)))
+         `(call-with-current-continuation
+           (lambda (,(inject 'exit))
+            (let f () ,@body (f))))))))</pre><p>The <tt>while</tt> macro is a little trickier: do we inject the call to <tt>exit</tt> or not?  Just like the explicit renaming macro version did <i>not</i> rename it, we must inject it to allow it to be captured by the <tt>loop</tt> macro:</p><pre> (define-syntax while
+   (ir-macro-transformer
+     (lambda (expr inject compare)
+       (let ((test (cadr expr))
+             (body (cddr expr)))
+         `(loop
+           (if (not ,test) (,(inject 'exit) #f))
+           ,@body)))))</pre><p>Note: Just like explicit renaming macros, this implementation of implicit renaming macros allow passing arbitrary expressions to the injection and comparison procedures.  The injection procedure also return fresh copies of its input.</p><h5 id="sec:ir-macro-transformer"><a href="#sec:ir-macro-transformer">ir-macro-transformer</a></h5>
+<dl class="defsig">
+<dt class="defsig" id="def:ir-macro-transformer"><span class="sig"><var class="id">ir-macro-transformer</var> <var class="arg">TRANSFORMER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>This procedure accepts a <i>reverse</i> syntax transformer, also known as an <i>implicit renaming macro transformer</i>.  This is a transformer which works almost like er-macro-transformer, except the rename and compare procedures it receives work a little differently.</p><p>The rename procedure is now called <tt>inject</tt> and instead of renaming the identifier to be resolved in the macro's definition environment, it will explicitly <i>inject</i> the identifier to be resolved in the expansion environment.  Any non-injected identifiers in the output expression produced by the transformer will be implicitly renamed to refer to the macro's environment instead.  All identifiers in the input expression are of course implicitly injected just like with explicit renaming macros.  See the section above for a more complete explanation.</p><p>To compare an input identifier you can generally compare to the bare symbol and only free identifiers will match.  In practice, this means that when you would call e.g.  <tt>(compare (cadr expression) (rename 'x))</tt> in an ER macro, you simply call <tt>(compare (cadr expression) 'x)</tt> in the IR macro.  Likewise, an <i>unhygienic</i> ER macro's comparison <tt>(compare sym 'abc)</tt> should be written as <tt>(compare sym (inject 'abc))</tt> in an IR macro.</p></dd></dl><h3 id="sec:Expanding_macros"><a href="#sec:Expanding_macros">Expanding macros</a></h3><h4 id="sec:expand"><a href="#sec:expand">expand</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:expand"><span class="sig"><var class="id">expand</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>If <var class="arg">X</var> is a macro-form, expand the macro (and repeat expansion until expression is a non-macro form).  Returns the resulting expression.</p></dd></dl><h3 id="sec:Macro_helper_procedures"><a href="#sec:Macro_helper_procedures">Macro helper procedures</a></h3><h4 id="sec:begin-for-syntax"><a href="#sec:begin-for-syntax">begin-for-syntax</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:begin-for-syntax"><span class="sig"><tt>(begin-for-syntax EXP ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Equivalent to <tt>(begin EXP ...)</tt>, but performs the evaluation of the expression during macro-expansion time, using the macro environment rather than the interaction environment.</p><p>You can use this to define your own helper procedures that you can call from a syntax transformer.</p></dd></dl><h4 id="sec:define-for-syntax"><a href="#sec:define-for-syntax">define-for-syntax</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:define-for-syntax"><span class="sig"><tt>(define-for-syntax (NAME VAR ...) EXP1 ...)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:define-for-syntax"><span class="sig"><tt>(define-for-syntax (NAME VAR1 ... VARn . VARn+1) EXP1 ...)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:define-for-syntax"><span class="sig"><tt>(define-for-syntax NAME [VALUE])</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Defines the toplevel variable <tt>NAME</tt> at macro-expansion time. This can be helpful when you want to define support procedures for use in macro-transformers, for example.</p><p>Essentially, this is a shorthand for <tt>(begin-for-syntax (define ...))</tt>.</p><p>Note that <tt>define-for-syntax</tt> definitions within a module are implicitly added to that module's import library. Refer to the documentation on <a href="Modules.html#sec:import-libraries">import libraries</a> for more information.</p></dd></dl><h4 id="sec:syntax"><a href="#sec:syntax">syntax</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:syntax"><span class="sig"><var class="id">syntax</var> <var class="arg">EXPRESSION</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>This will quote the <var class="arg">EXPRESSION</var> for use in a syntax expansion.  Any syntactic information will be stripped from the <var class="arg">EXPRESSION</var>.</p></dd></dl><h4 id="sec:strip-syntax"><a href="#sec:strip-syntax">strip-syntax</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:strip-syntax"><span class="sig"><var class="id">strip-syntax</var> <var class="arg">EXPRESSION</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Strips all syntactical information from <var class="arg">EXPRESSION</var>, returning a new expression where symbols have all context-information removed.</p><p>You should use this procedure whenever you want to manually construct new identifiers, which an unhygienic macro can insert.  In some cases it does not <i>appear</i> to be necessary to strip context information when you use the macro, but you still should do it.  Sometimes identifiers will not have been renamed (most often at toplevel), but there may be other contexts in which identifiers <i>will</i> have been renamed.</p></dd></dl><h4 id="sec:read-with-source-info"><a href="#sec:read-with-source-info">read-with-source-info</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:read-with-source-info"><span class="sig"><var class="id">read-with-source-info</var> <var class="dsssl">#!optional</var> <var class="arg">port</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Exactly like <tt>{read</tt>} from the <tt>{scheme</tt>} module, except it registers the expression it read into the line number database, so that if <tt>{(read-with-source-info)</tt>} returns <tt>{OBJ</tt>}, <tt>{(get-line-number OBJ)</tt>} will return the line number in <tt>{port</tt>}.</p><p>The port argument may be omitted, in which case it defaults to the value returned by <tt>current-input-port</tt>. It is an error to read from a closed port.</p></dd></dl><h4 id="sec:get-line-number"><a href="#sec:get-line-number">get-line-number</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:get-line-number"><span class="sig"><var class="id">get-line-number</var> <var class="arg">EXPR</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>If <var class="arg">EXPR</var> is a pair with the car being a symbol, and line-number information is available for this expression, then this procedure returns the associated source file and line number as a string. If line-number information is not available, then <tt>#f</tt> is returned.</p></dd></dl><h4 id="sec:syntax-error"><a href="#sec:syntax-error">syntax-error</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:syntax-error"><span class="sig"><tt>(syntax-error [LOCATION] MESSAGE ARGUMENT ...)</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Signals an exception of the kind <tt>(exn syntax)</tt>. Otherwise identical to <tt>error</tt>.</p></dd></dl><h3 id="sec:Compiler_macros"><a href="#sec:Compiler_macros">Compiler macros</a></h3><h4 id="sec:define-compiler-syntax"><a href="#sec:define-compiler-syntax">define-compiler-syntax</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:define-compiler-syntax"><span class="sig"><tt>(define-compiler-syntax NAME)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:define-compiler-syntax"><span class="sig"><tt>(define-compiler-syntax NAME TRANSFORMER)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Defines what is usually called a <i>compiler macro</i> in Lisp: <tt>NAME</tt> should be the name of a globally or locally bound procedure. Any direct call to this procedure will be transformed before compilation, which allows arbitrary rewritings of function calls.</p><p><tt>TRANSFORMER</tt> can be a <tt>syntax-rules</tt> expression or a transformer procedure (as returned by <tt>er-macro-transformer</tt> or <tt>ir-macro-transformer</tt>). Returning the original form in an explicit/implicit-renaming macro or simply &quot;falling trough&quot; all patterns in a <tt>syntax-rules</tt> form will keep the original expression and compile it normally.</p><p>In the interpreter this form does nothing and returns an unspecified value.</p><p>Compiler-syntax is always local to the current compilation unit and can not be exported. Compiler-syntax defined inside a module is not visible outside of that module.</p><p><tt>define-compiler-syntax</tt> should only be used at top-level. Local compiler-syntax can be defined with <tt>let-compiler-syntax</tt>.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define-compiler-syntax</span></i> +
+  <span class="paren2">(<span class="default">syntax-rules <span class="paren3">(<span class="default"></span>)</span>
+    <span class="paren3">(<span class="default"><span class="paren4">(<span class="default">_</span>)</span> 1</span>)</span>
+    <span class="paren3">(<span class="default"><span class="paren4">(<span class="default">_ x 0</span>)</span> x</span>)</span> </span>)</span> </span>)</span></pre><p>If no transformer is given, then <tt>(define-compiler-syntax NAME)</tt> removes any compiler-syntax definitions for <tt>NAME</tt>.</p></dd></dl><h4 id="sec:let-compiler-syntax"><a href="#sec:let-compiler-syntax">let-compiler-syntax</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:let-compiler-syntax"><span class="sig"><tt>(let-compiler-syntax ((NAME [TRANSFORMER]) ...) BODY ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Allows definition local compiler macros, which are only applicable inside <tt>BODY ...</tt>.  By not providing a <tt>TRANSFORMER</tt> expression, compiler-syntax for specific identifiers can be temporarily disabled.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20string%29.html">Module (chicken string)</a></p><p>Next: <a href="Module%20%28chicken%20tcp%29.html">Module (chicken tcp)</a></p></div></div></body></html>

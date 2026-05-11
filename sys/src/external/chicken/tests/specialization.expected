@@ -1,0 +1,112 @@
+;; numbers replaced with XXX by redact-gensyms.scm
+;; prefixes: (tmp g scm:)
+
+Note: Predicate is always true
+  In file `specialization-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (scheme#string? a)
+
+  The predicate will always return true.
+
+  Procedure `string?' from module `scheme' is a predicate for:
+
+    string
+
+  The given argument has this type:
+
+    string
+
+Note: Test is always true
+  In file `specialization-tests.scm:XXX',
+  At the toplevel,
+  In conditional expression:
+
+    (if (scheme#string? a) 'ok 'no)
+
+  Test condition has always true value of type:
+
+    true
+
+Note: Predicate is always false
+  In file `specialization-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (scheme#string? a)
+
+  The predicate will always return false.
+
+  Procedure `string?' from module `scheme' is a predicate for:
+
+    string
+
+  The given argument has this type:
+
+    symbol
+
+Note: Test is always false
+  In file `specialization-tests.scm:XXX',
+  At the toplevel,
+  In conditional expression:
+
+    (if (scheme#string? a) 'ok 'no)
+
+  Test condition is always false.
+
+Note: Predicate is always true
+  In file `specialization-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (scheme#input-port? p)
+
+  The predicate will always return true.
+
+  Procedure `input-port?' from module `scheme' is a predicate for:
+
+    input-port
+
+  The given argument has this type:
+
+    input/output-port
+
+Note: Test is always true
+  In file `specialization-tests.scm:XXX',
+  At the toplevel,
+  In conditional expression:
+
+    (if (scheme#input-port? p) 'ok 'no)
+
+  Test condition has always true value of type:
+
+    true
+
+Note: Predicate is always true
+  In file `specialization-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (scheme#output-port? p)
+
+  The predicate will always return true.
+
+  Procedure `output-port?' from module `scheme' is a predicate for:
+
+    output-port
+
+  The given argument has this type:
+
+    input/output-port
+
+Note: Test is always true
+  In file `specialization-tests.scm:XXX',
+  At the toplevel,
+  In conditional expression:
+
+    (if (scheme#output-port? p) 'ok 'no)
+
+  Test condition has always true value of type:
+
+    true

@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken flonum)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_flonum.29">Module (chicken flonum)</a>
+<ul>
+<li><a href="#sec:Arithmetic_floating-point_operations">Arithmetic floating-point operations</a></li></ul></li>
+<li><a href="#sec:Flonum_limits">Flonum limits</a></li></ul></div><h2 id="sec:Module_.28chicken_flonum.29"><a href="#sec:Module_.28chicken_flonum.29">Module (chicken flonum)</a></h2><p>Because CHICKEN supports a full numeric tower, operations can sometimes incur a subtantial overhead to simply detect the type of numbers you're passing in.  When you know you're definitely dealing only with flonums, you can choose to use flonum-specific operations to avoid this overhead.</p><p>This is purely a performance hack.  You might want to consider adding <a href="Types.html">type annotations</a> instead, this often gives the same performance boost without having to rewrite all numeric operators in your code.</p><h3 id="sec:Arithmetic_floating-point_operations"><a href="#sec:Arithmetic_floating-point_operations">Arithmetic floating-point operations</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:fp.2b"><span class="sig"><var class="id">fp+</var> <var class="arg">X</var> <var class="arg">Y</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fp-"><span class="sig"><var class="id">fp-</var> <var class="arg">X</var> <var class="arg">Y</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fp.2a"><span class="sig"><var class="id">fp*</var> <var class="arg">X</var> <var class="arg">Y</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fp.2f"><span class="sig"><var class="id">fp/</var> <var class="arg">X</var> <var class="arg">Y</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fp.2a.2b"><span class="sig"><var class="id">fp*+</var> <var class="arg">X</var> <var class="arg">Y</var> <var class="arg">Z</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpgcd"><span class="sig"><var class="id">fpgcd</var> <var class="arg">X</var> <var class="arg">Y</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpneg"><span class="sig"><var class="id">fpneg</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpmin"><span class="sig"><var class="id">fpmin</var> <var class="arg">X</var> <var class="arg">Y</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpmax"><span class="sig"><var class="id">fpmax</var> <var class="arg">X</var> <var class="arg">Y</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fp.3d"><span class="sig"><var class="id">fp=</var> <var class="arg">X</var> <var class="arg">Y</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fp.3e"><span class="sig"><var class="id">fp&gt;</var> <var class="arg">X</var> <var class="arg">Y</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fp.3c"><span class="sig"><var class="id">fp&lt;</var> <var class="arg">X</var> <var class="arg">Y</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fp.3e.3d"><span class="sig"><var class="id">fp&gt;=</var> <var class="arg">X</var> <var class="arg">Y</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fp.3c.3d"><span class="sig"><var class="id">fp&lt;=</var> <var class="arg">X</var> <var class="arg">Y</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpfloor"><span class="sig"><var class="id">fpfloor</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpceiling"><span class="sig"><var class="id">fpceiling</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fptruncate"><span class="sig"><var class="id">fptruncate</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpround"><span class="sig"><var class="id">fpround</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpsin"><span class="sig"><var class="id">fpsin</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpcos"><span class="sig"><var class="id">fpcos</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fptan"><span class="sig"><var class="id">fptan</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpasin"><span class="sig"><var class="id">fpasin</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpacos"><span class="sig"><var class="id">fpacos</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpatan"><span class="sig"><var class="id">fpatan</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpatan2"><span class="sig"><var class="id">fpatan2</var> <var class="arg">X</var> <var class="arg">Y</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpsinh"><span class="sig"><var class="id">fpsinh</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpcosh"><span class="sig"><var class="id">fpcosh</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fptanh"><span class="sig"><var class="id">fptanh</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpasinh"><span class="sig"><var class="id">fpasinh</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpacosh"><span class="sig"><var class="id">fpacosh</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpatanh"><span class="sig"><var class="id">fpatanh</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fplog"><span class="sig"><var class="id">fplog</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpexp"><span class="sig"><var class="id">fpexp</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpexpt"><span class="sig"><var class="id">fpexpt</var> <var class="arg">X</var> <var class="arg">Y</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpsqrt"><span class="sig"><var class="id">fpsqrt</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpabs"><span class="sig"><var class="id">fpabs</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:fpinteger.3f"><span class="sig"><var class="id">fpinteger?</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Arithmetic floating-point operations.</p><p>In safe mode, these procedures throw a type error when given non-float arguments. In unsafe mode, these procedures do not check their arguments. A non-flonum argument in unsafe mode can crash the application. <tt>fp*+</tt> implements fused multiply-add <tt>(X * Y) + Z</tt>.</p><p>Note: <tt>fpround</tt> uses the rounding mode that your C library implements, which is usually different from R5RS.</p></dd></dl><h2 id="sec:Flonum_limits"><a href="#sec:Flonum_limits">Flonum limits</a></h2>
+<dl class="defsig">
+<dt class="defsig" id="def:maximum-flonum"><span class="sig"><var class="id">maximum-flonum</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:minimum-flonum"><span class="sig"><var class="id">minimum-flonum</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:flonum-radix"><span class="sig"><var class="id">flonum-radix</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:flonum-epsilon"><span class="sig"><var class="id">flonum-epsilon</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:flonum-precision"><span class="sig"><var class="id">flonum-precision</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:flonum-decimal-precision"><span class="sig"><var class="id">flonum-decimal-precision</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:flonum-maximum-exponent"><span class="sig"><var class="id">flonum-maximum-exponent</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:flonum-minimum-exponent"><span class="sig"><var class="id">flonum-minimum-exponent</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:flonum-maximum-decimal-exponent"><span class="sig"><var class="id">flonum-maximum-decimal-exponent</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:flonum-minimum-decimal-exponent"><span class="sig"><var class="id">flonum-minimum-decimal-exponent</var></span><span class="type">constant</span></dt>
+<dd class="defsig"><p>Platform-specific flonum limits.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:flonum-print-precision"><span class="sig"><var class="id">flonum-print-precision</var> <var class="dsssl">#!optional</var> <var class="arg">PRECISION</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Gets and sets the number of significant digits printed for a floating-point number. <var class="arg">PRECISION</var> must be a positive <tt>fixnum</tt>.  Returns the setting that was previously in effect.</p><p>The default print precision is 15 on nearly all systems, and 7 on the rare system on which the <tt>double</tt> type is only single-precision.</p><p><b>Note:</b> To ensure read/write invariance for <i>all</i> floating-point numbers, you must increase print precision from 15 to 17 (or from 7 to 9).  For example:</p><pre>&gt; (define a (expt 2 -53))
+&gt; (define b (+ a (* 2 (expt 10 -32))))
+&gt; (eqv? a b)
+#f
+&gt; (flonum-print-precision 15)
+&gt; (cons a b)
+(1.11022302462516e-16 .
+ 1.11022302462516e-16)            ;; same printed representation
+&gt; (flonum-print-precision 17)
+&gt; (cons a b)
+(1.1102230246251565e-16 .
+ 1.1102230246251568e-16)          ;; differs in last place</pre><p>On the downside, this will result in unnecessarily precise representations of many numbers:</p><pre>&gt; (flonum-print-precision 17)
+&gt; 0.1
+0.10000000000000001</pre><p>The maximum number of decimal digits required to uniquely represent all floating-point numbers of a certain precision is given by the formula <tt>ceil(1+N*log10(2))</tt>, where N is the number of bits of precision; for double-precision, <tt>N=53</tt>.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20fixnum%29.html">Module (chicken fixnum)</a></p><p>Next: <a href="Module%20%28chicken%20foreign%29.html">Module (chicken foreign)</a></p></div></div></body></html>

@@ -1,0 +1,1211 @@
+;; numbers replaced with XXX by redact-gensyms.scm
+;; prefixes: (tmp g scm:)
+
+Warning: (scrutiny-tests.scm:XXX) - assignment to imported value binding `car'
+
+Note: Test is always true
+  In procedure `a',
+  In procedure `b',
+  In procedure `c',
+  In conditional expression:
+
+    (if x 1 2)
+
+  Test condition has always true value of type:
+
+    fixnum
+
+Note: Test is always true
+  In procedure `b',
+  In conditional expression:
+
+    (if x 1 2)
+
+  Test condition has always true value of type:
+
+    true
+
+Warning: Branch values mismatch
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `foo',
+  In conditional expression:
+
+    (if x (scheme#values 1 2) (scheme#values 1 2 (scheme#+ (scheme#+ ...))))
+
+  The branches have different numbers of values.
+
+  The true branch returns 2 values:
+
+    (scheme#values 1 2)
+
+  The false branch returns 3 values:
+
+    (scheme#values 1 2 (scheme#+ (scheme#+ (scheme#+ ...))))
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (bar 3 'a)
+
+  Argument #2 to procedure `bar' has an invalid type:
+
+    symbol
+
+  The expected type is:
+
+    number
+
+  This is the expression:
+
+    'a
+
+  Procedure `bar' has this type:
+
+    (#!rest number -> number)
+
+Warning: Wrong number of arguments
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (scheme#string?)
+
+  Procedure `string?' is called with 0 arguments but 1 argument is expected.
+
+  Procedure `string?' from module `scheme' has this type:
+
+    (* --> boolean)
+
+Warning: Too many argument values
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (chicken.base#print (scheme#values 1 2))
+
+  Argument #1 to procedure `print' returns 2 values but 1 is expected.
+
+  It is a call to `values' from module `scheme' which has this type:
+
+    (procedure (#!rest values) . *)
+
+  This is the expression:
+
+    (scheme#values 1 2)
+
+Warning: Not enough argument values
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (chicken.base#print (scheme#values))
+
+  Argument #1 to procedure `print' does not return any values.
+
+  It is a call to `values' from module `scheme' which has this type:
+
+    (procedure (#!rest values) . *)
+
+  This is the expression:
+
+    (scheme#values)
+
+Warning: Invalid procedure
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (x)
+
+  Variable `x18' is not a procedure.
+
+  It has this type:
+
+    fixnum
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (scheme#+ 'a 'b)
+
+  Argument #1 to procedure `+' has an invalid type:
+
+    symbol
+
+  The expected type is:
+
+    number
+
+  This is the expression:
+
+    'a
+
+  Procedure `+' from module `scheme' has this type:
+
+    (#!rest number -> number)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (scheme#+ 'a 'b)
+
+  Argument #2 to procedure `+' has an invalid type:
+
+    symbol
+
+  The expected type is:
+
+    number
+
+  This is the expression:
+
+    'b
+
+  Procedure `+' from module `scheme' has this type:
+
+    (#!rest number -> number)
+
+Warning: Invalid assignment
+  At the toplevel,
+  In assignment:
+
+    (set! scheme#car 33)
+
+  Variable `car' is assigned invalid value.
+
+  The assigned value has this type:
+
+    fixnum
+
+  The declared type of `car' from module `scheme' is:
+
+    ((pair 'a *) -> 'a)
+
+Warning: Let binding to `gXXX' has 2 values
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In let expression:
+
+    (let ((gXXX (scheme#values 1 2))) (gXXX))
+
+  Variable `gXXX' is bound to an expression that returns 2 values.
+
+  It is a call to `values' from module `scheme' which has this type:
+
+    (procedure (#!rest values) . *)
+
+  This is the expression:
+
+    (scheme#values 1 2)
+
+Warning: Invalid procedure
+  At the toplevel,
+  In procedure call:
+
+    (gXXX)
+
+  Variable `gXXX' is not a procedure.
+
+  It has this type:
+
+    fixnum
+
+Note: Test is always true
+  In procedure `foo',
+  In conditional expression:
+
+    (if bar 3 (##core#undefined))
+
+  Test condition has always true value of type:
+
+    (-> *)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `foo2',
+  In procedure call:
+
+    (scheme#string-append x "abc")
+
+  Argument #1 to procedure `string-append' has an invalid type:
+
+    number
+
+  The expected type is:
+
+    string
+
+  This is the expression:
+
+    x
+
+  Procedure `string-append' from module `scheme' has this type:
+
+    (#!rest string -> string)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (foo3 99)
+
+  Argument #1 to procedure `foo3' has an invalid type:
+
+    fixnum
+
+  The expected type is:
+
+    string
+
+  This is the expression:
+
+    99
+
+  Procedure `foo3' has this type:
+
+    (string -> string)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `foo4',
+  In procedure call:
+
+    (scheme#+ x 1)
+
+  Argument #1 to procedure `+' has an invalid type:
+
+    string
+
+  The expected type is:
+
+    number
+
+  This is the expression:
+
+    x
+
+  Procedure `+' from module `scheme' has this type:
+
+    (#!rest number -> number)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `foo5',
+  In procedure call:
+
+    (scheme#+ x 3)
+
+  Argument #1 to procedure `+' has an invalid type:
+
+    string
+
+  The expected type is:
+
+    number
+
+  This is the expression:
+
+    x
+
+  Procedure `+' from module `scheme' has this type:
+
+    (#!rest number -> number)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `foo6',
+  In procedure call:
+
+    (scheme#+ x 3)
+
+  Argument #1 to procedure `+' has an invalid type:
+
+    string
+
+  The expected type is:
+
+    number
+
+  This is the expression:
+
+    x
+
+  Procedure `+' from module `scheme' has this type:
+
+    (#!rest number -> number)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (scheme#+ x 1)
+
+  Argument #1 to procedure `+' has an invalid type:
+
+    string
+
+  The expected type is:
+
+    number
+
+  This is the expression:
+
+    x
+
+  Procedure `+' from module `scheme' has this type:
+
+    (#!rest number -> number)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `foo10',
+  In procedure call:
+
+    (foo9 x)
+
+  Argument #1 to procedure `foo9' has an invalid type:
+
+    number
+
+  The expected type is:
+
+    string
+
+  This is the expression:
+
+    x
+
+  Procedure `foo9' has this type:
+
+    (string -> symbol)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `foo10',
+  In procedure call:
+
+    (scheme#+ x 1)
+
+  Argument #1 to procedure `+' has an invalid type:
+
+    string
+
+  The expected type is:
+
+    number
+
+  This is the expression:
+
+    x
+
+  Procedure `+' from module `scheme' has this type:
+
+    (#!rest number -> number)
+
+Warning: Type mismatch
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `foo10',
+  In expression:
+
+    (scheme#substring x 0 10)
+
+  Expression's declared and actual types do not match.
+
+  The declared type is:
+
+    pair
+
+  The actual type is:
+
+    string
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `foo10',
+  In procedure call:
+
+    (scheme#string-append (the pair (scheme#substring x 0 10)))
+
+  Argument #1 to procedure `string-append' has an invalid type:
+
+    pair
+
+  The expected type is:
+
+    string
+
+  This is the expression:
+
+    (the pair (scheme#substring x 0 10))
+
+  Procedure `string-append' from module `scheme' has this type:
+
+    (#!rest string -> string)
+
+Warning: Too many values
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `foo10',
+  In expression:
+
+    (scheme#values 1 2)
+
+  Expression returns too many values.
+
+  The expression returns 2 values but is declared to return:
+
+    *
+
+Warning: Not enough values
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `foo10',
+  In expression:
+
+    (scheme#values)
+
+  Expression returns 0 values but is declared to return:
+
+    *
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `foo10',
+  In procedure call:
+
+    (scheme#* x y)
+
+  Argument #1 to procedure `*' has an invalid type:
+
+    string
+
+  The expected type is:
+
+    number
+
+  This is the expression:
+
+    x
+
+  Procedure `*' from module `scheme' has this type:
+
+    (#!rest number -> number)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  In module `foo',
+  In procedure `blabla',
+  In procedure call:
+
+    (scheme#+ 1 'x)
+
+  Argument #2 to procedure `+' has an invalid type:
+
+    symbol
+
+  The expected type is:
+
+    number
+
+  This is the expression:
+
+    'x
+
+  Procedure `+' from module `scheme' has this type:
+
+    (#!rest number -> number)
+
+Warning: Deprecated identifier `deprecated-procedure'
+  At the toplevel,
+  In expression:
+
+    deprecated-procedure
+
+  Use of deprecated identifier `deprecated-procedure'.
+
+Warning: Deprecated identifier `another-deprecated-procedure'
+  At the toplevel,
+  In expression:
+
+    another-deprecated-procedure
+
+  Use of deprecated identifier `another-deprecated-procedure'.
+
+  The suggested alternative is `replacement-procedure'.
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (apply1 scheme#+ (scheme#list 'a 2 3))
+
+  Argument #2 to procedure `apply1' has an invalid type:
+
+    (list symbol fixnum fixnum)
+
+  The expected type is:
+
+    (list-of number)
+
+  It is a call to `list' from module `scheme' which has this type:
+
+    (#!rest * --> list)
+
+  This is the expression:
+
+    (scheme#list 'a 2 3)
+
+  Procedure `apply1' has this type:
+
+    ((#!rest 'a -> 'b) (list-of 'a) -> 'b)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (apply1 scheme#+ (scheme#cons 'a (scheme#cons 2 (scheme#cons 3 ...))))
+
+  Argument #2 to procedure `apply1' has an invalid type:
+
+    (list symbol fixnum fixnum)
+
+  The expected type is:
+
+    (list-of number)
+
+  It is a call to `cons' from module `scheme' which has this type:
+
+    ('a 'b --> (pair 'a 'b))
+
+  This is the expression:
+
+    (scheme#cons 'a (scheme#cons 2 (scheme#cons 3 '())))
+
+  Procedure `apply1' has this type:
+
+    ((#!rest 'a -> 'b) (list-of 'a) -> 'b)
+
+Note: Predicate is always true
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (chicken.base#fixnum? x)
+
+  The predicate will always return true.
+
+  Procedure `fixnum?' from module `chicken.base' is a predicate for:
+
+    fixnum
+
+  The given argument has this type:
+
+    fixnum
+
+Note: Predicate is always false
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (scheme#symbol? x)
+
+  The predicate will always return false.
+
+  Procedure `symbol?' from module `scheme' is a predicate for:
+
+    symbol
+
+  The given argument has this type:
+
+    (or char string)
+
+Note: Predicate is always false
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (scheme#string? x)
+
+  The predicate will always return false.
+
+  Procedure `string?' from module `scheme' is a predicate for:
+
+    string
+
+  The given argument has this type:
+
+    (not (or char string))
+
+Note: Predicate is always false
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (char-or-string? x)
+
+  The predicate will always return false.
+
+  Procedure `char-or-string?' is a predicate for:
+
+    (or char string)
+
+  The given argument has this type:
+
+    fixnum
+
+Note: Test is always false
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In conditional expression:
+
+    (if (char-or-string? x) (scheme#symbol? x) (scheme#string? x))
+
+  Test condition is always false.
+
+Note: Predicate is always false
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (scheme#string? x)
+
+  The predicate will always return false.
+
+  Procedure `string?' from module `scheme' is a predicate for:
+
+    string
+
+  The given argument has this type:
+
+    fixnum
+
+Note: Predicate is always false
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (scheme#symbol? x)
+
+  The predicate will always return false.
+
+  Procedure `symbol?' from module `scheme' is a predicate for:
+
+    symbol
+
+  The given argument has this type:
+
+    char
+
+Note: Predicate is always false
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (scheme#string? x)
+
+  The predicate will always return false.
+
+  Procedure `string?' from module `scheme' is a predicate for:
+
+    string
+
+  The given argument has this type:
+
+    symbol
+
+Note: Predicate is always false
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (scheme#symbol? x)
+
+  The predicate will always return false.
+
+  Procedure `symbol?' from module `scheme' is a predicate for:
+
+    symbol
+
+  The given argument has this type:
+
+    (or char string)
+
+Note: Predicate is always false
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (scheme#string? x)
+
+  The predicate will always return false.
+
+  Procedure `string?' from module `scheme' is a predicate for:
+
+    string
+
+  The given argument has this type:
+
+    symbol
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (f (scheme#list))
+
+  Argument #1 to procedure `f' has an invalid type:
+
+    null
+
+  The expected type is:
+
+    pair
+
+  It is a call to `list' from module `scheme' which has this type:
+
+    (#!rest * --> list)
+
+  This is the expression:
+
+    (scheme#list)
+
+  Procedure `f' has this type:
+
+    (pair -> *)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (f (scheme#list 1))
+
+  Argument #1 to procedure `f' has an invalid type:
+
+    (list fixnum)
+
+  The expected type is:
+
+    null
+
+  It is a call to `list' from module `scheme' which has this type:
+
+    (#!rest * --> list)
+
+  This is the expression:
+
+    (scheme#list 1)
+
+  Procedure `f' has this type:
+
+    (null -> *)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  At the toplevel,
+  In procedure call:
+
+    (f (scheme#cons 1 2))
+
+  Argument #1 to procedure `f' has an invalid type:
+
+    (pair fixnum fixnum)
+
+  The expected type is:
+
+    list
+
+  It is a call to `cons' from module `scheme' which has this type:
+
+    ('a 'b --> (pair 'a 'b))
+
+  This is the expression:
+
+    (scheme#cons 1 2)
+
+  Procedure `f' has this type:
+
+    (list -> *)
+
+Warning: Negative vector index
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `vector-ref-warn1',
+  In procedure call:
+
+    (scheme#vector-ref v1 -1)
+
+  Procedure `vector-ref' from module `scheme' is called with a negative index -1.
+
+Warning: Vector index out of range
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `vector-ref-warn2',
+  In procedure call:
+
+    (scheme#vector-ref v1 3)
+
+  Procedure `vector-ref' from module `scheme' is called with index `3' for a vector of length `3'.
+
+Warning: Vector index out of range
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `vector-ref-warn3',
+  In procedure call:
+
+    (scheme#vector-ref v1 4)
+
+  Procedure `vector-ref' from module `scheme' is called with index `4' for a vector of length `3'.
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `vector-ref-standard-warn1',
+  In procedure call:
+
+    (scheme#vector-ref v1 'bad)
+
+  Argument #2 to procedure `vector-ref' has an invalid type:
+
+    symbol
+
+  The expected type is:
+
+    fixnum
+
+  This is the expression:
+
+    'bad
+
+  Procedure `vector-ref' from module `scheme' has this type:
+
+    ((vector-of 'a) fixnum -> 'a)
+
+Warning: Negative vector index
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `vector-set!-warn1',
+  In procedure call:
+
+    (scheme#vector-set! v1 -1 'whatever)
+
+  Procedure `vector-set!' from module `scheme' is called with a negative index -1.
+
+Warning: Vector index out of range
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `vector-set!-warn2',
+  In procedure call:
+
+    (scheme#vector-set! v1 3 'whatever)
+
+  Procedure `vector-set!' from module `scheme' is called with index `3' for a vector of length `3'.
+
+Warning: Vector index out of range
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `vector-set!-warn3',
+  In procedure call:
+
+    (scheme#vector-set! v1 4 'whatever)
+
+  Procedure `vector-set!' from module `scheme' is called with index `4' for a vector of length `3'.
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `vector-set!-standard-warn1',
+  In procedure call:
+
+    (scheme#vector-set! v1 'bad 'whatever)
+
+  Argument #2 to procedure `vector-set!' has an invalid type:
+
+    symbol
+
+  The expected type is:
+
+    fixnum
+
+  This is the expression:
+
+    'bad
+
+  Procedure `vector-set!' from module `scheme' has this type:
+
+    (vector fixnum * -> undefined)
+
+Warning: Negative list index
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `list-ref-warn1',
+  In procedure call:
+
+    (scheme#list-ref l1 -1)
+
+  Procedure `list-ref' from module `scheme' is called with a negative index -1.
+
+Warning: Negative list index
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `list-ref-warn2',
+  In procedure call:
+
+    (scheme#list-ref l2 -1)
+
+  Procedure `list-ref' from module `scheme' is called with a negative index -1.
+
+Warning: Negative list index
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `list-ref-warn3',
+  In procedure call:
+
+    (scheme#list-ref l3 -1)
+
+  Procedure `list-ref' from module `scheme' is called with a negative index -1.
+
+Warning: List index out of range
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `list-ref-warn4',
+  In procedure call:
+
+    (scheme#list-ref l1 3)
+
+  Procedure `list-ref' from module `scheme' is called with index `3' for a list of length `3'.
+
+Warning: List index out of range
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `list-ref-warn5',
+  In procedure call:
+
+    (scheme#list-ref l1 4)
+
+  Procedure `list-ref' from module `scheme' is called with index `4' for a list of length `3'.
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `list-ref-standard-warn1',
+  In procedure call:
+
+    (scheme#list-ref l1 'bad)
+
+  Argument #2 to procedure `list-ref' has an invalid type:
+
+    symbol
+
+  The expected type is:
+
+    fixnum
+
+  This is the expression:
+
+    'bad
+
+  Procedure `list-ref' from module `scheme' has this type:
+
+    ((list-of 'a) fixnum -> 'a)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `list-ref-standard-warn2',
+  In procedure call:
+
+    (scheme#list-ref l1 'bad)
+
+  Argument #2 to procedure `list-ref' has an invalid type:
+
+    symbol
+
+  The expected type is:
+
+    fixnum
+
+  This is the expression:
+
+    'bad
+
+  Procedure `list-ref' from module `scheme' has this type:
+
+    ((list-of 'a) fixnum -> 'a)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `list-ref-standard-warn3',
+  In procedure call:
+
+    (scheme#list-ref l2 'bad)
+
+  Argument #2 to procedure `list-ref' has an invalid type:
+
+    symbol
+
+  The expected type is:
+
+    fixnum
+
+  This is the expression:
+
+    'bad
+
+  Procedure `list-ref' from module `scheme' has this type:
+
+    ((list-of 'a) fixnum -> 'a)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `list-ref-standard-warn4',
+  In procedure call:
+
+    (scheme#list-ref l2 'bad)
+
+  Argument #2 to procedure `list-ref' has an invalid type:
+
+    symbol
+
+  The expected type is:
+
+    fixnum
+
+  This is the expression:
+
+    'bad
+
+  Procedure `list-ref' from module `scheme' has this type:
+
+    ((list-of 'a) fixnum -> 'a)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `list-ref-type-warn1',
+  In procedure call:
+
+    (chicken.base#add1 (scheme#list-ref l1 1))
+
+  Argument #1 to procedure `add1' has an invalid type:
+
+    symbol
+
+  The expected type is:
+
+    number
+
+  It is a call to `list-ref' from module `scheme' which has this type:
+
+    ((list-of 'a) fixnum -> 'a)
+
+  This is the expression:
+
+    (scheme#list-ref l1 1)
+
+  Procedure `add1' from module `chicken.base' has this type:
+
+    (number -> number)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `list-ref-type-warn2',
+  In procedure call:
+
+    (chicken.base#add1 (scheme#list-ref l2 1))
+
+  Argument #1 to procedure `add1' has an invalid type:
+
+    symbol
+
+  The expected type is:
+
+    number
+
+  It is a call to `list-ref' from module `scheme' which has this type:
+
+    ((list-of 'a) fixnum -> 'a)
+
+  This is the expression:
+
+    (scheme#list-ref l2 1)
+
+  Procedure `add1' from module `chicken.base' has this type:
+
+    (number -> number)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `list-ref-type-warn3',
+  In procedure call:
+
+    (chicken.base#add1 (scheme#list-ref l3 1))
+
+  Argument #1 to procedure `add1' has an invalid type:
+
+    symbol
+
+  The expected type is:
+
+    number
+
+  It is a call to `list-ref' from module `scheme' which has this type:
+
+    ((list-of 'a) fixnum -> 'a)
+
+  This is the expression:
+
+    (scheme#list-ref l3 1)
+
+  Procedure `add1' from module `chicken.base' has this type:
+
+    (number -> number)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `append-result-type-warn1',
+  In procedure call:
+
+    (chicken.base#add1 (scheme#list-ref l1 1))
+
+  Argument #1 to procedure `add1' has an invalid type:
+
+    symbol
+
+  The expected type is:
+
+    number
+
+  It is a call to `list-ref' from module `scheme' which has this type:
+
+    ((list-of 'a) fixnum -> 'a)
+
+  This is the expression:
+
+    (scheme#list-ref l1 1)
+
+  Procedure `add1' from module `chicken.base' has this type:
+
+    (number -> number)
+
+Warning: Invalid argument
+  In file `scrutiny-tests.scm:XXX',
+  In procedure `append-result-type-warn2',
+  In procedure call:
+
+    (chicken.base#add1 (scheme#list-ref l3 3))
+
+  Argument #1 to procedure `add1' has an invalid type:
+
+    symbol
+
+  The expected type is:
+
+    number
+
+  It is a call to `list-ref' from module `scheme' which has this type:
+
+    ((list-of 'a) fixnum -> 'a)
+
+  This is the expression:
+
+    (scheme#list-ref l3 3)
+
+  Procedure `add1' from module `chicken.base' has this type:
+
+    (number -> number)
+
+Warning: redefinition of standard binding: scheme#car

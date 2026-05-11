@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken process signal)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_process_signal.29">Module (chicken process signal)</a>
+<ul>
+<li><a href="#sec:set-alarm.21">set-alarm!</a></li>
+<li><a href="#sec:make-signal-handler">make-signal-handler</a></li>
+<li><a href="#sec:signal-ignore">signal-ignore</a></li>
+<li><a href="#sec:signal-default">signal-default</a></li>
+<li><a href="#sec:set-signal-mask.21">set-signal-mask!</a></li>
+<li><a href="#sec:signal-mask">signal-mask</a></li>
+<li><a href="#sec:signal-masked.3f">signal-masked?</a></li>
+<li><a href="#sec:signal-mask.21">signal-mask!</a></li>
+<li><a href="#sec:signal-unmask.21">signal-unmask!</a></li>
+<li><a href="#sec:Signal_codes">Signal codes</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_process_signal.29"><a href="#sec:Module_.28chicken_process_signal.29">Module (chicken process signal)</a></h2><p>This module offers procedures for dealing with POSIX process signals.</p><p>Please note that signals are very POSIX-specific.  Windows only supports rudimentary in-process signals for dealing with user interrupts, segmentation violations, floating-point exceptions and the like.  Inter-process signals are not supported.  Therefore, most of the procedures here are not available on native Windows builds.  If that's the case, the description contains a note.</p><h3 id="sec:set-alarm.21"><a href="#sec:set-alarm.21">set-alarm!</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:set-alarm.21"><span class="sig"><var class="id">set-alarm!</var> <var class="arg">SECONDS</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Sets an internal timer to raise the <tt>signal/alrm</tt> after <var class="arg">SECONDS</var> are elapsed.  You can use the <tt>make-signal-handler</tt> procedure to write a handler for this signal.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h3 id="sec:make-signal-handler"><a href="#sec:make-signal-handler">make-signal-handler</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:make-signal-handler"><span class="sig"><var class="id">make-signal-handler</var> <var class="arg">SIGNUM</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Establishes a handler for the POSIX signals with the numbers <tt>SIGNUM ...</tt> and returns a procedure of zero or one argument. Should one of the given signals be raised, then it will be stored in a queue. Invoking the procedure returned by <tt>make-signal-handler</tt> with zero arguments or with the argument <tt>#f</tt> will remove the oldest entry in the queue and return it to the caller. Invoking the procedure with argument <tt>#t</tt> when no signal was raised since the creation of the signal handler or the most recent call to the handler will result in suspending the execution until one of the signals given in <tt>SIGNUM ...</tt> occurs.</p><p>Notes:</p><ul><li>when signals arrive in quick succession (specifically, before the handler for a signal has been started), then signals will be queued (up to a certain limit); the order in which the queued signals will be handled is not specified</li>
+<li>Any signal handlers for the signals <tt>signal/segv</tt>, <tt>signal/bus</tt>, <tt>signal/fpe</tt> and <tt>signal/ill</tt> will be ignored and these signals will always trigger an exception, unless the executable was started with the <tt>-:S</tt> runtime option. This feature is only available on platforms that support the <tt>sigprocmask(3)</tt> POSIX API function.</li>
+</ul>
+</dd></dl><h3 id="sec:signal-ignore"><a href="#sec:signal-ignore">signal-ignore</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:signal-ignore"><span class="sig"><var class="id">signal-ignore</var> <var class="arg">SIGNUM</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Ignores any future occurrences if the signal <var class="arg">SIGNUM</var> by setting its disposition to <tt>SIG_IGN</tt>.</p></dd></dl><h3 id="sec:signal-default"><a href="#sec:signal-default">signal-default</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:signal-default"><span class="sig"><var class="id">signal-default</var> <var class="arg">SIGNUM</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Sets the default disposition for the signal <var class="arg">SIGNUM</var> by setting its disposition to <tt>SIG_DFL</tt>.</p></dd></dl><h3 id="sec:set-signal-mask.21"><a href="#sec:set-signal-mask.21">set-signal-mask!</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:set-signal-mask.21"><span class="sig"><var class="id">set-signal-mask!</var> <var class="arg">SIGLIST</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Sets the signal mask of the current process to block all signals given in the list <var class="arg">SIGLIST</var>.  Signals masked in that way will not be delivered to the current process.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h3 id="sec:signal-mask"><a href="#sec:signal-mask">signal-mask</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:signal-mask"><span class="sig"><var class="id">signal-mask</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the signal mask of the current process.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h3 id="sec:signal-masked.3f"><a href="#sec:signal-masked.3f">signal-masked?</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:signal-masked.3f"><span class="sig"><var class="id">signal-masked?</var> <var class="arg">SIGNUM</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns whether the signal for the code <var class="arg">SIGNUM</var> is currently masked.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h3 id="sec:signal-mask.21"><a href="#sec:signal-mask.21">signal-mask!</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:signal-mask.21"><span class="sig"><var class="id">signal-mask!</var> <var class="arg">SIGNUM</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Masks (blocks) the signal for the code <var class="arg">SIGNUM</var>.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h3 id="sec:signal-unmask.21"><a href="#sec:signal-unmask.21">signal-unmask!</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:signal-unmask.21"><span class="sig"><var class="id">signal-unmask!</var> <var class="arg">SIGNUM</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Unmasks (unblocks) the signal for the code <var class="arg">SIGNUM</var>.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), this procedure is unimplemented and will raise an error.</p></dd></dl><h3 id="sec:Signal_codes"><a href="#sec:Signal_codes">Signal codes</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:signal.2fterm"><span class="sig"><var class="id">signal/term</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fkill"><span class="sig"><var class="id">signal/kill</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fint"><span class="sig"><var class="id">signal/int</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fhup"><span class="sig"><var class="id">signal/hup</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2ffpe"><span class="sig"><var class="id">signal/fpe</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fill"><span class="sig"><var class="id">signal/ill</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fsegv"><span class="sig"><var class="id">signal/segv</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fabrt"><span class="sig"><var class="id">signal/abrt</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2ftrap"><span class="sig"><var class="id">signal/trap</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fquit"><span class="sig"><var class="id">signal/quit</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2falrm"><span class="sig"><var class="id">signal/alrm</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fvtalrm"><span class="sig"><var class="id">signal/vtalrm</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fprof"><span class="sig"><var class="id">signal/prof</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fio"><span class="sig"><var class="id">signal/io</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2furg"><span class="sig"><var class="id">signal/urg</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fchld"><span class="sig"><var class="id">signal/chld</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fcont"><span class="sig"><var class="id">signal/cont</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fstop"><span class="sig"><var class="id">signal/stop</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2ftstp"><span class="sig"><var class="id">signal/tstp</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fpipe"><span class="sig"><var class="id">signal/pipe</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fxcpu"><span class="sig"><var class="id">signal/xcpu</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fxfsz"><span class="sig"><var class="id">signal/xfsz</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fusr1"><span class="sig"><var class="id">signal/usr1</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fusr2"><span class="sig"><var class="id">signal/usr2</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fbus"><span class="sig"><var class="id">signal/bus</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fwinch"><span class="sig"><var class="id">signal/winch</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signal.2fbreak"><span class="sig"><var class="id">signal/break</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:signals-list"><span class="sig"><var class="id">signals-list</var></span><span class="type">constant</span></dt>
+<dd class="defsig"><p>These variables contain signal codes for use with <tt>process-signal</tt>, <tt>set-signal-handler!</tt>, <tt>signal-handler</tt>, <tt>signal-masked?</tt>, <tt>signal-mask!</tt>, or <tt>signal-unmask!</tt>.</p><p><b>NOTE</b>: On native Windows builds (all except cygwin), only <tt>signal/term</tt>, <tt>signal/int</tt>, <tt>signal/fpe</tt>, <tt>signal/ill</tt>, <tt>signal/segv</tt>, <tt>signal/abrt</tt>, <tt>signal/break</tt> have an actual value.  The others are all defined as zero, because those signals don't exist on Windows.</p><p><b>NOTE</b>: On UNIX builds and cygwin, <tt>signal/break</tt> is defined as zero because it only exists on Windows.</p><p>To get a list of signals that are known to exist on the current platform, you can check <tt>signals-list</tt> which is a list of integers (signal numbers).</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20process%29.html">Module (chicken process)</a></p><p>Next: <a href="Module%20%28chicken%20process-context%29.html">Module (chicken process-context)</a></p></div></div></body></html>

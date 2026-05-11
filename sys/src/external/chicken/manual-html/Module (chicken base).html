@@ -1,0 +1,689 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken base)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_base.29">Module (chicken base)</a>
+<ul>
+<li><a href="#sec:Numeric_predicates">Numeric predicates</a>
+<ul>
+<li><a href="#sec:fixnum.3f">fixnum?</a></li>
+<li><a href="#sec:flonum.3f">flonum?</a></li>
+<li><a href="#sec:bignum.3f">bignum?</a></li>
+<li><a href="#sec:exact-integer.3f">exact-integer?</a></li>
+<li><a href="#sec:cplxnum.3f">cplxnum?</a></li>
+<li><a href="#sec:ratnum.3f">ratnum?</a></li>
+<li><a href="#sec:nan.3f">nan?</a></li>
+<li><a href="#sec:infinite.3f">infinite?</a></li>
+<li><a href="#sec:finite.3f">finite?</a></li>
+<li><a href="#sec:equal.3d.3f">equal=?</a></li></ul></li>
+<li><a href="#sec:Arithmetic">Arithmetic</a>
+<ul>
+<li><a href="#sec:add1.2fsub1">add1/sub1</a></li>
+<li><a href="#sec:exact-integer-sqrt">exact-integer-sqrt</a></li>
+<li><a href="#sec:exact-integer-nth-root">exact-integer-nth-root</a></li>
+<li><a href="#sec:Division_with_quotient_and_remainder">Division with quotient and remainder</a></li>
+<li><a href="#sec:signum">signum</a></li></ul></li>
+<li><a href="#sec:Weak_pairs">Weak pairs</a>
+<ul>
+<li><a href="#sec:weak-cons">weak-cons</a></li></ul></li>
+<li><a href="#sec:Lazy_evaluation">Lazy evaluation</a>
+<ul>
+<li><a href="#sec:delay-force">delay-force</a></li>
+<li><a href="#sec:make-promise">make-promise</a></li>
+<li><a href="#sec:promise.3f">promise?</a></li></ul></li>
+<li><a href="#sec:Input.2fOutput">Input/Output</a>
+<ul>
+<li><a href="#sec:current-error-port">current-error-port</a></li>
+<li><a href="#sec:print">print</a></li>
+<li><a href="#sec:print.2a">print*</a></li></ul></li>
+<li><a href="#sec:Interrupts_and_error-handling">Interrupts and error-handling</a>
+<ul>
+<li><a href="#sec:enable-warnings">enable-warnings</a></li>
+<li><a href="#sec:error">error</a></li>
+<li><a href="#sec:assert">assert</a></li>
+<li><a href="#sec:get-call-chain">get-call-chain</a></li>
+<li><a href="#sec:print-call-chain">print-call-chain</a></li>
+<li><a href="#sec:procedure-information">procedure-information</a></li>
+<li><a href="#sec:warning">warning</a></li></ul></li>
+<li><a href="#sec:Lists">Lists</a>
+<ul>
+<li><a href="#sec:alist-ref">alist-ref</a></li>
+<li><a href="#sec:alist-update">alist-update</a></li>
+<li><a href="#sec:atom.3f">atom?</a></li>
+<li><a href="#sec:butlast">butlast</a></li>
+<li><a href="#sec:chop">chop</a></li>
+<li><a href="#sec:compress">compress</a></li>
+<li><a href="#sec:flatten">flatten</a></li>
+<li><a href="#sec:foldl">foldl</a></li>
+<li><a href="#sec:foldr">foldr</a></li>
+<li><a href="#sec:intersperse">intersperse</a></li>
+<li><a href="#sec:join">join</a></li>
+<li><a href="#sec:rassoc">rassoc</a></li>
+<li><a href="#sec:tail.3f">tail?</a></li></ul></li>
+<li><a href="#sec:Vectors">Vectors</a>
+<ul>
+<li><a href="#sec:vector-copy.21">vector-copy!</a></li>
+<li><a href="#sec:vector-resize">vector-resize</a></li>
+<li><a href="#sec:subvector">subvector</a></li></ul></li>
+<li><a href="#sec:Combinators">Combinators</a>
+<ul>
+<li><a href="#sec:constantly">constantly</a></li>
+<li><a href="#sec:complement">complement</a></li>
+<li><a href="#sec:compose">compose</a></li>
+<li><a href="#sec:conjoin">conjoin</a></li>
+<li><a href="#sec:disjoin">disjoin</a></li>
+<li><a href="#sec:each">each</a></li>
+<li><a href="#sec:flip">flip</a></li>
+<li><a href="#sec:identity">identity</a></li>
+<li><a href="#sec:list-of.3f">list-of?</a></li>
+<li><a href="#sec:o">o</a></li></ul></li>
+<li><a href="#sec:User-defined_named_characters">User-defined named characters</a>
+<ul>
+<li><a href="#sec:char-name">char-name</a></li></ul></li>
+<li><a href="#sec:The_unspecified_value">The unspecified value</a>
+<ul>
+<li><a href="#sec:void">void</a></li></ul></li>
+<li><a href="#sec:Continuations">Continuations</a>
+<ul>
+<li><a href="#sec:call.2fcc">call/cc</a></li></ul></li>
+<li><a href="#sec:Symbols">Symbols</a>
+<ul>
+<li><a href="#sec:Symbol_utilities">Symbol utilities</a>
+<ul>
+<li><a href="#sec:symbol-append">symbol-append</a></li></ul></li>
+<li><a href="#sec:Uninterned_symbols_.28.22gensyms.22.29">Uninterned symbols (&quot;gensyms&quot;)</a>
+<ul>
+<li><a href="#sec:gensym">gensym</a></li>
+<li><a href="#sec:string-.3euninterned-symbol">string-&gt;uninterned-symbol</a></li></ul></li></ul></li>
+<li><a href="#sec:Setters">Setters</a>
+<ul>
+<li><a href="#sec:setter">setter</a></li>
+<li><a href="#sec:getter-with-setter">getter-with-setter</a></li></ul></li>
+<li><a href="#sec:Binding_forms_for_optional_arguments">Binding forms for optional arguments</a>
+<ul>
+<li><a href="#sec:optional">optional</a></li>
+<li><a href="#sec:case-lambda">case-lambda</a></li>
+<li><a href="#sec:let-optionals">let-optionals</a></li>
+<li><a href="#sec:let-optionals.2a">let-optionals*</a></li></ul></li>
+<li><a href="#sec:Other_binding_forms">Other binding forms</a>
+<ul>
+<li><a href="#sec:and-let.2a">and-let*</a></li>
+<li><a href="#sec:letrec.2a">letrec*</a></li>
+<li><a href="#sec:rec">rec</a></li>
+<li><a href="#sec:cut">cut</a></li>
+<li><a href="#sec:define-values">define-values</a></li>
+<li><a href="#sec:fluid-let">fluid-let</a></li>
+<li><a href="#sec:let-values">let-values</a></li>
+<li><a href="#sec:let.2a-values">let*-values</a></li>
+<li><a href="#sec:letrec-values">letrec-values</a></li>
+<li><a href="#sec:receive">receive</a></li>
+<li><a href="#sec:set.21-values">set!-values</a></li>
+<li><a href="#sec:nth-value">nth-value</a></li></ul></li>
+<li><a href="#sec:Parameters">Parameters</a>
+<ul>
+<li><a href="#sec:parameterize">parameterize</a></li>
+<li><a href="#sec:make-parameter">make-parameter</a></li></ul></li>
+<li><a href="#sec:Substitution_forms_and_macros">Substitution forms and macros</a>
+<ul>
+<li><a href="#sec:define-constant">define-constant</a></li>
+<li><a href="#sec:define-inline">define-inline</a></li></ul></li>
+<li><a href="#sec:Conditional_forms">Conditional forms</a>
+<ul>
+<li><a href="#sec:unless">unless</a></li>
+<li><a href="#sec:when">when</a></li></ul></li>
+<li><a href="#sec:Record_structures">Record structures</a>
+<ul>
+<li><a href="#sec:define-record">define-record</a>
+<ul>
+<li><a href="#sec:SRFI-17_setters">SRFI-17 setters</a></li></ul></li>
+<li><a href="#sec:define-record-type">define-record-type</a></li>
+<li><a href="#sec:record-printer">record-printer</a></li>
+<li><a href="#sec:set-record-printer.21">set-record-printer!</a></li></ul></li>
+<li><a href="#sec:Other_forms">Other forms</a>
+<ul>
+<li><a href="#sec:include">include</a></li>
+<li><a href="#sec:include-relative">include-relative</a></li></ul></li>
+<li><a href="#sec:Making_extra_libraries_and_extensions_available">Making extra libraries and extensions available</a>
+<ul>
+<li><a href="#sec:require-extension">require-extension</a></li>
+<li><a href="#sec:require-library">require-library</a></li></ul></li>
+<li><a href="#sec:Process_shutdown">Process shutdown</a>
+<ul>
+<li><a href="#sec:emergency-exit">emergency-exit</a></li>
+<li><a href="#sec:exit">exit</a></li></ul></li>
+<li><a href="#sec:exit-handler">exit-handler</a></li>
+<li><a href="#sec:implicit-exit-handler">implicit-exit-handler</a>
+<ul>
+<li><a href="#sec:on-exit">on-exit</a></li></ul></li>
+<li><a href="#sec:System_interface">System interface</a>
+<ul>
+<li><a href="#sec:sleep">sleep</a></li></ul></li>
+<li><a href="#sec:Ports">Ports</a>
+<ul>
+<li><a href="#sec:String_ports">String ports</a>
+<ul>
+<li><a href="#sec:get-output-string">get-output-string</a></li>
+<li><a href="#sec:open-input-string">open-input-string</a></li>
+<li><a href="#sec:open-output-string">open-output-string</a></li></ul></li></ul></li>
+<li><a href="#sec:File_Input.2fOutput">File Input/Output</a>
+<ul>
+<li><a href="#sec:flush-output">flush-output</a></li></ul></li>
+<li><a href="#sec:Port_predicates">Port predicates</a>
+<ul>
+<li><a href="#sec:input-port-open.3f">input-port-open?</a></li>
+<li><a href="#sec:port-closed.3f">port-closed?</a></li>
+<li><a href="#sec:port.3f">port?</a></li></ul></li>
+<li><a href="#sec:Built-in_parameters">Built-in parameters</a>
+<ul>
+<li><a href="#sec:case-sensitive">case-sensitive</a></li>
+<li><a href="#sec:keyword-style">keyword-style</a></li>
+<li><a href="#sec:parentheses-synonyms">parentheses-synonyms</a></li>
+<li><a href="#sec:symbol-escape">symbol-escape</a></li></ul></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_base.29"><a href="#sec:Module_.28chicken_base.29">Module (chicken base)</a></h2><p>Core procedures and macros, acting as basic extensions to the R5RS standard and other essential features.</p><p>This module is used by default, unless a program is compiled with the <tt>-explicit-use</tt> option.</p><h3 id="sec:Numeric_predicates"><a href="#sec:Numeric_predicates">Numeric predicates</a></h3><p>These allow you to make a more precise differentiation between number types and their properties, not provided by R5RS.</p><h4 id="sec:fixnum.3f"><a href="#sec:fixnum.3f">fixnum?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:fixnum.3f"><span class="sig"><var class="id">fixnum?</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">X</var> is a fixnum, or <tt>#f</tt> otherwise.</p></dd></dl><h4 id="sec:flonum.3f"><a href="#sec:flonum.3f">flonum?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:flonum.3f"><span class="sig"><var class="id">flonum?</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">X</var> is a flonum, or <tt>#f</tt> otherwise.</p></dd></dl><h4 id="sec:bignum.3f"><a href="#sec:bignum.3f">bignum?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:bignum.3f"><span class="sig"><var class="id">bignum?</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">X</var> is a bignum (integer larger than fits in a fixnum), or <tt>#f</tt> otherwise.</p></dd></dl><h4 id="sec:exact-integer.3f"><a href="#sec:exact-integer.3f">exact-integer?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:exact-integer.3f"><span class="sig"><var class="id">exact-integer?</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">X</var> is an exact integer (i.e., a fixnum or a bignum), or <tt>#f</tt> otherwise.</p><p>This procedure is compatible with the definition from the R7RS <tt>(scheme base)</tt> library.</p></dd></dl><h4 id="sec:cplxnum.3f"><a href="#sec:cplxnum.3f">cplxnum?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:cplxnum.3f"><span class="sig"><var class="id">cplxnum?</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">X</var> is a true complex number (it has an imaginary component), or <tt>#f</tt> otherwise.</p><p>Please note that <tt>complex?</tt> will always return <tt>#t</tt> for any number type supported by CHICKEN, so you can use this predicate if you want to know the representational type of a number.</p></dd></dl><h4 id="sec:ratnum.3f"><a href="#sec:ratnum.3f">ratnum?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:ratnum.3f"><span class="sig"><var class="id">ratnum?</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">X</var> is a true rational number (it is a fraction with a denominator that's not 1), or <tt>#f</tt> otherwise.</p><p>Please note that <tt>rational?</tt> will always return <tt>#t</tt> for any number type supported by CHICKEN except complex numbers and non-finite flonums, so you can use this predicate if you want to know the representational type of a number.</p></dd></dl><h4 id="sec:nan.3f"><a href="#sec:nan.3f">nan?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:nan.3f"><span class="sig"><var class="id">nan?</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">N</var> is not a number (a IEEE flonum NaN-value).  If <var class="arg">N</var> is a complex number, it's considered nan if it has a real or imaginary component that's nan.</p><p>This procedure is compatible with the definition from the R7RS <tt>(scheme inexact)</tt> library.</p></dd></dl><h4 id="sec:infinite.3f"><a href="#sec:infinite.3f">infinite?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:infinite.3f"><span class="sig"><var class="id">infinite?</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">N</var> is negative or positive infinity, and <tt>#f</tt> otherwise.  If <var class="arg">N</var> is a complex number, it's considered infinite if it has a real or imaginary component that's infinite.</p><p>This procedure is compatible with the definition from the R7RS <tt>(scheme inexact)</tt> library.</p></dd></dl><h4 id="sec:finite.3f"><a href="#sec:finite.3f">finite?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:finite.3f"><span class="sig"><var class="id">finite?</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">N</var> represents a finite number and <tt>#f</tt> otherwise.  Positive and negative infinity as well as NaNs are not considered finite.  If <var class="arg">N</var> is a complex number, it's considered finite if both the real and imaginary components are finite.</p><p>This procedure is compatible with the definition from the R7RS <tt>(scheme inexact)</tt> library.</p></dd></dl><h4 id="sec:equal.3d.3f"><a href="#sec:equal.3d.3f">equal=?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:equal.3d.3f"><span class="sig"><var class="id">equal=?</var> <var class="arg">X</var> <var class="arg">y</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Similar to the standard procedure <tt>equal?</tt>, but compares numbers using the <tt>=</tt> operator, so <tt>equal=?</tt> allows structural comparison in combination with comparison of numerical data by value.</p></dd></dl><h3 id="sec:Arithmetic"><a href="#sec:Arithmetic">Arithmetic</a></h3><h4 id="sec:add1.2fsub1"><a href="#sec:add1.2fsub1">add1/sub1</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:add1"><span class="sig"><var class="id">add1</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:sub1"><span class="sig"><var class="id">sub1</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Adds/subtracts 1 from <var class="arg">N</var>.</p></dd></dl><h4 id="sec:exact-integer-sqrt"><a href="#sec:exact-integer-sqrt">exact-integer-sqrt</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:exact-integer-sqrt"><span class="sig"><var class="id">exact-integer-sqrt</var> <var class="arg">K</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns two values <tt>s</tt> and <tt>r</tt>, where <tt>s^2 + r = K</tt> and <tt>K &lt; (s+1)^2</tt>. In other words, <tt>s</tt> is the closest square root we can find that's equal to or smaller than <var class="arg">K</var>, and <tt>r</tt> is the rest if <var class="arg">K</var> isn't a neat square of two numbers.</p><p>This procedure is compatible with the definition from the R7RS <tt>(scheme base)</tt> library.</p></dd></dl><h4 id="sec:exact-integer-nth-root"><a href="#sec:exact-integer-nth-root">exact-integer-nth-root</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:exact-integer-nth-root"><span class="sig"><var class="id">exact-integer-nth-root</var> <var class="arg">K</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Like <tt>exact-integer-sqrt</tt>, but with any base value.  Calculates <tt>\sqrt[N]{K</tt>}, the <var class="arg">N</var>th root of <var class="arg">K</var> and returns two values <tt>s</tt> and <tt>r</tt> where <tt>s^N + r = K</tt> and <tt>K &lt; (s+1)^N</tt>.</p></dd></dl><h4 id="sec:Division_with_quotient_and_remainder"><a href="#sec:Division_with_quotient_and_remainder">Division with quotient and remainder</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:quotient.26remainder"><span class="sig"><var class="id">quotient&amp;remainder</var> <var class="arg">X</var> <var class="arg">Y</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:quotient.26modulo"><span class="sig"><var class="id">quotient&amp;modulo</var> <var class="arg">X</var> <var class="arg">Y</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns two values: the quotient and the remainder (or modulo) of <var class="arg">X</var> divided by <var class="arg">Y</var>.  Could be defined as <tt>(values (quotient X Y) (remainder X Y))</tt>, but is much more efficient when dividing very large numbers.</p></dd></dl><h4 id="sec:signum"><a href="#sec:signum">signum</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:signum"><span class="sig"><var class="id">signum</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>For real numbers, returns <tt>1</tt> if <var class="arg">N</var> is positive, <tt>-1</tt> if <var class="arg">N</var> is negative or <tt>0</tt> if <var class="arg">N</var> is zero. <tt>signum</tt> is exactness preserving.</p><p>For complex numbers, returns a complex number of the same angle but with magnitude 1.</p></dd></dl><h3 id="sec:Weak_pairs"><a href="#sec:Weak_pairs">Weak pairs</a></h3><p><i>Weak pairs</i> behave identically to regular pairs, with one exception: the car value may be garbage collected.  When that happens, it gets replaced with a sentinel &quot;broken-weak-pointer&quot; value.</p><p>They are indistinguishable from regular pairs: <tt>car</tt>, <tt>cdr</tt>, etc all work on them, <tt>pair?</tt> returns true, etc.  The <tt>WRITE</tt> representation is identical to regular pairs, so they will be read back as pairs.  In other words, they have no read/write invariance.</p><p>They're the same as regular pairs for all intents and purposes. However, there's a <tt>weak-pair?</tt> predicate which <i>can</i> distinguish between regular pairs and weak pairs.</p><p>NOTE: Due to internal limitations, <tt>set-car!</tt> on a weak pair currently may cause it to hold onto the value for one more GC cycle in some situations.</p><h4 id="sec:weak-cons"><a href="#sec:weak-cons">weak-cons</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:weak-cons"><span class="sig"><tt>(weak-cons obj[1] obj[2])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a newly allocated weak pair whose car is obj[1] and whose cdr is obj[2]. The pair is indistinguishable from normal pairs, except as noted above.</p><pre>(weak-cons 'a '())                   ===&gt;  (a)
+(weak-cons '(a) '(b c d))            ===&gt;  ((a) b c d)
+(weak-cons &quot;a&quot; '(b c))               ===&gt;  (&quot;a&quot; b c)
+(weak-cons 'a 3)                     ===&gt;  (a . 3)
+(weak-cons '(a b) 'c)                ===&gt;  ((a b) . c)
+
+(import (chicken gc))
+
+(let* ((x '(a b))
+       (y (weak-cons x 'c)))
+  (gc #t)
+  (car x))                           ===&gt; (a b)
+
+(let ((x (weak-cons '(a b) 'c)))
+  (gc #t)
+  (car x))                           ===&gt;  #!bwp</pre><p>As the final two examples show, when something <i>else</i> still holds on to the value that's stored in the car of a weak pair, it will not be reclaimed.  But if the value is <i>only</i> referenced by one or more weak pairs, it is reclaimed and the car of the weak pair is replaced with the <i>broken-weak-pointer</i> value <tt>#!bwp</tt>.</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:weak-pair.3f"><span class="sig"><var class="id">weak-pair?</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>This predicate returns <tt>#t</tt> if and only if <var class="arg">obj</var> is a weak pair.</p><pre>(weak-pair? (weak-cons 'a '()))      ===&gt;  #t
+(weak-pair? (cons 'a '()))           ===&gt;  #f
+(weak-pair? (vector 'a '()))         ===&gt;  #f</pre></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:bwp-object.3f"><span class="sig"><var class="id">bwp-object?</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>This predicate returns <tt>#t</tt> if <var class="arg">obj</var> is the broken-weak-pointer value, otherwise <tt>#f</tt>.</p></dd></dl><h3 id="sec:Lazy_evaluation"><a href="#sec:Lazy_evaluation">Lazy evaluation</a></h3><h4 id="sec:delay-force"><a href="#sec:delay-force">delay-force</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:delay-force"><span class="sig"><tt>(delay-force &lt;expression&gt;)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>The expression <tt>(delay-force expression)</tt> is conceptually similar to <tt>(delay (force expression))</tt>, with the difference that forcing the result of <tt>delay-force</tt> will in effect result in a tail call to <tt>(force expression)</tt>, while forcing the result of <tt>(delay (force expression))</tt> might not.</p><p>Thus iterative lazy algorithms that might result in a long series of chains of delay and force can be rewritten using delay-force to prevent consuming unbounded space during evaluation.</p><p>This special form is compatible with the definition from the R7RS <tt>(scheme lazy)</tt> library.</p><p>See the description of force under <a href="Module%20scheme.html#sec:control-features">Control features</a> in the &quot;scheme&quot; module documentation for a more complete description of delayed evaluation.</p><p>For more information regarding the unbounded build-up of space, see the <a href="http://srfi.schemers.org/srfi-45/srfi-45.html">SRFI-45</a> rationale.</p></dd></dl><h4 id="sec:make-promise"><a href="#sec:make-promise">make-promise</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:make-promise"><span class="sig"><var class="id">make-promise</var> <var class="arg">obj</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>The make-promise procedure returns a promise which, when forced, will return <var class="arg">obj</var> . It is similar to <tt>delay</tt>, but does not delay its argument: it is a procedure rather than syntax. If <var class="arg">obj</var> is already a promise, it is returned.</p><p>This procedure is compatible with the definition from the R7RS <tt>(scheme lazy)</tt> library.</p></dd></dl><h4 id="sec:promise.3f"><a href="#sec:promise.3f">promise?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:promise.3f"><span class="sig"><var class="id">promise?</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">X</var> is a promise returned by <tt>delay</tt>, or <tt>#f</tt> otherwise.</p><p>This procedure is compatible with the definition from the R7RS <tt>(scheme lazy)</tt> library.</p></dd></dl><h3 id="sec:Input.2fOutput"><a href="#sec:Input.2fOutput">Input/Output</a></h3><h4 id="sec:current-error-port"><a href="#sec:current-error-port">current-error-port</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:current-error-port"><span class="sig"><var class="id">current-error-port</var> <var class="dsssl">#!optional</var> <var class="arg">PORT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns default error output port. If <var class="arg">PORT</var> is given, then that port is selected as the new current error output port.</p><p>Note that the default error output port is not buffered. Use <a href="Module%20%28chicken%20port%29.html#sec:set-buffering-mode.21"><tt>set-buffering-mode!</tt></a> if you need a different behaviour.</p></dd></dl><h4 id="sec:print"><a href="#sec:print">print</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:print"><span class="sig"><tt>(print [EXP1 ...])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Outputs the optional arguments <tt>EXP1 ...</tt> using <tt>display</tt> and writes a newline character to the port that is the value of <tt>(current-output-port)</tt>. Returns <tt>(void)</tt>.</p></dd></dl><h4 id="sec:print.2a"><a href="#sec:print.2a">print*</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:print.2a"><span class="sig"><tt>(print* [EXP1 ...])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Similar to <tt>print</tt>, but does not output a terminating newline character and performs a <tt>flush-output</tt> after writing its arguments.</p></dd></dl><h3 id="sec:Interrupts_and_error-handling"><a href="#sec:Interrupts_and_error-handling">Interrupts and error-handling</a></h3><h4 id="sec:enable-warnings"><a href="#sec:enable-warnings">enable-warnings</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:enable-warnings"><span class="sig"><var class="id">enable-warnings</var> <var class="dsssl">#!optional</var> <var class="arg">BOOL</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Enables or disables warnings, depending on wether <var class="arg">BOOL</var> is true or false.  If called with no arguments, this procedure returns <tt>#t</tt> if warnings are currently enabled, or <tt>#f</tt> otherwise. Note that this is not a parameter.  The current state (whether warnings are enabled or disabled) is global and not thread-local.</p></dd></dl><h4 id="sec:error"><a href="#sec:error">error</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:error"><span class="sig"><tt>(error [LOCATION] [STRING] EXP ...)</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Prints error message, writes all extra arguments to the value of <tt>(current-error-port)</tt> and invokes the current exception-handler. This conforms to <a href="http://srfi.schemers.org/srfi-23/srfi-23.html">SRFI-23</a>.  If <tt>LOCATION</tt> is given and a symbol, it specifies the <i>location</i> (the name of the procedure) where the error occurred.</p></dd></dl><h4 id="sec:assert"><a href="#sec:assert">assert</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:assert"><span class="sig"><tt>(assert EXP [OBJ ...])</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Evaluates <tt>EXP</tt>, if it returns #f, <tt>error</tt> is applied to <tt>OBJ ...</tt>, else the result of <tt>EXP</tt> is returned. When compiling in unsafe mode, assertions of this kind are disabled.</p></dd></dl><h4 id="sec:get-call-chain"><a href="#sec:get-call-chain">get-call-chain</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:get-call-chain"><span class="sig"><var class="id">get-call-chain</var> <var class="dsssl">#!optional</var> <var class="arg">START</var> <var class="arg">THREAD</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a list with the call history. Backtrace information is only generated in code compiled without <tt>-no-trace</tt> and evaluated code. If the optional argument <var class="arg">START</var> is given, the backtrace starts at this offset, i.e. when <var class="arg">START</var> is 1, the next to last trace-entry is printed, and so on. If the optional argument <var class="arg">THREAD</var> is given, then the call-chain will only be constructed for calls performed by this thread.</p></dd></dl><h4 id="sec:print-call-chain"><a href="#sec:print-call-chain">print-call-chain</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:print-call-chain"><span class="sig"><var class="id">print-call-chain</var> <var class="dsssl">#!optional</var> <var class="arg">PORT</var> <var class="arg">START</var> <var class="arg">THREAD</var> <var class="arg">HEADER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Prints a backtrace of the procedure call history to <var class="arg">PORT</var>, which defaults to <tt>(current-output-port)</tt>. The output is prefixed by the <var class="arg">HEADER</var>, which defaults to <tt>&quot;\n\tCall history:\n&quot;</tt>.</p></dd></dl><h4 id="sec:procedure-information"><a href="#sec:procedure-information">procedure-information</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:procedure-information"><span class="sig"><var class="id">procedure-information</var> <var class="arg">PROC</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns an s-expression with debug information for the procedure <var class="arg">PROC</var>, or <tt>#f</tt>, if <var class="arg">PROC</var> has no associated debug information.</p></dd></dl><h4 id="sec:warning"><a href="#sec:warning">warning</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:warning"><span class="sig"><tt>(warning MESSAGE [EXP ...])</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Displays a warning message (if warnings are enabled with <tt>enable-warnings</tt>), from the <tt>MESSAGE</tt>, and optional <tt>EXP</tt> arguments, then continues execution. <tt>MESSAGE</tt>, and <tt>EXP</tt>, may be <tt>any</tt> object.</p></dd></dl><h3 id="sec:Lists"><a href="#sec:Lists">Lists</a></h3><h4 id="sec:alist-ref"><a href="#sec:alist-ref">alist-ref</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:alist-ref"><span class="sig"><var class="id">alist-ref</var> <var class="arg">KEY</var> <var class="arg">ALIST</var> <var class="dsssl">#!optional</var> <var class="arg">TEST</var> <var class="arg">DEFAULT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Looks up <var class="arg">KEY</var> in <var class="arg">ALIST</var> using <var class="arg">TEST</var> as the comparison function (or <tt>eqv?</tt> if no test was given) and returns the cdr of the found pair, or <var class="arg">DEFAULT</var> (which defaults to <tt>#f</tt>).</p></dd></dl><h4 id="sec:alist-update"><a href="#sec:alist-update">alist-update</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:alist-update"><span class="sig"><var class="id">alist-update</var> <var class="arg">KEY</var> <var class="arg">VALUE</var> <var class="arg">ALIST</var> <var class="dsssl">#!optional</var> <var class="arg">TEST</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:alist-update.21"><span class="sig"><var class="id">alist-update!</var> <var class="arg">KEY</var> <var class="arg">VALUE</var> <var class="arg">ALIST</var> <var class="dsssl">#!optional</var> <var class="arg">TEST</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>If the list <var class="arg">ALIST</var> contains a pair of the form <tt>(KEY . X)</tt>, then this procedure replaces <tt>X</tt> with <var class="arg">VALUE</var> and returns <var class="arg">ALIST</var>. If <var class="arg">ALIST</var> contains no such item, then <tt>alist-update</tt> returns <tt>((KEY . VALUE) . ALIST)</tt>. The optional argument <var class="arg">TEST</var> specifies the comparison procedure to search a matching pair in <var class="arg">ALIST</var> and defaults to <tt>eqv?</tt>. <tt>alist-update!</tt> is the destructive version of <tt>alist-update</tt>.</p></dd></dl><h4 id="sec:atom.3f"><a href="#sec:atom.3f">atom?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:atom.3f"><span class="sig"><var class="id">atom?</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">X</var> is not a pair.</p></dd></dl><h4 id="sec:butlast"><a href="#sec:butlast">butlast</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:butlast"><span class="sig"><var class="id">butlast</var> <var class="arg">LIST</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a fresh list with all elements but the last of <var class="arg">LIST</var>.</p></dd></dl><h4 id="sec:chop"><a href="#sec:chop">chop</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:chop"><span class="sig"><var class="id">chop</var> <var class="arg">LIST</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a new list of sublists, where each sublist contains <var class="arg">N</var> elements of <var class="arg">LIST</var>. If <var class="arg">LIST</var> has a length that is not a multiple of <var class="arg">N</var>, then the last sublist contains the remaining elements.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">chop &#x27;<span class="paren2">(<span class="default">1 2 3 4 5 6</span>)</span> 2</span>)</span> ==&gt; <span class="paren1">(<span class="default"><span class="paren2">(<span class="default">1 2</span>)</span> <span class="paren2">(<span class="default">3 4</span>)</span> <span class="paren2">(<span class="default">5 6</span>)</span></span>)</span>
+<span class="paren1">(<span class="default">chop &#x27;<span class="paren2">(<span class="default">a b c d</span>)</span> 3</span>)</span>     ==&gt; <span class="paren1">(<span class="default"><span class="paren2">(<span class="default">a b c</span>)</span> <span class="paren2">(<span class="default">d</span>)</span></span>)</span></pre></dd></dl><h4 id="sec:compress"><a href="#sec:compress">compress</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:compress"><span class="sig"><var class="id">compress</var> <var class="arg">BLIST</var> <var class="arg">LIST</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a new list with elements taken from <var class="arg">LIST</var> with corresponding true values in the list <var class="arg">BLIST</var>.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> nums &#x27;<span class="paren2">(<span class="default">99 100 110 401 1234</span>)</span></span>)</span>
+<span class="paren1">(<span class="default">compress <span class="paren2">(<span class="default">map odd? nums</span>)</span> nums</span>)</span>      ==&gt; <span class="paren1">(<span class="default">99 401</span>)</span></pre></dd></dl><h4 id="sec:flatten"><a href="#sec:flatten">flatten</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:flatten"><span class="sig"><var class="id">flatten</var> <var class="arg">LIST1</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>LIST1 ...</tt> concatenated together, with nested lists removed (flattened).</p></dd></dl><h4 id="sec:foldl"><a href="#sec:foldl">foldl</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:foldl"><span class="sig"><var class="id">foldl</var> <var class="arg">PROCEDURE</var> <var class="arg">INIT</var> <var class="arg">LIST</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Applies <var class="arg">PROCEDURE</var> to the elements from <var class="arg">LIST</var>, beginning from the left:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">foldl + 0 &#x27;<span class="paren2">(<span class="default">1 2 3</span>)</span></span>)</span>    ==&gt;    <span class="paren1">(<span class="default">+ <span class="paren2">(<span class="default">+ <span class="paren3">(<span class="default">+ 0 1</span>)</span> 2</span>)</span> 3</span>)</span></pre><p>Note that the order of arguments taken by <var class="arg">PROCEDURE</var> is different from the <tt>SRFI-1</tt> <tt>fold</tt> procedure, but matches the more natural order used in Haskell and Objective Caml.</p></dd></dl><h4 id="sec:foldr"><a href="#sec:foldr">foldr</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:foldr"><span class="sig"><var class="id">foldr</var> <var class="arg">PROCEDURE</var> <var class="arg">INIT</var> <var class="arg">LIST</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Applies <var class="arg">PROCEDURE</var> to the elements from <var class="arg">LIST</var>, beginning from the right:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">foldr + 0 &#x27;<span class="paren2">(<span class="default">1 2 3</span>)</span></span>)</span>    ==&gt;    <span class="paren1">(<span class="default">+ 1 <span class="paren2">(<span class="default">+ 2 <span class="paren3">(<span class="default">+ 3 0</span>)</span></span>)</span></span>)</span></pre></dd></dl><h4 id="sec:intersperse"><a href="#sec:intersperse">intersperse</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:intersperse"><span class="sig"><var class="id">intersperse</var> <var class="arg">LIST</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a new list with <var class="arg">X</var> placed between each element.</p></dd></dl><h4 id="sec:join"><a href="#sec:join">join</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:join"><span class="sig"><var class="id">join</var> <var class="arg">LISTOFLISTS</var> <var class="dsssl">#!optional</var> <var class="arg">LIST</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Concatenates the lists in <var class="arg">LISTOFLISTS</var> with <var class="arg">LIST</var> placed between each sublist. <var class="arg">LIST</var> defaults to the empty list.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">join &#x27;<span class="paren2">(<span class="default"><span class="paren3">(<span class="default">a b</span>)</span> <span class="paren3">(<span class="default">c d</span>)</span> <span class="paren3">(<span class="default">e</span>)</span></span>)</span> &#x27;<span class="paren2">(<span class="default">x y</span>)</span></span>)</span> ==&gt; <span class="paren1">(<span class="default">a b x y c d x y e</span>)</span>
+<span class="paren1">(<span class="default">join &#x27;<span class="paren2">(<span class="default"><span class="paren3">(<span class="default">p q</span>)</span> <span class="paren3">(<span class="default"></span>)</span> <span class="paren3">(<span class="default">r <span class="paren4">(<span class="default">s</span>)</span> t</span>)</span></span>)</span> &#x27;<span class="paren2">(<span class="default">-</span>)</span></span>)</span>  ==&gt; <span class="paren1">(<span class="default">p q - - r <span class="paren2">(<span class="default">s</span>)</span> t</span>)</span></pre><p><tt>join</tt> could be implemented as follows:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> <span class="paren2">(<span class="default">join lstoflsts #!optional <span class="paren3">(<span class="default">lst &#x27;<span class="paren4">(<span class="default"></span>)</span></span>)</span></span>)</span>
+  <span class="paren2">(<span class="default">apply append <span class="paren3">(<span class="default">intersperse lstoflists lst</span>)</span></span>)</span> </span>)</span></pre></dd></dl><h4 id="sec:rassoc"><a href="#sec:rassoc">rassoc</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:rassoc"><span class="sig"><var class="id">rassoc</var> <var class="arg">KEY</var> <var class="arg">LIST</var> <var class="dsssl">#!optional</var> <var class="arg">TEST</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Similar to <tt>assoc</tt>, but compares <var class="arg">KEY</var> with the <tt>cdr</tt> of each pair in <var class="arg">LIST</var> using <var class="arg">TEST</var> as the comparison procedures (which defaults to <tt>eqv?</tt>).</p></dd></dl><h4 id="sec:tail.3f"><a href="#sec:tail.3f">tail?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:tail.3f"><span class="sig"><var class="id">tail?</var> <var class="arg">X</var> <var class="arg">LIST</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns true if <var class="arg">X</var> is one of the tails (cdr's) of <var class="arg">LIST</var>.</p></dd></dl><h3 id="sec:Vectors"><a href="#sec:Vectors">Vectors</a></h3><h4 id="sec:vector-copy.21"><a href="#sec:vector-copy.21">vector-copy!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:vector-copy.21"><span class="sig"><var class="id">vector-copy!</var> <var class="arg">VECTOR1</var> <var class="arg">VECTOR2</var> <var class="dsssl">#!optional</var> <var class="arg">COUNT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Copies contents of <var class="arg">VECTOR1</var> into <var class="arg">VECTOR2</var>. If the argument <var class="arg">COUNT</var> is given, it specifies the maximal number of elements to be copied. If not given, the minimum of the lengths of the argument vectors is copied.</p><p>Exceptions: <tt>(exn bounds)</tt></p></dd></dl><h4 id="sec:vector-resize"><a href="#sec:vector-resize">vector-resize</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:vector-resize"><span class="sig"><var class="id">vector-resize</var> <var class="arg">VECTOR</var> <var class="arg">N</var> <var class="dsssl">#!optional</var> <var class="arg">INIT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Creates and returns a new vector with the contents of <var class="arg">VECTOR</var> and length <var class="arg">N</var>. If <var class="arg">N</var> is greater than the original length of <var class="arg">VECTOR</var>, then all additional items are initialized to <var class="arg">INIT</var>. If <var class="arg">INIT</var> is not specified, the contents are initialized to some unspecified value.</p></dd></dl><h4 id="sec:subvector"><a href="#sec:subvector">subvector</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:subvector"><span class="sig"><var class="id">subvector</var> <var class="arg">VECTOR</var> <var class="arg">FROM</var> <var class="dsssl">#!optional</var> <var class="arg">TO</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a new vector with elements taken from <var class="arg">VECTOR</var> in the given range. <var class="arg">TO</var> defaults to <tt>(vector-length VECTOR)</tt>.</p><p><tt>subvector</tt> was introduced in CHICKEN 4.7.3.</p></dd></dl><h3 id="sec:Combinators"><a href="#sec:Combinators">Combinators</a></h3><h4 id="sec:constantly"><a href="#sec:constantly">constantly</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:constantly"><span class="sig"><var class="id">constantly</var> <var class="arg">X</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a procedure that always returns the values <tt>X ...</tt> regardless of the number and value of its arguments.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">constantly X</span>)</span> &lt;=&gt; <span class="paren1">(<span class="default"><i><span class="symbol">lambda</span></i> args X</span>)</span></pre></dd></dl><h4 id="sec:complement"><a href="#sec:complement">complement</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:complement"><span class="sig"><var class="id">complement</var> <var class="arg">PROC</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a procedure that returns the boolean inverse of <var class="arg">PROC</var>.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">complement PROC</span>)</span> &lt;=&gt; <span class="paren1">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren2">(<span class="default">x</span>)</span> <span class="paren2">(<span class="default">not <span class="paren3">(<span class="default">PROC x</span>)</span></span>)</span></span>)</span></pre></dd></dl><h4 id="sec:compose"><a href="#sec:compose">compose</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:compose"><span class="sig"><var class="id">compose</var> <var class="arg">PROC1</var> <var class="arg">PROC2</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a procedure that represents the composition of the argument-procedures <tt>PROC1 PROC2 ...</tt>.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">compose F G</span>)</span> &lt;=&gt; <span class="paren1">(<span class="default"><i><span class="symbol">lambda</span></i> args
+                      <span class="paren2">(<span class="default">call-with-values
+                         <span class="paren3">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren4">(<span class="default"></span>)</span> <span class="paren4">(<span class="default">apply G args</span>)</span></span>)</span>
+                         F</span>)</span></span>)</span></pre><p><tt>(compose)</tt> is equivalent to <tt>values</tt>.</p></dd></dl><h4 id="sec:conjoin"><a href="#sec:conjoin">conjoin</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:conjoin"><span class="sig"><var class="id">conjoin</var> <var class="arg">PRED</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a procedure that returns <tt>#t</tt> if its argument satisfies the predicates <tt>PRED ...</tt>.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><span class="paren2">(<span class="default">conjoin odd? positive?</span>)</span> 33</span>)</span>   ==&gt;  #t
+<span class="paren1">(<span class="default"><span class="paren2">(<span class="default">conjoin odd? positive?</span>)</span> -33</span>)</span>  ==&gt;  #f</pre></dd></dl><h4 id="sec:disjoin"><a href="#sec:disjoin">disjoin</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:disjoin"><span class="sig"><var class="id">disjoin</var> <var class="arg">PRED</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a procedure that returns <tt>#t</tt> if its argument satisfies any predicate <tt>PRED ...</tt>.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><span class="paren2">(<span class="default">disjoin odd? positive?</span>)</span> 32</span>)</span>    ==&gt;  #t
+<span class="paren1">(<span class="default"><span class="paren2">(<span class="default">disjoin odd? positive?</span>)</span> -32</span>)</span>   ==&gt;  #f</pre></dd></dl><h4 id="sec:each"><a href="#sec:each">each</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:each"><span class="sig"><var class="id">each</var> <var class="arg">PROC</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a procedure that applies <tt>PROC ...</tt> to its arguments, and returns the result(s) of the last procedure application. For example</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">each pp eval</span>)</span></pre><p>is equivalent to</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">lambda</span></i> args 
+  <span class="paren2">(<span class="default">apply pp args</span>)</span>
+  <span class="paren2">(<span class="default">apply eval args</span>)</span> </span>)</span></pre><p><tt>(each PROC)</tt> is equivalent to <var class="arg">PROC</var> and <tt>(each)</tt> is equivalent to <tt>void</tt>.</p></dd></dl><h4 id="sec:flip"><a href="#sec:flip">flip</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:flip"><span class="sig"><var class="id">flip</var> <var class="arg">PROC</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a two-argument procedure that calls <var class="arg">PROC</var> with its arguments swapped:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">flip PROC</span>)</span> &lt;=&gt; <span class="paren1">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren2">(<span class="default">x y</span>)</span> <span class="paren2">(<span class="default">PROC y x</span>)</span></span>)</span></pre></dd></dl><h4 id="sec:identity"><a href="#sec:identity">identity</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:identity"><span class="sig"><var class="id">identity</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns its sole argument <var class="arg">X</var>.</p></dd></dl><h4 id="sec:list-of.3f"><a href="#sec:list-of.3f">list-of?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:list-of.3f"><span class="sig"><var class="id">list-of?</var> <var class="arg">PRED</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a procedure of one argument that returns <tt>#t</tt> when applied to a list of elements that all satisfy the predicate procedure <var class="arg">PRED</var>, or <tt>#f</tt> otherwise.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><span class="paren2">(<span class="default">list-of? even?</span>)</span> &#x27;<span class="paren2">(<span class="default">1 2 3</span>)</span></span>)</span>   ==&gt; #f
+<span class="paren1">(<span class="default"><span class="paren2">(<span class="default">list-of? number?</span>)</span> &#x27;<span class="paren2">(<span class="default">1 2 3</span>)</span></span>)</span> ==&gt; #t</pre></dd></dl><h4 id="sec:o"><a href="#sec:o">o</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:o"><span class="sig"><var class="id">o</var> <var class="arg">PROC</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>A single value version of <tt>compose</tt> (slightly faster). <tt>(o)</tt> is equivalent to <tt>identity</tt>.</p></dd></dl><h3 id="sec:User-defined_named_characters"><a href="#sec:User-defined_named_characters">User-defined named characters</a></h3><h4 id="sec:char-name"><a href="#sec:char-name">char-name</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:char-name"><span class="sig"><var class="id">char-name</var> <var class="arg">SYMBOL-OR-CHAR</var> <var class="dsssl">#!optional</var> <var class="arg">CHAR</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>This procedure can be used to inquire about character names or to define new ones. With a single argument the behavior is as follows: If <var class="arg">SYMBOL-OR-CHAR</var> is a symbol, then <tt>char-name</tt> returns the character with this name, or <tt>#f</tt> if no character is defined under this name. If <var class="arg">SYMBOL-OR-CHAR</var> is a character, then the name of the character is returned as a symbol, or <tt>#f</tt> if the character has no associated name.</p><p>If the optional argument <var class="arg">CHAR</var> is provided, then <var class="arg">SYMBOL-OR-CHAR</var> should be a symbol that will be the new name of the given character. If multiple names designate the same character, then the <tt>write</tt> will use the character name that was defined last.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">char-name &#x27;space</span>)</span>                  ==&gt; <span class="character">#\space</span>
+<span class="paren1">(<span class="default">char-name <span class="character">#\space</span></span>)</span>                 ==&gt; space
+<span class="paren1">(<span class="default">char-name &#x27;bell</span>)</span>                   ==&gt; #f
+<span class="paren1">(<span class="default">char-name <span class="paren2">(<span class="default">integer-&gt;char 7</span>)</span></span>)</span>       ==&gt; #f
+<span class="paren1">(<span class="default">char-name &#x27;bell <span class="paren2">(<span class="default">integer-&gt;char 7</span>)</span></span>)</span>
+<span class="paren1">(<span class="default">char-name &#x27;bell</span>)</span>                   ==&gt; <span class="character">#\bell</span>
+<span class="paren1">(<span class="default">char-&gt;integer <span class="paren2">(<span class="default">char-name &#x27;bell</span>)</span></span>)</span>   ==&gt; 7</pre></dd></dl><h3 id="sec:The_unspecified_value"><a href="#sec:The_unspecified_value">The unspecified value</a></h3><h4 id="sec:void"><a href="#sec:void">void</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:void"><span class="sig"><var class="id">void</var> <var class="arg">ARGUMENT</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Ignores <tt>ARGUMENT ...</tt> and returns an unspecified value.</p></dd></dl><h3 id="sec:Continuations"><a href="#sec:Continuations">Continuations</a></h3><h4 id="sec:call.2fcc"><a href="#sec:call.2fcc">call/cc</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:call.2fcc"><span class="sig"><var class="id">call/cc</var> <var class="arg">PROCEDURE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>An alias for <tt>call-with-current-continuation</tt>.</p><p>This procedure is compatible with the definition from the R7RS <tt>(scheme base)</tt> library.</p></dd></dl><h3 id="sec:Symbols"><a href="#sec:Symbols">Symbols</a></h3><h4 id="sec:Symbol_utilities"><a href="#sec:Symbol_utilities">Symbol utilities</a></h4><h5 id="sec:symbol-append"><a href="#sec:symbol-append">symbol-append</a></h5>
+<dl class="defsig">
+<dt class="defsig" id="def:symbol-append"><span class="sig"><var class="id">symbol-append</var> <var class="arg">SYMBOL1</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Creates a new symbol from the concatenated names of the argument symbols <tt>(SYMBOL1 ...)</tt>.</p></dd></dl><h4 id="sec:Uninterned_symbols_.28.22gensyms.22.29"><a href="#sec:Uninterned_symbols_.28.22gensyms.22.29">Uninterned symbols (&quot;gensyms&quot;)</a></h4><p>Symbols may be &quot;interned&quot; or &quot;uninterned&quot;. Interned symbols are registered in a global table, and when read back from a port are identical to a symbol written before:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> sym &#x27;foo</span>)</span>
+
+<span class="paren1">(<span class="default">eq? sym <span class="paren2">(<span class="default"><i><span class="symbol">with-input-from-string</span></i>
+            <span class="paren3">(<span class="default"><i><span class="symbol">with-output-to-string</span></i> 
+              <span class="paren4">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren5">(<span class="default"></span>)</span> <span class="paren5">(<span class="default">write sym</span>)</span></span>)</span></span>)</span>
+	    read</span>)</span></span>)</span>
+
+  =&gt; #t</pre><p>Uninterned symbols on the other hand are not globally registered and so multiple symbols with the same name may coexist:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> sym <span class="paren2">(<span class="default">gensym &#x27;foo</span>)</span></span>)</span>   <span class="comment">; sym is a uninterned symbol like &quot;foo42&quot;
+</span>
+<span class="paren1">(<span class="default">eq? sym <span class="paren2">(<span class="default"><i><span class="symbol">with-input-from-string</span></i>    <span class="comment">; the symbol read will be an interned symbol
+</span>            <span class="paren3">(<span class="default"><i><span class="symbol">with-output-to-string</span></i> 
+              <span class="paren4">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren5">(<span class="default"></span>)</span> <span class="paren5">(<span class="default">write sym</span>)</span></span>)</span></span>)</span>
+	    read</span>)</span></span>)</span>
+
+  =&gt; #f
+
+<span class="paren1">(<span class="default">eq? <span class="paren2">(<span class="default">string-&gt;uninterned-symbol <span class="string">&quot;foo&quot;</span></span>)</span> <span class="paren2">(<span class="default">string-&gt;uninterned-symbol <span class="string">&quot;foo&quot;</span></span>)</span></span>)</span>
+
+  =&gt; #f</pre><p>Use uninterned symbols if you need to generate unique values that can be compared quickly, for example as keys into a hash-table or association list. Note that uninterned symbols lose their uniqueness property when written to a file and read back in, as in the example above.</p><h5 id="sec:gensym"><a href="#sec:gensym">gensym</a></h5>
+<dl class="defsig">
+<dt class="defsig" id="def:gensym"><span class="sig"><var class="id">gensym</var> <var class="dsssl">#!optional</var> <var class="arg">STRING-OR-SYMBOL</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a newly created uninterned symbol. If an argument is provided, the new symbol is prefixed with that argument.</p></dd></dl><h5 id="sec:string-.3euninterned-symbol"><a href="#sec:string-.3euninterned-symbol">string-&gt;uninterned-symbol</a></h5>
+<dl class="defsig">
+<dt class="defsig" id="def:string-.3euninterned-symbol"><span class="sig"><var class="id">string-&gt;uninterned-symbol</var> <var class="arg">STRING</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a newly created, unique symbol with the name <var class="arg">STRING</var>.</p></dd></dl><h3 id="sec:Setters"><a href="#sec:Setters">Setters</a></h3><p>SRFI-17 is fully implemented. For more information see: <a href="http://srfi.schemers.org/srfi-17/srfi-17.html">SRFI-17</a>.</p><h4 id="sec:setter"><a href="#sec:setter">setter</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:setter"><span class="sig"><var class="id">setter</var> <var class="arg">PROCEDURE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the setter-procedure of <var class="arg">PROCEDURE</var>, or signals an error if <var class="arg">PROCEDURE</var> has no associated setter-procedure.</p><p>Note that <tt>(set! (setter PROC) ...)</tt> for a procedure that has no associated setter procedure yet is a very slow operation (the old procedure is replaced by a modified copy, which involves a garbage collection).</p></dd></dl><h4 id="sec:getter-with-setter"><a href="#sec:getter-with-setter">getter-with-setter</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:getter-with-setter"><span class="sig"><var class="id">getter-with-setter</var> <var class="arg">GETTER</var> <var class="arg">SETTER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a copy of the procedure <var class="arg">GETTER</var> with the associated setter procedure <var class="arg">SETTER</var>. Contrary to the SRFI specification, the setter of the returned procedure may be changed.</p></dd></dl><h3 id="sec:Binding_forms_for_optional_arguments"><a href="#sec:Binding_forms_for_optional_arguments">Binding forms for optional arguments</a></h3><h4 id="sec:optional"><a href="#sec:optional">optional</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:optional"><span class="sig"><tt>(optional ARGS DEFAULT)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Use this form for procedures that take a single optional argument. If <tt>ARGS</tt> is the empty list <tt>DEFAULT</tt> is evaluated and returned, otherwise the first element of the list <tt>ARGS</tt>. It is an error if <tt>ARGS</tt> contains more than one value.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> <span class="paren2">(<span class="default">incr x . i</span>)</span> <span class="paren2">(<span class="default">+ x <span class="paren3">(<span class="default">optional i 1</span>)</span></span>)</span></span>)</span>
+<span class="paren1">(<span class="default">incr 10</span>)</span>                                   ==&gt; 11
+<span class="paren1">(<span class="default">incr 12 5</span>)</span>                                 ==&gt; 17</pre></dd></dl><h4 id="sec:case-lambda"><a href="#sec:case-lambda">case-lambda</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:case-lambda"><span class="sig"><tt>(case-lambda (LAMBDA-LIST1 EXP1 ...) ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Expands into a lambda that invokes the body following the first matching lambda-list.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> plus
+  <span class="paren2">(<span class="default">case-lambda 
+    <span class="paren3">(<span class="default"><span class="paren4">(<span class="default"></span>)</span> 0</span>)</span>
+    <span class="paren3">(<span class="default"><span class="paren4">(<span class="default">x</span>)</span> x</span>)</span>
+    <span class="paren3">(<span class="default"><span class="paren4">(<span class="default">x y</span>)</span> <span class="paren4">(<span class="default">+ x y</span>)</span></span>)</span>
+    <span class="paren3">(<span class="default"><span class="paren4">(<span class="default">x y z</span>)</span> <span class="paren4">(<span class="default">+ <span class="paren5">(<span class="default">+ x y</span>)</span> z</span>)</span></span>)</span>
+    <span class="paren3">(<span class="default">args <span class="paren4">(<span class="default">apply + args</span>)</span></span>)</span></span>)</span></span>)</span>
+
+<span class="paren1">(<span class="default">plus</span>)</span>                      ==&gt; 0
+<span class="paren1">(<span class="default">plus 1</span>)</span>                    ==&gt; 1
+<span class="paren1">(<span class="default">plus 1 2 3</span>)</span>                ==&gt; 6</pre><p>For more information see the documentation for <a href="http://srfi.schemers.org/srfi-16/srfi-16.html">SRFI-16</a></p><p>This special form is also compatible with the definition from the R7RS <tt>(scheme case-lambda)</tt> library.</p></dd></dl><h4 id="sec:let-optionals"><a href="#sec:let-optionals">let-optionals</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:let-optionals"><span class="sig"><tt> (let-optionals ARGS ((VAR1 DEFAULT1) ...) BODY ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Binding constructs for optional procedure arguments. <tt>ARGS</tt> is normally a rest-parameter taken from a lambda-list. <tt>let-optionals</tt> binds <tt>VAR1 ...</tt> to available arguments in parallel, or to <tt>DEFAULT1 ...</tt> if not enough arguments were provided. <tt>let-optionals*</tt> binds <tt>VAR1 ...</tt> sequentially, so every variable sees the previous ones. it is an error if any excess arguments are provided.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">let-optionals &#x27;<span class="paren2">(<span class="default">one two</span>)</span> <span class="paren2">(<span class="default"><span class="paren3">(<span class="default">a 1</span>)</span> <span class="paren3">(<span class="default">b 2</span>)</span> <span class="paren3">(<span class="default">c 3</span>)</span></span>)</span>
+  <span class="paren2">(<span class="default">list a b c</span>)</span> </span>)</span>                               ==&gt; <span class="paren1">(<span class="default">one two 3</span>)</span></pre></dd></dl><h4 id="sec:let-optionals.2a"><a href="#sec:let-optionals.2a">let-optionals*</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:let-optionals.2a"><span class="sig"><tt> (let-optionals* ARGS ((VAR1 DEFAULT1) ... [RESTVAR]) BODY ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Binding constructs for optional procedure arguments. <tt>ARGS</tt> is normally a rest-parameter taken from a lambda-list. <tt>let-optionals</tt> binds <tt>VAR1 ...</tt> to available arguments in parallel, or to <tt>DEFAULT1 ...</tt> if not enough arguments were provided. <tt>let-optionals*</tt> binds <tt>VAR1 ...</tt> sequentially, so every variable sees the previous ones. If a single variable <tt>RESTVAR</tt> is given, then it is bound to any remaining arguments, otherwise it is an error if any excess arguments are provided.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">let-optionals* &#x27;<span class="paren2">(<span class="default">one two</span>)</span> <span class="paren2">(<span class="default"><span class="paren3">(<span class="default">a 1</span>)</span> <span class="paren3">(<span class="default">b 2</span>)</span> <span class="paren3">(<span class="default">c a</span>)</span></span>)</span>
+  <span class="paren2">(<span class="default">list a b c</span>)</span> </span>)</span>                               ==&gt; <span class="paren1">(<span class="default">one two one</span>)</span></pre></dd></dl><h3 id="sec:Other_binding_forms"><a href="#sec:Other_binding_forms">Other binding forms</a></h3><h4 id="sec:and-let.2a"><a href="#sec:and-let.2a">and-let*</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:and-let.2a"><span class="sig"><tt>(and-let* (BINDING ...) EXP1 EXP2 ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Bind sequentially and execute body. <tt>BINDING</tt> can be a list of a variable and an expression, a list with a single expression, or a single variable. If the value of an expression bound to a variable is <tt>#f</tt>, the <tt>and-let*</tt> form evaluates to <tt>#f</tt> (and the subsequent bindings and the body are not executed).  Otherwise the next binding is performed. If all bindings/expressions evaluate to a true result, the body is executed normally and the result of the last expression is the result of the <tt>and-let*</tt> form. See also the documentation for <a href="http://srfi.schemers.org/srfi-2/srfi-2.html">SRFI-2</a>.</p></dd></dl><h4 id="sec:letrec.2a"><a href="#sec:letrec.2a">letrec*</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:letrec.2a"><span class="sig"><tt>(letrec* ((VARIABLE EXPRESSION) ...) BODY ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Implements R6RS/R7RS <tt>letrec*</tt>. <tt>letrec*</tt> is similar to <tt>letrec</tt> but binds the variables sequentially and is to <tt>letrec</tt> what <tt>let*</tt> is to <tt>let</tt>.</p><p>This special form is compatible with the definition from the R7RS <tt>(scheme base)</tt> library.</p></dd></dl><h4 id="sec:rec"><a href="#sec:rec">rec</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:rec"><span class="sig"><tt>(rec NAME EXPRESSION)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:rec"><span class="sig"><tt>(rec (NAME VARIABLE ...) BODY ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Allows simple definition of recursive definitions. <tt>(rec NAME EXPRESSION)</tt> is equivalent to <tt>(letrec ((NAME EXPRESSION)) NAME)</tt> and <tt>(rec (NAME VARIABLE ...) BODY ...)</tt> is the same as <tt>(letrec ((NAME (lambda (VARIABLE ...) BODY ...))) NAME)</tt>.</p></dd></dl><h4 id="sec:cut"><a href="#sec:cut">cut</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:cut"><span class="sig"><tt>(cut SLOT ...)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:cute"><span class="sig"><tt>(cute SLOT ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p><a href="http://srfi.schemers.org/srfi-26/srfi-26.html">Syntactic sugar for specializing parameters</a>.</p></dd></dl><h4 id="sec:define-values"><a href="#sec:define-values">define-values</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:define-values"><span class="sig"><tt>(define-values (NAME ...) VALUEEXP)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:define-values"><span class="sig"><tt>(define-values (NAME1 ... NAMEn . NAMEn+1) VALUEEXP)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:define-values"><span class="sig"><tt>(define-values NAME VALUEEXP)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Defines several variables at once, with the result values of expression <tt>VALUEEXP</tt>, similar to <tt>set!-values</tt>.</p><p>This special form is compatible with the definition from the R7RS <tt>(scheme base)</tt> library.</p></dd></dl><h4 id="sec:fluid-let"><a href="#sec:fluid-let">fluid-let</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:fluid-let"><span class="sig"><tt>(fluid-let ((VAR1 X1) ...) BODY ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Binds the variables <tt>VAR1 ...</tt> dynamically to the values <tt>X1 ...</tt> during execution of <tt>BODY ...</tt>.  This implements <a href="http://srfi.schemers.org/srfi-15/srfi-15.html">SRFI-15</a>.</p></dd></dl><h4 id="sec:let-values"><a href="#sec:let-values">let-values</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:let-values"><span class="sig"><tt>(let-values (((NAME ...) VALUEEXP) ...) BODY ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Binds multiple variables to the result values of <tt>VALUEEXP ...</tt>. All variables are bound simultaneously.  Like <tt>define-values</tt>, the <tt>(NAME ...)</tt> expression can be any basic lambda list (dotted tail notation is supported).</p><p>This special form implements <a href="http://srfi.schemers.org/srfi-11/srfi-11.html">SRFI-11</a>, and it is also compatible with the definition from the R7RS <tt>(scheme base)</tt> library.</p></dd></dl><h4 id="sec:let.2a-values"><a href="#sec:let.2a-values">let*-values</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:let.2a-values"><span class="sig"><tt>(let*-values (((NAME ...) VALUEEXP) ...) BODY ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Binds multiple variables to the result values of <tt>VALUEEXP ...</tt>. The variables are bound sequentially.  Like <tt>let-values</tt>, the <tt>(NAME ...)</tt> expression can be any basic lambda list (dotted tail notation is supported).</p><p>This is also part of <a href="http://srfi.schemers.org/srfi-11/srfi-11.html">SRFI-11</a> and is also compatible with the definition from the R7RS <tt>(scheme base)</tt> library.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">let*-values <span class="paren2">(<span class="default"><span class="paren3">(<span class="default"><span class="paren4">(<span class="default">a b</span>)</span> <span class="paren4">(<span class="default">values 2 3</span>)</span></span>)</span>
+              <span class="paren3">(<span class="default"><span class="paren4">(<span class="default">p</span>)</span> <span class="paren4">(<span class="default">+ a b</span>)</span></span>)</span> </span>)</span>
+  p</span>)</span>                               ==&gt; 5</pre></dd></dl><h4 id="sec:letrec-values"><a href="#sec:letrec-values">letrec-values</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:letrec-values"><span class="sig"><tt>(letrec-values (((NAME ...) VALUEEXP) ...) BODY ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Binds the result values of <tt>VALUEEXP ...</tt> to multiple variables at once.  All variables are mutually recursive.  Like <tt>let-values</tt>, the <tt>(NAME ...)</tt> expression can be any basic lambda list (dotted tail notation is supported).</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default">letrec-values <span class="paren2">(<span class="default"><span class="paren3">(<span class="default"><span class="paren4">(<span class="default">odd even</span>)</span>
+                   <span class="paren4">(<span class="default">values 
+                     <span class="paren5">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren6">(<span class="default">n</span>)</span> <span class="paren6">(<span class="default"><i><span class="symbol">if</span></i> <span class="paren1">(<span class="default">zero? n</span>)</span> #f <span class="paren1">(<span class="default">even <span class="paren2">(<span class="default">sub1 n</span>)</span></span>)</span></span>)</span></span>)</span>
+                     <span class="paren5">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren6">(<span class="default">n</span>)</span> <span class="paren6">(<span class="default"><i><span class="symbol">if</span></i> <span class="paren1">(<span class="default">zero? n</span>)</span> #t <span class="paren1">(<span class="default">odd <span class="paren2">(<span class="default">sub1 n</span>)</span></span>)</span></span>)</span></span>)</span> </span>)</span> </span>)</span> </span>)</span>
+  <span class="paren2">(<span class="default">odd 17</span>)</span> </span>)</span>                           ==&gt; #t</pre></dd></dl><h4 id="sec:receive"><a href="#sec:receive">receive</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:receive"><span class="sig"><tt>(receive (NAME ...) VALUEEXP BODY ...)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:receive"><span class="sig"><tt>(receive (NAME1 ... NAMEn . NAMEn+1) VALUEEXP BODY ...)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:receive"><span class="sig"><tt>(receive NAME VALUEEXP BODY ...)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:receive"><span class="sig"><tt>(receive VALUEEXP)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p><a href="http://srfi.schemers.org/srfi-8/srfi-8.html">SRFI-8</a>. Syntactic sugar for <tt>call-with-values</tt>. Binds variables to the result values of <tt>VALUEEXP</tt> and evaluates <tt>BODY ...</tt>, similar <tt>define-values</tt> but lexically scoped.</p><p><tt>(receive VALUEEXP)</tt> is equivalent to <tt>(receive _ VALUEEXP _)</tt>. This shortened form is not described by SRFI-8.</p></dd></dl><h4 id="sec:set.21-values"><a href="#sec:set.21-values">set!-values</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:set.21-values"><span class="sig"><tt>(set!-values (NAME ...) VALUEEXP)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:set.21-values"><span class="sig"><tt>(set!-values (NAME1 ... NAMEn . NAMEn+1) VALUEEXP)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:set.21-values"><span class="sig"><tt>(set!-values NAME VALUEEXP)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Assigns the result values of expression <tt>VALUEEXP</tt> to multiple variables, similar to <tt>define-values</tt>.</p></dd></dl><h4 id="sec:nth-value"><a href="#sec:nth-value">nth-value</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:nth-value"><span class="sig"><tt>(nth-value N EXP)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Returns the <tt>N</tt>th value (counting from zero) of the values returned by expression <tt>EXP</tt>.</p></dd></dl><h3 id="sec:Parameters"><a href="#sec:Parameters">Parameters</a></h3><p>Parameters are CHICKEN's form of dynamic variables, except that they are procedures rather than actual variables.  A parameter is a procedure of zero or one arguments. To retrieve the value of a parameter call the parameter-procedure with zero arguments. To change the setting of the parameter, call the parameter-procedure with the new value as argument:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> foo <span class="paren2">(<span class="default">make-parameter 123</span>)</span></span>)</span>
+<span class="paren1">(<span class="default">foo</span>)</span>                             ==&gt; 123
+<span class="paren1">(<span class="default">foo 99</span>)</span>
+<span class="paren1">(<span class="default">foo</span>)</span>                             ==&gt; 99</pre><p>Parameters are fully thread-local, each thread of execution owns a local copy of a parameters' value.</p><p>CHICKEN implements <a href="http://srfi.schemers.org/srfi-39/srfi-39.html">SRFI-39</a>, which is also standardized by R7RS.</p><h4 id="sec:parameterize"><a href="#sec:parameterize">parameterize</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:parameterize"><span class="sig"><tt>(parameterize ((PARAMETER1 X1) ...) BODY ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Binds the parameters <tt>PARAMETER1 ...</tt> dynamically to the values <tt>X1 ...</tt> during execution of <tt>BODY ...</tt>.  (see also: <tt>make-parameter</tt> in <a href="Parameters.html">Parameters</a>). Note that <tt>PARAMETER</tt> may be any expression that evaluates to a parameter procedure.</p><p>This special form is compatible with the definition from the R7RS <tt>(scheme base)</tt> library.</p></dd></dl><h4 id="sec:make-parameter"><a href="#sec:make-parameter">make-parameter</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:make-parameter"><span class="sig"><var class="id">make-parameter</var> <var class="arg">VALUE</var> <var class="dsssl">#!optional</var> <var class="arg">GUARD</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a procedure that accepts zero or one argument. Invoking the procedure with zero arguments returns <var class="arg">VALUE</var>. Invoking the procedure with one argument changes its value to the value of that argument and returns the new value (subsequent invocations with zero parameters return the new value). <var class="arg">GUARD</var> should be a procedure of a single argument. Any new values of the parameter (even the initial value) are passed to this procedure. The guard procedure should check the value and/or convert it to an appropriate form.</p><p>This special form is compatible with the definition from the R7RS <tt>(scheme base)</tt> library.</p></dd></dl><h3 id="sec:Substitution_forms_and_macros"><a href="#sec:Substitution_forms_and_macros">Substitution forms and macros</a></h3><h4 id="sec:define-constant"><a href="#sec:define-constant">define-constant</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:define-constant"><span class="sig"><tt>(define-constant NAME CONST)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Defines a variable with a constant value, evaluated at compile-time. Any reference to such a constant should appear textually <b>after</b> its definition. This construct is equivalent to <tt>define</tt> when evaluated or interpreted.  Constant definitions should only appear at toplevel. Note that constants are local to the current compilation unit and are not available outside of the source file in which they are defined. Names of constants still exist in the Scheme namespace and can be lexically shadowed.  If the value is mutable, then the compiler is careful to preserve its identity.  <tt>CONST</tt> may be any constant expression, and may also refer to constants defined via <tt>define-constant</tt> previously, but it must be possible to evaluate the expression at compile-time.</p></dd></dl><h4 id="sec:define-inline"><a href="#sec:define-inline">define-inline</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:define-inline"><span class="sig"><tt>(define-inline (NAME VAR ...) BODY ...)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:define-inline"><span class="sig"><tt>(define-inline (NAME VAR ... . VAR) BODY ...)</tt></span><span class="type">syntax</span></dt>
+<dt class="defsig" id="def:define-inline"><span class="sig"><tt>(define-inline NAME EXP)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Defines an inline procedure. Any occurrence of <tt>NAME</tt> will be replaced by <tt>EXP</tt> or <tt>(lambda (VAR ... [. VAR]) BODY ...)</tt>. This is similar to a macro, but variable names and scope are handled correctly.</p><p>Inline substitutions take place <b>after</b> macro-expansion, and any reference to <tt>NAME</tt> should appear textually <b>after</b> its definition. Inline procedures are local to the current compilation unit and are not available outside of the source file in which they are defined. Names of inline procedures still exist in the Scheme namespace and can be lexically shadowed. Inline definitions should only appear at the toplevel.</p><p>Note that the <tt>inline-limit</tt> compiler option does not affect inline procedure expansion, and self-referential inline procedures may cause the compiler to enter an infinite loop.</p><p>In the third form, <tt>EXP</tt> must be a lambda expression.</p><p>This construct is equivalent to <tt>define</tt> when evaluated or interpreted.</p></dd></dl><h3 id="sec:Conditional_forms"><a href="#sec:Conditional_forms">Conditional forms</a></h3><h4 id="sec:unless"><a href="#sec:unless">unless</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:unless"><span class="sig"><tt>(unless TEST EXP1 EXP2 ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Equivalent to:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">if</span></i> <span class="paren2">(<span class="default">not TEST</span>)</span> <span class="paren2">(<span class="default">begin EXP1 EXP2 ...</span>)</span></span>)</span></pre></dd></dl><h4 id="sec:when"><a href="#sec:when">when</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:when"><span class="sig"><tt>(when TEST EXP1 EXP2 ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Equivalent to:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">if</span></i> TEST <span class="paren2">(<span class="default">begin EXP1 EXP2 ...</span>)</span></span>)</span></pre></dd></dl><h3 id="sec:Record_structures"><a href="#sec:Record_structures">Record structures</a></h3><h4 id="sec:define-record"><a href="#sec:define-record">define-record</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:define-record"><span class="sig"><tt>(define-record NAME SLOTNAME ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Defines a record type. This defines a number of procedures for creating, accessing, and modifying record members.</p><p>Call <tt>make-NAME</tt> to create an instance of the structure (with one initialization-argument for each slot, in the listed order).</p><p><tt>(NAME? STRUCT)</tt> tests any object for being an instance of this structure.</p><p>Slots are accessed via <tt>(NAME-SLOTNAME STRUCT)</tt> and updated using <tt>(NAME-SLOTNAME-set!</tt> <tt>STRUCT</tt> <tt>VALUE)</tt>.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define-record</span></i> point x y</span>)</span>
+<span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> p1 <span class="paren2">(<span class="default">make-point 123 456</span>)</span></span>)</span>
+<span class="paren1">(<span class="default">point? p1</span>)</span>                      ==&gt; #t
+<span class="paren1">(<span class="default">point-x p1</span>)</span>                     ==&gt; 123
+<span class="paren1">(<span class="default">point-y-set! p1 99</span>)</span>
+<span class="paren1">(<span class="default">point-y p1</span>)</span>                     ==&gt; 99</pre></dd></dl><h5 id="sec:SRFI-17_setters"><a href="#sec:SRFI-17_setters">SRFI-17 setters</a></h5><p><tt>SLOTNAME</tt> may alternatively also be of the form</p><pre> (setter SLOTNAME)</pre><p>In this case the slot can be read with <tt>(NAME-SLOTNAME STRUCT)</tt> as usual, and modified with <tt>(set! (NAME-SLOTNAME STRUCT) VALUE)</tt> (the slot-accessor has an associated SRFI-17 &quot;setter&quot; procedure) instead of the usual <tt>(NAME-SLOTNAME-set!</tt> <tt>STRUCT</tt> <tt>VALUE)</tt>.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define-record</span></i> point <span class="paren2">(<span class="default">setter x</span>)</span> <span class="paren2">(<span class="default">setter y</span>)</span></span>)</span>
+<span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> p1 <span class="paren2">(<span class="default">make-point 123 456</span>)</span></span>)</span>
+<span class="paren1">(<span class="default">point? p1</span>)</span>                      ==&gt; #t
+<span class="paren1">(<span class="default">point-x p1</span>)</span>                     ==&gt; 123
+<span class="paren1">(<span class="default">set! <span class="paren2">(<span class="default">point-y p1</span>)</span> 99</span>)</span>
+<span class="paren1">(<span class="default">point-y p1</span>)</span>                     ==&gt; 99</pre><h4 id="sec:define-record-type"><a href="#sec:define-record-type">define-record-type</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:define-record-type"><span class="sig"><tt>(define-record-type NAME (CONSTRUCTOR TAG ...) PREDICATE (FIELD ACCESSOR [MODIFIER]) ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>SRFI-9 record types. For more information see the documentation for <a href="http://srfi.schemers.org/srfi-9/srfi-9.html">SRFI-9</a>.</p><p>As an extension the <tt>MODIFIER</tt> may have the form <tt>(setter PROCEDURE)</tt>, which will define a SRFI-17 setter-procedure for the given <tt>PROCEDURE</tt> that sets the field value. Usually <tt>PROCEDURE</tt> has the same name is <tt>ACCESSOR</tt> (but it doesn't have to).</p><p>This special form is also compatible with the definition from the R7RS <tt>(scheme base)</tt> library.</p></dd></dl><h4 id="sec:record-printer"><a href="#sec:record-printer">record-printer</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:record-printer"><span class="sig"><var class="id">record-printer</var> <var class="arg">NAME</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the procedure used to print records of the type <var class="arg">NAME</var> if one has been set with <tt>set-record-printer!</tt>, <tt>#f</tt> otherwise.</p></dd></dl><h4 id="sec:set-record-printer.21"><a href="#sec:set-record-printer.21">set-record-printer!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:set-record-printer.21"><span class="sig"><var class="id">set-record-printer!</var> <var class="arg">NAME</var> <var class="arg">PROCEDURE</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><var class="dsssl">set!</var> (<var class="id">record-printer</var> <var class="arg">NAME</var>) <var class="arg">PROCEDURE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Defines a printing method for record of the type <var class="arg">NAME</var> by associating a procedure with the record type. When a record of this type is written using <tt>display, write</tt> or <tt>print</tt>, then the procedure is called with two arguments: the record to be printed and an output-port.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define-record-type</span></i> foo <span class="paren2">(<span class="default">make-foo x y z</span>)</span> foo?
+  <span class="paren2">(<span class="default">x foo-x</span>)</span>
+  <span class="paren2">(<span class="default">y foo-y</span>)</span>
+  <span class="paren2">(<span class="default">z foo-z</span>)</span></span>)</span>
+<span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> f <span class="paren2">(<span class="default">make-foo 1 2 3</span>)</span></span>)</span>
+<span class="paren1">(<span class="default">set-record-printer! foo
+  <span class="paren2">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren3">(<span class="default">x out</span>)</span>
+    <span class="paren3">(<span class="default">fprintf out <span class="string">&quot;#,(foo ~S ~S ~S)&quot;</span>
+             <span class="paren4">(<span class="default">foo-x x</span>)</span> <span class="paren4">(<span class="default">foo-y x</span>)</span> <span class="paren4">(<span class="default">foo-z x</span>)</span></span>)</span></span>)</span></span>)</span>
+<span class="paren1">(<span class="default"><i><span class="symbol">define-reader-ctor</span></i> &#x27;foo make-foo</span>)</span>
+<span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> s <span class="paren2">(<span class="default"><i><span class="symbol">with-output-to-string</span></i>
+              <span class="paren3">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren4">(<span class="default"></span>)</span> <span class="paren4">(<span class="default">write f</span>)</span></span>)</span></span>)</span></span>)</span>
+s                                   ==&gt; <span class="string">&quot;#,(foo 1 2 3)&quot;</span>
+<span class="paren1">(<span class="default">equal? f <span class="paren2">(<span class="default"><i><span class="symbol">with-input-from-string</span></i>
+              s read</span>)</span></span>)</span>)             ==&gt; #t</pre></dd></dl><h3 id="sec:Other_forms"><a href="#sec:Other_forms">Other forms</a></h3><h4 id="sec:include"><a href="#sec:include">include</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:include"><span class="sig"><tt>(include STRING)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Include toplevel-expressions from the given source file in the currently compiled/interpreted program.  If the included file has the extension <tt>.scm</tt>, then it may be omitted. The file is searched for in the current directory and all directories specified by the <tt>-include-path</tt> option.</p></dd></dl><h4 id="sec:include-relative"><a href="#sec:include-relative">include-relative</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:include-relative"><span class="sig"><tt>(include-relative STRING)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>Works like <tt>include</tt>, but the filename is searched for relative to the including file rather than the current directory.</p></dd></dl><h3 id="sec:Making_extra_libraries_and_extensions_available"><a href="#sec:Making_extra_libraries_and_extensions_available">Making extra libraries and extensions available</a></h3><h4 id="sec:require-extension"><a href="#sec:require-extension">require-extension</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:require-extension"><span class="sig"><tt>(require-extension ID ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>This is equivalent to <tt>(require-library ID ...)</tt> but performs an implicit <tt>import</tt>, if necessary. Since version 4.4.0, <tt>ID</tt> may also be an import specification (using <tt>rename</tt>, <tt>only</tt>, <tt>except</tt> or <tt>prefix</tt>).</p><p>To make long matters short - just use <tt>require-extension</tt> and it will normally figure everything out for dynamically loadable extensions and core library units.</p><p>This implementation of <tt>require-extension</tt> is compliant with <a href="http://srfi.schemers.org/srfi-55/srfi-55.html">SRFI-55</a> (see the <a href="http://srfi.schemers.org/srfi-55/srfi-55.html">SRFI-55</a> document for more information).</p></dd></dl><h4 id="sec:require-library"><a href="#sec:require-library">require-library</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:require-library"><span class="sig"><tt>(require-library ID ...)</tt></span><span class="type">syntax</span></dt>
+<dd class="defsig"><p>This form does all the necessary steps to make the libraries or extensions given in <tt>ID ...</tt> available. It loads syntactic extensions, if needed and generates code for loading/linking with core library modules or separately installed extensions.</p><p>During interpretation/evaluation <tt>require-library</tt> performs one of the following:</p><ul><li>If <tt>ID</tt> names a built-in feature, then nothing is done.</li>
+<li>If <tt>ID</tt> names one of the syntactic extensions <tt>chicken-syntax chicken-ffi-syntax</tt>, then this extension will be loaded.</li>
+<li>If <tt>ID</tt> names one of the core library units shipped with CHICKEN, then a <tt>(load-library 'ID)</tt> will be performed.</li>
+<li>If <tt>ID</tt> names an installed extension with the <tt>syntax</tt> or <tt>require-at-runtime</tt> attribute, then the extensions is loaded at compile-time, probably doing a run-time <tt>(require ...)</tt> for any run-time requirements.</li>
+<li>Otherwise, <tt>(require-library ID)</tt> is equivalent to <tt>(require 'ID)</tt>.</li>
+</ul>
+<p>During compilation, one of the following happens instead:</p><ul><li>If <tt>ID</tt> names a built-in feature, then nothing is done.</li>
+<li>If <tt>ID</tt> names one of the syntactic extensions <tt>chicken-syntax chicken-ffi-syntax</tt>, then this extension will be loaded at compile-time, making the syntactic extensions available in compiled code.</li>
+<li>If <tt>ID</tt> names one of the core library units shipped with CHICKEN, or if the option <tt>-uses ID</tt> has been passed to the compiler, then a <tt>(declare (uses ID))</tt> is generated.</li>
+<li>If <tt>ID</tt> names an installed extension with the <tt>syntax</tt> or <tt>require-at-runtime</tt> attribute, then the extension is loaded at compile-time, and code is emitted to <tt>(require ...)</tt> any needed run-time requirements.</li>
+<li>Otherwise <tt>(require-library ID)</tt> is equivalent to <tt>(require 'ID)</tt>.</li>
+</ul>
+<p><tt>ID</tt> should be a pure extension name and should not contain any path prefixes (for example <tt>dir/lib...</tt> is illegal).</p><p><tt>ID</tt> may also be a list that designates an extension-specifier. Currently the following extension specifiers are defined:</p><ul><li><tt>(srfi NUMBER ...)</tt> is required for SRFI-55 compatibility and is fully implemented</li>
+<li><tt>(version ID NUMBER)</tt> is equivalent to <tt>ID</tt>, but checks at compile-time whether the extension named <tt>ID</tt> is installed and whether its version is equal or higher than <tt>NUMBER</tt>. <tt>NUMBER</tt> may be a string or a number, the comparison is done lexicographically (using <tt>string&gt;=?</tt>).</li>
+</ul>
+</dd></dl><h3 id="sec:Process_shutdown"><a href="#sec:Process_shutdown">Process shutdown</a></h3><h4 id="sec:emergency-exit"><a href="#sec:emergency-exit">emergency-exit</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:emergency-exit"><span class="sig"><var class="id">emergency-exit</var> <var class="dsssl">#!optional</var> <var class="arg">CODE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Exits the current process without flushing any buffered output (using the C function <tt>_exit</tt>).  Note that the <tt>exit-handler</tt> is not called when this procedure is invoked. The optional exit status code <var class="arg">CODE</var> defaults to <tt>0</tt>.</p></dd></dl><h4 id="sec:exit"><a href="#sec:exit">exit</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:exit"><span class="sig"><var class="id">exit</var> <var class="dsssl">#!optional</var> <var class="arg">CODE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Exit the running process and return exit-code, which defaults to 0 (Invokes <tt>exit-handler</tt>).</p><p>Note that pending <tt>dynamic-wind</tt> thunks are <i>not</i> invoked when exiting your program in this way.</p></dd></dl><h3 id="sec:exit-handler"><a href="#sec:exit-handler">exit-handler</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:exit-handler"><span class="sig"><var class="id">exit-handler</var></span><span class="type">parameter</span></dt>
+<dd class="defsig"><p>A procedure of a single optional argument. When <tt>exit</tt> is called, then this procedure will be invoked with the exit-code as argument. The default behavior is to terminate the program.</p><p>Note that this handler is <i>not</i> invoked when <tt>emergency-exit</tt> is used.</p></dd></dl><h3 id="sec:implicit-exit-handler"><a href="#sec:implicit-exit-handler">implicit-exit-handler</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:implicit-exit-handler"><span class="sig"><var class="id">implicit-exit-handler</var></span><span class="type">parameter</span></dt>
+<dd class="defsig"><p>A procedure of no arguments. When the last toplevel expression of the program has executed, then the value of this parameter is called. The default behaviour is to invoke all pending finalizers.</p></dd></dl><h4 id="sec:on-exit"><a href="#sec:on-exit">on-exit</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:on-exit"><span class="sig"><var class="id">on-exit</var> <var class="arg">THUNK</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Schedules the zero-argument procedures <var class="arg">THUNK</var> to be executed before the process exits, either explicitly via <tt>exit</tt> or implicitly after execution of the last top-level form. Note that finalizers for unreferenced finalized data are run before exit procedures.</p></dd></dl><h3 id="sec:System_interface"><a href="#sec:System_interface">System interface</a></h3><h4 id="sec:sleep"><a href="#sec:sleep">sleep</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:sleep"><span class="sig"><var class="id">sleep</var> <var class="arg">SECONDS</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Puts the program to sleep for <var class="arg">SECONDS</var>. If the scheduler is loaded (for example when srfi-18 is in use) then only the calling thread is put to sleep and other threads may continue executing. Otherwise, the whole process is put to sleep.</p></dd></dl><h3 id="sec:Ports"><a href="#sec:Ports">Ports</a></h3><h4 id="sec:String_ports"><a href="#sec:String_ports">String ports</a></h4><h5 id="sec:get-output-string"><a href="#sec:get-output-string">get-output-string</a></h5>
+<dl class="defsig">
+<dt class="defsig" id="def:get-output-string"><span class="sig"><var class="id">get-output-string</var> <var class="arg">PORT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns accumulated output of a port created with <tt>(open-output-string)</tt>.</p></dd></dl><h5 id="sec:open-input-string"><a href="#sec:open-input-string">open-input-string</a></h5>
+<dl class="defsig">
+<dt class="defsig" id="def:open-input-string"><span class="sig"><var class="id">open-input-string</var> <var class="arg">STRING</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a port for reading from <var class="arg">STRING</var>.</p></dd></dl><h5 id="sec:open-output-string"><a href="#sec:open-output-string">open-output-string</a></h5>
+<dl class="defsig">
+<dt class="defsig" id="def:open-output-string"><span class="sig"><var class="id">open-output-string</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a port for accumulating output in a string.</p></dd></dl><h3 id="sec:File_Input.2fOutput"><a href="#sec:File_Input.2fOutput">File Input/Output</a></h3><h4 id="sec:flush-output"><a href="#sec:flush-output">flush-output</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:flush-output"><span class="sig"><var class="id">flush-output</var> <var class="dsssl">#!optional</var> <var class="arg">PORT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Write buffered output to the given output-port. <var class="arg">PORT</var> defaults to the value of <tt>(current-output-port)</tt>.</p></dd></dl><h3 id="sec:Port_predicates"><a href="#sec:Port_predicates">Port predicates</a></h3><h4 id="sec:input-port-open.3f"><a href="#sec:input-port-open.3f">input-port-open?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:input-port-open.3f"><span class="sig"><var class="id">input-port-open?</var> <var class="arg">PORT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Is the given <var class="arg">PORT</var> open for input?</p></dd></dl>
+<dl class="defsig">
+<dt class="defsig" id="def:output-port-open.3f"><span class="sig"><var class="id">output-port-open?</var> <var class="arg">PORT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Is the given <var class="arg">PORT</var> open for output?</p></dd></dl><h4 id="sec:port-closed.3f"><a href="#sec:port-closed.3f">port-closed?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:port-closed.3f"><span class="sig"><var class="id">port-closed?</var> <var class="arg">PORT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Is the given <var class="arg">PORT</var> closed (in all directions)?</p></dd></dl><h4 id="sec:port.3f"><a href="#sec:port.3f">port?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:port.3f"><span class="sig"><var class="id">port?</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">X</var> is a port object or <tt>#f</tt> otherwise.</p></dd></dl><h3 id="sec:Built-in_parameters"><a href="#sec:Built-in_parameters">Built-in parameters</a></h3><p>Certain behavior of the interpreter and compiled programs can be customized via the following built-in parameters:</p><h4 id="sec:case-sensitive"><a href="#sec:case-sensitive">case-sensitive</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:case-sensitive"><span class="sig"><var class="id">case-sensitive</var></span><span class="type">parameter</span></dt>
+<dd class="defsig"><p>If true, then <tt>read</tt> reads symbols and identifiers in case-sensitive mode and uppercase characters in symbols are printed escaped. Defaults to <tt>#t</tt>.</p></dd></dl><h4 id="sec:keyword-style"><a href="#sec:keyword-style">keyword-style</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:keyword-style"><span class="sig"><var class="id">keyword-style</var></span><span class="type">parameter</span></dt>
+<dd class="defsig"><p>Enables alternative keyword syntax, where <tt>STYLE</tt> may be either <tt>#:prefix</tt> (as in Common Lisp), which recognizes symbols beginning with a colon as keywords, or <tt>#:suffix</tt> (as in DSSSL), which recognizes symbols ending with a colon as keywords. Any other value disables the alternative syntaxes.  In the interpreter the default is <tt>#:suffix</tt>.</p></dd></dl><h4 id="sec:parentheses-synonyms"><a href="#sec:parentheses-synonyms">parentheses-synonyms</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:parentheses-synonyms"><span class="sig"><var class="id">parentheses-synonyms</var></span><span class="type">parameter</span></dt>
+<dd class="defsig"><p>If true, then the list delimiter synonyms <tt>#\[</tt> <tt>#\]</tt> and <tt>#\{</tt> <tt>#\</tt>} are enabled. Defaults to <tt>#t</tt>.</p></dd></dl><h4 id="sec:symbol-escape"><a href="#sec:symbol-escape">symbol-escape</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:symbol-escape"><span class="sig"><var class="id">symbol-escape</var></span><span class="type">parameter</span></dt>
+<dd class="defsig"><p>If true, then the symbol escape <tt>#\|</tt> <tt>#\|</tt> is enabled. Defaults to <tt>#t</tt>.</p></dd></dl><hr /><p>Previous: <a href="Module%20srfi-4.html">Module srfi-4</a></p><p>Next: <a href="Module%20%28chicken%20bitwise%29.html">Module (chicken bitwise)</a></p></div></div></body></html>

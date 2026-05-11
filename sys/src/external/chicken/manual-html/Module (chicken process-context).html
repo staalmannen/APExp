@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken process-context)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_process-context.29">Module (chicken process-context)</a>
+<ul>
+<li><a href="#sec:Information_about_the_program.27s_invocation">Information about the program's invocation</a>
+<ul>
+<li><a href="#sec:argc.2bargv">argc+argv</a></li>
+<li><a href="#sec:argv">argv</a></li>
+<li><a href="#sec:command-line-arguments">command-line-arguments</a></li>
+<li><a href="#sec:executable-pathname">executable-pathname</a></li>
+<li><a href="#sec:program-name">program-name</a></li></ul></li>
+<li><a href="#sec:Access_to_environment_variables">Access to environment variables</a>
+<ul>
+<li><a href="#sec:get-environment-variables">get-environment-variables</a></li>
+<li><a href="#sec:get-environment-variable">get-environment-variable</a></li>
+<li><a href="#sec:set-environment-variable.21">set-environment-variable!</a></li>
+<li><a href="#sec:unset-environment-variable.21">unset-environment-variable!</a></li></ul></li>
+<li><a href="#sec:Process_filesystem_context">Process filesystem context</a>
+<ul>
+<li><a href="#sec:change-directory">change-directory</a></li>
+<li><a href="#sec:current-directory">current-directory</a></li></ul></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_process-context.29"><a href="#sec:Module_.28chicken_process-context.29">Module (chicken process-context)</a></h2><p>This module provides access to the current process context.</p><ul><li>New in CHICKEN 5.4.0: Errors caused by underlying C calls that change errno will produce a condition object with an <tt>errno</tt> property, which can be accessed with <tt>(get-condition-property &lt;the-condition-object&gt; 'exn 'errno)</tt>.</li>
+</ul>
+<h3 id="sec:Information_about_the_program.27s_invocation"><a href="#sec:Information_about_the_program.27s_invocation">Information about the program's invocation</a></h3><h4 id="sec:argc.2bargv"><a href="#sec:argc.2bargv">argc+argv</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:argc.2bargv"><span class="sig"><var class="id">argc+argv</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns two values: an integer and a foreign-pointer object representing the <tt>argc</tt> and <tt>argv</tt> arguments passed to the current process.  See also <tt>argv</tt> below.</p></dd></dl><h4 id="sec:argv"><a href="#sec:argv">argv</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:argv"><span class="sig"><var class="id">argv</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Return a list of all supplied command-line arguments. The first item in the list is a string containing the name of the executing program. The other items are the arguments passed to the application. It depends on the host-shell whether arguments are expanded ('globbed') or not.</p><p>NOTE: This is the &quot;raw&quot; unprocessed argument list, including runtime options (starting with <tt>-:</tt>) which are consumed by the runtime library.</p></dd></dl><h4 id="sec:command-line-arguments"><a href="#sec:command-line-arguments">command-line-arguments</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:command-line-arguments"><span class="sig"><var class="id">command-line-arguments</var></span><span class="type">parameter</span></dt>
+<dd class="defsig"><p>Contains the list of arguments passed to this program.</p><p>This <i>excludes</i> the name of the program, as well as any runtime options (options starting with <tt>-:</tt>) up until the first empty runtime option (just <tt>&quot;-:&quot;</tt>) or non-runtime option, whichever comes first.</p><p>In other words, this method returns every option <i>after</i> the first list of unbroken runtime options, which are all skipped.  If an empty runtime option is present, that is the last of this list of unbroken runtime options and everything after it is returned by this method. If a non-runtime option is present, that also breaks up the runtime options and this method returns that and every following option.</p></dd></dl><h4 id="sec:executable-pathname"><a href="#sec:executable-pathname">executable-pathname</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:executable-pathname"><span class="sig"><var class="id">executable-pathname</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a full pathname of the currently-running executable, or <tt>#f</tt> if it couldn't be determined. When evaluating code in the interpreter, this will be a path to <tt>csi</tt>.</p></dd></dl><h4 id="sec:program-name"><a href="#sec:program-name">program-name</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:program-name"><span class="sig"><var class="id">program-name</var></span><span class="type">parameter</span></dt>
+<dd class="defsig"><p>The name of the currently executing program. This is equivalent to <tt>(car (argv))</tt> for compiled programs or the filename following the <tt>-script</tt> option in interpreted scripts.</p></dd></dl><h3 id="sec:Access_to_environment_variables"><a href="#sec:Access_to_environment_variables">Access to environment variables</a></h3><h4 id="sec:get-environment-variables"><a href="#sec:get-environment-variables">get-environment-variables</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:get-environment-variables"><span class="sig"><var class="id">get-environment-variables</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a association list of the environment variables and their current values (see also <a href="http://srfi.schemers.org/srfi-98/">SRFI-98</a>).</p></dd></dl><h4 id="sec:get-environment-variable"><a href="#sec:get-environment-variable">get-environment-variable</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:get-environment-variable"><span class="sig"><var class="id">get-environment-variable</var> <var class="arg">STRING</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the value of the environment variable <var class="arg">STRING</var> or <tt>#f</tt> if that variable is not defined. See also <a href="http://srfi.schemers.org/srfi-98/">SRFI-98</a>.</p></dd></dl><h4 id="sec:set-environment-variable.21"><a href="#sec:set-environment-variable.21">set-environment-variable!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:set-environment-variable.21"><span class="sig"><var class="id">set-environment-variable!</var> <var class="arg">VARIABLE</var> <var class="arg">VALUE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Sets the environment variable named <var class="arg">VARIABLE</var> to <var class="arg">VALUE</var>. Both arguments should be strings. If the variable is not defined in the environment, a new definition is created.</p></dd></dl><h4 id="sec:unset-environment-variable.21"><a href="#sec:unset-environment-variable.21">unset-environment-variable!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:unset-environment-variable.21"><span class="sig"><var class="id">unset-environment-variable!</var> <var class="arg">VARIABLE</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Removes the definition of the environment variable <var class="arg">VARIABLE</var> from the environment of the current process. If the variable is not defined, nothing happens.</p></dd></dl><h3 id="sec:Process_filesystem_context"><a href="#sec:Process_filesystem_context">Process filesystem context</a></h3><h4 id="sec:change-directory"><a href="#sec:change-directory">change-directory</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:change-directory"><span class="sig"><var class="id">change-directory</var> <var class="arg">NAME</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><tt>(set! (current-directory) NAME)</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Changes the current working directory to <var class="arg">NAME</var>.</p></dd></dl><h4 id="sec:current-directory"><a href="#sec:current-directory">current-directory</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:current-directory"><span class="sig"><var class="id">current-directory</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the name of the current working directory.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20process%20signal%29.html">Module (chicken process signal)</a></p><p>Next: <a href="Module%20%28chicken%20process-context%20posix%29.html">Module (chicken process-context posix)</a></p></div></div></body></html>

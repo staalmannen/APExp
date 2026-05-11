@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken keyword)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_keyword.29">Module (chicken keyword)</a>
+<ul>
+<li><a href="#sec:get-keyword">get-keyword</a></li>
+<li><a href="#sec:keyword.3f">keyword?</a></li>
+<li><a href="#sec:keyword-.3estring">keyword-&gt;string</a></li>
+<li><a href="#sec:string-.3ekeyword">string-&gt;keyword</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_keyword.29"><a href="#sec:Module_.28chicken_keyword.29">Module (chicken keyword)</a></h2><p>Keywords are written like symbols, but prefixed with <tt>#:</tt>.  They evaluate to themselves. While they behave a lot like symbols in that they are interned when read and can be compared in constant time with <tt>eq?</tt>, they are a distinct type.  In particular, they have no plist, they cannot be bound or assigned to and aren't <tt>eq?</tt> to a symbol with the same spelling.  Procedures can use keywords to accept optional named parameters in addition to normal required parameters.</p><p>The parameter <tt>keyword-style</tt> and the compiler/interpreter option <tt>-keyword-style</tt> can be used to allow an additional keyword syntax, either compatible to Common LISP, or to DSSSL.  As long as this parameter is set to <tt>#:suffix</tt>, CHICKEN conforms to <a href="http://srfi.schemers.org/srfi-88/srfi-88.html">SRFI-88</a>.</p><p>There is also a <tt>srfi-88</tt> or <tt>(srfi 88)</tt> module which only includes the standard procedures from the SRFI document, without the CHICKEN extensions.  <tt>(chicken keyword)</tt> offers the complete set of procedures, both CHICKEN-specific and standard SRFI-88.</p><h4 id="sec:get-keyword"><a href="#sec:get-keyword">get-keyword</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:get-keyword"><span class="sig"><var class="id">get-keyword</var> <var class="arg">KEYWORD</var> <var class="arg">ARGLIST</var> <var class="dsssl">#!optional</var> <var class="arg">THUNK</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the argument from <var class="arg">ARGLIST</var> specified under the keyword <var class="arg">KEYWORD</var>. If the keyword is not found, then the zero-argument procedure <var class="arg">THUNK</var> is invoked and the result value is returned. If <var class="arg">THUNK</var> is not given, <tt>#f</tt> is returned.</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> <span class="paren2">(<span class="default">increase x . args</span>)</span>
+  <span class="paren2">(<span class="default">+ x <span class="paren3">(<span class="default">get-keyword <span class="keyword">#:amount</span> args <span class="paren4">(<span class="default"><i><span class="symbol">lambda</span></i> <span class="paren5">(<span class="default"></span>)</span> 1</span>)</span></span>)</span></span>)</span> </span>)</span>
+<span class="paren1">(<span class="default">increase 123</span>)</span>                                      ==&gt; 124
+<span class="paren1">(<span class="default">increase 123 <span class="keyword">#:amount</span> 10</span>)</span>                          ==&gt; 133</pre></dd></dl><h4 id="sec:keyword.3f"><a href="#sec:keyword.3f">keyword?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:keyword.3f"><span class="sig"><var class="id">keyword?</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">X</var> is a keyword, or <tt>#f</tt> otherwise.</p></dd></dl><h4 id="sec:keyword-.3estring"><a href="#sec:keyword-.3estring">keyword-&gt;string</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:keyword-.3estring"><span class="sig"><var class="id">keyword-&gt;string</var> <var class="arg">KEYWORD</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Transforms <var class="arg">KEYWORD</var> into a string.</p></dd></dl><h4 id="sec:string-.3ekeyword"><a href="#sec:string-.3ekeyword">string-&gt;keyword</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:string-.3ekeyword"><span class="sig"><var class="id">string-&gt;keyword</var> <var class="arg">STRING</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a keyword with the name <var class="arg">STRING</var>.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20irregex%29.html">Module (chicken irregex)</a></p><p>Next: <a href="Module%20%28chicken%20load%29.html">Module (chicken load)</a></p></div></div></body></html>

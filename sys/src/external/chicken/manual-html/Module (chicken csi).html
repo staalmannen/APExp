@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken csi)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_csi.29">Module (chicken csi)</a>
+<ul>
+<li><a href="#sec:toplevel-command">toplevel-command</a></li>
+<li><a href="#sec:set-describer.21">set-describer!</a></li>
+<li><a href="#sec:default-evaluator">default-evaluator</a></li>
+<li><a href="#sec:editor-command">editor-command</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_csi.29"><a href="#sec:Module_.28chicken_csi.29">Module (chicken csi)</a></h2><p>This module provides procedures to access features specific to the <tt>csi</tt> interactive interpreter.</p><h3 id="sec:toplevel-command"><a href="#sec:toplevel-command">toplevel-command</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:toplevel-command"><span class="sig"><var class="id">toplevel-command</var> <var class="arg">SYMBOL</var> <var class="arg">PROC</var> <var class="dsssl">#!optional</var> <var class="arg">HELPSTRING</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Defines or redefines a toplevel interpreter command which can be invoked by entering <tt>,SYMBOL</tt>. <var class="arg">PROC</var> will be invoked when the command is entered and may read any required argument via <tt>read</tt> (or <tt>read-line</tt>). If the optional argument <var class="arg">HELPSTRING</var> is given, it will be listed by the <tt>,?</tt> command.</p></dd></dl><h3 id="sec:set-describer.21"><a href="#sec:set-describer.21">set-describer!</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:set-describer.21"><span class="sig"><var class="id">set-describer!</var> <var class="arg">TAG</var> <var class="arg">PROC</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Sets a custom description handler that invokes <var class="arg">PROC</var> when the <tt>,d</tt> command is invoked with a record-type object that has the type <var class="arg">TAG</var> (a symbol). <var class="arg">PROC</var> is called with two arguments: the object to be described and an output-port. It should write a possibly useful textual description of the object to the passed output-port. For example:</p><pre>#;1&gt; (define-record-type point (make-point x y) point?
+       (x point-x)
+       (y point-y))
+#;2&gt; (set-describer! 'point 
+       (lambda (pt o)
+         (with-output-to-port o
+           (lambda ()
+             (print &quot;a point with x=&quot; (point-x pt) &quot; and y=&quot; (point-y pt))))))
+#;3&gt; ,d (make-point 1 2)
+a point with x=1 and y=2</pre></dd></dl><h3 id="sec:default-evaluator"><a href="#sec:default-evaluator">default-evaluator</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:default-evaluator"><span class="sig"><var class="id">default-evaluator</var> <var class="arg">EXPR</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Takes <var class="arg">EXPR</var> and processes any of the built-in toplevel commands provided by <tt>csi</tt>. If <var class="arg">EXPR</var> is not a toplevel command, then it is evaluated using <tt>eval</tt>. This procedure is intended to be passed as an argument to <tt>repl</tt> to allow using <tt>csi</tt>s toplevel commands and history management in user-defined read-eval-print loops.</p></dd></dl><h3 id="sec:editor-command"><a href="#sec:editor-command">editor-command</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:editor-command"><span class="sig"><var class="id">editor-command</var></span><span class="type">parameter</span></dt>
+<dd class="defsig"><p>Holds the name of an editor that should be used when the toplevel command <tt>,e</tt> is used.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20continuation%29.html">Module (chicken continuation)</a></p><p>Next: <a href="Module%20%28chicken%20errno%29.html">Module (chicken errno)</a></p></div></div></body></html>

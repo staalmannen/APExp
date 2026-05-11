@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken errno)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_errno.29">Module (chicken errno)</a>
+<ul>
+<li><a href="#sec:errno">errno</a></li>
+<li><a href="#sec:errno_constants">errno constants</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_errno.29"><a href="#sec:Module_.28chicken_errno.29">Module (chicken errno)</a></h2><p>This module provides access to the standard C <tt>errno</tt> value.</p><p>Be careful, if you're using threads, <tt>errno</tt> might be clobbered as soon as another thread calls a C function.  To prevent this from happening, you can add <tt>(declare (disable-interrupts))</tt> at the top of your file, or use the <tt>-disable-interrupts</tt> compiler option to avoid any context switches while a procedure in this file is running.</p><h3 id="sec:errno"><a href="#sec:errno">errno</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:errno"><span class="sig"><var class="id">errno</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the error code of the last system call.</p></dd></dl><h3 id="sec:errno_constants"><a href="#sec:errno_constants">errno constants</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:errno.2fperm"><span class="sig"><var class="id">errno/perm</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2fnoent"><span class="sig"><var class="id">errno/noent</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2fsrch"><span class="sig"><var class="id">errno/srch</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2fintr"><span class="sig"><var class="id">errno/intr</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2fio"><span class="sig"><var class="id">errno/io</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2fnoexec"><span class="sig"><var class="id">errno/noexec</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2fbadf"><span class="sig"><var class="id">errno/badf</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2fchild"><span class="sig"><var class="id">errno/child</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2fnomem"><span class="sig"><var class="id">errno/nomem</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2facces"><span class="sig"><var class="id">errno/acces</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2ffault"><span class="sig"><var class="id">errno/fault</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2fbusy"><span class="sig"><var class="id">errno/busy</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2fnotdir"><span class="sig"><var class="id">errno/notdir</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2fisdir"><span class="sig"><var class="id">errno/isdir</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2finval"><span class="sig"><var class="id">errno/inval</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2fmfile"><span class="sig"><var class="id">errno/mfile</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2fnospc"><span class="sig"><var class="id">errno/nospc</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2fspipe"><span class="sig"><var class="id">errno/spipe</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2fpipe"><span class="sig"><var class="id">errno/pipe</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2fagain"><span class="sig"><var class="id">errno/again</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2frofs"><span class="sig"><var class="id">errno/rofs</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2fexist"><span class="sig"><var class="id">errno/exist</var></span><span class="type">constant</span></dt>
+<dt class="defsig" id="def:errno.2fwouldblock"><span class="sig"><var class="id">errno/wouldblock</var></span><span class="type">constant</span></dt>
+<dd class="defsig"><p>These variables contain error codes as returned by <tt>errno</tt>.</p><p><i>NOTE</i>: On Windows, <tt>EWOULDBLOCK</tt> does not exist.  For consistency, <tt>errno/wouldblock</tt> does exist, but it is defined as zero.</p><p>This does mean that in case there is no error, it looks like the <tt>errno/wouldblock</tt> error is returned.  But you have to check the return code of a system call before accessing <tt>errno</tt> anyway, so this should typically never happen.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20continuation%29.html">Module (chicken continuation)</a></p><p>Next: <a href="Module%20%28chicken%20eval%29.html">Module (chicken eval)</a></p></div></div></body></html>

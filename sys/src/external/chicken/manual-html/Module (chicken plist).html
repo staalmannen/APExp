@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken plist)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_plist.29">Module (chicken plist)</a>
+<ul>
+<li><a href="#sec:get">get</a></li>
+<li><a href="#sec:put.21">put!</a></li>
+<li><a href="#sec:remprop.21">remprop!</a></li>
+<li><a href="#sec:symbol-plist">symbol-plist</a></li>
+<li><a href="#sec:get-properties">get-properties</a></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_plist.29"><a href="#sec:Module_.28chicken_plist.29">Module (chicken plist)</a></h2><p>As in other Lisp dialects, CHICKEN supports &quot;property lists&quot; associated with symbols.  Properties are accessible via a key that can be any kind of value but which will be compared using <tt>eq?</tt>.</p><h3 id="sec:get"><a href="#sec:get">get</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:get"><span class="sig"><var class="id">get</var> <var class="arg">SYMBOL</var> <var class="arg">PROPERTY</var> <var class="dsssl">#!optional</var> <var class="arg">DEFAULT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the value stored under the key <var class="arg">PROPERTY</var> in the property list of <var class="arg">SYMBOL</var>. If no such property is stored, returns <var class="arg">DEFAULT</var>. The <var class="arg">DEFAULT</var> is optional and defaults to <tt>#f</tt>.</p></dd></dl><h3 id="sec:put.21"><a href="#sec:put.21">put!</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:put.21"><span class="sig"><var class="id">put!</var> <var class="arg">SYMBOL</var> <var class="arg">PROPERTY</var> <var class="arg">VALUE</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><tt>(set! (get SYMBOL PROPERTY) VALUE)</tt></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Stores <var class="arg">VALUE</var> under the key <var class="arg">PROPERTY</var> in the property list of <var class="arg">SYMBOL</var> replacing any previously stored value.</p></dd></dl><h3 id="sec:remprop.21"><a href="#sec:remprop.21">remprop!</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:remprop.21"><span class="sig"><var class="id">remprop!</var> <var class="arg">SYMBOL</var> <var class="arg">PROPERTY</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Deletes the first property matching the key <var class="arg">PROPERTY</var> in the property list of <var class="arg">SYMBOL</var>. Returns <tt>#t</tt> when a deletion performed, and <tt>#f</tt> otherwise.</p></dd></dl><h3 id="sec:symbol-plist"><a href="#sec:symbol-plist">symbol-plist</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:symbol-plist"><span class="sig"><var class="id">symbol-plist</var> <var class="arg">SYMBOL</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><var class="dsssl">set!</var> (<var class="id">symbol-plist</var> <var class="arg">SYMBOL</var>) <var class="arg">LST</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the property list of <var class="arg">SYMBOL</var> or sets it.  The property list is a flat list of alternating properties and values.</p><p>This list is not guaranteed to be a fresh copy, so avoid mutating it directly.</p></dd></dl><h3 id="sec:get-properties"><a href="#sec:get-properties">get-properties</a></h3>
+<dl class="defsig">
+<dt class="defsig" id="def:get-properties"><span class="sig"><var class="id">get-properties</var> <var class="arg">SYMBOL</var> <var class="arg">PROPERTIES</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Searches the property list of <var class="arg">SYMBOL</var> for the first property with a key in the list <var class="arg">PROPERTIES</var>. Returns 3 values: the matching property key, value, and the tail of property list after the matching property. When no match found all values are <tt>#f</tt>.</p><p>This tail of the property list is not guaranteed to be a fresh copy, so avoid mutating it directly.</p><p><var class="arg">PROPERTIES</var> may also be an atom, in which case it is treated as a list of one element.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20platform%29.html">Module (chicken platform)</a></p><p>Next: <a href="Module%20%28chicken%20port%29.html">Module (chicken port)</a></p></div></div></body></html>

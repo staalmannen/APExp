@@ -1,0 +1,208 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="manual.css" type="text/css" />
+<title>Chicken &raquo; Module (chicken memory)</title>
+<meta name="viewport" content="initial-scale=1" /></head>
+<body>
+<div id="body">
+<div id="main">
+<div id="toc">
+<h2 class="toc">TOC &raquo;</h2>
+<ul class="toc">
+<li><a href="#sec:Module_.28chicken_memory.29">Module (chicken memory)</a>
+<ul>
+<li><a href="#sec:Foreign_pointers">Foreign pointers</a>
+<ul>
+<li><a href="#sec:address-.3epointer">address-&gt;pointer</a></li>
+<li><a href="#sec:allocate">allocate</a></li>
+<li><a href="#sec:free">free</a></li>
+<li><a href="#sec:object-.3epointer">object-&gt;pointer</a></li>
+<li><a href="#sec:pointer-.3eobject">pointer-&gt;object</a></li>
+<li><a href="#sec:pointer.3f">pointer?</a></li>
+<li><a href="#sec:pointer-like.3f">pointer-like?</a></li>
+<li><a href="#sec:pointer.3d.3f">pointer=?</a></li>
+<li><a href="#sec:pointer-.3eaddress">pointer-&gt;address</a></li>
+<li><a href="#sec:pointer.2b">pointer+</a></li>
+<li><a href="#sec:align-to-word">align-to-word</a></li></ul></li>
+<li><a href="#sec:SRFI-4_Foreign_pointers">SRFI-4 Foreign pointers</a>
+<ul>
+<li><a href="#sec:pointer-u8-ref">pointer-u8-ref</a></li>
+<li><a href="#sec:pointer-s8-ref">pointer-s8-ref</a></li>
+<li><a href="#sec:pointer-u16-ref">pointer-u16-ref</a></li>
+<li><a href="#sec:pointer-s16-ref">pointer-s16-ref</a></li>
+<li><a href="#sec:pointer-u32-ref">pointer-u32-ref</a></li>
+<li><a href="#sec:pointer-s32-ref">pointer-s32-ref</a></li>
+<li><a href="#sec:pointer-u64-ref">pointer-u64-ref</a></li>
+<li><a href="#sec:pointer-s64-ref">pointer-s64-ref</a></li>
+<li><a href="#sec:pointer-f32-ref">pointer-f32-ref</a></li>
+<li><a href="#sec:pointer-f64-ref">pointer-f64-ref</a></li>
+<li><a href="#sec:pointer-u8-set.21">pointer-u8-set!</a></li>
+<li><a href="#sec:pointer-s8-set.21">pointer-s8-set!</a></li>
+<li><a href="#sec:pointer-u16-set.21">pointer-u16-set!</a></li>
+<li><a href="#sec:pointer-s16-set.21">pointer-s16-set!</a></li>
+<li><a href="#sec:pointer-u32-set.21">pointer-u32-set!</a></li>
+<li><a href="#sec:pointer-s32-set.21">pointer-s32-set!</a></li>
+<li><a href="#sec:pointer-u64-set.21">pointer-u64-set!</a></li>
+<li><a href="#sec:pointer-s64-set.21">pointer-s64-set!</a></li>
+<li><a href="#sec:pointer-f32-set.21">pointer-f32-set!</a></li>
+<li><a href="#sec:pointer-f64-set.21">pointer-f64-set!</a></li></ul></li>
+<li><a href="#sec:Tagged_pointers">Tagged pointers</a>
+<ul>
+<li><a href="#sec:tag-pointer">tag-pointer</a></li>
+<li><a href="#sec:tagged-pointer.3f">tagged-pointer?</a></li>
+<li><a href="#sec:pointer-tag">pointer-tag</a></li></ul></li>
+<li><a href="#sec:Pointer_vectors">Pointer vectors</a>
+<ul>
+<li><a href="#sec:make-pointer-vector_">make-pointer-vector </a></li>
+<li><a href="#sec:pointer-vector.3f">pointer-vector?</a></li>
+<li><a href="#sec:pointer-vector">pointer-vector</a></li>
+<li><a href="#sec:pointer-vector-length">pointer-vector-length</a></li>
+<li><a href="#sec:pointer-vector-ref">pointer-vector-ref</a></li>
+<li><a href="#sec:pointer-vector-set.21">pointer-vector-set!</a></li>
+<li><a href="#sec:pointer-vector-fill.21">pointer-vector-fill!</a></li></ul></li>
+<li><a href="#sec:Moving_memory">Moving memory</a>
+<ul>
+<li><a href="#sec:move-memory.21">move-memory!</a></li></ul></li></ul></li></ul></div><h2 id="sec:Module_.28chicken_memory.29"><a href="#sec:Module_.28chicken_memory.29">Module (chicken memory)</a></h2><p>The procedures from this module operate directly on memory, at a very low level.  This makes them unsafe, unlike most other Scheme procedures.  <b>Use at your own risk.</b></p><h3 id="sec:Foreign_pointers"><a href="#sec:Foreign_pointers">Foreign pointers</a></h3><p>The abstract class of <i>pointer</i> is divided into 2 categories:</p><dl><dt><i>pointer object</i></dt>
+<dd>is a regular or <a href="#sec:Tagged_pointers">tagged</a> foreign pointer object.</dd><dt><i>pointer-like object</i></dt>
+<dd>is a closure, port, <a href="Module%20%28chicken%20locative%29.html">locative</a>, or a pointer object.</dd></dl>
+<p>Note that Locatives, while technically pointers, are not considered a <i>pointer object</i>, but a <i>pointer-like object</i>. The distinction is artificial.</p><h4 id="sec:address-.3epointer"><a href="#sec:address-.3epointer">address-&gt;pointer</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:address-.3epointer"><span class="sig"><var class="id">address-&gt;pointer</var> <var class="arg">ADDRESS</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Creates a new foreign pointer object initialized to point to the address given in the integer <var class="arg">ADDRESS</var>.</p></dd></dl><h4 id="sec:allocate"><a href="#sec:allocate">allocate</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:allocate"><span class="sig"><var class="id">allocate</var> <var class="arg">BYTES</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a foreign pointer object to a freshly allocated region of static memory.</p><p>This procedure could be defined as follows:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> allocate <span class="paren2">(<span class="default">foreign-lambda c-pointer <span class="string">&quot;malloc&quot;</span> integer</span>)</span></span>)</span></pre></dd></dl><h4 id="sec:free"><a href="#sec:free">free</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:free"><span class="sig"><var class="id">free</var> <var class="arg">POINTER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Frees the memory pointed to by <var class="arg">POINTER</var>.</p><p>This procedure could be defined as follows:</p>
+<pre class="highlight colorize"><span class="paren1">(<span class="default"><i><span class="symbol">define</span></i> free <span class="paren2">(<span class="default">foreign-lambda void <span class="string">&quot;free&quot;</span> c-pointer</span>)</span></span>)</span></pre></dd></dl><h4 id="sec:object-.3epointer"><a href="#sec:object-.3epointer">object-&gt;pointer</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:object-.3epointer"><span class="sig"><var class="id">object-&gt;pointer</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a foreign pointer object pointing to the Scheme object X, which should be a non-immediate object. (&quot;foreign&quot; here is a bit of a misnomer.)</p><p>Note that data in the garbage collected heap moves during garbage collection.</p></dd></dl><h4 id="sec:pointer-.3eobject"><a href="#sec:pointer-.3eobject">pointer-&gt;object</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-.3eobject"><span class="sig"><var class="id">pointer-&gt;object</var> <var class="arg">POINTER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the Scheme object pointed to by the pointer object <var class="arg">POINTER</var>.</p><p>Whether the <var class="arg">POINTER</var> actually points to a Scheme object is not guaranteed. Use at your own risk.</p></dd></dl><h4 id="sec:pointer.3f"><a href="#sec:pointer.3f">pointer?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer.3f"><span class="sig"><var class="id">pointer?</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">X</var> is a pointer object, or <tt>#f</tt> otherwise.</p></dd></dl><h4 id="sec:pointer-like.3f"><a href="#sec:pointer-like.3f">pointer-like?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-like.3f"><span class="sig"><var class="id">pointer-like?</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">X</var> is a pointer-like object, or <tt>#f</tt> otherwise.</p></dd></dl><h4 id="sec:pointer.3d.3f"><a href="#sec:pointer.3d.3f">pointer=?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer.3d.3f"><span class="sig"><var class="id">pointer=?</var> <var class="arg">POINTER*1</var> <var class="arg">POINTER*2</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if the pointer-like objects <var class="arg">POINTER*1</var> and <var class="arg">POINTER*2</var> point to the same address, or <tt>#f</tt> otherwise.</p></dd></dl><h4 id="sec:pointer-.3eaddress"><a href="#sec:pointer-.3eaddress">pointer-&gt;address</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-.3eaddress"><span class="sig"><var class="id">pointer-&gt;address</var> <var class="arg">POINTER*</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the address, to which the pointer-like object <var class="arg">POINTER*</var> points.</p></dd></dl><h4 id="sec:pointer.2b"><a href="#sec:pointer.2b">pointer+</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer.2b"><span class="sig"><var class="id">pointer+</var> <var class="arg">POINTER*</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a new foreign pointer object representing the pointer-like object <var class="arg">POINTER*</var> address value increased by the byte-offset <var class="arg">N</var>.</p><p>Use of anything other than a pointer object as an argument is questionable.</p></dd></dl><h4 id="sec:align-to-word"><a href="#sec:align-to-word">align-to-word</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:align-to-word"><span class="sig"><var class="id">align-to-word</var> <var class="arg">POINTER*-OR-INT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Accepts either a pointer-like object or an integer as the argument and returns a new foreign pointer or integer aligned to the native word size of the host platform.</p><p>Use of anything other than an integer or pointer object as an argument is questionable.</p></dd></dl><h3 id="sec:SRFI-4_Foreign_pointers"><a href="#sec:SRFI-4_Foreign_pointers">SRFI-4 Foreign pointers</a></h3><p>These procedures actually accept a pointer-like object as the <tt>POINTER</tt> argument. However, as usual, use of anything other than a pointer object is questionable.</p><h4 id="sec:pointer-u8-ref"><a href="#sec:pointer-u8-ref">pointer-u8-ref</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-u8-ref"><span class="sig"><var class="id">pointer-u8-ref</var> <var class="arg">POINTER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the unsigned byte at the address designated by <var class="arg">POINTER</var>.</p></dd></dl><h4 id="sec:pointer-s8-ref"><a href="#sec:pointer-s8-ref">pointer-s8-ref</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-s8-ref"><span class="sig"><var class="id">pointer-s8-ref</var> <var class="arg">POINTER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the signed byte at the address designated by <var class="arg">POINTER</var>.</p></dd></dl><h4 id="sec:pointer-u16-ref"><a href="#sec:pointer-u16-ref">pointer-u16-ref</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-u16-ref"><span class="sig"><var class="id">pointer-u16-ref</var> <var class="arg">POINTER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the unsigned 16-bit integer at the address designated by <var class="arg">POINTER</var>.</p></dd></dl><h4 id="sec:pointer-s16-ref"><a href="#sec:pointer-s16-ref">pointer-s16-ref</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-s16-ref"><span class="sig"><var class="id">pointer-s16-ref</var> <var class="arg">POINTER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the signed 16-bit integer at the address designated by <var class="arg">POINTER</var>.</p></dd></dl><h4 id="sec:pointer-u32-ref"><a href="#sec:pointer-u32-ref">pointer-u32-ref</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-u32-ref"><span class="sig"><var class="id">pointer-u32-ref</var> <var class="arg">POINTER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the unsigned 32-bit integer at the address designated by <var class="arg">POINTER</var>.</p></dd></dl><h4 id="sec:pointer-s32-ref"><a href="#sec:pointer-s32-ref">pointer-s32-ref</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-s32-ref"><span class="sig"><var class="id">pointer-s32-ref</var> <var class="arg">POINTER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the signed 32-bit integer at the address designated by <var class="arg">POINTER</var>.</p></dd></dl><h4 id="sec:pointer-u64-ref"><a href="#sec:pointer-u64-ref">pointer-u64-ref</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-u64-ref"><span class="sig"><var class="id">pointer-u64-ref</var> <var class="arg">POINTER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the unsigned 64-bit integer at the address designated by <var class="arg">POINTER</var>.</p></dd></dl><h4 id="sec:pointer-s64-ref"><a href="#sec:pointer-s64-ref">pointer-s64-ref</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-s64-ref"><span class="sig"><var class="id">pointer-s64-ref</var> <var class="arg">POINTER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the signed 64-bit integer at the address designated by <var class="arg">POINTER</var>.</p></dd></dl><h4 id="sec:pointer-f32-ref"><a href="#sec:pointer-f32-ref">pointer-f32-ref</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-f32-ref"><span class="sig"><var class="id">pointer-f32-ref</var> <var class="arg">POINTER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the 32-bit float at the address designated by <var class="arg">POINTER</var>.</p></dd></dl><h4 id="sec:pointer-f64-ref"><a href="#sec:pointer-f64-ref">pointer-f64-ref</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-f64-ref"><span class="sig"><var class="id">pointer-f64-ref</var> <var class="arg">POINTER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the 64-bit double at the address designated by <var class="arg">POINTER</var>.</p></dd></dl><h4 id="sec:pointer-u8-set.21"><a href="#sec:pointer-u8-set.21">pointer-u8-set!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-u8-set.21"><span class="sig"><var class="id">pointer-u8-set!</var> <var class="arg">POINTER</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><var class="dsssl">set!</var> (<var class="id">pointer-u8-ref</var> <var class="arg">POINTER</var>) <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Stores the unsigned byte <var class="arg">N</var> at the address designated by <var class="arg">POINTER</var>.</p></dd></dl><h4 id="sec:pointer-s8-set.21"><a href="#sec:pointer-s8-set.21">pointer-s8-set!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-s8-set.21"><span class="sig"><var class="id">pointer-s8-set!</var> <var class="arg">POINTER</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><var class="dsssl">set!</var> (<var class="id">pointer-s8-ref</var> <var class="arg">POINTER</var>) <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Stores the signed byte <var class="arg">N</var> at the address designated by <var class="arg">POINTER</var>.</p></dd></dl><h4 id="sec:pointer-u16-set.21"><a href="#sec:pointer-u16-set.21">pointer-u16-set!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-u16-set.21"><span class="sig"><var class="id">pointer-u16-set!</var> <var class="arg">POINTER</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><var class="dsssl">set!</var> (<var class="id">pointer-u16-ref</var> <var class="arg">POINTER</var>) <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Stores the unsigned 16-bit integer <var class="arg">N</var> at the address designated by <var class="arg">POINTER</var>.</p></dd></dl><h4 id="sec:pointer-s16-set.21"><a href="#sec:pointer-s16-set.21">pointer-s16-set!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-s16-set.21"><span class="sig"><var class="id">pointer-s16-set!</var> <var class="arg">POINTER</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><var class="dsssl">set!</var> (<var class="id">pointer-s16-ref</var> <var class="arg">POINTER</var>) <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Stores the signed 16-bit integer <var class="arg">N</var> at the address designated by <var class="arg">POINTER</var>.</p></dd></dl><h4 id="sec:pointer-u32-set.21"><a href="#sec:pointer-u32-set.21">pointer-u32-set!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-u32-set.21"><span class="sig"><var class="id">pointer-u32-set!</var> <var class="arg">POINTER</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><var class="dsssl">set!</var> (<var class="id">pointer-u32-ref</var> <var class="arg">POINTER</var>) <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Stores the unsigned 32-bit integer <var class="arg">N</var> at the address designated by <var class="arg">POINTER</var>.</p></dd></dl><h4 id="sec:pointer-s32-set.21"><a href="#sec:pointer-s32-set.21">pointer-s32-set!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-s32-set.21"><span class="sig"><var class="id">pointer-s32-set!</var> <var class="arg">POINTER</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><var class="dsssl">set!</var> (<var class="id">pointer-s32-ref</var> <var class="arg">POINTER</var>) <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Stores the 32-bit integer <var class="arg">N</var> at the address designated by <var class="arg">POINTER</var>.</p></dd></dl><h4 id="sec:pointer-u64-set.21"><a href="#sec:pointer-u64-set.21">pointer-u64-set!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-u64-set.21"><span class="sig"><var class="id">pointer-u64-set!</var> <var class="arg">POINTER</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><var class="dsssl">set!</var> (<var class="id">pointer-u64-ref</var> <var class="arg">POINTER</var>) <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Stores the unsigned 64-bit integer <var class="arg">N</var> at the address designated by <var class="arg">POINTER</var>.</p></dd></dl><h4 id="sec:pointer-s64-set.21"><a href="#sec:pointer-s64-set.21">pointer-s64-set!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-s64-set.21"><span class="sig"><var class="id">pointer-s64-set!</var> <var class="arg">POINTER</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><var class="dsssl">set!</var> (<var class="id">pointer-s64-ref</var> <var class="arg">POINTER</var>) <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Stores the 64-bit integer <var class="arg">N</var> at the address designated by <var class="arg">POINTER</var>.</p></dd></dl><h4 id="sec:pointer-f32-set.21"><a href="#sec:pointer-f32-set.21">pointer-f32-set!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-f32-set.21"><span class="sig"><var class="id">pointer-f32-set!</var> <var class="arg">POINTER</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><var class="dsssl">set!</var> (<var class="id">pointer-f32-ref</var> <var class="arg">POINTER</var>) <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Stores the 32-bit floating-point number <var class="arg">N</var> at the address designated by <var class="arg">POINTER</var>.</p></dd></dl><h4 id="sec:pointer-f64-set.21"><a href="#sec:pointer-f64-set.21">pointer-f64-set!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-f64-set.21"><span class="sig"><var class="id">pointer-f64-set!</var> <var class="arg">POINTER</var> <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dt class="defsig" id="def:set.21"><span class="sig"><var class="dsssl">set!</var> (<var class="id">pointer-f64-ref</var> <var class="arg">POINTER</var>) <var class="arg">N</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Stores the 64-bit floating-point number <var class="arg">N</var> at the address designated by <var class="arg">POINTER</var>.</p></dd></dl><h3 id="sec:Tagged_pointers"><a href="#sec:Tagged_pointers">Tagged pointers</a></h3><p><i>Tagged</i> pointers are foreign pointer objects with an extra tag object.</p><h4 id="sec:tag-pointer"><a href="#sec:tag-pointer">tag-pointer</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:tag-pointer"><span class="sig"><var class="id">tag-pointer</var> <var class="arg">POINTER*</var> <var class="arg">TAG</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Creates a new tagged foreign pointer object from the pointer-like object <var class="arg">POINTER*</var> with the tag <var class="arg">TAG</var>, which may an arbitrary Scheme object.</p><p>Use of anything other than a pointer object is questionable.</p></dd></dl><h4 id="sec:tagged-pointer.3f"><a href="#sec:tagged-pointer.3f">tagged-pointer?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:tagged-pointer.3f"><span class="sig"><var class="id">tagged-pointer?</var> <var class="arg">X</var> <var class="dsssl">#!optional</var> <var class="arg">TAG</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">X</var> is a tagged foreign pointer object, or <tt>#f</tt> otherwise.</p><p>Further, returns <tt>#t</tt> when <var class="arg">X</var> has the optional tag <var class="arg">TAG</var> (using an <tt>equal?</tt> comparison), or <tt>#f</tt> otherwise.</p></dd></dl><h4 id="sec:pointer-tag"><a href="#sec:pointer-tag">pointer-tag</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-tag"><span class="sig"><var class="id">pointer-tag</var> <var class="arg">POINTER*</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>If <tt>POINTER</tt> is a tagged foreign pointer object, its tag is returned. If <var class="arg">POINTER*</var> is any other kind of pointer-like object <tt>#f</tt> is returned. Otherwise an error is signalled.</p></dd></dl><h3 id="sec:Pointer_vectors"><a href="#sec:Pointer_vectors">Pointer vectors</a></h3><p><i>Pointer vectors</i> are specialized and space-efficient vectors for foreign pointer objects. All procedures defined below that accept a pointer object allow <tt>#f</tt> as an alternative representation of the <tt>NULL</tt>-pointer.</p><h4 id="sec:make-pointer-vector_"><a href="#sec:make-pointer-vector_">make-pointer-vector </a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:make-pointer-vector"><span class="sig"><var class="id">make-pointer-vector</var> <var class="arg">LENGTH</var> <var class="dsssl">#!optional</var> <var class="arg">INIT</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Creates a pointer-vector of the given length and optionally initializes each element to <var class="arg">INIT</var>, which should be a pointer or <tt>#f</tt>, which represents the <tt>NULL</tt> pointer.</p></dd></dl><h4 id="sec:pointer-vector.3f"><a href="#sec:pointer-vector.3f">pointer-vector?</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-vector.3f"><span class="sig"><var class="id">pointer-vector?</var> <var class="arg">X</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns <tt>#t</tt> if <var class="arg">X</var> is a pointer-vector or <tt>#f</tt> otherwise.</p></dd></dl><h4 id="sec:pointer-vector"><a href="#sec:pointer-vector">pointer-vector</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-vector"><span class="sig"><var class="id">pointer-vector</var> <var class="arg">POINTER</var> <var class="arg">...</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns a pointer-vector from the given pointer arguments.</p></dd></dl><h4 id="sec:pointer-vector-length"><a href="#sec:pointer-vector-length">pointer-vector-length</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-vector-length"><span class="sig"><var class="id">pointer-vector-length</var> <var class="arg">POINTERVECTOR</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the length of the given pointer-vector.</p></dd></dl><h4 id="sec:pointer-vector-ref"><a href="#sec:pointer-vector-ref">pointer-vector-ref</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-vector-ref"><span class="sig"><var class="id">pointer-vector-ref</var> <var class="arg">POINTERVECTOR</var> <var class="arg">INDEX</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Returns the pointer at <var class="arg">INDEX</var> in the given pointer-vector or <tt>#f</tt> if the element is a <tt>NULL</tt>- pointer.</p></dd></dl><h4 id="sec:pointer-vector-set.21"><a href="#sec:pointer-vector-set.21">pointer-vector-set!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-vector-set.21"><span class="sig"><var class="id">pointer-vector-set!</var> <var class="arg">POINTERVECTOR</var> <var class="arg">INDEX</var> <var class="arg">POINTER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Sets the element at the position <var class="arg">INDEX</var> in the given pointer-vector to <var class="arg">POINTER</var>. The alternative syntax</p><pre> (set! (pointer-vector-ref POINTERVECTOR INDEX) POINTER)</pre><p>is also allowed.</p></dd></dl><h4 id="sec:pointer-vector-fill.21"><a href="#sec:pointer-vector-fill.21">pointer-vector-fill!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:pointer-vector-fill.21"><span class="sig"><var class="id">pointer-vector-fill!</var> <var class="arg">POINTERVECTOR</var> <var class="arg">POINTER</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Set every element in the <var class="arg">POINTERVECTOR</var> to <var class="arg">POINTER</var>.</p></dd></dl><h3 id="sec:Moving_memory"><a href="#sec:Moving_memory">Moving memory</a></h3><h4 id="sec:move-memory.21"><a href="#sec:move-memory.21">move-memory!</a></h4>
+<dl class="defsig">
+<dt class="defsig" id="def:move-memory.21"><span class="sig"><var class="id">move-memory!</var> <var class="arg">FROM</var> <var class="arg">TO</var> <var class="dsssl">#!optional</var> <var class="arg">BYTES</var> <var class="arg">FROM-OFFSET</var> <var class="arg">TO-OFFSET</var></span><span class="type">procedure</span></dt>
+<dd class="defsig"><p>Copies <var class="arg">BYTES</var> bytes of memory from <var class="arg">FROM</var> to <var class="arg">TO</var>. <var class="arg">FROM</var> and <var class="arg">TO</var> may be strings, blobs, <a href="Module%20srfi-4.html">SRFI-4 number-vectors</a>, memory mapped files, foreign pointers (as obtained from a call to <tt>foreign-lambda</tt>, for example), tagged-pointers or locatives. if <var class="arg">BYTES</var> is not given and the size of the source or destination operand is known then the maximal number of bytes will be copied. Moving memory to the storage returned by locatives will cause havoc, if the locative refers to containers of non-immediate data, like vectors or pairs.</p><p>The additional fourth and fifth argument specify starting offsets (in bytes) for the source and destination arguments.</p><p>Signals an error if any of the above constraints is violated.</p></dd></dl><hr /><p>Previous: <a href="Module%20%28chicken%20locative%29.html">Module (chicken locative)</a></p><p>Next: <a href="Module%20%28chicken%20memory%20representation%29.html">Module (chicken memory representation)</a></p></div></div></body></html>
