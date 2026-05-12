@@ -44,19 +44,13 @@ OFILES=\
 	pcomplete.$O\
 	pcomplib.$O\
 	syntax.$O\
-	xmalloc.$O\
-# termcap - force linking\
-#	termcap.$O\
-#	tparam.$O\
-# tilde -force linking \
-#	tilde.$O\
+	xmalloc.$O
 
 BASHSRC=$APEXPROOT/sys/src/external/bash
 
 BASHLIBS=\
 	libtermcap.a$O\
 	libtilde.a$O\
-	libmalloc.a$O\
 	libbuiltins.a$O\
 	libglob.a$O\
 	libsh.a$O\
@@ -90,14 +84,6 @@ CFLAGS=	-c -B -I. -I$BASHSRC -I$BASHSRC/include -I$BASHSRC/lib $DEFS
 %.$O: $BASHSRC/%.c
 			$CC $CFLAGS $BASHSRC/$stem.c
 
-termcap.$O: $BASHSRC/lib/termcap/termcap.c
-			$CC $CFLAGS $BASHSRC/lib/termcap/termcap.c
-
-tparam.$O: $BASHSRC/lib/termcap/tparam.c
-			$CC $CFLAGS $BASHSRC/lib/termcap/tparam.c
-
-tilde.$O: $BASHSRC/lib/tilde/tilde.c
-			$CC $CFLAGS $BASHSRC/lib/tilde/tilde.c
 
 libtermcap.a$O: $BASHSRC/lib/termcap/Makefile
 			make -C $BASHSRC/lib/termcap
@@ -119,11 +105,6 @@ libglob.a$O: $BASHSRC/lib/glob/Makefile
 			mv $BASHSRC/lib/glob/libglob.a libglob.a$O
 			rm $BASHSRC/lib/glob/*.o
 
-libmalloc.a$O: $BASHSRC/lib/malloc/Makefile
-			make -C $BASHSRC/lib/malloc
-			mv $BASHSRC/lib/malloc/libmalloc.a libmalloc.a$O
-			rm $BASHSRC/lib/malloc/*.o
-
 libhistory.a$O: $BASHSRC/lib/readline/Makefile
 			make -C $BASHSRC/lib/readline libhistory.a
 			mv $BASHSRC/lib/readline/libhistory.a libhistory.a$O
@@ -143,6 +124,7 @@ libbuiltins.a$O: $BASHSRC/builtins/Makefile
 
 install:V:
 			cp $BASHSRC/doc/bash.1 $APEXPROOT/sys/man/1/bash
+			cp $BIN/bash $BIN/sh
 
 clean:V:
 			rm -f *.[$OS] [$OS].out lib*.a*

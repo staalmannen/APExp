@@ -4,7 +4,6 @@ APEXPROOT=../../../..
 
 _CORE_APPS=\
 # shell\
-	pdksh\
 	bash\
 # parsing/editing source etc \
 	as\
