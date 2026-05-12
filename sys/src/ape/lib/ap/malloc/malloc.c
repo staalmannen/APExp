@@ -96,6 +96,7 @@ good:
 			nbp = nbp->next;
 		}
 		nbp->size = pow;
+		nbp->next = nil;
 	}
 	else {
 		uintptr_t gap;
@@ -114,4 +115,3 @@ good:
 
 	return bp->data;
 }
-
