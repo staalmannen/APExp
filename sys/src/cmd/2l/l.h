@@ -3,21 +3,41 @@
 #include	<bio.h>
 #include	"../2c/2.out.h"
 #include	"../cc/compat.h"
+
+typedef	struct	Reloc	Reloc;
+typedef	struct	Adr	Adr;
+typedef	struct	Prog	Prog;
+typedef	struct	Sym	Sym;
+typedef	struct	Auto	Auto;
+typedef	struct	Optab	Optab;
+
 #define PtrSize 4
 
 #define	P		((Prog*)0)
 #define	S		((Sym*)0)
 #define	TNAME		(curtext?curtext->from.sym->name:noname)
 #define	CPUT(c)\
+
+
 	{ *cbp++ = c;\
 	if(--cbc <= 0)\
 		cflush(); }
 
-typedef	struct	Adr	Adr;
-typedef	struct	Prog	Prog;
-typedef	struct	Sym	Sym;
-typedef	struct	Auto	Auto;
-typedef	struct	Optab	Optab;
+
+
+struct Reloc
+{
+	int	n;
+	int	t;
+	uchar	*m;
+	ulong	*a;
+	Sym	*sym;
+};
+
+
+
+
+
 
 struct	Adr
 {
@@ -80,14 +100,7 @@ struct	Auto
 	long	aoffset;
 	short	type;
 };
-struct	Reloc 
-{ 
-	int	n; 
-	int	t; 
-	uchar	*m; 
-	ulong	*a; 
-	Sym	*sym; 
-};
+
 
 struct	Sym
 {
@@ -281,3 +294,12 @@ void	undef(void);
 void	xdefine(char*, int, long);
 void	xfol(Prog*);
 int	zaddr(uchar*, Adr*, Sym*[]);
+
+struct	Reloc 
+{ 
+	int	n; 
+	int	t; 
+	uchar	*m; 
+	ulong	*a; 
+	Sym	*sym; 
+};

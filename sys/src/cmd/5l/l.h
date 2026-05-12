@@ -3,22 +3,44 @@
 #include	<bio.h>
 #include	"../5c/5.out.h"
 #include	"../cc/compat.h"
-#define PtrSize 4
 
-#define	LIBNAMELEN	300
-
-void	addlibpath(char*);
-int	fileexists(char*);
-char*	findlib(char*);
-
+typedef	struct	Reloc	Reloc;
 typedef	struct	Adr	Adr;
 typedef	struct	Sym	Sym;
 typedef	struct	Autom	Auto;
 typedef	struct	Prog	Prog;
 typedef	struct	Optab	Optab;
 typedef	struct	Oprang	Oprang;
-typedef	uchar	Opcross[32][2][32];
 typedef	struct	Count	Count;
+
+#define PtrSize 4
+
+#define	LIBNAMELEN	300
+
+
+
+void	addlibpath(char*);
+int	fileexists(char*);
+char*	findlib(char*);
+
+
+
+struct Reloc
+{
+	int	n;
+	int	t;
+	uchar	*m;
+	ulong	*a;
+	Sym	*sym;
+};
+
+
+
+
+
+
+typedef	uchar	Opcross[32][2][32];
+
 
 #define	P		((Prog*)0)
 #define	S		((Sym*)0)
@@ -72,14 +94,7 @@ struct	Prog
 #define	regused	u0.u0regused
 #define	forwd	u0.u0forwd
 
-struct	Reloc 
-{ 
-	int	n; 
-	int	t; 
-	uchar	*m; 
-	ulong	*a; 
-	Sym	*sym; 
-};
+
 
 struct	Sym
 {
@@ -423,3 +438,12 @@ void	noops(void);
 long	immrot(ulong);
 long	immaddr(long);
 long	opbra(int, int);
+
+struct	Reloc 
+{ 
+	int	n; 
+	int	t; 
+	uchar	*m; 
+	ulong	*a; 
+	Sym	*sym; 
+};

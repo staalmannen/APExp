@@ -3,13 +3,33 @@
 #include	<bio.h>
 #include	"../kc/k.out.h"
 #include	"../cc/compat.h"
-#define PtrSize 4
 
+typedef	struct	Reloc	Reloc;
 typedef	struct	Adr	Adr;
 typedef	struct	Sym	Sym;
 typedef	struct	Autom	Auto;
 typedef	struct	Prog	Prog;
 typedef	struct	Optab	Optab;
+
+#define PtrSize 4
+
+
+
+
+
+struct Reloc
+{
+	int	n;
+	int	t;
+	uchar	*m;
+	ulong	*a;
+	Sym	*sym;
+};
+
+
+
+
+
 
 #define	P		((Prog*)0)
 #define	S		((Sym*)0)
@@ -56,14 +76,7 @@ struct	Prog
 	uchar	as;
 	char	reg;
 };
-struct	Reloc 
-{ 
-	int	n; 
-	int	t; 
-	uchar	*m; 
-	ulong	*a; 
-	Sym	*sym; 
-};
+
 
 struct	Sym
 {
@@ -341,3 +354,12 @@ void	span(void);
 void	undef(void);
 void	xdefine(char*, int, long);
 void	xfol(Prog*);
+
+struct	Reloc 
+{ 
+	int	n; 
+	int	t; 
+	uchar	*m; 
+	ulong	*a; 
+	Sym	*sym; 
+};

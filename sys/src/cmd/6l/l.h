@@ -4,22 +4,43 @@
 #include	"../6c/6.out.h"
 #include	"../cc/compat.h"
 
-#define PtrSize 8
-
-#define	P		((Prog*)0)
-#define	S		((Sym*)0)
-#define	TNAME		(curtext?curtext->from.sym->name:noname)
-#define	cput(c)\
-	{ *cbp++ = c;\
-	if(--cbc <= 0)\
-		cflush(); }
-
+typedef	struct	Reloc	Reloc;
 typedef	struct	Adr	Adr;
 typedef	struct	Prog	Prog;
 typedef	struct	Sym	Sym;
 typedef	struct	Auto	Auto;
 typedef	struct	Optab	Optab;
 typedef	struct	Movtab	Movtab;
+
+
+#define PtrSize 8
+
+#define	P		((Prog*)0)
+#define	S		((Sym*)0)
+#define	TNAME		(curtext?curtext->from.sym->name:noname)
+#define cput(c) \\
+
+
+	{ *cbp++ = c;\
+	if(--cbc <= 0)\
+		cflush(); }
+
+
+
+struct Reloc
+{
+	int	n;
+	int	t;
+	uchar	*m;
+	ulong	*a;
+	Sym	*sym;
+};
+
+
+
+
+
+
 
 struct	Adr
 {
@@ -71,14 +92,7 @@ struct	Auto
 	long	aoffset;
 	short	type;
 };
-struct	Reloc 
-{ 
-	int	n; 
-	int	t; 
-	uchar	*m; 
-	ulong	*a; 
-	Sym	*sym; 
-};
+
 
 struct	Sym
 {
@@ -410,3 +424,12 @@ void	xdefine(char*, int, vlong);
 void	xfol(Prog*);
 int	zaddr(uchar*, Adr*, Sym*[]);
 void	zerosig(char*);
+
+struct	Reloc 
+{ 
+	int	n; 
+	int	t; 
+	uchar	*m; 
+	ulong	*a; 
+	Sym	*sym; 
+};

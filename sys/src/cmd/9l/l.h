@@ -3,17 +3,37 @@
 #include	<bio.h>
 #include	"../9c/9.out.h"
 #include	"../cc/compat.h"
-#define PtrSize 4
 
-#ifndef	EXTERN
-#define	EXTERN	extern
-#endif
-
+typedef	struct	Reloc	Reloc;
 typedef	struct	Adr	Adr;
 typedef	struct	Sym	Sym;
 typedef	struct	Autom	Auto;
 typedef	struct	Prog	Prog;
 typedef	struct	Optab	Optab;
+
+#define PtrSize 4
+
+
+
+#ifndef	EXTERN
+#define	EXTERN	extern
+#endif
+
+
+
+struct Reloc
+{
+	int	n;
+	int	t;
+	uchar	*m;
+	ulong	*a;
+	Sym	*sym;
+};
+
+
+
+
+
 
 #define	P		((Prog*)0)
 #define	S		((Sym*)0)
@@ -54,14 +74,7 @@ struct	Prog
 	short	optab;		/* could be uchar */
 	short	as;
 	char	reg;
-struct	Reloc 
-{ 
-	int	n; 
-	int	t; 
-	uchar	*m; 
-	ulong	*a; 
-	Sym	*sym; 
-};
+
 
 struct	Sym
 {
@@ -368,3 +381,12 @@ void	zerosig(char*);
 #pragma	varargck	type	"A"	int
 #pragma	varargck	type	"S"	char*
 #pragma	varargck	argpos	diag 1
+
+struct	Reloc 
+{ 
+	int	n; 
+	int	t; 
+	uchar	*m; 
+	ulong	*a; 
+	Sym	*sym; 
+};

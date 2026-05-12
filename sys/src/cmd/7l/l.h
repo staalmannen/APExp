@@ -3,15 +3,8 @@
 #include	<bio.h>
 #include	"../7c/7.out.h"
 #include	"../cc/compat.h"
-#define PtrSize 4
 
-#define	LIBNAMELEN	300
-
-void	addlibpath(char*);
-int	fileexists(char*);
-int	find1(long, int);
-char*	findlib(char*);
-
+typedef	struct	Reloc	Reloc;
 typedef	struct	Adr	Adr;
 typedef	struct	Autom	Auto;
 typedef	struct	Count	Count;
@@ -21,6 +14,37 @@ typedef	struct	Sym	Sym;
 typedef	struct	Mask	Mask;
 typedef	struct	Optab	Optab;
 typedef	struct	Oprang	Oprang;
+
+#define PtrSize 4
+
+#define	LIBNAMELEN	300
+
+
+
+void	addlibpath(char*);
+int	fileexists(char*);
+int	find1(long, int);
+char*	findlib(char*);
+
+
+
+struct Reloc
+{
+	int	n;
+	int	t;
+	uchar	*m;
+	ulong	*a;
+	Sym	*sym;
+};
+
+
+
+
+
+
+
+
+
 typedef	uchar	Opcross[32][2][32];
 
 #define	P		((Prog*)0)
@@ -75,14 +99,7 @@ struct	Prog
 #define	regused	u0.u0regused
 #define	forwd	u0.u0forwd
 
-struct	Reloc 
-{ 
-	int	n; 
-	int	t; 
-	uchar	*m; 
-	ulong	*a; 
-	Sym	*sym; 
-};
+
 
 struct	Sym
 {
@@ -441,3 +458,12 @@ void	zerosig(char*);
 #define	isreturn(a)	((a) == ARETURN || (a) == ARET || (a) == AERET)
 #define	branchop()	AB
 #define	canfollow(a)	((a) != ATEXT && (a) != ABCASE)
+
+struct	Reloc 
+{ 
+	int	n; 
+	int	t; 
+	uchar	*m; 
+	ulong	*a; 
+	Sym	*sym; 
+};
