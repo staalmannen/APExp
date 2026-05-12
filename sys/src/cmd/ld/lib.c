@@ -81,16 +81,14 @@ go_ldobj(Biobuf *f, char *pkg, int64 len, char *pn, int whence)
 void
 ldpkg(Biobuf *f, char *pkg, int64 len, char *filename, int whence)
 {
-	// DWARF DWARF LDPKG is not used in our simplified 9front-based linker
-	// just skip
+	go_ldpkg(f, pkg, len, filename, whence);
 }
 
 char*
 expandpkg(char *name, char *pkg)
 {
-	return name;
+	return go_expandpkg(name, pkg);
 }
-
 char*
 getgoroot(void)
 {

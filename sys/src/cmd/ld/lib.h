@@ -145,8 +145,11 @@ EXTERN	Segment	segrodata;	// NaCl only
 EXTERN	Segment	segsym;
 
 extern	void	usage(void);
-extern	void	ldpkg(Biobuf*, char*, int64, char*, int);
-extern	char*	expandpkg(char*, char*);
+extern	void	go_ldpkg(Biobuf*, char*, int64, char*, int);
+extern	char*	go_expandpkg(char*, char*);
+extern	void	go_mark(Sym*);
+extern	void	go_marktext(Sym*);
+extern	void	go_deadcode(void);
 extern	void	ldobj1(Biobuf *f, char*, int64 len, char *pn);
 
 /* Global linker symbols that are provided by the native linker */

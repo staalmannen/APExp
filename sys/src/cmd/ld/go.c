@@ -75,7 +75,7 @@ static int ndynexp;
 static Sym **dynexp;
 
 void
-ldpkg(Biobuf *f, char *pkg, int64 len, char *filename, int whence)
+go_ldpkg(Biobuf *f, char *pkg, int64 len, char *filename, int whence)
 {
 	char *data, *p0, *p1, *name;
 
@@ -251,7 +251,7 @@ loadpkgdata(char *file, char *pkg, char *data, int len)
 
 // replace all "". with pkg.
 char*
-expandpkg(char *t0, char *pkg)
+go_expandpkg(char *t0, char *pkg)
 {
 	int n;
 	char *p;
@@ -366,8 +366,8 @@ loop:
 		edef += n;
 	}
 
-	name = expandpkg(name, pkg);
-	def = expandpkg(def, pkg);
+	name = go_expandpkg(name, pkg);
+	def = go_expandpkg(def, pkg);
 
 	// done
 	*pp = p;
@@ -443,7 +443,7 @@ loaddynimport(char *file, char *pkg, char *p, int n)
 		*strchr(name, ' ') = 0;
 		*strchr(def, ' ') = 0;
 
-		name = expandpkg(name, pkg);
+		name = go_expandpkg(name, pkg);
 
 		s = lookup(name, 0);
 		s->dynimplib = lib;
@@ -485,7 +485,7 @@ loaddynexport(char *file, char *pkg, char *p, int n)
 		// successful parse: now can edit the line
 		*strchr(local, ' ') = 0;
 
-		elocal = expandpkg(local, pkg);
+		elocal = go_expandpkg(local, pkg);
 
 		s = lookup(elocal, 0);
 		if(s->dynimplib != nil) {
@@ -512,7 +512,7 @@ err:
 static int markdepth;
 
 static void
-marktext(Sym *s)
+go_marktext(Sym *s)
 {
 	Auto *a;
 	Prog *p;
@@ -521,20 +521,20 @@ marktext(Sym *s)
 		return;
 	markdepth++;
 	if(debug['v'] > 1)
-		Bprint(&bso, "%d marktext %s\n", markdepth, s->name);
+		Bprint(&bso, "%d go_marktext %s\n", markdepth, s->name);
 	for(a=s->autom; a; a=a->link)
-		mark(a->gotype);
+		go_mark(a->gotype);
 	for(p=s->text; p != P; p=p->link) {
 		if(p->from.sym)
-			mark(p->from.sym);
+			go_mark(p->from.sym);
 		if(p->to.sym)
-			mark(p->to.sym);
+			go_mark(p->to.sym);
 	}
 	markdepth--;
 }
 
 void
-mark(Sym *s)
+go_mark(Sym *s)
 {
 	int i;
 
@@ -542,11 +542,11 @@ mark(Sym *s)
 		return;
 	s->reachable = 1;
 	if(s->text)
-		marktext(s);
+		go_marktext(s);
 	for(i=0; i<s->nr; i++)
-		mark(s->r[i].sym);
+		go_mark(s->r[i].sym);
 	if(s->gotype)
-		mark(s->gotype);
+		go_mark(s->gotype);
 }
 
 static char*
@@ -600,21 +600,21 @@ addz(Sym *s, Auto *z)
 }
 
 void
-deadcode(void)
+go_deadcode(void)
 {
 	int i;
 	Sym *s, *last;
 	Auto *z;
 
 	if(debug['v'])
-		Bprint(&bso, "%5.2f deadcode\n", cputime());
+		Bprint(&bso, "%5.2f go_deadcode\n", cputime());
 
-	mark(lookup(INITENTRY, 0));
+	go_mark(lookup(INITENTRY, 0));
 	for(i=0; i<nelem(morename); i++)
-		mark(lookup(morename[i], 0));
+		go_mark(lookup(morename[i], 0));
 
 	for(i=0; i<ndynexp; i++)
-		mark(dynexp[i]);
+		go_mark(dynexp[i]);
 	
 	// remove dead text but keep file information (z symbols).
 	last = nil;

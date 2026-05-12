@@ -71,6 +71,15 @@ struct	Auto
 	long	aoffset;
 	short	type;
 };
+typedef	struct	Reloc	Reloc;
+struct	Reloc
+{
+	int	n;
+	int	t;
+	uchar	*m;
+	ulong	*a;
+};
+
 struct	Sym
 {
 	char	*name;
@@ -84,6 +93,12 @@ struct	Sym
 	vlong	value;
 	long	sig;
 	Sym*	link;
+	
+	/* Go-specific additions */
+	char	reachable;
+	Sym*	gotype;
+	Reloc*	r;
+	int	nr;
 };
 struct	Optab
 {

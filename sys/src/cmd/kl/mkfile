@@ -11,7 +11,7 @@ OFILES=\
 	enam.$O\
 	compat.$O\
 	dwarf.$O\
-	lib.$O
+	lib.$O go.$O
 
 HFILES=\
 	l.h\
@@ -39,7 +39,10 @@ enam.$O:	../kc/enam.c
 dwarf.$O:	../ld/dwarf.c
 	$CC $CFLAGS -I../ld ../ld/dwarf.c
 
-lib.$O:	../ld/lib.c
+lib.$O go.$O:	../ld/lib.c
 	$CC $CFLAGS -I../ld ../ld/lib.c
 
 compat.$O:	../cc/compat
+
+go.$O:	../ld/go.c
+	$CC $CFLAGS -I../ld ../ld/go.c
