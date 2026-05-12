@@ -241,7 +241,9 @@ hash_search (const char *string, HASH_TABLE *table, int flags)
   int bucket;
   unsigned int hv;
 
-  if (table == 0 || ((flags & HASH_CREATE) == 0 && HASH_ENTRIES (table) == 0))
+  if (string == 0 || table == 0 || table->bucket_array == 0 ||
+      table->nbuckets <= 0 ||
+      ((flags & HASH_CREATE) == 0 && HASH_ENTRIES (table) == 0))
     return (BUCKET_CONTENTS *)NULL;
 
   bucket = HASH_BUCKET (string, table, hv);
@@ -249,7 +251,7 @@ hash_search (const char *string, HASH_TABLE *table, int flags)
   for (list = table->bucket_array ? table->bucket_array[bucket] : 0; list; list = list->next)
     {
       /* This is the comparison function */
-      if (hv == list->khash && STREQ (list->key, string))
+      if (list->key && hv == list->khash && STREQ (list->key, string))
 	{
 	  list->times_found++;
 	  return (list);
@@ -290,14 +292,15 @@ hash_remove (const char *string, HASH_TABLE *table, int flags)
   BUCKET_CONTENTS *prev, *temp;
   unsigned int hv;
 
-  if (table == 0 || HASH_ENTRIES (table) == 0)
+  if (string == 0 || table == 0 || table->bucket_array == 0 ||
+      table->nbuckets <= 0 || HASH_ENTRIES (table) == 0)
     return (BUCKET_CONTENTS *)NULL;
 
   bucket = HASH_BUCKET (string, table, hv);
   prev = (BUCKET_CONTENTS *)NULL;
   for (temp = table->bucket_array[bucket]; temp; temp = temp->next)
     {
-      if (hv == temp->khash && STREQ (temp->key, string))
+      if (temp->key && hv == temp->khash && STREQ (temp->key, string))
 	{
 	  if (prev)
 	    prev->next = temp->next;

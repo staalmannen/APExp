@@ -6,18 +6,19 @@
 
 static void close_file(FILE *f)
 {
+	int locked;
+
 	if (!f) return;
 
 	/* Skip if already closed or invalid */
 	if (f->fd < 0) return;
 
-	/* Try to lock and flush */
-	if (FFINALLOCK(f)) {
-		if (f->wpos > f->wbase) {
-			f->write(f, 0, 0);
-		}
+	/* Static streams use lock == -1; flush them without taking a lock. */
+	locked = FFINALLOCK(f);
+	if (f->wpos && f->wbase && f->wpos > f->wbase && f->write)
+		f->write(f, 0, 0);
+	if (locked)
 		__unlockfile(f);
-	}
 }
 
 void __stdio_exit(void)
@@ -45,4 +46,3 @@ void __stdio_exit_needed(void)
 {
 	__stdio_exit();
 }
-
