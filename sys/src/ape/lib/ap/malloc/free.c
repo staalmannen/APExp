@@ -36,7 +36,7 @@ struct Arena
 	Bucket	*btab[MAX2SIZE];	
 	Lock;
 };
-static Arena arena;
+extern Arena __malloc_arena;
 
 #define datoff		((int)((Bucket*)0)->data)
 #define nil		((void*)0)
@@ -59,10 +59,9 @@ free(void *ptr)
 		abort();
 
 	bp->magic = 0;
-	l = &arena.btab[bp->size];
-	lock(&arena);
+	l = &__malloc_arena.btab[bp->size];
+	lock(&__malloc_arena);
 	bp->next = *l;
 	*l = bp;
-	unlock(&arena);
+	unlock(&__malloc_arena);
 }
-

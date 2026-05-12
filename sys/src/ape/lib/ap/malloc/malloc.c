@@ -36,7 +36,7 @@ struct Arena
 	Bucket	*btab[MAX2SIZE];	
 	Lock;
 };
-static Arena arena;
+Arena __malloc_arena;
 
 #define datoff		((int)((Bucket*)0)->data)
 #define nil		((void*)0)
@@ -58,11 +58,11 @@ malloc(size_t size)
 	return nil;
 good:
 	/* Allocate off this list */
-	lock(&arena);
-	bp = arena.btab[pow];
+	lock(&__malloc_arena);
+	bp = __malloc_arena.btab[pow];
 	if(bp) {
-		arena.btab[pow] = bp->next;
-		unlock(&arena);
+		__malloc_arena.btab[pow] = bp->next;
+		unlock(&__malloc_arena);
 
 		if(bp->magic != 0)
 			abort();
@@ -80,7 +80,7 @@ good:
 		n = (CUTOFF-pow)+2;
 		bp = sbrk(size*n + 15);	/* +15 so we can align the base */
 		if(bp == (void*)-1){
-			unlock(&arena);
+			unlock(&__malloc_arena);
 			return nil;
 		}
 		gap = (-(uintptr_t)bp) & 15;
@@ -88,7 +88,7 @@ good:
 
 		next = (uintptr_t)bp+size;
 		nbp = (Bucket*)next;
-		arena.btab[pow] = nbp;
+		__malloc_arena.btab[pow] = nbp;
 		for(n -= 2; n; n--) {
 			next = (uintptr_t)nbp+size;
 			nbp->next = (Bucket*)next;
@@ -101,18 +101,17 @@ good:
 		uintptr_t gap;
 		bp = sbrk(size + 15);	/* +15 so we can align the base */
 		if(bp == (void*)-1){
-			unlock(&arena);
+			unlock(&__malloc_arena);
 			return nil;
 		}
 		gap = (-(uintptr_t)bp) & 15;
 		bp = (Bucket*)((uintptr_t)bp + gap);
 	}
-	unlock(&arena);
+	unlock(&__malloc_arena);
 		
 	bp->size = pow;
 	bp->magic = MAGIC;
 
 	return bp->data;
 }
-
 
