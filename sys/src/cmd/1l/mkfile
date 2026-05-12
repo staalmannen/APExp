@@ -1,33 +1,14 @@
 </$objtype/mkfile
 
 TARG=1l
-OFILES=\
-	asm.$O\
-	obj.$O\
-	optab.$O\
-	pass.$O\
-	span.$O\
-	list.$O\
-	enam.$O\
-	compat.$O\
-	dwarf.$O\
-	lib.$O go.$O
+OFILES=	asm.$O	obj.$O	optab.$O	pass.$O	span.$O	list.$O	enam.$O	compat.$O	dwarf.$O	lib.$O	go.$O
 
-HFILES=\
-	l.h\
-	../2c/2.out.h\
-	../cc/compat.h\
-
+HFILES=	l.h	../2c/2.out.h	../cc/compat.h
 APEXPROOT=../../../..
 BIN=$APEXPROOT/$objtype/bin
 CFILES=${OFILES:%.$O=%.c}
 CFILES=${CFILES:enam.c=../2c/enam.c}
-UPDATE=\
-	mkfile\
-	$HFILES\
-	$CFILES\
-	${TARG:%=/386/bin/%}\
-
+UPDATE=	mkfile	$HFILES	$CFILES	${TARG:%=/386/bin/%}
 <$APEXPROOT/sys/src/cmd/mkone
 
 ../2c/enam.c: ../2c/2.out.h
@@ -39,10 +20,10 @@ enam.$O:	../2c/enam.c
 dwarf.$O:	../ld/dwarf.c
 	$CC $CFLAGS -I../ld ../ld/dwarf.c
 
-lib.$O go.$O:	../ld/lib.c
+lib.$O:	../ld/lib.c
 	$CC $CFLAGS -I../ld ../ld/lib.c
-
-compat.$O:	../cc/compat
 
 go.$O:	../ld/go.c
 	$CC $CFLAGS -I../ld ../ld/go.c
+
+compat.$O:	../cc/compat

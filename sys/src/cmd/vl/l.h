@@ -65,6 +65,15 @@ struct	Prog
 #define	regused	u0.u0regused
 #define	forwd	u0.u0forwd
 
+struct	Reloc 
+{ 
+	int	n; 
+	int	t; 
+	uchar	*m; 
+	ulong	*a; 
+	Sym	*sym; 
+};
+
 struct	Sym
 {
 	char	*name;
@@ -75,6 +84,21 @@ struct	Sym
 	char	dupok;
 	long	value;
 	Sym*	link;
+
+	/* Go-specific additions */
+	char	reachable;
+	Sym*	gotype;
+	Reloc*	r;
+	int	nr;
+	char	*dynimplib;
+	char	*dynimpname;
+	char	dynexport;
+	Prog	*text;
+	union
+	{
+		Auto*	u1autom;
+		Sym*	u1sym;
+	} u1;
 };
 struct	Autom
 {

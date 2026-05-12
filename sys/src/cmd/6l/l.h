@@ -71,13 +71,13 @@ struct	Auto
 	long	aoffset;
 	short	type;
 };
-typedef	struct	Reloc	Reloc;
-struct	Reloc
-{
-	int	n;
-	int	t;
-	uchar	*m;
-	ulong	*a;
+struct	Reloc 
+{ 
+	int	n; 
+	int	t; 
+	uchar	*m; 
+	ulong	*a; 
+	Sym	*sym; 
 };
 
 struct	Sym
@@ -99,7 +99,17 @@ struct	Sym
 	Sym*	gotype;
 	Reloc*	r;
 	int	nr;
-};
+	char	*dynimplib;
+	char	*dynimpname;
+	char	dynexport;
+	Prog	*text;
+	union
+	{
+		Auto*	u1autom;
+		Sym*	u1sym;
+	} u1;
+	};
+
 struct	Optab
 {
 	short	as;
