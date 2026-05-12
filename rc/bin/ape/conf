@@ -8,6 +8,7 @@
 # Please correct me if I got any of these wrong.
 
 ./configure --enable-static --disable-shared\
+	--disable-nls\
 	--bindir=/bin --sbindir=/bin --libexecdir=/bin\
 	--sysconfdir=/sys/lib --sharedstatedir=/srv\
 	--localstatedir=/srv --runstatedir=/srv\
@@ -19,6 +20,7 @@
 	--localedir=/sys/lib/ape/locale\
 	--mandir=/sys/man --docdir=/sys/doc\
 	--htmldir=/sys/doc --dvidir=/sys/doc\
-	--pdfdir=/sys/doc --psdir=/sys/doc
+	--pdfdir=/sys/doc --psdir=/sys/doc\
+	$*
 	
 	

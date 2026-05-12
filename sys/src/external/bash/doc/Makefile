@@ -36,19 +36,19 @@ srcdir = .
 prefix = /usr/local
 exec_prefix = ${prefix}
 
-datarootdir = ${prefix}/share
+datarootdir = /sys/lib/ape
 
-infodir = ${datarootdir}/info
+infodir = /sys/lib/info
 
-docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
+docdir = /sys/doc
 
 # set this to a directory name to have the HTML files installed
-htmldir = ${docdir}
+htmldir = /sys/doc
 
 # Support an alternate destination root directory for package building
 DESTDIR =
 
-mandir = ${datarootdir}/man
+mandir = /sys/man
 manpfx = man
 
 man1ext = .1

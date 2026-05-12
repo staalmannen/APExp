@@ -21,7 +21,7 @@
 
 prefix = /usr/local
 exec_prefix = ${prefix}
-libdir = ${exec_prefix}/lib
+libdir = /amd64/lib/ape
 
 # ${loadablesdir} is where the example loadable builtins and data files
 # are installed (make install target in Makefile.in)

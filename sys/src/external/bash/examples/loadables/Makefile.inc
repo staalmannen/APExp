@@ -27,12 +27,12 @@ PACKAGE_VERSION = 5.3-release
 prefix = /usr/local
 
 exec_prefix = ${prefix}
-bindir = ${exec_prefix}/bin
-libdir = ${exec_prefix}/lib
-infodir = ${datarootdir}/info
-includedir = ${prefix}/include
+bindir = /bin
+libdir = /amd64/lib/ape
+infodir = /sys/lib/info
+includedir = /sys/include/ape
 
-datarootdir = ${prefix}/share
+datarootdir = /sys/lib/ape
 
 loadablesdir = ${libdir}/bash
 headersdir = $(includedir)/$(PACKAGE_NAME)

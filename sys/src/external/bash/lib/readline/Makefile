@@ -32,7 +32,7 @@ srcdir = .
 topdir = ../..
 BUILD_DIR = /usr/glenda/APExp/sys/src/external/bash
 
-datarootdir = ${prefix}/share
+datarootdir = /sys/lib/ape
 
 INSTALL = /bin/install -c
 INSTALL_PROGRAM = ${INSTALL}

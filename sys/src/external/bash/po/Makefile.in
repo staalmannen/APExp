@@ -24,9 +24,9 @@ BUILD_DIR = /usr/glenda/APExp/sys/src/external/bash
 prefix = /usr/local
 exec_prefix = ${prefix}
 
-datarootdir = ${prefix}/share
-datadir = ${datarootdir}
-localedir = ${datarootdir}/locale
+datarootdir = /sys/lib/ape
+datadir = /sys/lib/ape
+localedir = /sys/lib/ape/locale
 
 gettextsrcdir = $(datadir)/gettext/po
 

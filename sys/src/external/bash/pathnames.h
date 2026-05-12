@@ -28,6 +28,6 @@
 #define SYS_PROFILE "/etc/profile"
 
 /* The default location of the bash debugger initialization/startup file. */
-#define DEBUGGER_START_FILE	"/usr/local/share/bashdb/bashdb-main.inc"
+#define DEBUGGER_START_FILE	"/sys/lib/ape/bashdb/bashdb-main.inc"
 
 #endif /* _PATHNAMES_H */

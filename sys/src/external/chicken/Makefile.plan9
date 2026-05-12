@@ -29,7 +29,19 @@ SRCDIR ?= ./
 # platform configuration
 
 STATICBUILD=1
+PREFIX=/
+BINDIR=/$(objtype)/bin/ape
+LIBDIR=/$(objtype)/lib/ape
+INCLUDEDIR=/sys/include/ape
+SHAREDIR=/sys/lib/chicken
+DATADIR=/sys/lib/chicken
+MANDIR=/sys/man
+MAN1DIR=/sys/man/1
 VARDIR=/sys/lib/chicken
+CHICKENDIR=/sys/lib/chicken
+CHICKENLIBDIR=/sys/lib/chicken
+EGGDIR=/sys/lib/chicken
+CHICKENINCDIR=/sys/include/ape/chicken
 
 ARCH ?= $(shell sh $(SRCDIR)/config-arch.sh)
 

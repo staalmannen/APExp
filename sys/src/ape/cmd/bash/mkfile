@@ -46,14 +46,16 @@ OFILES=\
 	syntax.$O\
 	xmalloc.$O\
 # termcap - force linking\
-	termcap.$O\
-	tparam.$O\
+#	termcap.$O\
+#	tparam.$O\
 # tilde -force linking \
-	tilde.$O\
+#	tilde.$O\
 
 BASHSRC=$APEXPROOT/sys/src/external/bash
 
 BASHLIBS=\
+	libtermcap.a$O\
+	libtilde.a$O\
 	libmalloc.a$O\
 	libbuiltins.a$O\
 	libglob.a$O\
@@ -73,9 +75,10 @@ YACC=bison
 DEFS= 	-DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale" -D_POSIX_SOURCE\
 		-D_BSD_EXTENSION -DHAVE_LIMITS_H -D_LIMITS_EXTENSION -DPLAN9\
 		-DCONF_OSTYPE="Plan9" -DCONF_MACHTYPE="$objtype-apexp-Plan9" -DPROGRAM="Bash"\
-		-DPACKAGE="Bash" -DPACKAGE_STRING='bash 5.3-release'\
+		-DPACKAGE="bash" -DPACKAGE_STRING='bash 5.3-release'\
 		-DCONF_VENDOR="apexp" -DCONF_HOSTTYPE="$objtype"\
 		-DHAVE_SYS_RESOURCE_H -DTERM=xterm -UJOB_CONTROL\
+		-Dbotch=programming_error
 
 
 CFLAGS=	-c -B -I. -I$BASHSRC -I$BASHSRC/include -I$BASHSRC/lib $DEFS
@@ -95,6 +98,16 @@ tparam.$O: $BASHSRC/lib/termcap/tparam.c
 
 tilde.$O: $BASHSRC/lib/tilde/tilde.c
 			$CC $CFLAGS $BASHSRC/lib/tilde/tilde.c
+
+libtermcap.a$O: $BASHSRC/lib/termcap/Makefile
+			make -C $BASHSRC/lib/termcap
+			mv $BASHSRC/lib/termcap/libtermcap.a libtermcap.a$O
+			rm $BASHSRC/lib/termcap/*.o
+
+libtilde.a$O: $BASHSRC/lib/tilde/Makefile
+			make -C $BASHSRC/lib/tilde
+			mv $BASHSRC/lib/tilde/libtilde.a libtilde.a$O
+			rm $BASHSRC/lib/tilde/*.o
 
 libsh.a$O: $BASHSRC/lib/sh/Makefile
 			make -C $BASHSRC/lib/sh

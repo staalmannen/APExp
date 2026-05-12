@@ -40,7 +40,7 @@ INTL_BUILDDIR = ${LIBBUILD}/intl
 INTL_INC = 
 LIBINTL_H = 
 
-datarootdir = ${prefix}/share
+datarootdir = /sys/lib/ape
 
 INSTALL = /bin/install -c
 INSTALL_PROGRAM = ${INSTALL}

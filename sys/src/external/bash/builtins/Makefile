@@ -39,11 +39,11 @@ srcdir = .
 
 topdir = ..
 
-datarootdir = ${prefix}/share
+datarootdir = /sys/lib/ape
 
-includedir = ${prefix}/include
-datadir = ${datarootdir}
-localedir = ${datarootdir}/locale
+includedir = /sys/include/ape
+datadir = /sys/lib/ape
+localedir = /sys/lib/ape/locale
 
 loadablesdir = ${libdir}/bash
 
@@ -77,7 +77,7 @@ LIBS_FOR_BUILD = $(LIBS)
 
 BASHINCDIR = ${topdir}/include
 
-RL_INCLUDEDIR = $(RL_LIBDIR)
+RL_INCLUDEDIR = 
 
 HIST_LIBSRC = ${topdir}/lib/readline
 RL_LIBSRC = ${topdir}/lib/readline

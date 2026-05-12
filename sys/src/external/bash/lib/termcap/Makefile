@@ -24,7 +24,7 @@ srcdir = .
 topdir = ../..
 BUILD_DIR = /usr/glenda/APExp/sys/src/external/bash
 
-libdir = ${exec_prefix}/lib
+libdir = /amd64/lib/ape
 
 INSTALL = /bin/install -c
 INSTALL_PROGRAM = ${INSTALL}

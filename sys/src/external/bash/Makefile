@@ -33,22 +33,22 @@ prefix = /usr/local
 
 exec_prefix = ${prefix}
 
-datarootdir = ${prefix}/share
+datarootdir = /sys/lib/ape
 
-bindir = ${exec_prefix}/bin
-libdir = ${exec_prefix}/lib
-infodir = ${datarootdir}/info
-includedir = ${prefix}/include
-datadir = ${datarootdir}
-localedir = ${datarootdir}/locale
+bindir = /bin
+libdir = /amd64/lib/ape
+infodir = /sys/lib/info
+includedir = /sys/include/ape
+datadir = /sys/lib/ape
+localedir = /sys/lib/ape/locale
 pkgconfigdir = ${libdir}/pkgconfig
 
 loadablesdir = ${libdir}/bash
 headersdir = $(includedir)/$(PACKAGE_NAME)
 
-docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
+docdir = /sys/doc
 
-mandir = ${datarootdir}/man
+mandir = /sys/man
 manpfx = man
 
 man1ext = .1
@@ -56,7 +56,7 @@ man1dir = $(mandir)/$(manpfx)1
 man3ext = .3
 man3dir = $(mandir)/$(manpfx)3
 
-htmldir = ${docdir}
+htmldir = /sys/doc
 
 # Support an alternate destination root directory for package building
 DESTDIR =
@@ -96,7 +96,7 @@ CTAGSFLAGS = -x
 ETAGS = etags
 ETAGSFLAGS =
 
-TESTSCRIPT = run-all
+TESTSCRIPT = run-minimal
 
 DEBUGGER_START_FILE = ${datadir}/bashdb/bashdb-main.inc
 
@@ -278,12 +278,12 @@ RL_LIBDOC = $(RL_LIBSRC)/doc
 RL_LIBDIR = $(dot)/$(LIBSUBDIR)/readline
 RL_ABSSRC = ${topdir}/$(RL_LIBDIR)
 
-RL_INCLUDEDIR = $(RL_LIBDIR)
+RL_INCLUDEDIR = 
 
-READLINE_LIB = -lreadline
+READLINE_LIB = 
 READLINE_LIBRARY = $(RL_LIBDIR)/libreadline.a
 READLINE_LDFLAGS = -L${RL_LIBDIR}
-READLINE_DEP = $(READLINE_LIBRARY)
+READLINE_DEP = 
 
 # The source, object and documentation of the GNU Readline library.
 READLINE_SOURCE	= $(RL_LIBSRC)/rldefs.h $(RL_LIBSRC)/rlconf.h \
@@ -332,12 +332,12 @@ HIST_LIBSRC = $(LIBSRC)/readline
 HIST_LIBDIR = $(dot)/$(LIBSUBDIR)/readline
 HIST_ABSSRC = ${topdir}/$(HIST_LIBDIR)
 
-HISTORY_LIB = -lhistory
+HISTORY_LIB = 
 HISTORY_LIBRARY = $(HIST_LIBDIR)/libhistory.a
 HISTORY_LDFLAGS = -L$(HIST_LIBDIR)
-HISTORY_DEP = $(HISTORY_LIBRARY)
+HISTORY_DEP = 
 
-HIST_INCLUDEDIR = $(HIST_LIBDIR)
+HIST_INCLUDEDIR = 
 
 # The source, object and documentation of the history library.
 HISTORY_SOURCE	= $(HIST_LIBSRC)/history.c $(HIST_LIBSRC)/histexpand.c \

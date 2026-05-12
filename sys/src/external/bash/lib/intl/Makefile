@@ -29,12 +29,12 @@ prefix = /usr/local
 exec_prefix = ${prefix}
 transform = s,x,x,
 
-datarootdir = ${prefix}/share
+datarootdir = /sys/lib/ape
 
-libdir = ${exec_prefix}/lib
-includedir = ${prefix}/include
-datadir = ${datarootdir}
-localedir = ${datarootdir}/locale
+libdir = /amd64/lib/ape
+includedir = /sys/include/ape
+datadir = /sys/lib/ape
+localedir = /sys/lib/ape/locale
 
 gettextsrcdir = $(datadir)/gettext/intl
 aliaspath = $(localedir)
