@@ -1374,14 +1374,6 @@ enum{
 
 int modemap[4] = { 0, 1, -1, 2, };
 
-typedef struct Reloc Reloc;
-
-struct Reloc
-{
-	int n;
-	int t;
-	uchar *m;
-	ulong *a;
 };
 
 Reloc rels;
