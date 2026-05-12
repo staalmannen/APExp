@@ -65,14 +65,6 @@ typedef vlong int64;
 #define pathchar go_pathchar
 #define pathtoprefix go_pathtoprefix
 
-typedef struct Reloc Reloc;
-struct Reloc
-{
-	int n;
-	int t;
-	uchar *m;
-	ulong *a;
-};
 
 typedef struct go_Library go_Library;
 struct go_Library

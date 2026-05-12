@@ -511,7 +511,7 @@ err:
 
 static int markdepth;
 
-static void
+void
 go_marktext(Sym *s)
 {
 	Auto *a;
