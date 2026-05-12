@@ -57,6 +57,8 @@ free(void *ptr)
 
 	if(bp->magic != MAGIC)
 		abort();
+	if(bp->size <= 0 || bp->size >= MAX2SIZE)
+		abort();
 
 	bp->magic = 0;
 	l = &__malloc_arena.btab[bp->size];

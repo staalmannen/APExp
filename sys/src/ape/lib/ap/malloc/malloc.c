@@ -67,6 +67,7 @@ good:
 		if(bp->magic != 0)
 			abort();
 
+		bp->next = nil;
 		bp->magic = MAGIC;
 		return bp->data;
 	}
@@ -93,9 +94,11 @@ good:
 			next = (uintptr_t)nbp+size;
 			nbp->next = (Bucket*)next;
 			nbp->size = pow;
+			nbp->magic = 0;
 			nbp = nbp->next;
 		}
 		nbp->size = pow;
+		nbp->magic = 0;
 		nbp->next = nil;
 	}
 	else {
@@ -111,6 +114,7 @@ good:
 	unlock(&__malloc_arena);
 		
 	bp->size = pow;
+	bp->next = nil;
 	bp->magic = MAGIC;
 
 	return bp->data;
