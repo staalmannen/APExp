@@ -104,6 +104,7 @@ struct proc_status {
   pid_t pid;
   int status;	/* Exit status of PID or 128 + fatal signal number */
   int flags;
+  char *command;
 };
 
 /* Values for proc_status.flags */
@@ -127,12 +128,13 @@ static int find_proc_slot (pid_t);
 static int find_index_by_pid (pid_t);
 static int find_status_by_pid (pid_t);
 static int find_termsig_by_pid (pid_t);
+static char *find_command_by_pid (pid_t);
 static int get_termsig (WAIT);
 static void set_pid_status (pid_t, WAIT);
 static void set_pid_flags (pid_t, int);
 static void unset_pid_flags (pid_t, int);
 static int get_pid_flags (pid_t);
-static void add_pid (pid_t, int);
+static void add_pid (pid_t, int, char *);
 static void mark_dead_jobs_as_notified (int);
 
 static sighandler wait_sigint_handler (int);
@@ -163,6 +165,7 @@ alloc_pid_list (void)
     {
       pid_list[i].pid = NO_PID;
       pid_list[i].status = pid_list[i].flags = 0;
+      pid_list[i].command = 0;
     }
 }
 
@@ -210,6 +213,17 @@ find_status_by_pid (pid_t pid)
   if (pid_list[i].flags & PROC_RUNNING)
     return (PROC_STILL_ALIVE);
   return (pid_list[i].status);
+}
+
+static char *
+find_command_by_pid (pid_t pid)
+{
+  int i;
+
+  i = find_index_by_pid (pid);
+  if (i == NO_PID)
+    return ((char *)0);
+  return (pid_list[i].command);
 }
 
 int
@@ -318,15 +332,18 @@ get_pid_flags (pid_t pid)
 }
 
 static void
-add_pid (pid_t pid, int async)
+add_pid (pid_t pid, int async, char *command)
 {
   int slot;
 
   slot = find_proc_slot (pid);
 
+  if (pid_list[slot].command)
+    free (pid_list[slot].command);
   pid_list[slot].pid = pid;
   pid_list[slot].status = -1;
   pid_list[slot].flags = PROC_RUNNING;
+  pid_list[slot].command = command;
   if (async)
     pid_list[slot].flags |= PROC_ASYNC;
 }
@@ -385,7 +402,14 @@ cleanup_dead_jobs (void)
       if (pid_list[i].pid != NO_PID &&
 	    (pid_list[i].flags & PROC_RUNNING) == 0 &&
 	    (pid_list[i].flags & PROC_NOTIFIED))
-	pid_list[i].pid = NO_PID;
+	{
+	  pid_list[i].pid = NO_PID;
+	  if (pid_list[i].command)
+	    {
+	      free (pid_list[i].command);
+	      pid_list[i].command = 0;
+	    }
+	}
     }
 
 #if defined (COPROCESS_SUPPORT)
@@ -478,10 +502,6 @@ make_child (char *command, int flags)
   int async_p, forksleep;
   sigset_t set, oset;
 
-  /* Discard saved memory. */
-  if (command)
-    free (command);
-
   async_p = (flags & FORK_ASYNC);
   start_pipeline ();
 
@@ -531,6 +551,8 @@ make_child (char *command, int flags)
 
   if (pid < 0)
     {
+      if (command)
+	free (command);
       sys_error ("fork");
       last_command_exit_value = EX_NOEXEC;
       throw_to_top_level ();
@@ -538,6 +560,8 @@ make_child (char *command, int flags)
 
   if (pid == 0)
     {
+      if (command)
+	free (command);
       unset_bash_input (0);
 
       CLRINTERRUPT;	/* XXX - children have their own interrupt state */
@@ -564,7 +588,7 @@ make_child (char *command, int flags)
       if (async_p)
 	last_asynchronous_pid = pid;
 
-      add_pid (pid, async_p);
+      add_pid (pid, async_p, command);
     }
   return (pid);
 }
@@ -797,6 +821,7 @@ wait_for (pid_t pid, int flags)
   int return_val, pstatus;
   pid_t got_pid;
   WAIT status;
+  char *child_command;
 
   pstatus = find_status_by_pid (pid);
 
@@ -890,7 +915,10 @@ wait_for (pid_t pid, int flags)
 
   if ((WIFSTOPPED (status) == 0) && WIFSIGNALED (status) && REPORTSIG(WTERMSIG (status)))
     {
+      child_command = find_command_by_pid (pid);
       fprintf (stderr, "%s", j_strsignal (WTERMSIG (status)));
+      if (child_command && *child_command)
+	fprintf (stderr, ": %s", child_command);
       if (WIFCORED (status))
 	fprintf (stderr, _(" (core dumped)"));
       fprintf (stderr, "\n");
