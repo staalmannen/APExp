@@ -87,7 +87,6 @@ static int mclose(FILE *m)
 FILE *fmemopen(void *restrict buf, size_t size, const char *restrict mode)
 {
 	struct mem_FILE *f;
-	FILE *mf;
 	int plus = !!strchr(mode, '+');
 	
 	if (!strchr("rwa", *mode)) {
@@ -127,6 +126,5 @@ FILE *fmemopen(void *restrict buf, size_t size, const char *restrict mode)
 	f->f.seek = mseek;
 	f->f.close = mclose;
 
-	mf = __ofl_add(&f->f);
-	return (FILE *)mf;
+	return &f->f;
 }

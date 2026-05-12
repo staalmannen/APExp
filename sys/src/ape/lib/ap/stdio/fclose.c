@@ -8,6 +8,23 @@ int fclose(FILE *f){
 
 	error = 0;
 
+	/* Remove heap streams from the global open-file list before any
+	 * flushing or close hooks run.  __stdio_exit() walks this list, so a
+	 * closed stream must never remain linked if later cleanup allocates or
+	 * frees memory.
+	 */
+	if (!(f->flags & F_PERM)) {
+		head = __ofl_lock();
+		if (*head == f)
+			*head = f->next;
+		if (f->prev)
+			f->prev->next = f->next;
+		if (f->next)
+			f->next->prev = f->prev;
+		f->prev = f->next = NULL;
+		__ofl_unlock();
+	}
+
 	/* Permanent streams (stdin/stdout/stderr have F_PERM): just flush,
 	 * do not close the fd or free memory. */
 	if (f->flags & F_PERM) {
@@ -34,20 +51,6 @@ int fclose(FILE *f){
 	}
 
 	f->flags = 0;
-
-	/* Remove heap streams from the global open-file list before free().
-	 * __stdio_exit() walks this list, so leaving a freed FILE linked here
-	 * turns a later exit into a use-after-free.
-	 */
-	head = __ofl_lock();
-	if (*head == f)
-		*head = f->next;
-	if (f->prev)
-		f->prev->next = f->next;
-	if (f->next)
-		f->next->prev = f->prev;
-	f->prev = f->next = NULL;
-	__ofl_unlock();
 
 	/* Free the FILE struct itself (not F_PERM, so it was heap-allocated) */
 	free(f);

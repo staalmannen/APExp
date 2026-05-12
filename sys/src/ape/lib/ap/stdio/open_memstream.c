@@ -71,7 +71,6 @@ static int ms_close(FILE *f)
 FILE *open_memstream(char **bufp, size_t *sizep)
 {
 	struct ms_FILE *f;
-	FILE *mf;
 	char *buf;
 
 	if (!(f=malloc(sizeof *f))) return 0;
@@ -99,6 +98,5 @@ FILE *open_memstream(char **bufp, size_t *sizep)
 	f->f.close = ms_close;
 	f->f.mode = -1;
 
-	mf = __ofl_add(&f->f);
-	return (FILE *)mf;
+	return &f->f;
 }
