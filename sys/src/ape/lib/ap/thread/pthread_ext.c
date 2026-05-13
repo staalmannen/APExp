@@ -99,69 +99,83 @@ pthread_detach(pthread_t t)
 }
 
 /*
- * pthread_rwlock_* - read-write lock stubs
+ * pthread_rwlock_* — backed by Plan9 native RWLock (qlock.h)
  *
- * Backed by a plain mutex since APExp is effectively single-threaded.
- * Multiple concurrent readers are not exploited but correctness is
- * maintained.
+ * Plan9's RWLock allows true concurrent readers and exclusive writers.
+ * pthread_rwlock_t is a union big enough (int[14] = 56 bytes) to hold
+ * RWLock (≤40 bytes) plus a one-int write-mode flag.
+ *
+ * pthread_rwlock_unlock needs to know whether to call runlock or wunlock.
+ * We track this with 'write_locked' stored after the RWLock in the opaque
+ * storage.  Readers set nothing; only the writer sets write_locked=1 after
+ * acquiring, clears it before releasing — safe because writers are exclusive.
  */
+#include <qlock.h>
+#include <string.h>
 
 typedef struct {
-	pthread_mutex_t mu;
-} _rwlock_impl;
-
-/* pthread_rwlock_t is defined as an opaque type; we cast to our impl.
- * Requires sizeof(pthread_rwlock_t) >= sizeof(_rwlock_impl) —
- * add a compile-time check here if your pthread.h defines the size. */
+	RWLock rw;
+	int    write_locked;
+} _RWL;
 
 int
 pthread_rwlock_init(pthread_rwlock_t *rwl, const pthread_rwlockattr_t *attr)
 {
-	_rwlock_impl *r = (_rwlock_impl*)rwl;
 	(void)attr;
-	return pthread_mutex_init(&r->mu, NULL);
+	memset(rwl, 0, sizeof *rwl);
+	return 0;
 }
 
 int
 pthread_rwlock_destroy(pthread_rwlock_t *rwl)
 {
-	_rwlock_impl *r = (_rwlock_impl*)rwl;
-	return pthread_mutex_destroy(&r->mu);
+	(void)rwl;
+	return 0;
 }
 
 int
 pthread_rwlock_rdlock(pthread_rwlock_t *rwl)
 {
-	_rwlock_impl *r = (_rwlock_impl*)rwl;
-	return pthread_mutex_lock(&r->mu);
+	rlock(&((_RWL*)rwl)->rw);
+	return 0;
 }
 
 int
 pthread_rwlock_wrlock(pthread_rwlock_t *rwl)
 {
-	_rwlock_impl *r = (_rwlock_impl*)rwl;
-	return pthread_mutex_lock(&r->mu);
+	_RWL *r = (_RWL*)rwl;
+	wlock(&r->rw);
+	r->write_locked = 1;
+	return 0;
 }
 
 int
 pthread_rwlock_tryrdlock(pthread_rwlock_t *rwl)
 {
-	_rwlock_impl *r = (_rwlock_impl*)rwl;
-	return pthread_mutex_trylock(&r->mu);
+	return canrlock(&((_RWL*)rwl)->rw) ? 0 : EBUSY;
 }
 
 int
 pthread_rwlock_trywrlock(pthread_rwlock_t *rwl)
 {
-	_rwlock_impl *r = (_rwlock_impl*)rwl;
-	return pthread_mutex_trylock(&r->mu);
+	_RWL *r = (_RWL*)rwl;
+	if(!canwlock(&r->rw))
+		return EBUSY;
+	r->write_locked = 1;
+	return 0;
 }
 
 int
 pthread_rwlock_unlock(pthread_rwlock_t *rwl)
 {
-	_rwlock_impl *r = (_rwlock_impl*)rwl;
-	return pthread_mutex_unlock(&r->mu);
+	_RWL *r = (_RWL*)rwl;
+	if(r->write_locked){
+		r->write_locked = 0;
+		wunlock(&r->rw);
+	} else {
+		runlock(&r->rw);
+	}
+	return 0;
 }
 
 int

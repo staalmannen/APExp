@@ -178,29 +178,133 @@ issocket(int fd)
 }
 
 /*
- * probably should do better than this
+ * Write a control message to a socket's Plan9 ctl file.
+ * Returns 0 on success, -1 on error (errno set).
  */
-int getsockopt(int fd, int level, int opt, void *v, int *len)
+static int
+sockctl(int fd, const char *msg)
 {
-	// should we check what fd is socket?
-	USED(fd, len);
+	Rock *r;
+	int cfd, n;
 
-	if(level != SOL_SOCKET){
-		errno = ENOPROTOOPT;
+	r = _sock_findrock(fd, NULL);
+	if(r == NULL || r->ctl[0] == '\0'){
+		errno = ENOTSOCK;
 		return -1;
 	}
-	switch(opt){
-	case SO_ERROR:
-		*(int *)v = 0;
-		return 0;
+	cfd = open(r->ctl, O_WRONLY);
+	if(cfd < 0)
+		return -1;
+	n = strlen(msg);
+	if(write(cfd, msg, n) != n){
+		close(cfd);
+		return -1;
+	}
+	close(cfd);
+	return 0;
+}
+
+int
+getsockopt(int fd, int level, int opt, void *v, int *len)
+{
+	Rock *r;
+
+	r = _sock_findrock(fd, NULL);
+
+	switch(level){
+	case SOL_SOCKET:
+		switch(opt){
+		case SO_ERROR:
+			if(*len >= (int)sizeof(int)){
+				*(int*)v = 0;
+				*len = sizeof(int);
+			}
+			return 0;
+		case SO_TYPE:
+			if(r == NULL){ errno = ENOTSOCK; return -1; }
+			if(*len >= (int)sizeof(int)){
+				*(int*)v = r->stype;
+				*len = sizeof(int);
+			}
+			return 0;
+		case SO_RCVBUF:
+		case SO_SNDBUF:
+			if(*len >= (int)sizeof(int)){
+				*(int*)v = 65536;
+				*len = sizeof(int);
+			}
+			return 0;
+		case SO_KEEPALIVE:
+		case SO_REUSEADDR:
+		case SO_BROADCAST:
+		case SO_OOBINLINE:
+			if(*len >= (int)sizeof(int)){
+				*(int*)v = 0;
+				*len = sizeof(int);
+			}
+			return 0;
+		default:
+			errno = ENOPROTOOPT;
+			return -1;
+		}
+	case IPPROTO_TCP:
+		switch(opt){
+		case TCP_NODELAY:
+			if(*len >= (int)sizeof(int)){
+				*(int*)v = 0;
+				*len = sizeof(int);
+			}
+			return 0;
+		default:
+			errno = ENOPROTOOPT;
+			return -1;
+		}
 	default:
-		errno = EINVAL;
+		errno = ENOPROTOOPT;
 		return -1;
 	}
 }
 
-int setsockopt(int, int, int, void *, int)
+int
+setsockopt(int fd, int level, int opt, void *v, int len)
 {
-	return 0;
+	int ival;
+
+	ival = (v != NULL && len >= (int)sizeof(int)) ? *(int*)v : 0;
+	(void)ival;
+
+	switch(level){
+	case SOL_SOCKET:
+		switch(opt){
+		case SO_KEEPALIVE:
+			if(ival)
+				return sockctl(fd, "keepalive 120000");
+			return 0;
+		case SO_REUSEADDR:
+		case SO_BROADCAST:
+		case SO_OOBINLINE:
+		case SO_SNDBUF:
+		case SO_RCVBUF:
+		case SO_LINGER:
+			/* Plan9 handles these transparently */
+			return 0;
+		default:
+			errno = ENOPROTOOPT;
+			return -1;
+		}
+	case IPPROTO_TCP:
+		switch(opt){
+		case TCP_NODELAY:
+			if(ival)
+				return sockctl(fd, "nodelay");
+			return 0;
+		default:
+			errno = ENOPROTOOPT;
+			return -1;
+		}
+	default:
+		errno = ENOPROTOOPT;
+		return -1;
+	}
 }
 
