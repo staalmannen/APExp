@@ -12,6 +12,10 @@ typedef	struct	Prog	Prog;
 typedef	struct	Optab	Optab;
 
 #define PtrSize 4
+#define cput(c) \
+	{ *cbp++ = c;\
+	if(--cbc <= 0)\
+		cflush(); }
 
 #ifndef	EXTERN
 #define	EXTERN	extern

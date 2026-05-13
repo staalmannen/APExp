@@ -15,9 +15,10 @@ typedef	struct	Count	Count;
 
 #define PtrSize 4
 
-#define cput(c) { *cbp++ = c;\
+#define cput(c) \
+	{ *cbp++ = c;\
 	if(--cbc <= 0)\
-		cflush(); 
+		cflush(); }
 
 struct Reloc
 {

@@ -14,6 +14,10 @@ typedef	struct	Oprang	Oprang;
 typedef	struct	Count	Count;
 
 #define PtrSize 4
+#define cput(c) \
+	{ *cbp++ = c;\
+	if(--cbc <= 0)\
+		cflush(); }
 
 #define	LIBNAMELEN	300
 
