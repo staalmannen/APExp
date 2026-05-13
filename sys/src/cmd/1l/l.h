@@ -12,10 +12,6 @@ typedef	struct	Auto	Auto;
 typedef	struct	Optab	Optab;
 
 #define PtrSize 4
-#define cput(c) \
-	{ *cbp++ = c;\
-	if(--cbc <= 0)\
-		cflush(); }
 
 #define	P		((Prog*)0)
 #define	S		((Sym*)0)

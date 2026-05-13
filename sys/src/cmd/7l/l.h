@@ -16,10 +16,6 @@ typedef	struct	Optab	Optab;
 typedef	struct	Oprang	Oprang;
 
 #define PtrSize 4
-#define cput(c) \
-	{ *cbp++ = c;\
-	if(--cbc <= 0)\
-		cflush(); }
 
 #define	LIBNAMELEN	300
 
