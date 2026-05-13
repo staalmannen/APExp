@@ -23,7 +23,7 @@ struct Reloc
 	int	t;
 	uchar	*m;
 	ulong	*a;
-	Sym	*sym;
+	Sym	*rsym;	/* named rsym to avoid collision with #define sym u1.u1sym */
 };
 
 
@@ -110,6 +110,7 @@ struct	Autom
 	Auto	*link;
 	long	aoffset;
 	short	type;
+	Sym	*gotype;
 };
 struct	Optab
 {
