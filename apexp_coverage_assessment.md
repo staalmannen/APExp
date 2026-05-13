@@ -21,7 +21,7 @@
 | locale/       |    21 |   30 |  70% | Good — iconv + gettext stubs present |
 | malloc/       |    10 |    8 | 125% | Complete — aligned allocation suite done |
 | prng/         |     3 |    5 |  60% | Good — arc4random added |
-| time/         |    16 |   30 |  53% | Reasonable — strptime/timegm/_r variants added |
+| time/         |    17 |   30 |  57% | Reasonable — strptime/timegm/_r variants; clock_nanosleep added |
 | unistd/       |    39 |   50 |  78% | Good — at() family now present |
 | stat/         |     9 |   16 |  56% | Reasonable |
 | fcntl/        |     3 |    5 |  60% | Reasonable |
@@ -36,8 +36,8 @@
 | errno/        |     1 |    3 |  33% | Thin |
 | thread/       |    29 |   85 |  34% | Functional — cond_timedwait + semaphores added |
 | aio/          |     1 |    5 |  20% | Initial implementation present |
-| select/       |     1 |    5 |  20% | poll only |
-| termios/      |     2 |   12 |  16% | Very thin — tcsetattr still missing |
+| select/       |     1 |    5 |  60% | poll() in select/; select()+FD_SET family in plan9/_buf.c |
+| termios/      |     2 |   12 |  92% | Near-complete — tcgetattr.c has tcsetattr/tcdrain/tcflush/tcflow/tcsendbreak/tcgetsid/tcsetpgrp/tcgetpgrp; cfgetospeed.c has cfmakeraw/cfset*/cfget* |
 | ctype/        |     3 |   52 |   5% | Misleading: table-driven, covers all standard ctype functions |
 | legacy/       |     1 |   14 |   7% | Thin |
 | crypt/        |     0 |    6 |   0% | Not present (covered by libsec) |
@@ -45,7 +45,7 @@
 | linux/        |     0 |   35 |   0% | N/A — Linux-specific |
 | mman/         |     0 |    8 |   0% | Partial via __p9_syscall mmap emulation |
 | mq/           |     0 |    6 |   0% | Not present |
-| sched/        |     0 |    6 |   0% | Not present |
+| sched/        |     1 |    6 |  80% | sched_yield, sched_get_priority_min/max, sched_getscheduler, sched_setscheduler, sched_getparam, sched_setparam, sched_rr_get_interval |
 | setjmp/       |     0 |   12 |   0% | Covered by arch/ assembly |
 
 ---
@@ -148,15 +148,17 @@ and collation stubs (`strcoll.c`, `wcscoll.c`, `strxfrm.c`, `wcsxfrm.c`).
 
 ## Overall assessment
 
-**Weighted POSIX compatibility: approximately 80-85%**
+**Weighted POSIX compatibility: approximately 88-92%**
 
-The old estimate was 65-70%. The major drivers of the improvement:
-- stdio migration makes all buffered I/O correct (was the biggest functional gap)
-- dirent/ completion unblocks a huge class of file-traversal software
-- string/ wchar completion matters for any Unicode-aware tool
-- at() family satisfies the POSIX.1-2008 file-API check in configure
+The previous estimate was 80-85%. The Tier 1 items (termios, select, sched,
+exit) turned out to already be implemented — the prior assessment undercounted
+because it used file count rather than function count. With those corrected:
+- termios is ~92% complete (all standard functions present)
+- select() + FD_SET family present in plan9/_buf.c
+- sched_yield + full scheduling stubs present
+- at_quick_exit present in exit/quick_exit.c
 
-The autoconf probe coverage estimate rises to **roughly 85%** of the ~200
+The autoconf probe coverage estimate is now **roughly 90%** of the ~200
 most-commonly probed functions.
 
 ---
@@ -167,28 +169,23 @@ Ranked by (impact on porting real software) × (implementation effort).
 
 ### Tier 1 — thin gaps with outsized configure impact
 
-**termios/ — complete it (still just 2 files)**
-This remains the single most glaring gap. `tcsetattr`, `cfsetispeed`,
-`cfsetospeed`, `tcdrain`, `tcflush`, `tcflow`, `tcsendbreak`, `cfmakeraw`
-are all missing. Every interactive program (shells, editors, readline users)
-probes for `tcsetattr`. The data needed is already in the `struct termios`
-that `tcgetattr` returns — completing this is mostly mechanical.
-Priority: **critical**.
+**termios/ — DONE**
+All key functions are already implemented across 2 files: `tcsetattr`,
+`tcdrain`, `tcflush`, `tcflow`, `tcsendbreak`, `tcgetsid`, `tcsetpgrp`,
+`tcgetpgrp` in `tcgetattr.c`; `cfmakeraw`, `cfset*/cfget*` in `cfgetospeed.c`.
+The low file count was misleading — coverage is ~92%.
 
-**exit/ — at_quick_exit**
-`quick_exit` was added; its registered-handler companion `at_quick_exit`
-(C11) was not. Trivially implemented alongside `quick_exit`. Many C++ and
-modern C runtimes probe for it.
+**exit/ — DONE**
+`at_quick_exit` and `quick_exit` are both present in `exit/quick_exit.c`.
 
-**select/ — add select() and FD_SET family**
-Currently only `poll()` is present. `select()` + `FD_SET`/`FD_CLR`/
-`FD_ISSET`/`FD_ZERO` are required by many older network programs and
-configure probes. On Plan9 these map to `poll()` + a bitmask wrapper.
+**select/ — DONE**
+`select()` + `FD_SET`/`FD_CLR`/`FD_ISSET`/`FD_ZERO` are in `plan9/_buf.c`.
+`poll()` is in `select/poll.c` (wraps select). Both declared in `sys/select.h`.
 
-**sched/ — sched_yield and basic stubs**
-`sched_yield`, `sched_get_priority_min/max`, `sched_setscheduler` (stub).
-Widely probed by threading and real-time software. `sched_yield` is a
-one-liner (`sleep(0)` or `yield()` in Plan9).
+**sched/ — DONE**
+`sched_yield`, `sched_get_priority_min/max`, `sched_getscheduler`,
+`sched_setscheduler`, `sched_getparam`, `sched_setparam`,
+`sched_rr_get_interval` are all in `sched/sched.c`.
 
 ### Tier 2 — moderate effort, clear payoff
 
@@ -251,13 +248,12 @@ for `aio_suspend` does not scale well with many concurrent requests.
 
 ## Summary priority list
 
-1. `termios/` — add tcsetattr + full terminal control suite
-2. `exit/` — add at_quick_exit
-3. `select/` — add select() + FD_SET family
-4. `sched/` — add sched_yield + scheduling stubs
-5. `thread/` — add rwlock and barrier
-6. `time/` — add POSIX interval timers
-7. `stat/` — add fstatat, utimensat, futimens
-8. `fcntl/` — complete F_* flag coverage
-9. `network/` — setsockopt/getsockopt + DNS resolver
-10. `mman/` — improve mmap emulation
+Items 1–4 from the previous list are now complete. Updated priorities:
+
+1. `time/` — POSIX interval timers (`timer_create`, `timer_settime`, `timer_delete`, `timer_gettime`); `clock_nanosleep` done
+2. `thread/` — rwlock and barrier are stubbed; wire rwlock to real mutex/cond implementation
+3. `network/` — `setsockopt`/`getsockopt` are stubs returning 0; needs `SO_REUSEADDR`, `TCP_NODELAY` etc mapped to Plan9 ctl commands
+4. `stat/` — `fstatat`, `utimensat`, `futimens`, `mknodat` (AT_FDCWD wrappers)
+5. `fcntl/` — complete `F_*` flag coverage: `F_DUPFD_CLOEXEC`, `O_CLOEXEC`, `F_GETFD`/`F_SETFD`
+6. `network/` — DNS resolver (`getaddrinfo` exists but may lack full `res_*` backend)
+7. `mman/` — improve `mmap` flag coverage (`MAP_ANONYMOUS`, `MAP_PRIVATE`, `PROT_*`)
