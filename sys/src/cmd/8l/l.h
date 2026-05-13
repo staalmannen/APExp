@@ -18,14 +18,9 @@ typedef	struct	Optab	Optab;
 #define	S		((Sym*)0)
 #define	TNAME		(curtext?curtext->from.sym->name:noname)
 
-#define cput(c) \\
-
-
-	{ *cbp++ = c;\
+#define cput(c) { *cbp++ = c;\
 	if(--cbc <= 0)\
 		cflush(); }
-
-
 
 struct Reloc
 {
@@ -35,11 +30,6 @@ struct Reloc
 	ulong	*a;
 	Sym	*rsym;	/* named rsym to avoid collision with #define sym u1.u1sym */
 };
-
-
-
-
-
 
 struct	Adr
 {
@@ -399,11 +389,3 @@ void	zerosig(char*);
 #pragma	varargck	type	"R"	int
 #pragma	varargck	type	"A"	int
 
-struct	Reloc
-{
-	int	n;
-	int	t;
-	uchar	*m;
-	ulong	*a;
-	Sym	*rsym;	/* named rsym to avoid collision with #define sym u1.u1sym */
-};

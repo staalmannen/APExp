@@ -23,7 +23,9 @@ void	addlibpath(char*);
 int	fileexists(char*);
 char*	findlib(char*);
 
-
+#define cput(c) { *cbp++ = c;\
+	if(--cbc <= 0)\
+		cflush(); 
 
 struct Reloc
 {
@@ -33,10 +35,6 @@ struct Reloc
 	ulong	*a;
 	Sym	*rsym;	/* named rsym to avoid collision with #define sym u1.u1sym */
 };
-
-
-
-
 
 
 typedef	uchar	Opcross[32][2][32];
@@ -440,11 +438,3 @@ long	immrot(ulong);
 long	immaddr(long);
 long	opbra(int, int);
 
-struct	Reloc
-{
-	int	n;
-	int	t;
-	uchar	*m;
-	ulong	*a;
-	Sym	*rsym;	/* named rsym to avoid collision with #define sym u1.u1sym */
-};

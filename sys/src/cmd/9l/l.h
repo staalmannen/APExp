@@ -13,13 +13,13 @@ typedef	struct	Optab	Optab;
 
 #define PtrSize 4
 
-
-
 #ifndef	EXTERN
 #define	EXTERN	extern
 #endif
 
-
+#define cput(c) { *cbp++ = c;\
+	if(--cbc <= 0)\
+		cflush(); 
 
 struct Reloc
 {
@@ -29,10 +29,6 @@ struct Reloc
 	ulong	*a;
 	Sym	*rsym;	/* named rsym to avoid collision with #define sym u1.u1sym */
 };
-
-
-
-
 
 
 #define	P		((Prog*)0)
@@ -383,11 +379,3 @@ void	zerosig(char*);
 #pragma	varargck	type	"S"	char*
 #pragma	varargck	argpos	diag 1
 
-struct	Reloc
-{
-	int	n;
-	int	t;
-	uchar	*m;
-	ulong	*a;
-	Sym	*rsym;	/* named rsym to avoid collision with #define sym u1.u1sym */
-};

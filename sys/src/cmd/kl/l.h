@@ -13,9 +13,9 @@ typedef	struct	Optab	Optab;
 
 #define PtrSize 4
 
-
-
-
+#define cput(c) { *cbp++ = c;\
+	if(--cbc <= 0)\
+		cflush(); 
 
 struct Reloc
 {
@@ -25,11 +25,6 @@ struct Reloc
 	ulong	*a;
 	Sym	*rsym;	/* named rsym to avoid collision with #define sym u1.u1sym */
 };
-
-
-
-
-
 
 #define	P		((Prog*)0)
 #define	S		((Sym*)0)
@@ -356,11 +351,3 @@ void	undef(void);
 void	xdefine(char*, int, long);
 void	xfol(Prog*);
 
-struct	Reloc
-{
-	int	n;
-	int	t;
-	uchar	*m;
-	ulong	*a;
-	Sym	*rsym;	/* named rsym to avoid collision with #define sym u1.u1sym */
-};

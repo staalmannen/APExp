@@ -20,13 +20,14 @@ typedef	struct	Oprang	Oprang;
 #define	LIBNAMELEN	300
 
 
-
 void	addlibpath(char*);
 int	fileexists(char*);
 int	find1(long, int);
 char*	findlib(char*);
 
-
+#define cput(c) { *cbp++ = c;\
+	if(--cbc <= 0)\
+		cflush(); 
 
 struct Reloc
 {
@@ -36,14 +37,6 @@ struct Reloc
 	ulong	*a;
 	Sym	*rsym;	/* named rsym to avoid collision with #define sym u1.u1sym */
 };
-
-
-
-
-
-
-
-
 
 typedef	uchar	Opcross[32][2][32];
 
@@ -460,11 +453,3 @@ void	zerosig(char*);
 #define	branchop()	AB
 #define	canfollow(a)	((a) != ATEXT && (a) != ABCASE)
 
-struct	Reloc
-{
-	int	n;
-	int	t;
-	uchar	*m;
-	ulong	*a;
-	Sym	*rsym;	/* named rsym to avoid collision with #define sym u1.u1sym */
-};

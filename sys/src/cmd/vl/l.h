@@ -15,9 +15,9 @@ typedef	struct	Count	Count;
 
 #define PtrSize 4
 
-
-
-
+#define cput(c) { *cbp++ = c;\
+	if(--cbc <= 0)\
+		cflush(); 
 
 struct Reloc
 {
@@ -27,11 +27,6 @@ struct Reloc
 	ulong	*a;
 	Sym	*rsym;	/* named rsym to avoid collision with #define sym u1.u1sym */
 };
-
-
-
-
-
 
 typedef	uchar	Opcross[32][2][32];
 
@@ -365,11 +360,3 @@ void	xfol(Prog*);
 void	xfol(Prog*);
 void	nopstat(char*, Count*);
 
-struct	Reloc
-{
-	int	n;
-	int	t;
-	uchar	*m;
-	ulong	*a;
-	Sym	*rsym;	/* named rsym to avoid collision with #define sym u1.u1sym */
-};
