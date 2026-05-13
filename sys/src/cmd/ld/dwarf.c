@@ -19,7 +19,13 @@ getspadj(Prog *p)
 // ... in the loop:
 // if ((q->spadj = getspadj(q)) == 0) continue;
 
+#ifdef D_SP
 #define DWARFREGSP D_SP
+#elif defined(REGSP)
+#define DWARFREGSP REGSP
+#else
+#define DWARFREGSP 0
+#endif
 
 // Externs for linker structures defined in l.h
 extern Prog *textp;
