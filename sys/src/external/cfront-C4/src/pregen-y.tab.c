@@ -5426,6 +5426,10 @@ yyreduce:
         if (__3n) {
             yyval.nl__7YYSTYPE = __ct__5nlistFP4name((struct nlist *)0, __3n);
             if ((long long)__3n->__O2__4name.n_qualifier >= 0x200000) {
+                { extern int fprint(int, char*, ...);
+                  fprint(2, "DEBUG n_qualifier=%p base=%d\n",
+                         (void*)__3n->__O2__4name.n_qualifier,
+                         (int)__3n->base__4node); }
                 if (__3n->__O2__4name.n_qualifier->n_template_arg__4name != 1)
                     UNSET_SCOPE__Fv();
                 if (__3n->__O2__4name.n_qualifier == sta_name)
