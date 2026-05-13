@@ -33,6 +33,16 @@ struct timespec {
 #define CLOCK_MONOTONIC 1
 
 #define TIMER_ABSTIME 1
+
+#ifndef _TIMER_T
+#define _TIMER_T
+typedef void* timer_t;
+#endif
+
+struct itimerspec {
+	struct timespec it_interval;  /* reload interval (0 = one-shot) */
+	struct timespec it_value;     /* time until first expiry (0 = disarmed) */
+};
 #ifndef CLOCK_PROCESS_CPUTIME_ID
 #define CLOCK_PROCESS_CPUTIME_ID 2
 #endif
@@ -82,6 +92,13 @@ extern void tzset(void);
 
 extern int nanosleep(const struct timespec *req, struct timespec *rem);
 extern int clock_nanosleep(clockid_t, int, const struct timespec *, struct timespec *);
+
+#include <signal.h>
+extern int timer_create(clockid_t, struct sigevent *, timer_t *);
+extern int timer_delete(timer_t);
+extern int timer_settime(timer_t, int, const struct itimerspec *, struct itimerspec *);
+extern int timer_gettime(timer_t, struct itimerspec *);
+extern int timer_getoverrun(timer_t);
 
 #ifdef __cplusplus
 }

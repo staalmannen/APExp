@@ -21,7 +21,7 @@
 | locale/       |    21 |   30 |  70% | Good — iconv + gettext stubs present |
 | malloc/       |    10 |    8 | 125% | Complete — aligned allocation suite done |
 | prng/         |     3 |    5 |  60% | Good — arc4random added |
-| time/         |    17 |   30 |  57% | Reasonable — strptime/timegm/_r variants; clock_nanosleep added |
+| time/         |    18 |   30 |  60% | Reasonable — strptime/timegm/_r variants; clock_nanosleep + POSIX interval timers done |
 | unistd/       |    39 |   50 |  78% | Good — at() family now present |
 | stat/         |     9 |   16 |  56% | Reasonable |
 | fcntl/        |     3 |    5 |  60% | Reasonable |
@@ -195,12 +195,12 @@ The low file count was misleading — coverage is ~92%.
 existing mutex/cond primitives. rwlock is probed for by almost all
 multi-threaded software; barrier is less common but expected.
 
-**time/ — POSIX interval timers**
+**time/ — POSIX interval timers — DONE**
 `timer_create`, `timer_delete`, `timer_settime`, `timer_gettime`,
-`timer_getoverrun` and `clock_nanosleep`. Plan9 has no kernel timer
-objects, but these can be approximated with pthreads (a background thread
-waking at the designated time and dispatching `SIGALRM` or a user signal).
-Needed by `readline`, GNU `make`, and various POSIX test suites.
+`timer_getoverrun`, and `clock_nanosleep` are all implemented.
+`timer.c` backs each timer with a worker pthread sleeping via
+`pthread_cond_timedwait`; supports `SIGEV_NONE`, `SIGEV_SIGNAL` (default
+`SIGALRM`), and `SIGEV_THREAD`. `timer_getoverrun` always returns 0.
 
 **stat/ — at() and timestamp family**
 `fstatat`, `utimensat`, `futimens`, `mknodat`. The `at`-suffixed variants
@@ -250,7 +250,12 @@ for `aio_suspend` does not scale well with many concurrent requests.
 
 Items 1–4 from the previous list are now complete. Updated priorities:
 
-1. `time/` — POSIX interval timers (`timer_create`, `timer_settime`, `timer_delete`, `timer_gettime`); `clock_nanosleep` done
+1. `network/` — `setsockopt`/`getsockopt` are stubs returning 0; needs `SO_REUSEADDR`, `TCP_NODELAY` etc mapped to Plan9 ctl commands
+2. `thread/` — rwlock and barrier are stubbed; wire rwlock to real mutex/cond implementation
+3. `stat/` — `fstatat`, `utimensat`, `futimens`, `mknodat` (AT_FDCWD wrappers)
+4. `fcntl/` — complete `F_*` flag coverage: `F_DUPFD_CLOEXEC`, `O_CLOEXEC`, `F_GETFD`/`F_SETFD`
+5. `network/` — DNS resolver (`getaddrinfo` exists but may lack full `res_*` backend)
+6. `mman/` — improve `mmap` flag coverage (`MAP_ANONYMOUS`, `MAP_PRIVATE`, `PROT_*`)
 2. `thread/` — rwlock and barrier are stubbed; wire rwlock to real mutex/cond implementation
 3. `network/` — `setsockopt`/`getsockopt` are stubs returning 0; needs `SO_REUSEADDR`, `TCP_NODELAY` etc mapped to Plan9 ctl commands
 4. `stat/` — `fstatat`, `utimensat`, `futimens`, `mknodat` (AT_FDCWD wrappers)
