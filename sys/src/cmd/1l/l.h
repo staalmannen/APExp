@@ -17,7 +17,8 @@ typedef	struct	Optab	Optab;
 #define	S		((Sym*)0)
 #define	TNAME		(curtext?curtext->from.sym->name:noname)
 
-#define	CPUT(c)	{ *cbp++ = c;\
+#define CPUT(c) cput(c)
+#define	cput(c)	{ *cbp++ = c;\
 	if(--cbc <= 0)\
 		cflush(); }
 

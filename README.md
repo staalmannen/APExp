@@ -56,7 +56,7 @@ the most capable web browser available on Plan9.
 Imported the latest 9front APE sources from git [7] (date: 2024-04-24; rebased 2026-01-29, which included the bitfield patch from @jamoson (bitfield support in kencc) [8]).
 In addition, several patches from @lufia [9, 10] to build libressl and curl
 (introduces pthread, include_next cpp support, etc) has been applied to the
-sources. To get more C99 compatibility, AI-generated patches have been introduced (VLA, hex float support, complex support, compound literals, division by 0, dropping keywords, etc). C99 support is *pretty much complete* by now, and we have even started adding some C11/C23 features to the compiler. This served as a base to add ports of third party libraries and utilities to enhance compatibility.
+sources. To get more C99 compatibility, AI-generated patches have been introduced (VLA, hex float support, complex support, compound literals, division by 0, dropping keywords, etc). C99 support is *pretty much complete* by now, and we have even started adding some C11/C23 features to the compiler. This served as a base to add ports of third party libraries and utilities to enhance compatibility. In addition to the compiler, the linker has been enhanced with DWARF2 support from the old Go compiler (copied from the goken9cc project). This means that binaries built with APExp should be possible to debug with advanced debuggers like GNU gdb or the Go "debug" utility.
 
 
 Install paths have been modified so that libraries and binaries are installed in the local directory structure of APExp. A bind script (apexp-sh) in the root of APExp can be used to overlay APExp over the native system.
