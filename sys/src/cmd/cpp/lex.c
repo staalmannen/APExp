@@ -283,6 +283,8 @@ expandlex(void)
 		if (bigfsm[EOFC][i]>=0)
 			bigfsm[EOFC][i] = ~S_EOF;
 	}
+		fprintf(stderr, "bigfsm['+'][NUM1]=%d bigfsm['+'][NUM2]=%d (NUM1=%d NUM2=%d S_SELF=%d)\n",
+		(int)bigfsm['+'][NUM1], (int)bigfsm['+'][NUM2], NUM1, NUM2, S_SELF);
 }
 
 /*
