@@ -283,8 +283,6 @@ expandlex(void)
 		if (bigfsm[EOFC][i]>=0)
 			bigfsm[EOFC][i] = ~S_EOF;
 	}
-	fprintf(stderr, "bigfsm['+'][NUM1]=%d bigfsm['+'][NUM2]=%d bigfsm['U'][NUM1]=%d (NUM1=%d NUM2=%d S_SELF=%d)\n",
-		(int)bigfsm['+'][NUM1], (int)bigfsm['+'][NUM2], (int)bigfsm['U'][NUM1], NUM1, NUM2, S_SELF);
 }
 
 /*
@@ -326,10 +324,6 @@ gettokens(Tokenrow *trp, int reset)
 		for (;;) {
 			oldstate = state;
 			c = *ip;
-			if (c == '+' || c == '-')
-				fprintf(stderr, "TRACE: char='%c'(%d) oldstate=%d bigfsm=%d tok_so_far='%.*s'\n",
-					c, c, oldstate, (int)bigfsm[(uchar)c][oldstate],
-					(int)(ip - tp->t), tp->t);
 			if ((state = bigfsm[c][state]) >= 0) {
 				ip += runelen;
 				runelen = 1;
@@ -344,9 +338,6 @@ gettokens(Tokenrow *trp, int reset)
 			case S_SELFB:
 				tp->type = GETACT(state);
 				tp->len = ip - tp->t;
-				if (tp->type == NUMBER && tp->len > 2)
-					fprintf(stderr, "LEX NUMBER len=%d '%.*s' next='%c'(%d)\n",
-						tp->len, tp->len, tp->t, (int)*ip, (int)*ip);
 				tp++;
 				goto continue2;
 
