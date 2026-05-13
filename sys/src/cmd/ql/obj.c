@@ -49,6 +49,13 @@ isobjfile(char *f)
 }
 
 void
+usage(void)
+{
+	diag("usage: ql [-options] objects");
+	errorexit();
+}
+
+void
 main(int argc, char *argv[])
 {
 	int c;

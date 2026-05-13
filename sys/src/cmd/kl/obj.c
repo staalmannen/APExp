@@ -18,6 +18,13 @@ char	*thestring 	= "sparc";
  */
 
 void
+usage(void)
+{
+	diag("usage: kl [-options] objects");
+	errorexit();
+}
+
+void
 main(int argc, char *argv[])
 {
 	int c;

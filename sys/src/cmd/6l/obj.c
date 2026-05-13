@@ -43,6 +43,13 @@ isobjfile(char *f)
 }
 
 void
+usage(void)
+{
+	diag("usage: 6l [-options] objects");
+	errorexit();
+}
+
+void
 main(int argc, char *argv[])
 {
 	int i, c;

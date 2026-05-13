@@ -24,6 +24,13 @@ char	*thestring 	= "mips";
 int little;
 
 void
+usage(void)
+{
+	diag("usage: vl [-options] objects");
+	errorexit();
+}
+
+void
 main(int argc, char *argv[])
 {
 	int c;
