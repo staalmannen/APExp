@@ -366,3 +366,4 @@ void	zerosig(char*);
 #pragma	varargck	type	"S"	char*
 
 #pragma	varargck	argpos	diag 1
+\ No newline at end of file
