@@ -50,7 +50,7 @@ int	tottok;
 int	tokkind[256];
 struct	fsm {
 	int	state;		/* if in this state */
-	uchar	ch[4];		/* and see one of these characters */
+	uchar	ch[8];		/* and see one of these characters */
 	int	nextstate;	/* enter this state if +ve */
 };
 
@@ -283,8 +283,8 @@ expandlex(void)
 		if (bigfsm[EOFC][i]>=0)
 			bigfsm[EOFC][i] = ~S_EOF;
 	}
-		fprintf(stderr, "bigfsm['+'][NUM1]=%d bigfsm['+'][NUM2]=%d (NUM1=%d NUM2=%d S_SELF=%d)\n",
-		(int)bigfsm['+'][NUM1], (int)bigfsm['+'][NUM2], NUM1, NUM2, S_SELF);
+	fprintf(stderr, "bigfsm['+'][NUM1]=%d bigfsm['+'][NUM2]=%d bigfsm['U'][NUM1]=%d (NUM1=%d NUM2=%d S_SELF=%d)\n",
+		(int)bigfsm['+'][NUM1], (int)bigfsm['+'][NUM2], (int)bigfsm['U'][NUM1], NUM1, NUM2, S_SELF);
 }
 
 /*
@@ -521,3 +521,4 @@ unsetsource(void)
 	cursource = s->next;
 	dofree(s);
 }
+
