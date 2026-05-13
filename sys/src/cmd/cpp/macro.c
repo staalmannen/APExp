@@ -73,13 +73,6 @@ dodefine(Tokenrow *trp)
 	trp->tp = tp;
 	if (((trp->lp)-1)->type==NL)
 		trp->lp -= 1;
-	{
-		Token *dtp;
-		fprintf(stderr, "dodefine: %.*s body=%d toks:", np->len, np->name, (int)(trp->lp - trp->tp));
-		for (dtp = trp->tp; dtp < trp->lp; dtp++)
-			fprintf(stderr, " [type=%d len=%d '%.*s']", dtp->type, dtp->len, dtp->len, dtp->t);
-		fprintf(stderr, "\n");
-	}
 	def = normtokenrow(trp);
 	if (np->flag&ISDEFINED) {
 		if (comparetokens(def, np->vp)
