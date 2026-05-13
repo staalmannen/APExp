@@ -356,11 +356,11 @@ void	undef(void);
 void	xdefine(char*, int, long);
 void	xfol(Prog*);
 
-struct	Reloc 
-{ 
-	int	n; 
-	int	t; 
-	uchar	*m; 
-	ulong	*a; 
-	Sym	*sym; 
+struct	Reloc
+{
+	int	n;
+	int	t;
+	uchar	*m;
+	ulong	*a;
+	Sym	*rsym;	/* named rsym to avoid collision with #define sym u1.u1sym */
 };
