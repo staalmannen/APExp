@@ -6,6 +6,7 @@ LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 OFILES=\
 	clock.$O\
 	clock_gettime.$O\
+	clock_nanosleep.$O\
 	ctime.$O\
 	difftime.$O\
 	gettimeofday.$O\

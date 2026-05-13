@@ -31,6 +31,8 @@ struct timespec {
 
 #define CLOCK_REALTIME 0
 #define CLOCK_MONOTONIC 1
+
+#define TIMER_ABSTIME 1
 #ifndef CLOCK_PROCESS_CPUTIME_ID
 #define CLOCK_PROCESS_CPUTIME_ID 2
 #endif
@@ -79,6 +81,7 @@ extern time_t timegm(struct tm *);
 extern void tzset(void);
 
 extern int nanosleep(const struct timespec *req, struct timespec *rem);
+extern int clock_nanosleep(clockid_t, int, const struct timespec *, struct timespec *);
 
 #ifdef __cplusplus
 }

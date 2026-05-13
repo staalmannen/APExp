@@ -177,7 +177,7 @@ This is correct per the standard.
 | `_Alignas` in declarations | Not implemented (layout effect) | Not implemented |
 | `_Atomic` full stdatomic.h | Dropped as qualifier; no CAS operations |
 | `constexpr` objects (C23) | Not implemented |
-| `auto` type deduction (C23) | Not implemented |
+| `auto` type deduction (C23) | Done — implemented in `cc.y` `autoadlist` rule |
 
 `tgmath.h` was written using `_Generic` to dispatch to the correct variant
 of each math function. It uses `fn` (not `f`) as the parameter name in
@@ -279,12 +279,11 @@ In function scope it should behave like a constant expression. Low impact
 for now (few real-world headers use it yet), but will become necessary as
 C23 adoption increases.
 
-### 6. `auto` type deduction (C23)
+### 6. `auto` type deduction (C23) — DONE
 
-`auto x = expr;` — infer type from initialiser. This is the largest single
-remaining C23 item and touches the declaration parser deeply. Required when
-porting C23 code that uses `auto` pervasively (e.g. modern C++ shims). Not
-urgent for the current APExp target software base.
+Implemented in `cc.y` via `autoadlist` non-terminal. Handles `auto x = expr;`,
+`auto *p = ptr;`, multiple declarations per statement, and `for(auto x = ...)`.
+See CLAUDE.md for full design notes.
 
 ### 7. Variadic macro `__VA_OPT__` (C99/C++20)
 
@@ -439,7 +438,7 @@ integration with the compiler's code-generation backend.
 | Feature | Standard | Difficulty | Impact | Notes |
 |:---|:---|:---|:---|:---|
 | **`_Alignas`** | C11 | Medium | High | Requires `sualign` struct-layout and local frame offset updates. |
-| **`auto`** | C23 | High | High | Deep change: type deduction in the declaration parser. |
+| **`auto`** | C23 | High | High | **Done** — `autoadlist` rule in `cc.y`. |
 | **`constexpr`** | C23 | High | Medium | File-scope maps to `static const`; function-scope is complex. |
 | **`_Atomic` / CAS** | C11 | High | High | Requires mapping to libap atomics or backend intrinsics. |
 
@@ -451,11 +450,8 @@ integration with the compiler's code-generation backend.
     parser to the backend's layout pass (`sualign`) and ensuring the stack
     frame allocator respects these requirements.
 
-2.  **`auto` Type Deduction (Priority 2)**: This allows `auto x = expr;` at
-    local scope. It is widely used in modern C codebases. It is high-difficulty
-    because it changes the declaration parser: the compiler must hold the
-    initialiser expression's type and perform deduction before the variable
-    declaration is finalized.
+2.  **`auto` Type Deduction (Priority 2)**: **Done.** Implemented via `autoadlist`
+    in `cc.y`. Handles local declarations, pointer depth inference, and `for` loops.
 
 3.  **`constexpr` Objects (Priority 3)**: While C23 makes this more formal,
     the compiler already handles constant expression folding well. The primary
@@ -473,7 +469,7 @@ integration with the compiler's code-generation backend.
 | C89 / ANSI C | ~100% | High — this is the baseline |
 | C99 | ~95% | High — all major features present |
 | C11 | ~75% | Medium — `_Generic`, `_Static_assert`, `_Alignof`, threads via libap |
-| C23 | ~50% | Medium — aliases, `nullptr`, `[[attrs]]`, `static_assert`, `__VA_OPT__` |
+| C23 | ~65% | Medium — aliases, `nullptr`, `[[attrs]]`, `static_assert`, `__VA_OPT__`, `auto` done |
 
 The preprocessor is now significantly more robust and aligns closely with
 modern C standards, supporting deep macro recursion, exhaustive rescanning,
