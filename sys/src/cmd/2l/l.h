@@ -31,7 +31,7 @@ struct Reloc
 	int	t;
 	uchar	*m;
 	ulong	*a;
-	Sym	*sym;
+	Sym	*rsym;	/* named rsym to avoid collision with #define sym u1.u1sym */
 };
 
 
@@ -99,6 +99,7 @@ struct	Auto
 	Auto*	link;
 	long	aoffset;
 	short	type;
+	Sym*	gotype;
 };
 
 
@@ -295,11 +296,11 @@ void	xdefine(char*, int, long);
 void	xfol(Prog*);
 int	zaddr(uchar*, Adr*, Sym*[]);
 
-struct	Reloc 
-{ 
-	int	n; 
-	int	t; 
-	uchar	*m; 
-	ulong	*a; 
-	Sym	*sym; 
+struct	Reloc
+{
+	int	n;
+	int	t;
+	uchar	*m;
+	ulong	*a;
+	Sym	*rsym;	/* named rsym to avoid collision with #define sym u1.u1sym */
 };

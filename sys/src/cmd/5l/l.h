@@ -31,7 +31,7 @@ struct Reloc
 	int	t;
 	uchar	*m;
 	ulong	*a;
-	Sym	*sym;
+	Sym	*rsym;	/* named rsym to avoid collision with #define sym u1.u1sym */
 };
 
 
@@ -134,6 +134,7 @@ struct	Autom
 	Auto*	link;
 	long	aoffset;
 	short	type;
+	Sym*	gotype;
 };
 struct	Optab
 {
@@ -439,11 +440,11 @@ long	immrot(ulong);
 long	immaddr(long);
 long	opbra(int, int);
 
-struct	Reloc 
-{ 
-	int	n; 
-	int	t; 
-	uchar	*m; 
-	ulong	*a; 
-	Sym	*sym; 
+struct	Reloc
+{
+	int	n;
+	int	t;
+	uchar	*m;
+	ulong	*a;
+	Sym	*rsym;	/* named rsym to avoid collision with #define sym u1.u1sym */
 };
