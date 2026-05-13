@@ -48,6 +48,11 @@ int	go_libraryp;
 go_Library*	go_library;
 int	go_nlibrary;
 
+/* set by go_mywhatsys() */
+char*	go_goroot;
+char*	go_goarch;
+char*	go_goos;
+
 /*
  * These functions bridge the DWARF code to the native linker's output.
  * We use the native cput() and cflush() macros defined in l.h.
