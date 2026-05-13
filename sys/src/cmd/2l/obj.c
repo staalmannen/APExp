@@ -19,6 +19,13 @@ char	*thestring 	= "68020";
  */
 
 void
+usage(void)
+{
+	diag("usage: 2l [-options] objects");
+	errorexit();
+}
+
+void
 main(int argc, char *argv[])
 {
 	int i, c;
