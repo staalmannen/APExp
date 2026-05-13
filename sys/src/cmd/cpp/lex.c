@@ -326,6 +326,10 @@ gettokens(Tokenrow *trp, int reset)
 		for (;;) {
 			oldstate = state;
 			c = *ip;
+			if (c == '+' || c == '-')
+				fprintf(stderr, "TRACE: char='%c'(%d) oldstate=%d bigfsm=%d tok_so_far='%.*s'\n",
+					c, c, oldstate, (int)bigfsm[(uchar)c][oldstate],
+					(int)(ip - tp->t), tp->t);
 			if ((state = bigfsm[c][state]) >= 0) {
 				ip += runelen;
 				runelen = 1;
