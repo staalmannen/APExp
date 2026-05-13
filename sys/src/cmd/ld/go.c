@@ -544,7 +544,7 @@ go_mark(Sym *s)
 	if(s->text)
 		go_marktext(s);
 	for(i=0; i<s->nr; i++)
-		go_mark(s->r[i].sym);
+		go_mark(s->r[i].rsym);
 	if(s->gotype)
 		go_mark(s->gotype);
 }
@@ -603,7 +603,8 @@ void
 go_deadcode(void)
 {
 	int i;
-	Sym *s, *last;
+	Prog *p, *last;
+	Sym *s;
 	Auto *z;
 
 	if(debug['v'])
@@ -615,29 +616,33 @@ go_deadcode(void)
 
 	for(i=0; i<ndynexp; i++)
 		go_mark(dynexp[i]);
-	
-	// remove dead text but keep file information (z symbols).
-	last = nil;
+
+	/*
+	 * Remove dead text but keep file information (z symbols).
+	 * textp is Prog* in Plan9 6l; iterate via pcond which chains TEXT progs.
+	 */
+	last = P;
 	z = nil;
-	for(s = textp; s != nil; s = s->next) {
-		if(!s->reachable) {
-			if(isz(s->autom))
+	for(p = textp; p != P; p = p->pcond) {
+		s = p->from.sym;
+		if(s == S || !s->reachable) {
+			if(s != S && isz(s->autom))
 				z = s->autom;
 			continue;
 		}
-		if(last == nil)
-			textp = s;
+		if(last == P)
+			textp = p;
 		else
-			last->next = s;
-		last = s;
+			last->pcond = p;
+		last = p;
 		if(z != nil) {
 			if(!isz(s->autom))
 				addz(s, z);
 			z = nil;
 		}
 	}
-	if(last == nil)
-		textp = nil;
+	if(last == P)
+		textp = P;
 	else
-		last->next = nil;
+		last->pcond = P;
 }
