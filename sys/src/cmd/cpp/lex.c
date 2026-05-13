@@ -338,6 +338,9 @@ gettokens(Tokenrow *trp, int reset)
 			case S_SELFB:
 				tp->type = GETACT(state);
 				tp->len = ip - tp->t;
+				if (tp->type == NUMBER && tp->len > 2)
+					fprintf(stderr, "LEX NUMBER len=%d '%.*s' next='%c'(%d)\n",
+						tp->len, tp->len, tp->t, (int)*ip, (int)*ip);
 				tp++;
 				goto continue2;
 
