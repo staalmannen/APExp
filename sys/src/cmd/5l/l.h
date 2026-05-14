@@ -393,6 +393,7 @@ void	listinit(void);
 Sym*	lookup(char*, int);
 void	cput(int);
 void	lput(long);
+#define ARCH_HAS_LPUTL
 void	lputl(long);
 void	mkfwd(void);
 void	names(void);
