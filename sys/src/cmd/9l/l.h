@@ -71,6 +71,7 @@ struct	Prog
 	short	as;
 	char	reg;
 
+};
 
 struct	Sym
 {
