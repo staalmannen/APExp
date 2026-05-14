@@ -392,7 +392,6 @@ void	ckoff(Sym*, long);
 int	chipfloat(Ieee*);
 int	cmp(int, int);
 int	compound(Prog*);
-void	cput(int);
 void	datfill(uchar*, long, uchar*, long);
 void	diag(char*, ...);
 void	dodata(void);
