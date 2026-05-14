@@ -354,6 +354,7 @@ int	relinv(int);
 long	rnd(long, long);
 void	sched(Prog*, Prog*);
 void	span(void);
+#define ARCH_HAS_STRNPUT
 void	strnput(char*, int);
 void	undef(void);
 void	xdefine(char*, int, long);

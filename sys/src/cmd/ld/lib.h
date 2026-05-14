@@ -165,6 +165,7 @@ void	go_mywhatsys(void);
 void	go_Lflag(char*);
 void	lputl(long);
 void	vlputl(vlong);
+void	wputl(ushort);
 
 /* set by call to mywhatsys() */
 extern	char*	go_goroot;
