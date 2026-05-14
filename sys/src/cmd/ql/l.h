@@ -15,7 +15,7 @@ typedef	struct	Optab	Optab;
 
 #define cput(c) { *cbp++ = c;\
 	if(--cbc <= 0)\
-		cflush();
+		cflush(); }
 
 struct Reloc
 {

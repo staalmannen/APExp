@@ -27,7 +27,7 @@ char*	findlib(char*);
 
 #define cput(c) { *cbp++ = c;\
 	if(--cbc <= 0)\
-		cflush(); 
+		cflush(); }
 
 struct Reloc
 {
@@ -392,7 +392,6 @@ void	ckoff(Sym*, long);
 int	chipfloat(Ieee*);
 int	cmp(int, int);
 int	compound(Prog*);
-void	cput(int);
 void	datfill(uchar*, long, uchar*, long);
 void	diag(char*, ...);
 void	dodata(void);
