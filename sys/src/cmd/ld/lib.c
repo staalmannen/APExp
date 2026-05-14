@@ -70,6 +70,32 @@ lputl(long l)
 }
 #endif
 
+/* Arches that define wputl in their own asm.c set ARCH_HAS_WPUTL in l.h */
+#ifndef ARCH_HAS_WPUTL
+void
+wputl(ushort w)
+{
+	cput(w);
+	cput(w>>8);
+}
+#endif
+
+/* Arches that define strnput in their own asm.c set ARCH_HAS_STRNPUT in l.h */
+#ifndef ARCH_HAS_STRNPUT
+void
+strnput(char *s, int n)
+{
+	for(; *s && n > 0; s++){
+		cput(*s);
+		n--;
+	}
+	while(n > 0){
+		cput(0);
+		n--;
+	}
+}
+#endif
+
 void
 vlputl(vlong v)
 {

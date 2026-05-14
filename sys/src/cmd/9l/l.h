@@ -362,6 +362,7 @@ long	regoff(Adr*);
 int	relinv(int);
 vlong	rnd(vlong, long);
 void	sched(Prog*, Prog*);
+#define ARCH_HAS_STRNPUT
 void	span(void);
 void	undef(void);
 void	undefsym(Sym*);

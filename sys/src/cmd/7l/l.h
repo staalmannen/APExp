@@ -437,6 +437,7 @@ vlong	rnd(vlong, long);
 void	span(void);
 void	undef(void);
 void	wput(long);
+#define ARCH_HAS_WPUTL
 void	wputl(long);
 void	noops(void);
 Mask*	findmask(uvlong);

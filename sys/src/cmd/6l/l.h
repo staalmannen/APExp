@@ -398,6 +398,8 @@ Sym*	lookup(char*, int);
 void	lput(long);
 #define ARCH_HAS_LPUTL
 void	lputl(long);
+#define ARCH_HAS_WPUTL
+#define ARCH_HAS_STRNPUT
 void	main(int, char*[]);
 void	mkfwd(void);
 void	nuxiinit(void);
