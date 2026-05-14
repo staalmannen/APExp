@@ -3,6 +3,8 @@ APE=../../ape
 APEXPROOT=../../../..
 
 _CORE_APPS=\
+# prerequisites\
+	make\
 # shell\
 	bash\
 # parsing/editing source etc \
@@ -12,7 +14,6 @@ _CORE_APPS=\
 	awk\
 	sed\
 # often invoked during make \
-	make\
 	m4\
 	iconv\
 	gettext\
