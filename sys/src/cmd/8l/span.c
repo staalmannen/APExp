@@ -1374,8 +1374,6 @@ enum{
 
 int modemap[4] = { 0, 1, -1, 2, };
 
-};
-
 Reloc rels;
 
 static void
