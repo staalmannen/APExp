@@ -1,7 +1,7 @@
 </$objtype/mkfile
 
 TARG=7l
-OFILES=	asm.$O	obj.$O	optab.$O	pass.$O	span.$O	list.$O	enam.$O	compat.$O	dwarf.$O	lib.$O	go.$O
+OFILES=	asm.$O	obj.$O	optab.$O	pass.$O	span.$O	list.$O	enam.$O	compat.$O	asmout.$O	bits.$O	cnam.$O	dyn.$O	mod.$O	noop.$O	dwarf.$O	lib.$O	go.$O
 
 HFILES=	l.h	../7c/7.out.h	../cc/compat.h
 APEXPROOT=../../../..

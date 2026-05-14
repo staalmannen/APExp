@@ -1,7 +1,7 @@
 </$objtype/mkfile
 
 TARG=ql
-OFILES=	asm.$O	obj.$O	optab.$O	pass.$O	span.$O	list.$O	enam.$O	compat.$O	dwarf.$O	lib.$O	go.$O
+OFILES=	asm.$O	obj.$O	optab.$O	pass.$O	span.$O	list.$O	enam.$O	compat.$O	asmout.$O	cnam.$O	noop.$O	sched.$O	dwarf.$O	lib.$O	go.$O
 
 HFILES=	l.h	../qc/q.out.h	../cc/compat.h
 APEXPROOT=../../../..
