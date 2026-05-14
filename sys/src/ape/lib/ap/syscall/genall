@@ -9,7 +9,7 @@ APEXPROOT=../../../../../..
 # we're in /sys/src/ape/lib/ap/syscall.
 SYSH=$APEXPROOT/sys/src/libc/9syscall/sys.h
 
-SYS=`{sed '/^#define._/d; s/#define.([A-Z0-9_]*).*/\1/' $SYSH}
+SYS=`{sed '/^#define._/d; /^#define/!d; s/^#define	//; s/	.*//' $SYSH}
 for(I in $SYS) {
 	i=_^$I
 	n=`{sed -n '/[ 	]'$I'[ 	]/s/.*	//p' $SYSH}
