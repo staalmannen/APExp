@@ -801,7 +801,7 @@ writelines(void)
 
 			lline = lh->line + q->line - lh->absline;
 			if (debug['v'] > 1)
-				print("%6llux %s[%lld] %P\n", q->pc, histfile[lh->file], lline, q);
+				print("%6llux %s[%lld] %P\n", (vlong)q->pc, histfile[lh->file], lline, q);
 
 			if (q->line == lc)
 				continue;
@@ -856,7 +856,7 @@ static void
 writeframes(void)
 {
 	vlong fdeo, fdesize, pad, cfa, pc;
-	Prog *p, *q;
+	Prog *p;
 
 	frameo = cpos();
 

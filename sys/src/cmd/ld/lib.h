@@ -163,6 +163,7 @@ void*	go_mal(uint32);
 void	go_unmal(void*, uint32);
 void	go_mywhatsys(void);
 void	go_Lflag(char*);
+void	lputl(long);
 void	vlputl(vlong);
 
 /* set by call to mywhatsys() */

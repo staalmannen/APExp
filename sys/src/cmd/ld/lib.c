@@ -58,6 +58,18 @@ char*	go_goos;
  * We use the native cput() and cflush() macros defined in l.h.
  */
 
+/* Arches that define lputl in their own asm.c set ARCH_HAS_LPUTL in l.h */
+#ifndef ARCH_HAS_LPUTL
+void
+lputl(long l)
+{
+	cput(l);
+	cput(l>>8);
+	cput(l>>16);
+	cput(l>>24);
+}
+#endif
+
 void
 vlputl(vlong v)
 {

@@ -415,6 +415,7 @@ void	llputl(vlong);
 void	loadlib(void);
 Sym*	lookup(char*, int);
 void	lput(long);
+#define ARCH_HAS_LPUTL
 void	lputl(long);
 void	mkfwd(void);
 int	movcon(vlong);
