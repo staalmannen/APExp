@@ -10,21 +10,3 @@ cputime(void)
 		t[0] += t[i];
 	return t[0] / 100.;
 }
-
-long
-seek(int f, long o, int p)
-{
-	long lseek(int, long, int);
-
-	return lseek(f, o, p);
-}
-
-int
-create(char *n, int m, long p)
-{
-	int creat(char*, int);
-
-	if(m != 1)
-		return -1;
-	return creat(n, p);
-}
