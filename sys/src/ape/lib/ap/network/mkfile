@@ -45,6 +45,7 @@ OFILES=\
 	lookup_name.$O\
 	lookup_serv.$O\
 	netname.$O\
+	ns_parse.$O\
 	ntohl.$O\
 	proto.$O\
 	rcmd.$O\
