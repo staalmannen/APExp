@@ -144,7 +144,6 @@ extern	char*	libraryobj[];
 extern	int	nerrors;
 Reloc*	addrel(Sym*);
 void	codeblk(int32, int32);
-void	datblk(int32, int32);
 Sym*	datsort(Sym*);
 void	reloc(void);
 void	savedata(Sym*, Prog*);
