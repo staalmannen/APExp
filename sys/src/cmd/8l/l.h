@@ -368,6 +368,8 @@ void	lputl(long);
 void	wputl(ushort);
 #define ARCH_HAS_STRNPUT
 #define PROG_HAS_PCOND
+#define AUTO_HAS_ASYM
+#define ADR_HAS_U1
 void	main(int, char*[]);
 void	mkfwd(void);
 void	nuxiinit(void);

@@ -569,7 +569,11 @@ inithist(Auto *a)
 		return 0;
 	}
 
+#ifdef AUTO_HAS_ASYM
 	unitname = decodez(a->asym->name);
+#else
+	unitname = decodez(a->sym->name);
+#endif
 
 	// Clear the history.
 	clearhistfile();
@@ -586,7 +590,11 @@ inithist(Auto *a)
 	// Construct the new one.
 	for (; a; a = a->link) {
 		if (a->type == D_FILE) {  // 'z'
+#ifdef AUTO_HAS_ASYM
 			int f = addhistfile(a->asym->name);
+#else
+			int f = addhistfile(a->sym->name);
+#endif
 			if (f < 0) {	   // pop file
 				includetop--;
 				checknesting();
@@ -725,10 +733,18 @@ writelines(void)
 	for(cursym = textp; cursym != P; cursym = cursym->link) {
 		if(cursym->as != ATEXT) continue;
 #endif
+#ifdef ADR_HAS_U1
 		Sym *s = cursym->from.u1.u1sym;
+#else
+		Sym *s = cursym->from.sym;
+#endif
 		// Look for history stack.  If we find one,
 		// we're entering a new compilation unit
+#ifdef ADR_HAS_U1
 		if((unitname = inithist(cursym->to.u1.u1autom)) != 0) {
+#else
+		if((unitname = inithist(cursym->to.autom)) != 0) {
+#endif
 			Linehist* lh1;
 			flushunit(epc, unitstart);
 			unitstart = cpos();

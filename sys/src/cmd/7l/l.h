@@ -448,6 +448,9 @@ void	zerosig(char*);
 #pragma	varargck	type	"R"	int
 
 /* for ../ld */
+#define AUTO_HAS_ASYM
+#define ADR_HAS_U1
+
 #define	isbranch(a)	((a) == AB)
 #define	iscall(a)	((a) == ABL)
 #define	isreturn(a)	((a) == ARETURN || (a) == ARET || (a) == AERET)

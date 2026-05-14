@@ -356,6 +356,8 @@ void	sched(Prog*, Prog*);
 void	span(void);
 #define ARCH_HAS_STRNPUT
 void	strnput(char*, int);
+#define AUTO_HAS_ASYM
+#define ADR_HAS_U1
 void	undef(void);
 void	xdefine(char*, int, long);
 void	xfol(Prog*);
