@@ -620,7 +620,9 @@ go_deadcode(void)
 	/*
 	 * Remove dead text but keep file information (z symbols).
 	 * textp is Prog* in Plan9 6l; iterate via pcond which chains TEXT progs.
+	 * Only available on arches whose Prog struct has the pcond field.
 	 */
+#ifdef PROG_HAS_PCOND
 	last = P;
 	z = nil;
 	for(p = textp; p != P; p = p->pcond) {
@@ -645,4 +647,5 @@ go_deadcode(void)
 		textp = P;
 	else
 		last->pcond = P;
+#endif
 }
