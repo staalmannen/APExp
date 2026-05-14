@@ -84,6 +84,7 @@ struct	Prog
 
 #define	stkoff	u0.u0stkoff
 #define	forwd	u0.u0forwd
+#define	PROG_HAS_PCOND
 
 struct	Auto
 {
