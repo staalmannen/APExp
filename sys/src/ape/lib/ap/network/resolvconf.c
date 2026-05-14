@@ -84,6 +84,29 @@ int __get_resolv_conf(struct resolvconf *conf, char *search, size_t search_sz)
 
 no_resolv_conf:
 	if (!nns) {
+		/* Plan9 fallback: read nameserver IPs from /net/ndb or /lib/ndb/local */
+		static const char *ndbpaths[] = { "/net/ndb", "/lib/ndb/local", 0 };
+		int pi;
+		for (pi = 0; ndbpaths[pi] && !nns; pi++) {
+			FILE *ndb = fopen(ndbpaths[pi], "r");
+			if (!ndb) continue;
+			while (fgets(line, sizeof line, ndb)) {
+				char *p = strstr(line, "dns=");
+				char *z;
+				if (!p) continue;
+				p += 4;
+				for (z = p; *z && !isspace(*z) && *z != '\n'; z++)
+					;
+				*z = 0;
+				if (*p && nns < MAXNS) {
+					if (__lookup_ipliteral(conf->ns + nns, p, AF_UNSPEC) > 0)
+						nns++;
+				}
+			}
+			fclose(ndb);
+		}
+	}
+	if (!nns) {
 		__lookup_ipliteral(conf->ns, "127.0.0.1", AF_UNSPEC);
 		nns = 1;
 	}
