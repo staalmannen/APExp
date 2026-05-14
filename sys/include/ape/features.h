@@ -37,4 +37,14 @@
 
 #define __REDIR(x,y) __typeof__(x) x __asm__(#y)
 
+/* Plan9 kencc has no weak symbol support; weak_alias is a no-op here.
+ * Explicit strong forwarders are provided in network/res_aliases.c. */
+#ifndef weak_alias
+#define weak_alias(old, new) /* no weak alias on Plan9 */
+#endif
+
+#ifndef hidden
+#define hidden
+#endif
+
 #endif

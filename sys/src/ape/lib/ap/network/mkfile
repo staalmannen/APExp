@@ -7,19 +7,33 @@ OFILES=\
 	accept.$O\
 	bind.$O\
 	connect.$O\
+	dn_comp.$O\
+	dn_expand.$O\
+	dn_skipname.$O\
+	dns_parse.$O\
 	endhostent.$O\
+	ent.$O\
 	gai_strerror.$O\
 	getaddrinfo.$O\
 	gethostbyaddr.$O\
+	gethostbyaddr_r.$O\
 	gethostbyname.$O\
+	gethostbyname2.$O\
+	gethostbyname2_r.$O\
+	gethostbyname_r.$O\
 	gethostname.$O\
 	getnameinfo.$O\
 	getpeername.$O\
 	getprotobyname.$O\
 	getservbyaddr.$O\
 	getservbyname.$O\
+	getservbyname_r.$O\
+	getservbyport.$O\
+	getservbyport_r.$O\
 	getsockname.$O\
-	idn.$O\
+	h_errno.$O\
+	herror.$O\
+	hstrerror.$O\
 	in6_addr.$O\
 	inet_addr.$O\
 	inet_aton.$O\
@@ -27,11 +41,27 @@ OFILES=\
 	inet_ntop.$O\
 	inet_pton.$O\
 	listen.$O\
+	lookup_ipliteral.$O\
+	lookup_name.$O\
+	lookup_serv.$O\
+	netname.$O\
+	ns_parse.$O\
 	ntohl.$O\
+	proto.$O\
 	rcmd.$O\
+	res_aliases.$O\
+	res_init.$O\
+	res_mkquery.$O\
+	res_msend.$O\
+	res_query.$O\
+	res_querydomain.$O\
+	res_send.$O\
+	res_state.$O\
+	resolvconf.$O\
 	rresvport.$O\
 	send.$O\
 	sendto.$O\
+	serv.$O\
 	shutdown.$O\
 	_sock_ingetaddr.$O\
 	_sock_ipattr.$O\
@@ -43,4 +73,6 @@ OFILES=\
 <$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=-c -D_POSIX_SOURCE -D_BSD_EXTENSION -D_PLAN9_SOURCE\
-	-I../include
+	-I../include\
+	-I.\
+	-I/sys/include/ape

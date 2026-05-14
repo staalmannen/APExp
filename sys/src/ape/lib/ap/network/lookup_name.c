@@ -13,7 +13,6 @@
 #include <resolv.h>
 #include "lookup.h"
 #include "stdio_impl.h"
-#include "syscall.h"
 
 static int is_valid_hostname(const char *host)
 {
