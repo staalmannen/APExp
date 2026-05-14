@@ -303,7 +303,6 @@ void	buildop(void);
 void	cflush(void);
 void	ckoff(Sym*, long);
 int	cmp(int, int);
-void	cput(long);
 int	compound(Prog*);
 double	cputime(void);
 void	datblk(long, long);
