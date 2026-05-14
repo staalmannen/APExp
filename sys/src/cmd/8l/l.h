@@ -366,6 +366,7 @@ void	lput(long);
 void	lputl(long);
 #define ARCH_HAS_WPUTL
 #define ARCH_HAS_STRNPUT
+#define PROG_HAS_PCOND
 void	main(int, char*[]);
 void	mkfwd(void);
 void	nuxiinit(void);

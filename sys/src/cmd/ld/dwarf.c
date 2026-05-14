@@ -7,12 +7,16 @@
 #include	"dwarf.h"
 #include	"dwarf_defs.h"
 
-/* Calculate stack adjustment from AADJSP instruction */
+/* Calculate stack adjustment from AADJSP instruction (x86 only) */
 static long
 getspadj(Prog *p)
 {
+#ifdef AADJSP
 	if(p->as == AADJSP)
 		return p->from.offset;
+#else
+	USED(p);
+#endif
 	return 0;
 }
 
@@ -719,7 +723,12 @@ writelines(void)
 	currfile = -1;
 	lineo = cpos();
 
+#ifdef PROG_HAS_PCOND
 	for(cursym = textp; cursym != P; cursym = cursym->pcond) {
+#else
+	for(cursym = textp; cursym != P; cursym = cursym->link) {
+		if(cursym->as != ATEXT) continue;
+#endif
 		Sym *s = cursym->from.u1.u1sym;
 		// Look for history stack.  If we find one,
 		// we're entering a new compilation unit
@@ -884,7 +893,12 @@ writeframes(void)
 	}
 	strnput("", pad);
 
+#ifdef PROG_HAS_PCOND
 	for(cursym = textp; cursym != P; cursym = cursym->pcond) {
+#else
+	for(cursym = textp; cursym != P; cursym = cursym->link) {
+		if(cursym->as != ATEXT) continue;
+#endif
 		fdeo = cpos();
 		// Emit a FDE, Section 6.4.1, starting wit a placeholder.
 		LPUT(0);	// length, must be multiple of PtrSize
