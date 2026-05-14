@@ -291,3 +291,6 @@ void	xdefine(char*, int, long);
 void	xfol(Prog*);
 int	zaddr(uchar*, Adr*, Sym*[]);
 
+#define PROG_HAS_PCOND
+#define AUTO_HAS_ASYM
+#define ADR_HAS_U1
