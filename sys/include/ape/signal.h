@@ -124,16 +124,17 @@ extern int sigsuspend(const sigset_t *);
 
 #include <pthread.h>
 
-struct sigevent {
-	int             sigev_notify;  /* Notification type */
-	int             sigev_signo;   /* Signal number */
-	union sigval    sigev_value;   /* Data passed with notification */
+/* sigev_notify values */
+#define SIGEV_NONE    0   /* no notification */
+#define SIGEV_SIGNAL  1   /* deliver sigev_signo */
+#define SIGEV_THREAD  2   /* call sigev_notify_function in new thread */
 
-	union sigval	*sigev_notify_function;
-                                          /* Notification function
-                                             (SIGEV_THREAD) */
+struct sigevent {
+	int             sigev_notify;  /* Notification type (SIGEV_*) */
+	int             sigev_signo;   /* Signal number (SIGEV_SIGNAL) */
+	union sigval    sigev_value;   /* Data passed with notification */
+	void          (*sigev_notify_function)(union sigval); /* SIGEV_THREAD */
 	pthread_attr_t *sigev_notify_attributes;
-                                          /* Notification attributes */
 };
 
 
