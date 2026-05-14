@@ -399,6 +399,7 @@ void	lput(long);
 #define ARCH_HAS_LPUTL
 void	lputl(long);
 #define ARCH_HAS_WPUTL
+void	wputl(ushort);
 #define ARCH_HAS_STRNPUT
 #define PROG_HAS_PCOND
 void	main(int, char*[]);
