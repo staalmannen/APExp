@@ -332,12 +332,6 @@ strnput(char *s, int n)
 }
 
 void
-cput(long l)
-{
-	CPUT(l);
-}
-
-void
 wput(long l)
 {
 	cbp[0] = l>>8;

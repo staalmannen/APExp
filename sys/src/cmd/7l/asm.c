@@ -180,16 +180,6 @@ asmb(void)
 }
 
 void
-cput(int c)
-{
-	cbp[0] = c;
-	cbp++;
-	cbc--;
-	if(cbc <= 0)
-		cflush();
-}
-
-void
 wput(long l)
 {
 

@@ -27,7 +27,7 @@ char*	findlib(char*);
 
 #define cput(c) { *cbp++ = c;\
 	if(--cbc <= 0)\
-		cflush(); 
+		cflush(); }
 
 struct Reloc
 {
