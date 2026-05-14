@@ -522,7 +522,7 @@ go_marktext(Sym *s)
 	markdepth++;
 	if(debug['v'] > 1)
 		Bprint(&bso, "%d go_marktext %s\n", markdepth, s->name);
-	for(a=s->autom; a; a=a->link)
+	for(a=s->u1.u1autom; a; a=a->link)
 		go_mark(a->gotype);
 	for(p=s->text; p != P; p=p->link) {
 		if(p->from.sym)
@@ -594,8 +594,8 @@ addz(Sym *s, Auto *z)
 		}
 	}
 	if(last) {
-		last->link = s->autom;
-		s->autom = z;
+		last->link = s->u1.u1autom;
+		s->u1.u1autom = z;
 	}
 }
 
@@ -628,8 +628,8 @@ go_deadcode(void)
 	for(p = textp; p != P; p = p->pcond) {
 		s = p->from.sym;
 		if(s == S || !s->reachable) {
-			if(s != S && isz(s->autom))
-				z = s->autom;
+			if(s != S && isz(s->u1.u1autom))
+				z = s->u1.u1autom;
 			continue;
 		}
 		if(last == P)
@@ -638,7 +638,7 @@ go_deadcode(void)
 			last->pcond = p;
 		last = p;
 		if(z != nil) {
-			if(!isz(s->autom))
+			if(!isz(s->u1.u1autom))
 				addz(s, z);
 			z = nil;
 		}

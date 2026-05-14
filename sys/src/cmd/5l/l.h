@@ -427,6 +427,8 @@ int	relinv(int);
 long	rnd(long, long);
 void	span(void);
 #define ARCH_HAS_STRNPUT
+#define AUTO_HAS_ASYM
+#define ADR_HAS_U1
 void	strnput(char*, int);
 void	undef(void);
 void	undefsym(Sym*);

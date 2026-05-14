@@ -351,3 +351,6 @@ void	undef(void);
 void	xdefine(char*, int, long);
 void	xfol(Prog*);
 
+#define AUTO_HAS_ASYM
+#define ADR_HAS_U1
+

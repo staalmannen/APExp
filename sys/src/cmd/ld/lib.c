@@ -493,7 +493,11 @@ go_addhist(int32 line, int type)
 	s = go_mal(sizeof(Sym));
 	s->name = go_mal(2*(histfrogp+1) + 1);
 
+#ifdef AUTO_HAS_ASYM
 	u->asym = s;
+#else
+	u->sym = s;
+#endif
 	u->type = type;
 	u->aoffset = line;
 	u->link = curhist;
