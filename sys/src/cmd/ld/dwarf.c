@@ -39,13 +39,7 @@ Prog *cursym;
 
 // Linker-core functions/vars not available in lib.h
 extern void cflush(void);
-extern void LPUT(long);
-extern void WPUT(ushort);
-extern void VPUT(vlong);
 extern void lputl(long);
-#ifndef ARCH_HAS_WPUTL
-extern void wputl(ushort);
-#endif
 extern void vlputl(vlong);
 extern vlong cpos(void);
 extern void diag(char*, ...);
