@@ -26,9 +26,9 @@ OFILES=\
 
 CC=pcc
 LD=pcc
-CFLAGS= -c -D_POSIX_SOURCE -I$CHCSRC
+CFLAGS= -c -D_POSIX_SOURCE -I$CHCSRC -DHAVE_CHICKEN_CONFIG_H -DHAVE_ALLOCA_H
 
-%.$O: $CHCSRC/src/%.c
-    $CC $CFLAGS $CHCSRC/src/$stem.c
+%.$O: $CHCSRC/%.c
+    $CC $CFLAGS $CHCSRC/$stem.c
 
 
