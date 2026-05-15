@@ -24,6 +24,8 @@ OFILES=\
 	get_current_dir.$O\
 	getrlimit.$O\
 	scratch_buffer.$O\
+# C11 stdatomic\
+	stdatomic.$O\
 
 
 <$APEXPROOT/sys/src/cmd/mksyslib
