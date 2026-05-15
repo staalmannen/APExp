@@ -765,7 +765,7 @@
  *	preprocessor can make decisions based on it.
  */
 #define INTSIZE 4		/**/
-#define LONGSIZE 8		/**/
+#define LONGSIZE 4		/* Plan9: long is 32-bit even on amd64 */
 #define SHORTSIZE 2		/**/
 
 /* MULTIARCH:
@@ -785,9 +785,9 @@
  */
 #define HAS_QUAD	/**/
 #ifdef HAS_QUAD
-#   define Quad_t long	/**/
-#   define Uquad_t unsigned long	/**/
-#   define QUADKIND 2	/**/
+#   define Quad_t long long	/* Plan9: long is 32-bit */
+#   define Uquad_t unsigned long long	/* Plan9: long is 32-bit */
+#   define QUADKIND 3	/* QUAD_IS_LONG_LONG */
 #   define QUAD_IS_INT	1
 #   define QUAD_IS_LONG	2
 #   define QUAD_IS_LONG_LONG	3
@@ -1041,8 +1041,9 @@
  *		static _inline      (older MSVC)
  *		static              (c89 compilers)
  */
+/* Plan9/kencc: no inline keyword, but we need static to prevent multiple defs */
 #undef HAS_STATIC_INLINE				/**/
-#define PERL_STATIC_INLINE /**/
+#define PERL_STATIC_INLINE static
 
 /* USE_STDIO_PTR:
  *	This symbol is defined if the _ptr and _cnt fields (or similar)
@@ -2329,8 +2330,10 @@
  *	Can we handle GCC builtin for telling that certain values are more
  *	likely
  */
-#define HAS_BUILTIN_EXPECT	/**/
-#define HAS_BUILTIN_CHOOSE_EXPR	/**/
+/* HAS_BUILTIN_EXPECT: kencc swallows __builtin_expect() returning 0,
+ * which corrupts LIKELY/UNLIKELY expressions. Disable it. */
+/*#define HAS_BUILTIN_EXPECT*/
+/*#define HAS_BUILTIN_CHOOSE_EXPR*/
 
 /* HAS_BUILTIN_ADD_OVERFLOW:
  *	This symbol, if defined, indicates that the compiler supports
@@ -4148,8 +4151,8 @@
  *	This symbol, if defined, indicates that a variable of type NVTYPE
  *	stores 0.0 in memory as all bits zero.
  */
-#define IVTYPE		long		/**/
-#define UVTYPE		unsigned long		/**/
+#define IVTYPE		long long		/* Plan9: long is 32-bit; use long long for 64-bit IV */
+#define UVTYPE		unsigned long long	/* Plan9: long is 32-bit; use long long for 64-bit UV */
 #define I8TYPE		signed char		/**/
 #define U8TYPE		unsigned char		/**/
 #define I16TYPE		short	/**/
@@ -4157,8 +4160,8 @@
 #define I32TYPE		int	/**/
 #define U32TYPE		unsigned int	/**/
 #ifdef HAS_QUAD
-#define I64TYPE		long	/**/
-#define U64TYPE		unsigned long	/**/
+#define I64TYPE		long long	/* Plan9: long is 32-bit on amd64 */
+#define U64TYPE		unsigned long long	/* Plan9: long is 32-bit on amd64 */
 #endif
 #define NVTYPE		long double		/**/
 #define IVSIZE		8		/**/
@@ -4224,11 +4227,11 @@
  *	This symbol defines the format string used for printing a Perl NV
  *	using %g-ish floating point format.
  */
-#define IVdf		"ld"		/**/
-#define UVuf		"lu"		/**/
-#define UVof		"lo"		/**/
-#define UVxf		"lx"		/**/
-#define UVXf		"lX"		/**/
+#define IVdf		"lld"		/* Plan9: IV is long long */
+#define UVuf		"llu"		/* Plan9: UV is unsigned long long */
+#define UVof		"llo"		/* Plan9: UV is unsigned long long */
+#define UVxf		"llx"		/* Plan9: UV is unsigned long long */
+#define UVXf		"llX"		/* Plan9: UV is unsigned long long */
 #define NVef		"Le"		/**/
 #define NVff		"Lf"		/**/
 #define NVgf		"Lg"		/**/
