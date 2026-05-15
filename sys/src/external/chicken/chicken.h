@@ -556,7 +556,7 @@ void *alloca ();
 
 #if defined(C_LLP)
 # define C_wabs                   llabs
-# define C_long                   C_s64
+# define C_long                   long long
 # ifndef LONG_LONG_MAX
 #  define C_LONG_MAX              LLONG_MAX
 #  define C_LONG_MIN              LLONG_MIN

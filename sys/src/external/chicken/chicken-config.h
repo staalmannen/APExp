@@ -1,6 +1,5 @@
 /* GENERATED */
 #define HAVE_DIRENT_H 1
-#define HAVE_DLFCN_H 1
 #define HAVE_INTTYPES_H 1
 #define HAVE_LIMITS_H 1
 #define HAVE_LONG_LONG 1
