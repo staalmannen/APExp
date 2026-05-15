@@ -1,5 +1,6 @@
 #include "lookup.h"
 #include "stdio_impl.h"
+#include <sys/socket.h>
 #include <ctype.h>
 #include <errno.h>
 #include <string.h>
