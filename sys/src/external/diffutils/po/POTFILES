@@ -1,0 +1,21 @@
+     ../lib/argmatch.c \
+     ../lib/argmatch.h \
+     ../lib/c-file-type.c \
+     ../lib/c-stack.c \
+     ../lib/diagnose.c \
+     ../lib/error.c \
+     ../lib/getopt.c \
+     ../lib/openat-die.c \
+     ../lib/quotearg.c \
+     ../lib/regcomp.c \
+     ../lib/version-etc.c \
+     ../lib/xalloc-die.c \
+     ../lib/xfreopen.c \
+     ../lib/xstdopen.c \
+     ../src/analyze.c \
+     ../src/cmp.c \
+     ../src/diff.c \
+     ../src/diff3.c \
+     ../src/dir.c \
+     ../src/sdiff.c \
+     ../src/util.c
