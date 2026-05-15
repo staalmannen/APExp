@@ -1215,7 +1215,7 @@
  *	to get any typedef'ed information.
  *	We will pick a type such that sizeof(SSize_t) == sizeof(Size_t).
  */
-#define SSize_t ssize_t	/* signed count of bytes */
+#define SSize_t long long	/* Plan9: ssize_t=long(32-bit); use long long for 64-bit signed size */
 
 /* EBCDIC:
  *	This symbol, if defined, indicates that this system uses
@@ -5383,7 +5383,7 @@
  *	unsigned long, int, etc.  It may be necessary to include
  *	<sys/types.h> to get any typedef'ed information.
  */
-#define Size_t size_t	 /* length parameter for string functions */
+#define Size_t unsigned long long	/* Plan9: size_t alias; use concrete 64-bit type */
 
 /* Uid_t_f:
  *	This symbol defines the format string used for printing a Uid_t.

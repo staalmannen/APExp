@@ -1647,13 +1647,16 @@ xdecl(int c, Type *t, Sym *s)
 	if(s->type != T)
 		if(s->class != c || !sametype(t, s->type) || t->etype == TENUM) {
 			/*
-			 * Allow static-to-static redeclaration (forward decl + definition).
-			 * kencc mismatches typedef chains vs resolved types for static
-			 * inline functions (e.g. proto.h forward decl vs inline.h definition).
-			 * Demote to warning so compilation continues with the new type.
+			 * Demote function redeclaration type mismatches to warnings.
+			 * kencc's sametype() mismatches typedef chains vs direct types,
+			 * so proto.h forward decls and .c definitions of the same function
+			 * (both static and global) fail the check even when semantically
+			 * identical. The definition's type wins via tmerge() below.
 			 */
-			if(s->class == CSTATIC && c == CSTATIC && t->etype == TFUNC)
-				warn(Z, "static redeclaration of: %s", s->name);
+			if(t->etype == TFUNC &&
+			   ((s->class == CSTATIC && c == CSTATIC) ||
+			    (s->class == CGLOBL  && c == CGLOBL)))
+				warn(Z, "redeclaration of: %s", s->name);
 			else {
 				diag(Z, "external redeclaration of: %s", s->name);
 				Bprint(&diagbuf, "	%s %T %L\n", cnames[c], t, nearln);
