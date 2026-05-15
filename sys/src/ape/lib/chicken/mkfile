@@ -5,6 +5,7 @@ CHCSRC=../../../external/chicken
 
 POSIXFILE=
 OFILES=\
+	runtime.$O\
 	library.$O\
 	eval.$O\
 	read-syntax.$O\
@@ -38,12 +39,11 @@ LD=pcc
 CFLAGS= -c -I$CHCSRC -DHAVE_CHICKEN_CONFIG_H -DHAVE_ALLOCA_H
 
 %.$O: $CHCSRC/%.c
-    $CC $CFLAGS $CHCSRC/$stem.c
+	$CC $CFLAGS $CHCSRC/$stem.c
 
 
 clean:V:
-    rm -f *.[$OS]
+	rm -f *.[$OS]
 
 nuke:V:
-    rm -f $LIB
-
+	rm -f $LIB
