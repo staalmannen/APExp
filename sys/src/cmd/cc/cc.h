@@ -127,6 +127,7 @@ struct	Type
 	char	garb;
 	char	vla;		/* 1 = variable-length array */
 	Node*	vlasizevar;	/* hidden auto holding runtime byte count (VLA only) */
+	short	alignas_req;	/* _Alignas() override; 0 = use type's natural alignment */
 };
 
 #define	T	((Type*)0)
@@ -483,6 +484,7 @@ EXTERN	Node*	initlist;
 EXTERN	Term	term[NTERM];
 EXTERN	int	nterm;
 EXTERN	int	packflg;
+EXTERN	int	alignasval;	/* pending _Alignas() requirement; 0 = none */
 EXTERN	int	fproundflg;
 EXTERN	int	profileflg;
 EXTERN	int	ncontin;

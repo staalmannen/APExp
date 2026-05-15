@@ -72,6 +72,7 @@ static Type *auto_deduct_type(Node*, Node*);
 %token	LTYPEOF LTYPEOF_UNQUAL
 %token	LNULLPTR LSTATICASSERT
 %token	LALIGNOF
+%token	LALIGNAS
 %token	LGENERIC
 %%
 prog:
@@ -1493,6 +1494,29 @@ gname:	/* garbage words */
 |	LVOLATILE { $$ = BVOLATILE; }
 |	LRESTRICT { $$ = 0; }
 |	LNORET { $$ = BNORET; }
+|	LALIGNAS '(' cexpr ')'
+	{
+		/* _Alignas(constant-expression) */
+		complex($3);
+		if($3->op != OCONST)
+			diag($3, "_Alignas: not a constant expression");
+		else {
+			long a = $3->vconst;
+			if(a <= 0 || (a & (a-1)) != 0)
+				diag($3, "_Alignas: argument must be a positive power of 2");
+			else
+				alignasval = a;
+		}
+		$$ = 0;
+	}
+|	LALIGNAS '(' tlist abdecor ')'
+	{
+		/* _Alignas(type-name): same alignment as the given type */
+		dodecl(NODECL, CXXX, $3, $4);
+		/* align(1, T, Ael1) is the Alignof formula from com.c OALIGNOF */
+		alignasval = align(1, lastdcl, Ael1);
+		$$ = 0;
+	}
 
 name:
 	LNAME
