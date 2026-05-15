@@ -1,4 +1,5 @@
 #include <netdb.h>
+#include <stdint.h>
 
 struct netent *getnetbyaddr(uint32_t net, int type)
 {
