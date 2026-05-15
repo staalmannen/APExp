@@ -35,6 +35,10 @@ typedef unsigned short in_port_t;
 #define	SOCK_RDM	4		/* reliably-delivered message */
 #define	SOCK_SEQPACKET	5		/* sequenced packet stream */
 
+/* Linux extensions — no-ops on Plan9 (no exec-inherited fd table) */
+#define	SOCK_CLOEXEC	0
+#define	SOCK_NONBLOCK	0
+
 /*
  * Option flags per-socket.
  */
