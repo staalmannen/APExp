@@ -12,6 +12,7 @@ OFILES=\
 	dn_skipname.$O\
 	dns_parse.$O\
 	ent.$O\
+	ether.$O\
 	gai_strerror.$O\
 	getaddrinfo.$O\
 	gethostbyaddr.$O\
