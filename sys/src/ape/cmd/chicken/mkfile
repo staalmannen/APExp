@@ -9,7 +9,13 @@ TARG=chicken
 
 BIN=$APEXPROOT/$objtype/bin/ape
 
-OFILES=\
+TARG= 	chicken\
+		chicken-do\
+		chicken-install\
+		chicken-uninstall\
+		chicken-status
+
+CHOFILES=\
 	chicken.$O\
 	batch-driver.$O\
 	core.$O\
@@ -22,7 +28,7 @@ OFILES=\
 	c-backend.$O\
 	user-pass.$O
 
-<$APEXPROOT/sys/src/cmd/mkone
+<$APEXPROOT/sys/src/cmd/mkmany
 
 CC=pcc
 LD=pcc
@@ -31,5 +37,23 @@ CFLAGS= -c -D_POSIX_SOURCE -I$CHCSRC -DHAVE_CHICKEN_CONFIG_H -DHAVE_ALLOCA_H -DC
 
 %.$O: $CHCSRC/%.c
     $CC $CFLAGS $CHCSRC/$stem.c
+
+$O.chicken: $CHOFILES
+
+$O.chicken-do: chicken-do.$O
+
+$O.chicken-install: chicken-install.$O
+
+$O.chicken-uninstall: chicken-uninstall.$O
+
+$O.chicken-status: chicken-status.$O
+
+
+
+
+
+
+
+
 
 
