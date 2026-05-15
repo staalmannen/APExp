@@ -43,9 +43,9 @@ struct resolvconf {
 #define MAXADDRS 48
 #define MAXSERVS 2
 
-hidden int __lookup_serv(struct service buf[static MAXSERVS], const char *name, int proto, int socktype, int flags);
-hidden int __lookup_name(struct address buf[static MAXADDRS], char canon[static 256], const char *name, int family, int flags);
-hidden int __lookup_ipliteral(struct address buf[static 1], const char *name, int family);
+hidden int __lookup_serv(struct service buf[MAXSERVS], const char *name, int proto, int socktype, int flags);
+hidden int __lookup_name(struct address buf[MAXADDRS], char canon[256], const char *name, int family, int flags);
+hidden int __lookup_ipliteral(struct address buf[1], const char *name, int family);
 
 hidden int __get_resolv_conf(struct resolvconf *, char *, size_t);
 hidden int __res_msend_rc(int, const unsigned char *const *, const int *, unsigned char *const *, int *, int, const struct resolvconf *);

@@ -9,7 +9,7 @@
 #include "lookup.h"
 #include "stdio_impl.h"
 
-int __lookup_serv(struct service buf[static MAXSERVS], const char *name, int proto, int socktype, int flags)
+int __lookup_serv(struct service buf[MAXSERVS], const char *name, int proto, int socktype, int flags)
 {
 	char line[128];
 	int cnt = 0;
