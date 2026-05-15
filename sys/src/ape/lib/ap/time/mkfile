@@ -7,6 +7,7 @@ OFILES=\
 	clock.$O\
 	clock_gettime.$O\
 	clock_nanosleep.$O\
+	itimer.$O\
 	timer.$O\
 	ctime.$O\
 	difftime.$O\
