@@ -1646,9 +1646,19 @@ xdecl(int c, Type *t, Sym *s)
 		}
 	if(s->type != T)
 		if(s->class != c || !sametype(t, s->type) || t->etype == TENUM) {
-			diag(Z, "external redeclaration of: %s", s->name);
-			Bprint(&diagbuf, "	%s %T %L\n", cnames[c], t, nearln);
-			Bprint(&diagbuf, "	%s %T %L\n", cnames[s->class], s->type, s->varlineno);
+			/*
+			 * Allow static-to-static redeclaration (forward decl + definition).
+			 * kencc mismatches typedef chains vs resolved types for static
+			 * inline functions (e.g. proto.h forward decl vs inline.h definition).
+			 * Demote to warning so compilation continues with the new type.
+			 */
+			if(s->class == CSTATIC && c == CSTATIC && t->etype == TFUNC)
+				warn(Z, "static redeclaration of: %s", s->name);
+			else {
+				diag(Z, "external redeclaration of: %s", s->name);
+				Bprint(&diagbuf, "	%s %T %L\n", cnames[c], t, nearln);
+				Bprint(&diagbuf, "	%s %T %L\n", cnames[s->class], s->type, s->varlineno);
+			}
 		}
 	tmerge(t, s);
 	s->type = t;
