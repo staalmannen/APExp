@@ -1586,6 +1586,10 @@ struct
 	"__alignof__",		LALIGNOF,	0,
 	"__alignof",		LALIGNOF,	0,
 
+	/* _Alignas / alignas: C11/C23 alignment specifier.  Layout effect. */
+	"_Alignas",		LALIGNAS,	0,
+	"alignas",		LALIGNAS,	0,
+
 	/*
 	 * GNU visibility / linkage hints.
 	 * These appear as function/variable attributes.  When used as

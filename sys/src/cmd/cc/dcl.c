@@ -837,6 +837,8 @@ sualign(Type *t)
 					else
 						diag(Z, "incomplete structure element");
 				w = align(w, l, Ael1);
+				if(l->alignas_req > 0)
+					w = round(w, l->alignas_req);
 				l->offset = w;
 				w = align(w, l, Ael2);
 			}
@@ -1554,6 +1556,12 @@ adecl(int c, Type *t, Sym *s)
 	switch(c) {
 	case CAUTO:
 		autoffset = align(autoffset, t, Aaut3);
+		/* _Alignas: round the end-of-allocation up so start is aligned.
+		 * Variable starts at base-autoffset; base%req==0 → autoffset%req==0. */
+		if(alignasval > 0) {
+			autoffset = round(autoffset, alignasval);
+			alignasval = 0;
+		}
 		stkoff = maxround(stkoff, autoffset);
 		s->offset = -autoffset;
 		break;
@@ -1567,6 +1575,7 @@ adecl(int c, Type *t, Sym *s)
 		if(s)
 			s->offset = autoffset;
 		autoffset = align(autoffset, t, Aarg2);
+		alignasval = 0;	/* _Alignas on parameters is ignored */
 		break;
 	}
 }
@@ -1646,6 +1655,7 @@ xdecl(int c, Type *t, Sym *s)
 	s->class = c;
 	s->block = 0;
 	s->offset = o;
+	alignasval = 0;	/* _Alignas on globals not yet supported; discard */
 }
 
 void
@@ -1736,6 +1746,10 @@ edecl(int c, Type *t, Sym *s)
 	t = copytyp(t1);
 	t->sym = s;
 	t->down = T;
+	if(alignasval > 0) {
+		t->alignas_req = alignasval;
+		alignasval = 0;
+	}
 	if(lastfield) {
 		t->shift = lastbit - lastfield;
 		t->nbits = lastfield;
