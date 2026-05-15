@@ -1,0 +1,34 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+CHCSRC=../../../external/chicken
+LIB=$APEXPROOT/$objtype/lib/ape/libchicken.a
+
+TARG=chicken
+
+BIN=$APEXPROOT/$objtype/bin/ape
+
+OFILES=\
+	chicken.$O\
+	batch-driver.$O\
+	core.$O\
+	optimizer.$O\
+	lfa2.$O\
+	compiler-syntax.$O\
+	scrutinizer.$O\
+	support.$O\
+	c-platform.$O\
+	c-backend.$O\
+	user-pass.$O
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+CC=pcc
+LD=pcc
+CFLAGS= -c -D_POSIX_SOURCE -I$CHCSRC
+
+%.$O: $CHCSRC/src/%.c
+    $CC $CFLAGS $CHCSRC/src/$stem.c
+
+
