@@ -22,7 +22,7 @@ static int is_valid_hostname(const char *host)
 	return !*s;
 }
 
-static int name_from_null(struct address buf[static 2], const char *name, int family, int flags)
+static int name_from_null(struct address buf[2], const char *name, int family, int flags)
 {
 	int cnt = 0;
 	if (name) return 0;
@@ -40,12 +40,12 @@ static int name_from_null(struct address buf[static 2], const char *name, int fa
 	return cnt;
 }
 
-static int name_from_numeric(struct address buf[static 1], const char *name, int family)
+static int name_from_numeric(struct address buf[1], const char *name, int family)
 {
 	return __lookup_ipliteral(buf, name, family);
 }
 
-static int name_from_hosts(struct address buf[static MAXADDRS], char canon[static 256], const char *name, int family)
+static int name_from_hosts(struct address buf[MAXADDRS], char canon[256], const char *name, int family)
 {
 	char line[512];
 	size_t l = strlen(name);
@@ -139,7 +139,7 @@ static int dns_parse_callback(void *c, int rr, const void *data, int len, const 
 	return 0;
 }
 
-static int name_from_dns(struct address buf[static MAXADDRS], char canon[static 256], const char *name, int family, const struct resolvconf *conf)
+static int name_from_dns(struct address buf[MAXADDRS], char canon[256], const char *name, int family, const struct resolvconf *conf)
 {
 	unsigned char qbuf[2][280], abuf[2][ABUF_SIZE];
 	const unsigned char *qp[2] = { qbuf[0], qbuf[1] };
@@ -186,7 +186,7 @@ static int name_from_dns(struct address buf[static MAXADDRS], char canon[static 
 	return EAI_NODATA;
 }
 
-static int name_from_dns_search(struct address buf[static MAXADDRS], char canon[static 256], const char *name, int family)
+static int name_from_dns_search(struct address buf[MAXADDRS], char canon[256], const char *name, int family)
 {
 	char search[256];
 	struct resolvconf conf;
@@ -304,7 +304,7 @@ static int addrcmp(const void *_a, const void *_b)
 	return b->sortkey - a->sortkey;
 }
 
-int __lookup_name(struct address buf[static MAXADDRS], char canon[static 256], const char *name, int family, int flags)
+int __lookup_name(struct address buf[MAXADDRS], char canon[256], const char *name, int family, int flags)
 {
 	int cnt = 0, i, j;
 
