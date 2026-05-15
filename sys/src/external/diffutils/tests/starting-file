@@ -1,0 +1,20 @@
+#!/bin/sh
+# Test diff -S.
+
+. "${srcdir=.}/init.sh"; path_prepend_ ../src
+
+mkdir d1 d2 || framework_failure_
+
+for i in a abc abC aBc aBC z; do
+ echo $i >d1/$i || framework_failure_
+done
+
+for i in a ABC ABc AbC Abc; do
+ echo x$i >d2/$i || framework_failure_
+done
+echo z >d2/z || framework_failure_
+
+LC_ALL=C diff -S z d1 d2 || fail=1
+LC_ALL=C diff -S z --ignore-file-name-case d1 d2 || fail=1
+
+Exit $fail

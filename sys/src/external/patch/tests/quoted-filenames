@@ -1,0 +1,57 @@
+# Copyright 2009-2025 Free Software Foundation, Inc.
+#
+# Copying and distribution of this file, with or without modification,
+# in any medium, are permitted without royalty provided the copyright
+# notice and this notice are preserved.
+
+# Don't recognize hunks before a filename has been specified/seen
+
+. $srcdir/test-lib.sh
+
+require cat
+require special_characters
+use_local_patch
+use_tmpdir
+
+# ==============================================================
+
+# Forbidden characters in Windows filenames:
+#   \ / : * ? " < > | TAB
+# Filenames with trailing space characters
+
+cat > d.diff <<EOF
+--- "\\t \\040"
++++ "\\t \\040"
+@@ -1 +1 @@
+-one
++two
+EOF
+
+ncheck 'echo one > "	  "'
+ncheck 'patch -s -p0 < d.diff'
+
+check 'cat "	  "' <<EOF
+two
+EOF
+
+cat > e.diff <<\EOF
+*** /dev/null	Sat Sep 14 08:47:53 2024
+--- "f\000g"	Tue Sep 17 10:21:17 2024
+***************
+*** 0 ****
+--- 1 ----
++
+EOF
+
+check 'patch -f < e.diff; echo status: $?' <<EOF
+can't find file to patch at input line 3
+Perhaps you should have used the -p or --strip option?
+The text leading up to this was:
+--------------------------
+|*** /dev/null	Sat Sep 14 08:47:53 2024
+|--- "f\000g"	Tue Sep 17 10:21:17 2024
+--------------------------
+No file to patch.  Skipping patch.
+1 out of 1 hunk ignored
+status: 1
+EOF

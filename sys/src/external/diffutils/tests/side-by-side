@@ -1,0 +1,52 @@
+#!/bin/sh
+# Test side-by-side output with non-ASCII characters.
+
+. "${srcdir=.}/init.sh"; path_prepend_ ../src
+require_utf8_locale_
+
+fail=0
+
+cat >in1 <<\EOF || framework_failure_
+a
+ab
+abc
+[一天早上，當格雷戈爾·薩姆沙從不安的夢中醒來時，
+ 他發現自己在床上變成了一隻可怕的害蟲。
+]
+EOF
+
+cat >in2 <<\EOF || framework_failure_
+ab
+abcd
+<一天早上，當格雷戈爾·薩姆沙從不安的夢中醒來時，
+ 他發現自己在床上變成了一隻可怕的害蟲。
+>
+EOF
+
+tr '_@' ' \t' >exp <<'EOF' || framework_failure_
+a@@_____<
+ab@@@ab
+abc@@_____|@abcd
+[一天早上，當格雷戈__|@<一天早上，當格雷戈
+_他發現自己在床上變@_他發現自己在床上變
+]@@_____|@>
+EOF
+
+returns_ 1 diff -y -W 44 in1 in2 >out 2>err || fail=1
+compare exp out || fail=1
+compare /dev/null err || fail=1
+
+cat >exp <<'EOF' || framework_failure_
+a                    <
+ab                      ab
+abc                  |  abcd
+[一天早上，當格雷戈  |  <一天早上，當格雷戈
+ 他發現自己在床上變      他發現自己在床上變
+]                    |  >
+EOF
+
+returns_ 1 diff --expand-tabs -y -W 44 in1 in2 >out 2>err || fail=1
+compare exp out || fail=1
+compare /dev/null err || fail=1
+
+Exit $fail

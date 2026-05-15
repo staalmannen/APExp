@@ -33,7 +33,7 @@ _OPTIONAL_APPS=\
 	unarj\
 	unrar\
 	xz\
-#	zstd\
+	zstd\
 #	tar\
 # languages \
 	lua\
@@ -50,7 +50,7 @@ _OPTIONAL_APPS=\
 #	basic\
 # dev tools \
 	pcregrep\
-	diff\
+#	diff\
 #	patch\
 	mkmk\
 	samurai\
