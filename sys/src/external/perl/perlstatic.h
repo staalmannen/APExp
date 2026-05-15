@@ -18,7 +18,7 @@
 STATIC void
 Perl_croak_memory_wrap(void)
 {
-    Perl_croak_nocontext("%s",PL_memory_wrap);
+    Perl_croak_nocontext("%s","panic: memory wrap");
 }
 
 
