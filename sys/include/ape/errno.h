@@ -98,5 +98,7 @@ extern int *_errnoloc;
 #define ENOTRECOVERABLE 69
 #define EOWNERDEAD      70
 
+#define EBADMSG		71
+
 
 #endif /* __ERRNO */
