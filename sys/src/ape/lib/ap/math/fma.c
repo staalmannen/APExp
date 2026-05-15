@@ -151,7 +151,9 @@ double fma(double x, double y, double z)
 				/* min normal after rounding, underflow depends
 				   on arch behaviour which can be imitated by
 				   a double to float conversion */
-				float fltmin = 0x0.ffffff8p-63*FLT_MIN * r;
+				volatile double vmin = FLT_MIN;
+				volatile double vr = r;
+				float fltmin = (float)(0x0.ffffff8p-63 * vmin * vr);
 				return DBL_MIN/FLT_MIN * fltmin;
 			}
 			/* one bit is lost when scaled, add another top bit to
