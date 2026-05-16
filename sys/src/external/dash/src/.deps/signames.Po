@@ -1,0 +1,9 @@
+signames.o: signames.c /usr/include/stdc-predef.h ../config.h \
+  /usr/include/signal.h /usr/include/features.h \
+  /usr/include/bits/alltypes.h /usr/include/bits/signal.h
+/usr/include/stdc-predef.h:
+../config.h:
+/usr/include/signal.h:
+/usr/include/features.h:
+/usr/include/bits/alltypes.h:
+/usr/include/bits/signal.h:

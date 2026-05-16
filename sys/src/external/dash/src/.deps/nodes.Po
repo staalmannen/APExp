@@ -1,0 +1,52 @@
+nodes.o: nodes.c /usr/include/stdc-predef.h ../config.h \
+  /usr/include/fortify/stdlib.h /usr/include/stdlib.h \
+  /usr/include/features.h /usr/include/bits/alltypes.h \
+  /usr/include/alloca.h /usr/include/limits.h /usr/include/bits/limits.h \
+  /usr/include/fortify/fortify-headers.h shell.h \
+  /usr/include/sys/param.h /usr/include/sys/resource.h \
+  /usr/include/sys/time.h /usr/include/fortify/sys/select.h \
+  /usr/include/sys/select.h \
+  /usr/include/fortify/sys/../fortify-headers.h \
+  /usr/include/bits/resource.h /usr/include/endian.h nodes.h memalloc.h \
+  /usr/include/stddef.h machdep.h mystring.h /usr/include/inttypes.h \
+  /usr/include/stdint.h /usr/include/bits/stdint.h \
+  /usr/include/fortify/string.h /usr/include/string.h \
+  /usr/include/fortify/strings.h /usr/include/strings.h system.h \
+  /usr/include/signal.h /usr/include/bits/signal.h \
+  /usr/include/stdbool.h /usr/include/sys/types.h
+/usr/include/stdc-predef.h:
+../config.h:
+/usr/include/fortify/stdlib.h:
+/usr/include/stdlib.h:
+/usr/include/features.h:
+/usr/include/bits/alltypes.h:
+/usr/include/alloca.h:
+/usr/include/limits.h:
+/usr/include/bits/limits.h:
+/usr/include/fortify/fortify-headers.h:
+shell.h:
+/usr/include/sys/param.h:
+/usr/include/sys/resource.h:
+/usr/include/sys/time.h:
+/usr/include/fortify/sys/select.h:
+/usr/include/sys/select.h:
+/usr/include/fortify/sys/../fortify-headers.h:
+/usr/include/bits/resource.h:
+/usr/include/endian.h:
+nodes.h:
+memalloc.h:
+/usr/include/stddef.h:
+machdep.h:
+mystring.h:
+/usr/include/inttypes.h:
+/usr/include/stdint.h:
+/usr/include/bits/stdint.h:
+/usr/include/fortify/string.h:
+/usr/include/string.h:
+/usr/include/fortify/strings.h:
+/usr/include/strings.h:
+system.h:
+/usr/include/signal.h:
+/usr/include/bits/signal.h:
+/usr/include/stdbool.h:
+/usr/include/sys/types.h:
