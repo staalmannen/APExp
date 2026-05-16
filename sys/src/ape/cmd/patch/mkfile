@@ -5,20 +5,8 @@ PTCHSRC=$APEXPROOT/sys/src/external/patch
 TARG=patch
 
 OFILES=\
-	addext.$O\
-	argmatch.$O\
-	backupfile.$O\
-	basename.$O\
-	getopt.$O\
-	getopt1.$O\
-	inp.$O\
-	maketime.$O\
-	partime.$O\
-	patch.$O\
-	pch.$O\
-	quotearg.$O\
-	util.$O\
-	version.$O\
+	inp.$O patch.$O pch.$O \
+	safe.$O util.$O version.$O merge.$O
 
 BIN=$APEXPROOT/$objtype/bin/ape
 
