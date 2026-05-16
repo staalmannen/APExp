@@ -10,7 +10,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY, to the extent permitted by law; without
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-# PARTICULAR PURPOSE.
+# PARTICULAR PURPOSE. -x
 
 
 
@@ -219,7 +219,7 @@ AWK = gawk
 CC = cc
 CCDEPMODE = depmode=none
 CC_FOR_BUILD = cc
-CFLAGS = -g
+CFLAGS = 
 CPPFLAGS = 
 CSCOPE = cscope
 CTAGS = ctags
@@ -301,13 +301,13 @@ top_build_prefix = ../
 top_builddir = ..
 top_srcdir = ..
 AM_YFLAGS = -d
-COMMON_CFLAGS = -Wall
+COMMON_CFLAGS = 
 COMMON_CPPFLAGS = \
 	-DBSD=1 -DSHELL
 
 AM_CFLAGS = $(COMMON_CFLAGS)
-AM_CPPFLAGS = -include $(top_builddir)/config.h $(COMMON_CPPFLAGS)
-AM_CFLAGS_FOR_BUILD = -g -O2 $(COMMON_CFLAGS) 
+AM_CPPFLAGS = 
+AM_CFLAGS_FOR_BUILD = 
 AM_CPPFLAGS_FOR_BUILD = $(COMMON_CPPFLAGS)
 COMPILE_FOR_BUILD = \
 	$(CC_FOR_BUILD) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS_FOR_BUILD) \
@@ -808,7 +808,7 @@ token.h token_vars.h: mktokens
 	$(AM_V_GEN)$(SHELL) $^
 
 builtins.def: builtins.def.in $(top_builddir)/config.h
-	$(AM_V_CC)$(COMPILE) -E -x c -o $@ $<
+	$(AM_V_CC)$(COMPILE) -E -c -o $@ $<
 
 builtins.c builtins.h: mkbuiltins builtins.def
 	$(AM_V_GEN)$(SHELL) $^

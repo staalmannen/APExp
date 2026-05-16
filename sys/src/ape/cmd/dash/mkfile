@@ -19,7 +19,8 @@ OFILES=\
     alias.$O\
     arith_yacc.$O\
 	arith_yylex.$O\
-	cd.$O\ error.$O\
+	cd.$O\
+	error.$O\
 	eval.$O\
     exec.$O\
     expand.$O\
