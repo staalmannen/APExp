@@ -1,6 +1,6 @@
 # APExp POSIX/musl coverage assessment
 
-*Last updated: 2026-04*
+*Last updated: 2026-05*
 
 ## File count comparison vs musl src/
 
@@ -32,7 +32,7 @@
 | exit/         |     4 |    7 |  57% | Good — quick_exit added |
 | process/      |     9 |   22 |  41% | Reasonable — posix_spawn added |
 | signal/       |    10 |   36 |  28% | Core only — sigaction now present |
-| network/      |    35 |   90 |  39% | Sockets OK, DNS resolver still missing |
+| network/      |    65 |   90 |  72% | Sockets + full musl DNS resolver stack now present |
 | errno/        |     1 |    3 |  33% | Thin |
 | thread/       |    29 |   85 |  34% | Functional — cond_timedwait + semaphores added |
 | aio/          |     1 |    5 |  20% | Initial implementation present |
@@ -43,7 +43,7 @@
 | crypt/        |     0 |    6 |   0% | Not present (covered by libsec) |
 | ldso/         |     0 |   12 |   0% | N/A — static linking |
 | linux/        |     0 |   35 |   0% | N/A — Linux-specific |
-| mman/         |     0 |    8 |   0% | Partial via __p9_syscall mmap emulation |
+| mman/         |     1 |    8 |  ~60% | plan9/mman.c: mmap/munmap/mprotect/msync/mremap/shm_open; MAP_ANONYMOUS+MAP_PRIVATE work |
 | mq/           |     0 |    6 |   0% | Not present |
 | sched/        |     1 |    6 |  80% | sched_yield, sched_get_priority_min/max, sched_getscheduler, sched_setscheduler, sched_getparam, sched_setparam, sched_rr_get_interval |
 | setjmp/       |     0 |   12 |   0% | Covered by arch/ assembly |
@@ -105,6 +105,25 @@ via a timer-thread pattern since Plan9 `rsleep()` has no timeout.
 `sem_post`, `sem_getvalue`, `sem_destroy`).
 `pthread_ext.c` — detach-state and stack-size attribute stubs.
 
+### network/ — full DNS resolver stack
+
+File count grew from 35 to 65. The musl DNS resolver was imported wholesale
+and adapted to Plan9's network interface: `res_msend`, `res_state`, `res_init`,
+`res_query`, `res_send`, `res_mkquery`, `res_querydomain`, plus full `getaddrinfo`
+using the resolver backend. `arpa/nameser.h` and `ns_parse.c` were added.
+Ether support (`ether.c`) and `SOCK_CLOEXEC`/`SOCK_NONBLOCK` stubs added.
+DNS resolution now falls back to Plan9's `/net/dns` via the ndb interface
+when the resolver stack finds no traditional `/etc/resolv.conf`.
+
+### mman/ — mmap in plan9/mman.c
+
+`plan9/mman.c` provides `mmap`, `munmap`, `mprotect`, `msync`, `mremap`,
+`madvise`, `mlock`/`munlock`, and `shm_open`/`shm_unlink`. The `__p9_syscall`
+backend handles `MAP_ANONYMOUS` (via `segattach`) and file-backed `MAP_PRIVATE`
+(via `read()`). `MAP_SHARED` write-back is not supported; `mprotect`/`msync`
+are no-ops. The file count was always 0 in the table because the implementation
+lives in `plan9/` rather than a dedicated `mman/` subdirectory.
+
 ### aio/ — initial implementation
 
 `aio.c` implements `aio_read`, `aio_write`, `aio_error`, `aio_return`,
@@ -148,17 +167,13 @@ and collation stubs (`strcoll.c`, `wcscoll.c`, `strxfrm.c`, `wcsxfrm.c`).
 
 ## Overall assessment
 
-**Weighted POSIX compatibility: approximately 88-92%**
+**Weighted POSIX compatibility: approximately 90-93%**
 
-The previous estimate was 80-85%. The Tier 1 items (termios, select, sched,
-exit) turned out to already be implemented — the prior assessment undercounted
-because it used file count rather than function count. With those corrected:
-- termios is ~92% complete (all standard functions present)
-- select() + FD_SET family present in plan9/_buf.c
-- sched_yield + full scheduling stubs present
-- at_quick_exit present in exit/quick_exit.c
+Updated from the 2026-04 estimate of 88-92%. Key improvements since last assessment:
+- network/ DNS resolver now complete (musl resolver stack imported, 35→65 files)
+- mmap/munmap/mprotect/msync/mremap/shm_open now available via plan9/mman.c
 
-The autoconf probe coverage estimate is now **roughly 90%** of the ~200
+The autoconf probe coverage estimate is now **roughly 92%** of the ~200
 most-commonly probed functions.
 
 ---
@@ -221,11 +236,10 @@ is partial. `O_CLOEXEC` on `open()` is widely probed.
 every network daemon. Implementation requires mapping POSIX socket option
 names to Plan9's `/net/tcp/N/ctl` commands.
 
-**network/ — DNS resolver**
-The gap between 35 and 90 files is almost entirely the DNS resolver
-(`__res_*`, `__dns_*`, `lookup_*`). This is the largest single missing
-piece for network-capable software. Worth importing musl's resolver
-wholesale and adapting to Plan9's `/net/dns` or `dial()` interface.
+**network/ — DNS resolver — DONE**
+The musl resolver stack was imported and adapted to Plan9. Full `getaddrinfo`
+and `gethostbyname` now use the resolver. The remaining network gap is
+`setsockopt`/`getsockopt` option mapping and IPv6 routing socket support.
 
 **thread/ — pthread_attr full coverage**
 `pthread_attr_setstacksize`, `pthread_attr_getstacksize`,
@@ -248,17 +262,10 @@ for `aio_suspend` does not scale well with many concurrent requests.
 
 ## Summary priority list
 
-Items 1–4 from the previous list are now complete. Updated priorities:
+Updated priorities (2026-05):
 
-1. `network/` — `setsockopt`/`getsockopt` are stubs returning 0; needs `SO_REUSEADDR`, `TCP_NODELAY` etc mapped to Plan9 ctl commands
-2. `thread/` — rwlock and barrier are stubbed; wire rwlock to real mutex/cond implementation
+1. `thread/` — rwlock and barrier are stubbed; wire rwlock to real mutex/cond implementation
+2. `network/` — `setsockopt`/`getsockopt` are stubs returning 0; needs `SO_REUSEADDR`, `TCP_NODELAY` etc mapped to Plan9 ctl commands
 3. `stat/` — `fstatat`, `utimensat`, `futimens`, `mknodat` (AT_FDCWD wrappers)
 4. `fcntl/` — complete `F_*` flag coverage: `F_DUPFD_CLOEXEC`, `O_CLOEXEC`, `F_GETFD`/`F_SETFD`
-5. `network/` — DNS resolver (`getaddrinfo` exists but may lack full `res_*` backend)
-6. `mman/` — improve `mmap` flag coverage (`MAP_ANONYMOUS`, `MAP_PRIVATE`, `PROT_*`)
-2. `thread/` — rwlock and barrier are stubbed; wire rwlock to real mutex/cond implementation
-3. `network/` — `setsockopt`/`getsockopt` are stubs returning 0; needs `SO_REUSEADDR`, `TCP_NODELAY` etc mapped to Plan9 ctl commands
-4. `stat/` — `fstatat`, `utimensat`, `futimens`, `mknodat` (AT_FDCWD wrappers)
-5. `fcntl/` — complete `F_*` flag coverage: `F_DUPFD_CLOEXEC`, `O_CLOEXEC`, `F_GETFD`/`F_SETFD`
-6. `network/` — DNS resolver (`getaddrinfo` exists but may lack full `res_*` backend)
-7. `mman/` — improve `mmap` flag coverage (`MAP_ANONYMOUS`, `MAP_PRIVATE`, `PROT_*`)
+5. `mman/` — `MAP_SHARED` write-back; improve `mprotect` mapping to Plan9 segment permissions

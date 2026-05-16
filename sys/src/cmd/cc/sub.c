@@ -573,7 +573,7 @@ typeext(Type *st, Node *l)
 	lt = l->type;
 	if(lt == T)
 		return;
-	if(st->etype == TIND && vconst(l) == 0) {
+	if(st->etype == TIND && zpconst(l)) {
 		l->type = st;
 		l->vconst = 0;
 		return;
