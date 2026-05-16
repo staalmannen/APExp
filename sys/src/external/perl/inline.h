@@ -185,7 +185,7 @@ initialized.
 PERL_STATIC_INLINE AV *
 Perl_av_new_alloc(pTHX_ SSize_t size, bool zeroflag)
 {
-    AV * const av = newAV();
+    AV *av = newAV();
     SV** ary;
     PERL_ARGS_ASSERT_AV_NEW_ALLOC;
     assert(size > 0);
