@@ -1,0 +1,5 @@
+#!/bin/sh
+echo "WARNING: 'aclocal' is missing. Touching files to skip regeneration."
+touch aclocal.m4 configure Makefile.in
+exit 0
+

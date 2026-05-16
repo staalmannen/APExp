@@ -190,12 +190,13 @@ initialized.
 PERL_STATIC_INLINE AV *
 Perl_av_new_alloc(pTHX_ SSize_t size, bool zeroflag)
 {
-    AV *av = newAV();
+    AV *av;
+// "not l-value" // = newAV();
     SV** ary;
     PERL_ARGS_ASSERT_AV_NEW_ALLOC;
     assert(size > 0);
 
-    Newx(ary, size, SV*); /* Newx performs the memwrap check */
+// "not l-value" //   Newx(ary, size, SV*); /* Newx performs the memwrap check */
     AvALLOC(av) = ary;
     AvARRAY(av) = ary;
     AvMAX(av) = size - 1;
@@ -279,7 +280,7 @@ S_strip_spaces(pTHX_ const char * orig, STRLEN * const len)
 {
     SV * tmpsv;
     char * tmps;
-    tmpsv = newSVpvn_flags(orig, *len, SVs_TEMP);
+// "not l-value" //    tmpsv = newSVpvn_flags(orig, *len, SVs_TEMP);
     tmps = SvPVX(tmpsv);
     while ((*len)--) {
         if (!isSPACE(*orig))
@@ -325,7 +326,7 @@ S_MgBYTEPOS(pTHX_ MAGIC *mg, SV *sv, const char *s, STRLEN len)
     else {
         STRLEN pos = (STRLEN)mg->mg_len;  /* kencc: no const-init */
         /* Without this check, we may read past the end of the buffer: */
-        if (pos > sv_or_pv_len_utf8(sv, s, len)) return len+1;
+// "not l-value" //        if (pos > sv_or_pv_len_utf8(sv, s, len)) return len+1;
         return sv_or_pv_pos_u2b(sv, s, pos, NULL);
     }
 }
@@ -1469,7 +1470,7 @@ Perl_is_utf8_invariant_string_loc(const U8* const s, STRLEN len, const U8 ** ep)
 #  if   BYTEORDER == 0x1234 || BYTEORDER == 0x12345678    \
      || BYTEORDER == 0x4321 || BYTEORDER == 0x87654321
 
-                *ep = x + variant_byte_number(* (const PERL_UINTMAX_T *) x);
+// "not l-value" //                *ep = x + variant_byte_number(* (const PERL_UINTMAX_T *) x);
                 assert(*ep >= s && *ep < send);
 
                 return FALSE;
@@ -1633,7 +1634,7 @@ Perl_lsbit_pos64(U64 word)
      *  complement machines, but not on 1's complement ones, and some compilers
      *  complain about negating an unsigned.)
      */
-    return single_1bit_pos64(word & (~word + 1));
+// "not l-value" //    return single_1bit_pos64(word & (~word + 1));
 
 #  endif
 
@@ -1676,7 +1677,7 @@ Perl_lsbit_pos32(U32 word)
 
 #else
 
-    return single_1bit_pos32(word & (~word + 1));
+// "not l-value" //    return single_1bit_pos32(word & (~word + 1));
 
 #endif
 
@@ -1744,7 +1745,7 @@ Perl_msbit_pos64(U64 word)
     word -= (word >> 1);
 
     /* Now we have a single bit set */
-    return single_1bit_pos64(word);
+// "not l-value" //    return single_1bit_pos64(word);
 
 #  endif
 
@@ -1789,7 +1790,7 @@ Perl_msbit_pos32(U32 word)
     word |= (word >>  8);
     word |= (word >> 16);
     word -= (word >> 1);
-    return single_1bit_pos32(word);
+// "not l-value" //    return single_1bit_pos32(word);
 
 #endif
 
@@ -2180,7 +2181,8 @@ Perl_is_utf8_string_flags(const U8 *s, STRLEN len, const U32 flags)
         const U8* x = first_variant;
 
         while (x < send) {
-            STRLEN cur_len = isUTF8_CHAR_flags(x, send, flags);
+            STRLEN cur_len;
+// "not l-value" // = isUTF8_CHAR_flags(x, send, flags);
             if (UNLIKELY(! cur_len)) {
                 return FALSE;
             }
@@ -2463,9 +2465,9 @@ Perl_isUTF8_CHAR(const U8 * const s0, const U8 * const e)
         return 0;
     }
 
-    return is_utf8_FF_helper_(s0, e,
-                              FALSE /* require full, not partial char */
-                             );
+// "not l-value" //    return is_utf8_FF_helper_(s0, e,
+//                              FALSE /* require full, not partial char */
+//                             );
 #endif
 
 }
@@ -2673,7 +2675,7 @@ Perl_utf8_distance(pTHX_ const U8 *a, const U8 *b)
 {
     PERL_ARGS_ASSERT_UTF8_DISTANCE;
 
-    return (a < b) ? -1 * (IV) utf8_length(a, b) : (IV) utf8_length(b, a);
+// "not l-value" //    return (a < b) ? -1 * (IV) utf8_length(a, b) : (IV) utf8_length(b, a);
 }
 
 /*
@@ -2786,9 +2788,9 @@ Perl_utf8_hop_forward_overshoot(const U8 * s, SSize_t off,
 
     if (off != 0) {
         if (UNLIKELY(s >= end && ! remaining)) {
-            Perl_croak_nocontext("panic: Start of forward hop (0x%p) is %zd"
-                                 " bytes beyond legal end position (0x%p)",
-                                 s, 1 + s - end, end);
+// "not l-value" //            Perl_croak_nocontext("panic: Start of forward hop (0x%p) is %zd"
+//                                 " bytes beyond legal end position (0x%p)",
+//                                 s, 1 + s - end, end);
         }
 
         if (UNLIKELY(UTF8_IS_CONTINUATION(*s))) {
@@ -2959,7 +2961,7 @@ Perl_isUTF8_CHAR_flags(const U8 * const s0, const U8 * const e, const U32 flags)
 
   check_success:
 
-    return is_utf8_char_helper_(s0, e, flags);
+// "not l-value" //    return is_utf8_char_helper_(s0, e, flags);
 
 #ifdef HAS_EXTRA_LONG_UTF8
 
@@ -2975,9 +2977,9 @@ Perl_isUTF8_CHAR_flags(const U8 * const s0, const U8 * const e, const U32 flags)
     }
 
     /* Otherwise examine the sequence not inline */
-    return is_utf8_FF_helper_(s0, e,
-                              FALSE /* require full, not partial char */
-                             );
+// "not l-value" //    return is_utf8_FF_helper_(s0, e,
+//                              FALSE /* require full, not partial char */
+//                             );
 #endif
 
 }
@@ -3045,7 +3047,7 @@ Perl_is_utf8_valid_partial_char_flags(const U8 * const s0, const U8 * const e, c
         return TRUE;
     }
 
-    return cBOOL(is_utf8_char_helper_(s0, e, flags));
+// "not l-value" //    return cBOOL(is_utf8_char_helper_(s0, e, flags));
 
 #ifdef HAS_EXTRA_LONG_UTF8
 
@@ -3062,9 +3064,9 @@ Perl_is_utf8_valid_partial_char_flags(const U8 * const s0, const U8 * const e, c
         return FALSE;
     }
 
-    return is_utf8_FF_helper_(s0, e,
-                              TRUE /* Require to be a partial character */
-                             );
+// "not l-value" //    return is_utf8_FF_helper_(s0, e,
+//                              TRUE /* Require to be a partial character */
+//                             );
 #endif
 
 }
@@ -3278,7 +3280,8 @@ Perl_utf8_to_uvchr_buf(pTHX_ const U8 *s, const U8 *send, STRLEN *retlen)
      * This API means 0 can mean a legal NUL, or the input is malformed; and
      * the caller has to know if warnings are disabled to know if it can rely on
      * 'retlen'.  Best to use utf8_to_uv() instead */
-    U32 flags = (ckWARN_d(WARN_UTF8)) ? 0 : (UTF8_ALLOW_ANY | UTF8_ALLOW_EMPTY);
+    U32 flags;
+// "not l-value" // = (ckWARN_d(WARN_UTF8)) ? 0 : (UTF8_ALLOW_ANY | UTF8_ALLOW_EMPTY);
 
     if (   LIKELY(utf8_to_uv_flags(s, send, &cp, retlen, flags))
         || flags)
@@ -3345,9 +3348,9 @@ Perl_is_safe_syscall(pTHX_ const char *pv, STRLEN len, const char *what, const c
         char *null_at;
         if (UNLIKELY((null_at = (char *)memchr(pv, 0, len-1)) != NULL)) {
                 SETERRNO(ENOENT, LIB_INVARG);
-                Perl_ck_warner(aTHX_ packWARN(WARN_SYSCALLS),
-                                   "Invalid \\0 character in %s for %s: %s\\0%s",
-                                   what, op_name, pv, null_at+1);
+// "not l-value" //                Perl_ck_warner(aTHX_ packWARN(WARN_SYSCALLS),
+//                                   "Invalid \\0 character in %s for %s: %s\\0%s",
+//                                   what, op_name, pv, null_at+1);
                 return FALSE;
         }
     }
@@ -3520,7 +3523,7 @@ Perl_cx_pushblock(pTHX_ U8 type, U8 gimme, SV** sp, I32 saveix)
 
     PERL_ARGS_ASSERT_CX_PUSHBLOCK;
 
-    CXINC;
+// "not l-value" //    CXINC;
     cx = CX_CUR();
     cx->cx_type        = type;
     cx->blk_gimme      = gimme;
@@ -3966,7 +3969,7 @@ Perl_push_stackinfo(pTHX_ I32 type, UV flags)
     })
 
     if (!next) {
-        next = new_stackinfo_flags(32, 2048/sizeof(PERL_CONTEXT) - 1, flags);
+ // "not l-value" //       next = new_stackinfo_flags(32, 2048/sizeof(PERL_CONTEXT) - 1, flags);
         next->si_prev = PL_curstackinfo;
         PL_curstackinfo->si_next = next;
     }
@@ -4005,7 +4008,7 @@ Perl_pop_stackinfo(pTHX)
         Perl_deb(aTHX_ "pop  STACKINFO %d in %s at %s:%d\n",
                      i, SAFE_FUNCTION__, __FILE__, __LINE__);})
     if (!prev) {
-        Perl_croak_popstack();
+// "not l-value" //        Perl_croak_popstack();
     }
 
     switch_argstack(prev->si_stack);
@@ -4040,7 +4043,8 @@ Perl_newPADxVOP(pTHX_ I32 type, I32 flags, PADOFFSET padix)
 
     assert(type == OP_PADSV || type == OP_PADAV || type == OP_PADHV
             || type == OP_PADCV);
-    OP *o = newOP(type, flags);
+    OP *o;
+// "not l-value" // = newOP(type, flags);
     o->op_targ = padix;
     return o;
 }
@@ -4378,7 +4382,7 @@ Perl_mortal_getenv(const char * str)
     ret = getenv(str);
 
     if (ret != NULL) {
-        ret = SvPVX( newSVpvn_flags(ret, strlen(ret) ,SVs_TEMP) );
+// "not l-value" //        ret = SvPVX( newSVpvn_flags(ret, strlen(ret) ,SVs_TEMP) );
     }
 
     GETENV_UNLOCK;
@@ -4509,7 +4513,7 @@ Perl_savepvn(pTHX_ const char *pv, Size_t len)
     char *newaddr;
     PERL_UNUSED_CONTEXT;
 
-    Newx(newaddr,len+1,char);
+// "not l-value" //    Newx(newaddr,len+1,char);
     /* Give a meaning to NULL pointer mainly for the use in sv_magic() */
     if (pv) {
         /* might not be null terminated */
@@ -4531,7 +4535,7 @@ Perl_savesvpv(pTHX_ SV *sv)
     PERL_ARGS_ASSERT_SAVESVPV;
 
     ++len;
-    Newx(newaddr,len,char);
+// "not l-value" //    Newx(newaddr,len,char);
     return (char *) CopyD(pv,newaddr,len,char);
 }
 
@@ -4543,7 +4547,7 @@ Perl_savesharedsvpv(pTHX_ SV *sv)
 
     PERL_ARGS_ASSERT_SAVESHAREDSVPV;
 
-    return savesharedpvn(pv, len);
+// "not l-value" //    return savesharedpvn(pv, len);
 }
 
 #ifndef PERL_GET_CONTEXT_DEFINED

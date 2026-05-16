@@ -124,7 +124,7 @@ libbuiltins.a$O: $BASHSRC/builtins/Makefile
 
 install:V:
 			cp $BASHSRC/doc/bash.1 $APEXPROOT/sys/man/1/bash
-			cp $BIN/bash $BIN/sh
+#			cp $BIN/bash $BIN/sh
 
 clean:V:
 			rm -f *.[$OS] [$OS].out lib*.a*

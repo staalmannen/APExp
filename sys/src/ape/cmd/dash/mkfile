@@ -1,0 +1,63 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+DASHSRC=../../../external/dash
+
+TARG=sh
+
+BIN=$APEXPROOT/$objtype/bin/ape
+
+DEPS=\
+    builtins.$O\
+    init.$O\
+    nodes.$O\
+    signames.$O\
+    syntax.$O
+
+OFILES=\
+    alias.$O\
+    arith_yacc.$O\
+	arith_yylex.$O\
+	cd.$O\ error.$O\
+	eval.$O\
+    exec.$O\
+    expand.$O\
+	histedit.$O\
+    input.$O\
+    jobs.$O\
+	mail.$O\
+	main.$O\
+	memalloc.$O\
+	miscbltin.$O\
+	mystring.$O\
+	options.$O\
+	parser.$O\
+	redir.$O\
+	show.$O\
+	trap.$O\
+	output.$O\
+    system.$O\
+    var.$O\
+# bltin\
+	printf.$O\
+	test.$O\
+	times.$O\
+# dependencies\
+    $DEPS
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+CC=pcc
+LD=pcc
+CFLAGS= -c -DBSD=1 -DSHELL -I$DASHSRC\
+    -I$DASHSRC/src -I$DASHSRC/src/bltin
+
+%.$O: $DASHSRC/src/%.c
+    $CC $CFLAGS $DASHSRC/src/$stem.c
+
+%.$O: $DASHSRC/src/bltin/%.c
+    $CC $CFLAGS $DASHSRC/src/bltin/$stem.c
+
+
+

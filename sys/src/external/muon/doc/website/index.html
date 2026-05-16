@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<!--
+SPDX-FileCopyrightText: Stone Tickle <lattis@mochiro.moe>
+SPDX-License-Identifier: GPL-3.0-only
+-->
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>muon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="muon_logo.svg" />
+    <link rel="stylesheet" href="main.css" />
+  </head>
+  <body>
+    <div>
+      <div class="logo">
+        <img src="muon_logo.svg" alt="muon logo" height=64></img>
+        <div class="logo_text">
+          <span>muon</span>
+          <small>
+            @version@-<a href="https://git.sr.ht/~lattis/muon/commit/@vcs_tag@">@vcs_tag@</a>
+            <br>
+            targeting @meson_compat@
+          </small>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p>A meson-compatible build system.</p>
+    </div>
+    <nav>
+      <div>
+        <a href="https://git.sr.ht/~lattis/muon">source</a>
+        [<a href="https://github.com/muon-build/muon">github</a>]
+      </div>
+      <div>
+        <a href="https://lists.sr.ht/~lattis/muon">mailing list</a>
+      </div>
+      <div>
+        <a href="https://todo.sr.ht/~lattis/muon">issue tracker</a>
+        [<a href="https://github.com/muon-build/muon/issues">github</a>]
+      </div>
+      <div>
+        <a href="ircs://irc.libera.chat/#muon">#muon on libera.chat</a>
+      </div>
+      <div>
+        <a href="muon_ci.html">ci</a>
+      </div>
+      <div>
+        <a href="https://play.muon.build">playground</a>
+      </div>
+      <div>
+        docs
+        <div>
+          <a href="https://docs.muon.build">Muon Docs</a>
+        </div>
+        <div>
+          <a href="https://docs.muon.build/reference">Muon Reference</a>
+        </div>
+        <div>
+          <a href="muon.1.html">muon.1</a>
+          / <a href="meson-reference.3.html">meson-reference.3</a>
+          / <a href="meson.build.5.html">meson.build.5</a>
+        </div>
+      </div>
+      <div>
+        <span>downloads</span>
+        <div id=downloads>
+          <span class="loader" id="loader"></span>
+        </div>
+      </div>
+      <div>
+        other links
+        <div>
+          <a href="https://repology.org/project/muon-meson/versions">repology</a>
+        </div>
+      </div>
+    </nav>
+
+    <script>
+      (() => {
+        const baseUri = 'https://muon.build/releases'
+        const downloadsElement = document.getElementById('downloads');
+
+        function sizeToH(b) {
+          if (b > 1024 * 1024) {
+            b /= 1024 * 1024;
+            return `${b.toFixed(2)}mb`
+          } else if (b > 1024) {
+            b /= 1024;
+            return `${b.toFixed(2)}kb`
+          } else {
+            return `${b}b`
+          }
+        }
+
+        function sortReleases(list) {
+          function verToNum(ver) {
+            return ver.substr(1).split('.').map((n) => parseInt(n)).reduce((a, b) => a * 100 + b, 0);
+          }
+
+          // Remove 'edge' from the list
+          const edgeIdx = list.findIndex((e) => e.ver === 'edge');
+          list.splice(edgeIdx, 1);
+
+          list.sort((a, b) => {
+            return verToNum(b.ver) - verToNum(a.ver) ;
+          });
+
+          list.forEach((e) => {
+            e.items.sort((a, b) => {
+              if (a.itemPath < b.itemPath) {
+                return -1;
+              } else if (a.itemPath > b.itemPath) {
+                return 1;
+              } else {
+                return 0;
+              }
+            });
+          });
+        }
+
+        function doneLoading() {
+          document.getElementById('loader').style.display = 'none';
+        }
+
+        function renderReleases(list) {
+          function versionTag(type) {
+            const e = document.createElement("div");
+            e.classList.add("version-tag");
+            e.classList.add(`version-tag-${type}`);
+            const t = document.createElement("span");
+            t.innerHTML = type;
+            e.appendChild(t);
+            return e;
+          }
+
+          sortReleases(list);
+
+          list.forEach((e, i) => {
+            const elem = document.createElement("details");
+            downloadsElement.appendChild(elem);
+
+            const summary = document.createElement("summary");
+            const content = document.createElement("span");
+            summary.appendChild(content);
+            elem.appendChild(summary);
+
+            content.classList.add("version-item");
+            const summaryTitle = document.createElement("span");
+            summaryTitle.innerHTML = e.ver;
+            content.appendChild(summaryTitle);
+            if (i == 0) {
+              content.appendChild(versionTag("dev"));
+            } else if (i == 1) {
+              content.appendChild(versionTag("latest"));
+            }
+
+            const ul = document.createElement("ul");
+            elem.appendChild(ul);
+
+            e.items.forEach((item) => {
+              const li = document.createElement("li");
+              ul.appendChild(li);
+
+              const a = document.createElement("a");
+
+              a.innerHTML = item.itemPath.substr(e.ver.length + 1);
+
+              a.href = `${baseUri}/${item.itemPath}`;
+              li.appendChild(a);
+
+              const info = document.createElement("span");
+              info.innerHTML = ` - ${sizeToH(item.item.size)}`;
+              li.appendChild(info);
+            });
+          });
+        }
+
+        function fetchJson(uri) {
+          return fetch(uri).then((response) => {
+            if (!response.ok) {
+              throw new Error("Failed with HTTP code " + response.status);
+            }
+            return response.json();
+          })
+        }
+
+        function fetchAndAddItems(path) {
+          return fetchJson(`${baseUri}/${path}`).then((dir) => {
+            return Promise.all(dir.map((item) => {
+              const itemPath =  `${path}/${item.name}`;
+              if (item['type'] === 'directory') {
+                return fetchAndAddItems(itemPath);
+              } else if (item['type'] === 'file') {
+                return new Promise((resolve, reject) => {
+                  resolve({item: item, itemPath: itemPath});
+                });
+              }
+            }));
+          });
+        }
+
+        function flattenChildren(children, path) {
+          return Object.keys(children).flatMap((entry) => {
+            const itemPath =  `${path}/${entry}`;
+            if (children[entry].children === undefined) {
+              return {itemPath: itemPath, item: {size: children[entry].size}};
+            } else {
+              return flattenChildren(children[entry].children, itemPath);
+            }
+          });
+        }
+
+        fetchJson(baseUri).then((result) => {
+          doneLoading();
+          renderReleases(Object.keys(result).map((ver) => ({
+            ver: ver,
+            items: flattenChildren(result[ver].children, ver)
+          })));
+        }).catch(err => {
+          doneLoading();
+          const p = document.createElement("p");
+          p.innerHTML = `Error fetching releases: ${err}`;
+          downloadsElement.appendChild(p);
+        });
+      })()
+    </script>
+  </body>
+</html>

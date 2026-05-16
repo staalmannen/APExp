@@ -1,0 +1,26 @@
+#!/bin/sh
+# Test ignoring case
+
+. "${srcdir=.}/init.sh"; path_prepend_ ../src
+
+fail=0
+
+printf 'Funky Stuff\n' >a
+printf 'fUNKy stuFf\n' >b
+
+diff -i a b >out || fail=1
+compare /dev/null out || fail=1
+
+require_utf8_locale_
+
+echo 'AĀȀΆΑАӐḀἈＡ𐐀-Δ' >a
+echo 'aāȁάαаӑḁἀａ𐐨-δ' >b
+
+diff -i a b >out || fail=1
+compare /dev/null out || fail=1
+
+mkdir d || framework_failure_
+touch f d/F || framework_failure_
+diff --ignore-file-name-case f d || fail=1
+
+Exit $fail

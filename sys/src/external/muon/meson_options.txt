@@ -1,0 +1,99 @@
+# SPDX-FileCopyrightText: Stone Tickle <lattis@mochiro.moe>
+# SPDX-License-Identifier: GPL-3.0-only
+
+################################################################################
+# optional runtime dependencies
+################################################################################
+
+option(
+    'libcurl',
+    type: 'feature',
+    value: 'auto',
+    description: 'required for fetching wraps',
+)
+
+option(
+    'libarchive',
+    type: 'feature',
+    value: 'auto',
+    description: 'required for extracting wrap archives',
+)
+
+option(
+    'libpkgconf',
+    type: 'feature',
+    value: 'auto',
+    description: 'enable libpkgconf backend for pkg-config dependency discovery',
+)
+
+option(
+    'samurai',
+    type: 'feature',
+    value: 'enabled',
+    description: 'embed samurai into the muon executable',
+)
+
+option(
+    'tracy',
+    type: 'feature',
+    value: 'auto',
+    description: 'enable tracy for profiling',
+)
+
+option(
+    'ui',
+    type: 'feature',
+    value: 'disabled',
+    description: 'enable experimental imgui based ui',
+)
+
+option(
+    'readline',
+    type: 'combo',
+    choices: ['builtin', 'bestline'],
+    value: 'builtin',
+    description: 'select readline implementation',
+)
+
+################################################################################
+# build settings
+################################################################################
+
+option(
+    'static',
+    type: 'boolean',
+    value: false,
+    description: 'build a static muon executable',
+)
+
+################################################################################
+# docs and tests
+################################################################################
+
+option(
+    'man-pages',
+    type: 'feature',
+    value: 'auto',
+    description: 'build man pages',
+)
+
+option(
+    'meson-docs',
+    type: 'feature',
+    value: 'auto',
+    description: 'pull in meson documentation, used for lsp, website, and meson-reference.3',
+)
+
+option(
+    'meson-tests',
+    type: 'feature',
+    value: 'auto',
+    description: 'pull in meson project tests',
+)
+
+option(
+    'website',
+    type: 'feature',
+    value: 'auto',
+    description: 'build website',
+)

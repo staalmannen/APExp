@@ -1,0 +1,50 @@
+</$objtype/mkfile
+APEXPROOT=../../../../..
+LIB=$APEXPROOT/$objtype/lib/ape/libchicken.a
+CHCSRC=../../../external/chicken
+
+POSIXFILE=
+OFILES=\
+	runtime.$O\
+	library.$O\
+	eval.$O\
+	read-syntax.$O\
+	repl.$O\
+	data-structures.$O\
+	pathname.$O\
+	port.$O\
+	file.$O\
+	extras.$O\
+	lolevel.$O\
+	tcp.$O\
+	srfi-4.$O\
+	continuation.$O\
+	$POSIXFILE\
+	internal.$O\
+	irregex.$O\
+	scheduler.$O\
+	debugger-client.$O\
+	profiler.$O\
+	stub.$O\
+	expand.$O\
+	modules.$O\
+	chicken-syntax.$O\
+	chicken-ffi-syntax.$O\
+	build-version.$O
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CC=pcc
+LD=pcc
+CFLAGS= -c -I$CHCSRC -DHAVE_CHICKEN_CONFIG_H -DHAVE_ALLOCA_H -DC_BUILDING_LIBCHICKEN\
+	-UPIC -DC_ENABLE_PTABLES -DC_LLP
+
+%.$O: $CHCSRC/%.c
+	$CC $CFLAGS $CHCSRC/$stem.c
+
+
+clean:V:
+	rm -f *.[$OS]
+
+nuke:V:
+	rm -f $LIB

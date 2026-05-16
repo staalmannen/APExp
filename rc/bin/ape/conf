@@ -8,7 +8,7 @@
 # Please correct me if I got any of these wrong.
 
 ./configure --enable-static --disable-shared\
-	--disable-nls\
+	--disable-nls --prefix=/\
 	--bindir=/bin --sbindir=/bin --libexecdir=/bin\
 	--sysconfdir=/sys/lib --sharedstatedir=/srv\
 	--localstatedir=/srv --runstatedir=/srv\

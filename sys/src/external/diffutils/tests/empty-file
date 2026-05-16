@@ -1,0 +1,23 @@
+#!/bin/sh
+# Test empty files
+
+. "${srcdir=.}/init.sh"; path_prepend_ ../src
+
+fail=0
+mkdir a b
+touch a/test
+echo 'content' > b/test
+
+returns_ 1 diff -Naur a b >out || fail=1
+cat <<EOF > expected || framework_failure_
+diff -Naur a/test b/test
+--- a/test
++++ b/test
+@@ -0,0 +1 @@
++content
+EOF
+# Remove date and time.
+sed -e 's/^\([-+*][-+*][-+*] [^	]*\)	.*/\1/' out > k; mv k out
+compare expected out || fail=1
+
+Exit $fail

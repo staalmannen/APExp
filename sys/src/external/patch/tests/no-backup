@@ -1,0 +1,56 @@
+# Copyright 2025 Free Software Foundation, Inc.
+#
+# Copying and distribution of this file, with or without modification,
+# in any medium, are permitted without royalty provided the copyright
+# notice and this notice are preserved.
+
+# Test the --no-backup-if-mismatch option
+
+. $srcdir/test-lib.sh
+
+require cat
+use_local_patch
+use_tmpdir
+
+# ==============================================================
+
+cat >my_file <<'EOF'
+/* ... */
+void baz();
+
+
+void baz() {
+	/* ... */
+}
+
+int main() {
+	int foo;
+	int bar;
+
+	/* ... */
+	baz();
+}
+EOF
+
+cat >my_file.patch <<'EOF'
+--- my_file	2025-02-16 11:22:12.881765792 +0000
++++ my_file_new	2025-02-16 11:22:12.881796732 +0000
+@@ -2,7 +2,7 @@
+ void baz();
+
+ void baz() {
+-	/* ... */
++	// ...
+ }
+
+ int main() {
+EOF
+
+unset POSIXLY_CORRECT
+
+check 'patch -N --no-backup-if-mismatch <my_file.patch || echo "Status: $?"' <<'EOF'
+patching file my_file
+Hunk #1 succeeded at 3 with fuzz 1 (offset 1 line).
+EOF
+
+ncheck 'test ! -f my_file.orig'

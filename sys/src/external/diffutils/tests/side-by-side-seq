@@ -1,0 +1,26 @@
+#!/bin/sh
+# Test side-by-side output on sequences.
+
+. "${srcdir=.}/init.sh"; path_prepend_ ../src
+
+fail=0
+
+seq 1 100 >in1 || framework_failure_
+(seq 1 49 && seq 51 100) >in2 || framework_failure_
+awk '
+  BEGIN {
+    for (i = 1; i <= 100; i++) {
+      if (i == 50) {
+        print "50   <"
+      } else {
+        printf "%d\t%d\n", i, i
+      }
+    }
+  }
+' </dev/null >exp || framework_failure_
+
+returns_ 1 diff -yW 11 in1 in2 >out 2>err || fail=1
+compare exp out || fail=1
+compare /dev/null err || fail=1
+
+Exit $fail

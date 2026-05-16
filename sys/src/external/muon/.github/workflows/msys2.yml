@@ -1,0 +1,46 @@
+# SPDX-FileCopyrightText: Stone Tickle <lattis@mochiro.moe>
+# SPDX-FileCopyrightText: Vincent Torri <vtorri@outlook.fr>
+# SPDX-License-Identifier: GPL-3.0-only
+
+name: msys2
+
+on:
+  push:
+    branches:
+      - master
+      - '[0-9]+.[0-9]+'
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        config:
+          - msystem: mingw32
+            install: base-devel git mingw-w64-i686-ninja mingw-w64-i686-toolchain mingw-w64-i686-pkgconf mingw-w64-i686-curl mingw-w64-i686-libarchive
+          - msystem: mingw64
+            install: base-devel git mingw-w64-x86_64-ninja mingw-w64-x86_64-toolchain mingw-w64-x86_64-pkgconf mingw-w64-x86_64-curl mingw-w64-x86_64-libarchive
+          - msystem: msys
+            install: base-devel git ninja gcc pkgconf libcurl-devel libarchive-devel
+    name: msys2 - ${{ matrix.config.msystem }}
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - uses: actions/checkout@master
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: ${{ matrix.config.msystem }}
+        update: true
+        install: ${{ matrix.config.install }}
+    - name: bootstrap
+      run: |
+        CC=gcc CFLAGS=-std=c99 ./bootstrap.sh build
+        CC=gcc CFLAGS=-std=c99 ./build/muon-bootstrap.exe setup build
+        ninja -C build
+    - name: test
+      run: |
+        ./build/muon.exe -C build test -v -ddots || true

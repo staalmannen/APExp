@@ -1,0 +1,11 @@
+; SPDX-FileCopyrightText: Stone Tickle <lattis@mochiro.moe>
+; SPDX-License-Identifier: GPL-3.0-only
+
+[wrap-git]
+url = https://github.com/glfw/glfw
+revision = 7b6aead9fb88b3623e3b3725ebb42670cbe4c579
+depth = 1
+patch_directory = glfw3
+
+[provide]
+glfw3 = glfw3_dep

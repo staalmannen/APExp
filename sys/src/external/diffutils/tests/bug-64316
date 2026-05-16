@@ -1,0 +1,31 @@
+#!/bin/sh
+# Test for signed integer overflow bug within diff.
+# Bug reported by Gisele Vanem <http://bugs.gnu.org/64316>.
+# Compile with gcc -fsanitize=undefined to test for this bug.
+
+. "${srcdir=.}/init.sh"; path_prepend_ ../src
+
+fail=0
+
+for f in a b; do
+  printf 'c\nd\ne\nf\ng\n%s\nh\ni\nj\nk\nl\n' $f >$f || framework_failure_
+done
+
+cat >exp <<'EOF' || framework_failure_
+@@ -3,7 +3,7 @@
+ e
+ f
+ g
+-a
++b
+ h
+ i
+ j
+EOF
+
+returns_ 1 diff -u a b >out 2>err || fail=1
+sed '1,2d' out >out1 || framework_failure_
+compare exp out1 || fail=1
+compare /dev/null err || fail=1
+
+Exit $fail

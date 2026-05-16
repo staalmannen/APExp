@@ -1,0 +1,41 @@
+# SPDX-FileCopyrightText: Stone Tickle <lattis@mochiro.moe>
+# SPDX-License-Identifier: GPL-3.0-only
+
+input = argv[1]
+output = argv[2]
+
+argv.delete(0)
+argv.delete(0)
+argv.delete(0)
+
+options = {'msgfmt': '', 'type': '', 'podir': '', 'datadirs': '', 'extra_args': ''}
+
+foreach arg : argv
+    # Note: arg may have multiple equal signs such as: extra_args=--keyword=Description
+    # See: "subprojects/meson-tests/frameworks/6 gettext/data2/meson.build"
+    elems = arg.split('=')
+    key = elems[0]
+    val = '='.join(elems.slice(1))
+
+    options += {key: val}
+
+endforeach
+
+datadirs_env = environment()
+
+if options['datadirs'] != ''
+    datadirs_env.set('GETTEXTDATADIRS', options['datadirs'])
+endif
+
+extra_args = options['extra_args'] != '' ? options['extra_args'].split('^') : []
+
+run_command(
+    options['msgfmt'],
+    '--@0@'.format(options['type']),
+    '-d', options['podir'],
+    '--template', input,
+    '-o', output,
+    extra_args,
+    env: datadirs_env,
+    check: true,
+)

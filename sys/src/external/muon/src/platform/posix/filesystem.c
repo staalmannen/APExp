@@ -1,0 +1,549 @@
+/*
+ * SPDX-FileCopyrightText: Stone Tickle <lattis@mochiro.moe>
+ * SPDX-License-Identifier: GPL-3.0-only
+ */
+
+#include "compat.h"
+
+#include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <poll.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+#include <unistd.h>
+
+#include "buf_size.h"
+#include "lang/string.h"
+#include "log.h"
+#include "platform/assert.h"
+#include "platform/filesystem.h"
+#include "platform/mem.h"
+#include "platform/os.h"
+#include "platform/path.h"
+
+static bool
+fs_lstat(const char *path, struct stat *sb)
+{
+	if (lstat(path, sb) != 0) {
+		LOG_E("failed lstat(%s): %s", path, strerror(errno));
+		return false;
+	}
+
+	return true;
+}
+
+enum fs_mtime_result
+fs_mtime(const char *path, int64_t *mtime)
+{
+	struct stat st;
+
+	if (stat(path, &st) < 0) {
+		if (errno != ENOENT) {
+			LOG_E("failed stat(%s): %s", path, strerror(errno));
+			return fs_mtime_result_err;
+		}
+		return fs_mtime_result_not_found;
+	} else {
+#ifdef __APPLE__
+		*mtime = (int64_t)st.st_mtime * 1000000000 + st.st_mtimensec;
+/*
+   Illumos hides the members of st_mtim when you define _POSIX_C_SOURCE
+   since it has not been updated to support POSIX.1-2008:
+   https://www.illumos.org/issues/13327
+ */
+#elif defined(__sun) && !defined(__EXTENSIONS__)
+		*mtime = (int64_t)st.st_mtim.__tv_sec * 1000000000 + st.st_mtim.__tv_nsec;
+#else
+		*mtime = (int64_t)st.st_mtim.tv_sec * 1000000000 + st.st_mtim.tv_nsec;
+#endif
+		return fs_mtime_result_ok;
+	}
+}
+
+bool
+fs_exists(const char *path)
+{
+	return access(path, F_OK) == 0;
+}
+
+bool
+fs_symlink_exists(const char *path)
+{
+	struct stat sb;
+
+	// use lstat here instead of fs_lstat because we want to ignore errors
+	return lstat(path, &sb) == 0 && S_ISLNK(sb.st_mode);
+}
+
+static bool
+fs_lexists(const char *path)
+{
+	return fs_exists(path) || fs_symlink_exists(path);
+}
+
+bool
+fs_file_exists(const char *path)
+{
+	struct stat sb;
+	if (access(path, F_OK) != 0) {
+		return false;
+	} else if (!fs_stat(path, &sb)) {
+		return false;
+	} else if (!S_ISREG(sb.st_mode)) {
+		return false;
+	}
+
+	return true;
+}
+
+bool
+fs_exe_exists(const char *path)
+{
+	struct stat sb;
+	if (access(path, X_OK) != 0) {
+		return false;
+	} else if (!fs_stat(path, &sb)) {
+		return false;
+	} else if (!S_ISREG(sb.st_mode)) {
+		return false;
+	}
+
+	return true;
+}
+
+bool
+fs_dir_exists(const char *path)
+{
+	struct stat sb;
+	if (access(path, F_OK) != 0) {
+		return false;
+	} else if (!fs_stat(path, &sb)) {
+		return false;
+	} else if (!S_ISDIR(sb.st_mode)) {
+		return false;
+	}
+
+	return true;
+}
+
+bool
+fs_mkdir(const char *path, bool exist_ok)
+{
+	if (mkdir(path, 0755) == -1) {
+		if (exist_ok && errno == EEXIST) {
+			return true;
+		}
+
+		LOG_E("failed to create directory %s: %s", path, strerror(errno));
+		return false;
+	}
+
+	return true;
+}
+
+bool
+fs_rmdir(const char *path, bool force)
+{
+	if (rmdir(path) == -1) {
+		if (force) {
+			return true;
+		}
+
+		LOG_E("failed to remove directory %s: %s", path, strerror(errno));
+		return false;
+	}
+
+	return true;
+}
+
+static bool
+fs_copy_link(const char *src, const char *dest)
+{
+	bool res = false;
+	ssize_t n;
+	char *buf;
+
+	struct stat st;
+	if (!fs_lstat(src, &st)) {
+		return false;
+	}
+
+	if (!S_ISLNK(st.st_mode)) {
+		return false;
+	}
+
+	// TODO: allow pseudo-files?
+	assert(st.st_size > 0);
+
+	buf = z_malloc(st.st_size + 1);
+	n = readlink(src, buf, st.st_size);
+	if (n == -1) {
+		LOG_E("readlink('%s') failed: %s", src, strerror(errno));
+		goto ret;
+	}
+
+	buf[n] = '\0';
+	res = fs_make_symlink(buf, dest, true);
+ret:
+	z_free(buf);
+	return res;
+}
+
+static bool
+fs_close(int fd)
+{
+	if (close(fd) == -1) {
+		LOG_E("failed close(): %s", strerror(errno));
+		return false;
+	}
+	return true;
+}
+
+static bool
+fs_write_fd(int fd, const void *buf_v, size_t len)
+{
+	const char *buf = buf_v;
+	while (len > 0) {
+		ssize_t w = write(fd, buf, len);
+		if (w < 0) {
+			if (errno == EINTR) {
+				continue;
+			}
+			LOG_E("failed write(): %s", strerror(errno));
+			return false;
+		}
+		buf += w;
+		len -= w;
+	}
+	return true;
+}
+
+// NOTE: better to also return the dirfd, so that it can use renameat()
+// instead of rename(). but path_dirname needs a workspace, we don't have one.
+static int
+fs_maketmp(const char *file, char **out_tmpname)
+{
+	char suffix[] = "-XXXXXX";
+	size_t l = strlen(file) + sizeof(suffix);
+	char *s = *out_tmpname = z_malloc(l);
+	snprintf(s, l, "%s%s", file, suffix);
+	int fd = mkstemp(s);
+	if (fd < 0) {
+		*out_tmpname = NULL;
+		z_free(s);
+	}
+	return fd;
+}
+
+bool
+fs_copy_file(const char *src, const char *dest, bool force)
+{
+	bool res = false;
+	FILE *f_src = NULL;
+	int f_dest = 0;
+	char *f_dest_tmpname = NULL;
+
+	struct stat st;
+	if (!fs_lstat(src, &st)) {
+		goto ret;
+	}
+
+	if (S_ISLNK(st.st_mode)) {
+		return fs_copy_link(src, dest);
+	} else if (!S_ISREG(st.st_mode)) {
+		LOG_E("unhandled file type");
+		goto ret;
+	}
+
+	if (force) {
+		fs_make_writeable_if_exists(dest);
+	}
+
+	if (!(f_src = fs_fopen(src, "r"))) {
+		goto ret;
+	}
+
+	if ((f_dest = fs_maketmp(dest, &f_dest_tmpname)) < 0) {
+		LOG_E("failed to create temp destination file %s: %s", dest, strerror(errno));
+		goto ret;
+	}
+	if (!fs_chmod(f_dest_tmpname, st.st_mode)) {
+		goto ret;
+	}
+
+	assert(f_dest != 0);
+
+	size_t r;
+	char buf[BUF_SIZE_32k];
+
+	while ((r = fread(buf, 1, BUF_SIZE_32k, f_src)) > 0) {
+		errno = 0; // to ensure that we get the error from write() only
+
+		if (!fs_write_fd(f_dest, buf, r)) {
+			goto ret;
+		}
+	}
+
+	if (!feof(f_src)) {
+		LOG_E("incomplete read: %s", strerror(errno));
+		goto ret;
+	}
+
+	if (!fs_close(f_dest)) {
+		f_dest = 0;
+		goto ret;
+	}
+	f_dest = 0;
+
+	// now time to atomically rename the tmpfile into the proper place
+	if (rename(f_dest_tmpname, dest) < 0) {
+		LOG_E("failed rename(): %s", strerror(errno));
+		goto ret;
+	}
+
+	{
+		// Attempt to copy file attributes.  If this fails it isn't fatal.
+		struct timeval times[2] = {
+			{ .tv_sec = st.st_atime, },
+			{ .tv_sec = st.st_mtime, },
+		};
+
+		if (utimes(dest, times) == -1) {
+			L("failed utimes(): %s", strerror(errno));
+		}
+	}
+
+	res = true;
+ret:
+	if (f_dest_tmpname) {
+		if (!res) {
+			unlink(f_dest_tmpname);
+		}
+		z_free(f_dest_tmpname);
+	}
+
+	if (f_src) {
+		if (!fs_fclose(f_src)) {
+			res = false;
+		}
+	}
+
+	if (f_dest > 0) {
+		if (!fs_close(f_dest)) {
+			res = false;
+		}
+	}
+
+	return res;
+}
+
+bool
+fs_dir_foreach(const char *path, void *_ctx, fs_dir_foreach_cb cb)
+{
+	DIR *d;
+	struct dirent *ent;
+
+	if (!(d = opendir(path))) {
+		LOG_E("failed opendir(%s): %s", path, strerror(errno));
+		return false;
+	}
+
+	bool loop = true, res = true;
+	while (loop && (ent = readdir(d))) {
+		if (strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0) {
+			continue;
+		}
+
+		switch (cb(_ctx, ent->d_name)) {
+		case ir_cont: break;
+		case ir_done: loop = false; break;
+		case ir_err:
+			loop = false;
+			res = false;
+			break;
+		}
+	}
+
+	if (closedir(d) != 0) {
+		LOG_E("failed closedir(): %s", strerror(errno));
+		return false;
+	}
+
+	return res;
+}
+
+bool
+fs_remove(const char *path)
+{
+	if (remove(path) != 0) {
+		LOG_E("failed remove(\"%s\"): %s", path, strerror(errno));
+		return false;
+	}
+
+	return true;
+}
+
+bool
+fs_make_symlink(const char *target, const char *path, bool force)
+{
+	if (force && fs_lexists(path)) {
+		if (!fs_remove(path)) {
+			return false;
+		}
+	}
+
+	if (symlink(target, path) != 0) {
+		LOG_E("failed symlink(\"%s\", \"%s\"): %s", target, path, strerror(errno));
+		return false;
+	}
+
+	return true;
+}
+
+const char *
+fs_user_home(void)
+{
+	return os_get_env("HOME");
+}
+
+bool
+fs_is_a_tty_from_fd(int fd)
+{
+	errno = 0;
+	if (isatty(fd) == 1) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool
+fs_chmod(const char *path, uint32_t mode)
+{
+	if (mode & S_ISVTX) {
+		struct stat sb;
+		if (!fs_stat(path, &sb)) {
+			return false;
+		}
+		if (!S_ISDIR(sb.st_mode)) {
+			LOG_E("attempt to set sticky bit on regular file: %s", path);
+			return false;
+		}
+	}
+
+	if (fs_symlink_exists(path)) {
+#ifdef AT_FDCWD
+		if (fchmodat(AT_FDCWD, path, (mode_t)mode, AT_SYMLINK_NOFOLLOW) == -1) {
+#else
+		if (chmod(path, (mode_t)mode)) {
+#endif
+			if (errno == EOPNOTSUPP) {
+				LOG_W("changing permissions of symlinks not supported");
+				return true;
+			}
+
+			LOG_E("failed fchmodat(AT_FCWD, %s, %o, AT_SYMLINK_NOFOLLOW): %s", path, mode, strerror(errno));
+			return false;
+		}
+	} else if (chmod(path, (mode_t)mode) == -1) {
+		LOG_E("failed chmod(%s, %o): %s", path, mode, strerror(errno));
+		return false;
+	}
+
+	return true;
+}
+
+bool
+fs_find_cmd(struct workspace *wk, struct tstr *buf, const char *cmd)
+{
+	assert(*cmd);
+	uint32_t len;
+	const char *env_path, *base_start;
+
+	tstr_clear(buf);
+
+	if (!path_is_basename(cmd)) {
+		path_make_absolute(wk, buf, cmd);
+
+		if (fs_exe_exists(buf->buf)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	if (!(env_path = os_get_env("PATH"))) {
+		LOG_E("failed to get the value of PATH");
+		return false;
+	}
+
+	base_start = env_path;
+	while (true) {
+		if (!*env_path || *env_path == ENV_PATH_SEP) {
+			len = env_path - base_start;
+
+			tstr_clear(buf);
+			tstr_pushn(wk, buf, base_start, len);
+
+			base_start = env_path + 1;
+
+			path_push(wk, buf, cmd);
+
+			if (fs_exe_exists(buf->buf)) {
+				return true;
+			}
+
+			if (!*env_path) {
+				break;
+			}
+		}
+
+		++env_path;
+	}
+
+	return false;
+}
+
+bool
+fs_has_extension(const char *path, const char *ext)
+{
+	char *s;
+
+	s = strrchr(path, '.');
+	if (!s) {
+		return false;
+	}
+
+	return strcmp(s, ext) == 0;
+}
+
+FILE *
+fs_make_tmp_file(const char *name, const char *suffix, char *buf, uint32_t len)
+{
+	return 0;
+}
+
+bool
+fs_wait_for_input(int fd)
+{
+	while (true) {
+		struct pollfd fds = {
+			.fd = fd,
+			.events = POLLIN,
+		};
+
+		if (poll(&fds, 1, -1) == -1) {
+			LOG_E("poll: %s", strerror(errno));
+			return false;
+		}
+
+		if (fds.revents & POLLIN) {
+			break;
+		}
+	}
+
+	return true;
+}

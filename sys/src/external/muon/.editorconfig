@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: Eli Schwartz <eschwartz@archlinux.org>
+# SPDX-FileCopyrightText: dffdff2423 <dffdff2423@gmail.com>
+# SPDX-License-Identifier: GPL-3.0-only
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[{*.c,*.h,*.sh}]
+indent_style = tab
+
+[{meson.build,meson_options.txt}]
+indent_style = space
+indent_size = 4

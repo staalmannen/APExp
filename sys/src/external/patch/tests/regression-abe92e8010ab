@@ -1,0 +1,33 @@
+. $srcdir/test-lib.sh
+
+require cat
+use_local_patch
+use_tmpdir
+
+cat > f <<EOF
+1
+2
+test:
+a
+4
+EOF
+
+cat > f.diff <<EOF
+2,3c2
+< test:
+< a
+---
+> 3
+EOF
+
+check 'patch f < f.diff' <<EOF
+patching file f
+Hunk #1 succeeded at 3 (offset 1 line).
+EOF
+
+check 'cat f' <<EOF
+1
+2
+3
+4
+EOF

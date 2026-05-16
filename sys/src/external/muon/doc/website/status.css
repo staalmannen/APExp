@@ -1,0 +1,67 @@
+/*
+ * SPDX-FileCopyrightText: Stone Tickle <lattis@mochiro.moe>
+ * SPDX-License-Identifier: GPL-3.0-only
+ */
+
+.positive {
+    background-color: #50FA7B;
+    color: #21222C;
+}
+
+.negative {
+    background-color: #FF5555;
+    color: #21222C;
+}
+
+.warning {
+    background-color: #FFFD8C;
+    color: #21222C;
+}
+
+tr:nth-child(odd) {
+  background-color: #F8F8F2;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #282A36;
+    color: #F8F8F2;
+  }
+  a {
+    color: #8BE9FD;
+  }
+
+  tr:nth-child(odd) {
+    background-color: #424450;
+  }
+}
+
+body {
+    margin: 0;
+    font-family: sans-serif;
+}
+
+.wrapper {
+    width: auto;
+}
+
+@media screen and (min-width: 769px) {
+  .wrapper {
+      margin-left: 100px;
+      margin-right: 100px;
+  }
+}
+
+table {
+    width: 100%;
+}
+
+.item {
+    width: 100%;
+}
+
+.support_cell {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}

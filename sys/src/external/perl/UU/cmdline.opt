@@ -1,0 +1,4 @@
+: Configure command line arguments.
+config_arg0='./Configure'
+config_args=''
+config_argc=0

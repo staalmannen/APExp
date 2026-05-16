@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: Stone Tickle <lattis@mochiro.moe>
+# SPDX-License-Identifier: GPL-3.0-only
+
+image: netbsd/latest
+packages:
+sources:
+  - https://git.sr.ht/~lattis/muon
+tasks:
+  - build: |
+      cd muon
+      # TODO remove this when we implement rpaths
+      export LD_LIBRARY_PATH=/usr/pkg/lib
+      tools/ci/bootstrap.sh build
+  - test: |
+      cd muon/build
+      # TODO remove this when we implement rpaths
+      export LD_LIBRARY_PATH=/usr/pkg/lib
+      ./muon test -d dots -s lang

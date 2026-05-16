@@ -1,0 +1,40 @@
+#!/bin/sh
+case $# in
+0) exit 1;;
+esac
+thing=$1
+shift
+dflt=$1
+shift
+for dir in $*; do
+	case "$thing" in
+	.)
+	if test -d $dir/$thing; then
+		echo $dir
+		exit 0
+	fi
+	;;
+	*)
+	for thisthing in $dir/$thing; do
+		: just loop through to pick last item
+	done
+	if test -f $thisthing; then
+		echo $thisthing
+		exit 0
+	elif test "X" != X -a -f $thisthing; then
+		echo $thisthing
+		exit 0
+	elif test -f $dir/$thing.exe; then
+		if test -n ""; then
+			echo $dir/$thing.exe
+		elif test ":" != ":"; then
+			: on Eunice apparently
+			echo $dir/$thing
+		fi
+		exit 0
+	fi
+	;;
+	esac
+done
+echo $dflt
+exit 1

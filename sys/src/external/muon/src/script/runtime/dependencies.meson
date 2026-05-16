@@ -1,0 +1,191 @@
+# SPDX-FileCopyrightText: Stone Tickle <lattis@mochiro.moe>
+# SPDX-License-Identifier: GPL-3.0-only
+
+fs = import('fs')
+
+func clike_compiler(native bool) -> compiler
+    foreach candidate : ['c', 'cpp', 'objc', 'objcpp']
+        if meson.has_compiler(candidate, native: native)
+            return meson.get_compiler(candidate, native: native)
+        endif
+    endforeach
+
+    error('No c-like compiler available.')
+endfunc
+
+func not_found() -> dep
+    return dependency('', required: false)
+endfunc
+
+meson.register_dependency_handler(
+    'intl',
+    builtin: func(native bool:, _ glob[any]:) -> dep
+        code = '#include <libintl.h>\n\nint main() {\n    gettext("Hello world");\n}'
+
+        return clike_compiler(native).links(code) ? declare_dependency() : not_found()
+    endfunc,
+    system: func(static bool:, native bool:, _ glob[any]:) -> dep
+        return clike_compiler(native).find_library(
+            'intl',
+            has_headers: ['libintl.h'],
+            static: static,
+            required: false,
+        )
+    endfunc,
+)
+
+meson.register_dependency_handler(
+    'iconv',
+    builtin: func(native bool:, _ glob[any]:) -> dep
+        code = '#include <iconv.h>\n\nint main() {\n    iconv_open("","");\n}'
+
+        return clike_compiler(native).links(code) ? declare_dependency() : not_found()
+    endfunc,
+    system: func(static bool:, native bool:, _ glob[any]:) -> dep
+        return clike_compiler(native).find_library(
+            'iconv',
+            has_headers: ['iconv.h'],
+            static: static,
+            required: false,
+        )
+    endfunc,
+)
+
+meson.register_dependency_handler(
+    'zlib',
+    order: ['pkg-config', 'system'],
+    system: func(static bool:, native bool:, _ glob[any]:) -> dep
+        cc = clike_compiler(native)
+
+        if cc.get_internal_id() == 'clang-apple'
+            dep = declare_dependency(
+                link_args: '-lz',
+            )
+        else
+            dep = cc.find_library(
+                'z',
+                has_headers: ['zlib.h'],
+                static: static,
+                required: false,
+            )
+        endif
+
+        if not dep.found()
+            return dep
+        endif
+
+        return declare_dependency(
+            dependencies: dep,
+            version: cc.get_define('ZLIB_VERSION', prefix: '#include <zlib.h>').strip('"'),
+        )
+    endfunc,
+)
+
+meson.register_dependency_handler(
+    'objfw',
+    config_tool: func(modules list[str]:, _ glob[any]:) -> dep
+        objfwconfig = find_program('objfw-config', required: false)
+
+        if not objfwconfig.found()
+            return not_found()
+        endif
+
+        config = func(args list[str]) -> list[str]
+            output = run_command([objfwconfig] + args, check: true).stdout()
+
+            value = []
+            foreach arg : output.split(' ')
+                if arg != ''
+                    value += arg
+                endif
+            endforeach
+
+            return value
+        endfunc
+
+        modules_args = []
+        if not is_null(modules)
+            foreach module : modules
+                modules_args += '--package'
+                modules_args += module
+            endforeach
+        endif
+
+        compile_args = config(['--cppflags', '--objcflags'] + modules_args)
+        link_args = config(['--ldflags', '--libs'] + modules_args)
+        version = run_command([objfwconfig, '--version'], check: true).stdout().strip()
+
+        return declare_dependency(
+            compile_args: compile_args,
+            link_args: link_args,
+            version: version,
+        )
+    endfunc,
+)
+
+meson.register_dependency_handler(
+    'gtest',
+    system: func(main bool: false, native bool:, _ glob[any]:) -> dep
+        cc = clike_compiler(native)
+        deps = [dependency('threads')]
+
+        gtest_lib = cc.find_library('gtest', required: false)
+        gtest_main_lib = cc.find_library('gtest_main', required: false)
+
+        if gtest_lib.found() and (not main or gtest_main_lib.found())
+            deps += gtest_lib
+            if gtest_main_lib.found()
+                deps += gtest_main_lib
+            endif
+
+            return declare_dependency(dependencies: deps)
+        endif
+
+        foreach s : ['/usr/src/gtest/src', '/usr/src/googletest/googletest/src']
+            if fs.is_dir(s)
+                sources = files(s / 'gtest-all.cc')
+                if main
+                    sources += files(s / 'gtest_main.cc')
+                endif
+
+                return declare_dependency(
+                    sources: sources,
+                    include_directories: [
+                        s / '..',
+                        s / '../include',
+                    ],
+                )
+            endif
+        endforeach
+
+        return not_found()
+    endfunc,
+    pkgconfig: func(main bool: false, kwargs glob[any]:) -> dep
+        name = 'gtest'
+        if main
+            name += '_main'
+        endif
+
+        return dependency(name, method: 'pkg-config', kwargs: kwargs)
+    endfunc,
+)
+
+meson.register_dependency_handler(
+    'dl',
+    builtin: func(native bool:, _ glob[any]:) -> dep
+        cc = clike_compiler(native)
+        if cc.has_function('dlopen', prefix: '#include <dlfcn.h>')
+            return declare_dependency()
+        endif
+
+        return not_found()
+    endfunc,
+    system: func(native bool:, _ glob[any]:) -> dep
+        cc = clike_compiler(native)
+        if cc.has_header('dlfcn.h')
+            return cc.find_library('dl', required: false)
+        endif
+
+        return not_found()
+    endfunc,
+)

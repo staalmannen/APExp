@@ -1,0 +1,50 @@
+# Copyright 2009-2025 Free Software Foundation, Inc.
+#
+# Copying and distribution of this file, with or without modification,
+# in any medium, are permitted without royalty provided the copyright
+# notice and this notice are preserved.
+
+# Patch must not overwrite backup files it has created itself.
+# (Backup file tests for symlinks are in tests/symlinks.)
+
+. $srcdir/test-lib.sh
+
+require cat
+require hardlinks
+use_local_patch
+use_tmpdir
+
+# ==============================================================
+
+# Hardlinks between source files
+
+echo one > f
+ln f g
+
+cat > fg.diff <<EOF
+--- f.orig
++++ f
+@@ -2 +2 @@
+-one
++two
+--- g.orig
++++ g
+@@ -2 +2 @@
+-one
++two
+EOF
+
+check 'patch -p0 < fg.diff' <<EOF
+patching file f
+Hunk #1 succeeded at 1 (offset -1 lines).
+patching file g
+Hunk #1 succeeded at 1 (offset -1 lines).
+EOF
+
+check 'cat f.orig' <<EOF
+one
+EOF
+
+check 'cat g.orig' <<EOF
+one
+EOF

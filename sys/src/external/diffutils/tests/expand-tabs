@@ -1,0 +1,19 @@
+#!/bin/sh
+# Test tab expansion.
+
+. "${srcdir=.}/init.sh"; path_prepend_ ../src
+
+fail=0
+
+cat >exp <<'EOF' || framework_failure_
+0a1
+>         x
+EOF
+
+for p in '\b\tx\n' '\b        x\n' '\b \tx\n'; do
+  printf "$p" | returns_ 1 diff -t /dev/null - >out || fail=1
+done
+
+compare exp out || fail=1
+
+Exit $fail

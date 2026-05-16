@@ -1,0 +1,19 @@
+/*
+ * SPDX-FileCopyrightText: Stone Tickle <lattis@mochiro.moe>
+ * SPDX-License-Identifier: GPL-3.0-only
+ */
+
+#ifndef MUON_PREPROCESSOR_HELPERS_H
+#define MUON_PREPROCESSOR_HELPERS_H
+
+#define STRINGIZE(x) STRINGIZE2(x)
+#define STRINGIZE2(x) #x
+#define LINE_STRING STRINGIZE(__LINE__)
+
+#ifdef CONCAT
+#undef CONCAT
+#endif
+#define CONCAT(first, second) CONCAT_SIMPLE(first, second)
+#define CONCAT_SIMPLE(first, second) first##second
+
+#endif

@@ -1,34 +1,12 @@
 </$objtype/mkfile
 APEXPROOT=../../../../..
+PTCHSRC=$APEXPROOT/sys/src/external/patch
+
 TARG=patch
 
 OFILES=\
-	addext.$O\
-	argmatch.$O\
-	backupfile.$O\
-	basename.$O\
-	getopt.$O\
-	getopt1.$O\
-	inp.$O\
-	maketime.$O\
-	partime.$O\
-	patch.$O\
-	pch.$O\
-	quotearg.$O\
-	util.$O\
-	version.$O\
-
-HFILES=\
-	backupfile.h\
-	common.h\
-	getopt.h\
-	maketime.h\
-	inp.h\
-	partime.h\
-	quotearg.h\
-	pch.h\
-	util.h\
-	version.h\
+	inp.$O patch.$O pch.$O \
+	safe.$O util.$O version.$O merge.$O
 
 BIN=$APEXPROOT/$objtype/bin/ape
 
@@ -36,6 +14,16 @@ BIN=$APEXPROOT/$objtype/bin/ape
 
 CC=pcc -c
 CFLAGS=-B -p -D_POSIX_SOURCE \
-	-D_BSD_EXTENSION -I. -DHAVE_CONFIG_H \
+	-D_BSD_EXTENSION -I$PTCHSRC \
+	-I$PTCHSRC/src -I$PTCHSRC/lib \
+	-DHAVE_CONFIG_H \
 	-Ded_PROGRAM="/bin/ed"
+
+%.$O: $PTCHSRC/src/%.c
+	$CC $CFLAGS $prereq
+
+%.$O: $PTCHSRC/lib/%.c
+	$CC $CFLAGS $prereq
+
+
 

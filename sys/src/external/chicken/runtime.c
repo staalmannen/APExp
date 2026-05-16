@@ -22,7 +22,7 @@
 ; SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 ; THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 ; OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-; POSSIBILITY OF SUCH DAMAGE.
+; POSSIBILITY OF SUCH DAMAGE. create_initial
 */
 
 
@@ -547,7 +547,7 @@ static void C_fcall update_weak_pairs(int mode, C_byte *undead_start, C_byte *un
 static void C_fcall update_locatives(int mode, C_byte *undead_start, C_byte *undead_end) C_regparm;
 static LF_LIST *find_module_handle(C_char *name);
 static void set_profile_timer(C_uword freq);
-static void take_profile_sample();
+static void take_profile_sample(void);
 
 static C_cpsproc(call_cc_wrapper) C_noret;
 static C_cpsproc(call_cc_values_wrapper) C_noret;
@@ -579,7 +579,7 @@ static C_regparm void bignum_destructive_divide_unsigned_small(C_word **ptr, C_w
 static C_regparm void bignum_destructive_divide_full(C_word numerator, C_word denominator, C_word quotient, C_word remainder, C_word return_remainder);
 static C_regparm void bignum_destructive_divide_normalized(C_word big_u, C_word big_v, C_word big_q);
 
-static C_PTABLE_ENTRY *create_initial_ptable();
+static C_PTABLE_ENTRY *create_initial_ptable(void);
 
 #if !defined(NO_DLOAD2) && (defined(HAVE_DLFCN_H) || defined(HAVE_DL_H) || (defined(HAVE_LOADLIBRARY) && defined(HAVE_GETPROCADDRESS)))
 static void C_ccall dload_2(C_word, C_word *) C_noret;
@@ -879,7 +879,7 @@ void *C_get_statistics(void) {
 }
 
 
-static C_PTABLE_ENTRY *create_initial_ptable()
+static C_PTABLE_ENTRY *create_initial_ptable(void)
 {
   /* IMPORTANT: hardcoded table size -
      this must match the number of C_pte calls + 1 (NULL terminator)! */
@@ -978,7 +978,7 @@ void *CHICKEN_new_gc_root_2(int finalizable)
 }
 
 
-void *CHICKEN_new_gc_root()
+void *CHICKEN_new_gc_root(void)
 {
   return CHICKEN_new_gc_root_2(0);
 }
@@ -4256,7 +4256,7 @@ C_regparm void *C_fcall C_retrieve2_symbol_proc(C_word val, char *name)
 #ifdef C_NONUNIX
 VOID CALLBACK win_timer(PVOID data_ignored, BOOLEAN wait_or_fired)
 {
-  if (profiling) take_profile_sample();
+  if (profiling) take_profile_sample(void);
 }
 #endif
 
@@ -4294,7 +4294,7 @@ error:
 }
 
 /* Bump profile count for current top of trace buffer */
-static void take_profile_sample()
+static void take_profile_sample(void)
 {
   PROFILE_BUCKET **bp, *b;
   C_char *key;
@@ -12662,7 +12662,7 @@ C_private_repository_path()
 }
 
 C_char *
-C_executable_pathname() {
+C_executable_pathname(void) {
 #ifdef SEARCH_EXE_PATH
   return C_main_exe == NULL ? NULL : C_strdup(C_main_exe);
 #else
@@ -13235,7 +13235,7 @@ static C_word random_urandom(C_word buf, int count)
   }
 
   while(count > 0) {
-    r = read(fd, C_data_pointer(buf) + off, count);
+    r = read(fd, (void *) ((int) C_data_pointer(buf) + off), count);
 
     if(r == -1) {
       if(errno != EINTR && errno != EAGAIN) return C_SCHEME_FALSE;

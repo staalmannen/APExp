@@ -14,6 +14,7 @@ _CORE_APP_DEPENDENCIES=\
 
 _OPTIONAL_LIBS=\
 	bz2\
+	chicken\
 	curses\
 	fortran\
 	lua\

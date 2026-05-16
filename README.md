@@ -53,7 +53,7 @@ the most capable web browser available on Plan9.
 
 ***Starting material :*** 
 
-Imported the latest 9front APE sources from git [7] (date: 2024-04-24; rebased 2026-01-29, which included the bitfield patch from @jamoson (bitfield support in kencc) [8]).
+Imported the latest 9front APE sources from git [7] (rebased 2026-01-29, which included the bitfield patch from @jamoson (bitfield support in kencc) [8]).
 In addition, several patches from @lufia [9, 10] to build libressl and curl
 (introduces pthread, include_next cpp support, etc) has been applied to the
 sources. To get more C99 compatibility, AI-generated patches have been introduced (VLA, hex float support, complex support, compound literals, division by 0, dropping keywords, etc). C99 support is *pretty much complete* by now, and we have even started adding some C11/C23 features to the compiler. This served as a base to add ports of third party libraries and utilities to enhance compatibility. In addition to the compiler, the linker has been enhanced with DWARF2 support from the old Go compiler (copied from the goken9cc project). This means that binaries built with APExp should be possible to debug with advanced debuggers like GNU gdb or the Go "debug" utility.
@@ -136,7 +136,8 @@ C transpilers are fun little proof-of-concept programs, which also open up for m
 - pascal-to-C transpiler p2c (2.01)
 - fortran-to-C transpiler f2c (20250303)
 - portable ObjC-to-C transpiler (3.4.8, bootstrap, TODO: build 3.4.13 with the bootstrapped compiler)
-- C++-to-C transpiler Cfront (version "C4") 
+- C++-to-C transpiler Cfront (version "C4", WIP)
+- Scheme-to-C transpiler Chicken (version 5.4.0) 
 
 
 ***(un)archivers***
@@ -151,6 +152,7 @@ sources could be a barrier. Because of this, APExp package several (un)archivers
 - unace (2.7)
 - clzip (1.14)
 - xz (5.8.3)
+- zstd (1.5.7)
 
 
 ***BLOAT!!!1!!!***

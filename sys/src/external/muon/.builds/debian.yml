@@ -1,0 +1,43 @@
+# SPDX-FileCopyrightText: Stone Tickle <lattis@mochiro.moe>
+# SPDX-License-Identifier: GPL-3.0-only
+
+image: debian/stable
+packages:
+  - clang
+  - libclang-rt-dev
+  - llvm
+  - gobjc
+
+sources:
+  - https://git.sr.ht/~lattis/muon
+tasks:
+  - bootstrap: |
+      cd muon
+      tools/ci/bootstrap.sh build
+
+  - build_asan_ubsan: |
+      cd muon
+      build/muon setup -Db_sanitize=address,undefined build_asan_ubsan
+      build/muon -C build_asan_ubsan samu
+
+  - build_memsan: |
+      cd muon
+      CC=clang build/muon setup -Db_sanitize=memory build_memsan
+      build/muon -C build_memsan samu
+
+  - build_fortify_source: |
+      cd muon
+      CC=clang CFLAGS=-D_FORTIFY_SOURCE=3 build/muon setup build_fortify_source
+      build/muon -C build_fortify_source samu
+
+  - test_asan_ubsan: |
+      cd muon/build_asan_ubsan
+      ./muon test -d dots
+
+  - test_memsan: |
+      cd muon/build_memsan
+      ./muon test -d dots
+
+  - test_fortify_source: |
+      cd muon/build_fortify_source
+      ./muon test -d dots
