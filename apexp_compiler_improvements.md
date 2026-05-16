@@ -3,7 +3,7 @@
 *Covers: `sys/src/cmd/cc/` (common front-end) and all arch backends (`6c`, `8c`,
 `5c`, `7c`, `kc`, `vc`, `qc`, `tc`, `zc`, etc.)*
 
-*Last updated: 2026-04*
+*Last updated: 2026-05*
 
 ---
 
@@ -174,8 +174,8 @@ This is correct per the standard.
 | `static_assert`, `alignof` | Done (C23 aliases) | Now also supports single-argument `static_assert` |
 | `typeof_unqual` | `lex.c` LTYPEOF_UNQUAL; `cc.y`; `com.c` | Now properly strips const/volatile qualifiers |
 | `__VA_OPT__` | `macro.c` `substargs` | Fully compliant C23/C++20 implementation |
-| `_Alignas` in declarations | Not implemented (layout effect) | Not implemented |
-| `_Atomic` full stdatomic.h | Dropped as qualifier; no CAS operations |
+| `_Alignas` in declarations | `cc/dcl.c` `adecl()`, `sualign()` | Layout effect done: struct members + auto vars; `LALIGN` token in `cc.y` |
+| `_Atomic` / `stdatomic.h` | `lex.c` drop qualifier; `sys/include/ape/stdatomic.h` | Header provides non-atomic typedefs + Plan9 spinlock-based ops |
 | `constexpr` objects (C23) | Not implemented |
 | `auto` type deduction (C23) | Done — implemented in `cc.y` `autoadlist` rule |
 
@@ -246,25 +246,27 @@ function returning a 64-bit integer.
 
 These are listed roughly in order of difficulty and anticipated impact.
 
-### 1. `_Alignas` in declarations
+### 1. `_Alignas` in declarations — DONE (2026-05)
 
-`_Alignof` (the query) works. `_Alignas(N)` as a declaration specifier
-(affecting struct layout and variable placement) does not. Implementation:
-parse the alignment argument; store it in the decl node; in the struct
-layout pass (`sualign`), honour the alignment by padding before the member;
-for local variables, round up the frame offset.
+`_Alignas(N)` as a declaration specifier is now implemented (`cc/dcl.c`).
+- Struct members: `sualign()` pads before the member to meet the requested
+  alignment. The alignment value is stored in the type's `garb.c2` field.
+- Auto variables: `adecl()` rounds up the frame offset to the requested alignment.
+- `LALIGN` token added to the grammar.
+`_Alignof` (the query) was already done; `_Alignas` now completes the pair.
 
-### 3. `_Atomic` / stdatomic.h
+### 3. `_Atomic` / stdatomic.h — PARTIAL (2026-05)
 
-Currently dropped as a qualifier; atomic operations (`__atomic_load`,
-`__atomic_store`, `__atomic_compare_exchange`, etc.) are swallowed as
-`__builtin_*`. A practical minimum for C11/C23 compatibility:
-- Keep dropping `_Atomic` as a storage qualifier (acceptable for Plan9's
-  single-address-space model on uniprocessor builds).
-- Provide `<stdatomic.h>` with `atomic_*` types as non-atomic equivalents
-  and `atomic_load/store/exchange` as memory-barrier-less macros.
-  This satisfies the vast majority of portable code that uses atomics for
-  documentation rather than genuine lock-free synchronisation.
+`_Atomic` is still dropped as a qualifier. `<stdatomic.h>` now exists at
+`sys/include/ape/stdatomic.h` providing:
+- `_Atomic(T)` as a no-op macro (typedef equivalent)
+- `atomic_*` type aliases for all C11 atomic types
+- `atomic_load`, `atomic_store`, `atomic_exchange` backed by Plan9 spinlocks
+- `atomic_compare_exchange_strong/weak` with spinlock-based CAS emulation
+- `atomic_fetch_add/sub/and/or/xor` operations
+- `ATOMIC_FLAG_INIT`, `atomic_flag_test_and_set`, `atomic_flag_clear`
+This satisfies portable code that uses atomics for documentation and basic
+coordination; genuine lock-free algorithms are not supported.
 
 ### 4. Digit separators in float exponent (casep loop)
 
