@@ -18,7 +18,8 @@
 STATIC void
 Perl_croak_memory_wrap(void)
 {
-    Perl_croak_nocontext("%s","panic: memory wrap");
+    /* kencc cannot call Perl_croak here (not-an-l-value); abort is correct */
+    abort();
 }
 
 
