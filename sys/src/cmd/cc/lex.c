@@ -886,6 +886,30 @@ talph:
 		goto l0;	/* fetch next real token */
 	}
 	/*
+	 * C99 __func__ and GCC __FUNCTION__: predefined string literal
+	 * containing the current function name. kencc has no tracking of the
+	 * current function name at the lex level, so we return an empty string.
+	 * This satisfies type-checking (const char[]) without the expense of
+	 * tracking function names through the lexer.
+	 */
+	if(s->lexical == LNAME && (
+	    strcmp(s->name, "__func__")     == 0 ||
+	    strcmp(s->name, "__FUNCTION__") == 0 ||
+	    strcmp(s->name, "__PRETTY_FUNCTION__") == 0)) {
+		char *cp;
+		int c1;
+		cp = alloc(0);
+		c1 = 0;
+		yylval.sval.l = c1;
+		do {
+			cp = allocn(cp, c1, 1);
+			cp[c1++] = 0;
+		} while(c1 & MAXALIGN);
+		yylval.sval.s = cp;
+		strcpy(symb, "\"\"");
+		return LSTRING;
+	}
+	/*
 	 * GCC __builtin_* functions: swallow the entire call and
 	 * substitute a zero constant.  This handles the common cases:
 	 *   __builtin_expect(x, v)         -> 0  (branch prediction hint)
