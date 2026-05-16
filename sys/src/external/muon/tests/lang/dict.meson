@@ -1,0 +1,71 @@
+# SPDX-FileCopyrightText: Stone Tickle <lattis@mochiro.moe>
+# SPDX-License-Identifier: GPL-3.0-only
+
+a = {'a': 'b', 'c': 'd', 'e': {'f': {'g': {'h': [1, 2, {'3': 'secret!'}]}}}}
+
+assert(a['a'] == 'b')
+assert(a['c'] == 'd')
+# TODO: index chaining
+# assert(a['e']['f']['g']['h'][2]['3'] == 'secret!')
+
+count = 0
+foreach _x, _y : a
+    count += 1
+endforeach
+
+assert(count == 3)
+
+b = {'a': 1, 'b': 2}
+b += {'c': 3}
+assert(b['a'] == 1)
+assert(b['c'] == 3)
+b += {'a': 2}
+assert(b['a'] == 2)
+
+assert(b['c'].to_string() == '3')
+
+dict = {'a': 0, 'b': 0, 'c': 0}
+assert(dict.keys().length() == 3)
+foreach k : dict.keys()
+    dict += {k: 7}
+endforeach
+
+assert(dict['a'] == 7)
+assert(dict['b'] == 7)
+assert(dict['c'] == 7)
+
+# Test dict.delete
+d = {'a': 1, 'b': 2, 'c': 3}
+a = d
+d.delete('a')
+assert(a.a == 1)
+assert(d == {'b': 2, 'c': 3})
+assert(d.keys() == ['b', 'c'])
+d = d + {'a': 4, 'b': 3, 'e': 5}
+assert(d.keys() == ['b', 'c', 'a', 'e'])
+
+# test big dicts
+func big_dict(n int) -> dict[int]
+    d = {}
+    foreach i : range(n)
+        d += {f'@i@': i}
+    endforeach
+
+    return d
+endfunc
+
+n = 128
+
+l = 0
+foreach k, v : big_dict(n)
+    assert(k == f'@v@')
+    l += 1
+endforeach
+
+q = big_dict(n)
+foreach k, v : q
+    q += {(k.to_int() + n).to_string(): 1}
+endforeach
+
+p(q.keys())
+assert(q.keys().length() == n * 2)

@@ -1,0 +1,41 @@
+# SPDX-FileCopyrightText: Stone Tickle <lattis@mochiro.moe>
+# SPDX-License-Identifier: GPL-3.0-only
+
+# test that we can pass a ton of arguments
+# cmd = []
+# foreach n : range(1000)
+#     cmd += f'str-@n@'
+# endforeach
+
+# stdout = run_command([find_program('echo')] + cmd, check: true).stdout().strip()
+
+# assert(stdout == ' '.join(cmd))
+
+env = {}
+cmd = []
+expect = []
+foreach n : range(100)
+    env += {f'ENVVAR@n@': f'val@n@'}
+    cmd += f'$ENVVAR@n@'
+    expect += f'val@n@'
+endforeach
+
+cmd = ' '.join(cmd)
+
+# p(cmd)
+
+stdout = run_command(
+    [find_program('sh'), '-c', f'echo "@cmd@"'],
+    check: true,
+    env: env,
+).stdout().strip()
+
+assert(stdout == ' '.join(expect))
+
+stdout = run_command(
+    [find_program('sh'), '-c', 'echo $#', '--', '', 'a', '', 'b', ''],
+    check: true,
+    env: env,
+).stdout().strip()
+
+assert(stdout == '5')

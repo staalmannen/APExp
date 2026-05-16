@@ -1,0 +1,91 @@
+# SPDX-FileCopyrightText: Stone Tickle <lattis@mochiro.moe>
+# SPDX-License-Identifier: GPL-3.0-only
+
+func listify(a glob[int]) -> list[int]
+    return a
+endfunc
+
+assert(p(listify([[1, [], [2], [[], [], [], [], [[]]]], [[[]]], 4])) == [1, 2, 4])
+
+assert(1 not in [2, 3, 4])
+
+assert([1, 2, 3, 4, 5].contains(3))
+
+a = [1, 2, 3, 4]
+b = a
+
+a += 5
+assert(b == [1, 2, 3, 4])
+
+c = [6, 7, 8]
+a += c
+c += 9
+
+assert(c == [6, 7, 8, 9])
+assert(a == [1, 2, 3, 4, 5, 6, 7, 8])
+
+arr_with_comments = [
+    true,
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    true,
+]
+
+assert(arr_with_comments.length() == 2)
+
+a = [1, 2, 3, 4, 5]
+a.delete(0)
+assert(a == [2, 3, 4, 5])
+a.delete(3)
+assert(a == [2, 3, 4])
+a.delete(1)
+assert(a == [2, 4])
+a.delete(1)
+assert(a == [2])
+a.delete(0)
+assert(a == [])
+# a.delete(0) # ??? error
+a += [1, 2, 3, 4, 5]
+assert(a == [1, 2, 3, 4, 5])
+a.delete(2)
+assert(a == [1, 2, 4, 5])
+a += 2
+assert(a == [1, 2, 4, 5, 2])
+a.delete(4)
+assert(a == [1, 2, 4, 5])
+a += a
+assert(a == [1, 2, 4, 5, 1, 2, 4, 5])
+
+a = ['a', 'a']
+foreach e : a
+    a += e
+endforeach
+assert(a.length() == 4)
+
+# slices
+a = [1, 2, 3, 4, 5]
+assert(a.slice() == a)
+assert(a.slice(2) == [3, 4, 5])
+assert(a.slice(2, 3) == [3])
+b = a.slice(4)
+b += 6
+assert(b == [5, 6])
+assert(a == [1, 2, 3, 4, 5])
+
+a = ['a', 'b', 'c']
+a.slice()
+
+assert(['A', 'B', 'C'].slice(1) == ['B', 'C'])
+assert(['A', 'B'].slice(1) == ['B'])
+assert(['A'].slice(1) == [])
+assert([].slice(1) == [])

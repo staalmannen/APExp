@@ -1,0 +1,69 @@
+# SPDX-FileCopyrightText: Stone Tickle <lattis@mochiro.moe>
+# SPDX-License-Identifier: GPL-3.0-only
+
+project('a')
+
+if (
+    # comment
+    false # in a weird
+)
+    # place! # test
+else
+endif # test2
+
+foreach a : (
+    # test 7
+    b # test 4
+)
+    # test 6 # test 3
+endforeach
+# test 5
+
+a = [
+    1,
+    # inner
+    2, # between comma
+    # between comma 2
+] # trailing
+
+(
+    # hello
+    a()
+)
+a = (
+    # comment 7
+    1
+    + 2
+) # comment 11
+# comment 12
+
+a = [
+    '-o', # comment after dashed string element
+    'obj.o',
+    '-foo',
+    '-bar',
+    '-baz', 'zoo',
+    '-A', 'B', # -A B on same line
+]
+
+a = [
+    # top
+    '-data', {
+        'key': [
+            '-foo', # Obscure comment
+            {
+                'bar':  # Comment between key and value
+                ['baz', None, 2],
+                'flim': 'flam', # Comment after key/value pair
+            },
+            '-x', [
+                3,
+                2, # Mid array comment
+                1,
+            ],
+        ],
+    },
+    # bottom
+]
+
+# trailing comment

@@ -1,0 +1,54 @@
+# SPDX-FileCopyrightText: Stone Tickle <lattis@mochiro.moe>
+# SPDX-License-Identifier: GPL-3.0-only
+
+fs = import('fs')
+
+opts = {}
+
+handlers = {
+    's': {'desc': 'src'},
+    'd': {'desc': 'dest'},
+    'p': {'desc': 'sep'},
+    'f': {'desc': 'fallback'},
+    'r': {'desc': 'source_root'},
+}
+
+foreach k, v : handlers
+    handlers[k].action = func(optarg str)
+        opts[v.desc] = optarg
+    endfunc
+    handlers[k].required = true
+endforeach
+
+opts.cmd = import('getopt').getopt(argv, handlers)
+
+if opts.cmd.length() >= 1
+    programs = [[opts.cmd[0], opts.cmd.slice(1)]]
+else
+    programs = [['git', ['-C', opts.source_root, 'describe', '--dirty=+']]]
+endif
+
+found_tag = false
+
+foreach p : programs
+    prog = find_program(p[0], required: false)
+
+    if not prog.found()
+        continue
+    endif
+
+    runres = run_command(prog, p[1], check: false)
+    if runres.returncode() != 0
+        continue
+    endif
+
+    found_tag = true
+    vcs_tag = runres.stdout().strip()
+endforeach
+
+if not found_tag
+    vcs_tag = opts.fallback
+endif
+
+s = fs.read(opts.src)
+fs.write(opts.dest, vcs_tag.join(s.split(opts.sep)))
