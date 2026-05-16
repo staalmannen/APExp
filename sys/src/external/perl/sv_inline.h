@@ -489,7 +489,7 @@ Perl_newSV_type(pTHX_ const svtype type)
         } else
 #endif
         {
-// "not l-value" //            new_body = new_NOARENAZ(type_details);
+            new_body = new_NOARENAZ(type_details);
         }
         SvANY(sv) = new_body;
 
@@ -510,9 +510,8 @@ Perl_newSV_type(pTHX_ const svtype type)
         sv->sv_u.svu_rv = NULL;
         break;
     default:
-	return 0; /* temp fix */
-// "not l-value" //        Perl_croak(aTHX_ "panic: sv_upgrade to unknown type %lu",
-//                   (unsigned long)type);
+        Perl_croak(aTHX_ "panic: sv_upgrade to unknown type %lu",
+                   (unsigned long)type);
     }
 
     return sv;
