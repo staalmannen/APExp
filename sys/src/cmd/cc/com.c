@@ -155,14 +155,14 @@ tcomo(Node *n, int f)
 		}
 		break;
 
-	case OASI:	/* same as as, but no test for const */
+	case OASI:	/* same as as, but no test for const or lvalue (init1 guarantees CAUTO target) */
 		n->op = OAS;
 		o = tcom(l);
 		if(o | tcom(r))
 			goto bad;
 
 		typeext(l->type, r);
-		if(tlvalue(l) || tcompat(n, l->type, r->type, tasign))
+		if(tcompat(n, l->type, r->type, tasign))
 			goto bad;
 		if(!sametype(l->type, r->type)) {
 			r = new1(OCAST, r, Z);
