@@ -132,6 +132,7 @@ PERL_STATIC_INLINE SV**
 Perl_av_fetch_simple(pTHX_ AV *av, SSize_t key, I32 lval)
 {
     SV **arr;
+    SV *newsv;  /* kencc: hoist from nested block */
     PERL_ARGS_ASSERT_AV_FETCH_SIMPLE;
     assert(SvTYPE(av) == SVt_PVAV);
     assert(!SvMAGICAL(av));
@@ -142,7 +143,7 @@ Perl_av_fetch_simple(pTHX_ AV *av, SSize_t key, I32 lval)
     arr = AvARRAY(av);
     if (key > AvFILLp(av) || !arr[key]) {
         if (lval) {
-            SV *newsv = newSV_type(SVt_NULL);
+            newsv = newSV_type(SVt_NULL);
             return av_store_simple(av, key, newsv);
         }
         return NULL;
@@ -322,7 +323,7 @@ S_MgBYTEPOS(pTHX_ MAGIC *mg, SV *sv, const char *s, STRLEN len)
     if (mg->mg_flags & MGf_BYTES || !DO_UTF8(sv))
         return (STRLEN)mg->mg_len;
     else {
-        const STRLEN pos = (STRLEN)mg->mg_len;
+        STRLEN pos = (STRLEN)mg->mg_len;  /* kencc: no const-init */
         /* Without this check, we may read past the end of the buffer: */
         if (pos > sv_or_pv_len_utf8(sv, s, len)) return len+1;
         return sv_or_pv_pos_u2b(sv, s, pos, NULL);
@@ -1191,10 +1192,11 @@ Perl_sv_can_existdelete(pTHX_ SV *sv)
 {
     /* Anything without tie magic is fine */
     MAGIC *mg;
+    HV *stash;  /* kencc: hoist mid-block decl */
     if(!SvRMAGICAL(sv) || !(mg = mg_find(sv, PERL_MAGIC_tied)))
         return true;
 
-    HV *stash = SvSTASH(SvRV(SvTIED_obj(sv, mg)));
+    stash = SvSTASH(SvRV(SvTIED_obj(sv, mg)));
     return stash &&
         gv_fetchmethod_autoload(stash, "EXISTS", TRUE) &&
         gv_fetchmethod_autoload(stash, "DELETE", TRUE);
@@ -2174,7 +2176,7 @@ Perl_is_utf8_string_flags(const U8 *s, STRLEN len, const U32 flags)
     }
 
     if (! is_utf8_invariant_string_loc(s, len, &first_variant)) {
-        const U8* const send = s + len;
+        const U8* send = s + len;  /* kencc: no const ptr */
         const U8* x = first_variant;
 
         while (x < send) {
@@ -2215,12 +2217,13 @@ Perl_is_utf8_string_loclen(const U8 *s, STRLEN len, const U8 **ep, STRLEN *el)
     }
 
     {
-        const U8* const send = s + len;
+        const U8* send = s + len;  /* kencc: no const ptr */
         const U8* x = first_variant;
         STRLEN outlen = first_variant - s;
+        STRLEN cur_len;  /* kencc: hoist from while body */
 
         while (x < send) {
-            const STRLEN cur_len = isUTF8_CHAR(x, send);
+            cur_len = isUTF8_CHAR(x, send);
             if (UNLIKELY(! cur_len)) {
                 break;
             }
@@ -2318,7 +2321,7 @@ Perl_is_utf8_string_loclen(const U8 *s, STRLEN len, const U8 **ep, STRLEN *el)
                               incomplete_char_action)                       \
     STMT_START {                                                            \
         const U8 * s8dfa_ = s0;                                             \
-        const U8 * const e8dfa_ = e;                                        \
+        const U8 * e8dfa_ = e;  /* kencc: no const ptr */                  \
         PERL_UINT_FAST16_T state = 0;                                        \
                                                                             \
         PERL_NON_CORE_CHECK_EMPTY(s8dfa_, e8dfa_);                          \
@@ -2504,12 +2507,13 @@ Perl_is_strict_utf8_string_loclen(const U8 *s, STRLEN len, const U8 **ep, STRLEN
     }
 
     {
-        const U8* const send = s + len;
+        const U8* send = s + len;  /* kencc: no const ptr */
         const U8* x = first_variant;
         STRLEN outlen = first_variant - s;
+        STRLEN cur_len;  /* kencc: hoist from while body */
 
         while (x < send) {
-            const STRLEN cur_len = isSTRICT_UTF8_CHAR(x, send);
+            cur_len = isSTRICT_UTF8_CHAR(x, send);
             if (UNLIKELY(! cur_len)) {
                 break;
             }
@@ -2554,12 +2558,13 @@ Perl_is_c9strict_utf8_string_loclen(const U8 *s, STRLEN len, const U8 **ep, STRL
     }
 
     {
-        const U8* const send = s + len;
+        const U8* send = s + len;  /* kencc: no const ptr */
         const U8* x = first_variant;
         STRLEN outlen = first_variant - s;
+        STRLEN cur_len;  /* kencc: hoist from while body */
 
         while (x < send) {
-            const STRLEN cur_len = isC9_STRICT_UTF8_CHAR(x, send);
+            cur_len = isC9_STRICT_UTF8_CHAR(x, send);
             if (UNLIKELY(! cur_len)) {
                 break;
             }
@@ -2629,9 +2634,10 @@ Perl_is_utf8_string_loclen_flags(const U8 *s, STRLEN len, const U8 **ep, STRLEN 
         const U8* send = s + len;
         const U8* x = first_variant;
         STRLEN outlen = first_variant - s;
+        STRLEN cur_len;  /* kencc: hoist from while body */
 
         while (x < send) {
-            const STRLEN cur_len = isUTF8_CHAR_flags(x, send, flags);
+            cur_len = isUTF8_CHAR_flags(x, send, flags);
             if (UNLIKELY(! cur_len)) {
                 break;
             }
@@ -3158,6 +3164,12 @@ Perl_utf8_to_uv_msgs(const U8 * const s0,
 #endif
 
     {
+        /* kencc: hoist all decls before post-return declarations */
+        const U8 * s;
+        PERL_UINT_FAST8_T type;
+        PERL_UINT_FAST16_T state;
+        UV uv;
+
         /* UTF-8 invariants are returned unchanged.  The code below is quite
          * capable of handling this, but this shortcuts this very common case
          * */
@@ -3170,7 +3182,7 @@ Perl_utf8_to_uv_msgs(const U8 * const s0,
             return true;
         }
 
-        const U8 * s = s0;
+        s = s0;
 
         /* This dfa is fast.  If it accepts the input, it was for a
          * well-formed, non-problematic code point, which can be returned
@@ -3186,12 +3198,12 @@ Perl_utf8_to_uv_msgs(const U8 * const s0,
          *
          * The terminology of the dfa refers to a 'class'.  The variable 'type'
          * would have been named 'class' except that is a reserved word in C++
-         * 
+         *
          * The table can be a U16 on EBCDIC platforms, so 'state' is declared
          * as U16; 'type' is likely to never occupy more than 5 bits.  */
-        PERL_UINT_FAST8_T type = PL_strict_utf8_dfa_tab[*s];
-        PERL_UINT_FAST16_T state = PL_strict_utf8_dfa_tab[256 + type];
-        UV uv = (0xff >> type) & NATIVE_UTF8_TO_I8(*s);
+        type = PL_strict_utf8_dfa_tab[*s];
+        state = PL_strict_utf8_dfa_tab[256 + type];
+        uv = (0xff >> type) & NATIVE_UTF8_TO_I8(*s);
 
         while (state > 1 && ++s < e) {
             type  = PL_strict_utf8_dfa_tab[*s];
@@ -3573,7 +3585,8 @@ Perl_cx_topblock(pTHX_ PERL_CONTEXT *cx)
 PERL_STATIC_INLINE void
 Perl_cx_pushsub(pTHX_ PERL_CONTEXT *cx, CV *cv, OP *retop, bool hasargs)
 {
-    U8 phlags = CX_PUSHSUB_GET_LVALUE_MASK(Perl_was_lvalue_sub);
+    U8 phlags;  /* kencc: split init */
+    phlags = CX_PUSHSUB_GET_LVALUE_MASK(Perl_was_lvalue_sub);
 
     PERL_ARGS_ASSERT_CX_PUSHSUB;
 
@@ -3941,9 +3954,10 @@ Perl_switch_argstack(pTHX_ AV *to)
 PERL_STATIC_INLINE void
 Perl_push_stackinfo(pTHX_ I32 type, UV flags)
 {
+    PERL_SI *next;  /* kencc: hoist before ASSERT */
     PERL_ARGS_ASSERT_PUSH_STACKINFO;
 
-    PERL_SI *next = PL_curstackinfo->si_next;
+    next = PL_curstackinfo->si_next;
     DEBUG_l({
         int i = 0; PERL_SI *p = PL_curstackinfo;
         while (p) { i++; p = p->si_prev; }
@@ -3983,7 +3997,8 @@ Perl_pop_stackinfo(pTHX)
 {
     PERL_ARGS_ASSERT_POP_STACKINFO;
 
-    PERL_SI * const prev = PL_curstackinfo->si_prev;
+    PERL_SI *prev;  /* kencc: no const-init */
+    prev = PL_curstackinfo->si_prev;
     DEBUG_l({
         int i = -1; PERL_SI *p = PL_curstackinfo;
         while (p) { i++; p = p->si_prev; }
@@ -4480,7 +4495,7 @@ Perl_savepv(pTHX_ const char *pv)
         return NULL;
     else {
         char *newaddr;
-        const STRLEN pvlen = strlen(pv)+1;
+        STRLEN pvlen = strlen(pv)+1;  /* kencc: no const-init */
         Newx(newaddr, pvlen, char);
         return (char*)memcpy(newaddr, pv, pvlen);
     }
@@ -4510,7 +4525,7 @@ PERL_STATIC_INLINE char *
 Perl_savesvpv(pTHX_ SV *sv)
 {
     STRLEN len;
-    const char * const pv = SvPV_const(sv, len);
+    const char * pv = SvPV_const(sv, len);  /* kencc: no const ptr */
     char *newaddr;
 
     PERL_ARGS_ASSERT_SAVESVPV;
@@ -4524,7 +4539,7 @@ PERL_STATIC_INLINE char *
 Perl_savesharedsvpv(pTHX_ SV *sv)
 {
     STRLEN len;
-    const char * const pv = SvPV_const(sv, len);
+    const char * pv = SvPV_const(sv, len);  /* kencc: no const ptr */
 
     PERL_ARGS_ASSERT_SAVESHAREDSVPV;
 
