@@ -107,7 +107,7 @@ Perl_av_store_simple(pTHX_ AV *av, SSize_t key, SV *val)
         SvREFCNT_dec(ary[key]);
 
     ary[key] = val;
-    return &ary[key];
+    return ary + key;  /* &ary[key] — kencc: avoid & on subscript */
 }
 
 /*
@@ -131,6 +131,7 @@ The rough perl equivalent is C<$myarray[$key]>.
 PERL_STATIC_INLINE SV**
 Perl_av_fetch_simple(pTHX_ AV *av, SSize_t key, I32 lval)
 {
+    SV **arr;
     PERL_ARGS_ASSERT_AV_FETCH_SIMPLE;
     assert(SvTYPE(av) == SVt_PVAV);
     assert(!SvMAGICAL(av));
@@ -138,12 +139,13 @@ Perl_av_fetch_simple(pTHX_ AV *av, SSize_t key, I32 lval)
     assert(AvREAL(av));
     assert(key > -1);
 
-    if ( (key > AvFILLp(av)) || !AvARRAY(av)[key]) {
-        if (lval) return av_store_simple(av,key,newSV_type(SVt_NULL));
+    arr = AvARRAY(av);
+    if (key > AvFILLp(av) || !arr[key]) {
+        if (lval)
+            return av_store_simple(av, key, newSV_type(SVt_NULL));
         return NULL;
-    } else {
-        return &AvARRAY(av)[key];
     }
+    return arr + key;  /* &arr[key] — avoid & on macro expr (kencc) */
 }
 
 PERL_STATIC_INLINE void
@@ -249,10 +251,12 @@ recursive call.
 PERL_STATIC_INLINE I32 *
 Perl_CvDEPTH(const CV * const sv)
 {
+    XPVCV *body;
     PERL_ARGS_ASSERT_CVDEPTH;
     assert(SvTYPE(sv) == SVt_PVCV || SvTYPE(sv) == SVt_PVFM);
 
-    return &((XPVCV*)SvANY(sv))->xcv_depth;
+    body = (XPVCV*)SvANY(sv);
+    return &body->xcv_depth;
 }
 
 /*
@@ -1215,13 +1219,14 @@ Perl_sv_can_existdelete(pTHX_ SV *sv)
 PERL_STATIC_INLINE struct regexp *
 Perl_ReANY(const REGEXP * const re)
 {
-    XPV* const p = (XPV*)SvANY(re);
-
+    XPV *p;
     PERL_ARGS_ASSERT_REANY;
     assert(isREGEXP(re));
 
-    return SvTYPE(re) == SVt_PVLV ? p->xpv_len_u.xpvlenu_rx
-                                   : (struct regexp *)p;
+    p = (XPV*)SvANY(re);
+    if (SvTYPE(re) == SVt_PVLV)
+        return p->xpv_len_u.xpvlenu_rx;
+    return (struct regexp *)p;
 }
 
 /* ------------------------------- utf8.h ------------------------------- */

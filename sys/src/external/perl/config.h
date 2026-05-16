@@ -2196,6 +2196,11 @@
 /* kencc: PERL_MALLOC_WRAP disabled — complex comma exprs in Newx fail */
 /*#define PERL_MALLOC_WRAP*/
 
+/* kencc has no __func__/__FUNCTION__ predefined identifier */
+#ifndef __FUNCTION__
+#define __FUNCTION__ ""
+#endif
+
 /* MYMALLOC:
  *	This symbol, if defined, indicates that we're using our own malloc.
  */
