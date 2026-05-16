@@ -2003,14 +2003,14 @@ any magic.
 
 /* contains inlined gv_add_by_type */
 #define CLEAR_ERRSV() STMT_START {					\
-    SV ** const svp = &GvSV(PL_errgv);					\
+    SV ** svp = &GvSV(PL_errgv);					\
     if (!*svp) {							\
         *svp = newSVpvs("");                                            \
     } else if (SvREADONLY(*svp)) {					\
         SvREFCNT_dec_NN(*svp);						\
         *svp = newSVpvs("");						\
     } else {								\
-        SV *const errsv = *svp;						\
+        SV * errsv = *svp;						\
         SvPVCLEAR(errsv);                                               \
         SvPOK_only(errsv);						\
         if (SvMAGICAL(errsv)) {						\
@@ -2021,7 +2021,7 @@ any magic.
 
 /* contains inlined gv_add_by_type */
 #define SANE_ERRSV() STMT_START {					\
-    SV ** const svp = &GvSV(PL_errgv);					\
+    SV ** svp = &GvSV(PL_errgv);					\
     if (!*svp) {							\
         *svp = newSVpvs("");                                            \
     } else if (SvREADONLY(*svp)) {					\
@@ -2029,7 +2029,7 @@ any magic.
         SvREFCNT_dec_NN(*svp);						\
         *svp = dupsv;							\
     } else {								\
-        SV *const errsv = *svp;						\
+        SV * errsv = *svp;						\
         if (SvMAGICAL(errsv)) {						\
             mg_free(errsv);						\
         }								\

@@ -304,7 +304,7 @@ casts it to a pointer of that C<type>.
 
 # define save_freeop(op)                    \
 STMT_START {                                 \
-      OP * const _o = (OP *)(op);             \
+      OP * _o = (OP *)(op);             \
       assert(!_o->op_savefree);               \
       _o->op_savefree = 1;                     \
       save_pushptr((void *)(_o), SAVEt_FREEOP); \
