@@ -2645,7 +2645,8 @@ static int parse_makefile(struct GenCtx *g, const char *root, const char *rel)
 			pkgdatadir = pkgdatadir_buf;
 		}
 		if (!sysconfdir || !*sysconfdir)
-			sysconfdir = "/etc";
+// fix plan9 paths
+			sysconfdir = "/sys/lib/ape";
 
 		am_var_set(&d->am, "prefix", prefix);
 		am_var_set(&d->am, "bindir", bindir);
@@ -3315,7 +3316,7 @@ static int emit_install(struct GenCtx *g, const char *root)
 
 	sysconfdir = conf_get(g->conf, "sysconfdir");
 	if (!sysconfdir || !*sysconfdir)
-		sysconfdir = "/etc";
+		sysconfdir = "/sys/lib/ape";
 
 	pkgdatadir = conf_get(g->conf, "pkgdatadir");
 	if (!pkgdatadir || !*pkgdatadir) {

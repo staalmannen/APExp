@@ -459,16 +459,16 @@ static int cmd_configure(void)
 	if (!yacc)
 		fprintf(stderr, "satan: warning: no yacc found (byacc or bison), .y sources will fail\n");
 
-	snprintf(tmp, sizeof(tmp), "/etc/satan.conf.tmp");
+	snprintf(tmp, sizeof(tmp), "/sys/lib/ape/satan.conf.tmp");
 	if (write_conf(tmp, cc, cxx, ar, as, ranlib, ld, strip, objcopy, nm, pc, ninja, lex, yacc, sed, awk, ln_s, grep) != 0) {
 		fprintf(stderr, "satan: failed to write %s: %s\n", tmp, strerror(errno));
 		return 1;
 	}
-	if (rename(tmp, "/etc/satan.conf") != 0) {
+	if (rename(tmp, "/sys/lib/ape/satan.conf") != 0) {
 		fprintf(stderr, "satan: failed to move config into place: %s\n", strerror(errno));
 		return 1;
 	}
-	printf("satan: wrote /etc/satan.conf\n");
+	printf("satan: wrote /sys/lib/ape/satan.conf\n");
 	return 0;
 }
 
@@ -486,9 +486,9 @@ static int load_conf_common(struct Conf *conf, const char *root, int strict,
 	struct Conf override;
 
 	conf_init(conf);
-	if (conf_load(conf, "/etc/satan.conf") != 0) {
+	if (conf_load(conf, "/sys/lib/ape/satan.conf") != 0) {
 		if (strict) {
-			fprintf(stderr, "satan: missing /etc/satan.conf (run satan configure)\n");
+			fprintf(stderr, "satan: missing /sys/lib/ape/satan.conf (run satan configure)\n");
 			return -1;
 		}
 	} else {

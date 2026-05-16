@@ -1571,7 +1571,8 @@ static void set_dir_defaults(struct Auto *a)
 	const char *libs;
 
 	conf_init(&conf);
-	if (conf_load(&conf, "/etc/satan.conf") != 0)
+// changed path for plan9/APExp
+	if (conf_load(&conf, "/sys/lib/ape/satan.conf") != 0)
 		conf_apply_defaults(&conf);
 	else
 		conf_apply_defaults(&conf);
@@ -1603,12 +1604,13 @@ static void set_dir_defaults(struct Auto *a)
 	libs = conf_get(&conf, "LIBS");
 
 	{
-		const char *def_prefix = prefix ? prefix : "/usr";
-		const char *def_bindir = bindir ? bindir : "/usr/bin";
-		const char *def_sbindir = sbindir ? sbindir : "/usr/sbin";
-		const char *def_libdir = libdir ? libdir : "/usr/lib";
-		const char *def_includedir = includedir ? includedir : "/usr/include";
-		const char *def_mandir = mandir ? mandir : "/usr/share/man";
+// changed to plan9 defaults
+		const char *def_prefix = prefix ? prefix : "/";
+		const char *def_bindir = bindir ? bindir : "/bin";
+		const char *def_sbindir = sbindir ? sbindir : "/sbin";
+		const char *def_libdir = libdir ? libdir : "/$M/lib/ape";
+		const char *def_includedir = includedir ? includedir : "/sys/include/ape";
+		const char *def_mandir = mandir ? mandir : "/sys/man";
 		struct {
 			const char *key;
 			const char *val;
@@ -1625,7 +1627,7 @@ static void set_dir_defaults(struct Auto *a)
 			auto_set_val(a, defaults[di].key, defaults[di].val, 0);
 	}
 
-	dataroot = join_path2(prefix ? prefix : "/usr", "share");
+	dataroot = join_path2(prefix ? prefix : "/sys/lib", "share");
 	auto_set_val(a, "datarootdir", dataroot, 0);
 	datadir = xstrdup(dataroot);
 	auto_set_val(a, "datadir", datadir, 0);
@@ -1639,11 +1641,11 @@ static void set_dir_defaults(struct Auto *a)
 		free(pkgdatadir);
 	}
 
-	libexecdir = join_path2(prefix ? prefix : "/usr", "libexec");
+	libexecdir = join_path2(prefix ? prefix : "/$M", "bin/ape");
 	auto_set_val(a, "libexecdir", libexecdir, 0);
-	sysconfdir = join_path2(prefix ? prefix : "/usr", "etc");
+	sysconfdir = join_path2(prefix ? prefix : "/sys/lib", "etc");
 	auto_set_val(a, "sysconfdir", sysconfdir, 0);
-	localstatedir = join_path2(prefix ? prefix : "/usr", "var");
+	localstatedir = join_path2(prefix ? prefix : "/sys/lib", "var");
 	auto_set_val(a, "localstatedir", localstatedir, 0);
 
 	{
@@ -1850,8 +1852,8 @@ int main(int argc, char **argv)
 	char *path;
 	int rc;
 
-	if (access("/etc/satan.conf", R_OK) != 0) {
-		fprintf(stderr, "demiurge: missing /etc/satan.conf (run satan configure)\n");
+	if (access("/sys/lib/ape/satan.conf", R_OK) != 0) {
+		fprintf(stderr, "demiurge: missing /sys/lib/ape/satan.conf (run satan configure)\n");
 		return 1;
 	}
 
