@@ -2272,7 +2272,7 @@ immediately written again.
         Perl_sv_mortalcopy_flags(aTHX_ sv, SV_GMAGIC|SV_DO_COW_SVSETSV)
 #define sv_cathek(sv,hek)					    \
         STMT_START {						     \
-            HEK * const bmxk = hek;				      \
+            HEK * bmxk = hek;				      \
             sv_catpvn_flags(sv, HEK_KEY(bmxk), HEK_LEN(bmxk),	       \
                             HEK_UTF8(bmxk) ? SV_CATUTF8 : SV_CATBYTES); \
         } STMT_END

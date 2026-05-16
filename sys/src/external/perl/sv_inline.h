@@ -330,7 +330,7 @@ static const struct body_details bodies_by_type[] = {
 /* grab a new thing from the arena's free list, allocating more if necessary. */
 #define new_body_from_arena(xpv, root_index, type_meta) \
     STMT_START { \
-        void ** const r3wt = &PL_body_roots[root_index]; \
+        void ** r3wt = &PL_body_roots[root_index]; \
         xpv = (PTR_TBL_ENT_t*) (*((void **)(r3wt))      \
           ? *((void **)(r3wt)) : Perl_more_bodies(aTHX_ root_index, \
                                              type_meta.body_size,\
@@ -494,7 +494,7 @@ Perl_newSV_type(pTHX_ const svtype type)
         SvANY(sv) = new_body;
 
         if (UNLIKELY(type == SVt_PVIO)) {
-            IO * const io = MUTABLE_IO(sv);
+            IO * io = MUTABLE_IO(sv);  /* kencc: no const-init */
             GV *iogv = gv_fetchpvs("IO::File::", GV_ADD, SVt_PVHV);
 
             SvOBJECT_on(io);

@@ -1398,9 +1398,9 @@ See L<perlcall/LIGHTWEIGHT CALLBACKS>.
 #define PUSH_MULTICALL_FLAGS(the_cv, flags) \
     STMT_START {							\
         PERL_CONTEXT *cx;						\
-        CV * const _nOnclAshIngNamE_ = the_cv;				\
-        CV * const cv = _nOnclAshIngNamE_;				\
-        PADLIST * const padlist = CvPADLIST(cv);			\
+        CV * _nOnclAshIngNamE_ = the_cv;				\
+        CV * cv = _nOnclAshIngNamE_;					\
+        PADLIST * padlist = CvPADLIST(cv);				\
         multicall_oldcatch = CATCH_GET;					\
         CATCH_SET(TRUE);						\
         PUSHSTACKi(PERLSI_MULTICALL);					\
@@ -1442,9 +1442,9 @@ See L<perlcall/LIGHTWEIGHT CALLBACKS>.
 
 #define CHANGE_MULTICALL_FLAGS(the_cv, flags) \
     STMT_START {							\
-        CV * const _nOnclAshIngNamE_ = the_cv;				\
-        CV * const cv = _nOnclAshIngNamE_;				\
-        PADLIST * const padlist = CvPADLIST(cv);			\
+        CV * _nOnclAshIngNamE_ = the_cv;				\
+        CV * cv = _nOnclAshIngNamE_;					\
+        PADLIST * padlist = CvPADLIST(cv);				\
         PERL_CONTEXT *cx = CX_CUR();					\
         assert(CxMULTICALL(cx));                                        \
         cx_popsub_common(cx);                                           \
