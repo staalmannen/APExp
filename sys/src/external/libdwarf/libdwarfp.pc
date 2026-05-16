@@ -1,0 +1,14 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=/amd64/lib/ape
+includedir=/sys/include/ape
+pkgincludedir=/sys/include/ape/libdwarf-2
+
+Name: libdwarfp
+Description: DWARF debug symbols producer library
+Version: 2.3.1
+Requires.private: @requirements_libdwarfp_pc@
+Requires: libdwarf
+Libs: -L${libdir} -ldwarfp
+Libs.private: @requirements_libdwarfp_libs@
+Cflags: -I${pkgincludedir}

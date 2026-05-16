@@ -6,7 +6,7 @@ LIB=libcoreutils.a$O
 CORESRC=../../../external/coreutils
 
 TARG=\
-	base64\
+#	base64\
 	basename\
 	cat\
 	chmod\
@@ -97,7 +97,8 @@ BIN=$APEXPROOT/$objtype/bin/ape
 
 <$APEXPROOT/sys/src/cmd/mkmany
 
-CFLAGS=-c -I$CORESRC/src -I$CORESRC/lib -D_POSIX_SOURCE -DHAVE_CONFIG_H -DLOCALEDIR=\"/sys/lib/ape/locale\"
+CFLAGS= -c -I$CORESRC/src -I$CORESRC/lib -D_POSIX_SOURCE\
+	-DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale"
 
 %.$O: $CORESRC/src/%.c
 	$CC $CFLAGS $prereq -o $target
@@ -113,5 +114,11 @@ $O.cp: cp.$O cp-hash.$O copy.$O
 
 $O.chown: chown.$O chown-core.$O
 	$CC -o chown chown.$O chown-core.$O libcoreutils.a$O
+
+base64-basenc.$O : $CORESRC/src/basenc.c
+	$CC -DBASE_TYPE=64 $CFLAGS $prereq -o $target
+
+$O.base64: base64-basenc.$O
+	$CC -o base64 base64-basenc.$O libcoreutils.a$O
 
 
