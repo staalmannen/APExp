@@ -141,8 +141,10 @@ Perl_av_fetch_simple(pTHX_ AV *av, SSize_t key, I32 lval)
 
     arr = AvARRAY(av);
     if (key > AvFILLp(av) || !arr[key]) {
-        if (lval)
-            return av_store_simple(av, key, newSV_type(SVt_NULL));
+        if (lval) {
+            SV *newsv = newSV_type(SVt_NULL);
+            return av_store_simple(av, key, newsv);
+        }
         return NULL;
     }
     return arr + key;  /* &arr[key] — avoid & on macro expr (kencc) */
