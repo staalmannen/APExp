@@ -267,7 +267,8 @@
  *	This symbol, if defined, indicates that the entire msg*(2) library is
  *	supported (IPC mechanism based on message queues).
  */
-#define HAS_MSG		/**/
+/* Plan9 has no SysV IPC */
+#undef HAS_MSG		/**/
 
 /* HAS_MSYNC:
  *	This symbol, if defined, indicates that the msync system call is
@@ -1890,7 +1891,8 @@
  *	This symbol, if defined, indicates that the entire shm*(2) library is
  *	supported.
  */
-#define HAS_SHM		/**/
+/* Plan9 has no SysV IPC */
+#undef HAS_SHM		/**/
 
 /* Shmat_t:
  *	This symbol holds the return type of the shmat() system call.
