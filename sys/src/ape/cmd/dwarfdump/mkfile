@@ -2,8 +2,9 @@ APEXPROOT=../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-DWSRC=../../../external/chicken
-LIB=$APEXPROOT/$objtype/lib/ape/libdwarf.a
+DWSRC=../../../external/libdwarf
+LIB=$APEXPROOT/$objtype/lib/ape/libdwarf.a\
+	$APEXPROOT/$objtype/lib/ape/libzstd.a
 
 BIN=$APEXPROOT/$objtype/bin/ape
 
@@ -65,8 +66,8 @@ OFILES=\
 
 CC=pcc
 LD=pcc
-CFLAGS= -c -IDWSRC -IDWSRC/src/bin/dwarfdump\
-	-DHAVE_CONFIG_H
+CFLAGS= -c -I$DWSRC -I$DWSRC/src/bin/dwarfdump\
+	-I$DWSRC/src/lib/libdwarf -DHAVE_CONFIG_H
 
 %.$O: $DWSRC//src/bin/dwarfdump/%.c
     $CC $CFLAGS $DWSRC//src/bin/dwarfdump/$stem.c

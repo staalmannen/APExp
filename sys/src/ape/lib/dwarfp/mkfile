@@ -35,13 +35,13 @@ OFILES=\
 
 CC=pcc
 LD=pcc
-CFLAGS= -c -I$DWSRC -I$DWSRC/src/lib/libwarfp -I$DWSRC/src/lib/libwarf\
+CFLAGS= -c -I$DWSRC -I$DWSRC/src/lib/libdwarfp -I$DWSRC/src/lib/libdwarf\
 	-DHAVE_CONFIG_H
 
-%.$O: $DWSRC/src/lib/libwarfp/%.c
-	$CC $CFLAGS $DWSRC/src/lib/libwarfp/$stem.c
+%.$O: $DWSRC/src/lib/libdwarfp/%.c
+	$CC $CFLAGS $DWSRC/src/lib/libdwarfp/$stem.c
 
-%.$O: $DWSRC/src/lib/libwarf/%.c
-	$CC $CFLAGS $DWSRC/src/lib/libwarf/$stem.c
+%.$O: $DWSRC/src/lib/libdwarf/%.c
+	$CC $CFLAGS $DWSRC/src/lib/libdwarf/$stem.c
 
 
