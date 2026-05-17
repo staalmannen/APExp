@@ -122,7 +122,7 @@ STATIC void parsefname(void);
 STATIC void parseheredoc(void);
 STATIC int readtoken(void);
 STATIC int xxreadtoken(void);
-STATIC int pgetc_eatbnl();
+static int pgetc_eatbnl(void);
 STATIC int readtoken1(int, char const *, char *, int);
 STATIC void synexpect(int) __attribute__((__noreturn__));
 STATIC void synerror(const char *) __attribute__((__noreturn__));
@@ -888,12 +888,13 @@ static void synstack_pop(struct synstack **stack)
 unsigned getmbc(int c, char *out, int mode)
 {
 	char *const start = out;
-	mbstate_t mbst = {};
+	mbstate_t mbst;
 	unsigned ml = 0;
 	size_t ml2;
 	wchar_t wc;
 	char *mbc;
 
+	memset(&mbst, 0, sizeof(mbst));
 	if (likely(c >= 0 || c <= PEOF))
 		return 0;
 
@@ -1475,11 +1476,11 @@ badsub:
 
 		if ((newsyn != synstack->syntax || synstack->innerdq) &&
 		    subtype != VSNORMAL) {
-			synstack_push(&synstack,
-				      synstack->prev ?:
-				      alloca(sizeof(*synstack)),
-				      newsyn);
-
+			struct stack *prev;
+			prev = synstack->prev;
+			if (prev == NULL)
+				prev = (struct stack *)alloca(sizeof(*synstack));
+			synstack_push(&synstack, prev, newsyn);
 			synstack->varpushed++;
 			synstack->dblquote = newsyn != BASESYNTAX;
 		}
@@ -1631,11 +1632,13 @@ parsebackq: {
  * Parse an arithmetic expansion (indicate start of one and set state)
  */
 parsearith: {
+		struct stack *prev;
+		prev = synstack->prev;
+		if (prev == NULL)
+			prev = (struct stack *)alloca(sizeof(*synstack));
+		synstack_push(&synstack, prev, ARISYNTAX);
+		synstack->dblquote = 1;
 
-	synstack_push(&synstack,
-		      synstack->prev ?: alloca(sizeof(*synstack)),
-		      ARISYNTAX);
-	synstack->dblquote = 1;
 	if (chkeofmark)
 		USTPUTC(c, out);
 	else {
