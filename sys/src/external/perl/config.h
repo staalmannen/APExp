@@ -56,7 +56,8 @@
  *	This symbol, if defined, indicates that the crypt routine is available
  *	to encrypt passwords and the like.
  */
-#define HAS_CRYPT		/**/
+/* Plan9: no DES crypt */
+#undef HAS_CRYPT
 
 /* HAS_CTERMID:
  *	This symbol, if defined, indicates that the ctermid routine is
@@ -442,7 +443,8 @@
  *	process.
  */
 #define HAS_SETREGID		/**/
-#define HAS_SETRESGID		/**/
+/* Plan9: no Linux/BSD setresgid */
+#undef HAS_SETRESGID
 
 /* HAS_SETREUID:
  *	This symbol, if defined, indicates that the setreuid routine is
@@ -455,7 +457,8 @@
  *	process.
  */
 #define HAS_SETREUID		/**/
-#define HAS_SETRESUID		/**/
+/* Plan9: no Linux/BSD setresuid */
+#undef HAS_SETRESUID
 
 /* HAS_SETRGID:
  *	This symbol, if defined, indicates that the setrgid routine is available
@@ -2298,7 +2301,8 @@
  *	This symbol, if defined, indicates that the accept4 routine is
  *	available to accept socket connections.
  */
-#define HAS_ACCEPT4	/**/
+/* Plan9: no Linux accept4() extension */
+#undef HAS_ACCEPT4
 
 /* HAS_ACOSH:
  *	This symbol, if defined, indicates that the acosh routine is

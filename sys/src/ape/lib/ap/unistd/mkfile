@@ -33,8 +33,13 @@ OFILES=\
 	read.$O\
 	rename.$O\
 	rmdir.$O\
+	setegid.$O\
+	seteuid.$O\
 	setgid.$O\
+	setgroups.$O\
 	setpgid.$O\
+	setregid.$O\
+	setreuid.$O\
 	setsid.$O\
 	setuid.$O\
 	ttyname.$O\
