@@ -2232,6 +2232,9 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     {
         const char *s;
     for (argc--,argv++; argc > 0; argc--,argv++) {
+        write(2, "PB: argv loop: ", 15);
+        if (argv[0]) write(2, argv[0], strlen(argv[0]));
+        write(2, "\n", 1);
         if (argv[0][0] != '-' || !argv[0][1])
             break;
         s = argv[0]+1;
