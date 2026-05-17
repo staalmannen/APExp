@@ -389,6 +389,7 @@ static int debug_initialization = 0;
 #endif
 
 #include "EXTERN.h"
+#include <unistd.h>
 #define PERL_IN_LOCALE_C
 #include "perl.h"
 
@@ -8906,6 +8907,7 @@ S_output_check_environment_warning(pTHX_ const char * const language,
 int
 Perl_init_i18nl10n(pTHX_ int printwarn)
 {
+    write(2, "I18N: enter\n", 12);
     /* printwarn is:
      *    0 if not to output warning when setup locale is bad
      *    1 if to output warning based on value of PERL_BADLANG
@@ -8981,12 +8983,14 @@ Perl_init_i18nl10n(pTHX_ int printwarn)
      * before it is safely copied here, but that isn't a general solution.
      */
 
+    write(2, "I18N: before PL_langinfo_sv setup\n", 34);
     if (PL_langinfo_sv == NULL) {
          PL_langinfo_sv = newSVpvs("");
     }
     if (PL_scratch_langinfo == NULL) {
          PL_scratch_langinfo = newSVpvs("");
     }
+    write(2, "I18N: after PL_langinfo_sv setup\n", 33);
 
 #ifndef USE_LOCALE
 
@@ -9164,14 +9168,18 @@ Perl_init_i18nl10n(pTHX_ int printwarn)
 
 #  endif
 
+    write(2, "I18N: before new_LC_ALL\n", 24);
     new_LC_ALL("C", true /* Don't shortcut */);
+    write(2, "I18N: after new_LC_ALL\n", 23);
 
 /*===========================================================================*/
 
     /* Now ready to override the initialization with the values that the user
      * wants.  This is done in the global locale as explained in the
      * introductory comments to this function */
+    write(2, "I18N: before switch_to_global_locale\n", 37);
     switch_to_global_locale();
+    write(2, "I18N: after switch_to_global_locale\n", 36);
 
     const char * const lc_all     = PerlEnv_getenv("LC_ALL");
     const char * const lang       = PerlEnv_getenv("LANG");
