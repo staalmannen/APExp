@@ -8836,7 +8836,9 @@ S_give_perl_locale_control(pTHX_
 
 #  if defined(LC_ALL)
 
+    write(2, "I18N: gplc: before new_LC_ALL\n", 30);
     new_LC_ALL(lc_all_string, true);
+    write(2, "I18N: gplc: after new_LC_ALL\n", 29);
 
 #    else
 
@@ -9302,14 +9304,20 @@ Perl_init_i18nl10n(pTHX_ int printwarn)
         lc_all_string = savepv(stdized_setlocale(LC_ALL, locale));
         STDIZED_SETLOCALE_UNLOCK;
         write(2, "I18N: after stdized_setlocale\n", 30);
+        write(2, "I18N: lc_all_string check\n", 26);
 
         DEBUG_LOCALE_INIT(LC_ALL_INDEX_, locale, lc_all_string);
 
+        write(2, "I18N: after DEBUG_LOCALE_INIT\n", 30);
+
         if (LIKELY(lc_all_string)) {     /* Succeeded */
+            write(2, "I18N: lc_all_string is set, ok=1\n", 33);
             ok = 1;
+            write(2, "I18N: before break\n", 19);
             break;
         }
 
+        write(2, "I18N: lc_all_string was NULL\n", 29);
         if (trial == 0 && locwarn) {
             PerlIO_printf(Perl_error_log,
                                   "perl: warning: Setting locale failed.\n");
@@ -9502,7 +9510,9 @@ Perl_init_i18nl10n(pTHX_ int printwarn)
 
 #  ifdef LC_ALL
 
+    write(2, "I18N: before give_perl_locale_control\n", 38);
     give_perl_locale_control(lc_all_string, __LINE__);
+    write(2, "I18N: after give_perl_locale_control\n", 37);
     Safefree(lc_all_string);
 
 #  else
