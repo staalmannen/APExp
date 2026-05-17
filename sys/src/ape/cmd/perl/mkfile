@@ -11,14 +11,15 @@ BIN=$APEXPROOT/$objtype/bin/ape
 <$APEXPROOT/sys/src/cmd/mkone
 
 PERLSRC=../../../external/perl
-CFLAGS=-c -I$PERLSRC -D_POSIX_SOURCE -DHAVE_CONFIG_H -D_PLAN9_SOURCE -D_BSD_EXTENSION
+CFLAGS=-c -I$PERLSRC -D_POSIX_SOURCE -DHAVE_CONFIG_H -D_PLAN9_SOURCE\
+	-D_BSD_EXTENSION -DPERL_CORE
 
 CLEANFILES = *.c
 
 %.$O: $PERLSRC/%.c
 	$CC $CFLAGS $prereq -o $target
 
-miniperl: miniperlmain.$O opmini.$O perlmini.$O universalmini.$O
+miniperl: miniperlmain.$O opmini.$O perlmini.$O universalmini.$O $LIB
 	$LD $prereq -o $target
 
 opmini.$O: $PERLSRC/op.c

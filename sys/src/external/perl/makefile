@@ -922,3 +922,55 @@ ctags:
 
 # AUTOMATICALLY GENERATED MAKE DEPENDENCIES--PUT NOTHING BELOW THIS LINE
 # If this runs make out of memory, delete /usr/include lines.
+av$(OBJ_EXT): cflags
+builtin$(OBJ_EXT): cflags
+caretx$(OBJ_EXT): cflags
+class$(OBJ_EXT): cflags
+deb$(OBJ_EXT): cflags
+doio$(OBJ_EXT): cflags
+doop$(OBJ_EXT): cflags
+dquote$(OBJ_EXT): cflags
+dump$(OBJ_EXT): cflags
+globals$(OBJ_EXT): cflags
+gv$(OBJ_EXT): cflags
+hv$(OBJ_EXT): cflags
+keywords$(OBJ_EXT): cflags
+locale$(OBJ_EXT): cflags
+mathoms$(OBJ_EXT): cflags
+mg$(OBJ_EXT): cflags
+mro_core$(OBJ_EXT): cflags
+numeric$(OBJ_EXT): cflags
+op$(OBJ_EXT): cflags
+pad$(OBJ_EXT): cflags
+peep$(OBJ_EXT): cflags
+perl$(OBJ_EXT): cflags
+perlio$(OBJ_EXT): cflags
+perly$(OBJ_EXT): cflags
+pp$(OBJ_EXT): cflags
+pp_ctl$(OBJ_EXT): cflags
+pp_hot$(OBJ_EXT): cflags
+pp_pack$(OBJ_EXT): cflags
+pp_sort$(OBJ_EXT): cflags
+pp_sys$(OBJ_EXT): cflags
+reentr$(OBJ_EXT): cflags
+regcomp$(OBJ_EXT): cflags
+regcomp_debug$(OBJ_EXT): cflags
+regcomp_invlist$(OBJ_EXT): cflags
+regcomp_study$(OBJ_EXT): cflags
+regcomp_trie$(OBJ_EXT): cflags
+regexec$(OBJ_EXT): cflags
+run$(OBJ_EXT): cflags
+scope$(OBJ_EXT): cflags
+sv$(OBJ_EXT): cflags
+taint$(OBJ_EXT): cflags
+time64$(OBJ_EXT): cflags
+toke$(OBJ_EXT): cflags
+universal$(OBJ_EXT): cflags
+utf8$(OBJ_EXT): cflags
+util$(OBJ_EXT): cflags
+perlmain$(OBJ_EXT): cflags
+miniperlmain$(OBJ_EXT): cflags
+opmini$(OBJ_EXT): cflags
+perlmini$(OBJ_EXT): cflags
+universalmini$(OBJ_EXT): cflags
+# WARNING: Put nothing here or make depend will gobble it up!
