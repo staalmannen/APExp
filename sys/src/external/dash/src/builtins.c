@@ -36,7 +36,9 @@ int unaliascmd(int, char **);
 int unsetcmd(int, char **);
 int waitcmd(int, char **);
 int aliascmd(int, char **);
+#ifdef HAVE_GETRLIMIT
 int ulimitcmd(int, char **);
+#endif
 int testcmd(int, char **);
 int killcmd(int, char **);
 
@@ -75,7 +77,9 @@ const struct builtincmd builtincmd[] = {
 	{ "trap", trapcmd, 3 },
 	{ "true", truecmd, 2 },
 	{ "type", typecmd, 2 },
+#ifdef HAVE_GETRLIMIT
 	{ "ulimit", ulimitcmd, 2 },
+#endif
 	{ "umask", umaskcmd, 2 },
 	{ "unalias", unaliascmd, 2 },
 	{ "unset", unsetcmd, 3 },
