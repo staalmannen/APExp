@@ -29,6 +29,8 @@ struct timezone {
 extern int gettimeofday(struct timeval *, struct timezone *);
 int getitimer(int, struct itimerval *);
 int setitimer(int, const struct itimerval *, struct itimerval *);
+int utimes(const char *, const struct timeval [2]);
+int futimes(int, const struct timeval [2]);
 
 
 #endif /* __SYSTIME_H */

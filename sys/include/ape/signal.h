@@ -112,6 +112,7 @@ extern "C" {
 #endif
 
 extern int kill(pid_t, int);
+extern int killpg(pid_t, int);
 extern int sigemptyset(sigset_t *);
 extern int sigfillset(sigset_t *);
 extern int sigaddset(sigset_t *, int);

@@ -11,6 +11,8 @@ OFILES=\
 	stat.$O\
 	umask.$O\
 	utime.$O\
+	utimes.$O\
+	futimes.$O\
 # stubs\
 	fchown-stub.$O\
 # hacks\

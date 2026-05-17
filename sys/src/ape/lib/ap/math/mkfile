@@ -12,6 +12,7 @@ OFILES=\
 	fabs.$O\
 	floor.$O\
 	floorf.$O\
+	floorl.$O\
 	fmin.$O\
 	fmod.$O\
 	gamma.$O\

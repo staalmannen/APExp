@@ -10,6 +10,7 @@ OFILES=\
 	execve.$O\
 	execvp.$O\
 	fork.$O\
+	killpg.$O\
 	wait.$O\
 # GNU extensions\
 	execvpe.$O\
