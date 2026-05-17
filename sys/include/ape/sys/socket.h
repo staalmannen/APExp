@@ -204,7 +204,7 @@ extern int recvfrom(int, void *, int, int, void *, int *);
 extern int recvmsg(int, struct msghdr *, int);
 extern int send(int, void *, int, int);
 extern int sendto(int, void *, int, int, void *, int);
-extern int sendmsg(int, struct msghdr *, int);
+extern ssize_t sendmsg(int, const struct msghdr *, int);
 extern int shutdown(int, int);
 extern int socket(int, int, int);
 extern int socketpair(int, int, int, int *);

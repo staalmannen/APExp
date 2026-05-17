@@ -10,6 +10,8 @@ OFILES=\
 	getpwnam.$O\
 	getpwuid.$O\
 # musl\
+	getpwent_a.$O\
+	nscd_query.$O\
 	getpw_r.$O\
 	getpw_a.$O
 
