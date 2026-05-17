@@ -569,7 +569,7 @@ echocmd(int argc, char **argv)
 		if (!s || !*++argv)
 			fmt = lastfmt;
 
-		nonl = print_escape_str(fmt, NULL, NULL, s ?: nullstr);
+		nonl = print_escape_str(fmt, NULL, NULL, s ? s : nullstr);
 	} while (!nonl && *argv);
 	return 0;
 }
