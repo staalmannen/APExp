@@ -2709,22 +2709,31 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     }
 
 
+    write(2, "PB: before lex_start\n", 21);
     lex_start(linestr_sv, rsfp, lex_start_flags);
+    write(2, "PB: after lex_start\n", 20);
     SvREFCNT_dec(linestr_sv);
 
+    write(2, "PB: before newSVpvs main\n", 25);
     PL_subname = newSVpvs("main");
+    write(2, "PB: after newSVpvs main\n", 24);
 
-    if (add_read_e_script)
+    if (add_read_e_script) {
+        write(2, "PB: before filter_add\n", 22);
         filter_add(read_e_script, NULL);
+        write(2, "PB: after filter_add\n", 21);
+    }
 
     /* now parse the script */
     if (minus_e == FALSE)
         PL_hints |= HINTS_DEFAULT; /* after init_main_stash ; need to be after init_predump_symbols */
 
     SETERRNO(0,SS_NORMAL);
+    write(2, "PB: before yyparse\n", 19);
     if (yyparse(GRAMPROG) || PL_parser->error_count) {
         abort_execution(NULL, PL_origfilename);
     }
+    write(2, "PB: after yyparse\n", 18);
     CopLINE_set(PL_curcop, 0);
     SET_CURSTASH(PL_defstash);
     if (PL_e_script) {
