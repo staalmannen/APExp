@@ -694,7 +694,7 @@ static char *subevalvar(char *start, char *str, int strloc, int startloc,
 	if (flag & EXP_DISCARD)
 		return p;
 
-	startp = stackblock() + startloc;
+	startp = (char *)stackblock() + startloc;
 
 	switch (subtype) {
 	case VSASSIGN:
@@ -714,11 +714,11 @@ static char *subevalvar(char *start, char *str, int strloc, int startloc,
 		abort();
 #endif
 
-	rmescend = stackblock() + strloc;
+	rmescend = (char *)stackblock() + strloc;
 	str = preglob(rmescend, 0);
 	if (FNMATCH_IS_ENABLED) {
-		startp = stackblock() + startloc;
-		rmescend = stackblock() + strloc;
+		startp = (char *)stackblock() + startloc;
+		rmescend = (char *)stackblock() + strloc;
 		nstrloc = str - (char *)stackblock();
 	}
 
@@ -727,8 +727,8 @@ static char *subevalvar(char *start, char *str, int strloc, int startloc,
 		rmesc = _rmescapes(startp, RMESCAPE_ALLOC | RMESCAPE_GROW);
 		if (rmesc != startp)
 			rmescend = expdest;
-		startp = stackblock() + startloc;
-		str = stackblock() + nstrloc;
+		startp = (char *)stackblock() + startloc;
+		str = (char *)stackblock() + nstrloc;
 	}
 	rmescend--;
 
@@ -737,7 +737,7 @@ static char *subevalvar(char *start, char *str, int strloc, int startloc,
 	/* VSTRIMLEFT/VSTRIMRIGHTMAX -> scanleft */
 	scan = (subtype & 1) ^ zero ? scanleft : scanright;
 
-	endp = stackblock() + strloc - 1;
+	endp = (char *)stackblock() + strloc - 1;
 	loc = scan(startp, endp, rmesc, rmescend, str, quotes, zero);
 	if (!loc) {
 		if (quotes) {
@@ -908,7 +908,9 @@ struct mbpair {
 static struct mbpair mbtodest(const char *p, char *q, const char *syntax,
 			      size_t len)
 {
-	mbstate_t mbs = {};
+	mbstate_t mbs;
+	memset(&mbs, 0, sizeof(mbs));
+
 	struct mbpair mbp;
 	char *q0 = q;
 	size_t ml;
@@ -1180,26 +1182,27 @@ static unsigned ifsisifs(const char *p, unsigned ml, const char *ifs)
 	bool isifs = false;
 	wchar_t wc = *p;
 	wchar_t ifs0;
+	mbstate_t mbst;
+	wchar_t wc2;
 
 	if (likely(ifs[0]) && unlikely(wcifs)) {
 		if (wc & 0x80) {
-			mbstate_t mbst = {};
-			wchar_t wc2;
+			memset(&mbst, 0, sizeof(mbst));
 
 			if (mbrtowc(&wc2, p, ml, &mbst) != ml)
 				goto out;
 			wc = wc2;
 		}
 
-		isifs = wcschr(wcifs, wc);
+		isifs = (wcschr(wcifs, wc) != NULL);
 		ifs0 = wcifs[0];
 	} else if (likely(!ml)) {
-		isifs = strchr(ifs, wc);
+		isifs = (strchr(ifs, wc) != NULL);
 		ifs0 = ifs[0];
 	}
 
 	if (isifs)
-		isdefifs = iswspace(wc ?: ifs0);
+		isdefifs = iswspace(wc ? wc : ifs0);
 
 out:
 	return isifs << 1 | isdefifs;
@@ -1408,7 +1411,9 @@ out:
 
 void changeifs(const char *ifs)
 {
-	mbstate_t mbs = {};
+	mbstate_t mbs;
+	memset(&mbs, 0, sizeof(mbs));
+
 	wchar_t *nwcifs;
 	unsigned mb = 0;
 	size_t len = 0;
