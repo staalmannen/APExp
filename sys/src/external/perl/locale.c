@@ -3447,6 +3447,7 @@ S_setlocale_failure_panic_via_i(pTHX_
 STATIC void
 S_new_numeric(pTHX_ const char *newnum, bool force)
 {
+    write(2, "S_new_numeric: enter\n", 21);
     PERL_ARGS_ASSERT_NEW_NUMERIC;
 
     /* Called after each libc setlocale() or uselocale() call affecting
@@ -3667,6 +3668,7 @@ Perl_set_numeric_underlying(pTHX_ const char * const file, const line_t line)
 STATIC void
 S_new_ctype(pTHX_ const char *newctype, bool force)
 {
+    write(2, "S_new_ctype: enter\n", 19);
     PERL_ARGS_ASSERT_NEW_CTYPE;
     PERL_UNUSED_ARG(force);
 
@@ -4149,15 +4151,29 @@ S_new_LC_ALL(pTHX_ const char *lc_all, bool force)
     write(2, "NLA: after parse_LC_ALL_string\n", 31);
 
     for_all_individual_category_indexes(i) {
-        write(2, "NLA: cat loop iter\n", 19);
+        char ibuf[40]; int ilen;
+        ilen = 0; ibuf[ilen++]='N'; ibuf[ilen++]='L'; ibuf[ilen++]='A';
+        ibuf[ilen++]=':'; ibuf[ilen++]=' '; ibuf[ilen++]='i'; ibuf[ilen++]='=';
+        ibuf[ilen++]='0' + (i/10); ibuf[ilen++]='0' + (i%10);
+        ibuf[ilen++]=' '; ibuf[ilen++]='u'; ibuf[ilen++]='f';
+        ibuf[ilen++]='=';
+        ibuf[ilen++]= update_functions[i] ? 'Y' : 'N';
+        ibuf[ilen++]='\n';
+        write(2, ibuf, ilen);
+
         if (update_functions[i]) {
-            write(2, "NLA: calling update_functions[i]\n", 33);
             const char * this_locale = individ_locales[i];
+            write(2, "NLA: locale=", 12);
+            if (this_locale) write(2, this_locale, strlen(this_locale));
+            else write(2, "(null)", 6);
+            write(2, "\n", 1);
             update_functions[i](aTHX_ this_locale, force);
-            write(2, "NLA: returned update_functions[i]\n", 34);
+            write(2, "NLA: uf returned\n", 17);
         }
 
+        write(2, "NLA: pre-Safefree\n", 18);
         Safefree(individ_locales[i]);
+        write(2, "NLA: post-Safefree\n", 19);
     }
     write(2, "NLA: exit\n", 10);
 }
@@ -4167,6 +4183,7 @@ S_new_LC_ALL(pTHX_ const char *lc_all, bool force)
 STATIC void
 S_new_collate(pTHX_ const char *newcoll, bool force)
 {
+    write(2, "S_new_collate: enter\n", 21);
     PERL_ARGS_ASSERT_NEW_COLLATE;
     PERL_UNUSED_ARG(force);
 
