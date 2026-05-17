@@ -49,7 +49,15 @@ __get_locale(int cat, const char *val)
 char *
 setlocale(int cat, const char *name)
 {
-	if ((unsigned)cat > LC_ALL)
+	(void)name;
+	/* Reject categories we don't recognize.  Our locale.h numbers them:
+	 *   LC_ALL=0, LC_COLLATE=1, LC_CTYPE=2, LC_MONETARY=3,
+	 *   LC_NUMERIC=4, LC_TIME=5, LC_MESSAGES=1729.
+	 * Original check used '> LC_ALL', but LC_ALL is 0 and all real
+	 * categories are > 0 — that incorrectly rejected LC_CTYPE etc. */
+	if (cat != LC_ALL && cat != LC_COLLATE && cat != LC_CTYPE
+	    && cat != LC_MONETARY && cat != LC_NUMERIC && cat != LC_TIME
+	    && cat != LC_MESSAGES)
 		return 0;
 	/* We accept the set request but do nothing - always UTF-8.      */
 	/* For LC_ALL, return a semicolon-separated string of C.UTF-8.   */
