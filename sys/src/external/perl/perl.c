@@ -1945,7 +1945,9 @@ perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
     JMPENV_PUSH(ret);
     switch (ret) {
     case 0:
+        write(2, "PP: before parse_body\n", 22);
         parse_body(env,xsinit);
+        write(2, "PP: after parse_body\n", 21);
         if (PL_unitcheckav) {
             call_list(oldscope, PL_unitcheckav);
         }
@@ -2234,9 +2236,12 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     bool add_read_e_script = FALSE;
     U32 lex_start_flags = 0;
 
+    write(2, "PB: enter parse_body\n", 21);
     PERL_SET_PHASE(PERL_PHASE_START);
 
+    write(2, "PB: before init_main_stash\n", 27);
     init_main_stash();
+    write(2, "PB: after init_main_stash\n", 26);
 
     {
         const char *s;
