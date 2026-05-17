@@ -27,6 +27,20 @@ static const char c_time[] =
 static const char c_messages[] = "^[yY]\0" "^[nN]\0" "yes\0" "no";
 static const char c_numeric[] = ".\0" "";
 
+/*
+ * The high 16 bits of nl_item encode the locale category, but the
+ * encoding used by the macros in langinfo.h is musl's category
+ * numbering (NUMERIC=1, TIME=2, COLLATE=3, MONETARY=4, MESSAGES=5),
+ * NOT the LC_* values from our locale.h (where LC_ALL=0, LC_COLLATE=1,
+ * LC_CTYPE=2, LC_MONETARY=3, LC_NUMERIC=4, LC_TIME=5, LC_MESSAGES=1729).
+ * The switch below must use the musl encoding, since that's what the
+ * langinfo.h macro values were derived from.
+ */
+#define MUSL_CAT_NUMERIC  1
+#define MUSL_CAT_TIME     2
+#define MUSL_CAT_MONETARY 4
+#define MUSL_CAT_MESSAGES 5
+
 char *nl_langinfo_l(nl_item item, locale_t loc)
 {
 	int cat = item >> 16;
@@ -38,21 +52,21 @@ char *nl_langinfo_l(nl_item item, locale_t loc)
 	/* _NL_LOCALE_NAME extension */
 	if (idx == 65535 && cat < LC_ALL)
 		return loc->cat[cat] ? (char *)loc->cat[cat]->name : "C";
-	
+
 	switch (cat) {
-	case LC_NUMERIC:
+	case MUSL_CAT_NUMERIC:
 		if (idx > 1) return "";
 		str = c_numeric;
 		break;
-	case LC_TIME:
+	case MUSL_CAT_TIME:
 		if (idx > 0x31) return "";
 		str = c_time;
 		break;
-	case LC_MONETARY:
+	case MUSL_CAT_MONETARY:
 		if (idx > 0) return "";
 		str = "";
 		break;
-	case LC_MESSAGES:
+	case MUSL_CAT_MESSAGES:
 		if (idx > 3) return "";
 		str = c_messages;
 		break;
@@ -74,21 +88,21 @@ char *nl_langinfo(nl_item item)
 	/* _NL_LOCALE_NAME extension */
 	if (idx == 65535 && cat < LC_ALL)
 		return "C";
-	
+
 	switch (cat) {
-	case LC_NUMERIC:
+	case MUSL_CAT_NUMERIC:
 		if (idx > 1) return "";
 		str = c_numeric;
 		break;
-	case LC_TIME:
+	case MUSL_CAT_TIME:
 		if (idx > 0x31) return "";
 		str = c_time;
 		break;
-	case LC_MONETARY:
+	case MUSL_CAT_MONETARY:
 		if (idx > 0) return "";
 		str = "";
 		break;
-	case LC_MESSAGES:
+	case MUSL_CAT_MESSAGES:
 		if (idx > 3) return "";
 		str = c_messages;
 		break;
