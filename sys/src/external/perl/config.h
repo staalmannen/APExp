@@ -3189,8 +3189,9 @@
  *	This symbol, if defined, indicates that the prctl routine is
  *	available to set process title and supports PR_SET_NAME.
  */
-#define HAS_PRCTL		/**/
-#define HAS_PRCTL_SET_NAME		/**/
+/* Plan9: no Linux prctl(2) */
+#undef HAS_PRCTL		/**/
+#undef HAS_PRCTL_SET_NAME		/**/
 
 /* HAS_PROCSELFEXE:
  *	This symbol is defined if PROCSELFEXE_PATH is a symlink
