@@ -2638,12 +2638,17 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #   endif
 #endif
 
+    write(2, "PB: before init_predump_symbols\n", 32);
     init_predump_symbols();
+    write(2, "PB: after init_predump_symbols\n", 31);
     /* init_postdump_symbols not currently designed to be called */
     /* more than once (ENV isn't cleared first, for example)	 */
     /* But running with -u leaves %ENV & @ARGV undefined!    XXX */
-    if (!PL_do_undump)
+    if (!PL_do_undump) {
+        write(2, "PB: before init_postdump_symbols\n", 33);
         init_postdump_symbols(argc,argv,env);
+        write(2, "PB: after init_postdump_symbols\n", 32);
+    }
 
     /* PL_unicode is turned on by -C, or by $ENV{PERL_UNICODE},
      * or explicitly in some platforms.
