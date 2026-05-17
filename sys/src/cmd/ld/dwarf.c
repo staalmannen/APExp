@@ -1007,7 +1007,11 @@ writelines(void)
 			DWDie *v = newdie(dwinfo->child->child, 
 				(a->type == D_PARAM) ? DW_ABRV_PARAMETER : DW_ABRV_VARIABLE);
 			dwinfo->child->child = v;
+#ifdef AUTO_HAS_ASYM
 			newattr(v, DW_AT_name, DW_CLS_STRING, strlen(a->asym->name), a->asym->name);
+#else
+			newattr(v, DW_AT_name, DW_CLS_STRING, strlen(a->sym->name), a->sym->name);
+#endif
 			putlocation(v, a->aoffset, 0);
 			newattr(v, DW_AT_type, DW_CLS_REFERENCE, (vlong)findtype("int"), 0);
 		}
