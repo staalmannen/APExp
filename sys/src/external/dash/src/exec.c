@@ -171,13 +171,17 @@ repeat:
 
 static const char *legal_pathopt(const char *opt, const char *term, int magic)
 {
+	const char *p;
 	switch (magic) {
 	case 0:
 		opt = NULL;
 		break;
 
 	case 1:
-		opt = prefix(opt, "builtin") ?: prefix(opt, "func");
+		p = prefix(opt, "builtin");
+		if (p == NULL)
+			p = prefix(opt, "func");
+		opt = p;
 		break;
 
 	default:
