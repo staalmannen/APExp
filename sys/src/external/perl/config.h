@@ -3662,7 +3662,11 @@
  */
 /*#define PERL_LC_ALL_USES_NAME_VALUE_PAIRS  	/ **/
 #define  PERL_LC_ALL_SEPARATOR ";"	/**/
-#define  PERL_LC_ALL_CATEGORY_POSITIONS_INIT  { 0, 1, 2, 3, 4, 5 }	/**/
+/* Plan9 APE locale.h: LC_CTYPE=2, LC_NUMERIC=4, LC_COLLATE=1, LC_TIME=5,
+ * LC_MESSAGES=1729, LC_MONETARY=3. These are in Perl's internal index order
+ * (CTYPE=0, NUMERIC=1, COLLATE=2, TIME=3, MESSAGES=4, MONETARY=5) so that
+ * get_category_index(INIT[i]) == i for all positions. */
+#define  PERL_LC_ALL_CATEGORY_POSITIONS_INIT  { 2, 4, 1, 5, 1729, 3 }	/**/
 
 /* USE_DYNAMIC_LOADING:
  *	This symbol, if defined, indicates that dynamic loading of
