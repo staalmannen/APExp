@@ -751,14 +751,14 @@ newstructtype(char *name, int size)
 }
 
 static DWDie*
-newmember(DWDie *s, char *name, DWDie *type, int offset)
+newmember(DWDie *s, char *name, DWDie *t, int off)
 {
 	DWDie *m;
 	m = newdie(s->child, DW_ABRV_MEMBER);
 	s->child = m;
 	newattr(m, DW_AT_name, DW_CLS_STRING, strlen(name), name);
-	newattr(m, DW_AT_type, DW_CLS_REFERENCE, (vlong)type, 0);
-	newattr(m, DW_AT_data_member_location, DW_CLS_CONSTANT, offset, 0);
+	newattr(m, DW_AT_type, DW_CLS_REFERENCE, (vlong)t, 0);
+	newattr(m, DW_AT_data_member_location, DW_CLS_CONSTANT, off, 0);
 	return m;
 }
 
@@ -793,7 +793,7 @@ defbasetypes(void)
 }
 
 static void
-putlocation(DWDie *die, vlong offset, int isglobal)
+putlocation(DWDie *die, vlong off, int isglobal)
 {
 	char buf[32], *p;
 	int n;
@@ -803,17 +803,17 @@ putlocation(DWDie *die, vlong offset, int isglobal)
 		*p++ = DW_OP_addr;
 		switch(PtrSize){
 		case 4:
-			*(uint32*)p = offset;
+			*(uint32*)p = off;
 			p += 4;
 			break;
 		case 8:
-			*(uint64*)p = offset;
+			*(uint64*)p = off;
 			p += 8;
 			break;
 		}
 	} else {
 		*p++ = DW_OP_fbreg;
-		n = sleb128enc(offset, p);
+		n = sleb128enc(off, p);
 		p += n;
 	}
 	newattr(die, DW_AT_location, DW_CLS_BLOCK, p - buf, strdup(buf));
