@@ -23,7 +23,7 @@ DebugInfo* dwarf_init(const char* path) {
         return NULL;
     }
     
-    if (dwarf_init(info->fd, DW_DLC_READ, NULL, NULL, &info->dbg, &err) != DW_DLV_OK) {
+    if (dwarf_init_b(info->fd, DW_GROUPNUMBER_ANY, NULL, NULL, &info->dbg, &err) != DW_DLV_OK) {
         close(info->fd);
         free(info);
         return NULL;
