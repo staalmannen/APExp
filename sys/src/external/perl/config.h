@@ -515,7 +515,7 @@
  *	This symbol, if defined, indicates that the syscall routine is
  *	available to call arbitrary system calls. If undefined, that's tough.
  */
-#define HAS_SYSCALL	/**/
+#undef HAS_SYSCALL	/**/
 
 /* HAS_SYSCONF:
  *	This symbol, if defined, indicates that sysconf() is available
@@ -3493,7 +3493,7 @@
  *		extern int syscall(int,  ...);
  *		extern int syscall(long, ...);
  */
-#define HAS_SYSCALL_PROTO	/**/
+#undef HAS_SYSCALL_PROTO	/**/
 
 /* HAS_TELLDIR_PROTO:
  *	This symbol, if defined, indicates that the system provides
@@ -3806,7 +3806,7 @@
  *	This symbol, if defined, indicates that <shadow.h> exists and
  *	should be included.
  */
-#define I_SHADOW		/**/
+#undef I_SHADOW		/**/
 
 /* I_SOCKS:
  *	This symbol, if defined, indicates that <socks.h> exists and
@@ -3864,7 +3864,7 @@
 /* I_SYS_SYSCALL:
  *	This symbol, if defined, indicates that <sys/syscall.h> exists.
  */
-#define I_SYS_SYSCALL		/**/
+#undef I_SYS_SYSCALL		/**/
 
 /* I_SYSUTSNAME:
  *	This symbol, if defined, indicates that <sys/utsname.h> exists and
