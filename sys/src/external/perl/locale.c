@@ -9181,8 +9181,11 @@ Perl_init_i18nl10n(pTHX_ int printwarn)
     switch_to_global_locale();
     write(2, "I18N: after switch_to_global_locale\n", 36);
 
+    write(2, "I18N: before getenv LC_ALL\n", 27);
     const char * const lc_all     = PerlEnv_getenv("LC_ALL");
+    write(2, "I18N: before getenv LANG\n", 25);
     const char * const lang       = PerlEnv_getenv("LANG");
+    write(2, "I18N: after getenv\n", 19);
 
     /* We try each locale in the enum, in order, until we get one that works,
      * or exhaust the list.  Normally the loop is executed just once.
@@ -9294,9 +9297,11 @@ Perl_init_i18nl10n(pTHX_ int printwarn)
 
 #  ifdef LC_ALL
 
+        write(2, "I18N: before stdized_setlocale\n", 31);
         STDIZED_SETLOCALE_LOCK;
         lc_all_string = savepv(stdized_setlocale(LC_ALL, locale));
         STDIZED_SETLOCALE_UNLOCK;
+        write(2, "I18N: after stdized_setlocale\n", 30);
 
         DEBUG_LOCALE_INIT(LC_ALL_INDEX_, locale, lc_all_string);
 
