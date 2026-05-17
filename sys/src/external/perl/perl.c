@@ -2617,10 +2617,15 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     write(2, "PB: before boot_core_mro\n", 25);
     boot_core_mro();
     write(2, "PB: after boot_core_mro\n", 24);
+    write(2, "PB: before newXS Internals::V\n", 30);
     newXS("Internals::V", S_Internals_V, __FILE__);
+    write(2, "PB: after newXS Internals::V\n", 29);
 
-    if (xsinit)
+    if (xsinit) {
+        write(2, "PB: before xsinit\n", 18);
         (*xsinit)(aTHX);	/* in case linked C routines want magical variables */
+        write(2, "PB: after xsinit\n", 17);
+    }
 #if defined(VMS) || defined(WIN32) || defined(__CYGWIN__)
     init_os_extras();
 #endif
