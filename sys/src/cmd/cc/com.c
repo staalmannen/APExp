@@ -176,6 +176,11 @@ tcomo(Node *n, int f)
 		o = tcom(l);
 		if(o | tcom(r))
 			goto bad;
+		/* ONAME/OIND/ODOT after successful tcom are always lvalues;
+		 * tcom's ONAME/OIND case sets addable=1, and arrays/funcs are
+		 * transformed to OADDR by addaddr (so l->op wouldn't be ONAME).
+		 * Workaround for kencc bug: addable can be 0 here for ONAME locals. */
+		if(l->op != ONAME && l->op != OIND && l->op != ODOT && l->op != OBIT)
 		if(tlvalue(l))
 			goto bad;
 		if(isfunct(n))
@@ -204,6 +209,7 @@ tcomo(Node *n, int f)
 		o = tcom(l);
 		if(o | tcom(r))
 			goto bad;
+		if(l->op != ONAME && l->op != OIND && l->op != ODOT && l->op != OBIT)
 		if(tlvalue(l))
 			goto bad;
 		if(isfunct(n))
@@ -239,6 +245,7 @@ tcomo(Node *n, int f)
 		o = tcom(l);
 		if(o | tcom(r))
 			goto bad;
+		if(l->op != ONAME && l->op != OIND && l->op != ODOT && l->op != OBIT)
 		if(tlvalue(l))
 			goto bad;
 		if(isfunct(n))
@@ -284,6 +291,7 @@ tcomo(Node *n, int f)
 		o = tcom(l);
 		if(o | tcom(r))
 			goto bad;
+		if(l->op != ONAME && l->op != OIND && l->op != ODOT && l->op != OBIT)
 		if(tlvalue(l))
 			goto bad;
 		if(isfunct(n))
@@ -307,6 +315,7 @@ tcomo(Node *n, int f)
 		o = tcom(l);
 		if(o | tcom(r))
 			goto bad;
+		if(l->op != ONAME && l->op != OIND && l->op != ODOT && l->op != OBIT)
 		if(tlvalue(l))
 			goto bad;
 		if(isfunct(n))
@@ -338,6 +347,7 @@ tcomo(Node *n, int f)
 	case OPOSTDEC:
 		if(tcom(l))
 			goto bad;
+		if(l->op != ONAME && l->op != OIND && l->op != ODOT && l->op != OBIT)
 		if(tlvalue(l))
 			goto bad;
 		if(isfunct(n))
@@ -869,6 +879,7 @@ tcomo(Node *n, int f)
 	case OADDR:
 		if(tcomo(l, ADDROP))
 			goto bad;
+		if(l->op != ONAME && l->op != OIND && l->op != ODOT && l->op != OBIT)
 		if(tlvalue(l))
 			goto bad;
 		if(l->type->nbits) {
@@ -919,6 +930,7 @@ tcomo(Node *n, int f)
 	return 0;
 
 addaddr:
+	if(n->op != ONAME && n->op != OIND && n->op != ODOT && n->op != OBIT)
 	if(tlvalue(n))
 		goto bad;
 	l = new1(OXXX, Z, Z);
@@ -1087,6 +1099,9 @@ tlvalue(Node *n)
 {
 
 	if(!n->addable) {
+		fprint(2, "tlvalue FAIL: op=%d etype=%d class=%d sym=%s\n",
+			n->op, n->type ? (int)n->type->etype : -1, n->class,
+			n->sym ? n->sym->name : "(none)");
 		diag(n, "not an l-value");
 		return 1;
 	}
