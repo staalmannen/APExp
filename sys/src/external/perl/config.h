@@ -1472,16 +1472,19 @@
  *	different visibility.
  */
 #define HASATTRIBUTE_DEPRECATED	/**/
-#define HASATTRIBUTE_FORMAT	/**/
-#define PRINTF_FORMAT_NULL_OK	/**/
-#define HASATTRIBUTE_NORETURN	/**/
-#define HASATTRIBUTE_MALLOC	/**/
-#define HASATTRIBUTE_NONNULL	/**/
-#define HASATTRIBUTE_PURE	/**/
-#define HASATTRIBUTE_UNUSED	/**/
-#define HASATTRIBUTE_WARN_UNUSED_RESULT	/**/
-#define HASATTRIBUTE_ALWAYS_INLINE	/**/
-#define HASATTRIBUTE_VISIBILITY	/**/
+/* kencc: GCC __attribute__((...)) is swallowed but trailing-position attributes
+ * after function declarators trigger a parse bug that misparses the return
+ * type as TFUNC. Undefine these so __attribute__*__ macros expand to empty. */
+/*#define HASATTRIBUTE_FORMAT	/ **/
+/*#define PRINTF_FORMAT_NULL_OK	/ **/
+/*#define HASATTRIBUTE_NORETURN	/ **/
+/*#define HASATTRIBUTE_MALLOC	/ **/
+/*#define HASATTRIBUTE_NONNULL	/ **/
+/*#define HASATTRIBUTE_PURE	/ **/
+/*#define HASATTRIBUTE_UNUSED	/ **/
+/*#define HASATTRIBUTE_WARN_UNUSED_RESULT	/ **/
+/*#define HASATTRIBUTE_ALWAYS_INLINE	/ **/
+/*#define HASATTRIBUTE_VISIBILITY	/ **/
 
 /* HAS_BACKTRACE:
  *	This symbol, if defined, indicates that the backtrace() routine is

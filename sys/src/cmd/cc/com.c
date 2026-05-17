@@ -799,10 +799,6 @@ tcomo(Node *n, int f)
 		if(o | tcoma(l, r, l->type->down, 1))
 			goto bad;
 		n->type = l->type->link;
-		fprint(2, "OFUNC: callee=%s callee_etype=%d result_etype=%d\n",
-			l->sym ? l->sym->name : "(indirect)",
-			l->type ? (int)l->type->etype : -1,
-			n->type ? (int)n->type->etype : -1);
 		if(!debug['B']){
 			if(l->type->down == T){
 				if(!debug['T'])
@@ -883,8 +879,6 @@ tcomo(Node *n, int f)
 	case OADDR:
 		if(tcomo(l, ADDROP))
 			goto bad;
-		fprint(2, "OADDR: l->op=%d l->type_etype=%d l->addable=%d\n",
-			l->op, l->type ? (int)l->type->etype : -1, l->addable);
 		if(l->op != ONAME && l->op != OIND && l->op != ODOT && l->op != OBIT)
 		if(tlvalue(l))
 			goto bad;
@@ -936,8 +930,6 @@ tcomo(Node *n, int f)
 	return 0;
 
 addaddr:
-	fprint(2, "addaddr: n->op=%d n->type_etype=%d n->addable=%d\n",
-		n->op, n->type ? (int)n->type->etype : -1, n->addable);
 	if(n->op != ONAME && n->op != OIND && n->op != ODOT && n->op != OBIT)
 	if(tlvalue(n))
 		goto bad;
@@ -1107,9 +1099,6 @@ tlvalue(Node *n)
 {
 
 	if(!n->addable) {
-		fprint(2, "tlvalue FAIL: op=%d etype=%d class=%d sym=%s\n",
-			n->op, n->type ? (int)n->type->etype : -1, n->class,
-			n->sym ? n->sym->name : "(none)");
 		diag(n, "not an l-value");
 		return 1;
 	}
