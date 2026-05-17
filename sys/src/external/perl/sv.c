@@ -5110,9 +5110,22 @@ Perl_sv_setpvn_fresh(pTHX_ SV *const sv, const char *const ptr, const STRLEN len
     if (ptr) {
         const IV iv = len;
         /* len is STRLEN which is unsigned, need to copy to signed */
-        if (iv < 0)
+        if (iv < 0) {
+            /* Dump first 32 bytes of ptr for debugging */
+            char dbgbuf[80];
+            int i, n;
+            write(2, "SVFRESH bad len, ptr=", 21);
+            n = 0;
+            for (i = 0; i < 32 && ptr[i] && n < 60; i++) {
+                if (ptr[i] >= 32 && ptr[i] < 127)
+                    dbgbuf[n++] = ptr[i];
+                else { dbgbuf[n++] = '\\'; dbgbuf[n++] = 'x'; }
+            }
+            dbgbuf[n++] = '\n';
+            write(2, dbgbuf, n);
             croak("panic: sv_setpvn_fresh called with negative strlen %"
                        IVdf, iv);
+        }
 
         dptr = sv_grow_fresh(sv, len + 1);
         Move(ptr,dptr,len,char);
