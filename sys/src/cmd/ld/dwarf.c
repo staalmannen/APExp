@@ -777,6 +777,17 @@ newarraytype(DWDie *base, int count)
 	return d;
 }
 
+static DWDie*
+newptrtype(DWDie *target)
+{
+	DWDie *d;
+	d = newdie(dwtypes, DW_ABRV_PTRTYPE);
+	dwtypes = d;
+	newattr(d, DW_AT_type, DW_CLS_REFERENCE, (vlong)target, 0);
+	newattr(d, DW_AT_byte_size, DW_CLS_CONSTANT, PtrSize, 0);
+	return d;
+}
+
 static void
 defbasetypes(void)
 {
