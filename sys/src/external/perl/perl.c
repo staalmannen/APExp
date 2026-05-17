@@ -37,6 +37,7 @@
 #include "EXTERN.h"
 #define PERL_IN_PERL_C
 #include "perl.h"
+#include <unistd.h>
 #include "patchlevel.h"			/* for local_patches */
 #include "XSUB.h"
 
@@ -231,6 +232,7 @@ perl_construct(pTHXx)
 
     PERL_ARGS_ASSERT_PERL_CONSTRUCT;
 
+    write(2, "PC: enter\n", 10);
 #ifdef MULTIPLICITY
     init_interp();
     PL_perl_destruct_level = 1;
@@ -245,7 +247,9 @@ perl_construct(pTHXx)
     Zero(PL_op_exec_cnt, OP_max+2, UV);
 #endif
 
+    write(2, "PC: before init_constants\n", 26);
     init_constants();
+    write(2, "PC: after init_constants\n", 25);
 
     SvREADONLY_on(&PL_sv_placeholder);
     SvREFCNT(&PL_sv_placeholder) = SvREFCNT_IMMORTAL;
@@ -259,8 +263,10 @@ perl_construct(pTHXx)
 #endif
 
     PL_rs = newSVpvs("\n");
+    write(2, "PC: before init_stacks\n", 23);
 
     init_stacks();
+    write(2, "PC: after init_stacks\n", 22);
 
 #if !defined(NO_PERL_RAND_SEED) || !defined(NO_PERL_INTERNAL_HASH_SEED)
     bool sensitive_env_vars_allowed =
@@ -305,12 +311,16 @@ perl_construct(pTHXx)
     }
 #endif
 
+    write(2, "PC: before init_ids\n", 20);
     init_ids();
+    write(2, "PC: after init_ids\n", 19);
 
     JMPENV_BOOTSTRAP;
     STATUS_ALL_SUCCESS;
+    write(2, "PC: before init_uniprops\n", 25);
 
     init_uniprops();
+    write(2, "PC: after init_uniprops\n", 24);
     (void) uv_to_utf8_flags((U8 *) PL_TR_SPECIAL_HANDLING_UTF8,
                             TR_SPECIAL_HANDLING,
                             UNICODE_ALLOW_ABOVE_IV_MAX);
@@ -331,11 +341,14 @@ perl_construct(pTHXx)
     sys_intern_init();
 #endif
 
+    write(2, "PC: before PerlIO_init\n", 23);
     PerlIO_init(aTHX);			/* Hook to IO system */
+    write(2, "PC: after PerlIO_init\n", 22);
 
     PL_fdpid = newAV();			/* for remembering popen pids by fd */
     PL_modglobal = newHV();		/* pointers to per-interpreter module globals */
     PL_errors = newSVpvs("");
+    write(2, "PC: after newAV/newHV/newSVpvs\n", 31);
     SvPVCLEAR(PERL_DEBUG_PAD(0));        /* For regex debugging. */
     SvPVCLEAR(PERL_DEBUG_PAD(1));        /* ext/re needs these */
     SvPVCLEAR(PERL_DEBUG_PAD(2));        /* even without DEBUGGING. */
@@ -461,8 +474,10 @@ perl_construct(pTHXx)
     /* Start with 1 bucket, for DFS.  It's unlikely we'll need more.  */
     HvMAX(PL_registered_mros) = 0;
 
+    write(2, "PC: before ENTER+init_i18nl10n\n", 31);
     ENTER;
     init_i18nl10n(1);
+    write(2, "PC: after init_i18nl10n (perl_construct done)\n", 46);
 }
 
 /*
