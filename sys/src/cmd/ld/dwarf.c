@@ -155,6 +155,10 @@ enum
 	DW_ABRV_PARAMETER,
 	DW_ABRV_BASETYPE,
 	DW_ABRV_PTRTYPE,
+	DW_ABRV_STRUCTTYPE,
+	DW_ABRV_MEMBER,
+	DW_ABRV_ARRAYTYPE,
+	DW_ABRV_SUBRANGE,
 	DW_NABRV
 };
 
@@ -213,6 +217,34 @@ struct DWAbbrev {
 		DW_TAG_pointer_type, DW_CHILDREN_no,
 		DW_AT_type,      DW_FORM_ref_addr,
 		DW_AT_byte_size, DW_FORM_data1,
+		0, 0
+	},
+	/* STRUCTTYPE */
+	{
+		DW_TAG_structure_type, DW_CHILDREN_yes,
+		DW_AT_name,      DW_FORM_string,
+		DW_AT_byte_size, DW_FORM_data4,
+		0, 0
+	},
+	/* MEMBER */
+	{
+		DW_TAG_member,   DW_CHILDREN_no,
+		DW_AT_name,      DW_FORM_string,
+		DW_AT_type,      DW_FORM_ref_addr,
+		DW_AT_data_member_location, DW_FORM_data4,
+		0, 0
+	},
+	/* ARRAYTYPE */
+	{
+		DW_TAG_array_type, DW_CHILDREN_yes,
+		DW_AT_type,      DW_FORM_ref_addr,
+		0, 0
+	},
+	/* SUBRANGE */
+	{
+		DW_TAG_subrange_type, DW_CHILDREN_no,
+		DW_AT_type,      DW_FORM_ref_addr,
+		DW_AT_upper_bound, DW_FORM_udata,
 		0, 0
 	},
 };
@@ -708,28 +740,56 @@ newbasetype(char *name, int enc, int size)
 }
 
 static DWDie*
-newptrtype(DWDie *target)
+newstructtype(char *name, int size)
 {
 	DWDie *d;
-	d = newdie(dwtypes, DW_ABRV_PTRTYPE);
+	d = newdie(dwtypes, DW_ABRV_STRUCTTYPE);
 	dwtypes = d;
-	newattr(d, DW_AT_type, DW_CLS_REFERENCE, (vlong)target, 0);
-	newattr(d, DW_AT_byte_size, DW_CLS_CONSTANT, PtrSize, 0);
+	newattr(d, DW_AT_name, DW_CLS_STRING, strlen(name), name);
+	newattr(d, DW_AT_byte_size, DW_CLS_CONSTANT, size, 0);
+	return d;
+}
+
+static DWDie*
+newmember(DWDie *s, char *name, DWDie *type, int offset)
+{
+	DWDie *m;
+	m = newdie(s->child, DW_ABRV_MEMBER);
+	s->child = m;
+	newattr(m, DW_AT_name, DW_CLS_STRING, strlen(name), name);
+	newattr(m, DW_AT_type, DW_CLS_REFERENCE, (vlong)type, 0);
+	newattr(m, DW_AT_data_member_location, DW_CLS_CONSTANT, offset, 0);
+	return m;
+}
+
+static DWDie*
+newarraytype(DWDie *base, int count)
+{
+	DWDie *d, *s;
+	d = newdie(dwtypes, DW_ABRV_ARRAYTYPE);
+	dwtypes = d;
+	newattr(d, DW_AT_type, DW_CLS_REFERENCE, (vlong)base, 0);
+	
+	s = newdie(d->child, DW_ABRV_SUBRANGE);
+	d->child = s;
+	newattr(s, DW_AT_type, DW_CLS_REFERENCE, (vlong)findtype("int"), 0);
+	newattr(s, DW_AT_upper_bound, DW_CLS_CONSTANT, count - 1, 0);
 	return d;
 }
 
 static void
 defbasetypes(void)
 {
-	DWDie *intdie, *chardie;
+	DWDie *intdie, *chardie, *voiddie;
 	if(findtype("int")) return;
 	intdie = newbasetype("int", DW_ATE_signed, PtrSize);
 	chardie = newbasetype("char", DW_ATE_signed_char, 1);
-	newbasetype("void", DW_ATE_address, 0);
+	voiddie = newbasetype("void", DW_ATE_address, 0);
 	
 	/* Add basic pointers */
 	newptrtype(intdie);
 	newptrtype(chardie);
+	newptrtype(voiddie);
 }
 
 static void
