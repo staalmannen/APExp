@@ -89,7 +89,7 @@ extern volatile sig_atomic_t intpending;
 #ifdef __GNUC__
 #define barrier() ({ __asm__ __volatile__ ("": : :"memory"); })
 #else
-#define barrier()
+#define barrier() ((void)0)
 #endif
 
 #ifdef __GNUC__
@@ -100,7 +100,7 @@ extern volatile sig_atomic_t intpending;
 		0; \
 	})
 #else
-#define INTOFF (suppressint++, barrier())
+#define INTOFF do { suppressint++; barrier(); } while(0)
 #endif
 
 #ifdef REALLY_SMALL
