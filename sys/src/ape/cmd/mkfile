@@ -49,6 +49,8 @@ _OPTIONAL_APPS=\
 #		c++lib\
 #	basic\
 # dev tools \
+	adeb\
+	dwarfdump\
 	pcregrep\
 #	diff\
 #	patch\
