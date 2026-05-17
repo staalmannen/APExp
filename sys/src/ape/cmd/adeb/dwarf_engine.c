@@ -33,8 +33,7 @@ DebugInfo* dwarf_init(const char* path) {
 }
 
 void dwarf_close(DebugInfo* info) {
-    Dwarf_Error err;
-    dwarf_finish(info->dbg, &err);
+    dwarf_finish(info->dbg);
     close(info->fd);
     free(info);
 }
