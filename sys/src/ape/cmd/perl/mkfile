@@ -22,7 +22,7 @@ miniperl: miniperlmain.$O opmini.$O perlmini.$O universalmini.$O
 	$LD $prereq -o $target
 
 opmini.$O: $PERLSRC/op.c
-	$CC $CFLAGS  -DPERL_IS_MINIPERL -DPERL_EXTERNAL_GLOB $PERLSRC/op.c -o $target
+	$CC $CFLAGS -DPERL_IS_MINIPERL -DPERL_EXTERNAL_GLOB $PERLSRC/op.c -o $target
 
 perlmini.$O: $PERLSRC/perl.c
 	$CC $CFLAGS -DPERL_IS_MINIPERL -DPERL_EXTERNAL_GLOB $PERLSRC/perl.c -o $target
@@ -30,6 +30,16 @@ perlmini.$O: $PERLSRC/perl.c
 universalmini.$O: $PERLSRC/universal.c
 	$CC $CFLAGS -DPERL_IS_MINIPERL -DPERL_EXTERNAL_GLOB $PERLSRC/universal.c -o $target
 
+# pm_to_blib is a MakeMaker marker file (records that .pm files were
+# copied to blib/). We skip the MakeMaker step: miniperl finds
+# ExtUtils::Miniperl directly via -I below, so just touch the marker.
+$PERLSRC/ext/ExtUtils-Miniperl/pm_to_blib: miniperl
+	touch $PERLSRC/ext/ExtUtils-Miniperl/pm_to_blib
+
+# Generate perlmain.c via miniperl.
+# No DynaLoader: Plan9 has no dlopen; all extensions are linked statically
+# or omitted. Pass -I to the ExtUtils-Miniperl source directly.
 perlmain.c: miniperl $PERLSRC/ext/ExtUtils-Miniperl/pm_to_blib
-	./miniperl -MExtUtils::Miniperl -e 'writemain(\"perlmain.c", @ARGV)' DynaLoader\
-	$PERLSRC/ext/ExtUtils-Miniperl/pm_to_blib
+	./miniperl -I$PERLSRC/ext/ExtUtils-Miniperl/lib \
+		-MExtUtils::Miniperl \
+		-e 'writemain("perlmain.c")'
