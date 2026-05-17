@@ -1473,7 +1473,7 @@ static void *opendir_interruptible(const char *pathname)
 	return opendir(pathname);
 }
 #else
-#define GLOB_ALTDIRFUNC 0
+#undef GLOB_ALTDIRFUNC
 #endif
 
 static void expandmeta_glob(struct strlist *str)

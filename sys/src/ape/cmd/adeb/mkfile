@@ -2,7 +2,8 @@ APEXPROOT=../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-LIB=$APEXPROOT/$objtype/lib/ape/libdwarf.a
+LIB=$APEXPROOT/$objtype/lib/ape/libdwarf.a\
+	$APEXPROOT/$objtype/lib/ape/libzstd.a
 
 TARG=adeb
 BIN=$APEXPROOT/$objtype/bin/ape
@@ -12,6 +13,9 @@ OFILES=\
 	dwarf_engine.$O\
 
 <$APEXPROOT/sys/src/cmd/mkone
+
+CC=pcc
+CFLAGS= -c
 
 %.$O: %.c
 	$CC $CFLAGS $stem.c
