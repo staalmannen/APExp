@@ -1549,8 +1549,10 @@ expandmeta(struct strlist *str)
 {
 	/* TODO - EXP_REDIR */
 
-	if (GLOB_IS_ENABLED)
-		return expandmeta_glob(str);
+	if (GLOB_IS_ENABLED) {
+		expandmeta_glob(str);
+		return;
+	}
 
 	while (str) {
 		struct strlist **savelastp;
@@ -1858,15 +1860,15 @@ patmatch(char *pattern, const char *string)
 
 
 static __attribute__((noinline)) int ccmatch(char *p, const char *mbc, int ml,
-					     char **r)
+					       char **r)
 {
-	mbstate_t mbst = {};
+	mbstate_t mbst;
 	wctype_t type;
 	wchar_t wc;
 	char *q;
 
+	memset(&mbst, 0, sizeof(mbst));
 	*r = 0;
-
 	if (*p++ != ':')
 		return 0;
 
