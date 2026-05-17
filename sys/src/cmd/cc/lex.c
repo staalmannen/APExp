@@ -856,8 +856,23 @@ talph:
 	    strcmp(s->name, "__asm__")       == 0 ||
 	    strcmp(s->name, "__asm")         == 0)) {
 		int ac, depth;
-		/* skip whitespace to see if '(' follows */
-		do { ac = GETC(); } while(ac == ' ' || ac == '\t');
+		/*
+		 * After reading the identifier above, peekc holds the char that
+		 * ended the identifier loop (e.g. the first '(' of '((...))').
+		 * Consume peekc FIRST so we don't lose it; otherwise GETC reads
+		 * the second '(', depth tracking finishes at the inner ')',
+		 * and the outer ')' leaks to the parser as a phantom token —
+		 * the parser then sees "name(args) ()" and types the function
+		 * as "function returning function".
+		 */
+		if(peekc != IGN) {
+			ac = peekc;
+			peekc = IGN;
+		} else {
+			ac = GETC();
+		}
+		while(ac == ' ' || ac == '\t')
+			ac = GETC();
 		if(ac == '(') {
 			depth = 1;
 			while(depth > 0) {
@@ -876,13 +891,7 @@ talph:
 		}
 		/* Do NOT reset lasttok here: the swallowed keyword is invisible
 		 * to the parser, so the previous type keyword (e.g. LDOUBLE before
-		 * __asm__("sym") _Complex) must still be visible for _Complex combining.
-		 * Consume peekc before goto to avoid losing a character. */
-		if(peekc != IGN) {
-			c = peekc;
-			peekc = IGN;
-			goto l1;
-		}
+		 * __asm__("sym") _Complex) must still be visible for _Complex combining. */
 		goto l0;	/* fetch next real token */
 	}
 	/*
