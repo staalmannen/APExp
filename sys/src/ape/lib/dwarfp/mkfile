@@ -1,0 +1,47 @@
+</$objtype/mkfile
+APEXPROOT=../../../../..
+
+LIB=$APEXPROOT/$objtype/lib/ape/libdwarfp.a
+DWSRC=../../../external/libdwarf
+
+
+OFILES=\
+	dwarf_pro_alloc.$O \
+	dwarf_pro_arange.$O \
+	dwarf_pro_debug_sup.$O \
+	dwarf_pro_die.$O dwarf_pro_dnames.$O \
+	dwarf_pro_error.$O dwarf_pro_expr.$O \
+	dwarf_pro_finish.$O \
+	dwarf_pro_forms.$O \
+	dwarf_pro_frame.$O \
+	dwarf_pro_funcs.$O dwarf_pro_init.$O \
+	dwarf_pro_line.$O \
+	dwarf_pro_log_extra_flag_strings.$O \
+	dwarf_pro_macinfo.$O \
+	dwarf_pro_pubnames.$O \
+	dwarf_pro_reloc.$O \
+	dwarf_pro_reloc_symbolic.$O \
+	dwarf_pro_reloc_stream.$O \
+	dwarf_pro_section.$O \
+	dwarf_pro_types.$O dwarf_pro_vars.$O \
+	dwarf_pro_weaks.$O\
+# libdwarf objects\
+	dwarf_tsearchhash.$O\
+	dwarf_memcpy_swap.$O\
+	dwarf_string.$O
+
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CC=pcc
+LD=pcc
+CFLAGS= -c -I$DWSRC -I$DWSRC/src/lib/libwarfp -I$DWSRC/src/lib/libwarf\
+	-DHAVE_CONFIG_H
+
+%.$O: $DWSRC/src/lib/libwarfp/%.c
+	$CC $CFLAGS $DWSRC/src/lib/libwarfp/$stem.c
+
+%.$O: $DWSRC/src/lib/libwarf/%.c
+	$CC $CFLAGS $DWSRC/src/lib/libwarf/$stem.c
+
+

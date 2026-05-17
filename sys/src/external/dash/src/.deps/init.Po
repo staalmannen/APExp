@@ -1,0 +1,81 @@
+init.o: init.c /usr/include/stdc-predef.h ../config.h shell.h \
+  /usr/include/sys/param.h /usr/include/sys/resource.h \
+  /usr/include/features.h /usr/include/sys/time.h \
+  /usr/include/fortify/sys/select.h /usr/include/sys/select.h \
+  /usr/include/bits/alltypes.h \
+  /usr/include/fortify/sys/../fortify-headers.h \
+  /usr/include/bits/resource.h /usr/include/endian.h \
+  /usr/include/limits.h /usr/include/bits/limits.h mystring.h \
+  /usr/include/inttypes.h /usr/include/stdint.h \
+  /usr/include/bits/stdint.h /usr/include/fortify/string.h \
+  /usr/include/string.h /usr/include/fortify/strings.h \
+  /usr/include/strings.h /usr/include/fortify/fortify-headers.h init.h \
+  eval.h expand.h /usr/include/fortify/stdio.h /usr/include/stdio.h \
+  /usr/include/termios.h /usr/include/bits/termios.h \
+  /usr/include/fortify/unistd.h /usr/include/unistd.h input.h \
+  /usr/include/stdbool.h error.h /usr/include/setjmp.h \
+  /usr/include/bits/setjmp.h /usr/include/signal.h \
+  /usr/include/bits/signal.h syntax.h /usr/include/ctype.h parser.h \
+  token.h redir.h memalloc.h /usr/include/stddef.h \
+  /usr/include/fortify/stdlib.h /usr/include/stdlib.h \
+  /usr/include/alloca.h trap.h output.h /usr/include/stdarg.h \
+  /usr/include/sys/types.h /usr/include/sys/stat.h \
+  /usr/include/bits/stat.h cd.h var.h
+/usr/include/stdc-predef.h:
+../config.h:
+shell.h:
+/usr/include/sys/param.h:
+/usr/include/sys/resource.h:
+/usr/include/features.h:
+/usr/include/sys/time.h:
+/usr/include/fortify/sys/select.h:
+/usr/include/sys/select.h:
+/usr/include/bits/alltypes.h:
+/usr/include/fortify/sys/../fortify-headers.h:
+/usr/include/bits/resource.h:
+/usr/include/endian.h:
+/usr/include/limits.h:
+/usr/include/bits/limits.h:
+mystring.h:
+/usr/include/inttypes.h:
+/usr/include/stdint.h:
+/usr/include/bits/stdint.h:
+/usr/include/fortify/string.h:
+/usr/include/string.h:
+/usr/include/fortify/strings.h:
+/usr/include/strings.h:
+/usr/include/fortify/fortify-headers.h:
+init.h:
+eval.h:
+expand.h:
+/usr/include/fortify/stdio.h:
+/usr/include/stdio.h:
+/usr/include/termios.h:
+/usr/include/bits/termios.h:
+/usr/include/fortify/unistd.h:
+/usr/include/unistd.h:
+input.h:
+/usr/include/stdbool.h:
+error.h:
+/usr/include/setjmp.h:
+/usr/include/bits/setjmp.h:
+/usr/include/signal.h:
+/usr/include/bits/signal.h:
+syntax.h:
+/usr/include/ctype.h:
+parser.h:
+token.h:
+redir.h:
+memalloc.h:
+/usr/include/stddef.h:
+/usr/include/fortify/stdlib.h:
+/usr/include/stdlib.h:
+/usr/include/alloca.h:
+trap.h:
+output.h:
+/usr/include/stdarg.h:
+/usr/include/sys/types.h:
+/usr/include/sys/stat.h:
+/usr/include/bits/stat.h:
+cd.h:
+var.h:

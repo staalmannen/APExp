@@ -1,0 +1,63 @@
+</$objtype/mkfile
+APEXPROOT=../../../../..
+
+LIB=$APEXPROOT/$objtype/lib/ape/libdwarf.a
+DWSRC=../../../external/libdwarf
+
+
+OFILES=\
+	dwarf_abbrev.$O \
+	dwarf_alloc.$O dwarf_arange.$O \
+	dwarf_crc.$O dwarf_crc32.$O \
+	dwarf_debugaddr.$O dwarf_debuglink.$O \
+	dwarf_die_deliv.$O dwarf_debugnames.$O \
+	dwarf_debug_sup.$O dwarf_dsc.$O \
+	dwarf_elf_load_headers.$O \
+	dwarf_elfread.$O \
+	dwarf_elf_rel_detector.$O \
+	dwarf_error.$O \
+	dwarf_fill_in_attr_form.$O \
+	dwarf_find_sigref.$O \
+	dwarf_fission_to_cu.$O dwarf_form.$O \
+	dwarf_form_class_names.$O \
+	dwarf_frame.$O dwarf_frame_cfa_read.$O \
+	dwarf_frame2.$O dwarf_frame_iter.$O \
+	dwarf_gdbindex.$O \
+	dwarf_generic_init.$O dwarf_global.$O \
+	dwarf_gnu_index.$O dwarf_groups.$O \
+	dwarf_harmless.$O dwarf_init_finish.$O \
+	dwarf_leb.$O dwarf_line.$O \
+	dwarf_lname_version.$O dwarf_loc.$O \
+	dwarf_locationop_read.$O \
+	dwarf_loclists.$O dwarf_lvn_name.$O \
+	dwarf_machoread.$O \
+	dwarf_64machoread.$O dwarf_macro.$O \
+	dwarf_macro5.$O dwarf_memcpy_swap.$O \
+	dwarf_names.$O \
+	dwarf_object_detector.$O \
+	dwarf_object_read_common.$O \
+	dwarf_peread.$O dwarf_print_lines.$O \
+	dwarf_query.$O \
+	dwarf_safe_arithmetic.$O \
+	dwarf_safe_strcpy.$O \
+	dwarf_secname_ck.$O dwarf_seekr.$O \
+	dwarf_setup_sections.$O \
+	dwarf_ranges.$O dwarf_rnglists.$O \
+	dwarf_str_offsets.$O dwarf_string.$O \
+	dwarf_stringsection.$O dwarf_tied.$O \
+	dwarf_tsearchhash.$O dwarf_util.$O \
+	dwarf_xu_index.$O \
+	dwarf_local_malloc.$O
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CC=pcc
+LD=pcc
+CFLAGS= -c -I$DWSRC -I$DWSRC/src/lib/libwarf\
+	-DHAVE_CONFIG_H
+
+%.$O: $DWSRC/src/lib/libwarf/%.c
+	$CC $CFLAGS $DWSRC/src/lib/libwarf/$stem.c
+
+
+

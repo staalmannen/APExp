@@ -56,7 +56,7 @@ hard_locale_LC_MESSAGES (void)
 #endif
 }
 
-static int cmp (void);
+int cmp (void, void);
 static off_t file_position (int);
 static idx_t block_compare (word const *, word const *) ATTRIBUTE_PURE;
 static idx_t count_newlines (char *, idx_t);
@@ -397,8 +397,8 @@ main (int argc, char **argv)
    Return EXIT_SUCCESS if identical, EXIT_FAILURE if different,
    >1 if error.  */
 
-static int
-cmp (void)
+int
+cmp (void, void)
 {
   word *buffer0 = buffer[0];
   word *buffer1 = buffer[1];

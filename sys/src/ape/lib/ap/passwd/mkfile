@@ -9,6 +9,11 @@ OFILES=\
 	getpwent.$O\
 	getpwnam.$O\
 	getpwuid.$O\
+# musl\
+	getpwent_a.$O\
+	nscd_query.$O\
+	getpw_r.$O\
+	getpw_a.$O
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

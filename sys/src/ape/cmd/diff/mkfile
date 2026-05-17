@@ -2,12 +2,16 @@
 APEXPROOT=../../../../..
 DIFFSRC=$APEXPROOT/sys/src/external/diffutils
 
-TARG= cmp diff diff3 sdiff
+TARG=\
+	cmp\
+	diff\
+	diff3\
+	sdiff
 
 LIB= libdiff.a$O
 
 LIBO=\
-	sigsegv.$O stackvma.$O stdbit.$O
+	sigsegv.$O stdbit.$O
 
 CMPO=\
 	cmp.$O system.$O
@@ -28,9 +32,12 @@ BIN=$APEXPROOT/$objtype/bin/ape
 
 <$APEXPROOT/sys/src/cmd/mkmany
 
+RPLS= -Drpl_malloc=malloc -Drpl_free=free -Drpl_getopt_long=getopt_long\
+	-Drpl_optarg=optarg -Drpl_optind=optind
+
 CC=pcc -c
 CFLAGS=-B -p -D_POSIX_SOURCE -DREGEX_MALLOC -I$DIFFSRC/src -I$DIFFSRC/lib \
-	-DHAVE_CONFIG_H -DDIFF_PROGRAM="/bin/diff" \
+	-DHAVE_CONFIG_H -DDIFF_PROGRAM="/bin/diff" $RPLS\
 
 %.$O: $DIFFSRC/src/%.c
 	$CC $CFLAGS $prereq
@@ -39,6 +46,8 @@ CFLAGS=-B -p -D_POSIX_SOURCE -DREGEX_MALLOC -I$DIFFSRC/src -I$DIFFSRC/lib \
 	$CC $CFLAGS $prereq
 
 libdiff.a$O: $LIBO
+	ar vu $target $LIBO
+
 $O.diff: $DIFFO $LIB
 $O.diff3: $DIFF3O $LIB
 $O.sdiff: $SDIFFO $LIB

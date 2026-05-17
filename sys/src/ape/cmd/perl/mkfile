@@ -18,7 +18,7 @@ CLEANFILES = *.c
 %.$O: $PERLSRC/%.c
 	$CC $CFLAGS $prereq -o $target
 
-miniperl: miniperlmain.$O opmini.$O perlmini.$O universalmini.$O
+miniperl: miniperlmain.$O opmini.$O perlmini.$O universalmini.$O $LIB
 	$LD $prereq -o $target
 
 opmini.$O: $PERLSRC/op.c

@@ -202,7 +202,7 @@ freealias(struct alias *ap) {
 	return next;
 }
 
-void __attribute__((noinline)) printalias(const struct alias *ap) {
+void printalias(const struct alias *ap) {
 	out1fmt(snlfmt, single_quote(ap->name));
 }
 

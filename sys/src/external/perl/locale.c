@@ -5997,7 +5997,7 @@ S_populate_hash_from_localeconv(pTHX_ HV * hv,
          * critical section.  (This case is indicated by element [1] being a
          * NULL marker, hence having only one real element.) */
 #  ifndef LOCALECONV_NEEDS_CRITICAL_SECTION
-        const bool calculate_utf8ness_here = category_strings[1].name;
+        const bool calculate_utf8ness_here = (const bool) category_strings[1].name;
 #  endif
         bool utf8ness = false;
 

@@ -5,10 +5,10 @@
 #  is that makefile has the dependencies filled in at the end.
 
 CC = cc
-LD = cc
+LD = ld
 
-LDFLAGS =  -fstack-protector-strong -L/usr/local/lib
-CLDFLAGS =  -fstack-protector-strong -L/usr/local/lib
+LDFLAGS = 
+CLDFLAGS = 
 
 mallocsrc = 
 mallocobj = 
@@ -23,10 +23,10 @@ ECHO = echo
 # appropriate questions in Configure.  If you want to change these,
 # edit config.sh instead, or specify --man1dir=/wherever on
 # installman commandline.
-bin = /usr/local/bin
-scriptdir = /usr/local/bin
-shrpdir = /usr/local/lib/perl5/5.42.2/x86_64-linux/CORE
-privlib = /usr/local/lib/perl5/5.42.2
+bin = /bin
+scriptdir = /rc/bin/ape
+shrpdir = /amd64/lib/ape/CORE
+privlib = /sys/lib/perl
 man1dir =  
 man1ext = 0
 man3dir =  
@@ -34,10 +34,10 @@ man3ext = 0
 
 # The following are used to build and install shared libraries for
 # dynamic loading.
-LDDLFLAGS = -shared -O2 -L/usr/local/lib -fstack-protector-strong
+LDDLFLAGS = 
 SHRPLDFLAGS = $(LDDLFLAGS)
-CCDLFLAGS = -Wl,-E
-DLSUFFIX = .so
+CCDLFLAGS = 
+DLSUFFIX = .none
 PLDLFLAGS = 
 LIBPERL = libperl.a
 LLIBPERL= $(LIBPERL)
@@ -83,14 +83,14 @@ RUN_PERL = $(LDLIBPTH) $(RUN) ./perl$(EXE_EXT) -Ilib -I.
 # Macros to run our tests
 RUN_TESTS = $(LDLIBPTH) ./runtests
 
-dynamic_ext =   lib/auto/B/B.so lib/auto/Compress/Raw/Bzip2/Bzip2.so lib/auto/Compress/Raw/Zlib/Zlib.so lib/auto/Cwd/Cwd.so lib/auto/Data/Dumper/Dumper.so lib/auto/Devel/PPPort/PPPort.so lib/auto/Devel/Peek/Peek.so lib/auto/Digest/MD5/MD5.so lib/auto/Digest/SHA/SHA.so lib/auto/Encode/Encode.so lib/auto/Fcntl/Fcntl.so lib/auto/File/DosGlob/DosGlob.so lib/auto/File/Glob/Glob.so lib/auto/Filter/Util/Call/Call.so lib/auto/Hash/Util/Util.so lib/auto/Hash/Util/FieldHash/FieldHash.so lib/auto/I18N/Langinfo/Langinfo.so lib/auto/IO/IO.so lib/auto/IPC/SysV/SysV.so lib/auto/List/Util/Util.so lib/auto/MIME/Base64/Base64.so lib/auto/Math/BigInt/FastCalc/FastCalc.so lib/auto/Opcode/Opcode.so lib/auto/POSIX/POSIX.so lib/auto/PerlIO/encoding/encoding.so lib/auto/PerlIO/mmap/mmap.so lib/auto/PerlIO/via/via.so lib/auto/SDBM_File/SDBM_File.so lib/auto/Socket/Socket.so lib/auto/Storable/Storable.so lib/auto/Sys/Hostname/Hostname.so lib/auto/Sys/Syslog/Syslog.so lib/auto/Time/HiRes/HiRes.so lib/auto/Time/Piece/Piece.so lib/auto/Unicode/Collate/Collate.so lib/auto/Unicode/Normalize/Normalize.so lib/auto/XS/APItest/APItest.so lib/auto/XS/Typemap/Typemap.so lib/auto/attributes/attributes.so lib/auto/mro/mro.so lib/auto/re/re.so lib/auto/threads/threads.so lib/auto/threads/shared/shared.so
-dynamic_ext_re = lib/auto/re/re.so
+dynamic_ext =   lib/auto/B/B.none lib/auto/Compress/Raw/Bzip2/Bzip2.none lib/auto/Compress/Raw/Zlib/Zlib.none lib/auto/Cwd/Cwd.none lib/auto/Data/Dumper/Dumper.none lib/auto/Devel/PPPort/PPPort.none lib/auto/Devel/Peek/Peek.none lib/auto/Digest/MD5/MD5.none lib/auto/Digest/SHA/SHA.none lib/auto/Encode/Encode.none lib/auto/Fcntl/Fcntl.none lib/auto/File/DosGlob/DosGlob.none lib/auto/File/Glob/Glob.none lib/auto/Filter/Util/Call/Call.none lib/auto/Hash/Util/Util.none lib/auto/Hash/Util/FieldHash/FieldHash.none lib/auto/I18N/Langinfo/Langinfo.none lib/auto/IO/IO.none lib/auto/IPC/SysV/SysV.none lib/auto/List/Util/Util.none lib/auto/MIME/Base64/Base64.none lib/auto/Math/BigInt/FastCalc/FastCalc.none lib/auto/Opcode/Opcode.none lib/auto/POSIX/POSIX.none lib/auto/PerlIO/encoding/encoding.none lib/auto/PerlIO/mmap/mmap.none lib/auto/PerlIO/via/via.none lib/auto/SDBM_File/SDBM_File.none lib/auto/Socket/Socket.none lib/auto/Storable/Storable.none lib/auto/Sys/Hostname/Hostname.none lib/auto/Sys/Syslog/Syslog.none lib/auto/Time/HiRes/HiRes.none lib/auto/Time/Piece/Piece.none lib/auto/Unicode/Collate/Collate.none lib/auto/Unicode/Normalize/Normalize.none lib/auto/XS/APItest/APItest.none lib/auto/XS/Typemap/Typemap.none lib/auto/attributes/attributes.none lib/auto/mro/mro.none lib/auto/re/re.none lib/auto/threads/threads.none lib/auto/threads/shared/shared.none
+dynamic_ext_re = lib/auto/re/re.none
 static_ext =  
 nonxs_ext =   cpan/Archive-Tar/pm_to_blib dist/Attribute-Handlers/pm_to_blib cpan/AutoLoader/pm_to_blib cpan/CPAN/pm_to_blib cpan/CPAN-Meta/pm_to_blib cpan/CPAN-Meta-Requirements/pm_to_blib cpan/CPAN-Meta-YAML/pm_to_blib dist/Carp/pm_to_blib cpan/Config-Perl-V/pm_to_blib dist/Devel-SelfStubber/pm_to_blib cpan/Digest/pm_to_blib dist/Dumpvalue/pm_to_blib dist/Env/pm_to_blib ext/Errno/pm_to_blib dist/Exporter/pm_to_blib dist/ExtUtils-CBuilder/pm_to_blib cpan/ExtUtils-Constant/pm_to_blib cpan/ExtUtils-Install/pm_to_blib cpan/ExtUtils-MakeMaker/pm_to_blib cpan/ExtUtils-Manifest/pm_to_blib ext/ExtUtils-Miniperl/pm_to_blib cpan/ExtUtils-PL2Bat/pm_to_blib dist/ExtUtils-ParseXS/pm_to_blib cpan/File-Fetch/pm_to_blib ext/File-Find/pm_to_blib cpan/File-Path/pm_to_blib cpan/File-Temp/pm_to_blib ext/FileCache/pm_to_blib dist/Filter-Simple/pm_to_blib dist/FindBin/pm_to_blib cpan/Getopt-Long/pm_to_blib cpan/HTTP-Tiny/pm_to_blib dist/I18N-Collate/pm_to_blib dist/I18N-LangTags/pm_to_blib cpan/IO-Compress/pm_to_blib cpan/IO-Socket-IP/pm_to_blib cpan/IO-Zlib/pm_to_blib cpan/IPC-Cmd/pm_to_blib ext/IPC-Open3/pm_to_blib cpan/JSON-PP/pm_to_blib dist/Locale-Maketext/pm_to_blib cpan/Locale-Maketext-Simple/pm_to_blib cpan/Math-BigInt/pm_to_blib dist/Math-Complex/pm_to_blib cpan/Memoize/pm_to_blib dist/Module-CoreList/pm_to_blib cpan/Module-Load/pm_to_blib cpan/Module-Load-Conditional/pm_to_blib cpan/Module-Loaded/pm_to_blib cpan/Module-Metadata/pm_to_blib cpan/NEXT/pm_to_blib dist/Net-Ping/pm_to_blib cpan/Params-Check/pm_to_blib cpan/Perl-OSType/pm_to_blib ext/PerlIO-scalar/pm_to_blib cpan/PerlIO-via-QuotedPrint/pm_to_blib cpan/Pod-Checker/pm_to_blib cpan/Pod-Escapes/pm_to_blib ext/Pod-Functions/pm_to_blib ext/Pod-Html/pm_to_blib cpan/Pod-Perldoc/pm_to_blib cpan/Pod-Simple/pm_to_blib cpan/Pod-Usage/pm_to_blib dist/Safe/pm_to_blib dist/Search-Dict/pm_to_blib dist/SelfLoader/pm_to_blib cpan/Term-ANSIColor/pm_to_blib cpan/Term-Cap/pm_to_blib dist/Term-Complete/pm_to_blib dist/Term-ReadLine/pm_to_blib cpan/Term-Table/pm_to_blib dist/Test/pm_to_blib cpan/Test-Harness/pm_to_blib cpan/Test-Simple/pm_to_blib dist/Text-Abbrev/pm_to_blib cpan/Text-Balanced/pm_to_blib cpan/Text-ParseWords/pm_to_blib cpan/Text-Tabs/pm_to_blib dist/Thread-Queue/pm_to_blib dist/Thread-Semaphore/pm_to_blib dist/Tie-File/pm_to_blib ext/Tie-Hash-NamedCapture/pm_to_blib ext/Tie-Memoize/pm_to_blib cpan/Tie-RefHash/pm_to_blib cpan/Time-Local/pm_to_blib dist/XSLoader/pm_to_blib cpan/autodie/pm_to_blib dist/autouse/pm_to_blib dist/base/pm_to_blib cpan/bignum/pm_to_blib dist/constant/pm_to_blib dist/encoding-warnings/pm_to_blib cpan/experimental/pm_to_blib dist/if/pm_to_blib dist/lib/pm_to_blib cpan/libnet/pm_to_blib cpan/parent/pm_to_blib cpan/perlfaq/pm_to_blib cpan/podlators/pm_to_blib cpan/version/pm_to_blib
 ext = $(dynamic_ext) $(static_ext) $(nonxs_ext)
 DYNALOADER = DynaLoader$(OBJ_EXT)
 
-libs = -lpthread -ldl -lm -lcrypt -lutil -lc 
+libs =   
 
 public = $(PERL_EXE) utilities
 
@@ -104,11 +104,6 @@ devtty = /dev/tty
 #
 
 # Mention gmake here so it gets probed for by Configure.
-
-# If you're going to use valgrind and it can't be invoked as plain valgrind
-# then you'll need to change this, or override it on the make command line.
-VALGRIND ?= valgrind
-VG_TEST  ?= ./perl -e 1 2>/dev/null
 
 DTRACE =  
 DTRACE_H = 
@@ -130,11 +125,11 @@ SHELL = /bin/sh
 # how to tr(anslate) newlines
 TRNL = '\n'
 
-OPTIMIZE = -O2
+OPTIMIZE =  
 
 EXTRAS = 
 
-INSTALLPREFIXEXP = /usr/local
+INSTALLPREFIXEXP = /
 
 
 CCCMD    = sh $(shellflags) cflags "optimize='$(OPTIMIZE)'" $@
@@ -296,7 +291,7 @@ perl$(OBJ_EXT): git_version.h
 utils/Makefile: $(MINIPERL_EXE) $(CONFIGPM) utils/Makefile.PL
 	$(MINIPERL) utils/Makefile.PL
 
-utilities:	utils/Makefile $(MINIPERL_EXE) $(CONFIGPM) lib/auto/Cwd/Cwd$(DLSUFFIX) FORCE
+utilities:	utils/Makefile $(PERL_EXE) $(CONFIGPM) FORCE
 	@echo " "; echo "	Making utilities"; cd utils; $(LDLIBPTH) $(MAKE) all
 
 
@@ -602,8 +597,8 @@ cpan/Pod-Simple/pm_to_blib: dist/if/pm_to_blib
 ext/Pod-Functions/pm_to_blib: cpan/Pod-Simple/pm_to_blib cpan/Pod-Escapes/pm_to_blib pod/perlfunc.pod
 cpan/IO-Compress/pm_to_blib: dist/lib/pm_to_blib
 
-lib/auto/Math/BigInt/FastCalc/FastCalc.so: lib/auto/List/Util/Util.so
-lib/auto/Unicode/Normalize/Normalize.so: uni.data
+lib/auto/Math/BigInt/FastCalc/FastCalc.none: lib/auto/List/Util/Util.none
+lib/auto/Unicode/Normalize/Normalize.none: uni.data
 
 .PHONY: printconfig
 printconfig:
@@ -821,8 +816,7 @@ test_prep test-prep: test_prep_pre $(MINIPERL_EXE) $(unidatafiles) $(PERL_EXE) \
 	$(dynamic_ext) $(TEST_PERL_DLL) runtests $(generated_pods) common_build
 	cd t && (rm -f $(PERL_EXE); $(LNS) ../$(PERL_EXE) $(PERL_EXE))
 
-test_prep_reonly: $(MINIPERL_EXE) $(PERL_EXE) $(dynamic_ext_re) $(TEST_PERL_DLL)
-	$(MINIPERL) make_ext.pl $(dynamic_ext_re) MAKE="$(MAKE)" LIBPERL_A=$(LIBPERL) LINKTYPE=dynamic
+test_prep_reonly: $(MINIPERL_EXE) $(PERL_EXE) $(TEST_PERL_DLL)
 	cd t && (rm -f $(PERL_EXE); $(LNS) ../$(PERL_EXE) $(PERL_EXE))
 
 test check: test_prep
@@ -834,15 +828,6 @@ test_tty test-tty: test_prep
 test_notty test-notty: test_prep
 	$(RUN_TESTS) no-tty
 
-# Targets for valgrind testing:
-
-test.valgrind check.valgrind:	test_prep
-	@echo "Checking usemymalloc='n' in config.sh..."
-	@grep "^usemymalloc="    config.sh
-	@grep "^usemymalloc='n'" config.sh >/dev/null || exit 1
-	@echo "And of course you have to have valgrind..."
-	$(VALGRIND) $(VG_TEST) || exit 1
-	PERL_VALGRIND=1 VALGRIND='$(VALGRIND)' TESTFILE=harness $(RUN_TESTS) choose
 
 # minitest can't depend on lib/Config.pm because that might be where miniperl
 # is crashing.

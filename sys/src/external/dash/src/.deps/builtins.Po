@@ -1,0 +1,24 @@
+builtins.o: builtins.c /usr/include/stdc-predef.h ../config.h shell.h \
+  /usr/include/sys/param.h /usr/include/sys/resource.h \
+  /usr/include/features.h /usr/include/sys/time.h \
+  /usr/include/fortify/sys/select.h /usr/include/sys/select.h \
+  /usr/include/bits/alltypes.h \
+  /usr/include/fortify/sys/../fortify-headers.h \
+  /usr/include/bits/resource.h /usr/include/endian.h \
+  /usr/include/limits.h /usr/include/bits/limits.h builtins.h
+/usr/include/stdc-predef.h:
+../config.h:
+shell.h:
+/usr/include/sys/param.h:
+/usr/include/sys/resource.h:
+/usr/include/features.h:
+/usr/include/sys/time.h:
+/usr/include/fortify/sys/select.h:
+/usr/include/sys/select.h:
+/usr/include/bits/alltypes.h:
+/usr/include/fortify/sys/../fortify-headers.h:
+/usr/include/bits/resource.h:
+/usr/include/endian.h:
+/usr/include/limits.h:
+/usr/include/bits/limits.h:
+builtins.h:
