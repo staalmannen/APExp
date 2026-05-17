@@ -4116,6 +4116,11 @@ S_new_LC_ALL(pTHX_ const char *lc_all, bool force)
 {
     PERL_ARGS_ASSERT_NEW_LC_ALL;
 
+    write(2, "NLA: enter\n", 11);
+    write(2, "NLA: lc_all=", 12);
+    if (lc_all) write(2, lc_all, strlen(lc_all)); else write(2, "(null)", 6);
+    write(2, "\n", 1);
+
     /* new_LC_ALL() updates all the things we care about.  Note that this is
      * called just after a change, so uses the actual underlying locale just
      * set, and not the nominal one (should they differ, as they may in
@@ -4123,6 +4128,7 @@ S_new_LC_ALL(pTHX_ const char *lc_all, bool force)
 
     const char * individ_locales[LC_ALL_INDEX_] = { NULL };
 
+    write(2, "NLA: before parse_LC_ALL_string\n", 32);
     switch (parse_LC_ALL_string(lc_all,
                                 individ_locales,
                                 override_if_ignored,   /* Override any ignored
@@ -4140,15 +4146,20 @@ S_new_LC_ALL(pTHX_ const char *lc_all, bool force)
       case full_array:
         break;
     }
+    write(2, "NLA: after parse_LC_ALL_string\n", 31);
 
     for_all_individual_category_indexes(i) {
+        write(2, "NLA: cat loop iter\n", 19);
         if (update_functions[i]) {
+            write(2, "NLA: calling update_functions[i]\n", 33);
             const char * this_locale = individ_locales[i];
             update_functions[i](aTHX_ this_locale, force);
+            write(2, "NLA: returned update_functions[i]\n", 34);
         }
 
         Safefree(individ_locales[i]);
     }
+    write(2, "NLA: exit\n", 10);
 }
 
 #  ifdef USE_LOCALE_COLLATE
