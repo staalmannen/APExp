@@ -156,7 +156,8 @@ RESET {
 
 static char *varnull(const char *s)
 {
-	return (strchr(s, '=') ?: nullstr - 1) + 1;
+	char *p = strchr(s, '=');
+	return (p ? p : nullstr - 1) + 1;
 }
 
 /*
@@ -327,7 +328,8 @@ lookupvar(const char *name)
 
 intmax_t lookupvarint(const char *name)
 {
-	return atomax(lookupvar(name) ?: nullstr, 0);
+	const char *val = lookupvar(name);
+	return atomax(val ? val : nullstr, 0);
 }
 
 
