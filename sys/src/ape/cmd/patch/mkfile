@@ -17,7 +17,8 @@ CFLAGS=-B -p -D_POSIX_SOURCE \
 	-D_BSD_EXTENSION -I$PTCHSRC \
 	-I$PTCHSRC/src -I$PTCHSRC/lib \
 	-DHAVE_CONFIG_H \
-	-Ded_PROGRAM="/bin/ed"
+	-Ded_PROGRAM="/bin/ed"\
+	-DS_IRWXUGO=S_IRUSR
 
 %.$O: $PTCHSRC/src/%.c
 	$CC $CFLAGS $prereq
