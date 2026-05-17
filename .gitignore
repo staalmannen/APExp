@@ -32,3 +32,6 @@ sys/lib/ape/locale.alias
 sys/src/ape/cmd/**/lib*.a[01256789kqtv]
 sys/src/cmd/*c/enam.c
 sys/src/external/f2c/lib/arithchk
+
+# Claude Code harness artifacts
+.claude/
