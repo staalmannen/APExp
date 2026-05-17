@@ -2317,10 +2317,12 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
         case 'e':
             forbid_setid('e', FALSE);
         minus_e = TRUE;
+            write(2, "PB: -e arm enter\n", 17);
             if (!PL_e_script) {
                 PL_e_script = newSVpvs("");
                 add_read_e_script = TRUE;
             }
+            write(2, "PB: -e sv_catpv\n", 16);
             if (*++s)
                 sv_catpv(PL_e_script, s);
             else if (argv[1]) {
@@ -2330,6 +2332,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
             else
                 croak("No code specified for -%c", c);
             sv_catpvs(PL_e_script, "\n");
+            write(2, "PB: -e arm done\n", 16);
             break;
 
         case 'f':
@@ -2403,6 +2406,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     }
 
   switch_end:
+    write(2, "PB: switch_end\n", 15);
 
     {
         char *s;
@@ -2493,10 +2497,12 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 
     /* Set $^X early so that it can be used for relocatable paths in @INC  */
     /* and for SITELIB_EXP in USE_SITECUSTOMIZE                            */
+    write(2, "PB: before set_caret_X\n", 23);
     assert (!TAINT_get);
     TAINT;
     set_caret_X();
     TAINT_NOT;
+    write(2, "PB: after set_caret_X\n", 22);
 
 #if defined(USE_SITECUSTOMIZE)
     if (!minus_f) {
@@ -2548,13 +2554,17 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
         scriptname = "-";
     }
 
+    write(2, "PB: before init_perllib\n", 24);
     assert (!TAINT_get);
     init_perllib();
+    write(2, "PB: after init_perllib\n", 23);
 
     {
         bool suidscript = FALSE;
 
+        write(2, "PB: before open_script\n", 23);
         rsfp = open_script(scriptname, dosearch, &suidscript);
+        write(2, "PB: after open_script\n", 22);
         if (!rsfp) {
             rsfp = PerlIO_stdin();
             lex_start_flags = LEX_DONT_CLOSE_RSFP;
@@ -2598,10 +2608,15 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 
     PL_isarev = newHV();
 
+    write(2, "PB: before boot_core_PerlIO\n", 28);
     boot_core_PerlIO();
+    write(2, "PB: before boot_core_UNIVERSAL\n", 31);
     boot_core_UNIVERSAL();
+    write(2, "PB: before boot_core_builtin\n", 29);
     boot_core_builtin();
+    write(2, "PB: before boot_core_mro\n", 25);
     boot_core_mro();
+    write(2, "PB: after boot_core_mro\n", 24);
     newXS("Internals::V", S_Internals_V, __FILE__);
 
     if (xsinit)
