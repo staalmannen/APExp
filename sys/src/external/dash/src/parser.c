@@ -1476,11 +1476,12 @@ badsub:
 
 		if ((newsyn != synstack->syntax || synstack->innerdq) &&
 		    subtype != VSNORMAL) {
-			struct stack *prev;
+			struct synstack *prev;
 			prev = synstack->prev;
 			if (prev == NULL)
-				prev = (struct stack *)alloca(sizeof(*synstack));
+				prev = (struct synstack *)alloca(sizeof(*synstack));
 			synstack_push(&synstack, prev, newsyn);
+
 			synstack->varpushed++;
 			synstack->dblquote = newsyn != BASESYNTAX;
 		}
@@ -1632,10 +1633,10 @@ parsebackq: {
  * Parse an arithmetic expansion (indicate start of one and set state)
  */
 parsearith: {
-		struct stack *prev;
+		struct synstack *prev;
 		prev = synstack->prev;
 		if (prev == NULL)
-			prev = (struct stack *)alloca(sizeof(*synstack));
+			prev = (struct synstack *)alloca(sizeof(*synstack));
 		synstack_push(&synstack, prev, ARISYNTAX);
 		synstack->dblquote = 1;
 
