@@ -151,6 +151,8 @@ enum
 	DW_ABRV_NULL,
 	DW_ABRV_COMPUNIT,
 	DW_ABRV_FUNCTION,
+	DW_ABRV_VARIABLE,
+	DW_ABRV_BASETYPE,
 	DW_NABRV
 };
 
@@ -174,10 +176,26 @@ struct DWAbbrev {
 	},
 	/* FUNCTION */
 	{
-		DW_TAG_subprogram, DW_CHILDREN_no,
+		DW_TAG_subprogram, DW_CHILDREN_yes,
 		DW_AT_name,	 DW_FORM_string,
 		DW_AT_low_pc,	 DW_FORM_addr,
 		DW_AT_high_pc,	 DW_FORM_addr,
+		0, 0
+	},
+	/* VARIABLE */
+	{
+		DW_TAG_variable, DW_CHILDREN_no,
+		DW_AT_name,      DW_FORM_string,
+		DW_AT_location,  DW_FORM_block1,
+		DW_AT_type,      DW_FORM_ref_addr,
+		0, 0
+	},
+	/* BASETYPE */
+	{
+		DW_TAG_base_type, DW_CHILDREN_no,
+		DW_AT_name,      DW_FORM_string,
+		DW_AT_encoding,  DW_FORM_data1,
+		DW_AT_byte_size, DW_FORM_data1,
 		0, 0
 	},
 };
@@ -223,6 +241,7 @@ struct DWAttr {
 typedef struct DWDie DWDie;
 struct DWDie {
 	int abbrev;
+	vlong dieo;
 	DWDie *link;
 	DWDie *child;
 	DWAttr *attr;
@@ -324,8 +343,14 @@ putattr(int form, int cls, vlong value, char *data)
 		cput(value?1:0);
 		break;
 
-	case DW_FORM_strp:	// string
 	case DW_FORM_ref_addr:	// reference
+		if(value == 0)
+			addrput(0);
+		else
+			addrput(((DWDie*)value)->dieo);
+		break;
+
+	case DW_FORM_strp:	// string
 	case DW_FORM_ref1:	// reference
 	case DW_FORM_ref2:	// reference
 	case DW_FORM_ref4:	// reference
@@ -369,6 +394,7 @@ putdies(DWDie* die)
 static void
 putdie(DWDie* die)
 {
+	die->dieo = cpos() - infoo;
 	uleb128put(die->abbrev);
 	putattrs(die->abbrev, die->attr);
 	if (abbrevs[die->abbrev].children) {
@@ -640,6 +666,66 @@ searchhist(vlong absline)
 	return lh;
 }
 
+static DWDie *dwtypes;
+
+static DWDie*
+findtype(char *name)
+{
+	DWDie *d;
+	for(d = dwtypes; d; d = d->link)
+		if(strcmp(d->attr->data, name) == 0)
+			return d;
+	return nil;
+}
+
+static DWDie*
+newbasetype(char *name, int enc, int size)
+{
+	DWDie *d;
+	d = newdie(dwtypes, DW_ABRV_BASETYPE);
+	dwtypes = d;
+	newattr(d, DW_AT_name, DW_CLS_STRING, strlen(name), name);
+	newattr(d, DW_AT_encoding, DW_CLS_CONSTANT, enc, 0);
+	newattr(d, DW_AT_byte_size, DW_CLS_CONSTANT, size, 0);
+	return d;
+}
+
+static void
+defbasetypes(void)
+{
+	if(findtype("int")) return;
+	newbasetype("int", DW_ATE_signed, PtrSize);
+	newbasetype("char", DW_ATE_signed_char, 1);
+	newbasetype("void", DW_ATE_address, 0);
+}
+
+static void
+putlocation(DWDie *die, vlong offset, int isglobal)
+{
+	char buf[32], *p;
+	int n;
+
+	p = buf;
+	if(isglobal){
+		*p++ = DW_OP_addr;
+		switch(PtrSize){
+		case 4:
+			*(uint32*)p = offset;
+			p += 4;
+			break;
+		case 8:
+			*(uint64*)p = offset;
+			p += 8;
+			break;
+		}
+	} else {
+		*p++ = DW_OP_fbreg;
+		n = sleb128enc(offset, p);
+		p += n;
+	}
+	newattr(die, DW_AT_location, DW_CLS_BLOCK, p - buf, strdup(buf));
+}
+
 static int
 guesslang(char *s)
 {
@@ -804,6 +890,22 @@ writelines(void)
 		newattr(dwinfo->child, DW_AT_low_pc, DW_CLS_ADDRESS, s->value, 0);
 		epc = s->value + 0; // Sym doesn't have a size
 		newattr(dwinfo->child, DW_AT_high_pc, DW_CLS_ADDRESS, epc, 0);
+
+		/* Add local variables */
+		defbasetypes();
+		Auto *a;
+#ifdef ADR_HAS_U1
+		for(a = cursym->to.u1.u1autom; a; a = a->link) {
+#else
+		for(a = cursym->to.autom; a; a = a->link) {
+#endif
+			if(a->type != D_AUTO && a->type != D_PARAM) continue;
+			DWDie *v = newdie(dwinfo->child->child, DW_ABRV_VARIABLE);
+			dwinfo->child->child = v;
+			newattr(v, DW_AT_name, DW_CLS_STRING, strlen(a->asym->name), a->asym->name);
+			putlocation(v, a->aoffset, 0);
+			newattr(v, DW_AT_type, DW_CLS_REFERENCE, (vlong)findtype("int"), 0);
+		}
 
 		{
 			Prog *q;
