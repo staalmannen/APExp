@@ -1,0 +1,84 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+DWSRC=../../../external/chicken
+LIB=$APEXPROOT/$objtype/lib/ape/libdwarf.a
+
+BIN=$APEXPROOT/$objtype/bin/ape
+
+TARG= 	dwarfdump
+
+OFILES=\
+	dd_addrmap.$O \
+	dd_all_srcfiles.$O \
+	dd_attr_form.$O \
+	dd_canonical_append.$O \
+	dd_checkutil.$O \
+	dd_check_attr_encoding.$O \
+	dd_command_options.$O \
+	dd_common.$O \
+	dd_compiler_info.$O \
+	dd_lvn_table.$O dd_regex.$O \
+	dd_safe_strcpy.$O \
+	dwarfdump.$O \
+	dd_tsearchbal.$O \
+	dd_dwconf.$O dd_getopt.$O \
+	dd_esb.$O dd_glflags.$O \
+	dd_helpertree.$O \
+	dd_macrocheck.$O \
+	dd_makename.$O dd_naming.$O \
+	dd_opscounttab.$O \
+	print_abbrevs.$O \
+	print_aranges.$O \
+	print_debugfission.$O \
+	print_die.$O \
+	dd_trace_abstract_origin_etc.$O \
+	print_debug_addr.$O \
+	print_debug_gnu.$O \
+	print_debug_names.$O \
+	print_debug_sup.$O \
+	print_frames.$O \
+	print_gdbindex.$O \
+	print_hipc_lopc_attr.$O \
+	print_lines.$O \
+	print_llex_codes.$O \
+	print_origloclist_codes.$O \
+	print_loclists.$O \
+	print_loclists_codes.$O \
+	print_macinfo.$O \
+	print_macro.$O \
+	print_pubnames.$O \
+	print_ranges.$O \
+	print_rnglists.$O \
+	print_section_groups.$O \
+	print_sections.$O \
+	print_str_offsets.$O \
+	print_strings.$O \
+	print_tag_attributes_usage.$O \
+	dd_sanitized.$O \
+	dd_strstrnocase.$O \
+	dd_true_section_name.$O \
+	dd_uri.$O dd_utf8.$O
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+CC=pcc
+LD=pcc
+CFLAGS= -c -IDWSRC -IDWSRC/src/bin/dwarfdump\
+	-DHAVE_CONFIG_H
+
+%.$O: $DWSRC//src/bin/dwarfdump/%.c
+    $CC $CFLAGS $DWSRC//src/bin/dwarfdump/$stem.c
+
+
+
+
+
+
+
+
+
+
+
+
