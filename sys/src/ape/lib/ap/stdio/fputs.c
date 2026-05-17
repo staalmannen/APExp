@@ -7,15 +7,15 @@ int fputs(const char *s, FILE *f)
 
 	if (!s) return EOF;
 
-	FLOCK(f);
+	_FLOCK(f);
 
 	len = strlen(s);
 	if (f->write(f, (const unsigned char *)s, len) != len) {
-		FUNLOCK(f);
+		_FUNLOCK(f);
 		return EOF;
 	}
 
-	FUNLOCK(f);
+	_FUNLOCK(f);
 	return 0;
 }
 

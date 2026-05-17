@@ -184,7 +184,8 @@
  *	This symbol, if defined, indicates that the getpriority routine is
  *	available to get a process's priority.
  */
-#define HAS_GETPRIORITY		/**/
+/* Plan9: no UNIX priority API */
+#undef HAS_GETPRIORITY		/**/
 
 /* HAS_INET_ATON:
  *	This symbol, if defined, indicates to the C program that the
@@ -427,7 +428,8 @@
  *	This symbol, if defined, indicates that the setpriority routine is
  *	available to set a process's priority.
  */
-#define HAS_SETPRIORITY		/**/
+/* Plan9: no UNIX priority API */
+#undef HAS_SETPRIORITY		/**/
 
 /* HAS_SETREGID:
  *	This symbol, if defined, indicates that the setregid routine is
@@ -806,7 +808,8 @@
  *	This symbol, if defined, indicates that the eaccess routine is
  *	available to do extended access checks.
  */
-#define HAS_EACCESS		/**/
+/* Plan9: no GNU eaccess() extension */
+#undef HAS_EACCESS		/**/
 
 /* I_SYS_ACCESS:
  *	This symbol, if defined, indicates to the C program that it should
@@ -2786,7 +2789,8 @@
  *	This symbol, if defined, indicates that the getspnam system call is
  *	available to retrieve SysV shadow password entries by name.
  */
-#define HAS_GETSPNAM		/**/
+/* Plan9: no shadow passwords */
+#undef HAS_GETSPNAM		/**/
 
 /* HAS_HASMNTOPT:
  *	This symbol, if defined, indicates that the hasmntopt routine is

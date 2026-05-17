@@ -24,18 +24,18 @@ int fflush(FILE *f){
 		return error;
 	}
 
-	FLOCK(f);
+	_FLOCK(f);
 
 	if (f->wpos > f->wbase) {
 		/* Flush-signal: write function flushes pending wbase..wpos internally */
 		f->write(f, 0, 0);
 		if (f->flags & F_ERR) {
-			FUNLOCK(f);
+			_FUNLOCK(f);
 			return EOF;
 		}
 	}
 
-	FUNLOCK(f);
+	_FUNLOCK(f);
 	return 0;
 }
 

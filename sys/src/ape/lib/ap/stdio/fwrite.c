@@ -6,9 +6,9 @@ size_t fwrite(const void *restrict p, size_t recl, size_t nrec, FILE *restrict f
 
 	if (!total) return 0;
 
-	FLOCK(f);
+	_FLOCK(f);
 	written = __fwritex((const unsigned char *)p, total, f);
-	FUNLOCK(f);
+	_FUNLOCK(f);
 
 	return written / recl;
 }

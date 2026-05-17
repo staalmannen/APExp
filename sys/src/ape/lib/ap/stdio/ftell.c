@@ -3,16 +3,16 @@
 long ftell(FILE *f){
 	off_t seekp;
 
-	FLOCK(f);
+	_FLOCK(f);
 
 	if (f->fd < 0) {
-		FUNLOCK(f);
+		_FUNLOCK(f);
 		return -1;
 	}
 
 	seekp = lseek(f->fd, 0, SEEK_CUR);
 	if (seekp < 0) {
-		FUNLOCK(f);
+		_FUNLOCK(f);
 		return -1;
 	}
 
@@ -20,7 +20,7 @@ long ftell(FILE *f){
 	seekp -= (f->rend - f->rpos);
 	seekp += (f->wpos - f->wbase);
 
-	FUNLOCK(f);
+	_FUNLOCK(f);
 	return seekp;
 }
 
