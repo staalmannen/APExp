@@ -913,14 +913,14 @@ writelines(void)
 		if(cursym->as != ATEXT) continue;
 #endif
 #ifdef ADR_HAS_U1
-		Sym *s = cursym->from.u1.u1sym;
+		Sym *s = cursym->from.sym;
 #else
 		Sym *s = cursym->from.sym;
 #endif
 		// Look for history stack.  If we find one,
 		// we're entering a new compilation unit
 #ifdef ADR_HAS_U1
-		if((unitname = inithist(cursym->to.u1.u1autom)) != 0) {
+		if((unitname = inithist(cursym->to.autom)) != 0) {
 #else
 		if((unitname = inithist(cursym->to.autom)) != 0) {
 #endif
@@ -988,7 +988,7 @@ writelines(void)
 		defbasetypes();
 		Auto *a;
 #ifdef ADR_HAS_U1
-		for(a = cursym->to.u1.u1autom; a; a = a->link) {
+		for(a = cursym->to.autom; a; a = a->link) {
 #else
 		for(a = cursym->to.autom; a; a = a->link) {
 #endif
