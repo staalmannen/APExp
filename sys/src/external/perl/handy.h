@@ -408,7 +408,7 @@ Perl_xxx(aTHX_ ...) form for any API calls where it's used.
 =cut
 */
 
-#define STR_WITH_LEN(s)  ASSERT_IS_LITERAL(s), ((size_t)(sizeof(s)-1))
+#define STR_WITH_LEN(s)  ASSERT_IS_LITERAL(s), (sizeof(s)-1)
 
 /* STR_WITH_LEN() shortcuts */
 #define newSVpvs(str) Perl_newSVpvn(aTHX_ STR_WITH_LEN(str))
