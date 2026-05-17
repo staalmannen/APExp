@@ -3447,7 +3447,6 @@ S_setlocale_failure_panic_via_i(pTHX_
 STATIC void
 S_new_numeric(pTHX_ const char *newnum, bool force)
 {
-    write(2, "S_new_numeric: enter\n", 21);
     PERL_ARGS_ASSERT_NEW_NUMERIC;
 
     /* Called after each libc setlocale() or uselocale() call affecting
@@ -3668,7 +3667,6 @@ Perl_set_numeric_underlying(pTHX_ const char * const file, const line_t line)
 STATIC void
 S_new_ctype(pTHX_ const char *newctype, bool force)
 {
-    write(2, "S_new_ctype: enter\n", 19);
     PERL_ARGS_ASSERT_NEW_CTYPE;
     PERL_UNUSED_ARG(force);
 
@@ -4118,11 +4116,6 @@ S_new_LC_ALL(pTHX_ const char *lc_all, bool force)
 {
     PERL_ARGS_ASSERT_NEW_LC_ALL;
 
-    write(2, "NLA: enter\n", 11);
-    write(2, "NLA: lc_all=", 12);
-    if (lc_all) write(2, lc_all, strlen(lc_all)); else write(2, "(null)", 6);
-    write(2, "\n", 1);
-
     /* new_LC_ALL() updates all the things we care about.  Note that this is
      * called just after a change, so uses the actual underlying locale just
      * set, and not the nominal one (should they differ, as they may in
@@ -4130,7 +4123,6 @@ S_new_LC_ALL(pTHX_ const char *lc_all, bool force)
 
     const char * individ_locales[LC_ALL_INDEX_] = { NULL };
 
-    write(2, "NLA: before parse_LC_ALL_string\n", 32);
     switch (parse_LC_ALL_string(lc_all,
                                 individ_locales,
                                 override_if_ignored,   /* Override any ignored
@@ -4148,34 +4140,15 @@ S_new_LC_ALL(pTHX_ const char *lc_all, bool force)
       case full_array:
         break;
     }
-    write(2, "NLA: after parse_LC_ALL_string\n", 31);
 
     for_all_individual_category_indexes(i) {
-        char ibuf[40]; int ilen;
-        ilen = 0; ibuf[ilen++]='N'; ibuf[ilen++]='L'; ibuf[ilen++]='A';
-        ibuf[ilen++]=':'; ibuf[ilen++]=' '; ibuf[ilen++]='i'; ibuf[ilen++]='=';
-        ibuf[ilen++]='0' + (i/10); ibuf[ilen++]='0' + (i%10);
-        ibuf[ilen++]=' '; ibuf[ilen++]='u'; ibuf[ilen++]='f';
-        ibuf[ilen++]='=';
-        ibuf[ilen++]= update_functions[i] ? 'Y' : 'N';
-        ibuf[ilen++]='\n';
-        write(2, ibuf, ilen);
-
         if (update_functions[i]) {
             const char * this_locale = individ_locales[i];
-            write(2, "NLA: locale=", 12);
-            if (this_locale) write(2, this_locale, strlen(this_locale));
-            else write(2, "(null)", 6);
-            write(2, "\n", 1);
             update_functions[i](aTHX_ this_locale, force);
-            write(2, "NLA: uf returned\n", 17);
         }
 
-        write(2, "NLA: pre-Safefree\n", 18);
         Safefree(individ_locales[i]);
-        write(2, "NLA: post-Safefree\n", 19);
     }
-    write(2, "NLA: exit\n", 10);
 }
 
 #  ifdef USE_LOCALE_COLLATE
@@ -4183,7 +4156,6 @@ S_new_LC_ALL(pTHX_ const char *lc_all, bool force)
 STATIC void
 S_new_collate(pTHX_ const char *newcoll, bool force)
 {
-    write(2, "S_new_collate: enter\n", 21);
     PERL_ARGS_ASSERT_NEW_COLLATE;
     PERL_UNUSED_ARG(force);
 
@@ -8864,9 +8836,7 @@ S_give_perl_locale_control(pTHX_
 
 #  if defined(LC_ALL)
 
-    write(2, "I18N: gplc: before new_LC_ALL\n", 30);
     new_LC_ALL(lc_all_string, true);
-    write(2, "I18N: gplc: after new_LC_ALL\n", 29);
 
 #    else
 
@@ -8937,7 +8907,6 @@ S_output_check_environment_warning(pTHX_ const char * const language,
 int
 Perl_init_i18nl10n(pTHX_ int printwarn)
 {
-    write(2, "I18N: enter\n", 12);
     /* printwarn is:
      *    0 if not to output warning when setup locale is bad
      *    1 if to output warning based on value of PERL_BADLANG
@@ -9013,14 +8982,12 @@ Perl_init_i18nl10n(pTHX_ int printwarn)
      * before it is safely copied here, but that isn't a general solution.
      */
 
-    write(2, "I18N: before PL_langinfo_sv setup\n", 34);
     if (PL_langinfo_sv == NULL) {
          PL_langinfo_sv = newSVpvs("");
     }
     if (PL_scratch_langinfo == NULL) {
          PL_scratch_langinfo = newSVpvs("");
     }
-    write(2, "I18N: after PL_langinfo_sv setup\n", 33);
 
 #ifndef USE_LOCALE
 
@@ -9198,24 +9165,17 @@ Perl_init_i18nl10n(pTHX_ int printwarn)
 
 #  endif
 
-    write(2, "I18N: before new_LC_ALL\n", 24);
     new_LC_ALL("C", true /* Don't shortcut */);
-    write(2, "I18N: after new_LC_ALL\n", 23);
 
 /*===========================================================================*/
 
     /* Now ready to override the initialization with the values that the user
      * wants.  This is done in the global locale as explained in the
      * introductory comments to this function */
-    write(2, "I18N: before switch_to_global_locale\n", 37);
     switch_to_global_locale();
-    write(2, "I18N: after switch_to_global_locale\n", 36);
 
-    write(2, "I18N: before getenv LC_ALL\n", 27);
     const char * const lc_all     = PerlEnv_getenv("LC_ALL");
-    write(2, "I18N: before getenv LANG\n", 25);
     const char * const lang       = PerlEnv_getenv("LANG");
-    write(2, "I18N: after getenv\n", 19);
 
     /* We try each locale in the enum, in order, until we get one that works,
      * or exhaust the list.  Normally the loop is executed just once.
@@ -9327,25 +9287,17 @@ Perl_init_i18nl10n(pTHX_ int printwarn)
 
 #  ifdef LC_ALL
 
-        write(2, "I18N: before stdized_setlocale\n", 31);
         STDIZED_SETLOCALE_LOCK;
         lc_all_string = savepv(stdized_setlocale(LC_ALL, locale));
         STDIZED_SETLOCALE_UNLOCK;
-        write(2, "I18N: after stdized_setlocale\n", 30);
-        write(2, "I18N: lc_all_string check\n", 26);
 
         DEBUG_LOCALE_INIT(LC_ALL_INDEX_, locale, lc_all_string);
 
-        write(2, "I18N: after DEBUG_LOCALE_INIT\n", 30);
-
         if (LIKELY(lc_all_string)) {     /* Succeeded */
-            write(2, "I18N: lc_all_string is set, ok=1\n", 33);
             ok = 1;
-            write(2, "I18N: before break\n", 19);
             break;
         }
 
-        write(2, "I18N: lc_all_string was NULL\n", 29);
         if (trial == 0 && locwarn) {
             PerlIO_printf(Perl_error_log,
                                   "perl: warning: Setting locale failed.\n");
@@ -9538,9 +9490,7 @@ Perl_init_i18nl10n(pTHX_ int printwarn)
 
 #  ifdef LC_ALL
 
-    write(2, "I18N: before give_perl_locale_control\n", 38);
     give_perl_locale_control(lc_all_string, __LINE__);
-    write(2, "I18N: after give_perl_locale_control\n", 37);
     Safefree(lc_all_string);
 
 #  else
