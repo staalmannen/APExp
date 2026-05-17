@@ -4,10 +4,10 @@
 int fseek(FILE *f, long offs, int type){
 	off_t ret;
 
-	FLOCK(f);
+	_FLOCK(f);
 
 	if (f->fd < 0) {
-		FUNLOCK(f);
+		_FUNLOCK(f);
 		return -1;
 	}
 
@@ -15,7 +15,7 @@ int fseek(FILE *f, long offs, int type){
 	if (f->wpos > f->wbase) {
 		f->write(f, 0, 0);
 		if (f->flags & F_ERR) {
-			FUNLOCK(f);
+			_FUNLOCK(f);
 			return -1;
 		}
 	}
@@ -24,7 +24,7 @@ int fseek(FILE *f, long offs, int type){
 	ret = lseek(f->fd, offs, type);
 	if (ret < 0) {
 		f->flags |= F_ERR;
-		FUNLOCK(f);
+		_FUNLOCK(f);
 		return -1;
 	}
 
@@ -32,7 +32,7 @@ int fseek(FILE *f, long offs, int type){
 	f->rpos = f->rend = 0;
 	f->flags &= ~(F_EOF | F_ERR);
 
-	FUNLOCK(f);
+	_FUNLOCK(f);
 	return 0;
 }
 

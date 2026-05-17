@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 int setvbuf(FILE *f, char *buf, int mode, size_t size){
-	FLOCK(f);
+	_FLOCK(f);
 
 	/* Flush any pending writes (write(f,0,0) is the musl flush-signal) */
 	if (f->wpos > f->wbase) {
@@ -17,7 +17,7 @@ int setvbuf(FILE *f, char *buf, int mode, size_t size){
 		f->buf = NULL;
 		f->buf_size = 0;
 		f->lbf = EOF;
-		FUNLOCK(f);
+		_FUNLOCK(f);
 		return 0;
 	}
 
@@ -25,14 +25,14 @@ int setvbuf(FILE *f, char *buf, int mode, size_t size){
 		f->buf = NULL;
 		f->buf_size = 0;
 		f->lbf = EOF;
-		FUNLOCK(f);
+		_FUNLOCK(f);
 		return 0;
 	}
 
 	if (buf == NULL) {
 		buf = malloc(size);
 		if (!buf) {
-			FUNLOCK(f);
+			_FUNLOCK(f);
 			return -1;
 		}
 		f->flags |= F_SVB;
@@ -49,7 +49,7 @@ int setvbuf(FILE *f, char *buf, int mode, size_t size){
 		f->lbf = EOF;
 	}
 
-	FUNLOCK(f);
+	_FUNLOCK(f);
 	return 0;
 }
 

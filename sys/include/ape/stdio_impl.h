@@ -85,8 +85,8 @@ static inline void __unlockfile(struct _IO_FILE *f) {
 	if (lock) pthread_mutex_unlock(lock);
 }
 
-#define FLOCK(f) int __need_unlock = __lockfile(f)
-#define FUNLOCK(f) do { if (__need_unlock) __unlockfile(f); } while(0)
+#define _FLOCK(f) int __need_unlock = __lockfile(f)
+#define _FUNLOCK(f) do { if (__need_unlock) __unlockfile(f); } while(0)
 #define FFINALLOCK(f) ((f)->lock>=0 ? __lockfile((f)) : 0)
 
 hidden size_t __stdio_read(struct _IO_FILE *, unsigned char *, size_t);

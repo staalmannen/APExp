@@ -6,7 +6,7 @@ size_t fread(void *restrict p, size_t recl, size_t nrec, FILE *restrict f){
 	size_t total = recl * nrec;
 	size_t bytes = 0;
 
-	FLOCK(f);
+	_FLOCK(f);
 
 	while (bytes < total) {
 		size_t avail = f->rend - f->rpos;
@@ -41,7 +41,7 @@ size_t fread(void *restrict p, size_t recl, size_t nrec, FILE *restrict f){
 		}
 	}
 
-	FUNLOCK(f);
+	_FUNLOCK(f);
 
 	return bytes / recl;
 }

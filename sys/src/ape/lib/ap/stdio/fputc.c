@@ -3,19 +3,19 @@
 int fputc(int c, FILE *f)
 {
 	unsigned char ch = (unsigned char)c;
-	FLOCK(f);
+	_FLOCK(f);
 
 	if (f->wpos != f->wend && ch != f->lbf) {
 		*f->wpos++ = ch;
-		FUNLOCK(f);
+		_FUNLOCK(f);
 		return ch;
 	}
 
 	if (f->write(f, &ch, 1) != 1) {
-		FUNLOCK(f);
+		_FUNLOCK(f);
 		return EOF;
 	}
 
-	FUNLOCK(f);
+	_FUNLOCK(f);
 	return ch;
 }
