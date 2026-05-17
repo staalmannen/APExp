@@ -2,6 +2,8 @@
 #include <libdwarf.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 /* Simple DWARF parsing wrapper for adeb */
 
@@ -12,10 +14,10 @@ struct DebugInfo {
 };
 
 DebugInfo* dwarf_init(const char* path) {
-    DebugInfo* info = malloc(sizeof(DebugInfo));
+    DebugInfo* info = (DebugInfo*)malloc(sizeof(DebugInfo));
     Dwarf_Error err;
     
-    info->fd = open(path, OREAD);
+    info->fd = open(path, O_RDONLY);
     if (info->fd < 0) {
         free(info);
         return NULL;

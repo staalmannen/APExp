@@ -1,7 +1,10 @@
-#include <u.h>
-#include <libc.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <string.h>
 
-/* Minimalist /proc interface for Plan 9/9front */
+/* Minimalist /proc interface for APE */
 
 typedef struct Proc Proc;
 struct Proc {
@@ -13,21 +16,21 @@ struct Proc {
 };
 
 Proc* proc_open(int pid) {
-    Proc* p = malloc(sizeof(Proc));
+    Proc* p = (Proc*)malloc(sizeof(Proc));
     char buf[128];
     
     p->pid = pid;
-    snprint(buf, sizeof(buf), "/proc/%d/ctl", pid);
-    p->ctl = open(buf, OWRITE);
+    snprintf(buf, sizeof(buf), "/proc/%d/ctl", pid);
+    p->ctl = open(buf, O_WRONLY);
     
-    snprint(buf, sizeof(buf), "/proc/%d/mem", pid);
-    p->mem = open(buf, ORDWR);
+    snprintf(buf, sizeof(buf), "/proc/%d/mem", pid);
+    p->mem = open(buf, O_RDWR);
     
-    snprint(buf, sizeof(buf), "/proc/%d/regs", pid);
-    p->regs = open(buf, OREAD);
+    snprintf(buf, sizeof(buf), "/proc/%d/regs", pid);
+    p->regs = open(buf, O_RDONLY);
     
-    snprint(buf, sizeof(buf), "/proc/%d/status", pid);
-    p->status = open(buf, OREAD);
+    snprintf(buf, sizeof(buf), "/proc/%d/status", pid);
+    p->status = open(buf, O_RDONLY);
     
     return p;
 }
@@ -46,7 +49,7 @@ int proc_command(Proc* p, char* cmd) {
 
 int main(int argc, char** argv) {
     if (argc < 2) {
-        print("Usage: adeb <pid>\n");
+        printf("Usage: adeb <pid>\n");
         return 1;
     }
     
@@ -58,7 +61,7 @@ int main(int argc, char** argv) {
         return 1;
     }
     
-    print("Attached to process %d\n", pid);
+    printf("Attached to process %d\n", pid);
     
     proc_command(p, "stop");
     
