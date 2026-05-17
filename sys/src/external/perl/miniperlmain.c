@@ -56,6 +56,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include <unistd.h>
 
 static void xs_init (pTHX);
 static PerlInterpreter *my_perl;
@@ -83,6 +84,7 @@ main(int argc, char **argv, char **env)
 #else
     PERL_SYS_INIT3(&argc,&argv,&env);
 #endif
+    write(2, "DBG: after PERL_SYS_INIT3\n", 26);
 
 #if defined(USE_ITHREADS)
     /* XXX Ideally, this should really be happening in perl_alloc() or
@@ -105,11 +107,15 @@ main(int argc, char **argv, char **env)
 	my_perl = perl_alloc();
 	if (!my_perl)
 	    exit(1);
+	write(2, "DBG: after perl_alloc\n", 22);
 	perl_construct(my_perl);
+	write(2, "DBG: after perl_construct\n", 26);
 	PL_perl_destruct_level = 0;
     }
     PL_exit_flags |= PERL_EXIT_DESTRUCT_END;
+    write(2, "DBG: before perl_parse\n", 23);
     if (!perl_parse(my_perl, xs_init, argc, argv, (char **)NULL)) {
+	write(2, "DBG: after perl_parse (ok), before perl_run\n", 44);
 
         /* perl_parse() may end up starting its own run loops, which
          * might end up "leaking" PL_restartop from the parse phase into
