@@ -595,8 +595,12 @@ move_file (struct outfile *outfrom, struct stat const *fromst,
 		      else if (errno != ENOENT)
 			pfatal ("Can't remove file %s", quotearg (to));
 		    }
-		  copy_file (from, fromst, &(struct outfile) { .name = to },
-			     &tost, 0, mode, 0, to_dir_known_to_exist);
+		  struct outfile out;
+		  out.name = to;
+		  out.temporary = false;
+		  copy_file (from, fromst, &out,
+		             &tost, 0, mode, 0, to_dir_known_to_exist);
+
 		  insert_file_id (&tost, CREATED);
 		  return;
 		}
