@@ -371,13 +371,15 @@ set_file_attributes (char *to, int tofd, enum file_attributes attr,
 
 static void
 create_backup_copy (char *from, char *to, const struct stat *st,
-		    bool to_dir_known_to_exist)
+                    bool to_dir_known_to_exist)
 {
-  copy_file (from, st, &(struct outfile) { .name = to },
-	     nullptr, 0, st->st_mode, FA_TIMES | FA_IDS | FA_MODE,
-	     to_dir_known_to_exist);
+  struct outfile out;
+  out.name = to;
+  out.temporary = false;
+  copy_file (from, st, &out,
+             nullptr, 0, st->st_mode, FA_TIMES | FA_IDS | FA_MODE,
+             to_dir_known_to_exist);
 }
-
 void
 create_backup (char *to, const struct stat *to_st, bool leave_original)
 {
