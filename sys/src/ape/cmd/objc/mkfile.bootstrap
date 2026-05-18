@@ -7,126 +7,146 @@ OBJCSRC=../../../external/Objc/bootstrap
 TARG=objc1\
 	postlink\
 
-PRELINK=$APEXPROOT/$objtype/lib/ape/_prelink.$O
-
 BIN=$APEXPROOT/$objtype/bin/ape
+LIBDIR=$APEXPROOT/$objtype/lib/ape
 
-OBJS= pointer.$O\
-	compdef.$O\
-	exprstmt.$O\
-	dfltstmt.$O\
-	namedecl.$O\
-	structsp.$O\
+PRELINK=$LIBDIR/_prelink.$O
+
+OBJCRT=$LIBDIR/objcrt.a
+OBJPAK=$LIBDIR/objpak.a
+OCLIB=$LIBDIR/oclib.a
+
+LIB=objcrt.a$O objpak.a$O oclib.a$O
+
+CRT_OBJS=\
+	Object.$O\
+	Block.$O\
 	Message.$O\
 	Exceptn.$O\
 	OutOfMem.$O\
-	badvers.$O\
-	outofbnd.$O\
-	typeinc.$O\
-	unknownt.$O\
-	notfound.$O\
-	trlunit.$O\
-	gasmstmt.$O\
-	dasmstmt.$O\
-	contstmt.$O\
-	setseq.$O\
-	method.$O\
-	enumtor.$O\
-	keyseq.$O\
-	sizeof.$O\
-	typeof.$O\
-	lblstmt.$O\
-	arydecl.$O\
-	dotxpr.$O\
-	set.$O\
-	stclass.$O\
-	assoc.$O\
-	pfixxpr.$O\
-	casestmt.$O\
-	constxpr.$O\
-	condxpr.$O\
-	precdecl.$O\
-	ordcltn.$O\
-	treeseq.$O\
-	sortcltn.$O\
-	identxpr.$O\
-	assign.$O\
-	precxpr.$O\
-	Object.$O\
-	classdef.$O\
-	initdecl.$O\
-	dictnary.$O\
-	selector.$O\
-	fundef.$O\
-	options.$O\
-	funcall.$O\
-	expr.$O\
-	keywxpr.$O\
-	node.$O\
-	valueseq.$O\
-	btincall.$O\
-	Block.$O\
-	ifstmt.$O\
-	unyxpr.$O\
-	parmdef.$O\
-	util.$O\
-	cltnseq.$O\
-	array.$O\
-	idarray.$O\
-	forstmt.$O\
-	deref.$O\
-	binxpr.$O\
-	ocstring.$O\
-	objcrt.$O\
-	datadef.$O\
-	gasmop.$O\
-	dostmt.$O\
-	gattrib.$O\
-	arrowxpr.$O\
-	cppdirec.$O\
-	keywdecl.$O\
+	objcrt.$O
+
+PAK_OBJS=\
 	ascfiler.$O\
-	relxpr.$O\
-	gatrdecl.$O\
-	switstmt.$O\
-	funbody.$O\
-	rtrnstmt.$O\
-	listxpr.$O\
-	whilstmt.$O\
-	type.$O\
-	fundecl.$O\
-	def.$O\
-	stkframe.$O\
-	globdef.$O\
-	var.$O\
-	aryvar.$O\
-	scalar.$O\
-	parmlist.$O\
-	commaxpr.$O\
-	stardecl.$O\
-	gotostmt.$O\
-	indexxpr.$O\
-	addrof.$O\
-	selxpr.$O\
-	sequence.$O\
-	stmt.$O\
-	msgxpr.$O\
-	methdef.$O\
-	compstmt.$O\
-	decl.$O\
-	symbol.$O\
-	blockxpr.$O\
-	enumsp.$O\
-	bflddecl.$O\
-	castxpr.$O\
-	lex.$O\
-	lexfiltr.$O\
-	yacc.$O\
+	notfound.$O\
+	outofbnd.$O\
+	unknownt.$O\
+	typeinc.$O\
+	badvers.$O\
 	cltn.$O\
-	pfixdecl.$O
+	ordcltn.$O\
+	sortcltn.$O\
+	set.$O\
+	dictnary.$O\
+	sequence.$O\
+	array.$O\
+	ocstring.$O\
+	idarray.$O\
+	intarray.$O\
+	rectangl.$O\
+	point.$O\
+	assoc.$O\
+	objgraph.$O\
+	cltnseq.$O\
+	keyseq.$O\
+	valueseq.$O\
+	setseq.$O\
+	bagseq.$O\
+	treeseq.$O\
+	octext.$O\
+	txtstyle.$O\
+	paragrph.$O\
+	txtattr.$O
+
+OC_OBJS=\
+    node.$O\
+    stkframe.$O\
+    symbol.$O\
+    stclass.$O\
+    cppdirec.$O\
+    type.$O\
+    options.$O\
+    stmt.$O\
+    ifstmt.$O\
+    whilstmt.$O\
+    switstmt.$O\
+    lblstmt.$O\
+    rtrnstmt.$O\
+    dfltstmt.$O\
+    casestmt.$O\
+    compstmt.$O\
+    exprstmt.$O\
+    gotostmt.$O\
+    contstmt.$O\
+    forstmt.$O\
+    dostmt.$O\
+    decl.$O\
+    pointer.$O\
+    arydecl.$O\
+    fundecl.$O\
+    precdecl.$O\
+    bflddecl.$O\
+    pfixdecl.$O\
+    initdecl.$O\
+    keywdecl.$O\
+    namedecl.$O\
+    stardecl.$O\
+    var.$O\
+    aryvar.$O\
+    scalar.$O\
+    expr.$O\
+    listxpr.$O\
+    keywxpr.$O\
+    condxpr.$O\
+    castxpr.$O\
+    unyxpr.$O\
+    deref.$O\
+    addrof.$O\
+    sizeof.$O\
+    typeof.$O\
+    pfixxpr.$O\
+    indexxpr.$O\
+    binxpr.$O\
+    dotxpr.$O\
+    arrowxpr.$O\
+    msgxpr.$O\
+    blockxpr.$O\
+    selxpr.$O\
+    precxpr.$O\
+    commaxpr.$O\
+    constxpr.$O\
+    identxpr.$O\
+    assign.$O\
+    relxpr.$O\
+    funcall.$O\
+    btincall.$O\
+    def.$O\
+    fundef.$O\
+    methdef.$O\
+    funbody.$O\
+    method.$O\
+    selector.$O\
+    gasmop.$O\
+    gasmstmt.$O\
+    dasmstmt.$O\
+    gattrib.$O\
+    gatrdecl.$O\
+    compdef.$O\
+    datadef.$O\
+    globdef.$O\
+    structsp.$O\
+    classdef.$O\
+    enumtor.$O\
+    enumsp.$O\
+    parmdef.$O\
+    parmlist.$O\
+    util.$O\
+    trlunit.$O
+
 
 OBJC1OBJS=_objc1.$O\
 	objc1.$O
+
 PLINKOBJS=_plink.$O\
 	postlink.$O
 
@@ -139,9 +159,23 @@ CFLAGS= -c -DNDEBUG -D_POSIX_SOURCE -I$OBJCSRC
 %.$O: $OBJCSRC/%.c
     $CC $CFLAGS $OBJCSRC/$stem.c
 
-$O.objc1: $OBJS $OBJC1OBJS
+objcrt.a$O: $CRT_OBJS
+	ar vu $target $prereq
+	cp $target $OBJCRT
 
-$O.postlink: $OBJS $PLINKOBJS
+objpak.a$O: $PAK_OBJS
+	ar vu $target $prereq
+	cp $target $OBJPAK
+
+oclib.a$O: $OC_OBJS
+	ar vu $target $prereq
+	cp $target $OCLIB
+
+$O.objc1: $OBJC1OBJS $LIB
+	$LD $prereq -o $target
+
+$O.postlink: $PLINKOBJS $LIB
+	$LD $prereq -o $target
 
 $PRELINK: $OBJCSRC/_prelink.c
     $CC $CFLAGS $OBJCSRC/_prelink.c
