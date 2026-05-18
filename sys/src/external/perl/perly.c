@@ -361,9 +361,7 @@ Perl_yyparse (pTHX_ int gramtype)
 
             if (parser->yychar == YYEMPTY) {
                 YYDPRINTF ((Perl_debug_log, "Reading a token:\n"));
-                write(2, "YY: before yylex\n", 17);
                 parser->yychar = yylex();
-                write(2, "YY: after yylex\n", 16);
                 assert(parser->yychar >= 0);
                 if (parser->yychar == YYEOF) {
                     YYDPRINTF ((Perl_debug_log, "Now at end of input.\n"));
