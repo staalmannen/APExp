@@ -9069,6 +9069,24 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
     first = *firstp;
     other = *otherp;
 
+    {
+        char _lb[80]; int _li=0;
+        const char *_hx="0123456789abcdef";
+        int _i;
+        unsigned long long _f=(unsigned long long)(void*)first;
+        unsigned long long _o=(unsigned long long)(void*)other;
+        unsigned int _ft=first?(unsigned int)first->op_type:0xDEAD;
+        _lb[_li++]='L'; _lb[_li++]='G'; _lb[_li++]='P'; _lb[_li++]=' ';
+        _lb[_li++]='f'; _lb[_li++]='=';
+        for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_f>>_i)&0xf];
+        _lb[_li++]=' '; _lb[_li++]='o'; _lb[_li++]='=';
+        for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_o>>_i)&0xf];
+        _lb[_li++]=' '; _lb[_li++]='f'; _lb[_li++]='t'; _lb[_li++]='=';
+        for(_i=12;_i>=0;_i-=4) _lb[_li++]=_hx[(_ft>>_i)&0xf];
+        _lb[_li++]='\n';
+        write(2,_lb,_li);
+    }
+
     if (type == OP_XOR)		/* Not short circuit, but here by precedence. */
         return newBINOP(type, flags, scalar(first), scalar(other));
 

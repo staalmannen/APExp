@@ -11459,6 +11459,8 @@ S_warn_vcatpvfn_missing_argument(pTHX) {
               PL_op ? OP_DESC(PL_op) : "sv_vcatpvfn()");
 }
 
+static void S_croak_overflow(void);
+
 
 static void
 S_croak_overflow()
