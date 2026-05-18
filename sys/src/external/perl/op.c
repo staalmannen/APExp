@@ -8909,6 +8909,11 @@ Perl_newSTATEOP(pTHX_ I32 flags, char *label, OP *o)
 
     flags &= ~SVf_UTF8;
 
+    if (!PL_curcop) {
+        write(2, "newSTATEOP: PL_curcop is NULL, using PL_compiling\n", 50);
+        PL_curcop = &PL_compiling;
+    }
+
     NewOp(1101, cop, 1, COP);
     if (PERLDB_LINE && CopLINE(PL_curcop) && PL_curstash != PL_debstash) {
         OpTYPE_set(cop, OP_DBSTATE);
