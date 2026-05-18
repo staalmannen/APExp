@@ -169,13 +169,13 @@ merge_result (bool *first_result, intmax_t hunk, char const *what,
   *first_result = false;
 }
 
-int
+bool
 merge_hunk (intmax_t hunk, struct outstate *outstate,
-            idx_t where, int *somefailed)
+            idx_t where, bool *somefailed)
 {
-  int applies_cleanly;
-  int first_result = 1;
-  int already_applied;
+  bool applies_cleanly;
+  bool first_result = 1;
+  bool already_applied;
 
   FILE *fp = outstate->ofp;
   idx_t old = 1;

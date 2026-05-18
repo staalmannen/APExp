@@ -177,7 +177,7 @@ bool similar (char const *, idx_t, char const *, idx_t) ATTRIBUTE_PURE;
 enum conflict_style { MERGE_MERGE, MERGE_DIFF3 };
 extern enum conflict_style conflict_style;
 
-int merge_hunk (intmax_t hunk, struct outstate *, idx_t where, int *);
+bool merge_hunk (intmax_t hunk, struct outstate *, idx_t where, bool *);
 #else
 # define merge_hunk(hunk, outstate, where, somefailed) 0
 #endif
