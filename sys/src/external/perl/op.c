@@ -1400,7 +1400,6 @@ S_cop_free(pTHX_ COP* cop)
 
     cophh_free(CopHINTHASH_get(cop));
     if (PL_curcop == cop) {
-       write(2, "S_cop_free: PL_curcop=cop -> NULL\n", 34);
        PL_curcop = NULL;
     }
 }
@@ -8911,7 +8910,6 @@ Perl_newSTATEOP(pTHX_ I32 flags, char *label, OP *o)
     flags &= ~SVf_UTF8;
 
     if (!PL_curcop) {
-        write(2, "newSTATEOP: PL_curcop is NULL, using PL_compiling\n", 50);
         PL_curcop = &PL_compiling;
     }
 

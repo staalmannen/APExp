@@ -285,19 +285,15 @@ Perl_yyparse (pTHX_ int gramtype)
     YYDPRINTF ((Perl_debug_log, "Starting parse\n"));
 
     parser = PL_parser;
-    write(2, "YY: parser set\n", 15);
 
     ENTER;  /* force parser state cleanup/restoration before we return */
-    write(2, "YY: after ENTER\n", 16);
     SAVEPPTR(parser->yylval.pval);
-    write(2, "YY: after SAVEPPTR\n", 19);
     SAVEINT(parser->yychar);
     SAVEINT(parser->yyerrstatus);
     SAVEINT(parser->yylen);
     SAVEVPTR(parser->stack);
     SAVEVPTR(parser->stack_max1);
     SAVEVPTR(parser->ps);
-    write(2, "YY: after SAVEs\n", 16);
 
     /* initialise state for this parse */
     parser->yychar = gramtype;
@@ -306,13 +302,10 @@ Perl_yyparse (pTHX_ int gramtype)
     parser->yyerrstatus = 0;
     parser->yylen = 0;
     Newx(parser->stack, YYINITDEPTH, yy_stack_frame);
-    write(2, "YY: after Newx stack\n", 21);
     parser->stack_max1 = parser->stack + YYINITDEPTH - 1;
     ps = parser->ps = parser->stack;
     ps->state = 0;
-    write(2, "YY: before SAVEDESTRUCTOR\n", 26);
     SAVEDESTRUCTOR_X(S_clear_yystack, parser);
-    write(2, "YY: entering main loop\n", 23);
 
     while (1) {
         /* main loop: shift some tokens, then reduce when possible */
@@ -450,23 +443,6 @@ Perl_yyparse (pTHX_ int gramtype)
         YY_STACK_PRINT(parser);
         YY_REDUCE_PRINT (yyn);
 
-        {
-            /* print rule number and PL_curcop as hex */
-            char _rdbuf[48]; int _rdi=0; int _ryn=yyn;
-            unsigned long long _cop=(unsigned long long)(void*)PL_curcop;
-            const char *_hx="0123456789abcdef";
-            int _i;
-            _rdbuf[_rdi++]='R'; _rdbuf[_rdi++]=':';
-            if(_ryn==0){_rdbuf[_rdi++]='0';}else{
-                char _tmp[12]; int _ti=0;
-                while(_ryn>0){_tmp[_ti++]='0'+(_ryn%10);_ryn/=10;}
-                while(_ti-->0)_rdbuf[_rdi++]=_tmp[_ti];
-            }
-            _rdbuf[_rdi++]=' '; _rdbuf[_rdi++]='c'; _rdbuf[_rdi++]='=';
-            for(_i=60;_i>=0;_i-=4) _rdbuf[_rdi++]=_hx[(_cop>>_i)&0xf];
-            _rdbuf[_rdi++]='\n';
-            write(2,_rdbuf,_rdi);
-        }
         switch (yyn) {
 
     /* contains all the rule actions; auto-generated from perly.y */

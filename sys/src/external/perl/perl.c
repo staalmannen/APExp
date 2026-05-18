@@ -1931,9 +1931,7 @@ perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
     JMPENV_PUSH(ret);
     switch (ret) {
     case 0:
-        write(2, "PP: before parse_body\n", 22);
         parse_body(env,xsinit);
-        write(2, "PP: after parse_body\n", 21);
         if (PL_unitcheckav) {
             call_list(oldscope, PL_unitcheckav);
         }
@@ -2222,19 +2220,13 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     bool add_read_e_script = FALSE;
     U32 lex_start_flags = 0;
 
-    write(2, "PB: enter parse_body\n", 21);
     PERL_SET_PHASE(PERL_PHASE_START);
 
-    write(2, "PB: before init_main_stash\n", 27);
     init_main_stash();
-    write(2, "PB: after init_main_stash\n", 26);
 
     {
         const char *s;
     for (argc--,argv++; argc > 0; argc--,argv++) {
-        write(2, "PB: argv loop: ", 15);
-        if (argv[0]) write(2, argv[0], strlen(argv[0]));
-        write(2, "\n", 1);
         if (argv[0][0] != '-' || !argv[0][1])
             break;
         s = argv[0]+1;
@@ -2317,12 +2309,10 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
         case 'e':
             forbid_setid('e', FALSE);
         minus_e = TRUE;
-            write(2, "PB: -e arm enter\n", 17);
             if (!PL_e_script) {
                 PL_e_script = newSVpvs("");
                 add_read_e_script = TRUE;
             }
-            write(2, "PB: -e sv_catpv\n", 16);
             if (*++s)
                 sv_catpv(PL_e_script, s);
             else if (argv[1]) {
@@ -2332,7 +2322,6 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
             else
                 croak("No code specified for -%c", c);
             sv_catpvs(PL_e_script, "\n");
-            write(2, "PB: -e arm done\n", 16);
             break;
 
         case 'f':
@@ -2406,7 +2395,6 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     }
 
   switch_end:
-    write(2, "PB: switch_end\n", 15);
 
     {
         char *s;
@@ -2497,12 +2485,10 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 
     /* Set $^X early so that it can be used for relocatable paths in @INC  */
     /* and for SITELIB_EXP in USE_SITECUSTOMIZE                            */
-    write(2, "PB: before set_caret_X\n", 23);
     assert (!TAINT_get);
     TAINT;
     set_caret_X();
     TAINT_NOT;
-    write(2, "PB: after set_caret_X\n", 22);
 
 #if defined(USE_SITECUSTOMIZE)
     if (!minus_f) {
@@ -2554,17 +2540,13 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
         scriptname = "-";
     }
 
-    write(2, "PB: before init_perllib\n", 24);
     assert (!TAINT_get);
     init_perllib();
-    write(2, "PB: after init_perllib\n", 23);
 
     {
         bool suidscript = FALSE;
 
-        write(2, "PB: before open_script\n", 23);
         rsfp = open_script(scriptname, dosearch, &suidscript);
-        write(2, "PB: after open_script\n", 22);
         if (!rsfp) {
             rsfp = PerlIO_stdin();
             lex_start_flags = LEX_DONT_CLOSE_RSFP;
@@ -2608,23 +2590,14 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 
     PL_isarev = newHV();
 
-    write(2, "PB: before boot_core_PerlIO\n", 28);
     boot_core_PerlIO();
-    write(2, "PB: before boot_core_UNIVERSAL\n", 31);
     boot_core_UNIVERSAL();
-    write(2, "PB: before boot_core_builtin\n", 29);
     boot_core_builtin();
-    write(2, "PB: before boot_core_mro\n", 25);
     boot_core_mro();
-    write(2, "PB: after boot_core_mro\n", 24);
-    write(2, "PB: before newXS Internals::V\n", 30);
     newXS("Internals::V", S_Internals_V, __FILE__);
-    write(2, "PB: after newXS Internals::V\n", 29);
 
     if (xsinit) {
-        write(2, "PB: before xsinit\n", 18);
         (*xsinit)(aTHX);	/* in case linked C routines want magical variables */
-        write(2, "PB: after xsinit\n", 17);
     }
 #if defined(VMS) || defined(WIN32) || defined(__CYGWIN__)
     init_os_extras();
@@ -2638,16 +2611,12 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #   endif
 #endif
 
-    write(2, "PB: before init_predump_symbols\n", 32);
     init_predump_symbols();
-    write(2, "PB: after init_predump_symbols\n", 31);
     /* init_postdump_symbols not currently designed to be called */
     /* more than once (ENV isn't cleared first, for example)	 */
     /* But running with -u leaves %ENV & @ARGV undefined!    XXX */
     if (!PL_do_undump) {
-        write(2, "PB: before init_postdump_symbols\n", 33);
         init_postdump_symbols(argc,argv,env);
-        write(2, "PB: after init_postdump_symbols\n", 32);
     }
 
     /* PL_unicode is turned on by -C, or by $ENV{PERL_UNICODE},
@@ -2709,19 +2678,13 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     }
 
 
-    write(2, "PB: before lex_start\n", 21);
     lex_start(linestr_sv, rsfp, lex_start_flags);
-    write(2, "PB: after lex_start\n", 20);
     SvREFCNT_dec(linestr_sv);
 
-    write(2, "PB: before newSVpvs main\n", 25);
     PL_subname = newSVpvs("main");
-    write(2, "PB: after newSVpvs main\n", 24);
 
     if (add_read_e_script) {
-        write(2, "PB: before filter_add\n", 22);
         filter_add(read_e_script, NULL);
-        write(2, "PB: after filter_add\n", 21);
     }
 
     /* now parse the script */
@@ -2729,11 +2692,9 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
         PL_hints |= HINTS_DEFAULT; /* after init_main_stash ; need to be after init_predump_symbols */
 
     SETERRNO(0,SS_NORMAL);
-    write(2, "PB: before yyparse\n", 19);
     if (yyparse(GRAMPROG) || PL_parser->error_count) {
         abort_execution(NULL, PL_origfilename);
     }
-    write(2, "PB: after yyparse\n", 18);
     CopLINE_set(PL_curcop, 0);
     SET_CURSTASH(PL_defstash);
     if (PL_e_script) {
