@@ -1249,15 +1249,21 @@ init_signals (void)
   signal (SIGCHLD, SIG_DFL);
 
 #if HAVE_SIGACTION && HAVE_SIGFILLSET
-  struct sigaction fatal_act = { .sa_handler = handle_signal };
+  struct sigaction fatal_act;
+  memset(&fatal_act, 0, sizeof(fatal_act));
+  fatal_act.sa_handler = handle_signal;
   sigfillset (&fatal_act.sa_mask);
-  for (int i = 0; i < NUM_SIGS; i++)
-    {
-      struct sigaction initial_act;
-      if (sigaction (sigs[i], nullptr, &initial_act) == 0
-	  && initial_act.sa_handler != SIG_IGN)
-	sigaction (sigs[i], &fatal_act, nullptr);
-    }
+  {
+      int i;
+      for (i = 0; i < NUM_SIGS; i++)
+        {
+          struct sigaction initial_act;
+          if (sigaction (sigs[i], (struct sigaction *)0, &initial_act) == 0
+         && initial_act.sa_handler != SIG_IGN)
+            sigaction (sigs[i], &fatal_act, (struct sigaction *)0);
+        }
+  }
+
 #else
   for (int i = 0; i < NUM_SIGS; i++)
     if (signal (sigs[i], SIG_IGN) != SIG_IGN)
