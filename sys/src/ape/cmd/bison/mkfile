@@ -100,7 +100,7 @@ LIB_OBJS=\
 #	libbison_a-xtime.$O \
 #	libbison_a-getprogname.$O \
 #	libbison_a-gettime.$O \
-#	libbison_a-hash.$O \
+	libbison_a-hash.$O \
 #	libbison_a-gl_hash_map.$O \
 #	libbison_a-hash-pjw.$O \
 #	libbison_a-hash-triple-simple.$O \
@@ -122,7 +122,7 @@ LIB_OBJS=\
 #	libbison_a-printf-frexp.$O \
 #	libbison_a-printf-frexpl.$O \
 	libbison_a-progname.$O \
-#	libbison_a-quotearg.$O \
+	libbison_a-quotearg.$O \
 #	libbison_a-gl_rbtree_oset.$O \
 #	libbison_a-gl_rbtreehash_list.$O \
 #	libbison_a-scratch_buffer_dupfree.$O \
@@ -142,8 +142,8 @@ LIB_OBJS=\
 #	libbison_a-pipe-safer.$O \
 #	libbison_a-wait-process.$O \
 #	libbison_a-wctype-h.$O \
-	libbison_a-xmalloc.$O \
-	libbison_a-xalloc-die.$O \
+#	libbison_a-xmalloc.$O \
+#	libbison_a-xalloc-die.$O \
 #	libbison_a-xconcat-filename.$O \
 #	libbison_a-xhash.$O \
 #	libbison_a-gl_xlist.$O \
