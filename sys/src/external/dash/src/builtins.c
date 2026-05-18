@@ -5,8 +5,10 @@
 #include "shell.h"
 #include "builtins.h"
 
+#if JOBS
 int bgcmd(int, char **);
 int fgcmd(int, char **);
+#endif
 int breakcmd(int, char **);
 int cdcmd(int, char **);
 int commandcmd(int, char **);
@@ -47,7 +49,9 @@ const struct builtincmd builtincmd[] = {
 	{ ":", truecmd, 3 },
 	{ "[", testcmd, 0 },
 	{ "alias", aliascmd, 6 },
+#if JOBS
 	{ "bg", bgcmd, 2 },
+#endif
 	{ "break", breakcmd, 3 },
 	{ "cd", cdcmd, 2 },
 	{ "chdir", cdcmd, 0 },
@@ -59,7 +63,9 @@ const struct builtincmd builtincmd[] = {
 	{ "exit", exitcmd, 3 },
 	{ "export", exportcmd, 7 },
 	{ "false", falsecmd, 2 },
+#if JOBS
 	{ "fg", fgcmd, 2 },
+#endif
 	{ "getopts", getoptscmd, 2 },
 	{ "hash", hashcmd, 2 },
 	{ "jobs", jobscmd, 2 },

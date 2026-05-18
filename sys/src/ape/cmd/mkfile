@@ -6,6 +6,7 @@ _CORE_APPS=\
 # prerequisites\
 	make\
 # shell\
+	dash\
 	bash\
 # parsing/editing source etc \
 	as\

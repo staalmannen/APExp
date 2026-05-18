@@ -1,5 +1,5 @@
 /* config.h.  Generated from config.h.in by configure.  */
-/* config.h.in.  Generated from configure.ac by autoheader.  */
+/* config.h.in.  Generated from configure.ac by autoheader. */
 
 /* Define if __attribute__((__alias__())) is supported */
 /* #undef HAVE_ALIAS_ATTRIBUTE */
@@ -36,10 +36,10 @@
 #define HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the 'isalpha' function. */
-/* #undef HAVE_ISALPHA */
+#define HAVE_ISALPHA 1
 
 /* Define to 1 if you have the 'killpg' function. */
-/* #undef HAVE_KILLPG */
+#define HAVE_KILLPG 1
 
 /* Define to 1 if you have the 'memfd_create' function. */
 /* #undef HAVE_MEMFD_CREATE */
