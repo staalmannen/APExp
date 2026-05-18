@@ -332,7 +332,6 @@ Perl_yyparse (pTHX_ int gramtype)
              * element to make this check faster */
 
             if (ps >= parser->stack_max1) {
-                write(2, "YY: growing stack\n", 18);
                 Size_t pos = ps - parser->stack;
                 Size_t newsize = 2 * (parser->stack_max1 + 2 - parser->stack);
                 /* this will croak on insufficient memory */
@@ -353,7 +352,6 @@ Perl_yyparse (pTHX_ int gramtype)
              * lookahead token. */
 
             yyn = yypact[yystate];
-            write(2, "YY: yypact\n", 11);
             if (yyn == YYPACT_NINF)
                 goto yydefault;
 
@@ -401,7 +399,6 @@ Perl_yyparse (pTHX_ int gramtype)
             }
 
             yyn = yytable[yyn];
-            write(2, "YY: yytable\n", 12);
             if (yyn <= 0) {
                 if (yyn == 0 || yyn == YYTABLE_NINF)
                     goto yyerrlab;
@@ -419,7 +416,6 @@ Perl_yyparse (pTHX_ int gramtype)
             if (parser->yychar != YYEOF)
                 parser->yychar = YYEMPTY;
 
-            write(2, "YY: shift\n", 10);
             YYPUSHSTACK;
             ps->state   = yyn;
             ps->val     = parser->yylval;
@@ -454,7 +450,18 @@ Perl_yyparse (pTHX_ int gramtype)
         YY_STACK_PRINT(parser);
         YY_REDUCE_PRINT (yyn);
 
-        write(2, "YY: reduce\n", 11);
+        {
+            /* print rule number as decimal */
+            char _rdbuf[16]; int _rdi=0; int _ryn=yyn;
+            _rdbuf[_rdi++]='R'; _rdbuf[_rdi++]=':';
+            if(_ryn==0){_rdbuf[_rdi++]='0';}else{
+                char _tmp[12]; int _ti=0;
+                while(_ryn>0){_tmp[_ti++]='0'+(_ryn%10);_ryn/=10;}
+                while(_ti-->0)_rdbuf[_rdi++]=_tmp[_ti+1];
+            }
+            _rdbuf[_rdi++]='\n';
+            write(2,_rdbuf,_rdi);
+        }
         switch (yyn) {
 
     /* contains all the rule actions; auto-generated from perly.y */
