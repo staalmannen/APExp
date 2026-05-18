@@ -9093,16 +9093,20 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
     assert((PL_opargs[type] & OA_CLASS_MASK) == OA_LOGOP
         || type == OP_CUSTOM);
 
+    write(2,"LGP1\n",5);
     scalarboolean(first);
+    write(2,"LGP2\n",5);
 
     if (S_is_control_transfer(aTHX_ first)) {
         op_free(other);
         first->op_folded = 1;
         return first;
     }
+    write(2,"LGP3\n",5);
 
     /* search for a constant op that could let us fold the test */
     if ((cstop = search_const(first))) {
+        write(2,"LGP4\n",5);
         if (cstop->op_private & OPpCONST_STRICT)
             no_bareword_allowed(cstop);
         else if ((cstop->op_private & OPpCONST_BARE))
@@ -9217,7 +9221,9 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
         }
     }
 
+    write(2,"LGP5\n",5);
     logop = alloc_LOGOP(type, first, LINKLIST(other));
+    write(2,"LGP6\n",5);
     logop->op_flags |= (U8)flags;
     logop->op_private = (U8)(1 | (flags >> 8));
 
