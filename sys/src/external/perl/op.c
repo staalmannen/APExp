@@ -1826,6 +1826,7 @@ Perl_op_linklist(pTHX_ OP *o)
          */
 
         o = o->op_sibparent;
+        if (!o) { write(2,"LLNULL\n",7); break; }
         assert(!o->op_next);
         prevp = &(o->op_next);
         kid   = (o->op_flags & OPf_KIDS) ? cUNOPo->op_first : NULL;
@@ -9226,19 +9227,27 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
     write(2,"LGP6\n",5);
     logop->op_flags |= (U8)flags;
     logop->op_private = (U8)(1 | (flags >> 8));
+    write(2,"LGP7\n",5);
 
     /* establish postfix order */
     logop->op_next = LINKLIST(first);
+    write(2,"LGP8\n",5);
     first->op_next = (OP*)logop;
+    write(2,"LGP9\n",5);
     assert(!OpHAS_SIBLING(first));
+    write(2,"LGPA\n",5);
     op_sibling_splice((OP*)logop, first, 0, other);
+    write(2,"LGPB\n",5);
 
     CHECKOP(type,logop);
+    write(2,"LGPC\n",5);
 
     o = newUNOP(prepend_not ? OP_NOT : OP_NULL,
                 PL_opargs[type] & OA_RETSCALAR ? OPf_WANT_SCALAR : 0,
                 (OP*)logop);
+    write(2,"LGPD\n",5);
     other->op_next = o;
+    write(2,"LGPE\n",5);
 
     return o;
 }
