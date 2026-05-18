@@ -617,10 +617,14 @@ main (int argc, char **argv)
 
 		      if (stat_file (outname, &outstat) != 0)
 			say ("Cannot stat file %s, skipping backup\n", outname);
-		      else
-			output_file (&(struct outfile) { .name = outname },
-				     &outstat, nullptr, nullptr,
-				     file_type | 0, true);
+		      else {
+			struct outfile outf;
+			outf.name = (char *)outname;
+			outf.temporary = false;
+			output_file (&outf, &outstat, nullptr, nullptr,
+			             file_type | 0, true);
+		      }
+
 		    }
 		}
 	    }
