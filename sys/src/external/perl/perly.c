@@ -451,14 +451,19 @@ Perl_yyparse (pTHX_ int gramtype)
         YY_REDUCE_PRINT (yyn);
 
         {
-            /* print rule number as decimal */
-            char _rdbuf[16]; int _rdi=0; int _ryn=yyn;
+            /* print rule number and PL_curcop as hex */
+            char _rdbuf[48]; int _rdi=0; int _ryn=yyn;
+            unsigned long long _cop=(unsigned long long)(void*)PL_curcop;
+            const char *_hx="0123456789abcdef";
+            int _i;
             _rdbuf[_rdi++]='R'; _rdbuf[_rdi++]=':';
             if(_ryn==0){_rdbuf[_rdi++]='0';}else{
                 char _tmp[12]; int _ti=0;
                 while(_ryn>0){_tmp[_ti++]='0'+(_ryn%10);_ryn/=10;}
-                while(_ti-->0)_rdbuf[_rdi++]=_tmp[_ti+1];
+                while(_ti-->0)_rdbuf[_rdi++]=_tmp[_ti];
             }
+            _rdbuf[_rdi++]=' '; _rdbuf[_rdi++]='c'; _rdbuf[_rdi++]='=';
+            for(_i=60;_i>=0;_i-=4) _rdbuf[_rdi++]=_hx[(_cop>>_i)&0xf];
             _rdbuf[_rdi++]='\n';
             write(2,_rdbuf,_rdi);
         }
