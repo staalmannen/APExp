@@ -145,7 +145,10 @@ OC_OBJS=\
 
 
 OBJC1OBJS=_objc1.$O\
-	objc1.$O
+	objc1.$O\
+	yacc.$O\
+	lex.$O\
+	lexfiltr.$O
 
 PLINKOBJS=_plink.$O\
 	postlink.$O
