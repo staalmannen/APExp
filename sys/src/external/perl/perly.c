@@ -285,15 +285,19 @@ Perl_yyparse (pTHX_ int gramtype)
     YYDPRINTF ((Perl_debug_log, "Starting parse\n"));
 
     parser = PL_parser;
+    write(2, "YY: parser set\n", 15);
 
     ENTER;  /* force parser state cleanup/restoration before we return */
+    write(2, "YY: after ENTER\n", 16);
     SAVEPPTR(parser->yylval.pval);
+    write(2, "YY: after SAVEPPTR\n", 19);
     SAVEINT(parser->yychar);
     SAVEINT(parser->yyerrstatus);
     SAVEINT(parser->yylen);
     SAVEVPTR(parser->stack);
     SAVEVPTR(parser->stack_max1);
     SAVEVPTR(parser->ps);
+    write(2, "YY: after SAVEs\n", 16);
 
     /* initialise state for this parse */
     parser->yychar = gramtype;
@@ -302,10 +306,13 @@ Perl_yyparse (pTHX_ int gramtype)
     parser->yyerrstatus = 0;
     parser->yylen = 0;
     Newx(parser->stack, YYINITDEPTH, yy_stack_frame);
+    write(2, "YY: after Newx stack\n", 21);
     parser->stack_max1 = parser->stack + YYINITDEPTH - 1;
     ps = parser->ps = parser->stack;
     ps->state = 0;
+    write(2, "YY: before SAVEDESTRUCTOR\n", 26);
     SAVEDESTRUCTOR_X(S_clear_yystack, parser);
+    write(2, "YY: entering main loop\n", 23);
 
     while (1) {
         /* main loop: shift some tokens, then reduce when possible */
@@ -354,7 +361,9 @@ Perl_yyparse (pTHX_ int gramtype)
 
             if (parser->yychar == YYEMPTY) {
                 YYDPRINTF ((Perl_debug_log, "Reading a token:\n"));
+                write(2, "YY: before yylex\n", 17);
                 parser->yychar = yylex();
+                write(2, "YY: after yylex\n", 16);
                 assert(parser->yychar >= 0);
                 if (parser->yychar == YYEOF) {
                     YYDPRINTF ((Perl_debug_log, "Now at end of input.\n"));
