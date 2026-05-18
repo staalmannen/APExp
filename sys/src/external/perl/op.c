@@ -1399,8 +1399,10 @@ S_cop_free(pTHX_ COP* cop)
         cop->cop_warnings = rcpv_free(cop->cop_warnings);
 
     cophh_free(CopHINTHASH_get(cop));
-    if (PL_curcop == cop)
+    if (PL_curcop == cop) {
+       write(2, "S_cop_free: PL_curcop=cop -> NULL\n", 34);
        PL_curcop = NULL;
+    }
 }
 
 STATIC void

@@ -9639,6 +9639,11 @@ int
 Perl_yylex(pTHX)
 {
     char *s = PL_bufptr;
+    if (!PL_curcop) {
+        write(2, "yylex: PL_curcop is NULL!\n", 26);
+        /* force a visible crash rather than silent wrong-address fault */
+        PL_curcop = &PL_compiling;
+    }
 
     if (UNLIKELY(PL_parser->recheck_charset_validity)) {
         const U8* first_bad_char_loc;
