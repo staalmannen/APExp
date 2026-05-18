@@ -45,6 +45,7 @@ _OPTIONAL_APPS=\
 # transpilers \
 	f2c\
 	p2c\
+	chicken\
 	objc\
 	cfront\
 #		c++lib\

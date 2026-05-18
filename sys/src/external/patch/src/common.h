@@ -50,7 +50,6 @@
 #define ARRAY_SIZE(a) (sizeof (a) / sizeof ((a)[0]))
 
 /* typedefs */
-typedef int bool;
 #ifndef true
 #define true 1
 #endif

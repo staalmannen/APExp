@@ -1,5 +1,5 @@
 /* config.h.  Generated from config.hin by configure.  */
-/* config.hin.  Generated from configure.ac by autoheader.  */
+/* config.hin.  Generated from configure.ac by autoheader. */
 
 /* Witness that <config.h> has been included.  */
 #define _GL_CONFIG_H_INCLUDED 1
@@ -2617,21 +2617,6 @@
 
 /* Define as 'int' if <sys/types.h> doesn't define. */
 /* #undef uid_t */
-
-
-  /* This definition is a duplicate of the one in unitypes.h.
-     It is here so that we can cope with an older version of unitypes.h
-     that does not contain this definition and that is pre-installed among
-     the public header files.  */
-  # if defined __restrict \
-       || 2 < __GNUC__ + (95 <= __GNUC_MINOR__) \
-       || __clang_major__ >= 3
-  #  define _UC_RESTRICT __restrict
-  # elif 199901L <= __STDC_VERSION__ || defined restrict
-  #  define _UC_RESTRICT restrict
-  # else
-  #  define _UC_RESTRICT
-  # endif
   
 
 #if !(defined __cplusplus \
