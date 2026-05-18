@@ -47,12 +47,14 @@ _OPTIONAL_APPS=\
 	p2c\
 	chicken\
 	objc\
+#		objclib\
 	cfront\
 #		c++lib\
 #	basic\
 # dev tools \
 	adeb\
 	dwarfdump\
+	hell\
 	pcregrep\
 #	diff\
 #	patch\
