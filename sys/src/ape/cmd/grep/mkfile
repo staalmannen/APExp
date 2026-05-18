@@ -62,7 +62,7 @@ LIB_OBJS=\
 	libgreputils_a-ialloc.$O \
 	libgreputils_a-iswctype.$O \
 	libgreputils_a-localcharset.$O \
-	libgreputils_a-localeconv.$O \
+#	libgreputils_a-localeconv.$O \
 	libgreputils_a-lock.$O \
 	libgreputils_a-lseek.$O \
 	libgreputils_a-lstat.$O \
@@ -77,7 +77,7 @@ LIB_OBJS=\
 	libgreputils_a-mcel.$O \
 	libgreputils_a-memchr2.$O \
 	libgreputils_a-memrchr.$O \
-	libgreputils_a-nl_langinfo.$O \
+#	libgreputils_a-nl_langinfo.$O \
 	libgreputils_a-obstack.$O \
 	libgreputils_a-once.$O \
 	libgreputils_a-openat.$O \

@@ -56,7 +56,7 @@ LIB_OBJS=\
 	hard-locale.$O\
 	ialloc.$O\
 	localcharset.$O\
-	localeconv.$O\
+#	localeconv.$O\
 	lock.$O\
 	lstat.$O\
 	malloca.$O\
@@ -65,7 +65,7 @@ LIB_OBJS=\
 	memrchr.$O\
 	mkdir.$O\
 	mkostemp.$O\
-	nl_langinfo.$O\
+#	nl_langinfo.$O\
 	obstack.$O\
 	progname.$O\
 	qcopy-acl.$O\
