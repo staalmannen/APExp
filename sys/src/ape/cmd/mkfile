@@ -3,8 +3,6 @@ APE=../../ape
 APEXPROOT=../../../..
 
 _CORE_APPS=\
-# prerequisites\
-	make\
 # shell\
 	dash\
 	bash\
@@ -14,6 +12,7 @@ _CORE_APPS=\
 	bison\
 	awk\
 	sed\
+	make\
 # often invoked during make \
 	m4\
 	iconv\

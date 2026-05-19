@@ -46,6 +46,33 @@ OFILES=\
 	syntax.$O\
 	xmalloc.$O
 
+OBJTERMCAP= termcap.$O tparam.$O
+
+OBJTILDE= tilde.$O
+
+OBJGLOB= glob.$O strmatch.$O smatch.$O xmbsrtowcs.$O gmisc.$O
+
+OBJBUILTINS=builtins.$O \
+	alias.$O bind.$O break.$O builtin.$O caller.$O cd.$O colon.$O command.$O \
+	common.$O declare.$O echo.$O enable.$O eval.$O evalfile.$O \
+	evalstring.$O exec.$O exit.$O fc.$O fg_bg.$O hash.$O help.$O history.$O \
+	jobs.$O kill.$O let.$O mapfile.$O \
+	pushd.$O read.$O return.$O set.$O setattr.$O shift.$O source.$O \
+	suspend.$O test.$O times.$O trap.$O type.$O ulimit.$O umask.$O \
+	wait.$O getopts.$O shopt.$O printf.$O getopt.$O bashgetopt.$O complete.$O
+
+OBJSH= clktck.$O clock.$O getenv.$O oslib.$O setlinebuf.$O strnlen.$O \
+	itos.$O zread.$O zwrite.$O shtty.$O shmatch.$O eaccess.$O \
+	netconn.$O netopen.$O timeval.$O makepath.$O pathcanon.$O \
+	pathphys.$O tmpfile.$O stringlist.$O stringvec.$O spell.$O shquote.$O \
+	strtrans.$O snprintf.$O mailstat.$O fmtulong.$O \
+	fmtullong.$O fmtumax.$O zcatfd.$O zmapfd.$O winsize.$O wcsdup.$O \
+	fpurge.$O zgetline.$O mbscmp.$O mbsncmp.$O uconvert.$O ufuncs.$O casemod.$O \
+	input_avail.$O mbscasecmp.$O fnxform.$O unicode.$O shmbchar.$O strvis.$O \
+	strscpy.$O anonfile.$O compat.$O \
+	utf8.$O random.$O gettimeofday.$O timers.$O wcsnwidth.$O\
+	mktime.$O mbschr.$O getcwd.$O
+
 BASHSRC=$APEXPROOT/sys/src/external/bash
 
 BASHLIBS=\
@@ -54,9 +81,9 @@ BASHLIBS=\
 	libbuiltins.a$O\
 	libglob.a$O\
 	libsh.a$O\
-	libhistory.a$O\
 
-LIB= $BASHLIBS $APEXPROOT/$objtype/lib/ape/libreadline.a
+#link libap first to already occupy symbols supported by the system libap
+LIB= $APEXPROOT/$objtype/lib/ape/libap.a $BASHLIBS $APEXPROOT/$objtype/lib/ape/libreadline.a
 
 BIN=$APEXPROOT/$objtype/bin/ape
 
@@ -68,15 +95,21 @@ YACC=bison
 
 DEFS= 	-DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale" -D_POSIX_SOURCE\
 		-D_BSD_EXTENSION -DHAVE_LIMITS_H -D_LIMITS_EXTENSION -DPLAN9\
-		-DCONF_OSTYPE="Plan9" -DCONF_MACHTYPE="$objtype-apexp-Plan9" -DPROGRAM="Bash"\
+		-DCONF_OSTYPE="plan9" -DCONF_MACHTYPE="$objtype-apexp-plan9" -DPROGRAM="bash"\
 		-DPACKAGE="bash" -DPACKAGE_STRING='bash 5.3-release'\
 		-DCONF_VENDOR="apexp" -DCONF_HOSTTYPE="$objtype"\
-		-DHAVE_SYS_RESOURCE_H -DTERM=xterm -UJOB_CONTROL\
-		-Dbotch=programming_error
+		-DHAVE_SYS_RESOURCE_H -DTERM=vt100 -UJOB_CONTROL\
+		-Dbotch=programming_error -DSHELL
 
 
-CFLAGS=	-c -B -I. -I$BASHSRC -I$BASHSRC/include -I$BASHSRC/lib $DEFS
+CFLAGS=	-c -B -I. -I$BASHSRC -I$BASHSRC/include -I$BASHSRC/lib -I$BASHSRC/lib/intl\
+		$DEFS
 
+$BASHSRC/builtins/mkbuiltins: $BASHSRC/builtins/mkbuiltins.c
+		$CC $CFLAGS $prereq -o $target
+
+$BASHSRC/builtins/%.c: $BASHSRC/builtins/mkbuiltins $BASHSRC/builtins/%.def
+		@{cd $BASHSRC/builtins ; ./mkbuiltins $stem.def }
 
 %.$O: %.c
 			$CC $CFLAGS $stem.c
@@ -84,49 +117,42 @@ CFLAGS=	-c -B -I. -I$BASHSRC -I$BASHSRC/include -I$BASHSRC/lib $DEFS
 %.$O: $BASHSRC/%.c
 			$CC $CFLAGS $BASHSRC/$stem.c
 
+%.$O: $BASHSRC/builtins/%.c
+			$CC $CFLAGS -I$BASHSRC/builtins $BASHSRC/builtins/$stem.c
 
-libtermcap.a$O: $BASHSRC/lib/termcap/Makefile
-			make -C $BASHSRC/lib/termcap
-			mv $BASHSRC/lib/termcap/libtermcap.a libtermcap.a$O
-			rm $BASHSRC/lib/termcap/*.o
+%.$O: $BASHSRC/lib/termcap/%.c
+			$CC $CFLAGS -I$BASHSRC/lib/termcap $BASHSRC/lib/termcap/$stem.c
 
-libtilde.a$O: $BASHSRC/lib/tilde/Makefile
-			make -C $BASHSRC/lib/tilde
-			mv $BASHSRC/lib/tilde/libtilde.a libtilde.a$O
-			rm $BASHSRC/lib/tilde/*.o
+%.$O: $BASHSRC/lib/tilde/%.c
+			$CC $CFLAGS -I$BASHSRC/lib/tilde $BASHSRC/lib/tilde/$stem.c
 
-libsh.a$O: $BASHSRC/lib/sh/Makefile
-			make -C $BASHSRC/lib/sh
-			mv $BASHSRC/lib/sh/libsh.a libsh.a$O
-			rm $BASHSRC/lib/sh/*.o
+%.$O: $BASHSRC/lib/sh/%.c
+			$CC $CFLAGS -I$BASHSRC/lib/sh $BASHSRC/lib/sh/$stem.c
 
-libglob.a$O: $BASHSRC/lib/glob/Makefile
-			make -C $BASHSRC/lib/glob
-			mv $BASHSRC/lib/glob/libglob.a libglob.a$O
-			rm $BASHSRC/lib/glob/*.o
+%.$O: $BASHSRC/lib/glob/%.c
+			$CC $CFLAGS -I$BASHSRC/lib/glob $BASHSRC/lib/glob/$stem.c
 
-libhistory.a$O: $BASHSRC/lib/readline/Makefile
-			make -C $BASHSRC/lib/readline libhistory.a
-			mv $BASHSRC/lib/readline/libhistory.a libhistory.a$O
-			rm $BASHSRC/lib/readline/*.o
 
-libintl.a$O: $BASHSRC/lib/intl/Makefile
-			make -C $BASHSRC/lib/intl
-			mv $BASHSRC/lib/intl/libintl.a libintl.a$O
-			rm $BASHSRC/lib/intl/*.o
+libtermcap.a$O: $OBJTERMCAP
+			ar vu $target $prereq
 
-libbuiltins.a$O: $BASHSRC/builtins/Makefile
-			make -C $BASHSRC/builtins
-			mv $BASHSRC/builtins/libbuiltins.a libbuiltins.a$O
-			rm $BASHSRC/builtins/*.o
-			rm $BASHSRC/builtins/mkbuiltins
-			rm $BASHSRC/builtins/psize.aux
+libtilde.a$O: $OBJTILDE
+			ar vu $target $prereq
+
+libsh.a$O: $OBJSH
+			ar vu $target $prereq
+
+libglob.a$O: $OBJGLOB
+			ar vu $target $prereq
+
+libbuiltins.a$O: $OBJBUILTINS
+			ar vu $target $prereq
 
 install:V:
 			cp $BASHSRC/doc/bash.1 $APEXPROOT/sys/man/1/bash
 
 clean:V:
-			rm -f *.[$OS] [$OS].out lib*.a*
+			rm -f *.[$OS] [$OS].$Out lib*.a* $BASHSRC/builtins/mkbuiltins
 
 
 
