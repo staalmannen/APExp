@@ -1160,8 +1160,12 @@ S_optimize_op(pTHX_ OP* o)
                 return; /* at top; no parents/siblings to try */
             if (OpHAS_SIBLING(o))
                 next_kid = o->op_sibparent;
-            else
-                o = o->op_sibparent; /*try parent's next sibling */
+            else {
+                OP *_par = o->op_sibparent;
+                if (!_par)
+                    return; /* detached/partially-built subtree; skip */
+                o = _par; /*try parent's next sibling */
+            }
         }
 
       /* this label not yet used. Goto here if any code above sets
