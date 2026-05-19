@@ -1839,8 +1839,14 @@ Tconv(Fmt *fp)
 
 	t = va_arg(fp->args, Type*);
 	while(t != T) {
-		if(t->garb&~GINCOMPLETE)
-			fmtprint(fp, "%s ", gnames[t->garb&~GINCOMPLETE]);
+		{
+			/* GNORET is only meaningful on TFUNC nodes */
+			int garb = t->garb & ~GINCOMPLETE;
+			if(t->etype != TFUNC)
+				garb &= ~GNORET;
+			if(garb)
+				fmtprint(fp, "%s ", gnames[garb]);
+		}
 		et = t->etype;
 		fmtprint(fp, "%s", tnames[et]);
 		if(et == TFUNC && (t1 = t->down) != T) {
