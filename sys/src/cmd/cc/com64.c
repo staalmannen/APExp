@@ -644,6 +644,10 @@ convvtox(vlong c, int et)
 {
 	int n;
 
+	/* C99: _Bool stores 0 or 1 only — normalize rather than truncate */
+	if(et == TBOOL)
+		return c != 0;
+
 	n = 8 * ewidth[et];
 	c &= MASK(n);
 	if(!typeu[et])

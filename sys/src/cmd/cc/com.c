@@ -1002,6 +1002,7 @@ tcoma(Node *l, Node *n, Type *t, int f)
 			break;
 
 		case TUCHAR:
+		case TBOOL:
 		case TUSHORT:
 			t = types[TUINT];
 			break;
@@ -1015,6 +1016,7 @@ tcoma(Node *l, Node *n, Type *t, int f)
 		break;
 
 	case TUCHAR:
+	case TBOOL:
 	case TUSHORT:
 		t = types[TUINT];
 		break;
