@@ -4570,6 +4570,31 @@ Perl_op_scope(pTHX_ OP *o)
             o = op_prepend_elem(OP_LINESEQ,
                     newOP(OP_ENTER, (o->op_flags & OPf_WANT)), o);
             OpTYPE_set(o, OP_LEAVE);
+            /* SCOPEDIAG: print OP_ENTER sibparent right after op_scope wraps */
+            if (o->op_flags & OPf_KIDS) {
+                OP *_en = cLISTOPo->op_first;
+                if (_en && _en->op_type == OP_ENTER) {
+                    char _lb[128]; int _li=0;
+                    const char *_hx="0123456789abcdef";
+                    unsigned long long _oa=(unsigned long long)(void*)o;
+                    unsigned long long _ea=(unsigned long long)(void*)_en;
+                    unsigned int _em=(unsigned int)_en->op_moresib;
+                    unsigned long long _esp=(unsigned long long)(void*)_en->op_sibparent;
+                    int _i;
+                    _lb[_li++]='S'; _lb[_li++]='C'; _lb[_li++]='O'; _lb[_li++]='P';
+                    _lb[_li++]='E'; _lb[_li++]='D'; _lb[_li++]='I'; _lb[_li++]='A';
+                    _lb[_li++]='G'; _lb[_li++]=' ';
+                    _lb[_li++]='L'; _lb[_li++]='=';
+                    for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_oa>>_i)&0xf];
+                    _lb[_li++]=' '; _lb[_li++]='E'; _lb[_li++]='=';
+                    for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_ea>>_i)&0xf];
+                    _lb[_li++]=' '; _lb[_li++]='m'; _lb[_li++]='=';
+                    _lb[_li++]=_hx[_em&0xf];
+                    _lb[_li++]=' '; _lb[_li++]='s'; _lb[_li++]='p'; _lb[_li++]='=';
+                    for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_esp>>_i)&0xf];
+                    _lb[_li++]='\n'; write(2,_lb,_li);
+                }
+            }
         }
         else if (o->op_type == OP_LINESEQ) {
             OP *kid;
@@ -9143,6 +9168,34 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
             op_free(first);
             if (other->op_type == OP_LEAVE)
                 other = newUNOP(OP_NULL, OPf_SPECIAL, other);
+            /* CFDIAG: print OP_NULL subtree after constant-fold wrap */
+            if (other->op_type == OP_NULL) {
+                OP *_lv = (other->op_flags & OPf_KIDS) ? cUNOPx(other)->op_first : NULL;
+                if (_lv && _lv->op_type == OP_LEAVE) {
+                    OP *_en = (_lv->op_flags & OPf_KIDS) ? cLISTOPx(_lv)->op_first : NULL;
+                    char _lb[128]; int _li=0;
+                    const char *_hx="0123456789abcdef";
+                    unsigned long long _na=(unsigned long long)(void*)other;
+                    unsigned long long _la=(unsigned long long)(void*)_lv;
+                    unsigned long long _ea=_en?(unsigned long long)(void*)_en:0;
+                    unsigned int _em=_en?(unsigned int)_en->op_moresib:0xFF;
+                    unsigned long long _esp=_en?(unsigned long long)(void*)_en->op_sibparent:0;
+                    int _i;
+                    _lb[_li++]='C'; _lb[_li++]='F'; _lb[_li++]='D'; _lb[_li++]='I';
+                    _lb[_li++]='A'; _lb[_li++]='G'; _lb[_li++]=' ';
+                    _lb[_li++]='N'; _lb[_li++]='=';
+                    for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_na>>_i)&0xf];
+                    _lb[_li++]=' '; _lb[_li++]='L'; _lb[_li++]='=';
+                    for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_la>>_i)&0xf];
+                    _lb[_li++]=' '; _lb[_li++]='E'; _lb[_li++]='=';
+                    for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_ea>>_i)&0xf];
+                    _lb[_li++]=' '; _lb[_li++]='m'; _lb[_li++]='=';
+                    _lb[_li++]=_hx[_em&0xf];
+                    _lb[_li++]=' '; _lb[_li++]='s'; _lb[_li++]='p'; _lb[_li++]='=';
+                    for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_esp>>_i)&0xf];
+                    _lb[_li++]='\n'; write(2,_lb,_li);
+                }
+            }
             else if (other->op_type == OP_MATCH
                   || other->op_type == OP_SUBST
                   || other->op_type == OP_TRANSR
@@ -9248,6 +9301,36 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
     logop->op_private = (U8)(1 | (flags >> 8));
 
     /* establish postfix order */
+    /* LLDIAG: if first is OP_NULL->OP_LEAVE->OP_ENTER, check OP_ENTER sibparent */
+    if (first->op_type == OP_NULL && (first->op_flags & OPf_KIDS)) {
+        OP *_lv = cUNOPx(first)->op_first;
+        if (_lv && _lv->op_type == OP_LEAVE && (_lv->op_flags & OPf_KIDS)) {
+            OP *_en = cLISTOPx(_lv)->op_first;
+            if (_en && _en->op_type == OP_ENTER) {
+                char _lb[128]; int _li=0;
+                const char *_hx="0123456789abcdef";
+                unsigned long long _na=(unsigned long long)(void*)first;
+                unsigned long long _la=(unsigned long long)(void*)_lv;
+                unsigned long long _ea=(unsigned long long)(void*)_en;
+                unsigned int _em=(unsigned int)_en->op_moresib;
+                unsigned long long _esp=(unsigned long long)(void*)_en->op_sibparent;
+                int _i;
+                _lb[_li++]='L'; _lb[_li++]='L'; _lb[_li++]='D'; _lb[_li++]='I';
+                _lb[_li++]='A'; _lb[_li++]='G'; _lb[_li++]=' ';
+                _lb[_li++]='N'; _lb[_li++]='=';
+                for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_na>>_i)&0xf];
+                _lb[_li++]=' '; _lb[_li++]='L'; _lb[_li++]='=';
+                for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_la>>_i)&0xf];
+                _lb[_li++]=' '; _lb[_li++]='E'; _lb[_li++]='=';
+                for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_ea>>_i)&0xf];
+                _lb[_li++]=' '; _lb[_li++]='m'; _lb[_li++]='=';
+                _lb[_li++]=_hx[_em&0xf];
+                _lb[_li++]=' '; _lb[_li++]='s'; _lb[_li++]='p'; _lb[_li++]='=';
+                for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_esp>>_i)&0xf];
+                _lb[_li++]='\n'; write(2,_lb,_li);
+            }
+        }
+    }
     logop->op_next = LINKLIST(first);
     first->op_next = (OP*)logop;
     assert(!OpHAS_SIBLING(first));
