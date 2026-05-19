@@ -34,8 +34,6 @@ OFILES=	array.$O\
 		gawkmisc.$O\
 #support \
 		dfa.$O\
-#		getopt.$O\
-#		getopt1.$O\
 		localeinfo.$O\
 		minrx.$O\
 		random.$O\
