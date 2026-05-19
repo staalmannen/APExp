@@ -1261,9 +1261,10 @@ rsametype(Type *t1, Type *t2, int n, int f)
 		et = t1->etype;
 		if(et != t2->etype)
 			return 0;
-		if((t1->garb & GNORET) != (t2->garb & GNORET))
-			return 0;
 		if(et == TFUNC) {
+			/* _Noreturn is part of a function type's identity */
+			if((t1->garb & GNORET) != (t2->garb & GNORET))
+				return 0;
 			if(!rsametype(t1->link, t2->link, n, 0))
 				return 0;
 			t1 = t1->down;
