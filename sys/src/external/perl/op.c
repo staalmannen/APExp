@@ -1794,10 +1794,15 @@ Perl_op_linklist(pTHX_ OP *o)
     OP **prevp;
     OP *kid;
     OP * top_op = o;
+    /* trail: last 6 ops visited for LLNULL diagnosis */
+    OP *_trail[6]; unsigned int _trail_t[6]; int _ti=0, _tc=0;
 
     PERL_ARGS_ASSERT_OP_LINKLIST;
 
     while (1) {
+        /* record trail for LLNULL diagnosis */
+        _trail[_ti] = o; _trail_t[_ti] = o ? (unsigned int)o->op_type : 0xDEAD;
+        _ti = (_ti + 1) % 6; if (_tc < 6) _tc++;
         /* Descend down the tree looking for any unprocessed subtrees to
          * do first */
         if (!o->op_next) {
@@ -1828,21 +1833,42 @@ Perl_op_linklist(pTHX_ OP *o)
             OP *_prev = o;
             o = o->op_sibparent;
             if (!o) {
-                /* print: "LLNULL prev=<addr> ty=<type>\n" */
-                char _lb[48]; int _li=0;
+                /* print top_op, _prev, trail for diagnosis */
+                char _lb[96]; int _li=0, _i, _j;
                 const char *_hx="0123456789abcdef";
                 unsigned long long _pa=(unsigned long long)(void*)_prev;
                 unsigned int _pt=_prev?(unsigned int)_prev->op_type:0xDEAD;
-                int _i;
+                unsigned int _pm=_prev?(unsigned int)_prev->op_moresib:0xFF;
+                unsigned long long _ta=(unsigned long long)(void*)top_op;
+                unsigned int _tt=top_op?(unsigned int)top_op->op_type:0xDEAD;
+                /* LLNULL p=<prev> t=<type> m=<moresib> T=<top> TT=<top_type> */
+                _li=0;
                 _lb[_li++]='L'; _lb[_li++]='L'; _lb[_li++]='N';
                 _lb[_li++]='U'; _lb[_li++]='L'; _lb[_li++]='L';
                 _lb[_li++]=' '; _lb[_li++]='p'; _lb[_li++]='=';
                 for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_pa>>_i)&0xf];
                 _lb[_li++]=' '; _lb[_li++]='t'; _lb[_li++]='=';
                 for(_i=12;_i>=0;_i-=4) _lb[_li++]=_hx[(_pt>>_i)&0xf];
-                _lb[_li++]='\n';
-                write(2,_lb,_li);
-                break;
+                _lb[_li++]=' '; _lb[_li++]='m'; _lb[_li++]='=';
+                _lb[_li++]=_hx[_pm&0xf];
+                _lb[_li++]=' '; _lb[_li++]='T'; _lb[_li++]='=';
+                for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_ta>>_i)&0xf];
+                _lb[_li++]=' '; _lb[_li++]='T'; _lb[_li++]='T'; _lb[_li++]='=';
+                for(_i=12;_i>=0;_i-=4) _lb[_li++]=_hx[(_tt>>_i)&0xf];
+                _lb[_li++]='\n'; write(2,_lb,_li);
+                /* print trail: last _tc ops visited */
+                for(_j=0;_j<_tc;_j++){
+                    int _idx=(_ti-_tc+_j+6)%6;
+                    unsigned long long _oa=(unsigned long long)(void*)_trail[_idx];
+                    unsigned int _ot=_trail_t[_idx];
+                    _li=0;
+                    _lb[_li++]='L'; _lb[_li++]='L'; _lb[_li++]='T'; _lb[_li++]=' ';
+                    for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_oa>>_i)&0xf];
+                    _lb[_li++]=' '; _lb[_li++]='t'; _lb[_li++]='=';
+                    for(_i=12;_i>=0;_i-=4) _lb[_li++]=_hx[(_ot>>_i)&0xf];
+                    _lb[_li++]='\n'; write(2,_lb,_li);
+                }
+                return _prev->op_next; /* return self-linked next rather than UB */
             }
         }
         assert(!o->op_next);
