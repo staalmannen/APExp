@@ -38,8 +38,20 @@ $PERLSRC/ext/ExtUtils-Miniperl/pm_to_blib: miniperl
 
 # Generate perlmain.c via miniperl.
 # No DynaLoader: Plan9 has no dlopen; all extensions are linked statically
-# or omitted. Pass -I to the ExtUtils-Miniperl source directly.
+# or omitted.
+#
+# -I paths explained:
+#   ExtUtils-Miniperl/lib  — ExtUtils::Miniperl (writemain)
+#   $PERLSRC/lib           — strict.pm, ExtUtils/Embed.pm, Config.pm stub, etc.
+#   dist/Exporter/lib      — Exporter.pm (used by ExtUtils::Miniperl)
+#   dist/PathTools/lib     — File::Spec (used by ExtUtils::Embed)
+#   dist/Carp/lib          — Carp.pm (used by warnings/strict chain)
 perlmain.c: miniperl $PERLSRC/ext/ExtUtils-Miniperl/pm_to_blib
-	./miniperl -I$PERLSRC/ext/ExtUtils-Miniperl/lib -I/sys/lib/perl\
+	./miniperl \
+		-I$PERLSRC/ext/ExtUtils-Miniperl/lib \
+		-I$PERLSRC/lib \
+		-I$PERLSRC/dist/Exporter/lib \
+		-I$PERLSRC/dist/PathTools/lib \
+		-I$PERLSRC/dist/Carp/lib \
 		-MExtUtils::Miniperl \
 		-e 'writemain("perlmain.c")'

@@ -605,7 +605,7 @@ addmove(Reg *r, int bn, int rn, int f)
 	a->type = v->name;
 
 	p1->as = AMOVL;
-	if(v->etype == TCHAR || v->etype == TUCHAR)
+	if(v->etype == TCHAR || v->etype == TUCHAR || v->etype == TBOOL)
 		p1->as = AMOVB;
 	if(v->etype == TSHORT || v->etype == TUSHORT)
 		p1->as = AMOVW;
@@ -615,7 +615,7 @@ addmove(Reg *r, int bn, int rn, int f)
 		p1->from = *a;
 		*a = zprog.from;
 		a->type = rn;
-		if(v->etype == TUCHAR)
+		if(v->etype == TUCHAR || v->etype == TBOOL)
 			p1->as = AMOVB;
 		if(v->etype == TUSHORT)
 			p1->as = AMOVW;
@@ -963,6 +963,7 @@ allreg(ulong b, Rgn *r)
 
 	case TCHAR:
 	case TUCHAR:
+	case TBOOL:
 	case TSHORT:
 	case TUSHORT:
 	case TINT:

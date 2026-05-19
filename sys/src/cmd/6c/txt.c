@@ -315,6 +315,7 @@ regalloc(Node *n, Node *tn, Node *o)
 	switch(tn->type->etype) {
 	case TCHAR:
 	case TUCHAR:
+	case TBOOL:
 	case TSHORT:
 	case TUSHORT:
 	case TINT:
@@ -616,6 +617,7 @@ gmove(Node *f, Node *t)
 			a = AMOVBQSX;
 		goto ld;
 	case TUCHAR:
+	case TBOOL:
 		a = AMOVBLZX;
 		if(t64)
 			a = AMOVBQZX;
@@ -691,6 +693,7 @@ gmove(Node *f, Node *t)
 	switch(tt) {
 	case TCHAR:
 	case TUCHAR:
+	case TBOOL:
 		a = AMOVB;	goto st;
 	case TSHORT:
 	case TUSHORT:
@@ -810,6 +813,7 @@ gmove(Node *f, Node *t)
 
 	case CASE(	TIND,	TCHAR):
 	case CASE(	TIND,	TUCHAR):
+	case CASE(	TIND,	TBOOL):
 	case CASE(	TIND,	TSHORT):
 	case CASE(	TIND,	TUSHORT):
 	case CASE(	TIND,	TINT):
@@ -818,6 +822,7 @@ gmove(Node *f, Node *t)
 	case CASE(	TIND,	TULONG):
 	case CASE(	TVLONG,	TCHAR):
 	case CASE(	TVLONG,	TUCHAR):
+	case CASE(	TVLONG,	TBOOL):
 	case CASE(	TVLONG,	TSHORT):
 	case CASE(	TVLONG,	TUSHORT):
 	case CASE(	TVLONG,	TINT):
@@ -826,6 +831,7 @@ gmove(Node *f, Node *t)
 	case CASE(	TVLONG,	TULONG):
 	case CASE(	TUVLONG,	TCHAR):
 	case CASE(	TUVLONG,	TUCHAR):
+	case CASE(	TUVLONG,	TBOOL):
 	case CASE(	TUVLONG,	TSHORT):
 	case CASE(	TUVLONG,	TUSHORT):
 	case CASE(	TUVLONG,	TINT):
@@ -934,6 +940,12 @@ gmove(Node *f, Node *t)
 	case CASE(	TUCHAR,	TUINT):
 	case CASE(	TUCHAR,	TLONG):
 	case CASE(	TUCHAR,	TULONG):
+	case CASE(	TBOOL,	TSHORT):
+	case CASE(	TBOOL,	TUSHORT):
+	case CASE(	TBOOL,	TINT):
+	case CASE(	TBOOL,	TUINT):
+	case CASE(	TBOOL,	TLONG):
+	case CASE(	TBOOL,	TULONG):
 		a = AMOVBLZX;
 		if(f->op == OCONST) {
 			f->vconst &= 0xff;
@@ -944,6 +956,9 @@ gmove(Node *f, Node *t)
 	case CASE(	TUCHAR,	TVLONG):
 	case CASE(	TUCHAR,	TUVLONG):
 	case CASE(	TUCHAR,	TIND):
+	case CASE(	TBOOL,	TVLONG):
+	case CASE(	TBOOL,	TUVLONG):
+	case CASE(	TBOOL,	TIND):
 		a = AMOVBQZX;
 		if(f->op == OCONST) {
 			f->vconst &= 0xff;
@@ -956,6 +971,7 @@ gmove(Node *f, Node *t)
  */
 	case CASE(	TFLOAT,	TCHAR):
 	case CASE(	TFLOAT,	TUCHAR):
+	case CASE(	TFLOAT,	TBOOL):
 	case CASE(	TFLOAT,	TSHORT):
 	case CASE(	TFLOAT,	TUSHORT):
 	case CASE(	TFLOAT,	TINT):
@@ -968,6 +984,7 @@ gmove(Node *f, Node *t)
 
 	case CASE(	TDOUBLE,TCHAR):
 	case CASE(	TDOUBLE,TUCHAR):
+	case CASE(	TDOUBLE,TBOOL):
 	case CASE(	TDOUBLE,TSHORT):
 	case CASE(	TDOUBLE,TUSHORT):
 	case CASE(	TDOUBLE,TINT):
@@ -1048,6 +1065,7 @@ gmove(Node *f, Node *t)
  * fix to float
  */
 	case CASE(	TUCHAR,	TFLOAT):
+	case CASE(	TBOOL,	TFLOAT):
 	case CASE(	TUSHORT,TFLOAT):
 	case CASE(	TINT,	TFLOAT):
 	case CASE(	TLONG,	TFLOAT):
@@ -1056,6 +1074,7 @@ gmove(Node *f, Node *t)
 
 
 	case CASE(	TUCHAR,	TDOUBLE):
+	case CASE(	TBOOL,	TDOUBLE):
 	case CASE(	TUSHORT,TDOUBLE):
 	case CASE(	TINT,	TDOUBLE):
 	case CASE(	TLONG,	TDOUBLE):
@@ -1208,7 +1227,7 @@ gopcode(int o, Type *ty, Node *f, Node *t)
 	switch(o) {
 	case OCOM:
 		a = ANOTL;
-		if(et == TCHAR || et == TUCHAR)
+		if(et == TCHAR || et == TUCHAR || et == TBOOL)
 			a = ANOTB;
 		if(et == TSHORT || et == TUSHORT)
 			a = ANOTW;
@@ -1218,7 +1237,7 @@ gopcode(int o, Type *ty, Node *f, Node *t)
 
 	case ONEG:
 		a = ANEGL;
-		if(et == TCHAR || et == TUCHAR)
+		if(et == TCHAR || et == TUCHAR || et == TBOOL)
 			a = ANEGB;
 		if(et == TSHORT || et == TUSHORT)
 			a = ANEGW;
@@ -1233,7 +1252,7 @@ gopcode(int o, Type *ty, Node *f, Node *t)
 	case OASADD:
 	case OADD:
 		a = AADDL;
-		if(et == TCHAR || et == TUCHAR)
+		if(et == TCHAR || et == TUCHAR || et == TBOOL)
 			a = AADDB;
 		if(et == TSHORT || et == TUSHORT)
 			a = AADDW;
@@ -1248,7 +1267,7 @@ gopcode(int o, Type *ty, Node *f, Node *t)
 	case OASSUB:
 	case OSUB:
 		a = ASUBL;
-		if(et == TCHAR || et == TUCHAR)
+		if(et == TCHAR || et == TUCHAR || et == TBOOL)
 			a = ASUBB;
 		if(et == TSHORT || et == TUSHORT)
 			a = ASUBW;
@@ -1263,7 +1282,7 @@ gopcode(int o, Type *ty, Node *f, Node *t)
 	case OASOR:
 	case OOR:
 		a = AORL;
-		if(et == TCHAR || et == TUCHAR)
+		if(et == TCHAR || et == TUCHAR || et == TBOOL)
 			a = AORB;
 		if(et == TSHORT || et == TUSHORT)
 			a = AORW;
@@ -1274,7 +1293,7 @@ gopcode(int o, Type *ty, Node *f, Node *t)
 	case OASAND:
 	case OAND:
 		a = AANDL;
-		if(et == TCHAR || et == TUCHAR)
+		if(et == TCHAR || et == TUCHAR || et == TBOOL)
 			a = AANDB;
 		if(et == TSHORT || et == TUSHORT)
 			a = AANDW;
@@ -1285,7 +1304,7 @@ gopcode(int o, Type *ty, Node *f, Node *t)
 	case OASXOR:
 	case OXOR:
 		a = AXORL;
-		if(et == TCHAR || et == TUCHAR)
+		if(et == TCHAR || et == TUCHAR || et == TBOOL)
 			a = AXORB;
 		if(et == TSHORT || et == TUSHORT)
 			a = AXORW;
@@ -1296,7 +1315,7 @@ gopcode(int o, Type *ty, Node *f, Node *t)
 	case OASLSHR:
 	case OLSHR:
 		a = ASHRL;
-		if(et == TCHAR || et == TUCHAR)
+		if(et == TCHAR || et == TUCHAR || et == TBOOL)
 			a = ASHRB;
 		if(et == TSHORT || et == TUSHORT)
 			a = ASHRW;
@@ -1307,7 +1326,7 @@ gopcode(int o, Type *ty, Node *f, Node *t)
 	case OASASHR:
 	case OASHR:
 		a = ASARL;
-		if(et == TCHAR || et == TUCHAR)
+		if(et == TCHAR || et == TUCHAR || et == TBOOL)
 			a = ASARB;
 		if(et == TSHORT || et == TUSHORT)
 			a = ASARW;
@@ -1318,7 +1337,7 @@ gopcode(int o, Type *ty, Node *f, Node *t)
 	case OASASHL:
 	case OASHL:
 		a = ASALL;
-		if(et == TCHAR || et == TUCHAR)
+		if(et == TCHAR || et == TUCHAR || et == TBOOL)
 			a = ASALB;
 		if(et == TSHORT || et == TUSHORT)
 			a = ASALW;
@@ -1328,7 +1347,7 @@ gopcode(int o, Type *ty, Node *f, Node *t)
 
 	case OROL:
 		a = AROLL;
-		if(et == TCHAR || et == TUCHAR)
+		if(et == TCHAR || et == TUCHAR || et == TBOOL)
 			a = AROLB;
 		if(et == TSHORT || et == TUSHORT)
 			a = AROLW;
@@ -1393,7 +1412,7 @@ gopcode(int o, Type *ty, Node *f, Node *t)
 	case OHS:
 	case OHI:
 		a = ACMPL;
-		if(et == TCHAR || et == TUCHAR)
+		if(et == TCHAR || et == TUCHAR || et == TBOOL)
 			a = ACMPB;
 		if(et == TSHORT || et == TUSHORT)
 			a = ACMPW;
@@ -1509,6 +1528,7 @@ schar	ewidth[NTYPE] =
 	-1,		/*[TXXX]*/
 	SZ_CHAR,	/*[TCHAR]*/
 	SZ_CHAR,	/*[TUCHAR]*/
+	SZ_CHAR,	/*[TBOOL]*/
 	SZ_SHORT,	/*[TSHORT]*/
 	SZ_SHORT,	/*[TUSHORT]*/
 	SZ_INT,		/*[TINT]*/
@@ -1532,6 +1552,7 @@ long	ncast[NTYPE] =
 	0,				/*[TXXX]*/
 	BCHAR|BUCHAR,			/*[TCHAR]*/
 	BCHAR|BUCHAR,			/*[TUCHAR]*/
+	BCHAR|BUCHAR|BBOOL,		/*[TBOOL]*/
 	BSHORT|BUSHORT,			/*[TSHORT]*/
 	BSHORT|BUSHORT,			/*[TUSHORT]*/
 	BINT|BUINT|BLONG|BULONG,	/*[TINT]*/

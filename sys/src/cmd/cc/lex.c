@@ -1552,14 +1552,14 @@ struct
 	 * _Bool: C99 boolean.  Map to LCHAR (unsigned char width).
 	 * Values are 0 or 1; the width and integer promotion match.
 	 */
-	"_Bool",		LCHAR,		TUCHAR,
+	"_Bool",		LCHAR,		TBOOL,
 
 	/*
 	 * C23 bool, true, and false.
 	 * bool is mapped to LCHAR (unsigned char width) like _Bool.
 	 * true and false are mapped to LCONST 1 and 0.
 	 */
-	"bool",			LCHAR,		TUCHAR,
+	"bool",			LCHAR,		TBOOL,
 	"true",			LCONST,		1,
 	"false",		LCONST,		0,
 
@@ -1665,6 +1665,7 @@ cinit(void)
 	types[TXXX] = T;
 	types[TCHAR] = typ(TCHAR, T);
 	types[TUCHAR] = typ(TUCHAR, T);
+	types[TBOOL] = typ(TBOOL, T);
 	types[TSHORT] = typ(TSHORT, T);
 	types[TUSHORT] = typ(TUSHORT, T);
 	types[TINT] = typ(TINT, T);
