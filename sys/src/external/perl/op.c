@@ -1622,6 +1622,24 @@ Perl_op_sibling_splice(pTHX_ OP *parent, OP *start, int del_count, OP* insert)
         while (OpHAS_SIBLING(last_ins))
             last_ins = OpSIBLING(last_ins);
         OpMAYBESIB_set(last_ins, rest, NULL);
+        /* SPLDIAG: verify OpMAYBESIB_set for OP_ENTER */
+        if (last_ins->op_type == OP_ENTER && rest != NULL) {
+            char _lb[80]; int _li=0;
+            const char *_hx="0123456789abcdef";
+            unsigned long long _ra=(unsigned long long)(void*)rest;
+            unsigned long long _sp=(unsigned long long)(void*)last_ins->op_sibparent;
+            unsigned int _m=(unsigned int)last_ins->op_moresib;
+            int _i;
+            _lb[_li++]='S'; _lb[_li++]='P'; _lb[_li++]='L'; _lb[_li++]='D';
+            _lb[_li++]='I'; _lb[_li++]='A'; _lb[_li++]='G'; _lb[_li++]=' ';
+            _lb[_li++]='r'; _lb[_li++]='=';
+            for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_ra>>_i)&0xf];
+            _lb[_li++]=' '; _lb[_li++]='m'; _lb[_li++]='=';
+            _lb[_li++]=_hx[_m&0xf];
+            _lb[_li++]=' '; _lb[_li++]='s'; _lb[_li++]='p'; _lb[_li++]='=';
+            for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_sp>>_i)&0xf];
+            _lb[_li++]='\n'; write(2,_lb,_li);
+        }
     }
     else
         insert = rest;

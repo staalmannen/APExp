@@ -1098,8 +1098,11 @@ C<sib> is non-null. For a higher-level interface, see C<L</op_sibling_splice>>.
 #define OpMORESIB_set(o, sib) ((o)->op_moresib = 1, (o)->op_sibparent = (sib))
 #define OpLASTSIB_set(o, parent) \
     ((o)->op_moresib = 0, (o)->op_sibparent = (parent))
+/* Plan9 kencc: bitfield-assign expression value is unreliable; use comma
+ * operator so (sib) is tested directly, not via the bitfield result. */
 #define OpMAYBESIB_set(o, sib, parent) \
-    ((o)->op_sibparent = ((o)->op_moresib = cBOOL(sib)) ? (sib) : (parent))
+    ((o)->op_moresib = cBOOL(sib),     \
+     (o)->op_sibparent = (sib) ? (sib) : (parent))
 
 #if !defined(PERL_CORE) && !defined(PERL_EXT)
 /* for backwards compatibility only */
