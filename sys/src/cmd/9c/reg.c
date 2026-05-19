@@ -488,7 +488,7 @@ addmove(Reg *r, int bn, int rn, int f)
 		a->type = D_CONST;
 
 	p1->as = AMOVW;
-	if(v->etype == TCHAR || v->etype == TUCHAR)
+	if(v->etype == TCHAR || v->etype == TUCHAR || v->etype == TBOOL)
 		p1->as = AMOVB;
 	if(v->etype == TSHORT || v->etype == TUSHORT)
 		p1->as = AMOVH;
@@ -514,7 +514,7 @@ addmove(Reg *r, int bn, int rn, int f)
 			a->type = D_FREG;
 			a->reg = rn-NREG;
 		}
-		if(v->etype == TUCHAR)
+		if(v->etype == TUCHAR || v->etype == TBOOL)
 			p1->as = AMOVBZ;
 		if(v->etype == TUSHORT)
 			p1->as = AMOVHZ;
@@ -841,6 +841,7 @@ allreg(ulong b, Rgn *r)
 
 	case TCHAR:
 	case TUCHAR:
+	case TBOOL:
 	case TSHORT:
 	case TUSHORT:
 	case TINT:

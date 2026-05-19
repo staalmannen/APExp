@@ -1101,6 +1101,7 @@ vconst(Node *n)
 
 	case TCHAR:
 	case TUCHAR:
+	case TBOOL:
 	case TSHORT:
 	case TUSHORT:
 	case TINT:

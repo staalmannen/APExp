@@ -880,6 +880,7 @@ allreg(ulong b, Rgn *r)
 
 	case TCHAR:
 	case TUCHAR:
+	case TBOOL:
 	case TSHORT:
 	case TUSHORT:
 	case TINT:

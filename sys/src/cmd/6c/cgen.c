@@ -1899,7 +1899,7 @@ castup(Type *t1, Type *t2)
 		return ft == TLONG || ft == TINT || ft == TSHORT || ft == TCHAR;
 	case TUINT:
 	case TULONG:
-		return ft == TULONG || ft == TUINT || ft == TUSHORT || ft == TUCHAR;
+		return ft == TULONG || ft == TUINT || ft == TUSHORT || ft == TUCHAR || ft == TBOOL;
 	case TVLONG:
 		return ft == TLONG || ft == TINT || ft == TSHORT;
 	case TUVLONG:

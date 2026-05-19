@@ -268,6 +268,7 @@ regalloc(Node *n, Node *tn, Node *o)
 	switch(tn->type->etype) {
 	case TCHAR:
 	case TUCHAR:
+	case TBOOL:
 	case TSHORT:
 	case TUSHORT:
 	case TINT:
@@ -612,6 +613,7 @@ gmove(Node *f, Node *t)
 			a = AMOVB;
 			break;
 		case TUCHAR:
+		case TBOOL:
 			a = AMOVBU;
 			break;
 		case TSHORT:
@@ -661,6 +663,7 @@ gmove(Node *f, Node *t)
 			a = AMOVW;
 			break;
 		case TUCHAR:
+		case TBOOL:
 			a = AMOVBU;
 			break;
 		case TCHAR:
@@ -731,6 +734,7 @@ gmove(Node *f, Node *t)
 		case TUSHORT:
 		case TCHAR:
 		case TUCHAR:
+		case TBOOL:
 			a = AMOVDW;
 			if(ft == TFLOAT)
 				a = AMOVFW;
@@ -800,6 +804,7 @@ gmove(Node *f, Node *t)
 		case TUSHORT:
 		case TCHAR:
 		case TUCHAR:
+		case TBOOL:
 			a = AMOVW;
 			break;
 		}
@@ -829,6 +834,7 @@ gmove(Node *f, Node *t)
 		case TUSHORT:
 		case TCHAR:
 		case TUCHAR:
+		case TBOOL:
 			a = AMOVW;
 			break;
 		}
@@ -858,6 +864,7 @@ gmove(Node *f, Node *t)
 		case TUSHORT:
 		case TCHAR:
 		case TUCHAR:
+		case TBOOL:
 			a = AMOVW;
 			break;
 		}
@@ -887,11 +894,13 @@ gmove(Node *f, Node *t)
 			break;
 		case TCHAR:
 		case TUCHAR:
+		case TBOOL:
 			a = AMOVW;
 			break;
 		}
 		break;
 	case TUCHAR:
+	case TBOOL:
 		switch(tt) {
 		case TDOUBLE:
 			regalloc(&nod, f, Z);
@@ -916,6 +925,7 @@ gmove(Node *f, Node *t)
 			break;
 		case TCHAR:
 		case TUCHAR:
+		case TBOOL:
 			a = AMOVW;
 			break;
 		}
@@ -964,6 +974,7 @@ gmover(Node *f, Node *t)
 			a = AMOVB;
 			break;
 		case TUCHAR:
+		case TBOOL:
 			a = AMOVBU;
 			break;
 		}
@@ -1341,6 +1352,7 @@ schar	ewidth[NTYPE] =
 	-1,		/* [TXXX] */
 	SZ_CHAR,	/* [TCHAR] */
 	SZ_CHAR,	/* [TUCHAR] */
+	SZ_CHAR,	/* [TBOOL] */
 	SZ_SHORT,	/* [TSHORT] */
 	SZ_SHORT,	/* [TUSHORT] */
 	SZ_INT,		/* [TINT] */
@@ -1365,6 +1377,7 @@ long	ncast[NTYPE] =
 	0,				/* [TXXX] */
 	BCHAR|BUCHAR,			/* [TCHAR] */
 	BCHAR|BUCHAR,			/* [TUCHAR] */
+	BCHAR|BUCHAR|BBOOL,		/* [TBOOL] */
 	BSHORT|BUSHORT,			/* [TSHORT] */
 	BSHORT|BUSHORT,			/* [TUSHORT] */
 	BINT|BUINT|BLONG|BULONG|BIND,	/* [TINT] */

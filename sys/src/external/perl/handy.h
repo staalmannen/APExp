@@ -150,14 +150,7 @@ required, but is kept for backwards compatibility.
 
 =cut
 */
-/* Plan9/kencc: _Bool is TUCHAR (unsigned char) — (bool)(x) truncates to the
- * low byte, giving 0 for aligned pointers or flags like SVf_UTF8=0x20000000.
- * Use double-negation instead, which normalises any non-zero value to int 1. */
-#ifdef _PLAN9_SOURCE
-#  define cBOOL(cbool) (!!(cbool))
-#else
-#  define cBOOL(cbool) ((bool) (cbool))
-#endif
+#define cBOOL(cbool) ((bool) (cbool))
 
 /* Try to figure out __func__ or __FUNCTION__ equivalent, if any.
  * XXX Should really be a Configure probe, with HAS__FUNCTION__

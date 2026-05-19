@@ -322,6 +322,7 @@ Gtab	gtabinit[NTYPE] =
 {
 	TCHAR,		"c",
 	TUCHAR,		"uc",
+	TBOOL,		"uc",
 	TSHORT,		"h",
 	TUSHORT,	"uh",
 	TINT,		"i",

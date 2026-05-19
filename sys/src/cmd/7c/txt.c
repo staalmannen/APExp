@@ -283,6 +283,7 @@ regalloc(Node *n, Node *tn, Node *o)
 	switch(tn->type->etype) {
 	case TCHAR:
 	case TUCHAR:
+	case TBOOL:
 	case TSHORT:
 	case TUSHORT:
 	case TINT:
@@ -600,6 +601,7 @@ gmove(Node *f, Node *t)
 			a = AMOVB;
 			break;
 		case TUCHAR:
+		case TBOOL:
 			a = AMOVBU;
 			break;
 		case TSHORT:
@@ -636,6 +638,7 @@ gmove(Node *f, Node *t)
 			a = AMOVWU;
 			break;
 		case TUCHAR:
+		case TBOOL:
 			a = AMOVBU;
 			break;
 		case TCHAR:
@@ -695,6 +698,7 @@ gmove(Node *f, Node *t)
 				a = AFCVTZSSW;
 			break;
 		case TUCHAR:
+		case TBOOL:
 		case TUSHORT:
 		case TUINT:
 		case TULONG:
@@ -740,6 +744,7 @@ gmove(Node *f, Node *t)
 		case TUSHORT:
 		case TCHAR:
 		case TUCHAR:
+		case TBOOL:
 			if(typeu[tt])
 				a = AMOVWU;
 			else
@@ -779,6 +784,7 @@ gmove(Node *f, Node *t)
 		case TUSHORT:
 		case TCHAR:
 		case TUCHAR:
+		case TBOOL:
 			a = AMOVWU;
 			break;
 		case TVLONG:
@@ -815,6 +821,7 @@ gmove(Node *f, Node *t)
 		case TUSHORT:
 		case TCHAR:
 		case TUCHAR:
+		case TBOOL:
 			a = AMOV;
 			break;
 		}
@@ -846,6 +853,7 @@ gmove(Node *f, Node *t)
 		case TUSHORT:
 		case TCHAR:
 		case TUCHAR:
+		case TBOOL:
 			a = AMOV;
 			break;
 		}
@@ -877,11 +885,13 @@ gmove(Node *f, Node *t)
 			break;
 		case TCHAR:
 		case TUCHAR:
+		case TBOOL:
 			a = AMOV;
 			break;
 		}
 		break;
 	case TUCHAR:
+	case TBOOL:
 		switch(tt) {
 		case TDOUBLE:
 			regalloc(&nod, f, Z);
@@ -908,6 +918,7 @@ gmove(Node *f, Node *t)
 			break;
 		case TCHAR:
 		case TUCHAR:
+		case TBOOL:
 			a = AMOV;
 			break;
 		}
@@ -941,6 +952,7 @@ gmover(Node *f, Node *t)
 			a = AMOVB;
 			break;
 		case TUCHAR:
+		case TBOOL:
 			a = AMOVBU;
 			break;
 		case TINT:
@@ -1415,6 +1427,7 @@ schar	ewidth[NTYPE] =
 	-1,		/* [TXXX] */
 	SZ_CHAR,	/* [TCHAR] */
 	SZ_CHAR,	/* [TUCHAR] */
+	SZ_CHAR,	/* [TBOOL] */
 	SZ_SHORT,	/* [TSHORT] */
 	SZ_SHORT,	/* [TUSHORT] */
 	SZ_INT,		/* [TINT] */
@@ -1439,6 +1452,7 @@ long	ncast[NTYPE] =
 	0,				/* [TXXX] */
 	BCHAR|BUCHAR,			/* [TCHAR] */
 	BCHAR|BUCHAR,			/* [TUCHAR] */
+	BCHAR|BUCHAR|BBOOL,		/* [TBOOL] */
 	BSHORT|BUSHORT,			/* [TSHORT] */
 	BSHORT|BUSHORT,			/* [TUSHORT] */
 	BINT|BUINT|BLONG|BULONG,	/* [TINT] */

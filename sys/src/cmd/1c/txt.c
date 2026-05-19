@@ -237,6 +237,7 @@ oinit(int o, int ab, int aw, int al, int af, int ad)
 	}
 	opxt[i][TCHAR] = ab;
 	opxt[i][TUCHAR] = ab;
+	opxt[i][TBOOL] = ab;
 	opxt[i][TSHORT] = aw;
 	opxt[i][TUSHORT] = aw;
 	opxt[i][TINT] = al;
@@ -862,6 +863,7 @@ schar	ewidth[NTYPE] =
 	-1,		/* [TXXX] */
 	SZ_CHAR,	/* [TCHAR] */
 	SZ_CHAR,	/* [TUCHAR] */
+	SZ_CHAR,	/* [TBOOL] */
 	SZ_SHORT,	/* [TSHORT] */
 	SZ_SHORT,	/* [TUSHORT] */
 	SZ_INT,		/* [TINT] */
@@ -885,6 +887,7 @@ long	ncast[NTYPE] =
 	0,				/* [TXXX] */
 	BCHAR|BUCHAR,			/* [TCHAR] */
 	BCHAR|BUCHAR,			/* [TUCHAR] */
+	BCHAR|BUCHAR|BBOOL,		/* [TBOOL] */
 	BSHORT|BUSHORT,			/* [TSHORT] */
 	BSHORT|BUSHORT,			/* [TUSHORT] */
 	BINT|BUINT|BLONG|BULONG|BIND,	/* [TINT] */

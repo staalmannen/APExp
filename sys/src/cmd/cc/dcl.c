@@ -539,6 +539,7 @@ init1(Sym *s, Type *t, long o, int exflag)
 
 	case TCHAR:
 	case TUCHAR:
+	case TBOOL:
 	case TINT:
 	case TUINT:
 	case TSHORT:
@@ -1512,6 +1513,7 @@ paramconv(Type *t, int f)
 		break;
 
 	case TUCHAR:
+	case TBOOL:
 	case TUSHORT:
 		if(!f)
 			t = types[TUINT];
