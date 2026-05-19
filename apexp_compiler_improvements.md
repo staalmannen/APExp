@@ -156,9 +156,10 @@ holds the value expression.
 2. Walk the OLIST with `sametype()` to find a matching association.
 3. Return the matching `->left`, or the `default:` branch, or `Z` on no match.
 
-`sametype()` ignores const/volatile (only checks `GNORET`), so
+`sametype()` ignores const/volatile qualifiers for matching purposes, so
 `_Generic(x, const int: ..., int: ...)` would be ambiguous — both match.
-This is correct per the standard.
+This is correct per the standard.  (`GNORET` is only checked for `TFUNC`
+types in `rsametype()` — see Part XII.)
 
 ### Other C11/C23 items
 
@@ -521,54 +522,159 @@ summarises the implementation so it can be found quickly in future work.
 
 ---
 
-## Part XII — DWARF Debug Information in the Plan9 Linkers
+## Part XII — GNORET garb propagation bug and fixes
 
-### Status (WIP as of 2026-05)
+### Problem description
 
-DWARF support has been ported into the APExp linker infrastructure.
-The implementation is **in progress** — sections are emitted but integration
-with the new `adbg` debugger is not yet complete.
+kencc uses a `garb` field on each `Type` node to record qualifiers:
+`GCONSTNT` (const), `GVOLATILE` (volatile), and `GNORET` (_Noreturn).
+`GNORET` is set on a type when `_Noreturn` appears in its declaration.
+Semantically this is only meaningful for **function types** — it marks a
+function that never returns.
+
+A longstanding bug caused `GNORET` to appear on **pointer** (`TIND`) type
+nodes in prototype parameter lists.  When `rsametype()` in `dcl.c` compared
+two otherwise identical pointer types, the check:
+
+```c
+if((t1->garb & GNORET) != (t2->garb & GNORET))
+    return 0;
+```
+
+fired and treated them as incompatible.  The symptom was error messages like:
+
+```
+argument prototype mismatch "IND STRUCT pthread_mutex" for "NORET IND STRUCT pthread_mutex": pthread_mutex_lock
+argument prototype mismatch "INT" for "NORET IND CONST CHAR": strcmp
+```
+
+The second form appears when an unrelated type mismatch (passing `int` where
+`const char *` is expected) is reported: the expected type is printed with a
+spurious `NORET` prefix because `GNORET` leaked onto the `TIND` node.
+
+### Root cause
+
+The root cause is that on Plan9 amd64, `sizeof(long) = 4` (ILP32 + 64-bit
+pointers — the LLP64 model).  `BNORET = 1L << TNORET`.  In the pre-TBOOL
+enum `TNORET = 31`, so `BNORET = 1L<<31 = 0x80000000` — valid in 32-bit.
+After TBOOL was inserted into the enum at position 3, every subsequent type
+constant shifted by 1, making `TNORET = 32` and `BNORET = 1L<<32 = 0` on a
+32-bit `long` (overflow → 0).
+
+With `BNORET = 0`, the `BGARB` mask (`BCONSTNT | BVOLATILE | BNORET`) no
+longer includes the _Noreturn bit, so `garbt()` never sets `GNORET`.
+This means the leak only manifests with the **old** (pre-TBOOL) compiler
+binary compiling headers that use `_Noreturn` (e.g. `stdlib.h` → `abort`,
+`exit`; the internal `libc.h` → `sysfatal`).  Once the compiler is rebuilt
+with TBOOL in the enum, `_Noreturn` is silently ignored and the garb never
+gets set.
+
+### Fixes applied
+
+**`sys/src/cmd/cc/dcl.c` — `rsametype()`**
+
+Moved the `GNORET` check inside the `et == TFUNC` branch so it is only
+enforced when comparing two function types.  For pointer, struct, array and
+scalar nodes the check is skipped, preventing false-positive prototype
+mismatches while the old compiler binary is still in service.
+
+```c
+/* Before (checked for ALL types): */
+if((t1->garb & GNORET) != (t2->garb & GNORET))
+    return 0;
+if(et == TFUNC) { ... }
+
+/* After (only for TFUNC): */
+if(et == TFUNC) {
+    if((t1->garb & GNORET) != (t2->garb & GNORET))
+        return 0;
+    ...
+}
+```
+
+**`sys/src/cmd/cc/lex.c` — `Tconv()` type printer**
+
+Strip `GNORET` from the garb before printing for any non-`TFUNC` node, so
+error messages no longer show `NORET IND CONST CHAR` for plain `const char*`.
+
+```c
+int garb = t->garb & ~GINCOMPLETE;
+if(t->etype != TFUNC)
+    garb &= ~GNORET;
+if(garb)
+    fmtprint(fp, "%s ", gnames[garb]);
+```
+
+**`sys/src/ape/lib/ap/passwd/getpw_a.c`**
+
+This file called `getuser()` (Plan9 native, undeclared in APE headers) three
+times, causing three "function not declared: getuser" diagnostics and then
+spurious "INT for NORET IND CONST CHAR" mismatches on `strcmp`/`strlen`/
+`strcpy`.  Fixed by replacing all three calls with `getlogin()` (declared in
+`<unistd.h>`, already included) and caching the result in a local pointer.
+
+### Invariant going forward
+
+- `GNORET` **must not** appear on `TIND`, `TSTRUCT`, `TARRAY`, scalar, or any
+  other non-`TFUNC` type node.  If it does, it is a garb-propagation bug.
+- `rsametype()` only checks `GNORET` for `TFUNC` nodes.
+- After the TBOOL enum insertion is in the running compiler, `BNORET = 1L<<32`
+  overflows to 0 on 32-bit `long` and `_Noreturn` qualifiers are silently
+  ignored.  This is acceptable for Plan9 (which has no `_Noreturn` ABIs to
+  enforce) but should be addressed by using `1LL<<TNORET` or a separate
+  `int`-sized `garb` bit table if `_Noreturn` enforcement is ever needed.
+
+---
+
+## Part XIII — DWARF Debug Information in the Plan9 Linkers
+
+### Status (as of 2026-05)
+
+DWARF infrastructure is **partially in place** but **not yet active**:
+
+- The linker-side emitter (`ld/dwarf.c`) is compiled and linked into 6l, but
+  its entry points (`dwarfemitdebugsections`, `dwarfaddfrag`) are **never
+  called** from 6l's `asm.c`, `obj.c`, or `pass.c`.  The DWARF code is
+  currently dead weight in the linker binary.
+- The libdwarf reader (`sys/src/ape/lib/dwarf/`) and libdwarfp producer
+  (`sys/src/ape/lib/dwarfp/`) mkfiles exist and point at the correct source
+  tree (`sys/src/external/libdwarf/`), but are not yet part of the default
+  build.
+- `dwarfdump` has a mkfile and correct `DWSRC` path; it needs libdwarf built
+  first.
+- No `adbg` debugger source is committed.
 
 ### Source locations
 
 | Path | Contents |
 |:-----|:---------|
-| `sys/src/cmd/ld/dwarf.c` | Shared DWARF emitter (~1000 lines). Emits `.debug_abbrev`, `.debug_info`, `.debug_line`, `.debug_frame` sections. Walks the linker's prog table to build DIE tree and line program. |
+| `sys/src/cmd/ld/dwarf.c` | Linker DWARF emitter (1236 lines, adapted from Go toolchain). Implements `dwarfaddfrag()` and `dwarfemitdebugsections()` but these are **not yet called** from the linker. |
 | `sys/src/cmd/ld/dwarf.h` | Public interface: `dwarfaddfrag()`, `dwarfemitdebugsections()` |
 | `sys/src/cmd/ld/dwarf_defs.h` | DWARF constants (DW_TAG_*, DW_AT_*, DW_FORM_*, etc.) |
-| `sys/src/cmd/6l/mkfile` | Compiles `../ld/dwarf.c` as `dwarf.$O` and links it into 6l |
-| `sys/src/ape/lib/dwarf/` | libdwarf (reader) — ported from upstream libdwarf |
-| `sys/src/ape/lib/dwarfp/` | libdwarfp (producer/writer) — ported from upstream libdwarf |
-| `sys/src/ape/cmd/dwarfdump/` | `dwarfdump` utility (WIP — mkfile has a stale `DWSRC` path pointing to `external/chicken` instead of `external/libdwarf`) |
-| `sys/src/ape/cmd/adbg/` | New DWARF-aware debugger (preliminary, not yet committed) |
+| `sys/src/cmd/6l/mkfile` | Compiles `../ld/dwarf.c` as `dwarf.$O` and links into 6l — but no call sites exist yet |
+| `sys/src/ape/lib/dwarf/` | libdwarf (reader) — mkfile points to `sys/src/external/libdwarf/src/lib/libdwarf/` |
+| `sys/src/ape/lib/dwarfp/` | libdwarfp (producer/writer) — mkfile points to `sys/src/external/libdwarf/src/lib/libdwarfp/` |
+| `sys/src/ape/cmd/dwarfdump/` | `dwarfdump` utility — mkfile has correct `DWSRC=../../../external/libdwarf`; depends on libdwarf + libzstd |
 
-### Architecture
+### What `ld/dwarf.c` implements
 
-The linker DWARF emitter in `ld/dwarf.c` is adapted from the Go toolchain's
-Plan9 linker. It:
-1. Builds an abbreviation table (compile-unit, subprogram, base-type DIEs)
-2. Walks the linker's `Prog` list to collect line-number → PC mappings and
-   builds the `.debug_line` state machine
-3. Emits `.debug_frame` CIE/FDE entries using the stack-pointer adjustment
-   records already tracked by the linker (`getspadj` / `AADJSP`)
-4. All four sections are appended after the program text in the output binary
+The emitter (when called) would:
+1. Build a DWARF abbreviation table (compile-unit, subprogram, base-type DIEs)
+2. Walk the linker's `Prog` list to collect line-number → PC mappings and emit
+   a `.debug_line` state machine
+3. Emit `.debug_frame` CIE/FDE entries using stack-pointer adjustment records
+   (`getspadj` / `AADJSP`)
+4. Emit `.debug_info` with type and function DIEs
+5. Append all four sections after the program text in the output binary
 
-### Using DWARF output today
+### TODOs to make DWARF active
 
-The `dwarfdump` utility (once built) can decode the sections. Example:
-```
-dwarfdump -a binary
-```
-
-The `adbg` debugger is intended as the primary consumer once it stabilises.
-Until then, Plan9's native `acid` debugger remains the main debugging tool.
-
-### Known issues / TODOs
-
-- `dwarfdump` mkfile has wrong `DWSRC=../../../external/chicken` — should be
-  `../../../external/libdwarf`.
-- DWARF sections may not be written to ELF when building APE binaries (the
-  APE linker path differs from the native 6l path). Needs verification.
-- `adbg` source not yet committed to the repository.
-- `libdwarfp` (producer) is ported but not yet wired into the compiler front-end
-  to emit type information from the C compiler itself.
+1. **Wire in the call sites**: in `6l/asm.c` (or `obj.c`/`pass.c`), add a call
+   to `dwarfemitdebugsections()` after the final section layout, and call
+   `dwarfaddfrag()` when processing object file symbol fragments.
+2. **Build libdwarf/libdwarfp**: add `dwarf` and `dwarfp` to
+   `sys/src/ape/lib/mkfile`'s subdirectory list.
+3. **Build dwarfdump**: add `dwarfdump` to `sys/src/ape/cmd/mkfile`.
+4. **Compiler front-end type info**: wire `libdwarfp` into the C compiler to
+   emit full type information (variables, struct layouts) rather than just
+   line numbers and function names.
