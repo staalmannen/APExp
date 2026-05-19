@@ -1208,7 +1208,7 @@ waitproc(int block, int *status)
 #ifdef HAVE_WAIT3
 			err = wait3(status, flags, NULL);
 #else
-			err = waitpid((pid_t)-1, status, flags, NULL);
+			err = waitpid((pid_t)-1, status, flags);
 #endif
 		while (err < 0 && errno == EINTR);
 

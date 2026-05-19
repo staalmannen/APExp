@@ -50,6 +50,12 @@
 #define ARRAY_SIZE(a) (sizeof (a) / sizeof ((a)[0]))
 
 /* typedefs */
+#ifndef true
+#define true 1
+#endif
+#ifndef false
+#define false 0
+#endif
 
 /* A description of an output file.  It may be temporary.  */
 struct outfile
@@ -173,5 +179,5 @@ extern enum conflict_style conflict_style;
 
 bool merge_hunk (intmax_t hunk, struct outstate *, idx_t where, bool *);
 #else
-# define merge_hunk(hunk, outstate, where, somefailed) false
+# define merge_hunk(hunk, outstate, where, somefailed) 0
 #endif

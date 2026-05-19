@@ -58,6 +58,7 @@ OFILES=\
 	resolvconf.$O\
 	rresvport.$O\
 	send.$O\
+	sendmsg.$O\
 	sendto.$O\
 	serv.$O\
 	shutdown.$O\

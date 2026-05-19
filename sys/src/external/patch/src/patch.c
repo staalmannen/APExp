@@ -617,10 +617,14 @@ main (int argc, char **argv)
 
 		      if (stat_file (outname, &outstat) != 0)
 			say ("Cannot stat file %s, skipping backup\n", outname);
-		      else
-			output_file (&(struct outfile) { .name = outname },
-				     &outstat, nullptr, nullptr,
-				     file_type | 0, true);
+		      else {
+			struct outfile outf;
+			outf.name = (char *)outname;
+			outf.temporary = false;
+			output_file (&outf, &outstat, nullptr, nullptr,
+			             file_type | 0, true);
+		      }
+
 		    }
 		}
 	    }
@@ -1589,8 +1593,12 @@ init_output (struct outstate *outstate)
 static FILE *
 open_outfile (char *name)
 {
-  if (strcmp (name, "-") != 0)
-    return create_output_file (&(struct outfile) { .name = name }, 0);
+  if (strcmp (name, "-") != 0) {
+      struct outfile out;
+      out.name = name;
+      out.temporary = false;
+      return create_output_file (&out, 0);
+  }
   else
     {
       int stdout_dup = dup (STDOUT_FILENO);

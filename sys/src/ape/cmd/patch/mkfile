@@ -4,9 +4,16 @@ PTCHSRC=$APEXPROOT/sys/src/external/patch
 
 TARG=patch
 
+LIB=libgnu.a$O
+
 OFILES=\
 	inp.$O patch.$O pch.$O \
 	safe.$O util.$O version.$O merge.$O
+
+LIBO=\
+	xmalloc.$O\
+	xalloc-die.$O
+
 
 BIN=$APEXPROOT/$objtype/bin/ape
 
@@ -16,9 +23,13 @@ CC=pcc -c
 CFLAGS=-B -p -D_POSIX_SOURCE \
 	-D_BSD_EXTENSION -I$PTCHSRC \
 	-I$PTCHSRC/src -I$PTCHSRC/lib \
-	-DHAVE_CONFIG_H \
+	-DHAVE_CONFIG_H -DENABLE_MERGE\
 	-Ded_PROGRAM="/bin/ed"\
 	-DS_IRWXUGO=S_IRUSR
+
+
+libgnu.a$O: $LIBO
+	ar vu libgnu.a$O $LIBO
 
 %.$O: $PTCHSRC/src/%.c
 	$CC $CFLAGS $prereq

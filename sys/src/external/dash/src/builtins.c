@@ -5,8 +5,10 @@
 #include "shell.h"
 #include "builtins.h"
 
+#if JOBS
 int bgcmd(int, char **);
 int fgcmd(int, char **);
+#endif
 int breakcmd(int, char **);
 int cdcmd(int, char **);
 int commandcmd(int, char **);
@@ -36,7 +38,9 @@ int unaliascmd(int, char **);
 int unsetcmd(int, char **);
 int waitcmd(int, char **);
 int aliascmd(int, char **);
+#ifdef HAVE_GETRLIMIT
 int ulimitcmd(int, char **);
+#endif
 int testcmd(int, char **);
 int killcmd(int, char **);
 
@@ -45,7 +49,9 @@ const struct builtincmd builtincmd[] = {
 	{ ":", truecmd, 3 },
 	{ "[", testcmd, 0 },
 	{ "alias", aliascmd, 6 },
+#if JOBS
 	{ "bg", bgcmd, 2 },
+#endif
 	{ "break", breakcmd, 3 },
 	{ "cd", cdcmd, 2 },
 	{ "chdir", cdcmd, 0 },
@@ -57,7 +63,9 @@ const struct builtincmd builtincmd[] = {
 	{ "exit", exitcmd, 3 },
 	{ "export", exportcmd, 7 },
 	{ "false", falsecmd, 2 },
+#if JOBS
 	{ "fg", fgcmd, 2 },
+#endif
 	{ "getopts", getoptscmd, 2 },
 	{ "hash", hashcmd, 2 },
 	{ "jobs", jobscmd, 2 },
@@ -75,7 +83,9 @@ const struct builtincmd builtincmd[] = {
 	{ "trap", trapcmd, 3 },
 	{ "true", truecmd, 2 },
 	{ "type", typecmd, 2 },
+#ifdef HAVE_GETRLIMIT
 	{ "ulimit", ulimitcmd, 2 },
+#endif
 	{ "umask", umaskcmd, 2 },
 	{ "unalias", unaliascmd, 2 },
 	{ "unset", unsetcmd, 3 },

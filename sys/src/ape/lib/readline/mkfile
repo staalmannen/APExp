@@ -2,7 +2,6 @@ APEXPROOT=../../../../..
 APE=$APEXPROOT/sys/src/ape
 </$APE/config
 
-# libhistory is just a substet of libreadline. I don't bother building it.
 LIB=$APEXPROOT/$objtype/lib/ape/libreadline.a
 BIN=$APEXPROOT/$objtype/bin/ape
 
@@ -57,7 +56,8 @@ RLSRC=../../../external/readline
 CC=$APEXPROOT/$objtype/bin/pcc
 
 CFLAGS=-c -DHAVE_CONFIG_H -D_POSIX_SOURCE -DHAVE_CURSES_H -DHAVE_STDLIB_H\
-	-I$RLSRC -DRL_LIBRARY_VERSION='"8.3"' -DBRACKETED_PASTE_DEFAULT=1
+	-I$RLSRC -DRL_LIBRARY_VERSION='"8.3"' -DBRACKETED_PASTE_DEFAULT=1\
+	-DREADLINE_LIBRARY
 
 %.$O: $RLSRC/%.c
 	$CC $CFLAGS $RLSRC/$stem.c

@@ -371,13 +371,15 @@ set_file_attributes (char *to, int tofd, enum file_attributes attr,
 
 static void
 create_backup_copy (char *from, char *to, const struct stat *st,
-		    bool to_dir_known_to_exist)
+                    bool to_dir_known_to_exist)
 {
-  copy_file (from, st, &(struct outfile) { .name = to },
-	     nullptr, 0, st->st_mode, FA_TIMES | FA_IDS | FA_MODE,
-	     to_dir_known_to_exist);
+  struct outfile out;
+  out.name = to;
+  out.temporary = false;
+  copy_file (from, st, &out,
+             nullptr, 0, st->st_mode, FA_TIMES | FA_IDS | FA_MODE,
+             to_dir_known_to_exist);
 }
-
 void
 create_backup (char *to, const struct stat *to_st, bool leave_original)
 {
@@ -593,8 +595,12 @@ move_file (struct outfile *outfrom, struct stat const *fromst,
 		      else if (errno != ENOENT)
 			pfatal ("Can't remove file %s", quotearg (to));
 		    }
-		  copy_file (from, fromst, &(struct outfile) { .name = to },
-			     &tost, 0, mode, 0, to_dir_known_to_exist);
+		  struct outfile out;
+		  out.name = to;
+		  out.temporary = false;
+		  copy_file (from, fromst, &out,
+		             &tost, 0, mode, 0, to_dir_known_to_exist);
+
 		  insert_file_id (&tost, CREATED);
 		  return;
 		}
@@ -1249,15 +1255,21 @@ init_signals (void)
   signal (SIGCHLD, SIG_DFL);
 
 #if HAVE_SIGACTION && HAVE_SIGFILLSET
-  struct sigaction fatal_act = { .sa_handler = handle_signal };
+  struct sigaction fatal_act;
+  memset(&fatal_act, 0, sizeof(fatal_act));
+  fatal_act.sa_handler = handle_signal;
   sigfillset (&fatal_act.sa_mask);
-  for (int i = 0; i < NUM_SIGS; i++)
-    {
-      struct sigaction initial_act;
-      if (sigaction (sigs[i], nullptr, &initial_act) == 0
-	  && initial_act.sa_handler != SIG_IGN)
-	sigaction (sigs[i], &fatal_act, nullptr);
-    }
+  {
+      int i;
+      for (i = 0; i < NUM_SIGS; i++)
+        {
+          struct sigaction initial_act;
+          if (sigaction (sigs[i], (struct sigaction *)0, &initial_act) == 0
+         && initial_act.sa_handler != SIG_IGN)
+            sigaction (sigs[i], &fatal_act, (struct sigaction *)0);
+        }
+  }
+
 #else
   for (int i = 0; i < NUM_SIGS; i++)
     if (signal (sigs[i], SIG_IGN) != SIG_IGN)

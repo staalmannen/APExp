@@ -34,8 +34,8 @@ OFILES=	array.$O\
 		gawkmisc.$O\
 #support \
 		dfa.$O\
-		getopt.$O\
-		getopt1.$O\
+#		getopt.$O\
+#		getopt1.$O\
 		localeinfo.$O\
 		minrx.$O\
 		random.$O\
@@ -44,7 +44,7 @@ OFILES=	array.$O\
 		dynarray_at_failure.$O\
 		dynarray_emplace_enlarge.$O\
 		dynarray_resize.$O\
-		dynarray_resize_clear.$O\
+#		dynarray_resize_clear.$O\
 		dynarray_finalize.$O\
 
 <$APEXPROOT/sys/src/cmd/mkone

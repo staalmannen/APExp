@@ -16,83 +16,84 @@ OFILES=	compile.$O\
 # lib objs from Makefile
 # I think I can comment out a lot of them
 LIB_OBJS=\
-	copy-acl.$O\
-	set-acl.$O\
-	acl-errno-valid.$O\
-	acl-internal.$O\
-	get-permissions.$O\
-	set-permissions.$O\
-	basename-lgpl.$O\
-	binary-io.$O\
-	c-ctype.$O\
-	c-strcasecmp.$O\
-	c-strncasecmp.$O\
-	canonicalize-lgpl.$O\
-	cloexec.$O\
-	close-stream.$O\
-	closeout.$O\
+#	copy-acl.$O\
+#	set-acl.$O\
+#	acl-errno-valid.$O\
+#	acl-internal.$O\
+#	get-permissions.$O\
+#	set-permissions.$O\
+#	basename-lgpl.$O\
+#	binary-io.$O\
+#	c-ctype.$O\
+#	c-strcasecmp.$O\
+#	c-strncasecmp.$O\
+#	canonicalize-lgpl.$O\
+#	cloexec.$O\
+#	close-stream.$O\
+#	closeout.$O\
 	dfa.$O\
-	localeinfo.$O\
-	dirname-lgpl.$O\
-	stripslash.$O\
-	dup2.$O\
+#	localeinfo.$O\
+#	dirname-lgpl.$O\
+#	stripslash.$O\
+#	dup2.$O\
 #	error.$O\
 	exitfail.$O\
 #	fcntl.$O\
-	fd-hook.$O\
-	fpending.$O\
+#	fd-hook.$O\
+#	fpending.$O\
 	free.$O\
-	fwriting.$O\
+#	fwriting.$O\
 	getprogname.$O\
-	getrandom.$O\
-	dynarray_at_failure.$O\
-	dynarray_emplace_enlarge.$O\
-	dynarray_finalize.$O\
-	dynarray_resize.$O\
-	dynarray_resize_clear.$O\
-	scratch_buffer_grow.$O\
-	scratch_buffer_grow_preserve.$O\
-	scratch_buffer_set_array_size.$O\
-	hard-locale.$O\
-	ialloc.$O\
-	localcharset.$O\
-	localeconv.$O\
-	lock.$O\
-	lstat.$O\
-	malloca.$O\
-	mbrlen.$O\
-	mbrtowc.$O\
-	memrchr.$O\
-	mkdir.$O\
-	mkostemp.$O\
-	nl_langinfo.$O\
+#	getrandom.$O\
+#	dynarray_at_failure.$O\
+#	dynarray_emplace_enlarge.$O\
+#	dynarray_finalize.$O\
+#	dynarray_resize.$O\
+#	dynarray_resize_clear.$O\
+#	scratch_buffer_grow.$O\
+#	scratch_buffer_grow_preserve.$O\
+#	scratch_buffer_set_array_size.$O\
+#	hard-locale.$O\
+	hash.$O\
+#	ialloc.$O\
+#	localcharset.$O\
+#	localeconv.$O\
+#	lock.$O\
+#	lstat.$O\
+#	malloca.$O\
+#	mbrlen.$O\
+#	mbrtowc.$O\
+#	memrchr.$O\
+#	mkdir.$O\
+#	mkostemp.$O\
+#	nl_langinfo.$O\
 	obstack.$O\
 	progname.$O\
-	qcopy-acl.$O\
-	qset-acl.$O\
-	quotearg.$O\
-	rawmemchr.$O\
-	readlink.$O\
-	reallocarray.$O\
+#	qcopy-acl.$O\
+#	qset-acl.$O\
+#	quotearg.$O\
+#	rawmemchr.$O\
+#	readlink.$O\
+#	reallocarray.$O\
 	regex.$O\
-	rename.$O\
-	rmdir.$O\
-	se-context.$O\
-	se-label.$O\
-	se-selinux.$O\
-	setlocale_null.$O\
-	setlocale-lock.$O\
-	stat-time.$O\
+#	rename.$O\
+#	rmdir.$O\
+#	se-context.$O\
+#	se-label.$O\
+#	se-selinux.$O\
+#	setlocale_null.$O\
+#	setlocale-lock.$O\
+#	stat-time.$O\
 	strerror.$O\
-	strerror-override.$O\
-	tempname.$O\
-	threadlib.$O\
+#	strerror-override.$O\
+#	tempname.$O\
+#	threadlib.$O\
 	unistd.$O\
 	version-etc.$O\
 	version-etc-fsf.$O\
-	wctype-h.$O\
+#	wctype-h.$O\
 	xmalloc.$O\
-	xalloc-die.$O\
+	xalloc-die.$O
 
 
 LIB=libgnu.a$O

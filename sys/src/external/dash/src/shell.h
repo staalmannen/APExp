@@ -49,6 +49,10 @@
  * a quit signal will generate a core dump.
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <sys/param.h>
 
 #ifndef JOBS

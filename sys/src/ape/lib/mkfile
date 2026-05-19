@@ -25,8 +25,9 @@ _OPTIONAL_LIBS=\
 	perl\
 	png\
 	readline\
+		history\
 	tcl\
-	tk\
+		tk\
 	xml2\
 	z\
 	zstd\

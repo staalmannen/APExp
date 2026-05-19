@@ -3,9 +3,8 @@ APE=../../ape
 APEXPROOT=../../../..
 
 _CORE_APPS=\
-# prerequisites\
-	make\
 # shell\
+	dash\
 	bash\
 # parsing/editing source etc \
 	as\
@@ -13,6 +12,7 @@ _CORE_APPS=\
 	bison\
 	awk\
 	sed\
+	make\
 # often invoked during make \
 	m4\
 	iconv\
@@ -44,11 +44,15 @@ _OPTIONAL_APPS=\
 # transpilers \
 	f2c\
 	p2c\
+	chicken\
 	objc\
 	cfront\
 #		c++lib\
 #	basic\
 # dev tools \
+	adeb\
+	dwarfdump\
+	hell\
 	pcregrep\
 #	diff\
 #	patch\

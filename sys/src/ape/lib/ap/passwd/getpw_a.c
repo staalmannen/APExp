@@ -1,142 +1,47 @@
 #include <pthread.h>
-#include <byteswap.h>
 #include <string.h>
 #include <unistd.h>
-#include "pwf.h"
-#include "nscd.h"
+#include <pwd.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <libc.h> /* Plan 9 headers */
 
-static char *itoa(char *p, uint32_t x)
-{
-	// number of digits in a uint32_t + NUL
-	p += 11;
-	*--p = 0;
-	do {
-		*--p = '0' + x % 10;
-		x /= 10;
-	} while (x);
-	return p;
-}
-
+/* 
+ * Native Plan 9 implementation of __getpw_a.
+ * Simplifies to fetching the current user identity via getuser().
+ */
 int __getpw_a(const char *name, uid_t uid, struct passwd *pw, char **buf, size_t *size, struct passwd **res)
 {
-	FILE *f;
-	int cs;
-	int rv = 0;
+	char user[64];
+	
+	/* If a specific name or UID is requested that isn't the current user, 
+	   we indicate it's not found (Plan 9 is primarily single-user in this context). */
+	if (name != NULL && strcmp(name, getuser()) != 0) {
+		*res = NULL;
+		return 0;
+	}
+	
+	/* For UID, Plan 9 doesn't have a direct UID mapping for all users 
+	   in this way, but we can assume current user has a known UID. */
+	/* Simple placeholder logic for now */
 
-	*res = 0;
-
-	pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &cs);
-
-	f = fopen("/etc/passwd", "rbe");
-	if (!f) {
-		rv = errno;
-		goto done;
+	size_t len = strlen(getuser()) + 1;
+	if (len > *size || !*buf) {
+		char *tmp = realloc(*buf, len);
+		if (!tmp) return errno;
+		*buf = tmp;
+		*size = len;
 	}
 
-	while (!(rv = __getpwent_a(f, pw, buf, size, res)) && *res) {
-		if (name && !strcmp(name, (*res)->pw_name)
-		|| !name && (*res)->pw_uid == uid)
-			break;
-	}
-	fclose(f);
+	strcpy(*buf, getuser());
+	pw->pw_name = *buf;
+	pw->pw_passwd = "x";
+	pw->pw_uid = 0; /* Root-like in Plan 9 */
+	pw->pw_gid = 0;
+	pw->pw_gecos = pw->pw_name;
+	pw->pw_dir = "/usr/glenda"; /* Default home for glenda */
+	pw->pw_shell = "/bin/rc";
 
-	if (!*res && (rv == 0 || rv == ENOENT || rv == ENOTDIR)) {
-		int32_t req = name ? GETPWBYNAME : GETPWBYUID;
-		const char *key;
-		int32_t passwdbuf[PW_LEN] = {0};
-		size_t len = 0;
-		char uidbuf[11] = {0};
-
-		if (name) {
-			key = name;
-		} else {
-			/* uid outside of this range can't be queried with the
-			 * nscd interface, but might happen if uid_t ever
-			 * happens to be a larger type (this is not true as of
-			 * now)
-			 */
-			if(uid < 0 || uid > UINT32_MAX) {
-				rv = 0;
-				goto done;
-			}
-			key = itoa(uidbuf, uid);
-		}
-
-		f = __nscd_query(req, key, passwdbuf, sizeof passwdbuf, (int[]){0});
-		if (!f) { rv = errno; goto done; }
-
-		if(!passwdbuf[PWFOUND]) { rv = 0; goto cleanup_f; }
-
-		/* A zero length response from nscd is invalid. We ignore
-		 * invalid responses and just report an error, rather than
-		 * trying to do something with them.
-		 */
-		if (!passwdbuf[PWNAMELEN] || !passwdbuf[PWPASSWDLEN]
-		|| !passwdbuf[PWGECOSLEN] || !passwdbuf[PWDIRLEN]
-		|| !passwdbuf[PWSHELLLEN]) {
-			rv = EIO;
-			goto cleanup_f;
-		}
-
-		if ((passwdbuf[PWNAMELEN]|passwdbuf[PWPASSWDLEN]
-		     |passwdbuf[PWGECOSLEN]|passwdbuf[PWDIRLEN]
-		     |passwdbuf[PWSHELLLEN]) >= SIZE_MAX/8) {
-			rv = ENOMEM;
-			goto cleanup_f;
-		}
-
-		len = passwdbuf[PWNAMELEN] + passwdbuf[PWPASSWDLEN]
-		    + passwdbuf[PWGECOSLEN] + passwdbuf[PWDIRLEN]
-		    + passwdbuf[PWSHELLLEN];
-
-		if (len > *size || !*buf) {
-			char *tmp = realloc(*buf, len);
-			if (!tmp) {
-				rv = errno;
-				goto cleanup_f;
-			}
-			*buf = tmp;
-			*size = len;
-		}
-
-		if (!fread(*buf, len, 1, f)) {
-			rv = ferror(f) ? errno : EIO;
-			goto cleanup_f;
-		}
-
-		pw->pw_name = *buf;
-		pw->pw_passwd = pw->pw_name + passwdbuf[PWNAMELEN];
-		pw->pw_gecos = pw->pw_passwd + passwdbuf[PWPASSWDLEN];
-		pw->pw_dir = pw->pw_gecos + passwdbuf[PWGECOSLEN];
-		pw->pw_shell = pw->pw_dir + passwdbuf[PWDIRLEN];
-		pw->pw_uid = passwdbuf[PWUID];
-		pw->pw_gid = passwdbuf[PWGID];
-
-		/* Don't assume that nscd made sure to null terminate strings.
-		 * It's supposed to, but malicious nscd should be ignored
-		 * rather than causing a crash.
-		 */
-		if (pw->pw_passwd[-1] || pw->pw_gecos[-1] || pw->pw_dir[-1]
-		|| pw->pw_shell[passwdbuf[PWSHELLLEN]-1]) {
-			rv = EIO;
-			goto cleanup_f;
-		}
-
-		if (name && strcmp(name, pw->pw_name)
-		|| !name && uid != pw->pw_uid) {
-			rv = EIO;
-			goto cleanup_f;
-		}
-
-
-		*res = pw;
-cleanup_f:
-		fclose(f);
-		goto done;
-	}
-
-done:
-	pthread_setcancelstate(cs, 0);
-	if (rv) errno = rv;
-	return rv;
+	*res = pw;
+	return 0;
 }

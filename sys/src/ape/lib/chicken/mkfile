@@ -3,7 +3,7 @@ APEXPROOT=../../../../..
 LIB=$APEXPROOT/$objtype/lib/ape/libchicken.a
 CHCSRC=../../../external/chicken
 
-POSIXFILE=
+POSIXFILE=posixunix.$O
 OFILES=\
 	runtime.$O\
 	library.$O\
@@ -37,7 +37,7 @@ OFILES=\
 CC=pcc
 LD=pcc
 CFLAGS= -c -I$CHCSRC -DHAVE_CHICKEN_CONFIG_H -DHAVE_ALLOCA_H -DC_BUILDING_LIBCHICKEN\
-	-UPIC -DC_ENABLE_PTABLES -DC_LLP
+	-UPIC -DC_ENABLE_PTABLES -DC_LLP -DSIGIO=SIGURG
 
 %.$O: $CHCSRC/%.c
 	$CC $CFLAGS $CHCSRC/$stem.c

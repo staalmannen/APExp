@@ -26,7 +26,7 @@ extern struct passwd *getpwent(void);
 extern void setpwent(void);
 extern void endpwent(void);
 
-extern int getpwnam_r(const char, struct passwd *, char *, size_t, struct passwd **);
+extern int getpwnam_r(const char *, struct passwd *, char *, size_t, struct passwd **);
 extern int getpwuid_r(uid_t, struct passwd *, char *, size_t, struct passwd **);
 
 #ifdef __cplusplus

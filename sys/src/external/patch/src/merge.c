@@ -171,11 +171,12 @@ merge_result (bool *first_result, intmax_t hunk, char const *what,
 
 bool
 merge_hunk (intmax_t hunk, struct outstate *outstate,
-	    idx_t where, bool *somefailed)
+            idx_t where, bool *somefailed)
 {
   bool applies_cleanly;
-  bool first_result = true;
+  bool first_result = 1;
   bool already_applied;
+
   FILE *fp = outstate->ofp;
   idx_t old = 1;
   idx_t firstold = pch_ptrn_lines ();

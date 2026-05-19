@@ -151,6 +151,14 @@ enum
 	DW_ABRV_NULL,
 	DW_ABRV_COMPUNIT,
 	DW_ABRV_FUNCTION,
+	DW_ABRV_VARIABLE,
+	DW_ABRV_PARAMETER,
+	DW_ABRV_BASETYPE,
+	DW_ABRV_PTRTYPE,
+	DW_ABRV_STRUCTTYPE,
+	DW_ABRV_MEMBER,
+	DW_ABRV_ARRAYTYPE,
+	DW_ABRV_SUBRANGE,
 	DW_NABRV
 };
 
@@ -174,10 +182,69 @@ struct DWAbbrev {
 	},
 	/* FUNCTION */
 	{
-		DW_TAG_subprogram, DW_CHILDREN_no,
+		DW_TAG_subprogram, DW_CHILDREN_yes,
 		DW_AT_name,	 DW_FORM_string,
 		DW_AT_low_pc,	 DW_FORM_addr,
 		DW_AT_high_pc,	 DW_FORM_addr,
+		0, 0
+	},
+	/* VARIABLE */
+	{
+		DW_TAG_variable, DW_CHILDREN_no,
+		DW_AT_name,      DW_FORM_string,
+		DW_AT_location,  DW_FORM_block1,
+		DW_AT_type,      DW_FORM_ref_addr,
+		0, 0
+	},
+	/* PARAMETER */
+	{
+		DW_TAG_formal_parameter, DW_CHILDREN_no,
+		DW_AT_name,      DW_FORM_string,
+		DW_AT_location,  DW_FORM_block1,
+		DW_AT_type,      DW_FORM_ref_addr,
+		0, 0
+	},
+	/* BASETYPE */
+	{
+		DW_TAG_base_type, DW_CHILDREN_no,
+		DW_AT_name,      DW_FORM_string,
+		DW_AT_encoding,  DW_FORM_data1,
+		DW_AT_byte_size, DW_FORM_data1,
+		0, 0
+	},
+	/* PTRTYPE */
+	{
+		DW_TAG_pointer_type, DW_CHILDREN_no,
+		DW_AT_type,      DW_FORM_ref_addr,
+		DW_AT_byte_size, DW_FORM_data1,
+		0, 0
+	},
+	/* STRUCTTYPE */
+	{
+		DW_TAG_structure_type, DW_CHILDREN_yes,
+		DW_AT_name,      DW_FORM_string,
+		DW_AT_byte_size, DW_FORM_data4,
+		0, 0
+	},
+	/* MEMBER */
+	{
+		DW_TAG_member,   DW_CHILDREN_no,
+		DW_AT_name,      DW_FORM_string,
+		DW_AT_type,      DW_FORM_ref_addr,
+		DW_AT_data_member_location, DW_FORM_data4,
+		0, 0
+	},
+	/* ARRAYTYPE */
+	{
+		DW_TAG_array_type, DW_CHILDREN_yes,
+		DW_AT_type,      DW_FORM_ref_addr,
+		0, 0
+	},
+	/* SUBRANGE */
+	{
+		DW_TAG_subrange_type, DW_CHILDREN_no,
+		DW_AT_type,      DW_FORM_ref_addr,
+		DW_AT_upper_bound, DW_FORM_udata,
 		0, 0
 	},
 };
@@ -223,6 +290,7 @@ struct DWAttr {
 typedef struct DWDie DWDie;
 struct DWDie {
 	int abbrev;
+	vlong dieo;
 	DWDie *link;
 	DWDie *child;
 	DWAttr *attr;
@@ -324,8 +392,14 @@ putattr(int form, int cls, vlong value, char *data)
 		cput(value?1:0);
 		break;
 
-	case DW_FORM_strp:	// string
 	case DW_FORM_ref_addr:	// reference
+		if(value == 0)
+			addrput(0);
+		else
+			addrput(((DWDie*)value)->dieo);
+		break;
+
+	case DW_FORM_strp:	// string
 	case DW_FORM_ref1:	// reference
 	case DW_FORM_ref2:	// reference
 	case DW_FORM_ref4:	// reference
@@ -369,6 +443,7 @@ putdies(DWDie* die)
 static void
 putdie(DWDie* die)
 {
+	die->dieo = cpos() - infoo;
 	uleb128put(die->abbrev);
 	putattrs(die->abbrev, die->attr);
 	if (abbrevs[die->abbrev].children) {
@@ -640,6 +715,121 @@ searchhist(vlong absline)
 	return lh;
 }
 
+static DWDie *dwtypes;
+
+static DWDie*
+findtype(char *name)
+{
+	DWDie *d;
+	for(d = dwtypes; d; d = d->link)
+		if(strcmp(d->attr->data, name) == 0)
+			return d;
+	return nil;
+}
+
+static DWDie*
+newbasetype(char *name, int enc, int size)
+{
+	DWDie *d;
+	d = newdie(dwtypes, DW_ABRV_BASETYPE);
+	dwtypes = d;
+	newattr(d, DW_AT_name, DW_CLS_STRING, strlen(name), name);
+	newattr(d, DW_AT_encoding, DW_CLS_CONSTANT, enc, 0);
+	newattr(d, DW_AT_byte_size, DW_CLS_CONSTANT, size, 0);
+	return d;
+}
+
+static DWDie*
+newstructtype(char *name, int size)
+{
+	DWDie *d;
+	d = newdie(dwtypes, DW_ABRV_STRUCTTYPE);
+	dwtypes = d;
+	newattr(d, DW_AT_name, DW_CLS_STRING, strlen(name), name);
+	newattr(d, DW_AT_byte_size, DW_CLS_CONSTANT, size, 0);
+	return d;
+}
+
+static DWDie*
+newmember(DWDie *s, char *name, DWDie *t, int off)
+{
+	DWDie *m;
+	m = newdie(s->child, DW_ABRV_MEMBER);
+	s->child = m;
+	newattr(m, DW_AT_name, DW_CLS_STRING, strlen(name), name);
+	newattr(m, DW_AT_type, DW_CLS_REFERENCE, (vlong)t, 0);
+	newattr(m, DW_AT_data_member_location, DW_CLS_CONSTANT, off, 0);
+	return m;
+}
+
+static DWDie*
+newarraytype(DWDie *base, int count)
+{
+	DWDie *d, *s;
+	d = newdie(dwtypes, DW_ABRV_ARRAYTYPE);
+	dwtypes = d;
+	newattr(d, DW_AT_type, DW_CLS_REFERENCE, (vlong)base, 0);
+	
+	s = newdie(d->child, DW_ABRV_SUBRANGE);
+	d->child = s;
+	newattr(s, DW_AT_type, DW_CLS_REFERENCE, (vlong)findtype("int"), 0);
+	newattr(s, DW_AT_upper_bound, DW_CLS_CONSTANT, count - 1, 0);
+	return d;
+}
+
+static DWDie*
+newptrtype(DWDie *target)
+{
+	DWDie *d;
+	d = newdie(dwtypes, DW_ABRV_PTRTYPE);
+	dwtypes = d;
+	newattr(d, DW_AT_type, DW_CLS_REFERENCE, (vlong)target, 0);
+	newattr(d, DW_AT_byte_size, DW_CLS_CONSTANT, PtrSize, 0);
+	return d;
+}
+
+static void
+defbasetypes(void)
+{
+	DWDie *intdie, *chardie, *voiddie;
+	if(findtype("int")) return;
+	intdie = newbasetype("int", DW_ATE_signed, PtrSize);
+	chardie = newbasetype("char", DW_ATE_signed_char, 1);
+	voiddie = newbasetype("void", DW_ATE_address, 0);
+	
+	/* Add basic pointers */
+	newptrtype(intdie);
+	newptrtype(chardie);
+	newptrtype(voiddie);
+}
+
+static void
+putlocation(DWDie *die, vlong off, int isglobal)
+{
+	char buf[32], *p;
+	int n;
+
+	p = buf;
+	if(isglobal){
+		*p++ = DW_OP_addr;
+		switch(PtrSize){
+		case 4:
+			*(uint32*)p = off;
+			p += 4;
+			break;
+		case 8:
+			*(uint64*)p = off;
+			p += 8;
+			break;
+		}
+	} else {
+		*p++ = DW_OP_fbreg;
+		n = sleb128enc(off, p);
+		p += n;
+	}
+	newattr(die, DW_AT_location, DW_CLS_BLOCK, p - buf, strdup(buf));
+}
+
 static int
 guesslang(char *s)
 {
@@ -734,14 +924,14 @@ writelines(void)
 		if(cursym->as != ATEXT) continue;
 #endif
 #ifdef ADR_HAS_U1
-		Sym *s = cursym->from.u1.u1sym;
+		Sym *s = cursym->from.sym;
 #else
 		Sym *s = cursym->from.sym;
 #endif
 		// Look for history stack.  If we find one,
 		// we're entering a new compilation unit
 #ifdef ADR_HAS_U1
-		if((unitname = inithist(cursym->to.u1.u1autom)) != 0) {
+		if((unitname = inithist(cursym->to.autom)) != 0) {
 #else
 		if((unitname = inithist(cursym->to.autom)) != 0) {
 #endif
@@ -804,6 +994,27 @@ writelines(void)
 		newattr(dwinfo->child, DW_AT_low_pc, DW_CLS_ADDRESS, s->value, 0);
 		epc = s->value + 0; // Sym doesn't have a size
 		newattr(dwinfo->child, DW_AT_high_pc, DW_CLS_ADDRESS, epc, 0);
+
+		/* Add local variables and parameters */
+		defbasetypes();
+		Auto *a;
+#ifdef ADR_HAS_U1
+		for(a = cursym->to.autom; a; a = a->link) {
+#else
+		for(a = cursym->to.autom; a; a = a->link) {
+#endif
+			if(a->type != D_AUTO && a->type != D_PARAM) continue;
+			DWDie *v = newdie(dwinfo->child->child, 
+				(a->type == D_PARAM) ? DW_ABRV_PARAMETER : DW_ABRV_VARIABLE);
+			dwinfo->child->child = v;
+#ifdef AUTO_HAS_ASYM
+			newattr(v, DW_AT_name, DW_CLS_STRING, strlen(a->asym->name), a->asym->name);
+#else
+			newattr(v, DW_AT_name, DW_CLS_STRING, strlen(a->sym->name), a->sym->name);
+#endif
+			putlocation(v, a->aoffset, 0);
+			newattr(v, DW_AT_type, DW_CLS_REFERENCE, (vlong)findtype("int"), 0);
+		}
 
 		{
 			Prog *q;
@@ -954,6 +1165,28 @@ writeframes(void)
 	framesize = cpos() - frameo;
 }
 
+static void
+writeglobals(void)
+{
+	int i;
+	Sym *s;
+	DWDie *v;
+
+	for(i = 0; i < NHASH; i++) {
+		for(s = hash[i]; s != S; s = s->link) {
+			if(s->type != SBSS && s->type != SDATA) continue;
+			if(s->name[0] == '.') continue;
+			
+			v = newdie(dwinfo->child, DW_ABRV_VARIABLE);
+			dwinfo->child = v;
+			newattr(v, DW_AT_name, DW_CLS_STRING, strlen(s->name), s->name);
+			putlocation(v, s->value, 1);
+			newattr(v, DW_AT_type, DW_CLS_REFERENCE, (vlong)findtype("int"), 0);
+			newattr(v, DW_AT_external, DW_CLS_FLAG, 1, 0);
+		}
+	}
+}
+
 /*
  *  Walk DWarfDebugInfoEntries, and emit .debug_info
  */
@@ -963,6 +1196,7 @@ writeinfo(void)
 	DWDie *compunit;
 	vlong unitstart;
 
+	writeglobals();
 	reversetree(&dwinfo);
 
 	infoo = cpos();

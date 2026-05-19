@@ -1,193 +1,54 @@
-</$objtype/mkfile
+<//mkfile
 APEXPROOT=../../../../..
 
 TARG=tar
 
-OFILES=\
-	buffer.$O checkpoint.$O \
-	compare.$O create.$O delete.$O \
-	exit.$O exclist.$O extract.$O \
-	xheader.$O incremen.$O list.$O \
-	map.$O misc.$O names.$O sparse.$O \
-	suffix.$O system.$O tar.$O \
-	transform.$O unlink.$O update.$O \
-	utf8.$O warning.$O xattrs.$O
+OFILES=	buffer. checkpoint. 	compare. create. delete. 	exit. exclist. extract. 	xheader. incremen. list. 	map. misc. names. sparse. 	suffix. system. tar. 	transform. unlink. update. 	utf8. warning. xattrs.
 
-LIBGNU_OBJS=\
-	libgnu_a-acl-errno-valid.$O \
-	libgnu_a-acl-internal.$O \
-	libgnu_a-get-permissions.$O \
-	libgnu_a-set-permissions.$O \
-	libgnu_a-allocator.$O libgnu_a-areadlink.$O \
-	libgnu_a-areadlink-with-size.$O \
-	libgnu_a-areadlinkat.$O \
-	libgnu_a-areadlinkat-with-size.$O \
-	libgnu_a-argmatch.$O libgnu_a-argp-ba.$O \
-	libgnu_a-argp-eexst.$O \
-	libgnu_a-argp-fmtstream.$O \
-	libgnu_a-argp-fs-xinl.$O libgnu_a-argp-help.$O \
-	libgnu_a-argp-parse.$O libgnu_a-argp-pin.$O \
-	libgnu_a-argp-pv.$O libgnu_a-argp-pvh.$O \
-	libgnu_a-argp-xinl.$O \
-	libgnu_a-argp-version-etc.$O \
-	libgnu_a-openat-proc.$O libgnu_a-backupfile.$O \
-	libgnu_a-backup-find.$O \
-	libgnu_a-basename-lgpl.$O libgnu_a-bitrotate.$O \
-	libgnu_a-btowc.$O libgnu_a-c-ctype.$O \
-	libgnu_a-c-strcasecmp.$O \
-	libgnu_a-c-strncasecmp.$O libgnu_a-c32isalnum.$O \
-	libgnu_a-c32isalpha.$O libgnu_a-c32isblank.$O \
-	libgnu_a-c32iscntrl.$O libgnu_a-c32isdigit.$O \
-	libgnu_a-c32isgraph.$O libgnu_a-c32islower.$O \
-	libgnu_a-c32isprint.$O libgnu_a-c32ispunct.$O \
-	libgnu_a-c32isspace.$O libgnu_a-c32isupper.$O \
-	libgnu_a-c32isxdigit.$O libgnu_a-c32tolower.$O \
-	libgnu_a-c32width.$O libgnu_a-canonicalize-lgpl.$O \
-	libgnu_a-careadlinkat.$O libgnu_a-chdir-long.$O \
-	libgnu_a-chown.$O \
-	libgnu_a-cloexec.$O \
-	libgnu_a-close-stream.$O \
-	libgnu_a-closeout.$O libgnu_a-opendir-safer.$O \
-	libgnu_a-dirname.$O \
-	libgnu_a-basename.$O libgnu_a-dirname-lgpl.$O \
-	libgnu_a-stripslash.$O libgnu_a-dup2.$O \
-	libgnu_a-error.$O libgnu_a-euidaccess.$O \
-	libgnu_a-exclude.$O libgnu_a-exitfail.$O \
-	libgnu_a-faccessat.$O libgnu_a-fchmodat.$O \
-	libgnu_a-fchownat.$O libgnu_a-fcntl.$O \
-	libgnu_a-creat-safer.$O libgnu_a-open-safer.$O \
-	libgnu_a-fd-hook.$O libgnu_a-fd-safer-flag.$O \
-	libgnu_a-dup-safer-flag.$O libgnu_a-fdopendir.$O \
-	libgnu_a-fdutimensat.$O libgnu_a-file-has-acl.$O \
-	libgnu_a-filenamecat-lgpl.$O \
-	libgnu_a-fpending.$O \
-	libgnu_a-fprintftime.$O libgnu_a-free.$O \
-	libgnu_a-fseek.$O libgnu_a-fseeko.$O \
-	libgnu_a-fstatat.$O libgnu_a-full-read.$O \
-	libgnu_a-full-write.$O libgnu_a-futimens.$O \
-	libgnu_a-getcwd.$O libgnu_a-getcwd-lgpl.$O \
-	libgnu_a-getgroups.$O libgnu_a-getopt.$O \
-	libgnu_a-getopt1.$O \
-	libgnu_a-getrandom.$O libgnu_a-gettime.$O \
-	libgnu_a-dynarray_at_failure.$O \
-	libgnu_a-dynarray_emplace_enlarge.$O \
-	libgnu_a-dynarray_finalize.$O \
-	libgnu_a-dynarray_resize.$O \
-	libgnu_a-dynarray_resize_clear.$O \
-	libgnu_a-scratch_buffer_grow.$O \
-	libgnu_a-scratch_buffer_grow_preserve.$O \
-	libgnu_a-scratch_buffer_set_array_size.$O \
-	libgnu_a-group-member.$O libgnu_a-hard-locale.$O \
-	libgnu_a-hash.$O libgnu_a-human.$O \
-	libgnu_a-ialloc.$O libgnu_a-imaxtostr.$O \
-	libgnu_a-inttostr.$O libgnu_a-offtostr.$O \
-	libgnu_a-uinttostr.$O libgnu_a-umaxtostr.$O \
-	libgnu_a-lchmod.$O libgnu_a-lchown.$O \
-	libgnu_a-linkat.$O \
-	libgnu_a-localcharset.$O libgnu_a-localeconv.$O \
-	libgnu_a-lseek.$O libgnu_a-lstat.$O libgnu_a-malloca.$O \
-	libgnu_a-mbchar.$O libgnu_a-mbrtoc32.$O libgnu_a-mbrtowc.$O \
-	libgnu_a-mbscasecmp.$O \
-	libgnu_a-mbsrtowcs.$O libgnu_a-mbuiter.$O \
-	libgnu_a-memrchr.$O \
-	libgnu_a-mkdir.$O libgnu_a-mkdtemp.$O \
-	libgnu_a-mkfifoat.$O libgnu_a-mknodat.$O \
-	libgnu_a-mknod.$O libgnu_a-modechange.$O \
-	libgnu_a-nl_langinfo.$O \
-	libgnu_a-nstrftime.$O \
-	libgnu_a-obstack.$O libgnu_a-openat.$O \
-	libgnu_a-openat-die.$O libgnu_a-openat-safer.$O \
-	libgnu_a-opendirat.$O \
-	libgnu_a-parse-datetime.$O\
-	libgnu_a-priv-set.$O libgnu_a-progname.$O \
-	libgnu_a-quotearg.$O \
-	libgnu_a-rawmemchr.$O \
-	libgnu_a-readlink.$O libgnu_a-readlinkat.$O libgnu_a-reallocarray.$O \
-	libgnu_a-regex.$O libgnu_a-rename.$O libgnu_a-renameat.$O \
-	libgnu_a-renameatu.$O \
-	libgnu_a-rmdir.$O libgnu_a-rpmatch.$O \
-	libgnu_a-safe-read.$O libgnu_a-safe-write.$O \
-	libgnu_a-save-cwd.$O libgnu_a-savedir.$O \
-	libgnu_a-selinux-at.$O \
-	libgnu_a-se-context.$O libgnu_a-se-label.$O \
-	libgnu_a-se-selinux.$O \
-	libgnu_a-setlocale_null.$O libgnu_a-setlocale-lock.$O \
-	libgnu_a-sleep.$O\
-	libgnu_a-stat-time.$O \
-	libgnu_a-stdopen.$O libgnu_a-stpcpy.$O \
-	libgnu_a-strerror.$O libgnu_a-strerror-override.$O \
-	libgnu_a-strnlen1.$O \
-	libgnu_a-strtol.$O libgnu_a-strtoll.$O libgnu_a-strtoul.$O \
-	libgnu_a-strtoull.$O libgnu_a-symlink.$O \
-	libgnu_a-symlinkat.$O libgnu_a-tempname.$O \
-	libgnu_a-time_rz.$O libgnu_a-timegm.$O \
-	libgnu_a-timespec.$O libgnu_a-timespec-sub.$O \
-	libgnu_a-tolower.$O libgnu_a-ctype_alnum.$O \
-	libgnu_a-ctype_alpha.$O libgnu_a-ctype_blank.$O libgnu_a-ctype_cntrl.$O \
-	libgnu_a-ctype_digit.$O libgnu_a-ctype_graph.$O libgnu_a-ctype_lower.$O \
-	libgnu_a-ctype_print.$O libgnu_a-ctype_punct.$O libgnu_a-ctype_space.$O \
-	libgnu_a-ctype_upper.$O libgnu_a-ctype_xdigit.$O \
-	libgnu_a-unistd.$O libgnu_a-dup-safer.$O \
-	libgnu_a-fd-safer.$O libgnu_a-pipe-safer.$O \
-	libgnu_a-width.$O libgnu_a-unlinkat.$O \
-	libgnu_a-unlinkdir.$O \
-	libgnu_a-utimens.$O \
-	libgnu_a-utimensat.$O libgnu_a-version-etc.$O \
-	libgnu_a-version-etc-fsf.$O \
-	libgnu_a-wctype-h.$O \
-	libgnu_a-wmempcpy.$O \
-	libgnu_a-xmalloc.$O libgnu_a-xalloc-die.$O \
-	libgnu_a-xgetcwd.$O libgnu_a-xsize.$O \
-	libgnu_a-xstrtol.$O libgnu_a-xstrtoul.$O \
-	libgnu_a-xstrtoumax.$O libgnu_a-xvasprintf.$O \
-	libgnu_a-xasprintf.$O
+LIBGNU_OBJS=#	libgnu_a-acl-errno-valid. #	libgnu_a-acl-internal. #	libgnu_a-get-permissions. #	libgnu_a-set-permissions. #	libgnu_a-allocator. #	libgnu_a-areadlink. #	libgnu_a-areadlink-with-size. #	libgnu_a-areadlinkat. #	libgnu_a-areadlinkat-with-size. #	libgnu_a-argmatch. #	libgnu_a-argp-ba. #	libgnu_a-argp-eexst. #	libgnu_a-argp-fmtstream. #	libgnu_a-argp-fs-xinl. #	libgnu_a-argp-help. #	libgnu_a-argp-parse. #	libgnu_a-argp-pin. #	libgnu_a-argp-pv. #	libgnu_a-argp-pvh. #	libgnu_a-argp-xinl. #	libgnu_a-argp-version-etc. #	libgnu_a-openat-proc. #	libgnu_a-backupfile. #	libgnu_a-backup-find. #	libgnu_a-basename-lgpl. #	libgnu_a-bitrotate. #	libgnu_a-btowc. #	libgnu_a-c-ctype. #	libgnu_a-c-strcasecmp. #	libgnu_a-c-strncasecmp. #	libgnu_a-c32isalnum. #	libgnu_a-c32isalpha. #	libgnu_a-c32isblank. #	libgnu_a-c32iscntrl. #	libgnu_a-c32isdigit. #	libgnu_a-c32isgraph. #	libgnu_a-c32islower. #	libgnu_a-c32isprint. #	libgnu_a-c32ispunct. #	libgnu_a-c32isspace. #	libgnu_a-c32isupper. #	libgnu_a-c32isxdigit. #	libgnu_a-c32tolower. #	libgnu_a-c32width. #	libgnu_a-canonicalize-lgpl. #	libgnu_a-careadlinkat. #	libgnu_a-chdir-long. #	libgnu_a-chown. #	libgnu_a-cloexec. #	libgnu_a-close-stream. #	libgnu_a-closeout. #	libgnu_a-opendir-safer. #	libgnu_a-dirname. #	libgnu_a-basename. #	libgnu_a-dirname-lgpl. #	libgnu_a-stripslash. #	libgnu_a-dup2. 	libgnu_a-error. 	libgnu_a-euidaccess. #	libgnu_a-exclude. #	libgnu_a-exitfail. #	libgnu_a-faccessat. #	libgnu_a-fchmodat. #	libgnu_a-fchownat. #	libgnu_a-fcntl. #	libgnu_a-creat-safer. #	libgnu_a-open-safer. #	libgnu_a-fd-hook. #	libgnu_a-fd-safer-flag. #	libgnu_a-dup-safer-flag. #	libgnu_a-fdopendir. #	libgnu_a-fdutimensat. #	libgnu_a-file-has-acl. #	libgnu_a-filenamecat-lgpl. #	libgnu_a-fpending. #	libgnu_a-fprintftime. #	libgnu_a-free. #	libgnu_a-fseek. #	libgnu_a-fseeko. #	libgnu_a-fstatat. #	libgnu_a-full-read. #	libgnu_a-full-write. #	libgnu_a-futimens. #	libgnu_a-getcwd. #	libgnu_a-getcwd-lgpl. #	libgnu_a-getgroups. #	libgnu_a-getopt. #	libgnu_a-getopt1. #	libgnu_a-getrandom. #	libgnu_a-gettime. #	libgnu_a-dynarray_at_failure. #	libgnu_a-dynarray_emplace_enlarge. #	libgnu_a-dynarray_finalize. #	libgnu_a-dynarray_resize. #	libgnu_a-dynarray_resize_clear. #	libgnu_a-scratch_buffer_grow. #	libgnu_a-scratch_buffer_grow_preserve. #	libgnu_a-scratch_buffer_set_array_size. #	libgnu_a-group-member. #	libgnu_a-hard-locale. 	libgnu_a-hash. #	libgnu_a-human. #	libgnu_a-ialloc. #	libgnu_a-imaxtostr. #	libgnu_a-inttostr. #	libgnu_a-offtostr. #	libgnu_a-uinttostr. #	libgnu_a-umaxtostr. #	libgnu_a-lchmod. #	libgnu_a-lchown. #	libgnu_a-linkat. #	libgnu_a-localcharset. #	libgnu_a-localeconv. #	libgnu_a-lseek. #	libgnu_a-lstat. #	libgnu_a-malloca. #	libgnu_a-mbchar. #	libgnu_a-mbrtoc32. #	libgnu_a-mbrtowc. #	libgnu_a-mbscasecmp. #	libgnu_a-mbsrtowcs. #	libgnu_a-mbuiter. #	libgnu_a-memrchr. #	libgnu_a-mkdir. #	libgnu_a-mkdtemp. #	libgnu_a-mkfifoat. #	libgnu_a-mknodat. #	libgnu_a-mknod. #	libgnu_a-modechange. #	libgnu_a-nl_langinfo. #	libgnu_a-nstrftime. #	libgnu_a-obstack. #	libgnu_a-openat. #	libgnu_a-openat-die. #	libgnu_a-openat-safer. #	libgnu_a-opendirat. #	libgnu_a-parse-datetime. #	libgnu_a-priv-set. 	libgnu_a-progname. #	libgnu_a-quotearg. #	libgnu_a-rawmemchr. #	libgnu_a-readlink. #	libgnu_a-readlinkat. #	libgnu_a-reallocarray. #	libgnu_a-regex. #	libgnu_a-rename. #	libgnu_a-renameat. #	libgnu_a-renameatu. #	libgnu_a-rmdir. #	libgnu_a-rpmatch. #	libgnu_a-safe-read. #	libgnu_a-safe-write. #	libgnu_a-save-cwd. #	libgnu_a-savedir. #	libgnu_a-selinux-at. #	libgnu_a-se-context. #	libgnu_a-se-label. #	libgnu_a-se-selinux. #	libgnu_a-setlocale_null. #	libgnu_a-setlocale-lock. #	libgnu_a-sleep. #	libgnu_a-stat-time. #	libgnu_a-stdopen. 	libgnu_a-stpcpy. 	libgnu_a-strerror. #	libgnu_a-strerror-override. #	libgnu_a-strnlen1. #	libgnu_a-strtol. #	libgnu_a-strtoll. #	libgnu_a-strtoul. #	libgnu_a-strtoull. #	libgnu_a-symlink. #	libgnu_a-symlinkat. #	libgnu_a-tempname. #	libgnu_a-time_rz. #	libgnu_a-timegm. #	libgnu_a-timespec. #	libgnu_a-timespec-sub. #	libgnu_a-tolower. #	libgnu_a-ctype_alnum. #	libgnu_a-ctype_alpha. #	libgnu_a-ctype_blank. #	libgnu_a-ctype_cntrl. #	libgnu_a-ctype_digit. #	libgnu_a-ctype_graph. #	libgnu_a-ctype_lower. #	libgnu_a-ctype_print. #	libgnu_a-ctype_punct. #	libgnu_a-ctype_space. #	libgnu_a-ctype_upper. #	libgnu_a-ctype_xdigit. 	libgnu_a-unistd. #	libgnu_a-dup-safer. #	libgnu_a-fd-safer. #	libgnu_a-pipe-safer. #	libgnu_a-width. #	libgnu_a-unlinkat. #	libgnu_a-unlinkdir. #	libgnu_a-utimens. #	libgnu_a-utimensat. 	libgnu_a-version-etc. #	libgnu_a-version-etc-fsf. #	libgnu_a-wctype-h. #	libgnu_a-wmempcpy. 	libgnu_a-xmalloc. 	libgnu_a-xalloc-die. #	libgnu_a-xgetcwd. #	libgnu_a-xsize. #	libgnu_a-xstrtol. #	libgnu_a-xstrtoul. #	libgnu_a-xstrtoumax. #	libgnu_a-xvasprintf. #	libgnu_a-xasprintf.
 
-LIBTAR_OBJS=\
-	paxerror.$O paxexit-status.$O \
-	paxnames.$O rtapelib.$O wordsplit.$O \
-	xattr-at.$O
+LIBTAR_OBJS=	paxerror. paxexit-status. 	paxnames. rtapelib. wordsplit. 	xattr-at.
 
-LIB=libgnu.a$O libtar.a$O
-BIN=$APEXPROOT/$objtype/bin/ape
+LIB=libgnu.a libtar.a
+BIN=//bin/ape
 
-<$APEXPROOT/sys/src/cmd/mkone
+</sys/src/cmd/mkone
 
 GTARSRC=../../../external/gtar
 
 #during building from scratch, the new pcc is not picked up and compilation
 #fails on include_next
-CC=$APEXPROOT/$objtype/bin/pcc
+CC=//bin/pcc
 
-CFLAGS=-c -I. -I$GTARSRC -I$GTARSRC/src -I$GTARSRC/lib -I$GTARSRC/gnu\
-	-B -DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale"
+CFLAGS=-c -I. -I -I/src -I/lib -I/gnu	-B -DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale"
 
-%.$O: $GTARSRC/src/%.c
-	$CC $CFLAGS $GTARSRC/src/$stem.c
+%.: /src/%.c
+	  /src/.c
 
-%.$O: $GTARSRC/lib/%.c
-	$CC $CFLAGS $GTARSRC/lib/$stem.c
+%.: /lib/%.c
+	  /lib/.c
 
-libgnu_a-%.$O: $GTARSRC/gnu/%.c
-	$CC $CFLAGS -c $source -o $target
+libgnu_a-%.: /gnu/%.c
+	  -c  -o 
 
-libgnu_a-%.$O: $GTARSRC/gnu/malloc/%.c
-	$CC $CFLAGS -c $source -o $target
+libgnu_a-%.: /gnu/malloc/%.c
+	  -c  -o 
 
-libgnu_a-%.$O: $GTARSRC/gnu/unicase/%.c
-	$CC $CFLAGS -c $source -o $target
+libgnu_a-%.: /gnu/unicase/%.c
+	  -c  -o 
 
-libgnu_a-%.$O: $GTARSRC/gnu/unictype/%.c
-	$CC $CFLAGS -c $source -o $target
+libgnu_a-%.: /gnu/unictype/%.c
+	  -c  -o 
 
-libgnu_a-%.$O: $GTARSRC/gnu/uniwidth/%.c
-	$CC $CFLAGS -c $source -o $target
+libgnu_a-%.: /gnu/uniwidth/%.c
+	  -c  -o 
 
 
-libtar.a$O: $LIBTAR_OBJS
-			ar vu libtar.a$O $LIBTAR_OBJS
+libtar.a: 
+			ar vu libtar.a 
 
-libgnu.a$O: $LIBGNU_OBJS
-			ar vu libgnu.a$O $LIBGNU_OBJS
+libgnu.a: 
+			ar vu libgnu.a 
 
 install:V:
-		cp $GTARSRC/tar.1 $APEXPROOT/sys/man/1/tar
+		cp /tar.1 /sys/man/1/tar

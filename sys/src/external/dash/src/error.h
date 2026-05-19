@@ -80,23 +80,77 @@ extern int exception;
 extern int suppressint;
 extern volatile sig_atomic_t intpending;
 
-void __intoff(void);
-#define INTOFF __intoff()
+#ifndef __GNUC__
+#ifndef __attribute__
+#define __attribute__(x)
+#endif
+#endif
 
+#ifdef __GNUC__
+#define barrier() ({ __asm__ __volatile__ ("": : :"memory"); })
+#else
+#define barrier() ((void)0)
+#endif
+
+#ifdef __GNUC__
+#define INTOFF \
+	({ \
+		suppressint++; \
+		barrier(); \
+		0; \
+	})
+#else
+#define INTOFF do { suppressint++; barrier(); } while(0)
+#endif
+
+#ifdef REALLY_SMALL
 void __inton(void);
 #define INTON __inton()
+#else
+#ifdef __GNUC__
+#define INTON \
+	({ \
+		barrier(); \
+		if (--suppressint == 0 && intpending) onint(); \
+		0; \
+	})
+#else
+#define INTON do { barrier(); if (--suppressint == 0 && intpending) onint(); } while(0)
+#endif
+#endif
 
-#define FORCEINTON __inton()
+#ifdef __GNUC__
+#define FORCEINTON \
+	({ \
+		barrier(); \
+		suppressint = 0; \
+		if (intpending) onint(); \
+		0; \
+	})
+#else
+#define FORCEINTON do { barrier(); suppressint = 0; if (intpending) onint(); } while(0)
+#endif
+
 #define SAVEINT(v) ((v) = suppressint)
-#define RESTOREINT(v) __inton()
+
+#ifdef __GNUC__
+#define RESTOREINT(v) \
+	({ \
+		barrier(); \
+		if ((suppressint = (v)) == 0 && intpending) onint(); \
+		0; \
+	})
+#else
+#define RESTOREINT(v) do { barrier(); if ((suppressint = (v)) == 0 && intpending) onint(); } while(0)
+#endif
 #define CLEAR_PENDING_INT intpending = 0
 #define int_pending() intpending
 
-void exraise(int);
-void onint(void);
+void exraise(int) __attribute__((__noreturn__));
+void onint(void) __attribute__((__noreturn__));
 extern int errlinno;
-void sh_error(const char *, ...);
-void exerror(int, const char *, ...);
+void sh_error(const char *, ...) __attribute__((__noreturn__));
+void exerror(int, const char *, ...) __attribute__((__noreturn__));
 const char *errmsg(int, int);
 
 void sh_warnx(const char *, ...);

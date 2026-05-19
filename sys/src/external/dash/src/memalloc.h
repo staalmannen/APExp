@@ -79,6 +79,7 @@ static inline char *_STPUTC(int c, char *p) {
 #define stackblocksize() stacknleft
 #define STARTSTACKSTR(p) ((p) = stackblock())
 #define STPUTC(c, p) ((p) = _STPUTC((c), (p)))
+#ifdef __GNUC__
 #define CHECKSTRSPACE(n, p) \
 	({ \
 		char *_q = (p); \
@@ -88,6 +89,15 @@ static inline char *_STPUTC(int c, char *p) {
 			(p) = makestrspace(_l, _q); \
 		0; \
 	})
+#else
+#define CHECKSTRSPACE(n, p) do { \
+		char *_q = (p); \
+		size_t _l = (n); \
+		size_t _m = sstrend - _q; \
+		if (_l > _m) \
+			(p) = makestrspace(_l, _q); \
+	} while(0)
+#endif
 #define USTPUTC(c, p)	(*p++ = (c))
 #define STACKSTRNUL(p)	((p) == sstrend? (p = growstackstr(), *p = '\0') : (*p = '\0'))
 #define STUNPUTC(p)	(--p)

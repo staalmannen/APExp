@@ -91,6 +91,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - libcurses : PDCursesMod (check out 2026-04-08; built with utf8/wchar)
 - GNU readline (version 8.3)
 - libpcre2 (version 10.47)
+- libdwarf (version 2.3.1)
 - libxml2 (version 2.15.2)
 - liblzma (from xz version 5.8.3)
 - libz (version 1.3.2)
@@ -126,6 +127,7 @@ Install paths have been modified so that libraries and binaries are installed in
 
 - Lua (version 5.5.0)
 - Tcl (tclsh) & Tk (wish) (version 9.0.3)
+- perl (version 5.42.2)
 
 
 ***Transpilers***
