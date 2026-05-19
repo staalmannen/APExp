@@ -642,7 +642,9 @@ DWARF infrastructure is **partially in place** but **not yet active**:
   build.
 - `dwarfdump` has a mkfile and correct `DWSRC` path; it needs libdwarf built
   first.
-- No `adbg` debugger source is committed.
+- `adeb` debugger source is committed at `sys/src/ape/cmd/adeb/` (skeleton:
+  `main.c`, `dwarf_engine.c`); full breakpoint/variable inspection not yet
+  implemented.
 
 ### Source locations
 
@@ -655,6 +657,25 @@ DWARF infrastructure is **partially in place** but **not yet active**:
 | `sys/src/ape/lib/dwarf/` | libdwarf (reader) — mkfile points to `sys/src/external/libdwarf/src/lib/libdwarf/` |
 | `sys/src/ape/lib/dwarfp/` | libdwarfp (producer/writer) — mkfile points to `sys/src/external/libdwarf/src/lib/libdwarfp/` |
 | `sys/src/ape/cmd/dwarfdump/` | `dwarfdump` utility — mkfile has correct `DWSRC=../../../external/libdwarf`; depends on libdwarf + libzstd |
+| `sys/src/ape/cmd/adeb/` | `adeb` debugger — source committed: `main.c`, `dwarf_engine.c`, `mkfile`, `README.md`, `APExp_Debugger_Design.md` |
+
+### `adeb` — Plan 9 `/proc` + libdwarf debugger
+
+`adeb` is the intended DWARF-aware debugger for APExp.  Its design is documented
+in `sys/src/ape/cmd/adeb/APExp_Debugger_Design.md`.  Key design points:
+
+- **No `ptrace`**: all process control goes through Plan 9's `/proc/<pid>/ctl`,
+  `/proc/<pid>/regs`, and `/proc/<pid>/mem` file interfaces.
+- **libdwarf for symbol lookup**: reads DWARF sections from the ELF binary to map
+  PC values → file:line, resolve variable locations (register or SP-relative),
+  and walk DIE trees for type/scope information.
+- **Event loop**: stop target → read PC → libdwarf PC→source lookup → interactive
+  CLI prompt → step/continue/inspect → repeat.
+- **Implementation**: `main.c` (~72 lines, CLI + event loop skeleton) and
+  `dwarf_engine.c` (~39 lines, libdwarf wrapper).  Still a skeleton — the
+  full variable inspection and breakpoint logic are not yet implemented.
+- **Build**: `mk` in `sys/src/ape/cmd/adeb/`; links against `libdwarf.a` and
+  `libzstd.a` (zstd is a libdwarf dependency).
 
 ### What `ld/dwarf.c` implements
 
