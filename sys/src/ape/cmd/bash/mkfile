@@ -105,11 +105,24 @@ DEFS= 	-DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale" -D_POSIX_SOURCE\
 CFLAGS=	-c -B -I. -I$BASHSRC -I$BASHSRC/include -I$BASHSRC/lib -I$BASHSRC/lib/intl\
 		$DEFS
 
-$BASHSRC/builtins/mkbuiltins: $BASHSRC/builtins/mkbuiltins.c
-		$CC $CFLAGS $prereq -o $target
+BASHSRC=$APEXPROOT/sys/src/external/bash
 
-$BASHSRC/builtins/%.c: $BASHSRC/builtins/mkbuiltins $BASHSRC/builtins/%.def
-		@{cd $BASHSRC/builtins ; ./mkbuiltins $stem.def }
+# Native rules for building mkbuiltins and generating source files
+# Note: These need to be built using the host compiler (the host-native cc)
+# because they generate code that is compiled into the bash binary.
+
+MKBUILTINS=$BASHSRC/builtins/mkbuiltins
+
+$MKBUILTINS: $BASHSRC/builtins/mkbuiltins.c
+	cc -I$BASHSRC -I$BASHSRC/include -o $MKBUILTINS $prereq
+
+# Generate builtins.c and builtext.h
+builtins.c builtext.h: $MKBUILTINS
+	@echo "Generating builtins.c and builtext.h..."
+	@(cd $BASHSRC/builtins && ./mkbuiltins -externfile ../../src/builtext.h -structfile ../../src/builtins.c -noproduction -D . alias.def bind.def break.def builtin.def caller.def cd.def colon.def command.def declare.def echo.def enable.def eval.def getopts.def exec.def exit.def fc.def fg_bg.def hash.def help.def history.def jobs.def kill.def let.def read.def return.def set.def setattr.def shift.def source.def suspend.def test.def times.def trap.def type.def ulimit.def umask.def wait.def reserved.def pushd.def shopt.def printf.def complete.def mapfile.def)
+
+$BASHSRC/builtins/%.c: $MKBUILTINS builtins.c $BASHSRC/builtins/$.def
+	@(cd $BASHSRC/builtins && ./mkbuiltins -D . $stem.def)
 
 %.$O: %.c
 			$CC $CFLAGS $stem.c
@@ -152,7 +165,7 @@ install:V:
 			cp $BASHSRC/doc/bash.1 $APEXPROOT/sys/man/1/bash
 
 clean:V:
-			rm -f *.[$OS] [$OS].$Out lib*.a* $BASHSRC/builtins/mkbuiltins
+			rm -f *.[$OS] [$OS].$Out lib*.a* $MKBUILTINS
 
 
 
