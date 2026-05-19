@@ -47,7 +47,6 @@ _OPTIONAL_APPS=\
 	p2c\
 	chicken\
 	objc\
-#		objclib\
 	cfront\
 #		c++lib\
 #	basic\

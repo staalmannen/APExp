@@ -40,6 +40,6 @@ $PERLSRC/ext/ExtUtils-Miniperl/pm_to_blib: miniperl
 # No DynaLoader: Plan9 has no dlopen; all extensions are linked statically
 # or omitted. Pass -I to the ExtUtils-Miniperl source directly.
 perlmain.c: miniperl $PERLSRC/ext/ExtUtils-Miniperl/pm_to_blib
-	./miniperl -I$PERLSRC/ext/ExtUtils-Miniperl/lib \
+	./miniperl -I$PERLSRC/ext/ExtUtils-Miniperl/lib -I/sys/lib/perl\
 		-MExtUtils::Miniperl \
 		-e 'writemain("perlmain.c")'
