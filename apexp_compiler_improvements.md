@@ -477,3 +477,98 @@ The preprocessor is now significantly more robust and aligns closely with
 modern C standards, supporting deep macro recursion, exhaustive rescanning,
 variadic macro optimizations (`__VA_OPT__`), and efficient header management
 (`#pragma once`).
+
+---
+
+## Part XI — Compound Literal Support (verified 2026-05)
+
+Compound literals (`(Type){...}`) are fully implemented. The following
+summarises the implementation so it can be found quickly in future work.
+
+### Implementation locations
+
+| File | Lines | Role |
+|:-----|:------|:-----|
+| `cc/cc.y` | `xuexpr` production | Grammar: parses `'(' tlist abdecor ')' '{' ilist '}'` and `'{' ilist ',' '}'` (trailing-comma) |
+| `cc/dcl.c` | `compoundlit()` | Lowering: creates a hidden auto/static variable (`.clit0`, `.clit1`, …), calls `doinit()` for initialization, converts OLIST → OCOMMA chain, marks OCOMMA `addable=1` for scalar/pointer types |
+| `cc/com.c` | `tcom()` OCOMMA case | Type-check: propagates `addable` from right child with same scalar/pointer guard |
+
+### Key design decisions
+
+- **Hidden variable**: `compoundlit` creates a uniquely named `.clitN` variable.
+  Inside a function it gets class `CAUTO`; at file scope (`autobn == 0`) it gets
+  `CSTATIC` (C99 §6.5.2.5 lifetime semantics).
+- **Addable guard**: Only scalar and pointer compound literals are marked
+  `addable=1`. Struct/union and complex literals are intentionally NOT marked
+  addable to prevent them from entering the `cgen()` register-allocation path
+  (which can't handle UNION/STRUCT), forcing them through `sugen()` instead.
+  Without this guard you get `"unknown type in regalloc: UNION"` errors.
+  The guard appears in both `dcl.c:compoundlit()` and `com.c` OCOMMA.
+- **`&(Type){...}`**: Works for scalar/pointer types because `addable=1` causes
+  `tlvalue()` to succeed. Struct/union address-of does NOT work (addable=0),
+  but this matches the limitation of the whole `cgen` path for aggregates.
+- **OLIST → OCOMMA conversion**: Multi-element initializers produce a
+  left-leaning OLIST tree from the parser. `compoundlit()` flattens this with
+  an explicit stack walk to avoid `"unknown op in cgen: LIST"` errors.
+
+### Known limitations
+
+- `&(struct S){...}` does not produce an addressable lvalue (aggregate compound
+  literals are not addable). Workarounds: assign to a named temp, then take
+  its address. This mirrors the `cgen`/`sugen` split in the code generator.
+- C99 static storage duration at file scope is supported but the hidden
+  variable has internal linkage only.
+
+---
+
+## Part XII — DWARF Debug Information in the Plan9 Linkers
+
+### Status (WIP as of 2026-05)
+
+DWARF support has been ported into the APExp linker infrastructure.
+The implementation is **in progress** — sections are emitted but integration
+with the new `adbg` debugger is not yet complete.
+
+### Source locations
+
+| Path | Contents |
+|:-----|:---------|
+| `sys/src/cmd/ld/dwarf.c` | Shared DWARF emitter (~1000 lines). Emits `.debug_abbrev`, `.debug_info`, `.debug_line`, `.debug_frame` sections. Walks the linker's prog table to build DIE tree and line program. |
+| `sys/src/cmd/ld/dwarf.h` | Public interface: `dwarfaddfrag()`, `dwarfemitdebugsections()` |
+| `sys/src/cmd/ld/dwarf_defs.h` | DWARF constants (DW_TAG_*, DW_AT_*, DW_FORM_*, etc.) |
+| `sys/src/cmd/6l/mkfile` | Compiles `../ld/dwarf.c` as `dwarf.$O` and links it into 6l |
+| `sys/src/ape/lib/dwarf/` | libdwarf (reader) — ported from upstream libdwarf |
+| `sys/src/ape/lib/dwarfp/` | libdwarfp (producer/writer) — ported from upstream libdwarf |
+| `sys/src/ape/cmd/dwarfdump/` | `dwarfdump` utility (WIP — mkfile has a stale `DWSRC` path pointing to `external/chicken` instead of `external/libdwarf`) |
+| `sys/src/ape/cmd/adbg/` | New DWARF-aware debugger (preliminary, not yet committed) |
+
+### Architecture
+
+The linker DWARF emitter in `ld/dwarf.c` is adapted from the Go toolchain's
+Plan9 linker. It:
+1. Builds an abbreviation table (compile-unit, subprogram, base-type DIEs)
+2. Walks the linker's `Prog` list to collect line-number → PC mappings and
+   builds the `.debug_line` state machine
+3. Emits `.debug_frame` CIE/FDE entries using the stack-pointer adjustment
+   records already tracked by the linker (`getspadj` / `AADJSP`)
+4. All four sections are appended after the program text in the output binary
+
+### Using DWARF output today
+
+The `dwarfdump` utility (once built) can decode the sections. Example:
+```
+dwarfdump -a binary
+```
+
+The `adbg` debugger is intended as the primary consumer once it stabilises.
+Until then, Plan9's native `acid` debugger remains the main debugging tool.
+
+### Known issues / TODOs
+
+- `dwarfdump` mkfile has wrong `DWSRC=../../../external/chicken` — should be
+  `../../../external/libdwarf`.
+- DWARF sections may not be written to ELF when building APE binaries (the
+  APE linker path differs from the native 6l path). Needs verification.
+- `adbg` source not yet committed to the repository.
+- `libdwarfp` (producer) is ported but not yet wired into the compiler front-end
+  to emit type information from the C compiler itself.
