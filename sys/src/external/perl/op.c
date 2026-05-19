@@ -1824,8 +1824,27 @@ Perl_op_linklist(pTHX_ OP *o)
          * link the parent in with all its (processed) children.
          */
 
-        o = o->op_sibparent;
-        if (!o) { write(2,"LLNULL\n",7); break; }
+        {
+            OP *_prev = o;
+            o = o->op_sibparent;
+            if (!o) {
+                /* print: "LLNULL prev=<addr> ty=<type>\n" */
+                char _lb[48]; int _li=0;
+                const char *_hx="0123456789abcdef";
+                unsigned long long _pa=(unsigned long long)(void*)_prev;
+                unsigned int _pt=_prev?(unsigned int)_prev->op_type:0xDEAD;
+                int _i;
+                _lb[_li++]='L'; _lb[_li++]='L'; _lb[_li++]='N';
+                _lb[_li++]='U'; _lb[_li++]='L'; _lb[_li++]='L';
+                _lb[_li++]=' '; _lb[_li++]='p'; _lb[_li++]='=';
+                for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_pa>>_i)&0xf];
+                _lb[_li++]=' '; _lb[_li++]='t'; _lb[_li++]='=';
+                for(_i=12;_i>=0;_i-=4) _lb[_li++]=_hx[(_pt>>_i)&0xf];
+                _lb[_li++]='\n';
+                write(2,_lb,_li);
+                break;
+            }
+        }
         assert(!o->op_next);
         prevp = &(o->op_next);
         kid   = (o->op_flags & OPf_KIDS) ? cUNOPo->op_first : NULL;
@@ -9068,44 +9087,22 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
     first = *firstp;
     other = *otherp;
 
-    {
-        char _lb[80]; int _li=0;
-        const char *_hx="0123456789abcdef";
-        int _i;
-        unsigned long long _f=(unsigned long long)(void*)first;
-        unsigned long long _o=(unsigned long long)(void*)other;
-        unsigned int _ft=first?(unsigned int)first->op_type:0xDEAD;
-        _lb[_li++]='L'; _lb[_li++]='G'; _lb[_li++]='P'; _lb[_li++]=' ';
-        _lb[_li++]='f'; _lb[_li++]='=';
-        for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_f>>_i)&0xf];
-        _lb[_li++]=' '; _lb[_li++]='o'; _lb[_li++]='=';
-        for(_i=60;_i>=0;_i-=4) _lb[_li++]=_hx[(_o>>_i)&0xf];
-        _lb[_li++]=' '; _lb[_li++]='f'; _lb[_li++]='t'; _lb[_li++]='=';
-        for(_i=12;_i>=0;_i-=4) _lb[_li++]=_hx[(_ft>>_i)&0xf];
-        _lb[_li++]='\n';
-        write(2,_lb,_li);
-    }
-
     if (type == OP_XOR)		/* Not short circuit, but here by precedence. */
         return newBINOP(type, flags, scalar(first), scalar(other));
 
     assert((PL_opargs[type] & OA_CLASS_MASK) == OA_LOGOP
         || type == OP_CUSTOM);
 
-    write(2,"LGP1\n",5);
     scalarboolean(first);
-    write(2,"LGP2\n",5);
 
     if (S_is_control_transfer(aTHX_ first)) {
         op_free(other);
         first->op_folded = 1;
         return first;
     }
-    write(2,"LGP3\n",5);
 
     /* search for a constant op that could let us fold the test */
     if ((cstop = search_const(first))) {
-        write(2,"LGP4\n",5);
         if (cstop->op_private & OPpCONST_STRICT)
             no_bareword_allowed(cstop);
         else if ((cstop->op_private & OPpCONST_BARE))
@@ -9220,32 +9217,22 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
         }
     }
 
-    write(2,"LGP5\n",5);
     logop = alloc_LOGOP(type, first, LINKLIST(other));
-    write(2,"LGP6\n",5);
     logop->op_flags |= (U8)flags;
     logop->op_private = (U8)(1 | (flags >> 8));
-    write(2,"LGP7\n",5);
 
     /* establish postfix order */
     logop->op_next = LINKLIST(first);
-    write(2,"LGP8\n",5);
     first->op_next = (OP*)logop;
-    write(2,"LGP9\n",5);
     assert(!OpHAS_SIBLING(first));
-    write(2,"LGPA\n",5);
     op_sibling_splice((OP*)logop, first, 0, other);
-    write(2,"LGPB\n",5);
 
     CHECKOP(type,logop);
-    write(2,"LGPC\n",5);
 
     o = newUNOP(prepend_not ? OP_NOT : OP_NULL,
                 PL_opargs[type] & OA_RETSCALAR ? OPf_WANT_SCALAR : 0,
                 (OP*)logop);
-    write(2,"LGPD\n",5);
     other->op_next = o;
-    write(2,"LGPE\n",5);
 
     return o;
 }
