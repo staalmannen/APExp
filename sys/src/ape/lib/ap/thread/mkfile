@@ -36,6 +36,7 @@ OFILES=\
 	pthread_ext.$O\
 	spinlock.$O\
 	pthread_kill.$O\
+	pthread_cancel.$O\
 
 
 HFILES=../include/lib.h

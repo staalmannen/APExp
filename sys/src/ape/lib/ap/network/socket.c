@@ -11,6 +11,8 @@
 /* bsd extensions */
 #include <sys/uio.h>
 #include <sys/socket.h>
+#include <sys/time.h>
+#include <netinet/in.h>
 
 #include "priv.h"
 
@@ -238,9 +240,25 @@ getsockopt(int fd, int level, int opt, void *v, int *len)
 		case SO_REUSEADDR:
 		case SO_BROADCAST:
 		case SO_OOBINLINE:
+		case SO_DEBUG:
+		case SO_DONTROUTE:
+		case SO_ACCEPTCONN:
 			if(*len >= (int)sizeof(int)){
 				*(int*)v = 0;
 				*len = sizeof(int);
+			}
+			return 0;
+		case SO_RCVTIMEO:
+		case SO_SNDTIMEO:
+			if(*len >= (int)sizeof(struct timeval)){
+				memset(v, 0, sizeof(struct timeval));
+				*len = sizeof(struct timeval);
+			}
+			return 0;
+		case SO_LINGER:
+			if(*len >= (int)sizeof(struct linger)){
+				memset(v, 0, sizeof(struct linger));
+				*len = sizeof(struct linger);
 			}
 			return 0;
 		default:
@@ -250,6 +268,33 @@ getsockopt(int fd, int level, int opt, void *v, int *len)
 	case IPPROTO_TCP:
 		switch(opt){
 		case TCP_NODELAY:
+		case TCP_MAXSEG:
+			if(*len >= (int)sizeof(int)){
+				*(int*)v = 0;
+				*len = sizeof(int);
+			}
+			return 0;
+		default:
+			errno = ENOPROTOOPT;
+			return -1;
+		}
+	case IPPROTO_IP:
+		switch(opt){
+		case IP_TTL:
+		case IP_TOS:
+			if(*len >= (int)sizeof(int)){
+				*(int*)v = 0;
+				*len = sizeof(int);
+			}
+			return 0;
+		default:
+			errno = ENOPROTOOPT;
+			return -1;
+		}
+	case IPPROTO_IPV6:
+		switch(opt){
+		case IPV6_V6ONLY:
+			/* Plan9 opens dual-stack by default; report not v6only */
 			if(*len >= (int)sizeof(int)){
 				*(int*)v = 0;
 				*len = sizeof(int);
@@ -283,11 +328,38 @@ setsockopt(int fd, int level, int opt, void *v, int len)
 		case SO_REUSEADDR:
 		case SO_BROADCAST:
 		case SO_OOBINLINE:
+		case SO_DEBUG:
+		case SO_DONTROUTE:
 		case SO_SNDBUF:
 		case SO_RCVBUF:
 		case SO_LINGER:
-			/* Plan9 handles these transparently */
+			/* Plan9 handles these transparently or they have no equivalent */
 			return 0;
+		case SO_RCVTIMEO: {
+			/* map struct timeval to milliseconds for Plan9 readtimeout */
+			char buf[32];
+			long ms;
+			struct timeval *tv = (struct timeval *)v;
+			if(tv == NULL || len < (int)sizeof(struct timeval))
+				return 0;
+			ms = tv->tv_sec * 1000 + tv->tv_usec / 1000;
+			if(ms <= 0) return 0;
+			snprintf(buf, sizeof buf, "readtimeout %ld", ms);
+			sockctl(fd, buf);	/* best-effort; ignore error */
+			return 0;
+		}
+		case SO_SNDTIMEO: {
+			char buf[32];
+			long ms;
+			struct timeval *tv = (struct timeval *)v;
+			if(tv == NULL || len < (int)sizeof(struct timeval))
+				return 0;
+			ms = tv->tv_sec * 1000 + tv->tv_usec / 1000;
+			if(ms <= 0) return 0;
+			snprintf(buf, sizeof buf, "writetimeout %ld", ms);
+			sockctl(fd, buf);
+			return 0;
+		}
 		default:
 			errno = ENOPROTOOPT;
 			return -1;
@@ -297,6 +369,34 @@ setsockopt(int fd, int level, int opt, void *v, int len)
 		case TCP_NODELAY:
 			if(ival)
 				return sockctl(fd, "nodelay");
+			return 0;
+		case TCP_MAXSEG:
+			return 0;
+		default:
+			errno = ENOPROTOOPT;
+			return -1;
+		}
+	case IPPROTO_IP:
+		switch(opt){
+		case IP_TTL:
+		case IP_TOS:
+		case IP_HDRINCL:
+		case IP_OPTIONS:
+			/* Plan9 kernel manages these; accept silently */
+			return 0;
+		default:
+			errno = ENOPROTOOPT;
+			return -1;
+		}
+	case IPPROTO_IPV6:
+		switch(opt){
+		case IPV6_V6ONLY:
+		case IPV6_MULTICAST_HOPS:
+		case IPV6_MULTICAST_IF:
+		case IPV6_MULTICAST_LOOP:
+		case IPV6_UNICAST_HOPS:
+		case IPV6_RECVPKTINFO:
+			/* Plan9 is dual-stack by default; accept silently */
 			return 0;
 		default:
 			errno = ENOPROTOOPT;

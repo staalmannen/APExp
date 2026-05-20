@@ -6,6 +6,7 @@ OFILES=\
 	getgrent.$O\
 	getgrgid.$O\
 	getgrnam.$O\
+	getgr_r.$O\
 	getpwent.$O\
 	getpwnam.$O\
 	getpwuid.$O\

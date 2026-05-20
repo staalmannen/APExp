@@ -18,7 +18,9 @@ struct Thread {
 	int		exited;
 	void		*ret;
 	sigset_t	sigset;
-	int		state;
+	int		state;		/* cancel state: 0=enable, 1=disable */
+	int		canceltype;	/* cancel type: 0=deferred, 1=async */
+	int		cancelled;	/* cancellation pending */
 };
 typedef struct Thread Thread;
 

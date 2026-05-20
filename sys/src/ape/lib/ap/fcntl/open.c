@@ -8,7 +8,8 @@
 #include "sys9.h"
 
 /*
- * O_NOCTTY has no effect
+ * O_NOCTTY has no effect.
+ * O_CLOEXEC maps to Plan9 OCEXEC (close on exec).
  */
 int
 open(const char *path, int flags, ...)
@@ -20,6 +21,7 @@ open(const char *path, int flags, ...)
 	va_list va;
 
 	f = flags&O_ACCMODE;
+	if(flags&O_CLOEXEC) f |= OCEXEC;
 	if(flags&O_CREAT){
 		if(access(path, 0) >= 0){
 			if(flags&O_EXCL){
@@ -53,6 +55,7 @@ open(const char *path, int flags, ...)
 	if(n >= 0){
 		fi = &_fdinfo[n];
 		fi->flags = FD_ISOPEN;
+		if(flags&O_CLOEXEC) fi->flags |= FD_CLOEXEC;
 		fi->oflags = flags&(O_ACCMODE|O_NONBLOCK|O_APPEND);
 		fi->uid = -2;
 		fi->gid = -2;

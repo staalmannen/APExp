@@ -102,6 +102,13 @@ struct sigaction {
   #define SA_NODEFER    0x020
   #define SA_SIGINFO    0x040   /* use sa_sigaction; Plan 9 passes zero siginfo */
 
+/* si_code values for siginfo_t */
+#define SI_USER		0	/* sent by kill() */
+#define SI_QUEUE	-1	/* sent by sigqueue() */
+#define SI_TIMER	-2	/* timer expiration */
+#define SI_ASYNCIO	-3	/* async I/O completion */
+#define SI_MESGQ	-4	/* message queue arrival */
+
 /* first argument to sigprocmask */
 #define SIG_BLOCK	1
 #define SIG_UNBLOCK	2
@@ -122,6 +129,11 @@ extern int sigaction(int, const struct sigaction *, struct sigaction *);
 extern int sigprocmask(int, sigset_t *, sigset_t *);
 extern int sigpending(sigset_t *);
 extern int sigsuspend(const sigset_t *);
+extern int sigwait(const sigset_t *restrict, int *restrict);
+extern int sigwaitinfo(const sigset_t *restrict, siginfo_t *restrict);
+struct timespec;	/* avoid pulling in time.h */
+extern int sigtimedwait(const sigset_t *restrict, siginfo_t *restrict, const struct timespec *restrict);
+extern int sigqueue(pid_t, int, const union sigval);
 
 #include <pthread.h>
 

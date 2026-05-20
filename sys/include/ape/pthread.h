@@ -22,8 +22,13 @@ typedef pid_t pthread_t;
 enum {
 	PTHREAD_THREADS_MAX = 1000,
 
-	PTHREAD_CANCEL_DISABLE = 1,
+	PTHREAD_CANCEL_ENABLE		= 0,
+	PTHREAD_CANCEL_DISABLE		= 1,
+	PTHREAD_CANCEL_DEFERRED		= 0,
+	PTHREAD_CANCEL_ASYNCHRONOUS	= 1,
 };
+
+#define PTHREAD_CANCELED ((void*)(long)-1)
 
 struct pthread_once {
 	Lock l;
@@ -108,6 +113,9 @@ extern void	*pthread_getspecific(pthread_key_t);
 extern int	pthread_setspecific(pthread_key_t, const void*);
 
 extern int	pthread_setcancelstate(int, int*);
+extern int	pthread_setcanceltype(int, int*);
+extern int	pthread_cancel(pthread_t);
+extern void	pthread_testcancel(void);
 extern int	pthread_kill(pthread_t, int);
 
 #ifndef _PTHREAD_SIGMASK
