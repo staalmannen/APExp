@@ -46,16 +46,16 @@ timer_thread(void *arg)
 {
 	timedwait_state *s = (timedwait_state *)arg;
 	struct timespec now, rem;
-	long ns;
+	long long ns;
 
 	/* compute remaining time */
 	clock_gettime(CLOCK_REALTIME, &now);
-	ns = (s->deadline.tv_sec  - now.tv_sec)  * 1000000000L
-	   + (s->deadline.tv_nsec - now.tv_nsec);
+	ns = (long long)(s->deadline.tv_sec  - now.tv_sec)  * 1000000000LL
+	   + (long long)(s->deadline.tv_nsec - now.tv_nsec);
 
 	if(ns > 0) {
-		rem.tv_sec  = ns / 1000000000L;
-		rem.tv_nsec = ns % 1000000000L;
+		rem.tv_sec  = (long long)(ns / 1000000000LL);
+		rem.tv_nsec = (long)(ns % 1000000000LL);
 		nanosleep(&rem, NULL);
 	}
 

@@ -369,10 +369,10 @@ p9_getuid(void)
 static long
 p9_nanosleep(const struct timespec *req, struct timespec *rem)
 {
-	long ms;
+	long long ms;
 	if(req == NULL)
 		return -EFAULT;
-	ms = (long)(req->tv_sec * 1000 + req->tv_nsec / 1000000);
+	ms = (long long)req->tv_sec * 1000 + req->tv_nsec / 1000000;
 	if(ms < 0) ms = 0;
 	if(_SLEEP(ms) < 0){
 		if(rem != NULL){
@@ -697,7 +697,7 @@ __p9_syscall(long n, long a1, long a2, long a3, long a4, long a5, long a6)
 		long long ns;
 		if(tv == NULL) return -EFAULT;
 		ns = nsec();
-		tv->tv_sec  = (long)(ns / 1000000000LL);
+		tv->tv_sec  = ns / 1000000000LL;
 		tv->tv_usec = (long)((ns % 1000000000LL) / 1000LL);
 		return 0;
 	}

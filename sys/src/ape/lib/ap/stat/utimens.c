@@ -10,6 +10,15 @@
 #define AT_FDCWD (-100)
 #endif
 
+/*
+ * applyts: store a POSIX timespec into a Plan9 Dir time field.
+ *
+ * Dir.atime/mtime are ulong (32-bit on 6c) because Plan9's 9P wire
+ * protocol encodes timestamps as 32-bit unsigned integers.  This is
+ * a kernel/protocol limitation: timestamps beyond 2038 will wrap
+ * until Plan9's 9P is upgraded to 64-bit timestamps.  The (ulong) cast
+ * is intentional and not a bug in userspace code.
+ */
 static void
 applyts(ulong *field, const struct timespec *ts)
 {

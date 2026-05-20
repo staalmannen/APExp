@@ -68,13 +68,16 @@ int
 ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *ts,
       const sigset_t *sigmask)
 {
+	long long timeout_ms;
 	int timeout;
 	(void)sigmask;
 
-	if(ts == NULL)
+	if(ts == NULL) {
 		timeout = -1;
-	else
-		timeout = (int)(ts->tv_sec * 1000 + ts->tv_nsec / 1000000);
-
+	} else {
+		timeout_ms = (long long)ts->tv_sec * 1000 + ts->tv_nsec / 1000000;
+		/* poll() takes int ms; clamp to INT_MAX (~24.8 days) */
+		timeout = (timeout_ms > 0x7fffffff) ? 0x7fffffff : (int)timeout_ms;
+	}
 	return poll(fds, nfds, timeout);
 }

@@ -309,12 +309,15 @@ int
 select(int nfds, fd_set *rfds, fd_set *wfds, fd_set *efds, struct timeval *timeout)
 {
 	int n, i, t, slots, fd, err;
+	long long tms;
 	Fdinfo *f;
 	Muxbuf *b;
 
-	if(timeout)
-		t = timeout->tv_sec*1000 + (timeout->tv_usec+999)/1000;
-	else
+	if(timeout) {
+		tms = (long long)timeout->tv_sec*1000 + ((long long)timeout->tv_usec+999)/1000;
+		/* clamp to INT_MAX; waittime/SLEEP are 32-bit kernel interfaces */
+		t = (tms > 0x7fffffff) ? 0x7fffffff : (int)tms;
+	} else
 		t = -1;
 	if(!((rfds && FD_ANYSET(rfds)) || (wfds && FD_ANYSET(wfds))
 			|| (efds && FD_ANYSET(efds)))) {
