@@ -13,6 +13,7 @@ OFILES=\
 	utime.$O\
 	utimes.$O\
 	futimes.$O\
+	utimens.$O\
 # stubs\
 	fchown-stub.$O\
 # hacks\

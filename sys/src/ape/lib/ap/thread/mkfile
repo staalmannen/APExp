@@ -34,6 +34,8 @@ OFILES=\
 # hacks \
 	semaphore.$O\
 	pthread_ext.$O\
+	spinlock.$O\
+	pthread_kill.$O\
 
 
 HFILES=../include/lib.h

@@ -108,6 +108,7 @@ extern void	*pthread_getspecific(pthread_key_t);
 extern int	pthread_setspecific(pthread_key_t, const void*);
 
 extern int	pthread_setcancelstate(int, int*);
+extern int	pthread_kill(pthread_t, int);
 
 #ifndef _PTHREAD_SIGMASK
 #define _PTHREAD_SIGMASK
@@ -145,6 +146,12 @@ extern int pthread_barrier_wait(pthread_barrier_t *);
 extern int pthread_barrierattr_init(pthread_barrierattr_t *);
 extern int pthread_barrierattr_destroy(pthread_barrierattr_t *);
 
+/* spinlock (backed by Plan9 tas()) */
+extern int pthread_spin_init(pthread_spinlock_t *, int);
+extern int pthread_spin_destroy(pthread_spinlock_t *);
+extern int pthread_spin_lock(pthread_spinlock_t *);
+extern int pthread_spin_trylock(pthread_spinlock_t *);
+extern int pthread_spin_unlock(pthread_spinlock_t *);
 
 #ifdef __cplusplus
 }

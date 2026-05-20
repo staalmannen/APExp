@@ -80,6 +80,7 @@ extern struct tm *localtime(const time_t *);
 extern size_t strftime(char *, size_t, const char *, const struct tm *);
 extern int clock_gettime(clockid_t, struct timespec *);
 extern int clock_settime(clockid_t, struct timespec *);
+extern int clock_getres(clockid_t, struct timespec *);
 
 extern struct tm *gmtime_r(const time_t *, struct tm *);
 extern struct tm *localtime_r(const time_t *, struct tm *);
