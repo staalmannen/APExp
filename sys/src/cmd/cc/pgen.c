@@ -1,5 +1,9 @@
 #include "gc.h"
 
+#ifdef WITH_DWARFP
+#include "dwarftype.h"
+#endif
+
 void
 codgen(Node *n, Node *nn)
 {
@@ -108,10 +112,14 @@ codgen(Node *n, Node *nn)
 
 	if(!debug['N'] || debug['R'] || debug['P'])
 		regopt(sp);
-	
+
 	if(thechar=='6' || thechar=='7' || thechar=='9' || hasdoubled)	/* [sic] */
 		maxargsafe = round(maxargsafe, 8);
 	sp->to.offset += maxargsafe;
+
+#ifdef WITH_DWARFP
+	dwarf_emit_func(n1->sym, sp);
+#endif
 }
 
 void

@@ -1,0 +1,71 @@
+# mkcompiler — shared build fragment for DWARF-enabled compiler rebuild.
+#
+# Must be included AFTER these variables are set in the arch mkfile:
+#   APEXPROOT   — path to repo root
+#   T           — arch char (1 2 5 6 7 8 9 k q v)
+#   OFILES      — same list as the native arch mkfile (without dwarftype.$O)
+#
+# The per-arch mkfile must also have done </$objtype/mkfile first.
+#
+# These compilers are Plan9 NATIVE binaries (compiled with the native
+# Plan9 C compiler, not pcc).  They install into $APEXPROOT/$objtype/bin/
+# so that within the APExp overlay (apexp-sh union mount) they shadow
+# the system compiler and emit DWARF type info via libdwarfp.
+
+CCSRC=$APEXPROOT/sys/src/cmd/cc
+ARCSRC=$APEXPROOT/sys/src/cmd/${T}c
+DWSRC=$APEXPROOT/sys/src/external/libdwarf
+LIBDWARFP=$APEXPROOT/$objtype/lib/ape/libdwarfp.a
+
+TARG=${T}c
+BIN=$APEXPROOT/$objtype/bin
+
+# cc/ front-end object library (built by native sys/src/cmd/cc build)
+CCLIB=$CCSRC/cc.a$O
+
+# Full object list: arch objects + dwarftype
+ALLOFILES=$OFILES dwarftype.$O
+
+# Build flags: Plan9 native include paths (no APE paths)
+CFLAGS=-FVw\
+	-I$ARCSRC\
+	-I$CCSRC
+
+install:V: $BIN/$TARG
+
+$BIN/$TARG: $ALLOFILES $CCLIB $LIBDWARFP
+	$LD -o $BIN/$TARG $ALLOFILES $CCLIB $LIBDWARFP
+
+# Arch-specific files
+%.$O: $ARCSRC/%.c
+	$CC $CFLAGS $ARCSRC/$stem.c
+
+# cc/-resident files (pswt, etc.) — pattern tried after $ARCSRC rule
+%.$O: $CCSRC/%.c
+	$CC $CFLAGS $CCSRC/$stem.c
+
+# enam.$O: compile from the already-generated file in the native build dir
+enam.$O: $ARCSRC/enam.c
+	$CC $CFLAGS $ARCSRC/enam.c
+
+# pgen.$O: compiled with -DWITH_DWARFP so the hook fires, and -I..
+# so that dwarftype.h (in the compiler/ root) is findable.
+pgen.$O: $CCSRC/pgen.c
+	$CC $CFLAGS -DWITH_DWARFP -I.. $CCSRC/pgen.c
+
+# dwarftype.$O: compiled with Plan9 native headers + libdwarfp headers.
+# Needs $ARCSRC for gc.h, $DWSRC for libdwarf.h / libdwarfp internals.
+dwarftype.$O: ../dwarftype.c ../dwarftype.h
+	$CC $CFLAGS\
+		-DWITH_DWARFP\
+		-I..\
+		-I$DWSRC\
+		-I$DWSRC/src/lib/libdwarfp\
+		-I$DWSRC/src/lib/libdwarf\
+		../dwarftype.c
+
+clean:V:
+	rm -f *.$O
+
+nuke:V:
+	rm -f *.$O $BIN/$TARG

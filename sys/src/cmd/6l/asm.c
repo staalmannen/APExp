@@ -1,6 +1,25 @@
 #include	"l.h"
+#include	"../ld/dwarf.h"
 
 #define	Dbufslop	100
+
+/* Write one 40-byte ELF32 section header (little-endian). */
+static void
+elf32shdr(long name, long type, long flags, long addr,
+          long offset, long size, long link, long info,
+          long align, long entsize)
+{
+	lputl(name);
+	lputl(type);
+	lputl(flags);
+	lputl(addr);
+	lputl(offset);
+	lputl(size);
+	lputl(link);
+	lputl(info);
+	lputl(align);
+	lputl(entsize);
+}
 
 #define PADDR(a)	((a) & ~0xfffffffff0000000ull)
 
@@ -88,6 +107,8 @@ asmb(void)
 	int a;
 	uchar *op1;
 	vlong vl;
+	/* ELF section header table info, filled in when emitting DWARF. */
+	long elf_shoff = 0, elf_shnum = 0, elf_shstrndx = 0;
 
 	if(debug['v'])
 		Bprint(&bso, "%5.2f asmb\n", cputime());
@@ -190,6 +211,59 @@ asmb(void)
 		asmdyn();
 		cflush();
 	}
+
+	/* For ELF output, append DWARF debug sections and build section header table. */
+	if(HEADTYPE == 5) {
+		/*
+		 * .shstrtab — section name strings with embedded NULs.
+		 * Written piecewise because strnput stops at the first NUL.
+		 * Byte offsets (for sh_name fields):
+		 *   0  ""              (SHT_NULL entry has empty name)
+		 *   1  ".text"
+		 *   7  ".data"
+		 *  13  ".debug_abbrev"
+		 *  27  ".debug_line"
+		 *  39  ".debug_frame"
+		 *  52  ".debug_info"
+		 *  64  ".shstrtab"
+		 * Total: 74 bytes
+		 */
+		enum { SHSTRTABSZ = 74 };
+		DwarfSects ds;
+		vlong shstroff, shoff;
+
+		dwarfemitdebugsections(&ds);
+		cflush();
+
+		/* .shstrtab */
+		shstroff = cpos();
+		cput(0);                        /*  0: empty name for SHT_NULL */
+		strnput(".text",         6);    /*  1 */
+		strnput(".data",         6);    /*  7 */
+		strnput(".debug_abbrev", 14);   /* 13 */
+		strnput(".debug_line",   12);   /* 27 */
+		strnput(".debug_frame",  13);   /* 39 */
+		strnput(".debug_info",   12);   /* 52 */
+		strnput(".shstrtab",     10);   /* 64 */
+		cflush();
+
+		/* section header table (8 × 40-byte ELF32 Shdr entries) */
+		shoff = cpos();
+		elf32shdr(0,   0, 0, 0,                  0,                    0,               0, 0, 0,  0);
+		elf32shdr(1,   1, 6, PADDR(INITTEXT),    HEADR,                (long)textsize,  0, 0, 16, 0); /* .text */
+		elf32shdr(7,   1, 3, PADDR(INITDAT),     HEADR+(long)textsize, (long)datsize,   0, 0, 8,  0); /* .data */
+		elf32shdr(13,  1, 0, 0, (long)ds.abbrev_off, (long)ds.abbrev_sz, 0, 0, 1, 0); /* .debug_abbrev */
+		elf32shdr(27,  1, 0, 0, (long)ds.line_off,   (long)ds.line_sz,   0, 0, 1, 0); /* .debug_line */
+		elf32shdr(39,  1, 0, 0, (long)ds.frame_off,  (long)ds.frame_sz,  0, 0, 8, 0); /* .debug_frame */
+		elf32shdr(52,  1, 0, 0, (long)ds.info_off,   (long)ds.info_sz,   0, 0, 1, 0); /* .debug_info */
+		elf32shdr(64,  3, 0, 0, (long)shstroff,       SHSTRTABSZ,         0, 0, 1, 0); /* .shstrtab */
+		cflush();
+
+		elf_shoff    = (long)shoff;
+		elf_shnum    = 8;
+		elf_shstrndx = 7;
+	}
+
 	if(debug['v'])
 		Bprint(&bso, "%5.2f headr\n", cputime());
 	Bflush(&bso);
@@ -239,14 +313,14 @@ asmb(void)
 		lputl(1L);			/* version = CURRENT */
 		lputl(PADDR(entryvalue()));	/* entry vaddr */
 		lputl(52L);			/* offset to first phdr */
-		lputl(0L);			/* offset to first shdr */
+		lputl(elf_shoff);		/* offset to first shdr */
 		lputl(0L);			/* processor specific flags */
 		wputl(52);			/* Ehdr size */
 		wputl(32);			/* Phdr size */
 		wputl(3);			/* # of Phdrs */
-		wputl(0);			/* Shdr size */
-		wputl(0);			/* # of Shdrs */
-		wputl(0);			/* Shdr string size */
+		wputl(elf_shnum ? 40 : 0);	/* Shdr entry size */
+		wputl(elf_shnum);		/* # of Shdrs */
+		wputl(elf_shstrndx);		/* .shstrtab section index */
 
 		lputl(1L);			/* text - type = PT_LOAD */
 		lputl(HEADR);			/* file offset */
