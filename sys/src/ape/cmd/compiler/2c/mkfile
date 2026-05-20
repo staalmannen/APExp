@@ -1,5 +1,5 @@
 </$objtype/mkfile
-APEXPROOT=../../../../..
+APEXPROOT=../../../../../..
 T=2
 OFILES=\
 	2c_vla.$O\
@@ -14,3 +14,7 @@ OFILES=\
 	mul.$O\
 
 <../mkcompiler
+
+%.$O: $APEXPROOT/sys/src/cmd/2c/%.c
+	$CC $CFLAGS $prereq
+
