@@ -433,8 +433,12 @@ loop2:
 	r1 = 0; /* set */
 	for(r = firstr; r != R; r = r->link) {
 		p = r->prog;
-		if(p->to.type == D_BRANCH)
-			p->to.offset = r->s2->pc;
+		if(p->to.type == D_BRANCH) {
+			if(r->s2 != R)
+				p->to.offset = r->s2->pc;
+			else
+				diag(Z, "branch to nowhere: %P", p);
+		}
 		r1 = r;
 	}
 
