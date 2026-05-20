@@ -48,6 +48,7 @@ extern "C" {
 
 #define	IPPROTO_RAW		255		/* raw IP packet */
 #define	IPPROTO_MAX		256
+#define	IPPROTO_IPV6		41		/* IPv6 header */
 
 
 /*
@@ -217,6 +218,17 @@ struct ip_opts {
 #define	IP_HDRINCL	7	/* int; header is included with data (raw) */
 #define	IP_TOS		8	/* int; IP type of service and precedence */
 #define	IP_TTL		9	/* int; IP time to live */
+
+/* Options for use with [gs]etsockopt at the IPPROTO_IPV6 level. */
+#define	IPV6_V6ONLY		26	/* int; only bind IPv6 addrs (RFC 3493) */
+#define	IPV6_MULTICAST_HOPS	18
+#define	IPV6_MULTICAST_IF	17
+#define	IPV6_MULTICAST_LOOP	19
+#define	IPV6_JOIN_GROUP		20
+#define	IPV6_LEAVE_GROUP	21
+#define	IPV6_UNICAST_HOPS	4
+#define	IPV6_RECVPKTINFO	49
+#define	IPV6_PKTINFO		50
 
 extern unsigned long	ntohl(unsigned long x);
 extern unsigned short	ntohs(unsigned short x);

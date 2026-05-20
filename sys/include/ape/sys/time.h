@@ -6,8 +6,8 @@
 #define __TIMEVAL__
 
 struct timeval {
-	long	tv_sec;
-	long	tv_usec;
+	long long	tv_sec;		/* seconds since epoch — 64-bit to survive 2038 */
+	long		tv_usec;	/* microseconds [0, 999999] — 32-bit is fine */
 };
 
 struct itimerval {

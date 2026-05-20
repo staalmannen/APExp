@@ -275,8 +275,12 @@ Updated priorities (2026-05):
 2. ~~`stat/` — `utimensat`, `futimens`, `mknodat`~~ — DONE (2026-05)
 3. ~~`select/` — `ppoll`~~ — DONE (2026-05)
 4. ~~`time/` — `clock_getres`~~ — DONE (2026-05)
-5. `network/` — `setsockopt`/`getsockopt` for more socket options (SO_LINGER, IPV6_V6ONLY, etc.)
-6. `fcntl/` — `O_CLOEXEC` flag on `open()` (F_DUPFD_CLOEXEC already works)
-7. `mman/` — `MAP_SHARED` write-back; `mprotect` mapping to Plan9 segment permissions
-8. `thread/` — `pthread_cancel` / `pthread_testcancel` (full cancellation protocol)
-9. `aio/` — `lio_listio` (batched async I/O)
+5. ~~`network/` — `setsockopt`/`getsockopt` for more socket options~~ — DONE (2026-05): added IPPROTO_IPV6/IPV6_V6ONLY, SO_RCVTIMEO/SO_SNDTIMEO (mapped to Plan9 readtimeout/writetimeout), SO_DEBUG, SO_DONTROUTE, SO_ACCEPTCONN, IP_TTL/IP_TOS, TCP_MAXSEG
+6. ~~`fcntl/` — `O_CLOEXEC` flag on `open()`~~ — DONE (2026-05): maps to Plan9 OCEXEC; also sets FD_CLOEXEC in fi->flags
+7. ~~`thread/` — `pthread_cancel` / `pthread_testcancel`~~ — DONE (2026-05): `pthread_cancel.c` with deferred (flag) and async (SIGTERM) modes; `pthread_setcanceltype`; `PTHREAD_CANCELED` sentinel
+8. ~~`signal/` — `sigwait`/`sigwaitinfo`/`sigtimedwait`/`sigqueue`~~ — DONE (2026-05): `sigwait.c` uses temporary handler + 1ms _SLEEP poll; `sigqueue` delegates to `kill()`; `SI_USER`/`SI_QUEUE`/`SI_TIMER` constants added to signal.h
+9. ~~`passwd/` — `getgrgid_r`/`getgrnam_r`~~ — DONE (2026-05): `getgr_r.c` iterates via getgrent() into caller-supplied buffer
+10. ~~`aio/` — `lio_listio`~~ — DONE (already implemented in prior session)
+11. `mman/` — `MAP_SHARED` write-back; `mprotect` mapping to Plan9 segment permissions
+12. `thread/` — `pthread_attr` full coverage (setstacksize wired to Plan9 thread stack)
+13. `complex/` — long double variants (`l` suffix functions) for full musl parity

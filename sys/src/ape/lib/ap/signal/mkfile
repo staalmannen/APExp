@@ -18,6 +18,7 @@ OFILES=\
 #	hacks\
 	sigaction.$O\
 	sigsegv.$O\
+	sigwait.$O\
 
 
 <$APEXPROOT/sys/src/cmd/mksyslib
