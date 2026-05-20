@@ -5,14 +5,16 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
-#include "../include/syscall.h"
 
 /*
  * mmap/munmap and related wrappers for APExp.
  *
  * The actual emulation (segattach for large allocations, malloc for
  * small ones, read() for file-backed) lives in __p9_syscall.c.
- * These functions expose them as public symbols that programs can link.
+ * We call those functions directly rather than routing through
+ * __p9_syscall(), because __p9_syscall() uses long (32-bit on Plan9 6c
+ * for amd64) for all arguments and return values, which would truncate
+ * 64-bit heap addresses and return corrupt pointers.
  *
  * Limitations:
  *   - MAP_SHARED write-back not supported; writes stay private.
@@ -21,29 +23,21 @@
  *   - shm_open is backed by files in /tmp.
  */
 
+/* Declared non-static in __p9_syscall.c */
+extern void *p9_mmap_tracked(void *addr, size_t len, int prot, int flags,
+                              int fd, off_t off);
+extern int   p9_munmap(void *addr, size_t len);
+
 void *
 mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 {
-	long r = __p9_syscall(SYS_mmap,
-	                      (long)addr, (long)len, (long)prot,
-	                      (long)flags, (long)fd, (long)off);
-	if(r < 0){
-		errno = (int)-r;
-		return MAP_FAILED;
-	}
-	return (void *)(uintptr_t)r;
+	return p9_mmap_tracked(addr, len, prot, flags, fd, off);
 }
 
 int
 munmap(void *addr, size_t len)
 {
-	long r = __p9_syscall(SYS_munmap, (long)addr, (long)len,
-	                      0L, 0L, 0L, 0L);
-	if(r < 0){
-		errno = (int)-r;
-		return -1;
-	}
-	return 0;
+	return p9_munmap(addr, len);
 }
 
 int

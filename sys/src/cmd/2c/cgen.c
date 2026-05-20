@@ -953,14 +953,14 @@ lcgen(Node *n, int result, Node *nn)
 }
 
 void
-bcgen(Node *n, int true)
+bcgen(Node *n, int cond)
 {
 
-	boolgen(n, true, D_NONE, Z, Z);
+	boolgen(n, cond, D_NONE, Z, Z);
 }
 
 void
-boolgen(Node *n, int true, int result, Node *nn, Node *post)
+boolgen(Node *n, int cond, int result, Node *nn, Node *post)
 {
 	Prog *p1, *p2;
 	Node *l, *r;
@@ -993,7 +993,7 @@ boolgen(Node *n, int true, int result, Node *nn, Node *post)
 
 	case OCONST:
 		fp = vconst(n);
-		if(!true)
+		if(!cond)
 			fp = !fp;
 		gbranch(OGOTO);
 		if(fp) {
@@ -1004,7 +1004,7 @@ boolgen(Node *n, int true, int result, Node *nn, Node *post)
 		goto com;
 
 	case ONOT:
-		boolgen(l, !true, result, nn, post);
+		boolgen(l, !cond, result, nn, post);
 		break;
 
 	case OCOND:
@@ -1014,7 +1014,7 @@ boolgen(Node *n, int true, int result, Node *nn, Node *post)
 
 		inargs++;
 		doinc(r->left, PRE);
-		boolgen(r->left, true, result, nn, r->left);
+		boolgen(r->left, cond, result, nn, r->left);
 		if(result != D_NONE) {
 			doinc(r->left, POST);
 			gbranch(OGOTO);
@@ -1022,7 +1022,7 @@ boolgen(Node *n, int true, int result, Node *nn, Node *post)
 			p1 = p;
 
 			doinc(r->right, PRE);
-			boolgen(r->right, !true, result, nn, r->right);
+			boolgen(r->right, !cond, result, nn, r->right);
 			doinc(r->right, POST);
 			patch(p1, pc);
 			inargs--;
@@ -1034,7 +1034,7 @@ boolgen(Node *n, int true, int result, Node *nn, Node *post)
 		p1 = p;
 
 		doinc(r->right, PRE);
-		boolgen(r->right, !true, result, nn, r->right);
+		boolgen(r->right, !cond, result, nn, r->right);
 		patch(p2, pc);
 		p2 = p;
 		if(doinc(post, POST|TEST)) {
@@ -1051,16 +1051,16 @@ boolgen(Node *n, int true, int result, Node *nn, Node *post)
 		goto com;
 
 	case OANDAND:
-		if(!true)
+		if(!cond)
 			goto caseor;
 
 	caseand:
 		doinc(l, PRE);
-		boolgen(l, true, D_NONE, Z, l);
+		boolgen(l, cond, D_NONE, Z, l);
 		p1 = p;
 		inargs++;
 		doinc(r, PRE);
-		boolgen(r, !true, D_NONE, Z, r);
+		boolgen(r, !cond, D_NONE, Z, r);
 		p2 = p;
 		patch(p1, pc);
 		gbranch(OGOTO);
@@ -1069,16 +1069,16 @@ boolgen(Node *n, int true, int result, Node *nn, Node *post)
 		goto com;
 
 	case OOROR:
-		if(!true)
+		if(!cond)
 			goto caseand;
 
 	caseor:
 		doinc(l, PRE);
-		boolgen(l, !true, D_NONE, Z, l);
+		boolgen(l, !cond, D_NONE, Z, l);
 		p1 = p;
 		inargs++;
 		doinc(r, PRE);
-		boolgen(r, !true, D_NONE, Z, r);
+		boolgen(r, !cond, D_NONE, Z, r);
 		p2 = p;
 		gbranch(OGOTO);
 		patch(p1, pc);
@@ -1090,10 +1090,10 @@ boolgen(Node *n, int true, int result, Node *nn, Node *post)
 	case ONE:
 		if(vconst(l) == 0) {
 			if(n->op == ONE) {
-				boolgen(r, true, result, nn, post);
+				boolgen(r, cond, result, nn, post);
 				break;
 			}
-			boolgen(r, !true, result, nn, post);
+			boolgen(r, !cond, result, nn, post);
 			break;
 		}
 
@@ -1151,7 +1151,7 @@ boolgen(Node *n, int true, int result, Node *nn, Node *post)
 		regfree(rg);
 
 	genbool:
-		if(true)
+		if(cond)
 			o = comrel[relindex(o)];
 		if(doinc(post, POST|TEST)) {
 			lg = regalloc(types[TSHORT], D_NONE);
