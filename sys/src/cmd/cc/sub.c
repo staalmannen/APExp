@@ -707,9 +707,17 @@ arith(Node *n, int f)
 			n->type = t2;
 	} else {
 		/* convert up to at least int */
-		if(f == 1)
-		while(k < TINT)
-			k += 2;
+		if(f == 1) {
+			/* TBOOL at position 3 broke the k+=2 signed/unsigned pairing.
+			 * Handle TCHAR/TUCHAR/TBOOL explicitly; k+=2 still works for
+			 * TSHORT(4)→TINT(6) and TUSHORT(5)→TUINT(7). */
+			if(k == TCHAR || k == TBOOL)
+				k = TINT;
+			else if(k == TUCHAR)
+				k = TUINT;
+			else while(k < TINT)
+				k += 2;
+		}
 		n->type = types[k];
 	}
 	if(n->op == OSUB)
