@@ -177,7 +177,7 @@ types in `rsametype()` — see Part XII.)
 | `__VA_OPT__` | `macro.c` `substargs` | Fully compliant C23/C++20 implementation |
 | `_Alignas` in declarations | `cc/dcl.c` `adecl()`, `sualign()` | Layout effect done: struct members + auto vars; `LALIGN` token in `cc.y` |
 | `_Atomic` / `stdatomic.h` | `lex.c` drop qualifier; `sys/include/ape/stdatomic.h` | Header provides non-atomic typedefs + Plan9 spinlock-based ops |
-| `constexpr` objects (C23) | Not implemented |
+| `constexpr` objects (C23) | Done — mapped to `LCONSTNT` (const qualifier) in `lex.c` |
 | `auto` type deduction (C23) | Done — implemented in `cc.y` `autoadlist` rule |
 
 `tgmath.h` was written using `_Generic` to dispatch to the correct variant
@@ -275,12 +275,12 @@ Digit separators (`1'000`) were added to all 8 numeric lexer loops. Verify
 that the `casep:` loop (hex float exponent, `p`/`P`) correctly handles
 `0x1.8p+1'0`. Likely a one-line fix identical to the other loops.
 
-### 5. `constexpr` objects (C23)
+### 5. `constexpr` objects (C23) — DONE
 
-`constexpr int N = 42;` at file scope should behave like `static const int`.
-In function scope it should behave like a constant expression. Low impact
-for now (few real-world headers use it yet), but will become necessary as
-C23 adoption increases.
+`constexpr int N = 42;` mapped to `LCONSTNT` (const qualifier) in `lex.c`.
+This makes `constexpr` act like `const` for all practical purposes kencc cares
+about.  The `static` storage-class implication at file scope is not enforced,
+but file-scope variables are already static by default in C.
 
 ### 6. `auto` type deduction (C23) — DONE
 
@@ -295,14 +295,21 @@ to nothing otherwise. Used in modern macro-heavy headers. Implemented in
 the preprocessor (`cpp/`); requires tracking whether the current `...`
 expansion is empty.
 
-### 8. `#pragma` handling improvements
+### 8. `#pragma` handling improvements — partially DONE
 
-Currently `#pragma` is silently dropped. Several important pragmas affect
-compiler behaviour: `#pragma pack(N)`, `#pragma GCC diagnostic`, and
-`#pragma once`. `#pragma once` is the highest-value item — it is used as
-a guard in many headers as a substitute for or complement to `#ifndef`
-guards. Implementation: maintain a set of canonicalised file paths seen
-with `#pragma once`; skip re-inclusion.
+`#pragma pack(N)` is now fully functional:
+- `#pragma pack(N)` — set alignment to N
+- `#pragma pack()` — reset to natural alignment
+- `#pragma pack(push)` / `#pragma pack(push, N)` — push/pop stack
+- `#pragma pack(pop)` — restore previous value
+
+The parser in `cc/dpchk.c:pragpack()` was fixed (2026-05) to handle the
+standard `(N)` parenthesised syntax.  All arch backends' `align()` functions
+already respected `packflg`.  A 32-entry push/pop stack (`packstack[]`,
+`packdepth`) was added to `cc.h`.
+
+`#pragma once` is handled by `cpp/cpp.c`.  `#pragma GCC diagnostic` is still
+silently dropped (low priority).
 
 ### 9. Designated initialisers for union types
 
@@ -377,16 +384,14 @@ appear after type keywords (`int`, `char`), struct/union specifiers, or
 pointer operators. This fixes regressions where common English words used as
 identifiers were being incorrectly dropped.
 
-### Remaining Challenges
+### Status (2026-05)
 
--   **Concatenation Rescanning**: While exhaustive rescanning is implemented,
-    certain cases involving `##` producing a macro name (like `CDiCCP`) may
-    still fail to expand in the final step. This suggests a subtle interaction
-    where the resulting token might be inheriting a hideset from the operator
-    itself or hitting an edge case in the `quicklook` bitmask optimization.
+The `##` concatenation rescanning issue is **fixed** — confirmed working by
+`sys/lib/tests/repro_macro.c` which now compiles correctly.
+
 -   **Integrated Preprocessor**: The integrated preprocessor in `sys/src/cmd/cc/`
-    requires a similar index-based refactoring to match the robustness of
-    the updated standalone `cpp`.
+    may still require similar index-based refactoring to match the robustness
+    of the updated standalone `cpp`, but this has not caused observed failures.
 
 ---
 
@@ -442,7 +447,7 @@ integration with the compiler's code-generation backend.
 |:---|:---|:---|:---|:---|
 | **`_Alignas`** | C11 | Medium | High | Requires `sualign` struct-layout and local frame offset updates. |
 | **`auto`** | C23 | High | High | **Done** — `autoadlist` rule in `cc.y`. |
-| **`constexpr`** | C23 | High | Medium | File-scope maps to `static const`; function-scope is complex. |
+| **`constexpr`** | C23 | Low | Medium | **Done** — mapped to `const` in `lex.c`. |
 | **`_Atomic` / CAS** | C11 | High | High | Requires mapping to libap atomics or backend intrinsics. |
 
 ### Technical Analysis
@@ -630,78 +635,178 @@ spurious "INT for NORET IND CONST CHAR" mismatches on `strcmp`/`strlen`/
 
 ### Status (as of 2026-05)
 
-DWARF infrastructure is **partially in place** but **not yet active**:
+DWARF infrastructure is **active in the linker** and partially wired in the
+compiler:
 
-- The linker-side emitter (`ld/dwarf.c`) is compiled and linked into 6l, but
-  its entry points (`dwarfemitdebugsections`, `dwarfaddfrag`) are **never
-  called** from 6l's `asm.c`, `obj.c`, or `pass.c`.  The DWARF code is
-  currently dead weight in the linker binary.
-- The libdwarf reader (`sys/src/ape/lib/dwarf/`) and libdwarfp producer
-  (`sys/src/ape/lib/dwarfp/`) mkfiles exist and point at the correct source
-  tree (`sys/src/external/libdwarf/`), but are not yet part of the default
-  build.
-- `dwarfdump` has a mkfile and correct `DWSRC` path; it needs libdwarf built
-  first.
-- `adeb` debugger source is committed at `sys/src/ape/cmd/adeb/` (skeleton:
-  `main.c`, `dwarf_engine.c`); full breakpoint/variable inspection not yet
-  implemented.
+**Done (committed):**
+- `6l/asm.c`: calls `dwarfemitdebugsections()` after text/data layout; writes an
+  8-entry ELF section header table so libdwarf's ELF reader can find the debug
+  sections.
+- `6l/obj.c`: calls `dwarfaddfrag(histgen, s->name+1)` when registering each
+  new SFILE symbol, feeding the fragment table that `decodez()` uses to
+  reconstruct full source paths from Plan9 'z'/'Z' history entries.
+- `sys/src/cmd/cc/pgen.c`: `#ifdef WITH_DWARFP` hook calls `dwarf_emit_func()`
+  at the end of `codgen()`.  The hook is disabled by default (native build);
+  enabled only when compiling with `-DWITH_DWARFP`.
+- `sys/src/ape/cmd/compiler/`: second-build directory containing DWARF-enabled
+  rebuilds of all 10 arch compilers (1c, 2c, 5c, 6c, 7c, 8c, 9c, kc, qc, vc).
+  Shared `mkcompiler` fragment links each against `cc.a$O` + `libdwarfp`.
+  Installs to `$APEXPROOT/$objtype/bin/`, shadowing the system compiler in the
+  APExp shell's `PATH`.
+- `dwarftype.c` (stub) in `sys/src/ape/cmd/compiler/`: placeholder `dwarf_emit_func()`
+  that compiles and links cleanly; real libdwarfp calls to be added later.
+
+**Still TODO:**
+- Build libdwarf/libdwarfp: add `dwarf` and `dwarfp` to `sys/src/ape/lib/mkfile`.
+- Build dwarfdump: add `dwarfdump` to `sys/src/ape/cmd/mkfile`.
+- Implement `dwarftype.c` with real libdwarfp calls (variable types, struct
+  layouts; the current `findtype("int")` placeholder in `writeglobals()` should
+  be replaced).
+- Extend DWARF wiring to other arch linkers (5l, 8l).
+
+### Dependency cycle and solution
+
+`sys/src/cmd/6c/` (native compilers) build **before** `sys/src/ape/lib/`
+(APE libraries including libdwarfp).  So native `6c` cannot link libdwarfp.
+
+**Solution:** `sys/src/ape/cmd/compiler/` is a second-pass build that runs
+*after* `sys/src/ape/lib/` and produces a DWARF-enabled `6c` (and all other
+arch compilers) that overwrites the native one in the APExp search path.
+
+The `pgen.c` hook is guarded by `#ifdef WITH_DWARFP` so the source is shared
+between the native build (no DWARF) and the APExp compiler build (with DWARF).
 
 ### Source locations
 
 | Path | Contents |
 |:-----|:---------|
-| `sys/src/cmd/ld/dwarf.c` | Linker DWARF emitter (1236 lines, adapted from Go toolchain). Implements `dwarfaddfrag()` and `dwarfemitdebugsections()` but these are **not yet called** from the linker. |
-| `sys/src/cmd/ld/dwarf.h` | Public interface: `dwarfaddfrag()`, `dwarfemitdebugsections()` |
-| `sys/src/cmd/ld/dwarf_defs.h` | DWARF constants (DW_TAG_*, DW_AT_*, DW_FORM_*, etc.) |
-| `sys/src/cmd/6l/mkfile` | Compiles `../ld/dwarf.c` as `dwarf.$O` and links into 6l — but no call sites exist yet |
-| `sys/src/ape/lib/dwarf/` | libdwarf (reader) — mkfile points to `sys/src/external/libdwarf/src/lib/libdwarf/` |
-| `sys/src/ape/lib/dwarfp/` | libdwarfp (producer/writer) — mkfile points to `sys/src/external/libdwarf/src/lib/libdwarfp/` |
-| `sys/src/ape/cmd/dwarfdump/` | `dwarfdump` utility — mkfile has correct `DWSRC=../../../external/libdwarf`; depends on libdwarf + libzstd |
-| `sys/src/ape/cmd/adeb/` | `adeb` debugger — source committed: `main.c`, `dwarf_engine.c`, `mkfile`, `README.md`, `APExp_Debugger_Design.md` |
+| `sys/src/cmd/ld/dwarf.c` | Linker DWARF emitter (adapted from Go toolchain). `dwarfaddfrag()` and `dwarfemitdebugsections()` are now called from the linker. |
+| `sys/src/cmd/ld/dwarf.h` | Public interface with `DwarfSects` struct for passing section offsets/sizes back to `asm.c`. |
+| `sys/src/cmd/6l/obj.c` | Calls `dwarfaddfrag()` on each new SFILE symbol. |
+| `sys/src/cmd/6l/asm.c` | Calls `dwarfemitdebugsections()`, writes `.shstrtab`, writes ELF32 section header table (8 entries). |
+| `sys/src/cmd/cc/pgen.c` | `#ifdef WITH_DWARFP` hook at end of `codgen()`. |
+| `sys/src/ape/cmd/compiler/mkcompiler` | Shared build rules for all 10 DWARF-enabled compiler rebuilds. |
+| `sys/src/ape/cmd/compiler/dwarftype.{h,c}` | Stub `dwarf_emit_func()` interface. |
+| `sys/src/ape/cmd/compiler/{1,2,5,6,7,8,9,k,q,v}c/mkfile` | Per-arch mkfiles for DWARF-enabled second builds. |
+| `sys/src/ape/lib/dwarf/` | libdwarf (reader) — mkfile exists, not yet in default build. |
+| `sys/src/ape/lib/dwarfp/` | libdwarfp (producer/writer) — mkfile exists, not yet in default build. |
+| `sys/src/ape/cmd/dwarfdump/` | `dwarfdump` — mkfile exists, depends on libdwarf. |
+| `sys/src/ape/cmd/adeb/` | `adeb` debugger — skeleton source committed. |
+
+### ELF section header layout emitted by 6l
+
+```
+Index  Name            Type   Content
+  0    (null)          NULL   —
+  1    .text           PROGBITS  executable code
+  2    .data           PROGBITS  initialised data
+  3    .debug_abbrev   PROGBITS  DWARF abbreviation table
+  4    .debug_line     PROGBITS  DWARF line number state machine
+  5    .debug_frame    PROGBITS  DWARF frame descriptions (CIE/FDE)
+  6    .debug_info     PROGBITS  DWARF compile-unit / subprogram DIEs
+  7    .shstrtab       STRTAB    section name strings
+```
+
+The ELF header's `e_shoff`, `e_shnum`, and `e_shstrndx` fields are filled in
+at seek-0 after all sections are written.
 
 ### `adeb` — Plan 9 `/proc` + libdwarf debugger
 
-`adeb` is the intended DWARF-aware debugger for APExp.  Its design is documented
-in `sys/src/ape/cmd/adeb/APExp_Debugger_Design.md`.  Key design points:
+`adeb` is the intended DWARF-aware debugger for APExp.  Key design points:
 
 - **No `ptrace`**: all process control goes through Plan 9's `/proc/<pid>/ctl`,
   `/proc/<pid>/regs`, and `/proc/<pid>/mem` file interfaces.
-- **Binary format — APE ELF, not Plan9 a.out**: APE binaries are ELF, not Plan9
-  a.out.  `6l` with `HEADTYPE=5` (the default for APE) writes an `\177ELF` header
-  (see `sys/src/cmd/6l/asm.c`).  Native Plan9 binaries use `HEADTYPE=2`/`3`
-  (Plan9 a.out magic numbers).  libdwarf's ELF reader works for APE ELF binaries;
-  it does **not** understand Plan9 a.out format.  adeb is therefore exclusively a
-  debugger for APE programs, not for native Plan9 binaries.
-- **libdwarf for symbol lookup**: reads DWARF sections from the APE ELF binary to
-  map PC values → file:line, resolve variable locations (register or SP-relative),
-  and walk DIE trees for type/scope information.
-- **Event loop**: stop target → read PC → libdwarf PC→source lookup → interactive
-  CLI prompt → step/continue/inspect → repeat.
-- **Implementation**: `main.c` (~72 lines, CLI + event loop skeleton) and
-  `dwarf_engine.c` (~39 lines, libdwarf wrapper).  Still a skeleton — the
-  full variable inspection and breakpoint logic are not yet implemented.
-- **Build**: `mk` in `sys/src/ape/cmd/adeb/`; links against `libdwarf.a` and
-  `libzstd.a` (zstd is a libdwarf dependency).
+- **APE ELF only**: `6l` with `HEADTYPE=5` writes `\177ELF`; libdwarf's ELF
+  reader works for APE ELF binaries but not Plan9 a.out.
+- **libdwarf for symbol lookup**: maps PC → file:line, resolves variable
+  locations, walks DIE trees for type information.
+- **Status**: skeleton only; `main.c` (~72 lines) + `dwarf_engine.c` (~39 lines).
 
-### What `ld/dwarf.c` implements
+### What `ld/dwarf.c` emits
 
-The emitter (when called) would:
-1. Build a DWARF abbreviation table (compile-unit, subprogram, base-type DIEs)
-2. Walk the linker's `Prog` list to collect line-number → PC mappings and emit
-   a `.debug_line` state machine
-3. Emit `.debug_frame` CIE/FDE entries using stack-pointer adjustment records
-   (`getspadj` / `AADJSP`)
-4. Emit `.debug_info` with type and function DIEs
-5. Append all four sections after the program text in the output binary
+1. `.debug_abbrev` — abbreviation table (compile-unit, subprogram, base-type DIEs)
+2. `.debug_line` — line-number state machine (PC → file:line)
+3. `.debug_frame` — CIE/FDE entries from `getspadj`/`AADJSP` records
+4. `.debug_info` — type and function DIEs
 
-### TODOs to make DWARF active
+Current limitation: all variable types appear as `int` (placeholder via
+`findtype("int")` in `writeglobals()`).  Real type info requires wiring in
+libdwarfp in the compiler pass.
 
-1. **Wire in the call sites**: in `6l/asm.c` (or `obj.c`/`pass.c`), add a call
-   to `dwarfemitdebugsections()` after the final section layout, and call
-   `dwarfaddfrag()` when processing object file symbol fragments.
-2. **Build libdwarf/libdwarfp**: add `dwarf` and `dwarfp` to
-   `sys/src/ape/lib/mkfile`'s subdirectory list.
-3. **Build dwarfdump**: add `dwarfdump` to `sys/src/ape/cmd/mkfile`.
-4. **Compiler front-end type info**: wire `libdwarfp` into the C compiler to
-   emit full type information (variables, struct layouts) rather than just
-   line numbers and function names.
+---
+
+## Part XIV — regopt "ref not found" Investigation
+
+### Symptom
+
+`TkImgDitherInstance` in `sys/src/external/tk/generic/tkImgPhInstance.c` (the
+largest function in the file, ~344 source lines, ~3292 Reg nodes after regopt
+pass 1) triggers "ref not found" in regopt pass 2 with display:
+
+```
+JEQ ,-3381(PC)
+JEQ ,-3264(PC)
+```
+
+The function is compiled with `-N` (disable regopt) as a workaround; the relevant
+rule is in `sys/src/ape/lib/tk/mkfile`.
+
+### Root cause analysis (2026-05)
+
+Extensive analysis traced the failure to pass 2:
+
+```c
+val = p->to.offset - initpc;
+// search for Reg node with r->pc == val
+if(r1 == R) diag(Z, "ref not found ...");
+```
+
+The display `-3381(PC)` at pass 8 time means `p->to.offset - (initpc + K) = -3381`
+where K is the position of the failing branch within the function.  In pass 2:
+`val = p->to.offset - initpc = K - 3381`.  With K ≈ 3100 (near function end)
+and npc ≈ 3292, this gives `val ≈ -281` → ref not found.
+
+The analysis ruled out:
+- **`supgen()` interference**: rolls back `pc` and cuts the linked list; case
+  labels set inside suppressed code are unreachable in pass 2.
+- **ADATA/AGLOBL net-zero effect**: these pseudo-instructions do `pc--` after
+  `nextpc()`, canceling their contribution to `pc`; no static variables in
+  `TkImgDitherInstance`.
+- **`continpc`/`breakpc` stale values from previous function**: save/restore
+  mechanics in OFOR and OSWITCH are structurally correct.
+- **`maxregion` overflow**: already fixed at 600; array grows by 128 beyond that.
+- **log5 search defect**: the skip-list search correctly handles negative val by
+  exhausting the list and returning R.
+- **32-bit overflow of `pc`**: the file is ~2028 lines; global pc at the point
+  of this function is in the low thousands, far from 2^31.
+- **Cross-function `continpc` contamination**: `ginit()` sets `continpc = -1`;
+  each OFOR saves/restores `continpc` around its body.
+
+The root cause is NOT identifiable through static analysis alone.  The enhanced
+diagnostic (added 2026-05) now prints `val`, `initpc`, `npc`, and
+`p->to.offset` so the next rebuild will produce actionable numbers.
+
+### Diagnostic added
+
+`sys/src/cmd/6c/reg.c` pass 2 now prints:
+
+```
+ref not found (val=<V> initpc=<I> npc=<N> offset=<O>)
+JEQ ,<offset>(PC)
+```
+
+This will reveal whether `val < 0` (target before function) or `val >= npc`
+(target beyond function end), and what `p->to.offset` and `initpc` are, which
+will pinpoint the exact code path that set the wrong target.
+
+### Next steps
+
+1. Rebuild and capture the full diagnostic output for the failing instructions.
+2. Verify `val < 0` vs `val >= npc`.
+3. If `val < 0`: trace which `patch()` call produced the wrong offset; the
+   `p->to.offset` value relative to the function's ATEXT global pc will identify
+   which `continpc`/`breakpc`/case-label was corrupted.
+4. If `val >= npc`: the target is beyond the function — possibly a forward
+   reference to a label in the next function, suggesting the linked list boundary
+   is wrong.
+5. Remove the `-N` workaround from the libtk mkfile once fixed.
