@@ -94,7 +94,7 @@ sigtimedwait(const sigset_t *restrict set, siginfo_t *restrict info,
 {
 	void (*saved[NSIG])(int, char *, Ureg*);
 	struct timespec now;
-	long deadline_ms, now_ms;
+	long long deadline_ms, now_ms;
 	int sig;
 
 	if(set == NULL) {
@@ -107,8 +107,8 @@ sigtimedwait(const sigset_t *restrict set, siginfo_t *restrict info,
 
 	if(timeout != NULL) {
 		clock_gettime(CLOCK_REALTIME, &now);
-		deadline_ms = (now.tv_sec + timeout->tv_sec) * 1000L
-		            + (now.tv_nsec + timeout->tv_nsec) / 1000000L;
+		deadline_ms = ((long long)now.tv_sec + timeout->tv_sec) * 1000LL
+		            + ((long long)now.tv_nsec + timeout->tv_nsec) / 1000000LL;
 	} else {
 		deadline_ms = -1;
 	}
@@ -118,7 +118,7 @@ sigtimedwait(const sigset_t *restrict set, siginfo_t *restrict info,
 			break;
 		if(deadline_ms >= 0) {
 			clock_gettime(CLOCK_REALTIME, &now);
-			now_ms = now.tv_sec * 1000L + now.tv_nsec / 1000000L;
+			now_ms = (long long)now.tv_sec * 1000LL + now.tv_nsec / 1000000LL;
 			if(now_ms >= deadline_ms) {
 				restore_handlers(set, saved);
 				errno = EAGAIN;

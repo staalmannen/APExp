@@ -337,26 +337,26 @@ setsockopt(int fd, int level, int opt, void *v, int len)
 			return 0;
 		case SO_RCVTIMEO: {
 			/* map struct timeval to milliseconds for Plan9 readtimeout */
-			char buf[32];
-			long ms;
+			char buf[40];
+			long long ms;
 			struct timeval *tv = (struct timeval *)v;
 			if(tv == NULL || len < (int)sizeof(struct timeval))
 				return 0;
-			ms = tv->tv_sec * 1000 + tv->tv_usec / 1000;
+			ms = (long long)tv->tv_sec * 1000 + tv->tv_usec / 1000;
 			if(ms <= 0) return 0;
-			snprintf(buf, sizeof buf, "readtimeout %ld", ms);
+			snprintf(buf, sizeof buf, "readtimeout %lld", ms);
 			sockctl(fd, buf);	/* best-effort; ignore error */
 			return 0;
 		}
 		case SO_SNDTIMEO: {
-			char buf[32];
-			long ms;
+			char buf[40];
+			long long ms;
 			struct timeval *tv = (struct timeval *)v;
 			if(tv == NULL || len < (int)sizeof(struct timeval))
 				return 0;
-			ms = tv->tv_sec * 1000 + tv->tv_usec / 1000;
+			ms = (long long)tv->tv_sec * 1000 + tv->tv_usec / 1000;
 			if(ms <= 0) return 0;
-			snprintf(buf, sizeof buf, "writetimeout %ld", ms);
+			snprintf(buf, sizeof buf, "writetimeout %lld", ms);
 			sockctl(fd, buf);
 			return 0;
 		}
