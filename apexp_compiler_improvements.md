@@ -666,8 +666,14 @@ in `sys/src/ape/cmd/adeb/APExp_Debugger_Design.md`.  Key design points:
 
 - **No `ptrace`**: all process control goes through Plan 9's `/proc/<pid>/ctl`,
   `/proc/<pid>/regs`, and `/proc/<pid>/mem` file interfaces.
-- **libdwarf for symbol lookup**: reads DWARF sections from the ELF binary to map
-  PC values → file:line, resolve variable locations (register or SP-relative),
+- **Binary format — APE ELF, not Plan9 a.out**: APE binaries are ELF, not Plan9
+  a.out.  `6l` with `HEADTYPE=5` (the default for APE) writes an `\177ELF` header
+  (see `sys/src/cmd/6l/asm.c`).  Native Plan9 binaries use `HEADTYPE=2`/`3`
+  (Plan9 a.out magic numbers).  libdwarf's ELF reader works for APE ELF binaries;
+  it does **not** understand Plan9 a.out format.  adeb is therefore exclusively a
+  debugger for APE programs, not for native Plan9 binaries.
+- **libdwarf for symbol lookup**: reads DWARF sections from the APE ELF binary to
+  map PC values → file:line, resolve variable locations (register or SP-relative),
   and walk DIE trees for type/scope information.
 - **Event loop**: stop target → read PC → libdwarf PC→source lookup → interactive
   CLI prompt → step/continue/inspect → repeat.
