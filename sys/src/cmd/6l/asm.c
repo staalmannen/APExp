@@ -3,22 +3,24 @@
 
 #define	Dbufslop	100
 
-/* Write one 40-byte ELF32 section header (little-endian). */
+/* Write one 40-byte ELF32 section header (little-endian).
+ * Parameter named 'foff' (file offset) to avoid collision with
+ * l.h's #define offset u0.u0offset. */
 static void
-elf32shdr(long name, long type, long flags, long addr,
-          long offset, long size, long link, long info,
-          long align, long entsize)
+elf32shdr(long sh_name, long sh_type, long sh_flags, long sh_addr,
+          long foff, long sh_size, long sh_link, long sh_info,
+          long sh_align, long sh_entsize)
 {
-	lputl(name);
-	lputl(type);
-	lputl(flags);
-	lputl(addr);
-	lputl(offset);
-	lputl(size);
-	lputl(link);
-	lputl(info);
-	lputl(align);
-	lputl(entsize);
+	lputl(sh_name);
+	lputl(sh_type);
+	lputl(sh_flags);
+	lputl(sh_addr);
+	lputl(foff);
+	lputl(sh_size);
+	lputl(sh_link);
+	lputl(sh_info);
+	lputl(sh_align);
+	lputl(sh_entsize);
 }
 
 #define PADDR(a)	((a) & ~0xfffffffff0000000ull)
