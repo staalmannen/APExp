@@ -207,6 +207,9 @@ $DRAWIMPL_OBJ: $TKSRC/plan9/tkPlan9DrawImpl.c
 %.$O: $TKSRC/xlib/%.c
 	$CC $CFLAGS $TKSRC/xlib/$stem.c
 
+tkImgPhInstance.$O: $TKSRC/generic/tkImgPhInstance.c
+	$CC $CFLAGS -N $TKSRC/generic/tkImgPhInstance.c
+
 %.$O: $TKSRC/generic/%.c
 	$CC $CFLAGS $TKSRC/generic/$stem.c
 
