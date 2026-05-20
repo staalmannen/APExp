@@ -341,8 +341,8 @@ enum
 	TCONSTNT,
 	TVOLATILE,
 	TUNSIGNED,
+	TNORET,		/* moved before TSIGNED so BNORET=1L<<30 fits in 32-bit long */
 	TSIGNED,
-	TNORET,
 	TOLD,
 	NALLTYPES,
 
