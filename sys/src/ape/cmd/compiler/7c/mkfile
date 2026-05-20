@@ -1,0 +1,19 @@
+</$objtype/mkfile
+APEXPROOT=../../../../..
+T=7
+OFILES=\
+	7c_vla.$O\
+	cgen.$O\
+	enam.$O\
+	list.$O\
+	machcap.$O\
+	mul.$O\
+	peep.$O\
+	pgen.$O\
+	pswt.$O\
+	reg.$O\
+	sgen.$O\
+	swt.$O\
+	txt.$O\
+
+<../mkcompiler

@@ -1,0 +1,32 @@
+APEXPROOT=../../../..
+
+ARCHES=\
+	1c\
+	2c\
+	5c\
+	6c\
+	7c\
+	8c\
+	9c\
+	kc\
+	qc\
+	vc\
+
+install:V:
+	for(i in $ARCHES) @{
+		cd $i
+		echo ----$i----
+		mk install
+	}
+
+clean:V:
+	for(i in $ARCHES) @{
+		cd $i
+		mk clean
+	}
+
+nuke:V:
+	for(i in $ARCHES) @{
+		cd $i
+		mk nuke
+	}
