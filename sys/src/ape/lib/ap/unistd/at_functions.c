@@ -142,3 +142,12 @@ symlinkat(const char *target, int dirfd, const char *linkpath)
 	errno = ENOSYS;
 	return -1;
 }
+
+int
+mknodat(int dirfd, const char *path, mode_t mode, dev_t dev)
+{
+	if(dirfd == AT_FDCWD || (path != NULL && path[0] == '/'))
+		return mknod(path, mode, dev);
+	errno = ENOSYS;
+	return -1;
+}

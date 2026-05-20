@@ -7,6 +7,8 @@
 #endif
 
 #include <sys/types.h>
+#include <time.h>
+#include <signal.h>
 
 struct pollfd {
 	int fd;			/* file descriptor */
@@ -35,6 +37,8 @@ extern "C" {
 #endif
 
 extern int poll(struct pollfd fds[], nfds_t nfds, int timeout);
+extern int ppoll(struct pollfd fds[], nfds_t nfds, const struct timespec *,
+                 const sigset_t *);
 
 #ifdef __cplusplus
 }

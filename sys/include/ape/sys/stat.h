@@ -87,6 +87,14 @@ extern int	lstat(char *, struct stat *);
 extern int	symlink(const char *, const char *);
 extern ssize_t readlink(const char *, char*, size_t);
 
+/* POSIX.1-2008 timestamp functions */
+#define UTIME_NOW  ((long)(1l << 30) - 1l)
+#define UTIME_OMIT ((long)(1l << 30) - 2l)
+
+extern int futimens(int, const struct timespec [2]);
+extern int utimensat(int, const char *, const struct timespec [2], int);
+extern int mknodat(int, const char *, mode_t, dev_t);
+
 #ifdef __cplusplus
 }
 #endif

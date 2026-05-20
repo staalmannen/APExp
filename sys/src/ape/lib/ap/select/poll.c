@@ -2,6 +2,8 @@
 #include <sys/time.h>
 #include <sys/select.h>
 #include <poll.h>
+#include <time.h>
+#include <signal.h>
 
 int
 poll(struct pollfd *fds, nfds_t nfds, int timeout)
@@ -54,4 +56,25 @@ poll(struct pollfd *fds, nfds_t nfds, int timeout)
 			p->revents |= POLLPRI|POLLHUP;
 	}
 	return n;
+}
+
+/*
+ * ppoll — like poll but with nanosecond timeout and atomic signal mask swap.
+ * Plan9 has no atomic sigmask+select primitive, so we approximate:
+ * convert timespec → milliseconds and delegate to poll().
+ * The sigmask argument is ignored (Plan9 signal masking is coarse-grained).
+ */
+int
+ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *ts,
+      const sigset_t *sigmask)
+{
+	int timeout;
+	(void)sigmask;
+
+	if(ts == NULL)
+		timeout = -1;
+	else
+		timeout = (int)(ts->tv_sec * 1000 + ts->tv_nsec / 1000000);
+
+	return poll(fds, nfds, timeout);
 }

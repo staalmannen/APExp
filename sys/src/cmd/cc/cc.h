@@ -486,6 +486,8 @@ EXTERN	Node*	initlist;
 EXTERN	Term	term[NTERM];
 EXTERN	int	nterm;
 EXTERN	int	packflg;
+EXTERN	int	packstack[32];	/* #pragma pack push/pop stack */
+EXTERN	int	packdepth;	/* current pack stack depth */
 EXTERN	int	alignasval;	/* pending _Alignas() requirement; 0 = none */
 EXTERN	int	fproundflg;
 EXTERN	int	profileflg;

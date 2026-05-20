@@ -395,7 +395,8 @@ regopt(Prog *p)
 			}
 			if(r1 == R) {
 				nearln = p->lineno;
-				diag(Z, "ref not found\n%P", p);
+				diag(Z, "ref not found (val=%ld initpc=%ld npc=%ld offset=%lld)\n%P",
+					val, initpc, npc, p->to.offset, p);
 				continue;
 			}
 			if(r1 == r) {

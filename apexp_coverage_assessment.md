@@ -196,6 +196,8 @@ The low file count was misleading — coverage is ~92%.
 **select/ — DONE**
 `select()` + `FD_SET`/`FD_CLR`/`FD_ISSET`/`FD_ZERO` are in `plan9/_buf.c`.
 `poll()` is in `select/poll.c` (wraps select). Both declared in `sys/select.h`.
+`ppoll()` added (2026-05): wraps `poll()`, converts `struct timespec *` timeout
+to milliseconds; `sigmask` argument is ignored (Plan9 has no atomic mask swap).
 
 **sched/ — DONE**
 `sched_yield`, `sched_get_priority_min/max`, `sched_getscheduler`,
@@ -204,11 +206,12 @@ The low file count was misleading — coverage is ~92%.
 
 ### Tier 2 — moderate effort, clear payoff
 
-**thread/ — rwlock and barrier**
-`pthread_rwlock_init/rdlock/wrlock/unlock/destroy` and
-`pthread_barrier_init/wait/destroy`. Both can be implemented using the
-existing mutex/cond primitives. rwlock is probed for by almost all
-multi-threaded software; barrier is less common but expected.
+**thread/ — rwlock and barrier — DONE**
+`pthread_rwlock_*` backed by Plan9 native `RWLock` (qlock.h) in `pthread_ext.c`.
+`pthread_barrier_*` implemented (wait always returns `PTHREAD_BARRIER_SERIAL_THREAD`
+since Plan9 has no multi-threaded barrier primitive).
+`pthread_spin_*` added (2026-05) in `spinlock.c` — backed by Plan9 `tas(int*)`.
+`pthread_kill` added (2026-05) in `pthread_kill.c` — delegates to `kill(pid, sig)`.
 
 **time/ — POSIX interval timers — DONE**
 `timer_create`, `timer_delete`, `timer_settime`, `timer_gettime`,
@@ -217,11 +220,15 @@ multi-threaded software; barrier is less common but expected.
 `pthread_cond_timedwait`; supports `SIGEV_NONE`, `SIGEV_SIGNAL` (default
 `SIGALRM`), and `SIGEV_THREAD`. `timer_getoverrun` always returns 0.
 
-**stat/ — at() and timestamp family**
-`fstatat`, `utimensat`, `futimens`, `mknodat`. The `at`-suffixed variants
-follow the same AT_FDCWD wrapper pattern already used in `unistd/`.
-`utimensat`/`futimens` replace deprecated `utimes`; many build systems
-probe for them.
+**stat/ — at() and timestamp family — DONE**
+`fstatat` is in `unistd/at_functions.c` (AT_FDCWD wrapper).
+`utimensat`/`futimens` added (2026-05) in `stat/utimens.c`: convert
+`struct timespec` to Plan9 Dir `atime`/`mtime` via `_dirwstat`/`_dirfwstat`;
+`UTIME_NOW` → `time(NULL)`, `UTIME_OMIT` → leave `~0UL` sentinel from
+`_nulldir` (Plan9 "don't change" value). Macros declared in `sys/stat.h`.
+`mknodat` added (2026-05) to `unistd/at_functions.c` as AT_FDCWD wrapper.
+`clock_getres` added (2026-05) to `time/clock_gettime.c`; reports 1ns
+resolution for CLOCK_REALTIME/CLOCK_MONOTONIC (Plan9 nsec() granularity).
 
 **fcntl/ — full F_* flag coverage**
 `F_DUPFD_CLOEXEC`, `FD_CLOEXEC` on open, `F_GETFD`/`F_SETFD`,
@@ -264,8 +271,12 @@ for `aio_suspend` does not scale well with many concurrent requests.
 
 Updated priorities (2026-05):
 
-1. `thread/` — rwlock and barrier are stubbed; wire rwlock to real mutex/cond implementation
-2. `network/` — `setsockopt`/`getsockopt` are stubs returning 0; needs `SO_REUSEADDR`, `TCP_NODELAY` etc mapped to Plan9 ctl commands
-3. `stat/` — `fstatat`, `utimensat`, `futimens`, `mknodat` (AT_FDCWD wrappers)
-4. `fcntl/` — complete `F_*` flag coverage: `F_DUPFD_CLOEXEC`, `O_CLOEXEC`, `F_GETFD`/`F_SETFD`
-5. `mman/` — `MAP_SHARED` write-back; improve `mprotect` mapping to Plan9 segment permissions
+1. ~~`thread/` — rwlock and barrier~~ — DONE (rwlock/barrier/spinlock/pthread_kill all implemented)
+2. ~~`stat/` — `utimensat`, `futimens`, `mknodat`~~ — DONE (2026-05)
+3. ~~`select/` — `ppoll`~~ — DONE (2026-05)
+4. ~~`time/` — `clock_getres`~~ — DONE (2026-05)
+5. `network/` — `setsockopt`/`getsockopt` for more socket options (SO_LINGER, IPV6_V6ONLY, etc.)
+6. `fcntl/` — `O_CLOEXEC` flag on `open()` (F_DUPFD_CLOEXEC already works)
+7. `mman/` — `MAP_SHARED` write-back; `mprotect` mapping to Plan9 segment permissions
+8. `thread/` — `pthread_cancel` / `pthread_testcancel` (full cancellation protocol)
+9. `aio/` — `lio_listio` (batched async I/O)

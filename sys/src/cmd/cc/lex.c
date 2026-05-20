@@ -1624,6 +1624,14 @@ struct
 	"alignas",		LALIGNAS,	0,
 
 	/*
+	 * C23 constexpr: compile-time constant object.
+	 * `constexpr int x = 5;` is equivalent to `static const int x = 5;`
+	 * at file scope.  Map to LCONSTNT (const qualifier) — close enough
+	 * for kencc, which does not enforce constant-expression initializers.
+	 */
+	"constexpr",		LCONSTNT,	0,
+
+	/*
 	 * GNU visibility / linkage hints.
 	 * These appear as function/variable attributes.  When used as
 	 * plain identifiers (not inside __attribute__) they are harmless

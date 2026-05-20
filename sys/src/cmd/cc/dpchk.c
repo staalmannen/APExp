@@ -380,19 +380,66 @@ dpcheck(Node *n)
 	checkargs(b, s, l->param);
 }
 
+/* parse an integer from s->name, handling both plain digits and +/- prefix */
+static int
+packval(Sym *s)
+{
+	if(s == S)
+		return 0;
+	if(strcmp(s->name, "on") == 0 || strcmp(s->name, "yes") == 0)
+		return 1;
+	return atoi(s->name);
+}
+
 void
 pragpack(void)
 {
 	Sym *s;
+	int c, n, hasparen;
 
-	packflg = 0;
+	/* skip optional '(' */
+	c = getnsc();
+	hasparen = (c == '(');
+	if(!hasparen)
+		unget(c);
+
 	s = getsym();
-	if(s) {
-		packflg = atoi(s->name+1);
-		if(strcmp(s->name, "on") == 0 ||
-		   strcmp(s->name, "yes") == 0)
-			packflg = 1;
+
+	/* #pragma pack() or #pragma pack — reset to natural alignment */
+	if(s == S) {
+		packflg = 0;
+		goto done;
 	}
+
+	/* #pragma pack(push) or #pragma pack(push, N) */
+	if(strcmp(s->name, "push") == 0) {
+		if(packdepth < nelem(packstack))
+			packstack[packdepth++] = packflg;
+		/* optional , N */
+		c = getnsc();
+		if(c == ',') {
+			s = getsym();
+			if(s)
+				packflg = packval(s);
+		} else
+			unget(c);
+		goto done;
+	}
+
+	/* #pragma pack(pop) */
+	if(strcmp(s->name, "pop") == 0) {
+		if(packdepth > 0)
+			packflg = packstack[--packdepth];
+		else
+			packflg = 0;
+		goto done;
+	}
+
+	/* #pragma pack(N) or #pragma pack N */
+	n = packval(s);
+	packflg = n;
+
+done:
 	while(getnsc() != '\n')
 		;
 	if(debug['f'])
