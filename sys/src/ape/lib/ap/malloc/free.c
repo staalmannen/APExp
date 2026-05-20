@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include <lock.h>
+#include "malloc_align.h"
 
 enum
 {
@@ -55,8 +56,14 @@ free(void *ptr)
 	/* Find the start of the structure */
 	bp = (Bucket*)((uintptr_t)ptr - datoff);
 
-	if(bp->magic != MAGIC)
+	if(bp->magic != MAGIC) {
+		/* aligned-fallback block: header written by aligned_alloc/posix_memalign */
+		if(malign_check(bp)) {
+			free(malign_orig(bp));
+			return;
+		}
 		abort();
+	}
 	if(bp->size <= 0 || bp->size >= MAX2SIZE)
 		abort();
 

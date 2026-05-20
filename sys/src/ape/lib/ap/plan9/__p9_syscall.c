@@ -143,18 +143,35 @@ p9retl(long r)
 #define O_CLOEXEC OCEXEC
 #endif
 
+/*
+ * Plan9 allows only ~8 segments per process (NSEG in the kernel).
+ * Using segattach for every mmap quickly exhausts this limit, causing
+ * "insufficient physical memory" errors.  Strategy:
+ *
+ *   anonymous, len < SEG_THRESHOLD: use malloc() (no new segment, sbrk-backed)
+ *   anonymous, len >= SEG_THRESHOLD: use segattach() (page-aligned, zeroed)
+ *   file-backed: always read into malloc'd buffer (MAP_SHARED write-back
+ *                is not supported — changes are private)
+ *
+ * Lowering SEG_THRESHOLD from 65536 to 1MB dramatically reduces the
+ * number of segattach calls for programs like bash that use mmap as
+ * a general allocator for medium-sized chunks.
+ */
+#define SEG_THRESHOLD (1024*1024)   /* 1 MB — use segattach only above this */
+
 static long
 p9_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 {
 	void *p;
+	int is_seg;
 	(void)prot;  /* Plan9 has no per-page protection */
 
-	/* MAP_FIXED at a specific address is not supportable in userland */
+	/* MAP_FIXED to a specific non-NULL address is not supportable */
 	if((flags & MAP_FIXED) && addr != NULL)
 		return -EINVAL;
 
-	/* allocate backing memory */
-	if(len >= 65536){
+	is_seg = (len >= SEG_THRESHOLD);
+	if(is_seg){
 		p = _SEGATTACH(0, "memory", 0, len);
 		if(p == (void*)-1)
 			return -ENOMEM;
@@ -165,15 +182,14 @@ p9_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 	}
 	memset(p, 0, len);
 
-	/* file-backed mapping: read file contents into the buffer.
-	 * Write-back (MAP_SHARED) is not supported; changes are private. */
+	/* file-backed mapping: read file contents into buffer */
 	if(!(flags & (MAP_ANONYMOUS|MAP_ANON)) && fd != -1){
 		ssize_t n;
 		if(off != 0)
 			lseek(fd, off, SEEK_SET);
 		n = read(fd, p, len);
 		if(n < 0){
-			if(len >= 65536) _SEGDETACH(p);
+			if(is_seg) _SEGDETACH(p);
 			else free(p);
 			return -EIO;
 		}
@@ -181,15 +197,20 @@ p9_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 	return (long)(uintptr_t)p;
 }
 
-/* We can't reliably know whether an address came from segattach or
- * malloc, so we track segattach regions in a small table. */
-#define MMAP_TABLE_SIZE 256
-static struct {
-	void *addr;
+/*
+ * mmap tracking table.
+ *
+ * Tracks (addr, is_seg) so munmap can call the correct release function.
+ * Uses a dynamically grown array so it never silently overflows — a full
+ * fixed table would cause munmap to not find entries and leak memory/segments.
+ */
+static struct MmapEntry {
+	void  *addr;
 	size_t len;
-	int   is_seg;   /* 1 = segattach, 0 = malloc */
-} mmap_table[MMAP_TABLE_SIZE];
-static int mmap_table_n = 0;
+	int    is_seg;
+} *mmap_table;
+static int mmap_table_n   = 0;
+static int mmap_table_cap = 0;
 
 static long
 p9_mmap_tracked(void *addr, size_t len, int prot, int flags, int fd, off_t off)
@@ -197,10 +218,22 @@ p9_mmap_tracked(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 	long r = p9_mmap(addr, len, prot, flags, fd, off);
 	if(r < 0)
 		return r;
-	if(mmap_table_n < MMAP_TABLE_SIZE){
+
+	/* grow table if needed */
+	if(mmap_table_n >= mmap_table_cap){
+		int newcap = mmap_table_cap ? mmap_table_cap * 2 : 64;
+		struct MmapEntry *t = realloc(mmap_table,
+		                              newcap * sizeof(*mmap_table));
+		if(t != NULL){
+			mmap_table     = t;
+			mmap_table_cap = newcap;
+		}
+		/* if realloc fails we proceed; munmap will fall back to segdetach */
+	}
+	if(mmap_table_n < mmap_table_cap){
 		mmap_table[mmap_table_n].addr   = (void*)r;
 		mmap_table[mmap_table_n].len    = len;
-		mmap_table[mmap_table_n].is_seg = (len >= 65536);
+		mmap_table[mmap_table_n].is_seg = (len >= SEG_THRESHOLD);
 		mmap_table_n++;
 	}
 	return r;
@@ -217,13 +250,14 @@ p9_munmap(void *addr, size_t len)
 				_SEGDETACH(addr);
 			else
 				free(addr);
-			/* remove from table */
 			mmap_table[i] = mmap_table[--mmap_table_n];
 			return 0;
 		}
 	}
-	/* not found in table - attempt free anyway */
-	free(addr);
+	/* addr not in table — could be a segattach we couldn't record.
+	 * Attempt segdetach; if it fails this is an unknown address and
+	 * we return 0 rather than crash or corrupt the malloc heap. */
+	_SEGDETACH(addr);
 	return 0;
 }
 
