@@ -159,26 +159,37 @@ p9retl(long r)
  */
 #define SEG_THRESHOLD (1024*1024)   /* 1 MB — use segattach only above this */
 
-static long
-p9_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off)
+/*
+ * p9_mmap_impl: core anonymous mmap emulation.
+ * Returns the allocated pointer on success, MAP_FAILED on error (sets errno).
+ * Uses void* throughout to preserve 64-bit addresses on amd64.
+ */
+static void *
+p9_mmap_impl(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 {
 	void *p;
 	int is_seg;
 	(void)prot;  /* Plan9 has no per-page protection */
 
 	/* MAP_FIXED to a specific non-NULL address is not supportable */
-	if((flags & MAP_FIXED) && addr != NULL)
-		return -EINVAL;
+	if((flags & MAP_FIXED) && addr != NULL){
+		errno = EINVAL;
+		return MAP_FAILED;
+	}
 
 	is_seg = (len >= SEG_THRESHOLD);
 	if(is_seg){
 		p = _SEGATTACH(0, "memory", 0, len);
-		if(p == (void*)-1)
-			return -ENOMEM;
+		if(p == (void*)-1){
+			errno = ENOMEM;
+			return MAP_FAILED;
+		}
 	} else {
 		p = malloc(len);
-		if(p == NULL)
-			return -ENOMEM;
+		if(p == NULL){
+			errno = ENOMEM;
+			return MAP_FAILED;
+		}
 	}
 	memset(p, 0, len);
 
@@ -191,10 +202,11 @@ p9_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 		if(n < 0){
 			if(is_seg) _SEGDETACH(p);
 			else free(p);
-			return -EIO;
+			errno = EIO;
+			return MAP_FAILED;
 		}
 	}
-	return (long)(uintptr_t)p;
+	return p;
 }
 
 /*
@@ -212,12 +224,17 @@ static struct MmapEntry {
 static int mmap_table_n   = 0;
 static int mmap_table_cap = 0;
 
-static long
+/*
+ * p9_mmap_tracked / p9_munmap: public (non-static) so mman.c can call
+ * them directly without going through __p9_syscall() which uses long
+ * (32-bit on amd64) and would truncate 64-bit heap addresses.
+ */
+void *
 p9_mmap_tracked(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 {
-	long r = p9_mmap(addr, len, prot, flags, fd, off);
-	if(r < 0)
-		return r;
+	void *p = p9_mmap_impl(addr, len, prot, flags, fd, off);
+	if(p == MAP_FAILED)
+		return MAP_FAILED;
 
 	/* grow table if needed */
 	if(mmap_table_n >= mmap_table_cap){
@@ -231,15 +248,15 @@ p9_mmap_tracked(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 		/* if realloc fails we proceed; munmap will fall back to segdetach */
 	}
 	if(mmap_table_n < mmap_table_cap){
-		mmap_table[mmap_table_n].addr   = (void*)r;
+		mmap_table[mmap_table_n].addr   = p;
 		mmap_table[mmap_table_n].len    = len;
 		mmap_table[mmap_table_n].is_seg = (len >= SEG_THRESHOLD);
 		mmap_table_n++;
 	}
-	return r;
+	return p;
 }
 
-static long
+int
 p9_munmap(void *addr, size_t len)
 {
 	int i;
@@ -590,12 +607,14 @@ __p9_syscall(long n, long a1, long a2, long a3, long a4, long a5, long a6)
 	case SYS_brk: /* [EMULATE] */
 		return p9_brk((void*)a1);
 
-	case SYS_mmap: /* [EMULATE] anonymous only */
-		return p9_mmap_tracked((void*)a1, (size_t)a2,
-		                       (int)a3, (int)a4, (int)a5, (off_t)a6);
+	case SYS_mmap: /* [EMULATE] — callers must use mman.c::mmap() directly; */
+		/* routing through __p9_syscall truncates 64-bit addresses via long */
+		errno = ENOSYS;
+		return -1;
 
-	case SYS_munmap: /* [EMULATE] */
-		return p9_munmap((void*)a1, (size_t)a2);
+	case SYS_munmap: /* [EMULATE] — same, use munmap() in mman.c directly */
+		errno = ENOSYS;
+		return -1;
 
 	case SYS_mremap: /* [STUB] not emulable portably */
 		return -ENOSYS;
