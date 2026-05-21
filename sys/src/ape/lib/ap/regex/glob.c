@@ -205,7 +205,7 @@ static int expand_tilde(char **pat, char *buf, size_t *pos)
 	char *home = *p ? NULL : getenv("HOME");
 	if (!home) {
 		struct passwd pw, *res;
-		switch (*p ? getpwnam_r((const char) p, &pw, buf, PATH_MAX, &res)
+		switch (*p ? getpwnam_r(p, &pw, buf, PATH_MAX, &res)
 			   : getpwuid_r(getuid(), &pw, buf, PATH_MAX, &res)) {
 		case ENOMEM:
 			return GLOB_NOSPACE;

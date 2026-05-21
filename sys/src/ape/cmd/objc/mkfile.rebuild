@@ -15,8 +15,9 @@ PRELINK=$LIBDIR/_prelink.$O
 OBJCRT=$LIBDIR/objcrt.a
 OBJPAK=$LIBDIR/objpak.a
 OCLIB=$LIBDIR/oclib.a
+OCLIB=$LIBDIR/cakit.a
 
-LIB=objcrt.a$O objpak.a$O oclib.a$O
+LIB=objcrt.a$O objpak.a$O oclib.a$O cakit.a$O
 
 CRT_OBJS=\
 	Object.$O\
@@ -146,6 +147,67 @@ OC_OBJS=\
     util.$O\
     trlunit.$O
 
+CA_OBJS=\
+    ccltn.$O\
+    ccltnsq.$O\
+    ccltnsqr.$O\
+	ccomplex.$O\
+	cfloat.$O\
+	fraction.$O\
+	integer.$O\
+	intmodp.$O\
+	matrix.$O\
+    matsq.$O\
+    matsqsq.$O\
+	monomial.$O\
+    monomc.$O\
+    dmonomc.$O\
+    dmonoms.$O\
+    smonomc.$O\
+	cobject.$O\
+	polynom.$O\
+    polyeseq.$O\
+    polyrseq.$O\
+    polycseq.$O\
+	polc.$O\
+    srspolc.$O\
+    osrspolc.$O\
+    drspolc.$O\
+    odrspolc.$O\
+    odrspols.$O\
+    idrspolc.$O\
+    idrspols.$O\
+    mdrspolc.$O\
+    mdrspols.$O\
+    drdpolc.$O\
+    odrdpolc.$O\
+    odrdpols.$O\
+    idrdpolc.$O\
+    idrdpols.$O\
+    mdrdpolc.$O\
+    mdrdpols.$O\
+    sespolc.$O\
+    osespolc.$O\
+    despolc.$O\
+    odespolc.$O\
+    odespols.$O\
+    idespolc.$O\
+    idespols.$O\
+    mdespolc.$O\
+    mdespols.$O\
+	cseq.$O\
+    cseqc.$O\
+	symbol.$O\
+	term.$O\
+	vector.$O\
+    vectorc.$O\
+    ovectorc.$O\
+    ovectors.$O\
+    mvectorc.$O\
+    mvectors.$O\
+    ivectorc.$O\
+    ivectors.$O
+
 OBJC1OBJS=_objc1.$O\
 	objc1.$O
 
@@ -159,10 +221,22 @@ CC=pcc
 LD=pcc
 CFLAGS= -c -DNDEBUG -D_POSIX_SOURCE -I$OBJCSRC
 
-%.c:	$OBJCSRC/src/objc/%.m
+%.c: $OBJCSRC/src/objc/%.m
 	$OBJC $prereq
 
-%.$O:	%.c
+%.c: $OBJCSRC/src/oclib/%.m
+	$OBJC $prereq
+
+%.c: $OBJCSRC/src/objpak/%.m
+	$OBJC $prereq
+
+%.c: $OBJCSRC/src/objcrt/%.m
+	$OBJC $prereq
+
+%.c: $OBJCSRC/src/cakit/%.m
+	$OBJC $prereq
+
+%.$O: %.c
     $CC $CFLAGS $stem.c
 
 objcrt.a$O: $CRT_OBJS
@@ -177,7 +251,12 @@ oclib.a$O: $OC_OBJS
 	ar vu $target $prereq
 	cp $target $OCLIB
 
-$O.objc1: $OBJC1OBJS $LIB
+cakit.a$O: $CA_OBJS
+	ar vu $target $prereq
+	cp $target $CALIB
+
+
+$O.$Objc1: $OBJC1OBJS $LIB
 	$LD $prereq -o $target
 
 $O.postlink: $PLINKOBJS $LIB

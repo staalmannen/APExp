@@ -16,6 +16,8 @@ _OPTIONAL_LIBS=\
 	bz2\
 	chicken\
 	curses\
+	dwarf\
+	dwarfp\
 	fortran\
 	lua\
 	lz4\

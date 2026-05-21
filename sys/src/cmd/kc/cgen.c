@@ -648,17 +648,17 @@ lcgen(Node *n, Node *nn)
 }
 
 void
-bcgen(Node *n, int cond)
+bcgen(Node *n, int true)
 {
 
 	if(n->type == T)
 		gbranch(OGOTO);
 	else
-		boolgen(n, cond, Z);
+		boolgen(n, true, Z);
 }
 
 void
-boolgen(Node *n, int cond, Node *nn)
+boolgen(Node *n, int true, Node *nn)
 {
 	int o;
 	Prog *p1, *p2;
@@ -677,7 +677,7 @@ boolgen(Node *n, int cond, Node *nn)
 	default:
 		if(n->op == OCONST) {
 			o = vconst(n);
-			if(!cond)
+			if(!true)
 				o = !o;
 			gbranch(OGOTO);
 			if(o) {
@@ -690,7 +690,7 @@ boolgen(Node *n, int cond, Node *nn)
 		regalloc(&nod, n, nn);
 		cgen(n, &nod);
 		o = ONE;
-		if(cond)
+		if(true)
 			o = comrel[relindex(o)];
 		if(typefd[n->type->etype]) {
 			nodreg(&nod1, n, NREG+FREGZERO);
@@ -702,22 +702,22 @@ boolgen(Node *n, int cond, Node *nn)
 
 	case OCOMMA:
 		cgen(l, Z);
-		boolgen(r, cond, nn);
+		boolgen(r, true, nn);
 		break;
 
 	case ONOT:
-		boolgen(l, !cond, nn);
+		boolgen(l, !true, nn);
 		break;
 
 	case OCOND:
 		bcgen(l, 1);
 		p1 = p;
-		bcgen(r->left, cond);
+		bcgen(r->left, true);
 		p2 = p;
 		gbranch(OGOTO);
 		patch(p1, pc);
 		p1 = p;
-		bcgen(r->right, !cond);
+		bcgen(r->right, !true);
 		patch(p2, pc);
 		p2 = p;
 		gbranch(OGOTO);
@@ -726,13 +726,13 @@ boolgen(Node *n, int cond, Node *nn)
 		goto com;
 
 	case OANDAND:
-		if(!cond)
+		if(!true)
 			goto caseor;
 
 	caseand:
-		bcgen(l, cond);
+		bcgen(l, true);
 		p1 = p;
-		bcgen(r, !cond);
+		bcgen(r, !true);
 		p2 = p;
 		patch(p1, pc);
 		gbranch(OGOTO);
@@ -740,13 +740,13 @@ boolgen(Node *n, int cond, Node *nn)
 		goto com;
 
 	case OOROR:
-		if(!cond)
+		if(!true)
 			goto caseand;
 
 	caseor:
-		bcgen(l, !cond);
+		bcgen(l, !true);
 		p1 = p;
-		bcgen(r, !cond);
+		bcgen(r, !true);
 		p2 = p;
 		gbranch(OGOTO);
 		patch(p1, pc);
@@ -764,7 +764,7 @@ boolgen(Node *n, int cond, Node *nn)
 	case OLO:
 	case OLS:
 		o = n->op;
-		if(cond)
+		if(true)
 			o = comrel[relindex(o)];
 		if(l->complex >= FNX && r->complex >= FNX) {
 			regret(&nod, r);
@@ -774,7 +774,7 @@ boolgen(Node *n, int cond, Node *nn)
 			regfree(&nod);
 			nod = *n;
 			nod.right = &nod1;
-			boolgen(&nod, cond, nn);
+			boolgen(&nod, true, nn);
 			break;
 		}
 		if(sconst(r)) {

@@ -77,7 +77,6 @@ Init	initetconv[] =
 {
 	TCHAR,		1,	0,
 	TUCHAR,		2,	0,
-	TBOOL,		2,	0,
 	TSHORT,		3,	0,
 	TUSHORT,	4,	0,
 	TLONG,		5,	0,
@@ -356,7 +355,6 @@ com64(Node *n)
 				a = nodsc2v;
 				goto setfnxl;
 			case TUCHAR:
-			case TBOOL:
 				a = noduc2v;
 				goto setfnxl;
 			case TSHORT:
@@ -473,7 +471,6 @@ com64(Node *n)
 				a = nodv2sc;
 				goto setfnx;
 			case TUCHAR:
-			case TBOOL:
 				a = nodv2uc;
 				goto setfnx;
 			case TIND:	// small pun here
@@ -646,10 +643,6 @@ vlong
 convvtox(vlong c, int et)
 {
 	int n;
-
-	/* C99: _Bool stores 0 or 1 only — normalize rather than truncate */
-	if(et == TBOOL)
-		return c != 0;
 
 	n = 8 * ewidth[et];
 	c &= MASK(n);

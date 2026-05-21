@@ -46,20 +46,20 @@ OFILES=\
 	syntax.$O\
 	xmalloc.$O
 
-OBJTERMCAP= termcap.$O tparam.$O
+OBJTERMCAP= tc-termcap.$O tc-tparam.$O
 
-OBJTILDE= tilde.$O
+OBJTILDE= ti-tilde.$O
 
 OBJGLOB= glob.$O strmatch.$O smatch.$O xmbsrtowcs.$O gmisc.$O
 
-OBJBUILTINS=builtins.$O \
-	alias.$O bind.$O break.$O builtin.$O caller.$O cd.$O colon.$O command.$O \
-	common.$O declare.$O echo.$O enable.$O eval.$O evalfile.$O \
-	evalstring.$O exec.$O exit.$O fc.$O fg_bg.$O hash.$O help.$O history.$O \
-	jobs.$O kill.$O let.$O mapfile.$O \
-	pushd.$O read.$O return.$O set.$O setattr.$O shift.$O source.$O \
-	suspend.$O test.$O times.$O trap.$O type.$O ulimit.$O umask.$O \
-	wait.$O getopts.$O shopt.$O printf.$O getopt.$O bashgetopt.$O complete.$O
+OBJBUILTINS=bi-builtins.$O \
+	bi-alias.$O bi-bind.$O bi-break.$O bi-builtin.$O bi-caller.$O bi-cd.$O bi-colon.$O bi-command.$O \
+	bi-common.$O bi-declare.$O bi-echo.$O bi-enable.$O bi-eval.$O bi-evalfile.$O \
+	bi-evalstring.$O bi-exec.$O bi-exit.$O bi-fc.$O bi-fg_bg.$O bi-hash.$O bi-help.$O bi-history.$O \
+	bi-jobs.$O bi-kill.$O bi-let.$O bi-mapfile.$O \
+	bi-pushd.$O bi-read.$O bi-return.$O bi-set.$O bi-setattr.$O bi-shift.$O bi-source.$O \
+	bi-suspend.$O bi-test.$O bi-times.$O bi-trap.$O bi-type.$O bi-ulimit.$O bi-umask.$O \
+	bi-wait.$O bi-getopts.$O bi-shopt.$O bi-printf.$O bi-getopt.$O bi-bashgetopt.$O bi-complete.$O
 
 OBJSH= clktck.$O clock.$O getenv.$O oslib.$O setlinebuf.$O strnlen.$O \
 	itos.$O zread.$O zwrite.$O shtty.$O shmatch.$O eaccess.$O \
@@ -113,16 +113,19 @@ BASHSRC=$APEXPROOT/sys/src/external/bash
 
 MKBUILTINS=$BASHSRC/builtins/mkbuiltins
 
+DEFFILES=alias.def bind.def break.def builtin.def caller.def cd.def colon.def command.def declare.def echo.def enable.def eval.def getopts.def exec.def exit.def fc.def fg_bg.def hash.def help.def history.def jobs.def kill.def let.def read.def return.def set.def setattr.def shift.def source.def suspend.def test.def times.def trap.def type.def ulimit.def umask.def wait.def reserved.def pushd.def shopt.def printf.def complete.def mapfile.def
+
 $MKBUILTINS: $BASHSRC/builtins/mkbuiltins.c
 	cc -I$BASHSRC -I$BASHSRC/include -o $MKBUILTINS $prereq
 
 # Generate builtins.c and builtext.h
-builtins.c builtext.h: $MKBUILTINS
+$BASHSRC/builtins/builtins.c $BASHSRC/builtins/builtext.h: $MKBUILTINS
 	@echo "Generating builtins.c and builtext.h..."
-	@(cd $BASHSRC/builtins && ./mkbuiltins -externfile ../../src/builtext.h -structfile ../../src/builtins.c -noproduction -D . alias.def bind.def break.def builtin.def caller.def cd.def colon.def command.def declare.def echo.def enable.def eval.def getopts.def exec.def exit.def fc.def fg_bg.def hash.def help.def history.def jobs.def kill.def let.def read.def return.def set.def setattr.def shift.def source.def suspend.def test.def times.def trap.def type.def ulimit.def umask.def wait.def reserved.def pushd.def shopt.def printf.def complete.def mapfile.def)
+	@(cd $BASHSRC/builtins && ./mkbuiltins -externfile builtext.h -structfile builtins.c -noproduction -D . $DEFFILES)
+	for (i in $DEFFILES)
+		@(cd $BASHSRC/builtins && ./mkbuiltins -D . $stem.def)
 
-$BASHSRC/builtins/%.c: $MKBUILTINS builtins.c $BASHSRC/builtins/$.def
-	@(cd $BASHSRC/builtins && ./mkbuiltins -D . $stem.def)
+$OBJBUILTINS: $BASHSRC/builtins/builtins.c
 
 %.$O: %.c
 			$CC $CFLAGS $stem.c
@@ -130,14 +133,14 @@ $BASHSRC/builtins/%.c: $MKBUILTINS builtins.c $BASHSRC/builtins/$.def
 %.$O: $BASHSRC/%.c
 			$CC $CFLAGS $BASHSRC/$stem.c
 
-%.$O: $BASHSRC/builtins/%.c
-			$CC $CFLAGS -I$BASHSRC/builtins $BASHSRC/builtins/$stem.c
+bi-%.$O: $BASHSRC/builtins/%.c
+			$CC $CFLAGS -I$BASHSRC/builtins $BASHSRC/builtins/$stem.c -o $target
 
-%.$O: $BASHSRC/lib/termcap/%.c
+tc-%.$O: $BASHSRC/lib/termcap/%.c
 			$CC $CFLAGS -I$BASHSRC/lib/termcap $BASHSRC/lib/termcap/$stem.c
 
-%.$O: $BASHSRC/lib/tilde/%.c
-			$CC $CFLAGS -I$BASHSRC/lib/tilde $BASHSRC/lib/tilde/$stem.c
+ti-%.$O: $BASHSRC/lib/tilde/%.c
+			$CC $CFLAGS -I$BASHSRC/lib/tilde $BASHSRC/lib/tilde/$stem.c -o $target
 
 %.$O: $BASHSRC/lib/sh/%.c
 			$CC $CFLAGS -I$BASHSRC/lib/sh $BASHSRC/lib/sh/$stem.c

@@ -3,6 +3,8 @@ APE=../../ape
 APEXPROOT=../../../..
 
 _CORE_APPS=\
+# recompile compilers with libdwarfp
+	compiler\
 # shell\
 	dash\
 	bash\
@@ -20,7 +22,7 @@ _CORE_APPS=\
 	libtool\
 	pkgconf\
 # core utilities \
-	base\
+#	base\
 	grep\
 #	core\
 

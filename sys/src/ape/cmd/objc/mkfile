@@ -1,8 +1,7 @@
 </$objtype/mkfile
 
 BUILD=bootstrap
-
-if (test -e /$objtype/ape/bin/objc1)
+if (whatis objc1 > /dev/null >[2=1])
 	BUILD=rebuild
 
 install:V:

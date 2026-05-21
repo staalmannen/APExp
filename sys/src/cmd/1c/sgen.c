@@ -581,7 +581,7 @@ xcom(Node *n)
 			n->right->type = types[TLONG];
 			n->type = types[TLONG];
 		}
-		if(n->type->etype == TUCHAR || n->type->etype == TBOOL || n->type->etype == TUSHORT) {
+		if(n->type->etype == TUCHAR || n->type->etype == TUSHORT) {
 			n->right = new1(OCAST, n->right, Z);
 			n->right->type = types[TULONG];
 			n->type = types[TULONG];

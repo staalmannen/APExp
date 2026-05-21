@@ -1002,7 +1002,6 @@ tcoma(Node *l, Node *n, Type *t, int f)
 			break;
 
 		case TUCHAR:
-		case TBOOL:
 		case TUSHORT:
 			t = types[TUINT];
 			break;
@@ -1016,7 +1015,6 @@ tcoma(Node *l, Node *n, Type *t, int f)
 		break;
 
 	case TUCHAR:
-	case TBOOL:
 	case TUSHORT:
 		t = types[TUINT];
 		break;
@@ -1286,39 +1284,6 @@ loop:
 			n->left = Z;
 			n->type = T;
 			break;
-		}
-		/*
-		 * C99 _Bool normalization: (bool)expr must produce 0 or 1,
-		 * not just a 1-byte truncation.  Rewrite as (bool)(expr != 0).
-		 * Skip if source is already _Bool (already 0 or 1).
-		 */
-		if(n->type == types[TBOOL]
-		&& n->left != Z && n->left->type != T
-		&& n->left->type->etype != TBOOL) {
-			if(l->op == OCONST) {
-				/* fold constant at compile time */
-				vlong cv;
-				if(typefd[l->type->etype])
-					cv = l->fconst != 0.0;
-				else
-					cv = l->vconst != 0;
-				n->op = OCONST;
-				n->left = Z;
-				n->vconst = cv;
-				/* type stays types[TBOOL] */
-				break;
-			}
-			/* runtime: rewrite source as (expr != 0) → yields TINT 0 or 1 */
-			{
-				Node *zero;
-				zero = new1(OCONST, Z, Z);
-				zero->type = n->left->type;
-				zero->vconst = 0;
-				zero->fconst = 0.0;
-				n->left = new1(ONE, n->left, zero);
-				n->left->type = types[TINT];
-				l = n->left;
-			}
 		}
 		if(l->op == OCONST) {
 			evconst(n);

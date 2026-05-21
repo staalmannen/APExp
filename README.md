@@ -103,7 +103,7 @@ Install paths have been modified so that libraries and binaries are installed in
 
 ***Utilities***
 
-- The original APE pdksh shell replaced by GNU bash (version 5.3)
+- The original APE pdksh shell replaced by GNU bash (version 5.3) and Dash (version 0.5.13)
 - APE make has been replaced by a port of GNU make (version 4.4.1)
 - APE sed has been replaced by a port of GNU sed (version 4.9)
 - APE grep has been replaced with GNU grep (version 3.12)
@@ -117,6 +117,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - the utilities like "cut", "ls", "true", "tsort", "xargs" and "yes" *et al.* have been built from suckless sbase [15]
 - steve's mkmk (/n/sources/contrib) imported to APExp
 - copied "which", and "printenv" rc scripts from steve (/n/sources/contrib)
+- a custom debug (adeb) utility based on libdwarf and plan9 /proc
 - samurai (version 1.9) for the ninja build system
 - pkgconf (version 2.5.1) for pkg-config
 - slibtool (version 0.7.4) for libtool
