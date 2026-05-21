@@ -34,7 +34,7 @@ readprocfdinit(void)
 	/* construct info from /proc/$pid/fd */
 	char buf[8192];
 	Fdinfo *fi;
-	int fd, pfd, n, tot, m;
+	int fd, pfd, n, tot, m = 0;
 	char *s, *nexts;
 
 	memset(buf, 0, sizeof buf);
@@ -60,7 +60,6 @@ readprocfdinit(void)
 	if(s == 0)
 		return -1;
 	s++;
-	m = 0;
 	for(; s && *s; s=nexts){
 		nexts = strchr(s, '\n');
 		if(nexts)
@@ -75,6 +74,7 @@ readprocfdinit(void)
 		fi->flags = FD_ISOPEN;
 		while(*s == ' ' || *s == '\t')
 			s++;
+		m = 0;
 		if(*s == 'r'){
 			m |= 1;
 			s++;
@@ -141,6 +141,16 @@ _fdinit(char *s, char *se)
 		sfdinit(usedproc, s, se);
 	if(!s && !usedproc)
 		defaultfdinit();
+
+	/* Safety: ensure stdin/stdout/stderr always have FD_ISOPEN set */
+	for(i = 0; i <= 2; i++) {
+		if(!(_fdinfo[i].flags & FD_ISOPEN)) {
+			_fdinfo[i].flags = FD_ISOPEN;
+			_fdinfo[i].oflags = (i == 0) ? O_RDONLY : O_WRONLY;
+			if(_isatty(i))
+				_fdinfo[i].flags |= FD_ISTTY;
+		}
+	}
 
 	for(i = 0; i < OPEN_MAX; i++) {
 		fi = &_fdinfo[i];
