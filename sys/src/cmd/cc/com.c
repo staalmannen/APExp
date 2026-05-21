@@ -718,13 +718,8 @@ tcomo(Node *n, int f)
 		n->op = OCONST;
 		n->left = Z;
 		n->right = Z;
-		{
-			/* sizeof must return size_t: unsigned 64-bit on LLP64/LP64
-			 * targets (pointer > long), unsigned 32-bit on ILP32 targets */
-			int sztype = ewidth[TIND] > ewidth[TLONG] ? TUVLONG : TULONG;
-			n->vconst = convvtox(n->type->width, sztype);
-			n->type = types[sztype];
-		}
+		n->vconst = convvtox(n->type->width, TINT);
+		n->type = types[TINT];
 		break;
 
 	case OTYPEOF:
