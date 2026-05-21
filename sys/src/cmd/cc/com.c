@@ -718,8 +718,13 @@ tcomo(Node *n, int f)
 		n->op = OCONST;
 		n->left = Z;
 		n->right = Z;
-		n->vconst = convvtox(n->type->width, TINT);
-		n->type = types[TINT];
+		/* Plan9: long is always 32-bit, even on amd64.  sizeof must return
+		 * TULONG (unsigned long, 32-bit) so it matches the ABI width of
+		 * every long/int parameter without corrupting the call stack.
+		 * Assignments to size_t (uvlong, 64-bit) zero-extend automatically
+		 * at the call site when the prototype is visible. */
+		n->vconst = convvtox(n->type->width, TULONG);
+		n->type = types[TULONG];
 		break;
 
 	case OTYPEOF:

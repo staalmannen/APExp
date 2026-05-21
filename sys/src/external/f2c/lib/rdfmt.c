@@ -214,8 +214,8 @@ rd_L(ftnint *n, int w, ftnlen len)
 		return errno = 116;
 		}
 	switch(len) {
-		case sizeof(char):	*(char *)n = (char)lv;	 break;
-		case sizeof(short):	*(short *)n = (short)lv; break;
+		case 1:	*(char *)n = (char)lv;	 break;	/* sizeof(char)=1 */
+		case 2:	*(short *)n = (short)lv; break;	/* sizeof(short)=2 */
 		default:		*n = lv;
 		}
 	while(w-- > 0) {
