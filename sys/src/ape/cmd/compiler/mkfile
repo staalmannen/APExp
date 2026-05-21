@@ -1,4 +1,4 @@
-APEXPROOT=../../../..
+APEXPROOT=../../../../..
 
 ARCHES=\
 	1c\
@@ -13,6 +13,8 @@ ARCHES=\
 	vc\
 
 install:V:
+	# cc.a$O (cc front-end archive) must exist before arch compilers link
+	cd $APEXPROOT/sys/src/cmd/cc && mk install
 	for(i in $ARCHES) @{
 		cd $i
 		echo ----$i----
