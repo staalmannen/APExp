@@ -69,20 +69,21 @@ extern struct _IO_FILE *volatile __stderr_used;
  */
 
 static inline int __lockfile(struct _IO_FILE *f) {
-	pthread_mutex_t *lock;
-	if (f->lock < 0) return 0;
-	lock = (pthread_mutex_t *)(intptr_t)f->lock;
-	if (!lock) return 0;
-	if (pthread_mutex_lock(lock) != 0)
-		return 0;
-	return 1;
+	/*
+	 * f->lock == -1 means single-threaded / no locking (stdout/stderr/stdin).
+	 * f->lock == 0 means not yet initialised.
+	 * f->lock > 0 would be a mutex pointer, but Plan9 APE stdio does not
+	 * set up pthread mutexes for the standard streams, so we never reach
+	 * that branch in practice.  Keeping this as a no-op avoids a potential
+	 * crash from using an uninitialised or sign-confused lock value as a
+	 * pointer.
+	 */
+	(void)f;
+	return 0;
 }
 
 static inline void __unlockfile(struct _IO_FILE *f) {
-	pthread_mutex_t *lock;
-	if (f->lock < 0) return;
-	lock = (pthread_mutex_t *)(intptr_t)f->lock;
-	if (lock) pthread_mutex_unlock(lock);
+	(void)f;
 }
 
 #define _FLOCK(f) int __need_unlock = __lockfile(f)
