@@ -1,0 +1,4 @@
+#!/bin/rc
+# pcc — APExp wrapper: delegates to cc (sys/src/ape/9src/cc.c) which
+# supports -g, -E, -S and the full APE include/link path setup.
+exec /$objtype/bin/ape/cc $*
