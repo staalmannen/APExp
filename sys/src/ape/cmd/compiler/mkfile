@@ -12,15 +12,15 @@ ARCHES=\
 	qc\
 	vc\
 
-install: cc.a$O
+install: cc/cc.a$O
 	for(i in $ARCHES) @{
 		cd $i
 		echo ----$i----
 		mk install
 	}
 
-cc.a$O:V:
-	mk -f mkfile.cc
+cc/cc.a$O:V:
+	cd cc && mk
 
 clean:V:
 	for(i in $ARCHES) @{

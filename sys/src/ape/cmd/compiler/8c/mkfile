@@ -20,6 +20,5 @@ OFILES=\
 
 <../mkcompiler
 
-%.$O: $APEXPROOT/sys/src/cmd/8c/%.c
-	$CC $CFLAGS $prereq
+
 

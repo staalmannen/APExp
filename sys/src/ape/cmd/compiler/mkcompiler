@@ -25,7 +25,7 @@ TARG=${T}c
 BIN=$APEXPROOT/$objtype/bin
 
 # cc/ front-end object library (built by native sys/src/cmd/cc build)
-CCLIB=../cc.a$O
+CCLIB=../cc/cc.a$O
 
 # Full object list: arch objects + dwarftype
 ALLOFILES=$OFILES dwarftype.$O

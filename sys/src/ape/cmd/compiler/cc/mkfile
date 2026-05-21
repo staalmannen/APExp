@@ -1,6 +1,6 @@
 </$objtype/mkfile
 
-APEXPROOT=../../../../..
+APEXPROOT=../../../../../..
 CCSRC=$APEXPROOT/sys/src/cmd/cc
 
 LIB=cc.a$O
