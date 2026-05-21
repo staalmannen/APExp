@@ -12,8 +12,12 @@
 # so that within the APExp overlay (apexp-sh union mount) they shadow
 # the system compiler and emit DWARF type info via libdwarfp.
 
-CCSRC=$APEXPROOT/sys/src/cmd/cc
-ARCSRC=$APEXPROOT/sys/src/cmd/${T}c
+#relative directories one deeper because we cd into a subdir
+
+APEXPROOT=../../../../../..
+CMDSRC=../../../../cmd
+CCSRC=$CMDSRC/cc
+ARCSRC=$CMDSRC/${T}c
 DWSRC=$APEXPROOT/sys/src/external/libdwarf
 LIBDWARFP=$APEXPROOT/$objtype/lib/ape/libdwarfp.a
 

@@ -87,7 +87,7 @@ static char *config_file_defaults[] = {
 #define STR2(s) # s
 #define STR(s)  STR2(s)
     STR(CONFPREFIX) "/dwarfdump.conf",
-    "/usr/share/dwarfdump/dwarfdump.conf",
+    "/sys/lib/ape/dwarfdump.conf",
     0
 };
 static const char *config_file_abi = 0;

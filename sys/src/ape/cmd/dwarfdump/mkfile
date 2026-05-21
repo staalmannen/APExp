@@ -67,11 +67,14 @@ OFILES=\
 CC=pcc
 LD=pcc
 CFLAGS= -c -I$DWSRC -I$DWSRC/src/bin/dwarfdump\
-	-I$DWSRC/src/lib/libdwarf -DHAVE_CONFIG_H
+	-I$DWSRC/src/lib/libdwarf -DHAVE_CONFIG_H\
+	-DCONFPREFIX="/sys/lib/ape"
 
 %.$O: $DWSRC//src/bin/dwarfdump/%.c
     $CC $CFLAGS $DWSRC//src/bin/dwarfdump/$stem.c
 
+# install:V:
+#	cp $DWSRC/src/bin/dwarfdump/dwarfdump.conf $APEXPROOT/sys/lib/ape/
 
 
 

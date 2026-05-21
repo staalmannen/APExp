@@ -46,7 +46,7 @@ TARG= \
 #		ln\
 #		logger\
 		logname\
-#		ls\
+		ls\
 		md5sum\
 		mkdir\
 		mkfifo\
