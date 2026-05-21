@@ -1,4 +1,5 @@
 #include "gc.h"
+#include "dwtypes.h"
 
 void
 codgen(Node *n, Node *nn)
@@ -112,6 +113,7 @@ codgen(Node *n, Node *nn)
 	if(thechar=='6' || thechar=='7' || thechar=='9' || hasdoubled)	/* [sic] */
 		maxargsafe = round(maxargsafe, 8);
 	sp->to.offset += maxargsafe;
+	dwtypes_emit_func(n1->sym);
 }
 
 void
