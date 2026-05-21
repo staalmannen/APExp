@@ -168,7 +168,7 @@ main(int argc, char *argv[])
 				suf++;
 				if(strcmp(suf, "c") == 0) {
 					append(&srcs, s);
-					append(&objs, changeext(s, "o"));
+					append(&objs, changeext(s, objext));
 				} else if(strcmp(suf, "o") == 0 ||
 					  strcmp(suf, ot->o) == 0 ||
 					  strcmp(suf, "a") == 0 ||
