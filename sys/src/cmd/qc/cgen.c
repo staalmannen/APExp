@@ -686,17 +686,17 @@ lcgen(Node *n, Node *nn)
 }
 
 void
-bcgen(Node *n, int true)
+bcgen(Node *n, int cond)
 {
 
 	if(n->type == T)
 		gbranch(OGOTO);
 	else
-		boolgen(n, true, Z);
+		boolgen(n, cond, Z);
 }
 
 void
-boolgen(Node *n, int true, Node *nn)
+boolgen(Node *n, int cond, Node *nn)
 {
 	int o, uns;
 	Prog *p1, *p2;
@@ -716,7 +716,7 @@ boolgen(Node *n, int true, Node *nn)
 	default:
 		if(n->op == OCONST) {
 			o = vconst(n);
-			if(!true)
+			if(!cond)
 				o = !o;
 			gbranch(OGOTO);
 			if(o) {
@@ -727,13 +727,13 @@ boolgen(Node *n, int true, Node *nn)
 			goto com;
 		}
 		if(typev[n->type->etype]) {
-			testv(n, true);
+			testv(n, cond);
 			goto com;
 		}
 		regalloc(&nod, n, nn);
 		cgen(n, &nod);
 		o = ONE;
-		if(true)
+		if(cond)
 			o = comrel[relindex(o)];
 		if(typefd[n->type->etype]) {
 			nodreg(&nod1, n, NREG+FREGZERO);
@@ -745,22 +745,22 @@ boolgen(Node *n, int true, Node *nn)
 
 	case OCOMMA:
 		cgen(l, Z);
-		boolgen(r, true, nn);
+		boolgen(r, cond, nn);
 		break;
 
 	case ONOT:
-		boolgen(l, !true, nn);
+		boolgen(l, !cond, nn);
 		break;
 
 	case OCOND:
 		bcgen(l, 1);
 		p1 = p;
-		bcgen(r->left, true);
+		bcgen(r->left, cond);
 		p2 = p;
 		gbranch(OGOTO);
 		patch(p1, pc);
 		p1 = p;
-		bcgen(r->right, !true);
+		bcgen(r->right, !cond);
 		patch(p2, pc);
 		p2 = p;
 		gbranch(OGOTO);
@@ -769,13 +769,13 @@ boolgen(Node *n, int true, Node *nn)
 		goto com;
 
 	case OANDAND:
-		if(!true)
+		if(!cond)
 			goto caseor;
 
 	caseand:
-		bcgen(l, true);
+		bcgen(l, cond);
 		p1 = p;
-		bcgen(r, !true);
+		bcgen(r, !cond);
 		p2 = p;
 		patch(p1, pc);
 		gbranch(OGOTO);
@@ -783,13 +783,13 @@ boolgen(Node *n, int true, Node *nn)
 		goto com;
 
 	case OOROR:
-		if(!true)
+		if(!cond)
 			goto caseand;
 
 	caseor:
-		bcgen(l, !true);
+		bcgen(l, !cond);
 		p1 = p;
-		bcgen(r, !true);
+		bcgen(r, !cond);
 		p2 = p;
 		gbranch(OGOTO);
 		patch(p1, pc);
@@ -809,11 +809,11 @@ boolgen(Node *n, int true, Node *nn)
 	case OGE:
 	case OGT:
 		if(typev[l->type->etype]){
-			cmpv(n, true, Z);
+			cmpv(n, cond, Z);
 			goto com;
 		}
 		o = n->op;
-		if(true)
+		if(cond)
 			o = comrel[relindex(o)];
 		if(l->complex >= FNX && r->complex >= FNX) {
 			regret(&nod, r);
@@ -823,7 +823,7 @@ boolgen(Node *n, int true, Node *nn)
 			regfree(&nod);
 			nod = *n;
 			nod.right = &nod1;
-			boolgen(&nod, true, nn);
+			boolgen(&nod, cond, nn);
 			break;
 		}
 		if(!uns && sconst(r) || (uns || o == OEQ || o == ONE) && uconst(r)) {
@@ -1281,7 +1281,7 @@ brcondv(Node *l, Node *r, int chi, int clo)
 }
 
 static void
-testv(Node *n, int true)
+testv(Node *n, int cond)
 {
 	Node nod;
 
@@ -1292,7 +1292,7 @@ testv(Node *n, int true)
 	*nod.right = *nodconst(0);
 	nod.right->type = n->type;
 	nod.type = types[TLONG];
-	cmpv(&nod, true, Z);
+	cmpv(&nod, cond, Z);
 }
 
 /*
@@ -1300,7 +1300,7 @@ testv(Node *n, int true)
  * which saves loading the latter if the high order comparison suffices
  */
 static void
-cmpv(Node *n, int true, Node *nn)
+cmpv(Node *n, int cond, Node *nn)
 {
 	Node *l, *r, nod, nod1;
 	int o, f1, f2;
@@ -1320,7 +1320,7 @@ cmpv(Node *n, int true, Node *nn)
 		cgen(r, &nod1);
 		nod = *n;
 		nod.right = &nod1;
-		cmpv(&nod, true, nn);
+		cmpv(&nod, cond, nn);
 		cursafe = curs;
 		return;
 	}
@@ -1334,7 +1334,7 @@ cmpv(Node *n, int true, Node *nn)
 	nod.type = types[TLONG];
 	nod1.type = types[TLONG];
 	o = n->op;
-	if(true)
+	if(cond)
 		o = comrel[relindex(o)];
 	switch(o){
 	case OEQ:

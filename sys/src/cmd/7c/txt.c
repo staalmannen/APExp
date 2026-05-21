@@ -1003,7 +1003,7 @@ zcmp(Prog *p, int as)
 void
 gopcode(int o, Node *f1, Node *f2, Node *t)
 {
-	int a, et, true;
+	int a, et, cond;
 	Adr ta;
 
 	et = TLONG;
@@ -1016,7 +1016,7 @@ gopcode(int o, Node *f1, Node *f2, Node *t)
 				et = f2->type->etype;
 		}
 	}
-	true = o & BTRUE;
+	cond = o & BTRUE;
 	o &= ~BTRUE;
 	a = AGOK;
 	switch(o) {
@@ -1214,24 +1214,24 @@ gopcode(int o, Node *f1, Node *f2, Node *t)
 				goto done;
 			a = ABLT;
 			/* ensure NaN comparison is always false */
-			if(typefd[et] && !true)
+			if(typefd[et] && !cond)
 				a = ABMI;
 			break;
 		case OLE:
 			a = ABLE;
-			if(typefd[et] && !true)
+			if(typefd[et] && !cond)
 				a = ABLS;
 			break;
 		case OGE:
 			if(zcmp(p, ATBZ))
 				goto done;
 			a = ABGE;
-			if(typefd[et] && true)
+			if(typefd[et] && cond)
 				a = ABPL;
 			break;
 		case OGT:
 			a = ABGT;
-			if(typefd[et] && true)
+			if(typefd[et] && cond)
 				a = ABHI;
 			break;
 		case OLO:
