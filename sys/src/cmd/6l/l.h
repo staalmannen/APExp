@@ -369,7 +369,6 @@ Prog*	brchain(Prog*);
 Prog*	brloop(Prog*);
 void	buildop(void);
 void	cflush(void);
-vlong	cpos(void);
 void	ckoff(Sym*, long);
 Prog*	copyp(Prog*);
 double	cputime(void);

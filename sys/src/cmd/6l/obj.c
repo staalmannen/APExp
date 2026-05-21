@@ -1,6 +1,5 @@
 #define	EXTERN
 #include	"l.h"
-#include	"../ld/dwarf.h"
 #include	<ar.h>
 
 #ifndef	DEFAULT
@@ -854,7 +853,6 @@ loop:
 				histgen++;
 				s->type = SFILE;
 				s->value = histgen;
-				dwarfaddfrag(histgen, s->name+1);
 			}
 			if(histfrogp < MAXHIST) {
 				histfrog[histfrogp] = s;

@@ -1226,21 +1226,11 @@ writeinfo(void)
 }
 
 void
-dwarfemitdebugsections(DwarfSects *out)
+dwarfemitdebugsections(void)
 {
 	writeabbrev();
 	writelines();
 	writeframes();
 	writeinfo();
-	if(out != nil) {
-		out->abbrev_off = abbrevo;
-		out->abbrev_sz  = abbrevsize;
-		out->line_off   = lineo;
-		out->line_sz    = linesize;
-		out->frame_off  = frameo;
-		out->frame_sz   = framesize;
-		out->info_off   = infoo;
-		out->info_sz    = infosize;
-	}
 }
 

@@ -306,7 +306,6 @@ enum
 	TXXX,
 	TCHAR,
 	TUCHAR,
-	TBOOL,
 	TSHORT,
 	TUSHORT,
 	TINT,
@@ -378,7 +377,6 @@ enum
 {
 	BCHAR		= 1L<<TCHAR,
 	BUCHAR		= 1L<<TUCHAR,
-	BBOOL		= 1L<<TBOOL,
 	BSHORT		= 1L<<TSHORT,
 	BUSHORT		= 1L<<TUSHORT,
 	BINT		= 1L<<TINT,
@@ -407,9 +405,9 @@ enum
 	BTYPEDEF	= 1L<<TTYPEDEF,
 	BTYPESTR	= 1L<<TTYPESTR,
 	BREGISTER	= 1L<<TREGISTER,
-	BNORET		= 0,		/* TNORET=32 overflows 32-bit long; _Noreturn silently dropped in APE mode */
+	BNORET		= 1L<<TNORET,
 
-	BINTEGER	= BCHAR|BUCHAR|BBOOL|BSHORT|BUSHORT|BINT|BUINT|
+	BINTEGER	= BCHAR|BUCHAR|BSHORT|BUSHORT|BINT|BUINT|
 				BLONG|BULONG|BVLONG|BUVLONG,
 	BNUMBER		= BINTEGER|BFLOAT|BDOUBLE,
 
@@ -486,8 +484,6 @@ EXTERN	Node*	initlist;
 EXTERN	Term	term[NTERM];
 EXTERN	int	nterm;
 EXTERN	int	packflg;
-EXTERN	int	packstack[32];	/* #pragma pack push/pop stack */
-EXTERN	int	packdepth;	/* current pack stack depth */
 EXTERN	int	alignasval;	/* pending _Alignas() requirement; 0 = none */
 EXTERN	int	fproundflg;
 EXTERN	int	profileflg;

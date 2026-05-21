@@ -539,7 +539,6 @@ init1(Sym *s, Type *t, long o, int exflag)
 
 	case TCHAR:
 	case TUCHAR:
-	case TBOOL:
 	case TINT:
 	case TUINT:
 	case TSHORT:
@@ -1261,10 +1260,9 @@ rsametype(Type *t1, Type *t2, int n, int f)
 		et = t1->etype;
 		if(et != t2->etype)
 			return 0;
+		if((t1->garb & GNORET) != (t2->garb & GNORET))
+			return 0;
 		if(et == TFUNC) {
-			/* _Noreturn is part of a function type's identity */
-			if((t1->garb & GNORET) != (t2->garb & GNORET))
-				return 0;
 			if(!rsametype(t1->link, t2->link, n, 0))
 				return 0;
 			t1 = t1->down;
@@ -1514,7 +1512,6 @@ paramconv(Type *t, int f)
 		break;
 
 	case TUCHAR:
-	case TBOOL:
 	case TUSHORT:
 		if(!f)
 			t = types[TUINT];

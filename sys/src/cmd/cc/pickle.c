@@ -62,7 +62,6 @@ Init	picklecinit[] =
 {
 	TCHAR,		'C',	0,
 	TUCHAR,		'b',	0,
-	TBOOL,		'b',	0,
 	TSHORT,		'd',	0,
 	TUSHORT,		'u',	0,
 	TLONG,		'D',	0,
@@ -126,7 +125,6 @@ picklemember(Type *t, long off)
 	case TUINT:
 	case TCHAR:
 	case TUCHAR:
-	case TBOOL:
 	case TSHORT:
 	case TUSHORT:
 	case TLONG:

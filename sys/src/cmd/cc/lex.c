@@ -1552,14 +1552,14 @@ struct
 	 * _Bool: C99 boolean.  Map to LCHAR (unsigned char width).
 	 * Values are 0 or 1; the width and integer promotion match.
 	 */
-	"_Bool",		LCHAR,		TBOOL,
+	"_Bool",		LCHAR,		TUCHAR,
 
 	/*
 	 * C23 bool, true, and false.
 	 * bool is mapped to LCHAR (unsigned char width) like _Bool.
 	 * true and false are mapped to LCONST 1 and 0.
 	 */
-	"bool",			LCHAR,		TBOOL,
+	"bool",			LCHAR,		TUCHAR,
 	"true",			LCONST,		1,
 	"false",		LCONST,		0,
 
@@ -1624,14 +1624,6 @@ struct
 	"alignas",		LALIGNAS,	0,
 
 	/*
-	 * C23 constexpr: compile-time constant object.
-	 * `constexpr int x = 5;` is equivalent to `static const int x = 5;`
-	 * at file scope.  Map to LCONSTNT (const qualifier) — close enough
-	 * for kencc, which does not enforce constant-expression initializers.
-	 */
-	"constexpr",		LCONSTNT,	0,
-
-	/*
 	 * GNU visibility / linkage hints.
 	 * These appear as function/variable attributes.  When used as
 	 * plain identifiers (not inside __attribute__) they are harmless
@@ -1673,7 +1665,6 @@ cinit(void)
 	types[TXXX] = T;
 	types[TCHAR] = typ(TCHAR, T);
 	types[TUCHAR] = typ(TUCHAR, T);
-	types[TBOOL] = typ(TBOOL, T);
 	types[TSHORT] = typ(TSHORT, T);
 	types[TUSHORT] = typ(TUSHORT, T);
 	types[TINT] = typ(TINT, T);
@@ -1847,14 +1838,8 @@ Tconv(Fmt *fp)
 
 	t = va_arg(fp->args, Type*);
 	while(t != T) {
-		{
-			/* GNORET is only meaningful on TFUNC nodes */
-			int garb = t->garb & ~GINCOMPLETE;
-			if(t->etype != TFUNC)
-				garb &= ~GNORET;
-			if(garb)
-				fmtprint(fp, "%s ", gnames[garb]);
-		}
+		if(t->garb&~GINCOMPLETE)
+			fmtprint(fp, "%s ", gnames[t->garb&~GINCOMPLETE]);
 		et = t->etype;
 		fmtprint(fp, "%s", tnames[et]);
 		if(et == TFUNC && (t1 = t->down) != T) {

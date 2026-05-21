@@ -395,8 +395,7 @@ regopt(Prog *p)
 			}
 			if(r1 == R) {
 				nearln = p->lineno;
-				diag(Z, "ref not found (val=%ld initpc=%ld npc=%ld offset=%lld)\n%P",
-					val, initpc, npc, p->to.offset, p);
+				diag(Z, "ref not found\n%P", p);
 				continue;
 			}
 			if(r1 == r) {
@@ -627,12 +626,8 @@ loop2:
 	r1 = 0; /* set */
 	for(r = firstr; r != R; r = r->link) {
 		p = r->prog;
-		if(p->to.type == D_BRANCH) {
-			if(r->s2 != R)
-				p->to.offset = r->s2->pc;
-			else
-				diag(Z, "branch to nowhere: %P", p);
-		}
+		if(p->to.type == D_BRANCH)
+			p->to.offset = r->s2->pc;
 		r1 = r;
 	}
 
@@ -679,7 +674,7 @@ addmove(Reg *r, int bn, int rn, int f)
 	a->type = v->name;
 
 	p1->as = AMOVL;
-	if(v->etype == TCHAR || v->etype == TUCHAR || v->etype == TBOOL)
+	if(v->etype == TCHAR || v->etype == TUCHAR)
 		p1->as = AMOVB;
 	if(v->etype == TSHORT || v->etype == TUSHORT)
 		p1->as = AMOVW;
@@ -695,7 +690,7 @@ addmove(Reg *r, int bn, int rn, int f)
 		p1->from = *a;
 		*a = zprog.from;
 		a->type = rn;
-		if(v->etype == TUCHAR || v->etype == TBOOL)
+		if(v->etype == TUCHAR)
 			p1->as = AMOVB;
 		if(v->etype == TUSHORT)
 			p1->as = AMOVW;
@@ -1039,7 +1034,6 @@ allreg(ulong b, Rgn *r)
 
 	case TCHAR:
 	case TUCHAR:
-	case TBOOL:
 	case TSHORT:
 	case TUSHORT:
 	case TINT:
