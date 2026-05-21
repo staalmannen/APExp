@@ -7,12 +7,13 @@ TARG=\
 	stty\
 	tar\
 	cc\
+	pcc
 
 BIN=$APEXPROOT/$objtype/bin/ape
 <$APEXPROOT/sys/src/cmd/mkmany
 
 # pcc: same binary as cc; argv[0]=="pcc" selects .$O object extension
-$BIN/pcc:	$BIN/cc
-	cp $BIN/cc $BIN/pcc
+$O.pcc:	$O.cc
+	cp $O.cc $O.pcc
 
-install:V:	$BIN/cc $BIN/pcc
+
