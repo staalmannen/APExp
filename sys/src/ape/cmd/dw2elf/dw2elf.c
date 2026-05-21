@@ -30,6 +30,7 @@
 #include <sys/stat.h>
 
 #include <libdwarf.h>
+#include <dwarf.h>
 #include <libdwarfp.h>
 
 /* ── Plan9 a.out constants (amd64 fat header) ─────────────────────────── */
@@ -272,6 +273,7 @@ static void emit_sidecar(Dwarf_P_Debug dbg, const char *srcname,
                          const uint8_t *buf, size_t len)
 {
 	Dwarf_P_Die cu_die, func_die, param_die;
+	Dwarf_P_Attribute attr_out;
 	Dwarf_Error err;
 	uint32_t nparams, nlocals, i, j;
 	char *fname, *pname;
@@ -283,7 +285,7 @@ static void emit_sidecar(Dwarf_P_Debug dbg, const char *srcname,
 	if(dwarf_new_die_a(dbg, DW_TAG_compile_unit,
 	                   NULL, NULL, NULL, NULL, &cu_die, &err) != DW_DLV_OK)
 		return;
-	dwarf_add_AT_name_a(cu_die, (char *)srcname, &err);
+	dwarf_add_AT_name_a(cu_die, (char *)srcname, &attr_out, &err);
 	if(dwarf_add_die_to_debug_a(dbg, cu_die, &err) != DW_DLV_OK)
 		return;
 
@@ -296,7 +298,7 @@ static void emit_sidecar(Dwarf_P_Debug dbg, const char *srcname,
 		if(dwarf_new_die_a(dbg, DW_TAG_subprogram,
 		                   cu_die, NULL, NULL, NULL,
 		                   &func_die, &err) == DW_DLV_OK)
-			dwarf_add_AT_name_a(func_die, fname, &err);
+			dwarf_add_AT_name_a(func_die, fname, &attr_out, &err);
 
 		for(i = 0; i < nparams; i++) {
 			pname = sc_str();
@@ -305,7 +307,7 @@ static void emit_sidecar(Dwarf_P_Debug dbg, const char *srcname,
 				if(dwarf_new_die_a(dbg, DW_TAG_formal_parameter,
 				                   func_die, NULL, NULL, NULL,
 				                   &param_die, &err) == DW_DLV_OK)
-					dwarf_add_AT_name_a(param_die, pname, &err);
+					dwarf_add_AT_name_a(param_die, pname, &attr_out, &err);
 			}
 			free(pname);
 		}
