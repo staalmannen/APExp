@@ -25,7 +25,7 @@ TARG=${T}c
 BIN=$APEXPROOT/$objtype/bin
 
 # cc/ front-end object library (built by native sys/src/cmd/cc build)
-CCLIB=$CCSRC/cc.a$O
+CCLIB=../cc.a$O
 
 # Full object list: arch objects + dwarftype
 ALLOFILES=$OFILES dwarftype.$O
@@ -37,8 +37,8 @@ CFLAGS=-FVw\
 
 install:V: $BIN/$TARG
 
-$BIN/$TARG: $ALLOFILES $CCLIB $LIBDWARFP
-	$LD -o $BIN/$TARG $ALLOFILES $CCLIB $LIBDWARFP
+$BIN/$TARG: $ALLOFILES $LIBDWARFP $CCLIB
+	$LD -o $BIN/$TARG $ALLOFILES $LIBDWARFP $CCLIB
 
 # Arch-specific files
 %.$O: $ARCSRC/%.c

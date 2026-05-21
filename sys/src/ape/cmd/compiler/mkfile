@@ -12,14 +12,15 @@ ARCHES=\
 	qc\
 	vc\
 
-install:V:
-	# cc.a$O (cc front-end archive) must exist before arch compilers link
-	cd $APEXPROOT/sys/src/cmd/cc && mk install
+install: cc.a$O
 	for(i in $ARCHES) @{
 		cd $i
 		echo ----$i----
 		mk install
 	}
+
+cc.a$O:V:
+	mk -f mkfile.cc
 
 clean:V:
 	for(i in $ARCHES) @{
