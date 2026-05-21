@@ -21,10 +21,12 @@ OFILES=\
 	dpchk.$O\
 	omachcap.$O\
 	vla.$O\
+	dwtypes.$O\
 
 HFILES=cc.h\
 	compat.h\
 	y.tab.h\
+	dwtypes.h\
 
 YFILES=cc.y\
 

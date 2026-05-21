@@ -45,7 +45,7 @@ typedef struct List {
 } List;
 
 List	srcs, objs, cpp, cc, ld, ldargs, srchlibs;
-int	cflag, vflag, Eflag, Sflag, Aflag;
+int	cflag, vflag, Eflag, Sflag, Aflag, gflag;
 char	*allos = "2678kqv";
 
 void	append(List *, char *);
@@ -103,7 +103,9 @@ main(int argc, char *argv[])
 			cflag = 1;
 			break;
 		case 's':
+			break;
 		case 'g':
+			gflag = 1;
 			break;
 		case 'L':
 			lib = ARGF();
@@ -184,6 +186,8 @@ main(int argc, char *argv[])
 	append(&cpp, "-I/sys/include/ape");
 	cppn = cpp.n;
 	ccn = cc.n;
+	if(gflag)
+		putenv("_DWTYPES=1");
 	for(i = 0; i < srcs.n; i++) {
 		append(&cpp, srcs.strings[i]);
 		if(Eflag)
@@ -203,7 +207,10 @@ main(int argc, char *argv[])
 		cpp.n = cppn;
 		cc.n = ccn;
 	}
+	if(gflag)
+		unsetenv("_DWTYPES");
 	if(!cflag) {
+		List dw2elf_cmd;
 		append(&ld, "-o");
 		append(&ld, oname);
 		for(i = 0; i < ldargs.n; i++)
@@ -214,6 +221,19 @@ main(int argc, char *argv[])
 		doexec(smprint("/bin/%s", ot->ld), &ld);
 		if(objs.n == 1)
 			remove(objs.strings[0]);
+		if(gflag) {
+			/* post-link: convert a.out + .dwtypes sidecars to ELF64 */
+			memset(&dw2elf_cmd, 0, sizeof dw2elf_cmd);
+			append(&dw2elf_cmd, "dw2elf");
+			append(&dw2elf_cmd, "-o");
+			append(&dw2elf_cmd, smprint("%s.elf", oname));
+			append(&dw2elf_cmd, oname);
+			for(i = 0; i < srcs.n; i++)
+				append(&dw2elf_cmd,
+				       changeext(srcs.strings[i], "dwtypes"));
+			doexec(smprint("/%s/bin/ape/dw2elf", ot->name),
+			       &dw2elf_cmd);
+		}
 	}
 
 	exits(0);
