@@ -47,8 +47,10 @@ _envsetup(void)
 	fdinited = 0;
 	cnt = 0;
 	dfd = _OPEN("/env", OREAD|OCEXEC);
-	if(dfd < 0)
+	if(dfd < 0) {
+		_fdinit(0, 0);
 		goto done;
+	}
 	psize = Envhunk;
 	ps = p = malloc(psize);
 	nd = _dirreadall(dfd, &d9a);
