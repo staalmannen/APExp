@@ -236,8 +236,7 @@ main(int argc, char *argv[])
 			for(i = 0; i < srcs.n; i++)
 				append(&dw2elf_cmd,
 				       changeext(srcs.strings[i], "dwtypes"));
-			doexec(smprint("/%s/bin/ape/dw2elf", ot->name),
-			       &dw2elf_cmd);
+			doexec("/bin/dw2elf", &dw2elf_cmd);
 		}
 	}
 
