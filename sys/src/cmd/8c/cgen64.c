@@ -1564,7 +1564,7 @@ cgen64(Node *n, Node *nn)
 {
 	Type *dt;
 	uchar *args, (*cp)[VLEN], (**optab)[VLEN];
-	int li, ri, lri, dr, si, m, op, sh, cmp, cond;
+	int li, ri, lri, dr, si, m, op, sh, cmp, vcond;
 	Node *c, *d, *l, *r, *t, *s, nod1, nod2, nod3, nod4, nod5;
 
 	if(debug['g']) {
@@ -2093,40 +2093,40 @@ twoop:
 			break;
 		}
 
-		cond = 1;
+		vcond = 1;
 		optab = cmptab;
 		switch(op) {
 		case OEQ:
 			optab = NEtab;
-			cond = 0;
+			vcond = 0;
 			break;
 		case ONE:
 			optab = NEtab;
 			break;
 		case OLE:
 			args = GTargs;
-			cond = 0;
+			vcond = 0;
 			break;
 		case OGT:
 			args = GTargs;
 			break;
 		case OLS:
 			args = HIargs;
-			cond = 0;
+			vcond = 0;
 			break;
 		case OHI:
 			args = HIargs;
 			break;
 		case OLT:
 			args = GEargs;
-			cond = 0;
+			vcond = 0;
 			break;
 		case OGE:
 			args = GEargs;
 			break;
 		case OLO:
 			args = HSargs;
-			cond = 0;
+			vcond = 0;
 			break;
 		case OHS:
 			args = HSargs;
@@ -2138,7 +2138,7 @@ twoop:
 
 		switch(lri) {
 		case IMM(0, 0):
-			biggen(l, r, Z, cond, optab[T0i], args);
+			biggen(l, r, Z, vcond, optab[T0i], args);
 			break;
 		case IMM(0, 1):
 		case IMM(1, 0):
@@ -2147,14 +2147,14 @@ twoop:
 				diag(l, "bad whatof\n");
 				break;
 			case WCONST:
-				biggen(l, r, Z, cond, optab[T0i], args);
+				biggen(l, r, Z, vcond, optab[T0i], args);
 				break;
 			case WHARD:
 				reglcgen(&nod2, r, Z);
 				r = &nod2;
 				/* fall thru */
 			case WADDR:
-				biggen(l, r, Z, cond, optab[T0i], args);
+				biggen(l, r, Z, vcond, optab[T0i], args);
 				if(ri == WHARD)
 					regfree(r);
 				break;
@@ -2169,7 +2169,7 @@ twoop:
 				reglcgen(&nod2, r, Z);
 				r = &nod2;
 			}
-			biggen(l, r, Z, cond, optab[Tii], args);
+			biggen(l, r, Z, vcond, optab[Tii], args);
 			if(li == WHARD)
 				regfree(l);
 			if(ri == WHARD)
