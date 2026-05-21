@@ -59,6 +59,7 @@
 #define EHDR_SIZE     64
 #define PHDR_SIZE     56
 #define SHDR_SIZE     64
+#define PAGE_SIZE     0x1000
 
 /* ── Plan9 etype values (APExp cc.h with TBOOL=3 inserted) ────────────── */
 #define P9_TVOID    0
@@ -401,9 +402,22 @@ int main(int argc, char *argv[])
 	data_vaddr = (text_vaddr + textsize + AOUT_INITRND - 1)
 	             & ~(AOUT_INITRND - 1);
 
-	/* ── ELF file offset layout ── */
-	text_foff = EHDR_SIZE + 2 * PHDR_SIZE;       /* 176 */
-	data_foff = text_foff + (long)textsize;
+	/* ── ELF file offset layout ──
+	 * ELF requires p_offset ≡ p_vaddr (mod p_align).
+	 * Pad after the ELF headers so text_foff ≡ text_vaddr (mod PAGE_SIZE),
+	 * then pad between text and data for the same constraint on data. */
+	{
+		long base = EHDR_SIZE + 2 * PHDR_SIZE;   /* 176 */
+		long tmod = (long)(text_vaddr % PAGE_SIZE);
+		long cmod = base % PAGE_SIZE;
+		text_foff = base + ((tmod - cmod + PAGE_SIZE) % PAGE_SIZE);
+	}
+	{
+		long base = text_foff + (long)textsize;
+		long dmod = (long)(data_vaddr % PAGE_SIZE);
+		long cmod = base % PAGE_SIZE;
+		data_foff = base + ((dmod - cmod + PAGE_SIZE) % PAGE_SIZE);
+	}
 
 	/* ── DWARF generation ── */
 	/* sections 0=NULL 1=.text 2=.data 3=.bss → DWARF starts at 4 */
@@ -416,12 +430,15 @@ int main(int argc, char *argv[])
 		int res;
 
 		res = dwarf_producer_init(
-		    DW_DLC_POINTER64 | DW_DLC_TARGET_LITTLEENDIAN,
+		    DW_DLC_POINTER64 | DW_DLC_TARGET_LITTLEENDIAN |
+		    DW_DLC_SYMBOLIC_RELOCATIONS,
 		    dw_section_callback, NULL, NULL, NULL,
 		    "x86_64", "V4", "",
 		    &dbg, &derr);
 
-		if(res == DW_DLV_OK) {
+		if(res != DW_DLV_OK) {
+			fprintf(stderr, "dw2elf: dwarf_producer_init failed\n");
+		} else {
 			for(i = 0; i < nsidecars; i++) {
 				size_t sclen;
 				uint8_t *scbuf = loadfile(sidecars[i], &sclen);
@@ -500,14 +517,19 @@ int main(int argc, char *argv[])
 	/* ── program headers ── */
 	write_phdr(ofd, PT_LOAD, PF_R|PF_X,
 	           (uint64_t)text_foff, text_vaddr,
-	           textsize, textsize, AOUT_INITRND);
+	           textsize, textsize, PAGE_SIZE);
 	write_phdr(ofd, PT_LOAD, PF_R|PF_W,
 	           (uint64_t)data_foff, data_vaddr,
-	           datsize, (uint64_t)datsize + bsssize, AOUT_INITRND);
+	           datsize, (uint64_t)datsize + bsssize, PAGE_SIZE);
 
-	/* ── text and data ── */
+	/* ── padding + text + padding + data ── */
+	cur = (long)(EHDR_SIZE + 2 * PHDR_SIZE);
+	while(cur < text_foff) { xwrite(ofd, &zero, 1); cur++; }
 	xwrite(ofd, aout_buf + AOUT_HEADR, textsize);
+	cur += (long)textsize;
+	while(cur < data_foff) { xwrite(ofd, &zero, 1); cur++; }
 	xwrite(ofd, aout_buf + AOUT_HEADR + textsize, datsize);
+	cur += (long)datsize;
 
 	/* ── DWARF sections ── */
 	for(i = 0; i < n_dw_sects; i++) {
