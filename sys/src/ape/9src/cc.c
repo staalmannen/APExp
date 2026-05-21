@@ -61,13 +61,15 @@ void
 main(int argc, char *argv[])
 {
 	char *s, *suf, *ccpath, *lib;
-	char *oname;
+	char *oname, *objext;
 	int haveoname = 0;
 	int i, cppn, ccn;
 	Objtype *ot;
 
 	ot = findoty();
 	oname = "a.out";
+	/* cc produces .o (for configure compat); pcc uses arch-native .$O */
+	objext = (strcmp(argv[0], "cc") == 0) ? "o" : ot->o;
 	append(&cpp, "cpp");
 	append(&cpp, "-D__STDC__=1");	/* ANSI says so */
 	append(&cpp, "-D_POSIX_SOURCE=");
@@ -187,7 +189,7 @@ main(int argc, char *argv[])
 	cppn = cpp.n;
 	ccn = cc.n;
 	if(gflag)
-		putenv("_DWTYPES=1");
+		putenv("_DWTYPES", "1");
 	for(i = 0; i < srcs.n; i++) {
 		append(&cpp, srcs.strings[i]);
 		if(Eflag)
@@ -200,7 +202,7 @@ main(int argc, char *argv[])
 				if (haveoname && cflag)
 					append(&cc, oname);
 				else
-					append(&cc, changeext(srcs.strings[i], "o"));
+					append(&cc, changeext(srcs.strings[i], objext));
 			}
 			dopipe("/bin/cpp", &cpp, ccpath, &cc);
 		}
@@ -208,7 +210,7 @@ main(int argc, char *argv[])
 		cc.n = ccn;
 	}
 	if(gflag)
-		unsetenv("_DWTYPES");
+		putenv("_DWTYPES", "");
 	if(!cflag) {
 		List dw2elf_cmd;
 		append(&ld, "-o");
