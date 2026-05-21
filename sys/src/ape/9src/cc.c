@@ -60,16 +60,19 @@ char *searchlib(char *, char*);
 void
 main(int argc, char *argv[])
 {
-	char *s, *suf, *ccpath, *lib;
+	char *s, *suf, *ccpath, *lib, *prog;
 	char *oname, *objext;
 	int haveoname = 0;
 	int i, cppn, ccn;
 	Objtype *ot;
 
 	ot = findoty();
-	oname = "a.out";
-	/* cc produces .o (for configure compat); pcc uses arch-native .$O */
-	objext = (strcmp(argv[0], "cc") == 0) ? "o" : ot->o;
+	prog = utfrrune(argv[0], '/');
+	prog = prog ? prog+1 : argv[0];
+	/* cc: POSIX mode (.o objects, a.out output, clean up intermediates)
+	 * pcc: Plan9 native mode (.$O objects, $O.out output, keep objects) */
+	objext = (strcmp(prog, "cc") == 0) ? "o" : ot->o;
+	oname  = (strcmp(prog, "cc") == 0) ? "a.out" : smprint("%s.out", ot->o);
 	append(&cpp, "cpp");
 	append(&cpp, "-D__STDC__=1");	/* ANSI says so */
 	append(&cpp, "-D_POSIX_SOURCE=");
@@ -221,8 +224,8 @@ main(int argc, char *argv[])
 			append(&ld, objs.strings[i]);
 		append(&ld, smprint("/%s/lib/ape/libap.a", ot->name));
 		doexec(smprint("/bin/%s", ot->ld), &ld);
-		if(objs.n == 1)
-			remove(objs.strings[0]);
+		if(objs.n == 1 && strcmp(objext, "o") == 0)
+			remove(objs.strings[0]);	/* cc mode only: clean up .o intermediate */
 		if(gflag) {
 			/* post-link: convert a.out + .dwtypes sidecars to ELF64 */
 			memset(&dw2elf_cmd, 0, sizeof dw2elf_cmd);
