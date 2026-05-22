@@ -1,0 +1,78 @@
+# mkelf: like mkone, but produces an ELF binary via 6l -H5 (amd64).
+# LDFLAGS defaults to -Wl,-H5 (works with LD=pcc; pcc forwards -H5 to 6l).
+# If using LD=6l directly, override: LDFLAGS=-H5
+# To append extra linker flags: LDFLAGS=$LDFLAGS -lfoo (after including this file)
+
+LDFLAGS=-Wl,-H5
+YFLAGS=-d
+AFLAGS=
+
+default:V:	$O.elf
+
+all:V:	$O.elf
+
+$O.elf:	$OFILES $LIB
+	$LD $LDFLAGS -o $target $prereq
+
+%.$O:	$HFILES		# don't combine with following %.$O rules
+
+%.$O:	%.c
+	$CC $CFLAGS $stem.c
+
+%.$O:	%.s
+	$AS $AFLAGS $stem.s
+
+y.tab.h y.tab.c:D:	$YFILES
+	$YACC $YFLAGS $prereq
+
+lex.yy.c:	$LFILES
+	$LEX $LFLAGS $prereq
+
+<$APEXPROOT/sys/src/cmd/transpilers
+
+install:V:	$BIN/$TARG
+
+$BIN/$TARG:	$O.elf
+	cp $prereq $BIN/$TARG
+
+installall:V:
+	for(objtype in $CPUS)
+		mk install
+
+allall:V:
+	for(objtype in $CPUS)
+		mk all
+
+nuke:V:
+	rm -f *.[$OS] [$OS].elf y.tab.? lex.yy.c y.debug y.output *.acid $TARG $CLEANFILES
+
+clean:V:
+	test -d ./test && @{cd test && mk $MKFLAGS clean}
+	rm -f *.[$OS] [$OS].elf y.tab.? lex.yy.c y.debug y.output $TARG $CLEANFILES
+
+safeinstall:V: $O.elf
+	test -e $BIN/$TARG && mv $BIN/$TARG $BIN/_$TARG
+	cp $prereq $BIN/$TARG
+
+update:V:
+	update $UPDATEFLAGS $UPDATE
+
+safeinstallall:V:
+	for (objtype in $CPUS)
+		mk safeinstall
+
+%.acid: %.$O $HFILES
+	$CC $CFLAGS -a $stem.c >$target
+
+$MAN/%:    %.man
+	cp $prereq $target
+
+man:V:    $MAN/$TARG
+
+test:QV: $O.elf $TESTDEP
+	if(test -d ./test){
+		pwd
+		@{cd ./test && mk $MKFLAGS test}
+	}
+	if not
+		status=()

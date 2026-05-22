@@ -1,4 +1,7 @@
 #include	"l.h"
+#include	"../ld/lib.h"
+#include	"../ld/elf.h"
+#include	"../ld/dwarf.h"
 
 #define	Dbufslop	100
 
@@ -80,6 +83,221 @@ strnput(char *s, int n)
 	}
 }
 
+/*
+ * asmbelf: finalize the ELF output file.
+ * Writes section headers, .shstrtab, then seeks back to write
+ * the ELF file header and program headers at offset 0.
+ *
+ * textfoff: file offset where .text begins (= HEADR)
+ * datafoff: file offset where .data begins (after padding)
+ * datva:    virtual address of .data segment
+ */
+void
+asmbelf(long textfoff, vlong datafoff, vlong datva)
+{
+	ElfEhdr *eh;
+	ElfPhdr *ph;
+	ElfShdr *sh;
+	vlong shstroff, shdroff;
+	int shstrndx;
+
+	/*
+	 * Create program headers first.
+	 * newElfPhdr() modifies hdr.shoff as a side effect; we will
+	 * overwrite hdr.shoff later with the true section-header offset.
+	 */
+	ph = newElfPhdr();
+	ph->type   = PT_LOAD;
+	ph->flags  = PF_R | PF_X;
+	ph->off    = textfoff;
+	ph->vaddr  = INITTEXT;
+	ph->paddr  = INITTEXT;
+	ph->filesz = textsize;
+	ph->memsz  = textsize;
+	ph->align  = 0x1000;
+
+	ph = newElfPhdr();
+	ph->type   = PT_LOAD;
+	ph->flags  = PF_R | PF_W;
+	ph->off    = datafoff;
+	ph->vaddr  = datva;
+	ph->paddr  = datva;
+	ph->filesz = datsize;
+	ph->memsz  = datsize + bsssize;
+	ph->align  = 0x1000;
+
+	/* NULL section header (index 0) */
+	newElfShdr(0);
+
+	/* .text section */
+	sh = elfshname(".text");
+	sh->type = SHT_PROGBITS;
+	sh->flags = SHF_ALLOC | SHF_EXECINSTR;
+	sh->addr = INITTEXT;
+	sh->off = textfoff;
+	sh->size = textsize;
+	sh->addralign = 16;
+
+	/* .data section */
+	sh = elfshname(".data");
+	sh->type = SHT_PROGBITS;
+	sh->flags = SHF_ALLOC | SHF_WRITE;
+	sh->addr = datva;
+	sh->off = datafoff;
+	sh->size = datsize;
+	sh->addralign = 8;
+
+	/* .bss section */
+	sh = elfshname(".bss");
+	sh->type = SHT_NOBITS;
+	sh->flags = SHF_ALLOC | SHF_WRITE;
+	sh->addr = datva + datsize;
+	sh->off = datafoff + datsize;	/* NOBITS: conventional end-of-data offset */
+	sh->size = bsssize;
+	sh->addralign = 8;
+
+	/* DWARF sections were added by dwarfaddelfheaders() before this call */
+
+	/* .shstrtab — always last named section */
+	shstrndx = numelfshdr;
+	sh = elfshname(".shstrtab");
+	sh->type = SHT_STRTAB;
+	sh->addralign = 1;
+	cflush();
+	shstroff = cpos();
+	sh->off = shstroff;
+	sh->size = elfwritestrtab();
+
+	/* 8-byte align before section headers */
+	cflush();
+	shdroff = (cpos() + 7) & ~7LL;
+	{
+		vlong cur;
+		cur = cpos();
+		while(cur < shdroff) {
+			cput(0);
+			cur++;
+		}
+	}
+	cflush();
+
+	/* Write section headers */
+	seek(cout, shdroff, 0);
+	elfwriteshdrs();
+	cflush();
+
+	/* Fill in ELF file header fields and write at offset 0 */
+	eh = getElfEhdr();
+	memset(eh->ident, 0, EI_NIDENT);
+	eh->ident[EI_MAG0]    = ELFMAG0;
+	eh->ident[EI_MAG1]    = ELFMAG1;
+	eh->ident[EI_MAG2]    = ELFMAG2;
+	eh->ident[EI_MAG3]    = ELFMAG3;
+	eh->ident[EI_CLASS]   = ELFCLASS64;
+	eh->ident[EI_DATA]    = ELFDATA2LSB;
+	eh->ident[EI_VERSION] = EV_CURRENT;
+	eh->type      = ET_EXEC;
+	eh->machine   = EM_X86_64;
+	eh->version   = EV_CURRENT;
+	eh->entry     = entryvalue();
+	eh->shoff     = shdroff;   /* set after all newElfPhdr() calls */
+	eh->shstrndx  = shstrndx;
+
+	seek(cout, 0, 0);
+	elfwritehdr();
+	elfwritephdrs();
+	cflush();
+}
+
+/*
+ * asmb_elf: assemble ELF64 output (called by asmb when HEADTYPE==5).
+ */
+static void
+asmb_elf(void)
+{
+	Prog *p;
+	long v;
+	int a;
+	uchar *op1;
+	vlong datva, datafoff, pad;
+
+	/* Initialize ELF state */
+	elfinit();
+
+	/* Compute data layout before writing anything */
+	datva    = (INITTEXT + textsize + INITRND - 1) & ~((vlong)INITRND - 1);
+	datafoff = HEADR + textsize;
+	pad      = ((datva & 0xfff) - (datafoff & 0xfff) + 0x1000) & 0xfff;
+	datafoff += pad;
+
+	/* Write text segment */
+	if(debug['v'])
+		Bprint(&bso, "%5.2f asmb elf text\n", cputime());
+	Bflush(&bso);
+
+	seek(cout, HEADR, 0);
+	pc = INITTEXT;
+	curp = firstp;
+	for(p = firstp; p != P; p = p->link) {
+		if(p->as == ATEXT)
+			curtext = p;
+		if(p->pc != pc) {
+			if(!debug['a'])
+				print("%P\n", curp);
+			diag("phase error %llux sb %llux in %s", p->pc, pc, TNAME);
+			pc = p->pc;
+		}
+		curp = p;
+		asmins(p);
+		a = (andptr - and);
+		if(cbc < a)
+			cflush();
+		if(debug['a']) {
+			Bprint(&bso, pcstr, pc);
+			for(op1 = and; op1 < andptr; op1++)
+				Bprint(&bso, "%.2ux", *op1 & 0xff);
+			Bprint(&bso, "\t%P\n", curp);
+		}
+		memmove(cbp, and, a);
+		cbp += a;
+		pc += a;
+		cbc -= a;
+	}
+	cflush();
+
+	/* Write alignment padding between text and data */
+	for(v = 0; v < pad; v++)
+		cput(0);
+	cflush();
+
+	/* Write data segment */
+	if(debug['v'])
+		Bprint(&bso, "%5.2f asmb elf data\n", cputime());
+	Bflush(&bso);
+
+	for(v = 0; v < datsize; v += sizeof(buf.dbuf) - Dbufslop) {
+		if(datsize - v > sizeof(buf.dbuf) - Dbufslop)
+			datblk(v, sizeof(buf.dbuf) - Dbufslop);
+		else
+			datblk(v, datsize - v);
+	}
+
+	/* Emit DWARF debug sections */
+	if(debug['v'])
+		Bprint(&bso, "%5.2f asmb elf dwarf\n", cputime());
+	Bflush(&bso);
+	if(!debug['w'])
+		dwarfemitdebugsections();
+	dwarfaddelfheaders();
+
+	/* Write ELF section/program headers */
+	if(debug['v'])
+		Bprint(&bso, "%5.2f asmb elf headers\n", cputime());
+	Bflush(&bso);
+	asmbelf(HEADR, datafoff, datva);
+	cflush();
+}
+
 void
 asmb(void)
 {
@@ -88,6 +306,11 @@ asmb(void)
 	int a;
 	uchar *op1;
 	vlong vl;
+
+	if(HEADTYPE == 5) {
+		asmb_elf();
+		return;
+	}
 
 	if(debug['v'])
 		Bprint(&bso, "%5.2f asmb\n", cputime());

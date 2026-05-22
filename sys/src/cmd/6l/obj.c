@@ -1,5 +1,6 @@
 #define	EXTERN
 #include	"l.h"
+#include	"../ld/elf.h"
 #include	<ar.h>
 
 #ifndef	DEFAULT
@@ -15,7 +16,7 @@ char	*paramspace	= "FP";
 /*
  *	-H2 -T0x200028 -R0x200000	is plan9 format (was -T4136 -R4096)
  *	-H3 -T4128 -R4096		is plan9 32-bit format
- *	-H5 -T0x80110000 -R4096		is ELF32
+ *	-H5				is ELF64 (amd64)
  *
  *	options used: 189BLQSWabcejlnpsvz
  */
@@ -147,14 +148,14 @@ main(int argc, char *argv[])
 		if(INITRND == -1)
 			INITRND = 4096;
 		break;
-	case 5:	/* elf32 executable */
-		HEADR = rnd(52L+3*32L, 16);
+	case 5:	/* ELF64 executable */
+		HEADR = ELFRESERVE;
 		if(INITTEXT == -1)
-			INITTEXT = 0xf0110000L;
+			INITTEXT = 0x200000+HEADR;
 		if(INITDAT == -1)
 			INITDAT = 0;
 		if(INITRND == -1)
-			INITRND = 4096;
+			INITRND = 0x200000;
 		break;
 	}
 	if(INITDAT != 0 && INITRND != 0)
