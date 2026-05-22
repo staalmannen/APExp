@@ -22,30 +22,30 @@ OFILES=\
 LIB_OBJS= \
 #	asyncsafe-spin.$O\
 #	basename-lgpl.$O\
+	c-stack.$O\
 #	c-ctype.$O\
-#	c-stack.$O\
 #	c-strcasecmp.$O\
 #	canonicalize.$O\
 #	canonicalize-lgpl.$O\
-#	clean-temp.$O\
-#	clean-temp-simple.$O\
-#	close-stream.$O\
+	clean-temp.$O\
+	clean-temp-simple.$O\
+	close-stream.$O\
 #	closein.$O\
 #	closeout.$O\
 #	concat-filename.$O\
 #	dup-safer.$O\
 #	dup-safer-flag.$O\
 	error.$O\
-#	execute.$O\
+	execute.$O\
 	exitfail.$O\
-#	fatal-signal.$O\
+	fatal-signal.$O\
 #	fd-safer.$O\
 #	fd-safer-flag.$O\
-#	filenamecat.$O\
+	filenamecat.$O\
 #	filenamecat-lgpl.$O\
 #	file-set.$O\
 #	findprog-in.$O\
-#	fopen-safer.$O\
+	fopen-safer.$O\
 #	fpending.$O\
 # 	freadahead.$O\
 #	fseterr.$O\
@@ -61,23 +61,23 @@ LIB_OBJS= \
 #	mbchar.$O\
 #	mbslen.$O\
 #	mbsstr.$O\
-#	memchr2.$O\
+	memchr2.$O\
 	mempcpy.$O\
 #	mkdtemp.$O\
-#	mkstemp-safer.$O\
+	mkstemp-safer.$O\
 #	malloca.$O\
 #	next-prime.$O\
 #	obstack.$O\
 #	pipe-safer.$O\
 #	pipe2-safer.$O\
 	progname.$O\
-#	propername.$O\
+	propername.$O\
 	quotearg.$O\
 #	reallocarray.$O\
 	regex.$O\
 #	rmdir.$O\
 #	secure_getenv.$O\
-#	spawn-pipe.$O\
+	spawn-pipe.$O\
 #	string.$O\
 #	strnlen1.$O\
 	strsignal.$O\
@@ -86,17 +86,17 @@ LIB_OBJS= \
 #	tmpdir.$O\
 #	trim.$O\
 #	vaszprintf.$O\
-#	version-etc.$O\
-#	version-etc-fsf.$O\
+	version-etc.$O\
+	version-etc-fsf.$O\
 #	vfzprintf.$O\
 #	vzprintf.$O\
-#	wait-process.$O\
+	wait-process.$O\
 	xalloc-die.$O\
 	xasprintf.$O\
 	xmalloc.$O\
 	xmalloca.$O\
 	xmemdup0.$O\
-#	xprintf.$O\
+	xprintf.$O\
 	xvasprintf.$O\
 # lib/malloc \
 #	dynarray_at_failure.$O\
