@@ -275,9 +275,9 @@ asmb_elf(void)
 		Bprint(&bso, "%5.2f asmb elf data\n", cputime());
 	Bflush(&bso);
 
-	for(v = 0; v < datsize; v += sizeof(buf.dbuf) - Dbufslop) {
-		if(datsize - v > sizeof(buf.dbuf) - Dbufslop)
-			datblk(v, sizeof(buf.dbuf) - Dbufslop);
+	for(v = 0; v < datsize; v += sizeof(buf) - Dbufslop) {
+		if(datsize - v > sizeof(buf) - Dbufslop)
+			datblk(v, sizeof(buf) - Dbufslop);
 		else
 			datblk(v, datsize - v);
 	}
