@@ -4,11 +4,6 @@ APE=$APEXPROOT/sys/src/ape
 
 DWSRC=$APEXPROOT/sys/src/external/libdwarf
 
-LIB=\
-	$APEXPROOT/$objtype/lib/ape/libdwarfp.a\
-	$APEXPROOT/$objtype/lib/ape/libdwarf.a\
-	$APEXPROOT/$objtype/lib/ape/libzstd.a\
-
 BIN=$APEXPROOT/$objtype/bin/ape
 
 TARG=dw2elf
@@ -22,4 +17,3 @@ CC=pcc
 LD=pcc
 CFLAGS=-c\
 	-I$DWSRC/src/lib/libdwarf\
-	-I$DWSRC/src/lib/libdwarfp\

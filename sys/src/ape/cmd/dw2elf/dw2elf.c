@@ -29,9 +29,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
-#include <libdwarf.h>
 #include <dwarf.h>
-#include <libdwarfp.h>
 
 /* ── Plan9 a.out constants (amd64 fat header) ─────────────────────────── */
 #define AOUT_HEADR       40
@@ -184,35 +182,16 @@ static int shstrtab_add(const char *s)
 	return off;
 }
 
-/* ── DWARF producer section table ──────────────────────────────────────── */
-#define MAX_DW_SECTS 16
+/* ── DWARF section table (2 sections: .debug_abbrev + .debug_info) ──────── */
+#define MAX_DW_SECTS 2
 static struct {
 	const char *name;
 	uint8_t    *data;
 	size_t      len;
-	uint32_t    elf_idx;   /* assigned by callback */
 	int         shname;    /* offset in .shstrtab */
 	long        foffset;   /* byte offset in output file */
 } dw_sects[MAX_DW_SECTS];
 static int n_dw_sects = 0;
-static int dw_base_elf_idx;   /* ELF index of first DWARF section */
-
-static int dw_section_callback(
-	const char *name, int size,
-	Dwarf_Unsigned type, Dwarf_Unsigned flags,
-	Dwarf_Unsigned link, Dwarf_Unsigned info,
-	Dwarf_Unsigned *sect_name_index,
-	void *user_data, int *error)
-{
-	(void)size; (void)type; (void)flags;
-	(void)link; (void)info; (void)user_data;
-	if(n_dw_sects >= MAX_DW_SECTS) { *error = 1; return DW_DLV_ERROR; }
-	dw_sects[n_dw_sects].name = name;
-	dw_sects[n_dw_sects].elf_idx = (uint32_t)(dw_base_elf_idx + n_dw_sects);
-	*sect_name_index = dw_sects[n_dw_sects].elf_idx;
-	n_dw_sects++;
-	return DW_DLV_OK;
-}
 
 /* ── .dwtypes sidecar reader ───────────────────────────────────────────── */
 
@@ -226,7 +205,7 @@ static uint32_t sc_u32(void)
 	if(sc_pos + 4 > sc_len) return 0;
 	memcpy(&v, sc_buf + sc_pos, 4);
 	sc_pos += 4;
-	return v;   /* sidecar is written in Plan9 native LE */
+	return v;
 }
 
 static uint8_t sc_u8(void)
@@ -235,7 +214,6 @@ static uint8_t sc_u8(void)
 	return sc_buf[sc_pos++];
 }
 
-/* returns malloc'd string; caller must free */
 static char *sc_str(void)
 {
 	uint32_t n = sc_u32();
@@ -254,75 +232,111 @@ static void sc_skip_type(int depth)
 	if(depth > 8) return;
 	tag = sc_u8();
 	switch(tag) {
-	case P9_TIND:
-		sc_skip_type(depth+1);
-		break;
-	case P9_TARRAY:
-		sc_skip_type(depth+1);
-		(void)sc_u32();
-		break;
+	case P9_TIND:    sc_skip_type(depth+1); break;
+	case P9_TARRAY:  sc_skip_type(depth+1); (void)sc_u32(); break;
 	case P9_TSTRUCT:
-	case P9_TUNION:
-		{ char *s = sc_str(); free(s); }
-		break;
+	case P9_TUNION:  { char *s = sc_str(); free(s); } break;
 	}
 }
 
-/* ── DWARF emission ────────────────────────────────────────────────────── */
+/* ── Minimal hand-coded DWARF4 writer ──────────────────────────────────── */
+/*
+ * Writes .debug_abbrev and .debug_info directly, using DW_FORM_string
+ * (inline null-terminated strings) for all attributes — no relocations,
+ * no .debug_str, no .rela sections.  Guaranteed readable by dwarfdump.
+ *
+ * Abbreviation table (fixed):
+ *   1 = DW_TAG_compile_unit  DW_CHILDREN_yes  DW_AT_name/string
+ *   2 = DW_TAG_subprogram    DW_CHILDREN_no   DW_AT_name/string
+ */
 
-static void emit_sidecar(Dwarf_P_Debug dbg, const char *srcname,
+#define DW4_INFO_MAX  (256*1024)
+static uint8_t abbrev_bytes[64];
+static size_t  abbrev_len;
+static uint8_t *info_bytes;
+static size_t   info_len;
+
+static void dw_u8b(uint8_t **p, uint8_t v)    { *(*p)++ = v; }
+static void dw_u16le(uint8_t **p, uint16_t v)  { (*p)[0]=v; (*p)[1]=v>>8; *p+=2; }
+static void dw_u32le(uint8_t **p, uint32_t v)
+{ (*p)[0]=v; (*p)[1]=v>>8; (*p)[2]=v>>16; (*p)[3]=v>>24; *p+=4; }
+static void dw_uleb(uint8_t **p, uint32_t v)
+{ do { uint8_t b=v&0x7f; v>>=7; *(*p)++=b|(v?0x80:0); } while(v); }
+static void dw_str(uint8_t **p, const char *s) { while(*s) *(*p)++=*s++; *(*p)++=0; }
+
+static void build_abbrev(void)
+{
+	uint8_t *p = abbrev_bytes;
+	/* abbrev 1: DW_TAG_compile_unit, has children, DW_AT_name/DW_FORM_string */
+	dw_uleb(&p, 1);
+	dw_uleb(&p, DW_TAG_compile_unit); dw_u8b(&p, DW_CHILDREN_yes);
+	dw_uleb(&p, DW_AT_name); dw_uleb(&p, DW_FORM_string);
+	dw_u8b(&p, 0); dw_u8b(&p, 0);
+	/* abbrev 2: DW_TAG_subprogram, no children, DW_AT_name/DW_FORM_string */
+	dw_uleb(&p, 2);
+	dw_uleb(&p, DW_TAG_subprogram); dw_u8b(&p, DW_CHILDREN_no);
+	dw_uleb(&p, DW_AT_name); dw_uleb(&p, DW_FORM_string);
+	dw_u8b(&p, 0); dw_u8b(&p, 0);
+	/* end of table */
+	dw_u8b(&p, 0);
+	abbrev_len = (size_t)(p - abbrev_bytes);
+}
+
+static void emit_sidecar(const char *srcname,
                          const uint8_t *buf, size_t len)
 {
-	Dwarf_P_Die cu_die, func_die, param_die;
-	Dwarf_P_Attribute attr_out;
-	Dwarf_Error err;
-	uint32_t nparams, nlocals, i, j;
-	char *fname, *pname;
+	uint8_t *p, *cu_len_ptr;
 
-	sc_buf = buf;
-	sc_len = len;
-	sc_pos = 8;   /* skip "DWTYPES1" magic */
+	if(!info_bytes) info_bytes = malloc(DW4_INFO_MAX);
+	if(!info_bytes) return;
+	if(info_len + 65536 > DW4_INFO_MAX) {
+		fprintf(stderr, "dw2elf: .debug_info buffer full\n"); return;
+	}
+	p = info_bytes + info_len;
 
-	if(dwarf_new_die_a(dbg, DW_TAG_compile_unit,
-	                   NULL, NULL, NULL, NULL, &cu_die, &err) != DW_DLV_OK)
-		return;
-	dwarf_add_AT_name_a(cu_die, (char *)srcname, &attr_out, &err);
-	if(dwarf_add_die_to_debug_a(dbg, cu_die, &err) != DW_DLV_OK)
-		return;
+	/* CU header: unit_length(placeholder) version=4 abbrev_off=0 addr_size=8 */
+	cu_len_ptr = p;
+	dw_u32le(&p, 0);   /* unit_length placeholder */
+	dw_u16le(&p, 4);   /* DWARF version */
+	dw_u32le(&p, 0);   /* offset into .debug_abbrev */
+	dw_u8b(&p, 8);     /* address_size (amd64) */
 
+	/* Root DIE: DW_TAG_compile_unit (abbrev 1), DW_AT_name = source file */
+	dw_uleb(&p, 1);
+	dw_str(&p, srcname);
+
+	/* One DW_TAG_subprogram DIE per function in the sidecar */
+	sc_buf = buf; sc_len = len; sc_pos = 8;
 	while(sc_pos < sc_len) {
-		fname   = sc_str();
+		char *fname = sc_str();
+		uint32_t nparams, nlocals, j;
 		sc_skip_type(0);    /* return type */
 		nparams = sc_u32();
-
-		func_die = NULL;
-		if(dwarf_new_die_a(dbg, DW_TAG_subprogram,
-		                   cu_die, NULL, NULL, NULL,
-		                   &func_die, &err) == DW_DLV_OK)
-			dwarf_add_AT_name_a(func_die, fname, &attr_out, &err);
-
-		for(i = 0; i < nparams; i++) {
-			pname = sc_str();
+		dw_uleb(&p, 2);     /* DW_TAG_subprogram (abbrev 2) */
+		dw_str(&p, fname);
+		free(fname);
+		for(j = 0; j < nparams; j++) {
+			char *s = sc_str(); free(s);
 			sc_skip_type(0);
-			if(func_die) {
-				if(dwarf_new_die_a(dbg, DW_TAG_formal_parameter,
-				                   func_die, NULL, NULL, NULL,
-				                   &param_die, &err) == DW_DLV_OK)
-					dwarf_add_AT_name_a(param_die, pname, &attr_out, &err);
-			}
-			free(pname);
 		}
-
-		/* locals (v1: always 0) */
 		nlocals = sc_u32();
 		for(j = 0; j < nlocals; j++) {
-			{ char *s = sc_str(); free(s); }
-			(void)sc_u32();   /* stack offset */
+			char *s = sc_str(); free(s);
+			(void)sc_u32();
 			sc_skip_type(0);
 		}
-
-		free(fname);
 	}
+
+	/* Null terminator for children of compile_unit */
+	dw_uleb(&p, 0);
+
+	/* Patch unit_length (total size minus the 4-byte length field) */
+	{
+		uint32_t culen = (uint32_t)(p - cu_len_ptr - 4);
+		cu_len_ptr[0]=culen; cu_len_ptr[1]=culen>>8;
+		cu_len_ptr[2]=culen>>16; cu_len_ptr[3]=culen>>24;
+	}
+	info_len = (size_t)(p - info_bytes);
 }
 
 /* ── main ──────────────────────────────────────────────────────────────── */
@@ -420,64 +434,25 @@ int main(int argc, char *argv[])
 	}
 
 	/* ── DWARF generation ── */
-	/* sections 0=NULL 1=.text 2=.data 3=.bss → DWARF starts at 4 */
-	dw_base_elf_idx = 4;
-
-	if(nsidecars > 0) {
-		Dwarf_P_Debug  dbg;
-		Dwarf_Error    derr;
-		Dwarf_Unsigned nbufs;
-		int res;
-
-		res = dwarf_producer_init(
-		    DW_DLC_POINTER64 | DW_DLC_TARGET_LITTLEENDIAN |
-		    DW_DLC_SYMBOLIC_RELOCATIONS,
-		    dw_section_callback, NULL, NULL, NULL,
-		    "x86_64", "V4", "",
-		    &dbg, &derr);
-
-		if(res != DW_DLV_OK) {
-			fprintf(stderr, "dw2elf: dwarf_producer_init failed\n");
-		} else {
-			for(i = 0; i < nsidecars; i++) {
-				size_t sclen;
-				uint8_t *scbuf = loadfile(sidecars[i], &sclen);
-				if(sclen >= 8 &&
-				   memcmp(scbuf, "DWTYPES1", 8) == 0)
-					emit_sidecar(dbg, sidecars[i], scbuf, sclen);
-				else
-					fprintf(stderr,
-					  "dw2elf: %s: bad magic, skipping\n",
-					  sidecars[i]);
-				free(scbuf);
-			}
-
-			if(dwarf_transform_to_disk_form_a(dbg, &nbufs, &derr)
-			   == DW_DLV_OK) {
-				Dwarf_Unsigned j2;
-				for(j2 = 0; j2 < nbufs; j2++) {
-					Dwarf_Unsigned eidx, blen;
-					Dwarf_Ptr      bptr;
-					int k;
-					if(dwarf_get_section_bytes_a(dbg, j2,
-					    &eidx, &blen, &bptr, &derr)
-					    != DW_DLV_OK)
-						continue;
-					for(k = 0; k < n_dw_sects; k++) {
-						if(dw_sects[k].elf_idx
-						   == (uint32_t)eidx) {
-							dw_sects[k].data =
-							  malloc(blen ? blen : 1);
-							dw_sects[k].len  = blen;
-							memcpy(dw_sects[k].data,
-							       bptr, blen);
-							break;
-						}
-					}
-				}
-			}
-			dwarf_producer_finish_a(dbg, &derr);
-		}
+	build_abbrev();
+	for(i = 0; i < nsidecars; i++) {
+		size_t sclen;
+		uint8_t *scbuf = loadfile(sidecars[i], &sclen);
+		if(sclen >= 8 && memcmp(scbuf, "DWTYPES1", 8) == 0)
+			emit_sidecar(sidecars[i], scbuf, sclen);
+		else
+			fprintf(stderr, "dw2elf: %s: bad magic, skipping\n",
+			        sidecars[i]);
+		free(scbuf);
+	}
+	if(info_len > 0) {
+		n_dw_sects = 2;
+		dw_sects[0].name = ".debug_abbrev";
+		dw_sects[0].data = abbrev_bytes;
+		dw_sects[0].len  = abbrev_len;
+		dw_sects[1].name = ".debug_info";
+		dw_sects[1].data = info_bytes;
+		dw_sects[1].len  = info_len;
 	}
 
 	/* ── build .shstrtab ── */
