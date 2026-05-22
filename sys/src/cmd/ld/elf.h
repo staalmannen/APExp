@@ -103,6 +103,15 @@
 #define ELF32RELASIZE   12
 #define ELF64RELASIZE   24
 
+/* Integer types used in ELF structures (lib.h defines these for ld/ files;
+ * define them here for files that include elf.h without lib.h). */
+#ifndef _LD_LIB_H_
+typedef unsigned char  uint8;
+typedef unsigned short uint16;
+typedef long           uint32;
+typedef uvlong         uint64;
+#endif
+
 /* ELF structures — we use 64-bit fields for both 32 and 64 bit */
 typedef struct ElfEhdr ElfEhdr;
 struct ElfEhdr

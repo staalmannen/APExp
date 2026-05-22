@@ -79,12 +79,7 @@ newElfPhdr(void)
 {
 	ElfPhdr *e;
 
-	e = malloc(sizeof *e);
-	if(e == nil) {
-		diag("out of memory");
-		errorexit();
-	}
-	memset(e, 0, sizeof *e);
+	e = mal(sizeof *e);
 	if(hdr.phnum >= NSECT) {
 		diag("too many phdrs");
 		errorexit();
@@ -103,12 +98,7 @@ newElfShdr(vlong nameoff)
 {
 	ElfShdr *e;
 
-	e = malloc(sizeof *e);
-	if(e == nil) {
-		diag("out of memory");
-		errorexit();
-	}
-	memset(e, 0, sizeof *e);
+	e = mal(sizeof *e);
 	e->name = (uint32)nameoff;
 	e->shnum = hdr.shnum;
 	if(hdr.shnum >= NSECT) {

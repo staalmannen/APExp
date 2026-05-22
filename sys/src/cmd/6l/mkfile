@@ -1,7 +1,7 @@
 </$objtype/mkfile
 
 TARG=6l
-OFILES=	asm.$O	obj.$O	optab.$O	pass.$O	span.$O	list.$O	enam.$O	compat.$O	dwarf.$O	lib.$O	go.$O
+OFILES=	asm.$O	obj.$O	optab.$O	pass.$O	span.$O	list.$O	enam.$O	compat.$O	dwarf.$O	lib.$O	go.$O	elf.$O
 
 HFILES=	l.h	../6c/6.out.h	../cc/compat.h
 APEXPROOT=../../../..
@@ -19,6 +19,9 @@ enam.$O:	../6c/enam.c
 
 dwarf.$O:	../ld/dwarf.c
 	$CC $CFLAGS -I../ld ../ld/dwarf.c
+
+elf.$O:	../ld/elf.c
+	$CC $CFLAGS -I../ld ../ld/elf.c
 
 lib.$O:	../ld/lib.c
 	$CC $CFLAGS -I../ld ../ld/lib.c

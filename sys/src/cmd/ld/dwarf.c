@@ -1001,3 +1001,42 @@ dwarfemitdebugsections(void)
 	writeinfo();
 }
 
+/*
+ * dwarfaddelfheaders: create ELF section headers for the DWARF sections.
+ * Called after dwarfemitdebugsections() so that offsets and sizes are known.
+ */
+void
+dwarfaddelfheaders(void)
+{
+	ElfShdr *sh;
+
+	if(abbrevsize > 0) {
+		sh = elfshname(".debug_abbrev");
+		sh->type = SHT_PROGBITS;
+		sh->off = abbrevo;
+		sh->size = abbrevsize;
+		sh->addralign = 1;
+	}
+	if(linesize > 0) {
+		sh = elfshname(".debug_line");
+		sh->type = SHT_PROGBITS;
+		sh->off = lineo;
+		sh->size = linesize;
+		sh->addralign = 1;
+	}
+	if(framesize > 0) {
+		sh = elfshname(".debug_frame");
+		sh->type = SHT_PROGBITS;
+		sh->off = frameo;
+		sh->size = framesize;
+		sh->addralign = 1;
+	}
+	if(infosize > 0) {
+		sh = elfshname(".debug_info");
+		sh->type = SHT_PROGBITS;
+		sh->off = infoo;
+		sh->size = infosize;
+		sh->addralign = 1;
+	}
+}
+
