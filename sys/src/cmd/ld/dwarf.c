@@ -6,8 +6,6 @@
 #include	"lib.h"
 #include	"dwarf.h"
 #include	"dwarf_defs.h"
-#include	"elf.h"
-
 /* Calculate stack adjustment from AADJSP instruction (x86 only) */
 static long
 getspadj(Prog *p)
@@ -53,14 +51,14 @@ extern void free(void*);
  * Offsets and sizes of the debug_* sections in the cout file.
  */
 
-static vlong abbrevo;
-static vlong abbrevsize;
-static vlong lineo;
-static vlong linesize;
-static vlong infoo;
-static vlong infosize;
-static vlong frameo;
-static vlong framesize;
+vlong dwarfabbrevo;
+vlong dwarfabbrevsize;
+vlong dwarflineo;
+vlong dwarflinesize;
+vlong dwarfinfoo;
+vlong dwarfinfosize;
+vlong dwarfframeo;
+vlong dwarfframesize;
 
 /*
  *  Basic I/O
@@ -188,7 +186,7 @@ writeabbrev(void)
 {
 	int i, n;
 
-	abbrevo = cpos();
+	dwarfabbrevo = cpos();
 	for (i = 1; i < DW_NABRV; i++) {
 		// See section 7.5.3
 		uleb128put(i);
@@ -201,7 +199,7 @@ writeabbrev(void)
 			(n+1) * sizeof(DWAttrForm));
 	}
 	cput(0);
-	abbrevsize = cpos() - abbrevo;
+	dwarfabbrevsize = cpos() - dwarfabbrevo;
 }
 
 /*
@@ -726,7 +724,7 @@ writelines(void)
 	lc = 1;
 	llc = 1;
 	currfile = -1;
-	lineo = cpos();
+	dwarflineo = cpos();
 
 #ifdef PROG_HAS_PCOND
 	for(cursym = textp; cursym != P; cursym = cursym->pcond) {
@@ -758,7 +756,7 @@ writelines(void)
 			dwinfo = newdie(dwinfo, DW_ABRV_COMPUNIT);
 			newattr(dwinfo, DW_AT_name, DW_CLS_STRING, strlen(unitname), unitname);
 			newattr(dwinfo, DW_AT_language, DW_CLS_CONSTANT, guesslang(unitname), 0);
-			newattr(dwinfo, DW_AT_stmt_list, DW_CLS_PTR, unitstart - lineo, 0);
+			newattr(dwinfo, DW_AT_stmt_list, DW_CLS_PTR, unitstart - dwarflineo, 0);
 			newattr(dwinfo, DW_AT_low_pc, DW_CLS_ADDRESS, cursym->pc, 0);
 			// Write .debug_line Line Number Program Header (sec 6.2.4)
 			// Fields marked with (*) must be changed for 64-bit dwarf
@@ -841,7 +839,7 @@ writelines(void)
 			}
 
 	flushunit(epc, unitstart);
-	linesize = cpos() - lineo;
+	dwarflinesize = cpos() - dwarflineo;
 }
 
 /*
@@ -880,7 +878,7 @@ writeframes(void)
 	vlong fdeo, fdesize, pad, cfa, pc;
 	Prog *p;
 
-	frameo = cpos();
+	dwarfframeo = cpos();
 
 	// Emit the CIE, Section 6.4.1
 	LPUT(CIERESERVE);  // initial length, must be multiple of PtrSize
@@ -899,7 +897,7 @@ writeframes(void)
 	uleb128put(-PtrSize / DATAALIGNMENTFACTOR);	// at cfa - x*4
 
 	// 4 is to exclude the length field.
-	pad = CIERESERVE + frameo + 4 - cpos();
+	pad = CIERESERVE + dwarfframeo + 4 - cpos();
 	if (pad < 0) {
 		diag("CIERESERVE too small by %lld bytes.", -pad);
 		errorexit();
@@ -952,7 +950,7 @@ writeframes(void)
 		seek(cout, fdeo + 4 + fdesize, 0);
 	}
 	cflush();
-	framesize = cpos() - frameo;
+	dwarfframesize = cpos() - dwarfframeo;
 }
 
 /*
@@ -966,7 +964,7 @@ writeinfo(void)
 
 	reversetree(&dwinfo);
 
-	infoo = cpos();
+	dwarfinfoo = cpos();
 
 	for (compunit = dwinfo; compunit; compunit = compunit->link) {
 		unitstart = cpos();
@@ -989,7 +987,7 @@ writeinfo(void)
 	}
 
 	cflush();
-	infosize = cpos() - infoo;
+	dwarfinfosize = cpos() - dwarfinfoo;
 }
 
 void
@@ -999,44 +997,5 @@ dwarfemitdebugsections(void)
 	writelines();
 	writeframes();
 	writeinfo();
-}
-
-/*
- * dwarfaddelfheaders: create ELF section headers for the DWARF sections.
- * Called after dwarfemitdebugsections() so that offsets and sizes are known.
- */
-void
-dwarfaddelfheaders(void)
-{
-	ElfShdr *sh;
-
-	if(abbrevsize > 0) {
-		sh = elfshname(".debug_abbrev");
-		sh->type = SHT_PROGBITS;
-		sh->off = abbrevo;
-		sh->size = abbrevsize;
-		sh->addralign = 1;
-	}
-	if(linesize > 0) {
-		sh = elfshname(".debug_line");
-		sh->type = SHT_PROGBITS;
-		sh->off = lineo;
-		sh->size = linesize;
-		sh->addralign = 1;
-	}
-	if(framesize > 0) {
-		sh = elfshname(".debug_frame");
-		sh->type = SHT_PROGBITS;
-		sh->off = frameo;
-		sh->size = framesize;
-		sh->addralign = 1;
-	}
-	if(infosize > 0) {
-		sh = elfshname(".debug_info");
-		sh->type = SHT_PROGBITS;
-		sh->off = infoo;
-		sh->size = infosize;
-		sh->addralign = 1;
-	}
 }
 

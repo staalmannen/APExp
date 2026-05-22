@@ -4,6 +4,20 @@
 
 
 /*
+ * Offsets and sizes of the DWARF debug sections, set by dwarfemitdebugsections().
+ * Exposed so that elf.c (and any future format handler) can create section headers
+ * without pulling in ELF-specific code into dwarf.c.
+ */
+extern vlong dwarfabbrevo;
+extern vlong dwarfabbrevsize;
+extern vlong dwarflineo;
+extern vlong dwarflinesize;
+extern vlong dwarfinfoo;
+extern vlong dwarfinfosize;
+extern vlong dwarfframeo;
+extern vlong dwarfframesize;
+
+/*
  * Register 'f' symbol file fragments.  Doing this while parsing the
  * .6 input saves a pass over the symbol table later.
  */
