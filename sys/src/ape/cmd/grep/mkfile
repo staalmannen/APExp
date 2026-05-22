@@ -28,15 +28,15 @@ LIB_OBJS=\
 #	libgreputils_a-chdir-long.$O \
 #	libgreputils_a-cloexec.$O \
 #	libgreputils_a-close-stream.$O \
-#	libgreputils_a-closeout.$O \
-#	libgreputils_a-cycle-check.$O \
+	libgreputils_a-closeout.$O \
+	libgreputils_a-cycle-check.$O \
 	libgreputils_a-dfa.$O \
-#	libgreputils_a-localeinfo.$O \
+	libgreputils_a-localeinfo.$O \
 #	libgreputils_a-dirname-lgpl.$O \
-#	libgreputils_a-stripslash.$O \
+	libgreputils_a-stripslash.$O \
 #	libgreputils_a-dup2.$O \
 #	libgreputils_a-error.$O \
-#	libgreputils_a-exclude.$O \
+	libgreputils_a-exclude.$O \
 	libgreputils_a-exitfail.$O \
 #	libgreputils_a-fcntl.$O \
 #	libgreputils_a-creat-safer.$O \
@@ -51,10 +51,10 @@ LIB_OBJS=\
 #	libgreputils_a-getcwd-lgpl.$O \
 #	libgreputils_a-getopt.$O \
 #	libgreputils_a-getopt1.$O \
-#	libgreputils_a-dynarray_at_failure.$O \
-#	libgreputils_a-dynarray_emplace_enlarge.$O \
-#	libgreputils_a-dynarray_finalize.$O \
-#	libgreputils_a-dynarray_resize.$O \
+	libgreputils_a-dynarray_at_failure.$O \
+	libgreputils_a-dynarray_emplace_enlarge.$O \
+	libgreputils_a-dynarray_finalize.$O \
+	libgreputils_a-dynarray_resize.$O \
 #	libgreputils_a-dynarray_resize_clear.$O \
 #	libgreputils_a-hard-locale.$O \
 	libgreputils_a-hash.$O \
@@ -75,20 +75,20 @@ LIB_OBJS=\
 #	libgreputils_a-mbsrtowcs.$O \
 #	libgreputils_a-mbszero.$O \
 #	libgreputils_a-mcel.$O \
-#	libgreputils_a-memchr2.$O \
+	libgreputils_a-memchr2.$O \
 #	libgreputils_a-memrchr.$O \
 #	libgreputils_a-nl_langinfo.$O \
 	libgreputils_a-obstack.$O \
 #	libgreputils_a-once.$O \
 #	libgreputils_a-openat.$O \
 #	libgreputils_a-openat-die.$O \
-#	libgreputils_a-openat-safer.$O \
+	libgreputils_a-openat-safer.$O \
 #	libgreputils_a-opendirat.$O \
 #	libgreputils_a-quotearg.$O \
 #	libgreputils_a-rawmemchr.$O \
 	libgreputils_a-reallocarray.$O \
 	libgreputils_a-regex.$O \
-#	libgreputils_a-safe-read.$O \
+	libgreputils_a-safe-read.$O \
 	libgreputils_a-same-inode.$O \
 #	libgreputils_a-save-cwd.$O \
 #	libgreputils_a-setlocale_null.$O \
@@ -120,7 +120,7 @@ LIB_OBJS=\
 	libgreputils_a-xstrtoimax.$O \
 	libgreputils_a-xstrtol.$O \
 	libgreputils_a-xstrtoul.$O \
-#	libgreputils_a-colorize-posix.$O \
+	libgreputils_a-colorize-posix.$O \
 	libgreputils_a-version-etc-fsf.$O
 
 LIB=libgrep.a$O
