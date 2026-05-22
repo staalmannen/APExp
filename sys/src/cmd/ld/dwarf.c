@@ -6,6 +6,7 @@
 #include	"lib.h"
 #include	"dwarf.h"
 #include	"dwarf_defs.h"
+#include	"elf.h"
 
 /* Calculate stack adjustment from AADJSP instruction (x86 only) */
 static long
