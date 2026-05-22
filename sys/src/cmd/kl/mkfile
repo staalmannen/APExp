@@ -1,7 +1,7 @@
 </$objtype/mkfile
 
 TARG=kl
-OFILES=	asm.$O	obj.$O	optab.$O	pass.$O	span.$O	list.$O	enam.$O	compat.$O	noop.$O	sched.$O	dwarf.$O	lib.$O	go.$O
+OFILES=	asm.$O	obj.$O	optab.$O	pass.$O	span.$O	list.$O	enam.$O	compat.$O	noop.$O	sched.$O	dwarf.$O	lib.$O	go.$O	elf.$O
 
 HFILES=	l.h	../kc/k.out.h	../cc/compat.h
 APEXPROOT=../../../..
@@ -25,5 +25,8 @@ lib.$O:	../ld/lib.c
 
 go.$O:	../ld/go.c
 	$CC $CFLAGS -I../ld ../ld/go.c
+
+elf.$O:	../ld/elf.c
+	$CC $CFLAGS -I../ld ../ld/elf.c
 
 compat.$O:	../cc/compat

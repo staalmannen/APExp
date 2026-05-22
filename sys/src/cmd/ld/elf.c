@@ -7,6 +7,7 @@
 #include	"l.h"
 #include	"lib.h"
 #include	"elf.h"
+#include	"dwarf.h"
 
 #define NSECT 48
 
@@ -289,4 +290,44 @@ elfwritestrtab(void)
 	strnput(elfstrtab, elfstrtabsz);
 	cflush();
 	return elfstrtabsz;
+}
+
+/*
+ * dwarfaddelfheaders: create ELF section headers for the DWARF sections.
+ * Called after dwarfemitdebugsections() so that offsets and sizes are known.
+ * Lives here (not dwarf.c) so that only linkers that link elf.$O get it.
+ */
+void
+dwarfaddelfheaders(void)
+{
+	ElfShdr *sh;
+
+	if(dwarfabbrevsize > 0) {
+		sh = elfshname(".debug_abbrev");
+		sh->type = SHT_PROGBITS;
+		sh->off = dwarfabbrevo;
+		sh->size = dwarfabbrevsize;
+		sh->addralign = 1;
+	}
+	if(dwarflinesize > 0) {
+		sh = elfshname(".debug_line");
+		sh->type = SHT_PROGBITS;
+		sh->off = dwarflineo;
+		sh->size = dwarflinesize;
+		sh->addralign = 1;
+	}
+	if(dwarfframesize > 0) {
+		sh = elfshname(".debug_frame");
+		sh->type = SHT_PROGBITS;
+		sh->off = dwarfframeo;
+		sh->size = dwarfframesize;
+		sh->addralign = 1;
+	}
+	if(dwarfinfosize > 0) {
+		sh = elfshname(".debug_info");
+		sh->type = SHT_PROGBITS;
+		sh->off = dwarfinfoo;
+		sh->size = dwarfinfosize;
+		sh->addralign = 1;
+	}
 }
