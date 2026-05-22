@@ -109,11 +109,11 @@ asmbelf(long textfoff, vlong datafoff, vlong datva)
 	ph = newElfPhdr();
 	ph->type   = PT_LOAD;
 	ph->flags  = PF_R | PF_X;
-	ph->off    = textfoff;
-	ph->vaddr  = INITTEXT;
-	ph->paddr  = INITTEXT;
-	ph->filesz = textsize;
-	ph->memsz  = textsize;
+	ph->off    = 0;                        /* cover ELF header from offset 0 */
+	ph->vaddr  = INITTEXT - textfoff;      /* 0x200C00 - 0xC00 = 0x200000   */
+	ph->paddr  = INITTEXT - textfoff;
+	ph->filesz = textfoff + textsize;      /* header area + text             */
+	ph->memsz  = textfoff + textsize;
 	ph->align  = 0x1000;
 
 	ph = newElfPhdr();
@@ -125,9 +125,6 @@ asmbelf(long textfoff, vlong datafoff, vlong datva)
 	ph->filesz = datsize;
 	ph->memsz  = datsize + bsssize;
 	ph->align  = 0x1000;
-
-	/* NULL section header (index 0) */
-	newElfShdr(0);
 
 	/* .text section */
 	sh = elfshname(".text");
@@ -223,6 +220,9 @@ asmb_elf(void)
 
 	/* Initialize ELF state */
 	elfinit();
+
+	/* NULL section header must be at index 0 — before any other shdr */
+	newElfShdr(0);
 
 	/* Compute data layout before writing anything */
 	datva    = (INITTEXT + textsize + INITRND - 1) & ~((vlong)INITRND - 1);
