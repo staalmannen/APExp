@@ -513,12 +513,11 @@ addhistfile(char *zentry)
 	return histfilesize - 1;
 }
 
-// Go's runtime C sources are sane, and Go sources nest only 1 level,
-// so 16 should be plenty.
+// APE headers have deep transitive include chains; 256 covers real-world use.
 static struct {
 	int file;
 	vlong line;
-} includestack[64];
+} includestack[256];
 static int includetop;
 static vlong absline;
 
@@ -542,9 +541,9 @@ checknesting(void)
 		errorexit();
 	}
 	if (includetop >= nelem(includestack)) {
-		diag("nesting too deep");
-		for (i = 0; i < nelem(includestack); i++)
-		        diag("%s", histfile[includestack[i].file]);		errorexit();
+		if(includetop == nelem(includestack))
+			diag("include nesting too deep, truncating DWARF line info");
+		includetop = nelem(includestack) - 1;
 	}
 }
 
