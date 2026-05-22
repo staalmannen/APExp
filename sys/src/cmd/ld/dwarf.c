@@ -518,7 +518,7 @@ addhistfile(char *zentry)
 static struct {
 	int file;
 	vlong line;
-} includestack[16];
+} includestack[64];
 static int includetop;
 static vlong absline;
 
