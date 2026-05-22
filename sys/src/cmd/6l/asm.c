@@ -109,11 +109,11 @@ asmbelf(long textfoff, vlong datafoff, vlong datva)
 	ph = newElfPhdr();
 	ph->type   = PT_LOAD;
 	ph->flags  = PF_R | PF_X;
-	ph->off    = textfoff;
-	ph->vaddr  = INITTEXT;
-	ph->paddr  = INITTEXT;
-	ph->filesz = textsize;
-	ph->memsz  = textsize;
+	ph->off    = 0;                        /* cover ELF header from offset 0 */
+	ph->vaddr  = INITTEXT - textfoff;      /* 0x200C00 - 0xC00 = 0x200000   */
+	ph->paddr  = INITTEXT - textfoff;
+	ph->filesz = textfoff + textsize;      /* header area + text             */
+	ph->memsz  = textfoff + textsize;
 	ph->align  = 0x1000;
 
 	ph = newElfPhdr();
