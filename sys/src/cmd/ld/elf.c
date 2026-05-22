@@ -69,6 +69,19 @@ elfinit(void)
 	}
 }
 
+/* elfforce32: switch to ELF32 format after elfinit().
+ * Plan9's kernel exec only accepts ELF32, even on amd64. */
+void
+elfforce32(void)
+{
+	elf64 = 0;
+	hdr.phoff    = ELF32HDRSIZE;
+	hdr.shoff    = ELF32HDRSIZE;
+	hdr.ehsize   = ELF32HDRSIZE;
+	hdr.phentsize = ELF32PHDRSIZE;
+	hdr.shentsize = ELF32SHDRSIZE;
+}
+
 ElfEhdr*
 getElfEhdr(void)
 {

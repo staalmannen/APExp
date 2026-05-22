@@ -190,7 +190,7 @@ asmbelf(long textfoff, vlong datafoff, vlong datva)
 	eh->ident[EI_MAG1]    = ELFMAG1;
 	eh->ident[EI_MAG2]    = ELFMAG2;
 	eh->ident[EI_MAG3]    = ELFMAG3;
-	eh->ident[EI_CLASS]   = ELFCLASS64;
+	eh->ident[EI_CLASS]   = ELFCLASS32;	/* Plan9 kernel exec requires ELF32 */
 	eh->ident[EI_DATA]    = ELFDATA2LSB;
 	eh->ident[EI_VERSION] = EV_CURRENT;
 	eh->type      = ET_EXEC;
@@ -207,7 +207,11 @@ asmbelf(long textfoff, vlong datafoff, vlong datva)
 }
 
 /*
- * asmb_elf: assemble ELF64 output (called by asmb when HEADTYPE==5).
+ * asmb_elf: assemble ELF32/AMD64 output (called by asmb when HEADTYPE==5).
+ *
+ * Plan9's kernel exec only accepts ELF32 format (ELFCLASS32), even on amd64.
+ * This matches the original 6l -H5 behaviour (cput(1) = ELFCLASS32 in case 5).
+ * All Plan9 userspace addresses fit in 32 bits, so ELF32 is sufficient.
  */
 static void
 asmb_elf(void)
@@ -218,8 +222,9 @@ asmb_elf(void)
 	uchar *op1;
 	vlong datva, datafoff, pad;
 
-	/* Initialize ELF state */
+	/* Initialize ELF state, then force ELF32 for Plan9 compatibility */
 	elfinit();
+	elfforce32();
 
 	/* NULL section header must be at index 0 — before any other shdr */
 	newElfShdr(0);

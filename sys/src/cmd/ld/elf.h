@@ -209,6 +209,7 @@ struct Elf_Note
 
 /* Declarations */
 void        elfinit(void);
+void        elfforce32(void);
 ElfEhdr*    getElfEhdr(void);
 ElfShdr*    newElfShdr(vlong);
 ElfPhdr*    newElfPhdr(void);
