@@ -291,6 +291,7 @@ asmb_elf(void)
 	if(debug['v'])
 		Bprint(&bso, "%5.2f asmb elf dwarf\n", cputime());
 	Bflush(&bso);
+	cflush();	/* cpos() is seek(cout,0,1) and ignores cbuf — must flush first */
 	if(!debug['w'])
 		dwarfemitdebugsections();
 	dwarfaddelfheaders();
