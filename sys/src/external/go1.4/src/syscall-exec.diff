@@ -1,0 +1,16 @@
+diff --git a/src/syscall/exec_plan9.go b/src/syscall/exec_plan9.go
+index 7a415fd..4198234 100644
+--- a/src/syscall/exec_plan9.go
++++ b/src/syscall/exec_plan9.go
+@@ -218,10 +218,7 @@ func forkAndExecInChild(argv0 *byte, argv []*byte, envv []envItem, dir *byte, at
+ 
+ 	// Close fds we don't need.
+ 	for i = 0; i < len(fdsToClose); i++ {
+-		r1, _, _ = RawSyscall(SYS_CLOSE, uintptr(fdsToClose[i]), 0, 0)
+-		if int32(r1) == -1 {
+-			goto childerror
+-		}
++		RawSyscall(SYS_CLOSE, uintptr(fdsToClose[i]), 0, 0)
+ 	}
+ 
+ 	if envv != nil {

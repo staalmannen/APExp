@@ -3,6 +3,8 @@ APE=../../ape
 APEXPROOT=../../../..
 
 _CORE_APPS=\
+# ELF post-link tool
+	dw2elf\
 # shell\
 	dash\
 	bash\
