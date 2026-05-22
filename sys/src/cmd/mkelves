@@ -1,12 +1,9 @@
 # mkelves: like mkmany, but produces ELF binaries via 6l -H5 (amd64).
-# LD=pcc uses -Wl,-H5 to pass the flag through pcc to the underlying linker.
-# LD=6l (or other arch linker) uses LDFLAGS=-H5 directly.
-#
-# Usage in a mkfile:
-#   LDFLAGS=-Wl,-H5		# when LD=pcc (APE build)
-#   LDFLAGS=-H5			# when LD=6l directly
-#   <$APEXPROOT/sys/src/cmd/mkelves
+# LDFLAGS defaults to -Wl,-H5 (works with LD=pcc; pcc forwards -H5 to 6l).
+# If using LD=6l directly, override: LDFLAGS=-H5
+# To append extra linker flags: LDFLAGS=$LDFLAGS -lfoo (after including this file)
 
+LDFLAGS=-Wl,-H5
 PROGS=${TARG:%=$O.%.elf}
 MANFILES=${TARG:%=%.man}
 YFLAGS=-d
