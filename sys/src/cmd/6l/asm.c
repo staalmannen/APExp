@@ -152,7 +152,7 @@ asmbelf(long textfoff, vlong datafoff, vlong datva)
 	sh->type = SHT_NOBITS;
 	sh->flags = SHF_ALLOC | SHF_WRITE;
 	sh->addr = datva + datsize;
-	sh->off = 0;
+	sh->off = datafoff + datsize;	/* NOBITS: conventional end-of-data offset */
 	sh->size = bsssize;
 	sh->addralign = 8;
 
