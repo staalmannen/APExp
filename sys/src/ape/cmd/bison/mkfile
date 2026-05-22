@@ -64,12 +64,12 @@ LIB_OBJS=\
 #	libbison_a-areadlink.$O \
 	libbison_a-argmatch.$O \
 #	libbison_a-gl_array_list.$O \
-#	libbison_a-basename-lgpl.$O \
+	libbison_a-basename-lgpl.$O \
 #	libbison_a-binary-io.$O \
 #	libbison_a-bitrotate.$O \
 	libbison_a-bitset.$O \
 #	libbison_a-array.$O \
-#	libbison_a-stats.$O \
+	libbison_a-stats.$O \
 #	libbison_a-table.$O \
 #	libbison_a-list.$O \
 #	libbison_a-vector.$O \
@@ -89,14 +89,14 @@ LIB_OBJS=\
 #	libbison_a-stripslash.$O \
 	libbison_a-execute.$O \
 	libbison_a-exitfail.$O \
-#	libbison_a-fatal-signal.$O \
+	libbison_a-fatal-signal.$O \
 #	libbison_a-fd-safer-flag.$O \
 #	libbison_a-dup-safer-flag.$O \
-#	libbison_a-file-set.$O \
-#	libbison_a-findprog-in.$O \
+	libbison_a-file-set.$O \
+	libbison_a-findprog-in.$O \
 	libbison_a-fopen-safer.$O \
-#	libbison_a-fstrcmp.$O \
-#	libbison_a-gethrxtime.$O \
+	libbison_a-fstrcmp.$O \
+	libbison_a-gethrxtime.$O \
 #	libbison_a-xtime.$O \
 #	libbison_a-getprogname.$O \
 #	libbison_a-gettime.$O \
@@ -125,25 +125,25 @@ LIB_OBJS=\
 	libbison_a-quotearg.$O \
 #	libbison_a-gl_rbtree_oset.$O \
 #	libbison_a-gl_rbtreehash_list.$O \
-#	libbison_a-scratch_buffer_dupfree.$O \
+	libbison_a-scratch_buffer_dupfree.$O \
 	libbison_a-scratch_buffer_grow.$O \
 	libbison_a-scratch_buffer_grow_preserve.$O \
 	libbison_a-scratch_buffer_set_array_size.$O \
 #	libbison_a-sig-handler.$O \
-#	libbison_a-spawn-pipe.$O \
+	libbison_a-spawn-pipe.$O \
 #	libbison_a-threadlib.$O \
 #	libbison_a-timespec.$O \
 	libbison_a-timevar.$O \
 #	libbison_a-tls.$O \
-#	libbison_a-unicodeio.$O \
+	libbison_a-unicodeio.$O \
 	libbison_a-unistd.$O \
 	libbison_a-dup-safer.$O \
 #	libbison_a-fd-safer.$O \
 #	libbison_a-pipe-safer.$O \
 	libbison_a-wait-process.$O \
 #	libbison_a-wctype-h.$O \
-#	libbison_a-xmalloc.$O \
-#	libbison_a-xalloc-die.$O \
+	libbison_a-xmalloc.$O \
+	libbison_a-xalloc-die.$O \
 	libbison_a-xconcat-filename.$O \
 	libbison_a-xhash.$O \
 #	libbison_a-gl_xlist.$O \
@@ -152,7 +152,7 @@ LIB_OBJS=\
 #	libbison_a-xreadlink.$O \
 	libbison_a-xsize.$O \
 #	libbison_a-xstrndup.$O \
-#	libbison_a-get-errno.$O \
+	libbison_a-get-errno.$O \
 	libbison_a-path-join.$O \
 	liby_a-main.$O \
 	liby_a-yyerror.$O
