@@ -126,9 +126,6 @@ asmbelf(long textfoff, vlong datafoff, vlong datva)
 	ph->memsz  = datsize + bsssize;
 	ph->align  = 0x1000;
 
-	/* NULL section header (index 0) */
-	newElfShdr(0);
-
 	/* .text section */
 	sh = elfshname(".text");
 	sh->type = SHT_PROGBITS;
@@ -223,6 +220,9 @@ asmb_elf(void)
 
 	/* Initialize ELF state */
 	elfinit();
+
+	/* NULL section header must be at index 0 — before any other shdr */
+	newElfShdr(0);
 
 	/* Compute data layout before writing anything */
 	datva    = (INITTEXT + textsize + INITRND - 1) & ~((vlong)INITRND - 1);
