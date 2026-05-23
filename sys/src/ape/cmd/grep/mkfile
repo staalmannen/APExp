@@ -40,7 +40,7 @@ LIB_OBJS=\
 #	libgreputils_a-exitfail.$O \
 #	libgreputils_a-fcntl.$O \
 #	libgreputils_a-creat-safer.$O \
-#	libgreputils_a-open-safer.$O \
+	libgreputils_a-open-safer.$O \
 #	libgreputils_a-fd-hook.$O \
 #	libgreputils_a-fdopendir.$O \
 #	libgreputils_a-filenamecat-lgpl.$O \
@@ -107,7 +107,7 @@ LIB_OBJS=\
 	libgreputils_a-threadlib.$O \
 	libgreputils_a-unistd.$O \
 #	libgreputils_a-dup-safer.$O \
-#	libgreputils_a-fd-safer.$O \
+	libgreputils_a-fd-safer.$O \
 #	libgreputils_a-pipe-safer.$O \
 	libgreputils_a-version-etc.$O \
 #	libgreputils_a-wctob.$O \
