@@ -122,7 +122,12 @@ main(int argc, char *argv[])
 		case 'N':
 		case 'T':
 		case 'w':
+		case 'F':
 			append(&cc, smprint("-%c", ARGC()));
+			break;
+		case 'B':
+			append(&cc, "-B");
+			Aflag = 1;
 			break;
 		case 'O':
 			break;
