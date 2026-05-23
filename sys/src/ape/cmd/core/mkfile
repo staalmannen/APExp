@@ -6,7 +6,7 @@ LIB=../gnulib/libgnu.a$O
 CORESRC=../../../external/coreutils
 
 TARG=\
-#	base64\
+	base64\
 	basename\
 	cat\
 	chmod\
@@ -87,9 +87,7 @@ TARG=\
 	whoami\
 	yes\
 
-GNU_OBJS=\
-	getopt.$O\
-	getopt1.$O\
+# GNU_OBJS=\
 
 BIN=$APEXPROOT/$objtype/bin/ape
 
@@ -101,11 +99,11 @@ CFLAGS= -c -I$CORESRC/src -I$CORESRC/lib -D_POSIX_SOURCE\
 %.$O: $CORESRC/src/%.c
 	$CC $CFLAGS $prereq
 
-%.$O: $CORESRC/lib/%.c
-	$CC $CFLAGS $prereq
+# %.$O: $CORESRC/lib/%.c
+#	$CC $CFLAGS $prereq
 
-../gnulib/libgnu.a$O : $GNU_OBJS
-	ar vu ../gnulib/libgnu.a$O $GNU_OBJS
+# ../gnulib/libgnu.a$O : $GNU_OBJS
+#	ar vu ../gnulib/libgnu.a$O $GNU_OBJS
 
 $O.cp: cp.$O cp-hash.$O copy.$O
 	$CC -o cp cp.$O cp-hash.$O copy.$O libcoreutils.a$O

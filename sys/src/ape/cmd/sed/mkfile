@@ -20,7 +20,6 @@ GNU_OBJS=\
 	acl-internal.$O\
 	get-permissions.$O\
 	set-permissions.$O\
-	c-strcasecmp.$O\
 	dfa.$O\
 	localeinfo.$O\
 	exitfail.$O\
@@ -33,17 +32,15 @@ GNU_OBJS=\
 	dynarray_resize.$O\
 	obstack.$O\
 	qcopy-acl.$O\
-	quotearg.$O\
 	regex.$O\
 	strerror.$O\
-	unistd.$O\
 
 LIB_OBJS=\
 	progname.$O\
 	version-etc.$O\
 	version-etc-fsf.$O\
 
-LIB= ..gnulib/libgnu.a$O libsed.a$O
+LIB= ../gnulib/libgnu.a$O libsed.a$O
 BIN=$APEXPROOT/$objtype/bin/ape
 
 <$APEXPROOT/sys/src/cmd/mkone
@@ -70,9 +67,9 @@ CFLAGS=-c -I. -I$GSEDSRC -I$GSEDSRC/sed -I$GSEDSRC/lib -B -DHAVE_CONFIG_H\
 	$CC $CFLAGS $GSEDSRC/lib/glthread/$stem.c
 
 libsed.a$O: $LIB_OBJS
-			ar vu libgnu.a$O $LIB_OBJS
+			ar vu libsed.a$O $LIB_OBJS
 
-../gnulib/libgnu.a$O: $GNU_OBJS
+../gnulib/libgnu.a$O:V: $GNU_OBJS
 			ar vu ../gnulib/libgnu.a$O $GNU_OBJS
 
 install:V:
