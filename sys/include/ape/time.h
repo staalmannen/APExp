@@ -110,6 +110,13 @@ extern long timezone;
 extern long altzone;
 extern int daylight;
 
+/* POSIX.1-2024: opaque timezone handle used by tzalloc/tzfree/localtime_rz */
+#ifndef __timezone_t_defined
+struct tm_zone;
+typedef struct tm_zone *timezone_t;
+#define __timezone_t_defined 1
+#endif
+
 #include <sys/times.h> /* times */
 #include <sys/time.h> /* gettimeofday */
 
