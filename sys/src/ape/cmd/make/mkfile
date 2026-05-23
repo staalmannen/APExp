@@ -14,8 +14,8 @@ OFILES=	\
 	expand.$O\
 	file.$O\
 	function.$O\
-#	getopt.$O\
-#	getopt1.$O\
+	getopt.$O\
+	getopt1.$O\
 	guile.$O\
 	hash.$O\
 	implicit.$O\
@@ -37,8 +37,8 @@ OFILES=	\
 	posixos.$O\
 	remote-stub.$O\
 # lib\
-#	getloadavg.$O\
-#	glob.$O
+	getloadavg.$O\
+	glob.$O
 
 
 BIN=$APEXPROOT/$objtype/bin/ape

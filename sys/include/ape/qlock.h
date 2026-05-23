@@ -5,6 +5,14 @@
 #include <u.h>
 #include <lock.h>
 
+#ifndef Lock
+typedef struct
+{
+	int	val;
+} Lock;
+#endif
+
+
 typedef struct QLp QLp;
 struct QLp
 {
