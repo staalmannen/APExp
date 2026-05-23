@@ -37,7 +37,6 @@ LIB_OBJS= \
 #	dup-safer-flag.$O\
 	error.$O\
 	execute.$O\
-	exitfail.$O\
 	fatal-signal.$O\
 #	fd-safer.$O\
 #	fd-safer-flag.$O\
@@ -91,9 +90,7 @@ LIB_OBJS= \
 #	vfzprintf.$O\
 #	vzprintf.$O\
 	wait-process.$O\
-	xalloc-die.$O\
 	xasprintf.$O\
-	xmalloc.$O\
 	xmalloca.$O\
 	xmemdup0.$O\
 	xprintf.$O\

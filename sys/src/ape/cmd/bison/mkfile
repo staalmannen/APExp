@@ -88,7 +88,7 @@ LIB_OBJS=\
 #	libbison_a-dirname-lgpl.$O \
 #	libbison_a-stripslash.$O \
 	libbison_a-execute.$O \
-	libbison_a-exitfail.$O \
+#	libbison_a-exitfail.$O \
 	libbison_a-fatal-signal.$O \
 #	libbison_a-fd-safer-flag.$O \
 #	libbison_a-dup-safer-flag.$O \
@@ -142,8 +142,8 @@ LIB_OBJS=\
 #	libbison_a-pipe-safer.$O \
 	libbison_a-wait-process.$O \
 #	libbison_a-wctype-h.$O \
-	libbison_a-xmalloc.$O \
-	libbison_a-xalloc-die.$O \
+#	libbison_a-xmalloc.$O \
+#	libbison_a-xalloc-die.$O \
 	libbison_a-xconcat-filename.$O \
 	libbison_a-xhash.$O \
 #	libbison_a-gl_xlist.$O \

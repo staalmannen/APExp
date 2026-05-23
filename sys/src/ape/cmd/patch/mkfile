@@ -11,12 +11,9 @@ OFILES=\
 	safe.$O util.$O version.$O merge.$O
 
 LIBO=\
-	xmalloc.$O\
-	xalloc-die.$O\
 	argmatch.$O\
 	backup-find.$O\
 	basename-lgpl.$O\
-	exitfail.$O\
 	gettime.$O\
 	hash.$O\
 	parse-datetime.$O\

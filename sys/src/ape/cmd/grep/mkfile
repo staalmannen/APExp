@@ -37,7 +37,7 @@ LIB_OBJS=\
 #	libgreputils_a-dup2.$O \
 #	libgreputils_a-error.$O \
 	libgreputils_a-exclude.$O \
-	libgreputils_a-exitfail.$O \
+#	libgreputils_a-exitfail.$O \
 #	libgreputils_a-fcntl.$O \
 #	libgreputils_a-creat-safer.$O \
 #	libgreputils_a-open-safer.$O \
@@ -114,8 +114,8 @@ LIB_OBJS=\
 #	libgreputils_a-wctype.$O \
 #	libgreputils_a-wctype-h.$O \
 	libgreputils_a-wmempcpy.$O \
-	libgreputils_a-xmalloc.$O \
-	libgreputils_a-xalloc-die.$O \
+#	libgreputils_a-xmalloc.$O \
+#	libgreputils_a-xalloc-die.$O \
 #	libgreputils_a-xbinary-io.$O \
 	libgreputils_a-xstrtoimax.$O \
 	libgreputils_a-xstrtol.$O \

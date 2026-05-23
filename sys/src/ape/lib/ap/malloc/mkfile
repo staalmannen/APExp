@@ -19,6 +19,7 @@ OFILES=\
 	aligned_alloc.$O\
 # GNU xalloc family\
 	xmalloc.$O\
+	exitfail.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

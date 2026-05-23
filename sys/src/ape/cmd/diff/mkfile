@@ -12,7 +12,6 @@ LIB= libdiff.a$O
 
 LIBO=\
 	sigsegv.$O stdbit.$O\
-	xmalloc.$O xalloc-die.$O\
 	xstrtoimax.$O\
 	quotearg.$O\
 	diagnose.$O\
@@ -21,8 +20,7 @@ LIBO=\
 	c-stack.$O\
 	xstdopen.$O\
 	propername-lite.$O\
-	cmpbuf.$O\
-	exitfail.$O
+	cmpbuf.$O
 
 CMPO=\
 	cmp.$O system.$O
