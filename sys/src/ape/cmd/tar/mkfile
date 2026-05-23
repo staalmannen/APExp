@@ -147,7 +147,7 @@ LIBGNU_OBJS=\
 #	libgnu_a-lstat.$O\
 #	libgnu_a-malloca.$O\
 #	libgnu_a-mbchar.$O\
-#	libgnu_a-mbrtoc32.$O
+#	libgnu_a-mbrtoc32.$O\
 #	libgnu_a-mbrtowc.$O\
 #	libgnu_a-mbscasecmp.$O\
 #	libgnu_a-mbsrtowcs.$O\
@@ -213,7 +213,8 @@ LIBGNU_OBJS=\
 #	libgnu_a-ctype_alpha.$O\
 #	libgnu_a-ctype_blank.$O\
 #	libgnu_a-ctype_cntrl.$O\
-#	libgnu_a-ctype_digit.$O\ #	libgnu_a-ctype_graph.$O\
+#	libgnu_a-ctype_digit.$O\
+#	libgnu_a-ctype_graph.$O\
 #	libgnu_a-ctype_lower.$O\
 #	libgnu_a-ctype_print.$O\
 #	libgnu_a-ctype_punct.$O\
@@ -241,7 +242,9 @@ LIBGNU_OBJS=\
 #	libgnu_a-xstrtoul.$O\
 #	libgnu_a-xstrtoumax.$O\
 #	libgnu_a-xvasprintf.$O\
-#	libgnu_a-xasprintf.$O
+#	libgnu_a-xasprintf.$O\
+
+
 
 LIBTAR_OBJS= paxerror.$O paxexit-status.$O 	paxnames.$O rtapelib.$O wordsplit.$O xattr-at.$O
 

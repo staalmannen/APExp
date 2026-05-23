@@ -13,8 +13,7 @@ OFILES=	compile.$O\
 		utils.$O\
 		version.$O
 
-# lib objs from Makefile
-# I think I can comment out a lot of them
+# lib objs are minimized
 LIB_OBJS=\
 	copy-acl.$O\
 	acl-internal.$O\
