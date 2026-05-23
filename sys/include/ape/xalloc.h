@@ -28,6 +28,14 @@ extern void *x2nrealloc(void *, size_t *, size_t);  /* growing: ~1.5x */
 extern void *x2realloc(void *, size_t *);
 extern void *xpalloc(void *, ptrdiff_t *, ptrdiff_t, ptrdiff_t, ptrdiff_t);
 
+/* idx_t (ptrdiff_t) signed-size variants */
+extern void *ximalloc(ptrdiff_t);
+extern void *xirealloc(void *, ptrdiff_t);
+extern void *xicalloc(ptrdiff_t, ptrdiff_t);
+extern void *xizalloc(ptrdiff_t);
+extern void *ximemdup(void const *, ptrdiff_t);
+extern char *ximemdup0(void const *, ptrdiff_t);
+
 /* Convenience: typed versions */
 #define XMALLOC(t, n)        ((t *)xmalloc((n) * sizeof(t)))
 #define XCALLOC(t, n)        ((t *)xcalloc((n), sizeof(t)))

@@ -169,3 +169,43 @@ xpalloc(void *pa, ptrdiff_t *pn, ptrdiff_t n_incr_min, ptrdiff_t n_max, ptrdiff_
 	*pn = n;
 	return pa;
 }
+
+/* idx_t (ptrdiff_t) variants — same semantics, signed-size argument. */
+
+void *
+ximalloc(ptrdiff_t s)
+{
+	return xmalloc((size_t)s);
+}
+
+void *
+xirealloc(void *p, ptrdiff_t s)
+{
+	return xrealloc(p, (size_t)s);
+}
+
+void *
+xicalloc(ptrdiff_t n, ptrdiff_t s)
+{
+	return xcalloc((size_t)n, (size_t)s);
+}
+
+void *
+xizalloc(ptrdiff_t s)
+{
+	return xicalloc(s, 1);
+}
+
+void *
+ximemdup(void const *p, ptrdiff_t s)
+{
+	return xmemdup(p, (size_t)s);
+}
+
+char *
+ximemdup0(void const *p, ptrdiff_t s)
+{
+	char *result = ximalloc(s + 1);
+	result[s] = '\0';
+	return memcpy(result, p, s);
+}
