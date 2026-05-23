@@ -1,7 +1,7 @@
 </$objtype/mkfile
 APEXPROOT=../../../../..
 TARG=m4
-LIB=libgnu.a$O\
+LIB=../gnulib/libgnu.a$O\
 	$APEXPROOT/$objtype/lib/ape/libintl.a\
 	$APEXPROOT/$objtype/lib/ape/libxml2.a
 
@@ -20,7 +20,7 @@ OFILES=\
 		symtab.$O
 
 #minimized gnulib
-LIB_OBJS= \
+GNU_OBJS= \
 	asyncsafe-spin.$O\
 	basename-lgpl.$O\
 	c-stack.$O\
@@ -129,10 +129,10 @@ CFLAGS=-c -B -I. -I$M4SRC -I$M4SRC/src  -I$M4SRC/lib -DHAVE_CONFIG_H\
 %.$O: $M4SRC/lib/glthread/%.c
 	$CC $CFLAGS $M4SRC/lib/glthread/$stem.c
 
-libgnu.a$O: $LIB_OBJS
-	ar vu libgnu.a$O $LIB_OBJS
+../gnulib/libgnu.a$O: $GNU_OBJS
+	ar vu ..gnulib/libgnu.a$O $GNU_OBJS
 
-CLEANFILES=libgnu.a$O
+
 
 
 

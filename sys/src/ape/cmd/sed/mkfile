@@ -14,7 +14,8 @@ OFILES=	compile.$O\
 		version.$O
 
 # lib objs are minimized
-LIB_OBJS=\
+
+GNU_OBJS=\
 	copy-acl.$O\
 	acl-internal.$O\
 	get-permissions.$O\
@@ -31,19 +32,18 @@ LIB_OBJS=\
 	dynarray_finalize.$O\
 	dynarray_resize.$O\
 	obstack.$O\
-	progname.$O\
 	qcopy-acl.$O\
 	quotearg.$O\
 	regex.$O\
 	strerror.$O\
 	unistd.$O\
+
+LIB_OBJS=\
+	progname.$O\
 	version-etc.$O\
 	version-etc-fsf.$O\
-	xmalloc.$O\
-	xalloc-die.$O
 
-
-LIB= libgnu.a$O
+LIB= ..gnulib/libgnu.a$O libsed.a$O
 BIN=$APEXPROOT/$objtype/bin/ape
 
 <$APEXPROOT/sys/src/cmd/mkone
@@ -69,8 +69,11 @@ CFLAGS=-c -I. -I$GSEDSRC -I$GSEDSRC/sed -I$GSEDSRC/lib -B -DHAVE_CONFIG_H\
 %.$O: $GSEDSRC/lib/glthread/%.c
 	$CC $CFLAGS $GSEDSRC/lib/glthread/$stem.c
 
-libgnu.a$O: $LIB_OBJS
+libsed.a$O: $LIB_OBJS
 			ar vu libgnu.a$O $LIB_OBJS
+
+../gnulib/libgnu.a$O: $GNU_OBJS
+			ar vu ../gnulib/libgnu.a$O $GNU_OBJS
 
 install:V:
 		cp $GSEDSRC/doc/sed.1 $APEXPROOT/sys/man/1/sed

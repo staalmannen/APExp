@@ -4,13 +4,13 @@ PTCHSRC=$APEXPROOT/sys/src/external/patch
 
 TARG=patch
 
-LIB=libgnu.a$O
+LIB=../gnulib/libgnu.a$O
 
 OFILES=\
 	inp.$O patch.$O pch.$O \
 	safe.$O util.$O version.$O merge.$O
 
-LIBO=\
+GNU_OBJ=\
 	argmatch.$O\
 	backup-find.$O\
 	basename-lgpl.$O\
@@ -37,8 +37,8 @@ CFLAGS=-B -p -D_POSIX_SOURCE \
 	-DS_IRWXUGO=S_IRUSR
 
 
-libgnu.a$O: $LIBO
-	ar vu libgnu.a$O $LIBO
+../gnulib/libgnu.a$O: $GNU_OBJ
+	ar vu ../gnulib/libgnu.a$O $GNU_OBJ
 
 %.$O: $PTCHSRC/src/%.c
 	$CC $CFLAGS $prereq

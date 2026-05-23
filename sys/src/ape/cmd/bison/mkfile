@@ -49,69 +49,72 @@ OFILES=\
 	bison-tables.$O \
 	bison-uniqstr.$O
 
+GNU_OBJS=\
+	u8-uctomb-aux.$O \
+	argmatch.$O \
+	gl_array_list.$O \
+	basename-lgpl.$O \
+	bitrotate.$O \
+	bitset.$O \
+	array.$O \
+	stats.$O \
+	table.$O \
+	list.$O \
+	vector.$O \
+	bitsetv.$O \
+	c-strcasecmp.$O \
+	canonicalize.$O \
+	close-stream.$O \
+	closeout.$O \
+	concat-filename.$O \
+	execute.$O \
+	fatal-signal.$O \
+	file-set.$O \
+	findprog-in.$O \
+	fopen-safer.$O \
+	fstrcmp.$O \
+	gethrxtime.$O \
+	gettime.$O \
+	hash.$O \
+	gl_hash_map.$O \
+	hash-pjw.$O \
+	hash-triple-simple.$O \
+	ialloc.$O \
+	integer_length.$O \
+	integer_length_l.$O \
+	gl_linked_list.$O \
+	lock.$O \
+	mbchar.$O \
+	mbswidth.$O \
+	progname.$O \
+	quotearg.$O \
+	gl_rbtree_oset.$O \
+	gl_rbtreehash_list.$O \
+	scratch_buffer_dupfree.$O \
+	scratch_buffer_grow.$O \
+	scratch_buffer_grow_preserve.$O \
+	scratch_buffer_set_array_size.$O \
+	spawn-pipe.$O \
+	timevar.$O \
+	unicodeio.$O \
+	unistd.$O \
+	dup-safer.$O \
+	fd-safer.$O \
+	pipe-safer.$O \
+	wait-process.$O \
+	xconcat-filename.$O \
+	xhash.$O \
+	xmemdup0.$O \
+	xsize.$O \
+	get-errno.$O \
+	path-join.$O \
+
 LIB_OBJS=\
-	libbison_a-u8-uctomb-aux.$O \
-	libbison_a-argmatch.$O \
-	libbison_a-gl_array_list.$O \
-	libbison_a-basename-lgpl.$O \
-	libbison_a-bitrotate.$O \
-	libbison_a-bitset.$O \
-	libbison_a-array.$O \
-	libbison_a-stats.$O \
-	libbison_a-table.$O \
-	libbison_a-list.$O \
-	libbison_a-vector.$O \
-	libbison_a-bitsetv.$O \
-	libbison_a-c-strcasecmp.$O \
-	libbison_a-canonicalize.$O \
-	libbison_a-close-stream.$O \
-	libbison_a-closeout.$O \
-	libbison_a-concat-filename.$O \
-	libbison_a-execute.$O \
-	libbison_a-fatal-signal.$O \
-	libbison_a-file-set.$O \
-	libbison_a-findprog-in.$O \
-	libbison_a-fopen-safer.$O \
-	libbison_a-fstrcmp.$O \
-	libbison_a-gethrxtime.$O \
-	libbison_a-gettime.$O \
-	libbison_a-hash.$O \
-	libbison_a-gl_hash_map.$O \
-	libbison_a-hash-pjw.$O \
-	libbison_a-hash-triple-simple.$O \
-	libbison_a-ialloc.$O \
-	libbison_a-integer_length.$O \
-	libbison_a-integer_length_l.$O \
-	libbison_a-gl_linked_list.$O \
-	libbison_a-lock.$O \
-	libbison_a-mbchar.$O \
-	libbison_a-mbswidth.$O \
-	libbison_a-progname.$O \
-	libbison_a-quotearg.$O \
-	libbison_a-gl_rbtree_oset.$O \
-	libbison_a-gl_rbtreehash_list.$O \
-	libbison_a-scratch_buffer_dupfree.$O \
-	libbison_a-scratch_buffer_grow.$O \
-	libbison_a-scratch_buffer_grow_preserve.$O \
-	libbison_a-scratch_buffer_set_array_size.$O \
-	libbison_a-spawn-pipe.$O \
-	libbison_a-timevar.$O \
-	libbison_a-unicodeio.$O \
-	libbison_a-unistd.$O \
-	libbison_a-dup-safer.$O \
-	libbison_a-fd-safer.$O \
-	libbison_a-pipe-safer.$O \
-	libbison_a-wait-process.$O \
-	libbison_a-xconcat-filename.$O \
-	libbison_a-xhash.$O \
-	libbison_a-xmemdup0.$O \
-	libbison_a-xsize.$O \
-	libbison_a-get-errno.$O \
-	libbison_a-path-join.$O \
 	liby_a-main.$O \
 	liby_a-yyerror.$O
 
-LIB=libbison.a$O
+LIB=libbison.a$O ../gnulib/libgnu.a$O
+
 BIN=$APEXPROOT/$objtype/bin/ape
 
 <$APEXPROOT/sys/src/cmd/mkone
@@ -131,30 +134,32 @@ CLEANFILES=$LIB
 bison-%.$O: $BISONSRC/src/%.c
 	$CC $CFLAGS -c $prereq -o $target
 
-libbison_a-%.$O: $BISONSRC/lib/%.c
+%.$O: $BISONSRC/lib/%.c
 	$CC $CFLAGS $prereq -o $target
 
-libbison_a-%.$O: $BISONSRC/lib/bitset/%.c
+%.$O: $BISONSRC/lib/bitset/%.c
 	$CC $CFLAGS $prereq -o $target
 
-libbison_a-%.$O: $BISONSRC/lib/malloc/%.c
+%.$O: $BISONSRC/lib/malloc/%.c
 	$CC $CFLAGS $prereq -o $target
 
-libbison_a-%.$O: $BISONSRC/lib/unistr/%.c
+%.$O: $BISONSRC/lib/unistr/%.c
 	$CC $CFLAGS $prereq -o $target
 
-libbison_a-%.$O: $BISONSRC/lib/glthread/%.c
+%.$O: $BISONSRC/lib/glthread/%.c
 	$CC $CFLAGS $prereq -o $target
 
-libbison_a-%.$O: $BISONSRC/lib/uniwidth/%.c
+%.$O: $BISONSRC/lib/uniwidth/%.c
 	$CC $CFLAGS $prereq -o $target
 
 liby_a-%.$O: $BISONSRC/lib/%.c
 	$CC $CFLAGS $prereq -o $target
 
-
 libbison.a$O: $LIB_OBJS
 		ar vu libbison.a$O $LIB_OBJS
+
+../gnulib/libgnu.a$O: $GNU_OBJS
+		ar vu ../gnulib/libgnu.a$O $GNU_OBJS
 
 install:V:
 		cp $BISONSRC/doc/bison.1 $APEXPROOT/sys/man/1/bison

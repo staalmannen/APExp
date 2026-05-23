@@ -2,7 +2,7 @@ APEXPROOT=../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-LIB=libcoreutils.a$O
+LIB=../gnulib/libgnu.a$O
 CORESRC=../../../external/coreutils
 
 TARG=\
@@ -87,11 +87,9 @@ TARG=\
 	whoami\
 	yes\
 
-LIBOBJS=\
-	libcoreutils_a-exitfail.$O\
-	libcoreutils_a-xmalloc.$O\
-	libcoreutils_a-getopt.$O\
-	libcoreutils_a-getopt1.$O\
+GNU_OBJS=\
+	getopt.$O\
+	getopt1.$O\
 
 BIN=$APEXPROOT/$objtype/bin/ape
 
@@ -101,13 +99,13 @@ CFLAGS= -c -I$CORESRC/src -I$CORESRC/lib -D_POSIX_SOURCE\
 	-DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale"
 
 %.$O: $CORESRC/src/%.c
-	$CC $CFLAGS $prereq -o $target
+	$CC $CFLAGS $prereq
 
-libcoreutils_a-%.$O: $CORESRC/lib/%.c
-	$CC $CFLAGS $prereq -o $target
+%.$O: $CORESRC/lib/%.c
+	$CC $CFLAGS $prereq
 
-libcoreutils.a$O : $LIBOBJS
-	ar vu libcoreutils.a$O $LIBOBJS
+../gnulib/libgnu.a$O : $GNU_OBJS
+	ar vu ../gnulib/libgnu.a$O $GNU_OBJS
 
 $O.cp: cp.$O cp-hash.$O copy.$O
 	$CC -o cp cp.$O cp-hash.$O copy.$O libcoreutils.a$O

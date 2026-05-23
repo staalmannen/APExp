@@ -51,7 +51,6 @@ _OPTIONAL_APPS=\
 #	basic\
 # dev tools \
 	adeb\
-	dw2elf\
 	dwarfdump\
 	hell\
 	pcregrep\

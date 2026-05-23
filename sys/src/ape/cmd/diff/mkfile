@@ -8,19 +8,23 @@ TARG=\
 	diff3\
 	sdiff
 
-LIB= libdiff.a$O
+LIB= ../gnulib/libgnu.a$O libdiff.a$O
 
-LIBO=\
+GNU_OBJ=\
 	sigsegv.$O stdbit.$O\
 	xstrtoimax.$O\
 	quotearg.$O\
 	diagnose.$O\
-	version-etc.$O version-etc-fsf.$O\
 	progname.$O\
 	c-stack.$O\
 	xstdopen.$O\
 	propername-lite.$O\
 	cmpbuf.$O
+
+LIBO=\
+	version-etc.$O\
+	version-etc-fsf.$O\
+
 
 CMPO=\
 	cmp.$O system.$O
@@ -56,6 +60,9 @@ CFLAGS=-B -p -D_POSIX_SOURCE -DREGEX_MALLOC -I$DIFFSRC/src -I$DIFFSRC/lib \
 
 libdiff.a$O: $LIBO
 	ar vu $target $LIBO
+
+../gnulib/libgnu.a$O: $GNU_OBJ
+	ar vu $target $GNU_OBJ
 
 $O.diff: $DIFFO $LIB
 $O.diff3: $DIFF3O $LIB
