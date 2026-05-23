@@ -1,0 +1,3 @@
+This is a "dump folder" where we build and share a single libgnu.a to simplify the build of applications that rely on gnulib.
+
+We have tried to reduce the dependency on gnulib as much as possible by re-implementing a lot of the API using thin shims in libap. Some things are bigger and weirder and those things are probably better to keep in a sepparate library.
