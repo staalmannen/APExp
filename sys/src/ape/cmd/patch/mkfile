@@ -17,6 +17,7 @@ LIBO=\
 	gettime.$O\
 	hash.$O\
 	parse-datetime.$O\
+	time_rz.$O\
 	progname.$O\
 	quotearg.$O\
 	tempname.$O\
