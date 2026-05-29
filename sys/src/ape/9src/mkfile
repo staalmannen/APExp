@@ -2,18 +2,15 @@
 
 APEXPROOT=../../../..
 
-#	ptyfs\	# for X11, not going to bother
 TARG=\
 	stty\
-	tar\
 	cc\
-	pcc
 
 BIN=$APEXPROOT/$objtype/bin/ape
 <$APEXPROOT/sys/src/cmd/mkmany
 
 # pcc: same binary as cc; argv[0]=="pcc" selects .$O object extension
-$O.pcc:	$O.cc
-	cp $O.cc $O.pcc
+$O.cc:	$APEXPROOT/sys/src/cmd/pcc.c
+		$CC $CFLAGS $prereq -o $target
 
 
