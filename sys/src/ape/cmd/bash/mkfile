@@ -143,7 +143,7 @@ DEFFILES=\
 	$DEFDIR/wait.def
 
 $MKBUILTINS: $BASHSRC/builtins/mkbuiltins.c
-	cc -I$BASHSRC -I$BASHSRC/include -o $target $prereq
+	pcc -I$BASHSRC -I$BASHSRC/include -o $target $prereq
 
 # Generate builtins/builtext.h and builtins/builtins.c into the LOCAL
 # build directory. -includefile names the header that the generated
