@@ -163,11 +163,25 @@ $OBJBUILTINS: builtins/builtext.h
 parse.$O eval.$O shell.$O subst.$O variables.$O trap.$O sig.$O \
 execute_cmd.$O bashline.$O expr.$O jobs.$O nojobs.$O pcomplete.$O: builtins/builtext.h
 
+# Plan9 mk: LAST matching pattern rule wins. The prefixed rules
+# (bi-, tc-, ti-) must therefore come AFTER the general %.$O rules
+# so that e.g. bi-alias.$O picks up its bi-% rule rather than falling
+# through to a bare %.$O rule that would look for
+# $BASHSRC/lib/glob/bi-alias.c (which does not exist).
+
 %.$O: %.c
 			$CC $CFLAGS $stem.c
 
 %.$O: $BASHSRC/%.c
 			$CC $CFLAGS $BASHSRC/$stem.c
+
+%.$O: $BASHSRC/lib/sh/%.c
+			$CC $CFLAGS -I$BASHSRC/lib/sh $BASHSRC/lib/sh/$stem.c
+
+%.$O: $BASHSRC/lib/glob/%.c
+			$CC $CFLAGS -I$BASHSRC/lib/glob $BASHSRC/lib/glob/$stem.c
+
+# Prefixed rules — must be last so they win against the bare %.$O rules above.
 
 # The generated bi-builtins.$O comes from ./builtins/builtins.c.
 bi-builtins.$O: builtins/builtins.c builtins/builtext.h
@@ -179,16 +193,10 @@ bi-%.$O: $BASHSRC/builtins/%.c
 			$CC $CFLAGS -I./builtins -I$BASHSRC/builtins $BASHSRC/builtins/$stem.c -o $target
 
 tc-%.$O: $BASHSRC/lib/termcap/%.c
-			$CC $CFLAGS -I$BASHSRC/lib/termcap $BASHSRC/lib/termcap/$stem.c
+			$CC $CFLAGS -I$BASHSRC/lib/termcap $BASHSRC/lib/termcap/$stem.c -o $target
 
 ti-%.$O: $BASHSRC/lib/tilde/%.c
 			$CC $CFLAGS -I$BASHSRC/lib/tilde $BASHSRC/lib/tilde/$stem.c -o $target
-
-%.$O: $BASHSRC/lib/sh/%.c
-			$CC $CFLAGS -I$BASHSRC/lib/sh $BASHSRC/lib/sh/$stem.c
-
-%.$O: $BASHSRC/lib/glob/%.c
-			$CC $CFLAGS -I$BASHSRC/lib/glob $BASHSRC/lib/glob/$stem.c
 
 
 libtermcap.a$O: $OBJTERMCAP
