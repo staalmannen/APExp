@@ -185,10 +185,14 @@ builtins/builtext.h: $MKBUILTINS $DEFFILES
 		../$DEFDIR/type.def ../$DEFDIR/ulimit.def ../$DEFDIR/umask.def \
 		../$DEFDIR/wait.def
 
-# builtins.c and every generated per-def .c are produced by the rule
-# above (single mkbuiltins invocation). Declare them dependent on the
-# header target so mk doesn't try to build them separately.
+# builtins.c and every generated per-def .c file (alias.c, bind.c, ...)
+# are side-effects of the single mkbuiltins invocation above. Depending
+# them on builtext.h with an empty recipe tells mk they exist as soon
+# as builtext.h does, without trying to rebuild them independently.
 builtins/builtins.c: builtins/builtext.h
+	:
+
+builtins/%.c: builtins/builtext.h
 	:
 
 # Every builtin object needs the generated header before it will compile.
