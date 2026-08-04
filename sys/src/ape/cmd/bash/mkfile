@@ -108,24 +108,60 @@ CFLAGS=	-c -B -I. -I$BASHSRC -I$BASHSRC/include -I$BASHSRC/lib -I$BASHSRC/lib/in
 BASHSRC=$APEXPROOT/sys/src/external/bash
 
 # Native rules for building mkbuiltins and generating source files
-# Note: These need to be built using the host compiler (the host-native cc)
-# because they generate code that is compiled into the bash binary.
+# Note: mkbuiltins is a build-time helper: compile it with the HOST cc,
+# not with our cross pcc. It emits the tables that describe every
+# builtin so the shell can dispatch by name.
+#
+# We generate builtins.c and builtext.h into a LOCAL ./builtins/
+# subdirectory so the external source tree stays pristine. CFLAGS
+# already carries -I., so bash root .c files that #include
+# "builtins/builtext.h" find it; bi-* compiles get -I./builtins added
+# so builtins/*.c that #include "builtext.h" find it too.
+#
+# All .def files are processed in a single mkbuiltins invocation — no
+# shell loops, no cd — so the rule works under rc, bash, or dash.
 
-MKBUILTINS=$BASHSRC/builtins/mkbuiltins
+MKBUILTINS=./mkbuiltins
 
-DEFFILES=alias.def bind.def break.def builtin.def caller.def cd.def colon.def command.def declare.def echo.def enable.def eval.def getopts.def exec.def exit.def fc.def fg_bg.def hash.def help.def history.def jobs.def kill.def let.def read.def return.def set.def setattr.def shift.def source.def suspend.def test.def times.def trap.def type.def ulimit.def umask.def wait.def reserved.def pushd.def shopt.def printf.def complete.def mapfile.def
+DEFDIR=$BASHSRC/builtins
+
+DEFFILES=\
+	$DEFDIR/alias.def $DEFDIR/bind.def $DEFDIR/break.def \
+	$DEFDIR/builtin.def $DEFDIR/caller.def $DEFDIR/cd.def \
+	$DEFDIR/colon.def $DEFDIR/command.def $DEFDIR/complete.def \
+	$DEFDIR/declare.def $DEFDIR/echo.def $DEFDIR/enable.def \
+	$DEFDIR/eval.def $DEFDIR/exec.def $DEFDIR/exit.def \
+	$DEFDIR/fc.def $DEFDIR/fg_bg.def $DEFDIR/getopts.def \
+	$DEFDIR/hash.def $DEFDIR/help.def $DEFDIR/history.def \
+	$DEFDIR/jobs.def $DEFDIR/kill.def $DEFDIR/let.def \
+	$DEFDIR/mapfile.def $DEFDIR/printf.def $DEFDIR/pushd.def \
+	$DEFDIR/read.def $DEFDIR/reserved.def $DEFDIR/return.def \
+	$DEFDIR/set.def $DEFDIR/setattr.def $DEFDIR/shift.def \
+	$DEFDIR/shopt.def $DEFDIR/source.def $DEFDIR/suspend.def \
+	$DEFDIR/test.def $DEFDIR/times.def $DEFDIR/trap.def \
+	$DEFDIR/type.def $DEFDIR/ulimit.def $DEFDIR/umask.def \
+	$DEFDIR/wait.def
 
 $MKBUILTINS: $BASHSRC/builtins/mkbuiltins.c
-	cc -I$BASHSRC -I$BASHSRC/include -o $MKBUILTINS $prereq
+	cc -I$BASHSRC -I$BASHSRC/include -o $target $prereq
 
-# Generate builtins.c and builtext.h
-$BASHSRC/builtins/builtins.c $BASHSRC/builtins/builtext.h: $MKBUILTINS
-	@echo "Generating builtins.c and builtext.h..."
-	@(cd $BASHSRC/builtins && ./mkbuiltins -externfile builtext.h -structfile builtins.c -noproduction -D . $DEFFILES)
-	for (i in $DEFFILES)
-		@(cd $BASHSRC/builtins && ./mkbuiltins -D . $stem.def)
+# Generate builtins/builtext.h and builtins/builtins.c into the LOCAL
+# build directory. -includefile names the header that the generated
+# builtins.c will #include; since it lives next to builtext.h in
+# ./builtins/, a plain "builtext.h" resolves via the .c's own directory.
+builtins/builtext.h builtins/builtins.c: $MKBUILTINS $DEFFILES
+	mkdir -p builtins
+	$MKBUILTINS -externfile builtins/builtext.h \
+		-includefile builtext.h \
+		-structfile builtins/builtins.c \
+		-noproduction -D $DEFDIR $DEFFILES
 
-$OBJBUILTINS: $BASHSRC/builtins/builtins.c
+# Every builtin object needs the generated header before it will compile.
+$OBJBUILTINS: builtins/builtext.h
+
+# Also required by any bash root source that dispatches to builtins.
+parse.$O eval.$O shell.$O subst.$O variables.$O trap.$O sig.$O \
+execute_cmd.$O bashline.$O expr.$O jobs.$O nojobs.$O pcomplete.$O: builtins/builtext.h
 
 %.$O: %.c
 			$CC $CFLAGS $stem.c
@@ -133,8 +169,14 @@ $OBJBUILTINS: $BASHSRC/builtins/builtins.c
 %.$O: $BASHSRC/%.c
 			$CC $CFLAGS $BASHSRC/$stem.c
 
+# The generated bi-builtins.$O comes from ./builtins/builtins.c.
+bi-builtins.$O: builtins/builtins.c builtins/builtext.h
+			$CC $CFLAGS -I./builtins builtins/builtins.c -o $target
+
+# All other bi-*.$O compile the .c out of the external tree; they need
+# -I./builtins so #include "builtext.h" finds our generated header.
 bi-%.$O: $BASHSRC/builtins/%.c
-			$CC $CFLAGS -I$BASHSRC/builtins $BASHSRC/builtins/$stem.c -o $target
+			$CC $CFLAGS -I./builtins -I$BASHSRC/builtins $BASHSRC/builtins/$stem.c -o $target
 
 tc-%.$O: $BASHSRC/lib/termcap/%.c
 			$CC $CFLAGS -I$BASHSRC/lib/termcap $BASHSRC/lib/termcap/$stem.c
@@ -168,7 +210,8 @@ install:V:
 			cp $BASHSRC/doc/bash.1 $APEXPROOT/sys/man/1/bash
 
 clean:V:
-			rm -f *.[$OS] [$OS].$Out lib*.a* $MKBUILTINS
+			rm -f *.[$OS] [$OS].$Out lib*.a* mkbuiltins
+			rm -rf builtins
 
 
 
