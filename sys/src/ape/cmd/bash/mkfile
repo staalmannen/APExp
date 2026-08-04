@@ -112,14 +112,21 @@ BASHSRC=$APEXPROOT/sys/src/external/bash
 # not with our cross pcc. It emits the tables that describe every
 # builtin so the shell can dispatch by name.
 #
-# We generate builtins.c and builtext.h into a LOCAL ./builtins/
-# subdirectory so the external source tree stays pristine. CFLAGS
-# already carries -I., so bash root .c files that #include
-# "builtins/builtext.h" find it; bi-* compiles get -I./builtins added
-# so builtins/*.c that #include "builtext.h" find it too.
+# Most bi-*.$O objects come from .def files (alias.def -> alias.c ->
+# bi-alias.$O). The .def format has a "$PRODUCES foo.c" directive that
+# tells mkbuiltins the OUTPUT filename — mkbuiltins fopen()s that name
+# in its current working directory. To keep the external source tree
+# clean, we run mkbuiltins with cwd=./builtins/ so all generated .c
+# files and builtext.h/builtins.c land in the local subdirectory.
 #
-# All .def files are processed in a single mkbuiltins invocation — no
-# shell loops, no cd — so the rule works under rc, bash, or dash.
+# A tiny handful of bi-*.$O come from real .c files under
+# external/bash/builtins/ (bashgetopt.c, common.c, evalfile.c,
+# evalstring.c, getopt.c). Those get explicit rules — the pattern rule
+# for the def-generated case cannot handle them because there is no
+# corresponding .def.
+#
+# All shell fragments use 'cd DIR && cmd' — portable across rc, bash,
+# and dash. No loops, no rc-only syntax.
 
 MKBUILTINS=./mkbuiltins
 
@@ -142,19 +149,47 @@ DEFFILES=\
 	$DEFDIR/type.def $DEFDIR/ulimit.def $DEFDIR/umask.def \
 	$DEFDIR/wait.def
 
+# Real .c files under external/bash/builtins/ (i.e. no .def source);
+# their bi-*.$O targets have explicit rules further down.
+BI_REAL_C=bi-common.$O bi-evalfile.$O bi-evalstring.$O \
+	bi-getopt.$O bi-bashgetopt.$O
+
 $MKBUILTINS: $BASHSRC/builtins/mkbuiltins.c
 	pcc -I$BASHSRC -I$BASHSRC/include -o $target $prereq
 
-# Generate builtins/builtext.h and builtins/builtins.c into the LOCAL
-# build directory. -includefile names the header that the generated
-# builtins.c will #include; since it lives next to builtext.h in
-# ./builtins/, a plain "builtext.h" resolves via the .c's own directory.
-builtins/builtext.h builtins/builtins.c: $MKBUILTINS $DEFFILES
+# Single mkbuiltins call, run with cwd=./builtins/, generates:
+#   * builtext.h  (extern declarations for every builtin)
+#   * builtins.c  (dispatch table; #include "builtext.h" resolves in cwd)
+#   * one alias.c/bind.c/... per .def, via the $PRODUCES directive
+# We touch a sentinel afterwards so mk can depend on a single target.
+# Each .def path is prefixed with ../ because cwd has moved one level down.
+builtins/builtext.h: $MKBUILTINS $DEFFILES
 	mkdir -p builtins
-	$MKBUILTINS -externfile builtins/builtext.h \
+	cd builtins && ../$MKBUILTINS \
+		-externfile builtext.h \
 		-includefile builtext.h \
-		-structfile builtins/builtins.c \
-		-noproduction -D $DEFDIR $DEFFILES
+		-structfile builtins.c \
+		../$DEFDIR/alias.def ../$DEFDIR/bind.def ../$DEFDIR/break.def \
+		../$DEFDIR/builtin.def ../$DEFDIR/caller.def ../$DEFDIR/cd.def \
+		../$DEFDIR/colon.def ../$DEFDIR/command.def ../$DEFDIR/complete.def \
+		../$DEFDIR/declare.def ../$DEFDIR/echo.def ../$DEFDIR/enable.def \
+		../$DEFDIR/eval.def ../$DEFDIR/exec.def ../$DEFDIR/exit.def \
+		../$DEFDIR/fc.def ../$DEFDIR/fg_bg.def ../$DEFDIR/getopts.def \
+		../$DEFDIR/hash.def ../$DEFDIR/help.def ../$DEFDIR/history.def \
+		../$DEFDIR/jobs.def ../$DEFDIR/kill.def ../$DEFDIR/let.def \
+		../$DEFDIR/mapfile.def ../$DEFDIR/printf.def ../$DEFDIR/pushd.def \
+		../$DEFDIR/read.def ../$DEFDIR/reserved.def ../$DEFDIR/return.def \
+		../$DEFDIR/set.def ../$DEFDIR/setattr.def ../$DEFDIR/shift.def \
+		../$DEFDIR/shopt.def ../$DEFDIR/source.def ../$DEFDIR/suspend.def \
+		../$DEFDIR/test.def ../$DEFDIR/times.def ../$DEFDIR/trap.def \
+		../$DEFDIR/type.def ../$DEFDIR/ulimit.def ../$DEFDIR/umask.def \
+		../$DEFDIR/wait.def
+
+# builtins.c and every generated per-def .c are produced by the rule
+# above (single mkbuiltins invocation). Declare them dependent on the
+# header target so mk doesn't try to build them separately.
+builtins/builtins.c: builtins/builtext.h
+	:
 
 # Every builtin object needs the generated header before it will compile.
 $OBJBUILTINS: builtins/builtext.h
@@ -187,10 +222,28 @@ execute_cmd.$O bashline.$O expr.$O jobs.$O nojobs.$O pcomplete.$O: builtins/buil
 bi-builtins.$O: builtins/builtins.c builtins/builtext.h
 			$CC $CFLAGS -I./builtins builtins/builtins.c -o $target
 
-# All other bi-*.$O compile the .c out of the external tree; they need
-# -I./builtins so #include "builtext.h" finds our generated header.
-bi-%.$O: $BASHSRC/builtins/%.c
-			$CC $CFLAGS -I./builtins -I$BASHSRC/builtins $BASHSRC/builtins/$stem.c -o $target
+# Explicit rules for the 5 bi-*.$O whose source is a REAL .c file
+# under external/bash/builtins/ (no .def counterpart, so the
+# def-generated pattern rule below cannot handle them).
+bi-common.$O: $BASHSRC/builtins/common.c builtins/builtext.h
+			$CC $CFLAGS -I./builtins -I$BASHSRC/builtins $BASHSRC/builtins/common.c -o $target
+
+bi-evalfile.$O: $BASHSRC/builtins/evalfile.c builtins/builtext.h
+			$CC $CFLAGS -I./builtins -I$BASHSRC/builtins $BASHSRC/builtins/evalfile.c -o $target
+
+bi-evalstring.$O: $BASHSRC/builtins/evalstring.c builtins/builtext.h
+			$CC $CFLAGS -I./builtins -I$BASHSRC/builtins $BASHSRC/builtins/evalstring.c -o $target
+
+bi-getopt.$O: $BASHSRC/builtins/getopt.c builtins/builtext.h
+			$CC $CFLAGS -I./builtins -I$BASHSRC/builtins $BASHSRC/builtins/getopt.c -o $target
+
+bi-bashgetopt.$O: $BASHSRC/builtins/bashgetopt.c builtins/builtext.h
+			$CC $CFLAGS -I./builtins -I$BASHSRC/builtins $BASHSRC/builtins/bashgetopt.c -o $target
+
+# Pattern rule: every other bi-*.$O comes from a mkbuiltins-generated
+# ./builtins/*.c (produced from the matching .def file).
+bi-%.$O: builtins/%.c builtins/builtext.h
+			$CC $CFLAGS -I./builtins -I$BASHSRC/builtins builtins/$stem.c -o $target
 
 tc-%.$O: $BASHSRC/lib/termcap/%.c
 			$CC $CFLAGS -I$BASHSRC/lib/termcap $BASHSRC/lib/termcap/$stem.c -o $target
