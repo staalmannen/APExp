@@ -10,7 +10,6 @@ BIN=$APEXPROOT/$objtype/bin/ape
 <$APEXPROOT/sys/src/cmd/mkmany
 
 # pcc: same binary as cc; argv[0]=="pcc" selects .$O object extension
-$O.cc:	$APEXPROOT/sys/src/cmd/pcc.c
-		$CC $CFLAGS $prereq -o $target
+
 
 
