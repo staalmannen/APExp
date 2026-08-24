@@ -157,13 +157,33 @@ BI_REAL_C=bi-common.$O bi-evalfile.$O bi-evalstring.$O \
 $MKBUILTINS: $BASHSRC/builtins/mkbuiltins.c
 	pcc -I$BASHSRC -I$BASHSRC/include -o $target $prereq
 
+# Every file produced by the mkbuiltins invocation below — the extern
+# header, the dispatch struct file, and one .c per .def. All are
+# targets of the SAME rule so mk knows a single recipe creates them
+# and only runs it once.
+GENERATED_C=\
+	builtins/alias.c builtins/bind.c builtins/break.c \
+	builtins/builtin.c builtins/caller.c builtins/cd.c \
+	builtins/colon.c builtins/command.c builtins/complete.c \
+	builtins/declare.c builtins/echo.c builtins/enable.c \
+	builtins/eval.c builtins/exec.c builtins/exit.c \
+	builtins/fc.c builtins/fg_bg.c builtins/getopts.c \
+	builtins/hash.c builtins/help.c builtins/history.c \
+	builtins/jobs.c builtins/kill.c builtins/let.c \
+	builtins/mapfile.c builtins/printf.c builtins/pushd.c \
+	builtins/read.c builtins/reserved.c builtins/return.c \
+	builtins/set.c builtins/setattr.c builtins/shift.c \
+	builtins/shopt.c builtins/source.c builtins/suspend.c \
+	builtins/test.c builtins/times.c builtins/trap.c \
+	builtins/type.c builtins/ulimit.c builtins/umask.c \
+	builtins/wait.c
+
 # Single mkbuiltins call, run with cwd=./builtins/, generates:
 #   * builtext.h  (extern declarations for every builtin)
 #   * builtins.c  (dispatch table; #include "builtext.h" resolves in cwd)
 #   * one alias.c/bind.c/... per .def, via the $PRODUCES directive
-# We touch a sentinel afterwards so mk can depend on a single target.
 # Each .def path is prefixed with ../ because cwd has moved one level down.
-builtins/builtext.h: $MKBUILTINS $DEFFILES
+builtins/builtext.h builtins/builtins.c $GENERATED_C: $MKBUILTINS $DEFFILES
 	mkdir -p builtins
 	cd builtins && ../$MKBUILTINS \
 		-externfile builtext.h \
@@ -184,15 +204,6 @@ builtins/builtext.h: $MKBUILTINS $DEFFILES
 		../$DEFDIR/test.def ../$DEFDIR/times.def ../$DEFDIR/trap.def \
 		../$DEFDIR/type.def ../$DEFDIR/ulimit.def ../$DEFDIR/umask.def \
 		../$DEFDIR/wait.def
-
-# builtins.c and every generated per-def .c file (alias.c, bind.c, ...)
-# are side-effects of the single mkbuiltins invocation above. Depending
-# them on builtext.h with NO recipe tells mk they exist as soon as
-# builtext.h does — a colon-recipe would fail under rc (which has no
-# ':' builtin and tries to exec './:').
-builtins/builtins.c: builtins/builtext.h
-
-builtins/%.c: builtins/builtext.h
 
 # Every builtin object needs the generated header before it will compile.
 $OBJBUILTINS: builtins/builtext.h
