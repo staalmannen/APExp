@@ -9,9 +9,16 @@ default:V: $O.out
 # depended only on ../cc/cc.h, so edits to lex.c / cc.y / dcl.c / com.c
 # never triggered a rebuild: stale cc.a survived the C99/C11/C23 patches
 # (the 'bool' keyword, _Generic, ...) and every arch backend that links
-# cc.a kept shipping the pre-patch behaviour.  The glob keeps this rule
-# from rotting when a new source file is added to cc/.
-$LIB:	../cc/*.h ../cc/*.c ../cc/cc.y ../cc/macbody
+# cc.a kept shipping the pre-patch behaviour.
+# NB: mk does not expand globs in prerequisites, so the list is explicit.
+# Add new cc/ sources here when they appear.
+CCSRC=../cc/cc.h ../cc/compat.h ../cc/dwtypes.h ../cc/cc.y ../cc/macbody\
+	../cc/acid.c ../cc/bits.c ../cc/cmplx.c ../cc/com.c ../cc/com64.c\
+	../cc/compat.c ../cc/dcl.c ../cc/dpchk.c ../cc/dwtypes.c ../cc/funct.c\
+	../cc/lex.c ../cc/mac.c ../cc/omachcap.c ../cc/pgen.c ../cc/pickle.c\
+	../cc/pswt.c ../cc/scon.c ../cc/sub.c ../cc/vla.c
+
+$LIB:	$CCSRC
 	cd ../cc
 	mk install
 
