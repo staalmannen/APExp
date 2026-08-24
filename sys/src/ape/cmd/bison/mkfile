@@ -49,66 +49,6 @@ OFILES=\
 	bison-tables.$O \
 	bison-uniqstr.$O
 
-GNU_OBJS=\
-	u8-uctomb-aux.$O \
-	argmatch.$O \
-	gl_array_list.$O \
-	basename-lgpl.$O \
-	bitrotate.$O \
-	bitset.$O \
-	array.$O \
-	stats.$O \
-	table.$O \
-	list.$O \
-	vector.$O \
-	bitsetv.$O \
-	c-strcasecmp.$O \
-	canonicalize.$O \
-	close-stream.$O \
-	closeout.$O \
-	concat-filename.$O \
-	execute.$O \
-	fatal-signal.$O \
-	file-set.$O \
-	findprog-in.$O \
-	fopen-safer.$O \
-	fstrcmp.$O \
-	gethrxtime.$O \
-	gettime.$O \
-	hash.$O \
-	gl_hash_map.$O \
-	hash-pjw.$O \
-	hash-triple-simple.$O \
-	ialloc.$O \
-	integer_length.$O \
-	integer_length_l.$O \
-	gl_linked_list.$O \
-	lock.$O \
-	mbchar.$O \
-	mbswidth.$O \
-	progname.$O \
-	quotearg.$O \
-	gl_rbtree_oset.$O \
-	gl_rbtreehash_list.$O \
-	scratch_buffer_dupfree.$O \
-	scratch_buffer_grow.$O \
-	scratch_buffer_grow_preserve.$O \
-	scratch_buffer_set_array_size.$O \
-	spawn-pipe.$O \
-	timevar.$O \
-	unicodeio.$O \
-	unistd.$O \
-	dup-safer.$O \
-	fd-safer.$O \
-	pipe-safer.$O \
-	wait-process.$O \
-	xconcat-filename.$O \
-	xhash.$O \
-	xmemdup0.$O \
-	xsize.$O \
-	get-errno.$O \
-	path-join.$O \
-
 LIB_OBJS=\
 	liby_a-main.$O \
 	liby_a-yyerror.$O
@@ -157,9 +97,6 @@ liby_a-%.$O: $BISONSRC/lib/%.c
 
 libbison.a$O: $LIB_OBJS
 		ar vu libbison.a$O $LIB_OBJS
-
-../gnulib/libgnu.a$O: $GNU_OBJS
-		ar vu ../gnulib/libgnu.a$O $GNU_OBJS
 
 install:V:
 		cp $BISONSRC/doc/bison.1 $APEXPROOT/sys/man/1/bison

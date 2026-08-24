@@ -78,7 +78,6 @@ LIB_OBJS=\
 	libgreputils_a-memchr2.$O \
 #	libgreputils_a-memrchr.$O \
 #	libgreputils_a-nl_langinfo.$O \
-	libgreputils_a-obstack.$O \
 #	libgreputils_a-once.$O \
 #	libgreputils_a-openat.$O \
 #	libgreputils_a-openat-die.$O \

@@ -1,0 +1,214 @@
+APE=../../../ape
+<$APE/config
+APEXPROOT=../../../../..
+
+# One shared libgnu.a for every GNU package that needs gnulib.
+#
+# Sources live in a single consolidated tree, sys/src/external/gnulib,
+# built by import.sh from the per-package gnulib copies (newest copy
+# wins; coreutils is the base). Because there is exactly one copy of
+# each module and one config.h, the object that ends up in the archive
+# no longer depends on which package happened to build last.
+#
+# Do NOT add a module that libap already provides — both archives are on
+# every link line, so a module present in both is a duplicate-symbol
+# error. See README for the current list and for the obstack case that
+# prompted this consolidation.
+
+GNUSRC=$APEXPROOT/sys/src/external/gnulib
+
+LIB=libgnu.a$O
+
+OFILES=\
+	acl-internal.$O\
+	argmatch.$O\
+	asyncsafe-spin.$O\
+	backup-find.$O\
+	basename-lgpl.$O\
+	bitrotate.$O\
+	bitset.$O\
+	bitsetv.$O\
+	c-stack.$O\
+	c-strcasecmp.$O\
+	canonicalize.$O\
+	canonicalize-lgpl.$O\
+	clean-temp.$O\
+	clean-temp-simple.$O\
+	close-stream.$O\
+	closein.$O\
+	closeout.$O\
+	cmpbuf.$O\
+	concat-filename.$O\
+	copy-acl.$O\
+	dfa.$O\
+	diagnose.$O\
+	dup-safer.$O\
+	dup-safer-flag.$O\
+	error.$O\
+	execute.$O\
+	fatal-signal.$O\
+	fd-safer.$O\
+	fd-safer-flag.$O\
+	file-set.$O\
+	filenamecat.$O\
+	filenamecat-lgpl.$O\
+	findprog-in.$O\
+	fopen-safer.$O\
+	freadahead.$O\
+	free.$O\
+	fseterr.$O\
+	fstrcmp.$O\
+	fwriting.$O\
+	get-errno.$O\
+	get-permissions.$O\
+	gethrxtime.$O\
+	getprogname.$O\
+	gettime.$O\
+	gl_array_list.$O\
+	gl_avltree_oset.$O\
+	gl_hash_map.$O\
+	gl_linked_list.$O\
+	gl_linkedhash_list.$O\
+	gl_rbtree_oset.$O\
+	gl_rbtreehash_list.$O\
+	hash.$O\
+	hash-pjw.$O\
+	hash-triple-simple.$O\
+	hashcode-named-file.$O\
+	hashcode-string1.$O\
+	hashcode-string2.$O\
+	hashkey-string.$O\
+	ialloc.$O\
+	integer_length.$O\
+	integer_length_l.$O\
+	localeinfo.$O\
+	malloca.$O\
+	mbchar.$O\
+	mbslen.$O\
+	mbsstr.$O\
+	mbswidth.$O\
+	memchr2.$O\
+	mempcpy.$O\
+	mkstemp-safer.$O\
+	next-prime.$O\
+	parse-datetime.$O\
+	path-join.$O\
+	pipe-safer.$O\
+	pipe2-safer.$O\
+	progname.$O\
+	propername.$O\
+	propername-lite.$O\
+	qcopy-acl.$O\
+	quotearg.$O\
+	regex.$O\
+	secure_getenv.$O\
+	set-permissions.$O\
+	sigsegv.$O\
+	spawn-pipe.$O\
+	stdbit.$O\
+	strerror.$O\
+	strnlen1.$O\
+	strsignal.$O\
+	strstr.$O\
+	tempname.$O\
+	time_rz.$O\
+	timevar.$O\
+	tmpdir.$O\
+	trim.$O\
+	unicodeio.$O\
+	unistd.$O\
+	vaszprintf.$O\
+	version-etc.$O\
+	version-etc-fsf.$O\
+	vfzprintf.$O\
+	vzprintf.$O\
+	wait-process.$O\
+	xasprintf.$O\
+	xconcat-filename.$O\
+	xhash.$O\
+	xmalloca.$O\
+	xmemdup0.$O\
+	xprintf.$O\
+	xsize.$O\
+	xstdopen.$O\
+	xstrtoimax.$O\
+	xvasprintf.$O\
+# lib/malloc \
+	dynarray_at_failure.$O\
+	dynarray_emplace_enlarge.$O\
+	dynarray_finalize.$O\
+	dynarray_resize.$O\
+	scratch_buffer_dupfree.$O\
+	scratch_buffer_grow.$O\
+	scratch_buffer_grow_preserve.$O\
+	scratch_buffer_set_array_size.$O\
+# lib/bitset \
+	array.$O\
+	list.$O\
+	stats.$O\
+	table.$O\
+	vector.$O\
+# lib/glthread \
+	lock.$O\
+	spin.$O\
+# lib/unistr \
+	u8-uctomb-aux.$O\
+
+#during building from scratch, the new pcc is not picked up and compilation
+#fails on include_next
+CC=$APEXPROOT/$objtype/bin/pcc
+
+# gnulib substitutes some libc functions and renames the originals to
+# rpl_*. APE provides the real ones, so map each rpl_ name back.
+UNRPL=-Drpl_readlink=readlink -Drpl_lseek=lseek -Drpl_open=open\
+	-Drpl_free=free -Drpl_malloc=malloc -Drpl_realloc=realloc\
+	-Drpl_calloc=calloc -Drpl_strtod=strtod -Drpl_fcntl=fcntl\
+	-Drpl_mkstemp=mkstemp -Drpl_getopt_long=getopt_long\
+	-Drpl_optarg=optarg -Drpl_optind=optind\
+	-Drpl_posix_spawn_file_actions_addopen=posix_spawn_file_actions_addopen
+
+CFLAGS=-c -B -I. -I$GNUSRC -DHAVE_CONFIG_H\
+	-D_POSIX_SOURCE -D_BSD_EXTENSION -D__USE_GNU\
+	-D_REGEX_LARGE_OFFSETS -DREGEX_MALLOC -DO_BINARY=0\
+	-DSETLOCALE_NULL_MAX=(256+1)\
+	-DLOCALEDIR="/sys/lib/ape/locale" $UNRPL
+
+# No two modules share a basename across these directories, so the
+# pattern rules cannot collide and mk's rule ordering does not matter.
+%.$O: $GNUSRC/%.c
+	$CC $CFLAGS $GNUSRC/$stem.c
+
+%.$O: $GNUSRC/malloc/%.c
+	$CC $CFLAGS $GNUSRC/malloc/$stem.c
+
+%.$O: $GNUSRC/bitset/%.c
+	$CC $CFLAGS $GNUSRC/bitset/$stem.c
+
+%.$O: $GNUSRC/glthread/%.c
+	$CC $CFLAGS $GNUSRC/glthread/$stem.c
+
+%.$O: $GNUSRC/unistr/%.c
+	$CC $CFLAGS $GNUSRC/unistr/$stem.c
+
+all:V:		$LIB
+
+install:V:	$LIB
+
+installall:V:	$LIB
+
+# Recreate the archive from scratch every time. 'ar vu' only appends, so
+# updating in place would leave a member behind after it is dropped from
+# OFILES — exactly the stale-member trap that made gnulib's obstack.o
+# collide with libap's. Re-archiving is cheap; guessing is not.
+$LIB:	$OFILES
+	rm -f $LIB
+	ar vu $LIB $OFILES
+
+# Rebuilding from scratch matters here: 'ar vu' only ever appends, so a
+# member dropped from OFILES survives in a stale archive and keeps
+# breaking the link. Always remove the archive, never update in place.
+clean:V:
+	rm -f *.[$OS] $LIB
+
+nuke:V:
+	rm -f *.[$OS] $LIB
