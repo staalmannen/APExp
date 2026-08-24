@@ -163,9 +163,11 @@ OFILES=\
 	$UNIX_OBJS\
 	$XLIB_OBJS\
 
+CC=pcc
+
 # Flags for generic/ and plan9/ files (APE headers + Tk includes)
 CFLAGS=\
-	-FVp -c\
+	-c\
 	-I.\
 	-I$TKSRC/generic\
 	-I$TKSRC/generic/ttk\
@@ -184,10 +186,12 @@ CFLAGS=\
 	-DTK_PLATFORM="plan9"\
 	-DSTATIC_BUILD\
 
+CC=pcc
+
 # DrawImpl uses APE's Plan 9 extension headers (draw.h, mouse.h, u.h)
 # It must NOT include Xlib.h; add -DPLAN9_SOURCE to enable draw.h.
 DRAWIMPL_CFLAGS=\
-	-FVp -c\
+	-c\
 	-I$TKSRC/plan9\
 	-I$APEXPROOT/sys/include/ape\
 	-I$APEXPROOT/$objtype/include/ape\
