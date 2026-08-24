@@ -187,13 +187,12 @@ builtins/builtext.h: $MKBUILTINS $DEFFILES
 
 # builtins.c and every generated per-def .c file (alias.c, bind.c, ...)
 # are side-effects of the single mkbuiltins invocation above. Depending
-# them on builtext.h with an empty recipe tells mk they exist as soon
-# as builtext.h does, without trying to rebuild them independently.
+# them on builtext.h with NO recipe tells mk they exist as soon as
+# builtext.h does — a colon-recipe would fail under rc (which has no
+# ':' builtin and tries to exec './:').
 builtins/builtins.c: builtins/builtext.h
-	:
 
 builtins/%.c: builtins/builtext.h
-	:
 
 # Every builtin object needs the generated header before it will compile.
 $OBJBUILTINS: builtins/builtext.h
