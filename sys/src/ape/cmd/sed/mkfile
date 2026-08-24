@@ -30,7 +30,6 @@ GNU_OBJS=\
 	dynarray_emplace_enlarge.$O\
 	dynarray_finalize.$O\
 	dynarray_resize.$O\
-	obstack.$O\
 	qcopy-acl.$O\
 	regex.$O\
 	strerror.$O\

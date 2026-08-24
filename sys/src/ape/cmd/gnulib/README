@@ -1,3 +1,34 @@
 This is a "dump folder" where we build and share a single libgnu.a to simplify the build of applications that rely on gnulib.
 
 We have tried to reduce the dependency on gnulib as much as possible by re-implementing a lot of the API using thin shims in libap. Some things are bigger and weirder and those things are probably better to keep in a sepparate library.
+
+
+Two rules for anyone adding objects to a package's GNU_OBJS list
+----------------------------------------------------------------
+
+1. Never add a gnulib module that libap already provides.
+
+   libap.a and libgnu.a are both on the link line for every package, so
+   a module present in both is a duplicate-symbol error, not a silent
+   preference. The failure can be indirect: gnulib splits obstack into
+   obstack.c and obstack_printf.c, while libap's string/obstack.c
+   implements both halves in one object. Linking gnulib's obstack.o
+   satisfies _obstack_begin, but the first reference to obstack_printf
+   then drags in libap's object, which redefines every _obstack_*
+   symbol. Symptom:
+
+       _obstack_begin: libap.a(obstack_printf): redefinition: _obstack_begin
+
+   Already provided by libap (do not add): obstack, xmalloc/xalloc-die
+   (the whole x*alloc family incl. xreallocarray, xpalloc and the idx_t
+   variants), exitfail.
+
+2. libgnu.a accumulates -- removing an object from GNU_OBJS is not enough.
+
+   Seven package mkfiles append to this one archive with 'ar vu', and
+   nothing ever removes members. Deleting a line from a GNU_OBJS list
+   stops the object being rebuilt but leaves the stale member in
+   libgnu.a$O, so the link keeps failing exactly as before. After
+   editing any GNU_OBJS list, delete the archive and let it be rebuilt:
+
+       rm sys/src/ape/cmd/gnulib/libgnu.a$objtype
