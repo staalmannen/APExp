@@ -5,6 +5,14 @@ if(! test -e /sys/include/ape/THIS_IS_APExp) {
     bind -b $cputype/include/ape /sys/include/ape
     bind -b $cputype/lib/ape /$cputype/lib/ape
     bind -b sys/include/ape /sys/include/ape
+    # Overlay locally-built compilers/linkers/assemblers over /bin so
+    # pcc (which hardcodes /bin/6c, /bin/6l, /bin/6a etc.) picks up
+    # THIS tree's freshly-built compiler with all its C99/C11/C23
+    # patches — bool keyword, _Generic, compound literals, etc.
+    # Without this, an outside-APExp 'mk install' silently uses the
+    # host system's stock 6c, which fails on ap/complex, ap/aio, and
+    # every gnulib-heavy binary in sys/src/ape/cmd that uses (bool).
+    bind -b $cputype/bin /bin
     echo "APExp mounted"
     }
 if not echo "APExp already mounted"

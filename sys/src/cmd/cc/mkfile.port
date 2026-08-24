@@ -5,7 +5,13 @@ D=${T:%=%c}
 
 default:V: $O.out
 
-$LIB:	../cc/cc.h
+# Rebuild cc.a whenever ANY cc source or header changes.  The old rule
+# depended only on ../cc/cc.h, so edits to lex.c / cc.y / dcl.c / com.c
+# never triggered a rebuild: stale cc.a survived the C99/C11/C23 patches
+# (the 'bool' keyword, _Generic, ...) and every arch backend that links
+# cc.a kept shipping the pre-patch behaviour.  The glob keeps this rule
+# from rotting when a new source file is added to cc/.
+$LIB:	../cc/*.h ../cc/*.c ../cc/cc.y ../cc/macbody
 	cd ../cc
 	mk install
 
