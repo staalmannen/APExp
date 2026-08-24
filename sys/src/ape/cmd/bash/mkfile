@@ -89,8 +89,11 @@ BIN=$APEXPROOT/$objtype/bin/ape
 
 <$APEXPROOT/sys/src/cmd/mkone
 
-CC=pcc
-LD=pcc
+#during building from scratch, the system pcc may predate patches
+#(e.g. C23 bool keyword, include_next behaviour) that bash needs.
+#Use the APExp-local pcc that just got rebuilt.
+CC=$APEXPROOT/$objtype/bin/pcc
+LD=$APEXPROOT/$objtype/bin/pcc
 YACC=bison
 
 DEFS= 	-DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale" -D_POSIX_SOURCE\
