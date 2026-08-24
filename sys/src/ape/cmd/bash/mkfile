@@ -109,7 +109,7 @@ DEFS= 	-DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale" -D_POSIX_SOURCE\
 		-DPACKAGE="bash" -DPACKAGE_STRING='bash 5.3-release'\
 		-DCONF_VENDOR="apexp" -DCONF_HOSTTYPE="$objtype"\
 		-DHAVE_SYS_RESOURCE_H -DTERM=vt100 -UJOB_CONTROL\
-		-Dbotch=programming_error -DSHELL -Dbool=int
+		-Dbotch=programming_error -DSHELL
 
 
 CFLAGS=	-c -B -I. -I$BASHSRC -I$BASHSRC/include -I$BASHSRC/lib -I$BASHSRC/lib/intl\
