@@ -1,34 +1,62 @@
-This is a "dump folder" where we build and share a single libgnu.a to simplify the build of applications that rely on gnulib.
+This directory builds ONE shared libgnu.a for every GNU package in
+sys/src/ape/cmd that needs gnulib.
 
-We have tried to reduce the dependency on gnulib as much as possible by re-implementing a lot of the API using thin shims in libap. Some things are bigger and weirder and those things are probably better to keep in a sepparate library.
+We have tried to reduce the dependency on gnulib as much as possible by
+re-implementing a lot of the API using thin shims in libap. Some things
+are bigger and weirder and those things are probably better to keep in a
+separate library -- that is what this is.
 
 
-Two rules for anyone adding objects to a package's GNU_OBJS list
-----------------------------------------------------------------
+How it is put together
+----------------------
 
-1. Never add a gnulib module that libap already provides.
+Sources come from sys/src/external/gnulib, a single consolidated tree
+produced by that directory's import.sh from the gnulib copies vendored
+inside the individual GNU packages. Priority is by gnulib vintage,
+newest first:
 
-   libap.a and libgnu.a are both on the link line for every package, so
-   a module present in both is a duplicate-symbol error, not a silent
+    coreutils (2026) > m4 (2026) > diffutils (2025) > ggrep (2025)
+    > patch (2025) > gtar (2023) > gsed (2022) > bison (2021)
+
+coreutils is the base -- it has the newest gnulib and the widest module
+coverage -- so it supplies config.h and decides the header set that
+everything compiles against. Later trees only fill in modules coreutils
+does not ship (bitset, fstrcmp, timevar, spawn-pipe and friends).
+
+This replaced an arrangement where each package compiled its own gnulib
+objects and appended them to a shared archive with 'ar vu'. Which copy of
+a module ended up in the archive then depended on build order, and stale
+members outlived the lists that put them there.
+
+
+Two rules for anyone editing the OFILES list
+--------------------------------------------
+
+1. Never add a module that libap already provides.
+
+   libap.a and libgnu.a are both on the link line for every package, so a
+   module present in both is a duplicate-symbol error, not a silent
    preference. The failure can be indirect: gnulib splits obstack into
    obstack.c and obstack_printf.c, while libap's string/obstack.c
    implements both halves in one object. Linking gnulib's obstack.o
-   satisfies _obstack_begin, but the first reference to obstack_printf
-   then drags in libap's object, which redefines every _obstack_*
+   satisfied _obstack_begin, but the first reference to obstack_printf
+   then dragged in libap's object, which redefined every _obstack_*
    symbol. Symptom:
 
        _obstack_begin: libap.a(obstack_printf): redefinition: _obstack_begin
 
-   Already provided by libap (do not add): obstack, xmalloc/xalloc-die
-   (the whole x*alloc family incl. xreallocarray, xpalloc and the idx_t
-   variants), exitfail.
+   Already provided by libap, do not add: obstack, exitfail, and the
+   whole x*alloc family -- xmalloc, xalloc-die, xreallocarray, xnmalloc,
+   xnrealloc, xcharalloc, xzalloc, x2realloc, x2nrealloc, xpalloc and the
+   idx_t variants (ximalloc, xirealloc, xicalloc, xizalloc, ximemdup,
+   ximemdup0).
 
-2. libgnu.a accumulates -- removing an object from GNU_OBJS is not enough.
+2. Do not let a package rebuild a module that lives here.
 
-   Seven package mkfiles append to this one archive with 'ar vu', and
-   nothing ever removes members. Deleting a line from a GNU_OBJS list
-   stops the object being rebuilt but leaves the stale member in
-   libgnu.a$O, so the link keeps failing exactly as before. After
-   editing any GNU_OBJS list, delete the archive and let it be rebuilt:
+   The same duplicate-symbol trap applies to a package's own private
+   archive. diff's libdiff.a and sed's libsed.a existed only to hold
+   version-etc and progname, which this library now supplies, so both
+   were removed outright.
 
-       rm sys/src/ape/cmd/gnulib/libgnu.a$objtype
+The mkfile deletes libgnu.a before re-archiving rather than using
+'ar vu' in place, so dropping a module from OFILES actually removes it.

@@ -3,6 +3,8 @@ APE=../../ape
 APEXPROOT=../../../..
 
 _CORE_APPS=\
+# shared gnulib: must be first, several apps below link ../gnulib/libgnu.a \
+	gnulib\
 # shell\
 	dash\
 	bash\

@@ -20,83 +20,6 @@ OFILES=\
 		symtab.$O
 
 #minimized gnulib
-GNU_OBJS= \
-	asyncsafe-spin.$O\
-	basename-lgpl.$O\
-	c-stack.$O\
-	c-strcasecmp.$O\
-	canonicalize.$O\
-	canonicalize-lgpl.$O\
-	clean-temp.$O\
-	clean-temp-simple.$O\
-	close-stream.$O\
-	closein.$O\
-	closeout.$O\
-	concat-filename.$O\
-	dup-safer.$O\
-	dup-safer-flag.$O\
-	error.$O\
-	execute.$O\
-	fatal-signal.$O\
-	fd-safer.$O\
-	fd-safer-flag.$O\
-	filenamecat.$O\
-	filenamecat-lgpl.$O\
-	file-set.$O\
-	findprog-in.$O\
-	fopen-safer.$O\
- 	freadahead.$O\
-	fseterr.$O\
-	gl_avltree_oset.$O\
-	gl_linked_list.$O\
-	gl_linkedhash_list.$O\
-	hash.$O\
-	hashcode-named-file.$O\
-	hashcode-string1.$O\
-	hashcode-string2.$O\
-	hashkey-string.$O\
-	mbslen.$O\
-	mbsstr.$O\
-	memchr2.$O\
-	mempcpy.$O\
-	mkstemp-safer.$O\
-	malloca.$O\
-	next-prime.$O\
-	pipe2-safer.$O\
-	progname.$O\
-	propername.$O\
-	quotearg.$O\
-	regex.$O\
-	secure_getenv.$O\
-	spawn-pipe.$O\
-	strnlen1.$O\
-	strsignal.$O\
-	strstr.$O\
-	tempname.$O\
-	tmpdir.$O\
-	trim.$O\
-	vaszprintf.$O\
-	version-etc.$O\
-	version-etc-fsf.$O\
-	vfzprintf.$O\
-	vzprintf.$O\
-	wait-process.$O\
-	xasprintf.$O\
-	xmalloca.$O\
-	xmemdup0.$O\
-	xprintf.$O\
-	xvasprintf.$O\
-# lib/malloc \
-	dynarray_at_failure.$O\
-	dynarray_emplace_enlarge.$O\
-	dynarray_finalize.$O\
-	dynarray_resize.$O\
-# lib/glthread \
-	lock.$O\
-	spin.$O\
-
-
-
 BIN=$APEXPROOT/$objtype/bin/ape
 HFILES=config.h
 
@@ -128,11 +51,3 @@ CFLAGS=-c -B -I. -I$M4SRC -I$M4SRC/src  -I$M4SRC/lib -DHAVE_CONFIG_H\
 
 %.$O: $M4SRC/lib/glthread/%.c
 	$CC $CFLAGS $M4SRC/lib/glthread/$stem.c
-
-../gnulib/libgnu.a$O: $GNU_OBJS
-	ar vu ..gnulib/libgnu.a$O $GNU_OBJS
-
-
-
-
-

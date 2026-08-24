@@ -10,20 +10,6 @@ OFILES=\
 	inp.$O patch.$O pch.$O \
 	safe.$O util.$O version.$O merge.$O
 
-GNU_OBJ=\
-	argmatch.$O\
-	backup-find.$O\
-	basename-lgpl.$O\
-	gettime.$O\
-	hash.$O\
-	parse-datetime.$O\
-	time_rz.$O\
-	progname.$O\
-	quotearg.$O\
-	tempname.$O\
-	xstdopen.$O\
-
-
 BIN=$APEXPROOT/$objtype/bin/ape
 
 <$APEXPROOT/sys/src/cmd/mkone
@@ -36,9 +22,6 @@ CFLAGS=-B -p -D_POSIX_SOURCE \
 	-Ded_PROGRAM="/bin/ed"\
 	-DS_IRWXUGO=S_IRUSR
 
-
-../gnulib/libgnu.a$O: $GNU_OBJ
-	ar vu ../gnulib/libgnu.a$O $GNU_OBJ
 
 %.$O: $PTCHSRC/src/%.c
 	$CC $CFLAGS $prereq
