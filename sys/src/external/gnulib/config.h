@@ -5691,3 +5691,10 @@
 # define GNULIB_TEXT_DOMAIN/**/"gnulib"
 #endif
 
+
+/* APExp: snippet macros.
+   gnulib normally splices arg-nonnull.h and warn-on-use.h into its
+   generated replacement headers. Those headers are removed here because
+   they shadow APE's, so include the snippets directly instead. */
+#include "arg-nonnull.h"
+#include "warn-on-use.h"
