@@ -99,6 +99,20 @@ if [ -d "$DEST/sys" ]; then
 fi
 echo "pruned $pruned replacement system headers"
 
+# coreutils sets ARGMATCH_DIE to usage (EXIT_FAILURE) in its config.h,
+# since every coreutils program exports a usage function. A shared
+# gnulib cannot assume that -- bison declares its usage static -- so
+# neutralise both and let argmatch.c use its own default,
+# exit (exit_failure).
+if [ -f "$DEST/config.h" ]; then
+	sed -i.bak \
+		-e 's|^#define ARGMATCH_DIE usage (EXIT_FAILURE)|/* #undef ARGMATCH_DIE */|' \
+		-e 's|^#define ARGMATCH_DIE_DECL void usage (int _e)|/* #undef ARGMATCH_DIE_DECL */|' \
+		"$DEST/config.h"
+	rm -f "$DEST/config.h.bak"
+	echo "neutralised coreutils ARGMATCH_DIE in config.h"
+fi
+
 # Make the snippet macros reachable from config.h.
 #
 # gnulib keeps _GL_ARG_NONNULL and _GL_WARN_ON_USE in standalone snippet
