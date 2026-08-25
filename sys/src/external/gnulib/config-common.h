@@ -15,8 +15,13 @@
  * every #include <config.h> in this tree still resolves.
  */
 
-#define LOCALEDIR "/sys/lib/ape/locale"
-
+/* APExp: LOCALEDIR.
+   gnulib, bison and sed pass -DLOCALEDIR in their mkfiles; m4, diff and
+   patch pass none, and m4 needs it to compile. Guarded so a command-line
+   -D still wins rather than colliding with this. */
+#ifndef LOCALEDIR
+# define LOCALEDIR "/sys/lib/ape/locale"
+#endif
 
 /* lib/config.h.  Generated from config.hin by configure.  */
 /* lib/config.hin.  Generated from configure.ac by autoheader.  */
@@ -5867,11 +5872,3 @@
 /* APExp: prototypes and off64_t that the deleted wrapper headers carried.
    See apexp-decls.h for how the list was derived. */
 #include "apexp-decls.h"
-
-/* APExp: LOCALEDIR.
-   gnulib and bison and sed pass -DLOCALEDIR in their mkfiles; m4, diff
-   and patch do not, and m4 needs it to compile. Defaulted here under a
-   guard so a command-line -D still wins and never collides. */
-#ifndef LOCALEDIR
-# define LOCALEDIR "/sys/lib/ape/locale"
-#endif

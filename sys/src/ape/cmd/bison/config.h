@@ -23,7 +23,6 @@
 #define VERSION              "3.8"
 #define PACKAGE_BUGREPORT    "bug-bison@gnu.org"
 #define PACKAGE_URL          "https://www.gnu.org/software/bison/"
-#define M4					"/bin/m4"
 
 /* bison-specific, with no counterpart in the shared file */
 #define PACKAGE_COPYRIGHT_YEAR 2021
