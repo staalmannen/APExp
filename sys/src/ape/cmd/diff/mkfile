@@ -11,19 +11,19 @@ TARG=\
 LIB= ../gnulib/libgnu.a$O
 
 CMPO=\
-	cmp.$O system.$O
+	cmp.$O system.$O version-etc.$O
 
 DIFFO=\
 	analyze.$O context.$O diff.$O \
 	dir.$O ed.$O ifdef.$O io.$O \
 	normal.$O side.$O system.$O \
-	util.$O
+	util.$O version-etc.$O
 
 DIFF3O=\
-	diff3.$O system.$O
+	diff3.$O system.$O version-etc.$O
 
 SDIFFO=\
-	sdiff.$O system.$O
+	sdiff.$O system.$O version-etc.$O
 
 BIN=$APEXPROOT/$objtype/bin/ape
 
@@ -52,3 +52,14 @@ CFLAGS=-B -p -D_POSIX_SOURCE -DREGEX_MALLOC -I. -I$GNUSRC -I$DIFFSRC/src -I$DIFF
 $O.diff: $DIFFO $LIB
 $O.diff3: $DIFF3O $LIB
 $O.sdiff: $SDIFFO $LIB
+
+# version-etc is built here, not taken from the shared libgnu.a.
+# emit_bug_reporting_address() compiles PACKAGE_BUGREPORT, PACKAGE_NAME
+# and PACKAGE_URL straight into the object, so a single shared copy would
+# give every program whichever package happened to build it. Compiled
+# against this directory's config.h it reports this package. The source
+# is the shared one so it matches the headers everything else uses; the
+# copy in this package's own lib is older.
+version-etc.$O: $GNUSRC/version-etc.c
+	$CC $CFLAGS $GNUSRC/version-etc.c
+

@@ -11,7 +11,8 @@ OFILES=	compile.$O\
 		regexp.$O\
 		sed.$O\
 		utils.$O\
-		version.$O
+		version.$O\
+		version-etc.$O
 
 LIB= ../gnulib/libgnu.a$O
 BIN=$APEXPROOT/$objtype/bin/ape
@@ -48,3 +49,14 @@ CFLAGS=-c -I. -I$GNUSRC -I$GSEDSRC -I$GSEDSRC/sed -I$GSEDSRC/lib -B -DHAVE_CONFI
 
 install:V:
 		cp $GSEDSRC/doc/sed.1 $APEXPROOT/sys/man/1/sed
+
+# version-etc is built here, not taken from the shared libgnu.a.
+# emit_bug_reporting_address() compiles PACKAGE_BUGREPORT, PACKAGE_NAME
+# and PACKAGE_URL straight into the object, so a single shared copy would
+# give every program whichever package happened to build it. Compiled
+# against this directory's config.h it reports this package. The source
+# is the shared one so it matches the headers everything else uses; the
+# copy in this package's own lib is older.
+version-etc.$O: $GNUSRC/version-etc.c
+	$CC $CFLAGS $GNUSRC/version-etc.c
+

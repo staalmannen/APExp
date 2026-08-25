@@ -116,7 +116,6 @@ OFILES=\
 	unicodeio.$O\
 	unistd.$O\
 	vaszprintf.$O\
-	version-etc.$O\
 	version-etc-fsf.$O\
 	vfzprintf.$O\
 	vzprintf.$O\

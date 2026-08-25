@@ -136,5 +136,28 @@ Four rules for editing any of this
    because bison's 2021 mbchar.h has an inline reading is_basic_table[],
    a table the 2026 mbchar.c no longer defines.
 
+5. version-etc is built per package, not shared.
+
+   Nearly every gnulib module is identity-free and belongs in the shared
+   archive. version-etc.c is the exception: emit_bug_reporting_address()
+   compiles PACKAGE_BUGREPORT, PACKAGE_NAME and PACKAGE_URL straight
+   into the object, and version_etc_arn() does the same with
+   PACKAGE_PACKAGER. One shared copy would give every program the bug
+   address of whichever package built it, and it would still compile and
+   link, so nothing would catch it.
+
+   It is therefore absent from OFILES. sed, m4 and diff each build it in
+   their own directory with an explicit rule, against their own config.h
+   but from the shared source, so it matches the headers everything else
+   uses. bison and patch never call it.
+
+   version-etc-fsf.c stays shared: it holds only the FSF copyright
+   notice and names no package. Checked the rest of OFILES for the same
+   problem and version-etc.c is the only case; backup-find.c looks like
+   one but its VERSION is the VERSION_CONTROL environment variable.
+
+   If a future module turns out to read PACKAGE_*, it belongs here for
+   the same reason.
+
 The mkfile deletes libgnu.a before re-archiving rather than using
 'ar vu' in place, so dropping a module from OFILES actually removes it.
