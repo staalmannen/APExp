@@ -117,6 +117,24 @@ typedef struct tm_zone *timezone_t;
 #define __timezone_t_defined 1
 #endif
 
+/*
+ * Reentrant timezone conversions, POSIX.1-2024. The implementation is
+ * gnulib's time_rz.c, built into libgnu.a rather than libap, so these
+ * only resolve for programs that link it.
+ *
+ * They are declared here because gnulib normally declares them in its
+ * own generated <time.h>, and APExp deletes that wrapper for shadowing
+ * this header. Without a declaration a caller such as parse-datetime.c
+ * gets the implicit int return, and assigning that to a timezone_t is
+ * an error rather than a warning:
+ *
+ *   incompatible types: "IND STRUCT tm_zone" and "INT" for op "AS"
+ */
+extern timezone_t tzalloc(char const *);
+extern void tzfree(timezone_t);
+extern struct tm *localtime_rz(timezone_t, time_t const *, struct tm *);
+extern time_t mktime_z(timezone_t, struct tm *);
+
 #include <sys/times.h> /* times */
 #include <sys/time.h> /* gettimeofday */
 
