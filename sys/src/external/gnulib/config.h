@@ -5698,3 +5698,74 @@
    they shadow APE's, so include the snippets directly instead. */
 #include "arg-nonnull.h"
 #include "warn-on-use.h"
+
+/* APExp: printf and scanf format attributes.
+   Another set gnulib splices into its generated stdio.h. error.c and
+   the vasnprintf family declare functions with
+   _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD, so without these the compiler
+   meets an unknown identifier and reports a syntax error on the
+   argument that follows it. Copied verbatim from stdio.in.h, which is
+   free of unsubstituted placeholders in this range. They all reduce to
+   _GL_ATTRIBUTE_FORMAT, which config.h already defines as empty for
+   non-GCC compilers, so on pcc these expand to nothing. */
+/* An __attribute__ __format__ specifier for a function that takes a format
+   string and arguments, where the format string directives are the ones
+   standardized by ISO C99 and POSIX.
+   _GL_ATTRIBUTE_SPEC_PRINTF_STANDARD  */
+/* __gnu_printf__ is supported in GCC >= 4.4.  */
+#if (__GNUC__ + (__GNUC_MINOR__ >= 4) > 4) && !defined __clang__
+# define _GL_ATTRIBUTE_SPEC_PRINTF_STANDARD __gnu_printf__
+#else
+# define _GL_ATTRIBUTE_SPEC_PRINTF_STANDARD __printf__
+#endif
+
+/* An __attribute__ __format__ specifier for a function that takes a format
+   string and arguments, where the format string directives are the ones of the
+   system printf(), rather than the ones standardized by ISO C99 and POSIX.
+   _GL_ATTRIBUTE_SPEC_PRINTF_SYSTEM  */
+/* On mingw, Gnulib sets __USE_MINGW_ANSI_STDIO in order to get closer to
+   the standards.  The macro GNULIB_PRINTF_ATTRIBUTE_FLAVOR_GNU indicates
+   whether this change is effective.  On older mingw, it is not.  */
+#if GNULIB_PRINTF_ATTRIBUTE_FLAVOR_GNU
+# define _GL_ATTRIBUTE_SPEC_PRINTF_SYSTEM _GL_ATTRIBUTE_SPEC_PRINTF_STANDARD
+#else
+# define _GL_ATTRIBUTE_SPEC_PRINTF_SYSTEM __printf__
+#endif
+
+/* _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD
+   indicates to GCC that the function takes a format string and arguments,
+   where the format string directives are the ones standardized by ISO C99
+   and POSIX.  */
+#define _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD(formatstring_parameter, first_argument) \
+  _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD, formatstring_parameter, first_argument))
+
+/* _GL_ATTRIBUTE_FORMAT_PRINTF_SYSTEM is like _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD,
+   except that it indicates to GCC that the supported format string directives
+   are the ones of the system printf(), rather than the ones standardized by
+   ISO C99 and POSIX.  */
+#define _GL_ATTRIBUTE_FORMAT_PRINTF_SYSTEM(formatstring_parameter, first_argument) \
+  _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_SYSTEM, formatstring_parameter, first_argument))
+
+/* _GL_ATTRIBUTE_FORMAT_SCANF
+   indicates to GCC that the function takes a format string and arguments,
+   where the format string directives are the ones standardized by ISO C99
+   and POSIX.  */
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4)
+# define _GL_ATTRIBUTE_FORMAT_SCANF(formatstring_parameter, first_argument) \
+   _GL_ATTRIBUTE_FORMAT ((__gnu_scanf__, formatstring_parameter, first_argument))
+#else
+# define _GL_ATTRIBUTE_FORMAT_SCANF(formatstring_parameter, first_argument) \
+   _GL_ATTRIBUTE_FORMAT ((__scanf__, formatstring_parameter, first_argument))
+#endif
+
+/* _GL_ATTRIBUTE_FORMAT_SCANF_SYSTEM is like _GL_ATTRIBUTE_FORMAT_SCANF,
+   except that it indicates to GCC that the supported format string directives
+   are the ones of the system scanf(), rather than the ones standardized by
+   ISO C99 and POSIX.  */
+#define _GL_ATTRIBUTE_FORMAT_SCANF_SYSTEM(formatstring_parameter, first_argument) \
+  _GL_ATTRIBUTE_FORMAT ((__scanf__, formatstring_parameter, first_argument))
+
+/* The definitions of _GL_FUNCDECL_RPL etc. are copied here.  */
+
+/* The definition of _GL_ARG_NONNULL is copied here.  */
+
