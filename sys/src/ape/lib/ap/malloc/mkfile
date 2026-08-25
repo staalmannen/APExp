@@ -19,6 +19,8 @@ OFILES=\
 	aligned_alloc.$O\
 # GNU xalloc family\
 	xmalloc.$O\
+# xalloc_die is replaceable, so it gets an object of its own\
+	xalloc_die.$O\
 	exitfail.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib

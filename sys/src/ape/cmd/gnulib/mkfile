@@ -114,6 +114,7 @@ OFILES=\
 	qcopy-acl.$O\
 	quotearg.$O\
 	regex.$O\
+	renameatu.$O\
 	safe-read.$O\
 	same-inode.$O\
 	secure_getenv.$O\
