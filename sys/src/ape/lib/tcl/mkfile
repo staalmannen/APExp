@@ -88,9 +88,29 @@ HFILES=\
 
 CC=pcc
 
+# -DWCHAR=char is load-bearing, not a workaround: do not remove it.
+# Tcl defines WCHAR only for Windows and Cygwin -- tclUnixPort.h's
+# "typedef unsigned short WCHAR" sits inside #ifdef __CYGWIN__ -- yet
+# tclClock.c uses WCHAR unguarded, so without this the file does not
+# compile at all. char is also what Tcl itself picks elsewhere on
+# non-Windows: see "#define WCHAR char" in generic/tclIOUtil.c. And it
+# has to be char rather than wchar_t, because tclClock.c assigns
+# getenv's char * straight to a const WCHAR *.
+#
+# Since WCHAR is char here, its string operations are the byte ones.
+# tclClock.c calls wcscmp, wcslen and wcscpy on a WCHAR * holding the TZ
+# value from getenv. That used to work because wchar.h macro'd the whole
+# wcs* family onto str* equivalents; those macros are gone now that libap
+# implements them for real, and the calls stopped matching:
+#   tclClock.c:4758 argument prototype mismatch "IND CONST CHAR" for
+#   "IND CONST UINT": wcscmp
+# Mapping them here keeps the byte behaviour where it is actually wanted,
+# rather than in a header shared by everything. The other wcs* uses in
+# tcl and tk are all under win/, which is not built here.
 CFLAGS=-c -I. -I$TCLSRC/generic -I$TCLSRC/unix -I$TCLSRC/minizip\
 	-I$TCLSRC/libtommath -DHAVE_TCL_CONFIG_H -DPLAN9 -DMODULE_SCOPE=extern\
-	-DWCHAR=char -I$APEXPROOT/sys/src/external/zlib -DMP_FIXED_CUTOFFS
+	-DWCHAR=char -I$APEXPROOT/sys/src/external/zlib -DMP_FIXED_CUTOFFS\
+	-Dwcscmp=strcmp -Dwcslen=strlen -Dwcscpy=strcpy -Dwcsncmp=strncmp -Dwcsncpy=strncpy -Dwcsrchr=strrchr
 
 %.$O: $TCLSRC/libtommath/%.c
 	$CC $CFLAGS $TCLSRC/libtommath/$stem.c
