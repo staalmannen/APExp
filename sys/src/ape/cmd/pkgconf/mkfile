@@ -26,7 +26,7 @@ LIB= libpkgconf.a$O
 
 <$APEXPROOT/sys/src/cmd/mkmany
 
-CFLAGS=-FVp -c -I$PCSRC -I$PCSRC/libpkgconf\
+CFLAGS=	-c -I$PCSRC -I$PCSRC/libpkgconf\
 		 -I$PCSRC/cli -I$PCSRC/cli/bomtool\
 		-DHAVE_CONFIG_H -DPKGCONFIG_IS_STATIC\
 		-DSYSTEM_INCLUDEDIR="/sys/include/ape"\
