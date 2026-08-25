@@ -52,6 +52,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <wchar.h>
+/* APExp: for mbrtoc32, see the call below. */
+#include <uchar.h>
 
 #include "mbchar.h"
 
@@ -135,7 +137,16 @@ mbfile_multi_getc (struct mbchar *mbc, struct mbfile_multi *mbf)
          behaviour will clobber it.  */
       mbstate_t backup_state = mbf->state;
 
-      bytes = mbrtowc (&mbc->wc, &mbf->buf[0], mbf->bufcount, &mbf->state);
+      /* APExp: mbrtoc32, not mbrtowc. This file is bison's, from 2021,
+         when mbchar_t.wc was a wchar_t. The mbchar.h it now compiles
+         against is the 2026 one, where wc is a char32_t, so mbrtowc
+         gave an argument prototype mismatch: "IND UINT" for
+         "IND USHORT". Passing a char32_t * to mbrtoc32 is also the
+         correct call on APE, whose wchar_t is only 16 bits and cannot
+         hold every rune. libap implements mbrtoc32 in
+         sys/src/ape/lib/ap/multibyte, taking a ucs4_t * which is the
+         same uint32_t as char32_t.  */
+      bytes = mbrtoc32 (&mbc->wc, &mbf->buf[0], mbf->bufcount, &mbf->state);
 
       if (bytes == (size_t) -1)
         {
