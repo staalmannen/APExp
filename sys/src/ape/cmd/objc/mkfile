@@ -1,8 +1,18 @@
 </$objtype/mkfile
 
-BUILD=bootstrap
-if (whatis objc1 > /dev/null >[2=1])
-	BUILD=rebuild
+# objc bootstraps itself: build with the system compiler the first time,
+# then rebuild with the objc1 that produced. Which mkfile to delegate to
+# therefore depends on whether objc1 already exists.
+#
+# This was written as a bare rc "if" at the top of the mkfile, but mk
+# parses this section itself and does not know rc's control flow. It read
+# the >[2=1] redirection as an assignment and stopped with
+#     mkfile:5: syntax error; multiple vars on left side of assignment
+# which broke mk clean for the whole tree, objc being in DIRS.
+#
+# The mk way to run a shell command here is a backquote expression, as in
+# sys/src/cmd/mkfile's TARG.
+BUILD=`{if(whatis objc1 >/dev/null >[2=1]) echo rebuild; if not echo bootstrap}
 
 install:V:
 	mk -f mkfile.$BUILD install
