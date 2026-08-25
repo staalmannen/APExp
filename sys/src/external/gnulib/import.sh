@@ -52,6 +52,51 @@ for t in $TREES; do
 	echo "$t: contributed $n files"
 done
 
+# Drop gnulib's replacement system headers.
+#
+# A configured gnulib generates wrappers named stdio.h, unistd.h,
+# stddef.h and so on from its *.in.h templates. Each one pulls in the
+# real header with #include_next. That works under autoconf, which
+# arranges the include path so the wrapper is found first and exactly
+# once. Here the build passes -I$GNUSRC, so the wrappers shadow the APE
+# headers and the two sets bounce off each other:
+#
+#   gnulib/stddef.h -> ape/time.h -> gnulib/time.h -> gnulib/sys/stat.h
+#     -> ape/unistd.h -> gnulib/unistd.h -> gnulib/stdlib.h -> ...
+#
+# which cpp reports as "#if too deeply nested". APE's headers are musl
+# derived and already provide what these wrappers add, so delete them
+# and let every gnulib source compile against APE directly.
+#
+# obstack.h goes too. libap implements obstack, sys/include/ape/obstack.h
+# is the matching full header, and the obstack module is deliberately
+# absent from the mkfile's OFILES.
+#
+# NOT deleted, even though APE ships a file of the same name: error.h,
+# sigsegv.h, unicase.h, unictype.h, unistr.h, unitypes.h. The APE copies
+# are 8 to 27 line stubs, too thin to declare what gnulib's own error.c,
+# sigsegv.c and u8-uctomb-aux.c need. config.h, getopt-cdefs.h, stdbit.h,
+# stdckdint.h, uninorm.h and uniwidth.h have no APE counterpart at all.
+SHADOWING="ctype.h dirent.h errno.h fcntl.h fnmatch.h getopt.h
+	inttypes.h limits.h obstack.h pthread.h sched.h signal.h
+	stddef.h stdint.h stdio.h stdlib.h string.h strings.h time.h
+	uchar.h unistd.h wchar.h wctype.h"
+
+pruned=0
+for h in $SHADOWING; do
+	if [ -f "$DEST/$h" ]; then
+		rm -f "$DEST/$h"
+		pruned=$((pruned + 1))
+	fi
+done
+if [ -d "$DEST/sys" ]; then
+	# sys/stat.h, sys/time.h, sys/types.h, sys/wait.h, sys/random.h are
+	# all replacement wrappers; APE provides every one of them.
+	pruned=$((pruned + $(ls "$DEST"/sys | wc -l)))
+	rm -rf "$DEST/sys"
+fi
+echo "pruned $pruned replacement system headers"
+
 echo "---"
 echo "imported $copied files into $DEST ($skipped already present, newer copy kept)"
 echo
