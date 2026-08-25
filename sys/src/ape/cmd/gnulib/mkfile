@@ -25,6 +25,7 @@ LIB=libgnu.a$O
 
 OFILES=\
 	acl-internal.$O\
+	allocator.$O\
 	argmatch.$O\
 	asyncsafe-spin.$O\
 	backup-find.$O\
