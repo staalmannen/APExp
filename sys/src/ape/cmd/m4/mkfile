@@ -17,7 +17,8 @@ OFILES=\
 		macro.$O\
 		output.$O\
 		path.$O\
-		symtab.$O
+		symtab.$O\
+		version-etc.$O
 
 #minimized gnulib
 BIN=$APEXPROOT/$objtype/bin/ape
@@ -58,3 +59,14 @@ CFLAGS=-c -B -I. -I$GNUSRC -I$M4SRC -I$M4SRC/src -I$M4SRC/lib -DHAVE_CONFIG_H\
 
 %.$O: $M4SRC/lib/glthread/%.c
 	$CC $CFLAGS $M4SRC/lib/glthread/$stem.c
+
+# version-etc is built here, not taken from the shared libgnu.a.
+# emit_bug_reporting_address() compiles PACKAGE_BUGREPORT, PACKAGE_NAME
+# and PACKAGE_URL straight into the object, so a single shared copy would
+# give every program whichever package happened to build it. Compiled
+# against this directory's config.h it reports this package. The source
+# is the shared one so it matches the headers everything else uses; the
+# copy in this package's own lib is older.
+version-etc.$O: $GNUSRC/version-etc.c
+	$CC $CFLAGS $GNUSRC/version-etc.c
+
