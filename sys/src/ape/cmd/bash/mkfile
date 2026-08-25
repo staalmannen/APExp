@@ -96,13 +96,6 @@ CC=$APEXPROOT/$objtype/bin/pcc
 LD=$APEXPROOT/$objtype/bin/pcc
 YACC=bison
 
-#-Dbool=int is a cpp-level shim: even if the installed pcc/6c does not
-# yet know 'bool' as a C23 keyword (the itab entry in cc/lex.c ships
-# with the source but requires a rebuild of cc.a AND 6c to take effect),
-# every 'bool' token in bash's own source and in gnulib macros like
-# ckd_mul is rewritten to 'int' before it reaches the compiler. Without
-# this shim, gnulib's '((bool) _GL_INT_MULTIPLY_WRAPV(...))' cast in
-# xreallocarray triggered 'undefined: bool' at link time.
 DEFS= 	-DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale" -D_POSIX_SOURCE\
 		-D_BSD_EXTENSION -DHAVE_LIMITS_H -D_LIMITS_EXTENSION -DPLAN9\
 		-DCONF_OSTYPE="plan9" -DCONF_MACHTYPE="$objtype-apexp-plan9" -DPROGRAM="bash"\
