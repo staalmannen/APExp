@@ -52,6 +52,39 @@ Two rules for anyone editing the OFILES list
    idx_t variants (ximalloc, xirealloc, xicalloc, xizalloc, ximemdup,
    ximemdup0).
 
+4. Each package needs its own config.h and a specific -I order.
+
+   This library is built with coreutils' config.h, which answers the
+   platform questions for everyone. It cannot answer package identity:
+   it says PACKAGE "coreutils" and VERSION "9.11". bison's src reads
+   VERSION, PACKAGE_STRING, PACKAGE_URL and PACKAGE_BUGREPORT for its
+   --version output, so on the shared file alone bison introduces itself
+   as GNU coreutils 9.11.
+
+   So give each package a config.h in its build directory that includes
+   the shared one by relative path and then overrides the identity
+   macros. Include it by path, not as <config.h>, which would find the
+   package's own file again through -I. and recurse. See bison's.
+
+   The include order that follows from this, in full:
+
+       -I.               the package's config.h
+       -I<pkg>/src       the package's own headers, which can share a
+                         name with a gnulib one. bison/src/configmake.h
+                         is hand-edited to give PKGDATADIR
+                         "/sys/lib/ape"; the gnulib configmake.h has no
+                         PKGDATADIR, so getting the wrong one is a
+                         compile error.
+       -I<gnulib>        shared module headers, ahead of the package's
+                         own copies, so declarations match the objects
+                         in libgnu.a. bison alone shares 203 header
+                         names with this tree.
+       -I<pkg>/lib       last, for headers only the package provides.
+
+   Getting the third and fourth the wrong way round fails at link time
+   with a missing symbol rather than at compile time, which makes it
+   look unrelated to headers.
+
 3. Watch for gnulib module renames when merging OFILES lists.
 
    The object list started as the union of what each package asked for,
