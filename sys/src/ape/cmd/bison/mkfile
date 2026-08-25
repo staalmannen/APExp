@@ -65,16 +65,26 @@ BISONSRC=../../../external/bison
 #fails on include_next
 CC=$APEXPROOT/$objtype/bin/pcc
 
-# -I$GNUSRC comes before -I$BISONSRC/lib on purpose. bison's own
-# gnulib copy is from 2021 and the shared libgnu.a is built from
-# coreutils' 2026 sources, so compiling bison against its own copies
-# of shared module headers links 2021 declarations to 2026 objects.
-# location.c includes mbchar.h, and the 2021 one has an inline that
-# reads is_basic_table[], a table the 2026 mbchar.c no longer defines:
-#   _convM2D: is_basic_table: not defined
-# Headers bison alone provides still resolve, via -I$BISONSRC/lib.
+# Include order matters here, and each position is load bearing.
+#
+#   -I.               ./config.h, which layers bison's package identity
+#                     over the shared gnulib one. See that file.
+#   -I$BISONSRC/src   bison's own headers. configmake.h is the one that
+#                     matters: it is the sole header name bison/src
+#                     shares with the gnulib tree, it is hand-edited
+#                     here to give PKGDATADIR "/sys/lib/ape", and the
+#                     gnulib copy has no PKGDATADIR at all.
+#   -I$GNUSRC         shared module headers, ahead of bison's own copies
+#                     of the same 203 names. bison's gnulib is from 2021
+#                     and libgnu.a is built from 2026 sources, so its
+#                     headers would declare an older API than the
+#                     objects provide. location.c includes mbchar.h, and
+#                     the 2021 one has an inline reading is_basic_table[],
+#                     a table the 2026 mbchar.c no longer defines:
+#                       _convM2D: is_basic_table: not defined
+#   -I$BISONSRC/lib   last, for the headers only bison provides.
 GNUSRC=$APEXPROOT/sys/src/external/gnulib
-CFLAGS=-c -I. -I$GNUSRC -I$BISONSRC -I$BISONSRC/lib -I$BISONSRC/src\
+CFLAGS=-c -I. -I$BISONSRC/src -I$BISONSRC -I$GNUSRC -I$BISONSRC/lib\
 		-B -DHAVE_CONFIG_H\
 		-DLOCALEDIR="/sys/lib/ape/locale"
 

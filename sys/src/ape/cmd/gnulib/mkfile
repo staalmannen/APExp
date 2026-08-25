@@ -35,7 +35,6 @@ OFILES=\
 	c-stack.$O\
 	c-strcasecmp.$O\
 	canonicalize.$O\
-	canonicalize-lgpl.$O\
 	clean-temp.$O\
 	clean-temp-simple.$O\
 	close-stream.$O\
@@ -73,8 +72,6 @@ OFILES=\
 	gl_rbtree_oset.$O\
 	gl_rbtreehash_list.$O\
 	hash.$O\
-	hash-pjw.$O\
-	hash-triple-simple.$O\
 	hashcode-named-file.$O\
 	hashcode-string1.$O\
 	hashcode-string2.$O\

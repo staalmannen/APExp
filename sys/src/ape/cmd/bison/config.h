@@ -1,5 +1,5 @@
 /*
- * config.h for patch.
+ * config.h for bison.
  *
  * The platform answers -- HAVE_* probes, type sizes, the APExp
  * additions -- are shared by every package that links libgnu.a and
@@ -15,11 +15,14 @@
 
 #include <config-common.h>
 
-#define PACKAGE              "patch"
-#define PACKAGE_NAME         "GNU patch"
-#define PACKAGE_STRING       "GNU patch 2.8"
-#define PACKAGE_TARNAME      "patch"
-#define PACKAGE_VERSION      "2.8"
-#define VERSION              "2.8"
-#define PACKAGE_BUGREPORT    "bug-patch@gnu.org"
-#define PACKAGE_URL          "https://www.gnu.org/software/patch/"
+#define PACKAGE              "bison"
+#define PACKAGE_NAME         "GNU Bison"
+#define PACKAGE_STRING       "GNU Bison 3.8"
+#define PACKAGE_TARNAME      "bison"
+#define PACKAGE_VERSION      "3.8"
+#define VERSION              "3.8"
+#define PACKAGE_BUGREPORT    "bug-bison@gnu.org"
+#define PACKAGE_URL          "https://www.gnu.org/software/bison/"
+
+/* bison-specific, with no counterpart in the shared file */
+#define PACKAGE_COPYRIGHT_YEAR 2021

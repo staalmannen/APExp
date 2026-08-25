@@ -1,5 +1,5 @@
 /*
- * config.h for patch.
+ * config.h for sed.
  *
  * The platform answers -- HAVE_* probes, type sizes, the APExp
  * additions -- are shared by every package that links libgnu.a and
@@ -15,11 +15,11 @@
 
 #include <config-common.h>
 
-#define PACKAGE              "patch"
-#define PACKAGE_NAME         "GNU patch"
-#define PACKAGE_STRING       "GNU patch 2.8"
-#define PACKAGE_TARNAME      "patch"
-#define PACKAGE_VERSION      "2.8"
-#define VERSION              "2.8"
-#define PACKAGE_BUGREPORT    "bug-patch@gnu.org"
-#define PACKAGE_URL          "https://www.gnu.org/software/patch/"
+#define PACKAGE              "sed"
+#define PACKAGE_NAME         "GNU sed"
+#define PACKAGE_STRING       "GNU sed 4.9"
+#define PACKAGE_TARNAME      "sed"
+#define PACKAGE_VERSION      "4.9"
+#define VERSION              "4.9"
+#define PACKAGE_BUGREPORT    "bug-sed@gnu.org"
+#define PACKAGE_URL          "https://www.gnu.org/software/sed/"

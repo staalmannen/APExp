@@ -33,7 +33,14 @@ RPLS= -Drpl_malloc=malloc -Drpl_free=free -Drpl_getopt_long=getopt_long\
 	-Drpl_optarg=optarg -Drpl_optind=optind
 
 CC=pcc -c
-CFLAGS=-B -p -D_POSIX_SOURCE -DREGEX_MALLOC -I. -I$DIFFSRC/src -I$DIFFSRC/lib \
+# -I. finds this directory's config.h, which layers package identity
+# over config-common.h. -I$GNUSRC comes before the package's own lib
+# directory so the shared module headers match the objects in
+# libgnu.a; the package's copies are older than the 2026 sources the
+# library is built from, and a mismatch shows up at link time as a
+# missing symbol rather than at compile time.
+GNUSRC=$APEXPROOT/sys/src/external/gnulib
+CFLAGS=-B -p -D_POSIX_SOURCE -DREGEX_MALLOC -I. -I$GNUSRC -I$DIFFSRC/src -I$DIFFSRC/lib \
 	-DHAVE_CONFIG_H -DDIFF_PROGRAM="/bin/diff" $RPLS\
 
 %.$O: $DIFFSRC/src/%.c

@@ -24,7 +24,14 @@ GSEDSRC=../../../external/gsed
 #fails on include_next
 CC=$APEXPROOT/$objtype/bin/pcc
 
-CFLAGS=-c -I. -I$GSEDSRC -I$GSEDSRC/sed -I$GSEDSRC/lib -B -DHAVE_CONFIG_H\
+# -I. finds this directory's config.h, which layers package identity
+# over config-common.h. -I$GNUSRC comes before the package's own lib
+# directory so the shared module headers match the objects in
+# libgnu.a; the package's copies are older than the 2026 sources the
+# library is built from, and a mismatch shows up at link time as a
+# missing symbol rather than at compile time.
+GNUSRC=$APEXPROOT/sys/src/external/gnulib
+CFLAGS=-c -I. -I$GNUSRC -I$GSEDSRC -I$GSEDSRC/sed -I$GSEDSRC/lib -B -DHAVE_CONFIG_H\
 		-DLOCALEDIR="/sys/lib/ape/locale"
 
 %.$O: $GSEDSRC/sed/%.c

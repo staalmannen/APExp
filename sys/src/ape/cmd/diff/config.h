@@ -1,5 +1,5 @@
 /*
- * config.h for patch.
+ * config.h for diff.
  *
  * The platform answers -- HAVE_* probes, type sizes, the APExp
  * additions -- are shared by every package that links libgnu.a and
@@ -15,11 +15,11 @@
 
 #include <config-common.h>
 
-#define PACKAGE              "patch"
-#define PACKAGE_NAME         "GNU patch"
-#define PACKAGE_STRING       "GNU patch 2.8"
-#define PACKAGE_TARNAME      "patch"
-#define PACKAGE_VERSION      "2.8"
-#define VERSION              "2.8"
-#define PACKAGE_BUGREPORT    "bug-patch@gnu.org"
-#define PACKAGE_URL          "https://www.gnu.org/software/patch/"
+#define PACKAGE              "diffutils"
+#define PACKAGE_NAME         "GNU diffutils"
+#define PACKAGE_STRING       "GNU diffutils 3.12"
+#define PACKAGE_TARNAME      "diffutils"
+#define PACKAGE_VERSION      "3.12"
+#define VERSION              "3.12"
+#define PACKAGE_BUGREPORT    "bug-diffutils@gnu.org"
+#define PACKAGE_URL          "https://www.gnu.org/software/diffutils/"
