@@ -5530,6 +5530,22 @@
    It is here so that we can cope with an older version of unitypes.h
    that does not contain this definition and that is pre-installed among
    the public header files.  */
+/* APExp: #ifndef added, matching the copy in unitypes.h, which has always
+   had one. Upstream leaves this copy unguarded because a config.h is
+   included once per translation unit -- but grep's src/search.h includes
+   <config.h> a second time, and under pcc the branch below is not stable
+   across the two visits. None of the __GNUC__/__clang_major__ arms apply,
+   so the choice turns on whether __restrict has been defined yet: not at
+   grep.c's own <config.h>, but by then <features.h> has been read, so
+   the second visit picks __restrict where the first picked restrict:
+
+     config-common.h:5536 ... search.h:20 ... grep.c:47
+       Macro redefinition of _UC_RESTRICT
+
+   A duplicate definition has to be idempotent to be harmless. Under gcc
+   it already was, since the first arm wins on both visits. Regenerate
+   with import.sh, which reapplies this. */
+#ifndef _UC_RESTRICT
 # if defined __restrict \
      || 2 < __GNUC__ + (95 <= __GNUC_MINOR__) \
      || __clang_major__ >= 3
@@ -5539,6 +5555,7 @@
 # else
 #  define _UC_RESTRICT
 # endif
+#endif
 
 
 /* Define to an unsigned 32-bit type if <sys/types.h> lacks this type. */

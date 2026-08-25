@@ -180,6 +180,41 @@ if [ -f "$DEST/config-common.h" ]; then
 	rm -f "$DEST/config-common.h.bak"
 fi
 
+# Guard config.h's copy of _UC_RESTRICT, the way unitypes.h guards its own.
+#
+# config.h carries a deliberate duplicate of the unitypes.h definition,
+# for hosts whose pre-installed unitypes.h predates it. unitypes.h wraps
+# its copy in #ifndef _UC_RESTRICT; the config.h copy is bare, because a
+# config.h is meant to be read once per translation unit.
+#
+# grep's src/search.h includes <config.h> a second time, and under pcc
+# the branch is not stable across the two visits. None of the
+# __GNUC__/__clang_major__ arms apply, so the choice comes down to
+# whether __restrict is defined yet -- not at grep.c's own <config.h>,
+# but yes by the time <features.h> has been read:
+#
+#   config-common.h:5536 ... search.h:20 ... grep.c:47
+#     Macro redefinition of _UC_RESTRICT
+#
+# Under gcc the first arm wins on both visits, so upstream never sees it.
+if [ -f "$DEST/config-common.h" ] &&
+   ! grep -q '^#ifndef _UC_RESTRICT' "$DEST/config-common.h"; then
+	awk '
+		/^# if defined __restrict/ && !seen {
+			print "#ifndef _UC_RESTRICT"
+			inblock = 1
+			seen = 1
+		}
+		{ print }
+		inblock && /^# endif/ {
+			print "#endif"
+			inblock = 0
+		}
+	' "$DEST/config-common.h" >"$DEST/config-common.h.new" &&
+		mv "$DEST/config-common.h.new" "$DEST/config-common.h"
+	echo "guarded _UC_RESTRICT in config-common.h"
+fi
+
 # Make the snippet macros reachable from config.h.
 #
 # gnulib keeps _GL_ARG_NONNULL and _GL_WARN_ON_USE in standalone snippet

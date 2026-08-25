@@ -186,13 +186,30 @@ control(Tokenrow *trp)
 		}
 		if (ifsatisfied[ifdepth]==2)
 			error(ERROR, "#elif after #else");
+		/*
+		 * Once a group has been selected, the conditions of the
+		 * remaining #elif directives are not evaluated (C11
+		 * 6.10.1p6). We used to evaluate anyway and discard the
+		 * result, which is not merely wasted work: eval()
+		 * diagnoses what it reads, so an arm the standard says
+		 * is dead still spoke up. c-ctype.h picks ASCII in the
+		 * #if and holds the EBCDIC test in the #elif, whose
+		 * '\xf0', '\xc1' and friends drew a warning apiece:
+		 *
+		 *   Character constant taken as not signed
+		 *
+		 * Reached here with ifsatisfied set means either the
+		 * live group is ending (skipping==0) or an earlier arm
+		 * already won and we are skipping the rest; both want
+		 * skipping and no evaluation.
+		 */
+		if (ifsatisfied[ifdepth]) {
+			skipping = ifdepth;
+			break;
+		}
 		if (eval(trp, np->val)) {
-			if (ifsatisfied[ifdepth])
-				skipping = ifdepth;
-			else {
-				skipping = 0;
-				ifsatisfied[ifdepth] = 1;
-			}
+			skipping = 0;
+			ifsatisfied[ifdepth] = 1;
 		} else
 			skipping = ifdepth;
 		break;
@@ -206,6 +223,11 @@ control(Tokenrow *trp)
 		}
 		if (ifsatisfied[ifdepth]==2)
 			error(ERROR, "#elifdef/#elifndef after #else");
+		/* dead arm: not evaluated, as for #elif above */
+		if (ifsatisfied[ifdepth]) {
+			skipping = ifdepth;
+			break;
+		}
 		{
 			Nlist *dp;
 			int defined;
@@ -217,12 +239,8 @@ control(Tokenrow *trp)
 			dp = lookup(trp->tp, 0);
 			defined = dp && (dp->flag&(ISDEFINED|ISMAC));
 			if ((np->val==KELIFDEF) == defined) {
-				if (ifsatisfied[ifdepth])
-					skipping = ifdepth;
-				else {
-					skipping = 0;
-					ifsatisfied[ifdepth] = 1;
-				}
+				skipping = 0;
+				ifsatisfied[ifdepth] = 1;
 			} else
 				skipping = ifdepth;
 		}
