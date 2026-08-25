@@ -52,6 +52,26 @@ Two rules for anyone editing the OFILES list
    idx_t variants (ximalloc, xirealloc, xicalloc, xizalloc, ximemdup,
    ximemdup0).
 
+3. Watch for gnulib module renames when merging OFILES lists.
+
+   The object list started as the union of what each package asked for,
+   and those lists span gnulib vintages. When gnulib renames a module it
+   keeps the function names, so both files land in the tree and both
+   define the same symbols. 'ar' reports it while building the archive:
+
+       duplicate text symbol: hash_pjw
+
+   Three such pairs were removed. The legacy name is on the left:
+
+       hash-pjw            -> hashcode-string2
+       hash-triple-simple  -> hashcode-named-file
+       canonicalize-lgpl   -> canonicalize   (alternatives, not a rename;
+                                              canonicalize is the superset,
+                                              adding canonicalize_filename_mode)
+
+   Adding a module means checking that nothing already in OFILES defines
+   its symbols under another file name.
+
 2. Do not let a package rebuild a module that lives here.
 
    The same duplicate-symbol trap applies to a package's own private
