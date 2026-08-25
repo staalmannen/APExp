@@ -29,9 +29,13 @@ OFILES=\
 	asyncsafe-spin.$O\
 	backup-find.$O\
 	basename-lgpl.$O\
+	binary-io.$O\
 	bitrotate.$O\
 	bitset.$O\
 	bitsetv.$O\
+	btoc32.$O\
+	btowc.$O\
+	c-ctype.$O\
 	c-stack.$O\
 	c-strcasecmp.$O\
 	canonicalize.$O\
@@ -41,13 +45,16 @@ OFILES=\
 	closein.$O\
 	closeout.$O\
 	cmpbuf.$O\
+	colorize-posix.$O\
 	concat-filename.$O\
 	copy-acl.$O\
+	cycle-check.$O\
 	dfa.$O\
 	diagnose.$O\
 	dup-safer.$O\
 	dup-safer-flag.$O\
 	error.$O\
+	exclude.$O\
 	execute.$O\
 	fatal-signal.$O\
 	fd-safer.$O\
@@ -59,6 +66,7 @@ OFILES=\
 	fopen-safer.$O\
 	free.$O\
 	fstrcmp.$O\
+	fts.$O\
 	get-errno.$O\
 	get-permissions.$O\
 	gethrxtime.$O\
@@ -76,12 +84,14 @@ OFILES=\
 	hashcode-string1.$O\
 	hashcode-string2.$O\
 	hashkey-string.$O\
+	i-ring.$O\
 	ialloc.$O\
 	integer_length.$O\
 	integer_length_l.$O\
 	localeinfo.$O\
 	malloca.$O\
 	mbchar.$O\
+	mbscasecmp.$O\
 	mbslen.$O\
 	mbsstr.$O\
 	mbswidth.$O\
@@ -90,6 +100,9 @@ OFILES=\
 	mkstemp-safer.$O\
 	next-prime.$O\
 	open-safer.$O\
+	openat-proc.$O\
+	openat-safer.$O\
+	opendirat.$O\
 	parse-datetime.$O\
 	path-join.$O\
 	pipe-safer.$O\
@@ -100,12 +113,20 @@ OFILES=\
 	qcopy-acl.$O\
 	quotearg.$O\
 	regex.$O\
+	safe-read.$O\
+	same-inode.$O\
 	secure_getenv.$O\
 	set-permissions.$O\
 	sigsegv.$O\
 	spawn-pipe.$O\
+	stat-time.$O\
 	stdbit.$O\
+	stdlib.$O\
+	stpcpy.$O\
+	str_endswith.$O\
 	strerror.$O\
+	strerror-override.$O\
+	stripslash.$O\
 	strnlen1.$O\
 	strsignal.$O\
 	strstr.$O\
@@ -121,6 +142,7 @@ OFILES=\
 	vfzprintf.$O\
 	vzprintf.$O\
 	wait-process.$O\
+	wmempcpy.$O\
 	xasprintf.$O\
 	xconcat-filename.$O\
 	xhash.$O\
@@ -130,6 +152,8 @@ OFILES=\
 	xsize.$O\
 	xstdopen.$O\
 	xstrtoimax.$O\
+	xstrtol.$O\
+	xstrtoul.$O\
 	xvasprintf.$O\
 	dynarray_at_failure.$O\
 	dynarray_emplace_enlarge.$O\
@@ -147,6 +171,7 @@ OFILES=\
 	lock.$O\
 	once.$O\
 	spin.$O\
+	threadlib.$O\
 	u8-uctomb-aux.$O
 
 #during building from scratch, the new pcc is not picked up and compilation
