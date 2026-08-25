@@ -14,11 +14,10 @@ APEXPROOT=../../../../..
 # error. See README for the current list and for the obstack case that
 # prompted this consolidation.
 #
-# Keep this file plain. No comments inside the OFILES list, since a
-# trailing backslash on a comment line sits inside the comment and
-# makes the continuation depend on whether mk strips comments before
-# or after joining lines. Keep CFLAGS and UNRPL on single lines for
-# the same reason.
+# Keep this file plain. No comments inside the OFILES list: a trailing
+# backslash on a comment line sits inside the comment, so whether the
+# list survives past it depends on whether mk strips comments before or
+# after joining continued lines.
 
 GNUSRC=$APEXPROOT/sys/src/external/gnulib
 
