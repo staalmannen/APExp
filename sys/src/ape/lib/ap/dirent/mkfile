@@ -6,6 +6,7 @@ LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 OFILES=\
 	dirfd.$O\
 	opendir.$O\
+	fdopendir.$O\
 	closedir.$O\
 	readdir.$O\
 	rewinddir.$O\

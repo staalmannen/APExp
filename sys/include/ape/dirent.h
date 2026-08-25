@@ -49,6 +49,7 @@ extern "C" {
  * functions defined on directories
  */
 DIR		*opendir(const char *);
+DIR		*fdopendir(int);
 struct dirent	*readdir(DIR *);
 void		rewinddir(DIR *);
 int		closedir(DIR *);
