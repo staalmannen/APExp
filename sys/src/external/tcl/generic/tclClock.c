@@ -4709,6 +4709,29 @@ ClockSafeCatchCmd(
  *----------------------------------------------------------------------
  */
 
+/*
+ * APExp: on Plan 9 the build sets -DWCHAR=char, following what Tcl
+ * itself does in tclIOUtil.c, because tzNow below takes getenv's char *
+ * directly. The three wcs* calls in this function therefore operate on
+ * bytes, and must be the byte functions.
+ *
+ * This used to happen by itself: APE's <wchar.h> macro'd the whole wcs*
+ * family onto their str* equivalents. libap implements them for real
+ * now, so the calls no longer type-check against a wchar_t * that is 32
+ * bits wide.
+ *
+ * The redirection has to be here rather than a -D in the mkfile. A -D
+ * rewrites the declaration in <wchar.h> as well as these calls, leaving
+ * "extern int strcmp(const wchar_t *, const wchar_t *)" to collide with
+ * the real declaration in <string.h>. Placed after all the includes, it
+ * only affects the uses below.
+ */
+#ifdef PLAN9
+#define wcscmp strcmp
+#define wcslen strlen
+#define wcscpy strcpy
+#endif
+
 #define TZ_INIT_MARKER	((WCHAR *) INT2PTR(-1))
 
 typedef struct {
