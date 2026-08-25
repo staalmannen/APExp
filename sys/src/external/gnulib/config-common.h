@@ -5879,6 +5879,32 @@
 # define strnul(s) ((s) + strlen (s))
 #endif
 
+/* APExp: no non-Gregorian calendars in strftime.
+   strftime.c defaults SUPPORT_NON_GREG_CALENDARS_IN_STRFTIME to true and
+   then calls gl_locale_name_unsafe to spot th_TH, fa_IR and the like:
+
+     nstrftime: undefined: gl_locale_name_unsafe in nstrftime
+
+   Supplying that means gnulib's localename module, which pulls in
+   localename-environ and getlocalename_l-unsafe, and the last of those
+   ends in "#error Please port ... to your platform" once its
+   glibc/macOS/Solaris/Windows arms all fail. Nothing to port to: Plan 9
+   has one locale, C.UTF-8, which is why libap's own locale machinery is
+   already a set of stubs. A calendar chosen by locale name cannot
+   trigger here.
+
+   strftime.c offers this exact escape: "You can override this via
+   AC_DEFINE([SUPPORT_NON_GREG_CALENDARS_IN_STRFTIME], [false]) and if
+   you do that you may be able to omit Gnulib's localename module and
+   its dependencies."
+
+   Spelled 0 rather than false: it is only ever read by #if, where the
+   two are equivalent, and 0 does not depend on whether false is a macro
+   or a keyword here. */
+#ifndef SUPPORT_NON_GREG_CALENDARS_IN_STRFTIME
+# define SUPPORT_NON_GREG_CALENDARS_IN_STRFTIME 0
+#endif
+
 /* APExp: streq, the same case as strnul above.
    It is an inline in the generated string.h (string.in.h:812, under
    GNULIB_STREQ), so it went with that wrapper. hard-locale.c is the

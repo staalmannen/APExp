@@ -302,6 +302,15 @@ EOF
 # define streq(a, b) (strcmp ((a), (b)) == 0)
 #endif
 
+/* APExp: no non-Gregorian calendars in strftime. Otherwise strftime.c
+   calls gl_locale_name_unsafe, which means gnulib's localename module,
+   whose getlocalename_l-unsafe.c ends in "#error Please port ... to
+   your platform". Plan 9 has one locale, so a calendar selected by
+   locale name cannot trigger. strftime.c documents this override. */
+#ifndef SUPPORT_NON_GREG_CALENDARS_IN_STRFTIME
+# define SUPPORT_NON_GREG_CALENDARS_IN_STRFTIME 0
+#endif
+
 /* APExp: prototypes and off64_t the deleted wrappers carried. */
 #include "apexp-decls.h"
 EOF
