@@ -88,6 +88,15 @@ static inline void __unlockfile(struct _IO_FILE *f) {
 
 #define _FLOCK(f) int __need_unlock = __lockfile(f)
 #define _FUNLOCK(f) do { if (__need_unlock) __unlockfile(f); } while(0)
+
+/*
+ * APExp internal, in stdio/__wfmt.c: convert a format string between the
+ * wide and narrow encodings. Used by the wide printf and scanf families,
+ * which delegate to their narrow counterparts. Both return a malloc'd
+ * buffer for the caller to free, or 0 with errno set.
+ */
+extern char *__wfmt_narrow(const wchar_t *);
+extern wchar_t *__wfmt_wide(const char *);
 #define FFINALLOCK(f) ((f)->lock>=0 ? __lockfile((f)) : 0)
 
 hidden size_t __stdio_read(struct _IO_FILE *, unsigned char *, size_t);

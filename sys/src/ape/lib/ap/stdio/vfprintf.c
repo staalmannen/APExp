@@ -8,6 +8,8 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
+#include <limits.h>
 
 /* Output a single character - helper function */
 static inline int _putc_impl(int c, FILE *f)
@@ -229,12 +231,82 @@ vfprintf(FILE *f, const char *s, va_list args)
 static int
 ocvt_c(FILE *f, va_list *args, int flags, int width, int)
 {
-	int i;
+	int i, len;
+	char b[MB_LEN_MAX];
 
-	if(!(flags&LEFT)) for(i=1; i<width; i++) _putc_impl(' ', f);
-	_putc_impl((unsigned char)va_arg(*args, int), f);
-	if(flags&LEFT) for(i=1; i<width; i++) _putc_impl(' ', f);
-	return width<1 ? 1 : width;
+	/*
+	 * C99 7.19.6.1: with the l modifier the argument is a wint_t,
+	 * converted as if by wcrtomb. Width counts the resulting bytes.
+	 */
+	if(flags&LONG){
+		mbstate_t st;
+		size_t k;
+
+		memset(&st, 0, sizeof st);
+		k = wcrtomb(b, (wchar_t)va_arg(*args, wint_t), &st);
+		len = k == (size_t)-1 ? 0 : (int)k;
+	} else{
+		b[0] = (char)(unsigned char)va_arg(*args, int);
+		len = 1;
+	}
+
+	if(!(flags&LEFT)) for(i=len; i<width; i++) _putc_impl(' ', f);
+	for(i=0; i<len; i++) _putc_impl(b[i], f);
+	if(flags&LEFT) for(i=len; i<width; i++) _putc_impl(' ', f);
+	return width<len ? len : width;
+}
+
+/*
+ * %ls: the argument is a wchar_t *, converted as if by repeated
+ * wcrtomb. C99 makes the precision a limit in BYTES, and forbids
+ * writing a partial multibyte character, so a character is emitted only
+ * if all of its bytes fit.
+ */
+static int
+ocvt_ls(FILE *f, va_list *args, int flags, int width, int precision)
+{
+	static const wchar_t empty[1] = { 0 };
+	const wchar_t *ws, *p;
+	mbstate_t st;
+	char b[MB_LEN_MAX];
+	size_t k;
+	int i, len, done, n = 0;
+
+	ws = va_arg(*args, const wchar_t *);
+	if(!ws)
+		ws = empty;
+
+	/* how many bytes will actually be written, for the padding */
+	memset(&st, 0, sizeof st);
+	len = 0;
+	for(p=ws; *p; p++){
+		k = wcrtomb(b, *p, &st);
+		if(k == (size_t)-1)
+			break;
+		if(precision >= 0 && len + (int)k > precision)
+			break;
+		len += (int)k;
+	}
+
+	if(!(flags&LEFT))
+		for(i=len; i<width; i++){ _putc_impl(' ', f); n++; }
+
+	memset(&st, 0, sizeof st);
+	done = 0;
+	for(p=ws; *p; p++){
+		k = wcrtomb(b, *p, &st);
+		if(k == (size_t)-1)
+			break;
+		if(precision >= 0 && done + (int)k > precision)
+			break;
+		for(i=0; i<(int)k; i++){ _putc_impl(b[i], f); n++; }
+		done += (int)k;
+	}
+
+	if(flags&LEFT)
+		for(i=len; i<width; i++){ _putc_impl(' ', f); n++; }
+
+	return n;
 }
 
 static int
@@ -242,6 +314,9 @@ ocvt_s(FILE *f, va_list *args, int flags, int width, int precision)
 {
 	int i, n = 0;
 	char *s;
+
+	if(flags&LONG)			/* %ls takes a wchar_t * */
+		return ocvt_ls(f, args, flags, width, precision);
 
 	s = va_arg(*args, char *);
 	if(!s)

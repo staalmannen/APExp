@@ -76,6 +76,9 @@ OFILES=\
 	wcscspn.$O\
 	wcsdup.$O\
 	wcslen.$O\
+# wide conversions (C99 7.24.4, 7.24.5)\
+	wcstol.$O\
+	wcsftime.$O\
 	wcsncasecmp.$O\
 	wcsncasecmp_l.$O\
 	wcsncat.$O\

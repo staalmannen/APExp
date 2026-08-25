@@ -34,7 +34,6 @@ OFILES=\
 	bitset.$O\
 	bitsetv.$O\
 	btoc32.$O\
-	btowc.$O\
 	c-ctype.$O\
 	c-stack.$O\
 	c-strcasecmp.$O\
@@ -124,6 +123,7 @@ OFILES=\
 	stdlib.$O\
 	stpcpy.$O\
 	str_endswith.$O\
+	striconv.$O\
 	strerror.$O\
 	strerror-override.$O\
 	stripslash.$O\
@@ -151,6 +151,7 @@ OFILES=\
 	xprintf.$O\
 	xsize.$O\
 	xstdopen.$O\
+	xstriconv.$O\
 	xstrtoimax.$O\
 	xstrtol.$O\
 	xstrtoul.$O\

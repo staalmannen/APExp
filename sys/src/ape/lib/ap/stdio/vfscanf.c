@@ -2,6 +2,9 @@
  * pANS stdio -- vfscanf
  */
 #include "iolib.h"
+#include <wchar.h>
+#include <limits.h>
+#include <string.h>
 #include <stdarg.h>
 #include <math.h>
 #include <stdlib.h>
@@ -16,6 +19,8 @@ static int icvt_n(FILE *f, va_list *args, int store, int width, int type);
 static int icvt_o(FILE *f, va_list *args, int store, int width, int type);
 static int icvt_p(FILE *f, va_list *args, int store, int width, int type);
 static int icvt_s(FILE *f, va_list *args, int store, int width, int type);
+static int icvt_ls(FILE *f, va_list *args, int store, int width);
+static int icvt_lc(FILE *f, va_list *args, int store, int width);
 static int icvt_u(FILE *f, va_list *args, int store, int width, int type);
 static int (*icvt[])(FILE *, va_list *, int, int, int)={
 0,	0,	0,	0,	0,	0,	0,	0,	/* ^@ ^A ^B ^C ^D ^E ^F ^G */
@@ -322,10 +327,13 @@ Done:
 }
 
 static int
-icvt_s(FILE *f, va_list *args, int store, int width, int)
+icvt_s(FILE *f, va_list *args, int store, int width, int type)
 {
 	int c, nn;
 	char *s;
+
+	if(type == 'l')			/* %ls stores wchar_t */
+		return icvt_ls(f, args, store, width);
 
 	s = 0;
 	if(store)
@@ -355,10 +363,13 @@ Done:
 	return 1;
 }
 static int
-icvt_c(FILE *f, va_list *args, int store, int width, int)
+icvt_c(FILE *f, va_list *args, int store, int width, int type)
 {
 	int c;
 	char *s;
+
+	if(type == 'l')			/* %lc stores wchar_t */
+		return icvt_lc(f, args, store, width);
 
 	s = 0;
 	if(store)
@@ -425,4 +436,95 @@ icvt_sq(FILE *f, va_list *args, int store, int width, int)
 Done:
 	if(store) *s='\0';
 	return nn > 0;
+}
+
+/*
+ * %ls -- like %s but the destination is a wchar_t *.
+ *
+ * The field width counts characters, not bytes, so this keeps its own
+ * count instead of using the wgetc macro, which decrements once per
+ * byte read. Bytes are accumulated and re-offered to mbrtowc from a
+ * cleared state until one completes, the same approach as fgetwc.
+ */
+static int
+icvt_ls(FILE *f, va_list *args, int store, int width)
+{
+	wchar_t *ws = 0, wc;
+	mbstate_t st;
+	char mb[MB_LEN_MAX];
+	size_t r;
+	int c, mbn = 0, nn = 0;
+
+	if(store)
+		ws = va_arg(*args, wchar_t *);
+	do
+		c = ngetc(f);
+	while(isspace(c));
+
+	while(width != 0){
+		if(c == EOF){
+			nread--;
+			break;
+		}
+		if(isspace(c)){
+			nungetc(c, f);
+			break;
+		}
+		mb[mbn++] = (char)c;
+		memset(&st, 0, sizeof st);
+		r = mbrtowc(&wc, mb, (size_t)mbn, &st);
+		if(r == (size_t)-1)
+			return 0;			/* encoding error */
+		if(r != (size_t)-2){			/* completed a character */
+			if(store)
+				*ws++ = wc;
+			mbn = 0;
+			nn++;
+			if(width > 0)
+				width--;
+		} else if(mbn == MB_LEN_MAX)
+			return 0;			/* over-long sequence */
+		c = ngetc(f);
+	}
+	if(nn == 0)
+		return 0;
+	if(store)
+		*ws = 0;
+	return 1;
+}
+
+/*
+ * %lc -- like %c but wide. Reads exactly the field width in characters,
+ * one by default, and does not terminate the result.
+ */
+static int
+icvt_lc(FILE *f, va_list *args, int store, int width)
+{
+	wchar_t *ws = 0, wc;
+	mbstate_t st;
+	char mb[MB_LEN_MAX];
+	size_t r;
+	int c, mbn = 0;
+
+	if(store)
+		ws = va_arg(*args, wchar_t *);
+	if(width < 0)
+		width = 1;
+	while(width > 0){
+		if((c = ngetc(f)) == EOF)
+			return 0;
+		mb[mbn++] = (char)c;
+		memset(&st, 0, sizeof st);
+		r = mbrtowc(&wc, mb, (size_t)mbn, &st);
+		if(r == (size_t)-1)
+			return 0;
+		if(r != (size_t)-2){
+			if(store)
+				*ws++ = wc;
+			mbn = 0;
+			width--;
+		} else if(mbn == MB_LEN_MAX)
+			return 0;
+	}
+	return 1;
 }

@@ -147,15 +147,6 @@ if [ -f "$DEST/config-common.h" ]; then
 	echo "turned off REPLACE_VASNPRINTF in config-common.h"
 fi
 
-# APE declares iconv_open in <iconv.h> but nothing implements it, so
-# propername.c must not take its HAVE_ICONV branch. coreutils probed a
-# host that had iconv. HAVE_ICONV_H is left at 1; the header does exist.
-if [ -f "$DEST/config-common.h" ]; then
-	sed -i.bak 's|^#define HAVE_ICONV 1|/* #undef HAVE_ICONV */|' \
-		"$DEST/config-common.h"
-	rm -f "$DEST/config-common.h.bak"
-	echo "turned off HAVE_ICONV in config-common.h"
-fi
 
 # coreutils' configure recorded the locale path of whatever host it ran
 # on. Point it at APE's.

@@ -52,78 +52,78 @@ typedef struct {
  * Missing functions from standard APE libraries.
  * Redefined or remapped to APE library functions
  * ##############################################
+ *
+ * These were once remapping macros: each wide function was declared and
+ * then #define'd onto its NARROW counterpart by casting wchar_t * to
+ * char *, which is only correct if wchar_t is a byte. It is not, so
+ * wcslen(s) was strlen((const char *)(s)) and returned 1 for a string of
+ * any length, the first element's low byte being zero for any ASCII
+ * character. They also broke any translation unit DEFINING one of these
+ * names, since the definition itself got expanded -- which is how
+ * gnulib's btowc.c came to report
+ *     btowc.c:29 external redeclaration of: Rune
+ *
+ * All 53 are gone. libap implements every one of them now: the wcs* and
+ * wmem* string and memory functions in string/, btowc and wctob in
+ * multibyte/, the wide stdio and the wide printf and scanf families in
+ * stdio/, and the wide conversions in string/wcstol.c and
+ * string/wcsftime.c.
  */
-
 /* hack */
+/*
+ * btowc and wctob are declared but deliberately NOT macro'd.
+ *
+ * They used to be "#define btowc(c) ((Rune)(c))" and
+ * "#define wctob(c) ((int)(c))", which are wrong above ASCII: in a UTF-8
+ * locale a lone byte 128..255 is not a character and btowc must return
+ * WEOF, and btowc(EOF) must be WEOF rather than a huge Rune. libap
+ * implements both correctly in multibyte/, and both files open with
+ * "#undef btowc" / "#undef wctob" to escape these macros -- which is
+ * what made them recognisable as a hack rather than an optimisation.
+ *
+ * The macros also broke anything that DEFINES either name: gnulib's
+ * btowc.c expanded to "wint_t ((Rune)(int c))", reported as
+ *   btowc.c:29 external redeclaration of: Rune
+ */
 extern Rune btowc(int);
-#define btowc(c) ((Rune)(c))
 extern int wctob(Rune);
-#define wctob(c) ((int)(c))
 
 /* stdio.h */
 extern Rune fgetwc(struct _IO_FILE *);
-#define fgetwc(f) fgetc(f)
 extern Rune fputwc(wchar_t, struct _IO_FILE *);
-#define fputwc(c, f) fputc((int)(c), (f))
 extern wchar_t *fgetws(wchar_t *, int, struct _IO_FILE *);
-#define fgetws(c, i, f) fgets((char *)(c), (i), (f))
 extern int fputws(const wchar_t *, struct _IO_FILE *);
-#define fputws(c, f) fputs((const char *)(c), (f))
 
 /* Variadic wide stdio: delegate to narrow counterparts via __VA_ARGS__ */
 extern int fwprintf(struct _IO_FILE *, const wchar_t *, ...);
-#define fwprintf(f, c, ...) fprintf((f), (const char *)(c), __VA_ARGS__)
 extern int fwscanf(struct _IO_FILE *, const wchar_t *, ...);
-#define fwscanf(f, c, ...) fscanf((f), (const char *)(c), __VA_ARGS__)
 extern Rune getwchar(void);
-#define getwchar() getchar()
 extern Rune getwc(struct _IO_FILE *);
-#define getwc(f) getc(f)
 extern Rune putwchar(Rune);
-#define putwchar(c) putchar((int)(c))
 extern Rune putwc(Rune, struct _IO_FILE *);
-#define putwc(r, f) putc((int)(r), (f))
 extern int swprintf(wchar_t *, size_t, const wchar_t *, ...);
-#define swprintf(c, st, wc, ...) snprintf((char *)(c), (st), (const char *)(wc), __VA_ARGS__)
 extern int swscanf(const wchar_t *, const wchar_t *, ...);
-#define swscanf(c1, c2, ...) sscanf((const char *)(c1), (const char *)(c2), __VA_ARGS__)
 extern Rune ungetwc(Rune, struct _IO_FILE *);
-#define ungetwc(c, f) ungetc((int)(c), (f))
 extern int vfwprintf(struct _IO_FILE *, const wchar_t *, va_list);
-#define vfwprintf(f, c, a) vfprintf((f), (const char *)(c), (a))
 extern int vfwscanf(struct _IO_FILE *, const wchar_t *, va_list);
-#define vfwscanf(f, c, a) vfscanf((f), (const char *)(c), (a))
 extern int vwprintf(const wchar_t *, va_list);
-#define vwprintf(c, a) vprintf((const char *)(c), (a))
 extern int vwscanf(const wchar_t *, va_list);
-#define vwscanf(c, a) vscanf((const char *)(c), (a))
 extern int vswprintf(wchar_t *, size_t, const wchar_t *, va_list);
-#define vswprintf(c1, st, c2, a) vsnprintf((char *)(c1), (st), (const char *)(c2), (a))
 extern int vswscanf(const wchar_t *, const wchar_t *, va_list);
-#define vswscanf(c1, c2, a) vsscanf((const char *)(c1), (const char *)(c2), (a))
 extern int wprintf(const wchar_t *, ...);
-#define wprintf(c, ...) printf((const char *)(c), __VA_ARGS__)
 extern int wscanf(const wchar_t *, ...);
-#define wscanf(c, ...) scanf((const char *)(c), __VA_ARGS__)
 
 /* stdlib.h
  * All wcs numeric conversions cast to char * and delegate to str* equivalents.
  * This is sound because numeric input is always ASCII, regardless of encoding.
  * wcstof/wcstold use strtof/strtold (not strtod) to preserve precision. */
 extern double wcstod(const wchar_t *, wchar_t **);
-#define wcstod(c1, c2) strtod((const char *)(c1), (char **)(c2))
 extern float wcstof(const wchar_t *, wchar_t **);
-#define wcstof(c1, c2) strtof((const char *)(c1), (char **)(c2))
 extern long double wcstold(const wchar_t *, wchar_t **);
-#define wcstold(c1, c2) strtold((const char *)(c1), (char **)(c2))
 extern long wcstol(const wchar_t *, wchar_t **, int);
-#define wcstol(c1, c2, i) strtol((const char *)(c1), (char **)(c2), (i))
 extern long long wcstoll(const wchar_t *, wchar_t **, int);
-#define wcstoll(c1, c2, i) strtoll((const char *)(c1), (char **)(c2), (i))
 extern unsigned long wcstoul(const wchar_t *, wchar_t **, int);
-#define wcstoul(c1, c2, i) strtoul((const char *)(c1), (char **)(c2), (i))
 extern unsigned long long wcstoull(const wchar_t *, wchar_t **, int);
-#define wcstoull(c1, c2, i) strtoull((const char *)(c1), (char **)(c2), (i))
 
 /* string.h
  * Note: wchar_t * strings are UTF-8 Rune sequences in this implementation,
@@ -131,53 +131,30 @@ extern unsigned long long wcstoull(const wchar_t *, wchar_t **, int);
  * are character-count sensitive (wcslen, wcsncat, wcsncmp, wcsncpy) may
  * return byte counts rather than Rune counts; this is a known limitation. */
 extern wchar_t *wcscat(wchar_t *, const wchar_t *);
-#define wcscat(c1, c2) strcat((char *)(c1), (const char *)(c2))
 extern wchar_t *wcschr(const wchar_t *, wchar_t);
-#define wcschr(c1, c2) ((wchar_t *)strchr((const char *)(c1), (int)(c2)))
 extern int wcscmp(const wchar_t *, const wchar_t *);
-#define wcscmp(c1, c2) strcmp((const char *)(c1), (const char *)(c2))
 extern int wcscoll(const wchar_t *, const wchar_t *);
-#define wcscoll(c1, c2) strcoll((const char *)(c1), (const char *)(c2))
 extern wchar_t *wcscpy(wchar_t *, const wchar_t *);
-#define wcscpy(dest, src) ((wchar_t *)strcpy((char *)(dest), (const char *)(src)))
 extern size_t wcscspn(const wchar_t *, const wchar_t *);
-#define wcscspn(c1, c2) strcspn((const char *)(c1), (const char *)(c2))
 extern size_t wcslen(const wchar_t *);
-#define wcslen(s) strlen((const char *)(s))
 extern wchar_t *wcsncat(wchar_t *, const wchar_t *, size_t);
-#define wcsncat(c1, c2, st) ((wchar_t *)strncat((char *)(c1), (const char *)(c2), (st)))
 extern int wcsncmp(const wchar_t *, const wchar_t *, size_t);
-#define wcsncmp(c1, c2, st) strncmp((const char *)(c1), (const char *)(c2), (st))
 extern wchar_t *wcsncpy(wchar_t *, const wchar_t *, size_t);
-#define wcsncpy(c1, c2, st) ((wchar_t *)strncpy((char *)(c1), (const char *)(c2), (st)))
 extern wchar_t *wcspbrk(const wchar_t *, const wchar_t *);
-#define wcspbrk(c1, c2) ((wchar_t *)strpbrk((const char *)(c1), (const char *)(c2)))
 extern wchar_t *wcsrchr(const wchar_t *, wchar_t);
-#define wcsrchr(c1, c2) ((wchar_t *)strrchr((const char *)(c1), (int)(c2)))
 extern size_t wcsspn(const wchar_t *, const wchar_t *);
-#define wcsspn(c1, c2) strspn((const char *)(c1), (const char *)(c2))
 extern wchar_t *wcsstr(const wchar_t *, const wchar_t *);
-#define wcsstr(c1, c2) ((wchar_t *)strstr((const char *)(c1), (const char *)(c2)))
 extern wchar_t *wcstok(wchar_t *, const wchar_t *, wchar_t **);
-#define wcstok(c1, c2, c3) ((wchar_t *)strtok_r((char *)(c1), (const char *)(c2), (char **)(c3)))
 extern wchar_t *wcswcs(const wchar_t *, const wchar_t *);
-#define wcswcs(c1, c2) ((wchar_t *)strstr((const char *)(c1), (const char *)(c2)))
 extern size_t wcsxfrm(wchar_t *, const wchar_t *, size_t);
-#define wcsxfrm(c1, c2, st) strxfrm((char *)(c1), (const char *)(c2), (st))
 extern wchar_t *wmemchr(const wchar_t *, wchar_t, size_t);
-#define wmemchr(c1, c2, st) ((wchar_t *)memchr((const void *)(c1), (int)(c2), (st)))
 extern int wmemcmp(const wchar_t *, const wchar_t *, size_t);
-#define wmemcmp(c1, c2, st) memcmp((const void *)(c1), (const void *)(c2), (st))
 extern wchar_t *wmemcpy(wchar_t *, const wchar_t *, size_t);
-#define wmemcpy(c1, c2, st) ((wchar_t *)memcpy((void *)(c1), (const void *)(c2), (st)))
 extern wchar_t *wmemmove(wchar_t *, const wchar_t *, size_t);
-#define wmemmove(c1, c2, st) ((wchar_t *)memmove((void *)(c1), (const void *)(c2), (st)))
 extern wchar_t *wmemset(wchar_t *, wchar_t, size_t);
-#define wmemset(c1, c2, st) ((wchar_t *)memset((void *)(c1), (int)(c2), (st)))
 
 /* time.h */
 extern size_t wcsftime(wchar_t *, size_t, const wchar_t *, const struct tm *);
-#define wcsftime(c1, st, c2, stm) strftime((char *)(c1), (st), (const char *)(c2), (stm))
 
 /* ##############################################
  * Missing functions from standard APE libraries.
