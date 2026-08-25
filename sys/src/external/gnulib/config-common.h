@@ -2240,20 +2240,13 @@
 /* #undef HAVE_HURD_H */
 
 /* Define if you have the iconv() function and it works. */
-/* APExp: APE declares iconv_open in <iconv.h> but nothing implements
-   it -- cmd/iconv builds only the tool, and neither libap nor
-   libintl provides the function. coreutils probed a host that had
-   it, so this said 1. Left that way, propername.c compiles its
-   HAVE_ICONV branch and calls xstr_iconv, which is why m4 failed to
-   link:
-     proper_name_utf8: undefined: xstr_iconv
-   Pulling in xstriconv.c and striconv.c would only move the failure
-   to iconv_open. With this off, proper_name_utf8 falls back to the
-   ASCII spelling of the name, so m4 --version prints "Rene' Seindal"
-   rather than "Rene\u0301 Seindal". HAVE_ICONV_H stays 1: the header
-   does exist, and code that includes it while guarding calls on
-   HAVE_ICONV is fine. */
-/* #undef HAVE_ICONV */
+/* APExp: libap implements iconv in locale/iconv.c and iconv_close.c,
+   both built via locale/mkfile. An earlier commit turned this off on the
+   mistaken finding that nothing implemented it -- the grep used to look
+   missed "iconv_t iconv_open(...)" written on one line, the same way it
+   missed btowc. Restored, so propername.c can convert the UTF-8 author
+   names it carries and m4 --version prints them properly. */
+#define HAVE_ICONV 1
 
 /* Define to 1 if you have the <iconv.h> header file. */
 #define HAVE_ICONV_H 1

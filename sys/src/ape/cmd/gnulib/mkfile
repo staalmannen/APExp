@@ -123,6 +123,7 @@ OFILES=\
 	stdlib.$O\
 	stpcpy.$O\
 	str_endswith.$O\
+	striconv.$O\
 	strerror.$O\
 	strerror-override.$O\
 	stripslash.$O\
@@ -150,6 +151,7 @@ OFILES=\
 	xprintf.$O\
 	xsize.$O\
 	xstdopen.$O\
+	xstriconv.$O\
 	xstrtoimax.$O\
 	xstrtol.$O\
 	xstrtoul.$O\
