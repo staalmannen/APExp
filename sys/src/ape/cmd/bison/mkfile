@@ -65,7 +65,16 @@ BISONSRC=../../../external/bison
 #fails on include_next
 CC=$APEXPROOT/$objtype/bin/pcc
 
-CFLAGS=-c -I. -I$BISONSRC -I$BISONSRC/lib -I$BISONSRC/src\
+# -I$GNUSRC comes before -I$BISONSRC/lib on purpose. bison's own
+# gnulib copy is from 2021 and the shared libgnu.a is built from
+# coreutils' 2026 sources, so compiling bison against its own copies
+# of shared module headers links 2021 declarations to 2026 objects.
+# location.c includes mbchar.h, and the 2021 one has an inline that
+# reads is_basic_table[], a table the 2026 mbchar.c no longer defines:
+#   _convM2D: is_basic_table: not defined
+# Headers bison alone provides still resolve, via -I$BISONSRC/lib.
+GNUSRC=$APEXPROOT/sys/src/external/gnulib
+CFLAGS=-c -I. -I$GNUSRC -I$BISONSRC -I$BISONSRC/lib -I$BISONSRC/src\
 		-B -DHAVE_CONFIG_H\
 		-DLOCALEDIR="/sys/lib/ape/locale"
 

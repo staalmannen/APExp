@@ -148,6 +148,7 @@ OFILES=\
 	table.$O\
 	vector.$O\
 	lock.$O\
+	once.$O\
 	spin.$O\
 	u8-uctomb-aux.$O
 

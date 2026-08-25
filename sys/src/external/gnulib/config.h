@@ -18,10 +18,17 @@
 /* #undef AC_APPLE_UNIVERSAL_BUILD */
 
 /* Define to the function xargmatch calls on failures. */
-#define ARGMATCH_DIE usage (EXIT_FAILURE)
+/* APExp: coreutils sets ARGMATCH_DIE to usage (EXIT_FAILURE), because
+   every coreutils program exports a usage function. A shared gnulib
+   cannot assume that: bison declares its usage static, so linking
+   bison against argmatch.o built this way fails with
+   "__argmatch_die: undefined: usage". Leaving both undefined lets
+   argmatch.c fall back to its own default, exit (exit_failure), which
+   is program-agnostic. exit_failure comes from libap. */
+/* #undef ARGMATCH_DIE */
 
 /* Define to the declaration of the xargmatch failure function. */
-#define ARGMATCH_DIE_DECL void usage (int _e)
+/* #undef ARGMATCH_DIE_DECL */
 
 /* Define if neither thread safety nor multithreading is desired. */
 /* #undef AVOID_ANY_THREADS */
