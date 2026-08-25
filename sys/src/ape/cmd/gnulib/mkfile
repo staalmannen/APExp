@@ -159,11 +159,20 @@ OFILES=\
 #fails on include_next
 CC=$APEXPROOT/$objtype/bin/pcc
 
-# gnulib substitutes some libc functions and renames the originals to
-# rpl_*. APE provides the real ones, so map each rpl_ name back.
-UNRPL=-Drpl_readlink=readlink -Drpl_lseek=lseek -Drpl_open=open -Drpl_free=free -Drpl_malloc=malloc -Drpl_realloc=realloc -Drpl_calloc=calloc -Drpl_strtod=strtod -Drpl_fcntl=fcntl -Drpl_mkstemp=mkstemp -Drpl_getopt_long=getopt_long -Drpl_optarg=optarg -Drpl_optind=optind -Drpl_posix_spawn_file_actions_addopen=posix_spawn_file_actions_addopen
-
-CFLAGS=-c -B -I. -I$GNUSRC -DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION -D__USE_GNU -D_REGEX_LARGE_OFFSETS -DREGEX_MALLOC -DO_BINARY=0 -DSETLOCALE_NULL_MAX=257 -DLOCALEDIR="/sys/lib/ape/locale" $UNRPL
+# There is deliberately no -Drpl_xxx=xxx mapping here.
+#
+# Per-package builds used to carry one, because their config.h renamed
+# malloc, free, open and friends to rpl_* and APE supplies the real
+# ones. The consolidated tree uses coreutils' config.h, which renames
+# none of those, so the mapping is dead weight.
+#
+# The renames coreutils' config.h does make are fts_* and re_*/reg*,
+# and those must be left alone. libap implements regcomp, regexec,
+# regfree and fts itself, so it is precisely the rpl_ prefix that keeps
+# gnulib's regex.c and fts.c from redefining them -- the same
+# duplicate-symbol trap that obstack fell into. Undoing them here, or
+# editing them out of config.h, reintroduces it.
+CFLAGS=-c -B -I. -I$GNUSRC -DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION -D__USE_GNU -D_REGEX_LARGE_OFFSETS -DREGEX_MALLOC -DO_BINARY=0 -DSETLOCALE_NULL_MAX=257 -DLOCALEDIR="/sys/lib/ape/locale"
 
 # No two modules share a basename across these directories, so the
 # pattern rules cannot collide and mk rule ordering does not matter.
