@@ -126,7 +126,25 @@ if [ -f "$DEST/config.h" ] && ! grep -q 'APExp: snippet macros' "$DEST/config.h"
 #include "arg-nonnull.h"
 #include "warn-on-use.h"
 EOF
-	echo "appended snippet includes to config.h"
+	# The printf and scanf format attributes are spliced into the
+	# generated stdio.h too. error.c and the vasnprintf family declare
+	# functions with _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD, so without
+	# these the compiler meets an unknown identifier and reports a
+	# syntax error on whatever argument follows it. Lift the block out
+	# of stdio.in.h between two stable anchors rather than by line
+	# number. Everything in it reduces to _GL_ATTRIBUTE_FORMAT, which
+	# config.h already defines as empty for non-GCC compilers.
+	{
+		echo
+		echo "/* APExp: printf and scanf format attributes, lifted from"
+		echo "   stdio.in.h because the generated stdio.h that normally"
+		echo "   carries them is deleted above. */"
+		awk '/__gnu_printf__ is supported in GCC/ { p = 1 }
+		     p { print }
+		     /__scanf__, formatstring_parameter, first_argument/ { if (p) exit }' \
+			"$DEST/stdio.in.h"
+	} >> "$DEST/config.h"
+	echo "appended snippet includes and format attributes to config.h"
 fi
 
 echo "---"
