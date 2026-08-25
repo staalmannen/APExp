@@ -29,11 +29,26 @@ typedef struct _COLLSYM {
   CHAR code;
 } __COLLSYM;
 
+/* Upstream form. The casts that stood here -- (unsigned short *) in the
+   wide branch, (char *) in the narrow one -- date from when APE's wchar_t
+   was 16-bit while pcc emitted L"..." as an array of Rune, i.e. 32-bit.
+   Casting a narrow literal to unsigned short * made the table match the
+   then-16-bit XCHAR at the cost of never holding a real wide string.
+   wchar_t is now 32 bits and equals Rune, so L##CS produces a literal of
+   exactly the element type XCHAR names, and the casts only mismatch:
+
+     collsyms.h:41 initialization of incompatible pointers: posix_collwcsyms
+     IND UINT and IND USHORT
+
+   The paste is what forms the literal and cannot be dropped: cpp's lexer
+   reaches STRING and CCON from state ST1 (lex.c), so re-lexing the glued
+   text "L\"NUL\"" yields one wide-string token. glob.c, gmisc.c and
+   smatch.c itself already rely on this. */
 #undef L
 #ifdef Lwide
-#define L(CS) (unsigned short *) CS
+#  define L(CS) L##CS
 #else
-#define L(CS) (char *) CS
+#  define L(CS) CS
 #endif
 
 static __COLLSYM POSIXCOLL [] =
