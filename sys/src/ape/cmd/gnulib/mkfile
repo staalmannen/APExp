@@ -172,7 +172,10 @@ CC=$APEXPROOT/$objtype/bin/pcc
 # gnulib's regex.c and fts.c from redefining them -- the same
 # duplicate-symbol trap that obstack fell into. Undoing them here, or
 # editing them out of config.h, reintroduces it.
-CFLAGS=-c -B -I. -I$GNUSRC -DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION -D__USE_GNU -D_REGEX_LARGE_OFFSETS -DREGEX_MALLOC -DO_BINARY=0 -DSETLOCALE_NULL_MAX=257 -DLOCALEDIR="/sys/lib/ape/locale"
+CFLAGS=-c -B -I. -I$GNUSRC -DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION\
+  -D__USE_GNU -D_REGEX_LARGE_OFFSETS -DREGEX_MALLOC -DO_BINARY=0\
+   -DSETLOCALE_NULL_MAX=257 -DLOCALEDIR="/sys/lib/ape/locale"
+
 
 # No two modules share a basename across these directories, so the
 # pattern rules cannot collide and mk rule ordering does not matter.

@@ -10,7 +10,9 @@
 // #define POSIX_THREAD_SEMANTICS 1
 
 #define	HAVE_SOCK_OPTS	1
+#ifndef _POSIX_SOURCE
 #define	_POSIX_SOURCE	1
+#endif
 #define	_BSD_EXTENSION	1
 #define	_SUSV2_SOURCE	1
 #define	_REENTRANT_SOURCE	1
