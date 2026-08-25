@@ -23,3 +23,14 @@
 #define VERSION              "2.8"
 #define PACKAGE_BUGREPORT    "bug-patch@gnu.org"
 #define PACKAGE_URL          "https://www.gnu.org/software/patch/"
+
+/* patch-specific, absent from coreutils' config.h. EDITOR_PROGRAM is
+   what patch execs for an ed-format diff; note this is a different macro
+   from the ed_PROGRAM already passed in CFLAGS, and patch/src uses both.
+   sigfillset is a probe coreutils does not run; libap implements it in
+   signal/sigset.c.
+
+   USE_XATTR is left alone: patch sets it to 0 and the shared file already
+   carries it as #undef, which reads the same. */
+#define EDITOR_PROGRAM "/bin/ed"
+#define HAVE_SIGFILLSET 1

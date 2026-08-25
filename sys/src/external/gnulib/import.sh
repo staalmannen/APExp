@@ -147,6 +147,14 @@ if [ -f "$DEST/config-common.h" ]; then
 	echo "turned off REPLACE_VASNPRINTF in config-common.h"
 fi
 
+# APE has <stdio_ext.h>, so let fwriting.h include it rather than calling
+# __fwriting with no declaration in scope.
+if [ -f "$DEST/config-common.h" ]; then
+	sed -i.bak 's|^/\* #undef HAVE_STDIO_EXT_H \*/|#define HAVE_STDIO_EXT_H 1|' \
+		"$DEST/config-common.h"
+	rm -f "$DEST/config-common.h.bak"
+fi
+
 # Make the snippet macros reachable from config.h.
 #
 # gnulib keeps _GL_ARG_NONNULL and _GL_WARN_ON_USE in standalone snippet
@@ -207,6 +215,8 @@ EOF
 #define HAVE___FSETERR 1
 #define HAVE___FWRITING 1
 #define HAVE___FREADING 1
+/* APE provides <stdio_ext.h>; fwriting.h gates its include on this. */
+#define HAVE_STDIO_EXT_H 1
 EOF
 	# strnul is declared in the generated string.h as a macro over an
 	# inline; strnul.c only emits the out-of-line copy of that inline, so

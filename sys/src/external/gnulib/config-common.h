@@ -2883,7 +2883,13 @@
 #define HAVE_STDINT_H_WITH_UINTMAX 1
 
 /* Define to 1 if you have the <stdio_ext.h> header file. */
-/* #undef HAVE_STDIO_EXT_H */
+/* APExp: APE provides <stdio_ext.h>, holding the musl accessors libap
+   implements: __freadahead, __fpending, __fseterr, __freading and
+   __fwriting. fwriting.h gates its include of that header on this,
+   so with it undef the macro still expanded to __fwriting but with no
+   declaration in scope. __freadahead returns size_t, and an implicit
+   int would have truncated it to 32 bits on amd64. */
+#define HAVE_STDIO_EXT_H 1
 
 /* Define to 1 if you have the <stdio.h> header file. */
 #define HAVE_STDIO_H 1
