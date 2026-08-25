@@ -49,4 +49,12 @@ extern ptrdiff_t vaszprintf(char **, const char *, va_list);
 extern off64_t vfzprintf(FILE *, const char *, va_list);
 extern off64_t vzprintf(const char *, va_list);
 
+/* locale.h wrapper.
+   The deleted wrapper pulled this header in under GNULIB_SETLOCALE_NULL
+   (locale.in.h:298), which is how hard-locale.c gets SETLOCALE_NULL_MAX
+   and setlocale_null_r -- it includes neither itself. Unlike the rest of
+   this file the real header exists, so include it rather than restating
+   it; it carries its own guard and its own arg-nonnull.h. */
+#include "setlocale_null.h"
+
 #endif /* _APEXP_DECLS_H */
