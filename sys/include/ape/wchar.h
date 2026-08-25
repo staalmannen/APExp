@@ -79,15 +79,18 @@ typedef struct {
  * those libap sources still opens with "#undef <name>" to escape these
  * macros, which is how they were found.
  *
- * The 29 that remain have no libap implementation, so removing them
- * would only turn a wrong answer into a link failure. They are the wide
- * stdio functions (fgetwc, fputwc, getwc, putwc, ungetwc, fgetws,
- * fputws, getwchar, putwchar), the wide printf/scanf family (fwprintf,
- * fwscanf, swprintf, swscanf, vfwprintf, vfwscanf, vswprintf, vswscanf,
- * vwprintf, vwscanf, wprintf, wscanf), the wide strtol family (wcstod,
- * wcstof, wcstol, wcstold, wcstoll, wcstoul, wcstoull) and wcsftime.
- * Treat each as a placeholder that happens to work for pure ASCII and
- * is wrong otherwise. Implementing them in libap is what retires them.
+ * The wide stdio character and string functions have since been
+ * implemented in libap -- fgetwc, fputwc, getwc, putwc, getwchar,
+ * putwchar, ungetwc, fgetws and fputws, in stdio/ -- so their macros
+ * are gone too.
+ *
+ * The 20 that remain have no libap implementation, so removing them
+ * would only turn a wrong answer into a link failure: the wide
+ * printf/scanf family (fwprintf, fwscanf, swprintf, swscanf, vfwprintf,
+ * vfwscanf, vswprintf, vswscanf, vwprintf, vwscanf, wprintf, wscanf),
+ * the wide strtol family (wcstod, wcstof, wcstol, wcstold, wcstoll,
+ * wcstoul, wcstoull) and wcsftime. Treat each as a placeholder that
+ * happens to work for pure ASCII and is wrong otherwise.
  */
 
 /* hack */
@@ -111,13 +114,9 @@ extern int wctob(Rune);
 
 /* stdio.h */
 extern Rune fgetwc(struct _IO_FILE *);
-#define fgetwc(f) fgetc(f)
 extern Rune fputwc(wchar_t, struct _IO_FILE *);
-#define fputwc(c, f) fputc((int)(c), (f))
 extern wchar_t *fgetws(wchar_t *, int, struct _IO_FILE *);
-#define fgetws(c, i, f) fgets((char *)(c), (i), (f))
 extern int fputws(const wchar_t *, struct _IO_FILE *);
-#define fputws(c, f) fputs((const char *)(c), (f))
 
 /* Variadic wide stdio: delegate to narrow counterparts via __VA_ARGS__ */
 extern int fwprintf(struct _IO_FILE *, const wchar_t *, ...);
@@ -125,19 +124,14 @@ extern int fwprintf(struct _IO_FILE *, const wchar_t *, ...);
 extern int fwscanf(struct _IO_FILE *, const wchar_t *, ...);
 #define fwscanf(f, c, ...) fscanf((f), (const char *)(c), __VA_ARGS__)
 extern Rune getwchar(void);
-#define getwchar() getchar()
 extern Rune getwc(struct _IO_FILE *);
-#define getwc(f) getc(f)
 extern Rune putwchar(Rune);
-#define putwchar(c) putchar((int)(c))
 extern Rune putwc(Rune, struct _IO_FILE *);
-#define putwc(r, f) putc((int)(r), (f))
 extern int swprintf(wchar_t *, size_t, const wchar_t *, ...);
 #define swprintf(c, st, wc, ...) snprintf((char *)(c), (st), (const char *)(wc), __VA_ARGS__)
 extern int swscanf(const wchar_t *, const wchar_t *, ...);
 #define swscanf(c1, c2, ...) sscanf((const char *)(c1), (const char *)(c2), __VA_ARGS__)
 extern Rune ungetwc(Rune, struct _IO_FILE *);
-#define ungetwc(c, f) ungetc((int)(c), (f))
 extern int vfwprintf(struct _IO_FILE *, const wchar_t *, va_list);
 #define vfwprintf(f, c, a) vfprintf((f), (const char *)(c), (a))
 extern int vfwscanf(struct _IO_FILE *, const wchar_t *, va_list);

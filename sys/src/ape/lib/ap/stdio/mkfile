@@ -84,6 +84,12 @@ OFILES=\
 	dprintf.$O\
 	flockfile.$O\
 	fopen_rb_ca.$O\
+# wide character stdio (C99 7.24.3)\
+	fgetwc.$O\
+	fputwc.$O\
+	ungetwc.$O\
+	fgetws.$O\
+	fputws.$O\
 # GNU extensions\
 	asnprintf.$O\
 	_fpending.$O\
