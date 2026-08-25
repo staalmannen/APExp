@@ -8,6 +8,17 @@ TARG=wish
 TKSRC=$APEXPROOT/sys/src/external/tk
 TCLSRC=$APEXPROOT/sys/src/external/tcl
 
+# Tcl's WCHAR is char on APExp, so its WCHAR string operations are the
+# byte ones. tclClock.c calls wcscmp, wcslen and wcscpy on a WCHAR *
+# holding the TZ value from getenv. That used to work because wchar.h
+# macro'd the whole wcs* family onto str* equivalents; those macros are
+# gone now that libap implements them for real, and the calls stopped
+# matching:
+#   tclClock.c:4758 argument prototype mismatch "IND CONST CHAR" for
+#   "IND CONST UINT": wcscmp
+# Mapping them here keeps the byte behaviour where it is actually wanted,
+# rather than in a header shared by everything. The other wcs* uses in
+# tcl and tk are all under win/, which is not built here.
 CFLAGS=\
 	-FVp -c\
 	-I$TKSRC/generic\
@@ -20,6 +31,7 @@ CFLAGS=\
 	-DPLAN9\
 	-DMODULE_SCOPE=/***/\
 	-DWCHAR=char\
+	-Dwcscmp=strcmp -Dwcslen=strlen -Dwcscpy=strcpy -Dwcsncmp=strncmp -Dwcsncpy=strncpy -Dwcsrchr=strrchr\
 	-DTK_PLATFORM="plan9"\
 
 
