@@ -4,6 +4,7 @@ APEXPROOT=../../../../..
 TARG=grep
 
 OFILES=\
+	version-etc.$O\
 	dfasearch.$O\
 	grep.$O \
 	kwsearch.$O\
@@ -11,119 +12,7 @@ OFILES=\
 	searchutils.$O\
 	pcresearch.$O
 
-LIB_OBJS=\
-	libgreputils_a-argmatch.$O \
-	libgreputils_a-openat-proc.$O \
-	libgreputils_a-basename-lgpl.$O \
-	libgreputils_a-binary-io.$O \
-	libgreputils_a-bitrotate.$O \
-	libgreputils_a-btoc32.$O \
-	libgreputils_a-btowc.$O \
-	libgreputils_a-c-ctype.$O \
-	libgreputils_a-c-stack.$O \
-	libgreputils_a-c-strcasecmp.$O \
-#	libgreputils_a-c32_apply_type_test.$O \
-#	libgreputils_a-c32_get_type_test.$O \
-#	libgreputils_a-c32tob.$O \
-#	libgreputils_a-chdir-long.$O \
-#	libgreputils_a-cloexec.$O \
-#	libgreputils_a-close-stream.$O \
-	libgreputils_a-closeout.$O \
-	libgreputils_a-cycle-check.$O \
-	libgreputils_a-dfa.$O \
-	libgreputils_a-localeinfo.$O \
-#	libgreputils_a-dirname-lgpl.$O \
-	libgreputils_a-stripslash.$O \
-#	libgreputils_a-dup2.$O \
-#	libgreputils_a-error.$O \
-	libgreputils_a-exclude.$O \
-#	libgreputils_a-exitfail.$O \
-#	libgreputils_a-fcntl.$O \
-#	libgreputils_a-creat-safer.$O \
-	libgreputils_a-open-safer.$O \
-#	libgreputils_a-fd-hook.$O \
-#	libgreputils_a-fdopendir.$O \
-#	libgreputils_a-filenamecat-lgpl.$O \
-#	libgreputils_a-fpending.$O \
-	libgreputils_a-free.$O \
-#	libgreputils_a-fstatat.$O \
-	libgreputils_a-fts.$O \
-#	libgreputils_a-getcwd-lgpl.$O \
-#	libgreputils_a-getopt.$O \
-#	libgreputils_a-getopt1.$O \
-	libgreputils_a-dynarray_at_failure.$O \
-	libgreputils_a-dynarray_emplace_enlarge.$O \
-	libgreputils_a-dynarray_finalize.$O \
-	libgreputils_a-dynarray_resize.$O \
-#	libgreputils_a-dynarray_resize_clear.$O \
-#	libgreputils_a-hard-locale.$O \
-	libgreputils_a-hash.$O \
-#	libgreputils_a-i-ring.$O \
-	libgreputils_a-ialloc.$O \
-#	libgreputils_a-iswctype.$O \
-#	libgreputils_a-localcharset.$O \
-#	libgreputils_a-localeconv.$O \
-#	libgreputils_a-lock.$O \
-#	libgreputils_a-lseek.$O \
-#	libgreputils_a-lstat.$O \
-#	libgreputils_a-malloca.$O \
-#	libgreputils_a-mbrlen.$O \
-#	libgreputils_a-mbrtoc32.$O \
-#	libgreputils_a-mbrtowc.$O \
-#	libgreputils_a-mbscasecmp.$O \
-#	libgreputils_a-mbsrtoc32s.$O \
-#	libgreputils_a-mbsrtowcs.$O \
-#	libgreputils_a-mbszero.$O \
-#	libgreputils_a-mcel.$O \
-	libgreputils_a-memchr2.$O \
-#	libgreputils_a-memrchr.$O \
-#	libgreputils_a-nl_langinfo.$O \
-#	libgreputils_a-once.$O \
-#	libgreputils_a-openat.$O \
-#	libgreputils_a-openat-die.$O \
-	libgreputils_a-openat-safer.$O \
-#	libgreputils_a-opendirat.$O \
-#	libgreputils_a-quotearg.$O \
-#	libgreputils_a-rawmemchr.$O \
-	libgreputils_a-reallocarray.$O \
-	libgreputils_a-regex.$O \
-	libgreputils_a-safe-read.$O \
-	libgreputils_a-same-inode.$O \
-#	libgreputils_a-save-cwd.$O \
-#	libgreputils_a-setlocale_null.$O \
-#	libgreputils_a-setlocale-lock.$O \
-#	libgreputils_a-setlocale_null-unlocked.$O \
-#	libgreputils_a-sigsegv.$O \
-#	libgreputils_a-stackvma.$O\
-	libgreputils_a-stat-time.$O \
-	libgreputils_a-stdlib.$O \
-	libgreputils_a-stpcpy.$O \
-	libgreputils_a-str_endswith.$O \
-	libgreputils_a-strerror.$O \
-	libgreputils_a-strerror-override.$O \
-	libgreputils_a-strnlen1.$O \
-	libgreputils_a-strtoll.$O \
-	libgreputils_a-threadlib.$O \
-	libgreputils_a-unistd.$O \
-#	libgreputils_a-dup-safer.$O \
-	libgreputils_a-fd-safer.$O \
-#	libgreputils_a-pipe-safer.$O \
-	libgreputils_a-version-etc.$O \
-#	libgreputils_a-wctob.$O \
-#	libgreputils_a-wctype.$O \
-#	libgreputils_a-wctype-h.$O \
-	libgreputils_a-wmempcpy.$O \
-#	libgreputils_a-xmalloc.$O \
-#	libgreputils_a-xalloc-die.$O \
-#	libgreputils_a-xbinary-io.$O \
-	libgreputils_a-xstrtoimax.$O \
-	libgreputils_a-xstrtol.$O \
-	libgreputils_a-xstrtoul.$O \
-	libgreputils_a-colorize-posix.$O \
-	libgreputils_a-version-etc-fsf.$O
-
-LIB=libgrep.a$O
-CLEANFILES=$LIB
+LIB=../gnulib/libgnu.a$O
 BIN=$APEXPROOT/$objtype/bin/ape
 
 <$APEXPROOT/sys/src/cmd/mkone
@@ -134,24 +23,24 @@ GREPSRC=../../../external/ggrep
 #fails on include_next
 CC=$APEXPROOT/$objtype/bin/pcc
 
-CFLAGS=-c -I. -I$GREPSRC -I$GREPSRC/src -I$GREPSRC/lib\
+# -I. finds this directory's config.h, which layers grep's identity over
+# config-common.h. -I$GNUSRC comes before grep's own lib directory so the
+# shared module headers match the objects in libgnu.a. grep/src shares no
+# header name with the shared tree, so nothing needs to precede $GNUSRC.
+GNUSRC=$APEXPROOT/sys/src/external/gnulib
+CFLAGS=-c -I. -I$GNUSRC -I$GREPSRC -I$GREPSRC/src -I$GREPSRC/lib\
 		-B -DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale"
 
 %.$O: $GREPSRC/src/%.c
 	$CC $CFLAGS $GREPSRC/src/$stem.c
 
-libgreputils_a-%.$O: $GREPSRC/lib/%.c
-	$CC $CFLAGS -c $prereq -o $target
-
-libgreputils_a-%.$O: $GREPSRC/lib/malloc/%.c
-	$CC $CFLAGS -c $prereq -o $target
-
-libgreputils_a-%.$O: $GREPSRC/lib/glthread/%.c
-	$CC $CFLAGS -c $prereq -o $target
-
-
-libgrep.a$O: $LIB_OBJS
-			ar vu libgrep.a$O $LIB_OBJS
-
 install:V:
 		cp $GREPSRC/doc/grep.in.1 $APEXPROOT/sys/man/1/grep
+
+# version-etc is built here, not taken from the shared libgnu.a.
+# emit_bug_reporting_address() compiles PACKAGE_BUGREPORT, PACKAGE_NAME
+# and PACKAGE_URL straight into the object, so a single shared copy would
+# give every program whichever package built it. See rule 5 in
+# ../gnulib/README.
+version-etc.$O: $GNUSRC/version-etc.c
+	$CC $CFLAGS $GNUSRC/version-etc.c
