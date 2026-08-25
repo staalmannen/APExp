@@ -84,13 +84,16 @@ typedef struct {
  * putwchar, ungetwc, fgetws and fputws, in stdio/ -- so their macros
  * are gone too.
  *
- * The 20 that remain have no libap implementation, so removing them
- * would only turn a wrong answer into a link failure: the wide
- * printf/scanf family (fwprintf, fwscanf, swprintf, swscanf, vfwprintf,
- * vfwscanf, vswprintf, vswscanf, vwprintf, vwscanf, wprintf, wscanf),
- * the wide strtol family (wcstod, wcstof, wcstol, wcstold, wcstoll,
- * wcstoul, wcstoull) and wcsftime. Treat each as a placeholder that
- * happens to work for pure ASCII and is wrong otherwise.
+ * The wide printf and scanf families are implemented too, in stdio/,
+ * by converting the format to the narrow encoding and delegating to
+ * vfprintf and vfscanf -- which gained %ls and %lc for the purpose,
+ * closing a C99 gap in the narrow versions as well.
+ *
+ * The 8 that remain have no libap implementation, so removing them
+ * would only turn a wrong answer into a link failure: the wide strtol
+ * family (wcstod, wcstof, wcstol, wcstold, wcstoll, wcstoul, wcstoull)
+ * and wcsftime. Treat each as a placeholder that happens to work for
+ * pure ASCII and is wrong otherwise.
  */
 
 /* hack */
@@ -120,34 +123,22 @@ extern int fputws(const wchar_t *, struct _IO_FILE *);
 
 /* Variadic wide stdio: delegate to narrow counterparts via __VA_ARGS__ */
 extern int fwprintf(struct _IO_FILE *, const wchar_t *, ...);
-#define fwprintf(f, c, ...) fprintf((f), (const char *)(c), __VA_ARGS__)
 extern int fwscanf(struct _IO_FILE *, const wchar_t *, ...);
-#define fwscanf(f, c, ...) fscanf((f), (const char *)(c), __VA_ARGS__)
 extern Rune getwchar(void);
 extern Rune getwc(struct _IO_FILE *);
 extern Rune putwchar(Rune);
 extern Rune putwc(Rune, struct _IO_FILE *);
 extern int swprintf(wchar_t *, size_t, const wchar_t *, ...);
-#define swprintf(c, st, wc, ...) snprintf((char *)(c), (st), (const char *)(wc), __VA_ARGS__)
 extern int swscanf(const wchar_t *, const wchar_t *, ...);
-#define swscanf(c1, c2, ...) sscanf((const char *)(c1), (const char *)(c2), __VA_ARGS__)
 extern Rune ungetwc(Rune, struct _IO_FILE *);
 extern int vfwprintf(struct _IO_FILE *, const wchar_t *, va_list);
-#define vfwprintf(f, c, a) vfprintf((f), (const char *)(c), (a))
 extern int vfwscanf(struct _IO_FILE *, const wchar_t *, va_list);
-#define vfwscanf(f, c, a) vfscanf((f), (const char *)(c), (a))
 extern int vwprintf(const wchar_t *, va_list);
-#define vwprintf(c, a) vprintf((const char *)(c), (a))
 extern int vwscanf(const wchar_t *, va_list);
-#define vwscanf(c, a) vscanf((const char *)(c), (a))
 extern int vswprintf(wchar_t *, size_t, const wchar_t *, va_list);
-#define vswprintf(c1, st, c2, a) vsnprintf((char *)(c1), (st), (const char *)(c2), (a))
 extern int vswscanf(const wchar_t *, const wchar_t *, va_list);
-#define vswscanf(c1, c2, a) vsscanf((const char *)(c1), (const char *)(c2), (a))
 extern int wprintf(const wchar_t *, ...);
-#define wprintf(c, ...) printf((const char *)(c), __VA_ARGS__)
 extern int wscanf(const wchar_t *, ...);
-#define wscanf(c, ...) scanf((const char *)(c), __VA_ARGS__)
 
 /* stdlib.h
  * All wcs numeric conversions cast to char * and delegate to str* equivalents.
