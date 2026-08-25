@@ -783,6 +783,13 @@ output_skeleton (void)
       }
 
     pid = create_pipe_bidi ("m4", m4, argv,
+                            /* APExp: dll_dirs was added to create_pipe_bidi
+                               after bison 3.8, and this links the 2026
+                               gnulib. It lists extra directories to search
+                               for DLLs on Windows, so NULL is both the
+                               correct value here and what every caller on a
+                               Unix-like system passes.  */
+                            /* dll_dirs */ NULL,
                             /* directory */ NULL,
                             /* null_stderr */ false,
                             /* slave_process */ true,

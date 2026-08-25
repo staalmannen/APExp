@@ -565,6 +565,9 @@ print_html (void)
   int status
     = execute (argv[0],
                argv[0], argv,
+               /* APExp: dll_dirs, added after bison 3.8. See the same
+                  argument in output.c's create_pipe_bidi call.  */
+               /* dll_dirs */ NULL,
                /* directory */ NULL,
                /* ignore_sigpipe */ false,
                /* null_stdin, null_stdout, null_stderr */ true, true, true,

@@ -39,3 +39,10 @@
    mbchar.c is 22 lines and never touches struct mbchar, so the two
    layouts never meet. */
 #define GNULIB_MBFILE 1
+
+/* bison invokes m4 to expand its skeletons, and takes both the program
+   path and the option that selects GNU m4 from its config. Neither has
+   a counterpart in coreutils'. Values as bison's own config.h had them,
+   where M4 was already pointed at APE's m4. */
+#define M4 "/bin/m4"
+#define M4_GNU_OPTION "--gnu"
