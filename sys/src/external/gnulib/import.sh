@@ -170,6 +170,9 @@ EOF
 #ifndef strnul
 # define strnul(s) ((s) + strlen (s))
 #endif
+
+/* APExp: prototypes and off64_t the deleted wrappers carried. */
+#include "apexp-decls.h"
 EOF
 	echo "appended snippet includes and format attributes to config.h"
 fi
