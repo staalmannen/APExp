@@ -514,7 +514,7 @@ isstruct(Node *a, Type *t)
 Node*
 init1(Sym *s, Type *t, long o, int exflag)
 {
-	Node *a, *l, *r, nod;
+	Node *a, *l, *r, *pre, nod;
 	Type *t1;
 	long e, w, so, mw, bitoff;
 	static Node *bitagg;
@@ -725,8 +725,26 @@ init1(Sym *s, Type *t, long o, int exflag)
 			if(t->width != 0)
 				if(mw >= t->width)
 					break;
+			/*
+			 * If the element type cannot use this designator, the
+			 * designator belongs to an enclosing aggregate: stop,
+			 * and let the caller re-dispatch it. init1 signals that
+			 * by consuming nothing.
+			 *
+			 * Without this, a flat designator list that walks back
+			 * out of an array, as in
+			 *
+			 *   { .file[0].desc = a, .file[1].desc = b }
+			 *
+			 * kept handing .file[1] to the element type, which does
+			 * not have a member called file.
+			 */
+			pre = peekinit();
 			r = init1(s, t->link, o+so, 1);
 			l = newlist(l, r);
+			if(pre != Z && peekinit() == pre)
+			if(pre->op == OELEM || pre->op == OARRAY)
+				break;
 			e++;
 		}
 		if(t->width == 0)
@@ -786,7 +804,21 @@ init1(Sym *s, Type *t, long o, int exflag)
 			if(a->op == OELEM || a->op == OARRAY)
 				goto again;
 		}
-		if(a && (a->op == OELEM || a->op == OARRAY))
+		/*
+		 * A designator naming no member of this struct is an error
+		 * only at a level that has its own braces: exflag is 0 for
+		 * the outermost aggregate and for anything reached through
+		 * doinit, which is the brace case.
+		 *
+		 * When exflag is set we were entered implicitly, without
+		 * braces of our own, so a designator we cannot use is one
+		 * that belongs to an enclosing aggregate. Return, consuming
+		 * nothing, and let that level match it -- the array case
+		 * above watches for exactly this. A designator that matches
+		 * nothing anywhere still reaches the outermost level, where
+		 * exflag is 0 and it is reported.
+		 */
+		if(a && (a->op == OELEM || a->op == OARRAY) && !exflag)
 			diag(a, "structure element not found %F", a);
 		if(bitoff != -1) {
 			if(bitagg)

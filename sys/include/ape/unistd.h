@@ -184,7 +184,7 @@ int fstatat(int dirfd, const char *path, struct stat *buf, int flags);
 int unlinkat(int dirfd, const char *path, int flags);
 int mkdirat(int dirfd, const char *path, mode_t mode);
 int renameat(int olddirfd, const char *old, int newdirfd, const char *new);
-int readlinkat(int dirfd, const char *path, char *buf, size_t n);
+ssize_t readlinkat(int dirfd, const char *path, char *buf, size_t n);
 int symlinkat(const char *target, int dirfd, const char *linkpath);
 int faccessat(int dirfd, const char *path, int mode, int flags);
 int fchownat(int dirfd, const char *path, uid_t uid, gid_t gid, int flags);

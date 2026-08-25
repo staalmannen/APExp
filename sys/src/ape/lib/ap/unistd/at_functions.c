@@ -125,7 +125,15 @@ linkat(int olddirfd, const char *oldpath, int newdirfd,
 	return -1;
 }
 
-int
+/* POSIX.1-2008 gives readlinkat an ssize_t return, as readlink has.
+   This said int, so on amd64 the callee wrote 4 bytes where an ssize_t
+   caller read 8. gnulib's careadlinkat takes the function as a
+   parameter and typechecks it:
+
+     diff.c:1265 argument prototype mismatch
+       "IND FUNC(INT, IND CONST CHAR, IND CHAR, UVLONG) INT" for
+       "IND FUNC(INT, IND CONST CHAR, IND CHAR, UVLONG) VLONG" */
+ssize_t
 readlinkat(int dirfd, const char *path, char *buf, size_t bufsiz)
 {
 	/* Plan9 has no symlinks */
