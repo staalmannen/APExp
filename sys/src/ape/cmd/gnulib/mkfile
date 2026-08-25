@@ -34,7 +34,6 @@ OFILES=\
 	bitset.$O\
 	bitsetv.$O\
 	btoc32.$O\
-	btowc.$O\
 	c-ctype.$O\
 	c-stack.$O\
 	c-strcasecmp.$O\

@@ -55,10 +55,23 @@ typedef struct {
  */
 
 /* hack */
+/*
+ * btowc and wctob are declared but deliberately NOT macro'd.
+ *
+ * They used to be "#define btowc(c) ((Rune)(c))" and
+ * "#define wctob(c) ((int)(c))", which are wrong above ASCII: in a UTF-8
+ * locale a lone byte 128..255 is not a character and btowc must return
+ * WEOF, and btowc(EOF) must be WEOF rather than a huge Rune. libap
+ * implements both correctly in multibyte/, and both files open with
+ * "#undef btowc" / "#undef wctob" to escape these macros -- which is
+ * what made them recognisable as a hack rather than an optimisation.
+ *
+ * The macros also broke anything that DEFINES either name: gnulib's
+ * btowc.c expanded to "wint_t ((Rune)(int c))", reported as
+ *   btowc.c:29 external redeclaration of: Rune
+ */
 extern Rune btowc(int);
-#define btowc(c) ((Rune)(c))
 extern int wctob(Rune);
-#define wctob(c) ((int)(c))
 
 /* stdio.h */
 extern Rune fgetwc(struct _IO_FILE *);
