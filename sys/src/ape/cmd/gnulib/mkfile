@@ -58,11 +58,8 @@ OFILES=\
 	filenamecat-lgpl.$O\
 	findprog-in.$O\
 	fopen-safer.$O\
-	freadahead.$O\
 	free.$O\
-	fseterr.$O\
 	fstrcmp.$O\
-	fwriting.$O\
 	get-errno.$O\
 	get-permissions.$O\
 	gethrxtime.$O\

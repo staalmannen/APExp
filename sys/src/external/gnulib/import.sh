@@ -144,6 +144,20 @@ EOF
 		     /__scanf__, formatstring_parameter, first_argument/ { if (p) exit }' \
 			"$DEST/stdio.in.h"
 	} >> "$DEST/config.h"
+	# libap implements the musl <stdio_ext.h> accessors, so let
+	# freadahead.h, fseterr.h and fwriting.h take their "musl libc"
+	# branch. Otherwise each falls through to a per-platform #elif chain
+	# that selects its Plan 9 case on EPLAN9 and reads fp->state, fp->rp
+	# and fp->wp from the old APE FILE. APExp's FILE is musl's, so those
+	# members do not exist and the compile fails.
+	cat >> "$DEST/config.h" <<'EOF'
+
+/* APExp: libap implements the musl <stdio_ext.h> accessors. */
+#define HAVE___FREADAHEAD 1
+#define HAVE___FSETERR 1
+#define HAVE___FWRITING 1
+#define HAVE___FREADING 1
+EOF
 	echo "appended snippet includes and format attributes to config.h"
 fi
 

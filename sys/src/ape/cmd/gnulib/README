@@ -45,8 +45,9 @@ Two rules for anyone editing the OFILES list
 
        _obstack_begin: libap.a(obstack_printf): redefinition: _obstack_begin
 
-   Already provided by libap, do not add: obstack, exitfail, and the
-   whole x*alloc family -- xmalloc, xalloc-die, xreallocarray, xnmalloc,
+   Already provided by libap, do not add: obstack, exitfail, the musl
+   <stdio_ext.h> accessors behind freadahead, fseterr and fwriting, and
+   the whole x*alloc family -- xmalloc, xalloc-die, xreallocarray, xnmalloc,
    xnrealloc, xcharalloc, xzalloc, x2realloc, x2nrealloc, xpalloc and the
    idx_t variants (ximalloc, xirealloc, xicalloc, xizalloc, ximemdup,
    ximemdup0).
