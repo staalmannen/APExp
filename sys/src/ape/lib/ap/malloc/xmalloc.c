@@ -4,13 +4,12 @@
 #include <stddef.h>
 #include <xalloc.h>
 
-/* Called on allocation failure. Programs may override this. */
-void
-xalloc_die(void)
-{
-	fputs("memory exhausted\n", stderr);
-	exit(1);
-}
+/*
+ * xalloc_die is deliberately not here. It is replaceable -- a program
+ * may define its own -- so it has to be alone in its object file, or
+ * defining one drags this whole object in behind it and the linker
+ * reports a redefinition. See xalloc_die.c.
+ */
 
 void *
 xmalloc(size_t n)
