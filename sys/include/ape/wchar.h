@@ -53,49 +53,22 @@ typedef struct {
  * Redefined or remapped to APE library functions
  * ##############################################
  *
- * WARNING about the remapping macros below.
- *
- * Each is of the form
- *
- *     extern int fputws(const wchar_t *, struct _IO_FILE *);
- *     #define fputws(c, f) fputs((const char *)(c), (f))
- *
- * that is, a wide-character function declared and then macro'd onto its
- * NARROW counterpart by casting wchar_t * to char *. That is only
- * correct if wchar_t is a byte. It is not: APE's wchar_t is 32 bits
- * (see Rune in <utf.h>), so a wchar_t string is an array of 4-byte
- * elements and reinterpreting it as char * stops at the first element
- * whose low byte is zero. For ASCII text on a little-endian machine
- * that is the very first character.
- *
- * These macros also break any translation unit that DEFINES one of
- * these names, since the definition itself gets expanded. gnulib's
- * btowc.c hit exactly that:
+ * These were once remapping macros: each wide function was declared and
+ * then #define'd onto its NARROW counterpart by casting wchar_t * to
+ * char *, which is only correct if wchar_t is a byte. It is not, so
+ * wcslen(s) was strlen((const char *)(s)) and returned 1 for a string of
+ * any length, the first element's low byte being zero for any ASCII
+ * character. They also broke any translation unit DEFINING one of these
+ * names, since the definition itself got expanded -- which is how
+ * gnulib's btowc.c came to report
  *     btowc.c:29 external redeclaration of: Rune
  *
- * The 24 of them that shadowed a working libap function have been
- * removed: btowc, wctob, and the wcs*/wmem* string and memory family,
- * which libap implements properly in string/ and locale/. Every one of
- * those libap sources still opens with "#undef <name>" to escape these
- * macros, which is how they were found.
- *
- * The wide stdio character and string functions have since been
- * implemented in libap -- fgetwc, fputwc, getwc, putwc, getwchar,
- * putwchar, ungetwc, fgetws and fputws, in stdio/ -- so their macros
- * are gone too.
- *
- * The wide printf and scanf families are implemented too, in stdio/,
- * by converting the format to the narrow encoding and delegating to
- * vfprintf and vfscanf -- which gained %ls and %lc for the purpose,
- * closing a C99 gap in the narrow versions as well.
- *
- * The 8 that remain have no libap implementation, so removing them
- * would only turn a wrong answer into a link failure: the wide strtol
- * family (wcstod, wcstof, wcstol, wcstold, wcstoll, wcstoul, wcstoull)
- * and wcsftime. Treat each as a placeholder that happens to work for
- * pure ASCII and is wrong otherwise.
+ * All 53 are gone. libap implements every one of them now: the wcs* and
+ * wmem* string and memory functions in string/, btowc and wctob in
+ * multibyte/, the wide stdio and the wide printf and scanf families in
+ * stdio/, and the wide conversions in string/wcstol.c and
+ * string/wcsftime.c.
  */
-
 /* hack */
 /*
  * btowc and wctob are declared but deliberately NOT macro'd.
@@ -145,19 +118,12 @@ extern int wscanf(const wchar_t *, ...);
  * This is sound because numeric input is always ASCII, regardless of encoding.
  * wcstof/wcstold use strtof/strtold (not strtod) to preserve precision. */
 extern double wcstod(const wchar_t *, wchar_t **);
-#define wcstod(c1, c2) strtod((const char *)(c1), (char **)(c2))
 extern float wcstof(const wchar_t *, wchar_t **);
-#define wcstof(c1, c2) strtof((const char *)(c1), (char **)(c2))
 extern long double wcstold(const wchar_t *, wchar_t **);
-#define wcstold(c1, c2) strtold((const char *)(c1), (char **)(c2))
 extern long wcstol(const wchar_t *, wchar_t **, int);
-#define wcstol(c1, c2, i) strtol((const char *)(c1), (char **)(c2), (i))
 extern long long wcstoll(const wchar_t *, wchar_t **, int);
-#define wcstoll(c1, c2, i) strtoll((const char *)(c1), (char **)(c2), (i))
 extern unsigned long wcstoul(const wchar_t *, wchar_t **, int);
-#define wcstoul(c1, c2, i) strtoul((const char *)(c1), (char **)(c2), (i))
 extern unsigned long long wcstoull(const wchar_t *, wchar_t **, int);
-#define wcstoull(c1, c2, i) strtoull((const char *)(c1), (char **)(c2), (i))
 
 /* string.h
  * Note: wchar_t * strings are UTF-8 Rune sequences in this implementation,
@@ -189,7 +155,6 @@ extern wchar_t *wmemset(wchar_t *, wchar_t, size_t);
 
 /* time.h */
 extern size_t wcsftime(wchar_t *, size_t, const wchar_t *, const struct tm *);
-#define wcsftime(c1, st, c2, stm) strftime((char *)(c1), (st), (const char *)(c2), (stm))
 
 /* ##############################################
  * Missing functions from standard APE libraries.
