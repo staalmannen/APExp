@@ -15,6 +15,9 @@
  * every #include <config.h> in this tree still resolves.
  */
 
+#define LOCALEDIR "/sys/lib/ape/locale"
+
+
 /* lib/config.h.  Generated from config.hin by configure.  */
 /* lib/config.hin.  Generated from configure.ac by autoheader.  */
 
