@@ -59,6 +59,60 @@ struct	stat {
 #define S_TYPEISSHM(st) 0
 #define S_TYPEISTMO(st) 0
 
+/*
+ * File types Plan 9 does not have. Portable code tests these without
+ * guarding them -- gnulib's c-file-type.c walks the whole list in one
+ * run of unguarded ifs -- because gnulib's generated <sys/stat.h>
+ * defines every one of them, to 0 on a system that lacks the type.
+ * That wrapper is pruned here for shadowing this header, so define them
+ * as gnulib would; undefined, each call is an implicit function and
+ * turns up at link time instead:
+ *
+ *   compare_files: undefined: c_file_type in compare_files
+ *
+ * Each is guarded, so a port that grows a real one of these only has to
+ * define it before including this header.
+ */
+#ifndef S_ISDOOR		/* Solaris 2.5 and up */
+#define S_ISDOOR(m) 0
+#endif
+#ifndef S_ISCTG			/* contiguous file */
+#define S_ISCTG(m) 0
+#endif
+#ifndef S_ISMPB			/* V7 multiplexed block special */
+#define S_ISMPB(m) 0
+#endif
+#ifndef S_ISMPC			/* V7 multiplexed character special */
+#define S_ISMPC(m) 0
+#endif
+#ifndef S_ISMPX			/* AIX */
+#define S_ISMPX(m) 0
+#endif
+#ifndef S_ISNAM			/* Xenix */
+#define S_ISNAM(m) 0
+#endif
+#ifndef S_ISNWK			/* HP-UX network special */
+#define S_ISNWK(m) 0
+#endif
+#ifndef S_ISPORT		/* Solaris 10 and up */
+#define S_ISPORT(m) 0
+#endif
+#ifndef S_ISWHT			/* BSD whiteout */
+#define S_ISWHT(m) 0
+#endif
+#ifndef S_ISOFD			/* Cray migrated, offline with data */
+#define S_ISOFD(m) 0
+#endif
+#ifndef S_ISOFL			/* Cray migrated, offline without data */
+#define S_ISOFL(m) 0
+#endif
+#ifndef S_TYPEISMQ		/* takes a struct stat *, not a mode */
+#define S_TYPEISMQ(st) 0
+#endif
+#ifndef S_TYPEISSEM
+#define S_TYPEISSEM(st) 0
+#endif
+
 #define S_IFMT S__MASK
 #define S_IFDIR 0040000
 #define S_IFCHR 0020000
