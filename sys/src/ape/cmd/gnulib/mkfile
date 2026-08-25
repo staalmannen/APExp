@@ -222,6 +222,24 @@ CFLAGS=-c -B -I. -I$GNUSRC -DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION\
    -DLOCALEDIR="/sys/lib/ape/locale"
 
 
+# Every object depends on the config headers.
+#
+# Without this, editing config-common.h changed nothing: mk saw each
+# object as up to date against its .c alone and rebuilt none of them, so
+# a fix landed only in modules that happened to be new that round. It
+# cost a round trip when turning off SUPPORT_NON_GREG_CALENDARS_IN_STRFTIME
+# left nstrftime.$O still asking for gl_locale_name_unsafe.
+#
+# Listed rather than globbed: mk does not expand globs in prerequisites.
+# The recipe-less pattern rule is how mksyslib adds $HFILES; keep it
+# separate from the rules below, as mksyslib's comment says.
+HFILES=\
+	config.h\
+	$GNUSRC/config-common.h\
+	$GNUSRC/apexp-decls.h\
+
+%.$O: $HFILES			# don't combine with following %.$O rules
+
 # No two modules share a basename across these directories, so the
 # pattern rules cannot collide and mk rule ordering does not matter.
 %.$O: $GNUSRC/%.c
