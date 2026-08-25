@@ -37,9 +37,11 @@ OFILES=\
 	bitsetv.$O\
 	btoc32.$O\
 	c-ctype.$O\
+	c-file-type.$O\
 	c-stack.$O\
 	c-strcasecmp.$O\
 	canonicalize.$O\
+	careadlinkat.$O\
 	clean-temp.$O\
 	clean-temp-simple.$O\
 	close-stream.$O\
@@ -101,6 +103,7 @@ OFILES=\
 	mempcpy.$O\
 	mkstemp-safer.$O\
 	next-prime.$O\
+	nstrftime.$O\
 	open-safer.$O\
 	openat-proc.$O\
 	openat-safer.$O\
@@ -123,6 +126,7 @@ OFILES=\
 	setlocale-lock.$O\
 	setlocale_null.$O\
 	setlocale_null-unlocked.$O\
+	sh-quote.$O\
 	sigsegv.$O\
 	spawn-pipe.$O\
 	stat-time.$O\

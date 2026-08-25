@@ -50,4 +50,31 @@ typedef unsigned long size_t;
 typedef unsigned int wchar_t;
 #endif
 
+/*
+ * C23 7.21.1: unreachable() expands to a void expression whose
+ * execution is undefined behaviour. It belongs in this header, and
+ * gnulib's generated <stddef.h> supplied it -- that wrapper is pruned
+ * here for shadowing this one, so without it a caller gets an implicit
+ * function and the link fails:
+ *
+ *   diff_2_files: undefined: unreachable in diff_2_files
+ *
+ * abort() is gnulib's own fallback for a compiler with no
+ * __builtin_unreachable, and is what pcc needs: it swallows unknown
+ * __builtin_* calls and yields a constant, so __builtin_unreachable()
+ * would compile to a no-op that neither traps nor informs the
+ * optimiser. Reaching abort() is at least honest about the bug.
+ *
+ * abort is declared here rather than pulling in <stdlib.h>, as gnulib
+ * also does; the declaration matches the one in <stdlib.h> exactly, so
+ * the two can be seen in either order. C++ has its own std::unreachable
+ * and no _Noreturn, so the whole block sits outside it.
+ */
+#ifndef __cplusplus
+#ifndef unreachable
+extern _Noreturn void abort(void);
+#define unreachable() abort()
+#endif
+#endif
+
 #endif /* __STDDEF_H */
