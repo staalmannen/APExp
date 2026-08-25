@@ -62,7 +62,7 @@ predate the 2026 gnulib being linked, so their platform answers no
 longer describe the objects.
 
 
-Four rules for editing any of this
+Five rules for editing any of this
 ----------------------------------
 
 1. Never add a module that libap already provides.
