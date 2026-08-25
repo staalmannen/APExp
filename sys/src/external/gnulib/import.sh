@@ -295,6 +295,13 @@ EOF
 # define strnul(s) ((s) + strlen (s))
 #endif
 
+/* APExp: streq, likewise an inline in the generated string.h.
+   streq.h is a different thing: the streq0..streq9 helpers call this
+   one rather than define it. */
+#ifndef streq
+# define streq(a, b) (strcmp ((a), (b)) == 0)
+#endif
+
 /* APExp: prototypes and off64_t the deleted wrappers carried. */
 #include "apexp-decls.h"
 EOF

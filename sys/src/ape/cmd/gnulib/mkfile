@@ -200,9 +200,21 @@ CC=$APEXPROOT/$objtype/bin/pcc
 # gnulib's regex.c and fts.c from redefining them -- the same
 # duplicate-symbol trap that obstack fell into. Undoing them here, or
 # editing them out of config.h, reintroduces it.
+# -DSETLOCALE_NULL_MAX=257 used to stand here, for hard-locale.c, which
+# uses the macro without including a header that defines it. Nothing in
+# OFILES did, so it went unnoticed until setlocale_null.c was added:
+# that module includes its own setlocale_null.h, which spells the same
+# value differently, and cpp compares replacement lists, not values.
+#
+#   setlocale_null.h:37 ... setlocale_null.c:22
+#     Macro redefinition of SETLOCALE_NULL_MAX
+#
+# apexp-decls.h now includes setlocale_null.h, which is what the deleted
+# <locale.h> wrapper did, so both the macro and setlocale_null_r reach
+# hard-locale.c from the one place that defines them.
 CFLAGS=-c -B -I. -I$GNUSRC -DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION\
   -D__USE_GNU -D_REGEX_LARGE_OFFSETS -DREGEX_MALLOC -DO_BINARY=0\
-   -DSETLOCALE_NULL_MAX=257 -DLOCALEDIR="/sys/lib/ape/locale"
+   -DLOCALEDIR="/sys/lib/ape/locale"
 
 
 # No two modules share a basename across these directories, so the

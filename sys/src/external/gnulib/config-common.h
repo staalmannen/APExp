@@ -5879,6 +5879,17 @@
 # define strnul(s) ((s) + strlen (s))
 #endif
 
+/* APExp: streq, the same case as strnul above.
+   It is an inline in the generated string.h (string.in.h:812, under
+   GNULIB_STREQ), so it went with that wrapper. hard-locale.c is the
+   compiled module that calls it, and it includes no header that would
+   declare it. streq.h is a different thing -- the streq0..streq9
+   fixed-length helpers, which call this streq rather than define it.
+   Upstream is "return !strcmp (s1, s2)". */
+#ifndef streq
+# define streq(a, b) (strcmp ((a), (b)) == 0)
+#endif
+
 /* APExp: prototypes and off64_t that the deleted wrapper headers carried.
    See apexp-decls.h for how the list was derived. */
 #include "apexp-decls.h"
