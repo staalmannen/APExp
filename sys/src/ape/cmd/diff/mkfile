@@ -80,8 +80,13 @@ CC=pcc -c
 CFLAGS=-B -p -D_POSIX_SOURCE -DREGEX_MALLOC -I. -I$GNUSRC -I$DIFFSRC/src \
 	-DHAVE_CONFIG_H -DDIFF_PROGRAM="/bin/diff"\
 
+# Name the source, not $prereq: HFILES are prerequisites too, so
+# $prereq would put config.h and friends on the pcc command line. pcc
+# happens to ignore an argument whose suffix it does not know, so this
+# was noisy rather than fatal, but it is luck either way. The sibling
+# mkfiles all spell the source out.
 %.$O: $DIFFSRC/src/%.c
-	$CC $CFLAGS $prereq
+	$CC $CFLAGS $DIFFSRC/src/$stem.c
 
 # No rule for $DIFFSRC/lib/%.c: every object comes from src or, for
 # version-etc, from the shared tree. A rule here would let a stale

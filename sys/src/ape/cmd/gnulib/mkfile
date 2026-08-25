@@ -158,6 +158,7 @@ OFILES=\
 	wmempcpy.$O\
 	xasprintf.$O\
 	xconcat-filename.$O\
+	xfreopen.$O\
 	xhash.$O\
 	xmalloca.$O\
 	xmemdup0.$O\
