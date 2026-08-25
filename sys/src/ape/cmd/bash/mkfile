@@ -287,8 +287,14 @@ libbuiltins.a$O: $OBJBUILTINS
 install:V:
 			cp $BASHSRC/doc/bash.1 $APEXPROOT/sys/man/1/bash
 
+# This overrides the clean rule mkone provides, so it has to repeat what
+# that one does before adding bash's own leftovers. "[$OS].$Out" was a
+# typo for "[$OS].out": $Out is not an mk variable, so rc expanded it to
+# a null list and refused to concatenate it onto the literal ahead of it,
+#     /rc/lib/rcmain:24 *eval*:1: null list in concatenation
 clean:V:
-			rm -f *.[$OS] [$OS].$Out lib*.a* mkbuiltins
+			rm -f *.[$OS] [$OS].out y.tab.? lex.yy.c y.debug y.output $TARG $CLEANFILES
+			rm -f lib*.a* mkbuiltins
 			rm -rf builtins
 
 
