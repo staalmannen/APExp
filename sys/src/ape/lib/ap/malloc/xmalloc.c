@@ -202,6 +202,20 @@ ximemdup(void const *p, ptrdiff_t s)
 	return xmemdup(p, (size_t)s);
 }
 
+/* Reallocate P as an array of N objects of S bytes each. */
+void *
+xireallocarray(void *p, ptrdiff_t n, ptrdiff_t s)
+{
+	return xreallocarray(p, (size_t)n, (size_t)s);
+}
+
+/* Allocate an array of N objects of S bytes each. */
+void *
+xinmalloc(ptrdiff_t n, ptrdiff_t s)
+{
+	return xireallocarray(NULL, n, s);
+}
+
 char *
 ximemdup0(void const *p, ptrdiff_t s)
 {

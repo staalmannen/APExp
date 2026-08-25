@@ -28,6 +28,8 @@ OFILES=\
 	argmatch.$O\
 	asyncsafe-spin.$O\
 	backup-find.$O\
+	backup-rename.$O\
+	backupfile.$O\
 	basename-lgpl.$O\
 	binary-io.$O\
 	bitrotate.$O\
@@ -121,6 +123,7 @@ OFILES=\
 	stat-time.$O\
 	stdbit.$O\
 	stdlib.$O\
+	stdopen.$O\
 	stpcpy.$O\
 	str_endswith.$O\
 	striconv.$O\

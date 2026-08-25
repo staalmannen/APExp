@@ -35,6 +35,8 @@ extern void *xicalloc(ptrdiff_t, ptrdiff_t);
 extern void *xizalloc(ptrdiff_t);
 extern void *ximemdup(void const *, ptrdiff_t);
 extern char *ximemdup0(void const *, ptrdiff_t);
+extern void *xireallocarray(void *, ptrdiff_t, ptrdiff_t);
+extern void *xinmalloc(ptrdiff_t, ptrdiff_t);
 
 /* Convenience: typed versions */
 #define XMALLOC(t, n)        ((t *)xmalloc((n) * sizeof(t)))
