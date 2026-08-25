@@ -1,3 +1,20 @@
+/* config-common.h -- the platform half of gnulib's config.h.
+ *
+ * APExp builds one shared libgnu.a, so there is one set of answers to
+ * the platform questions: the HAVE_* probes, the type sizes, the APExp
+ * additions at the end. Those live here, and every package that links
+ * libgnu.a compiles against them.
+ *
+ * Package identity does not belong here. This file started as
+ * coreutils' config.h, so it said PACKAGE "coreutils" and VERSION
+ * "9.11"; bison reads VERSION and PACKAGE_STRING for its --version
+ * output, and on the shared file alone it introduced itself as GNU
+ * coreutils 9.11. Those macros are commented out below and each build
+ * directory supplies its own config.h, which includes this one and then
+ * defines them. gnulib's own build directory does the same, so that
+ * every #include <config.h> in this tree still resolves.
+ */
+
 /* lib/config.h.  Generated from config.hin by configure.  */
 /* lib/config.hin.  Generated from configure.ac by autoheader.  */
 
@@ -3651,7 +3668,8 @@
 #define MAJOR_IN_SYSMACROS 1
 
 /* URL for full manual */
-#define MANUAL_URL "https://www.gnu.org/software/coreutils/manual/coreutils.html"
+/* APExp: package-specific, see the config.h in each build dir */
+/* #undef MANUAL_URL */
 
 /* Define to a substitute value for mmap()'s MAP_ANONYMOUS flag. */
 /* #undef MAP_ANONYMOUS */
@@ -3870,13 +3888,16 @@
 /* #undef OPEN_TRAILING_SLASH_BUG */
 
 /* Name of package */
-#define PACKAGE "coreutils"
+/* APExp: package-specific, see the config.h in each build dir */
+/* #undef PACKAGE */
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "bug-coreutils@gnu.org"
+/* APExp: package-specific, see the config.h in each build dir */
+/* #undef PACKAGE_BUGREPORT */
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME "GNU coreutils"
+/* APExp: package-specific, see the config.h in each build dir */
+/* #undef PACKAGE_NAME */
 
 /* String identifying the packager of this software */
 /* #undef PACKAGE_PACKAGER */
@@ -3888,16 +3909,20 @@
 /* #undef PACKAGE_PACKAGER_VERSION */
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GNU coreutils 9.11"
+/* APExp: package-specific, see the config.h in each build dir */
+/* #undef PACKAGE_STRING */
 
 /* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "coreutils"
+/* APExp: package-specific, see the config.h in each build dir */
+/* #undef PACKAGE_TARNAME */
 
 /* Define to the home page for this package. */
-#define PACKAGE_URL "https://www.gnu.org/software/coreutils/"
+/* APExp: package-specific, see the config.h in each build dir */
+/* #undef PACKAGE_URL */
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "9.11"
+/* APExp: package-specific, see the config.h in each build dir */
+/* #undef PACKAGE_VERSION */
 
 /* Define to the maximum link count that a true pipe can have. */
 #define PIPE_LINK_COUNT_MAX (1)
@@ -4286,7 +4311,8 @@
 /* #undef USE_XATTR */
 
 /* Version number of package */
-#define VERSION "9.11"
+/* APExp: package-specific, see the config.h in each build dir */
+/* #undef VERSION */
 
 /* Define to 1 if unsetenv returns void instead of int. */
 /* #undef VOID_UNSETENV */

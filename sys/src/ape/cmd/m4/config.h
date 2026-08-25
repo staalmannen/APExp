@@ -1,5 +1,5 @@
 /*
- * config.h for patch.
+ * config.h for m4.
  *
  * The platform answers -- HAVE_* probes, type sizes, the APExp
  * additions -- are shared by every package that links libgnu.a and
@@ -15,11 +15,11 @@
 
 #include <config-common.h>
 
-#define PACKAGE              "patch"
-#define PACKAGE_NAME         "GNU patch"
-#define PACKAGE_STRING       "GNU patch 2.8"
-#define PACKAGE_TARNAME      "patch"
-#define PACKAGE_VERSION      "2.8"
-#define VERSION              "2.8"
-#define PACKAGE_BUGREPORT    "bug-patch@gnu.org"
-#define PACKAGE_URL          "https://www.gnu.org/software/patch/"
+#define PACKAGE              "m4"
+#define PACKAGE_NAME         "GNU M4"
+#define PACKAGE_STRING       "GNU M4 1.4.21"
+#define PACKAGE_TARNAME      "m4"
+#define PACKAGE_VERSION      "1.4.21"
+#define VERSION              "1.4.21"
+#define PACKAGE_BUGREPORT    "bug-m4@gnu.org"
+#define PACKAGE_URL          "https://www.gnu.org/software/m4/"

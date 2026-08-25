@@ -25,7 +25,7 @@ DEST=$EXT/gnulib
 # tree:subdir, newest gnulib first
 TREES="coreutils/lib m4/lib diffutils/lib ggrep/lib patch/lib gtar/gnu gsed/lib bison/lib"
 
-if [ "$1" != "-f" ] && [ -e "$DEST/config.h" ]; then
+if [ "$1" != "-f" ] && [ -e "$DEST/config-common.h" ]; then
 	echo "$DEST already populated; pass -f to re-import" >&2
 	exit 1
 fi
@@ -42,6 +42,15 @@ for t in $TREES; do
 	# name table. No Makefiles, no .in.h templates that need autoconf.
 	for f in $(cd "$src" && find . -name '*.c' -o -name '*.h' -o -name '*.def'); do
 		d=$DEST/$(dirname "$f")
+		# config.h lands as config-common.h. Each build directory has its
+		# own config.h holding package identity, which includes this one;
+		# keeping the shared file under that name would shadow them.
+		if [ "$f" = "./config.h" ]; then
+			[ -e "$DEST/config-common.h" ] && { skipped=$((skipped + 1)); continue; }
+			cp "$src/$f" "$DEST/config-common.h"
+			n=$((n + 1)); copied=$((copied + 1))
+			continue
+		fi
 		if [ -e "$DEST/$f" ]; then
 			skipped=$((skipped + 1))
 			continue
@@ -99,17 +108,32 @@ if [ -d "$DEST/sys" ]; then
 fi
 echo "pruned $pruned replacement system headers"
 
+# Strip package identity from the shared file. It began as coreutils'
+# config.h, so it says PACKAGE "coreutils" and VERSION "9.11". bison
+# reads VERSION and PACKAGE_STRING for its --version output and would
+# introduce itself as GNU coreutils 9.11. Each build directory supplies
+# these instead, in a config.h that includes config-common.h.
+if [ -f "$DEST/config-common.h" ]; then
+	for m in PACKAGE PACKAGE_BUGREPORT PACKAGE_NAME PACKAGE_STRING \
+		 PACKAGE_TARNAME PACKAGE_URL PACKAGE_VERSION VERSION MANUAL_URL; do
+		sed -i.bak "s|^#define $m \".*\"\$|/* APExp: package-specific, see the config.h in each build dir */\n/* #undef $m */|" \
+			"$DEST/config-common.h"
+	done
+	rm -f "$DEST/config-common.h.bak"
+	echo "stripped package identity from config-common.h"
+fi
+
 # coreutils sets ARGMATCH_DIE to usage (EXIT_FAILURE) in its config.h,
 # since every coreutils program exports a usage function. A shared
 # gnulib cannot assume that -- bison declares its usage static -- so
 # neutralise both and let argmatch.c use its own default,
 # exit (exit_failure).
-if [ -f "$DEST/config.h" ]; then
+if [ -f "$DEST/config-common.h" ]; then
 	sed -i.bak \
 		-e 's|^#define ARGMATCH_DIE usage (EXIT_FAILURE)|/* #undef ARGMATCH_DIE */|' \
 		-e 's|^#define ARGMATCH_DIE_DECL void usage (int _e)|/* #undef ARGMATCH_DIE_DECL */|' \
-		"$DEST/config.h"
-	rm -f "$DEST/config.h.bak"
+		"$DEST/config-common.h"
+	rm -f "$DEST/config-common.h.bak"
 	echo "neutralised coreutils ARGMATCH_DIE in config.h"
 fi
 
@@ -132,8 +156,8 @@ fi
 #
 # c++defs.h is deliberately not included: it still has @PLACEHOLDER@ text
 # and only matters for the C++ aliasing that this build does not use.
-if [ -f "$DEST/config.h" ] && ! grep -q 'APExp: snippet macros' "$DEST/config.h"; then
-	cat >> "$DEST/config.h" <<'EOF'
+if [ -f "$DEST/config-common.h" ] && ! grep -q 'APExp: snippet macros' "$DEST/config-common.h"; then
+	cat >> "$DEST/config-common.h" <<'EOF'
 
 /* APExp: snippet macros.
    gnulib normally splices arg-nonnull.h and warn-on-use.h into its
@@ -159,14 +183,14 @@ EOF
 		     p { print }
 		     /__scanf__, formatstring_parameter, first_argument/ { if (p) exit }' \
 			"$DEST/stdio.in.h"
-	} >> "$DEST/config.h"
+	} >> "$DEST/config-common.h"
 	# libap implements the musl <stdio_ext.h> accessors, so let
 	# freadahead.h, fseterr.h and fwriting.h take their "musl libc"
 	# branch. Otherwise each falls through to a per-platform #elif chain
 	# that selects its Plan 9 case on EPLAN9 and reads fp->state, fp->rp
 	# and fp->wp from the old APE FILE. APExp's FILE is musl's, so those
 	# members do not exist and the compile fails.
-	cat >> "$DEST/config.h" <<'EOF'
+	cat >> "$DEST/config-common.h" <<'EOF'
 
 /* APExp: libap implements the musl <stdio_ext.h> accessors. */
 #define HAVE___FREADAHEAD 1
@@ -178,7 +202,7 @@ EOF
 	# inline; strnul.c only emits the out-of-line copy of that inline, so
 	# both vanish with the header. time_rz.c is the only compiled module
 	# that calls it. gnulib documents it as s + strlen (s).
-	cat >> "$DEST/config.h" <<'EOF'
+	cat >> "$DEST/config-common.h" <<'EOF'
 
 /* APExp: strnul, normally declared in the generated string.h. */
 #ifndef strnul
@@ -197,4 +221,4 @@ echo
 echo "config.h came from the first tree in TREES that had one (coreutils)."
 echo "Modules imported from an older tree were written against that tree's"
 echo "config.h; if one fails to build, add the HAVE_* it wants to"
-echo "$DEST/config.h rather than reintroducing a per-package gnulib."
+echo "$DEST/config-common.h rather than reintroducing a per-package gnulib."

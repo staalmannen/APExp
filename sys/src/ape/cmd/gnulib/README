@@ -19,9 +19,10 @@ newest first:
     > patch (2025) > gtar (2023) > gsed (2022) > bison (2021)
 
 coreutils is the base -- it has the newest gnulib and the widest module
-coverage -- so it supplies config.h and decides the header set that
-everything compiles against. Later trees only fill in modules coreutils
-does not ship (bitset, fstrcmp, timevar, spawn-pipe and friends).
+coverage -- so it supplies config-common.h and decides the header set
+that everything compiles against. Later trees only fill in modules
+coreutils does not ship (bitset, fstrcmp, timevar, spawn-pipe and
+friends).
 
 This replaced an arrangement where each package compiled its own gnulib
 objects and appended them to a shared archive with 'ar vu'. Which copy of
@@ -29,8 +30,40 @@ a module ended up in the archive then depended on build order, and stale
 members outlived the lists that put them there.
 
 
-Two rules for anyone editing the OFILES list
+config-common.h and the per-package config.h
 --------------------------------------------
+
+The shared tree holds config-common.h, not config.h: the platform half
+of the answers, meaning the HAVE_* probes, the type sizes and the APExp
+additions appended by import.sh.
+
+Package identity is deliberately not in it. The file began as coreutils'
+config.h, so it said PACKAGE "coreutils" and VERSION "9.11", and bison's
+src reads VERSION, PACKAGE_STRING, PACKAGE_URL and PACKAGE_BUGREPORT for
+its --version output. Left alone, bison compiled and linked cleanly and
+then introduced itself as GNU coreutils 9.11. import.sh comments those
+nine macros out.
+
+So every build directory that links libgnu.a has its own small config.h:
+
+    #include <config-common.h>
+    #define PACKAGE       "bison"
+    #define PACKAGE_STRING "GNU Bison 3.8"
+    ...
+
+found through -I. while config-common.h is found through -I$GNUSRC.
+That is why the shared file was renamed: under the name config.h it
+would shadow every one of them. This directory has such a config.h too,
+holding no identity, because gnulib's own sources all open with
+#include <config.h>.
+
+The package's own config.h in its source tree stays unused. Those
+predate the 2026 gnulib being linked, so their platform answers no
+longer describe the objects.
+
+
+Four rules for editing any of this
+----------------------------------
 
 1. Never add a module that libap already provides.
 
@@ -47,43 +80,17 @@ Two rules for anyone editing the OFILES list
 
    Already provided by libap, do not add: obstack, exitfail, the musl
    <stdio_ext.h> accessors behind freadahead, fseterr and fwriting, and
-   the whole x*alloc family -- xmalloc, xalloc-die, xreallocarray, xnmalloc,
-   xnrealloc, xcharalloc, xzalloc, x2realloc, x2nrealloc, xpalloc and the
-   idx_t variants (ximalloc, xirealloc, xicalloc, xizalloc, ximemdup,
-   ximemdup0).
+   the whole x*alloc family -- xmalloc, xalloc-die, xreallocarray,
+   xnmalloc, xnrealloc, xcharalloc, xzalloc, x2realloc, x2nrealloc,
+   xpalloc and the idx_t variants (ximalloc, xirealloc, xicalloc,
+   xizalloc, ximemdup, ximemdup0).
 
-4. Each package needs its own config.h and a specific -I order.
+2. Do not let a package rebuild a module that lives here.
 
-   This library is built with coreutils' config.h, which answers the
-   platform questions for everyone. It cannot answer package identity:
-   it says PACKAGE "coreutils" and VERSION "9.11". bison's src reads
-   VERSION, PACKAGE_STRING, PACKAGE_URL and PACKAGE_BUGREPORT for its
-   --version output, so on the shared file alone bison introduces itself
-   as GNU coreutils 9.11.
-
-   So give each package a config.h in its build directory that includes
-   the shared one by relative path and then overrides the identity
-   macros. Include it by path, not as <config.h>, which would find the
-   package's own file again through -I. and recurse. See bison's.
-
-   The include order that follows from this, in full:
-
-       -I.               the package's config.h
-       -I<pkg>/src       the package's own headers, which can share a
-                         name with a gnulib one. bison/src/configmake.h
-                         is hand-edited to give PKGDATADIR
-                         "/sys/lib/ape"; the gnulib configmake.h has no
-                         PKGDATADIR, so getting the wrong one is a
-                         compile error.
-       -I<gnulib>        shared module headers, ahead of the package's
-                         own copies, so declarations match the objects
-                         in libgnu.a. bison alone shares 203 header
-                         names with this tree.
-       -I<pkg>/lib       last, for headers only the package provides.
-
-   Getting the third and fourth the wrong way round fails at link time
-   with a missing symbol rather than at compile time, which makes it
-   look unrelated to headers.
+   The same duplicate-symbol trap applies to a package's own private
+   archive. diff's libdiff.a and sed's libsed.a existed only to hold
+   version-etc and progname, which this library now supplies, so both
+   were removed outright.
 
 3. Watch for gnulib module renames when merging OFILES lists.
 
@@ -105,12 +112,29 @@ Two rules for anyone editing the OFILES list
    Adding a module means checking that nothing already in OFILES defines
    its symbols under another file name.
 
-2. Do not let a package rebuild a module that lives here.
+4. Keep the -I order right in each package's mkfile.
 
-   The same duplicate-symbol trap applies to a package's own private
-   archive. diff's libdiff.a and sed's libsed.a existed only to hold
-   version-etc and progname, which this library now supplies, so both
-   were removed outright.
+       -I.               the package's own config.h
+       -I<pkg>/src       only where the package has a header whose name
+                         collides with one here. bison is the sole case:
+                         bison/src/configmake.h is hand-edited to give
+                         PKGDATADIR "/sys/lib/ape", and the gnulib
+                         configmake.h has no PKGDATADIR at all, so
+                         getting the wrong one is a compile error.
+       -I$GNUSRC         the shared tree, ahead of the package's own copies
+                         of the same module headers, so declarations match
+                         the objects in libgnu.a. bison alone shares 203
+                         header names with this tree.
+       -I<pkg>/lib       last, for headers only the package provides.
+
+   Getting the last two the wrong way round fails at link time with a
+   missing symbol rather than at compile time, so it does not look like a
+   header problem. bison hit it as
+
+       _convM2D: is_basic_table: not defined
+
+   because bison's 2021 mbchar.h has an inline reading is_basic_table[],
+   a table the 2026 mbchar.c no longer defines.
 
 The mkfile deletes libgnu.a before re-archiving rather than using
 'ar vu' in place, so dropping a module from OFILES actually removes it.
