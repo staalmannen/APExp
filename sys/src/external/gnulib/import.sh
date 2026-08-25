@@ -137,6 +137,16 @@ if [ -f "$DEST/config-common.h" ]; then
 	echo "neutralised coreutils ARGMATCH_DIE in config.h"
 fi
 
+# libap implements vasnprintf and asnprintf with gnulib's signature, so
+# the vasnprintf module is not in OFILES. Left at 1, vasnprintf.h renames
+# both to rpl_* and nothing defines them.
+if [ -f "$DEST/config-common.h" ]; then
+	sed -i.bak 's|^#define REPLACE_VASNPRINTF 1|/* #undef REPLACE_VASNPRINTF */|' \
+		"$DEST/config-common.h"
+	rm -f "$DEST/config-common.h.bak"
+	echo "turned off REPLACE_VASNPRINTF in config-common.h"
+fi
+
 # Make the snippet macros reachable from config.h.
 #
 # gnulib keeps _GL_ARG_NONNULL and _GL_WARN_ON_USE in standalone snippet

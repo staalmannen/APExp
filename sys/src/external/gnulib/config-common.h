@@ -4022,7 +4022,14 @@
 /* #undef REPLACE_STRERROR_0 */
 
 /* Define if vasnprintf exists but is overridden by gnulib. */
-#define REPLACE_VASNPRINTF 1
+/* APExp: libap implements vasnprintf and asnprintf, in
+   sys/src/ape/lib/ap/stdio/asnprintf.c, with exactly gnulib's
+   signature and declared in APE's <stdio.h>. Leaving this at 1 makes
+   vasnprintf.h rename both to rpl_*, and since the vasnprintf module
+   is deliberately not in OFILES nothing defines them:
+     fprintf_if: undefined: rpl_vasnprintf
+   Turning it off lets callers bind to libap's. */
+/* #undef REPLACE_VASNPRINTF */
 
 /* Define to 1 if setlocale (LC_ALL, NULL) is thread-safe. */
 #define SETLOCALE_NULL_ALL_MTSAFE 0
