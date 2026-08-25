@@ -97,6 +97,38 @@ if [ -d "$DEST/sys" ]; then
 fi
 echo "pruned $pruned replacement system headers"
 
+# Make the snippet macros reachable from config.h.
+#
+# gnulib keeps _GL_ARG_NONNULL and _GL_WARN_ON_USE in standalone snippet
+# files and has autoconf splice their text into each generated
+# replacement header. The deleted stdio.h alone carried 91 uses of
+# _GL_ARG_NONNULL along with the definition. With those headers gone the
+# macros vanish, and a module header such as stdio-safer.h that says
+#
+#   FILE *fopen_safer (char const *, char const *) _GL_ARG_NONNULL ((1, 2))
+#
+# reaches the compiler with _GL_ARG_NONNULL still an unknown identifier,
+# which is a syntax error rather than a missing-header one.
+#
+# Both snippets are self-guarded and free of unsubstituted @PLACEHOLDER@
+# text, so they can simply be included. Every gnulib source includes
+# config.h first, so pulling them in from there covers all of them.
+#
+# c++defs.h is deliberately not included: it still has @PLACEHOLDER@ text
+# and only matters for the C++ aliasing that this build does not use.
+if [ -f "$DEST/config.h" ] && ! grep -q 'APExp: snippet macros' "$DEST/config.h"; then
+	cat >> "$DEST/config.h" <<'EOF'
+
+/* APExp: snippet macros.
+   gnulib normally splices arg-nonnull.h and warn-on-use.h into its
+   generated replacement headers. Those headers are removed here because
+   they shadow APE's, so include the snippets directly instead. */
+#include "arg-nonnull.h"
+#include "warn-on-use.h"
+EOF
+	echo "appended snippet includes to config.h"
+fi
+
 echo "---"
 echo "imported $copied files into $DEST ($skipped already present, newer copy kept)"
 echo
