@@ -1,5 +1,4 @@
-APE=../../../ape
-<$APE/config
+</$objtype/mkfile
 APEXPROOT=../../../../..
 
 # One shared libgnu.a for every GNU package that needs gnulib.
@@ -170,7 +169,7 @@ UNRPL=-Drpl_readlink=readlink -Drpl_lseek=lseek -Drpl_open=open\
 CFLAGS=-c -B -I. -I$GNUSRC -DHAVE_CONFIG_H\
 	-D_POSIX_SOURCE -D_BSD_EXTENSION -D__USE_GNU\
 	-D_REGEX_LARGE_OFFSETS -DREGEX_MALLOC -DO_BINARY=0\
-	-DSETLOCALE_NULL_MAX=(256+1)\
+	-DSETLOCALE_NULL_MAX=257\
 	-DLOCALEDIR="/sys/lib/ape/locale" $UNRPL
 
 # No two modules share a basename across these directories, so the
@@ -204,7 +203,7 @@ $LIB:	$OFILES
 	rm -f $LIB
 	ar vu $LIB $OFILES
 
-# Rebuilding from scratch matters here: 'ar vu' only ever appends, so a
+# Rebuilding from scratch matters here. 'ar vu' only ever appends, so a
 # member dropped from OFILES survives in a stale archive and keeps
 # breaking the link. Always remove the archive, never update in place.
 clean:V:
