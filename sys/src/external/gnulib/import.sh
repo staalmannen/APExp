@@ -37,8 +37,10 @@ for t in $TREES; do
 	src=$EXT/$t
 	[ -d "$src" ] || { echo "skip (absent): $t"; continue; }
 	n=0
-	# .c and .h only: no Makefiles, no .in.h templates that need autoconf
-	for f in $(cd "$src" && find . -name '*.c' -o -name '*.h' -o -name 'config.h'); do
+	# Sources and headers, plus the .def fragments some headers #include
+	# textually: timevar.h expands timevar.def to build its enum and its
+	# name table. No Makefiles, no .in.h templates that need autoconf.
+	for f in $(cd "$src" && find . -name '*.c' -o -name '*.h' -o -name '*.def'); do
 		d=$DEST/$(dirname "$f")
 		if [ -e "$DEST/$f" ]; then
 			skipped=$((skipped + 1))
