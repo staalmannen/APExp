@@ -5780,3 +5780,22 @@
 #define HAVE___FSETERR 1
 #define HAVE___FWRITING 1
 #define HAVE___FREADING 1
+
+/* APExp: strnul.
+   gnulib declares strnul in its generated string.h, as a macro over the
+   inline _gl_strnul, and that wrapper is deleted here for shadowing
+   APE's <string.h>. strnul.c is no help: it exists only to emit the
+   out-of-line copy of that same inline, so it compiles to nothing once
+   the header is gone. time_rz.c is the only compiled module that calls
+   strnul, and without a definition it got the implicit int return:
+
+     time_rz.c:149 incompatible types: "IND CHAR" and "INT" for op "AS"
+
+   gnulib documents strnul (s) as equivalent to s + strlen (s). Kept as a
+   macro rather than a function so the result stays const-correct for a
+   const argument, which is what gnulib's _Generic version achieves.
+   Note it evaluates s twice; every current caller passes a plain
+   variable. */
+#ifndef strnul
+# define strnul(s) ((s) + strlen (s))
+#endif

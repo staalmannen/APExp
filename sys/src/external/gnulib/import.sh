@@ -158,6 +158,17 @@ EOF
 #define HAVE___FWRITING 1
 #define HAVE___FREADING 1
 EOF
+	# strnul is declared in the generated string.h as a macro over an
+	# inline; strnul.c only emits the out-of-line copy of that inline, so
+	# both vanish with the header. time_rz.c is the only compiled module
+	# that calls it. gnulib documents it as s + strlen (s).
+	cat >> "$DEST/config.h" <<'EOF'
+
+/* APExp: strnul, normally declared in the generated string.h. */
+#ifndef strnul
+# define strnul(s) ((s) + strlen (s))
+#endif
+EOF
 	echo "appended snippet includes and format attributes to config.h"
 fi
 
