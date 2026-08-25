@@ -10,20 +10,24 @@ TARG=\
 
 LIB= ../gnulib/libgnu.a$O
 
+# version.$O is not version-etc.$O. The first carries this package's
+# version string, the second is the shared gnulib module that prints it.
 CMPO=\
-	cmp.$O system.$O version-etc.$O
+	cmp.$O system.$O version.$O version-etc.$O
 
 DIFFO=\
 	analyze.$O context.$O diff.$O \
 	dir.$O ed.$O ifdef.$O io.$O \
 	normal.$O side.$O system.$O \
-	util.$O version-etc.$O
+	util.$O version.$O version-etc.$O
 
 DIFF3O=\
-	diff3.$O system.$O version-etc.$O
+	diff3.$O system.$O version.$O version-etc.$O
 
 SDIFFO=\
-	sdiff.$O system.$O version-etc.$O
+	sdiff.$O system.$O version.$O version-etc.$O
+
+CLEANFILES=version.c
 
 BIN=$APEXPROOT/$objtype/bin/ape
 
@@ -84,4 +88,32 @@ $O.sdiff: $SDIFFO $LIB
 # copy in this package's own lib is older.
 version-etc.$O: $GNUSRC/version-etc.c
 	$CC $CFLAGS $GNUSRC/version-etc.c
+
+# src/version.c is generated, not shipped. diffutils' Makefile.am writes
+# it at build time:
+#
+#   printf 'char const *Version = "$(PACKAGE_VERSION)";\n' >> $@t
+#
+# so the source tree has only the matching version.h, and Version came
+# out undefined at link time:
+#
+#   _convM2D: Version: not defined
+#
+# (the name before the colon is whichever text symbol the linker last
+# saw, not the referrer.)
+#
+# Written here rather than into the external tree, as bash's generated
+# builtins are, so the source stays clean. PACKAGE_VERSION comes from
+# this directory's config.h instead of being repeated in the recipe,
+# which keeps one copy of the number; upstream spells the literal only
+# because autoconf substitutes it.
+version.c:
+	echo '#include <config.h>' >version.c
+	echo '#include <version.h>' >>version.c
+	echo 'char const *Version = PACKAGE_VERSION;' >>version.c
+
+# An explicit rule: the $DIFFSRC/src pattern rule below would otherwise
+# be chosen and look for a version.c that is not there.
+version.$O: version.c
+	$CC $CFLAGS version.c
 

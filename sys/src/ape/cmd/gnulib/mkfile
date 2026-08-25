@@ -80,6 +80,7 @@ OFILES=\
 	gl_linkedhash_list.$O\
 	gl_rbtree_oset.$O\
 	gl_rbtreehash_list.$O\
+	hard-locale.$O\
 	hash.$O\
 	hashcode-named-file.$O\
 	hashcode-string1.$O\
@@ -119,6 +120,9 @@ OFILES=\
 	same-inode.$O\
 	secure_getenv.$O\
 	set-permissions.$O\
+	setlocale-lock.$O\
+	setlocale_null.$O\
+	setlocale_null-unlocked.$O\
 	sigsegv.$O\
 	spawn-pipe.$O\
 	stat-time.$O\
