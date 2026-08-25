@@ -163,8 +163,25 @@ CPPFLAGS =\
 	-D_XOPEN_SOURCE=700 \
 	-D_FILE_OFFSET_BITS=64
 
+# -I$SBASESRC/../gnulib is deliberately absent. It named a directory that
+# did not exist until the gnulib consolidation created it, so it had been
+# a dangling -I doing nothing. Now it resolves, and the one filename the
+# two trees share is regex.h, which sbase reaches through util.h:
+#
+#   gnulib/regex.h:420 unnamed structure element must be struct/union
+#
+# sbase must use APE's <regex.h>: it links libutil.a and libap.a and
+# nothing else, so regcomp/regexec come from libap, and gnulib's
+# struct re_pattern_buffer is not libap's. Compiling against one layout
+# and calling into the other would have been the quieter failure.
+#
+# The layouts differ twice over. gnulib's regex.h picks its field types
+# on _REGEX_LARGE_OFFSETS, which config-common.h defines -- so every
+# package that includes a config.h agrees with libgnu.a. sbase has no
+# config.h, so it would have taken the other branch and disagreed with
+# both.
 SBASE_CFLAGS=-c $CPPFLAGS -I$SBASESRC -I$SBASESRC/libutil\
-	-I$SBASESRC/../gnulib -D_POSIX_SOURCE -D_BSD_EXTENSION \
+	-D_POSIX_SOURCE -D_BSD_EXTENSION \
 	-D_LIMITS_EXTENSION -D_RESEARCH_SOURCE
 
 libutil.a$O: $UTIL_OBJS
