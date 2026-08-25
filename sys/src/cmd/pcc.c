@@ -209,13 +209,40 @@ main(int argc, char *argv[])
 	}
 	if(objs.n == 0)
 		fatal("no files to compile or load");
+	/*
+	 * -g asks for debugging output, which now means ELF64 with DWARF
+	 * straight from the linker. It used to mean something else: the
+	 * compiler wrote a .dwtypes type-info sidecar per object and a
+	 * post-link pass, dw2elf, folded a.out plus sidecars into ELF64.
+	 * dw2elf was removed once the linkers could emit ELF themselves,
+	 * but pcc kept exec'ing it, so -g failed outright.
+	 *
+	 * Only 6l reads -H5 as ELF64. Every other linker already had a
+	 * meaning for that number -- ipaq on 5l, sgi elf on vl, blue gene
+	 * on ql -- and each wants -T and -R values to go with it, so it
+	 * cannot be passed blindly. 5l and 7l spell elf -H7. Say so
+	 * rather than emitting a wrong-format binary.
+	 */
+	if(gflag && !cflag) {
+		if(strcmp(ot->ld, "6l") == 0)
+			append(&ldargs, "-H5");
+		else
+			fprint(2, "cc: -g: no ELF output for %s; "
+				"linking normally\n", ot->name);
+	}
 	ccpath = smprint("/bin/%s", ot->cc);
 	append(&cpp, smprint("-I/%s/include/ape", ot->name));
 	append(&cpp, "-I/sys/include/ape");
 	cppn = cpp.n;
 	ccn = cc.n;
-	if(gflag)
-		putenv("_DWTYPES", "1");
+	/*
+	 * _DWTYPES used to be set here and cleared after the loop. It told
+	 * cc/dwtypes.c to write a .dwtypes type-info sidecar beside each
+	 * object, which only dw2elf ever read. With dw2elf gone the
+	 * sidecars had no reader, so setting it only littered the build
+	 * directory. cc/dwtypes.c is left in place: reviving the sidecar
+	 * means restoring these two putenv calls and a consumer.
+	 */
 	for(i = 0; i < srcs.n; i++) {
 		append(&cpp, srcs.strings[i]);
 		if(Eflag)
@@ -235,10 +262,7 @@ main(int argc, char *argv[])
 		cpp.n = cppn;
 		cc.n = ccn;
 	}
-	if(gflag)
-		putenv("_DWTYPES", "");
 	if(!cflag) {
-		List dw2elf_cmd;
 		append(&ld, "-o");
 		append(&ld, oname);
 		for(i = 0; i < ldargs.n; i++)
@@ -249,18 +273,6 @@ main(int argc, char *argv[])
 		doexec(smprint("/bin/%s", ot->ld), &ld);
 		if(objs.n == 1 && strcmp(objext, "o") == 0)
 			remove(objs.strings[0]);	/* cc mode only: clean up .o intermediate */
-		if(gflag) {
-			/* post-link: convert a.out + .dwtypes sidecars to ELF64 */
-			memset(&dw2elf_cmd, 0, sizeof dw2elf_cmd);
-			append(&dw2elf_cmd, "dw2elf");
-			append(&dw2elf_cmd, "-o");
-			append(&dw2elf_cmd, smprint("%s.elf", oname));
-			append(&dw2elf_cmd, oname);
-			for(i = 0; i < srcs.n; i++)
-				append(&dw2elf_cmd,
-				       changeext(srcs.strings[i], "dwtypes"));
-			doexec("/bin/dw2elf", &dw2elf_cmd);
-		}
 	}
 
 	exits(0);

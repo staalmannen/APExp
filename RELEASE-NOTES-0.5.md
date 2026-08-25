@@ -218,8 +218,10 @@ bison, sed, m4 and grep now build against the shared archive.
   tree stays clean and there is no bootstrap dependency on `gmake`.
 - `mount-include` now binds the local `$cputype/bin` over `/bin`, so a
   rebuild uses APExp's own compilers rather than the host's.
-- ELF64 output with DWARF from the linkers (`-H5`), with `mkelf` and
-  `mkelves` build templates.
+- ELF64 output with DWARF from the linker. `pcc -g` now asks `6l` for it
+  directly with `-H5`; `mkelf` and `mkelves` are build templates for the
+  same thing. The old route — a `.dwtypes` sidecar per object plus a
+  `dw2elf` post-link pass — is gone.
 - Assorted `mk` fixes, including `clean` rules that used to stop a
   `mk clean` at the repository root.
 
@@ -246,9 +248,10 @@ bison, sed, m4 and grep now build against the shared archive.
 - `_Alignas` is accepted as a query (`_Alignof` works) but has no layout
   effect in declarations.
 - `_Atomic` is dropped as a qualifier; there is no full `<stdatomic.h>`.
-- **`pcc -g` is broken.** It execs `/bin/dw2elf`, which was removed from
-  the tree when the linkers gained native ELF64 output. Use
-  `-Wl,-H5` (or the `mkelf` template) for ELF and DWARF instead.
+- **`pcc -g` produces ELF only on amd64.** `-H5` means ELF64 to `6l`
+  alone; on the other linkers that number already meant something else
+  (ipaq on `5l`, sgi elf on `vl`, blue gene on `ql`), so `-g` elsewhere
+  links normally and says so.
 - Testing has been primarily on amd64. The other ten architectures build
   but have had much less exercise.
 
