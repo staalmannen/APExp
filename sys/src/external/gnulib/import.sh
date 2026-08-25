@@ -108,6 +108,22 @@ if [ -d "$DEST/sys" ]; then
 fi
 echo "pruned $pruned replacement system headers"
 
+# Generate fts_.h from the newest fts.in.h.
+#
+# fts.c includes "fts_.h", but newer gnulib ships only the fts.in.h
+# template and generates that header. coreutils supplies fts.c and
+# fts.in.h; ggrep still carries a pre-generated fts_.h, so the copy loop
+# takes fts.c from coreutils and fts_.h from ggrep -- a 2026 source
+# against a 2025 header:
+#   fts.c:1023 name not declared: FTS_MOUNT
+# @HAVE_SYS_CDEFS_H@ is the only substitution the template needs, and APE
+# does have <sys/cdefs.h>. The @(#) left behind is an SCCS id in a
+# comment, not a placeholder.
+if [ -f "$DEST/fts.in.h" ]; then
+	sed 's|@HAVE_SYS_CDEFS_H@|1|g' "$DEST/fts.in.h" > "$DEST/fts_.h"
+	echo "generated fts_.h from fts.in.h"
+fi
+
 # Strip package identity from the shared file. It began as coreutils'
 # config.h, so it says PACKAGE "coreutils" and VERSION "9.11". bison
 # reads VERSION and PACKAGE_STRING for its --version output and would
