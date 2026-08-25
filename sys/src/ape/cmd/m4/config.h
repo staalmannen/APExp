@@ -23,3 +23,10 @@
 #define VERSION              "1.4.21"
 #define PACKAGE_BUGREPORT    "bug-m4@gnu.org"
 #define PACKAGE_URL          "https://www.gnu.org/software/m4/"
+
+/* m4-specific, absent from coreutils' config.h.
+   SYSCMD_SHELL is the shell m4 hands to execute() for syscmd and esyscmd.
+   RENAME_OPEN_FILE_WORKS says rename(2) may be used on an open file,
+   which holds on Plan 9. Both as m4's own config.h had them. */
+#define SYSCMD_SHELL "/bin/sh"
+#define RENAME_OPEN_FILE_WORKS 1
