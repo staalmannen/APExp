@@ -206,7 +206,22 @@ typedef _uintptr_t uintptr_t;
 #define SIZE_WIDTH	32
 #endif
 
-#define WCHAR_WIDTH	16
+/*
+ * wchar_t is 32 bits and equals Rune; see the note in <stddef.h>. This
+ * said 16 while <wchar.h> said WCHAR_MAX was Runemax, 0x10FFFF.
+ *
+ * C99 7.18.3 puts WCHAR_MIN and WCHAR_MAX in this header as well as in
+ * <wchar.h>, and gnulib reads them from here. Spelled numerically because
+ * Runemax comes from <utf.h>, which this header does not pull in; the
+ * guards let the two headers agree in either include order.
+ */
+#define WCHAR_WIDTH	32
+#ifndef WCHAR_MIN
+#define WCHAR_MIN	0
+#endif
+#ifndef WCHAR_MAX
+#define WCHAR_MAX	0x10FFFF
+#endif
 #define WINT_WIDTH	32
 #define SIG_ATOMIC_WIDTH	32
 

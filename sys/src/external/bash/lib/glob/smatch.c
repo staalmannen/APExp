@@ -479,7 +479,7 @@ is_wcclass (wint_t wc, wchar_t *name)
 
   want_word = (wcscmp (name, L"word") == 0);
   if (want_word)
-    name = (unsigned short *) L"alnum";
+    name = L"alnum";	/* was cast to unsigned short *, for a 16-bit wchar_t */
 
   memset (&state, '\0', sizeof (mbstate_t));
   mbs = (char *) malloc (wcslen(name) * MB_CUR_MAX + 1);
