@@ -17,6 +17,7 @@ OFILES=\
 	sleep.$O\
 	time.$O\
 	times.$O\
+	timespec_get.$O\
 	tzset.$O\
 # musl\
 	__map_file.$O\

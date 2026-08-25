@@ -34,6 +34,10 @@ struct timespec {
 
 #define TIMER_ABSTIME 1
 
+/* C11 7.27.1: the time base for timespec_get. TIME_UTC is the only one
+   the standard defines, and the only one implemented here. */
+#define TIME_UTC 1
+
 #ifndef _TIMER_T
 #define _TIMER_T
 typedef void* timer_t;
@@ -81,6 +85,7 @@ extern size_t strftime(char *, size_t, const char *, const struct tm *);
 extern int clock_gettime(clockid_t, struct timespec *);
 extern int clock_settime(clockid_t, struct timespec *);
 extern int clock_getres(clockid_t, struct timespec *);
+extern int timespec_get(struct timespec *, int);
 
 extern struct tm *gmtime_r(const time_t *, struct tm *);
 extern struct tm *localtime_r(const time_t *, struct tm *);
