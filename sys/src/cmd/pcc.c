@@ -121,7 +121,6 @@ main(int argc, char *argv[])
 			break;
 		case 'N':
 		case 'T':
-		case 'p':
 		case 'w':
 		case 'F':
 			append(&cc, smprint("-%c", ARGC()));
@@ -131,6 +130,24 @@ main(int argc, char *argv[])
 			Aflag = 1;
 			break;
 		case 'O':
+			break;
+		/*
+		 * -p asks the compiler to preprocess with the ANSI cpp
+		 * rather than its built-in one. That is already what we
+		 * do -- see the dopipe() below, which runs /bin/cpp and
+		 * feeds the compiler on stdin -- so the request is
+		 * satisfied by accepting it and passing nothing on.
+		 *
+		 * Forwarding it was fatal. cc/lex.c under debug['p']
+		 * calls myaccess(file) before forking its own cpp, and
+		 * with input arriving on a pipe, file is the literal
+		 * string "stdin":
+		 *
+		 *   <eof> stdin does not exist
+		 *
+		 * make, patch and diff all carry -p in CFLAGS.
+		 */
+		case 'p':
 			break;
 		case 'W':
 			s = ARGF();
