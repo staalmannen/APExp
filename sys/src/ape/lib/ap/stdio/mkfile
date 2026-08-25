@@ -87,6 +87,7 @@ OFILES=\
 # GNU extensions\
 	asnprintf.$O\
 	_fpending.$O\
+	stdio_ext.$O\
 	error.$O\
 
 

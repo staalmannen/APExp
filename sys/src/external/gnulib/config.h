@@ -5769,3 +5769,14 @@
 
 /* The definition of _GL_ARG_NONNULL is copied here.  */
 
+
+/* APExp: libap implements the musl <stdio_ext.h> accessors, so let
+   freadahead.h, fseterr.h and fwriting.h take their "musl libc" branch
+   and forward to them. Otherwise each falls through to a per-platform
+   #elif chain that selects its Plan 9 case on EPLAN9 and reads
+   fp->state, fp->rp and fp->wp from the old APE FILE. APExp's FILE is
+   musl's, so those members no longer exist. */
+#define HAVE___FREADAHEAD 1
+#define HAVE___FSETERR 1
+#define HAVE___FWRITING 1
+#define HAVE___FREADING 1
