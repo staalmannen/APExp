@@ -15,8 +15,13 @@
  * every #include <config.h> in this tree still resolves.
  */
 
-#define LOCALEDIR "/sys/lib/ape/locale"
-
+/* APExp: LOCALEDIR.
+   gnulib, bison and sed pass -DLOCALEDIR in their mkfiles; m4, diff and
+   patch pass none, and m4 needs it to compile. Guarded so a command-line
+   -D still wins rather than colliding with this. */
+#ifndef LOCALEDIR
+# define LOCALEDIR "/sys/lib/ape/locale"
+#endif
 
 /* lib/config.h.  Generated from config.hin by configure.  */
 /* lib/config.hin.  Generated from configure.ac by autoheader.  */
@@ -391,7 +396,9 @@
 
 /* Define to the directory where to find the localizations of the translation
    domain 'gnulib', as a C string. */
-#define GNULIB_LOCALEDIR "/usr/local/share/locale"
+/* APExp: was "/usr/local/share/locale", the path on whatever host ran
+   coreutils' configure. */
+#define GNULIB_LOCALEDIR "/sys/lib/ape/locale"
 
 /* Define to a C preprocessor expression that evaluates to 1 or 0, depending
    whether the gnulib module lock shall be considered present. */
@@ -2233,7 +2240,20 @@
 /* #undef HAVE_HURD_H */
 
 /* Define if you have the iconv() function and it works. */
-#define HAVE_ICONV 1
+/* APExp: APE declares iconv_open in <iconv.h> but nothing implements
+   it -- cmd/iconv builds only the tool, and neither libap nor
+   libintl provides the function. coreutils probed a host that had
+   it, so this said 1. Left that way, propername.c compiles its
+   HAVE_ICONV branch and calls xstr_iconv, which is why m4 failed to
+   link:
+     proper_name_utf8: undefined: xstr_iconv
+   Pulling in xstriconv.c and striconv.c would only move the failure
+   to iconv_open. With this off, proper_name_utf8 falls back to the
+   ASCII spelling of the name, so m4 --version prints "Rene' Seindal"
+   rather than "Rene\u0301 Seindal". HAVE_ICONV_H stays 1: the header
+   does exist, and code that includes it while guarding calls on
+   HAVE_ICONV is fine. */
+/* #undef HAVE_ICONV */
 
 /* Define to 1 if you have the <iconv.h> header file. */
 #define HAVE_ICONV_H 1

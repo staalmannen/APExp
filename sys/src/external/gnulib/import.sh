@@ -147,6 +147,24 @@ if [ -f "$DEST/config-common.h" ]; then
 	echo "turned off REPLACE_VASNPRINTF in config-common.h"
 fi
 
+# APE declares iconv_open in <iconv.h> but nothing implements it, so
+# propername.c must not take its HAVE_ICONV branch. coreutils probed a
+# host that had iconv. HAVE_ICONV_H is left at 1; the header does exist.
+if [ -f "$DEST/config-common.h" ]; then
+	sed -i.bak 's|^#define HAVE_ICONV 1|/* #undef HAVE_ICONV */|' \
+		"$DEST/config-common.h"
+	rm -f "$DEST/config-common.h.bak"
+	echo "turned off HAVE_ICONV in config-common.h"
+fi
+
+# coreutils' configure recorded the locale path of whatever host it ran
+# on. Point it at APE's.
+if [ -f "$DEST/config-common.h" ]; then
+	sed -i.bak 's|^#define GNULIB_LOCALEDIR ".*"|#define GNULIB_LOCALEDIR "/sys/lib/ape/locale"|' \
+		"$DEST/config-common.h"
+	rm -f "$DEST/config-common.h.bak"
+fi
+
 # APE has <stdio_ext.h>, so let fwriting.h include it rather than calling
 # __fwriting with no declaration in scope.
 if [ -f "$DEST/config-common.h" ]; then
@@ -217,6 +235,12 @@ EOF
 #define HAVE___FREADING 1
 /* APE provides <stdio_ext.h>; fwriting.h gates its include on this. */
 #define HAVE_STDIO_EXT_H 1
+
+/* APExp: LOCALEDIR, for the packages whose mkfile does not pass -D.
+   Guarded so a command-line -D still wins. */
+#ifndef LOCALEDIR
+# define LOCALEDIR "/sys/lib/ape/locale"
+#endif
 EOF
 	# strnul is declared in the generated string.h as a macro over an
 	# inline; strnul.c only emits the out-of-line copy of that inline, so

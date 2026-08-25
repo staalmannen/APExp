@@ -89,6 +89,7 @@ OFILES=\
 	mempcpy.$O\
 	mkstemp-safer.$O\
 	next-prime.$O\
+	open-safer.$O\
 	parse-datetime.$O\
 	path-join.$O\
 	pipe-safer.$O\
