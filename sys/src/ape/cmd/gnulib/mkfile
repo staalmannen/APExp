@@ -118,6 +118,8 @@ OFILES=\
 	mkfifoat.$O\
 	modechange.$O\
 	mkstemp-safer.$O\
+	mini-gmp-gnulib.$O\
+	mini-mpq-gnulib.$O\
 	next-prime.$O\
 	nstrftime.$O\
 	open-safer.$O\

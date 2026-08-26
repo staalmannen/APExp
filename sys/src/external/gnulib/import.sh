@@ -124,6 +124,26 @@ if [ -f "$DEST/fts.in.h" ]; then
 	echo "generated fts_.h from fts.in.h"
 fi
 
+# Generate gmp.h, the wrapper over mini-gmp.
+#
+# coreutils' src/basenc.c and src/factor.c include <gmp.h> with no
+# guard. HAVE_GMP_H and HAVE_LIBGMP are both undefined here, so gnulib's
+# libgmp module answers with mini-gmp -- and gmp.h is not a template but
+# a file the Makefile writes, so nothing in the tarball carries it:
+#
+#   basenc.c:23 Could not find include file <gmp.h>
+#
+# Contents as coreutils' lib/gnulib.mk writes them, under
+# GL_GENERATE_MINI_GMP_H. The mini-mpq half is guarded by
+# GNULIB_LIBGMP_MPQ, which config-common.h sets.
+{
+	echo '#include "mini-gmp.h"'
+	echo '#if GNULIB_LIBGMP_MPQ'
+	echo '# include "mini-mpq.h"'
+	echo '#endif'
+} > "$DEST/gmp.h"
+echo "generated gmp.h as a mini-gmp wrapper"
+
 # Strip package identity from the shared file. It began as coreutils'
 # config.h, so it says PACKAGE "coreutils" and VERSION "9.11". bison
 # reads VERSION and PACKAGE_STRING for its --version output and would
