@@ -1,6 +1,6 @@
-/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
+/* DO NOT EDIT! GENERATED AUTOMATICALLY from se-selinux.in.h */
 /* Replacement <selinux/selinux.h> for platforms that lack it.
-   Copyright (C) 2008-2022 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -20,37 +20,41 @@
 #endif
 
 
-#if HAVE_SELINUX_SELINUX_H
+#if 0
 
-#include_next 
+#include_next <selinux/selinux.h>
 
 #else
 # if !defined _GL_SELINUX_SELINUX_H
 #  define _GL_SELINUX_SELINUX_H
 
-#  include <sys/types.h>
+/* This file uses _GL_INLINE_HEADER_BEGIN, _GL_INLINE, _GL_UNNAMED.  */
+#  if !_GL_CONFIG_H_INCLUDED
+#   error "Please include config.h first."
+#  endif
+
+#  include <sys/types.h> /* for mode_t */
 #  include <errno.h>
 
-#  ifndef _GL_INLINE_HEADER_BEGIN
-    #error "Please include config.h first."
-#  endif
 _GL_INLINE_HEADER_BEGIN
 #  ifndef SE_SELINUX_INLINE
 #   define SE_SELINUX_INLINE _GL_INLINE
 #  endif
 
-/* _GL_ATTRIBUTE_MAYBE_UNUSED declares that it is not a programming mistake if
-   the entity is not used.  The compiler should not warn if the entity is not
-   used.  */
-#  ifndef _GL_ATTRIBUTE_MAYBE_UNUSED
-#   if 0 /* no GCC or clang version supports this yet */
-#    define _GL_ATTRIBUTE_MAYBE_UNUSED [[__maybe_unused__]]
-#   elif defined __GNUC__ || defined __clang__
-#    define _GL_ATTRIBUTE_MAYBE_UNUSED __attribute__ ((__unused__))
+/* _GL_UNNAMED (ID) is the "name" of an unnamed function parameter.  */
+#  ifndef _GL_UNNAMED
+#   if ((defined __STDC_VERSION__ ? __STDC_VERSION__ : 0) < 202311 \
+        && !defined __cplusplus)
+#    define _GL_UNNAMED(id) unnamed_##id _GL_ATTRIBUTE_UNUSED
 #   else
-#    define _GL_ATTRIBUTE_MAYBE_UNUSED
+#    define _GL_UNNAMED(id)
 #   endif
 #  endif
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif
+
 
 #  if !GNULIB_defined_security_types
 
@@ -59,73 +63,108 @@ struct selinux_opt;
 #   define is_selinux_enabled() 0
 
 SE_SELINUX_INLINE int
-getcon (_GL_ATTRIBUTE_MAYBE_UNUSED char **con)
+getcon (char **_GL_UNNAMED (con))
+  { errno = ENOTSUP; return -1; }
+SE_SELINUX_INLINE int
+getcon_raw (char **_GL_UNNAMED (con))
   { errno = ENOTSUP; return -1; }
 SE_SELINUX_INLINE void
-freecon (_GL_ATTRIBUTE_MAYBE_UNUSED char *con) {}
+freecon (char *_GL_UNNAMED (con)) {}
 
 SE_SELINUX_INLINE int
-getfscreatecon (_GL_ATTRIBUTE_MAYBE_UNUSED char **con)
+getfscreatecon (char **_GL_UNNAMED (con))
   { errno = ENOTSUP; return -1; }
 SE_SELINUX_INLINE int
-setfscreatecon (_GL_ATTRIBUTE_MAYBE_UNUSED char const *con)
+getfscreatecon_raw (char **_GL_UNNAMED (con))
   { errno = ENOTSUP; return -1; }
 SE_SELINUX_INLINE int
-matchpathcon (_GL_ATTRIBUTE_MAYBE_UNUSED char const *file,
-              _GL_ATTRIBUTE_MAYBE_UNUSED mode_t m,
-              _GL_ATTRIBUTE_MAYBE_UNUSED char **con)
+setfscreatecon (char const *_GL_UNNAMED (con))
   { errno = ENOTSUP; return -1; }
 SE_SELINUX_INLINE int
-getfilecon (_GL_ATTRIBUTE_MAYBE_UNUSED char const *file,
-            _GL_ATTRIBUTE_MAYBE_UNUSED char **con)
+setfscreatecon_raw (char const *_GL_UNNAMED (con))
   { errno = ENOTSUP; return -1; }
 SE_SELINUX_INLINE int
-lgetfilecon (_GL_ATTRIBUTE_MAYBE_UNUSED char const *file,
-             _GL_ATTRIBUTE_MAYBE_UNUSED char **con)
+matchpathcon (char const *_GL_UNNAMED (file), mode_t _GL_UNNAMED (m),
+              char **_GL_UNNAMED (con))
   { errno = ENOTSUP; return -1; }
 SE_SELINUX_INLINE int
-fgetfilecon (int fd,_GL_ATTRIBUTE_MAYBE_UNUSED char **con)
+getfilecon (char const *_GL_UNNAMED (file), char **_GL_UNNAMED (con))
   { errno = ENOTSUP; return -1; }
 SE_SELINUX_INLINE int
-setfilecon (_GL_ATTRIBUTE_MAYBE_UNUSED char const *file,
-            _GL_ATTRIBUTE_MAYBE_UNUSED char const *con)
+getfilecon_raw (char const *_GL_UNNAMED (file), char **_GL_UNNAMED (con))
   { errno = ENOTSUP; return -1; }
 SE_SELINUX_INLINE int
-lsetfilecon (_GL_ATTRIBUTE_MAYBE_UNUSED char const *file,
-             _GL_ATTRIBUTE_MAYBE_UNUSED char const *con)
+lgetfilecon (char const *_GL_UNNAMED (file), char **_GL_UNNAMED (con))
   { errno = ENOTSUP; return -1; }
 SE_SELINUX_INLINE int
-fsetfilecon (_GL_ATTRIBUTE_MAYBE_UNUSED int fd,
-             _GL_ATTRIBUTE_MAYBE_UNUSED char const *con)
+lgetfilecon_raw (char const *_GL_UNNAMED (file), char **_GL_UNNAMED (con))
+  { errno = ENOTSUP; return -1; }
+SE_SELINUX_INLINE int
+fgetfilecon (int _GL_UNNAMED (fd), char **_GL_UNNAMED (con))
+  { errno = ENOTSUP; return -1; }
+SE_SELINUX_INLINE int
+fgetfilecon_raw (int _GL_UNNAMED (fd), char **_GL_UNNAMED (con))
+  { errno = ENOTSUP; return -1; }
+SE_SELINUX_INLINE int
+setfilecon (char const *_GL_UNNAMED (file), char const *_GL_UNNAMED (con))
+  { errno = ENOTSUP; return -1; }
+SE_SELINUX_INLINE int
+setfilecon_raw (char const *_GL_UNNAMED (file), char const *_GL_UNNAMED (con))
+  { errno = ENOTSUP; return -1; }
+SE_SELINUX_INLINE int
+lsetfilecon (char const *_GL_UNNAMED (file), char const *_GL_UNNAMED (con))
+  { errno = ENOTSUP; return -1; }
+SE_SELINUX_INLINE int
+lsetfilecon_raw (char const *_GL_UNNAMED (file), char const *_GL_UNNAMED (con))
+  { errno = ENOTSUP; return -1; }
+SE_SELINUX_INLINE int
+fsetfilecon (int _GL_UNNAMED (fd), char const *_GL_UNNAMED (con))
+  { errno = ENOTSUP; return -1; }
+SE_SELINUX_INLINE int
+fsetfilecon_raw (int _GL_UNNAMED (fd), char const *_GL_UNNAMED (con))
   { errno = ENOTSUP; return -1; }
 
 SE_SELINUX_INLINE int
-security_check_context (_GL_ATTRIBUTE_MAYBE_UNUSED char const *con)
+security_check_context (char const *_GL_UNNAMED (con))
   { errno = ENOTSUP; return -1; }
 SE_SELINUX_INLINE int
-security_check_context_raw (_GL_ATTRIBUTE_MAYBE_UNUSED char const *con)
+security_check_context_raw (char const *_GL_UNNAMED (con))
   { errno = ENOTSUP; return -1; }
 SE_SELINUX_INLINE int
-setexeccon (_GL_ATTRIBUTE_MAYBE_UNUSED char const *con)
+setexeccon (char const *_GL_UNNAMED (con))
   { errno = ENOTSUP; return -1; }
 SE_SELINUX_INLINE int
-security_compute_create (_GL_ATTRIBUTE_MAYBE_UNUSED char const *scon,
-                         _GL_ATTRIBUTE_MAYBE_UNUSED char const *tcon,
-                         _GL_ATTRIBUTE_MAYBE_UNUSED security_class_t tclass,
-                         _GL_ATTRIBUTE_MAYBE_UNUSED char **newcon)
+setexeccon_raw (char const *_GL_UNNAMED (con))
+  { errno = ENOTSUP; return -1; }
+SE_SELINUX_INLINE int
+security_compute_create (char const *_GL_UNNAMED (scon),
+                         char const *_GL_UNNAMED (tcon),
+                         security_class_t _GL_UNNAMED (tclass),
+                         char **_GL_UNNAMED (newcon))
+  { errno = ENOTSUP; return -1; }
+SE_SELINUX_INLINE int
+security_compute_create_raw (char const *_GL_UNNAMED (scon),
+                             char const *_GL_UNNAMED (tcon),
+                             security_class_t _GL_UNNAMED (tclass),
+                             char **_GL_UNNAMED (newcon))
   { errno = ENOTSUP; return -1; }
 SE_SELINUX_INLINE security_class_t
-string_to_security_class (char const *name)
+string_to_security_class (char const *_GL_UNNAMED (name))
   { errno = ENOTSUP; return 0; }
 SE_SELINUX_INLINE int
-matchpathcon_init_prefix (_GL_ATTRIBUTE_MAYBE_UNUSED char const *path,
-                          _GL_ATTRIBUTE_MAYBE_UNUSED char const *prefix)
+matchpathcon_init_prefix (char const *_GL_UNNAMED (path),
+                          char const *_GL_UNNAMED (prefix))
   { errno = ENOTSUP; return -1; }
 
 #   define GNULIB_defined_security_types 1
 #  endif
 
+
+#  ifdef __cplusplus
+}
+#  endif
+
 _GL_INLINE_HEADER_END
 
-# endif
+# endif /* _GL_SELINUX_SELINUX_H */
 #endif

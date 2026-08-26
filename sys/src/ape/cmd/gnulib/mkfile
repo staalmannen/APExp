@@ -73,6 +73,13 @@ GNUSRC=$APEXPROOT/sys/src/external/gnulib
 #                                     ever move here, build execute.c and
 #                                     spawn-pipe.c and let them use libap's
 #                                     posix_spawn -- do not build gnulib's.
+#   hash-triple-simple                The old name for hashcode-named-file:
+#                                     same triple_hash, triple_compare_ino_str
+#                                     and triple_free, and hash-triple.h is
+#                                     three lines that include
+#                                     hashcode-file.h and #warning that it
+#                                     is deprecated. Building both would
+#                                     define each of those twice.
 #   progreloc, relocatable            An artefact: safe-read.c defines
 #                                     safe_rw and renames it, so a scanner
 #                                     looking for safe_read finds only
@@ -180,6 +187,7 @@ OFILES=\
 	group-member.$O\
 	hard-locale.$O\
 	hash.$O\
+	hashcode-file-inode.$O\
 	hashcode-named-file.$O\
 	hashcode-string1.$O\
 	hashcode-string2.$O\

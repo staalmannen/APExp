@@ -1,6 +1,6 @@
-/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
+/* DO NOT EDIT! GENERATED AUTOMATICALLY from se-label.in.h */
 /* Replacement <selinux/label.h> for platforms that lack it.
-   Copyright 2020-2022 Free Software Foundation, Inc.
+   Copyright 2020-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -18,53 +18,68 @@
 /* Written by Paul Eggert.  */
 
 #ifndef SELINUX_LABEL_H
-
 #define SELINUX_LABEL_H
+
+/* This file uses _GL_INLINE_HEADER_BEGIN, _GL_INLINE, _GL_UNNAMED.  */
+#if !_GL_CONFIG_H_INCLUDED
+ #error "Please include config.h first."
+#endif
 
 #include <selinux/selinux.h>
 #include <errno.h>
 
-#ifndef _GL_INLINE_HEADER_BEGIN
- #error "Please include config.h first."
-#endif
 _GL_INLINE_HEADER_BEGIN
 #ifndef SE_LABEL_INLINE
 # define SE_LABEL_INLINE _GL_INLINE
 #endif
 
-/* _GL_ATTRIBUTE_MAYBE_UNUSED declares that it is not a programming mistake if
-   the entity is not used.  The compiler should not warn if the entity is not
-   used.  */
-#ifndef _GL_ATTRIBUTE_MAYBE_UNUSED
-# if 0 /* no GCC or clang version supports this yet */
-#  define _GL_ATTRIBUTE_MAYBE_UNUSED [[__maybe_unused__]]
-# elif defined __GNUC__ || defined __clang__
-#  define _GL_ATTRIBUTE_MAYBE_UNUSED __attribute__ ((__unused__))
+/* _GL_UNNAMED (ID) is the "name" of an unnamed function parameter.  */
+#ifndef _GL_UNNAMED
+# if ((defined __STDC_VERSION__ ? __STDC_VERSION__ : 0) < 202311 \
+      && !defined __cplusplus)
+#  define _GL_UNNAMED(id) unnamed_##id _GL_ATTRIBUTE_UNUSED
 # else
-#  define _GL_ATTRIBUTE_MAYBE_UNUSED
+#  define _GL_UNNAMED(id)
 # endif
 #endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #define SELABEL_CTX_FILE 0
 
 struct selabel_handle;
 
 SE_LABEL_INLINE int
-selabel_lookup (_GL_ATTRIBUTE_MAYBE_UNUSED struct selabel_handle *hnd,
-                _GL_ATTRIBUTE_MAYBE_UNUSED char **context,
-                _GL_ATTRIBUTE_MAYBE_UNUSED char const *key,
-                _GL_ATTRIBUTE_MAYBE_UNUSED int type)
+selabel_lookup (struct selabel_handle *_GL_UNNAMED (hnd),
+                char **_GL_UNNAMED (context),
+                char const *_GL_UNNAMED (key),
+                int _GL_UNNAMED (type))
+{ errno = ENOTSUP; return -1; }
+
+SE_LABEL_INLINE int
+selabel_lookup_raw (struct selabel_handle *_GL_UNNAMED (hnd),
+                    char **_GL_UNNAMED (context),
+                    char const *_GL_UNNAMED (key),
+                    int _GL_UNNAMED (type))
 { errno = ENOTSUP; return -1; }
 
 SE_LABEL_INLINE struct selabel_handle *
-selabel_open (_GL_ATTRIBUTE_MAYBE_UNUSED int backend,
-              _GL_ATTRIBUTE_MAYBE_UNUSED struct selinux_opt *options,
-              _GL_ATTRIBUTE_MAYBE_UNUSED unsigned nopt)
-{ errno = ENOTSUP; return 0; }
+selabel_open (int _GL_UNNAMED (backend),
+              struct selinux_opt *_GL_UNNAMED (options),
+              unsigned _GL_UNNAMED (nopt))
+{ errno = ENOTSUP; return (struct selabel_handle *) 0; }
 
 SE_LABEL_INLINE void
-selabel_close (_GL_ATTRIBUTE_MAYBE_UNUSED struct selabel_handle *hnd)
+selabel_close (struct selabel_handle *_GL_UNNAMED (hnd))
 { errno = ENOTSUP; }
+
+
+#ifdef __cplusplus
+}
+#endif
 
 _GL_INLINE_HEADER_END
 
