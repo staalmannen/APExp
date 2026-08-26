@@ -5949,6 +5949,16 @@
 # define streq(a, b) (strcmp ((a), (b)) == 0)
 #endif
 
+/* APExp: _GL_DT_NOTDIR, from the deleted dirent.h wrapper.
+   file-has-acl.c and qcopy-acl.c set it in the flags word they pass to
+   file_has_aclinfo, to say the entry is known not to be a directory.
+   gnulib's own value, from dirent.in.h:102. The IFTODT beside it in
+   that file is a BSD macro rather than a gnulib one, so it went into
+   APE's <dirent.h> instead. */
+#ifndef _GL_DT_NOTDIR
+# define _GL_DT_NOTDIR 0x100
+#endif
+
 /* APExp: prototypes and off64_t that the deleted wrapper headers carried.
    See apexp-decls.h for how the list was derived. */
 #include "apexp-decls.h"

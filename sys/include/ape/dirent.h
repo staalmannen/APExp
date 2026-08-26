@@ -51,6 +51,40 @@ struct	dirent {
 #define DT_LNK     10
 #define DT_SOCK    12
 
+/*
+ * BSD's conversions between a stat mode and a d_type value. Real
+ * systems put these in <dirent.h>; gnulib carries its own in
+ * dirent.in.h, which import.sh prunes for shadowing this header, so
+ * without them a caller gets an implicit function:
+ *
+ *   file-has-acl.c:979  IFTODT (sb->st_mode)
+ *
+ * No DT_WHT arm: BSD whiteout entries do not exist here, and neither
+ * DT_WHT nor S_IFWHT is defined, so an unknown mode simply reports
+ * DT_UNKNOWN and an unknown type maps back through the same shift
+ * gnulib uses.
+ *
+ * S_ISFIFO and S_ISSOCK are the same test in <sys/stat.h>, both mode
+ * 0010000, so the FIFO arm is reached first and a socket cannot be
+ * distinguished -- the same limitation readdir() has when it fills
+ * d_type. DTTOIF has it in the other direction: S_IFSOCK is S_IFIFO.
+ */
+#ifndef IFTODT
+#define IFTODT(mode) \
+   (S_ISREG(mode) ? DT_REG : S_ISDIR(mode) ? DT_DIR \
+    : S_ISLNK(mode) ? DT_LNK : S_ISBLK(mode) ? DT_BLK \
+    : S_ISCHR(mode) ? DT_CHR : S_ISFIFO(mode) ? DT_FIFO \
+    : S_ISSOCK(mode) ? DT_SOCK : DT_UNKNOWN)
+#endif
+#ifndef DTTOIF
+#define DTTOIF(dirtype) \
+   ((dirtype) == DT_REG ? S_IFREG : (dirtype) == DT_DIR ? S_IFDIR \
+    : (dirtype) == DT_LNK ? S_IFLNK : (dirtype) == DT_BLK ? S_IFBLK \
+    : (dirtype) == DT_CHR ? S_IFCHR : (dirtype) == DT_FIFO ? S_IFIFO \
+    : (dirtype) == DT_SOCK ? S_IFSOCK \
+    : (dirtype) << 12)
+#endif
+
 typedef struct _dirdesc {
 	int	dd_fd;		/* file descriptor */
 	long	dd_loc;		/* buf offset of entry from last readdir() */
