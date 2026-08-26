@@ -186,6 +186,16 @@ aborting. `libap.a` grew from ~3.5MB to ~6.2MB.
 The `iscmplx`/`typesu` guard is critical — without it, complex number OCOMMA
 nodes get `addable=1` causing "unknown type in regalloc: UNION" errors.
 
+That guard left `&(struct S){...}` still failing, because struct/union
+literals are exactly the ones the guard excludes. **Fix (2026-08):** the
+`OADDR` case in `com.c` `tcomo()` now hoists the comma first —
+`&(a, b)` → `(a, &b)` — so the `OADDR` lands on the hidden temporary's
+`ONAME`, which is addressable whatever its type, and the l-value test is
+never reached. Only fires when `l->op == OCOMMA` and the right operand is
+already addable and not a bit field. Covered by
+`sys/lib/tests/compound-literal-test.c`. Found via gnulib `randperm.c`,
+which passes `hash_remove(sv, &(struct sparse_ent_){i, 0})`.
+
 ### C99 Feature Status (complete)
 
 All C99 items are implemented. Key patches in `sys/src/cmd/cc/`:
