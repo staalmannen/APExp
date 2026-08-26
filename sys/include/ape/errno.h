@@ -49,7 +49,6 @@ extern int *_errnoloc;
 /* bsd networking software */
 #define ENOTSOCK	36
 #define EPROTONOSUPPORT	37
-#define EPROTOTYPE	37	/* two names for 37 */
 #define ECONNREFUSED	38
 #define EAFNOSUPPORT	39
 #define ENOBUFS		40
@@ -74,9 +73,6 @@ extern int *_errnoloc;
 #define EHOSTDOWN	58
 #define EHOSTUNREACH	59
 #define EGREG		60
-
-/* temporary redefinitions */
-#define ENOMSG ENOENT
 
 
 /* These added in 1003.1b-1993 */
@@ -126,6 +122,24 @@ extern int *_errnoloc;
 /* glibc spells EDEADLK this way too; coreutils' getlimits.c prints it
  * under "#if defined EDEADLOCK && EDEADLOCK == EDEADLK". */
 #define EDEADLOCK	EDEADLK
+
+/*
+ * These two used to be aliases of other errors -- EPROTOTYPE was a
+ * second name for EPROTONOSUPPORT (37), and ENOMSG was #defined to
+ * ENOENT under a comment reading "temporary redefinitions". They are
+ * distinct POSIX errors and now have distinct values.
+ *
+ * Sharing a value is not only untidy: gnulib's strerrorname_np.c is a
+ * switch over every errno name, and it guards only the aliases real
+ * systems have (EWOULDBLOCK/EAGAIN, ENOTSUP/EOPNOTSUPP,
+ * EDEADLOCK/EDEADLK). Two more collisions meant two duplicate case
+ * labels and a file that would not compile.
+ *
+ * ENOMSG had a caller, too: locale/catgets.c sets it when a message is
+ * not in the catalogue, which reported "no such file or directory".
+ */
+#define EPROTOTYPE	75
+#define ENOMSG		76
 
 
 #endif /* __ERRNO */

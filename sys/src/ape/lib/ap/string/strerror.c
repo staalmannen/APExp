@@ -49,8 +49,7 @@ char *sys_errlist[] = {
 
 	/* bsd networking software */
 	"Not a socket",
-	"Protocol not supported",	/* EPROTONOSUPPORT, EPROTOTYPE */
-/*	"Protocol wrong type for socket",	/* EPROTOTYPE */
+	"Protocol not supported",		/* EPROTONOSUPPORT */
 	"Connection refused",
 	"Address family not supported",
 	"No buffers",
@@ -96,6 +95,8 @@ char *sys_errlist[] = {
 	"Stale file handle",			/* ESTALE */
 	"Disk quota exceeded",			/* EDQUOT */
 	"No data available",			/* ENODATA */
+	"Protocol wrong type for socket",	/* EPROTOTYPE */
+	"No message of desired type",		/* ENOMSG */
 };
 #define	_IO_nerr	(sizeof sys_errlist/sizeof sys_errlist[0])
 int sys_nerr = _IO_nerr;
