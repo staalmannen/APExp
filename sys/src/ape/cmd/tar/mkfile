@@ -94,7 +94,7 @@ CC=pcc -c
 # config-common.h. -I$GNUSRC comes next so the module headers match the
 # objects in libgnu.a. Nothing in $GTARSRC/src or $GTARSRC/lib shadows
 # an APE header, so they can follow.
-CFLAGS=-c -B -p -I. -I$GNUSRC -I$GTARSRC -I$GTARSRC/src -I$GTARSRC/lib\
+CFLAGS=-B -p -I. -I$GNUSRC -I$GTARSRC -I$GTARSRC/src -I$GTARSRC/lib\
 	-DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale"
 
 %.$O: $GTARSRC/src/%.c

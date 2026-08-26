@@ -302,6 +302,27 @@ EOF
 # define streq(a, b) (strcmp ((a), (b)) == 0)
 #endif
 
+/* APExp: platform answers coreutils' configure never recorded, because
+   it reaches these through gnulib modules. Absent entirely, not even
+   "#undef", so a package testing them directly defaults to 0 -- which
+   made tar's lib/system.h define setlocale() away and break
+   <locale.h>. All five hold on APE. */
+#ifndef HAVE_LOCALE_H
+# define HAVE_LOCALE_H 1
+#endif
+#ifndef HAVE_SETLOCALE
+# define HAVE_SETLOCALE 1
+#endif
+#ifndef HAVE_FCNTL_H
+# define HAVE_FCNTL_H 1
+#endif
+#ifndef HAVE_MEMORY_H
+# define HAVE_MEMORY_H 1
+#endif
+#ifndef HAVE_STRUCT_STAT_ST_BLKSIZE
+# define HAVE_STRUCT_STAT_ST_BLKSIZE 1
+#endif
+
 /* APExp: no non-Gregorian calendars in strftime. Otherwise strftime.c
    calls gl_locale_name_unsafe, which means gnulib's localename module,
    whose getlocalename_l-unsafe.c ends in "#error Please port ... to

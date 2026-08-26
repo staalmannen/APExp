@@ -5879,6 +5879,39 @@
 # define strnul(s) ((s) + strlen (s))
 #endif
 
+/* APExp: platform answers coreutils' configure never recorded.
+   coreutils reaches these through gnulib modules, so its config.h has
+   no line for them at all -- not even a "#undef" -- and every package
+   that tests them directly gets the default of 0. tar's lib/system.h
+   does, and the result was not a missing feature but a broken header:
+
+     #if !HAVE_SETLOCALE
+     # define setlocale(category, locale)      <-- expands to nothing
+     #endif
+
+   turned <locale.h>'s own declaration into "extern char *;"
+
+     /sys/include/ape/locale.h:49 syntax error, last name: char
+
+   All five hold here: APE has <locale.h>, <fcntl.h> and <memory.h>,
+   libap has setlocale (locale/locale_stubs.c), and struct stat has
+   st_blksize. */
+#ifndef HAVE_LOCALE_H
+# define HAVE_LOCALE_H 1
+#endif
+#ifndef HAVE_SETLOCALE
+# define HAVE_SETLOCALE 1
+#endif
+#ifndef HAVE_FCNTL_H
+# define HAVE_FCNTL_H 1
+#endif
+#ifndef HAVE_MEMORY_H
+# define HAVE_MEMORY_H 1
+#endif
+#ifndef HAVE_STRUCT_STAT_ST_BLKSIZE
+# define HAVE_STRUCT_STAT_ST_BLKSIZE 1
+#endif
+
 /* APExp: no non-Gregorian calendars in strftime.
    strftime.c defaults SUPPORT_NON_GREG_CALENDARS_IN_STRFTIME to true and
    then calls gl_locale_name_unsafe to spot th_TH, fa_IR and the like:
