@@ -361,6 +361,11 @@ EOF
 # define SUPPORT_NON_GREG_CALENDARS_IN_STRFTIME 0
 #endif
 
+/* APExp: _GL_DT_NOTDIR, from the deleted dirent.h wrapper. */
+#ifndef _GL_DT_NOTDIR
+# define _GL_DT_NOTDIR 0x100
+#endif
+
 /* APExp: prototypes and off64_t the deleted wrappers carried. */
 #include "apexp-decls.h"
 EOF
