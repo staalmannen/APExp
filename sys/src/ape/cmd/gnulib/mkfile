@@ -19,8 +19,30 @@ APEXPROOT=../../../../..
 # list survives past it depends on whether mk strips comments before or
 # after joining continued lines.
 #
-# When working out what is missing, remember that gnulib's "--" headers
-# rename functions with plain macros: stdio--.h has
+# When working out what is missing, there are two ways a symbol hides
+# from a scan of the sources.
+#
+# The first is the thin wrapper: a .c file whose whole content is a
+# couple of #defines and an #include of another .c. dtoastr.c is
+#
+#	#define LENGTH 2
+#	#include "ftoastr.c"
+#
+# so nothing in dtoastr.c is named dtoastr, and a scan looking for where
+# a symbol is defined finds nothing. There are about eighty of these --
+# the at-func.c, anytostr.c, stdio-impl.h and *-impl.h families, plus
+# strtoul/strtoull, isnand/isnanf/isnanl, xstrtoimax and the rest.
+#
+# The second is the macro argument. od.c never writes dtoastr followed
+# by "(":
+#
+#	PRINT_FLOATTYPE (print_double, double, dtoastr, DBL_BUFSIZE_BOUND)
+#
+# so a scan keyed on a call shape misses it too. Scan for bare
+# identifiers, not calls.
+#
+# Third, gnulib's "--" headers rename functions with plain macros:
+# stdio--.h has
 #
 #	#define freopen freopen_safer
 #
@@ -132,9 +154,13 @@ OFILES=\
 	c-stack.$O\
 	c-strcasecmp.$O\
 	c-strncasecmp.$O\
+	c-strtod.$O\
+	c-strtold.$O\
 	canonicalize.$O\
 	careadlinkat.$O\
 	chdir-long.$O\
+	cl-strtod.$O\
+	cl-strtold.$O\
 	clean-temp.$O\
 	clean-temp-simple.$O\
 	close-stream.$O\
@@ -154,6 +180,7 @@ OFILES=\
 	dirname.$O\
 	dirname-lgpl.$O\
 	dtotimespec.$O\
+	dtoastr.$O\
 	dup-safer.$O\
 	dup-safer-flag.$O\
 	errno-iter.$O\
@@ -218,9 +245,11 @@ OFILES=\
 	ino-map.$O\
 	integer_length.$O\
 	integer_length_l.$O\
+	inttostr.$O\
 	isapipe.$O\
 	lchmod.$O\
 	lchown.$O\
+	ldtoastr.$O\
 	linebuffer.$O\
 	localeinfo.$O\
 	long-options.$O\
@@ -367,6 +396,8 @@ OFILES=\
 	xsize.$O\
 	xstdopen.$O\
 	xstriconv.$O\
+	xstrtod.$O\
+	xstrtold.$O\
 	xstrtoimax.$O\
 	xstrtol.$O\
 	xstrtol-error.$O\
