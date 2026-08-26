@@ -19,10 +19,14 @@
  *
  * Not included, having turned out to be dead code under this config.h:
  * timespec_get (gettime.c takes the clock_gettime branch, since
- * HAVE_CLOCK_GETTIME is set), strerrorname_np (xvasprintf.c guards it
- * with HAVE_WORKING_STRERRORNAME_NP, which is undef), and mkstemps and
- * mkostemps (mkstemp-safer.c guards them with GNULIB_MKSTEMPS and
+ * HAVE_CLOCK_GETTIME is set), and mkstemps and mkostemps
+ * (mkstemp-safer.c guards them with GNULIB_MKSTEMPS and
  * GNULIB_MKOSTEMPS, neither of which is defined).
+ *
+ * strerrorname_np was on that list too, on the grounds that its only
+ * caller was xvasprintf.c under HAVE_WORKING_STRERRORNAME_NP. That
+ * stopped being true with coreutils: getlimits.c calls it directly and
+ * with no guard, so it is declared below.
  */
 
 #include <stddef.h>
@@ -40,6 +44,7 @@ typedef off_t off64_t;
 
 /* string.h wrapper */
 extern size_t mbslen(const char *);
+extern const char *strerrorname_np(int);
 
 /* stdlib.h wrapper */
 extern char *secure_getenv(char const *);

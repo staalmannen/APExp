@@ -141,6 +141,7 @@ OFILES=\
 	dtotimespec.$O\
 	dup-safer.$O\
 	dup-safer-flag.$O\
+	errno-iter.$O\
 	error.$O\
 	euidaccess.$O\
 	exclude.$O\
@@ -303,6 +304,7 @@ OFILES=\
 	strerror-override.$O\
 	striconv.$O\
 	strintcmp.$O\
+	strerrorname_np.$O\
 	stripslash.$O\
 	strnlen1.$O\
 	strnumcmp.$O\
@@ -336,6 +338,7 @@ OFILES=\
 	xfts.$O\
 	xgetcwd.$O\
 	xgetgroups.$O\
+	xgethostname.$O\
 	xhash.$O\
 	xmalloca.$O\
 	xmemcoll.$O\
