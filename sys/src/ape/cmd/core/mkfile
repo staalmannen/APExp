@@ -130,11 +130,25 @@ BIN=$APEXPROOT/$objtype/bin/ape
 # Before the include: mkmany expands "%.$O: $HFILES" where it reads it,
 # so a later assignment would come too late and editing a config header
 # would rebuild nothing.
+#
+# The gnulib entries are the GENERATED headers -- import.sh writes them
+# from *.in.h templates, so they change when the shared tree is
+# re-imported or a substitution is corrected, and nothing else here would
+# notice. That is not hypothetical: regenerating selinux/selinux.h to add
+# the "_raw" stubs left copy.$O untouched, and cp went on failing to link
+# on the symbols the new header defines. The hand-written gnulib headers
+# are not listed; they change with their own .c files, which are compiled
+# in the gnulib directory.
 HFILES=\
 	config.h\
 	version.h\
 	$GNUSRC/config-common.h\
 	$GNUSRC/apexp-decls.h\
+	$GNUSRC/fts_.h\
+	$GNUSRC/gmp.h\
+	$GNUSRC/selinux/selinux.h\
+	$GNUSRC/selinux/context.h\
+	$GNUSRC/selinux/label.h\
 
 <$APEXPROOT/sys/src/cmd/mkmany
 
