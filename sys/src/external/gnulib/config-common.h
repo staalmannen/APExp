@@ -3495,7 +3495,7 @@
 
 
 /* Define to 1 if you have the `__fpurge' function. */
-/* #undef HAVE___FPURGE */
+#define HAVE___FPURGE 1	/* APExp: libap stdio/stdio_ext.c */
 
 /* Define to 1 if you have the `__freadahead' function. */
 /* #undef HAVE___FREADAHEAD */

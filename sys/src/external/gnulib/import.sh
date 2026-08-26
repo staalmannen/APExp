@@ -180,6 +180,15 @@ if [ -f "$DEST/config-common.h" ]; then
 	rm -f "$DEST/config-common.h.bak"
 fi
 
+# libap implements __fpurge in stdio/stdio_ext.c. Without this, fpurge.c
+# takes neither the musl nor the BSD branch and falls through to poking
+# at FILE internals it does not recognise.
+if [ -f "$DEST/config-common.h" ]; then
+	sed -i.bak 's|^/\* #undef HAVE___FPURGE \*/|#define HAVE___FPURGE 1|' \
+		"$DEST/config-common.h"
+	rm -f "$DEST/config-common.h.bak"
+fi
+
 # Guard config.h's copy of _UC_RESTRICT, the way unitypes.h guards its own.
 #
 # config.h carries a deliberate duplicate of the unitypes.h definition,
