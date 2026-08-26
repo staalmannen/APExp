@@ -36,6 +36,17 @@ GNUSRC=$APEXPROOT/sys/src/external/gnulib
 #                                     see libap's, because getopt_long.c
 #                                     reaches it through
 #                                     "#define gnu_getopt_long getopt_long".
+#   acl_entries                       Unguarded: it takes an acl_t and
+#                                     assumes POSIX-draft ACLs. Nothing
+#                                     supplies acl_t here -- gnulib's
+#                                     sys/ wrappers are pruned -- and
+#                                     file-has-acl.c only calls it from a
+#                                     branch USE_ACL 0 removes.
+#                                     getfilecon.c looks similar but is
+#                                     fine: gnulib ships stub
+#                                     selinux/*.h, which this tree keeps,
+#                                     and copy.c calls lgetfilecon_raw
+#                                     with no guard at all.
 #   progreloc, relocatable            An artefact: safe-read.c defines
 #                                     safe_rw and renames it, so a scanner
 #                                     looking for safe_read finds only
@@ -47,7 +58,6 @@ LIB=libgnu.a$O
 OFILES=\
 	acl-errno-valid.$O\
 	acl-internal.$O\
-	acl_entries.$O\
 	alignalloc.$O\
 	allocator.$O\
 	areadlink.$O\
@@ -129,8 +139,8 @@ OFILES=\
 	full-write.$O\
 	get-errno.$O\
 	get-permissions.$O\
-	getfilecon.$O\
 	gethrxtime.$O\
+	getfilecon.$O\
 	getprogname.$O\
 	gettime.$O\
 	gettime-res.$O\
