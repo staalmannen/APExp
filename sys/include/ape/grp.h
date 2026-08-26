@@ -20,6 +20,8 @@ extern struct group *getgrnam(const char *);
 extern int getgrgid_r(gid_t, struct group *, char *, size_t, struct group **);
 extern int getgrnam_r(const char *, struct group *, char *, size_t, struct group **);
 
+extern int initgroups(const char *, gid_t);
+
 extern struct group *getgrent(void);
 extern void setgrent(void);
 extern void endgrent(void);

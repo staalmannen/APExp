@@ -74,8 +74,10 @@ OFILES=\
 	findprog-in.$O\
 	fopen-safer.$O\
 	free.$O\
+	fprintftime.$O\
 	fstrcmp.$O\
 	full-read.$O\
+	full-write.$O\
 	fts.$O\
 	get-errno.$O\
 	get-permissions.$O\
@@ -97,6 +99,7 @@ OFILES=\
 	hashcode-string2.$O\
 	hashkey-string.$O\
 	i-ring.$O\
+	imaxtostr.$O\
 	ialloc.$O\
 	integer_length.$O\
 	integer_length_l.$O\
@@ -115,6 +118,7 @@ OFILES=\
 	next-prime.$O\
 	nstrftime.$O\
 	open-safer.$O\
+	offtostr.$O\
 	openat-proc.$O\
 	openat-safer.$O\
 	opendirat.$O\
@@ -129,6 +133,7 @@ OFILES=\
 	quotearg.$O\
 	regex.$O\
 	renameatu.$O\
+	rpmatch.$O\
 	safe-read.$O\
 	same-inode.$O\
 	savedir.$O\
@@ -158,6 +163,7 @@ OFILES=\
 	timevar.$O\
 	tmpdir.$O\
 	trim.$O\
+	umaxtostr.$O\
 	unicodeio.$O\
 	unlinkdir.$O\
 	unistd.$O\
