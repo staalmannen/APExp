@@ -38,9 +38,17 @@
 #define __REDIR(x,y) __typeof__(x) x __asm__(#y)
 
 /* Plan9 kencc has no weak symbol support; weak_alias is a no-op here.
- * Explicit strong forwarders are provided in network/res_aliases.c. */
+ * Explicit strong forwarders are provided in network/res_aliases.c.
+ *
+ * The parameter names are glibc's, and gnulib's libc-config.h:204 uses
+ * the same ones. That matters: libc-config.h defines weak_alias with no
+ * guard of its own, so whenever a header pulls this one in first, cpp
+ * sees a second definition -- and comparetokens() in cpp/macro.c
+ * compares the parameter lists as well as the bodies, so "(old, new)"
+ * would be a redefinition error where "(name, aliasname)" is the
+ * identical definition C allows. */
 #ifndef weak_alias
-#define weak_alias(old, new) /* no weak alias on Plan9 */
+#define weak_alias(name, aliasname) /* no weak alias on Plan9 */
 #endif
 
 #ifndef hidden
