@@ -21,17 +21,46 @@ APEXPROOT=../../../../..
 
 GNUSRC=$APEXPROOT/sys/src/external/gnulib
 
+# Deliberately NOT in OFILES, though a dependency scan will keep naming
+# them. Each is either already provided or must not be shared:
+#
+#   regcomp, regexec, regex_internal  regex.$O is gnulib's regex.c, which
+#                                     includes all three.
+#   mini-gmp                          mini-gmp-gnulib.$O includes it.
+#   getopt, getopt1                   libap has getopt, getopt_long and
+#                                     optarg/optind. Putting gnulib's in
+#                                     here would silently change which
+#                                     getopt every package links; tar
+#                                     builds its own copies locally for
+#                                     exactly that reason. A scan cannot
+#                                     see libap's, because getopt_long.c
+#                                     reaches it through
+#                                     "#define gnu_getopt_long getopt_long".
+#   progreloc, relocatable            An artefact: safe-read.c defines
+#                                     safe_rw and renames it, so a scanner
+#                                     looking for safe_read finds only
+#                                     progreloc.c's static copy and follows
+#                                     it into the relocation machinery.
+
 LIB=libgnu.a$O
 
 OFILES=\
+	acl-errno-valid.$O\
 	acl-internal.$O\
+	acl_entries.$O\
+	alignalloc.$O\
 	allocator.$O\
+	areadlink.$O\
+	areadlink-with-size.$O\
 	areadlinkat-with-size.$O\
 	argmatch.$O\
+	argv-iter.$O\
 	asyncsafe-spin.$O\
 	backup-find.$O\
 	backup-rename.$O\
 	backupfile.$O\
+	base32.$O\
+	base64.$O\
 	basename.$O\
 	basename-lgpl.$O\
 	binary-io.$O\
@@ -43,6 +72,7 @@ OFILES=\
 	c-file-type.$O\
 	c-stack.$O\
 	c-strcasecmp.$O\
+	c-strncasecmp.$O\
 	canonicalize.$O\
 	careadlinkat.$O\
 	chdir-long.$O\
@@ -55,38 +85,56 @@ OFILES=\
 	colorize-posix.$O\
 	concat-filename.$O\
 	copy-acl.$O\
+	copy-file-range.$O\
+	crc.$O\
 	cycle-check.$O\
 	dfa.$O\
+	di-set.$O\
 	diagnose.$O\
+	dirchownmod.$O\
 	dirname.$O\
 	dirname-lgpl.$O\
+	dtotimespec.$O\
 	dup-safer.$O\
 	dup-safer-flag.$O\
 	error.$O\
+	euidaccess.$O\
 	exclude.$O\
 	execute.$O\
+	fadvise.$O\
 	fatal-signal.$O\
-	fdutimensat.$O\
+	fd-reopen.$O\
 	fd-safer.$O\
 	fd-safer-flag.$O\
+	fdatasync.$O\
+	fdutimensat.$O\
+	file-has-acl.$O\
 	file-set.$O\
+	file-type.$O\
+	filemode.$O\
 	filenamecat.$O\
 	filenamecat-lgpl.$O\
+	filesystem-remote.$O\
+	filevercmp.$O\
 	findprog-in.$O\
 	fopen-safer.$O\
-	free.$O\
 	fprintftime.$O\
-	fadvise.$O\
 	fpurge.$O\
+	free.$O\
+	fseterr.$O\
 	fstrcmp.$O\
+	ftoastr.$O\
+	fts.$O\
 	full-read.$O\
 	full-write.$O\
-	fts.$O\
 	get-errno.$O\
 	get-permissions.$O\
+	getfilecon.$O\
 	gethrxtime.$O\
 	getprogname.$O\
 	gettime.$O\
+	gettime-res.$O\
+	getugroups.$O\
 	gl_array_list.$O\
 	gl_avltree_oset.$O\
 	gl_hash_map.$O\
@@ -94,78 +142,133 @@ OFILES=\
 	gl_linkedhash_list.$O\
 	gl_rbtree_oset.$O\
 	gl_rbtreehash_list.$O\
+	group-member.$O\
 	hard-locale.$O\
 	hash.$O\
-	human.$O\
 	hashcode-named-file.$O\
 	hashcode-string1.$O\
 	hashcode-string2.$O\
 	hashkey-string.$O\
+	heap.$O\
+	human.$O\
 	i-ring.$O\
-	imaxtostr.$O\
 	ialloc.$O\
+	idcache.$O\
+	imaxtostr.$O\
+	ino-map.$O\
 	integer_length.$O\
 	integer_length_l.$O\
+	isapipe.$O\
+	lchmod.$O\
+	lchown.$O\
+	linebuffer.$O\
 	localeinfo.$O\
+	long-options.$O\
 	malloca.$O\
 	mbchar.$O\
+	mbs_endswith.$O\
 	mbscasecmp.$O\
+	mbschr.$O\
 	mbslen.$O\
 	mbsstr.$O\
 	mbswidth.$O\
+	md5.$O\
+	md5-stream.$O\
+	memcasecmp.$O\
 	memchr2.$O\
+	memcmp2.$O\
+	memcoll.$O\
 	mempcpy.$O\
-	mkfifoat.$O\
-	modechange.$O\
-	mkstemp-safer.$O\
+	memset_explicit.$O\
+	mgetgroups.$O\
 	mini-gmp-gnulib.$O\
 	mini-mpq-gnulib.$O\
+	mkancesdirs.$O\
+	mkdir-p.$O\
+	mkfifoat.$O\
+	mkstemp-safer.$O\
+	modechange.$O\
+	mountlist.$O\
+	mpsort.$O\
 	next-prime.$O\
+	nproc.$O\
 	nstrftime.$O\
-	open-safer.$O\
 	offtostr.$O\
+	open-safer.$O\
 	openat-die.$O\
 	openat-proc.$O\
 	openat-safer.$O\
 	opendirat.$O\
 	parse-datetime.$O\
 	path-join.$O\
+	physmem.$O\
 	pipe-safer.$O\
 	pipe2-safer.$O\
+	posixtm.$O\
+	posixver.$O\
+	priv-set.$O\
 	progname.$O\
 	propername.$O\
 	propername-lite.$O\
 	qcopy-acl.$O\
+	qset-acl.$O\
 	quotearg.$O\
+	rand-isaac.$O\
+	randint.$O\
+	randperm.$O\
+	randread.$O\
+	read-file.$O\
+	readtokens.$O\
+	readtokens0.$O\
 	regex.$O\
 	renameatu.$O\
+	root-dev-ino.$O\
 	rpmatch.$O\
 	safe-read.$O\
 	safe-write.$O\
+	same.$O\
 	same-inode.$O\
 	save-cwd.$O\
 	savedir.$O\
+	savewd.$O\
 	secure_getenv.$O\
+	set-acl.$O\
 	set-permissions.$O\
 	setlocale-lock.$O\
 	setlocale_null.$O\
 	setlocale_null-unlocked.$O\
+	settime.$O\
 	sh-quote.$O\
+	sha1.$O\
+	sha1-stream.$O\
+	sha256.$O\
+	sha256-stream.$O\
+	sha3.$O\
+	sha3-stream.$O\
+	sha512.$O\
+	sha512-stream.$O\
+	sig2str.$O\
 	sigsegv.$O\
+	sm3.$O\
+	sm3-stream.$O\
 	spawn-pipe.$O\
+	spawnattr_setdefault.$O\
 	stat-time.$O\
 	stdbit.$O\
 	stdlib.$O\
 	stdopen.$O\
 	stpcpy.$O\
 	str_endswith.$O\
-	striconv.$O\
 	strerror.$O\
 	strerror-override.$O\
+	striconv.$O\
+	strintcmp.$O\
 	stripslash.$O\
 	strnlen1.$O\
+	strnumcmp.$O\
 	strsignal.$O\
 	strstr.$O\
+	targetdir.$O\
 	tempname.$O\
 	time_rz.$O\
 	timevar.$O\
@@ -173,32 +276,44 @@ OFILES=\
 	trim.$O\
 	umaxtostr.$O\
 	unicodeio.$O\
-	unlinkdir.$O\
 	unistd.$O\
+	unlinkdir.$O\
+	userspec.$O\
+	utimecmp.$O\
 	vaszprintf.$O\
 	version-etc-fsf.$O\
 	vfzprintf.$O\
 	vzprintf.$O\
 	wait-process.$O\
 	wmempcpy.$O\
+	write-any-file.$O\
+	xalignalloc.$O\
 	xasprintf.$O\
 	xconcat-filename.$O\
 	xdectoimax.$O\
 	xdectoumax.$O\
 	xfreopen.$O\
+	xfts.$O\
 	xgetcwd.$O\
+	xgetgroups.$O\
 	xhash.$O\
 	xmalloca.$O\
+	xmemcoll.$O\
 	xmemdup0.$O\
+	xnanosleep.$O\
 	xprintf.$O\
+	xreadlink.$O\
+	xsetenv.$O\
 	xsize.$O\
 	xstdopen.$O\
 	xstriconv.$O\
 	xstrtoimax.$O\
 	xstrtol.$O\
+	xstrtol-error.$O\
 	xstrtoul.$O\
 	xstrtoumax.$O\
 	xvasprintf.$O\
+	yesno.$O\
 	dynarray_at_failure.$O\
 	dynarray_emplace_enlarge.$O\
 	dynarray_finalize.$O\
