@@ -100,5 +100,17 @@ extern int *_errnoloc;
 
 #define EBADMSG		71
 
+/*
+ * Nothing in APE ever sets this -- Plan 9 has no NFS client whose
+ * handles can go stale.  It is here because POSIX requires the name and
+ * portable code tests for it unguarded: gnulib's savewd.c has
+ *
+ *	bool try_fork = errno == EACCES || errno == ESTALE;
+ *
+ * with no #ifdef.  Defining it to a value errno never takes gives that
+ * test the right answer.
+ */
+#define ESTALE		72
+
 
 #endif /* __ERRNO */

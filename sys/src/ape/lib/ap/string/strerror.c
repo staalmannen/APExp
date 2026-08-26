@@ -88,6 +88,12 @@ char *sys_errlist[] = {
 
 	"Value too large for defined data type", /* EOVERFLOW */
 	"Too many symbolic links encountered",	/* ELOOP */
+
+	"Illegal byte sequence",		/* EILSEQ */
+	"State not recoverable",		/* ENOTRECOVERABLE */
+	"Owner died",				/* EOWNERDEAD */
+	"Bad message",				/* EBADMSG */
+	"Stale file handle",			/* ESTALE */
 };
 #define	_IO_nerr	(sizeof sys_errlist/sizeof sys_errlist[0])
 int sys_nerr = _IO_nerr;
