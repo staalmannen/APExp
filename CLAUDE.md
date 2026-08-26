@@ -360,6 +360,58 @@ with proper `extern` declaration.
 **Note:** `ts` parameter to `pthread_cond_timedwait` is **absolute** CLOCK_REALTIME
 time (POSIX). `aio_suspend`'s `ts` is **relative** — convert before calling timedwait.
 
+### signal/ — sigset_t held only three signals
+
+`ap/signal/sigset.c` gated every operation on
+
+```c
+static sigset_t stdsigs = SIGHUP|SIGINT|SIGQUIT|...|SIGUSR2;
+```
+
+which ORs the signal **numbers** together, not their bits: `1|2|3|…|13` is
+15. `sigaddset`/`sigdelset`/`sigismember` all tested `BITSIG(signo)` (i.e.
+`2<<signo`) against that, so only signals 0, 1 and 2 were accepted — everything
+else returned `-1`/`EINVAL` and changed nothing, and `sigfillset()` produced a
+set naming SIGHUP and SIGINT alone.
+
+Silent, because almost nothing checks `sigaddset`'s return value: the caller
+just got an empty mask and blocked nothing. Fixed to accept every signal in
+`signal.h` (1..NSIG-1). `_psigblocked` is the only sigset the rest of libap
+keeps, and it is only saved and restored (`sigprocmask`, `notetramp`) — never
+tested against a signal number — so no stored set changed meaning.
+Covered by `sys/lib/tests/sigset-test.c`. Found via
+`posix_spawnattr_setsigdefault`, whose test put SIGTERM (11) in a set and got
+an empty one back.
+
+### process/ — execvp searches PATH
+
+`execvp`, `execvpe` and `execlp` each carried
+
+```
+BUG: instead of looking at PATH env variable,
+just try prepending /bin/ if name fails...
+```
+
+Fine while everything is in `/bin`; wrong under APExp, where the APE binaries
+live in `/$objtype/bin/ape` and are reached through PATH. Every coreutils
+program that ends in `execvp()` — `env`, `nohup`, `timeout`, `chroot`,
+`stdbuf` — could therefore only run things in `/bin`.
+
+New `ap/process/execpath.c` holds `_execpath()`, shared by all three: a name
+containing `/` is used as given, otherwise each PATH element is tried
+(empty element = cwd), and the reported errno is EACCES if some candidate
+existed but could not be run, else ENOENT. `/bin` is the fallback when PATH
+is unset, and is also tried last, so nothing that worked before stops.
+
+Each candidate is `access(X_OK)`-checked before exec is attempted, because in
+APE **a failed `execve()` is not free**: it has already done
+`_RFORK(RFCENVG)`, rewritten `/env/_fdinfo` and `/env/_sighdlr`, and closed
+every `FD_CLOEXEC` descriptor by the time the exec itself is tried. Which is
+also why `posix_spawn` cannot report exec failures in the parent — its
+close-on-exec report pipe is gone before exec is attempted, so an exec failure
+surfaces only as the child exiting 127. POSIX leaves that unspecified;
+glibc reports it, APE does not.
+
 ### process/ — posix_spawn honours file actions
 
 `sys/src/ape/lib/ap/process/posix_spawn.c` was fork+exec with every file
@@ -372,10 +424,9 @@ wrong fds with no error anywhere.
 Now: actions are recorded in a growable array hung off
 `posix_spawn_file_actions_t.__actions`, replayed in the child between fork
 and exec, with `SETSID`/`SETPGROUP`/`SETSIGDEF`/`SETSIGMASK` applied first.
-Child setup failures come back to the caller as the return value through a
-close-on-exec report pipe (a successful exec closes it, so the parent's read
-returns 0). `RESETIDS` and the scheduling flags are stored and returned
-faithfully but ignored — Plan 9 has no POSIX scheduler.
+Setup failures come back to the caller as the return value through a
+close-on-exec report pipe. `RESETIDS` and the scheduling flags are stored and
+returned faithfully but ignored — Plan 9 has no POSIX scheduler.
 
 The old file declared its own `typedef void posix_spawnattr_t;` rather than
 including `<spawn.h>`; it worked only because every use was through a

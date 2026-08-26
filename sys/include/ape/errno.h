@@ -112,5 +112,20 @@ extern int *_errnoloc;
  */
 #define ESTALE		72
 
+/*
+ * Like ESTALE: no APE call sets these, but portable code tests for them
+ * without an #ifdef and needs the names.  coreutils' copy.c and ln.c
+ * classify link(2) and copy_file_range(2) failures with EDQUOT, and its
+ * selinux.c, ls.c and chcon.c with ENODATA -- coreutils' own system.h
+ * falls back to "#define ENODATA (-1)", which then aliases ENODATA onto
+ * a value no errno ever has, in a different way, less visibly.
+ */
+#define EDQUOT		73
+#define ENODATA		74
+
+/* glibc spells EDEADLK this way too; coreutils' getlimits.c prints it
+ * under "#if defined EDEADLOCK && EDEADLOCK == EDEADLK". */
+#define EDEADLOCK	EDEADLK
+
 
 #endif /* __ERRNO */

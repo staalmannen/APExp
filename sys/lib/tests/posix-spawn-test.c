@@ -169,27 +169,35 @@ test_addopen(void)
 }
 
 /*
- * A child that cannot be exec'd. The error belongs in posix_spawn's
- * return value, not in a 127 exit status the caller has to guess at --
- * that is what the report pipe is for.
+ * A child that cannot be exec'd. POSIX leaves it unspecified whether
+ * this comes back as posix_spawn's return value or as the child exiting
+ * 127; either is a pass, and what must not happen is a spawn that looks
+ * entirely successful.
+ *
+ * On APE it is always the 127, because execve() closes FD_CLOEXEC
+ * descriptors -- the report pipe among them -- before it attempts the
+ * exec, so the child has nothing left to write to when exec fails.
  */
 static void
 test_enoent(void)
 {
 	pid_t pid;
-	int err;
+	int err, status;
 	char *argv[2];
-	char detail[64];
+	char detail[80];
 
 	argv[0] = "no-such-program-9f3a";
 	argv[1] = NULL;
 	pid = -1;
 	err = posix_spawnp(&pid, "no-such-program-9f3a", NULL, NULL, argv, NULL);
-	sprintf(detail, "returned %d", err);
-	check("failed exec is reported through the return value",
-	      err != 0, detail);
-	if (err == 0)
-		reap(pid);
+	if (err != 0) {
+		check("failed exec is diagnosed", 1, NULL);
+		return;
+	}
+	status = reap(pid);
+	sprintf(detail, "spawn returned 0 and the child exited %d, not 127",
+	        status);
+	check("failed exec is diagnosed", status == 127, detail);
 }
 
 /*
