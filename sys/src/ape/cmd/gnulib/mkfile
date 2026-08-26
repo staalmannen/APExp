@@ -72,6 +72,7 @@ OFILES=\
 	acl-internal.$O\
 	alignalloc.$O\
 	allocator.$O\
+	apexp-mountlist.$O\
 	areadlink.$O\
 	areadlink-with-size.$O\
 	areadlinkat-with-size.$O\
@@ -209,7 +210,6 @@ OFILES=\
 	mkfifoat.$O\
 	mkstemp-safer.$O\
 	modechange.$O\
-	mountlist.$O\
 	mpsort.$O\
 	next-prime.$O\
 	nproc.$O\
