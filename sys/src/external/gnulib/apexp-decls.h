@@ -49,6 +49,22 @@ extern const char *strerrorname_np(int);
 /* stdlib.h wrapper */
 extern char *secure_getenv(char const *);
 
+/* signal.h wrapper.
+   sig2str.c is in the archive, but SIG2STR_MAX and the two prototypes
+   live in the generated signal.h, not in sig2str.h -- that header kept
+   only SIGNUM_BOUND when gnulib moved the rest. env.c, kill.c, split.c
+   and operand2sig.c all declare "char signame[SIG2STR_MAX]":
+
+     env.c:621 name not declared: SIG2STR_MAX
+
+   The value is gnulib's own, from signal.in.h:153: "RTMAX", a sign, up
+   to ten digits, a NUL, and two spare. */
+#ifndef SIG2STR_MAX
+#define SIG2STR_MAX (5 + 1 + 10 + 1 + 2)
+#endif
+extern int sig2str(int, char *);
+extern int str2sig(const char *, int *);
+
 /* stdio.h wrapper */
 extern ptrdiff_t vaszprintf(char **, const char *, va_list);
 extern off64_t vfzprintf(FILE *, const char *, va_list);
