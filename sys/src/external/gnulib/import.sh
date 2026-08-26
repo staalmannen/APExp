@@ -166,6 +166,44 @@ for t in se-selinux se-context se-label; do
 	echo "generated $out from $t.in.h"
 done
 
+# Regenerate stdbit.h from its template.
+#
+# Third one of these, after fts_.h and the selinux stubs: a header the
+# copy loop took pre-generated from whichever package shipped one, and
+# which then outlived the sources around it. This one was generated with
+# every @GNULIB_STDC_*@ substituted as 0, by a package that used none of
+# them, so the whole file was #if 0 and coreutils' factor.c got an
+# implicit function instead of the macro:
+#
+#   gcd_odd: undefined: stdc_trailing_zeros in gcd_odd
+#
+# All the GNULIB_STDC_* go to 1. There is no cost to enabling a section
+# that nothing calls: _GL_INLINE is "_GL_UNUSED static" here (kencc
+# defines neither __GNUC__ nor __STDC_VERSION__ >= 199901L), so each
+# translation unit gets its own static copies and nothing is left to
+# link. HAVE_STDBIT_H is 0 -- APE has no <stdbit.h> of its own.
+#
+# Worth knowing, since it would be silent: kencc swallows __builtin_*
+# and yields a constant 0, so a stdbit.h that reached __builtin_ctz
+# would make stdc_trailing_zeros return 0 for every input and factor
+# would quietly produce wrong answers. It does not: those arms need
+# __GNUC__, __clang_major__ or __has_builtin, and kencc has none of
+# them, so the portable loop compiles instead.
+if [ -f "$DEST/stdbit.in.h" ]; then
+	{
+		echo "/* DO NOT EDIT! GENERATED AUTOMATICALLY from stdbit.in.h */"
+		sed -e 's|@GNULIB_STDC_[A-Z0-9_]*@|1|g' \
+		    -e 's|@HAVE_STDBIT_H@|0|g' \
+		    -e 's|@INCLUDE_NEXT@|include_next|g' \
+		    -e 's|@NEXT_STDBIT_H@|<stdbit.h>|g' \
+		    -e 's|@GUARD_PREFIX@|GL|g' \
+		    -e 's|@PRAGMA_SYSTEM_HEADER@||g' \
+		    -e 's|@PRAGMA_COLUMNS@||g' \
+		    "$DEST/stdbit.in.h"
+	} > "$DEST/stdbit.h"
+	echo "generated stdbit.h from stdbit.in.h"
+fi
+
 # Generate gmp.h, the wrapper over mini-gmp.
 #
 # coreutils' src/basenc.c and src/factor.c include <gmp.h> with no
