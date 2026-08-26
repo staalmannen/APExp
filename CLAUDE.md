@@ -360,6 +360,35 @@ with proper `extern` declaration.
 **Note:** `ts` parameter to `pthread_cond_timedwait` is **absolute** CLOCK_REALTIME
 time (POSIX). `aio_suspend`'s `ts` is **relative** — convert before calling timedwait.
 
+### process/ — posix_spawn honours file actions
+
+`sys/src/ape/lib/ap/process/posix_spawn.c` was fork+exec with every file
+action and attribute discarded — `posix_spawn_file_actions_adddup2()` and
+friends returned 0 and did nothing, so the child just inherited the parent's
+descriptors. Undetectable by the caller: gnulib's `spawn-pipe.c` wires its
+pipe to the child purely through `adddup2`, and would have got a child on the
+wrong fds with no error anywhere.
+
+Now: actions are recorded in a growable array hung off
+`posix_spawn_file_actions_t.__actions`, replayed in the child between fork
+and exec, with `SETSID`/`SETPGROUP`/`SETSIGDEF`/`SETSIGMASK` applied first.
+Child setup failures come back to the caller as the return value through a
+close-on-exec report pipe (a successful exec closes it, so the parent's read
+returns 0). `RESETIDS` and the scheduling flags are stored and returned
+faithfully but ignored — Plan 9 has no POSIX scheduler.
+
+The old file declared its own `typedef void posix_spawnattr_t;` rather than
+including `<spawn.h>`; it worked only because every use was through a
+pointer. Covered by `sys/lib/tests/posix-spawn-test.c`.
+
+Missing before, and the reason gnulib's own spawn replacement got pulled in:
+`posix_spawnattr_setsigdefault`/`getsigdefault`, `setpgroup`/`getpgroup`,
+`setschedparam`/`setschedpolicy` and their getters were declared in
+`spawn.h` but undefined in libap. **Do not build gnulib's `spawn*.c` or
+`execute.c`/`spawn-pipe.c` into the shared archive** — gnulib's
+`posix_spawnattr_t` has glibc's `_sd`/`_ss` members and does not compile
+against APE's `<spawn.h>`.
+
 ### aio/ — async I/O on pthreads
 
 `sys/src/ape/lib/ap/aio/aio.c` — complete rewrite from Copilot-generated stub.
