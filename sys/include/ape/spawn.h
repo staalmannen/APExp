@@ -66,6 +66,7 @@ int posix_spawn_file_actions_addopen(posix_spawn_file_actions_t *__restrict, int
 int posix_spawn_file_actions_addclose(posix_spawn_file_actions_t *, int);
 int posix_spawn_file_actions_adddup2(posix_spawn_file_actions_t *, int, int);
 int posix_spawn_file_actions_addchdir(posix_spawn_file_actions_t *__restrict, const char *__restrict);
+int posix_spawn_file_actions_addfchdir(posix_spawn_file_actions_t *, int);
 
 #if defined(_BSD_SOURCE) || defined(_GNU_SOURCE)
 int posix_spawn_file_actions_addchdir_np(posix_spawn_file_actions_t *__restrict, const char *__restrict);

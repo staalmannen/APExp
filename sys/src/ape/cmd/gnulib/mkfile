@@ -59,6 +59,20 @@ GNUSRC=$APEXPROOT/sys/src/external/gnulib
 #                                     selinux/*.h, which this tree keeps,
 #                                     and copy.c calls lgetfilecon_raw
 #                                     with no guard at all.
+#   execute, spawn-pipe,              These build gnulib's own posix_spawn
+#   spawnattr_setdefault              replacement, whose posix_spawnattr_t
+#                                     has glibc's _sd/_ss members. APE's
+#                                     <spawn.h> declares the type itself
+#                                     (__def/__mask), so spawnattr_setdefault.c
+#                                     does not compile against it, and libap
+#                                     implements the whole API in
+#                                     ap/process/posix_spawn.c. Nothing in
+#                                     the shared tree calls execute() or
+#                                     create_pipe_*; bison and m4 do, but
+#                                     from their own lib/ copies. If they
+#                                     ever move here, build execute.c and
+#                                     spawn-pipe.c and let them use libap's
+#                                     posix_spawn -- do not build gnulib's.
 #   progreloc, relocatable            An artefact: safe-read.c defines
 #                                     safe_rw and renames it, so a scanner
 #                                     looking for safe_read finds only
@@ -123,7 +137,6 @@ OFILES=\
 	error.$O\
 	euidaccess.$O\
 	exclude.$O\
-	execute.$O\
 	fadvise.$O\
 	fatal-signal.$O\
 	fd-reopen.$O\
@@ -272,8 +285,6 @@ OFILES=\
 	sigsegv.$O\
 	sm3.$O\
 	sm3-stream.$O\
-	spawn-pipe.$O\
-	spawnattr_setdefault.$O\
 	stat-time.$O\
 	stdbit.$O\
 	stdlib.$O\
