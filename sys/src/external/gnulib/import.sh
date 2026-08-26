@@ -352,6 +352,25 @@ EOF
 # define HAVE_STRUCT_STAT_ST_BLKSIZE 1
 #endif
 
+/* APExp: HAVE_LCHOWN, which lives in the generated unistd.h rather than
+   in config.h -- it is @HAVE_LCHOWN@ in unistd.in.h, and that wrapper is
+   pruned here. coreutils' copy.c reads it as a C value, not with #ifdef:
+
+     if (HAVE_LCHOWN && (lchownat (dst_dirfd, dst_relname, ...) != 0)
+
+   so an absent definition is a compile error rather than a silently
+   disabled feature. 0 is the truthful answer: APE has no lchown, and
+   gnulib's lchown.c -- which this archive does build -- then compiles
+   its !HAVE_LCHOWN arm, the one that refuses to chown a symlink.
+
+   Every other @-substituted name the built sources read as a C
+   expression is either in a comment (LOCALENAME_ENHANCE_LOCALE_FUNCS,
+   strftime.c:70) or in a module not built here (REPLACE_FCHDIR,
+   fdopendir.c). */
+#ifndef HAVE_LCHOWN
+# define HAVE_LCHOWN 0
+#endif
+
 /* APExp: no non-Gregorian calendars in strftime. Otherwise strftime.c
    calls gl_locale_name_unsafe, which means gnulib's localename module,
    whose getlocalename_l-unsafe.c ends in "#error Please port ... to
