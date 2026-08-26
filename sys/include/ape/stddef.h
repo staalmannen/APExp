@@ -59,21 +59,30 @@ typedef unsigned int wchar_t;
  *
  *   diff_2_files: undefined: unreachable in diff_2_files
  *
- * abort() is gnulib's own fallback for a compiler with no
- * __builtin_unreachable, and is what pcc needs: it swallows unknown
- * __builtin_* calls and yields a constant, so __builtin_unreachable()
- * would compile to a no-op that neither traps nor informs the
- * optimiser. Reaching abort() is at least honest about the bug.
+ * It calls a name of our own rather than abort() directly, and does not
+ * declare abort here. gnulib's copy declares abort itself, and copying
+ * that cost a build:
  *
- * abort is declared here rather than pulling in <stdlib.h>, as gnulib
- * also does; the declaration matches the one in <stdlib.h> exactly, so
- * the two can be seen in either order. C++ has its own std::unreachable
- * and no _Noreturn, so the whole block sits outside it.
+ *   /sys/include/ape/stdlib.h:36 external redeclaration of: abort
+ *       EXTERN FUNC(VOID) VOID       stdlib.h:36
+ *       EXTERN FUNC(VOID) NORET VOID stddef.h:75
+ *
+ * The two spellings are identical in the source, so this is the
+ * compiler declining to see a _Noreturn function declared twice: it
+ * keeps NORET from the first and compares the second without it. A
+ * distinct name cannot collide with anything, whichever order the
+ * headers are read in, and __ape_unreachable() in libap does the
+ * abort(). Better than __builtin_unreachable(), which pcc swallows into
+ * a constant -- a no-op that neither traps nor tells the optimiser
+ * anything.
+ *
+ * C++ has std::unreachable and no _Noreturn, so the block sits outside
+ * it.
  */
 #ifndef __cplusplus
 #ifndef unreachable
-extern _Noreturn void abort(void);
-#define unreachable() abort()
+extern _Noreturn void __ape_unreachable(void);
+#define unreachable() __ape_unreachable()
 #endif
 #endif
 
