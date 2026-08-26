@@ -16,6 +16,15 @@
  * _GL_FUNCDECL_RPL names in the deleted *.in.h templates, keeping the
  * ones a module in OFILES actually calls, and dropping the ones APE
  * already declares. Signatures are copied from each defining .c file.
+ * Re-run that sweep whenever modules are added to OFILES: the coreutils
+ * batch brought in eleven more, and the one that surfaced it was
+ * numfmt.c returning mbschr's char * through an implicit int --
+ *
+ *   numfmt.c:1403 incompatible types: "INT" and "IND CHAR" for op "LIST"
+ *
+ * which is the loud version. mbsstr and memset_explicit in the same
+ * batch also return pointers, and would have truncated silently
+ * wherever the result was simply stored.
  *
  * Not included, having turned out to be dead code under this config.h:
  * timespec_get (gettime.c takes the clock_gettime branch, since
@@ -45,9 +54,28 @@ typedef off_t off64_t;
 /* string.h wrapper */
 extern size_t mbslen(const char *);
 extern const char *strerrorname_np(int);
+extern char *mbschr(const char *, int);
+extern char *mbsstr(const char *, const char *);
+extern void *memset_explicit(void *, int, size_t);
+
+/* sys/stat.h wrapper */
+extern int lchmod(const char *, mode_t);
+extern int mkfifoat(int, const char *, mode_t);
+
+/* unistd.h wrapper */
+extern int euidaccess(const char *, int);
+extern int fdatasync(int);
+extern int group_member(gid_t);
+extern int lchown(const char *, uid_t, gid_t);
+
+/* uchar.h wrapper. wint_t is a macro in APE's <wchar.h> rather than a
+   typedef, so that header has to come first. wc.c is the caller. */
+#include <wchar.h>
+extern wint_t btoc32(int);
 
 /* stdlib.h wrapper */
 extern char *secure_getenv(char const *);
+extern int rpmatch(const char *);
 
 /* signal.h wrapper.
    sig2str.c is in the archive, but SIG2STR_MAX and the two prototypes
