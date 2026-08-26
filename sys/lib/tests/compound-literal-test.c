@@ -104,12 +104,18 @@ main(void)
 		check("&(union){...}", up->i == 1 || up->c[0] == 1);
 	}
 
-	/* Arrays: the literal is an array object, so it decays and the
-	   address-of is redundant but legal. */
+	/* Arrays: the literal is an array object, so it decays to a
+	   pointer to its first element like any other array.
+
+	   &(int[]){...} is deliberately NOT tested. kencc does not give
+	   &arr the type int(*)[N] for any array, named or literal -- it
+	   warns "address of array/func ignored" (cc/com.c, the typeaf
+	   branch of tcomo) and yields the array itself. So (*&(int[]){7,8})[1]
+	   does not compile, and that is a pre-existing kencc property of
+	   &array, nothing to do with compound literals. */
 	{
 		int *a = (int[]){10, 20, 30};
 		check("(int[]){...} decays", a[0] == 10 && a[2] == 30);
-		check("&(int[]){...}", (*&(int[]){7, 8})[1] == 8);
 	}
 
 	/* Scalar and pointer literals -- these were already addressable,
