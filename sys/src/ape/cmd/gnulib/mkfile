@@ -36,6 +36,18 @@ GNUSRC=$APEXPROOT/sys/src/external/gnulib
 #                                     see libap's, because getopt_long.c
 #                                     reaches it through
 #                                     "#define gnu_getopt_long getopt_long".
+#   fseterr                           libap has __fseterr and
+#                                     config-common.h sets
+#                                     HAVE___FSETERR, so fseterr.h
+#                                     redirects every caller to it with
+#                                     "#define fseterr(fp) __fseterr(fp)".
+#                                     fseterr.c carries no such guard of
+#                                     its own -- it says it is "not used
+#                                     on systems that have the __fseterr
+#                                     function" -- so building it walks
+#                                     into the #elif defined EPLAN9 arm
+#                                     and reads fp->state, which musl's
+#                                     FILE does not have.
 #   acl_entries                       Unguarded: it takes an acl_t and
 #                                     assumes POSIX-draft ACLs. Nothing
 #                                     supplies acl_t here -- gnulib's
@@ -131,7 +143,6 @@ OFILES=\
 	fprintftime.$O\
 	fpurge.$O\
 	free.$O\
-	fseterr.$O\
 	fstrcmp.$O\
 	ftoastr.$O\
 	fts.$O\
