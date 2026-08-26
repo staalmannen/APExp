@@ -258,6 +258,9 @@ sum-cksum.$O: $CORESRC/src/cksum.c
 blake2-b2sum.$O: $CORESRC/src/blake2/b2sum.c
 	$CC $CFLAGS -o blake2-b2sum.$O $CORESRC/src/blake2/b2sum.c
 
+blake2b-ref.$O: $CORESRC/src/blake2/blake2b-ref.c
+	$CC $CFLAGS $CORESRC/src/blake2/blake2b-ref.c
+
 $O.b2sum: blake2b-ref.$O blake2-b2sum.$O
 $O.cksum: cksum-sum.$O cksum_crc.$O crctab.$O blake2b-ref.$O blake2-b2sum.$O
 $O.sum: sum-cksum.$O
