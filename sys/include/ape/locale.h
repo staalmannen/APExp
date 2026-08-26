@@ -52,11 +52,31 @@ extern struct lconv *localeconv(void);
 /* from gnulib */
 #define LC_MESSAGES 1729
 
-/* from musl */
+/* from musl.
+
+   Two declarations that used to be here were file-local helpers inside
+   musl's own sources, hoisted into this header along with the real
+   entry points:
+
+     extern int cmp(void,void);
+     static ssize_t vstrfmon_l(char *, size_t, locale_t, const char *, va_list);
+
+   cmp is the static bsearch comparator in locale/catgets.c, and
+   vstrfmon_l is the static worker in locale/strfmon.c. Neither belongs
+   in a public header, and cmp was actively harmful: <locale.h> is
+   included by almost everything, cmp is an ordinary name for a local
+   comparison function, and any program that defines its own gets
+
+     seq.c:439 external redeclaration of: cmp
+       STATIC FUNC(IND CONST CHAR, VLONG, IND CONST CHAR, VLONG) INT
+       EXTERN FUNC(VOID, VOID) INT  /sys/include/ape/locale.h:57
+     seq.c:439 function inconsistently declared: cmp
+
+   It was not a valid declaration either -- "(void,void)" is two void
+   parameters -- and vstrfmon_l named va_list without <stdarg.h>, so
+   anything that had actually used it would not have compiled. */
 #include <nl_types.h> /* catgets catclose catopen */
-extern int cmp(void,void);
 extern void freelocale(locale_t);
-static ssize_t vstrfmon_l(char *, size_t, locale_t, const char *, va_list);
 extern ssize_t strfmon_l(char *, size_t, locale_t, const char *, ...);
 extern ssize_t strfmon(char *, size_t, const char *, ...);
 extern float strtof_l(const char *, char **, locale_t);
