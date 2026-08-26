@@ -150,6 +150,7 @@ C transpilers are fun little proof-of-concept programs, which also open up for m
 Many (old) sources are still distributed as compressed archives, and the ability to unpack those
 sources could be a barrier. Because of this, APExp package several (un)archivers by default:
 
+- GNU tar (1.35)
 - minigzip (from zlib)
 - bzip2 utilities (from libbz2)
 - unarj (2.65)
