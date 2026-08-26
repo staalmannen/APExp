@@ -26,11 +26,13 @@ LIB=libgnu.a$O
 OFILES=\
 	acl-internal.$O\
 	allocator.$O\
+	areadlinkat-with-size.$O\
 	argmatch.$O\
 	asyncsafe-spin.$O\
 	backup-find.$O\
 	backup-rename.$O\
 	backupfile.$O\
+	basename.$O\
 	basename-lgpl.$O\
 	binary-io.$O\
 	bitrotate.$O\
@@ -55,12 +57,15 @@ OFILES=\
 	cycle-check.$O\
 	dfa.$O\
 	diagnose.$O\
+	dirname.$O\
+	dirname-lgpl.$O\
 	dup-safer.$O\
 	dup-safer-flag.$O\
 	error.$O\
 	exclude.$O\
 	execute.$O\
 	fatal-signal.$O\
+	fdutimensat.$O\
 	fd-safer.$O\
 	fd-safer-flag.$O\
 	file-set.$O\
@@ -70,6 +75,7 @@ OFILES=\
 	fopen-safer.$O\
 	free.$O\
 	fstrcmp.$O\
+	full-read.$O\
 	fts.$O\
 	get-errno.$O\
 	get-permissions.$O\
@@ -85,6 +91,7 @@ OFILES=\
 	gl_rbtreehash_list.$O\
 	hard-locale.$O\
 	hash.$O\
+	human.$O\
 	hashcode-named-file.$O\
 	hashcode-string1.$O\
 	hashcode-string2.$O\
@@ -102,6 +109,8 @@ OFILES=\
 	mbswidth.$O\
 	memchr2.$O\
 	mempcpy.$O\
+	mkfifoat.$O\
+	modechange.$O\
 	mkstemp-safer.$O\
 	next-prime.$O\
 	nstrftime.$O\
@@ -122,6 +131,7 @@ OFILES=\
 	renameatu.$O\
 	safe-read.$O\
 	same-inode.$O\
+	savedir.$O\
 	secure_getenv.$O\
 	set-permissions.$O\
 	setlocale-lock.$O\
@@ -149,6 +159,7 @@ OFILES=\
 	tmpdir.$O\
 	trim.$O\
 	unicodeio.$O\
+	unlinkdir.$O\
 	unistd.$O\
 	vaszprintf.$O\
 	version-etc-fsf.$O\
@@ -159,6 +170,7 @@ OFILES=\
 	xasprintf.$O\
 	xconcat-filename.$O\
 	xfreopen.$O\
+	xgetcwd.$O\
 	xhash.$O\
 	xmalloca.$O\
 	xmemdup0.$O\
@@ -169,6 +181,7 @@ OFILES=\
 	xstrtoimax.$O\
 	xstrtol.$O\
 	xstrtoul.$O\
+	xstrtoumax.$O\
 	xvasprintf.$O\
 	dynarray_at_failure.$O\
 	dynarray_emplace_enlarge.$O\

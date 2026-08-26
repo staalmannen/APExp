@@ -29,18 +29,53 @@ OFILES=\
 	warning.$O\
 	xattrs.$O
 
-GNU_OBJS=\
+# tar's own support library, not gnulib: paxutils, the rmt client and
+# the wordsplit parser. These stay.
+LIBTAR_OBJS=\
+	paxerror.$O\
+	paxexit-status.$O\
+	paxnames.$O\
+	rtapelib.$O\
+	wordsplit.$O\
+	xattr-at.$O
 
-LIBTAR_OBJS= paxerror.$O paxexit-status.$O 	paxnames.$O rtapelib.$O wordsplit.$O xattr-at.$O
+LIB=libtar.a$O ../gnulib/libgnu.a$O
+BIN=$APEXPROOT/$objtype/bin/ape
 
-LIB=../gnulib/libgnu.a libtar.a
-BIN=/$objtype/bin/ape
+GTARSRC=$APEXPROOT/sys/src/external/gtar
+GNUSRC=$APEXPROOT/sys/src/external/gnulib
 
-</sys/src/cmd/mkone
+# Set before the include: mkone expands "%.$O: $HFILES" where it reads
+# it, so a later assignment would come too late and editing a config
+# header would rebuild nothing.
+HFILES=\
+	config.h\
+	rmt-command.h\
+	$GNUSRC/config-common.h\
+	$GNUSRC/apexp-decls.h\
 
-GTARSRC=../../../external/gtar
+<$APEXPROOT/sys/src/cmd/mkone
 
-CFLAGS=-c -I. -I$GTARSRC -I$GTARSRC/src -I$GTARSRC/lib -I$GTARSRC/gnu	-B -DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale"
+CC=pcc -c
+
+# $GTARSRC/gnu is deliberately absent, and so are the rules that built
+# from it. That directory is tar's own vendored gnulib, 278 sources of
+# it, and the point of the shared libgnu.a is that there is one copy of
+# each module. Two symptoms of having both:
+#
+#   mk: ambiguous recipes for unlink.6:
+#       unlink.6 <-(mkfile:46)- .../gtar/src/unlink.c
+#       unlink.6 <-(mkfile:52)- .../gtar/gnu/unlink.c
+#
+# and its obstack.h and time.h shadow APE's, the trap that cost diff a
+# round of failures.
+#
+# -I. finds this directory's config.h, which layers tar's identity over
+# config-common.h. -I$GNUSRC comes next so the module headers match the
+# objects in libgnu.a. Nothing in $GTARSRC/src or $GTARSRC/lib shadows
+# an APE header, so they can follow.
+CFLAGS=-c -B -p -I. -I$GNUSRC -I$GTARSRC -I$GTARSRC/src -I$GTARSRC/lib\
+	-DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale"
 
 %.$O: $GTARSRC/src/%.c
 	$CC $CFLAGS $GTARSRC/src/$stem.c
@@ -48,25 +83,58 @@ CFLAGS=-c -I. -I$GTARSRC -I$GTARSRC/src -I$GTARSRC/lib -I$GTARSRC/gnu	-B -DHAVE_
 %.$O: $GTARSRC/lib/%.c
 	$CC $CFLAGS $GTARSRC/lib/$stem.c
 
-%.$O: $GTARSRC/gnu/%.c
-	  $CC $CFLAGS $prereq
+# rmt-command.h is generated, not shipped. tar's lib/Makefile.am writes
+# it at build time:
+#
+#   echo "# define DEFAULT_RMT_COMMAND \"$(DEFAULT_RMT_DIR)/rmt\""
+#
+# and both src/tar.c and lib/rtapelib.c include it. Generated into this
+# directory rather than the external tree, as diff's version.c is, so
+# the source stays clean.
+rmt-command.h:
+	echo '#ifndef DEFAULT_RMT_COMMAND' >rmt-command.h
+	echo '#define DEFAULT_RMT_COMMAND "/bin/ape/rmt"' >>rmt-command.h
+	echo '#endif' >>rmt-command.h
 
-%.$O: $GTARSRC/gnu/malloc/%.c
-	  $CC $CFLAGS $prereq
+CLEANFILES=rmt-command.h
 
-%.$O: $GTARSRC/gnu/unicase/%.c
-	  $CC $CFLAGS $prereq
-
-%.$O: $GTARSRC/gnu/unictype/%.c
-	  $CC $CFLAGS $prereq
-
-%.$O: $GTARSRC/gnu/uniwidth/%.c
-	  $CC $CFLAGS $prereq
-
-libtar.a: $LIBTAR_OBJS
-		ar vu libtar.a $prereq
-
-../gnulib/libgnu.a$O: $GNU_OBJS
-		ar vu ../gnulib/libgnu.a$O $prereq
-
-
+# KNOWN BLOCKER: argp.
+#
+# src/tar.c is argp-driven, 15 uses. The shared tree has argp.h and the
+# eleven argp-*.c, but none is in ../gnulib/mkfile's OFILES, and adding
+# them is not just a matter of listing them:
+#
+#   argp-parse.c reaches past the public interface into getopt's
+#   reentrant internals -- <getopt_int.h>, struct _getopt_data,
+#   _getopt_long_r and _getopt_long_only_r. Those live in gnulib's
+#   getopt1.c, which also defines getopt_long and getopt_long_only, and
+#   gnulib's getopt.c defines optarg, optind, opterr and optopt. libap
+#   defines all six (misc/getopt_long.c, and <unistd.h> declares them),
+#   so pulling gnulib's getopt in duplicates every one.
+#
+# gnulib's answer is its generated getopt.h, which renames the lot to
+# rpl_* through getopt-pfx-core.h and getopt-pfx-ext.h -- which is what
+# the -Drpl_getopt_long=getopt_long line in diff's old mkfile was
+# undoing. That wrapper is one of the headers import.sh prunes, for
+# shadowing APE's <getopt.h> and #include_next-ing back into it.
+#
+# So the choice is: restore a getopt.h for the shared tree that does the
+# rpl_ prefixing without the shadowing, and build getopt.c, getopt1.c
+# and the argp family under those names; or leave tar using the argp in
+# $GTARSRC/gnu. Nothing else here needs that directory -- everything
+# else tar calls is in the shared libgnu.a as of this commit -- so it
+# would be argp alone, with its own -I and pattern rule.
+#
+# There is deliberately no rule here that adds objects to
+# ../gnulib/libgnu.a. One used to stand at the end of this file:
+#
+#   ../gnulib/libgnu.a$O: $GNU_OBJS
+#           ar vu ../gnulib/libgnu.a$O $prereq
+#
+# 'ar vu' only appends, so a package reaching into the shared archive
+# leaves members behind that outlive the list that put them there --
+# the stale-member trap that made gnulib's obstack collide with libap's.
+# The shared archive is built once, by ../gnulib/mkfile, which deletes
+# it first. A module tar needs goes in that mkfile's OFILES.
+libtar.a$O: $LIBTAR_OBJS
+	ar vu libtar.a$O $LIBTAR_OBJS
