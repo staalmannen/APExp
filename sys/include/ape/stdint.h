@@ -76,10 +76,24 @@ typedef _uintptr_t uintptr_t;
 #define INTMAX_C(c)  c##LL
 #define UINTMAX_C(c) c##ULL
 
-#define INT8_MIN	((int8_t)0x80)
-#define INT16_MIN	((int16_t)0x8000)
-#define INT32_MIN	((int32_t)0x80000000)
-#define INT64_MIN	((int64_t)0x8000000000000000LL)
+/*
+ * C99 7.18: these macros must be usable in #if. A cast is not allowed
+ * there -- the type name is not a macro, so cpp reads it as 0 and the
+ * expression falls apart. They were spelled ((int64_t)0x8000...LL) and
+ * so on, which cost GNU tar:
+ *
+ *   list.c:744 Syntax error in #if/#elif
+ *
+ * on "#if ! (INTMAX_MAX <= UINTMAX_MAX && - (INTMAX_MIN + 1) <= UINTMAX_MAX)".
+ *
+ * -MAX-1 is the usual spelling and is well defined besides: 0x80000000
+ * has type unsigned int, since it does not fit in int, so casting it to
+ * int32_t was implementation-defined where negating the maximum is not.
+ */
+#define INT8_MIN	(-INT8_MAX-1)
+#define INT16_MIN	(-INT16_MAX-1)
+#define INT32_MIN	(-INT32_MAX-1)
+#define INT64_MIN	(-INT64_MAX-1)
 #define INTMAX_MIN	INT64_MIN
 
 #define UINT8_MIN	0
