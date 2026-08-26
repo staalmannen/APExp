@@ -546,6 +546,44 @@ Without correction, any early FP call in Tcl/Tk (e.g. `log(2.)` in
 **Invariant:** Any new APE startup path that bypasses `main9.s` MUST set the
 POSIX FP environment before executing any floating-point code.
 
+### Header search order: the architecture directory wins
+
+`pcc.c:234-235` passes
+
+```
+-I/$objtype/include/ape
+-I/sys/include/ape
+```
+
+in that order, so **anything the host's stock APE keeps in the architecture
+directory shadows everything in this tree**. Stock APE keeps `float.h` and
+`stdarg.h` there.
+
+`mount-include` used to bind the repo's `$objtype/include/ape` onto
+`/sys/include/ape` and nowhere else, which only makes those files visible on
+the path pcc searches *second*. So APExp's `<float.h>` — a wrapper over the
+renamed `float_arch.h` — was never read on any architecture, and
+`#include <float.h>` silently got the host's stock copy. Invisible until
+something wanted a C99 name:
+
+```
+dtimespec-bound.h:61 name not declared: DBL_TRUE_MIN
+```
+
+**Fix:** `mount-include` also does `bind -b $cputype/include/ape
+/$cputype/include/ape`, and every architecture has a real `float.h` that
+chains to `float_arch.h` plus the shared `float_ext.h`.
+
+The rename was only half-applied, which is worth knowing: eight architectures
+have `float_arch.h`, while sparc, sparc64 and spim still call theirs
+`float.h`; same for `stdarg_arch.h` vs sparc's `stdarg.h`. `sys/include/ape/
+stdarg.h` is a pure wrapper that adds nothing, so that one is currently
+harmless — but it is the same trap.
+
+**Note:** `mount-include` is a no-op if `/sys/include/ape/THIS_IS_APExp`
+already exists, so a shell that mounted before this change keeps the old
+namespace. Start a fresh `apexp-sh`.
+
 ### Build order for compiler changes
 ```
 cd sys/src/cmd/cc && mk nuke && mk install   # regenerates y.tab.h
