@@ -11,15 +11,37 @@
  */
 #define MAXNAMLEN 255
 
+/*
+ * d_ino and d_type are real members, filled in by readdir() from the
+ * stat information Plan 9 returns. They used to be object-like macros:
+ *
+ *	#define d_ino  d_stat.st_ino
+ *	#define d_type d_stat.st_mode
+ *
+ * which broke twice over.
+ *
+ * As macros they rewrote the names anywhere they appeared, not just
+ * after a dot. gnulib's file-has-acl.c declares a local
+ *
+ *	unsigned char d_type = flags & UCHAR_MAX;
+ *
+ * which became "unsigned char d_stat.st_mode = ...":
+ *
+ *	file-has-acl.c:463 syntax error, last name: d_stat
+ *
+ * And st_mode is not what d_type holds. DT_DIR is 4 where S_IFDIR is
+ * 0040000, so "dp->d_type == DT_DIR" was false for every directory.
+ * libap's own misc/fts.c and regex/glob.c both test d_type against
+ * these constants and were quietly getting the wrong answer.
+ *
+ * Placed after d_stat so the offsets of d_name and d_stat do not move.
+ */
 struct	dirent {
 	char	d_name[MAXNAMLEN + 1];
 	struct stat d_stat;
+	ino_t	d_ino;
+	unsigned char d_type;
 };
-
-/* d_ino compatibility macro: map to the inode field in d_stat */
-#define d_ino d_stat.st_ino
-/* d_type is not available on Plan9; define DT_ constants as stubs */
-#define d_type d_stat.st_mode
 #define DT_UNKNOWN 0
 #define DT_FIFO    1
 #define DT_CHR     2
