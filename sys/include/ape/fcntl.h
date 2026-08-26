@@ -72,6 +72,28 @@ extern int creat(const char *, mode_t);
 #define O_BINARY	0		/* no CRLF translation (Windows); no-op */
 #define O_TEXT		0		/* CRLF translation (Windows); no-op */
 
+/* Flags other systems have and Plan 9 does not. gnulib's fcntl.in.h
+ * defines this same set to 0, but that is a generated wrapper over
+ * <fcntl.h> and the shared gnulib tree prunes it, so the definitions
+ * have to live here. coreutils' dd.c is what asks: it ORs the whole lot
+ * together to find a bit no O_ value uses, then names its own flags in
+ * what is left, and only O_CIO carries a fallback of its own.
+ *
+ * 0 is the right answer for each: they are hints (O_DIRECT, O_NOATIME)
+ * or Hurd/AIX-isms, and dd tests each with "if (O_NOATIME)" before
+ * offering the corresponding conv= keyword, so a zero means the keyword
+ * is simply not offered rather than accepted and ignored. */
+#define O_DIRECT	0		/* bypass the buffer cache (Linux) */
+#define O_CIO		0		/* concurrent I/O (AIX) */
+#define O_NOATIME	0		/* do not update st_atime (Linux) */
+#define O_NOLINKS	0		/* fail if link count > 1 (AIX) */
+#define O_NOLINK	0		/* do not follow the final link (Hurd) */
+#define O_NOTRANS	0		/* do not run the translator (Hurd) */
+#define O_IGNORE_CTTY	0		/* no controlling-tty magic (Hurd) */
+#define O_TTY_INIT	0		/* termios initialised on open (POSIX) */
+#define O_NDELAY	O_NONBLOCK	/* the pre-POSIX name */
+#define O_EXEC		O_RDONLY	/* open for execute only; close enough */
+
 /* F_DUPFD_CLOEXEC: dup fd to >= arg and set FD_CLOEXEC on result */
 #define F_DUPFD_CLOEXEC	8
 
