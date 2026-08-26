@@ -7,7 +7,7 @@ APEXPROOT=../../../../..
 # lists and the -D flags come from src/local.mk. Both are read from the
 # package rather than transcribed, so they stay right: local.mk is where
 # upstream records that cp also needs copy.c and force-link.c, that
-# base64 is basenc.c with -DBASE_TYPE=64, and so on.
+# base64 is basenc.c with $BASETYPE64, and so on.
 #
 # Not here, and not in default__progs either: stty, which APE already
 # installs from sys/src/ape/9src/stty.c; coreutils, the multicall binary,
@@ -139,6 +139,28 @@ HFILES=\
 
 CC=pcc -c
 
+# rc treats = as a metacharacter, so a literal -DNAME=VALUE written
+# into a recipe lexes as three tokens and the shell rejects it:
+#
+#   /rc/lib/rcmain:24 *eval*:1: token '=': syntax error
+#
+# Only mk's own expansion of a variable is quoted, which is why the
+# -DLOCALEDIR in CFLAGS below is fine and why every other mkfile in
+# the tree carries such flags in a variable. These are the per-program
+# ones from src/local.mk.
+
+BASETYPE32=-DBASE_TYPE=32
+BASETYPE42=-DBASE_TYPE=42
+BASETYPE64=-DBASE_TYPE=64
+HASHBLAKE2=-DHASH_ALGO_BLAKE2=1
+HASHCKSUM=-DHASH_ALGO_CKSUM=1
+HASHMD5=-DHASH_ALGO_MD5=1
+HASHSHA1=-DHASH_ALGO_SHA1=1
+HASHSHA224=-DHASH_ALGO_SHA224=1
+HASHSHA256=-DHASH_ALGO_SHA256=1
+HASHSHA384=-DHASH_ALGO_SHA384=1
+HASHSHA512=-DHASH_ALGO_SHA512=1
+HASHSUM=-DHASH_ALGO_SUM=1
 # -I. finds this directory's config.h, which puts coreutils' identity
 # back on top of config-common.h. config-common.h *is* coreutils'
 # config.h with the identity stripped out, so this is the one package
@@ -160,13 +182,13 @@ CFLAGS=-B -p -I. -I$GNUSRC -I$CORESRC/src\
 
 
 base64.$O: $CORESRC/src/basenc.c
-	$CC $CFLAGS -DBASE_TYPE=64 -o base64.$O $CORESRC/src/basenc.c
+	$CC $CFLAGS $BASETYPE64 -o base64.$O $CORESRC/src/basenc.c
 
 base32.$O: $CORESRC/src/basenc.c
-	$CC $CFLAGS -DBASE_TYPE=32 -o base32.$O $CORESRC/src/basenc.c
+	$CC $CFLAGS $BASETYPE32 -o base32.$O $CORESRC/src/basenc.c
 
 basenc.$O: $CORESRC/src/basenc.c
-	$CC $CFLAGS -DBASE_TYPE=42 -o basenc.$O $CORESRC/src/basenc.c
+	$CC $CFLAGS $BASETYPE42 -o basenc.$O $CORESRC/src/basenc.c
 
 chgrp.$O: $CORESRC/src/chown.c
 	$CC $CFLAGS -o chgrp.$O $CORESRC/src/chown.c
@@ -179,22 +201,22 @@ ginstall.$O: $CORESRC/src/install.c
 	$CC $CFLAGS -o ginstall.$O $CORESRC/src/install.c
 
 md5sum.$O: $CORESRC/src/cksum.c
-	$CC $CFLAGS -DHASH_ALGO_MD5=1 -o md5sum.$O $CORESRC/src/cksum.c
+	$CC $CFLAGS $HASHMD5 -o md5sum.$O $CORESRC/src/cksum.c
 
 sha1sum.$O: $CORESRC/src/cksum.c
-	$CC $CFLAGS -DHASH_ALGO_SHA1=1 -o sha1sum.$O $CORESRC/src/cksum.c
+	$CC $CFLAGS $HASHSHA1 -o sha1sum.$O $CORESRC/src/cksum.c
 
 sha224sum.$O: $CORESRC/src/cksum.c
-	$CC $CFLAGS -DHASH_ALGO_SHA224=1 -o sha224sum.$O $CORESRC/src/cksum.c
+	$CC $CFLAGS $HASHSHA224 -o sha224sum.$O $CORESRC/src/cksum.c
 
 sha256sum.$O: $CORESRC/src/cksum.c
-	$CC $CFLAGS -DHASH_ALGO_SHA256=1 -o sha256sum.$O $CORESRC/src/cksum.c
+	$CC $CFLAGS $HASHSHA256 -o sha256sum.$O $CORESRC/src/cksum.c
 
 sha384sum.$O: $CORESRC/src/cksum.c
-	$CC $CFLAGS -DHASH_ALGO_SHA384=1 -o sha384sum.$O $CORESRC/src/cksum.c
+	$CC $CFLAGS $HASHSHA384 -o sha384sum.$O $CORESRC/src/cksum.c
 
 sha512sum.$O: $CORESRC/src/cksum.c
-	$CC $CFLAGS -DHASH_ALGO_SHA512=1 -o sha512sum.$O $CORESRC/src/cksum.c
+	$CC $CFLAGS $HASHSHA512 -o sha512sum.$O $CORESRC/src/cksum.c
 
 
 vdir.$O: $CORESRC/src/ls.c
@@ -219,22 +241,25 @@ vdir.$O: $CORESRC/src/ls.c
 # blake2b-ref.c is algorithm code and reads no HASH_ALGO_*, so b2sum and
 # cksum share one object of it.
 b2sum.$O: $CORESRC/src/cksum.c
-	$CC $CFLAGS -DHASH_ALGO_BLAKE2=1 -o b2sum.$O $CORESRC/src/cksum.c
+	$CC $CFLAGS $HASHBLAKE2 -o b2sum.$O $CORESRC/src/cksum.c
 
 cksum.$O: $CORESRC/src/cksum.c
-	$CC $CFLAGS -DHASH_ALGO_CKSUM=1 -o cksum.$O $CORESRC/src/cksum.c
+	$CC $CFLAGS $HASHCKSUM -o cksum.$O $CORESRC/src/cksum.c
 
 cksum-sum.$O: $CORESRC/src/sum.c
-	$CC $CFLAGS -DHASH_ALGO_CKSUM=1 -o cksum-sum.$O $CORESRC/src/sum.c
+	$CC $CFLAGS $HASHCKSUM -o cksum-sum.$O $CORESRC/src/sum.c
 
 sum.$O: $CORESRC/src/sum.c
-	$CC $CFLAGS -DHASH_ALGO_SUM=1 -o sum.$O $CORESRC/src/sum.c
+	$CC $CFLAGS $HASHSUM -o sum.$O $CORESRC/src/sum.c
 
 sum-cksum.$O: $CORESRC/src/cksum.c
-	$CC $CFLAGS -DHASH_ALGO_SUM=1 -o sum-cksum.$O $CORESRC/src/cksum.c
+	$CC $CFLAGS $HASHSUM -o sum-cksum.$O $CORESRC/src/cksum.c
 
 blake2-b2sum.$O: $CORESRC/src/blake2/b2sum.c
 	$CC $CFLAGS -o blake2-b2sum.$O $CORESRC/src/blake2/b2sum.c
+
+blake2b-ref.$O: $CORESRC/src/blake2/blake2b-ref.c
+	$CC $CFLAGS $CORESRC/src/blake2/blake2b-ref.c
 
 $O.b2sum: blake2b-ref.$O blake2-b2sum.$O
 $O.cksum: cksum-sum.$O cksum_crc.$O crctab.$O blake2b-ref.$O blake2-b2sum.$O
