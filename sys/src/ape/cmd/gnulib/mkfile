@@ -119,6 +119,7 @@ OFILES=\
 	nstrftime.$O\
 	open-safer.$O\
 	offtostr.$O\
+	openat-die.$O\
 	openat-proc.$O\
 	openat-safer.$O\
 	opendirat.$O\
@@ -135,7 +136,9 @@ OFILES=\
 	renameatu.$O\
 	rpmatch.$O\
 	safe-read.$O\
+	safe-write.$O\
 	same-inode.$O\
+	save-cwd.$O\
 	savedir.$O\
 	secure_getenv.$O\
 	set-permissions.$O\
