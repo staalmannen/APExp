@@ -17,6 +17,7 @@ OFILES=\
 	getcwd.$O\
 	getgid.$O\
 	getgroups.$O\
+	initgroups.$O\
 	getlogin.$O\
 	getpgid.$O\
 	getpgrp.$O\
