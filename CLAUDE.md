@@ -481,6 +481,60 @@ Adding `TVLONG`/`TUVLONG` to `typesuvinit[]` in `cc/sub.c` breaks the entire
 ABI by making vlong-returning functions use struct-return convention.
 The correct content: `{ TSTRUCT, TUNION, TCFLOAT, TCDOUBLE, -1 }`.
 
+### Mixed-signedness compound assignment is miscompiled (OPEN)
+
+`E1 op= E2` where E1 is signed and E2 unsigned does the operation
+**signed**. C99 6.5.16.2p3 makes it equivalent to `E1 = E1 op (E2)`, so
+the usual arithmetic conversions apply to the operation and only the
+result is converted back to E1's type.
+
+```c
+vlong  rv1 = -1;
+vlong  rv2 = 2;
+rv1 /= (uvlong)rv2;     /* gives 0; should give 0x7fffffffffffffff */
+rv1 %= (uvlong)rv2;     /* gives -1; should give 1                */
+```
+
+Confirmed by `sys/lib/tests/compound-assign-test.c`, which also shows
+the fully-cast and simple-assignment forms are correct — so it is `op=`
+alone, not the division.
+
+Where: `cc/com.c` `case OASDIV:` (~line 243) and `case OASMOD:` (~line
+310). `arith(n, 0)` correctly sets `n->type` to the promoted type, but
+then
+
+```c
+if(!mixedasop(t, n->type)) {
+        if(!sametype(t, n->type)) {
+                r = new1(OCAST, n->right, Z);
+                r->type = t;      /* casts the RHS back down to E1's type */
+                n->right = r;
+                n->type = t;
+        }
+}
+if(typeu[n->type->etype]) {       /* n->type is now t, so this misses */
+        if(n->op == OASDIV)
+                n->op = OASLDIV;  /* ... and the unsigned opcode is never chosen */
+```
+
+`mixedasop` only detects an integer lvalue with a *floating* RHS
+(`sub.c`: `!typefd[l->etype] && typefd[r->etype]`), so a signed/unsigned
+pair takes the first branch. The opcode is selected from `n->type`
+*after* it has been overwritten with `t`, so it is chosen from E1's type
+rather than from the type the operation is performed in.
+
+The fix is to select the opcode from the arith type before `n->type` is
+overwritten. Not applied: it touches every architecture and every
+compound assignment, and needs the self-hosting check above.
+
+Found via cpp's `#if` evaluator, which did `rv1 /= (uvlong)rv2` to
+divide unsigned. `UINTMAX_MAX / 2` came out 0, so GNU tar's
+
+    #if ! (INTMAX_MAX <= UINTMAX_MAX / 2)
+
+fired its `#error`. cpp no longer relies on the implicit conversion.
+Any other `signed_lvalue op= (unsigned)x` in the tree is still wrong.
+
 ### Compiler self-hosting as correctness test
 After any compiler change, have it rebuild itself multiple times:
 ```
