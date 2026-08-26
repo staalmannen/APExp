@@ -132,6 +132,7 @@ BIN=$APEXPROOT/$objtype/bin/ape
 # would rebuild nothing.
 HFILES=\
 	config.h\
+	version.h\
 	$GNUSRC/config-common.h\
 	$GNUSRC/apexp-decls.h\
 
@@ -304,6 +305,23 @@ $O.vdir: ls-vdir.$O
 #
 # Written into this directory rather than the external tree, taking the
 # number from config.h so it has one home.
+# version.h is generated too, and it has to exist before anything else
+# compiles: src/system.h includes it, and every program includes
+# system.h. That is why it is in HFILES above -- mkmany's
+# "%.$O: $HFILES" rule then makes it before the first object.
+#
+#   cksum.c:25 ... system.h:87 Could not find include file "version.h"
+#
+# version.c and version.h are the only generated sources this program set
+# needs. local.mk lists eight BUILT_SOURCES, but dircolors.h, primes.h,
+# crctab.c, fs-is-local.h and fs.h are all shipped in the tarball, and
+# the other three belong to programs not built here: speedlist.h to stty,
+# coreutils.h to the multicall binary, and nothing includes
+# fs-latest-magic.h at all -- it is a maintainer target for regenerating
+# fs.h.
+version.h:
+	echo 'extern char const *Version;' >version.h
+
 version.c:
 	echo '#include <config.h>' >version.c
 	echo '#include <version.h>' >>version.c
@@ -312,4 +330,4 @@ version.c:
 version.$O: version.c
 	$CC $CFLAGS version.c
 
-CLEANFILES=version.c
+CLEANFILES=version.c version.h
