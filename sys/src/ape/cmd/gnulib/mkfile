@@ -45,6 +45,7 @@ OFILES=\
 	c-strcasecmp.$O\
 	canonicalize.$O\
 	careadlinkat.$O\
+	chdir-long.$O\
 	clean-temp.$O\
 	clean-temp-simple.$O\
 	close-stream.$O\
