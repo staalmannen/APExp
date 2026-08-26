@@ -65,6 +65,41 @@
 #define LZOP_PROGRAM     "lzop"
 
 /*
+ * __getopt_argv_const, for the gnulib getopt sources this package
+ * builds locally (see the mkfile).
+ *
+ *   getopt1.c:28 syntax error, last name: __getopt_argv_const
+ *
+ * getopt1.c declares
+ *
+ *   getopt_long (int argc, char *__getopt_argv_const *argv, ...)
+ *
+ * and upstream that macro reaches it through the generated getopt.h,
+ * by way of getopt-pfx-ext.h. That wrapper is one of the headers
+ * import.sh prunes for shadowing APE's <getopt.h>, so the name arrives
+ * undefined and the declaration will not parse.
+ *
+ * const, not empty. getopt-pfx-ext.h picks empty only under
+ * __GETOPT_PREFIX; otherwise it uses const, giving "char *const *argv",
+ * which is exactly how APE's <getopt.h> declares getopt_long. The two
+ * have to agree, since APE supplies the declaration and gnulib the
+ * definition.
+ *
+ * Note config-common.h has "#define __GETOPT_PREFIX rpl_", under which
+ * getopt-pfx-ext.h would pick empty instead. It does not apply: that
+ * prefix only takes effect through the same pruned headers, so nothing
+ * renames anything here and the getopt sources define the plain names.
+ * The value has to match APE's declaration, not gnulib's intent.
+ *
+ * Here rather than in config-common.h because tar is the only package
+ * that compiles gnulib's getopt. If another one starts, this is worth
+ * promoting.
+ */
+#ifndef __getopt_argv_const
+#define __getopt_argv_const const
+#endif
+
+/*
  * hash_delete was a deprecated synonym for hash_remove. tar 1.35 was
  * written against a gnulib that still had it; the 2026 hash.c in the
  * shared tree has only hash_remove:
