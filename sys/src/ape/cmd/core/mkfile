@@ -311,6 +311,14 @@ $O.vdir: ls-vdir.$O
 # "%.$O: $HFILES" rule then makes it before the first object.
 #
 #   cksum.c:25 ... system.h:87 Could not find include file "version.h"
+#
+# version.c and version.h are the only generated sources this program set
+# needs. local.mk lists eight BUILT_SOURCES, but dircolors.h, primes.h,
+# crctab.c, fs-is-local.h and fs.h are all shipped in the tarball, and
+# the other three belong to programs not built here: speedlist.h to stty,
+# coreutils.h to the multicall binary, and nothing includes
+# fs-latest-magic.h at all -- it is a maintainer target for regenerating
+# fs.h.
 version.h:
 	echo 'extern char const *Version;' >version.h
 
