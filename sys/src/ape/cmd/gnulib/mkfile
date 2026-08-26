@@ -418,10 +418,18 @@ CFLAGS=-c -B -I. -I$GNUSRC -DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION\
 # Listed rather than globbed: mk does not expand globs in prerequisites.
 # The recipe-less pattern rule is how mksyslib adds $HFILES; keep it
 # separate from the rules below, as mksyslib's comment says.
+# The gnulib entries below config.h are the GENERATED headers, written
+# by import.sh from *.in.h templates: they change on a re-import or when
+# a substitution is corrected, and nothing else here would notice.
 HFILES=\
 	config.h\
 	$GNUSRC/config-common.h\
 	$GNUSRC/apexp-decls.h\
+	$GNUSRC/fts_.h\
+	$GNUSRC/gmp.h\
+	$GNUSRC/selinux/selinux.h\
+	$GNUSRC/selinux/context.h\
+	$GNUSRC/selinux/label.h\
 
 %.$O: $HFILES			# don't combine with following %.$O rules
 
