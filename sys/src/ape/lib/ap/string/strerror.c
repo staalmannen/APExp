@@ -94,6 +94,8 @@ char *sys_errlist[] = {
 	"Owner died",				/* EOWNERDEAD */
 	"Bad message",				/* EBADMSG */
 	"Stale file handle",			/* ESTALE */
+	"Disk quota exceeded",			/* EDQUOT */
+	"No data available",			/* ENODATA */
 };
 #define	_IO_nerr	(sizeof sys_errlist/sizeof sys_errlist[0])
 int sys_nerr = _IO_nerr;

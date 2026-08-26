@@ -1,20 +1,12 @@
 #include <unistd.h>
-#include <sys/limits.h>
-#include <string.h>
+
+extern int _execpath(const char *, const char **, const char **);
 
 /*
- * execvpe: execvp with explicit environment.
- * GNU extension; equivalent to execvp but uses envp instead of environ.
+ * execvpe: execvp with an explicit environment. GNU extension.
  */
 int
 execvpe(const char *name, char *const argv[], char *const envp[])
 {
-	char buf[PATH_MAX];
-
-	if(execve(name, (const char **)argv, (const char **)envp) < 0){
-		strcpy(buf, "/bin/");
-		strcpy(buf+5, name);
-		execve(buf, (const char **)argv, (const char **)envp);
-	}
-	return -1;
+	return _execpath(name, (const char **)argv, (const char **)envp);
 }

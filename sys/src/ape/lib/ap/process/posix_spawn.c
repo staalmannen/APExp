@@ -30,6 +30,16 @@
  * a failed dup2 or open would look to the caller like a successful spawn
  * followed by a mysterious exit status.
  *
+ * A failed EXEC, though, cannot be reported this way in APE, and shows
+ * up only as the child exiting 127.  APE's execve() closes every
+ * FD_CLOEXEC descriptor (and rewrites /env/_fdinfo, and does
+ * _RFORK(RFCENVG)) BEFORE it attempts the exec, so by the time exec
+ * fails and returns, the report pipe the child would write to is
+ * already gone.  POSIX allows this -- whether posix_spawn() diagnoses
+ * an exec failure in the parent or leaves it as a 127 exit status is
+ * explicitly unspecified -- but it differs from glibc, where both are
+ * reported through the return value.
+ *
  * Returns 0 on success with the child pid in *pid, or an error number
  * directly -- posix_spawn does NOT set errno.
  */
@@ -493,6 +503,10 @@ spawn(pid_t *pid, const char *path,
 			else
 				execv(path, (const char **)argv);
 			err = errno;
+			if(err == 0)
+				err = ENOEXEC;
+			/* The write below is very likely to go nowhere:
+			 * see the note on exec failure at the top. */
 		}
 		write(p[1], &err, sizeof err);
 		_exit(127);
