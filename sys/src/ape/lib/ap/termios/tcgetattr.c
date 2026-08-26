@@ -87,10 +87,12 @@ tcgetattr(int fd, struct termios *t)
 /* BUG: ignores optional actions */
 
 int
-tcsetattr(int fd, int, const struct termios *t)
+tcsetattr(int fd, int optional_actions, const struct termios *t)
 {
 	int n, i;
 	char buf[100];
+
+	(void)optional_actions;	/* see the BUG note above */
 
 	if(!isptty(fd)) {
 		if(!isatty(fd)) {
@@ -183,8 +185,9 @@ tcdrain(int fd)
 }
 
 int
-tcflush(int fd, int)
+tcflush(int fd, int queue_selector)
 {
+	(void)queue_selector;
 	if(!isatty(fd)){
 		errno = ENOTTY;
 		return -1;
@@ -194,8 +197,9 @@ tcflush(int fd, int)
 }
 
 int
-tcflow(int fd, int)
+tcflow(int fd, int action)
 {
+	(void)action;
 	if(!isatty(fd)){
 		errno = ENOTTY;
 		return -1;
@@ -205,8 +209,9 @@ tcflow(int fd, int)
 }
 
 int
-tcsendbreak(int fd, int)
+tcsendbreak(int fd, int duration)
 {
+	(void)duration;
 	if(!isatty(fd)){
 		errno = ENOTTY;
 		return -1;
