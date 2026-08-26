@@ -481,7 +481,7 @@ Adding `TVLONG`/`TUVLONG` to `typesuvinit[]` in `cc/sub.c` breaks the entire
 ABI by making vlong-returning functions use struct-return convention.
 The correct content: `{ TSTRUCT, TUNION, TCFLOAT, TCDOUBLE, -1 }`.
 
-### Mixed-signedness compound assignment is miscompiled (OPEN)
+### Mixed-signedness compound assignment (FIXED)
 
 `E1 op= E2` where E1 is signed and E2 unsigned does the operation
 **signed**. C99 6.5.16.2p3 makes it equivalent to `E1 = E1 op (E2)`, so
@@ -523,9 +523,21 @@ pair takes the first branch. The opcode is selected from `n->type`
 *after* it has been overwritten with `t`, so it is chosen from E1's type
 rather than from the type the operation is performed in.
 
-The fix is to select the opcode from the arith type before `n->type` is
-overwritten. Not applied: it touches every architecture and every
-compound assignment, and needs the self-hosting check above.
+Fixed by reading the promoted type's signedness into a local, `uns`,
+immediately after `arith(n, 0)` and before those branches overwrite
+`n->type`, then selecting the opcode from `uns`. Both sites; `OASMUL`
+and `OASLMUL` fall into the `OASDIV` case, so `*=` is covered too.
+
+The shift case above it needs no change and must not get one: C99
+6.5.7p3 gives `E1 << E2` the promoted type of the *left* operand, so
+reading the lvalue's type there is already right.
+
+Still wrong, and a separate problem: kencc performs a compound
+assignment in the lvalue's own width, casting the right operand down
+first. `long x; x /= (uvlong)y;` therefore divides in 32 bits on amd64
+where C requires 64. Fixing that means rewriting `E1 op= E2` as
+`E1 = (T1)(E1 op E2)`, far more than choosing an opcode.
+`compound-assign-test.c` reports it without counting it as a failure.
 
 Found via cpp's `#if` evaluator, which did `rv1 /= (uvlong)rv2` to
 divide unsigned. `UINTMAX_MAX / 2` came out 0, so GNU tar's

@@ -89,6 +89,59 @@ main(void)
 	rv1 = -1;
 	check("(uvlong)vlong > 0", (uvlong)((uvlong)rv1 > 0), 1);
 
+	/* *= shares the OASDIV case in cc/com.c, so it takes the same
+	   path. Signed and unsigned multiply agree in the low bits, so
+	   this cannot tell them apart -- it is here to catch the block
+	   being broken outright. */
+	rv1 = -1;
+	rv2 = 3;
+	rv1 *= (uvlong)rv2;
+	check("vlong *= (uvlong): -1 * 3", (uvlong)rv1, (uvlong)(vlong)-3);
+
+	/* Shifts have their own block and were already right: C99
+	   6.5.7p3 gives the result the promoted LEFT operand's type, so
+	   reading the lvalue's type there is correct. Controls. */
+	rv1 = -1;
+	rv1 >>= 1;
+	check("vlong >>= 1 stays arithmetic", (uvlong)rv1, (uvlong)(vlong)-1);
+
+	u = ~0ULL;
+	u >>= 1;
+	check("uvlong >>= 1 is logical", u, 0x7fffffffffffffffULL);
+
+	/*
+	 * Not counted, and expected to differ: a KNOWN LIMITATION beyond
+	 * the signedness fix.
+	 *
+	 * C99 promotes the long to uvlong, divides in 64 bits unsigned,
+	 * then converts back, giving -1. kencc performs a compound
+	 * assignment in the lvalue's own width, casting the right operand
+	 * down to long first, which divides 0xffffffff by 2 and gives
+	 * 2147483647. Making this agree means rewriting E1 op= E2 as
+	 * E1 = (T1)(E1 op E2), which is a much larger change than
+	 * choosing the right opcode.
+	 */
+	{
+		long lv = -1;
+		uvlong d = 2;
+		unsigned long got, want;
+
+		/* What C requires: promote lv to uvlong, divide there,
+		   convert the result back to long. Computed rather than
+		   written out, because long is 64-bit on an LP64 host and
+		   32-bit on Plan 9 amd64, and only the narrower case can
+		   differ. */
+		want = (unsigned long)(long)(((uvlong)(long)-1) / 2);
+
+		lv /= d;
+		got = (unsigned long)lv;
+		printf("%s  long /= uvlong: got %lu, C requires %lu%s\n",
+		       got == want ? "note " : "KNOWN",
+		       got, want,
+		       got == want ? " (widths equal here, nothing to truncate)"
+				   : " -- the width limitation described above");
+	}
+
 	if (failures)
 		printf("\n%d failure(s)\n", failures);
 	else
