@@ -4,12 +4,28 @@
 #include <features.h>
 #include <stdint.h>
 
-#define __PDP_ENDIAN 3412
+/* __LITTLE_ENDIAN, __BIG_ENDIAN, __PDP_ENDIAN and __BYTE_ORDER all come
+   from <_apetypes.h>, which <stdint.h> above pulls in: it is the
+   per-architecture header, and the only one that knows the answer.
+   Until they were defined there, "#if __BYTE_ORDER == __LITTLE_ENDIAN"
+   below was comparing 0 to 0 and taking the little-endian arm on every
+   architecture.
 
+   Guarded because <machine/endian.h> defines the unprefixed four as
+   plain numbers; whichever header a program reaches first, the other
+   must not redefine them. */
+#ifndef BIG_ENDIAN
 #define BIG_ENDIAN __BIG_ENDIAN
+#endif
+#ifndef LITTLE_ENDIAN
 #define LITTLE_ENDIAN __LITTLE_ENDIAN
+#endif
+#ifndef PDP_ENDIAN
 #define PDP_ENDIAN __PDP_ENDIAN
+#endif
+#ifndef BYTE_ORDER
 #define BYTE_ORDER __BYTE_ORDER
+#endif
 
 static uint16_t __bswap16(uint16_t __x)
 {
