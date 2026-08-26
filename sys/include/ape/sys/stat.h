@@ -73,6 +73,21 @@ struct	stat {
  * Each is guarded, so a port that grows a real one of these only has to
  * define it before including this header.
  */
+/*
+ * S_IXUGO and S_IRWXUGO are not POSIX, but portable code uses them --
+ * GNU tar's extract.c and GNU patch both do. They come from gnulib's
+ * generated <sys/stat.h>, which is pruned here for shadowing this
+ * header, so define them as gnulib does:
+ *
+ *   extract.c:429 name not declared: S_IXUGO
+ */
+#ifndef S_IXUGO
+#define S_IXUGO		(S_IXUSR|S_IXGRP|S_IXOTH)
+#endif
+#ifndef S_IRWXUGO
+#define S_IRWXUGO	(S_IRWXU|S_IRWXG|S_IRWXO)
+#endif
+
 #ifndef S_ISDOOR		/* Solaris 2.5 and up */
 #define S_ISDOOR(m) 0
 #endif
