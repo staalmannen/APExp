@@ -93,8 +93,13 @@ struct __res_state {
 
 typedef struct __res_state *res_state;
 
-/* Plan9 kencc has no weak symbol support; aliases are provided explicitly */
-#define weak_alias(old, new) /* no weak alias on Plan9 */
+/* Plan9 kencc has no weak symbol support; aliases are provided
+ * explicitly. Guarded, and with glibc's parameter names, for the reason
+ * given in <features.h>: gnulib's libc-config.h defines this too, with
+ * no guard, and cpp compares parameter lists as well as bodies. */
+#ifndef weak_alias
+#define weak_alias(name, aliasname) /* no weak alias on Plan9 */
+#endif
 
 #ifdef __cplusplus
 extern "C" {

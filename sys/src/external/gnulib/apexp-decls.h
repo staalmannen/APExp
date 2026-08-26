@@ -68,10 +68,22 @@ extern int fdatasync(int);
 extern int group_member(gid_t);
 extern int lchown(const char *, uid_t, gid_t);
 
-/* uchar.h wrapper. wint_t is a macro in APE's <wchar.h> rather than a
-   typedef, so that header has to come first. wc.c is the caller. */
-#include <wchar.h>
-extern wint_t btoc32(int);
+/* uchar.h wrapper. wc.c is the caller.
+
+   Spelled "unsigned int" rather than wint_t on purpose. APE has
+   "#define wint_t Rune" in <wchar.h> and "typedef unsigned int Rune" in
+   <utf.h>, so the two are the same type -- but including <wchar.h> here
+   would reach <langinfo.h> and through it <features.h>, whose
+   weak_alias then collides with the one gnulib's libc-config.h defines
+   unguarded at line 204:
+
+     libc-config.h:204 strftime.c:36 fprintftime.c:20
+       Macro redefinition of weak_alias
+
+   Nothing that every gnulib and coreutils translation unit includes
+   should be dragging system headers in behind it. Keep this file to
+   declarations. */
+extern unsigned int btoc32(int);
 
 /* stdlib.h wrapper */
 extern char *secure_getenv(char const *);
