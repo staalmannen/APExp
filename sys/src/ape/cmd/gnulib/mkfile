@@ -76,6 +76,8 @@ OFILES=\
 	fopen-safer.$O\
 	free.$O\
 	fprintftime.$O\
+	fadvise.$O\
+	fpurge.$O\
 	fstrcmp.$O\
 	full-read.$O\
 	full-write.$O\
@@ -179,6 +181,8 @@ OFILES=\
 	wmempcpy.$O\
 	xasprintf.$O\
 	xconcat-filename.$O\
+	xdectoimax.$O\
+	xdectoumax.$O\
 	xfreopen.$O\
 	xgetcwd.$O\
 	xhash.$O\

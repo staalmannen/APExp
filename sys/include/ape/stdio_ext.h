@@ -29,6 +29,7 @@ extern "C" {
 extern size_t __freadahead(FILE *);
 
 /* Bytes buffered for writing but not yet flushed. */
+extern void __fpurge(FILE *);
 extern size_t __fpending(FILE *);
 
 /* Set the stream's error indicator. */

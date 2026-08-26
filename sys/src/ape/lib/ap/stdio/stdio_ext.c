@@ -43,3 +43,20 @@ __freading(FILE *f)
 {
 	return (f->flags & F_NOWR) || f->rend != 0;
 }
+
+/* Discard whatever is buffered in either direction, without touching
+   the underlying fd. musl clears the write pointers and the read
+   pointers; there is nothing else in the buffer to drop.
+
+   gnulib's fpurge.c wants this: with neither HAVE___FPURGE nor
+   HAVE_FPURGE it falls through to a chain of per-platform branches that
+   poke at FILE by hand -- _IO_EOF_SEEN for glibc, __sferror for the
+   BSDs -- none of which describes this FILE. Supplying __fpurge and
+   setting HAVE___FPURGE puts it back on the musl branch, which is the
+   one that actually matches. */
+void
+__fpurge(FILE *f)
+{
+	f->wpos = f->wbase = f->wend = 0;
+	f->rpos = f->rend = 0;
+}

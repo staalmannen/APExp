@@ -122,7 +122,7 @@ TARG=\
 
 # Linked into every program: mkmany puts $OFILES on each link line.
 # src/version.c is generated, not shipped -- see the foot of this file.
-OFILES=version.$O
+OFILES=version.$O version-etc.$O
 
 LIB=../gnulib/libgnu.a$O
 BIN=$APEXPROOT/$objtype/bin/ape
@@ -329,5 +329,12 @@ version.c:
 
 version.$O: version.c
 	$CC $CFLAGS version.c
+
+# version-etc is built here, not taken from the shared libgnu.a.
+# emit_bug_reporting_address() compiles PACKAGE_BUGREPORT, PACKAGE_NAME
+# and PACKAGE_URL straight into the object, so one shared copy would give
+# every program whichever package built it. Rule 5 in ../gnulib/README.
+version-etc.$O: $GNUSRC/version-etc.c
+	$CC $CFLAGS $GNUSRC/version-etc.c
 
 CLEANFILES=version.c version.h
