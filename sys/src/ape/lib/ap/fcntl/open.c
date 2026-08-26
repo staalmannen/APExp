@@ -10,6 +10,19 @@
 /*
  * O_NOCTTY has no effect.
  * O_CLOEXEC maps to Plan9 OCEXEC (close on exec).
+ *
+ * O_DIRECTORY has no Plan 9 equivalent and is enforced here, with an
+ * fstat after the open.  It used to be #defined to 0, which is not the
+ * harmless simplification it looks: gnulib's targetdir.c decides whether
+ * an operand is a directory by whether
+ *
+ *	open (file, O_PATHSEARCH | O_DIRECTORY)
+ *
+ * succeeds, so with O_DIRECTORY ignored, cp, mv, ln and install all took
+ * an existing plain file for a directory and tried to create the copy
+ * inside it:
+ *
+ *	cp: cannot stat '/amd64/bin/ape/cut/6.cut': No such system call
  */
 int
 open(const char *path, int flags, ...)
@@ -18,6 +31,7 @@ open(const char *path, int flags, ...)
 	long f;
 	int mode;
 	Fdinfo *fi;
+	struct stat st;
 	va_list va;
 
 	f = flags&O_ACCMODE;
@@ -64,6 +78,14 @@ open(const char *path, int flags, ...)
 			strcpy(fi->name, path);
 		if(fi->oflags&O_APPEND)
 			_SEEK(n, 0, 2);
+		/* After _fdinfo[n] is set up: fstat() reads it. */
+		if(flags&O_DIRECTORY){
+			if(fstat(n, &st) < 0 || !S_ISDIR(st.st_mode)){
+				close(n);
+				errno = ENOTDIR;
+				return -1;
+			}
+		}
 	}
 	return n;
 }

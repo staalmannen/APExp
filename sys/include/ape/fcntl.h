@@ -19,7 +19,20 @@
 #define	O_RSYNC		0x2000
 #define O_SYNC		0x4000
 #define O_CLOEXEC	02000000
-#define O_NOFOLLOW 00
+/* Plan 9 has no O_DIRECTORY, so open() enforces it after the fact.
+ * It used to be 0, which is not the harmless simplification it looks:
+ * gnulib's targetdir.c decides whether an operand is a directory by
+ * whether open (file, O_PATHSEARCH | O_DIRECTORY) succeeds, so cp, mv,
+ * ln and install all took an existing plain file for a directory and
+ * tried to create the copy inside it --
+ *   cp: cannot stat '/amd64/bin/ape/cut/6.cut': No such system call
+ *
+ * O_NOFOLLOW stays 0. Enforcing it would mean an lstat before the open,
+ * and APE's lstat is "return stat (name, ans)": nothing in libap sets
+ * S_IFLNK, so the test could never fire. It becomes worth doing when
+ * libap learns about 9front's symlinks, not before. */
+#define O_DIRECTORY	0x8000
+#define O_NOFOLLOW	0
 
 #define	F_DUPFD		0	/* Duplicate fildes */
 #define	F_GETFD		1	/* Get fildes flags */
@@ -54,9 +67,10 @@ extern int creat(const char *, mode_t);
 
 /* POSIX extensions / portability */
 #define O_SEARCH	O_RDONLY	/* open dir for search; no-op on Plan 9 */
+/* O_PATH is deliberately NOT defined: gnulib and coreutils test for it
+ * with #ifdef and fall back to O_SEARCH, which is what APE can do. */
 #define O_BINARY	0		/* no CRLF translation (Windows); no-op */
 #define O_TEXT		0		/* CRLF translation (Windows); no-op */
-#define O_DIRECTORY	0		/* fail if not dir (Linux); no-op on Plan 9 */
 
 /* F_DUPFD_CLOEXEC: dup fd to >= arg and set FD_CLOEXEC on result */
 #define F_DUPFD_CLOEXEC	8
