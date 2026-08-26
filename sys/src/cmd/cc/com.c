@@ -66,7 +66,7 @@ tcomo(Node *n, int f)
 {
 	Node *l, *r;
 	Type *t;
-	int o;
+	int o, uns;
 
 	if(n == Z) {
 		diag(Z, "Z in tcom");
@@ -266,6 +266,27 @@ tcomo(Node *n, int f)
 		arith(n, 0);
 		while(n->left->op == OCAST)
 			n->left = n->left->left;
+		/*
+		 * C99 6.5.16.2p3: "E1 op= E2" is equivalent to
+		 * "E1 = E1 op (E2)", so the usual arithmetic conversions
+		 * apply to the operation and only the result is converted
+		 * back to E1's type. The operation is therefore performed
+		 * in arith()'s promoted type, and that is what decides
+		 * whether it is signed.
+		 *
+		 * Read it here, before the branches below overwrite
+		 * n->type with t. They used to leave the test reading
+		 * E1's type instead, so a signed lvalue with an unsigned
+		 * operand divided signed:
+		 *
+		 *   vlong rv1 = -1, rv2 = 2;
+		 *   rv1 /= (uvlong)rv2;   gave 0, not 0x7fffffffffffffff
+		 *
+		 * mixedasop only spots an integer lvalue with a floating
+		 * operand, so a signed/unsigned pair never reached it.
+		 * See sys/lib/tests/compound-assign-test.c.
+		 */
+		uns = typeu[n->type->etype];
 		if(!mixedasop(t, n->type)) {
 			if(!sametype(t, n->type)) {
 				r = new1(OCAST, n->right, Z);
@@ -277,7 +298,7 @@ tcomo(Node *n, int f)
 			n->type = t;
 			break;
 		}
-		if(typeu[n->type->etype]) {
+		if(uns) {
 			if(n->op == OASDIV)
 				n->op = OASLDIV;
 			if(n->op == OASMUL)
@@ -326,6 +347,8 @@ tcomo(Node *n, int f)
 		arith(n, 0);
 		while(n->left->op == OCAST)
 			n->left = n->left->left;
+		/* as for OASDIV above */
+		uns = typeu[n->type->etype];
 		if(!mixedasop(t, n->type)) {
 			if(!sametype(t, n->type)) {
 				r = new1(OCAST, n->right, Z);
@@ -335,7 +358,7 @@ tcomo(Node *n, int f)
 			}
 		}else
 			n->type = t;
-		if(typeu[n->type->etype]) {
+		if(uns) {
 			if(n->op == OASMOD)
 				n->op = OASLMOD;
 		}
