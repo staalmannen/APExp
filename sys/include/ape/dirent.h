@@ -50,6 +50,14 @@ struct	dirent {
 #define DT_REG     8
 #define DT_LNK     10
 #define DT_SOCK    12
+/* BSD whiteout. Nothing on Plan 9 produces one and there is no S_IFWHT
+ * to map it to, so DT_WHT is here only because portable code names it
+ * without a guard -- gnulib's dirent.in.h defines it for the same
+ * reason, and that wrapper is pruned. coreutils' ls.c puts it in two
+ * initialisers, one of them designated:
+ *   ls.c:191 initializer subscript must be constant
+ *   ls.c:191 more initializers than structure: d_type_filetype  */
+#define DT_WHT     14
 
 /*
  * BSD's conversions between a stat mode and a d_type value. Real
@@ -59,10 +67,10 @@ struct	dirent {
  *
  *   file-has-acl.c:979  IFTODT (sb->st_mode)
  *
- * No DT_WHT arm: BSD whiteout entries do not exist here, and neither
- * DT_WHT nor S_IFWHT is defined, so an unknown mode simply reports
- * DT_UNKNOWN and an unknown type maps back through the same shift
- * gnulib uses.
+ * No DT_WHT arm: DT_WHT exists as a name above, but nothing here
+ * produces a whiteout and there is no S_IFWHT to map it to, so an
+ * unknown mode reports DT_UNKNOWN and DT_WHT maps back through the same
+ * shift gnulib uses -- which is what gnulib's own DTTOIF does too.
  *
  * S_ISFIFO and S_ISSOCK are the same test in <sys/stat.h>, both mode
  * 0010000, so the FIFO arm is reached first and a socket cannot be
