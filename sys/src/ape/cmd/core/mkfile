@@ -10,10 +10,43 @@ APEXPROOT=../../../../..
 # base64 is basenc.c with -DBASE_TYPE=64, and so on.
 #
 # Not here, and not in default__progs either: stty, which APE already
-# installs from sys/src/ape/9src/stty.c; coreutils, the multicall binary,
-# which needs single-binary.mk; and df, hostid, nice, pinky, stdbuf,
-# timeout, users, who and chroot, which upstream builds only if the
-# platform allows. Any of those can be added once it is known to work.
+# installs from sys/src/ape/9src/stty.c, and coreutils, the multicall
+# binary, which needs single-binary.mk.
+#
+# The nine in cu-progs.mk's build_if_possible__progs are also out. That
+# list is upstream saying "only where the platform allows", and here is
+# what each would need, so this does not have to be worked out again:
+#
+#   df            get_fs_usage, from gnulib's fsusage.c. APE has no
+#                 statvfs and no statfs, so none of that file's STAT_*
+#                 arms is selected and it compiles to a function that
+#                 returns 0 having filled nothing in -- df would print
+#                 whatever was on the stack. A stub returning ENOSYS
+#                 would at least be honest, but a df that always fails
+#                 is not worth installing. Its other dependency,
+#                 read_file_system_list, is already stubbed in
+#                 apexp-mountlist.c: Plan 9 has no global mount table,
+#                 only a per-process namespace.
+#   who,          read_utmp. gnulib compiles its own dummy here (no
+#   users,        HAVE_UTMPX_H, no HAVE_UTMP_H), which sets ENOSYS and
+#   pinky         returns -1, so these three would build and link and
+#                 then never be able to name a single logged-in user.
+#                 Plan 9 keeps no utmp.
+#   chroot        libap's chroot() is a stub that sets EIO and returns
+#                 -1 (ap/unistd/chroot.c). Plan 9's equivalent is
+#                 rfork(RFNAMEG) plus bind, which is not this interface.
+#   nice          nice() is not in libap at all. 9front's equivalent is
+#                 writing "pri" to /proc/$pid/ctl.
+#   hostid        gethostid() is not in libap.
+#   stdbuf        needs libstdbuf.so preloaded into the child through
+#                 LD_PRELOAD. Plan 9 has no dynamic linking, so this one
+#                 cannot be done at all.
+#   timeout       the only real candidate. Everything it needs exists --
+#                 setitimer (ap/time/itimer.c), alarm, sigaction, kill,
+#                 setpgid -- but it stands or falls on a SIGALRM handler
+#                 actually running, and ap/signal/signal.c documents
+#                 that note delivery on amd64 falls through to
+#                 terminate. Worth enabling once that is tested.
 #
 # '[' is left out as well, though it is in default__progs. It is
 # lbracket.c, two lines that define LBRACKET and include test.c, and the

@@ -98,11 +98,12 @@ filladdrinfo(char *s, struct addrinfo *a, struct addrinfo *h)
 }
 
 int
-getaddrinfo(char *node, char *serv, struct addrinfo *hints, struct addrinfo **res)
+getaddrinfo(const char *node, const char *serv, const struct addrinfo *hints, struct addrinfo **res)
 {
-	static struct addrinfo nohints;
+	static const struct addrinfo nohints;
 	struct addrinfo *a, *head, **tail;
-	char buf[1024], *proto;
+	char buf[1024];
+	const char *proto;
 	int n, fd, err;
 
 	if(res != 0)

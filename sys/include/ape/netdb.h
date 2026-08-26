@@ -121,7 +121,12 @@ struct	addrinfo {
 	struct addrinfo	*ai_next;	/* Pointer to next in list.  */
 };
 
-extern int	getaddrinfo(char *, char *, struct addrinfo *, struct addrinfo **);
+/* POSIX has all three of these const; APE had them plain, and gnulib's
+   canon-host.c passes a "char const *host", which is an argument
+   prototype mismatch to kencc. Nothing in the implementation writes
+   through them. getnameinfo's sockaddr is left non-const: _sock_inip()
+   takes it plain and that would cascade. */
+extern int	getaddrinfo(const char *, const char *, const struct addrinfo *, struct addrinfo **);
 extern void	freeaddrinfo(struct addrinfo *);
 extern int	getnameinfo(struct sockaddr *, int, char *, int, char *, int, unsigned int);
 extern char	*gai_strerror(int);
