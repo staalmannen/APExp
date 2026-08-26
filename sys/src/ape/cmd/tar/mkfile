@@ -3,6 +3,24 @@ APEXPROOT=../../../../..
 
 TARG=tar
 
+# argp, and the getopt it is layered on, built here as tar's own objects
+# rather than added to the shared libgnu.a. See the note below the
+# CFLAGS for why.
+ARGP_OBJS=\
+	argp-ba.$O\
+	argp-eexst.$O\
+	argp-fmtstream.$O\
+	argp-fs-xinl.$O\
+	argp-help.$O\
+	argp-parse.$O\
+	argp-pin.$O\
+	argp-pv.$O\
+	argp-pvh.$O\
+	argp-version-etc.$O\
+	argp-xinl.$O\
+	getopt.$O\
+	getopt1.$O
+
 OFILES=\
 	buffer.$O\
 	checkpoint.$O\
@@ -27,7 +45,9 @@ OFILES=\
 	update.$O\
 	utf8.$O\
 	warning.$O\
-	xattrs.$O
+	xattrs.$O\
+	version-etc.$O\
+	$ARGP_OBJS
 
 # tar's own support library, not gnulib: paxutils, the rmt client and
 # the wordsplit parser. These stay.
@@ -98,33 +118,77 @@ rmt-command.h:
 
 CLEANFILES=rmt-command.h
 
-# KNOWN BLOCKER: argp.
+# argp is tar's option parser, and it is built here rather than added to
+# the shared libgnu.a.
 #
-# src/tar.c is argp-driven, 15 uses. The shared tree has argp.h and the
-# eleven argp-*.c, but none is in ../gnulib/mkfile's OFILES, and adding
-# them is not just a matter of listing them:
+# argp-parse.c reaches past getopt's public interface into its reentrant
+# internals -- <getopt_int.h>, struct _getopt_data, _getopt_long_r and
+# _getopt_long_only_r. Those live in gnulib's getopt1.c, which also
+# defines getopt_long and getopt_long_only, and gnulib's getopt.c
+# defines optarg, optind, opterr and optopt. libap defines all six
+# (misc/getopt.c and misc/getopt_long.c), so gnulib's getopt cannot go
+# into libgnu.a without every package that links it silently changing
+# which getopt it uses.
 #
-#   argp-parse.c reaches past the public interface into getopt's
-#   reentrant internals -- <getopt_int.h>, struct _getopt_data,
-#   _getopt_long_r and _getopt_long_only_r. Those live in gnulib's
-#   getopt1.c, which also defines getopt_long and getopt_long_only, and
-#   gnulib's getopt.c defines optarg, optind, opterr and optopt. libap
-#   defines all six (misc/getopt_long.c, and <unistd.h> declares them),
-#   so pulling gnulib's getopt in duplicates every one.
+# As tar's own objects they are named on the link line rather than
+# waiting in an archive, so they define those six before libap.a is
+# searched and libap's members are simply never pulled. That is the
+# same precedence that lets libgnu.a's error() win over libap's. It
+# holds only while nothing drags libap's getopt in for some other
+# symbol: tar calls no plain getopt(), and argp-pin.$O is included so
+# that program_invocation_name does not pull libap's stdio/error.c.
 #
-# gnulib's answer is its generated getopt.h, which renames the lot to
-# rpl_* through getopt-pfx-core.h and getopt-pfx-ext.h -- which is what
-# the -Drpl_getopt_long=getopt_long line in diff's old mkfile was
-# undoing. That wrapper is one of the headers import.sh prunes, for
-# shadowing APE's <getopt.h> and #include_next-ing back into it.
+# The sources come from $GNUSRC, not $GTARSRC/gnu: the shared tree has
+# the whole argp family, argp.h, argp-namefrob.h, argp-fmtstream.h and
+# getopt_int.h, at a newer vintage, and none of those files includes a
+# header that $GTARSRC/gnu would shadow.
+%.$O: $GNUSRC/%.c
+	$CC $CFLAGS $GNUSRC/$stem.c
+
+# unlink.c is the one basename the shared tree and $GTARSRC/src share,
+# so the rule above and the $GTARSRC/src rule both match unlink.$O --
+# the same ambiguity $GTARSRC/gnu used to cause. An explicit rule for
+# the target settles it: tar's src/unlink.c handles its deferred
+# unlinking, while gnulib's is a replacement for the system call that is
+# not in libgnu.a and that tar does not want.
+unlink.$O: $GTARSRC/src/unlink.c
+	$CC $CFLAGS $GTARSRC/src/unlink.c
+
+# version-etc per package, not from the shared archive: it compiles
+# PACKAGE_BUGREPORT, PACKAGE_NAME and PACKAGE_URL into the object, so a
+# shared copy would report whichever package built it. argp-version-etc.c
+# calls version_etc_ar, so tar needs it either way.
+version-etc.$O: $GNUSRC/version-etc.c
+	$CC $CFLAGS $GNUSRC/version-etc.c
+
+# Anything that must come from tar's own vendored gnulib is built with a
+# gnu- prefix on the object, so two sources of the same name in
+# $GTARSRC/src and $GTARSRC/gnu cannot produce the same target:
 #
-# So the choice is: restore a getopt.h for the shared tree that does the
-# rpl_ prefixing without the shadowing, and build getopt.c, getopt1.c
-# and the argp family under those names; or leave tar using the argp in
-# $GTARSRC/gnu. Nothing else here needs that directory -- everything
-# else tar calls is in the shared libgnu.a as of this commit -- so it
-# would be argp alone, with its own -I and pattern rule.
+#   mk: ambiguous recipes for unlink.6:
+#       unlink.6 <-(mkfile:46)- .../gtar/src/unlink.c
+#       unlink.6 <-(mkfile:52)- .../gtar/gnu/unlink.c
 #
+# Nothing uses these at the moment -- everything tar needs is either in
+# the shared libgnu.a or built above -- but a module whose 2026 version
+# does not suit tar 1.35 can be listed as gnu-<name>.$O without
+# disturbing anything else. $GTARSRC/gnu goes last on the include path
+# so its obstack.h and time.h cannot shadow APE's for these objects.
+gnu-%.$O: $GTARSRC/gnu/%.c
+	$CC $CFLAGS -I$GTARSRC/gnu -o gnu-$stem.$O $GTARSRC/gnu/$stem.c
+
+gnu-%.$O: $GTARSRC/gnu/malloc/%.c
+	$CC $CFLAGS -I$GTARSRC/gnu -o gnu-$stem.$O $GTARSRC/gnu/malloc/$stem.c
+
+gnu-%.$O: $GTARSRC/gnu/unicase/%.c
+	$CC $CFLAGS -I$GTARSRC/gnu -o gnu-$stem.$O $GTARSRC/gnu/unicase/$stem.c
+
+gnu-%.$O: $GTARSRC/gnu/unictype/%.c
+	$CC $CFLAGS -I$GTARSRC/gnu -o gnu-$stem.$O $GTARSRC/gnu/unictype/$stem.c
+
+gnu-%.$O: $GTARSRC/gnu/uniwidth/%.c
+	$CC $CFLAGS -I$GTARSRC/gnu -o gnu-$stem.$O $GTARSRC/gnu/uniwidth/$stem.c
+
 # There is deliberately no rule here that adds objects to
 # ../gnulib/libgnu.a. One used to stand at the end of this file:
 #
