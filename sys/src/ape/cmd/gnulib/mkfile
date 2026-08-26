@@ -18,6 +18,21 @@ APEXPROOT=../../../../..
 # backslash on a comment line sits inside the comment, so whether the
 # list survives past it depends on whether mk strips comments before or
 # after joining continued lines.
+#
+# When working out what is missing, remember that gnulib's "--" headers
+# rename functions with plain macros: stdio--.h has
+#
+#	#define freopen freopen_safer
+#
+# and dirent--.h, fcntl--.h and unistd--.h do the same for opendir,
+# open, creat, dup and pipe. A source that includes one of those calls
+# freopen and needs freopen-safer.$O, so scanning the sources for the
+# symbol the linker will actually want finds nothing. Both freopen-safer
+# and opendir-safer were missed exactly that way.
+#
+# The rpl_* renames are the opposite case and can be ignored: they live
+# in "#if @REPLACE_FOO@" arms of the *.in.h wrappers, and those wrappers
+# are pruned here, so the rename never happens.
 
 GNUSRC=$APEXPROOT/sys/src/external/gnulib
 
@@ -165,6 +180,7 @@ OFILES=\
 	fprintftime.$O\
 	fpurge.$O\
 	free.$O\
+	freopen-safer.$O\
 	fstrcmp.$O\
 	ftoastr.$O\
 	fts.$O\
@@ -240,6 +256,7 @@ OFILES=\
 	open-safer.$O\
 	openat-die.$O\
 	openat-proc.$O\
+	opendir-safer.$O\
 	openat-safer.$O\
 	opendirat.$O\
 	parse-datetime.$O\
