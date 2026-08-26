@@ -326,8 +326,22 @@ evalop(struct pri pri)
 				rtype = UND;
 				break;
 			}
+			/*
+			 * Spelled out rather than "rv1 /= (uvlong)rv2".
+			 * That form asks for a compound assignment whose
+			 * right operand is unsigned and whose left is not,
+			 * and the divide came out signed: UINTMAX_MAX / 2
+			 * gave 0 instead of INTMAX_MAX, so
+			 *
+			 *   #if ! (INTMAX_MAX <= UINTMAX_MAX / 2)
+			 *
+			 * fired GNU tar's #error in src/misc.c. The plain
+			 * comparisons below are unaffected, which is why
+			 * the same test in src/list.c, with the operands
+			 * reversed, passed: 0 <= INTMAX_MAX holds.
+			 */
 			if (rtype==UNS)
-				rv1 /= (uvlong)rv2;
+				rv1 = (vlong)((uvlong)rv1 / (uvlong)rv2);
 			else
 				rv1 /= rv2;
 			break;
@@ -336,8 +350,9 @@ evalop(struct pri pri)
 				rtype = UND;
 				break;
 			}
+			/* Same as SLASH above. */
 			if (rtype==UNS)
-				rv1 %= (uvlong)rv2;
+				rv1 = (vlong)((uvlong)rv1 % (uvlong)rv2);
 			else
 				rv1 %= rv2;
 			break;
