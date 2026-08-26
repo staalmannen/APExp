@@ -10,6 +10,7 @@ OFILES=\
 	ioctl.$O\
 	pty.$O\
 	setprogname.$O\
+	unreachable.$O\
 	syslog.$O\
 	uname.$O\
 # musl\
