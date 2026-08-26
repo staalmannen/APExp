@@ -124,6 +124,48 @@ if [ -f "$DEST/fts.in.h" ]; then
 	echo "generated fts_.h from fts.in.h"
 fi
 
+# Regenerate the stub selinux/*.h from their templates.
+#
+# Same shape as fts_.h above: the copy loop takes these as pre-generated
+# headers from whichever package shipped one, and the one in the tree was
+# generated from a 2022 gnulib. coreutils' copy.c calls the "_raw"
+# variants unconditionally --
+#
+#   if (0 <= lgetfilecon_raw (src_name, &con_raw))
+#     if (setfscreatecon_raw (con_raw) < 0)
+#
+# -- and the 2022 stub declares only the non-raw ones, so cp, mv and
+# ginstall failed to link:
+#   set_process_security_ctx: undefined: lgetfilecon_raw
+#   set_process_security_ctx: undefined: setfscreatecon_raw
+# The current se-selinux.in.h has all of them.
+#
+# The substitutions: USE_SELINUX_SELINUX_H is 0 here (no libselinux, so
+# the stub arm is the one that compiles), which makes INCLUDE_NEXT and
+# NEXT_SELINUX_SELINUX_H dead but they still have to go somewhere.
+# PRAGMA_SYSTEM_HEADER and PRAGMA_COLUMNS are empty for the same reason
+# they are empty everywhere else in this tree: they are GCC pragmas.
+for t in se-selinux se-context se-label; do
+	case $t in
+	se-selinux) out=selinux/selinux.h ;;
+	se-context) out=selinux/context.h ;;
+	se-label)   out=selinux/label.h ;;
+	esac
+	[ -f "$DEST/$t.in.h" ] || continue
+	mkdir -p "$DEST/selinux"
+	{
+		echo "/* DO NOT EDIT! GENERATED AUTOMATICALLY from $t.in.h */"
+		sed -e 's|@PRAGMA_SYSTEM_HEADER@||g' \
+		    -e 's|@PRAGMA_COLUMNS@||g' \
+		    -e 's|@USE_SELINUX_SELINUX_H@|0|g' \
+		    -e 's|@INCLUDE_NEXT@|include_next|g' \
+		    -e 's|@NEXT_SELINUX_SELINUX_H@|<selinux/selinux.h>|g' \
+		    -e 's|@GUARD_PREFIX@|GL|g' \
+		    "$DEST/$t.in.h"
+	} > "$DEST/$out"
+	echo "generated $out from $t.in.h"
+done
+
 # Generate gmp.h, the wrapper over mini-gmp.
 #
 # coreutils' src/basenc.c and src/factor.c include <gmp.h> with no
