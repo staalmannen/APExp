@@ -1,17 +1,42 @@
+</$objtype/mkfile
 APEXPROOT=../../../../..
-APE=$APEXPROOT/sys/src/ape
-<$APE/config
 
-LIB=../gnulib/libgnu.a$O
-CORESRC=../../../external/coreutils
+# GNU coreutils, against the shared libgnu.a.
+#
+# TARG is default__progs from src/cu-progs.mk. The per-program object
+# lists and the -D flags come from src/local.mk. Both are read from the
+# package rather than transcribed, so they stay right: local.mk is where
+# upstream records that cp also needs copy.c and force-link.c, that
+# base64 is basenc.c with -DBASE_TYPE=64, and so on.
+#
+# Not here, and not in default__progs either: stty, which APE already
+# installs from sys/src/ape/9src/stty.c; coreutils, the multicall binary,
+# which needs single-binary.mk; and df, hostid, nice, pinky, stdbuf,
+# timeout, users, who and chroot, which upstream builds only if the
+# platform allows. Any of those can be added once it is known to work.
+#
+# '[' is left out as well, though it is in default__progs. It is
+# lbracket.c, two lines that define LBRACKET and include test.c, and the
+# name is hostile to a build system whose shell globs: it would appear
+# in TARG, in $O.[ and in $BIN/[. test is built, and '[' can be added
+# with an explicit rule if it turns out to be wanted.
+#
+# ginstall installs under that name, not as install, which is what
+# upstream's transform does. Rename it here if that matters.
+
+CORESRC=$APEXPROOT/sys/src/external/coreutils
+GNUSRC=$APEXPROOT/sys/src/external/gnulib
 
 TARG=\
+	b2sum\
 	base64\
+	base32\
+	basenc\
 	basename\
 	cat\
+	chgrp\
 	chmod\
 	chown\
-	chroot\
 	cksum\
 	comm\
 	cp\
@@ -19,7 +44,6 @@ TARG=\
 	cut\
 	date\
 	dd\
-	df\
 	dir\
 	dircolors\
 	dirname\
@@ -32,6 +56,8 @@ TARG=\
 	false\
 	fmt\
 	fold\
+	ginstall\
+	groups\
 	head\
 	id\
 	join\
@@ -39,6 +65,7 @@ TARG=\
 	ln\
 	logname\
 	ls\
+	md5sum\
 	mkdir\
 	mkfifo\
 	mknod\
@@ -61,6 +88,11 @@ TARG=\
 	rm\
 	rmdir\
 	seq\
+	sha1sum\
+	sha224sum\
+	sha256sum\
+	sha384sum\
+	sha512sum\
 	shred\
 	shuf\
 	sleep\
@@ -83,38 +115,176 @@ TARG=\
 	unexpand\
 	uniq\
 	unlink\
+	vdir\
 	wc\
 	whoami\
-	yes\
+	yes
 
-# GNU_OBJS=\
+# Linked into every program: mkmany puts $OFILES on each link line.
+# src/version.c is generated, not shipped -- see the foot of this file.
+OFILES=version.$O
 
+LIB=../gnulib/libgnu.a$O
 BIN=$APEXPROOT/$objtype/bin/ape
+
+# Before the include: mkmany expands "%.$O: $HFILES" where it reads it,
+# so a later assignment would come too late and editing a config header
+# would rebuild nothing.
+HFILES=\
+	config.h\
+	$GNUSRC/config-common.h\
+	$GNUSRC/apexp-decls.h\
 
 <$APEXPROOT/sys/src/cmd/mkmany
 
-CFLAGS= -c -I$CORESRC/src -I$CORESRC/lib -D_POSIX_SOURCE\
+CC=pcc -c
+
+# -I. finds this directory's config.h, which puts coreutils' identity
+# back on top of config-common.h. config-common.h *is* coreutils'
+# config.h with the identity stripped out, so this is the one package
+# where the two halves are being rejoined.
+#
+# $CORESRC/lib is deliberately absent. That is coreutils' own vendored
+# gnulib -- the tree config-common.h and the shared modules were built
+# from -- and its generated replacement headers would shadow APE's, the
+# way diffutils' did.
+CFLAGS=-B -p -I. -I$GNUSRC -I$CORESRC/src\
 	-DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale"
 
 %.$O: $CORESRC/src/%.c
-	$CC $CFLAGS $prereq
+	$CC $CFLAGS $CORESRC/src/$stem.c
 
-# %.$O: $CORESRC/lib/%.c
-#	$CC $CFLAGS $prereq
-
-# ../gnulib/libgnu.a$O : $GNU_OBJS
-#	ar vu ../gnulib/libgnu.a$O $GNU_OBJS
-
-$O.cp: cp.$O cp-hash.$O copy.$O
-	$CC -o cp cp.$O cp-hash.$O copy.$O libcoreutils.a$O
-
-$O.chown: chown.$O chown-core.$O
-	$CC -o chown chown.$O chown-core.$O libcoreutils.a$O
-
-base64-basenc.$O : $CORESRC/src/basenc.c
-	$CC -DBASE_TYPE=64 $CFLAGS $prereq -o $target
-
-$O.base64: base64-basenc.$O
-	$CC -o base64 base64-basenc.$O libcoreutils.a$O
+# Programs whose main object does not come from <prog>.c, or that need a
+# -D. mkmany links $O.<prog> from <prog>.$O, so each gets an explicit
+# rule building that object from the real source.
 
 
+base64.$O: $CORESRC/src/basenc.c
+	$CC $CFLAGS -DBASE_TYPE=64 -o base64.$O $CORESRC/src/basenc.c
+
+base32.$O: $CORESRC/src/basenc.c
+	$CC $CFLAGS -DBASE_TYPE=32 -o base32.$O $CORESRC/src/basenc.c
+
+basenc.$O: $CORESRC/src/basenc.c
+	$CC $CFLAGS -DBASE_TYPE=42 -o basenc.$O $CORESRC/src/basenc.c
+
+chgrp.$O: $CORESRC/src/chown.c
+	$CC $CFLAGS -o chgrp.$O $CORESRC/src/chown.c
+
+
+dir.$O: $CORESRC/src/ls.c
+	$CC $CFLAGS -o dir.$O $CORESRC/src/ls.c
+
+ginstall.$O: $CORESRC/src/install.c
+	$CC $CFLAGS -o ginstall.$O $CORESRC/src/install.c
+
+md5sum.$O: $CORESRC/src/cksum.c
+	$CC $CFLAGS -DHASH_ALGO_MD5=1 -o md5sum.$O $CORESRC/src/cksum.c
+
+sha1sum.$O: $CORESRC/src/cksum.c
+	$CC $CFLAGS -DHASH_ALGO_SHA1=1 -o sha1sum.$O $CORESRC/src/cksum.c
+
+sha224sum.$O: $CORESRC/src/cksum.c
+	$CC $CFLAGS -DHASH_ALGO_SHA224=1 -o sha224sum.$O $CORESRC/src/cksum.c
+
+sha256sum.$O: $CORESRC/src/cksum.c
+	$CC $CFLAGS -DHASH_ALGO_SHA256=1 -o sha256sum.$O $CORESRC/src/cksum.c
+
+sha384sum.$O: $CORESRC/src/cksum.c
+	$CC $CFLAGS -DHASH_ALGO_SHA384=1 -o sha384sum.$O $CORESRC/src/cksum.c
+
+sha512sum.$O: $CORESRC/src/cksum.c
+	$CC $CFLAGS -DHASH_ALGO_SHA512=1 -o sha512sum.$O $CORESRC/src/cksum.c
+
+
+vdir.$O: $CORESRC/src/ls.c
+	$CC $CFLAGS -o vdir.$O $CORESRC/src/ls.c
+
+# The checksum family. cksum.c is the shared driver: every one of these
+# is that file compiled with a different HASH_ALGO_*, which is how
+# upstream builds them (src_md5sum_CPPFLAGS and friends in local.mk).
+#
+# Three of them also take extra objects, and a per-program -D has to
+# reach those too -- automake gives them per-program object names for
+# exactly this reason. Two files are shared between programs with
+# different -D, so they get prefixed objects rather than one shared one:
+#
+#   sum   is sum.c   plus cksum.c, both -DHASH_ALGO_SUM
+#   cksum is cksum.c plus sum.c,   both -DHASH_ALGO_CKSUM
+#
+# and without the prefixes cksum.$O and sum.$O would each have to be two
+# different objects at once. b2sum's own b2sum.c is prefixed too: it
+# would otherwise collide with b2sum.$O, which is cksum.c.
+#
+# blake2b-ref.c is algorithm code and reads no HASH_ALGO_*, so b2sum and
+# cksum share one object of it.
+b2sum.$O: $CORESRC/src/cksum.c
+	$CC $CFLAGS -DHASH_ALGO_BLAKE2=1 -o b2sum.$O $CORESRC/src/cksum.c
+
+cksum.$O: $CORESRC/src/cksum.c
+	$CC $CFLAGS -DHASH_ALGO_CKSUM=1 -o cksum.$O $CORESRC/src/cksum.c
+
+cksum-sum.$O: $CORESRC/src/sum.c
+	$CC $CFLAGS -DHASH_ALGO_CKSUM=1 -o cksum-sum.$O $CORESRC/src/sum.c
+
+sum.$O: $CORESRC/src/sum.c
+	$CC $CFLAGS -DHASH_ALGO_SUM=1 -o sum.$O $CORESRC/src/sum.c
+
+sum-cksum.$O: $CORESRC/src/cksum.c
+	$CC $CFLAGS -DHASH_ALGO_SUM=1 -o sum-cksum.$O $CORESRC/src/cksum.c
+
+blake2-b2sum.$O: $CORESRC/src/blake2/b2sum.c
+	$CC $CFLAGS -o blake2-b2sum.$O $CORESRC/src/blake2/b2sum.c
+
+$O.b2sum: blake2b-ref.$O blake2-b2sum.$O
+$O.cksum: cksum-sum.$O cksum_crc.$O crctab.$O blake2b-ref.$O blake2-b2sum.$O
+$O.sum: sum-cksum.$O
+
+# Extra objects per program. No recipe: these only add prerequisites to
+# mkmany's "$O.%: %.$O $OFILES $LIB" rule, whose recipe links $prereq.
+$O.chgrp: chown-core.$O chown-chgrp.$O
+$O.chown: chown-core.$O chown-chown.$O
+$O.cp: copy.$O copy-file-data.$O cp-hash.$O force-link.$O selinux.$O
+$O.cut: set-fields.$O
+$O.date: show-date.$O
+$O.dir: ls-dir.$O
+$O.du: show-date.$O
+$O.env: operand2sig.$O
+$O.expand: expand-common.$O
+$O.ginstall: prog-fprintf.$O copy.$O copy-file-data.$O cp-hash.$O force-link.$O selinux.$O
+$O.groups: group-list.$O
+$O.id: group-list.$O
+$O.ln: force-link.$O relpath.$O
+$O.ls: ls-ls.$O
+$O.mkdir: prog-fprintf.$O selinux.$O
+$O.mkfifo: selinux.$O
+$O.mknod: selinux.$O
+$O.mv: remove.$O copy.$O copy-file-data.$O cp-hash.$O force-link.$O selinux.$O
+$O.numfmt: set-fields.$O
+$O.realpath: relpath.$O
+$O.rm: remove.$O
+$O.rmdir: prog-fprintf.$O
+$O.split: temp-stream.$O
+$O.stat: find-mount-point.$O
+$O.tac: temp-stream.$O
+$O.tail: iopoll.$O
+$O.tee: iopoll.$O
+$O.uname: uname-uname.$O
+$O.unexpand: expand-common.$O
+$O.vdir: ls-vdir.$O
+
+# src/version.c is generated, as GNU diff's is. local.mk writes
+#
+#   printf 'char const *Version = "$(PACKAGE_VERSION)";\n'
+#
+# Written into this directory rather than the external tree, taking the
+# number from config.h so it has one home.
+version.c:
+	echo '#include <config.h>' >version.c
+	echo '#include <version.h>' >>version.c
+	echo 'char const *Version = PACKAGE_VERSION;' >>version.c
+
+version.$O: version.c
+	$CC $CFLAGS version.c
+
+CLEANFILES=version.c
