@@ -80,12 +80,29 @@ struct	stat {
  * header, so define them as gnulib does:
  *
  *   extract.c:429 name not declared: S_IXUGO
+ *
+ * Spelled with spaces around the bars, exactly as gnulib, gtar,
+ * diffutils, bison and readline all spell them. That is not cosmetic:
+ * C99 6.10.3p2 makes the PRESENCE of white-space separation part of a
+ * macro's identity, and cpp/macro.c's comparetokens() implements it --
+ *
+ *	(tp1->wslen==0) != (tp2->wslen==0)
+ *
+ * -- so a definition that differs only in spacing is a redefinition
+ * rather than a repetition. readline's posixstat.h:160 defines S_IXUGO
+ * with no guard of its own, so the two meet:
+ *
+ *	readline/posixstat.h:160 Macro redefinition of S_IXUGO
+ *
+ * Written the way everyone else writes it, both definitions are
+ * identical and cpp accepts the second silently. Same reasoning as the
+ * weak_alias parameter names in <features.h>.
  */
 #ifndef S_IXUGO
-#define S_IXUGO		(S_IXUSR|S_IXGRP|S_IXOTH)
+#define S_IXUGO		(S_IXUSR | S_IXGRP | S_IXOTH)
 #endif
 #ifndef S_IRWXUGO
-#define S_IRWXUGO	(S_IRWXU|S_IRWXG|S_IRWXO)
+#define S_IRWXUGO	(S_IRWXU | S_IRWXG | S_IRWXO)
 #endif
 
 #ifndef S_ISDOOR		/* Solaris 2.5 and up */
