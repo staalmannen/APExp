@@ -1,6 +1,9 @@
 #ifndef _ARPA_NAMESER_H
 #define _ARPA_NAMESER_H
 
+/* used in the buffer sizes, so that this header stands on its own. */
+#include <stddef.h>
+
 #include <stdint.h>
 #include <sys/types.h>
 

@@ -35,6 +35,9 @@
 #ifndef	_FTS_H_
 #define	_FTS_H_
 
+/* fts uses size_t for the name lengths, so that this header stands on its own. */
+#include <stddef.h>
+
 #pragma lib "/$M/lib/ape/libap.a"
 
 

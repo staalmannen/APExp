@@ -1,6 +1,9 @@
 #ifndef __GRP
 #define __GRP
 
+/* POSIX: <grp.h> defines size_t and gid_t, so that this header stands on its own. */
+#include <stddef.h>
+
 #pragma lib "/$M/lib/ape/libap.a"
 #include <sys/types.h>
 

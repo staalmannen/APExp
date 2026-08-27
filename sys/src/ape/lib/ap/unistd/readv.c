@@ -2,7 +2,7 @@
 #include <string.h>
 #include <sys/uio.h>
 
-int
+ssize_t
 readv(int fd, struct iovec *v, int ent)
 {
 	int x, i, n, len;

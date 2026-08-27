@@ -1,5 +1,8 @@
 #ifndef _SYS_RANDOM_H
 #define _SYS_RANDOM_H
+
+/* getentropy and getrandom both take a size_t, so that this header stands on its own. */
+#include <stddef.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
