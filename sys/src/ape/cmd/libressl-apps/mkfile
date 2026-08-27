@@ -97,11 +97,30 @@ SSLSRC=$APEXPROOT/sys/src/external/libressl
 # so it needs the same include set the library was built with, minus the
 # hidden/ namespace directories, which are for the library's own
 # internal calls.
+# The HAVE_* set must match sys/src/ape/lib/libressl/mkfile exactly --
+# see the long note there. include/compat/*.h renames a function to
+# libressl_<name> unless told the platform has it, so a set that differs
+# from the library's would have apps calling libressl_strlcpy while the
+# archive defines strlcpy, or the reverse. Both spellings link, so the
+# only symptom is an undefined symbol at the very end.
+#
+# Keep these two lists in step. If one gains an entry, so does the other.
+HAVEFLAGS=-DHAVE_ENDIAN_H\
+	-DHAVE_ARC4RANDOM_BUF -DHAVE_GETENTROPY\
+	-DHAVE_ASPRINTF -DHAVE_CLOCK_GETTIME\
+	-DHAVE_GETDELIM -DHAVE_GETLINE -DHAVE_GETOPT\
+	-DHAVE_GETPAGESIZE -DHAVE_GETPROGNAME\
+	-DHAVE_MEMMEM -DHAVE_PIPE2 -DHAVE_REALLOCARRAY\
+	-DHAVE_STRCASECMP -DHAVE_STRLCAT -DHAVE_STRLCPY\
+	-DHAVE_STRNDUP -DHAVE_STRNLEN -DHAVE_STRSEP\
+	-DHAVE_ERR_H -DHAVE_RESOLV_H -DHAVE_ARPA_NAMESER_H -DHAVE_POLL
+
 CFLAGS=-c -I$SSLSRC/include -I$SSLSRC/include/compat\
 	-I$SSLSRC/apps/openssl -I$SSLSRC/crypto/arch/$objtype\
 	-DLIBRESSL_INTERNAL -D__BEGIN_HIDDEN_DECLS= -D__END_HIDDEN_DECLS=\
 	-DOPENSSL_NO_ASM -DOPENSSL_NO_HW_PADLOCK\
-	-DOPENSSLDIR="/sys/lib/ape/ssl"
+	-DOPENSSLDIR="/sys/lib/ape/ssl"\
+	$HAVEFLAGS
 
 %.$O: $SSLSRC/apps/openssl/%.c
 	$CC $CFLAGS $SSLSRC/apps/openssl/$stem.c

@@ -38,6 +38,7 @@ extern int	strcasecmp(char*, char*);
 extern int	strncasecmp(char*, char*,int);
 extern unsigned int	arc4random(void);
 extern void	arc4random_buf(void*, size_t);
+extern unsigned int	arc4random_uniform(unsigned int);
 extern int	getentropy(void*, size_t);
 
 extern const char*	getprogname(void);
