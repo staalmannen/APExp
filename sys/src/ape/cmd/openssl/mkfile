@@ -128,3 +128,34 @@ CFLAGS=-c -I$SSLSRC/include -I$SSLSRC/include/compat\
 # apps/openssl/compat holds poll_win.c and clock_gettime_osx.c only,
 # both for platforms this is not, so there is no rule for that
 # directory.
+
+# OPENSSLDIR above is /sys/lib/ape/ssl, and it has to actually contain
+# something: openssl(1) reads openssl.cnf from there for req, ca and
+# x509 -v3, and cert.pem is the CA bundle that both s_client and curl
+# verify against -- curl_config.h sets CURL_CA_BUNDLE to the same file.
+# Without it every TLS connection fails to verify and the only clue is
+# "unable to get local issuer certificate".
+#
+# mount-include binds the repo's sys/lib over /sys/lib, so these land at
+# the path compiled in. Upstream's Makefile.am installs the same three
+# files, and refuses to overwrite an existing one; the copies here are
+# unconditional, since this tree's sys/lib is the build's own and not a
+# system directory someone has configured.
+#
+# certs/ is the -CApath hash directory. It stays empty: filling it is
+# certhash(1)'s job, and certhash needs symlinks, which Plan 9 does not
+# have -- see the note on certhash_win.c above.
+install:V:
+	mkdir -p $APEXPROOT/sys/lib/ape/ssl/certs
+	cp $SSLSRC/cert.pem $APEXPROOT/sys/lib/ape/ssl/cert.pem
+	cp $SSLSRC/openssl.cnf $APEXPROOT/sys/lib/ape/ssl/openssl.cnf
+	cp $SSLSRC/x509v3.cnf $APEXPROOT/sys/lib/ape/ssl/x509v3.cnf
+	cp $SSLSRC/apps/openssl/openssl.1 $APEXPROOT/sys/man/1/openssl
+
+# Only the three files this installs. certs/ is left alone: it is where
+# a user would put their own, and nothing here put anything in it.
+nuke:V:
+	rm -f $APEXPROOT/sys/lib/ape/ssl/cert.pem
+	rm -f $APEXPROOT/sys/lib/ape/ssl/openssl.cnf
+	rm -f $APEXPROOT/sys/lib/ape/ssl/x509v3.cnf
+	rm -f $APEXPROOT/sys/man/1/openssl
