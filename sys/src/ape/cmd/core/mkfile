@@ -57,6 +57,24 @@ APEXPROOT=../../../../..
 # ginstall installs under that name, not as install, which is what
 # upstream's transform does. Rename it here if that matters.
 
+# Local changes to the vendored coreutils sources, to be reapplied on a
+# re-import. Keep this list complete; it is the only record.
+#
+#   src/expr.c   The assert
+#
+#                  static_assert (SIZE_MAX <= ULONG_MAX);
+#
+#                is removed. kencc's long is 32-bit on amd64 while
+#                size_t is 64-bit, so it does not hold -- it passed
+#                until 2026-08 only because SIZE_MAX was itself wrong.
+#                Every size_t this file gives to or takes from GMP is a
+#                string length or an offset into an argv string, so
+#                nothing can reach the 4 GiB where it would matter. The
+#                reasoning is written out where the assert was.
+#
+# Everything else about this port lives outside the package: this
+# mkfile, config.h, and the shared gnulib tree.
+
 CORESRC=$APEXPROOT/sys/src/external/coreutils
 GNUSRC=$APEXPROOT/sys/src/external/gnulib
 
