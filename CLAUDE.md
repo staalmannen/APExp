@@ -617,9 +617,14 @@ never looked for the NUL. GNU `ls` read its way off the end of the heap.
   defers, so a shadowed or neutralised arch header cannot produce a wrong
   width — only `#error`.
 
-Known so far to be kept per-architecture by stock APE: `float.h`, `stdarg.h`,
-`stdint.h`. `sys/include/ape/stdarg.h` is a pure wrapper that adds nothing, so
-it is currently harmless — but it is the same trap.
+Known to be kept per-architecture by stock APE: `float.h`, `stdarg.h`,
+`stdint.h`. **All three are now shadowed** by a real file in each architecture
+directory. `stdarg.h` was the same trap twice over: its content is in
+`stdarg_arch.h` under the guard `__STDARG`, which is the guard the stock
+header uses too, so the stock copy did not merely win the search — it
+disabled APExp's. `va_copy` is APExp's addition to those headers, and whether
+any of it reached a compile depended entirely on what the host happened to
+ship.
 
 `sys/lib/tests/limits-test.c` checks `(size_t)-1 == SIZE_MAX` and the same
 identity for the other types, and prints which of these headers were actually

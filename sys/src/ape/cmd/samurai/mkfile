@@ -23,7 +23,7 @@ OFILES=\
 
 <$APEXPROOT/sys/src/cmd/mkone
 
-CFLAGS=-FVp -c -I$SAMUSRC
+CFLAGS=-Fp -c -I$SAMUSRC
 
 %.$O: $SAMUSRC/%.c
 	$CC $CFLAGS $SAMUSRC/$stem.c

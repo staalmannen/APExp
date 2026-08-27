@@ -178,6 +178,16 @@ main(int argc, char *argv[])
 		case 'S':
 			Sflag = 1;
 			break;
+		/*
+		 * -V and -+ belong to cpp, not here: cpp/nlist.c has -V
+		 * for verbose and -+ ignored for compatibility. Four
+		 * mkfiles used to say "-FVp", which meant one
+		 *
+		 *   cc: flag -V ignored
+		 *
+		 * per source file and nothing else. Pass cpp flags with
+		 * -Wp, if they are actually wanted.
+		 */
 		default:
 			fprint(2, "cc: flag -%c ignored\n", ARGC());
 			break;
