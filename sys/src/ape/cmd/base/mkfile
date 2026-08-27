@@ -6,105 +6,54 @@ LIB=\
 	libutil.a$O\
 	$APEXPROOT/$objtype/lib/ape/libap.a\
 
+# sbase, for the utilities nothing else in this tree provides.
+#
+# It used to build 66 programs, 50 of which are now built from a better
+# implementation elsewhere and would only have raced to install over the
+# same name in $BIN. GNU coreutils covers 49 of them; diffutils covers
+# cmp. sed, grep and tar were already off for the same reason.
+#
+# Removed rather than commented out -- the list of what coreutils builds
+# is in sys/src/ape/cmd/core/mkfile, and duplicating it here as 50 dead
+# lines would only go stale. What is left is what sbase is actually for.
+#
+# UTIL_OBJS below is deliberately untouched. libutil.a is a library; an
+# object no remaining program calls simply sits in it.
+#
+# Two of these are worth knowing about:
+#   chroot   calls chroot(2), which libap answers with EIO
+#            (ap/unistd/chroot.c). Plan 9's equivalent is
+#            rfork(RFNAMEG) plus bind, so this cannot work as it stands.
+#            coreutils leaves its own chroot out for the same reason.
+#   cmp      is gone on the strength of diffutils providing it, and the
+#            diff directory is commented out in cmd/mkfile on this
+#            branch. Enable it there, or put cmp back here.
+#
+# kill, hostname, uptime and arch stay with sbase: coreutils has them
+# but lists them in no_install__progs, so it builds them and does not
+# install them.
 TARG= \
-		basename\
-#		bc\
 		cal\
-		cat\
-#		chgrp\
-#		chmod\
-#		chown\
 		chroot\
-		cksum\
-		cmp\
 		cols\
-		comm\
-#		cp\
-#		cron\
-		cut\
-		date\
 		dc\
-		dd\
-		dirname\
-#		du\
-		echo\
-#		ed\
-		env\
-		expand\
-		expr\
-		false\
-#		find\
-#		flock\
-		fold\
-#		getconf\
-##		grep\
-		head\
-#		hostname\
-		join\
 		kill\
-		link\
-#		ln\
-#		logger\
-		logname\
-		ls\
-		md5sum\
-		mkdir\
-		mkfifo\
-		mknod\
-		mktemp\
-#		mv\
-#		nice\
-#		nl\
-		nohup\
-		od\
-#		paste\
-		pathchk\
-		printenv\
-		printf\
-		pwd\
-		readlink\
-#		renice\
 		rev\
-#		rm\
-		rmdir\
-##		sed\
-		seq\
 		setsid\
-		sha1sum\
-#		sha244sum\
-#		sha256sum\
-#		sha384sum\
-#		sha512-224sum\
-#		sha512-256sum\
-#		sha512sum\
-		sleep\
-#		sort\
-		split\
 		sponge\
 		strings\
-#		sync\
-		tail\
-##		tar\
-		tee\
-		test\
 		tftp\
 		time\
-#		touch\
-		tr\
-		true\
-		tsort\
-		tty\
-		uname\
-		unexpand\
-		uniq\
-		unlink\
 		uudecode\
 		uuencode\
 		which\
-		whoami\
 		xargs\
-		xinstall\
-		yes
+		xinstall
+
+# Off, and sbase's own: bc, cron, ed, find, flock, getconf, hostname,
+# logger, nice, renice. No trailing backslashes here -- these are past
+# the end of TARG, and a comment line ending in one continues onto the
+# next line.
 
 UTIL_OBJS=\
 		concat.$O\
