@@ -1024,6 +1024,16 @@ gmove(Node *f, Node *t)
 		regfree(&nod2);
 		regfree(&nod3);
 		patch(p2, pc);
+		/*
+		 * The result is in nod1, which is t's own register only
+		 * when t is already one -- regalloc(&nod1, t, t) reuses o
+		 * if it is a register and allocates a fresh one if not.
+		 * Without this the conversion was dropped whenever the
+		 * destination was memory, which is every "double d = u;"
+		 * with d on the stack. The TULONG case below has always
+		 * had it.
+		 */
+		gmove(&nod1, t);
 		regfree(&nod);
 		regfree(&nod1);
 		return;

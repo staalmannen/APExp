@@ -42,6 +42,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <limits.h>
+#include <sys/types.h>	/* ssize_t */
 
 static int failures;
 
@@ -71,6 +72,7 @@ main(void)
 	printf("PTRDIFF_MAX %llx\n", (unsigned long long)PTRDIFF_MAX);
 	printf("UINTMAX_MAX %llx\n", (unsigned long long)UINTMAX_MAX);
 	printf("ULONG_MAX   %llx\n", (unsigned long long)ULONG_MAX);
+	printf("SSIZE_MAX   %llx\n", (unsigned long long)SSIZE_MAX);
 
 	/* Which headers actually got read, and what they decided. When
 	   SIZE_MAX is wrong these say why: SIZE_MAX comes from
@@ -150,13 +152,22 @@ main(void)
 	check("PTRDIFF_MAX == SIZE_MAX/2",
 	      (unsigned long long)PTRDIFF_MAX == SIZE_MAX / 2, d);
 
-	/* ssize_t, which had the same history as size_t. */
+	/* ssize_t, which had the same history as size_t and the same bug:
+	   SSIZE_MAX was LONG_MAX, and kencc's long is 32-bit on amd64
+	   while ssize_t has been long long since the 2026-04 width fix. */
 	{
 		size_t big = (size_t) -1;
+		ssize_t smax = (ssize_t) (((size_t) -1) >> 1);
 
 		sprintf(d, "sizeof(size_t) is %d", (int)sizeof(size_t));
 		check("size_t can hold more than 4G on a 64-bit host",
 		      sizeof(void *) != 8 || big > 0xffffffffULL, d);
+
+		sprintf(d, "sizeof(ssize_t) is %d, SSIZE_MAX is %llx",
+		        (int)sizeof(ssize_t), (unsigned long long)SSIZE_MAX);
+		check("SSIZE_MAX is as wide as ssize_t", SSIZE_MAX == smax, d);
+		check("sizeof(ssize_t) == sizeof(size_t)",
+		      sizeof(ssize_t) == sizeof(size_t), "they differ");
 	}
 
 	/* The same identity for every other unsigned type: a macro that
