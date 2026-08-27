@@ -5931,6 +5931,46 @@
 # define HAVE_LCHOWN 0
 #endif
 
+/* APExp: the statvfs answers, now that APE has <sys/statvfs.h>.
+   Plan 9 cannot report block or inode counts -- statvfs() and
+   fstatvfs() are there so the TYPE exists, and always fail with ENOSYS.
+   coreutils' stat.c needs the type whatever it does with the call:
+   it uses statvfs only for "stat -f", but declares a STRUCT_STATVFS and
+   static_asserts on its alignment unconditionally, so an incomplete
+   type loses the whole program --
+
+     stat.c:259 structure not fully declared statfs
+     stat.c:880 _Alignof undefined type
+
+   -- rather than just that one option.
+
+   STAT_STATVFS picks the statvfs arm over the statfs one. Together with
+   HAVE_STRUCT_STATVFS_F_TYPE that makes stat.c's USE_STATVFS true (see
+   the conditional at the top of stat.c, kept in sync with
+   m4/stat-prog.m4). F_FSID_IS_INTEGER is what POSIX says -- f_fsid is
+   an unsigned long -- and skips the block that takes alignof of the
+   struct. F_NAMEMAX names the member POSIX calls f_namemax rather than
+   Linux's f_namelen.
+
+   Deliberately NOT defined: HAVE_STRUCT_STATVFS_F_BASETYPE and
+   HAVE_STRUCT_STATVFS_F_FSTYPENAME, which are Solaris and BSD members
+   this struct does not have. */
+#ifndef HAVE_SYS_STATVFS_H
+# define HAVE_SYS_STATVFS_H 1
+#endif
+#ifndef STAT_STATVFS
+# define STAT_STATVFS 1
+#endif
+#ifndef HAVE_STRUCT_STATVFS_F_TYPE
+# define HAVE_STRUCT_STATVFS_F_TYPE 1
+#endif
+#ifndef HAVE_STRUCT_STATVFS_F_NAMEMAX
+# define HAVE_STRUCT_STATVFS_F_NAMEMAX 1
+#endif
+#ifndef STRUCT_STATVFS_F_FSID_IS_INTEGER
+# define STRUCT_STATVFS_F_FSID_IS_INTEGER 1
+#endif
+
 /* APExp: no non-Gregorian calendars in strftime.
    strftime.c defaults SUPPORT_NON_GREG_CALENDARS_IN_STRFTIME to true and
    then calls gl_locale_name_unsafe to spot th_TH, fa_IR and the like:

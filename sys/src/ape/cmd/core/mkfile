@@ -17,16 +17,16 @@ APEXPROOT=../../../../..
 # list is upstream saying "only where the platform allows", and here is
 # what each would need, so this does not have to be worked out again:
 #
-#   df            get_fs_usage, from gnulib's fsusage.c. APE has no
-#                 statvfs and no statfs, so none of that file's STAT_*
-#                 arms is selected and it compiles to a function that
-#                 returns 0 having filled nothing in -- df would print
-#                 whatever was on the stack. A stub returning ENOSYS
-#                 would at least be honest, but a df that always fails
-#                 is not worth installing. Its other dependency,
-#                 read_file_system_list, is already stubbed in
-#                 apexp-mountlist.c: Plan 9 has no global mount table,
-#                 only a per-process namespace.
+#   df            get_fs_usage, from gnulib's fsusage.c, which is not in
+#                 OFILES. It would now compile -- APE has a
+#                 <sys/statvfs.h> and config-common.h sets STAT_STATVFS
+#                 -- and would return -1/ENOSYS, since Plan 9 cannot
+#                 report block or inode counts for the file system
+#                 behind a path. read_file_system_list, its other
+#                 dependency, is already stubbed in apexp-mountlist.c:
+#                 there is no global mount table, only a per-process
+#                 namespace. So df would build and then fail on every
+#                 invocation, which is not worth installing.
 #   who,          read_utmp. gnulib compiles its own dummy here (no
 #   users,        HAVE_UTMPX_H, no HAVE_UTMP_H), which sets ENOSYS and
 #   pinky         returns -1, so these three would build and link and
