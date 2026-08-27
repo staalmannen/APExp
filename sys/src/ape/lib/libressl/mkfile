@@ -26,8 +26,12 @@ APE=$APEXPROOT/sys/src/ape
 # LibreSSL arch directory at all.
 #
 # One archive rather than three. curl wants -lssl -lcrypto and the tree
-# has no notion of link order between them; the 481 sources share no
-# basename, checked, so a flat object list is unambiguous.
+# has no notion of link order between them.
+#
+# ssl/ and tls/ objects are prefixed, crypto/ objects are not; see the
+# note above those pattern rules for why. The 481 selected sources share
+# no basename, but that is not the test that matters -- mk resolves a
+# target against every rule whose directory could produce it.
 
 LIB=$APEXPROOT/$objtype/lib/ape/libressl.a
 BIN=$APEXPROOT/$objtype/bin/ape
@@ -453,72 +457,152 @@ CRYPTOBJ=\
 	xts128.$O\
 
 SSLOBJ=\
-	bio_ssl.$O\
-	d1_both.$O\
-	d1_lib.$O\
-	d1_pkt.$O\
-	d1_srtp.$O\
-	pqueue.$O\
-	s3_cbc.$O\
-	s3_lib.$O\
-	ssl_asn1.$O\
-	ssl_both.$O\
-	ssl_cert.$O\
-	ssl_ciph.$O\
-	ssl_ciphers.$O\
-	ssl_clnt.$O\
-	ssl_err.$O\
-	ssl_init.$O\
-	ssl_kex.$O\
-	ssl_lib.$O\
-	ssl_methods.$O\
-	ssl_pkt.$O\
-	ssl_rsa.$O\
-	ssl_seclevel.$O\
-	ssl_sess.$O\
-	ssl_sigalgs.$O\
-	ssl_srvr.$O\
-	ssl_stat.$O\
-	ssl_tlsext.$O\
-	ssl_transcript.$O\
-	ssl_txt.$O\
-	ssl_versions.$O\
-	t1_enc.$O\
-	t1_lib.$O\
-	tls12_key_schedule.$O\
-	tls12_lib.$O\
-	tls12_record_layer.$O\
-	tls13_client.$O\
-	tls13_error.$O\
-	tls13_handshake.$O\
-	tls13_handshake_msg.$O\
-	tls13_key_schedule.$O\
-	tls13_legacy.$O\
-	tls13_lib.$O\
-	tls13_quic.$O\
-	tls13_record.$O\
-	tls13_record_layer.$O\
-	tls13_server.$O\
-	tls_buffer.$O\
-	tls_content.$O\
-	tls_key_share.$O\
-	tls_lib.$O\
+	ssl-bio_ssl.$O\
+	ssl-d1_both.$O\
+	ssl-d1_lib.$O\
+	ssl-d1_pkt.$O\
+	ssl-d1_srtp.$O\
+	ssl-pqueue.$O\
+	ssl-s3_cbc.$O\
+	ssl-s3_lib.$O\
+	ssl-ssl_asn1.$O\
+	ssl-ssl_both.$O\
+	ssl-ssl_cert.$O\
+	ssl-ssl_ciph.$O\
+	ssl-ssl_ciphers.$O\
+	ssl-ssl_clnt.$O\
+	ssl-ssl_err.$O\
+	ssl-ssl_init.$O\
+	ssl-ssl_kex.$O\
+	ssl-ssl_lib.$O\
+	ssl-ssl_methods.$O\
+	ssl-ssl_pkt.$O\
+	ssl-ssl_rsa.$O\
+	ssl-ssl_seclevel.$O\
+	ssl-ssl_sess.$O\
+	ssl-ssl_sigalgs.$O\
+	ssl-ssl_srvr.$O\
+	ssl-ssl_stat.$O\
+	ssl-ssl_tlsext.$O\
+	ssl-ssl_transcript.$O\
+	ssl-ssl_txt.$O\
+	ssl-ssl_versions.$O\
+	ssl-t1_enc.$O\
+	ssl-t1_lib.$O\
+	ssl-tls12_key_schedule.$O\
+	ssl-tls12_lib.$O\
+	ssl-tls12_record_layer.$O\
+	ssl-tls13_client.$O\
+	ssl-tls13_error.$O\
+	ssl-tls13_handshake.$O\
+	ssl-tls13_handshake_msg.$O\
+	ssl-tls13_key_schedule.$O\
+	ssl-tls13_legacy.$O\
+	ssl-tls13_lib.$O\
+	ssl-tls13_quic.$O\
+	ssl-tls13_record.$O\
+	ssl-tls13_record_layer.$O\
+	ssl-tls13_server.$O\
+	ssl-tls_buffer.$O\
+	ssl-tls_content.$O\
+	ssl-tls_key_share.$O\
+	ssl-tls_lib.$O\
 
 TLSOBJ=\
-	tls.$O\
-	tls_bio_cb.$O\
-	tls_client.$O\
-	tls_config.$O\
-	tls_conninfo.$O\
-	tls_keypair.$O\
-	tls_ocsp.$O\
-	tls_peer.$O\
-	tls_server.$O\
-	tls_signer.$O\
-	tls_util.$O\
-	tls_verify.$O\
+	tls-tls.$O\
+	tls-tls_bio_cb.$O\
+	tls-tls_client.$O\
+	tls-tls_config.$O\
+	tls-tls_conninfo.$O\
+	tls-tls_keypair.$O\
+	tls-tls_ocsp.$O\
+	tls-tls_peer.$O\
+	tls-tls_server.$O\
+	tls-tls_signer.$O\
+	tls-tls_util.$O\
+	tls-tls_verify.$O\
 
 OFILES=$CRYPTOBJ $SSLOBJ $TLSOBJ
+
+# The public headers, as installed. They are copies of the ones under
+# $SSLSRC/include with a "#pragma lib" added just inside the include
+# guard, which is how every ported library here tells the linker what to
+# pull in -- see sys/include/ape/zlib.h for the pattern.
+#
+# The build compiles against $SSLSRC/include, not against these, so the
+# two can drift. They are listed here so that editing an installed
+# header still forces a rebuild, and because a drift shows up as a
+# prototype mismatch rather than silently.
+HFILES=\
+	/sys/include/ape/openssl/aes.h\
+	/sys/include/ape/openssl/asn1.h\
+	/sys/include/ape/openssl/asn1t.h\
+	/sys/include/ape/openssl/bio.h\
+	/sys/include/ape/openssl/blowfish.h\
+	/sys/include/ape/openssl/bn.h\
+	/sys/include/ape/openssl/buffer.h\
+	/sys/include/ape/openssl/camellia.h\
+	/sys/include/ape/openssl/cast.h\
+	/sys/include/ape/openssl/chacha.h\
+	/sys/include/ape/openssl/cmac.h\
+	/sys/include/ape/openssl/cms.h\
+	/sys/include/ape/openssl/comp.h\
+	/sys/include/ape/openssl/conf.h\
+	/sys/include/ape/openssl/crypto.h\
+	/sys/include/ape/openssl/ct.h\
+	/sys/include/ape/openssl/curve25519.h\
+	/sys/include/ape/openssl/des.h\
+	/sys/include/ape/openssl/dh.h\
+	/sys/include/ape/openssl/dsa.h\
+	/sys/include/ape/openssl/dtls1.h\
+	/sys/include/ape/openssl/ec.h\
+	/sys/include/ape/openssl/ecdh.h\
+	/sys/include/ape/openssl/ecdsa.h\
+	/sys/include/ape/openssl/engine.h\
+	/sys/include/ape/openssl/err.h\
+	/sys/include/ape/openssl/evp.h\
+	/sys/include/ape/openssl/hkdf.h\
+	/sys/include/ape/openssl/hmac.h\
+	/sys/include/ape/openssl/idea.h\
+	/sys/include/ape/openssl/kdf.h\
+	/sys/include/ape/openssl/lhash.h\
+	/sys/include/ape/openssl/md4.h\
+	/sys/include/ape/openssl/md5.h\
+	/sys/include/ape/openssl/mlkem.h\
+	/sys/include/ape/openssl/modes.h\
+	/sys/include/ape/openssl/obj_mac.h\
+	/sys/include/ape/openssl/objects.h\
+	/sys/include/ape/openssl/ocsp.h\
+	/sys/include/ape/openssl/opensslconf.h\
+	/sys/include/ape/openssl/opensslfeatures.h\
+	/sys/include/ape/openssl/opensslv.h\
+	/sys/include/ape/openssl/ossl_typ.h\
+	/sys/include/ape/openssl/pem.h\
+	/sys/include/ape/openssl/pkcs12.h\
+	/sys/include/ape/openssl/pkcs7.h\
+	/sys/include/ape/openssl/poly1305.h\
+	/sys/include/ape/openssl/posix_time.h\
+	/sys/include/ape/openssl/rand.h\
+	/sys/include/ape/openssl/rc2.h\
+	/sys/include/ape/openssl/rc4.h\
+	/sys/include/ape/openssl/ripemd.h\
+	/sys/include/ape/openssl/rsa.h\
+	/sys/include/ape/openssl/safestack.h\
+	/sys/include/ape/openssl/sha.h\
+	/sys/include/ape/openssl/sm3.h\
+	/sys/include/ape/openssl/sm4.h\
+	/sys/include/ape/openssl/srtp.h\
+	/sys/include/ape/openssl/ssl.h\
+	/sys/include/ape/openssl/ssl3.h\
+	/sys/include/ape/openssl/stack.h\
+	/sys/include/ape/openssl/tls1.h\
+	/sys/include/ape/openssl/ts.h\
+	/sys/include/ape/openssl/txt_db.h\
+	/sys/include/ape/openssl/ui.h\
+	/sys/include/ape/openssl/x509.h\
+	/sys/include/ape/openssl/x509_vfy.h\
+	/sys/include/ape/openssl/x509v3.h\
+	/sys/include/ape/tls.h\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
@@ -723,8 +807,27 @@ apexp-cpu-caps.$O: apexp-cpu-caps.c
 %.$O: $SSLSRC/crypto/x509/%.c
 	$CC $CRYPTOFLAGS $SSLSRC/crypto/x509/$stem.c
 
-%.$O: $SSLSRC/ssl/%.c
-	$CC $SSLFLAGS $SSLSRC/ssl/$stem.c
+# ssl/ and tls/ objects carry a prefix, and crypto/ objects do not.
+#
+# Not cosmetic: mk resolves a target against every pattern rule whose
+# directory could produce it, not just the rule for the file actually
+# listed, so two rules that could both make bs_ber.$O are an error even
+# though only one bs_ber.c is in OFILES:
+#
+#   mk: ambiguous recipes for bs_ber.6:
+#       bs_ber.6 <-(mkfile:632)- .../libressl/crypto/bytestring/bs_ber.c
+#       bs_ber.6 <-(mkfile:727)- .../libressl/ssl/bs_ber.c
+#
+# Four basenames are reachable from more than one rule: bs_ber.c,
+# bs_cbb.c and bs_cbs.c from crypto/bytestring and ssl, and empty.c from
+# all three trees. Every one of them crosses a tree boundary; none of
+# crypto's 54 subdirectories collides with another. So prefixing ssl and
+# tls is enough, and leaves the 418 crypto objects plain.
+#
+# To re-check after an import: for each rule directory, list its *.c and
+# look for a basename appearing in two of them.
+ssl-%.$O: $SSLSRC/ssl/%.c
+	$CC $SSLFLAGS -o ssl-$stem.$O $SSLSRC/ssl/$stem.c
 
-%.$O: $SSLSRC/tls/%.c
-	$CC $TLSFLAGS $SSLSRC/tls/$stem.c
+tls-%.$O: $SSLSRC/tls/%.c
+	$CC $TLSFLAGS -o tls-$stem.$O $SSLSRC/tls/$stem.c
