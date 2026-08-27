@@ -1,8 +1,0 @@
-#!/bin/rc
-
-cd /env
-
-for (e in *){
-	v=`{cat $e}
-	echo $e'='^$"v
-}

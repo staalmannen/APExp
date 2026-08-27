@@ -56,7 +56,7 @@ the most capable web browser available on Plan9.
 Imported the latest 9front APE sources from git [7] (rebased 2026-01-29, which included the bitfield patch from @jamoson (bitfield support in kencc) [8]).
 In addition, several patches from @lufia [9, 10] to build libressl and curl
 (introduces pthread, include_next cpp support, etc) has been applied to the
-sources. To get more C99 compatibility, AI-generated patches have been introduced (VLA, hex float support, complex support, compound literals, division by 0, dropping keywords, etc). C99 support is *pretty much complete* by now, and we have even started adding some C11/C23 features to the compiler. This served as a base to add ports of third party libraries and utilities to enhance compatibility. In addition to the compiler, the linker has been enhanced with DWARF2 support from the old Go compiler (copied from the goken9cc project). This means that binaries built with APExp should be possible to debug with advanced debuggers like GNU gdb or the Go "debug" utility.
+sources. To get more C99 compatibility, AI-generated patches have been introduced (VLA, hex float support, complex support, compound literals, division by 0, dropping keywords, etc). C99 support is *pretty much complete* by now, and we have even started adding some C11/C23 features to the compiler. This served as a base to add ports of third party libraries and utilities to enhance compatibility. In addition to the compiler, the linker has been enhanced with DWARF2 support from the old Go compiler (copied from the goken9cc project). This was a bit of a detour because DWARF apparently only works on ELF binaries, but I keep it in just in case someone comes up with a good use case.
 
 
 Install paths have been modified so that libraries and binaries are installed in the local directory structure of APExp. A bind script (apexp-sh) in the root of APExp can be used to overlay APExp over the native system.
@@ -88,6 +88,8 @@ Install paths have been modified so that libraries and binaries are installed in
 - minimal (shim and stub) functions for common gnulib functions included
 
 **3rd party**
+- libressl (version 4.3.2)
+- libcurl (version 8.21.0)
 - libcurses : PDCursesMod (check out 2026-04-08; built with utf8/wchar)
 - GNU readline (version 8.3)
 - libpcre2 (version 10.47)
@@ -107,7 +109,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - APE make has been replaced by a port of GNU make (version 4.4.1)
 - APE sed has been replaced by a port of GNU sed (version 4.9)
 - patch has been replaced by a port of GNU patch (version 2.8)
-- cmp, diff and diff3 from GNU diffutils (version 3.12)
+- cmp, diff, diff3 and sdiff from GNU diffutils (version 3.12)
 - APE grep has been replaced with GNU grep (version 3.12)
 - GNU awk (version 5.4.0). Since native awk is sometimes needed, GNU awk is installed as gawk
 - GNU m4 (version 1.4.21) has been added
@@ -116,13 +118,15 @@ Install paths have been modified so that libraries and binaries are installed in
 - GNU bison (version 3.8) introduced. Native yacc as "yacc" because it is sometimes needed
 - system lex has been replaced by flex (version 2.6.4) as lex
 - an AI-generated GAS-compatible "as" front end to native $Oa assemblers.
-- the utilities like "cut", "ls", "true", "tsort", "xargs" and "yes" *et al.* have been built from suckless sbase [15]
+- the utilities like "cut", "ls", "true", "tsort", "xargs" and "yes" *et al.* from GNU coreutils (version 9.11)
+- extra utilities from sbase [15]
 - steve's mkmk (/n/sources/contrib) imported to APExp
-- copied "which", and "printenv" rc scripts from steve (/n/sources/contrib)
 - a custom debug (adeb) utility based on libdwarf and plan9 /proc
 - samurai (version 1.9) for the ninja build system
 - pkgconf (version 2.5.1) for pkg-config
 - slibtool (version 0.7.4) for libtool
+- curl (version 8.21.0)
+- openssl (libressl 4.3.2)
 
 
 ***Languages***
