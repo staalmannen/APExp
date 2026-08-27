@@ -711,6 +711,38 @@ divide unsigned. `UINTMAX_MAX / 2` came out 0, so GNU tar's
 fired its `#error`. cpp no longer relies on the implicit conversion.
 Any other `signed_lvalue op= (unsigned)x` in the tree is still wrong.
 
+### Macro identity includes whether there is white space
+
+C99 6.10.3p2: two definitions of the same macro are the same only if the
+*presence* of white-space separation matches at every point (the amount does
+not matter). `cpp/macro.c`'s `comparetokens()` implements exactly that:
+
+```c
+(tp1->wslen==0) != (tp2->wslen==0)
+```
+
+So a definition differing only in spacing is a **redefinition error**, not a
+harmless repetition. This has now bitten twice, and both times the other
+definition was unguarded, so APExp's spelling is the one that had to move:
+
+- `weak_alias` — `<features.h>` said `(old, new)`, gnulib's `libc-config.h`
+  says `(name, aliasname)`. Parameter names count as tokens.
+- `S_IXUGO` — APE said `(S_IXUSR|S_IXGRP|S_IXOTH)`, and gnulib, gtar,
+  diffutils, bison and readline all say `(S_IXUSR | S_IXGRP | S_IXOTH)`.
+  readline's `posixstat.h:160` has no guard, so the two met on a full rebuild.
+
+**Rule:** when adding a macro to an APE header that portable code also
+defines, copy the upstream spelling character for character, and guard it.
+Guarding alone is not enough — it only helps when APExp's header is read
+second.
+
+`/tmp`-style one-off check, if this is suspected again: compare token
+sequences *with* leading-whitespace flags between APE's headers and unguarded
+`#define`s under `sys/src/external`. The only other whitespace-only pairs
+today are inert — `.in.h` templates that are never compiled, and per-package
+vendored copies (bison's own `obstack.h`, tk's `MIN`/`MAX`) that never meet
+APE's headers.
+
 ### Unsigned 64-bit to floating point (FIXED)
 
 Both halves of this conversion were wrong, and neither mattered until
