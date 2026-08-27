@@ -72,14 +72,21 @@ typedef unsigned int _uintptr_t;
 # error "stdint_generic.h: INTPTR_WIDTH is 64 but _BITS64 is not set"
 #endif
 
-typedef char s8;
-typedef short s16;
-typedef long s32;
-typedef long long s64;
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef unsigned long u32;
-typedef unsigned long long u64;
+/*
+ * There were u8/u16/u32/u64 and s8/s16/s32/s64 typedefs here. They are
+ * neither C nor POSIX names, <stdint.h> is included by nearly everything,
+ * and they are exactly the names a program picks for its own short
+ * aliases -- so any file that defined its own met a redeclaration:
+ *
+ *	camellia.c:93 external redeclaration of: u32
+ *	    TYPEDEF UINT   crypto/camellia/camellia.c:93
+ *	    TYPEDEF ULONG  /sys/include/ape/stdint_generic.h:81
+ *
+ * They were also wrong: u32/s32 were spelled "unsigned long"/"long",
+ * which is 32-bit only because kencc's long happens to be 32-bit on
+ * amd64. Nothing in this tree used them -- libsec's aes.c, aesCFB.c and
+ * aesOFB.c each declare their own -- so they are gone. Use uint32_t.
+ */
 
 typedef char int8_t;
 typedef short int16_t;
