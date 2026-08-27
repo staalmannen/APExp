@@ -385,3 +385,26 @@ version-etc.$O: $GNUSRC/version-etc.c
 	$CC $CFLAGS $GNUSRC/version-etc.c
 
 CLEANFILES=version.c version.h
+
+# Man pages. mkmany's install: rule copies binaries and nothing else, so
+# this adds the pages on top of it, the way base/mkfile does for sbase.
+#
+# It matters more here than it looks. sbase used to build 50 of these
+# programs and install its own man page for each; those pages are still
+# in sys/man/1, and now describe a program that is no longer what gets
+# installed. Writing coreutils' page over them is what makes the section
+# agree with the binaries again.
+#
+# coreutils ships man/*.1 pre-generated, so there is no help2man (and no
+# perl) in the loop. ginstall is the one mismatch -- upstream's man page
+# for it is install.1, since the transform that renames it does not
+# apply here.
+install:V:
+	for (i in $TARG)
+		mk $MKFLAGS $i.install
+	for (i in $TARG) @{
+		if(~ $i ginstall)
+			cp $CORESRC/man/install.1 $APEXPROOT/sys/man/1/ginstall
+		if not if(test -f $CORESRC/man/$i.1)
+			cp $CORESRC/man/$i.1 $APEXPROOT/sys/man/1/$i
+	}

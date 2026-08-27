@@ -2,6 +2,14 @@ APE=../../ape
 <$APE/config
 APEXPROOT=../../../..
 
+# core comes after base on purpose. Both install into $BIN, and sbase's
+# TARG has been cut back to what coreutils does not cover, so nothing
+# should collide -- but the order is the backstop if one ever creeps
+# back in.
+#
+# Every comment line INSIDE these lists has to end in a backslash, as
+# the ones below do: the list is one continued line, and a comment
+# without it ends the assignment there.
 _CORE_APPS=\
 # shared gnulib: must be first, several apps below link ../gnulib/libgnu.a \
 	gnulib\
@@ -24,7 +32,7 @@ _CORE_APPS=\
 # core utilities \
 	base\
 	grep\
-#	core\
+	core\
 
 _OPTIONAL_APPS=\
 # archivers \
