@@ -21,6 +21,45 @@ typedef unsigned int _uintptr_t;
 # endif
 #endif
 
+/*
+ * INTPTR_WIDTH decides SIZE_MAX, UINTPTR_MAX and PTRDIFF_MAX below, and
+ * it used to come only from <stdint_arch.h>, with a silent fall back to
+ * 32 if that header had not been read. Silent is the problem: it is not
+ * a conservative default but a wrong answer, and the failure it produces
+ * is remote from its cause.
+ *
+ * It produced this. SIZE_MAX came out 0xffffffff on amd64 while size_t
+ * stayed 8 bytes, so gnulib's
+ *
+ *	for (size_t i = 0;
+ *	     ! (argsize == SIZE_MAX ? arg[i] == '\0' : i == argsize);
+ *	     i++)
+ *
+ * -- with argsize passed as (size_t)-1 to mean "find the NUL" -- never
+ * matched, never tested for the NUL, and counted towards 2**64 instead.
+ * GNU ls faulted reading past the end of the heap, several thousand
+ * bytes beyond a perfectly well-formed filename.
+ *
+ * _BITS64 is the signal the rest of this tree already uses: <alltypes.h>,
+ * <stddef.h>, <unistd.h>, <bsd.h> and <pthread.h> all key off it, and it
+ * is what makes size_t 64-bit in the first place. Deriving the width
+ * from it as well means the two cannot disagree quietly -- if they do,
+ * that is the #error below, not a bad SIZE_MAX.
+ */
+#if defined(_BITS64) && !defined(_STDINT_ARCH_H_)
+# undef INTPTR_WIDTH
+# undef UINTPTR_WIDTH
+# define INTPTR_WIDTH 64
+# define UINTPTR_WIDTH 64
+#endif
+
+#if defined(_BITS64) && INTPTR_WIDTH != 64
+# error "stdint.h: _BITS64 is set but INTPTR_WIDTH is not 64"
+#endif
+#if !defined(_BITS64) && INTPTR_WIDTH == 64
+# error "stdint.h: INTPTR_WIDTH is 64 but _BITS64 is not set"
+#endif
+
 typedef char s8;
 typedef short s16;
 typedef long s32;
@@ -205,9 +244,17 @@ typedef _uintptr_t uintptr_t;
 #define INTMAX_WIDTH       64
 #define UINTMAX_WIDTH      64
 
-/* 
- * Right now, all of our size_t types are 32 bit, even on
- * 64 bit architectures.
+/*
+ * size_t follows the pointer width. It has done since 2026-04; the
+ * comment that used to sit here said the opposite -- "Right now, all of
+ * our size_t types are 32 bit, even on 64 bit architectures" -- which
+ * was the state of things when SIZE_MAX was written, and stopped being
+ * true when amd64/include/ape/stddef_arch.h gained
+ *
+ *	typedef unsigned long long _size_t;
+ *
+ * A SIZE_MAX that does not match size_t is not a cosmetic mismatch: see
+ * the note on INTPTR_WIDTH above.
  */
 #ifndef SIZE_MIN
 #define SIZE_MIN	0
