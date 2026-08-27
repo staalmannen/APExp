@@ -311,7 +311,7 @@ simplet(long b)
  * difference can actually be observed. Signedness of the pointee
  * changes no representation, so nothing generated differs either way.
  */
-static int
+int
 ptrsignonly(Type *t1, Type *t2)
 {
 	static int pairs[][2] = {

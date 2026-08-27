@@ -53,6 +53,38 @@
 
 static int failures;
 
+/* Static initializers go through a different path in the compiler --
+   dcl.c's init1, not stcompat -- and needed the same relaxation. This is
+   apps/openssl/s_client.c's shape: an "unsigned int" whose address is
+   stored in an "int *" member of a file-scope aggregate.
+
+	s_client.c:540 initialization of incompatible pointers:
+	  s_client_options / IND INT and IND UINT
+
+   These have to be at file scope, and const-qualified members like the
+   real thing, for the static path to be the one taken. */
+static unsigned int cfg_off = 7;
+static int cfg_af = 9;
+
+struct sopt {
+	const char *name;
+	union {
+		int *value;
+		unsigned int *uvalue;
+	} opt;
+	const int flags;
+};
+
+static const struct sopt sopts[] = {
+	{ .name = "off",  .opt.value = &cfg_off, .flags = 1 },
+	{ .name = "af",   .opt.uvalue = &cfg_af, .flags = 2 },
+	{ NULL },
+};
+
+/* And the plain, non-aggregate static case. */
+static int *const p_to_unsigned = &cfg_off;
+static unsigned int *const p_to_signed = &cfg_af;
+
 static void
 check(const char *what, int ok, const char *detail)
 {
@@ -211,6 +243,24 @@ main(void)
 			      (void *)cu == (void *)&num, NULL);
 		}
 	}
+
+	/* Static initializers -- dcl.c's path rather than stcompat's. The
+	   real test is that the file compiled at all; these confirm the
+	   addresses landed where they should. */
+	sprintf(detail, "opt.value=%p want %p, flags=%d want 1",
+	        (void *)sopts[0].opt.value, (void *)&cfg_off, sopts[0].flags);
+	check("int * member initialised from an unsigned int *",
+	      (void *)sopts[0].opt.value == (void *)&cfg_off
+	      && sopts[0].flags == 1, detail);
+	sprintf(detail, "opt.uvalue=%p want %p, flags=%d want 2",
+	        (void *)sopts[1].opt.uvalue, (void *)&cfg_af, sopts[1].flags);
+	check("unsigned int * member initialised from an int *",
+	      (void *)sopts[1].opt.uvalue == (void *)&cfg_af
+	      && sopts[1].flags == 2, detail);
+	check("static int * = &unsigned int",
+	      (void *)p_to_unsigned == (void *)&cfg_off, NULL);
+	check("static unsigned int * = &int",
+	      (void *)p_to_signed == (void *)&cfg_af, NULL);
 
 	if (failures)
 		printf("\n%d failure(s)\n", failures);

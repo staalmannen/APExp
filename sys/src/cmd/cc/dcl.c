@@ -624,9 +624,28 @@ init1(Sym *s, Type *t, long o, int exflag)
 		if(t->etype == TIND) {
 			if(a->op == OCAST)
 				warn(a, "CAST in initialization ignored");
-			if(!sametype(t, a->type))
-				diag(a, "initialization of incompatible pointers: %s\n%T and %T",
-					s->name, t, a->type);
+			if(!sametype(t, a->type)) {
+				/*
+				 * Same relaxation as stcompat's: a pointer
+				 * differing only in the signedness of what
+				 * it points at is -Wpointer-sign, a warning
+				 * everywhere else, and it reaches static
+				 * initializers too. LibreSSL's
+				 * apps/openssl/s_client.c has
+				 *
+				 *   unsigned int off;
+				 *   ...
+				 *   .opt.value = &cfg.off,
+				 *
+				 * against the union's "int *value".
+				 */
+				if(!ptrsignonly(t, a->type))
+					diag(a, "initialization of incompatible pointers: %s\n%T and %T",
+						s->name, t, a->type);
+				else
+					warn(a, "pointer signedness: %s\n%T and %T",
+						s->name, t, a->type);
+			}
 		}
 
 		while(a->op == OCAST)
