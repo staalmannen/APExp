@@ -548,6 +548,8 @@ POSIX FP environment before executing any floating-point code.
 
 ### Header search order: the architecture directory wins
 
+**This has now cost two bugs. Read it before adding a header.**
+
 `pcc.c:234-235` passes
 
 ```
@@ -583,6 +585,40 @@ harmless — but it is the same trap.
 **Note:** `mount-include` is a no-op if `/sys/include/ape/THIS_IS_APExp`
 already exists, so a shell that mounted before this change keeps the old
 namespace. Start a fresh `apexp-sh`.
+
+The second bug was `<stdint.h>`, and it was worse than being ignored. Stock
+APE keeps a `stdint.h` in the architecture directory too, and that file takes
+the guard name `_STDINT_ARCH_H_` — which is the guard on APExp's own
+`stdint_arch.h`. So the stock header won the search, defined the guard, and
+APExp's arch header then compiled to **nothing**: the typedefs came from the
+stock file (right, by luck, on amd64) and `INTPTR_WIDTH` was never defined at
+all. `SIZE_MAX` is chosen by `#if INTPTR_WIDTH == 64`, so it came out
+`0xffffffff` while `size_t` stayed 8 bytes, and gnulib's
+
+```c
+argsize == SIZE_MAX ? arg[i] == '\0' : i == argsize
+```
+
+never looked for the NUL. GNU `ls` read its way off the end of the heap.
+
+**Fix, and the shape to copy for any header stock APE keeps per-architecture:**
+
+- every architecture directory has a real `stdint.h`, so the stock one is
+  never reached;
+- the content lives in `sys/include/ape/stdint_generic.h`, because none of
+  those copies could reach "the other stdint.h" by that name — the search
+  would find itself;
+- `INTPTR_WIDTH` is derived from `_BITS64` as well, and overrides rather than
+  defers, so a shadowed or neutralised arch header cannot produce a wrong
+  width — only `#error`.
+
+Known so far to be kept per-architecture by stock APE: `float.h`, `stdarg.h`,
+`stdint.h`. `sys/include/ape/stdarg.h` is a pure wrapper that adds nothing, so
+it is currently harmless — but it is the same trap.
+
+`sys/lib/tests/limits-test.c` checks `(size_t)-1 == SIZE_MAX` and the same
+identity for the other types, and prints which of these headers were actually
+read.
 
 ### Build order for compiler changes
 ```

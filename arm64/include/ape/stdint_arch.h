@@ -6,6 +6,8 @@ typedef unsigned long long _uintptr_t;
 #define INTPTR_WIDTH 64
 #define UINTPTR_WIDTH 64
 
-#include <stdint.h>
+/* Not <stdint.h>: that would find the wrapper beside this
+   file and stop at its guard. */
+#include <stdint_generic.h>
 
 #endif

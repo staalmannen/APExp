@@ -2,7 +2,7 @@
 #define _APEXP_STDINT_H_
 
 /*
- * <stdint.h>
+ * <stdint.h> for 68020
  *
  * Two lines, because the content cannot live under this name. pcc passes
  *
