@@ -721,6 +721,29 @@ divide unsigned. `UINTMAX_MAX / 2` came out 0, so GNU tar's
 fired its `#error`. cpp no longer relies on the implicit conversion.
 Any other `signed_lvalue op= (unsigned)x` in the tree is still wrong.
 
+### #include nesting limit was 20
+
+`cpp/include.c` had the depth guard written as a bare `20`. That is a guard
+against a circular include, and it also stopped LibreSSL, which reaches 20 on
+an ordinary chain with nothing repeated in it:
+
+```
+pthread.h compat/pthread.h signal.h time.h compat/time.h sys/stat.h
+compat/sys/stat.h unistd.h compat/unistd.h stdio_impl.h stdio.h
+compat/stdio.h utf.h wchar.h string.h compat/string.h netinet/in.h
+compat/netinet/in.h sys/socket.h compat/sys/socket.h  ->  b_sock.c
+```
+
+LibreSSL ships a `compat/` header for most system headers, each ending in an
+`#include_next` of the real one, so every step of a normal chain counts twice.
+
+Now `NINCDEPTH` in `cpp.h`, set to 200, which is what gcc and clang use for
+`-fmax-include-depth`. A genuine cycle passes 200 as fast as it passed 20.
+`incdepth` is a depth and not a count — `cpp.c:52` decrements it at each
+end-of-file — so this does not make a file with many includes any dearer.
+
+`NIF`, the `#if` nesting limit, is still 32 and has not been a problem.
+
 ### char * against unsigned char * is a warning, not an error
 
 `char *` and `unsigned char *` are distinct types, so passing one where the

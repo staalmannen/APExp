@@ -4,6 +4,31 @@
 #define	NINCLUDE 64		/* Max number of include directories (-I) */
 #define	NONCE	256		/* Max number of #pragma once directives */
 #define	NIF	32		/* depth of nesting of #if */
+
+/*
+ * Depth of nesting of #include. The guard is against a circular
+ * include, which this still catches immediately -- a cycle passes 200
+ * as fast as it passes 20.
+ *
+ * It was 20, written into the test in include.c. LibreSSL reaches
+ * exactly that on its own: it ships a compat/ header for most system
+ * headers, each ending in an #include_next of the real one, so every
+ * step of an ordinary chain counts twice --
+ *
+ *   pthread.h compat/pthread.h signal.h time.h compat/time.h
+ *   sys/stat.h compat/sys/stat.h unistd.h compat/unistd.h
+ *   stdio_impl.h stdio.h compat/stdio.h utf.h wchar.h string.h
+ *   compat/string.h netinet/in.h compat/netinet/in.h sys/socket.h
+ *   compat/sys/socket.h  ->  crypto/bio/b_sock.c
+ *
+ * -- and that is a legitimate chain with no repetition in it.
+ * 200 is what gcc and clang use for -fmax-include-depth.
+ *
+ * incdepth is a depth, not a count: cpp.c decrements it at the end of
+ * each included file. Raising it does not make a long list of includes
+ * in one file any more expensive.
+ */
+#define	NINCDEPTH 200		/* depth of nesting of #include */
 #ifndef EOF
 #define	EOF	(-1)
 #endif

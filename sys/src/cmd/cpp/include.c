@@ -127,7 +127,7 @@ doinclude(Tokenrow *trp, int next)
 		for (i=0; i<nblocked; i++)
 			if (oncecmp(incblocked+i, &n) == 0)
 				return;
-		if (++incdepth > 20)
+		if (++incdepth > NINCDEPTH)
 			error(FATAL, "#include too deeply nested");
 		s = setsource((char*)newstring((uchar*)iname, strlen(iname), 0), fd, NULL);
 		s->pos = pos;
