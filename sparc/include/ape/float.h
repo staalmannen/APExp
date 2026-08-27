@@ -72,4 +72,10 @@ union FPdbleword
 #define	FPAOVFL	(1<<8)
 #define	FPAINVAL	(1<<9)
 #endif
+
+/* The C99/C11 additions, shared with every other architecture. Unlike
+   the other eight, this file was never renamed to float_arch.h with a
+   wrapper above it, so it includes them itself. */
+#include <float_ext.h>
+
 #endif /* __FLOAT */

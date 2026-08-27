@@ -5,6 +5,17 @@ if(! test -e /sys/include/ape/THIS_IS_APExp) {
     bind -b $cputype/include/ape /sys/include/ape
     bind -b $cputype/lib/ape /$cputype/lib/ape
     bind -b sys/include/ape /sys/include/ape
+    # And over the architecture include directory itself. pcc passes
+    #   -I/$objtype/include/ape   before   -I/sys/include/ape
+    # (pcc.c:234-235), so anything the host's stock APE keeps in the
+    # architecture directory wins over everything in this tree --
+    # binding the same directory onto /sys/include/ape, as the line
+    # above does, only makes it visible on the path pcc searches
+    # SECOND. Stock APE keeps float.h and stdarg.h there, so APExp's
+    # <float.h> was never read on any architecture:
+    #   dtimespec-bound.h:61 name not declared: DBL_TRUE_MIN
+    # even though /sys/include/ape/float.h had defined DBL_TRUE_MIN.
+    bind -b $cputype/include/ape /$cputype/include/ape
     # Overlay locally-built compilers/linkers/assemblers over /bin so
     # pcc (which hardcodes /bin/6c, /bin/6l, /bin/6a etc.) picks up
     # THIS tree's freshly-built compiler with all its C99/C11/C23
