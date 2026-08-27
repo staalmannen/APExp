@@ -279,6 +279,50 @@ simplet(long b)
 	return types[TINT];
 }
 
+/*
+ * Do t1 and t2 differ only in the signedness of what they point at?
+ *
+ * "char *" and "unsigned char *" are distinct types, so passing one
+ * where the other is wanted is a constraint violation and C requires a
+ * diagnostic. Every compiler this code is written for makes that a
+ * warning -- gcc and clang call it -Wpointer-sign and it is not in
+ * -Werror by default -- so portable C is full of it. LibreSSL's
+ * asn1/a_object.c is representative:
+ *
+ *	char s[22];
+ *	n = snprintf(s, sizeof(s), fmt, arc);
+ *	if (!CBB_add_bytes(cbb, s, n))
+ *
+ * against "int CBB_add_bytes(CBB *, const uint8_t *, size_t)". There is
+ * nothing wrong with it, and there is no portable spelling that avoids
+ * a cast at every such call.
+ *
+ * Only one level, and only between the two one-byte integer types: an
+ * "int *" for a "char *" is still an error, and so is "char **" for
+ * "unsigned char **", which is the case where the difference can
+ * actually be observed. Signedness of the pointee changes no
+ * representation, so nothing generated differs either way.
+ */
+static int
+charptrsign(Type *t1, Type *t2)
+{
+	Type *p1, *p2;
+
+	if(t1 == T || t2 == T)
+		return 0;
+	if(t1->etype != TIND || t2->etype != TIND)
+		return 0;
+	p1 = t1->link;
+	p2 = t2->link;
+	if(p1 == T || p2 == T)
+		return 0;
+	if(p1->etype != TCHAR && p1->etype != TUCHAR)
+		return 0;
+	if(p2->etype != TCHAR && p2->etype != TUCHAR)
+		return 0;
+	return p1->etype != p2->etype;
+}
+
 int
 stcompat(Node *n, Type *t1, Type *t2, long ttab[])
 {
@@ -312,8 +356,12 @@ stcompat(Node *n, Type *t1, Type *t2, long ttab[])
 					return 1;
 		if(n->op != OCAST)
 		 	if(b == BIND && i == TIND)
-				if(!sametype(t1, t2))
-					return 1;
+				if(!sametype(t1, t2)) {
+					if(!charptrsign(t1, t2))
+						return 1;
+					warn(n, "pointer signedness: \"%T\" and \"%T\"",
+						t1, t2);
+				}
 		return 0;
 	}
 	return 1;
