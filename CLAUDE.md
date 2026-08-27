@@ -721,6 +721,39 @@ divide unsigned. `UINTMAX_MAX / 2` came out 0, so GNU tar's
 fired its `#error`. cpp no longer relies on the implicit conversion.
 Any other `signed_lvalue op= (unsigned)x` in the tree is still wrong.
 
+### char * against unsigned char * is a warning, not an error
+
+`char *` and `unsigned char *` are distinct types, so passing one where the
+other is declared is a constraint violation and C requires a diagnostic. gcc
+and clang give a warning — `-Wpointer-sign`, not in `-Werror` by default — so
+portable C is full of it, and there is no spelling that avoids a cast at every
+call. kencc used to refuse:
+
+```
+a_object.c:185 argument prototype mismatch "IND CHAR" for "IND CONST UCHAR":
+  CBB_add_bytes
+```
+
+from LibreSSL's `CBB_add_bytes(cbb, s, n)` with `char s[22]` against
+`int CBB_add_bytes(CBB *, const uint8_t *, size_t)`.
+
+`cc/sub.c` `stcompat()` now calls `charptrsign()` in the `BIND`/`TIND` branch
+and warns instead. **One level only, and only between the two one-byte integer
+types** — `int *` for `char *` is still an error, and so is `char **` for
+`unsigned char **`, which is the case where the difference can actually be
+observed.
+
+This cannot change code generation: `char` and `unsigned char` have the same
+representation, so the only thing that differs is whether a diagnostic is
+fatal. `warn()` is gated on `debug['w']`, so it is quiet unless `-w` is passed.
+
+Note `rsametype()` in `dcl.c` compares `etype` and the `GNORET` bit and
+nothing else — it already ignores `const` and `volatile`, which is why
+`char *` → `const char *` was never the problem here.
+
+Covered by `sys/lib/tests/charptr-test.c`, whose real test is that it
+compiles: every case in it is a constraint violation of that shape.
+
 ### Macro identity includes whether there is white space
 
 C99 6.10.3p2: two definitions of the same macro are the same only if the
