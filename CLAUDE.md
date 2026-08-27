@@ -771,8 +771,19 @@ e_sm4.c:241 argument prototype mismatch "IND INT" for "IND UINT":
 
 from `&ctx->num`, an `int *`, against `unsigned int *num`.
 
-`cc/sub.c` `stcompat()` now calls `ptrsignonly()` in the `BIND`/`TIND` branch
-and warns instead. **One level only, and only when the two pointees are the
+There are **two** sites, because static initializers do not go through
+`stcompat()`. `cc/dcl.c` `init1()` has its own `sametype()` test and gave
+
+```
+s_client.c:540 initialization of incompatible pointers: s_client_options
+  IND INT and IND UINT
+```
+
+for `.opt.value = &cfg.off` with `unsigned int off` against the union's
+`int *value`. Both sites now call `ptrsignonly()` (declared in `cc.h`) and
+warn instead.
+
+`cc/sub.c` `stcompat()` calls it in the `BIND`/`TIND` branch. **One level only, and only when the two pointees are the
 signed and unsigned spellings of the same type** — the five pairs are listed
 in `pairs[]` there. Still errors: `int *` for `char *`; `int *` for
 `unsigned long *`, which are the same width on amd64 but are not a

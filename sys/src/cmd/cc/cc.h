@@ -621,6 +621,7 @@ Decl*	push(void);
 Decl*	push1(Sym*);
 Node*	revertdcl(void);
 long	round(long, int);
+int	ptrsignonly(Type*, Type*);
 int	rsametype(Type*, Type*, int, int);
 int	sametype(Type*, Type*);
 ulong	sign(Sym*);
