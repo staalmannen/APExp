@@ -736,10 +736,28 @@ definition was unguarded, so APExp's spelling is the one that had to move:
   diffutils, bison and readline all say `(S_IXUSR | S_IXGRP | S_IXOTH)`.
   readline's `posixstat.h:160` has no guard, so the two met on a full rebuild.
 
+Only *interior* white space counts. `tokens.c` `normtokenrow()` ends with
+
+```c
+if (ntrp->lp > ntrp->bp)
+        ntrp->bp->wslen = 0;
+```
+
+so the first body token's leading space is discarded for both `#define` and
+`-D`. That is why `-DO_BINARY=0` on a command line coexists with
+`#define O_BINARY	0` in `<fcntl.h>`, while `S_IXUGO`'s spacing *between*
+its tokens did not.
+
 **Rule:** when adding a macro to an APE header that portable code also
 defines, copy the upstream spelling character for character, and guard it.
 Guarding alone is not enough — it only helps when APExp's header is read
 second.
+
+**Corollary for `-D` workarounds.** A `-DNAME=VALUE` in a mkfile that exists
+only because APE lacked `NAME` becomes a redefinition error the moment APE
+gains it. `sys/src/ape/cmd/libtool/mkfile` carried `-DESTALE=EDEADLK` for
+exactly that reason and had to lose it when `<errno.h>` gained `ESTALE`. When
+adding a name to an APE header, grep the mkfiles for `-D<name>=`.
 
 `/tmp`-style one-off check, if this is suspected again: compare token
 sequences *with* leading-whitespace flags between APE's headers and unguarded

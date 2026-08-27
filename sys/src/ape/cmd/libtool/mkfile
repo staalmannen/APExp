@@ -102,8 +102,16 @@ CFLAGS=-c -I$LTSRC/include -I$LTSRC/src/internal -I$LTSRC/build\
 	-DSLBT_PREFERRED_HOST_AS="/bin/as"\
 	-DSLBT_PREFERRED_HOST_NM="/bin/nm"\
 	-DSLBT_PREFERRED_HOST_RANLIB="/bin/ranlib"\
-	-DSLBT_MACHINE="$objtype"\
-	-DESTALE=EDEADLK
+	-DSLBT_MACHINE="$objtype"
+
+# -DESTALE=EDEADLK used to be on that list. It was there because APE had
+# no ESTALE and slbt_dump_machine.c does "errno = ESTALE;". <errno.h>
+# defines it now, as 72, so the two collide:
+#
+#   errno.h:109 ... slbt_archive_ctx.c:10 Macro redefinition of ESTALE
+#
+# and the real value is the better one to use anyway. Nothing else in
+# slibtool mentions ESTALE.
 
 %.$O: $LTSRC/src/%.c
 	$CC $CFLAGS $LTSRC/src/$stem.c
