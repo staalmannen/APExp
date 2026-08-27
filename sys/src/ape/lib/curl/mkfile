@@ -215,6 +215,29 @@ OFILES=\
 	ws.$O\
 	x509asn1.$O\
 
+# As for libressl: copies of $CRLSRC/include/curl with a "#pragma lib"
+# added inside the include guard.
+#
+# curl's headers name TWO libraries, libcurl first and libressl second,
+# and the order is the link order -- 6l's loadlib() walks the list in
+# order, appending as it goes. libcurl.a's own members cannot carry the
+# libressl pragma, because libcurl is compiled against $SSLSRC/include
+# rather than the installed copy, so a program that includes
+# <curl/curl.h> would otherwise link libcurl and never reach libressl.
+HFILES=\
+	/sys/include/ape/curl/curl.h\
+	/sys/include/ape/curl/curlver.h\
+	/sys/include/ape/curl/easy.h\
+	/sys/include/ape/curl/header.h\
+	/sys/include/ape/curl/mprintf.h\
+	/sys/include/ape/curl/multi.h\
+	/sys/include/ape/curl/options.h\
+	/sys/include/ape/curl/stdcheaders.h\
+	/sys/include/ape/curl/system.h\
+	/sys/include/ape/curl/typecheck-gcc.h\
+	/sys/include/ape/curl/urlapi.h\
+	/sys/include/ape/curl/websockets.h\
+
 <$APEXPROOT/sys/src/cmd/mksyslib
 
 CRLSRC=$APEXPROOT/sys/src/external/curl

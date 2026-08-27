@@ -524,6 +524,86 @@ TLSOBJ=\
 
 OFILES=$CRYPTOBJ $SSLOBJ $TLSOBJ
 
+# The public headers, as installed. They are copies of the ones under
+# $SSLSRC/include with a "#pragma lib" added just inside the include
+# guard, which is how every ported library here tells the linker what to
+# pull in -- see sys/include/ape/zlib.h for the pattern.
+#
+# The build compiles against $SSLSRC/include, not against these, so the
+# two can drift. They are listed here so that editing an installed
+# header still forces a rebuild, and because a drift shows up as a
+# prototype mismatch rather than silently.
+HFILES=\
+	/sys/include/ape/openssl/aes.h\
+	/sys/include/ape/openssl/asn1.h\
+	/sys/include/ape/openssl/asn1t.h\
+	/sys/include/ape/openssl/bio.h\
+	/sys/include/ape/openssl/blowfish.h\
+	/sys/include/ape/openssl/bn.h\
+	/sys/include/ape/openssl/buffer.h\
+	/sys/include/ape/openssl/camellia.h\
+	/sys/include/ape/openssl/cast.h\
+	/sys/include/ape/openssl/chacha.h\
+	/sys/include/ape/openssl/cmac.h\
+	/sys/include/ape/openssl/cms.h\
+	/sys/include/ape/openssl/comp.h\
+	/sys/include/ape/openssl/conf.h\
+	/sys/include/ape/openssl/crypto.h\
+	/sys/include/ape/openssl/ct.h\
+	/sys/include/ape/openssl/curve25519.h\
+	/sys/include/ape/openssl/des.h\
+	/sys/include/ape/openssl/dh.h\
+	/sys/include/ape/openssl/dsa.h\
+	/sys/include/ape/openssl/dtls1.h\
+	/sys/include/ape/openssl/ec.h\
+	/sys/include/ape/openssl/ecdh.h\
+	/sys/include/ape/openssl/ecdsa.h\
+	/sys/include/ape/openssl/engine.h\
+	/sys/include/ape/openssl/err.h\
+	/sys/include/ape/openssl/evp.h\
+	/sys/include/ape/openssl/hkdf.h\
+	/sys/include/ape/openssl/hmac.h\
+	/sys/include/ape/openssl/idea.h\
+	/sys/include/ape/openssl/kdf.h\
+	/sys/include/ape/openssl/lhash.h\
+	/sys/include/ape/openssl/md4.h\
+	/sys/include/ape/openssl/md5.h\
+	/sys/include/ape/openssl/mlkem.h\
+	/sys/include/ape/openssl/modes.h\
+	/sys/include/ape/openssl/obj_mac.h\
+	/sys/include/ape/openssl/objects.h\
+	/sys/include/ape/openssl/ocsp.h\
+	/sys/include/ape/openssl/opensslconf.h\
+	/sys/include/ape/openssl/opensslfeatures.h\
+	/sys/include/ape/openssl/opensslv.h\
+	/sys/include/ape/openssl/ossl_typ.h\
+	/sys/include/ape/openssl/pem.h\
+	/sys/include/ape/openssl/pkcs12.h\
+	/sys/include/ape/openssl/pkcs7.h\
+	/sys/include/ape/openssl/poly1305.h\
+	/sys/include/ape/openssl/posix_time.h\
+	/sys/include/ape/openssl/rand.h\
+	/sys/include/ape/openssl/rc2.h\
+	/sys/include/ape/openssl/rc4.h\
+	/sys/include/ape/openssl/ripemd.h\
+	/sys/include/ape/openssl/rsa.h\
+	/sys/include/ape/openssl/safestack.h\
+	/sys/include/ape/openssl/sha.h\
+	/sys/include/ape/openssl/sm3.h\
+	/sys/include/ape/openssl/sm4.h\
+	/sys/include/ape/openssl/srtp.h\
+	/sys/include/ape/openssl/ssl.h\
+	/sys/include/ape/openssl/ssl3.h\
+	/sys/include/ape/openssl/stack.h\
+	/sys/include/ape/openssl/tls1.h\
+	/sys/include/ape/openssl/ts.h\
+	/sys/include/ape/openssl/txt_db.h\
+	/sys/include/ape/openssl/ui.h\
+	/sys/include/ape/openssl/x509.h\
+	/sys/include/ape/openssl/x509_vfy.h\
+	/sys/include/ape/openssl/x509v3.h\
+	/sys/include/ape/tls.h\
+
 <$APEXPROOT/sys/src/cmd/mksyslib
 
 SSLSRC=$APEXPROOT/sys/src/external/libressl
