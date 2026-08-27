@@ -24,6 +24,15 @@
  *	@(#)netdb.h	5.11 (Berkeley) 5/21/90
  */
 
+/*
+ * size_t for the _r functions below, socklen_t for gethostbyaddr_r, and
+ * struct sockaddr for getnameinfo. This header declared all three
+ * without defining any of them, so it only compiled where the caller
+ * happened to have included <sys/socket.h> first.
+ */
+#include <stddef.h>
+#include <sys/socket.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -93,6 +102,30 @@ extern void sethostent(int),  endhostent(void),
 	    setservent(int),  endservent(void),
 	    setprotoent(int), endprotoent(void),
 	    setrpcent(int),   endrpcent(void);
+
+/*
+ * The reentrant forms, and gethostbyname2. All six are in libap --
+ * ap/network/gethostbyname_r.c and its neighbours -- and none of them
+ * was declared here, so a caller got the implicit int return and,
+ * worse, no check on the argument list. gethostbyname_r takes six
+ * arguments (it is the glibc/musl shape, not Solaris's five), which is
+ * exactly what a caller has to know and could not find out.
+ *
+ * These are not in POSIX; they are the glibc names portable network
+ * code probes for, and curl among others selects its resolver path from
+ * which of them exists.
+ */
+extern int gethostbyname_r(const char *, struct hostent *, char *, size_t,
+		struct hostent **, int *);
+extern int gethostbyname2_r(const char *, int, struct hostent *, char *,
+		size_t, struct hostent **, int *);
+extern int gethostbyaddr_r(const void *, socklen_t, int, struct hostent *,
+		char *, size_t, struct hostent **, int *);
+extern struct hostent *gethostbyname2(const char *, int);
+extern int getservbyname_r(const char *, const char *, struct servent *,
+		char *, size_t, struct servent **);
+extern int getservbyport_r(int, const char *, struct servent *, char *,
+		size_t, struct servent **);
 
 /*
  * Error return codes from gethostbyname() and gethostbyaddr()
