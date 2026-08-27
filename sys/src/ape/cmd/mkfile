@@ -64,8 +64,8 @@ _OPTIONAL_APPS=\
 	dwarfdump\
 	hell\
 	pcregrep\
-#	diff\
-#	patch\
+	diff\
+	patch\
 	mkmk\
 	samurai\
 

@@ -106,6 +106,8 @@ Install paths have been modified so that libraries and binaries are installed in
 - The original APE pdksh shell replaced by GNU bash (version 5.3) and Dash (version 0.5.13)
 - APE make has been replaced by a port of GNU make (version 4.4.1)
 - APE sed has been replaced by a port of GNU sed (version 4.9)
+- patch has been replaced by a port of GNU patch (version 2.8)
+- cmp, diff and diff3 from GNU diffutils (version 3.12)
 - APE grep has been replaced with GNU grep (version 3.12)
 - GNU awk (version 5.4.0). Since native awk is sometimes needed, GNU awk is installed as gawk
 - GNU m4 (version 1.4.21) has been added
@@ -148,6 +150,7 @@ C transpilers are fun little proof-of-concept programs, which also open up for m
 Many (old) sources are still distributed as compressed archives, and the ability to unpack those
 sources could be a barrier. Because of this, APExp package several (un)archivers by default:
 
+- GNU tar (1.35)
 - minigzip (from zlib)
 - bzip2 utilities (from libbz2)
 - unarj (2.65)

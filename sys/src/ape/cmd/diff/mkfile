@@ -92,6 +92,7 @@ CFLAGS=-B -p -D_POSIX_SOURCE -DREGEX_MALLOC -I. -I$GNUSRC -I$DIFFSRC/src \
 # version-etc, from the shared tree. A rule here would let a stale
 # package-local module be built by name alone.
 
+$O.cmp: $CMPO $LIB
 $O.diff: $DIFFO $LIB
 $O.diff3: $DIFF3O $LIB
 $O.sdiff: $SDIFFO $LIB
