@@ -14,6 +14,8 @@ APE=$APEXPROOT/sys/src/ape
 #   HAVE_STRLCAT STRLCPY STRNDUP STRNLEN STRSEP ASPRINTF FTRUNCATE
 #   GETDELIM GETLINE GETPAGESIZE GETPROGNAME REALLOCARRAY
 #   ARC4RANDOM_BUF GETENTROPY        yes, libap has them
+#                                    -- and each must be passed as a
+#                                    -DHAVE_*; see HAVEFLAGS below
 #   HAVE_STRTONUM FREEZERO RECALLOCARRAY SYSLOG_R TIMINGSAFE_MEMCMP
 #   TIMINGSAFE_BCMP EXPLICIT_BZERO   no, so compat/ supplies them
 #
@@ -626,10 +628,81 @@ SSLSRC=$APEXPROOT/sys/src/external/libressl
 # KINCLUDE_NEXT), so these are kept on the path rather than pruned the
 # way gnulib's shadowing headers are: LibreSSL's are meant to be found
 # first, and are how it adds strlcpy and friends to <string.h>.
+# The HAVE_* defines below are not optional decoration. Because there is
+# no config.h, autoconf puts every AC_CHECK_FUNCS answer into DEFS and
+# passes it on the command line, and include/compat/*.h reads them:
+#
+#	#ifndef HAVE_STRLCPY
+#	#define strlcpy libressl_strlcpy
+#	size_t strlcpy(char *dst, const char *src, size_t siz);
+#	#endif
+#
+# So a missing -DHAVE_STRLCPY does not merely fail to record that libap
+# has strlcpy -- it *renames every call* to libressl_strlcpy, which only
+# compat/strlcpy.c would define, and that file is not compiled precisely
+# because libap has the function. The two halves have to agree. Omitting
+# them all produced a screenful of
+#
+#	program_name: undefined: libressl_strlcpy in program_name
+#	set_ext_copy: undefined: libressl_strcasecmp in set_ext_copy
+#	...
+#
+# at the first link, and nothing before it.
+#
+# The rule, then: define HAVE_<F> exactly when the object list does NOT
+# carry compat/<f>.$O, and vice versa.
+HAVEFLAGS=-DHAVE_ENDIAN_H\
+	-DHAVE_ARC4RANDOM_BUF -DHAVE_GETENTROPY\
+	-DHAVE_ASPRINTF -DHAVE_CLOCK_GETTIME\
+	-DHAVE_GETDELIM -DHAVE_GETLINE -DHAVE_GETOPT\
+	-DHAVE_GETPAGESIZE -DHAVE_GETPROGNAME\
+	-DHAVE_MEMMEM -DHAVE_PIPE2 -DHAVE_REALLOCARRAY\
+	-DHAVE_STRCASECMP -DHAVE_STRLCAT -DHAVE_STRLCPY\
+	-DHAVE_STRNDUP -DHAVE_STRNLEN -DHAVE_STRSEP\
+	-DHAVE_ERR_H -DHAVE_RESOLV_H -DHAVE_ARPA_NAMESER_H -DHAVE_POLL
+
+# Deliberately NOT defined, each matched by a compat object above:
+#	HAVE_EXPLICIT_BZERO HAVE_FREEZERO HAVE_RECALLOCARRAY
+#	HAVE_STRTONUM HAVE_SYSLOG_R HAVE_TIMINGSAFE_BCMP
+#	HAVE_TIMINGSAFE_MEMCMP
+# and these, which need no object:
+#	HAVE_SYSLOG		APE has syslog() but no vsyslog(), which is
+#				what compat/syslog_r.c calls; without it
+#				syslog_r() compiles to a no-op, as it does
+#				on every other platform lacking vsyslog
+#	HAVE_B64_NTOP		only apps/nc uses b64_ntop, and we do not
+#				build it; leaving this off just declares
+#				two prototypes nothing calls
+#	HAVE_TIMESPECSUB	compat/time.h detects this itself, with
+#				"#ifdef timespecsub"
+#	HAVE_MACHINE_ENDIAN_H	APE has the header but it defines no
+#				byte-order operations; <endian.h> has them
+#	HAVE_READPASSPHRASE_H HAVE_NETINET_IP_H
+#				no such APE header, and nothing we build
+#				wants them
+#	HAVE_ATTRIBUTE__BOUNDED__ HAVE_ATTRIBUTE__DEAD
+#				gate __attribute__ spellings; pcc swallows
+#				__attribute__ whole, so neither answer
+#				changes anything, and off is the quieter
+#	HAVE_BIG_ENDIAN HAVE_LITTLE_ENDIAN HAVE_D_TYPE HAVE_D_NAMLEN
+#				only read inside _WIN32 branches
+#				(endian.h, dirent_msvc.h)
+#
+# That is every HAVE_* the compat headers mention. If this list and the
+# headers ever drift, the check is: every HAVE_* under
+# include/compat/ is either in HAVEFLAGS or named here.
+#
+# HAVE_ENDIAN_H is the second group of undefined symbols in that link --
+# be32toh, htobe32, be64toh, le32toh, htole64 and the rest. LibreSSL's
+# compat/endian.h supplies them only for Windows and Apple; everywhere
+# else it #include_next's the platform header, and without the define it
+# included nothing at all, leaving the names to be resolved as
+# functions. APE's <endian.h> has the full set.
 BASEFLAGS=-c -I$SSLSRC/include -I$SSLSRC/include/compat\
 	-DLIBRESSL_INTERNAL -D__BEGIN_HIDDEN_DECLS= -D__END_HIDDEN_DECLS=\
 	-DOPENSSL_NO_ASM -DOPENSSL_NO_HW_PADLOCK\
-	-DOPENSSLDIR="/sys/lib/ape/ssl"
+	-DOPENSSLDIR="/sys/lib/ape/ssl"\
+	$HAVEFLAGS
 
 # crypto, ssl and tls get different include paths on purpose, as they do
 # upstream. crypto/hidden and ssl/hidden each hold a namespace header
