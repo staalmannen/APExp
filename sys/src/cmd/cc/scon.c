@@ -55,6 +55,34 @@ evconst(Node *n)
 		if(isf) {
 			if(typefd[et])
 				d = l->fconst;
+			else if(typeu[et])
+				/*
+				 * vconst is a vlong, so an unsigned source
+				 * with the top bit set folds to a negative
+				 * double unless it is read back unsigned.
+				 * (double)(uvlong)~0 is 1.8446744e19, not -1.
+				 *
+				 * This was "d = l->vconst;" for every integer
+				 * type. It only began to matter when SIZE_MAX
+				 * became a 64-bit constant: gnulib's
+				 * hash.c has
+				 *
+				 *	float new_candidate = candidate / ...;
+				 *	if (SIZE_MAX <= new_candidate)
+				 *		return 0;
+				 *
+				 * which folded to "-1.0 <= 128.75", true, so
+				 * hash_initialize() returned NULL and every
+				 * program that hashes -- cp, mv, ln, du --
+				 * died with "memory exhausted" before it had
+				 * looked at its arguments.
+				 *
+				 * The reverse direction, float to unsigned
+				 * below, has the same shape and is still
+				 * wrong for values at or above 2**63; no
+				 * caller in this tree reaches it.
+				 */
+				d = (uvlong)l->vconst;
 			else
 				d = l->vconst;
 		} else {

@@ -711,6 +711,42 @@ divide unsigned. `UINTMAX_MAX / 2` came out 0, so GNU tar's
 fired its `#error`. cpp no longer relies on the implicit conversion.
 Any other `signed_lvalue op= (unsigned)x` in the tree is still wrong.
 
+### Unsigned 64-bit to floating point (FIXED)
+
+Both halves of this conversion were wrong, and neither mattered until
+`SIZE_MAX` became a 64-bit constant.
+
+**Constant folding, `cc/scon.c` `OCAST`.** A cast of a constant folds through
+`n->vconst`, which is a `vlong`, so an unsigned source with the top bit set
+came out negative: `(double)(uvlong)~0` gave `-1.0`. Fixed by reading it back
+unsigned when `typeu[et]`.
+
+**Runtime, `6c/txt.c` `CASE(TUVLONG, TDOUBLE)`.** The top-bit case is handled
+correctly — halve, convert, double — and then the result was never stored:
+the `gmove(&nod1, t)` that the `TULONG` case beside it has was missing.
+`regalloc(&nod1, t, t)` reuses `t`'s register when `t` is one, so this was
+invisible whenever the destination was a register and silent nonsense when it
+was memory.
+
+What it cost: gnulib's `hash.c` has
+
+```c
+float new_candidate = candidate / tuning->growth_threshold;
+if (SIZE_MAX <= new_candidate)
+  return 0;
+```
+
+which folded to `-1.0 <= 128.75`, true. `compute_bucket_size` returned 0,
+`hash_initialize` returned NULL, and every program that hashes — `cp`, `mv`,
+`ln`, `du` — died with "memory exhausted" before looking at its arguments.
+
+Still wrong, and not reached by anything here: the reverse direction in the
+same `scon.c` case, `v = l->fconst` for a float constant cast to an unsigned
+integer type, for values at or above 2**63.
+
+Covered by `sys/lib/tests/u64float-test.c`, which tests the folded and the
+runtime path separately, and the memory destination specifically.
+
 ### Compiler self-hosting as correctness test
 After any compiler change, have it rebuild itself multiple times:
 ```
