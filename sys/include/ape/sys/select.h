@@ -3,6 +3,12 @@
 
 #pragma lib "/$M/lib/ape/libap.a"
 
+/* POSIX lists suseconds_t here too; same guard as <sys/time.h>. */
+#ifndef __suseconds_t_defined
+#define __suseconds_t_defined
+typedef long suseconds_t;
+#endif
+
 #ifndef _FD_SET_T
 #define _FD_SET_T
 /* BSD select, and adjunct types and macros */
