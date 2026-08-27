@@ -1,28 +1,103 @@
 APEXPROOT=../../../../..
 APE=$APEXPROOT/sys/src/ape
-</$APE/config
+<$APE/config
+
+# curl 8.21.0 command-line tool.
+#
+# The source lists are lib/Makefile.inc and src/Makefile.inc, which are
+# static: configure selects nothing from them. curl compiles every
+# backend unconditionally and lets the file decide -- vtls/wolfssl.c
+# compiles to nothing without USE_WOLFSSL -- so there is one flat list
+# and the choice of TLS backend is a -D, not a source selection.
+#
+# Unlike LibreSSL, curl DOES have a config header: configure.ac line 40
+# is AC_CONFIG_HEADERS(lib/curl_config.h), and lib/curl_config.h.in is
+# shipped. curl_config.h in this directory is that template answered for
+# APExp, the same way sys/src/ape/cmd/core/config.h answers coreutils'.
+#
+# The tool reuses lib/curlx: src/Makefile.inc lists those sources as
+# ../lib/curlx/*.c, so they are compiled a second time here rather than
+# taken from libcurl.a -- upstream does the same, because the tool build
+# defines CURL_NO_OLDIES and the library build does not.
 
 TARG=curl
 BIN=$APEXPROOT/$objtype/bin/ape
 
-#temporary: check Lufia's 7 year old port
-# https://github.com/curl/curl/pull/3701
-# TODO: configure and identify generated files + needed object files
+OFILES=\
+	base64.$O\
+	basename.$O\
+	config2setopts.$O\
+	dynbuf.$O\
+	fopen.$O\
+	multibyte.$O\
+	nonblock.$O\
+	slist_wc.$O\
+	strcopy.$O\
+	strdup.$O\
+	strerr.$O\
+	strparse.$O\
+	terminal.$O\
+	timediff.$O\
+	timeval.$O\
+	tool_cb_dbg.$O\
+	tool_cb_hdr.$O\
+	tool_cb_prg.$O\
+	tool_cb_rea.$O\
+	tool_cb_see.$O\
+	tool_cb_soc.$O\
+	tool_cb_wrt.$O\
+	tool_cfgable.$O\
+	tool_dirhie.$O\
+	tool_doswin.$O\
+	tool_easysrc.$O\
+	tool_filetime.$O\
+	tool_findfile.$O\
+	tool_formparse.$O\
+	tool_getparam.$O\
+	tool_getpass.$O\
+	tool_help.$O\
+	tool_helpers.$O\
+	tool_ipfs.$O\
+	tool_libinfo.$O\
+	tool_listhelp.$O\
+	tool_main.$O\
+	tool_msgs.$O\
+	tool_operate.$O\
+	tool_operhlp.$O\
+	tool_paramhlp.$O\
+	tool_parsecfg.$O\
+	tool_progress.$O\
+	tool_setopt.$O\
+	tool_ssls.$O\
+	tool_stderr.$O\
+	tool_time.$O\
+	tool_urlglob.$O\
+	tool_util.$O\
+	tool_vms.$O\
+	tool_writeout.$O\
+	tool_writeout_json.$O\
+	tool_xattr.$O\
+	var.$O\
+	version_win32.$O\
+	wait.$O\
+	warnless.$O\
+	winapi.$O\
 
-OFILES=
+LIB=$APEXPROOT/$objtype/lib/ape/libcurl.a\
+	$APEXPROOT/$objtype/lib/ape/libressl.a\
+	$APEXPROOT/$objtype/lib/ape/libz.a
 
 <$APEXPROOT/sys/src/cmd/mkone
 
-CRLSRC=../../../external/curl
+CRLSRC=$APEXPROOT/sys/src/external/curl
+SSLSRC=$APEXPROOT/sys/src/external/libressl
 
-CFLAGS=-c -I$CRLSRC/include -DHAVE_CONFIG_H -D_POSIX_SOURCE
+CFLAGS=-c -I. -I$CRLSRC/include -I$CRLSRC/src -I$CRLSRC/lib\
+	-I$SSLSRC/include -DHAVE_CONFIG_H -DCURL_STATICLIB
 
-%.$O: $CRLSRC/%.c
-	$CC $CFLAGS $CRLSRC/$stem.c
-
-
-
-
-
-
-
+%.$O: $CRLSRC/src/%.c
+	$CC $CFLAGS $CRLSRC/src/$stem.c
+%.$O: $CRLSRC/lib/curlx/%.c
+	$CC $CFLAGS $CRLSRC/lib/curlx/$stem.c
+%.$O: $CRLSRC/src/toolx/%.c
+	$CC $CFLAGS $CRLSRC/src/toolx/$stem.c

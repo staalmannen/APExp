@@ -1,41 +1,730 @@
 APEXPROOT=../../../../..
 APE=$APEXPROOT/sys/src/ape
-</$APE/config
+<$APE/config
+
+# LibreSSL 4.3.2: libcrypto, libssl and libtls in one archive.
+#
+# Derived from the package's own Makefile.am rather than from configure.
+# LibreSSL portable has no AC_CONFIG_HEADERS -- there is no config.h and
+# never was -- so every answer configure would give is a -D here, and
+# the source lists are plain "libcrypto_la_SOURCES +=" lines gated by
+# "if HOST_*" and "if HAVE_*". Evaluating those for this platform is the
+# whole of what configure would have done:
+#
+#   HAVE_STRLCAT STRLCPY STRNDUP STRNLEN STRSEP ASPRINTF FTRUNCATE
+#   GETDELIM GETLINE GETPAGESIZE GETPROGNAME REALLOCARRAY
+#   ARC4RANDOM_BUF GETENTROPY        yes, libap has them
+#   HAVE_STRTONUM FREEZERO RECALLOCARRAY SYSLOG_R TIMINGSAFE_MEMCMP
+#   TIMINGSAFE_BCMP EXPLICIT_BZERO   no, so compat/ supplies them
+#   HOST_X86_64                      yes; every other HOST_* no
+#   HOST_ASM_*                       no, hence -DOPENSSL_NO_ASM
+#
+# Regenerating for another architecture means re-evaluating those: the
+# arch/ source and the -I crypto/arch/<arch> both change, and only
+# aarch64 amd64 arm i386 loongarch64 mips mips64 powerpc powerpc64
+# riscv64 sparc64 exist upstream -- 68020, spim and 32-bit sparc have no
+# LibreSSL arch directory at all.
+#
+# One archive rather than three. curl wants -lssl -lcrypto and the tree
+# has no notion of link order between them; the 481 sources share no
+# basename, checked, so a flat object list is unambiguous.
 
 LIB=$APEXPROOT/$objtype/lib/ape/libressl.a
 BIN=$APEXPROOT/$objtype/bin/ape
 
-#temporary: check Lufia's 7 year old port
-# https://github.com/libressl/portable/pull/510
-# TODO: configure and identify generated files + needed object files
+CRYPTOBJ=\
+	a_bitstr.$O\
+	a_enum.$O\
+	a_int.$O\
+	a_mbstr.$O\
+	a_object.$O\
+	a_octet.$O\
+	a_pkey.$O\
+	a_print.$O\
+	a_pubkey.$O\
+	a_strex.$O\
+	a_string.$O\
+	a_strnid.$O\
+	a_time.$O\
+	a_time_posix.$O\
+	a_time_tm.$O\
+	a_type.$O\
+	a_utf8.$O\
+	aes.$O\
+	aes_core.$O\
+	apexp-cpu-caps.$O\
+	asn1_err.$O\
+	asn1_gen.$O\
+	asn1_item.$O\
+	asn1_lib.$O\
+	asn1_old.$O\
+	asn1_old_lib.$O\
+	asn1_par.$O\
+	asn1_types.$O\
+	asn_mime.$O\
+	asn_moid.$O\
+	b_dump.$O\
+	b_posix.$O\
+	b_print.$O\
+	b_sock.$O\
+	bf_buff.$O\
+	bf_nbio.$O\
+	bf_null.$O\
+	bio_asn1.$O\
+	bio_b64.$O\
+	bio_cb.$O\
+	bio_enc.$O\
+	bio_err.$O\
+	bio_lib.$O\
+	bio_md.$O\
+	bio_meth.$O\
+	bio_ndef.$O\
+	blowfish.$O\
+	bn_add.$O\
+	bn_add_sub.$O\
+	bn_bpsw.$O\
+	bn_const.$O\
+	bn_convert.$O\
+	bn_ctx.$O\
+	bn_div.$O\
+	bn_err.$O\
+	bn_exp.$O\
+	bn_gcd.$O\
+	bn_isqrt.$O\
+	bn_kron.$O\
+	bn_lib.$O\
+	bn_mod.$O\
+	bn_mod_sqrt.$O\
+	bn_mod_words.$O\
+	bn_mont.$O\
+	bn_mul.$O\
+	bn_prime.$O\
+	bn_primitives.$O\
+	bn_print.$O\
+	bn_rand.$O\
+	bn_recp.$O\
+	bn_shift.$O\
+	bn_small_primes.$O\
+	bn_sqr.$O\
+	bn_word.$O\
+	bs_ber.$O\
+	bs_cbb.$O\
+	bs_cbs.$O\
+	bss_acpt.$O\
+	bss_bio.$O\
+	bss_conn.$O\
+	bss_dgram.$O\
+	bss_fd.$O\
+	bss_file.$O\
+	bss_mem.$O\
+	bss_null.$O\
+	bss_sock.$O\
+	buf_err.$O\
+	buffer.$O\
+	by_dir.$O\
+	by_file.$O\
+	by_mem.$O\
+	camellia.$O\
+	cast.$O\
+	cbc128.$O\
+	ccm128.$O\
+	cfb128.$O\
+	chacha.$O\
+	cm_ameth.$O\
+	cm_pmeth.$O\
+	cmac.$O\
+	cms_asn1.$O\
+	cms_att.$O\
+	cms_dd.$O\
+	cms_enc.$O\
+	cms_env.$O\
+	cms_err.$O\
+	cms_ess.$O\
+	cms_io.$O\
+	cms_kari.$O\
+	cms_lib.$O\
+	cms_pwri.$O\
+	cms_sd.$O\
+	cms_smime.$O\
+	conf_api.$O\
+	conf_def.$O\
+	conf_err.$O\
+	conf_lib.$O\
+	conf_mod.$O\
+	conf_sap.$O\
+	crypto_err.$O\
+	crypto_ex_data.$O\
+	crypto_init.$O\
+	crypto_legacy.$O\
+	crypto_lock.$O\
+	crypto_memory.$O\
+	ct_b64.$O\
+	ct_err.$O\
+	ct_log.$O\
+	ct_oct.$O\
+	ct_policy.$O\
+	ct_prn.$O\
+	ct_sct.$O\
+	ct_sct_ctx.$O\
+	ct_vfy.$O\
+	ct_x509v3.$O\
+	ctr128.$O\
+	curve25519.$O\
+	curve25519-generic.$O\
+	des.$O\
+	des_cksum.$O\
+	des_enc.$O\
+	des_fcrypt.$O\
+	des_key.$O\
+	dh_ameth.$O\
+	dh_asn1.$O\
+	dh_check.$O\
+	dh_err.$O\
+	dh_gen.$O\
+	dh_key.$O\
+	dh_lib.$O\
+	dh_pmeth.$O\
+	dsa_ameth.$O\
+	dsa_asn1.$O\
+	dsa_err.$O\
+	dsa_gen.$O\
+	dsa_key.$O\
+	dsa_lib.$O\
+	dsa_meth.$O\
+	dsa_ossl.$O\
+	dsa_pmeth.$O\
+	dsa_prn.$O\
+	e_aes.$O\
+	e_bf.$O\
+	e_camellia.$O\
+	e_cast.$O\
+	e_chacha.$O\
+	e_chacha20poly1305.$O\
+	e_des.$O\
+	e_des3.$O\
+	e_idea.$O\
+	e_null.$O\
+	e_rc2.$O\
+	e_rc4.$O\
+	e_sm4.$O\
+	e_xcbc_d.$O\
+	ec_ameth.$O\
+	ec_asn1.$O\
+	ec_convert.$O\
+	ec_curve.$O\
+	ec_err.$O\
+	ec_field.$O\
+	ec_key.$O\
+	ec_lib.$O\
+	ec_mult.$O\
+	ec_pmeth.$O\
+	ecdh.$O\
+	ecdsa.$O\
+	eck_prn.$O\
+	ecp_hp_methods.$O\
+	ecp_methods.$O\
+	ecx_methods.$O\
+	engine_stubs.$O\
+	err.$O\
+	err_all.$O\
+	err_prn.$O\
+	evp_aead.$O\
+	evp_cipher.$O\
+	evp_digest.$O\
+	evp_encode.$O\
+	evp_err.$O\
+	evp_key.$O\
+	evp_names.$O\
+	evp_pbe.$O\
+	evp_pkey.$O\
+	freezero.$O\
+	gcm128.$O\
+	hkdf.$O\
+	hkdf_evp.$O\
+	hm_ameth.$O\
+	hm_pmeth.$O\
+	hmac.$O\
+	idea.$O\
+	kdf_err.$O\
+	lhash.$O\
+	m_md4.$O\
+	m_md5.$O\
+	m_md5_sha1.$O\
+	m_null.$O\
+	m_ripemd.$O\
+	m_sha1.$O\
+	m_sha3.$O\
+	m_sigver.$O\
+	m_sm3.$O\
+	md4.$O\
+	md5.$O\
+	mlkem.$O\
+	mlkem_internal.$O\
+	mlkem_key.$O\
+	obj_dat.$O\
+	obj_err.$O\
+	obj_lib.$O\
+	obj_xref.$O\
+	ocsp_asn.$O\
+	ocsp_cl.$O\
+	ocsp_err.$O\
+	ocsp_ext.$O\
+	ocsp_ht.$O\
+	ocsp_lib.$O\
+	ocsp_prn.$O\
+	ocsp_srv.$O\
+	ocsp_vfy.$O\
+	ofb128.$O\
+	p12_add.$O\
+	p12_asn.$O\
+	p12_attr.$O\
+	p12_crt.$O\
+	p12_decr.$O\
+	p12_init.$O\
+	p12_key.$O\
+	p12_kiss.$O\
+	p12_mutl.$O\
+	p12_npas.$O\
+	p12_p8d.$O\
+	p12_p8e.$O\
+	p12_sbag.$O\
+	p12_utl.$O\
+	p5_pbe.$O\
+	p5_pbev2.$O\
+	p8_pkey.$O\
+	p_legacy.$O\
+	p_lib.$O\
+	p_sign.$O\
+	p_verify.$O\
+	pem_all.$O\
+	pem_err.$O\
+	pem_info.$O\
+	pem_lib.$O\
+	pem_oth.$O\
+	pem_pk8.$O\
+	pem_pkey.$O\
+	pem_sign.$O\
+	pem_x509.$O\
+	pem_xaux.$O\
+	pk12err.$O\
+	pk7_asn1.$O\
+	pk7_attr.$O\
+	pk7_doit.$O\
+	pk7_lib.$O\
+	pk7_mime.$O\
+	pk7_smime.$O\
+	pkcs7err.$O\
+	pmeth_fn.$O\
+	pmeth_gn.$O\
+	pmeth_lib.$O\
+	poly1305.$O\
+	pvkfmt.$O\
+	rand_err.$O\
+	rand_lib.$O\
+	randfile.$O\
+	rc2.$O\
+	rc4.$O\
+	recallocarray.$O\
+	ripemd.$O\
+	rsa_ameth.$O\
+	rsa_asn1.$O\
+	rsa_blinding.$O\
+	rsa_chk.$O\
+	rsa_eay.$O\
+	rsa_err.$O\
+	rsa_gen.$O\
+	rsa_lib.$O\
+	rsa_meth.$O\
+	rsa_none.$O\
+	rsa_oaep.$O\
+	rsa_pk1.$O\
+	rsa_pmeth.$O\
+	rsa_prn.$O\
+	rsa_pss.$O\
+	rsa_saos.$O\
+	rsa_sign.$O\
+	rsa_x931.$O\
+	sha1.$O\
+	sha256.$O\
+	sha3.$O\
+	sha512.$O\
+	sm3.$O\
+	sm4.$O\
+	stack.$O\
+	strtonum.$O\
+	syslog_r.$O\
+	t_crl.$O\
+	t_req.$O\
+	t_spki.$O\
+	t_x509.$O\
+	t_x509a.$O\
+	tasn_dec.$O\
+	tasn_enc.$O\
+	tasn_fre.$O\
+	tasn_new.$O\
+	tasn_prn.$O\
+	tasn_typ.$O\
+	tasn_utl.$O\
+	timingsafe_bcmp.$O\
+	timingsafe_memcmp.$O\
+	tls1_prf.$O\
+	ts_asn1.$O\
+	ts_conf.$O\
+	ts_err.$O\
+	ts_lib.$O\
+	ts_req_print.$O\
+	ts_req_utils.$O\
+	ts_rsp_print.$O\
+	ts_rsp_sign.$O\
+	ts_rsp_utils.$O\
+	ts_rsp_verify.$O\
+	ts_verify_ctx.$O\
+	txt_db.$O\
+	ui_err.$O\
+	ui_lib.$O\
+	ui_null.$O\
+	ui_openssl.$O\
+	x509_addr.$O\
+	x509_akey.$O\
+	x509_akeya.$O\
+	x509_alt.$O\
+	x509_asid.$O\
+	x509_att.$O\
+	x509_bcons.$O\
+	x509_bitst.$O\
+	x509_cmp.$O\
+	x509_conf.$O\
+	x509_constraints.$O\
+	x509_cpols.$O\
+	x509_crld.$O\
+	x509_d2.$O\
+	x509_def.$O\
+	x509_err.$O\
+	x509_ext.$O\
+	x509_extku.$O\
+	x509_genn.$O\
+	x509_ia5.$O\
+	x509_info.$O\
+	x509_int.$O\
+	x509_issuer_cache.$O\
+	x509_lib.$O\
+	x509_lu.$O\
+	x509_ncons.$O\
+	x509_obj.$O\
+	x509_ocsp.$O\
+	x509_pcons.$O\
+	x509_pku.$O\
+	x509_pmaps.$O\
+	x509_policy.$O\
+	x509_prn.$O\
+	x509_purp.$O\
+	x509_r2x.$O\
+	x509_req.$O\
+	x509_set.$O\
+	x509_siginfo.$O\
+	x509_skey.$O\
+	x509_trs.$O\
+	x509_txt.$O\
+	x509_utl.$O\
+	x509_v3.$O\
+	x509_verify.$O\
+	x509_vfy.$O\
+	x509_vpm.$O\
+	x509cset.$O\
+	x509name.$O\
+	x509rset.$O\
+	x509spki.$O\
+	x509type.$O\
+	x_algor.$O\
+	x_all.$O\
+	x_attrib.$O\
+	x_bignum.$O\
+	x_crl.$O\
+	x_exten.$O\
+	x_long.$O\
+	x_name.$O\
+	x_pubkey.$O\
+	x_req.$O\
+	x_sig.$O\
+	x_spki.$O\
+	x_val.$O\
+	x_x509.$O\
+	x_x509a.$O\
+	xts128.$O\
 
-CRYPTOBJ=
+SSLOBJ=\
+	bio_ssl.$O\
+	d1_both.$O\
+	d1_lib.$O\
+	d1_pkt.$O\
+	d1_srtp.$O\
+	pqueue.$O\
+	s3_cbc.$O\
+	s3_lib.$O\
+	ssl_asn1.$O\
+	ssl_both.$O\
+	ssl_cert.$O\
+	ssl_ciph.$O\
+	ssl_ciphers.$O\
+	ssl_clnt.$O\
+	ssl_err.$O\
+	ssl_init.$O\
+	ssl_kex.$O\
+	ssl_lib.$O\
+	ssl_methods.$O\
+	ssl_pkt.$O\
+	ssl_rsa.$O\
+	ssl_seclevel.$O\
+	ssl_sess.$O\
+	ssl_sigalgs.$O\
+	ssl_srvr.$O\
+	ssl_stat.$O\
+	ssl_tlsext.$O\
+	ssl_transcript.$O\
+	ssl_txt.$O\
+	ssl_versions.$O\
+	t1_enc.$O\
+	t1_lib.$O\
+	tls12_key_schedule.$O\
+	tls12_lib.$O\
+	tls12_record_layer.$O\
+	tls13_client.$O\
+	tls13_error.$O\
+	tls13_handshake.$O\
+	tls13_handshake_msg.$O\
+	tls13_key_schedule.$O\
+	tls13_legacy.$O\
+	tls13_lib.$O\
+	tls13_quic.$O\
+	tls13_record.$O\
+	tls13_record_layer.$O\
+	tls13_server.$O\
+	tls_buffer.$O\
+	tls_content.$O\
+	tls_key_share.$O\
+	tls_lib.$O\
 
-SSLOBJ=
+TLSOBJ=\
+	tls.$O\
+	tls_bio_cb.$O\
+	tls_client.$O\
+	tls_config.$O\
+	tls_conninfo.$O\
+	tls_keypair.$O\
+	tls_ocsp.$O\
+	tls_peer.$O\
+	tls_server.$O\
+	tls_signer.$O\
+	tls_util.$O\
+	tls_verify.$O\
 
-TLSOBJ=
-
-OFILES= $CRYPTOBJ $SSLOBJ $TLSOBJ
+OFILES=$CRYPTOBJ $SSLOBJ $TLSOBJ
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-SSLSRC=../../../external/libressl
+SSLSRC=$APEXPROOT/sys/src/external/libressl
 
-CFLAGS=-c -I$SSLSRC/include -DHAVE_CONFIG_H -D_POSIX_SOURCE
+# include/compat holds LibreSSL's own replacements for system headers --
+# string.h, stdlib.h, sys/types.h and so on -- each of which ends in an
+# #include_next of the real one. cpp supports that (nlist.c
+# KINCLUDE_NEXT), so these are kept on the path rather than pruned the
+# way gnulib's shadowing headers are: LibreSSL's are meant to be found
+# first, and are how it adds strlcpy and friends to <string.h>.
+BASEFLAGS=-c -I$SSLSRC/include -I$SSLSRC/include/compat\
+	-DLIBRESSL_INTERNAL -D__BEGIN_HIDDEN_DECLS= -D__END_HIDDEN_DECLS=\
+	-DOPENSSL_NO_ASM -DOPENSSL_NO_HW_PADLOCK\
+	-DOPENSSLDIR="/sys/lib/ape/ssl"
 
-%.$O: $SSLSRC/crypto/compat%.c
-	$CC $CFLAGS $SSLSRC/crypto/$stem.c
+# crypto, ssl and tls get different include paths on purpose, as they do
+# upstream. crypto/hidden and ssl/hidden each hold a namespace header
+# that binds internal calls to local aliases; their contents do not
+# overlap, but compiling ssl against crypto/hidden would alias EVP calls
+# that ssl is supposed to reach through the public header.
+CRYPTOFLAGS=$BASEFLAGS -DLIBRESSL_CRYPTO_INTERNAL\
+	-I$SSLSRC/crypto/hidden\
+	-I$SSLSRC/crypto\
+	-I$SSLSRC/crypto/aes\
+	-I$SSLSRC/crypto/asn1\
+	-I$SSLSRC/crypto/bf\
+	-I$SSLSRC/crypto/bio\
+	-I$SSLSRC/crypto/bn\
+	-I$SSLSRC/crypto/buffer\
+	-I$SSLSRC/crypto/bytestring\
+	-I$SSLSRC/crypto/camellia\
+	-I$SSLSRC/crypto/cast\
+	-I$SSLSRC/crypto/chacha\
+	-I$SSLSRC/crypto/cmac\
+	-I$SSLSRC/crypto/cms\
+	-I$SSLSRC/crypto/conf\
+	-I$SSLSRC/crypto/ct\
+	-I$SSLSRC/crypto/curve25519\
+	-I$SSLSRC/crypto/des\
+	-I$SSLSRC/crypto/dh\
+	-I$SSLSRC/crypto/dsa\
+	-I$SSLSRC/crypto/ec\
+	-I$SSLSRC/crypto/ecdh\
+	-I$SSLSRC/crypto/ecdsa\
+	-I$SSLSRC/crypto/engine\
+	-I$SSLSRC/crypto/err\
+	-I$SSLSRC/crypto/evp\
+	-I$SSLSRC/crypto/hkdf\
+	-I$SSLSRC/crypto/hmac\
+	-I$SSLSRC/crypto/idea\
+	-I$SSLSRC/crypto/kdf\
+	-I$SSLSRC/crypto/lhash\
+	-I$SSLSRC/crypto/md4\
+	-I$SSLSRC/crypto/md5\
+	-I$SSLSRC/crypto/mlkem\
+	-I$SSLSRC/crypto/modes\
+	-I$SSLSRC/crypto/objects\
+	-I$SSLSRC/crypto/ocsp\
+	-I$SSLSRC/crypto/pem\
+	-I$SSLSRC/crypto/pkcs12\
+	-I$SSLSRC/crypto/pkcs7\
+	-I$SSLSRC/crypto/poly1305\
+	-I$SSLSRC/crypto/rand\
+	-I$SSLSRC/crypto/rc2\
+	-I$SSLSRC/crypto/rc4\
+	-I$SSLSRC/crypto/ripemd\
+	-I$SSLSRC/crypto/rsa\
+	-I$SSLSRC/crypto/sha\
+	-I$SSLSRC/crypto/sm3\
+	-I$SSLSRC/crypto/sm4\
+	-I$SSLSRC/crypto/stack\
+	-I$SSLSRC/crypto/ts\
+	-I$SSLSRC/crypto/txt_db\
+	-I$SSLSRC/crypto/ui\
+	-I$SSLSRC/crypto/x509\
+	-I$SSLSRC/crypto/arch/$objtype -I$SSLSRC/crypto/bn/arch/$objtype
 
-%.$O: $SSLSRC/tls/crypto/%.c
-	$CC $CFLAGS $SSLSRC/ssl/$stem.c
+SSLFLAGS=$BASEFLAGS -I$SSLSRC/ssl/hidden -I$SSLSRC/crypto/arch/$objtype
 
-%.$O: $SSLSRC/tls/ssl/%.c
-	$CC $CFLAGS $SSLSRC/ssl/$stem.c
+TLSFLAGS=$BASEFLAGS -DTLS_DEFAULT_CA_FILE="/sys/lib/ape/ssl/cert.pem"
+
+CFLAGS=$CRYPTOFLAGS
+
+# crypto/arch/$objtype/crypto_cpu_caps.c is NOT built. On amd64 it is
+# GCC extended inline assembly --
+#
+#   __asm__ ("cpuid": "+a"(eax), "+b"(ebx), "+c"(ecx), "+d"(edx));
+#
+# which kencc cannot parse. apexp-cpu-caps.c stands in for it and
+# reports no capabilities, which is the right answer under
+# OPENSSL_NO_ASM: there is no assembly to dispatch to.
+apexp-cpu-caps.$O: apexp-cpu-caps.c
+	$CC $CRYPTOFLAGS apexp-cpu-caps.c
+
+%.$O: $SSLSRC/crypto/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/$stem.c
+%.$O: $SSLSRC/crypto/aes/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/aes/$stem.c
+%.$O: $SSLSRC/crypto/asn1/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/asn1/$stem.c
+%.$O: $SSLSRC/crypto/bf/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/bf/$stem.c
+%.$O: $SSLSRC/crypto/bio/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/bio/$stem.c
+%.$O: $SSLSRC/crypto/bn/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/bn/$stem.c
+%.$O: $SSLSRC/crypto/buffer/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/buffer/$stem.c
+%.$O: $SSLSRC/crypto/bytestring/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/bytestring/$stem.c
+%.$O: $SSLSRC/crypto/camellia/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/camellia/$stem.c
+%.$O: $SSLSRC/crypto/cast/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/cast/$stem.c
+%.$O: $SSLSRC/crypto/chacha/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/chacha/$stem.c
+%.$O: $SSLSRC/crypto/cmac/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/cmac/$stem.c
+%.$O: $SSLSRC/crypto/cms/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/cms/$stem.c
+%.$O: $SSLSRC/crypto/compat/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/compat/$stem.c
+%.$O: $SSLSRC/crypto/conf/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/conf/$stem.c
+%.$O: $SSLSRC/crypto/ct/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/ct/$stem.c
+%.$O: $SSLSRC/crypto/curve25519/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/curve25519/$stem.c
+%.$O: $SSLSRC/crypto/des/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/des/$stem.c
+%.$O: $SSLSRC/crypto/dh/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/dh/$stem.c
+%.$O: $SSLSRC/crypto/dsa/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/dsa/$stem.c
+%.$O: $SSLSRC/crypto/ec/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/ec/$stem.c
+%.$O: $SSLSRC/crypto/ecdh/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/ecdh/$stem.c
+%.$O: $SSLSRC/crypto/ecdsa/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/ecdsa/$stem.c
+%.$O: $SSLSRC/crypto/engine/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/engine/$stem.c
+%.$O: $SSLSRC/crypto/err/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/err/$stem.c
+%.$O: $SSLSRC/crypto/evp/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/evp/$stem.c
+%.$O: $SSLSRC/crypto/hkdf/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/hkdf/$stem.c
+%.$O: $SSLSRC/crypto/hmac/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/hmac/$stem.c
+%.$O: $SSLSRC/crypto/idea/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/idea/$stem.c
+%.$O: $SSLSRC/crypto/kdf/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/kdf/$stem.c
+%.$O: $SSLSRC/crypto/lhash/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/lhash/$stem.c
+%.$O: $SSLSRC/crypto/md4/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/md4/$stem.c
+%.$O: $SSLSRC/crypto/md5/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/md5/$stem.c
+%.$O: $SSLSRC/crypto/mlkem/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/mlkem/$stem.c
+%.$O: $SSLSRC/crypto/modes/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/modes/$stem.c
+%.$O: $SSLSRC/crypto/objects/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/objects/$stem.c
+%.$O: $SSLSRC/crypto/ocsp/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/ocsp/$stem.c
+%.$O: $SSLSRC/crypto/pem/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/pem/$stem.c
+%.$O: $SSLSRC/crypto/pkcs12/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/pkcs12/$stem.c
+%.$O: $SSLSRC/crypto/pkcs7/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/pkcs7/$stem.c
+%.$O: $SSLSRC/crypto/poly1305/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/poly1305/$stem.c
+%.$O: $SSLSRC/crypto/rand/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/rand/$stem.c
+%.$O: $SSLSRC/crypto/rc2/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/rc2/$stem.c
+%.$O: $SSLSRC/crypto/rc4/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/rc4/$stem.c
+%.$O: $SSLSRC/crypto/ripemd/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/ripemd/$stem.c
+%.$O: $SSLSRC/crypto/rsa/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/rsa/$stem.c
+%.$O: $SSLSRC/crypto/sha/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/sha/$stem.c
+%.$O: $SSLSRC/crypto/sm3/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/sm3/$stem.c
+%.$O: $SSLSRC/crypto/sm4/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/sm4/$stem.c
+%.$O: $SSLSRC/crypto/stack/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/stack/$stem.c
+%.$O: $SSLSRC/crypto/ts/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/ts/$stem.c
+%.$O: $SSLSRC/crypto/txt_db/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/txt_db/$stem.c
+%.$O: $SSLSRC/crypto/ui/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/ui/$stem.c
+%.$O: $SSLSRC/crypto/x509/%.c
+	$CC $CRYPTOFLAGS $SSLSRC/crypto/x509/$stem.c
+
+%.$O: $SSLSRC/ssl/%.c
+	$CC $SSLFLAGS $SSLSRC/ssl/$stem.c
 
 %.$O: $SSLSRC/tls/%.c
-	$CC $CFLAGS $SSLSRC/tls/$stem.c
-
-
-
-
-
+	$CC $TLSFLAGS $SSLSRC/tls/$stem.c
