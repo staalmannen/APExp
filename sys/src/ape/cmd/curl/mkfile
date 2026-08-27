@@ -1,0 +1,28 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+</$APE/config
+
+TARG=curl
+BIN=$APEXPROOT/$objtype/bin/ape
+
+#temporary: check Lufia's 7 year old port
+# https://github.com/curl/curl/pull/3701
+# TODO: configure and identify generated files + needed object files
+
+OFILES=
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+CRLSRC=../../../external/curl
+
+CFLAGS=-c -I$CRLSRC/include -DHAVE_CONFIG_H -D_POSIX_SOURCE
+
+%.$O: $CRLSRC/%.c
+	$CC $CFLAGS $CRLSRC/$stem.c
+
+
+
+
+
+
+

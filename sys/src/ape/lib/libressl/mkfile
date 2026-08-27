@@ -1,0 +1,41 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+</$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libressl.a
+BIN=$APEXPROOT/$objtype/bin/ape
+
+#temporary: check Lufia's 7 year old port
+# https://github.com/libressl/portable/pull/510
+# TODO: configure and identify generated files + needed object files
+
+CRYPTOBJ=
+
+SSLOBJ=
+
+TLSOBJ=
+
+OFILES= $CRYPTOBJ $SSLOBJ $TLSOBJ
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+SSLSRC=../../../external/libressl
+
+CFLAGS=-c -I$SSLSRC/include -DHAVE_CONFIG_H -D_POSIX_SOURCE
+
+%.$O: $SSLSRC/crypto/compat%.c
+	$CC $CFLAGS $SSLSRC/crypto/$stem.c
+
+%.$O: $SSLSRC/tls/crypto/%.c
+	$CC $CFLAGS $SSLSRC/ssl/$stem.c
+
+%.$O: $SSLSRC/tls/ssl/%.c
+	$CC $CFLAGS $SSLSRC/ssl/$stem.c
+
+%.$O: $SSLSRC/tls/%.c
+	$CC $CFLAGS $SSLSRC/tls/$stem.c
+
+
+
+
+
