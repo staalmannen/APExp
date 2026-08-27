@@ -681,7 +681,13 @@ CRYPTOFLAGS=$BASEFLAGS -DLIBRESSL_CRYPTO_INTERNAL\
 	-I$SSLSRC/crypto/x509\
 	-I$SSLSRC/crypto/arch/$objtype -I$SSLSRC/crypto/bn/arch/$objtype
 
-SSLFLAGS=$BASEFLAGS -I$SSLSRC/ssl/hidden -I$SSLSRC/crypto/arch/$objtype
+# ssl/Makefile.am adds crypto and crypto/bio to the base flags and
+# nothing else: bio_ssl.c reaches crypto/bio/bio_local.h for the BIO
+# method struct, and several files take crypto/*_local.h through the
+# plain crypto directory. It does NOT get crypto/hidden -- see above.
+SSLFLAGS=$BASEFLAGS -I$SSLSRC/ssl/hidden\
+	-I$SSLSRC/crypto -I$SSLSRC/crypto/bio\
+	-I$SSLSRC/crypto/arch/$objtype
 
 TLSFLAGS=$BASEFLAGS -DTLS_DEFAULT_CA_FILE="/sys/lib/ape/ssl/cert.pem"
 
