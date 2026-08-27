@@ -1,5 +1,8 @@
 #ifndef __LIMITS
 #define __LIMITS
+
+/* _BITS64, for SSIZE_MAX below. Guarded and macro-only. */
+#include <_apetypes.h>
 /* 8 bit chars (signed), 16 bit shorts, 32 bit ints/longs */
 
 #define CHAR_BIT	8
@@ -93,8 +96,24 @@
 /*#define SEM_NSEMS_MAX _POSIX_SEM_NSEMS_MAX */
 /*#define SEM_VALUE_MAX _POSIX_SEM_VALUE_MAX */
 /*#define SIGQUEUE_MAX _POSIX_SIGQUEUE_MAX */
+/*
+ * ssize_t, not long. These were LONG_MIN and LONG_MAX, which is the
+ * same mistake SIZE_MAX had: kencc's long is 32-bit on amd64, while
+ * <sys/types.h> and stddef_arch.h have made ssize_t "long long" since
+ * the 2026-04 width fix. So SSIZE_MAX described half the type it names.
+ *
+ * _BITS64 is the signal the rest of the tree uses for this; see the
+ * note in <stdint_generic.h>. Spelled out rather than written as
+ * LLONG_MAX so that it does not depend on the order these headers are
+ * read in.
+ */
+#ifdef _BITS64
+#define SSIZE_MIN (-0x7fffffffffffffffLL - 1)
+#define SSIZE_MAX 0x7fffffffffffffffLL
+#else
 #define SSIZE_MIN LONG_MIN
 #define SSIZE_MAX LONG_MAX
+#endif
 /*#define STREAM_MAX _POSIX_STREAM_MAX */
 /*#define TIMER_MAX _POSIX_TIMER_MAX */
 #define TZNAME_MAX _POSIX_TZNAME_MAX
