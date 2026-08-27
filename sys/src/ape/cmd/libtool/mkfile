@@ -94,7 +94,7 @@ LIB=
 
 <$APEXPROOT/sys/src/cmd/mkone
 
-CFLAGS=-FVp -c -I$LTSRC/include -I$LTSRC/src/internal -I$LTSRC/build\
+CFLAGS=-Fp -c -I$LTSRC/include -I$LTSRC/src/internal -I$LTSRC/build\
 	-D_POSIX_SOURCE -D_XOPEN_SOURCE=700 -D_DEFAULT_SOURCE\
 	-D_BSD_SOURCE -DSLBT_PACKAGE_DATADIR="/sys/lib/ape/libtool"\
 	-DSLBT_PACKAGE_M4DIR="/sys/lib/ape/m4"\
