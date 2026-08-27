@@ -42,8 +42,34 @@
 #include "xstrtol.h"
 
 /* Various parts of this code assume size_t fits into unsigned long
-   int, the widest unsigned type that GMP supports.  */
-static_assert (SIZE_MAX <= ULONG_MAX);
+   int, the widest unsigned type that GMP supports.
+
+   APExp: that does not hold on Plan 9 amd64, and this was
+
+     static_assert (SIZE_MAX <= ULONG_MAX);
+
+   kencc's long is 32-bit on amd64 while pointers and size_t are 64-bit,
+   so ULONG_MAX is 0xffffffff and SIZE_MAX is 0xffffffffffffffff. The
+   assert did pass until 2026-08, but only because SIZE_MAX was itself
+   wrong -- see sys/include/ape/stdint_generic.h.
+
+   Removed rather than worked around, because every size_t this file
+   actually hands to or takes from GMP is a string length or an offset
+   into a string, and expr's strings come from argv:
+
+     int_value (mbslen (r->u.s))          for "length"
+     int_value (mbs_logical_cspn (...))   for "index"
+     getsize (), which reads a value back out with mpz_get_ui ()
+
+   The first two would need an argument of 4 GiB to truncate, which
+   ARG_MAX forbids. getsize is safe in the other direction by
+   construction: a value too big for unsigned long fails
+   mpz_fits_ulong_p and it returns SIZE_MAX - 1, its "too large" answer,
+   which mbs_logical_substr already treats as past the end of the string
+   -- the same result a true 64-bit value would have produced.
+
+   If coreutils is re-imported, this is the one local change to
+   src/expr.c.  */
 
 /* The official name of this program (e.g., no 'g' prefix).  */
 #define PROGRAM_NAME "expr"
