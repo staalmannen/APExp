@@ -10,6 +10,28 @@ APE=$APEXPROOT/sys/src/ape
 #
 # mkone rather than mkmany: this is a single multi-call binary with a
 # subcommand table (openssl.c), not a directory of programs.
+#
+# Makefile.am has two either/or pairs, and this list originally had both
+# halves of each:
+#
+#	if HOST_WIN  apps_win.c  else apps_posix.c
+#	if BUILD_CERTHASH  certhash.c  else certhash_win.c
+#
+# apps_win.c opens with #include <windows.h>, so it stopped the build at
+# once. apps_posix.c is the one to keep.
+#
+# certhash is the less obvious of the two. Its condition upstream is
+#
+#	AM_CONDITIONAL([BUILD_CERTHASH], [test "x$ac_cv_func_symlink" = xyes])
+#
+# and configure would answer yes here, because libap does define
+# symlink() -- but only as a stub that sets ENOSYS and returns -1, since
+# Plan 9 has no symbolic links. certhash(1) exists to fill a directory
+# with hash-named symlinks to certificates, so the real implementation
+# would fail on every entry. certhash_win.c is misnamed: it is the
+# "platforms without symlinks" dummy, it includes nothing but apps.h,
+# and it prints one clear line saying certhash is not available. That is
+# the honest answer on Plan 9, so it is the half we keep.
 
 TARG=openssl
 BIN=$APEXPROOT/$objtype/bin/ape
@@ -17,10 +39,8 @@ BIN=$APEXPROOT/$objtype/bin/ape
 OFILES=\
 	apps.$O\
 	apps_posix.$O\
-	apps_win.$O\
 	asn1pars.$O\
 	ca.$O\
-	certhash.$O\
 	certhash_win.$O\
 	ciphers.$O\
 	cms.$O\

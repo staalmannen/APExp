@@ -16,6 +16,17 @@ APE=$APEXPROOT/sys/src/ape
 #   ARC4RANDOM_BUF GETENTROPY        yes, libap has them
 #   HAVE_STRTONUM FREEZERO RECALLOCARRAY SYSLOG_R TIMINGSAFE_MEMCMP
 #   TIMINGSAFE_BCMP EXPLICIT_BZERO   no, so compat/ supplies them
+#
+# explicit_bzero.$O was named in that list but missing from the objects
+# below, which the archive build cannot notice -- it would have surfaced
+# as an undefined symbol the first time something linked. 57 files in
+# crypto call it, and include/compat/string.h renames it to
+# libressl_explicit_bzero, so libap could not have supplied it even if
+# it had one. Upstream builds this single file at -O0, in its own
+# libcompatnoopt.la, so the memset cannot be optimised away; that is
+# belt and braces over the opaque call to __explicit_bzero_hook() that
+# follows the memset, which is what actually defeats dead-store
+# elimination. It is built with the ordinary flags here.
 #   HOST_X86_64                      yes; every other HOST_* no
 #   HOST_ASM_*                       no, hence -DOPENSSL_NO_ASM
 #
@@ -232,6 +243,7 @@ CRYPTOBJ=\
 	err.$O\
 	err_all.$O\
 	err_prn.$O\
+	explicit_bzero.$O\
 	evp_aead.$O\
 	evp_cipher.$O\
 	evp_digest.$O\
