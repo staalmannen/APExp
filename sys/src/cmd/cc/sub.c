@@ -297,16 +297,32 @@ simplet(long b)
  * nothing wrong with it, and there is no portable spelling that avoids
  * a cast at every such call.
  *
- * Only one level, and only between the two one-byte integer types: an
- * "int *" for a "char *" is still an error, and so is "char **" for
- * "unsigned char **", which is the case where the difference can
- * actually be observed. Signedness of the pointee changes no
- * representation, so nothing generated differs either way.
+ * -Wpointer-sign is not about char: it is any integer type against its
+ * own opposite signedness, and the wider ones turn up just as often.
+ * LibreSSL's evp/e_sm4.c passes "&ctx->num", an int *, to
+ * CRYPTO_ctr128_encrypt's "unsigned int *num".
+ *
+ * So: one level of indirection, and the two pointees must be the signed
+ * and unsigned spellings of the same type. "int *" for "char *" is
+ * still an error; so is "int *" for "unsigned long *", which merely
+ * happen to be the same width here and are what gcc calls incompatible
+ * pointer types rather than a signedness difference; and so is
+ * "char **" for "unsigned char **", which is the case where the
+ * difference can actually be observed. Signedness of the pointee
+ * changes no representation, so nothing generated differs either way.
  */
 static int
-charptrsign(Type *t1, Type *t2)
+ptrsignonly(Type *t1, Type *t2)
 {
+	static int pairs[][2] = {
+		{TCHAR, TUCHAR},
+		{TSHORT, TUSHORT},
+		{TINT, TUINT},
+		{TLONG, TULONG},
+		{TVLONG, TUVLONG},
+	};
 	Type *p1, *p2;
+	int i, e1, e2;
 
 	if(t1 == T || t2 == T)
 		return 0;
@@ -316,11 +332,13 @@ charptrsign(Type *t1, Type *t2)
 	p2 = t2->link;
 	if(p1 == T || p2 == T)
 		return 0;
-	if(p1->etype != TCHAR && p1->etype != TUCHAR)
-		return 0;
-	if(p2->etype != TCHAR && p2->etype != TUCHAR)
-		return 0;
-	return p1->etype != p2->etype;
+	e1 = p1->etype;
+	e2 = p2->etype;
+	for(i = 0; i < nelem(pairs); i++)
+		if((e1 == pairs[i][0] && e2 == pairs[i][1])
+		|| (e1 == pairs[i][1] && e2 == pairs[i][0]))
+			return 1;
+	return 0;
 }
 
 int
@@ -357,7 +375,7 @@ stcompat(Node *n, Type *t1, Type *t2, long ttab[])
 		if(n->op != OCAST)
 		 	if(b == BIND && i == TIND)
 				if(!sametype(t1, t2)) {
-					if(!charptrsign(t1, t2))
+					if(!ptrsignonly(t1, t2))
 						return 1;
 					warn(n, "pointer signedness: \"%T\" and \"%T\"",
 						t1, t2);
