@@ -1,35 +1,91 @@
 APEXPROOT=../../../../..
 APE=$APEXPROOT/sys/src/ape
-</$APE/config
+<$APE/config
 
-LIB=$APEXPROOT/$objtype/lib/ape/libressl.a
+# The openssl(1) command, from LibreSSL 4.3.2 apps/openssl.
+#
+# Source list from apps/openssl/Makefile.am. Everything links against
+# the one libressl.a that sys/src/ape/lib/libressl builds -- see the
+# comment there for why crypto, ssl and tls share an archive.
+#
+# mkone rather than mkmany: this is a single multi-call binary with a
+# subcommand table (openssl.c), not a directory of programs.
+
+TARG=openssl
 BIN=$APEXPROOT/$objtype/bin/ape
 
-#temporary: check Lufia's 7 year old port
-# https://github.com/libressl/portable/pull/510
-# TODO: configure and identify generated files + needed object files
+OFILES=\
+	apps.$O\
+	apps_posix.$O\
+	apps_win.$O\
+	asn1pars.$O\
+	ca.$O\
+	certhash.$O\
+	certhash_win.$O\
+	ciphers.$O\
+	cms.$O\
+	crl.$O\
+	crl2p7.$O\
+	dgst.$O\
+	dh.$O\
+	dhparam.$O\
+	dsa.$O\
+	dsaparam.$O\
+	ec.$O\
+	ecparam.$O\
+	enc.$O\
+	errstr.$O\
+	gendh.$O\
+	gendsa.$O\
+	genpkey.$O\
+	genrsa.$O\
+	ocsp.$O\
+	openssl.$O\
+	passwd.$O\
+	pkcs12.$O\
+	pkcs7.$O\
+	pkcs8.$O\
+	pkey.$O\
+	pkeyparam.$O\
+	pkeyutl.$O\
+	prime.$O\
+	rand.$O\
+	req.$O\
+	rsa.$O\
+	rsautl.$O\
+	s_cb.$O\
+	s_client.$O\
+	s_server.$O\
+	s_socket.$O\
+	s_time.$O\
+	sess_id.$O\
+	smime.$O\
+	speed.$O\
+	ts.$O\
+	verify.$O\
+	version.$O\
+	x509.$O\
 
-TARG=
+LIB=$APEXPROOT/$objtype/lib/ape/libressl.a
 
-<$APEXPROOT/sys/src/cmd/mkmany
+<$APEXPROOT/sys/src/cmd/mkone
 
-SSLSRC=../../../external/libressl
+SSLSRC=$APEXPROOT/sys/src/external/libressl
 
-CFLAGS=-c -I$SSLSRC/include -DHAVE_CONFIG_H -D_POSIX_SOURCE
+# apps/openssl reaches into the library's internals -- apps.c includes
+# "apps.h" which pulls <openssl/opensslconf.h> and the compat headers --
+# so it needs the same include set the library was built with, minus the
+# hidden/ namespace directories, which are for the library's own
+# internal calls.
+CFLAGS=-c -I$SSLSRC/include -I$SSLSRC/include/compat\
+	-I$SSLSRC/apps/openssl -I$SSLSRC/crypto/arch/$objtype\
+	-DLIBRESSL_INTERNAL -D__BEGIN_HIDDEN_DECLS= -D__END_HIDDEN_DECLS=\
+	-DOPENSSL_NO_ASM -DOPENSSL_NO_HW_PADLOCK\
+	-DOPENSSLDIR="/sys/lib/ape/ssl"
 
-%.$O: $SSLSRC/crypto/compat%.c
-	$CC $CFLAGS $SSLSRC/crypto/$stem.c
+%.$O: $SSLSRC/apps/openssl/%.c
+	$CC $CFLAGS $SSLSRC/apps/openssl/$stem.c
 
-%.$O: $SSLSRC/tls/crypto/%.c
-	$CC $CFLAGS $SSLSRC/ssl/$stem.c
-
-%.$O: $SSLSRC/tls/ssl/%.c
-	$CC $CFLAGS $SSLSRC/ssl/$stem.c
-
-%.$O: $SSLSRC/tls/%.c
-	$CC $CFLAGS $SSLSRC/tls/$stem.c
-
-
-
-
-
+# apps/openssl/compat holds poll_win.c and clock_gettime_osx.c only,
+# both for platforms this is not, so there is no rule for that
+# directory.

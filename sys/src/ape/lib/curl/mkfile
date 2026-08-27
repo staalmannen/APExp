@@ -1,28 +1,241 @@
 APEXPROOT=../../../../..
 APE=$APEXPROOT/sys/src/ape
-</$APE/config
+<$APE/config
+
+# curl 8.21.0.
+#
+# The source lists are lib/Makefile.inc and src/Makefile.inc, which are
+# static: configure selects nothing from them. curl compiles every
+# backend unconditionally and lets the file decide -- vtls/wolfssl.c
+# compiles to nothing without USE_WOLFSSL -- so there is one flat list
+# and the choice of TLS backend is a -D, not a source selection.
+#
+# Unlike LibreSSL, curl DOES have a config header: configure.ac line 40
+# is AC_CONFIG_HEADERS(lib/curl_config.h), and lib/curl_config.h.in is
+# shipped. curl_config.h in this directory is that template answered for
+# APExp, the same way sys/src/ape/cmd/core/config.h answers coreutils'.
+#
+# 192 sources, no two sharing a basename, so a flat object list is
+# unambiguous and the pattern rules below cannot collide.
 
 LIB=$APEXPROOT/$objtype/lib/ape/libcurl.a
 BIN=$APEXPROOT/$objtype/bin/ape
 
-#temporary: check Lufia's 7 year old port
-# https://github.com/curl/curl/pull/3701
-# TODO: configure and identify generated files + needed object files
-
-OFILES=
+OFILES=\
+	altsvc.$O\
+	amigaos.$O\
+	apple.$O\
+	asyn-ares.$O\
+	asyn-base.$O\
+	asyn-thrdd.$O\
+	base64.$O\
+	basename.$O\
+	bufq.$O\
+	bufref.$O\
+	capsule.$O\
+	cf-capsule.$O\
+	cf-dns.$O\
+	cf-h1-proxy.$O\
+	cf-h2-proxy.$O\
+	cf-haproxy.$O\
+	cf-https-connect.$O\
+	cf-ip-happy.$O\
+	cf-ngtcp2-cmn.$O\
+	cf-ngtcp2-proxy.$O\
+	cf-ngtcp2.$O\
+	cf-quiche.$O\
+	cf-recvbuf.$O\
+	cf-setup.$O\
+	cf-socket.$O\
+	cfilters.$O\
+	cipher_suite.$O\
+	cleartext.$O\
+	conncache.$O\
+	connect.$O\
+	content_encoding.$O\
+	cookie.$O\
+	cram.$O\
+	creds.$O\
+	cshutdn.$O\
+	curl_addrinfo.$O\
+	curl_endian.$O\
+	curl_fnmatch.$O\
+	curl_fopen.$O\
+	curl_get_line.$O\
+	curl_gethostname.$O\
+	curl_gssapi.$O\
+	curl_memrchr.$O\
+	curl_ntlm_core.$O\
+	curl_range.$O\
+	curl_sasl.$O\
+	curl_sha512_256.$O\
+	curl_share.$O\
+	curl_sspi.$O\
+	curl_threads.$O\
+	curl_trc.$O\
+	cw-out.$O\
+	cw-pause.$O\
+	dict.$O\
+	digest.$O\
+	digest_sspi.$O\
+	dnscache.$O\
+	doh.$O\
+	dynbuf.$O\
+	dynhds.$O\
+	easy.$O\
+	easygetopt.$O\
+	easyoptions.$O\
+	escape.$O\
+	fake_addrinfo.$O\
+	file.$O\
+	fileinfo.$O\
+	fopen.$O\
+	formdata.$O\
+	ftp.$O\
+	ftplistparser.$O\
+	getenv.$O\
+	getinfo.$O\
+	gopher.$O\
+	gsasl.$O\
+	gtls.$O\
+	hash.$O\
+	headers.$O\
+	hmac.$O\
+	hostcheck.$O\
+	hostip.$O\
+	hostip4.$O\
+	hostip6.$O\
+	hsts.$O\
+	http.$O\
+	http1.$O\
+	http2.$O\
+	http_aws_sigv4.$O\
+	http_chunks.$O\
+	http_digest.$O\
+	http_negotiate.$O\
+	http_ntlm.$O\
+	http_proxy.$O\
+	httpsrr.$O\
+	idn.$O\
+	if2ip.$O\
+	imap.$O\
+	inet_ntop.$O\
+	inet_pton.$O\
+	keylog.$O\
+	krb5_gssapi.$O\
+	krb5_sspi.$O\
+	ldap.$O\
+	libssh.$O\
+	libssh2.$O\
+	llist.$O\
+	macos.$O\
+	mbedtls.$O\
+	md4.$O\
+	md5.$O\
+	memdebug.$O\
+	mime.$O\
+	mprintf.$O\
+	mqtt.$O\
+	multi.$O\
+	multi_ev.$O\
+	multi_ntfy.$O\
+	multibyte.$O\
+	netrc.$O\
+	nonblock.$O\
+	ntlm.$O\
+	ntlm_sspi.$O\
+	oauth2.$O\
+	openldap.$O\
+	openssl.$O\
+	parsedate.$O\
+	peer.$O\
+	pingpong.$O\
+	pop3.$O\
+	progress.$O\
+	protocol.$O\
+	proxy.$O\
+	psl.$O\
+	rand.$O\
+	ratelimit.$O\
+	request.$O\
+	rtsp.$O\
+	rustls.$O\
+	schannel.$O\
+	schannel_verify.$O\
+	select.$O\
+	sendf.$O\
+	setopt.$O\
+	sha256.$O\
+	slist.$O\
+	smb.$O\
+	smtp.$O\
+	snprintf.$O\
+	socketpair.$O\
+	socks.$O\
+	socks_gssapi.$O\
+	socks_sspi.$O\
+	splay.$O\
+	spnego_gssapi.$O\
+	spnego_sspi.$O\
+	strcase.$O\
+	strcopy.$O\
+	strdup.$O\
+	strequal.$O\
+	strerr.$O\
+	strerror.$O\
+	strparse.$O\
+	system_win32.$O\
+	telnet.$O\
+	tftp.$O\
+	thrdpool.$O\
+	thrdqueue.$O\
+	timediff.$O\
+	timeval.$O\
+	transfer.$O\
+	uint-bset.$O\
+	uint-hash.$O\
+	uint-spbset.$O\
+	uint-table.$O\
+	url.$O\
+	urlapi.$O\
+	vauth.$O\
+	version.$O\
+	version_win32.$O\
+	vquic-tls.$O\
+	vquic.$O\
+	vssh.$O\
+	vtls.$O\
+	vtls_config.$O\
+	vtls_scache.$O\
+	vtls_spack.$O\
+	wait.$O\
+	warnless.$O\
+	winapi.$O\
+	wolfssl.$O\
+	ws.$O\
+	x509asn1.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CRLSRC=../../../external/curl
+CRLSRC=$APEXPROOT/sys/src/external/curl
+SSLSRC=$APEXPROOT/sys/src/external/libressl
 
-CFLAGS=-c -I$CRLSRC/include -DHAVE_CONFIG_H -D_POSIX_SOURCE
+# -I. first, for curl_config.h. BUILDING_LIBCURL and CURL_STATICLIB are
+# what the Makefile.am passes; without the second, the headers declare
+# the entry points dllimport on the platforms that care and curl_setup.h
+# takes a shared-library path this tree has no use for.
+CFLAGS=-c -I. -I$CRLSRC/include -I$CRLSRC/lib -I$SSLSRC/include\
+	-DHAVE_CONFIG_H -DBUILDING_LIBCURL -DCURL_STATICLIB
 
-%.$O: $CRLSRC/%.c
-	$CC $CFLAGS $CRLSRC/$stem.c
-
-
-
-
-
-
-
+%.$O: $CRLSRC/lib/%.c
+	$CC $CFLAGS $CRLSRC/lib/$stem.c
+%.$O: $CRLSRC/lib/curlx/%.c
+	$CC $CFLAGS $CRLSRC/lib/curlx/$stem.c
+%.$O: $CRLSRC/lib/vauth/%.c
+	$CC $CFLAGS $CRLSRC/lib/vauth/$stem.c
+%.$O: $CRLSRC/lib/vquic/%.c
+	$CC $CFLAGS $CRLSRC/lib/vquic/$stem.c
+%.$O: $CRLSRC/lib/vssh/%.c
+	$CC $CFLAGS $CRLSRC/lib/vssh/$stem.c
+%.$O: $CRLSRC/lib/vtls/%.c
+	$CC $CFLAGS $CRLSRC/lib/vtls/$stem.c
