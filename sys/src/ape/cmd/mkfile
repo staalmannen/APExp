@@ -68,6 +68,10 @@ _OPTIONAL_APPS=\
 	patch\
 	mkmk\
 	samurai\
+# TLS: openssl(1) from LibreSSL, and curl. Both need the libraries \
+# built first -- see the _TLS_LIBS note in ../lib/mkfile \
+	openssl\
+	curl\
 
 DIRS=\
 	$_CORE_APPS\

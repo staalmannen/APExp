@@ -34,10 +34,19 @@ _OPTIONAL_LIBS=\
 	z\
 	zstd\
 
+# TLS, and the one client that uses it. The loop below is sequential, so
+# these come after z: libcurl is compiled with HAVE_LIBZ and reaches
+# libz.a through the #pragma lib in <zlib.h>, and it needs libressl.a
+# for the TLS backend. Neither is alphabetical for that reason.
+_TLS_LIBS=\
+	libressl\
+	curl\
+
 DIRS=\
 	$_CORE_LIBS\
 	$_CORE_APP_DEPENDENCIES\
 	$_OPTIONAL_LIBS\
+	$_TLS_LIBS\
 
 
 none:V:

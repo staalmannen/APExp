@@ -92,7 +92,16 @@ LIB=$APEXPROOT/$objtype/lib/ape/libcurl.a\
 CRLSRC=$APEXPROOT/sys/src/external/curl
 SSLSRC=$APEXPROOT/sys/src/external/libressl
 
-CFLAGS=-c -I. -I$CRLSRC/include -I$CRLSRC/src -I$CRLSRC/lib\
+# curl_config.h comes from the library directory rather than from a
+# copy here. There used to be one of each, and they drifted the moment
+# the first was corrected: the library built and the tool then failed on
+# the two entries the library's copy had already had fixed --
+#
+#   curl_setup.h:910  redeclare tag: timeval
+#   curl_setup.h:1031 syntax error, last name: bool
+#
+# One answer to "what did configure decide" is all there can be.
+CFLAGS=-c -I$APE/lib/curl -I$CRLSRC/include -I$CRLSRC/src -I$CRLSRC/lib\
 	-I$SSLSRC/include -DHAVE_CONFIG_H -DCURL_STATICLIB
 
 %.$O: $CRLSRC/src/%.c
