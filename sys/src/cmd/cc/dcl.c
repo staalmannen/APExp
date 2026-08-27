@@ -801,8 +801,41 @@ init1(Sym *s, Type *t, long o, int exflag)
 			a = peekinit();
 			if(a == Z)
 				break;
-			if(a->op == OELEM || a->op == OARRAY)
+			if(a->op == OELEM || a->op == OARRAY) {
+				/*
+				 * A designator is interpreted relative to
+				 * the object of the enclosing brace list
+				 * (C99 6.7.8p17). If we were entered
+				 * implicitly -- exflag -- we are not that
+				 * list, so this designator is not ours even
+				 * if we happen to have a member of that
+				 * name. Stop, consuming nothing, and let the
+				 * level that owns the braces match it.
+				 *
+				 * Restarting here instead is what made
+				 * LibreSSL's ciphers.c fail:
+				 *
+				 *   .type = OPTION_VALUE,
+				 *   .opt.value = &cfg.version,
+				 *   .value = TLS1_2_VERSION,
+				 *
+				 * ".opt.value" enters the union to reach its
+				 * "int *value", and ".value" then matched
+				 * that same pointer a second time rather
+				 * than the "const int value" beside the
+				 * union in the struct:
+				 *
+				 *   ciphers.c:55 initialize pointer to an
+				 *     integer: ciphers_options
+				 *
+				 * The union is incidental. Two members of
+				 * the same name at different depths are
+				 * enough -- see designated-init-test.c.
+				 */
+				if(exflag)
+					break;
 				goto again;
+			}
 		}
 		/*
 		 * A designator naming no member of this struct is an error

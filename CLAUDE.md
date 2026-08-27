@@ -220,8 +220,10 @@ All C99 items are implemented. Key patches in `sys/src/cmd/cc/`:
 | main() implicit return 0 | `cc/pgen.c` | C99 §5.1.2.2.3; synthesises gen(&ret) with zero |
 | non-void fall-off warning | `cc/pgen.c` | Was error; now warn (use -B to suppress) |
 
-**Named initializers for static aggregates (17b):** Works — was never broken,
-the localeconv.c error was caused by missing struct members in `locale.h`, not a compiler bug.
+**Named initializers for static aggregates (17b):** Works — the localeconv.c
+error was caused by missing struct members in `locale.h`, not a compiler bug.
+One real bug found later, in the *scope* a designator is resolved in: see
+"Designators are relative to the enclosing brace list" below.
 
 **Anonymous struct/union:** Fully implemented in existing `dcl.c`+`sub.c` —
 `edecl()` accepts `sym==S`, `sualign()` assigns correct offsets, `dotsearch()`
@@ -788,6 +790,42 @@ nothing else — it already ignores `const` and `volatile`, which is why
 
 Covered by `sys/lib/tests/charptr-test.c`, whose real test is that it
 compiles: every case in it is a constraint violation of that shape.
+
+### Designators are relative to the enclosing brace list (FIXED)
+
+C99 6.7.8p17: a designator is interpreted relative to the object of the
+*enclosing brace list*. Reaching into a sub-object with a nested designator
+does not leave the current object there, because no braces were opened:
+
+```c
+struct s x = { .inner.v = &n, .v = 1 };   /* .v is the OUTER v */
+```
+
+`init1()` in `dcl.c` restarted its member walk at whatever level it was in
+(`goto again`), so having entered `inner` to satisfy `.inner.v`, the next
+designator matched `inner`'s members first. Found via LibreSSL's
+`apps/openssl/ciphers.c`, which has an `int *value` inside a named union and
+a `const int value` beside it:
+
+```
+ciphers.c:55 initialize pointer to an integer: ciphers_options
+```
+
+Fixed by breaking out of the member loop instead of `goto again` when
+`exflag` is set — `exflag` means "entered implicitly, without braces of our
+own", so a designator seen at that point belongs to an enclosing level.
+The existing code already returned without consuming when the designator
+named *no* member here; this extends that to the case where it names one by
+coincidence. The braced case keeps `exflag == 0` (via `doinit`) and so still
+restarts, which is correct.
+
+The union is incidental — two members of the same name at different depths
+are enough. **When the two have the same type there is no diagnostic at
+all**: the value simply lands at the wrong offset. `ciphers.c` was only
+caught because `int *` and `const int` disagree.
+
+Covered by `sys/lib/tests/designated-init-test.c`, whose case 3 is the silent
+variety.
 
 ### Macro identity includes whether there is white space
 
