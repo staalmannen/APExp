@@ -21,6 +21,14 @@
  * but does not work, or one behind the wrong feature-test macro, will
  * be claimed here. Expect to correct entries as the build reports them,
  * the way sys/src/ape/cmd/core/config.h was corrected.
+ *
+ * The mechanical pass was also biased one way: it answered "not in
+ * libap" for anything it could not find a *function* definition for,
+ * which is the wrong question for the type and struct-member probes --
+ * HAVE_STRUCT_TIMEVAL, HAVE_SA_FAMILY_T, HAVE_SUSECONDS_T and their
+ * kind. Those are all corrected in their own block below, with the
+ * header each one is actually in. Anything still answered "not in
+ * libap" here has been checked by hand.
  */
 
 #ifndef APEXP_CURL_CONFIG_H
@@ -76,7 +84,7 @@
 #define HAVE_TERMIOS_H                   1	/* termios.h */
 #define HAVE_UNISTD_H                    1	/* unistd.h */
 #define HAVE_UTIME_H                     1	/* utime.h */
-#define HAVE_ZSTD_H                      1	/* zstd.h */
+/* #undef HAVE_ZSTD_H                  */	/* see below */
 
 /* Functions found in libap or declared by an APE header. */
 #define CURL_DISABLE_LDAP                1	/* required here */
@@ -134,6 +142,48 @@
 #define USE_IPV6                         1	/* required here */
 #define USE_OPENSSL                      1	/* required here */
 
+/*
+ * Corrected after the first cut, when curl was actually compiled.
+ * Every one of these was answered "not in libap" by the mechanical
+ * pass and is in fact present. The first two stopped the build:
+ *
+ *   curl_setup.h:910  redeclare tag: timeval
+ *   curl_setup.h:1031 syntax error, last name: bool
+ *
+ * because curl supplies its own struct timeval, and its own enum for
+ * bool, when told the platform has neither -- and pcc has bool as a
+ * keyword, so the enum is not merely redundant but a syntax error.
+ * The openssl entries were just written before those headers were
+ * installed.
+ */
+#define HAVE_BOOL_T                      1	/* bool is a pcc keyword */
+#define HAVE_CLOCK_GETTIME_MONOTONIC     1	/* time.h, and libap implements it */
+#define HAVE_DECL_FSEEKO                 1	/* stdio.h */
+#define HAVE_FCNTL_O_NONBLOCK            1	/* fcntl.h */
+#define HAVE_GETHOSTBYNAME_R_6           1	/* libap; six arguments */
+#define HAVE_LIBSSL                      1	/* libressl, beside this */
+#define HAVE_LIBZ                        1	/* sys/src/ape/lib/z */
+#define HAVE_OPENSSL_CRYPTO_H            1	/* installed */
+#define HAVE_OPENSSL_ERR_H               1	/* installed */
+#define HAVE_OPENSSL_PEM_H               1	/* installed */
+#define HAVE_OPENSSL_RSA_H               1	/* installed */
+#define HAVE_OPENSSL_SSL_H               1	/* installed */
+#define HAVE_POSIX_STRERROR_R            1	/* strerror_r returns int */
+#define HAVE_SA_FAMILY_T                 1	/* sys/socket.h */
+#define HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID  1	/* netinet/in.h */
+#define HAVE_STRUCT_SOCKADDR_STORAGE     1	/* sys/socket.h */
+#define HAVE_STRUCT_TIMEVAL              1	/* sys/time.h */
+#define HAVE_SUSECONDS_T                 1	/* alltypes.h */
+
+/*
+ * HAVE_ZSTD_H was on and is now off. Only HAVE_ZSTD gates any code, so
+ * it was inert either way, but zstd.h here carries no #pragma lib, so
+ * claiming the header without a way to reach the library is a trap for
+ * whoever turns HAVE_ZSTD on next. zlib.h does carry one, which is why
+ * HAVE_LIBZ above is safe.
+ */
+
+
 /* Left undefined. */
 /* #undef CURL_CA_FALLBACK             */	/* left off */
 /* #undef CURL_CA_NATIVE               */	/* left off */
@@ -188,25 +238,20 @@
 /* #undef CURL_WITH_MULTI_SSL          */	/* not on this platform */
 /* #undef HAVE_ACCEPT4                 */	/* not in libap */
 /* #undef HAVE_ATOMIC                  */	/* not in libap */
-/* #undef HAVE_BOOL_T                  */	/* not in libap */
 /* #undef HAVE_BROTLI                  */	/* not in libap */
 /* #undef HAVE_BROTLI_DECODE_H         */	/* no such APE header */
 /* #undef HAVE_BUILTIN_AVAILABLE       */	/* not in libap */
-/* #undef HAVE_CLOCK_GETTIME_MONOTONIC */	/* not in libap */
 /* #undef HAVE_CLOCK_GETTIME_MONOTONIC_RAW */	/* not in libap */
 /* #undef HAVE_CLOSESOCKET             */	/* not in libap */
 /* #undef HAVE_CLOSESOCKET_CAMEL       */	/* not in libap */
-/* #undef HAVE_DECL_FSEEKO             */	/* not in libap */
 /* #undef HAVE_DES_ECB_ENCRYPT         */	/* not in libap */
 /* #undef HAVE_EVENTFD                 */	/* not in libap */
-/* #undef HAVE_FCNTL_O_NONBLOCK        */	/* not in libap */
 /* #undef HAVE_FSETXATTR               */	/* not on this platform */
 /* #undef HAVE_FSETXATTR_5             */	/* not in libap */
 /* #undef HAVE_FSETXATTR_6             */	/* not in libap */
 /* #undef HAVE_GETADDRINFO_THREADSAFE  */	/* not in libap */
 /* #undef HAVE_GETHOSTBYNAME_R_3       */	/* not in libap */
 /* #undef HAVE_GETHOSTBYNAME_R_5       */	/* not in libap */
-/* #undef HAVE_GETHOSTBYNAME_R_6       */	/* not in libap */
 /* #undef HAVE_GETIFADDRS              */	/* not in libap */
 /* #undef HAVE_GETPASS_R               */	/* not in libap */
 /* #undef HAVE_GLIBC_STRERROR_R        */	/* not in libap */
@@ -237,8 +282,6 @@
 /* #undef HAVE_LIBPSL_H                */	/* no such APE header */
 /* #undef HAVE_LIBSSH                  */	/* not in libap */
 /* #undef HAVE_LIBSSH2                 */	/* not in libap */
-/* #undef HAVE_LIBSSL                  */	/* not in libap */
-/* #undef HAVE_LIBZ                    */	/* not on this platform */
 /* #undef HAVE_LIBZSTD                 */	/* not in libap */
 /* #undef HAVE_LINUX_TCP_H             */	/* no such APE header */
 /* #undef HAVE_MACH_ABSOLUTE_TIME      */	/* not in libap */
@@ -251,20 +294,12 @@
 /* #undef HAVE_NGHTTP3_NGHTTP3_H       */	/* no such APE header */
 /* #undef HAVE_NGTCP2_NGTCP2_CRYPTO_H  */	/* no such APE header */
 /* #undef HAVE_NGTCP2_NGTCP2_H         */	/* no such APE header */
-/* #undef HAVE_OPENSSL_CRYPTO_H        */	/* no such APE header */
-/* #undef HAVE_OPENSSL_ERR_H           */	/* no such APE header */
-/* #undef HAVE_OPENSSL_PEM_H           */	/* no such APE header */
-/* #undef HAVE_OPENSSL_RSA_H           */	/* no such APE header */
 /* #undef HAVE_OPENSSL_SRP             */	/* not in libap */
-/* #undef HAVE_OPENSSL_SSL_H           */	/* no such APE header */
-/* #undef HAVE_POSIX_STRERROR_R        */	/* not in libap */
 /* #undef HAVE_PROTO_BSDSOCKET_H       */	/* no such APE header */
 /* #undef HAVE_QUICHE_CONN_SET_QLOG_FD */	/* not in libap */
 /* #undef HAVE_QUICHE_H                */	/* no such APE header */
-/* #undef HAVE_SA_FAMILY_T             */	/* not in libap */
 /* #undef HAVE_SENDMMSG                */	/* not in libap */
 /* #undef HAVE_SIGINTERRUPT            */	/* not in libap */
-/* #undef HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID */	/* not in libap */
 /* #undef HAVE_SSL_SET0_WBIO           */	/* not in libap */
 /* #undef HAVE_SSL_SET1_ECH_CONFIG_LIST */	/* not in libap */
 /* #undef HAVE_SSL_SET_QUIC_TLS_CBS    */	/* not in libap */
@@ -272,9 +307,6 @@
 /* #undef HAVE_STRCMPI                 */	/* not in libap */
 /* #undef HAVE_STRICMP                 */	/* not in libap */
 /* #undef HAVE_STROPTS_H               */	/* no such APE header */
-/* #undef HAVE_STRUCT_SOCKADDR_STORAGE */	/* not in libap */
-/* #undef HAVE_STRUCT_TIMEVAL          */	/* not in libap */
-/* #undef HAVE_SUSECONDS_T             */	/* not in libap */
 /* #undef HAVE_SYS_EVENTFD_H           */	/* no such APE header */
 /* #undef HAVE_SYS_FILIO_H             */	/* no such APE header */
 /* #undef HAVE_SYS_POLL_H              */	/* no such APE header */
