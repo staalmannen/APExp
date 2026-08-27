@@ -435,10 +435,15 @@ pointer. Covered by `sys/lib/tests/posix-spawn-test.c`.
 Missing before, and the reason gnulib's own spawn replacement got pulled in:
 `posix_spawnattr_setsigdefault`/`getsigdefault`, `setpgroup`/`getpgroup`,
 `setschedparam`/`setschedpolicy` and their getters were declared in
-`spawn.h` but undefined in libap. **Do not build gnulib's `spawn*.c` or
-`execute.c`/`spawn-pipe.c` into the shared archive** — gnulib's
-`posix_spawnattr_t` has glibc's `_sd`/`_ss` members and does not compile
-against APE's `<spawn.h>`.
+`spawn.h` but undefined in libap. **Do not build gnulib's `spawn*.c` into the
+shared archive** — gnulib's `posix_spawnattr_t` has glibc's `_sd`/`_ss`
+members and does not compile against APE's `<spawn.h>`.
+
+`execute.c` and `spawn-pipe.c` *are* built, and are the reason libap's
+implementation has to be real rather than a stub: bison and m4 both link the
+shared `libgnu.a` rather than a `lib/` of their own (`libbison.a` is two
+objects, `main` and `yyerror`), and they reach `create_pipe_bidi` and
+`execute`, which wire up a child entirely through file actions.
 
 ### aio/ — async I/O on pthreads
 
