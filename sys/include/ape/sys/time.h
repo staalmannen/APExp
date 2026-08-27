@@ -5,9 +5,30 @@
 #ifndef __TIMEVAL__
 #define __TIMEVAL__
 
+/*
+ * POSIX puts suseconds_t in <sys/types.h>, <sys/time.h> and
+ * <sys/select.h>, and says tv_usec below has that type. It used to be
+ * in <alltypes.h> alone -- which is not a header anyone includes by
+ * name -- so portable code that spelled the type could not find it:
+ *
+ *   timediff.c:52 syntax error, last name: tv_usec
+ *
+ * from curl's "tv->tv_usec = (suseconds_t)tv_usec;", where an unknown
+ * type name turns the cast into a syntax error.
+ *
+ * It is "long", not the "long long" alltypes.h had, because tv_usec is
+ * long and POSIX requires the two to agree. The alltypes.h spelling was
+ * musl's, where long is 64-bit; here it is 32, which is ample for
+ * [0, 999999] and is what every caller taking &tv->tv_usec expects.
+ */
+#ifndef __suseconds_t_defined
+#define __suseconds_t_defined
+typedef long suseconds_t;
+#endif
+
 struct timeval {
 	long long	tv_sec;		/* seconds since epoch — 64-bit to survive 2038 */
-	long		tv_usec;	/* microseconds [0, 999999] — 32-bit is fine */
+	suseconds_t	tv_usec;	/* microseconds [0, 999999] — 32-bit is fine */
 };
 
 struct itimerval {

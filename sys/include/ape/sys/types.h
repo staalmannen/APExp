@@ -6,6 +6,13 @@
 
 #pragma lib "/$M/lib/ape/libap.a"
 
+/* Also in <sys/time.h> and <sys/select.h>, under the same guard; see
+   the note beside struct timeval for why it is long. */
+#ifndef __suseconds_t_defined
+#define __suseconds_t_defined
+typedef long		suseconds_t;
+#endif
+
 typedef	unsigned short	ino_t;
 typedef	unsigned short	dev_t;
 typedef	long long		off_t;
@@ -22,6 +29,18 @@ typedef unsigned long	u_long;
 typedef unsigned int	in_addr_t;
 typedef long      blksize_t;   /* preferred I/O block size */
 typedef long long blkcnt_t;    /* count of file system blocks */
+
+/*
+ * The rest of the POSIX <sys/types.h> set. These used to be in
+ * <alltypes.h> alone, which is not a header anyone includes by name, so
+ * portable code that spelled one of them could not find it. blksize_t
+ * and blkcnt_t were in both -- the spellings happened to agree.
+ */
+typedef unsigned long long fsblkcnt_t;	/* file system block count */
+typedef unsigned long long fsfilcnt_t;	/* file system inode count */
+typedef unsigned	id_t;		/* uid_t or gid_t or pid_t */
+typedef int		key_t;		/* System V IPC key */
+typedef unsigned	useconds_t;	/* microseconds, for usleep */
 
 #ifndef _SIZE_T
 #define _SIZE_T

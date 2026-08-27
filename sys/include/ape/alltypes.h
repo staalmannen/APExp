@@ -17,17 +17,26 @@
 #include <langinfo.h>
 
 typedef long register_t;
-typedef long long suseconds_t;
 typedef uint64_t u_int64_t;
 
-typedef long blksize_t;
-typedef int64_t blkcnt_t;
-typedef uint64_t fsblkcnt_t;
-typedef uint64_t fsfilcnt_t;
-
-typedef unsigned id_t;
-typedef int key_t;
-typedef unsigned useconds_t;
+/*
+ * suseconds_t, blksize_t, blkcnt_t, fsblkcnt_t, fsfilcnt_t, id_t, key_t
+ * and useconds_t were all defined here. They are POSIX <sys/types.h>
+ * types and are now defined there, and reach this file through the
+ * include above.
+ *
+ * This file is not a header anyone includes by name, so a type that
+ * lives only here cannot be found by portable code that spells it:
+ *
+ *   timediff.c:52 syntax error, last name: tv_usec
+ *
+ * from curl's "tv->tv_usec = (suseconds_t)tv_usec;". An unknown type
+ * name turns the cast into a syntax error, which is why the complaint
+ * names the operand rather than the type.
+ *
+ * blksize_t and blkcnt_t were defined in both places; the two spellings
+ * agreed (int64_t is long long here), so it went unnoticed.
+ */
 
 typedef va_list __isoc_va_list;
 

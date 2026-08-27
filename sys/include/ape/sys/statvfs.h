@@ -28,8 +28,7 @@
  * no way to say "unknown" is worse than one that can. It is always 0.
  */
 
-#include <sys/types.h>
-#include <alltypes.h>	/* fsblkcnt_t, fsfilcnt_t */
+#include <sys/types.h>	/* fsblkcnt_t, fsfilcnt_t */
 
 struct statvfs {
 	unsigned long	f_bsize;	/* file system block size */
