@@ -71,6 +71,34 @@ main(void)
 	printf("PTRDIFF_MAX %llx\n", (unsigned long long)PTRDIFF_MAX);
 	printf("UINTMAX_MAX %llx\n", (unsigned long long)UINTMAX_MAX);
 	printf("ULONG_MAX   %llx\n", (unsigned long long)ULONG_MAX);
+
+	/* Which headers actually got read, and what they decided. When
+	   SIZE_MAX is wrong these say why: SIZE_MAX comes from
+	   "#if INTPTR_WIDTH == 64" in <stdint.h>, INTPTR_WIDTH comes from
+	   <stdint_arch.h>, and _BITS64 comes from <_apetypes.h>. Any of
+	   the three can be missing if a header is shadowed -- pcc searches
+	   -I/$objtype/include/ape before -I/sys/include/ape, so the host's
+	   stock APE wins there unless this tree has a file of that name. */
+#ifdef _STDINT_GENERIC_H_
+	printf("stdint.h:       APExp's (_STDINT_GENERIC_H_ set)\n");
+#else
+	printf("stdint.h:       NOT APExp's -- _STDINT_GENERIC_H_ unset\n");
+#endif
+#ifdef _STDINT_ARCH_H_
+	printf("stdint_arch.h:  read\n");
+#else
+	printf("stdint_arch.h:  NOT read\n");
+#endif
+#ifdef INTPTR_WIDTH
+	printf("INTPTR_WIDTH:   %d\n", (int)INTPTR_WIDTH);
+#else
+	printf("INTPTR_WIDTH:   undefined\n");
+#endif
+#ifdef _BITS64
+	printf("_BITS64:        set\n");
+#else
+	printf("_BITS64:        unset\n");
+#endif
 	printf("\n");
 
 	/* The one quotearg depends on. Written exactly as it uses it. */
