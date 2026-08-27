@@ -22,7 +22,15 @@ extern "C" {
 /*
  * Definitions related to sockets: types, address families, options.
  */
+/*
+ * <netdb.h> above needs socklen_t for gethostbyaddr_r and is included
+ * before this point, so it defines the typedef too, under this guard.
+ * Whichever header a translation unit reaches first supplies it.
+ */
+#ifndef __socklen_t_defined
+#define __socklen_t_defined
 typedef int socklen_t;
+#endif
 typedef unsigned short sa_family_t;
 typedef unsigned short in_port_t;
 

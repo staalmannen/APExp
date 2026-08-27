@@ -25,13 +25,26 @@
  */
 
 /*
- * size_t for the _r functions below, socklen_t for gethostbyaddr_r, and
- * struct sockaddr for getnameinfo. This header declared all three
- * without defining any of them, so it only compiled where the caller
- * happened to have included <sys/socket.h> first.
+ * size_t for the _r functions below, and socklen_t for
+ * gethostbyaddr_r.
+ *
+ * NOT by including <sys/socket.h>: that header includes this one at its
+ * top, before it defines socklen_t, so the include is a cycle and the
+ * typedef arrives too late --
+ *
+ *   netdb.h:122 mixed ansi/old function declaration: gethostbyaddr_r
+ *
+ * which is what an unknown type name in a prototype looks like, since
+ * "socklen_t" then parses as a parameter name. So socklen_t is defined
+ * here under the same guard <sys/socket.h> uses, and whichever is read
+ * first wins.
  */
 #include <stddef.h>
-#include <sys/socket.h>
+
+#ifndef __socklen_t_defined
+#define __socklen_t_defined
+typedef int socklen_t;
+#endif
 
 #ifdef __cplusplus
 extern "C" {
