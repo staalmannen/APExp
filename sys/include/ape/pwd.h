@@ -1,6 +1,9 @@
 #ifndef __PWD
 #define __PWD
 
+/* POSIX: <pwd.h> defines size_t, uid_t and gid_t, so that this header stands on its own. */
+#include <stddef.h>
+
 #pragma lib "/$M/lib/ape/libap.a"
 #include <sys/types.h>
 

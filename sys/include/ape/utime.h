@@ -1,6 +1,9 @@
 #ifndef __UTIME_H
 #define __UTIME_H
 
+/* POSIX: <utime.h> defines time_t, so that this header stands on its own. */
+#include <sys/types.h>
+
 #pragma lib "/$M/lib/ape/libap.a"
 
 struct utimbuf

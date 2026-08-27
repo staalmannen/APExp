@@ -1,5 +1,8 @@
 #ifndef _LANGINFO_H
 #define _LANGINFO_H
+
+/* POSIX: <langinfo.h> defines locale_t; size_t is used here, so that this header stands on its own. */
+#include <stddef.h>
 #pragma lib "/$M/lib/ape/libap.a"
 
 #ifdef __cplusplus

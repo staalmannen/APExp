@@ -8,7 +8,7 @@
 
 #include "priv.h"
 
-int
+ssize_t
 writev(int fd, struct iovec *v, int ent)
 {
 	int i, n, written;

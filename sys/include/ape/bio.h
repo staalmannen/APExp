@@ -4,6 +4,9 @@
 
 #ifndef __BIO_H_
 #define __BIO_H_
+
+/* Bprint takes a va_list, so that this header stands on its own. */
+#include <stdarg.h>
 #pragma	src	"/sys/src/libbio"
 #pragma	lib	"/$M/lib/ape/libbio.a"
 
