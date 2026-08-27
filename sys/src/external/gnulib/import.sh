@@ -451,6 +451,30 @@ EOF
 # define HAVE_LCHOWN 0
 #endif
 
+/* APExp: the statvfs answers, now that APE has <sys/statvfs.h>. The
+   calls always fail with ENOSYS -- Plan 9 cannot report block or inode
+   counts -- but the type has to exist, because coreutils' stat.c
+   declares a STRUCT_STATVFS unconditionally even though it only uses it
+   for "stat -f". STAT_STATVFS plus F_TYPE makes stat.c take the statvfs
+   arm; F_FSID_IS_INTEGER is what POSIX says and skips the block that
+   takes alignof of the struct. F_BASETYPE and F_FSTYPENAME are
+   deliberately absent: those are Solaris and BSD members. */
+#ifndef HAVE_SYS_STATVFS_H
+# define HAVE_SYS_STATVFS_H 1
+#endif
+#ifndef STAT_STATVFS
+# define STAT_STATVFS 1
+#endif
+#ifndef HAVE_STRUCT_STATVFS_F_TYPE
+# define HAVE_STRUCT_STATVFS_F_TYPE 1
+#endif
+#ifndef HAVE_STRUCT_STATVFS_F_NAMEMAX
+# define HAVE_STRUCT_STATVFS_F_NAMEMAX 1
+#endif
+#ifndef STRUCT_STATVFS_F_FSID_IS_INTEGER
+# define STRUCT_STATVFS_F_FSID_IS_INTEGER 1
+#endif
+
 /* APExp: no non-Gregorian calendars in strftime. Otherwise strftime.c
    calls gl_locale_name_unsafe, which means gnulib's localename module,
    whose getlocalename_l-unsafe.c ends in "#error Please port ... to

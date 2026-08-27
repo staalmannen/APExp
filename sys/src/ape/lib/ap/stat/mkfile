@@ -9,6 +9,7 @@ OFILES=\
 	fstat.$O\
 	lstat.$O\
 	stat.$O\
+	statvfs.$O\
 	umask.$O\
 	utime.$O\
 	utimes.$O\
