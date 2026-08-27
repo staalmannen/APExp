@@ -26,9 +26,22 @@
  * value checks confirm the obvious -- that a relaxation which changes
  * no representation changes no behaviour.
  *
+ * -Wpointer-sign is not about char, though the name of this file is:
+ * it is any integer type against its own opposite signedness. LibreSSL
+ * hit the int case next --
+ *
+ *   e_sm4.c:241 argument prototype mismatch "IND INT" for "IND UINT":
+ *     CRYPTO_ctr128_encrypt
+ *
+ * from passing "&ctx->num", an int *, to a "unsigned int *num"
+ * parameter -- so short, int, long and long long are covered below too.
+ *
  * Deliberately NOT here, because they must stay errors: "char **" for
  * "unsigned char **", which is the case where the difference can be
- * observed, and any pointer of a different width.
+ * observed; any pointer of a different width; and "int *" for
+ * "unsigned long *", which are the same width here but are not each
+ * other's signed/unsigned spelling, so gcc calls them incompatible
+ * pointer types rather than a signedness difference.
  *
  * Build and run:  pcc -o charptr-test charptr-test.c
  * Prints "PASS" per case; exit status is the number of failures.
@@ -90,6 +103,17 @@ takes_char(char *p)
 	return p[0];
 }
 
+/* The wider types, in the shape CRYPTO_ctr128_encrypt uses: a pointer
+   the callee increments. One of each signedness for every width. */
+static int		bump_i(int *p)			{ return ++*p; }
+static unsigned int	bump_u(unsigned int *p)		{ return ++*p; }
+static int		bump_sh(short *p)		{ return ++*p; }
+static int		bump_ush(unsigned short *p)	{ return ++*p; }
+static long		bump_l(long *p)			{ return ++*p; }
+static unsigned long	bump_ul(unsigned long *p)	{ return ++*p; }
+static long long	bump_ll(long long *p)		{ return ++*p; }
+static unsigned long long bump_ull(unsigned long long *p)	{ return ++*p; }
+
 int
 main(void)
 {
@@ -145,6 +169,48 @@ main(void)
 	/* Returning one for the other. */
 	check("sizeof(char) == sizeof(unsigned char)",
 	      sizeof(char) == 1 && sizeof(unsigned char) == 1, NULL);
+
+	/* The wider integer types, which are the same rule. e_sm4.c's
+	   case is the int one: an int * for an "unsigned int *num"
+	   parameter, written to by the callee. */
+	{
+		int num = 3;
+		unsigned int unum = 3;
+		short sh = 7;
+		unsigned short ush = 7;
+		long lo = 11;
+		unsigned long ulo = 11;
+		long long ll = 13;
+		unsigned long long ull = 13;
+
+		check("int * passed as unsigned int *",
+		      bump_u(&num) == 4 && num == 4, "store went astray");
+		check("unsigned int * passed as int *",
+		      bump_i(&unum) == 4 && unum == 4, "store went astray");
+		check("short * passed as unsigned short *",
+		      bump_ush(&sh) == 8 && sh == 8, "store went astray");
+		check("unsigned short * passed as short *",
+		      bump_sh(&ush) == 8 && ush == 8, "store went astray");
+		check("long * passed as unsigned long *",
+		      bump_ul(&lo) == 12 && lo == 12, "store went astray");
+		check("unsigned long * passed as long *",
+		      bump_l(&ulo) == 12 && ulo == 12, "store went astray");
+		check("long long * passed as unsigned long long *",
+		      bump_ull(&ll) == 14 && ll == 14, "store went astray");
+		check("unsigned long long * passed as long long *",
+		      bump_ll(&ull) == 14 && ull == 14, "store went astray");
+
+		/* Assignment, and const on the target. */
+		{
+			const unsigned int *cu = &num;
+			unsigned int *u = &num;
+
+			check("unsigned int * = int *", (void *)u == (void *)&num,
+			      NULL);
+			check("const unsigned int * = int *",
+			      (void *)cu == (void *)&num, NULL);
+		}
+	}
 
 	if (failures)
 		printf("\n%d failure(s)\n", failures);

@@ -744,7 +744,7 @@ end-of-file — so this does not make a file with many includes any dearer.
 
 `NIF`, the `#if` nesting limit, is still 32 and has not been a problem.
 
-### char * against unsigned char * is a warning, not an error
+### Pointer signedness is a warning, not an error
 
 `char *` and `unsigned char *` are distinct types, so passing one where the
 other is declared is a constraint violation and C requires a diagnostic. gcc
@@ -760,15 +760,27 @@ a_object.c:185 argument prototype mismatch "IND CHAR" for "IND CONST UCHAR":
 from LibreSSL's `CBB_add_bytes(cbb, s, n)` with `char s[22]` against
 `int CBB_add_bytes(CBB *, const uint8_t *, size_t)`.
 
-`cc/sub.c` `stcompat()` now calls `charptrsign()` in the `BIND`/`TIND` branch
-and warns instead. **One level only, and only between the two one-byte integer
-types** — `int *` for `char *` is still an error, and so is `char **` for
-`unsigned char **`, which is the case where the difference can actually be
-observed.
+`-Wpointer-sign` is not about `char`, and LibreSSL hit the `int` case next:
 
-This cannot change code generation: `char` and `unsigned char` have the same
-representation, so the only thing that differs is whether a diagnostic is
-fatal. `warn()` is gated on `debug['w']`, so it is quiet unless `-w` is passed.
+```
+e_sm4.c:241 argument prototype mismatch "IND INT" for "IND UINT":
+  CRYPTO_ctr128_encrypt
+```
+
+from `&ctx->num`, an `int *`, against `unsigned int *num`.
+
+`cc/sub.c` `stcompat()` now calls `ptrsignonly()` in the `BIND`/`TIND` branch
+and warns instead. **One level only, and only when the two pointees are the
+signed and unsigned spellings of the same type** — the five pairs are listed
+in `pairs[]` there. Still errors: `int *` for `char *`; `int *` for
+`unsigned long *`, which are the same width on amd64 but are not a
+signed/unsigned pair, and which gcc calls incompatible pointer types rather
+than a signedness difference; and `char **` for `unsigned char **`, which is
+the case where the difference can actually be observed.
+
+This cannot change code generation: a type and its opposite signedness have
+the same representation, so the only thing that differs is whether a
+diagnostic is fatal. `warn()` is gated on `debug['w']`, so it is quiet unless `-w` is passed.
 
 Note `rsametype()` in `dcl.c` compares `etype` and the `GNORET` bit and
 nothing else — it already ignores `const` and `volatile`, which is why
