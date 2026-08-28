@@ -1,4 +1,4 @@
-APEXPROOT=../../../../..
+APEXPROOT=../../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
@@ -48,7 +48,7 @@ APE=$APEXPROOT/sys/src/ape
 #
 # Run keygen first: encap and decap both build on it, so if keygen is
 # wrong the others fail as a consequence and say nothing extra.
-# "mk run" below does all five of the 768 ones in that order; 768 is
+# "mk test" below does all five of the 768 ones in that order; 768 is
 # the rank X25519MLKEM768 uses, and 1024 vectors are there too if the
 # fault turns out to be rank-dependent.
 #
@@ -58,10 +58,20 @@ APE=$APEXPROOT/sys/src/ape
 # with itself, which is exactly the kind that gets this far into a
 # handshake. Useful for the encoding and corruption checks it also does.
 #
-# Not in ../mkfile's DIRS: this is a diagnostic, not part of the system.
+# This lives beside the library it tests rather than under cmd/, which
+# is for installed commands. mksyslib already recurses here:
+#
+#	test:VQ:
+#		if(test -d ./test)
+#			cd test && mk $MKFLAGS test
+#
+# and its clean does the same, so "mk test" in ../ runs everything below
+# and no entry in any DIRS list is wanted or needed. Nothing here is
+# installed; BIN points at this directory so that an accidental
+# "mk install" stays local.
 
 TARG=mlkem_tests mlkem_unittest
-BIN=$APEXPROOT/$objtype/bin/ape
+BIN=.
 
 SSLSRC=$APEXPROOT/sys/src/external/libressl
 
@@ -107,7 +117,12 @@ $O.mlkem_unittest: mlkem_unittest.$O mlkem_tests_util.$O
 
 V=$SSLSRC/tests
 
-run:V: $PROGS
+# Named "test" because that is the target mksyslib invokes here. mkmany
+# defines one too -- it looks for a ./test below this directory, finds
+# none and does nothing -- so both recipes run, as they do wherever this
+# tree redefines a target after the include (cmd/awk and cmd/gettext do
+# the same with install).
+test:V: $PROGS
 	echo '---- keygen (first: encap and decap both build on it)'
 	$O.mlkem_tests mlkem768_keygen_tests $V/mlkem768_keygen_tests.txt
 	$O.mlkem_tests mlkem768_nist_keygen_tests $V/mlkem768_nist_keygen_tests.txt
