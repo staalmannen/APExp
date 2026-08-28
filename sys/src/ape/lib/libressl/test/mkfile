@@ -1,0 +1,135 @@
+APEXPROOT=../../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+# LibreSSL's own ML-KEM test programs, built so they can be run here.
+#
+# Why this exists. TLS 1.3 to any modern server failed with
+#
+#	e_chacha20poly1305.c:223 bad decrypt
+#
+# on the first encrypted record, while TLS 1.2 to the same server
+# succeeded completely, certificate verification included. Everything
+# underneath was checked against published vectors by
+# sys/lib/tests/tls13-kat-test.c -- SHA-256, HMAC, HKDF,
+# HKDF-Expand-Label, X25519, ChaCha20, Poly1305, the AEAD in both
+# directions and AES-GCM -- and all of it is correct.
+#
+# What that leaves is the one part of the TLS 1.3 key exchange none of
+# it covers. LibreSSL 4.3.2 puts X25519MLKEM768 first in
+# ecgroups_client_default[] (ssl/t1_lib.c), so the shared secret on a
+# server that accepts it is ML-KEM's decapsulated secret concatenated
+# with X25519's, not X25519's alone. That is also why the ClientHello
+# is 1516 bytes rather than ~300: an ML-KEM-768 key share is 1184.
+#
+#	openssl s_client -connect <host>:443 -groups X25519
+#
+# completes the handshake, which confirms it: with ML-KEM out of the
+# negotiation everything works.
+#
+# crypto/mlkem is ~2100 lines of int16_t polynomial arithmetic, NTT
+# butterflies and Montgomery/Barrett reduction -- the most
+# width-sensitive code in the library, and nothing else in a handshake
+# touches it. A wrong decapsulation is completely silent: the secret is
+# never transmitted or acknowledged, so the first sign is a record that
+# will not decrypt.
+#
+# These are upstream's own tests and vectors, so a failure here is
+# unambiguous and says which operation is wrong -- keygen, encap or
+# decap -- rather than just "TLS is broken".
+#
+# mlkem_tests takes a test name and a vector file:
+#
+#	mlkem_tests mlkem768_keygen_tests      $SSLSRC/tests/mlkem768_keygen_tests.txt
+#	mlkem_tests mlkem768_nist_keygen_tests $SSLSRC/tests/mlkem768_nist_keygen_tests.txt
+#	mlkem_tests mlkem768_encap_tests       $SSLSRC/tests/mlkem768_encap_tests.txt
+#	mlkem_tests mlkem768_decap_tests       $SSLSRC/tests/mlkem768_decap_tests.txt
+#	mlkem_tests mlkem768_nist_decap_tests  $SSLSRC/tests/mlkem768_nist_decap_tests.txt
+#
+# Run keygen first: encap and decap both build on it, so if keygen is
+# wrong the others fail as a consequence and say nothing extra.
+# "mk test" below does all five of the 768 ones in that order; 768 is
+# the rank X25519MLKEM768 uses, and 1024 vectors are there too if the
+# fault turns out to be rank-dependent.
+#
+# mlkem_unittest is upstream's round trip -- generate, encapsulate,
+# decapsulate, compare. Weaker evidence on its own, since an
+# implementation that is wrong the same way in both directions agrees
+# with itself, which is exactly the kind that gets this far into a
+# handshake. Useful for the encoding and corruption checks it also does.
+#
+# This lives beside the library it tests rather than under cmd/, which
+# is for installed commands. mksyslib already recurses here:
+#
+#	test:VQ:
+#		if(test -d ./test)
+#			cd test && mk $MKFLAGS test
+#
+# and its clean does the same, so "mk test" in ../ runs everything below
+# and no entry in any DIRS list is wanted or needed. Nothing here is
+# installed; BIN points at this directory so that an accidental
+# "mk install" stays local.
+
+TARG=mlkem_tests mlkem_unittest
+BIN=.
+
+SSLSRC=$APEXPROOT/sys/src/external/libressl
+
+OFILES=
+
+HFILES=
+
+LIB=$APEXPROOT/$objtype/lib/ape/libressl.a
+
+<$APEXPROOT/sys/src/cmd/mkmany
+
+# The tests reach past the public headers: mlkem_internal.h for the
+# rank constants and the internal entry points, bytestring.h because
+# parse_test_file.c reads the vector files with CBS. Same flag set the
+# library was built with, minus the hidden/ namespace directories --
+# see the note in ../../lib/libressl/mkfile for why those are excluded
+# and why the HAVE_* defines are not optional.
+HAVEFLAGS=-DHAVE_ENDIAN_H\
+	-DHAVE_ARC4RANDOM_BUF -DHAVE_GETENTROPY\
+	-DHAVE_ASPRINTF -DHAVE_CLOCK_GETTIME\
+	-DHAVE_GETDELIM -DHAVE_GETLINE -DHAVE_GETOPT\
+	-DHAVE_GETPAGESIZE -DHAVE_GETPROGNAME\
+	-DHAVE_MEMMEM -DHAVE_PIPE2 -DHAVE_REALLOCARRAY\
+	-DHAVE_STRCASECMP -DHAVE_STRLCAT -DHAVE_STRLCPY\
+	-DHAVE_STRNDUP -DHAVE_STRNLEN -DHAVE_STRSEP\
+	-DHAVE_ERR_H -DHAVE_RESOLV_H -DHAVE_ARPA_NAMESER_H -DHAVE_POLL
+
+CFLAGS=-c -I$SSLSRC/include -I$SSLSRC/include/compat\
+	-I$SSLSRC/tests -I$SSLSRC/crypto/mlkem -I$SSLSRC/crypto/bytestring\
+	-I$SSLSRC/crypto -I$SSLSRC/crypto/arch/$objtype\
+	-DLIBRESSL_INTERNAL -D__BEGIN_HIDDEN_DECLS= -D__END_HIDDEN_DECLS=\
+	-DOPENSSL_NO_ASM -DOPENSSL_NO_HW_PADLOCK\
+	$HAVEFLAGS
+
+$O.mlkem_tests: mlkem_tests.$O mlkem_tests_util.$O parse_test_file.$O
+	$LD -o $target $prereq $LIB
+
+$O.mlkem_unittest: mlkem_unittest.$O mlkem_tests_util.$O
+	$LD -o $target $prereq $LIB
+
+%.$O: $SSLSRC/tests/%.c
+	$CC $CFLAGS $SSLSRC/tests/$stem.c
+
+V=$SSLSRC/tests
+
+# Named "test" because that is the target mksyslib invokes here. mkmany
+# defines one too -- it looks for a ./test below this directory, finds
+# none and does nothing -- so both recipes run, as they do wherever this
+# tree redefines a target after the include (cmd/awk and cmd/gettext do
+# the same with install).
+test:V: $PROGS
+	echo '---- keygen (first: encap and decap both build on it)'
+	$O.mlkem_tests mlkem768_keygen_tests $V/mlkem768_keygen_tests.txt
+	$O.mlkem_tests mlkem768_nist_keygen_tests $V/mlkem768_nist_keygen_tests.txt
+	echo '---- encap'
+	$O.mlkem_tests mlkem768_encap_tests $V/mlkem768_encap_tests.txt
+	echo '---- decap (the direction a TLS client performs)'
+	$O.mlkem_tests mlkem768_decap_tests $V/mlkem768_decap_tests.txt
+	$O.mlkem_tests mlkem768_nist_decap_tests $V/mlkem768_nist_decap_tests.txt
+	echo '---- round trip'
+	$O.mlkem_unittest
