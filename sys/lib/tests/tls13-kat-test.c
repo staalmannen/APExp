@@ -47,6 +47,11 @@
  * Vectors: FIPS 180-2 (SHA-256), RFC 4231 (HMAC), RFC 5869 (HKDF),
  * RFC 8439 sections 2.4.2, 2.5.2 and 2.8.2 (ChaCha20, Poly1305, AEAD).
  *
+ * The AEAD interface is declared in <openssl/evp.h> here. There is no
+ * <openssl/aead.h> -- that is BoringSSL's split, and LibreSSL keeps the
+ * whole EVP_AEAD API in evp.h. EVP_AEAD_CTX is opaque, so the contexts
+ * below are allocated rather than declared on the stack.
+ *
  * Build and run, under apexp-sh:
  *   pcc -o tls13-kat-test tls13-kat-test.c
  * Prints "PASS" per case; exit status is the number of failures.
@@ -62,7 +67,6 @@
 #include <openssl/chacha.h>
 #include <openssl/poly1305.h>
 #include <openssl/evp.h>
-#include <openssl/aead.h>
 
 static int failures;
 
@@ -325,20 +329,24 @@ test_aead(void)
 		0x1a,0xe1,0x0b,0x59,0x4f,0x09,0xe2,0x6a,
 		0x7e,0x90,0x2e,0xcb,0xd0,0x60,0x06,0x91,
 	};
-	EVP_AEAD_CTX ctx;
+	EVP_AEAD_CTX *ctx;
 	unsigned char out[160], back[160];
 	size_t outlen = 0, backlen = 0;
 	char detail[128];
 
-	memset(&ctx, 0, sizeof(ctx));
-	if (!EVP_AEAD_CTX_init(&ctx, EVP_aead_chacha20_poly1305(),
+	if ((ctx = EVP_AEAD_CTX_new()) == NULL) {
+		checkbool("EVP_AEAD_CTX_new", 0, NULL);
+		return;
+	}
+	if (!EVP_AEAD_CTX_init(ctx, EVP_aead_chacha20_poly1305(),
 	    key, sizeof(key), 16, NULL)) {
 		checkbool("EVP_AEAD_CTX_init(chacha20-poly1305)", 0, NULL);
+		EVP_AEAD_CTX_free(ctx);
 		return;
 	}
 	checkbool("EVP_AEAD_CTX_init(chacha20-poly1305)", 1, NULL);
 
-	if (!EVP_AEAD_CTX_seal(&ctx, out, &outlen, sizeof(out),
+	if (!EVP_AEAD_CTX_seal(ctx, out, &outlen, sizeof(out),
 	    nonce, sizeof(nonce), (const unsigned char *)pt, 114,
 	    ad, sizeof(ad))) {
 		checkbool("AEAD seal", 0, "the call failed");
@@ -355,7 +363,7 @@ test_aead(void)
 	/* Open the RFC's own ciphertext, not ours: this is the direction
 	   that failed, and opening what we just sealed would pass even if
 	   both halves were wrong in the same way. */
-	if (!EVP_AEAD_CTX_open(&ctx, back, &backlen, sizeof(back),
+	if (!EVP_AEAD_CTX_open(ctx, back, &backlen, sizeof(back),
 	    nonce, sizeof(nonce), want, 130, ad, sizeof(ad))) {
 		checkbool("AEAD open of the RFC's ciphertext", 0,
 		    "bad decrypt -- this is the handshake failure, reproduced");
@@ -367,7 +375,7 @@ test_aead(void)
 			      (const unsigned char *)pt, 114);
 	}
 
-	EVP_AEAD_CTX_cleanup(&ctx);
+	EVP_AEAD_CTX_free(ctx);
 }
 
 /* ---- 7. AES-128-GCM, for contrast. ----
@@ -387,17 +395,21 @@ test_aesgcm(void)
 		0xab,0x6e,0x47,0xd4,0x2c,0xec,0x13,0xbd,
 		0xf5,0x3a,0x67,0xb2,0x12,0x57,0xbd,0xdf,
 	};
-	EVP_AEAD_CTX ctx;
+	EVP_AEAD_CTX *ctx;
 	unsigned char out[64];
 	size_t outlen = 0;
 
-	memset(&ctx, 0, sizeof(ctx));
-	if (!EVP_AEAD_CTX_init(&ctx, EVP_aead_aes_128_gcm(),
-	    key, sizeof(key), 16, NULL)) {
-		checkbool("EVP_AEAD_CTX_init(aes-128-gcm)", 0, NULL);
+	if ((ctx = EVP_AEAD_CTX_new()) == NULL) {
+		checkbool("EVP_AEAD_CTX_new", 0, NULL);
 		return;
 	}
-	if (!EVP_AEAD_CTX_seal(&ctx, out, &outlen, sizeof(out),
+	if (!EVP_AEAD_CTX_init(ctx, EVP_aead_aes_128_gcm(),
+	    key, sizeof(key), 16, NULL)) {
+		checkbool("EVP_AEAD_CTX_init(aes-128-gcm)", 0, NULL);
+		EVP_AEAD_CTX_free(ctx);
+		return;
+	}
+	if (!EVP_AEAD_CTX_seal(ctx, out, &outlen, sizeof(out),
 	    nonce, sizeof(nonce), pt, sizeof(pt), NULL, 0)) {
 		checkbool("AES-128-GCM seal", 0, "the call failed");
 	} else if (outlen != 32) {
@@ -405,7 +417,7 @@ test_aesgcm(void)
 	} else
 		check("AES-128-GCM, NIST case 2", out, want, 32);
 
-	EVP_AEAD_CTX_cleanup(&ctx);
+	EVP_AEAD_CTX_free(ctx);
 }
 
 int
