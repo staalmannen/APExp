@@ -70,7 +70,7 @@ APE=$APEXPROOT/sys/src/ape
 # installed; BIN points at this directory so that an accidental
 # "mk install" stays local.
 
-TARG=sha3_kat mlkem_tests mlkem_unittest
+TARG=keccakf_probe sha3_kat mlkem_tests mlkem_unittest
 BIN=.
 
 SSLSRC=$APEXPROOT/sys/src/external/libressl
@@ -107,6 +107,12 @@ CFLAGS=-c -I$SSLSRC/include -I$SSLSRC/include/compat\
 	-DOPENSSL_NO_ASM -DOPENSSL_NO_HW_PADLOCK\
 	$HAVEFLAGS
 
+# No $LIB here on purpose: keccakf_probe.c #includes sha3.c to reach the
+# static sha3_keccakf, so linking the archive would supply sha3_init and
+# friends a second time.
+$O.keccakf_probe: keccakf_probe.$O
+	$LD -o $target $prereq
+
 $O.sha3_kat: sha3_kat.$O
 	$LD -o $target $prereq $LIB
 
@@ -119,6 +125,9 @@ $O.mlkem_unittest: mlkem_unittest.$O mlkem_tests_util.$O
 sha3_kat.$O: sha3_kat.c
 	$CC $CFLAGS sha3_kat.c
 
+keccakf_probe.$O: keccakf_probe.c
+	$CC $CFLAGS -I$SSLSRC/crypto/sha keccakf_probe.c
+
 %.$O: $SSLSRC/tests/%.c
 	$CC $CFLAGS $SSLSRC/tests/$stem.c
 
@@ -130,7 +139,9 @@ V=$SSLSRC/tests
 # tree redefines a target after the include (cmd/awk and cmd/gettext do
 # the same with install).
 test:V: $PROGS
-	echo '---- Keccak, which everything in ML-KEM is built on'
+	echo '---- the Keccak permutation alone'
+	$O.keccakf_probe
+	echo '---- SHA-3 and SHAKE around it'
 	$O.sha3_kat
 	echo '---- keygen (first: encap and decap both build on it)'
 	$O.mlkem_tests mlkem768_keygen_tests $V/mlkem768_keygen_tests.txt
