@@ -70,7 +70,7 @@ APE=$APEXPROOT/sys/src/ape
 # installed; BIN points at this directory so that an accidental
 # "mk install" stays local.
 
-TARG=mlkem_tests mlkem_unittest
+TARG=sha3_kat mlkem_tests mlkem_unittest
 BIN=.
 
 SSLSRC=$APEXPROOT/sys/src/external/libressl
@@ -101,16 +101,23 @@ HAVEFLAGS=-DHAVE_ENDIAN_H\
 
 CFLAGS=-c -I$SSLSRC/include -I$SSLSRC/include/compat\
 	-I$SSLSRC/tests -I$SSLSRC/crypto/mlkem -I$SSLSRC/crypto/bytestring\
+	-I$SSLSRC/crypto/sha\
 	-I$SSLSRC/crypto -I$SSLSRC/crypto/arch/$objtype\
 	-DLIBRESSL_INTERNAL -D__BEGIN_HIDDEN_DECLS= -D__END_HIDDEN_DECLS=\
 	-DOPENSSL_NO_ASM -DOPENSSL_NO_HW_PADLOCK\
 	$HAVEFLAGS
+
+$O.sha3_kat: sha3_kat.$O
+	$LD -o $target $prereq $LIB
 
 $O.mlkem_tests: mlkem_tests.$O mlkem_tests_util.$O parse_test_file.$O
 	$LD -o $target $prereq $LIB
 
 $O.mlkem_unittest: mlkem_unittest.$O mlkem_tests_util.$O
 	$LD -o $target $prereq $LIB
+
+sha3_kat.$O: sha3_kat.c
+	$CC $CFLAGS sha3_kat.c
 
 %.$O: $SSLSRC/tests/%.c
 	$CC $CFLAGS $SSLSRC/tests/$stem.c
@@ -123,6 +130,8 @@ V=$SSLSRC/tests
 # tree redefines a target after the include (cmd/awk and cmd/gettext do
 # the same with install).
 test:V: $PROGS
+	echo '---- Keccak, which everything in ML-KEM is built on'
+	$O.sha3_kat
 	echo '---- keygen (first: encap and decap both build on it)'
 	$O.mlkem_tests mlkem768_keygen_tests $V/mlkem768_keygen_tests.txt
 	$O.mlkem_tests mlkem768_nist_keygen_tests $V/mlkem768_nist_keygen_tests.txt
