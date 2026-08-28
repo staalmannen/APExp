@@ -29,8 +29,17 @@
  * feeds it is equally suspect, and a wrong key produces exactly the same
  * symptom as a wrong cipher:
  *
- *   SHA-256   -> HMAC-SHA256 -> HKDF -> traffic keys -> ChaCha20
- *                                                    -> Poly1305
+ *   X25519 -> shared secret -> SHA-256 -> HMAC -> HKDF ->
+ *       HKDF-Expand-Label -> traffic keys -> ChaCha20 / Poly1305
+ *
+ * X25519 earns its place at the front. The server answered our
+ * ClientHello, so everything up to and including the key share was
+ * built and parsed correctly -- but the shared secret computed from the
+ * server's key share is never transmitted or acknowledged, so a wrong
+ * one is invisible until the first record fails to decrypt, which is
+ * precisely the symptom. It is also the most 64-bit-arithmetic-heavy
+ * code in the path, all int64_t limb products in curve25519.c, and
+ * nothing else in the handshake exercises it.
  *
  * So each stage is checked here against published vectors, in that
  * order. The first FAIL is the one to chase; later ones are consequences
@@ -67,6 +76,7 @@
 #include <openssl/chacha.h>
 #include <openssl/poly1305.h>
 #include <openssl/evp.h>
+#include <openssl/curve25519.h>
 
 static int failures;
 
@@ -378,6 +388,155 @@ test_aead(void)
 	EVP_AEAD_CTX_free(ctx);
 }
 
+/*
+ * ---- 6b. X25519. RFC 7748 sections 5.2 and 6.1. ----
+ *
+ * The ECDHE half. If this is wrong every key derived below it is wrong,
+ * and nothing says so until a record fails to decrypt.
+ */
+static void
+test_x25519(void)
+{
+	static const unsigned char alice_priv[32] = {
+		0x77,0x07,0x6d,0x0a,0x73,0x18,0xa5,0x7d,
+		0x3c,0x16,0xc1,0x72,0x51,0xb2,0x66,0x45,
+		0xdf,0x4c,0x2f,0x87,0xeb,0xc0,0x99,0x2a,
+		0xb1,0x77,0xfb,0xa5,0x1d,0xb9,0x2c,0x2a,
+	};
+	static const unsigned char alice_pub[32] = {
+		0x85,0x20,0xf0,0x09,0x89,0x30,0xa7,0x54,
+		0x74,0x8b,0x7d,0xdc,0xb4,0x3e,0xf7,0x5a,
+		0x0d,0xbf,0x3a,0x0d,0x26,0x38,0x1a,0xf4,
+		0xeb,0xa4,0xa9,0x8e,0xaa,0x9b,0x4e,0x6a,
+	};
+	static const unsigned char bob_priv[32] = {
+		0x5d,0xab,0x08,0x7e,0x62,0x4a,0x8a,0x4b,
+		0x79,0xe1,0x7f,0x8b,0x83,0x80,0x0e,0xe6,
+		0x6f,0x3b,0xb1,0x29,0x26,0x18,0xb6,0xfd,
+		0x1c,0x2f,0x8b,0x27,0xff,0x88,0xe0,0xeb,
+	};
+	static const unsigned char bob_pub[32] = {
+		0xde,0x9e,0xdb,0x7d,0x7b,0x7d,0xc1,0xb4,
+		0xd3,0x5b,0x61,0xc2,0xec,0xe4,0x35,0x37,
+		0x3f,0x83,0x43,0xc8,0x5b,0x78,0x67,0x4d,
+		0xad,0xfc,0x7e,0x14,0x6f,0x88,0x2b,0x4f,
+	};
+	static const unsigned char shared[32] = {
+		0x4a,0x5d,0x9d,0x5b,0xa4,0xce,0x2d,0xe1,
+		0x72,0x8e,0x3b,0xf4,0x80,0x35,0x0f,0x25,
+		0xe0,0x7e,0x21,0xc9,0x47,0xd1,0x9e,0x33,
+		0x76,0xf0,0x9b,0x3c,0x1e,0x16,0x17,0x42,
+	};
+	/* Section 5.2, iteration 1: a scalar multiplication by a base
+	   point that is not the standard one, which the section 6.1 pair
+	   never reaches. */
+	static const unsigned char k1[32] = {
+		0xa5,0x46,0xe3,0x6b,0xf0,0x52,0x7c,0x9d,
+		0x3b,0x16,0x15,0x4b,0x82,0x46,0x5e,0xdd,
+		0x62,0x14,0x4c,0x0a,0xc1,0xfc,0x5a,0x18,
+		0x50,0x6a,0x22,0x44,0xba,0x44,0x9a,0xc4,
+	};
+	static const unsigned char u1[32] = {
+		0xe6,0xdb,0x68,0x67,0x58,0x30,0x30,0xdb,
+		0x35,0x94,0xc1,0xa4,0x24,0xb1,0x5f,0x7c,
+		0x72,0x66,0x24,0xec,0x26,0xb3,0x35,0x3b,
+		0x10,0xa9,0x03,0xa6,0xd0,0xab,0x1c,0x4c,
+	};
+	static const unsigned char want1[32] = {
+		0xc3,0xda,0x55,0x37,0x9d,0xe9,0xc6,0x90,
+		0x8e,0x94,0xea,0x4d,0xf2,0x8d,0x08,0x4f,
+		0x32,0xec,0xcf,0x03,0x49,0x1c,0x71,0xf7,
+		0x54,0xb4,0x07,0x55,0x77,0xa2,0x85,0x52,
+	};
+	static const unsigned char basepoint[32] = { 9 };
+	unsigned char out[32];
+
+	/* Public keys, by multiplying the base point -- which is what
+	   X25519_public_from_private does internally; that one is not in
+	   <openssl/curve25519.h>, so go through the general entry point,
+	   which is the one the handshake calls anyway. */
+	if (!X25519(out, alice_priv, basepoint))
+		checkbool("X25519(alice_priv, basepoint)", 0, "returned 0");
+	else
+		check("X25519 public key from Alice's private, RFC 7748 6.1",
+		    out, alice_pub, 32);
+
+	if (!X25519(out, bob_priv, basepoint))
+		checkbool("X25519(bob_priv, basepoint)", 0, "returned 0");
+	else
+		check("X25519 public key from Bob's private, RFC 7748 6.1",
+		    out, bob_pub, 32);
+
+	if (!X25519(out, alice_priv, bob_pub))
+		checkbool("X25519(alice_priv, bob_pub)", 0, "returned 0");
+	else
+		check("X25519 shared secret, Alice's side", out, shared, 32);
+
+	if (!X25519(out, bob_priv, alice_pub))
+		checkbool("X25519(bob_priv, alice_pub)", 0, "returned 0");
+	else
+		check("X25519 shared secret, Bob's side", out, shared, 32);
+
+	if (!X25519(out, k1, u1))
+		checkbool("X25519, RFC 7748 5.2 vector 1", 0, "returned 0");
+	else
+		check("X25519, RFC 7748 5.2 vector 1", out, want1, 32);
+}
+
+/*
+ * ---- 6c. HKDF-Expand-Label, RFC 8446 section 7.1. ----
+ *
+ * Not callable directly -- tls13_hkdf_expand_label is internal to
+ * libssl -- so the HkdfLabel structure is built here exactly as
+ * tls13_key_schedule.c builds it with CBB, and fed to the public
+ * HKDF_expand. If this passes but the handshake still fails, the
+ * derivation is right and the CBB assembly of it is where to look.
+ *
+ *   struct { uint16 length; opaque label<7..255>; opaque context<0..255>; }
+ *
+ * with "tls13 " prefixed to the label. Vector from RFC 8448 section 3:
+ * the server handshake traffic key.
+ */
+static void
+test_expand_label(void)
+{
+	static const unsigned char secret[32] = {	/* s hs traffic */
+		0xb6,0x7b,0x7d,0x69,0x0c,0xc1,0x6c,0x4e,
+		0x75,0xe5,0x42,0x13,0xcb,0x2d,0x37,0xb4,
+		0xe9,0xc9,0x12,0xbc,0xde,0xd9,0x10,0x5d,
+		0x42,0xbe,0xfd,0x59,0xd3,0x91,0xad,0x38,
+	};
+	static const unsigned char want_key[16] = {
+		0x3f,0xce,0x51,0x60,0x09,0xc2,0x17,0x27,
+		0xd0,0xf2,0xe4,0xe8,0x6e,0xe4,0x03,0xbc,
+	};
+	static const unsigned char want_iv[12] = {
+		0x5d,0x31,0x3e,0xb2,0x67,0x12,0x76,0xee,
+		0x13,0x00,0x0b,0x30,
+	};
+	/* length(2) | len("tls13 key")=9 | "tls13 key" | 0 */
+	static const unsigned char label_key[13] = {
+		0x00,0x10,0x09,'t','l','s','1','3',' ','k','e','y',0x00,
+	};
+	/* length(2) | len("tls13 iv")=8 | "tls13 iv" | 0 */
+	static const unsigned char label_iv[12] = {
+		0x00,0x0c,0x08,'t','l','s','1','3',' ','i','v',0x00,
+	};
+	unsigned char out[16];
+
+	if (!HKDF_expand(out, 16, EVP_sha256(), secret, sizeof(secret),
+	    label_key, sizeof(label_key)))
+		check("HKDF-Expand-Label \"key\", RFC 8448", NULL, want_key, 16);
+	else
+		check("HKDF-Expand-Label \"key\", RFC 8448", out, want_key, 16);
+
+	if (!HKDF_expand(out, 12, EVP_sha256(), secret, sizeof(secret),
+	    label_iv, sizeof(label_iv)))
+		check("HKDF-Expand-Label \"iv\", RFC 8448", NULL, want_iv, 12);
+	else
+		check("HKDF-Expand-Label \"iv\", RFC 8448", out, want_iv, 12);
+}
+
 /* ---- 7. AES-128-GCM, for contrast. ----
         TLS 1.3's other cipher. If this passes and chacha20-poly1305
         fails, "curl --ciphers" onto an AES suite is a usable stopgap;
@@ -435,6 +594,11 @@ main(void)
 
 	printf("\n--- the AEAD itself: e_chacha20poly1305.c:223 is the open\n");
 	test_aead();
+
+	printf("\n--- the ECDHE secret and the label derivation above it,\n"
+	       "--- neither of which anything else in the handshake checks\n");
+	test_x25519();
+	test_expand_label();
 
 	printf("\n--- the other TLS 1.3 cipher, for contrast\n");
 	test_aesgcm();
