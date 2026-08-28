@@ -14,19 +14,29 @@
  *   lattice   NTT, pointwise multiply, Barrett/Montgomery reduction,
  *             and the byte encoding of the result
  *
- * This test decides which. If SHA-3 is wrong, everything above it is
- * garbage in and there is no point reading the polynomial arithmetic;
- * if SHA-3 is right, the fault is in crypto/mlkem itself.
+ * It is Keccak, and that is not a guess -- the keygen output proves it.
+ * All 100 vectors fail, both keys, every byte marked as differing. The
+ * last 32 bytes of an ML-KEM public key are rho, and FIPS 203 sets
  *
- * Keccak is the better suspect on the evidence. It is used by ML-KEM
- * and by essentially nothing else in a TLS handshake -- TLS 1.3 hashes
- * with SHA-256 and SHA-384 -- which fits a failure that appears only
- * when X25519MLKEM768 is negotiated. crypto/sha/sha3.c is also the only
- * file in all of crypto that calls le64toh and htole64, the two names
- * that were undefined at the first link and are now supplied by APE's
- * <endian.h> through -DHAVE_ENDIAN_H. On amd64 both are no-op casts and
- * <_apetypes.h> does set __BYTE_ORDER to __LITTLE_ENDIAN, so that
- * should be right -- but "should be right" is what this file is for.
+ *	(rho, sigma) = G(d || k)	G = SHA3-512, k = 3 for ML-KEM-768
+ *
+ * so rho is copied out of a hash with no lattice arithmetic anywhere
+ * near it. Checked against the vector file: for test 1,
+ * SHA3-512(d || 0x03)[0..31] is exactly the last 32 bytes of the
+ * expected public key. Those bytes came out wrong, so SHA3-512 is
+ * wrong, and everything the polynomial code does with the noise and the
+ * matrix was built on bad input.
+ *
+ * That also fits the shape of the whole failure: Keccak is used by
+ * ML-KEM and by essentially nothing else in a TLS handshake -- TLS 1.3
+ * hashes with SHA-256 and SHA-384 -- which is why TLS 1.2 and
+ * -groups X25519 both work.
+ *
+ * The source is not at fault. This file's logic was checked by
+ * transcribing sha3.c's permutation and sponge and running the vectors
+ * below against it under gcc, where every case passes. So the fault is
+ * in what pcc makes of that source, and this test exists to say which
+ * part.
  *
  * SHAKE is reached through crypto/sha/sha3_internal.h; only
  * EVP_sha3_256 is public, and SHAKE is not exposed at all.
@@ -41,13 +51,24 @@
  * All of them were checked against an independent implementation before
  * being written down.
  *
+ * The file opens below the hashes, with the 64-bit primitives Keccak is
+ * built from. That ordering is the point of it. SHA-256 is correct here
+ * and Keccak is not, and the first difference between them is width:
+ * SHA-256 is 32-bit arithmetic throughout, Keccak is 64-bit. So a
+ * compiler fault in 64-bit rotation or shifting would break exactly the
+ * one and not the other. crypto_rol_u64 is the real function sha3.c
+ * calls, included from crypto_internal.h rather than copied, so a pass
+ * here means the rotation genuinely works and the fault is higher up.
+ *
  * Build and run:  mk test  (from this directory)
  * Prints "PASS" per case; exit status is the number of failures.
  */
 
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
+#include "crypto_internal.h"
 #include "sha3_internal.h"
 
 static int failures;
@@ -75,6 +96,91 @@ check(const char *what, const unsigned char *got, const unsigned char *want,
 	hexdump("got ", got, n);
 	hexdump("want", want, n);
 	failures++;
+}
+
+static void
+checku64(const char *what, uint64_t got, uint64_t want)
+{
+	if (got == want) {
+		printf("PASS  %s\n", what);
+		return;
+	}
+	printf("FAIL  %s\n", what);
+	printf("      got  0x%016llx\n", (unsigned long long)got);
+	printf("      want 0x%016llx\n", (unsigned long long)want);
+	failures++;
+}
+
+/*
+ * The 64-bit primitives. crypto_rol_u64 takes its shift as a size_t,
+ * so the shift count reaches the instruction as a 64-bit value; the
+ * three rho/pi amounts below (1, 8, 44) are among the 24 Keccak uses,
+ * and 63 is the extreme. A rotation that loses the wrapped-around bits,
+ * or that shifts in 32 bits, gives a Keccak that is wrong for every
+ * input while leaving 32-bit SHA-256 untouched.
+ */
+static void
+test_rotate(void)
+{
+	volatile uint64_t v;	/* volatile: the compiler must not fold these */
+	volatile size_t n;
+
+	v = 1; n = 1;
+	checku64("rol(1, 1)", crypto_rol_u64(v, n), 0x0000000000000002ULL);
+	v = 1; n = 63;
+	checku64("rol(1, 63)", crypto_rol_u64(v, n), 0x8000000000000000ULL);
+	v = 0x8000000000000000ULL; n = 1;
+	checku64("rol(1<<63, 1) wraps to 1", crypto_rol_u64(v, n),
+	    0x0000000000000001ULL);
+	v = 0x0123456789abcdefULL; n = 8;
+	checku64("rol(0x0123456789abcdef, 8)", crypto_rol_u64(v, n),
+	    0x23456789abcdef01ULL);
+	v = 0xdeadbeefcafebabeULL; n = 44;
+	checku64("rol(0xdeadbeefcafebabe, 44)", crypto_rol_u64(v, n),
+	    0xebabedeadbeefcafULL);
+
+	/* The two halves separately, so a failure above says which. */
+	v = 0x0123456789abcdefULL; n = 8;
+	checku64("plain 64-bit left shift by a size_t", v << n,
+	    0x23456789abcdef00ULL);
+	checku64("plain 64-bit right shift by a size_t", v >> n,
+	    0x000123456789abcdULL);
+	v = 1; n = 40;
+	checku64("1 << 40 stays 64-bit", v << n, 0x0000010000000000ULL);
+	checku64("~0 is 64 bits wide", ~(uint64_t)0, 0xffffffffffffffffULL);
+}
+
+/*
+ * sha3_ctx keeps the state as a union of 200 bytes and 25 uint64_t:
+ * sha3_update XORs into the bytes, sha3_keccakf permutes the words. If
+ * those two views disagree, every hash is wrong however correct the
+ * permutation is.
+ */
+static void
+test_union(void)
+{
+	sha3_ctx ctx;
+	int i;
+
+	memset(&ctx, 0, sizeof(ctx));
+	for (i = 0; i < 8; i++)
+		ctx.state.b[i] = (uint8_t)(i + 1);
+	/* little endian: byte 0 is the least significant. */
+	checku64("byte writes are visible as a little-endian word",
+	    ctx.state.q[0], 0x0807060504030201ULL);
+
+	/* And the other direction: lane 3 is bytes 24..31, least
+	   significant first, so reading them back must rebuild the word. */
+	memset(&ctx, 0, sizeof(ctx));
+	ctx.state.q[3] = 0xfedcba9876543210ULL;
+	{
+		uint64_t rebuilt = 0;
+
+		for (i = 7; i >= 0; i--)
+			rebuilt = (rebuilt << 8) | ctx.state.b[24 + i];
+		checku64("word writes are visible as bytes", rebuilt,
+		    0xfedcba9876543210ULL);
+	}
 }
 
 /* mdlen is in bytes: 32 for SHA3-256, 64 for SHA3-512. */
@@ -177,6 +283,13 @@ main(void)
 
 	for (i = 0; i < 200; i++)
 		big[i] = (unsigned char)i;
+
+	printf("--- 64-bit primitives (SHA-256 works and is 32-bit; Keccak\n"
+	       "--- does not and is 64-bit, so start with the difference)\n");
+	test_rotate();
+	test_union();
+
+	printf("\n--- SHA-3 and SHAKE\n");
 
 	sha3(32, "", 0, out);
 	check("SHA3-256 of the empty string", out, sha3_256_empty, 32);
