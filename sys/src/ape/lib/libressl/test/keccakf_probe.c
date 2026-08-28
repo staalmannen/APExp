@@ -18,14 +18,20 @@
  * whatever is wrong with it.
  *
  * So stop diffusing. From an all-zero state the early rounds are almost
- * empty:
+ * empty -- in round 1 theta, rho and chi all act on zeros and do
+ * nothing, leaving only iota to set lane 0 to 1 -- and a wrong step is
+ * unmissable while the state is still sparse. Rounds 1 and 2 turned out
+ * to be correct in every step, so this version bisects the whole 24
+ * rather than the first two, against a generated table of the expected
+ * state after each round (keccakf_rounds.h).
  *
- *   round 1   theta, rho and chi all act on zeros and do nothing;
- *             only iota fires, leaving lane 0 = 1 and the rest zero
- *   round 2   works on that single bit, so the state stays sparse
- *             enough to read: after theta it is columns of 1s and 2s
- *
- * A single wrong rotate, index or operator is unmissable there.
+ * Having found the first wrong round it prints that round step by step.
+ * The state entering it is known correct, because the round before it
+ * passed, so exactly one of theta, rho+pi, chi and iota is the
+ * miscompiled step and what each should produce follows from the
+ * entering state. Those four are printed rather than checked: embedding
+ * expected values for every step of every round would be 2400 more
+ * constants for one number's worth of answer.
  *
  * probe_keccakf below is sha3_keccakf copied out of sha3.c, character
  * for character, with two parameters added: how many rounds to run, and
@@ -47,6 +53,7 @@
 #include <stdint.h>
 
 #include "sha3.c"
+#include "keccakf_rounds.h"
 
 static int failures;
 static int reported;
@@ -173,56 +180,8 @@ main(void)
 		0x16f53526e70465c2ULL, 0x75f644e97f30a13bULL,
 		0xeaf1ff7b5ceca249ULL,
 	};
-	/* One round of an all-zero state: only iota does anything. */
-	static const uint64_t r1[25] = {
-		1, 0, 0, 0, 0,  0, 0, 0, 0, 0,  0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0,  0, 0, 0, 0, 0,
-	};
-	/* Round 2, step by step. Sparse enough to read by eye. */
-	static const uint64_t r2_theta[25] = {
-		0x0000000000000001ULL, 0x0000000000000001ULL, 0, 0,
-		0x0000000000000002ULL,
-		0, 0x0000000000000001ULL, 0, 0, 0x0000000000000002ULL,
-		0, 0x0000000000000001ULL, 0, 0, 0x0000000000000002ULL,
-		0, 0x0000000000000001ULL, 0, 0, 0x0000000000000002ULL,
-		0, 0x0000000000000001ULL, 0, 0, 0x0000000000000002ULL,
-	};
-	static const uint64_t r2_rho[25] = {
-		0x0000000000000001ULL, 0x0000100000000000ULL, 0, 0,
-		0x0000000000008000ULL,
-		0, 0x0000000000200000ULL, 0, 0x0000200000000000ULL, 0,
-		0x0000000000000002ULL, 0, 0, 0x0000000000000200ULL, 0,
-		0x0000000010000000ULL, 0, 0x0000000000000400ULL, 0, 0,
-		0, 0, 0x0000010000000000ULL, 0, 0x0000000000000004ULL,
-	};
-	static const uint64_t r2_chi[25] = {
-		0x0000000000000001ULL, 0x0000100000000000ULL,
-		0x0000000000008000ULL, 0x0000000000000001ULL,
-		0x0000100000008000ULL,
-		0, 0x0000200000200000ULL, 0, 0x0000200000000000ULL,
-		0x0000000000200000ULL,
-		0x0000000000000002ULL, 0x0000000000000200ULL, 0,
-		0x0000000000000202ULL, 0,
-		0x0000000010000400ULL, 0, 0x0000000000000400ULL,
-		0x0000000010000000ULL, 0,
-		0x0000010000000000ULL, 0, 0x0000010000000004ULL, 0,
-		0x0000000000000004ULL,
-	};
-	/* Round 2 complete: chi above, then iota XORs 0x8082 into lane 0. */
-	static const uint64_t r2[25] = {
-		0x0000000000008083ULL, 0x0000100000000000ULL,
-		0x0000000000008000ULL, 0x0000000000000001ULL,
-		0x0000100000008000ULL,
-		0, 0x0000200000200000ULL, 0, 0x0000200000000000ULL,
-		0x0000000000200000ULL,
-		0x0000000000000002ULL, 0x0000000000000200ULL, 0,
-		0x0000000000000202ULL, 0,
-		0x0000000010000400ULL, 0, 0x0000000000000400ULL,
-		0x0000000010000000ULL, 0,
-		0x0000010000000000ULL, 0, 0x0000010000000004ULL, 0,
-		0x0000000000000004ULL,
-	};
 	uint64_t st[25], real[25];
+	int r, first_bad = -1;
 
 	printf("--- 1. the real sha3_keccakf, all-zero state, 24 rounds\n");
 	memset(real, 0, sizeof(real));
@@ -246,34 +205,63 @@ main(void)
 	}
 
 	printf("\n--- 3. bisect by round, from the all-zero state\n");
-	memset(st, 0, sizeof(st));
-	probe_keccakf(st, 1, STOP_NONE);
-	check("round 1 (only iota acts: lane 0 becomes 1)", st, r1, 25);
+	for (r = 1; r <= 24; r++) {
+		memset(st, 0, sizeof(st));
+		probe_keccakf(st, r, STOP_NONE);
+		if (memcmp(st, expected_round[r - 1], sizeof(st)) != 0) {
+			first_bad = r;
+			break;
+		}
+	}
+	if (first_bad < 0) {
+		printf("PASS  all 24 rounds -- which cannot happen while check 1\n"
+		       "      fails, so something is inconsistent\n");
+		return ++failures;
+	}
+	printf("rounds 1 to %d are correct; round %d is the first wrong one\n",
+	    first_bad - 1, first_bad);
+	failures++;
 
-	printf("\n--- 4. bisect by step, inside round 2\n");
-	memset(st, 0, sizeof(st));
-	probe_keccakf(st, 2, STOP_THETA);
-	check("through theta of round 2", st, r2_theta, 25);
+	/*
+	 * Round first_bad is entered with a state known to be right, so
+	 * the four steps below start from correct input and exactly one of
+	 * them is where it goes wrong. There is no expected value embedded
+	 * for them -- that would mean carrying 2400 more constants -- so
+	 * they are printed. With the entering state known correct, what
+	 * each step should produce follows from it.
+	 */
+	printf("\n--- 4. round %d step by step. The state it starts from is\n"
+	       "---    correct (round %d passed), so exactly one of these\n"
+	       "---    four is the miscompiled step.\n", first_bad, first_bad - 1);
+
+	if (first_bad > 1)
+		show("entering ", expected_round[first_bad - 2], 25);
+	else {
+		memset(st, 0, sizeof(st));
+		show("entering ", st, 25);
+	}
+	printf("\n");
 
 	memset(st, 0, sizeof(st));
-	probe_keccakf(st, 2, STOP_RHO);
-	check("through rho and pi of round 2", st, r2_rho, 25);
+	probe_keccakf(st, first_bad, STOP_THETA);
+	show("theta    ", st, 25);
+	printf("\n");
 
 	memset(st, 0, sizeof(st));
-	probe_keccakf(st, 2, STOP_CHI);
-	check("through chi of round 2", st, r2_chi, 25);
+	probe_keccakf(st, first_bad, STOP_RHO);
+	show("rho+pi   ", st, 25);
+	printf("\n");
 
 	memset(st, 0, sizeof(st));
-	probe_keccakf(st, 2, STOP_NONE);
-	check("round 2 complete, including iota", st, r2, 25);
+	probe_keccakf(st, first_bad, STOP_CHI);
+	show("chi      ", st, 25);
+	printf("\n");
 
-	if (failures)
-		printf("\n%d failure(s). The first FAIL in section 3 or 4 is\n"
-		       "the miscompiled step; everything after it follows.\n",
-		       failures);
-	else
-		printf("\nall ok -- which cannot happen while check 1 fails,\n"
-		       "so if you see this, the fault is round-dependent and\n"
-		       "the bisect needs to go further than round 2.\n");
+	memset(st, 0, sizeof(st));
+	probe_keccakf(st, first_bad, STOP_NONE);
+	show("iota     ", st, 25);
+	show("expected ", expected_round[first_bad - 1], 25);
+
+	printf("\nRound %d is the first wrong one.\n", first_bad);
 	return failures;
 }
