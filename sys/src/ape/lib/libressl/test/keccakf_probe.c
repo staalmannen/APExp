@@ -1,35 +1,43 @@
 /*
- * keccakf_probe.c -- the Keccak-f[1600] permutation on its own.
+ * keccakf_probe.c -- find the miscompiled step of Keccak-f[1600].
  *
- * sha3_kat.c narrowed the TLS 1.3 failure to SHA-3: every 64-bit
- * primitive Keccak is built from passes -- rotation at the amounts it
- * uses, both shifts, the byte/word union -- and every SHA-3 and SHAKE
- * vector fails. So the fault is in the permutation or the sponge around
- * it, and neither can be seen from a digest.
+ * Where this stands. sha3_kat.c showed every 64-bit primitive Keccak is
+ * built from to be correct -- crypto_rol_u64 at the amounts it uses,
+ * both shifts by a size_t, the byte/word union -- and every SHA-3 and
+ * SHAKE vector to be wrong. The first version of this file then showed
+ * the permutation itself wrong on the standard all-zero-state vector,
+ * so the sponge is not involved either.
  *
- * A digest shows 256 bits of a wrong 1600-bit state, after padding and
- * truncation have mixed everything together. This calls the permutation
- * directly and prints all 25 lanes, which is the whole state and six
- * times the signal. sha3_keccakf is static, so this file #includes
- * sha3.c rather than linking against it -- which is also why it does
- * not link libressl.a: the archive has the same symbols.
+ * The full 25-lane result did not identify the step. Keccak diffuses
+ * completely in a few rounds, so every candidate fault -- a byte-swapped
+ * state, round constants truncated to 32 bits or sign-extended from
+ * them, a dropped or extra round, theta without its rotate, chi with the
+ * wrong operator, every wrong index in theta's and chi's (i+n)%5 -- all
+ * produce output with no more lanes in common with the observed result
+ * than chance gives. After 24 rounds a wrong permutation looks random
+ * whatever is wrong with it.
  *
- * The vectors are the standard Keccak-f[1600] ones: the permutation
- * applied once and twice to an all-zero state. Nothing else is
- * involved -- no padding, no rate, no absorb loop -- so a failure here
- * is the permutation itself, and a pass means the permutation is right
- * and sha3_update/sha3_final/shake_out are where to look.
+ * So stop diffusing. From an all-zero state the early rounds are almost
+ * empty:
  *
- * The two extra inputs are not decoration. A zero state makes theta's
- * column parities zero for the first round, so the first round exercises
- * little; starting from a single set bit, and from a state with one bit
- * in every lane, drives different paths through rho's 24 distinct
- * rotate amounts and chi's non-linearity. If one input matches and
- * another does not, that difference says a great deal.
+ *   round 1   theta, rho and chi all act on zeros and do nothing;
+ *             only iota fires, leaving lane 0 = 1 and the rest zero
+ *   round 2   works on that single bit, so the state stays sparse
+ *             enough to read: after theta it is columns of 1s and 2s
  *
- * Print the got lines even when they fail: the full wrong state is what
- * makes it possible to work out which step is wrong without another
- * round trip.
+ * A single wrong rotate, index or operator is unmissable there.
+ *
+ * probe_keccakf below is sha3_keccakf copied out of sha3.c, character
+ * for character, with two parameters added: how many rounds to run, and
+ * where to stop inside the last one. It uses sha3.c's own rndc, rotc and
+ * piln tables -- this file #includes sha3.c, so they are in scope --
+ * which means the copy differs from the original in nothing but the two
+ * loop bounds. Check 2 confirms it reproduces the fault before any
+ * conclusion is drawn from it; if the copy came out right while the
+ * original came out wrong, that is a finding in itself and the bisect
+ * below would be meaningless.
+ *
+ * Only the first failing check is reported, to keep this to a screen.
  *
  * Build and run:  mk test  (from this directory)
  */
@@ -41,6 +49,7 @@
 #include "sha3.c"
 
 static int failures;
+static int reported;
 
 static void
 show(const char *label, const uint64_t *st, int nlanes)
@@ -55,7 +64,8 @@ show(const char *label, const uint64_t *st, int nlanes)
 		    (unsigned long long)st[i + 4]);
 }
 
-static void
+/* Reports the first failure only; later ones follow from it. */
+static int
 check(const char *what, const uint64_t *got, const uint64_t *want, int nlanes)
 {
 	int i, bad = -1;
@@ -67,18 +77,85 @@ check(const char *what, const uint64_t *got, const uint64_t *want, int nlanes)
 		}
 	if (bad < 0) {
 		printf("PASS  %s\n", what);
-		return;
+		return 1;
 	}
 	printf("FAIL  %s (first difference at lane %d)\n", what, bad);
-	show("got ", got, nlanes);
-	show("want", want, nlanes);
 	failures++;
+	if (!reported) {
+		show("got ", got, nlanes);
+		show("want", want, nlanes);
+		reported = 1;
+	}
+	return 0;
+}
+
+/* Where to stop inside the final round. */
+#define STOP_THETA	1
+#define STOP_RHO	2
+#define STOP_CHI	3
+#define STOP_NONE	4
+
+/*
+ * sha3_keccakf, verbatim, plus "rounds" and "stop". The le64toh and
+ * htole64 passes are kept so that the copy is the same code; on amd64
+ * they are no-op casts.
+ */
+static void
+probe_keccakf(uint64_t st[25], int rounds, int stop)
+{
+	uint64_t t0, t1, bc[5];
+	int i, j, r;
+
+	for (i = 0; i < 25; i++)
+		st[i] = le64toh(st[i]);
+
+	for (r = 0; r < rounds; r++) {
+		int last = (r == rounds - 1);
+
+		/* Theta */
+		for (i = 0; i < 5; i++)
+			bc[i] = st[i] ^ st[i + 5] ^ st[i + 10] ^ st[i + 15] ^ st[i + 20];
+
+		for (i = 0; i < 5; i++) {
+			t0 = bc[(i + 4) % 5] ^ crypto_rol_u64(bc[(i + 1) % 5], 1);
+			for (j = 0; j < 25; j += 5)
+				st[j + i] ^= t0;
+		}
+		if (last && stop == STOP_THETA)
+			break;
+
+		/* Rho Pi */
+		t0 = st[1];
+		for (i = 0; i < 24; i++) {
+			j = sha3_keccakf_piln[i];
+			t1 = st[j];
+			st[j] = crypto_rol_u64(t0, sha3_keccakf_rotc[i]);
+			t0 = t1;
+		}
+		if (last && stop == STOP_RHO)
+			break;
+
+		/* Chi */
+		for (j = 0; j < 25; j += 5) {
+			for (i = 0; i < 5; i++)
+				bc[i] = st[j + i];
+			for (i = 0; i < 5; i++)
+				st[j + i] ^= (~bc[(i + 1) % 5]) & bc[(i + 2) % 5];
+		}
+		if (last && stop == STOP_CHI)
+			break;
+
+		/* Iota */
+		st[0] ^= sha3_keccakf_rndc[r];
+	}
+
+	for (i = 0; i < 25; i++)
+		st[i] = htole64(st[i]);
 }
 
 int
 main(void)
 {
-	/* Keccak-f[1600] applied once to an all-zero state. */
 	static const uint64_t once[25] = {
 		0xf1258f7940e1dde7ULL, 0x84d5ccf933c0478aULL,
 		0xd598261ea65aa9eeULL, 0xbd1547306f80494dULL,
@@ -96,52 +173,107 @@ main(void)
 		0x16f53526e70465c2ULL, 0x75f644e97f30a13bULL,
 		0xeaf1ff7b5ceca249ULL,
 	};
-	/* And twice: the first five lanes are enough to tell. */
-	static const uint64_t twice[5] = {
-		0x2d5c954df96ecb3cULL, 0x6a332cd07057b56dULL,
-		0x093d8d1270d76b6cULL, 0x8a20d9b25569d094ULL,
-		0x4f9c4f99e5e7f156ULL,
+	/* One round of an all-zero state: only iota does anything. */
+	static const uint64_t r1[25] = {
+		1, 0, 0, 0, 0,  0, 0, 0, 0, 0,  0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0,  0, 0, 0, 0, 0,
 	};
-	uint64_t st[25];
-	int i;
+	/* Round 2, step by step. Sparse enough to read by eye. */
+	static const uint64_t r2_theta[25] = {
+		0x0000000000000001ULL, 0x0000000000000001ULL, 0, 0,
+		0x0000000000000002ULL,
+		0, 0x0000000000000001ULL, 0, 0, 0x0000000000000002ULL,
+		0, 0x0000000000000001ULL, 0, 0, 0x0000000000000002ULL,
+		0, 0x0000000000000001ULL, 0, 0, 0x0000000000000002ULL,
+		0, 0x0000000000000001ULL, 0, 0, 0x0000000000000002ULL,
+	};
+	static const uint64_t r2_rho[25] = {
+		0x0000000000000001ULL, 0x0000100000000000ULL, 0, 0,
+		0x0000000000008000ULL,
+		0, 0x0000000000200000ULL, 0, 0x0000200000000000ULL, 0,
+		0x0000000000000002ULL, 0, 0, 0x0000000000000200ULL, 0,
+		0x0000000010000000ULL, 0, 0x0000000000000400ULL, 0, 0,
+		0, 0, 0x0000010000000000ULL, 0, 0x0000000000000004ULL,
+	};
+	static const uint64_t r2_chi[25] = {
+		0x0000000000000001ULL, 0x0000100000000000ULL,
+		0x0000000000008000ULL, 0x0000000000000001ULL,
+		0x0000100000008000ULL,
+		0, 0x0000200000200000ULL, 0, 0x0000200000000000ULL,
+		0x0000000000200000ULL,
+		0x0000000000000002ULL, 0x0000000000000200ULL, 0,
+		0x0000000000000202ULL, 0,
+		0x0000000010000400ULL, 0, 0x0000000000000400ULL,
+		0x0000000010000000ULL, 0,
+		0x0000010000000000ULL, 0, 0x0000010000000004ULL, 0,
+		0x0000000000000004ULL,
+	};
+	/* Round 2 complete: chi above, then iota XORs 0x8082 into lane 0. */
+	static const uint64_t r2[25] = {
+		0x0000000000008083ULL, 0x0000100000000000ULL,
+		0x0000000000008000ULL, 0x0000000000000001ULL,
+		0x0000100000008000ULL,
+		0, 0x0000200000200000ULL, 0, 0x0000200000000000ULL,
+		0x0000000000200000ULL,
+		0x0000000000000002ULL, 0x0000000000000200ULL, 0,
+		0x0000000000000202ULL, 0,
+		0x0000000010000400ULL, 0, 0x0000000000000400ULL,
+		0x0000000010000000ULL, 0,
+		0x0000010000000000ULL, 0, 0x0000010000000004ULL, 0,
+		0x0000000000000004ULL,
+	};
+	uint64_t st[25], real[25];
 
-	printf("--- Keccak-f[1600] on its own, no padding or sponge\n");
+	printf("--- 1. the real sha3_keccakf, all-zero state, 24 rounds\n");
+	memset(real, 0, sizeof(real));
+	sha3_keccakf(real);
+	check("real permutation of the all-zero state", real, once, 25);
 
+	printf("\n--- 2. does the copy below reproduce it? (if not, nothing\n"
+	       "---    after this means anything)\n");
 	memset(st, 0, sizeof(st));
-	sha3_keccakf(st);
-	check("permutation of the all-zero state", st, once, 25);
-
-	sha3_keccakf(st);
-	check("permutation applied twice", st, twice, 5);
-
-	/*
-	 * No reference value for these, so they cannot pass or fail --
-	 * they are printed because the full wrong state from an input
-	 * that exercises different rotate amounts is what identifies the
-	 * faulty step without another round trip.
-	 */
-	if (failures) {
-		printf("\n--- two more states, for diagnosis only; there is no\n"
-		       "--- expected value here, the numbers themselves are the\n"
-		       "--- point\n");
-
-		memset(st, 0, sizeof(st));
-		st[0] = 1;
-		sha3_keccakf(st);
-		show("lane0=1 ", st, 25);
-
-		for (i = 0; i < 25; i++)
-			st[i] = 0x0000000100000001ULL;
-		sha3_keccakf(st);
-		show("all lanes 0x100000001 ", st, 25);
+	probe_keccakf(st, 24, STOP_NONE);
+	if (memcmp(st, real, sizeof(st)) == 0)
+		printf("PASS  the copy agrees with the real one\n");
+	else {
+		printf("FAIL  the copy does NOT agree with the real one --\n"
+		       "      the fault depends on something outside the\n"
+		       "      function body, and the bisect below is void\n");
+		show("copy", st, 25);
+		show("real", real, 25);
+		failures++;
+		return failures;
 	}
 
+	printf("\n--- 3. bisect by round, from the all-zero state\n");
+	memset(st, 0, sizeof(st));
+	probe_keccakf(st, 1, STOP_NONE);
+	check("round 1 (only iota acts: lane 0 becomes 1)", st, r1, 25);
+
+	printf("\n--- 4. bisect by step, inside round 2\n");
+	memset(st, 0, sizeof(st));
+	probe_keccakf(st, 2, STOP_THETA);
+	check("through theta of round 2", st, r2_theta, 25);
+
+	memset(st, 0, sizeof(st));
+	probe_keccakf(st, 2, STOP_RHO);
+	check("through rho and pi of round 2", st, r2_rho, 25);
+
+	memset(st, 0, sizeof(st));
+	probe_keccakf(st, 2, STOP_CHI);
+	check("through chi of round 2", st, r2_chi, 25);
+
+	memset(st, 0, sizeof(st));
+	probe_keccakf(st, 2, STOP_NONE);
+	check("round 2 complete, including iota", st, r2, 25);
+
 	if (failures)
-		printf("\n%d failure(s) -- the permutation is wrong, so the\n"
-		       "sponge above it is not the place to look.\n", failures);
+		printf("\n%d failure(s). The first FAIL in section 3 or 4 is\n"
+		       "the miscompiled step; everything after it follows.\n",
+		       failures);
 	else
-		printf("\nall ok -- the permutation is correct, so the fault is\n"
-		       "in the sponge: sha3_update, sha3_final, shake_xof or\n"
-		       "shake_out.\n");
+		printf("\nall ok -- which cannot happen while check 1 fails,\n"
+		       "so if you see this, the fault is round-dependent and\n"
+		       "the bisect needs to go further than round 2.\n");
 	return failures;
 }
