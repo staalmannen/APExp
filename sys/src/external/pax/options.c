@@ -64,7 +64,7 @@
 #include "tar.h"
 #include "extern.h"
 
-__RCSID("$MirOS: src/bin/pax/options.c,v 1.75 2020/09/04 22:27:49 tg Exp $");
+__RCSID("$MirOS: src/bin/pax/options.c,v 1.76 2021/10/03 20:48:06 tg Exp $");
 
 #ifndef _PATH_DEFTAPE
 #define _PATH_DEFTAPE "/dev/rmt0"
@@ -1916,6 +1916,9 @@ void
 pax_usage(void)
 {
 	(void)fputs(
+#ifndef SMALL
+	    "paxmirabilis " MIRCPIO_VERSION "\n"
+#endif
 	    "usage: pax [-0cdJjnOvz] [-E limit] [-f archive] [-G group] [-s replstr]\n"
 	    "           [-T range] [-U user] [pattern ...]\n"
 	    "       pax -r [-0cDdiJjknOuvYZz] [-E limit] [-f archive] [-G group] [-M flag]\n"
@@ -1939,6 +1942,9 @@ void
 tar_usage(void)
 {
 	(void)fputs(
+#ifndef SMALL
+	    "paxmirabilis " MIRCPIO_VERSION "\n"
+#endif
 	    "usage: tar {crtux}[014578AabefHhJjLmNOoPpqRSsvwXZz]\n"
 	    "           [blocking-factor | archive | replstr] [-C directory] [-I file]\n"
 	    "           [file ...]\n"
@@ -1958,6 +1964,9 @@ void
 cpio_usage(void)
 {
 	(void)fputs(
+#ifndef SMALL
+	    "paxmirabilis " MIRCPIO_VERSION "\n"
+#endif
 	    "usage: cpio -o [-0AaBcJjLVvZz] [-C bytes] [-F archive] [-H format]\n"
 	    "               [-M flag] [-O archive] <name-list [>archive]\n"
 	    "       cpio -i [-06BbcdfJjmrSstuVvZz] [-C bytes] [-E file] [-F archive]\n"

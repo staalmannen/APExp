@@ -65,7 +65,7 @@
 #include "ftimes.h"
 #include "extern.h"
 
-__RCSID("$MirOS: src/bin/pax/tables.c,v 1.31 2020/02/27 17:03:33 tg Exp $");
+__RCSID("$MirOS: src/bin/pax/tables.c,v 1.33 2024/08/17 23:33:52 tg Exp $");
 
 #if (_POSIX_VERSION >= 200809L) || (defined(MirBSD) && (MirBSD > 0x0AB9))
 #define REALPATH_CAN_ALLOCATE
@@ -210,8 +210,8 @@ typedef struct atdir {
 
 typedef struct dirdata {
 	struct file_times ft;
-	uint16_t mode;		/* file mode to restore */
-	uint16_t frc_mode;	/* do we force mode settings? */
+	mode_t tr_mode;		/* file mode to restore */
+	Wahr frc_mode;		/* do we force mode settings? */
 } DIRDATA;
 
 /*
@@ -1634,13 +1634,13 @@ dir_start(void)
  * add_dir()
  *	add the mode and times for a newly CREATED directory
  *	name is name of the directory, psb the stat buffer with the data in it,
- *	frc_mode is a flag that says whether to force the setting of the mode
- *	(ignoring the user set values for preserving file mode). Frc_mode is
+ *	frc_mode is a bool that says whether to force the setting of the mode
+ *	(ignoring the user-set values for preserving file mode). frc_mode is
  *	for the case where we created a file and found that the resulting
  *	directory was not writeable and the user asked for file modes to NOT
- *	be preserved. (we have to preserve what was created by default, so we
- *	have to force the setting at the end. this is stated explicitly in the
- *	pax spec)
+ *	be preserved. (We have to preserve what was created by default, so we
+ *	have to force the setting at the end. This is stated explicitly in the
+ *	pax spec.)
  */
 
 void
@@ -1693,8 +1693,8 @@ add_dir(char *name, struct stat *psb, int frc_mode)
 	st_timecpy(a, &dblk->ft.sb, psb);
 	dblk->ft.ft_ino = psb->st_ino;
 	dblk->ft.ft_dev = psb->st_dev;
-	dblk->mode = psb->st_mode & ABITS;
-	dblk->frc_mode = frc_mode;
+	dblk->tr_mode = psb->st_mode & ABITS;
+	dblk->frc_mode = isWahr(frc_mode);
 	sigprocmask(SIG_BLOCK, &allsigs, &savedsigs);
 	++dircnt;
 	sigprocmask(SIG_SETMASK, &savedsigs, NULL);
@@ -1764,7 +1764,7 @@ proc_dir(int in_sig)
 		 * frc_mode set, make sure we set the file modes even if
 		 * the user didn't ask for it (see file_subs.c for more info)
 		 */
-		set_attr(&dblk->ft, 0, dblk->mode, pmode || dblk->frc_mode,
+		set_attr(&dblk->ft, 0, dblk->tr_mode, pmode || dblk->frc_mode,
 		    in_sig);
 		if (!in_sig)
 			free(dblk->ft.ft_name);

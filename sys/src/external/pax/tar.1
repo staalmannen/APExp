@@ -1,8 +1,8 @@
-.\"	$MirOS: src/bin/pax/tar.1,v 1.45 2020/09/04 23:26:06 tg Exp $
+.\"	$MirOS: src/bin/pax/tar.1,v 1.49 2024/01/05 02:08:49 tg Exp $
 .\"	$OpenBSD: tar.1,v 1.61 2018/07/23 19:02:49 kn Exp $
 .\"
-.\" Copyright (c) 2005, 2008, 2009, 2011, 2012, 2014, 2016,
-.\"		  2017, 2018, 2019, 2020
+.\" Copyright © 2005, 2008, 2009, 2011, 2012, 2014, 2016,
+.\"		2017, 2018, 2019, 2020, 2021
 .\"	mirabilos <m@mirbsd.org>
 .\" Copyright (c) 1996 SigmaSoft, Th. Lockert
 .\" All rights reserved.
@@ -27,7 +27,12 @@
 .\" (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 .\" THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .\"-
-.\" Try to make GNU groff and AT&T nroff more compatible
+.\" $miros: contrib/samples/portmdoc,v 1.23 2024/01/04 22:52:50 tg Exp $
+.\"-
+.\" Copyright © 2008, 2009, 2010, 2016, 2018, 2020, 2023
+.\"	mirabilos <m@mirbsd.org>
+.\"
+.\" Glue GNU groff (BSD and GNU mdoc both) to AT&T nroff (UCB mdoc).
 .\" * ` generates ‘ in gnroff, so use \`
 .\" * ' generates ’ in gnroff, \' generates ´, so use \*(aq
 .\" * - generates ‐ in gnroff, \- generates −, so .tr it to -
@@ -40,18 +45,36 @@
 .\" Also make sure to use \& *before* a punctuation char that is to not
 .\" be interpreted as punctuation, and especially with two-letter words
 .\" but also (after) a period that does not end a sentence (“e.g.\&”).
-.\" The section after the "doc" macropackage has been loaded contains
-.\" additional code to convene between the UCB mdoc macropackage (and
-.\" its variant as BSD mdoc in groff) and the GNU mdoc macropackage.
+.\"-
+.\"
+.\" Implement .Dd with the Mdocdate RCS keyword
+.\"
+.rn Dd xD
+.de Dd
+.ie \\$1$Mdocdate: \{\
+.	xD \\$2 \\$3, \\$4
+.\}
+.el .xD \\$1 \\$2 \\$3
+..
+.\"
+.\" .Dd must come before most everything, because when called
+.\" with -mandoc it loads -mdoc via .so in .Dd (first macro).
+.\"
+.Dd $Mdocdate: January 5 2024 $
+.\"
+.\" Check which macro package we use, and do other -mdoc setup.
 .\"
 .ie \n(.g \{\
+.	if n .ss \n[.ss] 0
 .	if \*[.T]ascii .tr \-\N'45'
 .	if \*[.T]latin1 .tr \-\N'45'
 .	if \*[.T]utf8 .tr \-\N'45'
-.	ds <= \[<=]
-.	ds >= \[>=]
-.	ds Rq \[rq]
-.	ds Lq \[lq]
+.	if \*[.T]utf8 .tr \(la\*(Lt
+.	if \*[.T]utf8 .tr \(ra\*(Gt
+.	ds <= \(<=
+.	ds >= \(>=
+.	ds Rq \(rq
+.	ds Lq \(lq
 .	ds sL \(aq
 .	ds sR \(aq
 .	if \*[.T]utf8 .ds sL `
@@ -62,56 +85,36 @@
 .	ds TI \(ti
 .	ds ha \(ha
 .	ds en \(en
+.	ie d volume-ds-1 .ds tT gnu
+.	el .ie d doc-volume-ds-1 .ds tT gnp
+.	el .ds tT bsd
 .\}
 .el \{\
 .	ds aq '
 .	ds TI ~
 .	ds ha ^
 .	ds en \(em
+.	ds tT ucb
 .\}
 .ie n \{\
-.	ds EM \ \*(en\ \&
+.	ds EM \ \(em\ \&
 .\}
 .el \{\
-.	ds EM \f(TR\^\(em\^\fP
+.	ds EM \f(TR\|\(em\|\fP
 .\}
 .\"
-.\" Implement .Dd with the Mdocdate RCS keyword
-.\"
-.rn Dd xD
-.de Dd
-.ie \\$1$Mdocdate: \{\
-.	xD \\$2 \\$3, \\$4
-.\}
-.el .xD \\$1 \\$2 \\$3 \\$4 \\$5 \\$6 \\$7 \\$8
-..
-.\"
-.\" .Dd must come before definition of .Mx, because when called
-.\" with -mandoc, it might implement .Mx itself, but we want to
-.\" use our own definition. And .Dd must come *first*, always.
-.\"
-.Dd $Mdocdate: September 4 2020 $
-.\"
-.\" Check which macro package we use, and do other -mdoc setup.
-.\"
-.ie \n(.g \{\
-.	if \*[.T]utf8 .tr \[la]\*(Lt
-.	if \*[.T]utf8 .tr \[ra]\*(Gt
-.	ie d volume-ds-1 .ds tT gnu
-.	el .ie d doc-volume-ds-1 .ds tT gnp
-.	el .ds tT bsd
-.\}
-.el .ds tT ucb
-.\"
+.\" Add UCB mdoc compatibility to GNU mdoc
 .\" Implement .Mx (MirBSD)
 .\"
 .ie "\*(tT"gnu" \{\
+.	ds sP \s0
+.	ds tN \*[Tn-font-size]
 .	eo
 .	de Mx
 .	nr curr-font \n[.f]
 .	nr curr-size \n[.ps]
 .	ds str-Mx \f[\n[curr-font]]\s[\n[curr-size]u]
-.	ds str-Mx1 \*[Tn-font-size]\%MirBSD\*[str-Mx]
+.	ds str-Mx1 \*(tN\%MirBSD\*[str-Mx]
 .	if !\n[arg-limit] \
 .	if \n[.$] \{\
 .	ds macro-name Mx
@@ -120,7 +123,7 @@
 .	if (\n[arg-limit] > \n[arg-ptr]) \{\
 .	nr arg-ptr +1
 .	ie (\n[type\n[arg-ptr]] == 2) \
-.	as str-Mx1 \~\*[arg\n[arg-ptr]]
+.	ds str-Mx1 \*(tN\%MirBSD\~#\*[arg\n[arg-ptr]]\*[str-Mx]
 .	el \
 .	nr arg-ptr -1
 .	\}
@@ -133,17 +136,31 @@
 .	parse-space-vector
 .	print-recursive
 ..
+.	de Aq
+.	if !\n[arg-limit] \
+.	ds macro-name Aq
+.	ie \n[in-authors-section] \{\
+.		ds quote-left \*(Lt
+.		ds quote-right \*(Gt
+.	\}
+.	el \{\
+.		ds quote-left \[la]
+.		ds quote-right \[ra]
+.	\}
+.	enclose-string \$@
+..
 .	ec
-.	ds sP \s0
-.	ds tN \*[Tn-font-size]
 .\}
 .el .ie "\*(tT"gnp" \{\
+.	ds sP \s0
+.	ie t .ds tN \s[(\n[.ps]u-1z)]
+.	el .ds tN
 .	eo
 .	de Mx
 .	nr doc-curr-font \n[.f]
 .	nr doc-curr-size \n[.ps]
 .	ds doc-str-Mx \f[\n[doc-curr-font]]\s[\n[doc-curr-size]u]
-.	ds doc-str-Mx1 \*[doc-Tn-font-size]\%MirBSD\*[doc-str-Mx]
+.	ds doc-str-Mx1 \*(tN\%MirBSD\*[doc-str-Mx]
 .	if !\n[doc-arg-limit] \
 .	if \n[.$] \{\
 .	ds doc-macro-name Mx
@@ -152,7 +169,7 @@
 .	if (\n[doc-arg-limit] > \n[doc-arg-ptr]) \{\
 .	nr doc-arg-ptr +1
 .	ie (\n[doc-type\n[doc-arg-ptr]] == 2) \
-.	as doc-str-Mx1 \~\*[doc-arg\n[doc-arg-ptr]]
+.	ds doc-str-Mx1 \*(tN\%MirBSD\~#\*[doc-arg\n[doc-arg-ptr]]\*[doc-str-Mx]
 .	el \
 .	nr doc-arg-ptr -1
 .	\}
@@ -166,8 +183,6 @@
 .	doc-print-recursive
 ..
 .	ec
-.	ds sP \s0
-.	ds tN \*[doc-Tn-font-size]
 .\}
 .el \{\
 .	de Mx
@@ -175,13 +190,18 @@
 .	nr cZ \\n(.s
 .	ds aa \&\f\\n(cF\s\\n(cZ
 .	if \\n(aC==0 \{\
-.		ie \\n(.$==0 \&MirBSD\\*(aa
+.		ie \\n(.$==0 \&\\*(tNMirBSD\\*(aa
 .		el .aV \\$1 \\$2 \\$3 \\$4 \\$5 \\$6 \\$7 \\$8 \\$9
 .	\}
 .	if \\n(aC>\\n(aP \{\
 .		nr aP \\n(aP+1
 .		ie \\n(C\\n(aP==2 \{\
-.			as b1 \&MirBSD\ #\&\\*(A\\n(aP\\*(aa
+.			nr xX 0
+.			nr xX 1+\\*(A\\n(aP
+.			as b1 \&\\*(tNMirBSD\ \&
+.			if \\n(xX>0 .as b1 #\&
+.			as b1 \&\\*(A\\n(aP\\*(aa
+.			rr xX
 .			ie \\n(aC>\\n(aP \{\
 .				nr aP \\n(aP+1
 .				nR
@@ -189,12 +209,13 @@
 .			el .aZ
 .		\}
 .		el \{\
-.			as b1 \&MirBSD\\*(aa
+.			as b1 \&\\*(tNMirBSD\\*(aa
 .			nR
 .		\}
 .	\}
 ..
 .\}
+.\" </MirCVS://contrib/samples/portmdoc>
 .\"-
 .ie \ng==1 \{\
 .	ds nc mircpio
@@ -407,7 +428,7 @@ tar format as found in
 .Bx 4.3 .
 The default blocksize for this format is 10240 bytes.
 Pathnames stored by this format must be 100 characters or less in length.
-Only regular files, hard links, soft links, and directories
+Only regular files, hard links, symlinks and directories
 will be archived (other filesystem types are not supported).
 .Pp
 For backwards compatibility with even older tar formats, the

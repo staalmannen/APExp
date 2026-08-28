@@ -58,7 +58,7 @@
 #include "pax.h"
 #include "extern.h"
 
-__RCSID("$MirOS: src/bin/pax/ar_io.c,v 1.28 2019/02/10 21:50:06 tg Exp $");
+__RCSID("$MirOS: src/bin/pax/ar_io.c,v 1.29 2024/08/17 23:33:50 tg Exp $");
 
 #ifndef PAX_SAFE_PATH
 #define PAX_SAFE_PATH "/bin:/usr/bin"
@@ -324,7 +324,7 @@ ar_close(int in_sig)
 	if (arfd < 0) {
 		did_io = io_ok = flcnt = 0;
 		if (vfpart) {
-			(void)write(listfd, "\n", 1);
+			SHIKATANAI write(listfd, "\n", 1);
 			vfpart = 0;
 		}
 		return;
@@ -373,7 +373,7 @@ ar_close(int in_sig)
 	}
 
 	if (vflag && (artyp == ISTAPE)) {
-		(void)write(listfd, "done.\n", sizeof("done.\n")-1);
+		SHIKATANAI write(listfd, "done.\n", sizeof("done.\n")-1);
 		vfpart = 0;
 	}
 	arfd = -1;
@@ -393,7 +393,7 @@ ar_close(int in_sig)
 
 	/* Vflag can cause this to have been set */
 	if (vfpart) {
-		(void)write(listfd, "\n", 1);
+		SHIKATANAI write(listfd, "\n", 1);
 		vfpart = 0;
 	}
 
@@ -856,7 +856,7 @@ ar_fow(off_t sksz, off_t *skipped)
 		 * deal with the end of file (it will go to next volume by
 		 * itself)
 		 */
-		if ((mpos = cpos + sksz) > arsb.st_size) {
+		if ((mpos = cpos + sksz) > (off_t)arsb.st_size) {
 			*skipped = arsb.st_size - cpos;
 			mpos = arsb.st_size;
 		} else

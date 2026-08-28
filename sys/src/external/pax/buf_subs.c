@@ -48,7 +48,7 @@
 #include "pax.h"
 #include "extern.h"
 
-__RCSID("$MirOS: src/bin/pax/buf_subs.c,v 1.14 2018/12/13 07:14:16 tg Exp $");
+__RCSID("$MirOS: src/bin/pax/buf_subs.c,v 1.15 2024/08/17 23:33:50 tg Exp $");
 
 /*
  * routines which implement archive and file buffering
@@ -788,7 +788,7 @@ cp_file(ARCHD *arcn, int fd1, int fd2)
 	 * check for holes in the source file. If none, we will use regular
 	 * write instead of file write.
 	 */
-	 if (((off_t)(arcn->sb.st_blocks * BLKMULT)) >= arcn->sb.st_size)
+	 if (((off_t)(arcn->sb.st_blocks * BLKMULT)) >= (off_t)arcn->sb.st_size)
 		++no_hole;
 
 	/*
@@ -823,7 +823,7 @@ cp_file(ARCHD *arcn, int fd1, int fd2)
 	if (res < 0)
 		syswarn(1, errno, "Failed write during copy of %s to %s",
 			arcn->org_name, arcn->name);
-	else if (cpcnt != arcn->sb.st_size)
+	else if (cpcnt != (off_t)arcn->sb.st_size)
 		paxwarn(1, "File %s changed size during copy to %s",
 			arcn->org_name, arcn->name);
 	else if (fstat(fd1, &sb) < 0)

@@ -22,6 +22,12 @@
  * of said person’s immediate fault when using the work as intended.
  */
 
+#ifdef MKSH_USE_AUTOCONF_H
+/* things that “should” have been on the command line */
+#include "autoconf.h"
+#undef MKSH_USE_AUTOCONF_H
+#endif
+
 #ifndef PAX_COMPAT_H
 #define PAX_COMPAT_H
 #undef MBSDPORT_H
@@ -40,6 +46,8 @@
 #if HAVE_STDINT_H
 #include <stdint.h>
 #endif
+
+#include ".linked/mbsdcc.h"
 
 #undef __attribute__
 #if HAVE_ATTRIBUTE_BOUNDED
@@ -109,7 +117,8 @@
 #endif
 
 #ifdef EXTERN
-__IDSTRING(rcsid_compat_h, "$MirOS: src/bin/pax/compat.h,v 1.8 2020/10/30 06:56:00 tg Exp $");
+__IDSTRING(rcsid_compat_h, "$MirOS: src/bin/pax/compat.h,v 1.15 2024/08/17 23:33:51 tg Exp $");
+__IDSTRING(rcsid_mbsdcc_h, SYSKERN_MBSDCC_H);
 #endif
 
 /* possibly missing types */
@@ -122,21 +131,16 @@ typedef unsigned int uint32_t;
 typedef u_int32_t uint32_t;
 #endif
 #endif
-#if !HAVE_CAN_INT16TYPE
-#if !HAVE_CAN_UCBINT16
-typedef unsigned short int uint16_t;
-#else
-typedef u_int16_t uint16_t;
-#endif
-#endif
-
-#ifdef MKSH_TYPEDEF_SSIZE_T
-typedef MKSH_TYPEDEF_SSIZE_T ssize_t;
-#endif
 
 #if !HAVE_CAN_ULONG
 typedef unsigned long u_long;
 #endif
+
+/* boolean type (no <stdbool.h> deliberately) */
+typedef unsigned char Wahr;
+#define Ja		1U
+#define Nee		0U
+#define isWahr(cond)	((cond) ? Ja : Nee)
 
 /* missing macros / header bug workarounds */
 
@@ -156,24 +160,7 @@ typedef unsigned long u_long;
 
 /* macros dealing with struct stat.sb_[acm]time */
 
-#ifndef timespeccmp
-#define	timespeccmp(tsp,usp,cmp)					\
-	(((tsp)->tv_sec == (usp)->tv_sec) ?				\
-	    ((tsp)->tv_nsec cmp (usp)->tv_nsec) :			\
-	    ((tsp)->tv_sec cmp (usp)->tv_sec))
-#endif
-
-#if HAVE_ST_MTIM
-#define st_timecmp(x,sbpa,sbpb,op) \
-	timespeccmp(&(sbpa)->st_ ## x ## tim, &(sbpb)->st_ ## x ## tim, op)
-#define st_timecpy(x,sbpd,sbps) do {					\
-	(sbpd)->st_ ## x ## tim = (sbps)->st_ ## x ## tim;		\
-} while (/* CONSTCOND */ 0)
-#define st_timexp(x,ts,sbp) do {					\
-	(ts)->tv_sec = (sbp)->st_ ## x ## tim.tv_sec;			\
-	(ts)->tv_nsec = (sbp)->st_ ## x ## tim.tv_nsec;			\
-} while (/* CONSTCOND */ 0)
-#elif HAVE_ST_MTIMENSEC
+#if HAVE_ST_MTIMENSEC
 #define st_timecmp(x,sbpa,sbpb,op) ( \
 	((sbpa)->st_ ## x ## time == (sbpb)->st_ ## x ## time) ? \
 	    ((sbpa)->st_ ## x ## timensec op (sbpb)->st_ ## x ## timensec) : \

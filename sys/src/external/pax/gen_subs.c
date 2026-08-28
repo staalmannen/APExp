@@ -69,7 +69,7 @@
 #include "pax.h"
 #include "extern.h"
 
-__RCSID("$MirOS: src/bin/pax/gen_subs.c,v 1.21 2019/02/10 21:50:07 tg Exp $");
+__RCSID("$MirOS: src/bin/pax/gen_subs.c,v 1.22 2021/09/23 21:15:49 tg Exp $");
 
 /*
  * a collection of general purpose subroutines used by pax
@@ -143,7 +143,7 @@ ls_list(ARCHD *arcn, FILE *fp)
 		(void)fprintf(fp, "%9" OT_FMT " ", sbp->st_size);
 
 	/*
-	 * print name and link info for hard and soft links
+	 * print name and link info for hard and symbolic links
 	 */
 	(void)fputs(f_date, fp);
 	(void)putc(' ', fp);

@@ -39,7 +39,7 @@
  */
 
 #ifdef EXTERN
-__IDSTRING(rcsid_cpio_h, "$MirOS: src/bin/pax/cpio.h,v 1.6 2018/12/12 18:08:43 tg Exp $");
+__IDSTRING(rcsid_cpio_h, "$MirOS: src/bin/pax/cpio.h,v 1.7 2024/08/17 22:32:59 tg Exp $");
 #endif
 
 /*
@@ -93,19 +93,19 @@ typedef struct {
  * an array of chars in an attempt to improve portability!!
  */
 typedef struct {
-	u_char	h_magic[2];
-	u_char	h_dev[2];
-	u_char	h_ino[2];
-	u_char	h_mode[2];
-	u_char	h_uid[2];
-	u_char	h_gid[2];
-	u_char	h_nlink[2];
-	u_char	h_rdev[2];
-	u_char	h_mtime_1[2];
-	u_char	h_mtime_2[2];
-	u_char	h_namesize[2];
-	u_char	h_filesize_1[2];
-	u_char	h_filesize_2[2];
+	unsigned char h_magic[2];
+	unsigned char h_dev[2];
+	unsigned char h_ino[2];
+	unsigned char h_mode[2];
+	unsigned char h_uid[2];
+	unsigned char h_gid[2];
+	unsigned char h_nlink[2];
+	unsigned char h_rdev[2];
+	unsigned char h_mtime_1[2];
+	unsigned char h_mtime_2[2];
+	unsigned char h_namesize[2];
+	unsigned char h_filesize_1[2];
+	unsigned char h_filesize_2[2];
 } HD_BCPIO;
 
 #ifdef _PAX_

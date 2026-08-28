@@ -1,9 +1,10 @@
 #!/bin/sh
-srcversion='$MirOS: src/bin/pax/Build.sh,v 1.19 2020/10/30 06:56:40 tg Exp $'
+srcversion='$MirOS: src/bin/pax/Build.sh,v 1.27 2024/08/17 23:33:49 tg Exp $'
+set +evx
 #-
 # Copyright (c) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
 #		2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019,
-#		2020
+#		2020, 2021, 2023, 2024
 #	mirabilos <m@mirbsd.org>
 # Copyright (c) 2018
 #	mirabilos <t.glaser@tarent.de>
@@ -31,6 +32,8 @@ srcversion='$MirOS: src/bin/pax/Build.sh,v 1.19 2020/10/30 06:56:40 tg Exp $'
 LC_ALL=C; LANGUAGE=C
 export LC_ALL; unset LANGUAGE
 
+use_ach=x; unset use_ach
+
 case $ZSH_VERSION:$VERSION in
 :zsh*) ZSH_VERSION=2 ;;
 esac
@@ -46,10 +49,25 @@ if test -d /usr/xpg4/bin/. >/dev/null 2>&1; then
 	export PATH
 fi
 
+test_tool() {
+	x=`echo $2 | $3`
+	y=$?
+
+	test x"$y" = x"0" && test x"$x" = x"$4" && return
+	echo >&2 "E: your $1 does not work correctly!"
+	echo >&2 "N: 'echo $2 | $3' exited $y and returned '$x'; expected '$4'"
+	echo >&2 'N: install a better one and prepend its location to $PATH'
+	exit 1
+}
+test_tool grep foobarbaz 'grep bar' foobarbaz
+test_tool sed abc 'sed y/ac/AC/' AbC
+test_tool tr abc 'tr ac AC' AbC
+
+sp=' '
+ht='	'
 nl='
 '
-safeIFS='	'
-safeIFS=" $safeIFS$nl"
+safeIFS="$sp$ht$nl"
 IFS=$safeIFS
 allu=QWERTYUIOPASDFGHJKLZXCVBNM
 alll=qwertyuiopasdfghjklzxcvbnm
@@ -77,6 +95,17 @@ esac
 
 echo "For the build logs, demonstrate that /dev/null and /dev/tty exist:"
 ls -l /dev/null /dev/tty
+cat <<EOF
+Flags on entry (plus HAVE_* which are not shown here):
+- CC        <$CC>
+- CFLAGS    <$CFLAGS>
+- CPPFLAGS  <$CPPFLAGS>
+- LDFLAGS   <$LDFLAGS>
+- LIBS      <$LIBS>
+- LDSTATIC  <$LDSTATIC>
+- TARGET_OS <$TARGET_OS> TARGET_OSREV <$TARGET_OSREV>
+
+EOF
 
 v() {
 	$e "$*"
@@ -98,7 +127,7 @@ vq() {
 rmf() {
 	for _f in "$@"; do
 		case $_f in
-		*.1) ;;
+		cpio.[1ch]|pax.[1ch]|tar.[1ch]) ;;
 		*) rm -f "$_f" ;;
 		esac
 	done
@@ -166,6 +195,11 @@ ac_testinit() {
 			shift
 		fi
 		eval ft=\$HAVE_`upper $2`
+		if test_z "$ft"; then
+			echo >&2
+			echo >&2 "E: test $f depends on $2 which is not defined yet"
+			exit 255
+		fi
 		shift
 	fi
 	fd=${3-$f}
@@ -179,17 +213,28 @@ ac_testinit() {
 	return 0
 }
 
+cat_h_blurb() {
+	echo '#ifdef MKSH_USE_AUTOCONF_H
+/* things that “should” have been on the command line */
+#include "autoconf.h"
+#undef MKSH_USE_AUTOCONF_H
+#endif
+
+'
+	cat
+}
+
 # pipe .c | ac_test[n] [!] label [!] checkif[!]0 [setlabelifcheckis[!]0] useroutput
-ac_testnnd() {
+ac_testnndnd() {
 	if test x"$1" = x"!"; then
 		fr=1
 		shift
 	else
 		fr=0
 	fi
+	cat_h_blurb >conftest.c
 	ac_testinit "$@" || return 1
-	cat >conftest.c
-	vv ']' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN conftest.c $LIBS $ccpr"
+	vv ']' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN conftest.c $LIBS $ccpr"
 	test $tcfn = no && test -f a.out && tcfn=a.out
 	test $tcfn = no && test -f a.exe && tcfn=a.exe
 	test $tcfn = no && test -f conftest.exe && tcfn=conftest.exe
@@ -201,18 +246,28 @@ ac_testnnd() {
 	fi
 	vscan=
 	if test $phase = u; then
-		test $ct = gcc && vscan='unrecogni[sz]ed'
-		test $ct = hpcc && vscan='unsupported'
-		test $ct = pcc && vscan='unsupported'
-		test $ct = sunpro && vscan='-e ignored -e turned.off'
+		case $ct in
+		gcc*) vscan='unrecogni[sz]ed' ;;
+		hpcc) vscan='unsupported' ;;
+		pcc) vscan='unsupported' ;;
+		sunpro) vscan='-e ignored -e turned.off' ;;
+		esac
 	fi
 	test_n "$vscan" && grep $vscan vv.out >/dev/null 2>&1 && fv=$fr
 	return 0
 }
 ac_testn() {
-	ac_testnnd "$@" || return
-	rmf conftest.c conftest.o ${tcfn}* vv.out
-	ac_testdone
+	if ac_testnndnd "$@"; then
+		rmf conftest.c conftest.o ${tcfn}* vv.out
+		ac_testdone
+	else
+		rm -f conftest.c
+	fi
+}
+ac_testnnd() {
+	if ac_testnndnd "$@"; then
+		ac_testdone
+	fi
 }
 
 # ac_ifcpp cppexpr [!] label [!] checkif[!]0 [setlabelifcheckis[!]0] useroutput
@@ -237,6 +292,31 @@ EOF
 	test x"$fv" = x"1"
 }
 
+addtoach() {
+	if echo "$1" >>autoconf.h; then
+		echo ">>> $1"
+	else
+		echo >&2 "E: could not write autoconf.h"
+		exit 255
+	fi
+}
+
+# simple only (is IFS-split by shell)
+cpp_define() {
+	case $use_ach in
+	0)
+		add_cppflags "-D$1=$2"
+		;;
+	1)
+		addtoach "#define $1 $2"
+		;;
+	*)
+		echo >&2 "E: cpp_define() called too early!"
+		exit 255
+		;;
+	esac
+}
+
 add_cppflags() {
 	CPPFLAGS="$CPPFLAGS $*"
 }
@@ -245,7 +325,7 @@ ac_cppflags() {
 	test x"$1" = x"" || fu=$1
 	fv=$2
 	test x"$2" = x"" && eval fv=\$HAVE_$fu
-	add_cppflags -DHAVE_$fu=$fv
+	cpp_define HAVE_$fu $fv
 }
 
 ac_test() {
@@ -277,7 +357,7 @@ ac_flags() {
 		ac_testn can_$vn '' "$ft" <<-'EOF'
 			/* evil apo'stroph in comment test */
 			#include <unistd.h>
-			int main(void) { return (isatty(0)); }
+			int main(void) { int t[2]; return (isatty(pipe(t))); }
 		EOF
 		#'
 	fi
@@ -331,33 +411,62 @@ addsrcs() {
 		fr=1
 	fi
 	eval i=\$$1
-	test $fr = "$i" && case " $SRCS " in
-	*\ $2\ *)	;;
-	*)		SRCS="$SRCS $2" ;;
+	test $fr = "$i" && case "$sp$SRCS$sp" in
+	*"$sp$2$sp"*)	;;
+	*)		SRCS="$SRCS$sp$2" ;;
 	esac
 }
 
+# --- main ---
 
 curdir=`pwd` srcdir=`dirname "$0" 2>/dev/null`
+curdisp=.
+case x$curdir in
+x)
+	curdir=.
+	;;
+*"$sp"*|*"$ht"*|*"$nl"*)
+	echo >&2 Current directory should not contain space or tab or newline.
+	echo >&2 Errors may occur.
+	;;
+*"'"*)
+	echo >&2 Current directory should not contain single quotes.
+	echo >&2 Errors may occur.
+	;;
+*)
+	curdisp=$curdir
+	;;
+esac
 case x$srcdir in
 x)
 	srcdir=.
 	;;
-*\ *|*"	"*|*"$nl"*)
+*"$sp"*|*"$ht"*|*"$nl"*)
 	echo >&2 Source directory should not contain space or tab or newline.
 	echo >&2 Errors may occur.
 	;;
 *"'"*)
-	echo Source directory must not contain single quotes.
+	echo >&2 Source directory must not contain single quotes.
 	exit 1
 	;;
 esac
+srcdisp=`cd "$srcdir" && pwd` || srcdisp=
+test_n "$srcdisp" || srcdisp=$srcdir
+if test x"$srcdisp" = x"$curdir"; then
+	srcdisp=
+else
+	srcdisp=$srcdir/
+fi
+dstversion=`sed -n '/define MIRCPIO_VERSION/s/^.*"\([^"]*\)".*$/\1/p' "$srcdir/pax.h"`
+whatlong='MirCPIO (paxmirabilis)'
+whatshort=paxmirabilis
 
 e=echo
 r=0
 eq=0
 pm=0
 cm=normal
+Cg=
 optflags=-std-compile-opts
 last=
 mans=0
@@ -377,13 +486,19 @@ do
 		optflags=$i
 		last=
 		;;
+	:-A)
+		rm -f autoconf.h
+		addtoach '/* work around NeXTstep bug */'
+		use_ach=1
+		add_cppflags -DMKSH_USE_AUTOCONF_H
+		;;
 	:-c)
 		last=c
 		;;
 	:-g)
 		# checker, debug, valgrind build
 		add_cppflags -DDEBUG
-		CFLAGS="$CFLAGS -g3 -fno-builtin"
+		Cg=YES
 		;;
 	:-j)
 		pm=1
@@ -411,7 +526,7 @@ do
 		;;
 	:-v)
 		echo "Build.sh $srcversion"
-		echo "for paxmirabilis"
+		echo "for $whatlong $dstversion"
 		exit 0
 		;;
 	:*)
@@ -451,8 +566,10 @@ if test -d $tfn || test -d $tfn.exe; then
 	echo "$me: Error: ./$tfn is a directory!" >&2
 	exit 1
 fi
-rmf a.exe* a.out* conftest.c conftest.exe* *core core.* ${tfn}* *.bc *.dbg \
-    *.ll *.o Rebuild.sh lft no x vv.out
+test x"$use_ach" = x"1" || use_ach=0
+cpp_define MKSH_BUILDSH 1
+rmf a.exe* a.out* conftest.* *core core.* ${tfn}* *.bc *.dbg *.ll *.o *.cat? \
+    *.gen Rebuild.sh Makefrag.inc lft no x vv.out
 rm -rf mans
 
 SRCS="ar.c ar_io.c ar_subs.c buf_subs.c compat.c cpio.c"
@@ -460,7 +577,7 @@ SRCS="$SRCS file_subs.c ftree.c gen_subs.c getoldopt.c options.c"
 SRCS="$SRCS pat_rep.c pax.c sel_subs.c tables.c tar.c tty_subs.c"
 add_cppflags -DMBSDPORT_H=\\\"compat.h\\\"
 
-if test x"$srcdir" = x"."; then
+if test_z "$srcdisp"; then
 	CPPFLAGS="-I. $CPPFLAGS"
 else
 	CPPFLAGS="-I. -I'$srcdir' $CPPFLAGS"
@@ -473,17 +590,30 @@ fi
 
 if test_z "$TARGET_OS"; then
 	x=`uname -s 2>/dev/null || uname`
-	test x"$x" = x"`uname -n 2>/dev/null`" || TARGET_OS=$x
+	case $x in
+	scosysv)
+		# SVR4 Unix with uname -s = uname -n, whitelist
+		TARGET_OS=$x
+		;;
+	syllable)
+		# other OS with uname -s = uname = uname -n, whitelist
+		TARGET_OS=$x
+		;;
+	*)
+		test x"$x" = x"`uname -n 2>/dev/null`" || TARGET_OS=$x
+		;;
+	esac
 fi
 if test_z "$TARGET_OS"; then
 	echo "$me: Set TARGET_OS, your uname is broken!" >&2
 	exit 1
 fi
+osnote=
 oswarn=
 ccpc=-Wc,
 ccpl=-Wl,
 tsts=
-ccpr='|| for _f in ${tcfn}*; do case $_f in *.1) ;; *) rm -f "$_f" ;; esac; done'
+ccpr='|| for _f in ${tcfn}*; do case $_f in cpio.[1ch]|pax.[1ch]|tar.[1ch]) ;; *) rm -f "$_f" ;; esac; done'
 
 # Evil hack
 if test x"$TARGET_OS" = x"Android"; then
@@ -496,7 +626,7 @@ if test x"$TARGET_OS" = x"Minix"; then
 WARNING: additional checks before running Build.sh required!
 You can avoid these by calling Build.sh correctly, see below.
 "
-	cat >conftest.c <<'EOF'
+	cat_h_blurb >conftest.c <<'EOF'
 #include <sys/types.h>
 const char *
 #ifdef _NETBSD_SOURCE
@@ -507,7 +637,7 @@ ct="Minix3"
 ;
 EOF
 	ct=unknown
-	vv ']' "${CC-cc} -E $CFLAGS $CPPFLAGS $NOWARN conftest.c | grep ct= | tr -d \\\\015 >x"
+	vv ']' "${CC-cc} -E $CFLAGS $Cg $CPPFLAGS $NOWARN conftest.c | grep ct= | tr -d \\\\015 >x"
 	sed 's/^/[ /' x
 	eval `cat x`
 	rmf x vv.out
@@ -535,15 +665,36 @@ fi
 
 # Configuration depending on OS revision, on OSes that need them
 case $TARGET_OS in
-SCO_SV)
+NEXTSTEP)
+	test_n "$TARGET_OSREV" || TARGET_OSREV=`hostinfo 2>&1 | \
+	    grep 'NeXT Mach [0-9][0-9.]*:' | \
+	    sed 's/^.*NeXT Mach \([0-9][0-9.]*\):.*$/\1/'`
+	;;
+BeOS|HP-UX|QNX|SCO_SV)
 	test_n "$TARGET_OSREV" || TARGET_OSREV=`uname -r`
 	;;
 esac
 
+# SVR4 (some) workaround
+int_as_ssizet() {
+	cpp_define SSIZE_MIN INT_MIN
+	cpp_define SSIZE_MAX INT_MAX
+	cpp_define ssize_t int
+}
+
+cmplrflgs=
+
 # Configuration depending on OS name
 case $TARGET_OS in
+386BSD)
+	osnote='; it is untested'
+	: "${HAVE_CAN_OTWO=0}"
+	;;
+4.4BSD)
+	osnote='; assuming BOW (BSD on Windows)'
+	;;
 A/UX)
-	oswarn="; it is untested"
+	oswarn='; it is untested'
 	add_cppflags -D_POSIX_SOURCE
 	: "${CC=gcc}"
 	: "${LIBS=-lposix}"
@@ -551,40 +702,91 @@ A/UX)
 	add_cppflags -D__A_UX__
 	;;
 AIX)
-	oswarn="; it is untested"
+	oswarn='; it is untested'
 	add_cppflags -D_ALL_SOURCE
+	;;
+BeOS)
+	oswarn='; it is untested'
+	: "${CC=gcc}"
+	;;
+BSD/OS)
+	osnote='; it is untested'
+	;;
+Coherent)
+	oswarn='; it is untested, possibly has major issues'
+	cpp_define MKSH__NO_SYMLINK 1
 	;;
 CYGWIN*)
 	# libc lacks dprintf but the headers declare it unless #define’d
-	add_cppflags -Ddprintf=rpl_dprintf
+	cpp_define dprintf rpl_dprintf
 	;;
 Darwin)
-	oswarn="; it is untested"
+	osnote='; it is untested'
 	add_cppflags -D_DARWIN_C_SOURCE
 	;;
+DragonFly)
+	osnote='; it is untested'
+	;;
+FreeBSD)
+	osnote='; it is untested'
+	;;
 FreeMiNT)
-	oswarn="; it is untested"
+	oswarn='; it is untested'
 	add_cppflags -D_GNU_SOURCE
 	;;
 GNU)
-	oswarn="; it is untested"
+	osnote='; it is untested'
 	case $CC in
 	*tendracc*) ;;
 	*) add_cppflags -D_GNU_SOURCE ;;
 	esac
 	;;
 GNU/kFreeBSD)
-	oswarn="; it is untested"
+	osnote='; it is untested'
 	case $CC in
 	*tendracc*) ;;
 	*) add_cppflags -D_GNU_SOURCE ;;
 	esac
 	;;
+Haiku)
+	oswarn='; it is untested'
+	;;
+Harvey)
+	oswarn='; it is not ported'
+	add_cppflags -D_POSIX_SOURCE
+	add_cppflags -D_LIMITS_EXTENSION
+	add_cppflags -D_BSD_EXTENSION
+	add_cppflags -D_SUSV2_SOURCE
+	add_cppflags -D_GNU_SOURCE
+	cpp_define MKSH__NO_SYMLINK 1
+	;;
+HP-UX)
+	osnote='; it is untested'
+	case $TARGET_OSREV in
+	B.09.*)
+		: "${CC=c89}"
+		add_cppflags -D_HPUX_SOURCE
+		cpp_define MBSDINT_H_SMALL_SYSTEM 1
+		;;
+	esac
+	;;
 Interix)
-	oswarn="; it is untested"
+	oswarn='; it is untested'
 	ccpc='-X '
 	ccpl='-Y '
 	add_cppflags -D_ALL_SOURCE
+	;;
+IRIX*)
+	osnote='; it is untested'
+	;;
+Jehanne)
+	oswarn='; it is not ported'
+	add_cppflags -D_POSIX_SOURCE
+	add_cppflags -D_LIMITS_EXTENSION
+	add_cppflags -D_BSD_EXTENSION
+	add_cppflags -D_SUSV2_SOURCE
+	add_cppflags -D_GNU_SOURCE
+	cpp_define MKSH__NO_SYMLINK 1
 	;;
 Linux)
 	case $CC in
@@ -592,18 +794,34 @@ Linux)
 	*) add_cppflags -D_GNU_SOURCE ;;
 	esac
 	;;
+LynxOS)
+	osnote='; it is untested'
+	;;
 midipix)
+	oswarn='; it is untested'
 	add_cppflags -D_GNU_SOURCE
 	;;
 MidnightBSD)
-	add_cppflags -D_WITH_DPRINTF
-	add_cppflags -DUT_NAMESIZE=32
+	cpp_define _WITH_DPRINTF 1
+	cpp_define UT_NAMESIZE 32
+	;;
+Minix-vmd)
+	oswarn='; it is untested'
+	add_cppflags -D_MINIX_SOURCE
+	;;
+Minix3)
+	oswarn='; it is untested'
+	add_cppflags -D_POSIX_SOURCE -D_POSIX_1_SOURCE=2 -D_MINIX
+	;;
+Minoca)
+	oswarn='; it is untested'
+	: "${CC=gcc}"
 	;;
 MirBSD)
 	add_cppflags -D_ALL_SOURCE
 	;;
 MSYS_*)
-	oswarn="; it is untested"
+	osnote='; it is untested'
 	# broken on this OE (from ir0nh34d)
 	: "${HAVE_STDINT_H=0}"
 	;;
@@ -612,57 +830,134 @@ NetBSD)
 	add_cppflags -D_OPENBSD_SOURCE
 	;;
 NEXTSTEP)
-	oswarn="; it is untested"
+	oswarn='; it is untested'
 	add_cppflags -D_NEXT_SOURCE
 	add_cppflags -D_POSIX_SOURCE
-	: "${CC=cc -posix}"
+	: "${CC=cc -posix -traditional-cpp}"
+	;;
+Ninix3)
+	oswarn='; it is untested'
+	;;
+OpenBSD)
+	osnote='; it is untested'
+	;;
+OS/2)
+	oswarn='; it is not ported'
+	# cf. https://github.com/komh/pdksh-os2/commit/590f2b19b0ff92a9a373295bce914654f9f5bf22
+	HAVE_TERMIOS_H=0
+	: "${CC=gcc}"
+	: "${SIZE=: size}"
 	;;
 OS/390)
-	oswarn='; EBCDIC support is incomplete'
-	oswarn="; it is untested"
+	oswarn='; it is not ported'
+	osnote='; EBCDIC support missing'
 	: "${CC=xlc}"
 	: "${SIZE=: size}"
 	add_cppflags -D_ALL_SOURCE
 	;;
 OSF1)
-	oswarn="; it is untested"
+	oswarn='; it is untested'
 	add_cppflags -D_OSF_SOURCE
 	add_cppflags -D_POSIX_C_SOURCE=200112L
 	add_cppflags -D_XOPEN_SOURCE=600
 	add_cppflags -D_XOPEN_SOURCE_EXTENDED
 	;;
+Plan9)
+	oswarn='; it is not ported'
+	add_cppflags -D_POSIX_SOURCE
+	add_cppflags -D_LIMITS_EXTENSION
+	add_cppflags -D_BSD_EXTENSION
+	add_cppflags -D_SUSV2_SOURCE
+	cpp_define MKSH__NO_SYMLINK 1
+	# this is for detecting kencc
+	cmplrflgs=-DMKSH_MAYBE_KENCC
+	;;
+PW32*)
+	oswarn='; it is untested'
+	;;
 QNX)
-	oswarn="; it is untested"
+	oswarn='; it is untested'
 	add_cppflags -D__NO_EXT_QNX
 	add_cppflags -D__EXT_UNIX_MISC
 	;;
+scosysv)
+	oswarn='; it is untested'
+	cmplrflgs=-DMKSH_MAYBE_QUICK_C
+	int_as_ssizet
+	;;
+SCO_SV)
+	oswarn='; it is untested'
+	case $TARGET_OSREV in
+	3.2*)
+		# SCO OpenServer 5
+		;;
+	5*)
+		# SCO OpenServer 6
+		;;
+	*)
+		oswarn='; this is an unknown version of'
+		oswarn="$oswarn$nl$TARGET_OS ${TARGET_OSREV}, please tell me what to do"
+		;;
+	esac
+	;;
+SerenityOS)
+	oswarn='; it is untested'
+	;;
+SINIX-Z)
+	: "${CC=cc -Xa}"
+	cmplrflgs=-DMKSH_MAYBE_SCDE
+	;;
+skyos)
+	oswarn='; it is untested'
+	;;
 SunOS)
-	oswarn="; it is untested"
+	oswarn='; it is untested'
 	add_cppflags -D_BSD_SOURCE
 	add_cppflags -D__EXTENSIONS__
 	;;
 syllable)
-	oswarn="; it is untested"
+	oswarn='; it is untested'
 	add_cppflags -D_GNU_SOURCE
 	;;
 ULTRIX)
-	oswarn="; it is untested"
+	oswarn='; it is untested'
 	: "${CC=cc -YPOSIX}"
-	add_cppflags -DMKSH_TYPEDEF_SSIZE_T=int
+	int_as_ssizet
+	;;
+UnixWare|UNIX_SV)
+	# SCO UnixWare
+	oswarn='; it is untested'
 	;;
 UWIN*)
-	oswarn="; it is untested"
+	oswarn='; it is untested'
 	ccpc='-Yc,'
 	ccpl='-Yl,'
 	tsts=" 3<>/dev/tty"
 	;;
+XENIX)
+	oswarn='; it is untested'
+	# mostly when crosscompiling from scosysv
+	cmplrflgs=-DMKSH_MAYBE_QUICK_C
+	# this can barely do anything
+	int_as_ssizet
+	cpp_define MKSH__NO_SYMLINK 1
+	# these are broken
+	HAVE_TERMIOS_H=0
+	;;
+_svr4)
+	# generic target for SVR4 Unix with uname -s = uname -n
+	oswarn='; it may or may not work'
+	: "${CC=cc -Xa}"
+	cmplrflgs=-DMKSH_MAYBE_SCDE
+	int_as_ssizet #XXX maybe not for *all* _svr4? here for Dell UNIX
+	;;
 *)
 	oswarn='; it may or may not work'
-	test_n "$TARGET_OSREV" || TARGET_OSREV=`uname -r`
 	;;
 esac
+test_n "$TARGET_OSREV" || TARGET_OSREV=`uname -r`
 
-: "${CC=cc}${NROFF=nroff}${SIZE=size}"
+: "${AWK=awk}${CC=cc}${NROFF=nroff}${SIZE=size}"
 test 0 = $r && echo | $NROFF -v 2>&1 | grep GNU >/dev/null 2>&1 && \
     echo | $NROFF -c >/dev/null 2>&1 && NROFF="$NROFF -c"
 
@@ -691,7 +986,7 @@ OSF1)
 	vv '|' "uname -a >&2"
 	vv '|' "/usr/sbin/sizer -v >&2"
 	;;
-SCO_SV|UnixWare|UNIX_SV)
+scosysv|SCO_SV|UnixWare|UNIX_SV|XENIX)
 	vv '|' "uname -a >&2"
 	vv '|' "uname -X >&2"
 	;;
@@ -700,13 +995,18 @@ SCO_SV|UnixWare|UNIX_SV)
 	;;
 esac
 test_z "$oswarn" || echo >&2 "
-Warning: paxmirabilis has not yet been ported to or tested on your
-operating system '$TARGET_OS'$oswarn. If you can provide
-a shell account to the developer, this may improve; please
-drop us a success or failure notice or even send in diffs,
-at the very least, complete logs (Build.sh + test?) will help.
+Warning: $whatshort has not yet been ported to or tested on your
+operating system '$TARGET_OS'$oswarn."
+test_z "$osnote" || echo >&2 "
+Note: $whatshort is not fully ported to or tested yet on your
+operating system '$TARGET_OS'$osnote."
+test_z "$osnote$oswarn" || echo >&2 "
+If you can provide a shell account to the developer, this
+may improve; please drop us a success or failure notice or
+even send patches for the remaining issues, or, at the very
+least, complete logs (Build.sh + test?) will help.
 "
-$e "$bi$me: Building MirCPIO (paxmirabilis)$ao on $TARGET_OS ${TARGET_OSREV}..."
+$e "$bi$me: Building $whatlong$ao $ui$dstversion$ao on $TARGET_OS ${TARGET_OSREV}..."
 
 #
 # Start of mirtoconf checks
@@ -723,7 +1023,7 @@ $e $bi$me: Scanning for functions... please ignore any errors.$ao
 # - nwcc defines __GNUC__ too
 CPP="$CC -E"
 $e ... which compiler type seems to be used
-cat >conftest.c <<'EOF'
+cat_h_blurb >conftest.c <<'EOF'
 const char *
 #if defined(__ICC) || defined(__INTEL_COMPILER)
 ct="icc"
@@ -731,6 +1031,10 @@ ct="icc"
 ct="xlc"
 #elif defined(__SUNPRO_C)
 ct="sunpro"
+#elif defined(__neatcc__)
+ct="neatcc"
+#elif defined(__lacc__)
+ct="lacc"
 #elif defined(__ACK__)
 ct="ack"
 #elif defined(__BORLANDC__)
@@ -765,6 +1069,8 @@ ct="tcc"
 ct="clang"
 #elif defined(__NWCC__)
 ct="nwcc"
+#elif defined(__GNUC__) && (__GNUC__ < 2)
+ct="gcc1"
 #elif defined(__GNUC__)
 ct="gcc"
 #elif defined(_COMPILER_VERSION)
@@ -779,9 +1085,13 @@ ct="ucode"
 ct="uslc"
 #elif defined(__LCC__)
 ct="lcc"
+#elif defined(MKSH_MAYBE_QUICK_C) && defined(_M_BITFIELDS)
+ct="quickc"
 #elif defined(MKSH_MAYBE_KENCC)
 /* and none of the above matches */
 ct="kencc"
+#elif defined(MKSH_MAYBE_SCDE)
+ct="tryscde"
 #else
 ct="unknown"
 #endif
@@ -789,6 +1099,8 @@ ct="unknown"
 const char *
 #if defined(__KLIBC__) && !defined(__OS2__)
 et="klibc"
+#elif defined(__dietlibc__)
+et="dietlibc"
 #else
 et="unknown"
 #endif
@@ -796,24 +1108,36 @@ et="unknown"
 EOF
 ct=untested
 et=untested
-vv ']' "$CPP $CFLAGS $CPPFLAGS $NOWARN conftest.c | \
+vv ']' "$CPP $CFLAGS $CPPFLAGS $NOWARN $cmplrflgs conftest.c | \
     sed -n '/^ *[ce]t *= */s/^ *\([ce]t\) *= */\1=/p' | tr -d \\\\015 >x"
 sed 's/^/[ /' x
 eval `cat x`
 rmf x vv.out
-cat >conftest.c <<'EOF'
+cat_h_blurb >conftest.c <<'EOF'
 #include <unistd.h>
 int main(void) { return (isatty(0)); }
 EOF
+test_z "$Cg" || Cg=-g  # generic
+case $ct:$TARGET_OS in
+tryscde:*)
+	case `LC_ALL=C; export LC_ALL; $CC -V 2>&1` in
+	*'Standard C Development Environment'*)
+		ct=scde ;;
+	*)
+		ct=unknown ;;
+	esac
+	;;
+esac
 case $ct in
 ack)
 	# work around "the famous ACK const bug"
 	CPPFLAGS="-Dconst= $CPPFLAGS"
+	: "${HAVE_ATTRIBUTE_EXTENSION=0}"  # skip checking as we know it absent
 	;;
 adsp)
 	echo >&2 'Warning: Analog Devices C++ compiler for Blackfin, TigerSHARC
     and SHARC (21000) DSPs detected. This compiler has not yet
-    been tested for compatibility with paxmirabilis. Continue at your
+    been tested for compatibility with this. Continue at your
     own risk, please report success/failure to the developers.'
 	;;
 bcc)
@@ -823,10 +1147,9 @@ bcc)
 	;;
 clang)
 	# does not work with current "ccc" compiler driver
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN $LIBS -version"
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN $LIBS --version"
 	# one of these two works, for now
 	vv '|' "${CLANG-clang} -version"
-	vv '|' "${CLANG-clang} --version"
 	# ensure compiler and linker are in sync unless overridden
 	case $CCC_CC:$CCC_LD in
 	:*)	;;
@@ -834,8 +1157,9 @@ clang)
 	esac
 	;;
 dec)
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN $LIBS -V"
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN -Wl,-V conftest.c $LIBS"
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN $LIBS -V"
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN -Wl,-V conftest.c $LIBS"
+	: "${HAVE_ATTRIBUTE_EXTENSION=0}"  # skip checking as we know it absent
 	;;
 dmc)
 	echo >&2 "Warning: Digital Mars Compiler detected. When running under"
@@ -843,37 +1167,57 @@ dmc)
 	echo >&2 "    of this platform. Continue at your own risk,"
 	echo >&2 "    please report success/failure to the developers."
 	;;
+gcc1)
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN -v conftest.c $LIBS"
+	vv '|' 'eval echo "\`$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN $LIBS -dumpmachine\`" \
+		 "gcc\`$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN $LIBS -dumpversion\`"'
+	: "${HAVE_ATTRIBUTE_EXTENSION=0}" # false positive
+	;;
 gcc)
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN -v conftest.c $LIBS"
-	vv '|' 'eval echo "\`$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN $LIBS -dumpmachine\`" \
-		 "gcc\`$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN $LIBS -dumpversion\`"'
+	test_z "$Cg" || Cg='-g3 -fno-builtin'
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN -v conftest.c $LIBS"
+	vv '|' 'eval echo "\`$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN $LIBS -dumpmachine\`" \
+		 "gcc\`$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN $LIBS -dumpversion\`"'
 	;;
 hpcc)
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN -V conftest.c $LIBS"
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN -V conftest.c $LIBS"
+	case $TARGET_OS,$TARGET_OSREV in
+	HP-UX,B.09.*)
+		: "${HAVE_ATTRIBUTE_EXTENSION=0}"
+		;;
+	esac
 	;;
 iar)
 	echo >&2 'Warning: IAR Systems (http://www.iar.com) compiler for embedded
     systems detected. This unsupported compiler has not yet
-    been tested for compatibility with paxmirabilis. Continue at your
+    been tested for compatibility with this. Continue at your
     own risk, please report success/failure to the developers.'
 	;;
 icc)
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN $LIBS -V"
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN $LIBS -V"
 	;;
 kencc)
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN -v conftest.c $LIBS"
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN -v conftest.c $LIBS"
+	: "${HAVE_ATTRIBUTE_EXTENSION=0}"  # skip checking as we know it absent
+	;;
+lacc)
+	# no version information
 	;;
 lcc)
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN -v conftest.c $LIBS"
-	add_cppflags -D__inline__=__inline
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN -v conftest.c $LIBS"
+	cpp_define __inline__ __inline
+	: "${HAVE_ATTRIBUTE_EXTENSION=0}"  # skip checking as we know it absent
 	;;
 metrowerks)
 	echo >&2 'Warning: Metrowerks C compiler detected. This has not yet
-    been tested for compatibility with paxmirabilis. Continue at your
+    been tested for compatibility with this. Continue at your
     own risk, please report success/failure to the developers.'
 	;;
 mipspro)
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN $LIBS -version"
+	test_z "$Cg" || Cg='-g3'
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN $LIBS -version"
+	: "${HAVE_STDINT_H=0}" # broken unless building with __c99
+	: "${HAVE_ATTRIBUTE_EXTENSION=0}"  # skip checking as we know it absent
 	;;
 msc)
 	ccpr=		# errorlevels are not reliable
@@ -894,36 +1238,50 @@ msc)
 		;;
 	esac
 	;;
+neatcc)
+	cpp_define MKSH_DONT_EMIT_IDSTRING 1
+	vv '|' "$CC"
+	;;
 nwcc)
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN $LIBS -version"
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN $LIBS -version"
 	;;
 pcc)
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN $LIBS -v"
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN $LIBS -v"
 	;;
 pgi)
 	echo >&2 'Warning: PGI detected. This unknown compiler has not yet
-    been tested for compatibility with paxmirabilis. Continue at your
+    been tested for compatibility with this. Continue at your
     own risk, please report success/failure to the developers.'
+	;;
+quickc)
+	# no version information
+	: "${HAVE_ATTRIBUTE_EXTENSION=0}"  # skip checking as we know it absent
+	;;
+scde)
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN -V conftest.c $LIBS"
+	: "${HAVE_ATTRIBUTE_EXTENSION=0}"  # skip checking as we know it absent
 	;;
 sdcc)
 	echo >&2 'Warning: sdcc (http://sdcc.sourceforge.net), the small devices
     C compiler for embedded systems detected. This has not yet
-    been tested for compatibility with paxmirabilis. Continue at your
+    been tested for compatibility with this. Continue at your
     own risk, please report success/failure to the developers.'
 	;;
 sunpro)
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN -V conftest.c $LIBS"
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN -V conftest.c $LIBS"
 	;;
 tcc)
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN $LIBS -v"
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN $LIBS -v"
 	;;
 tendra)
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN $LIBS -V 2>&1 | \
-	    grep -F -i -e version -e release"
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN $LIBS -V 2>&1 | \
+	    grep -i -e version -e release"
+	: "${HAVE_ATTRIBUTE_EXTENSION=0}" # false positive
 	;;
 ucode)
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN $LIBS -V"
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN -Wl,-V conftest.c $LIBS"
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN $LIBS -V"
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN -Wl,-V conftest.c $LIBS"
+	: "${HAVE_ATTRIBUTE_EXTENSION=0}"  # skip checking as we know it absent
 	;;
 uslc)
 	case $TARGET_OS:$TARGET_OSREV in
@@ -933,22 +1291,23 @@ uslc)
 		: "${HAVE_CAN_OTWO=0}${HAVE_CAN_OPTIMISE=0}"
 		;;
 	esac
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN -V conftest.c $LIBS"
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN -V conftest.c $LIBS"
+	: "${HAVE_ATTRIBUTE_EXTENSION=0}"  # skip checking as we know it absent
 	;;
 watcom)
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN -v conftest.c $LIBS"
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN -v conftest.c $LIBS"
 	;;
 xlc)
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN $LIBS -qversion"
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN $LIBS -qversion=verbose"
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN $LIBS -qversion"
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN $LIBS -qversion=verbose"
 	vv '|' "ld -V"
 	;;
 *)
 	test x"$ct" = x"untested" && $e "!!! detecting preprocessor failed"
 	ct=unknown
-	vv "$CC --version"
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN -v conftest.c $LIBS"
-	vv '|' "$CC $CFLAGS $CPPFLAGS $LDFLAGS $NOWARN -V conftest.c $LIBS"
+	vv '|' "$CC --version"
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN -v conftest.c $LIBS"
+	vv '|' "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $NOWARN -V conftest.c $LIBS"
 	;;
 esac
 case $cm in
@@ -957,7 +1316,16 @@ dragonegg|llvm)
 	;;
 esac
 etd=" on $et"
+# still imake style but… can’t be helped
 case $et in
+dietlibc)
+	# live, BSD, live❣
+	#add_cppflags -D_BSD_SOURCE
+	# dietlibc has u_long as uint32_t in many versions, ouch,
+	# but thankfully ifdef _BSD_SOURCE, so… ouch²…
+	add_cppflags -U_BSD_SOURCE
+	: "${HAVE_CAN_ULONG=0}"
+	;;
 klibc)
 	;;
 unknown)
@@ -1043,6 +1411,10 @@ msc)
 	save_NOWARN="${ccpc}/w"
 	DOWARN="${ccpc}/WX"
 	;;
+quickc)
+	;;
+scde)
+	;;
 sunpro)
 	test x"$save_NOWARN" = x"" && save_NOWARN='-errwarn=%none'
 	ac_flags 0 errwarnnone "$save_NOWARN"
@@ -1095,7 +1467,7 @@ hpcc)
 	ac_flags 1 otwo +O2
 	phase=x
 	;;
-kencc|tcc|tendra)
+kencc|quickc|scde|tcc|tendra)
 	# no special optimisation
 	;;
 sunpro)
@@ -1115,7 +1487,16 @@ xlc)
 	test 1 = $HAVE_CAN_OTHREE || ac_flags 1 otwo -O2
 	;;
 *)
-	ac_flags 1 otwo -O2
+	if test_n "$Cg"; then
+		ac_flags 1 ogee -Og
+		if test 1 = $HAVE_CAN_OGEE; then
+			HAVE_CAN_OTWO=1 # for below
+		else
+			ac_flags 1 otwo -O2
+		fi
+	else
+		ac_flags 1 otwo -O2
+	fi
 	test 1 = $HAVE_CAN_OTWO || ac_flags 1 optimise -O
 	;;
 esac
@@ -1136,16 +1517,28 @@ dmc)
 	ac_flags 1 decl "${ccpc}-r" 'for strict prototype checks'
 	ac_flags 1 schk "${ccpc}-s" 'for stack overflow checking'
 	;;
-gcc)
+gcc1)
 	# The following tests run with -Werror (gcc only) if possible
 	NOWARN=$DOWARN; phase=u
-	# paxmirabilis is not written in CFrustFrust!
+	ac_flags 1 wnodeprecateddecls -Wno-deprecated-declarations
+	# we do not even use CFrustFrust in MirBSD so don’t code in it…
+	ac_flags 1 no_eh_frame -fno-asynchronous-unwind-tables
+	ac_flags 1 fnostrictaliasing -fno-strict-aliasing
+	ac_flags 1 data_abi_align -malign-data=abi
+	i=1
+	;;
+gcc)
+	ac_flags 1 fnolto -fno-lto 'whether we can explicitly disable buggy GCC LTO' -fno-lto
+	# The following tests run with -Werror (gcc only) if possible
+	NOWARN=$DOWARN; phase=u
+	ac_flags 1 wnodeprecateddecls -Wno-deprecated-declarations
+	# we do not even use CFrustFrust in MirBSD so don’t code in it…
 	ac_flags 1 no_eh_frame -fno-asynchronous-unwind-tables
 	ac_flags 1 fnostrictaliasing -fno-strict-aliasing
 	ac_flags 1 fstackprotectorstrong -fstack-protector-strong
 	test 1 = $HAVE_CAN_FSTACKPROTECTORSTRONG || \
 	    ac_flags 1 fstackprotectorall -fstack-protector-all
-	test $cm = dragonegg && case " $CC $CFLAGS $LDFLAGS " in
+	test $cm = dragonegg && case " $CC $CFLAGS $Cg $LDFLAGS " in
 	*\ -fplugin=*dragonegg*) ;;
 	*) ac_flags 1 fplugin_dragonegg -fplugin=dragonegg ;;
 	esac
@@ -1275,12 +1668,8 @@ test $ct = pcc && phase=u
 #
 # Compiler: check for stuff that only generates warnings
 #
-ac_test attribute_bounded '' 'for __attribute__((__bounded__))' <<-'EOF'
-	#if defined(__TenDRA__) || (defined(__GNUC__) && (__GNUC__ < 2))
-	extern int thiswillneverbedefinedIhope(void);
-	/* force a failure: TenDRA and gcc 1.42 have false positive here */
-	int main(void) { return (thiswillneverbedefinedIhope()); }
-	#else
+: "${HAVE_ATTRIBUTE_EXTENSION=1}" # not a separate test but a dependency
+ac_test attribute_bounded attribute_extension 0 'for __attribute__((__bounded__))' <<-'EOF'
 	#include <string.h>
 	#undef __attribute__
 	int xcopy(const void *, void *, size_t)
@@ -1294,14 +1683,8 @@ ac_test attribute_bounded '' 'for __attribute__((__bounded__))' <<-'EOF'
 		 */
 		memmove(d, s, n); return ((int)n);
 	}
-	#endif
 EOF
-ac_test attribute_format '' 'for __attribute__((__format__))' <<-'EOF'
-	#if defined(__TenDRA__) || (defined(__GNUC__) && (__GNUC__ < 2))
-	extern int thiswillneverbedefinedIhope(void);
-	/* force a failure: TenDRA and gcc 1.42 have false positive here */
-	int main(void) { return (thiswillneverbedefinedIhope()); }
-	#else
+ac_test attribute_format attribute_extension 0 'for __attribute__((__format__))' <<-'EOF'
 	#define fprintf printfoo
 	#include <stdio.h>
 	#undef __attribute__
@@ -1309,70 +1692,39 @@ ac_test attribute_format '' 'for __attribute__((__format__))' <<-'EOF'
 	extern int fprintf(FILE *, const char *format, ...)
 	    __attribute__((__format__(__printf__, 2, 3)));
 	int main(int ac, char *av[]) { return (fprintf(stderr, "%s%d", *av, ac)); }
-	#endif
 EOF
-ac_test attribute_nonnull '' 'for __attribute__((__nonnull__))' <<-'EOF'
-	#if defined(__TenDRA__) || (defined(__GNUC__) && (__GNUC__ < 2))
-	extern int thiswillneverbedefinedIhope(void);
-	/* force a failure: TenDRA and gcc 1.42 have false positive here */
-	int main(void) { return (thiswillneverbedefinedIhope()); }
-	#else
+ac_test attribute_nonnull attribute_extension 0 'for __attribute__((__nonnull__))' <<-'EOF'
 	#include <stdio.h>
 	#undef __attribute__
 	int fnord(const char *) __attribute__((__nonnull__(1)));
 	int main(void) { return (fnord("x")); }
 	int fnord(const char *x) { return (fputc(*x, stderr)); }
-	#endif
 EOF
-ac_test attribute_noreturn '' 'for __attribute__((__noreturn__))' <<-'EOF'
-	#if defined(__TenDRA__) || (defined(__GNUC__) && (__GNUC__ < 2))
-	extern int thiswillneverbedefinedIhope(void);
-	/* force a failure: TenDRA and gcc 1.42 have false positive here */
-	int main(void) { return (thiswillneverbedefinedIhope()); }
-	#else
+ac_test attribute_noreturn attribute_extension 0 'for __attribute__((__noreturn__))' <<-'EOF'
 	#include <stdlib.h>
 	#undef __attribute__
 	void fnord(void) __attribute__((__noreturn__));
 	int main(void) { fnord(); }
 	void fnord(void) { exit(0); }
-	#endif
 EOF
-ac_test attribute_pure '' 'for __attribute__((__pure__))' <<-'EOF'
-	#if defined(__TenDRA__) || (defined(__GNUC__) && (__GNUC__ < 2))
-	extern int thiswillneverbedefinedIhope(void);
-	/* force a failure: TenDRA and gcc 1.42 have false positive here */
-	int main(void) { return (thiswillneverbedefinedIhope()); }
-	#else
+ac_test attribute_pure attribute_extension 0 'for __attribute__((__pure__))' <<-'EOF'
 	#include <unistd.h>
 	#undef __attribute__
 	int foo(const char *) __attribute__((__pure__));
 	int main(int ac, char *av[]) { return (foo(av[ac - 1]) + isatty(0)); }
 	int foo(const char *s) { return ((int)s[0]); }
-	#endif
 EOF
-ac_test attribute_unused '' 'for __attribute__((__unused__))' <<-'EOF'
-	#if defined(__TenDRA__) || (defined(__GNUC__) && (__GNUC__ < 2))
-	extern int thiswillneverbedefinedIhope(void);
-	/* force a failure: TenDRA and gcc 1.42 have false positive here */
-	int main(void) { return (thiswillneverbedefinedIhope()); }
-	#else
+ac_test attribute_unused attribute_extension 0 'for __attribute__((__unused__))' <<-'EOF'
 	#include <unistd.h>
 	#undef __attribute__
 	int main(int ac __attribute__((__unused__)), char *av[]
 	    __attribute__((__unused__))) { return (isatty(0)); }
-	#endif
 EOF
-ac_test attribute_used '' 'for __attribute__((__used__))' <<-'EOF'
-	#if defined(__TenDRA__) || (defined(__GNUC__) && (__GNUC__ < 2))
-	extern int thiswillneverbedefinedIhope(void);
-	/* force a failure: TenDRA and gcc 1.42 have false positive here */
-	int main(void) { return (thiswillneverbedefinedIhope()); }
-	#else
+ac_test attribute_used attribute_extension 0 'for __attribute__((__used__))' <<-'EOF'
 	#include <unistd.h>
 	#undef __attribute__
 	static const char fnord[] __attribute__((__used__)) = "42";
 	int main(void) { return (isatty(0)); }
-	#endif
 EOF
 
 # End of tests run with -Werror
@@ -1412,11 +1764,10 @@ ac_header vis.h stdlib.h
 echo '#include <sys/types.h>
 #include <fts.h>
 #include <unistd.h>
-/* check that off_t can represent 2^63-1 correctly, thx FSF */
-#define LARGE_OFF_T ((((off_t)1 << 31) << 31) - 1 + (((off_t)1 << 31) << 31))
-int off_t_is_large[(LARGE_OFF_T % 2147483629 == 721 &&
-    LARGE_OFF_T % 2147483647 == 1) ? 1 : -1];
-int main(void) { return (isatty(0)); }' >lft.c
+struct ctassert_offt {
+	off_t min63bits:63;
+};
+int main(void) { return ((int)sizeof(struct ctassert_offt)); }' >lft.c
 ac_testn can_lfs '' "for large file support" <lft.c
 save_CPPFLAGS=$CPPFLAGS
 add_cppflags -D_FILE_OFFSET_BITS=64
@@ -1443,16 +1794,6 @@ ac_test can_ucbints '!' can_inttypes 1 "for UCB 32-bit integer types" <<-'EOF'
 	#include <stddef.h>
 	int main(int ac, char *av[]) { return ((u_int32_t)(size_t)*av + (int32_t)ac); }
 EOF
-ac_test can_int16type '!' stdint_h 1 "for standard 16-bit integer type" <<-'EOF'
-	#include <sys/types.h>
-	#include <stddef.h>
-	int main(int ac, char *av[]) { return ((uint16_t)(size_t)av[ac]); }
-EOF
-ac_test can_ucbint16 '!' can_int16type 1 "for UCB 16-bit integer type" <<-'EOF'
-	#include <sys/types.h>
-	#include <stddef.h>
-	int main(int ac, char *av[]) { return ((u_int16_t)(size_t)av[ac]); }
-EOF
 ac_test can_ulong '' "for u_long" <<-'EOF'
 	#include <sys/types.h>
 	#include <stddef.h>
@@ -1466,7 +1807,7 @@ if test $cm = makefile; then
 	: nothing to check
 else
 	HAVE_LINK_WORKS=x
-	ac_testinit link_works '' 'checking if the final link command may succeed'
+	ac_testinit link_works '' 'if the final link command may succeed'
 	fv=1
 	cat >conftest.c <<-EOF
 		#include <sys/types.h>
@@ -1531,26 +1872,26 @@ else
 EOF
 	case $cm in
 	llvm)
-		v "$CC $CFLAGS $CPPFLAGS $NOWARN -emit-llvm -c conftest.c" || fv=0
+		v "$CC $CFLAGS $Cg $CPPFLAGS $NOWARN -emit-llvm -c conftest.c" || fv=0
 		rmf $tfn.s
 		test $fv = 0 || v "llvm-link -o - conftest.o | opt $optflags | llc -o $tfn.s" || fv=0
-		test $fv = 0 || v "$CC $CFLAGS $LDFLAGS -o $tcfn $tfn.s $LIBS $ccpr"
+		test $fv = 0 || v "$CC $CFLAGS $Cg $LDFLAGS -o $tcfn $tfn.s $LIBS $ccpr"
 		;;
 	dragonegg)
-		v "$CC $CFLAGS $CPPFLAGS $NOWARN -S -flto conftest.c" || fv=0
+		v "$CC $CFLAGS $Cg $CPPFLAGS $NOWARN -S -flto conftest.c" || fv=0
 		test $fv = 0 || v "mv conftest.s conftest.ll"
 		test $fv = 0 || v "llvm-as conftest.ll" || fv=0
 		rmf $tfn.s
 		test $fv = 0 || v "llvm-link -o - conftest.bc | opt $optflags | llc -o $tfn.s" || fv=0
-		test $fv = 0 || v "$CC $CFLAGS $LDFLAGS -o $tcfn $tfn.s $LIBS $ccpr"
+		test $fv = 0 || v "$CC $CFLAGS $Cg $LDFLAGS -o $tcfn $tfn.s $LIBS $ccpr"
 		;;
 	combine)
-		v "$CC $CFLAGS $CPPFLAGS $LDFLAGS -fwhole-program --combine $NOWARN -o $tcfn conftest.c $LIBS $ccpr"
+		v "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS -fwhole-program --combine $NOWARN -o $tcfn conftest.c $LIBS $ccpr"
 		;;
 	lto|normal)
 		cm=normal
-		v "$CC $CFLAGS $CPPFLAGS $NOWARN -c conftest.c" || fv=0
-		test $fv = 0 || v "$CC $CFLAGS $LDFLAGS -o $tcfn conftest.o $LIBS $ccpr"
+		v "$CC $CFLAGS $Cg $CPPFLAGS $NOWARN -c conftest.c" || fv=0
+		test $fv = 0 || v "$CC $CFLAGS $Cg $LDFLAGS -o $tcfn conftest.o $LIBS $ccpr"
 		;;
 	esac
 	test -f $tcfn || fv=0
@@ -1590,12 +1931,6 @@ ac_test futimens <<-'EOF'
 	int main(void) { return (futimens(0, ts)); }
 EOF
 
-ac_test futimes '!' futimens 0 <<-'EOF'
-	#include <sys/time.h>
-	struct timeval tv[2] = {{0L, 0L}, {0L, 0L}};
-	int main(void) { return (futimes(0, tv)); }
-EOF
-
 ac_test lchmod '!' fchmodat 0 <<-'EOF'
 	#include <sys/types.h>
 	#include <sys/stat.h>
@@ -1622,7 +1957,7 @@ EOF
 
 ac_test reallocarray <<-'EOF'
 	#include <stdlib.h>
-	int main(void) { return (reallocarray(NULL, 3, 3) == NULL); }
+	int main(void) { return ((void *)reallocarray(NULL, 3, 3) == (void *)0UL); }
 EOF
 
 ac_test setpgent grp_h 0 'for setpassent and setgroupent' <<-'EOF'
@@ -1689,6 +2024,18 @@ ac_test utimes '!' utimensat 0 <<-'EOF'
 	#include <sys/time.h>
 	struct timeval tv[2] = {{0L, 0L}, {0L, 0L}};
 	int main(void) { return (utimes(".", tv)); }
+EOF
+
+ac_test lutimes '!' utimensat 0 <<-'EOF'
+	#include <sys/time.h>
+	struct timeval tv[2] = {{0L, 0L}, {0L, 0L}};
+	int main(void) { return (lutimes(".", tv)); }
+EOF
+
+ac_test futimes '!' futimens 0 <<-'EOF'
+	#include <sys/time.h>
+	struct timeval tv[2] = {{0L, 0L}, {0L, 0L}};
+	int main(void) { return (futimes(0, tv)); }
 EOF
 
 #
@@ -1806,7 +2153,7 @@ ac_test timet_large '' 'whether time_t is wider than 32 bit' <<-'EOF'
 	int main(void) { return (sizeof(struct ctasserts)); }
 EOF
 
-ac_test st_mtim '' 'whether struct stat has usable st_mtim' <<-'EOF'
+ac_testn st_mtimensec '' 'for struct stat.st_mtimensec' <<-'EOF'
 	#include <sys/types.h>
 	#if HAVE_BOTH_TIME_H
 	#include <sys/time.h>
@@ -1817,15 +2164,9 @@ ac_test st_mtim '' 'whether struct stat has usable st_mtim' <<-'EOF'
 	#include <time.h>
 	#endif
 	#include <sys/stat.h>
-	#include "compat.h"
-	int main(void) {
-		struct stat sb;
-		struct timespec ts = { 1544585569L, 0L };
-		return (fstat(0, &sb) || timespeccmp(&sb.st_mtim, &ts, >=));
-	}
+	int main(void) { struct stat sb; return (sizeof(sb.st_mtimensec)); }
 EOF
-
-ac_test st_mtimensec '!' st_mtim 0 'whether struct stat has st_mtimensec' <<-'EOF'
+ac_testn st_mtimespec '!' st_mtimensec 0 'for struct stat.st_mtimespec.tv_nsec' <<-'EOF'
 	#include <sys/types.h>
 	#if HAVE_BOTH_TIME_H
 	#include <sys/time.h>
@@ -1836,12 +2177,58 @@ ac_test st_mtimensec '!' st_mtim 0 'whether struct stat has st_mtimensec' <<-'EO
 	#include <time.h>
 	#endif
 	#include <sys/stat.h>
-	int main(void) {
-		struct stat sb;
-		return (fstat(0, &sb) || sb.st_mtimensec == 0);
-	}
+	int main(void) { struct stat sb; return (sizeof(sb.st_mtimespec.tv_nsec)); }
 EOF
+if test 1 = "$HAVE_ST_MTIMESPEC"; then
+	cpp_define st_atimensec st_atimespec.tv_nsec
+	cpp_define st_ctimensec st_ctimespec.tv_nsec
+	cpp_define st_mtimensec st_mtimespec.tv_nsec
+	HAVE_ST_MTIMENSEC=1
+fi
+ac_testn st_mtim '!' st_mtimensec 0 'for struct stat.st_mtim.tv_nsec' <<-'EOF'
+	#include <sys/types.h>
+	#if HAVE_BOTH_TIME_H
+	#include <sys/time.h>
+	#include <time.h>
+	#elif HAVE_SYS_TIME_H
+	#include <sys/time.h>
+	#elif HAVE_TIME_H
+	#include <time.h>
+	#endif
+	#include <sys/stat.h>
+	int main(void) { struct stat sb; return (sizeof(sb.st_mtim.tv_nsec)); }
+EOF
+if test 1 = "$HAVE_ST_MTIM"; then
+	cpp_define st_atimensec st_atim.tv_nsec
+	cpp_define st_ctimensec st_ctim.tv_nsec
+	cpp_define st_mtimensec st_mtim.tv_nsec
+	HAVE_ST_MTIMENSEC=1
+fi
+ac_testn st_mtime_nsec '!' st_mtimensec 0 'for struct stat.st_mtime_nsec' <<-'EOF'
+	#include <sys/types.h>
+	#if HAVE_BOTH_TIME_H
+	#include <sys/time.h>
+	#include <time.h>
+	#elif HAVE_SYS_TIME_H
+	#include <sys/time.h>
+	#elif HAVE_TIME_H
+	#include <time.h>
+	#endif
+	#include <sys/stat.h>
+	int main(void) { struct stat sb; return (sizeof(sb.st_mtime_nsec)); }
+EOF
+if test 1 = "$HAVE_ST_MTIME_NSEC"; then
+	cpp_define st_atimensec st_atime_nsec
+	cpp_define st_ctimensec st_ctime_nsec
+	cpp_define st_mtimensec st_mtime_nsec
+	HAVE_ST_MTIMENSEC=1
+fi
+ac_cppflags ST_MTIMENSEC
 
+
+#
+# Compiler: Praeprocessor (only if needed)
+#
 
 #
 # End of mirtoconf checks
@@ -1860,14 +2247,14 @@ $e $bi$me: Finished configuration testing, now producing output.$ao
 
 files=
 objs=
-sp=
+fsp=
 case $tcfn in
 a.exe|conftest.exe)
 	buildoutput=$tfn.exe
 	paxexe=$paxname.exe
 	cpioexe=$cpioname.exe
 	tarexe=$tarname.exe
-	add_cppflags -DMKSH_EXE_EXT
+	cpp_define MKSH_EXE_EXT 1
 	;;
 *)
 	buildoutput=$tfn
@@ -1892,16 +2279,16 @@ echo set -x >>Rebuild.sh
 for file in $SRCS; do
 	op=`echo x"$file" | sed 's/^x\(.*\)\.c$/\1./'`
 	test -f $file || file=$srcdir/$file
-	files="$files$sp$file"
-	echo "$CC $CFLAGS $CPPFLAGS $emitbc $file || exit 1" >>Rebuild.sh
+	files="$files$fsp$file"
+	echo "$CC $CFLAGS $Cg $CPPFLAGS $emitbc $file || exit 1" >>Rebuild.sh
 	if test $cm = dragonegg; then
 		echo "mv ${op}s ${op}ll" >>Rebuild.sh
 		echo "llvm-as ${op}ll || exit 1" >>Rebuild.sh
-		objs="$objs$sp${op}bc"
+		objs="$objs$fsp${op}bc"
 	else
-		objs="$objs$sp${op}o"
+		objs="$objs$fsp${op}o"
 	fi
-	sp=' '
+	fsp=$sp
 done
 case $cm in
 dragonegg|llvm)
@@ -1914,20 +2301,22 @@ dragonegg|llvm)
 	;;
 esac
 echo tcfn=$buildoutput >>Rebuild.sh
-echo "$CC $CFLAGS $LDFLAGS -o \$tcfn $lobjs $LIBS $ccpr" >>Rebuild.sh
+echo "$CC $CFLAGS $Cg $LDFLAGS -o \$tcfn $lobjs $LIBS $ccpr" >>Rebuild.sh
 echo "test -f \$tcfn || exit 1; $SIZE \$tcfn" >>Rebuild.sh
 echo "rm -f $paxexe $cpioexe $tarexe" >>Rebuild.sh
 echo "for x in $paxexe $cpioexe $tarexe; do" >>Rebuild.sh
-echo "  ln \$tcfn \$x || cp \$tcfn \$x || exit 1" >>Rebuild.sh
+echo "  ln \$tcfn \$x || cp -p \$tcfn \$x || exit 1" >>Rebuild.sh
 echo "done" >>Rebuild.sh
 if test $cm = makefile; then
 	extras='.linked/reallocarray.inc .linked/strlfun.inc .linked/strmode.inc .linked/strtonum.inc ar.h compat.h cpio.h extern.h ftimes.h pax.h tar.h'
 	cat >Makefrag.inc <<EOF
-# Makefile fragment for building paxmirabilis
+# Makefile fragment for building $whatlong $dstversion
 
 PROG=		$buildoutput
 # install as $paxexe and $cpioexe and $tarexe though
 MAN=		cpio.1 pax.1 tar.1
+SRCDIR=		$srcdir
+MF_DIR=		$curdisp
 SRCS=		$SRCS
 SRCS_FP=	$files
 OBJS_BP=	$objs
@@ -1935,13 +2324,13 @@ INDSRCS=	$extras
 NONSRCS_INST=	\$(MAN)
 NONSRCS_NOINST=	Build.sh Makefile Rebuild.sh
 CC=		$CC
-CPPFLAGS=	$CPPFLAGS
-CFLAGS=		$CFLAGS
+CPPFLAGS=	$CPPFLAGS -I'\$(MF_DIR)'
+CFLAGS=		$CFLAGS $Cg
 LDFLAGS=	$LDFLAGS
 LIBS=		$LIBS
 
 # not BSD make only:
-#VPATH=		$srcdir
+#VPATH=		\$(SRCDIR)
 #all: \$(PROG)
 #\$(PROG): \$(OBJS_BP)
 #	\$(CC) \$(CFLAGS) \$(LDFLAGS) -o \$@ \$(OBJS_BP) \$(LIBS)
@@ -1950,7 +2339,7 @@ LIBS=		$LIBS
 #	\$(CC) \$(CFLAGS) \$(CPPFLAGS) -c \$<
 
 # for BSD make only:
-#.PATH: $srcdir
+#.PATH: \$(SRCDIR)
 #.include <bsd.prog.mk>
 EOF
 	$e
@@ -1964,11 +2353,11 @@ if test $cm = combine; then
 		objs="$objs $file"
 	done
 	emitbc="-fwhole-program --combine"
-	v "$CC $CFLAGS $CPPFLAGS $LDFLAGS $emitbc $objs $LIBS $ccpr"
+	v "$CC $CFLAGS $Cg $CPPFLAGS $LDFLAGS $emitbc $objs $LIBS $ccpr"
 elif test 1 = $pm; then
 	for file in $SRCS; do
 		test -f $file || file=$srcdir/$file
-		v "$CC $CFLAGS $CPPFLAGS $emitbc $file" &
+		v "$CC $CFLAGS $Cg $CPPFLAGS $emitbc $file" &
 	done
 	wait
 else
@@ -1976,7 +2365,7 @@ else
 		test $cm = dragonegg && \
 		    op=`echo x"$file" | sed 's/^x\(.*\)\.c$/\1./'`
 		test -f $file || file=$srcdir/$file
-		v "$CC $CFLAGS $CPPFLAGS $emitbc $file" || exit 1
+		v "$CC $CFLAGS $Cg $CPPFLAGS $emitbc $file" || exit 1
 		if test $cm = dragonegg; then
 			v "mv ${op}s ${op}ll"
 			v "llvm-as ${op}ll" || exit 1
@@ -1990,11 +2379,17 @@ dragonegg|llvm)
 	;;
 esac
 tcfn=$buildoutput
-test $cm = combine || v "$CC $CFLAGS $LDFLAGS -o $tcfn $lobjs $LIBS $ccpr"
+case $cm in
+combine)
+	;;
+*)
+	v "$CC $CFLAGS $Cg $LDFLAGS -o $tcfn $lobjs $LIBS $ccpr"
+	;;
+esac
 test -f $tcfn || exit 1
 rm -f $paxexe $cpioexe $tarexe
 for x in $paxexe $cpioexe $tarexe; do
-	ln $tcfn $x || cp $tcfn $x || exit 1
+	ln $tcfn $x || cp -p $tcfn $x || exit 1
 done
 rm -rf mans
 mkdir mans
@@ -2012,7 +2407,7 @@ $e
 $e Installing the executable:
 $e "# $i -c -s -o root -g bin -m 555 $paxexe /bin/$paxexe"
 for x in $cpioexe $tarexe; do
-	$e "# ln /bin/$paxexe /bin/$x || cp /bin/$paxexe /bin/$x"
+	$e "# ln -f /bin/$paxexe /bin/$x || cp -fp /bin/$paxexe /bin/$x"
 done
 $e
 $e Installing the manual:
@@ -2044,8 +2439,8 @@ LDSTATIC			set this to '-static'; default unset
 LIBS				default empty; added after sources
 NOWARN				-Wno-error or similar
 NROFF				default: nroff
-TARGET_OS			default: $(uname -s || uname)
-TARGET_OSREV			[SCO] default: $(uname -r)
+TARGET_OS			default: `uname -s || uname`
+TARGET_OSREV			default: `uname -r` [only needed on some OS]
 
 ===== general format =====
 HAVE_STRLEN			ac_test
@@ -2055,7 +2450,6 @@ HAVE_CAN_FSTACKPROTECTORALL	ac_flags
 ==== cpp definitions ====
 DEBUG				don’t use in production, wants gcc
 MKSH_DONT_EMIT_IDSTRING		omit RCS IDs from binary
-MKSH_TYPEDEF_SSIZE_T		define to e.g. 'long' if your OS has no ssize_t
 PAX_SAFE_PATH			subprocess PATH, default "/bin:/usr/bin"
 SMALL				for the MirBSD installer/rescue system
 
@@ -2070,7 +2464,7 @@ $ sh Build.sh -r 2>&1 | tee log
 
 Install as /bin/pax and hardlink to /bin/cpio and /bin/tar or install as
 $prefix/bin/mirpax and hardlink to $prefix/bin/mir{cpio,tar}; install the
-manpages, if omitting the -r flag a catmanpages are made using $NROFF.
+manpages, if omitting the -r flag catmanpages are made using $NROFF.
 
 Add -tmir to install as mir{pax,cpio,tar} or -tpax for pax{,cpio,tar}.
 

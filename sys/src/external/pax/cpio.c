@@ -51,7 +51,7 @@
 #include "cpio.h"
 #include "extern.h"
 
-__RCSID("$MirOS: src/bin/pax/cpio.c,v 1.27 2019/02/24 01:49:17 tg Exp $");
+__RCSID("$MirOS: src/bin/pax/cpio.c,v 1.29 2024/08/17 23:33:51 tg Exp $");
 
 static int rd_nm(ARCHD *, int);
 static int rd_ln_nm(ARCHD *);
@@ -219,8 +219,8 @@ rd_ln_nm(ARCHD *arcn)
 	/*
 	 * check the length specified for bogus values
 	 */
-	if ((arcn->sb.st_size <= 0) ||
-	    (arcn->sb.st_size >= (off_t)sizeof(arcn->ln_name))) {
+	if (((off_t)arcn->sb.st_size <= 0) ||
+	    ((off_t)arcn->sb.st_size >= (off_t)sizeof(arcn->ln_name))) {
 		paxwarn(1, "cpio link name length is invalid: %" OT_FMT,
 		    arcn->sb.st_size);
 		return(-1);
@@ -308,19 +308,9 @@ cpio_rd(ARCHD *arcn, char *buf)
 		arcn->sb.st_mtime = INT_MAX;			/* XXX 2038 */
 	else
 		arcn->sb.st_mtime = val;
-#if HAVE_ST_MTIM
-	arcn->sb.st_mtim.tv_nsec = 0;
-#elif HAVE_ST_MTIMENSEC
-	arcn->sb.st_mtimensec = 0;
-#endif
-	/* inline st_timecpy variant, can’t use as-is */
-#if HAVE_ST_MTIM
-	arcn->sb.st_ctim = arcn->sb.st_atim = arcn->sb.st_mtim;
-#else
 	arcn->sb.st_ctime = arcn->sb.st_atime = arcn->sb.st_mtime;
 #if HAVE_ST_MTIMENSEC
-	arcn->sb.st_ctimensec = arcn->sb.st_atimensec = arcn->sb.st_mtimensec;
-#endif
+	arcn->sb.st_ctimensec = arcn->sb.st_atimensec = arcn->sb.st_mtimensec = 0;
 #endif
 	arcn->sb.st_size = (off_t)asc_ull(hd->c_filesize,sizeof(hd->c_filesize),
 	    OCT);
@@ -636,18 +626,9 @@ vcpio_rd(ARCHD *arcn, char *buf)
 	arcn->sb.st_uid = (uid_t)asc_ul(hd->c_uid, sizeof(hd->c_uid), HEX);
 	arcn->sb.st_gid = (gid_t)asc_ul(hd->c_gid, sizeof(hd->c_gid), HEX);
 	arcn->sb.st_mtime = (time_t)asc_ul(hd->c_mtime,sizeof(hd->c_mtime),HEX);
-#if HAVE_ST_MTIM
-	arcn->sb.st_mtim.tv_nsec = 0;
-#elif HAVE_ST_MTIMENSEC
-	arcn->sb.st_mtimensec = 0;
-#endif
-#if HAVE_ST_MTIM
-	arcn->sb.st_ctim = arcn->sb.st_atim = arcn->sb.st_mtim;
-#else
 	arcn->sb.st_ctime = arcn->sb.st_atime = arcn->sb.st_mtime;
 #if HAVE_ST_MTIMENSEC
-	arcn->sb.st_ctimensec = arcn->sb.st_atimensec = arcn->sb.st_mtimensec;
-#endif
+	arcn->sb.st_ctimensec = arcn->sb.st_atimensec = arcn->sb.st_mtimensec = 0;
 #endif
 	arcn->sb.st_size = (off_t)asc_ull(hd->c_filesize,
 	    sizeof(hd->c_filesize), HEX);
@@ -956,9 +937,9 @@ bcpio_id(char *blk, int size)
 	/*
 	 * check both normal and byte swapped magic cookies
 	 */
-	if (((u_short)SHRT_EXT(blk)) == MAGIC)
+	if (((unsigned short)SHRT_EXT(blk)) == MAGIC)
 		return(0);
-	if (((u_short)RSHRT_EXT(blk)) == MAGIC) {
+	if (((unsigned short)RSHRT_EXT(blk)) == MAGIC) {
 		if (!swp_head)
 			++swp_head;
 		return(0);
@@ -1023,18 +1004,9 @@ bcpio_rd(ARCHD *arcn, char *buf)
 			((off_t)(SHRT_EXT(hd->h_filesize_2)));
 		nsz = (int)(SHRT_EXT(hd->h_namesize));
 	}
-#if HAVE_ST_MTIM
-	arcn->sb.st_mtim.tv_nsec = 0;
-#elif HAVE_ST_MTIMENSEC
-	arcn->sb.st_mtimensec = 0;
-#endif
-#if HAVE_ST_MTIM
-	arcn->sb.st_ctim = arcn->sb.st_atim = arcn->sb.st_mtim;
-#else
 	arcn->sb.st_ctime = arcn->sb.st_atime = arcn->sb.st_mtime;
 #if HAVE_ST_MTIMENSEC
-	arcn->sb.st_ctimensec = arcn->sb.st_atimensec = arcn->sb.st_mtimensec;
-#endif
+	arcn->sb.st_ctimensec = arcn->sb.st_atimensec = arcn->sb.st_mtimensec = 0;
 #endif
 
 	/*
@@ -1138,7 +1110,8 @@ bcpio_wr(ARCHD *arcn)
 		hd->h_filesize_2[1] = CHR_WR_3(arcn->sb.st_size);
 		t_offt = (off_t)(SHRT_EXT(hd->h_filesize_1));
 		t_offt = (t_offt<<16) | ((off_t)(SHRT_EXT(hd->h_filesize_2)));
-		if (arcn->sb.st_size != t_offt) {
+		/* sb.st_size is off_t in POSIX but not dietlibc */
+		if ((off_t)arcn->sb.st_size != t_offt) {
 			paxwarn(1, "File is too large for %s format %s",
 			    "bcpio", arcn->org_name);
 			return (1);
