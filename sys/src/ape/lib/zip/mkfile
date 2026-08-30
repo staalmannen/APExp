@@ -1,0 +1,198 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+# libzip 1.11.4.
+#
+# Derived from the CMake build rather than run through it. lib's
+# add_library(zip ...) names 111 sources unconditionally; the rest are
+# chosen by CMakeLists.txt and every one of those choices is answered in
+# config.h beside this:
+#
+#   if(WIN32) ... else()	zip_source_file_stdio_named.c
+#				zip_random_unix.c
+#   HAVE_LIBBZ2			zip_algorithm_bzip2.c
+#   HAVE_LIBLZMA		zip_algorithm_xz.c
+#   HAVE_LIBZSTD		zip_algorithm_zstd.c
+#   HAVE_OPENSSL		zip_crypto_openssl.c
+#   HAVE_CRYPTO			zip_winzip_aes.c
+#				zip_source_winzip_aes_decode.c
+#				zip_source_winzip_aes_encode.c
+#
+# All of those are on: bz2, lzma, zstd, z and libressl are all built in
+# this tree, so libzip gets every compression method and Winzip AES
+# rather than stored and deflated only. A source is compiled exactly
+# when its HAVE_ is defined in config.h, and the two must agree -- the
+# same discipline as libressl's compat sources, and the same failure
+# mode if they drift: a link error at the end, or silently missing
+# support.
+#
+# zip_err_str.c is not upstream's. CMake generates it from zip.h and
+# zipint.h with cmake/GenerateZipErrorStrings.cmake; the copy here was
+# generated once by transcribing that script and lives beside this
+# mkfile. If the error tables in those two headers change, it must be
+# regenerated -- zip_error_strerror.c indexes _zip_err_str[] by error
+# code, so a stale table is an out-of-range read rather than a wrong
+# message.
+#
+# zipconf.h is generated too, but it is public: <zip.h> includes it, so
+# it is installed with zip.h into sys/include/ape.
+
+LIB=$APEXPROOT/$objtype/lib/ape/libzip.a
+BIN=$APEXPROOT/$objtype/bin/ape
+
+ZIPSRC=$APEXPROOT/sys/src/external/libzip
+
+OFILES=\
+	zip_add.$O\
+	zip_add_dir.$O\
+	zip_add_entry.$O\
+	zip_algorithm_bzip2.$O\
+	zip_algorithm_deflate.$O\
+	zip_algorithm_xz.$O\
+	zip_algorithm_zstd.$O\
+	zip_buffer.$O\
+	zip_close.$O\
+	zip_crypto_openssl.$O\
+	zip_delete.$O\
+	zip_dir_add.$O\
+	zip_dirent.$O\
+	zip_discard.$O\
+	zip_entry.$O\
+	zip_error.$O\
+	zip_error_clear.$O\
+	zip_error_get.$O\
+	zip_error_get_sys_type.$O\
+	zip_error_strerror.$O\
+	zip_error_to_str.$O\
+	zip_extra_field.$O\
+	zip_extra_field_api.$O\
+	zip_fclose.$O\
+	zip_fdopen.$O\
+	zip_file_add.$O\
+	zip_file_error_clear.$O\
+	zip_file_error_get.$O\
+	zip_file_get_comment.$O\
+	zip_file_get_external_attributes.$O\
+	zip_file_get_offset.$O\
+	zip_file_rename.$O\
+	zip_file_replace.$O\
+	zip_file_set_comment.$O\
+	zip_file_set_encryption.$O\
+	zip_file_set_external_attributes.$O\
+	zip_file_set_mtime.$O\
+	zip_file_strerror.$O\
+	zip_fopen.$O\
+	zip_fopen_encrypted.$O\
+	zip_fopen_index.$O\
+	zip_fopen_index_encrypted.$O\
+	zip_fread.$O\
+	zip_fseek.$O\
+	zip_ftell.$O\
+	zip_get_archive_comment.$O\
+	zip_get_archive_flag.$O\
+	zip_get_encryption_implementation.$O\
+	zip_get_file_comment.$O\
+	zip_get_name.$O\
+	zip_get_num_entries.$O\
+	zip_get_num_files.$O\
+	zip_hash.$O\
+	zip_io_util.$O\
+	zip_libzip_version.$O\
+	zip_memdup.$O\
+	zip_name_locate.$O\
+	zip_new.$O\
+	zip_open.$O\
+	zip_pkware.$O\
+	zip_progress.$O\
+	zip_random_unix.$O\
+	zip_realloc.$O\
+	zip_rename.$O\
+	zip_replace.$O\
+	zip_set_archive_comment.$O\
+	zip_set_archive_flag.$O\
+	zip_set_default_password.$O\
+	zip_set_file_comment.$O\
+	zip_set_file_compression.$O\
+	zip_set_name.$O\
+	zip_source_accept_empty.$O\
+	zip_source_begin_write.$O\
+	zip_source_begin_write_cloning.$O\
+	zip_source_buffer.$O\
+	zip_source_call.$O\
+	zip_source_close.$O\
+	zip_source_commit_write.$O\
+	zip_source_compress.$O\
+	zip_source_crc.$O\
+	zip_source_error.$O\
+	zip_source_file_common.$O\
+	zip_source_file_stdio.$O\
+	zip_source_file_stdio_named.$O\
+	zip_source_free.$O\
+	zip_source_function.$O\
+	zip_source_get_dostime.$O\
+	zip_source_get_file_attributes.$O\
+	zip_source_is_deleted.$O\
+	zip_source_layered.$O\
+	zip_source_open.$O\
+	zip_source_pass_to_lower_layer.$O\
+	zip_source_pkware_decode.$O\
+	zip_source_pkware_encode.$O\
+	zip_source_read.$O\
+	zip_source_remove.$O\
+	zip_source_rollback_write.$O\
+	zip_source_seek.$O\
+	zip_source_seek_write.$O\
+	zip_source_stat.$O\
+	zip_source_supports.$O\
+	zip_source_tell.$O\
+	zip_source_tell_write.$O\
+	zip_source_window.$O\
+	zip_source_winzip_aes_decode.$O\
+	zip_source_winzip_aes_encode.$O\
+	zip_source_write.$O\
+	zip_source_zip.$O\
+	zip_source_zip_new.$O\
+	zip_stat.$O\
+	zip_stat_index.$O\
+	zip_stat_init.$O\
+	zip_strerror.$O\
+	zip_string.$O\
+	zip_unchange.$O\
+	zip_unchange_all.$O\
+	zip_unchange_archive.$O\
+	zip_unchange_data.$O\
+	zip_utf-8.$O\
+	zip_winzip_aes.$O\
+
+HFILES=\
+	$ZIPSRC/lib/zip.h\
+	$ZIPSRC/lib/zipint.h\
+	$ZIPSRC/lib/compat.h\
+	config.h\
+	zipconf.h\
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+# -I. first: config.h, zipconf.h and the generated zip_err_str.c live
+# here, and lib/zipint.h includes "config.h" expecting the build
+# directory's copy rather than anything upstream ships.
+CFLAGS=-c -I. -I$ZIPSRC/lib\
+	-I$APEXPROOT/sys/src/external/libressl/include
+
+%.$O: $ZIPSRC/lib/%.c
+	$CC $CFLAGS $ZIPSRC/lib/$stem.c
+
+zip_err_str.$O: zip_err_str.c
+	$CC $CFLAGS zip_err_str.c
+
+# zip.h and zipconf.h are the public interface and are committed under
+# sys/include/ape rather than copied here at install time, because each
+# carries a #pragma lib that upstream's does not -- the same arrangement
+# as the libressl and curl headers. A program that includes <zip.h> then
+# links libzip.a without saying so, and libz.a, libbz2.a, liblzma.a,
+# libzstd.a and libressl.a with it, since the compression and crypto
+# backends above are compiled in and every caller needs them.
+#
+# If libzip is ever updated, sys/include/ape/zip.h has to be refreshed
+# from lib/zip.h and the pragmas put back.

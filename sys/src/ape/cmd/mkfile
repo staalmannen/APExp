@@ -75,6 +75,8 @@ _OPTIONAL_APPS=\
 # built first -- see the _TLS_LIBS note in ../lib/mkfile \
 	openssl\
 	curl\
+# libzip's three tools; needs ../lib/zip, which is built last there \
+	zip\
 
 DIRS=\
 	$_CORE_APPS\

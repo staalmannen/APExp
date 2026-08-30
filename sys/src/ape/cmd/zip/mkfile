@@ -1,0 +1,85 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+# libzip's three tools: zipcmp, zipmerge, ziptool.
+#
+# From src/CMakeLists.txt, which is short enough to quote whole:
+#
+#	check_function_exists(getopt HAVE_GETOPT)
+#	foreach(PROGRAM zipcmp zipmerge ziptool)
+#	  add_executable(${PROGRAM} ${PROGRAM}.c)
+#	  target_link_libraries(${PROGRAM} zip)
+#	  ...
+#	  if(NOT HAVE_GETOPT)
+#	    target_sources(${PROGRAM} PRIVATE getopt.c)
+#	  endif(NOT HAVE_GETOPT)
+#	endforeach()
+#	target_sources(zipcmp PRIVATE diff_output.c)
+#	target_link_libraries(zipcmp ${FTS_LIB} ZLIB::ZLIB)
+#
+# So: one source per program, plus diff_output.c for zipcmp only, plus
+# getopt.c for all three if the system has no getopt. libap has one --
+# ap/misc/getopt.c -- so src/getopt.c is not built.
+#
+# HAVE_GETOPT has to be defined for that to be consistent. It is not in
+# config.h.in, because upstream uses it only to pick the source file;
+# but all three tools also guard the header with it
+#
+#	#ifndef HAVE_GETOPT
+#	#include "getopt.h"
+#	#endif
+#
+# so without it they declare getopt themselves while linking libap's.
+# Worth avoiding here specifically: APE has its own <getopt.h> whose
+# prototype matches, but <bsd.h> declares "int getopt(int, char**,
+# char*)" without the consts, and a translation unit that picks up both
+# spellings is a redeclaration error rather than a warning.
+#
+# zipcmp also wants fts, which libap has in ap/misc/fts.c, so
+# HAVE_FTS_H is defined in the library's config.h and zipcmp walks
+# directory trees rather than taking the reduced path at zipcmp.c:295.
+#
+# mkmany rather than mkone: three separate programs, each with its own
+# main, which is exactly the case mkmany is for. The libraries come in
+# through the #pragma lib in <zip.h>, so no LIB is set here.
+#
+# In ../mkfile after openssl and curl, since ../../lib/zip is the last
+# library built there.
+
+TARG=zipcmp zipmerge ziptool
+BIN=$APEXPROOT/$objtype/bin/ape
+
+ZIPSRC=$APEXPROOT/sys/src/external/libzip
+
+OFILES=
+
+HFILES=
+
+<$APEXPROOT/sys/src/cmd/mkmany
+
+# The tools reach into the library's private headers -- ziptool.c
+# includes "zipint.h" for the internal source callbacks, and all three
+# need config.h and zipconf.h -- so they are compiled with the same
+# include set the library was, and -I on the library directory for the
+# generated config.h and zipconf.h.
+CFLAGS=-c -I$APE/lib/zip -I$ZIPSRC/lib -I$ZIPSRC/src -DHAVE_GETOPT
+
+$O.zipcmp: zipcmp.$O diff_output.$O
+	$LD -o $target $prereq
+
+%.$O: $ZIPSRC/src/%.c
+	$CC $CFLAGS $ZIPSRC/src/$stem.c
+
+# man/ carries each page three times: .mdoc is the source, .man is the
+# same page converted to the older man macros, and .html is for the web.
+# Plan 9's man(1) wants the man macros, so .man is the one to install.
+install:V:
+	cp $ZIPSRC/man/zipcmp.man $APEXPROOT/sys/man/1/zipcmp
+	cp $ZIPSRC/man/zipmerge.man $APEXPROOT/sys/man/1/zipmerge
+	cp $ZIPSRC/man/ziptool.man $APEXPROOT/sys/man/1/ziptool
+
+nuke:V:
+	rm -f $APEXPROOT/sys/man/1/zipcmp
+	rm -f $APEXPROOT/sys/man/1/zipmerge
+	rm -f $APEXPROOT/sys/man/1/ziptool
