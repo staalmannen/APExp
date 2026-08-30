@@ -194,18 +194,33 @@ CFLAGS=-c -I$PAXSRC\
 %.$O: $PAXSRC/%.c
 	$CC $CFLAGS $PAXSRC/$stem.c
 
-# Installs pax itself as well as the second name, rather than leaving
-# the first half to mkone's install rule -- see the note in ../zip/mkfile.
-# cp of the same file twice is harmless.
-#
 # tar is not installed; see the note at the top.
-install:V:	$O.out
-	cp $O.out $BIN/pax
+# Adding to a target the include already gives a recipe to needs care.
+# mk merges two rules for one target only when it can: if both carry a
+# recipe and their prerequisites differ, it refuses --
+#
+#	mk: ambiguous recipes for install:
+#	    install <-(.../mkmany:40)-
+#	    install <-(mkfile:85)- 6.zipcmp <-...
+#
+# and if both carry a recipe with the same prerequisites, one silently
+# wins. mkone's install is prerequisite-only so a second recipe is safe
+# there (cmd/awk relies on it), but mkmany's install and every nuke and
+# clean do carry one.
+#
+# So the rule below adds a prerequisite and no recipe, and the work goes
+# in a private target. That is correct whichever way mk would have gone,
+# and it leaves the include's own recipe running.
+install:V:	paxextra
+
+paxextra:V:	$O.out
 	cp $O.out $BIN/cpio
 	cp $PAXSRC/pax.1 $APEXPROOT/sys/man/1/pax
 	cp $PAXSRC/cpio.1 $APEXPROOT/sys/man/1/cpio
 
-nuke:V:
+nuke:V:	paxunman
+
+paxunman:V:
 	rm -f $BIN/cpio
 	rm -f $APEXPROOT/sys/man/1/pax
 	rm -f $APEXPROOT/sys/man/1/cpio
