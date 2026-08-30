@@ -1,0 +1,144 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+# paxmirabilis (MirCPIO): pax(1) and cpio(1).
+#
+# One binary, installed twice. options.c:337 selects the personality
+# from the *suffix* of argv[0] --
+#
+#	if (n >= 3 && !strcmp(argv[0] + (n - 3), NM_TAR))	tar
+#	else if (n >= 4 && !strcmp(argv[0] + (n - 4), NM_CPIO))	cpio
+#	else							pax
+#
+# -- so /$objtype/bin/ape/cpio runs in cpio mode and .../pax in pax
+# mode, with no argument or environment needed. Upstream does this with
+# symlinks (Makefile: LINKS+= ${BINDIR}/pax ${BINDIR}/cpio); Plan 9 has
+# no symlinks, so install copies the binary.
+#
+# tar is deliberately not installed: GNU tar is already in ../tar and
+# is the better one. tar.c is still compiled, because it is not the tar
+# *program* -- it implements the ustar and old-tar archive formats,
+# which pax and cpio both read and write. Leaving it out would remove
+# "pax -x ustar", not a duplicate binary.
+#
+# Derived from Build.sh rather than run through it: that is mirtoconf,
+# a shell autoconfigurator, and every answer it computes is either a
+# -D below or a source file chosen by it. Build.sh's four conditional
+# sources are
+#
+#	addsrcs '!' HAVE_UGID_FROM_UG	cache.c
+#	addsrcs '!' HAVE_REALLOCARRAY	reallocarray.c
+#	addsrcs '!' HAVE_STRMODE	strmode.c
+#	addsrcs '!' HAVE_STRTONUM	strtonum.c
+#
+# libap has reallocarray, so that one is left out; it has neither
+# strmode nor strtonum nor the BSD uid_from_user/user_from_uid pair, so
+# the other three are built. The rule is the same as for libressl: a
+# compat source is compiled exactly when the matching HAVE_ is not
+# defined, and the two must agree.
+#
+# autoconf.h is not needed. compat.h includes it only under
+# #ifdef MKSH_USE_AUTOCONF_H, which is not defined here, so the -D list
+# below is the whole configuration.
+
+TARG=pax
+BIN=$APEXPROOT/$objtype/bin/ape
+
+PAXSRC=$APEXPROOT/sys/src/external/pax
+
+OFILES=\
+	ar.$O\
+	ar_io.$O\
+	ar_subs.$O\
+	buf_subs.$O\
+	cache.$O\
+	compat.$O\
+	cpio.$O\
+	file_subs.$O\
+	ftree.$O\
+	gen_subs.$O\
+	getoldopt.$O\
+	options.$O\
+	pat_rep.$O\
+	pax.$O\
+	sel_subs.$O\
+	strmode.$O\
+	strtonum.$O\
+	tables.$O\
+	tar.$O\
+	tty_subs.$O\
+
+HFILES=\
+	$PAXSRC/ar.h\
+	$PAXSRC/compat.h\
+	$PAXSRC/cpio.h\
+	$PAXSRC/extern.h\
+	$PAXSRC/ftimes.h\
+	$PAXSRC/pax.h\
+	$PAXSRC/tar.h\
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+# What Build.sh would have decided here, checked one at a time against
+# sys/include/ape and sys/src/ape/lib/ap rather than assumed.
+#
+# The three worth a note:
+#
+#   HAVE_LCHOWN=1	<unistd.h> has "#define lchown chown", which is
+#			right rather than a fudge: Plan 9 has no symbolic
+#			links, so there is never a link to chown through.
+#   HAVE_ST_MTIMENSEC=0	APE's struct stat has st_mtim (a timespec), not
+#			the older st_mtimensec, so compat.h's st_timecmp
+#			compares whole seconds. Sub-second mtime
+#			comparison is lost; pax uses it only to decide
+#			whether an archive member is newer than a file on
+#			disk, and Plan 9's file servers do not keep
+#			nanoseconds anyway.
+#   HAVE_CAN_UCBINTS=0	no u_int32_t in <sys/types.h>. Irrelevant while
+#			HAVE_CAN_INTTYPES is 1 -- compat.h reads it only
+#			when int32_t is missing -- but wrong is wrong.
+HAVEFLAGS=\
+	-DHAVE_ATTRIBUTE_BOUNDED=0 -DHAVE_ATTRIBUTE_FORMAT=0\
+	-DHAVE_ATTRIBUTE_NONNULL=0 -DHAVE_ATTRIBUTE_NORETURN=0\
+	-DHAVE_ATTRIBUTE_PURE=0 -DHAVE_ATTRIBUTE_UNUSED=0\
+	-DHAVE_ATTRIBUTE_USED=0\
+	-DHAVE_SYS_TIME_H=1 -DHAVE_TIME_H=1 -DHAVE_BOTH_TIME_H=1\
+	-DHAVE_SYS_MKDEV_H=0 -DHAVE_SYS_MTIO_H=0\
+	-DHAVE_SYS_RESOURCE_H=1 -DHAVE_SYS_SYSMACROS_H=1\
+	-DHAVE_GRP_H=1 -DHAVE_PATHS_H=0 -DHAVE_STDINT_H=1\
+	-DHAVE_STRINGS_H=1 -DHAVE_UTIME_H=1\
+	-DHAVE_UTMP_H=0 -DHAVE_UTMPX_H=0 -DHAVE_VIS_H=0\
+	-DHAVE_CAN_INTTYPES=1 -DHAVE_CAN_UCBINTS=0 -DHAVE_CAN_ULONG=1\
+	-DHAVE_DPRINTF=1 -DHAVE_FCHMODAT=1 -DHAVE_FCHOWNAT=1\
+	-DHAVE_FUTIMENS=1 -DHAVE_FUTIMES=1 -DHAVE_LINKAT=1\
+	-DHAVE_UTIMENSAT=1 -DHAVE_UTIMES=1\
+	-DHAVE_LCHMOD=0 -DHAVE_LCHOWN=1 -DHAVE_LUTIMES=0\
+	-DHAVE_PLEDGE=0 -DHAVE_SETPGENT=0\
+	-DHAVE_REALLOCARRAY=1 -DHAVE_STRLCPY=1 -DHAVE_STRLCAT=1\
+	-DHAVE_STRMODE=0 -DHAVE_STRTONUM=0\
+	-DHAVE_UG_FROM_UGID=0 -DHAVE_UGID_FROM_UG=0\
+	-DHAVE_OFFT_LONG=0 -DHAVE_TIMET_LONG=0 -DHAVE_TIMET_LARGE=1\
+	-DHAVE_ST_MTIMENSEC=0
+
+# PAX_SAFE_PATH is what pax puts in PATH before running a -F filter or
+# a compression program (ar_io.c:1321). Upstream's default is
+# "/bin:/usr/bin"; here the APE binaries are what a filter would want.
+CFLAGS=-c -I$PAXSRC\
+	-DPAX_SAFE_PATH="/bin:/$objtype/bin/ape"\
+	$HAVEFLAGS
+
+%.$O: $PAXSRC/%.c
+	$CC $CFLAGS $PAXSRC/$stem.c
+
+# mkone's install puts $O.out at $BIN/pax; this adds the second name and
+# the two manual pages. tar.1 is not installed -- see the note above.
+install:V:	$O.out
+	cp $O.out $BIN/cpio
+	cp $PAXSRC/pax.1 $APEXPROOT/sys/man/1/pax
+	cp $PAXSRC/cpio.1 $APEXPROOT/sys/man/1/cpio
+
+nuke:V:
+	rm -f $BIN/cpio
+	rm -f $APEXPROOT/sys/man/1/pax
+	rm -f $APEXPROOT/sys/man/1/cpio

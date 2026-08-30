@@ -198,8 +198,8 @@ main(void)
 	sha3_keccakf(real);
 	check("real permutation of the all-zero state", real, once, 25);
 
-	printf("\n--- 2. does the copy below reproduce it? (if not, nothing\n"
-	       "---    after this means anything)\n");
+	printf("\n--- 2. the copy used for the bisect must agree with the\n"
+	       "---    real one, or nothing after this means anything\n");
 	memset(st, 0, sizeof(st));
 	probe_keccakf(st, 24, STOP_NONE);
 	if (memcmp(st, real, sizeof(st)) == 0)
@@ -224,9 +224,17 @@ main(void)
 		}
 	}
 	if (first_bad < 0) {
-		printf("PASS  all 24 rounds -- which cannot happen while check 1\n"
-		       "      fails, so something is inconsistent\n");
-		return ++failures;
+		/*
+		 * The ordinary outcome now that 6c is fixed. It is only a
+		 * contradiction if check 1 failed and yet every round is
+		 * right, which would mean the fault is outside the rounds.
+		 */
+		if (failures)
+			printf("FAIL  every round is correct and yet check 1 is\n"
+			       "      not -- the fault is outside the round loop\n");
+		else
+			printf("PASS  all 24 rounds\n");
+		return failures;
 	}
 	printf("rounds 1 to %d are correct; round %d is the first wrong one\n",
 	    first_bad - 1, first_bad);

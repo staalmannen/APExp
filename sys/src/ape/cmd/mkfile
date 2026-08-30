@@ -45,6 +45,9 @@ _OPTIONAL_APPS=\
 	xz\
 	zstd\
 	tar\
+# pax builds one binary and installs it as both pax and cpio; tar is \
+# not installed from it, GNU tar above is the one \
+	pax\
 # languages \
 	lua\
 	tclsh\
@@ -72,6 +75,8 @@ _OPTIONAL_APPS=\
 # built first -- see the _TLS_LIBS note in ../lib/mkfile \
 	openssl\
 	curl\
+# libzip's three tools; needs ../lib/zip, which is built last there \
+	zip\
 
 DIRS=\
 	$_CORE_APPS\

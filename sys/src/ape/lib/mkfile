@@ -42,11 +42,18 @@ _TLS_LIBS=\
 	libressl\
 	curl\
 
+# libzip compiles in every compression backend and the Winzip AES
+# crypto, so it comes after z, bz2, lzma, zstd (in _OPTIONAL_LIBS) and
+# after libressl above. Sequential loop again, so this has to be last.
+_ZIP_LIBS=\
+	zip\
+
 DIRS=\
 	$_CORE_LIBS\
 	$_CORE_APP_DEPENDENCIES\
 	$_OPTIONAL_LIBS\
 	$_TLS_LIBS\
+	$_ZIP_LIBS\
 
 
 none:V:
