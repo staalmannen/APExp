@@ -20,6 +20,35 @@
 #include "zipconf.h"
 #endif
 
+/*
+ * Not in config.h.in, and not decoration.
+ *
+ * compat.h reads this file at its line 39 and then, at line 82, does
+ *
+ *	#ifndef O_CLOEXEC
+ *	#define O_CLOEXEC 0
+ *	#endif
+ *
+ * for the sake of Windows. Nothing above that point includes <fcntl.h>,
+ * so on a system that does have O_CLOEXEC the guard still fires unless
+ * some earlier header dragged fcntl.h in. Here one eventually does --
+ * APE's <stdio.h> includes <stdio_impl.h>, which includes <fcntl.h> --
+ * but not until zip.h asks for stdio, by which time compat.h has
+ * already decided O_CLOEXEC is 0:
+ *
+ *	fcntl.h:21 ... zip.h:80 ... zipint.h:51 zip_add.c:36
+ *	  Macro redefinition of O_CLOEXEC
+ *
+ * Including it here is the fix rather than a workaround: it gives
+ * compat.h the information it is testing for, before it tests. Every
+ * file in libzip reaches compat.h, so one include covers all of them.
+ *
+ * The same reasoning would apply to compat.h's EOPNOTSUPP and EOVERFLOW
+ * fallbacks, but those are safe: it includes <errno.h> itself, at line
+ * 65, before testing them.
+ */
+#include <fcntl.h>
+
 /* zip_fdopen(). Needs fdopen and dup, both of which APE has. */
 #define ENABLE_FDOPEN
 
