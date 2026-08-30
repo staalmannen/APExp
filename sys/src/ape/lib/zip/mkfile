@@ -27,6 +27,18 @@ APE=$APEXPROOT/sys/src/ape
 # mode if they drift: a link error at the end, or silently missing
 # support.
 #
+# zip_err_str.$O is in the object list above even though its source is
+# not in sys/src/external: CMake names it
+# ${CMAKE_CURRENT_BINARY_DIR}/zip_err_str.c in add_library, a generated
+# path rather than a plain file name, which is exactly why the first
+# pass at this list dropped it. Without it the library builds and the
+# tools fail at the link:
+#
+#	_zip_err_str: not defined
+#	_zip_err_str_count: not defined
+#	_zip_err_details: not defined
+#	_zip_err_details_count: not defined
+#
 # zip_err_str.c is not upstream's. CMake generates it from zip.h and
 # zipint.h with cmake/GenerateZipErrorStrings.cmake; the copy here was
 # generated once by transcribing that script and lives beside this
@@ -59,6 +71,7 @@ OFILES=\
 	zip_dirent.$O\
 	zip_discard.$O\
 	zip_entry.$O\
+	zip_err_str.$O\
 	zip_error.$O\
 	zip_error_clear.$O\
 	zip_error_get.$O\
