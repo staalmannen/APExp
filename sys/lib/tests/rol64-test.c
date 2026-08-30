@@ -20,13 +20,25 @@
  * not in doubt. What is not yet known is which property of the call
  * site triggers it.
  *
- * That is what this file is for. Each case changes one thing:
+ * That is what this file is for. Each case changes one thing, and the
+ * first run through it already ruled most of them out:
  *
- *	how the result is used	assigned, or an operand of ^
- *	the shift		a literal constant, or a variable
- *	the function		static inline, static, or extern
- *	the arguments		a scalar, or an array element with a
- *				computed index
+ *	how the result is used	assigned, or an operand of ^	 both pass
+ *	the shift		a literal, or a variable	 both pass
+ *	the function		static inline, static, extern	 all pass
+ *	a 64-bit return with no shifting in it			 passes
+ *	the rotation written out, no call			 passes
+ *	the arguments		scalars				 pass
+ *				array elements, computed index	 FAIL
+ *
+ * So it is not the call, the XOR, the shift or the inline keyword. It
+ * is the array operands -- and the one thing that distinguishes them on
+ * amd64 is that the index expressions contain %, which needs AX and DX,
+ * the same registers a call returns its result in. The block of cases
+ * that follows separates the possibilities: division in the argument,
+ * in the other operand of the ^, in both, / instead of %, * instead of
+ * %, the division hoisted into a variable, and the whole shape with no
+ * call at all.
  *
  * The pattern of PASS and FAIL across them names the trigger. Every
  * case computes the same rotation of the same value -- the one theta
@@ -143,6 +155,67 @@ main(void)
 	check("r = other ^ ((v << 1) | (v >> 63))", r, OTHER ^ WANT);
 	r = (v << 1) | (v >> 63);
 	check("r = (v << 1) | (v >> 63)", r, WANT);
+
+	printf("\n--- narrowing: which part of the array operand matters?\n"
+	       "--- (on amd64 %% and / need AX and DX, which is also where a\n"
+	       "--- call returns its result -- so these separate a plain\n"
+	       "--- array index from one that needs a division)\n");
+	{
+		int k = vi + 1;		/* 1, but opaque */
+		int m = vi + 4;		/* 4, but opaque */
+
+		bc[0] = v;
+		bc[1] = v;
+		bc[2] = v;
+		bc[3] = other;
+		bc[4] = other;
+
+		/* Plain indices, no division anywhere. */
+		r = bc[m] ^ rol_inline(bc[k], 1);
+		check("bc[m] ^ rol(bc[k], 1)            -- no division",
+		    r, OTHER ^ WANT);
+
+		/* Division only in the call's argument. */
+		r = other ^ rol_inline(bc[(i + 1) % 5], 1);
+		check("other ^ rol(bc[(i+1)%5], 1)      -- % in the argument",
+		    r, OTHER ^ WANT);
+
+		/* Division only in the other operand of the ^. */
+		r = bc[(i + 4) % 5] ^ rol_inline(bc[k], 1);
+		check("bc[(i+4)%5] ^ rol(bc[k], 1)      -- % in the left operand",
+		    r, OTHER ^ WANT);
+
+		/* Division in both, which is what theta has. */
+		r = bc[(i + 4) % 5] ^ rol_inline(bc[(i + 1) % 5], 1);
+		check("bc[(i+4)%5] ^ rol(bc[(i+1)%5], 1) -- % in both",
+		    r, OTHER ^ WANT);
+
+		/* / rather than %, to see whether it is division as such. */
+		r = bc[m] ^ rol_inline(bc[(i + 5) / 5], 1);
+		check("bc[m] ^ rol(bc[(i+5)/5], 1)      -- / in the argument",
+		    r, OTHER ^ WANT);
+
+		/* A multiply instead: same shape, but no fixed registers. */
+		r = bc[m] ^ rol_inline(bc[(i + 1) * 1], 1);
+		check("bc[m] ^ rol(bc[(i+1)*1], 1)      -- * in the argument",
+		    r, OTHER ^ WANT);
+
+		/* Division outside the call, result in a plain variable, to
+		   show the division itself computes the right index. */
+		{
+			int idx = (i + 1) % 5;
+
+			r = bc[m] ^ rol_inline(bc[idx], 1);
+			check("bc[m] ^ rol(bc[idx], 1)          -- % hoisted out",
+			    r, OTHER ^ WANT);
+		}
+
+		/* And with no call at all, to confirm the call is needed. */
+		r = bc[(i + 4) % 5] ^ ((bc[(i + 1) % 5] << 1)
+		    | (bc[(i + 1) % 5] >> 63));
+		check("bc[(i+4)%5] ^ (shift written out) -- % but no call",
+		    r, OTHER ^ WANT);
+	}
 
 	printf("\n--- array operands with computed indices, as in theta\n");
 	bc[0] = v;
