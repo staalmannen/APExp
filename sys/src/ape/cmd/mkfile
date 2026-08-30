@@ -45,6 +45,9 @@ _OPTIONAL_APPS=\
 	xz\
 	zstd\
 	tar\
+# pax builds one binary and installs it as both pax and cpio; tar is \
+# not installed from it, GNU tar above is the one \
+	pax\
 # languages \
 	lua\
 	tclsh\
