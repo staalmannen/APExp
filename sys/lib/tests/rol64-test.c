@@ -13,37 +13,37 @@
  *
  *	st[j] = crypto_rol_u64(t0, sha3_keccakf_rotc[i]);
  *
- * is correct, so it is not the function: it is something about this
- * call site. Modelling the permutation with only the theta call's
- * result masked to 32 bits reproduces all 25 lanes of the observed
- * wrong state after 24 rounds -- a 1600-bit match, so the diagnosis is
- * not in doubt. What is not yet known is which property of the call
- * site triggers it.
+ * is correct, so it was never the function: it was the call site.
  *
- * That is what this file is for. Each case changes one thing, and the
- * first run through it already ruled most of them out:
+ * FIXED in 6c/cgen.c. cgen spills AX, CX or DX where the instruction it
+ * is about to emit can only use that register -- a divide or modulo
+ * needs AX and DX, a variable shift needs CX -- and the save was
  *
- *	how the result is used	assigned, or an operand of ^	 both pass
- *	the shift		a literal, or a variable	 both pass
- *	the function		static inline, static, extern	 all pass
- *	a 64-bit return with no shifting in it			 passes
- *	the rotation written out, no call			 passes
- *	the arguments		scalars				 pass
- *				array elements, computed index	 FAIL
+ *	regsalloc(&nod2, n);	-- slot sized from n, the divide
+ *	gmove(&nod, &nod2);	-- so a 32-bit save
  *
- * So it is not the call, the XOR, the shift or the inline keyword. It
- * is the array operands -- and the one thing that distinguishes them on
- * amd64 is that the index expressions contain %, which needs AX and DX,
- * the same registers a call returns its result in. The block of cases
- * that follows separates the possibilities: division in the argument,
- * in the other operand of the ^, in both, / instead of %, * instead of
- * %, the division hoisted into a variable, and the whole shape with no
- * call at all.
+ * regsalloc takes its size from the node it is given, and n is the
+ * divide. A 32-bit operation therefore spilled four bytes of a register
+ * that might hold eight. What is live in AX at that point belongs to an
+ * earlier part of the expression and has nothing to do with the type of
+ * the operation being generated. OFUNC has complex == FNX, so cgen's
+ * OXOR case evaluates the call first and it lands in AX; the 32-bit
+ * "% 5" beside it then saved AX four bytes wide.
  *
- * The pattern of PASS and FAIL across them names the trigger. Every
- * case computes the same rotation of the same value -- the one theta
- * actually got wrong, 0x0000300000200200 rotated left by 1 -- so any
- * FAIL is the compiler and nothing else.
+ * Now a regression test. The cases below found the trigger by changing
+ * one thing at a time, and the pattern was:
+ *
+ *	% in the call's argument		passed
+ *	% in the other operand of the ^		FAILED
+ *	% in the other operand, but no call	passed
+ *	% hoisted into a variable first		passed
+ *	/ or * instead of %			passed
+ *
+ * so the trigger is <expression containing / or %> op <64-bit function
+ * call>, with the division in the *other* operand: an argument is
+ * evaluated before the call, so nothing 64-bit is live across it yet.
+ * All of that is kept because it is what makes a future regression
+ * legible rather than just red.
  *
  * Nothing here is Keccak-specific and nothing here is unusual C. A
  * 64-bit function result feeding an XOR is ordinary enough that this is

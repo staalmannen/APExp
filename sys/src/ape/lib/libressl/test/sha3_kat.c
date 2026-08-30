@@ -32,7 +32,13 @@
  * hashes with SHA-256 and SHA-384 -- which is why TLS 1.2 and
  * -groups X25519 both work.
  *
- * The source is not at fault. This file's logic was checked by
+ * FIXED: the cause was a 6c code-generation bug, not anything in
+ * sha3.c -- cgen spilled AX four bytes wide for the 32-bit "% 5" in
+ * theta while a 64-bit call result was live in it. See
+ * sys/lib/tests/rol64-test.c and the note in CLAUDE.md. This file is
+ * now a regression test.
+ *
+ * The source was never at fault. This file's logic was checked by
  * transcribing sha3.c's permutation and sponge and running the vectors
  * below against it under gcc, where every case passes. So the fault is
  * in what pcc makes of that source, and this test exists to say which
