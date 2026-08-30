@@ -102,6 +102,7 @@ OFILES=\
 	_fpending.$O\
 	stdio_ext.$O\
 	error.$O\
+	unlocked.$O\
 
 
 
