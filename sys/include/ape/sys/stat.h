@@ -32,7 +32,7 @@ struct	stat {
 
 #define	S__MASK		     0170000
 #define S_ISLNK(m)	(((m)&S__MASK) == 0120000)
-#define S_ISSOCK(m)	(((m)&S__MASK) == 0010000)
+#define S_ISSOCK(m)	(((m)&S__MASK) == 0140000)
 #define S_ISREG(m)	(((m)&S__MASK) == 0100000)
 #define S_ISDIR(m)	(((m)&S__MASK) == 0040000)
 #define S_ISCHR(m)	(((m)&S__MASK) == 0020000)
@@ -152,7 +152,28 @@ struct	stat {
 #define S_IFREG 0100000
 #define S_IFIFO 0010000
 #define S_IFLNK 0120000
-#define S_IFSOCK S_IFIFO
+/*
+ * 0140000 is the conventional S_IFSOCK, and it is free under S__MASK
+ * (0170000). It used to be defined as S_IFIFO, on the reasoning that
+ * Plan 9 has no Unix-domain sockets in the file system so nothing can
+ * ever be one. Both halves of that were wrong in practice:
+ *
+ *   - S_ISSOCK() was then true for every FIFO, which is a wrong answer
+ *     rather than a missing one. Code that asks "is this a socket?"
+ *     about a pipe got yes.
+ *   - The two names being the same value makes any switch over file
+ *     types ill-formed, and archivers all have one:
+ *
+ *       ftree.c:458 duplicate cases in switch 4096
+ *
+ *     from pax's switch (S_IFMT & sb.st_mode) having both a case
+ *     S_IFIFO and a case S_IFSOCK. GNU tar, cpio and find have the
+ *     same shape.
+ *
+ * With a distinct value S_ISSOCK() is simply never true here, which is
+ * the accurate statement, and the switches compile.
+ */
+#define S_IFSOCK 0140000
 
 #ifdef __cplusplus
 extern "C" {
