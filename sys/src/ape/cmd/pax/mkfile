@@ -146,6 +146,34 @@ HAVEFLAGS=\
 # MKSH_MAYBE_KENCC only affects the compiler name in a version string
 # (Build.sh:1090), but it is the right one.
 #
+# MBSDPORT_H is the one add_cppflags Build.sh applies unconditionally,
+# at line 578:
+#
+#	add_cppflags -DMBSDPORT_H=\\\"compat.h\\\"
+#
+# Most sources include "compat.h" themselves, but the three standalone
+# compat ones -- strmode.c, strtonum.c, reallocarray.c -- do
+#
+#	#ifdef MBSDPORT_H
+#	#include MBSDPORT_H
+#	#endif
+#
+# instead, so without it they get no __RCSID and the line after it is a
+# stray string literal:
+#
+#	strmode.c:39 syntax error, last name: "<string>"
+#
+# Harmless for the files that include compat.h directly: its line 33 is
+# #undef MBSDPORT_H, and its own guard stops a second inclusion.
+#
+# _PATH_TMP is where pax puts its temporary file when TMPDIR is unset
+# (pax.c:268). It comes from <paths.h>, which APE does not have --
+# HAVE_PATHS_H is 0 above -- and pax uses it unguarded, the same
+# oversight as UT_NAMESIZE. options.c does guard its companion
+# _PATH_DEFTAPE, at line 69, which is why only this one is missing.
+# The trailing slash is BSD's spelling and makes no difference here:
+# pax.c strips trailing slashes from it two lines later.
+#
 # Build.sh has a Plan9 block at line 865 and the rest of it is
 # deliberately NOT copied. It adds
 #
@@ -160,6 +188,7 @@ HAVEFLAGS=\
 CFLAGS=-c -I$PAXSRC\
 	-DPAX_SAFE_PATH="/bin:/$objtype/bin/ape"\
 	-DUT_NAMESIZE=32 -DMKSH_MAYBE_KENCC\
+	-DMBSDPORT_H="compat.h" -D_PATH_TMP="/tmp/"\
 	$HAVEFLAGS
 
 %.$O: $PAXSRC/%.c
