@@ -41,8 +41,27 @@ APE=$APEXPROOT/sys/src/ape
 # directory trees rather than taking the reduced path at zipcmp.c:295.
 #
 # mkmany rather than mkone: three separate programs, each with its own
-# main, which is exactly the case mkmany is for. The libraries come in
-# through the #pragma lib in <zip.h>, so no LIB is set here.
+# main, which is exactly the case mkmany is for.
+#
+# LIB names the archives explicitly rather than leaving them to the
+# #pragma lib in <zip.h>. The pragma is real -- sys/include/ape/zip.h
+# carries it -- but these three do
+#
+#	#include "zip.h"
+#
+# in quotes, and -I$ZIPSRC/lib is on their path because they also need
+# zipint.h and compat.h, so the quoted form finds upstream's lib/zip.h
+# and never reaches the installed copy. Nothing then records a library,
+# and the link fails on every entry point:
+#
+#	compare_zip: undefined: zip_close in compare_zip
+#	list_zip: undefined: zip_open in list_zip
+#	...
+#
+# Order is the link order -- 6l walks the list appending as it goes --
+# so libzip.a comes first and the backends it was compiled with follow.
+# zlib is named for two reasons: libzip needs it for deflate, and
+# zipcmp.c includes <zlib.h> itself.
 #
 # In ../mkfile after openssl and curl, since ../../lib/zip is the last
 # library built there.
@@ -51,6 +70,13 @@ TARG=zipcmp zipmerge ziptool
 BIN=$APEXPROOT/$objtype/bin/ape
 
 ZIPSRC=$APEXPROOT/sys/src/external/libzip
+
+LIB=$APEXPROOT/$objtype/lib/ape/libzip.a\
+	$APEXPROOT/$objtype/lib/ape/libz.a\
+	$APEXPROOT/$objtype/lib/ape/libbz2.a\
+	$APEXPROOT/$objtype/lib/ape/liblzma.a\
+	$APEXPROOT/$objtype/lib/ape/libzstd.a\
+	$APEXPROOT/$objtype/lib/ape/libressl.a
 
 OFILES=
 
@@ -65,7 +91,7 @@ HFILES=
 # generated config.h and zipconf.h.
 CFLAGS=-c -I$APE/lib/zip -I$ZIPSRC/lib -I$ZIPSRC/src -DHAVE_GETOPT
 
-$O.zipcmp: zipcmp.$O diff_output.$O
+$O.zipcmp: zipcmp.$O diff_output.$O $LIB
 	$LD -o $target $prereq
 
 %.$O: $ZIPSRC/src/%.c
