@@ -145,7 +145,25 @@ CFLAGS=-c -I$SSLSRC/include -I$SSLSRC/include/compat\
 # certs/ is the -CApath hash directory. It stays empty: filling it is
 # certhash(1)'s job, and certhash needs symlinks, which Plan 9 does not
 # have -- see the note on certhash_win.c above.
-install:V:
+# Adding to a target the include already gives a recipe to needs care.
+# mk merges two rules for one target only when it can: if both carry a
+# recipe and their prerequisites differ, it refuses --
+#
+#	mk: ambiguous recipes for install:
+#	    install <-(.../mkmany:40)-
+#	    install <-(mkfile:85)- 6.zipcmp <-...
+#
+# and if both carry a recipe with the same prerequisites, one silently
+# wins. mkone's install is prerequisite-only so a second recipe is safe
+# there (cmd/awk relies on it), but mkmany's install and every nuke and
+# clean do carry one.
+#
+# So the rule below adds a prerequisite and no recipe, and the work goes
+# in a private target. That is correct whichever way mk would have gone,
+# and it leaves the include's own recipe running.
+install:V:	ssldata
+
+ssldata:V:
 	mkdir -p $APEXPROOT/sys/lib/ape/ssl/certs
 	cp $SSLSRC/cert.pem $APEXPROOT/sys/lib/ape/ssl/cert.pem
 	cp $SSLSRC/openssl.cnf $APEXPROOT/sys/lib/ape/ssl/openssl.cnf
@@ -154,7 +172,9 @@ install:V:
 
 # Only the three files this installs. certs/ is left alone: it is where
 # a user would put their own, and nothing here put anything in it.
-nuke:V:
+nuke:V:	sslundata
+
+sslundata:V:
 	rm -f $APEXPROOT/sys/lib/ape/ssl/cert.pem
 	rm -f $APEXPROOT/sys/lib/ape/ssl/openssl.cnf
 	rm -f $APEXPROOT/sys/lib/ape/ssl/x509v3.cnf

@@ -133,12 +133,26 @@ keccakf_probe.$O: keccakf_probe.c
 
 V=$SSLSRC/tests
 
-# Named "test" because that is the target mksyslib invokes here. mkmany
-# defines one too -- it looks for a ./test below this directory, finds
-# none and does nothing -- so both recipes run, as they do wherever this
-# tree redefines a target after the include (cmd/awk and cmd/gettext do
-# the same with install).
-test:V: $PROGS
+# Named "test" because that is the target mksyslib invokes in here.
+# Adding to a target the include already gives a recipe to needs care.
+# mk merges two rules for one target only when it can: if both carry a
+# recipe and their prerequisites differ, it refuses --
+#
+#	mk: ambiguous recipes for install:
+#	    install <-(.../mkmany:40)-
+#	    install <-(mkfile:85)- 6.zipcmp <-...
+#
+# and if both carry a recipe with the same prerequisites, one silently
+# wins. mkone's install is prerequisite-only so a second recipe is safe
+# there (cmd/awk relies on it), but mkmany's install and every nuke and
+# clean do carry one.
+#
+# So the rule below adds a prerequisite and no recipe, and the work goes
+# in a private target. That is correct whichever way mk would have gone,
+# and it leaves the include's own recipe running.
+test:V:	runtests
+
+runtests:V:	$PROGS
 	echo '---- the Keccak permutation alone'
 	$O.keccakf_probe
 	echo '---- SHA-3 and SHAKE around it'

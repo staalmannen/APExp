@@ -71,25 +71,35 @@ $O.zipcmp: zipcmp.$O diff_output.$O
 %.$O: $ZIPSRC/src/%.c
 	$CC $CFLAGS $ZIPSRC/src/$stem.c
 
-# Written to do the whole job -- build the three programs, copy them,
-# then the manual pages -- rather than relying on mkmany's install rule
-# also running. Two rules for one target is established practice in this
-# tree (cmd/awk, cmd/gettext, cmd/openssl all do it and all work), but
-# depending on it here buys nothing: the copies are idempotent and this
-# way the rule is readable on its own.
-#
 # man/ carries each page three times: .mdoc is the source, .man is the
 # same page converted to the older man macros, and .html is for the web.
 # Plan 9's man(1) wants the man macros, so .man is the one to install.
-install:V:	$PROGS
-	cp $O.zipcmp $BIN/zipcmp
-	cp $O.zipmerge $BIN/zipmerge
-	cp $O.ziptool $BIN/ziptool
+# Adding to a target the include already gives a recipe to needs care.
+# mk merges two rules for one target only when it can: if both carry a
+# recipe and their prerequisites differ, it refuses --
+#
+#	mk: ambiguous recipes for install:
+#	    install <-(.../mkmany:40)-
+#	    install <-(mkfile:85)- 6.zipcmp <-...
+#
+# and if both carry a recipe with the same prerequisites, one silently
+# wins. mkone's install is prerequisite-only so a second recipe is safe
+# there (cmd/awk relies on it), but mkmany's install and every nuke and
+# clean do carry one.
+#
+# So the rule below adds a prerequisite and no recipe, and the work goes
+# in a private target. That is correct whichever way mk would have gone,
+# and it leaves the include's own recipe running.
+install:V:	zipman
+
+zipman:V:	$PROGS
 	cp $ZIPSRC/man/zipcmp.man $APEXPROOT/sys/man/1/zipcmp
 	cp $ZIPSRC/man/zipmerge.man $APEXPROOT/sys/man/1/zipmerge
 	cp $ZIPSRC/man/ziptool.man $APEXPROOT/sys/man/1/ziptool
 
-nuke:V:
+nuke:V:	zipunman
+
+zipunman:V:
 	rm -f $APEXPROOT/sys/man/1/zipcmp
 	rm -f $APEXPROOT/sys/man/1/zipmerge
 	rm -f $APEXPROOT/sys/man/1/ziptool
