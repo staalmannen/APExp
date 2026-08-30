@@ -3,12 +3,63 @@
 /* ,x/^(print|prtree)\(/i/\/\/ */
 int castup(Type*, Type*);
 
+/*
+ * Save and restore a fixed register across code that must have it.
+ *
+ * The paths below spill AX, CX or DX because the instruction about to
+ * be generated can only use that register: a divide or modulo needs AX
+ * and DX, a variable shift needs CX. What is live in the register at
+ * that point belongs to some earlier, already-evaluated part of the
+ * expression, and its type has nothing to do with the type of the
+ * operation being generated -- so the save has to be the width of the
+ * register, not the width of the operation.
+ *
+ * They used to save it with regsalloc(&nod, n), which takes its size
+ * from n, the divide or shift. A 32-bit operation therefore spilled
+ * four bytes of a register that might hold eight, and the top half was
+ * lost. LibreSSL's Keccak is where this surfaced:
+ *
+ *	t0 = bc[(i + 4) % 5] ^ crypto_rol_u64(bc[(i + 1) % 5], 1);
+ *
+ * cgen evaluates the call first, into AX, then needs AX for the 32-bit
+ * "% 5" -- and saved it four bytes wide, so crypto_rol_u64's uint64_t
+ * result came back with bits 32..63 cleared. Every SHA-3 digest was
+ * wrong, which broke ML-KEM, which broke every TLS 1.3 handshake
+ * offering X25519MLKEM768.
+ *
+ * regwide makes a full-width alias of the register node; regspill
+ * allocates a full-width slot and saves it there. Restoring is a plain
+ * gmove back through the wide alias. The narrow node is left alone,
+ * because the callers still need it at the operation's own type for
+ * the result.
+ *
+ * Covered by sys/lib/tests/rol64-test.c.
+ */
+static void
+regwide(Node *w, Node *r)
+{
+	*w = *r;
+	w->type = types[TVLONG];
+	w->etype = TVLONG;
+}
+
+static void
+regspill(Node *slot, Node *w, Node *n)
+{
+	Node t;
+
+	t = *n;
+	t.type = types[TVLONG];
+	regsalloc(slot, &t);
+	gmove(w, slot);
+}
+
 void
 cgen(Node *n, Node *nn)
 {
 	Node *l, *r, *t;
 	Prog *p1;
-	Node nod, nod1, nod2, nod3, nod4;
+	Node nod, nod1, nod2, nod3, nod4, nodw;
 	int o, hardleft;
 	long v, curs;
 	vlong c;
@@ -218,11 +269,11 @@ cgen(Node *n, Node *nn)
 		 * get nod to be D_CX
 		 */
 		if(nodreg(&nod, nn, D_CX)) {
-			regsalloc(&nod1, n);
-			gmove(&nod, &nod1);
+			regwide(&nodw, &nod);
+			regspill(&nod1, &nodw, n);
 			cgen(n, &nod);		/* probably a bug */
 			gmove(&nod, nn);
-			gmove(&nod1, &nod);
+			gmove(&nod1, &nodw);
 			break;
 		}
 		reg[D_CX]++;
@@ -401,8 +452,8 @@ cgen(Node *n, Node *nn)
 		 * get nod1 to be D_DX
 		 */
 		if(nodreg(&nod, nn, D_AX)) {
-			regsalloc(&nod2, n);
-			gmove(&nod, &nod2);
+			regwide(&nodw, &nod);
+			regspill(&nod2, &nodw, n);
 			v = reg[D_AX];
 			reg[D_AX] = 0;
 
@@ -418,13 +469,13 @@ cgen(Node *n, Node *nn)
 			} else
 				cgen(n, nn);
 
-			gmove(&nod2, &nod);
+			gmove(&nod2, &nodw);
 			reg[D_AX] = v;
 			break;
 		}
 		if(nodreg(&nod1, nn, D_DX)) {
-			regsalloc(&nod2, n);
-			gmove(&nod1, &nod2);
+			regwide(&nodw, &nod1);
+			regspill(&nod2, &nodw, n);
 			v = reg[D_DX];
 			reg[D_DX] = 0;
 
@@ -440,7 +491,7 @@ cgen(Node *n, Node *nn)
 			} else
 				cgen(n, nn);
 
-			gmove(&nod2, &nod1);
+			gmove(&nod2, &nodw);
 			reg[D_DX] = v;
 			break;
 		}
@@ -511,12 +562,12 @@ cgen(Node *n, Node *nn)
 		 * get nod to be D_CX
 		 */
 		if(nodreg(&nod, nn, D_CX)) {
-			regsalloc(&nod1, n);
-			gmove(&nod, &nod1);
+			regwide(&nodw, &nod);
+			regspill(&nod1, &nodw, n);
 			cgen(n, &nod);
 			if(nn != Z)
 				gmove(&nod, nn);
-			gmove(&nod1, &nod);
+			gmove(&nod1, &nodw);
 			break;
 		}
 		reg[D_CX]++;
@@ -733,8 +784,8 @@ cgen(Node *n, Node *nn)
 		 * get nod1 to be D_DX
 		 */
 		if(nodreg(&nod, nn, D_AX)) {
-			regsalloc(&nod2, n);
-			gmove(&nod, &nod2);
+			regwide(&nodw, &nod);
+			regspill(&nod2, &nodw, n);
 			v = reg[D_AX];
 			reg[D_AX] = 0;
 
@@ -750,13 +801,13 @@ cgen(Node *n, Node *nn)
 			} else
 				cgen(n, nn);
 
-			gmove(&nod2, &nod);
+			gmove(&nod2, &nodw);
 			reg[D_AX] = v;
 			break;
 		}
 		if(nodreg(&nod1, nn, D_DX)) {
-			regsalloc(&nod2, n);
-			gmove(&nod1, &nod2);
+			regwide(&nodw, &nod1);
+			regspill(&nod2, &nodw, n);
 			v = reg[D_DX];
 			reg[D_DX] = 0;
 
@@ -772,7 +823,7 @@ cgen(Node *n, Node *nn)
 			} else
 				cgen(n, nn);
 
-			gmove(&nod2, &nod1);
+			gmove(&nod2, &nodw);
 			reg[D_DX] = v;
 			break;
 		}
