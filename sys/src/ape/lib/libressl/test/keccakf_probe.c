@@ -1,7 +1,17 @@
 /*
  * keccakf_probe.c -- find the miscompiled step of Keccak-f[1600].
  *
- * Where this stands. sha3_kat.c showed every 64-bit primitive Keccak is
+ * FIXED. The answer was a 6c code-generation bug: cgen spills AX for
+ * the 32-bit "% 5" in theta's bc[(i + 4) % 5], and sized the spill slot
+ * from the divide rather than from the register, so the 64-bit
+ * crypto_rol_u64 result live in AX lost its top half. Round 3 was the
+ * first round wrong because rounds 1 and 2 act on a state too sparse
+ * for the lost bits to matter. See sys/lib/tests/rol64-test.c.
+ *
+ * Kept as a regression test, and as the shape of a working method: to
+ * find a miscompiled step in a diffusing function, stop it early.
+ *
+ * How it went. sha3_kat.c showed every 64-bit primitive Keccak is
  * built from to be correct -- crypto_rol_u64 at the amounts it uses,
  * both shifts by a size_t, the byte/word union -- and every SHA-3 and
  * SHAKE vector to be wrong. The first version of this file then showed
