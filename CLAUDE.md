@@ -723,6 +723,66 @@ divide unsigned. `UINTMAX_MAX / 2` came out 0, so GNU tar's
 fired its `#error`. cpp no longer relies on the implicit conversion.
 Any other `signed_lvalue op= (unsigned)x` in the tree is still wrong.
 
+### Spilling a fixed register saved only the operation's width (FIXED)
+
+`6c/cgen.c` spills AX, CX or DX where the instruction it is about to emit
+can only use that register — a divide or modulo needs AX and DX, a
+variable shift needs CX. The save was
+
+```c
+if(nodreg(&nod, nn, D_AX)) {
+        regsalloc(&nod2, n);      /* slot sized from n, the divide */
+        gmove(&nod, &nod2);       /* ... so a 32-bit save */
+```
+
+`regsalloc` takes its size from the node handed to it, and `n` is the
+divide or the shift. So a **32-bit** operation spilled **four** bytes of a
+register that might be holding eight, and the top half was lost. What is
+live in AX at that moment belongs to some earlier part of the
+expression and has nothing to do with the type of the operation being
+generated.
+
+Found in LibreSSL's Keccak:
+
+```c
+t0 = bc[(i + 4) % 5] ^ crypto_rol_u64(bc[(i + 1) % 5], 1);
+```
+
+`cgen`'s `OXOR` case evaluates the call first, because `OFUNC` has
+`complex == FNX`, and it lands in AX. Then `bc[(i + 4) % 5]` needs AX for
+the 32-bit `% 5`, spills it four bytes wide, and `crypto_rol_u64`'s
+`uint64_t` result comes back with bits 32..63 cleared. The *identical*
+call two lines below, `st[j] = crypto_rol_u64(t0, rotc[i])`, is correct —
+no division beside it.
+
+The trigger is exactly `<expression containing / or %> op <64-bit
+function call>`, and `%` has to be in the **other operand**, not in the
+call's arguments: an argument is evaluated before the call, so nothing
+64-bit is live yet.
+
+Fixed with `regwide()`/`regspill()` at the head of `cgen.c`: the save
+uses a full-width alias of the register and an 8-byte slot, and the
+narrow node is left alone because callers still need it at the
+operation's own type for the result. Six sites — AX and DX in
+`ODIV`/`OMOD` and in the `OAS*` forms, CX in both shift cases.
+
+Only `6c` has this. `8c` is 32-bit, so a one-register save cannot
+truncate; the RISC back-ends need no fixed register for division, and
+their one `regsalloc(&nod, n)` is `OFUNC` with a discarded result, where
+`n` *is* the call and its type is right.
+
+What it cost: every SHA-3 digest was wrong, so ML-KEM was wrong, so
+every TLS 1.3 handshake offering X25519MLKEM768 failed at the first
+encrypted record with `bad decrypt` — while TLS 1.2 and
+`-groups X25519` worked, because nothing else in a handshake uses
+Keccak. **Nothing about this is Keccak-specific.** A 64-bit value live
+across a 32-bit `%` is ordinary C, so anything built before this fix is
+suspect and wants rebuilding.
+
+Covered by `sys/lib/tests/rol64-test.c`, which isolates the trigger
+one variable at a time, and by the Keccak vectors in
+`sys/src/ape/lib/libressl/test/`.
+
 ### #include nesting limit was 20
 
 `cpp/include.c` had the depth guard written as a bare `20`. That is a guard
