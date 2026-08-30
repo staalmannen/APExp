@@ -44,7 +44,7 @@ _OPTIONAL_APPS=\
 	unrar\
 	xz\
 	zstd\
-#	tar\
+	tar\
 # languages \
 	lua\
 	tclsh\

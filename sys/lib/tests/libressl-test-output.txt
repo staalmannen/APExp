@@ -1,0 +1,50 @@
+pcc -o 6.keccakf_probe keccakf_probe.6
+echo '---- the Keccak permutation alone'
+6.keccakf_probe
+echo '---- SHA-3 and SHAKE around it'
+6.sha3_kat
+echo '---- keygen (first: encap and decap both build on it)'
+6.mlkem_tests mlkem768_keygen_tests ../../../../../../sys/src/external/libressl/tests/mlkem768_keygen_tests.txt
+6.mlkem_tests mlkem768_nist_keygen_tests ../../../../../../sys/src/external/libressl/tests/mlkem768_nist_keygen_tests.txt
+echo '---- encap'
+6.mlkem_tests mlkem768_encap_tests ../../../../../../sys/src/external/libressl/tests/mlkem768_encap_tests.txt
+echo '---- decap (the direction a TLS client performs)'
+6.mlkem_tests mlkem768_decap_tests ../../../../../../sys/src/external/libressl/tests/mlkem768_decap_tests.txt
+6.mlkem_tests mlkem768_nist_decap_tests ../../../../../../sys/src/external/libressl/tests/mlkem768_nist_decap_tests.txt
+echo '---- round trip'
+6.mlkem_unittest
+---- the Keccak permutation alone
+--- Keccak-f[1600] on its own, no padding or sponge
+FAIL  permutation of the all-zero state (first difference at lane 0)
+  got  0x8d03b163946307f8 0x34682290f3055412 0x38bd91b46fdab00e 0x3791db8ac176f067 0x53c40a138a5359b8
+  got      0x951f6468e572f417 0xe6c87d966e0f3a84 0x47f1735d9e04a986 0x2f3b41f9669d15f6 0xc2fae7f751d96f83
+  got      0x34c8b240aeaea43d 0x1253743ea976c0c9 0x4c25fbd979c45f60 0xcb5f397604baa262 0xb21fb77743cbcfa3
+  got      0x1621240a380f6027 0x9996b44c14933dc3 0x9a2e0cd13bec69e6 0x2f0f8e8ee79251a4 0xa239c38d6fa96c68
+  got      0xeb3828b6205b1d49 0xa2eab4a319eba69f 0xc835b13a8b79dc92 0xe98465a19f4bd0a0 0xc8853e47ef415334
+  want 0xf1258f7940e1dde7 0x84d5ccf933c0478a 0xd598261ea65aa9ee 0xbd1547306f80494d 0x8b284e056253d057
+  want     0xff97a42d7f8e6fd4 0x90fee5a0a44647c4 0x8c5bda0cd6192e76 0xad30a6f71b19059c 0x30935ab7d08ffc64
+  want     0xeb5aa93f2317d635 0xa9a6e6260d712103 0x81a57c16dbcf555f 0x43b831cd0347c826 0x01f22f1a11a5569f
+  want     0x05e5635a21d9ae61 0x64befef28cc970f2 0x613670957bc46611 0xb87c5a554fd00ecb 0x8c3ee88a1ccf32c8
+  want     0x940c7922ae3a2614 0x1841f924a2c509e4 0x16f53526e70465c2 0x75f644e97f30a13b 0xeaf1ff7b5ceca249
+FAIL  permutation applied twice (first difference at lane 0)
+  got  0x6359102cf44d0424 0xd97979652b1e1efe 0xc38f86026c4e4da8 0xab8d878eb3e0357e 0x66134fd739ef7ad9
+  want 0x2d5c954df96ecb3c 0x6a332cd07057b56d 0x093d8d1270d76b6c 0x8a20d9b25569d094 0x4f9c4f99e5e7f156
+
+--- two more states, for diagnosis only; there is no
+--- expected value here, the numbers themselves are the
+--- point
+  lane0=1  0xec9e08765f3d84d2 0xa98dff9cd3264675 0xec347228699b6b27 0xd2bb52206e06d385 0x68048042f9e09b57
+  lane0=1      0xb27a4d6e4fcaced7 0xeb8551eca66a6766 0xa31aa3e223b31f01 0xaa13a8eb4ee3c910 0x804433a8422e57ed
+  lane0=1      0x82901bbfa447c3cf 0xc86b28a228457e24 0xd6e0d34a5a132f95 0xdb25fd201197d4c7 0xc5d08197eb744bd9
+  lane0=1      0xecd8f450c4922ada 0x965fdd1ecce1ec13 0x5162456ffce5f175 0x7a8919cf55977b24 0xdec2d3cbac76a944
+  lane0=1      0x1caad391edd60f1e 0x7a580d02ab0411e8 0x1f4118adbe3c7f51 0x1e5471721415451f 0x95a500980fa0112f
+  all lanes 0x100000001  0x54ef4450189c5a10 0x339ff3bcd1883aae 0xe9884193586b7226 0x5293586b11c4df1c 0xf9dc5a3c296cabf3
+  all lanes 0x100000001      0x3f9809c73eb0ce62 0xf412eaf98e42a9bd 0xdc147e6a925b523b 0xd5ac187579bbfe60 0xed6615b197dda166
+  all lanes 0x100000001      0xc3263dd1271d4851 0x72cd28a3e6b9a0d8 0xea1f30ad833b8c1a 0x16a90187793d9867 0x4eccb45033eda4d6
+  all lanes 0x100000001      0x85bc2ee7406ca94e 0x813a6b1bc063219e 0x1f23726e7c92acda 0x4ea87d0f2a6ed420 0x9153426e8493a1dc
+  all lanes 0x100000001      0xd3002c9703757bb4 0xddabd45b1be70a6b 0xd7c65212d39aa446 0xa56bbaeccabf8496 0x3bf4d814ca03b7a6
+
+2 failure(s) -- the permutation is wrong, so the
+sponge above it is not the place to look.
+mk: echo '---- the ...  : exit status=rc 7545: 6.keccakf_probe 7547: 2
+mk: if(test -d ./test) ...  : exit status=mk 7539: error
