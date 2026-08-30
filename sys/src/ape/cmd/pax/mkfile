@@ -124,8 +124,42 @@ HAVEFLAGS=\
 # PAX_SAFE_PATH is what pax puts in PATH before running a -F filter or
 # a compression program (ar_io.c:1321). Upstream's default is
 # "/bin:/usr/bin"; here the APE binaries are what a filter would want.
+#
+# UT_NAMESIZE is the width pax prints user and group names at in its
+# listing, gen_subs.c:132:
+#
+#	fprintf(fp, "%s%2u %-*.*s %-*.*s ", f_mode, nlink,
+#	    NAME_WIDTH, UT_NAMESIZE, name_uid(...),
+#
+# It normally comes from <utmp.h> or <utmpx.h>, and pax uses it there
+# without a guard even though both headers are optional. APE has
+# neither -- utmp is a login-records database Plan 9 does not keep --
+# so it has to be supplied:
+#
+#	gen_subs.c:132 name not declared: UT_NAMESIZE
+#
+# 32 is what Build.sh gives the one OS it hits this on (MidnightBSD,
+# line 806) and what glibc's <utmp.h> uses. It is a display width, not
+# a limit on anything stored, and 8 -- the traditional BSD value --
+# would truncate names in the listing.
+#
+# MKSH_MAYBE_KENCC only affects the compiler name in a version string
+# (Build.sh:1090), but it is the right one.
+#
+# Build.sh has a Plan9 block at line 865 and the rest of it is
+# deliberately NOT copied. It adds
+#
+#	-D_POSIX_SOURCE -D_LIMITS_EXTENSION -D_BSD_EXTENSION -D_SUSV2_SOURCE
+#
+# which is right for stock APE and wrong here: APExp's <features.h>
+# defaults to _BSD_SOURCE and _XOPEN_SOURCE 700 when *no* feature macro
+# is set, and defining _POSIX_SOURCE suppresses exactly that, narrowing
+# what the headers expose. _LIMITS_EXTENSION and _SUSV2_SOURCE are
+# read by no header in this tree, and _BSD_EXTENSION is only needed by
+# <select.h>, which pax does not include.
 CFLAGS=-c -I$PAXSRC\
 	-DPAX_SAFE_PATH="/bin:/$objtype/bin/ape"\
+	-DUT_NAMESIZE=32 -DMKSH_MAYBE_KENCC\
 	$HAVEFLAGS
 
 %.$O: $PAXSRC/%.c
