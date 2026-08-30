@@ -194,9 +194,13 @@ CFLAGS=-c -I$PAXSRC\
 %.$O: $PAXSRC/%.c
 	$CC $CFLAGS $PAXSRC/$stem.c
 
-# mkone's install puts $O.out at $BIN/pax; this adds the second name and
-# the two manual pages. tar.1 is not installed -- see the note above.
+# Installs pax itself as well as the second name, rather than leaving
+# the first half to mkone's install rule -- see the note in ../zip/mkfile.
+# cp of the same file twice is harmless.
+#
+# tar is not installed; see the note at the top.
 install:V:	$O.out
+	cp $O.out $BIN/pax
 	cp $O.out $BIN/cpio
 	cp $PAXSRC/pax.1 $APEXPROOT/sys/man/1/pax
 	cp $PAXSRC/cpio.1 $APEXPROOT/sys/man/1/cpio
