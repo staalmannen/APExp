@@ -9,8 +9,13 @@
 #include <stddef.h>
 #include <sys/types.h>
 
-/* Include musl-compatible stdio internal definitions */
-#include <stdio_impl.h>
+/*
+ * struct _IO_FILE only. This used to be <stdio_impl.h>, musl's internal
+ * header, which also pulls errno, unistd, fcntl and pthread in -- so
+ * every file including <stdio.h> got every O_ and F_ macro with it.
+ * See the note in <_iofile.h>.
+ */
+#include <_iofile.h>
 
 /* FILE is now the musl struct _IO_FILE */
 typedef struct _IO_FILE FILE;

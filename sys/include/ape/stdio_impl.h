@@ -2,7 +2,11 @@
 #define _STDIO_IMPL_H
 
 #include <stdio.h>
-/* APExp: replaced #include "syscall.h" with the POSIX headers we actually need */
+#include <_iofile.h>	/* struct _IO_FILE; <stdio.h> gets it from here too */
+/* APExp: replaced #include "syscall.h" with the POSIX headers we actually need.
+ * These stay: the implementation wants them. They no longer reach every
+ * file that includes <stdio.h>, because that now includes <_iofile.h>
+ * rather than this header -- see the note there. */
 #include <stdint.h>
 #include <stddef.h>
 #include <errno.h>
@@ -30,34 +34,6 @@
 #define F_SVB 64
 #define F_APP 128
 
-struct _IO_FILE {
-	unsigned flags;
-	unsigned char *rpos, *rend;
-	int (*close)(struct _IO_FILE *);
-	unsigned char *wend, *wpos;
-	unsigned char *mustbezero_1;
-	unsigned char *wbase;
-	size_t (*read)(struct _IO_FILE *, unsigned char *, size_t);
-	size_t (*write)(struct _IO_FILE *, const unsigned char *, size_t);
-	off_t (*seek)(struct _IO_FILE *, off_t, int);
-	unsigned char *buf;
-	size_t buf_size;
-	struct _IO_FILE *prev, *next;
-	int fd;
-	int pipe_pid;
-	long lockcount;
-	int mode;
-	volatile intptr_t lock;
-	int lbf;
-	void *cookie;
-	off_t off;
-	char *getln_buf;
-	void *mustbezero_2;
-	unsigned char *shend;
-	off_t shlim, shcnt;
-	struct _IO_FILE *prev_locked, *next_locked;
-	struct __locale_struct *locale;
-};
 
 extern struct _IO_FILE *volatile __stdin_used;
 extern struct _IO_FILE *volatile __stdout_used;
