@@ -15,10 +15,10 @@
  * DT_* constants, which are small integers unrelated to the S_IF* bits,
  * so the two have to be mapped rather than aliased.
  *
- * S_ISFIFO and S_ISSOCK are the same test in APE's <sys/stat.h> -- both
- * are mode 0010000 -- so a FIFO and a socket cannot be told apart here.
- * FIFO wins, since mkfifo() can create one and Plan 9 has no Unix-domain
- * sockets in the filesystem.
+ * There is no DT_SOCK arm. S_IFSOCK has its own value in APE's
+ * <sys/stat.h> now, but Plan 9 has no Unix-domain sockets in the file
+ * system, so nothing here ever has that mode and the arm would be dead.
+ * A FIFO, which mkfifo() can create, does reach DT_FIFO.
  */
 static unsigned char
 _dtype(mode_t m)

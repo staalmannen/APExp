@@ -72,10 +72,11 @@ struct	dirent {
  * unknown mode reports DT_UNKNOWN and DT_WHT maps back through the same
  * shift gnulib uses -- which is what gnulib's own DTTOIF does too.
  *
- * S_ISFIFO and S_ISSOCK are the same test in <sys/stat.h>, both mode
- * 0010000, so the FIFO arm is reached first and a socket cannot be
- * distinguished -- the same limitation readdir() has when it fills
- * d_type. DTTOIF has it in the other direction: S_IFSOCK is S_IFIFO.
+ * The DT_SOCK arms below are correct but unreachable in practice:
+ * S_IFSOCK has its own value in <sys/stat.h>, distinct from S_IFIFO,
+ * and Plan 9 has no Unix-domain sockets in the file system for anything
+ * to carry it. They used to be the same value, which made S_ISSOCK()
+ * true for every FIFO and IFTODT report DT_FIFO for both.
  */
 #ifndef IFTODT
 #define IFTODT(mode) \
