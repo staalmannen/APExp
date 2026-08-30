@@ -28,10 +28,31 @@ $O.msgfmt: msgfmt.$O $PARSEROBJS
 $O.msgmerge: msgmerge.$O
 	$CC -o $O.msgmerge msgmerge.$O $PARSEROBJS
 
-install:V:
+# The two shell scripts that go beside the binaries. This adds a
+# prerequisite to install and puts the work in a private target, rather
+# than giving install a second recipe.
+#
+# It used to be a second recipe, and mkmany's install has one too:
+#
+#	install:V:
+#		for (i in $TARG)
+#			mk $MKFLAGS $i.install
+#
+# Two recipes for one target with the same prerequisites -- both empty
+# here -- and one of them silently wins. This one did, so "mk install"
+# wrote the two scripts and never installed msgfmt or msgmerge. mkone's
+# install is prerequisite-only, which is why cmd/awk gets away with the
+# same shape; mkmany's is not.
+#
+# (When the prerequisites differ instead, mk refuses outright with
+# "ambiguous recipes for install" rather than choosing. Either way, a
+# prerequisite and a private target is the arrangement that works.)
+install:V:	gettextscripts
+
+gettextscripts:V:
 	cat $GETTEXTSRC/src/autopoint.in | sed 's,@datadir@,"/sys/lib/ape",' > $APEXPROOT/rc/bin/ape/autopoint
 	cp $GETTEXTSRC/src/xgettext.sh $APEXPROOT/rc/bin/ape/xgettext
-	chmod +x $APEXPROOT/rc/bin/ape/*
+	chmod +x $APEXPROOT/rc/bin/ape/autopoint $APEXPROOT/rc/bin/ape/xgettext
 
 
 
