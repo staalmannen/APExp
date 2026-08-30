@@ -145,6 +145,33 @@ extern void flockfile(FILE *);
 extern void funlockfile(FILE *);
 extern int ftrylockfile(FILE *);
 
+/*
+ * The _unlocked family, in stdio/unlocked.c. The first four are POSIX;
+ * the rest are GNU's, and are here because portable code uses them --
+ * bash's input path is written entirely in terms of them.
+ *
+ * Four of these used to exist as macros in stdio_impl.h, which this
+ * header included, so programs saw them by accident and libap never
+ * defined them. See the note at the top of unlocked.c for why they are
+ * functions and not macros now.
+ */
+extern int getc_unlocked(FILE *);
+extern int putc_unlocked(int, FILE *);
+extern int getchar_unlocked(void);
+extern int putchar_unlocked(int);
+
+extern int fgetc_unlocked(FILE *);
+extern int fputc_unlocked(int, FILE *);
+extern int feof_unlocked(FILE *);
+extern int ferror_unlocked(FILE *);
+extern void clearerr_unlocked(FILE *);
+extern int fileno_unlocked(FILE *);
+extern int fflush_unlocked(FILE *);
+extern size_t fread_unlocked(void *, size_t, size_t, FILE *);
+extern size_t fwrite_unlocked(const void *, size_t, size_t, FILE *);
+extern char *fgets_unlocked(char *, int, FILE *);
+extern int fputs_unlocked(const char *, FILE *);
+
 #ifdef __cplusplus
 }
 #endif
