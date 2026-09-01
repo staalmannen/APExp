@@ -80,6 +80,9 @@ struct opflags {
 	U16 op_spare:1;
 	U8 op_flags;
 	U8 op_private;
+	/* stands in for op_sibparent, which in perl precedes the flags;
+	   here it only has to be a pointer beside them */
+	int *op_sibparent_test;
 };
 
 /* The same widths in an int unit, which is the case kencc has always
@@ -112,8 +115,7 @@ main(void)
 	int n, bad;
 	char detail[128];
 
-	printf("sizeof(struct opflags) = %d (2 bit field bytes + 2 U8"
-	       " is 4)\n", (int)sizeof(struct opflags));
+	printf("sizeof(struct opflags) = %d\n", (int)sizeof(struct opflags));
 	printf("sizeof(struct intflags) = %d\n", (int)sizeof(struct intflags));
 	printf("sizeof(struct charflags) = %d\n", (int)sizeof(struct charflags));
 
@@ -253,6 +255,80 @@ main(void)
 		    (int)p->op_type, (int)p->op_moresib, (int)p->op_folded);
 		check("through a pointer", p->op_type == 33 &&
 		    p->op_moresib == 1 && p->op_folded == 1, detail);
+	}
+
+	/*
+	 * 8. The value of an assignment to a bit field.
+	 *
+	 * C99 6.5.16p3: the value of an assignment expression is the
+	 * value of the left operand after the assignment, converted to
+	 * its type. For a bit field that is the stored value, so
+	 * (o->op_moresib = 1) is 1.
+	 *
+	 * perl's op.h carries a note saying kencc gets this wrong --
+	 * "bitfield-assign expression value is unreliable (always 0)" --
+	 * and works around it in OpMAYBESIB_set. These cases say whether
+	 * that is still true and how far it goes, because the macro as
+	 * originally written is
+	 *
+	 *	((o)->op_sibparent = ((o)->op_moresib = cBOOL(sib))
+	 *	                     ? (sib) : (parent))
+	 *
+	 * which reads the assignment's value to choose a branch. A zero
+	 * there sets the sibling pointer to the parent while the flag
+	 * says there is a sibling, or leaves the flag clear -- either
+	 * way every op list in the program loses all but its first
+	 * element.
+	 */
+	{
+		int v;
+
+		memset(&o, 0, sizeof o);
+		v = (o.op_moresib = 1);
+		sprintf(detail, "(bf = 1) gave %d, field holds %d", v,
+		    (int)o.op_moresib);
+		check("value of a 1-bit assignment", v == 1, detail);
+
+		memset(&o, 0, sizeof o);
+		v = (o.op_type = 401);
+		sprintf(detail, "(bf = 401) gave %d, field holds %d", v,
+		    (int)o.op_type);
+		check("value of a 9-bit assignment", v == 401, detail);
+
+		/* The store must happen even when the value is used. */
+		sprintf(detail, "field holds %d after its value was read",
+		    (int)o.op_type);
+		check("a read value does not lose the store",
+		    o.op_type == 401, detail);
+	}
+
+	/*
+	 * 9. OpMAYBESIB_set as perl writes it upstream, which is where
+	 *    the whole op tree's sibling links come from.
+	 */
+	{
+		int sib = 7, parent = 9;
+		int *sibp = &sib, *parentp = &parent, *got;
+		struct opflags a;
+
+		memset(&a, 0, sizeof a);
+		a.op_sibparent_test = (a.op_moresib = (sibp != NULL))
+		    ? sibp : parentp;
+		got = (0 + a.op_moresib) ? a.op_sibparent_test : NULL;
+		sprintf(detail, "moresib=%d, sibparent %s", (int)a.op_moresib,
+		    a.op_sibparent_test == sibp ? "= sib" :
+		    a.op_sibparent_test == parentp ? "= parent (wrong)" :
+		    "= neither");
+		check("OpMAYBESIB_set with a sibling", got == sibp, detail);
+
+		memset(&a, 0, sizeof a);
+		a.op_sibparent_test = (a.op_moresib = (NULL != NULL))
+		    ? sibp : parentp;
+		got = (0 + a.op_moresib) ? a.op_sibparent_test : NULL;
+		sprintf(detail, "moresib=%d, sibparent %s", (int)a.op_moresib,
+		    a.op_sibparent_test == parentp ? "= parent" : "= other");
+		check("OpMAYBESIB_set without a sibling",
+		    got == NULL && a.op_sibparent_test == parentp, detail);
 	}
 
 	if (failures == 0)
