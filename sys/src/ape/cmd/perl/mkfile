@@ -58,6 +58,16 @@ $PERLSRC/ext/ExtUtils-Miniperl/pm_to_blib: miniperl
 #                            call with defined &DynaLoader::boot_DynaLoader
 #                            and falls back to its pure-perl getcwd.
 #   dist/Carp/lib          — Carp.pm (used by warnings/strict chain)
+#   dist/constant/lib      — constant.pm, which File::Spec::Unix uses at
+#                            its line 115 ("use constant _fn_curdir").
+#
+# That is the whole closure. Following every use and require from
+# ExtUtils::Miniperl reaches four more names, and none of them loads
+# here: Scalar::Util is inside "if ($taint)" at File/Spec/Unix.pm:169,
+# XSLoader is behind the DynaLoader guard at Cwd.pm:80, and Errno and
+# ExtUtils::MakeMaker are in runtime error paths and POD examples. The
+# rest -- strict, warnings, vars, overload, re -- are built into the
+# interpreter and need no file.
 perlmain.c: miniperl $PERLSRC/ext/ExtUtils-Miniperl/pm_to_blib
 	./miniperl \
 		-I$PERLSRC/ext/ExtUtils-Miniperl/lib \
@@ -66,5 +76,6 @@ perlmain.c: miniperl $PERLSRC/ext/ExtUtils-Miniperl/pm_to_blib
 		-I$PERLSRC/dist/PathTools/lib \
 		-I$PERLSRC/dist/PathTools \
 		-I$PERLSRC/dist/Carp/lib \
+		-I$PERLSRC/dist/constant/lib \
 		-MExtUtils::Miniperl \
 		-e 'writemain("perlmain.c")'
