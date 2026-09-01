@@ -21,11 +21,7 @@ OFILES=\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-# APEXP_PROBE_MAIN is temporary; see the note in ../../cmd/perl/mkfile.
-# Here it turns on one probe in locale.c, printed just before perl
-# panics over a setlocale it thinks failed, which asks libc the same
-# question again and says what it answered.
-CFLAGS=-c -I$PERLSRC -D_POSIX_SOURCE -DHAVE_CONFIG_H -D_PLAN9_SOURCE -D_BSD_EXTENSION -DPERL_CORE -DAPEXP_PROBE_MAIN
+CFLAGS=-c -I$PERLSRC -D_POSIX_SOURCE -DHAVE_CONFIG_H -D_PLAN9_SOURCE -D_BSD_EXTENSION -DPERL_CORE
 
 %.$O: $PERLSRC/%.c
 	$CC $CFLAGS $prereq -o $target
