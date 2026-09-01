@@ -50,6 +50,13 @@ $PERLSRC/ext/ExtUtils-Miniperl/pm_to_blib: miniperl
 #   $PERLSRC/lib           — strict.pm, ExtUtils/Embed.pm, Config.pm stub, etc.
 #   dist/Exporter/lib      — Exporter.pm (used by ExtUtils::Miniperl)
 #   dist/PathTools/lib     — File::Spec (used by ExtUtils::Embed)
+#   dist/PathTools         — Cwd.pm, which File::Spec::Unix loads at its
+#                            line 4. It sits beside that dist's lib/
+#                            rather than in it, because a full build
+#                            copies it into lib/ instead. Safe under
+#                            miniperl: Cwd.pm:80 guards the XSLoader
+#                            call with defined &DynaLoader::boot_DynaLoader
+#                            and falls back to its pure-perl getcwd.
 #   dist/Carp/lib          — Carp.pm (used by warnings/strict chain)
 perlmain.c: miniperl $PERLSRC/ext/ExtUtils-Miniperl/pm_to_blib
 	./miniperl \
@@ -57,6 +64,7 @@ perlmain.c: miniperl $PERLSRC/ext/ExtUtils-Miniperl/pm_to_blib
 		-I$PERLSRC/lib \
 		-I$PERLSRC/dist/Exporter/lib \
 		-I$PERLSRC/dist/PathTools/lib \
+		-I$PERLSRC/dist/PathTools \
 		-I$PERLSRC/dist/Carp/lib \
 		-MExtUtils::Miniperl \
 		-e 'writemain("perlmain.c")'
