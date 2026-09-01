@@ -479,6 +479,13 @@ EXTERN	char*	thestring;
 EXTERN	Type*	thisfn;
 EXTERN	Node*	thisfnnode;
 EXTERN	Type*	types[NCTYPE];		/* extended to hold TCFLOAT, TCDOUBLE */
+/*
+ * bool/_Bool. Its representation is unsigned char -- there is no TBOOL
+ * etype -- but it is its own Type object so that com.c can tell it from
+ * a plain unsigned char and give conversions to it the semantics C99
+ * 6.3.1.2 requires: a comparison against zero, not a truncation.
+ */
+EXTERN	Type*	typebool;
 EXTERN	Type*	fntypes[NTYPE];
 EXTERN	Node*	initlist;
 EXTERN	Term	term[NTERM];

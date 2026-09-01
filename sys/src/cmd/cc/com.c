@@ -54,6 +54,40 @@ enum
 	ADDROP	= 1<<2,
 };
 
+/*
+ * C99 6.3.1.2: when any scalar value is converted to _Bool, the result
+ * is 0 if the value compares equal to 0, and 1 otherwise. It is a
+ * comparison, not a truncation.
+ *
+ * kencc has no TBOOL etype -- bool is unsigned char (lex.c, and see
+ * typebool in cc.h) -- so without this, converting to bool keeps the
+ * low byte. Every 8-byte-aligned pointer then converts to something
+ * whose bit 0 is 0, and (bool)256 is 0 as well. Perl's
+ *
+ *	#define OpMAYBESIB_set(o, sib, parent) \
+ *	    ((o)->op_moresib = cBOOL(sib), ...)
+ *
+ * with cBOOL(x) being ((bool)(x)), is the case that found this: every
+ * op in a compiled program got op_moresib = 0 beside a perfectly good
+ * op_sibparent, so Perl_op_linklist saw no siblings, every statement
+ * list collapsed to its first element, and a program compiled and then
+ * executed almost nothing -- silently, exit status 0.
+ *
+ * n is already type-checked; !! needs nothing but int, which is what
+ * tcomo's ONOT case gives it.
+ */
+static Node*
+boolnorm(Node *n)
+{
+	Node *q;
+
+	q = new1(ONOT, n, Z);
+	q->type = types[TINT];
+	q = new1(ONOT, q, Z);
+	q->type = types[TINT];
+	return q;
+}
+
 int
 tcom(Node *n)
 {
@@ -123,6 +157,8 @@ tcomo(Node *n, int f)
 		}
 		if(tcompat(n, l->type, n->type, tcast))
 			goto bad;
+		if(n->type == typebool && l->type != typebool)
+			n->left = boolnorm(l);
 		break;
 
 	case ORETURN:
@@ -148,6 +184,11 @@ tcomo(Node *n, int f)
 		if(tcompat(n, n->type, l->type, tasign))
 			break;
 		constas(n, n->type, l->type);
+		/* returning is a conversion too; see the OAS case */
+		if(n->type == typebool && l->type != typebool) {
+			l = boolnorm(l);
+			n->left = l;
+		}
 		if(!sametype(n->type, l->type)) {
 			l = new1(OCAST, l, Z);
 			l->type = n->type;
@@ -196,6 +237,16 @@ tcomo(Node *n, int f)
 		if(tcompat(n, l->type, r->type, tasign))
 			goto bad;
 		constas(n, l->type, r->type);
+		/*
+		 * Assigning to a bool converts, so the same comparison
+		 * applies. It has to happen before the sametype test
+		 * below, which sees only etypes and so would let an
+		 * unsigned char through with no cast at all.
+		 */
+		if(l->type == typebool && r->type != typebool) {
+			r = boolnorm(r);
+			n->right = r;
+		}
 		if(!sametype(l->type, r->type)) {
 			r = new1(OCAST, r, Z);
 			r->type = l->type;
@@ -1038,6 +1089,18 @@ tcoma(Node *l, Node *n, Type *t, int f)
 			diag(l, "argument prototype mismatch \"%T\" for \"%T\": %F",
 				n->type, t, l);
 			return 1;
+		}
+		/*
+		 * Passing an argument converts, so the same comparison
+		 * applies -- and it has to happen before the promotion
+		 * below turns a bool parameter into unsigned int, which
+		 * would otherwise pass the value through untouched.
+		 */
+		if(t == typebool && n->type != typebool) {
+			n1 = new1(OXXX, Z, Z);
+			*n1 = *n;
+			n1 = boolnorm(n1);
+			*n = *n1;
 		}
 		switch(t->etype) {
 		case TCHAR:

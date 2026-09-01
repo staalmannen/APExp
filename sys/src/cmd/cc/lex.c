@@ -1549,17 +1549,18 @@ struct
 	"__signed__",		LSIGNED,	0,
 
 	/*
-	 * _Bool: C99 boolean.  Map to LCHAR (unsigned char width).
-	 * Values are 0 or 1; the width and integer promotion match.
+	 * _Bool (C99) and bool (C23). Its own token rather than LCHAR:
+	 * the grammar's "tname: LCHAR" yields BCHAR, so these used to
+	 * declare a plain signed char, and a conversion to one truncates
+	 * where C99 6.3.1.2 requires a comparison against zero. LBOOL
+	 * reduces to typebool, and com.c normalises conversions to it.
 	 */
-	"_Bool",		LCHAR,		TUCHAR,
+	"_Bool",		LBOOL,		0,
+	"bool",			LBOOL,		0,
 
 	/*
-	 * C23 bool, true, and false.
-	 * bool is mapped to LCHAR (unsigned char width) like _Bool.
-	 * true and false are mapped to LCONST 1 and 0.
+	 * C23 true and false, mapped to LCONST 1 and 0.
 	 */
-	"bool",			LCHAR,		TUCHAR,
 	"true",			LCONST,		1,
 	"false",		LCONST,		0,
 
@@ -1679,6 +1680,12 @@ cinit(void)
 	types[TENUM] = typ(TENUM, T);
 	types[TFUNC] = typ(TFUNC, types[TINT]);
 	types[TIND] = typ(TIND, types[TVOID]);
+
+	/*
+	 * bool has unsigned char's representation, width and alignment,
+	 * but is a distinct Type object: see the note in cc.h.
+	 */
+	typebool = typ(TUCHAR, T);
 
 	for(i=0; i<NHASH; i++)
 		hash[i] = S;
