@@ -43,7 +43,20 @@ $PERLSRC/ext/ExtUtils-Miniperl/pm_to_blib: miniperl
 
 # Generate perlmain.c via miniperl.
 # No DynaLoader: Plan9 has no dlopen; all extensions are linked statically
-# or omitted.
+# or omitted -- so writemain gets no extension arguments at all, and the
+# xs_init it produces has an empty body.
+#
+# Note the backslash: writemain's first argument is a *reference* to the
+# output file name (Miniperl.pm:21), and it writes perlmain.new and
+# renames it only after a clean close, so a failure leaves no truncated
+# file behind. A plain string there is not a file name -- it is an
+# extension to register, and the output goes to stdout. That is what
+# writemain("perlmain.c") did: it printed the whole file to the terminal
+# and emitted
+#
+#	newXS("perlmain.c::bootstrap", boot_perlmain.c, file);
+#
+# leaving cpp with "Can't open input file perlmain.c".
 #
 # -I paths explained:
 #   ExtUtils-Miniperl/lib  — ExtUtils::Miniperl (writemain)
@@ -78,4 +91,4 @@ perlmain.c: miniperl $PERLSRC/ext/ExtUtils-Miniperl/pm_to_blib
 		-I$PERLSRC/dist/Carp/lib \
 		-I$PERLSRC/dist/constant/lib \
 		-MExtUtils::Miniperl \
-		-e 'writemain("perlmain.c")'
+		-e 'writemain(\"perlmain.c")'
