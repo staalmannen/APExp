@@ -4712,6 +4712,17 @@ Perl_newPROG(pTHX_ OP *o)
 
     PERL_ARGS_ASSERT_NEWPROG;
 
+#ifdef APEXP_PROBE_MAIN
+    /* APExp: temporary. miniperl compiles and runs BEGIN and END blocks
+     * but never runs the main program, which means PL_main_start is NULL
+     * by the time S_run_body looks at it. This says which of the three
+     * ways that happens is the one here. Remove with the -D in
+     * sys/src/ape/cmd/perl/mkfile once known. */
+    PerlIO_printf(Perl_error_log,
+        "APEXP newPROG: in_eval=%d o=%p type=%s\n",
+        (int)PL_in_eval, (void *)o, o ? OP_NAME(o) : "(null)");
+#endif
+
     if (PL_in_eval) {
         PERL_CONTEXT *cx;
         I32 i;
@@ -4779,6 +4790,12 @@ Perl_newPROG(pTHX_ OP *o)
         start = LINKLIST(PL_main_root);
         PL_main_root->op_next = 0;
         S_process_optree(aTHX_ NULL, PL_main_root, start);
+#ifdef APEXP_PROBE_MAIN
+        PerlIO_printf(Perl_error_log,
+            "APEXP newPROG: start=%p main_start=%p main_root=%p type=%s\n",
+            (void *)start, (void *)PL_main_start, (void *)PL_main_root,
+            start ? OP_NAME(start) : "(null)");
+#endif
         if (!PL_parser->error_count)
             /* on error, leave CV slabbed so that ops left lying around
              * will eb cleaned up. Else unslab */

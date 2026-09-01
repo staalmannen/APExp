@@ -2868,6 +2868,14 @@ S_run_body(pTHX_ I32 oldscope)
 
     PERL_SET_PHASE(PERL_PHASE_RUN);
 
+#ifdef APEXP_PROBE_MAIN
+    /* APExp: temporary, see the note in op.c's Perl_newPROG. */
+    PerlIO_printf(Perl_error_log,
+        "APEXP run_body: restartop=%p main_start=%p main_root=%p in_eval=%d\n",
+        (void *)PL_restartop, (void *)PL_main_start, (void *)PL_main_root,
+        (int)PL_in_eval);
+#endif
+
     if (PL_restartop) {
 #ifdef DEBUGGING
         /* this complements the "EXECUTING..." debug we emit above.

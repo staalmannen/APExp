@@ -11,7 +11,12 @@ BIN=$APEXPROOT/$objtype/bin/ape
 <$APEXPROOT/sys/src/cmd/mkone
 
 PERLSRC=../../../external/perl
-CFLAGS=-c -I$PERLSRC -D_POSIX_SOURCE -DHAVE_CONFIG_H -D_PLAN9_SOURCE -D_BSD_EXTENSION -DPERL_CORE
+# APEXP_PROBE_MAIN is temporary: it turns on the three PerlIO_printf
+# probes in op.c's Perl_newPROG and perl.c's S_run_body that say why
+# PL_main_start is NULL. Both files are compiled here rather than into
+# libperl.a, so this costs two objects and a relink. Remove it, and the
+# probes, once the answer is in.
+CFLAGS=-c -I$PERLSRC -D_POSIX_SOURCE -DHAVE_CONFIG_H -D_PLAN9_SOURCE -D_BSD_EXTENSION -DPERL_CORE -DAPEXP_PROBE_MAIN
 
 CLEANFILES = *.c
 
