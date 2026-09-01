@@ -87,3 +87,141 @@ perlmain.c: miniperl $PERLSRC/ext/ExtUtils-Miniperl/pm_to_blib
 		-I$PERLSRC/dist/constant/lib \
 		-MExtUtils::Miniperl \
 		-e 'writemain(\"perlmain.c")'
+
+# ---------------------------------------------------------------------
+# The module library.
+#
+# config.h's PRIVLIB and SITELIB are /sys/lib/perl and perl builds @INC
+# from them, so that is where the pure-perl part of the distribution has
+# to land -- without it even "perl -V" fails:
+#
+#	Can't locate Config.pm in @INC ... (@INC entries checked:
+#	  /amd64/lib/ape/ /sys/lib/perl /amd64/lib/ape/ /sys/lib/perl).
+#
+# This used to be a hand-made copy of $PERLSRC/lib committed to the
+# tree, one file out of date and carrying 128 test files. It is a build
+# product now.
+PERLLIB=$APEXPROOT/sys/lib/perl
+
+# The dist/ and cpan/ trees that contain no .xs, so they need no
+# extension built. The fourteen that do -- ExtUtils-ParseXS, IO,
+# PathTools, Storable, threads, threads-shared, Compress-Raw-Bzip2,
+# Compress-Raw-Zlib, Digest-SHA, Encode, IPC-SysV, MIME-Base64,
+# Math-BigInt-FastCalc and Scalar-List-Utils -- are left out. Plan 9 has
+# no dlopen, so there would be nothing for XSLoader to load, and a .pm
+# that dies at bootstrap is worse than one that is simply absent: code
+# that probes with "eval { require X }" gets a truthful no either way,
+# and code that does not probe gets a clearer error.
+#
+# PathTools is the exception, handled separately below: File::Spec is
+# pure perl, and Cwd.pm has a pure-perl path it takes when DynaLoader is
+# absent (Cwd.pm:80). Both are needed by anything that touches paths.
+PUREDIST=\
+	cpan/Archive-Tar\
+	cpan/AutoLoader\
+	cpan/CPAN\
+	cpan/CPAN-Meta\
+	cpan/CPAN-Meta-Requirements\
+	cpan/CPAN-Meta-YAML\
+	cpan/Digest\
+	cpan/ExtUtils-Constant\
+	cpan/ExtUtils-Install\
+	cpan/ExtUtils-MakeMaker\
+	cpan/ExtUtils-Manifest\
+	cpan/ExtUtils-PL2Bat\
+	cpan/File-Fetch\
+	cpan/File-Path\
+	cpan/File-Temp\
+	cpan/Getopt-Long\
+	cpan/HTTP-Tiny\
+	cpan/IO-Compress\
+	cpan/IO-Socket-IP\
+	cpan/IPC-Cmd\
+	cpan/JSON-PP\
+	cpan/Locale-Maketext-Simple\
+	cpan/Math-BigInt\
+	cpan/Module-Load\
+	cpan/Module-Load-Conditional\
+	cpan/Module-Loaded\
+	cpan/Module-Metadata\
+	cpan/NEXT\
+	cpan/Params-Check\
+	cpan/Perl-OSType\
+	cpan/PerlIO-via-QuotedPrint\
+	cpan/Pod-Checker\
+	cpan/Pod-Escapes\
+	cpan/Pod-Perldoc\
+	cpan/Pod-Simple\
+	cpan/Pod-Usage\
+	cpan/Term-ANSIColor\
+	cpan/Term-Table\
+	cpan/Test-Harness\
+	cpan/Test-Simple\
+	cpan/Text-Balanced\
+	cpan/Text-ParseWords\
+	cpan/Text-Tabs\
+	cpan/Tie-RefHash\
+	cpan/Time-Local\
+	cpan/autodie\
+	cpan/bignum\
+	cpan/experimental\
+	cpan/libnet\
+	cpan/parent\
+	cpan/perlfaq\
+	cpan/podlators\
+	cpan/version\
+	dist/Attribute-Handlers\
+	dist/Carp\
+	dist/Devel-SelfStubber\
+	dist/Dumpvalue\
+	dist/Env\
+	dist/Exporter\
+	dist/ExtUtils-CBuilder\
+	dist/Filter-Simple\
+	dist/FindBin\
+	dist/I18N-Collate\
+	dist/I18N-LangTags\
+	dist/Locale-Maketext\
+	dist/Math-Complex\
+	dist/Module-CoreList\
+	dist/Net-Ping\
+	dist/Search-Dict\
+	dist/SelfLoader\
+	dist/Term-Complete\
+	dist/Term-ReadLine\
+	dist/Test\
+	dist/Text-Abbrev\
+	dist/Thread-Queue\
+	dist/Thread-Semaphore\
+	dist/Tie-File\
+	dist/autouse\
+	dist/base\
+	dist/constant\
+	dist/encoding-warnings
+
+install:V:	perllib
+
+# dircp rather than cp: it is the Plan 9 way to copy a tree (a tar
+# pipeline between two @{} blocks) and cp has no -r. The trees overlay
+# one another, which is what a real perl install does too -- every
+# dist and cpan module ends up in the same privlib.
+perllib:V:	$BIN/$TARG
+	mkdir -p $PERLLIB
+	dircp $PERLSRC/lib $PERLLIB
+	for(d in $PUREDIST)
+		dircp $PERLSRC/$d/lib $PERLLIB
+	dircp $PERLSRC/dist/PathTools/lib $PERLLIB
+	cp $PERLSRC/dist/PathTools/Cwd.pm $PERLLIB/Cwd.pm
+	cp Config.pm $PERLLIB/Config.pm
+	# $PERLSRC/lib carries its own tests -- 84 .t files and four
+	# directories named t. Nothing else copied above has any. Depth
+	# 3 is the deepest a .t sits, checked rather than assumed; an
+	# unmatched glob is passed through literally by rc and rm -f
+	# says nothing about it.
+	rm -f $PERLLIB/*.t $PERLLIB/*/*.t $PERLLIB/*/*/*.t
+	rm -rf $PERLLIB/*/t $PERLLIB/*/*/t
+
+nuke:V:	perllibnuke
+
+perllibnuke:V:
+	rm -rf $PERLLIB
