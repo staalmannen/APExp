@@ -86,6 +86,7 @@ sys/src/
 sys/include/ape/      # All architecture-independent APE/POSIX headers
 sys/lib/
 ├── ape/locale/       # Locale data
+├── perl/             # perl module library (installed by cmd/perl, not by hand)
 ├── pascal/           # Pascal runtime
 └── tests/            # Test programs (currently just stdio-test.c)
 sys/man/1/, sys/man/3/  # Manual pages
@@ -131,14 +132,77 @@ Safe to disable: non-C language libraries, transpilers (f2c, p2c, objc), archive
 
 ## Testing
 
-Minimal test infrastructure at `sys/lib/tests/stdio-test.c`. Testing is primarily ad-hoc: compile a program under APExp and verify it builds/runs correctly. In the future, more tests will be put in this directory.
+`sys/lib/tests/` holds standalone programs, each built and run by hand:
 
-## Current Development Focus (as of 2026-04)
+```
+cd sys/lib/tests && pcc -o bool-test bool-test.c && ./bool-test
+```
 
-- POSIX threading (`pthread`) — `sys/src/ape/lib/ap/thread/` (uncommitted: `cond_timedwait.c`)
-- Async I/O (`aio`) — `sys/src/ape/lib/ap/aio/aio.c` (uncommitted)
-- C11/C23 compiler features — `_Generic` support recently added
-- pthread header — `sys/include/ape/pthread.h` (uncommitted modifications)
+The convention: print `PASS`/`FAIL` per case, exit with the number of
+failures, and open with a comment saying which bug the test came from
+and what it cost. Anything testing a language or library rule should be
+correct on gcc too — checking a new test against gcc first is how you
+find out whether the test or the tree is wrong, and it has caught both.
+
+Every test named in the sections below sits here; the ones for kencc
+itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
+`compound-literal-test.c`, `designated-init-test.c`, `charptr-test.c`,
+`rol64-test.c` and `u64float-test.c`, and for libap `locale-test.c`,
+`sigset-test.c`, `posix-spawn-test.c`, `limits-test.c` and
+`stdio-test.c`. `sys/src/ape/lib/libressl/test/` is separate: it is
+upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
+
+Beyond that, testing is still mostly ad-hoc — compile a program under
+APExp and see whether it builds and runs.
+
+## Current Development Focus (as of 2026-09)
+
+- POSIX threading (`pthread`) — `sys/src/ape/lib/ap/thread/`
+- Async I/O (`aio`) — `sys/src/ape/lib/ap/aio/aio.c`
+- C11/C23 compiler features — `_Generic`, and `bool` as a real type
+- perl 5.42.2 — see the section below
+
+### perl
+
+`sys/src/ape/lib/perl` builds `libperl.a`; `sys/src/ape/cmd/perl` builds
+`miniperl`, uses it to generate `perlmain.c`, links `perl`, and installs
+the module library into `sys/lib/perl` (config.h's `PRIVLIB`).
+
+Working: the interpreter runs, module loading works, and
+`ExtUtils::Miniperl` generates `perlmain.c`.
+
+**No XS extensions.** Plan 9 has no dlopen, so `usedl` is empty,
+`dlsrc` is `dl_none.xs`, `xs_init` in `perlmain.c` has an empty body,
+and only the pure-perl `dist/` and `cpan/` trees are installed — the
+fourteen with a `.xs` are deliberately left out, listed in the mkfile.
+A `.pm` that dies in `XSLoader` is worse than one that is absent.
+PathTools is the exception: `File::Spec` is pure perl and `Cwd.pm` takes
+a pure-perl path when DynaLoader is missing.
+
+**`Config.pm` is hand-maintained**, at `sys/src/ape/cmd/perl/Config.pm`.
+APExp does not run `Configure`, so there is no `config.sh` for `configpm`
+to read; it is the companion to the hand-answered
+`sys/src/external/perl/config.h` and has to be kept in step with it. It
+provides `%Config` plus `import`, `myconfig`, `_V` (which `perl -V`
+calls, at perl.c:2356), `config_vars`, `config_sh` and `config_re`.
+
+**Getting perl to run at all turned up four bugs, and only one was
+perl's.** They are worth reading as a set, because three of them were
+silent:
+
+- `bool` was a signed char in kencc, so every conversion to it truncated
+  — see the section below. This is why miniperl compiled programs and
+  then executed nothing.
+- `setlocale` reported a locale it had not set — see libap, locale/.
+- `<stdio.h>` leaked errno, unistd, fcntl and pthread, and libap itself
+  relied on the leak.
+- perl's `config.h` claimed an 80-bit long double. kencc has none:
+  `sub.c`'s `simplet()` maps `BDOUBLE|BLONG` to `types[TDOUBLE]`, so
+  `long double` is `double`. `NVTYPE` is `double`, `NVSIZE` 8, the
+  `NVef`/`NVff`/`NVgf` formats lose their `L`, `USE_LONG_DOUBLE` is off,
+  and the `LONGDBL*` byte patterns and mantissa bit counts follow. A
+  format asking printf for a type nothing passes it is how `use 5.006`
+  came out as "Invalid version format (non-numeric data)".
 
 ---
 
@@ -313,10 +377,53 @@ error — this syntax is invalid C23 anyway and was never written in practice.
 
 Replaced complex musl locale machinery with Plan9-appropriate stubs:
 - `locale_stubs.c`: replaces `setlocale.c`, `uselocale.c`, `newlocale.c`, `locale_map.c`
-  — always returns C.UTF-8, no `libc.global_locale` or pthread->locale references
+  — no `libc.global_locale` or pthread->locale references
 - `dcngettext.c`: stub — always returns untranslated string
 - `localeconv.c`: positional initializers (no designated initializers at file scope)
 - `locale.h`: added 6 C99 `int_p_*`/`int_n_*` members to `struct lconv`
+
+#### setlocale must report the locale it set, even when there is only one
+
+Plan 9 has one locale, so `setlocale` changes no behaviour whatever it
+is asked for. Keeping the **names** straight is a separate contract, and
+the one callers actually test — C99 7.11.1.1p8 makes the return value a
+string associated with the locale now in effect for that category, which
+a later call can use to restore it.
+
+`locale_stubs.c` used to ignore `name` entirely and answer `"C.UTF-8"`
+to every set and every query. perl says so out loud:
+
+```
+locale.c: 3441: panic: Can't change locale for LC_NUMERIC (4)
+  from 'C.UTF-8' to 'C'
+```
+
+That is `Perl_set_numeric_standard`, which pins LC_NUMERIC to `"C"` so
+the radix character stays a dot whatever LC_CTYPE is doing — exactly the
+case where one category's name must differ from the others, and exactly
+what "everything is C.UTF-8" cannot express. miniperl died before
+running a line of perl.
+
+Now each category remembers the name it was last set to, a query returns
+that name, and a set returns the name just stored. `""` resolves through
+`LC_ALL`, the category's own variable and `LANG` (POSIX XBD 8.2), and
+with none set gives C.UTF-8 — UTF-8 is Plan 9's native encoding, and the
+native locale is what 7.11.1.1p3 leaves to the implementation. The
+initial value is `"C"`, as 7.11.1.1p4 requires.
+
+`setlocale(LC_ALL, NULL)` returns the bare name while every category
+agrees, as glibc does, so the common case stays something a caller can
+hand straight back; a mixture — which perl reaches the moment it pins
+LC_NUMERIC — gives the `LC_CTYPE=x;LC_NUMERIC=y;...` composite. Setting
+LC_ALL accepts that form **and** musl's bare `x;y;...`, because p8
+requires whatever a query returned to be settable.
+
+Note `LOCALE_NAME_MAX` is musl's, in `locale_impl.h` (23, the name field
+in `struct __locale_map`); the limit for names kept here is `LCNAMEMAX`.
+
+Covered by `sys/lib/tests/locale-test.c`. Every case in it is required
+of any conforming `setlocale`, so it passes on glibc, which is how it
+and the implementation were both checked.
 
 ### math/ — missing declarations added to math.h
 
@@ -631,6 +738,48 @@ ship.
 `sys/lib/tests/limits-test.c` checks `(size_t)-1 == SIZE_MAX` and the same
 identity for the other types, and prints which of these headers were actually
 read.
+
+### <stdio.h> used to drag errno, unistd, fcntl and pthread in
+
+`<stdio.h>` included `<stdio_impl.h>` — musl's *internal* header, which
+opens with `<stdint.h> <stddef.h> <errno.h> <unistd.h> <fcntl.h>
+<sys/types.h> <pthread.h>` because the implementation wants all of it.
+So nearly every translation unit in the tree got every `O_` and `F_`
+macro, all of unistd and all of pthread.
+
+Not merely untidy: portable code guards its fallbacks on whether a name
+exists, and a name appearing earlier than the author expected changes
+the answer. libzip's `compat.h` does `#ifndef O_CLOEXEC / #define
+O_CLOEXEC 0 / #endif` for Windows' sake, having included nothing that
+leads to fcntl — but `<zip.h>` asks for stdio a little later, fcntl
+arrives through the back door, and the two disagree.
+
+`struct _IO_FILE` now lives in `sys/include/ape/_iofile.h` with only
+`<stddef.h>`, `<stdint.h>` and `<sys/types.h>`; both `<stdio.h>` and
+`stdio_impl.h` include that, and stdio_impl.h keeps its heavy includes
+for the 64 files in `ap/stdio` that use it. This is musl's own
+arrangement, restored.
+
+**libap depended on the leak in two places**, and both are the shape to
+expect elsewhere:
+
+- `ap/include/musl.h` had `#ifndef errno / extern int errno;` — a
+  reference to a symbol that exists nowhere, since APE's `<errno.h>` is
+  `extern int *_errnoloc;` plus `#define errno (*_errnoloc)`. It never
+  fired only because musl.h includes `<libc.h>` → `<utf.h>` →
+  `<stdio.h>` → errno. It includes `<errno.h>` directly now.
+- The `_unlocked` family existed *only* as four macros in stdio_impl.h,
+  which musl has for its own use. `stdio/unlocked.c` defines all fifteen
+  now and `<stdio.h>` declares them — as functions, not macros, because
+  code that thinks a system lacks these writes an unguarded `#define
+  ferror_unlocked(x) ferror(x)` and cpp rejects a non-identical macro
+  redefinition (see the macro-identity section above). bash's config.h
+  asserts `HAVE_DECL_{FEOF,FERROR,GETC,PUTC}_UNLOCKED`.
+
+Locking in this stdio is a no-op — `stdio_impl.h`'s `__lockfile`
+returns 0 without doing anything — so each `_unlocked` function is its
+locked counterpart today. They are separate entry points so that the day
+`flockfile` becomes real, `unlocked.c` is the one file to change.
 
 ### Build order for compiler changes
 ```
@@ -983,6 +1132,73 @@ integer type, for values at or above 2**63.
 
 Covered by `sys/lib/tests/u64float-test.c`, which tests the folded and the
 runtime path separately, and the memory destination specifically.
+
+### bool was a signed char, so converting to it truncated (FIXED)
+
+C99 6.3.1.2: "When any scalar value is converted to `_Bool`, the result
+is 0 if the value compares equal to 0; otherwise, the result is 1."
+It is a **comparison**, not a truncation, and that is what makes `bool`
+usable as a flag at all.
+
+kencc had no bool. `lex.c`'s `itab` mapped both `_Bool` and `bool` to
+`LCHAR`, and the grammar's `tname: LCHAR` yields `BCHAR` — so `bool` was
+a plain **signed char**, and every conversion to it kept the low byte:
+
+```c
+bool b = 256;              /* false */
+op->moresib = (bool)ptr;   /* 0 for every aligned pointer */
+```
+
+An object pointer is 8-byte aligned, so its low byte is always even;
+store that in a one-bit bit field, which keeps bit 0, and the answer is
+always 0. (The bit field is behaving correctly — the conversion in front
+of it is what was wrong.)
+
+**What it cost.** perl's `handy.h` has `#define cBOOL(cbool) ((bool)
+(cbool))`, and `op.h` records whether an op has a next sibling with
+`OpMAYBESIB_set(o, sib, parent)`, which is the *only* thing that ever
+sets `op_moresib` to 1 — `op_prepend_elem` and `op_append_elem` both
+reach it through `op_sibling_splice`. So every op in every program perl
+compiled came out with `op_moresib = 0` beside a perfectly good
+`op_sibparent`. `Perl_op_linklist` walks a node's children with
+`OpSIBLING`, which reads that flag, so **every statement list collapsed
+to its first element**: the `op_next` chain for `print "hi\n"` was
+`enter, leave`. miniperl parsed its input, reported syntax errors
+correctly, ran `BEGIN` and `END` blocks, and executed none of the
+program in between — no output, no diagnostic, exit status 0.
+
+**Fix.** `bool`/`_Bool` get their own token `LBOOL` and their own
+`Type`, `typebool`: unsigned char's representation, width and alignment
+under a distinct identity. It is built in the `complex` production
+rather than `tname`, because `tname` yields a bit in a type mask and the
+mask has **no spare bit** — `BNORET` is already `1<<31` in a 32-bit
+`long`. `com.c`'s `boolnorm()` wraps the value in `!!`, which `tcomo`'s
+`ONOT` case gives type int, so the narrowing cast that follows sees a
+value that is already 0 or 1.
+
+**The mark is `Type.isbool`, a field, not the identity of `typebool`.**
+`copytyp()` is a struct copy and a type gets copied whenever it is used
+for anything — `dcl.c:996` copies a parameter's type to chain it into a
+prototype, `garbt()` copies for `const`/`volatile`. Pointer identity
+survives a cast and a return but not a declaration or a parameter, which
+is exactly the set that still failed when the first attempt used it.
+
+Applied at **five** sites, one per kind of conversion: the explicit cast
+and assignment (`OAS`) and return (`ORETURN`) in `tcomo`, argument
+passing in `tcoma` — before the promotion that turns a `bool` parameter
+into `unsigned int` — and `OASI`, which is auto initialisation and has
+its own copy of the conversion logic separate from `OAS`.
+
+**Still wrong, narrowly:** a static or file-scope initialiser is folded
+in `dcl.c` without going through `com.c`, so `static bool b = 256;`
+truncates. An auto `bool b = expr;` is an `OASI` and is covered.
+
+Covered by `sys/lib/tests/bool-test.c`.
+
+**Anything using `bool` and built before this is suspect** — the same
+warning as the 6c spill fix. gnulib, LibreSSL and curl all use `bool`
+heavily. A `bool` that silently reads false for `0x100` is exactly the
+class of bug that only shows up much later, somewhere else.
 
 ### Compiler self-hosting as correctness test
 After any compiler change, have it rebuild itself multiple times:

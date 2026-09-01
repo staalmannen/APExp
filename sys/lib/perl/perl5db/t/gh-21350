@@ -1,3 +1,0 @@
-#!perl
-
-print "minimal program to allow the debugger to launch\n";
