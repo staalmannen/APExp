@@ -6,7 +6,9 @@
  * setlocale/newlocale/uselocale as a configure or compile dependency,
  * without implementing real locale switching.
  *
- * setlocale()  - always succeeds, always returns "C.UTF-8"
+ * setlocale()  - accepts any name and reports that name back; see the
+ *                longer note above it for why the name matters even
+ *                though the behaviour never changes
  * newlocale()  - returns the one global UTF-8 locale
  * uselocale()  - returns the one global UTF-8 locale
  * duplocale()  - returns the one global UTF-8 locale
@@ -80,7 +82,7 @@ __get_locale(int cat, const char *val)
  * equivalent of setlocale(LC_ALL, "C") at program start.
  */
 
-#define LOCALE_NAME_MAX	64	/* longest name kept, plus the NUL */
+#define LCNAMEMAX	64	/* longest name kept, plus the NUL */
 #define NLOCALECAT	6
 
 /*
@@ -99,7 +101,7 @@ static const struct {
 	{ LC_MESSAGES,	"LC_MESSAGES" },
 };
 
-static char curlocale[NLOCALECAT][LOCALE_NAME_MAX] = {
+static char curlocale[NLOCALECAT][LCNAMEMAX] = {
 	"C", "C", "C", "C", "C", "C"
 };
 
@@ -138,7 +140,7 @@ lcset(int i, const char *name)
 {
 	if (*name == '\0')
 		name = lcfromenv(i);
-	if (strlen(name) >= LOCALE_NAME_MAX)
+	if (strlen(name) >= LCNAMEMAX)
 		return -1;
 	strcpy(curlocale[i], name);
 	return 0;
@@ -153,7 +155,7 @@ lcset(int i, const char *name)
 static char *
 lcall(void)
 {
-	static char buf[NLOCALECAT * (16 + LOCALE_NAME_MAX + 2)];
+	static char buf[NLOCALECAT * (16 + LCNAMEMAX + 2)];
 	char *p;
 	int i;
 
@@ -191,7 +193,7 @@ static int
 lcsetall(const char *name)
 {
 	const char *p, *semi, *eq;
-	char key[32], val[LOCALE_NAME_MAX];
+	char key[32], val[LCNAMEMAX];
 	size_t flen, klen, vlen;
 	int i, n;
 
@@ -210,7 +212,7 @@ lcsetall(const char *name)
 		if (eq != 0) {
 			klen = eq - p;
 			vlen = flen - klen - 1;
-			if (klen >= sizeof key || vlen >= LOCALE_NAME_MAX)
+			if (klen >= sizeof key || vlen >= LCNAMEMAX)
 				return -1;
 			memcpy(key, p, klen);
 			key[klen] = '\0';
@@ -223,7 +225,7 @@ lcsetall(const char *name)
 					break;
 				}
 		} else {
-			if (n >= NLOCALECAT || flen >= LOCALE_NAME_MAX)
+			if (n >= NLOCALECAT || flen >= LCNAMEMAX)
 				return -1;
 			memcpy(val, p, flen);
 			val[flen] = '\0';
@@ -240,7 +242,7 @@ lcsetall(const char *name)
 char *
 setlocale(int cat, const char *name)
 {
-	char saved[NLOCALECAT][LOCALE_NAME_MAX];
+	char saved[NLOCALECAT][LCNAMEMAX];
 	int i;
 
 	if (cat == LC_ALL) {
