@@ -4705,6 +4705,36 @@ Perl_blockhook_register(pTHX_ BHK *hk)
     Perl_av_create_and_push(aTHX_ &PL_blockhooks, newSViv(PTR2IV(hk)));
 }
 
+#ifdef APEXP_PROBE_MAIN
+/* APExp: temporary, see Perl_newPROG below. The sibling walk is bounded
+ * because a mis-set op_sibparent can point back into the list. */
+static void
+apexp_dump_kids(pTHX_ const char *what, OP *o)
+{
+    OP *k;
+    int n;
+
+    PerlIO_printf(Perl_error_log, "APEXP %s: %p %s flags=%02x kids=%d\n",
+        what, (void *)o, o ? OP_NAME(o) : "(null)",
+        o ? (unsigned)o->op_flags : 0u,
+        (o && (o->op_flags & OPf_KIDS)) ? 1 : 0);
+
+    if (!o || !(o->op_flags & OPf_KIDS))
+        return;
+
+    k = cLISTOPx(o)->op_first;
+    for (n = 0; k && n < 20; n++) {
+        PerlIO_printf(Perl_error_log,
+            "APEXP   kid[%d] %p %-12s moresib=%d sibparent=%p\n",
+            n, (void *)k, OP_NAME(k), (int)k->op_moresib,
+            (void *)k->op_sibparent);
+        k = k->op_moresib ? k->op_sibparent : NULL;
+    }
+    PerlIO_printf(Perl_error_log, "APEXP %s: %d kid%s\n", what, n,
+        n == 1 ? "" : "s");
+}
+#endif
+
 void
 Perl_newPROG(pTHX_ OP *o)
 {
@@ -4713,14 +4743,17 @@ Perl_newPROG(pTHX_ OP *o)
     PERL_ARGS_ASSERT_NEWPROG;
 
 #ifdef APEXP_PROBE_MAIN
-    /* APExp: temporary. miniperl compiles and runs BEGIN and END blocks
-     * but never runs the main program, which means PL_main_start is NULL
-     * by the time S_run_body looks at it. This says which of the three
-     * ways that happens is the one here. Remove with the -D in
+    /* APExp: temporary. The main program's op_next chain is just
+     * "enter, leave" -- OpSIBLING(enter) is NULL where the statements
+     * should be -- so either the list never had children or op_moresib
+     * did not stick. This walks the children as the tree holds them,
+     * printing the raw op_moresib and op_sibparent of each, which tells
+     * those two apart. Remove with the -D in
      * sys/src/ape/cmd/perl/mkfile once known. */
     PerlIO_printf(Perl_error_log,
         "APEXP newPROG: in_eval=%d o=%p type=%s\n",
         (int)PL_in_eval, (void *)o, o ? OP_NAME(o) : "(null)");
+    apexp_dump_kids(aTHX_ "newPROG arg", o);
 #endif
 
     if (PL_in_eval) {
@@ -4786,6 +4819,9 @@ Perl_newPROG(pTHX_ OP *o)
             return;
         }
         PL_main_root = op_scope(sawparens(scalarvoid(o)));
+#ifdef APEXP_PROBE_MAIN
+        apexp_dump_kids(aTHX_ "after op_scope", PL_main_root);
+#endif
         PL_curcop = &PL_compiling;
         start = LINKLIST(PL_main_root);
         PL_main_root->op_next = 0;
