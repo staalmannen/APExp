@@ -1686,6 +1686,7 @@ cinit(void)
 	 * but is a distinct Type object: see the note in cc.h.
 	 */
 	typebool = typ(TUCHAR, T);
+	typebool->isbool = 1;
 
 	for(i=0; i<NHASH; i++)
 		hash[i] = S;

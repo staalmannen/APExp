@@ -157,7 +157,7 @@ tcomo(Node *n, int f)
 		}
 		if(tcompat(n, l->type, n->type, tcast))
 			goto bad;
-		if(n->type == typebool && l->type != typebool)
+		if(n->type->isbool && (l->type == T || !l->type->isbool))
 			n->left = boolnorm(l);
 		break;
 
@@ -185,7 +185,7 @@ tcomo(Node *n, int f)
 			break;
 		constas(n, n->type, l->type);
 		/* returning is a conversion too; see the OAS case */
-		if(n->type == typebool && l->type != typebool) {
+		if(n->type->isbool && !l->type->isbool) {
 			l = boolnorm(l);
 			n->left = l;
 		}
@@ -205,6 +205,11 @@ tcomo(Node *n, int f)
 		typeext(l->type, r);
 		if(tcompat(n, l->type, r->type, tasign))
 			goto bad;
+		/* initialising converts; see the OAS case below */
+		if(l->type->isbool && !r->type->isbool) {
+			r = boolnorm(r);
+			n->right = r;
+		}
 		if(!sametype(l->type, r->type)) {
 			r = new1(OCAST, r, Z);
 			r->type = l->type;
@@ -243,7 +248,7 @@ tcomo(Node *n, int f)
 		 * below, which sees only etypes and so would let an
 		 * unsigned char through with no cast at all.
 		 */
-		if(l->type == typebool && r->type != typebool) {
+		if(l->type->isbool && !r->type->isbool) {
 			r = boolnorm(r);
 			n->right = r;
 		}
@@ -1096,7 +1101,7 @@ tcoma(Node *l, Node *n, Type *t, int f)
 		 * below turns a bool parameter into unsigned int, which
 		 * would otherwise pass the value through untouched.
 		 */
-		if(t == typebool && n->type != typebool) {
+		if(t->isbool && !n->type->isbool) {
 			n1 = new1(OXXX, Z, Z);
 			*n1 = *n;
 			n1 = boolnorm(n1);

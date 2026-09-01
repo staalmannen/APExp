@@ -126,6 +126,7 @@ struct	Type
 	char	etype;
 	char	garb;
 	char	vla;		/* 1 = variable-length array */
+	char	isbool;		/* declared bool/_Bool; see typebool */
 	Node*	vlasizevar;	/* hidden auto holding runtime byte count (VLA only) */
 	short	alignas_req;	/* _Alignas() override; 0 = use type's natural alignment */
 };
@@ -481,9 +482,16 @@ EXTERN	Node*	thisfnnode;
 EXTERN	Type*	types[NCTYPE];		/* extended to hold TCFLOAT, TCDOUBLE */
 /*
  * bool/_Bool. Its representation is unsigned char -- there is no TBOOL
- * etype -- but it is its own Type object so that com.c can tell it from
- * a plain unsigned char and give conversions to it the semantics C99
- * 6.3.1.2 requires: a comparison against zero, not a truncation.
+ * etype -- but it carries the isbool mark so that com.c can tell it
+ * from a plain unsigned char and give conversions to it the semantics
+ * C99 6.3.1.2 requires: a comparison against zero, not a truncation.
+ *
+ * The mark is a field rather than the identity of this one Type,
+ * because a type is copied whenever it is used: copytyp() is a struct
+ * copy, and dcl.c copies a parameter's type to chain it into a
+ * prototype and copies again for const/volatile. Pointer identity
+ * therefore survives a cast and a return, but not a declaration or a
+ * parameter -- which is exactly the set of cases that used to fail.
  */
 EXTERN	Type*	typebool;
 EXTERN	Type*	fntypes[NTYPE];

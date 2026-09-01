@@ -55,7 +55,10 @@ check(const char *what, int ok, const char *detail)
 int zero = 0;
 int low_byte_zero = 256;
 int low_bit_zero = 2;
-long big = 0x100000000L;
+/* long long, not long: kencc's long is 32 bits even on amd64, so a
+   long here would be truncated to 0 before the cast ever saw it and the
+   case would test nothing. */
+long long big = 0x100000000LL;
 double half = 0.5;
 char buf[64];
 char *aligned = buf;
@@ -93,7 +96,8 @@ main(void)
 	check("cast of a value with a zero low bit",
 	    (bool)low_bit_zero == 1, detail);
 
-	sprintf(detail, "(bool)0x100000000 = %d", (int)(bool)big);
+	sprintf(detail, "(bool)0x100000000 = %d (big = %lld)",
+	    (int)(bool)big, big);
 	check("cast of a value with a zero low word", (bool)big == 1,
 	    detail);
 
