@@ -1804,10 +1804,14 @@
 #define LONG_DOUBLE_IS_UNKNOWN_FORMAT			-1
 #define LONG_DOUBLE_IS_DOUBLEDOUBLE_128_BIT_LITTLE_ENDIAN	LONG_DOUBLE_IS_DOUBLEDOUBLE_128_BIT_LE_LE /* back-compat */
 #define LONG_DOUBLE_IS_DOUBLEDOUBLE_128_BIT_BIG_ENDIAN	LONG_DOUBLE_IS_DOUBLEDOUBLE_128_BIT_BE_BE /* back-compat */
+/*
+ * Plan9: binary64, so the plain IEEE style -- not EXTENDED, which is
+ * the x87 80-bit format kencc does not have.
+ */
 #define LONG_DOUBLE_STYLE_IEEE
 #undef LONG_DOUBLE_STYLE_IEEE_DOUBLEDOUBLE
-#define LONG_DOUBLE_STYLE_IEEE_EXTENDED
-#undef LONG_DOUBLE_STYLE_IEEE_STD
+#undef LONG_DOUBLE_STYLE_IEEE_EXTENDED
+#define LONG_DOUBLE_STYLE_IEEE_STD
 #undef LONG_DOUBLE_STYLE_VAX
 #endif
 
@@ -3926,8 +3930,17 @@
  */
 #define DOUBLEINFBYTES  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf0, 0x7f		/**/
 #define DOUBLENANBYTES  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf8, 0xff		/**/
-#define LONGDBLINFBYTES 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0xff, 0x7f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00		/**/
-#define LONGDBLNANBYTES 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc0, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00		/**/
+/*
+ * Plan9: long double is double, so these are the binary64 patterns,
+ * not the x87 80-bit ones. They must be LONG_DOUBLESIZE bytes long:
+ * perl.h:8713 takes the "NVSIZE == LONG_DOUBLESIZE && LONGDBLINFBYTES"
+ * branch ahead of the DOUBLE one, and a 16-byte list there overflows
+ * the union it initialises --
+ *
+ *	perl.h:8714 more initializers than structure: PL_inf
+ */
+#define LONGDBLINFBYTES 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf0, 0x7f		/* Plan9: = DOUBLEINFBYTES */
+#define LONGDBLNANBYTES 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf8, 0xff		/* Plan9: = DOUBLENANBYTES */
 
 /* PERL_PRIfldbl:
  *	This symbol, if defined, contains the string used by stdio to
@@ -4045,8 +4058,8 @@
  *	This depends on which floating point type was chosen.
  */
 #define DOUBLEMANTBITS  52
-#define LONGDBLMANTBITS 64
-#define NVMANTBITS      64
+#define LONGDBLMANTBITS 52	/* Plan9: long double is double */
+#define NVMANTBITS      52	/* Plan9: NV is double */
 
 /* NEED_VA_COPY:
  *	This symbol, if defined, indicates that the system stores
