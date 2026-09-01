@@ -3386,25 +3386,6 @@ S_setlocale_failure_panic_via_i(pTHX_
 {
     PERL_ARGS_ASSERT_SETLOCALE_FAILURE_PANIC_VIA_I;
 
-#ifdef APEXP_PROBE_MAIN
-    /* APExp: temporary. Ask libc the same question again, raw, and say
-     * what it answers -- so this separates "libap's setlocale returned
-     * NULL" from "it answered and perl's layer above it turned that
-     * into a failure". Remove with the -D in sys/src/ape/lib/perl/mkfile
-     * and sys/src/ape/cmd/perl/mkfile. */
-    {
-        const int apexp_cat = categories[cat_index];
-        const char *apexp_raw = setlocale(apexp_cat, failed);
-        const char *apexp_qry = setlocale(apexp_cat, NULL);
-
-        PerlIO_printf(Perl_error_log,
-            "APEXP setlocale(%d, \"%s\") = %s; setlocale(%d, NULL) = %s\n",
-            apexp_cat, failed ? failed : "(null)",
-            apexp_raw ? apexp_raw : "(NULL)",
-            apexp_cat, apexp_qry ? apexp_qry : "(NULL)");
-    }
-#endif
-
     /* Called to panic when a setlocale form unexpectedly failed for the
      * category determined by 'cat_index', and the locale that was in effect
      * (and likely still is) is 'current'.  'current' may be NULL, which causes

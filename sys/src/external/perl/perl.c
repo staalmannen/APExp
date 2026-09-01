@@ -2868,32 +2868,6 @@ S_run_body(pTHX_ I32 oldscope)
 
     PERL_SET_PHASE(PERL_PHASE_RUN);
 
-#ifdef APEXP_PROBE_MAIN
-    /* APExp: temporary, see the note in op.c's Perl_newPROG. */
-    PerlIO_printf(Perl_error_log,
-        "APEXP run_body: restartop=%p main_start=%p main_root=%p in_eval=%d\n",
-        (void *)PL_restartop, (void *)PL_main_start, (void *)PL_main_root,
-        (int)PL_in_eval);
-    /* Walk the op_next chain the runops loop is about to follow. If it
-     * ends after an op or two, the chain is what is wrong; if it is the
-     * whole program, the ops run and something else swallows them. */
-    {
-        const OP *po = PL_main_start;
-        int pn = 0;
-
-        while (po && pn < 40) {
-            PerlIO_printf(Perl_error_log,
-                "APEXP chain[%d] %p %-12s next=%p ppaddr=%p\n",
-                pn, (const void *)po, OP_NAME(po),
-                (const void *)po->op_next, (const void *)po->op_ppaddr);
-            po = po->op_next;
-            pn++;
-        }
-        PerlIO_printf(Perl_error_log, "APEXP chain: %d ops, ended %s\n",
-            pn, po ? "at the probe's limit" : "with a null op_next");
-    }
-#endif
-
     if (PL_restartop) {
 #ifdef DEBUGGING
         /* this complements the "EXECUTING..." debug we emit above.
