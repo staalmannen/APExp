@@ -70,6 +70,7 @@ static Type *auto_deduct_type(Node*, Node*);
 %token	LWHILE LVOID LENUM LSIGNED LCONSTNT LVOLATILE LSET LSIGNOF
 %token	LRESTRICT LINLINE LNORET LDOTDOTDOT LCOMPLEX LIMAGINARY LCOMPLEXF LCOMPLEXD
 %token	LTYPEOF LTYPEOF_UNQUAL
+%token	LBOOL
 %token	LNULLPTR LSTATICASSERT
 %token	LALIGNOF
 %token	LALIGNAS
@@ -1235,7 +1236,19 @@ ctlist:
 	}
 
 complex:
-	LSTRUCT ltag
+	/*
+	 * bool/_Bool. In "complex" rather than "tname" because that rule
+	 * yields a bit in a type mask, and the mask has no spare bit --
+	 * BNORET is already 1<<31 in a 32-bit long. "complex" hands back
+	 * a Type* directly, which is what typebool needs to be: unsigned
+	 * char's representation under a distinct identity, so com.c can
+	 * give conversions to it C99 6.3.1.2's meaning.
+	 */
+	LBOOL
+	{
+		$$ = typebool;
+	}
+|	LSTRUCT ltag
 	{
 		dotag($2, TSTRUCT, 0);
 		$$ = $2->suetag;
