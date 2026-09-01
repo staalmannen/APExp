@@ -1784,8 +1784,13 @@
 #define  HAS_LDEXPL		/**/
 #define HAS_LONG_DOUBLE		/**/
 #ifdef HAS_LONG_DOUBLE
-#define LONG_DOUBLESIZE 16		/**/
-#define LONG_DOUBLEKIND 3		/**/
+/*
+ * Plan9: kencc has no distinct long double. sub.c's simplet() maps
+ * BDOUBLE|BLONG to types[TDOUBLE], so "long double" is double: 8 bytes,
+ * IEEE 754 binary64. LONG_DOUBLEKIND 0 is LONG_DOUBLE_IS_DOUBLE.
+ */
+#define LONG_DOUBLESIZE 8		/* Plan9: long double is double */
+#define LONG_DOUBLEKIND 0		/* Plan9: LONG_DOUBLE_IS_DOUBLE */
 #define LONG_DOUBLE_IS_DOUBLE				0
 #define LONG_DOUBLE_IS_IEEE_754_128_BIT_LITTLE_ENDIAN	1
 #define LONG_DOUBLE_IS_IEEE_754_128_BIT_BIG_ENDIAN	2
@@ -4181,7 +4186,7 @@
 #define I64TYPE		long long	/* Plan9: long is 32-bit on amd64 */
 #define U64TYPE		unsigned long long	/* Plan9: long is 32-bit on amd64 */
 #endif
-#define NVTYPE		long double		/**/
+#define NVTYPE		double		/* Plan9: kencc long double is double */
 #define IVSIZE		8		/**/
 #define UVSIZE		8		/**/
 #define I8SIZE		1		/**/
@@ -4194,10 +4199,15 @@
 #define I64SIZE		8	/**/
 #define U64SIZE		8	/**/
 #endif
-#define NVSIZE		16		/**/
-#define NV_PRESERVES_UV
-#define NV_PRESERVES_UV_BITS	64
-#define NV_OVERFLOWS_INTEGERS_AT	(256.0*256.0*256.0*256.0*256.0*256.0*256.0*2.0*2.0*2.0*2.0*2.0*2.0*2.0*2.0)
+#define NVSIZE		8		/* Plan9: NV is double */
+/*
+ * A binary64 double has a 53-bit significand, so it cannot hold every
+ * 64-bit UV: NV_PRESERVES_UV must stay undefined, and integers stop
+ * being exactly representable at 2**53.
+ */
+/*#define NV_PRESERVES_UV	/ **/
+#define NV_PRESERVES_UV_BITS	53
+#define NV_OVERFLOWS_INTEGERS_AT	(256.0*256.0*256.0*256.0*256.0*256.0*2.0*2.0*2.0*2.0*2.0)
 #define NV_ZERO_IS_ALLBITS_ZERO
 #if UVSIZE == 8
 #   ifdef BYTEORDER
@@ -4250,9 +4260,16 @@
 #define UVof		"llo"		/* Plan9: UV is unsigned long long */
 #define UVxf		"llx"		/* Plan9: UV is unsigned long long */
 #define UVXf		"llX"		/* Plan9: UV is unsigned long long */
-#define NVef		"Le"		/**/
-#define NVff		"Lf"		/**/
-#define NVgf		"Lg"		/**/
+/*
+ * No L: NV is double. These were "Le"/"Lf"/"Lg", which is what broke
+ * "use 5.006" -- vutil.c's GET_NUMERIC_VERSION stringifies the version
+ * with "%.9" NVff before scanning it, and the result was not a number:
+ *
+ *	Invalid version format (non-numeric data) at Carp.pm line 3.
+ */
+#define NVef		"e"		/* Plan9: NV is double */
+#define NVff		"f"		/* Plan9: NV is double */
+#define NVgf		"g"		/* Plan9: NV is double */
 
 /* SELECT_MIN_BITS:
  *	This symbol holds the minimum number of bits operated by select.
@@ -4395,9 +4412,8 @@
  *	This symbol, if defined, indicates that long doubles should
  *	be used when available.
  */
-#ifndef USE_LONG_DOUBLE
-#define USE_LONG_DOUBLE		/**/
-#endif
+/* Plan9: kencc's long double is double, so there is nothing to use. */
+/*#define USE_LONG_DOUBLE	/ **/
 
 /* USE_MORE_BITS:
  *	This symbol, if defined, indicates that 64-bit interfaces and
