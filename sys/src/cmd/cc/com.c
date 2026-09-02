@@ -705,8 +705,36 @@ tcomo(Node *n, int f)
 
 	case OLIST:		/* compound literal initialiser list */
 	case OCOMMA:
+		/*
+		 * The right operand carries the comma's type, so it has to be
+		 * typed with the flags this node was typed with -- not with
+		 * tcom(), which is tcomo(..., ADDROF) and so decays an array
+		 * to a pointer at the bottom of this function.
+		 *
+		 * sizeof is the case that cares. It types its operand with
+		 * tcomo(l, 0) precisely to keep an array an array, and an
+		 * array compound literal reaches it as OCOMMA(init, ONAME)
+		 * from compoundlit(). Decaying the ONAME made every such
+		 * sizeof the size of a pointer:
+		 *
+		 *	sizeof((int[]){1,2,3,4,5,6,7})		8, not 28
+		 *	sizeof((char const *[]){"a",...,"e"})	8, not 40
+		 *
+		 * which silently breaks the standard way of counting variadic
+		 * arguments,
+		 *
+		 *	#define ARRAY_CARDINALITY(a) (sizeof (a) / sizeof (*(a)))
+		 *	ARRAY_CARDINALITY (((char const *[]) {__VA_ARGS__}))
+		 *
+		 * used by gnulib and by bison, where it made every muscle key
+		 * come out as its first fragment alone. Note it reads as 1
+		 * rather than 0, since sizeof the element is a pointer too.
+		 *
+		 * The left operand is evaluated only for its side effects, so
+		 * tcom() stays right for it.
+		 */
 		o = tcom(l);
-		if(o | tcom(r))
+		if(o | tcomo(r, f))
 			goto bad;
 		n->type = r->type;
 		/*
