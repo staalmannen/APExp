@@ -278,6 +278,37 @@ LD=pcc
 YACC=$APEXPROOT/$objtype/bin/ape/bison
 LEX=$APEXPROOT/$objtype/bin/ape/flex
 CFLAGS=-c -DNDEBUG -D_POSIX_SOURCE
+
+# Include flags, per directory, from upstream's configure.in:498-502.
+# They are not interchangeable and not optional:
+#
+#   -noI  stops the driver adding its own -I/sys/include/ape/objcrt and
+#         friends. Those are the *installed* headers -- stage 1's, here
+#         -- and the runtime has to be compiled against the headers
+#         beside its own sources, or it is built to one ABI and linked
+#         against another. configure.in calls this NOI and passes it to
+#         every one of the five.
+#
+#   Each directory then gets the include/ trees it depends on, its own
+#   source directory (its private headers live beside its .m files:
+#   src/oclib has 85 headers where include/oclib has the 78 public
+#   ones), and -I. for anything generated into the build directory.
+#
+# yacc.ym is what found this. It includes "options.h", "node.h",
+# "util.h" and "stmt.h", all of them oclib's private headers, so
+# compiling src/objc without -I$OBJCSRC/src/oclib gives
+#
+#	cpp: yacc.ym:36 Could not find include file "options.h"
+OBJCINCDIR=$OBJCSRC/include
+CRTINC=-I$OBJCINCDIR/objcrt
+PAKINC=-I$OBJCINCDIR/objpak
+
+CRTFLAGS=-noI $CRTINC -I$OBJCSRC/src/objcrt -I.
+PAKFLAGS=-noI $CRTINC $PAKINC -I$OBJCSRC/src/objpak -I.
+OCFLAGS=-noI $CRTINC $PAKINC -I$OBJCSRC/src/oclib -I.
+CAFLAGS=-noI $CRTINC -I$OBJCSRC/src/cakit -I.
+OBJCFLAGS=-noI $CRTINC $PAKINC -I$OBJCSRC/src/oclib -I$OBJCSRC/src/objc -I.
+
 MFLAGS=-c -DNDEBUG
 
 # objc -c compiles straight to an object; there is no separate .c step.
@@ -288,19 +319,19 @@ MFLAGS=-c -DNDEBUG
 # have compiled and linked the file, since the driver links unless told
 # -c.
 %.$O: $OBJCSRC/src/objcrt/%.m
-	$OBJC $MFLAGS $prereq -o $target
+	$OBJC $MFLAGS $CRTFLAGS $prereq -o $target
 
 %.$O: $OBJCSRC/src/objpak/%.m
-	$OBJC $MFLAGS $prereq -o $target
+	$OBJC $MFLAGS $PAKFLAGS $prereq -o $target
 
 %.$O: $OBJCSRC/src/oclib/%.m
-	$OBJC $MFLAGS $prereq -o $target
+	$OBJC $MFLAGS $OCFLAGS $prereq -o $target
 
 ca%.$O: $OBJCSRC/src/cakit/%.m
-	$OBJC $MFLAGS $prereq -o $target
+	$OBJC $MFLAGS $CAFLAGS $prereq -o $target
 
 %.$O: $OBJCSRC/src/objc/%.m
-	$OBJC $MFLAGS -I$OBJCSRC/src/objc $prereq -o $target
+	$OBJC $MFLAGS $OBJCFLAGS $prereq -o $target
 
 # yacc.ym and lex.lm are Objective-C with grammar and scanner rules
 # around it: run bison or flex, rename the C it produces to .m, and
@@ -312,13 +343,13 @@ yacc.$O: $OBJCSRC/src/objc/yacc.ym
 	$YACC -y -d $prereq
 	cp y.tab.c yacc.m
 	cp y.tab.h yacc.h
-	$OBJC $MFLAGS -I. -I$OBJCSRC/src/objc yacc.m -o $target
+	$OBJC $MFLAGS $OBJCFLAGS yacc.m -o $target
 	rm -f y.tab.c y.tab.h yacc.m
 
 lex.$O: $OBJCSRC/src/objc/lex.lm yacc.$O
 	$LEX $OBJCSRC/src/objc/lex.lm
 	cp lex.yy.c lex.m
-	$OBJC $MFLAGS -I. -I$OBJCSRC/src/objc lex.m -o $target
+	$OBJC $MFLAGS $OBJCFLAGS lex.m -o $target
 	rm -f lex.yy.c lex.m
 
 objcrt.a$O: $CRT_OBJS
@@ -347,11 +378,11 @@ $O.postlink: $PLINKOBJS $LIB
 # tables postlink writes into, and the driver looks for _prelink.o in
 # libdir when it is asked for -postlink.
 $PRELINK: $OBJCSRC/src/objc/_prelink.c
-	$CC $CFLAGS -I$OBJCSRC/src/objc $prereq
+	$CC $CFLAGS $CRTINC -I$OBJCSRC/src/objc $prereq
 	cp _prelink.$O $PRELINK
 
 $PREDLL: $OBJCSRC/src/objc/_predll.c
-	$CC $CFLAGS -I$OBJCSRC/src/objc $prereq
+	$CC $CFLAGS $CRTINC -I$OBJCSRC/src/objc $prereq
 	cp _predll.$O $PREDLL
 
 install:V: $PRELINK $PREDLL

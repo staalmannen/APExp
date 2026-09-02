@@ -38,12 +38,6 @@ muscle_kind_new (char const *k)
     return muscle_keyword;
   else if (STREQ (k, "string"))
     return muscle_string;
-  /* APExp: temporary. This abort is silent, and the stack alone does
-     not say what k holds. Remove with the probe in
-     muscle_percent_define_get_raw below. */
-  fprintf (stderr, "APEXP muscle_kind_new: k=%p len=%d [%s]\n",
-           (void *) k, k ? (int) strlen (k) : -1, k ? k : "<NULL>");
-  fflush (stderr);
   abort ();
 }
 
@@ -591,11 +585,6 @@ muscle_percent_define_get_raw (char const *variable, char const *field)
 {
   uniqstr name = muscle_name (variable, field);
   char const *res = muscle_find_const (name);
-  /* APExp: temporary, with the one in muscle_kind_new above. */
-  fprintf (stderr, "APEXP get_raw: var=[%s] field=[%s] name=[%s] res=%p [%s]\n",
-           variable ? variable : "<NULL>", field ? field : "<NULL>",
-           name ? name : "<NULL>", (void *) res, res ? res : "<NULL>");
-  fflush (stderr);
   if (!res)
     complain (NULL, fatal, _("%s: undefined %%define variable %s"),
               "muscle_percent_define_get_raw", quote (variable));
