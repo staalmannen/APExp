@@ -34,6 +34,8 @@ extern Thread*	_pthreadalloc(void);
 extern void	_pthreadsetpid(Thread*, pthread_t);
 extern Thread*	_pthreadnew(pthread_t);
 extern Thread*	_pthreadget(pthread_t);
+extern void	_pthreadkeydtors(void);
+extern void	_pthreadkeyforget(void*);
 extern void	_pthreadfree(Thread*);
 
 #ifdef __cplusplus

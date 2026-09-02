@@ -4,6 +4,12 @@
 rfork en
 fn sigterm{}
 HOME=$home
+# bash does not see rc's $path, and without PATH it falls back to
+# whatever was compiled in -- which is why "which" reports "$PATH is not
+# set" and why any program that looks a command up by PATH is at the
+# mercy of that default. /bin is the union everything below is bound
+# into, so it is the whole answer here.
+PATH=/bin
 LC_ALL = C.UTF-8
 LC_CTYPE = C.UTF-8
 LC_NUMERIC = C.UTF-8
