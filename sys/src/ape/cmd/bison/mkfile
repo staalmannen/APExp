@@ -117,9 +117,36 @@ liby_a-%.$O: $BISONSRC/lib/%.c
 libbison.a$O: $LIB_OBJS
 		ar vu libbison.a$O $LIB_OBJS
 
+# bison cannot generate a parser from the program alone. It shells out
+# to m4 -- config.h says /bin/m4, which mount-include now puts on the
+# path -- and feeds it a skeleton and the m4sugar library, both read
+# from PKGDATADIR at run time. src/configmake.h sets that to
+# /sys/lib/ape/bison; this is what puts the files there.
+#
+# Until now nothing in the tree had ever run bison, so it had never
+# mattered that only the man pages were installed. objc's stage 2 is
+# the first, and got no diagnostic at all -- bison read yacc.ym and
+# then aborted.
+#
+# xslt and the css are for bison --html and are small; installing the
+# whole data directory keeps this from having to track which skeletons
+# upstream adds.
+BISONDATA=$APEXPROOT/sys/lib/ape/bison
+
 install:V:
 		cp $BISONSRC/doc/bison.1 $APEXPROOT/sys/man/1/bison
 		cp $BISONSRC/doc/yacc.1 $APEXPROOT/sys/man/1/yacc
+		mkdir -p $BISONDATA
+		dircp $BISONSRC/data $BISONDATA
+
+# A prerequisite with no recipe, not a second nuke recipe: mkone's nuke
+# carries one and takes no prerequisites, so two recipes would leave mk
+# to pick one silently. mkone's install is prerequisite-only, which is
+# why adding to it above is safe.
+nuke:V:	bisondatanuke
+
+bisondatanuke:V:
+		rm -rf $BISONDATA
 
 
 
