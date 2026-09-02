@@ -88,7 +88,20 @@ CFLAGS=-c -I. -I$BISONSRC/src -I$BISONSRC -I$GNUSRC -I$BISONSRC/lib\
 		-B -DHAVE_CONFIG_H\
 		-DLOCALEDIR="/sys/lib/ape/locale"
 
-CLEANFILES=$LIB
+# libbison.a$O only, not $LIB. $LIB is
+#
+#	LIB=libbison.a$O ../gnulib/libgnu.a$O
+#
+# so "mk clean" here deleted the shared gnulib archive that tar, m4,
+# sed, grep, patch, diff and coreutils all link against, and every one
+# of them then had to be preceded by a trip to ../gnulib. Clean removes
+# what this directory built; libgnu.a belongs to ../gnulib and is
+# cleaned there.
+#
+# CLEANFILES is needed at all because mkone's clean removes *.[$OS] but
+# not *.a$O, so the local archive would otherwise survive. mkmany does
+# remove *.a$O -- that is the difference between the two.
+CLEANFILES=libbison.a$O
 
 bison-%.$O: $BISONSRC/src/%.c
 	$CC $CFLAGS -c $prereq -o $target
