@@ -61,6 +61,17 @@ check(const char *what, const char *got, const char *want)
 	}
 }
 
+static void
+checkn(const char *what, int got, int want)
+{
+	if(got == want){
+		printf("PASS %s: %d\n", what, got);
+	}else{
+		printf("FAIL %s: got %d, want %d\n", what, got, want);
+		failures++;
+	}
+}
+
 /* m4's macro, with TOKEN_DATA_TEXT collapsed to the array element. */
 #define ARG_STR(argc, argv) \
 	((argc == 0) ? "" : \
@@ -155,6 +166,38 @@ main(void)
 	args[2] = "";
 	fetchf(buf, sizeof buf, 3, args, 3);
 	check("bison c.m4 token, last", buf, "YYEOF|0|");
+
+	/*
+	 * 5. snprintf's return is the length it would have written,
+	 * not the length it did (C99 7.19.6.5p3).  The two-pass idiom
+	 * -- measure, allocate, format again -- is built on it, and
+	 * gets a silent truncation instead of a second pass when the
+	 * count comes back clamped.
+	 *
+	 * gcc warns about the deliberate truncations here
+	 * (-Wformat-truncation); that is it agreeing with the test.
+	 */
+	{
+		int n;
+
+		strcpy(buf, "untouched");
+		n = snprintf(buf, 4, "%s", "abcdefg");
+		checkn("snprintf return, truncated", n, 7);
+		check("snprintf buffer, truncated", buf, "abc");
+
+		n = snprintf(NULL, 0, "%s", "abcdefg");
+		checkn("snprintf return, sizing pass", n, 7);
+
+		strcpy(buf, "untouched");
+		n = snprintf(buf, 1, "x");
+		checkn("snprintf return, room for NUL only", n, 1);
+		check("snprintf buffer, room for NUL only", buf, "");
+
+		strcpy(buf, "untouched");
+		n = snprintf(buf, sizeof buf, "%s", "");
+		checkn("snprintf return, empty", n, 0);
+		check("snprintf buffer, empty", buf, "");
+	}
 
 	printf("%d failure(s)\n", failures);
 	return failures;

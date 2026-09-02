@@ -119,7 +119,16 @@ FILE *fmemopen(void *restrict buf, size_t size, const char *restrict mode)
 	if (!plus) f->f.flags = (*mode == 'r') ? F_NOWR : F_NORD;
 	if (*mode == 'r') f->c.len = size;
 	else if (*mode == 'a') f->c.len = f->c.pos = strnlen(buf, size);
-	else if (plus) *f->c.buf = 0;
+	/*
+	 * POSIX: "If mode is w or w+ ... the first byte of the buffer
+	 * shall be set to the null byte."  musl does it for w+ alone,
+	 * on the reasoning that a stream you cannot read from cannot
+	 * tell -- but the caller can, and does: mwrite only writes the
+	 * terminator after a write, so a "w" stream that formats
+	 * nothing leaves the caller's buffer holding whatever it held
+	 * before.  See vsnprintf.c, which used to be built on this.
+	 */
+	else if (size) *f->c.buf = 0;
 
 	f->f.read = mread;
 	f->f.write = mwrite;
