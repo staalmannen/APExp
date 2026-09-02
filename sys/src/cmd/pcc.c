@@ -202,7 +202,28 @@ main(int argc, char *argv[])
 			suf = utfrrune(s, '.');
 			if(suf) {
 				suf++;
-				if(strcmp(suf, "c") == 0) {
+				/*
+				 * .i is C that has already been through
+				 * the preprocessor. gcc and clang both
+				 * take it, and a driver that runs cpp
+				 * itself and hands on the result relies
+				 * on it: objc(1) writes cpp's output,
+				 * feeds it to objc1, and gives what
+				 * comes back to the C compiler as
+				 * <name>.i. Without this that argument
+				 * matched nothing here and was dropped
+				 * without a word, leaving
+				 *
+				 *	cc: no files to compile or load
+				 *
+				 * 6c preprocesses it a second time,
+				 * which costs a pass and changes
+				 * nothing: what objc1 emits carries
+				 * #line directives and no other
+				 * directives at all.
+				 */
+				if(strcmp(suf, "c") == 0 ||
+				   strcmp(suf, "i") == 0) {
 					append(&srcs, s);
 					append(&objs, changeext(s, objext));
 				} else if(strcmp(suf, "o") == 0 ||
