@@ -225,6 +225,29 @@ main(void)
 	}
 
 	/*
+	 * Storage, which is a separate question from sizeof.
+	 * compoundlit() in cc/dcl.c calls adecl() -- which reserves the
+	 * frame slot from t->width -- before doinit(), and it is doinit
+	 * that sets the width of an array declared with an empty [].
+	 * So the slot may be reserved as zero bytes and overlap the next
+	 * auto. bison never sees this: it uses these literals only
+	 * inside sizeof, whose operand is not evaluated.
+	 */
+	{
+		int *p = (int[]){11, 22, 33, 44, 55};
+		int guard[8];
+		char detail[96];
+		int i;
+
+		for (i = 0; i < 8; i++)
+			guard[i] = -1;
+		sprintf(detail, "p[0]=%d p[4]=%d, wanted 11 and 55",
+		    p[0], p[4]);
+		checkd("array literal keeps its storage", p[0] == 11
+		    && p[4] == 55 && guard[0] == -1, detail);
+	}
+
+	/*
 	 * The whole idiom: count the arguments with the literal, then
 	 * pass them variadically. This is bison's UNIQSTR_CONCAT, and
 	 * the string below is the muscle key it failed to build.
