@@ -1,33 +1,75 @@
 </$objtype/mkfile
 
-# objc bootstraps itself: build with the system compiler the first time,
-# then rebuild with the objc1 that produced. Which mkfile to delegate to
-# therefore depends on whether objc1 already exists.
+# The Portable Object Compiler is written in Objective-C, so building it
+# takes two stages -- the same shape as perl, where miniperl is built
+# first and then used to produce the real one:
 #
-# This was written as a bare rc "if" at the top of the mkfile, but mk
-# parses this section itself and does not know rc's control flow. It read
-# the >[2=1] redirection as an assignment and stopped with
-#     mkfile:5: syntax error; multiple vars on left side of assignment
-# which broke mk clean for the whole tree, objc being in DIRS.
+#   stage 1  external/Objc/bootstrap/*.c, 147 files of Objective-C that
+#            upstream has already translated to C, compiled with pcc.
+#            Produces objc1, postlink and the three runtime libraries,
+#            and installs them.
 #
-# The mk way to run a shell command here is a backquote expression, as in
-# sys/src/cmd/mkfile's TARG.
-BUILD=`{if(whatis objc1 >/dev/null >[2=1]) echo rebuild; if not echo bootstrap}
+#   stage 2  external/Objc/src/src/{objcrt,objpak,oclib,cakit,objc}/*.m,
+#            the real sources, compiled with the objc(1) driver -- which
+#            runs the stage 1 objc1. Produces the same programs plus
+#            cakit, and installs them over stage 1's.
+#
+# Both stages always run, in that order. This used to choose between
+# them with
+#
+#	BUILD=`{if(whatis objc1 >/dev/null >[2=1]) echo rebuild
+#	        if not echo bootstrap}
+#	install:V:
+#		mk -f mkfile.$BUILD install
+#
+# which cannot do what it was meant to, for three separate reasons:
+#
+#  - It is one or the other. A single "mk install" can never bootstrap
+#    and then rebuild, because the backquote is evaluated once when mk
+#    parses this file. A clean tree bootstrapped and stopped there, and
+#    the real compiler was never built at all.
+#
+#  - The test is not reproducible. "whatis objc1" searches $path, so the
+#    answer depends on whether some earlier build left an objc1 lying
+#    around -- possibly one from a previous release, and possibly from a
+#    kencc that has since been fixed. Stage 2 would then be compiled by
+#    a stale compiler with no indication that it had been.
+#
+#  - clean and nuke delegated to whichever mkfile the test picked, so
+#    the other stage's objects were never removed.
+#
+# Running both unconditionally costs a stage 1 build that is usually
+# redundant, and buys a build that does the same thing every time.
+#
+# The clean between the stages is not optional. Both stages compile a
+# file called Object, objc1, symbol and so on into this same directory,
+# so stage 1 leaves an Object.$O that is *newer* than stage 2's
+# Object.m -- the .m comes from the distribution and has a release date
+# on it. mk would find the object up to date and link stage 1's code
+# into the stage 2 compiler, silently. Stage 1's programs are already in
+# $BIN by then, so nothing is lost by removing the local objects.
 
 install:V:
-	mk -f mkfile.$BUILD install
+	mk $MKFLAGS -f mkfile.bootstrap install
+	mk $MKFLAGS -f mkfile.bootstrap clean
+	mk $MKFLAGS -f mkfile.rebuild install
 
 installall:V:
-	mk -f mkfile.$BUILD installall
+	mk $MKFLAGS -f mkfile.bootstrap installall
+	mk $MKFLAGS -f mkfile.bootstrap clean
+	mk $MKFLAGS -f mkfile.rebuild installall
 
+# clean and nuke run over both, since either may have left objects.
 clean:V:
-	mk -f mkfile.$BUILD clean
+	mk $MKFLAGS -f mkfile.bootstrap clean
+	mk $MKFLAGS -f mkfile.rebuild clean
 
 nuke:V:
-	mk -f mkfile.$BUILD nuke
+	mk $MKFLAGS -f mkfile.bootstrap nuke
+	mk $MKFLAGS -f mkfile.rebuild nuke
 
-
-
-
-
-
+# Stage 1 alone, for when stage 2 is what is being debugged and the
+# bootstrap compiler is known good.
+bootstrap:V:
+	mk $MKFLAGS -f mkfile.bootstrap install
+	mk $MKFLAGS -f mkfile.bootstrap clean
