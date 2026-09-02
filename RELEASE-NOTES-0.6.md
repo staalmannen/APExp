@@ -9,7 +9,7 @@ about what that made possible: GNU coreutils, tar, diff and patch build
 and are installed by default, and so do LibreSSL, curl, libzip, pax and
 perl. TLS 1.3 works.
 
-It is also the release in which four separate compiler bugs were found,
+It is also the release in which five separate compiler bugs were found,
 every one of which produced **silently wrong values** rather than an error.
 Two of them had been corrupting output for as long as they had existed.
 That is the reason for the rebuild notice below, and it is not a formality.
@@ -28,7 +28,7 @@ latest release rather than upgrading in place.
 not the usual ABI-change warning: the compiler was quietly producing wrong
 values in ordinary C, so a binary can link cleanly and still be wrong.
 
-Two of the four bugs are the reason:
+Two of the five bugs are the reason:
 
 - **`bool` was a signed char**, so *every* conversion to it truncated to
   the low byte instead of comparing against zero, as C99 6.3.1.2 requires.
@@ -41,6 +41,12 @@ Two of the four bugs are the reason:
   Every SHA-3 digest was wrong, so ML-KEM was wrong, so every TLS 1.3
   handshake offering X25519MLKEM768 failed. Nothing about that is
   Keccak-specific: a 64-bit value live across a 32-bit `%` is ordinary C.
+
+Rebuilding the compiler is not enough on its own, and neither is
+rebuilding libap. Everything here links statically, so a library fix
+reaches only the binaries relinked after it — an old `ls` keeps the old
+`hash.c` and the old `setlocale` inside it however many times libap is
+rebuilt underneath. That is what "everything" means above.
 
 The order matters, because every architecture compiler consumes `y.tab.h`
 from `cc`:
@@ -123,7 +129,7 @@ The interpreter runs and loads modules; `ExtUtils::Miniperl` generates
 
 ## Compiler correctness fixes
 
-All four of the first group produced wrong values with no diagnostic.
+All five of the first group produced wrong values with no diagnostic.
 
 **Converting to `bool` truncated instead of comparing** (`cc/lex.c`,
 `cc.y`, `com.c`). `_Bool` and `bool` were mapped onto `LCHAR`, which the
@@ -151,6 +157,22 @@ the right answer and then never stored it. gnulib's `hash.c` compares
 `SIZE_MAX` against a float, so `hash_initialize` returned NULL and every
 program that hashes — `cp`, `mv`, `ln`, `du` — died with "memory
 exhausted" before looking at its arguments.
+
+**A comma expression's type decayed, so `sizeof` an array compound
+literal was the size of a pointer** (`cc/com.c`). `compoundlit()` builds
+`(type){...}` as `OCOMMA(initialisation, ONAME)`, and the `OCOMMA` case
+typed its right operand with `tcom()` — which is `tcomo(..., ADDROF)`, and
+so turned the array into a pointer. `sizeof` types its operand with
+`tcomo(l, 0)` precisely to stop that happening, and the flag was being
+thrown away one level down:
+
+```c
+sizeof((int[]){1,2,3,4,5,6,7})   /* 8, not 28 */
+```
+
+That is the standard way of counting variadic arguments, so
+`ARRAY_CARDINALITY` over a compound literal answered 1 for any array of
+pointers. bison's `muscle_kind_new` uses it to size a table and aborted.
 
 **A designator was resolved in the wrong scope** (`cc/dcl.c`). C99
 6.7.8p17 makes a designator relative to the object of the *enclosing*
