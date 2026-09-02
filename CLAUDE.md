@@ -148,8 +148,8 @@ Every test named in the sections below sits here; the ones for kencc
 itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `compound-literal-test.c`, `designated-init-test.c`, `charptr-test.c`,
 `rol64-test.c` and `u64float-test.c`, and for libap `locale-test.c`,
-`sigset-test.c`, `posix-spawn-test.c`, `limits-test.c` and
-`stdio-test.c`. `sys/src/ape/lib/libressl/test/` is separate: it is
+`sigset-test.c`, `posix-spawn-test.c`, `limits-test.c`,
+`format-arg-test.c` and `stdio-test.c`. `sys/src/ape/lib/libressl/test/` is separate: it is
 upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
 
 Beyond that, testing is still mostly ad-hoc — compile a program under
