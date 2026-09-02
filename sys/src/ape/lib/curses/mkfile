@@ -74,8 +74,34 @@ CURSRC=../../../external/PDCursesMod
 
 CC=pcc
 LD=pcc
+# __bool_true_false_are_defined says "bool, true and false already
+# exist, do not define them", and it is normally <stdbool.h> that says
+# so. curses.h:136 is
+#
+#	#if !defined(PDC_PP98) && !defined(__bool_true_false_are_defined)
+#	typedef unsigned char bool;
+#	#endif
+#
+# and nothing on the way to it includes <stdbool.h>, so PDCurses reached
+# for its own bool. kencc reserves bool as a keyword whether or not the
+# header was included, so that typedef cannot be accepted:
+#
+#	curses.h:136 syntax error, last name: bool
+#
+# It used to parse by accident. While bool was LCHAR, the line was
+# LTYPEDEF LUNSIGNED LCHAR LCHAR ';', which gctnlist absorbed as a
+# declaration with no declarator -- a silent no-op that left bool
+# meaning signed char. Now that bool is its own token it cannot follow
+# "unsigned char", and the accident is a diagnostic.
+#
+# Defining it here rather than adding an include to upstream's header:
+# it is the same answer <stdbool.h> would give, and the value matches
+# that header's token for token, which cpp requires of a macro defined
+# twice -- white space included. See the macro identity note in
+# CLAUDE.md.
 CFLAGS= -c -I$CURSRC -I$CURSRC/plan9 -I$CURSRC/common -D_POSIX_SOURCE \
--D_BSD_EXTENSION -D_C99_SNPRINTF_EXTENSION -DHAVE_VSNPRINTF -DHAVE_GETTIMEOFDAY -DPDC_FORCE_UTF8
+-D_BSD_EXTENSION -D_C99_SNPRINTF_EXTENSION -DHAVE_VSNPRINTF -DHAVE_GETTIMEOFDAY -DPDC_FORCE_UTF8 \
+-D__bool_true_false_are_defined=1
 
 %.$O: $CURSRC/pdcurses/%.c
 	$CC $CFLAGS $CURSRC/pdcurses/$stem.c
