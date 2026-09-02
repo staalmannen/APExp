@@ -29,7 +29,21 @@ ld=${LD-"pcc"}
 cpp=${CPP-"pcc -E"}
 cppwantsdotc=1
 cpargs="-D__PORTABLE_OBJC__ "
-ocargs="-gnu -noTags"
+# APExp: -nolinetags, not -noTags. objc1 has never had a -noTags option
+# -- neither the bootstrap one nor src/objc/objc1.m, both of which take
+# -nolinetags and -shortTags -- and this script's own option table says
+# as much a couple of hundred lines below:
+#
+#	-nolinetags|-noTags) ocargs="$ocargs -nolinetags";;
+#
+# so -noTags is a spelling this driver accepts and translates. It is
+# only the default, which goes to objc1 untranslated, that had it:
+#
+#	objc1: unknown option -noTags
+#
+# configure.in:409 is where it comes from, added when the C compiler is
+# found not to handle long #line tags.
+ocargs="-gnu -nolinetags"
 ccargs=""
 ldargs=""
 dlargs="-bogus"

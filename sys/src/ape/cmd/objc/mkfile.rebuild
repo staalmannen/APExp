@@ -269,6 +269,13 @@ PLINKOBJS=postlink.$O
 # through its own "#! /bin/sh": /bin/sh is dash, which this tree
 # installs into $objtype/bin/ape, so outside apexp-sh there is no
 # /bin/sh either and the shebang would fail before the script began.
+# The three files the yacc.$O and lex.$O rules rename into place.
+# mkmany's clean removes y.tab.? and lex.yy.c, which are what bison and
+# flex write, but not what those rules copy them to -- so a failed build
+# left yacc.m and yacc.h behind, and the next one compiled them instead
+# of regenerating.
+CLEANFILES=yacc.m yacc.h lex.m
+
 OBJC=$APEXPROOT/$objtype/bin/ape/sh $APEXPROOT/rc/bin/ape/objc
 OBJCBIN=$APEXPROOT/$objtype/bin/ape
 OBJCLIB=$APEXPROOT/$objtype/lib/ape
