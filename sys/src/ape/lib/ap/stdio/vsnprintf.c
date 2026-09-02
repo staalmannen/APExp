@@ -40,8 +40,27 @@
  *    quietly truncates instead of growing.
  *
  * sn_write reports every byte as written and copies only what fits, so
- * the count stays right however small nbuf is.  A zero buf_size means
- * vfprintf hands each piece straight to it rather than buffering.
+ * the count stays right however small nbuf is.
+ *
+ * It differs from musl's in one respect, and the difference is not
+ * optional.  musl leaves buf_size 0 and lets its vfprintf substitute an
+ * internal buffer; this tree's vfprintf is the pANS one, and its
+ * __fwritex is a stub -- "return f->write(f, s, l)" -- which never
+ * calls __towrite.  So nothing here will initialise wbase/wpos/wend on
+ * our behalf, and they have to be set before vfprintf is entered.
+ *
+ * Leaving wend null is not merely unbuffered, it is unbounded:
+ * ocvt_fixed writes the sign with fputs before its first character, so
+ * for a %d the stub runs first, sn_write sets wpos = wbase = f->buf and
+ * wend stays null, and _putc_impl's "f->wpos != f->wend" is then true
+ * for every character that follows.  The digits walk off the end of the
+ * buffer and into the stack.  %s never reached it -- ocvt_s uses
+ * _putc_impl alone, which goes through __overflow, which does call
+ * __towrite.
+ *
+ * Hence a real buffer, all three pointers set here, and an explicit
+ * flush at the end: this vfprintf never flushes, the fmemopen version
+ * having relied on fclose to do it.
  *
  * The old INT_MAX comment is still worth keeping in mind: sprintf calls
  * this with nbuf = INT_MAX, so nothing here may compute nbuf-1 as a
@@ -77,10 +96,11 @@ static size_t sn_write(FILE *f, const unsigned char *s, size_t l)
 }
 
 int vsnprintf(char *buf, size_t nbuf, const char *fmt, va_list args){
-	unsigned char b[1];
+	unsigned char b[BUFSIZ];
 	char dummy[1];
 	struct cookie c;
 	FILE f;
+	int n;
 
 	if (nbuf > INT_MAX) {
 		errno = EOVERFLOW;
@@ -95,10 +115,14 @@ int vsnprintf(char *buf, size_t nbuf, const char *fmt, va_list args){
 	f.write = sn_write;
 	f.lock = -1;
 	f.buf = b;
-	f.buf_size = 0;
+	f.buf_size = sizeof b;
+	f.wbase = f.wpos = b;
+	f.wend = b + sizeof b;
 	f.cookie = &c;
 	f.fd = -1;
 
 	*c.s = 0;
-	return vfprintf(&f, fmt, args);
+	n = vfprintf(&f, fmt, args);
+	f.write(&f, 0, 0);	/* flush what is still in b */
+	return n;
 }
