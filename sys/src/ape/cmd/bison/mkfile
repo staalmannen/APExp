@@ -131,13 +131,27 @@ libbison.a$O: $LIB_OBJS
 # xslt and the css are for bison --html and are small; installing the
 # whole data directory keeps this from having to track which skeletons
 # upstream adds.
+# Plan 9's tar, by full path, rather than dircp.
+#
+# Inside apexp-sh both /bin/tar and /bin/dircp are the APE ones -- it
+# binds $cputype/bin/ape and rc/bin/ape with -b -- and rc/bin/ape/dircp
+# says so itself: "copy a tree with ape's tar". So an install step that
+# says dircp gets GNU tar, and GNU tar does not currently work here:
+#
+#	tar: suicide: bad address in notify
+#	: This does not look like a tar archive
+#
+# Copying a tree during a build should not depend on which tar the
+# session happens to prefer, so this names Plan 9's.
+P9TAR=/$cputype/bin/tar
+
 BISONDATA=$APEXPROOT/sys/lib/ape/bison
 
 install:V:
 		cp $BISONSRC/doc/bison.1 $APEXPROOT/sys/man/1/bison
 		cp $BISONSRC/doc/yacc.1 $APEXPROOT/sys/man/1/yacc
 		mkdir -p $BISONDATA
-		dircp $BISONSRC/data $BISONDATA
+		@{cd $BISONSRC/data && $P9TAR cf /fd/1 .} | @{cd $BISONDATA && $P9TAR xf /fd/0}
 
 # A prerequisite with no recipe, not a second nuke recipe: mkone's nuke
 # carries one and takes no prerequisites, so two recipes would leave mk
