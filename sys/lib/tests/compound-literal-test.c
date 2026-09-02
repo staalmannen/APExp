@@ -19,14 +19,65 @@
  *
  *	hash_remove (sv, &(struct sparse_ent_) {i, 0});
  *
+ * The sizeof cases came later, from bison. An array compound literal
+ * takes its size from the number of initialisers, exactly as
+ * "int a[] = {1,2,3}" does, and gnulib and bison count variadic
+ * arguments with that:
+ *
+ *	#define ARRAY_CARDINALITY(a) (sizeof (a) / sizeof (*(a)))
+ *	#define UNIQSTR_CONCAT(...) \
+ *	  uniqstr_concat (ARRAY_CARDINALITY (((char const *[]) {__VA_ARGS__})), \
+ *	                  __VA_ARGS__)
+ *
+ * bison builds every muscle key that way. With the count wrong,
+ * muscle_name("lr.type", "kind") returned "percent_define_" -- the first
+ * fragment alone -- so every muscle collided into one entry, and
+ * muscle_kind_new got an empty string and aborted with no diagnostic.
+ * bison could not generate a parser at all.
+ *
  * Build and run:  pcc -o compound-literal-test compound-literal-test.c
  * Prints "PASS" per case; exit status is the number of failures.
  */
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
+#define ARRAY_CARDINALITY(a) (sizeof (a) / sizeof (*(a)))
+
+/* bison's UNIQSTR_CONCAT, with the same shape. */
+#define CONCAT(...) \
+	concat(ARRAY_CARDINALITY(((char const *[]){__VA_ARGS__})), \
+	       __VA_ARGS__)
+
+static char *
+concat(int nargs, ...)
+{
+	static char buf[256];
+	va_list ap;
+	int i;
+
+	buf[0] = 0;
+	va_start(ap, nargs);
+	for (i = 0; i < nargs; i++)
+		strcat(buf, va_arg(ap, char const *));
+	va_end(ap);
+	return buf;
+}
+
 static int failures;
+
+static void
+checkd(const char *what, int ok, const char *detail)
+{
+	if (ok)
+		printf("PASS  %s\n", what);
+	else {
+		printf("FAIL  %s%s%s\n", what, detail ? ": " : "",
+		       detail ? detail : "");
+		failures++;
+	}
+}
 
 static void
 check(const char *what, int ok)
@@ -137,6 +188,55 @@ main(void)
 	{
 		const struct ent *cp = &(const struct ent){5, 6};
 		check("&(const struct){...}", cp->index + cp->val == 11);
+	}
+
+	/*
+	 * An array compound literal is sized by its initialisers, like
+	 * any other array declared with an empty [].
+	 */
+	{
+		char detail[96];
+
+		sprintf(detail, "got %d, wanted %d",
+		    (int)sizeof((char const *[]){"a", "b", "c", "d", "e"}),
+		    (int)(5 * sizeof(char const *)));
+		checkd("array literal sized by its initialisers",
+		    sizeof((char const *[]){"a", "b", "c", "d", "e"})
+		        == 5 * sizeof(char const *), detail);
+
+		sprintf(detail, "got %d, wanted 5",
+		    (int)ARRAY_CARDINALITY(((char const *[]){
+		        "a", "b", "c", "d", "e"})));
+		checkd("ARRAY_CARDINALITY of a 5-element literal",
+		    ARRAY_CARDINALITY(((char const *[]){
+		        "a", "b", "c", "d", "e"})) == 5, detail);
+
+		sprintf(detail, "got %d, wanted 1",
+		    (int)ARRAY_CARDINALITY(((char const *[]){"a"})));
+		checkd("ARRAY_CARDINALITY of a 1-element literal",
+		    ARRAY_CARDINALITY(((char const *[]){"a"})) == 1, detail);
+
+		sprintf(detail, "got %d, wanted %d",
+		    (int)sizeof((int[]){1, 2, 3, 4, 5, 6, 7}),
+		    (int)(7 * sizeof(int)));
+		checkd("int array literal sized by its initialisers",
+		    sizeof((int[]){1, 2, 3, 4, 5, 6, 7}) == 7 * sizeof(int),
+		    detail);
+	}
+
+	/*
+	 * The whole idiom: count the arguments with the literal, then
+	 * pass them variadically. This is bison's UNIQSTR_CONCAT, and
+	 * the string below is the muscle key it failed to build.
+	 */
+	{
+		char *r = CONCAT("percent_define_", "kind", "(", "lr.type",
+		    ")");
+		char detail[160];
+
+		sprintf(detail, "got [%s]", r);
+		checkd("count with a literal, then pass variadically",
+		    strcmp(r, "percent_define_kind(lr.type)") == 0, detail);
 	}
 
 	if (failures)
