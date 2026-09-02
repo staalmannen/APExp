@@ -253,10 +253,9 @@ declaration needs it in the real header.
 
 ## Testing
 
-`sys/lib/tests/` has grown from one program to thirteen. Each is
-standalone, prints `PASS`/`FAIL` per case, exits with the number of
-failures, and opens with a comment recording which bug it came from and
-what that bug cost:
+The tests in `sys/lib/tests` are standalone programs. Each prints
+`PASS`/`FAIL` per case, exits with the number of failures, and opens with
+a comment recording which bug it came from and what that bug cost:
 
 ```
 cd sys/lib/tests && pcc -o bool-test bool-test.c && ./bool-test
