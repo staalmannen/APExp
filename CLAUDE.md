@@ -739,6 +739,53 @@ ship.
 identity for the other types, and prints which of these headers were actually
 read.
 
+### stdio/ — vsnprintf wrote nothing when there was nothing to write
+
+`vsnprintf` was a wrapper over `fmemopen(buf, nbuf, "w")` plus
+`vfprintf`. `fmemopen`'s `mwrite` writes the terminating NUL *after* a
+write, so formatting **zero** characters — `snprintf(buf, n, "%s", "")` —
+touched the buffer not at all and left whatever was there before. C99
+7.19.6.5p2 requires a null-terminated result whenever `n` is nonzero.
+
+Found through GNU m4. `format()` formats each conversion into a fresh
+`xasprintf` buffer, and a specifier with no argument left formats the
+empty string — so it came back holding the *previous* conversion. bison's
+`data/skeletons/c.m4:557` formats `"%s = %s%s%s"` with three arguments,
+the last being the separating comma or nothing:
+
+```
+YYEOF = 0,,		/* wrong */
+YYEOF = 0,		/* right */
+```
+
+so every token of every parser bison generated had a doubled comma. Most
+C compilers accept `, ,` in an enumerator list often enough that nothing
+noticed; the Portable Object Compiler is the first thing in the tree that
+*parses* a `y.tab.c` rather than compiling it, and it said
+`y.tab.c:138: fatal: syntax error ","`.
+
+The same file had a second bug: `mwrite` short-writes at the end of the
+buffer, which makes `vfprintf` count short *and* set the error flag, so
+the return value was the truncated length or -1 rather than the length
+that would have been written (7.19.6.5p3). That silently breaks the
+measure-allocate-format-again idiom.
+
+Now musl's own implementation, which is a cookie writer rather than a
+`FILE`: `sn_write` reports every byte as written and copies only what
+fits, so the count is right however small `nbuf` is, and the buffer is
+terminated before `vfprintf` is called at all. This also retires the
+`nbuf > 65536` `open_memstream` path that existed to keep `sprintf`'s
+`nbuf = INT_MAX` from overflowing a length computation.
+
+`fmemopen` was fixed alongside: POSIX says `w` and `w+` set the first
+byte of the buffer to NUL, and musl did it for `w+` alone.
+
+Covered by `sys/lib/tests/format-arg-test.c`, which separates the two
+halves of the m4 line this came from — printf's `%*.*s` with a zero width
+and a negative precision, and the `ARG_STR` idiom (a comma expression in
+the second arm of a conditional, passed to a variadic function). Both
+were suspects; only the library was at fault.
+
 ### <stdio.h> used to drag errno, unistd, fcntl and pthread in
 
 `<stdio.h>` included `<stdio_impl.h>` — musl's *internal* header, which

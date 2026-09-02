@@ -241,6 +241,16 @@ Other header work:
   with everything discarded, so `posix_spawn_file_actions_adddup2()`
   returned 0 and did nothing. Undetectable by the caller, and gnulib's
   `spawn-pipe.c` wires its pipe to the child entirely through `adddup2`.
+- **`vsnprintf` left the buffer untouched when it formatted nothing**,
+  and reported a truncated length when it ran out of room. It was built
+  on `fmemopen`, whose write hook only lays down the terminating NUL
+  *after* a write, so `snprintf(buf, n, "%s", "")` returned whatever the
+  buffer held before; and the same hook's short write at the end of the
+  buffer made the return value the length written rather than the length
+  that would have been (C99 7.19.6.5p2 and p3), which quietly breaks
+  measure-allocate-format-again. musl's own implementation replaces it.
+  GNU m4's `format()` is what found it, and every parser bison generated
+  had a doubled comma after each token as a result.
 - **`sigset_t` held three signals.** `sigaddset`/`sigdelset` were gated on
   a mask built by ORing signal *numbers* together, so only 0, 1 and 2 were
   accepted; `sigfillset()` produced a set naming SIGHUP and SIGINT alone.
