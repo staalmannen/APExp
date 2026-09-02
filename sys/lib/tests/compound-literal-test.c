@@ -235,16 +235,20 @@ main(void)
 	 */
 	{
 		int *p = (int[]){11, 22, 33, 44, 55};
-		int guard[8];
-		char detail[96];
-		int i;
+		int other = 0x5a5a;
+		char detail[160];
+		int overlaps;
 
-		for (i = 0; i < 8; i++)
-			guard[i] = -1;
-		sprintf(detail, "p[0]=%d p[4]=%d, wanted 11 and 55",
-		    p[0], p[4]);
-		checkd("array literal keeps its storage", p[0] == 11
-		    && p[4] == 55 && guard[0] == -1, detail);
+		/* Measure the overlap directly rather than inferring it
+		   from which write lands last: the literal occupies
+		   p[0..4], and no other auto may share that range. */
+		overlaps = (char *)&other >= (char *)p
+		    && (char *)&other < (char *)(p + 5);
+		sprintf(detail, "p=%p..%p other=%p%s; p[0]=%d p[4]=%d",
+		    (void *)p, (void *)(p + 5), (void *)&other,
+		    overlaps ? " OVERLAPS" : "", p[0], p[4]);
+		checkd("array literal has a frame slot of its own",
+		    !overlaps && p[0] == 11 && p[4] == 55, detail);
 	}
 
 	/*
