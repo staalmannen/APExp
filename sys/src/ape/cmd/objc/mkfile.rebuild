@@ -249,10 +249,34 @@ PLINKOBJS=postlink.$O
 
 <$APEXPROOT/sys/src/cmd/mkmany
 
-OBJC=objc
+# Name every tool by its path in this tree rather than trusting $path.
+# bison and flex install into $objtype/bin/ape and the driver lives in
+# rc/bin/ape, and neither of those is on $path unless apexp-sh bound
+# them over /bin -- a "mk install" from a plain rc gets
+#
+#	bison: file does not exist: './bison'
+#
+# and would silently use the host's tools if it had any. Stage 2 is the
+# first thing in the tree to run a program out of $objtype/bin/ape at
+# build time, which is why YACC=bison in ../../config has never been
+# exercised before now.
+#
+# OBJCBIN, OBJCLIB and OBJCINC are read by the driver (rc/bin/ape/objc)
+# and point it at the stage 1 compiler, the stage 1 runtime and this
+# tree's headers. Without them it would look for /bin/objc1.
+#
+# The driver is named with the shell in front of it rather than run
+# through its own "#! /bin/sh": /bin/sh is dash, which this tree
+# installs into $objtype/bin/ape, so outside apexp-sh there is no
+# /bin/sh either and the shebang would fail before the script began.
+OBJC=$APEXPROOT/$objtype/bin/ape/sh $APEXPROOT/rc/bin/ape/objc
+OBJCBIN=$APEXPROOT/$objtype/bin/ape
+OBJCLIB=$APEXPROOT/$objtype/lib/ape
+OBJCINC=$APEXPROOT/sys/include/ape
 CC=pcc
 LD=pcc
-LEX=flex
+YACC=$APEXPROOT/$objtype/bin/ape/bison
+LEX=$APEXPROOT/$objtype/bin/ape/flex
 CFLAGS=-c -DNDEBUG -D_POSIX_SOURCE
 MFLAGS=-c -DNDEBUG
 

@@ -24,6 +24,27 @@ if(! test -e /sys/include/ape/THIS_IS_APExp) {
     # host system's stock 6c, which fails on ap/complex, ap/aio, and
     # every gnulib-heavy binary in sys/src/ape/cmd that uses (bool).
     bind -b $cputype/bin /bin
+    # And the APE commands and helper scripts this tree builds, so that
+    # a plain "mk install" from rc -- the first build, before apexp-sh
+    # can be used -- can run them. Stage 2 of objc is what needs this:
+    # it runs bison, flex and the objc driver, which live here and in
+    # rc/bin/ape and are on no other path.
+    #
+    # -a, not -b. $cputype/bin/ape is coreutils: cp, rm, mv, ln, mkdir,
+    # echo, test, cat, date, chmod, ls, printf, touch, tr, wc and the
+    # rest, every one of which Plan 9 has in /bin already and every one
+    # of which mk recipes in this tree call. Binding it before /bin
+    # would hand the whole remainder of the build GNU versions of all of
+    # them, which is a large behaviour change to make halfway through a
+    # build and a hard one to attribute afterwards. Appending leaves
+    # Plan 9's own commands winning and adds only the names Plan 9 does
+    # not have -- bison, flex, sh, objc, byacc, make, libtool,
+    # pkg-config. Those are the ones a build needs.
+    #
+    # apexp-sh still binds both with -b, which is right there: at that
+    # point the GNU tools are the environment being asked for.
+    bind -a $cputype/bin/ape /bin
+    bind -a rc/bin/ape /bin
     echo "APExp mounted"
     }
 if not echo "APExp already mounted"

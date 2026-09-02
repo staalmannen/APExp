@@ -325,9 +325,20 @@ done
 # for cross compiles this is not what we want
 #
 
-bindir="/bin"
-libdir="/$objtype/lib/ape"
-hdrdir="/sys/include/ape"
+# APExp: let the environment say where the compiler, its libraries and
+# its headers are, in the same style as the cc/ld/cpp overrides at the
+# top of this script. The defaults are unchanged, and are what a normal
+# apexp-sh session wants -- it binds $cputype/bin/ape over /bin, and
+# mount-include binds $cputype/lib/ape and sys/include/ape over their
+# system paths, so all three resolve into the tree.
+#
+# The overrides exist for building objc itself. Stage 2 of that build
+# runs this script to compile the real compiler with the bootstrap one,
+# and it must use the bootstrap objc1 from the tree whether or not those
+# binds are in place -- a "mk install" from a plain rc has no /bin/objc1.
+bindir="${OBJCBIN-/bin}"
+libdir="${OBJCLIB-/$objtype/lib/ape}"
+hdrdir="${OBJCINC-/sys/include/ape}"
 objc1=$bindir/objc1
 
 case $verbose in
