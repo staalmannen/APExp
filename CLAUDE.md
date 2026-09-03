@@ -819,24 +819,9 @@ and a negative precision, and the `ARG_STR` idiom (a comma expression in
 the second arm of a conditional, passed to a variadic function). Both
 were suspects; only the library was at fault.
 
-### ungetc refused a stream that had not been read yet
+### Three lines of flex, and two stdio bugs behind them
 
-C99 7.19.7.11 guarantees one character of pushback on any input stream,
-read from or not. libap's `ungetc` returned EOF when `f->rpos` was null:
-
-```c
-if(!f->buf || !f->rpos || f->rpos <= f->buf - UNGET)
-	return EOF;
-```
-
-with a comment saying `__toread` must not be called because it resets
-`rpos`/`rend` and would destroy buffered data. It only resets them when
-there are none -- musl guards the call with `!f->rpos`, which is true
-exactly when no read window exists. That is the case being rejected.
-
-flex is the whole reason this matters, and the failure was three steps
-removed from the cause. flex sends its output through a chain of filter
-processes,
+flex sends its output through a chain of filter processes,
 
 ```
 flex -> filter_tee_header -> m4 -P -> filter_fix_linedirs -> lex.yy.c
@@ -844,7 +829,7 @@ flex -> filter_tee_header -> m4 -P -> filter_fix_linedirs -> lex.yy.c
 
 and every child has to make the *stdin FILE* refer to a new descriptor,
 which C gives no way to do. `filter_apply_chain` dup2s onto
-`fileno(stdin)` and then resynchronises the stream (`filter.c:164`) with
+`fileno(stdin)` and then resynchronises the stream (`filter.c:164`):
 
 ```c
 fseek (stdin, 0, SEEK_CUR);
@@ -852,14 +837,58 @@ ungetc (' ', stdin);
 (void) fgetc (stdin);
 ```
 
--- push a character and take it straight back, touching the descriptor
-not at all. flex's own comment calls it "a Hail Mary situation. It seems
-to work." With `ungetc` failing, the `fgetc` became a **real read on a
-pipe nothing had written to yet**: each filter blocked there, and the
-one that goes on to `execvp("m4")` swallowed a bufferful into a `FILE`
-the exec was about to discard.
+push a character and take it straight back, touching the descriptor not
+at all. flex's own comment calls it "a Hail Mary situation. It seems to
+work." Each of those three lines found a different bug.
 
-What it cost: an empty `lex.yy.c`, or flex killed by
+**`fseek` set the error indicator when the seek failed.** This is the
+one that broke flex. C99 7.19.9.2p5 makes `fseek` "return nonzero only
+for a request that cannot be satisfied"; it says nothing about `ferror`,
+and neither glibc nor musl touches it -- a stream you cannot seek is not
+a stream that has failed. A pipe is not seekable, so the `fseek` above
+left `stdin` permanently in error, and this stdio's `fgets` tests that
+explicitly:
+
+```c
+if(c==EOF && s==as || ferror(f)) return NULL;
+```
+
+so the first `fgets` in every filter returned NULL without reading a
+byte. Each filter exited at once, m4 saw end of file on its input, and
+flex died writing into a pipe with no reader.
+
+Two more bugs sat in the same function, in both `fseek` and `fseeko`,
+which were separate copies that had already drifted: a relative seek
+ignored data sitting in the read buffer, so `fseek(f, 0, SEEK_CUR)` was
+not the no-op it is meant to be and disagreed with `ftell`, which did
+account for it; and both went straight to `lseek(f->fd)` and refused
+`f->fd < 0`, so a stream from `fmemopen` or `open_memstream` -- no
+descriptor, seeking through `f->seek` -- could not be sought at all,
+though POSIX requires it. `fseek` delegates to `fseeko` now.
+`rewind` also clears the error indicator, which 7.19.9.5 requires and
+which is what distinguishes it from `fseek(f, 0L, SEEK_SET)`.
+
+`ftell`/`ftello` still use `lseek(f->fd)` and so still fail on a
+memstream. Do not "fix" them by calling `f->seek`: this tree's
+`__stdio_seek` flushes and clears the buffers, unlike musl's, so ftell
+would acquire side effects.
+
+**`ungetc` refused a stream that had not been read yet.** A separate
+bug on the same three lines, and a real one -- C99 7.19.7.11 guarantees
+one character of pushback on any input stream, read from or not. It
+returned EOF when `f->rpos` was null, with a comment saying `__toread`
+must not be called because it resets `rpos`/`rend` and would destroy
+buffered data. It only resets them when there are none: musl guards the
+call with `!f->rpos`, which is true exactly when no read window exists.
+
+This one only bit `stdin`, whose static `FILE` in `stdio/stdin.c` starts
+with `rpos = rend = NULL`; `fopen` and `fdopen` leave a read window set
+up, so those were fine. Left unfixed it would have cost the `fgetc`
+after it a *real read on a pipe nothing had written to yet* -- every
+filter blocking there, and the one that goes on to `execvp("m4")`
+swallowing a bufferful into a `FILE` the exec was about to discard.
+
+**What it cost:** an empty `lex.yy.c`, or flex killed by
 
 ```
 flex: sys: write on closed pipe
@@ -870,9 +899,11 @@ the tree that runs flex, so flex had never worked here -- and the empty
 output looked like success, because `freopen` creates `lex.yy.c` before
 any filter runs.
 
-Covered by `sys/lib/tests/unget-pipe-test.c`. Note the byte count is the
-case that matters: a failed `ungetc` leaves the line count right, since
-the `fgetc` after it eats one character rather than a whole line.
+Covered by `sys/lib/tests/unget-pipe-test.c`. Note that a test here has
+to *report* rather than exit: the child has several silent exit paths,
+and a quiet child leaves the parent writing into a pipe with no reader,
+so it dies of SIGPIPE before printing anything -- which is the same
+mechanism that kills flex, and it hid the answer for a round trip.
 
 ### <stdio.h> used to drag errno, unistd, fcntl and pthread in
 

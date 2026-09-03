@@ -1,39 +1,11 @@
 #include "stdio_impl.h"
-#include <errno.h>
 
+/*
+ * fseek is fseeko with a narrower offset. It used to be a second copy
+ * of the same logic, and the two had already drifted; see fseeko.c for
+ * what was wrong with both. No locking here -- fseeko takes the lock,
+ * and __lockfile is a real mutex, so taking it twice would deadlock.
+ */
 int fseek(FILE *f, long offs, int type){
-	off_t ret;
-
-	_FLOCK(f);
-
-	if (f->fd < 0) {
-		_FUNLOCK(f);
-		return -1;
-	}
-
-	/* Flush write buffer if needed */
-	if (f->wpos > f->wbase) {
-		f->write(f, 0, 0);
-		if (f->flags & F_ERR) {
-			_FUNLOCK(f);
-			return -1;
-		}
-	}
-
-	/* Seek to position */
-	ret = lseek(f->fd, offs, type);
-	if (ret < 0) {
-		f->flags |= F_ERR;
-		_FUNLOCK(f);
-		return -1;
-	}
-
-	/* Clear read buffer on successful seek */
-	f->rpos = f->rend = 0;
-	f->flags &= ~(F_EOF | F_ERR);
-
-	_FUNLOCK(f);
-	return 0;
+	return fseeko(f, (off_t)offs, type);
 }
-
-
