@@ -819,7 +819,7 @@ and a negative precision, and the `ARG_STR` idiom (a comma expression in
 the second arm of a conditional, passed to a variadic function). Both
 were suspects; only the library was at fault.
 
-### Three lines of flex, and two stdio bugs behind them
+### Three lines of flex, and three stdio bugs behind them
 
 flex sends its output through a chain of filter processes,
 
@@ -887,6 +887,33 @@ up, so those were fine. Left unfixed it would have cost the `fgetc`
 after it a *real read on a pipe nothing had written to yet* -- every
 filter blocking there, and the one that goes on to `execvp("m4")`
 swallowing a bufferful into a `FILE` the exec was about to discard.
+
+**`freopen` returned a new stream instead of reopening the given one.**
+The third bug, and the one that sent the whole scanner to the terminal.
+C99 7.19.5.4p2 makes `freopen` associate the *named file with the
+stream it is given*; it returns that stream. This did
+
+```c
+if (f && f->fd >= 0) fclose(f);
+fd = open(name, flags, 0666);
+return __fdopen(fd, mode);
+```
+
+so the caller's stream was untouched. On a permanent stream it did
+nothing at all: `fclose()` on `F_PERM` -- stdin, stdout, stderr --
+flushes and returns *without closing the descriptor*, by design. fd 1
+stayed on the terminal, `open()` took a fresh descriptor, and the new
+`FILE` was discarded by every caller, since the return value is checked
+against NULL and otherwise thrown away.
+
+flex's `main.c:333` is `freopen (outfilename, "w+", stdout)` followed by
+writing the scanner to `stdout`, so `lex.yy.c` was created by that
+`open()` and never written to again. Now it is musl's: open the file as
+a separate stream, `dup2` its descriptor onto the one the caller's
+stream already uses, adopt its flags and hooks, close the temporary.
+**`fileno(f)` must not change** -- flex then does
+`dup2(pipe, fileno(stdout))` and forks children that inherit descriptor
+1 expecting it to be the output file.
 
 **What it cost:** an empty `lex.yy.c`, or flex killed by
 
