@@ -38,6 +38,28 @@ PREDLL=$LIBDIR/_predll.$O
 
 LIB=objcrt.a$O objpak.a$O oclib.a$O cakit.a$O
 
+# What the two programs actually link, and in what order.
+#
+# Plan 9's linker makes one pass over the archives it is given, pulling
+# only the members that resolve symbols undefined at the time it reaches
+# them. So an archive has to come *after* everything that references it,
+# and the order above -- which is only a build dependency list -- is the
+# wrong way round:
+#
+#	kill: SortCltn: not defined
+#	kill: Dictionary: not defined
+#	kill: IdArray: not defined
+#
+# oclib's classdef.m, def.m, funcall.m and four more use those three
+# collection classes, and objpak defines them, so objpak had already
+# been passed by the time anything wanted them.
+#
+# This is upstream's OBJC_BOOTLIBS, configure.in:505-507, verbatim in
+# order. cakit is deliberately absent: it belongs to UT_BOOTLIBS, the
+# utilities, and objc1 does not use it. It is still built and installed
+# here, just not linked into the compiler.
+LINKLIBS=oclib.a$O objpak.a$O objcrt.a$O
+
 # The four object lists are upstream's own, from each directory's
 # Makefile.in OBJFILES, rather than from the .m files present: objpak
 # and oclib each have one .m that is not built.
@@ -376,10 +398,10 @@ cakit.a$O: $CA_OBJS
 	cp $target $CALIB
 
 $O.objc1: $OBJC1OBJS $LIB
-	$LD $prereq -o $target
+	$LD $OBJC1OBJS $LINKLIBS -o $target
 
 $O.postlink: $PLINKOBJS $LIB
-	$LD $prereq -o $target
+	$LD $PLINKOBJS $LINKLIBS -o $target
 
 # _prelink.c and _predll.c are plain C, not Objective-C: they are the
 # tables postlink writes into, and the driver looks for _prelink.o in
