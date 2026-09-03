@@ -45,6 +45,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
 #include <sys/wait.h>
 
 #define NLINES	2000
@@ -186,17 +187,33 @@ filter_child(void)
 	if(pid == 0){
 		char buf[512];
 		long nl = 0, nb = 0;
+		int sk, ug, gc;
 
+		/*
+		 * Everything here reports to stderr, which nothing in this
+		 * test redirects. A child that exits quietly takes the
+		 * parent with it -- the parent is left writing into a pipe
+		 * with no reader -- and then there is nothing on screen to
+		 * say which step went wrong.
+		 */
 		close(p[1]);
 		clearerr(stdin);
-		if(dup2(p[0], fileno(stdin)) == -1)
+		if(dup2(p[0], fileno(stdin)) == -1){
+			fprintf(stderr, "  child: dup2 onto fileno(stdin) failed\n");
 			_exit(2);
+		}
 		close(p[0]);
 
 		/* filter.c:164-171, verbatim in shape */
-		fseek(stdin, 0, SEEK_CUR);
-		ungetc(' ', stdin);
-		(void)fgetc(stdin);
+		sk = fseek(stdin, 0, SEEK_CUR);
+		ug = ungetc(' ', stdin);
+		gc = fgetc(stdin);
+
+		fprintf(stderr, "  child: fseek=%d ungetc=%d fgetc=%d\n",
+			sk, ug, gc);
+		if(ug != ' ')
+			fprintf(stderr, "  child: ungetc failed;"
+				" the fgetc above was a real read\n");
 
 		while(fgets(buf, sizeof buf, stdin)){
 			nl++;
@@ -204,8 +221,10 @@ filter_child(void)
 		}
 
 		res = fopen(RESULT, "w");
-		if(!res)
+		if(!res){
+			fprintf(stderr, "  child: cannot write %s\n", RESULT);
 			_exit(3);
+		}
 		fprintf(res, "%ld %ld\n", nl, nb);
 		fclose(res);
 		_exit(0);
@@ -223,10 +242,19 @@ filter_child(void)
 		want += strlen(line);
 		fputs(line, out);
 	}
+	if(ferror(out))
+		printf("  parent: write failed --"
+			" the child stopped reading early\n");
 	fclose(out);
 
 	if(waitpid(pid, &status, 0) < 0){
 		check("flex filter idiom", 0, "waitpid failed");
+		return;
+	}
+	if(status != 0){
+		snprintf(detail, sizeof detail, "child exited with status %#x",
+			status);
+		check("flex filter idiom, child ran", 0, detail);
 		return;
 	}
 
@@ -257,6 +285,13 @@ filter_child(void)
 int
 main(void)
 {
+	/*
+	 * The parent must survive a child that stops reading, so that it
+	 * can say so. Without this it dies of SIGPIPE mid-loop and the
+	 * test prints neither a failure nor a total.
+	 */
+	signal(SIGPIPE, SIG_IGN);
+
 	unread_file();
 	unread_pipe();
 	filter_child();
