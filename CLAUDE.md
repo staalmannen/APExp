@@ -602,6 +602,39 @@ with same pattern. power64 `stddef_arch.h` created (power64 had none).
 32-bit architectures (386, arm, mips, power, sparc, 68020, spim) are correct
 as-is: `unsigned long` = pointer-sized on ILP32.
 
+### A variadic sentinel must be a pointer, not 0
+
+`f(a, b, 0)` where `f` reads its arguments with `va_arg(ap, char *)`
+until NULL is undefined behaviour, and on amd64 Plan 9 it does not
+work. The `0` is an `int`, and the default argument promotions leave it
+an `int` — four bytes. Arguments are passed in eight-byte stack slots,
+so `va_arg` reads eight: the zero in the low half and whatever the frame
+holds in the high half. The loop then keeps going.
+
+This is the same shape as the `size_t` problem above, and it survives
+everywhere else for the same reason a lot of this does: System V amd64
+passes small integers in registers, and writing the low half of a
+register zeroes the upper half as a side effect. **Nothing zeroes a
+stack slot.**
+
+flex is where it turned up. `main.c:383` had
+
+```c
+filter_create_ext(output_chain, m4, "-P", 0);
+```
+
+and flex pipes its generated scanner through `m4 -P`, so the garbage
+pointers became extra `argv` entries; m4 took them for file names,
+exited without reading its stdin, and flex died writing into a pipe with
+no reader — `flex: sys: write on closed pipe`, with nothing to say which
+of the two was at fault.
+
+Note it is stack-layout dependent, so it can appear to work and then
+stop when the compiler changes. When a variadic call goes wrong, check
+the sentinel before anything else. `execl`, `execle`, `execlp` and
+gnulib's `version_etc` are the common ones; all call sites of those in
+the tree are correct today.
+
 ### APE malloc / free() constraint
 `free(ptr)` computes `(Bucket*)((uintptr_t)ptr - datoff)` where `datoff=16`.
 Any pointer passed to `free()` MUST be exactly the value returned by `malloc()`.
