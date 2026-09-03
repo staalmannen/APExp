@@ -149,7 +149,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `compound-literal-test.c`, `designated-init-test.c`, `charptr-test.c`,
 `rol64-test.c` and `u64float-test.c`, and for libap `locale-test.c`,
 `sigset-test.c`, `posix-spawn-test.c`, `limits-test.c`,
-`format-arg-test.c` and `stdio-test.c`. `sys/src/ape/lib/libressl/test/` is separate: it is
+`format-arg-test.c`, `unget-pipe-test.c` and `stdio-test.c`. `sys/src/ape/lib/libressl/test/` is separate: it is
 upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
 
 Beyond that, testing is still mostly ad-hoc — compile a program under
@@ -818,6 +818,61 @@ halves of the m4 line this came from — printf's `%*.*s` with a zero width
 and a negative precision, and the `ARG_STR` idiom (a comma expression in
 the second arm of a conditional, passed to a variadic function). Both
 were suspects; only the library was at fault.
+
+### ungetc refused a stream that had not been read yet
+
+C99 7.19.7.11 guarantees one character of pushback on any input stream,
+read from or not. libap's `ungetc` returned EOF when `f->rpos` was null:
+
+```c
+if(!f->buf || !f->rpos || f->rpos <= f->buf - UNGET)
+	return EOF;
+```
+
+with a comment saying `__toread` must not be called because it resets
+`rpos`/`rend` and would destroy buffered data. It only resets them when
+there are none -- musl guards the call with `!f->rpos`, which is true
+exactly when no read window exists. That is the case being rejected.
+
+flex is the whole reason this matters, and the failure was three steps
+removed from the cause. flex sends its output through a chain of filter
+processes,
+
+```
+flex -> filter_tee_header -> m4 -P -> filter_fix_linedirs -> lex.yy.c
+```
+
+and every child has to make the *stdin FILE* refer to a new descriptor,
+which C gives no way to do. `filter_apply_chain` dup2s onto
+`fileno(stdin)` and then resynchronises the stream (`filter.c:164`) with
+
+```c
+fseek (stdin, 0, SEEK_CUR);
+ungetc (' ', stdin);
+(void) fgetc (stdin);
+```
+
+-- push a character and take it straight back, touching the descriptor
+not at all. flex's own comment calls it "a Hail Mary situation. It seems
+to work." With `ungetc` failing, the `fgetc` became a **real read on a
+pipe nothing had written to yet**: each filter blocked there, and the
+one that goes on to `execvp("m4")` swallowed a bufferful into a `FILE`
+the exec was about to discard.
+
+What it cost: an empty `lex.yy.c`, or flex killed by
+
+```
+flex: sys: write on closed pipe
+```
+
+neither of which mentions stdio. `objc`'s `lex.lm` is the only thing in
+the tree that runs flex, so flex had never worked here -- and the empty
+output looked like success, because `freopen` creates `lex.yy.c` before
+any filter runs.
+
+Covered by `sys/lib/tests/unget-pipe-test.c`. Note the byte count is the
+case that matters: a failed `ungetc` leaves the line count right, since
+the `fgetc` after it eats one character rather than a whole line.
 
 ### <stdio.h> used to drag errno, unistd, fcntl and pthread in
 
