@@ -28,6 +28,15 @@
 #include "posixjmp.h"	/* defines procenv_t */
 #include "rlmbutil.h"	/* for HANDLE_MULTIBYTE */
 
+/*
+ * for sigset_t (_rl_timeout_select's prototype below) and SIGINT/SIGWINCH.
+ * This file used to get all three for free through a leak in APExp's
+ * <string.h>, which reached <signal.h> by way of <wchar.h> and <time.h>;
+ * see the "<string.h> reached Plan 9's <u.h>" note in CLAUDE.md. Ask
+ * directly now that the leak is gone.
+ */
+#include <signal.h>
+
 /*************************************************************************
  *									 *
  * Convenience definitions						 *
