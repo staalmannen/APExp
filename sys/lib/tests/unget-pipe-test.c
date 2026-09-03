@@ -228,7 +228,74 @@ freopen_stdout(void)
 }
 
 /*
- * 4. flex's filter idiom end to end: the child re-points stdin at a
+ * 4. fclose closes the file, even on a permanent stream.
+ *
+ * C99 7.19.5.1 has no exemption for stdin/stdout/stderr: fclose
+ * "causes the stream to be flushed and the associated file to be
+ * closed". F_PERM only means the FILE itself is static and must not be
+ * freed.
+ *
+ * This is how a program at the head of a pipeline says it is done.
+ * flex's cleanup is fclose(stdout) followed by wait() for its filter
+ * children, so a descriptor left open means the first filter never sees
+ * end of file and nothing downstream can exit.
+ *
+ * Tested by writing to the descriptor afterwards, which is exact and
+ * needs no timing: if fclose closed it, the write fails. Done in a
+ * child, since it closes stdout for good.
+ */
+static void
+fclose_perm(void)
+{
+	int pid, status, fd, r;
+	FILE *res;
+	char detail[128];
+	long wrote = 0;
+
+	fflush(stdout);
+
+	if((pid = fork()) < 0){
+		check("fclose closes a permanent stream", 0, "fork failed");
+		return;
+	}
+	if(pid == 0){
+		fd = fileno(stdout);
+		fclose(stdout);
+
+		/* Must happen before anything reopens a low descriptor. */
+		r = write(fd, "x", 1);
+
+		res = fopen(RESULT, "w");
+		if(!res)
+			_exit(3);
+		fprintf(res, "%d\n", r);
+		fclose(res);
+		_exit(0);
+	}
+	if(waitpid(pid, &status, 0) < 0 || status != 0){
+		snprintf(detail, sizeof detail, "child status %#x", status);
+		check("fclose closes a permanent stream", 0, detail);
+		return;
+	}
+
+	res = fopen(RESULT, "r");
+	if(!res || fscanf(res, "%ld", &wrote) != 1){
+		check("fclose closes a permanent stream", 0,
+			"child wrote no result");
+		if(res)
+			fclose(res);
+		return;
+	}
+	fclose(res);
+
+	snprintf(detail, sizeof detail,
+		"write to the descriptor after fclose returned %ld,"
+		" want -1", wrote);
+	check("fclose closes a permanent stream", wrote == -1, detail);
+}
+
+/*
+ * 5. flex's filter idiom end to end: the child re-points stdin at a
  * pipe and reads every line the parent writes. A lost or duplicated
  * character shows up as a wrong count or a wrong byte total.
  */
@@ -368,6 +435,7 @@ main(void)
 	unread_file();
 	unread_pipe();
 	freopen_stdout();
+	fclose_perm();
 	filter_child();
 	remove(RESULT);
 

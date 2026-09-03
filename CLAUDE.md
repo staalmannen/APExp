@@ -932,6 +932,43 @@ and a quiet child leaves the parent writing into a pipe with no reader,
 so it dies of SIGPIPE before printing anything -- which is the same
 mechanism that kills flex, and it hid the answer for a round trip.
 
+### fclose left the standard streams open
+
+`F_PERM` says the `FILE` is static and must not be freed. It does not
+mean the file stays open. `fclose` returned early for such a stream:
+
+```c
+if (f->flags & F_PERM) {
+	if (fflush(f) == EOF) error = EOF;
+	return error;
+}
+```
+
+so `fclose(stdout)` flushed and left descriptor 1 open. C99 7.19.5.1
+grants no exemption to the standard streams -- fclose "causes the stream
+to be flushed and the associated file to be closed" -- and musl calls
+the close hook unconditionally, skipping only the `free`.
+
+Closing stdout is how a program at the head of a pipeline says it is
+done. flex's cleanup is
+
+```c
+fflush (stdout);
+fclose (stdout);
+while (wait (&child_status) > 0) ...
+```
+
+and with the descriptor still open the first filter never saw end of
+file, nothing downstream could exit, and flex waited for children that
+could not finish. `lex.yy.c` was complete on disk and the build simply
+stopped, which `ps` showed exactly:
+
+```
+flex  Await		the parent, in wait()
+flex  Pread		filter_tee_header
+flex  Pread		filter_fix_linedirs
+```
+
 ### <stdio.h> used to drag errno, unistd, fcntl and pthread in
 
 `<stdio.h>` included `<stdio_impl.h>` — musl's *internal* header, which
