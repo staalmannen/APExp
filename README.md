@@ -142,9 +142,9 @@ Install paths have been modified so that libraries and binaries are installed in
 
 C transpilers are fun little proof-of-concept programs, which also open up for more languages. Many will only have very little practical use, however.
 
-- pascal-to-C transpiler p2c (2.01)
-- fortran-to-C transpiler f2c (20250303)
-- portable ObjC-to-C transpiler (3.4.8, bootstrap, TODO: build 3.4.13 with the bootstrapped compiler)
+- pascal-to-C transpiler p2c (version 2.01)
+- fortran-to-C transpiler f2c (version 20250303)
+- portable ObjC-to-C transpiler (version 3.4.13)
 - C++-to-C transpiler Cfront (version "C4", WIP)
 - Scheme-to-C transpiler Chicken (version 5.4.0) 
 
@@ -154,15 +154,15 @@ C transpilers are fun little proof-of-concept programs, which also open up for m
 Many (old) sources are still distributed as compressed archives, and the ability to unpack those
 sources could be a barrier. Because of this, APExp package several (un)archivers by default:
 
-- GNU tar (1.35)
+- GNU tar (version 1.35)
 - minigzip (from zlib)
 - bzip2 utilities (from libbz2)
-- unarj (2.65)
-- unrar (2.71 ; can handle old rar archives. More recent versions written in c++)
-- unace (2.7)
-- clzip (1.14)
-- xz (5.8.3)
-- zstd (1.5.7)
+- unarj (version 2.65)
+- unrar (version 2.71 ; can handle old rar archives. More recent versions written in c++)
+- unace (version 2.7)
+- clzip (version 1.14)
+- xz (version 5.8.3)
+- zstd (version 1.5.7)
 
 
 ***BLOAT!!!1!!!***
