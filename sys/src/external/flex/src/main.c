@@ -380,7 +380,30 @@ void check_options (void)
 			}
 		}
 	}
-    filter_create_ext(output_chain, m4, "-P", 0);
+    /*
+     * The sentinel must be a null POINTER, not a plain 0.
+     *
+     * filter_create_ext is variadic and reads its arguments with
+     * va_arg(ap, const char *) until one is NULL (filter.c:75). A bare
+     * 0 is an int, and the default argument promotions leave it an int
+     * -- four bytes. On amd64 Plan 9 arguments are passed on the stack
+     * in eight-byte slots, so va_arg reads eight bytes: the zero in the
+     * low half and whatever the frame happens to hold in the high half.
+     * Non-null, so the loop kept going and appended garbage pointers to
+     * argv.
+     *
+     * m4 then took those for file names, failed, and exited without
+     * ever reading its stdin -- leaving flex writing into a pipe with
+     * no reader:
+     *
+     *	flex: sys: write on closed pipe
+     *
+     * It is undefined behaviour on any implementation; it survives on
+     * ABIs that pass int arguments in registers, because the upper half
+     * of the register is zeroed as a side effect. Nothing zeroes a
+     * stack slot.
+     */
+    filter_create_ext(output_chain, m4, "-P", (const char *) NULL);
     filter_create_int(output_chain, filter_fix_linedirs, NULL);
 
     /* For debugging, only run the requested number of filters. */
