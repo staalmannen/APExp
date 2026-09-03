@@ -157,7 +157,78 @@ unread_pipe(void)
 }
 
 /*
- * 3. flex's filter idiom end to end: the child re-points stdin at a
+ * 3. freopen reopens the stream it is given (C99 7.19.5.4p2), keeping
+ * its identity and its descriptor number. flex does
+ *
+ *	freopen (outfilename, "w+", stdout);
+ *
+ * at main.c:333 and then writes the scanner to stdout, and its filter
+ * chain later does dup2(pipe, fileno(stdout)) and forks children that
+ * inherit descriptor 1 expecting it to be the output file. A freopen
+ * that returns some other stream leaves stdout on the terminal.
+ *
+ * Done in a child so the test's own stdout is not disturbed. stdout is
+ * a permanent stream (F_PERM), which is the case that was broken:
+ * fclose() on such a stream flushes without closing the descriptor.
+ */
+static void
+freopen_stdout(void)
+{
+	int pid, status, fd;
+	FILE *res;
+	char detail[128];
+	char got[64];
+
+	/*
+	 * Flush before forking. When stdout is not a terminal it is
+	 * fully buffered, and the child would inherit everything printed
+	 * so far and write it out a second time.
+	 */
+	fflush(stdout);
+
+	if((pid = fork()) < 0){
+		check("freopen keeps the stream", 0, "fork failed");
+		return;
+	}
+	if(pid == 0){
+		if(freopen(RESULT, "w", stdout) == NULL)
+			_exit(2);
+		/* fileno must not change: flex's dup2 relies on it. */
+		printf("fd=%d hello\n", fileno(stdout));
+		fflush(stdout);
+		_exit(0);
+	}
+	if(waitpid(pid, &status, 0) < 0 || status != 0){
+		snprintf(detail, sizeof detail, "child status %#x", status);
+		check("freopen keeps the stream", 0, detail);
+		return;
+	}
+
+	res = fopen(RESULT, "r");
+	if(!res || !fgets(got, sizeof got, res)){
+		check("freopen keeps the stream", 0,
+			"nothing was written to the file");
+		if(res)
+			fclose(res);
+		return;
+	}
+	fclose(res);
+	got[strcspn(got, "\n")] = '\0';
+
+	if(sscanf(got, "fd=%d", &fd) != 1){
+		snprintf(detail, sizeof detail, "file holds \"%s\"", got);
+		check("freopen keeps the stream", 0, detail);
+		return;
+	}
+	snprintf(detail, sizeof detail, "file holds \"%s\"", got);
+	check("freopen writes reach the file", strstr(got, "hello") != NULL,
+		detail);
+	snprintf(detail, sizeof detail, "fileno(stdout) became %d, want 1", fd);
+	check("freopen keeps the descriptor", fd == 1, detail);
+}
+
+/*
+ * 4. flex's filter idiom end to end: the child re-points stdin at a
  * pipe and reads every line the parent writes. A lost or duplicated
  * character shows up as a wrong count or a wrong byte total.
  */
@@ -176,6 +247,8 @@ filter_child(void)
 		check("flex filter idiom", 0, "pipe failed");
 		return;
 	}
+
+	fflush(stdout);
 
 	if((pid = fork()) < 0){
 		check("flex filter idiom", 0, "fork failed");
@@ -294,6 +367,7 @@ main(void)
 
 	unread_file();
 	unread_pipe();
+	freopen_stdout();
 	filter_child();
 	remove(RESULT);
 
