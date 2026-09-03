@@ -204,6 +204,14 @@ Also fixed:
 
 ## Headers and types
 
+**`<string.h>` reached Plan 9's `<u.h>`**, by way of `wchar.h`,
+`time.h`, `signal.h`, `pthread.h` and `lock.h` — so asking for `strlen`
+also defined `nil`, `uchar`, `ushort`, `ulong` and `uint`. Every link in
+that chain existed for a single pointer parameter and is now a forward
+declaration; `string.h` and `wchar.h` had also been including each
+other, so what a file saw depended on which it asked for first.
+
+
 **`SIZE_MAX` was 32-bit on amd64** while `size_t` was 8 bytes, and
 `SSIZE_MAX` was `LONG_MAX` with the same problem. The cause is worth
 knowing because it will recur: stock APE keeps `float.h`, `stdarg.h` and
@@ -251,6 +259,24 @@ Other header work:
   measure-allocate-format-again. musl's own implementation replaces it.
   GNU m4's `format()` is what found it, and every parser bison generated
   had a doubled comma after each token as a result.
+- **Three more stdio bugs, all found by flex.** `objc`'s scanner is the
+  only thing in the tree that runs flex, so it had never worked here,
+  and it uses all three within twenty lines. **`fseek` set the error
+  indicator when the seek failed** — C99 7.19.9.2 says it returns
+  nonzero and nothing more, and a stream you cannot seek is not a stream
+  that has failed; a pipe is unseekable, so probing one poisoned it for
+  good. **`freopen` returned a new stream instead of reopening the one
+  it was given** (7.19.5.4), which on a permanent stream did nothing at
+  all, leaving `stdout` on the terminal. **`fclose` did not close the
+  standard streams** — `F_PERM` means the `FILE` is static, not that the
+  file stays open (7.19.5.1), so closing `stdout` to signal end of input
+  to a pipeline silently didn't. Each of these breaks ordinary programs,
+  not just flex. `fseek` and `fseeko` had also drifted into two copies
+  with two further bugs — a relative seek ignored buffered data, and
+  neither could seek an `fmemopen` or `open_memstream` stream at all.
+- **`ungetc` refused a stream that had not been read from yet**, against
+  C99 7.19.7.11's guarantee of one character of pushback. It hit `stdin`
+  specifically, whose static `FILE` starts with no read window.
 - **`sigset_t` held three signals.** `sigaddset`/`sigdelset` were gated on
   a mask built by ORing signal *numbers* together, so only 0, 1 and 2 were
   accepted; `sigfillset()` produced a set naming SIGHUP and SIGINT alone.
