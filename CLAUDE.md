@@ -828,6 +828,48 @@ returns 0 without doing anything — so each `_unlocked` function is its
 locked counterpart today. They are separate entry points so that the day
 `flockfile` becomes real, `unlocked.c` is the one file to change.
 
+### <string.h> reached Plan 9's <u.h>
+
+The same shape as the `<stdio.h>` leak above, and found the same way —
+by a port whose own names collided:
+
+```
+string.h -> wchar.h -> time.h -> signal.h -> pthread.h -> lock.h -> u.h
+```
+
+`<u.h>` is Plan 9's, and defines `nil`, `uchar`, `ushort`, `ulong` and
+`uint`. So asking for `strlen` brought all of them. The Portable Object
+Compiler is where it showed:
+
+```
+Object.m:28 ... Object.h:32 ... string.h:70 ... u.h:4
+  Macro redefinition of nil
+```
+
+`objcrt.h:83` defines `nil` as `((id)0)`, as every Objective-C runtime
+does, and guards it — so the unguarded definition in `u.h` simply lost
+to whichever of the two came second.
+
+**Every link in that chain existed for a pointer parameter**, and each
+is now a forward declaration, which is the idiom `signal.h` was already
+using one line above the offending include (`struct timespec; /* avoid
+pulling in time.h */`):
+
+- `string.h` wanted `wchar_t` for three APExp additions, and
+  `<stddef.h>` — already included — provides it. This was also circular:
+  `wchar.h` includes `string.h` back, so which definitions a file saw
+  depended on which of the two it asked for first.
+- `wchar.h` wanted `struct tm` for `wcsftime`.
+- `time.h` wanted `struct sigevent` for `timer_create`.
+- `signal.h` wanted `pthread_attr_t` for `struct sigevent`. That one is a
+  typedef rather than a tag, so it is repeated under a `_PTHREAD_ATTR_T`
+  guard in both headers.
+
+`nil` in `u.h` is guarded now as well. `<pthread.h>` still reaches
+`<lock.h>` and so `<u.h>` legitimately — `pthread_mutex_t` is built on
+`Lock` — so that path stays, and a name as common as `nil` should not
+be defined unconditionally at the end of it.
+
 ### Build order for compiler changes
 ```
 cd sys/src/cmd/cc && mk nuke && mk install   # regenerates y.tab.h

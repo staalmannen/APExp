@@ -67,7 +67,29 @@ size_t strlcat(char *, const char *, size_t);
 char *index(const char *s, int c);
 void swab(const void *src, void *dst, ssize_t n);
 
-#include <wchar.h>
+/*
+ * These three are APExp additions, and they need wchar_t and nothing
+ * else -- which <stddef.h>, included at the top, already provides.
+ *
+ * This used to say "#include <wchar.h>", which made <string.h> the head
+ * of a chain reaching all the way into Plan 9's own headers:
+ *
+ *	string.h -> wchar.h -> time.h -> signal.h -> pthread.h
+ *	  -> lock.h -> u.h
+ *
+ * and u.h defines nil, uchar, ushort, ulong and uint. So every
+ * translation unit that asked for strlen got those too. The Portable
+ * Object Compiler is where it surfaced -- Object.h defines nil as
+ * ((id)0), as any Objective-C runtime does, and u.h then redefined it:
+ *
+ *	Object.m:28 ... Object.h:32 ... string.h:70 ... u.h:4
+ *	  Macro redefinition of nil
+ *
+ * It was also circular: <wchar.h> includes <string.h> back. Each of the
+ * four links has been cut where it was needed only for a pointer
+ * parameter; see the forward declarations in wchar.h, time.h and
+ * signal.h.
+ */
 extern size_t wcsnlen(const wchar_t *, size_t);
 extern int wcscasecmp(const wchar_t *, const wchar_t *);
 extern int wcsncasecmp(const wchar_t *, const wchar_t *, size_t);
