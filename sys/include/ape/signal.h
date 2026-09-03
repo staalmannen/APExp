@@ -135,7 +135,16 @@ struct timespec;	/* avoid pulling in time.h */
 extern int sigtimedwait(const sigset_t *restrict, siginfo_t *restrict, const struct timespec *restrict);
 extern int sigqueue(pid_t, int, const union sigval);
 
-#include <pthread.h>
+/*
+ * struct sigevent's only use of it is a pointer, so the typedef is all
+ * that is wanted here -- and <pthread.h> reaches <lock.h> and so Plan
+ * 9's <u.h>, which defines nil, uchar, ushort, ulong and uint. See the
+ * note in <string.h>.
+ */
+#ifndef _PTHREAD_ATTR_T
+#define _PTHREAD_ATTR_T
+typedef int pthread_attr_t;
+#endif
 
 /* sigev_notify values */
 #define SIGEV_NONE    0   /* no notification */

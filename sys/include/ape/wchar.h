@@ -20,7 +20,7 @@
 #include <stdio.h>  /* provides FILE */
 #include <stdlib.h> /* provides: mbtowc wctomb mbstowcs wcstombs */
 #include <string.h>
-#include <time.h>
+struct tm;	/* for wcsftime; avoid pulling in time.h */
 #include <langinfo.h>
 
 /*

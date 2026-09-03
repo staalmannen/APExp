@@ -3,7 +3,10 @@
 #pragma lib "/$M/lib/ape/libap.a"
 
 typedef struct pthread_once pthread_once_t;
-typedef int pthread_attr_t;
+#ifndef _PTHREAD_ATTR_T
+#define _PTHREAD_ATTR_T
+typedef int pthread_attr_t;	/* also in <signal.h>, for struct sigevent */
+#endif
 typedef struct pthread_mutex pthread_mutex_t;
 typedef int pthread_mutexattr_t;
 typedef struct pthread_cond pthread_cond_t;
