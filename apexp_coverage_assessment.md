@@ -1,56 +1,86 @@
 # APExp POSIX/musl coverage assessment
 
-*Last updated: 2026-05*
+*Last updated: 2026-09*
 
 ## File count comparison vs musl src/
 
 | Directory     | APExp | musl |  %  | Notes |
 |---------------|------:|-----:|----:|-------|
-| math/         |   224 |  223 | 100% | Complete |
+| math/         |   227 |  223 | 102% | Complete |
 | search/       |     8 |    8 | 100% | Complete |
 | stdlib/       |    24 |   20 | 120% | Complete + extras |
-| stdio/        |    80 |   72 | 111% | Complete — musl model fully migrated |
+| stdio/        |    95 |   72 | 132% | Complete — musl buffering model, plus fseek/freopen/fclose/vsnprintf/ungetc correctness fixes this cycle |
 | regex/        |     6 |    5 | 120% | Complete + glob/fnmatch |
 | conf/         |     6 |    5 | 120% | Complete |
-| string/       |    87 |   80 | 109% | Complete + wchar suite |
-| multibyte/    |    55 |   26 | 212% | Complete + Plan9 rune extras |
-| dirent/       |    10 |    8 | 125% | Complete + versionsort |
+| string/       |    93 |   80 | 116% | Complete + wchar suite |
+| multibyte/    |    61 |   26 | 235% | Complete + Plan9 rune extras |
+| dirent/       |    11 |    8 | 138% | Complete + versionsort |
 | env/          |     5 |    8 |  62% | Near-complete |
-| misc/         |    15 |   20 |  75% | Good |
-| search/       |     8 |    8 | 100% | Complete |
+| misc/         |    19 |   20 |  95% | Near-complete — getopt_long, fts, nftw, realpath, syslog all present |
 | locale/       |    21 |   30 |  70% | Good — iconv + gettext stubs present |
-| malloc/       |    10 |    8 | 125% | Complete — aligned allocation suite done |
-| prng/         |     3 |    5 |  60% | Good — arc4random added |
-| time/         |    18 |   30 |  60% | Reasonable — strptime/timegm/_r variants; clock_nanosleep + POSIX interval timers done |
-| unistd/       |    39 |   50 |  78% | Good — at() family now present |
-| stat/         |     9 |   16 |  56% | Reasonable |
-| fcntl/        |     3 |    5 |  60% | Reasonable |
-| temp/         |     3 |    5 |  60% | Reasonable |
-| passwd/       |     6 |   18 |  33% | Basic lookups only |
-| complex/      |    67 |  140 |  48% | Half coverage |
-| fenv/         |     7 |   15 |  46% | Half coverage |
+| malloc/       |    13 |    8 | 163% | Complete — aligned allocation suite done |
+| prng/         |     4 |    5 |  80% | Good — arc4random_uniform added |
+| time/         |    20 |   30 |  67% | Reasonable — strptime/timegm/_r variants; clock_nanosleep + POSIX interval timers done |
+| unistd/       |    50 |   50 | 100% | Complete — at() family, initgroups, dup/dup2/pipe2 all present |
+| stat/         |    13 |   16 |  81% | Good — chmod/chown/fchmod/fstat/lstat/utimens family present |
+| fcntl/        |     4 |    5 |  80% | Good — fcntl/open/creat/flock |
+| temp/         |     5 |    5 | 100% | Complete — mkstemp/mkdtemp/mktemp/tmpfile |
+| passwd/       |    10 |   18 |  56% | Reasonable — getpw*/getgr* with _r and array variants |
+| complex/      |    69 |  140 |  49% | Half coverage |
+| fenv/         |     7 |   15 |  47% | Half coverage |
 | exit/         |     4 |    7 |  57% | Good — quick_exit added |
-| process/      |     9 |   22 |  41% | Reasonable — posix_spawn added |
-| signal/       |    10 |   36 |  28% | Core only — sigaction now present |
-| network/      |    65 |   90 |  72% | Sockets + full musl DNS resolver stack now present |
-| errno/        |     1 |    3 |  33% | Thin |
-| thread/       |    29 |   85 |  34% | Functional — cond_timedwait + semaphores added |
-| aio/          |     1 |    5 |  20% | Initial implementation present |
+| process/      |    12 |   22 |  55% | Reasonable — posix_spawn honours file actions now (see CLAUDE.md) |
+| signal/       |    12 |   36 |  33% | Core only — sigaction present, sigset_t fixed this cycle; the amd64 notify/trampoline path is where the outstanding GNU tar and bash crashes likely live — see priorities below |
+| network/      |    64 |   90 |  71% | Sockets + full musl DNS resolver stack present |
+| errno/        |     3 |    3 | 100% | Complete — errno accessor, err()/warn() |
+| thread/       |    32 |   85 |  38% | Functional — cond_timedwait, semaphores, pthread_key_* destructors added |
+| aio/          |     1 |    5 |  20% | Initial implementation present, complete rewrite this cycle (see CLAUDE.md) |
 | select/       |     1 |    5 |  60% | poll() in select/; select()+FD_SET family in plan9/_buf.c |
 | termios/      |     2 |   12 |  92% | Near-complete — tcgetattr.c has tcsetattr/tcdrain/tcflush/tcflow/tcsendbreak/tcgetsid/tcsetpgrp/tcgetpgrp; cfgetospeed.c has cfmakeraw/cfset*/cfget* |
-| ctype/        |     3 |   52 |   5% | Misleading: table-driven, covers all standard ctype functions |
+| ctype/        |    35 |   52 |  67% | Good — now one function per file matching musl's layout (was a single table-driven file) |
 | legacy/       |     1 |   14 |   7% | Thin |
 | crypt/        |     0 |    6 |   0% | Not present (covered by libsec) |
 | ldso/         |     0 |   12 |   0% | N/A — static linking |
 | linux/        |     0 |   35 |   0% | N/A — Linux-specific |
 | mman/         |     1 |    8 |  ~60% | plan9/mman.c: mmap/munmap/mprotect/msync/mremap/shm_open; MAP_ANONYMOUS+MAP_PRIVATE work |
-| mq/           |     0 |    6 |   0% | Not present |
+| mq/           |     0 |    6 |   0% | **Non-goal.** POSIX message queues; no `mq_*` call exists anywhere in the tree (checked against every port, including go1.4's syscall tables, which only *name* mq_open for other OSes). Plan 9 has no kernel primitive to build it on, so this would be a from-scratch implementation — `mq_notify`'s signal/thread delivery and priority-ordered messages are the hard parts — for zero known consumers. Revisit only if a port is found that actually calls it. |
 | sched/        |     1 |    6 |  80% | sched_yield, sched_get_priority_min/max, sched_getscheduler, sched_setscheduler, sched_getparam, sched_setparam, sched_rr_get_interval |
 | setjmp/       |     0 |   12 |   0% | Covered by arch/ assembly |
 
 ---
 
 ## What changed since the previous assessment
+
+### stdio/ — three correctness bugs found while bringing up flex
+
+`fseek` set the error indicator on any seek that failed rather than
+returning nonzero as C99 7.19.9.2 requires, which permanently poisoned
+any stream probed on an unseekable descriptor (a pipe, in flex's case).
+`freopen` returned a *new* `FILE` instead of reopening the stream it was
+given, so it silently did nothing on a permanent stream (`stdin`,
+`stdout`, `stderr`). `fclose` on a permanent stream flushed but never
+closed the descriptor, so a program that closes `stdout` to signal
+end-of-input to a pipeline — ordinary Unix practice — hung waiting for a
+child that would never see EOF. `ungetc` refused a stream that had not
+yet been read from, against the C99 7.19.7.11 guarantee. `fseek`/`fseeko`
+had also drifted into two copies with two more bugs each (a relative
+seek ignoring buffered data; neither could seek a memstream). None of
+these are flex-specific — see CLAUDE.md for the mechanism and the
+`unget-pipe-test.c` regression test that exercises all of them together.
+
+### string.h/ — a header leak into Plan 9's own namespace
+
+`<string.h>` reached `<u.h>` (Plan 9's `nil`/`uchar`/`ushort`/`ulong`)
+through `wchar.h → time.h → signal.h → pthread.h → lock.h`, entirely for
+pointer-parameter forward references. Cut to forward declarations at
+every link; see CLAUDE.md.
+
+### ctype/ — real per-function files, matching musl's layout
+
+Was a single table-driven file (3 files total) that the previous
+assessment flagged as "misleading — covers everything, counts badly."
+Now genuinely one function per file (35 files), which is both a more
+accurate count and easier to audit against musl function-by-function.
 
 ### stdio/ — complete musl buffering model migration
 
@@ -169,12 +199,17 @@ and collation stubs (`strcoll.c`, `wcscoll.c`, `strxfrm.c`, `wcsxfrm.c`).
 
 **Weighted POSIX compatibility: approximately 90-93%**
 
-Updated from the 2026-04 estimate of 88-92%. Key improvements since last assessment:
-- network/ DNS resolver now complete (musl resolver stack imported, 35→65 files)
-- mmap/munmap/mprotect/msync/mremap/shm_open now available via plan9/mman.c
+Unchanged from the 2026-05 estimate — this update is a file-count refresh
+and a correctness pass, not new surface. The per-directory table above
+had drifted from the tree (several directories were undercounted by a
+third or more, e.g. `unistd/` 39→50, `stat/` 9→13, `ctype/` 3→35 after
+being split into one function per file); those numbers are now taken
+directly from the tree rather than carried forward. The `mq/` row is
+reclassified from an apparent gap to a documented non-goal — see the
+table note.
 
-The autoconf probe coverage estimate is now **roughly 92%** of the ~200
-most-commonly probed functions.
+The autoconf probe coverage estimate is unchanged at **roughly 92%** of
+the ~200 most-commonly probed functions.
 
 ---
 
@@ -269,7 +304,7 @@ for `aio_suspend` does not scale well with many concurrent requests.
 
 ## Summary priority list
 
-Updated priorities (2026-05):
+Updated priorities (2026-09):
 
 1. ~~`thread/` — rwlock and barrier~~ — DONE (rwlock/barrier/spinlock/pthread_kill all implemented)
 2. ~~`stat/` — `utimensat`, `futimens`, `mknodat`~~ — DONE (2026-05)
@@ -281,6 +316,21 @@ Updated priorities (2026-05):
 8. ~~`signal/` — `sigwait`/`sigwaitinfo`/`sigtimedwait`/`sigqueue`~~ — DONE (2026-05): `sigwait.c` uses temporary handler + 1ms _SLEEP poll; `sigqueue` delegates to `kill()`; `SI_USER`/`SI_QUEUE`/`SI_TIMER` constants added to signal.h
 9. ~~`passwd/` — `getgrgid_r`/`getgrnam_r`~~ — DONE (2026-05): `getgr_r.c` iterates via getgrent() into caller-supplied buffer
 10. ~~`aio/` — `lio_listio`~~ — DONE (already implemented in prior session)
-11. `mman/` — `MAP_SHARED` write-back; `mprotect` mapping to Plan9 segment permissions
-12. `thread/` — `pthread_attr` full coverage (setstacksize wired to Plan9 thread stack)
-13. `complex/` — long double variants (`l` suffix functions) for full musl parity
+11. ~~`ctype/` — split the table-driven file into one function per file~~ — DONE (2026-09), matching musl's layout for easier audit
+12. ~~`stdio/` — `fseek`/`freopen`/`fclose`/`ungetc` correctness~~ — DONE (2026-09), found via bringing up flex; see CLAUDE.md
+13. `mman/` — `MAP_SHARED` write-back; `mprotect` mapping to Plan9 segment permissions
+14. `thread/` — `pthread_attr` full coverage (setstacksize wired to Plan9 thread stack)
+15. `complex/` — long double variants (`l` suffix functions) for full musl parity
+16. **`mq/` — not a priority. Deliberately unimplemented; see the table note above.**
+
+### Not a coverage gap, but the next place to look for bugs
+
+`signal/` at 33% is the thinnest directory with real, active consumers,
+and it is where the outstanding GNU tar (`suicide: bad address in
+notify`) and bash-script-crash bugs most likely live — `signal/signal.c`
+and `arch/amd64/notetramp.c` are the note-handler registration and
+trampoline, the same machinery behind the amd64 `sigsetjmp`/`siglongjmp`
+fixes documented in CLAUDE.md. This is bug-hunting, not a missing-file
+gap, so it will not move the percentage in this table much even when
+fixed — but it is worth doing before adding more musl surface to a
+signal path that is already known to be fragile.
