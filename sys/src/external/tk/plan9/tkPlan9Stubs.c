@@ -618,11 +618,35 @@ TkGetInterpNames(Tcl_Interp *interp, Tk_Window tkwin)
 /* XLoadFont stub (no X11 font server)                                */
 /* ------------------------------------------------------------------ */
 
+/*
+ * There is no X font server here, but returning None is not "no font
+ * server", it is "that font could not be loaded" -- and Tk treats the
+ * difference as fatal. tkUnixCursor.c's TkGetCursorByName loads
+ * CURSORFONT to pick glyph shapes out of it:
+ *
+ *	dispPtr->cursorFont = XLoadFont(display, CURSORFONT);
+ *	if (dispPtr->cursorFont == None) {
+ *	    ... "couldn't load cursor font" ...
+ *	}
+ *	cursor = XCreateGlyphCursor(display, dispPtr->cursorFont, ...);
+ *
+ * so returning None failed every widget that has a -cursor default,
+ * which is most of them:
+ *
+ *	Error in startup script: couldn't load cursor font
+ *	    (default value for "-cursor" in widget ".e")
+ *
+ * The id is only ever handed back to XCreateGlyphCursor, which ignores
+ * it here -- rio owns the pointer, so cursors are cosmetic and
+ * XCreateGlyphCursor already answers a placeholder. A non-zero id is
+ * therefore honest about what we can do: the font is not real, but
+ * nothing ever reads it.
+ */
 Font
 XLoadFont(Display *display, const char *name)
 {
     (void)display; (void)name;
-    return None;
+    return (Font) 1;
 }
 
 /* ------------------------------------------------------------------ */
