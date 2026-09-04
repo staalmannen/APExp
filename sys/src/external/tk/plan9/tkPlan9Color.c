@@ -147,8 +147,36 @@ TkpGetColorByValue(Tk_Window tkwin, XColor *colorPtr)
 /* TkpFreeColor                                                       */
 /* ------------------------------------------------------------------ */
 
+/*
+ * Release the platform's hold on the colour, and nothing else. The
+ * TkColor struct belongs to generic Tk, which goes on using it the
+ * moment this returns (tkColor.c, Tk_FreeColor):
+ *
+ *	TkpFreeColor(tkColPtr);
+ *	prevPtr = Tcl_GetHashValue(tkColPtr->hashPtr);
+ *	...
+ *	prevPtr->nextPtr = tkColPtr->nextPtr;
+ *	if (tkColPtr->objRefCount == 0) {
+ *	    ckfree(tkColPtr);
+ *	}
+ *
+ * This used to ckfree(tkColPtr), so all of that read freed memory and
+ * the final ckfree was a double free. Destroying any widget that had
+ * actually released a colour killed wish, which meant every Tk test
+ * file: constraints.tcl builds a label, and the first border genuinely
+ * freed takes its background colour down with it.
+ *
+ * There is nothing to release here. XAllocColor above allocates no
+ * server resource -- it packs the RGB triple into a pixel value and
+ * returns -- so unlike tkUnixColor.c, which calls XFreeColors and
+ * DeleteStressedCmap, this has no platform work to do.
+ *
+ * The same mistake was in TkpDeleteFont; see the note there. Any Tkp*
+ * hook that is handed a generic Tk struct owns the platform resources
+ * hanging off it and never the struct itself.
+ */
 void
 TkpFreeColor(TkColor *tkColPtr)
 {
-    ckfree(tkColPtr);
+    (void)tkColPtr;
 }
