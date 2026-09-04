@@ -50,6 +50,19 @@ if {[llength $argv] < 1} {
     _real_exit 2
 }
 set testfile [lindex $argv 0]
+
+# Clear argv before sourcing. "package require tcltest", which the test
+# file does on its first line, parses ::argv as tcltest options -- so
+# leaving the file name there makes tcltest report
+#
+#	missing value for option <path>
+#
+# and exit 1 (tcltest.tcl:1545), which is not what happens under a plain
+# "wish bell.test", where argv is empty. Clearing it keeps this wrapper
+# faithful to the real invocation.
+set argv {}
+set argc 0
+
 mark "sourcing $testfile"
 
 if {[catch {source $testfile} err]} {
