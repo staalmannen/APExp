@@ -491,7 +491,18 @@ XCreateFontCursor(
     Display *display,
     unsigned int shape)
 {
-    return (Cursor) 0;
+    /*
+     * Not reached by the Plan 9 port -- tkUnixCursor.c builds named
+     * cursors with XCreateGlyphCursor -- but 0 is None, which Tk reads
+     * as failure, and any two callers would collide in
+     * dispPtr->cursorIdTable and panic. Answer a unique non-zero id for
+     * the same reasons as the cursor stubs in plan9/tkPlan9Draw.c.
+     */
+    static unsigned long next = 0x40000000;
+
+    (void) display;
+    (void) shape;
+    return (Cursor) next++;
 }
 
 void
