@@ -36,6 +36,12 @@ clean:V:
 	for (i in $DIRS)
 		@{ cd $i; mk $target }
 
+distclean:V:
+	for (i in $DIRS)
+		@{ cd $i; mk clean }
+	for (j in $_ARCHS)
+		@{ rm $j/lib/ape/* ; rm $i/bin/ape/* }
+
 nuke:V:
 	for (i in $DIRS)
 		@{ cd $i; mk $target }

@@ -7,4 +7,7 @@ default:V:
 
 install:V: default
 
+clean:V:
+	echo "All cleaned up!"
+
 all:V: default

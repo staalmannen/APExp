@@ -1,0 +1,47 @@
+</$objtype/mkfile
+APEXPROOT=../../../../..
+
+TARG=	\
+	satan\
+	demiurge\
+
+PARSEROBJS=	poparser.$O poparser_sysdep.$O StringEscape.$O
+
+BIN=$APEXPROOT/$objtype/bin/ape
+
+
+<$APEXPROOT/sys/src/cmd/mkmany
+
+HELLSRC=../../../external/auto_hell
+
+LD=pcc
+CC=pcc
+
+CFLAGS=-Fw -B -c -I$HELLSRC/satan -I$HELLSRC/macros -I$HELLSRC/demiurge\
+	-D_SC_NPROCESSORS_ONLN=1 
+
+
+satan-%.$O: $HELLSRC/satan/%.c
+	$CC $CFLAGS $HELLSRC/satan/$stem.c -o $target
+
+macros-%.$O: $HELLSRC/macros/%.c
+	$CC $CFLAGS $HELLSRC/macros/$stem.c -o $target
+
+demiurge-%.$O: $HELLSRC/demiurge/%.c
+	$CC $CFLAGS $HELLSRC/demiurge/$stem.c -o $target
+
+$O.satan: satan-main.$O satan-gen.$O satan-probe.$O satan-am.$O satan-conf.$O satan-map.$O\
+		satan-vec.$O satan-str.$O satan-util.$O satan-amparse.$O satan-amlex.$O
+		$LD $prereq -o $target
+
+$O.demiurge: demiurge-demiurge.$O demiurge-macro.$O macros-builtins.$O satan-map.$O\
+		satan-vec.$O satan-str.$O satan-util.$O satan-conf.$O
+		$LD $prereq -o $target
+
+
+
+
+
+
+
+
