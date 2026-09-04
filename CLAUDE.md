@@ -149,7 +149,8 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `compound-literal-test.c`, `designated-init-test.c`, `charptr-test.c`,
 `rol64-test.c` and `u64float-test.c`, and for libap `locale-test.c`,
 `sigset-test.c`, `posix-spawn-test.c`, `limits-test.c`,
-`format-arg-test.c`, `unget-pipe-test.c` and `stdio-test.c`. `sys/src/ape/lib/libressl/test/` is separate: it is
+`format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c` and
+`stdio-test.c`. `sys/src/ape/lib/libressl/test/` is separate: it is
 upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
 
 Beyond that, testing is still mostly ad-hoc — compile a program under
@@ -818,6 +819,45 @@ halves of the m4 line this came from — printf's `%*.*s` with a zero width
 and a negative precision, and the `ARG_STR` idiom (a comma expression in
 the second arm of a conditional, passed to a variadic function). Both
 were suspects; only the library was at fault.
+
+### isatty must follow the descriptor, across dup2 and exec
+
+APE caches the answer in `_fdinfo[fd].flags` as `FD_ISTTY`, and the flag
+travels across an exec in the `$_fdinfo` environment variable.
+`sfdinit()` in `plan9/_fdinfo.c` restored the inherited value and then
+only ever OR'd `FD_ISTTY` back in from the real descriptor -- it never
+cleared it:
+
+```c
+fi->flags = fl;			/* inherited, may say ISTTY */
+if(_isatty(fd))
+	fi->flags |= FD_ISTTY;	/* sets, never clears */
+```
+
+So a descriptor that was the console in the parent and a pipe in the
+child kept `FD_ISTTY`, and `isatty()` lied. Note `readprocfdinit()`
+gets this right -- it rebuilds the flags from `/proc/$pid/fd` -- and
+then `sfdinit()` runs afterwards and overwrites its work.
+
+Tcl decides whether it is interactive with `isatty(0)`
+(`tclMain.c:365`). Tk's test suite drives a child `wish` over a pipe, so
+the child believed it had a terminal and wrote its `"% "` prompt into
+the pipe the parent was reading results from:
+
+```
+Error in startup script: unexpected output from background
+process: "% foo"
+```
+
+which names neither isatty nor the pipe. The descriptor is the
+authority and now wins in both directions.
+
+Covered by `sys/lib/tests/isatty-test.c`, whose three cases -- a pipe, a
+pipe moved onto descriptor 0 by dup2, and the same across an exec --
+fail independently. Only the third involves `$_fdinfo`, so it is the
+one that was broken; run it from an interactive shell, where descriptor
+0 really is the console, or the inherited flag is absent and the bug
+cannot reproduce.
 
 ### Three lines of flex, and three stdio bugs behind them
 

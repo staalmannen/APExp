@@ -120,8 +120,29 @@ sfdinit(int usedproc, char *s, char *se)
 				continue;	/* should probably ignore all of $_fdinit */
 			fi->flags = fl;
 			fi->oflags = ofl;
+			/*
+			 * The descriptor itself is the authority on
+			 * whether it is a terminal, and it has to win
+			 * in both directions. fl is inherited through
+			 * $_fdinfo across an exec, so a descriptor that
+			 * was the console in the parent and is a pipe
+			 * in the child arrives here still carrying
+			 * FD_ISTTY -- and this used to only ever OR the
+			 * flag in, never clear it.
+			 *
+			 * Tcl asks isatty(0) to decide whether it is
+			 * interactive (tclMain.c:365). Tk's test suite
+			 * drives a child wish over a pipe, so the child
+			 * believed it had a terminal and printed its
+			 * "% " prompt into the pipe:
+			 *
+			 *	unexpected output from background
+			 *	process: "% foo"
+			 */
 			if(_isatty(fd))
 				fi->flags |= FD_ISTTY;
+			else
+				fi->flags &= ~FD_ISTTY;
 		}
 	}
 
