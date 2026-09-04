@@ -127,8 +127,8 @@ The interpreter runs and loads modules; `ExtUtils::Miniperl` generates
 
 ### Tcl/Tk
 
-Tk's test suite runs. Two bugs stood between it and a working `wish`,
-and neither was in Tk proper:
+Tk's test suite runs. Three bugs stood between it and a working `wish`,
+and none of them was in Tk proper:
 
 - **`TkpDeleteFont` freed the `TkFont` struct.** That hook releases
   platform resources only — generic Tk owns the struct and frees it in
