@@ -140,7 +140,9 @@ cd sys/lib/tests && pcc -o bool-test bool-test.c && ./bool-test
 
 The convention: print `PASS`/`FAIL` per case, exit with the number of
 failures, and open with a comment saying which bug the test came from
-and what it cost. Anything testing a language or library rule should be
+and what it cost. `tk-childproc-test.tcl` is the exception to the C
+convention -- it is a Tcl script, run with `wish`, because the thing it
+reproduces is Tk spawning a second Tk. Anything testing a language or library rule should be
 correct on gcc too — checking a new test against gcc first is how you
 find out whether the test or the tree is wrong, and it has caught both.
 
