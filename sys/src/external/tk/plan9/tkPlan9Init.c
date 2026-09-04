@@ -52,6 +52,35 @@ TkP9AllocWindow(void)
     return NULL;
 }
 
+/*
+ * Where a window actually sits on the screen.
+ *
+ * X window coordinates are relative to the *parent*, so a button inside
+ * a frame inside a toplevel is at the sum of the three, not at its own
+ * x,y. Every drawing call used one level only, so nested widgets all
+ * collapsed toward the origin and piled up in the top-left corner.
+ *
+ * The walk is bounded by the table size: a corrupt parent chain must
+ * not spin here.
+ */
+void
+TkP9WindowOffset(Window xid, int *ox, int *oy)
+{
+    P9Window *pw;
+    int x = 0, y = 0, guard;
+
+    for (pw = TkP9FindWindow(xid), guard = 0;
+         pw != NULL && guard < TKP9_MAX_WINDOWS;
+         pw = TkP9FindWindow(pw->parent), guard++) {
+        x += pw->x;
+        y += pw->y;
+        if (pw->xid == TKP9_ROOT_XID || pw->parent == pw->xid)
+            break;
+    }
+    *ox = x;
+    *oy = y;
+}
+
 void
 TkP9FreeWindow(Window xid)
 {
