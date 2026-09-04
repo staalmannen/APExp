@@ -43,6 +43,23 @@ proc exit {{code 0}} {
     _real_exit $code
 }
 
+# Trace every file the test pulls in. The process dies part way through
+# sourcing bell.test without calling exit and without raising an error,
+# so the last "source begin" without a matching "source end" is the file
+# it died in.
+rename source _real_source
+proc source {args} {
+    set f [lindex $args end]
+    mark "source begin: $f"
+    set code [catch {uplevel 1 [linsert $args 0 _real_source]} result options]
+    if {$code == 0} {
+	mark "source end: $f"
+	return $result
+    }
+    mark "source FAILED: $f -- $result"
+    return -options $options $result
+}
+
 mark "start, parent is [info nameofexecutable]"
 
 if {[llength $argv] < 1} {
