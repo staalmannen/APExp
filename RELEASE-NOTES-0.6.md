@@ -127,8 +127,8 @@ The interpreter runs and loads modules; `ExtUtils::Miniperl` generates
 
 ### Tcl/Tk
 
-Tk's test suite runs. Two bugs stood between it and a working `wish`,
-and neither was in Tk proper:
+Tk's test suite runs. Three bugs stood between it and a working `wish`,
+and none of them was in Tk proper:
 
 - **`TkpDeleteFont` freed the `TkFont` struct.** That hook releases
   platform resources only — generic Tk owns the struct and frees it in
@@ -142,6 +142,16 @@ and neither was in Tk proper:
 - **`isatty` on a pipe**, described under libap above, which made the
   child `wish` the suite drives over a pipe print its `"% "` prompt
   into the results stream.
+- **The Plan 9 event source told Tcl's notifier never to sleep.**
+  `DisplaySetupProc` set a zero maximum block time unconditionally, so
+  every `wish` process spun at 100% CPU for its whole life. One `wish`
+  still worked, having the machine to itself, which is why it went
+  unnoticed; two could not, and the test suite drives a child `wish`
+  over a pipe. Upstream sets a zero block time only when events are
+  already queued — we cap the sleep at 20ms and poll on wakeup, since
+  `/dev/mouse` and `/dev/cons` are polled rather than registered with
+  the notifier. Anyone who has run `wish` on Plan 9 and found the
+  machine sluggish was seeing this.
 
 ---
 
