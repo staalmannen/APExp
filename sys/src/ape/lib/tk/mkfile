@@ -228,37 +228,6 @@ $DRAWIMPL_OBJ: $TKSRC/plan9/tkPlan9DrawImpl.c
 tkImgPhInstance.$O: $TKSRC/generic/tkImgPhInstance.c
 	$CC $CFLAGS -N $TKSRC/generic/tkImgPhInstance.c
 
-# DIAGNOSTIC PROBE, not a fix -- remove once the question below is answered.
-#
-# wish dies on every Tk test with
-#
-#	wish 515: suicide: sys: trap: fault read addr=0x18 pc=0x274fca
-#
-# which acid places at tkFont.c:1159, in Tk_AllocFontFromObj:
-#
-#	cacheHashPtr = Tcl_CreateHashEntry(&fiPtr->fontCache,
-#		Tcl_GetString(objPtr), &isNew);
-#	firstFontPtr = (TkFont *)Tcl_GetHashValue(cacheHashPtr);
-#
-# Tcl_GetHashValue(h) is ((h)->clientData), and clientData sits at 0x18
-# in Tcl_HashEntry (nextPtr 0, tablePtr 8, hash 0x10) -- so cacheHashPtr
-# is null on that line.
-#
-# CreateHashEntry returns null in exactly one place, "if (!newPtr ||
-# (newPtr == TCL_HASH_FIND))", and the caller passes &isNew, a stack
-# address that is neither. So either the third argument arrives
-# corrupted or cacheHashPtr is clobbered between the two lines. Note the
-# statement nests two calls in one expression -- Tcl_GetString and the
-# indirect call through tablePtr->createProc -- which is the shape of
-# the 6c bug fixed earlier this cycle, where a value live across a call
-# was truncated.
-#
-# If -N makes wish run, it is codegen and we have a small reproducer.
-# If it still faults, the null is real and the fault is in the hash
-# table or in fiPtr, and this rule should just be deleted.
-tkFont.$O: $TKSRC/generic/tkFont.c
-	$CC $CFLAGS -N $TKSRC/generic/tkFont.c
-
 %.$O: $TKSRC/generic/%.c
 	$CC $CFLAGS $TKSRC/generic/$stem.c
 

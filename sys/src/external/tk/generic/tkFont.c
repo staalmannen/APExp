@@ -13,6 +13,10 @@
 
 #include "tkInt.h"
 #include "tkFont.h"
+
+/* APExp diagnostic (temporary) -- see Tk_AllocFontFromObj below. */
+#include <stdio.h>
+#include <stdint.h>
 #if defined(MAC_OSX_TK)
 #include "tkMacOSXInt.h"    /* Defines TK_DRAW_IN_CONTEXT */
 #endif
@@ -1156,6 +1160,46 @@ Tk_AllocFontFromObj(
 	cacheHashPtr = Tcl_CreateHashEntry(&fiPtr->fontCache,
 		Tcl_GetString(objPtr), &isNew);
     }
+    /*
+     * APExp diagnostic -- temporary, remove once the wish crash is
+     * understood. cacheHashPtr is null here on every Tk test:
+     *
+     *	wish: suicide: sys: trap: fault read addr=0x18
+     *
+     * 0x18 is clientData in Tcl_HashEntry, which is what
+     * Tcl_GetHashValue reads. Fires only in the broken case, and only
+     * just before the fault, so it costs nothing when things work.
+     */
+    if (cacheHashPtr == NULL) {
+	fprintf(stderr, "APExp: Tk_AllocFontFromObj: cacheHashPtr is NULL\n");
+	fprintf(stderr, "  font        = \"%s\"\n", Tcl_GetString(objPtr));
+	fprintf(stderr, "  branch      = %s\n",
+		(oldFontPtr != NULL) ? "oldFontPtr->cacheHashPtr"
+				     : "Tcl_CreateHashEntry");
+	fprintf(stderr, "  oldFontPtr  = %llx\n",
+		(unsigned long long) (uintptr_t) oldFontPtr);
+	fprintf(stderr, "  fiPtr       = %llx\n",
+		(unsigned long long) (uintptr_t) fiPtr);
+	fprintf(stderr, "  isNew       = %d\n", isNew);
+	fprintf(stderr, "  fontCache.buckets    = %llx\n",
+		(unsigned long long) (uintptr_t) fiPtr->fontCache.buckets);
+	fprintf(stderr, "  fontCache.numBuckets = %lld\n",
+		(long long) fiPtr->fontCache.numBuckets);
+	fprintf(stderr, "  fontCache.numEntries = %lld\n",
+		(long long) fiPtr->fontCache.numEntries);
+	fprintf(stderr, "  fontCache.keyType    = %d\n",
+		fiPtr->fontCache.keyType);
+	fprintf(stderr, "  fontCache.findProc   = %llx\n",
+		(unsigned long long) (uintptr_t) fiPtr->fontCache.findProc);
+	fprintf(stderr, "  fontCache.createProc = %llx\n",
+		(unsigned long long) (uintptr_t) fiPtr->fontCache.createProc);
+	fprintf(stderr, "  fontCache.typePtr    = %llx\n",
+		(unsigned long long) (uintptr_t) fiPtr->fontCache.typePtr);
+	fprintf(stderr, "  sizeof(Tcl_HashTable)=%d sizeof(Tcl_HashEntry)=%d\n",
+		(int) sizeof(Tcl_HashTable), (int) sizeof(Tcl_HashEntry));
+	fflush(stderr);
+    }
+
     firstFontPtr = (TkFont *)Tcl_GetHashValue(cacheHashPtr);
     for (fontPtr = firstFontPtr; (fontPtr != NULL);
 	    fontPtr = fontPtr->nextPtr) {
