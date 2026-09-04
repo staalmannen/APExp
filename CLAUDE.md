@@ -636,6 +636,55 @@ the sentinel before anything else. `execl`, `execle`, `execlp` and
 gnulib's `version_etc` are the common ones; all call sites of those in
 the tree are correct today.
 
+### sizeof is 32-bit, so a call with no prototype in scope corrupts it
+
+`cc/com.c`'s `OSIZE` case ends with
+
+```c
+/* Plan9: long is always 32-bit, even on amd64.  sizeof must return
+ * TULONG (unsigned long, 32-bit) so it matches the ABI width of
+ * every long/int parameter without corrupting the call stack.
+ * Assignments to size_t (uvlong, 64-bit) zero-extend automatically
+ * at the call site when the prototype is visible. */
+n->type = types[TULONG];
+```
+
+**"when the prototype is visible"** is the whole of it. With no prototype
+in scope, `sizeof` is written into the argument slot as four bytes, and
+a callee compiled against a real `size_t` reads eight -- the low half
+right, the high half whatever the stack held.
+
+`plan9/callmain.c` was the case that found it. It includes `lib.h`,
+`sys9.h` and `<stdlib.h>`, none of which reach `<string.h>`, and does
+
+```c
+memset(privates, 0, sizeof(privates));
+```
+
+so `memset` ran with `n = 0xfefefefe00000080` instead of 128 and walked
+into the guard page:
+
+```
+mkbuiltins: suicide: sys: trap: fault write addr=0x7ffffffff000
+```
+
+**Every APE program starts through `_callmain`**, so this was latent in
+all of them, and fired only where that garbage happened to be nonzero.
+That is why it appeared on a fresh 9front and not on a machine that had
+been building for a while, and why the programs that hit it --
+`mkbuiltins`, `objc`, `cfront` -- are the ones the build invokes with
+very long command lines: argv and the environment sit at the top of the
+stack, so their size decides what lands in the slot above.
+
+This is the same family as the variadic sentinel above, and it has the
+same tell: a value that is right in its low 32 bits and garbage above.
+**When an argument arrives half right, look for a missing prototype
+before anything else.** kencc has no diagnostic for calling a function
+with no prototype in scope, so nothing warns; adding one would catch
+this class at compile time, but a great deal of old Plan 9 code relies
+on implicit declarations, so it would need to be a warning rather than
+an error.
+
 ### APE malloc / free() constraint
 `free(ptr)` computes `(Bucket*)((uintptr_t)ptr - datoff)` where `datoff=16`.
 Any pointer passed to `free()` MUST be exactly the value returned by `malloc()`.
