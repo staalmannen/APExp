@@ -127,8 +127,9 @@ The interpreter runs and loads modules; `ExtUtils::Miniperl` generates
 
 ### Tcl/Tk
 
-Tk's test suite runs. Three bugs stood between it and a working `wish`,
-and none of them was in Tk proper:
+Tk's test suite runs — `bell.test` reports `Total 8 Passed 8 Skipped 0
+Failed 0`. Five bugs stood between it and a working `wish`, and none of
+them was in Tk proper:
 
 - **`TkpDeleteFont` freed the `TkFont` struct.** That hook releases
   platform resources only — generic Tk owns the struct and frees it in
@@ -142,6 +143,20 @@ and none of them was in Tk proper:
 - **`isatty` on a pipe**, described under libap above, which made the
   child `wish` the suite drives over a pipe print its `"% "` prompt
   into the results stream.
+- **`TkpFreeColor` freed the `TkColor` struct** — the same mistake as
+  `TkpDeleteFont`, in a different hook. `Tk_FreeColor` goes on using the
+  struct the moment the hook returns, reading `hashPtr`, `nextPtr` and
+  `objRefCount` from it and then freeing it itself, so this was a
+  use-after-free followed by a double free. It killed any widget that
+  actually released a colour, which meant every Tk test file. There was
+  nothing for the hook to release in the first place: `XAllocColor` here
+  packs the RGB triple into a pixel value and allocates no server
+  resource.
+- **`XLoadFont` answered `None`.** Tk reads that as "that font failed to
+  load" rather than "there is no font server", so `TkGetCursorByName`
+  refused every widget with a `-cursor` default — which is most of them.
+  The id is only passed back to `XCreateGlyphCursor`, which ignores it,
+  since rio owns the pointer.
 - **The Plan 9 event source told Tcl's notifier never to sleep.**
   `DisplaySetupProc` set a zero maximum block time unconditionally, so
   every `wish` process spun at 100% CPU for its whole life. One `wish`
