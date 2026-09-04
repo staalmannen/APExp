@@ -422,13 +422,43 @@ TkpGetCapture(void)
 /* Display warning (no stderr on Plan 9 GUI — write to /dev/cons)    */
 /* ------------------------------------------------------------------ */
 
+/*
+ * Write through Tcl's stderr channel, as tkUnixInit.c does, not with
+ * fprintf. This is the only path by which a startup-script error is
+ * ever reported -- Tk_MainEx calls it and then Tcl_Exit(1) -- so if it
+ * goes astray, a failing script exits 1 with nothing said at all, which
+ * is exactly what every Tk test file was doing.
+ *
+ * Mixing C stdio with Tcl channel writes on one descriptor also gives
+ * unpredictable interleaving, and bypasses Tcl's own flushing at exit.
+ * Falling back to fputs keeps something on the terminal if the channel
+ * is not available -- during finalization, say.
+ */
 void
 TkpDisplayWarning(const char *msg, const char *title)
 {
-    if (title && *title)
-        fprintf(stderr, "%s: %s\n", title, msg ? msg : "");
-    else if (msg)
-        fprintf(stderr, "%s\n", msg);
+    Tcl_Channel errChannel = Tcl_GetStdChannel(TCL_STDERR);
+
+    if (errChannel) {
+	if (title && *title) {
+	    Tcl_WriteChars(errChannel, title, TCL_INDEX_NONE);
+	    Tcl_WriteChars(errChannel, ": ", 2);
+	}
+	if (msg)
+	    Tcl_WriteChars(errChannel, msg, TCL_INDEX_NONE);
+	Tcl_WriteChars(errChannel, "\n", 1);
+	Tcl_Flush(errChannel);
+	return;
+    }
+
+    if (title && *title) {
+	fputs(title, stderr);
+	fputs(": ", stderr);
+    }
+    if (msg)
+	fputs(msg, stderr);
+    fputs("\n", stderr);
+    fflush(stderr);
 }
 
 /* ------------------------------------------------------------------ */
