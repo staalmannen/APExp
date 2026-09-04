@@ -14,6 +14,13 @@
 
 #include "tkInt.h"
 #include "tkButton.h"
+
+/* APExp diagnostic -- temporary, chasing the destroy-a-label death. */
+#include <stdio.h>
+#define BDBG(m) do { \
+	fprintf(stderr, "APExp: DestroyButton: %s\n", (m)); \
+	fflush(stderr); \
+} while (0)
 #include "default.h"
 
 typedef struct {
@@ -937,7 +944,9 @@ DestroyButton(
     TkButton *butPtr)		/* Info about button widget. */
 {
     butPtr->flags |= BUTTON_DELETED;
+    BDBG("enter");
     TkpDestroyButton(butPtr);
+    BDBG("after TkpDestroyButton");
 
     if (butPtr->flags & REDRAW_PENDING) {
 	Tcl_CancelIdleCall(TkpDisplayButton, butPtr);
@@ -948,7 +957,9 @@ DestroyButton(
      * Tk_FreeOptions handle all the standard option-related stuff.
      */
 
+    BDBG("before DeleteCommandFromToken");
     Tcl_DeleteCommandFromToken(butPtr->interp, butPtr->widgetCmd);
+    BDBG("after DeleteCommandFromToken");
     if (butPtr->textVarNamePtr != NULL) {
 	Tcl_UntraceVar2(butPtr->interp, Tcl_GetString(butPtr->textVarNamePtr),
 		NULL, TCL_GLOBAL_ONLY|TCL_TRACE_WRITES|TCL_TRACE_UNSETS,
@@ -963,9 +974,11 @@ DestroyButton(
     if (butPtr->tristateImage != NULL) {
 	Tk_FreeImage(butPtr->tristateImage);
     }
+    BDBG("before normalTextGC");
     if (butPtr->normalTextGC != NULL) {
 	Tk_FreeGC(butPtr->display, butPtr->normalTextGC);
     }
+    BDBG("after normalTextGC");
     if (butPtr->activeTextGC != NULL) {
 	Tk_FreeGC(butPtr->display, butPtr->activeTextGC);
     }
@@ -975,22 +988,28 @@ DestroyButton(
     if (butPtr->stippleGC != NULL) {
 	Tk_FreeGC(butPtr->display, butPtr->stippleGC);
     }
+    BDBG("before gray bitmap");
     if (butPtr->gray != None) {
 	Tk_FreeBitmap(butPtr->display, butPtr->gray);
     }
+    BDBG("after gray bitmap");
     if (butPtr->copyGC != NULL) {
 	Tk_FreeGC(butPtr->display, butPtr->copyGC);
     }
+    BDBG("before textLayout");
     if (butPtr->textLayout != NULL) {
 	Tk_FreeTextLayout(butPtr->textLayout);
     }
+    BDBG("after textLayout");
     if (butPtr->selVarNamePtr != NULL) {
 	Tcl_UntraceVar2(butPtr->interp, Tcl_GetString(butPtr->selVarNamePtr),
 		NULL, TCL_GLOBAL_ONLY|TCL_TRACE_WRITES|TCL_TRACE_UNSETS,
 		ButtonVarProc, butPtr);
     }
+    BDBG("before FreeConfigOptions");
     Tk_FreeConfigOptions(butPtr, butPtr->optionTable,
 	    butPtr->tkwin);
+    BDBG("after FreeConfigOptions");
     butPtr->tkwin = NULL;
     Tcl_EventuallyFree(butPtr, TCL_DYNAMIC);
 }
