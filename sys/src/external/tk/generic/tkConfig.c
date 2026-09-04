@@ -24,6 +24,7 @@
 #endif
 
 #include "tkInt.h"
+#include <stdio.h>
 #include "tkFont.h"
 
 #ifdef _WIN32
@@ -1808,12 +1809,23 @@ Tk_FreeConfigOptions(
 	    } else {
 		oldInternalPtr = NULL;
 	    }
+	    /* APExp diagnostic -- temporary, chasing the label destroy. */
+	    fprintf(stderr, "APExp: FreeConfigOptions: %s type=%d free=%d\n",
+		    specPtr->optionName ? specPtr->optionName : "(null)",
+		    (int) specPtr->type,
+		    (optionPtr->flags & OPTION_NEEDS_FREEING) ? 1 : 0);
+	    fflush(stderr);
+
 	    if (optionPtr->flags & OPTION_NEEDS_FREEING) {
 		FreeResources(optionPtr, oldPtr, oldInternalPtr, tkwin);
 	    }
 	    if (oldPtr != NULL) {
 		Tcl_DecrRefCount(oldPtr);
 	    }
+
+	    fprintf(stderr, "APExp: FreeConfigOptions: %s done\n",
+		    specPtr->optionName ? specPtr->optionName : "(null)");
+	    fflush(stderr);
 	}
     }
 }
