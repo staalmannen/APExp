@@ -450,26 +450,50 @@ Tk_Free3DBorder(
     fprintf(stderr, "APExp: Tk_Free3DBorder prevPtr=%llx, freeing\n",
 	    (unsigned long long)(uintptr_t) prevPtr);
     fflush(stderr);
+#define B3DBG(m) do { \
+	fprintf(stderr, "APExp: Tk_Free3DBorder: %s\n", (m)); \
+	fflush(stderr); \
+} while (0)
+
+    B3DBG("before TkpFreeBorder");
     TkpFreeBorder(borderPtr);
+    B3DBG("after TkpFreeBorder");
+
+    B3DBG("before bgColorPtr");
     Tk_FreeColor(borderPtr->bgColorPtr);
+    B3DBG("after bgColorPtr");
+
     if (borderPtr->darkColorPtr != NULL) {
+	B3DBG("before darkColorPtr");
 	Tk_FreeColor(borderPtr->darkColorPtr);
+	B3DBG("after darkColorPtr");
     }
     if (borderPtr->lightColorPtr != NULL) {
+	B3DBG("before lightColorPtr");
 	Tk_FreeColor(borderPtr->lightColorPtr);
+	B3DBG("after lightColorPtr");
     }
     if (borderPtr->shadow != None) {
+	B3DBG("before shadow bitmap");
 	Tk_FreeBitmap(display, borderPtr->shadow);
+	B3DBG("after shadow bitmap");
     }
     if (borderPtr->bgGC != NULL) {
+	B3DBG("before bgGC");
 	Tk_FreeGC(display, borderPtr->bgGC);
+	B3DBG("after bgGC");
     }
     if (borderPtr->darkGC != NULL) {
+	B3DBG("before darkGC");
 	Tk_FreeGC(display, borderPtr->darkGC);
+	B3DBG("after darkGC");
     }
     if (borderPtr->lightGC != NULL) {
+	B3DBG("before lightGC");
 	Tk_FreeGC(display, borderPtr->lightGC);
+	B3DBG("after lightGC");
     }
+    B3DBG("before hash unlink");
     if (prevPtr == borderPtr) {
 	if (borderPtr->nextPtr == NULL) {
 	    Tcl_DeleteHashEntry(borderPtr->hashPtr);
@@ -482,9 +506,13 @@ Tk_Free3DBorder(
 	}
 	prevPtr->nextPtr = borderPtr->nextPtr;
     }
+    B3DBG("after hash unlink");
     if (borderPtr->objRefCount == 0) {
+	B3DBG("ckfree borderPtr");
 	ckfree(borderPtr);
     }
+    B3DBG("done");
+#undef B3DBG
 }
 
 /*
