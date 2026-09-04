@@ -148,12 +148,42 @@ TkpGetFontFromAttributes(
 /* TkpDeleteFont                                                      */
 /* ------------------------------------------------------------------ */
 
+/*
+ * Release the platform resources only. The TkFont struct itself belongs
+ * to generic Tk, which frees it in Tk_FreeFont immediately after this
+ * returns:
+ *
+ *	TkpDeleteFont(fontPtr);
+ *	if (fontPtr->objRefCount == 0) {
+ *	    ckfree(fontPtr);
+ *	}
+ *
+ * This used to ckfree(p9f), so that read of objRefCount was already a
+ * read of freed memory and the ckfree a double free. Worse, a font with
+ * objRefCount > 0 -- one a Tcl_Obj still refers to -- is deliberately
+ * kept by Tk with a stale cacheHashPtr, and the guard that catches such
+ * a stale reference is "oldFontPtr->resourceRefCount == 0". Reading
+ * that field out of recycled memory gave a nonzero answer, so the guard
+ * did not fire and Tk_AllocFontFromObj went on to dereference the null
+ * cacheHashPtr:
+ *
+ *	wish: suicide: sys: trap: fault read addr=0x18
+ *
+ * (0x18 is clientData in Tcl_HashEntry, what Tcl_GetHashValue reads.)
+ * Every Tk test died this way on the first use of TkDefaultFont.
+ *
+ * tkUnixFont.c and tkWinFont.c both do platform cleanup alone; see
+ * their ReleaseFont.
+ */
 void
 TkpDeleteFont(TkFont *tkFontPtr)
 {
     P9Font *p9f = (P9Font *)tkFontPtr;
-    if (p9f->p9font) tkp9_closefont(p9f->p9font);
-    ckfree(p9f);
+
+    if (p9f->p9font) {
+	tkp9_closefont(p9f->p9font);
+	p9f->p9font = NULL;
+    }
 }
 
 /* ------------------------------------------------------------------ */
