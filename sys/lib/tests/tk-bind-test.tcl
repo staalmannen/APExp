@@ -59,6 +59,18 @@ foreach {label ev} {
     bind .f $ev {}
 }
 
+# 1b. Key events again, with the focus set. Tk_HandleEvent redirects
+# KeyPress/KeyRelease to the focus window and drops them when there is
+# none, so a bare "event generate .f <Key-a>" proves nothing on its own.
+focus -force .f
+update
+mark "focus is now [focus]"
+set ::hits {}
+bind .f <Key-a> {lappend ::hits fired}
+event generate .f <Key-a>
+mark "KeyA with focus: [expr {[llength $::hits] ? "FIRED" : "not delivered"}]"
+bind .f <Key-a> {}
+
 # 2. Queued delivery, to see whether the two paths differ.
 set ::hits {}
 bind .f <Enter> {lappend ::hits fired}

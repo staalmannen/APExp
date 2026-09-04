@@ -228,16 +228,44 @@ TkWmNewWindow(TkWindow *winPtr)
     (void)winPtr;
 }
 
+/*
+ * Tk_MapWindow hands a toplevel entirely to us and returns:
+ *
+ *	if (winPtr->flags & TK_TOP_HIERARCHY) {
+ *	    TkWmMapWindow(winPtr);
+ *	    return;
+ *	}
+ *	winPtr->flags |= TK_MAPPED;
+ *	XMapWindow(winPtr->display, winPtr->window);
+ *
+ * so a no-op here means the toplevel is never marked mapped and never
+ * mapped, and since the geometry managers only map children of a mapped
+ * parent, nothing in the whole application is ever mapped. Tk draws only
+ * mapped windows, so wish showed a blank white window whatever it was
+ * doing, and "winfo ismapped .f" answered 0 after pack and update.
+ *
+ * There is no window manager here -- rio owns the window and there is
+ * exactly one -- so the right behaviour is what Tk_MapWindow does for an
+ * ordinary window: mark it mapped and map it. tkUnixWm.c does a great
+ * deal more, but all of it concerns wrapper windows, WM hints and
+ * icons, none of which exist on Plan 9.
+ */
 void
 TkWmMapWindow(TkWindow *winPtr)
 {
-    (void)winPtr;
+    if (winPtr->flags & TK_MAPPED)
+	return;
+    winPtr->flags |= TK_MAPPED;
+    XMapWindow(winPtr->display, winPtr->window);
 }
 
 void
 TkWmUnmapWindow(TkWindow *winPtr)
 {
-    (void)winPtr;
+    if (!(winPtr->flags & TK_MAPPED))
+	return;
+    winPtr->flags &= ~TK_MAPPED;
+    XUnmapWindow(winPtr->display, winPtr->window);
 }
 
 void
