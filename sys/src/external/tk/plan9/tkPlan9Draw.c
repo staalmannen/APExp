@@ -42,9 +42,7 @@ GCBackgroundRGBA(GC gc)
 static void
 DrawableOffset(Drawable d, int *ox, int *oy)
 {
-    P9Window *pw = TkP9FindWindow((Window)d);
-    if (pw) { *ox = pw->x; *oy = pw->y; }
-    else    { *ox = 0;     *oy = 0;     }
+    TkP9WindowOffset((Window)d, ox, oy);
 }
 
 /* ------------------------------------------------------------------ */
@@ -163,9 +161,11 @@ int
 XClearWindow(Display *display, Window w)
 {
     P9Window *pw = TkP9FindWindow(w);
+    int ox, oy;
     (void)display;
     if (!pw) return 0;
-    tkp9_fillrect(pw->x, pw->y, pw->width, pw->height, pw->bg_pixel);
+    TkP9WindowOffset(w, &ox, &oy);
+    tkp9_fillrect(ox, oy, pw->width, pw->height, pw->bg_pixel);
     return 0;
 }
 
@@ -175,9 +175,11 @@ XClearArea(Display *display, Window w,
            Bool exposures)
 {
     P9Window *pw = TkP9FindWindow(w);
+    int ox, oy;
     (void)display; (void)exposures;
     if (!pw) return 0;
-    tkp9_fillrect(pw->x + x, pw->y + y, (int)width, (int)height,
+    TkP9WindowOffset(w, &ox, &oy);
+    tkp9_fillrect(ox + x, oy + y, (int)width, (int)height,
                   pw->bg_pixel);
     return 0;
 }

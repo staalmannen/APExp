@@ -295,13 +295,10 @@ Tk_DrawChars(
     void *fnt;
     int ox, oy;
     unsigned long rgba;
-    P9Window *pw;
     (void)display;
 
     fnt  = p9f ? p9f->p9font : NULL;
-    pw   = TkP9FindWindow((Window)d);
-    ox   = pw ? pw->x : 0;
-    oy   = pw ? pw->y : 0;
+    TkP9WindowOffset((Window)d, &ox, &oy);
     rgba = TkP9XColorStructToRGBA(gc->foreground);
 
     /* y in Tk is the baseline; Plan 9 string() also uses baseline */
