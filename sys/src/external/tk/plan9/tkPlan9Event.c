@@ -329,6 +329,17 @@ DisplaySetupProc(void *clientData, int flags)
     if (!gP9.initialized) return;
 
     /*
+     * Push anything drawn since the last pass out to the screen.
+     * libdraw buffers its operations, so without this the widgets draw
+     * into the buffer and nothing ever appears -- a blank white window,
+     * whatever Tk is doing. tkUnixEvent.c's DisplaySetupProc flushes
+     * the X connection here for the same reason; XFlush and XSync were
+     * the only things calling tkp9_flush, and Tk's redraw path goes
+     * through neither.
+     */
+    tkp9_flush();
+
+    /*
      * This used to set a zero block time unconditionally, which tells
      * the notifier never to sleep -- so every wish process spun at 100%
      * CPU for its whole life. A single wish still worked, having the
