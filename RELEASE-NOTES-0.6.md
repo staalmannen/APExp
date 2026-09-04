@@ -125,6 +125,24 @@ The interpreter runs and loads modules; `ExtUtils::Miniperl` generates
   `configpm`; it is the companion to the hand-answered `config.h` and has
   to be kept in step with it.
 
+### Tcl/Tk
+
+Tk's test suite runs. Two bugs stood between it and a working `wish`,
+and neither was in Tk proper:
+
+- **`TkpDeleteFont` freed the `TkFont` struct.** That hook releases
+  platform resources only — generic Tk owns the struct and frees it in
+  `Tk_FreeFont` immediately afterwards, reading `objRefCount` in
+  between. So every font release was a use-after-free and a double free.
+  It surfaced as a null dereference a long way downstream: Tk keeps a
+  font whose `objRefCount` is still positive, with a deliberately stale
+  `cacheHashPtr`, and detects that later via `resourceRefCount == 0` —
+  read out of recycled memory the guard did not fire, and every Tk test
+  died on first use of `TkDefaultFont`.
+- **`isatty` on a pipe**, described under libap above, which made the
+  child `wish` the suite drives over a pipe print its `"% "` prompt
+  into the results stream.
+
 ---
 
 ## Compiler correctness fixes
@@ -277,6 +295,15 @@ Other header work:
 - **`ungetc` refused a stream that had not been read from yet**, against
   C99 7.19.7.11's guarantee of one character of pushback. It hit `stdin`
   specifically, whose static `FILE` starts with no read window.
+- **`isatty` followed a stale flag, not the descriptor.** APE caches the
+  answer as `FD_ISTTY` in `_fdinfo` and inherits it across an exec
+  through `$_fdinfo`; the restore path only ever OR'd the flag back in
+  from the real descriptor and never cleared it, so a descriptor that
+  was the console in the parent and a pipe in the child still claimed to
+  be a terminal. Anything that asks `isatty` how to behave when spawned
+  over a pipe — shells choosing job control, programs choosing line
+  versus block buffering, tools deciding whether to colourise — was
+  getting the wrong answer.
 - **`sigset_t` held three signals.** `sigaddset`/`sigdelset` were gated on
   a mask built by ORing signal *numbers* together, so only 0, 1 and 2 were
   accepted; `sigfillset()` produced a set naming SIGHUP and SIGINT alone.
