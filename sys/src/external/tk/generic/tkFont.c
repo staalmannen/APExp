@@ -13,6 +13,8 @@
 
 #include "tkInt.h"
 #include "tkFont.h"
+#include <stdio.h>
+#include <stdint.h>
 #if defined(MAC_OSX_TK)
 #include "tkMacOSXInt.h"    /* Defines TK_DRAW_IN_CONTEXT */
 #endif
@@ -1497,10 +1499,25 @@ Tk_FreeFont(
 	prevPtr->nextPtr = fontPtr->nextPtr;
     }
 
+    /* APExp diagnostic -- temporary. */
+    fprintf(stderr, "APExp: Tk_FreeFont about to TkpDeleteFont"
+	    " fontPtr=%llx objRefCount=%lld cacheHashPtr=%llx\n",
+	    (unsigned long long)(uintptr_t) fontPtr,
+	    (long long) fontPtr->objRefCount,
+	    (unsigned long long)(uintptr_t) fontPtr->cacheHashPtr);
+    fflush(stderr);
+
     TkpDeleteFont(fontPtr);
+
+    fprintf(stderr, "APExp: Tk_FreeFont back from TkpDeleteFont\n");
+    fflush(stderr);
+
     if (fontPtr->objRefCount == 0) {
 	ckfree(fontPtr);
     }
+
+    fprintf(stderr, "APExp: Tk_FreeFont done\n");
+    fflush(stderr);
 }
 
 /*

@@ -75,6 +75,8 @@ try "font actual Helvetica"		{font actual {Helvetica -12}}
 
 try "create frame"			{frame .f}
 try "destroy frame"			{destroy .f}
+try "create bare label"			{label .l0}
+try "destroy bare label"		{destroy .l0}
 try "create label"			{label .l -text hi}
 try "destroy label"			{destroy .l}
 try "create plain entry"		{entry .e2}

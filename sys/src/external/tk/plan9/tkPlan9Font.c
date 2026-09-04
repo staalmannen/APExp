@@ -18,6 +18,8 @@
  */
 
 #include "tkPlan9Int.h"
+#include <stdio.h>
+#include <stdint.h>
 #include "tkFont.h"
 
 /* ------------------------------------------------------------------ */
@@ -180,10 +182,19 @@ TkpDeleteFont(TkFont *tkFontPtr)
 {
     P9Font *p9f = (P9Font *)tkFontPtr;
 
+    /* APExp diagnostic -- temporary, chasing the destroy-a-label death. */
+    fprintf(stderr, "APExp: TkpDeleteFont enter tkFontPtr=%llx p9font=%llx\n",
+	    (unsigned long long)(uintptr_t) tkFontPtr,
+	    (unsigned long long)(uintptr_t) p9f->p9font);
+    fflush(stderr);
+
     if (p9f->p9font) {
 	tkp9_closefont(p9f->p9font);
 	p9f->p9font = NULL;
     }
+
+    fprintf(stderr, "APExp: TkpDeleteFont done\n");
+    fflush(stderr);
 }
 
 /* ------------------------------------------------------------------ */
