@@ -309,15 +309,47 @@ PollP9Events(Display *dpy)
 /* Tcl event source callbacks                                          */
 /* ------------------------------------------------------------------ */
 
+/*
+ * How long the notifier may sleep when we have nothing queued, in
+ * microseconds. We poll /dev/mouse and /dev/cons in DisplayCheckProc
+ * rather than registering them as file handlers, so the notifier has
+ * nothing of ours to block on and this interval sets input latency.
+ * 20ms is 50Hz, which is imperceptible for pointer and key input and
+ * costs almost nothing.
+ */
+#define P9_POLL_US	20000
+
 static void
 DisplaySetupProc(void *clientData, int flags)
 {
-    Tcl_Time blockTime = {0, 0};
+    Tcl_Time blockTime;
     (void)clientData;
 
     if (!(flags & TCL_WINDOW_EVENTS)) return;
-    if (gP9.initialized)
-        Tcl_SetMaxBlockTime(&blockTime);
+    if (!gP9.initialized) return;
+
+    /*
+     * This used to set a zero block time unconditionally, which tells
+     * the notifier never to sleep -- so every wish process spun at 100%
+     * CPU for its whole life. A single wish still worked, having the
+     * machine to itself, but two could not: Tk's test suite drives a
+     * child wish over a pipe (tests/testutils.tcl:382), and with both
+     * parent and child burning a core the child never got enough CPU to
+     * answer, so every round timed out.
+     *
+     * tkUnixEvent.c's DisplaySetupProc is the model: zero block time
+     * only when events are already queued, otherwise let the notifier
+     * sleep. It can sleep on the X connection; we have no descriptor
+     * registered, so we cap the sleep instead and poll on wakeup.
+     */
+    if (TkP9EventsPending()) {
+	blockTime.sec = 0;
+	blockTime.usec = 0;
+    } else {
+	blockTime.sec = 0;
+	blockTime.usec = P9_POLL_US;
+    }
+    Tcl_SetMaxBlockTime(&blockTime);
 }
 
 static void
