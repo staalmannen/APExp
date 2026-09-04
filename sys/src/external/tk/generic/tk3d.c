@@ -12,6 +12,7 @@
  */
 
 #include "tkInt.h"
+#include <stdio.h>
 #include "tk3d.h"
 
 /*
@@ -419,14 +420,36 @@ Tk_Free3DBorder(
     Tk_3DBorder border)		/* Token for border to be released. */
 {
     TkBorder *borderPtr = (TkBorder *) border;
-    Display *display = DisplayOfScreen(borderPtr->screen);
+    Display *display;
     TkBorder *prevPtr;
 
+    /* APExp diagnostic -- temporary, chasing the label destroy. */
+    fprintf(stderr, "APExp: Tk_Free3DBorder border=%llx screen=%llx"
+	    " hashPtr=%llx resourceRefCount=%lld objRefCount=%lld\n",
+	    (unsigned long long)(uintptr_t) borderPtr,
+	    (unsigned long long)(uintptr_t) borderPtr->screen,
+	    (unsigned long long)(uintptr_t) borderPtr->hashPtr,
+	    (long long) borderPtr->resourceRefCount,
+	    (long long) borderPtr->objRefCount);
+    fflush(stderr);
+
+    display = DisplayOfScreen(borderPtr->screen);
+
+    fprintf(stderr, "APExp: Tk_Free3DBorder display=%llx\n",
+	    (unsigned long long)(uintptr_t) display);
+    fflush(stderr);
+
     if (borderPtr->resourceRefCount-- > 1) {
+	fprintf(stderr, "APExp: Tk_Free3DBorder still referenced, returning\n");
+	fflush(stderr);
 	return;
     }
 
     prevPtr = (TkBorder *)Tcl_GetHashValue(borderPtr->hashPtr);
+
+    fprintf(stderr, "APExp: Tk_Free3DBorder prevPtr=%llx, freeing\n",
+	    (unsigned long long)(uintptr_t) prevPtr);
+    fflush(stderr);
     TkpFreeBorder(borderPtr);
     Tk_FreeColor(borderPtr->bgColorPtr);
     if (borderPtr->darkColorPtr != NULL) {
