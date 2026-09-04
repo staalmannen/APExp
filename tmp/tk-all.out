@@ -1,0 +1,5680 @@
+Tests running in interp:  /bin/wish
+Tests located in:  /usr/glenda/APExp/sys/src/external/tk/tests
+Tests running in:  /usr/glenda/APExp/sys/src/external/tk/tests
+Temporary files stored in /usr/glenda/APExp/sys/src/external/tk/tests
+Test files sourced into current interpreter
+Running tests that match:  *
+Skipping test files that match:  l.*.test
+Only running test files that match:  *.test
+Tests began at 2026-09-04 20:15:17 +0200
+bell.test
+Bell should ring now ...
+bgerror.test
+bind.test
+
+
+==== bind-4.1 TkBindEventProc procedure FAILED
+==== Contents of test case:
+
+    bind all <Enter> {lappend x "%W enter all"}
+    bind Test <Enter> {lappend x "%W enter frame"}
+    bind Toplevel <Enter> {lappend x "%W enter toplevel"}
+    bind xyz <Enter> {lappend x "%W enter xyz"}
+    bind {a b} <Enter> {lappend x "%W enter {a b}"}
+    bind .t <Enter>  {lappend x "%W enter .t"}
+    bind .t.f <Enter> {lappend x "%W enter .t.f"}
+
+    event generate .t.f <Enter>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+{.t.f enter .t.f} {.t.f enter frame} {.t.f enter .t} {.t.f enter all}
+==== bind-4.1 FAILED
+
+
+
+==== bind-4.2 TkBindEventProc procedure FAILED
+==== Contents of test case:
+
+    bind all <Enter> {lappend x "%W enter all"}
+    bind Test <Enter> {lappend x "%W enter frame"}
+    bind Toplevel <Enter> {lappend x "%W enter toplevel"}
+    bind xyz <Enter> {lappend x "%W enter xyz"}
+    bind {a b} <Enter> {lappend x "%W enter {a b}"}
+    bind .t <Enter>  {lappend x "%W enter .t"}
+    bind .t.f <Enter> {lappend x "%W enter .t.f"}
+
+    bindtags .t.f {.t.f {a b} xyz}
+    event generate .t.f <Enter>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+{.t.f enter .t.f} {.t.f enter {a b}} {.t.f enter xyz}
+==== bind-4.2 FAILED
+
+
+
+==== bind-4.4 TkBindEventProc procedure FAILED
+==== Contents of test case:
+
+    bind all <Enter> {lappend x "%W enter all"}
+    bind Test <Enter> {lappend x "%W enter frame"}
+    bind Toplevel <Enter> {lappend x "%W enter toplevel"}
+    bind xyz <Enter> {lappend x "%W enter xyz"}
+    bind {a b} <Enter> {lappend x "%W enter {a b}"}
+    bind .t <Enter>  {lappend x "%W enter .t"}
+
+    bindtags .t.f {.t.f .t.f2 .t.f3}
+    bind .t.f <Enter> {lappend x "%W enter .t.f"}
+    bind .t.f3 <Enter> {lappend x "%W enter .t.f3"}
+    event generate .t.f <Enter>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+{.t.f enter .t.f} {.t.f enter .t.f3}
+==== bind-4.4 FAILED
+
+
+
+==== bind-13.1 Tk_BindEvent procedure FAILED
+==== Contents of test case:
+
+    bind Test <Key> {lappend x "%W %K Test Key"}
+    bind all <Key> {lappend x "%W %K all Key"}
+    bind Test : {lappend x "%W %K Test :"}
+    bind all  _ {lappend x "%W %K all _"}
+    bind .t.f : {lappend x "%W %K .t.f :"}
+
+    event generate .t.f <:>
+    event generate .t.f <+>
+    event generate .t.f <_>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+{.t.f : .t.f :} {.t.f : Test :} {.t.f : all Key} {.t.f + Test Key} {.t.f + all Key} {.t.f _ Test Key} {.t.f _ all _}
+==== bind-13.1 FAILED
+
+
+
+==== bind-13.2 Tk_BindEvent procedure FAILED
+==== Contents of test case:
+
+    bind Test <Key> {lappend x "%W %K Test press any"; break}
+    bind all <Key> {continue; lappend x "%W %K all press any"}
+    bind .t.f : {lappend x "%W %K .t.f pressed colon"}
+
+    event generate .t.f <:>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+{.t.f : .t.f pressed colon} {.t.f : Test press any}
+==== bind-13.2 FAILED
+
+
+
+==== bind-13.3 Tk_BindEvent procedure FAILED
+==== Contents of test case:
+
+    bind Test <Key> {lappend x "%W %K Test press any"; error Test}
+    bind .t.f : {lappend x "%W %K .t.f pressed colon"}
+    event generate .t.f <:>
+    update
+    list $x $errorInfo
+
+---- Result was:
+{} {no event type or button # or keysym
+    while executing
+".t.c bind foo <"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"}
+---- Result should have been (exact matching):
+{{.t.f : .t.f pressed colon} {.t.f : Test press any}} {Test
+    while executing
+"error Test"
+    (command bound to event)}
+==== bind-13.3 FAILED
+
+
+
+==== bind-13.4 Tk_BindEvent procedure FAILED
+==== Contents of test case:
+
+    bind Test : {lappend x "%W %K Test"}
+    bind .t.f : {lappend x "%W %K .t.f"}
+    foo
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+{.t.f : .t.f} {.t.f : Test}
+==== bind-13.4 FAILED
+
+
+
+==== bind-13.7 Tk_BindEvent procedure FAILED
+==== Contents of test case:
+
+    bind .t.f : {lappend x "%W (.t.f binding)"}
+    bind Test : {lappend x "%W (Test binding)"}
+    bind all : {bind .t.f : {}; lappend x "%W (all binding)"}
+    event generate .t.f <:>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+{.t.f (.t.f binding)} {.t.f (Test binding)} {.t.f (all binding)}
+==== bind-13.7 FAILED
+
+
+
+==== bind-13.8 Tk_BindEvent procedure FAILED
+==== Contents of test case:
+
+    bind .t.f : {lappend x "%W (.t.f binding)"}
+    bind Test : {lappend x "%W (Test binding)"}
+    bind all : {destroy .t.f; lappend x "%W (all binding)"}
+    event generate .t.f <:>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+{.t.f (.t.f binding)} {.t.f (Test binding)} {.t.f (all binding)}
+==== bind-13.8 FAILED
+
+
+
+==== bind-13.9 Tk_BindEvent procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-1> {lappend x "%W z (.t.f <Button-1> binding)"}
+    bind .t.f <Button> {lappend x "%W z (.t.f <Button> binding)"}
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-2>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+{.t.f z (.t.f <Button-1> binding)} {.t.f z (.t.f <Button> binding)}
+==== bind-13.9 FAILED
+
+
+
+==== bind-13.10 Tk_BindEvent procedure: don't ignore NotifyInferior - bug 47d4f29159 FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> "lappend x Enter%#"
+    bind .t.f <Leave> "lappend x Leave%#"
+    event generate .t.f <Enter> -serial 100 -detail NotifyAncestor
+    event generate .t.f <Enter> -serial 101 -detail NotifyInferior
+    event generate .t.f <Leave> -serial 102 -detail NotifyAncestor
+    event generate .t.f <Leave> -serial 103 -detail NotifyInferior
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Enter100 Enter101 Leave102 Leave103
+==== bind-13.10 FAILED
+
+
+
+==== bind-13.11 Tk_BindEvent procedure: collapse Motions FAILED
+==== Contents of test case:
+
+    bind .t.f <Motion> "lappend x Motion%#(%x,%y)"
+    event generate .t.f <Motion> -serial 100 -x 100 -y 200 -when tail
+    update
+    event generate .t.f <Motion> -serial 101 -x 200 -y 300 -when tail
+    event generate .t.f <Motion> -serial 102 -x 300 -y 400 -when tail
+    update
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Motion100(100,200) Motion102(300,400)
+==== bind-13.11 FAILED
+
+
+
+==== bind-13.13 Tk_BindEvent procedure: valid key detail FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> "lappend x Key%K"
+    bind .t.f <KeyRelease> "lappend x Release%K"
+    event generate .t.f <Key> -keysym :
+    event generate .t.f <KeyRelease> -keysym :
+    return $x
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: no keycode for keysym ":"
+    while executing
+"event generate .t.f <Key> -keysym :"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TK LOOKUP KEYCODE :
+==== bind-13.13 FAILED
+
+
+
+==== bind-13.14 Tk_BindEvent procedure: invalid key detail FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> "lappend x Key%K"
+    bind .t.f <KeyRelease> "lappend x Release%K"
+    event generate .t.f <Key> -keycode -1
+    event generate .t.f <KeyRelease> -keycode -1
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Key?? Release??
+==== bind-13.14 FAILED
+
+
+
+==== bind-13.15 Tk_BindEvent procedure: button detail FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> "lappend x Button%b"
+    bind .t.f <ButtonRelease> "lappend x Release%b"
+    event generate .t.f <Button> -button 1
+    event generate .t.f <ButtonRelease> -button 3
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Button1 Release3
+==== bind-13.15 FAILED
+
+
+
+==== bind-13.16 Tk_BindEvent procedure: virtual detail FAILED
+==== Contents of test case:
+
+    bind .t.f <<Paste>> "lappend x Paste"
+    event generate .t.f <<Paste>>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Paste
+==== bind-13.16 FAILED
+
+
+
+==== bind-13.17 Tk_BindEvent procedure: virtual event in event stream FAILED
+==== Contents of test case:
+
+    bind .t.f <<Paste>> "lappend x Paste"
+    event generate .t.f <<Paste>>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Paste
+==== bind-13.17 FAILED
+
+
+
+==== bind-13.18 Tk_BindEvent procedure: match detail physical FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-2> {set x Button-2}
+    event add <<Paste>> <Button-2>
+    bind .t.f <<Paste>> {set x Paste}
+    event generate .t.f <Button-2>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Button-2
+==== bind-13.18 FAILED
+
+
+
+==== bind-13.19 Tk_BindEvent procedure: no match detail physical FAILED
+==== Contents of test case:
+
+    event add <<Paste>> <Button-2>
+    bind .t.f <<Paste>> {set x Paste}
+    event generate .t.f <Button-2>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Paste
+==== bind-13.19 FAILED
+
+
+
+==== bind-13.20 Tk_BindEvent procedure: match detail virtual FAILED
+==== Contents of test case:
+
+    event add <<Paste>> <Button-2>
+    bind .t.f <<Paste>> "lappend x Paste"
+    event generate .t.f <Button-2>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Paste
+==== bind-13.20 FAILED
+
+
+
+==== bind-13.22 Tk_BindEvent procedure: match no-detail physical FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> {set x Button}
+    event add <<Paste>> <Button>
+    bind .t.f <<Paste>> {set x Paste}
+    event generate .t.f <Button-2>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Button
+==== bind-13.22 FAILED
+
+
+
+==== bind-13.23 Tk_BindEvent procedure: no match no-detail physical FAILED
+==== Contents of test case:
+
+    event add <<Paste>> <Button>
+    bind .t.f <<Paste>> {set x Paste}
+    event generate .t.f <Button-2>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Paste
+==== bind-13.23 FAILED
+
+
+
+==== bind-13.24 Tk_BindEvent procedure: match no-detail virtual FAILED
+==== Contents of test case:
+
+    event add <<Paste>> <Button>
+    bind .t.f <<Paste>> "lappend x Paste"
+    event generate .t.f <Button-2>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Paste
+==== bind-13.24 FAILED
+
+
+
+==== bind-13.26 Tk_BindEvent procedure: precedence FAILED
+==== Contents of test case:
+
+    event add <<Paste>> <Button-2>
+    event add <<Copy>> <Button>
+    bind .t.f <Button-2> "lappend x Button-2"
+    bind .t.f <<Paste>> "lappend x Paste"
+    bind .t.f <Button> "lappend x Button"
+    bind .t.f <<Copy>> "lappend x Copy"
+
+    event generate .t.f <Button-2>
+    bind .t.f <Button-2> {}
+    event generate .t.f <Button-2>
+    bind .t.f <<Paste>> {}
+    event generate .t.f <Button-2>
+    bind .t.f <Button> {}
+    event generate .t.f <Button-2>
+    bind .t.f <<Copy>> {}
+    event generate .t.f <Button-2>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Button-2 Paste Button Copy
+==== bind-13.26 FAILED
+
+
+
+==== bind-13.27 Tk_BindEvent procedure: no detail virtual pattern list FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-2> {set x Button-2}
+    event generate .t.f <Button-2>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Button-2
+==== bind-13.27 FAILED
+
+
+
+==== bind-13.28 Tk_BindEvent procedure: detail virtual pattern list FAILED
+==== Contents of test case:
+
+    event add <<Paste>> <Button-2>
+    bind .t.f <<Paste>> {set x Paste}
+    event generate .t.f <Button-2>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Paste
+==== bind-13.28 FAILED
+
+
+
+==== bind-13.29 Tk_BindEvent procedure: no no-detail virtual pattern list FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> {set x Button}
+    event generate .t.f <Button-2>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Button
+==== bind-13.29 FAILED
+
+
+
+==== bind-13.30 Tk_BindEvent procedure: no-detail virtual pattern list FAILED
+==== Contents of test case:
+
+    event add <<Paste>> <Button>
+    bind .t.f <<Paste>> {set x Paste}
+    event generate .t.f <Button-2>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Paste
+==== bind-13.30 FAILED
+
+
+
+==== bind-13.32 Tk_BindEvent procedure: match FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-2> {set x Button-2}
+    event generate .t.f <Button-2>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Button-2
+==== bind-13.32 FAILED
+
+
+
+==== bind-13.33 Tk_BindEvent procedure: many C bindings cause realloc FAILED
+==== Contents of test case:
+
+    bindtags .t.f {a b c d e f g h i j k l m n o p}
+    foreach p [bindtags .t.f] {
+	bind $p <Button-1> "lappend x $p"
+    }
+    event generate .t.f <Button-1>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+a b c d e f g h i j k l m n o p
+==== bind-13.33 FAILED
+
+
+
+==== bind-13.34 Tk_BindEvent procedure: multiple tags FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-2> {lappend x .t.f}
+    bind Test <Button-2> {lappend x Button}
+    event generate .t.f <Button-2>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+.t.f Button
+==== bind-13.34 FAILED
+
+
+
+==== bind-13.35 Tk_BindEvent procedure: execute binding FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-1> {lappend x 1}
+    event generate .t.f <Button-1>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-13.35 FAILED
+
+
+
+==== bind-13.38 Tk_BindEvent procedure: binding gets to run FAILED
+==== Contents of test case:
+
+    bind Test <Button-1> {lappend x Test}
+    bind .t.f <Button-1> {lappend x .t.f}
+    event generate .t.f <Button-1>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+.t.f Test
+==== bind-13.38 FAILED
+
+
+
+==== bind-13.41 Tk_BindEvent procedure: continue in script FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-2> {lappend x b1; continue; lappend x b2}
+    bind Test <Button-2> {lappend x B1; continue; lappend x B2}
+    event generate .t.f <Button-2>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+b1 B1
+==== bind-13.41 FAILED
+
+
+
+==== bind-13.43 Tk_BindEvent procedure: break in script FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-2> {lappend x b1; break; lappend x b2}
+    bind Test <Button-2> {lappend x B1; break; lappend x B2}
+    event generate .t.f <Button-2>
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+b1
+==== bind-13.43 FAILED
+
+
+
+==== bind-13.45 Tk_BindEvent procedure: error in script FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-2> {lappend x b1; blap}
+    bind Test <Button-2> {lappend x B1}
+    event generate .t.f <Button-2>
+    update
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+b1 {invalid command name "blap"}
+==== bind-13.45 FAILED
+
+
+
+==== bind-15.1 MatchPatterns procedure, ignoring type mismatches FAILED
+==== Contents of test case:
+
+    bind .t.f 12 {set x 1}
+    set x 0
+    event generate .t.f <Key-1>
+    event generate .t.f <KeyRelease-1>
+    event generate .t.f <Key-2>
+    event generate .t.f <KeyRelease-2>
+    return $x
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-15.1 FAILED
+
+
+
+==== bind-15.2 MatchPatterns procedure, ignoring type mismatches FAILED
+==== Contents of test case:
+
+    bind .t.f 12 {set x 1}
+    set x 0
+    event generate .t.f <Key-1>
+    event generate .t.f <Enter>
+    event generate .t.f <KeyRelease-1>
+    event generate .t.f <Leave>
+    event generate .t.f <Key-2>
+    event generate .t.f <KeyRelease-2>
+    return $x
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-15.2 FAILED
+
+
+
+==== bind-15.4 MatchPatterns procedure, ignoring type mismatches FAILED
+==== Contents of test case:
+
+    bind .t.f <Double-Button-1> {set x 1}
+    set x 0
+    event generate .t.f <Button-1>
+    event generate .t.f <ButtonRelease-1>
+    event generate .t.f <Button-1>
+    event generate .t.f <ButtonRelease-1>
+    return $x
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-15.4 FAILED
+
+
+
+==== bind-15.5 MatchPatterns procedure, ignoring type mismatches FAILED
+==== Contents of test case:
+
+    bind .t.f <Double-ButtonRelease> {set x 1}
+    set x 0
+    event generate .t.f <Button-1>
+    event generate .t.f <ButtonRelease-1>
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    return $x
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-15.5 FAILED
+
+
+
+==== bind-15.7 MatchPatterns procedure, ignoring type mismatches FAILED
+==== Contents of test case:
+
+    bind .t.f <Double-Button-1> {set x 1}
+    set x 0
+    event generate .t.f <Button-1>
+    event generate .t.f <Shift_L>
+    event generate .t.f <ButtonRelease-1>
+    event generate .t.f <Button-1>
+    event generate .t.f <ButtonRelease-1>
+    return $x
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-15.7 FAILED
+
+
+
+==== bind-15.9 MatchPatterns procedure, modifier checks FAILED
+==== Contents of test case:
+
+    bind .t.f <M1-M2-Key> {set x 1}
+    set x 0
+    event generate .t.f <a> -state 0x18
+    return $x
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-15.9 FAILED
+
+
+
+==== bind-15.10 MatchPatterns procedure, modifier checks FAILED
+==== Contents of test case:
+
+    bind .t.f <M1-M2-Key> {set x 1}
+    set x 0
+    event generate .t.f <a> -state 0xfc
+    return $x
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-15.10 FAILED
+
+
+
+==== bind-15.14 MatchPatterns procedure, checking "nearby" FAILED
+==== Contents of test case:
+
+    bind .t.f <Double-Button-1> {set x 1}
+    set x 0
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.f <Button-1> -x 30 -y 40
+    event generate .t.f <Button-1> -x 31 -y 39
+    event generate .t.f <ButtonRelease-1>
+    return $x
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-15.14 FAILED
+
+
+
+==== bind-15.15 MatchPatterns procedure, checking "nearby" FAILED
+==== Contents of test case:
+
+    bind .t.f <Double-Button-1> {set x 1}
+    set x 0
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.f <Button-1> -x 30 -y 40
+    event generate .t.f <Button-1> -x 29 -y 41
+    event generate .t.f <ButtonRelease-1>
+    return $x
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-15.15 FAILED
+
+
+
+==== bind-15.20 MatchPatterns procedure, checking "nearby" FAILED
+==== Contents of test case:
+
+    bind .t.f <Double-Button-1> {set x 1}
+    set x 0
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.f <Button-1> -time 300
+    event generate .t.f <Button-1> -time 700
+    event generate .t.f <ButtonRelease-1>
+    return $x
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-15.20 FAILED
+
+
+
+==== bind-15.22 MatchPatterns procedure, time wrap-around FAILED
+==== Contents of test case:
+
+    bind .t.f <Double-Button-1> {set x 1}
+    set x 0
+    event generate .t.f <Button-1> -time -100
+    event generate .t.f <Button-1> -time 200
+    event generate .t.f <ButtonRelease-1>
+    return $x
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-15.22 FAILED
+
+
+
+==== bind-15.24 MatchPatterns procedure, virtual event FAILED
+==== Contents of test case:
+
+    event add <<Paste>> <Button-1>
+    bind .t.f <<Paste>> {lappend x paste}
+    event generate .t.f <Button-1>
+    event generate .t.f <ButtonRelease-1>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+paste
+==== bind-15.24 FAILED
+
+
+
+==== bind-15.26 MatchPatterns procedure, reject a virtual event FAILED
+==== Contents of test case:
+
+    event add <<V1>> <Button>
+    event add <<V2>> <Button-1>
+    event add <<V3>> <Shift-Button-1>
+    bind .t.f <<V2>> "lappend x V2%#"
+    event generate .t.f <Button> -serial 101
+    event generate .t.f <Button-1> -serial 102
+    event generate .t.f <Shift-Button-1> -serial 103
+    event generate .t.f <ButtonRelease-1>
+    bind .t.f <Shift-Button-1> "lappend x Shift-Button-1"
+    event generate .t.f <Button> -serial 104
+    event generate .t.f <Button-1> -serial 105
+    event generate .t.f <Shift-Button-1> -serial 106
+    event generate .t.f <ButtonRelease-1>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+V2102 V2103 V2105 Shift-Button-1
+==== bind-15.26 FAILED
+
+
+
+==== bind-15.27 MatchPatterns procedure, conflict resolution FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> {set x 0}
+    bind .t.f 1 {set x 1}
+    set x none
+    event generate .t.f <Key-1>
+    return $x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+1
+==== bind-15.27 FAILED
+
+
+
+==== bind-15.28 MatchPatterns procedure, conflict resolution FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> {set x 0}
+    bind .t.f 1 {set x 1}
+    set x none
+    event generate .t.f <Key-2>
+    return $x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+0
+==== bind-15.28 FAILED
+
+
+
+==== bind-15.29 MatchPatterns procedure, conflict resolution FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> {lappend x 0}
+    bind .t.f 1 {lappend x 1}
+    bind .t.f 21 {lappend x 2}
+    set x none
+    event generate .t.f <Key-2>
+    event generate .t.f <KeyRelease-2>
+    event generate .t.f <Key-1>
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+none 0 2
+==== bind-15.29 FAILED
+
+
+
+==== bind-15.30 MatchPatterns procedure, conflict resolution FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> {set x 0}
+    bind .t.f <Button-1> {set x 1}
+    set x none
+    event generate .t.f <Button-1>
+    event generate .t.f <ButtonRelease-1>
+    return $x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+1
+==== bind-15.30 FAILED
+
+
+
+==== bind-15.31 MatchPatterns procedure, conflict resolution FAILED
+==== Contents of test case:
+
+    bind .t.f <M1-Key> {set x 0}
+    bind .t.f <M2-Key> {set x 1}
+    event generate .t.f <a> -state 0x18
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-15.31 FAILED
+
+
+
+==== bind-15.32 MatchPatterns procedure, conflict resolution FAILED
+==== Contents of test case:
+
+    bind .t.f <M2-Key> {set x 0}
+    bind .t.f <M1-Key> {set x 1}
+    set x none
+    event generate .t.f <a> -state 0x18
+    return $x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+1
+==== bind-15.32 FAILED
+
+
+
+==== bind-15.33 MatchPatterns procedure, conflict resolution FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-1> {lappend x single}
+    bind Test <Button-1> {lappend x single(Test)}
+    bind Test <Double-Button-1> {lappend x double(Test)}
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    event generate .t.f <ButtonRelease-1>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+single single(Test) single double(Test) single double(Test)
+==== bind-15.33 FAILED
+
+
+
+==== bind-16.1 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> {set x abcd}
+    set x none
+    event generate .t.f <Enter>
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+abcd
+==== bind-16.1 FAILED
+
+
+
+==== bind-16.2 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> {set x %#}
+    set x none
+    event generate .t.f <Enter> -serial 1234
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+1234
+==== bind-16.2 FAILED
+
+
+
+==== bind-16.3 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Configure> {set x %a}
+    set x none
+    event generate .t.f <Configure> -above .t -window .t.f
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+0xf
+==== bind-16.3 FAILED
+
+
+
+==== bind-16.4 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> {set x %b}
+    set x none
+    event generate .t.f <Button-3>
+    event generate .t.f <ButtonRelease-3>
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+3
+==== bind-16.4 FAILED
+
+
+
+==== bind-16.5 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Expose> {set x %c}
+    set x none
+    event generate .t.f <Expose> -count 47
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+47
+==== bind-16.5 FAILED
+
+
+
+==== bind-16.6 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> {set x %d}
+    set x none
+    event generate .t.f <Enter> -detail NotifyAncestor
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+NotifyAncestor
+==== bind-16.6 FAILED
+
+
+
+==== bind-16.7 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> {set x %d}
+    set x none
+    event generate .t.f <Enter> -detail NotifyVirtual
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+NotifyVirtual
+==== bind-16.7 FAILED
+
+
+
+==== bind-16.8 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> {set x %d}
+    set x none
+    event generate .t.f <Enter> -detail NotifyNonlinear
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+NotifyNonlinear
+==== bind-16.8 FAILED
+
+
+
+==== bind-16.9 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> {set x %d}
+    set x none
+    event generate .t.f <Enter> -detail NotifyNonlinearVirtual
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+NotifyNonlinearVirtual
+==== bind-16.9 FAILED
+
+
+
+==== bind-16.10 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> {set x %d}
+    set x none
+    event generate .t.f <Enter> -detail NotifyPointer
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+NotifyPointer
+==== bind-16.10 FAILED
+
+
+
+==== bind-16.11 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> {set x %d}
+    set x none
+    event generate .t.f <Enter> -detail NotifyPointerRoot
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+NotifyPointerRoot
+==== bind-16.11 FAILED
+
+
+
+==== bind-16.12 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> {set x %d}
+    set x none
+    event generate .t.f <Enter> -detail NotifyDetailNone
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+NotifyDetailNone
+==== bind-16.12 FAILED
+
+
+
+==== bind-16.13 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> {set x %f}
+    set x none
+    event generate .t.f <Enter> -focus 1
+    return $x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+1
+==== bind-16.13 FAILED
+
+
+
+==== bind-16.14 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Expose> {set x "%x %y %w %h"}
+    set x none
+    event generate .t.f <Expose> -x 24 -y 18 -width 147 -height 61
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+24 18 147 61
+==== bind-16.14 FAILED
+
+
+
+==== bind-16.15 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Configure> {set x "%x %y %w %h"}
+    set x none
+    event generate .t.f <Configure> -x 24 -y 18 -width 147 -height 61 -window .t.f
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+24 18 147 61
+==== bind-16.15 FAILED
+
+
+
+==== bind-16.16 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> {set x "%k"}
+    set x none
+    event generate .t.f <Key> -keycode 146
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+146
+==== bind-16.16 FAILED
+
+
+
+==== bind-16.17 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> {set x "%m"}
+    set x none
+    event generate .t.f <Enter> -mode NotifyNormal
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+NotifyNormal
+==== bind-16.17 FAILED
+
+
+
+==== bind-16.18 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> {set x "%m"}
+    set x none
+    event generate .t.f <Enter> -mode NotifyGrab
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+NotifyGrab
+==== bind-16.18 FAILED
+
+
+
+==== bind-16.19 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> {set x "%m"}
+    set x none
+    event generate .t.f <Enter> -mode NotifyUngrab
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+NotifyUngrab
+==== bind-16.19 FAILED
+
+
+
+==== bind-16.20 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> {set x "%m"}
+    set x none
+    event generate .t.f <Enter> -mode NotifyWhileGrabbed
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+NotifyWhileGrabbed
+==== bind-16.20 FAILED
+
+
+
+==== bind-16.21 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Map> {set x "%o"}
+    set x none
+    event generate .t.f <Map> -override 1 -window .t.f
+    return $x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+1
+==== bind-16.21 FAILED
+
+
+
+==== bind-16.22 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Reparent> {set x "%o"}
+    set x none
+    event generate .t.f <Reparent> -override true -window .t.f
+    return $x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+1
+==== bind-16.22 FAILED
+
+
+
+==== bind-16.23 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Configure> {set x "%o"}
+    set x none
+    event generate .t.f <Configure> -override 1 -window .t.f
+    return $x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+1
+==== bind-16.23 FAILED
+
+
+
+==== bind-16.24 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Circulate> {set x "%p"}
+    set x none
+    event generate .t.f <Circulate> -place PlaceOnTop -window .t.f
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+PlaceOnTop
+==== bind-16.24 FAILED
+
+
+
+==== bind-16.25 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Circulate> {set x "%p"}
+    set x none
+    event generate .t.f <Circulate> -place PlaceOnBottom -window .t.f
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+PlaceOnBottom
+==== bind-16.25 FAILED
+
+
+
+==== bind-16.26 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-1> {set x "%s"}
+    set x none
+    event generate .t.f <Button-1> -state 1402
+    event generate .t.f <ButtonRelease-1>
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+1402
+==== bind-16.26 FAILED
+
+
+
+==== bind-16.27 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> {set x "%s"}
+    set x none
+    event generate .t.f <Enter> -state 0x3ff
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+1023
+==== bind-16.27 FAILED
+
+
+
+==== bind-16.28 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Visibility> {set x "%s"}
+    set x none
+    event generate .t.f <Visibility> -state VisibilityPartiallyObscured
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+VisibilityPartiallyObscured
+==== bind-16.28 FAILED
+
+
+
+==== bind-16.29 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Visibility> {set x "%s"}
+    set x none
+    event generate .t.f <Visibility> -state VisibilityUnobscured
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+VisibilityUnobscured
+==== bind-16.29 FAILED
+
+
+
+==== bind-16.30 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Visibility> {set x "%s"}
+    set x none
+    event generate .t.f <Visibility> -state VisibilityFullyObscured
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+VisibilityFullyObscured
+==== bind-16.30 FAILED
+
+
+
+==== bind-16.31 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> {set x "%t"}
+    set x none
+    event generate .t.f <Button> -time 4294
+    event generate .t.f <ButtonRelease>
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+4294
+==== bind-16.31 FAILED
+
+
+
+==== bind-16.32 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> {set x "%x %y"}
+    set x none
+    event generate .t.f <Button> -x 881 -y 432
+    event generate .t.f <ButtonRelease>
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+881 432
+==== bind-16.32 FAILED
+
+
+
+==== bind-16.33 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Reparent> {set x "%x %y"}
+    set x none
+    event generate .t.f <Reparent> -x 882 -y 431 -window .t.f
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+882 431
+==== bind-16.33 FAILED
+
+
+
+==== bind-16.34 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> {set x "%x %y"}
+    set x none
+    event generate .t.f <Enter> -x 781 -y 632
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+781 632
+==== bind-16.34 FAILED
+
+
+
+==== bind-16.36 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Configure> {set x "%B"}
+    set x none
+    event generate .t.f <Configure> -borderwidth 24 -window .t.f
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+24
+==== bind-16.36 FAILED
+
+
+
+==== bind-16.37 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> {set x "%E"}
+    set x none
+    event generate .t.f <Enter> -sendevent 1
+    return $x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+1
+==== bind-16.37 FAILED
+
+
+
+==== bind-16.39 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> {set x "%N"}
+    set x none
+    event generate .t.f <space>
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+32
+==== bind-16.39 FAILED
+
+
+
+==== bind-16.40 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> {set x "%S"}
+    set x none
+    event generate .t.f <space> -subwindow .t
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+0xf
+==== bind-16.40 FAILED
+
+
+
+==== bind-16.41 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> {set x "%T"}
+    set x none
+    event generate .t.f <Key>
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+2
+==== bind-16.41 FAILED
+
+
+
+==== bind-16.42 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> {set x "%W"}
+    set x none
+    event generate .t.f <Key>
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+.t.f
+==== bind-16.42 FAILED
+
+
+
+==== bind-16.43 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> {set x "%X %Y"}
+    set x none
+    event generate .t.f <Button> -rootx 422 -rooty 13
+    event generate .t.f <ButtonRelease>
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+422 13
+==== bind-16.43 FAILED
+
+
+
+==== bind-16.44 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Gravity> {set x "%R %S"}
+    set x none
+    event generate .t.f <Gravity>
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+?? ??
+==== bind-16.44 FAILED
+
+
+
+==== bind-16.45 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind .t.e <Key> {set x "%M"}
+    bind Entry <Key> {set y "%M"}
+    bind all <Key> {set z "%M"}
+    set x none; set y none; set z none
+    event gen .t.e <a>
+    list $x $y $z
+
+---- Result was:
+none none none
+---- Result should have been (exact matching):
+0 1 2
+==== bind-16.45 FAILED
+
+
+
+==== bind-16.46 ExpandPercents procedure FAILED
+==== Contents of test case:
+
+    bind all <Key> {set z "%M"}
+    bind Entry <Key> {set y "%M"}
+    bind .t.e <Key> {set x "%M"}
+    set x none; set y none; set z none
+    event gen .t.e <a>
+    list $x $y $z
+
+---- Result was:
+none none none
+---- Result should have been (exact matching):
+0 1 2
+==== bind-16.46 FAILED
+
+
+
+==== bind-17.16 event command: generate FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-1> "lappend x 1"
+    event generate .t.f <Button-1>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-17.16 FAILED
+
+
+
+==== bind-19.11 DeleteVirtualEvent procedure: owned by 1, only FAILED
+==== Contents of test case:
+
+    event add <<xyz>> <Button-2>
+    bind .t.f <<xyz>> {lappend x %#}
+    event generate .t.f <Button-2> -serial 101
+    event generate .t.f <ButtonRelease-2>
+    event delete <<xyz>>
+    event generate .t.f <Button-2> -serial 102
+    event generate .t.f <ButtonRelease-2>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+101
+==== bind-19.11 FAILED
+
+
+
+==== bind-19.12 DeleteVirtualEvent procedure: owned by 1, first in chain FAILED
+==== Contents of test case:
+
+    event add <<abc>> <Control-Button-2>
+    event add <<xyz>> <Button-2>
+    bind .t.f <<xyz>> {lappend x xyz}
+    bind .t.f <<abc>> {lappend x abc}
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.f <Control-Button-2>
+    event generate .t.f <Control-ButtonRelease-2>
+    event delete <<xyz>>
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.f <Control-Button-2>
+    event generate .t.f <Control-ButtonRelease-2>
+    list $x [event info <<abc>>]
+
+---- Result was:
+{} <Control-Button-2>
+---- Result should have been (exact matching):
+{xyz abc abc} <Control-Button-2>
+==== bind-19.12 FAILED
+
+
+
+==== bind-19.13 DeleteVirtualEvent procedure: owned by 1, second in chain FAILED
+==== Contents of test case:
+
+    event add <<def>> <Shift-Button-2>
+    event add <<xyz>> <Button-2>
+    event add <<abc>> <Control-Button-2>
+    bind .t.f <<xyz>> {lappend x xyz}
+    bind .t.f <<abc>> {lappend x abc}
+    bind .t.f <<def>> {lappend x def}
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.f <Control-Button-2>
+    event generate .t.f <Control-ButtonRelease-2>
+    event generate .t.f <Shift-Button-2>
+    event generate .t.f <Shift-ButtonRelease-2>
+    event delete <<xyz>>
+    event generate .t.f <Button-2>
+    event generate .t.f <Control-Button-2>
+    event generate .t.f <Shift-Button-2>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.f <Control-ButtonRelease-2>
+    event generate .t.f <Shift-ButtonRelease-2>
+    list $x [event info <<def>>] [event info <<xyz>>] [event info <<abc>>]
+
+---- Result was:
+{} <Shift-Button-2> {} <Control-Button-2>
+---- Result should have been (exact matching):
+{xyz abc def abc def} <Shift-Button-2> {} <Control-Button-2>
+==== bind-19.13 FAILED
+
+
+
+==== bind-19.14 DeleteVirtualEvent procedure: owned by 1, last in chain FAILED
+==== Contents of test case:
+
+    event add <<xyz>> <Button-2>
+    event add <<abc>> <Control-Button-2>
+    event add <<def>> <Shift-Button-2>
+    bind .t.f <<xyz>> {lappend x xyz}
+    bind .t.f <<abc>> {lappend x abc}
+    bind .t.f <<def>> {lappend x def}
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.f <Control-Button-2>
+    event generate .t.f <Control-ButtonRelease-2>
+    event generate .t.f <Shift-Button-2>
+    event generate .t.f <Shift-ButtonRelease-2>
+    event delete <<xyz>>
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.f <Control-Button-2>
+    event generate .t.f <Control-ButtonRelease-2>
+    event generate .t.f <Shift-Button-2>
+    event generate .t.f <Shift-ButtonRelease-2>
+    list $x [event info <<xyz>>] [event info <<abc>>] [event info <<def>>]
+
+---- Result was:
+{} {} <Control-Button-2> <Shift-Button-2>
+---- Result should have been (exact matching):
+{xyz abc def abc def} {} <Control-Button-2> <Shift-Button-2>
+==== bind-19.14 FAILED
+
+
+
+==== bind-19.15 DeleteVirtualEvent procedure: owned by many, first FAILED
+==== Contents of test case:
+
+    event add <<xyz>> <Button-2>
+    event add <<abc>> <Button-2>
+    event add <<def>> <Button-2>
+    bind .t.f <<xyz>> {lappend x xyz}
+    bind .t.g <<abc>> {lappend x abc}
+    bind .t.h <<def>> {lappend x def}
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.g <Button-2>
+    event generate .t.g <ButtonRelease-2>
+    event generate .t.h <Button-2>
+    event generate .t.h <ButtonRelease-2>
+    event delete <<xyz>>
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.g <Button-2>
+    event generate .t.g <ButtonRelease-2>
+    event generate .t.h <Button-2>
+    event generate .t.h <ButtonRelease-2>
+    list $x [event info <<xyz>>] [event info <<abc>>] [event info <<def>>]
+
+---- Result was:
+{} {} <Button-2> <Button-2>
+---- Result should have been (exact matching):
+{xyz abc def abc def} {} <Button-2> <Button-2>
+==== bind-19.15 FAILED
+
+
+
+==== bind-19.16 DeleteVirtualEvent procedure: owned by many, middle FAILED
+==== Contents of test case:
+
+    event add <<xyz>> <Button-2>
+    event add <<abc>> <Button-2>
+    event add <<def>> <Button-2>
+    bind .t.f <<xyz>> {lappend x xyz}
+    bind .t.g <<abc>> {lappend x abc}
+    bind .t.h <<def>> {lappend x def}
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.g <Button-2>
+    event generate .t.g <ButtonRelease-2>
+    event generate .t.h <Button-2>
+    event generate .t.h <ButtonRelease-2>
+    event delete <<abc>>
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.g <Button-2>
+    event generate .t.g <ButtonRelease-2>
+    event generate .t.h <Button-2>
+    event generate .t.h <ButtonRelease-2>
+    list $x [event info <<xyz>>] [event info <<abc>>] [event info <<def>>]
+
+---- Result was:
+{} <Button-2> {} <Button-2>
+---- Result should have been (exact matching):
+{xyz abc def xyz def} <Button-2> {} <Button-2>
+==== bind-19.16 FAILED
+
+
+
+==== bind-19.17 DeleteVirtualEvent procedure: owned by many, last FAILED
+==== Contents of test case:
+
+    event add <<xyz>> <Button-2>
+    event add <<abc>> <Button-2>
+    event add <<def>> <Button-2>
+    bind .t.f <<xyz>> {lappend x xyz}
+    bind .t.g <<abc>> {lappend x abc}
+    bind .t.h <<def>> {lappend x def}
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.g <Button-2>
+    event generate .t.g <ButtonRelease-2>
+    event generate .t.h <Button-2>
+    event generate .t.h <ButtonRelease-2>
+    event delete <<def>>
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.g <Button-2>
+    event generate .t.g <ButtonRelease-2>
+    event generate .t.h <Button-2>
+    event generate .t.h <ButtonRelease-2>
+    list $x [event info <<xyz>>] [event info <<abc>>] [event info <<def>>]
+
+---- Result was:
+{} <Button-2> <Button-2> {}
+---- Result should have been (exact matching):
+{xyz abc def xyz abc} <Button-2> <Button-2> {}
+==== bind-19.17 FAILED
+
+
+
+==== bind-22.9 HandleEventGenerate FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> {set x "%s %b"}
+    event generate .t.f <ButtonRelease-1>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.f <ButtonRelease-3>
+    event generate .t.f <Control-Button-1>
+    event generate .t.f <Control-ButtonRelease-1>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+4 1
+==== bind-22.9 FAILED
+
+
+
+==== bind-22.10 HandleEventGenerate FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> {set x "%s %K"}
+    event generate .t.f <Control-space>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+4 space
+==== bind-22.10 FAILED
+
+
+
+==== bind-22.11 HandleEventGenerate FAILED
+==== Contents of test case:
+
+    bind .t.f <<Paste>> {set x "%s"}
+    event generate .t.f <<Paste>> -state 1
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-22.11 FAILED
+
+
+
+==== bind-22.12 HandleEventGenerate FAILED
+==== Contents of test case:
+
+    bind .t.f <Motion> {set x "%s"}
+    event generate .t.f <Control-Motion>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+4
+==== bind-22.12 FAILED
+
+
+
+==== bind-22.13 HandleEventGenerate FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> {lappend x %#}
+    event generate .t.f <Button> -when now -serial 100
+    event generate .t.f <ButtonRelease> -when now
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+100
+==== bind-22.13 FAILED
+
+
+
+==== bind-22.14 HandleEventGenerate FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> {lappend x %#}
+    event generate .t.f <Button> -when head -serial 100
+    event generate .t.f <Button> -when head -serial 101
+    event generate .t.f <Button> -when head -serial 102
+    event generate .t.f <ButtonRelease> -when tail
+    lappend x foo
+    update
+    set x
+
+---- Result was:
+foo
+---- Result should have been (exact matching):
+foo 102 101 100
+==== bind-22.14 FAILED
+
+
+
+==== bind-22.15 HandleEventGenerate FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> {lappend x %#}
+    event generate .t.f <Button> -when head -serial 99
+    event generate .t.f <Button> -when mark -serial 100
+    event generate .t.f <Button> -when mark -serial 101
+    event generate .t.f <Button> -when mark -serial 102
+    event generate .t.f <ButtonRelease> -when tail
+    lappend x foo
+    update
+    set x
+
+---- Result was:
+foo
+---- Result should have been (exact matching):
+foo 100 101 102 99
+==== bind-22.15 FAILED
+
+
+
+==== bind-22.16 HandleEventGenerate FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> {lappend x %#}
+    event generate .t.f <Button> -when head -serial 99
+    event generate .t.f <Button> -when tail -serial 100
+    event generate .t.f <Button> -when tail -serial 101
+    event generate .t.f <Button> -when tail -serial 102
+    event generate .t.f <ButtonRelease> -when tail
+    lappend x foo
+    update
+    set x
+
+---- Result was:
+foo
+---- Result should have been (exact matching):
+foo 99 100 101 102
+==== bind-22.16 FAILED
+
+
+
+==== bind-22.20 HandleEventGenerate: options <Configure> -above .t FAILED
+==== Contents of test case:
+
+    bind .t.f <Configure> "lappend x %a"
+    event generate .t.f <Configure> -above .t
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+0xf
+==== bind-22.20 FAILED
+
+
+
+==== bind-22.22 HandleEventGenerate: options <Configure> -above [winfo id .t] FAILED
+==== Contents of test case:
+
+    bind .t.f <Configure> "lappend x %a"
+    event generate .t.f <Configure> -above [winfo id .t]
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+0xf
+==== bind-22.22 FAILED
+
+
+
+==== bind-22.25 HandleEventGenerate: options <Configure> -borderwidth 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Configure> "lappend x %B"
+    event generate .t.f <Configure> -borderwidth 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.25 FAILED
+
+
+
+==== bind-22.28 HandleEventGenerate: options <Button> -button 1 FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> "lappend x %b"
+    event generate .t.f <Button> -button 1
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-22.28 FAILED
+
+
+
+==== bind-22.29 HandleEventGenerate: options <ButtonRelease> -button 1 FAILED
+==== Contents of test case:
+
+    bind .t.f <ButtonRelease> "lappend x %b"
+    event generate .t.f <ButtonRelease> -button 1
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-22.29 FAILED
+
+
+
+==== bind-22.32 HandleEventGenerate: options <Expose> -count 20 FAILED
+==== Contents of test case:
+
+    bind .t.f <Expose> "lappend x %c"
+    event generate .t.f <Expose> -count 20
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+20
+==== bind-22.32 FAILED
+
+
+
+==== bind-22.35 HandleEventGenerate: options <FocusIn> -detail NotifyVirtual FAILED
+==== Contents of test case:
+
+    bind .t.f <FocusIn> "lappend x FocusIn %d"
+    event generate .t.f <FocusIn> -detail NotifyVirtual
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+FocusIn NotifyVirtual
+==== bind-22.35 FAILED
+
+
+
+==== bind-22.35.1 HandleEventGenerate: options <FocusOut> -detail NotifyVirtual FAILED
+==== Contents of test case:
+
+    bind .t.f <FocusOut> "lappend x FocusOut %d"
+    event generate .t.f <FocusOut> -detail NotifyVirtual
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+FocusOut NotifyVirtual
+==== bind-22.35.1 FAILED
+
+
+
+==== bind-22.36 HandleEventGenerate: options <Enter> -detail NotifyVirtual FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> "lappend x %d"
+    event generate .t.f <Enter> -detail NotifyVirtual
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+NotifyVirtual
+==== bind-22.36 FAILED
+
+
+
+==== bind-22.39 HandleEventGenerate: options <Enter> -focus 1 FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> "lappend x %f"
+    event generate .t.f <Enter> -focus 1
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-22.39 FAILED
+
+
+
+==== bind-22.42 HandleEventGenerate: options <Expose> -height 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Expose> "lappend x %h"
+    event generate .t.f <Expose> -height 2i
+    expr {$x eq [winfo pixels .t.f 2i]}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.42 FAILED
+
+
+
+==== bind-22.43 HandleEventGenerate: options <Configure> -height 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Configure> "lappend x %h"
+    event generate .t.f <Configure> -height 2i
+    expr {$x eq [winfo pixels .t.f 2i]}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.43 FAILED
+
+
+
+==== bind-22.46 HandleEventGenerate: options <Key> -keycode 20 FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> "lappend x %k"
+    event generate .t.f <Key> -keycode 20
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+20
+==== bind-22.46 FAILED
+
+
+
+==== bind-22.49 HandleEventGenerate: options <Key> -keysym space FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> "lappend x %K"
+    event generate .t.f <Key> -keysym space
+    return $x
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: no keycode for keysym "space"
+    while executing
+"event generate .t.f <Key> -keysym space"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TK LOOKUP KEYCODE space
+==== bind-22.49 FAILED
+
+
+
+==== bind-22.50 HandleEventGenerate: options <Button> -keysym space FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> "lappend x %b"
+    event generate .t.f <Button> -keysym space
+
+---- Result was:
+no keycode for keysym "space"
+---- Result should have been (exact matching):
+<Button> event doesn't accept "-keysym" option
+==== bind-22.50 FAILED
+
+
+
+==== bind-22.52 HandleEventGenerate: options <Enter> -mode NotifyNormal FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> "lappend x %m"
+    event generate .t.f <Enter> -mode NotifyNormal
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+NotifyNormal
+==== bind-22.52 FAILED
+
+
+
+==== bind-22.53 HandleEventGenerate: options <FocusIn> -mode NotifyNormal FAILED
+==== Contents of test case:
+
+    bind .t.f <FocusIn> "lappend x %m"
+    event generate .t.f <FocusIn> -mode NotifyNormal
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+NotifyNormal
+==== bind-22.53 FAILED
+
+
+
+==== bind-22.56 HandleEventGenerate: options <Map> -override 1 FAILED
+==== Contents of test case:
+
+    bind .t.f <Map> "lappend x %o"
+    event generate .t.f <Map> -override 1
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-22.56 FAILED
+
+
+
+==== bind-22.57 HandleEventGenerate: options <Reparent> -override 1 FAILED
+==== Contents of test case:
+
+    bind .t.f <Reparent> "lappend x %o"
+    event generate .t.f <Reparent> -override 1
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-22.57 FAILED
+
+
+
+==== bind-22.58 HandleEventGenerate: options <Configure> -override 1 FAILED
+==== Contents of test case:
+
+    bind .t.f <Configure> "lappend x %o"
+    event generate .t.f <Configure> -override 1
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-22.58 FAILED
+
+
+
+==== bind-22.61 HandleEventGenerate: options <Circulate> -place PlaceOnTop FAILED
+==== Contents of test case:
+
+    bind .t.f <Circulate> "lappend x %p"
+    event generate .t.f <Circulate> -place PlaceOnTop
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+PlaceOnTop
+==== bind-22.61 FAILED
+
+
+
+==== bind-22.64 HandleEventGenerate: options <Key> -root .t FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> "lappend x %R"
+    event generate .t.f <Key> -root .t
+    expr {[winfo id .t] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.64 FAILED
+
+
+
+==== bind-22.66 HandleEventGenerate: options <Key> -root [winfo id .t] FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> "lappend x %R"
+    event generate .t.f <Key> -root [winfo id .t]
+    expr {[winfo id .t] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.66 FAILED
+
+
+
+==== bind-22.67 HandleEventGenerate: options <Button> -root .t FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> "lappend x %R"
+    event generate .t.f <Button> -root .t
+    expr {[winfo id .t] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.67 FAILED
+
+
+
+==== bind-22.68 HandleEventGenerate: options <ButtonRelease> -root .t FAILED
+==== Contents of test case:
+
+    bind .t.f <ButtonRelease> "lappend x %R"
+    event generate .t.f <ButtonRelease> -root .t
+    expr {[winfo id .t] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.68 FAILED
+
+
+
+==== bind-22.69 HandleEventGenerate: options <Motion> -root .t FAILED
+==== Contents of test case:
+
+    bind .t.f <Motion> "lappend x %R"
+    event generate .t.f <Motion> -root .t
+    expr {[winfo id .t] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.69 FAILED
+
+
+
+==== bind-22.70 HandleEventGenerate: options <<Paste>> -root .t FAILED
+==== Contents of test case:
+
+    bind .t.f <<Paste>> "lappend x %R"
+    event generate .t.f <<Paste>> -root .t
+    expr {[winfo id .t] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.70 FAILED
+
+
+
+==== bind-22.71 HandleEventGenerate: options <Enter> -root .t FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> "lappend x %R"
+    event generate .t.f <Enter> -root .t
+    expr {[winfo id .t] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.71 FAILED
+
+
+
+==== bind-22.74 HandleEventGenerate: options <Key> -rootx 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> "lappend x %X"
+    event generate .t.f <Key> -rootx 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.74 FAILED
+
+
+
+==== bind-22.75 HandleEventGenerate: options <Button> -rootx 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> "lappend x %X"
+    event generate .t.f <Button> -rootx 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.75 FAILED
+
+
+
+==== bind-22.76 HandleEventGenerate: options <ButtonRelease> -rootx 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <ButtonRelease> "lappend x %X"
+    event generate .t.f <ButtonRelease> -rootx 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.76 FAILED
+
+
+
+==== bind-22.77 HandleEventGenerate: options <Motion> -rootx 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Motion> "lappend x %X"
+    event generate .t.f <Motion> -rootx 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.77 FAILED
+
+
+
+==== bind-22.78 HandleEventGenerate: options <<Paste>> -rootx 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <<Paste>> "lappend x %X"
+    event generate .t.f <<Paste>> -rootx 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.78 FAILED
+
+
+
+==== bind-22.79 HandleEventGenerate: options <Enter> -rootx 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> "lappend x %X"
+    event generate .t.f <Enter> -rootx 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.79 FAILED
+
+
+
+==== bind-22.82 HandleEventGenerate: options <Key> -rooty 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> "lappend x %Y"
+    event generate .t.f <Key> -rooty 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.82 FAILED
+
+
+
+==== bind-22.83 HandleEventGenerate: options <Button> -rooty 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> "lappend x %Y"
+    event generate .t.f <Button> -rooty 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.83 FAILED
+
+
+
+==== bind-22.84 HandleEventGenerate: options <ButtonRelease> -rooty 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <ButtonRelease> "lappend x %Y"
+    event generate .t.f <ButtonRelease> -rooty 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.84 FAILED
+
+
+
+==== bind-22.85 HandleEventGenerate: options <Motion> -rooty 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Motion> "lappend x %Y"
+    event generate .t.f <Motion> -rooty 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.85 FAILED
+
+
+
+==== bind-22.86 HandleEventGenerate: options <<Paste>> -rooty 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <<Paste>> "lappend x %Y"
+    event generate .t.f <<Paste>> -rooty 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.86 FAILED
+
+
+
+==== bind-22.87 HandleEventGenerate: options <Enter> -rooty 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> "lappend x %Y"
+    event generate .t.f <Enter> -rooty 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.87 FAILED
+
+
+
+==== bind-22.90 HandleEventGenerate: options <Key> -sendevent 1 FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> "lappend x %E"
+    event generate .t.f <Key> -sendevent 1
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-22.90 FAILED
+
+
+
+==== bind-22.91 HandleEventGenerate: options <Key> -sendevent yes FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> "lappend x %E"
+    event generate .t.f <Key> -sendevent yes
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-22.91 FAILED
+
+
+
+==== bind-22.92 HandleEventGenerate: options <Key> -sendevent 43 FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> "lappend x %E"
+    event generate .t.f <Key> -sendevent 43
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-22.92 FAILED
+
+
+
+==== bind-22.94 HandleEventGenerate: options <Key> -serial 100 FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> "lappend x %#"
+    event generate .t.f <Key> -serial 100
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+100
+==== bind-22.94 FAILED
+
+
+
+==== bind-22.96 HandleEventGenerate: options <Key> -state 1 FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> "lappend x %s"
+    event generate .t.f <Key> -state 1
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-22.96 FAILED
+
+
+
+==== bind-22.97 HandleEventGenerate: options <Button> -state 1025 FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> "lappend x %s"
+    event generate .t.f <Button> -state 1025
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1025
+==== bind-22.97 FAILED
+
+
+
+==== bind-22.98 HandleEventGenerate: options <ButtonRelease> -state 1025 FAILED
+==== Contents of test case:
+
+    bind .t.f <ButtonRelease> "lappend x %s"
+    event generate .t.f <ButtonRelease> -state 1025
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1025
+==== bind-22.98 FAILED
+
+
+
+==== bind-22.99 HandleEventGenerate: options <Motion> -state 1 FAILED
+==== Contents of test case:
+
+    bind .t.f <Motion> "lappend x %s"
+    event generate .t.f <Motion> -state 1
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-22.99 FAILED
+
+
+
+==== bind-22.100 HandleEventGenerate: options <<Paste>> -state 1 FAILED
+==== Contents of test case:
+
+    bind .t.f <<Paste>> "lappend x %s"
+    event generate .t.f <<Paste>> -state 1
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-22.100 FAILED
+
+
+
+==== bind-22.101 HandleEventGenerate: options <Enter> -state 1 FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> "lappend x %s"
+    event generate .t.f <Enter> -state 1
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-22.101 FAILED
+
+
+
+==== bind-22.103 HandleEventGenerate: options <Visibility> -state VisibilityUnobscured FAILED
+==== Contents of test case:
+
+    bind .t.f <Visibility> "lappend x %s"
+    event generate .t.f <Visibility> -state VisibilityUnobscured
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+VisibilityUnobscured
+==== bind-22.103 FAILED
+
+
+
+==== bind-22.106 HandleEventGenerate: options <Key> -subwindow .t FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> "lappend x %S"
+    event generate .t.f <Key> -subwindow .t
+    expr {[winfo id .t] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.106 FAILED
+
+
+
+==== bind-22.108 HandleEventGenerate: options <Key> -subwindow [winfo id .t] FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> "lappend x %S"
+    event generate .t.f <Key> -subwindow [winfo id .t]
+    expr {[winfo id .t] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.108 FAILED
+
+
+
+==== bind-22.109 HandleEventGenerate: options <Button> -subwindow .t FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> "lappend x %S"
+    event generate .t.f <Button> -subwindow .t
+    expr {[winfo id .t] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.109 FAILED
+
+
+
+==== bind-22.110 HandleEventGenerate: options <ButtonRelease> -subwindow .t FAILED
+==== Contents of test case:
+
+    bind .t.f <ButtonRelease> "lappend x %S"
+    event generate .t.f <ButtonRelease> -subwindow .t
+    expr {[winfo id .t] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.110 FAILED
+
+
+
+==== bind-22.111 HandleEventGenerate: options <Motion> -subwindow .t FAILED
+==== Contents of test case:
+
+    bind .t.f <Motion> "lappend x %S"
+    event generate .t.f <Motion> -subwindow .t
+    expr {[winfo id .t] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.111 FAILED
+
+
+
+==== bind-22.112 HandleEventGenerate: options <<Paste>> -subwindow .t FAILED
+==== Contents of test case:
+
+    bind .t.f <<Paste>> "lappend x %S"
+    event generate .t.f <<Paste>> -subwindow .t
+    expr {[winfo id .t] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.112 FAILED
+
+
+
+==== bind-22.113 HandleEventGenerate: options <Enter> -subwindow .t FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> "lappend x %S"
+    event generate .t.f <Enter> -subwindow .t
+    expr {[winfo id .t] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.113 FAILED
+
+
+
+==== bind-22.116 HandleEventGenerate: options <Key> -time 100 FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> "lappend x %t"
+    event generate .t.f <Key> -time 100
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+100
+==== bind-22.116 FAILED
+
+
+
+==== bind-22.117 HandleEventGenerate: options <Button> -time 100 FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> "lappend x %t"
+    event generate .t.f <Button> -time 100
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+100
+==== bind-22.117 FAILED
+
+
+
+==== bind-22.118 HandleEventGenerate: options <ButtonRelease> -time 100 FAILED
+==== Contents of test case:
+
+    bind .t.f <ButtonRelease> "lappend x %t"
+    event generate .t.f <ButtonRelease> -time 100
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+100
+==== bind-22.118 FAILED
+
+
+
+==== bind-22.119 HandleEventGenerate: options <Motion> -time 100 FAILED
+==== Contents of test case:
+
+    bind .t.f <Motion> "lappend x %t"
+    event generate .t.f <Motion> -time 100
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+100
+==== bind-22.119 FAILED
+
+
+
+==== bind-22.120 HandleEventGenerate: options <<Paste>> -time 100 FAILED
+==== Contents of test case:
+
+    bind .t.f <<Paste>> "lappend x %t"
+    event generate .t.f <<Paste>> -time 100
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+100
+==== bind-22.120 FAILED
+
+
+
+==== bind-22.121 HandleEventGenerate: options <Enter> -time 100 FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> "lappend x %t"
+    event generate .t.f <Enter> -time 100
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+100
+==== bind-22.121 FAILED
+
+
+
+==== bind-22.122 HandleEventGenerate: options <Property> -time 100 FAILED
+==== Contents of test case:
+
+    bind .t.f <Property> "lappend x %t"
+    event generate .t.f <Property> -time 100
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+100
+==== bind-22.122 FAILED
+
+
+
+==== bind-22.125 HandleEventGenerate: options <Expose> -width 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Expose> "lappend x %w"
+    event generate .t.f <Expose> -width 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.125 FAILED
+
+
+
+==== bind-22.126 HandleEventGenerate: options <Configure> -width 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Configure> "lappend x %w"
+    event generate .t.f <Configure> -width 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.126 FAILED
+
+
+
+==== bind-22.129 HandleEventGenerate: options <Unmap> -window .t.f FAILED
+==== Contents of test case:
+
+    bind .t.f <Unmap> "lappend x %W"
+    event generate .t.f <Unmap> -window .t.f
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+.t.f
+==== bind-22.129 FAILED
+
+
+
+==== bind-22.132 HandleEventGenerate: options <Unmap> -window .t.f FAILED
+==== Contents of test case:
+
+    bind .t.f <Unmap> "lappend x %W"
+    event generate .t.f <Unmap> -window .t.f
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+.t.f
+==== bind-22.132 FAILED
+
+
+
+==== bind-22.133 HandleEventGenerate: options <Map> -window .t.f FAILED
+==== Contents of test case:
+
+    bind .t.f <Map> "lappend x %W"
+    event generate .t.f <Map> -window .t.f
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+.t.f
+==== bind-22.133 FAILED
+
+
+
+==== bind-22.134 HandleEventGenerate: options <Reparent> -window .t.f FAILED
+==== Contents of test case:
+
+    bind .t.f <Reparent> "lappend x %W"
+    event generate .t.f <Reparent> -window .t.f
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+.t.f
+==== bind-22.134 FAILED
+
+
+
+==== bind-22.135 HandleEventGenerate: options <Configure> -window .t.f FAILED
+==== Contents of test case:
+
+    bind .t.f <Configure> "lappend x %W"
+    event generate .t.f <Configure> -window .t.f
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+.t.f
+==== bind-22.135 FAILED
+
+
+
+==== bind-22.136 HandleEventGenerate: options <Gravity> -window .t.f FAILED
+==== Contents of test case:
+
+    bind .t.f <Gravity> "lappend x %W"
+    event generate .t.f <Gravity> -window .t.f
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+.t.f
+==== bind-22.136 FAILED
+
+
+
+==== bind-22.137 HandleEventGenerate: options <Circulate> -window .t.f FAILED
+==== Contents of test case:
+
+    bind .t.f <Circulate> "lappend x %W"
+    event generate .t.f <Circulate> -window .t.f
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+.t.f
+==== bind-22.137 FAILED
+
+
+
+==== bind-22.140 HandleEventGenerate: options <Key> -x 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> "lappend x %x"
+    event generate .t.f <Key> -x 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.140 FAILED
+
+
+
+==== bind-22.141 HandleEventGenerate: options <Button> -x 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> "lappend x %x"
+    event generate .t.f <Button> -x 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.141 FAILED
+
+
+
+==== bind-22.142 HandleEventGenerate: options <ButtonRelease> -x 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <ButtonRelease> "lappend x %x"
+    event generate .t.f <ButtonRelease> -x 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.142 FAILED
+
+
+
+==== bind-22.143 HandleEventGenerate: options <Motion> -x 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Motion> "lappend x %x"
+    event generate .t.f <Motion> -x 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.143 FAILED
+
+
+
+==== bind-22.144 HandleEventGenerate: options <<Paste>> -x 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <<Paste>> "lappend x %x"
+    event generate .t.f <<Paste>> -x 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.144 FAILED
+
+
+
+==== bind-22.145 HandleEventGenerate: options <Enter> -x 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> "lappend x %x"
+    event generate .t.f <Enter> -x 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.145 FAILED
+
+
+
+==== bind-22.146 HandleEventGenerate: options <Expose> -x 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Expose> "lappend x %x"
+    event generate .t.f <Expose> -x 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.146 FAILED
+
+
+
+==== bind-22.147 HandleEventGenerate: options <Configure> -x 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Configure> "lappend x %x"
+    event generate .t.f <Configure> -x 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.147 FAILED
+
+
+
+==== bind-22.148 HandleEventGenerate: options <Gravity> -x 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Gravity> "lappend x %x"
+    event generate .t.f <Gravity> -x 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.148 FAILED
+
+
+
+==== bind-22.149 HandleEventGenerate: options <Reparent> -x 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Reparent> "lappend x %x"
+    event generate .t.f <Reparent> -x 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.149 FAILED
+
+
+
+==== bind-22.152 HandleEventGenerate: options <Key> -y 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> "lappend x %y"
+    event generate .t.f <Key> -y 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.152 FAILED
+
+
+
+==== bind-22.153 HandleEventGenerate: options <Button> -y 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> "lappend x %y"
+    event generate .t.f <Button> -y 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.153 FAILED
+
+
+
+==== bind-22.154 HandleEventGenerate: options <ButtonRelease> -y 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <ButtonRelease> "lappend x %y"
+    event generate .t.f <ButtonRelease> -y 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.154 FAILED
+
+
+
+==== bind-22.155 HandleEventGenerate: options <Motion> -y 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Motion> "lappend x %y"
+    event generate .t.f <Motion> -y 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.155 FAILED
+
+
+
+==== bind-22.156 HandleEventGenerate: options <<Paste>> -y 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <<Paste>> "lappend x %y"
+    event generate .t.f <<Paste>> -y 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.156 FAILED
+
+
+
+==== bind-22.157 HandleEventGenerate: options <Enter> -y 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> "lappend x %y"
+    event generate .t.f <Enter> -y 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.157 FAILED
+
+
+
+==== bind-22.158 HandleEventGenerate: options <Expose> -y 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Expose> "lappend x %y"
+    event generate .t.f <Expose> -y 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.158 FAILED
+
+
+
+==== bind-22.159 HandleEventGenerate: options <Configure> -y 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Configure> "lappend x %y"
+    event generate .t.f <Configure> -y 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.159 FAILED
+
+
+
+==== bind-22.160 HandleEventGenerate: options <Gravity> -y 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Gravity> "lappend x %y"
+    event generate .t.f <Gravity> -y 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.160 FAILED
+
+
+
+==== bind-22.161 HandleEventGenerate: options <Reparent> -y 2i FAILED
+==== Contents of test case:
+
+    bind .t.f <Reparent> "lappend x %y"
+    event generate .t.f <Reparent> -y 2i
+    expr {[winfo pixels .t.f 2i] eq $x}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-22.161 FAILED
+
+
+
+==== bind-24.5 FindSequence procedure, multiple bindings FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-1> {lappend x single}
+    bind .t.f <Double-Button-1> {lappend x double}
+    bind .t.f <Triple-Button-1> {lappend x triple}
+    bind .t.f <Quadruple-Button-1> {lappend x quadruple}
+    set x press
+    event generate .t.f <Button-1>
+    event generate .t.f <ButtonRelease-1>
+    lappend x press
+    event generate .t.f <Button-1>
+    event generate .t.f <ButtonRelease-1>
+    lappend x press
+    event generate .t.f <Button-1>
+    event generate .t.f <ButtonRelease-1>
+    lappend x press
+    event generate .t.f <Button-1>
+    event generate .t.f <ButtonRelease-1>
+    lappend x press
+    event generate .t.f <Button-1>
+    event generate .t.f <ButtonRelease-1>
+    set x
+
+---- Result was:
+press press press press press
+---- Result should have been (exact matching):
+press single press double press triple press quadruple press quadruple
+==== bind-24.5 FAILED
+
+
+
+==== bind-24.7 FindSequence procedure: new pattern sequence FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-1><Button-2> {lappend x 1-2}
+    event generate .t.f <Button-1>
+    event generate .t.f <ButtonRelease-1>
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1-2
+==== bind-24.7 FAILED
+
+
+
+==== bind-24.8 FindSequence procedure: similar pattern sequence FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-1><Button-2> {lappend x 1-2}
+    bind .t.f <Button-2> {lappend x 2}
+    event generate .t.f <Button-3>
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.f <Button-1>
+    event generate .t.f <ButtonRelease-1>
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+2 1-2
+==== bind-24.8 FAILED
+
+
+
+==== bind-24.9 FindSequence procedure: similar pattern sequence FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-1><Button-2> {lappend x 1-2}
+    bind .t.f <Button-2><Button-2> {lappend x 2-2}
+    event generate .t.f <Button-3>
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.f <Button-1>
+    event generate .t.f <ButtonRelease-1>
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+2-2 1-2
+==== bind-24.9 FAILED
+
+
+
+==== bind-24.10 FindSequence procedure: similar pattern sequence FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-2><Button-2> {lappend x 2-2}
+    bind .t.f <Double-Button-2> {lappend x d-2}
+    event generate .t.f <Button-3>
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.f <Button-1>
+    event generate .t.f <ButtonRelease-1>
+    event generate .t.f <Button-2> -x 100
+    event generate .t.f <ButtonRelease-2>
+    event generate .t.f <Button-2> -x 200
+    event generate .t.f <ButtonRelease-2>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+d-2 2-2
+==== bind-24.10 FAILED
+
+
+
+==== bind-26.4 event names: Motion FAILED
+==== Contents of test case:
+
+    bind .t.f <Motion> "set x {event Motion}"
+    set x xyzzy
+    event generate .t.f <Motion>
+    list $x [bind .t.f]
+
+---- Result was:
+xyzzy <Motion>
+---- Result should have been (exact matching):
+{event Motion} <Motion>
+==== bind-26.4 FAILED
+
+
+
+==== bind-26.5 event names: Button FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> "set x {event Button}"
+    set x xyzzy
+    event generate .t.f <Button>
+    list $x [bind .t.f]
+
+---- Result was:
+xyzzy <Button>
+---- Result should have been (exact matching):
+{event Button} <Button>
+==== bind-26.5 FAILED
+
+
+
+==== bind-26.7 event names: ButtonRelease FAILED
+==== Contents of test case:
+
+    bind .t.f <ButtonRelease> "set x {event ButtonRelease}"
+    set x xyzzy
+    event generate .t.f <ButtonRelease>
+    list $x [bind .t.f]
+
+---- Result was:
+xyzzy <ButtonRelease>
+---- Result should have been (exact matching):
+{event ButtonRelease} <ButtonRelease>
+==== bind-26.7 FAILED
+
+
+
+==== bind-26.8 event names: Colormap FAILED
+==== Contents of test case:
+
+    bind .t.f <Colormap> "set x {event Colormap}"
+    set x xyzzy
+    event generate .t.f <Colormap>
+    list $x [bind .t.f]
+
+---- Result was:
+xyzzy <Colormap>
+---- Result should have been (exact matching):
+{event Colormap} <Colormap>
+==== bind-26.8 FAILED
+
+
+
+==== bind-26.9 event names: Enter FAILED
+==== Contents of test case:
+
+    bind .t.f <Enter> "set x {event Enter}"
+    set x xyzzy
+    event generate .t.f <Enter>
+    list $x [bind .t.f]
+
+---- Result was:
+xyzzy <Enter>
+---- Result should have been (exact matching):
+{event Enter} <Enter>
+==== bind-26.9 FAILED
+
+
+
+==== bind-26.10 event names: Leave FAILED
+==== Contents of test case:
+
+    bind .t.f <Leave> "set x {event Leave}"
+    set x xyzzy
+    event generate .t.f <Leave>
+    list $x [bind .t.f]
+
+---- Result was:
+xyzzy <Leave>
+---- Result should have been (exact matching):
+{event Leave} <Leave>
+==== bind-26.10 FAILED
+
+
+
+==== bind-26.11 event names: Expose FAILED
+==== Contents of test case:
+
+    bind .t.f <Expose> "set x {event Expose}"
+    set x xyzzy
+    event generate .t.f <Expose>
+    list $x [bind .t.f]
+
+---- Result was:
+xyzzy <Expose>
+---- Result should have been (exact matching):
+{event Expose} <Expose>
+==== bind-26.11 FAILED
+
+
+
+==== bind-26.12 event names: Key FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> "set x {event Key}"
+    set x xyzzy
+    event generate .t.f <Key>
+    list $x [bind .t.f]
+
+---- Result was:
+xyzzy <Key>
+---- Result should have been (exact matching):
+{event Key} <Key>
+==== bind-26.12 FAILED
+
+
+
+==== bind-26.14 event names: KeyRelease FAILED
+==== Contents of test case:
+
+    bind .t.f <KeyRelease> "set x {event KeyRelease}"
+    set x xyzzy
+    event generate .t.f <KeyRelease>
+    list $x [bind .t.f]
+
+---- Result was:
+xyzzy <KeyRelease>
+---- Result should have been (exact matching):
+{event KeyRelease} <KeyRelease>
+==== bind-26.14 FAILED
+
+
+
+==== bind-26.15 event names: Property FAILED
+==== Contents of test case:
+
+    bind .t.f <Property> "set x {event Property}"
+    set x xyzzy
+    event generate .t.f <Property>
+    list $x [bind .t.f]
+
+---- Result was:
+xyzzy <Property>
+---- Result should have been (exact matching):
+{event Property} <Property>
+==== bind-26.15 FAILED
+
+
+
+==== bind-26.16 event names: Visibility FAILED
+==== Contents of test case:
+
+    bind .t.f <Visibility> "set x {event Visibility}"
+    set x xyzzy
+    event generate .t.f <Visibility>
+    list $x [bind .t.f]
+
+---- Result was:
+xyzzy <Visibility>
+---- Result should have been (exact matching):
+{event Visibility} <Visibility>
+==== bind-26.16 FAILED
+
+
+
+==== bind-26.17 event names: Activate FAILED
+==== Contents of test case:
+
+    bind .t.f <Activate> "set x {event Activate}"
+    set x xyzzy
+    event generate .t.f <Activate>
+    list $x [bind .t.f]
+
+---- Result was:
+xyzzy <Activate>
+---- Result should have been (exact matching):
+{event Activate} <Activate>
+==== bind-26.17 FAILED
+
+
+
+==== bind-26.18 event names: Deactivate FAILED
+==== Contents of test case:
+
+    bind .t.f <Deactivate> "set x {event Deactivate}"
+    set x xyzzy
+    event generate .t.f <Deactivate>
+    list $x [bind .t.f]
+
+---- Result was:
+xyzzy <Deactivate>
+---- Result should have been (exact matching):
+{event Deactivate} <Deactivate>
+==== bind-26.18 FAILED
+
+
+
+==== bind-26.19 event names: Circulate FAILED
+==== Contents of test case:
+
+    bind .t.f <Circulate> "set x {event Circulate}"
+    set x xyzzy
+    event generate .t.f <Circulate>
+    list $x [bind .t.f]
+
+---- Result was:
+xyzzy <Circulate>
+---- Result should have been (exact matching):
+{event Circulate} <Circulate>
+==== bind-26.19 FAILED
+
+
+
+==== bind-26.20 event names: Configure FAILED
+==== Contents of test case:
+
+    bind .t.f <Configure> "set x {event Configure}"
+    set x xyzzy
+    event generate .t.f <Configure>
+    list $x [bind .t.f]
+
+---- Result was:
+xyzzy <Configure>
+---- Result should have been (exact matching):
+{event Configure} <Configure>
+==== bind-26.20 FAILED
+
+
+
+==== bind-26.21 event names: Gravity FAILED
+==== Contents of test case:
+
+    bind .t.f <Gravity> "set x {event Gravity}"
+    set x xyzzy
+    event generate .t.f <Gravity>
+    list $x [bind .t.f]
+
+---- Result was:
+xyzzy <Gravity>
+---- Result should have been (exact matching):
+{event Gravity} <Gravity>
+==== bind-26.21 FAILED
+
+
+
+==== bind-26.22 event names: Map FAILED
+==== Contents of test case:
+
+    bind .t.f <Map> "set x {event Map}"
+    set x xyzzy
+    event generate .t.f <Map>
+    list $x [bind .t.f]
+
+---- Result was:
+xyzzy <Map>
+---- Result should have been (exact matching):
+{event Map} <Map>
+==== bind-26.22 FAILED
+
+
+
+==== bind-26.23 event names: Reparent FAILED
+==== Contents of test case:
+
+    bind .t.f <Reparent> "set x {event Reparent}"
+    set x xyzzy
+    event generate .t.f <Reparent>
+    list $x [bind .t.f]
+
+---- Result was:
+xyzzy <Reparent>
+---- Result should have been (exact matching):
+{event Reparent} <Reparent>
+==== bind-26.23 FAILED
+
+
+
+==== bind-26.24 event names: Unmap FAILED
+==== Contents of test case:
+
+    bind .t.f <Unmap> "set x {event Unmap}"
+    set x xyzzy
+    event generate .t.f <Unmap>
+    list $x [bind .t.f]
+
+---- Result was:
+xyzzy <Unmap>
+---- Result should have been (exact matching):
+{event Unmap} <Unmap>
+==== bind-26.24 FAILED
+
+
+
+==== bind-27.3 button names FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-1> {lappend x "button 1"}
+    set x [bind .t.f]
+    event generate .t.f <Button-1>
+    event generate .t.f <ButtonRelease-1>
+    set x
+
+---- Result was:
+<Button-1>
+---- Result should have been (exact matching):
+<Button-1> {button 1}
+==== bind-27.3 FAILED
+
+
+
+==== bind-27.4 button names FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-2> {lappend x "button 2"}
+    set x [bind .t.f]
+    event generate .t.f <Button-2>
+    event generate .t.f <ButtonRelease-2>
+    set x
+
+---- Result was:
+<Button-2>
+---- Result should have been (exact matching):
+<Button-2> {button 2}
+==== bind-27.4 FAILED
+
+
+
+==== bind-27.5 button names FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-3> {lappend x "button 3"}
+    set x [bind .t.f]
+    event generate .t.f <Button-3>
+    event generate .t.f <ButtonRelease-3>
+    set x
+
+---- Result was:
+<Button-3>
+---- Result should have been (exact matching):
+<Button-3> {button 3}
+==== bind-27.5 FAILED
+
+
+
+==== bind-27.6 button names FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-4> {lappend x "button 4"}
+    set x [bind .t.f]
+    event generate .t.f <Button-4>
+    event generate .t.f <ButtonRelease-4>
+    set x
+
+---- Result was:
+<Button-4>
+---- Result should have been (exact matching):
+<Button-4> {button 4}
+==== bind-27.6 FAILED
+
+
+
+==== bind-27.7 button names FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-5> {lappend x "button 5"}
+    set x [bind .t.f]
+    event generate .t.f <Button-5>
+    event generate .t.f <ButtonRelease-5>
+    set x
+
+---- Result was:
+<Button-5>
+---- Result should have been (exact matching):
+<Button-5> {button 5}
+==== bind-27.7 FAILED
+
+
+
+==== bind-27.8 button names FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-6> {lappend x "button 6"}
+    set x [bind .t.f]
+    event generate .t.f <Button-6>
+    event generate .t.f <ButtonRelease-6>
+    set x
+
+---- Result was:
+<Button-6>
+---- Result should have been (exact matching):
+<Button-6> {button 6}
+==== bind-27.8 FAILED
+
+
+
+==== bind-27.9 button names FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-7> {lappend x "button 7"}
+    set x [bind .t.f]
+    event generate .t.f <Button-7>
+    event generate .t.f <ButtonRelease-7>
+    set x
+
+---- Result was:
+<Button-7>
+---- Result should have been (exact matching):
+<Button-7> {button 7}
+==== bind-27.9 FAILED
+
+
+
+==== bind-27.10 button names FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-8> {lappend x "button 8"}
+    set x [bind .t.f]
+    event generate .t.f <Button-8>
+    event generate .t.f <ButtonRelease-8>
+    set x
+
+---- Result was:
+<Button-8>
+---- Result should have been (exact matching):
+<Button-8> {button 8}
+==== bind-27.10 FAILED
+
+
+
+==== bind-27.11 button names FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-9> {lappend x "button 9"}
+    set x [bind .t.f]
+    event generate .t.f <Button-9>
+    event generate .t.f <ButtonRelease-9>
+    set x
+
+---- Result was:
+<Button-9>
+---- Result should have been (exact matching):
+<Button-9> {button 9}
+==== bind-27.11 FAILED
+
+
+
+==== bind-28.5 keysym names FAILED
+==== Contents of test case:
+
+    bind .t.f <:> "lappend x \"keysym received\""
+    bind .t.f <_> "lappend x {bad binding match}"
+    set x [lsort [bind .t.f]]
+    event generate .t.f <:> ;# -state 0
+    set x
+
+---- Result was:
+: _
+---- Result should have been (exact matching):
+: _ {keysym received}
+==== bind-28.5 FAILED
+
+
+
+==== bind-28.6 keysym names FAILED
+==== Contents of test case:
+
+    bind .t.f <Return> "lappend x \"keysym Return\""
+    bind .t.f <x> "lappend x {bad binding match}"
+    set x [lsort [bind .t.f]]
+    event generate .t.f <Return> -state 0
+    set x
+
+---- Result was:
+<Key-Return> x
+---- Result should have been (exact matching):
+<Key-Return> x {keysym Return}
+==== bind-28.6 FAILED
+
+
+
+==== bind-28.7 keysym names FAILED
+==== Contents of test case:
+
+    bind .t.f <X> "lappend x \"keysym X\""
+    bind .t.f <x> "lappend x {bad binding match}"
+    set x [lsort [bind .t.f]]
+    event generate .t.f <X> -state 1
+    set x
+
+---- Result was:
+X x
+---- Result should have been (exact matching):
+X x {keysym X}
+==== bind-28.7 FAILED
+
+
+
+==== bind-28.8 keysym names FAILED
+==== Contents of test case:
+
+    bind .t.f <X> "lappend x \"keysym X\""
+    bind .t.f <x> "lappend x {bad binding match}"
+    set x [lsort [bind .t.f]]
+    event generate .t.f <X> -state 1
+    set x
+
+---- Result was:
+X x
+---- Result should have been (exact matching):
+X x {keysym X}
+==== bind-28.8 FAILED
+
+
+
+==== bind-29.1 Tcl_BackgroundError procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> {error "This is a test"}
+    set x none
+    event generate .t.f <Button>
+    event generate .t.f <ButtonRelease>
+    update
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+{This is a test} {This is a test
+    while executing
+"error "This is a test""
+    (command bound to event)}
+==== bind-29.1 FAILED
+
+
+
+==== bind-29.2 Tcl_BackgroundError procedure FAILED
+==== Contents of test case:
+
+    bind .t.f <Button> {error Message2}
+    set x none
+    do
+    update
+    set x
+
+---- Result was:
+none
+---- Result should have been (exact matching):
+Message2 {Message2
+    while executing
+"error Message2"
+    (command bound to event)}
+==== bind-29.2 FAILED
+
+
+
+==== bind-30.1 MouseWheel events FAILED
+==== Contents of test case:
+
+    bind .t.f <MouseWheel> {set x Wheel}
+    event generate .t.f <MouseWheel>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Wheel
+==== bind-30.1 FAILED
+
+
+
+==== bind-30.2 MouseWheel events FAILED
+==== Contents of test case:
+
+    bind .t.f <MouseWheel> {set x %D}
+    event generate .t.f <MouseWheel> -delta 120
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+120
+==== bind-30.2 FAILED
+
+
+
+==== bind-30.3 MouseWheel events FAILED
+==== Contents of test case:
+
+    bind .t.f <MouseWheel> {set x "%D %x %y"}
+    event generate .t.f <MouseWheel> -delta 240 -x 10 -y 30
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+240 10 30
+==== bind-30.3 FAILED
+
+
+
+==== bind-31.2 virtual event user_data field - NULL, synch FAILED
+==== Contents of test case:
+
+    bind .t.f <<TestUserData>> {set x "TestUserData >%d<"}
+    event generate .t.f <<TestUserData>>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+TestUserData >{}<
+==== bind-31.2 FAILED
+
+
+
+==== bind-31.3 virtual event user_data field - shared, synch FAILED
+==== Contents of test case:
+
+    bind .t.f <<TestUserData>> {set x "TestUserData >%d<"}
+    event generate .t.f <<TestUserData>> -data "foo bar"
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+TestUserData >foo bar<
+==== bind-31.3 FAILED
+
+
+
+==== bind-31.4 virtual event user_data field - unshared, synch FAILED
+==== Contents of test case:
+
+    bind .t.f <<TestUserData>> {set x "TestUserData >%d<"}
+    event generate .t.f <<TestUserData>> -data [string index abc 1]
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+TestUserData >b<
+==== bind-31.4 FAILED
+
+
+
+==== bind-31.5 virtual event user_data field - NULL, asynch FAILED
+==== Contents of test case:
+
+    bind .t.f <<TestUserData>> {set x "TestUserData >%d<"}
+    event generate .t.f <<TestUserData>> -when head
+    list $x [update] $x
+
+---- Result was:
+{} {} {}
+---- Result should have been (exact matching):
+{} {} {TestUserData >{}<}
+==== bind-31.5 FAILED
+
+
+
+==== bind-31.6 virtual event user_data field - shared, asynch FAILED
+==== Contents of test case:
+
+    bind .t.f <<TestUserData>> {set x "TestUserData >%d<"}
+    event generate .t.f <<TestUserData>> -data "foo bar" -when head
+    list $x [update] $x
+
+---- Result was:
+{} {} {}
+---- Result should have been (exact matching):
+{} {} {TestUserData >foo bar<}
+==== bind-31.6 FAILED
+
+
+
+==== bind-31.7 virtual event user_data field - unshared, asynch FAILED
+==== Contents of test case:
+
+    bind .t.f <<TestUserData>> {set x "TestUserData >%d<"}
+    event generate .t.f <<TestUserData>> -data [string index abc 1] -when head
+    list $x [update] $x
+
+---- Result was:
+{} {} {}
+---- Result should have been (exact matching):
+{} {} {TestUserData >b<}
+==== bind-31.7 FAILED
+
+
+
+==== bind-32.2 detection of double click should not fail FAILED
+==== Contents of test case:
+
+    event generate .t.f <Button-1>
+    event generate .t.f <ButtonRelease-1>
+    # Simulate a lot of intervening exposure events. The old implementation
+    # that used an event ring overflowed, and the double click was not detected.
+    # But new implementation should work properly.
+    for {set i 0} {$i < 1000} {incr i} {
+	event generate .t.f <Expose>
+    }
+    event generate .t.f <Button-1>
+    event generate .t.f <ButtonRelease-1>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Double
+==== bind-32.2 FAILED
+
+
+
+==== bind-32.3 should trigger best match of modifier states FAILED
+==== Contents of test case:
+
+    bind .t.f <Alt-Control-A> { lappend x "Alt-Control" }
+    bind .t.f <Shift-Control-A> { lappend x "Shift-Control" }
+    bind .t.f <Shift-A> { lappend x "Shift" }
+    event generate .t.f <Alt-Control-A>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Shift-Control
+==== bind-32.3 FAILED
+
+
+
+==== bind-32.5 should trigger Quadruple-1 FAILED
+==== Contents of test case:
+
+    bind .t.f <Quadruple-Button-1> { set x "Quadruple" }
+    bind .t.f <Triple-Button-1> { set x "Triple" }
+    bind .t.f <Double-Button-1> { set x "Double" }
+    bind .t.f <Button-1> { set x "Single" }
+    # Old implementation triggered "Double", but new implementation
+    # triggers "Quadruple", the latter behavior conforms to other toolkits.
+    event generate .t.f <Button-1> -time 0
+    event generate .t.f <Button-1> -time 400
+    event generate .t.f <Button-1> -time 800
+    event generate .t.f <Button-1> -time 1200
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Quadruple
+==== bind-32.5 FAILED
+
+
+
+==== bind-32.6 problem with sendevent FAILED
+==== Contents of test case:
+
+    # Old implementation was losing sendevent value
+    bind .t.f <FocusIn> { set x "sendevent=%E" }
+    event generate .t.f <FocusIn> -sendevent 1
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+sendevent=1
+==== bind-32.6 FAILED
+
+
+
+==== bind-32.7 test sequences FAILED
+==== Contents of test case:
+
+    bind .t.f <Double-Button-1> { lappend x "Double" }
+    bind .t.f <Button-1><Button-1><a> { lappend x "11" }
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    event generate .t.f <a>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Double 11
+==== bind-32.7 FAILED
+
+
+
+==== bind-32.8 test sequences FAILED
+==== Contents of test case:
+
+    bind .t.f <a><Button-1><Double-Button-1><Button-1><a> { lappend x "Double" }
+    event generate .t.f <a>
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    event generate .t.f <a>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Double
+==== bind-32.8 FAILED
+
+
+
+==== bind-32.9 trigger events for modifier keys FAILED
+==== Contents of test case:
+
+    bind .t.f <Key> { set x "Key" }
+    event generate .t.f <Key> -keysym Caps_Lock
+    set x
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: no keycode for keysym "Caps_Lock"
+    while executing
+"event generate .t.f <Key> -keysym Caps_Lock"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TK LOOKUP KEYCODE Caps_Lock
+==== bind-32.9 FAILED
+
+
+
+==== bind-32.10 reset key state when destroying window FAILED
+==== Contents of test case:
+
+    pack [frame .t.f]; update; focus -force .t.f
+    bind .t.f <A> { set x "A" }
+    event generate .t.f <A>
+    event generate .t.f <A>
+    destroy .t.f; update
+    pack [frame .t.f]; update; focus -force .t.f
+    bind .t.f <A> { set x "A" }
+    bind .t.f <Double-A> { set x "AA" }
+    event generate .t.f <A>
+    destroy .t.f
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+A
+==== bind-32.10 FAILED
+
+
+
+==== bind-32.11 match detailed virtual FAILED
+==== Contents of test case:
+
+    event add <<TestControlButton1>> <Control-Button-1>
+    bind Test <<TestControlButton1>> { set x "Control-Button-1" }
+    bind Test <Button-1> { set x "Button-1" }
+    bind .t.f <Button-1> { set x "Button-1" }
+    event generate .t.f <Control-Button-1>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Control-Button-1
+==== bind-32.11 FAILED
+
+
+
+==== bind-32.12 don't detect repetition when window has changed FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-1> { set x "1" }
+    bind .t.f <Double-Button-1> { set x "11" }
+    event generate .t.f <Button-1>
+    event generate .t.g <Button-1>
+    event generate .t.f <Button-1>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-32.12 FAILED
+
+
+
+==== bind-32.13 don't detect repetition when window has changed FAILED
+==== Contents of test case:
+
+    bind .t.f <A> { set x "A" }
+    bind .t.f <Double-A> { set x "AA" }
+    focus -force .t.f; event generate .t.f <A>
+    focus -force .t.g; event generate .t.g <A>
+    focus -force .t.f; event generate .t.f <A>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+A
+==== bind-32.13 FAILED
+
+
+
+==== bind-32.14 don't detect repetition when window has changed FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-1> { set x "1" }
+    bind .t.f <Double-Button-1> { set x "11" }
+    focus -force .t.f; event generate .t.f <Button-1>
+    focus -force .t.g; event generate .t.g <Button-1>
+    focus -force .t.f; event generate .t.f <Button-1>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-32.14 FAILED
+
+
+
+==== bind-32.15 reset button state when destroying window FAILED
+==== Contents of test case:
+
+    pack [frame .t.f]; update; focus -force .t.f
+    bind .t.f <Button-1> { set x "1" }
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    destroy .t.f; update
+    pack [frame .t.f]; update; focus -force .t.f
+    bind .t.f <Button-1> { set x "1" }
+    bind .t.f <Double-Button-1> { set x "11" }
+    event generate .t.f <Button-1>
+    destroy .t.f
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-32.15 FAILED
+
+
+
+==== bind-33.1 prefer longest match FAILED
+==== Contents of test case:
+
+    bind .t.f <a><Button-1><Button-1> { lappend x "a11" }
+    bind .t.f <Double-Button-1> { lappend x "Double" }
+    event generate .t.f <a>
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+a11
+==== bind-33.1 FAILED
+
+
+
+==== bind-33.2 prefer most specific event FAILED
+==== Contents of test case:
+
+    bind .t.f <Double-Button-1> { lappend x "Double" }
+    bind .t.f <Button-1><Button-1> { lappend x "11" }
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Double
+==== bind-33.2 FAILED
+
+
+
+==== bind-33.3 prefer most specific event FAILED
+==== Contents of test case:
+
+    bind .t.f <a><Double-Button-1><a> { lappend x "Double" }
+    bind .t.f <a><Button-1><Button-1><a> { lappend x "11" }
+    event generate .t.f <a>
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    event generate .t.f <a>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Double
+==== bind-33.3 FAILED
+
+
+
+==== bind-33.4 prefer most specific event FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-1><Button-1> { lappend x "11" }
+    bind .t.f <Double-Button-1> { lappend x "Double" }
+    event generate .t.f <Button-1> -time 0
+    event generate .t.f <Button-1> -time 1000
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+11
+==== bind-33.4 FAILED
+
+
+
+==== bind-33.5 prefer most specific event FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-1><Button-1> { lappend x "11" }
+    bind .t.f <Double-Button> { lappend x "Double" }
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+11
+==== bind-33.5 FAILED
+
+
+
+==== bind-33.6 prefer most specific event FAILED
+==== Contents of test case:
+
+    bind .t.f <a><Button-1><Button-1><Button-1><Button-1><a> { lappend x "1111" }
+    bind .t.f <a><Button><Double-Button><Button><a> { lappend x "Any-Double-Any" }
+    event generate .t.f <a>
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    event generate .t.f <a>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1111
+==== bind-33.6 FAILED
+
+
+
+==== bind-33.7 prefer most specific event FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-1><a> { lappend x "1" }
+    bind .t.f <Button><a> { lappend x "Any" }
+    event generate .t.f <Button-1>
+    event generate .t.f <a>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-33.7 FAILED
+
+
+
+==== bind-33.8 prefer most specific event FAILED
+==== Contents of test case:
+
+    bind .t.f <Double-Button-1><a> { lappend x "1" }
+    bind .t.f <Button><Button><a> { lappend x "Any" }
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    event generate .t.f <a>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1
+==== bind-33.8 FAILED
+
+
+
+==== bind-33.9 prefer last in case of homogeneous equal patterns FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-1><Button-2><Button-2><Double-Button-1> { lappend x "first" }
+    bind .t.f <Button-1><Double-Button-2><Button-1><Button-1> { lappend x "last" }
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-2>
+    event generate .t.f <Button-2>
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+last
+==== bind-33.9 FAILED
+
+
+
+==== bind-33.10 prefer last in case of homogeneous equal patterns FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-1><Double-Button-2><Button-1><Button-1> { lappend x "first" }
+    bind .t.f <Button-1><Button-2><Button-2><Double-Button-1> { lappend x "last" }
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-2>
+    event generate .t.f <Button-2>
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+last
+==== bind-33.10 FAILED
+
+
+
+==== bind-33.11 should prefer most specific FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-2><Double-Button-1><Double-Button-2><Double-Button-1><Button-2><Button-2> { lappend x "first" }
+    bind .t.f <Button-2><Button-1><Button-1><Button-2><Button-2><Double-Button-1><Double-Button-2> { lappend x "last" }
+    event generate .t.f <Button-2>
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-2>
+    event generate .t.f <Button-2>
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-2>
+    event generate .t.f <Button-2>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+first
+==== bind-33.11 FAILED
+
+
+
+==== bind-33.12 prefer last in case of homogeneous equal patterns FAILED
+==== Contents of test case:
+
+    bind .t.f <Control-Button-1><Button-1> { lappend x "first" }
+    bind .t.f <Button-1><Control-Button-1> { lappend x "last" }
+    event generate .t.f <Control-Button-1>
+    event generate .t.f <Control-Button-1>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+last
+==== bind-33.12 FAILED
+
+
+
+==== bind-33.13 prefer last in case of homogeneous equal patterns FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-1><Control-Button-1> { lappend x "first" }
+    bind .t.f <Control-Button-1><Button-1> { lappend x "last" }
+    event generate .t.f <Control-Button-1>
+    event generate .t.f <Control-Button-1>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+last
+==== bind-33.13 FAILED
+
+
+
+==== bind-33.14 prefer last in case of homogeneous equal patterns FAILED
+==== Contents of test case:
+
+    bind .t.f <Button-1><Button><Button-1><Button> { lappend x "first" }
+    bind .t.f <Button><Button-1><Button><Button-1> { lappend x "last" }
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+last
+==== bind-33.14 FAILED
+
+
+
+==== bind-33.15 prefer last in case of homogeneous equal patterns FAILED
+==== Contents of test case:
+
+    bind .t.f <Button><Button-1><Button><Button-1> { lappend x "first" }
+    bind .t.f <Button-1><Button><Button-1><Button> { lappend x "last" }
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    event generate .t.f <Button-1>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+last
+==== bind-33.15 FAILED
+
+
+
+==== bind-33.16 simulate use of the keyboard to trigger a pattern sequence with modifier - bug [16ef161925] FAILED
+==== Contents of test case:
+
+    bind .t.f <Escape><Control-c> { lappend x "Esc_Control-c" }
+    event generate .t.f <Escape>
+    event generate .t.f <Control_L>
+    event generate .t.f <Control_L>
+    event generate .t.f <Control_L>
+    event generate .t.f <Control-c>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Esc_Control-c
+==== bind-33.16 FAILED
+
+
+
+==== bind-33.17 simulate use of the keyboard to trigger a pattern sequence with modifier - bug [16ef161925] FAILED
+==== Contents of test case:
+
+    bind .t.f <Escape><Control-c> { lappend x "Esc_Control-c" }
+    bind .t.f <Escape><Control_L><Control-c> { lappend x "Esc_Ctrl_L_Control-c" }
+    event generate .t.f <Escape>
+    event generate .t.f <Control_L>
+    event generate .t.f <Control_L>
+    event generate .t.f <Control_L>
+    event generate .t.f <Control-c>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Esc_Ctrl_L_Control-c
+==== bind-33.17 FAILED
+
+
+
+==== bind-33.18 simulate use of the keyboard to trigger a pattern sequence with modifier - bug [16ef161925] FAILED
+==== Contents of test case:
+
+    bind .t.f <Escape><Control-c> { lappend x "Esc_Control-c" }
+    bind .t.f <Escape><Control_L><Control-c> { lappend x "Esc_Ctrl_L_Control-c" }
+    bind .t.f <Escape><Control_L><Control_L><Control-c> { lappend x "Esc_Ctrl_L(2)_Control-c" }
+    event generate .t.f <Escape>
+    event generate .t.f <Control_L>
+    event generate .t.f <Control_L>
+    event generate .t.f <Control_L>
+    event generate .t.f <Control-c>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Esc_Ctrl_L(2)_Control-c
+==== bind-33.18 FAILED
+
+
+
+==== bind-33.19 simulate use of the keyboard to trigger a pattern sequence with modifier - bug [16ef161925] FAILED
+==== Contents of test case:
+
+    bind .t.f <Escape><Control-c> { lappend x "Esc_Control-c" }
+    bind .t.f <Escape><Key><Key><Control-c> { lappend x "Esc_Key(2)_Control-c" }
+    event generate .t.f <Escape>
+    event generate .t.f <Alt_L>
+    event generate .t.f <Control_L>
+    event generate .t.f <Control-c>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Esc_Key(2)_Control-c
+==== bind-33.19 FAILED
+
+
+
+==== bind-33.20 simulate use of the keyboard to trigger a pattern sequence with mixed Key and Button types - bug [16ef161925] FAILED
+==== Contents of test case:
+
+    bind .t.f <Key-1><Button-1> { lappend x "1_Button1" }
+    event generate .t.f <Key-1>
+    event generate .t.f <KeyRelease-1>
+    event generate .t.f <Button-1>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1_Button1
+==== bind-33.20 FAILED
+
+
+
+==== bind-33.21 simulate use of the keyboard to trigger a pattern sequence with mixed Key and Button types - bug [16ef161925] FAILED
+==== Contents of test case:
+
+    bind .t.f <Key-1><Button-1> { lappend x "1_Button1" }
+    bind .t.f <Key-1><Button-1><Key-2> { lappend x "1_Button1_2" }
+    event generate .t.f <Key-1>
+    event generate .t.f <KeyRelease-1>
+    event generate .t.f <Button-1>
+    event generate .t.f <Key-2>
+    event generate .t.f <KeyRelease-2>
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+1_Button1 1_Button1_2
+==== bind-33.21 FAILED
+
+
+
+==== bind-34.1 -warp works relatively to a window FAILED
+==== Contents of test case:
+
+    # In order to avoid platform-dependent coordinate results due to
+    # decorations and borders, this test warps the pointer twice
+    # relatively to a window that moved in the meantime, and checks
+    # how much the pointer moved
+    wm geometry .top +200+200
+    after 10 ; update
+    event generate .top <Motion> -x 20 -y 20 -warp 1
+    controlPointerWarpTiming
+    set pointerPos1 [winfo pointerxy .top]
+    wm geometry .top +600+600
+    after 10 ; update
+    event generate .top <Motion> -x 20 -y 20 -warp 1
+    controlPointerWarpTiming
+    set pointerPos2 [winfo pointerxy .top]
+    # from the first warped position to the second one, the mouse
+    # pointer should have moved the same amount as the window moved
+    set res 1
+    foreach pos1 $pointerPos1 pos2 $pointerPos2 {
+	if {$pos1 != ($pos2 - 400)} {
+	    set res [list $pointerPos1 $pointerPos2]
+	}
+    }
+    set res
+
+---- Result was:
+{0 0} {0 0}
+---- Result should have been (exact matching):
+1
+==== bind-34.1 FAILED
+
+
+
+==== bind-34.2 -warp works relatively to the screen FAILED
+==== Contents of test case:
+
+    # Contrary to bind-34.1, we're directly checking screen coordinates
+    event generate {} <Motion> -x 20 -y 20 -warp 1
+    controlPointerWarpTiming
+    set res [winfo pointerxy .]
+    event generate {} <Motion> -x 200 -y 200 -warp 1
+    controlPointerWarpTiming
+    lappend res {*}[winfo pointerxy .]
+
+---- Result was:
+0 0 0 0
+---- Result should have been (exact matching):
+20 20 200 200
+==== bind-34.2 FAILED
+
+
+
+==== bind-36.1 pointer warp with grab on toplevel, bug [e3888d5820] FAILED
+==== Contents of test case:
+
+    grab .top
+    event generate .top.l <Motion> -warp 1 -x 10 -y 10
+    controlPointerWarpTiming
+    foreach {x1 y1} [winfo pointerxy .top.l] {}
+    event generate {} <Motion> -warp 1 -x 50 -y 50
+    controlPointerWarpTiming
+    grab release .top
+    event generate .top.l <Motion> -warp 1 -x 10 -y 10
+    controlPointerWarpTiming
+    foreach {x2 y2} [winfo pointerxy .top.l] {}
+    # success if the coords are the same with or without the grab, and if they
+    # are at (10,10) inside the label widget as requested by the warping
+    expr {$x1==$x2 && $y1==$y2 && $x1==[winfo rootx .top.l]+10  && $y1==[winfo rooty .top.l]+10}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== bind-36.1 FAILED
+
+bitmap.test
+border.test
+busy.test
+button.test
+
+
+==== button-1.104 configuration option: "activebackground" for label FAILED
+==== Contents of test case:
+
+    .l configure -font {}
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== button-1.104 FAILED
+
+
+
+==== button-1.106 configuration option: "activebackground" for button FAILED
+==== Contents of test case:
+
+    .b configure -font {}
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== button-1.106 FAILED
+
+
+
+==== button-1.108 configuration option: "activebackground" for checkbutton FAILED
+==== Contents of test case:
+
+    .c configure -font {}
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== button-1.108 FAILED
+
+
+
+==== button-1.110 configuration option: "activebackground" for radiobutton FAILED
+==== Contents of test case:
+
+    .r configure -font {}
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== button-1.110 FAILED
+
+canvImg.test
+canvMoveto.test
+canvPs.test
+canvRect.test
+canvText.test
+
+
+==== canvasText-1.7 configuration options: bad value for "font" FAILED
+==== Contents of test case:
+
+    .c itemconfigure test -font {}
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== canvasText-1.7 FAILED
+
+
+
+==== canvText-17.1 TextToPostscript procedure FAILED
+==== Contents of test case:
+
+    set font {Courier 12 italic}
+    set ax [font measure $font 0]
+    set ay [font metrics $font -linespace]
+    .c config -height 300 -highlightthickness 0 -bd 0
+    update
+    .c create text 100 100 -tags test
+    .c itemconfig test -font $font -text "00000000" -width [expr 3*$ax]
+    .c itemconfig test -anchor n -fill black
+    set x [.c postscript]
+    set x [string range $x [string first "findfont " $x] end]
+    expr {$x eq [subst $result] ? "ok" : $x}
+
+---- Result was:
+%!PS-Adobe-3.0 EPSF-3.0
+%%Creator: Tk Canvas Widget
+%%Title: Window .c
+%%CreationDate: Fri Sep  4 20:15:22 2026
+%%BoundingBox: 306 396 307 397
+%%Pages: 1
+%%DocumentData: Clean7Bit
+%%Orientation: Portrait
+%%EndComments
+
+%%BeginProlog
+% This is a standard prolog for Postscript generated by Tk's canvas
+% widget.
+/CurrentEncoding [
+/space/space/space/space/space/space/space/space
+/space/space/space/space/space/space/space/space
+/space/space/space/space/space/space/space/space
+/space/space/space/space/space/space/space/space
+/space/exclam/quotedbl/numbersign/dollar/percent/ampersand/quotesingle
+/parenleft/parenright/asterisk/plus/comma/hyphen/period/slash
+/zero/one/two/three/four/five/six/seven
+/eight/nine/colon/semicolon/less/equal/greater/question
+/at/A/B/C/D/E/F/G
+/H/I/J/K/L/M/N/O
+/P/Q/R/S/T/U/V/W
+/X/Y/Z/bracketleft/backslash/bracketright/asciicircum/underscore
+/grave/a/b/c/d/e/f/g
+/h/i/j/k/l/m/n/o
+/p/q/r/s/t/u/v/w
+/x/y/z/braceleft/bar/braceright/asciitilde/space
+/space/space/space/space/space/space/space/space
+/space/space/space/space/space/space/space/space
+/space/space/space/space/space/space/space/space
+/space/space/space/space/space/space/space/space
+/space/exclamdown/cent/sterling/currency/yen/brokenbar/section
+/dieresis/copyright/ordfeminine/guillemotleft/logicalnot/hyphen/registered/macron
+/degree/plusminus/twosuperior/threesuperior/acute/mu/paragraph/periodcentered
+/cedilla/onesuperior/ordmasculine/guillemotright/onequarter/onehalf/threequarters/questiondown
+/Agrave/Aacute/Acircumflex/Atilde/Adieresis/Aring/AE/Ccedilla
+/Egrave/Eacute/Ecircumflex/Edieresis/Igrave/Iacute/Icircumflex/Idieresis
+/Eth/Ntilde/Ograve/Oacute/Ocircumflex/Otilde/Odieresis/multiply
+/Oslash/Ugrave/Uacute/Ucircumflex/Udieresis/Yacute/Thorn/germandbls
+/agrave/aacute/acircumflex/atilde/adieresis/aring/ae/ccedilla
+/egrave/eacute/ecircumflex/edieresis/igrave/iacute/icircumflex/idieresis
+/eth/ntilde/ograve/oacute/ocircumflex/otilde/odieresis/divide
+/oslash/ugrave/uacute/ucircumflex/udieresis/yacute/thorn/ydieresis
+] def
+50 dict begin
+/baseline 0 def
+/stipimage 0 def
+/height 0 def
+/justify 0 def
+/lineLength 0 def
+/spacing 0 def
+/stipple 0 def
+/strings 0 def
+/xoffset 0 def
+/yoffset 0 def
+/tmpstip null def
+/baselineSampler ( TXygqPZ) def
+baselineSampler 0 196 put
+/cstringshow {{ dup type /stringtype eq { show } { glyphshow } ifelse } forall } bind def
+/cstringwidth {0 exch 0 exch { dup type /stringtype eq { stringwidth } { currentfont /Encoding get exch 1 exch put (\001) stringwidth } ifelse exch 3 1 roll add 3 1 roll add exch } forall } bind def
+/ISOEncode {dup length dict begin {1 index /FID ne {def} {pop pop} ifelse} forall /Encoding CurrentEncoding def currentdict end /Temporary exch definefont } bind def
+/StrokeClip {{strokepath} stopped { (This Postscript printer gets limitcheck overflows when) = (stippling dashed lines;  lines will be printed solid instead.) = [] 0 setdash strokepath} if clip } bind def
+/EvenPixels {dup 0 matrix currentmatrix dtransform dup mul exch dup mul add sqrt dup round dup 1 lt {pop 1} if exch div mul } bind def
+/StippleFill {/tmpstip 1 index def 1 EvenPixels dup scale pathbbox 4 2 roll 5 index div dup 0 lt {1 sub} if cvi 5 index mul 4 1 roll 6 index div dup 0 lt {1 sub} if cvi 6 index mul 3 2 roll 6 index exch { 2 index 5 index 3 index { gsave 1 index exch translate 5 index 5 index true matrix tmpstip imagemask grestore } for pop } for pop pop pop pop pop } bind def
+/AdjustColor {CL 2 lt { currentgray CL 0 eq { .5 lt {0} {1} ifelse } if setgray } if } bind def
+/DrawText {/stipple exch def /justify exch def /yoffset exch def /xoffset exch def /spacing exch def /strings exch def /lineLength 0 def strings { cstringwidth pop dup lineLength gt {/lineLength exch def} {pop} ifelse newpath } forall 0 0 moveto baselineSampler false charpath pathbbox dup /baseline exch def exch pop exch sub /height exch def pop newpath translate rotate lineLength xoffset mul strings length 1 sub spacing mul height add yoffset mul translate justify lineLength mul baseline neg translate strings { dup cstringwidth pop justify neg mul 0 moveto stipple { gsave /char (X) def { dup type /stringtype eq { { char 0 3 -1 roll put currentpoint gsave char true charpath clip StippleText grestore char stringwidth translate moveto } forall } { currentfont /Encoding get exch 1 exch put currentpoint gsave (\001) true charpath clip StippleText grestore (\001) stringwidth translate moveto } ifelse } forall grestore } {cstringshow} ifelse 0 spacing neg translate } forall } bind def
+/TkPhotoColor {gsave 32 dict begin /tinteger exch def /transparent 1 string def transparent 0 tinteger put /olddict exch def olddict /DataSource get dup type /filetype ne { olddict /DataSource 3 -1 roll 0 () /SubFileDecode filter put } { pop } ifelse /newdict olddict maxlength dict def olddict newdict copy pop /w newdict /Width get def /crpp newdict /Decode get length 2 idiv def /str w string def /pix w crpp mul string def /substrlen 2 w log 2 log div floor exp cvi def /substrs [ { substrlen string 0 1 substrlen 1 sub { 1 index exch tinteger put } for /substrlen substrlen 2 idiv def substrlen 0 eq {exit} if } loop ] def /h newdict /Height get def 1 w div 1 h div matrix scale olddict /ImageMatrix get exch matrix concatmatrix matrix invertmatrix concat newdict /Height 1 put newdict /DataSource pix put /mat [w 0 0 h 0 0] def newdict /ImageMatrix mat put 0 1 h 1 sub { mat 5 3 -1 roll neg put olddict /DataSource get str readstring pop pop /tail str def /x 0 def olddict /DataSource get pix readstring pop pop { tail transparent search dup /done exch not def {exch pop exch pop} if /w1 exch length def w1 0 ne { newdict /DataSource pix x crpp mul w1 crpp mul getinterval put newdict /Width w1 put mat 4 x neg put /x x w1 add def newdict image /tail tail w1 tail length w1 sub getinterval def } if done {exit} if tail substrs { anchorsearch {pop} if } forall /tail exch def tail length 0 eq {exit} if /x w tail length sub def } loop } for end grestore } bind def
+/TkPhotoMono {gsave 32 dict begin /dummyInteger exch def /olddict exch def olddict /DataSource get dup type /filetype ne { olddict /DataSource 3 -1 roll 0 () /SubFileDecode filter put } { pop } ifelse /newdict olddict maxlength dict def olddict newdict copy pop /w newdict /Width get def /pix w 7 add 8 idiv string def /h newdict /Height get def 1 w div 1 h div matrix scale olddict /ImageMatrix get exch matrix concatmatrix matrix invertmatrix concat newdict /Height 1 put newdict /DataSource pix put /mat [w 0 0 h 0 0] def newdict /ImageMatrix mat put 0 1 h 1 sub { mat 5 3 -1 roll neg put 0.000 0.000 0.000 setrgbcolor olddict /DataSource get pix readstring pop pop newdict /DataSource pix put newdict imagemask 1.000 1.000 1.000 setrgbcolor olddict /DataSource get pix readstring pop pop newdict /DataSource pix put newdict imagemask } for end grestore } bind def
+%%EndProlog
+%%BeginSetup
+/CL 2 def
+%%EndSetup
+
+%%Page: 1 1
+save
+306.0 396.0 translate
+0.999 0.999 scale
+0 0 translate
+0 1 moveto 1 1 lineto 1 0 lineto 0 0 lineto closepath clip newpath
+restore showpage
+
+%%Trailer
+end
+%%EOF
+
+---- Result should have been (exact matching):
+ok
+==== canvText-17.1 FAILED
+
+canvWind.test
+
+
+==== canvWind-1.1 DisplayWinItem, windows off-screen vertically FAILED
+==== Contents of test case:
+
+    toplevel .t
+    canvas .t.c -scrollregion {0 0 1000 800} -width 250 -height 200 -bd 2  -relief sunken -xscrollincrement 1 -yscrollincrement 1  -highlightthickness 1
+    pack .t.c -fill both -expand 1 -padx 20 -pady 20
+    wm geometry .t +0+0
+    set f .t.f
+    frame $f -width 80 -height 50 -bg red
+    .t.c create window 300 400 -window $f -anchor nw
+    .t.c xview moveto .3
+    .t.c yview moveto .50
+    update
+    set x [list [list [winfo ismapped $f] [winfo y $f]]]
+    .t.c yview scroll 52 units
+    update
+    lappend x [list [winfo ismapped $f] [winfo y $f]]
+    .t.c yview scroll 1 units
+    update
+    lappend x [list [winfo ismapped $f] [winfo y $f]]
+    .t.c yview scroll -255 units
+    update
+    lappend x [list [winfo ismapped $f] [winfo y $f]]
+    .t.c yview scroll -1 units
+    update
+    lappend x [list [winfo ismapped $f] [winfo y $f]]
+
+---- Result was:
+{0 0} {0 0} {0 0} {0 0} {0 0}
+---- Result should have been (exact matching):
+{1 23} {1 -29} {0 -29} {1 225} {0 225}
+==== canvWind-1.1 FAILED
+
+
+
+==== canvWind-1.2 DisplayWinItem, windows off-screen vertically FAILED
+==== Contents of test case:
+
+    toplevel .t
+    canvas .t.c -scrollregion {0 0 1000 800} -width 250 -height 200 -bd 2  -relief sunken -xscrollincrement 1 -yscrollincrement 1  -highlightthickness 1
+    pack .t.c -fill both -expand 1 -padx 20 -pady 20
+    wm geometry .t +0+0
+    set f .t.c.f
+    frame $f -width 80 -height 50 -bg red
+    .t.c create window 300 400 -window $f -anchor nw
+    .t.c xview moveto .3
+    .t.c yview moveto .50
+    update
+    set x [list [list [winfo ismapped $f] [winfo y $f]]]
+    .t.c yview scroll 52 units
+    update
+    lappend x [list [winfo ismapped $f] [winfo y $f]]
+    .t.c yview scroll 1 units
+    update
+    lappend x [list [winfo ismapped $f] [winfo y $f]]
+    .t.c yview scroll -255 units
+    update
+    lappend x [list [winfo ismapped $f] [winfo y $f]]
+    .t.c yview scroll -1 units
+    update
+    lappend x [list [winfo ismapped $f] [winfo y $f]]
+
+---- Result was:
+{0 0} {0 0} {0 0} {0 0} {0 0}
+---- Result should have been (exact matching):
+{1 3} {1 -49} {0 -49} {1 205} {0 205}
+==== canvWind-1.2 FAILED
+
+
+
+==== canvWind-1.3 DisplayWinItem, windows off-screen horizontally FAILED
+==== Contents of test case:
+
+    toplevel .t
+    canvas .t.c -scrollregion {0 0 1000 800} -width 250 -height 200 -bd 2  -relief sunken -xscrollincrement 1 -yscrollincrement 1  -highlightthickness 1
+    pack .t.c -fill both -expand 1 -padx 20 -pady 20
+    wm geometry .t +0+0
+    set f .t.f
+    frame $f -width 80 -height 50 -bg red
+    .t.c create window 300 400 -window $f -anchor nw
+    .t.c xview moveto .3
+    .t.c yview moveto .50
+    update
+    set x [list [list [winfo ismapped $f] [winfo x $f]]]
+    .t.c xview scroll 82 units
+    update
+    lappend x [list [winfo ismapped $f] [winfo x $f]]
+    .t.c xview scroll 1 units
+    update
+    lappend x [list [winfo ismapped $f] [winfo x $f]]
+    .t.c xview scroll -335 units
+    update
+    lappend x [list [winfo ismapped $f] [winfo x $f]]
+    .t.c xview scroll -1 units
+    update
+    lappend x [list [winfo ismapped $f] [winfo x $f]]
+
+---- Result was:
+{0 0} {0 0} {0 0} {0 0} {0 0}
+---- Result should have been (exact matching):
+{1 23} {1 -59} {0 -59} {1 275} {0 275}
+==== canvWind-1.3 FAILED
+
+
+
+==== canvWind-1.4 DisplayWinItem, windows off-screen horizontally FAILED
+==== Contents of test case:
+
+    toplevel .t
+    canvas .t.c -scrollregion {0 0 1000 800} -width 250 -height 200 -bd 2  -relief sunken -xscrollincrement 1 -yscrollincrement 1  -highlightthickness 1
+    pack .t.c -fill both -expand 1 -padx 20 -pady 20
+    wm geometry .t +0+0
+    set f .t.c.f
+    frame $f -width 80 -height 50 -bg red
+    .t.c create window 300 400 -window $f -anchor nw
+    .t.c xview moveto .3
+    .t.c yview moveto .50
+    update
+    set x [list [list [winfo ismapped $f] [winfo x $f]]]
+    .t.c xview scroll 82 units
+    update
+    lappend x [list [winfo ismapped $f] [winfo x $f]]
+    .t.c xview scroll 1 units
+    update
+    lappend x [list [winfo ismapped $f] [winfo x $f]]
+    .t.c xview scroll -335 units
+    update
+    lappend x [list [winfo ismapped $f] [winfo x $f]]
+    .t.c xview scroll -1 units
+    update
+    lappend x [list [winfo ismapped $f] [winfo x $f]]
+
+---- Result was:
+{0 0} {0 0} {0 0} {0 0} {0 0}
+---- Result should have been (exact matching):
+{1 3} {1 -79} {0 -79} {1 255} {0 255}
+==== canvWind-1.4 FAILED
+
+canvas.test
+
+
+==== canvas-2.3 CanvasWidgetCmd, xview option FAILED
+==== Contents of test case:
+
+    .c configure -xscrollincrement 40 -yscrollincrement 5
+    .c xview moveto 0
+    update
+    set x [list [.c xview]]
+    .c xview scroll 2 units
+    update
+    lappend x [.c xview]
+
+---- Result was:
+{0.0 0.005} {0.4 0.405}
+---- Result should have been (exact matching):
+{0.0 0.3} {0.4 0.7}
+==== canvas-2.3 FAILED
+
+
+
+==== canvas-2.4 CanvasWidgetCmd, xview option FAILED
+==== Contents of test case:
+
+    .c configure -xscrollincrement 0 -yscrollincrement 5
+    .c xview moveto 0.6
+    update
+    set x [list [.c xview]]
+    .c xview scroll 2 units
+    update
+    lappend x [.c xview]
+
+---- Result was:
+{0.6 0.605} {0.6 0.605}
+---- Result should have been (exact matching):
+{0.6 0.9} {0.66 0.96}
+==== canvas-2.4 FAILED
+
+
+
+==== canvas-3.1 CanvasWidgetCmd, yview option FAILED
+==== Contents of test case:
+
+    .c configure -xscrollincrement 40 -yscrollincrement 5
+    .c yview moveto 0
+    update
+    set x [list [.c yview]]
+    .c yview scroll 3 units
+    update
+    lappend x [.c yview]
+
+---- Result was:
+{0.0 0.0125} {0.1875 0.2}
+---- Result should have been (exact matching):
+{0.0 0.5} {0.1875 0.6875}
+==== canvas-3.1 FAILED
+
+
+
+==== canvas-3.2 CanvasWidgetCmd, yview option FAILED
+==== Contents of test case:
+
+    .c configure -xscrollincrement 40 -yscrollincrement 0
+    .c yview moveto 0
+    update
+    set x [list [.c yview]]
+    .c yview scroll 2 units
+    update
+    lappend x [.c yview]
+
+---- Result was:
+{0.0 0.0125} {0.0 0.0125}
+---- Result should have been (exact matching):
+{0.0 0.5} {0.1 0.6}
+==== canvas-3.2 FAILED
+
+
+
+==== canvas-6.4 CanvasSetOrigin procedure FAILED
+==== Contents of test case:
+
+    .c configure -xscrollincrement 20 -yscrollincrement 10
+    .c xview moveto 1.0
+    .c canvasx 0
+
+---- Result was:
+295.0
+---- Result should have been (exact matching):
+215.0
+==== canvas-6.4 FAILED
+
+
+
+==== canvas-6.5 CanvasSetOrigin procedure FAILED
+==== Contents of test case:
+
+    .c configure -xscrollincrement 20 -yscrollincrement 10
+    .c yview moveto 1.0
+    .c canvasy 0
+
+---- Result was:
+95.0
+---- Result should have been (exact matching):
+55.0
+==== canvas-6.5 FAILED
+
+
+
+==== canvas-13.1 canvas delete during event, SF bug-228024 FAILED
+==== Contents of test case:
+
+    kill_canvas .c
+    set ::x {}
+    # do this many times to improve chances of triggering the crash
+    for {set i 0} {$i < 30} {incr i} {
+	event generate .c <Button-1> -x 100 -y 100
+	event generate .c <ButtonRelease-1> -x 100 -y 100
+    }
+    return $::x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+okokokokokokokokokokokokokokokokokokokokokokokokokokokokokok
+==== canvas-13.1 FAILED
+
+
+
+==== canvas-23.1 canvas image FAILED
+==== Contents of test case:
+
+    .c configure -background #c0c0c0 -scrollregion {0 0 9 9}
+    .c create rectangle 0 0 0 9 -fill #000080 -outline #000080
+    .c image testimage
+    matchPixels [testimage data] {  {#000080 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#000080 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#000080 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#000080 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#000080 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#000080 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#000080 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#000080 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#000080 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#000080 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}}
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: failed to copy Pixmap to XImage
+    while executing
+".c image testimage"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== canvas-23.1 FAILED
+
+
+
+==== canvas-23.2 canvas image with subsample FAILED
+==== Contents of test case:
+
+    .c configure -background #c0c0c0 -scrollregion {0 0 9 9}
+    .c create rectangle 0 0 1 9 -fill #008000 -outline #008000
+    .c image testimage 2
+    matchPixels [testimage data] {  {#008000 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#008000 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#008000 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#008000 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#008000 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}}
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: failed to copy Pixmap to XImage
+    while executing
+".c image testimage 2"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== canvas-23.2 FAILED
+
+
+
+==== canvas-23.3 canvas image with subsample and zoom FAILED
+==== Contents of test case:
+
+    .c configure -background #c0c0c0 -scrollregion {0 0 9 9}
+    .c create rectangle 0 0 9 0 -fill #800000 -outline #800000
+    .c image testimage 1 2
+    matchPixels [testimage data] {  {#800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000}  {#800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000 #800000}  {#c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}  {#c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0 #c0c0c0}}
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: failed to copy Pixmap to XImage
+    while executing
+".c image testimage 1 2"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== canvas-23.3 FAILED
+
+choosedir.test
+clipboard.test
+
+
+==== clipboard-4.1 ClipboardLostSel procedure FAILED
+==== Contents of test case:
+
+    clipboard append "Test"
+    selection clear -s CLIPBOARD
+    clipboard get
+
+---- Result was:
+selection not supported
+---- Result should have been (exact matching):
+CLIPBOARD selection doesn't exist or form "STRING" not defined
+==== clipboard-4.1 FAILED
+
+
+
+==== clipboard-4.2 ClipboardLostSel procedure FAILED
+==== Contents of test case:
+
+    clipboard append "Test"
+    clipboard append -t TEST "Test2"
+    selection clear -s CLIPBOARD
+    clipboard get
+
+---- Result was:
+selection not supported
+---- Result should have been (exact matching):
+CLIPBOARD selection doesn't exist or form "STRING" not defined
+==== clipboard-4.2 FAILED
+
+
+
+==== clipboard-4.3 ClipboardLostSel procedure FAILED
+==== Contents of test case:
+
+    clipboard append "Test"
+    clipboard append -t TEST "Test2"
+    selection clear -s CLIPBOARD
+    clipboard get -t TEST
+
+---- Result was:
+selection not supported
+---- Result should have been (exact matching):
+CLIPBOARD selection doesn't exist or form "TEST" not defined
+==== clipboard-4.3 FAILED
+
+
+
+==== clipboard-4.4 ClipboardLostSel procedure FAILED
+==== Contents of test case:
+
+    clipboard append "Test"
+    clipboard append -t TEST "Test2"
+    clipboard append "Test3"
+    selection clear -s CLIPBOARD
+    clipboard get
+
+---- Result was:
+selection not supported
+---- Result should have been (exact matching):
+CLIPBOARD selection doesn't exist or form "STRING" not defined
+==== clipboard-4.4 FAILED
+
+
+
+==== clipboard-4.5 ClipboardLostSel procedure FAILED
+==== Contents of test case:
+
+    clipboard append "Test"
+    clipboard append -t TEST "Test2"
+    clipboard append "Test3"
+    selection clear -s CLIPBOARD
+    clipboard get -t TEST
+
+---- Result was:
+selection not supported
+---- Result should have been (exact matching):
+CLIPBOARD selection doesn't exist or form "TEST" not defined
+==== clipboard-4.5 FAILED
+
+
+
+==== clipboard-6.2 Tk_ClipboardAppend procedure FAILED
+==== Contents of test case:
+
+    childTkProcess create
+    clipboard append -f INTEGER -t TEST "16"
+    set result [childTkProcess eval {clipboard get TEST}]
+    return $result
+
+---- Result was:
+selection not supported
+---- Result should have been (exact matching):
+0x10 
+==== clipboard-6.2 FAILED
+
+clrpick.test
