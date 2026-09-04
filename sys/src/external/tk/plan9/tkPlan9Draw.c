@@ -389,13 +389,35 @@ XFlush(Display *display)
 /* Cursor stubs                                                        */
 /* ------------------------------------------------------------------ */
 
+/*
+ * Cursors are cosmetic here -- rio owns the pointer, and nothing in this
+ * backend draws one -- but their ids still have to be *unique*. Tk
+ * registers every cursor in dispPtr->cursorIdTable keyed by the id and
+ * panics on a collision (tkCursor.c:283, and again at :388):
+ *
+ *	cursor already registered in Tk_GetCursor
+ *
+ * These all used to answer (Cursor)1, so the second distinct cursor a
+ * program asked for killed it. The whole Tk test suite got as far as
+ * busy.test before hitting it.
+ *
+ * Zero is not available either: it is None, which Tk reads as failure.
+ */
+static Cursor
+P9NextCursorId(void)
+{
+    static unsigned long next = 1;
+
+    return (Cursor) next++;
+}
+
 Cursor
 XCreatePixmapCursor(Display *d, Pixmap p1, Pixmap p2,
                     XColor *c1, XColor *c2,
                     unsigned int x, unsigned int y)
 {
     (void)d; (void)p1; (void)p2; (void)c1; (void)c2; (void)x; (void)y;
-    return (Cursor)1;
+    return P9NextCursorId();
 }
 
 Cursor
@@ -404,7 +426,7 @@ XCreateGlyphCursor(Display *d, Font f1, Font f2,
                    XColor *c1, XColor *c2)
 {
     (void)d; (void)f1; (void)f2; (void)ch1; (void)ch2; (void)c1; (void)c2;
-    return (Cursor)1;
+    return P9NextCursorId();
 }
 
 int

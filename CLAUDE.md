@@ -152,7 +152,8 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `rol64-test.c` and `u64float-test.c`, and for libap `locale-test.c`,
 `sigset-test.c`, `posix-spawn-test.c`, `limits-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c` and
-`stdio-test.c`. `sys/src/ape/lib/libressl/test/` is separate: it is
+`stdio-test.c`. The three `tk-*.tcl` scripts there are Tcl, run with
+`wish`; see the Tk section below. `sys/src/ape/lib/libressl/test/` is separate: it is
 upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
 
 Beyond that, testing is still mostly ad-hoc — compile a program under
@@ -1143,6 +1144,56 @@ pulling in time.h */`):
 `<lock.h>` and so `<u.h>` legitimately — `pthread_mutex_t` is built on
 `Lock` — so that path stays, and a name as common as `nil` should not
 be defined unconditionally at the end of it.
+
+### Tk on Plan 9: a Tkp* hook never owns the struct
+
+Tk's platform hooks are handed a generic Tk struct and are responsible
+for the **platform resources hanging off it, never the struct itself**.
+Generic Tk keeps using the struct the moment the hook returns, and frees
+it when it is ready. This was got wrong twice, in
+`sys/src/external/tk/plan9/`:
+
+- `TkpDeleteFont` did `ckfree(p9f)`. `Tk_FreeFont` then reads
+  `fontPtr->objRefCount` and frees it again.
+- `TkpFreeColor` did `ckfree(tkColPtr)`. `Tk_FreeColor` then reads
+  `hashPtr`, `nextPtr` and `objRefCount` and frees it again.
+
+Both are a use-after-free followed by a double free, and both were
+invisible until something released the resource **for real**. That is
+the trap: a refcounted resource with more than one reference returns
+early from `Tk_FreeX` and never reaches the hook, so a frame could be
+created and destroyed all day while a label -- whose `-activebackground`
+border was the first genuinely released -- killed the process. Compare
+`tkUnixFont.c`'s `ReleaseFont` and `tkUnixColor.c`'s `TkpFreeColor`:
+neither touches the struct.
+
+Neither hook has anything to release on Plan 9 anyway. `XAllocColor`
+here packs an RGB triple into a pixel value and allocates nothing, so
+`TkpFreeColor` is empty.
+
+**A stub that answers "failure" is not the same as a stub that answers
+"nothing to do".** `XLoadFont` returned `None`, which Tk reads as *that
+font could not be loaded* rather than *there is no font server*, so
+`TkGetCursorByName` failed every widget with a `-cursor` default -- most
+of them. It returns a non-zero id now; the value is only handed back to
+`XCreateGlyphCursor`, which ignores it, because rio owns the pointer.
+
+**The event source must let the notifier sleep.** `DisplaySetupProc` set
+a zero maximum block time unconditionally, so every `wish` spun at 100%
+CPU for its whole life. One `wish` still worked, having the machine to
+itself; two starved each other, and Tk's test suite drives a child
+`wish` over a pipe. `tkUnixEvent.c` sets zero only when events are
+already queued; we cap the sleep at 20ms and poll on wakeup, since
+`/dev/mouse` and `/dev/cons` are polled rather than registered with the
+notifier.
+
+Three scripts in `sys/lib/tests` came out of this and are the way back
+in: `tk-childproc-test.tcl` (the two-wish handshake, with a repeat
+count), `tk-runtest.tcl` (runs a test file with `source` traced and
+`exit` intercepted) and `tk-widget-test.tcl` (font calls and widget
+create/destroy, one at a time). The technique that actually worked, all
+three times, was a `fprintf(stderr, ...)` at each step of the suspect
+function -- not acid, which fights `wish` for the rio window.
 
 ### Build order for compiler changes
 ```
