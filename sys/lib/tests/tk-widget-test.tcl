@@ -53,6 +53,37 @@ proc try {label script} {
 mark "start, [info nameofexecutable]"
 mark "windowingsystem is [tk windowingsystem]"
 
+# --- Pure font operations, no widgets -------------------------------
+#
+# These exercise TkpGetFontFromAttributes, tkp9_openfont and
+# tkp9_measuretext without creating a window, a cursor, a 3D border or
+# a GC. If one of these dies, it is the font backend; if they all pass
+# and "create entry" still dies, the font path is exonerated and the
+# fault is in one of the other things a widget allocates.
+
+try "font families"			{font families}
+try "font measure Helvetica"		{font measure {Helvetica -12} "abc"}
+try "font metrics Helvetica"		{font metrics {Helvetica -12}}
+try "font measure Times"		{font measure {Times -14} "abc"}
+try "font actual Helvetica"		{font actual {Helvetica -12}}
+
+# --- Widgets, simplest first ----------------------------------------
+#
+# A frame allocates a border and colours but no font; a label adds a
+# font; an entry adds a cursor and an insertion cursor. Whichever is
+# the first to die names what is at fault.
+
+try "create frame"			{frame .f}
+try "destroy frame"			{destroy .f}
+try "create label"			{label .l -text hi}
+try "destroy label"			{destroy .l}
+try "create plain entry"		{entry .e2}
+try "destroy plain entry"		{destroy .e2}
+try "create entry with font"		{entry .e3 -font {Helvetica -12}}
+try "destroy entry with font"		{destroy .e3}
+
+# --- Exactly what constraints.tcl does ------------------------------
+
 try "destroy .e (may not exist)"	{destroy .e}
 try "create entry"			{entry .e -width 0 -font {Helvetica -12} -bd 1 -highlightthickness 1}
 try "insert into entry"			{.e insert end a.bcd}
