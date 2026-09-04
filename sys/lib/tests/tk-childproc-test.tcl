@@ -1,7 +1,18 @@
 # Can a running wish spawn a second wish and talk to it over a pipe?
 #
-#	wish tk-childproc-test.tcl > /tmp/p.out 2>&1; echo "status=$?"
-#	cat /tmp/p.out
+#	wish   tk-childproc-test.tcl [child-interpreter]
+#	tclsh  tk-childproc-test.tcl [child-interpreter]
+#
+# The child defaults to whatever is running the script, so
+#
+#	wish  tk-childproc-test.tcl		wish parent,  wish child
+#	tclsh tk-childproc-test.tcl		tclsh parent, tclsh child
+#	tclsh tk-childproc-test.tcl /bin/wish	tclsh parent, wish child
+#	wish  tk-childproc-test.tcl /bin/tclsh	wish parent,  tclsh child
+#
+# which is what separates "the child wish cannot start when spawned from
+# a Tcl pipe" from "the child wish cannot start while another wish holds
+# the rio window".
 #
 # This is Tk's own childTkProcess (tests/testutils.tcl:382) reduced to
 # its essentials. constraints.tcl:42 calls it, main.tcl sources
@@ -35,9 +46,16 @@ proc mark {msg} {
 mark "parent start"
 mark "parent is [info nameofexecutable]"
 
+# Which interpreter to spawn. Defaults to our own, as childTkProcess does.
+set child [info nameofexecutable]
+if {[llength $argv] > 0} {
+    set child [lindex $argv 0]
+}
+mark "child will be $child"
+
 # Same shape as childTkProcess create, minus the unique-appname counter.
 if {[catch {
-    set fd [open "|[list [info nameofexecutable] -name tkchild]" r+]
+    set fd [open "|[list $child -name tkchild]" r+]
 } err]} {
     mark "open failed: $err"
     exit 1
