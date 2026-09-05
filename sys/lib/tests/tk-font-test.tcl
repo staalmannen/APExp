@@ -71,8 +71,11 @@ if {[catch {.l configure -font {}} err]} {
 }
 
 # 2. A "{family} size style" list must be parsed, not swallowed whole.
+# Tk keeps the family as written when the platform cannot resolve it to
+# a real font name -- X11 answers lowercase because the X font name is
+# lowercase. Either is defensible, so compare without case.
 check "family of {Helvetica -12}" \
-    [font actual {Helvetica -12} -family] "helvetica"
+    [string tolower [font actual {Helvetica -12} -family]] "helvetica"
 check "size of {Helvetica -12}" \
     [font actual {Helvetica -12} -size] "-12"
 check "size of {Courier 10}" \

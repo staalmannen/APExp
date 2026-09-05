@@ -1393,6 +1393,83 @@ against. A wrong entry costs size accuracy and nothing else.
 Tk uses it to skip measuring character by character, so claiming it for
 a proportional font mislays every string.
 
+### Tk on Plan 9: stacking order, and the two coordinate spaces
+
+Three separate things were missing here, and they hide each other:
+
+- `Tk_CoordsToWindow` was a stub returning NULL, so `winfo containing`
+  answered the empty string for every point. `raise.test` decides the
+  stacking order **entirely** by asking what is on top at a given pixel,
+  so all eleven of its cases failed on that one line -- reporting
+  `bad window path name ""`, which names neither stacking nor
+  hit-testing.
+- `TkWmRestackToplevel` was a no-op, so `raise`/`lower` on a toplevel
+  did nothing.
+- `XRaiseWindow`/`XLowerWindow` were no-ops. There is no compositing
+  here -- drawing goes straight into the one rio window -- so a raised
+  window stays buried under whatever was drawn over it until something
+  makes it repaint. On X the server sends the Expose; nothing on Plan 9
+  will, so `P9ExposeTree` does.
+
+Tk already keeps the stacking order of a window's **children** itself,
+in `parentPtr->childList`, later meaning higher (`Tk_RestackWindow`).
+Toplevels have no such list, so this port keeps them in
+`dispPtr->firstWmPtr` in the same convention: first is bottom, last is
+top. `TkWmNewWindow` therefore appends rather than prepending as
+`tkUnixWm.c` does -- there the X server owns the order.
+`Tk_CoordsToWindow` walks both lists forward and keeps the **last**
+match.
+
+**The recurring trap in this file is that `P9Window.x`/`.y` are relative
+to the parent, and event coordinates are relative to the screen.**
+`WindowAtPoint` compared the two directly, so every nested window was
+hit-tested at the wrong place -- a click landed on whichever widget
+happened to sit at the same offset inside its own parent, and it looked
+correct only for children of the root. `GenerateMouseEvent` then
+computed the event's window-relative `x`/`y` with `pw->x` alone, one
+level instead of the whole ancestry. `TkP9WindowOffset` is the accumulated
+offset and is what both need. This is the same mistake the drawing code
+made, and it is worth suspecting first whenever something lands in the
+wrong place.
+
+Covered by `sys/lib/tests/tk-stacking-test.tcl`, which tests the sibling
+case (Tk's own childList) and the toplevel case (this port's list)
+separately, because restacking with no hit-test reports nothing and
+hit-testing with no restacking reports a stale but plausible answer.
+
+### Tk on Plan 9: embedding is easy here, because there is one process
+
+`Tk_UseWindow` answered `"-use not supported on Plan 9"`, which is every
+test in `safe.test` and `safePrimarySelection.test` -- 34 of them --
+because `safe::loadTk` **always** ends in `-use`. Given no `-use`
+argument it builds a decorated toplevel containing a
+`frame $w.c -container 1` and embeds into that
+(`library/safetk.tcl`, `tkTopLevel`).
+
+`tkUnixEmbed.c` is 1200 lines because on X the container and the
+embedded application are usually **separate clients**: it needs wrapper
+windows, a property protocol to pass geometry between them, and an error
+handler for when the other client dies mid-conversation. A safe
+interpreter is a child interpreter in this same process, sharing this
+window table, so the whole thing reduces to two rules:
+
+- `Tk_MakeWindow` creates an embedded toplevel as a child of the
+  container window instead of the root. That substitution *is* the
+  embedding.
+- The embedded toplevel does not size itself. `WmUpdateGeometry` passes
+  its request to the container with `Tk_GeometryRequest` and then takes
+  the container's size; a `<Configure>` on the container resizes the
+  embedded window to match.
+
+The `Container` list lives in `tkPlan9Wm.c` beside the two halves it
+joins. `Tk_GetOtherWindow` walks it in both directions, which is always
+answerable here -- on X it can only answer for a container and embedded
+window in the same process.
+
+Covered by `sys/lib/tests/tk-embed-test.tcl`, which checks the refusal
+message for a non-container as well as the working case, since
+safe.test's failures were reported entirely by message.
+
 ### Syntax-check Tk's Plan 9 backend on the host before shipping it
 
 A round trip to the VM costs a full rebuild, and twice now it has been

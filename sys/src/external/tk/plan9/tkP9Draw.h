@@ -83,6 +83,12 @@ char  *tkp9_getsnarf(void);
 int    tkp9_putsnarf(const char *s, int nbytes);   /* 0 on success */
 
 /*
+ * Move the mouse pointer to an absolute screen position. rio accepts
+ * "m<x> <y>" written to /dev/mouse. Returns 0 on success.
+ */
+int    tkp9_warpmouse(int x, int y);
+
+/*
  * Fonts (opaque handle = Plan 9 Font*)
  */
 void  *tkp9_openfont(const char *name);	  /* returns Font*, or defont */

@@ -205,6 +205,7 @@ XkbOpenDisplay(
     screen->root_depth       = 32;
     screen->max_maps         = 1;
     screen->min_maps         = 1;
+    screen->cmap             = 1;	/* nonzero: DefaultColormap must not be None */
     screen->backing_store    = NotUseful;
     screen->save_unders      = False;
 
@@ -506,17 +507,70 @@ XMapRaised(Display *display, Window w)
     return XMapWindow(display, w);
 }
 
+/*
+ * Restacking is Tk's own bookkeeping -- it reorders parentPtr->childList
+ * (later in the list is higher) and firstWmPtr for toplevels -- so there
+ * is nothing to record here. What there IS to do is repaint: an X server
+ * would expose whatever the change uncovered, and nothing on Plan 9
+ * will. Drawing is immediate into the one rio window, so a window that
+ * has just been raised stays buried under whatever was drawn over it
+ * until it repaints itself.
+ *
+ * Exposing the whole subtree is what makes "raise" visible at all.
+ */
+static void
+P9ExposeTree(Display *display, Window w)
+{
+    P9Window *pw = TkP9FindWindow(w);
+    XEvent ev;
+    int i;
+
+    if (pw == NULL || !pw->mapped || pw->ispixmap)
+        return;
+
+    memset(&ev, 0, sizeof(ev));
+    ev.type            = Expose;
+    ev.xexpose.display = display;
+    ev.xexpose.window  = w;
+    ev.xexpose.x       = 0;
+    ev.xexpose.y       = 0;
+    ev.xexpose.width   = pw->width;
+    ev.xexpose.height  = pw->height;
+    ev.xexpose.count   = 0;
+    TkP9EnqueueEvent(&ev);
+
+    for (i = 0; i < gP9.nwins; i++) {
+        P9Window *c = &gP9.wins[i];
+        if (c->inuse && !c->ispixmap && c->parent == w && c->xid != w)
+            P9ExposeTree(display, c->xid);
+    }
+}
+
 int
 XRaiseWindow(Display *display, Window w)
 {
-    (void)display; (void)w;
+    P9ExposeTree(display, w);
     return 0;
 }
 
 int
 XLowerWindow(Display *display, Window w)
 {
-    (void)display; (void)w;
+    /*
+     * Lowering uncovers the siblings that were beneath, so they are the
+     * ones that must repaint -- and the easiest correct answer is to
+     * expose everything sharing this parent.
+     */
+    P9Window *pw = TkP9FindWindow(w);
+    int i;
+
+    if (pw == NULL)
+        return 0;
+    for (i = 0; i < gP9.nwins; i++) {
+        P9Window *c = &gP9.wins[i];
+        if (c->inuse && !c->ispixmap && c->parent == pw->parent)
+            P9ExposeTree(display, c->xid);
+    }
     return 0;
 }
 
@@ -967,14 +1021,56 @@ XFree(void *data)
     return 0;
 }
 
+/*
+ * Move the pointer. dx,dy are relative to dw when it is given, and to
+ * the current position when dw is None; the source rectangle is only
+ * used to restrict when the warp happens, and Tk always passes an empty
+ * one, meaning "always".
+ *
+ * The event that follows is generated here rather than waited for.
+ * /dev/mouse does report the move back, but Tk's own tests read
+ * "winfo pointerxy" immediately afterwards, and rio's reply has not
+ * arrived by then.
+ */
 int
 XWarpPointer(Display *d, Window s, Window dw,
              int sx, int sy, unsigned sw, unsigned sh,
              int dx, int dy)
 {
-    (void)d; (void)s; (void)dw;
-    (void)sx; (void)sy; (void)sw; (void)sh;
-    (void)dx; (void)dy;
+    int ox, oy, x, y;
+    XEvent ev;
+    (void)s; (void)sx; (void)sy; (void)sw; (void)sh;
+
+    if (dw == None) {
+        x = gP9.lastmouse.x + dx;
+        y = gP9.lastmouse.y + dy;
+    } else {
+        TkP9WindowOffset(dw, &ox, &oy);
+        x = ox + dx;
+        y = oy + dy;
+    }
+    if (x < 0) x = 0;
+    if (y < 0) y = 0;
+    if (x >= gP9.screenw) x = gP9.screenw - 1;
+    if (y >= gP9.screenh) y = gP9.screenh - 1;
+
+    if (tkp9_warpmouse(x, y) < 0)
+        return 0;
+
+    gP9.lastmouse.x = x;
+    gP9.lastmouse.y = y;
+
+    memset(&ev, 0, sizeof(ev));
+    ev.type              = MotionNotify;
+    ev.xmotion.display   = d;
+    ev.xmotion.window    = (dw == None) ? TKP9_ROOT_XID : dw;
+    ev.xmotion.root      = TKP9_ROOT_XID;
+    ev.xmotion.x_root    = x;
+    ev.xmotion.y_root    = y;
+    ev.xmotion.x         = (dw == None) ? x : dx;
+    ev.xmotion.y         = (dw == None) ? y : dy;
+    ev.xmotion.time      = (Time)(gP9.lastmouse.msec);
+    TkP9EnqueueEvent(&ev);
     return 0;
 }
 

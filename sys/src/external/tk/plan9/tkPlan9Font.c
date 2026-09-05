@@ -55,6 +55,10 @@ typedef struct {
     int         pixels;
 } P9FontFile;
 
+/*
+ * Monospace. fixed/ has the finest spread of sizes on a 9front install,
+ * and B and O suffixes are its bold and oblique variants.
+ */
 static const P9FontFile monoFonts[] = {
     {"/lib/font/bit/fixed/unicode.4x6.font",    6},
     {"/lib/font/bit/fixed/unicode.5x7.font",    7},
@@ -65,31 +69,105 @@ static const P9FontFile monoFonts[] = {
     {"/lib/font/bit/fixed/unicode.6x13.font",  13},
     {"/lib/font/bit/fixed/unicode.7x14.font",  14},
     {"/lib/font/bit/fixed/unicode.9x15.font",  15},
-    {"/lib/font/bit/fixed/unicode.8x16.font",  16},
+    {"/lib/font/bit/terminus/unicode.16.font", 16},
     {"/lib/font/bit/fixed/unicode.9x18.font",  18},
     {"/lib/font/bit/fixed/unicode.10x20.font", 20},
     {NULL, 0}
 };
 
-static const P9FontFile propFonts[] = {
-    {"/lib/font/bit/lucsans/unicode.6.font",    6},
-    {"/lib/font/bit/lucsans/unicode.7.font",    7},
-    {"/lib/font/bit/lucsans/unicode.8.font",    8},
-    {"/lib/font/bit/pelm/unicode.9.font",       9},
-    {"/lib/font/bit/lucsans/unicode.10.font",  10},
-    {"/lib/font/bit/lucsans/unicode.13.font",  13},
-    {"/lib/font/bit/lucidasans/unicode.13.font", 13},
-    {"/lib/font/bit/lucsans/unicode.16.font",  16},
-    {"/lib/font/bit/lucidasans/unicode.16.font", 16},
+static const P9FontFile monoBoldFonts[] = {
+    {"/lib/font/bit/fixed/unicode.6x13B.font", 13},
+    {"/lib/font/bit/fixed/unicode.7x13B.font", 13},
+    {"/lib/font/bit/fixed/unicode.8x13B.font", 13},
+    {"/lib/font/bit/fixed/unicode.7x14B.font", 14},
+    {"/lib/font/bit/fixed/unicode.9x15B.font", 15},
+    {"/lib/font/bit/fixed/unicode.9x18B.font", 18},
     {NULL, 0}
 };
 
+static const P9FontFile monoItalicFonts[] = {
+    {"/lib/font/bit/fixed/unicode.6x13O.font", 13},
+    {"/lib/font/bit/fixed/unicode.7x13O.font", 13},
+    {"/lib/font/bit/fixed/unicode.8x13O.font", 13},
+    {NULL, 0}
+};
+
+/*
+ * Proportional. lucida/unicode.* is the only family here with a size
+ * for nearly every request, so it carries the range; dejavusans has
+ * bold and italic with full Unicode coverage, which lucida's latin1B
+ * and latin1I do not.
+ */
+static const P9FontFile propFonts[] = {
+    {"/lib/font/bit/lucida/unicode.5.font",       5},
+    {"/lib/font/bit/lucida/unicode.6.font",       6},
+    {"/lib/font/bit/lucida/unicode.7.font",       7},
+    {"/lib/font/bit/lucida/unicode.8.font",       8},
+    {"/lib/font/bit/lucida/unicode.9.font",       9},
+    {"/lib/font/bit/lucida/unicode.10.font",     10},
+    {"/lib/font/bit/lucida/unicode.12.font",     12},
+    {"/lib/font/bit/lucida/unicode.14.font",     14},
+    {"/lib/font/bit/lucida/unicode.16.font",     16},
+    {"/lib/font/bit/lucida/unicode.18.font",     18},
+    {"/lib/font/bit/lucida/unicode.20.font",     20},
+    {"/lib/font/bit/lucida/unicode.24.font",     24},
+    {"/lib/font/bit/lucida/unicode.28.font",     28},
+    {"/lib/font/bit/lucida/unicode.32.font",     32},
+    {NULL, 0}
+};
+
+static const P9FontFile propBoldFonts[] = {
+    {"/lib/font/bit/lucidasans/boldunicode.6.font",   6},
+    {"/lib/font/bit/lucidasans/boldunicode.7.font",   7},
+    {"/lib/font/bit/lucidasans/boldunicode.8.font",   8},
+    {"/lib/font/bit/lucidasans/boldunicode.10.font", 10},
+    {"/lib/font/bit/dejavusansbd/unicode.12.font",   12},
+    {"/lib/font/bit/lucidasans/boldunicode.13.font", 13},
+    {"/lib/font/bit/dejavusansbd/unicode.14.font",   14},
+    {"/lib/font/bit/dejavusansbd/unicode.16.font",   16},
+    {"/lib/font/bit/dejavusansbd/unicode.18.font",   18},
+    {NULL, 0}
+};
+
+static const P9FontFile propItalicFonts[] = {
+    {"/lib/font/bit/lucidasans/italicunicode.6.font",   6},
+    {"/lib/font/bit/lucidasans/italicunicode.7.font",   7},
+    {"/lib/font/bit/lucidasans/italicunicode.8.font",   8},
+    {"/lib/font/bit/lucidasans/italicunicode.10.font", 10},
+    {"/lib/font/bit/dejavusansit/unicode.12.font",     12},
+    {"/lib/font/bit/lucidasans/italicunicode.13.font", 13},
+    {"/lib/font/bit/dejavusansit/unicode.14.font",     14},
+    {"/lib/font/bit/dejavusansit/unicode.16.font",     16},
+    {"/lib/font/bit/dejavusansit/unicode.18.font",     18},
+    {NULL, 0}
+};
+
+/*
+ * Serif. times/ is latin1 only, so the Unicode DejaVu serif faces carry
+ * this; outside 12..18 there is nothing, and the proportional table
+ * takes over.
+ */
 static const P9FontFile serifFonts[] = {
-    {"/lib/font/bit/times/unicode.8.font",      8},
-    {"/lib/font/bit/times/unicode.10.font",    10},
-    {"/lib/font/bit/times/unicode.12.font",    12},
-    {"/lib/font/bit/times/unicode.14.font",    14},
-    {"/lib/font/bit/times/unicode.16.font",    16},
+    {"/lib/font/bit/dejavu/unicode.12.font", 12},
+    {"/lib/font/bit/dejavu/unicode.14.font", 14},
+    {"/lib/font/bit/dejavu/unicode.16.font", 16},
+    {"/lib/font/bit/dejavu/unicode.18.font", 18},
+    {NULL, 0}
+};
+
+static const P9FontFile serifBoldFonts[] = {
+    {"/lib/font/bit/dejavubd/unicode.12.font", 12},
+    {"/lib/font/bit/dejavubd/unicode.14.font", 14},
+    {"/lib/font/bit/dejavubd/unicode.16.font", 16},
+    {"/lib/font/bit/dejavubd/unicode.18.font", 18},
+    {NULL, 0}
+};
+
+static const P9FontFile serifItalicFonts[] = {
+    {"/lib/font/bit/dejavuit/unicode.12.font", 12},
+    {"/lib/font/bit/dejavuit/unicode.14.font", 14},
+    {"/lib/font/bit/dejavuit/unicode.16.font", 16},
+    {"/lib/font/bit/dejavuit/unicode.18.font", 18},
     {NULL, 0}
 };
 
@@ -158,7 +236,7 @@ FontIsFixed(void *fnt)
 static void *
 ChooseFont(Tk_Window tkwin, const TkFontAttributes *faPtr)
 {
-    const P9FontFile *table;
+    const P9FontFile *table, *variant = NULL;
     int pixels;
     void *fnt;
 
@@ -166,14 +244,32 @@ ChooseFont(Tk_Window tkwin, const TkFontAttributes *faPtr)
     if (pixels <= 0)
         pixels = 13;			/* Tk's own fallback size */
 
-    if (IsMonoFamily(faPtr->family))
+    if (IsMonoFamily(faPtr->family)) {
         table = monoFonts;
-    else if (IsSerifFamily(faPtr->family))
+        if (faPtr->weight == TK_FW_BOLD)      variant = monoBoldFonts;
+        else if (faPtr->slant != TK_FS_ROMAN) variant = monoItalicFonts;
+    } else if (IsSerifFamily(faPtr->family)) {
         table = serifFonts;
-    else
+        if (faPtr->weight == TK_FW_BOLD)      variant = serifBoldFonts;
+        else if (faPtr->slant != TK_FS_ROMAN) variant = serifItalicFonts;
+    } else {
         table = propFonts;
+        if (faPtr->weight == TK_FW_BOLD)      variant = propBoldFonts;
+        else if (faPtr->slant != TK_FS_ROMAN) variant = propItalicFonts;
+    }
 
-    fnt = OpenNearest(table, pixels);
+    /*
+     * A bold or italic face only exists at some sizes. Prefer one, but
+     * take the right size in the regular face over the right style in
+     * the wrong size -- a bitmap font cannot have both.
+     */
+    fnt = NULL;
+    if (variant != NULL)
+        fnt = OpenNearest(variant, pixels);
+    if (fnt == NULL)
+        fnt = OpenNearest(table, pixels);
+    if (fnt == NULL && table != propFonts)
+        fnt = OpenNearest(propFonts, pixels);
     if (fnt == NULL && table != monoFonts)
         fnt = OpenNearest(monoFonts, pixels);
     if (fnt == NULL)
