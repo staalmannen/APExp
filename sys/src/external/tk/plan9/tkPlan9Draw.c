@@ -355,10 +355,22 @@ Pixmap
 XCreatePixmap(Display *display, Drawable d,
               unsigned int width, unsigned int height, unsigned int depth)
 {
-    /* For now, allocate a fake window as pixmap storage */
-    return XCreateWindow(display, (Window)d,
-                         0, 0, width, height, 0,
-                         (int)depth, InputOutput, CopyFromParent, 0, NULL);
+    /*
+     * A pixmap is backed by a fake window here, but it is *not* a child
+     * window: it is an independent drawable with its own coordinate
+     * space starting at (0,0). Marking it keeps TkP9WindowOffset from
+     * walking up to the parent it was created against and giving it
+     * that window's position on screen.
+     */
+    Window xid = XCreateWindow(display, (Window)d,
+                               0, 0, width, height, 0,
+                               (int)depth, InputOutput, CopyFromParent,
+                               0, NULL);
+    P9Window *pw = TkP9FindWindow(xid);
+
+    if (pw)
+        pw->ispixmap = 1;
+    return (Pixmap) xid;
 }
 
 int

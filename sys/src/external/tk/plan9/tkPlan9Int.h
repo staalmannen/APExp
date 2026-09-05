@@ -47,6 +47,7 @@ typedef struct P9Window {
     Window    parent;
     int       x, y, width, height;
     int       mapped;
+    int       ispixmap;		/* created by XCreatePixmap, not a window */
     int       border_width;
     unsigned long bg_pixel;		/* background fill colour (Plan 9 RGBA) */
     unsigned long border_pixel;

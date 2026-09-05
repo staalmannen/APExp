@@ -74,7 +74,12 @@ TkP9WindowOffset(Window xid, int *ox, int *oy)
          pw = TkP9FindWindow(pw->parent), guard++) {
         x += pw->x;
         y += pw->y;
-        if (pw->xid == TKP9_ROOT_XID || pw->parent == pw->xid)
+        /*
+         * A pixmap is a drawable in its own right, not a child of the
+         * window it was created against, so its position is its own and
+         * the walk stops here.
+         */
+        if (pw->ispixmap || pw->xid == TKP9_ROOT_XID || pw->parent == pw->xid)
             break;
     }
     *ox = x;
