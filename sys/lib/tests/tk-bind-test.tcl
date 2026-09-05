@@ -125,5 +125,60 @@ bind .f <<Custom>> {lappend ::hits virtual}
 event generate .f <<Custom>>
 mark "virtual event: [expr {[llength $::hits] ? "FIRED" : "not delivered"}]"
 
+# 5. The same key test, but inside a second toplevel.
+#
+# Everything above uses a frame in "." and now works, while bind.test
+# still fails every key case -- and its one structural difference is
+# that it builds .t.f inside a toplevel .t:
+#
+#	toplevel .t -width 100 -height 50
+#	frame .t.f -class Test -width 150 -height 100
+#	pack .t.f
+#	focus -force .t.f
+#
+# Tk_HandleEvent hands a key event to TkFocusKeyEvent, which redirects
+# it to displayFocusPtr->focusWinPtr and returns NULL -- dropping the
+# event -- when there is no focus window. TkSetFocusWin refuses to set
+# one unless the target AND every ancestor up to the toplevel have
+# TK_MAPPED (tkFocus.c, the allMapped loop); it silently defers instead,
+# arming a VisibilityChange handler. So a toplevel this port never marks
+# mapped would lose every key event and nothing else, which is exactly
+# the failure shape.
+#
+# "focus" reporting .t.f is the discriminator: if it answers empty or
+# ".", the focus was never set and the mapping is why.
+toplevel .t -width 100 -height 50
+wm geom .t +0+0
+frame .t.f -class Test -width 150 -height 100
+pack .t.f
+focus -force .t.f
+update
+mark "toplevel .t: exists [winfo exists .t], mapped [winfo ismapped .t], id [winfo id .t]"
+mark ".t.f:       exists [winfo exists .t.f], mapped [winfo ismapped .t.f], id [winfo id .t.f]"
+mark "focus is now '[focus]' (want .t.f)"
+
+set ::hits {}
+bind .t.f <Key> {lappend ::hits "K=%K k=%k N=%N"}
+event generate .t.f <Key-a>
+mark ".t.f <Key> after <Key-a>: [expr {[llength $::hits] ? $::hits : "not delivered"}]"
+
+set ::hits {}
+event generate .t.f <Key>
+mark ".t.f <Key> after bare <Key>: [expr {[llength $::hits] ? $::hits : "not delivered"}]"
+
+set ::hits {}
+event generate .t.f <:>
+mark ".t.f <Key> after <:>: [expr {[llength $::hits] ? $::hits : "not delivered"}]"
+bind .t.f <Key> {}
+
+# A button event to the same window, as a control: if this arrives and
+# the key events do not, the difference is the focus redirect and not
+# delivery in general.
+set ::hits {}
+bind .t.f <Button-1> {lappend ::hits fired}
+event generate .t.f <Button-1>
+mark ".t.f <Button-1>: [expr {[llength $::hits] ? "FIRED" : "not delivered"}]"
+bind .t.f <Button-1> {}
+
 mark "done"
 exit 0
