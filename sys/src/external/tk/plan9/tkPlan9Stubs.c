@@ -491,7 +491,6 @@ Tk_SetCaretPos(Tk_Window tkwin, int x, int y, int height)
     (void)tkwin; (void)x; (void)y; (void)height;
 }
 
-const char *
 /*
  * The characters a key event stands for -- Tk's %A substitution.
  *
@@ -500,7 +499,7 @@ const char *
  * function and cursor keys and stand for no character at all, and
  * neither does a keysym of 0.
  */
-char *
+const char *
 TkpGetString(TkWindow *winPtr, XEvent *eventPtr, Tcl_DString *dsPtr)
 {
     KeySym sym;
@@ -523,7 +522,6 @@ TkpGetString(TkWindow *winPtr, XEvent *eventPtr, Tcl_DString *dsPtr)
     return Tcl_DStringValue(dsPtr);
 }
 
-void
 /*
  * Fill in a synthetic key event's keycode from its keysym.
  *
