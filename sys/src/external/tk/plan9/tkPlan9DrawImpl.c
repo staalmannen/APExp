@@ -371,6 +371,47 @@ tkp9_openfont(const char *name)
     return f;
 }
 
+/*
+ * rio moves the pointer when "m<x> <y>" is written to /dev/mouse, so a
+ * warp needs the descriptor to be open for writing -- tkp9_open asks
+ * for O_RDWR first and only falls back to O_RDONLY.
+ */
+/*
+ * Formatted by hand rather than with snprint: this file includes no
+ * stdio, so a print function here would be called with no prototype in
+ * scope, and a variadic call like that is the exact shape that has cost
+ * this tree several silent bugs.
+ */
+static int
+putnum(char *p, int v)
+{
+    char tmp[16];
+    int n = 0, i = 0;
+
+    if(v < 0) { p[i++] = '-'; v = -v; }
+    do { tmp[n++] = '0' + v % 10; v /= 10; } while(v > 0);
+    while(n > 0)
+        p[i++] = tmp[--n];
+    return i;
+}
+
+int
+tkp9_warpmouse(int x, int y)
+{
+    char buf[40];
+    int n = 0;
+
+    if(gMouseFd < 0)
+        return -1;
+    buf[n++] = 'm';
+    n += putnum(buf + n, x);
+    buf[n++] = ' ';
+    n += putnum(buf + n, y);
+    if(write(gMouseFd, buf, n) != n)
+        return -1;
+    return 0;
+}
+
 void *
 tkp9_openfontpath(const char *path)
 {

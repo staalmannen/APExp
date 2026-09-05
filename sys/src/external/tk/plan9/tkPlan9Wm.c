@@ -286,7 +286,14 @@ TkpDoWarpWrtWin(TkDisplay *dispPtr)
 void
 TkpWarpPointer(TkDisplay *dispPtr)
 {
-    (void)dispPtr;
+    Window w;
+
+    if (dispPtr->warpWindow != NULL)
+	w = Tk_WindowId(dispPtr->warpWindow);
+    else
+	w = TKP9_ROOT_XID;
+    XWarpPointer(dispPtr->display, None, w, 0, 0, 0, 0,
+	    (int) dispPtr->warpX, (int) dispPtr->warpY);
 }
 
 /* ------------------------------------------------------------------ */

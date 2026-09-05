@@ -6,7 +6,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-05 09:47:54 +0200
+Tests began at 2026-09-05 10:25:34 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -111,66 +111,11 @@ bitmap.test
 border.test
 busy.test
 button.test
-
-
-==== button-1.104 configuration option: "activebackground" for label FAILED
-==== Contents of test case:
-
-    .l configure -font {}
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== button-1.104 FAILED
-
-
-
-==== button-1.106 configuration option: "activebackground" for button FAILED
-==== Contents of test case:
-
-    .b configure -font {}
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== button-1.106 FAILED
-
-
-
-==== button-1.108 configuration option: "activebackground" for checkbutton FAILED
-==== Contents of test case:
-
-    .c configure -font {}
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== button-1.108 FAILED
-
-
-
-==== button-1.110 configuration option: "activebackground" for radiobutton FAILED
-==== Contents of test case:
-
-    .r configure -font {}
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== button-1.110 FAILED
-
 canvImg.test
 canvMoveto.test
 canvPs.test
 canvRect.test
 canvText.test
-
-
-==== canvasText-1.7 configuration options: bad value for "font" FAILED
-==== Contents of test case:
-
-    .c itemconfigure test -font {}
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== canvasText-1.7 FAILED
-
 canvWind.test
 canvas.test
 
@@ -360,17 +305,6 @@ window ".container" doesn't have -container option set
 ==== embed-1.5.nonwin FAILED
 
 entry.test
-
-
-==== entry-1.20 configuration option: "font" for entry FAILED
-==== Contents of test case:
-
-    .e configure -font {}
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== entry-1.20 FAILED
-
 event.test
 
 
@@ -632,63 +566,95 @@ focusTcl.test
 font.test
 
 
-==== font-4.7 font command: actual: arguments FAILED
+==== font-21.7 Tk_PostscriptFontName procedure: exhaustive FAILED
 ==== Contents of test case:
 
-    # (tkfont == NULL)
-    font actual "\{xyz"
+    set name {avantgarde 12 roman normal}
+    if {[font actual {avantgarde 12 roman normal} -family] == "avantgarde"} {
+	set x [psfontname avantgarde 12 roman normal]
+    } else {
+	set x AvantGarde-Book
+    }
 
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== font-4.7 FAILED
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: wrong # args: should be "psfontname name"
+    while executing
+"psfontname avantgarde 12 roman normal"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL WRONGARGS
+==== font-21.7 FAILED
 
 
 
-==== font-9.4 font command: measure: arguments FAILED
+==== font-21.8 Tk_PostscriptFontName procedure: exhaustive FAILED
 ==== Contents of test case:
 
-    # (tkfont == NULL)
-    font measure "\{xyz" abc
+    set name {avantgarde 12 roman bold}
+    if {[font actual {avantgarde 12 roman normal} -family] == "avantgarde"} {
+	set x [psfontname avantgarde 12 roman normal]
+    } else {
+	set x AvantGarde-Demi
+    }
 
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== font-9.4 FAILED
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: wrong # args: should be "psfontname name"
+    while executing
+"psfontname avantgarde 12 roman normal"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL WRONGARGS
+==== font-21.8 FAILED
 
 
 
-==== font-10.6 font command: metrics: bad font FAILED
+==== font-21.9 Tk_PostscriptFontName procedure: exhaustive FAILED
 ==== Contents of test case:
 
-    # (tkfont == NULL)
-    font metrics "\{xyz"
+    set name {avantgarde 12 italic normal}
+    if {[font actual {avantgarde 12 roman normal} -family] == "avantgarde"} {
+	set x [psfontname avantgarde 12 roman normal]
+    } else {
+	set x AvantGarde-BookOblique
+    }
 
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== font-10.6 FAILED
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: wrong # args: should be "psfontname name"
+    while executing
+"psfontname avantgarde 12 roman normal"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL WRONGARGS
+==== font-21.9 FAILED
 
 
 
-==== font-15.9 Tk_AllocFontFromObj procedure: get attribute font FAILED
+==== font-21.10 Tk_PostscriptFontName procedure: exhaustive FAILED
 ==== Contents of test case:
 
-    # (fontPtr == NULL)
-    .t.f config -font {xxx yyy zzz}
+    set name {avantgarde 12 italic bold}
+    if {[font actual {avantgarde 12 roman normal} -family] == "avantgarde"} {
+	set x [psfontname avantgarde 12 roman normal]
+    } else {
+	set x AvantGarde-DemiOblique
+    }
 
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== font-15.9 FAILED
-
-
-
-==== font-15.10 Tk_AllocFontFromObj procedure: no match FAILED
-==== Contents of test case:
-
-    # (ParseFontNameObj() != TCL_OK)
-    font actual "\{xyz"
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== font-15.10 FAILED
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: wrong # args: should be "psfontname name"
+    while executing
+"psfontname avantgarde 12 roman normal"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL WRONGARGS
+==== font-21.10 FAILED
 
 
 
@@ -1034,231 +1000,6 @@ font.test
 
 
 
-==== font-38.1 ParseFontNameObj procedure: begins with - FAILED
-==== Contents of test case:
-
-    lindex [font actual -xyz-times-*-*-*-*-*-*-*-*-*-*-*-*] 1
-
----- Result was:
--xyz-times-*-*-*-*-*-*-*-*-*-*-*-*
----- Result should have been (exact matching):
-times 0
-==== font-38.1 FAILED
-
-
-
-==== font-38.2 ParseFontNameObj procedure: begins with -* FAILED
-==== Contents of test case:
-
-    lindex [font actual -*-times-xyz-*-*-*-*-*-*-*-*-*-*-*] 1
-
----- Result was:
--*-times-xyz-*-*-*-*-*-*-*-*-*-*-*
----- Result should have been (exact matching):
-times 0
-==== font-38.2 FAILED
-
-
-
-==== font-38.3 ParseFontNameObj procedure: begins with -, doesn't look like list FAILED
-==== Contents of test case:
-
-    lindex [font actual -xyz-times-*-*-*-*-*-*-*-*-*-*-*-*] 1
-
----- Result was:
--xyz-times-*-*-*-*-*-*-*-*-*-*-*-*
----- Result should have been (exact matching):
-times 0
-==== font-38.3 FAILED
-
-
-
-==== font-38.4 ParseFontNameObj procedure: begins with -, looks like list FAILED
-==== Contents of test case:
-
-    lindex [font actual {-family times}] 1
-
----- Result was:
--family times
----- Result should have been (exact matching):
-times 0
-==== font-38.4 FAILED
-
-
-
-==== font-38.5 ParseFontNameObj procedure: begins with * FAILED
-==== Contents of test case:
-
-    lindex [font actual *-times-xyz-*-*-*-*-*-*-*-*-*-*-*] 1
-
----- Result was:
-*-times-xyz-*-*-*-*-*-*-*-*-*-*-*
----- Result should have been (exact matching):
-times 0
-==== font-38.5 FAILED
-
-
-
-==== font-38.6 ParseFontNameObj procedure: begins with * FAILED
-==== Contents of test case:
-
-    font actual *-times-xyz -family
-
----- Result was:
-*-times-xyz
----- Result should have been (exact matching):
-times 0
-==== font-38.6 FAILED
-
-
-
-==== font-38.7 ParseFontNameObj procedure: arguments FAILED
-==== Contents of test case:
-
-    font actual "\{xyz"
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== font-38.7 FAILED
-
-
-
-==== font-38.8 ParseFontNameObj procedure: arguments FAILED
-==== Contents of test case:
-
-    font actual ""
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== font-38.8 FAILED
-
-
-
-==== font-38.9 ParseFontNameObj procedure: arguments FAILED
-==== Contents of test case:
-
-    font actual {times 20 xyz xyz}
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== font-38.9 FAILED
-
-
-
-==== font-38.10 ParseFontNameObj procedure: arguments FAILED
-==== Contents of test case:
-
-    font actual {times xyz xyz}
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== font-38.10 FAILED
-
-
-
-==== font-38.12 ParseFontNameObj procedure: stylelist error FAILED
-==== Contents of test case:
-
-    font actual {times 12 bold xyz}
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== font-38.12 FAILED
-
-
-
-==== font-38.13 ParseFontNameObj: options with hyphenated family: bug #2791352 FAILED
-==== Contents of test case:
-
-    font actual {-family sans-serif -size 12 -weight bold -slant roman -underline 0 -overstrike 0}
-
----- Result was:
--family {-family sans-serif -size 12 -weight bold -slant roman -underline 0 -overstrike 0} -size 18 -weight normal -slant roman -underline 0 -overstrike 0
----- Result should have been (exact matching):
--family {sans-serif 12 bold} -size 18 -weight normal -slant roman -underline 0 -overstrike 0
-==== font-38.13 FAILED
-
-
-
-==== font-38.14 ParseFontNameObj: bug #2791352 FAILED
-==== Contents of test case:
-
-    font actual {-invalidfont 8 bold}
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== font-38.14 FAILED
-
-
-
-==== font-40.1 TkFontParseXLFD procedure: initial dash FAILED
-==== Contents of test case:
-
-    font actual -xyz-times-*-*-*-*-*-*-*-*-*-*-*-* -family
-
----- Result was:
--xyz-times-*-*-*-*-*-*-*-*-*-*-*-*
----- Result should have been (exact matching):
-times 0
-==== font-40.1 FAILED
-
-
-
-==== font-40.2 TkFontParseXLFD procedure: no initial dash FAILED
-==== Contents of test case:
-
-    font actual *-times-*-*-*-*-*-*-*-*-*-*-*-xyz -family
-
----- Result was:
-*-times-*-*-*-*-*-*-*-*-*-*-*-xyz
----- Result should have been (exact matching):
-times 0
-==== font-40.2 FAILED
-
-
-
-==== font-40.3 TkFontParseXLFD procedure: not enough fields FAILED
-==== Contents of test case:
-
-    font actual -xyz-times-*-*-* -family
-
----- Result was:
--xyz-times-*-*-*
----- Result should have been (exact matching):
-times 0
-==== font-40.3 FAILED
-
-
-
-==== font-40.5 TkFontParseXLFD procedure: all fields specified FAILED
-==== Contents of test case:
-
-    lindex [font actual  -foundry-times-weight-slant-setwidth-addstyle-10-10-10-10-spacing-avgwidth-registry-encoding] 1
-
----- Result was:
--foundry-times-weight-slant-setwidth-addstyle-10-10-10-10-spacing-avgwidth-registry-encoding
----- Result should have been (exact matching):
-times 0
-==== font-40.5 FAILED
-
-
-
-==== font-43.1 FieldSpecified procedure: specified vs. non-specified FAILED
-==== Contents of test case:
-
-    font actual -xyz--*-*-*-*-*-*-*-*-*-*-*-*
-    font actual -xyz-*-*-*-*-*-*-*-*-*-*-*-*-*
-    font actual -xyz-?-*-*-*-*-*-*-*-*-*-*-*-*
-    lindex [font actual -xyz-times-*-*-*-*-*-*-*-*-*-*-*-*] 1
-
----- Result was:
--xyz-times-*-*-*-*-*-*-*-*-*-*-*-*
----- Result should have been (exact matching):
-times 0
-==== font-43.1 FAILED
-
-
-
 ==== font-44.1 TkFontGetPixels: size < 0 FAILED
 ==== Contents of test case:
 
@@ -1267,7 +1008,7 @@ times 0
     font actual {times -13} -size
 
 ---- Result was:
-16
+-13
 ---- Result should have been (exact matching):
 26
 ==== font-44.1 FAILED
@@ -1280,10 +1021,28 @@ times 0
     font actual {snarky 10} -family
 
 ---- Result was:
-snarky 10
+snarky
 ---- Result should have been (exact matching):
--size 10
+
 ==== font-45.1 FAILED
+
+
+
+==== font-45.3 TkFontGetAliasList: match FAILED
+==== Contents of test case:
+
+    if {[font actual {{times new roman} 10} -family] eq "Times New Roman"} {
+	# avoid test failure on systems that have a real "times new roman" font
+	set res 1
+    } else {
+	set res [expr {[font actual {{times new roman} 10} -family] eq  [font actual {times 10} -family]} ]
+    }
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== font-45.3 FAILED
 
 fontchooser.test
 
@@ -1327,66 +1086,6 @@ Hello
 ---- Result should have been (exact matching):
 \u041F\u0440\u0438\u0432\u0435\u0442
 ==== fontchooser-2.1 FAILED
-
-
-
-==== fontchooser-4.1 fontchooser -font FAILED
-==== Contents of test case:
-
-    testDialog launch {
-	tk::fontchooser::Configure -command $applyFontCmd -font courier
-	tk::fontchooser::Show
-    }
-    testDialog onDisplay {
-	Click ok
-    }
-    expr {$testDialogFont ne {}}
-
----- Result was:
-0
----- Result should have been (exact matching):
-1
-==== fontchooser-4.1 FAILED
-
-
-
-==== fontchooser-4.2 fontchooser -font FAILED
-==== Contents of test case:
-
-    testDialog launch {
-	tk::fontchooser::Configure -command $applyFontCmd -font TkDefaultFont
-	tk::fontchooser::Show
-    }
-    testDialog onDisplay {
-	Click ok
-    }
-    expr {$testDialogFont ne {}}
-
----- Result was:
-0
----- Result should have been (exact matching):
-1
-==== fontchooser-4.2 FAILED
-
-
-
-==== fontchooser-4.3 fontchooser -font FAILED
-==== Contents of test case:
-
-    testDialog launch {
-	tk::fontchooser::Configure -command $applyFontCmd -font {times 14 bold}
-	tk::fontchooser::Show
-    }
-    testDialog onDisplay {
-	Click ok
-    }
-    expr {$testDialogFont ne {}}
-
----- Result was:
-0
----- Result should have been (exact matching):
-1
-==== fontchooser-4.3 FAILED
 
 frame.test
 
@@ -1710,71 +1409,16 @@ listbox.test
     lappend result [getsize .]
 
 ---- Result was:
-190x328 26x15 26x15
+190x308 26x15 26x15
 ---- Result should have been (exact matching):
 30x20 26x15 26x15
 ==== listbox-4.7 FAILED
 
 main.test
 menu.test
-
-
-==== menu-2.104 entry configuration options 1 -font {kill rock stars} command FAILED
-==== Contents of test case:
-
-    .m1 entryconfigure 1 -font {kill rock stars}
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== menu-2.104 FAILED
-
-
-
-==== menu-2.105 entry configuration options 2 -font {kill rock stars} cascade FAILED
-==== Contents of test case:
-
-    .m1 entryconfigure 2 -font {kill rock stars}
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== menu-2.105 FAILED
-
-
-
-==== menu-2.107 entry configuration options 4 -font {kill rock stars} checkbutton FAILED
-==== Contents of test case:
-
-    .m1 entryconfigure 4 -font {kill rock stars}
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== menu-2.107 FAILED
-
-
-
-==== menu-2.108 entry configuration options 5 -font {kill rock stars} radiobutton FAILED
-==== Contents of test case:
-
-    .m1 entryconfigure 5 -font {kill rock stars}
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== menu-2.108 FAILED
-
 menuDraw.test
 menubut.test
 message.test
-
-
-==== message-1.18 configuration option: "font" FAILED
-==== Contents of test case:
-
-    .m configure -font {}
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== message-1.18 FAILED
-
 msgbox.test
 obj.test
 option.test
@@ -3298,6 +2942,40 @@ can't unset "res1": no such variable
 ==== safePrimarySelection-6.10 FAILED
 
 scale.test
+
+
+==== scale-8.8 ScaleElement procedure FAILED
+==== Contents of test case:
+
+    scale .s -from 0 -to 100 -orient horizontal -bd 1 -highlightthickness 2  -tick 20 -sliderlength 20 -length 200 -label Test -showvalue 0
+    pack .s
+    .s set 30
+    update
+    list [.s identify 2 28] [.s identify 3 28] [.s identify 202 28]  [.s identify 203 28]
+
+---- Result was:
+{} {} {} {}
+---- Result should have been (exact matching):
+{} trough1 trough2 {}
+==== scale-8.8 FAILED
+
+
+
+==== scale-8.9 ScaleElement procedure FAILED
+==== Contents of test case:
+
+    scale .s -from 0 -to 100 -orient horizontal -bd 1 -highlightthickness 2  -tick 20 -sliderlength 20 -length 200 -label Test -showvalue 0
+    pack .s
+    .s set 80
+    update
+    list [.s identify 145 28] [.s identify 146 28] [.s identify 165 28]  [.s identify 166 28]
+
+---- Result was:
+{} {} {} {}
+---- Result should have been (exact matching):
+trough1 slider slider trough2
+==== scale-8.9 FAILED
+
 
 
 ==== scale-19 Bug [3529885fff] - Click in through goes in wrong direction FAILED
