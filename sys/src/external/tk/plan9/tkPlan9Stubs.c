@@ -147,7 +147,7 @@ void
 TkpBuildRegionFromAlphaData(Region region,
     unsigned x, unsigned y,
     unsigned width, unsigned height,
-    const unsigned char *dataPtr,
+    unsigned char *dataPtr,
     unsigned pixelStride,
     unsigned lineStride)
 {

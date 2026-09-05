@@ -1314,6 +1314,46 @@ Covered by `sys/lib/tests/tk-selection-test.tcl`, which tests the two
 directions separately and skips itself when `/dev/snarf` cannot be
 opened (there is no snarf file without rio).
 
+### Syntax-check Tk's Plan 9 backend on the host before shipping it
+
+A round trip to the VM costs a full rebuild, and twice now it has been
+spent on a typo. gcc will parse these files on the build host -- it
+never links, and it does not need Plan 9 -- so a bad edit is caught in
+a second instead of a rebuild:
+
+```sh
+cd sys/src/external/tk
+for f in plan9/*.c; do
+	[ "$f" = plan9/tkPlan9DrawImpl.c ] && continue	# needs <draw.h>
+	gcc -fsyntax-only -w -Igeneric -Igeneric/ttk -Ixlib -Ibitmaps \
+	    -Iplan9 -I../tcl/generic -I../tcl/plan9 \
+	    -DHAVE_TCL_CONFIG_H -DHAVE_TK_CONFIG_H -DPLAN9 \
+	    -DMODULE_SCOPE=extern -DWCHAR=char -DTK_PLATFORM='"plan9"' \
+	    -DSTATIC_BUILD "$f" || echo "FAILED $f"
+done
+```
+
+All seven files are clean today, so any output is a regression. Note
+gcc is *stricter* than pcc here and that is the point: it rejects the
+prototype mismatches `rsametype()` waves through, which is how
+`TkpBuildRegionFromAlphaData` was found taking a `const unsigned char *`
+against a declaration with no `const`, and `XCreateGlyphCursor` taking
+non-const `XColor *` against Xlib's `_Xconst`.
+
+The mistake it would have caught both times is putting a comment
+*between* a function's return type and its declarator, which strands the
+old return type above it:
+
+```c
+const char *
+/* ... comment ... */
+char *
+TkpGetString(...)
+```
+
+pcc reports that as `syntax error, last name: char`, which names neither
+the function nor the real problem.
+
 ### Tk on Plan 9: modifier keys are not events of their own
 
 `tkBind.c` consults `dispPtr->modKeyCodes` twice, and both uses are

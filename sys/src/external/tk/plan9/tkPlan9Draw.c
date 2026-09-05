@@ -477,7 +477,7 @@ XCreatePixmapCursor(Display *d, Pixmap p1, Pixmap p2,
 Cursor
 XCreateGlyphCursor(Display *d, Font f1, Font f2,
                    unsigned int ch1, unsigned int ch2,
-                   XColor *c1, XColor *c2)
+                   const XColor *c1, const XColor *c2)
 {
     (void)d; (void)f1; (void)f2; (void)ch1; (void)ch2; (void)c1; (void)c2;
     return P9NextCursorId();
