@@ -1393,6 +1393,50 @@ against. A wrong entry costs size accuracy and nothing else.
 Tk uses it to skip measuring character by character, so claiming it for
 a proportional font mislays every string.
 
+### Tk on Plan 9: stacking order, and the two coordinate spaces
+
+Three separate things were missing here, and they hide each other:
+
+- `Tk_CoordsToWindow` was a stub returning NULL, so `winfo containing`
+  answered the empty string for every point. `raise.test` decides the
+  stacking order **entirely** by asking what is on top at a given pixel,
+  so all eleven of its cases failed on that one line -- reporting
+  `bad window path name ""`, which names neither stacking nor
+  hit-testing.
+- `TkWmRestackToplevel` was a no-op, so `raise`/`lower` on a toplevel
+  did nothing.
+- `XRaiseWindow`/`XLowerWindow` were no-ops. There is no compositing
+  here -- drawing goes straight into the one rio window -- so a raised
+  window stays buried under whatever was drawn over it until something
+  makes it repaint. On X the server sends the Expose; nothing on Plan 9
+  will, so `P9ExposeTree` does.
+
+Tk already keeps the stacking order of a window's **children** itself,
+in `parentPtr->childList`, later meaning higher (`Tk_RestackWindow`).
+Toplevels have no such list, so this port keeps them in
+`dispPtr->firstWmPtr` in the same convention: first is bottom, last is
+top. `TkWmNewWindow` therefore appends rather than prepending as
+`tkUnixWm.c` does -- there the X server owns the order.
+`Tk_CoordsToWindow` walks both lists forward and keeps the **last**
+match.
+
+**The recurring trap in this file is that `P9Window.x`/`.y` are relative
+to the parent, and event coordinates are relative to the screen.**
+`WindowAtPoint` compared the two directly, so every nested window was
+hit-tested at the wrong place -- a click landed on whichever widget
+happened to sit at the same offset inside its own parent, and it looked
+correct only for children of the root. `GenerateMouseEvent` then
+computed the event's window-relative `x`/`y` with `pw->x` alone, one
+level instead of the whole ancestry. `TkP9WindowOffset` is the accumulated
+offset and is what both need. This is the same mistake the drawing code
+made, and it is worth suspecting first whenever something lands in the
+wrong place.
+
+Covered by `sys/lib/tests/tk-stacking-test.tcl`, which tests the sibling
+case (Tk's own childList) and the toplevel case (this port's list)
+separately, because restacking with no hit-test reports nothing and
+hit-testing with no restacking reports a stale but plausible answer.
+
 ### Syntax-check Tk's Plan 9 backend on the host before shipping it
 
 A round trip to the VM costs a full rebuild, and twice now it has been

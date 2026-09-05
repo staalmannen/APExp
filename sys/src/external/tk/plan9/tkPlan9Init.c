@@ -507,17 +507,70 @@ XMapRaised(Display *display, Window w)
     return XMapWindow(display, w);
 }
 
+/*
+ * Restacking is Tk's own bookkeeping -- it reorders parentPtr->childList
+ * (later in the list is higher) and firstWmPtr for toplevels -- so there
+ * is nothing to record here. What there IS to do is repaint: an X server
+ * would expose whatever the change uncovered, and nothing on Plan 9
+ * will. Drawing is immediate into the one rio window, so a window that
+ * has just been raised stays buried under whatever was drawn over it
+ * until it repaints itself.
+ *
+ * Exposing the whole subtree is what makes "raise" visible at all.
+ */
+static void
+P9ExposeTree(Display *display, Window w)
+{
+    P9Window *pw = TkP9FindWindow(w);
+    XEvent ev;
+    int i;
+
+    if (pw == NULL || !pw->mapped || pw->ispixmap)
+        return;
+
+    memset(&ev, 0, sizeof(ev));
+    ev.type            = Expose;
+    ev.xexpose.display = display;
+    ev.xexpose.window  = w;
+    ev.xexpose.x       = 0;
+    ev.xexpose.y       = 0;
+    ev.xexpose.width   = pw->width;
+    ev.xexpose.height  = pw->height;
+    ev.xexpose.count   = 0;
+    TkP9EnqueueEvent(&ev);
+
+    for (i = 0; i < gP9.nwins; i++) {
+        P9Window *c = &gP9.wins[i];
+        if (c->inuse && !c->ispixmap && c->parent == w && c->xid != w)
+            P9ExposeTree(display, c->xid);
+    }
+}
+
 int
 XRaiseWindow(Display *display, Window w)
 {
-    (void)display; (void)w;
+    P9ExposeTree(display, w);
     return 0;
 }
 
 int
 XLowerWindow(Display *display, Window w)
 {
-    (void)display; (void)w;
+    /*
+     * Lowering uncovers the siblings that were beneath, so they are the
+     * ones that must repaint -- and the easiest correct answer is to
+     * expose everything sharing this parent.
+     */
+    P9Window *pw = TkP9FindWindow(w);
+    int i;
+
+    if (pw == NULL)
+        return 0;
+    for (i = 0; i < gP9.nwins; i++) {
+        P9Window *c = &gP9.wins[i];
+        if (c->inuse && !c->ispixmap && c->parent == pw->parent)
+            P9ExposeTree(display, c->xid);
+    }
     return 0;
 }
 

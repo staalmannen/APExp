@@ -152,6 +152,61 @@ WmUpdateNow(TkWindow *winPtr)
 }
 
 /* ------------------------------------------------------------------ */
+/* Stacking order                                                      */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Tk keeps the stacking order of a window's children itself, in
+ * parentPtr->childList, with later in the list meaning higher
+ * (Tk_RestackWindow). Toplevels have no such list -- on X the server
+ * stacks them -- so this port keeps them in dispPtr->firstWmPtr, in the
+ * same convention: first is bottom, last is top.
+ */
+
+static WmInfo *
+WmLast(TkDisplay *dispPtr)
+{
+    WmInfo *p = dispPtr->firstWmPtr;
+
+    if (p == NULL)
+	return NULL;
+    while (p->nextPtr != NULL)
+	p = p->nextPtr;
+    return p;
+}
+
+static void
+WmUnlink(TkDisplay *dispPtr, WmInfo *wmPtr)
+{
+    WmInfo *p;
+
+    if (dispPtr->firstWmPtr == wmPtr) {
+	dispPtr->firstWmPtr = wmPtr->nextPtr;
+    } else {
+	for (p = dispPtr->firstWmPtr; p != NULL; p = p->nextPtr) {
+	    if (p->nextPtr == wmPtr) {
+		p->nextPtr = wmPtr->nextPtr;
+		break;
+	    }
+	}
+    }
+    wmPtr->nextPtr = NULL;
+}
+
+/* Put wmPtr immediately above afterPtr; a NULL afterPtr means bottom. */
+static void
+WmLinkAfter(TkDisplay *dispPtr, WmInfo *wmPtr, WmInfo *afterPtr)
+{
+    if (afterPtr == NULL) {
+	wmPtr->nextPtr = dispPtr->firstWmPtr;
+	dispPtr->firstWmPtr = wmPtr;
+    } else {
+	wmPtr->nextPtr = afterPtr->nextPtr;
+	afterPtr->nextPtr = wmPtr;
+    }
+}
+
+/* ------------------------------------------------------------------ */
 /* TkpGetWrapperWindow / TkpMakeMenuWindow                            */
 /* ------------------------------------------------------------------ */
 
@@ -491,8 +546,14 @@ TkWmNewWindow(TkWindow *winPtr)
     wmPtr->minWidth  = 1;
     wmPtr->minHeight = 1;
     wmPtr->flags     = WM_NEVER_MAPPED;
-    wmPtr->nextPtr   = winPtr->dispPtr->firstWmPtr;
-    winPtr->dispPtr->firstWmPtr = wmPtr;
+    wmPtr->nextPtr   = NULL;
+    /*
+     * firstWmPtr is this port's stacking order for toplevels, running
+     * bottom to top, so a new toplevel goes on the end -- on top, and in
+     * creation order, which is what raise.test's first case checks.
+     * (tkUnixWm.c prepends, but there the X server owns the stacking.)
+     */
+    WmLinkAfter(winPtr->dispPtr, wmPtr, WmLast(winPtr->dispPtr));
     winPtr->wmInfoPtr = wmPtr;
 
     /*
@@ -557,21 +618,11 @@ TkWmUnmapWindow(TkWindow *winPtr)
 void
 TkWmDeadWindow(TkWindow *winPtr)
 {
-    WmInfo *wmPtr = winPtr->wmInfoPtr, *prevPtr;
+    WmInfo *wmPtr = winPtr->wmInfoPtr;
 
     if (wmPtr == NULL)
 	return;
-    if (winPtr->dispPtr->firstWmPtr == wmPtr) {
-	winPtr->dispPtr->firstWmPtr = wmPtr->nextPtr;
-    } else {
-	for (prevPtr = winPtr->dispPtr->firstWmPtr; prevPtr != NULL;
-		prevPtr = prevPtr->nextPtr) {
-	    if (prevPtr->nextPtr == wmPtr) {
-		prevPtr->nextPtr = wmPtr->nextPtr;
-		break;
-	    }
-	}
-    }
+    WmUnlink(winPtr->dispPtr, wmPtr);
     if (wmPtr->flags & WM_UPDATE_PENDING)
 	Tcl_CancelIdleCall(WmUpdateGeometry, winPtr);
     winPtr->wmInfoPtr = NULL;
@@ -584,10 +635,44 @@ TkWmSetClass(TkWindow *winPtr)
     (void)winPtr;
 }
 
+/*
+ * "raise .a ?.b?" and "lower .a ?.b?" for toplevels. With no other
+ * window named, Above means all the way to the top and Below all the way
+ * to the bottom.
+ */
 void
 TkWmRestackToplevel(TkWindow *winPtr, int aboveBelow, TkWindow *otherPtr)
 {
-    (void)winPtr; (void)aboveBelow; (void)otherPtr;
+    TkDisplay *dispPtr = winPtr->dispPtr;
+    WmInfo *wmPtr = winPtr->wmInfoPtr, *otherWmPtr, *afterPtr;
+
+    if (wmPtr == NULL)
+	return;
+    otherWmPtr = (otherPtr != NULL) ? otherPtr->wmInfoPtr : NULL;
+    if (otherWmPtr == wmPtr)
+	return;
+
+    WmUnlink(dispPtr, wmPtr);
+    if (otherWmPtr == NULL) {
+	afterPtr = (aboveBelow == Above) ? WmLast(dispPtr) : NULL;
+    } else if (aboveBelow == Above) {
+	afterPtr = otherWmPtr;
+    } else {
+	/* Immediately below otherWmPtr: after whatever precedes it. */
+	afterPtr = NULL;
+	{
+	    WmInfo *p;
+	    for (p = dispPtr->firstWmPtr; p != NULL && p != otherWmPtr;
+		    p = p->nextPtr)
+		afterPtr = p;
+	}
+    }
+    WmLinkAfter(dispPtr, wmPtr, afterPtr);
+
+    if (aboveBelow == Above)
+	XRaiseWindow(winPtr->display, winPtr->window);
+    else
+	XLowerWindow(winPtr->display, winPtr->window);
 }
 
 TkWindow *
@@ -772,11 +857,77 @@ Tk_GetVRootGeometry(Tk_Window tkwin, int *xPtr, int *yPtr,
 /* Coords → window hit-test                                           */
 /* ------------------------------------------------------------------ */
 
+/*
+ * Which window is at this point on the screen?
+ *
+ * The Unix version asks the X server, walking down with
+ * XTranslateCoordinates. There is no server here, and there does not
+ * need to be one: this port already knows the whole tree and its
+ * stacking order, which is what the server would be consulted for.
+ *
+ * Both loops walk forward and keep the LAST match, because both lists
+ * run bottom to top -- childList by Tk's own convention, firstWmPtr by
+ * this port's.
+ *
+ * This was a stub returning NULL, so "winfo containing" answered the
+ * empty string for every point. raise.test decides the stacking order
+ * entirely by asking what is on top at a given pixel, so all eleven of
+ * its cases failed on that one line.
+ */
+static int
+PointInWindow(TkWindow *winPtr, int rootX, int rootY)
+{
+    int x, y;
+
+    Tk_GetRootCoords((Tk_Window) winPtr, &x, &y);
+    return rootX >= x && rootX < x + Tk_Width((Tk_Window) winPtr)
+	&& rootY >= y && rootY < y + Tk_Height((Tk_Window) winPtr);
+}
+
 Tk_Window
 Tk_CoordsToWindow(int rootX, int rootY, Tk_Window tkwin)
 {
-    (void)rootX; (void)rootY; (void)tkwin;
-    return NULL;
+    TkWindow *winPtr = (TkWindow *) tkwin;
+    TkDisplay *dispPtr = winPtr->dispPtr;
+    TkWindow *topPtr = NULL, *bestPtr, *childPtr;
+    WmInfo *wmPtr;
+
+    for (wmPtr = dispPtr->firstWmPtr; wmPtr != NULL; wmPtr = wmPtr->nextPtr) {
+	TkWindow *tl = wmPtr->winPtr;
+
+	if (tl == NULL || tl->mainPtr == NULL || tl->window == None)
+	    continue;
+	if (!Tk_IsMapped((Tk_Window) tl))
+	    continue;
+	if (PointInWindow(tl, rootX, rootY))
+	    topPtr = tl;
+    }
+    if (topPtr == NULL)
+	return NULL;
+
+    /*
+     * Tk_CoordsToWindow reports only windows of this application; a
+     * toplevel belonging to another interpreter hides what is under it
+     * just as an alien window would.
+     */
+    if (topPtr->mainPtr != winPtr->mainPtr)
+	return NULL;
+
+    for (;;) {
+	bestPtr = NULL;
+	for (childPtr = topPtr->childList; childPtr != NULL;
+		childPtr = childPtr->nextPtr) {
+	    if (childPtr->window == None
+		    || (childPtr->flags & TK_TOP_HIERARCHY)
+		    || !Tk_IsMapped((Tk_Window) childPtr))
+		continue;
+	    if (PointInWindow(childPtr, rootX, rootY))
+		bestPtr = childPtr;
+	}
+	if (bestPtr == NULL)
+	    return (Tk_Window) topPtr;
+	topPtr = bestPtr;
+    }
 }
 
 /* ------------------------------------------------------------------ */

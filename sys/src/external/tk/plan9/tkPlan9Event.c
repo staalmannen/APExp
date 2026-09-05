@@ -83,19 +83,39 @@ ButtonToMask(int buttons)
 /* Find topmost mapped window containing (x, y)                       */
 /* ------------------------------------------------------------------ */
 
+/*
+ * x and y are screen coordinates, and w->x/w->y are relative to the
+ * window's PARENT -- this used to compare the two directly, so every
+ * nested window was hit-tested at the wrong place and a click landed on
+ * whichever widget happened to have the same offset within its own
+ * parent. It only looked right for children of the root.
+ *
+ * Among the windows that really do contain the point, the smallest is
+ * the deepest, since a child is always within its parent; ties go to
+ * the later entry, which is the more recently created.
+ */
 static Window
 WindowAtPoint(int x, int y)
 {
     int i;
     Window best = TKP9_ROOT_XID;
-    /* Scan forward; last mapped window wins (topmost in paint order) */
+    long bestarea = 0;
+
     for (i = 0; i < gP9.nwins; i++) {
         P9Window *w = &gP9.wins[i];
-        if (!w->inuse || !w->mapped) continue;
+        int ox, oy;
+        long area;
+
+        if (!w->inuse || !w->mapped || w->ispixmap) continue;
         if (w->xid == TKP9_ROOT_XID) continue;
-        if (x >= w->x && x < w->x + w->width &&
-            y >= w->y && y < w->y + w->height)
+        TkP9WindowOffset(w->xid, &ox, &oy);
+        if (x < ox || x >= ox + w->width || y < oy || y >= oy + w->height)
+            continue;
+        area = (long) w->width * (long) w->height;
+        if (best == TKP9_ROOT_XID || area <= bestarea) {
             best = w->xid;
+            bestarea = area;
+        }
     }
     return best;
 }
@@ -117,8 +137,21 @@ GenerateMouseEvent(Display *dpy, TkP9Mouse *cur)
 
     win  = WindowAtPoint(cur->x, cur->y);
     pw   = TkP9FindWindow(win);
-    wx   = cur->x - (pw ? pw->x : 0);
-    wy   = cur->y - (pw ? pw->y : 0);
+    /*
+     * x and y in an event are relative to the window, and the window's
+     * position on screen is the sum of its whole ancestry -- pw->x is
+     * only its offset within its own parent. Every widget below the top
+     * level was told the pointer was somewhere it was not.
+     */
+    if (pw != NULL) {
+        int ox, oy;
+        TkP9WindowOffset(win, &ox, &oy);
+        wx = cur->x - ox;
+        wy = cur->y - oy;
+    } else {
+        wx = cur->x;
+        wy = cur->y;
+    }
     state = ButtonToMask(prev->buttons);
 
     /* Motion */
