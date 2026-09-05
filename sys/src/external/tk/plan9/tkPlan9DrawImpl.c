@@ -278,6 +278,86 @@ tkp9_flush(void)
 }
 
 /* ------------------------------------------------------------------ */
+/* Snarf buffer (/dev/snarf)                                           */
+/* ------------------------------------------------------------------ */
+
+/*
+ * rio serves the whole snarf buffer from offset 0 of a freshly opened
+ * /dev/snarf and there is no way to be told when it changes, so both of
+ * these open, do their business and close. Holding the descriptor open
+ * would read a stale copy.
+ *
+ * The contents are UTF-8, which is what Tk wants for a UTF8_STRING
+ * target and what Plan 9 uses natively, so no conversion is needed.
+ */
+char *
+tkp9_getsnarf(void)
+{
+    int fd, n;
+    long len, cap;
+    char *buf, *nbuf;
+
+    fd = open("/dev/snarf", O_RDONLY);
+    if (fd < 0)
+	return NULL;
+
+    cap = 4096;
+    len = 0;
+    buf = malloc(cap);
+    if (buf == NULL) {
+	close(fd);
+	return NULL;
+    }
+    for (;;) {
+	if (len + 1 >= cap) {
+	    cap *= 2;
+	    nbuf = realloc(buf, cap);
+	    if (nbuf == NULL) {
+		free(buf);
+		close(fd);
+		return NULL;
+	    }
+	    buf = nbuf;
+	}
+	n = read(fd, buf + len, cap - len - 1);
+	if (n < 0) {
+	    free(buf);
+	    close(fd);
+	    return NULL;
+	}
+	if (n == 0)
+	    break;
+	len += n;
+    }
+    close(fd);
+    buf[len] = '\0';
+    return buf;
+}
+
+int
+tkp9_putsnarf(const char *s, int nbytes)
+{
+    int fd, n;
+    int off = 0;
+
+    if (s == NULL)
+	return -1;
+    fd = open("/dev/snarf", O_WRONLY|O_TRUNC);
+    if (fd < 0)
+	return -1;
+    while (off < nbytes) {
+	n = write(fd, s + off, nbytes - off);
+	if (n <= 0) {
+	    close(fd);
+	    return -1;
+	}
+	off += n;
+    }
+    close(fd);
+    return 0;
+}
+
+/* ------------------------------------------------------------------ */
 /* Fonts                                                               */
 /* ------------------------------------------------------------------ */
 
