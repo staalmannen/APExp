@@ -35,26 +35,150 @@ typedef struct {
 } P9Font;
 
 /* ------------------------------------------------------------------ */
-/* Name -> Plan 9 path heuristic                                       */
+/* Choosing a Plan 9 font file                                         */
 /* ------------------------------------------------------------------ */
 
-static const char *
-MapFontName(const char *name)
+/*
+ * Plan 9 bitmap fonts come in discrete sizes, one file each, so a font
+ * request is answered by picking the nearest available file rather than
+ * by scaling. The size in the table is the nominal pixel height, which
+ * is what the file names encode.
+ *
+ * Any of these may be absent -- what a 9front install ships varies --
+ * so a candidate that will not open is skipped and the next-nearest
+ * tried. If none opens we fall back to libdraw's default font, which is
+ * the behaviour this port had for every request.
+ */
+
+typedef struct {
+    const char *path;
+    int         pixels;
+} P9FontFile;
+
+static const P9FontFile monoFonts[] = {
+    {"/lib/font/bit/fixed/unicode.4x6.font",    6},
+    {"/lib/font/bit/fixed/unicode.5x7.font",    7},
+    {"/lib/font/bit/fixed/unicode.5x8.font",    8},
+    {"/lib/font/bit/fixed/unicode.6x9.font",    9},
+    {"/lib/font/bit/fixed/unicode.6x10.font",  10},
+    {"/lib/font/bit/fixed/unicode.6x12.font",  12},
+    {"/lib/font/bit/fixed/unicode.6x13.font",  13},
+    {"/lib/font/bit/fixed/unicode.7x14.font",  14},
+    {"/lib/font/bit/fixed/unicode.9x15.font",  15},
+    {"/lib/font/bit/fixed/unicode.8x16.font",  16},
+    {"/lib/font/bit/fixed/unicode.9x18.font",  18},
+    {"/lib/font/bit/fixed/unicode.10x20.font", 20},
+    {NULL, 0}
+};
+
+static const P9FontFile propFonts[] = {
+    {"/lib/font/bit/lucsans/unicode.6.font",    6},
+    {"/lib/font/bit/lucsans/unicode.7.font",    7},
+    {"/lib/font/bit/lucsans/unicode.8.font",    8},
+    {"/lib/font/bit/pelm/unicode.9.font",       9},
+    {"/lib/font/bit/lucsans/unicode.10.font",  10},
+    {"/lib/font/bit/lucsans/unicode.13.font",  13},
+    {"/lib/font/bit/lucidasans/unicode.13.font", 13},
+    {"/lib/font/bit/lucsans/unicode.16.font",  16},
+    {"/lib/font/bit/lucidasans/unicode.16.font", 16},
+    {NULL, 0}
+};
+
+static const P9FontFile serifFonts[] = {
+    {"/lib/font/bit/times/unicode.8.font",      8},
+    {"/lib/font/bit/times/unicode.10.font",    10},
+    {"/lib/font/bit/times/unicode.12.font",    12},
+    {"/lib/font/bit/times/unicode.14.font",    14},
+    {"/lib/font/bit/times/unicode.16.font",    16},
+    {NULL, 0}
+};
+
+static int
+IsMonoFamily(const char *f)
 {
-    /* Tk's logical font names */
-    if (!name || !*name) goto dflt;
-    if (strstr(name, "Fixed") || strstr(name, "fixed") ||
-        strstr(name, "Courier") || strstr(name, "courier") ||
-        strstr(name, "Mono") || strstr(name, "mono"))
-        return "/lib/font/bit/fixed/unicode.6x13.font";
-    if (strstr(name, "Helvetica") || strstr(name, "helvetica") ||
-        strstr(name, "Arial") || strstr(name, "Sans") || strstr(name, "sans"))
-        return "/lib/font/bit/pelm/unicode.9.font";
-    if (strstr(name, "Times") || strstr(name, "times") ||
-        strstr(name, "Serif") || strstr(name, "serif"))
-        return "/lib/font/bit/vga/unicode.8x16.font";
-dflt:
-    return NULL;  /* use Plan 9's default font */
+    return f != NULL && (strstr(f, "ourier") || strstr(f, "ixed")
+            || strstr(f, "ono") || strstr(f, "onospace")
+            || strstr(f, "erminal"));
+}
+
+static int
+IsSerifFamily(const char *f)
+{
+    return f != NULL && (strstr(f, "imes") || strstr(f, "erif")
+            || strstr(f, "oman"));
+}
+
+/*
+ * Open the file whose nominal size is nearest to wantPixels, trying
+ * successively worse matches until one opens.
+ */
+static void *
+OpenNearest(const P9FontFile *table, int wantPixels)
+{
+    int used[32];
+    int nused = 0, i, best, bestd, d;
+    void *fnt;
+
+    for (;;) {
+        best = -1;
+        bestd = 0;
+        for (i = 0; table[i].path != NULL; i++) {
+            int j, skip = 0;
+            for (j = 0; j < nused; j++)
+                if (used[j] == i) { skip = 1; break; }
+            if (skip)
+                continue;
+            d = table[i].pixels - wantPixels;
+            if (d < 0)
+                d = -d;
+            if (best < 0 || d < bestd) { best = i; bestd = d; }
+        }
+        if (best < 0)
+            return NULL;
+        fnt = tkp9_openfontpath(table[best].path);
+        if (fnt != NULL)
+            return fnt;
+        if (nused >= (int)(sizeof used / sizeof used[0]))
+            return NULL;
+        used[nused++] = best;
+    }
+}
+
+/*
+ * Tk uses fm.fixed to skip measuring character by character, so claiming
+ * it for a proportional font mislays every string. libdraw does not say,
+ * so ask the font.
+ */
+static int
+FontIsFixed(void *fnt)
+{
+    return tkp9_measuretext(fnt, "i", 1) == tkp9_measuretext(fnt, "W", 1);
+}
+
+static void *
+ChooseFont(Tk_Window tkwin, const TkFontAttributes *faPtr)
+{
+    const P9FontFile *table;
+    int pixels;
+    void *fnt;
+
+    pixels = (int)(TkFontGetPixels(tkwin, faPtr->size) + 0.5);
+    if (pixels <= 0)
+        pixels = 13;			/* Tk's own fallback size */
+
+    if (IsMonoFamily(faPtr->family))
+        table = monoFonts;
+    else if (IsSerifFamily(faPtr->family))
+        table = serifFonts;
+    else
+        table = propFonts;
+
+    fnt = OpenNearest(table, pixels);
+    if (fnt == NULL && table != monoFonts)
+        fnt = OpenNearest(monoFonts, pixels);
+    if (fnt == NULL)
+        fnt = tkp9_openfont(NULL);	/* libdraw's default */
+    return fnt;
 }
 
 /* ------------------------------------------------------------------ */
@@ -71,17 +195,37 @@ TkpFontPkgInit(TkMainInfo *mainPtr)
 /* TkpGetNativeFont                                                   */
 /* ------------------------------------------------------------------ */
 
+/*
+ * Look up a font by *native* name, and fail if the name is not one.
+ *
+ * Failing is the whole contract. tkFont.c calls this first and, when it
+ * returns NULL, parses the string itself -- as an XLFD, as a
+ * "{family} size style" list, or as -family/-size option pairs -- and
+ * comes back through TkpGetFontFromAttributes. This used to accept
+ * everything, opening the default font for any string whatsoever, so
+ * that parsing never happened: sizes and styles were silently ignored,
+ *
+ *	font actual {Helvetica -12}
+ *	  -> -family {Helvetica -12} -size 18
+ *
+ * an XLFD came back whole as the family name, and an empty font name --
+ * which must be an error -- was accepted (button-1.104, canvasText-1.7).
+ *
+ * The only genuinely native name here is the path of a Plan 9 font
+ * file, which is what openfont(2) takes.
+ */
 TkFont *
 TkpGetNativeFont(Tk_Window tkwin, const char *name)
 {
     P9Font *p9f;
-    const char *path;
     void *fnt;
     (void)tkwin;
 
-    path = MapFontName(name);
-    fnt  = tkp9_openfont(path);  /* returns default if path==NULL */
-    if (!fnt) return NULL;
+    if (name == NULL || name[0] != '/')
+        return NULL;
+    fnt = tkp9_openfontpath(name);
+    if (fnt == NULL)
+        return NULL;
 
     p9f = (P9Font *) ckalloc(sizeof(P9Font));
     memset(p9f, 0, sizeof(P9Font));
@@ -91,14 +235,14 @@ TkpGetNativeFont(Tk_Window tkwin, const char *name)
     p9f->height  = tkp9_fontheight(fnt);
 
     p9f->header.fa.family     = Tk_GetUid(name);
-    p9f->header.fa.size       = p9f->height;
+    p9f->header.fa.size       = -p9f->height;	/* negative == pixels */
     p9f->header.fa.weight     = TK_FW_NORMAL;
     p9f->header.fa.slant      = TK_FS_ROMAN;
     p9f->header.fa.underline  = 0;
     p9f->header.fa.overstrike = 0;
     p9f->header.fm.ascent     = p9f->ascent;
     p9f->header.fm.descent    = p9f->descent;
-    p9f->header.fm.fixed      = 1;
+    p9f->header.fm.fixed      = FontIsFixed(fnt);
     p9f->header.fm.maxWidth   = tkp9_measuretext(fnt, "W", 1);
 
     return (TkFont *)p9f;
@@ -115,16 +259,14 @@ TkpGetFontFromAttributes(
     const TkFontAttributes *faPtr)
 {
     P9Font *p9f;
-    const char *path;
     void *fnt;
-    (void)tkwin;
 
-    path = MapFontName(faPtr->family);
-    fnt  = tkp9_openfont(path);
-    if (!fnt) return NULL;
+    fnt = ChooseFont(tkwin, faPtr);
+    if (fnt == NULL)
+        return NULL;
 
     if (tkFontPtr != NULL) {
-        /* Reuse existing struct */
+        /* Reuse the existing struct; generic Tk still owns it. */
         p9f = (P9Font *)tkFontPtr;
         tkp9_closefont(p9f->p9font);
     } else {
@@ -137,11 +279,17 @@ TkpGetFontFromAttributes(
     p9f->descent = tkp9_fontdescent(fnt);
     p9f->height  = tkp9_fontheight(fnt);
 
-    p9f->header.fa             = *faPtr;
-    p9f->header.fm.ascent      = p9f->ascent;
-    p9f->header.fm.descent     = p9f->descent;
-    p9f->header.fm.fixed       = 1;
-    p9f->header.fm.maxWidth    = tkp9_measuretext(fnt, "W", 1);
+    /*
+     * Report back what was asked for, not what was found: Tk caches on
+     * these attributes, and answering with the file's own size would
+     * make "font actual" disagree with the request for every size that
+     * has no exact bitmap.
+     */
+    p9f->header.fa          = *faPtr;
+    p9f->header.fm.ascent   = p9f->ascent;
+    p9f->header.fm.descent  = p9f->descent;
+    p9f->header.fm.fixed    = FontIsFixed(fnt);
+    p9f->header.fm.maxWidth = tkp9_measuretext(fnt, "W", 1);
 
     return (TkFont *)p9f;
 }
@@ -197,6 +345,7 @@ TkpGetFontFamilies(Tcl_Interp *interp, Tk_Window tkwin)
 {
     (void)tkwin;
     /* Return a small set of known Plan 9 font families */
+    Tcl_AppendElement(interp, "courier");
     Tcl_AppendElement(interp, "fixed");
     Tcl_AppendElement(interp, "helvetica");
     Tcl_AppendElement(interp, "times");

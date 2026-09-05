@@ -371,6 +371,13 @@ tkp9_openfont(const char *name)
     return f;
 }
 
+void *
+tkp9_openfontpath(const char *path)
+{
+    if(!path || !path[0]) return nil;
+    return openfont(display, path);
+}
+
 void
 tkp9_closefont(void *fnt)
 {

@@ -1358,6 +1358,41 @@ setting form was a silent no-op -- `wm geometry .t 200x100` changed
 nothing and reported no error -- and the query was a hardcoded
 `"1x1+0+0"`, which is a very convincing wrong answer.
 
+### Tk on Plan 9: TkpGetNativeFont has to be able to fail
+
+`tkFont.c` asks the platform for a *native* font name first, and when
+that returns NULL it parses the string itself -- as an XLFD, as a
+`{family size style}` list, or as `-family`/`-size` option pairs -- and
+comes back through `TkpGetFontFromAttributes`. **Failing is the
+contract.** This port accepted every string and opened libdraw's default
+font for it, so the parsing never happened:
+
+```
+font actual {Helvetica -12}   ->  -family {Helvetica -12} -size 18
+font actual -xyz-times-*-...  ->  the whole XLFD as the family
+.l configure -font {}         ->  accepted, and must be an error
+```
+
+Sizes and styles were therefore ignored everywhere, which is 45 of
+font.test's failures plus `button-1.104..110` and `canvasText-1.7`.
+
+The only genuinely native name here is the path of a Plan 9 font file,
+so `TkpGetNativeFont` now refuses anything not starting with `/`, and
+`tkp9_openfontpath` opens exactly that file or fails -- `tkp9_openfont`
+falls back to the default font, which is the wrong answer when the
+caller needs to know whether a file exists.
+
+Plan 9 bitmap fonts come in discrete sizes, one file each, so
+`TkpGetFontFromAttributes` picks the nearest by pixel height from a
+table and skips candidates that will not open. **The table is a guess at
+what a 9front install ships**; `sys/lib/tests/tk-font-test.tcl` prints
+the real `/lib/font/bit` inventory, which is the thing to correct it
+against. A wrong entry costs size accuracy and nothing else.
+
+`fm.fixed` is measured (`width("i") == width("W")`) rather than assumed:
+Tk uses it to skip measuring character by character, so claiming it for
+a proportional font mislays every string.
+
 ### Syntax-check Tk's Plan 9 backend on the host before shipping it
 
 A round trip to the VM costs a full rebuild, and twice now it has been
