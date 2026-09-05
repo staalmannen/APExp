@@ -36,12 +36,32 @@ GCBackgroundRGBA(GC gc)
 }
 
 /* ------------------------------------------------------------------ */
-/* Window offset lookup                                                */
+/* Drawable resolution                                                 */
 /* ------------------------------------------------------------------ */
 
+/*
+ * Resolve a Drawable to something the draw layer can render into.
+ *
+ * A pixmap has its own image and its own coordinate space starting at
+ * (0,0). A window is drawn straight onto the screen at its position,
+ * which is the sum of its offsets up the parent chain.
+ *
+ * Tk double-buffers nearly every widget through a pixmap, so getting
+ * this right is what makes widgets appear where they belong rather than
+ * as scratch drawing in the corner of the window.
+ */
 static void
-DrawableOffset(Drawable d, int *ox, int *oy)
+DrawableTarget(Drawable d, void **img, int *ox, int *oy)
 {
+    P9Window *pw = TkP9FindWindow((Window)d);
+
+    if (pw != NULL && pw->ispixmap) {
+	*img = pw->img;
+	*ox = 0;
+	*oy = 0;
+	return;
+    }
+    *img = NULL;			/* the window on screen */
     TkP9WindowOffset((Window)d, ox, oy);
 }
 
@@ -53,13 +73,14 @@ int
 XDrawLines(Display *display, Drawable d, GC gc,
            XPoint *points, int npoints, int mode)
 {
+    void *img;
     int ox, oy, i;
     unsigned long rgba;
     int lw;
     (void)display;
 
     if (npoints < 2) return 0;
-    DrawableOffset(d, &ox, &oy);
+    DrawableTarget(d, &img, &ox, &oy);
     rgba = GCForegroundRGBA(gc);
     lw   = (gc->line_width > 0) ? (int)gc->line_width : 1;
 
@@ -78,7 +99,7 @@ XDrawLines(Display *display, Drawable d, GC gc,
             cx += points[i+1].x; cy += points[i+1].y;
             x2 = cx; y2 = cy;
         }
-        tkp9_drawline(x1, y1, x2, y2, lw, rgba);
+        tkp9_drawline(img, x1, y1, x2, y2, lw, rgba);
     }
     return 0;
 }
@@ -87,15 +108,16 @@ int
 XFillRectangles(Display *display, Drawable d, GC gc,
                 XRectangle *rects, int nrects)
 {
+    void *img;
     int ox, oy, i;
     unsigned long rgba;
     (void)display;
 
-    DrawableOffset(d, &ox, &oy);
+    DrawableTarget(d, &img, &ox, &oy);
     rgba = GCForegroundRGBA(gc);
 
     for (i = 0; i < nrects; i++)
-        tkp9_fillrect(rects[i].x + ox, rects[i].y + oy,
+        tkp9_fillrect(img, rects[i].x + ox, rects[i].y + oy,
                       rects[i].width, rects[i].height, rgba);
     return 0;
 }
@@ -104,15 +126,16 @@ int
 XDrawRectangle(Display *display, Drawable d, GC gc,
                int x, int y, unsigned int w, unsigned int h)
 {
+    void *img;
     int ox, oy;
     int lw;
     unsigned long rgba;
     (void)display;
 
-    DrawableOffset(d, &ox, &oy);
+    DrawableTarget(d, &img, &ox, &oy);
     rgba = GCForegroundRGBA(gc);
     lw   = (gc->line_width > 0) ? (int)gc->line_width : 1;
-    tkp9_drawrect(x + ox, y + oy, (int)w, (int)h, lw, rgba);
+    tkp9_drawrect(img, x + ox, y + oy, (int)w, (int)h, lw, rgba);
     return 0;
 }
 
@@ -134,14 +157,15 @@ XCopyArea(Display *display, Drawable src, Drawable dst, GC gc,
           unsigned int w, unsigned int h,
           int dst_x, int dst_y)
 {
+    void *simg, *dimg;
     int sox, soy, dox, doy;
     (void)display; (void)gc;
 
-    DrawableOffset(src, &sox, &soy);
-    DrawableOffset(dst, &dox, &doy);
-    tkp9_copyarea(src_x + sox, src_y + soy,
+    DrawableTarget(src, &simg, &sox, &soy);
+    DrawableTarget(dst, &dimg, &dox, &doy);
+    tkp9_copyarea(simg, src_x + sox, src_y + soy,
                   (int)w, (int)h,
-                  dst_x + dox, dst_y + doy);
+                  dimg, dst_x + dox, dst_y + doy);
     return 0;
 }
 
@@ -161,11 +185,12 @@ int
 XClearWindow(Display *display, Window w)
 {
     P9Window *pw = TkP9FindWindow(w);
+    void *img;
     int ox, oy;
     (void)display;
     if (!pw) return 0;
     TkP9WindowOffset(w, &ox, &oy);
-    tkp9_fillrect(ox, oy, pw->width, pw->height, pw->bg_pixel);
+    tkp9_fillrect(NULL, ox, oy, pw->width, pw->height, pw->bg_pixel);
     return 0;
 }
 
@@ -175,11 +200,12 @@ XClearArea(Display *display, Window w,
            Bool exposures)
 {
     P9Window *pw = TkP9FindWindow(w);
+    void *img;
     int ox, oy;
     (void)display; (void)exposures;
     if (!pw) return 0;
     TkP9WindowOffset(w, &ox, &oy);
-    tkp9_fillrect(ox + x, oy + y, (int)width, (int)height,
+    tkp9_fillrect(NULL, ox + x, oy + y, (int)width, (int)height,
                   pw->bg_pixel);
     return 0;
 }
@@ -189,15 +215,16 @@ XDrawArc(Display *display, Drawable d, GC gc,
          int x, int y, unsigned int w, unsigned int h,
          int angle1, int angle2)
 {
+    void *img;
     int ox, oy, lw;
     unsigned long rgba;
     (void)display;
 
-    DrawableOffset(d, &ox, &oy);
+    DrawableTarget(d, &img, &ox, &oy);
     rgba = GCForegroundRGBA(gc);
     lw   = (gc->line_width > 0) ? (int)gc->line_width : 1;
     /* Plan 9 arc: centre, semi-axes a,b, line-width, colour, angle pair */
-    tkp9_drawarc(x + ox + (int)w/2, y + oy + (int)h/2,
+    tkp9_drawarc(img, x + ox + (int)w/2, y + oy + (int)h/2,
                  (int)w/2, (int)h/2,
                  angle1/64, angle2/64, lw, rgba);
     return 0;
@@ -208,13 +235,14 @@ XFillArc(Display *display, Drawable d, GC gc,
          int x, int y, unsigned int w, unsigned int h,
          int angle1, int angle2)
 {
+    void *img;
     int ox, oy;
     unsigned long rgba;
     (void)display;
 
-    DrawableOffset(d, &ox, &oy);
+    DrawableTarget(d, &img, &ox, &oy);
     rgba = GCForegroundRGBA(gc);
-    tkp9_fillarc(x + ox + (int)w/2, y + oy + (int)h/2,
+    tkp9_fillarc(img, x + ox + (int)w/2, y + oy + (int)h/2,
                  (int)w/2, (int)h/2,
                  angle1/64, angle2/64, rgba);
     return 0;
@@ -248,13 +276,14 @@ int
 XFillPolygon(Display *display, Drawable d, GC gc,
              XPoint *points, int npoints, int shape, int mode)
 {
+    void *img;
     int ox, oy, i;
     int *xv, *yv;
     unsigned long rgba;
     (void)display; (void)shape; (void)mode;
 
     if (npoints < 1) return 0;
-    DrawableOffset(d, &ox, &oy);
+    DrawableTarget(d, &img, &ox, &oy);
     rgba = GCForegroundRGBA(gc);
 
     xv = (int *)ckalloc(npoints * sizeof(int));
@@ -263,7 +292,7 @@ XFillPolygon(Display *display, Drawable d, GC gc,
         xv[i] = points[i].x + ox;
         yv[i] = points[i].y + oy;
     }
-    tkp9_fillpoly(xv, yv, npoints, rgba);
+    tkp9_fillpoly(img, xv, yv, npoints, rgba);
     ckfree(xv);
     ckfree(yv);
     return 0;
@@ -273,15 +302,16 @@ int
 XDrawSegments(Display *display, Drawable d, GC gc,
               XSegment *segs, int nsegs)
 {
+    void *img;
     int ox, oy, i, lw;
     unsigned long rgba;
     (void)display;
 
-    DrawableOffset(d, &ox, &oy);
+    DrawableTarget(d, &img, &ox, &oy);
     rgba = GCForegroundRGBA(gc);
     lw   = (gc->line_width > 0) ? (int)gc->line_width : 1;
     for (i = 0; i < nsegs; i++)
-        tkp9_drawline(segs[i].x1 + ox, segs[i].y1 + oy,
+        tkp9_drawline(img, segs[i].x1 + ox, segs[i].y1 + oy,
                       segs[i].x2 + ox, segs[i].y2 + oy,
                       lw, rgba);
     return 0;
@@ -290,11 +320,12 @@ XDrawSegments(Display *display, Drawable d, GC gc,
 int
 XDrawPoint(Display *display, Drawable d, GC gc, int x, int y)
 {
+    void *img;
     int xv[1], yv[1], ox, oy;
     (void)display;
-    DrawableOffset(d, &ox, &oy);
+    DrawableTarget(d, &img, &ox, &oy);
     xv[0] = x + ox; yv[0] = y + oy;
-    tkp9_drawpoints(xv, yv, 1, GCForegroundRGBA(gc));
+    tkp9_drawpoints(img, xv, yv, 1, GCForegroundRGBA(gc));
     return 0;
 }
 
@@ -302,18 +333,19 @@ int
 XDrawPoints(Display *display, Drawable d, GC gc,
             XPoint *points, int npoints, int mode)
 {
+    void *img;
     int ox, oy, i;
     int *xv, *yv;
     (void)display; (void)mode;
 
-    DrawableOffset(d, &ox, &oy);
+    DrawableTarget(d, &img, &ox, &oy);
     xv = (int *)ckalloc(npoints * sizeof(int));
     yv = (int *)ckalloc(npoints * sizeof(int));
     for (i = 0; i < npoints; i++) {
         xv[i] = points[i].x + ox;
         yv[i] = points[i].y + oy;
     }
-    tkp9_drawpoints(xv, yv, npoints, GCForegroundRGBA(gc));
+    tkp9_drawpoints(img, xv, yv, npoints, GCForegroundRGBA(gc));
     ckfree(xv);
     ckfree(yv);
     return 0;
@@ -355,15 +387,35 @@ Pixmap
 XCreatePixmap(Display *display, Drawable d,
               unsigned int width, unsigned int height, unsigned int depth)
 {
-    /* For now, allocate a fake window as pixmap storage */
-    return XCreateWindow(display, (Window)d,
-                         0, 0, width, height, 0,
-                         (int)depth, InputOutput, CopyFromParent, 0, NULL);
+    /*
+     * A pixmap is backed by a fake window here, but it is *not* a child
+     * window: it is an independent drawable with its own coordinate
+     * space starting at (0,0). Marking it keeps TkP9WindowOffset from
+     * walking up to the parent it was created against and giving it
+     * that window's position on screen.
+     */
+    Window xid = XCreateWindow(display, (Window)d,
+                               0, 0, width, height, 0,
+                               (int)depth, InputOutput, CopyFromParent,
+                               0, NULL);
+    P9Window *pw = TkP9FindWindow(xid);
+
+    if (pw) {
+        pw->ispixmap = 1;
+        pw->img = tkp9_allocimage((int)width, (int)height);
+    }
+    return (Pixmap) xid;
 }
 
 int
 XFreePixmap(Display *display, Pixmap pixmap)
 {
+    P9Window *pw = TkP9FindWindow((Window)pixmap);
+
+    if (pw != NULL && pw->img != NULL) {
+        tkp9_freeimage(pw->img);
+        pw->img = NULL;
+    }
     return XDestroyWindow(display, (Window)pixmap);
 }
 

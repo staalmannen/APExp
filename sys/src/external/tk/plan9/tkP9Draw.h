@@ -33,21 +33,40 @@ int    tkp9_screenwidth(void);
 int    tkp9_screenheight(void);
 
 /*
- * Drawing — all coordinates are absolute screen pixels.
+ * Off-screen drawables.
+ *
+ * A pixmap is a real image, not a rectangle borrowed from the screen.
+ * Tk double-buffers nearly every widget -- draw into a pixmap, then
+ * XCopyArea it into place -- so without these the scratch drawing went
+ * straight to the window and the copy was a no-op.
+ */
+void  *tkp9_allocimage(int w, int h);	/* origin (0,0); nil on failure */
+void   tkp9_freeimage(void *img);
+
+/*
+ * Drawing.
+ *
+ * 'dst' is a drawable from tkp9_allocimage, or NULL for the window on
+ * screen. Coordinates are relative to that drawable's own top-left, so
+ * a caller never has to know where the rio window sits on the display
+ * or where an image was allocated.
+ *
  * 'rgba' uses Plan 9 convention: 0xRRGGBBFF.
  */
-void   tkp9_fillrect(int x, int y, int w, int h, unsigned long rgba);
-void   tkp9_drawline(int x1, int y1, int x2, int y2, int width,
+void   tkp9_fillrect(void *dst, int x, int y, int w, int h,
 		     unsigned long rgba);
-void   tkp9_drawrect(int x, int y, int w, int h, int bw,
+void   tkp9_drawline(void *dst, int x1, int y1, int x2, int y2, int width,
 		     unsigned long rgba);
-void   tkp9_copyarea(int sx, int sy, int w, int h, int dx, int dy);
-void   tkp9_drawarc(int x, int y, int a, int b, int angle1, int angle2,
-		    int lw, unsigned long rgba);
-void   tkp9_fillarc(int x, int y, int a, int b, int angle1, int angle2,
-		    unsigned long rgba);
-void   tkp9_fillpoly(int *xv, int *yv, int n, unsigned long rgba);
-void   tkp9_drawpoints(int *xv, int *yv, int n, unsigned long rgba);
+void   tkp9_drawrect(void *dst, int x, int y, int w, int h, int bw,
+		     unsigned long rgba);
+void   tkp9_copyarea(void *src, int sx, int sy, int w, int h,
+		     void *dst, int dx, int dy);
+void   tkp9_drawarc(void *dst, int x, int y, int a, int b,
+		    int angle1, int angle2, int lw, unsigned long rgba);
+void   tkp9_fillarc(void *dst, int x, int y, int a, int b,
+		    int angle1, int angle2, unsigned long rgba);
+void   tkp9_fillpoly(void *dst, int *xv, int *yv, int n, unsigned long rgba);
+void   tkp9_drawpoints(void *dst, int *xv, int *yv, int n, unsigned long rgba);
 void   tkp9_flush(void);
 
 /*
@@ -63,14 +82,13 @@ int    tkp9_measuretext(void *fnt, const char *s, int nbytes);
 /*
  * Text drawing
  */
-void   tkp9_drawtext(int x, int y, const char *s, int nbytes,
+void   tkp9_drawtext(void *dst, int x, int y, const char *s, int nbytes,
 		     void *fnt, unsigned long rgba);
 
 /*
- * Image blending — put a row of RGBA pixels into the screen
- * at (x, y), 'npix' pixels wide.
+ * Image blending — put w*h RGBA pixels into 'dst' at (x, y).
  */
-void   tkp9_putpixels(int x, int y, int w, int h,
+void   tkp9_putpixels(void *dst, int x, int y, int w, int h,
 		      const unsigned char *rgba32);
 
 /*

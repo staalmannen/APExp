@@ -295,14 +295,30 @@ Tk_DrawChars(
     void *fnt;
     int ox, oy;
     unsigned long rgba;
+    P9Window *pw;
+    void *img;
     (void)display;
 
     fnt  = p9f ? p9f->p9font : NULL;
-    TkP9WindowOffset((Window)d, &ox, &oy);
     rgba = TkP9XColorStructToRGBA(gc->foreground);
 
+    /*
+     * Text goes to the same place as everything else: a pixmap's own
+     * image in its own coordinates, or the window on screen at its
+     * position. Tk draws widget text into a pixmap and blits it, so
+     * this has to agree with XCopyArea or the text lands in the corner.
+     */
+    pw = TkP9FindWindow((Window)d);
+    if (pw != NULL && pw->ispixmap) {
+        img = pw->img;
+        ox = oy = 0;
+    } else {
+        img = NULL;
+        TkP9WindowOffset((Window)d, &ox, &oy);
+    }
+
     /* y in Tk is the baseline; Plan 9 string() also uses baseline */
-    tkp9_drawtext(x + ox, y + oy - (p9f ? p9f->ascent : 0),
+    tkp9_drawtext(img, x + ox, y + oy - (p9f ? p9f->ascent : 0),
                   source, (int)numBytes, fnt, rgba);
 }
 

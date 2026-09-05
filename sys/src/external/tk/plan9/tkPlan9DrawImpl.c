@@ -104,36 +104,63 @@ tkp9_screenheight(void)
 }
 
 /* ------------------------------------------------------------------ */
-/* Window-relative coordinates                                         */
+/* Destinations and drawable-relative coordinates                      */
 /* ------------------------------------------------------------------ */
 
 /*
- * Tk works in coordinates relative to the top-left of the application's
- * area; libdraw works in display coordinates. A rio window's image has
- * screen->r placed wherever the window sits on the display, so its
- * origin is not (0,0) except by accident.
+ * Callers work in coordinates relative to a drawable's own top-left and
+ * pass NULL for "the window on screen". libdraw works in the
+ * destination image's own coordinates, and an image's r.min is wherever
+ * it happens to live -- for a rio window, wherever the window sits on
+ * the display; for an allocated image, (0,0).
  *
- * Everything below therefore has to be translated by screen->r.min.
- * Without it every draw call landed outside screen->r, was clipped away
- * entirely, and wish showed a blank window however correctly Tk was
- * drawing -- which is exactly what it did: events, geometry, mapping and
- * font measurement were all fine, because none of them touch display
- * coordinates.
- *
- * Note tkp9_screenwidth/height are already right: Dx and Dy are
- * differences, so the offset cancels.
+ * Translating by dst->r.min therefore handles both uniformly. Without
+ * it every draw call to the screen landed outside screen->r and was
+ * clipped away, which is why wish showed a blank window however
+ * correctly Tk was drawing.
  */
-static Point
-p9pt(int x, int y)
+static Image *
+dstimage(void *dst)
 {
-    return Pt(x + screen->r.min.x, y + screen->r.min.y);
+    return dst ? (Image *) dst : screen;
+}
+
+static Point
+dstpt(Image *d, int x, int y)
+{
+    return Pt(d->r.min.x + x, d->r.min.y + y);
 }
 
 static Rectangle
-p9rect(int x, int y, int w, int h)
+dstrect(Image *d, int x, int y, int w, int h)
 {
-    return Rect(x + screen->r.min.x,     y + screen->r.min.y,
-                x + w + screen->r.min.x, y + h + screen->r.min.y);
+    return Rect(d->r.min.x + x,     d->r.min.y + y,
+                d->r.min.x + x + w, d->r.min.y + y + h);
+}
+
+/* ------------------------------------------------------------------ */
+/* Off-screen drawables                                                */
+/* ------------------------------------------------------------------ */
+
+void *
+tkp9_allocimage(int w, int h)
+{
+    if(!display || w <= 0 || h <= 0)
+        return nil;
+    /*
+     * Allocated at the origin so the caller's coordinates need no
+     * adjustment, and in the screen's channel format so blitting to and
+     * from the window needs no conversion.
+     */
+    return allocimage(display, Rect(0, 0, w, h),
+                      screen ? screen->chan : RGB24, 0, DWhite);
+}
+
+void
+tkp9_freeimage(void *img)
+{
+    if(img && img != screen)
+        freeimage((Image *)img);
 }
 
 /* ------------------------------------------------------------------ */
@@ -141,102 +168,106 @@ p9rect(int x, int y, int w, int h)
 /* ------------------------------------------------------------------ */
 
 void
-tkp9_fillrect(int x, int y, int w, int h, unsigned long rgba)
+tkp9_fillrect(void *dst, int x, int y, int w, int h, unsigned long rgba)
 {
-    Image *src;
-    if(!screen) return;
+    Image *d = dstimage(dst), *src;
+    if(!d) return;
     src = colorimage(rgba);
     if(!src) return;
-    draw(screen, p9rect(x, y, w, h), src, nil, ZP);
+    draw(d, dstrect(d, x, y, w, h), src, nil, ZP);
     freeimage(src);
 }
 
 void
-tkp9_drawline(int x1, int y1, int x2, int y2, int lw, unsigned long rgba)
+tkp9_drawline(void *dst, int x1, int y1, int x2, int y2, int lw,
+              unsigned long rgba)
 {
-    Image *src;
-    if(!screen) return;
+    Image *d = dstimage(dst), *src;
+    if(!d) return;
     src = colorimage(rgba);
     if(!src) return;
     if(lw < 1) lw = 1;
-    line(screen, p9pt(x1, y1), p9pt(x2, y2), Endsquare, Endsquare,
+    line(d, dstpt(d, x1, y1), dstpt(d, x2, y2), Endsquare, Endsquare,
          lw/2, src, ZP);
     freeimage(src);
 }
 
 void
-tkp9_drawrect(int x, int y, int w, int h, int bw, unsigned long rgba)
+tkp9_drawrect(void *dst, int x, int y, int w, int h, int bw,
+              unsigned long rgba)
 {
-    Image *src;
-    if(!screen || bw < 1) return;
+    Image *d = dstimage(dst), *src;
+    if(!d || bw < 1) return;
     src = colorimage(rgba);
     if(!src) return;
-    border(screen, p9rect(x, y, w, h), bw, src, ZP);
+    border(d, dstrect(d, x, y, w, h), bw, src, ZP);
     freeimage(src);
 }
 
 void
-tkp9_copyarea(int sx, int sy, int w, int h, int dx, int dy)
+tkp9_copyarea(void *src, int sx, int sy, int w, int h,
+              void *dst, int dx, int dy)
 {
-    if(!screen) return;
-    draw(screen, p9rect(dx, dy, w, h), screen, nil, p9pt(sx, sy));
+    Image *s = dstimage(src), *d = dstimage(dst);
+    if(!s || !d) return;
+    draw(d, dstrect(d, dx, dy, w, h), s, nil, dstpt(s, sx, sy));
 }
 
 void
-tkp9_drawarc(int x, int y, int a, int b, int angle1, int angle2,
+tkp9_drawarc(void *dst, int x, int y, int a, int b, int angle1, int angle2,
              int lw, unsigned long rgba)
 {
-    Image *src;
-    if(!screen) return;
+    Image *d = dstimage(dst), *src;
+    if(!d) return;
     src = colorimage(rgba);
     if(!src) return;
     if(lw < 1) lw = 1;
-    arc(screen, p9pt(x, y), a, b, lw/2, src, ZP, angle1, angle2);
+    arc(d, dstpt(d, x, y), a, b, lw/2, src, ZP, angle1, angle2);
     freeimage(src);
 }
 
 void
-tkp9_fillarc(int x, int y, int a, int b, int angle1, int angle2,
+tkp9_fillarc(void *dst, int x, int y, int a, int b, int angle1, int angle2,
              unsigned long rgba)
 {
-    Image *src;
-    if(!screen) return;
+    Image *d = dstimage(dst), *src;
+    if(!d) return;
     src = colorimage(rgba);
     if(!src) return;
-    fillarc(screen, p9pt(x, y), a, b, src, ZP, angle1, angle2);
+    fillarc(d, dstpt(d, x, y), a, b, src, ZP, angle1, angle2);
     freeimage(src);
 }
 
 void
-tkp9_fillpoly(int *xv, int *yv, int n, unsigned long rgba)
+tkp9_fillpoly(void *dst, int *xv, int *yv, int n, unsigned long rgba)
 {
+    Image *d = dstimage(dst), *src;
     Point *pts;
-    Image *src;
     int i;
-    if(!screen || n < 1) return;
+    if(!d || n < 1) return;
     pts = malloc(n * sizeof(Point));
     if(!pts) return;
     for(i = 0; i < n; i++) {
-        pts[i] = p9pt(xv[i], yv[i]);
+        pts[i] = dstpt(d, xv[i], yv[i]);
     }
     src = colorimage(rgba);
     if(src) {
-        fillpoly(screen, pts, n, 0, src, ZP);
+        fillpoly(d, pts, n, 0, src, ZP);
         freeimage(src);
     }
     free(pts);
 }
 
 void
-tkp9_drawpoints(int *xv, int *yv, int n, unsigned long rgba)
+tkp9_drawpoints(void *dst, int *xv, int *yv, int n, unsigned long rgba)
 {
-    Image *src;
+    Image *d = dstimage(dst), *src;
     int i;
-    if(!screen || n < 1) return;
+    if(!d || n < 1) return;
     src = colorimage(rgba);
     if(!src) return;
     for(i = 0; i < n; i++)
-        draw(screen, p9rect(xv[i], yv[i], 1, 1), src, nil, ZP);
+        draw(d, dstrect(d, xv[i], yv[i], 1, 1), src, nil, ZP);
     freeimage(src);
 }
 
@@ -302,16 +333,16 @@ tkp9_measuretext(void *fnt, const char *s, int nbytes)
 /* ------------------------------------------------------------------ */
 
 void
-tkp9_drawtext(int x, int y, const char *s, int nbytes,
+tkp9_drawtext(void *dst, int x, int y, const char *s, int nbytes,
               void *fnt, unsigned long rgba)
 {
-    Image *src;
+    Image *d = dstimage(dst), *src;
     Font *f;
-    if(!screen || !s || nbytes <= 0) return;
+    if(!d || !s || nbytes <= 0) return;
     f   = fnt ? (Font *)fnt : font;
     src = colorimage(rgba);
     if(!src) return;
-    stringn(screen, p9pt(x, y), src, ZP, f, s, nbytes);
+    stringn(d, dstpt(d, x, y), src, ZP, f, s, nbytes);
     freeimage(src);
 }
 
@@ -320,14 +351,15 @@ tkp9_drawtext(int x, int y, const char *s, int nbytes,
 /* ------------------------------------------------------------------ */
 
 void
-tkp9_putpixels(int x, int y, int w, int h, const unsigned char *rgba32)
+tkp9_putpixels(void *dst, int x, int y, int w, int h,
+               const unsigned char *rgba32)
 {
-    Image *img;
-    if(!screen || !rgba32 || w <= 0 || h <= 0) return;
-    img = allocimage(display, p9rect(x, y, w, h), RGBA32, 0, DTransparent);
+    Image *d = dstimage(dst), *img;
+    if(!d || !rgba32 || w <= 0 || h <= 0) return;
+    img = allocimage(display, Rect(0, 0, w, h), RGBA32, 0, DTransparent);
     if(!img) return;
     loadimage(img, img->r, (uchar*)rgba32, w * h * 4);
-    draw(screen, img->r, img, nil, img->r.min);
+    draw(d, dstrect(d, x, y, w, h), img, nil, img->r.min);
     freeimage(img);
 }
 
