@@ -37,6 +37,18 @@
 /* Root window XID */
 #define TKP9_ROOT_XID   10
 
+/*
+ * Pending-event ring size. Must be a power of two: TkP9EnqueueEvent and
+ * TkP9DequeueEvent wrap with TKP9_EVQMASK.
+ *
+ * Mapping one window enqueues three events (MapNotify, VisibilityNotify,
+ * Expose) and the ring drops silently when it is full, so this has to
+ * comfortably exceed the number of windows a single "update" can map --
+ * a Tk test file builds a widget tree and maps all of it at once.
+ */
+#define TKP9_EVQUEUE    1024
+#define TKP9_EVQMASK    (TKP9_EVQUEUE - 1)
+
 /* ------------------------------------------------------------------ */
 /* Per-window record                                                   */
 /* ------------------------------------------------------------------ */
@@ -72,7 +84,7 @@ typedef struct P9DisplayState {
     P9Window     wins[TKP9_MAX_WINDOWS];
     int          nwins;
     /* Pending X events queue (simple ring buffer) */
-    XEvent       evqueue[256];
+    XEvent       evqueue[TKP9_EVQUEUE];
     int          evhead;
     int          evtail;
     /* Last known mouse state */
