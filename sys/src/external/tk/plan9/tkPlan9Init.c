@@ -815,10 +815,45 @@ XWithdrawWindow(Display *display, Window w, int screen)
     return XUnmapWindow(display, w);
 }
 
+/*
+ * rio owns the keyboard, so there is no focus server to ask and nothing
+ * tells us which window a keystroke was meant for. Tk tells us instead:
+ * TkpChangeFocus calls XSetInputFocus with the toplevel it wants, and
+ * GenerateKeyEvent addresses the event to whatever we last recorded.
+ *
+ * The event has to name a window Tk knows, not the root: Tk_HandleEvent
+ * looks the window up and drops the event when there is no TkWindow for
+ * it, and the root is not one -- so with the root hardwired as the
+ * destination, as it was, every keystroke was discarded before
+ * TkFocusKeyEvent could redirect it to the focus widget. Until Tk sets
+ * a focus, fall back to the first mapped child of the root, which is
+ * the one toplevel a wish normally has.
+ */
+Window
+TkP9FocusWindow(void)
+{
+    P9Window *pw;
+    int i;
+
+    if (gP9.focuswin != None && gP9.focuswin != TKP9_ROOT_XID) {
+        pw = TkP9FindWindow(gP9.focuswin);
+        if (pw != NULL && pw->mapped && !pw->ispixmap)
+            return gP9.focuswin;
+    }
+    for (i = 0; i < gP9.nwins; i++) {
+        pw = &gP9.wins[i];
+        if (pw->inuse && pw->mapped && !pw->ispixmap &&
+            pw->xid != TKP9_ROOT_XID && pw->parent == TKP9_ROOT_XID)
+            return pw->xid;
+    }
+    return TKP9_ROOT_XID;
+}
+
 int
 XSetInputFocus(Display *display, Window w, int revert, Time t)
 {
-    (void)display; (void)w; (void)revert; (void)t;
+    (void)display; (void)revert; (void)t;
+    gP9.focuswin = w;
     return 0;
 }
 
@@ -826,7 +861,7 @@ int
 XGetInputFocus(Display *display, Window *focus_return, int *revert_return)
 {
     (void)display;
-    if (focus_return)  *focus_return  = TKP9_ROOT_XID;
+    if (focus_return)  *focus_return  = TkP9FocusWindow();
     if (revert_return) *revert_return = RevertToParent;
     return 0;
 }

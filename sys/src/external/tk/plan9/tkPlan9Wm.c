@@ -68,10 +68,20 @@ TkpWmConfigure(TkWindow *winPtr, int w, int h)
 /* Focus management (trivial — no separate focus server)              */
 /* ------------------------------------------------------------------ */
 
+/*
+ * Record where keyboard input should go. Returning 0 tells tkFocus.c to
+ * generate the FocusIn/FocusOut events itself rather than waiting for
+ * ones from a server -- there is no server here to send them. That is
+ * also what tkUnixWm.c's TkpChangeFocus returns when it does not call
+ * XSetInputFocus.
+ */
 int
 TkpChangeFocus(TkWindow *winPtr, int claim)
 {
-    (void)winPtr; (void)claim;
+    (void)claim;
+    if (winPtr != NULL && winPtr->window != None)
+	XSetInputFocus(winPtr->display, winPtr->window, RevertToParent,
+	               CurrentTime);
     return 0;
 }
 

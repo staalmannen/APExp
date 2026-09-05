@@ -78,6 +78,8 @@ typedef struct P9DisplayState {
     /* Last known mouse state */
     TkP9Mouse    lastmouse;
     int          lastbuttons;
+    /* Window that keyboard input is delivered to (see TkP9FocusWindow) */
+    Window       focuswin;
     /* Display/screen pointers (set by XkbOpenDisplay) */
     Display     *xdisplay;
     /* Tcl event source state */
@@ -92,6 +94,7 @@ extern P9DisplayState gP9;
 
 extern P9Window *TkP9FindWindow(Window xid);
 extern void      TkP9WindowOffset(Window xid, int *ox, int *oy);
+extern Window    TkP9FocusWindow(void);
 extern P9Window *TkP9AllocWindow(void);
 extern void      TkP9FreeWindow(Window xid);
 

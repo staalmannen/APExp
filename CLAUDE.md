@@ -1195,6 +1195,45 @@ create/destroy, one at a time). The technique that actually worked, all
 three times, was a `fprintf(stderr, ...)` at each step of the suspect
 function -- not acid, which fights `wish` for the rio window.
 
+### Tk on Plan 9: a keycode here is a keysym, whole
+
+There is no keyboard map on Plan 9. `/dev/cons` gives a **rune**, not a
+scan code, so the X two-step of keycode -> keysym has nothing to do and
+the two are the same thing. Every function in `plan9/` that converts
+between them is therefore the identity, and the one that was not is the
+one that broke.
+
+`XKeysymToKeycode` masked with `0xFF`. That is fine for Latin-1 and
+wrong for everything else, because **every special key lives in the
+0xFF00 page**: `XK_Up` is 0xFF52, so it arrived as 0x52, `R`. Down was
+`T`, Return 0x0D, and the whole page collapsed onto ASCII. `KeyCode` is
+an `unsigned int` in this shim (`xlib/X11/X.h:112`, widened for the Mac
+IME) and `XKeyEvent.keycode` is one too, so there was never a reason to
+narrow it.
+
+Three hooks `tkBind.c` needs were empty stubs, in
+`plan9/tkPlan9Stubs.c`:
+
+- `TkpSetKeycodeAndState` -- `event generate` calls it at
+  `tkBind.c:4156` and then refuses the event if `keycode == 0`. Doing
+  nothing is how `event generate .f <Key-a>` became
+  `no keycode for keysym "a"`, and it is why `bind.test` alone had 146
+  failures, all of them key events.
+- `TkpGetKeySym` -- returned `NoSymbol` for anything that was not a
+  `KeyPress`, so the release half of every binding was lost.
+- `TkpGetString` -- `%A` in a binding script.
+
+**A key event must name a window Tk knows.** `GenerateKeyEvent` sent
+every keystroke to the root, and `Tk_HandleEvent` drops an event whose
+window has no `TkWindow` -- so real typing was discarded before
+`TkFocusKeyEvent` could redirect it to the focus widget. Nothing here
+can ask who has focus (rio owns the keyboard), so Tk is the authority:
+`TkpChangeFocus` records the toplevel through `XSetInputFocus`, and
+`TkP9FocusWindow` hands it back, falling back to the first mapped child
+of the root. Note this is invisible to `event generate`, which names its
+own window -- so the synthetic and the real path fail separately, and
+`tk-bind-test.tcl` only covers the synthetic one.
+
 ### Build order for compiler changes
 ```
 cd sys/src/cmd/cc && mk nuke && mk install   # regenerates y.tab.h

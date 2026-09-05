@@ -198,7 +198,7 @@ static void
 GenerateKeyEvent(Display *dpy, int rune, int press)
 {
     XEvent ev;
-    Window focus = TKP9_ROOT_XID;
+    Window focus = TkP9FocusWindow();
     KeySym sym;
 
     sym = RuneToKeySym(rune);
@@ -208,12 +208,9 @@ GenerateKeyEvent(Display *dpy, int rune, int press)
     ev.xkey.display       = dpy;
     ev.xkey.window        = focus;
     ev.xkey.root          = TKP9_ROOT_XID;
-    ev.xkey.keycode       = (KeyCode)(rune & 0xFF);
     ev.xkey.state         = ButtonToMask(gP9.lastmouse.buttons);
     ev.xkey.time          = (Time)(gP9.lastmouse.msec);
-
-    /* Store keysym in the upper bits of keycode for TkpGetKeySym */
-    ev.xkey.keycode = XKeysymToKeycode(dpy, sym);
+    ev.xkey.keycode       = XKeysymToKeycode(dpy, sym);
     TkP9EnqueueEvent(&ev);
 
     /* Auto-generate KeyRelease for non-modifier keys */
@@ -422,9 +419,22 @@ KeyCode
 XKeysymToKeycode(Display *display, KeySym sym)
 {
     (void)display;
-    /* Simple mapping: use low byte of keysym as keycode */
-    if (sym < 0x100) return (KeyCode)sym;
-    return (KeyCode)(sym & 0xFF);
+    /*
+     * There is no keyboard map on Plan 9 -- /dev/cons hands us a rune,
+     * not a scan code -- so a keycode here is simply a keysym, and this
+     * is the identity. Tk's own KeyCode is an unsigned int (X.h:112,
+     * widened for the Mac IME), and XKeyEvent.keycode is unsigned int
+     * too, so every keysym fits.
+     *
+     * It used to mask with 0xFF, which is only harmless for Latin-1.
+     * Every special key shares the 0xFF00 page -- XK_Up is 0xFF52 --
+     * so the mask turned Up into 'R', Down into 'T', Return into 0x0D,
+     * and collapsed the whole page onto the ASCII range. Anything
+     * reading the keysym back (TkpGetKeySym, XKeycodeToKeysym,
+     * XmbLookupString, all of which are the identity in the other
+     * direction) then got a different key than the one pressed.
+     */
+    return (KeyCode)sym;
 }
 
 KeySym
