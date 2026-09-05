@@ -59,17 +59,46 @@ foreach {label ev} {
     bind .f $ev {}
 }
 
-# 1b. Key events again, with the focus set. Tk_HandleEvent redirects
-# KeyPress/KeyRelease to the focus window and drops them when there is
-# none, so a bare "event generate .f <Key-a>" proves nothing on its own.
+# 1c. Key events: is it delivery, or pattern matching?
+#
+# bind.test's remaining failures are all key events -- <:>, <+>, <_>,
+# <Key-a> -- and every one returns empty. Two very different causes look
+# identical from Tcl: the event never reaches the binding table, or it
+# arrives and fails to match the pattern.
+#
+# A catch-all <Key> binding separates them. If <Key> fires and <Key-a>
+# does not, delivery is fine and the keysym is wrong, in which case %K
+# and %k say what Tk actually saw -- that is TkpGetKeySym's answer, and
+# on this port it just hands back xkey.keycode, which XKeysymToKeycode
+# produced as (keysym & 0xFF).
 focus -force .f
 update
 mark "focus is now [focus]"
+
+set ::hits {}
+bind .f <Key> {lappend ::hits "Key: K=%K k=%k"}
+event generate .f <Key-a>
+mark "catch-all <Key> after <Key-a>: [expr {[llength $::hits] ? $::hits : "not delivered"}]"
+bind .f <Key> {}
+
 set ::hits {}
 bind .f <Key-a> {lappend ::hits fired}
 event generate .f <Key-a>
-mark "KeyA with focus: [expr {[llength $::hits] ? "FIRED" : "not delivered"}]"
+mark "specific <Key-a>: [expr {[llength $::hits] ? "FIRED" : "not delivered"}]"
 bind .f <Key-a> {}
+
+# The same event asked for by keysym rather than by pattern, and a
+# couple of the punctuation keys bind.test uses.
+foreach k {a colon plus underscore} {
+    set ::hits {}
+    bind .f <Key> {lappend ::hits "K=%K"}
+    if {[catch {event generate .f <Key> -keysym $k} err]} {
+	mark "keysym $k: event generate raised: $err"
+    } else {
+	mark "keysym $k: [expr {[llength $::hits] ? $::hits : "not delivered"}]"
+    }
+    bind .f <Key> {}
+}
 
 # 2. Queued delivery, to see whether the two paths differ.
 set ::hits {}
