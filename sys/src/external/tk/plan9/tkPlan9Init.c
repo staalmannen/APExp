@@ -100,7 +100,7 @@ TkP9FreeWindow(Window xid)
 void
 TkP9EnqueueEvent(XEvent *ev)
 {
-    int next = (gP9.evtail + 1) & 255;
+    int next = (gP9.evtail + 1) & TKP9_EVQMASK;
     if (next == gP9.evhead) return; /* drop if full */
     gP9.evqueue[gP9.evtail] = *ev;
     gP9.evtail = next;
@@ -111,7 +111,7 @@ TkP9DequeueEvent(XEvent *ev)
 {
     if (gP9.evhead == gP9.evtail) return 0;
     *ev = gP9.evqueue[gP9.evhead];
-    gP9.evhead = (gP9.evhead + 1) & 255;
+    gP9.evhead = (gP9.evhead + 1) & TKP9_EVQMASK;
     return 1;
 }
 
@@ -422,6 +422,46 @@ XMapWindow(Display *display, Window w)
     ev.xmap.event              = w;
     ev.xmap.window             = w;
     ev.xmap.override_redirect  = False;
+    TkP9EnqueueEvent(&ev);
+
+    /*
+     * Send VisibilityNotify. X sends one when a window becomes viewable,
+     * and Tk waits for it in more than one place -- most importantly
+     * FocusMapProc (tkFocus.c). "focus -force .w" on a window that is
+     * not yet mapped cannot set the focus, so TkSetFocusWin defers:
+     *
+     *	if (!allMapped) {
+     *	    Tk_CreateEventHandler((Tk_Window) winPtr, VisibilityChangeMask,
+     *		    FocusMapProc, winPtr);
+     *	    displayFocusPtr->focusOnMapPtr = winPtr;
+     *	    displayFocusPtr->forceFocus = force;
+     *	    return;
+     *	}
+     *
+     * and FocusMapProc finishes the job when the window turns up. With
+     * no VisibilityNotify ever sent, that handler never fired and the
+     * focus was simply never set.
+     *
+     * The idiom this breaks is the one every Tk test file opens with:
+     *
+     *	pack .t.f
+     *	focus -force .t.f
+     *	update
+     *
+     * pack maps on the idle queue, so at the moment of the focus command
+     * .t.f is still unmapped and the deferred path is the only path. Key
+     * events are the only thing that notices, since they alone are
+     * redirected through the focus (tkEvent.c InvokeFocusHandlers, which
+     * discards the event when there is no focus window) -- which is why
+     * a button binding on the very same widget worked while every key
+     * binding on it silently did nothing, and why bind.test failed 134
+     * cases with empty results and no errors.
+     */
+    memset(&ev, 0, sizeof(ev));
+    ev.type                 = VisibilityNotify;
+    ev.xvisibility.display  = display;
+    ev.xvisibility.window   = w;
+    ev.xvisibility.state    = VisibilityUnobscured;
     TkP9EnqueueEvent(&ev);
 
     /* Send Expose so the window gets repainted */

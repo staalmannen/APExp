@@ -1234,6 +1234,54 @@ of the root. Note this is invisible to `event generate`, which names its
 own window -- so the synthetic and the real path fail separately, and
 `tk-bind-test.tcl` only covers the synthetic one.
 
+### Tk on Plan 9: no VisibilityNotify, so `focus -force` before `update` did nothing
+
+`focus -force .w` on a window that is not yet mapped cannot set the
+focus, so `TkSetFocusWin` does not fail -- it **defers**:
+
+```c
+if (!allMapped) {
+	Tk_CreateEventHandler((Tk_Window) winPtr, VisibilityChangeMask,
+	        FocusMapProc, winPtr);
+	displayFocusPtr->focusOnMapPtr = winPtr;
+	return;
+}
+```
+
+and `FocusMapProc` finishes the job when the window turns up. `XMapWindow`
+here sent `MapNotify` and `Expose` but no `VisibilityNotify`, so that
+handler never fired and the focus was never set.
+
+The idiom this breaks is the one every Tk test file opens with:
+
+```tcl
+pack .t.f
+focus -force .t.f
+update
+```
+
+`pack` maps on the idle queue, so at the moment of the focus command
+`.t.f` is still unmapped and the deferred path is the *only* path.
+
+**Key events are the only thing that notices.** They alone are
+redirected through the focus -- `InvokeFocusHandlers` (`tkEvent.c:255`)
+calls `TkFocusKeyEvent`, which returns NULL when there is no focus
+window, and `Tk_HandleEvent` then discards the event. So a `<Button-1>`
+binding on a widget worked while every `<Key>` binding on the *same*
+widget silently did nothing, and `bind.test` failed 134 cases with empty
+results and no errors anywhere.
+
+Reordering the two lines makes it work, which is what made this hard to
+see: `sys/lib/tests/tk-bind-test.tcl` passed its key cases because it
+had `update` before `focus -force`, the one order bind.test never uses.
+`focus` answering `.f` rather than empty was the tell -- neither
+clearing path in `TkFocusFilterEvent` leaves a name behind, both assign
+NULL, so the focus had never moved in the first place.
+
+`TkP9EnqueueEvent`'s ring is 1024 entries now (`TKP9_EVQUEUE`, and the
+wrap derives from it rather than a hardcoded `& 255`): mapping one
+window costs three events, and a full ring is dropped silently.
+
 ### Build order for compiler changes
 ```
 cd sys/src/cmd/cc && mk nuke && mk install   # regenerates y.tab.h

@@ -127,74 +127,50 @@ mark "virtual event: [expr {[llength $::hits] ? "FIRED" : "not delivered"}]"
 
 # 5. The same key test, but inside a second toplevel.
 #
-# Everything above uses a frame in "." and now works, while bind.test
-# still fails every key case -- and its one structural difference is
-# that it builds .t.f inside a toplevel .t:
+# Everything above uses a frame in "." and works, while bind.test failed
+# every key case -- and the difference is not the toplevel, it is the
+# ORDER of two lines. Every Tk test file opens with
 #
-#	toplevel .t -width 100 -height 50
-#	frame .t.f -class Test -width 150 -height 100
 #	pack .t.f
 #	focus -force .t.f
+#	update
 #
-# Tk_HandleEvent hands a key event to TkFocusKeyEvent, which redirects
-# it to displayFocusPtr->focusWinPtr and returns NULL -- dropping the
-# event -- when there is no focus window. TkSetFocusWin refuses to set
-# one unless the target AND every ancestor up to the toplevel have
-# TK_MAPPED (tkFocus.c, the allMapped loop); it silently defers instead,
-# arming a VisibilityChange handler. So a toplevel this port never marks
-# mapped would lose every key event and nothing else, which is exactly
-# the failure shape.
+# and pack maps on the idle queue, so at the moment of the focus command
+# .t.f is still unmapped. TkSetFocusWin does not fail on that; it defers
+# (tkFocus.c):
 #
-# "focus" reporting .t.f is the discriminator: if it answers empty or
-# ".", the focus was never set and the mapping is why.
+#	if (!allMapped) {
+#	    Tk_CreateEventHandler((Tk_Window) winPtr, VisibilityChangeMask,
+#		    FocusMapProc, winPtr);
+#	    displayFocusPtr->focusOnMapPtr = winPtr;
+#	    return;
+#	}
+#
+# and FocusMapProc finishes the job when the window turns up. XMapWindow
+# in this port sent MapNotify and Expose but no VisibilityNotify, so that
+# handler never fired and the focus was simply never set.
+#
+# Key events are the only thing that notices, because they alone are
+# redirected through the focus: InvokeFocusHandlers (tkEvent.c:255) calls
+# TkFocusKeyEvent, which returns NULL when there is no focus window, and
+# Tk_HandleEvent discards the event. Hence a Button-1 binding working on
+# the very widget whose Key bindings do nothing -- the control at the end
+# of this section.
+#
+# Order matters here, so keep it exactly as bind.test has it. Writing
+# "update" before "focus -force" makes this pass whether the bug is fixed
+# or not, which is how it hid for a round trip.
 toplevel .t -width 100 -height 50
 wm geom .t +0+0
 frame .t.f -class Test -width 150 -height 100
 pack .t.f
+focus -force .t.f
+mark "focus before update:      '[focus]'"
+mark "focus -lastfor .t.f:      '[focus -lastfor .t.f]' (.t.f = TkSetFocusWin got past the mapped test)"
 update
 mark "toplevel .t: exists [winfo exists .t], mapped [winfo ismapped .t], id [winfo id .t]"
 mark ".t.f:       exists [winfo exists .t.f], mapped [winfo ismapped .t.f], id [winfo id .t.f]"
-
-# Which of the two possible stories is it: the focus was never set, or it
-# was set and something during "update" took it away again? The observed
-# answer is ".f" -- the frame in "." from section 1c -- and that is not
-# what either clearing path in TkFocusFilterEvent leaves behind; both
-# assign NULL, which "focus" reports as empty. A real FocusIn arriving
-# for toplevel "." would restore exactly ".f", since that is what its
-# ToplevelFocusInfo remembers.
-#
-# Two probes separate the cases, with no C to rebuild:
-#
-#   "focus" before update       -- did TkSetFocusWin assign at all?
-#   "focus -lastfor .t.f"       -- reads .t's ToplevelFocusInfo, which
-#                                  TkSetFocusWin fills in *after* the
-#                                  allMapped test and *before* the
-#                                  assignment. .t.f here means it got
-#                                  past the mapped check; .t means it
-#                                  bailed there.
-#
-# A <FocusIn> binding on . and on .f then says whether anything really
-# is handing the focus back during update.
-bind . <FocusIn>    {mark "  ... FocusIn on . (%d)"}
-bind .f <FocusIn>   {mark "  ... FocusIn on .f (%d)"}
-bind .t.f <FocusIn> {mark "  ... FocusIn on .t.f (%d)"}
-bind .t.f <FocusOut> {mark "  ... FocusOut on .t.f (%d)"}
-
-focus -force .t.f
-mark "focus before update:      '[focus]' (want .t.f)"
-mark "focus -lastfor .t.f:      '[focus -lastfor .t.f]' (.t.f = passed the mapped test)"
-update
 mark "focus after update:       '[focus]' (want .t.f)"
-
-bind . <FocusIn> {}
-bind .f <FocusIn> {}
-bind .t.f <FocusIn> {}
-bind .t.f <FocusOut> {}
-
-# Re-assert the focus with nothing running in between, so the key cases
-# below test delivery rather than whatever update did to the focus.
-focus -force .t.f
-mark "focus for the key cases:  '[focus]'"
 
 set ::hits {}
 bind .t.f <Key> {lappend ::hits "K=%K k=%k N=%N"}
