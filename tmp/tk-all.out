@@ -6,7 +6,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-05 04:19:40 +0200
+Tests began at 2026-09-05 04:42:50 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -137,15 +137,10 @@ bind.test
     event generate .t.f <KeyRelease> -keysym :
     return $x
 
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: no keycode for keysym ":"
-    while executing
-"event generate .t.f <Key> -keysym :"
-    ("uplevel" body line 4)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: TK LOOKUP KEYCODE :
+---- Result was:
+
+---- Result should have been (exact matching):
+Key: Release:
 ==== bind-13.13 FAILED
 
 
@@ -164,46 +159,6 @@ bind.test
 ---- Result should have been (exact matching):
 Key?? Release??
 ==== bind-13.14 FAILED
-
-
-
-==== bind-15.1 MatchPatterns procedure, ignoring type mismatches FAILED
-==== Contents of test case:
-
-    bind .t.f 12 {set x 1}
-    set x 0
-    event generate .t.f <Key-1>
-    event generate .t.f <KeyRelease-1>
-    event generate .t.f <Key-2>
-    event generate .t.f <KeyRelease-2>
-    return $x
-
----- Result was:
-0
----- Result should have been (exact matching):
-1
-==== bind-15.1 FAILED
-
-
-
-==== bind-15.2 MatchPatterns procedure, ignoring type mismatches FAILED
-==== Contents of test case:
-
-    bind .t.f 12 {set x 1}
-    set x 0
-    event generate .t.f <Key-1>
-    event generate .t.f <Enter>
-    event generate .t.f <KeyRelease-1>
-    event generate .t.f <Leave>
-    event generate .t.f <Key-2>
-    event generate .t.f <KeyRelease-2>
-    return $x
-
----- Result was:
-0
----- Result should have been (exact matching):
-1
-==== bind-15.2 FAILED
 
 
 
@@ -256,43 +211,6 @@ Key?? Release??
 ---- Result should have been (exact matching):
 1
 ==== bind-15.10 FAILED
-
-
-
-==== bind-15.27 MatchPatterns procedure, conflict resolution FAILED
-==== Contents of test case:
-
-    bind .t.f <Key> {set x 0}
-    bind .t.f 1 {set x 1}
-    set x none
-    event generate .t.f <Key-1>
-    return $x
-
----- Result was:
-0
----- Result should have been (exact matching):
-1
-==== bind-15.27 FAILED
-
-
-
-==== bind-15.29 MatchPatterns procedure, conflict resolution FAILED
-==== Contents of test case:
-
-    bind .t.f <Key> {lappend x 0}
-    bind .t.f 1 {lappend x 1}
-    bind .t.f 21 {lappend x 2}
-    set x none
-    event generate .t.f <Key-2>
-    event generate .t.f <KeyRelease-2>
-    event generate .t.f <Key-1>
-    set x
-
----- Result was:
-none 0 0
----- Result should have been (exact matching):
-none 0 2
-==== bind-15.29 FAILED
 
 
 
@@ -578,30 +496,11 @@ xyz {} <Button-2> <Button-2>
     event generate .t.f <Key> -keysym space
     return $x
 
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: no keycode for keysym "space"
-    while executing
-"event generate .t.f <Key> -keysym space"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: TK LOOKUP KEYCODE space
-==== bind-22.49 FAILED
-
-
-
-==== bind-22.50 HandleEventGenerate: options <Button> -keysym space FAILED
-==== Contents of test case:
-
-    bind .t.f <Button> "lappend x %b"
-    event generate .t.f <Button> -keysym space
-
 ---- Result was:
-no keycode for keysym "space"
+
 ---- Result should have been (exact matching):
-<Button> event doesn't accept "-keysym" option
-==== bind-22.50 FAILED
+space
+==== bind-22.49 FAILED
 
 
 
@@ -977,39 +876,11 @@ Double
     event generate .t.f <Key> -keysym Caps_Lock
     set x
 
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: no keycode for keysym "Caps_Lock"
-    while executing
-"event generate .t.f <Key> -keysym Caps_Lock"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: TK LOOKUP KEYCODE Caps_Lock
-==== bind-32.9 FAILED
-
-
-
-==== bind-32.10 reset key state when destroying window FAILED
-==== Contents of test case:
-
-    pack [frame .t.f]; update; focus -force .t.f
-    bind .t.f <A> { set x "A" }
-    event generate .t.f <A>
-    event generate .t.f <A>
-    destroy .t.f; update
-    pack [frame .t.f]; update; focus -force .t.f
-    bind .t.f <A> { set x "A" }
-    bind .t.f <Double-A> { set x "AA" }
-    event generate .t.f <A>
-    destroy .t.f
-    set x
-
 ---- Result was:
 
 ---- Result should have been (exact matching):
-A
-==== bind-32.10 FAILED
+Key
+==== bind-32.9 FAILED
 
 
 
@@ -1042,7 +913,7 @@ A
     set x
 
 ---- Result was:
-
+AA
 ---- Result should have been (exact matching):
 A
 ==== bind-32.13 FAILED
@@ -1438,7 +1309,7 @@ canvText.test
 %!PS-Adobe-3.0 EPSF-3.0
 %%Creator: Tk Canvas Widget
 %%Title: Window .c
-%%CreationDate: Sat Sep  5 04:19:44 2026
+%%CreationDate: Sat Sep  5 04:42:54 2026
 %%BoundingBox: 306 396 308 398
 %%Pages: 1
 %%DocumentData: Clean7Bit
