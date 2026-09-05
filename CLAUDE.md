@@ -1314,6 +1314,34 @@ Covered by `sys/lib/tests/tk-selection-test.tcl`, which tests the two
 directions separately and skips itself when `/dev/snarf` cannot be
 opened (there is no snarf file without rio).
 
+### Tk on Plan 9: modifier keys are not events of their own
+
+`tkBind.c` consults `dispPtr->modKeyCodes` twice, and both uses are
+about *not* letting a modifier press count as an event in its own right:
+
+- `tkBind.c:2226` -- a modifier press must not reset the repetition
+  count for buttons, or `<Double-Button-1>` is lost the moment a shift
+  key is touched between the two clicks.
+- `tkBind.c:2809` -- a modifier-only press must not drop a partly
+  matched pattern sequence, or `<Escape><Control-c>` can never be
+  triggered from a real keyboard: what arrives is Escape, then
+  `Control_L` repeating while held, then `Control-c`.
+
+`TkpInitKeymapInfo` set the three modifier masks and left the array
+empty, so neither rule could fire. There is no modifier map to read --
+`/dev/cons` gives a rune -- so it is now simply the list of modifier
+keysyms, which are the keycodes here. `lockUsage` is `LU_IGNORE`:
+nothing sets `LockMask`, so there is no Lock modifier to reinterpret.
+
+Related, and the same "no keyboard map" problem: X decides whether a
+key event carries `ShiftMask` by asking which shift level of the keycode
+produced the keysym. `TkP9KeysymShifted` answers it from the keysym
+alone -- a character with a lowercase form is the shifted one -- which
+covers A-Z and the accented capitals and is what makes
+`bind .e <Shift-Key-A>` fire. Which *punctuation* needs Shift is a
+property of the physical layout and is not knowable here, so those are
+reported unshifted.
+
 ### Build order for compiler changes
 ```
 cd sys/src/cmd/cc && mk nuke && mk install   # regenerates y.tab.h

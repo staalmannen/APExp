@@ -107,6 +107,7 @@ extern P9DisplayState gP9;
 extern P9Window *TkP9FindWindow(Window xid);
 extern void      TkP9WindowOffset(Window xid, int *ox, int *oy);
 extern Window    TkP9FocusWindow(void);
+extern int       TkP9KeysymShifted(KeySym sym);
 extern P9Window *TkP9AllocWindow(void);
 extern void      TkP9FreeWindow(Window xid);
 

@@ -195,5 +195,89 @@ event generate .t.f <Button-1>
 mark ".t.f <Button-1>: [expr {[llength $::hits] ? "FIRED" : "not delivered"}]"
 bind .t.f <Button-1> {}
 
+# 6. Sibling widgets: are events delivered to each of them, or only to
+# the first?
+#
+# The remaining bind.test failures cluster on this. bind-19.15..17 build
+# three frames and get events on only .t.f:
+#
+#	{xyz xyz}		 instead of  {xyz abc def xyz def}
+#
+# and bind-32.12..14 ask Tk to notice that the window changed between
+# two clicks, which it cannot do if the middle event never arrives:
+#
+#	.t.f, .t.g, .t.f  ->  "11" (a double click) instead of "1"
+#
+# bind.test packs three 150x100 frames into a 100x50 toplevel, so this
+# also asks whether geometry propagation resizes .t -- if it does not,
+# pack leaves the frames that do not fit unmapped, and an unmapped
+# window is exactly the case that has bitten twice already.
+frame .t.g -class Test -width 150 -height 100
+frame .t.h -class Test -width 150 -height 100
+pack .t.g .t.h
+update
+mark ".t geometry [winfo geometry .t]  (150x300 if propagation works)"
+foreach w {.t.f .t.g .t.h} {
+    mark "  $w: mapped [winfo ismapped $w] id [winfo id $w] geom [winfo geometry $w]"
+}
+
+# Buttons are not redirected through the focus, so this is delivery
+# alone -- no focus involved.
+foreach w {.t.f .t.g .t.h} {
+    set ::hits {}
+    bind $w <Button-2> {lappend ::hits fired}
+    event generate $w <Button-2>
+    mark "  Button-2 on $w: [expr {[llength $::hits] ? "FIRED" : "not delivered"}]"
+    bind $w <Button-2> {}
+}
+
+# And the repetition rule the failing tests actually check: a click on a
+# different window in between must stop the two on .t.f counting as a
+# double.
+set ::x {}
+bind .t.f <Button-1> {set ::x 1}
+bind .t.f <Double-Button-1> {set ::x 11}
+event generate .t.f <Button-1>
+event generate .t.g <Button-1>
+event generate .t.f <Button-1>
+mark "  repetition across windows: $::x (want 1, 11 means .t.g was missed)"
+bind .t.f <Button-1> {}
+bind .t.f <Double-Button-1> {}
+
+# 7. Modifier keys must not count as events of their own.
+#
+# tkBind.c consults dispPtr->modKeyCodes in two places, and the array was
+# left empty by TkpInitKeymapInfo, so neither rule could fire: a modifier
+# press reset the button repetition count (bind-15.7) and dropped a
+# partly matched pattern sequence (bind-33.16..18).
+set ::x 0
+bind .t.f <Double-Button-1> {set ::x 1}
+event generate .t.f <Button-1>
+event generate .t.f <Shift_L>
+event generate .t.f <ButtonRelease-1>
+event generate .t.f <Button-1>
+event generate .t.f <ButtonRelease-1>
+mark "double-click survives a Shift_L between: $::x (want 1)"
+bind .t.f <Double-Button-1> {}
+
+set ::x {}
+bind .t.f <Escape><Control-c> {lappend ::x Esc_Control-c}
+event generate .t.f <Escape>
+event generate .t.f <Control_L>
+event generate .t.f <Control_L>
+event generate .t.f <Control_L>
+event generate .t.f <Control-c>
+mark "sequence survives repeated Control_L: '$::x' (want Esc_Control-c)"
+bind .t.f <Escape><Control-c> {}
+
+# An uppercase keysym has to carry ShiftMask, as it does on a real
+# keyboard -- there is no keyboard map here, so the keysym's own case is
+# the only evidence.
+set ::x none
+bind .t.f <Shift-Key-A> {set ::x shifted}
+event generate .t.f <Key-A>
+mark "<Key-A> matches <Shift-Key-A>: $::x (want shifted)"
+bind .t.f <Shift-Key-A> {}
+
 mark "done"
 exit 0
