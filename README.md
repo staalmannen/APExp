@@ -97,6 +97,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - libxml2 (version 2.15.2)
 - liblzma (from xz version 5.8.3)
 - libz (version 1.3.2)
+- libzip (version 1.11.4)
 - libbz2 (version 1.0.8)
 - lz4 (version 1.10.0)
 - zstd (version 1.5.7)
@@ -105,7 +106,7 @@ Install paths have been modified so that libraries and binaries are installed in
 
 ***Utilities***
 
-- The original APE pdksh shell replaced by GNU bash (version 5.3) and Dash (version 0.5.13)
+- The original APE pdksh shell replaced by GNU bash (version 5.3) as /bin/bash and Dash (version 0.5.13) as /bin/sh. Bash is the default login shell in apexp-sh.
 - APE make has been replaced by a port of GNU make (version 4.4.1)
 - APE sed has been replaced by a port of GNU sed (version 4.9)
 - patch has been replaced by a port of GNU patch (version 2.8)
@@ -142,6 +143,7 @@ Install paths have been modified so that libraries and binaries are installed in
 
 C transpilers are fun little proof-of-concept programs, which also open up for more languages. Many will only have very little practical use, however.
 
+- BASIC-to-C transpiler Bacon (version 5.0.3)
 - pascal-to-C transpiler p2c (version 2.01)
 - fortran-to-C transpiler f2c (version 20250303)
 - portable ObjC-to-C transpiler (version 3.4.13)
