@@ -86,6 +86,14 @@ int    tkp9_putsnarf(const char *s, int nbytes);   /* 0 on success */
  * Fonts (opaque handle = Plan 9 Font*)
  */
 void  *tkp9_openfont(const char *name);	  /* returns Font*, or defont */
+
+/*
+ * Open exactly this font file, or fail. tkp9_openfont silently falls
+ * back to the default font, which is the wrong answer when the caller
+ * is walking a list of candidate sizes and needs to know which ones
+ * actually exist.
+ */
+void  *tkp9_openfontpath(const char *path);   /* NULL if it will not open */
 void   tkp9_closefont(void *fnt);
 int    tkp9_fontascent(void *fnt);
 int    tkp9_fontdescent(void *fnt);	  /* height - ascent */

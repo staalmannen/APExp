@@ -6,7 +6,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-05 09:36:26 +0200
+Tests began at 2026-09-05 09:47:54 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -27,156 +27,6 @@ Key{} Release{}
 ---- Result should have been (exact matching):
 Key?? Release??
 ==== bind-13.14 FAILED
-
-
-
-==== bind-19.15 DeleteVirtualEvent procedure: owned by many, first FAILED
-==== Contents of test case:
-
-    event add <<xyz>> <Button-2>
-    event add <<abc>> <Button-2>
-    event add <<def>> <Button-2>
-    bind .t.f <<xyz>> {lappend x xyz}
-    bind .t.g <<abc>> {lappend x abc}
-    bind .t.h <<def>> {lappend x def}
-    event generate .t.f <Button-2>
-    event generate .t.f <ButtonRelease-2>
-    event generate .t.g <Button-2>
-    event generate .t.g <ButtonRelease-2>
-    event generate .t.h <Button-2>
-    event generate .t.h <ButtonRelease-2>
-    event delete <<xyz>>
-    event generate .t.f <Button-2>
-    event generate .t.f <ButtonRelease-2>
-    event generate .t.g <Button-2>
-    event generate .t.g <ButtonRelease-2>
-    event generate .t.h <Button-2>
-    event generate .t.h <ButtonRelease-2>
-    list $x [event info <<xyz>>] [event info <<abc>>] [event info <<def>>]
-
----- Result was:
-xyz {} <Button-2> <Button-2>
----- Result should have been (exact matching):
-{xyz abc def abc def} {} <Button-2> <Button-2>
-==== bind-19.15 FAILED
-
-
-
-==== bind-19.16 DeleteVirtualEvent procedure: owned by many, middle FAILED
-==== Contents of test case:
-
-    event add <<xyz>> <Button-2>
-    event add <<abc>> <Button-2>
-    event add <<def>> <Button-2>
-    bind .t.f <<xyz>> {lappend x xyz}
-    bind .t.g <<abc>> {lappend x abc}
-    bind .t.h <<def>> {lappend x def}
-    event generate .t.f <Button-2>
-    event generate .t.f <ButtonRelease-2>
-    event generate .t.g <Button-2>
-    event generate .t.g <ButtonRelease-2>
-    event generate .t.h <Button-2>
-    event generate .t.h <ButtonRelease-2>
-    event delete <<abc>>
-    event generate .t.f <Button-2>
-    event generate .t.f <ButtonRelease-2>
-    event generate .t.g <Button-2>
-    event generate .t.g <ButtonRelease-2>
-    event generate .t.h <Button-2>
-    event generate .t.h <ButtonRelease-2>
-    list $x [event info <<xyz>>] [event info <<abc>>] [event info <<def>>]
-
----- Result was:
-{xyz xyz} <Button-2> {} <Button-2>
----- Result should have been (exact matching):
-{xyz abc def xyz def} <Button-2> {} <Button-2>
-==== bind-19.16 FAILED
-
-
-
-==== bind-19.17 DeleteVirtualEvent procedure: owned by many, last FAILED
-==== Contents of test case:
-
-    event add <<xyz>> <Button-2>
-    event add <<abc>> <Button-2>
-    event add <<def>> <Button-2>
-    bind .t.f <<xyz>> {lappend x xyz}
-    bind .t.g <<abc>> {lappend x abc}
-    bind .t.h <<def>> {lappend x def}
-    event generate .t.f <Button-2>
-    event generate .t.f <ButtonRelease-2>
-    event generate .t.g <Button-2>
-    event generate .t.g <ButtonRelease-2>
-    event generate .t.h <Button-2>
-    event generate .t.h <ButtonRelease-2>
-    event delete <<def>>
-    event generate .t.f <Button-2>
-    event generate .t.f <ButtonRelease-2>
-    event generate .t.g <Button-2>
-    event generate .t.g <ButtonRelease-2>
-    event generate .t.h <Button-2>
-    event generate .t.h <ButtonRelease-2>
-    list $x [event info <<xyz>>] [event info <<abc>>] [event info <<def>>]
-
----- Result was:
-{xyz xyz} <Button-2> <Button-2> {}
----- Result should have been (exact matching):
-{xyz abc def xyz abc} <Button-2> <Button-2> {}
-==== bind-19.17 FAILED
-
-
-
-==== bind-32.12 don't detect repetition when window has changed FAILED
-==== Contents of test case:
-
-    bind .t.f <Button-1> { set x "1" }
-    bind .t.f <Double-Button-1> { set x "11" }
-    event generate .t.f <Button-1>
-    event generate .t.g <Button-1>
-    event generate .t.f <Button-1>
-    set x
-
----- Result was:
-11
----- Result should have been (exact matching):
-1
-==== bind-32.12 FAILED
-
-
-
-==== bind-32.13 don't detect repetition when window has changed FAILED
-==== Contents of test case:
-
-    bind .t.f <A> { set x "A" }
-    bind .t.f <Double-A> { set x "AA" }
-    focus -force .t.f; event generate .t.f <A>
-    focus -force .t.g; event generate .t.g <A>
-    focus -force .t.f; event generate .t.f <A>
-    set x
-
----- Result was:
-AA
----- Result should have been (exact matching):
-A
-==== bind-32.13 FAILED
-
-
-
-==== bind-32.14 don't detect repetition when window has changed FAILED
-==== Contents of test case:
-
-    bind .t.f <Button-1> { set x "1" }
-    bind .t.f <Double-Button-1> { set x "11" }
-    focus -force .t.f; event generate .t.f <Button-1>
-    focus -force .t.g; event generate .t.g <Button-1>
-    focus -force .t.f; event generate .t.f <Button-1>
-    set x
-
----- Result was:
-11
----- Result should have been (exact matching):
-1
-==== bind-32.14 FAILED
 
 
 
@@ -321,364 +171,8 @@ canvText.test
 ---- Return code should have been one of: 1
 ==== canvasText-1.7 FAILED
 
-
-
-==== canvText-17.1 TextToPostscript procedure FAILED
-==== Contents of test case:
-
-    set font {Courier 12 italic}
-    set ax [font measure $font 0]
-    set ay [font metrics $font -linespace]
-    .c config -height 300 -highlightthickness 0 -bd 0
-    update
-    .c create text 100 100 -tags test
-    .c itemconfig test -font $font -text "00000000" -width [expr 3*$ax]
-    .c itemconfig test -anchor n -fill black
-    set x [.c postscript]
-    set x [string range $x [string first "findfont " $x] end]
-    expr {$x eq [subst $result] ? "ok" : $x}
-
----- Result was:
-%!PS-Adobe-3.0 EPSF-3.0
-%%Creator: Tk Canvas Widget
-%%Title: Window .c
-%%CreationDate: Sat Sep  5 09:36:30 2026
-%%BoundingBox: 306 396 308 398
-%%Pages: 1
-%%DocumentData: Clean7Bit
-%%Orientation: Portrait
-%%EndComments
-
-%%BeginProlog
-% This is a standard prolog for Postscript generated by Tk's canvas
-% widget.
-/CurrentEncoding [
-/space/space/space/space/space/space/space/space
-/space/space/space/space/space/space/space/space
-/space/space/space/space/space/space/space/space
-/space/space/space/space/space/space/space/space
-/space/exclam/quotedbl/numbersign/dollar/percent/ampersand/quotesingle
-/parenleft/parenright/asterisk/plus/comma/hyphen/period/slash
-/zero/one/two/three/four/five/six/seven
-/eight/nine/colon/semicolon/less/equal/greater/question
-/at/A/B/C/D/E/F/G
-/H/I/J/K/L/M/N/O
-/P/Q/R/S/T/U/V/W
-/X/Y/Z/bracketleft/backslash/bracketright/asciicircum/underscore
-/grave/a/b/c/d/e/f/g
-/h/i/j/k/l/m/n/o
-/p/q/r/s/t/u/v/w
-/x/y/z/braceleft/bar/braceright/asciitilde/space
-/space/space/space/space/space/space/space/space
-/space/space/space/space/space/space/space/space
-/space/space/space/space/space/space/space/space
-/space/space/space/space/space/space/space/space
-/space/exclamdown/cent/sterling/currency/yen/brokenbar/section
-/dieresis/copyright/ordfeminine/guillemotleft/logicalnot/hyphen/registered/macron
-/degree/plusminus/twosuperior/threesuperior/acute/mu/paragraph/periodcentered
-/cedilla/onesuperior/ordmasculine/guillemotright/onequarter/onehalf/threequarters/questiondown
-/Agrave/Aacute/Acircumflex/Atilde/Adieresis/Aring/AE/Ccedilla
-/Egrave/Eacute/Ecircumflex/Edieresis/Igrave/Iacute/Icircumflex/Idieresis
-/Eth/Ntilde/Ograve/Oacute/Ocircumflex/Otilde/Odieresis/multiply
-/Oslash/Ugrave/Uacute/Ucircumflex/Udieresis/Yacute/Thorn/germandbls
-/agrave/aacute/acircumflex/atilde/adieresis/aring/ae/ccedilla
-/egrave/eacute/ecircumflex/edieresis/igrave/iacute/icircumflex/idieresis
-/eth/ntilde/ograve/oacute/ocircumflex/otilde/odieresis/divide
-/oslash/ugrave/uacute/ucircumflex/udieresis/yacute/thorn/ydieresis
-] def
-50 dict begin
-/baseline 0 def
-/stipimage 0 def
-/height 0 def
-/justify 0 def
-/lineLength 0 def
-/spacing 0 def
-/stipple 0 def
-/strings 0 def
-/xoffset 0 def
-/yoffset 0 def
-/tmpstip null def
-/baselineSampler ( TXygqPZ) def
-baselineSampler 0 196 put
-/cstringshow {{ dup type /stringtype eq { show } { glyphshow } ifelse } forall } bind def
-/cstringwidth {0 exch 0 exch { dup type /stringtype eq { stringwidth } { currentfont /Encoding get exch 1 exch put (\001) stringwidth } ifelse exch 3 1 roll add 3 1 roll add exch } forall } bind def
-/ISOEncode {dup length dict begin {1 index /FID ne {def} {pop pop} ifelse} forall /Encoding CurrentEncoding def currentdict end /Temporary exch definefont } bind def
-/StrokeClip {{strokepath} stopped { (This Postscript printer gets limitcheck overflows when) = (stippling dashed lines;  lines will be printed solid instead.) = [] 0 setdash strokepath} if clip } bind def
-/EvenPixels {dup 0 matrix currentmatrix dtransform dup mul exch dup mul add sqrt dup round dup 1 lt {pop 1} if exch div mul } bind def
-/StippleFill {/tmpstip 1 index def 1 EvenPixels dup scale pathbbox 4 2 roll 5 index div dup 0 lt {1 sub} if cvi 5 index mul 4 1 roll 6 index div dup 0 lt {1 sub} if cvi 6 index mul 3 2 roll 6 index exch { 2 index 5 index 3 index { gsave 1 index exch translate 5 index 5 index true matrix tmpstip imagemask grestore } for pop } for pop pop pop pop pop } bind def
-/AdjustColor {CL 2 lt { currentgray CL 0 eq { .5 lt {0} {1} ifelse } if setgray } if } bind def
-/DrawText {/stipple exch def /justify exch def /yoffset exch def /xoffset exch def /spacing exch def /strings exch def /lineLength 0 def strings { cstringwidth pop dup lineLength gt {/lineLength exch def} {pop} ifelse newpath } forall 0 0 moveto baselineSampler false charpath pathbbox dup /baseline exch def exch pop exch sub /height exch def pop newpath translate rotate lineLength xoffset mul strings length 1 sub spacing mul height add yoffset mul translate justify lineLength mul baseline neg translate strings { dup cstringwidth pop justify neg mul 0 moveto stipple { gsave /char (X) def { dup type /stringtype eq { { char 0 3 -1 roll put currentpoint gsave char true charpath clip StippleText grestore char stringwidth translate moveto } forall } { currentfont /Encoding get exch 1 exch put currentpoint gsave (\001) true charpath clip StippleText grestore (\001) stringwidth translate moveto } ifelse } forall grestore } {cstringshow} ifelse 0 spacing neg translate } forall } bind def
-/TkPhotoColor {gsave 32 dict begin /tinteger exch def /transparent 1 string def transparent 0 tinteger put /olddict exch def olddict /DataSource get dup type /filetype ne { olddict /DataSource 3 -1 roll 0 () /SubFileDecode filter put } { pop } ifelse /newdict olddict maxlength dict def olddict newdict copy pop /w newdict /Width get def /crpp newdict /Decode get length 2 idiv def /str w string def /pix w crpp mul string def /substrlen 2 w log 2 log div floor exp cvi def /substrs [ { substrlen string 0 1 substrlen 1 sub { 1 index exch tinteger put } for /substrlen substrlen 2 idiv def substrlen 0 eq {exit} if } loop ] def /h newdict /Height get def 1 w div 1 h div matrix scale olddict /ImageMatrix get exch matrix concatmatrix matrix invertmatrix concat newdict /Height 1 put newdict /DataSource pix put /mat [w 0 0 h 0 0] def newdict /ImageMatrix mat put 0 1 h 1 sub { mat 5 3 -1 roll neg put olddict /DataSource get str readstring pop pop /tail str def /x 0 def olddict /DataSource get pix readstring pop pop { tail transparent search dup /done exch not def {exch pop exch pop} if /w1 exch length def w1 0 ne { newdict /DataSource pix x crpp mul w1 crpp mul getinterval put newdict /Width w1 put mat 4 x neg put /x x w1 add def newdict image /tail tail w1 tail length w1 sub getinterval def } if done {exit} if tail substrs { anchorsearch {pop} if } forall /tail exch def tail length 0 eq {exit} if /x w tail length sub def } loop } for end grestore } bind def
-/TkPhotoMono {gsave 32 dict begin /dummyInteger exch def /olddict exch def olddict /DataSource get dup type /filetype ne { olddict /DataSource 3 -1 roll 0 () /SubFileDecode filter put } { pop } ifelse /newdict olddict maxlength dict def olddict newdict copy pop /w newdict /Width get def /pix w 7 add 8 idiv string def /h newdict /Height get def 1 w div 1 h div matrix scale olddict /ImageMatrix get exch matrix concatmatrix matrix invertmatrix concat newdict /Height 1 put newdict /DataSource pix put /mat [w 0 0 h 0 0] def newdict /ImageMatrix mat put 0 1 h 1 sub { mat 5 3 -1 roll neg put 0.000 0.000 0.000 setrgbcolor olddict /DataSource get pix readstring pop pop newdict /DataSource pix put newdict imagemask 1.000 1.000 1.000 setrgbcolor olddict /DataSource get pix readstring pop pop newdict /DataSource pix put newdict imagemask } for end grestore } bind def
-%%EndProlog
-%%BeginSetup
-/CL 2 def
-%%EndSetup
-
-%%Page: 1 1
-save
-306.0 396.0 translate
-1 1 scale
-0 0 translate
-0 1 moveto 1 1 lineto 1 0 lineto 0 0 lineto closepath clip newpath
-restore showpage
-
-%%Trailer
-end
-%%EOF
-
----- Result should have been (exact matching):
-ok
-==== canvText-17.1 FAILED
-
 canvWind.test
-
-
-==== canvWind-1.1 DisplayWinItem, windows off-screen vertically FAILED
-==== Contents of test case:
-
-    toplevel .t
-    canvas .t.c -scrollregion {0 0 1000 800} -width 250 -height 200 -bd 2  -relief sunken -xscrollincrement 1 -yscrollincrement 1  -highlightthickness 1
-    pack .t.c -fill both -expand 1 -padx 20 -pady 20
-    wm geometry .t +0+0
-    set f .t.f
-    frame $f -width 80 -height 50 -bg red
-    .t.c create window 300 400 -window $f -anchor nw
-    .t.c xview moveto .3
-    .t.c yview moveto .50
-    update
-    set x [list [list [winfo ismapped $f] [winfo y $f]]]
-    .t.c yview scroll 52 units
-    update
-    lappend x [list [winfo ismapped $f] [winfo y $f]]
-    .t.c yview scroll 1 units
-    update
-    lappend x [list [winfo ismapped $f] [winfo y $f]]
-    .t.c yview scroll -255 units
-    update
-    lappend x [list [winfo ismapped $f] [winfo y $f]]
-    .t.c yview scroll -1 units
-    update
-    lappend x [list [winfo ismapped $f] [winfo y $f]]
-
----- Result was:
-{0 0} {0 0} {0 0} {0 0} {0 0}
----- Result should have been (exact matching):
-{1 23} {1 -29} {0 -29} {1 225} {0 225}
-==== canvWind-1.1 FAILED
-
-
-
-==== canvWind-1.2 DisplayWinItem, windows off-screen vertically FAILED
-==== Contents of test case:
-
-    toplevel .t
-    canvas .t.c -scrollregion {0 0 1000 800} -width 250 -height 200 -bd 2  -relief sunken -xscrollincrement 1 -yscrollincrement 1  -highlightthickness 1
-    pack .t.c -fill both -expand 1 -padx 20 -pady 20
-    wm geometry .t +0+0
-    set f .t.c.f
-    frame $f -width 80 -height 50 -bg red
-    .t.c create window 300 400 -window $f -anchor nw
-    .t.c xview moveto .3
-    .t.c yview moveto .50
-    update
-    set x [list [list [winfo ismapped $f] [winfo y $f]]]
-    .t.c yview scroll 52 units
-    update
-    lappend x [list [winfo ismapped $f] [winfo y $f]]
-    .t.c yview scroll 1 units
-    update
-    lappend x [list [winfo ismapped $f] [winfo y $f]]
-    .t.c yview scroll -255 units
-    update
-    lappend x [list [winfo ismapped $f] [winfo y $f]]
-    .t.c yview scroll -1 units
-    update
-    lappend x [list [winfo ismapped $f] [winfo y $f]]
-
----- Result was:
-{0 0} {0 0} {0 0} {0 0} {0 0}
----- Result should have been (exact matching):
-{1 3} {1 -49} {0 -49} {1 205} {0 205}
-==== canvWind-1.2 FAILED
-
-
-
-==== canvWind-1.3 DisplayWinItem, windows off-screen horizontally FAILED
-==== Contents of test case:
-
-    toplevel .t
-    canvas .t.c -scrollregion {0 0 1000 800} -width 250 -height 200 -bd 2  -relief sunken -xscrollincrement 1 -yscrollincrement 1  -highlightthickness 1
-    pack .t.c -fill both -expand 1 -padx 20 -pady 20
-    wm geometry .t +0+0
-    set f .t.f
-    frame $f -width 80 -height 50 -bg red
-    .t.c create window 300 400 -window $f -anchor nw
-    .t.c xview moveto .3
-    .t.c yview moveto .50
-    update
-    set x [list [list [winfo ismapped $f] [winfo x $f]]]
-    .t.c xview scroll 82 units
-    update
-    lappend x [list [winfo ismapped $f] [winfo x $f]]
-    .t.c xview scroll 1 units
-    update
-    lappend x [list [winfo ismapped $f] [winfo x $f]]
-    .t.c xview scroll -335 units
-    update
-    lappend x [list [winfo ismapped $f] [winfo x $f]]
-    .t.c xview scroll -1 units
-    update
-    lappend x [list [winfo ismapped $f] [winfo x $f]]
-
----- Result was:
-{0 0} {0 0} {0 0} {0 0} {0 0}
----- Result should have been (exact matching):
-{1 23} {1 -59} {0 -59} {1 275} {0 275}
-==== canvWind-1.3 FAILED
-
-
-
-==== canvWind-1.4 DisplayWinItem, windows off-screen horizontally FAILED
-==== Contents of test case:
-
-    toplevel .t
-    canvas .t.c -scrollregion {0 0 1000 800} -width 250 -height 200 -bd 2  -relief sunken -xscrollincrement 1 -yscrollincrement 1  -highlightthickness 1
-    pack .t.c -fill both -expand 1 -padx 20 -pady 20
-    wm geometry .t +0+0
-    set f .t.c.f
-    frame $f -width 80 -height 50 -bg red
-    .t.c create window 300 400 -window $f -anchor nw
-    .t.c xview moveto .3
-    .t.c yview moveto .50
-    update
-    set x [list [list [winfo ismapped $f] [winfo x $f]]]
-    .t.c xview scroll 82 units
-    update
-    lappend x [list [winfo ismapped $f] [winfo x $f]]
-    .t.c xview scroll 1 units
-    update
-    lappend x [list [winfo ismapped $f] [winfo x $f]]
-    .t.c xview scroll -335 units
-    update
-    lappend x [list [winfo ismapped $f] [winfo x $f]]
-    .t.c xview scroll -1 units
-    update
-    lappend x [list [winfo ismapped $f] [winfo x $f]]
-
----- Result was:
-{0 0} {0 0} {0 0} {0 0} {0 0}
----- Result should have been (exact matching):
-{1 3} {1 -79} {0 -79} {1 255} {0 255}
-==== canvWind-1.4 FAILED
-
 canvas.test
-
-
-==== canvas-2.3 CanvasWidgetCmd, xview option FAILED
-==== Contents of test case:
-
-    .c configure -xscrollincrement 40 -yscrollincrement 5
-    .c xview moveto 0
-    update
-    set x [list [.c xview]]
-    .c xview scroll 2 units
-    update
-    lappend x [.c xview]
-
----- Result was:
-{0.0 0.005} {0.4 0.405}
----- Result should have been (exact matching):
-{0.0 0.3} {0.4 0.7}
-==== canvas-2.3 FAILED
-
-
-
-==== canvas-2.4 CanvasWidgetCmd, xview option FAILED
-==== Contents of test case:
-
-    .c configure -xscrollincrement 0 -yscrollincrement 5
-    .c xview moveto 0.6
-    update
-    set x [list [.c xview]]
-    .c xview scroll 2 units
-    update
-    lappend x [.c xview]
-
----- Result was:
-{0.6 0.605} {0.6 0.605}
----- Result should have been (exact matching):
-{0.6 0.9} {0.66 0.96}
-==== canvas-2.4 FAILED
-
-
-
-==== canvas-3.1 CanvasWidgetCmd, yview option FAILED
-==== Contents of test case:
-
-    .c configure -xscrollincrement 40 -yscrollincrement 5
-    .c yview moveto 0
-    update
-    set x [list [.c yview]]
-    .c yview scroll 3 units
-    update
-    lappend x [.c yview]
-
----- Result was:
-{0.0 0.0125} {0.1875 0.2}
----- Result should have been (exact matching):
-{0.0 0.5} {0.1875 0.6875}
-==== canvas-3.1 FAILED
-
-
-
-==== canvas-3.2 CanvasWidgetCmd, yview option FAILED
-==== Contents of test case:
-
-    .c configure -xscrollincrement 40 -yscrollincrement 0
-    .c yview moveto 0
-    update
-    set x [list [.c yview]]
-    .c yview scroll 2 units
-    update
-    lappend x [.c yview]
-
----- Result was:
-{0.0 0.0125} {0.0 0.0125}
----- Result should have been (exact matching):
-{0.0 0.5} {0.1 0.6}
-==== canvas-3.2 FAILED
-
-
-
-==== canvas-6.4 CanvasSetOrigin procedure FAILED
-==== Contents of test case:
-
-    .c configure -xscrollincrement 20 -yscrollincrement 10
-    .c xview moveto 1.0
-    .c canvasx 0
-
----- Result was:
-295.0
----- Result should have been (exact matching):
-215.0
-==== canvas-6.4 FAILED
-
-
-
-==== canvas-6.5 CanvasSetOrigin procedure FAILED
-==== Contents of test case:
-
-    .c configure -xscrollincrement 20 -yscrollincrement 10
-    .c yview moveto 1.0
-    .c canvasy 0
-
----- Result was:
-95.0
----- Result should have been (exact matching):
-55.0
-==== canvas-6.5 FAILED
-
 
 
 ==== canvas-23.1 canvas image FAILED
@@ -803,3 +297,3031 @@ CLIPBOARD selection doesn't exist or form "TEST" not defined
 ==== clipboard-6.2 FAILED
 
 clrpick.test
+cluster.test
+cmds.test
+color.test
+config.test
+cursor.test
+dialog.test
+embed.test
+
+
+==== embed-1.1 Tk_UseWindow procedure, bad window identifier FAILED
+==== Contents of test case:
+
+    toplevel .t -use xyz
+
+---- Result was:
+-use not supported on Plan 9
+---- Result should have been (exact matching):
+expected integer but got "xyz"
+==== embed-1.1 FAILED
+
+
+
+==== embed-1.3 CreateFrame procedure, both -use and -container is invalid FAILED
+==== Contents of test case:
+
+    toplevel .container -container 1
+    toplevel .t -use [winfo id .container] -container 1
+
+---- Result was:
+-use not supported on Plan 9
+---- Result should have been (exact matching):
+windows cannot have both the -use and the -container option set
+==== embed-1.3 FAILED
+
+
+
+==== embed-1.4.nonwin Tk_UseWindow procedure, -container must be set FAILED
+==== Contents of test case:
+
+    toplevel .container
+    toplevel .embd -use [winfo id .container]
+
+---- Result was:
+-use not supported on Plan 9
+---- Result should have been (exact matching):
+window ".container" doesn't have -container option set
+==== embed-1.4.nonwin FAILED
+
+
+
+==== embed-1.5.nonwin Tk_UseWindow procedure, -container must be set FAILED
+==== Contents of test case:
+
+    frame .container
+    toplevel .embd -use [winfo id .container]
+
+---- Result was:
+-use not supported on Plan 9
+---- Result should have been (exact matching):
+window ".container" doesn't have -container option set
+==== embed-1.5.nonwin FAILED
+
+entry.test
+
+
+==== entry-1.20 configuration option: "font" for entry FAILED
+==== Contents of test case:
+
+    .e configure -font {}
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== entry-1.20 FAILED
+
+event.test
+
+
+==== event-9.1 enter . window by destroying a toplevel - bug b1d115fa60 FAILED
+==== Contents of test case:
+
+    wm geometry . 200x200+300+300
+    wm deiconify .
+    pause 200
+    toplevel .top2 -width 200 -height 200
+    wm geometry .top2 +[expr {[winfo rootx .]+50}]+[expr {[winfo rooty .]+50}]
+    update idletasks
+    wm deiconify .top2
+    update idletasks
+    raise .top2
+    pause 400
+    event generate .top2 <Motion> -warp 1 -x 50 -y 50
+    pause 100
+    bind . <Enter> {lappend res %W}
+    set res [list ]
+    destroy .top2
+    update idletasks
+    pause 200
+    set res
+
+---- Result was:
+
+---- Result should have been (exact matching):
+.
+==== event-9.1 FAILED
+
+
+
+==== event-9.2 enter toplevel window by destroying a toplevel - bug b1d115fa60 FAILED
+==== Contents of test case:
+
+    toplevel .top1
+    wm geometry .top1 200x200+300+300
+    wm deiconify .top1
+    pause 200
+    toplevel .top2 -width 200 -height 200
+    wm geometry .top2 +[expr {[winfo rootx .top1]+50}]+[expr {[winfo rooty .top1]+50}]
+    pause 200
+    wm deiconify .top2
+    update idletasks
+    raise .top2
+    pause 400
+    event generate .top2 <Motion> -warp 1 -x 50 -y 50
+    pause 100
+    bind .top1 <Enter> {lappend res %W}
+    set res [list ]
+    destroy .top2
+    pause 200
+    set res
+
+---- Result was:
+
+---- Result should have been (exact matching):
+.top1
+==== event-9.2 FAILED
+
+wait for <Enter> event on .one timed out (> 1000 ms)
+
+
+==== event-9.11 pointer window container = parent FAILED
+==== Contents of test case:
+
+    bind all <Leave> {append result "<Leave> %d %W|"}
+    bind all <Enter> {append result "<Enter> %d %W|"}
+    destroy .one.f1.f2
+    update
+    set result
+
+---- Result was:
+|
+---- Result should have been (exact matching):
+|<Enter> NotifyInferior .one.f1|
+==== event-9.11 FAILED
+
+wait for <Enter> event on .one timed out (> 1000 ms)
+
+
+==== event-9.12 pointer window container != parent FAILED
+==== Contents of test case:
+
+    bind all <Leave> {append result "<Leave> %d %W|"}
+    bind all <Enter> {append result "<Enter> %d %W|"}
+    destroy .one.g
+    update
+    set result
+
+---- Result was:
+|
+---- Result should have been (exact matching):
+|<Enter> NotifyNonlinearVirtual .one.f1|<Enter> NotifyNonlinear .one.f1.f2|
+==== event-9.12 FAILED
+
+wait for <Enter> event on .one timed out (> 1000 ms)
+wait for <Enter> event on .two timed out (> 1000 ms)
+wait for <Enter> event on .one timed out (> 1000 ms)
+
+
+==== event-9.13 pointer window is a toplevel, toplevel destination FAILED
+==== Contents of test case:
+
+    bind all <Leave> {append result "<Leave> %d %W|"}
+    bind all <Enter> {append result "<Enter> %d %W|"}
+    destroy .two
+    waitForWindowEvent .one <Enter>
+    update
+    set result
+
+---- Result was:
+|
+---- Result should have been (exact matching):
+|<Enter> NotifyNonlinear .one|
+==== event-9.13 FAILED
+
+wait for <Enter> event on .one timed out (> 1000 ms)
+wait for <Enter> event on .two timed out (> 1000 ms)
+wait for <Enter> event on .one.f1.f2 timed out (> 1000 ms)
+
+
+==== event-9.14 pointer window is a toplevel, tk internal destination FAILED
+==== Contents of test case:
+
+    bind all <Leave> {append result "<Leave> %d %W|"}
+    bind all <Enter> {append result "<Enter> %d %W|"}
+    destroy .two
+    waitForWindowEvent .one.f1.f2 <Enter>
+    set result
+
+---- Result was:
+|
+---- Result should have been (exact matching):
+|<Enter> NotifyNonlinearVirtual .one|<Enter> NotifyNonlinearVirtual .one.f1|<Enter> NotifyNonlinear .one.f1.f2|
+==== event-9.14 FAILED
+
+wait for <Enter> event on .one timed out (> 1000 ms)
+wait for <Enter> event on .two timed out (> 1000 ms)
+wait for <Enter> event on .one timed out (> 1000 ms)
+
+
+==== event-9.16 Successive destructions (pointer window + parent), single generation of crossing events FAILED
+==== Contents of test case:
+
+    bind all <Leave> {append result "<Leave> %d %W|"}
+    bind all <Enter> {append result "<Enter> %d %W|"}
+    destroy .one.f1
+    update
+    set result
+
+---- Result was:
+|
+---- Result should have been (exact matching):
+|<Enter> NotifyInferior .one|
+==== event-9.16 FAILED
+
+wait for <Enter> event on .one timed out (> 1000 ms)
+
+
+==== event-9.17 Successive destructions (pointer window + parent), separate crossing events FAILED
+==== Contents of test case:
+
+    bind all <Leave> {append result "<Leave> %d %W|"}
+    bind all <Enter> {append result "<Enter> %d %W|"}
+    destroy .one.f1.f2
+    update; # make sure window is gone
+    destroy .one.f1
+    update; # make sure window is gone
+    set result
+
+---- Result was:
+|
+---- Result should have been (exact matching):
+|<Enter> NotifyInferior .one.f1|<Enter> NotifyInferior .one|
+==== event-9.17 FAILED
+
+wait for <Enter> event on .one timed out (> 1000 ms)
+wait for <Enter> event on .two.f1.f2 timed out (> 1000 ms)
+wait for <Enter> event on .one timed out (> 1000 ms)
+
+
+==== event-9.18 Successive destructions (pointer window + ancestors including its toplevel), destination is non-root toplevel FAILED
+==== Contents of test case:
+
+    bind all <Leave> {append result "<Leave> %d %W|"}
+    bind all <Enter> {append result "<Enter> %d %W|"}
+    destroy .two
+    waitForWindowEvent .one <Enter>
+    set result
+
+---- Result was:
+|
+---- Result should have been (exact matching):
+|<Enter> NotifyNonlinear .one|
+==== event-9.18 FAILED
+
+wait for <Enter> event on .one timed out (> 1000 ms)
+wait for <Enter> event on .three.f1.f2 timed out (> 1000 ms)
+wait for <Enter> event on .two.f1.f2 timed out (> 1000 ms)
+
+
+==== event-9.19 Successive destructions (pointer window + ancestors including its toplevel), destination is internal window, bypass root win FAILED
+==== Contents of test case:
+
+    bind all <Leave> {append result "<Leave> %d %W|"}
+    bind all <Enter> {append result "<Enter> %d %W|"}
+    destroy .three
+    waitForWindowEvent .two.f1.f2 <Enter>
+    update idletasks; #finish destroying .two
+    set result
+
+---- Result was:
+|
+---- Result should have been (exact matching):
+|<Enter> NotifyNonlinearVirtual .two|<Enter> NotifyNonlinearVirtual .two.f1|<Enter> NotifyNonlinear .two.f1.f2|
+==== event-9.19 FAILED
+
+wait for <Enter> event on .one timed out (> 1000 ms)
+wait for <Enter> event on .two.f1.f2 timed out (> 1000 ms)
+filebox.test
+
+
+==== filebox-7.1-0 tk_getOpenFile - directory not readable FAILED
+==== Contents of test case:
+
+		ToEnterFileByKey .t1 NOTREADABLE $fileDir
+		ToPressButton .t1 ok
+		ToPressButton .t1 cancel
+		tk_getOpenFile -parent .t1  -title "Please select the NOTREADABLE directory"  -initialdir $fileDir
+		set gotmessage
+	    
+---- Result was:
+
+---- Result should have been (glob matching):
+*NOTREADABLE*
+==== filebox-7.1-0 FAILED
+
+focus.test
+
+
+==== focus-1.19 Tk_FocusCmd procedure, -force option FAILED
+==== Contents of test case:
+
+    focusClear
+    focus .t.b1
+    set x  [list [focus]]
+    focus -force .t.b1
+    lappend x [focus]
+
+---- Result was:
+.t.b1 .t.b1
+---- Result should have been (exact matching):
+{} .t.b1
+==== focus-1.19 FAILED
+
+focusTcl.test
+font.test
+
+
+==== font-4.7 font command: actual: arguments FAILED
+==== Contents of test case:
+
+    # (tkfont == NULL)
+    font actual "\{xyz"
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== font-4.7 FAILED
+
+
+
+==== font-9.4 font command: measure: arguments FAILED
+==== Contents of test case:
+
+    # (tkfont == NULL)
+    font measure "\{xyz" abc
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== font-9.4 FAILED
+
+
+
+==== font-10.6 font command: metrics: bad font FAILED
+==== Contents of test case:
+
+    # (tkfont == NULL)
+    font metrics "\{xyz"
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== font-10.6 FAILED
+
+
+
+==== font-15.9 Tk_AllocFontFromObj procedure: get attribute font FAILED
+==== Contents of test case:
+
+    # (fontPtr == NULL)
+    .t.f config -font {xxx yyy zzz}
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== font-15.9 FAILED
+
+
+
+==== font-15.10 Tk_AllocFontFromObj procedure: no match FAILED
+==== Contents of test case:
+
+    # (ParseFontNameObj() != TCL_OK)
+    font actual "\{xyz"
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== font-15.10 FAILED
+
+
+
+==== font-24.5 Tk_ComputeTextLayout: break line FAILED
+==== Contents of test case:
+
+    .t.l config -text "000\t00000" -wrap [expr 9 * $ax]
+    update
+    list [expr {[winfo reqwidth .t.l] eq [expr {$ax * 8}]}]  [expr {[winfo reqheight .t.l] eq [expr {$ay * 2}]}]
+
+---- Result was:
+0 1
+---- Result should have been (exact matching):
+1 1
+==== font-24.5 FAILED
+
+
+
+==== font-24.11 Tk_ComputeTextLayout: absorb spaces at eol FAILED
+==== Contents of test case:
+
+    set x {}
+    .t.l config -text "000            000" -wrap [expr {$ax * 5}]
+    update
+    lappend x [expr {[winfo reqwidth .t.l] eq [expr {$ax * 3}]}]
+    lappend x [expr {[winfo reqheight .t.l] eq [expr {$ay * 2}]}]
+    .t.l config -text "000            "
+    update
+    lappend x [expr {[winfo reqwidth .t.l] eq [expr {$ax * 3}]}]
+    lappend x [expr {[winfo reqheight .t.l] eq $ay}]
+    return $x
+
+---- Result was:
+0 1 0 1
+---- Result should have been (exact matching):
+1 1 1 1
+==== font-24.11 FAILED
+
+
+
+==== font-24.12 Tk_ComputeTextLayout: append non-printing spaces to chunk FAILED
+==== Contents of test case:
+
+    set x {}
+    .t.l config -text "000            0000" -wrap [expr {$ax * 5}]
+    update
+    lappend x [expr {[winfo reqwidth .t.l] eq [expr {$ax * 4}]}]
+    lappend x [expr {[winfo reqheight .t.l] eq [expr {$ay * 2}]}]
+    .t.l config -text "000\t00            0000" -wrap [expr {$ax * 12}]
+    update
+    lappend x [expr {[winfo reqwidth .t.l] eq [expr {$ax * 10}]}]
+    lappend x [expr {[winfo reqheight .t.l] eq [expr {$ay * 2}]}]
+    return $x
+
+---- Result was:
+0 1 0 1
+---- Result should have been (exact matching):
+1 1 1 1
+==== font-24.12 FAILED
+
+
+
+==== font-24.15 Tk_ComputeTextLayout: justification FAILED
+==== Contents of test case:
+
+    csetup "000\n00000"
+    .t.c itemconfig text -just left
+    lappend x [.t.c index text @[expr $ax*2],0]
+    .t.c itemconfig text -just center
+    lappend x [.t.c index text @[expr $ax*2],0]
+    .t.c itemconfig text -just right
+    lappend x [.t.c index text @[expr $ax*2],0]
+    .t.c itemconfig text -just left
+    return $x
+
+---- Result was:
+1 0 0
+---- Result should have been (exact matching):
+2 1 0
+==== font-24.15 FAILED
+
+
+
+==== font-28.4 Tk_PointToChar procedure: intersect line FAILED
+==== Contents of test case:
+
+    csetup "000\n000\n000"
+    .t.c index text @0,$ay
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+4
+==== font-28.4 FAILED
+
+
+
+==== font-28.5 Tk_PointToChar procedure: to the left of all chunks FAILED
+==== Contents of test case:
+
+    csetup "000\n000\n000"
+    .t.c index text @-100,$ay
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+4
+==== font-28.5 FAILED
+
+
+
+==== font-28.6 Tk_PointToChar procedure: past any possible chunk FAILED
+==== Contents of test case:
+
+    csetup "000\n000\n000"
+    .t.c index text @100000,$ay
+
+---- Result was:
+3
+---- Result should have been (exact matching):
+7
+==== font-28.6 FAILED
+
+
+
+==== font-28.7 Tk_PointToChar procedure: which chunk on this line FAILED
+==== Contents of test case:
+
+    csetup "000\n000\t000\t000\n000"
+    .t.c index text @[expr $ax*2],$ay
+
+---- Result was:
+1
+---- Result should have been (exact matching):
+6
+==== font-28.7 FAILED
+
+
+
+==== font-28.8 Tk_PointToChar procedure: which chunk on this line FAILED
+==== Contents of test case:
+
+    csetup "000\n000\t000\t000\n000"
+    .t.c index text @[expr $ax*10],$ay
+
+---- Result was:
+3
+---- Result should have been (exact matching):
+10
+==== font-28.8 FAILED
+
+
+
+==== font-28.9 Tk_PointToChar procedure: in special chunk FAILED
+==== Contents of test case:
+
+    csetup "000\n000\t000\t000\n000"
+    .t.c index text @[expr $ax*6],$ay
+
+---- Result was:
+3
+---- Result should have been (exact matching):
+7
+==== font-28.9 FAILED
+
+
+
+==== font-28.10 Tk_PointToChar procedure: past all chars in chunk FAILED
+==== Contents of test case:
+
+    csetup "000 0000000"
+    .t.c itemconfig text -width [expr $ax*5]
+    set x [.t.c index text @[expr $ax*5],0]
+    .t.c itemconfig text -width 0
+    return $x
+
+---- Result was:
+4
+---- Result should have been (exact matching):
+3
+==== font-28.10 FAILED
+
+
+
+==== font-30.2 Tk_DistanceToTextLayout procedure: loop multiple FAILED
+==== Contents of test case:
+
+    csetup "000\n000\n000"
+    .t.c bind all <Enter> {lappend x [.t.c index current @%x,%y]}
+    set x {}
+    event generate .t.c <Leave>
+    event generate .t.c <Enter> -x $ax -y $ay
+    return $x
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+5
+==== font-30.2 FAILED
+
+
+
+==== font-30.3 Tk_DistanceToTextLayout procedure: loop to end FAILED
+==== Contents of test case:
+
+    csetup "000\n0\n000"
+    .t.c bind all <Enter> {lappend x [.t.c index current @%x,%y]}
+    set x {}
+    event generate .t.c <Leave>
+    event generate .t.c <Enter> -x [expr $ax*2] -y $ay
+    return $x
+
+---- Result was:
+1
+---- Result should have been (exact matching):
+
+==== font-30.3 FAILED
+
+
+
+==== font-30.5 Tk_DistanceToTextLayout procedure: ignore newline FAILED
+==== Contents of test case:
+
+    csetup "000\n0\n000"
+    .t.c bind all <Enter> {lappend x [.t.c index current @%x,%y]}
+    set x {}
+    event generate .t.c <Leave>
+    event generate .t.c <Enter> -x [expr $ax*2] -y $ay
+    return $x
+
+---- Result was:
+1
+---- Result should have been (exact matching):
+
+==== font-30.5 FAILED
+
+
+
+==== font-30.8 Tk_DistanceToTextLayout procedure: on right side FAILED
+==== Contents of test case:
+
+    csetup "0\n000"
+    .t.c bind all <Enter> {lappend x [.t.c index current @%x,%y]}
+    set x {}
+    event generate .t.c <Leave>
+    event generate .t.c <Enter> -x [expr $ax*2] -y 0
+    return $x
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+
+==== font-30.8 FAILED
+
+
+
+==== font-30.9 Tk_DistanceToTextLayout procedure: inside line FAILED
+==== Contents of test case:
+
+    csetup "0\n000"
+    .t.c bind all <Enter> {lappend x [.t.c index current @%x,%y]}
+    set x {}
+    event generate .t.c <Leave>
+    event generate .t.c <Enter> -x $ax -y 0
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+0
+==== font-30.9 FAILED
+
+
+
+==== font-30.11 Tk_DistanceToTextLayout procedure: below line FAILED
+==== Contents of test case:
+
+    csetup "000\n0"
+    .t.c bind all <Enter> {lappend x [.t.c index current @%x,%y]}
+    set x {}
+    event generate .t.c <Leave>
+    event generate .t.c <Enter> -x 0 -y $ay
+    return $x
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+
+==== font-30.11 FAILED
+
+
+
+==== font-30.12 Tk_DistanceToTextLayout procedure: in line FAILED
+==== Contents of test case:
+
+    csetup "0\n000"
+    .t.c bind all <Enter> {lappend x [.t.c index current @%x,%y]}
+    set x {}
+    event generate .t.c <Leave>
+    event generate .t.c <Enter> -x $ax -y $ay
+    return $x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+3
+==== font-30.12 FAILED
+
+
+
+==== font-30.13 Tk_DistanceToTextLayout procedure: exact hit FAILED
+==== Contents of test case:
+
+    csetup "000"
+    .t.c bind all <Enter> {lappend x [.t.c index current @%x,%y]}
+    set x {}
+    event generate .t.c <Leave>
+    event generate .t.c <Enter> -x $ax -y 0
+    return $x
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== font-30.13 FAILED
+
+
+
+==== font-31.6 Tk_IntersectTextLayout procedure: ignore spaces at eol FAILED
+==== Contents of test case:
+
+    csetup "000\n000      000000000"
+    .t.c itemconfig text -width [expr $ax*10]
+    set x [.t.c find overlapping [expr $ax*5] $ay [expr $ax*5] $ay]
+    .t.c itemconfig text -width 0
+    return $x
+
+---- Result was:
+1
+---- Result should have been (exact matching):
+
+==== font-31.6 FAILED
+
+
+
+==== font-38.1 ParseFontNameObj procedure: begins with - FAILED
+==== Contents of test case:
+
+    lindex [font actual -xyz-times-*-*-*-*-*-*-*-*-*-*-*-*] 1
+
+---- Result was:
+-xyz-times-*-*-*-*-*-*-*-*-*-*-*-*
+---- Result should have been (exact matching):
+times 0
+==== font-38.1 FAILED
+
+
+
+==== font-38.2 ParseFontNameObj procedure: begins with -* FAILED
+==== Contents of test case:
+
+    lindex [font actual -*-times-xyz-*-*-*-*-*-*-*-*-*-*-*] 1
+
+---- Result was:
+-*-times-xyz-*-*-*-*-*-*-*-*-*-*-*
+---- Result should have been (exact matching):
+times 0
+==== font-38.2 FAILED
+
+
+
+==== font-38.3 ParseFontNameObj procedure: begins with -, doesn't look like list FAILED
+==== Contents of test case:
+
+    lindex [font actual -xyz-times-*-*-*-*-*-*-*-*-*-*-*-*] 1
+
+---- Result was:
+-xyz-times-*-*-*-*-*-*-*-*-*-*-*-*
+---- Result should have been (exact matching):
+times 0
+==== font-38.3 FAILED
+
+
+
+==== font-38.4 ParseFontNameObj procedure: begins with -, looks like list FAILED
+==== Contents of test case:
+
+    lindex [font actual {-family times}] 1
+
+---- Result was:
+-family times
+---- Result should have been (exact matching):
+times 0
+==== font-38.4 FAILED
+
+
+
+==== font-38.5 ParseFontNameObj procedure: begins with * FAILED
+==== Contents of test case:
+
+    lindex [font actual *-times-xyz-*-*-*-*-*-*-*-*-*-*-*] 1
+
+---- Result was:
+*-times-xyz-*-*-*-*-*-*-*-*-*-*-*
+---- Result should have been (exact matching):
+times 0
+==== font-38.5 FAILED
+
+
+
+==== font-38.6 ParseFontNameObj procedure: begins with * FAILED
+==== Contents of test case:
+
+    font actual *-times-xyz -family
+
+---- Result was:
+*-times-xyz
+---- Result should have been (exact matching):
+times 0
+==== font-38.6 FAILED
+
+
+
+==== font-38.7 ParseFontNameObj procedure: arguments FAILED
+==== Contents of test case:
+
+    font actual "\{xyz"
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== font-38.7 FAILED
+
+
+
+==== font-38.8 ParseFontNameObj procedure: arguments FAILED
+==== Contents of test case:
+
+    font actual ""
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== font-38.8 FAILED
+
+
+
+==== font-38.9 ParseFontNameObj procedure: arguments FAILED
+==== Contents of test case:
+
+    font actual {times 20 xyz xyz}
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== font-38.9 FAILED
+
+
+
+==== font-38.10 ParseFontNameObj procedure: arguments FAILED
+==== Contents of test case:
+
+    font actual {times xyz xyz}
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== font-38.10 FAILED
+
+
+
+==== font-38.12 ParseFontNameObj procedure: stylelist error FAILED
+==== Contents of test case:
+
+    font actual {times 12 bold xyz}
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== font-38.12 FAILED
+
+
+
+==== font-38.13 ParseFontNameObj: options with hyphenated family: bug #2791352 FAILED
+==== Contents of test case:
+
+    font actual {-family sans-serif -size 12 -weight bold -slant roman -underline 0 -overstrike 0}
+
+---- Result was:
+-family {-family sans-serif -size 12 -weight bold -slant roman -underline 0 -overstrike 0} -size 18 -weight normal -slant roman -underline 0 -overstrike 0
+---- Result should have been (exact matching):
+-family {sans-serif 12 bold} -size 18 -weight normal -slant roman -underline 0 -overstrike 0
+==== font-38.13 FAILED
+
+
+
+==== font-38.14 ParseFontNameObj: bug #2791352 FAILED
+==== Contents of test case:
+
+    font actual {-invalidfont 8 bold}
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== font-38.14 FAILED
+
+
+
+==== font-40.1 TkFontParseXLFD procedure: initial dash FAILED
+==== Contents of test case:
+
+    font actual -xyz-times-*-*-*-*-*-*-*-*-*-*-*-* -family
+
+---- Result was:
+-xyz-times-*-*-*-*-*-*-*-*-*-*-*-*
+---- Result should have been (exact matching):
+times 0
+==== font-40.1 FAILED
+
+
+
+==== font-40.2 TkFontParseXLFD procedure: no initial dash FAILED
+==== Contents of test case:
+
+    font actual *-times-*-*-*-*-*-*-*-*-*-*-*-xyz -family
+
+---- Result was:
+*-times-*-*-*-*-*-*-*-*-*-*-*-xyz
+---- Result should have been (exact matching):
+times 0
+==== font-40.2 FAILED
+
+
+
+==== font-40.3 TkFontParseXLFD procedure: not enough fields FAILED
+==== Contents of test case:
+
+    font actual -xyz-times-*-*-* -family
+
+---- Result was:
+-xyz-times-*-*-*
+---- Result should have been (exact matching):
+times 0
+==== font-40.3 FAILED
+
+
+
+==== font-40.5 TkFontParseXLFD procedure: all fields specified FAILED
+==== Contents of test case:
+
+    lindex [font actual  -foundry-times-weight-slant-setwidth-addstyle-10-10-10-10-spacing-avgwidth-registry-encoding] 1
+
+---- Result was:
+-foundry-times-weight-slant-setwidth-addstyle-10-10-10-10-spacing-avgwidth-registry-encoding
+---- Result should have been (exact matching):
+times 0
+==== font-40.5 FAILED
+
+
+
+==== font-43.1 FieldSpecified procedure: specified vs. non-specified FAILED
+==== Contents of test case:
+
+    font actual -xyz--*-*-*-*-*-*-*-*-*-*-*-*
+    font actual -xyz-*-*-*-*-*-*-*-*-*-*-*-*-*
+    font actual -xyz-?-*-*-*-*-*-*-*-*-*-*-*-*
+    lindex [font actual -xyz-times-*-*-*-*-*-*-*-*-*-*-*-*] 1
+
+---- Result was:
+-xyz-times-*-*-*-*-*-*-*-*-*-*-*-*
+---- Result should have been (exact matching):
+times 0
+==== font-43.1 FAILED
+
+
+
+==== font-44.1 TkFontGetPixels: size < 0 FAILED
+==== Contents of test case:
+
+    # if this test failed, start the investigations by reading ticket [8162e9b7a9]
+    tk scaling 0.5
+    font actual {times -13} -size
+
+---- Result was:
+16
+---- Result should have been (exact matching):
+26
+==== font-44.1 FAILED
+
+
+
+==== font-45.1 TkFontGetAliasList: no match FAILED
+==== Contents of test case:
+
+    font actual {snarky 10} -family
+
+---- Result was:
+snarky 10
+---- Result should have been (exact matching):
+-size 10
+==== font-45.1 FAILED
+
+fontchooser.test
+
+
+==== fontchooser-2.0 fontchooser -title FAILED
+==== Contents of test case:
+
+    testDialog launch {
+	tk::fontchooser::Configure -title "Hello"
+	tk::fontchooser::Show
+    }
+    testDialog onDisplay {
+	set x [wm title $testDialog]
+	Click cancel
+    }
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Hello
+==== fontchooser-2.0 FAILED
+
+
+
+==== fontchooser-2.1 fontchooser -title (cyrillic) FAILED
+==== Contents of test case:
+
+    testDialog launch {
+	tk::fontchooser::Configure  -title "Привет"
+	tk::fontchooser::Show
+    }
+    testDialog onDisplay {
+	set x [wm title $testDialog]
+	Click cancel
+    }
+    set x
+
+---- Result was:
+
+---- Result should have been (exact matching):
+\u041F\u0440\u0438\u0432\u0435\u0442
+==== fontchooser-2.1 FAILED
+
+
+
+==== fontchooser-4.1 fontchooser -font FAILED
+==== Contents of test case:
+
+    testDialog launch {
+	tk::fontchooser::Configure -command $applyFontCmd -font courier
+	tk::fontchooser::Show
+    }
+    testDialog onDisplay {
+	Click ok
+    }
+    expr {$testDialogFont ne {}}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== fontchooser-4.1 FAILED
+
+
+
+==== fontchooser-4.2 fontchooser -font FAILED
+==== Contents of test case:
+
+    testDialog launch {
+	tk::fontchooser::Configure -command $applyFontCmd -font TkDefaultFont
+	tk::fontchooser::Show
+    }
+    testDialog onDisplay {
+	Click ok
+    }
+    expr {$testDialogFont ne {}}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== fontchooser-4.2 FAILED
+
+
+
+==== fontchooser-4.3 fontchooser -font FAILED
+==== Contents of test case:
+
+    testDialog launch {
+	tk::fontchooser::Configure -command $applyFontCmd -font {times 14 bold}
+	tk::fontchooser::Show
+    }
+    testDialog onDisplay {
+	Click ok
+    }
+    expr {$testDialogFont ne {}}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== fontchooser-4.3 FAILED
+
+frame.test
+
+
+==== frame-1.3 frame configuration options FAILED
+==== Contents of test case:
+
+    frame .f -colormap new
+    .f configure -colormap
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: 
+    while executing
+"frame .f -colormap new"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== frame-1.3 FAILED
+
+
+
+==== frame-1.4 frame configuration options FAILED
+==== Contents of test case:
+
+    frame .f -colormap new
+    .f configure -colormap .
+
+---- Result was:
+
+---- Result should have been (exact matching):
+can't modify -colormap option after widget is created
+==== frame-1.4 FAILED
+
+
+
+==== frame-2.3 toplevel configuration options FAILED
+==== Contents of test case:
+
+    toplevel .t -width 200 -height 100 -colormap new
+    wm geometry .t +0+0
+    .t configure -colormap
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: 
+    while executing
+"toplevel .t -width 200 -height 100 -colormap new"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== frame-2.3 FAILED
+
+
+
+==== frame-2.4 toplevel configuration options FAILED
+==== Contents of test case:
+
+    toplevel .t -width 200 -height 100 -colormap new
+    wm geometry .t +0+0
+    .t configure -colormap .
+
+---- Result was:
+
+---- Result should have been (exact matching):
+can't modify -colormap option after widget is created
+==== frame-2.4 FAILED
+
+
+
+==== frame-2.18 toplevel configuration options FAILED
+==== Contents of test case:
+
+    toplevel .t -container 1 -width 300 -height 120
+    wm geometry .t +0+0
+    toplevel .x -container 1 -use [winfo id .t]
+
+---- Result was:
+-use not supported on Plan 9
+---- Result should have been (exact matching):
+windows cannot have both the -use and the -container option set
+==== frame-2.18 FAILED
+
+
+
+==== frame-3.9 TkCreateFrame procedure, -use option FAILED
+==== Contents of test case:
+
+    toplevel .t -container 1 -width 300 -height 120
+    wm geometry .t +0+0
+    toplevel .x -width 140 -height 300 -use [winfo id .t] -bg green
+    tkwait visibility .x
+    list [expr {[winfo rootx .x] - [winfo rootx .t]}]  [expr {[winfo rooty .x] - [winfo rooty .t]}]  [winfo width .t] [winfo height .t]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    while executing
+"toplevel .x -width 140 -height 300 -use [winfo id .t] -bg green"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== frame-3.9 FAILED
+
+
+
+==== frame-3.10 TkCreateFrame procedure, -use option FAILED
+==== Contents of test case:
+
+    toplevel .t -container 1 -width 300 -height 120
+    wm geometry .t +0+0
+    update
+    option add *x.use [winfo id .t]
+    toplevel .x -width 140 -height 300 -bg green
+    tkwait visibility .x
+    update
+    list [expr {[winfo rootx .x] - [winfo rootx .t]}]  [expr {[winfo rooty .x] - [winfo rooty .t]}]  [winfo width .t] [winfo height .t]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    while executing
+"toplevel .x -width 140 -height 300 -bg green"
+    ("uplevel" body line 6)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== frame-3.10 FAILED
+
+
+
+==== frame-3.24 TkCreateFrame procedure FAILED
+==== Contents of test case:
+
+    toplevel .t -width 300 -height 200 -colormap new -bogus option
+    wm geometry .t +0+0
+
+---- Result was:
+
+---- Result should have been (exact matching):
+unknown option "-bogus"
+==== frame-3.24 FAILED
+
+
+
+==== frame-13.3 labelframe configuration options FAILED
+==== Contents of test case:
+
+    labelframe .f -colormap new
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: 
+    while executing
+"labelframe .f -colormap new"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== frame-13.3 FAILED
+
+geometry.test
+
+
+==== geometry-4.7 Tk_MaintainGeometry and Tk_UnmaintainGeometry FAILED
+==== Contents of test case:
+
+    bind .b1 <Configure> {lappend x configure}
+    place .f -x 20 -y 30 -width 200 -height 200
+    place .f.f -x 15 -y 5 -width 150 -height 120
+    place .f.f.f -width 100 -height 80
+    place .f.f.b4 -in .f.f.f -x 50 -y 5
+    place .b1 -in .f.f.f -x 10 -y 25
+    update
+    set x init
+    place .f -x 25 -y 35
+    update
+    lappend x |
+    place .f -x 30 -y 40
+    place .f.f -x 10 -y 0
+    update
+    return $x
+
+---- Result was:
+init configure configure |
+---- Result should have been (exact matching):
+init configure |
+==== geometry-4.7 FAILED
+
+get.test
+grab.test
+grid.test
+image.test
+
+
+==== image-6.2 Tk_ImageCmd procedure, "types" option FAILED
+==== Contents of test case:
+
+    lsort [image types]
+
+---- Result was:
+bitmap photo
+---- Result should have been (glob matching):
+bitmap*photo test
+==== image-6.2 FAILED
+
+imgBmap.test
+imgListFormat.test
+
+
+==== imgListFormat-3.1 StringMatchDef: data is not a list FAILED
+==== Contents of test case:
+
+    testphotostringmatch {not a " proper list}
+    # " (this comment is here only for editor highlighting)
+
+---- Result was:
+invalid command name "testphotostringmatch"
+---- Result should have been (exact matching):
+unmatched open quote in list
+==== imgListFormat-3.1 FAILED
+
+
+
+==== imgListFormat-3.2 StringMatchDef:  list element not a proper list FAILED
+==== Contents of test case:
+
+    testphotostringmatch {{red white} {not "} {blue green}}
+    # "
+
+---- Result was:
+invalid command name "testphotostringmatch"
+---- Result should have been (exact matching):
+unmatched open quote in list
+==== imgListFormat-3.2 FAILED
+
+
+
+==== imgListFormat-3.3 StringMatchDef:  sublists with differen lengths FAILED
+==== Contents of test case:
+
+    testphotostringmatch {{#001122 #334455 #667788}
+		{#99AABB #CCDDEE}
+		{#FF0011 #223344 #556677}}
+
+---- Result was:
+invalid command name "testphotostringmatch"
+---- Result should have been (exact matching):
+invalid row # 1: all rows must have the same number of elements
+==== imgListFormat-3.3 FAILED
+
+imgPNG.test
+imgPPM.test
+imgPhoto.test
+
+
+==== imgPhoto-4.15 ImgPhotoCmd procedure: copy option FAILED
+==== Contents of test case:
+
+    photo1 copy photo2
+    photo1 copy photo2 -from 0 70 60 120 -shrink
+    list [image width photo1] [image height photo1] [photo1 get 20 10]
+
+---- Result was:
+60 50 {0 0 0}
+---- Result should have been (exact matching):
+60 50 {215 154 120}
+==== imgPhoto-4.15 FAILED
+
+
+
+==== imgPhoto-4.75 <photo> read command: filename starting with '-' FAILED
+==== Contents of test case:
+
+    file copy -force $teapotPhotoFile -teapotPhotoFile
+    image create photo photo1
+    photo1 read -teapotPhotoFile
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "/usr/glenda/APExp/sys/src/external/tk/tests/teapot.ppm" to "-teapotPhotoFile": no such file or directory
+    while executing
+"file copy -force $teapotPhotoFile -teapotPhotoFile"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+---- Test cleanup failed:
+image "photo1" does not exist
+---- errorInfo(cleanup): image "photo1" does not exist
+    while executing
+"image delete photo1"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TK LOOKUP IMAGE photo1
+==== imgPhoto-4.75 FAILED
+
+imgSVGnano.test
+listbox.test
+
+
+==== listbox-4.7 ConfigureListbox procedure FAILED
+==== Contents of test case:
+
+    wm withdraw .
+    listbox .l2 -font $fixed -width 30 -height 20 -setgrid 1
+    wm geom . +25+25
+    pack .l2
+    update
+    wm deiconify .
+    set result [getsize .]
+    wm geom . 26x15
+    update
+    lappend result [getsize .]
+    .l2 configure -setgrid 1
+    update
+    lappend result [getsize .]
+
+---- Result was:
+190x328 26x15 26x15
+---- Result should have been (exact matching):
+30x20 26x15 26x15
+==== listbox-4.7 FAILED
+
+main.test
+menu.test
+
+
+==== menu-2.104 entry configuration options 1 -font {kill rock stars} command FAILED
+==== Contents of test case:
+
+    .m1 entryconfigure 1 -font {kill rock stars}
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== menu-2.104 FAILED
+
+
+
+==== menu-2.105 entry configuration options 2 -font {kill rock stars} cascade FAILED
+==== Contents of test case:
+
+    .m1 entryconfigure 2 -font {kill rock stars}
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== menu-2.105 FAILED
+
+
+
+==== menu-2.107 entry configuration options 4 -font {kill rock stars} checkbutton FAILED
+==== Contents of test case:
+
+    .m1 entryconfigure 4 -font {kill rock stars}
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== menu-2.107 FAILED
+
+
+
+==== menu-2.108 entry configuration options 5 -font {kill rock stars} radiobutton FAILED
+==== Contents of test case:
+
+    .m1 entryconfigure 5 -font {kill rock stars}
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== menu-2.108 FAILED
+
+menuDraw.test
+menubut.test
+message.test
+
+
+==== message-1.18 configuration option: "font" FAILED
+==== Contents of test case:
+
+    .m configure -font {}
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== message-1.18 FAILED
+
+msgbox.test
+obj.test
+option.test
+pack.test
+
+
+==== pack-18.1.1 unmap content when container unmapped FAILED
+==== Contents of test case:
+
+    frame .pack.a -width 100 -height 50 -relief raised -bd 2 -bg green
+    after 100
+    pack .pack.a
+    update
+    set result [winfo ismapped .pack.a]
+    wm iconify .pack
+    lappend result [winfo ismapped .pack.a]
+    .pack.a configure -width 200 -height 75
+    update
+    lappend result [winfo width .pack.a] [winfo height .pack.a]  [winfo ismapped .pack.a]
+    wm deiconify .pack
+    update
+    lappend result [winfo ismapped .pack.a]
+
+---- Result was:
+1 1 200 75 1 1
+---- Result should have been (exact matching):
+1 0 200 75 0 1
+==== pack-18.1.1 FAILED
+
+
+
+==== pack-18.2 unmap content when container unmapped FAILED
+==== Contents of test case:
+
+    frame .pack.a -relief raised -bd 2 -bg green
+    frame .pack.b -width 70 -height 30 -relief sunken -bd 2 -bg red
+    pack .pack.a
+    pack .pack.b -in .pack.a
+    update
+    set result [winfo ismapped .pack.b]
+    wm iconify .pack
+    lappend result [winfo ismapped .pack.b]
+    .pack.b configure -width 100 -height 30
+    update
+    lappend result [winfo width .pack.b] [winfo height .pack.b]  [winfo ismapped .pack.b]
+    wm deiconify .pack
+    update
+    lappend result [winfo ismapped .pack.b]
+
+---- Result was:
+1 1 100 30 1 1
+---- Result should have been (exact matching):
+1 0 100 30 0 1
+==== pack-18.2 FAILED
+
+packgrid.test
+panedwindow.test
+pkgconfig.test
+
+
+==== pkgconfig-1.1 query keys FAILED
+==== Contents of test case:
+
+    lsort [::tk::pkgconfig list]
+
+---- Result was:
+fontsystem
+---- Result should have been (glob matching):
+*bindir,install bindir,runtime *demodir,install demodir,runtime*docdir,install docdir,runtime fontsystem includedir,install includedir,runtime libdir,install libdir,runtime* scriptdir,install scriptdir,runtime*
+==== pkgconfig-1.1 FAILED
+
+place.test
+
+
+==== place-8.1 PlaceStructureProc, mapping and unmapping content FAILED
+==== Contents of test case:
+
+    place .t.f2 -relx 1.0 -rely 1.0 -anchor sw
+    update
+    set result [winfo ismapped .t.f2]
+    wm iconify .t
+    lappend result [winfo ismapped .t.f2]
+    place .t.f2 -x 40 -y 30 -relx 0 -rely 0 -anchor nw
+    update
+    lappend result [winfo x .t.f2] [winfo y .t.f2] [winfo ismapped .t.f2]
+    wm deiconify .t
+    update
+    lappend result [winfo ismapped .t.f2]
+
+---- Result was:
+1 1 40 30 1 1
+---- Result should have been (exact matching):
+1 0 40 30 0 1
+==== place-8.1 FAILED
+
+
+
+==== place-8.2 PlaceStructureProc, mapping and unmapping content FAILED
+==== Contents of test case:
+
+    place .t.f -x 0 -y 0 -width 200 -height 100
+    place .t.f2 -in .t.f -relx 1.0 -rely 1.0 -anchor sw -width 50 -height 20
+    update
+    set result [winfo ismapped .t.f2]
+    wm iconify .t
+    update idletasks
+    lappend result [winfo ismapped .t.f2]
+    place .t.f2 -x 40 -y 30 -relx 0 -rely 0 -anchor nw
+    update
+    lappend result [winfo x .t.f2] [winfo y .t.f2] [winfo ismapped .t.f2]
+    wm deiconify .t
+    update
+    lappend result [winfo ismapped .t.f2]
+
+---- Result was:
+1 1 42 32 1 1
+---- Result should have been (exact matching):
+1 0 42 32 0 1
+==== place-8.2 FAILED
+
+raise.test
+
+
+==== raise-1.1 preserve creation order FAILED
+==== Contents of test case:
+
+    raise_setup
+    tkwait visibility .raise.e
+    raise_getOrder
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: bad window path name ""
+    while executing
+"winfo name [winfo containing [expr $x+50] [expr $y+70]]"
+    (procedure "raise_getOrder" line 4)
+    invoked from within
+"raise_getOrder"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TK LOOKUP WINDOW {}
+==== raise-1.1 FAILED
+
+
+
+==== raise-2.1 raise internal windows before creation FAILED
+==== Contents of test case:
+
+    raise_setup
+    raise .raise.a
+    update
+    raise_getOrder
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: bad window path name ""
+    while executing
+"winfo name [winfo containing [expr $x+50] [expr $y+70]]"
+    (procedure "raise_getOrder" line 4)
+    invoked from within
+"raise_getOrder"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TK LOOKUP WINDOW {}
+==== raise-2.1 FAILED
+
+
+
+==== raise-2.2 raise internal windows before creation FAILED
+==== Contents of test case:
+
+    raise_setup
+    raise .raise.c
+    update
+    raise_getOrder
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: bad window path name ""
+    while executing
+"winfo name [winfo containing [expr $x+50] [expr $y+70]]"
+    (procedure "raise_getOrder" line 4)
+    invoked from within
+"raise_getOrder"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TK LOOKUP WINDOW {}
+==== raise-2.2 FAILED
+
+
+
+==== raise-2.3 raise internal windows before creation FAILED
+==== Contents of test case:
+
+    raise_setup
+    raise .raise.e
+    update
+    raise_getOrder
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: bad window path name ""
+    while executing
+"winfo name [winfo containing [expr $x+50] [expr $y+70]]"
+    (procedure "raise_getOrder" line 4)
+    invoked from within
+"raise_getOrder"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TK LOOKUP WINDOW {}
+==== raise-2.3 FAILED
+
+
+
+==== raise-2.4 raise internal windows before creation FAILED
+==== Contents of test case:
+
+    raise_setup
+    raise .raise.e .raise.a
+    update
+    raise_getOrder
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: bad window path name ""
+    while executing
+"winfo name [winfo containing [expr $x+50] [expr $y+70]]"
+    (procedure "raise_getOrder" line 4)
+    invoked from within
+"raise_getOrder"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TK LOOKUP WINDOW {}
+==== raise-2.4 FAILED
+
+
+
+==== raise-2.5 raise internal windows before creation FAILED
+==== Contents of test case:
+
+    raise_setup
+    raise .raise.a .raise.d
+    update
+    raise_getOrder
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: bad window path name ""
+    while executing
+"winfo name [winfo containing [expr $x+50] [expr $y+70]]"
+    (procedure "raise_getOrder" line 4)
+    invoked from within
+"raise_getOrder"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TK LOOKUP WINDOW {}
+==== raise-2.5 FAILED
+
+
+
+==== raise-3.1 raise internal windows after creation FAILED
+==== Contents of test case:
+
+    raise_setup
+    update
+    raise .raise.a .raise.d
+    raise_getOrder
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: bad window path name ""
+    while executing
+"winfo name [winfo containing [expr $x+50] [expr $y+70]]"
+    (procedure "raise_getOrder" line 4)
+    invoked from within
+"raise_getOrder"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TK LOOKUP WINDOW {}
+==== raise-3.1 FAILED
+
+
+
+==== raise-4.1 raise relative to nephews FAILED
+==== Contents of test case:
+
+    raise_setup
+    update
+    frame .raise.d.child
+    raise .raise.a .raise.d.child
+    raise_getOrder
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: bad window path name ""
+    while executing
+"winfo name [winfo containing [expr $x+50] [expr $y+70]]"
+    (procedure "raise_getOrder" line 4)
+    invoked from within
+"raise_getOrder"
+    ("uplevel" body line 6)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TK LOOKUP WINDOW {}
+==== raise-4.1 FAILED
+
+
+
+==== raise-5.1 lower internal windows FAILED
+==== Contents of test case:
+
+    raise_setup
+    update
+    lower .raise.d
+    raise_getOrder
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: bad window path name ""
+    while executing
+"winfo name [winfo containing [expr $x+50] [expr $y+70]]"
+    (procedure "raise_getOrder" line 4)
+    invoked from within
+"raise_getOrder"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TK LOOKUP WINDOW {}
+==== raise-5.1 FAILED
+
+
+
+==== raise-5.2 lower internal windows FAILED
+==== Contents of test case:
+
+    raise_setup
+    update
+    lower .raise.d .raise.b
+    raise_getOrder
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: bad window path name ""
+    while executing
+"winfo name [winfo containing [expr $x+50] [expr $y+70]]"
+    (procedure "raise_getOrder" line 4)
+    invoked from within
+"raise_getOrder"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TK LOOKUP WINDOW {}
+==== raise-5.2 FAILED
+
+
+
+==== raise-5.3 lower internal windows FAILED
+==== Contents of test case:
+
+    raise_setup
+    update
+    lower .raise.a .raise.e
+    raise_getOrder
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: bad window path name ""
+    while executing
+"winfo name [winfo containing [expr $x+50] [expr $y+70]]"
+    (procedure "raise_getOrder" line 4)
+    invoked from within
+"raise_getOrder"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TK LOOKUP WINDOW {}
+==== raise-5.3 FAILED
+
+safe.test
+
+
+==== safe-1.1 Safe Tk loading into an interpreter FAILED
+==== Contents of test case:
+
+    safe::loadTk [safe::interpCreate a]
+    safe::interpDelete a
+    set x {}
+    return $x
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "safe::loadTk" line 61)
+    invoked from within
+"safe::loadTk [safe::interpCreate a]"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+==== safe-1.1 FAILED
+
+
+
+==== safe-1.2 Safe Tk loading into an interpreter FAILED
+==== Contents of test case:
+
+    safe::interpCreate a
+    safe::loadTk a
+    lsort [interp hidden a]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "safe::loadTk" line 61)
+    invoked from within
+"safe::loadTk a"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+==== safe-1.2 FAILED
+
+
+
+==== safe-1.3 Safe Tk loading into an interpreter FAILED
+==== Contents of test case:
+
+    safe::interpCreate a
+    safe::loadTk a
+    lsort [interp aliases a]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "safe::loadTk" line 61)
+    invoked from within
+"safe::loadTk a"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+==== safe-1.3 FAILED
+
+
+
+==== safe-2.1 Unsafe commands not available FAILED
+==== Contents of test case:
+
+    safe::interpCreate a
+    safe::loadTk a
+    set status broken
+    if {[catch {interp eval a {toplevel .t}} msg]} {
+	set status ok
+    }
+    return $status
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "safe::loadTk" line 61)
+    invoked from within
+"safe::loadTk a"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+==== safe-2.1 FAILED
+
+
+
+==== safe-2.2 Unsafe commands not available FAILED
+==== Contents of test case:
+
+    safe::interpCreate a
+    safe::loadTk a
+    set status broken
+    if {[catch {interp eval a {menu .m}} msg]} {
+	set status ok
+    }
+    return $status
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "safe::loadTk" line 61)
+    invoked from within
+"safe::loadTk a"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+==== safe-2.2 FAILED
+
+
+
+==== safe-2.3 Unsafe subcommands not available FAILED
+==== Contents of test case:
+
+    safe::interpCreate a
+    safe::loadTk a
+    set status broken
+    if {[catch {interp eval a {tk appname}} msg]} {
+	set status ok
+    }
+    list $status $msg
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "safe::loadTk" line 61)
+    invoked from within
+"safe::loadTk a"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+==== safe-2.3 FAILED
+
+
+
+==== safe-2.4 Unsafe subcommands not available FAILED
+==== Contents of test case:
+
+    safe::interpCreate a
+    safe::loadTk a
+    set status broken
+    if {[catch {interp eval a {tk scaling 1}} msg]} {
+	set status ok
+    }
+    list $status $msg
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "safe::loadTk" line 61)
+    invoked from within
+"safe::loadTk a"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+==== safe-2.4 FAILED
+
+
+
+==== safe-3.1 Unsafe commands are available hidden FAILED
+==== Contents of test case:
+
+    safe::interpCreate a
+    safe::loadTk a
+    set status ok
+    if {[catch {interp invokehidden a toplevel .t} msg]} {
+	set status broken
+    }
+    return $status
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "safe::loadTk" line 61)
+    invoked from within
+"safe::loadTk a"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+==== safe-3.1 FAILED
+
+
+
+==== safe-3.2 Unsafe commands are available hidden FAILED
+==== Contents of test case:
+
+    safe::interpCreate a
+    safe::loadTk a
+    set status ok
+    if {[catch {interp invokehidden a menu .m} msg]} {
+	set status broken
+    }
+    return $status
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "safe::loadTk" line 61)
+    invoked from within
+"safe::loadTk a"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+==== safe-3.2 FAILED
+
+
+
+==== safe-4.1 testing loadTk FAILED
+==== Contents of test case:
+
+    # no error shall occur, the user will eventually see a new toplevel
+    set i [safe::loadTk [safe::interpCreate]]
+    interp eval $i {button .b -text "hello world!"; pack .b}
+    # lets don't update because it might imply that the user has to position
+    # the window (if the wm does not do it automatically) and thus make the
+    # test suite not runable non interactively
+    safe::interpDelete $i
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "safe::loadTk" line 61)
+    invoked from within
+"safe::loadTk [safe::interpCreate]"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+==== safe-4.1 FAILED
+
+
+
+==== safe-4.2 testing loadTk -use FAILED
+==== Contents of test case:
+
+    set w .safeTkFrame
+    frame $w -container 1;
+    pack $w
+    set i [safe::loadTk [safe::interpCreate] -use [winfo id $w]]
+    interp eval $i {button .b -text "hello world!"; pack .b}
+    safe::interpDelete $i
+    destroy $w
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "safe::loadTk" line 61)
+    invoked from within
+"safe::loadTk [safe::interpCreate] -use [winfo id $w]"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+==== safe-4.2 FAILED
+
+
+
+==== safe-5.2 multi-level Tk loading with clearance FAILED
+==== Contents of test case:
+
+    # No error shall occur in that test and no window shall remain at the end.
+    set i [safe::interpCreate [list $safeParent x]]
+    safe::loadTk $i
+    interp eval $i {
+	button .b -text Ok -command {destroy .}
+	pack .b
+#	tkwait window . ; # for interactive testing/debugging
+    }
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "safe::loadTk" line 61)
+    invoked from within
+"safe::loadTk $i"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+==== safe-5.2 FAILED
+
+
+
+==== safe-6.1 loadTk -use windowPath FAILED
+==== Contents of test case:
+
+    set w .safeTkFrame
+    frame $w -container 1;
+    pack $w
+    set i [safe::loadTk [safe::interpCreate] -use $w]
+    interp eval $i {button .b -text "hello world!"; pack .b}
+    safe::interpDelete $i
+    destroy $w
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "safe::loadTk" line 61)
+    invoked from within
+"safe::loadTk [safe::interpCreate] -use $w"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+==== safe-6.1 FAILED
+
+
+
+==== safe-7.1 canvas printing FAILED
+==== Contents of test case:
+
+    set i [safe::loadTk [safe::interpCreate]]
+    interp eval $i {canvas .c; .c postscript}
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "safe::loadTk" line 61)
+    invoked from within
+"safe::loadTk [safe::interpCreate]"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+could not find interpreter "interp7"
+---- errorInfo(cleanup): could not find interpreter "interp7"
+    while executing
+"interp children $child"
+    (procedure "safe::interpDelete" line 12)
+    invoked from within
+"safe::interpDelete $i"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP INTERP interp7
+==== safe-7.1 FAILED
+
+safePrimarySelection.test
+
+
+==== safePrimarySelection-3.1 IMPORTANT, safe interpreter, text, no existing selection FAILED
+==== Contents of test case:
+
+    set res0 [::_test_tmp::getPrimarySelection]
+    set int2 child2
+    ::safe::interpCreate $int2
+    ::safe::loadTk $int2
+    $int2 eval $::_test_tmp::script
+    $int2 eval ::_test_tmp::tryText
+    set res1 [$int2 eval ::_test_tmp::getPrimarySelection]
+    set res2 [::_test_tmp::getPrimarySelection]
+    set res3 $res0--$res1--$res2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "::safe::loadTk" line 61)
+    invoked from within
+"::safe::loadTk $int2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+can't unset "res3": no such variable
+---- errorInfo(cleanup): can't unset "res3": no such variable
+    while executing
+"unset int2 res0 res1 res2 res3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME res3
+==== safePrimarySelection-3.1 FAILED
+
+
+
+==== safePrimarySelection-3.2 IMPORTANT, safe interpreter, entry, no existing selection FAILED
+==== Contents of test case:
+
+    set res0 [::_test_tmp::getPrimarySelection]
+    set int2 child2
+    ::safe::interpCreate $int2
+    ::safe::loadTk $int2
+    $int2 eval $::_test_tmp::script
+    $int2 eval ::_test_tmp::tryEntry
+    set res1 [$int2 eval ::_test_tmp::getPrimarySelection]
+    set res2 [::_test_tmp::getPrimarySelection]
+    set res3 $res0--$res1--$res2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "::safe::loadTk" line 61)
+    invoked from within
+"::safe::loadTk $int2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+can't unset "res1": no such variable
+---- errorInfo(cleanup): can't unset "res1": no such variable
+    while executing
+"unset int2 res0 res1 res2 res3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME res1
+==== safePrimarySelection-3.2 FAILED
+
+
+
+==== safePrimarySelection-3.3 IMPORTANT, safe interpreter, ttk::entry, no existing selection FAILED
+==== Contents of test case:
+
+    set res0 [::_test_tmp::getPrimarySelection]
+    set int2 child2
+    ::safe::interpCreate $int2
+    ::safe::loadTk $int2
+    $int2 eval $::_test_tmp::script
+    $int2 eval ::_test_tmp::tryTtkEntry
+    set res1 [$int2 eval ::_test_tmp::getPrimarySelection]
+    set res2 [::_test_tmp::getPrimarySelection]
+    set res3 $res0--$res1--$res2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "::safe::loadTk" line 61)
+    invoked from within
+"::safe::loadTk $int2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+can't unset "res1": no such variable
+---- errorInfo(cleanup): can't unset "res1": no such variable
+    while executing
+"unset int2 res0 res1 res2 res3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME res1
+==== safePrimarySelection-3.3 FAILED
+
+
+
+==== safePrimarySelection-3.4 IMPORTANT, safe interpreter, listbox, no existing selection FAILED
+==== Contents of test case:
+
+    set res0 [::_test_tmp::getPrimarySelection]
+    set int2 child2
+    ::safe::interpCreate $int2
+    ::safe::loadTk $int2
+    $int2 eval $::_test_tmp::script
+    $int2 eval ::_test_tmp::tryListbox
+    set res1 [$int2 eval ::_test_tmp::getPrimarySelection]
+    set res2 [::_test_tmp::getPrimarySelection]
+    set res3 $res0--$res1--$res2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "::safe::loadTk" line 61)
+    invoked from within
+"::safe::loadTk $int2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+can't unset "res1": no such variable
+---- errorInfo(cleanup): can't unset "res1": no such variable
+    while executing
+"unset int2 res0 res1 res2 res3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME res1
+==== safePrimarySelection-3.4 FAILED
+
+
+
+==== safePrimarySelection-3.5 IMPORTANT, safe interpreter, spinbox as entry, no existing selection FAILED
+==== Contents of test case:
+
+    set res0 [::_test_tmp::getPrimarySelection]
+    set int2 child2
+    ::safe::interpCreate $int2
+    ::safe::loadTk $int2
+    $int2 eval $::_test_tmp::script
+    $int2 eval ::_test_tmp::trySpinbox 1
+    set res1 [$int2 eval ::_test_tmp::getPrimarySelection]
+    set res2 [::_test_tmp::getPrimarySelection]
+    set res3 $res0--$res1--$res2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "::safe::loadTk" line 61)
+    invoked from within
+"::safe::loadTk $int2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+can't unset "res1": no such variable
+---- errorInfo(cleanup): can't unset "res1": no such variable
+    while executing
+"unset int2 res0 res1 res2 res3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME res1
+==== safePrimarySelection-3.5 FAILED
+
+
+
+==== safePrimarySelection-3.6 IMPORTANT, safe interpreter, spinbox spun, no existing selection FAILED
+==== Contents of test case:
+
+    set res0 [::_test_tmp::getPrimarySelection]
+    set int2 child2
+    ::safe::interpCreate $int2
+    ::safe::loadTk $int2
+    $int2 eval $::_test_tmp::script
+    $int2 eval ::_test_tmp::trySpinbox 2
+    set res1 [$int2 eval ::_test_tmp::getPrimarySelection]
+    set res2 [::_test_tmp::getPrimarySelection]
+    set res3 $res0--$res1--$res2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "::safe::loadTk" line 61)
+    invoked from within
+"::safe::loadTk $int2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+can't unset "res1": no such variable
+---- errorInfo(cleanup): can't unset "res1": no such variable
+    while executing
+"unset int2 res0 res1 res2 res3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME res1
+==== safePrimarySelection-3.6 FAILED
+
+
+
+==== safePrimarySelection-3.7 IMPORTANT, safe interpreter, spinbox spun/selected/spun, no existing selection FAILED
+==== Contents of test case:
+
+    set res0 [::_test_tmp::getPrimarySelection]
+    set int2 child2
+    ::safe::interpCreate $int2
+    ::safe::loadTk $int2
+    $int2 eval $::_test_tmp::script
+    $int2 eval ::_test_tmp::trySpinbox 3
+    set res1 [$int2 eval ::_test_tmp::getPrimarySelection]
+    set res2 [::_test_tmp::getPrimarySelection]
+    set res3 $res0--$res1--$res2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "::safe::loadTk" line 61)
+    invoked from within
+"::safe::loadTk $int2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+can't unset "res1": no such variable
+---- errorInfo(cleanup): can't unset "res1": no such variable
+    while executing
+"unset int2 res0 res1 res2 res3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME res1
+==== safePrimarySelection-3.7 FAILED
+
+
+
+==== safePrimarySelection-3.8 IMPORTANT, safe interpreter, ttk::spinbox as entry, no existing selection FAILED
+==== Contents of test case:
+
+    set res0 [::_test_tmp::getPrimarySelection]
+    set int2 child2
+    ::safe::interpCreate $int2
+    ::safe::loadTk $int2
+    $int2 eval $::_test_tmp::script
+    $int2 eval ::_test_tmp::tryTtkSpinbox 1
+    set res1 [$int2 eval ::_test_tmp::getPrimarySelection]
+    set res2 [::_test_tmp::getPrimarySelection]
+    set res3 $res0--$res1--$res2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "::safe::loadTk" line 61)
+    invoked from within
+"::safe::loadTk $int2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+can't unset "res1": no such variable
+---- errorInfo(cleanup): can't unset "res1": no such variable
+    while executing
+"unset int2 res0 res1 res2 res3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME res1
+==== safePrimarySelection-3.8 FAILED
+
+
+
+==== safePrimarySelection-3.9 IMPORTANT, safe interpreter, ttk::spinbox spun, no existing selection FAILED
+==== Contents of test case:
+
+    set res0 [::_test_tmp::getPrimarySelection]
+    set int2 child2
+    ::safe::interpCreate $int2
+    ::safe::loadTk $int2
+    $int2 eval $::_test_tmp::script
+    $int2 eval ::_test_tmp::tryTtkSpinbox 2
+    set res1 [$int2 eval ::_test_tmp::getPrimarySelection]
+    set res2 [::_test_tmp::getPrimarySelection]
+    set res3 $res0--$res1--$res2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "::safe::loadTk" line 61)
+    invoked from within
+"::safe::loadTk $int2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+can't unset "res1": no such variable
+---- errorInfo(cleanup): can't unset "res1": no such variable
+    while executing
+"unset int2 res0 res1 res2 res3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME res1
+==== safePrimarySelection-3.9 FAILED
+
+
+
+==== safePrimarySelection-3.10 IMPORTANT, safe interpreter, ttk::spinbox spun/selected/spun, no existing selection FAILED
+==== Contents of test case:
+
+    set res0 [::_test_tmp::getPrimarySelection]
+    set int2 child2
+    ::safe::interpCreate $int2
+    ::safe::loadTk $int2
+    $int2 eval $::_test_tmp::script
+    $int2 eval ::_test_tmp::tryTtkSpinbox 3
+    set res1 [$int2 eval ::_test_tmp::getPrimarySelection]
+    set res2 [::_test_tmp::getPrimarySelection]
+    set res3 $res0--$res1--$res2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "::safe::loadTk" line 61)
+    invoked from within
+"::safe::loadTk $int2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+can't unset "res1": no such variable
+---- errorInfo(cleanup): can't unset "res1": no such variable
+    while executing
+"unset int2 res0 res1 res2 res3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME res1
+==== safePrimarySelection-3.10 FAILED
+
+
+
+==== safePrimarySelection-6.1 IMPORTANT, safe interpreter, text, existing selection FAILED
+==== Contents of test case:
+
+    set res0 [::_test_tmp::getPrimarySelection]
+    set int2 child2
+    ::safe::interpCreate $int2
+    ::safe::loadTk $int2
+    $int2 eval $::_test_tmp::script
+    $int2 eval ::_test_tmp::tryText
+    set res1 [$int2 eval ::_test_tmp::getPrimarySelection]
+    set res2 [::_test_tmp::getPrimarySelection]
+    set res3 $res0--$res1--$res2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "::safe::loadTk" line 61)
+    invoked from within
+"::safe::loadTk $int2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+can't unset "res1": no such variable
+---- errorInfo(cleanup): can't unset "res1": no such variable
+    while executing
+"unset int2 res0 res1 res2 res3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME res1
+==== safePrimarySelection-6.1 FAILED
+
+
+
+==== safePrimarySelection-6.2 IMPORTANT, safe interpreter, entry, existing selection FAILED
+==== Contents of test case:
+
+    set res0 [::_test_tmp::getPrimarySelection]
+    set int2 child2
+    ::safe::interpCreate $int2
+    ::safe::loadTk $int2
+    $int2 eval $::_test_tmp::script
+    $int2 eval ::_test_tmp::tryEntry
+    set res1 [$int2 eval ::_test_tmp::getPrimarySelection]
+    set res2 [::_test_tmp::getPrimarySelection]
+    set res3 $res0--$res1--$res2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "::safe::loadTk" line 61)
+    invoked from within
+"::safe::loadTk $int2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+can't unset "res1": no such variable
+---- errorInfo(cleanup): can't unset "res1": no such variable
+    while executing
+"unset int2 res0 res1 res2 res3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME res1
+==== safePrimarySelection-6.2 FAILED
+
+
+
+==== safePrimarySelection-6.3 IMPORTANT, safe interpreter, ttk::entry, existing selection FAILED
+==== Contents of test case:
+
+    set res0 [::_test_tmp::getPrimarySelection]
+    set int2 child2
+    ::safe::interpCreate $int2
+    ::safe::loadTk $int2
+    $int2 eval $::_test_tmp::script
+    $int2 eval ::_test_tmp::tryTtkEntry
+    set res1 [$int2 eval ::_test_tmp::getPrimarySelection]
+    set res2 [::_test_tmp::getPrimarySelection]
+    set res3 $res0--$res1--$res2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "::safe::loadTk" line 61)
+    invoked from within
+"::safe::loadTk $int2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+can't unset "res1": no such variable
+---- errorInfo(cleanup): can't unset "res1": no such variable
+    while executing
+"unset int2 res0 res1 res2 res3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME res1
+==== safePrimarySelection-6.3 FAILED
+
+
+
+==== safePrimarySelection-6.4 IMPORTANT, safe interpreter, listbox, existing selection FAILED
+==== Contents of test case:
+
+    set res0 [::_test_tmp::getPrimarySelection]
+    set int2 child2
+    ::safe::interpCreate $int2
+    ::safe::loadTk $int2
+    $int2 eval $::_test_tmp::script
+    $int2 eval ::_test_tmp::tryListbox
+    set res1 [$int2 eval ::_test_tmp::getPrimarySelection]
+    set res2 [::_test_tmp::getPrimarySelection]
+    set res3 $res0--$res1--$res2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "::safe::loadTk" line 61)
+    invoked from within
+"::safe::loadTk $int2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+can't unset "res1": no such variable
+---- errorInfo(cleanup): can't unset "res1": no such variable
+    while executing
+"unset int2 res0 res1 res2 res3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME res1
+==== safePrimarySelection-6.4 FAILED
+
+
+
+==== safePrimarySelection-6.5 IMPORTANT, safe interpreter, spinbox as entry, existing selection FAILED
+==== Contents of test case:
+
+    set res0 [::_test_tmp::getPrimarySelection]
+    set int2 child2
+    ::safe::interpCreate $int2
+    ::safe::loadTk $int2
+    $int2 eval $::_test_tmp::script
+    $int2 eval ::_test_tmp::trySpinbox 1
+    set res1 [$int2 eval ::_test_tmp::getPrimarySelection]
+    set res2 [::_test_tmp::getPrimarySelection]
+    set res3 $res0--$res1--$res2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "::safe::loadTk" line 61)
+    invoked from within
+"::safe::loadTk $int2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+can't unset "res1": no such variable
+---- errorInfo(cleanup): can't unset "res1": no such variable
+    while executing
+"unset int2 res0 res1 res2 res3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME res1
+==== safePrimarySelection-6.5 FAILED
+
+
+
+==== safePrimarySelection-6.6 IMPORTANT, safe interpreter, spinbox spun, existing selection FAILED
+==== Contents of test case:
+
+    set res0 [::_test_tmp::getPrimarySelection]
+    set int2 child2
+    ::safe::interpCreate $int2
+    ::safe::loadTk $int2
+    $int2 eval $::_test_tmp::script
+    $int2 eval ::_test_tmp::trySpinbox 2
+    set res1 [$int2 eval ::_test_tmp::getPrimarySelection]
+    set res2 [::_test_tmp::getPrimarySelection]
+    set res3 $res0--$res1--$res2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "::safe::loadTk" line 61)
+    invoked from within
+"::safe::loadTk $int2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+can't unset "res1": no such variable
+---- errorInfo(cleanup): can't unset "res1": no such variable
+    while executing
+"unset int2 res0 res1 res2 res3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME res1
+==== safePrimarySelection-6.6 FAILED
+
+
+
+==== safePrimarySelection-6.7 IMPORTANT, safe interpreter, spinbox spun/selected/spun, existing selection FAILED
+==== Contents of test case:
+
+    set res0 [::_test_tmp::getPrimarySelection]
+    set int2 child2
+    ::safe::interpCreate $int2
+    ::safe::loadTk $int2
+    $int2 eval $::_test_tmp::script
+    $int2 eval ::_test_tmp::trySpinbox 3
+    set res1 [$int2 eval ::_test_tmp::getPrimarySelection]
+    set res2 [::_test_tmp::getPrimarySelection]
+    set res3 $res0--$res1--$res2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "::safe::loadTk" line 61)
+    invoked from within
+"::safe::loadTk $int2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+can't unset "res1": no such variable
+---- errorInfo(cleanup): can't unset "res1": no such variable
+    while executing
+"unset int2 res0 res1 res2 res3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME res1
+==== safePrimarySelection-6.7 FAILED
+
+
+
+==== safePrimarySelection-6.8 IMPORTANT, safe interpreter, ttk::spinbox as entry, existing selection FAILED
+==== Contents of test case:
+
+    set res0 [::_test_tmp::getPrimarySelection]
+    set int2 child2
+    ::safe::interpCreate $int2
+    ::safe::loadTk $int2
+    $int2 eval $::_test_tmp::script
+    $int2 eval ::_test_tmp::tryTtkSpinbox 1
+    set res1 [$int2 eval ::_test_tmp::getPrimarySelection]
+    set res2 [::_test_tmp::getPrimarySelection]
+    set res3 $res0--$res1--$res2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "::safe::loadTk" line 61)
+    invoked from within
+"::safe::loadTk $int2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+can't unset "res1": no such variable
+---- errorInfo(cleanup): can't unset "res1": no such variable
+    while executing
+"unset int2 res0 res1 res2 res3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME res1
+==== safePrimarySelection-6.8 FAILED
+
+
+
+==== safePrimarySelection-6.9 IMPORTANT, safe interpreter, ttk::spinbox spun, existing selection FAILED
+==== Contents of test case:
+
+    set res0 [::_test_tmp::getPrimarySelection]
+    set int2 child2
+    ::safe::interpCreate $int2
+    ::safe::loadTk $int2
+    $int2 eval $::_test_tmp::script
+    $int2 eval ::_test_tmp::tryTtkSpinbox 2
+    set res1 [$int2 eval ::_test_tmp::getPrimarySelection]
+    set res2 [::_test_tmp::getPrimarySelection]
+    set res3 $res0--$res1--$res2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "::safe::loadTk" line 61)
+    invoked from within
+"::safe::loadTk $int2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+can't unset "res1": no such variable
+---- errorInfo(cleanup): can't unset "res1": no such variable
+    while executing
+"unset int2 res0 res1 res2 res3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME res1
+==== safePrimarySelection-6.9 FAILED
+
+
+
+==== safePrimarySelection-6.10 IMPORTANT, safe interpreter, ttk::spinbox spun/selected/spun, existing selection FAILED
+==== Contents of test case:
+
+    set res0 [::_test_tmp::getPrimarySelection]
+    set int2 child2
+    ::safe::interpCreate $int2
+    ::safe::loadTk $int2
+    $int2 eval $::_test_tmp::script
+    $int2 eval ::_test_tmp::tryTtkSpinbox 3
+    set res1 [$int2 eval ::_test_tmp::getPrimarySelection]
+    set res2 [::_test_tmp::getPrimarySelection]
+    set res3 $res0--$res1--$res2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: -use not supported on Plan 9
+    invoked from within
+"load {} Tk $child"
+    (procedure "::safe::loadTk" line 61)
+    invoked from within
+"::safe::loadTk $int2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE HIDDENTOKEN
+---- Test cleanup failed:
+can't unset "res1": no such variable
+---- errorInfo(cleanup): can't unset "res1": no such variable
+    while executing
+"unset int2 res0 res1 res2 res3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME res1
+==== safePrimarySelection-6.10 FAILED
+
+scale.test
+
+
+==== scale-19 Bug [3529885fff] - Click in through goes in wrong direction FAILED
+==== Contents of test case:
+
+	foreach {x y} [.s1 coord 50] {}
+	event generate .s1 <Button-1> -x $x -y $y
+	event generate .s1 <ButtonRelease-1> -x $x -y $y
+	foreach {x y} [.s2 coord 50] {}
+	event generate .s2 <Button-1> -x $x -y $y
+	event generate .s2 <ButtonRelease-1> -x $x -y $y
+	foreach {x y} [.s3 coord 50] {}
+	event generate .s3 <Button-1> -x $x -y $y
+	event generate .s3 <ButtonRelease-1> -x $x -y $y
+	foreach {x y} [.s4 coord 50] {}
+	event generate .s4 <Button-1> -x $x -y $y
+	event generate .s4 <ButtonRelease-1> -x $x -y $y
+	update
+	list $x1 $x2 $x3 $x4
+    
+---- Result was:
+1.00 1.00 1.00 1.00
+---- Result should have been (exact matching):
+1.0 1.0 1.0 1.0
+==== scale-19 FAILED
+
+scrollbar.test
