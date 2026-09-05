@@ -151,11 +151,50 @@ toplevel .t -width 100 -height 50
 wm geom .t +0+0
 frame .t.f -class Test -width 150 -height 100
 pack .t.f
-focus -force .t.f
 update
 mark "toplevel .t: exists [winfo exists .t], mapped [winfo ismapped .t], id [winfo id .t]"
 mark ".t.f:       exists [winfo exists .t.f], mapped [winfo ismapped .t.f], id [winfo id .t.f]"
-mark "focus is now '[focus]' (want .t.f)"
+
+# Which of the two possible stories is it: the focus was never set, or it
+# was set and something during "update" took it away again? The observed
+# answer is ".f" -- the frame in "." from section 1c -- and that is not
+# what either clearing path in TkFocusFilterEvent leaves behind; both
+# assign NULL, which "focus" reports as empty. A real FocusIn arriving
+# for toplevel "." would restore exactly ".f", since that is what its
+# ToplevelFocusInfo remembers.
+#
+# Two probes separate the cases, with no C to rebuild:
+#
+#   "focus" before update       -- did TkSetFocusWin assign at all?
+#   "focus -lastfor .t.f"       -- reads .t's ToplevelFocusInfo, which
+#                                  TkSetFocusWin fills in *after* the
+#                                  allMapped test and *before* the
+#                                  assignment. .t.f here means it got
+#                                  past the mapped check; .t means it
+#                                  bailed there.
+#
+# A <FocusIn> binding on . and on .f then says whether anything really
+# is handing the focus back during update.
+bind . <FocusIn>    {mark "  ... FocusIn on . (%d)"}
+bind .f <FocusIn>   {mark "  ... FocusIn on .f (%d)"}
+bind .t.f <FocusIn> {mark "  ... FocusIn on .t.f (%d)"}
+bind .t.f <FocusOut> {mark "  ... FocusOut on .t.f (%d)"}
+
+focus -force .t.f
+mark "focus before update:      '[focus]' (want .t.f)"
+mark "focus -lastfor .t.f:      '[focus -lastfor .t.f]' (.t.f = passed the mapped test)"
+update
+mark "focus after update:       '[focus]' (want .t.f)"
+
+bind . <FocusIn> {}
+bind .f <FocusIn> {}
+bind .t.f <FocusIn> {}
+bind .t.f <FocusOut> {}
+
+# Re-assert the focus with nothing running in between, so the key cases
+# below test delivery rather than whatever update did to the focus.
+focus -force .t.f
+mark "focus for the key cases:  '[focus]'"
 
 set ::hits {}
 bind .t.f <Key> {lappend ::hits "K=%K k=%k N=%N"}
