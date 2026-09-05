@@ -216,7 +216,9 @@ frame .t.g -class Test -width 150 -height 100
 frame .t.h -class Test -width 150 -height 100
 pack .t.g .t.h
 update
-mark ".t geometry [winfo geometry .t]  (150x300 if propagation works)"
+mark ".t   winfo geometry [winfo geometry .t]  (150x300 if propagation works)"
+mark ".t   wm geometry    [wm geometry .t]"
+mark ".t   req [winfo reqwidth .t]x[winfo reqheight .t]"
 foreach w {.t.f .t.g .t.h} {
     mark "  $w: mapped [winfo ismapped $w] id [winfo id $w] geom [winfo geometry $w]"
 }

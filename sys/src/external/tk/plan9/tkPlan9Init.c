@@ -533,18 +533,19 @@ XReparentWindow(Display *display, Window w, Window p, int x, int y)
 /* Window geometry                                                     */
 /* ------------------------------------------------------------------ */
 
-int
-XResizeWindow(Display *display, Window w,
-              unsigned int width, unsigned int height)
+/*
+ * Tell whoever is watching that the window moved or changed size. On X
+ * the server does this, and Tk's toplevel geometry code depends on it:
+ * <Configure> bindings, and every widget that relays out when its own
+ * size changes, arrive through here.
+ *
+ * XMoveWindow and XMoveResizeWindow used to update the window table
+ * silently, so a toplevel resize was invisible to Tk.
+ */
+static void
+P9ReportConfigure(Display *display, Window w, P9Window *pw)
 {
-    P9Window *pw = TkP9FindWindow(w);
     XEvent ev;
-    (void)display;
-    if (!pw) return 0;
-    if ((int)width  < 1) width  = 1;
-    if ((int)height < 1) height = 1;
-    pw->width  = (int)width;
-    pw->height = (int)height;
 
     memset(&ev, 0, sizeof(ev));
     ev.type                     = ConfigureNotify;
@@ -557,6 +558,20 @@ XResizeWindow(Display *display, Window w,
     ev.xconfigure.height        = pw->height;
     ev.xconfigure.border_width  = pw->border_width;
     TkP9EnqueueEvent(&ev);
+}
+
+int
+XResizeWindow(Display *display, Window w,
+              unsigned int width, unsigned int height)
+{
+    P9Window *pw = TkP9FindWindow(w);
+    (void)display;
+    if (!pw) return 0;
+    if ((int)width  < 1) width  = 1;
+    if ((int)height < 1) height = 1;
+    pw->width  = (int)width;
+    pw->height = (int)height;
+    P9ReportConfigure(display, w, pw);
     return 0;
 }
 
@@ -565,7 +580,9 @@ XMoveWindow(Display *display, Window w, int x, int y)
 {
     P9Window *pw = TkP9FindWindow(w);
     (void)display;
-    if (pw) { pw->x = x; pw->y = y; }
+    if (!pw) return 0;
+    pw->x = x; pw->y = y;
+    P9ReportConfigure(display, w, pw);
     return 0;
 }
 
@@ -579,6 +596,7 @@ XMoveResizeWindow(Display *display, Window w,
     pw->x = x; pw->y = y;
     pw->width  = (int)width  > 0 ? (int)width  : 1;
     pw->height = (int)height > 0 ? (int)height : 1;
+    P9ReportConfigure(display, w, pw);
     return 0;
 }
 

@@ -6,7 +6,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-05 09:20:20 +0200
+Tests began at 2026-09-05 09:36:26 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -27,26 +27,6 @@ Key{} Release{}
 ---- Result should have been (exact matching):
 Key?? Release??
 ==== bind-13.14 FAILED
-
-
-
-==== bind-15.7 MatchPatterns procedure, ignoring type mismatches FAILED
-==== Contents of test case:
-
-    bind .t.f <Double-Button-1> {set x 1}
-    set x 0
-    event generate .t.f <Button-1>
-    event generate .t.f <Shift_L>
-    event generate .t.f <ButtonRelease-1>
-    event generate .t.f <Button-1>
-    event generate .t.f <ButtonRelease-1>
-    return $x
-
----- Result was:
-0
----- Result should have been (exact matching):
-1
-==== bind-15.7 FAILED
 
 
 
@@ -146,23 +126,6 @@ xyz {} <Button-2> <Button-2>
 
 
 
-==== bind-32.3 should trigger best match of modifier states FAILED
-==== Contents of test case:
-
-    bind .t.f <Alt-Control-A> { lappend x "Alt-Control" }
-    bind .t.f <Shift-Control-A> { lappend x "Shift-Control" }
-    bind .t.f <Shift-A> { lappend x "Shift" }
-    event generate .t.f <Alt-Control-A>
-    set x
-
----- Result was:
-Alt-Control
----- Result should have been (exact matching):
-Shift-Control
-==== bind-32.3 FAILED
-
-
-
 ==== bind-32.12 don't detect repetition when window has changed FAILED
 ==== Contents of test case:
 
@@ -214,66 +177,6 @@ A
 ---- Result should have been (exact matching):
 1
 ==== bind-32.14 FAILED
-
-
-
-==== bind-33.16 simulate use of the keyboard to trigger a pattern sequence with modifier - bug [16ef161925] FAILED
-==== Contents of test case:
-
-    bind .t.f <Escape><Control-c> { lappend x "Esc_Control-c" }
-    event generate .t.f <Escape>
-    event generate .t.f <Control_L>
-    event generate .t.f <Control_L>
-    event generate .t.f <Control_L>
-    event generate .t.f <Control-c>
-    set x
-
----- Result was:
-
----- Result should have been (exact matching):
-Esc_Control-c
-==== bind-33.16 FAILED
-
-
-
-==== bind-33.17 simulate use of the keyboard to trigger a pattern sequence with modifier - bug [16ef161925] FAILED
-==== Contents of test case:
-
-    bind .t.f <Escape><Control-c> { lappend x "Esc_Control-c" }
-    bind .t.f <Escape><Control_L><Control-c> { lappend x "Esc_Ctrl_L_Control-c" }
-    event generate .t.f <Escape>
-    event generate .t.f <Control_L>
-    event generate .t.f <Control_L>
-    event generate .t.f <Control_L>
-    event generate .t.f <Control-c>
-    set x
-
----- Result was:
-
----- Result should have been (exact matching):
-Esc_Ctrl_L_Control-c
-==== bind-33.17 FAILED
-
-
-
-==== bind-33.18 simulate use of the keyboard to trigger a pattern sequence with modifier - bug [16ef161925] FAILED
-==== Contents of test case:
-
-    bind .t.f <Escape><Control-c> { lappend x "Esc_Control-c" }
-    bind .t.f <Escape><Control_L><Control-c> { lappend x "Esc_Ctrl_L_Control-c" }
-    bind .t.f <Escape><Control_L><Control_L><Control-c> { lappend x "Esc_Ctrl_L(2)_Control-c" }
-    event generate .t.f <Escape>
-    event generate .t.f <Control_L>
-    event generate .t.f <Control_L>
-    event generate .t.f <Control_L>
-    event generate .t.f <Control-c>
-    set x
-
----- Result was:
-
----- Result should have been (exact matching):
-Esc_Ctrl_L(2)_Control-c
-==== bind-33.18 FAILED
 
 
 
@@ -439,7 +342,7 @@ canvText.test
 %!PS-Adobe-3.0 EPSF-3.0
 %%Creator: Tk Canvas Widget
 %%Title: Window .c
-%%CreationDate: Sat Sep  5 09:20:24 2026
+%%CreationDate: Sat Sep  5 09:36:30 2026
 %%BoundingBox: 306 396 308 398
 %%Pages: 1
 %%DocumentData: Clean7Bit
