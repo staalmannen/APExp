@@ -92,6 +92,12 @@ typedef struct P9DisplayState {
     int          lastbuttons;
     /* Window that keyboard input is delivered to (see TkP9FocusWindow) */
     Window       focuswin;
+    /*
+     * Set when a window was mapped, unmapped or destroyed, so the next
+     * poll re-reports the pointer even though it has not moved: what is
+     * under it may have changed, and Tk must see the Enter/Leave.
+     */
+    int          pointerDirty;
     /* Display/screen pointers (set by XkbOpenDisplay) */
     Display     *xdisplay;
     /* Tcl event source state */
@@ -108,6 +114,13 @@ extern P9Window *TkP9FindWindow(Window xid);
 extern void      TkP9WindowOffset(Window xid, int *ox, int *oy);
 extern Window    TkP9FocusWindow(void);
 extern int       TkP9KeysymShifted(KeySym sym);
+extern void      TkP9UpdatePointer(int x, int y, int buttons);
+
+/*
+ * tkPointer.c exports this for the platforms that use it (Windows and
+ * Mac call it from their destroy paths) but declares it in no header.
+ */
+MODULE_SCOPE void TkPointerDeadWindow(TkWindow *winPtr);
 extern P9Window *TkP9AllocWindow(void);
 extern void      TkP9FreeWindow(Window xid);
 

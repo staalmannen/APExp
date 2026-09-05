@@ -1470,6 +1470,40 @@ Covered by `sys/lib/tests/tk-embed-test.tcl`, which checks the refusal
 message for a non-container as well as the working case, since
 safe.test's failures were reported entirely by message.
 
+### Tk on Plan 9: the mouse goes through tkPointer.c, not hand-made events
+
+`tkPointer.c` is the X server's pointer state machine reimplemented in
+Tk for the platforms that have no server -- Windows and Mac. It is built
+here (it is in the libtk mkfile) and this port never called it: the
+event source built `MotionNotify` and `ButtonPress`/`ButtonRelease` by
+hand and enqueued them.
+
+What that loses is everything else an X server sends about the pointer.
+Chiefly **EnterNotify/LeaveNotify were never generated at all**: no
+`<Enter>`/`<Leave>` bindings, no hover highlighting, no grab handling
+(so no modal dialogs), and no notion of which window has the mouse after
+one is destroyed -- `event-9.*` is that case: destroy a toplevel over
+`.` and `.` must see `<Enter>`.
+
+`TkP9UpdatePointer` now hands the position, button state and the window
+under the pointer (`Tk_CoordsToWindow`) to `Tk_UpdatePointer`, which
+synthesises the lot. Two details it depends on:
+
+- `XDestroyWindow` calls `TkPointerDeadWindow`, which `tkPointer.c`
+  exports but declares in no header; the Windows and Mac ports call it
+  from their destroy paths.
+- A window mapped, unmapped or destroyed under a **stationary** pointer
+  sets `gP9.pointerDirty`, and the next poll reports the same position
+  again so the crossing events are generated. An X server does this
+  unasked; nothing here will.
+
+`Tk_MeasureChars` was rewritten at the same time to honour
+`TK_WHOLE_WORDS` and `TK_AT_LEAST_ONE`, which it ignored:
+`Tk_ComputeTextLayout` wraps with both set and expects a break at the
+last word boundary that fits, or at least one character. Breaking at any
+character put line breaks mid-word and in the wrong place for tabs
+(font-24.*). The structure follows `tkUnixFont.c`.
+
 ### Syntax-check Tk's Plan 9 backend on the host before shipping it
 
 A round trip to the VM costs a full rebuild, and twice now it has been

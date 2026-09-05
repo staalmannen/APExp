@@ -399,8 +399,18 @@ XCreateSimpleWindow(
 int
 XDestroyWindow(Display *display, Window w)
 {
-    (void)display;
+    TkWindow *winPtr;
+
+    /*
+     * tkPointer.c remembers the window the pointer was last in; a dead
+     * one must be forgotten before it is freed. The Windows and Mac
+     * ports do the same from their destroy paths.
+     */
+    winPtr = (TkWindow *) Tk_IdToWindow(display, w);
+    if (winPtr != NULL)
+        TkPointerDeadWindow(winPtr);
     TkP9FreeWindow(w);
+    gP9.pointerDirty = 1;
     return 0;
 }
 
@@ -415,6 +425,7 @@ XMapWindow(Display *display, Window w)
     if (!pw) return 0;
     if (pw->mapped) return 0;
     pw->mapped = 1;
+    gP9.pointerDirty = 1;
 
     /* Send MapNotify */
     memset(&ev, 0, sizeof(ev));
@@ -490,6 +501,7 @@ XUnmapWindow(Display *display, Window w)
     pw = TkP9FindWindow(w);
     if (!pw || !pw->mapped) return 0;
     pw->mapped = 0;
+    gP9.pointerDirty = 1;
 
     memset(&ev, 0, sizeof(ev));
     ev.type              = UnmapNotify;
@@ -1038,7 +1050,6 @@ XWarpPointer(Display *d, Window s, Window dw,
              int dx, int dy)
 {
     int ox, oy, x, y;
-    XEvent ev;
     (void)s; (void)sx; (void)sy; (void)sw; (void)sh;
 
     if (dw == None) {
@@ -1059,18 +1070,7 @@ XWarpPointer(Display *d, Window s, Window dw,
 
     gP9.lastmouse.x = x;
     gP9.lastmouse.y = y;
-
-    memset(&ev, 0, sizeof(ev));
-    ev.type              = MotionNotify;
-    ev.xmotion.display   = d;
-    ev.xmotion.window    = (dw == None) ? TKP9_ROOT_XID : dw;
-    ev.xmotion.root      = TKP9_ROOT_XID;
-    ev.xmotion.x_root    = x;
-    ev.xmotion.y_root    = y;
-    ev.xmotion.x         = (dw == None) ? x : dx;
-    ev.xmotion.y         = (dw == None) ? y : dy;
-    ev.xmotion.time      = (Time)(gP9.lastmouse.msec);
-    TkP9EnqueueEvent(&ev);
+    TkP9UpdatePointer(x, y, gP9.lastmouse.buttons);
     return 0;
 }
 
