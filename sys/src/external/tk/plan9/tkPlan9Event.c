@@ -415,7 +415,6 @@ TkpSync(Display *display)
 /* Key mapping stubs (minimal)                                         */
 /* ------------------------------------------------------------------ */
 
-void
 /*
  * Does producing this keysym require Shift?
  *
