@@ -610,27 +610,10 @@ Tk_FreePixmap(Display *display, Pixmap pixmap)
 /* Embed / container (no embedding support on Plan 9)                 */
 /* ------------------------------------------------------------------ */
 
-int
-Tk_UseWindow(Tcl_Interp *interp, Tk_Window tkwin, const char *string)
-{
-    (void)tkwin; (void)string;
-    Tcl_SetObjResult(interp,
-        Tcl_NewStringObj("-use not supported on Plan 9", -1));
-    return TCL_ERROR;
-}
-
-void
-Tk_MakeContainer(Tk_Window tkwin)
-{
-    (void)tkwin;
-}
-
-Tk_Window
-Tk_GetOtherWindow(Tk_Window tkwin)
-{
-    (void)tkwin;
-    return NULL;
-}
+/*
+ * Tk_UseWindow, Tk_MakeContainer and Tk_GetOtherWindow are real now and
+ * live in tkPlan9Wm.c beside the Container list they share.
+ */
 
 /* ------------------------------------------------------------------ */
 /* App name (no send/register on Plan 9)                              */

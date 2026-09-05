@@ -1437,6 +1437,39 @@ case (Tk's own childList) and the toplevel case (this port's list)
 separately, because restacking with no hit-test reports nothing and
 hit-testing with no restacking reports a stale but plausible answer.
 
+### Tk on Plan 9: embedding is easy here, because there is one process
+
+`Tk_UseWindow` answered `"-use not supported on Plan 9"`, which is every
+test in `safe.test` and `safePrimarySelection.test` -- 34 of them --
+because `safe::loadTk` **always** ends in `-use`. Given no `-use`
+argument it builds a decorated toplevel containing a
+`frame $w.c -container 1` and embeds into that
+(`library/safetk.tcl`, `tkTopLevel`).
+
+`tkUnixEmbed.c` is 1200 lines because on X the container and the
+embedded application are usually **separate clients**: it needs wrapper
+windows, a property protocol to pass geometry between them, and an error
+handler for when the other client dies mid-conversation. A safe
+interpreter is a child interpreter in this same process, sharing this
+window table, so the whole thing reduces to two rules:
+
+- `Tk_MakeWindow` creates an embedded toplevel as a child of the
+  container window instead of the root. That substitution *is* the
+  embedding.
+- The embedded toplevel does not size itself. `WmUpdateGeometry` passes
+  its request to the container with `Tk_GeometryRequest` and then takes
+  the container's size; a `<Configure>` on the container resizes the
+  embedded window to match.
+
+The `Container` list lives in `tkPlan9Wm.c` beside the two halves it
+joins. `Tk_GetOtherWindow` walks it in both directions, which is always
+answerable here -- on X it can only answer for a container and embedded
+window in the same process.
+
+Covered by `sys/lib/tests/tk-embed-test.tcl`, which checks the refusal
+message for a non-container as well as the working case, since
+safe.test's failures were reported entirely by message.
+
 ### Syntax-check Tk's Plan 9 backend on the host before shipping it
 
 A round trip to the VM costs a full rebuild, and twice now it has been

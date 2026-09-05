@@ -62,6 +62,8 @@ typedef struct TkWmInfo {
 #define WM_NEVER_MAPPED		2
 
 static void WmUpdateGeometry(void *clientData);
+MODULE_SCOPE void   TkP9EmbedGeometryRequest(TkWindow *winPtr, int w, int h);
+MODULE_SCOPE Window TkP9EmbedParent(TkWindow *winPtr);
 
 /*
  * Ask for a geometry update at idle time, as tkUnixWm.c's TopLevelReqProc
@@ -101,6 +103,18 @@ WmUpdateGeometry(void *clientData)
     if (wmPtr == NULL)
 	return;
     wmPtr->flags &= ~WM_UPDATE_PENDING;
+
+    /*
+     * An embedded toplevel does not get to choose its own size: it
+     * passes the request to the container and takes whatever the
+     * container settles on.
+     */
+    if (winPtr->flags & TK_EMBEDDED) {
+	TkP9EmbedGeometryRequest(winPtr,
+		Tk_ReqWidth((Tk_Window) winPtr),
+		Tk_ReqHeight((Tk_Window) winPtr));
+	return;
+    }
 
     width  = (wmPtr->width  >= 0) ? wmPtr->width
 				  : Tk_ReqWidth((Tk_Window) winPtr);
@@ -303,8 +317,259 @@ TkpSetCursor(TkpCursor cursor)
 }
 
 /* ------------------------------------------------------------------ */
-/* Embed (no embedding support)                                       */
+/* Embedding                                                           */
 /* ------------------------------------------------------------------ */
+
+/*
+ * Embedding on Plan 9 is far simpler than on X, and the reason is that
+ * there is only ever one process involved. tkUnixEmbed.c is 1200 lines
+ * because the container and the embedded application are usually
+ * separate X clients: it needs wrapper windows, a property protocol to
+ * pass geometry between them, and an error handler in case the other
+ * client dies mid-conversation.
+ *
+ * Here the "other application" is a child interpreter in this same
+ * process, sharing this window table, so the whole thing reduces to:
+ * create the embedded toplevel as a child of the container window, and
+ * keep the two sizes in step.
+ *
+ * This was refused outright -- "-use not supported on Plan 9" -- which
+ * is every test in safe.test and safePrimarySelection.test (34 of them),
+ * because safe::loadTk always ends in "-use": with no -use argument it
+ * builds a decorated toplevel with a "frame $w.c -container 1" and uses
+ * that (library/safetk.tcl, tkTopLevel).
+ */
+
+typedef struct Container {
+    Window    parent;		/* Window id of the container. */
+    TkWindow *parentPtr;	/* The container, once it is known. */
+    TkWindow *embeddedPtr;	/* The embedded toplevel, once it is known. */
+    struct Container *nextPtr;
+} Container;
+
+static Container *firstContainerPtr = NULL;
+
+static Container *
+FindContainer(Window parent)
+{
+    Container *c;
+
+    for (c = firstContainerPtr; c != NULL; c = c->nextPtr)
+	if (c->parent == parent)
+	    return c;
+    return NULL;
+}
+
+static Container *
+FindContainerByEmbedded(TkWindow *winPtr)
+{
+    Container *c;
+
+    for (c = firstContainerPtr; c != NULL; c = c->nextPtr)
+	if (c->embeddedPtr == winPtr)
+	    return c;
+    return NULL;
+}
+
+static Container *
+GetContainer(Window parent)
+{
+    Container *c = FindContainer(parent);
+
+    if (c == NULL) {
+	c = (Container *) ckalloc(sizeof(Container));
+	memset(c, 0, sizeof(Container));
+	c->parent = parent;
+	c->nextPtr = firstContainerPtr;
+	firstContainerPtr = c;
+    }
+    return c;
+}
+
+static void
+EmbedWindowDeleted(TkWindow *winPtr)
+{
+    Container *c, **prevPtrPtr;
+
+    prevPtrPtr = &firstContainerPtr;
+    for (c = firstContainerPtr; c != NULL; c = *prevPtrPtr) {
+	if (c->embeddedPtr == winPtr)
+	    c->embeddedPtr = NULL;
+	if (c->parentPtr == winPtr) {
+	    c->parentPtr = NULL;
+	    c->parent = None;
+	}
+	if (c->parentPtr == NULL && c->embeddedPtr == NULL) {
+	    *prevPtrPtr = c->nextPtr;
+	    ckfree(c);
+	} else {
+	    prevPtrPtr = &c->nextPtr;
+	}
+    }
+}
+
+/* Give the embedded toplevel exactly the container's size. */
+static void
+EmbedFitToContainer(Container *containerPtr)
+{
+    TkWindow *embPtr = containerPtr->embeddedPtr;
+    TkWindow *parPtr = containerPtr->parentPtr;
+    int w, h;
+
+    if (embPtr == NULL || embPtr->window == None || parPtr == NULL)
+	return;
+    w = Tk_Width((Tk_Window) parPtr);
+    h = Tk_Height((Tk_Window) parPtr);
+    if (w < 1) w = 1;
+    if (h < 1) h = 1;
+    if (embPtr->changes.width == w && embPtr->changes.height == h
+	    && embPtr->changes.x == 0 && embPtr->changes.y == 0)
+	return;
+    embPtr->changes.x = embPtr->changes.y = 0;
+    embPtr->changes.width  = w;
+    embPtr->changes.height = h;
+    XMoveResizeWindow(embPtr->display, embPtr->window, 0, 0,
+	    (unsigned) w, (unsigned) h);
+}
+
+static void
+ContainerEventProc(void *clientData, XEvent *eventPtr)
+{
+    TkWindow *winPtr = (TkWindow *) clientData;
+    Container *containerPtr = FindContainer(winPtr->window);
+
+    if (containerPtr == NULL)
+	return;
+    if (eventPtr->type == ConfigureNotify)
+	EmbedFitToContainer(containerPtr);
+    else if (eventPtr->type == DestroyNotify)
+	EmbedWindowDeleted(winPtr);
+}
+
+static void
+EmbeddedEventProc(void *clientData, XEvent *eventPtr)
+{
+    TkWindow *winPtr = (TkWindow *) clientData;
+
+    if (eventPtr->type == DestroyNotify)
+	EmbedWindowDeleted(winPtr);
+}
+
+/*
+ * The embedded toplevel does not size itself: it asks the container,
+ * and then takes whatever the container ends up being. This is what
+ * WmUpdateGeometry defers to for a TK_EMBEDDED toplevel.
+ */
+void
+TkP9EmbedGeometryRequest(TkWindow *winPtr, int width, int height)
+{
+    Container *containerPtr = FindContainerByEmbedded(winPtr);
+
+    if (containerPtr == NULL || containerPtr->parentPtr == NULL)
+	return;
+    Tk_GeometryRequest((Tk_Window) containerPtr->parentPtr, width, height);
+    EmbedFitToContainer(containerPtr);
+}
+
+/* The container window an embedded toplevel lives in, or None. */
+Window
+TkP9EmbedParent(TkWindow *winPtr)
+{
+    Container *containerPtr = FindContainerByEmbedded(winPtr);
+
+    return (containerPtr != NULL) ? containerPtr->parent : None;
+}
+
+int
+Tk_UseWindow(Tcl_Interp *interp, Tk_Window tkwin, const char *string)
+{
+    TkWindow *winPtr = (TkWindow *) tkwin;
+    TkWindow *usePtr;
+    Window parent;
+    Container *containerPtr;
+
+    if (winPtr->window != None) {
+	Tcl_SetObjResult(interp, Tcl_NewStringObj(
+		"can't modify container after widget is created", -1));
+	Tcl_SetErrorCode(interp, "TK", "EMBED", "POST_CREATE", (char *)NULL);
+	return TCL_ERROR;
+    }
+    if (TkpScanWindowId(interp, string, &parent) != TCL_OK)
+	return TCL_ERROR;
+
+    /*
+     * Every window here belongs to this process, so a container we
+     * cannot find is one that does not exist.
+     */
+    usePtr = (TkWindow *) Tk_IdToWindow(winPtr->display, parent);
+    if (usePtr == NULL) {
+	Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+		"couldn't create child of window \"%s\"", string));
+	Tcl_SetErrorCode(interp, "TK", "EMBED", "NO_TARGET", (char *)NULL);
+	return TCL_ERROR;
+    }
+    if (!(usePtr->flags & TK_CONTAINER)) {
+	Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+		"window \"%s\" doesn't have -container option set",
+		usePtr->pathName));
+	Tcl_SetErrorCode(interp, "TK", "EMBED", "CONTAINER", (char *)NULL);
+	return TCL_ERROR;
+    }
+
+    Tk_SetWindowVisual(tkwin, usePtr->visual, usePtr->depth,
+	    usePtr->atts.colormap);
+    Tk_CreateEventHandler(tkwin, StructureNotifyMask, EmbeddedEventProc,
+	    winPtr);
+
+    containerPtr = GetContainer(parent);
+    containerPtr->embeddedPtr = winPtr;
+    winPtr->flags |= TK_EMBEDDED;
+    if (containerPtr->parentPtr != NULL) {
+	winPtr->flags |= TK_BOTH_HALVES;
+	containerPtr->parentPtr->flags |= TK_BOTH_HALVES;
+    }
+    return TCL_OK;
+}
+
+void
+Tk_MakeContainer(Tk_Window tkwin)
+{
+    TkWindow *winPtr = (TkWindow *) tkwin;
+    Container *containerPtr;
+
+    /*
+     * The window has to exist before it can be named as a -use target,
+     * which is exactly what "winfo id $w.c" is about to do.
+     */
+    Tk_MakeWindowExist(tkwin);
+
+    containerPtr = GetContainer(Tk_WindowId(tkwin));
+    containerPtr->parentPtr = winPtr;
+    winPtr->flags |= TK_CONTAINER;
+    if (containerPtr->embeddedPtr != NULL) {
+	winPtr->flags |= TK_BOTH_HALVES;
+	containerPtr->embeddedPtr->flags |= TK_BOTH_HALVES;
+    }
+
+    Tk_CreateEventHandler(tkwin, StructureNotifyMask, ContainerEventProc,
+	    winPtr);
+    EmbedFitToContainer(containerPtr);
+}
+
+Tk_Window
+Tk_GetOtherWindow(Tk_Window tkwin)
+{
+    TkWindow *winPtr = (TkWindow *) tkwin;
+    Container *c;
+
+    for (c = firstContainerPtr; c != NULL; c = c->nextPtr) {
+	if (c->embeddedPtr == winPtr)
+	    return (Tk_Window) c->parentPtr;
+	if (c->parentPtr == winPtr)
+	    return (Tk_Window) c->embeddedPtr;
+    }
+    return NULL;
+}
 
 void
 TkpGetOtherWindow(TkWindow *winPtr)
@@ -315,9 +580,7 @@ TkpGetOtherWindow(TkWindow *winPtr)
 int
 TkpUseWindow(Tcl_Interp *interp, Tk_Window tkwin, const char *string)
 {
-    Tcl_SetObjResult(interp,
-        Tcl_NewStringObj("-use not supported on Plan 9", -1));
-    return TCL_ERROR;
+    return Tk_UseWindow(interp, tkwin, string);
 }
 
 int
@@ -766,6 +1029,18 @@ Tk_MakeWindow(Tk_Window tkwin, Window parent)
     atts.border_pixel = winPtr->atts.border_pixel;
     atts.colormap     = winPtr->atts.colormap;
     mask |= CWBorderPixel | CWColormap;
+
+    /*
+     * An embedded toplevel is created inside its container rather than
+     * at the root -- that substitution is the whole of embedding here,
+     * since container and embedded window share this process and this
+     * window table.
+     */
+    if (winPtr->flags & TK_EMBEDDED) {
+        Window container = TkP9EmbedParent(winPtr);
+        if (container != None)
+            parent = container;
+    }
 
     return XCreateWindow(winPtr->display, parent,
         winPtr->changes.x, winPtr->changes.y,
