@@ -551,7 +551,20 @@ TkpSetKeycodeAndState(Tk_Window tkwin, KeySym keySym, XEvent *eventPtr)
 
     if (eventPtr == NULL)
 	return;
-    eventPtr->xkey.keycode = (keySym == NoSymbol) ? 0 : (unsigned int) keySym;
+    if (keySym == NoSymbol) {
+	eventPtr->xkey.keycode = 0;
+	return;
+    }
+    eventPtr->xkey.keycode = (unsigned int) keySym;
+
+    /*
+     * X's version reports which shift level of the keycode produced the
+     * keysym and ORs in ShiftMask accordingly; do the same from the
+     * keysym alone. Note this is an OR: tkBind.c has already put the
+     * pattern's own modifiers in xkey.state before calling us.
+     */
+    if (TkP9KeysymShifted(keySym))
+	eventPtr->xkey.state |= ShiftMask;
 }
 
 /*

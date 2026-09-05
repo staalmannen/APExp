@@ -211,6 +211,14 @@ GenerateKeyEvent(Display *dpy, int rune, int press)
     ev.xkey.state         = ButtonToMask(gP9.lastmouse.buttons);
     ev.xkey.time          = (Time)(gP9.lastmouse.msec);
     ev.xkey.keycode       = XKeysymToKeycode(dpy, sym);
+
+    /*
+     * /dev/cons gives the character already cased, with no word on which
+     * physical keys made it, so an uppercase rune is the only evidence
+     * Shift was held. Without this, <Shift-Key-A> never fires.
+     */
+    if (TkP9KeysymShifted(sym))
+	ev.xkey.state |= ShiftMask;
     TkP9EnqueueEvent(&ev);
 
     /* Auto-generate KeyRelease for non-modifier keys */
@@ -408,11 +416,81 @@ TkpSync(Display *display)
 /* ------------------------------------------------------------------ */
 
 void
+/*
+ * Does producing this keysym require Shift?
+ *
+ * On X, TkpSetKeycodeAndState answers this by asking the keyboard map
+ * which shift level of the keycode yields the keysym. There is no map
+ * here, so the question is decided from the keysym itself: a character
+ * with a lowercase form is the shifted one. That covers A-Z and the
+ * accented capitals, and it is what makes "bind .e <Shift-Key-A>" fire.
+ *
+ * Which punctuation needs Shift is a property of the physical layout --
+ * ':' is shifted on a US keyboard and not on several others -- and
+ * nothing here can know it, so those keysyms are reported unshifted.
+ */
+int
+TkP9KeysymShifted(KeySym sym)
+{
+    int c;
+
+    if (sym == NoSymbol || (sym >= 0xFF00 && sym <= 0xFFFF))
+	return 0;
+    c = (sym >= 0x01000000) ? (int)(sym - 0x01000000) : (int)sym;
+    return Tcl_UniCharToLower(c) != c;
+}
+
+/*
+ * Tk needs to know which keycodes are modifier keys, and it is not a
+ * cosmetic detail: tkBind.c consults dispPtr->modKeyCodes twice, and
+ * both uses are about *not* letting a modifier press count as an event
+ * in its own right.
+ *
+ *   tkBind.c:2226 -- a modifier press must not reset the repetition
+ *	count for buttons, or <Double-Button-1> is lost the moment a
+ *	shift key is touched between the two clicks.
+ *   tkBind.c:2809 -- a modifier-only press must not drop a partly
+ *	matched pattern sequence, or <Escape><Control-c> can never be
+ *	triggered from a real keyboard: what actually arrives is Escape,
+ *	then Control_L (repeating while held), then Control-c.
+ *
+ * With the array left empty, as it was, neither rule could fire.
+ *
+ * There is no modifier map to read here -- Plan 9 hands us a rune, not
+ * a scan code -- so the list is simply the modifier keysyms, which are
+ * the keycodes on this port (see XKeysymToKeycode).
+ *
+ * lockUsage stays LU_IGNORE: nothing here ever sets LockMask, so there
+ * is no Lock modifier to reinterpret as Caps or Shift Lock.
+ */
+void
 TkpInitKeymapInfo(TkDisplay *dispPtr)
 {
-    dispPtr->modeModMask = 0;
-    dispPtr->altModMask  = Mod1Mask;
-    dispPtr->metaModMask = Mod4Mask;
+    static const KeySym modKeySyms[] = {
+	XK_Shift_L,   XK_Shift_R,
+	XK_Control_L, XK_Control_R,
+	XK_Caps_Lock, XK_Shift_Lock,
+	XK_Meta_L,    XK_Meta_R,
+	XK_Alt_L,     XK_Alt_R,
+	XK_Super_L,   XK_Super_R,
+	XK_Hyper_L,   XK_Hyper_R,
+	XK_Mode_switch, XK_Num_Lock, XK_Scroll_Lock
+    };
+    int n = (int)(sizeof modKeySyms / sizeof modKeySyms[0]);
+    int i;
+
+    dispPtr->bindInfoStale = 0;
+    dispPtr->lockUsage     = LU_IGNORE;
+    dispPtr->modeModMask   = 0;
+    dispPtr->altModMask    = Mod1Mask;
+    dispPtr->metaModMask   = Mod4Mask;
+
+    if (dispPtr->modKeyCodes != NULL)
+	ckfree(dispPtr->modKeyCodes);
+    dispPtr->modKeyCodes = (KeyCode *) ckalloc(n * sizeof(KeyCode));
+    for (i = 0; i < n; i++)
+	dispPtr->modKeyCodes[i] = (KeyCode) modKeySyms[i];
+    dispPtr->numModKeyCodes = n;
 }
 
 KeyCode
