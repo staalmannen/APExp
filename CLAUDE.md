@@ -1314,6 +1314,50 @@ Covered by `sys/lib/tests/tk-selection-test.tcl`, which tests the two
 directions separately and skips itself when `/dev/snarf` cannot be
 opened (there is no snarf file without rio).
 
+### Tk on Plan 9: a toplevel needs a geometry manager, even with no wm
+
+Tk never sizes a toplevel itself. It hands the job to the window
+manager through `Tk_ManageGeometry`, and when the contents of a toplevel
+want more room, pack/grid/place call `Tk_GeometryRequest`, which reaches
+the wm's `requestProc` **and nowhere else**. `TkWmNewWindow` was an
+empty stub, so no toplevel was ever managed and no toplevel was ever
+sized: every one stayed 1x1.
+
+pack will not map a slave that does not fit, so this is silent and
+looks like a delivery bug:
+
+```tcl
+toplevel .t -width 100 -height 50
+pack [frame .t.f -width 150 -height 100]
+pack [frame .t.g -width 150 -height 100]
+```
+
+leaves `.t` at 1x1 and `.t.g` unmapped, with no error. It is also why
+widgets in a second toplevel piled into the corner at their minimum
+size.
+
+`tkPlan9Wm.c` now keeps a `WmInfo` per toplevel and does the smallest
+thing that stands in for a window manager: honour an explicit
+`wm geometry`, otherwise take the requested size, clamp to
+minsize/maxsize, resize. Updates are deferred to idle time and
+suppressed until the first map (`WM_NEVER_MAPPED`), as `tkUnixWm.c`
+does, so a window is not resized repeatedly while it is being built.
+
+Two things this depends on:
+
+- **`XMoveWindow`/`XMoveResizeWindow` must report a ConfigureNotify.**
+  Only `XResizeWindow` did. On X the server sends it and everything
+  that relays out on `<Configure>` hangs off it.
+- **The size is written into `winPtr->changes` directly.** On X, Tk
+  learns a toplevel's new size from the server's ConfigureNotify; there
+  is no server here. The early return when nothing changed is what stops
+  the resize/Configure/re-request cycle from looping.
+
+`Tk_WmObjCmd` never resolved its window argument at all, so every
+setting form was a silent no-op -- `wm geometry .t 200x100` changed
+nothing and reported no error -- and the query was a hardcoded
+`"1x1+0+0"`, which is a very convincing wrong answer.
+
 ### Syntax-check Tk's Plan 9 backend on the host before shipping it
 
 A round trip to the VM costs a full rebuild, and twice now it has been

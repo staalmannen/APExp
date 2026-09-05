@@ -14,6 +14,144 @@
 #include <stdlib.h>
 
 /* ------------------------------------------------------------------ */
+/* Toplevel geometry                                                   */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Every toplevel needs a geometry manager, and this port had none.
+ *
+ * Tk does not size a toplevel itself: it hands the job to the window
+ * manager through Tk_ManageGeometry, and when the contents of a
+ * toplevel want more room, pack/grid/place call Tk_GeometryRequest,
+ * which reaches the wm's requestProc and nowhere else. With
+ * TkWmNewWindow an empty stub, no toplevel was ever managed, so no
+ * toplevel was ever sized: it stayed 1x1, and pack then refused to map
+ * children that could not fit in 1x1.
+ *
+ * That is the whole of bind.test's
+ *
+ *	toplevel .t -width 100 -height 50
+ *	pack [frame .t.f -width 150 -height 100]
+ *	pack [frame .t.g -width 150 -height 100]
+ *
+ * where .t stayed 1x1 and .t.g and .t.h came back "mapped 0", and it is
+ * why widgets in a second toplevel piled into the corner at their
+ * minimum size.
+ *
+ * There is no window manager on Plan 9 -- rio owns the frame and there
+ * is one window -- so this is the smallest thing that can stand in for
+ * one: honour an explicit "wm geometry", otherwise take the requested
+ * size, clamp to minsize/maxsize, and resize. tkUnixWm.c does a great
+ * deal more, and all of it is about negotiating with a real window
+ * manager.
+ */
+
+typedef struct TkWmInfo {
+    TkWindow *winPtr;
+    int x, y;			/* Requested position. */
+    int width, height;		/* Explicit size from "wm geometry", or -1
+				 * to follow the requested size. */
+    int minWidth, minHeight;
+    int maxWidth, maxHeight;	/* 0 means unlimited. */
+    int withdrawn;
+    int flags;
+    struct TkWmInfo *nextPtr;
+} WmInfo;
+
+#define WM_UPDATE_PENDING	1
+#define WM_NEVER_MAPPED		2
+
+static void WmUpdateGeometry(void *clientData);
+
+/*
+ * Ask for a geometry update at idle time, as tkUnixWm.c's TopLevelReqProc
+ * does. An explicit "wm geometry" size wins over the requested one, so
+ * there is nothing to recompute in that case.
+ */
+static void
+WmReqProc(void *clientData, Tk_Window tkwin)
+{
+    TkWindow *winPtr = (TkWindow *) tkwin;
+    WmInfo *wmPtr = winPtr->wmInfoPtr;
+    (void)clientData;
+
+    if (wmPtr == NULL)
+	return;
+    if (wmPtr->width >= 0 && wmPtr->height >= 0)
+	return;
+    if (!(wmPtr->flags & (WM_UPDATE_PENDING|WM_NEVER_MAPPED))) {
+	Tcl_DoWhenIdle(WmUpdateGeometry, winPtr);
+	wmPtr->flags |= WM_UPDATE_PENDING;
+    }
+}
+
+static const Tk_GeomMgr wmMgrType = {
+    "wm",			/* name */
+    WmReqProc,			/* requestProc */
+    NULL			/* lostContentProc */
+};
+
+static void
+WmUpdateGeometry(void *clientData)
+{
+    TkWindow *winPtr = (TkWindow *) clientData;
+    WmInfo *wmPtr = winPtr->wmInfoPtr;
+    int width, height;
+
+    if (wmPtr == NULL)
+	return;
+    wmPtr->flags &= ~WM_UPDATE_PENDING;
+
+    width  = (wmPtr->width  >= 0) ? wmPtr->width
+				  : Tk_ReqWidth((Tk_Window) winPtr);
+    height = (wmPtr->height >= 0) ? wmPtr->height
+				  : Tk_ReqHeight((Tk_Window) winPtr);
+
+    if (width  < wmPtr->minWidth)  width  = wmPtr->minWidth;
+    if (height < wmPtr->minHeight) height = wmPtr->minHeight;
+    if (wmPtr->maxWidth  > 0 && width  > wmPtr->maxWidth)
+	width = wmPtr->maxWidth;
+    if (wmPtr->maxHeight > 0 && height > wmPtr->maxHeight)
+	height = wmPtr->maxHeight;
+    if (width  < 1) width  = 1;
+    if (height < 1) height = 1;
+
+    if (width == winPtr->changes.width && height == winPtr->changes.height
+	    && wmPtr->x == winPtr->changes.x
+	    && wmPtr->y == winPtr->changes.y)
+	return;
+
+    /*
+     * On X the server answers a resize request with a ConfigureNotify and
+     * Tk learns the new size from it. There is no server here, so record
+     * it directly; XMoveResizeWindow still sends the ConfigureNotify, so
+     * <Configure> bindings and the widgets that relayout on them work.
+     */
+    winPtr->changes.x      = wmPtr->x;
+    winPtr->changes.y      = wmPtr->y;
+    winPtr->changes.width  = width;
+    winPtr->changes.height = height;
+    if (winPtr->window != None)
+	XMoveResizeWindow(winPtr->display, winPtr->window,
+		wmPtr->x, wmPtr->y, (unsigned) width, (unsigned) height);
+}
+
+/* Force the update now rather than at idle time. */
+static void
+WmUpdateNow(TkWindow *winPtr)
+{
+    WmInfo *wmPtr = winPtr->wmInfoPtr;
+
+    if (wmPtr == NULL)
+	return;
+    if (wmPtr->flags & WM_UPDATE_PENDING) {
+	Tcl_CancelIdleCall(WmUpdateGeometry, winPtr);
+	wmPtr->flags &= ~WM_UPDATE_PENDING;
+    }
+    WmUpdateGeometry(winPtr);
+}
+
+/* ------------------------------------------------------------------ */
 /* TkpGetWrapperWindow / TkpMakeMenuWindow                            */
 /* ------------------------------------------------------------------ */
 
@@ -37,10 +175,22 @@ TkpMakeMenuWindow(Tk_Window tkwin, int transient)
 /* Wm state: iconify, withdraw, etc.                                  */
 /* ------------------------------------------------------------------ */
 
+/*
+ * Withdrawn means unmapped, and normal means mapped. There is no icon
+ * and no window manager, so IconicState is treated as withdrawn.
+ */
 int
 TkpWmSetState(TkWindow *winPtr, int state)
 {
-    (void)winPtr; (void)state;
+    if (winPtr == NULL || winPtr->window == None)
+	return 1;
+    if (state == NormalState || state == ZoomState) {
+	if (!(winPtr->flags & TK_MAPPED))
+	    TkWmMapWindow(winPtr);
+    } else {
+	if (winPtr->flags & TK_MAPPED)
+	    TkWmUnmapWindow(winPtr);
+    }
     return 1;
 }
 
@@ -323,7 +473,26 @@ TkpClipboardAppend(TkDisplay *dispPtr, Atom target, Atom format,
 void
 TkWmNewWindow(TkWindow *winPtr)
 {
-    (void)winPtr;
+    WmInfo *wmPtr = (WmInfo *) ckalloc(sizeof(WmInfo));
+
+    memset(wmPtr, 0, sizeof(WmInfo));
+    wmPtr->winPtr    = winPtr;
+    wmPtr->x         = winPtr->changes.x;
+    wmPtr->y         = winPtr->changes.y;
+    wmPtr->width     = -1;
+    wmPtr->height    = -1;
+    wmPtr->minWidth  = 1;
+    wmPtr->minHeight = 1;
+    wmPtr->flags     = WM_NEVER_MAPPED;
+    wmPtr->nextPtr   = winPtr->dispPtr->firstWmPtr;
+    winPtr->dispPtr->firstWmPtr = wmPtr;
+    winPtr->wmInfoPtr = wmPtr;
+
+    /*
+     * This is the whole point: without it, a Tk_GeometryRequest from the
+     * toplevel's contents reaches nobody and the toplevel never resizes.
+     */
+    Tk_ManageGeometry((Tk_Window) winPtr, &wmMgrType, NULL);
 }
 
 /*
@@ -351,6 +520,18 @@ TkWmNewWindow(TkWindow *winPtr)
 void
 TkWmMapWindow(TkWindow *winPtr)
 {
+    WmInfo *wmPtr = winPtr->wmInfoPtr;
+
+    /*
+     * Size it before it appears. Until now the toplevel has been
+     * accumulating geometry requests with updates suppressed
+     * (WM_NEVER_MAPPED), exactly as tkUnixWm.c does, so that a window
+     * is not resized repeatedly while it is still being built.
+     */
+    if (wmPtr != NULL && (wmPtr->flags & WM_NEVER_MAPPED)) {
+	wmPtr->flags &= ~WM_NEVER_MAPPED;
+	WmUpdateGeometry(winPtr);
+    }
     if (winPtr->flags & TK_MAPPED)
 	return;
     winPtr->flags |= TK_MAPPED;
@@ -369,7 +550,25 @@ TkWmUnmapWindow(TkWindow *winPtr)
 void
 TkWmDeadWindow(TkWindow *winPtr)
 {
-    (void)winPtr;
+    WmInfo *wmPtr = winPtr->wmInfoPtr, *prevPtr;
+
+    if (wmPtr == NULL)
+	return;
+    if (winPtr->dispPtr->firstWmPtr == wmPtr) {
+	winPtr->dispPtr->firstWmPtr = wmPtr->nextPtr;
+    } else {
+	for (prevPtr = winPtr->dispPtr->firstWmPtr; prevPtr != NULL;
+		prevPtr = prevPtr->nextPtr) {
+	    if (prevPtr->nextPtr == wmPtr) {
+		prevPtr->nextPtr = wmPtr->nextPtr;
+		break;
+	    }
+	}
+    }
+    if (wmPtr->flags & WM_UPDATE_PENDING)
+	Tcl_CancelIdleCall(WmUpdateGeometry, winPtr);
+    winPtr->wmInfoPtr = NULL;
+    ckfree(wmPtr);
 }
 
 void
@@ -616,7 +815,9 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
         OPT_STATE, OPT_TITLE, OPT_TRANSIENT, OPT_WITHDRAW
     };
     int index;
-    (void)clientData;
+    Tk_Window tkwin = NULL;
+    TkWindow *winPtr = NULL;
+    WmInfo *wmPtr = NULL;
 
     if (objc < 2) {
         Tcl_WrongNumArgs(interp, 1, objv, "option window ?arg ...?");
@@ -626,17 +827,117 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
             sizeof(char *), "option", 0, &index) != TCL_OK)
         return TCL_ERROR;
 
+    /*
+     * Resolve the window. This used to be skipped entirely, so every
+     * "wm" subcommand that sets something was a silent no-op -- "wm
+     * geometry .t 200x100" changed nothing and reported no error.
+     */
+    if (objc >= 3) {
+        tkwin = Tk_NameToWindow(interp, Tcl_GetString(objv[2]),
+                (Tk_Window) clientData);
+        if (tkwin == NULL)
+            return TCL_ERROR;
+        winPtr = (TkWindow *) tkwin;
+        wmPtr  = winPtr->wmInfoPtr;
+    }
+
     switch (index) {
     case OPT_GEOMETRY:
-        /* query (wm geometry .): return a placeholder */
-        if (objc == 3)
-            Tcl_SetObjResult(interp, Tcl_NewStringObj("1x1+0+0", -1));
+        if (objc == 3) {
+            char buf[TCL_INTEGER_SPACE * 4 + 4];
+            snprintf(buf, sizeof buf, "%dx%d+%d+%d",
+                    winPtr->changes.width, winPtr->changes.height,
+                    winPtr->changes.x, winPtr->changes.y);
+            Tcl_SetObjResult(interp, Tcl_NewStringObj(buf, -1));
+            return TCL_OK;
+        }
+        if (objc == 4 && wmPtr != NULL) {
+            const char *s = Tcl_GetString(objv[3]);
+            int w, h, x, y;
+
+            if (*s == '\0') {		/* revert to the requested size */
+                wmPtr->width = wmPtr->height = -1;
+                WmUpdateNow(winPtr);
+                return TCL_OK;
+            }
+            /*
+             * WxH, +X+Y, or both. A position-only form must leave the
+             * size following the requested one, or packing a toplevel
+             * after "wm geometry .t +0+0" would freeze it at 1x1.
+             */
+            if (sscanf(s, "%dx%d%d%d", &w, &h, &x, &y) == 4) {
+                /* WxH-X-Y, the negative-offset form. */
+                wmPtr->width = w; wmPtr->height = h;
+                wmPtr->x = x; wmPtr->y = y;
+            } else if (sscanf(s, "%dx%d+%d+%d", &w, &h, &x, &y) == 4) {
+                wmPtr->width = w; wmPtr->height = h;
+                wmPtr->x = x; wmPtr->y = y;
+            } else if (sscanf(s, "%dx%d", &w, &h) == 2) {
+                wmPtr->width = w; wmPtr->height = h;
+            } else if (sscanf(s, "+%d+%d", &x, &y) == 2
+                    || sscanf(s, "%d%d", &x, &y) == 2) {
+                wmPtr->x = x; wmPtr->y = y;
+            } else {
+                Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+                        "bad geometry specifier \"%s\"", s));
+                Tcl_SetErrorCode(interp, "TK", "VALUE", "GEOMETRY",
+                        (char *)NULL);
+                return TCL_ERROR;
+            }
+            WmUpdateNow(winPtr);
+        }
+        return TCL_OK;
+
+    case OPT_MINSIZE:
+    case OPT_MAXSIZE: {
+        int w, h;
+
+        if (objc == 3) {
+            if (wmPtr == NULL) {
+                Tcl_SetObjResult(interp, Tcl_NewStringObj("0 0", -1));
+                return TCL_OK;
+            }
+            Tcl_SetObjResult(interp, Tcl_ObjPrintf("%d %d",
+                    (index == OPT_MINSIZE) ? wmPtr->minWidth : wmPtr->maxWidth,
+                    (index == OPT_MINSIZE) ? wmPtr->minHeight : wmPtr->maxHeight));
+            return TCL_OK;
+        }
+        if (objc == 5 && wmPtr != NULL) {
+            if (Tcl_GetIntFromObj(interp, objv[3], &w) != TCL_OK
+                    || Tcl_GetIntFromObj(interp, objv[4], &h) != TCL_OK)
+                return TCL_ERROR;
+            if (index == OPT_MINSIZE) {
+                wmPtr->minWidth = w; wmPtr->minHeight = h;
+            } else {
+                wmPtr->maxWidth = w; wmPtr->maxHeight = h;
+            }
+            WmUpdateNow(winPtr);
+        }
+        return TCL_OK;
+    }
+
+    case OPT_WITHDRAW:
+        if (winPtr != NULL) {
+            if (wmPtr != NULL)
+                wmPtr->withdrawn = 1;
+            TkpWmSetState(winPtr, WithdrawnState);
+        }
+        return TCL_OK;
+
+    case OPT_DEICONIFY:
+        if (winPtr != NULL) {
+            if (wmPtr != NULL)
+                wmPtr->withdrawn = 0;
+            TkpWmSetState(winPtr, NormalState);
+        }
         return TCL_OK;
 
     case OPT_STATE:
-        /* always report the window as normal */
-        if (objc == 3)
-            Tcl_SetObjResult(interp, Tcl_NewStringObj("normal", -1));
+        if (objc == 3) {
+            Tcl_SetObjResult(interp, Tcl_NewStringObj(
+                    (wmPtr != NULL && wmPtr->withdrawn)
+                        ? "withdrawn" : "normal", -1));
+        }
         return TCL_OK;
 
     case OPT_STACKORDER:
@@ -655,13 +956,6 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
         /* query returns "1 1" */
         if (objc == 3)
             Tcl_SetObjResult(interp, Tcl_NewStringObj("1 1", -1));
-        return TCL_OK;
-
-    case OPT_MINSIZE:
-    case OPT_MAXSIZE:
-        /* query returns "0 0" */
-        if (objc == 3)
-            Tcl_SetObjResult(interp, Tcl_NewStringObj("0 0", -1));
         return TCL_OK;
 
     case OPT_FRAME:
