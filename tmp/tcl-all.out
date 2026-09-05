@@ -1,0 +1,140 @@
+Tests running in interp:  /bin/tclsh
+Tests located in:  /usr/glenda/APExp/sys/src/external/tcl/tests
+Tests running in:  /usr/glenda/APExp/sys/src/external/tcl/tests
+Temporary files stored in /usr/glenda/APExp/sys/src/external/tcl/tests
+Test files run in separate interpreters
+Running tests that match:  *
+Skipping test files that match:  l.*.test
+Only running test files that match:  *.test
+Tests began at 2026-09-05 05:39:42 +0200
+aaa_exit.test
+abstractlist.test
+append.test
+appendComp.test
+apply.test
+assemble.test
+assocd.test
+async.test
+autoMkindex.test
+basic.test
+bigdata.test
+binary.test
+
+
+==== binary-53.25 Binary float round to Inf FAILED
+==== Contents of test case:
+
+    binary scan [binary format H* 47effffff0000001] Q round_to_inf
+    binary scan [binary format R $round_to_inf] R inf1
+    expr {$inf1 eq Inf}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== binary-53.25 FAILED
+
+
+
+==== binary-53.26 Binary float round to -Inf FAILED
+==== Contents of test case:
+
+    binary scan [binary format H* c7effffff0000001] Q round_to_inf
+    binary scan [binary format R $round_to_inf] R inf1
+    expr {$inf1 eq -Inf}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== binary-53.26 FAILED
+
+
+
+==== binary-62.1 infinity FAILED
+==== Contents of test case:
+
+    binary scan [binary format q Infinity] w w
+    format 0x%016lx $w
+
+---- Result was:
+0x7fefffffffffffe2
+---- Result should have been (exact matching):
+0x7ff0000000000000
+==== binary-62.1 FAILED
+
+
+
+==== binary-62.2 infinity FAILED
+==== Contents of test case:
+
+    binary scan [binary format q -Infinity] w w
+    format 0x%016lx $w
+
+---- Result was:
+0xffefffffffffffe2
+---- Result should have been (exact matching):
+0xfff0000000000000
+==== binary-62.2 FAILED
+
+
+
+==== binary-62.3 infinity FAILED
+==== Contents of test case:
+
+    binary scan [binary format q Inf] w w
+    format 0x%016lx $w
+
+---- Result was:
+0x7fefffffffffffe2
+---- Result should have been (exact matching):
+0x7ff0000000000000
+==== binary-62.3 FAILED
+
+
+
+==== binary-62.4 infinity FAILED
+==== Contents of test case:
+
+    binary scan [binary format q -Infinity] w w
+    format 0x%016lx $w
+
+---- Result was:
+0xffefffffffffffe2
+---- Result should have been (exact matching):
+0xfff0000000000000
+==== binary-62.4 FAILED
+
+brodnik.test
+Test file error: can't find package tcl::test
+    while executing
+"package require tcl::test"
+    (in namespace eval "::tcl::test::brodnik" script line 8)
+    invoked from within
+"namespace eval ::tcl::test::brodnik {
+    namespace import ::tcltest::loadTestedCommands
+    namespace import ::tcltest::testConstraint
+    namespace ..."
+    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/brodnik.test" line 12)
+chan.test
+
+
+==== chan-16.9 chan command: pending input subcommand FAILED
+==== Contents of test case:
+
+    after idle chan-16.9-client
+    vwait ::chan-16.9-done
+    set ::chan-16.9-data
+
+---- Test setup failed:
+couldn't open socket: operation not supported
+---- errorInfo(setup): couldn't open socket: operation not supported
+    while executing
+"socket -server chan-16.9-accept -myaddr 127.0.0.1 0"
+    ("uplevel" body line 32)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): POSIX ENOTSUP {operation not supported}
+==== chan-16.9 FAILED
+
+chanio.test
