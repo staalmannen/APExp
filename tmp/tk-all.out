@@ -6,7 +6,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-05 05:05:44 +0200
+Tests began at 2026-09-05 09:20:20 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -439,7 +439,7 @@ canvText.test
 %!PS-Adobe-3.0 EPSF-3.0
 %%Creator: Tk Canvas Widget
 %%Title: Window .c
-%%CreationDate: Sat Sep  5 05:05:48 2026
+%%CreationDate: Sat Sep  5 09:20:24 2026
 %%BoundingBox: 306 396 308 398
 %%Pages: 1
 %%DocumentData: Clean7Bit
@@ -515,7 +515,7 @@ baselineSampler 0 196 put
 %%Page: 1 1
 save
 306.0 396.0 translate
-1.002 1.002 scale
+1 1 scale
 0 0 translate
 0 1 moveto 1 1 lineto 1 0 lineto 0 0 lineto closepath clip newpath
 restore showpage
@@ -850,10 +850,8 @@ clipboard.test
     selection clear -s CLIPBOARD
     clipboard get
 
----- Result was:
-selection not supported
----- Result should have been (exact matching):
-CLIPBOARD selection doesn't exist or form "STRING" not defined
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
 ==== clipboard-4.1 FAILED
 
 
@@ -866,27 +864,9 @@ CLIPBOARD selection doesn't exist or form "STRING" not defined
     selection clear -s CLIPBOARD
     clipboard get
 
----- Result was:
-selection not supported
----- Result should have been (exact matching):
-CLIPBOARD selection doesn't exist or form "STRING" not defined
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
 ==== clipboard-4.2 FAILED
-
-
-
-==== clipboard-4.3 ClipboardLostSel procedure FAILED
-==== Contents of test case:
-
-    clipboard append "Test"
-    clipboard append -t TEST "Test2"
-    selection clear -s CLIPBOARD
-    clipboard get -t TEST
-
----- Result was:
-selection not supported
----- Result should have been (exact matching):
-CLIPBOARD selection doesn't exist or form "TEST" not defined
-==== clipboard-4.3 FAILED
 
 
 
@@ -899,28 +879,9 @@ CLIPBOARD selection doesn't exist or form "TEST" not defined
     selection clear -s CLIPBOARD
     clipboard get
 
----- Result was:
-selection not supported
----- Result should have been (exact matching):
-CLIPBOARD selection doesn't exist or form "STRING" not defined
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
 ==== clipboard-4.4 FAILED
-
-
-
-==== clipboard-4.5 ClipboardLostSel procedure FAILED
-==== Contents of test case:
-
-    clipboard append "Test"
-    clipboard append -t TEST "Test2"
-    clipboard append "Test3"
-    selection clear -s CLIPBOARD
-    clipboard get -t TEST
-
----- Result was:
-selection not supported
----- Result should have been (exact matching):
-CLIPBOARD selection doesn't exist or form "TEST" not defined
-==== clipboard-4.5 FAILED
 
 
 
@@ -933,7 +894,7 @@ CLIPBOARD selection doesn't exist or form "TEST" not defined
     return $result
 
 ---- Result was:
-selection not supported
+CLIPBOARD selection doesn't exist or form "TEST" not defined
 ---- Result should have been (exact matching):
 0x10 
 ==== clipboard-6.2 FAILED
