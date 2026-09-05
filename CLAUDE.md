@@ -1282,6 +1282,38 @@ NULL, so the focus had never moved in the first place.
 wrap derives from it rather than a hardcoded `& 255`): mapping one
 window costs three events, and a full ring is dropped silently.
 
+### Tk on Plan 9: the clipboard is /dev/snarf
+
+Plan 9 has one system-wide cut buffer, `/dev/snarf`, served by rio, so
+PRIMARY and CLIPBOARD both map onto it -- which is what a user wants
+anyway: snarf in an editor, paste into a Tk entry.
+
+Both directions were missing, and they fail independently:
+
+- `TkSelGetSelection` answered `"selection not supported"`. That is the
+  hook for a selection **this application does not own**; a locally
+  owned one is served by `tkSelect.c` from its own handlers and never
+  reaches the platform (`Tk_GetSelection`), so `clipboard get` right
+  after `clipboard append` worked and hid half the gap.
+- `TkSelUpdateClipboard` was `#define TkSelUpdateClipboard(a,b) {}` in
+  `tkPlan9Port.h`, so nothing a Tk program copied ever left the process.
+
+`tkp9_getsnarf`/`tkp9_putsnarf` in `tkPlan9DrawImpl.c` open, do their
+business and close every time: rio serves the whole buffer from offset 0
+of a freshly opened `/dev/snarf` and there is no change notification, so
+a held descriptor reads a stale copy. The contents are UTF-8, which is
+what a `UTF8_STRING` target wants and what Plan 9 uses natively, so
+nothing is converted.
+
+`TkSelUpdateClipboard` rebuilds the whole buffer from
+`dispPtr->clipTargetPtr` on every clear and every append rather than
+trying to append -- rio offers no way to append to `/dev/snarf`, and a
+clear then correctly leaves it empty.
+
+Covered by `sys/lib/tests/tk-selection-test.tcl`, which tests the two
+directions separately and skips itself when `/dev/snarf` cannot be
+opened (there is no snarf file without rio).
+
 ### Build order for compiler changes
 ```
 cd sys/src/cmd/cc && mk nuke && mk install   # regenerates y.tab.h

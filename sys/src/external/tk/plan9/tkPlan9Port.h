@@ -91,8 +91,14 @@
  */
 #define TkpButtonSetDefaults()		{}
 #define TkpDestroyButton(butPtr)	{}
-#define TkSelUpdateClipboard(a,b)	{}
 #define TkSetPixmapColormap(p,c)	{}
+
+/*
+ * TkSelUpdateClipboard used to be an empty macro here. It is a real
+ * function now (tkPlan9Wm.c), which pushes Tk's clipboard out to
+ * /dev/snarf; tkSelect.h declares it when this file does not define it
+ * as a macro.
+ */
 
 #define TkpPrintWindowId(buf,w) \
 	snprintf((buf), TCL_INTEGER_SPACE, "0x%lx", (unsigned long)(w))

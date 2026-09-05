@@ -9,7 +9,9 @@
  */
 
 #include "tkPlan9Int.h"
+#include "tkSelect.h"
 #include <time.h>
+#include <stdlib.h>
 
 /* ------------------------------------------------------------------ */
 /* TkpGetWrapperWindow / TkpMakeMenuWindow                            */
@@ -173,19 +175,105 @@ Cups_Init(Tcl_Interp *interp)
 }
 
 /* ------------------------------------------------------------------ */
-/* Selection / clipboard stubs                                        */
+/* Selection / clipboard, backed by /dev/snarf                        */
 /* ------------------------------------------------------------------ */
 
+/*
+ * Plan 9 has one system-wide cut buffer, /dev/snarf, so PRIMARY and
+ * CLIPBOARD both map onto it. That is the behaviour a user wants
+ * anyway: snarf in an editor, paste into a Tk entry.
+ *
+ * This hook is reached only for a selection Tk does *not* own --
+ * tkSelect.c serves a locally-owned one from its own handlers and never
+ * gets here (see Tk_GetSelection), so "clipboard get" right after
+ * "clipboard append" does not depend on any of this.
+ */
 int
 TkSelGetSelection(Tcl_Interp *interp, Tk_Window tkwin,
                   Atom selection, Atom target,
                   Tk_GetSelProc *proc, void *clientData)
 {
-    (void)tkwin; (void)selection; (void)target;
-    (void)proc; (void)clientData;
-    Tcl_SetObjResult(interp,
-        Tcl_NewStringObj("selection not supported", -1));
+    const char *targetName;
+    char *snarf;
+    int result;
+
+    targetName = Tk_GetAtomName(tkwin, target);
+
+    if (strcmp(targetName, "TARGETS") == 0)
+	return proc(clientData, interp, "STRING TARGETS TEXT UTF8_STRING");
+
+    if (strcmp(targetName, "STRING") != 0
+	    && strcmp(targetName, "UTF8_STRING") != 0
+	    && strcmp(targetName, "TEXT") != 0
+	    && strcmp(targetName, "COMPOUND_TEXT") != 0)
+	goto cantget;
+
+    /* /dev/snarf is UTF-8, which is what every one of those wants. */
+    snarf = tkp9_getsnarf();
+    if (snarf == NULL)
+	goto cantget;
+    result = proc(clientData, interp, snarf);
+    free(snarf);
+    return result;
+
+  cantget:
+    Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+	"%s selection doesn't exist or form \"%s\" not defined",
+	Tk_GetAtomName(tkwin, selection), targetName));
+    Tcl_SetErrorCode(interp, "TK", "SELECTION", "EXISTS", (char *)NULL);
     return TCL_ERROR;
+}
+
+/*
+ * Push Tk's clipboard out to /dev/snarf.
+ *
+ * Called by tkClipboard.c after every "clipboard clear" and every
+ * "clipboard append", and it was an empty macro in tkPlan9Port.h -- so
+ * nothing a Tk application copied was ever visible to anything else on
+ * the system.
+ *
+ * Rebuild the whole buffer each time rather than trying to append: on a
+ * clear the target list is empty and snarf correctly becomes empty, and
+ * on an append the concatenation is what the clipboard now holds. rio
+ * gives no way to append to /dev/snarf in any case.
+ */
+void
+TkSelUpdateClipboard(TkWindow *winPtr, clipboardOption option)
+{
+    TkDisplay *dispPtr;
+    TkClipboardTarget *targetPtr, *bestPtr;
+    TkClipboardBuffer *cbPtr;
+    Atom utf8Atom, stringAtom;
+    Tcl_DString ds;
+
+    (void)option;
+    if (winPtr == NULL || winPtr->dispPtr == NULL)
+	return;
+    dispPtr = winPtr->dispPtr;
+
+    utf8Atom   = Tk_InternAtom((Tk_Window) winPtr, "UTF8_STRING");
+    stringAtom = Tk_InternAtom((Tk_Window) winPtr, "STRING");
+
+    /* Prefer UTF8_STRING; fall back to STRING. Both are UTF-8 here. */
+    bestPtr = NULL;
+    for (targetPtr = dispPtr->clipTargetPtr; targetPtr != NULL;
+	    targetPtr = targetPtr->nextPtr) {
+	if (targetPtr->type == utf8Atom) {
+	    bestPtr = targetPtr;
+	    break;
+	}
+	if (targetPtr->type == stringAtom && bestPtr == NULL)
+	    bestPtr = targetPtr;
+    }
+
+    Tcl_DStringInit(&ds);
+    if (bestPtr != NULL) {
+	for (cbPtr = bestPtr->firstBufferPtr; cbPtr != NULL;
+		cbPtr = cbPtr->nextPtr)
+	    Tcl_DStringAppend(&ds, cbPtr->buffer, (Tcl_Size) cbPtr->length);
+    }
+    tkp9_putsnarf(Tcl_DStringValue(&ds), (int) Tcl_DStringLength(&ds));
+    Tcl_DStringFree(&ds);
 }
 
 void

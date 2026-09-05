@@ -70,6 +70,19 @@ void   tkp9_drawpoints(void *dst, int *xv, int *yv, int n, unsigned long rgba);
 void   tkp9_flush(void);
 
 /*
+ * The snarf buffer -- Plan 9's system-wide cut buffer, /dev/snarf,
+ * served by rio. There is exactly one of them, so both PRIMARY and
+ * CLIPBOARD map onto it.
+ *
+ * tkp9_getsnarf returns malloc'd NUL-terminated UTF-8 that the caller
+ * frees, or NULL if the buffer could not be read. It is reopened on
+ * every call because rio serves the whole contents from offset 0 and a
+ * held descriptor would go stale.
+ */
+char  *tkp9_getsnarf(void);
+int    tkp9_putsnarf(const char *s, int nbytes);   /* 0 on success */
+
+/*
  * Fonts (opaque handle = Plan 9 Font*)
  */
 void  *tkp9_openfont(const char *name);	  /* returns Font*, or defont */
