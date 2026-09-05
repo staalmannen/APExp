@@ -6,7 +6,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-05 10:45:37 +0200
+Tests began at 2026-09-05 18:23:17 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -616,65 +616,6 @@ font.test
 
 
 
-==== font-24.5 Tk_ComputeTextLayout: break line FAILED
-==== Contents of test case:
-
-    .t.l config -text "000\t00000" -wrap [expr 9 * $ax]
-    update
-    list [expr {[winfo reqwidth .t.l] eq [expr {$ax * 8}]}]  [expr {[winfo reqheight .t.l] eq [expr {$ay * 2}]}]
-
----- Result was:
-0 1
----- Result should have been (exact matching):
-1 1
-==== font-24.5 FAILED
-
-
-
-==== font-24.11 Tk_ComputeTextLayout: absorb spaces at eol FAILED
-==== Contents of test case:
-
-    set x {}
-    .t.l config -text "000            000" -wrap [expr {$ax * 5}]
-    update
-    lappend x [expr {[winfo reqwidth .t.l] eq [expr {$ax * 3}]}]
-    lappend x [expr {[winfo reqheight .t.l] eq [expr {$ay * 2}]}]
-    .t.l config -text "000            "
-    update
-    lappend x [expr {[winfo reqwidth .t.l] eq [expr {$ax * 3}]}]
-    lappend x [expr {[winfo reqheight .t.l] eq $ay}]
-    return $x
-
----- Result was:
-0 1 0 1
----- Result should have been (exact matching):
-1 1 1 1
-==== font-24.11 FAILED
-
-
-
-==== font-24.12 Tk_ComputeTextLayout: append non-printing spaces to chunk FAILED
-==== Contents of test case:
-
-    set x {}
-    .t.l config -text "000            0000" -wrap [expr {$ax * 5}]
-    update
-    lappend x [expr {[winfo reqwidth .t.l] eq [expr {$ax * 4}]}]
-    lappend x [expr {[winfo reqheight .t.l] eq [expr {$ay * 2}]}]
-    .t.l config -text "000\t00            0000" -wrap [expr {$ax * 12}]
-    update
-    lappend x [expr {[winfo reqwidth .t.l] eq [expr {$ax * 10}]}]
-    lappend x [expr {[winfo reqheight .t.l] eq [expr {$ay * 2}]}]
-    return $x
-
----- Result was:
-0 1 0 1
----- Result should have been (exact matching):
-1 1 1 1
-==== font-24.12 FAILED
-
-
-
 ==== font-24.15 Tk_ComputeTextLayout: justification FAILED
 ==== Contents of test case:
 
@@ -777,23 +718,6 @@ font.test
 ---- Result should have been (exact matching):
 7
 ==== font-28.9 FAILED
-
-
-
-==== font-28.10 Tk_PointToChar procedure: past all chars in chunk FAILED
-==== Contents of test case:
-
-    csetup "000 0000000"
-    .t.c itemconfig text -width [expr $ax*5]
-    set x [.t.c index text @[expr $ax*5],0]
-    .t.c itemconfig text -width 0
-    return $x
-
----- Result was:
-4
----- Result should have been (exact matching):
-3
-==== font-28.10 FAILED
 
 
 
@@ -938,23 +862,6 @@ font.test
 ---- Result should have been (exact matching):
 1
 ==== font-30.13 FAILED
-
-
-
-==== font-31.6 Tk_IntersectTextLayout procedure: ignore spaces at eol FAILED
-==== Contents of test case:
-
-    csetup "000\n000      000000000"
-    .t.c itemconfig text -width [expr $ax*10]
-    set x [.t.c find overlapping [expr $ax*5] $ay [expr $ax*5] $ay]
-    .t.c itemconfig text -width 0
-    return $x
-
----- Result was:
-1
----- Result should have been (exact matching):
-
-==== font-31.6 FAILED
 
 
 
