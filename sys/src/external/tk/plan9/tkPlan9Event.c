@@ -80,151 +80,63 @@ ButtonToMask(int buttons)
 }
 
 /* ------------------------------------------------------------------ */
-/* Find topmost mapped window containing (x, y)                       */
+/* Event generation                                                    */
 /* ------------------------------------------------------------------ */
 
 /*
- * x and y are screen coordinates, and w->x/w->y are relative to the
- * window's PARENT -- this used to compare the two directly, so every
- * nested window was hit-tested at the wrong place and a click landed on
- * whichever widget happened to have the same offset within its own
- * parent. It only looked right for children of the root.
+ * Report the pointer to Tk through Tk_UpdatePointer rather than by
+ * hand-building Motion and Button events.
  *
- * Among the windows that really do contain the point, the smallest is
- * the deepest, since a child is always within its parent; ties go to
- * the later entry, which is the more recently created.
+ * tkPointer.c is the X server's pointer state machine reimplemented in
+ * Tk for the platforms that have no such server -- Windows and Mac --
+ * and it is already built here (mkfile), but this port never called it.
+ * Given the window under the pointer, the position and the button
+ * state it synthesises everything an X server would send: Motion,
+ * ButtonPress/Release from the change in state, and above all
+ * EnterNotify/LeaveNotify, which this port never produced at all. No
+ * crossing events means no <Enter>/<Leave> bindings, no hover
+ * highlighting, and no "which window has the mouse" after a window is
+ * destroyed -- event-9.* is that last case: destroy a toplevel over
+ * "." and "." must see <Enter>. It also runs the grab logic, which is
+ * what makes "grab" and modal dialogs work.
+ *
+ * The window is found with Tk_CoordsToWindow, using any window of the
+ * application as a handle, because tkPointer.c wants a TkWindow, not an
+ * X id. A point over no Tk window is reported with NULL, which is how a
+ * Leave to the outside is generated.
  */
-static Window
-WindowAtPoint(int x, int y)
+static Tk_Window
+AnyTkWindow(void)
 {
-    int i;
-    Window best = TKP9_ROOT_XID;
-    long bestarea = 0;
+    TkMainInfo *mainPtr = TkGetMainInfoList();
 
-    for (i = 0; i < gP9.nwins; i++) {
-        P9Window *w = &gP9.wins[i];
-        int ox, oy;
-        long area;
-
-        if (!w->inuse || !w->mapped || w->ispixmap) continue;
-        if (w->xid == TKP9_ROOT_XID) continue;
-        TkP9WindowOffset(w->xid, &ox, &oy);
-        if (x < ox || x >= ox + w->width || y < oy || y >= oy + w->height)
-            continue;
-        area = (long) w->width * (long) w->height;
-        if (best == TKP9_ROOT_XID || area <= bestarea) {
-            best = w->xid;
-            bestarea = area;
-        }
-    }
-    return best;
+    return (mainPtr != NULL) ? (Tk_Window) mainPtr->winPtr : NULL;
 }
 
-/* ------------------------------------------------------------------ */
-/* Event generation                                                    */
-/* ------------------------------------------------------------------ */
+void
+TkP9UpdatePointer(int x, int y, int buttons)
+{
+    Tk_Window any = AnyTkWindow(), under = NULL;
+    unsigned state = ButtonToMask(buttons);
+
+    if (any != NULL)
+	under = Tk_CoordsToWindow(x, y, any);
+    Tk_UpdatePointer(under, x, y, (int) state);
+}
 
 static void
 GenerateMouseEvent(Display *dpy, TkP9Mouse *cur)
 {
     TkP9Mouse *prev = &gP9.lastmouse;
-    int changed = cur->buttons ^ prev->buttons;
-    XEvent ev;
-    Window win;
-    P9Window *pw;
-    int wx, wy;
-    unsigned state;
+    (void)dpy;
 
-    win  = WindowAtPoint(cur->x, cur->y);
-    pw   = TkP9FindWindow(win);
-    /*
-     * x and y in an event are relative to the window, and the window's
-     * position on screen is the sum of its whole ancestry -- pw->x is
-     * only its offset within its own parent. Every widget below the top
-     * level was told the pointer was somewhere it was not.
-     */
-    if (pw != NULL) {
-        int ox, oy;
-        TkP9WindowOffset(win, &ox, &oy);
-        wx = cur->x - ox;
-        wy = cur->y - oy;
-    } else {
-        wx = cur->x;
-        wy = cur->y;
+    if (cur->x == prev->x && cur->y == prev->y
+	    && cur->buttons == prev->buttons) {
+	*prev = *cur;
+	return;
     }
-    state = ButtonToMask(prev->buttons);
-
-    /* Motion */
-    if (cur->x != prev->x || cur->y != prev->y) {
-        memset(&ev, 0, sizeof(ev));
-        ev.type                 = MotionNotify;
-        ev.xmotion.display      = dpy;
-        ev.xmotion.window       = win;
-        ev.xmotion.root         = TKP9_ROOT_XID;
-        ev.xmotion.x            = wx;
-        ev.xmotion.y            = wy;
-        ev.xmotion.x_root       = cur->x;
-        ev.xmotion.y_root       = cur->y;
-        ev.xmotion.state        = state;
-        ev.xmotion.time         = cur->msec;
-        ev.xmotion.is_hint      = NotifyNormal;
-        TkP9EnqueueEvent(&ev);
-    }
-
-    /* Button press/release for each changed button */
-    if (changed & 1) {
-        int btn = Button1; int mask = Button1Mask;
-        int pressed = (cur->buttons & 1) != 0;
-        memset(&ev, 0, sizeof(ev));
-        ev.type              = pressed ? ButtonPress : ButtonRelease;
-        ev.xbutton.display   = dpy;
-        ev.xbutton.window    = win;
-        ev.xbutton.root      = TKP9_ROOT_XID;
-        ev.xbutton.x         = wx;
-        ev.xbutton.y         = wy;
-        ev.xbutton.x_root    = cur->x;
-        ev.xbutton.y_root    = cur->y;
-        ev.xbutton.button    = btn;
-        ev.xbutton.state     = pressed ? state : state | mask;
-        ev.xbutton.time      = cur->msec;
-        TkP9EnqueueEvent(&ev);
-    }
-    if (changed & 2) {
-        int btn = Button2; int mask = Button2Mask;
-        int pressed = (cur->buttons & 2) != 0;
-        memset(&ev, 0, sizeof(ev));
-        ev.type              = pressed ? ButtonPress : ButtonRelease;
-        ev.xbutton.display   = dpy;
-        ev.xbutton.window    = win;
-        ev.xbutton.root      = TKP9_ROOT_XID;
-        ev.xbutton.x         = wx;
-        ev.xbutton.y         = wy;
-        ev.xbutton.x_root    = cur->x;
-        ev.xbutton.y_root    = cur->y;
-        ev.xbutton.button    = btn;
-        ev.xbutton.state     = pressed ? state : state | mask;
-        ev.xbutton.time      = cur->msec;
-        TkP9EnqueueEvent(&ev);
-    }
-    if (changed & 4) {
-        int btn = Button3; int mask = Button3Mask;
-        int pressed = (cur->buttons & 4) != 0;
-        memset(&ev, 0, sizeof(ev));
-        ev.type              = pressed ? ButtonPress : ButtonRelease;
-        ev.xbutton.display   = dpy;
-        ev.xbutton.window    = win;
-        ev.xbutton.root      = TKP9_ROOT_XID;
-        ev.xbutton.x         = wx;
-        ev.xbutton.y         = wy;
-        ev.xbutton.x_root    = cur->x;
-        ev.xbutton.y_root    = cur->y;
-        ev.xbutton.button    = btn;
-        ev.xbutton.state     = pressed ? state : state | mask;
-        ev.xbutton.time      = cur->msec;
-        TkP9EnqueueEvent(&ev);
-    }
-
     *prev = *cur;
+    TkP9UpdatePointer(cur->x, cur->y, cur->buttons);
 }
 
 static void
@@ -415,6 +327,18 @@ DisplayCheckProc(void *clientData, int flags)
     dpy = dispPtr->display;
 
     PollP9Events(dpy);
+
+    /*
+     * A window came or went under a pointer that did not move. Report
+     * the same position again so tkPointer.c can generate the crossing
+     * events -- this is how "." sees <Enter> when a toplevel over it is
+     * destroyed (event-9.1), which an X server would do unasked.
+     */
+    if (gP9.pointerDirty) {
+        gP9.pointerDirty = 0;
+        TkP9UpdatePointer(gP9.lastmouse.x, gP9.lastmouse.y,
+                          gP9.lastmouse.buttons);
+    }
 
     /* Transfer from our queue into Tk's queue */
     while (TkP9EventsPending()) {

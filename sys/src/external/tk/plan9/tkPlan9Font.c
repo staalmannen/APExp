@@ -20,6 +20,7 @@
 #include "tkPlan9Int.h"
 #include <stdio.h>
 #include <stdint.h>
+#include <ctype.h>
 #include "tkFont.h"
 
 /* ------------------------------------------------------------------ */
@@ -451,6 +452,22 @@ TkpGetFontFamilies(Tcl_Interp *interp, Tk_Window tkwin)
 /* Tk_MeasureChars                                                    */
 /* ------------------------------------------------------------------ */
 
+/*
+ * How many bytes of source fit in maxPixels, and how wide they are.
+ *
+ * The flags are the whole difficulty, and this used to ignore two of
+ * them. Tk_ComputeTextLayout wraps text by calling this with
+ * TK_WHOLE_WORDS|TK_AT_LEAST_ONE, and expects a break at the last word
+ * boundary that fits -- or, if no whole word fits, at least one
+ * character, so a line can never be empty. Breaking at any character
+ * instead, as this did, put line breaks in the middle of words and put
+ * them in the wrong place for tabs, which is what font-24.* measured.
+ *
+ * The structure follows tkUnixFont.c: walk forward accumulating width,
+ * remember the last place a run of spaces began after non-space (term),
+ * stop at the first character that will not fit, then decide what to
+ * report from the flags.
+ */
 int
 Tk_MeasureChars(
     Tk_Font tkfont,
@@ -461,45 +478,79 @@ Tk_MeasureChars(
     int *lengthPtr)
 {
     P9Font *p9f = (P9Font *)tkfont;
-    void *fnt;
-    int w, i, nbytes;
+    void *fnt = p9f ? p9f->p9font : NULL;
+    const char *p, *end, *next, *term;
+    int ch, curX, newX, termX, sawNonSpace, cw;
+    Tcl_Size curByte;
 
-    fnt = p9f ? p9f->p9font : NULL;
+    if (numBytes < 0)
+        numBytes = (Tcl_Size) strlen(source);
+    end = source + numBytes;
 
-    if (numBytes < 0) numBytes = (Tcl_Size)strlen(source);
+    if (numBytes == 0) {
+        curX = 0;
+        curByte = 0;
+    } else if (maxPixels < 0) {
+        curX = tkp9_measuretext(fnt, source, (int) numBytes);
+        curByte = numBytes;
+    } else {
+        next = source + Tcl_UtfToUniChar(source, &ch);
+        newX = curX = termX = 0;
+        term = source;
+        sawNonSpace = (ch > 255) || !isspace(ch);
 
-    if (maxPixels < 0) {
-        /* Measure all bytes */
-        w = tkp9_measuretext(fnt, source, (int)numBytes);
-        if (lengthPtr) *lengthPtr = w;
-        return (int)numBytes;
-    }
-
-    /* Find how many bytes fit within maxPixels */
-    nbytes = 0;
-    w      = 0;
-    i      = 0;
-    while (i < (int)numBytes) {
-        /* Walk UTF-8 characters */
-        unsigned char c = (unsigned char)source[i];
-        int charlen = 1;
-        if      ((c & 0x80) == 0x00) charlen = 1;
-        else if ((c & 0xE0) == 0xC0) charlen = 2;
-        else if ((c & 0xF0) == 0xE0) charlen = 3;
-        else if ((c & 0xF8) == 0xF0) charlen = 4;
-        if (i + charlen > (int)numBytes) break;
-
-        int cw = tkp9_measuretext(fnt, source + i, charlen);
-        if (w + cw > maxPixels) {
-            if (flags & TK_PARTIAL_OK) { nbytes += charlen; w += cw; }
-            break;
+        for (p = source; ; ) {
+            cw = tkp9_measuretext(fnt, p, (int)(next - p));
+            newX += cw;
+            if (newX > maxPixels)
+                break;
+            curX = newX;
+            p = next;
+            if (p >= end) {
+                term = end;
+                termX = curX;
+                break;
+            }
+            next += Tcl_UtfToUniChar(next, &ch);
+            if ((ch < 256) && isspace(ch)) {
+                if (sawNonSpace) {
+                    term = p;
+                    termX = curX;
+                    sawNonSpace = 0;
+                }
+            } else {
+                sawNonSpace = 1;
+            }
         }
-        w      += cw;
-        nbytes += charlen;
-        i      += charlen;
+
+        /*
+         * p points to the first character that did not fit (or end).
+         * curX is the width of everything before it.
+         */
+        if ((flags & TK_PARTIAL_OK) && (p < end) && (curX < maxPixels)) {
+            /* The partial character counts, and its whole width. */
+            curX = newX;
+            p += Tcl_UtfToUniChar(p, &ch);
+        }
+        if ((flags & TK_AT_LEAST_ONE) && (term == source) && (p < end)) {
+            term = p;
+            termX = curX;
+            if (term == source) {
+                term += Tcl_UtfToUniChar(term, &ch);
+                termX = newX;
+            }
+        } else if ((p >= end) || !(flags & TK_WHOLE_WORDS)) {
+            term = p;
+            termX = curX;
+        }
+
+        curX = termX;
+        curByte = term - source;
     }
-    if (lengthPtr) *lengthPtr = w;
-    return nbytes;
+
+    if (lengthPtr)
+        *lengthPtr = curX;
+    return (int) curByte;
 }
 
 /* ------------------------------------------------------------------ */
