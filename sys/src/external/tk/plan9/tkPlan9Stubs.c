@@ -492,26 +492,90 @@ Tk_SetCaretPos(Tk_Window tkwin, int x, int y, int height)
 }
 
 const char *
+/*
+ * The characters a key event stands for -- Tk's %A substitution.
+ *
+ * The keysym is the Unicode code point for anything printable, so the
+ * string is just its UTF-8 encoding. Keysyms in the 0xFF00 range are
+ * function and cursor keys and stand for no character at all, and
+ * neither does a keysym of 0.
+ */
+char *
 TkpGetString(TkWindow *winPtr, XEvent *eventPtr, Tcl_DString *dsPtr)
 {
-    (void)winPtr; (void)eventPtr;
+    KeySym sym;
+    char buf[TCL_UTF_MAX + 1];
+    int n;
+
+    (void)winPtr;
     Tcl_DStringSetLength(dsPtr, 0);
+
+    if (eventPtr == NULL ||
+        (eventPtr->type != KeyPress && eventPtr->type != KeyRelease))
+	return Tcl_DStringValue(dsPtr);
+
+    sym = (KeySym) eventPtr->xkey.keycode;
+    if (sym == 0 || (sym >= 0xFF00 && sym <= 0xFFFF))
+	return Tcl_DStringValue(dsPtr);
+
+    n = Tcl_UniCharToUtf((int) sym, buf);
+    Tcl_DStringAppend(dsPtr, buf, n);
     return Tcl_DStringValue(dsPtr);
 }
 
 void
+/*
+ * Fill in a synthetic key event's keycode from its keysym.
+ *
+ * "event generate . <Key-a>" goes through here (tkBind.c:4156) and then
+ * checks the result:
+ *
+ *	TkpSetKeycodeAndState(tkwin, keysym, &event.general);
+ *	if (event.general.xkey.keycode == 0) {
+ *	    ... "no keycode for keysym \"%s\"" ...
+ *	}
+ *
+ * so an empty stub failed every key event in the suite -- 146 of the
+ * 196 remaining failures in bind.test were this one function.
+ *
+ * This port keeps keycode and keysym identical: XKeycodeToKeysym and
+ * TkpGetKeySym both hand the value straight back. That works for every
+ * keysym rather than only the ASCII ones because KeyCode here is an
+ * unsigned int, not X11's 8-bit type, and XKeyEvent.keycode is an
+ * unsigned int too. No modifier state is needed either, since the
+ * keysym is carried exactly rather than being recovered from a keyboard
+ * map -- which is what tkUnixKey.c's loop over shift levels is for.
+ */
+void
 TkpSetKeycodeAndState(Tk_Window tkwin, KeySym keySym, XEvent *eventPtr)
 {
-    (void)tkwin; (void)keySym; (void)eventPtr;
+    (void)tkwin;
+
+    if (eventPtr == NULL)
+	return;
+    eventPtr->xkey.keycode = (keySym == NoSymbol) ? 0 : (unsigned int) keySym;
 }
 
+/*
+ * The inverse of TkpSetKeycodeAndState: keycode and keysym are the same
+ * value here.
+ *
+ * This used to answer NoSymbol for anything that was not a KeyPress,
+ * which loses the release half of every binding -- Tk matches <KeyRelease>
+ * patterns through this same call.
+ */
 KeySym
 TkpGetKeySym(TkDisplay *dispPtr, XEvent *eventPtr)
 {
     (void)dispPtr;
-    if (eventPtr && eventPtr->type == KeyPress)
-        return (KeySym)eventPtr->xkey.keycode;
-    return NoSymbol;
+
+    if (eventPtr == NULL)
+	return NoSymbol;
+    if (eventPtr->type != KeyPress && eventPtr->type != KeyRelease)
+	return NoSymbol;
+    if (eventPtr->xkey.keycode == 0)
+	return NoSymbol;
+    return (KeySym) eventPtr->xkey.keycode;
 }
 
 /* ------------------------------------------------------------------ */
