@@ -34,7 +34,7 @@ tcltest:V: $TESTOFILES $LIB
 	$LD $LDFLAGS -o $target $prereq
 
 tclTestInit.$O: $TCLSRC/unix/tclAppInit.c
-	$CC $CFLAGS -DTCL_TEST $TCLSRC/unix/tclAppInit.c
+	$CC $CFLAGS -DTCL_TEST -o $target $TCLSRC/unix/tclAppInit.c
 
 tclTest.$O: $TCLSRC/generic/tclTest.c
 	$CC $CFLAGS $TCLSRC/generic/tclTest.c
