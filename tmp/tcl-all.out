@@ -1,12 +1,12 @@
-Tests running in interp:  /bin/tclsh
+Tests running in interp:  /usr/glenda/APExp/sys/src/ape/cmd/tclsh/tcltest
 Tests located in:  /usr/glenda/APExp/sys/src/external/tcl/tests
-Tests running in:  /usr/glenda/APExp/sys/src/external/tcl/tests
-Temporary files stored in /usr/glenda/APExp/sys/src/external/tcl/tests
+Tests running in:  /usr/glenda/APExp/sys/src/ape/cmd/tclsh
+Temporary files stored in /usr/glenda/APExp/sys/src/ape/cmd/tclsh
 Test files run in separate interpreters
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-05 05:39:42 +0200
+Tests began at 2026-09-06 07:44:07 +0200
 aaa_exit.test
 abstractlist.test
 append.test
@@ -105,17 +105,8 @@ binary.test
 0xfff0000000000000
 ==== binary-62.4 FAILED
 
+Test file error: tcltest 4860: Killed: Insufficient physical memory
 brodnik.test
-Test file error: can't find package tcl::test
-    while executing
-"package require tcl::test"
-    (in namespace eval "::tcl::test::brodnik" script line 8)
-    invoked from within
-"namespace eval ::tcl::test::brodnik {
-    namespace import ::tcltest::loadTestedCommands
-    namespace import ::tcltest::testConstraint
-    namespace ..."
-    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/brodnik.test" line 12)
 chan.test
 
 
@@ -127,14 +118,171 @@ chan.test
     set ::chan-16.9-data
 
 ---- Test setup failed:
-couldn't open socket: operation not supported
----- errorInfo(setup): couldn't open socket: operation not supported
+couldn't open socket: connection refused
+---- errorInfo(setup): couldn't open socket: connection refused
     while executing
-"socket -server chan-16.9-accept -myaddr 127.0.0.1 0"
-    ("uplevel" body line 32)
+"socket 127.0.0.1 [lindex [fconfigure $::server -sockname] 2]"
+    ("uplevel" body line 33)
     invoked from within
 "uplevel 1 $setup"
----- errorCode(setup): POSIX ENOTSUP {operation not supported}
+---- errorCode(setup): POSIX ECONNREFUSED {connection refused}
 ==== chan-16.9 FAILED
 
 chanio.test
+
+
+==== chan-io-6.31 Tcl_GetsObj: crlf mode: buffer exhausted, blocked FAILED
+==== Contents of test case:
+
+    # (FilterInputBytes() != 0)
+    set f [openpipe w+ $path(cat)]
+    chan configure $f -translation {crlf lf} -buffering none
+    chan puts -nonewline $f "bbbbbbbbbbbbbb\r\n123456789012345\r"
+    chan configure $f -buffersize 16
+    lappend x [chan gets $f]
+    chan configure $f -blocking 0
+    lappend x [chan gets $f line] $line [chan blocked $f]  [testchannel inputbuffered $f]
+
+---- Result was:
+bbbbbbbbbbbbbb -1 {} 1 0
+---- Result should have been (exact matching):
+bbbbbbbbbbbbbb -1 {} 1 16
+==== chan-io-6.31 FAILED
+
+
+
+==== chan-io-6.43 Tcl_GetsObj: input saw cr FAILED
+==== Contents of test case:
+
+    # if (chanPtr->flags & INPUT_SAW_CR)
+    set f [openpipe w+ $path(cat)]
+    chan configure $f -translation {auto lf} -buffering none
+    chan puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    chan configure $f -buffersize 16
+    lappend x [chan gets $f]
+    chan configure $f -blocking 0
+    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
+    chan configure $f -blocking 1
+    chan puts -nonewline $f "\nabcd\refg\x1A"
+    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
+    lappend x [chan gets $f line] $line
+
+---- Result was:
+bbbbbbbbbbbbbbb -1 {} 0 15 123456789abcdef 1 4 abcd
+---- Result should have been (exact matching):
+bbbbbbbbbbbbbbb 15 123456789abcdef 1 4 abcd 0 3 efg
+==== chan-io-6.43 FAILED
+
+
+
+==== chan-io-6.44 Tcl_GetsObj: input saw cr, not followed by cr FAILED
+==== Contents of test case:
+
+    # not (*eol == '\n')
+    set f [openpipe w+ $path(cat)]
+    chan configure $f -translation {auto lf} -buffering none
+    chan puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    chan configure $f -buffersize 16
+    lappend x [chan gets $f]
+    chan configure $f -blocking 0
+    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
+    chan configure $f -blocking 1
+    chan puts -nonewline $f "abcd\refg\x1A"
+    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
+    lappend x [chan gets $f line] $line
+
+---- Result was:
+bbbbbbbbbbbbbbb -1 {} 0 15 123456789abcdef 1 4 abcd
+---- Result should have been (exact matching):
+bbbbbbbbbbbbbbb 15 123456789abcdef 1 4 abcd 0 3 efg
+==== chan-io-6.44 FAILED
+
+
+
+==== chan-io-6.45 Tcl_GetsObj: input saw cr, skip right number of bytes FAILED
+==== Contents of test case:
+
+    # Tcl_ExternalToUtf()
+    set f [openpipe w+ $path(cat)]
+    chan configure $f -translation {auto lf} -buffering none
+    chan configure $f -encoding utf-16
+    chan puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    chan configure $f -buffersize 16
+    chan gets $f
+    chan configure $f -blocking 0
+    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
+    chan configure $f -blocking 1
+    chan puts -nonewline $f "\nabcd\refg"
+    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
+
+---- Result was:
+-1 {} 0 15 123456789abcdef 0
+---- Result should have been (exact matching):
+15 123456789abcdef 1 4 abcd 0
+==== chan-io-6.45 FAILED
+
+
+
+==== chan-io-6.46 Tcl_GetsObj: input saw cr, followed by just \n should give eof FAILED
+==== Contents of test case:
+
+    # memmove()
+    set f [openpipe w+ $path(cat)]
+    chan configure $f -translation {auto lf} -buffering none
+    chan puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    chan configure $f -buffersize 16
+    chan gets $f
+    chan configure $f -blocking 0
+    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
+    chan configure $f -blocking 1
+    chan puts -nonewline $f "\n\x1A"
+    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
+
+---- Result was:
+-1 {} 0 15 123456789abcdef 1
+---- Result should have been (exact matching):
+15 123456789abcdef 1 -1 {} 0
+==== chan-io-6.46 FAILED
+
+
+
+==== chan-io-6.47 Tcl_GetsObj: auto mode: \r at end of buffer, peek for \n FAILED
+==== Contents of test case:
+
+    # (eol == dstEnd)
+    set f [open $path(test1) w]
+    chan configure $f -translation lf
+    chan puts -nonewline $f "123456789012345\r\nabcdefghijklmnopq"
+    chan close $f
+    set f [open $path(test1)]
+    chan configure $f -translation auto -buffersize 16
+    list [chan gets $f] [testchannel inputbuffered $f]
+
+---- Result was:
+123456789012345 0
+---- Result should have been (exact matching):
+123456789012345 15
+==== chan-io-6.47 FAILED
+
+
+
+==== chan-io-8.1 PeekAhead: only go to device if no more cached data FAILED
+==== Contents of test case:
+
+    # (bufPtr->nextPtr == NULL)
+    set f [open $path(test1) w]
+    chan configure $f -encoding ascii -translation lf
+    chan puts -nonewline $f "123456789012345\r\n2345678"
+    chan close $f
+    set f [open $path(test1)]
+    chan configure $f -encoding ascii -translation auto -buffersize 16
+    # here
+    chan gets $f
+    testchannel inputbuffered $f
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+7
+==== chan-io-8.1 FAILED
+
