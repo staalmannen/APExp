@@ -29,7 +29,7 @@ tclAppInit.$O: $TCLSRC/unix/tclAppInit.c
 # ./tcltest <...>/tests/all.tcl.
 TESTOFILES=tclTestInit.$O tclTest.$O tclTestObj.$O tclTestProcBodyObj.$O \
 	tclMutexTest.$O tclThreadTest.$O tclUnixTest.$O tclTestABSList.$O \
-	tclStubLib.$O tclStubCall.$O tclStubLibTbl.$O \
+	tclStubLib.$O tclStubLibTbl.$O \
 	tclTomMathStubLib.$O tclOOStubLib.$O
 
 tcltest:V: $TESTOFILES $LIB
@@ -64,9 +64,6 @@ tclTestABSList.$O: $TCLSRC/generic/tclTestABSList.c
 # side stub objects, so link them into the test interpreter only.
 tclStubLib.$O: $TCLSRC/generic/tclStubLib.c
 	$CC $CFLAGS -DSTATIC_BUILD $TCLSRC/generic/tclStubLib.c
-
-tclStubCall.$O: $TCLSRC/generic/tclStubCall.c
-	$CC $CFLAGS -DSTATIC_BUILD $TCLSRC/generic/tclStubCall.c
 
 tclStubLibTbl.$O: $TCLSRC/generic/tclStubLibTbl.c
 	$CC $CFLAGS -DSTATIC_BUILD $TCLSRC/generic/tclStubLibTbl.c
