@@ -6,7 +6,7 @@ Test files run in separate interpreters
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-06 07:57:01 +0200
+Tests began at 2026-09-06 08:06:35 +0200
 aaa_exit.test
 abstractlist.test
 append.test
@@ -49,7 +49,7 @@ binary.test
 1
 ==== binary-53.26 FAILED
 
-Test file error: tcltest 7309: Killed: Insufficient physical memory
+Test file error: tcltest 9165: Killed: Insufficient physical memory
 brodnik.test
 chan.test
 
@@ -62,14 +62,14 @@ chan.test
     set ::chan-16.9-data
 
 ---- Test setup failed:
-couldn't open socket: connection refused
----- errorInfo(setup): couldn't open socket: connection refused
+couldn't open socket: operation not supported
+---- errorInfo(setup): couldn't open socket: operation not supported
     while executing
-"socket 127.0.0.1 [lindex [fconfigure $::server -sockname] 2]"
-    ("uplevel" body line 33)
+"socket -server chan-16.9-accept -myaddr 127.0.0.1 0"
+    ("uplevel" body line 32)
     invoked from within
 "uplevel 1 $setup"
----- errorCode(setup): POSIX ECONNREFUSED {connection refused}
+---- errorCode(setup): POSIX ENOTSUP {operation not supported}
 ==== chan-16.9 FAILED
 
 chanio.test
