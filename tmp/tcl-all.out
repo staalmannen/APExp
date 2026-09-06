@@ -6,7 +6,7 @@ Test files run in separate interpreters
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-06 07:44:07 +0200
+Tests began at 2026-09-06 07:57:01 +0200
 aaa_exit.test
 abstractlist.test
 append.test
@@ -49,63 +49,7 @@ binary.test
 1
 ==== binary-53.26 FAILED
 
-
-
-==== binary-62.1 infinity FAILED
-==== Contents of test case:
-
-    binary scan [binary format q Infinity] w w
-    format 0x%016lx $w
-
----- Result was:
-0x7fefffffffffffe2
----- Result should have been (exact matching):
-0x7ff0000000000000
-==== binary-62.1 FAILED
-
-
-
-==== binary-62.2 infinity FAILED
-==== Contents of test case:
-
-    binary scan [binary format q -Infinity] w w
-    format 0x%016lx $w
-
----- Result was:
-0xffefffffffffffe2
----- Result should have been (exact matching):
-0xfff0000000000000
-==== binary-62.2 FAILED
-
-
-
-==== binary-62.3 infinity FAILED
-==== Contents of test case:
-
-    binary scan [binary format q Inf] w w
-    format 0x%016lx $w
-
----- Result was:
-0x7fefffffffffffe2
----- Result should have been (exact matching):
-0x7ff0000000000000
-==== binary-62.3 FAILED
-
-
-
-==== binary-62.4 infinity FAILED
-==== Contents of test case:
-
-    binary scan [binary format q -Infinity] w w
-    format 0x%016lx $w
-
----- Result was:
-0xffefffffffffffe2
----- Result should have been (exact matching):
-0xfff0000000000000
-==== binary-62.4 FAILED
-
-Test file error: tcltest 4860: Killed: Insufficient physical memory
+Test file error: tcltest 7309: Killed: Insufficient physical memory
 brodnik.test
 chan.test
 
