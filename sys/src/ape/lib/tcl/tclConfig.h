@@ -74,6 +74,15 @@
 
 /* math helper */
 #include <math.h>
+#/*
+ * APE's HUGE_VAL is necessarily a finite decimal literal because ken cannot
+ * compile the exact DBL_MAX spelling.  Tcl needs IEEE infinity here (not the
+ * largest finite double) when it parses or packs Inf and Infinity.
+ */
+#undef HUGE_VAL
+#define HUGE_VAL Inf(1)
+#undef INFINITY
+#define INFINITY ((float)Inf(1))
 #ifndef isnan
 #define	isnan	isNaN
 #endif
@@ -84,5 +93,4 @@
 #define	P_tmpdir		"/tmp"
 
 #endif
-
 

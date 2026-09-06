@@ -62,8 +62,17 @@ bind(int fd, void *a, int alen)
 	n = write(cfd, msg, strlen(msg));
 	if(n < 0){
 		_syserrno();
-		if(errno == EPLAN9)
-			errno = EOPNOTSUPP;
+		if(errno == EPLAN9){
+			/*
+			 * Some 9front network stacks reject the standalone "bind"
+			 * control message.  The address is already retained in r->addr,
+			 * and listen() will issue "announce" with that address.  Treat
+			 * this as deferred binding so POSIX server setup (bind; listen)
+			 * works there too.
+			 */
+			close(cfd);
+			return 0;
+		}
 		close(cfd);
 		return -1;
 	}
@@ -75,5 +84,4 @@ bind(int fd, void *a, int alen)
 
 	return 0;
 }
-
 

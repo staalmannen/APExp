@@ -6,6 +6,7 @@ TCLSRC=$APEXPROOT/sys/src/external/tcl
 
 BIN=$APEXPROOT/$objtype/bin
 TARG=tclsh
+CLEANFILES=tcltest
 
 OFILES=tclAppInit.$O
 LIB=$APEXPROOT/$objtype/lib/ape/libtcl.a $APEXPROOT/$objtype/lib/ape/libz.a
@@ -23,4 +24,35 @@ $O.out: $OFILES $LIB
 tclAppInit.$O: $TCLSRC/unix/tclAppInit.c
 	$CC $CFLAGS $TCLSRC/unix/tclAppInit.c
 
+# Test-only interpreter, analogous to Tcl's upstream tcltest target.  It is
+# deliberately not installed as /bin/tclsh; run it from this directory as
+# ./tcltest <...>/tests/all.tcl.
+TESTOFILES=tclTestInit.$O tclTest.$O tclTestObj.$O tclTestProcBodyObj.$O \
+	tclMutexTest.$O tclThreadTest.$O tclUnixTest.$O tclTestABSList.$O
 
+tcltest:V: $TESTOFILES $LIB
+	$LD $LDFLAGS -o $target $prereq
+
+tclTestInit.$O: $TCLSRC/unix/tclAppInit.c
+	$CC $CFLAGS -DTCL_TEST $TCLSRC/unix/tclAppInit.c
+
+tclTest.$O: $TCLSRC/generic/tclTest.c
+	$CC $CFLAGS $TCLSRC/generic/tclTest.c
+
+tclTestObj.$O: $TCLSRC/generic/tclTestObj.c
+	$CC $CFLAGS $TCLSRC/generic/tclTestObj.c
+
+tclTestProcBodyObj.$O: $TCLSRC/generic/tclTestProcBodyObj.c
+	$CC $CFLAGS $TCLSRC/generic/tclTestProcBodyObj.c
+
+tclMutexTest.$O: $TCLSRC/generic/tclMutexTest.c
+	$CC $CFLAGS $TCLSRC/generic/tclMutexTest.c
+
+tclThreadTest.$O: $TCLSRC/generic/tclThreadTest.c
+	$CC $CFLAGS $TCLSRC/generic/tclThreadTest.c
+
+tclUnixTest.$O: $TCLSRC/unix/tclUnixTest.c
+	$CC $CFLAGS $TCLSRC/unix/tclUnixTest.c
+
+tclTestABSList.$O: $TCLSRC/generic/tclTestABSList.c
+	$CC $CFLAGS $TCLSRC/generic/tclTestABSList.c
