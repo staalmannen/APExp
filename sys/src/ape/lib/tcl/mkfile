@@ -82,7 +82,8 @@ OFILES=\
 TCLSRC=$APEXPROOT/sys/src/external/tcl
 
 HFILES=\
-	$TCLSRC/plan9/tclConfig.h\
+	tclConfig.h\
+	tclUuid.h\
 
 <$APEXPROOT/sys/src/cmd/mklib
 

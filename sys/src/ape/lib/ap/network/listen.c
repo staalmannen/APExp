@@ -149,6 +149,14 @@ listen(int fd, int backlog)
 		}
 		close(cfd);
 
+		/*
+		 * announce assigns the ephemeral port when bind() had to defer its
+		 * request.  Keep the cached sockaddr in sync so getsockname(), and
+		 * therefore Tcl's -sockname result, reports the assigned port.
+		 */
+		if(_sock_inport(&r->addr) == 0)
+			_sock_ingetaddr(r, &r->addr, 0, "local");
+
 		return listenproc(r, fd);
 	case PF_UNIX:
 		if(r->other < 0){
