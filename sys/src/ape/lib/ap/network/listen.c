@@ -132,30 +132,26 @@ listen(int fd, int backlog)
 	switch(r->domain){
 	case PF_INET:
 	case PF_INET6:
-		cfd = open(r->ctl, O_RDWR);
-		if(cfd < 0){
-			errno = EBADF;
-			return -1;
-		}
-		strcpy(msg, "announce ");
-		_sock_inaddr2string(r, msg + 9, sizeof msg - 9);
-		n = write(cfd, msg, strlen(msg));
-		if(n < 0){
-			_syserrno();
-			if(errno == EPLAN9)
-				errno = EOPNOTSUPP;
+		if(!r->announced){
+			cfd = open(r->ctl, O_RDWR);
+			if(cfd < 0){
+				errno = EBADF;
+				return -1;
+			}
+			strcpy(msg, "announce ");
+			_sock_inaddr2string(r, msg + 9, sizeof msg - 9);
+			n = write(cfd, msg, strlen(msg));
+			if(n < 0){
+				_syserrno();
+				if(errno == EPLAN9)
+					errno = EOPNOTSUPP;
+				close(cfd);
+				return -1;
+			}
 			close(cfd);
-			return -1;
+			if(_sock_inport(&r->addr) == 0)
+				_sock_ingetaddr(r, &r->addr, 0, "local");
 		}
-		close(cfd);
-
-		/*
-		 * announce assigns the ephemeral port when bind() had to defer its
-		 * request.  Keep the cached sockaddr in sync so getsockname(), and
-		 * therefore Tcl's -sockname result, reports the assigned port.
-		 */
-		if(_sock_inport(&r->addr) == 0)
-			_sock_ingetaddr(r, &r->addr, 0, "local");
 
 		return listenproc(r, fd);
 	case PF_UNIX:

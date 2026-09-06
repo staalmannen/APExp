@@ -70,6 +70,7 @@ _sock_newrock(int fd)
 	memset(&r->raddr, 0, sizeof(r->raddr));
 	memset(&r->addr, 0, sizeof(r->addr));
 	r->reserved = 0;
+	r->announced = 0;
 	r->other = -1;
 	return r;
 }
@@ -407,4 +408,3 @@ setsockopt(int fd, int level, int opt, void *v, int len)
 		return -1;
 	}
 }
-

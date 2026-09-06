@@ -65,12 +65,31 @@ bind(int fd, void *a, int alen)
 		if(errno == EPLAN9){
 			/*
 			 * Some 9front network stacks reject the standalone "bind"
-			 * control message.  The address is already retained in r->addr,
-			 * and listen() will issue "announce" with that address.  Treat
-			 * this as deferred binding so POSIX server setup (bind; listen)
-			 * works there too.
+			 * control message.  Tcl calls getsockname() between bind() and
+			 * listen() when it requested port zero, so merely deferring the
+			 * operation loses the assigned port.  Announce now and let
+			 * listen() only start its accept proxy.
 			 */
 			close(cfd);
+			cfd = open(r->ctl, O_RDWR);
+			if(cfd < 0){
+				errno = EBADF;
+				return -1;
+			}
+			strcpy(msg, "announce ");
+			_sock_inaddr2string(r, msg + 9, sizeof msg - 9);
+			n = write(cfd, msg, strlen(msg));
+			if(n < 0)
+				_syserrno();
+			close(cfd);
+			if(n < 0){
+				if(errno == EPLAN9)
+					errno = EOPNOTSUPP;
+				return -1;
+			}
+			r->announced = 1;
+			if(_sock_inport(&r->addr) == 0)
+				_sock_ingetaddr(r, &r->addr, 0, "local");
 			return 0;
 		}
 		close(cfd);
@@ -84,4 +103,3 @@ bind(int fd, void *a, int alen)
 
 	return 0;
 }
-

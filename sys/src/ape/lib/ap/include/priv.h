@@ -30,6 +30,7 @@ struct Rock
 	int		protocol;	/* ... */
 	struct sockaddr	addr;		/* address from bind */
 	int		reserved;	/* use a priveledged port # (< 1024) */
+	int		announced;	/* bind had to issue announce before listen */
 	struct sockaddr	raddr;		/* peer address */
 	char		ctl[Ctlsize];	/* name of control file (if any) */
 	int		other;		/* fd of the remote end for Unix domain */
