@@ -5,10 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "tools/re2c/substr.h"
-#include "tools/re2c/globals.h"
-#include "tools/re2c/dfa.h"
-#include "tools/re2c/parse.h"
+#include "substr.h"
+#include "globals.h"
+#include "dfa.h"
+#include "parse.h"
 
 #ifdef _WIN32
 /* tmpfile() replacment for Windows.

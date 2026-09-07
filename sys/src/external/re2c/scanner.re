@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
-#include "tools/re2c/scanner.h"
-#include "tools/re2c/parse.h"
-#include "tools/re2c/globals.h"
-#include "tools/re2c/parser.h"
+#include "scanner.h"
+#include "parse.h"
+#include "globals.h"
+#include "parser.h"
 
 #ifndef MAX
 #define MAX(a,b) (((a)>(b))?(a):(b))

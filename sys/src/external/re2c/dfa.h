@@ -2,7 +2,7 @@
 #define re2c_dfa_h
 
 #include <stdio.h>
-#include "tools/re2c/re.h"
+#include "re.h"
 
 extern void prtCh(FILE *, unsigned char);
 extern void printSpan(FILE *, unsigned int, unsigned int);

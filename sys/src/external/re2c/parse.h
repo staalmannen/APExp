@@ -2,8 +2,8 @@
 #define re2c_parse_h
 
 #include <stdio.h>
-#include "tools/re2c/scanner.h"
-#include "tools/re2c/re.h"
+#include "scanner.h"
+#include "re.h"
 
 typedef struct Symbol {
     struct Symbol		*next;

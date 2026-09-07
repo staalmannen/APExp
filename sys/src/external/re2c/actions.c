@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <ctype.h>
 
-#include "tools/re2c/globals.h"
-#include "tools/re2c/parse.h"
-#include "tools/re2c/dfa.h"
+#include "globals.h"
+#include "parse.h"
+#include "dfa.h"
 
 static Symbol *first = NULL;
 

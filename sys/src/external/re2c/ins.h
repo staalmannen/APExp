@@ -1,7 +1,7 @@
 #ifndef re2c_ins_h
 #define re2c_ins_h
 
-#include "tools/re2c/basics.h"
+#include "basics.h"
 
 #define nChars 256
 typedef unsigned char Char;

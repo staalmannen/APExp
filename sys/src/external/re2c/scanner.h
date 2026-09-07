@@ -2,7 +2,7 @@
 #define	_scanner_h
 
 #include <stdio.h>
-#include "tools/re2c/token.h"
+#include "token.h"
 
 typedef struct Scanner {
     FILE		*in;

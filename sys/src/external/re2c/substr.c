@@ -1,6 +1,6 @@
 #include <string.h>
-#include "tools/re2c/substr.h"
-#include "tools/re2c/globals.h"
+#include "substr.h"
+#include "globals.h"
 
 void
 SubStr_out(const SubStr *s, FILE *o)
