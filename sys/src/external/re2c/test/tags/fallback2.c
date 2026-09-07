@@ -18,9 +18,8 @@
 {
 	YYCTYPE yych;
 	unsigned int yyaccept = 0;
-	YYMARKER = YYCURSOR;
 	if (YYLIMIT <= YYCURSOR) YYFILL(1);
-	yych = *YYCURSOR;
+	yych = *(YYMARKER = YYCURSOR);
 	switch (yych) {
 		case 'a': goto yy2;
 		default:

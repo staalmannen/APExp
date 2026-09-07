@@ -9,9 +9,9 @@
 
 {
 	YYCTYPE yych;
-	static const void* yyctable[2] = {
+	static void *yyctable[2] = {
 		&&yyc_r1,
-		&&yyc_r2
+		&&yyc_r2,
 	};
 	goto *yyctable[YYGETCONDITION()];
 /* *********************************** */
@@ -19,7 +19,7 @@ yyc_r1:
 	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 	yych = *YYCURSOR;
 	{
-		static const void* yytarget[256] = {
+		static void *yytarget[256] = {
 			&&yy1, &&yy1, &&yy1, &&yy1, &&yy1, &&yy1, &&yy1, &&yy1,
 			&&yy1, &&yy1, &&yy2, &&yy1, &&yy1, &&yy1, &&yy1, &&yy1,
 			&&yy1, &&yy1, &&yy1, &&yy1, &&yy1, &&yy1, &&yy1, &&yy1,
@@ -99,9 +99,9 @@ yy10:
 
 {
 	YYCTYPE yych;
-	static const void* yyctable[2] = {
+	static void *yyctable[2] = {
 		&&yyc_r1,
-		&&yyc_r2
+		&&yyc_r2,
 	};
 	goto *yyctable[YYGETCONDITION()];
 /* *********************************** */
@@ -109,7 +109,7 @@ yyc_r1:
 	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 	yych = *YYCURSOR;
 	{
-		static const void* yytarget[256] = {
+		static void *yytarget[256] = {
 			&&yy13, &&yy13, &&yy13, &&yy13, &&yy13, &&yy13, &&yy13, &&yy13,
 			&&yy13, &&yy13, &&yy12, &&yy13, &&yy13, &&yy13, &&yy13, &&yy13,
 			&&yy13, &&yy13, &&yy13, &&yy13, &&yy13, &&yy13, &&yy13, &&yy13,
@@ -186,5 +186,5 @@ yy21:
 
 reuse/reuse_conds_default_0.re:13:0: warning: control flow in condition 'r2' is undefined for strings that match '\xA', use default rule '*' [-Wundefined-control-flow]
 reuse/reuse_conds_default_0.re:18:0: warning: control flow in condition 'r1' is undefined for strings that match '\xA', use default rule '*' [-Wundefined-control-flow]
-reuse/reuse_conds_default_0.re:13:0: warning: condition numbers may change, use `conditions` block to generate reliable condition identifiers [-Wcondition-order]
-reuse/reuse_conds_default_0.re:18:0: warning: condition numbers may change, use `conditions` block to generate reliable condition identifiers [-Wcondition-order]
+reuse/reuse_conds_default_0.re:13:0: warning: condition numbers may change, use '/*!conditions:re2c*/' directive to generate reliable condition identifiers [-Wcondition-order]
+reuse/reuse_conds_default_0.re:18:0: warning: condition numbers may change, use '/*!conditions:re2c*/' directive to generate reliable condition identifiers [-Wcondition-order]

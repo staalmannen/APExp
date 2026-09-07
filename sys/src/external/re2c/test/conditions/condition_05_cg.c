@@ -59,9 +59,9 @@ char scan(Scanner *s)
 #line 60 "conditions/condition_05_cg.c"
 		{
 			unsigned char yych;
-			static const void* yyctable[2] = {
+			static void *yyctable[2] = {
 				&&yyc_normal,
-				&&yyc_comment
+				&&yyc_comment,
 			};
 			goto *yyctable[cond];
 /* *********************************** */
@@ -144,4 +144,4 @@ int main(int argc, char **argv)
 	}
 	return 0;
 }
-conditions/condition_05_cg.re:56:0: warning: condition numbers may change, use `conditions` block to generate reliable condition identifiers [-Wcondition-order]
+conditions/condition_05_cg.re:56:0: warning: condition numbers may change, use '/*!conditions:re2c*/' directive to generate reliable condition identifiers [-Wcondition-order]

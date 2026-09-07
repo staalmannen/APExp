@@ -7,15 +7,15 @@
 	yych = *YYCURSOR;
 	switch (yych) {
 		case 'a':
-			yyt1 = YYCURSOR;
 			yyt2 = NULL;
+			yyt1 = YYCURSOR;
 			goto yy2;
 		case 'b':
 			yyt2 = YYCURSOR;
 			goto yy4;
 		default:
-			yyt1 = YYCURSOR;
 			yyt2 = NULL;
+			yyt1 = YYCURSOR;
 			goto yy1;
 	}
 yy1:
@@ -54,5 +54,5 @@ yy7:
 }
 
 tags/topsort2.re:4:28: warning: rule matches empty string [-Wmatch-empty-string]
-tags/topsort2.re:4:28: warning: tag `p` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/topsort2.re:4:28: warning: tag `q` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/topsort2.re:4:28: warning: tag 'p' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/topsort2.re:4:28: warning: tag 'q' has 2nd degree of nondeterminism [-Wnondeterministic-tags]

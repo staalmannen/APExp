@@ -1,4 +1,4 @@
-//go:generate re2go $INPUT -o $OUTPUT -i --api simple
+//go:generate re2go $INPUT -o $OUTPUT -i
 package main
 
 import "errors"
@@ -9,12 +9,12 @@ var (
 	eOverflow = errors.New("overflow error")
 )
 
-func parse_u32(yyinput string) (uint32, error) {
-	var yycursor, yymarker int
+func parse_u32(str string) (uint32, error) {
+	var cur, mar int
 	result := uint64(0)
 
 	add := func(base uint64, offset byte) {
-		result = result * base + uint64(yyinput[yycursor-1] - offset)
+		result = result * base + uint64(str[cur-1] - offset)
 		if result >= u32Limit {
 			result = u32Limit
 		}
@@ -22,7 +22,12 @@ func parse_u32(yyinput string) (uint32, error) {
 
 	/*!re2c
 		re2c:yyfill:enable = 0;
-		re2c:YYCTYPE = byte;
+		re2c:define:YYCTYPE   = byte;
+		re2c:define:YYPEEK    = "str[cur]";
+		re2c:define:YYSKIP    = "cur += 1";
+		re2c:define:YYSHIFT   = "cur += @@{shift}";
+		re2c:define:YYBACKUP  = "mar = cur";
+		re2c:define:YYRESTORE = "cur = mar";
 
 		end = "\x00";
 

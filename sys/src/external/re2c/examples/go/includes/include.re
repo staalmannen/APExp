@@ -1,13 +1,17 @@
-//go:generate re2go $INPUT -o $OUTPUT -i --api simple
+//go:generate re2go $INPUT -o $OUTPUT -i
 package main
 
 /*!include:re2c "definitions.go" */
 
-func lex(yyinput string) int {
-	var yycursor, yymarker int
+func lex(str string) int {
+	var cur, mar int
 	/*!re2c
-		re2c:YYCTYPE = byte;
-		re2c:yyfill:enable = 0;
+		re2c:define:YYCTYPE   = byte;
+		re2c:define:YYPEEK    = "str[cur]";
+		re2c:define:YYSKIP    = "cur += 1";
+		re2c:define:YYBACKUP  = "mar = cur";
+		re2c:define:YYRESTORE = "cur = mar";
+		re2c:yyfill:enable    = 0;
 
 		*      { return ResultFail }
 		number { return ResultOk }

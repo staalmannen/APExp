@@ -16,12 +16,12 @@ const BUFSIZE: usize = 10;
 
 struct State {
     file: File,
-    yyinput: [u8; BUFSIZE],
-    yylimit: usize,
-    yycursor: usize,
-    yymarker: usize,
-    token: usize,
-    yystate: isize,
+    buf: [u8; BUFSIZE],
+    lim: usize,
+    cur: usize,
+    mar: usize,
+    tok: usize,
+    state: isize,
 }
 
 #[derive(Debug, PartialEq)]
@@ -29,20 +29,20 @@ enum Status {End, Ready, Waiting, BadPacket, BigPacket}
 
 fn fill(st: &mut State) -> Status {
     // Error: lexeme too long. In real life can reallocate a larger buffer.
-    if st.token < 1 { return Status::BigPacket; }
+    if st.tok < 1 { return Status::BigPacket; }
 
     // Shift buffer contents (discard everything up to the current lexeme).
-    st.yyinput.copy_within(st.token..st.yylimit, 0);
-    st.yylimit -= st.token;
-    st.yycursor -= st.token;
-    st.yymarker = st.yymarker.overflowing_sub(st.token).0; // underflows if marker is unused
-    st.token = 0;
+    st.buf.copy_within(st.tok..st.lim, 0);
+    st.lim -= st.tok;
+    st.cur -= st.tok;
+    st.mar = st.mar.overflowing_sub(st.tok).0; // underflows if marker is unused
+    st.tok = 0;
 
     // Fill free space at the end of buffer with new data.
-    match st.file.read(&mut st.yyinput[st.yylimit..BUFSIZE - 1]) { // -1 for sentinel
+    match st.file.read(&mut st.buf[st.lim..BUFSIZE - 1]) { // -1 for sentinel
         Ok(n) => {
-            st.yylimit += n;
-            st.yyinput[st.yylimit] = 0; // append sentinel symbol
+            st.lim += n;
+            st.buf[st.lim] = 0; // append sentinel symbol
         },
         Err(why) => panic!("cannot read from file: {}", why)
     }
@@ -50,15 +50,21 @@ fn fill(st: &mut State) -> Status {
     return Status::Ready;
 }
 
-fn lex(yyrecord: &mut State, recv: &mut usize) -> Status {
+fn lex(st: &mut State, recv: &mut usize) -> Status {
     let mut yych;
     'lex: loop {
-        yyrecord.token = yyrecord.yycursor;
+        st.tok = st.cur;
     /*!re2c
-        re2c:api = record;
         re2c:eof = 0;
-        re2c:YYCTYPE = "u8";
-        re2c:YYFILL = "return Status::Waiting;";
+        re2c:define:YYCTYPE    = "u8";
+        re2c:define:YYPEEK     = "*st.buf.get_unchecked(st.cur)";
+        re2c:define:YYSKIP     = "st.cur += 1;";
+        re2c:define:YYBACKUP   = "st.mar = st.cur;";
+        re2c:define:YYRESTORE  = "st.cur = st.mar;";
+        re2c:define:YYLESSTHAN = "st.cur >= st.lim";
+        re2c:define:YYGETSTATE = "st.state";
+        re2c:define:YYSETSTATE = "st.state = @@;";
+        re2c:define:YYFILL     = "return Status::Waiting;";
 
         packet = [a-z]+[;];
 
@@ -69,7 +75,7 @@ fn lex(yyrecord: &mut State, recv: &mut usize) -> Status {
 }
 
 fn test(packets: Vec<&[u8]>, expect: Status) {
-    // Create a pipe (open the same file for reading and writing).
+    // Create a "socket" (open the same file for reading and writing).
     let fname = "pipe";
     let mut fw: File = match File::create(fname) {
         Err(why) => panic!("cannot open {}: {}", fname, why),
@@ -81,17 +87,17 @@ fn test(packets: Vec<&[u8]>, expect: Status) {
     };
 
     // Initialize lexer state: `state` value is -1, all offsets are at the end
-    // of buffer, the character at `yylimit` offset is the sentinel (null).
-    let yylimit = BUFSIZE - 1;
+    // of buffer, the character at `lim` offset is the sentinel (null).
+    let lim = BUFSIZE - 1;
     let mut state = State {
         file: fr,
-        // Sentinel (at `yylimit` offset) is set to null, which triggers YYFILL.
-        yyinput: [0; BUFSIZE],
-        yylimit: yylimit,
-        yycursor: yylimit,
-        yymarker: yylimit,
-        token: yylimit,
-        yystate: -1,
+        // Sentinel (at `lim` offset) is set to null, which triggers YYFILL.
+        buf: [0; BUFSIZE],
+        cur: lim,
+        mar: lim,
+        tok: lim,
+        lim: lim,
+        state: -1,
     };
 
     // Main loop. The buffer contains incomplete data which appears packet by
@@ -115,7 +121,7 @@ fn test(packets: Vec<&[u8]>, expect: Status) {
                 }
             }
             status = fill(&mut state);
-            log!("queue: '{}'", String::from_utf8_lossy(&state.yyinput));
+            log!("queue: '{}'", String::from_utf8_lossy(&state.buf));
             if status == Status::BigPacket {
                 log!("error: packet too big");
                 break;

@@ -1,4 +1,4 @@
-//go:generate re2go $INPUT -o $OUTPUT --input-encoding utf8 --api simple
+//go:generate re2go $INPUT -o $OUTPUT --input-encoding utf8
 package main
 
 // This example supports multiple input encodings: UTF-8 and UTF-32.
@@ -6,24 +6,28 @@ package main
 // blocks add only encoding-specific configurations.
 /*!rules:re2c
 	re2c:yyfill:enable = 0;
+	re2c:define:YYPEEK    = "str[cur]";
+	re2c:define:YYSKIP    = "cur += 1";
+	re2c:define:YYBACKUP  = "mar = cur";
+	re2c:define:YYRESTORE = "cur = mar";
 
 	"∀x ∃y" { return 0; }
 	*       { return 1; }
 */
 
-func lexUTF8(yyinput []uint8) int {
-	var yycursor, yymarker int
+func lexUTF8(str []uint8) int {
+	var cur, mar int
 	/*!use:re2c
 		re2c:encoding:utf8 = 1;
-		re2c:YYCTYPE = uint8;
+		re2c:define:YYCTYPE = uint8;
 	*/
 }
 
-func lexUTF32(yyinput []uint32) int {
-	var yycursor, yymarker int
+func lexUTF32(str []uint32) int {
+	var cur, mar int
 	/*!use:re2c
 		re2c:encoding:utf32 = 1;
-		re2c:YYCTYPE = uint32;
+		re2c:define:YYCTYPE = uint32;
 	*/
 }
 

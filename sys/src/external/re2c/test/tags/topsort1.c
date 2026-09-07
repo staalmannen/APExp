@@ -3,9 +3,8 @@
 
 {
 	YYCTYPE yych;
-	YYMARKER = YYCURSOR;
 	if ((YYLIMIT - YYCURSOR) < 4) YYFILL(4);
-	yych = *YYCURSOR;
+	yych = *(YYMARKER = YYCURSOR);
 	switch (yych) {
 		case 'a':
 			yyt1 = NULL;
@@ -61,4 +60,4 @@ yy7:
 	{}
 }
 
-tags/topsort1.re:4:21: warning: tag `p` has 5th degree of nondeterminism [-Wnondeterministic-tags]
+tags/topsort1.re:4:21: warning: tag 'p' has 5th degree of nondeterminism [-Wnondeterministic-tags]

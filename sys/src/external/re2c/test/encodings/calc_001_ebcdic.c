@@ -22,101 +22,101 @@ int scan(char *s, int l)
 
 		{
 			YYCTYPE yych;
+			YYDEBUG(0, *YYCURSOR);
 			if ((YYLIMIT - YYCURSOR) < 2) YYFILL(2);
 			yych = *YYCURSOR;
-			YYDEBUG(0, yych);
 			switch (yych) {
 				case 0x00: goto yy1;
-				case 0x4E: goto yy3;
-				case 0x60: goto yy4;
-				case 0xF0: goto yy5;
-				case 0xF1:
-				case 0xF2:
-				case 0xF3:
-				case 0xF4:
-				case 0xF5:
-				case 0xF6:
-				case 0xF7:
-				case 0xF8:
-				case 0xF9: goto yy7;
+				case 0x4E /* + */: goto yy3;
+				case 0x60 /* - */: goto yy4;
+				case 0xF0 /* 0 */: goto yy5;
+				case 0xF1 /* 1 */:
+				case 0xF2 /* 2 */:
+				case 0xF3 /* 3 */:
+				case 0xF4 /* 4 */:
+				case 0xF5 /* 5 */:
+				case 0xF6 /* 6 */:
+				case 0xF7 /* 7 */:
+				case 0xF8 /* 8 */:
+				case 0xF9 /* 9 */: goto yy7;
 				default: goto yy2;
 			}
 yy1:
-			YYDEBUG(1, yych);
+			YYDEBUG(1, *YYCURSOR);
 			++YYCURSOR;
 			{ printf("EOF\n");	return 0; }
 yy2:
-			YYDEBUG(2, yych);
+			YYDEBUG(2, *YYCURSOR);
 			++YYCURSOR;
 			{ printf("ERR\n");	return 1; }
 yy3:
-			YYDEBUG(3, yych);
+			YYDEBUG(3, *YYCURSOR);
 			++YYCURSOR;
 			{ printf("+\n");	continue; }
 yy4:
-			YYDEBUG(4, yych);
+			YYDEBUG(4, *YYCURSOR);
 			++YYCURSOR;
 			{ printf("-\n");	continue; }
 yy5:
-			YYDEBUG(5, yych);
+			YYDEBUG(5, *YYCURSOR);
 			yych = *++YYCURSOR;
 			switch (yych) {
-				case 0xF0:
-				case 0xF1:
-				case 0xF2:
-				case 0xF3:
-				case 0xF4:
-				case 0xF5:
-				case 0xF6:
-				case 0xF7:
-				case 0xF8:
-				case 0xF9: goto yy9;
+				case 0xF0 /* 0 */:
+				case 0xF1 /* 1 */:
+				case 0xF2 /* 2 */:
+				case 0xF3 /* 3 */:
+				case 0xF4 /* 4 */:
+				case 0xF5 /* 5 */:
+				case 0xF6 /* 6 */:
+				case 0xF7 /* 7 */:
+				case 0xF8 /* 8 */:
+				case 0xF9 /* 9 */: goto yy9;
 				default: goto yy6;
 			}
 yy6:
-			YYDEBUG(6, yych);
+			YYDEBUG(6, *YYCURSOR);
 			{ printf("Num\n");	continue; }
 yy7:
-			YYDEBUG(7, yych);
+			YYDEBUG(7, *YYCURSOR);
 			++YYCURSOR;
 			if (YYLIMIT <= YYCURSOR) YYFILL(1);
 			yych = *YYCURSOR;
 			switch (yych) {
-				case 0xF0:
-				case 0xF1:
-				case 0xF2:
-				case 0xF3:
-				case 0xF4:
-				case 0xF5:
-				case 0xF6:
-				case 0xF7:
-				case 0xF8:
-				case 0xF9: goto yy7;
+				case 0xF0 /* 0 */:
+				case 0xF1 /* 1 */:
+				case 0xF2 /* 2 */:
+				case 0xF3 /* 3 */:
+				case 0xF4 /* 4 */:
+				case 0xF5 /* 5 */:
+				case 0xF6 /* 6 */:
+				case 0xF7 /* 7 */:
+				case 0xF8 /* 8 */:
+				case 0xF9 /* 9 */: goto yy7;
 				default: goto yy8;
 			}
 yy8:
-			YYDEBUG(8, yych);
+			YYDEBUG(8, *YYCURSOR);
 			{ printf("Num\n");	continue; }
 yy9:
-			YYDEBUG(9, yych);
+			YYDEBUG(9, *YYCURSOR);
 			++YYCURSOR;
 			if (YYLIMIT <= YYCURSOR) YYFILL(1);
 			yych = *YYCURSOR;
 			switch (yych) {
-				case 0xF0:
-				case 0xF1:
-				case 0xF2:
-				case 0xF3:
-				case 0xF4:
-				case 0xF5:
-				case 0xF6:
-				case 0xF7:
-				case 0xF8:
-				case 0xF9: goto yy9;
+				case 0xF0 /* 0 */:
+				case 0xF1 /* 1 */:
+				case 0xF2 /* 2 */:
+				case 0xF3 /* 3 */:
+				case 0xF4 /* 4 */:
+				case 0xF5 /* 5 */:
+				case 0xF6 /* 6 */:
+				case 0xF7 /* 7 */:
+				case 0xF8 /* 8 */:
+				case 0xF9 /* 9 */: goto yy9;
 				default: goto yy10;
 			}
 yy10:
-			YYDEBUG(10, yych);
+			YYDEBUG(10, *YYCURSOR);
 			{ printf("Oct\n");	continue; }
 		}
 

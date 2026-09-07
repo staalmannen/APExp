@@ -1,4 +1,4 @@
-// re2rust $INPUT -o $OUTPUT --api simple
+// re2rust $INPUT -o $OUTPUT
 
 // This example shows how to combine reusable re2c blocks: two blocks
 // ('colors' and 'fish') are merged into one. The 'salmon' rule occurs
@@ -19,13 +19,15 @@ enum Ans { Color, Fish, Dunno }
     "haddock" | "salmon" | "eel" { return Ans::Fish; }
 */
 
-fn lex(yyinput: &[u8]) -> Ans {
-    assert!(yyinput.len() > 0); // expect nonempty input
-
-    let (mut yycursor, mut yymarker) = (0, 0);
+fn lex(str: &[u8]) -> Ans {
+    let (mut cur, mut mar) = (0, 0);
     /*!re2c
         re2c:yyfill:enable = 0;
-        re2c:YYCTYPE = u8;
+        re2c:define:YYCTYPE   = u8;
+        re2c:define:YYPEEK    = "*str.get_unchecked(cur)";
+        re2c:define:YYSKIP    = "cur += 1;";
+        re2c:define:YYBACKUP  = "mar = cur;";
+        re2c:define:YYRESTORE = "cur = mar;";
 
         !use:fish;
         !use:colors;

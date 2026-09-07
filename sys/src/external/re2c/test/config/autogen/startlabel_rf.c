@@ -4,19 +4,18 @@
 
 // re2c:state:nextlabel = 0;
 
+
 	switch (YYGETSTATE()) {
-		case 0: goto yyFillLabel0;
 		default: goto yy0;
+		case 0: goto yyFillLabel0;
 	}
 yy0:
 	goto yy1;
 yy2:
 	++YYCURSOR;
 yy1:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(0);
-		YYFILL(1);
-	}
+	YYSETSTATE(0);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel0:
 	yych = *YYCURSOR;
 	switch (yych) {
@@ -30,9 +29,10 @@ yy3:
 
 // re2c:state:nextlabel = 1;
 
+
 	switch (YYGETSTATE()) {
-		case 1: goto yyFillLabel1;
 		default: goto yy4;
+		case 1: goto yyFillLabel1;
 	}
 yyNext:
 yy4:
@@ -40,10 +40,8 @@ yy4:
 yy6:
 	++YYCURSOR;
 yy5:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(1);
-		YYFILL(1);
-	}
+	YYSETSTATE(1);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel1:
 	yych = *YYCURSOR;
 	switch (yych) {
@@ -58,19 +56,18 @@ yy7:
 // re2c:startlabel = 0;
 // re2c:state:nextlabel = 0;
 
+
 	switch (YYGETSTATE()) {
-		case 2: goto yyFillLabel2;
 		default: goto yy8;
+		case 2: goto yyFillLabel2;
 	}
 yy8:
 	goto yy9;
 yy10:
 	++YYCURSOR;
 yy9:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(2);
-		YYFILL(1);
-	}
+	YYSETSTATE(2);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel2:
 	yych = *YYCURSOR;
 	switch (yych) {
@@ -85,9 +82,10 @@ yy11:
 // re2c:startlabel = 0;
 // re2c:state:nextlabel = 1;
 
+
 	switch (YYGETSTATE()) {
-		case 3: goto yyFillLabel3;
 		default: goto yy12;
+		case 3: goto yyFillLabel3;
 	}
 yyNext:
 yy12:
@@ -95,10 +93,8 @@ yy12:
 yy14:
 	++YYCURSOR;
 yy13:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(3);
-		YYFILL(1);
-	}
+	YYSETSTATE(3);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel3:
 	yych = *YYCURSOR;
 	switch (yych) {
@@ -113,19 +109,18 @@ yy15:
 // re2c:startlabel = 1;
 // re2c:state:nextlabel = 0;
 
+
 	switch (YYGETSTATE()) {
-		case 4: goto yyFillLabel4;
 		default: goto yy16;
+		case 4: goto yyFillLabel4;
 	}
 yy16:
 	goto yy17;
 yy18:
 	++YYCURSOR;
 yy17:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(4);
-		YYFILL(1);
-	}
+	YYSETSTATE(4);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel4:
 	yych = *YYCURSOR;
 	switch (yych) {
@@ -140,9 +135,10 @@ yy19:
 // re2c:startlabel = 1;
 // re2c:state:nextlabel = 1;
 
+
 	switch (YYGETSTATE()) {
-		case 5: goto yyFillLabel5;
 		default: goto yy20;
+		case 5: goto yyFillLabel5;
 	}
 yyNext:
 yy20:
@@ -150,10 +146,8 @@ yy20:
 yy22:
 	++YYCURSOR;
 yy21:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(5);
-		YYFILL(1);
-	}
+	YYSETSTATE(5);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel5:
 	yych = *YYCURSOR;
 	switch (yych) {
@@ -168,20 +162,19 @@ yy23:
 // re2c:startlabel = Lstart;
 // re2c:state:nextlabel = 0;
 
+
 	switch (YYGETSTATE()) {
-		case 6: goto yyFillLabel6;
 		default: goto yy24;
+		case 6: goto yyFillLabel6;
 	}
-Lstart:
 yy24:
+Lstart:
 	goto yy25;
 yy26:
 	++YYCURSOR;
 yy25:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(6);
-		YYFILL(1);
-	}
+	YYSETSTATE(6);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel6:
 	yych = *YYCURSOR;
 	switch (yych) {
@@ -196,21 +189,20 @@ yy27:
 // re2c:startlabel = Lstart;
 // re2c:state:nextlabel = 1;
 
+
 	switch (YYGETSTATE()) {
-		case 7: goto yyFillLabel7;
 		default: goto yy28;
+		case 7: goto yyFillLabel7;
 	}
 yyNext:
-Lstart:
 yy28:
+Lstart:
 	goto yy29;
 yy30:
 	++YYCURSOR;
 yy29:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(7);
-		YYFILL(1);
-	}
+	YYSETSTATE(7);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel7:
 	yych = *YYCURSOR;
 	switch (yych) {
@@ -226,20 +218,19 @@ yy31:
 // re2c:startlabel = 0;
 // re2c:state:nextlabel = 0;
 
+
 	switch (YYGETSTATE()) {
-		case 8: goto yyFillLabel8;
 		default: goto yy32;
+		case 8: goto yyFillLabel8;
 	}
-Lstart:
 yy32:
+Lstart:
 	goto yy33;
 yy34:
 	++YYCURSOR;
 yy33:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(8);
-		YYFILL(1);
-	}
+	YYSETSTATE(8);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel8:
 	yych = *YYCURSOR;
 	switch (yych) {
@@ -255,21 +246,20 @@ yy35:
 // re2c:startlabel = 0;
 // re2c:state:nextlabel = 1;
 
+
 	switch (YYGETSTATE()) {
-		case 9: goto yyFillLabel9;
 		default: goto yy36;
+		case 9: goto yyFillLabel9;
 	}
 yyNext:
-Lstart:
 yy36:
+Lstart:
 	goto yy37;
 yy38:
 	++YYCURSOR;
 yy37:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(9);
-		YYFILL(1);
-	}
+	YYSETSTATE(9);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel9:
 	yych = *YYCURSOR;
 	switch (yych) {
@@ -285,20 +275,19 @@ yy39:
 // re2c:startlabel = 1;
 // re2c:state:nextlabel = 0;
 
+
 	switch (YYGETSTATE()) {
-		case 10: goto yyFillLabel10;
 		default: goto yy40;
+		case 10: goto yyFillLabel10;
 	}
-Lstart:
 yy40:
+Lstart:
 	goto yy41;
 yy42:
 	++YYCURSOR;
 yy41:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(10);
-		YYFILL(1);
-	}
+	YYSETSTATE(10);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel10:
 	yych = *YYCURSOR;
 	switch (yych) {
@@ -314,21 +303,20 @@ yy43:
 // re2c:startlabel = 1;
 // re2c:state:nextlabel = 1;
 
+
 	switch (YYGETSTATE()) {
-		case 11: goto yyFillLabel11;
 		default: goto yy44;
+		case 11: goto yyFillLabel11;
 	}
 yyNext:
-Lstart:
 yy44:
+Lstart:
 	goto yy45;
 yy46:
 	++YYCURSOR;
 yy45:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(11);
-		YYFILL(1);
-	}
+	YYSETSTATE(11);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel11:
 	yych = *YYCURSOR;
 	switch (yych) {

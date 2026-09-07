@@ -1,14 +1,14 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 if [[ $# -ne 2 ]]; then
-    echo "usage: $0 SRCDIR BLDDIR"
+    echo "usage: ./unicode_groups.sh SRCDIR BLDDIR"
     exit 1
 fi
 
 srcdir="$1"
 blddir="$2"
 
-for fre in encodings/unicode_{blocks,group_*}_{8,x,u}*.re; do
+for fre in encodings/unicode_{blocks,group_*}_{8,x,u}_encoding_policy_{ignore,substitute,fail}.re; do
     echo $fre
     fc=${fre/.re/.c}
     fe=${fre/.re/}
@@ -27,12 +27,10 @@ for fre in encodings/unicode_{blocks,group_*}_{8,x,u}*.re; do
     g++ -W -Wall -Wextra \
         -I $srcdir \
         -I $blddir \
-        -I $srcdir/src/encoding \
-        $srcdir/src/encoding/range_suffix.cc \
-        $srcdir/src/encoding/utf8.cc \
-        $srcdir/src/encoding/utf16.cc \
-        $srcdir/src/regexp/regexp.cc \
-        $srcdir/src/util/range.cc \
+        -I $srcdir/src/encoding/utf8 \
+        -I $srcdir/src/encoding/utf16 \
+        $srcdir/src/encoding/utf8/utf8.cc \
+        $srcdir/src/encoding/utf16/utf16.cc \
         $fc \
         -o $fe
 

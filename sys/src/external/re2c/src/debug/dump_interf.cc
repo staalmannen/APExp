@@ -7,9 +7,11 @@
 #include "src/debug/debug.h"
 #include "src/regexp/tag.h"
 
+
 namespace re2c {
 
-void dump_interf(const cfg_t& cfg, const bool* interf) {
+void dump_interf(const cfg_t &cfg, const bool *interf)
+{
     const tagver_t nver = cfg.dfa.maxtagver + 1;
     for (tagver_t y = 1; y < nver; ++y) {
         fprintf(stderr, "%2d ", y);

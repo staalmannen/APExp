@@ -6,7 +6,10 @@
 
 static const uint64_t ERROR = UINT64_MAX;
 
-#define CHECK(n) if (n > UINT32_MAX) return ERROR;
+template<int BASE> static void add(uint64_t &u, char d) {
+    u = u * BASE + d;
+    if (u > UINT32_MAX) u = ERROR;
+}
 
 static uint64_t parse_u32(const char *s) {
     const char *YYCURSOR = s, *YYMARKER;
@@ -14,7 +17,7 @@ static uint64_t parse_u32(const char *s) {
 
     
 {
-	unsigned char yych;
+	char yych;
 	yych = *YYCURSOR;
 	switch (yych) {
 		case '0': goto yy2;
@@ -97,7 +100,7 @@ yy9:
 bin:
     
 {
-	unsigned char yych;
+	char yych;
 	yych = *YYCURSOR;
 	switch (yych) {
 		case 0x00: goto yy11;
@@ -113,13 +116,13 @@ yy12:
 	{ return ERROR; }
 yy13:
 	++YYCURSOR;
-	{ u = u * 2 + (YYCURSOR[-1] - '0'); CHECK(u); goto bin; }
+	{ add<2>(u, YYCURSOR[-1] - '0'); goto bin; }
 }
 
 oct:
     
 {
-	unsigned char yych;
+	char yych;
 	yych = *YYCURSOR;
 	switch (yych) {
 		case 0x00: goto yy15;
@@ -141,13 +144,13 @@ yy16:
 	{ return ERROR; }
 yy17:
 	++YYCURSOR;
-	{ u = u * 8 + (YYCURSOR[-1] - '0'); CHECK(u); goto oct; }
+	{ add<8>(u, YYCURSOR[-1] - '0'); goto oct; }
 }
 
 dec:
     
 {
-	unsigned char yych;
+	char yych;
 	yych = *YYCURSOR;
 	switch (yych) {
 		case 0x00: goto yy19;
@@ -171,13 +174,13 @@ yy20:
 	{ return ERROR; }
 yy21:
 	++YYCURSOR;
-	{ u = u * 10 + (YYCURSOR[-1] - '0'); CHECK(u); goto dec; }
+	{ add<10>(u, YYCURSOR[-1] - '0'); goto dec; }
 }
 
 hex:
     
 {
-	unsigned char yych;
+	char yych;
 	yych = *YYCURSOR;
 	switch (yych) {
 		case 0x00: goto yy23;
@@ -213,13 +216,13 @@ yy24:
 	{ return ERROR; }
 yy25:
 	++YYCURSOR;
-	{ u = u * 16 + (YYCURSOR[-1] - '0');      CHECK(u); goto hex; }
+	{ add<16>(u, YYCURSOR[-1] - '0');      goto hex; }
 yy26:
 	++YYCURSOR;
-	{ u = u * 16 + (YYCURSOR[-1] - 'A' + 10); CHECK(u); goto hex; }
+	{ add<16>(u, YYCURSOR[-1] - 'A' + 10); goto hex; }
 yy27:
 	++YYCURSOR;
-	{ u = u * 16 + (YYCURSOR[-1] - 'a' + 10); CHECK(u); goto hex; }
+	{ add<16>(u, YYCURSOR[-1] - 'a' + 10); goto hex; }
 }
 
 }

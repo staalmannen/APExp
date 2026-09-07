@@ -3,7 +3,9 @@
 
 
 
+
 	switch (YYGETSTATE()) {
+		default: goto yy0;
 		case 0:
 			if (YYLIMIT <= YYCURSOR) goto yy4;
 			goto yyFillLabel0;
@@ -16,7 +18,6 @@
 		case 3:
 			if (YYLIMIT <= YYCURSOR) goto yy19;
 			goto yyFillLabel3;
-		default: goto yy0;
 	}
 yy0:
 yyFillLabel0:
@@ -41,6 +42,7 @@ yy3:
 yy4:
 	YYSETSTATE(-1);
 	{ return EOF; }
+
 
 
 
@@ -69,6 +71,7 @@ yy9:
 
 
 
+
 yyFillLabel2:
 	yych = *YYCURSOR;
 	switch (yych) {
@@ -91,6 +94,7 @@ yy13:
 yy14:
 	YYSETSTATE(-1);
 	{ return EOF; }
+
 
 
 

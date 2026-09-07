@@ -1,182 +1,241 @@
 #ifndef _RE2C_CODEGEN_CODE_
 #define _RE2C_CODEGEN_CODE_
 
-#include <stdint.h>
+#include <assert.h>
+#include <stddef.h>
+#include "src/util/c99_stdint.h"
 #include <string.h>
+#include <fstream>
+#include <set>
+#include <string>
+#include <sstream>
+#include <vector>
+#include <map>
 
 #include "src/constants.h"
 #include "src/dfa/tcmd.h"
+#include "src/debug/debug.h"
 #include "src/msg/location.h"
-#include "src/util/allocator.h"
-#include "src/util/check.h"
-#include "src/util/containers.h"
+#include "src/util/forbid_copy.h"
+#include "src/util/slab_allocator.h"
+#include "src/util/smart_ptr.h"
 #include "src/util/string_utils.h"
+
 
 namespace re2c {
 
 // forward decls
+class Msg;
+struct Opt;
+struct opt_t;
 struct Code;
 struct CodeGo;
 struct CodeGoIf;
+struct Output;
+struct OutputBlock;
 struct State;
+struct DFA;
+typedef std::vector<smart_ptr<DFA> > dfas_t;
+template <typename value_t> class uniq_vector_t;
+
+// need 8-byte alignment to allocate structs with pointers and 64-bit integers
+typedef slab_allocator_t<1024 * 1024, 8> code_alc_t;
 
 struct Label {
-    static constexpr uint32_t NONE = ~0u;
+    static const uint32_t NONE = ~0u;
 
     uint32_t index;
-    bool used;
+    bool     used;
 };
 
-inline Label* new_label(OutAllocator& alc, uint32_t index) {
-    Label* l = alc.alloct<Label>(1);
+inline Label *new_label(code_alc_t &alc, uint32_t index)
+{
+    Label *l = alc.alloct<Label>(1);
     l->index = index;
     l->used = false;
     return l;
 }
 
-using CodeList = list_t<Code>;
+class Scratchbuf {
+    code_alc_t &alc;
+    std::ostringstream os;
+
+public:
+    explicit Scratchbuf(code_alc_t &alc): alc(alc), os() {}
+    bool empty() const { return os.str().empty(); }
+    std::ostringstream &stream() { return os; }
+    const char *flush();
+    Scratchbuf& i32(int32_t u) { os << u; return *this; }
+    Scratchbuf& u32(uint32_t u) { os << u; return *this; }
+    Scratchbuf& u64(uint64_t u) { os << u; return *this; }
+    Scratchbuf& str(const std::string &s) { os << s; return *this; }
+    Scratchbuf& cstr(const char *s) { os << s; return *this; }
+    Scratchbuf& u32_width(uint32_t u, int width);
+    Scratchbuf& yybm_char(uint32_t u, const opt_t *opts, int width);
+    Scratchbuf& exact_uint(size_t width);
+
+    Scratchbuf& label(const Label &l, bool check_used = true) {
+        assert((l.used || !check_used) && l.index != Label::NONE);
+        os << l.index;
+        return *this;
+    }
+};
+
+template<typename T>
+struct code_list_t {
+    T  *head;
+    T **ptail;
+};
+
+typedef code_list_t<Code> CodeList;
 
 struct CodeJump {
-    const State* to;
-    tcid_t tags;
-    bool skip;
-    bool eof;
-    bool elide;
+    const State *to;
+    tcid_t       tags;
+    bool         skip;
+    bool         eof;
+    bool         elide;
 };
 
 struct CodeBmState {
-    const CodeGo* go;
-    const State* state; // destination DFA state
-    uint32_t offset;    // start offset in the 'yybm' buffer
-    uint32_t mask;      // bit mask
-    CodeBmState* next;
+    const CodeGo *go;
+    const State  *state;  // destination DFA state
+    uint32_t      offset; // start offset in the 'yybm' buffer
+    uint32_t      mask;   // bit mask
+    CodeBmState  *next;
 };
 
-using CodeBmStates = list_t<CodeBmState>;
+typedef code_list_t<CodeBmState> CodeBmStates;
 
 struct CodeBitmap {
-    CodeBmStates* states;
-    uint32_t nchars;
-    uint32_t nelems;
-    const char** elems;
-    bool used;
+    CodeBmStates *states;
+    uint32_t      nchars;
+    bool          used;
 };
 
 struct Span {
-    uint32_t ub;
-    State* to;
-    tcid_t tags;
+    uint32_t  ub;
+    State    *to;
+    tcid_t    tags;
 };
 
 struct CodeRanges {
-    VarType type;
-    uint32_t size;
-    int64_t* elems;
+    VarType   type;
+    uint32_t  size;
+    int64_t  *elems;
 };
 
 struct CodeGoCase {
-    const CodeRanges* ranges;
-    CodeJump jump;
+    const CodeRanges *ranges;
+    CodeJump          jump;
 };
 
 struct CodeGoSw {
-    CodeGoCase* cases;
-    CodeGoCase* defcase;
-    uint32_t ncases;
+    CodeGoCase *cases;
+    CodeGoCase *defcase;
+    uint32_t    ncases;
 };
 
-struct CodeGoSwIf {
-    union {
-        CodeGoSw* gosw;
-        CodeGoIf* goif;
-    };
-    enum class Kind: uint32_t {
-        SWITCH,
-        IF
-    } kind;
+struct CodeCmp {
+    const char *cmp;
+    uint32_t    val;
 };
 
-// Binary IF (used for many branches).
-struct CodeGoIfB {
-    const char* cond;
-    CodeGoIf* gothen;
-    CodeGoIf* goelse;
+// binary if
+struct CodeGoIfB
+{
+    const CodeCmp *cond;
+    CodeGoIf      *gothen;
+    CodeGoIf      *goelse;
 };
 
-struct CodeGoBranch {
-    const char* cond;
-    union {
-        CodeJump jump;
-        CodeGoSwIf* swif;
-    };
-    enum class Kind: uint32_t {
-        JUMP,
-        SWIF
-    } kind;
-};
-
-// Linear IF (used for few branches).
+// linear if
 struct CodeGoIfL {
-    size_t nbranches;
-    CodeGoBranch* branches;
-    State* def;
+    struct Branch {
+        const CodeCmp *cond;
+        CodeJump       jump;
+    };
+
+    size_t  nbranches;
+    Branch *branches;
+    State  *def;
 };
 
 struct CodeGoIf {
-    union {
-        CodeGoIfB* goifb;
-        CodeGoIfL* goifl;
-    };
-    enum class Kind: uint32_t {
+    enum Kind {
         BINARY,
         LINEAR
-    } kind;
-};
-
-struct CodeGoCgotoTable {
-    static constexpr uint32_t TABLE_SIZE = 0x100;
-
-    State** table;
-};
-
-struct CodeGoCgoto {
-    CodeGoSwIf* hgo;
-    CodeGoCgotoTable* table;
-};
-
-struct CodeGo {
-    enum class Kind: uint32_t {
-        EMPTY,
-        SWITCH_IF,
-        LINEAR_IF,
-        CGOTO,
-        DOT
     };
 
     Kind kind;
-    uint32_t span_count;
-    Span* span;
-    tcid_t tags;
-    bool skip;
-    bool eof; // true if YYEND check is needed
     union {
-        CodeGoSwIf* goswif;
-        CodeGoCgoto* cgoto;
-        CodeGoSw* godot;
-        CodeGoIfL* goifl;
+        CodeGoIfB *goifb;
+        CodeGoIfL *goifl;
     };
 };
 
-struct CodeBranch {
-    const char* cond;
-    CodeList* code;
-    CodeBranch* next;
+struct CodeGoSwIf {
+    enum Kind{
+        SWITCH,
+        IF
+    };
+
+    Kind kind;
+    union {
+        CodeGoSw *gosw;
+        CodeGoIf *goif;
+    };
 };
 
-using CodeBranches = list_t<CodeBranch>;
+struct CodeGoBm {
+    const CodeBmState *bitmap;
+    CodeGoSwIf        *hgo;
+    CodeGoSwIf        *lgo;
+};
+
+struct CodeGoCpTable {
+    static const uint32_t TABLE_SIZE;
+
+    State **table;
+};
+
+struct CodeGoCp {
+    CodeGoSwIf    *hgo;
+    CodeGoCpTable *table;
+};
+
+struct CodeGo {
+    enum Kind {
+        EMPTY,
+        SWITCH_IF,
+        BITMAP,
+        CPGOTO,
+        DOT
+    };
+
+    Kind      kind;
+    uint32_t  nspans;
+    Span     *span;
+    tcid_t    tags;
+    bool      skip;
+    union {
+        CodeGoSwIf *goswif;
+        CodeGoBm   *gobm;
+        CodeGoCp   *gocp;
+        CodeGoSw   *godot;
+    };
+};
+
+struct CodeIfTE {
+    const char *if_cond;
+    const char *else_cond;
+    CodeList   *if_code;
+    CodeList   *else_code;
+    bool        oneline;
+};
 
 struct CodeCase {
-    enum class Kind: uint32_t {
+    enum Kind {
         RANGES,
         NUMBER,
         STRING,
@@ -184,645 +243,572 @@ struct CodeCase {
     } kind;
 
     union {
-        const CodeRanges* ranges;
-        int32_t number;
-        const char* string;
+        const CodeRanges *ranges;
+        int32_t           number;
+        const char       *string;
     };
-    CodeList* body;
-    CodeCase* next;
+    CodeList *body;
+    CodeCase *next;
 };
 
-using CodeCases = list_t<CodeCase>;
+typedef code_list_t<CodeCase> CodeCases;
 
 struct CodeSwitch {
-    const char* expr;
-    CodeCases* cases;
-};
-
-struct CodeLoop {
-    const char* init;
-    CodeCases* cases;
-    CodeList* body;
+    const char *expr;
+    CodeCases  *cases;
 };
 
 struct CodeBlock {
-    enum class Kind: uint32_t {
+    enum Fmt {
         WRAPPED,
         INDENTED,
         RAW
     };
 
-    Kind kind;
-    CodeList* stmts;
+    CodeList *stmts;
+    Fmt       fmt;
 };
 
 struct CodeVar {
     VarType type;
-    bool is_default;
-    const char* name;
-    const char* init;
+    const char *name;
+    const char *init;
 };
 
-// TODO: merge `BlockNameList` and `CodeExpr`?
 struct BlockNameList {
-    const char* name;
-    BlockNameList* next;
-};
-
-struct CodeAssign {
-    const char* lhs;
-    const char* rhs;
+    const char    *name;
+    BlockNameList *next;
 };
 
 struct CodeFmt {
-    BlockNameList* block_names;
-    const char* format;
-    const char* separator;
+    BlockNameList *block_names;
+    const char    *format;
+    const char    *separator;
 };
 
 struct CodeRaw {
-    const char* data;
-    size_t size;
+    const char *data;
+    size_t      size;
 };
-
-struct CodeCgoto {
-    const char* array;
-    const char* base;
-    const char* index;
-};
-
-struct CodeContinue {
-    const char* label;
-    const char* value;
-};
-
-struct CodeParam {
-    const char* name;
-    const char* type;
-    CodeParam* next;
-};
-
-using CodeParams = list_t<CodeParam>;
 
 struct CodeArg {
-    const char* arg;
-    CodeArg* next;
+    const char *arg;
+    CodeArg    *next;
 };
 
-using CodeArgs = list_t<CodeArg>;
+typedef code_list_t<CodeArg> CodeArgs;
 
-struct CodeFnDef {
-    const char* name;
-    const char* type;
-    const CodeParams* params; // shared between different function definitions
-    CodeList* body;
-};
-
-struct CodeFnCall {
-    const char* name;
-    const char* retval;
-    const CodeArgs* args; // shared between different function calls
-    bool tailcall;
+struct CodeFunc {
+    CodeArgs   *args;
+    const char *name;
+    const char *semi;
 };
 
 struct CodeLabel {
-    enum class Kind: uint32_t {
+    enum Kind {
         NLABEL,
         SLABEL
     } kind;
 
     union {
-        const Label* nlabel;
-        const char* slabel;
+        Label      *nlabel;
+        const char *slabel;
     };
-};
-
-struct CodeArray {
-    const char* name;
-    const char* type;
-    const char** elems;
-    size_t size;
-    bool local;
-    bool constant;
-    bool tabulate;
-};
-
-struct CodeEnum {
-    const char* type;
-    size_t size;
-    const char** elem_ids;
-    const uint32_t* elem_nums;
-};
-
-struct CodeDebug {
-    uint32_t state;
-};
-
-struct CodeTag {
-    const char* tag1;
-    const char* tag2;
-    int32_t dist;
 };
 
 struct Code {
     union {
-        const char* text;
-        const char* target;
-        const char* cond;
-        const char* state;
-        BlockNameList* block_names;
-        CodeBranches* ifte;
-        CodeSwitch swch;
-        CodeBlock block;
-        CodeCgoto cgoto;
-        CodeContinue cont;
-        CodeFnDef fndef;
-        CodeFnCall fncall;
-        CodeRaw raw;
-        CodeVar var;
-        CodeArray array;
-        CodeEnum enumr;
-        CodeFmt fmt;
-        CodeAssign assign;
-        CodeLabel label;
-        CodeDebug debug;
-        CodeTag tag;
-        CodeLoop loop;
-        CodeList* rfuncs;
-        loc_t loc;
-        size_t accept;
+        const char    *text;
+        BlockNameList *block_names;
+        CodeIfTE       ifte;
+        CodeSwitch     swch;
+        CodeBlock      block;
+        CodeFunc       func;
+        CodeRaw        raw;
+        CodeVar        var;
+        CodeFmt        fmt;
+        CodeLabel      label;
+        CodeList      *loop;
+        loc_t          loc;
     };
 
-    CodeKind kind;
-    Code* next;
+    CodeKind  kind;
+    Code     *next;
 };
 
-// YYFN name, type, attributes and params/args (they are common for all function definitions/calls,
-// so they can be precomputed for each block options and once for whole-program options).
-struct CodeFnCommon {
-    const char* name;
-    const char* type;
-    CodeParams* params = nullptr;
-    CodeParams* params_yych = nullptr; // same as `params`, but with `yych` at the end
-    CodeArgs* args = nullptr;
-    CodeArgs* args_yych = nullptr; // same as `args`, but with `yych` at the end
-};
+template<typename T>
+inline code_list_t<T> *new_code_list(code_alc_t &alc)
+{
+    code_list_t<T> *x = alc.alloct<code_list_t<T> >(1);
+    x->head = NULL;
+    x->ptail = &x->head;
+    return x;
+}
 
-inline Code* new_code(OutAllocator& alc, CodeKind kind) {
-    Code* x = alc.alloct<Code>(1);
+template<typename T>
+inline void append(code_list_t<T> *list, T *elem)
+{
+    DASSERT(elem);
+    *list->ptail = elem;
+    list->ptail  = &elem->next;
+}
+
+template<typename T>
+inline void prepend(code_list_t<T> *list, T *elem)
+{
+    DASSERT(elem);
+    if (!list->head) {
+        list->ptail = &elem->next;
+    }
+    elem->next = list->head;
+    list->head = elem;
+}
+
+template<typename T>
+inline void append(code_list_t<T> *list1, code_list_t<T> *list2)
+{
+    if (list2 && list2->head) {
+        *list1->ptail = list2->head;
+        for (; *(list1->ptail); list1->ptail = &(*list1->ptail)->next);
+    }
+}
+
+inline Code *new_code(code_alc_t &alc, CodeKind kind)
+{
+    Code *x = alc.alloct<Code>(1);
     x->kind = kind;
-    x->next = nullptr;
+    x->next = NULL;
     return x;
 }
 
-inline Code* code_stmt(OutAllocator& alc, const char* text) {
-    Code* x = new_code(alc, CodeKind::STMT);
+inline Code *code_stmt(code_alc_t &alc, const char *text)
+{
+    Code *x = new_code(alc, CODE_STMT);
     x->text = text;
     return x;
 }
 
-inline Code* code_goto(OutAllocator& alc, const char* target) {
-    Code* x = new_code(alc, CodeKind::GOTO);
-    x->target = target;
+inline Code *code_loop(code_alc_t &alc, CodeList *loop)
+{
+    Code *x = new_code(alc, CODE_LOOP);
+    x->loop = loop;
     return x;
 }
 
-inline Code* code_cgoto(OutAllocator& alc, const char* array, const char* base, const char* index) {
-    Code* x = new_code(alc, CodeKind::CGOTO);
-    x->cgoto.array = array;
-    x->cgoto.base = base;
-    x->cgoto.index = index;
-    return x;
-}
-
-inline Code* code_continue(OutAllocator& alc, const char* label, const char* value = nullptr) {
-    Code* x = new_code(alc, CodeKind::CONTINUE);
-    x->cont.label = label;
-    x->cont.value = value;
-    return x;
-}
-
-inline Code* code_loop(
-        OutAllocator& alc,
-        CodeList* body,
-        const char* init = nullptr,
-        CodeCases* cases = nullptr) {
-    Code* x = new_code(alc, CodeKind::LOOP);
-    x->loop.init = init;
-    x->loop.cases = cases;
-    x->loop.body = body;
-    return x;
-}
-
-inline Code* code_text(OutAllocator& alc, const char* text) {
-    Code* x = new_code(alc, CodeKind::TEXT);
+inline Code *code_text(code_alc_t &alc, const char *text)
+{
+    Code *x = new_code(alc, CODE_TEXT);
     x->text = text;
     return x;
 }
 
-inline Code* code_raw(OutAllocator& alc, const uint8_t* data, size_t size) {
-    Code* x = new_code(alc, CodeKind::RAW);
-    char* copy = alc.alloct<char>(size);
+inline Code *code_raw(code_alc_t &alc, const char *data, size_t size)
+{
+    Code *x = new_code(alc, CODE_RAW);
+    char *copy = alc.alloct<char>(size);
     memcpy(copy, data, size);
     x->raw.size = size;
     x->raw.data = copy;
     return x;
 }
 
-inline Code* code_textraw(OutAllocator& alc, const char* text) {
-    Code* x = new_code(alc, CodeKind::TEXT_RAW);
+inline Code *code_textraw(code_alc_t &alc, const char *text)
+{
+    Code *x = new_code(alc, CODE_TEXT_RAW);
     x->text = text;
     return x;
 }
 
-inline Code* code_abort(OutAllocator& alc) {
-    return new_code(alc, CodeKind::ABORT);
+inline Code *code_abort(code_alc_t &alc)
+{
+    return new_code(alc, CODE_ABORT);
 }
 
-inline Code* code_newline(OutAllocator& alc) {
+inline Code *code_newline(code_alc_t &alc)
+{
     return code_textraw(alc, "");
 }
 
-inline Code* code_nlabel(OutAllocator& alc, const Label* label) {
-    Code* x = new_code(alc, CodeKind::LABEL);
-    x->label.kind = CodeLabel::Kind::NLABEL;
+inline Code *code_nlabel(code_alc_t &alc, Label *label)
+{
+    Code *x = new_code(alc, CODE_LABEL);
+    x->label.kind = CodeLabel::NLABEL;
     x->label.nlabel = label;
     return x;
 }
 
-inline Code* code_slabel(OutAllocator& alc, const char* label) {
-    Code* x = new_code(alc, CodeKind::LABEL);
-    x->label.kind = CodeLabel::Kind::SLABEL;
+inline Code *code_slabel(code_alc_t &alc, const char *label)
+{
+    Code *x = new_code(alc, CODE_LABEL);
+    x->label.kind = CodeLabel::SLABEL;
     x->label.slabel = label;
     return x;
 }
 
-inline Code* code_fmt(OutAllocator& alc,
-                      CodeKind kind,
-                      BlockNameList* blocks,
-                      const char* format,
-                      const char* separator) {
-    Code* x = new_code(alc, kind);
+inline Code *code_fmt(code_alc_t &alc, CodeKind kind, BlockNameList *blocks,
+    const char *format, const char *separator)
+{
+    Code *x = new_code(alc, kind);
     x->fmt.block_names = blocks;
-    x->fmt.format = format;
-    x->fmt.separator = separator;
+    x->fmt.format      = format;
+    x->fmt.separator   = separator;
     return x;
 }
 
-inline Code* code_state_goto(OutAllocator& alc, BlockNameList* blocks) {
-    Code* x = new_code(alc, CodeKind::STATE_GOTO);
+inline Code *code_cond_table(code_alc_t &alc)
+{
+    return new_code(alc, CODE_COND_TABLE);
+}
+
+inline Code *code_cond_goto(code_alc_t &alc)
+{
+    return new_code(alc, CODE_COND_GOTO);
+}
+
+inline Code *code_state_goto(code_alc_t &alc, BlockNameList *blocks)
+{
+    Code *x = new_code(alc, CODE_STATE_GOTO);
     x->block_names = blocks;
     return x;
 }
 
-inline Code* code_line_info_input(OutAllocator& alc, const loc_t& loc) {
-    Code* x = new_code(alc, CodeKind::LINE_INFO_INPUT);
+inline Code *code_line_info_input(code_alc_t &alc, const loc_t &loc)
+{
+    Code *x = new_code(alc, CODE_LINE_INFO_INPUT);
     x->loc = loc;
     return x;
 }
 
-inline Code* code_var(
-        OutAllocator& alc, VarType type, bool is_default, const char* name, const char* init) {
-    Code* x = new_code(alc, CodeKind::VAR);
-    x->var.type = type;
-    x->var.is_default = is_default;
-    x->var.name = copystr(name, alc);
-    x->var.init = init;
-    return x;
+inline Code *code_yych_decl(code_alc_t &alc)
+{
+    return new_code(alc, CODE_YYCH);
 }
 
-inline void init_code_const(Code* x, VarType type, const char* name, const char* init) {
-    x->kind = CodeKind::CONST;
-    x->var.type = type;
-    x->var.name = name;
-    x->var.init = init;
+inline Code *code_yyaccept_def(code_alc_t &alc)
+{
+    return new_code(alc, CODE_YYACCEPT);
 }
 
-inline Code* code_assign(OutAllocator& alc, const char* lhs, const char* rhs) {
-    Code* x = new_code(alc, CodeKind::ASSIGN);
-    x->assign.lhs = lhs;
-    x->assign.rhs = rhs;
-    return x;
+inline Code *code_yystate_def(code_alc_t &alc)
+{
+    return new_code(alc, CODE_YYSTATE);
 }
 
-inline Code* code_line_info_output(OutAllocator& alc) {
-    return new_code(alc, CodeKind::LINE_INFO_OUTPUT);
+inline Code *code_line_info_output(code_alc_t &alc)
+{
+    return new_code(alc, CODE_LINE_INFO_OUTPUT);
 }
 
-inline Code* code_debug(OutAllocator& alc, uint32_t state) {
-    Code* x = new_code(alc, CodeKind::DEBUG);
-    x->debug.state = state;
-    return x;
+inline Code *code_skip(code_alc_t &alc)
+{
+    return new_code(alc, CODE_SKIP);
 }
 
-inline Code* code_skip(OutAllocator& alc) {
-    return new_code(alc, CodeKind::SKIP);
+inline Code *code_peek(code_alc_t &alc)
+{
+    return new_code(alc, CODE_PEEK);
 }
 
-inline Code* code_peek(OutAllocator& alc) {
-    return new_code(alc, CodeKind::PEEK);
+inline Code *code_backup(code_alc_t &alc)
+{
+    return new_code(alc, CODE_BACKUP);
 }
 
-inline Code* code_backup(OutAllocator& alc) {
-    return new_code(alc, CodeKind::BACKUP);
-}
-
-inline Code* code_backupctx(OutAllocator& alc) {
-    return new_code(alc, CodeKind::BACKUPCTX);
-}
-
-inline Code* code_restore(OutAllocator& alc) {
-    return new_code(alc, CodeKind::RESTORE);
-}
-
-inline Code* code_restore_ctx(OutAllocator& alc) {
-    return new_code(alc, CodeKind::RESTORECTX);
-}
-
-inline Code* code_restore_tag(OutAllocator& alc, const char* tag) {
-    Code* x = new_code(alc, CodeKind::RESTORETAG);
-    x->tag.tag1 = tag;
-    x->tag.tag2 = nullptr;
-    x->tag.dist = 0;
-    return x;
-}
-
-inline Code* code_shift(OutAllocator& alc, int32_t dist) {
-    Code* x = new_code(alc, CodeKind::SHIFT);
-    x->tag.tag1 = nullptr;
-    x->tag.tag2 = nullptr;
-    x->tag.dist = dist;
-    return x;
-}
-
-inline Code* code_shift_tag(
-        OutAllocator& alc, const char* tag, const char* neg, int32_t dist, bool is_mtag) {
-    Code* x = new_code(alc, is_mtag ? CodeKind::SHIFTMTAG : CodeKind::SHIFTSTAG);
-    x->tag.tag1 = tag;
-    x->tag.tag2 = neg;
-    x->tag.dist = dist;
-    return x;
-}
-
-inline Code* code_set_tag(OutAllocator& alc, const char* tag, bool is_mtag, bool is_negative) {
-    Code* x = new_code(alc, is_mtag
-        ? (is_negative ? CodeKind::MTAGN : CodeKind::MTAGP)
-        : (is_negative ? CodeKind::STAGN : CodeKind::STAGP));
-    x->tag.tag1 = tag;
-    x->tag.tag2 = nullptr;
-    x->tag.dist = 0;
-    return x;
-}
-
-inline Code* code_copy_tag(OutAllocator& alc, const char* lhs, const char* rhs, bool is_mtag) {
-    Code* x = new_code(alc, is_mtag ? CodeKind::COPYMTAG : CodeKind::COPYSTAG);
-    x->tag.tag1 = lhs;
-    x->tag.tag2 = rhs;
-    x->tag.dist = 0;
-    return x;
-}
-
-inline Code* code_set_accept(OutAllocator& alc, size_t accept) {
-    Code* x = new_code(alc, CodeKind::SETACCEPT);
-    x->accept = accept;
-    return x;
-}
-
-inline Code* code_set_cond(OutAllocator& alc, const char* cond) {
-    Code* x = new_code(alc, CodeKind::SETCOND);
-    x->cond = cond;
-    return x;
-}
-
-inline Code* code_set_state(OutAllocator& alc, const char* state) {
-    Code* x = new_code(alc, CodeKind::SETSTATE);
-    x->state = state;
-    return x;
-}
-
-inline Code* code_dfas(OutAllocator& alc) {
-    return new_code(alc, CodeKind::DFAS);
-}
-
-inline Code* code_block(OutAllocator& alc, CodeList* stmts, CodeBlock::Kind kind) {
-    Code* x = new_code(alc, CodeKind::BLOCK);
-    x->block.kind = kind;
+inline Code *code_block(code_alc_t &alc, CodeList *stmts, CodeBlock::Fmt fmt)
+{
+    Code *x = new_code(alc, CODE_BLOCK);
     x->block.stmts = stmts;
+    x->block.fmt   = fmt;
     return x;
 }
 
-inline CodeBranch* code_branch(OutAllocator& alc, const char* cond, CodeList* code) {
-    CodeBranch* x = alc.alloct<CodeBranch>(1);
-    x->cond = cond;
-    x->code = code;
-    x->next = nullptr;
+inline Code *code_if_then_else(code_alc_t &alc, const char *if_cond, CodeList *if_code,
+    CodeList *else_code, bool oneline = true)
+{
+    Code *x = new_code(alc, CODE_IF_THEN_ELSE);
+    x->ifte.if_cond   = if_cond;
+    x->ifte.else_cond = NULL;
+    x->ifte.if_code   = if_code;
+    x->ifte.else_code = else_code;
+    x->ifte.oneline   = oneline;
     return x;
 }
 
-inline CodeBranches* code_branches(OutAllocator& alc) {
-    return new_list<CodeBranch>(alc);
-}
-
-inline Code* code_if_then_else(OutAllocator& alc) {
-    Code* x = new_code(alc, CodeKind::IF_THEN_ELSE);
-    x->ifte = code_branches(alc);
+inline Code *code_if_then_elif(code_alc_t &alc, const char *if_cond, CodeList *if_code,
+    const char *else_cond, CodeList *else_code)
+{
+    Code *x = code_if_then_else(alc, if_cond, if_code, else_code, false);
+    x->ifte.else_cond = else_cond;
     return x;
 }
 
-inline Code* code_if_then_else(
-        OutAllocator& alc, const char* if_cond, CodeList* if_code, CodeList* else_code) {
-    Code* x = new_code(alc, CodeKind::IF_THEN_ELSE);
-    x->ifte = code_branches(alc);
-    append(x->ifte, code_branch(alc, if_cond, if_code));
-    if (else_code) append(x->ifte, code_branch(alc, nullptr, else_code));
-    return x;
-}
-
-inline Code* code_if_then_elif(OutAllocator& alc,
-                               const char* if_cond,
-                               CodeList* if_code,
-                               const char* else_cond,
-                               CodeList* else_code) {
-    Code* x = new_code(alc, CodeKind::IF_THEN_ELSE);
-    x->ifte = code_branches(alc);
-    append(x->ifte, code_branch(alc, if_cond, if_code));
-    append(x->ifte, code_branch(alc, else_cond, else_code));
-    return x;
-}
-
-inline CodeCase* code_case(OutAllocator& alc, CodeList* body, CodeCase::Kind kind) {
-    CodeCase* x = alc.alloct<CodeCase>(1);
+inline CodeCase *code_case(code_alc_t &alc, CodeList *body, CodeCase::Kind kind)
+{
+    CodeCase *x = alc.alloct<CodeCase>(1);
     x->kind = kind;
     x->body = body;
-    x->next = nullptr;
+    x->next = NULL;
     return x;
 }
 
-inline CodeCase* code_case_default(OutAllocator& alc, CodeList* body) {
-    return code_case(alc, body, CodeCase::Kind::DEFAULT);
+inline CodeCase *code_case_default(code_alc_t &alc, CodeList *body)
+{
+    return code_case(alc, body, CodeCase::DEFAULT);
 }
 
-inline CodeCase* code_case_number(OutAllocator& alc, CodeList* body, int32_t number) {
-    CodeCase* x = code_case(alc, body, CodeCase::Kind::NUMBER);
+inline CodeCase *code_case_number(code_alc_t &alc, CodeList *body, int32_t number)
+{
+    CodeCase *x = code_case(alc, body, CodeCase::NUMBER);
     x->number = number;
     return x;
 }
 
-inline CodeCase* code_case_string(OutAllocator& alc, CodeList* body, const char* string) {
-    CodeCase* x = code_case(alc, body, CodeCase::Kind::STRING);
+inline CodeCase *code_case_string(code_alc_t &alc, CodeList *body, const char *string)
+{
+    CodeCase *x = code_case(alc, body, CodeCase::STRING);
     x->string = string;
     return x;
 }
 
-inline CodeCase* code_case_ranges(OutAllocator& alc, CodeList* body, const CodeRanges* ranges) {
-    CodeCase* x = code_case(alc, body, CodeCase::Kind::RANGES);
+inline CodeCase *code_case_ranges(
+        code_alc_t &alc, CodeList *body, const CodeRanges *ranges) {
+    CodeCase *x = code_case(alc, body, CodeCase::RANGES);
     x->ranges = ranges;
     return x;
 }
 
-inline CodeRanges* code_ranges(OutAllocator& alc, VarType type, int64_t* start, int64_t* end) {
-    CodeRanges* x = alc.alloct<CodeRanges>(1);
+inline CodeRanges *code_ranges(
+        code_alc_t &alc, VarType type, int64_t *start, int64_t *end) {
+    CodeRanges *x = alc.alloct<CodeRanges>(1);
     x->size = static_cast<uint32_t>(end - start) / 2;
     x->type = type;
     x->elems = start;
     return x;
 }
 
-inline CodeCases* code_cases(OutAllocator& alc) {
-    return new_list<CodeCase>(alc);
+inline CodeCases *code_cases(code_alc_t &alc)
+{
+    return new_code_list<CodeCase>(alc);
 }
 
-inline CodeParam* code_param(OutAllocator& alc, const char* name, const char* type) {
-    CodeParam* x = alc.alloct<CodeParam>(1);
-    x->name = name;
-    x->type = type;
-    x->next = nullptr;
-    return x;
-}
-
-inline CodeParams* code_params(OutAllocator& alc) {
-    return new_list<CodeParam>(alc);
-}
-
-inline CodeArg* code_arg(OutAllocator& alc, const char* arg) {
-    CodeArg* x = alc.alloct<CodeArg>(1);
+inline CodeArg *code_arg(code_alc_t &alc, const char *arg)
+{
+    CodeArg *x = alc.alloct<CodeArg>(1);
     x->arg = arg;
-    x->next = nullptr;
+    x->next = NULL;
     return x;
 }
 
-inline CodeArgs* code_args(OutAllocator& alc) {
-    return new_list<CodeArg>(alc);
+inline CodeArgs *code_args(code_alc_t &alc)
+{
+    return new_code_list<CodeArg>(alc);
 }
 
-inline void init_code_fndef(
-        Code* x, const char* name, const char* type, CodeParams* params, CodeList* body) {
-    x->kind = CodeKind::FNDEF;
-    x->fndef.name = name;
-    x->fndef.type = type;
-    x->fndef.params = params;
-    x->fndef.body = body;
-}
-
-inline Code* code_fndef(
-        OutAllocator& alc, const char* name, const char* type, CodeParams* params, CodeList* body) {
-    Code* x = new_code(alc, CodeKind::FNDEF);
-    x->fndef.name = name;
-    x->fndef.type = type;
-    x->fndef.params = params;
-    x->fndef.body = body;
+inline Code *code_func(code_alc_t &alc, const char *name, CodeArgs *args,
+    const char *semi)
+{
+    Code *x = new_code(alc, CODE_FUNC);
+    x->func.args = args;
+    x->func.name = name;
+    x->func.semi = semi;
     return x;
 }
 
-inline Code* code_fncall(
-        OutAllocator& alc,
-        const char* name,
-        const char* retval,
-        CodeArgs* args,
-        bool tailcall = false) {
-    Code* x = new_code(alc, CodeKind::FNCALL);
-    x->fncall.name = name;
-    x->fncall.retval = retval;
-    x->fncall.args = args;
-    x->fncall.tailcall = tailcall;
+inline Code *code_fdecl(code_alc_t &alc, const char *name, CodeArgs *args)
+{
+    return code_func(alc, name, args, "");
+}
+
+inline Code *code_fcall(code_alc_t &alc, const char *name, CodeArgs *args,
+    const char *semi)
+{
+    return code_func(alc, name, args, semi);
+}
+
+inline Code *code_switch(code_alc_t &alc, const char *expr, CodeCases *cases)
+{
+    Code *x = new_code(alc, CODE_SWITCH);
+    x->swch.expr   = expr;
+    x->swch.cases  = cases;
     return x;
 }
 
-inline Code* code_tailcall(OutAllocator& alc, const char* name, CodeArgs* args, bool have_retval) {
-    // tailcall returns immediately so the `retval` string won't be used
-    const char* retval = have_retval ? "<unused-retval>" : nullptr;
-    return code_fncall(alc, name, retval, args, true);
+inline CodeList *code_list(code_alc_t &alc)
+{
+    return new_code_list<Code>(alc);
 }
 
-inline Code* code_recursive_functions(OutAllocator& alc, CodeList* fndefs) {
-    Code* x = new_code(alc, CodeKind::REC_FUNCS);
-    x->rfuncs = fndefs;
-    return x;
-}
-
-inline Code* code_switch(OutAllocator& alc, const char* expr, CodeCases* cases) {
-    Code* x = new_code(alc, CodeKind::SWITCH);
-    x->swch.expr = expr;
-    x->swch.cases = cases;
-    return x;
-}
-
-inline CodeList* code_list(OutAllocator& alc) {
-    return new_list<Code>(alc);
-}
-
-inline CodeBmState* code_bmstate(OutAllocator& alc, const CodeGo* go, const State* s) {
-    CodeBmState* x = alc.alloct<CodeBmState>(1);
-    x->go = go;
-    x->state = s;
+inline CodeBmState *code_bmstate(code_alc_t &alc, const CodeGo *go, const State *s)
+{
+    CodeBmState *x = alc.alloct<CodeBmState>(1);
+    x->go     = go;
+    x->state  = s;
     x->offset = 0;
-    x->mask = 0;
-    x->next = nullptr;
+    x->mask   = 0;
+    x->next   = NULL;
     return x;
 }
 
-inline CodeBitmap* code_bitmap(OutAllocator& alc, uint32_t nchars) {
-    CodeBitmap* x = alc.alloct<CodeBitmap>(1);
-    x->states = new_list<CodeBmState>(alc);
+inline CodeBitmap *code_bitmap(code_alc_t &alc, uint32_t nchars)
+{
+    CodeBitmap *x = alc.alloct<CodeBitmap>(1);
+    x->states = new_code_list<CodeBmState>(alc);
     x->nchars = nchars;
-    x->nelems = 0;
-    x->elems = nullptr;
-    x->used = false;
+    x->used   = false;
     return x;
 }
 
-inline Code* code_array(
-        OutAllocator& alc,
-        const char* name,
-        const char* type,
-        const char** elems,
-        size_t size,
-        bool local,
-        bool constant,
-        bool tabulate = false) {
-    Code* x = new_code(alc, CodeKind::ARRAY);
-    x->array.name = name;
-    x->array.type = type;
-    x->array.elems = elems;
-    x->array.size = size;
-    x->array.local = local;
-    x->array.constant = constant;
-    x->array.tabulate = tabulate;
-    return x;
-}
+typedef std::vector<OutputBlock *> blocks_t;
+typedef blocks_t::const_iterator blocks_citer_t;
+typedef std::set<std::string> tagnames_t;
 
-inline void init_code_enum(
-        Code* x, const char* type, size_t size, const char** elem_ids, uint32_t* elem_nums) {
-    x->kind = CodeKind::ENUM;
-    x->enumr.type = type;
-    x->enumr.size = size;
-    x->enumr.elem_ids = elem_ids;
-    x->enumr.elem_nums = elem_nums;
-}
+struct CodegenCtxGlobal {
+    code_alc_t &allocator;
+    Scratchbuf &scratchbuf;
+    Msg &msg;
+    const opt_t *opts;
+    const blocks_t &cblocks;
+    const blocks_t &hblocks;
+    const blocks_t *pblocks;
+    mutable blocks_t tmpblocks; // temporary buffer for block lists in directives
+    const bool warn_cond_ord;
+};
 
-inline Code* code_fingerprint(OutAllocator& alc) {
-    return new_code(alc, CodeKind::FINGERPRINT);
-}
+struct CodegenCtxPass1 {
+    const CodegenCtxGlobal *global; // global part
+    const OutputBlock *block;       // block-local part
+};
+
+struct CodegenCtxPass2 {
+    code_alc_t &allocator;
+    Scratchbuf &scratchbuf;
+    const opt_t *opts;
+};
+
+struct RenderContext {
+    std::ostringstream &os;
+    const opt_t *opts;
+    const Msg &msg;
+    uint32_t ind;
+    const char *file;
+    uint32_t &line;
+};
+
+struct OutputFragment {
+    Code     *code;
+    uint32_t  indent;
+};
+
+struct StartCond {
+    std::string name;
+    uint32_t number;
+};
+typedef std::vector<StartCond> StartConds;
+
+typedef std::map<uint32_t, CodeList*> storable_states_t;
+
+struct OutputBlock {
+    InputBlockKind kind;
+    std::string name;
+    const loc_t loc;
+    std::vector<OutputFragment> fragments;
+    bool used_yyaccept;
+    bool have_user_code;
+    StartConds conds;
+    tagnames_t stags;
+    tagnames_t mtags;
+    const opt_t *opts;
+
+    size_t max_fill;   // YYMAXFILL
+    size_t max_nmatch; // YYMAXNMATCH
+
+    // Used in the state switch (with `-f --storable-state` option).
+    Label *start_label; // label of the DFA start state
+    uint32_t fill_index; // next free index in YYFILL state enumeration
+    uint32_t fill_state; // index of the most recent YYFILL state
+    storable_states_t fill_goto; // transitions to YYFILL states
+
+    OutputBlock(InputBlockKind kind, const std::string &name, const loc_t &loc);
+    ~OutputBlock();
+    FORBID_COPY(OutputBlock);
+};
+
+struct Output {
+    blocks_t cblocks; /* .c file */
+    blocks_t hblocks; /* .h file */
+    blocks_t *pblocks; /* selector */
+    uint32_t label_counter;
+    bool state_goto;
+    bool cond_enum_autogen; // true unless an explicit `types:re2c` directive is used
+    bool cond_goto;
+    bool warn_condition_order;
+    bool need_header;
+    bool done_mtag_defs;
+    Msg &msg;
+    std::set<std::string> skeletons;
+    code_alc_t allocator;
+    Scratchbuf scratchbuf;
+
+    // YYFILL state index accumulated for all non-reuse blocks
+    uint32_t total_fill_index;
+
+    // "final" options accumulated for all non-reuse blocks
+    const opt_t *total_opts;
+
+    explicit Output(Msg &msg);
+    ~Output();
+    OutputBlock &block();
+    bool open ();
+    void new_block(Opt &opts, InputBlockKind kind, const std::string &name,
+        const loc_t &loc);
+    void gather_info_from_block();
+    void header_mode(bool on);
+    bool in_header() const;
+    void wraw(const char *s, const char *e, bool newline = false);
+    void wversion_time ();
+    void wdelay_stmt(uint32_t ind, Code *code);
+    bool emit();
+    bool emit_blocks(const std::string &fname, const CodegenCtxGlobal &globalctx);
+    FORBID_COPY (Output);
+};
+
+void init_go(CodeGo *go);
+void code_go(code_alc_t &alc, const DFA &dfa, const opt_t *opts, State *from);
+State *fallback_state_with_eof_rule(
+        const DFA &dfa, const opt_t *opts, const State *state, tcid_t *ptags);
+CodeBmState *find_bitmap(const CodeBitmap *bitmap, const CodeGo *go, const State *s);
+void insert_bitmap(code_alc_t &alc, CodeBitmap *bitmap, const CodeGo *go, const State *s);
+CodeList *gen_bitmap(Output &output, const CodeBitmap *bitmap);
+
+void gen_go(Output &output, const DFA &dfa, const CodeGo *go, const State *from,
+    CodeList *stmts);
+void gen_tags(Scratchbuf &buf, const opt_t *opts, Code *code, const tagnames_t &tags);
+void emit_action(Output &output, const DFA &dfa, const State *s, CodeList *stmts);
+void gen_settags(Output &output, CodeList *tag_actions, const DFA &dfa, tcid_t tcid,
+    bool delayed);
+void gen_goto(Output &output, const DFA &dfa, CodeList *stmts, const State *from,
+    const CodeJump &jump);
+const char *gen_lessthan(Scratchbuf &o, const opt_t *opts, size_t n);
+void gen_code(Output &output, dfas_t &dfas);
+void gen_dfa_as_blocks_with_labels(Output &output, const DFA &dfa, CodeList *stmts);
+void gen_dfa_as_switch_cases(Output &output, DFA &dfa, CodeCases *cases);
+void wrap_dfas_in_loop_switch(Output &output, CodeList *stmts, CodeCases *cases);
+
+void expand_pass_1(CodegenCtxPass1 &ctx, Code *code);
+void expand_pass_2(CodegenCtxPass2 &ctx, Code *code);
+void remove_empty(CodegenCtxPass2 &ctx, Code *code);
+void combine(CodegenCtxPass2 &ctx, Code *code);
+void render(RenderContext &rctx, const Code *code);
+
+bool consume(const State *s);
+void expand_fintags(const Tag &tag, std::vector<std::string> &fintags);
+std::string vartag_name(tagver_t ver, const std::string &prefix,
+    const std::set<tagver_t> &mtagvers);
+std::string vartag_expr(tagver_t ver, const opt_t *opts,
+    const std::set<tagver_t> &mtagvers);
+void output_version_time(std::ostream &os, const opt_t *opts);
+void gen_peek_expr(std::ostream &os, const opt_t *opts);
+void gen_yydebug(Output &output, const Label *label, CodeList *stmts);
 
 } // namespace re2c
 

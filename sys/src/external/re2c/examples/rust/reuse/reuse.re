@@ -1,30 +1,32 @@
-// re2rust $INPUT -o $OUTPUT --input-encoding utf8 --api simple
+// re2rust $INPUT -o $OUTPUT --input-encoding utf8
 
 // This example supports multiple input encodings: UTF-8 and UTF-32.
 // Both lexers are generated from the same rules block, and the use
 // blocks add only encoding-specific configurations.
 /*!rules:re2c
     re2c:yyfill:enable = 0;
+    re2c:define:YYPEEK    = "*str.get_unchecked(cur)";
+    re2c:define:YYSKIP    = "cur += 1;";
+    re2c:define:YYBACKUP  = "mar = cur;";
+    re2c:define:YYRESTORE = "cur = mar;";
 
-    "∀x ∃y" { return Some(yycursor); }
+    "∀x ∃y" { return Some(cur); }
     *       { return None; }
 */
 
-fn lex_utf8(yyinput: &[u8]) -> Option<usize> {
-    assert!(yyinput.len() > 0); // expect nonempty input
-    let (mut yycursor, mut yymarker) = (0, 0);
+fn lex_utf8(str: &[u8]) -> Option<usize> {
+    let (mut cur, mut mar) = (0, 0);
     /*!use:re2c
         re2c:encoding:utf8 = 1;
-        re2c:YYCTYPE = u8;
+        re2c:define:YYCTYPE = u8;
     */
 }
 
-fn lex_utf32(yyinput: &[u32]) -> Option<usize> {
-    assert!(yyinput.len() > 0); // expect nonempty input
-    let (mut yycursor, mut yymarker) = (0, 0);
+fn lex_utf32(str: &[u32]) -> Option<usize> {
+    let (mut cur, mut mar) = (0, 0);
     /*!use:re2c
         re2c:encoding:utf32 = 1;
-        re2c:YYCTYPE = u32;
+        re2c:define:YYCTYPE = u32;
     */
 }
 

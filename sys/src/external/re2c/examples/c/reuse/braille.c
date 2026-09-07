@@ -45,7 +45,7 @@ struct out_t {
 
 enum YYCONDTYPE {
 	yycl,
-	yycn
+	yycn,
 };
 
 
@@ -407,8 +407,11 @@ static void lex_utf16(const iutf16_t & in)
     
 {
 	unsigned int yych;
-	if (c < 1) goto yyc_l;
-	else goto yyc_n;
+	if (c < 1) {
+		goto yyc_l;
+	} else {
+		goto yyc_n;
+	}
 /* *********************************** */
 yyc_l:
 	yych = *YYCURSOR;
@@ -824,8 +827,11 @@ static void lex_utf32(const iutf32_t & in)
     
 {
 	unsigned int yych;
-	if (c < 1) goto yyc_l;
-	else goto yyc_n;
+	if (c < 1) {
+		goto yyc_l;
+	} else {
+		goto yyc_n;
+	}
 /* *********************************** */
 yyc_l:
 	yych = *YYCURSOR;
@@ -1241,8 +1247,11 @@ static void lex_ucs2(const iucs2_t & in)
     
 {
 	unsigned int yych;
-	if (c < 1) goto yyc_l;
-	else goto yyc_n;
+	if (c < 1) {
+		goto yyc_l;
+	} else {
+		goto yyc_n;
+	}
 /* *********************************** */
 yyc_l:
 	yych = *YYCURSOR;

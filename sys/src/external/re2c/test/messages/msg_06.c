@@ -1,1 +1,1 @@
-re2c: error: option --posix-closure was removed
+re2c: error: bad argument 'xxx' to option --posix-closure (expected <gor1 | gtop>)

@@ -10,7 +10,7 @@ enum ScanContition {
 	EStateNormal,
 	EStateComment,
 	EStateSkiptoeol,
-	EStateString
+	EStateString,
 };
 
 
@@ -79,16 +79,17 @@ void scan(Scanner *s)
 	s->tok = s->cur;
 
 	switch (s->state) {
+		default: goto yy0;
 		case 0: goto yyFillLabel0;
 		case 1: goto yyFillLabel1;
 		case 2: goto yyFillLabel2;
 		case 3: goto yyFillLabel3;
-		default: goto yy0;
 	}
 
 	for(;;)
 	{
 		s->tok = s->cur;
+
 
 yy0:
 		switch (s->cond) {
@@ -99,10 +100,8 @@ yy0:
 		}
 /* *********************************** */
 yyc_Normal:
-		if ((s->lim - s->cur) < 4) {
-			s->state = 0;(0);
-			if (fill(s, 4) == ~0) break;
-		}
+		s->state = 0;(0);
+		if ((s->lim - s->cur) < 4) if (fill(s, 4) == ~0) break;
 yyFillLabel0:
 		s->yych = *s->cur;
 		switch (s->yych) {
@@ -235,10 +234,8 @@ yy23:
 		continue;
 /* *********************************** */
 yyc_Comment:
-		if ((s->lim - s->cur) < 2) {
-			s->state = 1;(1);
-			if (fill(s, 2) == ~0) break;
-		}
+		s->state = 1;(1);
+		if ((s->lim - s->cur) < 2) if (fill(s, 2) == ~0) break;
 yyFillLabel1:
 		s->yych = *s->cur;
 		switch (s->yych) {
@@ -263,10 +260,8 @@ yy28:
 		continue;
 /* *********************************** */
 yyc_Skiptoeol:
-		if ((s->lim - s->cur) < 5) {
-			s->state = 2;(2);
-			if (fill(s, 5) == ~0) break;
-		}
+		s->state = 2;(2);
+		if ((s->lim - s->cur) < 5) if (fill(s, 5) == ~0) break;
 yyFillLabel2:
 		s->yych = *s->cur;
 		switch (s->yych) {
@@ -351,10 +346,8 @@ yy43:
 		}
 /* *********************************** */
 yyc_String:
-		if ((s->lim - s->cur) < 2) {
-			s->state = 3;(3);
-			if (fill(s, 2) == ~0) break;
-		}
+		s->state = 3;(3);
+		if ((s->lim - s->cur) < 2) if (fill(s, 2) == ~0) break;
 yyFillLabel3:
 		s->yych = *s->cur;
 		switch (s->yych) {

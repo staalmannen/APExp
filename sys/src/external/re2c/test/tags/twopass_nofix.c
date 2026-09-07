@@ -7,17 +7,14 @@
 {
 	YYCTYPE yych;
 	unsigned int yyaccept = 0;
-	YYMARKER = YYCURSOR;
 	if ((YYLIMIT - YYCURSOR) < 6) YYFILL(6);
-	yych = *YYCURSOR;
+	yych = *(YYMARKER = YYCURSOR);
 	switch (yych) {
 		case 'a':
 			yyt3 = YYCURSOR;
 			goto yy3;
 		case 'b':
-			yyt1 = YYCURSOR;
-			yyt2 = YYCURSOR;
-			yyt3 = YYCURSOR;
+			yyt1 = yyt2 = yyt3 = YYCURSOR;
 			goto yy5;
 		default:
 			yyt2 = YYCURSOR;
@@ -35,8 +32,7 @@ yy2:
 			yyt4 = YYCURSOR;
 			goto yy8;
 		case 'b':
-			yyt1 = YYCURSOR;
-			yyt4 = YYCURSOR;
+			yyt1 = yyt4 = YYCURSOR;
 			goto yy9;
 		default:
 			yyt1 = YYCURSOR;
@@ -52,8 +48,7 @@ yy4:
 	YYCURSOR = YYMARKER;
 	switch (yyaccept) {
 		case 0:
-			yyt1 = NULL;
-			yyt4 = NULL;
+			yyt1 = yyt4 = NULL;
 			goto yy1;
 		case 1:
 			yyt1 = yyt2;
@@ -75,8 +70,7 @@ yy5:
 			yyt4 = YYCURSOR;
 			goto yy8;
 		case 'b':
-			yyt1 = YYCURSOR;
-			yyt4 = YYCURSOR;
+			yyt1 = yyt4 = YYCURSOR;
 			goto yy9;
 		default:
 			yyt1 = YYCURSOR;
@@ -99,8 +93,7 @@ yy7:
 			goto yy8;
 		case 'b':
 			yyt2 = yyt1;
-			yyt1 = YYCURSOR;
-			yyt4 = YYCURSOR;
+			yyt1 = yyt4 = YYCURSOR;
 			goto yy9;
 		default:
 			yyt1 = YYCURSOR;
@@ -122,8 +115,7 @@ yy9:
 		case 'a': goto yy11;
 		case 'b':
 			yyt2 = yyt1;
-			yyt1 = YYCURSOR;
-			yyt4 = YYCURSOR;
+			yyt1 = yyt4 = YYCURSOR;
 			goto yy9;
 		default:
 			yyt1 = YYCURSOR;
@@ -172,14 +164,12 @@ yy13:
 			yyt3 = NULL;
 			goto yy15;
 		case 'b':
-			yyt1 = YYCURSOR;
-			yyt2 = YYCURSOR;
 			yyt3 = NULL;
+			yyt1 = yyt2 = YYCURSOR;
 			goto yy14;
 		default:
-			yyt1 = YYCURSOR;
-			yyt2 = YYCURSOR;
 			yyt3 = NULL;
+			yyt1 = yyt2 = YYCURSOR;
 			goto yy12;
 	}
 yy14:
@@ -214,8 +204,8 @@ yy16:
 }
 
 tags/twopass_nofix.re:8:29: warning: rule matches empty string [-Wmatch-empty-string]
-tags/twopass_nofix.re:7:42: warning: tag `p` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/twopass_nofix.re:7:42: warning: tag `q` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/twopass_nofix.re:7:42: warning: tag `y` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/twopass_nofix.re:8:29: warning: tag `r` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/twopass_nofix.re:8:29: warning: tag `s` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/twopass_nofix.re:7:42: warning: tag 'p' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/twopass_nofix.re:7:42: warning: tag 'q' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/twopass_nofix.re:7:42: warning: tag 'y' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/twopass_nofix.re:8:29: warning: tag 'r' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/twopass_nofix.re:8:29: warning: tag 's' has 2nd degree of nondeterminism [-Wnondeterministic-tags]

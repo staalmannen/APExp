@@ -10,18 +10,17 @@
 // (expect a global state switch here with a start label in y
 // including blocks y, z and the unnamed blocks)
 
+
 	switch (YYGETSTATE()) {
+		default: goto yy0;
 		case 0: goto yyFillLabel0;
 		case 2: goto yyFillLabel2;
 		case 3: goto yyFillLabel3;
 		case 5: goto yyFillLabel5;
-		default: goto yy0;
 	}
 yy0:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(0);
-		YYFILL(1);
-	}
+	YYSETSTATE(0);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel0:
 	++YYCURSOR;
 	YYSETSTATE(-1);
@@ -30,15 +29,14 @@ yyFillLabel0:
 
 // use block (expect a local state switch for this block only)
 
+
 	switch (YYGETSTATE()) {
-		case 1: goto yyFillLabel1;
 		default: goto yy2;
+		case 1: goto yyFillLabel1;
 	}
 yy2:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(1);
-		YYFILL(1);
-	}
+	YYSETSTATE(1);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel1:
 	++YYCURSOR;
 	YYSETSTATE(-1);
@@ -47,10 +45,9 @@ yyFillLabel1:
 
 // global block z that includes x (no start label)
 
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(2);
-		YYFILL(1);
-	}
+
+	YYSETSTATE(2);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel2:
 	++YYCURSOR;
 	YYSETSTATE(-1);
@@ -59,10 +56,9 @@ yyFillLabel2:
 
 // unnamed local block that includes x (no start label)
 
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(3);
-		YYFILL(1);
-	}
+
+	YYSETSTATE(3);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel3:
 	++YYCURSOR;
 	YYSETSTATE(-1);
@@ -71,15 +67,14 @@ yyFillLabel3:
 
 // use block (expect a local state switch for this block only)
 
+
 	switch (YYGETSTATE()) {
-		case 4: goto yyFillLabel4;
 		default: goto yy8;
+		case 4: goto yyFillLabel4;
 	}
 yy8:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(4);
-		YYFILL(1);
-	}
+	YYSETSTATE(4);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel4:
 	++YYCURSOR;
 	YYSETSTATE(-1);
@@ -88,10 +83,9 @@ yyFillLabel4:
 
 // unnamed global block (no start label)
 
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(5);
-		YYFILL(1);
-	}
+
+	YYSETSTATE(5);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel5:
 	++YYCURSOR;
 	YYSETSTATE(-1);

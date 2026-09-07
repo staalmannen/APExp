@@ -5,11 +5,11 @@
 // global `getstate:re2c` including y, z and unnamed blocks,
 // with start label in the first unnamed block
 switch (YYGETSTATE()) {
+	default: goto yy2;
 	case 1: goto yyFillLabel1;
 	case 2: goto yyFillLabel2;
 	case 3: goto yyFillLabel3;
 	case 4: goto yyFillLabel4;
-	default: goto yy2;
 }
 
 
@@ -18,15 +18,14 @@ switch (YYGETSTATE()) {
 
 // use block (expect a local state switch for this block only)
 
+
 	switch (YYGETSTATE()) {
-		case 0: goto yyFillLabel0;
 		default: goto yy0;
+		case 0: goto yyFillLabel0;
 	}
 yy0:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(0);
-		YYFILL(1);
-	}
+	YYSETSTATE(0);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel0:
 	++YYCURSOR;
 	YYSETSTATE(-1);
@@ -35,11 +34,10 @@ yyFillLabel0:
 
 // unnamed global block that includes x (has start label)
 
+
 yy2:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(1);
-		YYFILL(1);
-	}
+	YYSETSTATE(1);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel1:
 	++YYCURSOR;
 	YYSETSTATE(-1);
@@ -48,10 +46,9 @@ yyFillLabel1:
 
 // local block y (no start label)
 
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(2);
-		YYFILL(1);
-	}
+
+	YYSETSTATE(2);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel2:
 	++YYCURSOR;
 	YYSETSTATE(-1);
@@ -60,10 +57,9 @@ yyFillLabel2:
 
 // global block z that includes x (no start label)
 
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(3);
-		YYFILL(1);
-	}
+
+	YYSETSTATE(3);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel3:
 	++YYCURSOR;
 	YYSETSTATE(-1);
@@ -72,10 +68,9 @@ yyFillLabel3:
 
 // unnamed local block (no start label)
 
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(4);
-		YYFILL(1);
-	}
+
+	YYSETSTATE(4);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel4:
 	++YYCURSOR;
 	YYSETSTATE(-1);
@@ -84,15 +79,14 @@ yyFillLabel4:
 
 // use block (expect a local state switch for this block only)
 
+
 	switch (YYGETSTATE()) {
-		case 5: goto yyFillLabel5;
 		default: goto yy10;
+		case 5: goto yyFillLabel5;
 	}
 yy10:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(5);
-		YYFILL(1);
-	}
+	YYSETSTATE(5);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel5:
 	++YYCURSOR;
 	YYSETSTATE(-1);

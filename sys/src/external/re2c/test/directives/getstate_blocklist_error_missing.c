@@ -1,1 +1,1 @@
-re2c: error: cannot find block named `missing` referenced by `getstate` block
+re2c: error: cannot find block 'missing' listed in `getstate:re2c` directive

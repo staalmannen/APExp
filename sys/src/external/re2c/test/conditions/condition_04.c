@@ -5,9 +5,9 @@
 #line 6 "conditions/condition_04.c"
 {
 	YYCTYPE yych;
-	static const void* yyctable[2] = {
+	static void *yyctable[2] = {
 		&&yyc_r1,
-		&&yyc_r2
+		&&yyc_r2,
 	};
 	goto *yyctable[YYGETCONDITION()];
 /* *********************************** */
@@ -76,4 +76,4 @@ yy10:
 
 conditions/condition_04.re:2:0: warning: control flow in condition 'r1' is undefined for strings that match '[\x0-\x30\x33-\x60\x63-\xFF]', use default rule '*' [-Wundefined-control-flow]
 conditions/condition_04.re:2:0: warning: control flow in condition 'r2' is undefined for strings that match '[\x0-\x30\x33-\x61\x63-\xFF]', use default rule '*' [-Wundefined-control-flow]
-conditions/condition_04.re:2:0: warning: condition numbers may change, use `conditions` block to generate reliable condition identifiers [-Wcondition-order]
+conditions/condition_04.re:2:0: warning: condition numbers may change, use '/*!conditions:re2c*/' directive to generate reliable condition identifiers [-Wcondition-order]

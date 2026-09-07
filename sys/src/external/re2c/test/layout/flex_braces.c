@@ -17,7 +17,7 @@
 
 
 // re2c block that starts with %{ on a new line with spaces
-	  
+
 #line 22 "layout/flex_braces.c"
 {
 	YYCTYPE yych;
@@ -33,9 +33,20 @@
 // not a block, just a %{ in a string
 const char *s = "%{ * {} %}";
 
-// %{ is not a block start, as it's not followed by a newline
+// re2c erroneously thinks %{ in a string is a block start
 const char *s = "begin...\
-%{ * {} %}...end";
+
+#line 40 "layout/flex_braces.c"
+{
+	YYCTYPE yych;
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
+	++YYCURSOR;
+#line 18 "layout/flex_braces.re"
+	{}
+#line 47 "layout/flex_braces.c"
+}
+#line 18 "layout/flex_braces.re"
+...end";
 
 // not a block, just a %{ in a multiline comment
 /* %{ * {} %} */
@@ -43,14 +54,14 @@ const char *s = "begin...\
 // re2c erroneously thinks %{ in a comment is a block start
 /*
 
-#line 47 "layout/flex_braces.c"
+#line 58 "layout/flex_braces.c"
 {
 	YYCTYPE yych;
 	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 	++YYCURSOR;
 #line 26 "layout/flex_braces.re"
 	{}
-#line 54 "layout/flex_braces.c"
+#line 65 "layout/flex_braces.c"
 }
 #line 27 "layout/flex_braces.re"
 
@@ -59,14 +70,17 @@ const char *s = "begin...\
 // not a block, just a %{ in a oneline comment
 // %{ * {} %}
 
-// %{ is not a block start, as it's not followed by a newline
+// re2c erroneously thinks %{ in a macro is a block start
 #define X \
-  %{ * {} %}
 
-// empty block
-#line 39 "layout/flex_braces.re"
-
-
-// %{ is not a block start, as it's not followed by a newline
-%{%}
+#line 77 "layout/flex_braces.c"
+{
+	YYCTYPE yych;
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
+	++YYCURSOR;
+#line 35 "layout/flex_braces.re"
+	{}
+#line 84 "layout/flex_braces.c"
+}
+#line 35 "layout/flex_braces.re"
 

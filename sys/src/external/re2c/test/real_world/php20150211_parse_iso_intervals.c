@@ -254,44 +254,44 @@ std:
 {
 	YYCTYPE yych;
 	unsigned int yyaccept = 0;
-	static const unsigned char yybm[256] = {
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		128, 128, 128, 128, 128, 128, 128, 128,
-		128, 128,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0
+	static const unsigned char yybm[] = {
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		128, 128, 128, 128, 128, 128, 128, 128, 
+		128, 128,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
 	};
 	if ((YYLIMIT - YYCURSOR) < 20) YYFILL(20);
 	yych = *YYCURSOR;
 	{
-		static const void* yytarget[256] = {
+		static void *yytarget[256] = {
 			&&yy1, &&yy2, &&yy2, &&yy2, &&yy2, &&yy2, &&yy2, &&yy2,
 			&&yy2, &&yy4, &&yy1, &&yy2, &&yy2, &&yy2, &&yy2, &&yy2,
 			&&yy2, &&yy2, &&yy2, &&yy2, &&yy2, &&yy2, &&yy2, &&yy2,
@@ -400,7 +400,9 @@ yy7:
 	}
 yy8:
 	yych = *++YYCURSOR;
-	if (yybm[0+yych] & 128) goto yy13;
+	if (yybm[0+yych] & 128) {
+		goto yy13;
+	}
 	goto yy3;
 yy9:
 	yych = *++YYCURSOR;
@@ -408,12 +410,15 @@ yy9:
 	if (yych <= '9') goto yy14;
 yy10:
 	YYCURSOR = YYMARKER;
-	if (yyaccept == 0) goto yy3;
-	else goto yy7;
+	if (yyaccept == 0) {
+		goto yy3;
+	} else {
+		goto yy7;
+	}
 yy11:
 	yych = *++YYCURSOR;
 	{
-		static const void* yytarget[256] = {
+		static void *yytarget[256] = {
 			&&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10,
 			&&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10,
 			&&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10,
@@ -459,7 +464,9 @@ yy13:
 	++YYCURSOR;
 	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 	yych = *YYCURSOR;
-	if (yybm[0+yych] & 128) goto yy13;
+	if (yybm[0+yych] & 128) {
+		goto yy13;
+	}
 	{
 		DEBUG_OUTPUT("recurrences");
 		TIMELIB_INIT;
@@ -477,7 +484,7 @@ yy14:
 yy15:
 	yych = *++YYCURSOR;
 	{
-		static const void* yytarget[256] = {
+		static void *yytarget[256] = {
 			&&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10,
 			&&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10,
 			&&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10,
@@ -543,7 +550,7 @@ yy20:
 	if ((YYLIMIT - YYCURSOR) < 2) YYFILL(2);
 	yych = *YYCURSOR;
 	{
-		static const void* yytarget[256] = {
+		static void *yytarget[256] = {
 			&&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10,
 			&&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10,
 			&&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10,
@@ -592,7 +599,7 @@ yy21:
 yy22:
 	yych = *++YYCURSOR;
 	{
-		static const void* yytarget[256] = {
+		static void *yytarget[256] = {
 			&&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10,
 			&&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10,
 			&&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10,
@@ -654,7 +661,7 @@ yy25:
 	if ((YYLIMIT - YYCURSOR) < 3) YYFILL(3);
 	yych = *YYCURSOR;
 	{
-		static const void* yytarget[256] = {
+		static void *yytarget[256] = {
 			&&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10,
 			&&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10,
 			&&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10,
@@ -775,7 +782,7 @@ yy39:
 	yych = *YYCURSOR;
 yy40:
 	{
-		static const void* yytarget[256] = {
+		static void *yytarget[256] = {
 			&&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10,
 			&&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10,
 			&&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10, &&yy10,

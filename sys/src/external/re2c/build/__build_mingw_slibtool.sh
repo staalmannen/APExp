@@ -16,6 +16,5 @@ cd $builddir
     --enable-debug \
     --enable-libs \
     --host i686-w64-mingw32 \
-    && make -j$(nproc) LIBTOOL="slibtool" \
-    && ../build/copy_wine_libs_on_nixos.sh
+    && make -j$(nproc) LIBTOOL="slibtool"
 cd ..

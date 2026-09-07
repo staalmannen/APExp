@@ -1,16 +1,21 @@
-//go:generate re2go $INPUT -o $OUTPUT --api simple
+//go:generate re2go $INPUT -o $OUTPUT
 package main
 
 // Expects a null-terminated string.
-func lex(yyinput string) int {
-	var yycursor, yymarker int
-	yylimit := len(yyinput) - 1 // lim points at the terminating null
+func lex(str string) int {
+	var cur, mar int
+	lim := len(str) - 1 // lim points at the terminating null
 	count := 0
 
 	for { /*!re2c
-		re2c:YYCTYPE = byte;
-		re2c:yyfill:enable = 0;
 		re2c:eof = 0;
+		re2c:define:YYCTYPE    = byte;
+		re2c:define:YYPEEK     = "str[cur]";
+		re2c:define:YYSKIP     = "cur += 1";
+		re2c:define:YYBACKUP   = "mar = cur";
+		re2c:define:YYRESTORE  = "cur = mar";
+		re2c:define:YYLESSTHAN = "lim <= cur";
+		re2c:yyfill:enable = 0;
 
 		str = ['] ([^'\\] | [\\][^])* ['];
 

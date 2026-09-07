@@ -1,1 +1,1 @@
-re2c: error: `unsafe` feature is not supported for this backend
+re2c: error: cannot combine TDFA(0) and staDFA

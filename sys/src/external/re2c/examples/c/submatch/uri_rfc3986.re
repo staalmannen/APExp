@@ -72,13 +72,13 @@ loop:
     in->tok = in->cur;
 /*!re2c
 
-    re2c:YYCTYPE = "unsigned char";
-    re2c:YYCURSOR = in->cur;
-    re2c:YYMARKER = in->mar;
-    re2c:YYLIMIT = in->lim;
-    re2c:YYFILL = "if (fill(in, @@) != 0) return 2;";
-    re2c:YYFILL:naked = 1;
-    re2c:tags:expression = "in->@@";
+    re2c:define:YYCTYPE      = char;
+    re2c:define:YYCURSOR     = in->cur;
+    re2c:define:YYMARKER     = in->mar;
+    re2c:define:YYLIMIT      = in->lim;
+    re2c:define:YYFILL       = "if (fill(in, @@) != 0) return 2;";
+    re2c:define:YYFILL:naked = 1;
+    re2c:tags:expression     = "in->@@";
 
     end = "\x00";
     eol = "\n";
@@ -154,7 +154,7 @@ loop:
 */
 }
 
-int main()
+int main(int argc, char **argv)
 {
     const char *fname = "input";
     FILE *f;

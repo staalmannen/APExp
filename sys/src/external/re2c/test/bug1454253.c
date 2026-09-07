@@ -23,9 +23,8 @@ size_t scan(const char *s, int l, char *r)
 #line 24 "bug1454253.c"
 {
 	YYCTYPE yych;
-	YYMARKER = YYCURSOR;
 	if ((YYLIMIT - YYCURSOR) < 2) YYFILL(2);
-	yych = *YYCURSOR;
+	yych = *(YYMARKER = YYCURSOR);
 	switch (yych) {
 		case 0x00: goto yy2;
 		case '?': goto yy4;
@@ -38,7 +37,7 @@ yy1:
 		*r++ = '\0';
 		return p - s;
 	}
-#line 42 "bug1454253.c"
+#line 41 "bug1454253.c"
 yy2:
 	++YYCURSOR;
 #line 35 "bug1454253.re"
@@ -47,7 +46,7 @@ yy2:
 		*r++ = '\0';
 		return p - s;
 	}
-#line 51 "bug1454253.c"
+#line 50 "bug1454253.c"
 yy3:
 	++YYCURSOR;
 	if (YYLIMIT <= YYCURSOR) YYFILL(1);
@@ -203,7 +202,7 @@ yy7:
 		*r++ = '1';
 		continue;
 	}
-#line 207 "bug1454253.c"
+#line 206 "bug1454253.c"
 yy8:
 	++YYCURSOR;
 	if (YYLIMIT <= YYCURSOR) YYFILL(1);
@@ -279,7 +278,7 @@ yy9:
 		*r++ = '2';
 		continue;
 	}
-#line 283 "bug1454253.c"
+#line 282 "bug1454253.c"
 }
 #line 46 "bug1454253.re"
 

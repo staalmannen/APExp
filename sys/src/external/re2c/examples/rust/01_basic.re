@@ -1,13 +1,17 @@
-// re2rust $INPUT -o $OUTPUT --no-unsafe --api simple
+// re2rust $INPUT -o $OUTPUT
 
-fn lex(yyinput: &[u8]) -> bool {
-    let mut yycursor = 0;
+fn lex(s: &[u8]) -> bool {
+    let mut cursor = 0;
     /*!re2c
-        re2c:YYCTYPE = u8;
+        re2c:define:YYCTYPE = u8;
+        re2c:define:YYPEEK = "*s.get_unchecked(cursor)";
+        re2c:define:YYSKIP = "cursor += 1;";
         re2c:yyfill:enable = 0;
 
-        [1-9][0-9]* { return true; }
-        *           { return false; }
+        number = [1-9][0-9]*;
+
+        number { return true; }
+        *      { return false; }
     */
 }
 

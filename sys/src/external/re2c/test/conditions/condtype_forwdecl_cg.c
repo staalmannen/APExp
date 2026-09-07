@@ -12,9 +12,9 @@ int main ()
 #line 13 "conditions/condtype_forwdecl_cg.c"
 {
 	unsigned char yych;
-	static const void* yyctable[2] = {
+	static void *yyctable[2] = {
 		&&yyc_a,
-		&&yyc_b
+		&&yyc_b,
 	};
 	goto *yyctable[YYGETCONDITION()];
 /* *********************************** */
@@ -44,7 +44,7 @@ yy3:
 #line 45 "conditions/condtype_forwdecl_cg.c"
 enum cond_t : int {
 	yyca,
-	yycb
+	yycb,
 };
 #line 19 "conditions/condtype_forwdecl_cg.re"
 

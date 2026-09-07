@@ -9,7 +9,7 @@
 // earlier. Default rule * occurs in all three blocks; the local (not
 // inherited) definition takes priority.
 
-typedef enum { COLOR, FISH, DUNNO } What;
+enum What { COLOR, FISH, DUNNO };
 
 #line 15 "c/reuse/usedir.re"
 
@@ -22,7 +22,7 @@ static What lex(const char *s) {
     
 #line 24 "c/reuse/usedir.c"
 {
-	unsigned char yych;
+	char yych;
 	yych = *YYCURSOR;
 	switch (yych) {
 		case 'e': goto yy3;

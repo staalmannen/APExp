@@ -46,43 +46,45 @@ std:
 #line 47 "config/config9.c"
 {
 	unsigned char curr;
-	static const unsigned char yybm[256] = {
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		128, 128, 128, 128, 128, 128, 128, 128,
-		128, 128,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0
+	static const unsigned char yybm[] = {
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		128, 128, 128, 128, 128, 128, 128, 128, 
+		128, 128,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
 	};
 	if ((s.lim - s.cur) < 3) fill(3);
 	curr = (unsigned char)*s.cur;
-	if (yybm[0+curr] & 128) goto xx4;
+	if (yybm[0+curr] & 128) {
+		goto xx4;
+	}
 	if (curr <= 0x1F) {
 		if (curr <= 0x08) goto xx1;
 		if (curr <= '\n') goto xx3;
@@ -98,7 +100,7 @@ xx2:
 	{
 		return UNEXPECTED;
 	}
-#line 102 "config/config9.c"
+#line 104 "config/config9.c"
 xx3:
 	++s.cur;
 #line 62 "config/config9.re"
@@ -108,15 +110,17 @@ xx3:
 		cursor = s.cur;
 		goto std;
 	}
-#line 112 "config/config9.c"
+#line 114 "config/config9.c"
 xx4:
 	++s.cur;
 	if (s.lim <= s.cur) fill(1);
 	curr = (unsigned char)*s.cur;
-	if (yybm[0+curr] & 128) goto xx4;
+	if (yybm[0+curr] & 128) {
+		goto xx4;
+	}
 #line 59 "config/config9.re"
 	{ return NUMBER;  }
-#line 120 "config/config9.c"
+#line 124 "config/config9.c"
 xx5:
 	curr = (unsigned char)*++s.cur;
 	if (curr <= '/') goto xx2;
@@ -136,7 +140,7 @@ xx7:
 	s.cur = s.ctx;
 #line 58 "config/config9.re"
 	{ return KEYWORD; }
-#line 140 "config/config9.c"
+#line 144 "config/config9.c"
 xx8:
 	curr = (unsigned char)*++s.cur;
 	if (curr <= '/') goto xx9;
@@ -145,7 +149,7 @@ xx9:
 	s.cur -= 1;
 #line 57 "config/config9.re"
 	{ return KEYWORD; }
-#line 149 "config/config9.c"
+#line 153 "config/config9.c"
 }
 #line 72 "config/config9.re"
 

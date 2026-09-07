@@ -4,25 +4,25 @@
 
 // `getstate:re2c:y` (start in y)
 switch (YYGETSTATE()) {
-	case 1: goto yyFillLabel1;
 	default: goto yy2;
+	case 1: goto yyFillLabel1;
 }
 
 
 // `getstate:re2c:z:x` (start in z)
 switch (YYGETSTATE()) {
+	default: goto yy4;
 	case 2: goto yyFillLabel2;
 	case 0: goto yyFillLabel0;
-	default: goto yy4;
 }
 
 
 // `getstate:re2c:y:x:z` (start in y)
 switch (YYGETSTATE()) {
+	default: goto yy2;
 	case 1: goto yyFillLabel1;
 	case 0: goto yyFillLabel0;
 	case 2: goto yyFillLabel2;
-	default: goto yy2;
 }
 
 
@@ -31,10 +31,9 @@ switch (YYGETSTATE()) {
 
 // global block x (no start label)
 
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(0);
-		YYFILL(1);
-	}
+
+	YYSETSTATE(0);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel0:
 	++YYCURSOR;
 	YYSETSTATE(-1);
@@ -43,11 +42,10 @@ yyFillLabel0:
 
 // global block y (with start label)
 
+
 yy2:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(1);
-		YYFILL(1);
-	}
+	YYSETSTATE(1);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel1:
 	++YYCURSOR;
 	YYSETSTATE(-1);
@@ -56,11 +54,10 @@ yyFillLabel1:
 
 // local block z (with start label)
 
+
 yy4:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(2);
-		YYFILL(1);
-	}
+	YYSETSTATE(2);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel2:
 	++YYCURSOR;
 	YYSETSTATE(-1);
@@ -72,24 +69,24 @@ yyFillLabel2:
 
 // `getstate:re2c:y:x:z` (start in y)
 switch (YYGETSTATE()) {
+	default: goto yy2;
 	case 1: goto yyFillLabel1;
 	case 0: goto yyFillLabel0;
 	case 2: goto yyFillLabel2;
-	default: goto yy2;
 }
 
 
 // `getstate:re2c:z:x` (start in z)
 switch (YYGETSTATE()) {
+	default: goto yy4;
 	case 2: goto yyFillLabel2;
 	case 0: goto yyFillLabel0;
-	default: goto yy4;
 }
 
 
 // `getstate:re2c:y` (start in y)
 switch (YYGETSTATE()) {
-	case 1: goto yyFillLabel1;
 	default: goto yy2;
+	case 1: goto yyFillLabel1;
 }
 

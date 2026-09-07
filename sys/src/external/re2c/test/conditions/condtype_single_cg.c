@@ -5,8 +5,8 @@
 #line 6 "conditions/condtype_single_cg.c"
 {
 	YYCTYPE yych;
-	static const void* yyctable[1] = {
-		&&yyc_a
+	static void *yyctable[1] = {
+		&&yyc_a,
 	};
 	goto *yyctable[YYGETCONDITION()];
 /* *********************************** */
@@ -23,4 +23,4 @@ yy1:
 #line 4 "conditions/condtype_single_cg.re"
 
 conditions/condtype_single_cg.re:2:0: warning: control flow in condition 'a' is undefined for strings that match '[\x0-\x60\x62-\xFF]', use default rule '*' [-Wundefined-control-flow]
-conditions/condtype_single_cg.re:2:0: warning: condition numbers may change, use `conditions` block to generate reliable condition identifiers [-Wcondition-order]
+conditions/condtype_single_cg.re:2:0: warning: condition numbers may change, use '/*!conditions:re2c*/' directive to generate reliable condition identifiers [-Wcondition-order]

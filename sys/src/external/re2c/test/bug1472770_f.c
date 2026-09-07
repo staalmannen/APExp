@@ -27,19 +27,18 @@ int scan(char *p)
 start:
 
 #line 30 "bug1472770_f.c"
+
 	switch (YYGETSTATE()) {
-		case 0: goto yyFillLabel0;
 		default: goto yy0;
+		case 0: goto yyFillLabel0;
 	}
 yy0:
 	goto yy1;
 yy2:
 	++YYCURSOR;
 yy1:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(0);
-		YYFILL(1);
-	}
+	YYSETSTATE(0);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel0:
 	yych = *YYCURSOR;
 	switch (yych) {
@@ -54,7 +53,7 @@ yy3:
 	{
 		return n;
 	}
-#line 58 "bug1472770_f.c"
+#line 57 "bug1472770_f.c"
 yy4:
 	++YYCURSOR;
 	YYSETSTATE(-1);
@@ -63,7 +62,7 @@ yy4:
 		++n;
 		goto start;
 	}
-#line 67 "bug1472770_f.c"
+#line 66 "bug1472770_f.c"
 #line 36 "bug1472770_f.re"
 
 }

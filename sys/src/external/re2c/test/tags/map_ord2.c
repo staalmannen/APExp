@@ -4,13 +4,12 @@
 
 {
 	YYCTYPE yych;
-	YYMARKER = YYCURSOR;
 	if ((YYLIMIT - YYCURSOR) < 8) YYFILL(8);
-	yych = *YYCURSOR;
+	yych = *(YYMARKER = YYCURSOR);
 	switch (yych) {
 		case 'a':
-			yyt1 = YYCURSOR;
 			yyt2 = NULL;
+			yyt1 = YYCURSOR;
 			goto yy2;
 		default:
 			yyt1 = NULL;
@@ -82,4 +81,4 @@ yy10:
 }
 
 tags/map_ord2.re:5:24: warning: rule matches empty string [-Wmatch-empty-string]
-tags/map_ord2.re:5:24: warning: tag `t` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/map_ord2.re:5:24: warning: tag 't' has 2nd degree of nondeterminism [-Wnondeterministic-tags]

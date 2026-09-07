@@ -7,7 +7,7 @@
 // earlier. Default rule * occurs in all three blocks; the local (not
 // inherited) definition takes priority.
 
-typedef enum { COLOR, FISH, DUNNO } What;
+enum What { COLOR, FISH, DUNNO };
 
 /*!rules:re2c:colors
     *                            { assert(false); }
@@ -23,7 +23,7 @@ static What lex(const char *s) {
     const char *YYCURSOR = s, *YYMARKER;
     /*!re2c
         re2c:yyfill:enable = 0;
-        re2c:YYCTYPE = "unsigned char";
+        re2c:define:YYCTYPE = char;
 
         !use:fish;
         !use:colors;

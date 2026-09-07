@@ -21,7 +21,6 @@ digraph re2c {
 10 -> 5 [label="[0x00-)][+-0xFF]"]
 10 -> 20 [label="[*]"]
 11 -> 12
-12 [style="dashed"]
 12 -> 13 [label="[0x00-0x08][0x0A-0x1F][!-\"][$-0xFF]"]
 12 -> 11 [label="[0x09][ ]"]
 12 -> 14 [label="[#]"]
@@ -29,7 +28,6 @@ digraph re2c {
 13 -> 5 [label="yyaccept=1"]
 13 -> 19 [label="yyaccept=2"]
 14 -> 15
-15 [style="dashed"]
 15 -> 13 [label="[0x00-0x08][0x0A-0x1F][!-k][m-0xFF]"]
 15 -> 14 [label="[0x09][ ]"]
 15 -> 21 [label="[l]"]
@@ -102,7 +100,6 @@ digraph re2c {
 48 -> 13 [label="[0x00-9][;-0xFF]"]
 48 -> 56 [label="[:]"]
 49 -> 50
-50 [style="dashed"]
 50 -> 13 [label="[0x00-0x08][0x0A-0x1F][!-0][:-0xFF]"]
 50 -> 49 [label="[0x09][ ]"]
 50 -> 57 [label="[1-9]<yyt1>"]
@@ -119,7 +116,6 @@ digraph re2c {
 56 -> 13 [label="[0x00-q][s-0xFF]"]
 56 -> 64 [label="[r]"]
 57 -> 58
-58 [style="dashed"]
 58 -> 13 [label="[0x00-0x08][0x0B-0x0C][0x0E-0x1F][!-/][:-0xFF]"]
 58 -> 65 [label="[0x09][ ]"]
 58 -> 67 [label="[0x0A]"]
@@ -138,7 +134,6 @@ digraph re2c {
 64 -> 13 [label="[0x00-d][f-0xFF]"]
 64 -> 75 [label="[e]"]
 65 -> 66
-66 [style="dashed"]
 66 -> 13 [label="[0x00-0x08][0x0A-0x1F][!][#-0xFF]"]
 66 -> 65 [label="[0x09][ ]"]
 66 -> 76 [label="[\"]"]
@@ -159,7 +154,6 @@ digraph re2c {
 75 -> 13 [label="[0x00-1][3-0xFF]"]
 75 -> 83 [label="[2]"]
 76 -> 77
-77 [style="dashed"]
 77 -> 76 [label="[0x00-0x09][0x0B-!][#-[][0x5D-0xFF]"]
 77 -> 13 [label="[0x0A]"]
 77 -> 84 [label="[\"]"]
@@ -240,7 +234,6 @@ digraph re2c {
 112 -> 113
 113 [label="dot/scanner_re2c_default.re:446"]
 114 -> 115
-115 [style="dashed"]
 115 -> 116 [label="[0x00-0x08][0x0A-0x1F][!-0xFF]"]
 115 -> 114 [label="[0x09][ ]"]
 116 [label="dot/scanner_re2c_default.re:430"]
@@ -276,7 +269,6 @@ digraph re2c {
 135 -> 166 [label="[!]"]
 135 -> 168 [label="[>]"]
 136 -> 137
-137 [style="dashed"]
 137 -> 169 [label="[0x00-0x08][0x0A-0x1F][!-+][--/][:-<][?-@][[-^][`][{-0xFF]"]
 137 -> 171 [label="[0x09][ ]<yyt1>"]
 137 -> 173 [label="[,][=->]<yyt1>"]
@@ -294,7 +286,6 @@ digraph re2c {
 141 -> 188 [label="[A-Z][_][a-z]"]
 142 [label="dot/scanner_re2c_default.re:250"]
 143 -> 144
-144 [style="dashed"]
 144 -> 145 [label="[0x00-0x08][0x0A-0x1F][!-\"][$-0xFF]"]
 144 -> 143 [label="[0x09][ ]"]
 144 -> 146 [label="[#]"]
@@ -307,12 +298,10 @@ digraph re2c {
 145 -> 184 [label="yyaccept=6"]
 145 -> 226 [label="yyaccept=7"]
 146 -> 147
-147 [style="dashed"]
 147 -> 145 [label="[0x00-0x08][0x0A-0x1F][!-k][m-0xFF]"]
 147 -> 146 [label="[0x09][ ]"]
 147 -> 190 [label="[l]"]
 148 -> 149
-149 [style="dashed"]
 149 -> 148 [label="[0x00-0x09][0x0B-!][#-[][0x5D-0xFF]"]
 149 -> 145 [label="[0x0A]"]
 149 -> 150 [label="[\"]"]
@@ -324,7 +313,6 @@ digraph re2c {
 153 -> 154
 154 [label="dot/scanner_re2c_default.re:275"]
 155 -> 156
-156 [style="dashed"]
 156 -> 155 [label="[0x00-0x09][0x0B-&][(-[][0x5D-0xFF]"]
 156 -> 145 [label="[0x0A]"]
 156 -> 157 [label="[']"]
@@ -350,14 +338,12 @@ digraph re2c {
 169 -> 170
 170 [label="dot/scanner_re2c_default.re:404"]
 171 -> 172
-172 [style="dashed"]
 172 -> 199 [label="[0x00-0x08][0x0A-0x1F][!-+][--<][?-0xFF]"]
 172 -> 171 [label="[0x09][ ]"]
 172 -> 173 [label="[,][=->]"]
 173 -> 174
 174 [label="dot/scanner_re2c_default.re:398"]
 175 -> 176
-176 [style="dashed"]
 176 -> 175 [label="[0x00-0x09][0x0B-[][^-0xFF]"]
 176 -> 145 [label="[0x0A]"]
 176 -> 177 [label="[\\]"]
@@ -367,7 +353,6 @@ digraph re2c {
 178 -> 179
 179 [label="dot/scanner_re2c_default.re:319"]
 180 -> 181
-181 [style="dashed"]
 181 -> 180 [label="[0x00-0x09][0x0B-[][^-0xFF]"]
 181 -> 145 [label="[0x0A]"]
 181 -> 201 [label="[\\]"]
@@ -379,13 +364,11 @@ digraph re2c {
 185 -> 187 [label="[0x00-+][--0xFF]"]
 185 -> 205 [label="[,]"]
 186 -> 187
-187 [style="dashed"]
 187 -> 145 [label="[0x00-+][--/][:-|][~-0xFF]"]
 187 -> 208 [label="[,]"]
 187 -> 186 [label="[0-9]"]
 187 -> 206 [label="[}]"]
 188 -> 189
-189 [style="dashed"]
 189 -> 145 [label="[0x00-/][:-@][[-^][`][{-|][~-0xFF]"]
 189 -> 188 [label="[0-9][A-Z][_][a-z]"]
 189 -> 209 [label="[}]"]
@@ -394,7 +377,6 @@ digraph re2c {
 191 -> 192
 192 [label="dot/scanner_re2c_default.re:255"]
 193 -> 194
-194 [style="dashed"]
 194 -> 145 [label="[0x00-0x08][0x0A-0x1F][!-9][;-<][>-z][|-0xFF]"]
 194 -> 193 [label="[0x09][ ]"]
 194 -> 195 [label="[:]"]
@@ -429,7 +411,6 @@ digraph re2c {
 212 -> 137 [label="[0x00-9][;-0xFF]"]
 212 -> 220 [label="[:]"]
 213 -> 214
-214 [style="dashed"]
 214 -> 145 [label="[0x00-/][:-|][~-0xFF]"]
 214 -> 213 [label="[0-9]"]
 214 -> 221 [label="[}]"]
@@ -446,14 +427,12 @@ digraph re2c {
 223 -> 228 [label="[0x00-0][:-0xFF]"]
 223 -> 145 [label="[1-9]"]
 224 -> 225
-225 [style="dashed"]
 225 -> 226 [label="[0x00-/][;-?][[-^][`][{-0xFF]"]
 225 -> 224 [label="[0-9][A-Z][_][a-z]"]
 225 -> 229 [label="[:]"]
 225 -> 230 [label="[@]"]
 226 [label="dot/scanner_re2c_default.re:384"]
 227 -> 228
-228 [style="dashed"]
 228 -> 145 [label="[0x00-0x08][0x0A-0x1F][!-0][:-0xFF]"]
 228 -> 227 [label="[0x09][ ]"]
 228 -> 231 [label="[1-9]<yyt1>"]
@@ -462,18 +441,15 @@ digraph re2c {
 230 -> 145 [label="[0x00-@][[-^][`][{-0xFF]"]
 230 -> 233 [label="[A-Z][_][a-z]"]
 231 -> 232
-232 [style="dashed"]
 232 -> 145 [label="[0x00-0x08][0x0B-0x0C][0x0E-0x1F][!-/][:-0xFF]"]
 232 -> 235 [label="[0x09][ ]"]
 232 -> 237 [label="[0x0A]"]
 232 -> 239 [label="[0x0D]"]
 232 -> 231 [label="[0-9]"]
 233 -> 234
-234 [style="dashed"]
 234 -> 226 [label="[0x00-/][:-@][[-^][`][{-0xFF]"]
 234 -> 233 [label="[0-9][A-Z][_][a-z]"]
 235 -> 236
-236 [style="dashed"]
 236 -> 145 [label="[0x00-0x08][0x0A-0x1F][!][#-0xFF]"]
 236 -> 235 [label="[0x09][ ]"]
 236 -> 240 [label="[\"]"]
@@ -482,7 +458,6 @@ digraph re2c {
 239 -> 145 [label="[0x00-0x09][0x0B-0xFF]"]
 239 -> 237 [label="[0x0A]"]
 240 -> 241
-241 [style="dashed"]
 241 -> 240 [label="[0x00-0x09][0x0B-!][#-[][0x5D-0xFF]"]
 241 -> 145 [label="[0x0A]"]
 241 -> 242 [label="[\"]"]
@@ -524,7 +499,6 @@ digraph re2c {
 259 [label="dot/scanner_re2c_default.re:485"]
 260 -> 259
 261 -> 262
-262 [style="dashed"]
 262 -> 263 [label="[0x00-0x08][0x0A-0x1F][!-k][m-0xFF]"]
 262 -> 261 [label="[0x09][ ]"]
 262 -> 274 [label="[l]"]
@@ -532,7 +506,6 @@ digraph re2c {
 263 -> 249 [label="yyaccept=1"]
 263 -> 259 [label="yyaccept=2"]
 264 -> 265
-265 [style="dashed"]
 265 -> 264 [label="[0x00-0x09][0x0B-!][#-[][0x5D-0xFF]"]
 265 -> 263 [label="[0x0A]"]
 265 -> 266 [label="[\"]"]
@@ -542,7 +515,6 @@ digraph re2c {
 268 -> 264 [label="[0x00-0x09][0x0B-0xFF]"]
 268 -> 263 [label="[0x0A]"]
 269 -> 270
-270 [style="dashed"]
 270 -> 269 [label="[0x00-0x09][0x0B-&][(-[][0x5D-0xFF]"]
 270 -> 263 [label="[0x0A]"]
 270 -> 266 [label="[']"]
@@ -550,7 +522,6 @@ digraph re2c {
 271 -> 269 [label="[0x00-0x09][0x0B-0xFF]"]
 271 -> 263 [label="[0x0A]"]
 272 -> 273
-273 [style="dashed"]
 273 -> 263 [label="[0x00-0x08][0x0A-0x1F][!-\"][$-0xFF]"]
 273 -> 272 [label="[0x09][ ]"]
 273 -> 261 [label="[#]"]
@@ -563,19 +534,16 @@ digraph re2c {
 277 -> 279 [label="[0x00-0][:-0xFF]"]
 277 -> 263 [label="[1-9]"]
 278 -> 279
-279 [style="dashed"]
 279 -> 263 [label="[0x00-0x08][0x0A-0x1F][!-0][:-0xFF]"]
 279 -> 278 [label="[0x09][ ]"]
 279 -> 280 [label="[1-9]<yyt1>"]
 280 -> 281
-281 [style="dashed"]
 281 -> 263 [label="[0x00-0x08][0x0B-0x0C][0x0E-0x1F][!-/][:-0xFF]"]
 281 -> 282 [label="[0x09][ ]"]
 281 -> 284 [label="[0x0A]"]
 281 -> 286 [label="[0x0D]"]
 281 -> 280 [label="[0-9]"]
 282 -> 283
-283 [style="dashed"]
 283 -> 263 [label="[0x00-0x08][0x0A-0x1F][!][#-0xFF]"]
 283 -> 282 [label="[0x09][ ]"]
 283 -> 287 [label="[\"]"]
@@ -584,7 +552,6 @@ digraph re2c {
 286 -> 263 [label="[0x00-0x09][0x0B-0xFF]"]
 286 -> 284 [label="[0x0A]"]
 287 -> 288
-288 [style="dashed"]
 288 -> 287 [label="[0x00-0x09][0x0B-!][#-[][0x5D-0xFF]"]
 288 -> 263 [label="[0x0A]"]
 288 -> 289 [label="[\"]"]
@@ -611,13 +578,11 @@ digraph re2c {
 298 -> 294 [label="[0x00-)][+-0xFF]"]
 298 -> 306 [label="[*]"]
 299 -> 300
-300 [style="dashed"]
 300 -> 301 [label="[0x00-0x08][0x0A-0x1F][!-\"][$-0xFF]"]
 300 -> 299 [label="[0x09][ ]"]
 300 -> 302 [label="[#]"]
 301 -> 296 [label="yyaccept=0"]
 302 -> 303
-303 [style="dashed"]
 303 -> 301 [label="[0x00-0x08][0x0A-0x1F][!-k][m-0xFF]"]
 303 -> 302 [label="[0x09][ ]"]
 303 -> 308 [label="[l]"]
@@ -634,19 +599,16 @@ digraph re2c {
 311 -> 313 [label="[0x00-0][:-0xFF]"]
 311 -> 301 [label="[1-9]"]
 312 -> 313
-313 [style="dashed"]
 313 -> 301 [label="[0x00-0x08][0x0A-0x1F][!-0][:-0xFF]"]
 313 -> 312 [label="[0x09][ ]"]
 313 -> 314 [label="[1-9]<yyt1>"]
 314 -> 315
-315 [style="dashed"]
 315 -> 301 [label="[0x00-0x08][0x0B-0x0C][0x0E-0x1F][!-/][:-0xFF]"]
 315 -> 316 [label="[0x09][ ]"]
 315 -> 318 [label="[0x0A]"]
 315 -> 320 [label="[0x0D]"]
 315 -> 314 [label="[0-9]"]
 316 -> 317
-317 [style="dashed"]
 317 -> 301 [label="[0x00-0x08][0x0A-0x1F][!][#-0xFF]"]
 317 -> 316 [label="[0x09][ ]"]
 317 -> 321 [label="[\"]"]
@@ -655,7 +617,6 @@ digraph re2c {
 320 -> 301 [label="[0x00-0x09][0x0B-0xFF]"]
 320 -> 318 [label="[0x0A]"]
 321 -> 322
-322 [style="dashed"]
 322 -> 321 [label="[0x00-0x09][0x0B-!][#-[][0x5D-0xFF]"]
 322 -> 301 [label="[0x0A]"]
 322 -> 323 [label="[\"]"]
@@ -681,12 +642,10 @@ digraph re2c {
 333 -> 334
 334 [label="dot/scanner_re2c_default.re:602"]
 335 -> 336
-336 [style="dashed"]
 336 -> 337 [label="[0x00-0x08][0x0A-0x1F][!-0xFF]"]
 336 -> 335 [label="[0x09][ ]"]
 337 [label="dot/scanner_re2c_default.re:594"]
 338 -> 339
-339 [style="dashed"]
 339 -> 340 [label="[0x00-0x08][0x0A-0x1F][!-0xFF]"]
 339 -> 338 [label="[0x09][ ]"]
 340 [label="dot/scanner_re2c_default.re:597"]
@@ -701,18 +660,15 @@ digraph re2c {
 342 -> 353 [label="[1-9]"]
 343 [label="dot/scanner_re2c_default.re:615"]
 344 -> 345
-345 [style="dashed"]
 345 -> 344 [label="[0x00-0x08][0x0B-0x0C][0x0E-0x1F][!-:][<-0xFF]"]
 345 -> 343 [label="[0x09-0x0A][0x0D][ ][;]"]
 346 -> 347
-347 [style="dashed"]
 347 -> 346 [label="[0x00-0x08][0x0B-0x0C][0x0E-0x1F][!][#-:][<-[][0x5D-0xFF]"]
 347 -> 355 [label="[0x09][0x0D][ ][;]"]
 347 -> 343 [label="[0x0A]"]
 347 -> 344 [label="[\"]"]
 347 -> 358 [label="[\\]"]
 348 -> 349
-349 [style="dashed"]
 349 -> 348 [label="[0x00-0x08][0x0B-0x0C][0x0E-0x1F][!-&][(-:][<-[][0x5D-0xFF]"]
 349 -> 359 [label="[0x09][0x0D][ ][;]"]
 349 -> 343 [label="[0x0A]"]
@@ -724,12 +680,10 @@ digraph re2c {
 351 -> 352 [label="[0x09-0x0A][0x0D][ ][;]"]
 352 [label="dot/scanner_re2c_default.re:609"]
 353 -> 354
-354 [style="dashed"]
 354 -> 344 [label="[0x00-0x08][0x0B-0x0C][0x0E-0x1F][!-/][:][<-0xFF]"]
 354 -> 352 [label="[0x09-0x0A][0x0D][ ][;]"]
 354 -> 353 [label="[0-9]"]
 355 -> 356
-356 [style="dashed"]
 356 -> 355 [label="[0x00-0x09][0x0B-!][#-[][0x5D-0xFF]"]
 356 -> 357 [label="[0x0A]"]
 356 -> 362 [label="[\"]"]
@@ -739,7 +693,6 @@ digraph re2c {
 358 -> 355 [label="[0x09][0x0D][ ][;]"]
 358 -> 343 [label="[0x0A]"]
 359 -> 360
-360 [style="dashed"]
 360 -> 359 [label="[0x00-0x09][0x0B-&][(-[][0x5D-0xFF]"]
 360 -> 357 [label="[0x0A]"]
 360 -> 362 [label="[']"]
@@ -765,12 +718,10 @@ digraph re2c {
 371 -> 376 [label="[0x00-0x09][0x0B-0xFF]"]
 371 -> 368 [label="[0x0A]"]
 372 -> 373
-373 [style="dashed"]
 373 -> 374 [label="[0x00-/][:-0xFF]"]
 373 -> 372 [label="[0-9]"]
 374 [label="dot/scanner_re2c_default.re:629"]
 375 -> 376
-376 [style="dashed"]
 376 -> 375 [label="[0x00-0x09][0x0B-!][#-[][0x5D-0xFF]"]
 376 -> 377 [label="[0x0A]"]
 376 -> 378 [label="[\"]"]

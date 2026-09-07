@@ -157,3 +157,4 @@ yy23:
 	{}
 }
 
+tags/cond_star2.re:12:20: warning: unreachable rule in condition 'c2' (shadowed by rules at lines 6, 7) [-Wunreachable-rules]

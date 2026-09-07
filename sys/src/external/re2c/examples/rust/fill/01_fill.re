@@ -7,11 +7,11 @@ const BUFSIZE: usize = 4096;
 
 struct State {
     file: File,
-    yyinput: [u8; BUFSIZE],
-    yylimit: usize,
-    yycursor: usize,
-    yymarker: usize,
-    token: usize,
+    buf: [u8; BUFSIZE],
+    lim: usize,
+    cur: usize,
+    mar: usize,
+    tok: usize,
     eof: bool,
 }
 
@@ -22,21 +22,21 @@ fn fill(st: &mut State) -> Fill {
     if st.eof { return Fill::Eof; }
 
     // Error: lexeme too long. In real life could reallocate a larger buffer.
-    if st.token < 1 { return Fill::LongLexeme; }
+    if st.tok < 1 { return Fill::LongLexeme; }
 
     // Shift buffer contents (discard everything up to the current token).
-    st.yyinput.copy_within(st.token..st.yylimit, 0);
-    st.yylimit -= st.token;
-    st.yycursor -= st.token;
-    st.yymarker = st.yymarker.overflowing_sub(st.token).0; // may underflow if marker is unused
-    st.token = 0;
+    st.buf.copy_within(st.tok..st.lim, 0);
+    st.lim -= st.tok;
+    st.cur -= st.tok;
+    st.mar = st.mar.overflowing_sub(st.tok).0; // may underflow if marker is unused
+    st.tok = 0;
 
     // Fill free space at the end of buffer with new data from file.
-    match st.file.read(&mut st.yyinput[st.yylimit..BUFSIZE - 1]) { // -1 for sentinel
+    match st.file.read(&mut st.buf[st.lim..BUFSIZE - 1]) { // -1 for sentinel
         Ok(n) => {
-            st.yylimit += n;
+            st.lim += n;
             st.eof = n == 0; // end of file
-            st.yyinput[st.yylimit] = 0; // append sentinel
+            st.buf[st.lim] = 0; // append sentinel
         }
         Err(why) => panic!("cannot read from file: {}", why)
     }
@@ -44,15 +44,19 @@ fn fill(st: &mut State) -> Fill {
     return Fill::Ok;
 }
 
-fn lex(yyrecord: &mut State) -> isize {
+fn lex(st: &mut State) -> isize {
     let mut count: isize = 0;
 
     'lex: loop {
-        yyrecord.token = yyrecord.yycursor;
+        st.tok = st.cur;
     /*!re2c
-        re2c:api = record;
-        re2c:YYCTYPE = u8;
-        re2c:YYFILL = "fill(yyrecord) == Fill::Ok";
+        re2c:define:YYCTYPE    = u8;
+        re2c:define:YYPEEK     = "*st.buf.get_unchecked(st.cur)";
+        re2c:define:YYSKIP     = "st.cur += 1;";
+        re2c:define:YYBACKUP   = "st.mar = st.cur;";
+        re2c:define:YYRESTORE  = "st.cur = st.mar;";
+        re2c:define:YYLESSTHAN = "st.cur >= st.lim";
+        re2c:define:YYFILL     = "fill(st) == Fill::Ok";
         re2c:eof = 0;
 
         str = ['] ([^'\\] | [\\][^])* ['];
@@ -86,15 +90,15 @@ fn main() {
     };
 
     // Initialize lexer state: all offsets are at the end of buffer.
-    let yylimit = BUFSIZE - 1;
+    let lim = BUFSIZE - 1;
     let mut st = State {
         file: file,
-        // Sentinel (at `yylimit` offset) is set to null, which triggers YYFILL.
-        yyinput: [0; BUFSIZE],
-        yylimit: yylimit,
-        yycursor: yylimit,
-        yymarker: yylimit,
-        token: yylimit,
+        // Sentinel (at `lim` offset) is set to null, which triggers YYFILL.
+        buf: [0; BUFSIZE],
+        lim: lim,
+        cur: lim,
+        mar: lim,
+        tok: lim,
         eof: false,
     };
 

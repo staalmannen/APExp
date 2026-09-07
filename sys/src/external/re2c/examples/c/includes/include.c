@@ -10,7 +10,7 @@ Result lex(const char *s) {
     const char *YYCURSOR = s, *YYMARKER;
     
 {
-	unsigned char yych;
+	char yych;
 	unsigned int yyaccept = 0;
 	yych = *YYCURSOR;
 	switch (yych) {

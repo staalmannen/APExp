@@ -18,7 +18,7 @@ static enum YYCONDTYPE yy_state;
 
 enum YYCONDTYPE {
 	yycINITIAL,
-	yycST_VALUE
+	yycST_VALUE,
 };
 
 
@@ -35,42 +35,11 @@ int scan(char *s, int l)
 		{
 			YYCTYPE yych;
 			unsigned int yyaccept = 0;
-			static const unsigned char yybm_ST_VALUE[256] = {
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0, 128,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				128,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0
-			};
-			if (YYGETCONDITION() < 1) goto yyc_INITIAL;
-			else goto yyc_ST_VALUE;
+			if (YYGETCONDITION() < 1) {
+				goto yyc_INITIAL;
+			} else {
+				goto yyc_ST_VALUE;
+			}
 /* *********************************** */
 yyc_INITIAL:
 			if ((YYLIMIT - YYCURSOR) < 2) YYFILL(2);
@@ -100,16 +69,22 @@ yy5:
 	}
 /* *********************************** */
 yyc_ST_VALUE:
-			YYMARKER = YYCURSOR;
 			if (YYLIMIT <= YYCURSOR) YYFILL(1);
-			yych = *YYCURSOR;
-			if (yybm_ST_VALUE[0+yych] & 128) {
-				++YYCURSOR;
-				goto yy8;
-			}
-			if (yych == '$') {
-				++YYCURSOR;
-				goto yy9;
+			yych = *(YYMARKER = YYCURSOR);
+			if (yych <= 0x1F) {
+				if (yych == '\t') {
+					++YYCURSOR;
+					goto yy8;
+				}
+			} else {
+				if (yych <= ' ') {
+					++YYCURSOR;
+					goto yy8;
+				}
+				if (yych == '$') {
+					++YYCURSOR;
+					goto yy9;
+				}
 			}
 yy7:
 			{
@@ -119,7 +94,11 @@ yy7:
 yy8:
 			if (YYLIMIT <= YYCURSOR) YYFILL(1);
 			yych = *YYCURSOR;
-			if (yybm_ST_VALUE[0+yych] & 128) {
+			if (yych == '\t') {
+				++YYCURSOR;
+				goto yy8;
+			}
+			if (yych == ' ') {
 				++YYCURSOR;
 				goto yy8;
 			}
@@ -139,8 +118,11 @@ yy9:
 			}
 yy10:
 			YYCURSOR = YYMARKER;
-			if (yyaccept == 0) goto yy7;
-			else goto yy12;
+			if (yyaccept == 0) {
+				goto yy7;
+			} else {
+				goto yy12;
+			}
 yy11:
 			yyaccept = 1;
 			YYMARKER = YYCURSOR;

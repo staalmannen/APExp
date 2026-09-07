@@ -108,38 +108,31 @@ yy24:
 	goto yy11;
 yy25:
 	++YYCURSOR;
-	p = YYCURSOR;
-	p -= 4;
+	p = YYCURSOR - 4;
 	{ a }
 yy26:
 	++YYCURSOR;
-	p = YYCURSOR;
-	p -= 4;
+	p = YYCURSOR - 4;
 	{ b }
 yy27:
 	++YYCURSOR;
-	p = YYCURSOR;
-	p -= 4;
+	p = YYCURSOR - 4;
 	{ c }
 yy28:
 	++YYCURSOR;
-	p = YYCURSOR;
-	p -= 4;
+	p = YYCURSOR - 4;
 	{ d }
 yy29:
 	++YYCURSOR;
-	p = YYCURSOR;
-	p -= 4;
+	p = YYCURSOR - 4;
 	{ e }
 yy30:
 	++YYCURSOR;
-	p = YYCURSOR;
-	p -= 4;
+	p = YYCURSOR - 4;
 	{ f }
 yy31:
 	++YYCURSOR;
-	p = YYCURSOR;
-	p -= 4;
+	p = YYCURSOR - 4;
 	{ g }
 }
 

@@ -10,8 +10,11 @@ int main ()
 #line 11 "conditions/condtype_cs.c"
 {
 	unsigned char yych;
-	if (YYGETCONDITION() < 1) goto yyc_a;
-	else goto yyc_b;
+	if (YYGETCONDITION() < 1) {
+		goto yyc_a;
+	} else {
+		goto yyc_b;
+	}
 /* *********************************** */
 yyc_a:
 	yych = *YYCURSOR;
@@ -20,7 +23,7 @@ yy1:
 	++YYCURSOR;
 #line 10 "conditions/condtype_cs.re"
 	{}
-#line 24 "conditions/condtype_cs.c"
+#line 27 "conditions/condtype_cs.c"
 /* *********************************** */
 yyc_b:
 	yych = *YYCURSOR;
@@ -29,7 +32,7 @@ yy3:
 	++YYCURSOR;
 #line 11 "conditions/condtype_cs.re"
 	{}
-#line 33 "conditions/condtype_cs.c"
+#line 36 "conditions/condtype_cs.c"
 }
 #line 12 "conditions/condtype_cs.re"
 
@@ -37,4 +40,4 @@ yy3:
 }
 conditions/condtype_cs.re:7:0: warning: control flow in condition 'a' is undefined for strings that match '[\x0-\x60\x62-\xFF]', use default rule '*' [-Wundefined-control-flow]
 conditions/condtype_cs.re:7:0: warning: control flow in condition 'b' is undefined for strings that match '[\x0-\x61\x63-\xFF]', use default rule '*' [-Wundefined-control-flow]
-conditions/condtype_cs.re:7:0: warning: condition numbers may change, use `conditions` block to generate reliable condition identifiers [-Wcondition-order]
+conditions/condtype_cs.re:7:0: warning: condition numbers may change, use '/*!conditions:re2c*/' directive to generate reliable condition identifiers [-Wcondition-order]

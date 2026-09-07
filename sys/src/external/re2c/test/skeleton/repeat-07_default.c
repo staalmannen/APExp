@@ -5,13 +5,21 @@
 #include <stdlib.h> /* malloc, free */
 #include <string.h> /* memcpy */
 
-static void* read_file(const char* fname, size_t unit, size_t padding, size_t* pfsize) {
+static void *read_file
+    ( const char *fname
+    , size_t unit
+    , size_t padding
+    , size_t *pfsize
+    )
+{
     void *buffer = NULL;
     size_t fsize = 0;
 
     /* open file */
     FILE *f = fopen(fname, "rb");
-    if (f == NULL) goto error;
+    if (f == NULL) {
+        goto error;
+    }
 
     /* get file size */
     fseek(f, 0, SEEK_END);
@@ -20,10 +28,14 @@ static void* read_file(const char* fname, size_t unit, size_t padding, size_t* p
 
     /* allocate memory for file and padding */
     buffer = malloc(unit * (fsize + padding));
-    if (buffer == NULL) goto error;
+    if (buffer == NULL) {
+        goto error;
+    }
 
     /* read the whole file in memory */
-    if (fread(buffer, unit, fsize, f) != fsize) goto error;
+    if (fread(buffer, unit, fsize, f) != fsize) {
+        goto error;
+    }
 
     fclose(f);
     *pfsize = fsize;
@@ -32,7 +44,9 @@ static void* read_file(const char* fname, size_t unit, size_t padding, size_t* p
 error:
     fprintf(stderr, "error: cannot read file '%s'\n", fname);
     free(buffer);
-    if (f != NULL) fclose(f);
+    if (f != NULL) {
+        fclose(f);
+    }
     return NULL;
 }
 
@@ -43,9 +57,16 @@ error:
 #define YYSHIFT(o) cursor += o
 #define YYLESSTHAN(n) (limit - cursor) < n
 #define YYFILL(n) { goto loop_end; }
-#define YYEND() limit <= cursor
 
-static int action_line16(unsigned* pkix, const YYKEYTYPE* keys, const YYCTYPE* start, const YYCTYPE* token, const YYCTYPE** cursor, YYKEYTYPE rule_act) {
+static int action_line16
+    ( unsigned *pkix
+    , const YYKEYTYPE *keys
+    , const YYCTYPE *start
+    , const YYCTYPE *token
+    , const YYCTYPE **cursor
+    , YYKEYTYPE rule_act
+    )
+{
     const unsigned kix = *pkix;
     const long pos = token - start;
     const long len_act = *cursor - token;
@@ -53,31 +74,43 @@ static int action_line16(unsigned* pkix, const YYKEYTYPE* keys, const YYCTYPE* s
     const YYKEYTYPE rule_exp = keys[kix + 2];
     *pkix = kix + 3;
     if (rule_exp == 255) {
-        fprintf(stderr,
-            "warning: lex_line16: control flow is undefined"
-            " for input at position %ld, rerun re2c with '-W'\n");
+        fprintf
+            ( stderr
+            , "warning: lex_line16: control flow is undefined"
+                " for input at position %ld, rerun re2c with '-W'\n"
+            , pos
+            );
     }
     if (len_act == len_exp && rule_act == rule_exp) {
         const YYKEYTYPE offset = keys[kix];
         *cursor = token + offset;
         return 0;
     } else {
-        fprintf(stderr,
-            "error: lex_line16: at position %ld (key %u):\n"
-            "\texpected: match length %ld, rule %u\n"
-            "\tactual:   match length %ld, rule %u\n",
-            pos, kix, len_exp, rule_exp, len_act, rule_act);
+        fprintf
+            ( stderr
+            , "error: lex_line16: at position %ld (key %u):\n"
+                "\texpected: match length %ld, rule %u\n"
+                "\tactual:   match length %ld, rule %u\n"
+            , pos
+            , kix
+            , len_exp
+            , rule_exp
+            , len_act
+            , rule_act
+            );
         return 1;
     }
 }
 
-static int check_key_count_line16(unsigned have, unsigned used, unsigned need) {
+static int check_key_count_line16(unsigned have, unsigned used, unsigned need)
+{
     if (used + need <= have) return 0;
     fprintf(stderr, "error: lex_line16: not enough keys\n");
     return 1;
 }
 
-int lex_line16() {
+int lex_line16()
+{
     const size_t padding = 1; /* YYMAXFILL */
     int status = 0;
     size_t input_len = 0;
@@ -90,13 +123,23 @@ int lex_line16() {
     const YYCTYPE *eof = NULL;
     unsigned int i = 0;
 
-    input = (YYCTYPE *) read_file("skeleton/repeat-07_default.c.line16.input", sizeof (YYCTYPE), padding, &input_len);
+    input = (YYCTYPE *) read_file
+        ( "skeleton/repeat-07_default.c.line16.input"
+        , sizeof (YYCTYPE)
+        , padding
+        , &input_len
+        );
     if (input == NULL) {
         status = 1;
         goto end;
     }
 
-    keys = (YYKEYTYPE *) read_file("skeleton/repeat-07_default.c.line16.keys", sizeof (YYKEYTYPE), 0, &keys_count);
+    keys = (YYKEYTYPE *) read_file
+        ( "skeleton/repeat-07_default.c.line16.keys"
+        , sizeof (YYKEYTYPE)
+        , 0
+        , &keys_count
+        );
     if (keys == NULL) {
         status = 1;
         goto end;
@@ -116,7 +159,7 @@ loop:
         if (YYLESSTHAN(1)) YYFILL(1);
         yych = YYPEEK();
         {
-            static const void* yytarget[256] = {
+            static void *yytarget[256] = {
                 &&yy1, &&yy1, &&yy1, &&yy1, &&yy1, &&yy1, &&yy1, &&yy1,
                 &&yy1, &&yy1, &&yy2, &&yy1, &&yy1, &&yy1, &&yy1, &&yy1,
                 &&yy1, &&yy1, &&yy1, &&yy1, &&yy1, &&yy1, &&yy1, &&yy1,
@@ -223,9 +266,16 @@ end:
 #define YYSHIFT(o) cursor += o
 #define YYLESSTHAN(n) (limit - cursor) < n
 #define YYFILL(n) { goto loop_end; }
-#define YYEND() limit <= cursor
 
-static int action_line34(unsigned* pkix, const YYKEYTYPE* keys, const YYCTYPE* start, const YYCTYPE* token, const YYCTYPE** cursor, YYKEYTYPE rule_act) {
+static int action_line34
+    ( unsigned *pkix
+    , const YYKEYTYPE *keys
+    , const YYCTYPE *start
+    , const YYCTYPE *token
+    , const YYCTYPE **cursor
+    , YYKEYTYPE rule_act
+    )
+{
     const unsigned kix = *pkix;
     const long pos = token - start;
     const long len_act = *cursor - token;
@@ -233,31 +283,43 @@ static int action_line34(unsigned* pkix, const YYKEYTYPE* keys, const YYCTYPE* s
     const YYKEYTYPE rule_exp = keys[kix + 2];
     *pkix = kix + 3;
     if (rule_exp == 255) {
-        fprintf(stderr,
-            "warning: lex_line34: control flow is undefined"
-            " for input at position %ld, rerun re2c with '-W'\n");
+        fprintf
+            ( stderr
+            , "warning: lex_line34: control flow is undefined"
+                " for input at position %ld, rerun re2c with '-W'\n"
+            , pos
+            );
     }
     if (len_act == len_exp && rule_act == rule_exp) {
         const YYKEYTYPE offset = keys[kix];
         *cursor = token + offset;
         return 0;
     } else {
-        fprintf(stderr,
-            "error: lex_line34: at position %ld (key %u):\n"
-            "\texpected: match length %ld, rule %u\n"
-            "\tactual:   match length %ld, rule %u\n",
-            pos, kix, len_exp, rule_exp, len_act, rule_act);
+        fprintf
+            ( stderr
+            , "error: lex_line34: at position %ld (key %u):\n"
+                "\texpected: match length %ld, rule %u\n"
+                "\tactual:   match length %ld, rule %u\n"
+            , pos
+            , kix
+            , len_exp
+            , rule_exp
+            , len_act
+            , rule_act
+            );
         return 1;
     }
 }
 
-static int check_key_count_line34(unsigned have, unsigned used, unsigned need) {
+static int check_key_count_line34(unsigned have, unsigned used, unsigned need)
+{
     if (used + need <= have) return 0;
     fprintf(stderr, "error: lex_line34: not enough keys\n");
     return 1;
 }
 
-int lex_line34() {
+int lex_line34()
+{
     const size_t padding = 1; /* YYMAXFILL */
     int status = 0;
     size_t input_len = 0;
@@ -270,7 +332,12 @@ int lex_line34() {
     const YYCTYPE *eof = NULL;
     unsigned int i = 0;
 
-    input = (YYCTYPE *) read_file("skeleton/repeat-07_default.c.line34.input", sizeof (YYCTYPE), padding, &input_len);
+    input = (YYCTYPE *) read_file
+        ( "skeleton/repeat-07_default.c.line34.input"
+        , sizeof (YYCTYPE)
+        , padding
+        , &input_len
+        );
     if (input == NULL) {
         status = 1;
         goto end;
@@ -282,7 +349,12 @@ int lex_line34() {
         input[i] = p[0] + (p[1] << 8u);
     }
 
-    keys = (YYKEYTYPE *) read_file("skeleton/repeat-07_default.c.line34.keys", sizeof (YYKEYTYPE), 0, &keys_count);
+    keys = (YYKEYTYPE *) read_file
+        ( "skeleton/repeat-07_default.c.line34.keys"
+        , sizeof (YYKEYTYPE)
+        , 0
+        , &keys_count
+        );
     if (keys == NULL) {
         status = 1;
         goto end;
@@ -303,39 +375,39 @@ loop:
         yych = YYPEEK();
         if (yych & ~0xFF) {
         } else {
-            static const void* yytarget[256] = {
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9, &&yy10,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9, &&yy11,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9, &&yy12, &&yy13, &&yy14, &&yy15,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
-                 &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9
+            static void *yytarget[256] = {
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy10, &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy11, &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy12, &&yy13, &&yy14, &&yy15, &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,
+                &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9,  &&yy9
             };
             goto *yytarget[yych];
         }
@@ -410,9 +482,16 @@ end:
 #define YYSHIFT(o) cursor += o
 #define YYLESSTHAN(n) (limit - cursor) < n
 #define YYFILL(n) { goto loop_end; }
-#define YYEND() limit <= cursor
 
-static int action_line52(unsigned* pkix, const YYKEYTYPE* keys, const YYCTYPE* start, const YYCTYPE* token, const YYCTYPE** cursor, YYKEYTYPE rule_act) {
+static int action_line52
+    ( unsigned *pkix
+    , const YYKEYTYPE *keys
+    , const YYCTYPE *start
+    , const YYCTYPE *token
+    , const YYCTYPE **cursor
+    , YYKEYTYPE rule_act
+    )
+{
     const unsigned kix = *pkix;
     const long pos = token - start;
     const long len_act = *cursor - token;
@@ -420,31 +499,43 @@ static int action_line52(unsigned* pkix, const YYKEYTYPE* keys, const YYCTYPE* s
     const YYKEYTYPE rule_exp = keys[kix + 2];
     *pkix = kix + 3;
     if (rule_exp == 255) {
-        fprintf(stderr,
-            "warning: lex_line52: control flow is undefined"
-            " for input at position %ld, rerun re2c with '-W'\n");
+        fprintf
+            ( stderr
+            , "warning: lex_line52: control flow is undefined"
+                " for input at position %ld, rerun re2c with '-W'\n"
+            , pos
+            );
     }
     if (len_act == len_exp && rule_act == rule_exp) {
         const YYKEYTYPE offset = keys[kix];
         *cursor = token + offset;
         return 0;
     } else {
-        fprintf(stderr,
-            "error: lex_line52: at position %ld (key %u):\n"
-            "\texpected: match length %ld, rule %u\n"
-            "\tactual:   match length %ld, rule %u\n",
-            pos, kix, len_exp, rule_exp, len_act, rule_act);
+        fprintf
+            ( stderr
+            , "error: lex_line52: at position %ld (key %u):\n"
+                "\texpected: match length %ld, rule %u\n"
+                "\tactual:   match length %ld, rule %u\n"
+            , pos
+            , kix
+            , len_exp
+            , rule_exp
+            , len_act
+            , rule_act
+            );
         return 1;
     }
 }
 
-static int check_key_count_line52(unsigned have, unsigned used, unsigned need) {
+static int check_key_count_line52(unsigned have, unsigned used, unsigned need)
+{
     if (used + need <= have) return 0;
     fprintf(stderr, "error: lex_line52: not enough keys\n");
     return 1;
 }
 
-int lex_line52() {
+int lex_line52()
+{
     const size_t padding = 1; /* YYMAXFILL */
     int status = 0;
     size_t input_len = 0;
@@ -457,7 +548,12 @@ int lex_line52() {
     const YYCTYPE *eof = NULL;
     unsigned int i = 0;
 
-    input = (YYCTYPE *) read_file("skeleton/repeat-07_default.c.line52.input", sizeof (YYCTYPE), padding, &input_len);
+    input = (YYCTYPE *) read_file
+        ( "skeleton/repeat-07_default.c.line52.input"
+        , sizeof (YYCTYPE)
+        , padding
+        , &input_len
+        );
     if (input == NULL) {
         status = 1;
         goto end;
@@ -469,7 +565,12 @@ int lex_line52() {
         input[i] = p[0] + (p[1] << 8u) + (p[2] << 16u) + (p[3] << 24u);
     }
 
-    keys = (YYKEYTYPE *) read_file("skeleton/repeat-07_default.c.line52.keys", sizeof (YYKEYTYPE), 0, &keys_count);
+    keys = (YYKEYTYPE *) read_file
+        ( "skeleton/repeat-07_default.c.line52.keys"
+        , sizeof (YYKEYTYPE)
+        , 0
+        , &keys_count
+        );
     if (keys == NULL) {
         status = 1;
         goto end;
@@ -490,7 +591,7 @@ loop:
         yych = YYPEEK();
         if (yych & ~0xFF) {
         } else {
-            static const void* yytarget[256] = {
+            static void *yytarget[256] = {
                 &&yy17, &&yy17, &&yy17, &&yy17, &&yy17, &&yy17, &&yy17, &&yy17,
                 &&yy17, &&yy17, &&yy18, &&yy17, &&yy17, &&yy17, &&yy17, &&yy17,
                 &&yy17, &&yy17, &&yy17, &&yy17, &&yy17, &&yy17, &&yy17, &&yy17,
@@ -590,10 +691,17 @@ end:
 #undef YYLESSTHAN
 #undef YYFILL
 
-int main() {
-    if (lex_line16() != 0) return 1;
-    if (lex_line34() != 0) return 1;
-    if (lex_line52() != 0) return 1;
+int main()
+{
+    if (lex_line16() != 0) {
+        return 1;
+    }
+    if (lex_line34() != 0) {
+        return 1;
+    }
+    if (lex_line52() != 0) {
+        return 1;
+    }
     return 0;
 }
  	 !"#$%&'()*+,-./023456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`efghijklmnopqrstuvwxyz{|}~€‚ƒ„…†‡ˆ‰Š‹Œ‘’“”•–—˜™š›œŸ ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ØÙÚÛÜİŞßàáâãäåæçèéêëìíîïğñòóôõö÷øùúûüışÿ

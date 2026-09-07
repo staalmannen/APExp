@@ -90,6 +90,7 @@ const char * STATUSES[] = {
 static status_t lex(input_t &in)
 {
 switch (YYGETSTATE()) {
+	default: goto yy0;
 	case 0:
 		if (in.lim <= in.cur) goto yy28;
 		goto yyFillLabel0;
@@ -153,8 +154,8 @@ switch (YYGETSTATE()) {
 	case 20:
 		if (in.lim <= in.cur) goto yy14;
 		goto yyFillLabel20;
-	default: goto yy0;
 }
+
 
 
 yy0:

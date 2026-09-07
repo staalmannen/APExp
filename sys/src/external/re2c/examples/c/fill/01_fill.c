@@ -7,112 +7,112 @@
 
 #define BUFSIZE 4095
 
-typedef struct {
+struct Input {
     FILE *file;
     char buf[BUFSIZE + 1], *lim, *cur, *mar, *tok; // +1 for sentinel
-    int eof;
-} Input;
+    bool eof;
+};
 
-static int fill(Input *in) {
-    if (in->eof) return 1;
+static int fill(Input &in) {
+    if (in.eof) return 1;
 
-    const size_t shift = in->tok - in->buf;
-    const size_t used = in->lim - in->tok;
+    const size_t shift = in.tok - in.buf;
+    const size_t used = in.lim - in.tok;
 
     // Error: lexeme too long. In real life could reallocate a larger buffer.
     if (shift < 1) return 2;
 
     // Shift buffer contents (discard everything up to the current token).
-    memmove(in->buf, in->tok, used);
-    in->lim -= shift;
-    in->cur -= shift;
-    in->mar -= shift;
-    in->tok -= shift;
+    memmove(in.buf, in.tok, used);
+    in.lim -= shift;
+    in.cur -= shift;
+    in.mar -= shift;
+    in.tok -= shift;
 
     // Fill free space at the end of buffer with new data from file.
-    in->lim += fread(in->lim, 1, BUFSIZE - used, in->file);
-    in->lim[0] = 0;
-    in->eof = in->lim < in->buf + BUFSIZE;
+    in.lim += fread(in.lim, 1, BUFSIZE - used, in.file);
+    in.lim[0] = 0;
+    in.eof = in.lim < in.buf + BUFSIZE;
     return 0;
 }
 
-static int lex(Input *in) {
+static int lex(Input &in) {
     int count = 0;
-loop:
-        in->tok = in->cur;
+    for (;;) {
+        in.tok = in.cur;
     
 #line 45 "c/fill/01_fill.c"
 {
-	unsigned char yych;
+	char yych;
 yyFillLabel0:
-	yych = *in->cur;
+	yych = *in.cur;
 	switch (yych) {
 		case ' ': goto yy3;
 		case '\'': goto yy5;
 		default:
-			if (in->lim <= in->cur) {
+			if (in.lim <= in.cur) {
 				if (fill(in) == 0) goto yyFillLabel0;
 				goto yy10;
 			}
 			goto yy1;
 	}
 yy1:
-	++in->cur;
+	++in.cur;
 yy2:
 #line 52 "c/fill/01_fill.re"
 	{ return -1; }
 #line 65 "c/fill/01_fill.c"
 yy3:
-	++in->cur;
+	++in.cur;
 yyFillLabel1:
-	yych = *in->cur;
+	yych = *in.cur;
 	switch (yych) {
 		case ' ': goto yy3;
 		default:
-			if (in->lim <= in->cur) {
+			if (in.lim <= in.cur) {
 				if (fill(in) == 0) goto yyFillLabel1;
 			}
 			goto yy4;
 	}
 yy4:
 #line 55 "c/fill/01_fill.re"
-	{ goto loop; }
+	{ continue; }
 #line 81 "c/fill/01_fill.c"
 yy5:
-	in->mar = ++in->cur;
+	in.mar = ++in.cur;
 yyFillLabel2:
-	yych = *in->cur;
+	yych = *in.cur;
 	if (yych >= 0x01) goto yy7;
-	if (in->lim <= in->cur) {
+	if (in.lim <= in.cur) {
 		if (fill(in) == 0) goto yyFillLabel2;
 		goto yy2;
 	}
 yy6:
-	++in->cur;
+	++in.cur;
 yyFillLabel3:
-	yych = *in->cur;
+	yych = *in.cur;
 yy7:
 	switch (yych) {
 		case '\'': goto yy8;
 		case '\\': goto yy9;
 		default:
-			if (in->lim <= in->cur) {
+			if (in.lim <= in.cur) {
 				if (fill(in) == 0) goto yyFillLabel3;
 				goto yy11;
 			}
 			goto yy6;
 	}
 yy8:
-	++in->cur;
+	++in.cur;
 #line 54 "c/fill/01_fill.re"
-	{ ++count; goto loop; }
+	{ ++count; continue; }
 #line 110 "c/fill/01_fill.c"
 yy9:
-	++in->cur;
+	++in.cur;
 yyFillLabel4:
-	yych = *in->cur;
+	yych = *in.cur;
 	if (yych <= 0x00) {
-		if (in->lim <= in->cur) {
+		if (in.lim <= in.cur) {
 			if (fill(in) == 0) goto yyFillLabel4;
 			goto yy11;
 		}
@@ -124,11 +124,12 @@ yy10:
 	{ return count; }
 #line 126 "c/fill/01_fill.c"
 yy11:
-	in->cur = in->mar;
+	in.cur = in.mar;
 	goto yy2;
 }
 #line 56 "c/fill/01_fill.re"
 
+    }
 }
 
 int main() {
@@ -153,7 +154,7 @@ int main() {
     in.lim[0] = 0;
 
     // Run the lexer.
-    assert(lex(&in) == count);
+    assert(lex(in) == count);
 
     // Cleanup: remove input file.
     fclose(in.file);

@@ -13,7 +13,7 @@
 // not a block, just a %{ in a string
 const char *s = "%{ * {} %}";
 
-// %{ is not a block start, as it's not followed by a newline
+// re2c erroneously thinks %{ in a string is a block start
 const char *s = "begin...\
 %{ * {} %}...end";
 
@@ -30,14 +30,6 @@ const char *s = "begin...\
 // not a block, just a %{ in a oneline comment
 // %{ * {} %}
 
-// %{ is not a block start, as it's not followed by a newline
+// re2c erroneously thinks %{ in a macro is a block start
 #define X \
   %{ * {} %}
-
-// empty block
-%{
-%}
-
-// %{ is not a block start, as it's not followed by a newline
-%{%}
-

@@ -3,17 +3,20 @@
 
 #include "src/dfa/determinization.h"
 #include "src/dfa/tag_history.h"
+#include "src/debug/debug.h"
 #include "src/options/opt.h"
 #include "src/util/attribute.h"
-#include "src/util/check.h"
+
 
 namespace re2c {
 
 // maximum 29-bit (we have 30 bits, but highest must be non-negative)
-static constexpr int32_t MAX_RHO = 0x1fffFFFF;
+static const int32_t MAX_RHO = 0x1fffFFFF;
 
-template<typename ctx_t> static void compute_prectable_naive(ctx_t& ctx) RE2C_ATTR((used));
-template<typename ctx_t> static void compute_prectable_complex(ctx_t& ctx) RE2C_ATTR((used));
+template<typename ctx_t>
+static void compute_prectable_naive(ctx_t &ctx) RE2C_ATTR((used));
+template<typename ctx_t>
+static void compute_prectable_complex(ctx_t &ctx) RE2C_ATTR((used));
 
 // we *do* want this to be inlined
 static inline int32_t leftprec(tag_info_t info1, tag_info_t info2, bool last1, bool last2);
@@ -22,11 +25,10 @@ static inline int32_t unpack_leftmost(int32_t packed);
 static inline int32_t pack(int32_t longest, int32_t leftmost);
 
 template<typename ctx_t>
-int32_t phistory_t::precedence(ctx_t& ctx,
-                               const typename ctx_t::conf_t& x,
-                               const typename ctx_t::conf_t& y,
-                               int32_t& prec1,
-                               int32_t& prec2) {
+int32_t phistory_t::precedence(ctx_t &ctx
+    , const typename ctx_t::conf_t &x, const typename ctx_t::conf_t &y
+    , int32_t &prec1, int32_t &prec2)
+{
     prec1 = prec2 = MAX_RHO;
     int32_t prec = 0;
 
@@ -37,8 +39,8 @@ int32_t phistory_t::precedence(ctx_t& ctx,
         return 0;
     }
 
-    const std::vector<Tag>& tags = ctx.tags;
-    typename ctx_t::history_t& hist = ctx.history;
+    const std::vector<Tag> &tags = ctx.nfa.tags;
+    typename ctx_t::history_t &hist = ctx.history;
 
     const bool fork_frame = orig1 == orig2;
     if (!fork_frame) {
@@ -51,12 +53,13 @@ int32_t phistory_t::precedence(ctx_t& ctx,
     int32_t i1 = idx1, i2 = idx2;
     for (; i1 != i2; ) {
         if (i1 > i2) {
-            const typename ctx_t::history_t::node_t& n = hist.node(i1);
+            const typename ctx_t::history_t::node_t &n = hist.node(i1);
             info1 = n.info;
             prec1 = std::min(prec1, tags[info1.idx].height);
             i1 = n.pred;
-        } else {
-            const typename ctx_t::history_t::node_t& n = hist.node(i2);
+        }
+        else {
+            const typename ctx_t::history_t::node_t &n = hist.node(i2);
             info2 = n.info;
             prec2 = std::min(prec2, tags[info2.idx].height);
             i2 = n.pred;
@@ -64,7 +67,7 @@ int32_t phistory_t::precedence(ctx_t& ctx,
         DINCCOUNT_CLLENGTH(ctx, 1);
     }
     if (i1 != HROOT) {
-        DCHECK(fork_frame);
+        DASSERT(fork_frame);
         const int32_t h = tags[hist.node(i1).info.idx].height;
         prec1 = std::min(prec1, h);
         prec2 = std::min(prec2, h);
@@ -76,10 +79,12 @@ int32_t phistory_t::precedence(ctx_t& ctx,
     if (prec1 < prec2) return  1;
 
     // leftmost precedence
-    return !fork_frame ? prec : leftprec(info1, info2, i1 == idx1, i2 == idx2);
+    return !fork_frame ? prec
+        : leftprec(info1, info2, i1 == idx1, i2 == idx2);
 }
 
-int32_t leftprec(tag_info_t info1, tag_info_t info2, bool last1, bool last2) {
+int32_t leftprec(tag_info_t info1, tag_info_t info2, bool last1, bool last2)
+{
     // equal => not less
     if (last1 && last2) return 0;
 
@@ -91,56 +96,49 @@ int32_t leftprec(tag_info_t info1, tag_info_t info2, bool last1, bool last2) {
     const bool neg1 = info1.neg, neg2 = info2.neg;
 
     // can't be both negative
-    DCHECK(!(neg1 && neg2));
+    DASSERT(!(neg1 && neg2));
 
     // positive vs negative: positive wins
     if (neg1) return  1;
     if (neg2) return -1;
 
     // can't be both closing
-    DCHECK(!(tag1 % 2 == 1 && tag2 % 2 == 1));
+    DASSERT(!(tag1 % 2 == 1 && tag2 % 2 == 1));
 
     // closing vs opening: closing wins
     if (tag1 % 2 == 1) return -1;
     if (tag2 % 2 == 1) return  1;
 
-    // positive vs positive: smaller wins (this case is only possible because multiple top-level
-    // regexps don't have proper negative tags)
+    // positive vs positive: smaller wins
+    // (this case is only possible because multiple
+    // top-level RE don't have proper negative tags)
     if (tag1 < tag2) return -1;
     if (tag1 > tag2) return  1;
 
-    UNREACHABLE();
+    DASSERT(false);
+    return 0;
 }
 
 template<typename ctx_t>
-void compute_prectable(ctx_t& ctx) {
-    switch (ctx.opts->posix_prectable) {
-    case PosixPrectable::COMPLEX:
-        compute_prectable_complex(ctx);
-        break;
-    case PosixPrectable::NAIVE:
-        compute_prectable_naive(ctx);
-        break;
+void compute_prectable(ctx_t &ctx)
+{
+    switch (ctx.dc_opts->posix_prectable) {
+    case POSIX_PRECTABLE_COMPLEX: compute_prectable_complex(ctx); break;
+    case POSIX_PRECTABLE_NAIVE:   compute_prectable_naive(ctx);   break;
     }
-    ctx.kbufs.prectbl = ctx.newprectbl;
 }
 
-// Naive O(m^2*t) algorithm for computation of POSIX precedence table, where m is the number of
-// states in TNFA and t is the number of tags. If t ~~ m, the complexity is O(n^3); one example that
-// exhibits cubic behaviour is ((a?){1,N})*. In this example closure has O(m) states, and the
-// compared histories have O(N) length.
+// Naive O(m^2*t) algorithm for computation of POSIX precedence table, where
+// m is the number of states in TNFA and t is the number of tags. If t ~~ m,
+// the complexity is O(n^3); one example that exhibits cubic behaviour is
+// ((a?){1,N})*. In this example closure has O(m) states, and the compared
+// histories have O(N) length.
 template<typename ctx_t>
-void compute_prectable_naive(ctx_t& ctx) {
-#ifndef RE2C_LIB
-    TnfaState** state = ctx.kbufs.state;
-    const uint32_t* origin = ctx.kbufs.origin;
-    const hidx_t* thist = ctx.kbufs.thist;
-    const size_t newdim = ctx.kbufs.size;
-#else
-    const typename ctx_t::confset_t& state = ctx.state;
+void compute_prectable_naive(ctx_t &ctx)
+{
+    const typename ctx_t::confset_t &state = ctx.state;
+    int32_t *newtbl = ctx.newprectbl;
     const size_t newdim = state.size();
-#endif
-    int32_t* newtbl = ctx.newprectbl;
 
     const int32_t p0 = pack(MAX_RHO, 0);
 
@@ -148,60 +146,48 @@ void compute_prectable_naive(ctx_t& ctx) {
         newtbl[i * newdim + i] = p0;
         for (uint32_t j = i + 1; j < newdim; ++j) {
             int32_t prec1, prec2;
-#ifndef RE2C_LIB
-            typename ctx_t::conf_t c1{state[i], origin[i], thist[i]};
-            typename ctx_t::conf_t c2{state[j], origin[j], thist[j]};
-            int32_t prec = ctx_t::history_t::precedence(ctx, c1, c2, prec1, prec2);
-#else
-            int32_t prec = ctx_t::history_t::precedence(ctx, state[i], state[j], prec1, prec2);
-#endif
+            int32_t prec = ctx_t::history_t::precedence(ctx, state[i], state[j],
+                prec1, prec2);
             newtbl[i * newdim + j] = pack(prec1, prec);
             newtbl[j * newdim + i] = pack(prec2, -prec);
         }
     }
 }
 
-// Complex O(m^2) algorithm for computation of POSIX precedence table, where m is the number of
-// states in TNFA.
+// Complex O(m^2) algorithm for computation of POSIX precedence table, where
+// m is the number of states in TNFA.
 template<typename ctx_t>
-void compute_prectable_complex(ctx_t& ctx) {
-#ifndef RE2C_LIB
-    const uint32_t* origin = ctx.kbufs.origin;
-    const hidx_t* thist = ctx.kbufs.thist;
-    const size_t newdim = ctx.kbufs.size;
-#else
-    const typename ctx_t::confset_t& state = ctx.state;
-    const size_t newdim = state.size();
-#endif
-    const size_t olddim = ctx.oldprecdim;
-    const prectable_t* oldtbl = ctx.oldprectbl;
-    prectable_t* newtbl = ctx.newprectbl;
-    const std::vector<Tag>& tags = ctx.tags;
-    typename ctx_t::history_t& history = ctx.history;
-    std::vector<uint32_t>& sortcores = ctx.sortcores;
-    std::vector<uint32_t>& fcount = ctx.fincount;
-    std::vector<int32_t>& stack = ctx.worklist;
-    histleaf_t* level = ctx.histlevel, *li, *lj, *lk, *le = level;
+void compute_prectable_complex(ctx_t &ctx)
+{
+    const typename ctx_t::confset_t &state = ctx.state;
+    const std::vector<Tag> &tags = ctx.nfa.tags;
+    typename ctx_t::history_t &history = ctx.history;
 
-    // Group core configurations by their history tree index, so that later while traversing the
-    // tree we will know at once which configurations (if any) are bound to the given tree node. We
-    // use counting sort, which requires additional memory, but is fast and conveniently creates an
+    const prectable_t *oldtbl = ctx.oldprectbl;
+    prectable_t *newtbl = ctx.newprectbl;
+    const size_t olddim = ctx.oldprecdim, newdim = state.size();
+
+    std::vector<uint32_t> &sortcores = ctx.sortcores;
+    std::vector<uint32_t> &fcount = ctx.fincount;
+    std::vector<int32_t> &stack = ctx.worklist;
+    histleaf_t *level = ctx.histlevel, *li, *lj, *lk, *le = level;
+
+    // Group core configurations by their history tree index, so that later
+    // while traversing the tree we will know at once which configurations
+    // (if any) are bound to the given tree node. We use counting sort, which
+    // requires additional memory, but is fast and conveniently creates an
     // array of boundaries in the sorted configuration array.
     uint32_t maxfin = 0;
     sortcores.resize(newdim);
-    for (size_t k = 0; k < newdim; ++k) {
-#ifndef RE2C_LIB
-        typename ctx_t::history_t::node_t& n = history.node(thist[k]);
-#else
-        typename ctx_t::history_t::node_t& n = history.node(state[k].thist);
-#endif
+    for (typename ctx_t::cconfiter_t c = state.begin(), e = state.end(); c != e; ++c) {
+        typename ctx_t::history_t::node_t &n = history.node(c->thist);
         if (n.finidx >= USED) {
             n.finidx = maxfin++;
             fcount[n.finidx] = 0;
 
             // mark all nodes down to root as used (unless marked already)
             for (int32_t i = n.pred; i >= HROOT; ) {
-                typename ctx_t::history_t::node_t& m = history.node(i);
+                typename ctx_t::history_t::node_t &m = history.node(i);
                 if (m.finidx <= USED) break;
                 m.finidx = USED;
                 i = m.pred;
@@ -213,24 +199,21 @@ void compute_prectable_complex(ctx_t& ctx) {
     for (size_t i = 1; i <= maxfin; ++i) {
         fcount[i] += fcount[i - 1];
     }
-    sortcores.resize(newdim);
+    sortcores.resize(state.size());
     for (uint32_t i = static_cast<uint32_t>(newdim); i --> 0; ) {
-#ifndef RE2C_LIB
-        sortcores[--fcount[history.node(thist[i]).finidx]] = i;
-#else
         sortcores[--fcount[history.node(state[i].thist).finidx]] = i;
-#endif
     }
 
-    // Depth-first traversal of the history tree. During traversal we grow an array of items (one
-    // item per core configuration). Items are added in tree nodes that have core configurations
-    // associated with them. Each item represents one history. Items have immutable part (core ID,
-    // origin) and mutable part (current minimal height, current tree index) that changes as we
-    // return down the tree.
+    // Depth-first traversal of the history tree. During traversal we grow
+    // an array of items (one item per core configuration). Items are added
+    // in tree nodes that have core configurations associated with them.
+    // Each item represents one history. Items have immutable part (core ID,
+    // origin) and mutable part (current minimal height, current tree index)
+    // that changes as we return down the tree.
     stack.push_back(0);
     while (!stack.empty()) {
         const int32_t n = stack.back();
-        typename ctx_t::history_t::node_t& node = history.node(n);
+        typename ctx_t::history_t::node_t &node = history.node(n);
         const uint32_t fidx = node.finidx;
 
         if (fidx == NONFIN) {
@@ -241,7 +224,7 @@ void compute_prectable_complex(ctx_t& ctx) {
 
         if (node.next != -1) {
             // start or continue visiting subtrees rooted at this node
-            const typename ctx_t::history_t::arc_t& arc = history.arc(node.next);
+            const typename ctx_t::history_t::arc_t &arc = history.arc(node.next);
             stack.push_back(arc.node);
             node.next = arc.next;
             continue;
@@ -255,11 +238,8 @@ void compute_prectable_complex(ctx_t& ctx) {
             // this node has leaf configurations, add them to level
             for (uint32_t k = fcount[fidx], e = fcount[fidx + 1]; k < e; ++k) {
                 const uint32_t j = sortcores[k];
-#ifndef RE2C_LIB
-                *level++ = {j, origin[j], HROOT, h};
-#else
-                *level++ = {j, state[j].origin, HROOT, h};
-#endif
+                const histleaf_t l = {j, state[j].origin, HROOT, h};
+                *level++ = l;
             }
 
             // compute precedence for newly added configurations
@@ -272,7 +252,8 @@ void compute_prectable_complex(ctx_t& ctx) {
                     if (fork) {
                         newtbl[cj * newdim + ck] = p0;
                         newtbl[ck * newdim + cj] = p0;
-                    } else {
+                    }
+                    else {
                         newtbl[cj * newdim + ck] = oldtbl[oj * olddim + ok];
                         newtbl[ck * newdim + cj] = oldtbl[ok * olddim + oj];
                     }
@@ -280,17 +261,18 @@ void compute_prectable_complex(ctx_t& ctx) {
             }
         }
 
-        // Each subtree appended a sequence of items to level. We can find sequence boundaries by
-        // looking at tree index of each item: it is equal to tree index of the corresponding
-        // subtree (except for the leaf items added at this node; but we know where they start).
+        // Each subtree appended a sequence of items to level. We can find
+        // sequence boundaries by looking at tree index of each item: it is
+        // equal to tree index of the corresponding subtree (except for the
+        // leaf items added at this node; but we know where they start).
 
-        // We must compute precedence for each pair of items from different sequences (including
-        // leaf items added at this node), but not within sequence boundaries: those histories fork
-        // higher up the subtree; their precedence has already been computed and must not be
-        // touched.
+        // We must compute precedence for each pair of items from different
+        // sequences (including leaf items added at this node), but not within
+        // sequence boundaries: those histories fork higher up the subtree;
+        // their precedence has already been computed and must not be touched.
 
         for (int32_t a = node.last; a != -1; ) {
-            const typename ctx_t::history_t::arc_t& arc = history.arc(a);
+            const typename ctx_t::history_t::arc_t &arc = history.arc(a);
             a = arc.prev;
 
             // for all the items of this subtree
@@ -314,13 +296,16 @@ void compute_prectable_complex(ctx_t& ctx) {
 
                     if (p1 > p2) {
                         p = -1;
-                    } else if (p1 < p2) {
+                    }
+                    else if (p1 < p2) {
                         p = 1;
-                    } else if (fork) {
+                    }
+                    else if (fork) {
                         const tag_info_t t1 = history.node(li->hidx).info;
                         const tag_info_t t2 = history.node(lj->hidx).info;
                         p = leftprec(t1, t2, t1 == NOINFO, t2 == NOINFO);
-                    } else {
+                    }
+                    else {
                         p = unpack_leftmost(oldtbl[oi * olddim + oj]);
                     }
 
@@ -330,8 +315,8 @@ void compute_prectable_complex(ctx_t& ctx) {
             }
         }
 
-        // Finally, downgrade tree index of all subtree items, making their origins
-        // indistinguishable from each other for the previous level.
+        // finally, downgrade tree index of all subtree items, making their
+        // origins indistinguishable from each other for the previous level
         for (lj = level - 1; lj > li; --lj) {
             lj->hidx = n;
         }
@@ -340,17 +325,20 @@ void compute_prectable_complex(ctx_t& ctx) {
     }
 }
 
-int32_t unpack_longest(int32_t packed) {
+int32_t unpack_longest(int32_t packed)
+{
     // take lower 30 bits and sign-extend
     return static_cast<int32_t>(static_cast<uint32_t>(packed) << 2u) >> 2u;
 }
 
-int32_t unpack_leftmost(int32_t packed) {
+int32_t unpack_leftmost(int32_t packed)
+{
     // take higher 2 bits and sign-extend
     return packed >> 30u;
 }
 
-int32_t pack(int32_t longest, int32_t leftmost) {
+int32_t pack(int32_t longest, int32_t leftmost)
+{
     // avoid signed overflows by using unsigned arithmetics
     uint32_t u_longest = static_cast<uint32_t>(longest);
     uint32_t u_leftmost = static_cast<uint32_t>(leftmost);
@@ -359,7 +347,8 @@ int32_t pack(int32_t longest, int32_t leftmost) {
     uint32_t u_packed = (u_longest & 0x3fffFFFF) | (u_leftmost << 30u);
     int32_t packed = static_cast<int32_t>(u_packed);
 
-    DCHECK(unpack_longest(packed) == longest && unpack_leftmost(packed) == leftmost);
+    DASSERT(unpack_longest(packed) == longest
+        && unpack_leftmost(packed) == leftmost);
 
     return packed;
 }

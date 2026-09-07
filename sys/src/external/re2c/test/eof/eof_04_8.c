@@ -890,8 +890,11 @@ yyFillLabel9:
 	}
 yy14:
 	in.cur = in.mar;
-	if (yyaccept == 0) goto yy2;
-	else goto yy6;
+	if (yyaccept == 0) {
+		goto yy2;
+	} else {
+		goto yy6;
+	}
 yy15:
 	++in.cur;
 yyFillLabel10:

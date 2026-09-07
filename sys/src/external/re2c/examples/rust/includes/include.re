@@ -1,15 +1,17 @@
-// re2rust $INPUT -o $OUTPUT --api simple
+// re2rust $INPUT -o $OUTPUT
 
 /*!include:re2c "definitions.rs" */
 
-fn lex(yyinput: &[u8]) -> Num {
-    assert_eq!(yyinput.last(), Some(&0)); // expect null-terminated input
-
-    let mut yycursor = 0;
-    let mut yymarker = 0;
+fn lex(str: &[u8]) -> Num {
+    let mut cur = 0;
+    let mut mar = 0;
     /*!re2c
         re2c:yyfill:enable = 0;
-        re2c:YYCTYPE = u8;
+        re2c:define:YYCTYPE   = u8;
+        re2c:define:YYPEEK    = "*str.get_unchecked(cur)";
+        re2c:define:YYSKIP    = "cur += 1;";
+        re2c:define:YYBACKUP  = "mar = cur;";
+        re2c:define:YYRESTORE = "cur = mar;";
 
         *      { return Num::NaN; }
         number { return Num::Int; }

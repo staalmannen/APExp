@@ -4,7 +4,7 @@ enum YYCONDTYPE {
 	yycb,
 	yycc,
 	yycd,
-	yycf
+	yycf,
 };
 
 
@@ -106,8 +106,11 @@ yy13:
 
 {
 	YYCTYPE yych;
-	if (YYGETCONDITION() < 1) goto yyc_b;
-	else goto yyc_f;
+	if (YYGETCONDITION() < 1) {
+		goto yyc_b;
+	} else {
+		goto yyc_f;
+	}
 /* *********************************** */
 yyc_b:
 	if (YYLIMIT <= YYCURSOR) YYFILL(1);

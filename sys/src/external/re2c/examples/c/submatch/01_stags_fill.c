@@ -77,7 +77,7 @@ static bool lex(Input &in, std::vector<SemVer> &vers) {
     
 #line 79 "c/submatch/01_stags_fill.c"
 {
-	unsigned char yych;
+	char yych;
 yyFillLabel0:
 	yych = *in.cur;
 	switch (yych) {
@@ -180,8 +180,8 @@ yyFillLabel4:
 	yych = *in.cur;
 	switch (yych) {
 		case '\n':
-			in.yyt2 = in.cur;
 			in.yyt3 = NULL;
+			in.yyt2 = in.cur;
 			goto yy8;
 		case '.':
 			in.yyt2 = in.cur;
@@ -207,8 +207,7 @@ yy8:
 	t2 = in.yyt1;
 	t3 = in.yyt2;
 	t4 = in.yyt3;
-	t1 = in.yyt1;
-	t1 -= 1;
+	t1 = in.yyt1 - 1;
 #line 77 "c/submatch/01_stags_fill.re"
 	{
             int major = s2n(in.tok, t1);
@@ -218,7 +217,7 @@ yy8:
             vers.push_back(ver);
             continue;
         }
-#line 222 "c/submatch/01_stags_fill.c"
+#line 221 "c/submatch/01_stags_fill.c"
 yy9:
 	++in.cur;
 yyFillLabel5:
@@ -267,7 +266,7 @@ yyFillLabel6:
 yy11:
 #line 85 "c/submatch/01_stags_fill.re"
 	{ return true; }
-#line 271 "c/submatch/01_stags_fill.c"
+#line 270 "c/submatch/01_stags_fill.c"
 }
 #line 87 "c/submatch/01_stags_fill.re"
 }
@@ -291,7 +290,7 @@ int main() {
     in.file = f;
     in.cur = in.mar = in.tok = in.lim = in.buf + BUFSIZE;
     
-#line 295 "c/submatch/01_stags_fill.c"
+#line 294 "c/submatch/01_stags_fill.c"
 in.yyt1 = in.lim;
 in.yyt2 = in.lim;
 in.yyt3 = in.lim;

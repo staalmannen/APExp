@@ -1,6 +1,6 @@
-# generated automatically by aclocal 1.18.1 -*- Autoconf -*-
+# generated automatically by aclocal 1.16.5 -*- Autoconf -*-
 
-# Copyright (C) 1996-2025 Free Software Foundation, Inc.
+# Copyright (C) 1996-2021 Free Software Foundation, Inc.
 
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -14,13 +14,13 @@
 m4_ifndef([AC_CONFIG_MACRO_DIRS], [m4_defun([_AM_CONFIG_MACRO_DIRS], [])m4_defun([AC_CONFIG_MACRO_DIRS], [_AM_CONFIG_MACRO_DIRS($@)])])
 m4_ifndef([AC_AUTOCONF_VERSION],
   [m4_copy([m4_PACKAGE_VERSION], [AC_AUTOCONF_VERSION])])dnl
-m4_if(m4_defn([AC_AUTOCONF_VERSION]), [2.72],,
-[m4_warning([this file was generated for autoconf 2.72.
+m4_if(m4_defn([AC_AUTOCONF_VERSION]), [2.71],,
+[m4_warning([this file was generated for autoconf 2.71.
 You have another version of autoconf.  It may work, but is not guaranteed to.
 If you have problems, you may need to regenerate the build system entirely.
 To do so, use the procedure documented by the package, typically 'autoreconf'.])])
 
-# Copyright (C) 2002-2025 Free Software Foundation, Inc.
+# Copyright (C) 2002-2021 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -32,10 +32,10 @@ To do so, use the procedure documented by the package, typically 'autoreconf'.])
 # generated from the m4 files accompanying Automake X.Y.
 # (This private macro should not be called outside this file.)
 AC_DEFUN([AM_AUTOMAKE_VERSION],
-[am__api_version='1.18'
+[am__api_version='1.16'
 dnl Some users find AM_AUTOMAKE_VERSION and mistake it for a way to
 dnl require some minimum version.  Point them to the right macro.
-m4_if([$1], [1.18.1], [],
+m4_if([$1], [1.16.5], [],
       [AC_FATAL([Do not call $0, use AM_INIT_AUTOMAKE([$1]).])])dnl
 ])
 
@@ -51,14 +51,14 @@ m4_define([_AM_AUTOCONF_VERSION], [])
 # Call AM_AUTOMAKE_VERSION and AM_AUTOMAKE_VERSION so they can be traced.
 # This function is AC_REQUIREd by AM_INIT_AUTOMAKE.
 AC_DEFUN([AM_SET_CURRENT_AUTOMAKE_VERSION],
-[AM_AUTOMAKE_VERSION([1.18.1])dnl
+[AM_AUTOMAKE_VERSION([1.16.5])dnl
 m4_ifndef([AC_AUTOCONF_VERSION],
   [m4_copy([m4_PACKAGE_VERSION], [AC_AUTOCONF_VERSION])])dnl
 _AM_AUTOCONF_VERSION(m4_defn([AC_AUTOCONF_VERSION]))])
 
 # AM_AUX_DIR_EXPAND                                         -*- Autoconf -*-
 
-# Copyright (C) 2001-2025 Free Software Foundation, Inc.
+# Copyright (C) 2001-2021 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -110,7 +110,7 @@ am_aux_dir=`cd "$ac_aux_dir" && pwd`
 
 # AM_COND_IF                                            -*- Autoconf -*-
 
-# Copyright (C) 2008-2025 Free Software Foundation, Inc.
+# Copyright (C) 2008-2021 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -147,7 +147,7 @@ fi[]dnl
 
 # AM_CONDITIONAL                                            -*- Autoconf -*-
 
-# Copyright (C) 1997-2025 Free Software Foundation, Inc.
+# Copyright (C) 1997-2021 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -178,7 +178,7 @@ AC_CONFIG_COMMANDS_PRE(
 Usually this means the macro was only invoked conditionally.]])
 fi])])
 
-# Copyright (C) 1999-2025 Free Software Foundation, Inc.
+# Copyright (C) 1999-2021 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -310,7 +310,7 @@ AC_CACHE_CHECK([dependency style of $depcc],
       # icc doesn't choke on unknown options, it will just issue warnings
       # or remarks (even with -Werror).  So we grep stderr for any message
       # that says an option was ignored or not supported.
-      # When given -MP, icc 7.0 and 7.1 complain thus:
+      # When given -MP, icc 7.0 and 7.1 complain thusly:
       #   icc: Command line warning: ignoring option '-M'; no argument required
       # The diagnosis changed in icc 8.0:
       #   icc: Command line remark: option '-MP' not supported
@@ -369,7 +369,7 @@ _AM_SUBST_NOTMAKE([am__nodep])dnl
 
 # Generate code to set up dependency tracking.              -*- Autoconf -*-
 
-# Copyright (C) 1999-2025 Free Software Foundation, Inc.
+# Copyright (C) 1999-2021 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -437,7 +437,7 @@ AC_DEFUN([AM_OUTPUT_DEPENDENCY_COMMANDS],
 
 # Do all the work for Automake.                             -*- Autoconf -*-
 
-# Copyright (C) 1996-2025 Free Software Foundation, Inc.
+# Copyright (C) 1996-2021 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -537,9 +537,8 @@ AC_REQUIRE([AC_PROG_AWK])dnl
 AC_REQUIRE([AC_PROG_MAKE_SET])dnl
 AC_REQUIRE([AM_SET_LEADING_DOT])dnl
 _AM_IF_OPTION([tar-ustar], [_AM_PROG_TAR([ustar])],
-  [_AM_IF_OPTION([tar-pax], [_AM_PROG_TAR([pax])],
-    [_AM_IF_OPTION([tar-v7], [_AM_PROG_TAR([v7])],
-      [_AM_PROG_TAR([ustar])])])])
+	      [_AM_IF_OPTION([tar-pax], [_AM_PROG_TAR([pax])],
+			     [_AM_PROG_TAR([v7])])])
 _AM_IF_OPTION([no-dependencies],,
 [AC_PROVIDE_IFELSE([AC_PROG_CC],
 		  [_AM_DEPENDENCIES([CC])],
@@ -572,7 +571,7 @@ if test -z "$CSCOPE"; then
 fi
 AC_SUBST([CSCOPE])
 
-AC_REQUIRE([_AM_SILENT_RULES])dnl
+AC_REQUIRE([AM_SILENT_RULES])dnl
 dnl The testsuite driver may need to know about EXEEXT, so add the
 dnl 'am__EXEEXT' conditional if _AM_COMPILER_EXEEXT was seen.  This
 dnl macro is hooked onto _AC_COMPILER_EXEEXT early, see below.
@@ -580,9 +579,47 @@ AC_CONFIG_COMMANDS_PRE(dnl
 [m4_provide_if([_AM_COMPILER_EXEEXT],
   [AM_CONDITIONAL([am__EXEEXT], [test -n "$EXEEXT"])])])dnl
 
-AC_REQUIRE([_AM_PROG_RM_F])
-AC_REQUIRE([_AM_PROG_XARGS_N])
+# POSIX will say in a future version that running "rm -f" with no argument
+# is OK; and we want to be able to make that assumption in our Makefile
+# recipes.  So use an aggressive probe to check that the usage we want is
+# actually supported "in the wild" to an acceptable degree.
+# See automake bug#10828.
+# To make any issue more visible, cause the running configure to be aborted
+# by default if the 'rm' program in use doesn't match our expectations; the
+# user can still override this though.
+if rm -f && rm -fr && rm -rf; then : OK; else
+  cat >&2 <<'END'
+Oops!
 
+Your 'rm' program seems unable to run without file operands specified
+on the command line, even when the '-f' option is present.  This is contrary
+to the behaviour of most rm programs out there, and not conforming with
+the upcoming POSIX standard: <http://austingroupbugs.net/view.php?id=542>
+
+Please tell bug-automake@gnu.org about your system, including the value
+of your $PATH and any error possibly output before this message.  This
+can help us improve future automake versions.
+
+END
+  if test x"$ACCEPT_INFERIOR_RM_PROGRAM" = x"yes"; then
+    echo 'Configuration will proceed anyway, since you have set the' >&2
+    echo 'ACCEPT_INFERIOR_RM_PROGRAM variable to "yes"' >&2
+    echo >&2
+  else
+    cat >&2 <<'END'
+Aborting the configuration process, to ensure you take notice of the issue.
+
+You can download and install GNU coreutils to get an 'rm' implementation
+that behaves properly: <https://www.gnu.org/software/coreutils/>.
+
+If you want to complete the configuration process using your problematic
+'rm' anyway, export the environment variable ACCEPT_INFERIOR_RM_PROGRAM
+to "yes", and re-run configure.
+
+END
+    AC_MSG_ERROR([Your 'rm' program is bad, sorry.])
+  fi
+fi
 dnl The trailing newline in this macro's definition is deliberate, for
 dnl backward compatibility and to allow trailing 'dnl'-style comments
 dnl after the AM_INIT_AUTOMAKE invocation. See automake bug#16841.
@@ -615,7 +652,7 @@ for _am_header in $config_headers :; do
 done
 echo "timestamp for $_am_arg" >`AS_DIRNAME(["$_am_arg"])`/stamp-h[]$_am_stamp_count])
 
-# Copyright (C) 2001-2025 Free Software Foundation, Inc.
+# Copyright (C) 2001-2021 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -636,7 +673,7 @@ if test x"${install_sh+set}" != xset; then
 fi
 AC_SUBST([install_sh])])
 
-# Copyright (C) 2003-2025 Free Software Foundation, Inc.
+# Copyright (C) 2003-2021 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -657,7 +694,7 @@ AC_SUBST([am__leading_dot])])
 
 # Check to see how 'make' treats includes.	            -*- Autoconf -*-
 
-# Copyright (C) 2001-2025 Free Software Foundation, Inc.
+# Copyright (C) 2001-2021 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -700,7 +737,7 @@ AC_SUBST([am__quote])])
 
 # Fake the existence of programs that GNU maintainers use.  -*- Autoconf -*-
 
-# Copyright (C) 1997-2025 Free Software Foundation, Inc.
+# Copyright (C) 1997-2021 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -734,7 +771,7 @@ fi
 
 # Helper functions for option handling.                     -*- Autoconf -*-
 
-# Copyright (C) 2001-2025 Free Software Foundation, Inc.
+# Copyright (C) 2001-2021 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -763,7 +800,7 @@ AC_DEFUN([_AM_SET_OPTIONS],
 AC_DEFUN([_AM_IF_OPTION],
 [m4_ifset(_AM_MANGLE_OPTION([$1]), [$2], [$3])])
 
-# Copyright (C) 1999-2025 Free Software Foundation, Inc.
+# Copyright (C) 1999-2021 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -795,10 +832,7 @@ AC_CACHE_CHECK(
       break
     fi
   done
-  # aligned with autoconf, so not including core; see bug#72225.
-  rm -f -r a.out a.exe b.out conftest.$ac_ext conftest.$ac_objext \
-    conftest.dSYM conftest1.$ac_ext conftest1.$ac_objext conftest1.dSYM \
-    conftest2.$ac_ext conftest2.$ac_objext conftest2.dSYM
+  rm -f core conftest*
   unset am_i])
 if test "$am_cv_prog_cc_c_o" != yes; then
    # Losing compiler, so override with the script.
@@ -813,393 +847,7 @@ AC_LANG_POP([C])])
 # For backward compatibility.
 AC_DEFUN_ONCE([AM_PROG_CC_C_O], [AC_REQUIRE([AC_PROG_CC])])
 
-# Copyright (C) 1999-2025 Free Software Foundation, Inc.
-#
-# This file is free software; the Free Software Foundation
-# gives unlimited permission to copy and/or distribute it,
-# with or without modifications, as long as this notice is preserved.
-
-
-# AM_PATH_PYTHON([MINIMUM-VERSION], [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-# ---------------------------------------------------------------------------
-# Adds support for distributing Python modules and packages.  To
-# install modules, copy them to $(pythondir), using the python_PYTHON
-# automake variable.  To install a package with the same name as the
-# automake package, install to $(pkgpythondir), or use the
-# pkgpython_PYTHON automake variable.
-#
-# The variables $(pyexecdir) and $(pkgpyexecdir) are provided as
-# locations to install python extension modules (shared libraries).
-# Another macro is required to find the appropriate flags to compile
-# extension modules.
-#
-# If your package is configured with a different prefix to python,
-# users will have to add the install directory to the PYTHONPATH
-# environment variable, or create a .pth file (see the python
-# documentation for details).
-#
-# If the MINIMUM-VERSION argument is passed, AM_PATH_PYTHON will
-# cause an error if the version of python installed on the system
-# doesn't meet the requirement.  MINIMUM-VERSION should consist of
-# numbers and dots only.
-AC_DEFUN([AM_PATH_PYTHON],
- [
-  dnl Find a Python interpreter.  Python versions prior to 2.0 are not
-  dnl supported. (2.0 was released on October 16, 2000).
-  m4_define_default([_AM_PYTHON_INTERPRETER_LIST],
-[python python3 dnl
- python3.20 python3.19 python3.18 python3.17 python3.16 dnl
- python3.15 python3.14 python3.13 python3.12 python3.11 python3.10 dnl
- python3.9 python3.8 python3.7 python3.6 python3.5 python3.4 python3.3 dnl
- python3.2 python3.1 python3.0 dnl
- python2 dnl
- python2.7 python2.6 python2.5 python2.4 python2.3 python2.2 python2.1 dnl
- python2.0])
-
-  AC_ARG_VAR([PYTHON], [the Python interpreter])
-
-  m4_if([$1],[],[
-    dnl No version check is needed.
-    # Find any Python interpreter.
-    if test -z "$PYTHON"; then
-      AC_PATH_PROGS([PYTHON], _AM_PYTHON_INTERPRETER_LIST, :)
-    fi
-    am_display_PYTHON=python
-  ], [
-    dnl A version check is needed.
-    if test -n "$PYTHON"; then
-      # If the user set $PYTHON, use it and don't search something else.
-      AC_MSG_CHECKING([whether $PYTHON version is >= $1])
-      AM_PYTHON_CHECK_VERSION([$PYTHON], [$1],
-			      [AC_MSG_RESULT([yes])],
-			      [AC_MSG_RESULT([no])
-			       AC_MSG_ERROR([Python interpreter is too old])])
-      am_display_PYTHON=$PYTHON
-    else
-      # Otherwise, try each interpreter until we find one that satisfies
-      # VERSION.
-      AC_CACHE_CHECK([for a Python interpreter with version >= $1],
-	[am_cv_pathless_PYTHON],[
-	for am_cv_pathless_PYTHON in _AM_PYTHON_INTERPRETER_LIST none; do
-	  test "$am_cv_pathless_PYTHON" = none && break
-	  AM_PYTHON_CHECK_VERSION([$am_cv_pathless_PYTHON], [$1], [break])
-	done])
-      # Set $PYTHON to the absolute path of $am_cv_pathless_PYTHON.
-      if test "$am_cv_pathless_PYTHON" = none; then
-	PYTHON=:
-      else
-        AC_PATH_PROG([PYTHON], [$am_cv_pathless_PYTHON])
-      fi
-      am_display_PYTHON=$am_cv_pathless_PYTHON
-    fi
-  ])
-
-  if test "$PYTHON" = :; then
-    dnl Run any user-specified action, or abort.
-    m4_default([$3], [AC_MSG_ERROR([no suitable Python interpreter found])])
-  else
-
-  dnl Query Python for its version number.  Although site.py simply uses
-  dnl sys.version[:3], printing that failed with Python 3.10, since the
-  dnl trailing zero was eliminated. So now we output just the major
-  dnl and minor version numbers, as numbers. Apparently the tertiary
-  dnl version is not of interest.
-  dnl
-  AC_CACHE_CHECK([for $am_display_PYTHON version], [am_cv_python_version],
-    [am_cv_python_version=`$PYTHON -c "import sys; print ('%u.%u' % sys.version_info[[:2]])"`])
-  AC_SUBST([PYTHON_VERSION], [$am_cv_python_version])
-
-  dnl At times, e.g., when building shared libraries, you may want
-  dnl to know which OS platform Python thinks this is.
-  dnl
-  AC_CACHE_CHECK([for $am_display_PYTHON platform], [am_cv_python_platform],
-    [am_cv_python_platform=`$PYTHON -c "import sys; sys.stdout.write(sys.platform)"`])
-  AC_SUBST([PYTHON_PLATFORM], [$am_cv_python_platform])
-
-  dnl emacs-page
-  dnl If --with-python-sys-prefix is given, use the values of sys.prefix
-  dnl and sys.exec_prefix for the corresponding values of PYTHON_PREFIX
-  dnl and PYTHON_EXEC_PREFIX. Otherwise, use the GNU ${prefix} and
-  dnl ${exec_prefix} variables.
-  dnl
-  dnl The two are made distinct variables so they can be overridden if
-  dnl need be, although general consensus is that you shouldn't need
-  dnl this separation.
-  dnl
-  dnl Also allow directly setting the prefixes via configure options,
-  dnl overriding any default.
-  dnl
-  if test "x$prefix" = xNONE; then
-    am__usable_prefix=$ac_default_prefix
-  else
-    am__usable_prefix=$prefix
-  fi
-
-  # Allow user to request using sys.* values from Python,
-  # instead of the GNU $prefix values.
-  AC_ARG_WITH([python-sys-prefix],
-  [AS_HELP_STRING([--with-python-sys-prefix],
-                  [use Python's sys.prefix and sys.exec_prefix values])],
-  [am_use_python_sys=:],
-  [am_use_python_sys=false])
-
-  # Allow user to override whatever the default Python prefix is.
-  AC_ARG_WITH([python_prefix],
-  [AS_HELP_STRING([--with-python_prefix],
-                  [override the default PYTHON_PREFIX])],
-  [am_python_prefix_subst=$withval
-   am_cv_python_prefix=$withval
-   AC_MSG_CHECKING([for explicit $am_display_PYTHON prefix])
-   AC_MSG_RESULT([$am_cv_python_prefix])],
-  [
-   if $am_use_python_sys; then
-     # using python sys.prefix value, not GNU
-     AC_CACHE_CHECK([for python default $am_display_PYTHON prefix],
-     [am_cv_python_prefix],
-     [am_cv_python_prefix=`$PYTHON -c "import sys; sys.stdout.write(sys.prefix)"`])
-
-     dnl If sys.prefix is a subdir of $prefix, replace the literal value of
-     dnl $prefix with a variable reference so it can be overridden.
-     case $am_cv_python_prefix in
-     $am__usable_prefix*)
-       am__strip_prefix=`echo "$am__usable_prefix" | sed 's|.|.|g'`
-       am_python_prefix_subst=`echo "$am_cv_python_prefix" | sed "s,^$am__strip_prefix,\\${prefix},"`
-       ;;
-     *)
-       am_python_prefix_subst=$am_cv_python_prefix
-       ;;
-     esac
-   else # using GNU prefix value, not python sys.prefix
-     am_python_prefix_subst='${prefix}'
-     am_python_prefix=$am_python_prefix_subst
-     AC_MSG_CHECKING([for GNU default $am_display_PYTHON prefix])
-     AC_MSG_RESULT([$am_python_prefix])
-   fi])
-  # Substituting python_prefix_subst value.
-  AC_SUBST([PYTHON_PREFIX], [$am_python_prefix_subst])
-
-  # emacs-page Now do it all over again for Python exec_prefix, but with yet
-  # another conditional: fall back to regular prefix if that was specified.
-  AC_ARG_WITH([python_exec_prefix],
-  [AS_HELP_STRING([--with-python_exec_prefix],
-                  [override the default PYTHON_EXEC_PREFIX])],
-  [am_python_exec_prefix_subst=$withval
-   am_cv_python_exec_prefix=$withval
-   AC_MSG_CHECKING([for explicit $am_display_PYTHON exec_prefix])
-   AC_MSG_RESULT([$am_cv_python_exec_prefix])],
-  [
-   # no explicit --with-python_exec_prefix, but if
-   # --with-python_prefix was given, use its value for python_exec_prefix too.
-   AS_IF([test -n "$with_python_prefix"],
-   [am_python_exec_prefix_subst=$with_python_prefix
-    am_cv_python_exec_prefix=$with_python_prefix
-    AC_MSG_CHECKING([for python_prefix-given $am_display_PYTHON exec_prefix])
-    AC_MSG_RESULT([$am_cv_python_exec_prefix])],
-   [
-    # Set am__usable_exec_prefix whether using GNU or Python values,
-    # since we use that variable for pyexecdir.
-    if test "x$exec_prefix" = xNONE; then
-      am__usable_exec_prefix=$am__usable_prefix
-    else
-      am__usable_exec_prefix=$exec_prefix
-    fi
-    #
-    if $am_use_python_sys; then # using python sys.exec_prefix, not GNU
-      AC_CACHE_CHECK([for python default $am_display_PYTHON exec_prefix],
-      [am_cv_python_exec_prefix],
-      [am_cv_python_exec_prefix=`$PYTHON -c "import sys; sys.stdout.write(sys.exec_prefix)"`])
-      dnl If sys.exec_prefix is a subdir of $exec_prefix, replace the
-      dnl literal value of $exec_prefix with a variable reference so it can
-      dnl be overridden.
-      case $am_cv_python_exec_prefix in
-      $am__usable_exec_prefix*)
-        am__strip_prefix=`echo "$am__usable_exec_prefix" | sed 's|.|.|g'`
-        am_python_exec_prefix_subst=`echo "$am_cv_python_exec_prefix" | sed "s,^$am__strip_prefix,\\${exec_prefix},"`
-        ;;
-      *)
-        am_python_exec_prefix_subst=$am_cv_python_exec_prefix
-        ;;
-     esac
-   else # using GNU $exec_prefix, not python sys.exec_prefix
-     am_python_exec_prefix_subst='${exec_prefix}'
-     am_python_exec_prefix=$am_python_exec_prefix_subst
-     AC_MSG_CHECKING([for GNU default $am_display_PYTHON exec_prefix])
-     AC_MSG_RESULT([$am_python_exec_prefix])
-   fi])])
-  # Substituting python_exec_prefix_subst.
-  AC_SUBST([PYTHON_EXEC_PREFIX], [$am_python_exec_prefix_subst])
-
-  # Factor out some code duplication into this shell variable.
-  am_python_setup_sysconfig="\
-import sys
-# Prefer sysconfig over distutils.sysconfig, for better compatibility
-# with python 3.x.  See automake bug#10227.
-try:
-    import sysconfig
-except ImportError:
-    can_use_sysconfig = 0
-else:
-    can_use_sysconfig = 1
-# Can't use sysconfig in CPython 2.7, since it's broken in virtualenvs:
-# <https://github.com/pypa/virtualenv/issues/118>
-try:
-    from platform import python_implementation
-    if python_implementation() == 'CPython' and sys.version[[:3]] == '2.7':
-        can_use_sysconfig = 0
-except ImportError:
-    pass" # end of am_python_setup_sysconfig
-
-  # More repeated code, for figuring out the installation scheme to use.
-  am_python_setup_scheme="if hasattr(sysconfig, 'get_default_scheme'):
-      scheme = sysconfig.get_default_scheme()
-    else:
-      scheme = sysconfig._get_default_scheme()
-    if scheme == 'posix_local':
-      if '$am_py_prefix' == '/usr':
-        scheme = 'deb_system' # should only happen during Debian package builds
-      else:
-        # Debian's default scheme installs to /usr/local/ but we want to
-        # follow the prefix, as we always have.
-        # See bugs#54412, #64837, et al.
-        scheme = 'posix_prefix'" # end of am_python_setup_scheme
-
-  dnl emacs-page Set up 4 directories:
-
-  dnl 1. pythondir: where to install python scripts.  This is the
-  dnl    site-packages directory, not the python standard library
-  dnl    directory as in early automake betas.  This behavior
-  dnl    is more consistent with lispdir.m4 for example.
-  dnl Query sysconfig or distutils (per above) for this directory.
-  dnl
-  AC_CACHE_CHECK([for $am_display_PYTHON script directory (pythondir)],
-  [am_cv_python_pythondir],
-  [if test "x$am_cv_python_prefix" = x; then
-     am_py_prefix=$am__usable_prefix
-   else
-     am_py_prefix=$am_cv_python_prefix
-   fi
-   am_cv_python_pythondir=`$PYTHON -c "
-$am_python_setup_sysconfig
-if can_use_sysconfig:
-  try:
-    $am_python_setup_scheme
-    sitedir = sysconfig.get_path('purelib', scheme, vars={'base':'$am_py_prefix'})
-  except:
-    sitedir = sysconfig.get_path('purelib', vars={'base':'$am_py_prefix'})
-else:
-  from distutils import sysconfig
-  sitedir = sysconfig.get_python_lib(0, 0, prefix='$am_py_prefix')
-sys.stdout.write(sitedir)"`
-   #
-   case $am_cv_python_pythondir in
-   $am_py_prefix*)
-     am__strip_prefix=`echo "$am_py_prefix" | sed 's|.|.|g'`
-     am_cv_python_pythondir=`echo "$am_cv_python_pythondir" | sed "s,^$am__strip_prefix,\\${PYTHON_PREFIX},"`
-     ;;
-   *)
-     case $am_py_prefix in
-       /usr|/System*) ;;
-       *) am_cv_python_pythondir="\${PYTHON_PREFIX}/lib/python$PYTHON_VERSION/site-packages"
-          ;;
-     esac
-     ;;
-   esac
-  ])
-  AC_SUBST([pythondir], [$am_cv_python_pythondir])
-
-  dnl 2. pkgpythondir: $PACKAGE directory under pythondir.  Was
-  dnl    PYTHON_SITE_PACKAGE in previous betas, but this naming is
-  dnl    more consistent with the rest of automake.
-  dnl
-  AC_SUBST([pkgpythondir], [\${pythondir}/$PACKAGE])
-
-  dnl 3. pyexecdir: directory for installing python extension modules
-  dnl    (shared libraries).
-  dnl Query sysconfig or distutils for this directory.
-  dnl Much of this is the same as for prefix setup above.
-  dnl
-  AC_CACHE_CHECK([for $am_display_PYTHON extension module directory (pyexecdir)],
-  [am_cv_python_pyexecdir],
-  [if test "x$am_cv_python_exec_prefix" = x; then
-     am_py_exec_prefix=$am__usable_exec_prefix
-   else
-     am_py_exec_prefix=$am_cv_python_exec_prefix
-   fi
-   am_cv_python_pyexecdir=`$PYTHON -c "
-$am_python_setup_sysconfig
-if can_use_sysconfig:
-  try:
-    $am_python_setup_scheme
-    sitedir = sysconfig.get_path('platlib', scheme, vars={'platbase':'$am_py_exec_prefix'})
-  except:
-    sitedir = sysconfig.get_path('platlib', vars={'platbase':'$am_py_exec_prefix'})
-else:
-  from distutils import sysconfig
-  sitedir = sysconfig.get_python_lib(1, 0, prefix='$am_py_exec_prefix')
-sys.stdout.write(sitedir)"`
-   #
-   case $am_cv_python_pyexecdir in
-   $am_py_exec_prefix*)
-     am__strip_prefix=`echo "$am_py_exec_prefix" | sed 's|.|.|g'`
-     am_cv_python_pyexecdir=`echo "$am_cv_python_pyexecdir" | sed "s,^$am__strip_prefix,\\${PYTHON_EXEC_PREFIX},"`
-     ;;
-   *)
-     case $am_py_exec_prefix in
-       /usr|/System*) ;;
-       *) am_cv_python_pyexecdir="\${PYTHON_EXEC_PREFIX}/lib/python$PYTHON_VERSION/site-packages"
-          ;;
-     esac
-     ;;
-   esac
-  ])
-  AC_SUBST([pyexecdir], [$am_cv_python_pyexecdir])
-
-  dnl 4. pkgpyexecdir: $(pyexecdir)/$(PACKAGE)
-  dnl
-  AC_SUBST([pkgpyexecdir], [\${pyexecdir}/$PACKAGE])
-
-  dnl Run any user-specified action.
-  $2
-  fi
-])
-
-
-# AM_PYTHON_CHECK_VERSION(PROG, VERSION, [ACTION-IF-TRUE], [ACTION-IF-FALSE])
-# ---------------------------------------------------------------------------
-# Run ACTION-IF-TRUE if the Python interpreter PROG has version >= VERSION.
-# Run ACTION-IF-FALSE otherwise.
-# This test uses sys.hexversion instead of the string equivalent (first
-# word of sys.version), in order to cope with versions such as 2.2c1.
-# This supports Python 2.0 or higher. (2.0 was released on October 16, 2000).
-AC_DEFUN([AM_PYTHON_CHECK_VERSION],
- [prog="import sys
-# split strings by '.' and convert to numeric.  Append some zeros
-# because we need at least 4 digits for the hex conversion.
-# map returns an iterator in Python 3.0 and a list in 2.x
-minver = list(map(int, '$2'.split('.'))) + [[0, 0, 0]]
-minverhex = 0
-# xrange is not present in Python 3.0 and range returns an iterator
-for i in list(range(0, 4)): minverhex = (minverhex << 8) + minver[[i]]
-sys.exit(sys.hexversion < minverhex)"
-  AS_IF([AM_RUN_LOG([$1 -c "$prog"])], [$3], [$4])])
-
-# Copyright (C) 2022-2025 Free Software Foundation, Inc.
-#
-# This file is free software; the Free Software Foundation
-# gives unlimited permission to copy and/or distribute it,
-# with or without modifications, as long as this notice is preserved.
-
-# _AM_PROG_RM_F
-# ---------------
-# Check whether 'rm -f' without any arguments works.
-# https://bugs.gnu.org/10828
-AC_DEFUN([_AM_PROG_RM_F],
-[am__rm_f_notfound=
-AS_IF([(rm -f && rm -fr && rm -rf) 2>/dev/null], [], [am__rm_f_notfound='""'])
-AC_SUBST(am__rm_f_notfound)
-])
-
-# Copyright (C) 2001-2025 Free Software Foundation, Inc.
+# Copyright (C) 2001-2021 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -1218,181 +866,26 @@ AC_DEFUN([AM_RUN_LOG],
 
 # Check to make sure that the build environment is sane.    -*- Autoconf -*-
 
-# Copyright (C) 1996-2025 Free Software Foundation, Inc.
+# Copyright (C) 1996-2021 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
 
-# _AM_SLEEP_FRACTIONAL_SECONDS
-# ----------------------------
-AC_DEFUN([_AM_SLEEP_FRACTIONAL_SECONDS], [dnl
-AC_CACHE_CHECK([whether sleep supports fractional seconds],
-               am_cv_sleep_fractional_seconds, [dnl
-AS_IF([sleep 0.001 2>/dev/null], [am_cv_sleep_fractional_seconds=yes],
-                                 [am_cv_sleep_fractional_seconds=no])
-])])
-
-# _AM_FILESYSTEM_TIMESTAMP_RESOLUTION
-# -----------------------------------
-# Determine the filesystem's resolution for file modification
-# timestamps.  The coarsest we know of is FAT, with a resolution
-# of only two seconds, even with the most recent "exFAT" extensions.
-# The finest (e.g. ext4 with large inodes, XFS, ZFS) is one
-# nanosecond, matching clock_gettime.  However, it is probably not
-# possible to delay execution of a shell script for less than one
-# millisecond, due to process creation overhead and scheduling
-# granularity, so we don't check for anything finer than that. (See below.)
-AC_DEFUN([_AM_FILESYSTEM_TIMESTAMP_RESOLUTION], [dnl
-AC_REQUIRE([_AM_SLEEP_FRACTIONAL_SECONDS])
-AC_CACHE_CHECK([filesystem timestamp resolution],
-               am_cv_filesystem_timestamp_resolution, [dnl
-# Default to the worst case.
-am_cv_filesystem_timestamp_resolution=2
-
-# Only try to go finer than 1 sec if sleep can do it.
-# Don't try 1 sec, because if 0.01 sec and 0.1 sec don't work,
-# - 1 sec is not much of a win compared to 2 sec, and
-# - it takes 2 seconds to perform the test whether 1 sec works.
-# 
-# Instead, just use the default 2s on platforms that have 1s resolution,
-# accept the extra 1s delay when using $sleep in the Automake tests, in
-# exchange for not incurring the 2s delay for running the test for all
-# packages.
-#
-am_try_resolutions=
-if test "$am_cv_sleep_fractional_seconds" = yes; then
-  # Even a millisecond often causes a bunch of false positives,
-  # so just try a hundredth of a second. The time saved between .001 and
-  # .01 is not terribly consequential.
-  am_try_resolutions="0.01 0.1 $am_try_resolutions"
-fi
-
-# In order to catch current-generation FAT out, we must *modify* files
-# that already exist; the *creation* timestamp is finer.  Use names
-# that make ls -t sort them differently when they have equal
-# timestamps than when they have distinct timestamps, keeping
-# in mind that ls -t prints the *newest* file first.
-rm -f conftest.ts?
-: > conftest.ts1
-: > conftest.ts2
-: > conftest.ts3
-
-# Make sure ls -t actually works.  Do 'set' in a subshell so we don't
-# clobber the current shell's arguments. (Outer-level square brackets
-# are removed by m4; they're present so that m4 does not expand
-# <dollar><star>; be careful, easy to get confused.)
-if (
-     set X `[ls -t conftest.ts[12]]` &&
-     {
-       test "$[]*" != "X conftest.ts1 conftest.ts2" ||
-       test "$[]*" != "X conftest.ts2 conftest.ts1";
-     }
-); then :; else
-  # If neither matched, then we have a broken ls.  This can happen
-  # if, for instance, CONFIG_SHELL is bash and it inherits a
-  # broken ls alias from the environment.  This has actually
-  # happened.  Such a system could not be considered "sane".
-  _AS_ECHO_UNQUOTED(
-    ["Bad output from ls -t: \"`[ls -t conftest.ts[12]]`\""],
-    [AS_MESSAGE_LOG_FD])
-  AC_MSG_FAILURE([ls -t produces unexpected output.
-Make sure there is not a broken ls alias in your environment.])
-fi
-
-for am_try_res in $am_try_resolutions; do
-  # Any one fine-grained sleep might happen to cross the boundary
-  # between two values of a coarser actual resolution, but if we do
-  # two fine-grained sleeps in a row, at least one of them will fall
-  # entirely within a coarse interval.
-  echo alpha > conftest.ts1
-  sleep $am_try_res
-  echo beta > conftest.ts2
-  sleep $am_try_res
-  echo gamma > conftest.ts3
-
-  # We assume that 'ls -t' will make use of high-resolution
-  # timestamps if the operating system supports them at all.
-  if (set X `ls -t conftest.ts?` &&
-      test "$[]2" = conftest.ts3 &&
-      test "$[]3" = conftest.ts2 &&
-      test "$[]4" = conftest.ts1); then
-    #
-    # Ok, ls -t worked. If we're at a resolution of 1 second, we're done,
-    # because we don't need to test make.
-    make_ok=true
-    if test $am_try_res != 1; then
-      # But if we've succeeded so far with a subsecond resolution, we
-      # have one more thing to check: make. It can happen that
-      # everything else supports the subsecond mtimes, but make doesn't;
-      # notably on macOS, which ships make 3.81 from 2006 (the last one
-      # released under GPLv2). https://bugs.gnu.org/68808
-      # 
-      # We test $MAKE if it is defined in the environment, else "make".
-      # It might get overridden later, but our hope is that in practice
-      # it does not matter: it is the system "make" which is (by far)
-      # the most likely to be broken, whereas if the user overrides it,
-      # probably they did so with a better, or at least not worse, make.
-      # https://lists.gnu.org/archive/html/automake/2024-06/msg00051.html
-      #
-      # Create a Makefile (real tab character here):
-      rm -f conftest.mk
-      echo 'conftest.ts1: conftest.ts2' >conftest.mk
-      echo '	touch conftest.ts2' >>conftest.mk
-      #
-      # Now, running
-      #   touch conftest.ts1; touch conftest.ts2; make
-      # should touch ts1 because ts2 is newer. This could happen by luck,
-      # but most often, it will fail if make's support is insufficient. So
-      # test for several consecutive successes.
-      #
-      # (We reuse conftest.ts[12] because we still want to modify existing
-      # files, not create new ones, per above.)
-      n=0
-      make=${MAKE-make}
-      until test $n -eq 3; do
-        echo one > conftest.ts1
-        sleep $am_try_res
-        echo two > conftest.ts2 # ts2 should now be newer than ts1
-        if $make -f conftest.mk | grep 'up to date' >/dev/null; then
-          make_ok=false
-          break # out of $n loop
-        fi
-        n=`expr $n + 1`
-      done
-    fi
-    #
-    if $make_ok; then
-      # Everything we know to check worked out, so call this resolution good.
-      am_cv_filesystem_timestamp_resolution=$am_try_res
-      break # out of $am_try_res loop
-    fi
-    # Otherwise, we'll go on to check the next resolution.
-  fi
-done
-rm -f conftest.ts?
-# (end _am_filesystem_timestamp_resolution)
-])])
-
 # AM_SANITY_CHECK
 # ---------------
 AC_DEFUN([AM_SANITY_CHECK],
-[AC_REQUIRE([_AM_FILESYSTEM_TIMESTAMP_RESOLUTION])
-# This check should not be cached, as it may vary across builds of
-# different projects.
-AC_MSG_CHECKING([whether build environment is sane])
+[AC_MSG_CHECKING([whether build environment is sane])
 # Reject unsafe characters in $srcdir or the absolute working directory
 # name.  Accept space and tab only in the latter.
 am_lf='
 '
 case `pwd` in
   *[[\\\"\#\$\&\'\`$am_lf]]*)
-    AC_MSG_RESULT([no])
     AC_MSG_ERROR([unsafe absolute working directory name]);;
 esac
 case $srcdir in
   *[[\\\"\#\$\&\'\`$am_lf\ \	]]*)
-    AC_MSG_RESULT([no])
     AC_MSG_ERROR([unsafe srcdir value: '$srcdir']);;
 esac
 
@@ -1401,40 +894,49 @@ esac
 # symlink; some systems play weird games with the mod time of symlinks
 # (eg FreeBSD returns the mod time of the symlink's containing
 # directory).
-am_build_env_is_sane=no
-am_has_slept=no
-rm -f conftest.file
-for am_try in 1 2; do
-  echo "timestamp, slept: $am_has_slept" > conftest.file
-  if (
-    set X `ls -Lt "$srcdir/configure" conftest.file 2> /dev/null`
-    if test "$[]*" = "X"; then
-      # -L didn't work.
-      set X `ls -t "$srcdir/configure" conftest.file`
-    fi
-    test "$[]2" = conftest.file
-  ); then
-    am_build_env_is_sane=yes
-    break
-  fi
-  # Just in case.
-  sleep "$am_cv_filesystem_timestamp_resolution"
-  am_has_slept=yes
-done
+if (
+   am_has_slept=no
+   for am_try in 1 2; do
+     echo "timestamp, slept: $am_has_slept" > conftest.file
+     set X `ls -Lt "$srcdir/configure" conftest.file 2> /dev/null`
+     if test "$[*]" = "X"; then
+	# -L didn't work.
+	set X `ls -t "$srcdir/configure" conftest.file`
+     fi
+     if test "$[*]" != "X $srcdir/configure conftest.file" \
+	&& test "$[*]" != "X conftest.file $srcdir/configure"; then
 
-AC_MSG_RESULT([$am_build_env_is_sane])
-if test "$am_build_env_is_sane" = no; then
-  AC_MSG_ERROR([newly created file is older than distributed files!
+	# If neither matched, then we have a broken ls.  This can happen
+	# if, for instance, CONFIG_SHELL is bash and it inherits a
+	# broken ls alias from the environment.  This has actually
+	# happened.  Such a system could not be considered "sane".
+	AC_MSG_ERROR([ls -t appears to fail.  Make sure there is not a broken
+  alias in your environment])
+     fi
+     if test "$[2]" = conftest.file || test $am_try -eq 2; then
+       break
+     fi
+     # Just in case.
+     sleep 1
+     am_has_slept=yes
+   done
+   test "$[2]" = conftest.file
+   )
+then
+   # Ok.
+   :
+else
+   AC_MSG_ERROR([newly created file is older than distributed files!
 Check your system clock])
 fi
-
+AC_MSG_RESULT([yes])
 # If we didn't sleep, we still need to ensure time stamps of config.status and
 # generated files are strictly newer.
 am_sleep_pid=
-AS_IF([test -e conftest.file || grep 'slept: no' conftest.file >/dev/null 2>&1],, [dnl
-  ( sleep "$am_cv_filesystem_timestamp_resolution" ) &
+if grep 'slept: no' conftest.file >/dev/null 2>&1; then
+  ( sleep 1 ) &
   am_sleep_pid=$!
-])
+fi
 AC_CONFIG_COMMANDS_PRE(
   [AC_MSG_CHECKING([that generated files are newer than configure])
    if test -n "$am_sleep_pid"; then
@@ -1445,18 +947,18 @@ AC_CONFIG_COMMANDS_PRE(
 rm -f conftest.file
 ])
 
-# Copyright (C) 2009-2025 Free Software Foundation, Inc.
+# Copyright (C) 2009-2021 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
 
-# _AM_SILENT_RULES
-# ----------------
-# Enable less verbose build rules support.
-AC_DEFUN([_AM_SILENT_RULES],
-[AM_DEFAULT_VERBOSITY=1
-AC_ARG_ENABLE([silent-rules], [dnl
+# AM_SILENT_RULES([DEFAULT])
+# --------------------------
+# Enable less verbose build rules; with the default set to DEFAULT
+# ("yes" being less verbose, "no" or empty being verbose).
+AC_DEFUN([AM_SILENT_RULES],
+[AC_ARG_ENABLE([silent-rules], [dnl
 AS_HELP_STRING(
   [--enable-silent-rules],
   [less verbose build output (undo: "make V=1")])
@@ -1464,6 +966,11 @@ AS_HELP_STRING(
   [--disable-silent-rules],
   [verbose build output (undo: "make V=0")])dnl
 ])
+case $enable_silent_rules in @%:@ (((
+  yes) AM_DEFAULT_VERBOSITY=0;;
+   no) AM_DEFAULT_VERBOSITY=1;;
+    *) AM_DEFAULT_VERBOSITY=m4_if([$1], [yes], [0], [1]);;
+esac
 dnl
 dnl A few 'make' implementations (e.g., NonStop OS and NextStep)
 dnl do not support nested variable expansions.
@@ -1482,21 +989,6 @@ am__doit:
 else
   am_cv_make_support_nested_variables=no
 fi])
-AC_SUBST([AM_V])dnl
-AM_SUBST_NOTMAKE([AM_V])dnl
-AC_SUBST([AM_DEFAULT_V])dnl
-AM_SUBST_NOTMAKE([AM_DEFAULT_V])dnl
-AC_SUBST([AM_DEFAULT_VERBOSITY])dnl
-AM_BACKSLASH='\'
-AC_SUBST([AM_BACKSLASH])dnl
-_AM_SUBST_NOTMAKE([AM_BACKSLASH])dnl
-dnl Delay evaluation of AM_DEFAULT_VERBOSITY to the end to allow multiple calls
-dnl to AM_SILENT_RULES to change the default value.
-AC_CONFIG_COMMANDS_PRE([dnl
-case $enable_silent_rules in @%:@ (((
-  yes) AM_DEFAULT_VERBOSITY=0;;
-   no) AM_DEFAULT_VERBOSITY=1;;
-esac
 if test $am_cv_make_support_nested_variables = yes; then
   dnl Using '$V' instead of '$(V)' breaks IRIX make.
   AM_V='$(V)'
@@ -1505,22 +997,17 @@ else
   AM_V=$AM_DEFAULT_VERBOSITY
   AM_DEFAULT_V=$AM_DEFAULT_VERBOSITY
 fi
-])dnl
+AC_SUBST([AM_V])dnl
+AM_SUBST_NOTMAKE([AM_V])dnl
+AC_SUBST([AM_DEFAULT_V])dnl
+AM_SUBST_NOTMAKE([AM_DEFAULT_V])dnl
+AC_SUBST([AM_DEFAULT_VERBOSITY])dnl
+AM_BACKSLASH='\'
+AC_SUBST([AM_BACKSLASH])dnl
+_AM_SUBST_NOTMAKE([AM_BACKSLASH])dnl
 ])
 
-# AM_SILENT_RULES([DEFAULT])
-# --------------------------
-# Set the default verbosity level to DEFAULT ("yes" being less verbose, "no" or
-# empty being verbose).
-AC_DEFUN([AM_SILENT_RULES],
-[AC_REQUIRE([_AM_SILENT_RULES])
-AM_DEFAULT_VERBOSITY=m4_if([$1], [yes], [0], [1])m4_newline
-dnl We intentionally force a newline after the assignment, since a) nothing
-dnl good can come of more text following, and b) that was the behavior
-dnl before 1.17. See https://bugs.gnu.org/72267.
-])
-
-# Copyright (C) 2001-2025 Free Software Foundation, Inc.
+# Copyright (C) 2001-2021 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -1548,7 +1035,7 @@ fi
 INSTALL_STRIP_PROGRAM="\$(install_sh) -c -s"
 AC_SUBST([INSTALL_STRIP_PROGRAM])])
 
-# Copyright (C) 2006-2025 Free Software Foundation, Inc.
+# Copyright (C) 2006-2021 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -1567,7 +1054,7 @@ AC_DEFUN([AM_SUBST_NOTMAKE], [_AM_SUBST_NOTMAKE($@)])
 
 # Check how to create a tarball.                            -*- Autoconf -*-
 
-# Copyright (C) 2004-2025 Free Software Foundation, Inc.
+# Copyright (C) 2004-2021 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -1613,19 +1100,15 @@ m4_if([$1], [v7],
       am_uid=`id -u || echo unknown`
       am_gid=`id -g || echo unknown`
       AC_MSG_CHECKING([whether UID '$am_uid' is supported by ustar format])
-      if test x$am_uid = xunknown; then
-        AC_MSG_WARN([ancient id detected; assuming current UID is ok, but dist-ustar might not work])
-      elif test $am_uid -le $am_max_uid; then
-        AC_MSG_RESULT([yes])
+      if test $am_uid -le $am_max_uid; then
+         AC_MSG_RESULT([yes])
       else
-        AC_MSG_RESULT([no])
-        _am_tools=none
+         AC_MSG_RESULT([no])
+         _am_tools=none
       fi
       AC_MSG_CHECKING([whether GID '$am_gid' is supported by ustar format])
-      if test x$gm_gid = xunknown; then
-        AC_MSG_WARN([ancient id detected; assuming current GID is ok, but dist-ustar might not work])
-      elif test $am_gid -le $am_max_gid; then
-        AC_MSG_RESULT([yes])
+      if test $am_gid -le $am_max_gid; then
+         AC_MSG_RESULT([yes])
       else
         AC_MSG_RESULT([no])
         _am_tools=none
@@ -1701,26 +1184,6 @@ m4_if([$1], [v7],
 AC_SUBST([am__tar])
 AC_SUBST([am__untar])
 ]) # _AM_PROG_TAR
-
-# Copyright (C) 2022-2025 Free Software Foundation, Inc.
-#
-# This file is free software; the Free Software Foundation
-# gives unlimited permission to copy and/or distribute it,
-# with or without modifications, as long as this notice is preserved.
-
-# _AM_PROG_XARGS_N
-# ----------------
-# Check whether 'xargs -n' works.  It should work everywhere, so the fallback
-# is not optimized at all as we never expect to use it.
-AC_DEFUN([_AM_PROG_XARGS_N],
-[AC_CACHE_CHECK([xargs -n works], am_cv_xargs_n_works, [dnl
-AS_IF([test "`echo 1 2 3 | xargs -n2 echo`" = "1 2
-3"], [am_cv_xargs_n_works=yes], [am_cv_xargs_n_works=no])])
-AS_IF([test "$am_cv_xargs_n_works" = yes], [am__xargs_n='xargs -n'], [dnl
-  am__xargs_n='am__xargs_n () { shift; sed "s/ /\\n/g" | while read am__xargs_n_arg; do "$@" "$am__xargs_n_arg"; done; }'
-])dnl
-AC_SUBST(am__xargs_n)
-])
 
 m4_include([m4/libtool.m4])
 m4_include([m4/ltoptions.m4])

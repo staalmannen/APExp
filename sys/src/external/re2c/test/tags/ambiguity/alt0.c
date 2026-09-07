@@ -4,8 +4,8 @@
 
 {
 	YYCTYPE yych;
-	yyt1 = YYCURSOR;
 	yyt2 = NULL;
+	yyt1 = YYCURSOR;
 	x = yyt1;
 	y = yyt2;
 	{}

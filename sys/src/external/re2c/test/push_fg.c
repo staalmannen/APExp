@@ -232,87 +232,86 @@ public:
         
 #line 234 "push_fg.c"
 {
-	static const unsigned char yybm[256] = {
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		192, 192, 192, 192, 192, 192, 192, 192,
-		192, 192,   0,   0,   0,   0,   0,   0,
-		  0, 128, 128, 128, 128, 128, 128, 128,
-		128, 128, 128, 128, 128, 128, 128, 128,
-		128, 128, 128, 128, 128, 128, 128, 128,
-		128, 128, 128,   0,   0,   0,   0, 128,
-		  0, 128, 128, 128, 128, 128, 128, 128,
-		128, 128, 128, 128, 128, 128, 128, 128,
-		128, 128, 128, 128, 128, 128, 128, 128,
-		128, 128, 128,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0
+
+	static const unsigned char yybm[] = {
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		192, 192, 192, 192, 192, 192, 192, 192, 
+		192, 192,   0,   0,   0,   0,   0,   0, 
+		  0, 128, 128, 128, 128, 128, 128, 128, 
+		128, 128, 128, 128, 128, 128, 128, 128, 
+		128, 128, 128, 128, 128, 128, 128, 128, 
+		128, 128, 128,   0,   0,   0,   0, 128, 
+		  0, 128, 128, 128, 128, 128, 128, 128, 
+		128, 128, 128, 128, 128, 128, 128, 128, 
+		128, 128, 128, 128, 128, 128, 128, 128, 
+		128, 128, 128,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
 	};
 	switch (YYGETSTATE()) {
+		default: goto yy0;
 		case 0: goto yyFillLabel0;
 		case 1: goto yyFillLabel1;
 		case 2: goto yyFillLabel2;
-		default: goto yy0;
 	}
 yy0:
-	if ((YYLIMIT - YYCURSOR) < 7) {
-		YYSETSTATE(0);
-		YYFILL(7);
-	}
+	YYSETSTATE(0);
+	if ((YYLIMIT - YYCURSOR) < 7) YYFILL(7);
 yyFillLabel0:
 	yych = *YYCURSOR;
 	{
-		static const void* yytarget[256] = {
-			 &&yy2,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
-			 &&yy3,  &&yy4,  &&yy5,  &&yy4,  &&yy4,  &&yy4,  &&yy3,  &&yy3,
-			 &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
-			 &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
-			 &&yy4,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
-			 &&yy6,  &&yy7,  &&yy8,  &&yy9,  &&yy3, &&yy10,  &&yy3, &&yy11,
+		static void *yytarget[256] = {
+			&&yy2,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
+			&&yy3,  &&yy4,  &&yy5,  &&yy4,  &&yy4,  &&yy4,  &&yy3,  &&yy3,
+			&&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
+			&&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
+			&&yy4,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
+			&&yy6,  &&yy7,  &&yy8,  &&yy9,  &&yy3,  &&yy10, &&yy3,  &&yy11,
 			&&yy12, &&yy12, &&yy12, &&yy12, &&yy12, &&yy12, &&yy12, &&yy12,
-			&&yy12, &&yy12,  &&yy3,  &&yy3,  &&yy3, &&yy13,  &&yy3,  &&yy3,
-			 &&yy3, &&yy14, &&yy14, &&yy14, &&yy14, &&yy14, &&yy14, &&yy14,
+			&&yy12, &&yy12, &&yy3,  &&yy3,  &&yy3,  &&yy13, &&yy3,  &&yy3,
+			&&yy3,  &&yy14, &&yy14, &&yy14, &&yy14, &&yy14, &&yy14, &&yy14,
 			&&yy14, &&yy14, &&yy14, &&yy14, &&yy14, &&yy14, &&yy14, &&yy14,
 			&&yy14, &&yy14, &&yy14, &&yy14, &&yy14, &&yy14, &&yy14, &&yy14,
-			&&yy14, &&yy14, &&yy14,  &&yy3,  &&yy3,  &&yy3,  &&yy3, &&yy14,
-			 &&yy3, &&yy14, &&yy16, &&yy14, &&yy14, &&yy17, &&yy18, &&yy19,
+			&&yy14, &&yy14, &&yy14, &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy14,
+			&&yy3,  &&yy14, &&yy16, &&yy14, &&yy14, &&yy17, &&yy18, &&yy19,
 			&&yy14, &&yy20, &&yy14, &&yy14, &&yy14, &&yy14, &&yy14, &&yy14,
 			&&yy14, &&yy14, &&yy21, &&yy14, &&yy14, &&yy14, &&yy14, &&yy22,
-			&&yy14, &&yy14, &&yy14,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
-			 &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
-			 &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
-			 &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
-			 &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
-			 &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
-			 &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
-			 &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
-			 &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
-			 &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
-			 &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
-			 &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
-			 &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
-			 &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
-			 &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
-			 &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
-			 &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3
+			&&yy14, &&yy14, &&yy14, &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
+			&&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
+			&&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
+			&&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
+			&&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
+			&&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
+			&&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
+			&&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
+			&&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
+			&&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
+			&&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
+			&&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
+			&&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
+			&&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
+			&&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
+			&&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,
+			&&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3,  &&yy3
 		};
 		goto *yytarget[yych];
 	}
@@ -321,94 +320,94 @@ yy2:
 	YYSETSTATE(-1);
 #line 260 "push_fg.re"
 	{ send(kEOF); return 1;  }
-#line 325 "push_fg.c"
+#line 324 "push_fg.c"
 yy3:
 	++YYCURSOR;
 	YYSETSTATE(-1);
 #line 261 "push_fg.re"
 	{ SEND(kUnknown);        }
-#line 331 "push_fg.c"
+#line 330 "push_fg.c"
 yy4:
 	++YYCURSOR;
 	YYSETSTATE(-1);
 #line 259 "push_fg.re"
 	{ SKIP();                }
-#line 337 "push_fg.c"
+#line 336 "push_fg.c"
 yy5:
 	++YYCURSOR;
 	YYSETSTATE(-1);
 #line 258 "push_fg.re"
 	{ SKIP();                }
-#line 343 "push_fg.c"
+#line 342 "push_fg.c"
 yy6:
 	++YYCURSOR;
 	YYSETSTATE(-1);
 #line 251 "push_fg.re"
 	{ SEND(kLeftParen);      }
-#line 349 "push_fg.c"
+#line 348 "push_fg.c"
 yy7:
 	++YYCURSOR;
 	YYSETSTATE(-1);
 #line 252 "push_fg.re"
 	{ SEND(kRightParen);     }
-#line 355 "push_fg.c"
+#line 354 "push_fg.c"
 yy8:
 	++YYCURSOR;
 	YYSETSTATE(-1);
 #line 255 "push_fg.re"
 	{ SEND(kStar);           }
-#line 361 "push_fg.c"
+#line 360 "push_fg.c"
 yy9:
 	++YYCURSOR;
 	YYSETSTATE(-1);
 #line 254 "push_fg.re"
 	{ SEND(kPlus);           }
-#line 367 "push_fg.c"
+#line 366 "push_fg.c"
 yy10:
 	++YYCURSOR;
 	YYSETSTATE(-1);
 #line 253 "push_fg.re"
 	{ SEND(kMinus);          }
-#line 373 "push_fg.c"
+#line 372 "push_fg.c"
 yy11:
 	++YYCURSOR;
 	YYSETSTATE(-1);
 #line 256 "push_fg.re"
 	{ SEND(kSlash);          }
-#line 379 "push_fg.c"
+#line 378 "push_fg.c"
 yy12:
 	++YYCURSOR;
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(1);
-		YYFILL(1);
-	}
+	YYSETSTATE(1);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel1:
 	yych = *YYCURSOR;
-	if (yybm[0+yych] & 64) goto yy12;
+	if (yybm[0+yych] & 64) {
+		goto yy12;
+	}
 	YYSETSTATE(-1);
 #line 248 "push_fg.re"
 	{ SEND(kDecimalConstant);}
-#line 392 "push_fg.c"
+#line 391 "push_fg.c"
 yy13:
 	++YYCURSOR;
 	YYSETSTATE(-1);
 #line 250 "push_fg.re"
 	{ SEND(kEqual);          }
-#line 398 "push_fg.c"
+#line 397 "push_fg.c"
 yy14:
 	++YYCURSOR;
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(2);
-		YYFILL(1);
-	}
+	YYSETSTATE(2);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel2:
 	yych = *YYCURSOR;
 yy15:
-	if (yybm[0+yych] & 128) goto yy14;
+	if (yybm[0+yych] & 128) {
+		goto yy14;
+	}
 	YYSETSTATE(-1);
 #line 247 "push_fg.re"
 	{ SEND(kIdentifier);     }
-#line 412 "push_fg.c"
+#line 411 "push_fg.c"
 yy16:
 	yych = *++YYCURSOR;
 	if (yych == 'r') goto yy23;
@@ -455,11 +454,13 @@ yy26:
 	goto yy15;
 yy27:
 	yych = *++YYCURSOR;
-	if (yybm[0+yych] & 128) goto yy14;
+	if (yybm[0+yych] & 128) {
+		goto yy14;
+	}
 	YYSETSTATE(-1);
 #line 240 "push_fg.re"
 	{ SEND(kIf);             }
-#line 463 "push_fg.c"
+#line 464 "push_fg.c"
 yy28:
 	yych = *++YYCURSOR;
 	if (yych == 't') goto yy34;
@@ -478,11 +479,13 @@ yy31:
 	goto yy15;
 yy32:
 	yych = *++YYCURSOR;
-	if (yybm[0+yych] & 128) goto yy14;
+	if (yybm[0+yych] & 128) {
+		goto yy14;
+	}
 	YYSETSTATE(-1);
 #line 241 "push_fg.re"
 	{ SEND(kFor);            }
-#line 486 "push_fg.c"
+#line 489 "push_fg.c"
 yy33:
 	yych = *++YYCURSOR;
 	if (yych == 'o') goto yy38;
@@ -501,18 +504,22 @@ yy36:
 	goto yy15;
 yy37:
 	yych = *++YYCURSOR;
-	if (yybm[0+yych] & 128) goto yy14;
+	if (yybm[0+yych] & 128) {
+		goto yy14;
+	}
 	YYSETSTATE(-1);
 #line 242 "push_fg.re"
 	{ SEND(kElse);           }
-#line 509 "push_fg.c"
+#line 514 "push_fg.c"
 yy38:
 	yych = *++YYCURSOR;
-	if (yybm[0+yych] & 128) goto yy14;
+	if (yybm[0+yych] & 128) {
+		goto yy14;
+	}
 	YYSETSTATE(-1);
 #line 243 "push_fg.re"
 	{ SEND(kGoto);           }
-#line 516 "push_fg.c"
+#line 523 "push_fg.c"
 yy39:
 	yych = *++YYCURSOR;
 	if (yych == 'r') goto yy42;
@@ -523,29 +530,35 @@ yy40:
 	goto yy15;
 yy41:
 	yych = *++YYCURSOR;
-	if (yybm[0+yych] & 128) goto yy14;
+	if (yybm[0+yych] & 128) {
+		goto yy14;
+	}
 	YYSETSTATE(-1);
 #line 244 "push_fg.re"
 	{ SEND(kBreak);          }
-#line 531 "push_fg.c"
+#line 540 "push_fg.c"
 yy42:
 	yych = *++YYCURSOR;
 	if (yych == 'n') goto yy44;
 	goto yy15;
 yy43:
 	yych = *++YYCURSOR;
-	if (yybm[0+yych] & 128) goto yy14;
+	if (yybm[0+yych] & 128) {
+		goto yy14;
+	}
 	YYSETSTATE(-1);
 #line 245 "push_fg.re"
 	{ SEND(kWhile);          }
-#line 542 "push_fg.c"
+#line 553 "push_fg.c"
 yy44:
 	yych = *++YYCURSOR;
-	if (yybm[0+yych] & 128) goto yy14;
+	if (yybm[0+yych] & 128) {
+		goto yy14;
+	}
 	YYSETSTATE(-1);
 #line 246 "push_fg.re"
 	{ SEND(kReturn);         }
-#line 549 "push_fg.c"
+#line 562 "push_fg.c"
 }
 #line 262 "push_fg.re"
 

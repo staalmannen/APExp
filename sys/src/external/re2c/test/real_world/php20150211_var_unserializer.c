@@ -523,76 +523,76 @@ PHPAPI int php_var_unserialize_ex(UNSERIALIZE_PARAMETER)
 
 {
 	YYCTYPE yych;
-	static const unsigned char yybm[256] = {
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		128, 128, 128, 128, 128, 128, 128, 128,
-		128, 128,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0,
-		  0,   0,   0,   0,   0,   0,   0,   0
+	static const unsigned char yybm[] = {
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		128, 128, 128, 128, 128, 128, 128, 128, 
+		128, 128,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
+		  0,   0,   0,   0,   0,   0,   0,   0, 
 	};
 	if ((YYLIMIT - YYCURSOR) < 7) YYFILL(7);
 	yych = *YYCURSOR;
 	{
-		static const void* yytarget[256] = {
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy3,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy4,  &&yy3,
-			 &&yy1,  &&yy1,  &&yy5,  &&yy6,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy7,  &&yy8,  &&yy1,  &&yy9,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1, &&yy10,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1, &&yy11,
-			 &&yy1,  &&yy1, &&yy12, &&yy13,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1, &&yy14,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
-			 &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1
+		static void *yytarget[256] = {
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy3,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy4,  &&yy3,
+			&&yy1,  &&yy1,  &&yy5,  &&yy6,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy7,  &&yy8,  &&yy1,  &&yy9,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy10, &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy11,
+			&&yy1,  &&yy1,  &&yy12, &&yy13, &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy14, &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,
+			&&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1,  &&yy1
 		};
 		goto *yytarget[yych];
 	}
@@ -653,7 +653,9 @@ yy14:
 }
 yy15:
 	yych = *++YYCURSOR;
-	if (yybm[0+yych] & 128) goto yy28;
+	if (yybm[0+yych] & 128) {
+		goto yy28;
+	}
 	if (yych == '+') goto yy27;
 yy16:
 	YYCURSOR = YYMARKER;
@@ -696,7 +698,7 @@ yy21:
 yy22:
 	yych = *++YYCURSOR;
 	{
-		static const void* yytarget[256] = {
+		static void *yytarget[256] = {
 			&&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16,
 			&&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16,
 			&&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16,
@@ -773,13 +775,17 @@ yy26:
 	goto yy16;
 yy27:
 	yych = *++YYCURSOR;
-	if (yybm[0+yych] & 128) goto yy28;
+	if (yybm[0+yych] & 128) {
+		goto yy28;
+	}
 	goto yy16;
 yy28:
 	++YYCURSOR;
 	if ((YYLIMIT - YYCURSOR) < 2) YYFILL(2);
 	yych = *YYCURSOR;
-	if (yybm[0+yych] & 128) goto yy28;
+	if (yybm[0+yych] & 128) {
+		goto yy28;
+	}
 	if (yych <= '/') goto yy16;
 	if (yych <= ':') goto yy50;
 	goto yy16;
@@ -848,7 +854,7 @@ yy39:
 	if ((YYLIMIT - YYCURSOR) < 4) YYFILL(4);
 	yych = *YYCURSOR;
 	{
-		static const void* yytarget[256] = {
+		static void *yytarget[256] = {
 			&&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16,
 			&&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16,
 			&&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16,
@@ -987,7 +993,7 @@ yy55:
 	if ((YYLIMIT - YYCURSOR) < 4) YYFILL(4);
 	yych = *YYCURSOR;
 	{
-		static const void* yytarget[256] = {
+		static void *yytarget[256] = {
 			&&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16,
 			&&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16,
 			&&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16, &&yy16,

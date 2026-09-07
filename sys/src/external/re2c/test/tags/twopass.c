@@ -7,24 +7,21 @@
 {
 	YYCTYPE yych;
 	unsigned int yyaccept = 0;
-	YYMARKER = YYCURSOR;
 	if ((YYLIMIT - YYCURSOR) < 6) YYFILL(6);
-	yych = *YYCURSOR;
+	yych = *(YYMARKER = YYCURSOR);
 	switch (yych) {
 		case 'a':
 			yyt3 = YYCURSOR;
 			goto yy4;
 		case 'b':
-			yyt1 = YYCURSOR;
-			yyt2 = YYCURSOR;
-			yyt3 = YYCURSOR;
+			yyt1 = yyt2 = yyt3 = YYCURSOR;
 			goto yy6;
 		default: goto yy2;
 	}
 yy1:
 	s = yyt4;
 	r = yyt4;
-	if (r != NULL) r -= 1;
+	if (yyt4 != NULL) r -= 1;
 	{}
 yy2:
 	yyaccept = 1;
@@ -126,14 +123,12 @@ yy13:
 			yyt3 = NULL;
 			goto yy15;
 		case 'b':
-			yyt1 = YYCURSOR;
-			yyt2 = YYCURSOR;
 			yyt3 = NULL;
+			yyt1 = yyt2 = YYCURSOR;
 			goto yy14;
 		default:
-			yyt1 = YYCURSOR;
-			yyt2 = YYCURSOR;
 			yyt3 = NULL;
+			yyt1 = yyt2 = YYCURSOR;
 			goto yy12;
 	}
 yy14:
@@ -168,7 +163,7 @@ yy16:
 }
 
 tags/twopass.re:8:29: warning: rule matches empty string [-Wmatch-empty-string]
-tags/twopass.re:7:42: warning: tag `p` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/twopass.re:7:42: warning: tag `q` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/twopass.re:7:42: warning: tag `y` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/twopass.re:8:29: warning: tag `s` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/twopass.re:7:42: warning: tag 'p' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/twopass.re:7:42: warning: tag 'q' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/twopass.re:7:42: warning: tag 'y' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/twopass.re:8:29: warning: tag 's' has 2nd degree of nondeterminism [-Wnondeterministic-tags]

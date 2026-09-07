@@ -5,13 +5,21 @@
 #include <stdlib.h> /* malloc, free */
 #include <string.h> /* memcpy */
 
-static void* read_file(const char* fname, size_t unit, size_t padding, size_t* pfsize) {
+static void *read_file
+    ( const char *fname
+    , size_t unit
+    , size_t padding
+    , size_t *pfsize
+    )
+{
     void *buffer = NULL;
     size_t fsize = 0;
 
     /* open file */
     FILE *f = fopen(fname, "rb");
-    if (f == NULL) goto error;
+    if (f == NULL) {
+        goto error;
+    }
 
     /* get file size */
     fseek(f, 0, SEEK_END);
@@ -20,10 +28,14 @@ static void* read_file(const char* fname, size_t unit, size_t padding, size_t* p
 
     /* allocate memory for file and padding */
     buffer = malloc(unit * (fsize + padding));
-    if (buffer == NULL) goto error;
+    if (buffer == NULL) {
+        goto error;
+    }
 
     /* read the whole file in memory */
-    if (fread(buffer, unit, fsize, f) != fsize) goto error;
+    if (fread(buffer, unit, fsize, f) != fsize) {
+        goto error;
+    }
 
     fclose(f);
     *pfsize = fsize;
@@ -32,7 +44,9 @@ static void* read_file(const char* fname, size_t unit, size_t padding, size_t* p
 error:
     fprintf(stderr, "error: cannot read file '%s'\n", fname);
     free(buffer);
-    if (f != NULL) fclose(f);
+    if (f != NULL) {
+        fclose(f);
+    }
     return NULL;
 }
 
@@ -43,9 +57,16 @@ error:
 #define YYSHIFT(o) cursor += o
 #define YYLESSTHAN(n) (limit - cursor) < n
 #define YYFILL(n) { goto loop_end; }
-#define YYEND() limit <= cursor
 
-static int action_line125(unsigned* pkix, const YYKEYTYPE* keys, const YYCTYPE* start, const YYCTYPE* token, const YYCTYPE** cursor, YYKEYTYPE rule_act) {
+static int action_line125
+    ( unsigned *pkix
+    , const YYKEYTYPE *keys
+    , const YYCTYPE *start
+    , const YYCTYPE *token
+    , const YYCTYPE **cursor
+    , YYKEYTYPE rule_act
+    )
+{
     const unsigned kix = *pkix;
     const long pos = token - start;
     const long len_act = *cursor - token;
@@ -53,31 +74,43 @@ static int action_line125(unsigned* pkix, const YYKEYTYPE* keys, const YYCTYPE* 
     const YYKEYTYPE rule_exp = keys[kix + 2];
     *pkix = kix + 3;
     if (rule_exp == 255) {
-        fprintf(stderr,
-            "warning: lex_line125: control flow is undefined"
-            " for input at position %ld, rerun re2c with '-W'\n");
+        fprintf
+            ( stderr
+            , "warning: lex_line125: control flow is undefined"
+                " for input at position %ld, rerun re2c with '-W'\n"
+            , pos
+            );
     }
     if (len_act == len_exp && rule_act == rule_exp) {
         const YYKEYTYPE offset = keys[kix];
         *cursor = token + offset;
         return 0;
     } else {
-        fprintf(stderr,
-            "error: lex_line125: at position %ld (key %u):\n"
-            "\texpected: match length %ld, rule %u\n"
-            "\tactual:   match length %ld, rule %u\n",
-            pos, kix, len_exp, rule_exp, len_act, rule_act);
+        fprintf
+            ( stderr
+            , "error: lex_line125: at position %ld (key %u):\n"
+                "\texpected: match length %ld, rule %u\n"
+                "\tactual:   match length %ld, rule %u\n"
+            , pos
+            , kix
+            , len_exp
+            , rule_exp
+            , len_act
+            , rule_act
+            );
         return 1;
     }
 }
 
-static int check_key_count_line125(unsigned have, unsigned used, unsigned need) {
+static int check_key_count_line125(unsigned have, unsigned used, unsigned need)
+{
     if (used + need <= have) return 0;
     fprintf(stderr, "error: lex_line125: not enough keys\n");
     return 1;
 }
 
-int lex_line125() {
+int lex_line125()
+{
     const size_t padding = 1; /* YYMAXFILL */
     int status = 0;
     size_t input_len = 0;
@@ -90,13 +123,23 @@ int lex_line125() {
     const YYCTYPE *eof = NULL;
     unsigned int i = 0;
 
-    input = (YYCTYPE *) read_file("skeleton/php20150211_url_scanner_ex.c.line125.input", sizeof (YYCTYPE), padding, &input_len);
+    input = (YYCTYPE *) read_file
+        ( "skeleton/php20150211_url_scanner_ex.c.line125.input"
+        , sizeof (YYCTYPE)
+        , padding
+        , &input_len
+        );
     if (input == NULL) {
         status = 1;
         goto end;
     }
 
-    keys = (YYKEYTYPE *) read_file("skeleton/php20150211_url_scanner_ex.c.line125.keys", sizeof (YYKEYTYPE), 0, &keys_count);
+    keys = (YYKEYTYPE *) read_file
+        ( "skeleton/php20150211_url_scanner_ex.c.line125.keys"
+        , sizeof (YYKEYTYPE)
+        , 0
+        , &keys_count
+        );
     if (keys == NULL) {
         status = 1;
         goto end;
@@ -112,44 +155,46 @@ loop:
     {
         token = cursor;
         YYCTYPE yych;
-        static const unsigned char yybm[256] = {
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128,   0, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128,   0, 128, 128, 128, 128,   0,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128
+        static const unsigned char yybm[] = {
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128,   0, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128,   0, 128, 128, 128, 128,   0, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
         };
 
         if (YYLESSTHAN(1)) YYFILL(1);
         yych = YYPEEK();
-        if (yybm[0+yych] & 128) goto yy1;
+        if (yybm[0+yych] & 128) {
+            goto yy1;
+        }
         if (yych <= '#') goto yy2;
         if (yych <= ':') goto yy3;
         goto yy4;
@@ -157,7 +202,9 @@ yy1:
         YYSKIP();
         if (YYLESSTHAN(1)) YYFILL(1);
         yych = YYPEEK();
-        if (yybm[0+yych] & 128) goto yy1;
+        if (yybm[0+yych] & 128) {
+            goto yy1;
+        }
         status = check_key_count_line125(keys_count, i, 3)
              || action_line125(&i, keys, input, token, &cursor, 3);
         goto loop;
@@ -212,9 +259,16 @@ end:
 #define YYSHIFT(o) cursor += o
 #define YYLESSTHAN(n) (limit - cursor) < n
 #define YYFILL(n) { goto loop_end; }
-#define YYEND() limit <= cursor
 
-static int action_line313(unsigned* pkix, const YYKEYTYPE* keys, const YYCTYPE* start, const YYCTYPE* token, const YYCTYPE** cursor, YYKEYTYPE rule_act) {
+static int action_line313
+    ( unsigned *pkix
+    , const YYKEYTYPE *keys
+    , const YYCTYPE *start
+    , const YYCTYPE *token
+    , const YYCTYPE **cursor
+    , YYKEYTYPE rule_act
+    )
+{
     const unsigned kix = *pkix;
     const long pos = token - start;
     const long len_act = *cursor - token;
@@ -222,31 +276,43 @@ static int action_line313(unsigned* pkix, const YYKEYTYPE* keys, const YYCTYPE* 
     const YYKEYTYPE rule_exp = keys[kix + 2];
     *pkix = kix + 3;
     if (rule_exp == 255) {
-        fprintf(stderr,
-            "warning: lex_line313: control flow is undefined"
-            " for input at position %ld, rerun re2c with '-W'\n");
+        fprintf
+            ( stderr
+            , "warning: lex_line313: control flow is undefined"
+                " for input at position %ld, rerun re2c with '-W'\n"
+            , pos
+            );
     }
     if (len_act == len_exp && rule_act == rule_exp) {
         const YYKEYTYPE offset = keys[kix];
         *cursor = token + offset;
         return 0;
     } else {
-        fprintf(stderr,
-            "error: lex_line313: at position %ld (key %u):\n"
-            "\texpected: match length %ld, rule %u\n"
-            "\tactual:   match length %ld, rule %u\n",
-            pos, kix, len_exp, rule_exp, len_act, rule_act);
+        fprintf
+            ( stderr
+            , "error: lex_line313: at position %ld (key %u):\n"
+                "\texpected: match length %ld, rule %u\n"
+                "\tactual:   match length %ld, rule %u\n"
+            , pos
+            , kix
+            , len_exp
+            , rule_exp
+            , len_act
+            , rule_act
+            );
         return 1;
     }
 }
 
-static int check_key_count_line313(unsigned have, unsigned used, unsigned need) {
+static int check_key_count_line313(unsigned have, unsigned used, unsigned need)
+{
     if (used + need <= have) return 0;
     fprintf(stderr, "error: lex_line313: not enough keys\n");
     return 1;
 }
 
-int lex_line313() {
+int lex_line313()
+{
     const size_t padding = 1; /* YYMAXFILL */
     int status = 0;
     size_t input_len = 0;
@@ -259,13 +325,23 @@ int lex_line313() {
     const YYCTYPE *eof = NULL;
     unsigned int i = 0;
 
-    input = (YYCTYPE *) read_file("skeleton/php20150211_url_scanner_ex.c.line313.input", sizeof (YYCTYPE), padding, &input_len);
+    input = (YYCTYPE *) read_file
+        ( "skeleton/php20150211_url_scanner_ex.c.line313.input"
+        , sizeof (YYCTYPE)
+        , padding
+        , &input_len
+        );
     if (input == NULL) {
         status = 1;
         goto end;
     }
 
-    keys = (YYKEYTYPE *) read_file("skeleton/php20150211_url_scanner_ex.c.line313.keys", sizeof (YYKEYTYPE), 0, &keys_count);
+    keys = (YYKEYTYPE *) read_file
+        ( "skeleton/php20150211_url_scanner_ex.c.line313.keys"
+        , sizeof (YYKEYTYPE)
+        , 0
+        , &keys_count
+        );
     if (keys == NULL) {
         status = 1;
         goto end;
@@ -281,50 +357,54 @@ loop:
     {
         token = cursor;
         YYCTYPE yych;
-        static const unsigned char yybm[256] = {
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128,   0, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128
+        static const unsigned char yybm[] = {
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128,   0, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
         };
 
         if (YYLESSTHAN(1)) YYFILL(1);
         yych = YYPEEK();
-        if (yybm[0+yych] & 128) goto yy6;
+        if (yybm[0+yych] & 128) {
+            goto yy6;
+        }
         goto yy7;
 yy6:
         YYSKIP();
         if (YYLESSTHAN(1)) YYFILL(1);
         yych = YYPEEK();
-        if (yybm[0+yych] & 128) goto yy6;
+        if (yybm[0+yych] & 128) {
+            goto yy6;
+        }
         status = check_key_count_line313(keys_count, i, 3)
              || action_line313(&i, keys, input, token, &cursor, 1);
         goto loop;
@@ -369,9 +449,16 @@ end:
 #define YYSHIFT(o) cursor += o
 #define YYLESSTHAN(n) (limit - cursor) < n
 #define YYFILL(n) { goto loop_end; }
-#define YYEND() limit <= cursor
 
-static int action_line320(unsigned* pkix, const YYKEYTYPE* keys, const YYCTYPE* start, const YYCTYPE* token, const YYCTYPE** cursor, YYKEYTYPE rule_act) {
+static int action_line320
+    ( unsigned *pkix
+    , const YYKEYTYPE *keys
+    , const YYCTYPE *start
+    , const YYCTYPE *token
+    , const YYCTYPE **cursor
+    , YYKEYTYPE rule_act
+    )
+{
     const unsigned kix = *pkix;
     const long pos = token - start;
     const long len_act = *cursor - token;
@@ -379,31 +466,43 @@ static int action_line320(unsigned* pkix, const YYKEYTYPE* keys, const YYCTYPE* 
     const YYKEYTYPE rule_exp = keys[kix + 2];
     *pkix = kix + 3;
     if (rule_exp == 255) {
-        fprintf(stderr,
-            "warning: lex_line320: control flow is undefined"
-            " for input at position %ld, rerun re2c with '-W'\n");
+        fprintf
+            ( stderr
+            , "warning: lex_line320: control flow is undefined"
+                " for input at position %ld, rerun re2c with '-W'\n"
+            , pos
+            );
     }
     if (len_act == len_exp && rule_act == rule_exp) {
         const YYKEYTYPE offset = keys[kix];
         *cursor = token + offset;
         return 0;
     } else {
-        fprintf(stderr,
-            "error: lex_line320: at position %ld (key %u):\n"
-            "\texpected: match length %ld, rule %u\n"
-            "\tactual:   match length %ld, rule %u\n",
-            pos, kix, len_exp, rule_exp, len_act, rule_act);
+        fprintf
+            ( stderr
+            , "error: lex_line320: at position %ld (key %u):\n"
+                "\texpected: match length %ld, rule %u\n"
+                "\tactual:   match length %ld, rule %u\n"
+            , pos
+            , kix
+            , len_exp
+            , rule_exp
+            , len_act
+            , rule_act
+            );
         return 1;
     }
 }
 
-static int check_key_count_line320(unsigned have, unsigned used, unsigned need) {
+static int check_key_count_line320(unsigned have, unsigned used, unsigned need)
+{
     if (used + need <= have) return 0;
     fprintf(stderr, "error: lex_line320: not enough keys\n");
     return 1;
 }
 
-int lex_line320() {
+int lex_line320()
+{
     const size_t padding = 1; /* YYMAXFILL */
     int status = 0;
     size_t input_len = 0;
@@ -416,13 +515,23 @@ int lex_line320() {
     const YYCTYPE *eof = NULL;
     unsigned int i = 0;
 
-    input = (YYCTYPE *) read_file("skeleton/php20150211_url_scanner_ex.c.line320.input", sizeof (YYCTYPE), padding, &input_len);
+    input = (YYCTYPE *) read_file
+        ( "skeleton/php20150211_url_scanner_ex.c.line320.input"
+        , sizeof (YYCTYPE)
+        , padding
+        , &input_len
+        );
     if (input == NULL) {
         status = 1;
         goto end;
     }
 
-    keys = (YYKEYTYPE *) read_file("skeleton/php20150211_url_scanner_ex.c.line320.keys", sizeof (YYKEYTYPE), 0, &keys_count);
+    keys = (YYKEYTYPE *) read_file
+        ( "skeleton/php20150211_url_scanner_ex.c.line320.keys"
+        , sizeof (YYKEYTYPE)
+        , 0
+        , &keys_count
+        );
     if (keys == NULL) {
         status = 1;
         goto end;
@@ -438,44 +547,46 @@ loop:
     {
         token = cursor;
         YYCTYPE yych;
-        static const unsigned char yybm[256] = {
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0, 128,   0,   0,   0,   0,   0,
-              0, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128,   0,   0,   0,   0,   0,
-              0, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0
+        static const unsigned char yybm[] = {
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0, 128,   0,   0,   0,   0,   0, 
+              0, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128,   0,   0,   0,   0,   0, 
+              0, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
         };
 
         if (YYLESSTHAN(1)) YYFILL(1);
         yych = YYPEEK();
-        if (yybm[0+yych] & 128) goto yy9;
+        if (yybm[0+yych] & 128) {
+            goto yy9;
+        }
         YYSKIP();
         status = check_key_count_line320(keys_count, i, 3)
              || action_line320(&i, keys, input, token, &cursor, 1);
@@ -484,7 +595,9 @@ yy9:
         YYSKIP();
         if (YYLESSTHAN(1)) YYFILL(1);
         yych = YYPEEK();
-        if (yybm[0+yych] & 128) goto yy9;
+        if (yybm[0+yych] & 128) {
+            goto yy9;
+        }
         status = check_key_count_line320(keys_count, i, 3)
              || action_line320(&i, keys, input, token, &cursor, 0);
         goto loop;
@@ -524,9 +637,16 @@ end:
 #define YYSHIFT(o) cursor += o
 #define YYLESSTHAN(n) (limit - cursor) < n
 #define YYFILL(n) { goto loop_end; }
-#define YYEND() limit <= cursor
 
-static int action_line330(unsigned* pkix, const YYKEYTYPE* keys, const YYCTYPE* start, const YYCTYPE* token, const YYCTYPE** cursor, YYKEYTYPE rule_act) {
+static int action_line330
+    ( unsigned *pkix
+    , const YYKEYTYPE *keys
+    , const YYCTYPE *start
+    , const YYCTYPE *token
+    , const YYCTYPE **cursor
+    , YYKEYTYPE rule_act
+    )
+{
     const unsigned kix = *pkix;
     const long pos = token - start;
     const long len_act = *cursor - token;
@@ -534,31 +654,43 @@ static int action_line330(unsigned* pkix, const YYKEYTYPE* keys, const YYCTYPE* 
     const YYKEYTYPE rule_exp = keys[kix + 2];
     *pkix = kix + 3;
     if (rule_exp == 255) {
-        fprintf(stderr,
-            "warning: lex_line330: control flow is undefined"
-            " for input at position %ld, rerun re2c with '-W'\n");
+        fprintf
+            ( stderr
+            , "warning: lex_line330: control flow is undefined"
+                " for input at position %ld, rerun re2c with '-W'\n"
+            , pos
+            );
     }
     if (len_act == len_exp && rule_act == rule_exp) {
         const YYKEYTYPE offset = keys[kix];
         *cursor = token + offset;
         return 0;
     } else {
-        fprintf(stderr,
-            "error: lex_line330: at position %ld (key %u):\n"
-            "\texpected: match length %ld, rule %u\n"
-            "\tactual:   match length %ld, rule %u\n",
-            pos, kix, len_exp, rule_exp, len_act, rule_act);
+        fprintf
+            ( stderr
+            , "error: lex_line330: at position %ld (key %u):\n"
+                "\texpected: match length %ld, rule %u\n"
+                "\tactual:   match length %ld, rule %u\n"
+            , pos
+            , kix
+            , len_exp
+            , rule_exp
+            , len_act
+            , rule_act
+            );
         return 1;
     }
 }
 
-static int check_key_count_line330(unsigned have, unsigned used, unsigned need) {
+static int check_key_count_line330(unsigned have, unsigned used, unsigned need)
+{
     if (used + need <= have) return 0;
     fprintf(stderr, "error: lex_line330: not enough keys\n");
     return 1;
 }
 
-int lex_line330() {
+int lex_line330()
+{
     const size_t padding = 2; /* YYMAXFILL */
     int status = 0;
     size_t input_len = 0;
@@ -571,13 +703,23 @@ int lex_line330() {
     const YYCTYPE *eof = NULL;
     unsigned int i = 0;
 
-    input = (YYCTYPE *) read_file("skeleton/php20150211_url_scanner_ex.c.line330.input", sizeof (YYCTYPE), padding, &input_len);
+    input = (YYCTYPE *) read_file
+        ( "skeleton/php20150211_url_scanner_ex.c.line330.input"
+        , sizeof (YYCTYPE)
+        , padding
+        , &input_len
+        );
     if (input == NULL) {
         status = 1;
         goto end;
     }
 
-    keys = (YYKEYTYPE *) read_file("skeleton/php20150211_url_scanner_ex.c.line330.keys", sizeof (YYKEYTYPE), 0, &keys_count);
+    keys = (YYKEYTYPE *) read_file
+        ( "skeleton/php20150211_url_scanner_ex.c.line330.keys"
+        , sizeof (YYKEYTYPE)
+        , 0
+        , &keys_count
+        );
     if (keys == NULL) {
         status = 1;
         goto end;
@@ -593,45 +735,45 @@ loop:
     {
         token = cursor;
         YYCTYPE yych;
-        static const unsigned char yybm[256] = {
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0, 128, 128, 128,   0, 128,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-            128,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0
+        static const unsigned char yybm[] = {
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0, 128, 128, 128,   0, 128,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+            128,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
         };
 
         if (YYLESSTHAN(2)) YYFILL(2);
         yych = YYPEEK();
         {
-            static const void* yytarget[256] = {
+            static void *yytarget[256] = {
                 &&yy11, &&yy11, &&yy11, &&yy11, &&yy11, &&yy11, &&yy11, &&yy11,
                 &&yy11, &&yy13, &&yy13, &&yy13, &&yy11, &&yy13, &&yy11, &&yy11,
                 &&yy11, &&yy11, &&yy11, &&yy11, &&yy11, &&yy11, &&yy11, &&yy11,
@@ -677,7 +819,9 @@ yy13:
         YYSKIP();
         if (YYLESSTHAN(1)) YYFILL(1);
         yych = YYPEEK();
-        if (yybm[0+yych] & 128) goto yy13;
+        if (yybm[0+yych] & 128) {
+            goto yy13;
+        }
         status = check_key_count_line330(keys_count, i, 3)
              || action_line330(&i, keys, input, token, &cursor, 1);
         goto loop;
@@ -731,9 +875,16 @@ end:
 #define YYSHIFT(o) cursor += o
 #define YYLESSTHAN(n) (limit - cursor) < n
 #define YYFILL(n) { goto loop_end; }
-#define YYEND() limit <= cursor
 
-static int action_line339(unsigned* pkix, const YYKEYTYPE* keys, const YYCTYPE* start, const YYCTYPE* token, const YYCTYPE** cursor, YYKEYTYPE rule_act) {
+static int action_line339
+    ( unsigned *pkix
+    , const YYKEYTYPE *keys
+    , const YYCTYPE *start
+    , const YYCTYPE *token
+    , const YYCTYPE **cursor
+    , YYKEYTYPE rule_act
+    )
+{
     const unsigned kix = *pkix;
     const long pos = token - start;
     const long len_act = *cursor - token;
@@ -741,31 +892,43 @@ static int action_line339(unsigned* pkix, const YYKEYTYPE* keys, const YYCTYPE* 
     const YYKEYTYPE rule_exp = keys[kix + 2];
     *pkix = kix + 3;
     if (rule_exp == 255) {
-        fprintf(stderr,
-            "warning: lex_line339: control flow is undefined"
-            " for input at position %ld, rerun re2c with '-W'\n");
+        fprintf
+            ( stderr
+            , "warning: lex_line339: control flow is undefined"
+                " for input at position %ld, rerun re2c with '-W'\n"
+            , pos
+            );
     }
     if (len_act == len_exp && rule_act == rule_exp) {
         const YYKEYTYPE offset = keys[kix];
         *cursor = token + offset;
         return 0;
     } else {
-        fprintf(stderr,
-            "error: lex_line339: at position %ld (key %u):\n"
-            "\texpected: match length %ld, rule %u\n"
-            "\tactual:   match length %ld, rule %u\n",
-            pos, kix, len_exp, rule_exp, len_act, rule_act);
+        fprintf
+            ( stderr
+            , "error: lex_line339: at position %ld (key %u):\n"
+                "\texpected: match length %ld, rule %u\n"
+                "\tactual:   match length %ld, rule %u\n"
+            , pos
+            , kix
+            , len_exp
+            , rule_exp
+            , len_act
+            , rule_act
+            );
         return 1;
     }
 }
 
-static int check_key_count_line339(unsigned have, unsigned used, unsigned need) {
+static int check_key_count_line339(unsigned have, unsigned used, unsigned need)
+{
     if (used + need <= have) return 0;
     fprintf(stderr, "error: lex_line339: not enough keys\n");
     return 1;
 }
 
-int lex_line339() {
+int lex_line339()
+{
     const size_t padding = 1; /* YYMAXFILL */
     int status = 0;
     size_t input_len = 0;
@@ -778,13 +941,23 @@ int lex_line339() {
     const YYCTYPE *eof = NULL;
     unsigned int i = 0;
 
-    input = (YYCTYPE *) read_file("skeleton/php20150211_url_scanner_ex.c.line339.input", sizeof (YYCTYPE), padding, &input_len);
+    input = (YYCTYPE *) read_file
+        ( "skeleton/php20150211_url_scanner_ex.c.line339.input"
+        , sizeof (YYCTYPE)
+        , padding
+        , &input_len
+        );
     if (input == NULL) {
         status = 1;
         goto end;
     }
 
-    keys = (YYKEYTYPE *) read_file("skeleton/php20150211_url_scanner_ex.c.line339.keys", sizeof (YYKEYTYPE), 0, &keys_count);
+    keys = (YYKEYTYPE *) read_file
+        ( "skeleton/php20150211_url_scanner_ex.c.line339.keys"
+        , sizeof (YYKEYTYPE)
+        , 0
+        , &keys_count
+        );
     if (keys == NULL) {
         status = 1;
         goto end;
@@ -800,39 +973,39 @@ loop:
     {
         token = cursor;
         YYCTYPE yych;
-        static const unsigned char yybm[256] = {
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0, 128,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128,   0,   0,   0,   0,   0,
-              0, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128, 128, 128, 128, 128, 128,
-            128, 128, 128,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0
+        static const unsigned char yybm[] = {
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0, 128,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128,   0,   0,   0,   0,   0, 
+              0, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128, 128, 128, 128, 128, 128, 
+            128, 128, 128,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
         };
 
         if (YYLESSTHAN(1)) YYFILL(1);
@@ -850,7 +1023,9 @@ yy19:
         YYSKIP();
         if (YYLESSTHAN(1)) YYFILL(1);
         yych = YYPEEK();
-        if (yybm[0+yych] & 128) goto yy19;
+        if (yybm[0+yych] & 128) {
+            goto yy19;
+        }
         status = check_key_count_line339(keys_count, i, 3)
              || action_line339(&i, keys, input, token, &cursor, 0);
         goto loop;
@@ -892,9 +1067,16 @@ end:
 #define YYSHIFT(o) cursor += o
 #define YYLESSTHAN(n) (limit - cursor) < n
 #define YYFILL(n) { goto loop_end; }
-#define YYEND() limit <= cursor
 
-static int action_line346(unsigned* pkix, const YYKEYTYPE* keys, const YYCTYPE* start, const YYCTYPE* token, const YYCTYPE** cursor, YYKEYTYPE rule_act) {
+static int action_line346
+    ( unsigned *pkix
+    , const YYKEYTYPE *keys
+    , const YYCTYPE *start
+    , const YYCTYPE *token
+    , const YYCTYPE **cursor
+    , YYKEYTYPE rule_act
+    )
+{
     const unsigned kix = *pkix;
     const long pos = token - start;
     const long len_act = *cursor - token;
@@ -902,31 +1084,43 @@ static int action_line346(unsigned* pkix, const YYKEYTYPE* keys, const YYCTYPE* 
     const YYKEYTYPE rule_exp = keys[kix + 2];
     *pkix = kix + 3;
     if (rule_exp == 255) {
-        fprintf(stderr,
-            "warning: lex_line346: control flow is undefined"
-            " for input at position %ld, rerun re2c with '-W'\n");
+        fprintf
+            ( stderr
+            , "warning: lex_line346: control flow is undefined"
+                " for input at position %ld, rerun re2c with '-W'\n"
+            , pos
+            );
     }
     if (len_act == len_exp && rule_act == rule_exp) {
         const YYKEYTYPE offset = keys[kix];
         *cursor = token + offset;
         return 0;
     } else {
-        fprintf(stderr,
-            "error: lex_line346: at position %ld (key %u):\n"
-            "\texpected: match length %ld, rule %u\n"
-            "\tactual:   match length %ld, rule %u\n",
-            pos, kix, len_exp, rule_exp, len_act, rule_act);
+        fprintf
+            ( stderr
+            , "error: lex_line346: at position %ld (key %u):\n"
+                "\texpected: match length %ld, rule %u\n"
+                "\tactual:   match length %ld, rule %u\n"
+            , pos
+            , kix
+            , len_exp
+            , rule_exp
+            , len_act
+            , rule_act
+            );
         return 1;
     }
 }
 
-static int check_key_count_line346(unsigned have, unsigned used, unsigned need) {
+static int check_key_count_line346(unsigned have, unsigned used, unsigned need)
+{
     if (used + need <= have) return 0;
     fprintf(stderr, "error: lex_line346: not enough keys\n");
     return 1;
 }
 
-int lex_line346() {
+int lex_line346()
+{
     const size_t padding = 2; /* YYMAXFILL */
     int status = 0;
     size_t input_len = 0;
@@ -939,13 +1133,23 @@ int lex_line346() {
     const YYCTYPE *eof = NULL;
     unsigned int i = 0;
 
-    input = (YYCTYPE *) read_file("skeleton/php20150211_url_scanner_ex.c.line346.input", sizeof (YYCTYPE), padding, &input_len);
+    input = (YYCTYPE *) read_file
+        ( "skeleton/php20150211_url_scanner_ex.c.line346.input"
+        , sizeof (YYCTYPE)
+        , padding
+        , &input_len
+        );
     if (input == NULL) {
         status = 1;
         goto end;
     }
 
-    keys = (YYKEYTYPE *) read_file("skeleton/php20150211_url_scanner_ex.c.line346.keys", sizeof (YYKEYTYPE), 0, &keys_count);
+    keys = (YYKEYTYPE *) read_file
+        ( "skeleton/php20150211_url_scanner_ex.c.line346.keys"
+        , sizeof (YYKEYTYPE)
+        , 0
+        , &keys_count
+        );
     if (keys == NULL) {
         status = 1;
         goto end;
@@ -962,39 +1166,39 @@ loop:
         token = cursor;
         const YYCTYPE *marker = NULL;
         YYCTYPE yych;
-        static const unsigned char yybm[256] = {
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-            128,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0,
-              0,   0,   0,   0,   0,   0,   0,   0
+        static const unsigned char yybm[] = {
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+            128,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
+              0,   0,   0,   0,   0,   0,   0,   0, 
         };
 
         if (YYLESSTHAN(2)) YYFILL(2);
@@ -1016,7 +1220,9 @@ yy23:
         YYSKIP();
         if (YYLESSTHAN(1)) YYFILL(1);
         yych = YYPEEK();
-        if (yybm[0+yych] & 128) goto yy23;
+        if (yybm[0+yych] & 128) {
+            goto yy23;
+        }
         status = check_key_count_line346(keys_count, i, 3)
              || action_line346(&i, keys, input, token, &cursor, 0);
         goto loop;
@@ -1068,9 +1274,16 @@ end:
 #define YYSHIFT(o) cursor += o
 #define YYLESSTHAN(n) (limit - cursor) < n
 #define YYFILL(n) { goto loop_end; }
-#define YYEND() limit <= cursor
 
-static int action_line354(unsigned* pkix, const YYKEYTYPE* keys, const YYCTYPE* start, const YYCTYPE* token, const YYCTYPE** cursor, YYKEYTYPE rule_act) {
+static int action_line354
+    ( unsigned *pkix
+    , const YYKEYTYPE *keys
+    , const YYCTYPE *start
+    , const YYCTYPE *token
+    , const YYCTYPE **cursor
+    , YYKEYTYPE rule_act
+    )
+{
     const unsigned kix = *pkix;
     const long pos = token - start;
     const long len_act = *cursor - token;
@@ -1078,31 +1291,43 @@ static int action_line354(unsigned* pkix, const YYKEYTYPE* keys, const YYCTYPE* 
     const YYKEYTYPE rule_exp = keys[kix + 2];
     *pkix = kix + 3;
     if (rule_exp == 255) {
-        fprintf(stderr,
-            "warning: lex_line354: control flow is undefined"
-            " for input at position %ld, rerun re2c with '-W'\n");
+        fprintf
+            ( stderr
+            , "warning: lex_line354: control flow is undefined"
+                " for input at position %ld, rerun re2c with '-W'\n"
+            , pos
+            );
     }
     if (len_act == len_exp && rule_act == rule_exp) {
         const YYKEYTYPE offset = keys[kix];
         *cursor = token + offset;
         return 0;
     } else {
-        fprintf(stderr,
-            "error: lex_line354: at position %ld (key %u):\n"
-            "\texpected: match length %ld, rule %u\n"
-            "\tactual:   match length %ld, rule %u\n",
-            pos, kix, len_exp, rule_exp, len_act, rule_act);
+        fprintf
+            ( stderr
+            , "error: lex_line354: at position %ld (key %u):\n"
+                "\texpected: match length %ld, rule %u\n"
+                "\tactual:   match length %ld, rule %u\n"
+            , pos
+            , kix
+            , len_exp
+            , rule_exp
+            , len_act
+            , rule_act
+            );
         return 1;
     }
 }
 
-static int check_key_count_line354(unsigned have, unsigned used, unsigned need) {
+static int check_key_count_line354(unsigned have, unsigned used, unsigned need)
+{
     if (used + need <= have) return 0;
     fprintf(stderr, "error: lex_line354: not enough keys\n");
     return 1;
 }
 
-int lex_line354() {
+int lex_line354()
+{
     const size_t padding = 2; /* YYMAXFILL */
     int status = 0;
     size_t input_len = 0;
@@ -1115,13 +1340,23 @@ int lex_line354() {
     const YYCTYPE *eof = NULL;
     unsigned int i = 0;
 
-    input = (YYCTYPE *) read_file("skeleton/php20150211_url_scanner_ex.c.line354.input", sizeof (YYCTYPE), padding, &input_len);
+    input = (YYCTYPE *) read_file
+        ( "skeleton/php20150211_url_scanner_ex.c.line354.input"
+        , sizeof (YYCTYPE)
+        , padding
+        , &input_len
+        );
     if (input == NULL) {
         status = 1;
         goto end;
     }
 
-    keys = (YYKEYTYPE *) read_file("skeleton/php20150211_url_scanner_ex.c.line354.keys", sizeof (YYKEYTYPE), 0, &keys_count);
+    keys = (YYKEYTYPE *) read_file
+        ( "skeleton/php20150211_url_scanner_ex.c.line354.keys"
+        , sizeof (YYKEYTYPE)
+        , 0
+        , &keys_count
+        );
     if (keys == NULL) {
         status = 1;
         goto end;
@@ -1138,44 +1373,46 @@ loop:
         token = cursor;
         const YYCTYPE *marker = NULL;
         YYCTYPE yych;
-        static const unsigned char yybm[256] = {
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 192, 192, 224, 224, 192, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            192, 224, 128, 224, 224, 224, 224,  64,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224,   0, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224,
-            224, 224, 224, 224, 224, 224, 224, 224
+        static const unsigned char yybm[] = {
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 192, 192, 224, 224, 192, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            192, 224, 128, 224, 224, 224, 224,  64, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224,   0, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
+            224, 224, 224, 224, 224, 224, 224, 224, 
         };
 
         if (YYLESSTHAN(2)) YYFILL(2);
         yych = YYPEEK();
-        if (yybm[0+yych] & 32) goto yy26;
+        if (yybm[0+yych] & 32) {
+            goto yy26;
+        }
         if (yych <= ' ') goto yy27;
         if (yych <= '"') goto yy29;
         if (yych <= '\'') goto yy30;
@@ -1184,7 +1421,9 @@ yy26:
         YYSKIP();
         if (YYLESSTHAN(1)) YYFILL(1);
         yych = YYPEEK();
-        if (yybm[0+yych] & 32) goto yy26;
+        if (yybm[0+yych] & 32) {
+            goto yy26;
+        }
         status = check_key_count_line354(keys_count, i, 3)
              || action_line354(&i, keys, input, token, &cursor, 2);
         goto loop;
@@ -1211,7 +1450,9 @@ yy31:
         if (YYLESSTHAN(1)) YYFILL(1);
         yych = YYPEEK();
 yy32:
-        if (yybm[0+yych] & 64) goto yy31;
+        if (yybm[0+yych] & 64) {
+            goto yy31;
+        }
         if (yych <= '"') goto yy34;
 yy33:
         YYRESTORE();
@@ -1226,7 +1467,9 @@ yy35:
         if (YYLESSTHAN(1)) YYFILL(1);
         yych = YYPEEK();
 yy36:
-        if (yybm[0+yych] & 128) goto yy35;
+        if (yybm[0+yych] & 128) {
+            goto yy35;
+        }
         if (yych >= '(') goto yy33;
         YYSKIP();
         status = check_key_count_line354(keys_count, i, 3)
@@ -1263,14 +1506,29 @@ end:
 #undef YYLESSTHAN
 #undef YYFILL
 
-int main() {
-    if (lex_line125() != 0) return 1;
-    if (lex_line313() != 0) return 1;
-    if (lex_line320() != 0) return 1;
-    if (lex_line330() != 0) return 1;
-    if (lex_line339() != 0) return 1;
-    if (lex_line346() != 0) return 1;
-    if (lex_line354() != 0) return 1;
+int main()
+{
+    if (lex_line125() != 0) {
+        return 1;
+    }
+    if (lex_line313() != 0) {
+        return 1;
+    }
+    if (lex_line320() != 0) {
+        return 1;
+    }
+    if (lex_line330() != 0) {
+        return 1;
+    }
+    if (lex_line339() != 0) {
+        return 1;
+    }
+    if (lex_line346() != 0) {
+        return 1;
+    }
+    if (lex_line354() != 0) {
+        return 1;
+    }
     return 0;
 }
   #:?#:?#:?		#

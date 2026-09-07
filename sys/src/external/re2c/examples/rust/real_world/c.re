@@ -186,7 +186,7 @@ enum SymType {
 // C lexers (unfortunately) need information from the symbol table to return
 // the correct token type, because an identifier could be a type name. (This
 // ambiguity is a big source of trouble in C.) This is a fake "sym_type" that
-// always returns Identifier. It needs to be fixed to actually hook into the
+// always returns Identifer. It needs to be fixed to actually hook into the
 // parser's symbol table if this lexer is used in the real world.
 fn sym_type(_ident: &str) -> SymType {
     SymType::Identifier
@@ -283,24 +283,21 @@ impl Input {
 // Some of this lexer was taken from the C lex grammar at
 // http://www.quut.com/c/ANSI-C-grammar-l.html
 fn next_token(input: &mut Input) -> Result<Option<Token>, LexError> {
-    // The input must be null-terminated, otherwise the function has UB.
-    assert_eq!(input.data.last(), Some(&0));
-
     if input.eof { return Ok(None) }
 
     input.token = input.cursor;
     /*!re2c
     re2c:yyfill:enable = 0;
-    re2c:YYCTYPE      = "u8";
-    re2c:YYPEEK       = "input.data[input.cursor]";
-    re2c:YYSKIP       = "input.cursor += 1;";
-    re2c:YYBACKUP     = "input.marker = input.cursor;";
-    re2c:YYRESTORE    = "input.cursor = input.marker;";
-    re2c:YYRESTORETAG = "input.cursor = ${tag};";
-    re2c:YYSTAGP      = "@@{tag} = input.cursor;";
-    re2c:YYSTAGN      = "@@{tag} = -1;";
-    re2c:YYSHIFT      = "input.cursor += @@{shift};";
-    re2c:YYSHIFTSTAG  = "@@{tag} += @@{shift};";
+    re2c:define:YYCTYPE      = "u8";
+    re2c:define:YYPEEK       = "input.data[input.cursor]";
+    re2c:define:YYSKIP       = "input.cursor += 1;";
+    re2c:define:YYBACKUP     = "input.marker = input.cursor;";
+    re2c:define:YYRESTORE    = "input.cursor = input.marker;";
+    re2c:define:YYRESTORETAG = "input.cursor = ${tag};";
+    re2c:define:YYSTAGP      = "@@{tag} = input.cursor;";
+    re2c:define:YYSTAGN      = "@@{tag} = -1;";
+    re2c:define:YYSHIFT      = "input.cursor += @@{shift};";
+    re2c:define:YYSHIFTSTAG  = "@@{tag} += @@{shift};";
 
     O  = [0-7];
     D  = [0-9];

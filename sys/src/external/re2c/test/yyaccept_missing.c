@@ -18,7 +18,7 @@ static enum YYCONDTYPE yy_state;
 
 enum YYCONDTYPE {
 	yycINITIAL,
-	yycST_VALUE
+	yycST_VALUE,
 };
 
 
@@ -35,42 +35,11 @@ int scan(char *s, int l)
 		{
 			YYCTYPE yych;
 			unsigned int yyaccept = 0;
-			static const unsigned char yybm_ST_VALUE[256] = {
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0, 128,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				128,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0,
-				  0,   0,   0,   0,   0,   0,   0,   0
-			};
-			if (YYGETCONDITION() < 1) goto yyc_INITIAL;
-			else goto yyc_ST_VALUE;
+			if (YYGETCONDITION() < 1) {
+				goto yyc_INITIAL;
+			} else {
+				goto yyc_ST_VALUE;
+			}
 /* *********************************** */
 yyc_INITIAL:
 			if ((YYLIMIT - YYCURSOR) < 2) YYFILL(2);
@@ -99,45 +68,87 @@ yy5:
 	}
 /* *********************************** */
 yyc_ST_VALUE:
-			YYMARKER = YYCURSOR;
-			if (YYLIMIT <= YYCURSOR) YYFILL(1);
-			yych = *YYCURSOR;
-			if (yybm_ST_VALUE[0+yych] & 128) goto yy8;
-			if (yych == '$') goto yy9;
-yy7:
 			{
+				static const unsigned char yybm[] = {
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0, 128,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					128,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+					  0,   0,   0,   0,   0,   0,   0,   0, 
+				};
+				if (YYLIMIT <= YYCURSOR) YYFILL(1);
+				yych = *(YYMARKER = YYCURSOR);
+				if (yybm[0+yych] & 128) {
+					goto yy8;
+				}
+				if (yych == '$') goto yy9;
+yy7:
+				{
 		YYSETCONDITION(STATE(INITIAL));
 		printf("Found spaces\n");
 	}
 yy8:
-			++YYCURSOR;
-			if (YYLIMIT <= YYCURSOR) YYFILL(1);
-			yych = *YYCURSOR;
-			if (yybm_ST_VALUE[0+yych] & 128) goto yy8;
-			goto yy7;
+				++YYCURSOR;
+				if (YYLIMIT <= YYCURSOR) YYFILL(1);
+				yych = *YYCURSOR;
+				if (yybm[0+yych] & 128) {
+					goto yy8;
+				}
+				goto yy7;
 yy9:
-			++YYCURSOR;
-			if (YYLIMIT <= YYCURSOR) YYFILL(1);
-			yych = *YYCURSOR;
-			if (yych <= '@') goto yy10;
-			if (yych <= 'Z') goto yy11;
-			if (yych <= '`') goto yy10;
-			if (yych <= 'z') goto yy11;
+				++YYCURSOR;
+				if (YYLIMIT <= YYCURSOR) YYFILL(1);
+				yych = *YYCURSOR;
+				if (yych <= '@') goto yy10;
+				if (yych <= 'Z') goto yy11;
+				if (yych <= '`') goto yy10;
+				if (yych <= 'z') goto yy11;
 yy10:
-			YYCURSOR = YYMARKER;
-			if (yyaccept == 0) goto yy7;
-			else goto yy12;
+				YYCURSOR = YYMARKER;
+				if (yyaccept == 0) {
+					goto yy7;
+				} else {
+					goto yy12;
+				}
 yy11:
-			yyaccept = 1;
-			YYMARKER = ++YYCURSOR;
-			if (YYLIMIT <= YYCURSOR) YYFILL(1);
-			yych = *YYCURSOR;
-			if (yych == '$') goto yy9;
+				yyaccept = 1;
+				YYMARKER = ++YYCURSOR;
+				if (YYLIMIT <= YYCURSOR) YYFILL(1);
+				yych = *YYCURSOR;
+				if (yych == '$') goto yy9;
 yy12:
-			{
+				{
 		printf("Found $ or $\\<x>\n");
 		continue;
 	}
+			}
 		}
 
 	}

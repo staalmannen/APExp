@@ -35,48 +35,29 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_RE2C_SRC_PARSE_PARSER_H_INCLUDED
-# define YY_RE2C_SRC_PARSE_PARSER_H_INCLUDED
+#ifndef YY_YY_SRC_PARSE_PARSER_H_INCLUDED
+# define YY_YY_SRC_PARSE_PARSER_H_INCLUDED
 /* Debug traces.  */
-#ifndef RE2C_DEBUG
-# if defined YYDEBUG
-#if YYDEBUG
-#   define RE2C_DEBUG 1
-#  else
-#   define RE2C_DEBUG 0
-#  endif
-# else /* ! defined YYDEBUG */
-#  define RE2C_DEBUG 0
-# endif /* ! defined YYDEBUG */
-#endif  /* ! defined RE2C_DEBUG */
-#if RE2C_DEBUG
-extern int re2c_debug;
+#ifndef YYDEBUG
+# define YYDEBUG 0
 #endif
-/* "%code requires" blocks.  */
-#line 1 "../src/parse/parser.ypp"
-
-/* pull in types to populate YYSTYPE: */
-#include "src/parse/ast.h"
-namespace re2c {
-    struct AstNode;
-    struct SemAct;
-}
-
-#line 66 "src/parse/parser.h"
+#if YYDEBUG
+extern int yydebug;
+#endif
 
 /* Token kinds.  */
-#ifndef RE2C_TOKENTYPE
-# define RE2C_TOKENTYPE
-  enum re2c_tokentype
+#ifndef YYTOKENTYPE
+# define YYTOKENTYPE
+  enum yytokentype
   {
-    RE2C_EMPTY = -2,
-    RE2C_EOF = 0,                  /* "end of file"  */
-    RE2C_error = 256,              /* error  */
-    RE2C_UNDEF = 257,              /* "invalid token"  */
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
     TOKEN_CJUMP = 258,             /* TOKEN_CJUMP  */
     TOKEN_CNEXT = 259,             /* TOKEN_CNEXT  */
     TOKEN_CLIST = 260,             /* TOKEN_CLIST  */
-    TOKEN_CPRE_RULE = 261,         /* TOKEN_CPRE_RULE  */
+    TOKEN_CSETUP = 261,            /* TOKEN_CSETUP  */
     TOKEN_CZERO = 262,             /* TOKEN_CZERO  */
     TOKEN_CLOSESIZE = 263,         /* TOKEN_CLOSESIZE  */
     TOKEN_CODE = 264,              /* TOKEN_CODE  */
@@ -86,41 +67,37 @@ namespace re2c {
     TOKEN_FID_END = 268,           /* TOKEN_FID_END  */
     TOKEN_LINE_INFO = 269,         /* TOKEN_LINE_INFO  */
     TOKEN_REGEXP = 270,            /* TOKEN_REGEXP  */
-    TOKEN_BLOCK = 271,             /* TOKEN_BLOCK  */
-    TOKEN_ENTRY = 272,             /* TOKEN_ENTRY  */
-    TOKEN_PRE_RULE = 273,          /* TOKEN_PRE_RULE  */
-    TOKEN_POST_RULE = 274,         /* TOKEN_POST_RULE  */
-    TOKEN_LPAREN_NEG = 275,        /* TOKEN_LPAREN_NEG  */
-    TOKEN_ERROR = 276              /* TOKEN_ERROR  */
+    TOKEN_BLOCK = 271              /* TOKEN_BLOCK  */
   };
-  typedef enum re2c_tokentype re2c_token_kind_t;
+  typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
-#if ! defined RE2C_STYPE && ! defined RE2C_STYPE_IS_DECLARED
-union RE2C_STYPE
+#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
+union YYSTYPE
 {
-#line 43 "../src/parse/parser.ypp"
+#line 35 "../src/parse/parser.ypp"
 
-    const re2c::AstNode* regexp;
-    const re2c::SemAct* semact;
-    char op;
-    re2c::AstBounds bounds;
-    const char* cstr;
-    std::string* str;
+    const re2c::AST *regexp;
+    re2c::SemAct    *semact;
+    char             op;
+    re2c::ASTBounds  bounds;
+    std::string     *str;
+    re2c::CondList  *clist;
 
-#line 113 "src/parse/parser.h"
+#line 89 "src/parse/parser.h"
 
 };
-typedef union RE2C_STYPE RE2C_STYPE;
-# define RE2C_STYPE_IS_TRIVIAL 1
-# define RE2C_STYPE_IS_DECLARED 1
+typedef union YYSTYPE YYSTYPE;
+# define YYSTYPE_IS_TRIVIAL 1
+# define YYSTYPE_IS_DECLARED 1
 #endif
 
 
+extern YYSTYPE yylval;
 
 
-int re2c_parse (re2c::Input& input, re2c::Ast& ast, re2c::Opt& opts, re2c::AstGrams& grams);
+int yyparse (re2c::context_t &context);
 
 
-#endif /* !YY_RE2C_SRC_PARSE_PARSER_H_INCLUDED  */
+#endif /* !YY_YY_SRC_PARSE_PARSER_H_INCLUDED  */

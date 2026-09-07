@@ -15,9 +15,9 @@ char *scan(char *p)
 
 #line 17 "config/config4f.c"
 	switch (YYGETSTATE()) {
+		default: goto yy0;
 		case 0: goto yyFillLabel0;
 		case 1: goto yyFillLabel1;
-		default: goto yy0;
 	}
 #line 15 "config/config4f.re"
 
@@ -26,11 +26,10 @@ char *scan(char *p)
 
 
 #line 29 "config/config4f.c"
+
 yy0:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(0);
-		YYFILL(1);
-	}
+	YYSETSTATE(0);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel0:
 	yych = *YYCURSOR;
 	switch (yych) {
@@ -51,13 +50,11 @@ yy2:
 	YYSETSTATE(-1);
 #line 23 "config/config4f.re"
 	{ return NULL; }
-#line 55 "config/config4f.c"
+#line 54 "config/config4f.c"
 yy3:
 	++YYCURSOR;
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(1);
-		YYFILL(1);
-	}
+	YYSETSTATE(1);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel1:
 	yych = *YYCURSOR;
 	switch (yych) {
@@ -77,7 +74,7 @@ yy4:
 	YYSETSTATE(-1);
 #line 22 "config/config4f.re"
 	{ return YYCURSOR; }
-#line 81 "config/config4f.c"
+#line 78 "config/config4f.c"
 #line 24 "config/config4f.re"
 
 }

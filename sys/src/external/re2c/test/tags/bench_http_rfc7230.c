@@ -548,31 +548,8 @@ yy7:
 	yych = *++YYCURSOR;
 	switch (yych) {
 		case ' ':
-			in->yyt3 = YYCURSOR;
-			in->yyt4 = NULL;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt9 = NULL;
-			in->yyt10 = YYCURSOR;
-			in->yyt11 = YYCURSOR;
-			in->yyt12 = NULL;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
+			in->yyt4 = in->yyt5 = in->yyt6 = in->yyt7 = in->yyt9 = in->yyt12 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
+			in->yyt3 = in->yyt10 = in->yyt11 = YYCURSOR;
 			goto yy12;
 		case '!':
 		case '$':
@@ -599,38 +576,25 @@ yy7:
 		case '=':
 		case '_':
 		case '~':
-			in->yyt3 = YYCURSOR;
-			in->yyt4 = NULL;
-			in->yyt5 = YYCURSOR;
-			in->yyt9 = NULL;
-			in->yyt10 = YYCURSOR;
+			in->yyt4 = in->yyt9 = NULL;
+			in->yyt3 = in->yyt5 = in->yyt10 = YYCURSOR;
 			goto yy13;
 		case '%':
-			in->yyt3 = YYCURSOR;
-			in->yyt4 = NULL;
-			in->yyt5 = YYCURSOR;
-			in->yyt9 = NULL;
-			in->yyt10 = YYCURSOR;
+			in->yyt4 = in->yyt9 = NULL;
+			in->yyt3 = in->yyt5 = in->yyt10 = YYCURSOR;
 			goto yy14;
 		case '/':
 			in->yyt26 = YYCURSOR;
 			goto yy15;
 		case ':':
-			in->yyt3 = YYCURSOR;
-			in->yyt4 = NULL;
-			in->yyt5 = YYCURSOR;
-			in->yyt9 = NULL;
-			in->yyt10 = YYCURSOR;
-			in->yyt11 = YYCURSOR;
+			in->yyt4 = in->yyt9 = NULL;
+			in->yyt3 = in->yyt5 = in->yyt10 = in->yyt11 = YYCURSOR;
 			goto yy16;
 		case '?':
-			in->yyt26 = YYCURSOR;
-			in->yyt27 = YYCURSOR;
+			in->yyt26 = in->yyt27 = YYCURSOR;
 			goto yy17;
 		case '@':
-			in->yyt3 = YYCURSOR;
-			in->yyt5 = YYCURSOR;
-			in->yyt9 = YYCURSOR;
+			in->yyt3 = in->yyt5 = in->yyt9 = YYCURSOR;
 			goto yy18;
 		case 'A':
 		case 'B':
@@ -684,18 +648,12 @@ yy7:
 		case 'x':
 		case 'y':
 		case 'z':
-			in->yyt3 = YYCURSOR;
-			in->yyt4 = NULL;
-			in->yyt5 = YYCURSOR;
-			in->yyt9 = NULL;
-			in->yyt10 = YYCURSOR;
-			in->yyt13 = YYCURSOR;
+			in->yyt4 = in->yyt9 = NULL;
+			in->yyt3 = in->yyt5 = in->yyt10 = in->yyt13 = YYCURSOR;
 			goto yy19;
 		case '[':
-			in->yyt3 = YYCURSOR;
-			in->yyt4 = NULL;
-			in->yyt9 = NULL;
-			in->yyt10 = YYCURSOR;
+			in->yyt4 = in->yyt9 = NULL;
+			in->yyt3 = in->yyt10 = YYCURSOR;
 			goto yy20;
 		default: goto yy8;
 	}
@@ -808,27 +766,8 @@ yy13:
 	yych = *YYCURSOR;
 	switch (yych) {
 		case ' ':
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
+			in->yyt5 = in->yyt6 = in->yyt7 = in->yyt12 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
 			in->yyt11 = YYCURSOR;
-			in->yyt12 = NULL;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
 			goto yy12;
 		case '!':
 		case '$':
@@ -951,30 +890,8 @@ yy15:
 	yych = *YYCURSOR;
 	switch (yych) {
 		case ' ':
-			in->yyt3 = NULL;
-			in->yyt4 = NULL;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt9 = NULL;
-			in->yyt10 = NULL;
-			in->yyt11 = NULL;
-			in->yyt12 = NULL;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
+			in->yyt3 = in->yyt4 = in->yyt5 = in->yyt6 = in->yyt7 = in->yyt9 = in->yyt10 = in->yyt11 = in->yyt12 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt28 = NULL;
 			in->yyt27 = YYCURSOR;
-			in->yyt28 = NULL;
 			goto yy12;
 		case '!':
 		case '$':
@@ -1066,26 +983,8 @@ yy16:
 	yych = *++YYCURSOR;
 	switch (yych) {
 		case ' ':
-			in->yyt5 = YYCURSOR;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt12 = YYCURSOR;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
+			in->yyt6 = in->yyt7 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
+			in->yyt5 = in->yyt12 = YYCURSOR;
 			goto yy12;
 		case '0':
 		case '1':
@@ -1105,29 +1004,8 @@ yy17:
 	yych = *++YYCURSOR;
 	switch (yych) {
 		case ' ':
-			in->yyt3 = NULL;
-			in->yyt4 = NULL;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = YYCURSOR;
-			in->yyt9 = NULL;
-			in->yyt10 = NULL;
-			in->yyt11 = NULL;
-			in->yyt12 = NULL;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt28 = YYCURSOR;
+			in->yyt3 = in->yyt4 = in->yyt5 = in->yyt6 = in->yyt9 = in->yyt10 = in->yyt11 = in->yyt12 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = NULL;
+			in->yyt7 = in->yyt28 = YYCURSOR;
 			goto yy12;
 		case '!':
 		case '$':
@@ -1222,28 +1100,8 @@ yy18:
 	switch (yych) {
 		case ' ':
 			in->yyt4 = in->yyt5;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt10 = YYCURSOR;
-			in->yyt11 = YYCURSOR;
-			in->yyt12 = NULL;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
+			in->yyt5 = in->yyt6 = in->yyt7 = in->yyt12 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
+			in->yyt10 = in->yyt11 = YYCURSOR;
 			goto yy12;
 		case '!':
 		case '$':
@@ -1328,8 +1186,7 @@ yy18:
 			in->yyt10 = YYCURSOR;
 			goto yy32;
 		case ':':
-			in->yyt10 = YYCURSOR;
-			in->yyt11 = YYCURSOR;
+			in->yyt10 = in->yyt11 = YYCURSOR;
 			goto yy33;
 		case '[':
 			in->yyt4 = in->yyt5;
@@ -1343,27 +1200,8 @@ yy19:
 	yych = *YYCURSOR;
 	switch (yych) {
 		case ' ':
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
+			in->yyt5 = in->yyt6 = in->yyt7 = in->yyt12 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
 			in->yyt11 = YYCURSOR;
-			in->yyt12 = NULL;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
 			goto yy12;
 		case '!':
 		case '$':
@@ -1444,8 +1282,7 @@ yy19:
 		case 'y':
 		case 'z': goto yy19;
 		case ':':
-			in->yyt11 = YYCURSOR;
-			in->yyt14 = YYCURSOR;
+			in->yyt11 = in->yyt14 = YYCURSOR;
 			goto yy34;
 		case '@':
 			in->yyt9 = YYCURSOR;
@@ -1676,25 +1513,8 @@ yy28:
 	yych = *YYCURSOR;
 	switch (yych) {
 		case ' ':
+			in->yyt6 = in->yyt7 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
 			in->yyt5 = YYCURSOR;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
 			goto yy12;
 		case '!':
 		case '$':
@@ -1786,28 +1606,8 @@ yy29:
 	yych = *YYCURSOR;
 	switch (yych) {
 		case ' ':
-			in->yyt3 = NULL;
-			in->yyt4 = NULL;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
+			in->yyt3 = in->yyt4 = in->yyt5 = in->yyt6 = in->yyt9 = in->yyt10 = in->yyt11 = in->yyt12 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = NULL;
 			in->yyt7 = YYCURSOR;
-			in->yyt9 = NULL;
-			in->yyt10 = NULL;
-			in->yyt11 = NULL;
-			in->yyt12 = NULL;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
 			goto yy12;
 		case '!':
 		case '$':
@@ -1929,27 +1729,8 @@ yy31:
 	switch (yych) {
 		case ' ':
 			in->yyt4 = in->yyt5;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
+			in->yyt5 = in->yyt6 = in->yyt7 = in->yyt12 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
 			in->yyt11 = YYCURSOR;
-			in->yyt12 = NULL;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
 			goto yy12;
 		case '!':
 		case '$':
@@ -2068,26 +1849,8 @@ yy33:
 	switch (yych) {
 		case ' ':
 			in->yyt4 = in->yyt5;
-			in->yyt5 = YYCURSOR;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt12 = YYCURSOR;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
+			in->yyt6 = in->yyt7 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
+			in->yyt5 = in->yyt12 = YYCURSOR;
 			goto yy12;
 		case '0':
 		case '1':
@@ -2107,26 +1870,8 @@ yy34:
 	yych = *++YYCURSOR;
 	switch (yych) {
 		case ' ':
-			in->yyt5 = YYCURSOR;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt12 = YYCURSOR;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
+			in->yyt6 = in->yyt7 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
+			in->yyt5 = in->yyt12 = YYCURSOR;
 			goto yy12;
 		case '!':
 		case '$':
@@ -2214,24 +1959,14 @@ yy34:
 		case '7':
 		case '8':
 		case '9':
-			in->yyt12 = YYCURSOR;
-			in->yyt23 = YYCURSOR;
+			in->yyt12 = in->yyt23 = YYCURSOR;
 			goto yy48;
 		case '?':
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = YYCURSOR;
-			in->yyt24 = YYCURSOR;
+			in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = NULL;
+			in->yyt23 = in->yyt24 = YYCURSOR;
 			goto yy49;
 		case '@':
-			in->yyt9 = YYCURSOR;
-			in->yyt23 = YYCURSOR;
+			in->yyt9 = in->yyt23 = YYCURSOR;
 			goto yy50;
 		default: goto yy8;
 	}
@@ -2410,25 +2145,8 @@ yy44:
 	switch (yych) {
 		case ' ':
 			in->yyt4 = in->yyt5;
+			in->yyt6 = in->yyt7 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
 			in->yyt5 = YYCURSOR;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
 			goto yy12;
 		case '0':
 		case '1':
@@ -2448,28 +2166,8 @@ yy45:
 	yych = *YYCURSOR;
 	switch (yych) {
 		case ' ':
-			in->yyt3 = NULL;
-			in->yyt4 = NULL;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt9 = NULL;
-			in->yyt10 = NULL;
-			in->yyt11 = NULL;
-			in->yyt12 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
+			in->yyt3 = in->yyt4 = in->yyt5 = in->yyt6 = in->yyt7 = in->yyt9 = in->yyt10 = in->yyt11 = in->yyt12 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
 			in->yyt24 = YYCURSOR;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
 			goto yy12;
 		case '!':
 		case '$':
@@ -2552,14 +2250,7 @@ yy45:
 		case '%': goto yy46;
 		case '/': goto yy58;
 		case '?':
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
+			in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = NULL;
 			in->yyt24 = YYCURSOR;
 			goto yy49;
 		case '@':
@@ -2608,25 +2299,8 @@ yy48:
 	yych = *YYCURSOR;
 	switch (yych) {
 		case ' ':
+			in->yyt6 = in->yyt7 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
 			in->yyt5 = YYCURSOR;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
 			goto yy12;
 		case '!':
 		case '$':
@@ -2709,14 +2383,7 @@ yy48:
 		case '8':
 		case '9': goto yy48;
 		case '?':
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
+			in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = NULL;
 			in->yyt24 = YYCURSOR;
 			goto yy49;
 		case '@':
@@ -2728,19 +2395,8 @@ yy49:
 	yych = *++YYCURSOR;
 	switch (yych) {
 		case ' ':
-			in->yyt3 = NULL;
-			in->yyt4 = NULL;
-			in->yyt5 = NULL;
-			in->yyt6 = YYCURSOR;
-			in->yyt7 = NULL;
-			in->yyt9 = NULL;
-			in->yyt10 = NULL;
-			in->yyt11 = NULL;
-			in->yyt12 = NULL;
-			in->yyt25 = YYCURSOR;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
+			in->yyt3 = in->yyt4 = in->yyt5 = in->yyt7 = in->yyt9 = in->yyt10 = in->yyt11 = in->yyt12 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
+			in->yyt6 = in->yyt25 = YYCURSOR;
 			goto yy12;
 		case '!':
 		case '$':
@@ -2835,28 +2491,8 @@ yy50:
 	switch (yych) {
 		case ' ':
 			in->yyt4 = in->yyt5;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt10 = YYCURSOR;
-			in->yyt11 = YYCURSOR;
-			in->yyt12 = NULL;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
+			in->yyt5 = in->yyt6 = in->yyt7 = in->yyt12 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
+			in->yyt10 = in->yyt11 = YYCURSOR;
 			goto yy12;
 		case '!':
 		case '$':
@@ -2941,8 +2577,7 @@ yy50:
 			in->yyt10 = YYCURSOR;
 			goto yy67;
 		case ':':
-			in->yyt10 = YYCURSOR;
-			in->yyt11 = YYCURSOR;
+			in->yyt10 = in->yyt11 = YYCURSOR;
 			goto yy68;
 		case '[':
 			in->yyt4 = in->yyt5;
@@ -3093,28 +2728,8 @@ yy58:
 yy59:
 	switch (yych) {
 		case ' ':
-			in->yyt3 = NULL;
-			in->yyt4 = NULL;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt9 = NULL;
-			in->yyt10 = NULL;
-			in->yyt11 = NULL;
-			in->yyt12 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
+			in->yyt3 = in->yyt4 = in->yyt5 = in->yyt6 = in->yyt7 = in->yyt9 = in->yyt10 = in->yyt11 = in->yyt12 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
 			in->yyt24 = YYCURSOR;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
 			goto yy12;
 		case '!':
 		case '$':
@@ -3198,14 +2813,7 @@ yy59:
 		case '~': goto yy58;
 		case '%': goto yy61;
 		case '?':
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
+			in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = NULL;
 			in->yyt24 = YYCURSOR;
 			goto yy49;
 		default: goto yy8;
@@ -3272,29 +2880,8 @@ yy62:
 	yych = *++YYCURSOR;
 	switch (yych) {
 		case ' ':
-			in->yyt3 = NULL;
-			in->yyt4 = NULL;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt9 = NULL;
-			in->yyt10 = NULL;
-			in->yyt11 = NULL;
-			in->yyt12 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = YYCURSOR;
-			in->yyt18 = YYCURSOR;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = YYCURSOR;
-			in->yyt22 = YYCURSOR;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
+			in->yyt3 = in->yyt4 = in->yyt5 = in->yyt6 = in->yyt7 = in->yyt9 = in->yyt10 = in->yyt11 = in->yyt12 = in->yyt15 = in->yyt16 = in->yyt19 = in->yyt20 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
+			in->yyt17 = in->yyt18 = in->yyt21 = in->yyt22 = YYCURSOR;
 			goto yy12;
 		case '!':
 		case '$':
@@ -3373,52 +2960,30 @@ yy62:
 		case 'y':
 		case 'z':
 		case '~':
-			in->yyt3 = YYCURSOR;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = YYCURSOR;
+			in->yyt15 = in->yyt16 = NULL;
+			in->yyt3 = in->yyt17 = YYCURSOR;
 			goto yy82;
 		case '%':
-			in->yyt3 = YYCURSOR;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = YYCURSOR;
+			in->yyt15 = in->yyt16 = NULL;
+			in->yyt3 = in->yyt17 = YYCURSOR;
 			goto yy83;
 		case '/':
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = YYCURSOR;
-			in->yyt18 = YYCURSOR;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = YYCURSOR;
+			in->yyt15 = in->yyt16 = in->yyt19 = in->yyt20 = NULL;
+			in->yyt17 = in->yyt18 = in->yyt21 = YYCURSOR;
 			goto yy84;
 		case ':':
-			in->yyt3 = YYCURSOR;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = YYCURSOR;
-			in->yyt18 = YYCURSOR;
+			in->yyt15 = in->yyt16 = NULL;
+			in->yyt3 = in->yyt17 = in->yyt18 = YYCURSOR;
 			goto yy85;
 		case '?':
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = YYCURSOR;
-			in->yyt18 = YYCURSOR;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = YYCURSOR;
-			in->yyt22 = YYCURSOR;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
+			in->yyt15 = in->yyt16 = in->yyt19 = in->yyt20 = in->yyt23 = in->yyt24 = NULL;
+			in->yyt17 = in->yyt18 = in->yyt21 = in->yyt22 = YYCURSOR;
 			goto yy49;
 		case '@':
-			in->yyt3 = YYCURSOR;
-			in->yyt16 = YYCURSOR;
+			in->yyt3 = in->yyt16 = YYCURSOR;
 			goto yy86;
 		case '[':
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
+			in->yyt15 = in->yyt16 = NULL;
 			in->yyt17 = YYCURSOR;
 			goto yy87;
 		default: goto yy8;
@@ -3429,18 +2994,8 @@ yy63:
 	yych = *YYCURSOR;
 	switch (yych) {
 		case ' ':
-			in->yyt3 = NULL;
-			in->yyt4 = NULL;
-			in->yyt5 = NULL;
+			in->yyt3 = in->yyt4 = in->yyt5 = in->yyt7 = in->yyt9 = in->yyt10 = in->yyt11 = in->yyt12 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
 			in->yyt6 = YYCURSOR;
-			in->yyt7 = NULL;
-			in->yyt9 = NULL;
-			in->yyt10 = NULL;
-			in->yyt11 = NULL;
-			in->yyt12 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
 			goto yy12;
 		case '!':
 		case '$':
@@ -3563,27 +3118,8 @@ yy66:
 	switch (yych) {
 		case ' ':
 			in->yyt4 = in->yyt5;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
+			in->yyt5 = in->yyt6 = in->yyt7 = in->yyt12 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
 			in->yyt11 = YYCURSOR;
-			in->yyt12 = NULL;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
 			goto yy12;
 		case '!':
 		case '$':
@@ -3669,14 +3205,7 @@ yy66:
 			in->yyt11 = YYCURSOR;
 			goto yy68;
 		case '?':
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
+			in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = NULL;
 			in->yyt24 = YYCURSOR;
 			goto yy49;
 		default: goto yy8;
@@ -3715,26 +3244,8 @@ yy68:
 	switch (yych) {
 		case ' ':
 			in->yyt4 = in->yyt5;
-			in->yyt5 = YYCURSOR;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt12 = YYCURSOR;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
+			in->yyt6 = in->yyt7 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
+			in->yyt5 = in->yyt12 = YYCURSOR;
 			goto yy12;
 		case '0':
 		case '1':
@@ -3987,27 +3498,8 @@ yy77:
 	yych = *++YYCURSOR;
 	switch (yych) {
 		case ' ':
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
+			in->yyt5 = in->yyt6 = in->yyt7 = in->yyt12 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
 			in->yyt11 = YYCURSOR;
-			in->yyt12 = NULL;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
 			goto yy12;
 		case ':':
 			in->yyt5 = in->yyt4;
@@ -4068,26 +3560,8 @@ yy82:
 	yych = *YYCURSOR;
 	switch (yych) {
 		case ' ':
-			in->yyt3 = NULL;
-			in->yyt4 = NULL;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt9 = NULL;
-			in->yyt10 = NULL;
-			in->yyt11 = NULL;
-			in->yyt12 = NULL;
-			in->yyt18 = YYCURSOR;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = YYCURSOR;
-			in->yyt22 = YYCURSOR;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
+			in->yyt3 = in->yyt4 = in->yyt5 = in->yyt6 = in->yyt7 = in->yyt9 = in->yyt10 = in->yyt11 = in->yyt12 = in->yyt19 = in->yyt20 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
+			in->yyt18 = in->yyt21 = in->yyt22 = YYCURSOR;
 			goto yy12;
 		case '!':
 		case '$':
@@ -4168,22 +3642,15 @@ yy82:
 		case '~': goto yy82;
 		case '%': goto yy83;
 		case '/':
-			in->yyt18 = YYCURSOR;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = YYCURSOR;
+			in->yyt19 = in->yyt20 = NULL;
+			in->yyt18 = in->yyt21 = YYCURSOR;
 			goto yy84;
 		case ':':
 			in->yyt18 = YYCURSOR;
 			goto yy85;
 		case '?':
-			in->yyt18 = YYCURSOR;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = YYCURSOR;
-			in->yyt22 = YYCURSOR;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
+			in->yyt19 = in->yyt20 = in->yyt23 = in->yyt24 = NULL;
+			in->yyt18 = in->yyt21 = in->yyt22 = YYCURSOR;
 			goto yy49;
 		case '@':
 			in->yyt16 = YYCURSOR;
@@ -4225,22 +3692,8 @@ yy84:
 	yych = *YYCURSOR;
 	switch (yych) {
 		case ' ':
-			in->yyt3 = NULL;
-			in->yyt4 = NULL;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt9 = NULL;
-			in->yyt10 = NULL;
-			in->yyt11 = NULL;
-			in->yyt12 = NULL;
+			in->yyt3 = in->yyt4 = in->yyt5 = in->yyt6 = in->yyt7 = in->yyt9 = in->yyt10 = in->yyt11 = in->yyt12 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
 			in->yyt22 = YYCURSOR;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
 			goto yy12;
 		case '!':
 		case '$':
@@ -4324,9 +3777,8 @@ yy84:
 		case '~': goto yy84;
 		case '%': goto yy110;
 		case '?':
+			in->yyt23 = in->yyt24 = NULL;
 			in->yyt22 = YYCURSOR;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
 			goto yy49;
 		default: goto yy8;
 	}
@@ -4334,30 +3786,11 @@ yy85:
 	yych = *++YYCURSOR;
 	switch (yych) {
 		case ' ':
-			in->yyt3 = NULL;
-			in->yyt4 = NULL;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt9 = NULL;
-			in->yyt10 = NULL;
-			in->yyt11 = NULL;
-			in->yyt12 = NULL;
-			in->yyt19 = YYCURSOR;
-			in->yyt20 = YYCURSOR;
-			in->yyt21 = YYCURSOR;
-			in->yyt22 = YYCURSOR;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
+			in->yyt3 = in->yyt4 = in->yyt5 = in->yyt6 = in->yyt7 = in->yyt9 = in->yyt10 = in->yyt11 = in->yyt12 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
+			in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = YYCURSOR;
 			goto yy12;
 		case '/':
-			in->yyt19 = YYCURSOR;
-			in->yyt20 = YYCURSOR;
-			in->yyt21 = YYCURSOR;
+			in->yyt19 = in->yyt20 = in->yyt21 = YYCURSOR;
 			goto yy84;
 		case '0':
 		case '1':
@@ -4372,12 +3805,8 @@ yy85:
 			in->yyt19 = YYCURSOR;
 			goto yy114;
 		case '?':
-			in->yyt19 = YYCURSOR;
-			in->yyt20 = YYCURSOR;
-			in->yyt21 = YYCURSOR;
-			in->yyt22 = YYCURSOR;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
+			in->yyt23 = in->yyt24 = NULL;
+			in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = YYCURSOR;
 			goto yy49;
 		default: goto yy112;
 	}
@@ -4386,27 +3815,8 @@ yy86:
 	switch (yych) {
 		case ' ':
 			in->yyt15 = in->yyt3;
-			in->yyt3 = NULL;
-			in->yyt4 = NULL;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt9 = NULL;
-			in->yyt10 = NULL;
-			in->yyt11 = NULL;
-			in->yyt12 = NULL;
-			in->yyt17 = YYCURSOR;
-			in->yyt18 = YYCURSOR;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = YYCURSOR;
-			in->yyt22 = YYCURSOR;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
+			in->yyt3 = in->yyt4 = in->yyt5 = in->yyt6 = in->yyt7 = in->yyt9 = in->yyt10 = in->yyt11 = in->yyt12 = in->yyt19 = in->yyt20 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
+			in->yyt17 = in->yyt18 = in->yyt21 = in->yyt22 = YYCURSOR;
 			goto yy12;
 		case '!':
 		case '$':
@@ -4492,26 +3902,16 @@ yy86:
 			goto yy116;
 		case '/':
 			in->yyt15 = in->yyt3;
-			in->yyt17 = YYCURSOR;
-			in->yyt18 = YYCURSOR;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = YYCURSOR;
+			in->yyt19 = in->yyt20 = NULL;
+			in->yyt17 = in->yyt18 = in->yyt21 = YYCURSOR;
 			goto yy84;
 		case ':':
-			in->yyt17 = YYCURSOR;
-			in->yyt18 = YYCURSOR;
+			in->yyt17 = in->yyt18 = YYCURSOR;
 			goto yy117;
 		case '?':
 			in->yyt15 = in->yyt3;
-			in->yyt17 = YYCURSOR;
-			in->yyt18 = YYCURSOR;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = YYCURSOR;
-			in->yyt22 = YYCURSOR;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
+			in->yyt19 = in->yyt20 = in->yyt23 = in->yyt24 = NULL;
+			in->yyt17 = in->yyt18 = in->yyt21 = in->yyt22 = YYCURSOR;
 			goto yy49;
 		case '[':
 			in->yyt15 = in->yyt3;
@@ -4613,25 +4013,8 @@ yy90:
 	switch (yych) {
 		case ' ':
 			in->yyt4 = in->yyt5;
+			in->yyt6 = in->yyt7 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
 			in->yyt5 = YYCURSOR;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
 			goto yy12;
 		case '!':
 		case '$':
@@ -4715,14 +4098,7 @@ yy90:
 		case '8':
 		case '9': goto yy90;
 		case '?':
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
+			in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = NULL;
 			in->yyt24 = YYCURSOR;
 			goto yy49;
 		default: goto yy8;
@@ -5399,24 +4775,8 @@ yy114:
 	yych = *YYCURSOR;
 	switch (yych) {
 		case ' ':
-			in->yyt3 = NULL;
-			in->yyt4 = NULL;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt9 = NULL;
-			in->yyt10 = NULL;
-			in->yyt11 = NULL;
-			in->yyt12 = NULL;
-			in->yyt20 = YYCURSOR;
-			in->yyt21 = YYCURSOR;
-			in->yyt22 = YYCURSOR;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
+			in->yyt3 = in->yyt4 = in->yyt5 = in->yyt6 = in->yyt7 = in->yyt9 = in->yyt10 = in->yyt11 = in->yyt12 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
+			in->yyt20 = in->yyt21 = in->yyt22 = YYCURSOR;
 			goto yy12;
 		case '!':
 		case '$':
@@ -5488,8 +4848,7 @@ yy114:
 		case '~': goto yy111;
 		case '%': goto yy113;
 		case '/':
-			in->yyt20 = YYCURSOR;
-			in->yyt21 = YYCURSOR;
+			in->yyt20 = in->yyt21 = YYCURSOR;
 			goto yy84;
 		case '0':
 		case '1':
@@ -5502,11 +4861,8 @@ yy114:
 		case '8':
 		case '9': goto yy114;
 		case '?':
-			in->yyt20 = YYCURSOR;
-			in->yyt21 = YYCURSOR;
-			in->yyt22 = YYCURSOR;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
+			in->yyt23 = in->yyt24 = NULL;
+			in->yyt20 = in->yyt21 = in->yyt22 = YYCURSOR;
 			goto yy49;
 		case '@':
 			in->yyt16 = YYCURSOR;
@@ -5520,26 +4876,8 @@ yy115:
 	switch (yych) {
 		case ' ':
 			in->yyt15 = in->yyt3;
-			in->yyt3 = NULL;
-			in->yyt4 = NULL;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt9 = NULL;
-			in->yyt10 = NULL;
-			in->yyt11 = NULL;
-			in->yyt12 = NULL;
-			in->yyt18 = YYCURSOR;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = YYCURSOR;
-			in->yyt22 = YYCURSOR;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
+			in->yyt3 = in->yyt4 = in->yyt5 = in->yyt6 = in->yyt7 = in->yyt9 = in->yyt10 = in->yyt11 = in->yyt12 = in->yyt19 = in->yyt20 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
+			in->yyt18 = in->yyt21 = in->yyt22 = YYCURSOR;
 			goto yy12;
 		case '!':
 		case '$':
@@ -5621,23 +4959,16 @@ yy115:
 		case '%': goto yy116;
 		case '/':
 			in->yyt15 = in->yyt3;
-			in->yyt18 = YYCURSOR;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = YYCURSOR;
+			in->yyt19 = in->yyt20 = NULL;
+			in->yyt18 = in->yyt21 = YYCURSOR;
 			goto yy84;
 		case ':':
 			in->yyt18 = YYCURSOR;
 			goto yy117;
 		case '?':
 			in->yyt15 = in->yyt3;
-			in->yyt18 = YYCURSOR;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = YYCURSOR;
-			in->yyt22 = YYCURSOR;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
+			in->yyt19 = in->yyt20 = in->yyt23 = in->yyt24 = NULL;
+			in->yyt18 = in->yyt21 = in->yyt22 = YYCURSOR;
 			goto yy49;
 		default: goto yy8;
 	}
@@ -5675,31 +5006,12 @@ yy117:
 	switch (yych) {
 		case ' ':
 			in->yyt15 = in->yyt3;
-			in->yyt3 = NULL;
-			in->yyt4 = NULL;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt9 = NULL;
-			in->yyt10 = NULL;
-			in->yyt11 = NULL;
-			in->yyt12 = NULL;
-			in->yyt19 = YYCURSOR;
-			in->yyt20 = YYCURSOR;
-			in->yyt21 = YYCURSOR;
-			in->yyt22 = YYCURSOR;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
+			in->yyt3 = in->yyt4 = in->yyt5 = in->yyt6 = in->yyt7 = in->yyt9 = in->yyt10 = in->yyt11 = in->yyt12 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
+			in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = YYCURSOR;
 			goto yy12;
 		case '/':
 			in->yyt15 = in->yyt3;
-			in->yyt19 = YYCURSOR;
-			in->yyt20 = YYCURSOR;
-			in->yyt21 = YYCURSOR;
+			in->yyt19 = in->yyt20 = in->yyt21 = YYCURSOR;
 			goto yy84;
 		case '0':
 		case '1':
@@ -5715,12 +5027,8 @@ yy117:
 			goto yy140;
 		case '?':
 			in->yyt15 = in->yyt3;
-			in->yyt19 = YYCURSOR;
-			in->yyt20 = YYCURSOR;
-			in->yyt21 = YYCURSOR;
-			in->yyt22 = YYCURSOR;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
+			in->yyt23 = in->yyt24 = NULL;
+			in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = YYCURSOR;
 			goto yy49;
 		default: goto yy8;
 	}
@@ -6213,29 +5521,12 @@ yy140:
 	switch (yych) {
 		case ' ':
 			in->yyt15 = in->yyt3;
-			in->yyt3 = NULL;
-			in->yyt4 = NULL;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt9 = NULL;
-			in->yyt10 = NULL;
-			in->yyt11 = NULL;
-			in->yyt12 = NULL;
-			in->yyt20 = YYCURSOR;
-			in->yyt21 = YYCURSOR;
-			in->yyt22 = YYCURSOR;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
+			in->yyt3 = in->yyt4 = in->yyt5 = in->yyt6 = in->yyt7 = in->yyt9 = in->yyt10 = in->yyt11 = in->yyt12 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
+			in->yyt20 = in->yyt21 = in->yyt22 = YYCURSOR;
 			goto yy12;
 		case '/':
 			in->yyt15 = in->yyt3;
-			in->yyt20 = YYCURSOR;
-			in->yyt21 = YYCURSOR;
+			in->yyt20 = in->yyt21 = YYCURSOR;
 			goto yy84;
 		case '0':
 		case '1':
@@ -6249,11 +5540,8 @@ yy140:
 		case '9': goto yy140;
 		case '?':
 			in->yyt15 = in->yyt3;
-			in->yyt20 = YYCURSOR;
-			in->yyt21 = YYCURSOR;
-			in->yyt22 = YYCURSOR;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
+			in->yyt23 = in->yyt24 = NULL;
+			in->yyt20 = in->yyt21 = in->yyt22 = YYCURSOR;
 			goto yy49;
 		default: goto yy8;
 	}
@@ -6943,45 +6231,20 @@ yy169:
 	yych = *++YYCURSOR;
 	switch (yych) {
 		case ' ':
-			in->yyt3 = NULL;
-			in->yyt4 = NULL;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt9 = NULL;
-			in->yyt10 = NULL;
-			in->yyt11 = NULL;
-			in->yyt12 = NULL;
-			in->yyt18 = YYCURSOR;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = YYCURSOR;
-			in->yyt22 = YYCURSOR;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
+			in->yyt3 = in->yyt4 = in->yyt5 = in->yyt6 = in->yyt7 = in->yyt9 = in->yyt10 = in->yyt11 = in->yyt12 = in->yyt19 = in->yyt20 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
+			in->yyt18 = in->yyt21 = in->yyt22 = YYCURSOR;
 			goto yy12;
 		case '/':
-			in->yyt18 = YYCURSOR;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = YYCURSOR;
+			in->yyt19 = in->yyt20 = NULL;
+			in->yyt18 = in->yyt21 = YYCURSOR;
 			goto yy84;
 		case ':':
 			in->yyt3 = in->yyt15;
 			in->yyt18 = YYCURSOR;
 			goto yy117;
 		case '?':
-			in->yyt18 = YYCURSOR;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = YYCURSOR;
-			in->yyt22 = YYCURSOR;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
+			in->yyt19 = in->yyt20 = in->yyt23 = in->yyt24 = NULL;
+			in->yyt18 = in->yyt21 = in->yyt22 = YYCURSOR;
 			goto yy49;
 		default: goto yy8;
 	}
@@ -8085,8 +7348,7 @@ yy215:
 			YYMTAGN(in->yytm33);
 			YYMTAGN(in->yytm32);
 			YYMTAGN(in->yytm31);
-			in->yyt29 = NULL;
-			in->yyt30 = NULL;
+			in->yyt29 = in->yyt30 = NULL;
 			goto yy244;
 		case '!':
 		case '#':
@@ -8166,8 +7428,7 @@ yy215:
 		case '|':
 		case '~':
 			YYMTAGP(in->yytm31);
-			in->yyt29 = NULL;
-			in->yyt30 = NULL;
+			in->yyt29 = in->yyt30 = NULL;
 			goto yy245;
 		default: goto yy8;
 	}
@@ -8851,15 +8112,15 @@ yy244:
 	au = in->yyt13;
 	of = in->yyt26;
 	v3 = in->yyt8;
+	if (in->yyt8 != NULL) v3 -= 8;
 	v1 = in->yyt29;
+	if (in->yyt29 != NULL) v1 -= 13;
 	v2 = in->yyt29;
+	if (in->yyt29 != NULL) v2 -= 5;
 	st1 = in->yyt29;
+	if (in->yyt29 != NULL) st1 -= 4;
 	st2 = in->yyt29;
-	if (v3 != NULL) v3 -= 8;
-	if (v1 != NULL) v1 -= 13;
-	if (v2 != NULL) v2 -= 5;
-	if (st1 != NULL) st1 -= 4;
-	if (st2 != NULL) st2 -= 1;
+	if (in->yyt29 != NULL) st2 -= 1;
 	{
 #ifndef VERIFY
         c += 1;
@@ -9618,8 +8879,7 @@ yy270:
 		case 0x1E:
 		case 0x7F: goto yy8;
 		case '\n':
-			in->yyt29 = YYCURSOR;
-			in->yyt30 = YYCURSOR;
+			in->yyt29 = in->yyt30 = YYCURSOR;
 			goto yy295;
 		default:
 			in->yyt29 = YYCURSOR;
@@ -10250,34 +9510,7 @@ yy295:
 			YYMTAGN(in->yytm33);
 			YYMTAGN(in->yytm32);
 			YYMTAGN(in->yytm31);
-			in->yyt1 = NULL;
-			in->yyt2 = NULL;
-			in->yyt3 = NULL;
-			in->yyt4 = NULL;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt8 = NULL;
-			in->yyt9 = NULL;
-			in->yyt10 = NULL;
-			in->yyt11 = NULL;
-			in->yyt12 = NULL;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
+			in->yyt1 = in->yyt2 = in->yyt3 = in->yyt4 = in->yyt5 = in->yyt6 = in->yyt7 = in->yyt8 = in->yyt9 = in->yyt10 = in->yyt11 = in->yyt12 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
 			goto yy244;
 		case '!':
 		case '#':
@@ -10357,34 +9590,7 @@ yy295:
 		case '|':
 		case '~':
 			YYMTAGP(in->yytm31);
-			in->yyt1 = NULL;
-			in->yyt2 = NULL;
-			in->yyt3 = NULL;
-			in->yyt4 = NULL;
-			in->yyt5 = NULL;
-			in->yyt6 = NULL;
-			in->yyt7 = NULL;
-			in->yyt8 = NULL;
-			in->yyt9 = NULL;
-			in->yyt10 = NULL;
-			in->yyt11 = NULL;
-			in->yyt12 = NULL;
-			in->yyt13 = NULL;
-			in->yyt14 = NULL;
-			in->yyt15 = NULL;
-			in->yyt16 = NULL;
-			in->yyt17 = NULL;
-			in->yyt18 = NULL;
-			in->yyt19 = NULL;
-			in->yyt20 = NULL;
-			in->yyt21 = NULL;
-			in->yyt22 = NULL;
-			in->yyt23 = NULL;
-			in->yyt24 = NULL;
-			in->yyt25 = NULL;
-			in->yyt26 = NULL;
-			in->yyt27 = NULL;
-			in->yyt28 = NULL;
+			in->yyt1 = in->yyt2 = in->yyt3 = in->yyt4 = in->yyt5 = in->yyt6 = in->yyt7 = in->yyt8 = in->yyt9 = in->yyt10 = in->yyt11 = in->yyt12 = in->yyt13 = in->yyt14 = in->yyt15 = in->yyt16 = in->yyt17 = in->yyt18 = in->yyt19 = in->yyt20 = in->yyt21 = in->yyt22 = in->yyt23 = in->yyt24 = in->yyt25 = in->yyt26 = in->yyt27 = in->yyt28 = NULL;
 			goto yy245;
 		default: goto yy8;
 	}
@@ -14043,21 +13249,21 @@ int main(int argc, char **argv)
     free_input(&in);
     return 0;
 }
-tags/bench_http_rfc7230.re:250:17: warning: tag `m1` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/bench_http_rfc7230.re:250:17: warning: tag `at` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/bench_http_rfc7230.re:250:17: warning: tag `u3` has 3rd degree of nondeterminism [-Wnondeterministic-tags]
-tags/bench_http_rfc7230.re:250:17: warning: tag `u4` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/bench_http_rfc7230.re:250:17: warning: tag `hs3` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/bench_http_rfc7230.re:250:17: warning: tag `hs4` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/bench_http_rfc7230.re:250:17: warning: tag `r3` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/bench_http_rfc7230.re:250:17: warning: tag `s1` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/bench_http_rfc7230.re:250:17: warning: tag `s2` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/bench_http_rfc7230.re:250:17: warning: tag `u1` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/bench_http_rfc7230.re:250:17: warning: tag `u2` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/bench_http_rfc7230.re:250:17: warning: tag `hs1` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/bench_http_rfc7230.re:250:17: warning: tag `hs2` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/bench_http_rfc7230.re:250:17: warning: tag `r1` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/bench_http_rfc7230.re:250:17: warning: tag `p3` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/bench_http_rfc7230.re:250:17: warning: tag `h3` has 3rd degree of nondeterminism [-Wnondeterministic-tags]
-tags/bench_http_rfc7230.re:250:17: warning: tag `h4` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-tags/bench_http_rfc7230.re:250:17: warning: tag `h5` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/bench_http_rfc7230.re:250:17: warning: tag 'm1' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/bench_http_rfc7230.re:250:17: warning: tag 'at' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/bench_http_rfc7230.re:250:17: warning: tag 'u3' has 3rd degree of nondeterminism [-Wnondeterministic-tags]
+tags/bench_http_rfc7230.re:250:17: warning: tag 'u4' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/bench_http_rfc7230.re:250:17: warning: tag 'hs3' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/bench_http_rfc7230.re:250:17: warning: tag 'hs4' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/bench_http_rfc7230.re:250:17: warning: tag 'r3' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/bench_http_rfc7230.re:250:17: warning: tag 's1' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/bench_http_rfc7230.re:250:17: warning: tag 's2' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/bench_http_rfc7230.re:250:17: warning: tag 'u1' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/bench_http_rfc7230.re:250:17: warning: tag 'u2' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/bench_http_rfc7230.re:250:17: warning: tag 'hs1' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/bench_http_rfc7230.re:250:17: warning: tag 'hs2' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/bench_http_rfc7230.re:250:17: warning: tag 'r1' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/bench_http_rfc7230.re:250:17: warning: tag 'p3' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/bench_http_rfc7230.re:250:17: warning: tag 'h3' has 3rd degree of nondeterminism [-Wnondeterministic-tags]
+tags/bench_http_rfc7230.re:250:17: warning: tag 'h4' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+tags/bench_http_rfc7230.re:250:17: warning: tag 'h5' has 2nd degree of nondeterminism [-Wnondeterministic-tags]

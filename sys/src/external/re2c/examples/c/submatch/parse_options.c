@@ -44,7 +44,7 @@ static int lex(const char *s) {
     for (;;) {
     
 {
-	unsigned char yych;
+	char yych;
 	unsigned int yyaccept = 0;
 	yych = *s;
 	switch (yych) {
@@ -144,8 +144,7 @@ yy10:
 			yyt4 = s;
 			goto yy9;
 		case '"':
-			yyt1 = s;
-			yyt4 = s;
+			yyt1 = yyt4 = s;
 			goto yy21;
 		case '=':
 			yyt4 = s;
@@ -205,8 +204,7 @@ yy13:
 			yyt5 = s;
 			goto yy12;
 		case '"':
-			yyt1 = s;
-			yyt5 = s;
+			yyt1 = yyt5 = s;
 			goto yy32;
 		case '=':
 			yyt5 = s;
@@ -238,8 +236,7 @@ yy14:
 		case '7':
 		case '8':
 		case '9':
-			yyt1 = s;
-			yyt5 = s;
+			yyt1 = yyt5 = s;
 			goto yy33;
 		case '=':
 			yyt5 = s;
@@ -259,8 +256,7 @@ yy15:
 			yyt1 = s;
 			goto yy16;
 		case '"':
-			yyt1 = s;
-			yyt5 = s;
+			yyt1 = yyt5 = s;
 			goto yy36;
 		case '=':
 			yyt5 = s;
@@ -1536,8 +1532,7 @@ yy99:
 		default: goto yy28;
 	}
 yy100:
-	v = s;
-	v -= 10;
+	v = s - 10;
 	{ o.date   = std::string(v, s); continue; }
 yy101:
 	yych = *++s;
@@ -1621,5 +1616,5 @@ int main() {
     return 0;
 }
 c/submatch/parse_options.re:68:12: warning: rule matches empty string [-Wmatch-empty-string]
-c/submatch/parse_options.re:80:35: warning: tag `k` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
-c/submatch/parse_options.re:80:35: warning: tag `v` has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+c/submatch/parse_options.re:80:35: warning: tag 'k' has 2nd degree of nondeterminism [-Wnondeterministic-tags]
+c/submatch/parse_options.re:80:35: warning: tag 'v' has 2nd degree of nondeterminism [-Wnondeterministic-tags]

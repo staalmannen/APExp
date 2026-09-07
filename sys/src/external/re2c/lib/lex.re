@@ -1,34 +1,39 @@
-#include <stdint.h>
 #include <stdio.h>
+
+#include "src/util/c99_stdint.h"
 
 #include "src/encoding/enc.h"
 #include "src/msg/msg.h"
 #include "src/parse/ast.h"
+#include "src/parse/unescape.h"
 #include "src/util/range.h"
-#include "src/util/string_utils.h"
+#include "src/util/s_to_n32_unsafe.h"
 #include "parse.h"
 #include "lib/lex.h"
 
 
+extern YYSTYPE yylval;
 
 namespace re2c {
 
-static int32_t lex_cls_chr(const uint8_t*&, uint32_t&);
+static int32_t lex_cls_chr(const char *&, uint32_t &);
 
 /*!re2c
     re2c:flags:tags = 1;
     re2c:yyfill:enable = 0;
     re2c:define:YYCURSOR = cur;
     re2c:define:YYMARKER = mar;
-    re2c:define:YYCTYPE = uint8_t;
+    re2c:define:YYCTYPE = char;
 
     nil = "\x00";
     num = [0-9]+;
 */
 
-int lex(RE2C_LIB_STYPE* yylval, const uint8_t*& cur, Ast& ast) {
-    /*!stags:re2c format = "const uint8_t* @@;"; */
-    const uint8_t* mar, *x, *y;
+int lex(const char *&cur)
+{
+    /*!stags:re2c format = "const char *@@;"; */
+    const char *mar, *x, *y;
+    std::vector<ASTRange> cls;
     bool neg = false;
     uint32_t l, u;
 
@@ -48,31 +53,33 @@ int lex(RE2C_LIB_STYPE* yylval, const uint8_t*& cur, Ast& ast) {
     "["  { goto cls; }
 
     "{" @x num "}" {
-        if (!s_to_u32_unsafe(x, cur - 1, yylval->bounds.min)) goto err_cnt;
-        yylval->bounds.max = yylval->bounds.min;
+        if (!s_to_u32_unsafe(x, cur - 1, yylval.bounds.min)) goto err_cnt;
+        yylval.bounds.max = yylval.bounds.min;
         return TOKEN_COUNT;
     }
 
     "{" @x num "," @y num "}" {
-        if (!s_to_u32_unsafe(x, y - 1, yylval->bounds.min)
-            || !s_to_u32_unsafe(y, cur - 1, yylval->bounds.max)) goto err_cnt;
+        if (!s_to_u32_unsafe(x, y - 1, yylval.bounds.min)
+            || !s_to_u32_unsafe(y, cur - 1, yylval.bounds.max)) goto err_cnt;
         return TOKEN_COUNT;
     }
 
     "{" @x num ",}" {
-        if (!s_to_u32_unsafe(x, cur - 2, yylval->bounds.min)) goto err_cnt;
-        yylval->bounds.max = Ast::MANY;
+        if (!s_to_u32_unsafe(x, cur - 2, yylval.bounds.min)) goto err_cnt;
+        yylval.bounds.max = AST::MANY;
         return TOKEN_COUNT;
     }
 
     "." {
-        yylval->regexp = ast.dot(NOWHERE);
+        yylval.regexp = ast_dot(NOWHERE);
         return TOKEN_REGEXP;
     }
 
     [^] \ nil {
-        ast.temp_chars.push_back({cur[-1], NOWHERE});
-        yylval->regexp = ast.str(NOWHERE, false);
+        ASTChar c = {static_cast<uint32_t>(cur[-1]), NOWHERE};
+        std::vector<ASTChar> *str = new std::vector<ASTChar>;
+        str->push_back(c);
+        yylval.regexp = ast_str(NOWHERE, str, false);
         return TOKEN_REGEXP;
     }
 */
@@ -85,11 +92,13 @@ cls:
 */
 add:
     if (l > u) goto err;
-    ast.temp_ranges.push_back(AstRange(l, u, NOWHERE));
+    cls.push_back(ASTRange(l, u, NOWHERE));
 /*!local:re2c
     ""  { goto cls; }
     "]" {
-        yylval->regexp = ast.cls(NOWHERE, neg);
+        std::vector<ASTRange> *p = new std::vector<ASTRange>;
+        p->swap(cls);
+        yylval.regexp = ast_cls(NOWHERE, p, neg);
         return TOKEN_REGEXP;
     }
 */
@@ -103,8 +112,9 @@ err_cnt:
     return TOKEN_ERROR;
 }
 
-int32_t lex_cls_chr(const uint8_t*& cur, uint32_t& c) {
-    const uint8_t* mar, *p = cur;
+int32_t lex_cls_chr(const char *&cur, uint32_t &c)
+{
+    const char *mar, *p = cur;
 /*!local:re2c
     *    { return 1; }
     "[." { error("collating characters not supported"); return 1; }
@@ -113,18 +123,18 @@ int32_t lex_cls_chr(const uint8_t*& cur, uint32_t& c) {
 
     "\\x"[0-9a-fA-F]{2} { c = unesc_hex(p, cur); return 0; }
 
-    "\\"      { c = '\\'_u8; return 0; }
-    "\\a"     { c = '\a'_u8; return 0; }
-    "\\b"     { c = '\b'_u8; return 0; }
-    "\\f"     { c = '\f'_u8; return 0; }
-    "\\n"     { c = '\n'_u8; return 0; }
-    "\\r"     { c = '\r'_u8; return 0; }
-    "\\t"     { c = '\t'_u8; return 0; }
-    "\\v"     { c = '\v'_u8; return 0; }
-    "\\\\"    { c = '\\'_u8; return 0; }
-    "\\]"     { c = ']'_u8;  return 0; }
+    "\\"      { c = static_cast<uint8_t>('\\');    return 0; }
+    "\\a"     { c = static_cast<uint8_t>('\a');    return 0; }
+    "\\b"     { c = static_cast<uint8_t>('\b');    return 0; }
+    "\\f"     { c = static_cast<uint8_t>('\f');    return 0; }
+    "\\n"     { c = static_cast<uint8_t>('\n');    return 0; }
+    "\\r"     { c = static_cast<uint8_t>('\r');    return 0; }
+    "\\t"     { c = static_cast<uint8_t>('\t');    return 0; }
+    "\\v"     { c = static_cast<uint8_t>('\v');    return 0; }
+    "\\\\"    { c = static_cast<uint8_t>('\\');    return 0; }
+    "\\]"     { c = static_cast<uint8_t>(']');     return 0; }
 
-    [^] \ nil { c = cur[-1]; return 0; }
+    [^] \ nil { c = static_cast<uint8_t>(cur[-1]); return 0; }
 */
 }
 

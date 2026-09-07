@@ -8,15 +8,14 @@
 
 // use block (expect a local state switch for this block only)
 
+
 	switch (YYGETSTATE()) {
-		case 0: goto yyFillLabel0;
 		default: goto yy0;
+		case 0: goto yyFillLabel0;
 	}
 yy0:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(0);
-		YYFILL(1);
-	}
+	YYSETSTATE(0);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel0:
 	++YYCURSOR;
 	YYSETSTATE(-1);
@@ -25,15 +24,14 @@ yyFillLabel0:
 
 // use block (expect a local state switch for this block only)
 
+
 	switch (YYGETSTATE()) {
-		case 1: goto yyFillLabel1;
 		default: goto yy2;
+		case 1: goto yyFillLabel1;
 	}
 yy2:
-	if (YYLIMIT <= YYCURSOR) {
-		YYSETSTATE(1);
-		YYFILL(1);
-	}
+	YYSETSTATE(1);
+	if (YYLIMIT <= YYCURSOR) YYFILL(1);
 yyFillLabel1:
 	++YYCURSOR;
 	YYSETSTATE(-1);

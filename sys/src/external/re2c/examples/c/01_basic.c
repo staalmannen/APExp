@@ -2,10 +2,11 @@
 // re2c $INPUT -o $OUTPUT -i --case-ranges
 #include <assert.h>
 
-int lex(const char* YYCURSOR) {
+bool lex(const char *s) {
+    const char *YYCURSOR = s;
     
 {
-	unsigned char yych;
+	char yych;
 	yych = *YYCURSOR;
 	switch (yych) {
 		case '1' ... '9': goto yy2;
@@ -13,7 +14,7 @@ int lex(const char* YYCURSOR) {
 	}
 yy1:
 	++YYCURSOR;
-	{ return 1; }
+	{ return false; }
 yy2:
 	yych = *++YYCURSOR;
 	switch (yych) {
@@ -21,12 +22,12 @@ yy2:
 		default: goto yy3;
 	}
 yy3:
-	{ return 0; }
+	{ return true; }
 }
 
 }
 
 int main() {
-    assert(lex("1234") == 0);
+    assert(lex("1234"));
     return 0;
 }

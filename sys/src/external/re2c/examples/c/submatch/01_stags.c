@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <stddef.h>
 
-typedef struct { int major, minor, patch; } SemVer;
+struct SemVer { int major, minor, patch; };
 
 static int s2n(const char *s, const char *e) { // pre-parsed string to number
     int n = 0;
@@ -12,7 +12,7 @@ static int s2n(const char *s, const char *e) { // pre-parsed string to number
     return n;
 }
 
-static int lex(const char *str, SemVer *ver) {
+static bool lex(const char *str, SemVer &ver) {
     const char *YYCURSOR = str, *YYMARKER;
 
     // User-defined tag variables that are available in semantic action.
@@ -31,7 +31,7 @@ const char *yyt4;
     
 #line 33 "c/submatch/01_stags.c"
 {
-	unsigned char yych;
+	char yych;
 	yych = *YYCURSOR;
 	switch (yych) {
 		case '0':
@@ -52,7 +52,7 @@ yy1:
 	++YYCURSOR;
 yy2:
 #line 35 "c/submatch/01_stags.re"
-	{ return 1; }
+	{ return false; }
 #line 57 "c/submatch/01_stags.c"
 yy3:
 	yych = *(YYMARKER = ++YYCURSOR);
@@ -110,8 +110,8 @@ yy7:
 	yych = *++YYCURSOR;
 	switch (yych) {
 		case 0x00:
-			yyt3 = YYCURSOR;
 			yyt4 = NULL;
+			yyt3 = YYCURSOR;
 			goto yy8;
 		case '.':
 			yyt3 = YYCURSOR;
@@ -134,16 +134,15 @@ yy8:
 	t3 = yyt2;
 	t4 = yyt3;
 	t5 = yyt4;
-	t2 = yyt2;
-	t2 -= 1;
+	t2 = yyt2 - 1;
 #line 29 "c/submatch/01_stags.re"
 	{
-            ver->major = s2n(t1, t2);
-            ver->minor = s2n(t3, t4);
-            ver->patch = t5 != NULL ? s2n(t5, YYCURSOR - 1) : 0;
-            return 0;
+            ver.major = s2n(t1, t2);
+            ver.minor = s2n(t3, t4);
+            ver.patch = t5 != NULL ? s2n(t5, YYCURSOR - 1) : 0;
+            return true;
         }
-#line 147 "c/submatch/01_stags.c"
+#line 146 "c/submatch/01_stags.c"
 yy9:
 	yych = *++YYCURSOR;
 	switch (yych) {
@@ -184,8 +183,8 @@ yy10:
 
 int main() {
     SemVer v;
-    assert(lex("23.34", &v) == 0 && v.major == 23 && v.minor == 34 && v.patch == 0);
-    assert(lex("1.2.999", &v) == 0 && v.major == 1 && v.minor == 2 && v.patch == 999);
-    assert(lex("1.a", &v) == 1);
+    assert(lex("23.34", v) && v.major == 23 && v.minor == 34 && v.patch == 0);
+    assert(lex("1.2.999", v) && v.major == 1 && v.minor == 2 && v.patch == 999);
+    assert(!lex("1.a", v));
     return 0;
 }

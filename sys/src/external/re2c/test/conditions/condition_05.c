@@ -59,9 +59,9 @@ char scan(Scanner *s)
 #line 60 "conditions/condition_05.c"
 		{
 			unsigned char yych;
-			static const void* yyctable[2] = {
+			static void *yyctable[2] = {
 				&&yyc_normal,
-				&&yyc_comment
+				&&yyc_comment,
 			};
 			goto *yyctable[cond];
 /* *********************************** */
@@ -148,5 +148,5 @@ int main(int argc, char **argv)
 
 enum YYCONDTYPE {
 	yycnormal,
-	yyccomment
+	yyccomment,
 };

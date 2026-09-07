@@ -24,9 +24,9 @@ int main ()
 #line 25 "conditions/condtype_yysetcondition_cg.c"
 {
 	unsigned char yych;
-	static const void* yyctable[2] = {
+	static void *yyctable[2] = {
 		&&yyc_b,
-		&&yyc_a
+		&&yyc_a,
 	};
 	goto *yyctable[YYGETCONDITION()];
 /* *********************************** */
@@ -55,4 +55,4 @@ yy2:
 	}
 	return 0;
 }
-conditions/condtype_yysetcondition_cg.re:21:0: warning: condition numbers may change, use `conditions` block to generate reliable condition identifiers [-Wcondition-order]
+conditions/condtype_yysetcondition_cg.re:21:0: warning: condition numbers may change, use '/*!conditions:re2c*/' directive to generate reliable condition identifiers [-Wcondition-order]
