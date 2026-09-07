@@ -22,7 +22,7 @@ _CORE_APPS=\
 	bison\
 	awk\
 	sed\
-#	re2c\
+	re2c\
 	make\
 # often invoked during make \
 	m4\
