@@ -115,6 +115,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - GNU awk (version 5.4.0). Since native awk is sometimes needed, GNU awk is installed as gawk
 - GNU m4 (version 1.4.21) has been added
 - gettext utilities from Sabotage Linux "gettext-tiny" [14]
+- A C implemented re2c (version 1.0.0) from YASM
 - A "musl" iconv utility has been added from Alpine Linux.
 - GNU bison (version 3.8) introduced. Native yacc as "yacc" because it is sometimes needed
 - system lex has been replaced by flex (version 2.6.4) as lex
