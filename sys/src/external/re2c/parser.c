@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "globals.h"
-#include "parse.h"
-#include "parser.h"
+#include "tools/re2c/globals.h"
+#include "tools/re2c/parse.h"
+#include "tools/re2c/parser.h"
 
 int yylex(void);
 static RegExp *parse_expr(void);

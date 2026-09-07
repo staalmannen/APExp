@@ -5,10 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "substr.h"
-#include "globals.h"
-#include "dfa.h"
-#include "parse.h"
+#include "tools/re2c/substr.h"
+#include "tools/re2c/globals.h"
+#include "tools/re2c/dfa.h"
+#include "tools/re2c/parse.h"
 
 #ifdef _WIN32
 /* tmpfile() replacment for Windows.
@@ -461,8 +461,8 @@ Go_genSwitch(Go *g, FILE *o, State *from, State *next, int *readCh){
 	    if(g->span[i].to != def)
 		*(t++) = &g->span[i];
 
-	    if (dFlag)
-		fputs("\tYYDEBUG(-1, yych);\n", o);
+	if (dFlag)
+	    fputs("\tYYDEBUG(-1, yych);\n", o);
 
 #if 0
 	if (*readCh) {
@@ -936,12 +936,12 @@ void DFA_emit(DFA *d, FILE *o){
 	oline++;
 	useLabel(label);
     } else {
-	int i;
+	int j;
 	fputs("\tswitch(YYGETSTATE()) {\n", o);
 	fputs("\t\tcase -1: goto yy0;\n", o);
 
-	for (i=0; i<maxFillIndexes; ++i)
-	    fprintf(o, "\t\tcase %u: goto yyFillLabel%u;\n", i, i);
+	for (j=0; j<maxFillIndexes; ++j)
+	    fprintf(o, "\t\tcase %d: goto yyFillLabel%d;\n", j, j);
 
 	fputs("\t\tdefault: /* abort() */;\n", o);
 	fputs("\t}\n", o);
