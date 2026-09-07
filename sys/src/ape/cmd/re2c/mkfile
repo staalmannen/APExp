@@ -1,0 +1,22 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+TARG=re2c
+OFILES=actions.$O code.$O dfa.$O main.$O mbo_getopt.$O parser.$O scanner.$O substr.$O \
+	translate.$O 
+BIN=$APEXPROOT/$objtype/bin/ape
+
+</sys/src/cmd/mkone
+
+RE2CSRC=$APEXPROOT/sys/src/external/re2c
+CC=pcc
+LD=pcc
+CFLAGS=-c -I. -I$RE2CSRC -D_POSIX_SOURCE
+
+%.$O: $RE2CSRC/%.c
+	$CC $CFLAGS $RE2CSRC/$stem.c
+
+install:V:
+	cp $RE2CSRC/re2c.1 $APEXPROOT/sys/man/1/re2c
+

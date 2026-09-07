@@ -1,0 +1,10 @@
+re2c is used to write fast lexers. This is the YASM pure C port of the originally C++ re2c. This is a build dependency of some rather interesting packages, like php, which is the reason I wanted to port it.
+
+
+mkfile was generated with:
+
+mkmk -o re2c -a -S -I. -I/sys/include/ape -I/$objtype/include/ape > mkfile
+
+
+subdirectories are currently excluded from the build.
+
