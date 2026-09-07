@@ -22,6 +22,7 @@ _CORE_APPS=\
 	bison\
 	awk\
 	sed\
+#	re2c\
 	make\
 # often invoked during make \
 	m4\
@@ -42,16 +43,17 @@ _OPTIONAL_APPS=\
 	unace\
 	unarj\
 	unrar\
+#	lz4\
 	xz\
 	zstd\
+	zip\
 	tar\
-# pax builds one binary and installs it as both pax and cpio; tar is \
-# not installed from it, GNU tar above is the one \
 	pax\
 # languages \
 	lua\
 	tclsh\
-#	perl\
+	perl\
+#	go\
 # GUI \
 	wish\
 # transpilers \
@@ -71,12 +73,10 @@ _OPTIONAL_APPS=\
 	patch\
 	mkmk\
 	samurai\
-# TLS: openssl(1) from LibreSSL, and curl. Both need the libraries \
-# built first -- see the _TLS_LIBS note in ../lib/mkfile \
+#	muon\
+# TLS and curl \
 	openssl\
 	curl\
-# libzip's three tools; needs ../lib/zip, which is built last there \
-	zip\
 
 DIRS=\
 	$_CORE_APPS\
