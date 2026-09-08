@@ -5,7 +5,7 @@ APE=$APEXPROOT/sys/src/ape
 MUSRC=$APEXPROOT/sys/src/external/muon
 
 BIN=$APEXPROOT/$objtype/bin/ape
-TARG=muon
+TARG=muon init
 
 OFILES=\
 # .\
@@ -18,11 +18,11 @@ OFILES=\
 	xcode.$O\
 	ninja.$O\
 # src/backend/ninja\
-	alias_target.$O\
-	build_target.$O\
-	coverage.$O\
-	custom_target.$O\
-	rules.$O\
+	ninja-alias_target.$O\
+	ninja-build_target.$O\
+	ninja-coverage.$O\
+	ninja-custom_target.$O\
+	ninja-rules.$O\
 # src/datastructures\
 	arr.$O\
 	bucket_arr.$O\
@@ -51,51 +51,51 @@ OFILES=\
 	feature_opt.$O\
 	file.$O\
 	generator.$O\
-	kernel.$O\
-# src/functions/kernel\
-	build_target.$O\
-	configure_file.$O\
-	custom_target.$O\
-	dependency.$O\
-	install.$O\
-	options.$O\
-	subproject.$O\
 	machine.$O\
 	meson.$O\
 	modules.$O\
-# src/functions/modules\
-	curl.$O\
-	fs.$O\
-	getopt.$O\
-	json.$O\
-	keyval.$O\
-	pkgconfig.$O\
-	python.$O\
-	sourceset.$O\
-	subprojects.$O\
-	toolchain.$O\
 	number.$O\
 	run_result.$O\
 	source_configuration.$O\
 	source_set.$O\
 	string.$O\
 	subproject.$O\
+	kernel.$O\
+# src/functions/kernel\
+	k-build_target.$O\
+	k-configure_file.$O\
+	k-custom_target.$O\
+	k-dependency.$O\
+	k-install.$O\
+	k-options.$O\
+	k-subproject.$O\
+# src/functions/modules\
+	mod-curl.$O\
+	mod-fs.$O\
+	mod-getopt.$O\
+	mod-json.$O\
+	mod-keyval.$O\
+	mod-pkgconfig.$O\
+	mod-python.$O\
+	mod-sourceset.$O\
+	mod-subprojects.$O\
+	mod-toolchain.$O\
 # src/lang\
-	analyze.$O\
-	compiler.$O\
-	eval.$O\
-	fmt.$O\
-	func_lookup.$O\
-	lexer.$O\
-	lsp.$O\
-	object.$O\
-	object_iterators.$O\
-	parser.$O\
-	serial.$O\
-	string.$O\
-	typecheck.$O\
-	vm.$O\
-	workspace.$O\
+	l-analyze.$O\
+	l-compiler.$O\
+	l-eval.$O\
+	l-fmt.$O\
+	l-func_lookup.$O\
+	l-lexer.$O\
+	l-lsp.$O\
+	l-object.$O\
+	l-object_iterators.$O\
+	l-parser.$O\
+	l-serial.$O\
+	l-string.$O\
+	l-typecheck.$O\
+	l-vm.$O\
+	l-workspace.$O\
 # src\
 	args.$O\
 	cmd_install.$O\
@@ -122,16 +122,16 @@ OFILES=\
 	ui_null.$O\
 # src/platform\
 	filesystem.$O\
-	init.$O\
 	log.$O\
 	os.$O\
 	path.$O\
 	run_cmd.$O\
-	term.$O\
-	timer.$O\
 	uname.$O\
 # src/platform/posix\
-	rpath_fixer.$O\
+	p-init.$O\
+	p-rpath_fixer.$O\
+	p-term.$O\
+	p-timer.$O\
 # src/external\
 	libcurl.$O\
 	samurai.$O\
@@ -157,8 +157,8 @@ CFLAGS=-c -I$MUSRC/include -DMUON_STATIC -DMUON_PLATFORM_posix
 %.$O: $MUSRC/src/backend/%.c
 	$CC $CFLAGS $MUSRC/src/backend/$stem.c
 
-%.$O: $MUSRC/src/backend/ninja/%.c
-	$CC $CFLAGS $MUSRC/src/backend/ninja/$stem.c
+ninja-%.$O: $MUSRC/src/backend/ninja/%.c
+	$CC $CFLAGS $MUSRC/src/backend/ninja/$stem.c -o $target
 
 %.$O: $MUSRC/src/datastructures/%.c
 	$CC $CFLAGS $MUSRC/src/datastructures/$stem.c
@@ -169,20 +169,20 @@ CFLAGS=-c -I$MUSRC/include -DMUON_STATIC -DMUON_PLATFORM_posix
 %.$O: $MUSRC/src/functions/%.c
 	$CC $CFLAGS $MUSRC/src/functions/$stem.c
 
-%.$O: $MUSRC/src/functions/kernel/%.c
-	$CC $CFLAGS $MUSRC/src/functions/kernel/$stem.c
+k-%.$O: $MUSRC/src/functions/kernel/%.c
+	$CC $CFLAGS $MUSRC/src/functions/kernel/$stem.c -o $target
 
-%.$O: $MUSRC/src/functions/modules/%.c
-	$CC $CFLAGS $MUSRC/src/functions/modules/$stem.c
+mod-%.$O: $MUSRC/src/functions/modules/%.c
+	$CC $CFLAGS $MUSRC/src/functions/modules/$stem.c -o $target
 
-%.$O: $MUSRC/src/lang/%.c
-	$CC $CFLAGS $MUSRC/src/lang/$stem.c
+l-%.$O: $MUSRC/src/lang/%.c
+	$CC $CFLAGS $MUSRC/src/lang/$stem.c -o $target
 
 %.$O: $MUSRC/src/platform/%.c
 	$CC $CFLAGS $MUSRC/src/platform/$stem.c
 
-%.$O: $MUSRC/src/platform/posix/%.c
-	$CC $CFLAGS $MUSRC/src/platform/posix/$stem.c
+p-%.$O: $MUSRC/src/platform/posix/%.c
+	$CC $CFLAGS $MUSRC/src/platform/posix/$stem.c -o $target
 
 %.$O: $MUSRC/src/external/%.c
 	$CC $CFLAGS $MUSRC/src/external/$stem.c

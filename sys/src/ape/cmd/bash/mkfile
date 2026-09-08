@@ -286,6 +286,7 @@ libbuiltins.a$O: $OBJBUILTINS
 
 install:V:
 			cp $BASHSRC/doc/bash.1 $APEXPROOT/sys/man/1/bash
+			cp $BIN/bash $BIN/sh
 
 # This overrides the clean rule mkone provides, so it has to repeat what
 # that one does before adding bash's own leftovers. "[$OS].$Out" was a

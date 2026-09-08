@@ -16,14 +16,14 @@ BIN=$APEXPROOT/$objtype/bin/ape
 
 LZ4SRC=../../../external/lz4
 
-LZ4INC=-I$LZ4SRC -I$LZ4SRC/lib -I$LZ4SRC/program
+LZ4INC=-I$LZ4SRC -I$LZ4SRC/lib -I$LZ4SRC/programs
 
 CC=pcc
 LD=pcc
 CFLAGS= -c -DLZ4IO_MULTITHREAD $LZ4INC
 
-%.$O: $LZ4SRC/program/%.c
-    $CC $CFLAGS $LZ4SRC/program/%.c
+%.$O: $LZ4SRC/programs/%.c
+    $CC $CFLAGS $LZ4SRC/programs/$stem.c
 
 $O.lz4: bench.$O lorem.$O lz4cli.$O lz4io.$O threadpool.$O timefn.$O util.$O
 	$LD $prereq $LIB -o $target

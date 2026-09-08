@@ -10,11 +10,13 @@ APEXPROOT=../../../..
 # Every comment line INSIDE these lists has to end in a backslash, as
 # the ones below do: the list is one continued line, and a comment
 # without it ends the assignment there.
+# for now, we default to bash as sh. We might remove dash as alternative.
+
 _CORE_APPS=\
 # shared gnulib: must be first, several apps below link ../gnulib/libgnu.a \
 	gnulib\
 # shell\
-	dash\
+#	dash\
 	bash\
 # parsing/editing source etc \
 	as\
@@ -43,7 +45,7 @@ _OPTIONAL_APPS=\
 	unace\
 	unarj\
 	unrar\
-#	lz4\
+	lz4\
 	xz\
 	zstd\
 	zip\
