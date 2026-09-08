@@ -129,13 +129,13 @@ OFILES=\
 	uname.$O\
 # src/platform/posix\
 	p-init.$O\
-	p-rpath_fixer.$O\
 	p-term.$O\
 	p-timer.$O\
+# src/platform/null\
+	rpath_fixer.$O\
 # src/external\
 	libcurl.$O\
 	samurai.$O\
-	readline_bestline.$O\
 	pkgconfig.$O
 
 LIB=
@@ -180,6 +180,9 @@ l-%.$O: $MUSRC/src/lang/%.c
 
 %.$O: $MUSRC/src/platform/%.c
 	$CC $CFLAGS $MUSRC/src/platform/$stem.c
+
+%.$O: $MUSRC/src/platform/null/%.c
+	$CC $CFLAGS $MUSRC/src/platform/null/$stem.c
 
 p-%.$O: $MUSRC/src/platform/posix/%.c
 	$CC $CFLAGS $MUSRC/src/platform/posix/$stem.c -o $target
