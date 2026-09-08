@@ -1,4 +1,0 @@
-global dummy
-section .rodata align=16
-dummy:
-  dd 0x00010203
