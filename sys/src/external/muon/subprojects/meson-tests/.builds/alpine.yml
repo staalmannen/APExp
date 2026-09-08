@@ -1,0 +1,9 @@
+image: alpine/3.21
+secrets:
+  - ead807ad-2453-416b-8ae6-308363891a8d
+sources:
+  - https://git.sr.ht/~lattis/meson-tests
+tasks:
+  - push_to_gh_mirror: |
+      cd meson-tests
+      tools/ci/push_to_gh_mirror.sh

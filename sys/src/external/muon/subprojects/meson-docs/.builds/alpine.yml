@@ -1,0 +1,9 @@
+image: alpine/3.21
+secrets:
+  - 9ba5eb75-1169-44f2-b69c-9f10d73de0d0
+sources:
+  - https://git.sr.ht/~lattis/meson-docs
+tasks:
+  - push_to_gh_mirror: |
+      cd meson-docs
+      tools/ci/push_to_gh_mirror.sh

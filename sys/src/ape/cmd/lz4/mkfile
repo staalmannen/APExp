@@ -1,0 +1,51 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+TARG=\
+	lz4\
+	lz4c\
+	lz4cat\
+	unlz4
+
+
+LIB=$APEXPROOT/$objtype/lib/ape/liblz4.a
+BIN=$APEXPROOT/$objtype/bin/ape
+
+<$APEXPROOT/sys/src/cmd/mkmany
+
+LZ4SRC=../../../external/lz4
+
+LZ4INC=-I$LZ4SRC -I$LZ4SRC/lib -I$LZ4SRC/program
+
+CC=pcc
+LD=pcc
+CFLAGS= -c -DLZ4IO_MULTITHREAD $LZ4INC
+
+%.$O: $LZ4SRC/program/%.c
+    $CC $CFLAGS $LZ4SRC/program/%.c
+
+$O.lz4: bench.$O lorem.$O lz4cli.$O lz4io.$O threadpool.$O timefn.$O util.$O
+	$LD $prereq $LIB -o $target
+
+$O.lz4c: $O.lz4
+	cp $prereq $target
+
+$O.lz4cat: $O.lz4
+	cp $prereq $target
+
+$O.unlz4: $O.lz4
+	cp $prereq $target
+
+
+
+
+
+
+
+
+
+
+
+
+
