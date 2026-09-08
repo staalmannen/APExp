@@ -1,0 +1,194 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+MUSRC=$APEXPROOT/sys/src/external/muon
+
+BIN=$APEXPROOT/$objtype/bin/ape
+TARG=muon
+
+OFILES=\
+# .\
+	version.$O\
+# src/backend\
+	backend.$O\
+	common_args.$O\
+	introspect.$O\
+	output.$O\
+	xcode.$O\
+	ninja.$O\
+# src/backend/ninja\
+	alias_target.$O\
+	build_target.$O\
+	coverage.$O\
+	custom_target.$O\
+	rules.$O\
+# src/datastructures\
+	arr.$O\
+	bucket_arr.$O\
+	hash.$O\
+	stack.$O\
+# src/formats\
+	editorconfig.$O\
+	ini.$O\
+	json.$O\
+	lines.$O\
+	tap.$O\
+	xml.$O\
+# src/functions\
+	array.$O\
+	boolean.$O\
+	both_libs.$O\
+	build_target.$O\
+	compiler.$O\
+	configuration_data.$O\
+	custom_target.$O\
+	dependency.$O\
+	dict.$O\
+	disabler.$O\
+	environment.$O\
+	external_program.$O\
+	feature_opt.$O\
+	file.$O\
+	generator.$O\
+	kernel.$O\
+# src/functions/kernel\
+	build_target.$O\
+	configure_file.$O\
+	custom_target.$O\
+	dependency.$O\
+	install.$O\
+	options.$O\
+	subproject.$O\
+	machine.$O\
+	meson.$O\
+	modules.$O\
+# src/functions/modules\
+	curl.$O\
+	fs.$O\
+	getopt.$O\
+	json.$O\
+	keyval.$O\
+	pkgconfig.$O\
+	python.$O\
+	sourceset.$O\
+	subprojects.$O\
+	toolchain.$O\
+	number.$O\
+	run_result.$O\
+	source_configuration.$O\
+	source_set.$O\
+	string.$O\
+	subproject.$O\
+# src/lang\
+	analyze.$O\
+	compiler.$O\
+	eval.$O\
+	fmt.$O\
+	func_lookup.$O\
+	lexer.$O\
+	lsp.$O\
+	object.$O\
+	object_iterators.$O\
+	parser.$O\
+	serial.$O\
+	string.$O\
+	typecheck.$O\
+	vm.$O\
+	workspace.$O\
+# src\
+	args.$O\
+	cmd_install.$O\
+	cmd_subprojects.$O\
+	cmd_test.$O\
+	coerce.$O\
+	compilers.$O\
+	embedded.$O\
+	error.$O\
+	guess.$O\
+	install.$O\
+	log.$O\
+	machine_file.$O\
+	machines.$O\
+	main.$O\
+	memmem.$O\
+	meson_opts.$O\
+	options.$O\
+	opts.$O\
+	rpmvercmp.$O\
+	sha_256.$O\
+	vsenv.$O\
+	wrap.$O\
+	ui_null.$O\
+# src/platform\
+	filesystem.$O\
+	init.$O\
+	log.$O\
+	os.$O\
+	path.$O\
+	run_cmd.$O\
+	term.$O\
+	timer.$O\
+	uname.$O\
+# src/platform/posix\
+	rpath_fixer.$O\
+# src/external\
+	libcurl.$O\
+	samurai.$O\
+	readline_bestline.$O\
+	pkgconfig.$O
+
+LIB=
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+
+CFLAGS=-c -I$MUSRC/include -DMUON_STATIC -DMUON_PLATFORM_posix
+
+%.$O: %.c
+	$CC $CFLAGS $stem.c
+
+%.$O: $MUSRC/tools/%.c
+	$CC $CFLAGS $MUSRC/tools/$stem.c
+
+%.$O: $MUSRC/src/%.c
+	$CC $CFLAGS $MUSRC/src/$stem.c
+
+%.$O: $MUSRC/src/backend/%.c
+	$CC $CFLAGS $MUSRC/src/backend/$stem.c
+
+%.$O: $MUSRC/src/backend/ninja/%.c
+	$CC $CFLAGS $MUSRC/src/backend/ninja/$stem.c
+
+%.$O: $MUSRC/src/datastructures/%.c
+	$CC $CFLAGS $MUSRC/src/datastructures/$stem.c
+
+%.$O: $MUSRC/src/formats/%.c
+	$CC $CFLAGS $MUSRC/src/formats/$stem.c
+
+%.$O: $MUSRC/src/functions/%.c
+	$CC $CFLAGS $MUSRC/src/functions/$stem.c
+
+%.$O: $MUSRC/src/functions/kernel/%.c
+	$CC $CFLAGS $MUSRC/src/functions/kernel/$stem.c
+
+%.$O: $MUSRC/src/functions/modules/%.c
+	$CC $CFLAGS $MUSRC/src/functions/modules/$stem.c
+
+%.$O: $MUSRC/src/lang/%.c
+	$CC $CFLAGS $MUSRC/src/lang/$stem.c
+
+%.$O: $MUSRC/src/platform/%.c
+	$CC $CFLAGS $MUSRC/src/platform/$stem.c
+
+%.$O: $MUSRC/src/platform/posix/%.c
+	$CC $CFLAGS $MUSRC/src/platform/posix/$stem.c
+
+%.$O: $MUSRC/src/external/%.c
+	$CC $CFLAGS $MUSRC/src/external/$stem.c
+
+
+
+
+
+
