@@ -143,17 +143,70 @@ TkpCopyRegion(TkRegion dst, TkRegion src)
     if (dst && src) *(Region)dst = *(Region)src;
 }
 
+/*
+ * Mark the non-transparent pixels of a photo block as valid.
+ *
+ * This is not decorative and it must not be a stub. modelPtr->validRegion
+ * is how the photo code records which pixels it has, and Tk_PhotoPutBlock
+ * builds it HERE for any block with alpha -- which is every photo, since
+ * pix32 always carries an alpha byte. Leave the region empty and
+ * TkImgPhotoConfigureInstance's
+ *
+ *	TkClipBox(modelPtr->validRegion, &validBox);
+ *	if ((validBox.width > 0) && (validBox.height > 0))
+ *	    TkImgDitherInstance(...);
+ *
+ * never fires, so the instance pixmap is never written -- TkPutImage is
+ * reached from nowhere else -- and every photo drew as whatever was
+ * behind it. The same empty region is then set as the gc's clip mask for
+ * the XCopyArea that paints it, so it fails twice over.
+ *
+ * Silent, and it looks like a drawing bug: XPutImage was simply never
+ * called, which is what section 3 of sys/lib/tests/tk-image-test.tcl
+ * reports and what a $TKP9DEBUG trace on XPutImage's entry proves.
+ *
+ * Upstream's loop, kept run by run rather than collapsed to one bounding
+ * box: the region here is a bbox, so the two agree today, but a real
+ * region implementation later would need no change.
+ */
 void
 TkpBuildRegionFromAlphaData(Region region,
     unsigned x, unsigned y,
     unsigned width, unsigned height,
-    unsigned char *dataPtr,
+    unsigned char *dataPtr,	/* points at the alpha byte of (x, y) */
     unsigned pixelStride,
     unsigned lineStride)
 {
-    (void)region; (void)x; (void)y;
-    (void)width; (void)height; (void)dataPtr;
-    (void)pixelStride; (void)lineStride;
+    unsigned char *lineDataPtr;
+    unsigned x1, y1, end;
+    XRectangle rect;
+
+    if (region == NULL || dataPtr == NULL)
+	return;
+
+    for (y1 = 0; y1 < height; y1++) {
+	lineDataPtr = dataPtr;
+	for (x1 = 0; x1 < width; x1 = end) {
+	    /* Skip to the first non-transparent pixel of this run. */
+	    while (x1 < width && *lineDataPtr == 0) {
+		x1++;
+		lineDataPtr += pixelStride;
+	    }
+	    end = x1;
+	    while (end < width && *lineDataPtr != 0) {
+		end++;
+		lineDataPtr += pixelStride;
+	    }
+	    if (end > x1) {
+		rect.x      = (short)(x + x1);
+		rect.y      = (short)(y + y1);
+		rect.width  = (unsigned short)(end - x1);
+		rect.height = 1;
+		XUnionRectWithRegion(&rect, region, region);
+	    }
+	}
+	dataPtr += lineStride;
+    }
 }
 
 /* ------------------------------------------------------------------ */

@@ -1930,10 +1930,43 @@ the third mattered.
 genuinely one wide, so the *fill* covers column 0 and nothing depends on
 the outline.
 
-**Still open:** a photo drawn onto a canvas reads back as the canvas
-background, so nothing of it renders, even though a photo now draws on
-screen. That is `XPutImage` or the path from the photo instance to it,
-and section 3 of `tk-image-test.tcl` is the case.
+### Tk on Plan 9: an empty validRegion means no photo is ever dithered
+
+A photo drawn onto a canvas read back as the canvas background --
+section 3 of `tk-image-test.tcl` -- and it was **not** `XPutImage`.
+Under `$TKP9DEBUG` the trace shows `XCopyArea: 4x4 from 30 (pixmap)` and
+**no `XPutImage` line at all**: the instance pixmap was copied
+faithfully and was empty.
+
+`TkPutImage` is reached from exactly one place, `TkImgDitherInstance`
+(`tkImgPhInstance.c:1983`), and that is gated on
+
+```c
+TkClipBox(modelPtr->validRegion, &validBox);
+if ((validBox.width > 0) && (validBox.height > 0))
+	TkImgDitherInstance(...);
+```
+
+`TkpBuildRegionFromAlphaData` is what fills that region, and it was an
+empty stub in `plan9/tkPlan9Stubs.c`. `Tk_PhotoPutBlock` calls it for any
+block with alpha, which is **every** photo -- `pix32` always carries an
+alpha byte -- so `validRegion` was empty for every photo ever created,
+the dither never ran, and the pixmap stayed blank. The same empty region
+is then set as the gc's clip mask for the `XCopyArea` that paints it, so
+it fails twice over.
+
+It is upstream's run-by-run loop now rather than a single bounding box:
+the region here is a bbox (`struct _XRegion`, same file), so the two
+agree today, but a real region implementation later needs no change.
+
+**The trace had to be on the entry of `XPutImage`.** An exit-side trace
+cannot tell *never called* from *called and turned the image away*, and
+those two want opposite fixes -- the first round of tracing here sat
+after the early returns and proved nothing.
+
+`XSubtractRegion` in that file is still deliberately approximate (it
+returns `sra`), which with a bbox region means a re-put with
+transparency does not shrink the valid area.
 
 ### Syntax-check Tk's Plan 9 backend on the host before shipping it
 
