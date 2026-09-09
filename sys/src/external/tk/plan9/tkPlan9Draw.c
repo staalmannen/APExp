@@ -405,20 +405,49 @@ XPutImage(Display *display, Drawable d, GC gc, XImage *image,
     int ox, oy;
     (void)display; (void)gc;
 
-    if (image == NULL || image->data == NULL || width == 0 || height == 0)
+    /*
+     * Trace on ENTRY and at every refusal, not just on the way out. An
+     * exit-only trace cannot tell "never called" from "called and bailed",
+     * which is exactly the question when a photo does not appear.
+     */
+    if (tkp9_debug())
+        fprintf(stderr, "XPutImage: image %p %dx%d bpp %d bpl %d,"
+                " src %d,%d %ux%u -> drawable %lu at %d,%d\n",
+                (void *) image,
+                image? image->width: 0, image? image->height: 0,
+                image? image->bits_per_pixel: 0,
+                image? image->bytes_per_line: 0,
+                src_x, src_y, width, height, (unsigned long) d,
+                dest_x, dest_y);
+
+    if (image == NULL || image->data == NULL || width == 0 || height == 0) {
+        if (tkp9_debug())
+            fprintf(stderr, "XPutImage: refused, no image or empty\n");
         return 0;
-    if (image->bits_per_pixel != 32)
-        return 0;			/* nothing here makes any other depth */
+    }
+    if (image->bits_per_pixel != 32) {
+        /* nothing here makes any other depth */
+        if (tkp9_debug())
+            fprintf(stderr, "XPutImage: refused, %d bits per pixel\n",
+                    image->bits_per_pixel);
+        return 0;
+    }
 
     /* Clip the source rectangle to the image rather than reading past it. */
-    if (src_x < 0 || src_y < 0)
+    if (src_x < 0 || src_y < 0) {
+        if (tkp9_debug())
+            fprintf(stderr, "XPutImage: refused, negative source\n");
         return 0;
+    }
     if (src_x + (int)width > image->width)
         width = (unsigned)(image->width - src_x);
     if (src_y + (int)height > image->height)
         height = (unsigned)(image->height - src_y);
-    if ((int)width <= 0 || (int)height <= 0)
+    if ((int)width <= 0 || (int)height <= 0) {
+        if (tkp9_debug())
+            fprintf(stderr, "XPutImage: refused, clipped to nothing\n");
         return 0;
+    }
 
     buf = (unsigned char *)ckalloc((size_t)width * height * 4);
     for (y = 0; y < height; y++) {
@@ -434,10 +463,10 @@ XPutImage(Display *display, Drawable d, GC gc, XImage *image,
 
     DrawableTarget(d, &img, &ox, &oy);
     if (tkp9_debug())
-        fprintf(stderr, "XPutImage: %ux%u from (%d,%d) to drawable %lu"
-                " (%s) at %d,%d + offset %d,%d\n",
-                width, height, src_x, src_y, (unsigned long) d,
-                img? "pixmap": "screen", dest_x, dest_y, ox, oy);
+        fprintf(stderr, "XPutImage: drawing %ux%u into %s at %d,%d"
+                " + offset %d,%d\n",
+                width, height, img? "pixmap": "screen",
+                dest_x, dest_y, ox, oy);
     tkp9_putpixels(img, dest_x + ox, dest_y + oy,
                    (int)width, (int)height, buf);
     ckfree(buf);
@@ -868,8 +897,15 @@ XGetImage(
     unsigned int ix, iy;
     (void)plane_mask;
 
-    if (format != ZPixmap || width == 0 || height == 0)
+    if (tkp9_debug())
+        fprintf(stderr, "XGetImage: %ux%u at %d,%d from drawable %lu\n",
+                width, height, x, y, (unsigned long) d);
+    if (format != ZPixmap || width == 0 || height == 0) {
+        if (tkp9_debug())
+            fprintf(stderr, "XGetImage: refused, format %d %ux%u\n",
+                    format, width, height);
         return NULL;
+    }
 
     buf = (unsigned char *)ckalloc((size_t)width * height * 4);
     DrawableTarget(d, &img, &ox, &oy);
