@@ -6,7 +6,6 @@ OFILES=\
 # original APE \
 	atan2.$O\
 	erf.$O\
-	exp.$O\
 	fabs.$O\
 	floor.$O\
 	floorf.$O\
@@ -18,9 +17,7 @@ OFILES=\
 	j0.$O\
 	j1.$O\
 	jn.$O\
-	log.$O\
 	nan.$O\
-	pow.$O\
 	sinh.$O\
 	sqrt.$O\
 	tanh.$O\
@@ -30,6 +27,11 @@ OFILES=\
 	asin.$O\
 	atan.$O\
 	cos.$O\
+	exp.$O\
+	log.$O\
+	log2.$O\
+	log10.$O\
+	pow.$O\
 	sin.$O\
 	tan.$O\
 	__cosdf.$O\
