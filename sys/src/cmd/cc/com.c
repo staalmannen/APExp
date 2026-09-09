@@ -1539,7 +1539,19 @@ loop:
 	case ODIV:
 	case OLDIV:
 		ccom(l);
-		if(vconst(l) == 0 && !side(r)) {
+		/*
+		 * 0/x is 0 only for integers. In floating point 0.0/0.0 is
+		 * NaN and 0.0/-1.0 is -0.0, and folding it away also
+		 * replaced the node with the integer constant, so the
+		 * result was a positive integer zero. The t == 0 case below
+		 * already had this guard; this one did not.
+		 *
+		 * asin(2.0) is what found it: musl reports a domain error
+		 * with "return 0/(x-x);", which folded to 0 and returned
+		 * 0.0 instead of NaN.
+		 */
+		if(vconst(l) == 0 && !side(r)
+		&& !(n->type != T && typefd[n->type->etype])) {
 			*n = *l;
 			break;
 		}

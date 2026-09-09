@@ -152,7 +152,8 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `rol64-test.c` and `u64float-test.c`, and for libap `locale-test.c`,
 `sigset-test.c`, `posix-spawn-test.c`, `limits-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
-`sincos-test.c`, `explog-test.c` and `stdio-test.c`. The three `tk-*.tcl` scripts there are Tcl, run with
+`sincos-test.c`, `explog-test.c`, `fparith-test.c` and
+`stdio-test.c`. The three `tk-*.tcl` scripts there are Tcl, run with
 `wish`; see the Tk section below. `sys/src/ape/lib/libressl/test/` is separate: it is
 upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
 
@@ -1734,6 +1735,50 @@ assembly implementations overwrite C port versions via the duplicate-skip mechan
 Adding `TVLONG`/`TUVLONG` to `typesuvinit[]` in `cc/sub.c` breaks the entire
 ABI by making vlong-returning functions use struct-return convention.
 The correct content: `{ TSTRUCT, TUNION, TCFLOAT, TCDOUBLE, -1 }`.
+
+### Integer rules applied to floating point (FIXED)
+
+Three bugs of one shape, all found by musl's `asin()`, all silent. When
+something floating-point is subtly wrong, ask whether an integer rule
+has been applied to it.
+
+**`double op float` was computed in FLOAT.** `cc/sub.c`'s promotion
+table had `tab[TDOUBLE][TFLOAT] == TFLOAT`, so the common type of a
+double and a float was the **smaller** of the two -- C99 6.3.1.8 gives
+it to the greater rank. The `TFLOAT` row was right
+(`tab[TFLOAT][TDOUBLE] == TDOUBLE`), so `float op double` always worked
+and only this direction was wrong, which is how it survived.
+
+`asin(1.0)` returns `x*pio2_hi + 0x1p-120f` -- a double plus a float
+constant whose only job is to raise `inexact` -- and the answer came
+back as **float** pi/2, `1.5707963705062866`, exactly 4.371e-08 above
+the double value. **Every mixed-precision expression in the tree was
+quietly rounded to 24 bits**, so anything built before this is suspect,
+the same warning as the 6c spill and the `bool` fix.
+
+**`0/x` was folded to 0 for floating point.** `cc/com.c`'s `ccom()`
+`ODIV` case did `if(vconst(l) == 0 && !side(r)) *n = *l;`. True for
+integers; in floating point `0.0/0.0` is NaN and `0.0/-1.0` is `-0.0`.
+Worse, `*n = *l` replaces the node with the **integer** constant, so the
+answer was a positive integer zero. The divisor-is-zero case two lines
+below already carried a `typefd` guard; this one did not.
+
+`asin(2.0)` reports its domain error with `return 0/(x-x);`, which
+folded away and returned 0.0 instead of NaN.
+
+**`INFINITY` was `DBL_MAX`.** `<math.h>` had
+`#define HUGE_VAL 1.79769313486231e+308` with `INFINITY` on top of it --
+a finite number, against C99 7.12p3/p4. `isinf(INFINITY)` was false,
+`exp(1000) == INFINITY` was false, and `cos(INFINITY)` computed a real
+cosine of a very large angle rather than NaN. It hid unusually well:
+`exp(INFINITY)` *passed*, because `exp(1.8e308)` returns `1.0+x`, which
+compares equal to that same 1.8e308. `HUGE_VAL` is `Inf(1)` now, as
+`NAN` was already `NaN()` -- neither is the constant expression the
+standard asks for, and there is no way to write one here.
+
+Covered by `sys/lib/tests/fparith-test.c`, which also reports the sign
+of `-0.0` through a call: that was still failing when these three were
+fixed, and is left named rather than rediscovered.
 
 ### Hex floating constants were silently zero (FIXED)
 

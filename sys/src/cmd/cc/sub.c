@@ -1983,8 +1983,24 @@ char	tab[NTYPE][NTYPE] =
 /*TFLOAT*/	{ 0,	TFLOAT, TFLOAT, TFLOAT, TFLOAT, TFLOAT, TFLOAT, TFLOAT,
 			TFLOAT, TFLOAT, TFLOAT, TFLOAT, TDOUBLE, TIND,
 		},
+/*
+ * The TFLOAT column here used to say TFLOAT, so "double op float" was
+ * computed in FLOAT -- a straight violation of C99 6.3.1.8, which makes
+ * the common type the one with the greater rank. Note the TFLOAT row
+ * above has TDOUBLE in its TDOUBLE column, so "float op double" was
+ * always right; only this direction was wrong, which is how it survived.
+ *
+ * asin(1.0) is what found it. musl's returns
+ *
+ *	x*pio2_hi + 0x1p-120f
+ *
+ * -- a double plus a float constant that exists only to raise inexact --
+ * and the answer came back as float pi/2, 1.5707963705062866, exactly
+ * 4.371e-08 above the double value. Any mixed-precision arithmetic in
+ * the tree was silently rounded to 24 bits.
+ */
 /*TDOUBLE*/	{ 0,	TDOUBLE, TDOUBLE, TDOUBLE, TDOUBLE, TDOUBLE, TDOUBLE, TDOUBLE,
-			TDOUBLE, TDOUBLE, TDOUBLE, TFLOAT, TDOUBLE, TIND,
+			TDOUBLE, TDOUBLE, TDOUBLE, TDOUBLE, TDOUBLE, TIND,
 		},
 /*TIND*/	{ 0,	TIND, TIND, TIND, TIND, TIND, TIND, TIND,
 			 TIND, TIND, TIND, TIND, TIND, TIND,
