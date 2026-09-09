@@ -1722,6 +1722,162 @@ last word boundary that fits, or at least one character. Breaking at any
 character put line breaks mid-word and in the wrong place for tabs
 (font-24.*). The structure follows `tkUnixFont.c`.
 
+### Tk on Plan 9: what the remaining test failures are, and which are ours
+
+The suite is at **36 failing tests** (`wish all.tcl`; note `grep -c
+FAILED` counts two lines each, so 72 lines). Nine of those are known
+not to be the Plan 9 backend's, and are worth recording so they are not
+chased again:
+
+**The five remaining `event-9.*` are generic Tk.** The port's side is
+proved correct by `tk-enter-test.tcl`: the hit test agrees with the warp
+at every level and the crossings arrive. What is wrong is the `%d`
+detail when the window the pointer was in has just been **destroyed**:
+
+```
+event-9.14  got   |<Enter> NotifyVirtual .one|<Enter> NotifyVirtual .one.f1|<Enter> NotifyAncestor .one.f1.f2|
+            want  |<Enter> NotifyNonlinearVirtual .one|...NotifyNonlinearVirtual .one.f1|...NotifyNonlinear .one.f1.f2|
+```
+
+`TkPointerDeadWindow` (`generic/tkPointer.c`) sets `lastWinPtr =
+TkGetContainer(winPtr)`, which is NULL for anything not embedded. So
+`GenerateEnterLeave` calls `TkInOutEvents` with a **NULL sourcePtr**,
+`FindCommonAncestor(NULL, dest)` returns `upLevels == 0`, and that is
+the "dest is an inferior of source" branch -- `NotifyVirtual` down the
+chain and `NotifyAncestor` at the end, exactly what comes out. The
+non-linear details need a live source in a different branch.
+
+`event-9.16` and `event-9.17` say in their own comments that they test
+"overwriting the dead window struct in `TkPointerDeadWindow()` and
+subsequent reading in `GenerateEnterLeave()`" -- **a mechanism this
+tree's `tkPointer.c` does not have**: its `ThreadSpecificData` holds
+`grabWinPtr`, `lastState`, `lastPos`, `lastWinPtr`, `restrictWinPtr`
+and `cursorWinPtr`, and nothing else. So the test file is newer than
+the `tkPointer.c` beside it. Fixing this means patching generic Tk,
+which is shared with the Windows and Mac ports; `TkPointerDeadWindow`
+is called from exactly three places and ours (`XDestroyWindow` in
+`tkPlan9Init.c`) matches `win/tkWinWindow.c:316` and
+`macosx/tkMacOSXSubwindows.c:70`.
+
+**The four `place-8.*`/`pack-18.*` fail on X11 too.** All four have the
+shape
+
+```
+got   1 1 W H 1 1
+want  1 0 W H 0 1
+```
+
+and all four ask whether a **child** reports `winfo ismapped` as 0 after
+`wm iconify` on its toplevel. On Windows the OS sends `WM_SHOWWINDOW`
+with `SW_PARENTCLOSING` to the children and Tk turns that into
+`UnmapNotify`; X sends nothing for a child of an unmapped window, and
+neither `Tk_UnmapWindow` nor either port's `TkWmUnmapWindow` walks the
+children. The tests carry `-constraints {failsOnUbuntu failsOnXQuartz}`,
+and that constraint is
+
+```tcl
+testConstraint failsOnUbuntu [expr {![info exists ::env(CI)] || ![string match Linux $::tcl_platform(os)]}]
+```
+
+-- true (so the test *runs*) everywhere except CI on Linux. They
+therefore fail on an ordinary Linux/X11 desktop as well. **Do not
+"fix" these by unmapping descendants**: that would be inventing
+semantics X does not have, in the one direction where this port
+deliberately follows X.
+
+`clipboard-4.1/4.2/4.4/6.2` are the third such group, and were already
+known: they turn on X selection *ownership*, which `/dev/snarf` has no
+concept of.
+
+**The four `font-21.19..22` are an upstream test bug**, and the block
+they sit in shows it. Sixteen tests there all ask the *same* question
+and compare it against a *different* name:
+
+```tcl
+if {[font actual {avantgarde 12 roman normal} -family] == "helvetica"} {
+    set x [psfontname avantgarde 12 roman normal]      ;# four arguments
+} else {
+    set x Helvetica
+}
+```
+
+`proc psfontname {name}` takes **one** argument, and every other call
+site in the file quotes it (`psfontname "arial 10"`). So the `then`
+branch raises `wrong # args`. It is dead code on a normal machine --
+21.7..21.10 compare against `avantgarde`, 21.11..18 against `bookman`
+and so on, and only a machine where avantgarde resolves to *helvetica*
+ever enters it. `ChooseFont` here resolves any unknown proportional
+family to helvetica, so we do.
+
+**Do not change the fallback to dodge this.** Reporting the family that
+was actually resolved is the contract (see the font section above), and
+`tk-font-test.tcl` asserts the real requirement -- that an unknown
+family does *not* come back as itself.
+
+**`imgListFormat-3.1/3.2/3.3` need `tktest`, not `wish`**:
+`invalid command name "testphotostringmatch"`, which `generic/tkTest.c`
+registers only in Tk's own test binary. A harness limitation, not a
+port bug.
+
+That is 16 of the 36 accounted for. `canvas-23.*` **is** ours and was
+the useful find in that sweep -- see the image section below.
+
+### Tk on Plan 9: the image path was a stub in both directions
+
+`canvas-23.1/23.2/23.3` fail with
+
+```
+failed to copy Pixmap to XImage
+```
+
+which is `tkCanvas.c` reporting that `XGetImage` returned NULL. It was
+a stub, and so were `XPutImage` and `TkPutImage`; `tkp9_putpixels`
+existed but **nothing called it**. So the whole pixel path was
+unimplemented in both directions, and the three canvas tests are only
+the corner of it the suite happens to poke -- `TkPutImage` is how Tk
+draws every photo image.
+
+The awkward part is the pixel format, and it has a trap in it.
+
+**The XImage side.** `XCreateImage` here declares 32 bits per pixel and
+`byte_order`, and generic Tk reads a pixel with a plain 32-bit load and
+then decomposes it with the *visual's* masks -- `tkCanvas.c`'s
+`DrawCanvas` does exactly that, and `screen->root_visual` says
+`0xFF0000`/`0x00FF00`/`0x0000FF`. So an XImage pixel is the host-order
+word `0x00RRGGBB`, and the only way to agree on both endiannesses is a
+32-bit access rather than naming bytes. `XImagePixel()` is that
+accessor. `P9GetPixel`/`P9PutPixel` used to store R,G,B,A in *memory*
+order, which contradicts the `LSBFirst` the same file declared -- on a
+little-endian machine that puts blue where the red mask looks. Nothing
+had noticed because no pixel ever made the trip. `byte_order` now
+follows the host rather than being hardcoded, since this tree builds
+big-endian architectures too.
+
+**The Plan 9 side, and the trap.** `tkp9_putpixels`/`tkp9_getpixels`
+speak R,G,B,A bytes and convert to Plan 9's `RGBA32`. Plan 9 names a
+channel from the most significant bits down and stores the pixel
+little-endian, which makes `RGBA32` A,B,G,R in memory -- but **that is
+not assumed**, because getting it wrong is *invisible in a round trip*:
+put and get would permute and unpermute by the same amount and cancel,
+and the error would surface only where these bytes meet the XImage
+layout, as red and blue exchanged in every photo, a long way from here.
+So `rgbacalibrate()` asks instead, once: fill a pixel with four
+components that are all different (`0x4080C0FF` -- the colour argument
+to `allocimage` is `0xRRGGBBAA`, documented and stable, and an alpha of
+`0xFF` makes premultiplication the identity) and see where each lands.
+The documented order is the fallback if the probe cannot run.
+`$TKP9DEBUG` prints what it found.
+
+`tkp9_getpixels` draws the source into an `RGBA32` temporary before
+unloading it rather than unloading the source directly: a pixmap is
+allocated in the *screen's* channel (`tkp9_allocimage`), which varies by
+machine, and `draw()` does that conversion for us.
+
+**A round-trip test cannot check this.** The absolute colour is what
+matters, which is exactly what `canvas-23.1` does -- it fills with
+`#000080` and reads the pixels back -- so a red/blue swap shows up
+there as `#800000`.
+
 ### Syntax-check Tk's Plan 9 backend on the host before shipping it
 
 A round trip to the VM costs a full rebuild, and twice now it has been

@@ -119,6 +119,13 @@ void   tkp9_putpixels(void *dst, int x, int y, int w, int h,
 		      const unsigned char *rgba32);
 
 /*
+ * Read w*h pixels back out, as R,G,B,A bytes. 0 on success, -1 on
+ * failure. The inverse of tkp9_putpixels, and what XGetImage needs.
+ */
+int    tkp9_getpixels(void *src, int x, int y, int w, int h,
+		      unsigned char *rgba32);
+
+/*
  * Event file descriptors (callers select on these)
  */
 int    tkp9_mousefd(void);

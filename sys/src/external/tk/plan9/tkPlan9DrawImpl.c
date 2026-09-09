@@ -180,6 +180,60 @@ dstrect(Image *d, int x, int y, int w, int h)
 }
 
 /* ------------------------------------------------------------------ */
+/* Pixel byte order                                                    */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Which byte of an RGBA32 pixel holds which component, in memory order.
+ *
+ * Plan 9 names a channel from the most significant bits of the pixel
+ * downwards and stores the pixel little-endian, which makes RGBA32
+ * A,B,G,R in memory. That is the documented answer and it is used as
+ * the fallback -- but it is not assumed, because **getting it wrong is
+ * invisible in a round trip**: tkp9_putpixels and tkp9_getpixels would
+ * permute and unpermute by the same amount and cancel out. The error
+ * would surface only where these bytes meet Tk's XImage layout, as red
+ * and blue exchanged in every photo image, which is a long way from
+ * here.
+ *
+ * So ask rather than assume, once: fill a pixel with four components
+ * that are all different and see where each one lands. The colour
+ * argument to allocimage is 0xRRGGBBAA, which is documented and stable,
+ * and an alpha of 0xFF makes premultiplication the identity so the
+ * values arrive unchanged.
+ */
+static int rgbaidx[4] = { -1, -1, -1, -1 };	/* memory index of R,G,B,A */
+
+static void
+rgbacalibrate(void)
+{
+    Image *img;
+    uchar buf[4];
+    int i;
+
+    if(rgbaidx[0] >= 0)
+        return;
+    rgbaidx[0] = 3; rgbaidx[1] = 2; rgbaidx[2] = 1; rgbaidx[3] = 0;
+    if(display == nil)
+        return;
+    img = allocimage(display, Rect(0, 0, 1, 1), RGBA32, 1, 0x4080C0FF);
+    if(img == nil)
+        return;
+    if(unloadimage(img, img->r, buf, sizeof buf) == sizeof buf)
+        for(i = 0; i < 4; i++)
+            switch(buf[i]){
+            case 0x40: rgbaidx[0] = i; break;
+            case 0x80: rgbaidx[1] = i; break;
+            case 0xC0: rgbaidx[2] = i; break;
+            case 0xFF: rgbaidx[3] = i; break;
+            }
+    freeimage(img);
+    if(tkp9_debug())
+        fprint(2, "tkp9: RGBA32 memory order R=%d G=%d B=%d A=%d\n",
+            rgbaidx[0], rgbaidx[1], rgbaidx[2], rgbaidx[3]);
+}
+
+/* ------------------------------------------------------------------ */
 /* Off-screen drawables                                                */
 /* ------------------------------------------------------------------ */
 
@@ -542,12 +596,71 @@ tkp9_putpixels(void *dst, int x, int y, int w, int h,
                const unsigned char *rgba32)
 {
     Image *d = dstimage(dst), *img;
+    uchar *p;
+    int i, n;
+
     if(!d || !rgba32 || w <= 0 || h <= 0) return;
+    rgbacalibrate();
+    n = w * h;
+    if((p = malloc(n * 4)) == nil)
+        return;
+    for(i = 0; i < n; i++){
+        p[i*4 + rgbaidx[0]] = rgba32[i*4 + 0];
+        p[i*4 + rgbaidx[1]] = rgba32[i*4 + 1];
+        p[i*4 + rgbaidx[2]] = rgba32[i*4 + 2];
+        p[i*4 + rgbaidx[3]] = rgba32[i*4 + 3];
+    }
     img = allocimage(display, Rect(0, 0, w, h), RGBA32, 0, DTransparent);
-    if(!img) return;
-    loadimage(img, img->r, (uchar*)rgba32, w * h * 4);
-    draw(d, dstrect(d, x, y, w, h), img, nil, img->r.min);
+    if(img != nil){
+        loadimage(img, img->r, p, n * 4);
+        draw(d, dstrect(d, x, y, w, h), img, nil, img->r.min);
+        freeimage(img);
+    }
+    free(p);
+}
+
+/*
+ * Read w*h pixels back out of a drawable, as R,G,B,A bytes. The inverse
+ * of tkp9_putpixels, and the thing XGetImage needs: "canvas image"
+ * renders into a pixmap and then has to get the pixels out of it, which
+ * is the only way Tk can copy a drawable into a photo.
+ *
+ * The source is drawn into an RGBA32 temporary first rather than being
+ * unloaded directly, because a pixmap is allocated in the screen's own
+ * channel (tkp9_allocimage) and that varies by machine; draw() does the
+ * conversion for us and unloadimage then has one format to deal with.
+ */
+int
+tkp9_getpixels(void *src, int x, int y, int w, int h, unsigned char *rgba32)
+{
+    Image *s = dstimage(src), *img;
+    uchar *p;
+    int i, n, ok;
+
+    if(!s || !rgba32 || w <= 0 || h <= 0) return -1;
+    rgbacalibrate();
+    n = w * h;
+    img = allocimage(display, Rect(0, 0, w, h), RGBA32, 0, DTransparent);
+    if(img == nil)
+        return -1;
+    draw(img, img->r, s, nil, dstrect(s, x, y, w, h).min);
+    if((p = malloc(n * 4)) == nil){
+        freeimage(img);
+        return -1;
+    }
+    ok = unloadimage(img, img->r, p, n * 4) == n * 4;
     freeimage(img);
+    if(ok)
+        for(i = 0; i < n; i++){
+            rgba32[i*4 + 0] = p[i*4 + rgbaidx[0]];
+            rgba32[i*4 + 1] = p[i*4 + rgbaidx[1]];
+            rgba32[i*4 + 2] = p[i*4 + rgbaidx[2]];
+            rgba32[i*4 + 3] = p[i*4 + rgbaidx[3]];
+        }
+    free(p);
+    if(tkp9_debug() && !ok)
+        fprint(2, "tkp9_getpixels: unloadimage %dx%d failed: %r\n", w, h);
+    return ok ? 0 : -1;
 }
 
 /* ------------------------------------------------------------------ */

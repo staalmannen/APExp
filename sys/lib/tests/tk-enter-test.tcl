@@ -52,6 +52,19 @@
 # wrong. Hence the "where" proc below -- one line of geometry would
 # have pinned this without the round trip that found it.
 #
+# With Tk_GetRootCoords fixed, all four sections pass:
+#
+#	.: rootx,rooty 700,400 size 200x200 mapped 1
+#	.one: rootx,rooty 100,100 size 300x300 mapped 1
+#	pointer now at 350 350; winfo containing -> '.one'
+#	crossings: {Enter .one NotifyAncestor}
+#	...
+#	crossings after destroying .two:
+#	    {Enter .one NotifyVirtual} {Enter .one.f1 NotifyAncestor}
+#
+# -- the hit test agrees with the warp at every level, and the detail
+# fields are the ones event-9.* expects.
+#
 # DO NOT TOUCH THE MOUSE while this runs.
 
 set fail 0
@@ -125,16 +138,26 @@ ok {[winfo containing 350 350] eq ".one"} "winfo containing says .one"
 ok {[lsearch -glob $c "Enter .one *"] >= 0} "<Enter> arrived on .one"
 
 note ""
-note "--- 2. a child under the pointer ---"
+note "--- 2. a child mapped under a stationary pointer ---"
+# The frame covers 200,200..400,400 within .one, i.e. screen 300..500
+# clipped to .one's 400 -- the pointer at 350,350 is inside it. An X
+# server generates the crossing unasked; here gP9.pointerDirty makes the
+# next poll re-report the same position so tkPointer.c can.
+#
+# Clear the log BEFORE the thing being measured. Reading it with
+# "[crossings]" after having called "crossings" to clear reports the
+# buffer that call just emptied, which is how this section first printed
+# an empty result that looked like a missing crossing.
+crossings
 frame .one.f1 -width 200 -height 200 -bg red
 place .one.f1 -x 200 -y 200
 update
 settle
-crossings
-# The frame covers 300,300..500,500 in .one, i.e. screen 300..500 --
-# the pointer at 350,350 is inside it, so mapping it must give an Enter.
+set c [crossings]
 note "  winfo containing 350 350 -> '[winfo containing 350 350]'"
-note "  crossings from mapping a frame under the pointer: [crossings]"
+note "  crossings from mapping a frame under the pointer: $c"
+ok {[lsearch -glob $c "Enter .one.f1 *"] >= 0} \
+    "a child mapped under the pointer gives an <Enter>"
 
 note ""
 note "--- 3. destroy the window under the pointer (event-9.1's shape) ---"
