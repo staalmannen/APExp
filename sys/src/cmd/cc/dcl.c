@@ -604,7 +604,15 @@ init1(Sym *s, Type *t, long o, int exflag)
 					s->name);
 				return Z;
 			}
-			if(vconst(a) == 0)
+			/*
+			 * A zero initialiser needs no DATA record: the
+			 * object goes in BSS, which is already zero. That
+			 * is the fifth place the sign of zero was lost --
+			 * -0.0 is not all-zero bits, and vconst() answers 0
+			 * for it because it truncates to an int. Emit it.
+			 */
+			if(vconst(a) == 0
+			&& !(typefd[a->type->etype] && fpnegzero(a->fconst)))
 				return Z;
 
 			if(t->nbits) {

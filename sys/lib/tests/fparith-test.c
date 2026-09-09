@@ -60,11 +60,20 @@
  *	            inherited the bug from the compiler compiling it;
  *	cc/pswt.c   ieeedtod tested "native < 0" before "native == 0",
  *	            and -0.0 is not less than 0;
+ *	cc/dcl.c    init1 skips a zero static initialiser, since BSS is
+ *	            already zero -- and vconst() answers 0 for -0.0,
+ *	            because it truncates to an int;
  *	6c/txt.c    gmove materialised any zero constant with XORPD of a
  *	            register against itself, which gives +0.0.
  *
  *    and 6l's ieeedtof took -0.0 for a denormal and diagnosed "double
  *    fp to single fp overflow".
+ *
+ *    The dcl.c one is the shape that survives every fix upstream of it:
+ *    the value was folded correctly and then DISCARDED AS A ZERO rather
+ *    than written wrongly. It was the last case still failing when the
+ *    others were fixed. A file-scope initialiser never goes through
+ *    com.c or cgen.c, so it fails on its own.
  *
  *    The sign of zero is not decorative: it is what makes 1/x tell the
  *    two infinities apart, and it is the sign of the result of every
