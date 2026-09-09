@@ -6,7 +6,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-09 10:25:06 +0200
+Tests began at 2026-09-09 12:06:42 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -27,85 +27,6 @@ Key{} Release{}
 ---- Result should have been (exact matching):
 Key?? Release??
 ==== bind-13.14 FAILED
-
-
-
-==== bind-34.1 -warp works relatively to a window FAILED
-==== Contents of test case:
-
-    # In order to avoid platform-dependent coordinate results due to
-    # decorations and borders, this test warps the pointer twice
-    # relatively to a window that moved in the meantime, and checks
-    # how much the pointer moved
-    wm geometry .top +200+200
-    after 10 ; update
-    event generate .top <Motion> -x 20 -y 20 -warp 1
-    controlPointerWarpTiming
-    set pointerPos1 [winfo pointerxy .top]
-    wm geometry .top +600+600
-    after 10 ; update
-    event generate .top <Motion> -x 20 -y 20 -warp 1
-    controlPointerWarpTiming
-    set pointerPos2 [winfo pointerxy .top]
-    # from the first warped position to the second one, the mouse
-    # pointer should have moved the same amount as the window moved
-    set res 1
-    foreach pos1 $pointerPos1 pos2 $pointerPos2 {
-	if {$pos1 != ($pos2 - 400)} {
-	    set res [list $pointerPos1 $pointerPos2]
-	}
-    }
-    set res
-
----- Result was:
-{0 0} {0 0}
----- Result should have been (exact matching):
-1
-==== bind-34.1 FAILED
-
-
-
-==== bind-34.2 -warp works relatively to the screen FAILED
-==== Contents of test case:
-
-    # Contrary to bind-34.1, we're directly checking screen coordinates
-    event generate {} <Motion> -x 20 -y 20 -warp 1
-    controlPointerWarpTiming
-    set res [winfo pointerxy .]
-    event generate {} <Motion> -x 200 -y 200 -warp 1
-    controlPointerWarpTiming
-    lappend res {*}[winfo pointerxy .]
-
----- Result was:
-0 0 0 0
----- Result should have been (exact matching):
-20 20 200 200
-==== bind-34.2 FAILED
-
-
-
-==== bind-36.1 pointer warp with grab on toplevel, bug [e3888d5820] FAILED
-==== Contents of test case:
-
-    grab .top
-    event generate .top.l <Motion> -warp 1 -x 10 -y 10
-    controlPointerWarpTiming
-    foreach {x1 y1} [winfo pointerxy .top.l] {}
-    event generate {} <Motion> -warp 1 -x 50 -y 50
-    controlPointerWarpTiming
-    grab release .top
-    event generate .top.l <Motion> -warp 1 -x 10 -y 10
-    controlPointerWarpTiming
-    foreach {x2 y2} [winfo pointerxy .top.l] {}
-    # success if the coords are the same with or without the grab, and if they
-    # are at (10,10) inside the label widget as requested by the warping
-    expr {$x1==$x2 && $y1==$y2 && $x1==[winfo rootx .top.l]+10  && $y1==[winfo rooty .top.l]+10}
-
----- Result was:
-0
----- Result should have been (exact matching):
-1
-==== bind-36.1 FAILED
 
 bitmap.test
 border.test
@@ -324,7 +245,6 @@ event.test
 .top1
 ==== event-9.2 FAILED
 
-wait for <Enter> event on .one timed out (> 1000 ms)
 
 
 ==== event-9.11 pointer window container = parent FAILED
@@ -342,7 +262,6 @@ wait for <Enter> event on .one timed out (> 1000 ms)
 |<Enter> NotifyInferior .one.f1|
 ==== event-9.11 FAILED
 
-wait for <Enter> event on .one timed out (> 1000 ms)
 
 
 ==== event-9.12 pointer window container != parent FAILED
@@ -360,9 +279,6 @@ wait for <Enter> event on .one timed out (> 1000 ms)
 |<Enter> NotifyNonlinearVirtual .one.f1|<Enter> NotifyNonlinear .one.f1.f2|
 ==== event-9.12 FAILED
 
-wait for <Enter> event on .one timed out (> 1000 ms)
-wait for <Enter> event on .two timed out (> 1000 ms)
-wait for <Enter> event on .one timed out (> 1000 ms)
 
 
 ==== event-9.13 pointer window is a toplevel, toplevel destination FAILED
@@ -381,9 +297,6 @@ wait for <Enter> event on .one timed out (> 1000 ms)
 |<Enter> NotifyNonlinear .one|
 ==== event-9.13 FAILED
 
-wait for <Enter> event on .one timed out (> 1000 ms)
-wait for <Enter> event on .two timed out (> 1000 ms)
-wait for <Enter> event on .one.f1.f2 timed out (> 1000 ms)
 
 
 ==== event-9.14 pointer window is a toplevel, tk internal destination FAILED
@@ -401,9 +314,6 @@ wait for <Enter> event on .one.f1.f2 timed out (> 1000 ms)
 |<Enter> NotifyNonlinearVirtual .one|<Enter> NotifyNonlinearVirtual .one.f1|<Enter> NotifyNonlinear .one.f1.f2|
 ==== event-9.14 FAILED
 
-wait for <Enter> event on .one timed out (> 1000 ms)
-wait for <Enter> event on .two timed out (> 1000 ms)
-wait for <Enter> event on .one timed out (> 1000 ms)
 
 
 ==== event-9.16 Successive destructions (pointer window + parent), single generation of crossing events FAILED
@@ -421,7 +331,6 @@ wait for <Enter> event on .one timed out (> 1000 ms)
 |<Enter> NotifyInferior .one|
 ==== event-9.16 FAILED
 
-wait for <Enter> event on .one timed out (> 1000 ms)
 
 
 ==== event-9.17 Successive destructions (pointer window + parent), separate crossing events FAILED
@@ -441,9 +350,6 @@ wait for <Enter> event on .one timed out (> 1000 ms)
 |<Enter> NotifyInferior .one.f1|<Enter> NotifyInferior .one|
 ==== event-9.17 FAILED
 
-wait for <Enter> event on .one timed out (> 1000 ms)
-wait for <Enter> event on .two.f1.f2 timed out (> 1000 ms)
-wait for <Enter> event on .one timed out (> 1000 ms)
 
 
 ==== event-9.18 Successive destructions (pointer window + ancestors including its toplevel), destination is non-root toplevel FAILED
@@ -461,9 +367,6 @@ wait for <Enter> event on .one timed out (> 1000 ms)
 |<Enter> NotifyNonlinear .one|
 ==== event-9.18 FAILED
 
-wait for <Enter> event on .one timed out (> 1000 ms)
-wait for <Enter> event on .three.f1.f2 timed out (> 1000 ms)
-wait for <Enter> event on .two.f1.f2 timed out (> 1000 ms)
 
 
 ==== event-9.19 Successive destructions (pointer window + ancestors including its toplevel), destination is internal window, bypass root win FAILED
@@ -482,8 +385,6 @@ wait for <Enter> event on .two.f1.f2 timed out (> 1000 ms)
 |<Enter> NotifyNonlinearVirtual .two|<Enter> NotifyNonlinearVirtual .two.f1|<Enter> NotifyNonlinear .two.f1.f2|
 ==== event-9.19 FAILED
 
-wait for <Enter> event on .one timed out (> 1000 ms)
-wait for <Enter> event on .two.f1.f2 timed out (> 1000 ms)
 filebox.test
 
 
