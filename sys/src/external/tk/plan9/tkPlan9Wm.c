@@ -55,6 +55,16 @@ typedef struct TkWmInfo {
     int maxWidth, maxHeight;	/* 0 means unlimited. */
     int withdrawn;
     int flags;
+    char *title;		/* "wm title", or NULL for the default. */
+    /*
+     * Gridding, as tkUnixWm.c keeps it. When gridWin is non-NULL the
+     * width/height above are in GRID UNITS rather than pixels, and a
+     * grid unit is widthInc/heightInc pixels; reqGridWidth/Height is the
+     * grid size corresponding to the toplevel's own requested size.
+     */
+    TkWindow *gridWin;
+    int reqGridWidth, reqGridHeight;
+    int widthInc, heightInc;
     struct TkWmInfo *nextPtr;
 } WmInfo;
 
@@ -62,6 +72,10 @@ typedef struct TkWmInfo {
 #define WM_NEVER_MAPPED		2
 
 static void WmUpdateGeometry(void *clientData);
+static void WmGridToPixels(WmInfo *wmPtr, int gw, int gh,
+			   int *widthPtr, int *heightPtr);
+static void WmPixelsToGrid(WmInfo *wmPtr, int w, int h,
+			   int *gwPtr, int *ghPtr);
 MODULE_SCOPE void   TkP9EmbedGeometryRequest(TkWindow *winPtr, int w, int h);
 MODULE_SCOPE Window TkP9EmbedParent(TkWindow *winPtr);
 
@@ -116,10 +130,19 @@ WmUpdateGeometry(void *clientData)
 	return;
     }
 
-    width  = (wmPtr->width  >= 0) ? wmPtr->width
-				  : Tk_ReqWidth((Tk_Window) winPtr);
-    height = (wmPtr->height >= 0) ? wmPtr->height
-				  : Tk_ReqHeight((Tk_Window) winPtr);
+    /*
+     * An explicit size is in grid units while the toplevel is gridded
+     * ("-setgrid 1" on a listbox or a text widget), so convert here --
+     * this is the one place a size leaves wmPtr for the screen.
+     */
+    if (wmPtr->width >= 0 && wmPtr->height >= 0) {
+	WmGridToPixels(wmPtr, wmPtr->width, wmPtr->height, &width, &height);
+    } else {
+	width  = (wmPtr->width  >= 0) ? wmPtr->width
+				      : Tk_ReqWidth((Tk_Window) winPtr);
+	height = (wmPtr->height >= 0) ? wmPtr->height
+				      : Tk_ReqHeight((Tk_Window) winPtr);
+    }
 
     if (width  < wmPtr->minWidth)  width  = wmPtr->minWidth;
     if (height < wmPtr->minHeight) height = wmPtr->minHeight;
@@ -583,11 +606,29 @@ TkpUseWindow(Tcl_Interp *interp, Tk_Window tkwin, const char *string)
     return Tk_UseWindow(interp, tkwin, string);
 }
 
+/*
+ * Parse a window id, and *fail* on one that is not a number.
+ *
+ * strtoul answers 0 for "xyz" without complaint, so "toplevel .t -use
+ * xyz" reached the lookup below and came back "couldn't create child of
+ * window \"xyz\"" -- a plausible message for the wrong reason, and one
+ * that would equally describe a real id naming a window that has gone.
+ * tkUnixEmbed.c's version reports the ordinary Tcl integer error, which
+ * is what embed-1.1 asks for.
+ */
 int
 TkpScanWindowId(Tcl_Interp *interp, const char *string, Window *idPtr)
 {
-    (void)interp;
-    *idPtr = (Window)strtoul(string, NULL, 0);
+    Tcl_Obj *obj = Tcl_NewStringObj(string, TCL_INDEX_NONE);
+    Tcl_WideInt value;
+    int code;
+
+    Tcl_IncrRefCount(obj);
+    code = Tcl_GetWideIntFromObj(interp, obj, &value);
+    Tcl_DecrRefCount(obj);
+    if (code != TCL_OK)
+	return TCL_ERROR;
+    *idPtr = (Window) value;
     return TCL_OK;
 }
 
@@ -814,6 +855,8 @@ TkWmNewWindow(TkWindow *winPtr)
     wmPtr->height    = -1;
     wmPtr->minWidth  = 1;
     wmPtr->minHeight = 1;
+    wmPtr->widthInc  = 1;
+    wmPtr->heightInc = 1;
     wmPtr->flags     = WM_NEVER_MAPPED;
     wmPtr->nextPtr   = NULL;
     /*
@@ -894,6 +937,8 @@ TkWmDeadWindow(TkWindow *winPtr)
     WmUnlink(winPtr->dispPtr, wmPtr);
     if (wmPtr->flags & WM_UPDATE_PENDING)
 	Tcl_CancelIdleCall(WmUpdateGeometry, winPtr);
+    if (wmPtr->title != NULL)
+	ckfree(wmPtr->title);
     winPtr->wmInfoPtr = NULL;
     ckfree(wmPtr);
 }
@@ -982,18 +1027,159 @@ TkWmProtocolEventProc(TkWindow *winPtr, XEvent *eventPtr)
 /* Grid geometry hint (wm-level resize grid)                         */
 /* ------------------------------------------------------------------ */
 
+/*
+ * Both of these were empty stubs, so "-setgrid 1" on a listbox or a text
+ * widget did nothing at all. Gridding is not decoration: with it set,
+ * "wm geometry" speaks in CHARACTERS rather than pixels, in both
+ * directions, which is what listbox-4.7 checks --
+ *
+ *	listbox .l2 -font $fixed -width 30 -height 20 -setgrid 1
+ *	wm geometry .			;# must say 30x20, not 190x308
+ *	wm geometry . 26x15		;# 26 characters, not 26 pixels
+ *
+ * The convention is tkUnixWm.c's and is worth stating once: while
+ * gridWin is non-NULL, wmPtr->width and wmPtr->height hold GRID UNITS,
+ * and everything that touches them converts. Nothing else in this file
+ * needs to know, because the conversion is confined to the three places
+ * a size crosses that boundary -- WmUpdateGeometry on the way out to
+ * pixels, and the "wm geometry" query and setter.
+ */
+
+/*
+ * The pixel size may have moved even with an explicit "wm geometry" in
+ * force, since that size is now read in different units -- so ask for an
+ * update directly rather than through WmReqProc, which deliberately does
+ * nothing when the size is explicit.
+ */
+static void
+WmGridChanged(TkWindow *winPtr)
+{
+    WmInfo *wmPtr = winPtr->wmInfoPtr;
+
+    if (!(wmPtr->flags & (WM_UPDATE_PENDING|WM_NEVER_MAPPED))) {
+	Tcl_DoWhenIdle(WmUpdateGeometry, winPtr);
+	wmPtr->flags |= WM_UPDATE_PENDING;
+    }
+}
+
+/* Which toplevel does this window belong to? */
+static TkWindow *
+WmToplevelOf(TkWindow *winPtr)
+{
+    while (winPtr != NULL && !(winPtr->flags & TK_TOP_LEVEL))
+	winPtr = winPtr->parentPtr;
+    return winPtr;
+}
+
+/* Grid units -> pixels, for a size held in wmPtr->width/height. */
+static void
+WmGridToPixels(WmInfo *wmPtr, int gw, int gh, int *widthPtr, int *heightPtr)
+{
+    TkWindow *winPtr = wmPtr->winPtr;
+
+    if (wmPtr->gridWin == NULL) {
+	*widthPtr = gw;
+	*heightPtr = gh;
+	return;
+    }
+    *widthPtr  = Tk_ReqWidth((Tk_Window) winPtr)
+	    + (gw - wmPtr->reqGridWidth) * wmPtr->widthInc;
+    *heightPtr = Tk_ReqHeight((Tk_Window) winPtr)
+	    + (gh - wmPtr->reqGridHeight) * wmPtr->heightInc;
+}
+
+/* Pixels -> grid units. */
+static void
+WmPixelsToGrid(WmInfo *wmPtr, int w, int h, int *gwPtr, int *ghPtr)
+{
+    TkWindow *winPtr = wmPtr->winPtr;
+
+    if (wmPtr->gridWin == NULL) {
+	*gwPtr = w;
+	*ghPtr = h;
+	return;
+    }
+    *gwPtr = wmPtr->reqGridWidth
+	    + (w - Tk_ReqWidth((Tk_Window) winPtr)) / wmPtr->widthInc;
+    *ghPtr = wmPtr->reqGridHeight
+	    + (h - Tk_ReqHeight((Tk_Window) winPtr)) / wmPtr->heightInc;
+}
+
 void
 Tk_SetGrid(Tk_Window tkwin, int reqWidth, int reqHeight,
            int gridWidth, int gridHeight)
 {
-    (void)tkwin; (void)reqWidth; (void)reqHeight;
-    (void)gridWidth; (void)gridHeight;
+    TkWindow *winPtr = WmToplevelOf((TkWindow *) tkwin);
+    WmInfo *wmPtr;
+
+    if (winPtr == NULL || (wmPtr = winPtr->wmInfoPtr) == NULL)
+	return;
+    if (gridWidth <= 0 || gridHeight <= 0)
+	return;
+    /*
+     * Only one window may grid a toplevel. tkUnixWm.c takes the first and
+     * ignores the rest rather than reporting an error -- two gridded
+     * widgets in one toplevel is a layout mistake, not a Tcl one.
+     */
+    if (wmPtr->gridWin != NULL && wmPtr->gridWin != (TkWindow *) tkwin)
+	return;
+
+    if (wmPtr->gridWin != NULL
+	    && wmPtr->reqGridWidth == reqWidth
+	    && wmPtr->reqGridHeight == reqHeight
+	    && wmPtr->widthInc == gridWidth
+	    && wmPtr->heightInc == gridHeight)
+	return;
+
+    /*
+     * An explicit "wm geometry" set BEFORE gridding is in pixels and has
+     * to be reinterpreted, or it would silently become a character count
+     * a few hundred times too large.
+     */
+    if (wmPtr->gridWin == NULL && wmPtr->width >= 0) {
+	int gw, gh;
+
+	wmPtr->gridWin = (TkWindow *) tkwin;
+	wmPtr->reqGridWidth = reqWidth;
+	wmPtr->reqGridHeight = reqHeight;
+	wmPtr->widthInc = gridWidth;
+	wmPtr->heightInc = gridHeight;
+	WmPixelsToGrid(wmPtr, wmPtr->width, wmPtr->height, &gw, &gh);
+	wmPtr->width = gw;
+	wmPtr->height = gh;
+    } else {
+	wmPtr->gridWin = (TkWindow *) tkwin;
+	wmPtr->reqGridWidth = reqWidth;
+	wmPtr->reqGridHeight = reqHeight;
+	wmPtr->widthInc = gridWidth;
+	wmPtr->heightInc = gridHeight;
+    }
+    WmGridChanged(winPtr);
 }
 
 void
 Tk_UnsetGrid(Tk_Window tkwin)
 {
-    (void)tkwin;
+    TkWindow *winPtr = WmToplevelOf((TkWindow *) tkwin);
+    WmInfo *wmPtr;
+    int w, h;
+
+    if (winPtr == NULL || (wmPtr = winPtr->wmInfoPtr) == NULL)
+	return;
+    if (wmPtr->gridWin != (TkWindow *) tkwin)
+	return;
+
+    if (wmPtr->width >= 0) {
+	WmGridToPixels(wmPtr, wmPtr->width, wmPtr->height, &w, &h);
+	wmPtr->width = w;
+	wmPtr->height = h;
+    }
+    wmPtr->gridWin = NULL;
+    wmPtr->widthInc = 1;
+    wmPtr->heightInc = 1;
+    wmPtr->reqGridWidth = 0;
+    wmPtr->reqGridHeight = 0;
+    WmGridChanged(winPtr);
 }
 
 /* ------------------------------------------------------------------ */
@@ -1338,8 +1524,16 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
     case OPT_GEOMETRY:
         if (objc == 3) {
             char buf[TCL_INTEGER_SPACE * 4 + 4];
-            snprintf(buf, sizeof buf, "%dx%d+%d+%d",
-                    winPtr->changes.width, winPtr->changes.height,
+            int w = winPtr->changes.width, h = winPtr->changes.height;
+
+            /*
+             * A gridded toplevel reports its size in characters, not
+             * pixels -- that is the whole point of "-setgrid 1", and the
+             * setter above already reads WxH in the same units.
+             */
+            if (wmPtr != NULL)
+                WmPixelsToGrid(wmPtr, w, h, &w, &h);
+            snprintf(buf, sizeof buf, "%dx%d+%d+%d", w, h,
                     winPtr->changes.x, winPtr->changes.y);
             Tcl_SetObjResult(interp, Tcl_NewStringObj(buf, -1));
             return TCL_OK;
@@ -1440,10 +1634,36 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
 
     case OPT_ICONNAME:
     case OPT_TITLE:
-        /* query returns empty string; set is silently accepted */
-        if (objc == 3)
-            Tcl_SetObjResult(interp, Tcl_NewStringObj("", -1));
-        return TCL_OK;
+        /*
+         * rio owns the window frame, so nothing here displays a title.
+         * That is no reason to forget it: "wm title" is a query as well
+         * as a set, and answering the empty string to a title the caller
+         * has just set is simply wrong. fontchooser-2.0/2.1 read the
+         * title back to identify the dialog they raised.
+         *
+         * The default is the toplevel's own name, as Tk uses on X.
+         */
+        if (wmPtr == NULL)
+            return TCL_OK;
+        if (objc == 3) {
+            Tcl_SetObjResult(interp, Tcl_NewStringObj(
+                    wmPtr->title != NULL ? wmPtr->title
+                                         : winPtr->nameUid, -1));
+            return TCL_OK;
+        }
+        if (objc == 4) {
+            const char *s = Tcl_GetString(objv[3]);
+            size_t n = strlen(s) + 1;
+
+            if (wmPtr->title != NULL)
+                ckfree(wmPtr->title);
+            wmPtr->title = (char *) ckalloc(n);
+            memcpy(wmPtr->title, s, n);
+            TkpWmSetTitle(winPtr, wmPtr->title);
+            return TCL_OK;
+        }
+        Tcl_WrongNumArgs(interp, 2, objv, "window ?newTitle?");
+        return TCL_ERROR;
 
     case OPT_RESIZABLE:
         /* query returns "1 1" */

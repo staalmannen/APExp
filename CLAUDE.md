@@ -1724,10 +1724,10 @@ character put line breaks mid-word and in the wrong place for tabs
 
 ### Tk on Plan 9: what the remaining test failures are, and which are ours
 
-The suite is at **36 failing tests** (`wish all.tcl`; note `grep -c
-FAILED` counts two lines each, so 72 lines). Nine of those are known
-not to be the Plan 9 backend's, and are worth recording so they are not
-chased again:
+The suite is at **32 failing tests** (`wish all.tcl`; note `grep -c
+FAILED` counts two lines each, so 64 lines). **20 of the 32 are known
+not to be the Plan 9 backend's**, and are worth recording so they are
+not chased again:
 
 **The five remaining `event-9.*` are generic Tk.** The port's side is
 proved correct by `tk-enter-test.tcl`: the hit test agrees with the warp
@@ -1814,13 +1814,37 @@ was actually resolved is the contract (see the font section above), and
 `tk-font-test.tcl` asserts the real requirement -- that an unknown
 family does *not* come back as itself.
 
-**`imgListFormat-3.1/3.2/3.3` need `tktest`, not `wish`**:
-`invalid command name "testphotostringmatch"`, which `generic/tkTest.c`
-registers only in Tk's own test binary. A harness limitation, not a
-port bug.
+**`imgListFormat-3.1/3.2/3.3` and `image-6.2` need `tktest`, not
+`wish`**: `invalid command name "testphotostringmatch"`, and `image
+types` must list `test`, which `generic/tkTest.c` registers only in Tk's
+own test binary. A harness limitation, not a port bug.
 
-That is 16 of the 36 accounted for. `canvas-23.*` **is** ours and was
-the useful find in that sweep -- see the image section below.
+**`focus-1.19` needs two applications.** `focusClear` in `focus.test` is
+`childTkProcess eval {focus -force .}` -- it takes the focus away by
+giving it to *another* wish. rio owns the keyboard here and Tk is the
+only authority on focus within a process (see `TkP9FocusWindow` above),
+so a second wish cannot take this one's focus and `focus` stays `.t.b1`
+where the test wants `{}`. Not fixable without a cross-application focus
+protocol that Plan 9 does not have.
+
+**`imgPhoto-4.75` and `filebox-7.1-0` are the environment**, not Tk:
+the first needs `file copy` to a name beginning with `-` and reports
+ENOENT, the second needs a directory that cannot be read.
+
+`pkgconfig-1.1` wants the twelve `CFG_INSTALL_*`/`CFG_RUNTIME_*` keys,
+which the unix Makefile passes as `-D`s and `sys/src/ape/lib/tk/mkfile`
+does not. **Left undefined deliberately**: APExp has no install prefix
+to name -- it builds into the repo tree and overlays it with a union
+mount -- so every one of those paths would be a fabrication, and
+`tcl_findLibrary` is what actually locates the scripts at runtime.
+
+That is 20 of the 32 accounted for. The rest that are ours and still
+open: `frame-14.1` (a label 4 pixels too wide, so font measurement),
+`geometry-4.7` (one `<Configure>` too many from `Tk_MaintainGeometry`)
+and `event-9.11..13` alongside the two documented above.
+
+`canvas-23.*` **was** ours and is fixed -- see the image and rectangle
+sections below.
 
 ### Tk on Plan 9: the image path was a stub in both directions
 
@@ -1967,6 +1991,55 @@ after the early returns and proved nothing.
 `XSubtractRegion` in that file is still deliberately approximate (it
 returns `sra`), which with a bbox region means a re-put with
 transparency does not shrink the valid area.
+
+### Tk on Plan 9: four wm and keysym stubs that answered plausibly
+
+Four small ones, all of the same family as `XLoadFont` above -- a stub
+that returns a *plausible* answer rather than admitting it did nothing,
+so nothing upstream can tell.
+
+**`XKeysymToString` returned `""` for a keysym it could not name.**
+Xlib returns NULL, and every caller here tells the two apart:
+`tkBind.c`'s `%K` keeps its `"??"` default only while the name is NULL.
+So `event generate <Key> -keycode -1` substituted the empty string
+(`bind-13.14`). An empty *name* is not the same as *no name*.
+
+**`TkpScanWindowId` used `strtoul` and could not fail.** `toplevel .t
+-use xyz` therefore reached the container lookup with id 0 and reported
+`couldn't create child of window "xyz"` -- a believable message for the
+wrong reason, and one that equally describes a real id naming a window
+that has gone. It is `Tcl_GetWideIntFromObj` now, so a non-number gives
+the ordinary Tcl integer error (`embed-1.1`).
+
+**`wm title` was write-only.** rio owns the frame, so nothing displays a
+title -- but `wm title` is a *query* as well, and answering the empty
+string to a title the caller has just set is simply wrong.
+`fontchooser-2.0/2.1` identify the dialog they raised by reading it
+back. Stored in `WmInfo` now, defaulting to the toplevel's `nameUid` as
+Tk does on X.
+
+**`Tk_SetGrid`/`Tk_UnsetGrid` were empty, so `-setgrid 1` did nothing.**
+Gridding is not decoration: with it in force `wm geometry` speaks in
+**characters** rather than pixels, in both directions --
+
+```tcl
+listbox .l2 -font $fixed -width 30 -height 20 -setgrid 1
+wm geometry .           ;# must say 30x20, and said 190x308
+wm geometry . 26x15     ;# 26 characters, not 26 pixels
+```
+
+The convention is `tkUnixWm.c`'s and is the thing to remember: while
+`wmPtr->gridWin` is non-NULL, **`wmPtr->width`/`height` hold grid units,
+not pixels**. The conversion is confined to the three places a size
+crosses that boundary -- `WmUpdateGeometry` on the way out, and the `wm
+geometry` query and setter -- plus `Tk_SetGrid` itself, which must
+reinterpret a size that was set in pixels *before* gridding, or a
+`wm geometry` from earlier silently becomes a character count a few
+hundred times too large. `Tk_UnsetGrid` converts back.
+
+Note `wm minsize`/`maxsize` are also in grid units on X and are still
+clamped as pixels here; inert today, since the defaults are 1 and
+unlimited.
 
 ### Syntax-check Tk's Plan 9 backend on the host before shipping it
 

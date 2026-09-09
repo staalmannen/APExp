@@ -520,7 +520,19 @@ XKeysymToString(KeySym keysym)
         buf[1] = '\0';
         return buf;
     }
-    return (char *)"";
+    /*
+     * NULL, not "". Xlib returns NULL for a keysym it cannot name, and
+     * every caller here tells the two apart: tkBind.c's %K substitution
+     * keeps its "??" default only while the name is NULL, and
+     * TkKeysymToString / Tk_GetUid pass the answer straight through.
+     * Returning an empty string says "this keysym is called nothing",
+     * which is not the same as "there is no such keysym" -- the same
+     * distinction XLoadFont got wrong in the other direction.
+     *
+     * bind-13.14 is the case: "event generate <Key> -keycode -1" must
+     * report %K as "??", and reported the empty string instead.
+     */
+    return NULL;
 }
 
 XModifierKeymap *
