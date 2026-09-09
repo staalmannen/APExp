@@ -31,11 +31,19 @@
 #	23.2  rectangle 0 0 1 9   width 1       pass
 #	23.3  rectangle 0 0 9 0   zero height   FAIL
 #
-# A rectangle with zero width or height is not empty to X: the outline
-# is a closed path through the four corners, so it degenerates to a
-# line, and that is how the canvas asks for a one-pixel column or row.
-# tkp9_drawrect handed it to Plan 9's border(), which draws nothing for
-# an empty rectangle.
+# The SECOND wrong guess was that a zero-width rectangle reaches the
+# platform and has to be drawn as a line. It does not: tkRectOval.c
+# widens a degenerate box itself, "x1 -= 1" here, so what arrives is one
+# pixel wide starting at -1.
+#
+# The answer is X's outline convention. XDrawRectangle draws a
+# five-point path through the corners, so it covers w+1 by h+1 pixels --
+# and for this item the fill lands on column -1, off the canvas, while
+# column 0 is painted by that extra outline pixel and by nothing else.
+# Plan 9's border() draws inside the rectangle it is given, one short.
+#
+# Three differences between these tests (colour, width, height) and only
+# the third mattered. Both wrong guesses fitted the evidence.
 #
 # Section 3 is still open: a photo drawn onto the canvas reads back as
 # the canvas background, so nothing of it rendered, even though a photo
@@ -115,8 +123,9 @@ ok {$got eq "#123456"} "a photo round-trips through put and get"
 note ""
 note "Section 1 passing means the byte order is right -- that was the"
 note "first guess and it was wrong. Section 2 is the one that matters:"
-note "a rectangle of zero width or height must still draw its outline,"
-note "because X draws the outline as a path through the corners."
+note "XDrawRectangle covers w+1 by h+1 pixels, because X draws the"
+note "outline as a five-point path through the corners, and column 0"
+note "here is painted by that extra pixel and by nothing else."
 
 puts "$fail failure(s)"
 flush stdout

@@ -297,29 +297,29 @@ tkp9_drawrect(void *dst, int x, int y, int w, int h, int bw,
     src = colorimage(rgba);
     if(!src) return;
     /*
-     * A rectangle with zero width or height is NOT empty to X. The
-     * outline is a closed path through the four corners, so it
-     * degenerates to a line -- and Tk's canvas relies on that:
+     * X's rectangle outline is a five-point path through the corners --
+     * (x,y) (x+w,y) (x+w,y+h) (x,y+h) (x,y) -- so it covers **w+1 by
+     * h+1 pixels**, one more than the width and height it was given.
+     * Plan 9's border() draws inside the rectangle it is handed, so it
+     * has to be widened by one in each direction to mean the same
+     * thing. Note XFillRectangle is not like this: a fill really is w
+     * by h, and tkp9_fillrect is right as it stands.
      *
-     *	.c create rectangle 0 0 0 9	a one-pixel column
-     *	.c create rectangle 0 0 9 0	a one-pixel row
+     * That extra pixel is not a rounding detail, it is load-bearing.
+     * canvas-23.1 is
      *
-     * are canvas-23.1 and canvas-23.3. Plan 9's border() takes the
-     * empty rectangle dstrect() makes of those and draws nothing, so
-     * they came out as bare background. canvas-23.2 is the same test
-     * with width 1 and it passed throughout, which is what pinned this
-     * to the degenerate case rather than to colour or to the image path.
+     *	.c create rectangle 0 0 0 9 -fill #000080 -outline #000080
      *
-     * X's outline runs corner to corner inclusive, covering w+1 by h+1
-     * pixels, so the line is one longer than the width or height asked
-     * for -- which is what makes canvas-23.3's row span all ten columns
-     * of a rectangle nine wide.
+     * and tkRectOval.c's DisplayRectOval already widens a degenerate
+     * box itself -- for x2 == x1 with a coordinate of 0 it does
+     * "x1 -= 1" -- so what arrives here is one pixel wide starting at
+     * -1. The fill covers only column -1, off the canvas; column 0 is
+     * painted by the outline's extra pixel and by nothing else. Drawing
+     * the outline one short therefore lost the whole column, which read
+     * back as bare background and looked for all the world like a
+     * colour bug, since 23.1, 23.2 and 23.3 differ in colour too.
      */
-    if(w <= 0 || h <= 0)
-        draw(d, dstrect(d, x, y, w > 0? w + 1: bw, h > 0? h + 1: bw),
-             src, nil, ZP);
-    else
-        border(d, dstrect(d, x, y, w, h), bw, src, ZP);
+    border(d, dstrect(d, x, y, w + 1, h + 1), bw, src, ZP);
     freeimage(src);
 }
 

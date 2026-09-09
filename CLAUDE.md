@@ -1892,34 +1892,43 @@ tkp9: RGBA32 memory order R=3 G=2 B=1 A=0
 
 which is A,B,G,R, the documented order, measured correctly.
 
-### Tk on Plan 9: a rectangle of zero width still has an outline
+### Tk on Plan 9: XDrawRectangle covers w+1 by h+1 pixels
 
-What actually separated those three canvas tests was not their colour
-but their **shape**:
+**X's rectangle outline is a five-point path through the corners** --
+`(x,y) (x+w,y) (x+w,y+h) (x,y+h) (x,y)` -- so it covers **w+1 by h+1**
+pixels, one more than the width and height it is given. Plan 9's
+`border()` draws *inside* the rectangle handed to it, so `tkp9_drawrect`
+has to widen by one in each direction to mean the same thing.
+`XFillRectangle` is **not** like this: a fill really is `w` by `h`, and
+`tkp9_fillrect` is right as it stands.
 
+That extra pixel is not a rounding detail, it is load-bearing, and
+`canvas-23.1` is the proof:
+
+```tcl
+.c create rectangle 0 0 0 9 -fill #000080 -outline #000080
 ```
-23.1  .c create rectangle 0 0 0 9    zero width     FAIL
-23.2  .c create rectangle 0 0 1 9    width 1        pass
-23.3  .c create rectangle 0 0 9 0    zero height    FAIL
-```
 
-**A rectangle with zero width or height is not empty to X.** The outline
-is a closed path through the four corners, so it degenerates to a
-*line*, and that is how the canvas asks for a one-pixel column or row.
-`tkp9_drawrect` handed it to Plan 9's `border()`, which draws nothing
-for the empty rectangle `dstrect()` makes of it, so those columns came
-back as bare background -- which reads exactly like a colour bug when
-the three tests you are comparing use three different colours.
+`tkRectOval.c`'s `DisplayRectOval` **already widens a degenerate box
+itself** -- for `x2 == x1` at a coordinate of 0 it does `x1 -= 1` -- so
+what arrives at the platform is one pixel wide starting at **-1**. The
+fill covers only column -1, off the canvas; column 0 is painted by the
+outline's extra pixel and by nothing else. Drawing the outline one short
+lost the whole column.
 
-Note X's outline runs corner to corner **inclusive**, covering `w+1` by
-`h+1` pixels: `canvas-23.3` asks for a rectangle nine wide and expects
-its row to span all ten columns. The degenerate case therefore draws one
-pixel longer than the width or height it was given.
+**This was diagnosed wrong twice, and both wrong answers were
+plausible.** First as a red/blue swap, because 23.1/23.2/23.3 differ in
+colour (blue, green, red) and green is the invariant middle byte --
+refuted by `tk-image-test.tcl` section 1, where every colour makes the
+trip exactly. Then as a *zero-width* rectangle reaching X, which is
+wrong because Tk normalises that before the platform ever sees it; the
+special case written for it was dead code. The lesson both times: the
+tests differed in three ways at once (colour, width, height), and only
+the third mattered.
 
-The non-degenerate case keeps `border()`, which draws *inside* a `w` by
-`h` box and so is one pixel short of X in both directions. That is a
-real difference and it is deliberately left alone: no failing test shows
-it, and it is the path every widget border in the toolkit draws through.
+`canvas-23.2` passes throughout because its rectangle is `0 0 1 9` --
+genuinely one wide, so the *fill* covers column 0 and nothing depends on
+the outline.
 
 **Still open:** a photo drawn onto a canvas reads back as the canvas
 background, so nothing of it renders, even though a photo now draws on
