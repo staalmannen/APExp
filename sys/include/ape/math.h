@@ -4,7 +4,26 @@
 
 /* a HUGE_VAL appropriate for IEEE double-precision */
 /* the correct value, 1.797693134862316e+308, causes a ken overflow */
-#define HUGE_VAL 1.79769313486231e+308
+/*
+ * C99 7.12p3/p4: HUGE_VAL is positive infinity where the implementation
+ * has one, and INFINITY represents unbounded infinity. These used to be
+ * 1.79769313486231e+308 -- roughly DBL_MAX, a finite number -- so
+ * isinf(INFINITY) was false, exp(1000) == INFINITY was false, and
+ * cos(INFINITY) computed a real cosine of a very large angle instead of
+ * NaN. Plan 9's libc supplies Inf(), which NAN below already relies on
+ * for the same reason; neither is the constant expression the standard
+ * asks for, and that is the price of having no way to write one here.
+ */
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern double Inf(int);		/* Plan 9 libc; declared again below */
+extern double NaN(void);
+#ifdef __cplusplus
+}
+#endif
+
+#define HUGE_VAL Inf(1)
 
 #define INFINITY HUGE_VAL
 #define HUGE_VALF ((float)HUGE_VAL)	/* float infinity on IEEE 754 */
