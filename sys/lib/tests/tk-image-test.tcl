@@ -45,10 +45,17 @@
 # Three differences between these tests (colour, width, height) and only
 # the third mattered. Both wrong guesses fitted the evidence.
 #
-# Section 3 is still open: a photo drawn onto the canvas reads back as
-# the canvas background, so nothing of it rendered, even though a photo
-# does now draw on screen. That is XPutImage or the path from the photo
-# instance to it, and it is a separate question from the rectangle.
+# Section 3 was a photo drawn onto the canvas reading back as the canvas
+# background, and it was NOT XPutImage: under $TKP9DEBUG, XPutImage was
+# never called at all. TkPutImage is reached from exactly one place --
+# TkImgDitherInstance -- and that is gated on the photo's validRegion
+# being non-empty. TkpBuildRegionFromAlphaData, which is what builds that
+# region, was an empty stub, so the region stayed empty, the dither never
+# ran, and the instance pixmap that XCopyArea then copied held nothing.
+#
+# Note the trace is what settled it, and it had to be on the ENTRY of
+# XPutImage: an exit-side trace cannot tell "never called" from "called
+# and turned the image away", and those want opposite fixes.
 #
 # Run with $TKP9DEBUG to see the measured order:
 #
