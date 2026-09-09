@@ -6,28 +6,11 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-09 16:23:20 +0200
+Tests began at 2026-09-09 16:52:34 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
 bind.test
-
-
-==== bind-13.14 Tk_BindEvent procedure: invalid key detail FAILED
-==== Contents of test case:
-
-    bind .t.f <Key> "lappend x Key%K"
-    bind .t.f <KeyRelease> "lappend x Release%K"
-    event generate .t.f <Key> -keycode -1
-    event generate .t.f <KeyRelease> -keycode -1
-    return $x
-
----- Result was:
-Key{} Release{}
----- Result should have been (exact matching):
-Key?? Release??
-==== bind-13.14 FAILED
-
 bitmap.test
 border.test
 busy.test
@@ -107,19 +90,6 @@ config.test
 cursor.test
 dialog.test
 embed.test
-
-
-==== embed-1.1 Tk_UseWindow procedure, bad window identifier FAILED
-==== Contents of test case:
-
-    toplevel .t -use xyz
-
----- Result was:
-couldn't create child of window "xyz"
----- Result should have been (exact matching):
-expected integer but got "xyz"
-==== embed-1.1 FAILED
-
 entry.test
 event.test
 
@@ -341,48 +311,6 @@ font.test
 ==== font-21.22 FAILED
 
 fontchooser.test
-
-
-==== fontchooser-2.0 fontchooser -title FAILED
-==== Contents of test case:
-
-    testDialog launch {
-	tk::fontchooser::Configure -title "Hello"
-	tk::fontchooser::Show
-    }
-    testDialog onDisplay {
-	set x [wm title $testDialog]
-	Click cancel
-    }
-    set x
-
----- Result was:
-
----- Result should have been (exact matching):
-Hello
-==== fontchooser-2.0 FAILED
-
-
-
-==== fontchooser-2.1 fontchooser -title (cyrillic) FAILED
-==== Contents of test case:
-
-    testDialog launch {
-	tk::fontchooser::Configure  -title "Привет"
-	tk::fontchooser::Show
-    }
-    testDialog onDisplay {
-	set x [wm title $testDialog]
-	Click cancel
-    }
-    set x
-
----- Result was:
-
----- Result should have been (exact matching):
-\u041F\u0440\u0438\u0432\u0435\u0442
-==== fontchooser-2.1 FAILED
-
 frame.test
 
 
@@ -528,31 +456,6 @@ image "photo1" does not exist
 
 imgSVGnano.test
 listbox.test
-
-
-==== listbox-4.7 ConfigureListbox procedure FAILED
-==== Contents of test case:
-
-    wm withdraw .
-    listbox .l2 -font $fixed -width 30 -height 20 -setgrid 1
-    wm geom . +25+25
-    pack .l2
-    update
-    wm deiconify .
-    set result [getsize .]
-    wm geom . 26x15
-    update
-    lappend result [getsize .]
-    .l2 configure -setgrid 1
-    update
-    lappend result [getsize .]
-
----- Result was:
-190x308 26x15 26x15
----- Result should have been (exact matching):
-30x20 26x15 26x15
-==== listbox-4.7 FAILED
-
 main.test
 menu.test
 menuDraw.test
