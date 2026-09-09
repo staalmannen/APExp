@@ -1076,6 +1076,10 @@ XWarpPointer(Display *d, Window s, Window dw,
     if (x >= gP9.screenw) x = gP9.screenw - 1;
     if (y >= gP9.screenh) y = gP9.screenh - 1;
 
+    if (tkp9_debug())
+        fprintf(stderr, "XWarpPointer: dw=%lu dx=%d dy=%d -> screen %d,%d\n",
+                (unsigned long) dw, dx, dy, x, y);
+
     if (tkp9_warpmouse(x, y) < 0)
         return 0;
 

@@ -127,6 +127,13 @@ int    tkp9_kbdfd(void);
 /*
  * Event reading
  */
+/*
+ * Is $TKP9DEBUG set? Tracing for the paths nothing else can report --
+ * /dev/mouse opens once and this process holds it, so its state is not
+ * reachable from Tcl. See the note in tkPlan9DrawImpl.c.
+ */
+int    tkp9_debug(void);
+
 int    tkp9_readmouse(TkP9Mouse *out);	/* 0=ok, -1=eof/error */
 int    tkp9_readkey(void);		/* UTF-32 codepoint, or -1 */
 int    tkp9_checkresized(void);		/* 1 if window was resized */

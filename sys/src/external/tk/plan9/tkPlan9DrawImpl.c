@@ -42,8 +42,32 @@
 /* ------------------------------------------------------------------ */
 
 static int  gMouseFd  = -1;	/* /dev/mouse */
+static int  gMouseRW  = 0;	/* was /dev/mouse opened for writing? */
 static int  gConsFd   = -1;	/* /dev/cons (keyboard) */
 static int  gResized  = 0;
+
+/*
+ * $TKP9DEBUG turns on tracing for the paths that have no other way to
+ * report themselves. Nothing here can be reached from Tcl -- /dev/mouse
+ * can only be opened once, and this process holds it -- so a question
+ * like "did the warp write succeed, and what did rio say" is otherwise
+ * only answerable by rebuilding with a printf in it. CLAUDE.md records
+ * that as the technique that worked for every bug found in this
+ * directory; this is the same thing left behind rather than removed.
+ *
+ * Plan 9's fprint() is used rather than fprintf(): this file includes
+ * no stdio (see the header comment), and libc.h declares fprint, so
+ * there is no variadic-call-with-no-prototype trap. %r is the errstr.
+ */
+int
+tkp9_debug(void)
+{
+    static int on = -1;
+
+    if(on < 0)
+        on = getenv("TKP9DEBUG") != nil;
+    return on;
+}
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
@@ -65,10 +89,27 @@ tkp9_open(const char *label)
     if(initdraw(nil, nil, (char*)label) < 0)
         return -1;
 
-    /* Open mouse device directly (avoids libthread dependency) */
+    /*
+     * Open mouse device directly (avoids libthread dependency).
+     *
+     * It has to be O_RDWR to warp the pointer: a warp is a write of
+     * "m x y" to this same descriptor, which is what libdraw's moveto()
+     * does. The read-only fallback keeps events working on a system
+     * that will not give write permission, at the cost of warping, so
+     * remember which one we got -- silently losing the warp is how
+     * bind-34.* and event-9.* fail.
+     */
     gMouseFd = open("/dev/mouse", O_RDWR);
+    gMouseRW = gMouseFd >= 0;
     if(gMouseFd < 0)
         gMouseFd = open("/dev/mouse", O_RDONLY);
+    if(tkp9_debug()){
+        if(gMouseFd < 0)
+            fprint(2, "tkp9: /dev/mouse will not open: %r\n");
+        else
+            fprint(2, "tkp9: /dev/mouse fd=%d writable=%d\n",
+                gMouseFd, gMouseRW);
+    }
 
     /* Open console for keyboard input */
     gConsFd = open("/dev/cons", O_RDONLY);
@@ -399,16 +440,34 @@ int
 tkp9_warpmouse(int x, int y)
 {
     char buf[40];
-    int n = 0;
+    int n = 0, w;
 
-    if(gMouseFd < 0)
+    if(gMouseFd < 0){
+        if(tkp9_debug())
+            fprint(2, "tkp9_warpmouse(%d,%d): no /dev/mouse\n", x, y);
         return -1;
+    }
+    if(!gMouseRW && tkp9_debug())
+        fprint(2, "tkp9_warpmouse(%d,%d): /dev/mouse is read-only\n", x, y);
+
     buf[n++] = 'm';
     n += putnum(buf + n, x);
     buf[n++] = ' ';
     n += putnum(buf + n, y);
-    if(write(gMouseFd, buf, n) != n)
+
+    w = write(gMouseFd, buf, n);
+    if(w != n){
+        if(tkp9_debug()){
+            buf[n] = '\0';		/* n <= 24, buf is 40 */
+            fprint(2, "tkp9_warpmouse: write(%d, \"%s\", %d) = %d: %r\n",
+                gMouseFd, buf, n, w);
+        }
         return -1;
+    }
+    if(tkp9_debug()){
+        buf[n] = '\0';
+        fprint(2, "tkp9_warpmouse: wrote \"%s\" ok\n", buf);
+    }
     return 0;
 }
 
@@ -520,7 +579,16 @@ tkp9_readmouse(TkP9Mouse *out)
     if(gMouseFd < 0) return -1;
 
     n = read(gMouseFd, buf, sizeof buf);
-    if(n != 1 + 4*12) return -1;
+    if(n != 1 + 4*12){
+        /*
+         * A short record is dropped silently, so if the format is ever
+         * not 'm' plus four 12-byte fields, no mouse event is delivered
+         * at all and nothing says why.
+         */
+        if(tkp9_debug())
+            fprint(2, "tkp9_readmouse: read = %d, want %d: %r\n", n, 1 + 4*12);
+        return -1;
+    }
 
     if(buf[0] == 'r') {
         /* Resize event */

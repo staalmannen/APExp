@@ -610,6 +610,12 @@ TkpWarpPointer(TkDisplay *dispPtr)
 	w = Tk_WindowId(dispPtr->warpWindow);
     else
 	w = TKP9_ROOT_XID;
+
+    if (tkp9_debug())
+	fprintf(stderr, "TkpWarpPointer: warpWindow=%s w=%lu warpX=%d warpY=%d\n",
+		dispPtr->warpWindow? Tk_PathName(dispPtr->warpWindow): "(screen)",
+		(unsigned long) w, (int) dispPtr->warpX, (int) dispPtr->warpY);
+
     XWarpPointer(dispPtr->display, None, w, 0, 0, 0, 0,
 	    (int) dispPtr->warpX, (int) dispPtr->warpY);
 }
