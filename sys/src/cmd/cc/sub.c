@@ -1231,6 +1231,43 @@ topbit(ulong v)
 }
 
 /*
+ * Is this negative zero?  -0.0 compares equal to 0.0 and is not less
+ * than it, so every ordinary test misses it; the sign bit is the only
+ * thing that distinguishes the two, and it has to be read directly.
+ * Both members are eight bytes, so the byte order does not matter.
+ */
+int
+fpnegzero(double d)
+{
+	union {
+		double	d;
+		uvlong	v;
+	} u;
+
+	if(d != 0)
+		return 0;
+	u.d = d;
+	return (int)(u.v >> 63);
+}
+
+/*
+ * -0.0, assembled from its bits.  Writing the constant would not do:
+ * this compiler is compiled by itself, so before the fix has been
+ * through a rebuild the -0.0 in the source folds to +0.0.
+ */
+double
+fpnegzeroval(void)
+{
+	union {
+		double	d;
+		uvlong	v;
+	} u;
+
+	u.v = (uvlong)1 << 63;
+	return u.d;
+}
+
+/*
  * try to cast a constant down
  * rather than cast a variable up
  * example:

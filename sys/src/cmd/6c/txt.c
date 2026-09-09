@@ -596,7 +596,12 @@ gmove(Node *f, Node *t)
 			f->op, tnames[ft], t->op, tnames[tt]);
 	if(typefd[ft] && f->op == OCONST) {
 		/* TO DO: pick up special constants, possibly preloaded */
-		if(f->fconst == 0.0){
+		/*
+		 * XORPD of a register with itself gives +0.0, so -0.0 must
+		 * not take this path -- it compares equal to 0.0 and used
+		 * to lose its sign here.
+		 */
+		if(f->fconst == 0.0 && !fpnegzero(f->fconst)){
 			regalloc(&nod, t, t);
 			gins(AXORPD, &nod, &nod);
 			gmove(&nod, t);

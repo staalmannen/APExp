@@ -616,6 +616,17 @@ tcomo(Node *n, int f)
 			goto bad;
 		if(isfunct(n))
 			break;
+		/*
+		 * Unary + is the value of its operand (C99 6.5.3.3p2).
+		 * Rewriting it as 0 + x below is a way of applying the
+		 * integer promotions; floating point has none to apply,
+		 * and the rewrite is wrong there -- 0.0 + -0.0 is +0.0,
+		 * so +(-0.0) lost its sign.
+		 */
+		if(typefd[l->type->etype]) {
+			*n = *l;
+			break;
+		}
 
 		r = l;
 		l = new(OCONST, Z, Z);

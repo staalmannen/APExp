@@ -38,9 +38,20 @@ evconst(Node *n)
 		return;
 
 	case ONEG:
-		if(isf)
-			d = -l->fconst;
-		else
+		if(isf) {
+			/*
+			 * Negating +0.0 has to give -0.0. The plain "-x"
+			 * here would be right in a compiler that generates
+			 * negation correctly, but this one compiles itself:
+			 * writing it as an exclusive-or with the sign bit
+			 * makes the fold correct on the first rebuild
+			 * rather than the second.
+			 */
+			if(l->fconst == 0)
+				d = fpnegzero(l->fconst)? 0.0: fpnegzeroval();
+			else
+				d = -l->fconst;
+		} else
 			v = -l->vconst;
 		break;
 

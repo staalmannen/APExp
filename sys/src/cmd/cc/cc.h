@@ -716,6 +716,8 @@ int	vconst(Node*);
 int	log2(uvlong);
 int	vlog(Node*);
 int	topbit(ulong);
+int	fpnegzero(double);
+double	fpnegzeroval(void);
 void	simplifyshift(Node*);
 void	rolor(Node*);
 long	typebitor(long, long);

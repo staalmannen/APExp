@@ -286,6 +286,7 @@ regopt(Prog *p)
 		case ASUBSD:
 		case ASUBSS:
 		case AXORPD:
+		case AXORPS:
 			for(z=0; z<BITS; z++) {
 				r->set.b[z] |= bit.b[z];
 				r->use2.b[z] |= bit.b[z];

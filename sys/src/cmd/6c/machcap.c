@@ -19,8 +19,17 @@ machcap(Node *n)
 		}
 		break;
 
-	case OCOM:
 	case ONEG:
+		/*
+		 * Floating-point negation is a sign-bit flip, generated in
+		 * cgen.c.  Answering 0 here made com.c rewrite -x as 0 - x,
+		 * which is right for integers and wrong for floating point:
+		 * 0.0 - 0.0 is +0.0, so -(+0.0) came out positive.
+		 */
+		if(typefd[n->left->type->etype])
+			return 1;
+		/* fall through */
+	case OCOM:
 	case OADD:
 	case OAND:
 	case OOR:

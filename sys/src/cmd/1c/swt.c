@@ -702,14 +702,19 @@ ieeedtod(Ieee *ieee, double native)
 	double fr, ho, f;
 	int exp;
 
+	/*
+	 * Zero must be tested before the sign, not after: -0.0 is not
+	 * < 0, so it used to fall into the "native == 0" arm and come
+	 * out as +0.0, losing the sign of a -0.0 constant.
+	 */
+	if(native == 0) {
+		ieee->l = 0;
+		ieee->h = fpnegzero(native)? 0x80000000L: 0;
+		return;
+	}
 	if(native < 0) {
 		ieeedtod(ieee, -native);
 		ieee->h |= 0x80000000L;
-		return;
-	}
-	if(native == 0) {
-		ieee->l = 0;
-		ieee->h = 0;
 		return;
 	}
 	fr = frexp(native, &exp);
