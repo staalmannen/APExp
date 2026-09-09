@@ -6,7 +6,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-09 06:20:04 +0200
+Tests began at 2026-09-09 10:25:06 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -324,6 +324,7 @@ event.test
 .top1
 ==== event-9.2 FAILED
 
+wait for <Enter> event on .one timed out (> 1000 ms)
 
 
 ==== event-9.11 pointer window container = parent FAILED
@@ -341,6 +342,7 @@ event.test
 |<Enter> NotifyInferior .one.f1|
 ==== event-9.11 FAILED
 
+wait for <Enter> event on .one timed out (> 1000 ms)
 
 
 ==== event-9.12 pointer window container != parent FAILED
@@ -358,6 +360,9 @@ event.test
 |<Enter> NotifyNonlinearVirtual .one.f1|<Enter> NotifyNonlinear .one.f1.f2|
 ==== event-9.12 FAILED
 
+wait for <Enter> event on .one timed out (> 1000 ms)
+wait for <Enter> event on .two timed out (> 1000 ms)
+wait for <Enter> event on .one timed out (> 1000 ms)
 
 
 ==== event-9.13 pointer window is a toplevel, toplevel destination FAILED
@@ -376,6 +381,9 @@ event.test
 |<Enter> NotifyNonlinear .one|
 ==== event-9.13 FAILED
 
+wait for <Enter> event on .one timed out (> 1000 ms)
+wait for <Enter> event on .two timed out (> 1000 ms)
+wait for <Enter> event on .one.f1.f2 timed out (> 1000 ms)
 
 
 ==== event-9.14 pointer window is a toplevel, tk internal destination FAILED
@@ -393,6 +401,9 @@ event.test
 |<Enter> NotifyNonlinearVirtual .one|<Enter> NotifyNonlinearVirtual .one.f1|<Enter> NotifyNonlinear .one.f1.f2|
 ==== event-9.14 FAILED
 
+wait for <Enter> event on .one timed out (> 1000 ms)
+wait for <Enter> event on .two timed out (> 1000 ms)
+wait for <Enter> event on .one timed out (> 1000 ms)
 
 
 ==== event-9.16 Successive destructions (pointer window + parent), single generation of crossing events FAILED
@@ -410,6 +421,7 @@ event.test
 |<Enter> NotifyInferior .one|
 ==== event-9.16 FAILED
 
+wait for <Enter> event on .one timed out (> 1000 ms)
 
 
 ==== event-9.17 Successive destructions (pointer window + parent), separate crossing events FAILED
@@ -429,6 +441,9 @@ event.test
 |<Enter> NotifyInferior .one.f1|<Enter> NotifyInferior .one|
 ==== event-9.17 FAILED
 
+wait for <Enter> event on .one timed out (> 1000 ms)
+wait for <Enter> event on .two.f1.f2 timed out (> 1000 ms)
+wait for <Enter> event on .one timed out (> 1000 ms)
 
 
 ==== event-9.18 Successive destructions (pointer window + ancestors including its toplevel), destination is non-root toplevel FAILED
@@ -446,6 +461,9 @@ event.test
 |<Enter> NotifyNonlinear .one|
 ==== event-9.18 FAILED
 
+wait for <Enter> event on .one timed out (> 1000 ms)
+wait for <Enter> event on .three.f1.f2 timed out (> 1000 ms)
+wait for <Enter> event on .two.f1.f2 timed out (> 1000 ms)
 
 
 ==== event-9.19 Successive destructions (pointer window + ancestors including its toplevel), destination is internal window, bypass root win FAILED
@@ -464,6 +482,8 @@ event.test
 |<Enter> NotifyNonlinearVirtual .two|<Enter> NotifyNonlinearVirtual .two.f1|<Enter> NotifyNonlinear .two.f1.f2|
 ==== event-9.19 FAILED
 
+wait for <Enter> event on .one timed out (> 1000 ms)
+wait for <Enter> event on .two.f1.f2 timed out (> 1000 ms)
 filebox.test
 
 
