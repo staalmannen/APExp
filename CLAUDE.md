@@ -1722,6 +1722,76 @@ last word boundary that fits, or at least one character. Breaking at any
 character put line breaks mid-word and in the wrong place for tabs
 (font-24.*). The structure follows `tkUnixFont.c`.
 
+### Tk on Plan 9: what the remaining test failures are, and which are ours
+
+The suite is at **36 failing tests** (`wish all.tcl`; note `grep -c
+FAILED` counts two lines each, so 72 lines). Nine of those are known
+not to be the Plan 9 backend's, and are worth recording so they are not
+chased again:
+
+**The five remaining `event-9.*` are generic Tk.** The port's side is
+proved correct by `tk-enter-test.tcl`: the hit test agrees with the warp
+at every level and the crossings arrive. What is wrong is the `%d`
+detail when the window the pointer was in has just been **destroyed**:
+
+```
+event-9.14  got   |<Enter> NotifyVirtual .one|<Enter> NotifyVirtual .one.f1|<Enter> NotifyAncestor .one.f1.f2|
+            want  |<Enter> NotifyNonlinearVirtual .one|...NotifyNonlinearVirtual .one.f1|...NotifyNonlinear .one.f1.f2|
+```
+
+`TkPointerDeadWindow` (`generic/tkPointer.c`) sets `lastWinPtr =
+TkGetContainer(winPtr)`, which is NULL for anything not embedded. So
+`GenerateEnterLeave` calls `TkInOutEvents` with a **NULL sourcePtr**,
+`FindCommonAncestor(NULL, dest)` returns `upLevels == 0`, and that is
+the "dest is an inferior of source" branch -- `NotifyVirtual` down the
+chain and `NotifyAncestor` at the end, exactly what comes out. The
+non-linear details need a live source in a different branch.
+
+`event-9.16` and `event-9.17` say in their own comments that they test
+"overwriting the dead window struct in `TkPointerDeadWindow()` and
+subsequent reading in `GenerateEnterLeave()`" -- **a mechanism this
+tree's `tkPointer.c` does not have**: its `ThreadSpecificData` holds
+`grabWinPtr`, `lastState`, `lastPos`, `lastWinPtr`, `restrictWinPtr`
+and `cursorWinPtr`, and nothing else. So the test file is newer than
+the `tkPointer.c` beside it. Fixing this means patching generic Tk,
+which is shared with the Windows and Mac ports; `TkPointerDeadWindow`
+is called from exactly three places and ours (`XDestroyWindow` in
+`tkPlan9Init.c`) matches `win/tkWinWindow.c:316` and
+`macosx/tkMacOSXSubwindows.c:70`.
+
+**The four `place-8.*`/`pack-18.*` fail on X11 too.** All four have the
+shape
+
+```
+got   1 1 W H 1 1
+want  1 0 W H 0 1
+```
+
+and all four ask whether a **child** reports `winfo ismapped` as 0 after
+`wm iconify` on its toplevel. On Windows the OS sends `WM_SHOWWINDOW`
+with `SW_PARENTCLOSING` to the children and Tk turns that into
+`UnmapNotify`; X sends nothing for a child of an unmapped window, and
+neither `Tk_UnmapWindow` nor either port's `TkWmUnmapWindow` walks the
+children. The tests carry `-constraints {failsOnUbuntu failsOnXQuartz}`,
+and that constraint is
+
+```tcl
+testConstraint failsOnUbuntu [expr {![info exists ::env(CI)] || ![string match Linux $::tcl_platform(os)]}]
+```
+
+-- true (so the test *runs*) everywhere except CI on Linux. They
+therefore fail on an ordinary Linux/X11 desktop as well. **Do not
+"fix" these by unmapping descendants**: that would be inventing
+semantics X does not have, in the one direction where this port
+deliberately follows X.
+
+`clipboard-4.1/4.2/4.4/6.2` are the third such group, and were already
+known: they turn on X selection *ownership*, which `/dev/snarf` has no
+concept of.
+
+That leaves roughly 23 that may be real, the largest being `font` (4),
+`imgListFormat` (3) and `canvas` (3).
+
 ### Syntax-check Tk's Plan 9 backend on the host before shipping it
 
 A round trip to the VM costs a full rebuild, and twice now it has been
