@@ -43,6 +43,26 @@
 # Run it both ways. Section 1 decides whether the warp is the bug or
 # merely downstream of a mouse poll that delivers nothing, and it needs
 # you to move the mouse.
+#
+# WHAT THIS ACTUALLY FOUND, and why the script is kept: the warp was
+# never the bug. The trace reads
+#
+#	tkp9: /dev/mouse fd=7 writable=1
+#	XWarpPointer: dw=11 dx=20 dy=20 -> screen 120,120
+#	tkp9_warpmouse: wrote "m120 120" ok
+#	  FAIL to a window (bind-34.1): pointerxy unchanged at 0 0
+#
+# -- written, and acknowledged, and still 0 0. The answer is in section
+# 1 of the same run: a real <Motion> reported 397 124 and "winfo
+# pointerxy" said 0 0 on the very next line, so gP9.lastmouse was right
+# and only the READBACK was wrong. TkGetPointerCoords in tkPlan9Wm.c
+# was a stub assigning 0 to both, next door to an XQueryPointer that
+# works.
+#
+# The moral for the next one of these: a value that is read back wrong
+# looks identical to a value that was never written. Prove the readback
+# before chasing the write -- one line comparing %X against winfo
+# pointerxy would have saved two rounds here.
 
 set fail 0
 
