@@ -85,8 +85,10 @@ check "family of {Times 10}" \
     [string tolower [font actual {Times 10} -family]] "times"
 check "an unknown family resolves to something else" \
     [expr {[font actual {avantgarde 12} -family] ne "avantgarde"}] 1
+# In POINTS, so a request for -12 pixels at scaling 1.0 reads back as 12.
+# font-44.1 is the same rule with scaling 0.5, in section 5b.
 check "size of {Helvetica -12}" \
-    [font actual {Helvetica -12} -size] "-12"
+    [font actual {Helvetica -12} -size] "12"
 check "size of {Courier 10}" \
     [font actual {Courier 10} -size] "10"
 check "weight of {Helvetica 12 bold}" \
@@ -174,10 +176,39 @@ update
 .t.c insert text 0 "000\n000\n000"
 update
 note "canvas bbox of 3 lines: [.t.c bbox text]"
-foreach probe [list 0 [expr {$ay - 1}] $ay [expr {$ay + 1}] [expr {2 * $ay}]] {
+note "canvas item coords: [.t.c coords text], angle [.t.c itemcget text -angle]"
+foreach probe [list 0 [expr {$ay - 1}] $ay [expr {$ay + 1}] \
+                    [expr {2 * $ay}] [expr {2 * $ay + 1}]] {
     note "  index @0,$probe -> [.t.c index text @0,$probe]"
 }
 check "index at the start of line 2" [.t.c index text @0,$ay] 4
+
+# The boundaries land one pixel late -- at 13 and 25 where the metrics
+# allow only 12 and 24. That cannot come from the metrics: the bbox says
+# the layout is 3 * 12 tall, and ascent+descent is 12, so the two
+# disagree with each other. What sits between "@0,12" and Tk_PointToChar
+# is tkCanvText.c:1529
+#
+#	Tk_PointToChar(layout, (int)(x*cs - y*s), (int)(y*cs + x*s));
+#
+# with cs/s the item's cosine and sine. For an unrotated item they must
+# be exactly 1.0 and 0.0 -- and if cs were a hair under 1.0, (int)(12*cs)
+# truncates to 11 and (int)(13*cs) to 12, which is precisely the shift
+# seen. Tcl's expr calls libap's libm, so this asks the same question
+# directly.
+note "cos(0.0) = [expr {cos(0.0)}]   (must be exactly 1.0)"
+note "sin(0.0) = [expr {sin(0.0)}]   (must be exactly 0.0)"
+check "cos(0.0) is exactly 1.0" [expr {cos(0.0) == 1.0}] 1
+check "sin(0.0) is exactly 0.0" [expr {sin(0.0) == 0.0}] 1
+
+# And separate the item's origin from any scaling of y: move the item
+# down and see whether the boundary moves by the same amount or by more.
+.t.c coords text 0 100
+update
+note "item moved to y=100; bbox now [.t.c bbox text]"
+foreach probe [list 100 [expr {100 + $ay}] [expr {100 + $ay + 1}]] {
+    note "  index @0,$probe -> [.t.c index text @0,$probe]"
+}
 destroy .t
 
 # 6. A real Plan 9 font path is a native name and must still work.
