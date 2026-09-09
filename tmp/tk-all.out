@@ -6,7 +6,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-05 18:23:17 +0200
+Tests began at 2026-09-09 04:54:21 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -324,7 +324,6 @@ event.test
 .top1
 ==== event-9.2 FAILED
 
-wait for <Enter> event on .one timed out (> 1000 ms)
 
 
 ==== event-9.11 pointer window container = parent FAILED
@@ -342,7 +341,6 @@ wait for <Enter> event on .one timed out (> 1000 ms)
 |<Enter> NotifyInferior .one.f1|
 ==== event-9.11 FAILED
 
-wait for <Enter> event on .one timed out (> 1000 ms)
 
 
 ==== event-9.12 pointer window container != parent FAILED
@@ -360,9 +358,6 @@ wait for <Enter> event on .one timed out (> 1000 ms)
 |<Enter> NotifyNonlinearVirtual .one.f1|<Enter> NotifyNonlinear .one.f1.f2|
 ==== event-9.12 FAILED
 
-wait for <Enter> event on .one timed out (> 1000 ms)
-wait for <Enter> event on .two timed out (> 1000 ms)
-wait for <Enter> event on .one timed out (> 1000 ms)
 
 
 ==== event-9.13 pointer window is a toplevel, toplevel destination FAILED
@@ -381,9 +376,6 @@ wait for <Enter> event on .one timed out (> 1000 ms)
 |<Enter> NotifyNonlinear .one|
 ==== event-9.13 FAILED
 
-wait for <Enter> event on .one timed out (> 1000 ms)
-wait for <Enter> event on .two timed out (> 1000 ms)
-wait for <Enter> event on .one.f1.f2 timed out (> 1000 ms)
 
 
 ==== event-9.14 pointer window is a toplevel, tk internal destination FAILED
@@ -401,9 +393,6 @@ wait for <Enter> event on .one.f1.f2 timed out (> 1000 ms)
 |<Enter> NotifyNonlinearVirtual .one|<Enter> NotifyNonlinearVirtual .one.f1|<Enter> NotifyNonlinear .one.f1.f2|
 ==== event-9.14 FAILED
 
-wait for <Enter> event on .one timed out (> 1000 ms)
-wait for <Enter> event on .two timed out (> 1000 ms)
-wait for <Enter> event on .one timed out (> 1000 ms)
 
 
 ==== event-9.16 Successive destructions (pointer window + parent), single generation of crossing events FAILED
@@ -421,7 +410,6 @@ wait for <Enter> event on .one timed out (> 1000 ms)
 |<Enter> NotifyInferior .one|
 ==== event-9.16 FAILED
 
-wait for <Enter> event on .one timed out (> 1000 ms)
 
 
 ==== event-9.17 Successive destructions (pointer window + parent), separate crossing events FAILED
@@ -441,9 +429,6 @@ wait for <Enter> event on .one timed out (> 1000 ms)
 |<Enter> NotifyInferior .one.f1|<Enter> NotifyInferior .one|
 ==== event-9.17 FAILED
 
-wait for <Enter> event on .one timed out (> 1000 ms)
-wait for <Enter> event on .two.f1.f2 timed out (> 1000 ms)
-wait for <Enter> event on .one timed out (> 1000 ms)
 
 
 ==== event-9.18 Successive destructions (pointer window + ancestors including its toplevel), destination is non-root toplevel FAILED
@@ -461,9 +446,6 @@ wait for <Enter> event on .one timed out (> 1000 ms)
 |<Enter> NotifyNonlinear .one|
 ==== event-9.18 FAILED
 
-wait for <Enter> event on .one timed out (> 1000 ms)
-wait for <Enter> event on .three.f1.f2 timed out (> 1000 ms)
-wait for <Enter> event on .two.f1.f2 timed out (> 1000 ms)
 
 
 ==== event-9.19 Successive destructions (pointer window + ancestors including its toplevel), destination is internal window, bypass root win FAILED
@@ -482,8 +464,6 @@ wait for <Enter> event on .two.f1.f2 timed out (> 1000 ms)
 |<Enter> NotifyNonlinearVirtual .two|<Enter> NotifyNonlinearVirtual .two.f1|<Enter> NotifyNonlinear .two.f1.f2|
 ==== event-9.19 FAILED
 
-wait for <Enter> event on .one timed out (> 1000 ms)
-wait for <Enter> event on .two.f1.f2 timed out (> 1000 ms)
 filebox.test
 
 
@@ -524,14 +504,14 @@ focusTcl.test
 font.test
 
 
-==== font-21.7 Tk_PostscriptFontName procedure: exhaustive FAILED
+==== font-21.19 Tk_PostscriptFontName procedure: exhaustive FAILED
 ==== Contents of test case:
 
-    set name {avantgarde 12 roman normal}
-    if {[font actual {avantgarde 12 roman normal} -family] == "avantgarde"} {
+    set name {helvetica 12 roman normal}
+    if {[font actual {avantgarde 12 roman normal} -family] == "helvetica"} {
 	set x [psfontname avantgarde 12 roman normal]
     } else {
-	set x AvantGarde-Book
+	set x Helvetica
     }
 
 ---- Test generated error; Return code was: 1
@@ -543,18 +523,18 @@ font.test
     invoked from within
 "uplevel 1 $script"
 ---- errorCode: TCL WRONGARGS
-==== font-21.7 FAILED
+==== font-21.19 FAILED
 
 
 
-==== font-21.8 Tk_PostscriptFontName procedure: exhaustive FAILED
+==== font-21.20 Tk_PostscriptFontName procedure: exhaustive FAILED
 ==== Contents of test case:
 
-    set name {avantgarde 12 roman bold}
-    if {[font actual {avantgarde 12 roman normal} -family] == "avantgarde"} {
+    set name {helvetica 12 roman bold}
+    if {[font actual {avantgarde 12 roman normal} -family] == "helvetica"} {
 	set x [psfontname avantgarde 12 roman normal]
     } else {
-	set x AvantGarde-Demi
+	set x Helvetica-Bold
     }
 
 ---- Test generated error; Return code was: 1
@@ -566,18 +546,18 @@ font.test
     invoked from within
 "uplevel 1 $script"
 ---- errorCode: TCL WRONGARGS
-==== font-21.8 FAILED
+==== font-21.20 FAILED
 
 
 
-==== font-21.9 Tk_PostscriptFontName procedure: exhaustive FAILED
+==== font-21.21 Tk_PostscriptFontName procedure: exhaustive FAILED
 ==== Contents of test case:
 
-    set name {avantgarde 12 italic normal}
-    if {[font actual {avantgarde 12 roman normal} -family] == "avantgarde"} {
+    set name {helvetica 12 italic normal}
+    if {[font actual {avantgarde 12 roman normal} -family] == "helvetica"} {
 	set x [psfontname avantgarde 12 roman normal]
     } else {
-	set x AvantGarde-BookOblique
+	set x Helvetica-Oblique
     }
 
 ---- Test generated error; Return code was: 1
@@ -589,18 +569,18 @@ font.test
     invoked from within
 "uplevel 1 $script"
 ---- errorCode: TCL WRONGARGS
-==== font-21.9 FAILED
+==== font-21.21 FAILED
 
 
 
-==== font-21.10 Tk_PostscriptFontName procedure: exhaustive FAILED
+==== font-21.22 Tk_PostscriptFontName procedure: exhaustive FAILED
 ==== Contents of test case:
 
-    set name {avantgarde 12 italic bold}
-    if {[font actual {avantgarde 12 roman normal} -family] == "avantgarde"} {
+    set name {helvetica 12 italic bold}
+    if {[font actual {avantgarde 12 roman normal} -family] == "helvetica"} {
 	set x [psfontname avantgarde 12 roman normal]
     } else {
-	set x AvantGarde-DemiOblique
+	set x Helvetica-BoldOblique
     }
 
 ---- Test generated error; Return code was: 1
@@ -612,7 +592,7 @@ font.test
     invoked from within
 "uplevel 1 $script"
 ---- errorCode: TCL WRONGARGS
-==== font-21.10 FAILED
+==== font-21.22 FAILED
 
 
 
@@ -862,52 +842,6 @@ font.test
 ---- Result should have been (exact matching):
 1
 ==== font-30.13 FAILED
-
-
-
-==== font-44.1 TkFontGetPixels: size < 0 FAILED
-==== Contents of test case:
-
-    # if this test failed, start the investigations by reading ticket [8162e9b7a9]
-    tk scaling 0.5
-    font actual {times -13} -size
-
----- Result was:
--13
----- Result should have been (exact matching):
-26
-==== font-44.1 FAILED
-
-
-
-==== font-45.1 TkFontGetAliasList: no match FAILED
-==== Contents of test case:
-
-    font actual {snarky 10} -family
-
----- Result was:
-snarky
----- Result should have been (exact matching):
-
-==== font-45.1 FAILED
-
-
-
-==== font-45.3 TkFontGetAliasList: match FAILED
-==== Contents of test case:
-
-    if {[font actual {{times new roman} 10} -family] eq "Times New Roman"} {
-	# avoid test failure on systems that have a real "times new roman" font
-	set res 1
-    } else {
-	set res [expr {[font actual {{times new roman} 10} -family] eq  [font actual {times 10} -family]} ]
-    }
-
----- Result was:
-0
----- Result should have been (exact matching):
-1
-==== font-45.3 FAILED
 
 fontchooser.test
 
