@@ -1729,35 +1729,46 @@ FAILED` counts two lines each, so 52 lines). **25 of those are known
 not to be the Plan 9 backend's**, and are worth recording so they are
 not chased again:
 
-**The five remaining `event-9.*` are generic Tk.** The port's side is
-proved correct by `tk-enter-test.tcl`: the hit test agrees with the warp
-at every level and the crossings arrive. What is wrong is the `%d`
-detail when the window the pointer was in has just been **destroyed**:
+**The five `event-9.*` are ours after all, and are still open.** An
+earlier note here said they were generic Tk's, on the strength of
+`event-9.14`'s `%d` details. **That was wrong twice over**, and both
+errors are worth keeping as a warning about reasoning from one member of
+a group:
+
+- **`generic/tkPointer.c` in this tree is upstream's.** Diffed against
+  `tcltk/tk` `main`, the only differences in the whole file are `int` vs
+  `bool`, `TkpGetMS` vs `TkGetMS`, one cast, and an `#include`. So
+  `TkPointerDeadWindow` is not stale, and the comment in `event-9.16`
+  and `9.17` about "overwriting the dead window struct in
+  `TkPointerDeadWindow()`" simply describes the `lastWinPtr =
+  TkGetContainer(winPtr)` that is already there. Check the vendored file
+  against upstream *before* concluding it is out of date.
+- **Three of the five report no crossing at all**, not a wrong detail.
+  `event-9.11`, `9.12` and `9.17` come back as the bare `|` separator:
 
 ```
-event-9.14  got   |<Enter> NotifyVirtual .one|<Enter> NotifyVirtual .one.f1|<Enter> NotifyAncestor .one.f1.f2|
-            want  |<Enter> NotifyNonlinearVirtual .one|...NotifyNonlinearVirtual .one.f1|...NotifyNonlinear .one.f1.f2|
+event-9.11  got   |
+            want  |<Enter> NotifyInferior .one.f1|
 ```
 
-`TkPointerDeadWindow` (`generic/tkPointer.c`) sets `lastWinPtr =
-TkGetContainer(winPtr)`, which is NULL for anything not embedded. So
-`GenerateEnterLeave` calls `TkInOutEvents` with a **NULL sourcePtr**,
-`FindCommonAncestor(NULL, dest)` returns `upLevels == 0`, and that is
-the "dest is an inferior of source" branch -- `NotifyVirtual` down the
-chain and `NotifyAncestor` at the end, exactly what comes out. The
-non-linear details need a live source in a different branch.
+  Only `9.13`/`9.14` show the `NotifyVirtual`-for-`NotifyNonlinear`
+  substitution, which is what `TkInOutEvents` does with a NULL
+  `sourcePtr`. Two different failures, and reading the group from its
+  loudest member got the quiet three wrong.
 
-`event-9.16` and `event-9.17` say in their own comments that they test
-"overwriting the dead window struct in `TkPointerDeadWindow()` and
-subsequent reading in `GenerateEnterLeave()`" -- **a mechanism this
-tree's `tkPointer.c` does not have**: its `ThreadSpecificData` holds
-`grabWinPtr`, `lastState`, `lastPos`, `lastWinPtr`, `restrictWinPtr`
-and `cursorWinPtr`, and nothing else. So the test file is newer than
-the `tkPointer.c` beside it. Fixing this means patching generic Tk,
-which is shared with the Windows and Mac ports; `TkPointerDeadWindow`
-is called from exactly three places and ours (`XDestroyWindow` in
-`tkPlan9Init.c`) matches `win/tkWinWindow.c:316` and
-`macosx/tkMacOSXSubwindows.c:70`.
+`GenerateEnterLeave` generates nothing when the window it is handed
+**equals** the one it already believes the pointer is in.
+`TkPointerDeadWindow` has just set that to NULL, so "nothing at all"
+means `Tk_CoordsToWindow` answered NULL too -- which is the port's side,
+not Tk's.
+
+The distinction the passing cases hide: `event-9.1` and section 3 of
+`tk-enter-test.tcl` both destroy a **toplevel** and both work. The
+failures all destroy a nested **frame**. Section 5 of that test is
+`event-9.11` copied exactly -- including `create_and_pack_frames`'
+geometry, which is load-bearing -- and prints `winfo containing` on both
+sides of the destroy, so it separates "the hit test lost the parent"
+from "the crossing was generated against a NULL source".
 
 **The four `place-8.*`/`pack-18.*` fail on X11 too.** All four have the
 shape
@@ -1848,9 +1859,8 @@ string is **four pixels wider** than on X, one per character, because
 Plan 9 bitmap fonts come in whole sizes and the nearest to 8 points is
 not 8 points. Nothing to fix without a scalable font.
 
-That is 25 of the 26 accounted for. The **one** still ours and open is
-`event-9.11..13` -- the same generic-Tk `%d` detail as 9.14 and 9.17
-above, so all five are really one item.
+That is 21 of the 26 accounted for. The five still ours and open are
+the `event-9.*` group above.
 
 `canvas-23.*`, `geometry-4.7`, `listbox-4.7`, `bind-13.14`, `embed-1.1`
 and `fontchooser-2.0/2.1` **were** ours and are fixed -- see the
