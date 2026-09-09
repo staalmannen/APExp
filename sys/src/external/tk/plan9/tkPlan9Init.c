@@ -873,17 +873,28 @@ XQueryPointer(Display *display, Window w,
               int *win_x_return, int *win_y_return,
               unsigned int *mask_return)
 {
-    P9Window *pw = TkP9FindWindow(w);
     int rx = gP9.lastmouse.x;
     int ry = gP9.lastmouse.y;
+    int ox = 0, oy = 0;
     (void)display;
+
+    /*
+     * The window-relative coordinates need the offset of w from the
+     * screen, which is the accumulated offset up the parent chain --
+     * P9Window.x/.y are relative to the parent alone. Subtracting
+     * pw->x here was the same mistake WindowAtPoint and
+     * GenerateMouseEvent made, and it is right only for a child of the
+     * root: for anything nested the answer was short by every
+     * ancestor's offset.
+     */
+    TkP9WindowOffset(w, &ox, &oy);
 
     if (root_return)  *root_return  = TKP9_ROOT_XID;
     if (child_return) *child_return = None;
     if (root_x_return) *root_x_return = rx;
     if (root_y_return) *root_y_return = ry;
-    if (win_x_return)  *win_x_return  = rx - (pw ? pw->x : 0);
-    if (win_y_return)  *win_y_return  = ry - (pw ? pw->y : 0);
+    if (win_x_return)  *win_x_return  = rx - ox;
+    if (win_y_return)  *win_y_return  = ry - oy;
     if (mask_return) {
         unsigned m = 0;
         if (gP9.lastmouse.buttons & 1) m |= Button1Mask;
