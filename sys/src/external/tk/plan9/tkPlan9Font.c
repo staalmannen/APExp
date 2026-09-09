@@ -98,9 +98,14 @@ static const P9FontFile monoItalicFonts[] = {
  * for nearly every request, so it carries the range; dejavusans has
  * bold and italic with full Unicode coverage, which lucida's latin1B
  * and latin1I do not.
+ *
+ * Checked against a real 9front /lib/font/bit (tk-font-test.tcl prints
+ * the inventory): lucida's unicode.* starts at 6, so the unicode.5 this
+ * table used to name did not exist. Nothing broke -- a candidate that
+ * will not open is skipped -- but the smallest request then answered
+ * with 6 having pretended to consider a 5.
  */
 static const P9FontFile propFonts[] = {
-    {"/lib/font/bit/lucida/unicode.5.font",       5},
     {"/lib/font/bit/lucida/unicode.6.font",       6},
     {"/lib/font/bit/lucida/unicode.7.font",       7},
     {"/lib/font/bit/lucida/unicode.8.font",       8},

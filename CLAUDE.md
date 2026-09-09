@@ -1505,10 +1505,21 @@ caller needs to know whether a file exists.
 
 Plan 9 bitmap fonts come in discrete sizes, one file each, so
 `TkpGetFontFromAttributes` picks the nearest by pixel height from a
-table and skips candidates that will not open. **The table is a guess at
-what a 9front install ships**; `sys/lib/tests/tk-font-test.tcl` prints
-the real `/lib/font/bit` inventory, which is the thing to correct it
-against. A wrong entry costs size accuracy and nothing else.
+table and skips candidates that will not open. The table began as a
+guess at what a 9front install ships; `sys/lib/tests/tk-font-test.tcl`
+prints the real `/lib/font/bit` inventory, which is what to correct it
+against, and it has now been checked against one. A wrong entry costs
+size accuracy and nothing else -- a candidate that will not open is
+skipped -- so the one error found (`lucida/unicode.5`, which does not
+exist; lucida's `unicode.*` starts at 6) was silent.
+
+**`font families` lists four and `font actual` reports three.** The
+list is `courier fixed helvetica times`, but `ChooseFont` resolves every
+request to one of `courier`, `times` and `helvetica` -- a request for
+`fixed` is monospaced, so it comes back as `courier`. That is the wrong
+way round for font.test's idiom, which decides whether a family exists
+by asking whether `font actual {X 12} -family` is still `X`: `fixed` is
+advertised and then denied. Either drop it from the list or report it.
 
 `fm.fixed` is measured (`width("i") == width("W")`) rather than assumed:
 Tk uses it to skip measuring character by character, so claiming it for
