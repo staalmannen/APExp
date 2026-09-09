@@ -65,6 +65,36 @@ DrawableTarget(Drawable d, void **img, int *ox, int *oy)
     TkP9WindowOffset((Window)d, ox, oy);
 }
 
+/*
+ * An XImage here is 32 bits per pixel holding the visual's pixel value
+ * -- 0x00RRGGBB, per screen->root_visual's masks -- in the HOST's byte
+ * order, which is what XCreateImage below declares. Generic Tk reads a
+ * pixel with a plain 32-bit load and then decomposes it with those
+ * masks (tkCanvas.c's DrawCanvas does exactly that), so the only way to
+ * agree with it on both endiannesses is to go through a 32-bit access
+ * rather than naming bytes.
+ *
+ * These two used to store R,G,B,A in memory order, which contradicts
+ * the LSBFirst byte_order the same file declares: on a little-endian
+ * machine that puts blue where the red mask looks. Nothing had noticed
+ * because XPutImage and XGetImage were both stubs, so no pixel ever
+ * made the trip.
+ */
+static unsigned int *
+XImagePixel(XImage *image, int x, int y)
+{
+    return (unsigned int *)(image->data + (size_t)y * image->bytes_per_line
+                            + (size_t)x * 4);
+}
+
+static int
+HostByteOrder(void)
+{
+    unsigned int one = 1;
+
+    return (*(unsigned char *)&one) ? LSBFirst : MSBFirst;
+}
+
 /* ------------------------------------------------------------------ */
 /* Core drawing operations                                             */
 /* ------------------------------------------------------------------ */
@@ -361,9 +391,43 @@ XPutImage(Display *display, Drawable d, GC gc, XImage *image,
           int dest_x, int dest_y,
           unsigned int width, unsigned int height)
 {
-    (void)display; (void)d; (void)gc; (void)image;
-    (void)src_x; (void)src_y; (void)dest_x; (void)dest_y;
-    (void)width; (void)height;
+    void *img;
+    unsigned char *buf, *q;
+    unsigned int x, y, p;
+    int ox, oy;
+    (void)display; (void)gc;
+
+    if (image == NULL || image->data == NULL || width == 0 || height == 0)
+        return 0;
+    if (image->bits_per_pixel != 32)
+        return 0;			/* nothing here makes any other depth */
+
+    /* Clip the source rectangle to the image rather than reading past it. */
+    if (src_x < 0 || src_y < 0)
+        return 0;
+    if (src_x + (int)width > image->width)
+        width = (unsigned)(image->width - src_x);
+    if (src_y + (int)height > image->height)
+        height = (unsigned)(image->height - src_y);
+    if ((int)width <= 0 || (int)height <= 0)
+        return 0;
+
+    buf = (unsigned char *)ckalloc((size_t)width * height * 4);
+    for (y = 0; y < height; y++) {
+        for (x = 0; x < width; x++) {
+            p = *XImagePixel(image, src_x + (int)x, src_y + (int)y);
+            q = buf + ((size_t)y * width + x) * 4;
+            q[0] = (unsigned char)(p >> 16);	/* red_mask   0xFF0000 */
+            q[1] = (unsigned char)(p >>  8);	/* green_mask 0x00FF00 */
+            q[2] = (unsigned char)(p);		/* blue_mask  0x0000FF */
+            q[3] = 0xFF;
+        }
+    }
+
+    DrawableTarget(d, &img, &ox, &oy);
+    tkp9_putpixels(img, dest_x + ox, dest_y + oy,
+                   (int)width, (int)height, buf);
+    ckfree(buf);
     return 0;
 }
 
@@ -682,33 +746,21 @@ P9DestroyImage(XImage *image)
     return 0;
 }
 
+
 static unsigned long
 P9GetPixel(XImage *image, int x, int y)
 {
-    unsigned char *data;
-    int idx;
     if (!image || !image->data) return 0;
     if (x < 0 || y < 0 || x >= image->width || y >= image->height) return 0;
-    data = (unsigned char *)image->data;
-    idx  = y * image->bytes_per_line + x * 4;
-    return ((unsigned long)data[idx+0] << 16) |
-           ((unsigned long)data[idx+1] <<  8) |
-            (unsigned long)data[idx+2];
+    return *XImagePixel(image, x, y) & 0x00FFFFFFu;
 }
 
 static int
 P9PutPixel(XImage *image, int x, int y, unsigned long pixel)
 {
-    unsigned char *data;
-    int idx;
     if (!image || !image->data) return 0;
     if (x < 0 || y < 0 || x >= image->width || y >= image->height) return 0;
-    data = (unsigned char *)image->data;
-    idx  = y * image->bytes_per_line + x * 4;
-    data[idx+0] = (pixel >> 16) & 0xFF;
-    data[idx+1] = (pixel >>  8) & 0xFF;
-    data[idx+2] =  pixel        & 0xFF;
-    data[idx+3] = 0xFF;
+    *XImagePixel(image, x, y) = 0xFF000000u | (unsigned int)(pixel & 0x00FFFFFFu);
     return 0;
 }
 
@@ -764,14 +816,27 @@ XCreateImage(
     image->data           = data;
     image->bytes_per_line = bytes_per_line > 0 ? bytes_per_line : (int)width * 4;
     image->bits_per_pixel = 32;
-    image->byte_order     = LSBFirst;
+    /*
+     * The pixel is stored as a host-order 32-bit word (see
+     * XImagePixel), so say so rather than hardcoding LSBFirst: this
+     * tree builds for big-endian architectures too, and generic Tk
+     * byte-swaps when byte_order disagrees with the host.
+     */
+    image->byte_order     = HostByteOrder();
     image->bitmap_unit    = 32;
-    image->bitmap_bit_order = LSBFirst;
+    image->bitmap_bit_order = image->byte_order;
     image->bitmap_pad     = 32;
     _XInitImageFuncPtrs(image);
     return image;
 }
 
+/*
+ * Read a rectangle of a drawable back as an XImage. "canvas image"
+ * renders the canvas into a pixmap and then has to get the pixels out
+ * of it -- tkCanvas.c's comment calls this "the only way to get Pixmap
+ * image data out of an image" -- so a stub returning NULL is
+ * canvas-23.* failing with "failed to copy Pixmap to XImage".
+ */
 XImage *
 XGetImage(
     Display *display,
@@ -782,9 +847,44 @@ XGetImage(
     unsigned long plane_mask,
     int format)
 {
-    (void)display; (void)d; (void)x; (void)y;
-    (void)width; (void)height; (void)plane_mask; (void)format;
-    return NULL;
+    XImage *image;
+    unsigned char *buf, *q;
+    char *data;
+    void *img;
+    int ox, oy;
+    unsigned int ix, iy;
+    (void)plane_mask;
+
+    if (format != ZPixmap || width == 0 || height == 0)
+        return NULL;
+
+    buf = (unsigned char *)ckalloc((size_t)width * height * 4);
+    DrawableTarget(d, &img, &ox, &oy);
+    if (tkp9_getpixels(img, x + ox, y + oy, (int)width, (int)height, buf) < 0) {
+        ckfree(buf);
+        return NULL;
+    }
+
+    data = (char *)ckalloc((size_t)width * height * 4);
+    image = XCreateImage(display, NULL, 32, ZPixmap, 0, data,
+                         width, height, 32, (int)width * 4);
+    if (image == NULL) {
+        ckfree(buf);
+        ckfree(data);
+        return NULL;
+    }
+
+    for (iy = 0; iy < height; iy++) {
+        for (ix = 0; ix < width; ix++) {
+            q = buf + ((size_t)iy * width + ix) * 4;
+            *XImagePixel(image, (int)ix, (int)iy) =
+                0xFF000000u | ((unsigned int)q[0] << 16)
+                            | ((unsigned int)q[1] <<  8)
+                            |  (unsigned int)q[2];
+        }
+    }
+    ckfree(buf);
+    return image;
 }
 
 /* Region operations — minimal implementations */
