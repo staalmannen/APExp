@@ -23,13 +23,14 @@ OFILES=\
 	log.$O\
 	nan.$O\
 	pow.$O\
-	sin.$O\
 	sinh.$O\
 	sqrt.$O\
-	tan.$O\
 	tanh.$O\
 # musl \
 	__cos.$O\
+	cos.$O\
+	sin.$O\
+	tan.$O\
 	__cosdf.$O\
 	__cosl.$O\
 	__expo2.$O\
