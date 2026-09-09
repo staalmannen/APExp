@@ -16,7 +16,7 @@ _CORE_APPS=\
 # shared gnulib: must be first, several apps below link ../gnulib/libgnu.a \
 	gnulib\
 # shell\
-#	dash\
+	dash\
 	bash\
 # parsing/editing source etc \
 	as\
