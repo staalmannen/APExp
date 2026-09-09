@@ -1647,6 +1647,37 @@ synthesises the lot. Two details it depends on:
   again so the crossing events are generated. An X server does this
   unasked; nothing here will.
 
+**`winfo pointerxy` answered 0,0 whatever the pointer was doing.**
+`TkGetPointerCoords` in `tkPlan9Wm.c` was a stub assigning 0 to both,
+sitting a few hundred lines from an `XQueryPointer` that works. It is
+`tkUnixWm.c`'s now: ask about the root window and take the coordinates
+relative to it, which are the screen coordinates, and answer -1,-1 on
+failure rather than a plausible 0,0.
+
+That is the whole of `bind-34.1` and `bind-34.2`, and it is worth
+reading as a lesson in reading a symptom. Both tests warp the pointer
+and then read it back with `winfo pointerxy`, so `0 0` looks exactly
+like a warp that never happened -- and the chain behind a warp is long
+enough (`TkpWarpPointer` -> `XWarpPointer` -> `tkp9_warpmouse` -> a
+write to `/dev/mouse`) to hold a plausible suspect at every link. It is
+also silent at every link: `XWarpPointer` returns early without setting
+`gP9.lastmouse` when the write fails, so a failed warp and a failed
+readback are indistinguishable from Tcl.
+
+**The tell was one line of `tk-warp-test.tcl`**: a real `<Motion>`
+reported `%X %Y` as `397 124`, and `winfo pointerxy` on the next line
+said `0 0`. `gP9.lastmouse` was demonstrably right, so nothing upstream
+of the readback could be at fault. `$TKP9DEBUG` then confirmed the warp
+end to end -- `/dev/mouse fd=7 writable=1`, `-> screen 120,120`,
+`wrote "m120 120" ok` -- which is the evidence that the warp was never
+the bug. **Two rounds were spent on the write before that**, on the
+strength of a deduction that was sound except for assuming the readback
+worked.
+
+`Tk_GetPointerCoords` sat beside it, an identical stub, declared and
+called nowhere in the tree -- dead code wearing the name of an API that
+does not exist. Removed.
+
 `Tk_MeasureChars` was rewritten at the same time to honour
 `TK_WHOLE_WORDS` and `TK_AT_LEAST_ONE`, which it ignored:
 `Tk_ComputeTextLayout` wraps with both set and expects a break at the

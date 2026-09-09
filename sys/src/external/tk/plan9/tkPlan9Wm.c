@@ -1104,20 +1104,35 @@ Tk_ResetUserInactiveTime(Display *dpy)
 /* Pointer coords (return last known mouse position)                  */
 /* ------------------------------------------------------------------ */
 
-void
-Tk_GetPointerCoords(Tk_Window tkwin, int *xPtr, int *yPtr)
-{
-    (void)tkwin;
-    *xPtr = 0;
-    *yPtr = 0;
-}
-
+/*
+ * Where is the pointer? This is what "winfo pointerxy" answers, and it
+ * was a stub returning 0,0 sitting next to an XQueryPointer that works
+ * -- so the position was always 0,0 however the pointer got there.
+ *
+ * That is the whole of bind-34.1 and bind-34.2. Both warp the pointer
+ * and then read it back with "winfo pointerxy", and it looked exactly
+ * like a warp that had not happened: the warp is fine, the readback was
+ * not. The tell was a real <Motion> reporting %X %Y as 397 124 while
+ * winfo pointerxy said 0 0 in the next line.
+ *
+ * Structured as tkUnixWm.c's: ask about the root, and take the
+ * coordinates relative to it, which are the screen coordinates.
+ * A failed query answers -1,-1 rather than a plausible 0,0.
+ */
 void
 TkGetPointerCoords(Tk_Window tkwin, int *xPtr, int *yPtr)
 {
-    (void)tkwin;
-    *xPtr = 0;
-    *yPtr = 0;
+    TkWindow *winPtr = (TkWindow *) tkwin;
+    Window root, child;
+    int rootX, rootY;
+    unsigned mask;
+
+    if (XQueryPointer(winPtr->display,
+	    RootWindow(winPtr->display, winPtr->screenNum),
+	    &root, &child, &rootX, &rootY, xPtr, yPtr, &mask) != True) {
+	*xPtr = -1;
+	*yPtr = -1;
+    }
 }
 
 /* ------------------------------------------------------------------ */
