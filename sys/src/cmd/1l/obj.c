@@ -1333,11 +1333,17 @@ ieeedtof(Ieee *e)
 	long v;
 
 	/*
-	 * Zero, of either sign.  Testing only h == 0 missed -0.0, whose
-	 * h is 0x80000000: it went on to compute an exponent of -1022
-	 * and reported "double fp to single fp overflow".
+	 * Zero, and anything the old test called zero.  Testing h == 0
+	 * alone missed -0.0, whose h is 0x80000000: it went on to
+	 * compute an exponent of -1022 and reported "double fp to
+	 * single fp overflow".
+	 *
+	 * Mask the sign and nothing else.  Adding "&& l == 0" here is
+	 * wrong and was a regression: a double with h == 0 and l != 0
+	 * is a subnormal, far below the least float, and this has
+	 * always flushed it to zero rather than diagnosed it.
 	 */
-	if((e->h & ~0x80000000L) == 0 && e->l == 0)
+	if((e->h & ~0x80000000L) == 0)
 		return e->h & 0x80000000L;
 	exp = (e->h>>20) & ((1L<<11)-1L);
 	exp -= (1L<<10) - 2L;
