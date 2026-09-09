@@ -22,14 +22,27 @@
 #
 # so an unchanged 0 0 means the write to /dev/mouse did not happen.
 # tkp9_warpmouse fails in exactly two ways: no descriptor, or a short
-# write. This script asks rio directly, from Tcl, so the answer costs
-# no rebuild.
+# write.
 #
-# Section 2 is the one that matters. Plan 9's mouse file takes "m x y",
-# and what it does with a window's file is the question: rio may refuse
-# the write when the window is not the current one, and the coordinates
-# may be the window's or the screen's. Section 3 asks which by warping
-# to a point whose two readings differ.
+# The first attempt at this script tried to ask rio directly, by
+# opening /dev/mouse from Tcl and writing "m150 150". That cannot work,
+# and the failure is the useful part of the answer:
+#
+#	couldn't open "/dev/mouse": file in use
+#
+# /dev/mouse opens once, and this process is holding it -- which does
+# at least prove the descriptor exists, so tkp9_warpmouse is not
+# failing for want of one. Everything else about it (whether the open
+# got O_RDWR or fell back to O_RDONLY, what the write returned, what
+# rio put in the errstr) is only visible from inside the process.
+#
+# Hence $TKP9DEBUG, which traces the whole chain:
+#
+#	TKP9DEBUG=1 wish tk-warp-test.tcl
+#
+# Run it both ways. Section 1 decides whether the warp is the bug or
+# merely downstream of a mouse poll that delivers nothing, and it needs
+# you to move the mouse.
 
 set fail 0
 
@@ -54,49 +67,46 @@ note "  mouse report or a warp changes it. Move the mouse over the"
 note "  window and run again -- if it is still 0 0 then the poll is"
 note "  the bug and the warp is a red herring."
 
-# 1. Does a real mouse report reach Tk at all? Bind <Motion> and ask
-# the user to move the pointer. This separates "the poll never updates
-# lastmouse" from "the warp cannot write".
+# 1. Does a real mouse report reach Tk at all? This is the question
+# that decides whether the warp is the bug or a symptom, so it waits
+# long enough to actually be answered: MOVE THE MOUSE OVER THE wish
+# WINDOW while it counts down. Doing nothing reports "no motion seen",
+# which is not the same as a failure and is not counted as one.
 note ""
-note "--- 1. real motion (move the mouse over this window) ---"
+note "--- 1. real motion ---"
+note "  MOVE THE MOUSE OVER THE wish WINDOW now (10s)..."
 set ::sawmotion {}
 bind . <Motion> {set ::sawmotion "%X %Y"}
-set after_id [after 3000 {set ::sawmotion timeout}]
-vwait ::sawmotion
-after cancel $after_id
-if {$::sawmotion eq "timeout"} {
-    note "  FAIL no <Motion> in 3s -- the mouse poll is not delivering"
-    incr fail
+for {set i 10} {$i > 0 && $::sawmotion eq ""} {incr i -1} {
+    after 1000 {set ::tick 1}
+    vwait ::tick
+    update
+}
+bind . <Motion> {}
+if {$::sawmotion eq ""} {
+    note "  no <Motion> seen. If you did move the mouse over the window,"
+    note "  the poll is the bug and the warp is downstream of it; run"
+    note "  with TKP9DEBUG set to see what tkp9_readmouse got."
 } else {
     note "  PASS <Motion> reported screen coords $::sawmotion"
     note "  winfo pointerxy . -> [pxy]"
 }
-bind . <Motion> {}
 
-# 2. Write to /dev/mouse by hand. This is exactly what tkp9_warpmouse
-# does -- "m" then the two numbers, no newline -- so a failure here is
-# the failure, and the error message names it.
+# 2. /dev/mouse cannot be opened twice, and this process holds it, so
+# asking rio from Tcl is not possible -- "file in use" is all that can
+# come back, which at least proves Tk has the descriptor. The state
+# that matters (was it opened for writing, and what did the warp write
+# return) is only visible from inside, hence $TKP9DEBUG.
 note ""
-note "--- 2. writing \"m x y\" to /dev/mouse by hand ---"
-foreach mode {r+ w} {
-    if {[catch {open /dev/mouse $mode} f]} {
-	note "  open /dev/mouse $mode: FAILED: $f"
-	continue
-    }
-    note "  open /dev/mouse $mode: ok"
-    fconfigure $f -translation binary -buffering none
-    set target "m150 150"
-    if {[catch {puts -nonewline $f $target; flush $f} err]} {
-	note "  write '$target': FAILED: $err"
-	incr fail
-    } else {
-	note "  write '$target': ok"
-	after 100
-	update
-	note "  winfo pointerxy . -> [pxy]"
-    }
+note "--- 2. who holds /dev/mouse ---"
+if {[catch {open /dev/mouse r+} f]} {
+    note "  open /dev/mouse: $f"
+    note "  'file in use' here is the expected answer and means Tk has it."
+} else {
+    note "  open /dev/mouse SUCCEEDED -- so Tk does NOT have it, which is"
+    note "  the bug: no descriptor means no events and no warp."
     catch {close $f}
-    break
+    incr fail
 }
 
 # 3. Tk's own warp, both forms. bind-34.2 is the second of these.
@@ -125,16 +135,19 @@ foreach {what cmd} {
     }
 }
 
-# 4. Which coordinate system did the write use? Warp to a point well
-# inside the window and compare the two readings. If rio takes the
-# coordinates as window-relative it will land at rootx+150, and if as
-# screen coordinates at 150.
+# 4. If the warp DID move the pointer, which coordinate system did rio
+# take? The last warp above asked for screen 200,200.
 note ""
 note "--- 4. window-relative or screen coordinates? ---"
 note "  . is at [winfo rootx .],[winfo rooty .]"
-note "  after 'm150 150' the pointer is at [pxy]"
-note "  screen-relative would read 150 150"
-note "  window-relative would read [expr {[winfo rootx .]+150}] [expr {[winfo rooty .]+150}]"
+note "  after warping to screen 200,200 the pointer reads [pxy]"
+note "  screen-relative would read 200 200"
+note "  window-relative would read [expr {[winfo rootx .]+200}] [expr {[winfo rooty .]+200}]"
+note ""
+note "Run again with TKP9DEBUG set for the trace from inside:"
+note "    TKP9DEBUG=1 wish tk-warp-test.tcl"
+note "which reports the /dev/mouse descriptor and mode, every"
+note "TkpWarpPointer/XWarpPointer call, and the warp write with its errstr."
 
 puts "$fail failure(s)"
 flush stdout
