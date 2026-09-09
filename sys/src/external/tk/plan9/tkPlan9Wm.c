@@ -1000,14 +1000,53 @@ Tk_UnsetGrid(Tk_Window tkwin)
 /* Root coordinates                                                   */
 /* ------------------------------------------------------------------ */
 
+/*
+ * The walk up the parents STOPS AT A TOPLEVEL. A toplevel's parentPtr
+ * is its logical Tk parent -- ".one"'s is "." -- and its changes.x/y
+ * are already screen coordinates, so continuing past it adds the
+ * parent's position to a window that is not inside it.
+ *
+ * This walked the whole chain, so every toplevel but "." was reported
+ * at its own position plus "."'s. Invisible while "." sits at 0,0, and
+ * event.test's setup_win_mousepointer opens with
+ *
+ *	wm geometry . +700+400; # root window out of our way
+ *
+ * which is what made it maximal: ".one" at +100+100 was reported at
+ * 800,500. Everything that asks where a window is went wrong with it --
+ * "winfo rootx/rooty" for any toplevel, "winfo containing", and through
+ * Tk_CoordsToWindow the entire pointer machinery, since a hit test that
+ * finds nothing hands NULL to Tk_UpdatePointer and no crossing is ever
+ * generated. That is the ten event-9.* failures, all of them stuck in
+ * that one setup line waiting for an <Enter> that could not come.
+ *
+ * An EMBEDDED toplevel is the exception and must keep walking, through
+ * its container rather than its parent -- the container is where it
+ * actually sits. tkUnixWm.c has to consult the X server when the
+ * container belongs to another application; here Tk_GetOtherWindow can
+ * always answer, because an embedded window and its container share
+ * this process.
+ */
 void
 Tk_GetRootCoords(Tk_Window tkwin, int *xPtr, int *yPtr)
 {
     TkWindow *winPtr = (TkWindow *)tkwin;
     int x = 0, y = 0;
-    while (winPtr) {
+
+    while (winPtr != NULL) {
         x += winPtr->changes.x + winPtr->changes.border_width;
         y += winPtr->changes.y + winPtr->changes.border_width;
+        if (winPtr->flags & TK_TOP_LEVEL) {
+            Tk_Window otherPtr;
+
+            if (!(winPtr->flags & TK_EMBEDDED))
+                break;
+            otherPtr = Tk_GetOtherWindow((Tk_Window) winPtr);
+            if (otherPtr == NULL)
+                break;
+            winPtr = (TkWindow *) otherPtr;
+            continue;
+        }
         winPtr = winPtr->parentPtr;
     }
     *xPtr = x;

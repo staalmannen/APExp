@@ -1647,6 +1647,43 @@ synthesises the lot. Two details it depends on:
   again so the crossing events are generated. An X server does this
   unasked; nothing here will.
 
+**`Tk_GetRootCoords` walked past the toplevel, so every toplevel but
+`.` was in the wrong place.** The walk up `parentPtr` must **stop at a
+window with `TK_TOP_LEVEL`**: a toplevel's `parentPtr` is its logical
+Tk parent -- `.one`'s is `.` -- and its `changes.x/y` are already screen
+coordinates, so continuing past it adds the parent's position to a
+window that is not inside it. `tkUnixWm.c` breaks there; this walked the
+whole chain.
+
+Invisible while `.` sits at 0,0, which is why `tk-warp-test.tcl` never
+caught it -- `.` is the one toplevel with no `parentPtr`. `event.test`'s
+`setup_win_mousepointer` opens with
+
+```tcl
+wm geometry . +700+400; # root window out of our way
+```
+
+and that is what made it fatal rather than merely wrong: `.one` at
++100+100 was reported at **800,500**.
+
+**Everything that asks where a window is went wrong with it** --
+`winfo rootx`/`rooty` for any toplevel, `winfo containing`, and through
+`Tk_CoordsToWindow` the entire pointer machinery, because a hit test
+that finds nothing hands NULL to `Tk_UpdatePointer` and no crossing is
+ever generated. That is the ten `event-9.*` failures, every one of them
+stuck in that single setup line waiting for an `<Enter>` that could not
+come, never reaching the behaviour it was written to test.
+
+An **embedded** toplevel is the exception and must keep walking, through
+its container rather than its parent. `tkUnixWm.c` consults the X server
+when the container belongs to another application; here
+`Tk_GetOtherWindow` can always answer, since the two share this process.
+
+Covered by `sys/lib/tests/tk-enter-test.tcl`, which prints
+`winfo rootx`/`width`/`ismapped` for each window before using it. One
+line of that would have found this immediately; the round trip went on
+the crossing machinery instead, which was correct all along.
+
 **`winfo pointerxy` answered 0,0 whatever the pointer was doing.**
 `TkGetPointerCoords` in `tkPlan9Wm.c` was a stub assigning 0 to both,
 sitting a few hundred lines from an `XQueryPointer` that works. It is
