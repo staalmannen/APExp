@@ -191,6 +191,84 @@ note "  moving to .one (10,10): $c"
 
 destroy .one
 catch {destroy .two}
+settle
+
+note ""
+note "--- 5. destroy a nested FRAME under the pointer (event-9.11's shape) ---"
+# Section 3 destroys a TOPLEVEL and passes; event-9.1 is that case and it
+# passes in the suite too. event-9.11/9.12/9.17 destroy a nested FRAME
+# and report NO CROSSING AT ALL -- the result is the bare "|" separator,
+# not a wrong %d detail:
+#
+#	---- Result was:                 |
+#	---- Result should have been:    |<Enter> NotifyInferior .one.f1|
+#
+# so the interesting question is which of the two inputs to
+# GenerateEnterLeave is wrong. It generates nothing when the window it is
+# handed EQUALS the one it already believes the pointer is in, and
+# TkPointerDeadWindow has just set that to NULL (TkGetContainer of a
+# non-embedded window is NULL) -- so "nothing at all" is what you get
+# when Tk_CoordsToWindow also answers NULL.
+#
+# Hence: print the hit test on both sides of the destroy, and the
+# crossings separately. It is NOT a generic Tk bug -- this tree's
+# tkPointer.c is byte-identical to upstream's apart from int/bool.
+#
+# The geometry is event.test's create_and_pack_frames, copied exactly,
+# because it is load-bearing: .f1 is 200x200 anchored SE inside .one's
+# 300x300, so screen (200,200)-(400,400), and .f2 is 100x100 anchored SE
+# inside that, so screen (300,300)-(400,400). The warp to 250,250 in
+# .one is screen 350,350, which is inside both.
+wm geometry . +700+400
+toplevel .one
+pack propagate .one 0
+wm geometry .one 300x300+100+100
+tkwait visibility .one
+update
+frame .one.f1 -bg blue -width 200 -height 200
+pack propagate .one.f1 0
+frame .one.f1.f2 -bg yellow -width 100 -height 100
+pack .one.f1.f2 .one.f1 -side bottom -anchor se
+update idletasks
+event generate .one <Motion> -warp 1 -x 250 -y 250
+settle
+
+where .one
+where .one.f1
+where .one.f1.f2
+note "  pointer at [winfo pointerxy .] (want 350 350)"
+note "  containing 350 350 -> '[winfo containing 350 350]' (want .one.f1.f2)"
+ok {[winfo containing 350 350] eq ".one.f1.f2"} \
+    "the pointer starts in the innermost frame"
+
+crossings
+destroy .one.f1.f2
+update
+settle
+set c [crossings]
+note "  containing 350 350 after destroy -> '[winfo containing 350 350]'\
+ (want .one.f1)"
+note "  crossings: $c"
+ok {[winfo containing 350 350] eq ".one.f1"} \
+    "the hit test finds the parent frame once the child is gone"
+ok {[lsearch -glob $c "Enter .one.f1 *"] >= 0} \
+    "<Enter> arrives on the parent frame"
+ok {[lsearch -glob $c "Enter .one.f1 NotifyInferior"] >= 0} \
+    "and its detail is NotifyInferior"
+
+note ""
+note "  now the second step, which is event-9.17:"
+crossings
+destroy .one.f1
+update
+settle
+set c [crossings]
+note "  containing 350 350 -> '[winfo containing 350 350]' (want .one)"
+note "  crossings: $c"
+ok {[lsearch -glob $c "Enter .one NotifyInferior"] >= 0} \
+    "<Enter> NotifyInferior arrives on .one"
+
+destroy .one
 
 puts "$fail failure(s)"
 flush stdout

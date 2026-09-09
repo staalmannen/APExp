@@ -626,6 +626,26 @@ P9ReportConfigure(Display *display, Window w, P9Window *pw)
     TkP9EnqueueEvent(&ev);
 }
 
+/*
+ * A configure request that changes nothing reports nothing.
+ *
+ * X generates a ConfigureNotify when a window is *actually*
+ * reconfigured; moving a window to where it already is is silent. That
+ * is not a detail -- Tk counts these events, and code that relays out on
+ * <Configure> is written expecting one per real change.
+ *
+ * geometry-4.7 is the case. Tk_MaintainGeometry registers a placed
+ * window with EVERY master between it and its parent, so moving .f
+ * runs the callback more than once and .b1 is moved to the same place
+ * each time after the first. The test wants
+ *
+ *	init configure |
+ *
+ * and got "init configure configure |". WmUpdateGeometry in
+ * tkPlan9Wm.c already carries this rule, for the same reason and
+ * against a worse symptom: without it, resize -> Configure ->
+ * re-request loops.
+ */
 int
 XResizeWindow(Display *display, Window w,
               unsigned int width, unsigned int height)
@@ -635,6 +655,8 @@ XResizeWindow(Display *display, Window w,
     if (!pw) return 0;
     if ((int)width  < 1) width  = 1;
     if ((int)height < 1) height = 1;
+    if (pw->width == (int)width && pw->height == (int)height)
+	return 0;
     pw->width  = (int)width;
     pw->height = (int)height;
     P9ReportConfigure(display, w, pw);
@@ -647,6 +669,8 @@ XMoveWindow(Display *display, Window w, int x, int y)
     P9Window *pw = TkP9FindWindow(w);
     (void)display;
     if (!pw) return 0;
+    if (pw->x == x && pw->y == y)
+	return 0;
     pw->x = x; pw->y = y;
     P9ReportConfigure(display, w, pw);
     return 0;
@@ -657,11 +681,16 @@ XMoveResizeWindow(Display *display, Window w,
                   int x, int y, unsigned int width, unsigned int height)
 {
     P9Window *pw = TkP9FindWindow(w);
+    int nw, nh;
     (void)display;
     if (!pw) return 0;
+    nw = (int)width  > 0 ? (int)width  : 1;
+    nh = (int)height > 0 ? (int)height : 1;
+    if (pw->x == x && pw->y == y && pw->width == nw && pw->height == nh)
+	return 0;
     pw->x = x; pw->y = y;
-    pw->width  = (int)width  > 0 ? (int)width  : 1;
-    pw->height = (int)height > 0 ? (int)height : 1;
+    pw->width  = nw;
+    pw->height = nh;
     P9ReportConfigure(display, w, pw);
     return 0;
 }
