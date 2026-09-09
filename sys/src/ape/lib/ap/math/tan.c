@@ -1,70 +1,41 @@
+/* origin: FreeBSD /usr/src/lib/msun/src/s_tan.c */
 /*
-	floating point tangent
-
-	A series is used after range reduction.
-	Coefficients are #4285 from Hart & Cheney. (19.74D)
+ * ====================================================
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
+ * ====================================================
  */
 
-#include <math.h>
-#include <errno.h>
+#include "libm.h"
 
-static double invpi	  = 1.27323954473516268;
-static double p0	 = -0.1306820264754825668269611177e+5;
-static double p1	  = 0.1055970901714953193602353981e+4;
-static double p2	 = -0.1550685653483266376941705728e+2;
-static double p3	  = 0.3422554387241003435328470489e-1;
-static double p4	  = 0.3386638642677172096076369e-4;
-static double q0	 = -0.1663895238947119001851464661e+5;
-static double q1	  = 0.4765751362916483698926655581e+4;
-static double q2	 = -0.1555033164031709966900124574e+3;
-
-double
-tan(double arg)
+double tan(double x)
 {
-	double sign, temp, e, x, xsq;
-	int flag, i;
+	double y[2];
+	uint32_t ix;
+	unsigned n;
 
-	flag = 0;
-	sign = 1;
-	if(arg < 0){
-		arg = -arg;
-		sign = -1;
-	}
-	arg = arg*invpi;   /* overflow? */
-	x = modf(arg, &e);
-	i = e;
-	switch(i%4) {
-	case 1:
-		x = 1 - x;
-		flag = 1;
-		break;
+	GET_HIGH_WORD(ix, x);
+	ix &= 0x7fffffff;
 
-	case 2:
-		sign = - sign;
-		flag = 1;
-		break;
-
-	case 3:
-		x = 1 - x;
-		sign = - sign;
-		break;
-
-	case 0:
-		break;
-	}
-
-	xsq = x*x;
-	temp = ((((p4*xsq+p3)*xsq+p2)*xsq+p1)*xsq+p0)*x;
-	temp = temp/(((xsq+q2)*xsq+q1)*xsq+q0);
-
-	if(flag == 1) {
-		if(temp == 0) {
-			errno = EDOM;
-			if (sign > 0)
-				return HUGE_VAL;
-			return -HUGE_VAL;
+	/* |x| ~< pi/4 */
+	if (ix <= 0x3fe921fb) {
+		if (ix < 0x3e400000) {  /* |x| < 2**-27 */
+			/* raise inexact if x!=0 and underflow if subnormal */
+			FORCE_EVAL(ix < 0x00100000 ? x/0x1p120f : x+0x1p120f);
+			return x;
 		}
-		temp = 1/temp;
+		return __tan(x, 0.0, 0);
 	}
-	return sign*temp;
+
+	/* tan(Inf or NaN) is NaN */
+	if (ix >= 0x7ff00000)
+		return x - x;
+
+	/* argument reduction */
+	n = __rem_pio2(x, y);
+	return __tan(y[0], y[1], n&1);
 }

@@ -151,8 +151,8 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `compound-literal-test.c`, `designated-init-test.c`, `charptr-test.c`,
 `rol64-test.c` and `u64float-test.c`, and for libap `locale-test.c`,
 `sigset-test.c`, `posix-spawn-test.c`, `limits-test.c`,
-`format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c` and
-`stdio-test.c`. The three `tk-*.tcl` scripts there are Tcl, run with
+`format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
+`sincos-test.c` and `stdio-test.c`. The three `tk-*.tcl` scripts there are Tcl, run with
 `wish`; see the Tk section below. `sys/src/ape/lib/libressl/test/` is separate: it is
 upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
 
@@ -428,6 +428,108 @@ in `struct __locale_map`); the limit for names kept here is `LCNAMEMAX`.
 Covered by `sys/lib/tests/locale-test.c`. Every case in it is required
 of any conforming `setlocale`, so it passes on glibc, which is how it
 and the implementation were both checked.
+
+### math/ — sin, cos and tan were Plan 9's, and cos(0) was not 1
+
+`sin.c` was Plan 9's libc: a Hart & Cheney rational approximation from
+1980 with a crude argument reduction, defining `sin` **and** `cos`.
+Every musl helper it should have been using was already in the tree and
+unreachable -- `__sin.c`, `__cos.c`, `__tan.c`, `__rem_pio2.c`,
+`__rem_pio2_large.c`, and musl's own `sincos.c` -- because only the
+double `sin`/`cos`/`tan` entry points were missing. They are musl's now.
+
+It was wrong in two separate ways.
+
+**It never returned exactly 1 for cos(0).** Plan 9's `cos` is
+`sinus(x, 1)`, which shifts the quadrant and evaluates the polynomial at
+the *end* of its interval instead of taking a shortcut for a tiny
+argument:
+
+```
+cos(0.0) = 0.99999999999999956
+```
+
+Two ulp, and invisible in almost everything. Tk's canvas rotates every
+text item by its `-angle` with
+
+```c
+Tk_PointToChar(layout, (int)(x*cs - y*s), (int)(y*cs + x*s));
+```
+
+and for an unrotated item `cs` is `cos(0)`. `(int)(12 * 0.999...956)` is
+**11**, so `canvas index @x,y` was one pixel out everywhere and
+`font-28.*`/`font-30.*` asked which character sat at the start of line 2
+and were told line 1 -- 13 tests. **An exactness bug is not a rounding
+bug**: truncation turns 2 ulp into a whole pixel, and that is the shape
+to expect when a tiny error has a visible effect.
+
+**The argument reduction fell apart away from zero**, which is the more
+serious half. Against glibc:
+
+| x | cos error, old | new |
+|---|---|---|
+| pi/2 | 5e15 ulp | 0 |
+| 100 | 44 ulp | 0 |
+| 1e6 | 162415 ulp | 0 |
+| 1e15 | 4e14 ulp | 1 |
+
+`cos(1e6)` had five wrong decimal digits and `cos(1e15)` no correct ones,
+because the reduction was done in double alone (`x > 32764` fell back to
+two `modf` calls). Anything doing trigonometry on a large angle -- a plot
+axis, an accumulated phase, a time in seconds -- was quietly getting
+noise. **Anything that called sin, cos or tan and was built before this
+is suspect**, the same warning as the 6c spill and the `bool` fix.
+
+Covered by `sys/lib/tests/sincos-test.c`. Every case in it is required of
+any conforming libm, so it passes on glibc -- which is how both it and
+the replacement were checked, by building the new files on the host and
+diffing them against glibc ulp for ulp.
+
+**The inverse functions were worse, and are musl's now too.** Measuring
+the whole directory the same way -- building each file on the host and
+diffing against glibc over its domain -- gave:
+
+| | old | new |
+|---|---|---|
+| `atan` | 1.4e11 ulp | 1 |
+| `acos` | 3029 ulp | 1 |
+| `asin` | 12 ulp | 1 |
+
+`atan(-1.02)` had six correct digits. `asin.c` defined `acos` as well,
+which is why both moved together.
+
+**`atan2` stays Plan 9's**, and deliberately: it only works out the
+quadrant and calls `atan`, so with the new `atan` under it it measures
+1 ulp. A musl `atan2` written for it measured worse and was dropped --
+see the harness note below.
+
+**What is still Plan 9's, with its measured error**, so the next person
+knows where to look rather than re-deriving it:
+
+| | max error vs glibc | note |
+|---|---|---|
+| `erfc` | 4e6 ulp | far tail only, value ~1e-17 |
+| `exp` | 430 ulp | at \|x\| near 700; 3 ulp on [-1,1] |
+| `log2`, `log10` | 2 ulp | **and not exact**: `log2(8)` is 2.9999999999999996, `log10(100)` is 1.9999999999999998 -- the same truncation trap as `cos(0)`, so `(int)log2(8)` is 2 |
+| `pow` | 6 ulp | |
+| `tanh` | 4 ulp | |
+| `erf`, `sinh` | 2-3 ulp | |
+| `log`, `sqrt`, `hypot`, `atan2` | 1-2 ulp | fine |
+
+musl's `exp_data.c`, `log_data.c`, `log2_data.c` and `pow_data.c` are
+already in the tree **and already in the mkfile**, compiled and unused,
+because only the double entry points are Plan 9's -- exactly the
+situation `sin`/`cos`/`tan` were in. Replacing `exp`, `log`, `log2`,
+`log10` and `pow` is therefore mostly a matter of writing the dispatch.
+
+**Measure before replacing, and give the harness a prototype.** Building
+these on the host against glibc is what settled every one of the numbers
+above, and it twice reported a function as catastrophically broken when
+the fault was the harness: renaming `atan` to `n_atan` with a `#define`
+placed *after* `<math.h>` leaves the call inside `atan2.c` with **no
+prototype in scope**, so it returns `int`. That is the same trap as
+`sizeof` and the variadic sentinel above, met from the other side -- and
+it nearly cost a good `atan2` on both sides of the comparison.
 
 ### math/ — missing declarations added to math.h
 

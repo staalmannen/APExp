@@ -4,8 +4,6 @@ APE=$APEXPROOT/sys/src/ape
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 OFILES=\
 # original APE \
-	asin.$O\
-	atan.$O\
 	atan2.$O\
 	erf.$O\
 	exp.$O\
@@ -23,13 +21,17 @@ OFILES=\
 	log.$O\
 	nan.$O\
 	pow.$O\
-	sin.$O\
 	sinh.$O\
 	sqrt.$O\
-	tan.$O\
 	tanh.$O\
 # musl \
 	__cos.$O\
+	acos.$O\
+	asin.$O\
+	atan.$O\
+	cos.$O\
+	sin.$O\
+	tan.$O\
 	__cosdf.$O\
 	__cosl.$O\
 	__expo2.$O\

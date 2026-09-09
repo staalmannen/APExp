@@ -1,4 +1,4 @@
-/* origin: FreeBSD /usr/src/lib/msun/src/e_asin.c */
+/* origin: FreeBSD /usr/src/lib/msun/src/e_acos.c */
 /*
  * ====================================================
  * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
@@ -9,13 +9,28 @@
  * is preserved.
  * ====================================================
  */
+/* acos(x)
+ * Method:
+ *	acos(x)  = pi/2 - asin(x)
+ *	acos(-x) = pi/2 + asin(x)
+ * For |x| <= 0.5
+ *	acos(x) = pi/2 - (x + x*x^2*R(x^2))
+ * For x > 0.5
+ *	acos(x) = pi/2 - (pi/2 - 2asin(sqrt((1-x)/2)))
+ *		= 2asin(sqrt((1-x)/2))
+ *		= 2s + 2s*z*R(z)	...z=(1-x)/2, s=sqrt(z)
+ *		= 2f + (2c + 2s*z*R(z))
+ *	where f=hi part of s, and c = (z-f*f)/(s+f) is the correction.
+ * For x < -0.5
+ *	acos(x) = pi - 2asin(sqrt((1-|x|)/2))
+ *		= pi - 0.5*(s+s*z*R(z)), where z=(1-|x|)/2, s=sqrt(z)
+ */
 
 #include "libm.h"
 
 static const double
 pio2_hi = 1.57079632679489655800e+00, /* 0x3FF921FB, 0x54442D18 */
 pio2_lo = 6.12323399573676603587e-17, /* 0x3C91A626, 0x33145C07 */
-/* coefficients for R(x^2) */
 pS0 =  1.66666666666666657415e-01, /* 0x3FC55555, 0x55555555 */
 pS1 = -3.25565818622400915405e-01, /* 0xBFD4D612, 0x03EB6F7D */
 pS2 =  2.01212532134862925881e-01, /* 0x3FC9C155, 0x0E884455 */
@@ -35,9 +50,9 @@ static double R(double z)
 	return p/q;
 }
 
-double asin(double x)
+double acos(double x)
 {
-	double z,r,s;
+	double z,w,s,c,df;
 	uint32_t hx,ix;
 
 	GET_HIGH_WORD(hx, x);
@@ -45,34 +60,35 @@ double asin(double x)
 	/* |x| >= 1 or nan */
 	if (ix >= 0x3ff00000) {
 		uint32_t lx;
-		GET_LOW_WORD(lx, x);
-		if ((ix-0x3ff00000 | lx) == 0)
-			/* asin(1) = +-pi/2 with inexact */
-			return x*pio2_hi + 0x1p-120f;
+
+		GET_LOW_WORD(lx,x);
+		if ((ix-0x3ff00000 | lx) == 0) {
+			/* acos(1)=0, acos(-1)=pi */
+			if (hx >> 31)
+				return 2*pio2_hi + 0x1p-120f;
+			return 0;
+		}
 		return 0/(x-x);
 	}
 	/* |x| < 0.5 */
 	if (ix < 0x3fe00000) {
-		/* if 0x1p-1022 <= |x| < 0x1p-26, avoid raising underflow */
-		if (ix < 0x3e500000 && ix >= 0x00100000)
-			return x;
-		return x + x*R(x*x);
+		if (ix <= 0x3c600000)  /* |x| < 2**-57 */
+			return pio2_hi + 0x1p-120f;
+		return pio2_hi - (x - (pio2_lo-x*R(x*x)));
 	}
-	/* 1 > |x| >= 0.5 */
-	z = (1 - fabs(x))*0.5;
+	/* x < -0.5 */
+	if (hx >> 31) {
+		z = (1.0+x)*0.5;
+		s = sqrt(z);
+		w = R(z)*s-pio2_lo;
+		return 2*(pio2_hi - (s+w));
+	}
+	/* x > 0.5 */
+	z = (1.0-x)*0.5;
 	s = sqrt(z);
-	r = R(z);
-	if (ix >= 0x3fef3333) {  /* if |x| > 0.975 */
-		x = pio2_hi-(2*(s+s*r)-pio2_lo);
-	} else {
-		double f,c;
-		/* f+c = sqrt(z) */
-		f = s;
-		SET_LOW_WORD(f,0);
-		c = (z-f*f)/(s+f);
-		x = 0.5*pio2_hi - (2*s*r - (pio2_lo-2*c) - (0.5*pio2_hi-2*f));
-	}
-	if (hx >> 31)
-		return -x;
-	return x;
+	df = s;
+	SET_LOW_WORD(df,0);
+	c = (z-df*df)/(s+df);
+	w = R(z)*s+c;
+	return 2*(df+w);
 }
