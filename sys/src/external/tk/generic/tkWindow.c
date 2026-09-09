@@ -1342,7 +1342,15 @@ Tk_CreateWindowFromPath(
  *--------------------------------------------------------------
  */
 
-#if defined(MAC_OSX_TK) || defined(_WIN32)
+/*
+ * PLAN9 belongs in this list for the same reason Windows and the Mac do:
+ * the condition is not the operating system, it is "there is no X server
+ * to generate the crossing events when a window under the pointer is
+ * destroyed". This port drives generic/tkPointer.c exactly as those two
+ * do (see TkP9UpdatePointer), so it needs this hook for the same reason
+ * -- and without it the whole event-9.1* family got no <Enter> at all.
+ */
+#if defined(MAC_OSX_TK) || defined(_WIN32) || defined(PLAN9)
 static void SendEnterLeaveForDestroy(
     Tk_Window tkwin)
 {
