@@ -6,7 +6,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-09 14:50:04 +0200
+Tests began at 2026-09-09 15:40:36 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -154,36 +154,6 @@ expected integer but got "xyz"
 
 entry.test
 event.test
-
-
-==== event-9.1 enter . window by destroying a toplevel - bug b1d115fa60 FAILED
-==== Contents of test case:
-
-    wm geometry . 200x200+300+300
-    wm deiconify .
-    pause 200
-    toplevel .top2 -width 200 -height 200
-    wm geometry .top2 +[expr {[winfo rootx .]+50}]+[expr {[winfo rooty .]+50}]
-    update idletasks
-    wm deiconify .top2
-    update idletasks
-    raise .top2
-    pause 400
-    event generate .top2 <Motion> -warp 1 -x 50 -y 50
-    pause 100
-    bind . <Enter> {lappend res %W}
-    set res [list ]
-    destroy .top2
-    update idletasks
-    pause 200
-    set res
-
----- Result was:
-
----- Result should have been (exact matching):
-.
-==== event-9.1 FAILED
-
 
 
 ==== event-9.11 pointer window container = parent FAILED
