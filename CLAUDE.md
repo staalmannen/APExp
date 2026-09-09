@@ -1724,8 +1724,8 @@ character put line breaks mid-word and in the wrong place for tabs
 
 ### Tk on Plan 9: what the remaining test failures are, and which are ours
 
-The suite is at **32 failing tests** (`wish all.tcl`; note `grep -c
-FAILED` counts two lines each, so 64 lines). **20 of the 32 are known
+The suite is at **26 failing tests** (`wish all.tcl`; note `grep -c
+FAILED` counts two lines each, so 52 lines). **25 of those are known
 not to be the Plan 9 backend's**, and are worth recording so they are
 not chased again:
 
@@ -1838,12 +1838,22 @@ to name -- it builds into the repo tree and overlays it with a union
 mount -- so every one of those paths would be a fabrication, and
 `tcl_findLibrary` is what actually locates the scripts at runtime.
 
-That is 20 of the 32 accounted for. The rest that are ours and still
-open: `frame-14.1` (a label 4 pixels too wide, so font measurement),
-`geometry-4.7` (one `<Configure>` too many from `Tk_MaintainGeometry`)
-and `event-9.11..13` alongside the two documented above.
+**`frame-14.1` is the discrete font sizes**, and it is arithmetic rather
+than a guess. `tkFrame.c:1243` gives a labelframe a minimum width of
+`labelReqWidth + 2*(borderWidth + LABELMARGIN)` -- 12 with the defaults
+-- and the test's content is 50x50 inside a 2-pixel border, so 54 is the
+answer whenever the label needs no more than 42. `.l` is
+`label .l -text Mupp -font {helvetica 8}`, and here it asks for 46: the
+string is **four pixels wider** than on X, one per character, because
+Plan 9 bitmap fonts come in whole sizes and the nearest to 8 points is
+not 8 points. Nothing to fix without a scalable font.
 
-`canvas-23.*` **was** ours and is fixed -- see the image and rectangle
+That is 25 of the 26 accounted for. The **one** still ours and open is
+`event-9.11..13` -- the same generic-Tk `%d` detail as 9.14 and 9.17
+above, so all five are really one item.
+
+`canvas-23.*`, `geometry-4.7`, `listbox-4.7`, `bind-13.14`, `embed-1.1`
+and `fontchooser-2.0/2.1` **were** ours and are fixed -- see the
 sections below.
 
 ### Tk on Plan 9: the image path was a stub in both directions
@@ -2040,6 +2050,28 @@ hundred times too large. `Tk_UnsetGrid` converts back.
 Note `wm minsize`/`maxsize` are also in grid units on X and are still
 clamped as pixels here; inert today, since the defaults are 1 and
 unlimited.
+
+### Tk on Plan 9: a configure that changes nothing must report nothing
+
+`XMoveWindow`, `XResizeWindow` and `XMoveResizeWindow` sent a
+ConfigureNotify unconditionally. X generates one when a window is
+*actually* reconfigured -- moving a window to where it already is is
+silent -- and that is not a detail, because **Tk counts these events**
+and everything that relays out on `<Configure>` is written expecting one
+per real change.
+
+`geometry-4.7` is the case, and it shows why the redundant events are
+not rare: `Tk_MaintainGeometry` registers a placed window with **every**
+master between it and its parent, so one `place .f -x 25 -y 35` runs the
+callback several times and moves `.b1` to the same place each time after
+the first. The test wants `init configure |` and got
+`init configure configure |`.
+
+`WmUpdateGeometry` in `tkPlan9Wm.c` already carried this rule, and
+against a worse symptom -- without it, resize -> Configure ->
+re-request loops -- so the fix is the same guard at the three X entry
+points. `XConfigureWindow` sends no ConfigureNotify at all and is left
+alone.
 
 ### Syntax-check Tk's Plan 9 backend on the host before shipping it
 
