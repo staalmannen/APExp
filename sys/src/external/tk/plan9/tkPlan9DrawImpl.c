@@ -292,10 +292,34 @@ tkp9_drawrect(void *dst, int x, int y, int w, int h, int bw,
               unsigned long rgba)
 {
     Image *d = dstimage(dst), *src;
+
     if(!d || bw < 1) return;
     src = colorimage(rgba);
     if(!src) return;
-    border(d, dstrect(d, x, y, w, h), bw, src, ZP);
+    /*
+     * A rectangle with zero width or height is NOT empty to X. The
+     * outline is a closed path through the four corners, so it
+     * degenerates to a line -- and Tk's canvas relies on that:
+     *
+     *	.c create rectangle 0 0 0 9	a one-pixel column
+     *	.c create rectangle 0 0 9 0	a one-pixel row
+     *
+     * are canvas-23.1 and canvas-23.3. Plan 9's border() takes the
+     * empty rectangle dstrect() makes of those and draws nothing, so
+     * they came out as bare background. canvas-23.2 is the same test
+     * with width 1 and it passed throughout, which is what pinned this
+     * to the degenerate case rather than to colour or to the image path.
+     *
+     * X's outline runs corner to corner inclusive, covering w+1 by h+1
+     * pixels, so the line is one longer than the width or height asked
+     * for -- which is what makes canvas-23.3's row span all ten columns
+     * of a rectangle nine wide.
+     */
+    if(w <= 0 || h <= 0)
+        draw(d, dstrect(d, x, y, w > 0? w + 1: bw, h > 0? h + 1: bw),
+             src, nil, ZP);
+    else
+        border(d, dstrect(d, x, y, w, h), bw, src, ZP);
     freeimage(src);
 }
 
