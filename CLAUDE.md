@@ -1393,6 +1393,24 @@ against. A wrong entry costs size accuracy and nothing else.
 Tk uses it to skip measuring character by character, so claiming it for
 a proportional font mislays every string.
 
+**`font actual` reports what was resolved, not what was asked for.**
+`tkUnixFont.c` reports the family of the X font it actually found, and
+code relies on that: font.test asks
+
+```tcl
+if {[font actual {avantgarde 12 roman normal} -family] eq "avantgarde"}
+```
+
+to decide whether the machine really has that family, and took the wrong
+branch while every request answered with its own name. There are three
+families here -- courier, times, helvetica -- whatever was requested.
+
+The **size is reported in points**, which is what makes `font actual
+-size` depend on `tk scaling`: Tk stores a negative size as pixels, so at
+scaling 0.5 a request for `-13` pixels is 26 points (font-44.1).
+`TkFontGetPixels` on the way in, `TkFontGetPoints` on the way out, as
+`tkUnixFont.c` does.
+
 ### Tk on Plan 9: stacking order, and the two coordinate spaces
 
 Three separate things were missing here, and they hide each other:
