@@ -1780,11 +1780,11 @@ Covered by `sys/lib/tests/fparith-test.c`.
 
 ### The sign of zero was dropped everywhere (FIXED)
 
-The fourth of that family, and the widest: **six** separate places, each
-one a test of the form `x == 0` or `x < 0` written by someone who did
-not have two zeros in mind. `-0.0` compares equal to `0.0` and is not
-less than it, so every ordinary test misses it and every one of these
-was silent.
+The fourth of that family, and the widest: **seven** separate places,
+each one a test of the form `x == 0` or `x < 0` written by someone who
+did not have two zeros in mind. `-0.0` compares equal to `0.0` and is
+not less than it, so every ordinary test misses it and every one of
+these was silent.
 
 **Negation was `0 - x`.** x86-64 has no scalar floating-point negate, and
 `cc/com.c` rewrites `-x` as `0 - x` whenever the back end says it cannot
@@ -1803,15 +1803,23 @@ aligned and the memory form of those instructions wants sixteen.
 `AXORPD` (`gmove` uses it to make a zero); `reg.c`'s default arm is
 `diag("reg: unknown op")`, so a missing entry is at least loud.
 
-Four more places lost the sign on the way out, and they are the reason
+Five more places lost the sign on the way out, and they are the reason
 fixing the negation alone was not enough:
 
 | | |
 |---|---|
 | `cc/scon.c` | `evconst` folded `-x` with a runtime negation, so it inherited the bug from the compiler compiling it |
 | `cc/pswt.c`, `1c`+`2c` `swt.c` | `ieeedtod` tested `native < 0` before `native == 0` |
+| `cc/dcl.c` | `init1` skips a **zero** static initialiser, since BSS is already zero -- and `vconst()` answers 0 for `-0.0`, because it truncates to an `int` |
 | `6c/txt.c` | `gmove` made any zero constant with `XORPD` of a register against itself, which is `+0.0` |
 | every `*l/obj.c` | `ieeedtof` took `-0.0` for a denormal and said `double fp to single fp overflow` |
+
+The `dcl.c` one is the one to remember, because it is the shape that
+survives every fix upstream of it: the value was folded correctly, and
+then **discarded as a zero** rather than written wrongly. `static double
+negzero = -0.0;` was the last case still failing after the other six
+were fixed, and it fails on its own -- a file-scope initialiser never
+goes through `com.c` or `cgen.c` at all.
 
 **`fpnegzero()` and `fpnegzeroval()` are in `cc/sub.c`**, so they are in
 `cc.a` and every back end has them -- `1c` and `2c` do not build
