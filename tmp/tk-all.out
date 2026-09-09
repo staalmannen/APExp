@@ -6,7 +6,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-09 12:06:42 +0200
+Tests began at 2026-09-09 12:53:00 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -187,66 +187,6 @@ entry.test
 event.test
 
 
-==== event-9.1 enter . window by destroying a toplevel - bug b1d115fa60 FAILED
-==== Contents of test case:
-
-    wm geometry . 200x200+300+300
-    wm deiconify .
-    pause 200
-    toplevel .top2 -width 200 -height 200
-    wm geometry .top2 +[expr {[winfo rootx .]+50}]+[expr {[winfo rooty .]+50}]
-    update idletasks
-    wm deiconify .top2
-    update idletasks
-    raise .top2
-    pause 400
-    event generate .top2 <Motion> -warp 1 -x 50 -y 50
-    pause 100
-    bind . <Enter> {lappend res %W}
-    set res [list ]
-    destroy .top2
-    update idletasks
-    pause 200
-    set res
-
----- Result was:
-
----- Result should have been (exact matching):
-.
-==== event-9.1 FAILED
-
-
-
-==== event-9.2 enter toplevel window by destroying a toplevel - bug b1d115fa60 FAILED
-==== Contents of test case:
-
-    toplevel .top1
-    wm geometry .top1 200x200+300+300
-    wm deiconify .top1
-    pause 200
-    toplevel .top2 -width 200 -height 200
-    wm geometry .top2 +[expr {[winfo rootx .top1]+50}]+[expr {[winfo rooty .top1]+50}]
-    pause 200
-    wm deiconify .top2
-    update idletasks
-    raise .top2
-    pause 400
-    event generate .top2 <Motion> -warp 1 -x 50 -y 50
-    pause 100
-    bind .top1 <Enter> {lappend res %W}
-    set res [list ]
-    destroy .top2
-    pause 200
-    set res
-
----- Result was:
-
----- Result should have been (exact matching):
-.top1
-==== event-9.2 FAILED
-
-
-
 ==== event-9.11 pointer window container = parent FAILED
 ==== Contents of test case:
 
@@ -274,7 +214,7 @@ event.test
     set result
 
 ---- Result was:
-|
+|<Leave> NotifyInferior .one|<Enter> NotifyVirtual .one.f1|<Enter> NotifyAncestor .one.f1.f2|
 ---- Result should have been (exact matching):
 |<Enter> NotifyNonlinearVirtual .one.f1|<Enter> NotifyNonlinear .one.f1.f2|
 ==== event-9.12 FAILED
@@ -292,7 +232,7 @@ event.test
     set result
 
 ---- Result was:
-|
+|<Enter> NotifyAncestor .one|
 ---- Result should have been (exact matching):
 |<Enter> NotifyNonlinear .one|
 ==== event-9.13 FAILED
@@ -309,27 +249,10 @@ event.test
     set result
 
 ---- Result was:
-|
+|<Enter> NotifyVirtual .one|<Enter> NotifyVirtual .one.f1|<Enter> NotifyAncestor .one.f1.f2|
 ---- Result should have been (exact matching):
 |<Enter> NotifyNonlinearVirtual .one|<Enter> NotifyNonlinearVirtual .one.f1|<Enter> NotifyNonlinear .one.f1.f2|
 ==== event-9.14 FAILED
-
-
-
-==== event-9.16 Successive destructions (pointer window + parent), single generation of crossing events FAILED
-==== Contents of test case:
-
-    bind all <Leave> {append result "<Leave> %d %W|"}
-    bind all <Enter> {append result "<Enter> %d %W|"}
-    destroy .one.f1
-    update
-    set result
-
----- Result was:
-|
----- Result should have been (exact matching):
-|<Enter> NotifyInferior .one|
-==== event-9.16 FAILED
 
 
 
@@ -349,41 +272,6 @@ event.test
 ---- Result should have been (exact matching):
 |<Enter> NotifyInferior .one.f1|<Enter> NotifyInferior .one|
 ==== event-9.17 FAILED
-
-
-
-==== event-9.18 Successive destructions (pointer window + ancestors including its toplevel), destination is non-root toplevel FAILED
-==== Contents of test case:
-
-    bind all <Leave> {append result "<Leave> %d %W|"}
-    bind all <Enter> {append result "<Enter> %d %W|"}
-    destroy .two
-    waitForWindowEvent .one <Enter>
-    set result
-
----- Result was:
-|
----- Result should have been (exact matching):
-|<Enter> NotifyNonlinear .one|
-==== event-9.18 FAILED
-
-
-
-==== event-9.19 Successive destructions (pointer window + ancestors including its toplevel), destination is internal window, bypass root win FAILED
-==== Contents of test case:
-
-    bind all <Leave> {append result "<Leave> %d %W|"}
-    bind all <Enter> {append result "<Enter> %d %W|"}
-    destroy .three
-    waitForWindowEvent .two.f1.f2 <Enter>
-    update idletasks; #finish destroying .two
-    set result
-
----- Result was:
-|
----- Result should have been (exact matching):
-|<Enter> NotifyNonlinearVirtual .two|<Enter> NotifyNonlinearVirtual .two.f1|<Enter> NotifyNonlinear .two.f1.f2|
-==== event-9.19 FAILED
 
 filebox.test
 
