@@ -130,15 +130,33 @@ if {[catch {open /dev/mouse r+} f]} {
 }
 
 # 3. Tk's own warp, both forms. bind-34.2 is the second of these.
+#
+# The check is WHERE the pointer landed, not merely that it moved. An
+# earlier version of this script asked only whether pointerxy changed,
+# and reported PASS for
+#
+#	to a window (bind-34.1): pointerxy 407 188 -> 369 52
+#
+# with a warp target of 120,120 -- the reading had changed because a
+# hand was still on the mouse from section 1, and "it changed" is not
+# "it went where it was told". bind-34.1 itself warps twice and requires
+# the two readings to differ by exactly the amount the window moved, so
+# nothing less than the exact position is worth reporting.
+#
+# DO NOT TOUCH THE MOUSE from here on: a real report overwrites
+# gP9.lastmouse and invalidates the reading.
 note ""
-note "--- 3. event generate -warp ---"
-foreach {what cmd} {
-    "to a window (bind-34.1)"  {event generate . <Motion> -x 20 -y 20 -warp 1}
-    "to the screen (bind-34.2)" {event generate {} <Motion> -x 200 -y 200 -warp 1}
-} {
-    set before [pxy]
+note "--- 3. event generate -warp (do not touch the mouse) ---"
+set rx [winfo rootx .]
+set ry [winfo rooty .]
+foreach {what cmd wantx wanty} [list \
+    "to a window (bind-34.1)"   {event generate . <Motion> -x 20 -y 20 -warp 1} \
+        [expr {$rx + 20}] [expr {$ry + 20}] \
+    "to the screen (bind-34.2)" {event generate {} <Motion> -x 200 -y 200 -warp 1} \
+        200 200 \
+] {
     if {[catch $cmd err]} {
-	note "  $what: command FAILED: $err"
+	note "  FAIL $what: command raised: $err"
 	incr fail
 	continue
     }
@@ -146,23 +164,24 @@ foreach {what cmd} {
     update
     after 100
     update
-    set after [pxy]
-    if {$before eq $after} {
-	note "  FAIL $what: pointerxy unchanged at $after"
-	incr fail
+    set got [pxy]
+    if {$got eq [list $wantx $wanty]} {
+	note "  PASS $what: pointer is at $got"
     } else {
-	note "  PASS $what: pointerxy $before -> $after"
+	note "  FAIL $what: pointer is at $got, want $wantx $wanty"
+	incr fail
     }
 }
 
-# 4. If the warp DID move the pointer, which coordinate system did rio
-# take? The last warp above asked for screen 200,200.
+# 4. If section 3 failed with a position that is neither the target nor
+# the last place the mouse physically was, rio is not honouring the
+# write. XWarpPointer sets gP9.lastmouse itself right after the write,
+# so Tk believes the warp until the next real mouse report overwrites
+# it -- which means a warp can look right for as long as nothing moves
+# and then quietly revert.
 note ""
-note "--- 4. window-relative or screen coordinates? ---"
-note "  . is at [winfo rootx .],[winfo rooty .]"
-note "  after warping to screen 200,200 the pointer reads [pxy]"
-note "  screen-relative would read 200 200"
-note "  window-relative would read [expr {[winfo rootx .]+200}] [expr {[winfo rooty .]+200}]"
+note "--- 4. notes ---"
+note "  . is at [winfo rootx .],[winfo rooty .]; pointer reads [pxy]"
 note ""
 note "Run again with TKP9DEBUG set for the trace from inside:"
 note "    TKP9DEBUG=1 wish tk-warp-test.tcl"
