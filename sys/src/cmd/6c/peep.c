@@ -798,6 +798,7 @@ copyu(Prog *p, Adr *v, Adr *s)
 	case ASUBSD:
 	case ASUBSS:
 	case AXORPD:
+	case AXORPS:
 		if(copyas(&p->to, v))
 			return 2;
 		goto caseread;

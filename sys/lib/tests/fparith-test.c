@@ -42,6 +42,34 @@
  *    NaN. It hid well: exp(INFINITY) "passed" because exp(1.8e308)
  *    returns 1.0+x, which compares equal to that same 1.8e308.
  *
+ * 4. Negation was 0 - x, so -(+0.0) was +0.0.
+ *
+ *    x86-64 has no scalar floating-point negate, and cc/com.c rewrites
+ *    -x as 0 - x whenever the back end says it cannot do the operation
+ *    itself (machcap()). 6c's machcap() answered for the integer types
+ *    only, so every floating-point negation went through the rewrite --
+ *    and 0.0 - 0.0 is +0.0. Unary plus had the same shape, 0 + x, so
+ *    +(-0.0) was +0.0 as well.
+ *
+ *    Negation is a sign-bit flip and is now generated as one, an XORPS
+ *    or XORPD against a mask of -0.0. Three more places dropped the
+ *    sign of zero on the way to the object file, each of them a test of
+ *    the form "if(x == 0)" where the two zeros differ:
+ *
+ *	cc/scon.c   evconst folded -0.0 with a runtime negation, so it
+ *	            inherited the bug from the compiler compiling it;
+ *	cc/pswt.c   ieeedtod tested "native < 0" before "native == 0",
+ *	            and -0.0 is not less than 0;
+ *	6c/txt.c    gmove materialised any zero constant with XORPD of a
+ *	            register against itself, which gives +0.0.
+ *
+ *    and 6l's ieeedtof took -0.0 for a denormal and diagnosed "double
+ *    fp to single fp overflow".
+ *
+ *    The sign of zero is not decorative: it is what makes 1/x tell the
+ *    two infinities apart, and it is the sign of the result of every
+ *    multiplication and division that underflows.
+ *
  * Every case below is required by C99, so this passes on gcc, which is
  * how it was checked.
  */
@@ -63,6 +91,15 @@ ok(int cond, const char *what)
 /* Kept out of the expression so nothing can be folded away. */
 static double dzero(void) { return 0.0; }
 static double done(void)  { return 1.0; }
+static float  fzero(void) { return 0.0f; }
+static float  fone(void)  { return 1.0f; }
+
+/*
+ * A static initialiser is folded in dcl.c and written straight to the
+ * object file, so it never goes through com.c or cgen.c -- a separate
+ * path, and it was separately wrong.
+ */
+static double negzero = -0.0;
 
 int
 main(void)
@@ -139,18 +176,41 @@ main(void)
 	ok(isinf(1.0 / dzero()), "1.0/0.0 is infinite");
 
 	/*
-	 * The sign of zero through a call and a negation. This is not one
-	 * of the three above; it is here because it is the same family and
-	 * was still failing when they were fixed, so the next run says so
-	 * rather than leaving it to be rediscovered.
+	 * 4. The sign of zero, through every route to one: a constant, a
+	 * runtime negation, a static initialiser, unary plus, and the
+	 * library. Each went through a different piece of the compiler and
+	 * each failed separately, so they are listed separately.
 	 */
 	{
 		double z;
+		float g;
 
 		z = -0.0;
 		ok(z == 0.0 && signbit(z), "the constant -0.0 is negative zero");
+		ok(negzero == 0.0 && signbit(negzero),
+			"a static -0.0 initialiser is negative zero");
 		z = -dzero();
 		ok(z == 0.0 && signbit(z), "-(0.0) is negative zero");
+		z = -(-dzero());
+		ok(z == 0.0 && !signbit(z), "-(-(0.0)) is back to +0.0");
+
+		/* Unary plus is the value of its operand, sign and all. */
+		z = +(-0.0);
+		ok(z == 0.0 && signbit(z), "+(-0.0) is negative zero");
+
+		/* Ordinary negation must still work. */
+		ok(-done() == -1.0, "-(1.0) is -1.0");
+		ok(-(-done()) == 1.0, "-(-(1.0)) is 1.0");
+
+		/* float has its own sign bit, in its own place. */
+		g = fzero();
+		ok(-g == 0.0f && signbit(-g), "float -(0.0f) is negative zero");
+		ok(-fone() == -1.0f, "float -(1.0f) is -1.0f");
+
+		/* 1/x is how a program notices. */
+		ok(1.0 / -dzero() < 0.0, "1/-0.0 is -inf");
+		ok(1.0 / dzero() > 0.0, "1/+0.0 is +inf");
+
 		z = sin(-0.0);
 		ok(z == 0.0 && signbit(z), "sin(-0.0) is -0.0");
 	}

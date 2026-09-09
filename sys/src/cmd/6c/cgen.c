@@ -162,6 +162,38 @@ cgen(Node *n, Node *nn)
 			nullwarn(l, Z);
 			break;
 		}
+		/*
+		 * Floating-point negation flips the sign bit; it is not
+		 * 0 - x, which gives +0.0 for an argument of +0.0 and so
+		 * loses the sign of zero. com.c did that rewrite because
+		 * machcap() used to answer 0 for ONEG on a float or double.
+		 *
+		 * There is no scalar negate instruction, so this is XOR
+		 * with a mask holding nothing but the sign bit -- which is
+		 * the constant -0.0, of the same type as the operand, so
+		 * the same code covers float and double. The mask is loaded
+		 * into a register rather than used from memory: the linker
+		 * lays an FCONST literal out four or eight bytes aligned,
+		 * and the memory form of XORPS/XORPD requires sixteen.
+		 *
+		 * fpnegzeroval() assembles the mask from its bits instead
+		 * of writing -0.0, because kencc builds kencc: until the
+		 * fix has propagated through a rebuild, a -0.0 written here
+		 * would be folded to +0.0 by the compiler compiling it.
+		 */
+		if(o == ONEG && typefd[n->type->etype]) {
+			regalloc(&nod, n, nn);
+			cgen(l, &nod);
+			nod1 = *nodfconst(fpnegzeroval());
+			nod1.type = n->type;
+			regalloc(&nod2, n, Z);
+			gmove(&nod1, &nod2);
+			gins(n->type->etype == TFLOAT? AXORPS: AXORPD, &nod2, &nod);
+			regfree(&nod2);
+			gmove(&nod, nn);
+			regfree(&nod);
+			break;
+		}
 		regalloc(&nod, l, nn);
 		cgen(l, &nod);
 		gopcode(o, n->type, Z, &nod);

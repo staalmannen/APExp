@@ -1776,9 +1776,62 @@ compares equal to that same 1.8e308. `HUGE_VAL` is `Inf(1)` now, as
 `NAN` was already `NaN()` -- neither is the constant expression the
 standard asks for, and there is no way to write one here.
 
-Covered by `sys/lib/tests/fparith-test.c`, which also reports the sign
-of `-0.0` through a call: that was still failing when these three were
-fixed, and is left named rather than rediscovered.
+Covered by `sys/lib/tests/fparith-test.c`.
+
+### The sign of zero was dropped everywhere (FIXED)
+
+The fourth of that family, and the widest: **six** separate places, each
+one a test of the form `x == 0` or `x < 0` written by someone who did
+not have two zeros in mind. `-0.0` compares equal to `0.0` and is not
+less than it, so every ordinary test misses it and every one of these
+was silent.
+
+**Negation was `0 - x`.** x86-64 has no scalar floating-point negate, and
+`cc/com.c` rewrites `-x` as `0 - x` whenever the back end says it cannot
+do the operation itself -- `machcap()`. 6c's `machcap()` answered for the
+integer types only (`typechlv`), so **every** floating-point negation in
+the tree went through the rewrite, and `0.0 - 0.0` is `+0.0`. Unary plus
+is the same shape one line above, `0 + x`, so `+(-0.0)` was `+0.0` too;
+that one is now simply the operand, since floating point has no
+promotions to apply.
+
+Negation is a sign-bit flip and `6c/cgen.c` generates one: `XORPS` or
+`XORPD` against a mask of `-0.0`. The mask is loaded into a register
+first -- the linker lays an `FCONST` literal out four or eight bytes
+aligned and the memory form of those instructions wants sixteen.
+`AXORPS` had to be added to `reg.c` and `peep.c`, which knew only
+`AXORPD` (`gmove` uses it to make a zero); `reg.c`'s default arm is
+`diag("reg: unknown op")`, so a missing entry is at least loud.
+
+Four more places lost the sign on the way out, and they are the reason
+fixing the negation alone was not enough:
+
+| | |
+|---|---|
+| `cc/scon.c` | `evconst` folded `-x` with a runtime negation, so it inherited the bug from the compiler compiling it |
+| `cc/pswt.c`, `1c`+`2c` `swt.c` | `ieeedtod` tested `native < 0` before `native == 0` |
+| `6c/txt.c` | `gmove` made any zero constant with `XORPD` of a register against itself, which is `+0.0` |
+| every `*l/obj.c` | `ieeedtof` took `-0.0` for a denormal and said `double fp to single fp overflow` |
+
+**`fpnegzero()` and `fpnegzeroval()` are in `cc/sub.c`**, so they are in
+`cc.a` and every back end has them -- `1c` and `2c` do not build
+`pswt.c`, which is where they were first put. Both read or write the
+sign bit through a `union { double; uvlong; }` rather than writing
+`-0.0`: **kencc compiles kencc**, so a `-0.0` in the compiler's own
+source would have folded to `+0.0` and the fix would only have taken
+effect on the second rebuild. `evconst` is written the same way for the
+same reason.
+
+The sign of zero is not decorative. It is what makes `1/x` tell the two
+infinities apart, it is the sign of every underflowing product and
+quotient, and `atan2`, `copysign` and `log` all branch on it -- so
+**anything doing floating-point arithmetic near zero and built before
+this is suspect**, the same warning as the 6c spill and the `bool` fix.
+
+Covered by `sys/lib/tests/fparith-test.c`, which reaches a `-0.0` by
+each of the routes above separately -- a constant, a static initialiser,
+a runtime negation, unary plus and the library -- because they fail
+independently.
 
 ### Hex floating constants were silently zero (FIXED)
 

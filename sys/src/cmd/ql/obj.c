@@ -1362,8 +1362,13 @@ ieeedtof(Ieee *ieeep)
 	int exp;
 	long v;
 
-	if(ieeep->h == 0)
-		return 0;
+	/*
+	 * Zero, of either sign.  Testing only h == 0 missed -0.0, whose
+	 * h is 0x80000000: it went on to compute an exponent of -1022
+	 * and reported "double fp to single fp overflow".
+	 */
+	if((ieeep->h & ~0x80000000L) == 0 && ieeep->l == 0)
+		return ieeep->h & 0x80000000L;
 	exp = (ieeep->h>>20) & ((1L<<11)-1L);
 	exp -= (1L<<10) - 2L;
 	v = (ieeep->h & 0xfffffL) << 3;
