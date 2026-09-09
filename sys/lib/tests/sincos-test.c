@@ -1,5 +1,5 @@
 /*
- * sin, cos and tan: exact at zero, and correct after argument reduction.
+ * The trig family: exact at zero, and correct after argument reduction.
  *
  *	pcc -o sincos-test sincos-test.c && ./sincos-test
  *
@@ -40,6 +40,17 @@
  * Replaced by musl's, which are FreeBSD's fdlibm: sin.c, cos.c and tan.c
  * dispatch to __sin/__cos/__tan after __rem_pio2, all four of which were
  * already in the tree and unused for the double versions.
+ *
+ * Measuring the rest of ap/math the same way -- building each file on the
+ * host and diffing against glibc -- found the inverse functions were worse
+ * still, so asin, acos and atan are musl's now too:
+ *
+ *	atan   1.4e11 ulp  ->  1
+ *	acos     3029 ulp  ->  1
+ *	asin       12 ulp  ->  1
+ *
+ * atan2 stays Plan 9's: it only works out the quadrant and calls atan, and
+ * with the new atan under it, it measures 1 ulp.
  *
  * Every case below is required of any conforming libm, so this passes on
  * glibc, which is how it and the replacement were both checked.
@@ -201,6 +212,51 @@ main(void)
 		}
 		ok(good, "(int)(n * cos(0.0)) == n for n in 0..64");
 	}
+
+	/*
+	 * The inverse functions. Plan 9's atan was the worst thing in the
+	 * directory -- 1.4e11 ulp, six correct digits -- and its asin.c
+	 * defined acos as well, at 3029 ulp near 1.
+	 */
+	ok(atan(0.0) == 0.0, "atan(0.0) is exactly 0.0");
+	z = atan(-0.0);
+	ok(z == 0.0 && signbit(z), "atan(-0.0) is -0.0");
+	ok(asin(0.0) == 0.0, "asin(0.0) is exactly 0.0");
+	ok(acos(1.0) == 0.0, "acos(1.0) is exactly 0.0");
+
+	near(atan(0.5),   0x1.dac670561bb4fp-2, 1.0, "atan(0.5)");
+	near(atan(1.0),   0x1.921fb54442d18p-1, 1.0, "atan(1.0)");
+	near(atan(2.0),   0x1.1b6e192ebbe44p+0, 1.0, "atan(2.0)");
+	near(atan(-1.02),-0x1.97316882ab45ap-1, 1.0, "atan(-1.02)");
+	near(atan(0.99),  0x1.8f8d0f7321467p-1, 1.0, "atan(0.99)");
+	near(atan(100.0), 0x1.8f905eb2def22p+0, 1.0, "atan(100.0)");
+
+	near(asin(0.5),    0x1.0c152382d7366p-1, 1.0, "asin(0.5)");
+	near(asin(0.9999), 0x1.8e80e1a01556ap+0, 1.0, "asin(0.9999)");
+	near(asin(-0.75), -0x1.b235315c680dcp-1, 1.0, "asin(-0.75)");
+	near(acos(0.5),    0x1.0c152382d7366p+0, 1.0, "acos(0.5)");
+	near(acos(0.9999), 0x1.cf69d216bd74bp-7, 1.0, "acos(0.9999)");
+	near(acos(-0.75),  0x1.359d26f93b6c3p+1, 1.0, "acos(-0.75)");
+
+	/* The endpoints, which must be pi/2 and pi exactly as Tk sees them. */
+	near(asin(1.0),  0x1.921fb54442d18p+0, 0.0, "asin(1.0) is pi/2");
+	near(acos(-1.0), 0x1.921fb54442d18p+1, 0.0, "acos(-1.0) is pi");
+
+	/* Outside the domain is NaN, not a polynomial on nonsense. */
+	ok(isnan(asin(2.0)), "asin(2.0) is NaN");
+	ok(isnan(acos(-2.0)), "acos(-2.0) is NaN");
+	near(atan(INFINITY), 0x1.921fb54442d18p+0, 0.0, "atan(inf) is pi/2");
+
+	/*
+	 * atan2 is still Plan 9's -- it only picks the quadrant and calls
+	 * atan -- so these check that the quadrants are right on top of the
+	 * new atan.
+	 */
+	near(atan2(1.0, 1.0),   0x1.921fb54442d18p-1, 1.0, "atan2(1,1)");
+	near(atan2(-1.0, -1.0), -2.3561944901923448, 1.0, "atan2(-1,-1)");
+	near(atan2(1.0, -1.0),   2.3561944901923448, 1.0, "atan2(1,-1)");
+	near(atan2(1.0, 0.0),   0x1.921fb54442d18p+0, 1.0, "atan2(1,0)");
+	ok(atan2(0.0, 1.0) == 0.0, "atan2(0,1) is exactly 0.0");
 
 	printf("%d failure(s)\n", failures);
 	return failures;

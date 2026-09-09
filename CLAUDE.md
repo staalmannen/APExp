@@ -485,11 +485,51 @@ any conforming libm, so it passes on glibc -- which is how both it and
 the replacement were checked, by building the new files on the host and
 diffing them against glibc ulp for ulp.
 
-**The other Plan 9 leftovers in `ap/math` are worth the same look.**
-`sin.c` was found only because Tk truncated its result; the directory
-still has `asin.c`, `atan.c`, `atan2.c`, `exp.c`, `pow.c`, `gamma.c`,
-`hypot.c`, `j0.c` and others from the same 1980 source, sitting beside
-musl versions of their helpers.
+**The inverse functions were worse, and are musl's now too.** Measuring
+the whole directory the same way -- building each file on the host and
+diffing against glibc over its domain -- gave:
+
+| | old | new |
+|---|---|---|
+| `atan` | 1.4e11 ulp | 1 |
+| `acos` | 3029 ulp | 1 |
+| `asin` | 12 ulp | 1 |
+
+`atan(-1.02)` had six correct digits. `asin.c` defined `acos` as well,
+which is why both moved together.
+
+**`atan2` stays Plan 9's**, and deliberately: it only works out the
+quadrant and calls `atan`, so with the new `atan` under it it measures
+1 ulp. A musl `atan2` written for it measured worse and was dropped --
+see the harness note below.
+
+**What is still Plan 9's, with its measured error**, so the next person
+knows where to look rather than re-deriving it:
+
+| | max error vs glibc | note |
+|---|---|---|
+| `erfc` | 4e6 ulp | far tail only, value ~1e-17 |
+| `exp` | 430 ulp | at \|x\| near 700; 3 ulp on [-1,1] |
+| `log2`, `log10` | 2 ulp | **and not exact**: `log2(8)` is 2.9999999999999996, `log10(100)` is 1.9999999999999998 -- the same truncation trap as `cos(0)`, so `(int)log2(8)` is 2 |
+| `pow` | 6 ulp | |
+| `tanh` | 4 ulp | |
+| `erf`, `sinh` | 2-3 ulp | |
+| `log`, `sqrt`, `hypot`, `atan2` | 1-2 ulp | fine |
+
+musl's `exp_data.c`, `log_data.c`, `log2_data.c` and `pow_data.c` are
+already in the tree **and already in the mkfile**, compiled and unused,
+because only the double entry points are Plan 9's -- exactly the
+situation `sin`/`cos`/`tan` were in. Replacing `exp`, `log`, `log2`,
+`log10` and `pow` is therefore mostly a matter of writing the dispatch.
+
+**Measure before replacing, and give the harness a prototype.** Building
+these on the host against glibc is what settled every one of the numbers
+above, and it twice reported a function as catastrophically broken when
+the fault was the harness: renaming `atan` to `n_atan` with a `#define`
+placed *after* `<math.h>` leaves the call inside `atan2.c` with **no
+prototype in scope**, so it returns `int`. That is the same trap as
+`sizeof` and the variadic sentinel above, met from the other side -- and
+it nearly cost a good `atan2` on both sides of the comparison.
 
 ### math/ — missing declarations added to math.h
 
