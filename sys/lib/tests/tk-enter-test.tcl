@@ -36,20 +36,49 @@
 # So this reports which window each Enter actually names, and asks
 # "winfo containing" separately, rather than only whether one arrived.
 #
+# WHAT IT FOUND, first run:
+#
+#	pointer now at 350 350  (want 350 350)
+#	winfo containing -> ''  (want .one)
+#	crossings:
+#
+# The warp is exact and the hit test finds nothing at a point plainly
+# inside .one -- so Tk_CoordsToWindow returned NULL, TkP9UpdatePointer
+# handed NULL to Tk_UpdatePointer, and no crossing could be generated.
+# Behind that: Tk_GetRootCoords walked the parent chain past the
+# toplevel, and a toplevel's parentPtr is its logical Tk parent, so
+# .one's position had .'s added to it. setup_win_mousepointer moves .
+# to +700+400 first, which is what made it fatal rather than merely
+# wrong. Hence the "where" proc below -- one line of geometry would
+# have pinned this without the round trip that found it.
+#
 # DO NOT TOUCH THE MOUSE while this runs.
 
 set fail 0
 
 proc note {m} { puts $m; flush stdout }
 
+# The condition is a braced expression, evaluated in the caller's scope:
+# "if {$cond}" on a braced argument gets the string, not a boolean, and
+# fails with "expected boolean value but got a list".
 proc ok {cond what} {
     global fail
-    if {$cond} {
+    if {[uplevel 1 [list expr $cond]]} {
 	note "  PASS $what"
     } else {
 	note "  FAIL $what"
 	incr fail
     }
+}
+
+# Where does Tk think a window is, and how big? Tk_GetRootCoords is the
+# thing behind "winfo rootx", and getting it wrong takes winfo
+# containing and the whole pointer machinery with it, so print it for
+# anything whose position matters.
+proc where {w} {
+    note "  $w: rootx,rooty [winfo rootx $w],[winfo rooty $w]\
+ size [winfo width $w]x[winfo height $w]\
+ mapped [winfo ismapped $w]"
 }
 
 # Collect every crossing, with the window and the detail field, the way
@@ -83,6 +112,8 @@ tkwait visibility .one
 update
 crossings
 
+where .
+where .one
 event generate .one <Motion> -warp 1 -x 250 -y 250
 settle
 set c [crossings]
