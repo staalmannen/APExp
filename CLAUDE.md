@@ -115,7 +115,7 @@ Multiple upstream libraries are **merged into libap**: lib9, libbsd, libutf, lib
 
 The Plan9 C compilers (`sys/src/cmd/[1-9]c/`) have been patched extensively for C99/C11/C23 compatibility:
 
-- **C99:** VLA, compound literals, hex floats, complex numbers, `//` comments, `_Bool`, designated initializers, `__alignof__`, `_Generic` (C11/C23), unicode escapes
+- **C99:** VLA, compound literals, hex floats (lexed since the start, but *converted* only since the `hexfloat()` fix -- see below), complex numbers, `//` comments, `_Bool`, designated initializers, `__alignof__`, `_Generic` (C11/C23), unicode escapes
 - **Bitfield support** (from @jamoson's kencc patch)
 - **GAS-compatible `as` front-end** to native Plan9 assemblers (vibe-coded with claude.ai)
 
@@ -1716,6 +1716,46 @@ assembly implementations overwrite C port versions via the duplicate-skip mechan
 Adding `TVLONG`/`TUVLONG` to `typesuvinit[]` in `cc/sub.c` breaks the entire
 ABI by making vlong-returning functions use struct-return convention.
 The correct content: `{ TSTRUCT, TUNION, TCFLOAT, TCDOUBLE, -1 }`.
+
+### Hex floating constants were silently zero (FIXED)
+
+`cc/lex.c` collected the whole literal into `symb` and finished with
+
+```c
+yylval.dval = strtod(symb, nil);
+```
+
+**Plan 9's `strtod` does not parse C99 hex floats.** It reads the leading
+`0`, stops at the `x`, and returns 0.0. So every `0x1.921fb54442d18p-1`
+in the tree was **zero**, with no diagnostic from anything -- and hex
+floats were on the "implemented" list above, because the *lexer* work
+(`casedothex`, `casep`) had been done and the conversion had not.
+
+What it cost, all of it silent:
+
+- musl's math tables are written entirely this way. `exp_data.c`,
+  `log_data.c`, `log2_data.c` and `pow_data.c` are **597 constants**,
+  every one zero. Nothing had noticed only because nothing used them
+  yet -- see the math section.
+- `__rem_pio2.c`'s `pio4` threshold and `__rem_pio2_large.c`'s `0x1p24`
+  scaling, so the **large-argument** path of sin/cos/tan was still wrong
+  after those were replaced with musl's.
+- A `0x1p-120f` added to a result purely to raise `inexact` is harmless
+  at zero, which is why the small-argument cases looked fine. That is
+  the shape of it: harmless where the constant is decorative, fatal
+  where it is data.
+
+`hexfloat()` in `lex.c` does the conversion now: mantissa into a
+`uvlong`, stopped at 60 bits with round-to-nearest on the first dropped
+digit, then `ldexp` by the binary exponent. Checked against `strtod` on
+the build host over **every one of the 1921 hex float literals in
+`ap/math`** -- all 1921 bit-identical.
+
+The tell for this class: a constant that is *decorative* (an inexact
+flag, a threshold that only picks a slower path) hides the bug, and a
+constant that is *data* exposes it. When a table-driven routine is
+wildly wrong and a polynomial one is fine, suspect the constants before
+the algorithm.
 
 ### Mixed-signedness compound assignment (FIXED)
 

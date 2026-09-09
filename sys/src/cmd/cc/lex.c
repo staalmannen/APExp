@@ -442,6 +442,97 @@ enum
 	Numflt		= 1<<4,
 };
 
+
+/*
+ * C99 hex floating constants: 0x h.hhh p[+-]ddd
+ *
+ * Plan 9's strtod does not parse these. It reads the leading "0", stops
+ * at the 'x', and returns 0.0 -- so every hex float literal in the tree
+ * was silently zero, with no diagnostic from anything. The lexer already
+ * collects the whole literal into symb; it only ever needed a converter
+ * that understands it.
+ *
+ * What that cost: musl's math tables are written entirely this way, so
+ * exp_data.c, log_data.c, log2_data.c and pow_data.c (597 constants)
+ * were all-zero, and __rem_pio2.c's pio4 threshold and
+ * __rem_pio2_large.c's 0x1p24 scaling with them. It is the reason a
+ * "0x1p-120f" added to a result to raise inexact is harmless while a
+ * table of coefficients is not.
+ *
+ * The mantissa is accumulated in a uvlong and stopped at 60 bits, which
+ * is more than a double can hold, so every literal short enough to be
+ * exactly representable converts exactly. Longer ones truncate rather
+ * than round to nearest -- half an ulp, and no constant in the tree is
+ * that long.
+ */
+static int
+hexdigit(int c)
+{
+	if(c >= '0' && c <= '9')
+		return c - '0';
+	if(c >= 'a' && c <= 'f')
+		return c - 'a' + 10;
+	if(c >= 'A' && c <= 'F')
+		return c - 'A' + 10;
+	return -1;
+}
+
+static double
+hexfloat(char *s)
+{
+	uvlong m;
+	int frac, adj, e, esign, d, dropped;
+
+	s += 2;				/* skip "0x" */
+	m = 0;
+	frac = 0;
+	adj = 0;
+	dropped = 0;
+	for(; *s; s++) {
+		if(*s == '.') {
+			frac = 1;
+			continue;
+		}
+		if(*s == 'p' || *s == 'P')
+			break;
+		d = hexdigit(*s);
+		if(d < 0)
+			break;
+		if(m < ((uvlong)1 << 60)) {
+			m = m*16 + d;
+			if(frac)
+				adj -= 4;	/* digit is below the point */
+		} else {
+			/*
+			 * The mantissa holds more bits than a double can,
+			 * so anything further only decides the rounding.
+			 * Round to nearest on the first digit dropped.
+			 */
+			if(!dropped) {
+				dropped = 1;
+				if(d >= 8)
+					m++;
+			}
+			if(!frac)
+				adj += 4;	/* keep the magnitude */
+		}
+	}
+	e = 0;
+	esign = 1;
+	if(*s == 'p' || *s == 'P') {
+		s++;
+		if(*s == '+')
+			s++;
+		else if(*s == '-') {
+			esign = -1;
+			s++;
+		}
+		for(; *s >= '0' && *s <= '9'; s++)
+			e = e*10 + (*s - '0');
+	}
+	return ldexp((double)m, e*esign + adj);
+}
+
 long
 yylex(void)
 {
@@ -1257,7 +1348,10 @@ caseout:
 	}
 	*cp = 0;
 	peekc = c;
-	yylval.dval = strtod(symb, nil);
+	if(symb[0] == '0' && (symb[1] == 'x' || symb[1] == 'X'))
+		yylval.dval = hexfloat(symb);
+	else
+		yylval.dval = strtod(symb, nil);
 	if(isInf(yylval.dval, 1) || isInf(yylval.dval, -1)) {
 		yyerror("overflow in float constant");
 		yylval.dval = 0;
