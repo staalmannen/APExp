@@ -71,11 +71,20 @@ if {[catch {.l configure -font {}} err]} {
 }
 
 # 2. A "{family} size style" list must be parsed, not swallowed whole.
-# Tk keeps the family as written when the platform cannot resolve it to
-# a real font name -- X11 answers lowercase because the X font name is
-# lowercase. Either is defensible, so compare without case.
+#
+# "font actual" reports the family that was RESOLVED, not the one asked
+# for, as tkUnixFont.c does -- there are three families here whatever
+# was requested. font.test relies on that: it asks whether
+# "font actual {avantgarde 12} -family" is still "avantgarde" to decide
+# whether the machine really has that family.
 check "family of {Helvetica -12}" \
     [string tolower [font actual {Helvetica -12} -family]] "helvetica"
+check "family of {Courier 10}" \
+    [string tolower [font actual {Courier 10} -family]] "courier"
+check "family of {Times 10}" \
+    [string tolower [font actual {Times 10} -family]] "times"
+check "an unknown family resolves to something else" \
+    [expr {[font actual {avantgarde 12} -family] ne "avantgarde"}] 1
 check "size of {Helvetica -12}" \
     [font actual {Helvetica -12} -size] "-12"
 check "size of {Courier 10}" \
@@ -117,6 +126,59 @@ if {[dict get $m20 -linespace] > [dict get $m8 -linespace]} {
     note "FAIL linespace does not follow size"
     incr fail
 }
+
+# 5b. "font actual -size" is in POINTS, so it follows "tk scaling"; Tk
+# stores a negative size as pixels. At scaling 0.5 a request for -13
+# pixels is 26 points. This is font-44.1.
+set oldscaling [tk scaling]
+tk scaling 0.5
+check "size in points follows tk scaling" [font actual {times -13} -size] 26
+tk scaling $oldscaling
+
+# 5c. Text layout across lines.
+#
+# font-28.* and font-30.* ask a canvas text item which character is at a
+# given point, and get 0 where they want the start of line 2. Both the
+# label that defines the reference height and the canvas item use
+# "Courier -12", so they should agree.
+#
+# Tk_PointToChar picks a line with
+#
+#	if (y < baseline + fontPtr->fm.descent)
+#
+# and the first line's baseline is fm.ascent, so line 1 is chosen for
+# y < ascent+descent. Returning 0 therefore means ay came out SMALLER
+# than the font's own ascent+descent -- but ay is the reqheight of a
+# label with no padding, which is exactly one line. These numbers say
+# which of the two is wrong.
+destroy .t 2>/dev/null
+toplevel .t
+label .t.l -padx 0 -pady 0 -bd 0 -highlightthickness 0 -justify left \
+    -text "0" -font "Courier -12"
+pack .t.l
+update
+set ax [winfo reqwidth .t.l]
+set ay [winfo reqheight .t.l]
+note "label reqwidth  (ax) = $ax"
+note "label reqheight (ay) = $ay"
+note "metrics of Courier -12: [font metrics "Courier -12"]"
+note "  ascent+descent = [expr {[font metrics {Courier -12} -ascent] + \
+    [font metrics {Courier -12} -descent]}] (ay must equal this)"
+note "  actual: [font actual "Courier -12"]"
+
+canvas .t.c -closeenough 0
+.t.c create text 0 0 -tags text -anchor nw -just left -font "Courier -12"
+pack .t.c
+update
+.t.c dchars text 0 end
+.t.c insert text 0 "000\n000\n000"
+update
+note "canvas bbox of 3 lines: [.t.c bbox text]"
+foreach probe [list 0 [expr {$ay - 1}] $ay [expr {$ay + 1}] [expr {2 * $ay}]] {
+    note "  index @0,$probe -> [.t.c index text @0,$probe]"
+}
+check "index at the start of line 2" [.t.c index text @0,$ay] 4
+destroy .t
 
 # 6. A real Plan 9 font path is a native name and must still work.
 set p /lib/font/bit/fixed/unicode.6x13.font

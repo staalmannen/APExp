@@ -235,7 +235,8 @@ FontIsFixed(void *fnt)
 }
 
 static void *
-ChooseFont(Tk_Window tkwin, const TkFontAttributes *faPtr)
+ChooseFont(Tk_Window tkwin, const TkFontAttributes *faPtr,
+           const char **familyPtr)
 {
     const P9FontFile *table, *variant = NULL;
     int pixels;
@@ -247,14 +248,17 @@ ChooseFont(Tk_Window tkwin, const TkFontAttributes *faPtr)
 
     if (IsMonoFamily(faPtr->family)) {
         table = monoFonts;
+        *familyPtr = "courier";
         if (faPtr->weight == TK_FW_BOLD)      variant = monoBoldFonts;
         else if (faPtr->slant != TK_FS_ROMAN) variant = monoItalicFonts;
     } else if (IsSerifFamily(faPtr->family)) {
         table = serifFonts;
+        *familyPtr = "times";
         if (faPtr->weight == TK_FW_BOLD)      variant = serifBoldFonts;
         else if (faPtr->slant != TK_FS_ROMAN) variant = serifItalicFonts;
     } else {
         table = propFonts;
+        *familyPtr = "helvetica";
         if (faPtr->weight == TK_FW_BOLD)      variant = propBoldFonts;
         else if (faPtr->slant != TK_FS_ROMAN) variant = propItalicFonts;
     }
@@ -316,7 +320,6 @@ TkpGetNativeFont(Tk_Window tkwin, const char *name)
 {
     P9Font *p9f;
     void *fnt;
-    (void)tkwin;
 
     if (name == NULL || name[0] != '/')
         return NULL;
@@ -332,7 +335,8 @@ TkpGetNativeFont(Tk_Window tkwin, const char *name)
     p9f->height  = tkp9_fontheight(fnt);
 
     p9f->header.fa.family     = Tk_GetUid(name);
-    p9f->header.fa.size       = -p9f->height;	/* negative == pixels */
+    /* Stored negative (pixels), reported in points, as above. */
+    p9f->header.fa.size       = TkFontGetPoints(tkwin, -p9f->height);
     p9f->header.fa.weight     = TK_FW_NORMAL;
     p9f->header.fa.slant      = TK_FS_ROMAN;
     p9f->header.fa.underline  = 0;
@@ -357,8 +361,9 @@ TkpGetFontFromAttributes(
 {
     P9Font *p9f;
     void *fnt;
+    const char *family = "helvetica";
 
-    fnt = ChooseFont(tkwin, faPtr);
+    fnt = ChooseFont(tkwin, faPtr, &family);
     if (fnt == NULL)
         return NULL;
 
@@ -377,12 +382,25 @@ TkpGetFontFromAttributes(
     p9f->height  = tkp9_fontheight(fnt);
 
     /*
-     * Report back what was asked for, not what was found: Tk caches on
-     * these attributes, and answering with the file's own size would
-     * make "font actual" disagree with the request for every size that
-     * has no exact bitmap.
+     * "font actual" reports what was RESOLVED, not what was asked for.
+     * tkUnixFont.c does the same -- it reports the family of the X font
+     * it actually found -- and code relies on it: font.test asks
+     *
+     *	if {[font actual {avantgarde 12 roman normal} -family] eq "avantgarde"}
+     *
+     * to decide whether this machine really has that family, and took
+     * the wrong branch when every request answered with its own name.
+     * There are three families here, whatever was asked for.
+     *
+     * The size is reported in points. Tk stores a negative size as
+     * pixels, and "font actual -size" must give points, which is what
+     * makes it depend on "tk scaling": at scaling 0.5, a request for
+     * -13 pixels is 26 points (font-44.1). tkUnixFont.c is the same
+     * pair of calls.
      */
     p9f->header.fa          = *faPtr;
+    p9f->header.fa.family   = Tk_GetUid(family);
+    p9f->header.fa.size     = TkFontGetPoints(tkwin, faPtr->size);
     p9f->header.fm.ascent   = p9f->ascent;
     p9f->header.fm.descent  = p9f->descent;
     p9f->header.fm.fixed    = FontIsFixed(fnt);
