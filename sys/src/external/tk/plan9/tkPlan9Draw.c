@@ -193,6 +193,14 @@ XCopyArea(Display *display, Drawable src, Drawable dst, GC gc,
 
     DrawableTarget(src, &simg, &sox, &soy);
     DrawableTarget(dst, &dimg, &dox, &doy);
+    if (tkp9_debug())
+        fprintf(stderr, "XCopyArea: %ux%u from %lu (%s) %d,%d+%d,%d"
+                " to %lu (%s) %d,%d+%d,%d\n",
+                w, h,
+                (unsigned long) src, simg? "pixmap": "screen",
+                src_x, src_y, sox, soy,
+                (unsigned long) dst, dimg? "pixmap": "screen",
+                dst_x, dst_y, dox, doy);
     tkp9_copyarea(simg, src_x + sox, src_y + soy,
                   (int)w, (int)h,
                   dimg, dst_x + dox, dst_y + doy);
@@ -425,6 +433,11 @@ XPutImage(Display *display, Drawable d, GC gc, XImage *image,
     }
 
     DrawableTarget(d, &img, &ox, &oy);
+    if (tkp9_debug())
+        fprintf(stderr, "XPutImage: %ux%u from (%d,%d) to drawable %lu"
+                " (%s) at %d,%d + offset %d,%d\n",
+                width, height, src_x, src_y, (unsigned long) d,
+                img? "pixmap": "screen", dest_x, dest_y, ox, oy);
     tkp9_putpixels(img, dest_x + ox, dest_y + oy,
                    (int)width, (int)height, buf);
     ckfree(buf);

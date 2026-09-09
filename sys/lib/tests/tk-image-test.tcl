@@ -106,19 +106,34 @@ ok {$right eq "#c0c0c0"} "the background reads back #c0c0c0"
 
 note ""
 note "--- 3. a photo drawn INTO the canvas, i.e. XPutImage ---"
-# The other direction: put a known photo on the canvas and read it back.
-# This is a round trip through both halves, so it passes even if both
-# are wrong by the same permutation -- which is exactly why section 1
-# and 2 above, which only read, are the ones that decide.
+# The other direction. Three things have to be true and they fail
+# differently, so ask them separately rather than only looking at the
+# canvas at the end.
 image create photo src -width 4 -height 4
 src put #123456 -to 0 0 4 4
+
+# (a) does the photo itself hold the colour? If not, nothing below is
+# about drawing at all.
+note "  the photo's own data: [lindex [lindex [src data] 1] 1]"
+ok {[lindex [lindex [src data] 1] 1] eq "#123456"} "the photo holds #123456"
+
+# (b) can one photo be copied to another? That is pure Tk, no platform
+# drawing, and separates the photo machinery from this port.
+image create photo copyof -width 4 -height 4
+copyof copy src
+note "  after 'copyof copy src': [lindex [lindex [copyof data] 1] 1]"
+ok {[lindex [lindex [copyof data] 1] 1] eq "#123456"} "photo-to-photo copy works"
+
+# (c) the real question: onto a canvas, and back out again. This is
+# XPutImage into the instance pixmap, then XCopyArea from it into the
+# canvas, then XGetImage out of the canvas.
 .c delete all
-.c configure -background #ffffff
+.c configure -background #ffffff -scrollregion {0 0 9 9}
 .c create image 0 0 -anchor nw -image src
 update
 set got [pixelat 1 1]
-note "  put #123456 as a photo, read back $got"
-ok {$got eq "#123456"} "a photo round-trips through put and get"
+note "  drawn on a canvas and read back: $got"
+ok {$got eq "#123456"} "a photo drawn on a canvas reads back"
 
 note ""
 note "Section 1 passing means the byte order is right -- that was the"
