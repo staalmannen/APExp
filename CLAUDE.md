@@ -1874,9 +1874,57 @@ allocated in the *screen's* channel (`tkp9_allocimage`), which varies by
 machine, and `draw()` does that conversion for us.
 
 **A round-trip test cannot check this.** The absolute colour is what
-matters, which is exactly what `canvas-23.1` does -- it fills with
-`#000080` and reads the pixels back -- so a red/blue swap shows up
-there as `#800000`.
+matters, so `sys/lib/tests/tk-image-test.tcl` only *reads*: it draws
+each of red, green, blue, navy, maroon and grey with the ordinary
+drawing path and asks what comes back.
+
+**The calibration works, and the first diagnosis from these tests was
+wrong.** With the path implemented, `canvas-23.2` passed and `23.1` and
+`23.3` did not, and the three differ only in colour -- blue, green, red
+-- with green the middle byte and `#c0c0c0` grey, both invariant under
+exchanging red and blue. That is a very convincing red/blue swap, and it
+is not what was happening: every colour makes the trip exactly, and
+`$TKP9DEBUG` reports
+
+```
+tkp9: RGBA32 memory order R=3 G=2 B=1 A=0
+```
+
+which is A,B,G,R, the documented order, measured correctly.
+
+### Tk on Plan 9: a rectangle of zero width still has an outline
+
+What actually separated those three canvas tests was not their colour
+but their **shape**:
+
+```
+23.1  .c create rectangle 0 0 0 9    zero width     FAIL
+23.2  .c create rectangle 0 0 1 9    width 1        pass
+23.3  .c create rectangle 0 0 9 0    zero height    FAIL
+```
+
+**A rectangle with zero width or height is not empty to X.** The outline
+is a closed path through the four corners, so it degenerates to a
+*line*, and that is how the canvas asks for a one-pixel column or row.
+`tkp9_drawrect` handed it to Plan 9's `border()`, which draws nothing
+for the empty rectangle `dstrect()` makes of it, so those columns came
+back as bare background -- which reads exactly like a colour bug when
+the three tests you are comparing use three different colours.
+
+Note X's outline runs corner to corner **inclusive**, covering `w+1` by
+`h+1` pixels: `canvas-23.3` asks for a rectangle nine wide and expects
+its row to span all ten columns. The degenerate case therefore draws one
+pixel longer than the width or height it was given.
+
+The non-degenerate case keeps `border()`, which draws *inside* a `w` by
+`h` box and so is one pixel short of X in both directions. That is a
+real difference and it is deliberately left alone: no failing test shows
+it, and it is the path every widget border in the toolkit draws through.
+
+**Still open:** a photo drawn onto a canvas reads back as the canvas
+background, so nothing of it renders, even though a photo now draws on
+screen. That is `XPutImage` or the path from the photo instance to it,
+and section 3 of `tk-image-test.tcl` is the case.
 
 ### Syntax-check Tk's Plan 9 backend on the host before shipping it
 

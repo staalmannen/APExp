@@ -8,37 +8,43 @@
 # with "failed to copy Pixmap to XImage") and no photo image drew at
 # all, since TkPutImage is how Tk paints one.
 #
-# With them implemented, canvas-23.2 passes and 23.1 and 23.3 do not --
-# and the three differ only in colour:
+# With them implemented, canvas-23.2 passes and 23.1 and 23.3 do not.
+# The first guess was a red/blue swap, because the three differ only in
+# colour -- 23.1 blue, 23.2 green, 23.3 red -- and green is the middle
+# byte, invariant under exchanging the other two.
 #
-#	23.1  #000080   blue    FAIL
-#	23.2  #008000   green   pass
-#	23.3  #800000   red     FAIL
+# THAT WAS WRONG, and section 1 is what refuted it: every colour makes
+# the trip exactly, red and blue included, and under $TKP9DEBUG the
+# port reports
 #
-# Green is the middle byte and #c0c0c0 is grey, so both are invariant
-# under exchanging red and blue. That is the whole diagnosis: something
-# on the way out swaps them.
+#	tkp9: RGBA32 memory order R=3 G=2 B=1 A=0
 #
-# The chain is short and only one link is uncertain:
+# which is A,B,G,R -- the documented order, measured correctly by
+# rgbacalibrate(). The byte order was never wrong.
 #
-#   .c create rectangle -fill  ->  GCForegroundRGBA -> tkp9_fillrect
-#       every widget in the toolkit has drawn through this for months,
-#       so it is not the suspect
-#   .c image                   ->  XGetImage -> tkp9_getpixels
-#       draws the source into an RGBA32 image and unloadimages it,
-#       permuting bytes by rgbaidx[], which rgbacalibrate() measures
-#   testimage data             ->  tkCanvas.c, which reads a host-order
-#       32-bit word and decomposes it with the visual's masks. Neither
-#       _WIN32 nor TK_XGETIMAGE_USES_ABGR32 is defined here, so this
-#       end is unconditional and matches what XGetImage packs.
+# Section 2 has the real answer, and it is not a colour at all: the
+# filled column reads back as the BACKGROUND. The rectangle is not
+# drawn. What separates the three tests is not their colour but their
+# shape:
 #
-# So this script prints the colours that come back, and under
-# $TKP9DEBUG the port prints the RGBA32 memory order it measured:
+#	23.1  rectangle 0 0 0 9   zero width    FAIL
+#	23.2  rectangle 0 0 1 9   width 1       pass
+#	23.3  rectangle 0 0 9 0   zero height   FAIL
+#
+# A rectangle with zero width or height is not empty to X: the outline
+# is a closed path through the four corners, so it degenerates to a
+# line, and that is how the canvas asks for a one-pixel column or row.
+# tkp9_drawrect handed it to Plan 9's border(), which draws nothing for
+# an empty rectangle.
+#
+# Section 3 is still open: a photo drawn onto the canvas reads back as
+# the canvas background, so nothing of it rendered, even though a photo
+# does now draw on screen. That is XPutImage or the path from the photo
+# instance to it, and it is a separate question from the rectangle.
+#
+# Run with $TKP9DEBUG to see the measured order:
 #
 #	tkp9: RGBA32 memory order R=? G=? B=? A=?
-#
-# Between the two, one run says whether rgbacalibrate() is wrong, never
-# ran, or is right and the fault is elsewhere. Run it BOTH ways.
 
 set fail 0
 
@@ -107,9 +113,10 @@ note "  put #123456 as a photo, read back $got"
 ok {$got eq "#123456"} "a photo round-trips through put and get"
 
 note ""
-note "If section 1 shows red and blue exchanged while green is right,"
-note "rgbacalibrate() has the RGBA32 memory order wrong. Run again with"
-note "TKP9DEBUG=1 to see the order it measured."
+note "Section 1 passing means the byte order is right -- that was the"
+note "first guess and it was wrong. Section 2 is the one that matters:"
+note "a rectangle of zero width or height must still draw its outline,"
+note "because X draws the outline as a path through the corners."
 
 puts "$fail failure(s)"
 flush stdout
