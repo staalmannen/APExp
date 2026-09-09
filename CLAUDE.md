@@ -1756,19 +1756,42 @@ event-9.11  got   |
   `sourcePtr`. Two different failures, and reading the group from its
   loudest member got the quiet three wrong.
 
-`GenerateEnterLeave` generates nothing when the window it is handed
-**equals** the one it already believes the pointer is in.
-`TkPointerDeadWindow` has just set that to NULL, so "nothing at all"
-means `Tk_CoordsToWindow` answered NULL too -- which is the port's side,
-not Tk's.
-
-The distinction the passing cases hide: `event-9.1` and section 3 of
-`tk-enter-test.tcl` both destroy a **toplevel** and both work. The
-failures all destroy a nested **frame**. Section 5 of that test is
+**The answer, from section 5 of `tk-enter-test.tcl`.** That section is
 `event-9.11` copied exactly -- including `create_and_pack_frames`'
-geometry, which is load-bearing -- and prints `winfo containing` on both
-sides of the destroy, so it separates "the hit test lost the parent"
-from "the crossing was generated against a NULL source".
+geometry, which is load-bearing -- and it prints the hit test on both
+sides of the destroy:
+
+```
+containing 350 350 -> '.one.f1.f2'        (want .one.f1.f2)   PASS
+containing 350 350 after destroy -> '.one.f1'                 PASS
+crossings:
+```
+
+So `Tk_CoordsToWindow` is right at both ends and **the pointer update
+never runs at all**. It is not the hit test and it is not tkPointer.c:
+
+`generic/tkWindow.c` calls `SendEnterLeaveForDestroy(tkwin)` at the very
+top of `Tk_DestroyWindow`, before anything is torn down, and that
+function is **real only under `MAC_OSX_TK` or `_WIN32`** -- everywhere
+else it compiles to an empty stub, because on X the server sends the
+crossings. This port drives `tkPointer.c` exactly as those two do, so
+`PLAN9` belongs in that condition; the condition is not the operating
+system, it is *there is no X server to generate the crossings*.
+
+That is a one-token change to a shared generic file, and it is the right
+place rather than a copy under `plan9/`: forking a generic file means
+the next Tk update silently skips the fix, and this is upstream's own
+"no X server" list, not a Plan 9 peculiarity.
+
+Note the gate on the call, `(winPtr->flags & TK_DONT_DESTROY_WINDOW) ==
+0`, is what keeps `event-9.16` right: a child destroyed as part of its
+parent carries that flag, so the subtree yields one crossing rather than
+one per level.
+
+The distinction every passing case hid: `event-9.1` and section 3 of
+`tk-enter-test.tcl` both destroy a **toplevel**, which is the branch
+`TkPointerDeadWindow` plus the deferred `pointerDirty` poll happens to
+cover. Every failing one destroys a nested **frame**.
 
 **The four `place-8.*`/`pack-18.*` fail on X11 too.** All four have the
 shape
