@@ -1,4 +1,4 @@
-tk-runall: starting, line buffered
+tk-runall: starting, line buffered, default bgerror dialog replaced by a log line (tkerror delegation kept)
 Tests running in interp:  /bin/wish
 Tests located in:  /usr/glenda/APExp/sys/src/external/tk/tests
 Tests running in:  /usr/glenda/APExp/sys/src/external/tk/tests
@@ -7,7 +7,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-10 04:21:27 +0200
+Tests began at 2026-09-10 09:03:15 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -127,6 +127,23 @@ event.test
 ---- Result should have been (exact matching):
 |<Enter> NotifyNonlinearVirtual .one|<Enter> NotifyNonlinearVirtual .one.f1|<Enter> NotifyNonlinear .one.f1.f2|
 ==== event-9.14 FAILED
+
+
+
+==== event-9.16 Successive destructions (pointer window + parent), single generation of crossing events FAILED
+==== Contents of test case:
+
+    bind all <Leave> {append result "<Leave> %d %W|"}
+    bind all <Enter> {append result "<Enter> %d %W|"}
+    destroy .one.f1
+    update
+    set result
+
+---- Result was:
+|
+---- Result should have been (exact matching):
+|<Enter> NotifyInferior .one|
+==== event-9.16 FAILED
 
 filebox.test
 
