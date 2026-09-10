@@ -1957,15 +1957,44 @@ a little" and "scrolled a lot" are therefore two different code paths,
 and **only the first moves a rectangle** -- the operation this port has
 most often got wrong.
 
-Section 8 asks the distance directly, largest first. It also splits the
-`update`, which nobody had asked yet and which decides the fix:
+Section 8 asked the distance directly and split the `update` in two,
+and it gave one decisive answer and one misleading one.
 
-- **`update idletasks` hangs** -- the loop is inside the redisplay
-  itself: one call that never returns, or an idle handler that re-posts
-  itself.
-- **`update idletasks` returns and `update` hangs** -- the redisplay is
-  *generating an event*, almost certainly an Expose from the copy,
-  which schedules another redisplay.
+**Decisive: `update idletasks` hangs.** That runs only idle handlers,
+so **the loop is inside the redisplay** -- `DisplayText` either never
+returns or re-posts its own idle handler forever. No event is involved
+and the Expose theory is dead. Everything from here is `tkTextDisp.c`
+and what this port's drawing does underneath it.
+
+**Misleading: the distances do not mean what they look like.**
+
+| | reaches | |
+|---|---|---|
+| `moveto 1.0` | 77, the end | ok |
+| `moveto 0.5` | 51 | ok |
+| `scroll 100 units` | 77, clamped to the end | ok |
+| `scroll 20 units` | **21** | **hangs** |
+
+`moveto 0.5` lands mid-file and works, so the overlap/full-repaint
+story above is **wrong** -- a mid-file top index is reachable without
+hanging. But those two rows differ in *two* ways again, the command and
+the position, which is the fourth time in this file. Section 10 reaches
+the same position by both commands:
+
+- **`scroll 50 units` (to 51, where `moveto` survived) hangs** -- it is
+  the **command**. `yview scroll N units` goes through
+  `YScrollByLines`, which walks display lines with `LayoutDLine`;
+  `moveto` does not. That is the loop with the `do/while` that never
+  ends if a display line comes back zero bytes long -- see the note in
+  `tk-mousewheel-test.tcl`'s header, which suspected it early and was
+  set aside when the scroll commands all returned. **They return
+  because the walk is not where it hangs; the redisplay that follows
+  is.**
+- **it works** -- it is the **position**, and both commands are
+  innocent.
+
+`scroll ... pixels` and the old `yview <index>` form are asked too:
+they reach the same place without the display-line walk.
 
 **Every binding counts and prints its own invocation number**, because
 the one fact that decides the shape is whether the binding runs once or

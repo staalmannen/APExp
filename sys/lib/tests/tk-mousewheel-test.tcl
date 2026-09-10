@@ -495,6 +495,107 @@ foreach {tag cmd what} {
 }
 
 # ------------------------------------------------------------------
+# SECTION 9, and it is the one that matters now.
+#
+# Section 8 gave a decisive half and a misleading half.
+#
+# THE DECISIVE HALF: 8d's "update idletasks" hangs. That runs ONLY idle
+# handlers, so the loop is inside the REDISPLAY -- DisplayText either
+# never returns or re-posts its own idle handler forever. No event is
+# involved, and the Expose theory is dead. Everything from here is
+# about tkTextDisp.c and what this port's drawing does under it.
+#
+# THE MISLEADING HALF: the distances do not say what they seem to.
+#
+#	moveto 1.0		index 77 (the end)	ok
+#	moveto 0.5		index 51		ok
+#	scroll 100 units	index 77 (clamped)	ok
+#	scroll 20 units		index 21		HANGS
+#
+# "moveto 0.5" lands in the middle of the file and works, so the
+# no-overlap/full-repaint story from section 8's header is WRONG -- a
+# mid-file position is reachable without hanging. But 8b and 8d differ
+# in TWO ways again, the command AND the position, which is the fourth
+# time in this file. The only way to separate them is to reach the same
+# position by both commands.
+#
+#	  10a  moveto -> ~21     10b  moveto -> 51   (8b, known ok)
+#	  10c  scroll -> 51      10d  scroll -> 21   (8d, known hang)
+#
+#   10c hangs	it is the COMMAND. "yview scroll N units" goes through
+#		YScrollByLines, which walks display lines with LayoutDLine;
+#		"moveto" does not. That is the line-walking path, and it
+#		is the one with the do/while that never ends if a display
+#		line comes back zero bytes long.
+#   10c works	it is the POSITION -- something about a top index near
+#		the start, and the two commands are innocent.
+#
+# 10e adds "scroll ... pixels", which reaches the same place without
+# the line walk at all, and 10f the old "yview <index>" form.
+
+proc topline {} { return [.t index @0,0] }
+
+step "10a. moveto 0.2 -- reach index ~21 by MOVETO (8d reached 21 by\
+ scroll and hung)"
+pair 0 1
+.t yview moveto 0.2
+done "scroll returned; index is [topline]"
+step "10a. ... update idletasks"
+update idletasks
+done "returned"
+
+step "10b. moveto 0.5 -- index 51 by moveto; 8b already did this and it\
+ worked, repeated here so the pair is side by side"
+pair 0 1
+.t yview moveto 0.5
+done "scroll returned; index is [topline]"
+step "10b. ... update idletasks"
+update idletasks
+done "returned"
+
+step "10e. scroll 300 pixels -- lands near index 21 WITHOUT the display\
+ line walk, so this separates the walk from the destination"
+pair 0 1
+if {[catch {.t yview scroll 300 pixels} err]} {
+    done "not supported here: $err"
+} else {
+    done "scroll returned; index is [topline]"
+    step "10e. ... update idletasks"
+    update idletasks
+    done "returned"
+}
+
+step "10f. the old 'yview <index>' form to line 21 -- another way to\
+ the same place"
+pair 0 1
+if {[catch {.t yview 20} err]} {
+    done "not supported here: $err"
+} else {
+    done "scroll returned; index is [topline]"
+    step "10f. ... update idletasks"
+    update idletasks
+    done "returned"
+}
+
+step "10c. THE SHARP ONE: scroll 50 units -- index 51, the SAME place\
+ 10b reached by moveto and survived.  If this hangs it is the command\
+ (YScrollByLines) and not the position"
+pair 0 1
+.t yview scroll 50 units
+done "scroll returned; index is [topline]"
+step "10c. ... update idletasks"
+update idletasks
+done "returned"
+
+step "10d. scroll 20 units -- the known hang, repeated last"
+pair 0 1
+.t yview scroll 20 units
+done "scroll returned; index is [topline]"
+step "10d. ... update idletasks"
+update idletasks
+done "returned"
+
+# ------------------------------------------------------------------
 foreach {tag sbfirst wired what} {
     A 0 1 {text packed first, WIRED -- this is build's arrangement, and it hangs}
     B 0 0 {text packed first, unwired}
