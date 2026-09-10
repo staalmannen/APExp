@@ -94,6 +94,54 @@ proc try {tag what script} {
     done "update returned"
 }
 
+# ------------------------------------------------------------------
+# THE ANSWER, found by case 3 below plus one grep.
+#
+# "moveto 0.2" reaches index 21 and hangs; "moveto 0.5" reaches 51 and
+# does not. Same command, so the display-line walk this file was built
+# to accuse is innocent -- it is the POSITION, or rather the distance.
+#
+# unix/tkUnixDraw.c's TkScrollWindow, which this port builds, issues the
+# XCopyArea and then waits for the X server to say how much of it
+# succeeded:
+#
+#	while (!info.done) {
+#	    Tcl_ServiceEvent(TCL_WINDOW_EVENTS);
+#	}
+#
+# info.done is set ONLY by a NoExpose or the last GraphicsExpose for
+# that window, and neither event name appears anywhere in plan9/. So
+# the loop has no exit: an infinite loop inside one Tk call, which is
+# precisely "update idletasks never returns, CPU pinned, nothing
+# written". win/tkWinDraw.c and macosx/tkMacOSXImage.c define
+# TkScrollWindow themselves for this reason; plan9/tkPlan9Draw.c now
+# does too.
+#
+# WHY ONLY SHORT SCROLLS. tkTextDisp.c copies only when the old and new
+# views overlap, and repaints outright when they do not -- so only the
+# copying path reaches TkScrollWindow at all. The widget here shows
+# about 24 lines ("moveto 1.0" reports a top index of 77 of 100), so:
+#
+#	moveto 1.0	 76 lines	no overlap	ok
+#	moveto 0.5	 50 lines	no overlap	ok
+#	moveto 0.2	 20 lines	OVERLAP		hung
+#	scroll 20 units	 20 lines	OVERLAP		hung
+#	scroll 3 units	  3 lines	OVERLAP		hung
+#
+# The overlap theory was dropped one round earlier on the strength of a
+# guess that ~15 lines were visible. It is 24. Measure the widget.
+#
+# WITH THE FIX IN, every case below returns and the file runs to the
+# end. It is kept as the regression test: case 10 is the wheel scroll
+# scrollbar-10.1 actually performs.
+
+puts "--- visible lines, since the whole rule turns on this ---"
+pair
+puts "   .t is [winfo height .t]px tall, top index [.t index @0,0],\
+ bottom index [.t index @0,[expr {[winfo height .t]-1}]]"
+flush stdout
+
+puts ""
 puts "--- cases expected to return ---"
 flush stdout
 
