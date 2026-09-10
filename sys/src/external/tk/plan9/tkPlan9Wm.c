@@ -211,18 +211,6 @@ WmUpdateGeometry(void *clientData)
     wmPtr->flags &= ~WM_UPDATE_PENDING;
 
     /*
-     * An embedded toplevel does not get to choose its own size: it
-     * passes the request to the container and takes whatever the
-     * container settles on.
-     */
-    if (winPtr->flags & TK_EMBEDDED) {
-	TkP9EmbedGeometryRequest(winPtr,
-		Tk_ReqWidth((Tk_Window) winPtr),
-		Tk_ReqHeight((Tk_Window) winPtr));
-	return;
-    }
-
-    /*
      * WORK IN THE UNITS min/max ARE EXPRESSED IN, and convert to pixels
      * at the very end.
      *
@@ -262,6 +250,32 @@ WmUpdateGeometry(void *clientData)
     WmGridToPixels(wmPtr, width, height, &width, &height);
     if (width  < 1) width  = 1;
     if (height < 1) height = 1;
+
+    /*
+     * An embedded toplevel does not get to choose its own size: it
+     * passes the request to the container and takes whatever the
+     * container settles on.
+     *
+     * THIS BRANCH USED TO SIT ABOVE THE BLOCK ABOVE and pass
+     * Tk_ReqWidth/Tk_ReqHeight straight through, so an explicit
+     *
+     *		wm geometry .t1 70x300+10+20
+     *
+     * on an embedded toplevel was discarded before it could be used and
+     * the window kept its -width/-height (unixEmbed-10.2). The request
+     * an embedded window makes is its *wanted* size, and an explicit
+     * "wm geometry" is exactly what overrides the requested one -- as
+     * it does for every other toplevel three lines up. tkUnixWm.c's
+     * UpdateGeometryInfo computes width/height first for the same
+     * reason and only then asks the container.
+     *
+     * min/max and the grid conversion apply here too, which is the
+     * other thing the early return skipped.
+     */
+    if (winPtr->flags & TK_EMBEDDED) {
+	TkP9EmbedGeometryRequest(winPtr, width, height);
+	return;
+    }
 
     if (width == winPtr->changes.width && height == winPtr->changes.height
 	    && wmPtr->x == winPtr->changes.x
@@ -1520,13 +1534,42 @@ TkpGetMS(void)
 }
 
 /* ------------------------------------------------------------------ */
-/* Focus claim / key redirect (embed stubs — no embedding on Plan 9)  */
+/* Focus claim / key redirect, for embedded toplevels                  */
 /* ------------------------------------------------------------------ */
 
+/*
+ * Someone focused a window inside an EMBEDDED toplevel while the focus
+ * is elsewhere, so the embedded half has to ask the container for it.
+ * The comment here used to say "no embedding on Plan 9" and the body
+ * was empty -- left over from before Tk_UseWindow was implemented (see
+ * the embedding section in CLAUDE.md).
+ *
+ * unix/tkUnixEmbed.c cannot do this directly, because on X the
+ * container is usually a different client: it sends the container a
+ * synthetic FocusIn with mode EMBEDDED_APP_WANTS_FOCUS and detail
+ * `force`, and generic Tk turns that back into a TkSetFocusWin on the
+ * receiving side (tkFocus.c:295). The event is the round trip, not the
+ * mechanism.
+ *
+ * Here the two halves share this process and this window table, so the
+ * round trip is the identity: call TkSetFocusWin on the container. That
+ * is the same reduction the rest of this port's embedding makes.
+ *
+ * Found by unixEmbed-8.2, which loads Tk into a child *interpreter* --
+ * so it is one of the few embedding tests that does not need a second
+ * wish or tktest, and therefore one of the few that can pass here.
+ */
 void
 TkpClaimFocus(TkWindow *topLevelPtr, int force)
 {
-    (void)topLevelPtr; (void)force;
+    TkWindow *containerPtr;
+
+    if (!(topLevelPtr->flags & TK_EMBEDDED))
+	return;
+    containerPtr = (TkWindow *) Tk_GetOtherWindow((Tk_Window) topLevelPtr);
+    if (containerPtr == NULL)
+	return;
+    TkSetFocusWin(containerPtr, force);
 }
 
 void

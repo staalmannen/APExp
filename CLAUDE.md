@@ -154,7 +154,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c` and
-`stdio-test.c`. The eighteen `tk-*.tcl` scripts there are Tcl, run with
+`stdio-test.c`. The nineteen `tk-*.tcl` scripts there are Tcl, run with
 `wish`; see the Tk section below. `tk-runall.tcl` is the harness for
 Tk's own suite rather than a test of its own, and `tk-runtest.tcl` runs
 a single file from it. `sys/src/ape/lib/libressl/test/` is separate: it is
@@ -1727,25 +1727,35 @@ character put line breaks mid-word and in the wrong place for tabs
 
 ### Tk on Plan 9: what the remaining test failures are, and which are ours
 
-**THE SUITE NOW RUNS ALL 97 FILES**, since the `TkScrollWindow` fix
-below. Everything above this line in the section was a 62-file prefix;
-this is the first measurement of the whole thing, and the list has been
-re-derived rather than extended.
+**THE SUITE NOW RUNS ALL 97 FILES AND EXITS CLEANLY**, since the
+`TkScrollWindow` fix below and the window-table leak further down.
+Everything above this line in the section was a 62-file prefix; the
+table below is the whole thing, and the list has been re-derived rather
+than extended.
 
-**287 failing tests**, from **485** on the first full run -- which was
+```
+all.tcl:  Total 10027  Passed 8320  Skipped 1429  Failed 278
+Sourced 97 Test Files.
+```
+
+**278 failing tests**, from **485** on the first full run -- which was
 up from 25 only because that run was the first to measure 35 files at
-all, not a regression. Attributed by file across the three runs:
+all, not a regression. Attributed by file across the runs:
 
-| file | run 1 | run 2 | run 3 |
-|---|---|---|---|
-| `wm.test` | 202 | 130 | 74 |
-| `unixWm.test` | 129 | 62 | 60 |
-| `unixEmbed.test` | 29 | 29 | 29 |
-| `textDisp.test` | 23 | 23 | 23 |
-| `select.test` | 23 | 23 | 23 |
-| `unixSelect.test` | 18 | 18 | 18 |
-| `systray.test` | 13 | 13 | 13 |
-| `winfo.test` | 6 | 4 | 4 |
+| file | run 1 | run 2 | run 3 | run 4 |
+|---|---|---|---|---|
+| `wm.test` | 202 | 130 | 74 | 66 |
+| `unixWm.test` | 129 | 62 | 60 | 59 |
+| `unixEmbed.test` | 29 | 29 | 29 | 29 |
+| `textDisp.test` | 23 | 23 | 23 | 23 |
+| `select.test` | 23 | 23 | 23 | 23 |
+| `unixSelect.test` | 18 | 18 | 18 | 18 |
+| `systray.test` | 13 | 13 | 13 | 13 |
+| `winfo.test` | 6 | 4 | 4 | 4 |
+
+Run 4 is the first one that finished, so it is also the first whose
+total can be checked against tcltest's own rather than against
+`grep -c FAILED` halved. The two agree: 278.
 
 **Everything outside `wm` is untouched so far**, which is the honest
 reading: the 198 fixed are all one area, and the six files below it in
@@ -1894,8 +1904,12 @@ Storing is not the whole of it where a value can be *validated*:
 name that cannot be resolved is the same class of lie as answering the
 empty string.
 
-**It does not exit cleanly.** After the last test of the last file
-`wish` dies, at the same address every run:
+**It used not to exit cleanly, and this is how that was chased.**
+**FIXED** -- the answer is the window-table leak at the end of this
+subsection, and everything between here and there is the route to it,
+kept because most of it is method rather than result. After the last
+test of the last file `wish` used to die, at the same address every
+run:
 
 ```
 ==== xmfbox-2.6 FAILED
@@ -2205,16 +2219,61 @@ in another function twenty minutes later, and the climbing high-water
 mark distinguished a leak from a working set. Neither was visible from
 Tcl at all.
 
-**Both symptoms should go with it, and that is the thing to check on
-the next run.** Once the table is full every `XCreateWindow` answers
-`None`, so a frame exists to Tk and not to this port -- `bad window
-path name ".foo.top"` -- and generic Tk keys `dispPtr->winTable` on the
-window id, so every such window collides on id 0 and they delete each
-other's entries. A use-after-free of a `TkWindow` reached through that
-table is exactly the fault `acid` resolved to `Tk_GeometryRequest`. If
-`xmfbox-2.6` still fails, or the fault survives, then there is a second
-cause and `Tk_MaintainGeometry` is back on the list -- but do not
-assume that in advance.
+**Both symptoms went with it, and the suite now finishes and exits.**
+The next run has no occupancy line at all -- so the table never passed
+256, where it used to climb to 2048 -- and it ends:
+
+```
+xmfbox.test
+
+Tests ended at 2026-09-10 15:04:38 +0200
+all.tcl:  Total 10027  Passed 8320  Skipped 1429  Failed 278
+Sourced 97 Test Files.
+...
+tk-runall: every file ran, now entering exit (code 0)
+```
+
+`xmfbox.test` reports **no failure at all** now, and there is no
+general protection violation. Both were downstream of the exhaustion,
+as expected: with the table full every `XCreateWindow` answered `None`,
+so a frame existed to Tk and not to this port -- `bad window path name
+".foo.top"` -- and generic Tk keys `dispPtr->winTable` on the window
+id, so every such window collided on id 0 and they deleted each other's
+entries. A use-after-free of a `TkWindow` reached through that table is
+exactly the fault `acid` resolved to `Tk_GeometryRequest`. So
+`Tk_MaintainGeometry` is off the list for the crash; it is still the
+suspect for `geometry-4.7`, which is a different and much smaller
+thing.
+
+**This is the first complete accounting of the whole suite**, and it
+supersedes every count above it. `Total 10027` -- the `[n-z]` half
+alone had said 5007, and no earlier run reached a total at all.
+
+| file | failing |
+|---|---|
+| `wm.test` | 66 |
+| `unixWm.test` | 59 |
+| `unixEmbed.test` | 29 |
+| `textDisp.test` | 23 |
+| `select.test` | 23 |
+| `unixSelect.test` | 18 |
+| `systray.test` | 13 |
+| `winfo`, `font`, `event`, `clipboard` | 4 each |
+| `tk`, `textTag`, `imgListFormat` | 3 each |
+| `textWind`, `place`, `pack` | 2 each |
+| `winWm`, `visual`, `unixFont` and 9 more | 1 each |
+
+**278, and `wm` plus `unixWm` are 125 of them.** Everything below
+`unixSelect` in that table is a handful, so the shape of the remaining
+work is: two files that have had attention and need more, four that
+have had none (`unixEmbed`, `textDisp`, `select`, `systray`), and a
+long tail of ones and twos that the sections below already account for
+individually.
+
+`Skipped 1429` is constraints and is not a target: `win` 337, `fonts`
+126, `nonPortable`, `aqua` 30, `winSend` 51, plus the `test*`
+constraints (`testwrapper` 54, `testtext` 31, `testutils` 20) which
+need `tktest` rather than `wish` -- see the `imgListFormat` note below.
 
 `unixWm.test`, `unixSelect.test`, `unixEmbed.test` and `unixFont.test`
 run here because `tcl_platform(platform)` is `unix`, so the `unix`
@@ -2226,6 +2285,158 @@ reading before it is counted as ours.
 
 `event.test` is down to 2 from 3, which is the `event-9.16`
 nondeterminism noted above showing itself again: it passed this run.
+
+#### The four untouched files: 106 failures, and three of them are ours
+
+`unixEmbed` 29, `select` 23, `textDisp` 23, `unixSelect` 18, `systray`
+13 had had no attention at all. Read end to end, and the answer is much
+better than the number: **three are real bugs here, two of them now
+fixed, and the other 103 are asking for things this machine does not
+have.**
+
+**`systray` -- 13, none ours, none reachable.** Every one is
+`invalid command name "_systray"` (or `_sysnotify`). That command is
+registered by `unix/tkUnixSysTray.c`, which speaks the XEmbed system
+tray protocol to a `_NET_SYSTEM_TRAY_S<n>` owner, and by
+`unix/tkUnixSysNotify.c`, which **dlopens libnotify at runtime**. rio
+has no tray and Plan 9 has no dlopen, so neither file is built and
+neither ever could be. Do not stub `_systray`: a tray icon that reports
+success and appears nowhere is the `XLoadFont` mistake with a bigger
+blast radius.
+
+**`unixSelect` -- 18, none ours.** All eighteen failures are the
+`unixSelect-1.*` block and all eighteen run `childTkProcess eval`,
+i.e. they hand the selection to a **second wish** and read it back.
+`unixSelect-1.19`, the one test in the file that does not, passes.
+
+**`select` -- 23, none ours, and the interesting one is the exception
+that proves it.** 22 use a second wish. The 23rd, `select-5.8`, is
+entirely in-process and **still is not ours**:
+
+```tcl
+selection handle .f1 {apply {{type offset count} {
+    selection clear
+    handler $type $offset $count
+}} STRING}
+list [selection get] $selInfo [catch {selection get} msg] $msg
+```
+
+The whole 16 KB value and `$selInfo` come back **byte-identical**; the
+only difference is the last two elements. The handler clears the
+selection while serving it, so the second `selection get` must fail
+with "PRIMARY selection doesn't exist"; here it succeeds and returns
+the empty string, because with no owner the request falls through to
+`/dev/snarf`, which was empty.
+
+**Do not "fix" this by making an empty snarf buffer an error.** It is
+tempting -- it would make this one test pass, and every other Tk errors
+on an empty clipboard -- but the pass would be incidental: PRIMARY here
+*is* the system cut buffer, so what the second `selection get` returns
+depends on what was snarfed last, not on who owns anything. The test is
+asking about **ownership**, which `/dev/snarf` has no concept of, so it
+belongs with `clipboard-4.*` and the other 22. `tk-selection-test.tcl`
+asserts the opposite decision deliberately ("an empty snarf buffer is a
+legitimate empty answer, not an error") and that decision stands. Same
+rule as `font-21.19..22`: **do not change a documented fallback to dodge
+a test.**
+
+**`unixEmbed` -- 29, and TWO are ours.** The split is mechanical once
+the messages are read:
+
+| | |
+|---|---|
+| 14 | the `-3.3a`, `-5.1a`, … variants: `no library with prefix "Tktest" is loaded statically`. They `load {} Tktest child`, so they need `tktest` rather than `wish` -- the same harness limit as `imgListFormat-3.*` |
+| 13 | the plain ids: `childTkProcess`, i.e. a second wish embedding into this one's container. **Cross-application embedding is the one thing this port's embedding cannot do**, and deliberately: the whole reduction in `Tk_MakeWindow` rests on both halves sharing this process |
+| 2 | `unixEmbed-8.2` and `unixEmbed-10.2`, both in-process, both real |
+
+`unixEmbed-8.2` is the useful kind of exception: it loads **Tk** (not
+Tktest) into a child *interpreter*, so it is one of the few embedding
+tests that can run here at all. It found `TkpClaimFocus` still an empty
+stub under a comment reading "no embedding on Plan 9" -- left from
+before `Tk_UseWindow` existed. See the focus-claim note below.
+
+`unixEmbed-10.2` found `WmUpdateGeometry` discarding an explicit
+`wm geometry` on an embedded toplevel; see the note below that.
+
+**`textDisp` -- 23, none cheaply ours, and they are three different
+things.** Worth splitting because only one third is even about this
+port's code:
+
+- **13 are font metrics** (`3.1`, the six `9.*`, the six `16.*`).
+  `textDisp-9.1` wants the wrapped display lines to be `2.0 2.1[78]`
+  and gets `2.0 2.13 2.33`; `16.11` wants `.t index @0,0` to be `103.0`
+  and gets `102.5`. The test file's own comment says the glob is "to
+  have some tolerance on actually used font size" -- the tolerance is
+  one character, and Plan 9 bitmap fonts come in whole sizes. Same
+  family as `frame-14.1`. Nothing to fix without a scalable font.
+- **2 are the `TkScrollWindow` trade-off, already documented above.**
+  `6.5` and `6.6` place a frame over the text, scroll, and expect the
+  obscured source region to be repaired -- which is precisely the
+  `GraphicsExpose` case the note above says this port gives up:
+  "a copy whose source was overlapped by a sibling window has already
+  picked up the sibling's pixels, and with no backing store there is no
+  record of it". They redraw *less* than X does, which is the expected
+  direction.
+- **8 are Expose granularity** (`7.1`..`7.8`), and this is the one that
+  is a genuine open question. **There is no partial Expose anywhere in
+  this port**: `P9ExposeTree` always reports `0,0,width,height` and is
+  reached only from `XMapWindow`, `XRaiseWindow` and `XLowerWindow` --
+  `XUnmapWindow` and `XDestroyWindow` send **none at all**.
+
+  Those two facts predict two different bugs, and they want opposite
+  fixes: either no Expose reaches the text widget (in which case
+  destroying a window leaves its pixels on screen, which is worse than
+  the test, and the full relayout has another cause) or a whole-window
+  one does (in which case the fix is damage rectangles). **Print the
+  events before choosing**: `sys/lib/tests/tk-expose-test.tcl` runs
+  `textDisp-7.1` with an `<Expose>` binding that reports `%x %y %w %h`,
+  and says which. Note the asymmetry it warns about -- too *much*
+  damage costs a repaint, too *little* leaves stale pixels nothing will
+  ever correct.
+
+The arithmetic for the whole exercise: of 106 failures in the four
+untouched files, **3 were ours** and 103 need a second wish (53),
+`tktest` (14), a system tray (13), a scalable font (13), or the backing
+store this port does not have (2), with 8 still open. That ratio is the
+thing to carry into the next file rather than the raw count.
+
+#### Tk on Plan 9: TkpClaimFocus, and an embedded wm geometry
+
+Two one-function bugs, both found by the only two `unixEmbed` tests
+that can run here.
+
+**`TkpClaimFocus` was an empty stub**, under a comment saying "no
+embedding on Plan 9" that predated `Tk_UseWindow`. Generic Tk calls it
+when something focuses a window inside an embedded toplevel while the
+focus is elsewhere, and `unix/tkUnixEmbed.c` answers by sending the
+container a synthetic `FocusIn` with mode `EMBEDDED_APP_WANTS_FOCUS`,
+which generic Tk turns straight back into a `TkSetFocusWin` on the
+receiving side (`tkFocus.c:295`). **The event is the round trip, not
+the mechanism** -- on X the container is usually a different client.
+Here both halves share this process and this window table, so the round
+trip is the identity: `Tk_GetOtherWindow` to find the container, then
+`TkSetFocusWin` on it. Same reduction as the rest of this port's
+embedding.
+
+**`WmUpdateGeometry` threw away an explicit `wm geometry` on an
+embedded toplevel.** The `TK_EMBEDDED` branch sat *above* the size
+computation and passed `Tk_ReqWidth`/`Tk_ReqHeight` straight through,
+so
+
+```tcl
+toplevel .t1 -use [winfo id .f1] -width 150 -height 80
+wm geometry .t1 70x300+10+20
+wm geometry .t1			;# answered 150x80+0+0
+```
+
+kept the `-width`/`-height`. An embedded window's request is its
+*wanted* size, and an explicit `wm geometry` is exactly what overrides
+a requested one -- as it does for every other toplevel three lines
+further down the same function. The branch moved below the computation,
+so it now gets the min/max clamp and the grid conversion too, which the
+early return also skipped. `tkUnixWm.c`'s `UpdateGeometryInfo` computes
+width and height first and only then asks the container, for the same
+reason.
 
 ---
 
