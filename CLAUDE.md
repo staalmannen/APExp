@@ -1919,9 +1919,31 @@ the pair. `7e1b`..`7e1d` ask whether "delivery" is even the operative
 half, since an X event handler is only one way to run a script from
 inside the event loop: the same scroll from an **idle** handler, from a
 **timer** (`after 0`), and from a **`<Key>`** binding, none of which
-touch the pointer machinery. If the key event is fine and the wheel is
-not, the pointer path is implicated; if the idle handler hangs too,
-none of the event machinery is.
+touch the pointer machinery.
+
+**`7e1b` hangs -- an idle handler, no event, no binding -- which
+exonerates the whole event and pointer machinery.** But it also
+introduced a second difference and so cannot yet be read that way: the
+sections from `7e1b` on use `build2`, whose widget set is **not** the
+one step 2 scrolled. `build` packs the text first and the scrollbar
+second; `build2` packs the *scrollbar* first, with `-expand 1`, and
+scrolls a different text widget. So "top level vs event loop" and "one
+widget arrangement vs another" changed together -- **the same
+three-differences-at-once trap this file has now been caught by three
+times** (`canvas-23.*`, step 6 versus step 8, and this).
+
+`7e1a1`..`7e1a3` are the missing controls, and they run first:
+`build2`'s own widgets scrolled at the **top level**, and `build`'s
+widgets scrolled from an **idle handler**. Only one of those can hang,
+and which one it is decides whether any of this is about the event loop
+at all.
+
+Both builders now print `winfo width`/`height`/`ismapped` for each
+widget, which is a specific suspicion rather than tidiness: `build2`
+gives the scrollbar the expanding half of the cavity, and **a text
+widget laid out into no height** is a very good way to make
+`tkTextDisp.c` loop while looking exactly like a scrolling bug from
+Tcl.
 
 **Every binding counts and prints its own invocation number**, because
 the one fact that decides the shape is whether the binding runs once or
