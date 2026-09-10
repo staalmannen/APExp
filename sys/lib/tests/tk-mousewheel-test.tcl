@@ -71,6 +71,10 @@ proc build {} {
     for {set i 1} {$i < 100} {incr i} {.t insert end "Line $i\n"}
     pack [scrollbar .s -command {.t yview}] -fill y -expand 1 -side left
     update
+    puts "   .t [winfo width .t]x[winfo height .t] mapped\
+ [winfo ismapped .t];  .s [winfo width .s]x[winfo height .s] mapped\
+ [winfo ismapped .s]"
+    flush stdout
 }
 
 puts "--- what the binding actually is on this build ---"
@@ -338,20 +342,59 @@ done "returned; the binding ran $::n time(s)"
 # one of the ways to end up running a script from inside the event
 # loop, and the cheap ones do not need an event at all.
 
-# The unwired pair, built once for the four sections below.
+# The unwired pair, built once for the sections below.
+#
+# NOTE the geometry printout, and do not remove it. This proc packs the
+# SCROLLBAR first, with -expand 1, and the text second -- the reverse
+# of build's order -- so the cavity is divided differently. A text
+# widget laid out into no height at all is a very good way to make
+# tkTextDisp.c loop, and it would look exactly like a scrolling bug
+# from Tcl. One line settles it.
 proc build2 {} {
     destroy .t .s .u
     pack [scrollbar .s] -fill y -expand 1 -side left
     pack [text .u] -side left
     for {set i 1} {$i < 100} {incr i} {.u insert end "Line $i\n"}
     update
+    puts "   .u [winfo width .u]x[winfo height .u] mapped\
+ [winfo ismapped .u];  .s [winfo width .s]x[winfo height .s] mapped\
+ [winfo ismapped .s]"
+    flush stdout
 }
 
-step "7e1b. scroll the text widget from an IDLE handler -- inside the\
- event loop, but no event and no binding"
+# ------------------------------------------------------------------
+# THE CONTROL THAT WAS MISSING, and it has to come first.
+#
+# Step 2 scrolled .t, from build, at the top level, and returned. 7e1b
+# scrolls .u, from build2, inside the event loop, and hangs. That is
+# TWO differences, not one -- the widget set changed when build2 was
+# written -- and this file has now been caught by exactly that three
+# times (canvas-23.*, step 6 vs step 8, and here). So ask each half on
+# its own before believing either.
+step "7e1a1. build2's OWN widgets, scrolled at the TOP LEVEL -- if this\
+ hangs, it is the widget arrangement and not the event loop at all"
 build2
-after idle {incr ::n; .u yview scroll 3.0 units}
 wheelcount
+.u yview scroll 3.0 units
+done "scroll returned; index is [.u index @0,0]"
+step "7e1a2. ... and the update after it"
+update
+done "update returned"
+
+step "7e1a3. build's widgets (.t, the wired pair), scrolled from an\
+ IDLE handler -- the other half: the original widget set, inside the\
+ event loop"
+build
+wheelcount
+after idle {incr ::n; .t yview scroll 3.0 units}
+update
+done "returned; ran $::n time(s), index is [.t index @0,0]"
+
+step "7e1b. build2's widgets scrolled from an IDLE handler -- inside\
+ the event loop, but no event and no binding"
+build2
+wheelcount
+after idle {incr ::n; .u yview scroll 3.0 units}
 update
 done "returned; ran $::n time(s), index is [.u index @0,0]"
 
