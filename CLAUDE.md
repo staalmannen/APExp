@@ -1892,14 +1892,45 @@ Storing is not the whole of it where a value can be *validated*:
 name that cannot be resolved is the same class of lie as answering the
 empty string.
 
-**It does not exit cleanly.** There is still no
-`tk-runall: runAllTests returned` marker, because after the last test
-of the last file `wish` dies, at the same address every run:
+**It does not exit cleanly.** After the last test of the last file
+`wish` dies, at the same address every run:
 
 ```
 ==== xmfbox-2.6 FAILED
 wish 16510: suicide: sys: trap: general protection violation pc=0x26f694
 ```
+
+**`tk-runall.tcl`'s completion marker was measuring nothing, and the
+absence of it was not evidence of anything.** `tcltest::cleanupTests`
+ends with
+
+```tcl
+/* tcltest.tcl:2630 */
+if {[info exists ::tk_version] && ![testConstraint interactive]} {
+	exit
+}
+```
+
+so under `wish` **tcltest exits the application itself** once the last
+file is summarised, and `source all.tcl` never returns. A marker written
+after it could not print however well the run went -- which is exactly
+what was seen: a run that printed tcltest's own
+`Total 5007 Passed 3945 Skipped 805 Failed 257` and no marker, with no
+crash. Nothing was wrong; the marker was unreachable.
+
+`tk-runall.tcl` wraps `::exit` now and prints
+
+```
+tk-runall: every file ran, now entering exit
+```
+
+from inside the wrapper, **before** the real exit, so everything
+`Tcl_Exit` does -- including tearing down every window -- happens after
+that line. That makes it a genuine discriminator for the crash below:
+marker then fault means the fault is in teardown; fault with no marker
+means a test file did it. Do not put a failure count in it --
+`cleanupTests` zeroes `numTests` a few lines above that `exit`, so it
+would always read 0.
 
 **Resolve a pc with acid, statically, on the binary.** This is *not*
 the interactive acid the note above warns about -- there is no process,
@@ -1955,20 +1986,92 @@ registers the **`Container *` itself** as client data, so it never
 looks anything up and can never fail to find it. That is a real
 difference and a real hole.
 
-**It is not yet shown to be this crash.** `-singleproc 1` leaves ~30
-toplevels alive at exit -- safe.test's "Untrusted Tcl applet"
-containers among them -- and teardown touches all of them, so there is
-more than one route to a dead window.
-`sys/lib/tests/tk-embed-destroy-test.tcl` exists to make the answer a
-printed line rather than an argument: it builds container/embedded
-pairs, destroys each half first in turn, and **provokes a geometry
-request afterwards**, which is the step that matters -- destroying the
-container proves nothing on its own, because nothing dereferences the
-stale pointer until something asks for a resize.
+**REFUTED, and the reason is worth more than the result.**
+`sys/lib/tests/tk-embed-destroy-test.tcl` runs every ordering --
+destroy the embedded half first, the container first, the container's
+toplevel, five live pairs at once, and Tk's own exit teardown -- and
+**provokes a geometry request after each**, which is the step that
+matters, since nothing dereferences a stale pointer until something
+asks for a resize. All of it returns.
+
+Section 4 says why, in one line:
+
+```
+STEP: 4. destroy the CONTAINER half, then provoke a geometry request
+     .c gone      .c.f gone      .e gone
+  ok: the embedded half went with its container, so nothing to poke
+```
+
+**The embedded half dies with its container**, and that is structural
+rather than luck: `Tk_MakeWindow` creates an embedded toplevel as a
+*child of the container window* -- that substitution *is* the embedding
+here (see the embedding section above). So `containerPtr->parentPtr`
+cannot outlive an embedded half that could still make a request, and
+the `ContainerEventProc` hole above -- real though it is -- cannot
+produce this crash. Fix it on its own merits if you like; do not expect
+the crash to go with it.
+
+**So the caller is still unidentified.** The other things that call
+`Tk_GeometryRequest` on a window they stored earlier are generic Tk's:
+`Tk_MaintainGeometry`, which registers a placed window with *every*
+master between it and its parent -- and which is already implicated in
+the one known-open port bug, `geometry-4.7`.
+
+**Bisecting by test file: NEITHER HALF CRASHES.** `tk-runall.tcl`
+forwards its arguments to tcltest, so this needs no rebuild:
+
+```
+wish $home/APExp/sys/lib/tests/tk-runall.tcl -file {[a-m]*.test}
+wish $home/APExp/sys/lib/tests/tk-runall.tcl -file {[n-z]*.test}
+```
+
+Both run to completion. So **the crash is cumulative or a cross-half
+interaction**, and cannot be found by splitting in two -- one half
+"containing" it is exactly what did not happen.
+
+**Bisect a prefix instead.** `a-m` is clean and `a-z` crashes, so the
+threshold is somewhere in between and the lower bound never moves:
+
+```
+wish .../tk-runall.tcl -file {[a-s]*.test}	;# then narrow
+```
+
+Three or four runs name the file whose *addition* is fatal, which is a
+different and more useful fact than which file contains the bug: with
+`-singleproc 1` every file is sourced into one wish, so the answer is
+likely "the Nth toplevel" or "the Nth of something" rather than a
+misbehaving test.
+
+**The discriminator is the crash message itself**, not the absence of a
+marker -- the marker was unreachable until the `::exit` wrapper, and
+reading its absence as "did not finish" is what made the two clean
+halves look ambiguous when they were not.
+
+**The `[n-z]` half also gave the first proper accounting**, which no
+earlier run reached because none of them finished:
+
+```
+all.tcl:  Total 5007  Passed 3945  Skipped 805  Failed 257
+Sourced 47 Test Files.
+```
+
+**That corroborates the counting method used throughout this section.**
+`grep -c FAILED` halved gave 287 for all 97 files; tcltest says 257 for
+these 47, leaving ~30 for `[a-m]`, which adds up. The numbers in the
+table above are not an artefact of how they were counted.
+
+The 805 skips are constraints, and the big ones are all legitimately
+absent here: `win` 280, `secureserver` 71, `nonPortable` 69, `nt` 55,
+`winSend` 51, `fonts` 50. **Do not read `Total 5007` as a target.**
 
 **The crash hides nothing.** `xmfbox` is the last file alphabetically,
 so all 97 files and every failure are already measured; only the
-summary line and the marker are lost. It is still worth doing early,
+summary line is lost. **The next full run settles where the fault is
+without any further work**: `tk-runall.tcl` now prints its marker from
+inside a wrapper around `::exit`, so a `tk-runall: every file ran, now
+entering exit` line followed by the fault confirms the fault is in
+`Tcl_Exit`/teardown, and a fault with no marker moves it back into a
+test file. It is still worth doing early,
 because a general protection violation is a memory-safety signal and
 this port has form -- `TkpDeleteFont` and `TkpFreeColor` both freed a
 struct they did not own (see the hook section above), and both were
@@ -2033,12 +2136,16 @@ wrong order, so keep them apart:
   bound on progress, not the truth.
 - **There is also a real hang**, and this is the one that matters.
   Adding the exit did *not* change the log: `tk-runall.tcl` produced a
-  byte-identical 535 lines, so `runAllTests` never returned. The first
-  two explanations were both true and neither was the cause.
+  byte-identical 535 lines. The first two explanations were both true
+  and neither was the cause. (The reasoning written here at the time --
+  "so `runAllTests` never returned" -- leant on a marker that could not
+  print in any case; see the marker note above. The byte-identical log
+  is the evidence, and it stands on its own. The hang was later
+  confirmed directly, by `-verbose t` ending at `scrollbar-10.1 start`.)
 
 `sys/lib/tests/tk-runall.tcl` sets line buffering before anything is
-written and prints `tk-runall: runAllTests returned, N failed` when the
-suite completes. With both in place the answer is settled:
+written and prints a marker from inside a wrapper around `::exit`. With
+both in place the answer is settled:
 
 **A background error is a hang, and neutralising it means replacing the
 default handler, not `::bgerror`.** Tk's default background-error

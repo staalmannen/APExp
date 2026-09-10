@@ -37,16 +37,38 @@
 #    Those two look identical from outside and want opposite next steps,
 #    so the marker line at the bottom separates them:
 #
-#	tk-runall: runAllTests returned, N failed
+#	tk-runall: every file ran, now entering exit
 #
-#    Present  -> every file ran; anything wedged after it is in exit,
-#                i.e. Tcl_Exit -> destroying the main window -> this
-#                port's teardown. The leftover windows on screen point
-#                the same way.
+#    Present  -> every file ran; anything wedged or faulting after it is
+#                in exit, i.e. Tcl_Exit -> destroying the main window ->
+#                this port's teardown. The leftover windows on screen
+#                point the same way.
 #    Absent   -> a test file hung, and with line buffering the LAST
 #                NAME IN THE LOG is now genuinely where it stopped
 #                rather than wherever the buffer happened to end.
 #
+# 3. THE MARKER HAS TO BE HUNG ON exit, NOT ON THE END OF THE SCRIPT.
+#    This was got wrong for several rounds, and the wrong version is
+#    worse than none: it reads as "the suite did not finish" on every
+#    run, including the ones that finished.
+#
+#    tcltest::cleanupTests ends with (tcltest.tcl:2630)
+#
+#	# exit only if running Tk in non-interactive mode
+#	if {[info exists ::tk_version] && ![testConstraint interactive]} {
+#	    exit
+#	}
+#
+#    -- under wish, tcltest exits the application itself once the last
+#    file has been summarised. So "source all.tcl" NEVER RETURNS, and a
+#    marker written after it can never be reached however well the run
+#    went. Note the comment upstream put above those lines: "Actually,
+#    this doesn't belong here at all. A package really has no business
+#    [exit]-ing an application."
+#
+#    So ::exit is wrapped below instead. Do not put the count in the
+#    marker: cleanupTests zeroes numTests a few lines above that exit,
+#    so it would always read 0. "grep -c FAILED" halved is the count.
 # The leftover windows are a third thing, and not a mystery: all.tcl
 # sets -singleproc 1, so all 97 files are sourced into one wish, and
 # every toplevel a test forgets to destroy -- safe.test's "Untrusted Tcl
@@ -125,16 +147,31 @@ proc ::tk::dialog::error::bgerror {err {flag 1}} {
     return
 }
 
+# The completion marker. tcltest exits the application from inside
+# cleanupTests (see 3 above), so this is the only place the marker can
+# be written from -- and it is written BEFORE the real exit runs, which
+# is what makes it useful: everything Tcl_Exit does, including tearing
+# down every window this port ever created, happens after this line.
+#
+# The suite's teardown crash lands there, so
+#
+#	marker, then the fault	-> the crash is in exit/teardown
+#	fault, no marker	-> a test file did it
+rename ::exit ::tk-runall-realexit
+
+proc ::exit {{code 0}} {
+    puts "tk-runall: every file ran, now entering exit (code $code)"
+    puts "tk-runall: anything below this line is Tcl_Exit and Tk teardown"
+    flush stdout
+    ::tk-runall-realexit $code
+}
+
 puts "tk-runall: starting, line buffered, default bgerror dialog replaced\
- by a log line (tkerror delegation kept)"
+ by a log line (tkerror delegation kept), exit wrapped for the marker"
 
 # all.tcl reads $argv itself, so options given here reach tcltest.
 source [file join [pwd] all.tcl]
 
-# Reaching this line at all is the interesting part -- see above.
-set failed 0
-catch {set failed $::tcltest::numTests(Failed)}
-puts "tk-runall: runAllTests returned, $failed failed"
-flush stdout
-
-exit [expr {$failed > 0 ? 1 : 0}]
+# Only reached if tcltest did NOT exit for us -- e.g. the interactive
+# constraint was set. Go through the wrapper so the marker still prints.
+exit 0
