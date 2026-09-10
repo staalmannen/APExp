@@ -7,3 +7,4 @@ To install, just write mk install in the top level directory.
 To make a clean rebuild, just run mk clean in the root of APExp. You can also just remove binaries from $objtype/bin, $objtype/bin/ape and libraries from $objtype/lib/ape to completely start from fresh. (TODO: mk distclean option. The reason to use this instead of nuke is to avoid accidental deletions of files from system directories if I messed up somewhere).
 
 APExp builds on a clean 9front (amd64) VM. Please let me know if any changes are needed to make it build on other Plan9 distros and architectures.
+\ No newline at end of file

@@ -62,12 +62,26 @@
 #	registers the Container* ITSELF as the client data, so it never
 #	looks anything up and can never fail to find it.
 #
-# That is a real difference from upstream and a real hole. It is NOT
-# yet shown to be this crash: the suite leaves roughly thirty
-# toplevels alive at exit -- safe.test's "Untrusted Tcl applet"
-# containers among them -- and teardown touches all of them, so there
-# is more than one way to reach a dead window. This file is here to
-# make the answer a printed line rather than an argument.
+# That is a real difference from upstream and a real hole.
+#
+# IT IS NOT THIS CRASH. Every section below returns. Section 4 says
+# why in one line:
+#
+#	STEP: 4. destroy the CONTAINER half, then provoke a request
+#	     .c gone      .c.f gone      .e gone
+#	  ok: the embedded half went with its container
+#
+# The embedded half DIES WITH ITS CONTAINER, and that is structural
+# rather than luck: Tk_MakeWindow creates an embedded toplevel as a
+# CHILD of the container window -- that substitution is the whole of
+# the embedding on Plan 9. So containerPtr->parentPtr cannot outlive an
+# embedded half that could still ask for a resize, and the
+# ContainerEventProc hole cannot produce a dangling parentPtr. Worth
+# fixing on its own merits; do not expect the crash to go with it.
+#
+# The file stays as the regression test for that ordering, and as the
+# record of a suspect that was excluded by running it rather than by
+# arguing about it.
 #
 # ORDER: every case that should survive comes before any case that
 # might not, and each prints a flushed marker BEFORE it runs, so the
