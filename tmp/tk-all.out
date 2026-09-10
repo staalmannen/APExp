@@ -7,7 +7,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-10 14:48:25 +0200
+Tests began at 2026-09-10 15:03:00 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -93,7 +93,6 @@ dialog.test
 embed.test
 entry.test
 event.test
-tkp9: window table 256/2048 in use
 
 
 ==== event-9.13 pointer window is a toplevel, toplevel destination FAILED
@@ -129,6 +128,41 @@ tkp9: window table 256/2048 in use
 |<Enter> NotifyNonlinearVirtual .one|<Enter> NotifyNonlinearVirtual .one.f1|<Enter> NotifyNonlinear .one.f1.f2|
 ==== event-9.14 FAILED
 
+
+
+==== event-9.18 Successive destructions (pointer window + ancestors including its toplevel), destination is non-root toplevel FAILED
+==== Contents of test case:
+
+    bind all <Leave> {append result "<Leave> %d %W|"}
+    bind all <Enter> {append result "<Enter> %d %W|"}
+    destroy .two
+    waitForWindowEvent .one <Enter>
+    set result
+
+---- Result was:
+|<Enter> NotifyAncestor .one|
+---- Result should have been (exact matching):
+|<Enter> NotifyNonlinear .one|
+==== event-9.18 FAILED
+
+
+
+==== event-9.19 Successive destructions (pointer window + ancestors including its toplevel), destination is internal window, bypass root win FAILED
+==== Contents of test case:
+
+    bind all <Leave> {append result "<Leave> %d %W|"}
+    bind all <Enter> {append result "<Enter> %d %W|"}
+    destroy .three
+    waitForWindowEvent .two.f1.f2 <Enter>
+    update idletasks; #finish destroying .two
+    set result
+
+---- Result was:
+|<Enter> NotifyVirtual .two|<Enter> NotifyVirtual .two.f1|<Enter> NotifyAncestor .two.f1.f2|
+---- Result should have been (exact matching):
+|<Enter> NotifyNonlinearVirtual .two|<Enter> NotifyNonlinearVirtual .two.f1|<Enter> NotifyNonlinear .two.f1.f2|
+==== event-9.19 FAILED
+
 filebox.test
 
 
@@ -147,7 +181,6 @@ filebox.test
 *NOTREADABLE*
 ==== filebox-7.1-0 FAILED
 
-tkp9: window table 512/2048 in use
 focus.test
 
 
@@ -261,7 +294,6 @@ font.test
 ==== font-21.22 FAILED
 
 fontchooser.test
-tkp9: window table 768/2048 in use
 frame.test
 
 
@@ -314,7 +346,6 @@ init configure |
 get.test
 grab.test
 grid.test
-tkp9: window table 1024/2048 in use
 image.test
 
 
@@ -470,7 +501,6 @@ pack.test
 
 packgrid.test
 panedwindow.test
-tkp9: window table 1280/2048 in use
 pkgconfig.test
 
 
@@ -536,7 +566,6 @@ place.test
 
 raise.test
 safe.test
-tkp9: window table 1536/2048 in use
 safePrimarySelection.test
 scale.test
 scrollbar.test
@@ -1864,7 +1893,6 @@ result: 145.0 - expected: 164.0
 151.80
 ==== textDisp-16.17 FAILED
 
-tkp9: window table 1792/2048 in use
 textImage.test
 
 
@@ -5735,5 +5763,55 @@ pack {} wm {}
 ==== wm-forget-2 FAILED
 
 xmfbox.test
-tkp9: window table 2048/2048 in use
-tkp9: window table full (2048 entries); every XCreateWindow from here would answer None
+
+Tests ended at 2026-09-10 15:04:38 +0200
+all.tcl:	Total	10027	Passed	8320	Skipped	1429	Failed	278
+Sourced 97 Test Files.
+Files with failing tests: clipboard.test event.test filebox.test focus.test font.test frame.test geometry.test image.test imgListFormat.test imgPhoto.test pack.test pkgconfig.test place.test select.test systray.test text.test textDisp.test textImage.test textTag.test textWind.test tk.test unixEmbed.test unixFont.test unixSelect.test unixWm.test visual.test winWm.test winfo.test wm.test
+Number of tests skipped for each constraint:
+	12	altDisplay
+	30	aqua
+	7	aquaOrWin32
+	1	cliboardManagerPresent
+	16	colorsFree
+	21	defaultPseudocolor8
+	10	emptyTest
+	126	fonts
+	1	hasArial
+	1	hasCourierNew
+	1	hasTimesNew
+	2	haveDISPLAY
+	1	haveDefault24bitsVisual
+	3	haveFixedFamilyFont
+	5	haveOtherVisual
+	1	havePseudocolorVisual
+	8	knownBug
+	1	memory
+	9	needsICU
+	89	nonPortable
+	55	nt
+	2	pseudocolor8
+	71	secureserver
+	154	testImageType
+	5	testbitmap
+	7	testborder
+	5	testcursor
+	18	testembed
+	5	testfont
+	7	testmakeexist
+	21	testmenubar
+	11	testmetrics
+	1	testmovemouse
+	215	testobjconfig
+	3	testpressbutton
+	1	testprintf
+	31	testtext
+	20	testutils
+	7	testwinevent
+	54	testwrapper
+	1	userInteraction
+	337	win
+	2	win32
+	51	winSend
+tk-runall: every file ran, now entering exit (code 0)
+tk-runall: anything below this line is Tcl_Exit and Tk teardown
