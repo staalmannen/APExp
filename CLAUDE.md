@@ -1892,14 +1892,45 @@ Storing is not the whole of it where a value can be *validated*:
 name that cannot be resolved is the same class of lie as answering the
 empty string.
 
-**It does not exit cleanly.** There is still no
-`tk-runall: runAllTests returned` marker, because after the last test
-of the last file `wish` dies, at the same address every run:
+**It does not exit cleanly.** After the last test of the last file
+`wish` dies, at the same address every run:
 
 ```
 ==== xmfbox-2.6 FAILED
 wish 16510: suicide: sys: trap: general protection violation pc=0x26f694
 ```
+
+**`tk-runall.tcl`'s completion marker was measuring nothing, and the
+absence of it was not evidence of anything.** `tcltest::cleanupTests`
+ends with
+
+```tcl
+/* tcltest.tcl:2630 */
+if {[info exists ::tk_version] && ![testConstraint interactive]} {
+	exit
+}
+```
+
+so under `wish` **tcltest exits the application itself** once the last
+file is summarised, and `source all.tcl` never returns. A marker written
+after it could not print however well the run went -- which is exactly
+what was seen: a run that printed tcltest's own
+`Total 5007 Passed 3945 Skipped 805 Failed 257` and no marker, with no
+crash. Nothing was wrong; the marker was unreachable.
+
+`tk-runall.tcl` wraps `::exit` now and prints
+
+```
+tk-runall: every file ran, now entering exit
+```
+
+from inside the wrapper, **before** the real exit, so everything
+`Tcl_Exit` does -- including tearing down every window -- happens after
+that line. That makes it a genuine discriminator for the crash below:
+marker then fault means the fault is in teardown; fault with no marker
+means a test file did it. Do not put a failure count in it --
+`cleanupTests` zeroes `numTests` a few lines above that `exit`, so it
+would always read 0.
 
 **Resolve a pc with acid, statically, on the binary.** This is *not*
 the interactive acid the note above warns about -- there is no process,
@@ -2011,6 +2042,11 @@ different and more useful fact than which file contains the bug: with
 likely "the Nth toplevel" or "the Nth of something" rather than a
 misbehaving test.
 
+**The discriminator is the crash message itself**, not the absence of a
+marker -- the marker was unreachable until the `::exit` wrapper, and
+reading its absence as "did not finish" is what made the two clean
+halves look ambiguous when they were not.
+
 **The `[n-z]` half also gave the first proper accounting**, which no
 earlier run reached because none of them finished:
 
@@ -2030,7 +2066,12 @@ absent here: `win` 280, `secureserver` 71, `nonPortable` 69, `nt` 55,
 
 **The crash hides nothing.** `xmfbox` is the last file alphabetically,
 so all 97 files and every failure are already measured; only the
-summary line and the marker are lost. It is still worth doing early,
+summary line is lost. **The next full run settles where the fault is
+without any further work**: `tk-runall.tcl` now prints its marker from
+inside a wrapper around `::exit`, so a `tk-runall: every file ran, now
+entering exit` line followed by the fault confirms the fault is in
+`Tcl_Exit`/teardown, and a fault with no marker moves it back into a
+test file. It is still worth doing early,
 because a general protection violation is a memory-safety signal and
 this port has form -- `TkpDeleteFont` and `TkpFreeColor` both freed a
 struct they did not own (see the hook section above), and both were
@@ -2095,12 +2136,16 @@ wrong order, so keep them apart:
   bound on progress, not the truth.
 - **There is also a real hang**, and this is the one that matters.
   Adding the exit did *not* change the log: `tk-runall.tcl` produced a
-  byte-identical 535 lines, so `runAllTests` never returned. The first
-  two explanations were both true and neither was the cause.
+  byte-identical 535 lines. The first two explanations were both true
+  and neither was the cause. (The reasoning written here at the time --
+  "so `runAllTests` never returned" -- leant on a marker that could not
+  print in any case; see the marker note above. The byte-identical log
+  is the evidence, and it stands on its own. The hang was later
+  confirmed directly, by `-verbose t` ending at `scrollbar-10.1 start`.)
 
 `sys/lib/tests/tk-runall.tcl` sets line buffering before anything is
-written and prints `tk-runall: runAllTests returned, N failed` when the
-suite completes. With both in place the answer is settled:
+written and prints a marker from inside a wrapper around `::exit`. With
+both in place the answer is settled:
 
 **A background error is a hang, and neutralising it means replacing the
 default handler, not `::bgerror`.** Tk's default background-error
