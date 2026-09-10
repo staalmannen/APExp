@@ -83,6 +83,15 @@ typedef struct P9DisplayState {
     /* Window table */
     P9Window     wins[TKP9_MAX_WINDOWS];
     int          nwins;
+    /*
+     * How many slots are in use, and the most ever in use at once.
+     * Occupancy is REPORTED, not merely counted: running out is a
+     * cliff, and the failure it used to produce -- XCreateWindow
+     * answering None -- is silent at every level above it. See
+     * TkP9AllocWindow.
+     */
+    int          winuse;
+    int          winhigh;
     /* Pending X events queue (simple ring buffer) */
     XEvent       evqueue[TKP9_EVQUEUE];
     int          evhead;
