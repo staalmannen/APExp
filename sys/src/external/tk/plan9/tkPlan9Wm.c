@@ -1128,11 +1128,102 @@ TkWmRemoveFromColormapWindows(TkWindow *winPtr)
     (void)winPtr;
 }
 
+/*
+ * Count, then collect, the toplevels in winPtr's family that would
+ * appear in a stacking order: mapped, a toplevel, and not embedded.
+ * Upstream's TkWmStackorderToplevelWrapperMap does the same walk into a
+ * hash table keyed by the X wrapper window; there are no wrappers here,
+ * so an array and a linear scan are enough for the handful of toplevels
+ * a program has.
+ */
+static int
+WmStackCount(TkWindow *winPtr)
+{
+    TkWindow *childPtr;
+    int n = 0;
+
+    if (Tk_IsMapped((Tk_Window) winPtr) && Tk_IsTopLevel(winPtr)
+            && !Tk_IsEmbedded(winPtr))
+	n = 1;
+    for (childPtr = winPtr->childList; childPtr != NULL;
+	    childPtr = childPtr->nextPtr)
+	n += WmStackCount(childPtr);
+    return n;
+}
+
+static void
+WmStackCollect(TkWindow *winPtr, TkWindow **list, int *np)
+{
+    TkWindow *childPtr;
+
+    if (Tk_IsMapped((Tk_Window) winPtr) && Tk_IsTopLevel(winPtr)
+            && !Tk_IsEmbedded(winPtr))
+	list[(*np)++] = winPtr;
+    for (childPtr = winPtr->childList; childPtr != NULL;
+	    childPtr = childPtr->nextPtr)
+	WmStackCollect(childPtr, list, np);
+}
+
+/*
+ * TkWmStackorderToplevel --
+ *
+ *	The toplevels under parentPtr, bottom of the stacking order first,
+ *	NULL-terminated; the caller ckfrees it. NULL means failure, which
+ *	is not the same as an empty list and is what "wm stackorder"
+ *	reports as an error.
+ *
+ *	THIS WAS A STUB RETURNING NULL, and the note in CLAUDE.md claiming
+ *	it was implemented was wrong -- read from a grep of the name
+ *	rather than the body. That mattered: `wm stackorder` was rewritten
+ *	to call it, so 31 of wm.test's 32 stackorder tests went from
+ *	answering an empty list to raising an error.
+ *
+ *	On X this needs XQueryTree, because the server owns the order and
+ *	a window manager may have reparented every toplevel into a frame.
+ *	Here this port owns it: dispPtr->firstWmPtr is the list, bottom
+ *	first (see the stacking-order section in CLAUDE.md), which is
+ *	already the order this function must return. So the whole job is
+ *	to intersect that list with the family under parentPtr.
+ */
 TkWindow **
 TkWmStackorderToplevel(TkWindow *parentPtr)
 {
-    (void)parentPtr;
-    return NULL;
+    TkWindow **windows, **found;
+    WmInfo *wmPtr;
+    int n, i, k = 0, got = 0;
+
+    n = WmStackCount(parentPtr);
+    windows = (TkWindow **) ckalloc((n + 1) * sizeof *windows);
+    if (n == 0) {
+	windows[0] = NULL;
+	return windows;
+    }
+    found = (TkWindow **) ckalloc(n * sizeof *found);
+    WmStackCollect(parentPtr, found, &got);
+
+    for (wmPtr = parentPtr->dispPtr->firstWmPtr; wmPtr != NULL;
+	    wmPtr = wmPtr->nextPtr)
+	for (i = 0; i < got; i++)
+	    if (found[i] == wmPtr->winPtr) {
+		windows[k++] = found[i];
+		found[i] = NULL;		/* once only */
+		break;
+	    }
+
+    /*
+     * Anything mapped but absent from firstWmPtr, in discovery order.
+     * There should be none -- every toplevel is linked in by
+     * TkWmNewWindow -- but returning a SHORT list would be a silently
+     * wrong stacking order, and "wm stackorder ." answering the empty
+     * list is one of the cases the tests check by name.
+     */
+    for (i = 0; i < got; i++)
+	if (found[i] != NULL)
+	    windows[k++] = found[i];
+
+    windows[k] = NULL;
+    ckfree(found);
+    return windows;
 }
 
 void
@@ -1623,6 +1714,22 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
     if (Tcl_GetIndexFromObjStruct(interp, objv[1], opts,
             sizeof(char *), "option", 0, &index) != TCL_OK)
         return TCL_ERROR;
+
+    /*
+     * Every subcommand needs a window, and the message for leaving it
+     * out is the GENERIC one -- "wm option window ?arg ...?" -- not the
+     * per-subcommand usage. Upstream checks this after resolving the
+     * index and before dispatching, and each subcommand's own
+     * Tcl_WrongNumArgs is then only ever reached with a window present.
+     *
+     * Without it every "wm <sub>" with no window answered
+     * "wm stackorder window ?isabove|isbelow window?" and so on, which
+     * is one failing test per subcommand -- the wm-*-1.1 "usage" cases.
+     */
+    if (objc < 3) {
+        Tcl_WrongNumArgs(interp, 1, objv, "option window ?arg ...?");
+        return TCL_ERROR;
+    }
 
     /*
      * Resolve the window. This used to be skipped entirely, so every
