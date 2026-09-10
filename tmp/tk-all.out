@@ -6,7 +6,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-09 16:52:34 +0200
+Tests began at 2026-09-10 03:55:07 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -94,40 +94,6 @@ entry.test
 event.test
 
 
-==== event-9.11 pointer window container = parent FAILED
-==== Contents of test case:
-
-    bind all <Leave> {append result "<Leave> %d %W|"}
-    bind all <Enter> {append result "<Enter> %d %W|"}
-    destroy .one.f1.f2
-    update
-    set result
-
----- Result was:
-|
----- Result should have been (exact matching):
-|<Enter> NotifyInferior .one.f1|
-==== event-9.11 FAILED
-
-
-
-==== event-9.12 pointer window container != parent FAILED
-==== Contents of test case:
-
-    bind all <Leave> {append result "<Leave> %d %W|"}
-    bind all <Enter> {append result "<Enter> %d %W|"}
-    destroy .one.g
-    update
-    set result
-
----- Result was:
-|<Leave> NotifyInferior .one|<Enter> NotifyVirtual .one.f1|<Enter> NotifyAncestor .one.f1.f2|
----- Result should have been (exact matching):
-|<Enter> NotifyNonlinearVirtual .one.f1|<Enter> NotifyNonlinear .one.f1.f2|
-==== event-9.12 FAILED
-
-
-
 ==== event-9.13 pointer window is a toplevel, toplevel destination FAILED
 ==== Contents of test case:
 
@@ -160,25 +126,6 @@ event.test
 ---- Result should have been (exact matching):
 |<Enter> NotifyNonlinearVirtual .one|<Enter> NotifyNonlinearVirtual .one.f1|<Enter> NotifyNonlinear .one.f1.f2|
 ==== event-9.14 FAILED
-
-
-
-==== event-9.17 Successive destructions (pointer window + parent), separate crossing events FAILED
-==== Contents of test case:
-
-    bind all <Leave> {append result "<Leave> %d %W|"}
-    bind all <Enter> {append result "<Enter> %d %W|"}
-    destroy .one.f1.f2
-    update; # make sure window is gone
-    destroy .one.f1
-    update; # make sure window is gone
-    set result
-
----- Result was:
-|
----- Result should have been (exact matching):
-|<Enter> NotifyInferior .one.f1|<Enter> NotifyInferior .one|
-==== event-9.17 FAILED
 
 filebox.test
 
