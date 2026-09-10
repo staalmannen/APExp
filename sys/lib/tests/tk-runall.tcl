@@ -65,7 +65,29 @@ fconfigure stderr -buffering line
 catch {fconfigure $::tcltest::outputChannel -buffering line}
 catch {fconfigure $::tcltest::errorChannel -buffering line}
 
-puts "tk-runall: starting, line buffered"
+# A background error inside a binding reaches bgerror, and Tk's default
+# bgerror puts up a MODAL dialog and waits for a click. Nothing in a
+# test run will ever click it, so an unhandled error inside any binding
+# stops the whole suite dead -- with the message only on screen, never
+# in the log, and the CPU pinned by the dialog's own event loop. That is
+# a hang whose cause is invisible from the log alone, which is exactly
+# the trap this file spent several rounds inside.
+#
+# Log it instead. This is a deliberate change to how the suite behaves,
+# so note the one place it could matter: bgerror.test tests bgerror
+# itself, but each of its cases defines its own bgerror, which overrides
+# this one for the duration -- so it is unaffected. Any BGERROR line
+# below is a real background error that would otherwise have wedged the
+# run.
+proc ::bgerror {msg} {
+    puts "BGERROR: $msg"
+    if {[info exists ::errorInfo]} {
+	puts "BGERROR-INFO: $::errorInfo"
+    }
+    flush stdout
+}
+
+puts "tk-runall: starting, line buffered, bgerror logged not dialogged"
 
 # all.tcl reads $argv itself, so options given here reach tcltest.
 source [file join [pwd] all.tcl]
