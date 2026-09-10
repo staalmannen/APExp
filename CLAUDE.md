@@ -1730,7 +1730,7 @@ FAILED` counts two lines each, so 52 lines). **25 of those are known
 not to be the Plan 9 backend's**, and are worth recording so they are
 not chased again:
 
-**The five `event-9.*` are ours after all, and are still open.** An
+**The five `event-9.*` were ours after all, and are fixed.** An
 earlier note here said they were generic Tk's, on the strength of
 `event-9.14`'s `%d` details. **That was wrong twice over**, and both
 errors are worth keeping as a warning about reasoning from one member of
@@ -1793,6 +1793,18 @@ The distinction every passing case hid: `event-9.1` and section 3 of
 `tk-enter-test.tcl` both destroy a **toplevel**, which is the branch
 `TkPointerDeadWindow` plus the deferred `pointerDirty` poll happens to
 cover. Every failing one destroys a nested **frame**.
+
+With `PLAN9` in that condition, section 5 gives the details the suite
+asks for, both steps:
+
+```
+containing 350 350 after destroy -> '.one.f1'
+crossings: {Enter .one.f1 NotifyInferior}	;# event-9.11
+...
+crossings: {Enter .one NotifyInferior}		;# event-9.17's second half
+```
+
+and sections 1-4 are unchanged, so the toplevel path did not regress.
 
 **The four `place-8.*`/`pack-18.*` fail on X11 too.** All four have the
 shape
@@ -1883,12 +1895,18 @@ string is **four pixels wider** than on X, one per character, because
 Plan 9 bitmap fonts come in whole sizes and the nearest to 8 points is
 not 8 points. Nothing to fix without a scalable font.
 
-That is 21 of the 26 accounted for. The five still ours and open are
-the `event-9.*` group above.
+That accounts for all 26. Nothing in the list is a known-open port bug:
+21 are upstream, environment or harness limitations, and the five
+`event-9.*` are fixed but not yet re-measured in a full suite run --
+`tk-enter-test.tcl` section 5 is the evidence for them.
 
-`canvas-23.*`, `geometry-4.7`, `listbox-4.7`, `bind-13.14`, `embed-1.1`
-and `fontchooser-2.0/2.1` **were** ours and are fixed -- see the
-sections below.
+`canvas-23.*`, `geometry-4.7`, `listbox-4.7`, `bind-13.14`, `embed-1.1`,
+`fontchooser-2.0/2.1` and the `event-9.*` group **were** ours and are
+fixed -- see the sections below.
+
+**When the next full run lands, re-derive this list rather than
+trusting it.** Every count in this section is a snapshot, and three
+times now a group has been misread from one member of it.
 
 ### Tk on Plan 9: the image path was a stub in both directions
 
