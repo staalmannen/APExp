@@ -1746,12 +1746,52 @@ not a regression. Attributed by file:
 | `winfo.test` | 6 |
 | everything else | 42 across 22 files |
 
-**`wm` is 331 of the 485, and it is one cause.** `Tk_WmObjCmd` in
-`tkPlan9Wm.c` lists 33 subcommands and implements **eleven**:
+**`wm` is 331 of the 485, and it was mostly one cause -- now fixed.**
+`Tk_WmObjCmd` in `tkPlan9Wm.c` lists 33 subcommands and implemented
+**eleven**; the other 22 fell through to `default: return TCL_OK`.
+All 33 have a real case now, and the `default:` arm **raises an error**
+instead of succeeding, so the next subcommand added to `opts[]` without
+an implementation cannot repeat this silently. (A check that the two
+lists match: `awk` the `enum` block for `OPT_*` and compare against
+`grep -o 'case OPT_[A-Z]*'` -- 33 and 33 today.)
+
+Three of them were worth more than the storage:
+
+- **`wm stackorder` answered an empty list**, which is 32 tests on its
+  own and was needless: `TkWmStackorderToplevel` is implemented *in the
+  same file* and `dispPtr->firstWmPtr` has kept the order all along.
+  It now returns the list, and the `isabove`/`isbelow` form with
+  upstream's not-a-toplevel and not-mapped errors.
+- **`wm iconify` and `wm grid` had no case at all**, so the new erroring
+  `default:` would have turned two silent no-ops into hard failures --
+  caught before shipping only by listing `opts[]` against the cases.
+  `wm grid` goes through `Tk_SetGrid`/`Tk_UnsetGrid`, so it shares the
+  grid-units convention documented below; `wm iconify` needs `iconic`
+  to be **distinct from withdrawn** in `wm state`, hence a separate
+  `iconified` field.
+- **`wm iconname` was an alias for `wm title`.** They are different
+  strings and wm.test sets one and reads the other.
+
+`wm overrideredirect` is kept in `Tk_Attributes(tkwin)->override_redirect`
+rather than in `WmInfo`, as upstream does: generic Tk reads it there
+(menus and tooltips set it), so a private copy would be a second answer
+to the same question.
+
+`wm forget` and `wm manage` are still no-ops -- they are real
+generic-Tk reparenting operations, seven tests, and doing them wrongly
+is worse than not doing them.
+
+**The remaining wm failures are not this.** `state`, `iconify`,
+`deiconify`, `withdraw`, `minsize`, `maxsize`, `resizable`, `geometry`
+and `stackorder` were all *implemented* and still failing, so expect a
+second, different cause underneath. Do not read the next run's drop as
+"the wm work is done".
+
+The eleven that were already implemented:
 `geometry`, `minsize`, `maxsize`, `withdraw`, `deiconify`, `state`,
 `stackorder`, `iconname`, `title`, `resizable`, `frame`. The other 22
-fall through to `default:` and answer nothing, which is why almost every
-failure in those two files has the shape
+answered nothing, which is why almost every failure in those two files
+had the shape
 
 ```
 got   {} {} {}
@@ -1759,15 +1799,21 @@ want  {} {3 4 10 2} {}
 ```
 
 -- the test queries (empty), sets, queries again expecting what it set,
-unsets, queries again. **This is `wm title` again, times 22** (see the
+unsets, queries again. **This was `wm title` again, times 22** (see the
 "four wm and keysym stubs that answered plausibly" section): the fact
 that rio makes most of these do nothing is irrelevant to the *query*
-contract, which is what the tests check and what portable Tk code
-reads back. `aspect`, `client`, `colormapwindows`, `command`,
-`focusmodel`, `group`, `iconbitmap`, `iconmask`, `iconphoto`,
-`iconposition`, `iconwindow`, `overrideredirect`, `positionfrom`,
-`protocol`, `sizefrom` and `transient` all need storing in `WmInfo` and
-reporting back, whatever they do or do not do to the screen.
+contract, which is what the tests check and what portable Tk code reads
+back -- `wm transient` to find a dialog's master, `wm protocol` to find
+the `WM_DELETE_WINDOW` handler. They are stored in `WmInfo` and reported
+back now, with upstream's argument checking and error messages, because
+the tests check those too.
+
+Storing is not the whole of it where a value can be *validated*:
+`wm iconbitmap` resolves its bitmap, `wm iconphoto` its images,
+`wm group`/`wm iconwindow`/`wm transient` their windows, and
+`wm command`/`wm colormapwindows` must be proper lists. Accepting a
+name that cannot be resolved is the same class of lie as answering the
+empty string.
 
 **It does not exit cleanly.** There is still no
 `tk-runall: runAllTests returned` marker, because after the last test

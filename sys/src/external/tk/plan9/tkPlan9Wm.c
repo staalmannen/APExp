@@ -54,6 +54,7 @@ typedef struct TkWmInfo {
     int minWidth, minHeight;
     int maxWidth, maxHeight;	/* 0 means unlimited. */
     int withdrawn;
+    int iconified;		/* "wm iconify"; distinct from withdrawn */
     int flags;
     char *title;		/* "wm title", or NULL for the default. */
     /*
@@ -65,8 +66,99 @@ typedef struct TkWmInfo {
     TkWindow *gridWin;
     int reqGridWidth, reqGridHeight;
     int widthInc, heightInc;
+
+    /*
+     * The rest of the "wm" subcommands. rio owns the frame and there is
+     * no window manager, so almost none of these can have an effect on
+     * the screen -- but that is not what they are for. Every one of them
+     * is a QUERY as well as a set, and portable Tk code reads them back:
+     * "wm transient" to find a dialog's master, "wm protocol" to find
+     * the WM_DELETE_WINDOW handler, "wm overrideredirect" to decide
+     * whether a menu is a real toplevel.
+     *
+     * Answering the empty string to a value the caller has just set is
+     * simply wrong, and it is the same mistake "wm title" made on its
+     * own before this (see the "four wm stubs that answered plausibly"
+     * section in CLAUDE.md). Twenty-two subcommands fell through to
+     * "default: return TCL_OK" here, which is why wm.test and
+     * unixWm.test between them reported over three hundred failures of
+     * the shape
+     *
+     *		got   {} {} {}
+     *		want  {} {3 4 10 2} {}
+     *
+     * -- query, set, query back, unset, query again.
+     *
+     * Stored faithfully, reported faithfully, and acted on only where
+     * there is something here to act on. The argument checking and the
+     * error messages follow tkUnixWm.c's, because the tests check those
+     * too and there is no reason to invent different ones.
+     */
+    int minAspectX, minAspectY;	/* wm aspect */
+    int maxAspectX, maxAspectY;
+    int hasAspect;
+    char *clientMachine;	/* wm client */
+    char *command;		/* wm command, kept as the list string */
+    char *cmapWindows;		/* wm colormapwindows, ditto */
+    int focusActive;		/* wm focusmodel: 1 active, 0 passive */
+    char *leaderName;		/* wm group */
+    char *iconName;		/* wm iconname -- NOT the title */
+    char *iconBadge;		/* wm iconbadge */
+    char *iconBitmap;		/* wm iconbitmap */
+    char *iconMask;		/* wm iconmask */
+    char *iconWindow;		/* wm iconwindow, as a path name */
+    char *iconPhoto;		/* wm iconphoto, as given */
+    int iconX, iconY, hasIconPos;
+    int positionFrom;		/* 0 unset, 1 user, 2 program */
+    int sizeFrom;
+    char *transient;		/* wm transient, as a path name */
+    struct WmProto *protoPtr;	/* wm protocol handlers */
+
     struct TkWmInfo *nextPtr;
 } WmInfo;
+
+/*
+ * One "wm protocol" handler. A list rather than a hash table: there are
+ * three of these on a busy toplevel.
+ */
+typedef struct WmProto {
+    struct WmProto *nextPtr;
+    char *name;
+    char *command;
+} WmProto;
+
+/*
+ * Replace a stored string, freeing the old one. A NULL or empty s
+ * clears the slot, which is how every one of these subcommands spells
+ * "unset" -- "wm client .t {}" and so on.
+ */
+static void
+WmSetString(char **slot, const char *s)
+{
+    if (*slot != NULL) {
+	ckfree(*slot);
+	*slot = NULL;
+    }
+    if (s != NULL && *s != '\0') {
+	size_t n = strlen(s) + 1;
+
+	*slot = (char *) ckalloc(n);
+	memcpy(*slot, s, n);
+    }
+}
+
+/*
+ * Report a stored string, or nothing at all when it is unset. Returning
+ * the empty string and returning nothing are the same to Tcl here, but
+ * writing it once keeps every query the same shape.
+ */
+static int
+WmReturnString(Tcl_Interp *interp, const char *s)
+{
+    if (s != NULL)
+	Tcl_SetObjResult(interp, Tcl_NewStringObj(s, -1));
+    return TCL_OK;
+}
 
 #define WM_UPDATE_PENDING	1
 #define WM_NEVER_MAPPED		2
@@ -939,6 +1031,32 @@ TkWmDeadWindow(TkWindow *winPtr)
 	Tcl_CancelIdleCall(WmUpdateGeometry, winPtr);
     if (wmPtr->title != NULL)
 	ckfree(wmPtr->title);
+
+    /*
+     * Everything "wm" stores. Each of these is a ckalloc'd string, so a
+     * toplevel created and destroyed in a loop -- which the test suite
+     * does constantly -- would otherwise leak one per subcommand used.
+     */
+    WmSetString(&wmPtr->clientMachine, NULL);
+    WmSetString(&wmPtr->command, NULL);
+    WmSetString(&wmPtr->cmapWindows, NULL);
+    WmSetString(&wmPtr->leaderName, NULL);
+    WmSetString(&wmPtr->iconName, NULL);
+    WmSetString(&wmPtr->iconBadge, NULL);
+    WmSetString(&wmPtr->iconBitmap, NULL);
+    WmSetString(&wmPtr->iconMask, NULL);
+    WmSetString(&wmPtr->iconWindow, NULL);
+    WmSetString(&wmPtr->iconPhoto, NULL);
+    WmSetString(&wmPtr->transient, NULL);
+    while (wmPtr->protoPtr != NULL) {
+	WmProto *p = wmPtr->protoPtr;
+
+	wmPtr->protoPtr = p->nextPtr;
+	WmSetString(&p->name, NULL);
+	WmSetString(&p->command, NULL);
+	ckfree(p);
+    }
+
     winPtr->wmInfoPtr = NULL;
     ckfree(wmPtr);
 }
@@ -1621,18 +1739,206 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
 
     case OPT_STATE:
         if (objc == 3) {
-            Tcl_SetObjResult(interp, Tcl_NewStringObj(
-                    (wmPtr != NULL && wmPtr->withdrawn)
-                        ? "withdrawn" : "normal", -1));
+            const char *s = "normal";
+
+            if (wmPtr != NULL)
+                s = wmPtr->withdrawn ? "withdrawn"
+                  : wmPtr->iconified ? "iconic" : "normal";
+            Tcl_SetObjResult(interp, Tcl_NewStringObj(s, -1));
+            return TCL_OK;
+        }
+        /*
+         * "wm state .t normal|iconic|withdrawn" is the setting form and
+         * is the same three operations under another name.
+         */
+        if (objc == 4 && winPtr != NULL) {
+            static const char *const states[] = {
+                "normal", "iconic", "withdrawn", NULL };
+            int st;
+
+            if (Tcl_GetIndexFromObjStruct(interp, objv[3], states,
+                    sizeof(char *), "argument", 0, &st) != TCL_OK)
+                return TCL_ERROR;
+            if (wmPtr != NULL) {
+                wmPtr->withdrawn = (st == 2);
+                wmPtr->iconified = (st == 1);
+            }
+            TkpWmSetState(winPtr, st == 0 ? NormalState :
+                    st == 1 ? IconicState : WithdrawnState);
+            return TCL_OK;
         }
         return TCL_OK;
 
-    case OPT_STACKORDER:
-        /* return empty list */
-        Tcl_SetObjResult(interp, Tcl_NewListObj(0, NULL));
+    case OPT_ICONIFY:
+        /*
+         * There are no icons here, but iconified is a state a caller can
+         * ask about and pack/place react to (place-8.*, pack-18.*), so
+         * it has to be distinct from withdrawn rather than folded into
+         * it.
+         */
+        if (winPtr != NULL) {
+            if (wmPtr != NULL) {
+                wmPtr->withdrawn = 0;
+                wmPtr->iconified = 1;
+            }
+            TkpWmSetState(winPtr, IconicState);
+        }
         return TCL_OK;
 
+    case OPT_GRID: {
+        int w, h, dx, dy;
+
+        /*
+         * "wm grid" is the same gridding Tk_SetGrid drives from
+         * "-setgrid 1" -- see the gridding note in CLAUDE.md -- reached
+         * from Tcl instead of from a widget. While it is in force
+         * wmPtr->width/height are in GRID UNITS, so the conversion has
+         * to go through the same two helpers.
+         */
+        if (objc != 3 && objc != 7) {
+            Tcl_WrongNumArgs(interp, 2, objv,
+                    "window ?baseWidth baseHeight widthInc heightInc?");
+            return TCL_ERROR;
+        }
+        if (wmPtr == NULL)
+            return TCL_OK;
+        if (objc == 3) {
+            if (wmPtr->gridWin != NULL) {
+                Tcl_Obj *r[4];
+
+                r[0] = Tcl_NewWideIntObj(wmPtr->reqGridWidth);
+                r[1] = Tcl_NewWideIntObj(wmPtr->reqGridHeight);
+                r[2] = Tcl_NewWideIntObj(wmPtr->widthInc);
+                r[3] = Tcl_NewWideIntObj(wmPtr->heightInc);
+                Tcl_SetObjResult(interp, Tcl_NewListObj(4, r));
+            }
+            return TCL_OK;
+        }
+        if (*Tcl_GetString(objv[3]) == '\0') {
+            Tk_UnsetGrid(tkwin);
+            return TCL_OK;
+        }
+        if (Tcl_GetIntFromObj(interp, objv[3], &w) != TCL_OK
+         || Tcl_GetIntFromObj(interp, objv[4], &h) != TCL_OK
+         || Tcl_GetIntFromObj(interp, objv[5], &dx) != TCL_OK
+         || Tcl_GetIntFromObj(interp, objv[6], &dy) != TCL_OK)
+            return TCL_ERROR;
+        if (w < 0 || h < 0 || dx <= 0 || dy <= 0) {
+            Tcl_SetObjResult(interp, Tcl_NewStringObj(
+                    "baseWidth or baseHeight can't be < 0, and"
+                    " widthInc or heightInc can't be <= 0", -1));
+            Tcl_SetErrorCode(interp, "TK", "VALUE", "GRID", (char *) NULL);
+            return TCL_ERROR;
+        }
+        Tk_SetGrid(tkwin, w, h, dx, dy);
+        return TCL_OK;
+    }
+
+    case OPT_STACKORDER: {
+        /*
+         * This used to answer an empty list, which is 32 of wm.test's
+         * failures on its own -- and needlessly, because
+         * TkWmStackorderToplevel is implemented in this file and
+         * dispPtr->firstWmPtr has kept the order all along (bottom
+         * first, as Tk's own childList convention has it).
+         */
+        static const char *const rels[] = { "isabove", "isbelow", NULL };
+        TkWindow **windows, **wp;
+        int rel;
+
+        if (objc != 3 && objc != 5) {
+            Tcl_WrongNumArgs(interp, 2, objv,
+                    "window ?isabove|isbelow window?");
+            return TCL_ERROR;
+        }
+        windows = TkWmStackorderToplevel(winPtr);
+        if (windows == NULL)
+            return TCL_ERROR;
+        if (objc == 3) {
+            Tcl_Obj *l = Tcl_NewObj();
+
+            for (wp = windows; *wp != NULL; wp++)
+                Tcl_ListObjAppendElement(NULL, l,
+                        Tcl_NewStringObj((*wp)->pathName, -1));
+            ckfree(windows);
+            Tcl_SetObjResult(interp, l);
+            return TCL_OK;
+        }
+        {
+            Tk_Window relWin;
+            TkWindow *winPtr2;
+            int i1 = -1, i2 = -1, i;
+
+            if (TkGetWindowFromObj(interp, (Tk_Window) clientData, objv[4],
+                    &relWin) != TCL_OK) {
+                ckfree(windows);
+                return TCL_ERROR;
+            }
+            winPtr2 = (TkWindow *) relWin;
+            if (!Tk_IsTopLevel(winPtr2)) {
+                Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+                        "window \"%s\" isn't a top-level window",
+                        winPtr2->pathName));
+                Tcl_SetErrorCode(interp, "TK", "WM", "STACK", "TOPLEVEL",
+                        (char *) NULL);
+                ckfree(windows);
+                return TCL_ERROR;
+            }
+            if (!Tk_IsMapped(winPtr)) {
+                Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+                        "window \"%s\" isn't mapped", winPtr->pathName));
+                Tcl_SetErrorCode(interp, "TK", "WM", "STACK", "MAPPED",
+                        (char *) NULL);
+                ckfree(windows);
+                return TCL_ERROR;
+            }
+            if (!Tk_IsMapped(winPtr2)) {
+                Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+                        "window \"%s\" isn't mapped", winPtr2->pathName));
+                Tcl_SetErrorCode(interp, "TK", "WM", "STACK", "MAPPED",
+                        (char *) NULL);
+                ckfree(windows);
+                return TCL_ERROR;
+            }
+            for (i = 0, wp = windows; *wp != NULL; wp++, i++) {
+                if (*wp == winPtr)
+                    i1 = i;
+                if (*wp == winPtr2)
+                    i2 = i;
+            }
+            ckfree(windows);
+            if (i1 < 0 || i2 < 0) {
+                Tcl_SetObjResult(interp, Tcl_NewStringObj(
+                        "TkWmStackorderToplevel failed", -1));
+                return TCL_ERROR;
+            }
+            if (Tcl_GetIndexFromObjStruct(interp, objv[3], rels,
+                    sizeof(char *), "argument", 0, &rel) != TCL_OK)
+                return TCL_ERROR;
+            Tcl_SetObjResult(interp, Tcl_NewBooleanObj(
+                    rel == 0 ? (i1 > i2) : (i1 < i2)));
+        }
+        return TCL_OK;
+    }
+
     case OPT_ICONNAME:
+        /*
+         * NOT an alias for the title, though it shared this case until
+         * now. wm.test sets one and reads the other back, so folding
+         * them together answers the wrong string. There is no icon here
+         * either way; the name is simply remembered.
+         */
+        if (wmPtr == NULL)
+            return TCL_OK;
+        if (objc == 3)
+            return WmReturnString(interp, wmPtr->iconName);
+        if (objc == 4) {
+            WmSetString(&wmPtr->iconName, Tcl_GetString(objv[3]));
+            return TCL_OK;
+        }
+        Tcl_WrongNumArgs(interp, 2, objv, "window ?newName?");
+        return TCL_ERROR;
+
     case OPT_TITLE:
         /*
          * rio owns the window frame, so nothing here displays a title.
@@ -1676,8 +1982,486 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
         Tcl_SetObjResult(interp, Tcl_NewStringObj("0x0", -1));
         return TCL_OK;
 
-    default:
-        /* all other sub-commands silently succeed */
+    case OPT_ASPECT: {
+        int n1, d1, n2, d2;
+
+        if (objc != 3 && objc != 7) {
+            Tcl_WrongNumArgs(interp, 2, objv,
+                    "window ?minNumer minDenom maxNumer maxDenom?");
+            return TCL_ERROR;
+        }
+        if (wmPtr == NULL)
+            return TCL_OK;
+        if (objc == 3) {
+            if (wmPtr->hasAspect) {
+                Tcl_Obj *r[4];
+
+                r[0] = Tcl_NewWideIntObj(wmPtr->minAspectX);
+                r[1] = Tcl_NewWideIntObj(wmPtr->minAspectY);
+                r[2] = Tcl_NewWideIntObj(wmPtr->maxAspectX);
+                r[3] = Tcl_NewWideIntObj(wmPtr->maxAspectY);
+                Tcl_SetObjResult(interp, Tcl_NewListObj(4, r));
+            }
+            return TCL_OK;
+        }
+        if (*Tcl_GetString(objv[3]) == '\0') {
+            wmPtr->hasAspect = 0;
+            return TCL_OK;
+        }
+        if (Tcl_GetIntFromObj(interp, objv[3], &n1) != TCL_OK
+         || Tcl_GetIntFromObj(interp, objv[4], &d1) != TCL_OK
+         || Tcl_GetIntFromObj(interp, objv[5], &n2) != TCL_OK
+         || Tcl_GetIntFromObj(interp, objv[6], &d2) != TCL_OK)
+            return TCL_ERROR;
+        if (n1 <= 0 || d1 <= 0 || n2 <= 0 || d2 <= 0) {
+            Tcl_SetObjResult(interp, Tcl_NewStringObj(
+                    "aspect number can't be <= 0", -1));
+            Tcl_SetErrorCode(interp, "TK", "VALUE", "ASPECT", (char *) NULL);
+            return TCL_ERROR;
+        }
+        wmPtr->minAspectX = n1; wmPtr->minAspectY = d1;
+        wmPtr->maxAspectX = n2; wmPtr->maxAspectY = d2;
+        wmPtr->hasAspect = 1;
         return TCL_OK;
+    }
+
+    case OPT_CLIENT:
+        if (objc != 3 && objc != 4) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window ?name?");
+            return TCL_ERROR;
+        }
+        if (wmPtr == NULL)
+            return TCL_OK;
+        if (objc == 3)
+            return WmReturnString(interp, wmPtr->clientMachine);
+        WmSetString(&wmPtr->clientMachine, Tcl_GetString(objv[3]));
+        return TCL_OK;
+
+    case OPT_COMMAND:
+        if (objc != 3 && objc != 4) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window ?value?");
+            return TCL_ERROR;
+        }
+        if (wmPtr == NULL)
+            return TCL_OK;
+        if (objc == 3)
+            return WmReturnString(interp, wmPtr->command);
+        {
+            /*
+             * The argument must be a proper list -- upstream splits it
+             * into argv for WM_COMMAND, and rejects what it cannot
+             * split. Keep the check even though nothing here consumes
+             * the result, or "wm command .t {\{}" would be accepted
+             * where every other Tk says it is not.
+             */
+            Tcl_Size n;
+            Tcl_Obj **el;
+
+            if (Tcl_ListObjGetElements(interp, objv[3], &n, &el) != TCL_OK)
+                return TCL_ERROR;
+            WmSetString(&wmPtr->command, n == 0 ? NULL :
+                    Tcl_GetString(objv[3]));
+        }
+        return TCL_OK;
+
+    case OPT_CMAPWINS:
+        if (objc != 3 && objc != 4) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window ?windowList?");
+            return TCL_ERROR;
+        }
+        if (wmPtr == NULL)
+            return TCL_OK;
+        if (objc == 3)
+            return WmReturnString(interp, wmPtr->cmapWindows);
+        {
+            Tcl_Size n, i;
+            Tcl_Obj **el;
+
+            if (Tcl_ListObjGetElements(interp, objv[3], &n, &el) != TCL_OK)
+                return TCL_ERROR;
+            /* Every element must name a window, as on X. */
+            for (i = 0; i < n; i++)
+                if (Tk_NameToWindow(interp, Tcl_GetString(el[i]),
+                        (Tk_Window) clientData) == NULL)
+                    return TCL_ERROR;
+            WmSetString(&wmPtr->cmapWindows, n == 0 ? NULL :
+                    Tcl_GetString(objv[3]));
+        }
+        return TCL_OK;
+
+    case OPT_FOCUSMODEL: {
+        static const char *const models[] = { "active", "passive", NULL };
+        int m;
+
+        if (objc != 3 && objc != 4) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window ?active|passive?");
+            return TCL_ERROR;
+        }
+        if (wmPtr == NULL)
+            return TCL_OK;
+        if (objc == 3)
+            return WmReturnString(interp,
+                    wmPtr->focusActive ? "active" : "passive");
+        if (Tcl_GetIndexFromObjStruct(interp, objv[3], models,
+                sizeof(char *), "argument", 0, &m) != TCL_OK)
+            return TCL_ERROR;
+        wmPtr->focusActive = (m == 0);
+        return TCL_OK;
+    }
+
+    case OPT_GROUP:
+        if (objc != 3 && objc != 4) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window ?pathName?");
+            return TCL_ERROR;
+        }
+        if (wmPtr == NULL)
+            return TCL_OK;
+        if (objc == 3)
+            return WmReturnString(interp, wmPtr->leaderName);
+        {
+            const char *s = Tcl_GetString(objv[3]);
+
+            if (*s == '\0') {
+                WmSetString(&wmPtr->leaderName, NULL);
+                return TCL_OK;
+            }
+            if (Tk_NameToWindow(interp, s, (Tk_Window) clientData) == NULL)
+                return TCL_ERROR;
+            WmSetString(&wmPtr->leaderName, s);
+        }
+        return TCL_OK;
+
+    case OPT_TRANSIENT:
+        if (objc != 3 && objc != 4) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window ?window?");
+            return TCL_ERROR;
+        }
+        if (wmPtr == NULL)
+            return TCL_OK;
+        if (objc == 3)
+            return WmReturnString(interp, wmPtr->transient);
+        {
+            const char *s = Tcl_GetString(objv[3]);
+            Tk_Window master;
+
+            if (*s == '\0') {
+                WmSetString(&wmPtr->transient, NULL);
+                return TCL_OK;
+            }
+            master = Tk_NameToWindow(interp, s, (Tk_Window) clientData);
+            if (master == NULL)
+                return TCL_ERROR;
+            /*
+             * A window cannot be its own master, and the master must be
+             * a toplevel -- both are upstream's checks and both are
+             * tested.
+             */
+            if (master == tkwin) {
+                Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+                        "can't make \"%s\" its own master", s));
+                Tcl_SetErrorCode(interp, "TK", "WM", "TRANSIENT", "SELF",
+                        (char *) NULL);
+                return TCL_ERROR;
+            }
+            Tk_MakeWindowExist(master);
+            WmSetString(&wmPtr->transient, Tk_PathName(master));
+        }
+        return TCL_OK;
+
+    case OPT_ICONBITMAP:
+    case OPT_ICONMASK: {
+        char **slot = (index == OPT_ICONBITMAP) ? &wmPtr->iconBitmap
+                                                : &wmPtr->iconMask;
+
+        if (objc != 3 && objc != 4) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window ?bitmap?");
+            return TCL_ERROR;
+        }
+        if (wmPtr == NULL)
+            return TCL_OK;
+        if (objc == 3)
+            return WmReturnString(interp, *slot);
+        {
+            const char *s = Tcl_GetString(objv[3]);
+
+            if (*s == '\0') {
+                WmSetString(slot, NULL);
+                return TCL_OK;
+            }
+            /*
+             * The bitmap has to exist: "wm iconbitmap .t bad-bitmap" is
+             * an error everywhere else, and answering OK to a name that
+             * cannot be resolved is the same class of lie this whole
+             * change is about.
+             */
+            if (Tk_GetBitmap(interp, tkwin, s) == None)
+                return TCL_ERROR;
+            WmSetString(slot, s);
+        }
+        return TCL_OK;
+    }
+
+    case OPT_ICONPHOTO:
+        /*
+         * "wm iconphoto window ?-default? image1 ?image2 ...?". Nothing
+         * displays it, but the images must exist -- that is the half a
+         * caller can observe.
+         */
+        if (objc < 4) {
+            Tcl_WrongNumArgs(interp, 2, objv,
+                    "window ?-default? image1 ?image2 ...?");
+            return TCL_ERROR;
+        }
+        {
+            int i = 3;
+
+            if (strcmp(Tcl_GetString(objv[3]), "-default") == 0) {
+                i = 4;
+                if (objc < 5) {
+                    Tcl_WrongNumArgs(interp, 2, objv,
+                            "window ?-default? image1 ?image2 ...?");
+                    return TCL_ERROR;
+                }
+            }
+            for (; i < objc; i++) {
+                Tk_Image img = Tk_GetImage(interp, tkwin,
+                        Tcl_GetString(objv[i]), NULL, NULL);
+
+                if (img == NULL)
+                    return TCL_ERROR;
+                Tk_FreeImage(img);
+            }
+            if (wmPtr != NULL)
+                WmSetString(&wmPtr->iconPhoto, Tcl_GetString(objv[objc-1]));
+        }
+        return TCL_OK;
+
+    case OPT_ICONBADGE:
+        /* "wm iconbadge window badge" -- set only, no query form. */
+        if (objc != 4) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window badge");
+            return TCL_ERROR;
+        }
+        if (wmPtr != NULL)
+            WmSetString(&wmPtr->iconBadge, Tcl_GetString(objv[3]));
+        return TCL_OK;
+
+    case OPT_ICONPOS: {
+        int x, y;
+
+        if (objc != 3 && objc != 5) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window ?x y?");
+            return TCL_ERROR;
+        }
+        if (wmPtr == NULL)
+            return TCL_OK;
+        if (objc == 3) {
+            if (wmPtr->hasIconPos) {
+                Tcl_Obj *r[2];
+
+                r[0] = Tcl_NewWideIntObj(wmPtr->iconX);
+                r[1] = Tcl_NewWideIntObj(wmPtr->iconY);
+                Tcl_SetObjResult(interp, Tcl_NewListObj(2, r));
+            }
+            return TCL_OK;
+        }
+        if (*Tcl_GetString(objv[3]) == '\0') {
+            wmPtr->hasIconPos = 0;
+            return TCL_OK;
+        }
+        if (Tcl_GetIntFromObj(interp, objv[3], &x) != TCL_OK
+         || Tcl_GetIntFromObj(interp, objv[4], &y) != TCL_OK)
+            return TCL_ERROR;
+        wmPtr->iconX = x;
+        wmPtr->iconY = y;
+        wmPtr->hasIconPos = 1;
+        return TCL_OK;
+    }
+
+    case OPT_ICONWIN:
+        if (objc != 3 && objc != 4) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window ?pathName?");
+            return TCL_ERROR;
+        }
+        if (wmPtr == NULL)
+            return TCL_OK;
+        if (objc == 3)
+            return WmReturnString(interp, wmPtr->iconWindow);
+        {
+            const char *s = Tcl_GetString(objv[3]);
+            Tk_Window icon;
+
+            if (*s == '\0') {
+                WmSetString(&wmPtr->iconWindow, NULL);
+                return TCL_OK;
+            }
+            icon = Tk_NameToWindow(interp, s, (Tk_Window) clientData);
+            if (icon == NULL)
+                return TCL_ERROR;
+            if (!Tk_IsTopLevel(icon)) {
+                Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+                        "can't use %s as icon window: not at top level", s));
+                Tcl_SetErrorCode(interp, "TK", "WM", "ICONWINDOW",
+                        "INNER", (char *) NULL);
+                return TCL_ERROR;
+            }
+            WmSetString(&wmPtr->iconWindow, Tk_PathName(icon));
+        }
+        return TCL_OK;
+
+    case OPT_OVERREDIR: {
+        int b;
+
+        if (objc != 3 && objc != 4) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window ?boolean?");
+            return TCL_ERROR;
+        }
+        /*
+         * Kept in the window's own attributes rather than in WmInfo,
+         * as upstream does: generic Tk reads override_redirect there
+         * (menus and tooltips set it), so a private copy would be a
+         * second answer to the same question.
+         */
+        if (objc == 3) {
+            Tcl_SetObjResult(interp, Tcl_NewBooleanObj(
+                    Tk_Attributes(tkwin)->override_redirect));
+            return TCL_OK;
+        }
+        if (Tcl_GetBooleanFromObj(interp, objv[3], &b) != TCL_OK)
+            return TCL_ERROR;
+        if (Tk_Attributes(tkwin)->override_redirect != b) {
+            XSetWindowAttributes atts;
+
+            atts.override_redirect = b;
+            Tk_ChangeWindowAttributes(tkwin, CWOverrideRedirect, &atts);
+        }
+        return TCL_OK;
+    }
+
+    case OPT_POSFROM:
+    case OPT_SIZEFROM: {
+        static const char *const froms[] = { "program", "user", NULL };
+        int *slot = (index == OPT_POSFROM) ? &wmPtr->positionFrom
+                                           : &wmPtr->sizeFrom;
+        int f;
+
+        if (objc != 3 && objc != 4) {
+            Tcl_WrongNumArgs(interp, 2, objv, index == OPT_POSFROM
+                    ? "window ?user/program?" : "window ?user|program?");
+            return TCL_ERROR;
+        }
+        if (wmPtr == NULL)
+            return TCL_OK;
+        if (objc == 3)
+            return WmReturnString(interp,
+                    *slot == 1 ? "user" : *slot == 2 ? "program" : "");
+        if (*Tcl_GetString(objv[3]) == '\0') {
+            *slot = 0;
+            return TCL_OK;
+        }
+        if (Tcl_GetIndexFromObjStruct(interp, objv[3], froms,
+                sizeof(char *), "argument", 0, &f) != TCL_OK)
+            return TCL_ERROR;
+        *slot = (f == 1) ? 1 : 2;	/* froms[] is program, user */
+        return TCL_OK;
+    }
+
+    case OPT_PROTOCOL: {
+        WmProto *p, **prev;
+        const char *name;
+
+        if (objc < 3 || objc > 5) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window ?name? ?command?");
+            return TCL_ERROR;
+        }
+        if (wmPtr == NULL)
+            return TCL_OK;
+        if (objc == 3) {
+            /* Every protocol that has a handler. */
+            Tcl_Obj *l = Tcl_NewListObj(0, NULL);
+
+            for (p = wmPtr->protoPtr; p != NULL; p = p->nextPtr)
+                Tcl_ListObjAppendElement(NULL, l,
+                        Tcl_NewStringObj(p->name, -1));
+            Tcl_SetObjResult(interp, l);
+            return TCL_OK;
+        }
+        name = Tcl_GetString(objv[3]);
+        prev = &wmPtr->protoPtr;
+        for (p = wmPtr->protoPtr; p != NULL; prev = &p->nextPtr,
+                p = p->nextPtr)
+            if (strcmp(p->name, name) == 0)
+                break;
+        if (objc == 4)
+            return WmReturnString(interp, p != NULL ? p->command : NULL);
+
+        /* Setting: an empty command removes the handler. */
+        if (p != NULL) {
+            *prev = p->nextPtr;
+            WmSetString(&p->name, NULL);
+            WmSetString(&p->command, NULL);
+            ckfree(p);
+        }
+        if (*Tcl_GetString(objv[4]) != '\0') {
+            p = (WmProto *) ckalloc(sizeof *p);
+            p->name = p->command = NULL;
+            WmSetString(&p->name, name);
+            WmSetString(&p->command, Tcl_GetString(objv[4]));
+            p->nextPtr = wmPtr->protoPtr;
+            wmPtr->protoPtr = p;
+        }
+        return TCL_OK;
+    }
+
+    case OPT_ATTRIBUTES:
+        /*
+         * X offers -alpha, -topmost, -type, -zoomed and -fullscreen.
+         * None of them means anything without a window manager, so they
+         * are reported at their defaults rather than refused: a caller
+         * asking "wm attributes .t -topmost" wants an answer, and 0 is
+         * the true one here.
+         */
+        if (objc == 3) {
+            Tcl_SetObjResult(interp, Tcl_NewStringObj(
+                    "-alpha 1.0 -topmost 0 -zoomed 0 -fullscreen 0"
+                    " -type {}", -1));
+            return TCL_OK;
+        }
+        if (objc == 4) {
+            const char *a = Tcl_GetString(objv[3]);
+
+            if (strcmp(a, "-alpha") == 0)
+                Tcl_SetObjResult(interp, Tcl_NewDoubleObj(1.0));
+            else if (strcmp(a, "-type") == 0)
+                Tcl_SetObjResult(interp, Tcl_NewStringObj("", -1));
+            else
+                Tcl_SetObjResult(interp, Tcl_NewBooleanObj(0));
+            return TCL_OK;
+        }
+        return TCL_OK;
+
+    case OPT_FORGET:
+    case OPT_MANAGE:
+        /*
+         * Turning a toplevel into an ordinary child and back. Both are
+         * real generic-Tk operations and neither needs a window manager;
+         * they are left alone here because doing them wrongly is worse
+         * than not doing them, and wm-forget/wm-manage are seven tests.
+         * See the note in CLAUDE.md.
+         */
+        return TCL_OK;
+
+    default:
+        /*
+         * Nothing should reach here now. Every subcommand in opts[]
+         * above has a case, so a new one added to that list without an
+         * implementation is the only way in -- and silently succeeding
+         * is exactly what this change exists to stop.
+         */
+        Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+                "wm %s is not implemented on Plan 9",
+                Tcl_GetString(objv[1])));
+        Tcl_SetErrorCode(interp, "TK", "WM", "UNSUPPORTED", (char *) NULL);
+        return TCL_ERROR;
     }
 }
