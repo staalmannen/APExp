@@ -1894,16 +1894,85 @@ empty string.
 
 **It does not exit cleanly.** There is still no
 `tk-runall: runAllTests returned` marker, because after the last test
-of the last file `wish` dies:
+of the last file `wish` dies, at the same address every run:
 
 ```
 ==== xmfbox-2.6 FAILED
-wish 11179: suicide: sys: trap: general protection violation pc=0x26f694
+wish 16510: suicide: sys: trap: general protection violation pc=0x26f694
 ```
 
-A crash rather than a hang this time, and at teardown rather than in a
-test. That is its own bug and wants `pc=0x26f694` resolved against the
-binary.
+**Resolve a pc with acid, statically, on the binary.** This is *not*
+the interactive acid the note above warns about -- there is no process,
+so nothing fights `wish` for the rio window:
+
+```
+acid /bin/wish
+acid: pcfile(0x26f694)
+acid: pcline(0x26f694)
+acid: src(0x26f694)		/* prints the line, with context */
+```
+
+It answers `generic/tkGeometry.c:153`, which is `Tk_GeometryRequest`:
+
+```c
+148  if ((reqWidth == winPtr->reqWidth) && ...) return;
+151  winPtr->reqWidth = reqWidth;
+152  winPtr->reqHeight = reqHeight;
+153> if ((winPtr->geomMgrPtr != NULL)
+154      && (winPtr->geomMgrPtr->requestProc != NULL)) {
+```
+
+**Read the shape of the fault, not just the line number.** Lines 148,
+151 and 152 read *and write* through `winPtr` without faulting, and
+only 153/154 die. A null or unmapped `winPtr` would have faulted at
+148. **APE's malloc never unmaps a freed block** (see the allocator
+note below), so a freed `TkWindow` stays readable and writable, and the
+first thing that actually fails is the **pointer chase** through a
+garbage `geomMgrPtr` to reach `requestProc`. So this is a
+use-after-free of a `TkWindow`, and "it wrote to the struct first" is
+no evidence the struct was alive. That reasoning generalises: on this
+allocator, a wild pointer shows up at the first *double* indirection,
+not the first access.
+
+**The suspect, and it is a suspect.** The one place in
+`plan9/tkPlan9Wm.c` that calls `Tk_GeometryRequest` on a *stored*
+window pointer is `TkP9EmbedGeometryRequest`, which uses
+`containerPtr->parentPtr`. `EmbedWindowDeleted` clears that when the
+container is destroyed, so for it to dangle that cleanup must not have
+run -- and there is a hole big enough:
+
+`Tk_MakeContainer` registers `ContainerEventProc` with **`winPtr`** as
+its client data, and the proc opens with
+
+```c
+containerPtr = FindContainer(winPtr->window);
+if (containerPtr == NULL)
+	return;			/* cleanup skipped */
+```
+
+Upstream's equivalent, `EmbedStructureProc` in `unix/tkUnixEmbed.c`,
+registers the **`Container *` itself** as client data, so it never
+looks anything up and can never fail to find it. That is a real
+difference and a real hole.
+
+**It is not yet shown to be this crash.** `-singleproc 1` leaves ~30
+toplevels alive at exit -- safe.test's "Untrusted Tcl applet"
+containers among them -- and teardown touches all of them, so there is
+more than one route to a dead window.
+`sys/lib/tests/tk-embed-destroy-test.tcl` exists to make the answer a
+printed line rather than an argument: it builds container/embedded
+pairs, destroys each half first in turn, and **provokes a geometry
+request afterwards**, which is the step that matters -- destroying the
+container proves nothing on its own, because nothing dereferences the
+stale pointer until something asks for a resize.
+
+**The crash hides nothing.** `xmfbox` is the last file alphabetically,
+so all 97 files and every failure are already measured; only the
+summary line and the marker are lost. It is still worth doing early,
+because a general protection violation is a memory-safety signal and
+this port has form -- `TkpDeleteFont` and `TkpFreeColor` both freed a
+struct they did not own (see the hook section above), and both were
+invisible until something released a resource for real.
 
 `unixWm.test`, `unixSelect.test`, `unixEmbed.test` and `unixFont.test`
 run here because `tcl_platform(platform)` is `unix`, so the `unix`
