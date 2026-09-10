@@ -6,7 +6,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-10 03:55:07 +0200
+Tests began at 2026-09-10 04:10:58 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
