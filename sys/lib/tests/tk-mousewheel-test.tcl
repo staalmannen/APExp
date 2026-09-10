@@ -363,40 +363,92 @@ proc build2 {} {
 }
 
 # ------------------------------------------------------------------
-# THE CONTROL THAT WAS MISSING, and it has to come first.
+# THE 2x2, and it supersedes everything above.
 #
-# Step 2 scrolled .t, from build, at the top level, and returned. 7e1b
-# scrolls .u, from build2, inside the event loop, and hangs. That is
-# TWO differences, not one -- the widget set changed when build2 was
-# written -- and this file has now been caught by exactly that three
-# times (canvas-23.*, step 6 vs step 8, and here). So ask each half on
-# its own before believing either.
-step "7e1a1. build2's OWN widgets, scrolled at the TOP LEVEL -- if this\
- hangs, it is the widget arrangement and not the event loop at all"
-build2
-wheelcount
-.u yview scroll 3.0 units
-done "scroll returned; index is [.u index @0,0]"
-step "7e1a2. ... and the update after it"
-update
-done "update returned"
+# 7e1a1 answered the control: build2's widgets scrolled AT THE TOP
+# LEVEL -- the scroll RETURNED, and the "update" after it hung. So the
+# event loop is not the operative half after all: nothing is delivered,
+# no binding runs, the scroll completes, and the REDISPLAY that follows
+# never settles. Every section above that talked about "inside
+# delivery" was describing the update that came after it.
+#
+# Geometry is not the answer either: both text widgets come out
+# 486x246 and mapped, so the zero-height layout loop is ruled out.
+#
+# What is left is the difference between build and build2, and there
+# are TWO of them -- pack order and whether the pair is wired to each
+# other. That is the same mistake as before, so this asks all four
+# combinations with ONE widget name throughout, changing one thing at a
+# time. The known-hanging arrangement is last so the other three print.
+#
+#	A  text first,      wired	build's arrangement; step 2+5 returned
+#	B  text first,      unwired
+#	C  scrollbar first, wired
+#	D  scrollbar first, unwired	build2's arrangement; hangs
+#
+# What each outcome means:
+#   only D hangs		it is the pair of differences, not either
+#				alone -- look at what an unwired scrollbar
+#				packed first leaves undamaged
+#   C and D hang		PACK ORDER, i.e. the text widget sitting at
+#				x=10 instead of x=0. This port has a
+#				documented history of confusing
+#				parent-relative and screen coordinates in
+#				exactly this way (see the stacking section
+#				in CLAUDE.md), and a scroll is a copy of a
+#				rectangle from one place to another.
+#   B and D hang		the WIRING: with -yscrollcommand set, .s set
+#				runs after every scroll and evidently
+#				settles something that otherwise does not.
 
-step "7e1a3. build's widgets (.t, the wired pair), scrolled from an\
- IDLE handler -- the other half: the original widget set, inside the\
- event loop"
-build
+proc pair {sbfirst wired} {
+    destroy .t .s
+    if {$wired} {
+	set t [text .t -yscrollcommand {.s set}]
+	set s [scrollbar .s -command {.t yview}]
+    } else {
+	set t [text .t]
+	set s [scrollbar .s]
+    }
+    if {$sbfirst} {
+	pack $s -fill y -expand 1 -side left
+	pack $t -side left
+    } else {
+	pack $t -side left
+	pack $s -fill y -expand 1 -side left
+    }
+    for {set i 1} {$i < 100} {incr i} {.t insert end "Line $i\n"}
+    update
+    puts "   .t at [winfo x .t],[winfo y .t] size\
+ [winfo width .t]x[winfo height .t] mapped [winfo ismapped .t];\
+ .s at [winfo x .s],[winfo y .s] size [winfo width .s]x[winfo height .s]"
+    flush stdout
+}
+
+foreach {tag sbfirst wired what} {
+    A 0 1 {text packed first, WIRED -- this is build's arrangement}
+    B 0 0 {text packed first, unwired}
+    C 1 1 {scrollbar packed first, WIRED}
+    D 1 0 {scrollbar packed first, unwired -- this is build2's, and it hangs}
+} {
+    step "7e1$tag. $what: scroll at the top level"
+    pair $sbfirst $wired
+    .t yview scroll 3.0 units
+    done "scroll returned; index is [.t index @0,0]"
+    step "7e1$tag. ... and the update after it -- THIS is the one that\
+ hangs for D"
+    update
+    done "update returned"
+}
+
+step "7e1b. arrangement A scrolled from an IDLE handler -- with the\
+ update question settled, this asks whether the event loop matters at\
+ all on an arrangement that works"
+pair 0 1
 wheelcount
 after idle {incr ::n; .t yview scroll 3.0 units}
 update
 done "returned; ran $::n time(s), index is [.t index @0,0]"
-
-step "7e1b. build2's widgets scrolled from an IDLE handler -- inside\
- the event loop, but no event and no binding"
-build2
-wheelcount
-after idle {incr ::n; .u yview scroll 3.0 units}
-update
-done "returned; ran $::n time(s), index is [.u index @0,0]"
 
 step "7e1c. the same from a TIMER handler (after 0) rather than an idle\
  -- a different queue, still no X event"
