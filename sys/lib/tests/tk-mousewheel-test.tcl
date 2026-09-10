@@ -191,6 +191,85 @@ done "delivered with no binding; update returned"
 bind Scrollbar <MouseWheel> $saved
 
 # ------------------------------------------------------------------
+# Between step 6 (returned) and step 8 (hangs) there are THREE
+# differences, not one, and each wants a different fix. Step 6 called
+#
+#	tk::ScrollByUnits .s v -4
+#
+# and the real binding is
+#
+#	tk::ScrollByUnits %W vh %D -40.0		-> .s vh -120 -40.0
+#
+# so step 6 skipped, all at once:
+#
+#   a. the counting branch. It is guarded by
+#	  [string length $orient] == 2 && $factor != 1.0
+#      (scrlbar.tcl:375), and "v" with the default 1.0 fails BOTH halves
+#      -- so Priv(xEvents)/Priv(yEvents) were never read, and the
+#      "> 10 and non-dominant" early return was never reachable;
+#   b. the division. -4/1.0 is -4.0; -120/-40.0 is 3.0. Opposite signs,
+#      and sign picks the branch in YScrollByLines;
+#   c. delivery. Step 6 ran at the top level, step 8 runs inside the
+#      event loop with a redisplay pending.
+#
+# These sections take them one at a time, and they are placed BEFORE
+# step 8 on purpose: a hang has to be killed by hand, so everything
+# cheaper than the hang must have already printed.
+
+step "7b. what does .s get return, and how long is it? (ScrollByUnits\
+ branches on llength: 2 picks 'yview scroll N units', anything else\
+ picks 'yview <fraction>', a different command entirely)"
+build
+event generate .s <Enter>
+update
+puts "   .s get -> [.s get]  (llength [llength [.s get]])"
+flush stdout
+done "probe complete"
+
+step "7c. tk::ScrollByUnits .s vh -120 -40.0 -- the binding's exact\
+ arguments, called directly, so delivery is NOT involved"
+if {[catch {tk::ScrollByUnits .s vh -120 -40.0} err]} {
+    done "raised an error rather than hanging: $err"
+} else {
+    done "returned; index is [.t index @0,0]"
+}
+
+step "7d. the same call twelve times -- the counting branch's early\
+ return needs xEvents+yEvents > 10 to fire at all, so it is unreachable\
+ in one call"
+if {[catch {
+    for {set i 0} {$i < 12} {incr i} {tk::ScrollByUnits .s vh -120 -40.0}
+} err]} {
+    done "raised an error rather than hanging: $err"
+} else {
+    done "returned; index is [.t index @0,0], xEvents\
+ $::tk::Priv(xEvents) yEvents $::tk::Priv(yEvents)"
+}
+
+step "7e. delivery of a <MouseWheel> whose class binding SCROLLS but\
+ does not go through ScrollByUnits -- delivery plus a scroll, with the\
+ library proc taken out"
+build
+set saved [bind Scrollbar <MouseWheel>]
+bind Scrollbar <MouseWheel> {.t yview scroll 3.0 units}
+event generate .s <Enter>
+event generate .s <MouseWheel> -delta -120
+update
+bind Scrollbar <MouseWheel> $saved
+done "returned; index is [.t index @0,0].  If THIS hangs it is scrolling\
+ from inside event delivery, and ScrollByUnits is innocent; if it\
+ returns and step 8 does not, it is the proc."
+
+step "7f. the real binding body, but run from 'after idle' rather than\
+ from an event -- inside the event loop, without the wheel event"
+build
+event generate .s <Enter>
+update
+after idle {tk::ScrollByUnits .s vh -120 -40.0}
+update
+done "returned; index is [.t index @0,0]"
+
+# ------------------------------------------------------------------
 # NOTE: this used to omit the <Enter>, which made it an invalid
 # sequence on ANY Tk -- ScrollByUnits would raise "can't read
 # Priv(xEvents)" upstream too. The hang that produced was Tk's modal
