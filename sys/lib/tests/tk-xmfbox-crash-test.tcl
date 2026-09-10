@@ -91,6 +91,44 @@
 #	                                  behind (a grab, a focus, a
 #	                                  stale geometry manager)
 #
+# THE ANSWER WAS THE TABLE, AND THIS FILE SAID OTHERWISE ONCE. Read
+# that before trusting a run of it.
+#
+# On its first run it took the third outcome -- the dialog built at
+# every count up to 361 live windows and the table reported only
+# 256/2048 -- and the window table was written off. It was the table.
+# The very next full suite run printed
+#
+#	tkp9: window table 2048/2048 in use
+#	tkp9: window table full (2048 entries); ...
+#
+# in xmfbox.test, the exact file that had been crashing.
+#
+# TWO REASONS THAT FIRST RUN MISLED, and both are worth keeping:
+#
+#  1. It ran on a build that was itself broken. The same commit that
+#     added the occupancy counter moved fields in the middle of
+#     P9DisplayState, and mk rebuilt only one of the seven files in
+#     plan9/ (see the HFILES note in CLAUDE.md). A measurement taken
+#     from a build you have just broken measures the breakage. NEVER
+#     draw a negative conclusion from the same run that shows an
+#     unexplained regression elsewhere.
+#
+#  2. "countwins" below is TK's count, not the port's. Section 2 says
+#     "1 window before, 1 after" and that is true and irrelevant: Tk
+#     had freed its TkWindows, and the P9Window slots behind them had
+#     leaked. The two numbers are only equal when nothing leaks, which
+#     is precisely the thing under test. The stderr lines are the
+#     port's own count, and they are the ones to read.
+#
+# THE LEAK, now fixed: generic/tkWindow.c:1584 skipped XDestroyWindow
+# for a child whose parent was going away, because on X the server
+# destroys the subtree implicitly. Nothing here does, and
+# XDestroyWindow is the only thing that frees a P9Window slot -- so
+# every child of every destroyed toplevel leaked one. PLAN9 is in that
+# condition now, beside MAC_OSX_TK and _WIN32, for the same reason it
+# is in SendEnterLeaveForDestroy's: there is no X server.
+#
 # ORDER: cheap and expected-to-pass cases first, then the ramp, because
 # a failure here may kill wish rather than raise an error. Each step
 # prints a flushed marker BEFORE it runs, so the last STEP line names

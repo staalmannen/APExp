@@ -2138,21 +2138,83 @@ So it is loud now, and measured:
 suite: build the dialog with a growing number of live toplevels
 underneath, reporting at each step.
 
-**IT IS NOT THE WINDOW COUNT.** The ramp took the third of its three
-outcomes: the dialog builds correctly at every count up to 361 live
-windows, and the table only reached `256/2048`. So the table is
-exonerated -- as a *cause*. It is still worth its new loudness, and the
-occupancy lines are now the standing answer to "did we get close?"
-(**no**: the whole 97-file suite never printed one, so it never passed
-256 either).
+**IT WAS THE TABLE, AND IT LEAKED.** The very first full run with the
+occupancy lines in it says so in two lines, in `xmfbox.test` -- the
+exact file that had been crashing:
 
-So the suite leaves something else behind. **Look at what survives a
-test file** -- a grab, a focus, a stale geometry manager, a `place`
-registration -- rather than at anything that is merely counted.
-`Tk_MaintainGeometry` remains the standing suspect, and it fits better
-than the table did: it registers a placed window with *every* master
-between it and its parent, and it is already implicated in
-`geometry-4.7`.
+```
+xmfbox.test
+tkp9: window table 2048/2048 in use
+tkp9: window table full (2048 entries); every XCreateWindow from
+      here would answer None
+```
+
+The climb is the whole story: 256 at log line 96, then 512, 768, 1024,
+1280, 1536 by line 539, 1792 by 1867, and 2048 four thousand lines
+later. **A high-water mark that only ever rises is a leak, not a
+working set.**
+
+**`generic/tkWindow.c:1584` was the leak**, and it is the same shape as
+`SendEnterLeaveForDestroy` twenty lines up:
+
+```c
+#if defined(MAC_OSX_TK) || defined(_WIN32)
+	XDestroyWindow(winPtr->display, winPtr->window);
+#else
+	if ((winPtr->flags & TK_TOP_HIERARCHY)
+		|| !(winPtr->flags & TK_DONT_DESTROY_WINDOW)) {
+	    /* the parent's X window is destroyed; much faster not to */
+	    XDestroyWindow(winPtr->display, winPtr->window);
+	}
+#endif
+```
+
+The `#else` skips the destroy for a child whose parent is going away,
+because **on X the server destroys the subtree implicitly** and a round
+trip per child is waste. Nothing here does that, and `XDestroyWindow`
+in `plan9/tkPlan9Init.c` is the *only* thing that frees a `P9Window`
+slot -- so every child of every destroyed toplevel leaked one, and a Tk
+test file builds and destroys widget trees continuously. `PLAN9` is in
+that condition now, for the third time in this port and always for the
+same reason: **the condition is not the operating system, it is that
+there is no X server.**
+
+**The ramp test said the opposite, and both reasons it was wrong are
+worth more than the result.**
+
+- **It ran on a build that was itself broken.** The same commit that
+  added the counter moved fields inside `P9DisplayState` and mk
+  rebuilt one of the seven files (see the `HFILES` note below). *A
+  measurement taken from a build you have just broken measures the
+  breakage.* The regression was visible in the same run and was not
+  treated as invalidating the measurement beside it. **Never draw a
+  negative conclusion from a run that also shows an unexplained
+  regression.**
+- **It counted the wrong thing.** `countwins` in that script walks
+  `winfo children`, which is *Tk's* count. Its section 2 reports "1
+  window before, 1 after" and that is true and irrelevant: Tk had
+  freed its `TkWindow`s and the `P9Window` slots behind them had
+  leaked. The two agree only when nothing leaks, which is the thing
+  under test. **The stderr occupancy lines are the port's own count
+  and are the ones to read** -- which is exactly why they were made
+  unconditional.
+
+So the instrumentation earned its place twice over: the panic named the
+table at the point of failure instead of a general protection violation
+in another function twenty minutes later, and the climbing high-water
+mark distinguished a leak from a working set. Neither was visible from
+Tcl at all.
+
+**Both symptoms should go with it, and that is the thing to check on
+the next run.** Once the table is full every `XCreateWindow` answers
+`None`, so a frame exists to Tk and not to this port -- `bad window
+path name ".foo.top"` -- and generic Tk keys `dispPtr->winTable` on the
+window id, so every such window collides on id 0 and they delete each
+other's entries. A use-after-free of a `TkWindow` reached through that
+table is exactly the fault `acid` resolved to `Tk_GeometryRequest`. If
+`xmfbox-2.6` still fails, or the fault survives, then there is a second
+cause and `Tk_MaintainGeometry` is back on the list -- but do not
+assume that in advance.
 
 `unixWm.test`, `unixSelect.test`, `unixEmbed.test` and `unixFont.test`
 run here because `tcl_platform(platform)` is `unix`, so the `unix`
