@@ -7,7 +7,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-10 15:03:00 +0200
+Tests began at 2026-09-10 18:52:54 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -2600,7 +2600,7 @@ no library with prefix "Tktest" is loaded statically
     }
 
 ---- Result was:
-couldn't create child of window "0x4b73"
+couldn't create child of window "0x4b7a"
 ---- Result should have been (exact matching):
 {{configure .t1 300 120}} 300x120+0+0
 ==== unixEmbed-6.1 FAILED
@@ -2655,7 +2655,7 @@ no library with prefix "Tktest" is loaded statically
     }
 
 ---- Result was:
-couldn't create child of window "0x4b76"
+couldn't create child of window "0x4b7c"
 ---- Result should have been (exact matching):
 {{configure .t1 200 200}} 200x200+0+0
 ==== unixEmbed-6.2 FAILED
@@ -2921,30 +2921,10 @@ no library with prefix "Tktest" is loaded statically
     }] [focus]
 
 ---- Result was:
-{{} {}} .f2
+{{} {}} .f1
 ---- Result should have been (exact matching):
 {{} .} .f1
 ==== unixEmbed-8.2 FAILED
-
-
-
-==== unixEmbed-10.2 geometry propagation in tkUnixWm.c/UpdateGeometryInfo FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    update
-    toplevel .t1 -use [winfo id .f1] -width 150 -height 80
-    update
-    wm geometry .t1 70x300+10+20
-    update
-    wm geometry .t1
-
----- Result was:
-150x80+0+0
----- Result should have been (exact matching):
-70x300+0+0
-==== unixEmbed-10.2 FAILED
 
 unixFont.test
 
@@ -4272,7 +4252,7 @@ unmapped 0 mapped 1
 ---- Result was:
 5 -10
 ---- Result should have been (exact matching):
-5 916
+5 875
 ==== unixWm-44.7 FAILED
 
 
@@ -4290,7 +4270,7 @@ unmapped 0 mapped 1
 ---- Result was:
 -30 2
 ---- Result should have been (exact matching):
-1064 2
+822 2
 ==== unixWm-44.8 FAILED
 
 
@@ -5764,8 +5744,8 @@ pack {} wm {}
 
 xmfbox.test
 
-Tests ended at 2026-09-10 15:04:38 +0200
-all.tcl:	Total	10027	Passed	8320	Skipped	1429	Failed	278
+Tests ended at 2026-09-10 18:54:40 +0200
+all.tcl:	Total	10027	Passed	8321	Skipped	1429	Failed	277
 Sourced 97 Test Files.
 Files with failing tests: clipboard.test event.test filebox.test focus.test font.test frame.test geometry.test image.test imgListFormat.test imgPhoto.test pack.test pkgconfig.test place.test select.test systray.test text.test textDisp.test textImage.test textTag.test textWind.test tk.test unixEmbed.test unixFont.test unixSelect.test unixWm.test visual.test winWm.test winfo.test wm.test
 Number of tests skipped for each constraint:
