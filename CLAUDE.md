@@ -1899,16 +1899,39 @@ sign of the binding's `-120/-40.0`. Three differences at once between a
 step that returned and a step that hung -- the same trap as
 `canvas-23.*`. 7c and 7d exist to close each of them, and both returned.
 
-Sections 7e0..7e4 split "inside delivery", which still covers four
-things: a non-empty binding at all, a widget command that touches only
-the scrollbar, a scroll of a text widget with **no** `-yscrollcommand`
-back into `.s`, and `update` versus `after`+`vwait`. **Every binding
-counts and prints its own invocation number**, because the one fact
-that decides the shape is whether the binding runs once or forever:
-`wheel #1` and then silence means one delivery whose drain never
-settles (look at what the redisplay queues -- Expose, `pointerDirty`, an
-idle handler that re-posts itself); `wheel #1 #2 #3 ...` means the event
-is being redelivered, which is this port's event source.
+Sections 7e0..7e2 then split "inside delivery", and narrow it twice
+more. **`7e0` (a binding that only does `incr`) and `7e1` (a binding
+that does `.s set`) each ran exactly once and returned**, so delivery
+itself is sound and the binding is not being re-run; it is *what the
+binding does* that matters. **`7e2` hangs with the text widget not
+wired to the scrollbar at all**, which disposes of the
+`-yscrollcommand` callback as well. The table is now
+
+| | |
+|---|---|
+| delivery + trivial binding | returns |
+| delivery + `.s set` | returns |
+| **delivery + a text scroll** | **hangs** |
+| a text scroll on its own | returns |
+
+so it is not delivery, not the scroll, and not the scrollbar -- it is
+the pair. `7e1b`..`7e1d` ask whether "delivery" is even the operative
+half, since an X event handler is only one way to run a script from
+inside the event loop: the same scroll from an **idle** handler, from a
+**timer** (`after 0`), and from a **`<Key>`** binding, none of which
+touch the pointer machinery. If the key event is fine and the wheel is
+not, the pointer path is implicated; if the idle handler hangs too,
+none of the event machinery is.
+
+**Every binding counts and prints its own invocation number**, because
+the one fact that decides the shape is whether the binding runs once or
+forever: `wheel #1` and then silence means one delivery whose drain
+never settles (look at what the redisplay queues -- Expose,
+`pointerDirty`, an idle handler that re-posts itself); `wheel #1 #2
+#3 ...` means the event is being redelivered, which is this port's
+event source. `7e2` originally lacked that printing and so could not
+say which -- worth remembering, since it is one line and the run that
+omits it is wasted.
 
 The leftover windows are a third thing and not a mystery: `all.tcl` sets
 `-singleproc 1`, so all 97 files are sourced into one wish and every

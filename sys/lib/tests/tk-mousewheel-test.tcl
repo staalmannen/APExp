@@ -322,24 +322,92 @@ update
 bind Scrollbar <MouseWheel> $saved
 done "returned; the binding ran $::n time(s)"
 
-step "7e2. binding scrolls a text widget that is NOT wired to the\
- scrollbar -- scrolling from inside delivery, with no -yscrollcommand\
- callback back into .s"
-destroy .t .s .u
-pack [scrollbar .s] -fill y -expand 1 -side left
-pack [text .u] -side left
-for {set i 1} {$i < 100} {incr i} {.u insert end "Line $i\n"}
+# ------------------------------------------------------------------
+# 7e2 HANGS, and its text widget is NOT wired to the scrollbar -- so
+# the -yscrollcommand callback is not the loop either. Combined with
+# 7e0 and 7e1, which each ran their binding exactly once and returned:
+#
+#	delivery + trivial binding	returns
+#	delivery + .s set		returns
+#	delivery + a text scroll	HANGS
+#	a text scroll on its own	returns	(step 2)
+#
+# So it is not delivery, and it is not the scroll, and it is not the
+# scrollbar. What is left is the pair, and the next question is whether
+# "delivery" is even the operative half -- an X event handler is only
+# one of the ways to end up running a script from inside the event
+# loop, and the cheap ones do not need an event at all.
+
+# The unwired pair, built once for the four sections below.
+proc build2 {} {
+    destroy .t .s .u
+    pack [scrollbar .s] -fill y -expand 1 -side left
+    pack [text .u] -side left
+    for {set i 1} {$i < 100} {incr i} {.u insert end "Line $i\n"}
+    update
+}
+
+step "7e1b. scroll the text widget from an IDLE handler -- inside the\
+ event loop, but no event and no binding"
+build2
+after idle {incr ::n; .u yview scroll 3.0 units}
+wheelcount
 update
+done "returned; ran $::n time(s), index is [.u index @0,0]"
+
+step "7e1c. the same from a TIMER handler (after 0) rather than an idle\
+ -- a different queue, still no X event"
+build2
+wheelcount
+after 0 {incr ::n; .u yview scroll 3.0 units}
+after 200 {set ::v7e1c 1}
+vwait ::v7e1c
+done "returned; ran $::n time(s), index is [.u index @0,0]"
+
+step "7e1d. the same from a <Key> binding -- a real X event, but a\
+ keyboard one, so nothing in the pointer machinery is involved"
+build2
+focus -force .s
+update
+bind .s <Key-a> {incr ::n; .u yview scroll 3.0 units}
+wheelcount
+event generate .s <Key-a>
+update
+bind .s <Key-a> {}
+done "returned; ran $::n time(s), index is [.u index @0,0].  If a key\
+ event is fine and the wheel is not, it is the POINTER path."
+
+step "7e2. THE HANG: binding scrolls a text widget that is NOT wired to\
+ the scrollbar.  Watch the wheel# lines"
+build2
 set saved [bind Scrollbar <MouseWheel>]
 wheelcount
-bind Scrollbar <MouseWheel> {incr ::n; .u yview scroll 3.0 units}
+bind Scrollbar <MouseWheel> {
+    incr ::n
+    if {$::n <= 8} { puts "  wheel #$::n"; flush stdout }
+    .u yview scroll 3.0 units
+}
 event generate .s <Enter>
 event generate .s <MouseWheel> -delta -120
 update
 bind Scrollbar <MouseWheel> $saved
-done "returned; the binding ran $::n time(s), index is [.u index @0,0].\
-  If this returns and 7e4 hangs, the loop is the -yscrollcommand\
- callback, not scrolling as such."
+done "returned after all; ran $::n time(s), index is [.u index @0,0]"
+
+step "7e2b. the same WITHOUT the preceding <Enter> -- this binding does\
+ not read Priv(xEvents), so the crossing is not needed here, and\
+ leaving it out asks whether the crossing is part of the loop"
+build2
+set saved [bind Scrollbar <MouseWheel>]
+wheelcount
+bind Scrollbar <MouseWheel> {
+    incr ::n
+    if {$::n <= 8} { puts "  wheel-noenter #$::n"; flush stdout }
+    .u yview scroll 3.0 units
+}
+event generate .s <MouseWheel> -delta -120
+update
+bind Scrollbar <MouseWheel> $saved
+done "returned; ran $::n time(s), index is [.u index @0,0]"
 destroy .u
 
 step "7e3. the wired pair, but delivered through after+vwait rather\
