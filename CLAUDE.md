@@ -2136,13 +2136,23 @@ So it is loud now, and measured:
 
 `sys/lib/tests/tk-xmfbox-crash-test.tcl` asks the question without the
 suite: build the dialog with a growing number of live toplevels
-underneath, reporting at each step. Its three outcomes want three
-different next steps -- fails at zero (the suite is a red herring),
-fails past some count (accumulation, and the count goes to the table),
-never fails (**not** window count; something else survives a test file
--- a grab, a focus, a stale geometry manager). Note the table being
-innocent is a real possible answer here, and the ramp is what
-distinguishes it from a guess.
+underneath, reporting at each step.
+
+**IT IS NOT THE WINDOW COUNT.** The ramp took the third of its three
+outcomes: the dialog builds correctly at every count up to 361 live
+windows, and the table only reached `256/2048`. So the table is
+exonerated -- as a *cause*. It is still worth its new loudness, and the
+occupancy lines are now the standing answer to "did we get close?"
+(**no**: the whole 97-file suite never printed one, so it never passed
+256 either).
+
+So the suite leaves something else behind. **Look at what survives a
+test file** -- a grab, a focus, a stale geometry manager, a `place`
+registration -- rather than at anything that is merely counted.
+`Tk_MaintainGeometry` remains the standing suspect, and it fits better
+than the table did: it registers a placed window with *every* master
+between it and its parent, and it is already implicated in
+`geometry-4.7`.
 
 `unixWm.test`, `unixSelect.test`, `unixEmbed.test` and `unixFont.test`
 run here because `tcl_platform(platform)` is `unix`, so the `unix`
@@ -2947,6 +2957,58 @@ against a worse symptom -- without it, resize -> Configure ->
 re-request loops -- so the fix is the same guard at the three X entry
 points. `XConfigureWindow` sends no ConfigureNotify at all and is left
 alone.
+
+### A header not in HFILES is a header mk does not rebuild for
+
+`sys/src/cmd/mklib` makes every object depend on `$HFILES`:
+
+```
+%.$O:	$HFILES		# don't combine with following %.$O rules
+```
+
+so a header **not listed there changes nothing**. mk rebuilds only the
+`.c` files that themselves changed, and every other object keeps the
+layout it was compiled against. Plan 9 mkfiles do not scan `#include`s,
+and `HFILES` in `sys/src/ape/lib/tk/mkfile` was the single line
+`tkConfig.h`.
+
+**This cost a whole suite run, and the symptom named nothing.** Two
+`int` fields were added to `P9DisplayState` in `plan9/tkPlan9Int.h` --
+the struct behind `gP9`, the **one global all seven files in `plan9/`
+share** -- and they were put beside `nwins`, which sits *above*
+`evqueue`. Only `tkPlan9Init.c` was recompiled, because only its `.c`
+had changed. The other six went on reading `evqueue`, `evhead`,
+`focuswin` and `lastmouse` at the old offsets **of the same object**.
+
+```
+bind.test	3 failures  ->  116, every one an empty result
+		(no key event was delivered at all)
+canvWind, clipboard, clrpick	up as well
+the run				died in cmds.test
+```
+
+Every one of those is a plausible Tk regression, and the group as a
+whole reads as "the event source broke". Nothing in it points at a
+header, let alone at a build system.
+
+Two fixes, and both are wanted:
+
+- **`HFILES` now lists the port's own headers** -- `tkPlan9Int.h`,
+  `tkPlan9Port.h`, `tkPlan9Default.h`, `tkP9Draw.h`. Those are the ones
+  that change; the vendored `generic/` and `xlib/` headers do not, and
+  listing several hundred of them would make every build walk the tree.
+- **Append to a shared global struct, never insert.** The comment at
+  the end of `P9DisplayState` says so. Appending cannot move an
+  existing field, so a stale object still reads everything it knew
+  about correctly.
+
+**The same trap is waiting in every vendored tree here**, since
+`mklib`'s rule is shared and most of these mkfiles have a short
+`HFILES` or none. The tells to remember: a change that is *logically
+inert* (a counter, a field nothing reads yet) followed by *broad,
+unrelated* breakage is a layout problem, not a logic one -- and on this
+build system the first thing to suspect is which objects were actually
+recompiled. `mk nuke` in the library directory settles it in one run.
 
 ### Syntax-check Tk's Plan 9 backend on the host before shipping it
 

@@ -83,15 +83,6 @@ typedef struct P9DisplayState {
     /* Window table */
     P9Window     wins[TKP9_MAX_WINDOWS];
     int          nwins;
-    /*
-     * How many slots are in use, and the most ever in use at once.
-     * Occupancy is REPORTED, not merely counted: running out is a
-     * cliff, and the failure it used to produce -- XCreateWindow
-     * answering None -- is silent at every level above it. See
-     * TkP9AllocWindow.
-     */
-    int          winuse;
-    int          winhigh;
     /* Pending X events queue (simple ring buffer) */
     XEvent       evqueue[TKP9_EVQUEUE];
     int          evhead;
@@ -111,6 +102,30 @@ typedef struct P9DisplayState {
     Display     *xdisplay;
     /* Tcl event source state */
     int          eventSourceAdded;
+    /*
+     * How many window-table slots are in use, and the most ever in use
+     * at once. Occupancy is REPORTED, not merely counted: running out
+     * is a cliff, and the failure it used to produce -- XCreateWindow
+     * answering None -- is silent at every level above it. See
+     * TkP9AllocWindow.
+     *
+     * APPEND NEW FIELDS HERE, AT THE END, and nowhere else. gP9 is one
+     * global shared by all seven files in this directory, and inserting
+     * a field in the middle moves every field after it -- so a file
+     * that is not recompiled reads the wrong offsets on the same
+     * object. That is not hypothetical: these two fields were first
+     * put beside nwins, which sits above evqueue, and the event ring
+     * and focus window moved under six objects that mk did not rebuild.
+     * bind.test went from 3 failures to 116 -- every key event lost --
+     * and the suite died in cmds.test.
+     *
+     * The mkfile now lists this header in HFILES so mk rebuilds them
+     * all, which is the real fix; appending is the belt to its braces,
+     * because the same trap is waiting in every vendored tree here
+     * whose mkfile does not track headers.
+     */
+    int          winuse;
+    int          winhigh;
 } P9DisplayState;
 
 extern P9DisplayState gP9;
