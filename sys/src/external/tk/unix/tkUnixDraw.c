@@ -15,6 +15,25 @@
 #include "tkUnixInt.h"
 #endif
 
+#ifndef PLAN9
+/*
+ * TkScrollWindow below waits for the X server to report, with a
+ * GraphicsExpose or a NoExpose, how much of the copy it could not
+ * satisfy. Its loop
+ *
+ *	while (!info.done) {
+ *	    Tcl_ServiceEvent(TCL_WINDOW_EVENTS);
+ *	}
+ *
+ * has NO other exit, so on a platform with no server to send those it
+ * spins forever with the CPU pinned. That is why win/tkWinDraw.c and
+ * macosx/tkMacOSXImage.c each define TkScrollWindow themselves rather
+ * than build this one; plan9/tkPlan9Draw.c now does the same, and the
+ * rest of this file -- Tk_DrawHighlightBorder and TkpDrawFrameEx -- is
+ * still wanted there, which is why the guard is here rather than in the
+ * mkfile.
+ */
+
 /*
  * The following structure is used to pass information to ScrollRestrictProc
  * from TkScrollWindow.
@@ -171,6 +190,7 @@ ScrollRestrictProc(
     }
     return TK_DISCARD_EVENT;
 }
+#endif /* !PLAN9 */
 
 /*
  *----------------------------------------------------------------------

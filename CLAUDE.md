@@ -1966,7 +1966,49 @@ returns or re-posts its own idle handler forever. No event is involved
 and the Expose theory is dead. Everything from here is `tkTextDisp.c`
 and what this port's drawing does underneath it.
 
-**Misleading: the distances do not mean what they look like.**
+**FOUND: `TkScrollWindow` waits for an event this port never sends.**
+`unix/tkUnixDraw.c` -- which `sys/src/ape/lib/tk/mkfile:147` builds --
+issues the `XCopyArea` and then waits for the X server to say how much
+of it succeeded:
+
+```c
+while (!info.done) {
+	Tcl_ServiceEvent(TCL_WINDOW_EVENTS);
+}
+```
+
+`info.done` is set **only** by a `NoExpose` or the last
+`GraphicsExpose` for that window, and **neither event name appears
+anywhere in `plan9/`** -- `XCopyArea` there begins `(void)gc;` and
+never looks at `graphics_exposures`. So the loop has no exit at all: an
+infinite loop inside one Tk call, which is exactly "`update idletasks`
+never returns, CPU pinned, nothing written".
+
+`win/tkWinDraw.c` and `macosx/tkMacOSXImage.c` each define
+`TkScrollWindow` themselves for precisely this reason and neither waits
+for an event. **The condition is not the operating system, it is that
+there is no X server to answer** -- the same shape as
+`SendEnterLeaveForDestroy` above. `plan9/tkPlan9Draw.c` now defines it:
+copy, then return 0, which is what a `NoExpose` means. The unix version
+is wrapped in `#ifndef PLAN9` rather than dropped from the mkfile,
+because the same file's `Tk_DrawHighlightBorder` and `TkpDrawFrameEx`
+are still wanted.
+
+**Do not "fix" this by sending NoExpose from `XCopyArea` instead.**
+`tkGC.c:188` defaults `graphics_exposures` to **True** for every GC Tk
+creates, so that would enqueue an event for every copy in the program
+-- every photo blit, every 3D border -- into a 1024-entry ring that
+drops silently when full.
+
+The one thing lost is the case X repairs and this port cannot: a copy
+whose source was overlapped by a sibling window has already picked up
+the sibling's pixels, and with no backing store there is no record of
+it. Returning the whole rectangle as damage would repaint correctly and
+make every scroll a full redraw, which is the cost the copy exists to
+avoid.
+
+**Misleading, and the reason this took four extra rounds: the distances
+do not mean what they look like.**
 
 | | reaches | |
 |---|---|---|
@@ -1975,26 +2017,30 @@ and what this port's drawing does underneath it.
 | `scroll 100 units` | 77, clamped to the end | ok |
 | `scroll 20 units` | **21** | **hangs** |
 
-`moveto 0.5` lands mid-file and works, so the overlap/full-repaint
-story above is **wrong** -- a mid-file top index is reachable without
-hanging. But those two rows differ in *two* ways again, the command and
-the position, which is the fourth time in this file. Section 10 reaches
-the same position by both commands:
+**`moveto 0.2` reaches index 21 and hangs**, while `moveto 0.5` reaches
+51 and does not -- same command, so `YScrollByLines` and its
+display-line walk are innocent, and so is the command/position question
+the test was built to settle.
 
-- **`scroll 50 units` (to 51, where `moveto` survived) hangs** -- it is
-  the **command**. `yview scroll N units` goes through
-  `YScrollByLines`, which walks display lines with `LayoutDLine`;
-  `moveto` does not. That is the loop with the `do/while` that never
-  ends if a display line comes back zero bytes long -- see the note in
-  `tk-mousewheel-test.tcl`'s header, which suspected it early and was
-  set aside when the scroll commands all returned. **They return
-  because the walk is not where it hangs; the redisplay that follows
-  is.**
-- **it works** -- it is the **position**, and both commands are
-  innocent.
+The overlap story *was* right; **the arithmetic used to refute it was
+wrong.** `moveto 1.0` reports a top index of 77 on a 100-display-line
+widget, so about **24 lines are visible**, not the ~15 assumed when the
+theory was dropped. Measured from the freshly-built top:
 
-`scroll ... pixels` and the old `yview <index>` form are asked too:
-they reach the same place without the display-line walk.
+| | distance | overlap? | |
+|---|---|---|---|
+| `moveto 1.0` | 76 | no | ok |
+| `moveto 0.5` | 50 | no | ok |
+| `moveto 0.2` | 20 | **yes** | **hangs** |
+| `scroll 20 units` | 20 | **yes** | **hangs** |
+| `scroll 3 units` | 3 | **yes** | **hangs** |
+
+Every row fits: `tkTextDisp.c` copies only when the old and new views
+overlap and repaints outright when they do not, so only the copying
+path reaches `TkScrollWindow`. **Check what a widget's actual geometry
+is before ruling a mechanism out on line counts** -- one `winfo height`
+divided by the line height would have kept this on the right track two
+rounds earlier.
 
 **This now lives in `sys/lib/tests/tk-textscroll-hang-test.tcl`**, and
 `tk-mousewheel-test.tcl` is finished -- kept as the record of how the

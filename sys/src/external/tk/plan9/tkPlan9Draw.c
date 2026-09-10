@@ -207,6 +207,73 @@ XCopyArea(Display *display, Drawable src, Drawable dst, GC gc,
     return 0;
 }
 
+/*
+ * TkScrollWindow --
+ *
+ *	Scroll a rectangle of a window in place, and report how much of it
+ *	the platform could NOT copy. Returns 0 for "all of it arrived", 1
+ *	with damageRgn filled in otherwise.
+ *
+ *	Note what the return value is not: it is not the strip the scroll
+ *	uncovers. tkTextDisp.c knows about that already and redraws it
+ *	itself (tkTextDisp.c:4349 and the comment at 4513). This reports
+ *	only the EXTRA damage from a copy that could not be satisfied --
+ *	on X, the part of the source that was obscured by another window,
+ *	which the server reports with GraphicsExpose.
+ *
+ *	WHY THIS IS HERE AT ALL. unix/tkUnixDraw.c's version issues the
+ *	XCopyArea and then waits for the server to say which it was:
+ *
+ *		while (!info.done) {
+ *		    Tcl_ServiceEvent(TCL_WINDOW_EVENTS);
+ *		}
+ *
+ *	and info.done is set ONLY by a NoExpose or the last GraphicsExpose
+ *	for that window. This port sends neither -- the two event names
+ *	appear nowhere in plan9/ -- so that loop had no exit at all. It is
+ *	an infinite loop inside one Tk call, which is why it presented as
+ *	"update idletasks never returns" with the CPU pinned and nothing
+ *	written, and why only a scroll SHORT ENOUGH FOR THE OLD AND NEW
+ *	VIEWS TO OVERLAP could trigger it: tkTextDisp.c only copies when
+ *	there is something worth copying, and repaints outright otherwise.
+ *	A three-line wheel scroll overlaps; "yview moveto 0.5" on a
+ *	99-line file does not.
+ *
+ *	win/tkWinDraw.c and macosx/tkMacOSXImage.c each define this
+ *	function themselves for exactly this reason, and neither waits for
+ *	an event. The condition is not the operating system, it is that
+ *	there is no X server to answer.
+ *
+ *	We answer 0 -- what a NoExpose means -- because nothing here can
+ *	say otherwise: drawing goes straight into the one rio window with
+ *	no backing store, so a copy whose source was overlapped by a
+ *	sibling has already picked up the sibling's pixels and there is no
+ *	record of it having happened. That is a visual artefact in a case
+ *	X repairs and this port cannot; returning the whole rectangle as
+ *	damage instead would repaint correctly but make every scroll a
+ *	full redraw, which is the cost the copy exists to avoid.
+ */
+int
+TkScrollWindow(
+    Tk_Window tkwin,		/* The window to be scrolled. */
+    GC gc,			/* GC for window to be scrolled. */
+    int x, int y, int width, int height,
+				/* Position rectangle to be scrolled. */
+    int dx, int dy,		/* Distance rectangle should be moved. */
+    Region damageRgn)		/* Region to accumulate damage in. */
+{
+    XCopyArea(Tk_Display(tkwin), Tk_WindowId(tkwin), Tk_WindowId(tkwin), gc,
+	    x, y, (unsigned) width, (unsigned) height, x + dx, y + dy);
+
+    /*
+     * Leave damageRgn as the caller set it up -- empty -- and say so.
+     * Do not call XEmptyRegion here to decide: the caller only consults
+     * damageRgn when we return 1.
+     */
+    (void) damageRgn;
+    return 0;
+}
+
 int
 XCopyPlane(Display *display, Drawable src, Drawable dst, GC gc,
            int src_x, int src_y,
