@@ -1,4 +1,4 @@
-tk-runall: starting, line buffered, default bgerror dialog replaced by a log line (tkerror delegation kept)
+tk-runall: starting, line buffered, default bgerror dialog replaced by a log line (tkerror delegation kept), exit wrapped for the marker
 Tests running in interp:  /bin/wish
 Tests located in:  /usr/glenda/APExp/sys/src/external/tk/tests
 Tests running in:  /usr/glenda/APExp/sys/src/external/tk/tests
@@ -7,7 +7,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-10 14:20:40 +0200
+Tests began at 2026-09-10 14:26:08 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -590,11 +590,9 @@ select.test
     list [selection get] $selInfo [catch {selection get} msg] $msg
 
 ---- Result was:
-Aa.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ba.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ca.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Da.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ea.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Fa.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ga.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ha.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ia.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ka.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14La.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ma.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Na.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ab.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Bb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Cb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Db.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Eb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Fb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Gb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Hb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Ib.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Kb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Lb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Mb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Nb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Ac.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Bc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Cc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Dc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Ec.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Fc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Gc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Hc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Ic.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Kc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Lc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Mc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Nc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Ad.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Bd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Cd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Dd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Ed.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Fd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Gd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Hd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Id.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Kd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Ld.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Md.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Nd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Ae.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Be.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ce.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14De.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ee.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Fe.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ge.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14He.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ie.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ke.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Le.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Me.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ne.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Af.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Bf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Cf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Df.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Ef.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Ff.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Gf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Hf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14If.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Kf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Lf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Mf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Nf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Ag.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Bg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Cg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Dg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Eg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Fg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Gg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Hg.1g.2g.3g.4g.
-\ No newline at end of file
+Aa.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ba.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ca.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Da.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ea.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Fa.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ga.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ha.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ia.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ka.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14La.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ma.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Na.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ab.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Bb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Cb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Db.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Eb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Fb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Gb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Hb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Ib.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Kb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Lb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Mb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Nb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Ac.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Bc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Cc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Dc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Ec.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Fc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Gc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Hc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Ic.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Kc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Lc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Mc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Nc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Ad.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Bd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Cd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Dd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Ed.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Fd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Gd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Hd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Id.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Kd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Ld.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Md.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Nd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Ae.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Be.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ce.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14De.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ee.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Fe.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ge.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14He.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ie.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ke.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Le.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Me.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ne.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Af.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Bf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Cf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Df.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Ef.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Ff.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Gf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Hf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14If.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Kf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Lf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Mf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Nf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Ag.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Bg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Cg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Dg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Eg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Fg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Gg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Hg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Ig.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Kg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Lg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Mg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Ng.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Aj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Bj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Cj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Dj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Ej.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Fj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Gj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Hj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Ij.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Kj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Lj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Mj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Nj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Ah.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Bh.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Ch.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Dh.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Eh.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Fh.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Gh.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Hh.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Ih.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Kh.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Lh.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Mh.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Nh.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Ai.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Bi.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Ci.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Di.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Ei.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Fi.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Gi.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Hi.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Ii.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Ki.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Li.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Mi.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Ni.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Aj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Bj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Cj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Dj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Ej.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Fj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Gj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Hj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Ij.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Kj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Lj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Mj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Nj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Ak.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Bk.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Ck.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Dk.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Ek.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Fk.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Gk.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Hk.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Ik.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Kk.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Lk.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Mk.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Nk.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Al.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Bl.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Cl.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Dl.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14El.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Fl.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Gl.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Hl.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Il.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Kl.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Ll.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Ml.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Nl.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Am.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Bm.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Cm.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Dm.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Em.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Fm.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Gm.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Hm.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Im.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Km.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Lm.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Mm.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Nm.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Ao.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Bo.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Co.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Do.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Eo.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Fo.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Go.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Ho.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Io.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Ko.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Lo.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Mo.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14No.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Ap.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Bp.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Cp.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Dp.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Ep.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Fp.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Gp.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Hp.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Ip.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Kp.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Lp.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Mp.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Np.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Aq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Bq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Cq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Dq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Eq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Fq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Gq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Hq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Iq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Kq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Lq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Mq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Nq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Ar.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Br.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Cr.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Dr.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Er.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Fr.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Gr.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Hr.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Ir.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Kr.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Lr.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Mr.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Nr.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14As.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Bs.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Cs.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Ds.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Es.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Fs.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Gs.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Hs.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Is.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Ks.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Ls.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Ms.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Ns.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14At.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Bt.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Ct.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Dt.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Et.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Ft.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Gt.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Ht.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14It.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Kt.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Lt.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Mt.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Nt.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Au.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Bu.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Cu.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Du.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Eu.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Fu.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Gu.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Hu.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Iu.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Ku.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Lu.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Mu.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Nu.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Av.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Bv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Cv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Dv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Ev.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Fv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Gv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Hv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Iv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Kv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Lv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Mv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Nv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Aw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Bw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Cw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Dw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Ew.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Fw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Gw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Hw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Iw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Kw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Lw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Mw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Nw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Ax.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Bx.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Cx.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Dx.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Ex.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Fx.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Gx.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Hx.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Ix.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Kx.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Lx.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Mx.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Nx.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Ay.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14By.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Cy.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Dy.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Ey.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Fy.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Gy.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Hy.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Iy.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Ky.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Ly.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14My.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Ny.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Az.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Bz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Cz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Dz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Ez.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Fz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Gz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Hz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Iz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Kz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Lz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Mz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Nz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14 {STRING 0 4000 STRING 4000 4000 STRING 8000 4000 STRING 12000 4000 STRING 16000 4000} 0 {}
 ---- Result should have been (exact matching):
-Aa.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ba.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ca.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Da.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ea.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Fa.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ga.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ha.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ia.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ka.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14La.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ma.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Na.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ab.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Bb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Cb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Db.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Eb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Fb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Gb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Hb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Ib.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Kb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Lb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Mb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Nb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Ac.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Bc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Cc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Dc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Ec.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Fc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Gc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Hc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Ic.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Kc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Lc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Mc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Nc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Ad.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Bd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Cd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Dd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Ed.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Fd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Gd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Hd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Id.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Kd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Ld.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Md.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Nd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Ae.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Be.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ce.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14De.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ee.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Fe.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ge.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14He.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ie.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ke.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Le.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Me.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ne.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Af.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Bf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Cf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Df.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Ef.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Ff.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Gf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Hf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14If.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Kf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Lf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Mf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Nf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Ag.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Bg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Cg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Dg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Eg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Fg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Gg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Hg.1g.2g.3g.4g.
-\ No newline at end of file
+Aa.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ba.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ca.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Da.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ea.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Fa.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ga.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ha.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ia.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ka.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14La.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ma.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Na.1a.2a.3a.4a.5a.6a.7a.8a.9a.10a.11a.12a.13a.14Ab.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Bb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Cb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Db.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Eb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Fb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Gb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Hb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Ib.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Kb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Lb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Mb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Nb.1b.2b.3b.4b.5b.6b.7b.8b.9b.10b.11b.12b.13b.14Ac.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Bc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Cc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Dc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Ec.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Fc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Gc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Hc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Ic.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Kc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Lc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Mc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Nc.1c.2c.3c.4c.5c.6c.7c.8c.9c.10c.11c.12c.13c.14Ad.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Bd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Cd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Dd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Ed.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Fd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Gd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Hd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Id.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Kd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Ld.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Md.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Nd.1d.2d.3d.4d.5d.6d.7d.8d.9d.10d.11d.12d.13d.14Ae.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Be.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ce.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14De.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ee.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Fe.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ge.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14He.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ie.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ke.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Le.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Me.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Ne.1e.2e.3e.4e.5e.6e.7e.8e.9e.10e.11e.12e.13e.14Af.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Bf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Cf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Df.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Ef.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Ff.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Gf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Hf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14If.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Kf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Lf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Mf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Nf.1f.2f.3f.4f.5f.6f.7f.8f.9f.10f.11f.12f.13f.14Ag.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Bg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Cg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Dg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Eg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Fg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Gg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Hg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Ig.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Kg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Lg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Mg.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Ng.1g.2g.3g.4g.5g.6g.7g.8g.9g.10g.11g.12g.13g.14Aj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Bj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Cj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Dj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Ej.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Fj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Gj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Hj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Ij.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Kj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Lj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Mj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Nj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Ah.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Bh.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Ch.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Dh.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Eh.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Fh.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Gh.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Hh.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Ih.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Kh.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Lh.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Mh.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Nh.1h.2h.3h.4h.5h.6h.7h.8h.9h.10h.11h.12h.13h.14Ai.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Bi.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Ci.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Di.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Ei.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Fi.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Gi.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Hi.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Ii.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Ki.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Li.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Mi.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Ni.1i.2i.3i.4i.5i.6i.7i.8i.9i.10i.11i.12i.13i.14Aj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Bj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Cj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Dj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Ej.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Fj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Gj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Hj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Ij.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Kj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Lj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Mj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Nj.1j.2j.3j.4j.5j.6j.7j.8j.9j.10j.11j.12j.13j.14Ak.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Bk.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Ck.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Dk.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Ek.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Fk.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Gk.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Hk.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Ik.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Kk.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Lk.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Mk.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Nk.1k.2k.3k.4k.5k.6k.7k.8k.9k.10k.11k.12k.13k.14Al.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Bl.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Cl.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Dl.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14El.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Fl.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Gl.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Hl.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Il.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Kl.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Ll.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Ml.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Nl.1l.2l.3l.4l.5l.6l.7l.8l.9l.10l.11l.12l.13l.14Am.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Bm.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Cm.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Dm.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Em.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Fm.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Gm.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Hm.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Im.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Km.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Lm.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Mm.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Nm.1m.2m.3m.4m.5m.6m.7m.8m.9m.10m.11m.12m.13m.14Ao.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Bo.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Co.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Do.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Eo.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Fo.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Go.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Ho.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Io.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Ko.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Lo.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Mo.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14No.1o.2o.3o.4o.5o.6o.7o.8o.9o.10o.11o.12o.13o.14Ap.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Bp.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Cp.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Dp.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Ep.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Fp.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Gp.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Hp.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Ip.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Kp.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Lp.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Mp.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Np.1p.2p.3p.4p.5p.6p.7p.8p.9p.10p.11p.12p.13p.14Aq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Bq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Cq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Dq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Eq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Fq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Gq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Hq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Iq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Kq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Lq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Mq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Nq.1q.2q.3q.4q.5q.6q.7q.8q.9q.10q.11q.12q.13q.14Ar.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Br.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Cr.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Dr.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Er.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Fr.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Gr.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Hr.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Ir.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Kr.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Lr.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Mr.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14Nr.1r.2r.3r.4r.5r.6r.7r.8r.9r.10r.11r.12r.13r.14As.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Bs.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Cs.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Ds.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Es.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Fs.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Gs.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Hs.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Is.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Ks.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Ls.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Ms.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14Ns.1s.2s.3s.4s.5s.6s.7s.8s.9s.10s.11s.12s.13s.14At.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Bt.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Ct.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Dt.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Et.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Ft.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Gt.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Ht.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14It.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Kt.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Lt.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Mt.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Nt.1t.2t.3t.4t.5t.6t.7t.8t.9t.10t.11t.12t.13t.14Au.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Bu.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Cu.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Du.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Eu.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Fu.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Gu.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Hu.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Iu.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Ku.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Lu.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Mu.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Nu.1u.2u.3u.4u.5u.6u.7u.8u.9u.10u.11u.12u.13u.14Av.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Bv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Cv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Dv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Ev.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Fv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Gv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Hv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Iv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Kv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Lv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Mv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Nv.1v.2v.3v.4v.5v.6v.7v.8v.9v.10v.11v.12v.13v.14Aw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Bw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Cw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Dw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Ew.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Fw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Gw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Hw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Iw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Kw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Lw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Mw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Nw.1w.2w.3w.4w.5w.6w.7w.8w.9w.10w.11w.12w.13w.14Ax.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Bx.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Cx.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Dx.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Ex.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Fx.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Gx.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Hx.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Ix.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Kx.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Lx.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Mx.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Nx.1x.2x.3x.4x.5x.6x.7x.8x.9x.10x.11x.12x.13x.14Ay.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14By.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Cy.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Dy.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Ey.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Fy.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Gy.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Hy.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Iy.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Ky.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Ly.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14My.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Ny.1y.2y.3y.4y.5y.6y.7y.8y.9y.10y.11y.12y.13y.14Az.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Bz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Cz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Dz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Ez.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Fz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Gz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Hz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Iz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Kz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Lz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Mz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14Nz.1z.2z.3z.4z.5z.6z.7z.8z.9z.10z.11z.12z.13z.14 {STRING 0 4000 STRING 4000 4000 STRING 8000 4000 STRING 12000 4000 STRING 16000 4000} 1 {PRIMARY selection doesn't exist or form "STRING" not defined}
 ==== select-5.8 FAILED
 
 
@@ -2567,987 +2565,7 @@ no library with prefix "Tktest" is loaded statically
     }
 
 ---- Result was:
-atching):
-extDisp-7.7 FAILED
-
-
-
-==== textDisp-7.8 TkTextRedrawRegion FAILED
-==== Contents of test case:
-
-# constrained by aquaKnownBug until ticket [aad0231f07] is fixed
-    .t delete 1.0 end
-    .t insert 1.0 "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\n"
-    frame .f2 -bg #ff0000
-    place .f2 -in .t -relx 0.0 -relwidth 0.4 -rely 0.35 -relheight 0.4  -anchor nw -bordermode ignore
-    update
-    destroy .f2
-    update
-    list $tk_textRelayout $tk_textRedraw
-
----- Result was:
-{1.0 2.0 3.0 4.0 5.0 6.0 7.0} {1.0 2.0 3.0 4.0 5.0 6.0 7.0 eof}
----- Result should have been (exact matching):
-{} {borders 4.0 5.0 6.0 7.0 eof}
-==== textDisp-7.8 FAILED
-
-
-
-==== textDisp-9.1 TkTextRedrawTag FAILED
-==== Contents of test case:
-
-    .t configure -wrap char
-    .t delete 1.0 end
-    .t insert 1.0 "Line 1\nLine 2 is long enough to wrap around\nLine 3\nLine 4"
-    update
-    .t tag add big 2.2 2.4
-    update
-   list $tk_textRelayout $tk_textRedraw
-# glob matching is to have some tolerance on actually used font size
-# while still testing what we want to test
-
----- Result was:
-{2.0 2.13 2.33} {2.0 2.13 2.33}
----- Result should have been (glob matching):
-{2.0 2.1[78]} {2.0 2.1[78]}
-==== textDisp-9.1 FAILED
-
-
-
-==== textDisp-9.2 TkTextRedrawTag FAILED
-==== Contents of test case:
-
-    .t configure -wrap char
-    .t delete 1.0 end
-    .t insert 1.0 "Line 1\nLine 2 is long enough to wrap around\nLine 3\nLine 4"
-    update
-    .t tag add big 1.2 2.4
-p around\nLine 3\nLine 4"
-.t tag add big 1.2 2.4
-    update
-    list $tk_textRelayout $tk_textRedraw
-# glob matching is to have some tolerance on actually used font size
-# while still testing what we want to test
-
----- Result was:
-{1.0 2.0} {1.0 2.0}
----- Result should have been (glob matching):
-{1.0 2.0 2.1[678]} {1.0 2.0 2.1[678]}
-==== textDisp-9.2 FAILED
-
-
-
-==== textDisp-9.4 TkTextRedrawTag FAILED
-==== Contents of test case:
-
-    .t configure -wrap char
-    .t delete 1.0 end
-    .t insert 1.0 "Line 1\nLine 2 is long enough to wrap around\nLine 3\nLine 4"
-    update
-    .t tag add big 2.2 2.20
-    update
-    .t tag remove big 1.0 end
-    update
-    list $tk_textRelayout $tk_textRedraw
-
----- Result was:
-{2.0 2.20 3.0 4.0} {2.0 2.20 3.0 4.0 eof}
----- Result should have been (exact matching):
-{2.0 2.20} {2.0 2.20 eof}
-==== textDisp-9.4 FAILED
-
-
-
-==== textDisp-9.5 TkTextRedrawTag FAILED
-==== Contents of test case:
-
-    .t delete 1.0 end
-    .t insert 1.0 "Line 1\nLine 2 is long enough to wrap around\nLine 3\nLine 4"
-    update
-    .t tag add big 2.2 2.end
-    update
-    .t tag remove big 1.0 end
-    update
-    list $tk_textRelayout $tk_textRedraw
-
----- Result was:
-{2.0 2.20 3.0 4.0} {2.0 2.20 3.0 4.0 eof}
----- Result should have been (exact matching):
-{2.0 2.20} {2.0 2.20 eof}
-==== textDisp-9.5 FAILED
-
-
-
-==== textDisp-9.8 TkTextRedrawTag FAILED
-==== Contents of test case:
-
-    .t configure -wrap char
-    .t delete 1.0 end
-    .t insert 1.0 "Line 1\nLine 2 is long enough to wrap\nLine 3 is also long enough to wrap\nLine 4"
-    .t tag add big 1.0 2.0
-    update
-    .t tag add big 2.0 2.5
-    update
-    set tk_textRedraw
-# glob matching is to have some tolerance on actually used font size
-# while still testing what we want to test
-
----- Result was:
-
----- Result should have been (glob matching):
-2.0 2.1[678]
-==== textDisp-9.8 FAILED
-
-
-
-==== textDisp-9.9 TkTextRedrawTag FAILED
-==== Contents of test case:
-
-    .t configure -wrap char
-    .t delete 1.0 end
-    .t insert 1.0 "Line 1\nLine 2 is long enough to wrap\nLine 3 is also long enough to wrap\nLine 4"
-    .t tag add big 1.0 2.0
-    update
-    .t tag add big 1.5 2.5
-    update
-    set tk_textRedraw
-# glob matching is to have some tolerance on actually used font size
-# while still testing what we want to test
-
----- Result was:
-
----- Result should have been (glob matching):
-2.0 2.1[678]
-==== textDisp-9.9 FAILED
-
----> Warning: the font actually used by the tests, which is "-family courier -size 12 -weight normal -slant roman -underline 0 -overstrike 0", is too different from the requested "Courier -12". Some of the upcoming tests will probably fail.
-
-
-==== textDisp-16.1 TkTextYviewCmd procedure FAILED
-==== Contents of test case:
-
-    .t yview 21.0
-    set x [.t yview]
-    .t yview 1.0
-    list [expr {int([lindex $x 0]*100)}] [expr {int([lindex $x 1]*100)}]
-
----- Result was:
-7 11
----- Result should have been (exact matching):
-9 14
-==== textDisp-16.1 FAILED
-
-
-
-==== textDisp-16.11 TkTextYviewCmd procedure, "moveto" option FAILED
-==== Contents of test case:
-
-# constrained because text tagged with the big font plays a role
-    .t yview moveto 0.5
-    .t index @0,0
-
----- Result was:
-102.5
----- Result should have been (exact matching):
-103.0
-==== textDisp-16.11 FAILED
-
-
-
-==== textDisp-16.14 TkTextYviewCmd procedure, "moveto" option FAILED
-==== Contents of test case:
-
-    # y move to 3/4 of text widget content height
-    .t yview moveto .75
-    # target y position is inside line 151, which wraps 4 times
-    # exactly which display line depends on actual font size
-    set ytargetline [expr {150*$fixedHeight+5*$heightDiff}]
-    set expected 151.0
-    while {[expr {$ytargetline+$fixedHeight}] <= [expr {round(0.75*$totpix)}]} {
-	incr ytargetline $fixedHeight
-	set expected [.t index "$expected + 1 display line"]
-    }
-    lequal [.t index @0,0] $expected
-
----- Result was:
-result: 144.0 - expected: 163.0
----- Result should have been (exact matching):
-1
-==== textDisp-16.14 FAILED
-
-
-
-==== textDisp-16.15 TkTextYviewCmd procedure, "moveto" option FAILED
-==== Contents of test case:
-
-    # y move to 3/4 of text widget content height plus just one line height minus one pixel
-    .t yview moveto .75
-    set pixtonextline [expr {-[bo] + [lindex [.t bbox @0,0] 1] + [lindex [.t bbox @0,0] 3]}]
-    .t yview moveto [expr {0.75 + ($pixtonextline-1)/double($totpix)}]
-    # target y position is inside line 151, which wraps 4 times
-    # exactly which display line depends on actual font size
-    set ytargetline [expr {150*$fixedHeight+5*$heightDiff}]
-    set expected 151.0
-    while {[expr {$ytargetline+$fixedHeight}] <= [expr {round(0.75*$totpix + ($pixtonextline-1))}]} {
-	incr ytargetline $fixedHeight
-	set expected [.t index "$expected + 1 display line"]
-    }
-    lequal [.t index @0,0] $expected
-
----- Result was:
-result: 144.0 - expected: 163.0
----- Result should have been (exact matching):
-1
-==== textDisp-16.15 FAILED
-
-
-
-==== textDisp-16.16 TkTextYviewCmd procedure, "moveto" option FAILED
-==== Contents of test case:
-
-    # y move to 3/4 of text widget content height plus exactly one line height
-    .t yview moveto .75
-    set pixtonextline [expr {-[bo] + [lindex [.t bbox @0,0] 1] + [lindex [.t bbox @0,0] 3]}]
-    .t yview moveto [expr {0.75 + $pixtonextline/double($totpix)}]
-    # target y position is inside line 151, which wraps 4 times
-    # exactly which display line depends on actual font size
-    set ytargetline [expr {150*$fixedHeight+5*$heightDiff}]
-    set expected 151.0
-    while {[expr {$ytargetline+$fixedHeight}] <= [expr {round(0.75*$totpix + $pixtonextline)}]} {
-	incr ytargetline $fixedHeight
-	set expected [.t index "$expected + 1 display line"]
-    }
-    lequal [.t index @0,0] $expected
-
----- Result was:
-result: 145.0 - expected: 164.0
----- Result should have been (exact matching):
-1
-==== textDisp-16.16 FAILED
-
-
-
-==== textDisp-16.17 TkTextYviewCmd procedure, "moveto" option FAILED
-==== Contents of test case:
-
-# constrained because text tagged with the big font plays a role
-    .t yview moveto .755
-    .t index @0,0
-
----- Result was:
-145.0
----- Result should have been (exact matching):
-151.80
-==== textDisp-16.17 FAILED
-
-textImage.test
-
-
-==== textImage-4.2 alignment checking - baseline FAILED
-==== Contents of test case:
-
-    catch {
-	image create photo small -width 5 -height 5
-	small put red -to 0 0 4 4
-	image create photo large -width 50 -height 50
-	large put green -to 0 0 50 50
-    }
-    font create test_font2 -size 5
-    text .t -font test_font2 -bd 0 -highlightthickness 0 -padx 0 -pady 0
-    pack .t
-    .t image create end -image large
-    .t image create end -image small -align baseline
-    .t insert end test
-    update
-    # Sizes larger than 25 can be too big and lead to a negative 'norm',
-    # at least on Windows XP with certain settings.
-    foreach size {10 15 20 25} {
-	font configure test_font2 -size $size
-	array set Metrics [font metrics test_font2]
-	update  ; # services the idle "TheWorldHasChanged" event, queues "TkWorldChanged" events
-	update  ; # services the queued "TkWorldChanged" events
-	foreach {x y w h} [.t bbox small] {}
-	set norm [expr {
-		(([image height large] - $Metrics(-linespace))/2
-		+ $Metrics(-ascent) - [image height small] - $y)
-	}]
-	lappend result "$size $norm"
-    }
-    return $result
-
----- Result was:
-{10 0} {15 0} {20 0} {25 -5}
----- Result should have been (exact matching):
-{10 0} {15 0} {20 0} {25 0}
-==== textImage-4.2 FAILED
-
-textIndex.test
-textMark.test
-textTag.test
-
-
-==== textTag-16.2 TkTextPickCurrent procedure FAILED
-==== Contents of test case:
-
-    .t tag configure big -font $bigFont
-    # update needed here to stabilize the test
-    update
-    event gen .t <ButtonRelease-1> -state 0x100 -x $x1 -y $y1
-    event gen .t <Motion> -x $x2 -y $y2
-    set x [.t index current]
-    .t tag add big 3.0
-    update
-    lappend x [.t index current]
-
----- Result was:
-3.2 3.0
----- Result should have been (exact matching):
-3.2 3.1
-==== textTag-16.2 FAILED
-
-
-
-==== textTag-16.6 TkTextPickCurrent procedure FAILED
-==== Contents of test case:
-
-    .t tag configure big -font $bigFont
-    event gen .t <Motion> -x $x1 -y $y1
-    .t tag bind a <Enter> {.t tag add big 3.0 3.2}
-    .t tag add a 3.2
-    event gen .t <Motion> -x $x2 -y $y2
-    update
-    .t index current
-
----- Result was:
-3.0
----- Result should have been (exact matching):
-3.1
-==== textTag-16.6 FAILED
-
-
-
-==== textTag-16.7 TkTextPickCurrent procedure FAILED
-==== Contents of test case:
-
-    .t tag configure big -font $bigFont
-    .t tag bind a <Enter> {.t tag add big 3.0 3.2}
-    .t tag add a 3.2
-
-    event gen .t <Motion> -x $x1 -y $y1
-    .t tag bind a <Leave> {.t tag add big 3.0 3.2}
-    .t tag add a 2.1
-    event gen .t <Motion> -x $x2 -y $y2
-    update
-    .t index current
-
----- Result was:
-3.0
----- Result should have been (exact matching):
-3.1
-==== textTag-16.7 FAILED
-
-textWind.test
-
-
-==== textWind-12.1 EmbWinUndisplayProc procedure, mapping/unmapping FAILED
-==== Contents of test case:
-
-    .t insert 1.0 "Some sample text"
-    frame .f -width 30 -height 20 -bg $color
-    .t window create 1.2 -window .f
-    bind .f <Map> {lappend x mapped}
-    bind .f <Unmap> {lappend x unmapped}
-    set x created
-    update
-    lappend x modified
-    .t delete 1.0
-    update
-    lappend x replaced
-    .t window configure .f -window {}
-    .t delete 1.1
-    update
-    .t window create 1.4 -window .f
-    update
-    lappend x off-screen
-    .t configure -wrap none
-    .t insert 1.0 "Enough text to make the line run off-screen"
-    update
-    return $x
-
----- Result was:
-created mapped mapped modified replaced unmapped unmapped mapped mapped off-screen unmapped unmapped
----- Result should have been (exact matching):
-created mapped modified replaced unmapped mapped off-screen unmapped
-==== textWind-12.1 FAILED
-
-
-
-==== textWind-14.1 EmbWinDelayedUnmap procedure FAILED
-==== Contents of test case:
-
-    .t insert 1.0 "Some sample text"
-    frame .f -width 30 -height 20 -bg $color
-    .t window create 1.2 -window .f
-    update
-    bind .f <Unmap> {lappend x unmapped}
-    set x modified
-    .t insert 1.0 x
-    lappend x removed
-    .t window configure .f -window {}
-    lappend x updated
-    update
-    return $x
-
----- Result was:
-modified removed unmapped updated unmapped
----- Result should have been (exact matching):
-modified removed unmapped updated
-==== textWind-14.1 FAILED
-
-tk.test
-
-
-==== tk-2.3 tk command: appname FAILED
-==== Contents of test case:
-
-    tk appname bazfoogarply
-    expr {[lsearch -exact [winfo interps] [tk appname]] >= 0}
-
----- Result was:
-0
----- Result should have been (exact matching):
-1
-==== tk-2.3 FAILED
-
-this wish doesn't have XIM (X Input Methods) support
-
-
-==== tk-5.5 tk caret FAILED
-==== Contents of test case:
-
-    tk caret . -x 10 -y 11 -h 12; tk caret .
-
----- Result was:
--height 0 -x 0 -y 0
----- Result should have been (exact matching):
--height 12 -x 10 -y 11
-==== tk-5.5 FAILED
-
-
-
-==== tk-5.6 tk caret FAILED
-==== Contents of test case:
-
-    tk caret . -x 20 -y 25 -h 30; tk caret . -hei
-
----- Result was:
-0
----- Result should have been (exact matching):
-30
-==== tk-5.6 FAILED
-
-unixButton.test
-unixEmbed.test
-
-
-==== unixEmbed-3.3 ContainerEventProc procedure, disallow position changes FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    childTkProcess eval "set w1 [winfo id .f1]"
-    childTkProcess eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use $w1 -bd 2 -relief raised
-	update
-	wm geometry .t1 +30+40
-    }
-    update
-    childTkProcess eval {
-	wm geometry .t1
-    }
-
----- Result was:
-bad window path name ".t1"
----- Result should have been (exact matching):
-200x200+0+0
-==== unixEmbed-3.3 FAILED
-
-
-
-==== unixEmbed-3.3a ContainerEventProc procedure, disallow position changes FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    child alias w1 winfo id .f1
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1] -bd 2 -relief raised
-	update
-	wm geometry .t1 +30+40
-	update
-	wm geometry .t1
-    }
-
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
-==== unixEmbed-3.3a FAILED
-
-
-
-==== unixEmbed-3.4 ContainerEventProc procedure, disallow position changes FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    childTkProcess eval "set w1 [winfo id .f1]"
-    childTkProcess eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use $w1
-	update
-	wm geometry .t1 300x100+30+40
-    }
-    update
-    childTkProcess eval {
-	wm geometry .t1
-    }
-
----- Result was:
-bad window path name ".t1"
----- Result should have been (exact matching):
-300x100+0+0
-==== unixEmbed-3.4 FAILED
-
-
-
-==== unixEmbed-3.4a ContainerEventProc procedure, disallow position changes FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    child alias w1 winfo id .f1
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	update
-	wm geometry .t1 300x100+30+40
-	update
-	wm geometry .t1
-    }
-
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
-==== unixEmbed-3.4a FAILED
-
-
-
-==== unixEmbed-3.5 ContainerEventProc procedure, geometry requests FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    childTkProcess eval "set w1 [winfo id .f1]"
-    childTkProcess eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use $w1
-    }
-    update
-    childTkProcess eval {
-	.t1 configure -width 300 -height 80
-    }
-    update
-    list [winfo width .f1] [winfo height .f1] [childTkProcess eval {wm geometry .t1}]
-
----- Result was:
-200 50 {bad window path name ".t1"}
----- Result should have been (exact matching):
-300 80 300x80+0+0
-==== unixEmbed-3.5 FAILED
-
-
-
-==== unixEmbed-3.5a ContainerEventProc procedure, geometry requests FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    child alias w1 winfo id .f1
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	.t1 configure -width 300 -height 80
-	update
-    }
-    list [winfo width .f1] [winfo height .f1] [child eval {wm geometry .t1}]
-
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
-==== unixEmbed-3.5a FAILED
-
-
-
-==== unixEmbed-3.6 ContainerEventProc procedure, map requests FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    childTkProcess eval "set w1 [winfo id .f1]"
-    childTkProcess eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use $w1
-	set x unmapped
-	bind .t1 <Map> {set x mapped}
-    }
-    update
-    childTkProcess eval {
-	after 100
-	update
-	set x
-    }
-
----- Result was:
-can't read "x": no such variable
----- Result should have been (exact matching):
-mapped
-==== unixEmbed-3.6 FAILED
-
-
-
-==== unixEmbed-3.6a ContainerEventProc procedure, map requests FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    child alias w1 winfo id .f1
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	set x unmapped
-	bind .t1 <Map> {set x mapped}
-	update
-	after 100
-	update
-	set x
-    }
-
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
-==== unixEmbed-3.6a FAILED
-
-
-
-==== unixEmbed-3.7 ContainerEventProc procedure, destroy events FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    childTkProcess eval "set w1 [winfo id .f1]"
-    bind .f1 <Destroy> {set x dead}
-    set x alive
-    childTkProcess eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use $w1
-    }
-    update
-    childTkProcess eval {
-	destroy .t1
-    }
-    update
-    list $x [winfo exists .f1]
-
----- Result was:
-alive 1
----- Result should have been (exact matching):
-dead 0
-==== unixEmbed-3.7 FAILED
-
-
-
-==== unixEmbed-3.7a ContainerEventProc procedure, destroy events FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    child alias w1 winfo id .f1
-    bind .f1 <Destroy> {set x dead}
-    set x alive
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	update
-	destroy .t1
-    }
-    update
-    list $x [winfo exists .f1]
-
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
-==== unixEmbed-3.7a FAILED
-
-
-
-==== unixEmbed-4.1 EmbedStructureProc procedure, configure events FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    childTkProcess eval "set w1 [winfo id .f1]"
-    childTkProcess eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use $w1
-    }
-    update
-    childTkProcess eval {
-	.t1 configure -width 180 -height 100
-    }
-    update
-    childTkProcess eval {
-	winfo geometry .t1
-    }
-
----- Result was:
-bad window path name ".t1"
----- Result should have been (exact matching):
-180x100+0+0
-==== unixEmbed-4.1 FAILED
-
-
-
-==== unixEmbed-4.1a EmbedStructureProc procedure, configure events FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    child alias w1 winfo id .f1
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	update
-	.t1 configure -width 180 -height 100
-	update
-	winfo geometry .t1
-    }
-
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
-==== unixEmbed-4.1a FAILED
-
-
-
-==== unixEmbed-5.1 EmbedFocusProc procedure, FocusIn events FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    update
-    childTkProcess eval "set w1 [winfo id .f1]"
-    childTkProcess eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use $w1
-	bind .t1 <FocusIn> {lappend x "focus in %W"}
-	bind .t1 <FocusOut> {lappend x "focus out %W"}
-	set x {}
-    }
-    focus -force .f1
-    update
-    childTkProcess eval {set x}
-
----- Result was:
-can't read "x": no such variable
----- Result should have been (exact matching):
-{focus in .t1}
-==== unixEmbed-5.1 FAILED
-
-
-
-==== unixEmbed-5.1a EmbedFocusProc procedure, FocusIn events FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    update
-    child alias w1 winfo id .f1
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	bind .t1 <FocusIn> {lappend x "focus in %W"}
-	bind .t1 <FocusOut> {lappend x "focus out %W"}
-	update
-	set x {}
-    }
-    focus -force .f1
-    update
-    child eval {set x}
-
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
-==== unixEmbed-5.1a FAILED
-
-
-
-==== unixEmbed-5.2a EmbedFocusProc procedure, focusing on dead window FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    update
-    child alias w1 winfo id .f1
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	update
-	after 200 {destroy .t1}
-    }
-    after 400
-    focus -force .f1
-    update
-
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
-==== unixEmbed-5.2a FAILED
-
-
-
-==== unixEmbed-5.3 EmbedFocusProc procedure, FocusOut events FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    update
-    childTkProcess eval "set w1 [winfo id .f1]"
-    childTkProcess eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use $w1
-	bind .t1 <FocusIn> {lappend x "focus in %W"}
-	bind .t1 <FocusOut> {lappend x "focus out %W"}
-	set x {}
-    }
-    focus -force .f1
-    update
-    set x [childTkProcess eval {update; set x}]
-    focus .
-    update
-    list $x [childTkProcess eval {update; set x}]
-
----- Result was:
-{can't read "x": no such variable} {can't read "x": no such variable}
----- Result should have been (exact matching):
-{{focus in .t1}} {{focus in .t1} {focus out .t1}}
-==== unixEmbed-5.3 FAILED
-
-
-
-==== unixEmbed-5.3a EmbedFocusProc procedure, FocusOut events FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    update
-    child alias w1 winfo id .f1
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	set x {}
-	bind .t1 <FocusIn> {lappend x "focus in %W"}
-	bind .t1 <FocusOut> {lappend x "focus out %W"}
-	update
-    }
-    focus -force .f1
-    update
-    set x [child eval {update; set x }]
-    focus .
-    update
-    list $x [child eval {update; set x}]
-
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
-==== unixEmbed-5.3a FAILED
-
-
-
-==== unixEmbed-6.1 EmbedGeometryRequest procedure, window changes size FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    childTkProcess eval "set w1 [winfo id .f1]"
-    childTkProcess eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use $w1
-	update
-	bind .t1 <Configure> {lappend x {configure .t1 %w %h}}
-	set x {}
-	.t1 configure -width 300 -height 120
-	update
-	list $x [winfo geom .t1]
-    }
-
----- Result was:
-couldn't create child of window "0x4b78"
+couldn't create child of window "0x4b72"
 ---- Result should have been (exact matching):
 {{configure .t1 300 120}} 300x120+0+0
 ==== unixEmbed-6.1 FAILED
@@ -3602,7 +2620,7 @@ no library with prefix "Tktest" is loaded statically
     }
 
 ---- Result was:
-couldn't create child of window "0x4b7b"
+couldn't create child of window "0x4b75"
 ---- Result should have been (exact matching):
 {{configure .t1 200 200}} 200x200+0+0
 ==== unixEmbed-6.2 FAILED
@@ -3928,7 +2946,403 @@ unixSelect.test
 
 
 
-C4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+==== unixSelect-1.2 TkSelGetSelection procedure: simple i18n text, iso8859-1 FAILED
+==== Contents of test case:
+
+    childTkProcess eval {
+	pack [entry .e]
+	update
+	.e insert 0 üф
+	.e selection range 0 end
+    }
+    selection get
+
+---- Result was:
+s
+---- Result should have been (exact matching):
+\xFC?
+==== unixSelect-1.2 FAILED
+
+
+
+==== unixSelect-1.3 TkSelGetSelection procedure: simple i18n text, iso2022 FAILED
+==== Contents of test case:
+
+    selection handle -type COMPOUND_TEXT -format COMPOUND_TEXT .  {handler COMPOUND_TEXT}
+    selection own .
+    set selValue üф
+    set selInfo {}
+    set result [childTkProcess eval {
+	set x [selection get -type COMPOUND_TEXT]
+	list [string equal üф $x] [string length $x]
+    }]
+    lappend result $selInfo
+
+---- Result was:
+0 1 {}
+---- Result should have been (exact matching):
+1 2 {COMPOUND_TEXT 0 4000}
+==== unixSelect-1.3 FAILED
+
+
+
+==== unixSelect-1.4 TkSelGetSelection procedure: INCR i18n text, iso2022 FAILED
+==== Contents of test case:
+
+    # This test is subtle.  The selection ends up getting fetched twice by
+    # Tk:  once to compute the length, and again to actually send the data.
+    # The first time through, we don't convert the data to ISO2022, so the
+    # buffer boundaries end up being different in the two passes.
+    selection handle -type COMPOUND_TEXT -format COMPOUND_TEXT .  {handler COMPOUND_TEXT}
+    selection own .
+    set selValue [string repeat x 3999]üф[string repeat x 3999]
+    set selInfo {}
+    set result [childTkProcess eval {
+	set x [selection get -type COMPOUND_TEXT]
+	list [string equal  [string repeat x 3999]üф[string repeat x 3999] $x]  [string length $x]
+    }]
+    lappend result $selInfo
+
+---- Result was:
+0 1 {}
+---- Result should have been (exact matching):
+1 8000 {COMPOUND_TEXT 0 4000 COMPOUND_TEXT 4000 3999 COMPOUND_TEXT 7998 4000 COMPOUND_TEXT 0 4000 COMPOUND_TEXT 4000 3998 COMPOUND_TEXT 7997 4000}
+==== unixSelect-1.4 FAILED
+
+
+
+==== unixSelect-1.5 TkSelGetSelection procedure: simple i18n text, iso2022 FAILED
+==== Contents of test case:
+
+    selection handle -type COMPOUND_TEXT -format COMPOUND_TEXT .  {handler COMPOUND_TEXT}
+    selection own .
+    set selValue üф
+    set selInfo {}
+    set result [childTkProcess eval {
+	set x [selection get -type COMPOUND_TEXT]
+	list [string equal üф $x] [string length $x]
+    }]
+    lappend result $selInfo
+
+---- Result was:
+0 1 {}
+---- Result should have been (exact matching):
+1 2 {COMPOUND_TEXT 0 4000}
+==== unixSelect-1.5 FAILED
+
+
+
+==== unixSelect-1.6 TkSelGetSelection procedure: INCR i18n text FAILED
+==== Contents of test case:
+
+    childTkProcess eval [subst -nobackslashes {entry .e; pack .e; update
+    .e insert 0 über$longValue
+    .e selection range 0 end}]
+    string length [selection get]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: PRIMARY selection doesn't exist or form "STRING" not defined
+    while executing
+"selection get"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== unixSelect-1.6 FAILED
+
+
+
+==== unixSelect-1.7 TkSelGetSelection procedure: INCR i18n text FAILED
+==== Contents of test case:
+
+    childTkProcess eval {
+	pack [entry .e]
+	update
+	.e insert 0 [string repeat x 3999]ü
+	.e selection range 0 end
+    }
+    selection get
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: PRIMARY selection doesn't exist or form "STRING" not defined
+    while executing
+"selection get"
+    ("uplevel" body line 8)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== unixSelect-1.7 FAILED
+
+
+
+==== unixSelect-1.8 TkSelGetSelection procedure: INCR i18n text FAILED
+==== Contents of test case:
+
+    childTkProcess eval {
+	pack [entry .e]
+	update
+	.e insert 0 ü[string repeat x 3999]
+	.e selection range 0 end
+    }
+    selection get
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: PRIMARY selection doesn't exist or form "STRING" not defined
+    while executing
+"selection get"
+    ("uplevel" body line 8)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== unixSelect-1.8 FAILED
+
+
+
+==== unixSelect-1.9 TkSelGetSelection procedure: INCR i18n text FAILED
+==== Contents of test case:
+
+    childTkProcess eval {
+	pack [entry .e]
+	update
+	.e insert 0 [string repeat x 3999]ü[string repeat x 4000]
+	.e selection range 0 end
+    }
+    selection get
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: PRIMARY selection doesn't exist or form "STRING" not defined
+    while executing
+"selection get"
+    ("uplevel" body line 8)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== unixSelect-1.9 FAILED
+
+
+
+==== unixSelect-1.10 TkSelGetSelection procedure: INCR i18n text, utf-8 FAILED
+==== Contents of test case:
+
+    childTkProcess eval {
+	pack [entry .e]
+	update
+	.e insert 0 [string repeat x 3999]ü
+	.e selection range 0 end
+    }
+    selection get -type UTF8_STRING
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: PRIMARY selection doesn't exist or form "UTF8_STRING" not defined
+    while executing
+"selection get -type UTF8_STRING"
+    ("uplevel" body line 8)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== unixSelect-1.10 FAILED
+
+
+
+==== unixSelect-1.11 TkSelGetSelection procedure: INCR i18n text, utf-8 FAILED
+==== Contents of test case:
+
+    childTkProcess eval {
+	pack [entry .e]
+	update
+	.e insert 0 ü[string repeat x 3999]
+	.e selection range 0 end
+    }
+    selection get -type UTF8_STRING
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: PRIMARY selection doesn't exist or form "UTF8_STRING" not defined
+    while executing
+"selection get -type UTF8_STRING"
+    ("uplevel" body line 8)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== unixSelect-1.11 FAILED
+
+
+
+==== unixSelect-1.12 TkSelGetSelection procedure: INCR i18n text, utf-8 FAILED
+==== Contents of test case:
+
+    childTkProcess eval {
+	pack [entry .e]
+	update
+	.e insert 0 [string repeat x 3999]ü[string repeat x 4000]
+	.e selection range 0 end
+    }
+    selection get -type UTF8_STRING
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: PRIMARY selection doesn't exist or form "UTF8_STRING" not defined
+    while executing
+"selection get -type UTF8_STRING"
+    ("uplevel" body line 8)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== unixSelect-1.12 FAILED
+
+
+
+==== unixSelect-1.13 TkSelGetSelection procedure: simple i18n text, utf-8 FAILED
+==== Contents of test case:
+
+    pack [entry .e]
+    update
+    .e insert 0 überф
+    .e selection range 0 end
+    childTkProcess eval {string length [selection get -type UTF8_STRING]}
+
+---- Result was:
+1
+---- Result should have been (exact matching):
+5
+==== unixSelect-1.13 FAILED
+
+
+
+==== unixSelect-1.14 TkSelGetSelection procedure: simple i18n text, utf-8 FAILED
+==== Contents of test case:
+
+    childTkProcess eval {
+	pack [entry .e]
+	update
+	.e insert 0 üф
+	.e selection range 0 end
+    }
+    selection get -type UTF8_STRING
+
+---- Result was:
+s
+---- Result should have been (exact matching):
+\xFC\u0444
+==== unixSelect-1.14 FAILED
+
+
+
+==== unixSelect-1.15 TkSelGetSelection procedure: INCR i18n text, utf-8 FAILED
+==== Contents of test case:
+
+    childTkProcess eval {
+	pack [entry .e]
+	update
+	.e insert 0 [string repeat [string repeat Ää 50]\n 21]
+	.e selection range 0 end
+    }
+    selection get -type UTF8_STRING
+
+---- Result was:
+s
+---- Result should have been (exact matching):
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+
+==== unixSelect-1.15 FAILED
+
+
+
+==== unixSelect-1.16 TkSelGetSelection procedure: INCR i18n text, utf-8 FAILED
+==== Contents of test case:
+
+    childTkProcess eval {
+	pack [entry .e]
+	update
+	.e insert 0 i[string repeat [string repeat Ää 50]\n 21]
+	.e selection range 0 end
+    }
+    selection get -type UTF8_STRING
+
+---- Result was:
+s
+---- Result should have been (exact matching):
+i\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+
+==== unixSelect-1.16 FAILED
+
+
+
+==== unixSelect-1.17 TkSelGetSelection procedure: INCR i18n text, utf-8 FAILED
+==== Contents of test case:
+
+    childTkProcess eval {
+	pack [text .t]
+	update
+	.t insert 1.0 [string repeat [string repeat Ää 50]\n 21]
+	# Has to be selected in a separate stage
+	.t tag add sel 1.0 21.end+1c
+    }
+    after 10
+    selection get -type UTF8_STRING
+
+---- Result was:
+s
+---- Result should have been (exact matching):
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
+\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
 \xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
 \xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
 \xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
@@ -3968,297 +3382,6 @@ i\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE
 \xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
 \xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
 \xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-
-==== unixSelect-1.18 FAILED
-
-unixWm.test
-
-
-==== unixWm-2.4 moving window while mapped FAILED
-==== Contents of test case:
-
-	wm geom .t $geom
-	update
-	scan [wm geom .t] %dx%d%1s%d%1s%d width height xsign x ysign y
-	format "%s%d%s%d" $xsign [eval expr $x$xsign$xerr] $ysign  [eval expr $y$ysign$yerr]
-    
----- Result was:
-+0+0
----- Result should have been (exact matching):
--0-0
-==== unixWm-2.4 FAILED
-
-
-
-==== unixWm-2.5 moving window while mapped FAILED
-==== Contents of test case:
-
-	wm geom .t $geom
-	update
-	scan [wm geom .t] %dx%d%1s%d%1s%d width height xsign x ysign y
-	format "%s%d%s%d" $xsign [eval expr $x$xsign$xerr] $ysign  [eval expr $y$ysign$yerr]
-    
----- Result was:
-+0+0
----- Result should have been (exact matching):
-+0-0
-==== unixWm-2.5 FAILED
-
-
-
-==== unixWm-2.6 moving window while mapped FAILED
-==== Contents of test case:
-
-	wm geom .t $geom
-	update
-	scan [wm geom .t] %dx%d%1s%d%1s%d width height xsign x ysign y
-	format "%s%d%s%d" $xsign [eval expr $x$xsign$xerr] $ysign  [eval expr $y$ysign$yerr]
-    
----- Result was:
-+0+0
----- Result should have been (exact matching):
--0+0
-==== unixWm-2.6 FAILED
-
-
-
-==== unixWm-2.7 moving window while mapped FAILED
-==== Contents of test case:
-
-	wm geom .t $geom
-	update
-	scan [wm geom .t] %dx%d%1s%d%1s%d width height xsign x ysign y
-	format "%s%d%s%d" $xsign [eval expr $x$xsign$xerr] $ysign  [eval expr $y$ysign$yerr]
-    
----- Result was:
-+-10+-5
----- Result should have been (exact matching):
--10-5
-==== unixWm-2.7 FAILED
-
-
-
-==== unixWm-2.8 moving window while mapped FAILED
-==== Contents of test case:
-
-	wm geom .t $geom
-	update
-	scan [wm geom .t] %dx%d%1s%d%1s%d width height xsign x ysign y
-	format "%s%d%s%d" $xsign [eval expr $x$xsign$xerr] $ysign  [eval expr $y$ysign$yerr]
-    
----- Result was:
-+-10+5
----- Result should have been (exact matching):
--10+5
-==== unixWm-2.8 FAILED
-
-
-
-==== unixWm-2.9 moving window while mapped FAILED
-==== Contents of test case:
-
-	wm geom .t $geom
-	update
-	scan [wm geom .t] %dx%d%1s%d%1s%d width height xsign x ysign y
-	format "%s%d%s%d" $xsign [eval expr $x$xsign$xerr] $ysign  [eval expr $y$ysign$yerr]
-    
----- Result was:
-+10+-5
----- Result should have been (exact matching):
-+10-5
-==== unixWm-2.9 FAILED
-
-
-
-==== unixWm-3.4 moving window while iconified FAILED
-==== Contents of test case:
-
-	update
-	wm iconify .t
-	update idletasks
-	wm geom .t $geom
-	update idletasks
-	wm deiconify .t
-	update idletasks
-	scan [wm geom .t] %dx%d%1s%d%1s%d width height xsign x ysign y
-	format "%s%d%s%d" $xsign [eval expr $x$xsign$xerr] $ysign  [eval expr $y$ysign$yerr]
-    
----- Result was:
-+0+0
----- Result should have been (exact matching):
--0-0
-==== unixWm-3.4 FAILED
-
-
-
-==== unixWm-3.5 moving window while iconified FAILED
-==== Contents of test case:
-
-	update
-	wm iconify .t
-	update idletasks
-	wm geom .t $geom
-	update idletasks
-	wm deiconify .t
-	update idletasks
-	scan [wm geom .t] %dx%d%1s%d%1s%d width height xsign x ysign y
-	format "%s%d%s%d" $xsign [eval expr $x$xsign$xerr] $ysign  [eval expr $y$ysign$yerr]
-    
----- Result was:
-+0+0
----- Result should have been (exact matching):
-+0-0
-==== unixWm-3.5 FAILED
-
-
-
-==== unixWm-3.6 moving window while iconified FAILED
-==== Contents of test case:
-
-	update
-	wm iconify .t
-	update idletasks
-	wm geom .t $geom
-	update idletasks
-	wm deiconify .t
-	update idletasks
-	scan [wm geom .t] %dx%d%1s%d%1s%d width height xsign x ysign y
-	format "%s%d%s%d" $xsign [eval expr $x$xsign$xerr] $ysign  [eval expr $y$ysign$yerr]
-    
----- Result was:
-+0+0
----- Result should have been (exact matching):
--0+0
-==== unixWm-3.6 FAILED
-
-
-
-==== unixWm-3.7 moving window while iconified FAILED
-==== Contents of test case:
-
-	update
-	wm iconify .t
-	update idletasks
-	wm geom .t $geom
-	update idletasks
-	wm deiconify .t
-	update idletasks
-	scan [wm geom .t] %dx%d%1s%d%1s%d width height xsign x ysign y
-	format "%s%d%s%d" $xsign [eval expr $x$xsign$xerr] $ysign  [eval expr $y$ysign$yerr]
-    
----- Result was:
-+-10+-5
----- Result should have been (exact matching):
--10-5
-==== unixWm-3.7 FAILED
-
-
-
-==== unixWm-3.8 moving window while iconified FAILED
-==== Contents of test case:
-
-	update
-	wm iconify .t
-	update idletasks
-	wm geom .t $geom
-	update idletasks
-	wm deiconify .t
-	update idletasks
-	scan [wm geom .t] %dx%d%1s%d%1s%d width height xsign x ysign y
-	format "%s%d%s%d" $xsign [eval expr $x$xsign$xerr] $ysign  [eval expr $y$ysign$yerr]
-    
----- Result was:
-+-10+5
----- Result should have been (exact matching):
--10+5
-==== unixWm-3.8 FAILED
-
-
-
-==== unixWm-3.9 moving window while iconified FAILED
-==== Contents of test case:
-
-	update
-	wm iconify .t
-	update idletasks
-	wm geom .t $geom
-	update idletasks
-	wm deiconify .t
-	update idletasks
-	scan [wm geom .t] %dx%d%1s%d%1s%d width height xsign x ysign y
-	format "%s%d%s%d" $xsign [eval expr $x$xsign$xerr] $ysign  [eval expr $y$ysign$yerr]
-    
----- Result was:
-+10+-5
----- Result should have been (exact matching):
-+10-5
-==== unixWm-3.9 FAILED
-
-
-
-==== unixWm-8.1 icon windows FAILED
-==== Contents of test case:
-
-    destroy .t
-    destroy .icon
-    toplevel .t -width 100 -height 30
-    wm geometry .t +0+0
-    toplevel .icon -width 50 -height 50 -bg red
-    wm iconwindow .t .icon
-    list [catch {wm withdraw .icon} msg] $msg
-
----- Result was:
-0 {}
----- Result should have been (exact matching):
-1 {can't withdraw .icon: it is an icon for .t}
-==== unixWm-8.1 FAILED
-
-
-
-==== unixWm-8.4 icon windows FAILED
-==== Contents of test case:
-
-    destroy .t
-    destroy .icon
-    toplevel .t -width 100 -height 30
-    wm geom .t +0+0
-    update idletasks
-    set result [wm iconwindow .t]
-    toplevel .icon -width 50 -height 50 -bg red
-    wm iconwindow .t .icon
-    lappend result [wm iconwindow .t] [wm state .icon]
-    wm iconwindow .t {}
-    lappend result [wm iconwindow .t] [wm state .icon]
-xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-
-==== unixSelect-1.18 FAILED
-
-unixWm.test
-
-\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
-xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
 \xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
 \xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
 \xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4
@@ -4803,25 +3926,6 @@ unixWm.test
 
 
 
-==== unixWm-23.3 Tk_WmCmd procedure, "iconify" option FAILED
-==== Contents of test case:
-
-    destroy .t2
-    toplevel .t2
-    wm geom .t2 +0+0
-    wm transient .t2 .t
-    set result [list [catch {wm iconify .t2} msg] $msg]
-    destroy .t2
-    set result
-
----- Result was:
-0 {}
----- Result should have been (exact matching):
-1 {can't iconify ".t2": it is a transient}
-==== unixWm-23.3 FAILED
-
-
-
 ==== unixWm-23.4 Tk_WmCmd procedure, "iconify" option FAILED
 ==== Contents of test case:
 
@@ -4869,158 +3973,32 @@ unixWm.test
     destroy .icon
     destroy .icon2
     toplevel .icon -width 50 -height 50 -bg green
-ontents of test case:
-
-    list [catch {wm frame .t 12} msg] $msg
-
----- Result was:
-0 0x0
----- Result should have been (exact matching):
-1 {wrong # args: should be "wm frame window"}
-==== unixWm-18.1 FAILED
-
-
-
-==== unixWm-19.1 Tk_WmCmd procedure, "geometry" option FAILED
-==== Contents of test case:
-
-    list [catch {wm geometry .t 12 13} msg] $msg
-
----- Result was:
-0 {}
----- Result should have been (exact matching):
-1 {wrong # args: should be "wm geometry window ?newGeometry?"}
-==== unixWm-19.1 FAILED
-
-
-
-==== unixWm-20.5 Tk_WmCmd procedure, "grid" option FAILED
-==== Contents of test case:
-
-    list [catch {wm grid .t -1 11 12 13} msg] $msg
-
----- Result was:
-1 {baseWidth or baseHeight can't be < 0, and widthInc or heightInc can't be <= 0}
----- Result should have been (exact matching):
-1 {baseWidth can't be < 0}
-==== unixWm-20.5 FAILED
-
-
-
-==== unixWm-20.7 Tk_WmCmd procedure, "grid" option FAILED
-==== Contents of test case:
-
-    list [catch {wm grid .t 10 -11 12 13} msg] $msg
-
----- Result was:
-1 {baseWidth or baseHeight can't be < 0, and widthInc or heightInc can't be <= 0}
----- Result should have been (exact matching):
-1 {baseHeight can't be < 0}
-==== unixWm-20.7 FAILED
-
-
-
-==== unixWm-20.9 Tk_WmCmd procedure, "grid" option FAILED
-==== Contents of test case:
-
-    list [catch {wm grid .t 10 11 -2 13} msg] $msg
-
----- Result was:
-1 {baseWidth or baseHeight can't be < 0, and widthInc or heightInc can't be <= 0}
----- Result should have been (exact matching):
-1 {widthInc can't be <= 0}
-==== unixWm-20.9 FAILED
-
-
-
-==== unixWm-20.11 Tk_WmCmd procedure, "grid" option FAILED
-==== Contents of test case:
-
-    list [catch {wm grid .t 10 11 12 -1} msg] $msg
-
----- Result was:
-1 {baseWidth or baseHeight can't be < 0, and widthInc or heightInc can't be <= 0}
----- Result should have been (exact matching):
-1 {heightInc can't be <= 0}
-==== unixWm-20.11 FAILED
-
-
-
-==== unixWm-23.1 Tk_WmCmd procedure, "iconify" option FAILED
-==== Contents of test case:
-
-    list [catch {wm iconify .t 12} msg] $msg
-
----- Result was:
-0 {}
----- Result should have been (exact matching):
-1 {wrong # args: should be "wm iconify window"}
-==== unixWm-23.1 FAILED
-
-
-
-==== unixWm-23.2 Tk_WmCmd procedure, "iconify" option FAILED
-==== Contents of test case:
-
-    destroy .t2
-    toplevel .t2
-    wm overrideredirect .t2 1
-    set result [list [catch {wm iconify .t2} msg] $msg]
-    destroy .t2
-    set result
-
----- Result was:
-0 {}
----- Result should have been (exact matching):
-_WmCmd procedure, "iconify" option FAILED
-==== Contents of test case:
-
-    destroy .t2
-    toplevel .t2
-    wm geom .t2 +0+0
-    wm iconwindow .t .t2
-    set result [list [catch {wm iconify .t2} msg] $msg]
-    destroy .t2
-    set result
-
----- Result was:
-0 {}
----- Result should have been (exact matching):
-1 {can't iconify ".t2": it is an icon for ".t"}
-==== unixWm-23.4 FAILED
-
-
-
-==== unixWm-27.5 Tk_WmCmd procedure, "iconwindow" option FAILED
-==== Contents of test case:
-
-    destroy .icon
-    toplevel .icon -width 50 -height 50 -bg green
-    destroy .t2
-    toplevel .t2
-    wm geom .t2 -0+0
-    wm iconwindow .t2 .icon
-    set result [list [catch {wm iconwindow .t .icon} msg] $msg]
-    destroy .t2
-    destroy .icon
-    set result
-
----- Result was:
-0 {}
----- Result should have been (exact matching):
-1 {.icon is already an icon for .t2}
-==== unixWm-27.5 FAILED
-
-
-
-==== unixWm-27.6 Tk_WmCmd procedure, "iconwindow" option, changing icons FAILED
-==== Contents of test case:
-
-    destroy .icon
-    destroy .icon2
-    toplevel .icon -width 50 -height 50 -bg green
     toplevel .icon2 -width 50 -height 50 -bg red
+    set result {}
+    wm iconwindow .t .icon
+    lappend result [wm state .icon] [wm state .icon2]
+    wm iconwindow .t .icon2
+    lappend result [wm state .icon] [wm state .icon2]
+    destroy .icon .icon2
+    set result
 
+---- Result was:
+normal normal normal normal
+---- Result should have been (exact matching):
+icon normal withdrawn icon
+==== unixWm-27.6 FAILED
+
+
+
+==== unixWm-27.7 Tk_WmCmd procedure, "iconwindow" option, withdrawing icon FAILED
+==== Contents of test case:
+
+    destroy .icon
+    toplevel .icon -width 50 -height 50 -bg green
+    wm geometry .icon +0+0
+    update
+    set result {}
+    lappend result [wm state .icon] [winfo viewable .icon]
     wm iconwindow .t .icon
     lappend result [wm state .icon] [winfo viewable .icon]
     destroy .icon
@@ -5183,7 +4161,8 @@ normal normal withdrawn iconic normal
     destroy .t2
     toplevel .t2 -width 120 -height 300
     wm geometry .t2 +0+0
-aw .t2} msg]  $msg]
+    wm iconwindow .t .t2
+    set result [list [catch {wm withdraw .t2} msg]  $msg]
     destroy .t2
     set result
 
@@ -5250,18 +4229,33 @@ unmapped 0 mapped 1
 
     wm overrideredirect .t 1
     tkwait visibility .t
- case:
-lt [wm state .t2]
-edirect .t 1
-nify .t2
-    lappend result [wm state .t2]
-pdate
+    update
+    wm geometry .t +5-10
+    update
+    list [winfo x .t] [winfo y .t]
+
+---- Result was:
+5 -10
+---- Result should have been (exact matching):
+5 916
+==== unixWm-44.7 FAILED
+
+
+
+==== unixWm-44.8 UpdateGeometryInfo procedure, computing position FAILED
+==== Contents of test case:
+
+    wm overrideredirect .t 1
+    tkwait visibility .t
+    update
+    wm geometry .t -30+$Y2
+    update
     list [winfo x .t] [winfo y .t]
 
 ---- Result was:
 -30 2
 ---- Result should have been (exact matching):
-1589 2
+1064 2
 ==== unixWm-44.8 FAILED
 
 
@@ -5271,14 +4265,30 @@ pdate
 
     wm geometry .t =100x120
     update
-m withdraw .t 1} msg]  $msg
-error; Return code was: 1
+    list [winfo width .t] [winfo height .t]
+
+---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
 ---- errorInfo: bad geometry specifier "=100x120"
     while executing
 "wm geometry .t =100x120"
     ("uplevel" body line 2)
-cifier "+20+10z"}
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TK VALUE GEOMETRY
+==== unixWm-48.1 FAILED
+
+
+
+==== unixWm-48.10 ParseGeometry procedure FAILED
+==== Contents of test case:
+
+    list [catch {wm geometry .t +20+10z} msg] $msg
+
+---- Result was:
+0 {}
+---- Result should have been (exact matching):
+1 {bad geometry specifier "+20+10z"}
 ==== unixWm-48.10 FAILED
 
 
@@ -5314,14 +4324,13 @@ cifier "+20+10z"}
     wm geom .t +100+100
     tkwait visibility .t
     toplevel .t2 -width 100 -height 200 -bg red
-17x4+100+0
- tkwait visibility .t2
+    wm geom .t2 +200+200
+    tkwait visibility .t2
     raise .t2
     update
     set x [winfo rootx .t]
     set y [winfo rooty .t]
     list [winfo containing [expr $x - 30]  [expr $y + 250]]  [winfo containing [expr $x - 1]   [expr $y + 250]]  [winfo containing $x              [expr $y + 250]]  [winfo containing [expr $x + 99]  [expr $y + 250]]  [winfo containing [expr $x + 100] [expr $y + 250]]  [winfo containing [expr $x + 150] [expr $y + 90]]  [winfo containing [expr $x + 199] [expr $y + 250]]  [winfo containing [expr $x + 200] [expr $y + 250]]  [winfo containing [expr $x + 220] [expr $y + 250]]  
-expr $y + 250]]  
 ---- Result was:
 {} {} .t .t .t2 .t .t2 .t .t
 ---- Result should have been (exact matching):
@@ -5762,4 +4771,993 @@ heightInc can't be <= 0
 
     wm iconbadge . !
 
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-iconbadge-1.3 FAILED
 
+
+
+==== wm-iconbadge-1.4 ::tk::icons::base_icon($win) must be a Tk photo on X11 FAILED
+==== Contents of test case:
+
+    set ::tk::icons::base_icon(.) book
+    wm iconbadge . 27
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-iconbadge-1.4 FAILED
+
+
+
+==== wm-iconbadge-1.5 illegal badge number FAILED
+==== Contents of test case:
+
+    image create photo book -data {
+	R0lGODlhDwAPAKIAAP//////AP8AAMDAwICAgAAAAAAAAAAAAC
+	wAAAAADwAPAAADSQhA2u5ksPeKABKSCaya29d4WKgERFF0l1IM
+	QCAKatvBJ0OTdzzXI1xMB3TBZAvATtB6NSLKleXi3OBoLqrVgc
+	0yv+DVSEUuFxIAOw==
+    }
+    set ::tk::icons::base_icon(.) book
+    wm iconbadge . illegal
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-iconbadge-1.5 FAILED
+
+
+
+==== wm-iconbadge-1.6 non-integer badge number FAILED
+==== Contents of test case:
+
+    image create photo book -data {
+	R0lGODlhDwAPAKIAAP//////AP8AAMDAwICAgAAAAAAAAAAAAC
+	wAAAAADwAPAAADSQhA2u5ksPeKABKSCaya29d4WKgERFF0l1IM
+	QCAKatvBJ0OTdzzXI1xMB3TBZAvATtB6NSLKleXi3OBoLqrVgc
+	0yv+DVSEUuFxIAOw==
+    }
+    set ::tk::icons::base_icon(.) book
+    wm iconbadge . 3.2
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-iconbadge-1.6 FAILED
+
+
+
+==== wm-iconbadge-1.7 negative or zero badge number FAILED
+==== Contents of test case:
+
+    image create photo book -data {
+	R0lGODlhDwAPAKIAAP//////AP8AAMDAwICAgAAAAAAAAAAAAC
+	wAAAAADwAPAAADSQhA2u5ksPeKABKSCaya29d4WKgERFF0l1IM
+	QCAKatvBJ0OTdzzXI1xMB3TBZAvATtB6NSLKleXi3OBoLqrVgc
+	0yv+DVSEUuFxIAOw==
+    }
+    set ::tk::icons::base_icon(.) book
+    wm iconbadge . 0
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-iconbadge-1.7 FAILED
+
+
+
+==== wm-iconify-1.2 usage FAILED
+==== Contents of test case:
+
+    wm iconify .t _
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-iconify-1.2 FAILED
+
+
+
+==== wm-iconify-2.1 Misc errors FAILED
+==== Contents of test case:
+
+    toplevel .t2
+    wm overrideredirect .t2 1
+    wm iconify .t2
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-iconify-2.1 FAILED
+
+
+
+==== wm-iconify-2.3 Misc errors FAILED
+==== Contents of test case:
+
+    toplevel .t2
+    wm geom .t2 +0+0
+    wm iconwindow .t .t2
+    wm iconify .t2
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-iconify-2.3 FAILED
+
+
+
+==== wm-iconify-2.4.2 Misc errors FAILED
+==== Contents of test case:
+
+    frame .t.f -container 1
+    toplevel .t2 -use [winfo id .t.f]
+    wm iconify .t2
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-iconify-2.4.2 FAILED
+
+
+
+==== wm-iconphoto-1.3 usage FAILED
+==== Contents of test case:
+
+    wm iconphoto . notanimage
+
+---- Result was:
+image "notanimage" does not exist
+---- Result should have been (exact matching):
+can't use "notanimage" as iconphoto: not a photo image
+==== wm-iconphoto-1.3 FAILED
+
+
+
+==== wm-iconwindow-1.5 usage FAILED
+==== Contents of test case:
+
+    toplevel .icon -width 50 -height 50 -bg green
+    toplevel .t2
+    wm geom .t2 -0+0
+    wm iconwindow .t2 .icon
+    wm iconwindow .t .icon
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-iconwindow-1.5 FAILED
+
+
+
+==== wm-maxsize-1.2 usage FAILED
+==== Contents of test case:
+
+    wm maxsize . a
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-maxsize-1.2 FAILED
+
+
+
+==== wm-maxsize-1.3 usage FAILED
+==== Contents of test case:
+
+    wm maxsize . a b c
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-maxsize-1.3 FAILED
+
+
+
+==== wm-maxsize-1.4 usage FAILED
+==== Contents of test case:
+
+    wm maxsize . x 100
+
+---- Result was:
+expected integer but got "x"
+---- Result should have been (exact matching):
+expected screen distance but got "x"
+==== wm-maxsize-1.4 FAILED
+
+
+
+==== wm-maxsize-1.5 usage FAILED
+==== Contents of test case:
+
+    wm maxsize . 100 bogus
+
+---- Result was:
+expected integer but got "bogus"
+---- Result should have been (exact matching):
+expected screen distance but got "bogus"
+==== wm-maxsize-1.5 FAILED
+
+
+
+==== wm-minsize-1.2 usage FAILED
+==== Contents of test case:
+
+    wm minsize . a
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-minsize-1.2 FAILED
+
+
+
+==== wm-minsize-1.3 usage FAILED
+==== Contents of test case:
+
+    wm minsize . a b c
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-minsize-1.3 FAILED
+
+
+
+==== wm-minsize-1.4 usage FAILED
+==== Contents of test case:
+
+    wm minsize . x 100
+
+---- Result was:
+expected integer but got "x"
+---- Result should have been (exact matching):
+expected screen distance but got "x"
+==== wm-minsize-1.4 FAILED
+
+
+
+==== wm-minsize-1.5 usage FAILED
+==== Contents of test case:
+
+    wm minsize . 100 bogus
+
+---- Result was:
+expected integer but got "bogus"
+---- Result should have been (exact matching):
+expected screen distance but got "bogus"
+==== wm-minsize-1.5 FAILED
+
+
+
+==== wm-resizable-1.2 usage FAILED
+==== Contents of test case:
+
+    wm resizable .t 1
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-resizable-1.2 FAILED
+
+
+
+==== wm-resizable-1.3 usage FAILED
+==== Contents of test case:
+
+    wm resizable .t 1 2 3
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-resizable-1.3 FAILED
+
+
+
+==== wm-resizable-1.4 usage FAILED
+==== Contents of test case:
+
+    wm resizable .t bad 0
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-resizable-1.4 FAILED
+
+
+
+==== wm-resizable-1.5 usage FAILED
+==== Contents of test case:
+
+    wm resizable .t 1 bad
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-resizable-1.5 FAILED
+
+
+
+==== wm-resizable-2.1 setting and reading values FAILED
+==== Contents of test case:
+
+    wm resizable .t 0 0
+    set result [wm resizable .t]
+    wm resizable .t 0 1
+    lappend result [wm resizable .t]
+    wm resizable .t 1 0
+    lappend result [wm resizable .t]
+    wm resizable .t 1 1
+    lappend result [wm resizable .t]
+
+---- Result was:
+1 1 {1 1} {1 1} {1 1}
+---- Result should have been (exact matching):
+0 0 {0 1} {1 0} {1 1}
+==== wm-resizable-2.1 FAILED
+
+
+
+==== wm-stackorder-1.7 usage FAILED
+==== Contents of test case:
+
+    toplevel .t
+    button .t.b
+    wm stackorder .t.b
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-stackorder-1.7 FAILED
+
+
+
+==== wm-stackorder-4.3 wm stackorder isabove|isbelow FAILED
+==== Contents of test case:
+
+    toplevel .t
+    tkwait visibility .t
+    raise .
+    raiseDelay
+    wm stackorder .t isabove .
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: TkWmStackorderToplevel failed
+    while executing
+"wm stackorder .t isabove ."
+    ("uplevel" body line 6)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== wm-stackorder-4.3 FAILED
+
+
+
+==== wm-stackorder-4.4 wm stackorder isabove|isbelow FAILED
+==== Contents of test case:
+
+    toplevel .t ; update
+    raise .
+    raiseDelay
+    wm stackorder .t isb .
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: TkWmStackorderToplevel failed
+    while executing
+"wm stackorder .t isb ."
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== wm-stackorder-4.4 FAILED
+
+
+
+==== wm-stackorder-5.2 A normal toplevel can't be raised above an  overrideredirect toplevel on unix FAILED
+==== Contents of test case:
+
+    toplevel .t
+    wm overrideredirect .t 1
+    tkwait visibility .t
+    raise .
+    update
+    raiseDelay
+    wm stackorder . isabove .t
+
+---- Result was:
+1
+---- Result should have been (exact matching):
+0
+==== wm-stackorder-5.2 FAILED
+
+
+
+==== wm-stackorder-5.3 An overrideredirect window can be explicitly lowered FAILED
+==== Contents of test case:
+
+    toplevel .t
+    wm overrideredirect .t 1
+    tkwait visibility .t
+    lower .t
+    update
+    raiseDelay
+    wm stackorder .t isbelow .
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: TkWmStackorderToplevel failed
+    while executing
+"wm stackorder .t isbelow ."
+    ("uplevel" body line 8)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== wm-stackorder-5.3 FAILED
+
+
+
+==== wm-transient-1.5 usage FAILED
+==== Contents of test case:
+
+    toplevel .icon -bg blue
+    toplevel .top
+    wm iconwindow .top .icon
+    toplevel .dummy
+    wm transient .icon .dummy
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-transient-1.5 FAILED
+
+
+
+==== wm-transient-1.6 usage FAILED
+==== Contents of test case:
+
+    toplevel .icon -bg blue
+    toplevel .top
+    wm iconwindow .top .icon
+    toplevel .dummy
+    wm transient .dummy .icon
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-transient-1.6 FAILED
+
+
+
+==== wm-transient-1.7 usage FAILED
+==== Contents of test case:
+
+    toplevel .top
+    wm transient .top .top
+
+---- Result was:
+can't make ".top" its own master
+---- Result should have been (exact matching):
+can't set ".top" as container: would cause management loop
+==== wm-transient-1.7 FAILED
+
+
+
+==== wm-transient-1.8 usage FAILED
+==== Contents of test case:
+
+    toplevel .t1
+    toplevel .t2
+    toplevel .t3
+    wm transient .t2 .t1
+    wm transient .t3 .t2
+    wm transient .t1 .t3
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-transient-1.8 FAILED
+
+
+
+==== wm-transient-1.9 usage FAILED
+==== Contents of test case:
+
+    toplevel .top
+    frame .top.f
+    wm transient .top .top.f
+
+---- Result was:
+can't make ".top.f" its own master
+---- Result should have been (exact matching):
+can't set ".top" as container: would cause management loop
+==== wm-transient-1.9 FAILED
+
+
+
+==== wm-transient-3.1 transient toplevel is withdrawn
+	when mapped if toplevel is withdrawn FAILED
+==== Contents of test case:
+
+    toplevel .top
+    wm withdraw .top
+    update
+    toplevel .subject
+    wm transient .subject .top
+    update
+    list [wm state .subject] [winfo ismapped .subject]
+
+---- Result was:
+withdrawn 1
+---- Result should have been (exact matching):
+withdrawn 0
+==== wm-transient-3.1 FAILED
+
+
+
+==== wm-transient-3.3 withdraw/deiconify on the toplevel
+	also does a withdraw/deiconify on the transient FAILED
+==== Contents of test case:
+
+    toplevel .top
+    toplevel .subject
+    update
+    wm transient .subject .top
+    wm withdraw .top
+    update
+    lappend results [wm state .subject] [winfo ismapped .subject]
+    wm deiconify .top
+    update
+    lappend results [wm state .subject] [winfo ismapped .subject]
+
+---- Result was:
+normal 1 normal 1
+---- Result should have been (exact matching):
+withdrawn 0 normal 1
+==== wm-transient-3.3 FAILED
+
+
+
+==== wm-transient-4.1 transient toplevel is withdrawn
+	when mapped if toplevel is iconic FAILED
+==== Contents of test case:
+
+    toplevel .top
+    wm iconify .top
+    update
+    toplevel .subject
+    wm transient .subject .top
+    update
+    list [wm state .subject] [winfo ismapped .subject]
+
+---- Result was:
+withdrawn 1
+---- Result should have been (exact matching):
+withdrawn 0
+==== wm-transient-4.1 FAILED
+
+
+
+==== wm-transient-4.3 iconify/deiconify on the toplevel
+	does a withdraw/deiconify on the transient FAILED
+==== Contents of test case:
+
+    toplevel .top
+    toplevel .subject
+    update idletasks
+    wm transient .subject .top
+    wm iconify .top
+    update idletasks
+    lappend results [wm state .subject] [winfo ismapped .subject]
+    wm deiconify .top
+    update idletasks
+    lappend results [wm state .subject] [winfo ismapped .subject]
+
+---- Result was:
+normal 1 normal 1
+---- Result should have been (exact matching):
+withdrawn 0 normal 1
+==== wm-transient-4.3 FAILED
+
+
+
+==== wm-transient-5.1 an error during transient command should not
+	cause the map/unmap binding to be deleted FAILED
+==== Contents of test case:
+
+    toplevel .top
+    toplevel .subject
+    update
+    wm transient .subject .top
+    # Expect a bad window path error here
+    lappend results [catch {wm transient .subject .bad}]
+    wm withdraw .top
+    update
+    lappend results [wm state .subject]
+    wm deiconify .top
+    update
+    lappend results [wm state .subject]
+
+---- Result was:
+1 normal normal
+---- Result should have been (exact matching):
+1 withdrawn normal
+==== wm-transient-5.1 FAILED
+
+
+
+==== wm-transient-5.2 remove transient property when toplevel
+	is destroyed FAILED
+==== Contents of test case:
+
+    toplevel .top
+    toplevel .subject
+    wm transient .subject .top
+    update
+    destroy .top
+    update
+    wm transient .subject
+
+---- Result was:
+.top
+---- Result should have been (exact matching):
+
+==== wm-transient-5.2 FAILED
+
+
+
+==== wm-transient-5.3 remove transient property from window
+	that had never been mapped when toplevel is destroyed FAILED
+==== Contents of test case:
+
+    toplevel .top
+    toplevel .subject
+    wm transient .subject .top
+    destroy .top
+    wm transient .subject
+
+---- Result was:
+.top
+---- Result should have been (exact matching):
+
+==== wm-transient-5.3 FAILED
+
+
+
+==== wm-transient-6.2 a withdrawn transient does not track
+	state changes in the toplevel FAILED
+==== Contents of test case:
+
+    toplevel .top
+    toplevel .subject
+    update
+    wm transient .subject .top
+    wm withdraw .subject
+    wm withdraw .top
+    wm deiconify .top
+    # idle handler should not map the transient
+    update
+    lappend results [wm state .subject]
+    wm deiconify .subject
+    lappend results [wm state .subject]
+    wm withdraw .top
+    lappend results [wm state .subject]
+    wm deiconify .top
+    # idle handler should map transient
+    update
+    lappend results [wm state .subject]
+
+---- Result was:
+withdrawn normal normal normal
+---- Result should have been (exact matching):
+withdrawn normal withdrawn normal
+==== wm-transient-6.2 FAILED
+
+
+
+==== wm-transient-7.2 Destroying toplevel FAILED
+==== Contents of test case:
+
+    toplevel .top
+    toplevel .transient
+    wm transient .transient .top
+    destroy .top
+    wm transient .transient
+
+---- Result was:
+.top
+---- Result should have been (exact matching):
+
+==== wm-transient-7.2 FAILED
+
+
+
+==== wm-transient-8.1 transient to withdrawn window, Bug 1163496 FAILED
+==== Contents of test case:
+
+    # Verifies that transients stay on top of their toplevels, even if they were
+    # made transients when those toplevels were withdrawn.
+    toplevel .t1; wm withdraw  .t1;     update
+    toplevel .t2; wm transient .t2 .t1; update
+    lappend result [winfo ismapped .t1] [winfo ismapped .t2]
+    wm deiconify .t1; update
+    lappend result [winfo ismapped .t1] [winfo ismapped .t2]
+    raise .t1; raiseDelay; update
+    lappend result [lsearch -all -inline -glob [wm stackorder .] ".t?"]
+
+---- Result was:
+1 1 1 1 {.t2 .t1}
+---- Result should have been (exact matching):
+0 0 1 1 {.t1 .t2}
+==== wm-transient-8.1 FAILED
+
+
+
+==== wm-state-1.2 usage FAILED
+==== Contents of test case:
+
+    wm state . _ _
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-state-1.2 FAILED
+
+
+
+==== wm-state-2.15 state change before map FAILED
+==== Contents of test case:
+
+    toplevel .t
+    wm iconify .t
+    wm deiconify .t
+    wm state .t
+
+---- Result was:
+iconic
+---- Result should have been (exact matching):
+normal
+==== wm-state-2.15 FAILED
+
+
+
+==== wm-state-2.17 state change after map FAILED
+==== Contents of test case:
+
+    toplevel .t
+    update
+    wm iconify .t
+    wm deiconify .t
+    wm state .t
+
+---- Result was:
+iconic
+---- Result should have been (exact matching):
+normal
+==== wm-state-2.17 FAILED
+
+
+
+==== wm-withdraw-1.2 usage FAILED
+==== Contents of test case:
+
+    wm withdraw . _
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-withdraw-1.2 FAILED
+
+
+
+==== wm-withdraw-2.1 Misc errors FAILED
+==== Contents of test case:
+
+    toplevel .t
+    toplevel .t2
+    wm iconwindow .t .t2
+    wm withdraw .t2
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-withdraw-2.1 FAILED
+
+
+
+==== wm-manage-1.1 managing a frame FAILED
+==== Contents of test case:
+
+    toplevel .t
+    frame .t.f
+    pack [label .t.f.l -text hello]
+    wm manage .t.f
+    raise .t.f
+    update
+    lappend result [winfo manage .t.f]
+    lappend result [winfo toplevel .t.f]
+
+---- Result was:
+{} .t
+---- Result should have been (exact matching):
+wm .t.f
+==== wm-manage-1.1 FAILED
+
+
+
+==== wm-manage-1.3 managing a labelframe FAILED
+==== Contents of test case:
+
+    toplevel .t
+    labelframe .t.f -text Labelframe
+    pack [label .t.f.l -text hello]
+    wm manage .t.f
+    raise .t.f
+    update
+    lappend result [winfo manage .t.f]
+    lappend result [winfo toplevel .t.f]
+
+---- Result was:
+{} .t
+---- Result should have been (exact matching):
+wm .t.f
+==== wm-manage-1.3 FAILED
+
+
+
+==== wm-manage-1.4 managing a ttk::frame FAILED
+==== Contents of test case:
+
+    toplevel .t
+    ttk::frame .t.f
+    pack [label .t.f.l -text hello]
+    wm manage .t.f
+    raise .t.f
+    update
+    lappend result [winfo manage .t.f]
+    lappend result [winfo toplevel .t.f]
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-manage-1.4 FAILED
+
+
+
+==== wm-manage-1.5 managing a text widget FAILED
+==== Contents of test case:
+
+    toplevel .t
+    text .t.f
+    .t.f insert end "Manage text\n" {}
+    wm manage .t.f
+    raise .t.f
+    update
+    lappend result [winfo manage .t.f]
+    lappend result [winfo toplevel .t.f]
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-manage-1.5 FAILED
+
+
+
+==== wm-manage-1.6 managing a button FAILED
+==== Contents of test case:
+
+    toplevel .t
+    button .t.f -text Button
+    wm manage .t.f
+    raise .t.f
+    update
+    lappend result [winfo manage .t.f]
+    lappend result [winfo toplevel .t.f]
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-manage-1.6 FAILED
+
+
+
+==== wm-manage-1.7 managing a frame FAILED
+==== Contents of test case:
+
+    toplevel .t
+    frame .t.f
+    pack [label .t.f.l -text Label]
+    pack .t.f
+    update
+    lappend result [winfo manage .t.f]
+    lappend result [winfo toplevel .t.f]
+    wm manage .t.f
+    raise .t.f
+    update
+    lappend result [winfo manage .t.f]
+    lappend result [winfo toplevel .t.f]
+    wm forget .t.f
+    pack .t.f
+    update
+    lappend result [winfo manage .t.f]
+    lappend result [winfo toplevel .t.f]
+
+---- Result was:
+pack .t pack .t pack .t
+---- Result should have been (exact matching):
+pack .t wm .t.f pack .t
+==== wm-manage-1.7 FAILED
+
+
+
+==== wm-manage-1.8 unmanaging a toplevel FAILED
+==== Contents of test case:
+
+    toplevel .t
+    toplevel .t.t
+    button .t.t.b -text "Manage This"
+    pack .t.t.b
+    update
+    lappend result [winfo manage .t.t]
+    lappend result [winfo toplevel .t.t.b]
+    wm forget .t.t
+    wm forget .t.t ; # second call should be a no-op
+    pack .t.t
+    update
+    lappend result [winfo manage .t.t]
+    lappend result [winfo toplevel .t.t.b]
+    wm manage .t.t
+    wm manage .t.t ; # second call should be a no-op
+    wm deiconify .t.t
+    update
+    lappend result [winfo manage .t.t]
+    lappend result [winfo toplevel .t.t.b]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: can't pack ".t.t": it's a top-level window
+    while executing
+"pack .t.t"
+    ("uplevel" body line 11)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TK GEOMETRY TOPLEVEL
+==== wm-manage-1.8 FAILED
+
+
+
+==== wm-forget-2 bug [e9112ef96e] - [wm forget] doesn't completely FAILED
+==== Contents of test case:
+
+    label .l -text "Top Dot"
+    frame .f
+    button .f.b -text Hello -command "puts Hello!"
+    pack .l -side top
+    pack .f.b
+    pack .f -side bottom
+    set res [winfo manager .f]
+    pack forget .f
+    update
+    lappend res [winfo manager .f]
+    wm manage .f
+    update
+    lappend res [winfo manager .f]
+    wm forget .f
+    update
+    lappend res [winfo manager .f]
+
+---- Result was:
+pack {} {} {}
+---- Result should have been (exact matching):
+pack {} wm {}
+==== wm-forget-2 FAILED
+
+xmfbox.test
+
+
+==== xmfbox-2.6 tk::MotifFDialog_ActivateFList, ~ in file names FAILED
+==== Contents of test case:
+
+    cleanup
+    close [open ./~nosuchuser1 {CREAT TRUNC WRONLY}]
+    set x [tk::MotifFDialog_Create foo open {}]
+    set i [lsearch [$::tk::dialog::file::foo(fList) get 0 end] ~nosuchuser1]
+    $::tk::dialog::file::foo(fList) selection clear 0 end
+    $::tk::dialog::file::foo(fList) selection set $i
+    tk::MotifFDialog_BrowseFList $x
+    tk::MotifFDialog_ActivateFList $x
+    list $::tk::dialog::file::foo(selectPath)  $::tk::dialog::file::foo(selectFile) [file normalize $tk::Priv(selectFilePath)]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: bad window path name ".foo.top"
+    while executing
+"pack $w.top -side top -expand yes -fill both"
+    (procedure "MotifFDialog_BuildUI" line 12)
+    invoked from within
+"MotifFDialog_BuildUI $w"
+    (procedure "tk::MotifFDialog_Create" line 15)
+    invoked from within
+"tk::MotifFDialog_Create foo open {}"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TK LOOKUP WINDOW .foo.top
+==== xmfbox-2.6 FAILED
+
+wish 7597: suicide: sys: trap: general protection violation pc=0x26f694
