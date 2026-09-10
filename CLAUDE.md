@@ -1755,6 +1755,32 @@ wrong order, so keep them apart:
 written and prints `tk-runall: runAllTests returned, N failed` when the
 suite completes. With both in place the answer is settled:
 
+**A background error is a hang, and neutralising it means replacing the
+default handler, not `::bgerror`.** Tk's default background-error
+handler puts up a **modal** dialog and waits for a click, so any
+unhandled error inside any binding stops the suite dead -- with the
+message only on screen, never in the log, and the CPU pinned by the
+dialog's own event loop. That is indistinguishable from a real spin.
+
+The obvious cure makes it worse. `::bgerror` is a `namespace import` of
+`::tk::dialog::error::bgerror` (`library/bgerror.tcl:281`), and the
+**`tkerror` compatibility delegation lives inside that handler**
+(`bgerror.tcl:107`), not in the dispatcher. Overriding `::bgerror`
+therefore threw the delegation away along with the dialog, and
+`bgerror-1.1..1.3` -- which each install a `::tkerror` and then
+`vwait errRes` for it to fire -- waited forever. The suite stopped
+three files in with a 632-byte log: the file that tests bgerror is
+exactly the one a careless bgerror override breaks, and it is early in
+the alphabet.
+
+`tk-runall.tcl` replaces `::tk::dialog::error::bgerror` instead,
+keeping the `::tkerror` call (and its return code, which `bgerror-1.3`
+relies on) and dropping only the dialog. A test's own `::bgerror` still
+wins, being consulted first. Note the override has to come **after**
+`bgerror.tcl` is sourced -- it is autoloaded on first use, so an
+override written first is silently undone the first time a background
+error arrives; `catch {::bgerror}` forces the load.
+
 **The hang is in `scrollbar.test`.** The marker is absent, so
 `runAllTests` never returned, and with line buffering the last name in
 the log is now genuinely where it stopped rather than wherever the 4 KB

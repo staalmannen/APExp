@@ -73,21 +73,60 @@ catch {fconfigure $::tcltest::errorChannel -buffering line}
 # a hang whose cause is invisible from the log alone, which is exactly
 # the trap this file spent several rounds inside.
 #
-# Log it instead. This is a deliberate change to how the suite behaves,
-# so note the one place it could matter: bgerror.test tests bgerror
-# itself, but each of its cases defines its own bgerror, which overrides
-# this one for the duration -- so it is unaffected. Any BGERROR line
-# below is a real background error that would otherwise have wedged the
-# run.
-proc ::bgerror {msg} {
-    puts "BGERROR: $msg"
-    if {[info exists ::errorInfo]} {
-	puts "BGERROR-INFO: $::errorInfo"
+# Log it instead. WHICH COMMAND TO REPLACE IS THE WHOLE OF IT, and the
+# obvious choice is wrong: overriding ::bgerror wedged the suite at
+# bgerror.test, three test files in, and produced a 632-byte log.
+#
+# The chain is
+#
+#	background error -> ::bgerror
+#	                 -> (namespace import, bgerror.tcl:281)
+#	                 -> ::tk::dialog::error::bgerror
+#	                       -> catch {::tkerror $err}   <- delegation
+#	                       -> otherwise the modal dialog
+#
+# so the tkerror compatibility path lives INSIDE the default handler,
+# not in the dispatcher. bgerror-1.1..1.3 each install a ::tkerror and
+# then "vwait errRes" for it to fire; replacing ::bgerror threw the
+# delegation away with the dialog, so errRes was never set and the vwait
+# never returned. The test file that tests bgerror is exactly the one a
+# careless bgerror override breaks, and it is early in the alphabet.
+#
+# Replacing the default handler instead keeps both things a test may
+# rely on: a test's own ::bgerror still wins (it is consulted first),
+# and ::tkerror is still delegated to, here, before anything is logged.
+# Only the dialog goes. Any BGERROR line below is a real background
+# error that would otherwise have wedged the run.
+#
+# Force bgerror.tcl to be sourced BEFORE overriding it. It is autoloaded
+# on first use, so an override written first would be silently undone
+# the first time a background error arrived and the real file was read
+# on top of it. Calling ::bgerror with no arguments triggers the
+# autoload and then fails on the argument count, which is what the catch
+# is for.
+catch {::bgerror}
+
+proc ::tk::dialog::error::bgerror {err {flag 1}} {
+    # Save errorInfo before ::tkerror can overwrite it, as the original
+    # does -- the trace is the useful half of the report.
+    set info $::errorInfo
+
+    set ret [catch {::tkerror $err} msg]
+    if {$ret != 1} {
+	# The application handled it. Return exactly what it returned:
+	# bgerror-1.3 relies on "return -code break" stopping the rest
+	# of the queued errors.
+	return -code $ret $msg
     }
+
+    puts "BGERROR: $err"
+    puts "BGERROR-INFO: $info"
     flush stdout
+    return
 }
 
-puts "tk-runall: starting, line buffered, bgerror logged not dialogged"
+puts "tk-runall: starting, line buffered, default bgerror dialog replaced\
+ by a log line (tkerror delegation kept)"
 
 # all.tcl reads $argv itself, so options given here reach tcltest.
 source [file join [pwd] all.tcl]
