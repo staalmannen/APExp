@@ -35,6 +35,15 @@
 proc step {msg} { puts "STEP: $msg"; flush stdout }
 proc done {msg} { puts "   ok: $msg"; flush stdout }
 
+# A background error inside a binding otherwise reaches Tk's bgerror
+# dialog, which is MODAL and waits for a click that no test will ever
+# give it -- so an error turns into a hang and the message is only
+# visible on screen. Log it instead.
+proc ::bgerror {msg} {
+    puts "BGERROR: $msg"
+    flush stdout
+}
+
 # The suite's setup, minus the wheel.
 proc build {} {
     destroy .t .s
@@ -49,6 +58,42 @@ puts "Scrollbar <MouseWheel>: [bind Scrollbar <MouseWheel>]"
 puts "Text <MouseWheel>:      [bind Text <MouseWheel>]"
 flush stdout
 puts ""
+
+# ------------------------------------------------------------------
+# Section 0, and it is the one that matters now.
+#
+# tk::ScrollByUnits reads $Priv(xEvents) and $Priv(yEvents) on every
+# wheel event, and the ONLY place in the whole library that ever sets
+# them is scrlbar.tcl:132
+#
+#	bind Scrollbar <Enter> {+
+#	    set tk::Priv(xEvents) 0; set tk::Priv(yEvents) 0
+#	}
+#
+# So a wheel event delivered to a scrollbar that has never seen an
+# <Enter> raises
+#
+#	can't read "Priv(xEvents)": no such element in array
+#
+# That is upstream's design, not a port bug: any Tk would do the same.
+# scrollbar-10.1 knows it, which is why it sends <Enter> first.
+#
+# The question this section asks is therefore whether the <Enter> is
+# actually DELIVERED here -- because if it is not, the wheel event
+# raises that error, the error reaches bgerror, and on a suite run the
+# modal dialog is the hang.
+build
+catch {unset ::tk::Priv(xEvents)}
+catch {unset ::tk::Priv(yEvents)}
+step "0. deliver <Enter> to the scrollbar and ask whether the class\
+ binding ran"
+event generate .s <Enter>
+update
+puts "   Priv(xEvents) exists: [info exists ::tk::Priv(xEvents)]\
+ (1 means the <Enter> class binding ran)"
+puts "   Priv(yEvents) exists: [info exists ::tk::Priv(yEvents)]"
+flush stdout
+done "probe complete"
 
 # ------------------------------------------------------------------
 build
@@ -146,9 +191,15 @@ done "delivered with no binding; update returned"
 bind Scrollbar <MouseWheel> $saved
 
 # ------------------------------------------------------------------
-step "8. the same delivery WITH the binding, through update rather\
- than vwait"
+# NOTE: this used to omit the <Enter>, which made it an invalid
+# sequence on ANY Tk -- ScrollByUnits would raise "can't read
+# Priv(xEvents)" upstream too. The hang that produced was Tk's modal
+# bgerror dialog waiting for a click, not a loop. Send the <Enter>, as
+# scrollbar-10.1 does.
+step "8. the same delivery WITH the binding and a preceding <Enter>,\
+ through update rather than vwait"
 build
+event generate .s <Enter>
 event generate .s <MouseWheel> -delta -120
 update
 done "update returned; index is [.t index @0,0]"
