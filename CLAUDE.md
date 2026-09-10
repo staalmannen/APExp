@@ -1725,8 +1725,26 @@ character put line breaks mid-word and in the wrong place for tabs
 
 ### Tk on Plan 9: what the remaining test failures are, and which are ours
 
-The suite is at **24 failing tests** (`grep -c FAILED` counts two lines
-each, so 48 lines).
+The suite is at **25 failing tests** (`grep -c FAILED` counts two lines
+each, so 50 lines).
+
+**It was 24, and the twenty-fifth is `event-9.16` -- which passed the
+previous run, with no C change in between.** The only difference between
+the two runs was `tk-runall.tcl`'s bgerror handling, which cannot reach
+a crossing event. So **at least one `event-9.*` test is
+nondeterministic here**, and the likely reason is worth knowing before
+anything is concluded from that group again: those tests warp the
+pointer and then depend on what is under it, while this port has no
+server and **polls the real `/dev/mouse`**. `gP9.pointerDirty` makes the
+next poll re-report the true position, so a mouse that moves during the
+run -- or a rio window that takes the pointer -- can overrule the warp.
+
+The practical rule: **an `event-9.*` result is only evidence if it
+repeats.** `9.16` reports the same empty `|` as `9.11`/`9.12`/`9.17`
+did, which is the "no crossing at all" failure the
+`SendEnterLeaveForDestroy` change fixed for its siblings; it is
+therefore also possible that the fix is racy rather than that the run
+was. Run `tk-enter-test.tcl` twice before touching it.
 
 **Read that number with the caveat below: the suite does not finish.**
 Every `tk-all.out` collected so far stops after `scrollbar.test`, 62
@@ -1849,13 +1867,58 @@ Do not skip to a fix from the mechanism: this file has now recorded four
 occasions where a confident mechanism was wrong and a printed
 intermediate value settled it in one round.
 
+**`sys/lib/tests/tk-mousewheel-test.tcl` has narrowed it to one
+sentence**, and the sentence is not what either shape above predicted.
+Its steps 0-7d all return, and between them they exonerate: crossing
+delivery (the `<Enter>` class binding demonstrably runs, so
+`Priv(xEvents)` is set and the "can't read Priv(xEvents)" error is not
+in play); the plain event loop and `after`; every shape of `yview
+scroll` -- positive, negative, integer, and the 0.5 that `ceil` must
+round to 1, so `GetScrollInfo`, `YScrollByLines`' do/while and this
+port's `Tk_MeasureChars` rewrite are all clear; `yview moveto`; `.s
+set`; `update` after all of it; `tk::ScrollByUnits` called directly with
+the binding's **exact** arguments (`.s vh -120 -40.0`) and twelve times
+over so the counting branch is reached; and delivery of a `<MouseWheel>`
+with the class binding removed.
+
+**The first thing that hangs is 7e, whose binding is a bare
+`.t yview scroll 3.0 units`** -- no `tk::ScrollByUnits` at all. So the
+library proc is innocent, and the statement of the bug is
+
+| | |
+|---|---|
+| scroll alone | returns |
+| delivery alone | returns |
+| **scroll from inside delivery** | **spins** |
+
+Note how nearly this went wrong: step 6 called `tk::ScrollByUnits .s v
+-4`, which with a one-character orient and the default factor 1.0 fails
+**both** halves of the `[string length $orient] == 2 && $factor != 1.0`
+guard, so it skipped the counting branch, and `-4/1.0` is the opposite
+sign of the binding's `-120/-40.0`. Three differences at once between a
+step that returned and a step that hung -- the same trap as
+`canvas-23.*`. 7c and 7d exist to close each of them, and both returned.
+
+Sections 7e0..7e4 split "inside delivery", which still covers four
+things: a non-empty binding at all, a widget command that touches only
+the scrollbar, a scroll of a text widget with **no** `-yscrollcommand`
+back into `.s`, and `update` versus `after`+`vwait`. **Every binding
+counts and prints its own invocation number**, because the one fact
+that decides the shape is whether the binding runs once or forever:
+`wheel #1` and then silence means one delivery whose drain never
+settles (look at what the redisplay queues -- Expose, `pointerDirty`, an
+idle handler that re-posts itself); `wheel #1 #2 #3 ...` means the event
+is being redelivered, which is this port's event source.
+
 The leftover windows are a third thing and not a mystery: `all.tcl` sets
 `-singleproc 1`, so all 97 files are sourced into one wish and every
 toplevel a test forgets to destroy stays up for the life of a process
 that never ends.
 
-**23 of the 24 are known not to be the Plan 9 backend's**, and are worth
-recording so they are not chased again:
+**23 of the 25 are known not to be the Plan 9 backend's** -- the two
+that are, or may be, ours are `geometry-4.7` and the intermittent
+`event-9.16` above. The rest are worth recording so they are not chased
+again:
 
 **Three of the five `event-9.*` were ours, and are fixed; `9.13` and
 `9.14` remain and are generic Tk's.** An
@@ -2045,8 +2108,10 @@ near this port. `sys/lib/tests/tk-geometry-test.tcl` prints `%x %y %w
 %h` for every `<Configure>` rather than counting them, which is what
 separates those two.
 
-That accounts for all 24: 23 are upstream, environment or harness
-limitations, and `geometry-4.7` is the single known-open port bug.
+That accounts for all 25: 23 are upstream, environment or harness
+limitations, `geometry-4.7` is the known-open port bug, and
+`event-9.16` is the intermittent one described at the top of this
+section.
 
 `canvas-23.*`, `listbox-4.7`, `bind-13.14`, `embed-1.1`,
 `fontchooser-2.0/2.1` and `event-9.11/9.12/9.17` **were** ours and are

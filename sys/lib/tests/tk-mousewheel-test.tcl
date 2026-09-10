@@ -31,6 +31,26 @@
 # ORDER MATTERS. A hang has to be killed by hand, so the probe that
 # distinguishes the most comes first and the whole-event-loop case comes
 # last. Whatever the last STEP line says is the one that did not return.
+#
+# WHERE THIS HAS GOT TO. Steps 0-7d all return, and between them they
+# exonerate: crossing delivery (0 -- the <Enter> class binding does run,
+# so Priv(xEvents) is set), the plain event loop (1), every shape of
+# yview scroll including the ceil rounding and both signs (2, 2b, 2c,
+# 2d), moveto (3), .s set (4), update after all of it (5), the
+# ScrollByUnits body called directly with the binding's exact arguments
+# (6, 7c) and twelve times over so the counting branch is reached (7d),
+# and delivery of a wheel event with the class binding removed (7).
+#
+# 7e is where it stops, and its binding is a bare
+# ".t yview scroll 3.0 units" -- no ScrollByUnits at all. So the
+# statement of the bug is now exactly:
+#
+#	scroll alone		returns
+#	delivery alone		returns
+#	scroll INSIDE delivery	spins
+#
+# and sections 7e0..7e4 split that sentence, since "inside delivery"
+# still covers four different things.
 
 proc step {msg} { puts "STEP: $msg"; flush stdout }
 proc done {msg} { puts "   ok: $msg"; flush stdout }
@@ -246,19 +266,127 @@ if {[catch {
  $::tk::Priv(xEvents) yEvents $::tk::Priv(yEvents)"
 }
 
-step "7e. delivery of a <MouseWheel> whose class binding SCROLLS but\
- does not go through ScrollByUnits -- delivery plus a scroll, with the\
- library proc taken out"
+# ------------------------------------------------------------------
+# 7e HANGS, and that is the result everything below is built on. Its
+# binding was a bare
+#
+#	bind Scrollbar <MouseWheel> {.t yview scroll 3.0 units}
+#
+# so tk::ScrollByUnits is INNOCENT: 7c called it with the binding's
+# exact arguments and returned, 7d called it twelve times and returned.
+# Three facts, and only their combination spins:
+#
+#	scroll alone (step 2)		returns
+#	delivery alone (step 7)		returns
+#	scroll from inside delivery	HANGS
+#
+# "Inside delivery" is doing a lot of work in that sentence, and it
+# hides at least four different things. These sections take them one at
+# a time, cheapest first, with the known hang LAST so everything else
+# has printed before the machine has to be poked.
+#
+# The single most useful thing to know is whether the BINDING ITSELF is
+# running over and over -- that separates "the event is being
+# redelivered forever" from "one delivery, and something else will not
+# settle". So every binding here counts itself and prints, which costs
+# nothing when it returns and tells us the answer when it does not.
+
+proc wheelcount {} {
+    set ::n 0
+    set ::trace {}
+}
+
+step "7e0. delivery whose binding does something TRIVIAL -- is a\
+ non-empty binding enough on its own? (step 7's was empty)"
 build
 set saved [bind Scrollbar <MouseWheel>]
-bind Scrollbar <MouseWheel> {.t yview scroll 3.0 units}
+wheelcount
+bind Scrollbar <MouseWheel> {incr ::n}
 event generate .s <Enter>
 event generate .s <MouseWheel> -delta -120
 update
 bind Scrollbar <MouseWheel> $saved
-done "returned; index is [.t index @0,0].  If THIS hangs it is scrolling\
- from inside event delivery, and ScrollByUnits is innocent; if it\
- returns and step 8 does not, it is the proc."
+done "returned; the binding ran $::n time(s).  More than 1 means the\
+ wheel event is being REDELIVERED, which would be this port's event\
+ source rather than anything in Tk."
+
+step "7e1. binding touches the SCROLLBAR only (.s set), not the text --\
+ a widget command from inside delivery, with no text layout involved"
+build
+set saved [bind Scrollbar <MouseWheel>]
+wheelcount
+bind Scrollbar <MouseWheel> {incr ::n; .s set 0.1 0.2}
+event generate .s <Enter>
+event generate .s <MouseWheel> -delta -120
+update
+bind Scrollbar <MouseWheel> $saved
+done "returned; the binding ran $::n time(s)"
+
+step "7e2. binding scrolls a text widget that is NOT wired to the\
+ scrollbar -- scrolling from inside delivery, with no -yscrollcommand\
+ callback back into .s"
+destroy .t .s .u
+pack [scrollbar .s] -fill y -expand 1 -side left
+pack [text .u] -side left
+for {set i 1} {$i < 100} {incr i} {.u insert end "Line $i\n"}
+update
+set saved [bind Scrollbar <MouseWheel>]
+wheelcount
+bind Scrollbar <MouseWheel> {incr ::n; .u yview scroll 3.0 units}
+event generate .s <Enter>
+event generate .s <MouseWheel> -delta -120
+update
+bind Scrollbar <MouseWheel> $saved
+done "returned; the binding ran $::n time(s), index is [.u index @0,0].\
+  If this returns and 7e4 hangs, the loop is the -yscrollcommand\
+ callback, not scrolling as such."
+destroy .u
+
+step "7e3. the wired pair, but delivered through after+vwait rather\
+ than update -- is it 'update' that will not drain, or the event loop?"
+build
+set saved [bind Scrollbar <MouseWheel>]
+wheelcount
+bind Scrollbar <MouseWheel> {incr ::n; .t yview scroll 3.0 units}
+event generate .s <Enter>
+event generate .s <MouseWheel> -delta -120
+after 400 {set ::v7e3 1}
+vwait ::v7e3
+bind Scrollbar <MouseWheel> $saved
+done "returned; the binding ran $::n time(s), index is [.t index @0,0]"
+
+# ------------------------------------------------------------------
+# THE KNOWN HANG. Everything above has printed by now. The binding
+# prints its own invocation number, so the log says which of the two
+# shapes this is even though the script never gets to its "ok" line:
+#
+#   "  wheel #1" and nothing more	one delivery, and the drain after
+#					it never settles -- look at what
+#					the redisplay queues (Expose,
+#					pointerDirty, an idle handler that
+#					re-posts itself).
+#   "  wheel #1 #2 #3 ..." forever	the event is being redelivered,
+#					which is this port's event source.
+#
+# The count is capped so a redelivery loop does not fill the disk; after
+# the cap it goes quiet, and a quiet hang after exactly 8 lines is still
+# the second answer, not the first.
+step "7e4. THE HANG: the wired pair, binding scrolls .t, delivered\
+ through update.  Watch the wheel# lines below"
+build
+set saved [bind Scrollbar <MouseWheel>]
+wheelcount
+bind Scrollbar <MouseWheel> {
+    incr ::n
+    if {$::n <= 8} { puts "  wheel #$::n"; flush stdout }
+    .t yview scroll 3.0 units
+}
+event generate .s <Enter>
+event generate .s <MouseWheel> -delta -120
+update
+bind Scrollbar <MouseWheel> $saved
+done "returned after all; the binding ran $::n time(s), index is\
+ [.t index @0,0]"
 
 step "7f. the real binding body, but run from 'after idle' rather than\
  from an event -- inside the event loop, without the wheel event"
