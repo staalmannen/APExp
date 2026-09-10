@@ -1777,22 +1777,51 @@ state: `DisplayCheckProc` clears it and calls `TkP9UpdatePointer`, so
 anything that maps, unmaps or destroys a window from a crossing handler
 sets it again.
 
-**Suspected, not established**: `scrollbar-10.1` is the first test in
-the suite to wire a text widget and a scrollbar to each other --
-`text .t -yscrollcommand {.s set}` with `scrollbar .s -command
-{.t yview}` -- which is a feedback loop by construction, and it then
-sends `<Enter>` and `<MouseWheel>` at it. Neither ingredient is new on
-its own (four earlier files create a text widget, and `bind.test` sends
-MouseWheel), so it is the combination or nothing.
+**The test is `scrollbar-10.1`**, established rather than guessed.
+`-verbose t` prints each name as it *starts*, and the log ends
 
-**Name the test before touching anything.** No rebuild is needed:
+```
+---- scrollbar-9.1 start
+---- scrollbar-10.1 start
+```
+
+with nothing after it. The command needs no rebuild:
 
 ```
 wish $home/APExp/sys/lib/tests/tk-runall.tcl -file scrollbar.test -verbose t
 ```
 
-`-verbose t` prints each test name as it *starts*, so the last line
-names the hanging test exactly. Every option is forwarded to tcltest.
+That run also surfaced **two failures nobody had seen** --
+`scrollbar-6.41.1` (`ScrollbarPosition` answers `trough2` where `slider`
+is wanted) and `scrollbar-6.44` (answers empty where `trough2` is
+wanted). They were never in any count because the file hangs before
+tcltest reports anything, so `scrollbar.test`'s output never reached the
+log at all. **Any file at or after the hang may be hiding failures the
+same way.**
+
+`scrollbar-10.1` is the first test to wire a text widget and a scrollbar
+to each other -- `text .t -yscrollcommand {.s set}` against `scrollbar
+.s -command {.t yview}` -- and then aim `<Enter>` and `<MouseWheel>` at
+it. Neither ingredient is new alone: four earlier files create a text
+widget and `bind.test` sends MouseWheel.
+
+**`sys/lib/tests/tk-scrollbar-hang-test.tcl` splits its eight lines**,
+printing a flushed marker before each, so the last `STEP:` line names
+the statement that did not return. Its first two sections are the ones
+that matter, because they separate the two shapes a spin can have:
+
+- **a loop inside one Tk call**, never returning to the event loop.
+  `tkTextDisp.c` lays out 99 lines through `Tk_MeasureChars`, which this
+  port rewrote for `font-24.*`; a measure that reports no progress makes
+  the caller spin. Section 1 lays out the same text with **nothing
+  wired** -- if that hangs, it is this.
+- **a loop through the event loop**, an event regenerated as fast as it
+  is drained. Section 2 wires the two widgets together and does nothing
+  else -- if only that hangs, it is this.
+
+Do not skip to a fix from the mechanism: this file has now recorded four
+occasions where a confident mechanism was wrong and a printed
+intermediate value settled it in one round.
 
 The leftover windows are a third thing and not a mystery: `all.tcl` sets
 `-singleproc 1`, so all 97 files are sourced into one wish and every
