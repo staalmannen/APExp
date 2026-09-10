@@ -223,17 +223,33 @@ WmUpdateGeometry(void *clientData)
     }
 
     /*
-     * An explicit size is in grid units while the toplevel is gridded
-     * ("-setgrid 1" on a listbox or a text widget), so convert here --
-     * this is the one place a size leaves wmPtr for the screen.
+     * WORK IN THE UNITS min/max ARE EXPRESSED IN, and convert to pixels
+     * at the very end.
+     *
+     * "wm minsize" and "wm maxsize" speak grid units whenever the
+     * toplevel is gridded, exactly as "wm geometry" does -- that is
+     * tkUnixWm.c's convention and the one the rest of this file
+     * follows. Clamping AFTER the grid-to-pixel conversion compared a
+     * grid count against a pixel count, so
+     *
+     *		wm grid .t 1 1 50 50
+     *		wm geom .t 4x4			;# 4 grid units = 200px
+     *		wm minsize .t 8 8		;# 8 grid units
+     *
+     * asked whether 200 < 8 and left the window at 4x4 (wm-minsize-2.2
+     * and its neighbours). The note in CLAUDE.md said this was "inert
+     * today, since the defaults are 1 and unlimited" -- true until the
+     * tests that exercise it could run at all.
+     *
+     * Both helpers are the identity when gridWin is NULL, so the
+     * ungridded case is unchanged and needs no branch of its own.
      */
     if (wmPtr->width >= 0 && wmPtr->height >= 0) {
-	WmGridToPixels(wmPtr, wmPtr->width, wmPtr->height, &width, &height);
+	width  = wmPtr->width;
+	height = wmPtr->height;
     } else {
-	width  = (wmPtr->width  >= 0) ? wmPtr->width
-				      : Tk_ReqWidth((Tk_Window) winPtr);
-	height = (wmPtr->height >= 0) ? wmPtr->height
-				      : Tk_ReqHeight((Tk_Window) winPtr);
+	WmPixelsToGrid(wmPtr, Tk_ReqWidth((Tk_Window) winPtr),
+		Tk_ReqHeight((Tk_Window) winPtr), &width, &height);
     }
 
     if (width  < wmPtr->minWidth)  width  = wmPtr->minWidth;
@@ -242,6 +258,8 @@ WmUpdateGeometry(void *clientData)
 	width = wmPtr->maxWidth;
     if (wmPtr->maxHeight > 0 && height > wmPtr->maxHeight)
 	height = wmPtr->maxHeight;
+
+    WmGridToPixels(wmPtr, width, height, &width, &height);
     if (width  < 1) width  = 1;
     if (height < 1) height = 1;
 
@@ -1882,7 +1900,20 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
          * ask about and pack/place react to (place-8.*, pack-18.*), so
          * it has to be distinct from withdrawn rather than folded into
          * it.
+         *
+         * A TRANSIENT CANNOT BE ICONIFIED, and that refusal is upstream's
+         * -- a dialog is shown and hidden with the window it belongs to,
+         * not on its own. wm-transient-1.4..1.9 are exactly this, and
+         * they check the message.
          */
+        if (wmPtr != NULL && wmPtr->transient != NULL) {
+            Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+                    "can't iconify \"%s\": it is a transient",
+                    winPtr->pathName));
+            Tcl_SetErrorCode(interp, "TK", "WM", "ICONIFY", "TRANSIENT",
+                    (char *) NULL);
+            return TCL_ERROR;
+        }
         if (winPtr != NULL) {
             if (wmPtr != NULL) {
                 wmPtr->withdrawn = 0;
@@ -2259,10 +2290,22 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
             if (master == NULL)
                 return TCL_ERROR;
             /*
-             * A window cannot be its own master, and the master must be
-             * a toplevel -- both are upstream's checks and both are
-             * tested.
+             * The master is resolved to its nearest TOPLEVEL ancestor,
+             * as upstream does: "wm transient .subject .top.f" records
+             * .top, and reading it back must say .top rather than the
+             * frame that was named (wm-transient-2.2).
              */
+            while (!Tk_TopWinHierarchy((TkWindow *) master)) {
+                master = (Tk_Window) ((TkWindow *) master)->parentPtr;
+                if (master == NULL)
+                    break;
+            }
+            if (master == NULL) {
+                Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+                        "can't find a toplevel for \"%s\"", s));
+                Tcl_SetErrorCode(interp, "TK", "WM", "TRANSIENT", (char *) NULL);
+                return TCL_ERROR;
+            }
             if (master == tkwin) {
                 Tcl_SetObjResult(interp, Tcl_ObjPrintf(
                         "can't make \"%s\" its own master", s));
@@ -2272,6 +2315,29 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
             }
             Tk_MakeWindowExist(master);
             WmSetString(&wmPtr->transient, Tk_PathName(master));
+
+            /*
+             * A transient follows its master's state: while the master
+             * is iconic or withdrawn the transient is withdrawn too,
+             * because a dialog has no business on screen without the
+             * window it belongs to. wm-transient-4.* and -8.1 check
+             * exactly this, and it is the one part of "transient" that
+             * is behaviour rather than bookkeeping.
+             *
+             * Only the state at the moment of the call is honoured
+             * here. Upstream also *tracks* the master afterwards, with
+             * a structure handler on it; that is a larger change and
+             * the tests for it are separate.
+             */
+            {
+                WmInfo *mPtr = ((TkWindow *) master)->wmInfoPtr;
+
+                if (mPtr != NULL && (mPtr->withdrawn || mPtr->iconified)) {
+                    wmPtr->withdrawn = 1;
+                    wmPtr->iconified = 0;
+                    TkpWmSetState(winPtr, WithdrawnState);
+                }
+            }
         }
         return TCL_OK;
 
