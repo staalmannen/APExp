@@ -152,7 +152,8 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `rol64-test.c` and `u64float-test.c`, and for libap `locale-test.c`,
 `sigset-test.c`, `posix-spawn-test.c`, `limits-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
-`sincos-test.c`, `explog-test.c`, `fparith-test.c` and
+`sincos-test.c`, `explog-test.c`, `fparith-test.c`,
+`float-overflow-test.c`, `malloc-reuse-test.c` and
 `stdio-test.c`. The three `tk-*.tcl` scripts there are Tcl, run with
 `wish`; see the Tk section below. `sys/src/ape/lib/libressl/test/` is separate: it is
 upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
@@ -2173,6 +2174,97 @@ covers A-Z and the accented capitals and is what makes
 `bind .e <Shift-Key-A>` fire. Which *punctuation* needs Shift is a
 property of the physical layout and is not knowable here, so those are
 reported unshifted.
+
+### Tcl's own test suite, and the two things it has found so far
+
+Run from `sys/src/ape/cmd/tclsh`:
+
+```
+./tcltest $home/APExp/sys/src/external/tcl/tests/all.tcl >/tmp/tcl-all.out 2>&1
+```
+
+**It does not finish**, and that is the most important result in it. Of
+167 test files it reaches six -- `binary.test` is killed and the run
+stops during `chanio.test`, with no summary line:
+
+```
+Test file error: tcltest 69507: Killed: Insufficient physical memory
+```
+
+That note is the 9front kernel refusing to grow the process, and the
+same wall is expected to stop bash on a configure script. **Do not read
+the failure list as a survey**: it covers the first 4% of the suite in
+alphabetical order, so everything after `chanio` is simply unmeasured.
+
+Two findings, both worth a test of their own.
+
+**1. A double just past the float range may not round to infinity.**
+`binary-53.25` and `binary-53.26`:
+
+```tcl
+binary scan [binary format H* 47effffff0000001] Q round_to_inf
+binary scan [binary format R $round_to_inf] R inf1
+expr {$inf1 eq Inf}		;# answers 0, wants 1
+```
+
+`binary format R` is a 32-bit float, so this is a double -> float
+conversion and a read back. The constant is not arbitrary: FLT_MAX is
+`2**128 - 2**104`, the next float is infinity, and the midpoint is
+`2**128 - 2**103`, exactly `0x47EFFFFFF0000000`. The test value is that
+**plus one ulp of a double**, so round-to-nearest must give infinity
+with no tie to break, and `0x47EFFFFFEFFFFFFF` must give FLT_MAX.
+
+Three different things produce a `0` there and they want different
+fixes, which is why `sys/lib/tests/float-overflow-test.c` asks them
+separately: the conversion itself (6c's `CVTSD2SS`, or the folded path
+in `cc/scon.c` -- and note the sign-of-zero work found `ieeedtof` in
+every `*l/obj.c` mishandling this boundary); `isinf` and the
+`INFINITY`/`HUGE_VAL` macros, which `<math.h>` got wrong once already;
+and **printing**, because `eq Inf` is a *string* comparison -- it is
+asking whether Tcl's double-to-string gives exactly `"Inf"`, which Tcl
+reaches through `TclIsInfinite()` -> `isinf()`.
+
+**2. free() does not give memory back, except to a request of exactly
+the same size.** `ap/malloc/malloc.c` is Plan 9's: one free list per
+power-of-two class, and `free()` pushes a block onto the list for its
+own class and nowhere else. So
+
+- every request is rounded **up to a power of two** -- a 33 MB string
+  costs 64 MB;
+- **nothing splits or coalesces**, so 64 MB on the `2**26` list does not
+  satisfy a 32 MB request; the heap grows instead;
+- `realloc` is malloc-copy-free, so growing one buffer to N bytes walks
+  the classes and strands a dead block in each, leaving about 2N of
+  garbage that only an identically-sized request can reuse, on top of
+  the up-to-2N rounding.
+
+Growth by realloc is how every interpreter builds a big string, so this
+is the shape behind the OOM.
+
+**Splitting is the obvious fix and does not work as written.** A block
+of class k occupies `16 + 2**k` bytes -- the header is padded to 16 for
+`max_align_t` -- so two class-k blocks need `32 + 2**(k+1)`, which is
+sixteen bytes **more** than the class-(k+1) block they would be carved
+from. The layout has no room for it, which is presumably why Plan 9
+never did it. Making this allocator return memory means changing the
+block layout or replacing the allocator.
+
+`sys/lib/tests/malloc-reuse-test.c` measures it through `sbrk(0)` --
+what the process took from the kernel, which is the quantity the note is
+about, rather than what malloc believes it handed out. Its sizes are
+under glibc's 128 KB mmap threshold on purpose, so both assertions hold
+on glibc, which is how it was checked.
+
+**The rest of the list is not new work.** `chan-16.9` wants
+`socket -server`, which libap answers `ENOTSUP`; the seven
+`chan-io-6.4x`/`8.1` failures are one cluster, all `-buffersize 16` with
+`testchannel inputbuffered` reporting 0 where a partial buffer should
+remain, on a pipe and on a file alike. Tcl channels use `read`/`write`
+directly, not stdio, so the stdio work above is not implicated.
+
+**Getting a full run is the first job here**, not fixing the ten. Skip
+the files that cannot fit in the VM (`bigdata.test`, and `binary.test`
+until the allocator is dealt with) so the other 161 are measured at all.
 
 ### Build order for compiler changes
 ```
