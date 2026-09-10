@@ -425,18 +425,87 @@ proc pair {sbfirst wired} {
     flush stdout
 }
 
+# ------------------------------------------------------------------
+# THE 2x2 IS ANSWERED BY ITS FIRST CELL, and the answer is that the
+# arrangement was never the variable: A hangs. A is
+#
+#	pack [text .t -yscrollcommand {.s set}] -side left
+#	pack [scrollbar .s -command {.t yview}] -fill y -expand 1 -side left
+#
+# which is build's own arrangement, .t at 0,0 486x246 and .s at 486,0
+# -- so pack order and wiring are both out, and so is the x=10 offset
+# theory. It is left below because B, C and D still separate the
+# arrangements if this ever needs re-deriving; nothing reaches them
+# today.
+#
+# WHAT IS ACTUALLY LEFT is the only remaining difference between this
+# and step 2 + step 5, which returned on these same widgets: HOW FAR
+# the widget was scrolled before the update.
+#
+#	7e1A		scroll 3.0 units	index 4	   HANGS
+#	steps 2..4	... ending in moveto 0.5	index 51   returns
+#
+# That is not a coincidence of numbers. tkTextDisp.c does not repaint
+# the whole window for a small scroll: when the old and new views
+# overlap it COPIES the overlapping rectangle to its new position and
+# repaints only the strip that was uncovered. A jump to the middle of a
+# 99-line file has no overlap at all, so it takes the plain full-repaint
+# path. So "scrolled a little" and "scrolled a lot" are two different
+# code paths, and only the first involves moving a rectangle -- which is
+# the operation this port has most often got wrong.
+#
+# Section 8 asks the distance directly, largest first so the ones
+# expected to return print before the one expected to hang.
+#
+# It also splits "update" in two, which is the other thing nobody has
+# asked yet:
+#
+#   update idletasks	runs ONLY idle handlers, i.e. DisplayText.
+#			If this hangs, the loop is inside the redisplay
+#			itself -- one call that never returns, or an
+#			idle handler that re-posts itself forever.
+#   update		runs events as well. If idletasks returns and
+#			this hangs, the redisplay is GENERATING AN EVENT
+#			(an Expose from the copy, most likely) that
+#			schedules another redisplay, and round it goes.
+#
+# Those two want completely different fixes, and the log will now say
+# which in one word.
+
+foreach {tag cmd what} {
+    8a {yview moveto 1.0}   {to the very end -- no overlap at all}
+    8b {yview moveto 0.5}   {to the middle: this is what steps 2..4 left behind, and step 5's update returned}
+    8c {yview scroll 100 units} {further than the window is tall, so still no overlap}
+    8d {yview scroll 20 units}  {about one windowful}
+    8e {yview scroll 3 units}   {THE ONE THAT HANGS: a small scroll, most of the window reusable}
+    8f {yview scroll 1 units}   {the smallest scroll there is}
+} {
+    step "$tag. .t $cmd -- $what"
+    pair 0 1
+    eval .t $cmd
+    done "scroll returned; index is [.t index @0,0]"
+
+    step "$tag. ... update idletasks (redisplay ONLY, no events)"
+    update idletasks
+    done "update idletasks returned"
+
+    step "$tag. ... update (redisplay AND events)"
+    update
+    done "update returned"
+}
+
+# ------------------------------------------------------------------
 foreach {tag sbfirst wired what} {
-    A 0 1 {text packed first, WIRED -- this is build's arrangement}
+    A 0 1 {text packed first, WIRED -- this is build's arrangement, and it hangs}
     B 0 0 {text packed first, unwired}
     C 1 1 {scrollbar packed first, WIRED}
-    D 1 0 {scrollbar packed first, unwired -- this is build2's, and it hangs}
+    D 1 0 {scrollbar packed first, unwired -- this is build2's}
 } {
-    step "7e1$tag. $what: scroll at the top level"
+    step "8-arr$tag. $what: scroll 3 units at the top level"
     pair $sbfirst $wired
     .t yview scroll 3.0 units
     done "scroll returned; index is [.t index @0,0]"
-    step "7e1$tag. ... and the update after it -- THIS is the one that\
- hangs for D"
+    step "8-arr$tag. ... and the update after it"
     update
     done "update returned"
 }
