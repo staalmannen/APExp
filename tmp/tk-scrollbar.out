@@ -1,0 +1,190 @@
+tk-runall: starting, line buffered
+Tests running in interp:  /bin/wish
+Tests located in:  /usr/glenda/APExp/sys/src/external/tk/tests
+Tests running in:  /usr/glenda/APExp/sys/src/external/tk/tests
+Temporary files stored in /usr/glenda/APExp/sys/src/external/tk/tests
+Test files sourced into current interpreter
+Running tests that match:  *
+Skipping test files that match:  l.*.test
+Only running test files that match:  scrollbar.test
+Tests began at 2026-09-10 04:38:41 +0200
+scrollbar.test
+---- scrollbar-1.1 start
+---- scrollbar-1.2 start
+---- scrollbar-1.3 start
+---- scrollbar-1.4 start
+---- scrollbar-1.5 start
+---- scrollbar-1.6 start
+---- scrollbar-1.7 start
+---- scrollbar-1.8 start
+---- scrollbar-1.9 start
+---- scrollbar-1.10 start
+---- scrollbar-1.11 start
+---- scrollbar-1.12 start
+---- scrollbar-1.13 start
+---- scrollbar-1.14 start
+---- scrollbar-1.15 start
+---- scrollbar-1.16 start
+---- scrollbar-1.17 start
+---- scrollbar-1.18 start
+---- scrollbar-1.19 start
+---- scrollbar-1.20 start
+---- scrollbar-1.21 start
+---- scrollbar-1.22 start
+---- scrollbar-1.23 start
+---- scrollbar-1.24 start
+---- scrollbar-1.25 start
+---- scrollbar-1.26 start
+---- scrollbar-1.27 start
+---- scrollbar-1.28 start
+---- scrollbar-1.29 start
+---- scrollbar-1.30 start
+---- scrollbar-1.31 start
+---- scrollbar-1.32 start
+---- scrollbar-1.33 start
+---- scrollbar-1.34 start
+---- scrollbar-1.35 start
+---- scrollbar-1.36 start
+---- scrollbar-1.37 start
+---- scrollbar-1.38 start
+---- scrollbar-1.39 start
+---- scrollbar-1.40 start
+---- scrollbar-1.41 start
+---- scrollbar-2.1 start
+---- scrollbar-2.2 start
+---- scrollbar-2.3 start
+---- scrollbar-2.4 start
+---- scrollbar-2.5 start
+---- scrollbar-3.1 start
+---- scrollbar-3.2 start
+---- scrollbar-3.3 start
+---- scrollbar-3.4 start
+---- scrollbar-3.5 start
+---- scrollbar-3.6 start
+---- scrollbar-3.7 start
+---- scrollbar-3.8 start
+---- scrollbar-3.9 start
+---- scrollbar-3.10 start
+---- scrollbar-3.11 start
+---- scrollbar-3.13 start
+---- scrollbar-3.15 start
+---- scrollbar-3.16 start
+---- scrollbar-3.17 start
+---- scrollbar-3.18 start
+---- scrollbar-3.19 start
+---- scrollbar-3.20 start
+---- scrollbar-3.21 start
+---- scrollbar-3.22 start
+---- scrollbar-3.23 start
+---- scrollbar-3.24 start
+---- scrollbar-3.25 start
+---- scrollbar-3.26 start
+---- scrollbar-3.27 start
+---- scrollbar-3.28 start
+---- scrollbar-3.29 start
+---- scrollbar-3.30 start
+---- scrollbar-3.31 start
+---- scrollbar-3.32 start
+---- scrollbar-3.33 start
+---- scrollbar-3.34 start
+---- scrollbar-3.35 start
+---- scrollbar-3.36 start
+---- scrollbar-3.38 start
+---- scrollbar-3.41 start
+---- scrollbar-3.42 start
+---- scrollbar-3.43 start
+---- scrollbar-3.45 start
+---- scrollbar-3.46 start
+---- scrollbar-3.47 start
+---- scrollbar-3.48 start
+---- scrollbar-3.49 start
+---- scrollbar-3.50.1 start
+---- scrollbar-3.51 start
+---- scrollbar-3.52 start
+---- scrollbar-3.53 start
+---- scrollbar-3.54.1 start
+---- scrollbar-3.56 start
+---- scrollbar-3.57 start
+---- scrollbar-3.58 start
+---- scrollbar-3.59 start
+---- scrollbar-3.60 start
+---- scrollbar-3.61 start
+---- scrollbar-3.62 start
+---- scrollbar-3.63 start
+---- scrollbar-3.71 start
+---- scrollbar-3.72 start
+---- scrollbar-3.73 start
+---- scrollbar-3.74 start
+---- scrollbar-4.1 start
+---- scrollbar-5.1 start
+---- scrollbar-6.1 start
+---- scrollbar-6.3 start
+---- scrollbar-6.4 start
+---- scrollbar-6.6 start
+---- scrollbar-6.7 start
+---- scrollbar-6.8 start
+---- scrollbar-6.9 start
+---- scrollbar-6.10 start
+---- scrollbar-6.11.1 start
+---- scrollbar-6.12.1 start
+
+
+==== scrollbar-6.12.1 ScrollbarPosition procedure FAILED
+---- Result was:
+trough1
+---- Result should have been (exact matching):
+arrow1
+==== scrollbar-6.12.1 FAILED
+
+---- scrollbar-6.16 start
+---- scrollbar-6.20 start
+---- scrollbar-6.24 start
+---- scrollbar-6.25 start
+---- scrollbar-6.29.1 start
+
+
+==== scrollbar-6.29.1 ScrollbarPosition procedure FAILED
+---- Result was:
+trough2
+---- Result should have been (exact matching):
+arrow2
+==== scrollbar-6.29.1 FAILED
+
+---- scrollbar-6.30.1 start
+---- scrollbar-6.34 start
+---- scrollbar-6.35 start
+
+
+==== scrollbar-6.35 ScrollbarPosition procedure FAILED
+---- Result was:
+
+---- Result should have been (exact matching):
+trough2
+==== scrollbar-6.35 FAILED
+
+---- scrollbar-6.39.1 start
+---- scrollbar-6.41.1 start
+
+
+==== scrollbar-6.41.1 ScrollbarPosition procedure FAILED
+---- Result was:
+trough2
+---- Result should have been (exact matching):
+slider
+==== scrollbar-6.41.1 FAILED
+
+---- scrollbar-6.44 start
+
+
+==== scrollbar-6.44 ScrollbarPosition procedure FAILED
+---- Result was:
+
+---- Result should have been (exact matching):
+trough2
+==== scrollbar-6.44 FAILED
+
+---- scrollbar-7.1 start
+---- scrollbar-8.1 start
+---- scrollbar-8.2 start
+---- scrollbar-9.1 start
+---- scrollbar-10.1 start
