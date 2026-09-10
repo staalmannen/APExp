@@ -211,8 +211,28 @@ DRAWIMPL_CFLAGS=\
 	-I$APEXPROOT/$objtype/include/ape\
 	-D_PLAN9_SOURCE\
 
+# mklib makes every object depend on HFILES, so a header that is NOT
+# listed here changes nothing: mk rebuilds only the .c files that
+# themselves changed, and everything else keeps the layout it was
+# compiled against.
+#
+# THIS COST A WHOLE RUN. Two int fields were added to P9DisplayState in
+# tkPlan9Int.h -- the struct behind the single global gP9 that all seven
+# files in plan9/ share -- and only tkPlan9Init.c was rebuilt, because
+# only its .c had changed. The other six went on reading evqueue,
+# focuswin and lastmouse at the old offsets of the same object. Key
+# events stopped arriving (bind.test 3 failures -> 116) and the suite
+# died in cmds.test, none of which mentions a header.
+#
+# So the port's own headers belong here. They are the ones that change;
+# the vendored generic/ and xlib/ headers do not, and listing several
+# hundred of them would make every build walk the tree.
 HFILES=\
 	tkConfig.h\
+	$TKSRC/plan9/tkPlan9Int.h\
+	$TKSRC/plan9/tkPlan9Port.h\
+	$TKSRC/plan9/tkPlan9Default.h\
+	$TKSRC/plan9/tkP9Draw.h\
 
 <$APEXPROOT/sys/src/cmd/mklib
 
