@@ -1582,7 +1582,24 @@ Tk_DestroyWindow(
 	TkWmRemoveFromColormapWindows(winPtr);
     }
     if (winPtr->window != None) {
-#if defined(MAC_OSX_TK) || defined(_WIN32)
+	/*
+	 * PLAN9 belongs in this list for the same reason Windows and the Mac
+	 * do, and it is the same reason as SendEnterLeaveForDestroy above:
+	 * the condition is not the operating system, it is "there is no X
+	 * server". The #else branch skips the destroy for a child whose
+	 * parent is going away, because on X the server destroys the whole
+	 * subtree implicitly and an explicit round trip per child is waste.
+	 *
+	 * Nothing here will do that. XDestroyWindow in plan9/tkPlan9Init.c is
+	 * the ONLY thing that releases a P9Window slot, so every child of
+	 * every destroyed toplevel leaked one -- and a Tk test file builds
+	 * and destroys widget trees continuously. The fixed 2048-entry table
+	 * therefore filled monotonically over a 97-file run and reached
+	 * 2048/2048 in the last file, after which XCreateWindow could only
+	 * answer None. That is what "bad window path name .foo.top" and the
+	 * general protection violation at the end of the suite both were.
+	 */
+#if defined(MAC_OSX_TK) || defined(_WIN32) || defined(PLAN9)
 	XDestroyWindow(winPtr->display, winPtr->window);
 #else
 	if ((winPtr->flags & TK_TOP_HIERARCHY)
