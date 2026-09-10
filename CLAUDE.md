@@ -1996,6 +1996,25 @@ the same position by both commands:
 `scroll ... pixels` and the old `yview <index>` form are asked too:
 they reach the same place without the display-line walk.
 
+**This now lives in `sys/lib/tests/tk-textscroll-hang-test.tcl`**, and
+`tk-mousewheel-test.tcl` is finished -- kept as the record of how the
+suspects were excluded, not as something to run. The bug reproduces in
+four lines:
+
+```tcl
+pack [text .t -yscrollcommand {.s set}] -side left
+pack [scrollbar .s -command {.t yview}] -fill y -expand 1 -side left
+.t yview scroll 20 units
+update idletasks		;# never returns
+```
+
+**Put a new case in the right place or the run is wasted.** The distance
+loop was appended *after* the section it was meant to inform, so it hung
+at its fourth case and the run never reached the questions that mattered
+-- a whole round trip for a sequencing mistake. Every case expected to
+return must come before every case expected to hang, in file order, and
+each must print a flushed marker before it runs.
+
 **Every binding counts and prints its own invocation number**, because
 the one fact that decides the shape is whether the binding runs once or
 forever: `wheel #1` and then silence means one delivery whose drain
