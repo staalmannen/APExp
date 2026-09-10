@@ -1934,30 +1934,38 @@ Geometry is ruled out too, and cheaply: both text widgets come out
 `486x246` and mapped, so a text widget laid out into no height -- a
 good way to make `tkTextDisp.c` loop -- is not it.
 
-What remains is the difference between `build` and `build2`, and there
-are **two**: pack order, and whether the pair is wired to each other.
-The 2x2 in the test asks all four with **one widget name throughout**,
-changing one thing at a time, known-hanging arrangement last:
+**The arrangement was never the variable either.** The 2x2 written for
+that -- pack order against whether the pair is wired -- was answered by
+its first cell: **A hangs**, and A is `build`'s own arrangement, `.t`
+at `0,0` and `.s` at `486,0`. So pack order, the wiring, and the
+`x=10` offset are all out together.
 
-| | pack order | wired | |
-|---|---|---|---|
-| A | text first | yes | `build`'s; step 2+5 returned |
-| B | text first | no | |
-| C | scrollbar first | yes | |
-| D | scrollbar first | no | `build2`'s; hangs |
+**What is left is how far the widget was scrolled**, which is the only
+remaining difference from step 2 + step 5 on these same widgets:
 
-and each outcome points somewhere different:
+| | | |
+|---|---|---|
+| `7e1A` | `scroll 3.0 units`, index 4 | **hangs** |
+| steps 2..4 | ending in `moveto 0.5`, index 51 | returns |
 
-- **only D** -- the pair of differences, not either alone.
-- **C and D** -- **pack order**, i.e. the text widget sitting at `x=10`
-  rather than `x=0`. A scroll is a copy of a rectangle from one place
-  to another, and this port has a documented history of confusing
-  parent-relative with screen coordinates in exactly that way (see the
-  stacking section above, where `WindowAtPoint` and
-  `GenerateMouseEvent` both made it).
-- **B and D** -- the **wiring**: with `-yscrollcommand` set, `.s set`
-  runs after every scroll and evidently settles something that
-  otherwise does not.
+That is not a coincidence of numbers. `tkTextDisp.c` does not repaint
+the whole window for a small scroll: when the old and new views
+overlap it **copies the overlapping rectangle** to its new position and
+repaints only the strip uncovered. A jump to the middle of a 99-line
+file has no overlap, so it takes the plain full-repaint path. "Scrolled
+a little" and "scrolled a lot" are therefore two different code paths,
+and **only the first moves a rectangle** -- the operation this port has
+most often got wrong.
+
+Section 8 asks the distance directly, largest first. It also splits the
+`update`, which nobody had asked yet and which decides the fix:
+
+- **`update idletasks` hangs** -- the loop is inside the redisplay
+  itself: one call that never returns, or an idle handler that re-posts
+  itself.
+- **`update idletasks` returns and `update` hangs** -- the redisplay is
+  *generating an event*, almost certainly an Expose from the copy,
+  which schedules another redisplay.
 
 **Every binding counts and prints its own invocation number**, because
 the one fact that decides the shape is whether the binding runs once or
