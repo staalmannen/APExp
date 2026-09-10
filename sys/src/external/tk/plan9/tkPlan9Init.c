@@ -37,6 +37,27 @@ TkP9FindWindow(Window xid)
     return NULL;
 }
 
+/*
+ * The window table is a fixed array, so it can run out -- and the way it
+ * used to run out was the worst available: XCreateWindow answered None,
+ * which every caller reads as "no window" rather than "no room". A
+ * frame would then exist to Tk and not to this port, and the first
+ * thing to notice would be something a long way away.
+ *
+ * Two rules here, both about not being quiet:
+ *
+ *   - exhaustion PANICS, naming the table and its size. A panic at the
+ *     point of failure beats a general protection violation twenty
+ *     minutes later, which is what this cost once already.
+ *   - occupancy is reported as it climbs, one line per TKP9_WINREPORT
+ *     slots, unconditionally rather than under $TKP9DEBUG -- the debug
+ *     flag turns on a torrent of drawing traces, so a number that only
+ *     appears alongside them is a number nobody will see. Eight lines
+ *     over the life of a process is the whole cost, and it turns "did
+ *     we get close?" into something the log answers by itself.
+ */
+#define TKP9_WINREPORT 256
+
 P9Window *
 TkP9AllocWindow(void)
 {
@@ -46,9 +67,20 @@ TkP9AllocWindow(void)
             memset(&gP9.wins[i], 0, sizeof(P9Window));
             gP9.wins[i].inuse = 1;
             if (i >= gP9.nwins) gP9.nwins = i + 1;
+            gP9.winuse++;
+            if (gP9.winuse > gP9.winhigh) {
+                int prev = gP9.winhigh;
+                gP9.winhigh = gP9.winuse;
+                if (gP9.winhigh / TKP9_WINREPORT != prev / TKP9_WINREPORT)
+                    fprintf(stderr, "tkp9: window table %d/%d in use\n",
+                            gP9.winhigh, TKP9_MAX_WINDOWS);
+            }
             return &gP9.wins[i];
         }
     }
+    Tcl_Panic("tkp9: window table full (%d entries); "
+              "every XCreateWindow from here would answer None",
+              TKP9_MAX_WINDOWS);
     return NULL;
 }
 
@@ -90,7 +122,10 @@ void
 TkP9FreeWindow(Window xid)
 {
     P9Window *w = TkP9FindWindow(xid);
-    if (w) w->inuse = 0;
+    if (w) {
+        w->inuse = 0;
+        gP9.winuse--;
+    }
 }
 
 /* ------------------------------------------------------------------ */

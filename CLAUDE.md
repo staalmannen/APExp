@@ -154,8 +154,10 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c` and
-`stdio-test.c`. The three `tk-*.tcl` scripts there are Tcl, run with
-`wish`; see the Tk section below. `sys/src/ape/lib/libressl/test/` is separate: it is
+`stdio-test.c`. The eighteen `tk-*.tcl` scripts there are Tcl, run with
+`wish`; see the Tk section below. `tk-runall.tcl` is the harness for
+Tk's own suite rather than a test of its own, and `tk-runtest.tcl` runs
+a single file from it. `sys/src/ape/lib/libressl/test/` is separate: it is
 upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
 
 Beyond that, testing is still mostly ad-hoc — compile a program under
@@ -2066,16 +2068,81 @@ absent here: `win` 280, `secureserver` 71, `nonPortable` 69, `nt` 55,
 
 **The crash hides nothing.** `xmfbox` is the last file alphabetically,
 so all 97 files and every failure are already measured; only the
-summary line is lost. **The next full run settles where the fault is
-without any further work**: `tk-runall.tcl` now prints its marker from
-inside a wrapper around `::exit`, so a `tk-runall: every file ran, now
-entering exit` line followed by the fault confirms the fault is in
-`Tcl_Exit`/teardown, and a fault with no marker moves it back into a
-test file. It is still worth doing early,
-because a general protection violation is a memory-safety signal and
-this port has form -- `TkpDeleteFont` and `TkpFreeColor` both freed a
-struct they did not own (see the hook section above), and both were
-invisible until something released a resource for real.
+summary line is lost. It is still worth doing early, because a general
+protection violation is a memory-safety signal and this port has form
+-- `TkpDeleteFont` and `TkpFreeColor` both freed a struct they did not
+own (see the hook section above), and both were invisible until
+something released a resource for real.
+
+**IT IS NOT IN TEARDOWN.** The `::exit` marker settled that on its
+first run: the marker is **absent**, and so is `runAllTests`' own
+`Tests ended at` line, which it prints *before* `cleanupTests`
+(`tcltest.tcl:2996`). So wish dies between the last test reporting and
+`xmfbox.test`'s own trailing `cleanup; cleanupTests` -- inside the test
+file. The banner line confirms the wrapper was installed, so the
+absence means what it says this time.
+
+**And xmfbox-2.6 itself fails with something impossible**, which is a
+better lead than the fault:
+
+```
+bad window path name ".foo.top"
+    while executing
+"pack $w.top -side top -expand yes -fill both"
+```
+
+`library/xmfbox.tcl`'s `MotifFDialog_BuildUI` is
+
+```tcl
+329  toplevel $w -class TkMotifFDialog
+330  set top [frame $w.top -relief raised -bd 1]
+331  set bot [frame $w.bot -relief raised -bd 1]
+333  pack $w.bot -side bottom -fill x
+334> pack $w.top -side top -expand yes -fill both
+```
+
+`.foo.top` is created at 330 and **gone** at 334, with one `frame` and
+one `pack` in between. A window does not leave the name table on its
+own -- and a damaged widget tree is also what the fault two lines later
+says, so the two symptoms are probably one cause and the Tcl-level one
+is far cheaper to chase.
+
+**Something accumulated is needed**, because both halves ran clean and
+`[n-z]` contains `xmfbox.test`. With `-singleproc 1` all 97 files are
+sourced into one wish, so what accumulates is **live windows** -- every
+toplevel a test forgets to destroy.
+
+**The first suspect is the window table, because it is a fixed array
+that used to fail silently.** `tkPlan9Int.h` has `TKP9_MAX_WINDOWS
+2048`, and on exhaustion `TkP9AllocWindow` returned NULL and
+`XCreateWindow` answered `None` -- which every caller above it reads as
+*no window*, never as *no room*. A frame that exists to Tk and not to
+this port is exactly the shape of ".foo.top is gone". That is the
+`XLoadFont` family again (see "four wm and keysym stubs that answered
+plausibly"): **a stub that answers "failure" is not the same as one
+that answers "nothing to do", and a table that answers `None` when
+full is not answering at all.**
+
+So it is loud now, and measured:
+
+- exhaustion **panics**, naming the table and its size. A panic where
+  it happens beats a general protection violation twenty minutes later.
+- occupancy is reported as it climbs, one line per 256 slots:
+  `tkp9: window table 256/2048 in use`. **Unconditional, not under
+  `$TKP9DEBUG`** -- that flag turns on a torrent of drawing traces, and
+  a number that only appears beside them is a number nobody reads.
+  Eight lines over a process's life is the whole cost, and it makes the
+  next full run answer "did we get close?" by itself.
+
+`sys/lib/tests/tk-xmfbox-crash-test.tcl` asks the question without the
+suite: build the dialog with a growing number of live toplevels
+underneath, reporting at each step. Its three outcomes want three
+different next steps -- fails at zero (the suite is a red herring),
+fails past some count (accumulation, and the count goes to the table),
+never fails (**not** window count; something else survives a test file
+-- a grab, a focus, a stale geometry manager). Note the table being
+innocent is a real possible answer here, and the ramp is what
+distinguishes it from a guess.
 
 `unixWm.test`, `unixSelect.test`, `unixEmbed.test` and `unixFont.test`
 run here because `tcl_platform(platform)` is `unix`, so the `unix`
