@@ -1725,12 +1725,32 @@ character put line breaks mid-word and in the wrong place for tabs
 
 ### Tk on Plan 9: what the remaining test failures are, and which are ours
 
-The suite is at **26 failing tests** (`wish all.tcl`; note `grep -c
-FAILED` counts two lines each, so 52 lines). **25 of those are known
-not to be the Plan 9 backend's**, and are worth recording so they are
-not chased again:
+The suite is at **24 failing tests** (`grep -c FAILED` counts two lines
+each, so 48 lines).
 
-**The five `event-9.*` are ours after all, and are still open.** An
+**Read that number with the caveat below.** Every `tk-all.out` collected
+so far stops after `scrollbar.test`, 62 files of 97 -- and it is not a
+hang. Tk's `all.tcl` ends with its only `exit` inside
+`if {... && [info exists env(ERROR_ON_FAILURES)]}`, so with that
+variable unset the script falls off the end, **wish enters
+`Tk_MainLoop`**, and stdout redirected to a file is block buffered: the
+tail of the run is still in a stdio buffer that never gets flushed.
+The leftover windows on screen are the same cause -- `all.tcl` sets
+`-singleproc 1`, so all 97 files share one wish and every toplevel a
+test forgets to destroy stays up for the life of a process that never
+exits. Use `sys/lib/tests/tk-runall.tcl`, which sources `all.tcl` and
+then exits (exit flushes); if the log still stops short of tcltest's
+summary after that, then it really is a hang and the last file named is
+where to look. **So 35 files -- `select`, `send`, all of `text*`,
+`unixFont`, `unixWm`, `winfo`, `wm` and the `ttk` set -- have never been
+measured**, and every count in this section has silently been about the
+same 62-file prefix.
+
+**23 of the 24 are known not to be the Plan 9 backend's**, and are worth
+recording so they are not chased again:
+
+**Three of the five `event-9.*` were ours, and are fixed; `9.13` and
+`9.14` remain and are generic Tk's.** An
 earlier note here said they were generic Tk's, on the strength of
 `event-9.14`'s `%d` details. **That was wrong twice over**, and both
 errors are worth keeping as a warning about reasoning from one member of
@@ -1793,6 +1813,29 @@ The distinction every passing case hid: `event-9.1` and section 3 of
 `tk-enter-test.tcl` both destroy a **toplevel**, which is the branch
 `TkPointerDeadWindow` plus the deferred `pointerDirty` poll happens to
 cover. Every failing one destroys a nested **frame**.
+
+With `PLAN9` in that condition, section 5 gives the details the suite
+asks for, both steps:
+
+```
+containing 350 350 after destroy -> '.one.f1'
+crossings: {Enter .one.f1 NotifyInferior}	;# event-9.11
+...
+crossings: {Enter .one NotifyInferior}		;# event-9.17's second half
+```
+
+and sections 1-4 are unchanged, so the toplevel path did not regress.
+The suite agrees: `9.11`, `9.12` and `9.17` are gone.
+
+**`9.13` and `9.14` remain, and they are the other failure** -- the
+`NotifyVirtual`-for-`NotifyNonlinear` substitution `TkInOutEvents`
+makes with a NULL `sourcePtr`, described above. Both destroy a
+**toplevel**, which is the path `SendEnterLeaveForDestroy` deliberately
+leaves alone (`if (!Tk_IsTopLevel(tkwin))`), so it was never going to
+touch them. Fixing those means giving `TkPointerDeadWindow` a live
+stand-in for the dead window, which is a real change to generic Tk
+rather than a one-token one -- and the two tests that document that
+mechanism, `9.16` and `9.17`, both pass now.
 
 **The four `place-8.*`/`pack-18.*` fail on X11 too.** All four have the
 shape
@@ -1883,12 +1926,29 @@ string is **four pixels wider** than on X, one per character, because
 Plan 9 bitmap fonts come in whole sizes and the nearest to 8 points is
 not 8 points. Nothing to fix without a scalable font.
 
-That is 21 of the 26 accounted for. The five still ours and open are
-the `event-9.*` group above.
+**`geometry-4.7` is the one still open and still ours**, and the
+ConfigureNotify guard below **did not fix it** -- it reports two
+`configure` events exactly as before. So the extra event is either a
+second, genuinely different move of `.b1`, or a redundant one escaping
+by a path that never reaches those three X entry points;
+`Tk_MoveResizeWindow` sets `TK_NEED_CONFIG_NOTIFY` itself when a window
+has no X window yet, so generic Tk can synthesise one without going
+near this port. `sys/lib/tests/tk-geometry-test.tcl` prints `%x %y %w
+%h` for every `<Configure>` rather than counting them, which is what
+separates those two.
 
-`canvas-23.*`, `geometry-4.7`, `listbox-4.7`, `bind-13.14`, `embed-1.1`
-and `fontchooser-2.0/2.1` **were** ours and are fixed -- see the
-sections below.
+That accounts for all 24: 23 are upstream, environment or harness
+limitations, and `geometry-4.7` is the single known-open port bug.
+
+`canvas-23.*`, `listbox-4.7`, `bind-13.14`, `embed-1.1`,
+`fontchooser-2.0/2.1` and `event-9.11/9.12/9.17` **were** ours and are
+fixed -- see the sections below.
+
+**When the next full run lands, re-derive this list rather than
+trusting it.** Every count in this section is a snapshot of a 62-file
+prefix, and four times now something has been misread from one member
+of a group -- including, twice, a fix declared on a test's evidence
+before the suite confirmed it.
 
 ### Tk on Plan 9: the image path was a stub in both directions
 
@@ -2094,12 +2154,18 @@ silent -- and that is not a detail, because **Tk counts these events**
 and everything that relays out on `<Configure>` is written expecting one
 per real change.
 
-`geometry-4.7` is the case, and it shows why the redundant events are
-not rare: `Tk_MaintainGeometry` registers a placed window with **every**
-master between it and its parent, so one `place .f -x 25 -y 35` runs the
-callback several times and moves `.b1` to the same place each time after
-the first. The test wants `init configure |` and got
-`init configure configure |`.
+`geometry-4.7` is where this came from: `Tk_MaintainGeometry` registers
+a placed window with **every** master between it and its parent, so one
+`place .f -x 25 -y 35` runs the callback several times. The test wants
+`init configure |` and gets `init configure configure |`.
+
+**The guard did not fix that test**, which is worth recording as a
+correction rather than deleting: the rule is still right -- X really is
+silent for a reconfigure that changes nothing, and `WmUpdateGeometry`
+needs it against the re-request loop -- but it was not what
+`geometry-4.7` was reporting. See `sys/lib/tests/tk-geometry-test.tcl`,
+which prints each `<Configure>`'s `%x %y %w %h` so that "the same
+position twice" and "two different positions" stop looking alike.
 
 `WmUpdateGeometry` in `tkPlan9Wm.c` already carried this rule, and
 against a worse symptom -- without it, resize -> Configure ->
