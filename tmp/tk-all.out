@@ -7,7 +7,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-10 11:18:10 +0200
+Tests began at 2026-09-10 11:28:03 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -2565,7 +2565,7 @@ no library with prefix "Tktest" is loaded statically
     }
 
 ---- Result was:
-couldn't create child of window "0x4b79"
+couldn't create child of window "0x4b78"
 ---- Result should have been (exact matching):
 {{configure .t1 300 120}} 300x120+0+0
 ==== unixEmbed-6.1 FAILED
@@ -2620,7 +2620,7 @@ no library with prefix "Tktest" is loaded statically
     }
 
 ---- Result was:
-couldn't create child of window "0x4b7c"
+couldn't create child of window "0x4b7b"
 ---- Result should have been (exact matching):
 {{configure .t1 200 200}} 200x200+0+0
 ==== unixEmbed-6.2 FAILED
@@ -3639,21 +3639,6 @@ unixWm.test
 
 
 
-==== unixWm-8.2 icon windows FAILED
-==== Contents of test case:
-
-    destroy .t
-    toplevel .t -width 100 -height 30
-    list [catch {wm iconwindow} msg] $msg
-
----- Result was:
-1 {wrong # args: should be "wm iconwindow window ?pathName?"}
----- Result should have been (exact matching):
-1 {wrong # args: should be "wm option window ?arg ...?"}
-==== unixWm-8.2 FAILED
-
-
-
 ==== unixWm-8.4 icon windows FAILED
 ==== Contents of test case:
 
@@ -3742,19 +3727,6 @@ unixWm.test
 ---- Result should have been (exact matching):
 0
 ==== unixWm-9.4 FAILED
-
-
-
-==== unixWm-11.2 Tk_WmCmd procedure, miscellaneous errors FAILED
-==== Contents of test case:
-
-    list [catch {wm aspect} msg] $msg
-
----- Result was:
-1 {wrong # args: should be "wm aspect window ?minNumer minDenom maxNumer maxDenom?"}
----- Result should have been (exact matching):
-1 {wrong # args: should be "wm option window ?arg ...?"}
-==== unixWm-11.2 FAILED
 
 
 
@@ -4643,19 +4615,6 @@ embedded 0 container 0
 wm.test
 
 
-==== wm-1.3 Tk_WmObjCmd procedure, miscellaneous errors FAILED
-==== Contents of test case:
-
-    wm command
-
----- Result was:
-wrong # args: should be "wm command window ?value?"
----- Result should have been (exact matching):
-wrong # args: should be "wm option window ?arg ...?"
-==== wm-1.3 FAILED
-
-
-
 ==== wm-1.5 Tk_WmObjCmd procedure, miscellaneous errors FAILED
 ==== Contents of test case:
 
@@ -4668,30 +4627,6 @@ wrong # args: should be "wm option window ?arg ...?"
 
 
 
-==== wm-aspect-1.1 usage FAILED
-==== Contents of test case:
-
-    wm aspect
-
----- Result was:
-wrong # args: should be "wm aspect window ?minNumer minDenom maxNumer maxDenom?"
----- Result should have been (exact matching):
-wrong # args: should be "wm option window ?arg ...?"
-==== wm-aspect-1.1 FAILED
-
-
-
-==== wm-attributes-1.1 usage FAILED
-==== Contents of test case:
-
-    wm attributes
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== wm-attributes-1.1 FAILED
-
-
-
 ==== wm-attributes-1.2.5.1 usage FAILED
 ==== Contents of test case:
 
@@ -4700,32 +4635,6 @@ wrong # args: should be "wm option window ?arg ...?"
 ---- Test completed normally; Return code was: 0
 ---- Return code should have been one of: 1
 ==== wm-attributes-1.2.5.1 FAILED
-
-
-
-==== wm-client-1.1 usage FAILED
-==== Contents of test case:
-
-    wm client
-
----- Result was:
-wrong # args: should be "wm client window ?name?"
----- Result should have been (exact matching):
-wrong # args: should be "wm option window ?arg ...?"
-==== wm-client-1.1 FAILED
-
-
-
-==== wm-colormapwindows-1.1 usage FAILED
-==== Contents of test case:
-
-    wm colormapwindows
-
----- Result was:
-wrong # args: should be "wm colormapwindows window ?windowList?"
----- Result should have been (exact matching):
-wrong # args: should be "wm option window ?arg ...?"
-==== wm-colormapwindows-1.1 FAILED
 
 
 
@@ -4749,30 +4658,6 @@ wrong # args: should be "wm option window ?arg ...?"
 ---- Result should have been (exact matching):
 {.t2.b .t2} {.t2.b .t2.c .t2}
 ==== wm-colormapwindows-2.1 FAILED
-
-
-
-==== wm-command-1.1 usage FAILED
-==== Contents of test case:
-
-    wm command
-
----- Result was:
-wrong # args: should be "wm command window ?value?"
----- Result should have been (exact matching):
-wrong # args: should be "wm option window ?arg ...?"
-==== wm-command-1.1 FAILED
-
-
-
-==== wm-deiconify-1.1 usage FAILED
-==== Contents of test case:
-
-    wm deiconify
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== wm-deiconify-1.1 FAILED
 
 
 
@@ -4813,30 +4698,6 @@ wrong # args: should be "wm option window ?arg ...?"
 
 
 
-==== wm-focusmodel-1.1 usage FAILED
-==== Contents of test case:
-
-    wm focusmodel
-
----- Result was:
-wrong # args: should be "wm focusmodel window ?active|passive?"
----- Result should have been (exact matching):
-wrong # args: should be "wm option window ?arg ...?"
-==== wm-focusmodel-1.1 FAILED
-
-
-
-==== wm-frame-1.1 usage FAILED
-==== Contents of test case:
-
-    wm frame
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== wm-frame-1.1 FAILED
-
-
-
 ==== wm-frame-1.2 usage FAILED
 ==== Contents of test case:
 
@@ -4848,17 +4709,6 @@ wrong # args: should be "wm option window ?arg ...?"
 
 
 
-==== wm-geometry-1.1 usage FAILED
-==== Contents of test case:
-
-    wm geometry
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== wm-geometry-1.1 FAILED
-
-
-
 ==== wm-geometry-1.2 usage FAILED
 ==== Contents of test case:
 
@@ -4867,19 +4717,6 @@ wrong # args: should be "wm option window ?arg ...?"
 ---- Test completed normally; Return code was: 0
 ---- Return code should have been one of: 1
 ==== wm-geometry-1.2 FAILED
-
-
-
-==== wm-grid-1.1 usage FAILED
-==== Contents of test case:
-
-    wm grid
-
----- Result was:
-wrong # args: should be "wm grid window ?baseWidth baseHeight widthInc heightInc?"
----- Result should have been (exact matching):
-wrong # args: should be "wm option window ?arg ...?"
-==== wm-grid-1.1 FAILED
 
 
 
@@ -4932,32 +4769,6 @@ baseWidth or baseHeight can't be < 0, and widthInc or heightInc can't be <= 0
 ---- Result should have been (exact matching):
 heightInc can't be <= 0
 ==== wm-grid-1.12 FAILED
-
-
-
-==== wm-group-1.1 usage FAILED
-==== Contents of test case:
-
-    wm group
-
----- Result was:
-wrong # args: should be "wm group window ?pathName?"
----- Result should have been (exact matching):
-wrong # args: should be "wm option window ?arg ...?"
-==== wm-group-1.1 FAILED
-
-
-
-==== wm-iconbadge-1.1 usage FAILED
-==== Contents of test case:
-
-    wm iconbadge
-
----- Result was:
-wrong # args: should be "wm iconbadge window badge"
----- Result should have been (exact matching):
-wrong # args: should be "wm option window ?arg ...?"
-==== wm-iconbadge-1.1 FAILED
 
 
 
@@ -5051,30 +4862,6 @@ wrong # args: should be "wm option window ?arg ...?"
 
 
 
-==== wm-iconbitmap-1.1 usage FAILED
-==== Contents of test case:
-
-    wm iconbitmap
-
----- Result was:
-wrong # args: should be "wm iconbitmap window ?bitmap?"
----- Result should have been (exact matching):
-wrong # args: should be "wm option window ?arg ...?"
-==== wm-iconbitmap-1.1 FAILED
-
-
-
-==== wm-iconify-1.1 usage FAILED
-==== Contents of test case:
-
-    wm iconify
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== wm-iconify-1.1 FAILED
-
-
-
 ==== wm-iconify-1.2 usage FAILED
 ==== Contents of test case:
 
@@ -5140,43 +4927,6 @@ wrong # args: should be "wm option window ?arg ...?"
 
 
 
-==== wm-iconmask-1.1 usage FAILED
-==== Contents of test case:
-
-    wm iconmask
-
----- Result was:
-wrong # args: should be "wm iconmask window ?bitmap?"
----- Result should have been (exact matching):
-wrong # args: should be "wm option window ?arg ...?"
-==== wm-iconmask-1.1 FAILED
-
-
-
-==== wm-iconname-1.1 usage FAILED
-==== Contents of test case:
-
-    wm iconname
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== wm-iconname-1.1 FAILED
-
-
-
-==== wm-iconphoto-1.1 usage FAILED
-==== Contents of test case:
-
-    wm iconphoto
-
----- Result was:
-wrong # args: should be "wm iconphoto window ?-default? image1 ?image2 ...?"
----- Result should have been (exact matching):
-wrong # args: should be "wm option window ?arg ...?"
-==== wm-iconphoto-1.1 FAILED
-
-
-
 ==== wm-iconphoto-1.3 usage FAILED
 ==== Contents of test case:
 
@@ -5187,32 +4937,6 @@ image "notanimage" does not exist
 ---- Result should have been (exact matching):
 can't use "notanimage" as iconphoto: not a photo image
 ==== wm-iconphoto-1.3 FAILED
-
-
-
-==== wm-iconposition-1.1 usage FAILED
-==== Contents of test case:
-
-    wm iconposition
-
----- Result was:
-wrong # args: should be "wm iconposition window ?x y?"
----- Result should have been (exact matching):
-wrong # args: should be "wm option window ?arg ...?"
-==== wm-iconposition-1.1 FAILED
-
-
-
-==== wm-iconwindow-1.1 usage FAILED
-==== Contents of test case:
-
-    wm iconwindow
-
----- Result was:
-wrong # args: should be "wm iconwindow window ?pathName?"
----- Result should have been (exact matching):
-wrong # args: should be "wm option window ?arg ...?"
-==== wm-iconwindow-1.1 FAILED
 
 
 
@@ -5228,17 +4952,6 @@ wrong # args: should be "wm option window ?arg ...?"
 ---- Test completed normally; Return code was: 0
 ---- Return code should have been one of: 1
 ==== wm-iconwindow-1.5 FAILED
-
-
-
-==== wm-maxsize-1.1 usage FAILED
-==== Contents of test case:
-
-    wm maxsize
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== wm-maxsize-1.1 FAILED
 
 
 
@@ -5330,17 +5043,6 @@ expected screen distance but got "bogus"
 
 
 
-==== wm-minsize-1.1 usage FAILED
-==== Contents of test case:
-
-    wm minsize
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== wm-minsize-1.1 FAILED
-
-
-
 ==== wm-minsize-1.2 usage FAILED
 ==== Contents of test case:
 
@@ -5429,56 +5131,6 @@ expected screen distance but got "bogus"
 
 
 
-==== wm-overrideredirect-1.1 usage FAILED
-==== Contents of test case:
-
-    wm overrideredirect
-
----- Result was:
-wrong # args: should be "wm overrideredirect window ?boolean?"
----- Result should have been (exact matching):
-wrong # args: should be "wm option window ?arg ...?"
-==== wm-overrideredirect-1.1 FAILED
-
-
-
-==== wm-positionfrom-1.1 usage FAILED
-==== Contents of test case:
-
-    wm positionfrom
-
----- Result was:
-wrong # args: should be "wm positionfrom window ?user/program?"
----- Result should have been (exact matching):
-wrong # args: should be "wm option window ?arg ...?"
-==== wm-positionfrom-1.1 FAILED
-
-
-
-==== wm-protocol-1.1 usage FAILED
-==== Contents of test case:
-
-    wm protocol
-
----- Result was:
-wrong # args: should be "wm protocol window ?name? ?command?"
----- Result should have been (exact matching):
-wrong # args: should be "wm option window ?arg ...?"
-==== wm-protocol-1.1 FAILED
-
-
-
-==== wm-resizable-1.1 usage FAILED
-==== Contents of test case:
-
-    wm resizable
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== wm-resizable-1.1 FAILED
-
-
-
 ==== wm-resizable-1.2 usage FAILED
 ==== Contents of test case:
 
@@ -5543,58 +5195,6 @@ wrong # args: should be "wm option window ?arg ...?"
 
 
 
-==== wm-sizefrom-1.1 usage FAILED
-==== Contents of test case:
-
-    wm sizefrom
-
----- Result was:
-wrong # args: should be "wm sizefrom window ?user|program?"
----- Result should have been (exact matching):
-wrong # args: should be "wm option window ?arg ...?"
-==== wm-sizefrom-1.1 FAILED
-
-
-
-==== wm-stackorder-1.1 usage FAILED
-==== Contents of test case:
-
-    wm stackorder
-
----- Result was:
-wrong # args: should be "wm stackorder window ?isabove|isbelow window?"
----- Result should have been (exact matching):
-wrong # args: should be "wm option window ?arg ...?"
-==== wm-stackorder-1.1 FAILED
-
-
-
-==== wm-stackorder-1.4 usage FAILED
-==== Contents of test case:
-
-    wm stackorder . is .
-
----- Result was:
-
----- Result should have been (exact matching):
-ambiguous argument "is": must be isabove or isbelow
-==== wm-stackorder-1.4 FAILED
-
-
-
-==== wm-stackorder-1.6 usage FAILED
-==== Contents of test case:
-
-    wm stackorder . isabove _
-
----- Result was:
-
----- Result should have been (exact matching):
-bad window path name "_"
-==== wm-stackorder-1.6 FAILED
-
-
-
 ==== wm-stackorder-1.7 usage FAILED
 ==== Contents of test case:
 
@@ -5602,457 +5202,9 @@ bad window path name "_"
     button .t.b
     wm stackorder .t.b
 
----- Result was:
-
----- Result should have been (exact matching):
-window ".t.b" isn't a top-level window
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
 ==== wm-stackorder-1.7 FAILED
-
-
-
-==== wm-stackorder-1.8 usage FAILED
-==== Contents of test case:
-
-    toplevel .t
-    button .t.b
-    pack .t.b
-    update
-    wm stackorder . isabove .t.b
-
----- Result was:
-
----- Result should have been (exact matching):
-window ".t.b" isn't a top-level window
-==== wm-stackorder-1.8 FAILED
-
-
-
-==== wm-stackorder-1.9 usage FAILED
-==== Contents of test case:
-
-    toplevel .t
-    button .t.b
-    pack .t.b
-    update
-    wm stackorder . isbelow .t.b
-
----- Result was:
-
----- Result should have been (exact matching):
-window ".t.b" isn't a top-level window
-==== wm-stackorder-1.9 FAILED
-
-
-
-==== wm-stackorder-1.10 usage, isabove|isbelow toplevels must be mapped FAILED
-==== Contents of test case:
-
-    toplevel .t
-    update
-    wm withdraw .t
-    wm stackorder .t isabove .
-
----- Result was:
-
----- Result should have been (exact matching):
-window ".t" isn't mapped
-==== wm-stackorder-1.10 FAILED
-
-
-
-==== wm-stackorder-1.11 usage, isabove|isbelow toplevels must be mapped FAILED
-==== Contents of test case:
-
-    toplevel .t
-    update
-    wm withdraw .t
-    wm stackorder . isbelow .t
-
----- Result was:
-
----- Result should have been (exact matching):
-window ".t" isn't mapped
-==== wm-stackorder-1.11 FAILED
-
-
-
-==== wm-stackorder-2.1 stacking order FAILED
-==== Contents of test case:
-
-    toplevel .t ; update
-    raiseDelay
-    wm stackorder .
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder ."
-    ("uplevel" body line 4)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-2.1 FAILED
-
-
-
-==== wm-stackorder-2.2 stacking order FAILED
-==== Contents of test case:
-
-    toplevel .t ; update
-    raise .
-    raiseDelay
-    wm stackorder .
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder ."
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-2.2 FAILED
-
-
-
-==== wm-stackorder-2.3 stacking order FAILED
-==== Contents of test case:
-
-    set res {}
-    toplevel .t
-    tkwait visibility .t
-    raiseDelay
-    toplevel .t2
-    tkwait visibility .t2
-    raiseDelay
-    lappend res [wm stackorder .]
-    raise .
-    raiseDelay
-    lappend res [wm stackorder .]
-    raise .t2
-    raiseDelay
-    lappend res [wm stackorder .]
-    set res
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder ."
-    ("uplevel" body line 9)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-2.3 FAILED
-
-
-
-==== wm-stackorder-2.4 stacking order FAILED
-==== Contents of test case:
-
-    toplevel .t ; update
-    toplevel .t2 ; update
-    raise .
-    lower .t2
-    raiseDelay
-    wm stackorder .
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder ."
-    ("uplevel" body line 7)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-2.4 FAILED
-
-
-
-==== wm-stackorder-2.5 stacking order FAILED
-==== Contents of test case:
-
-    toplevel .parent ; update
-    destroy .parent.child1
-    toplevel .parent.child1 ; update
-    destroy .parent.child2
-    toplevel .parent.child2 ; update
-    destroy .extra
-    toplevel .extra ; update
-    raise .parent
-    lower .parent.child2
-    raiseDelay
-    wm stackorder .parent
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder .parent"
-    ("uplevel" body line 12)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-2.5 FAILED
-
-
-
-==== wm-stackorder-2.6 stacking order: non-toplevel widgets ignored FAILED
-==== Contents of test case:
-
-    toplevel .t1
-    raiseDelay
-    button .t1.b
-    pack .t1.b
-    update
-    wm stackorder .
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder ."
-    ("uplevel" body line 7)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-2.6 FAILED
-
-
-
-==== wm-stackorder-2.7 stacking order: no children returns self FAILED
-==== Contents of test case:
-
-    wm stackorder .
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder ."
-    ("uplevel" body line 2)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-2.7 FAILED
-
-
-
-==== wm-stackorder-3.1 unmapped toplevel FAILED
-==== Contents of test case:
-
-    toplevel .t1 ; update
-    raiseDelay
-    toplevel .t2 ; update
-    raiseDelay
-    wm iconify .t1
-    raiseDelay
-    wm stackorder .
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder ."
-    ("uplevel" body line 8)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-3.1 FAILED
-
-
-
-==== wm-stackorder-3.2 unmapped toplevel FAILED
-==== Contents of test case:
-
-    toplevel .t1 ; update
-    toplevel .t2 ; update
-    wm withdraw .t2
-    raiseDelay
-    wm stackorder .
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder ."
-    ("uplevel" body line 6)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-3.2 FAILED
-
-
-
-==== wm-stackorder-3.3 unmapped toplevel FAILED
-==== Contents of test case:
-
-    toplevel .t1 ; update
-    toplevel .t2 ; update
-    wm withdraw .t2
-    wm stackorder .t2
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder .t2"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-3.3 FAILED
-
-
-
-==== wm-stackorder-3.4 unmapped toplevel FAILED
-==== Contents of test case:
-
-    toplevel .t1 ; update
-    toplevel .t1.t2 ; update
-    wm withdraw .t1.t2
-    wm stackorder .t1
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder .t1"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-3.4 FAILED
-
-
-
-==== wm-stackorder-3.5 unmapped toplevel FAILED
-==== Contents of test case:
-
-    toplevel .t1 ; update
-    toplevel .t1.t2 ; update
-    wm withdraw .t1
-    wm stackorder .t1
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder .t1"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-3.5 FAILED
-
-
-
-==== wm-stackorder-3.6 unmapped toplevel FAILED
-==== Contents of test case:
-
-    toplevel .t1
-    tkwait visibility .t1
-    toplevel .t1.t2
-    tkwait visibility .t1.t2
-    toplevel .t1.t2.t3
-    tkwait visibility .t1.t2.t3
-    wm withdraw .t1.t2
-    raiseDelay
-    wm stackorder .t1
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder .t1"
-    ("uplevel" body line 10)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-3.6 FAILED
-
-
-
-==== wm-stackorder-3.7 unmapped toplevel, mapped children returned FAILED
-==== Contents of test case:
-
-    toplevel .t1 ; update
-    toplevel .t1.t2 ; update
-    wm withdraw .t1
-    wm stackorder .t1
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder .t1"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-3.7 FAILED
-
-
-
-==== wm-stackorder-3.8 toplevel mapped in idle callback FAILED
-==== Contents of test case:
-
-    toplevel .t1
-    wm stackorder .
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder ."
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-3.8 FAILED
-
-
-
-==== wm-stackorder-4.1 wm stackorder isabove|isbelow FAILED
-==== Contents of test case:
-
-    toplevel .t ; update
-    raise .t
-    wm stackorder . isabove .t
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder . isabove .t"
-    ("uplevel" body line 4)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-4.1 FAILED
-
-
-
-==== wm-stackorder-4.2 wm stackorder isabove|isbelow FAILED
-==== Contents of test case:
-
-    toplevel .t ; update
-    raise .t
-    wm stackorder . isbelow .t
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder . isbelow .t"
-    ("uplevel" body line 4)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-4.2 FAILED
 
 
 
@@ -6067,7 +5219,7 @@ window ".t" isn't mapped
 
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
----- errorInfo: 
+---- errorInfo: TkWmStackorderToplevel failed
     while executing
 "wm stackorder .t isabove ."
     ("uplevel" body line 6)
@@ -6088,7 +5240,7 @@ window ".t" isn't mapped
 
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
----- errorInfo: 
+---- errorInfo: TkWmStackorderToplevel failed
     while executing
 "wm stackorder .t isb ."
     ("uplevel" body line 5)
@@ -6096,31 +5248,6 @@ window ".t" isn't mapped
 "uplevel 1 $script"
 ---- errorCode: NONE
 ==== wm-stackorder-4.4 FAILED
-
-
-
-==== wm-stackorder-5.1 a menu is not a toplevel FAILED
-==== Contents of test case:
-
-    toplevel .t
-    menu .t.m -type menubar
-    .t.m add cascade -label "File"
-    .t configure -menu .t.m
-    update
-    raise .
-    raiseDelay
-    wm stackorder .
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder ."
-    ("uplevel" body line 9)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-5.1 FAILED
 
 
 
@@ -6135,15 +5262,10 @@ window ".t" isn't mapped
     raiseDelay
     wm stackorder . isabove .t
 
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder . isabove .t"
-    ("uplevel" body line 8)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
+---- Result was:
+1
+---- Result should have been (exact matching):
+0
 ==== wm-stackorder-5.2 FAILED
 
 
@@ -6161,7 +5283,7 @@ window ".t" isn't mapped
 
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
----- errorInfo: 
+---- errorInfo: TkWmStackorderToplevel failed
     while executing
 "wm stackorder .t isbelow ."
     ("uplevel" body line 8)
@@ -6169,39 +5291,6 @@ window ".t" isn't mapped
 "uplevel 1 $script"
 ---- errorCode: NONE
 ==== wm-stackorder-5.3 FAILED
-
-
-
-==== wm-stackorder-6.1 An embedded toplevel does not appear in the  stacking order FAILED
-==== Contents of test case:
-
-    toplevel .real -container 1
-    raiseDelay
-    toplevel .embd -bg blue -use [winfo id .real]
-    raiseDelay
-    wm stackorder .
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder ."
-    ("uplevel" body line 6)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-6.1 FAILED
-
-
-
-==== wm-title-1.1 usage FAILED
-==== Contents of test case:
-
-    wm title
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== wm-title-1.1 FAILED
 
 
 
@@ -6562,27 +5651,11 @@ withdrawn normal withdrawn normal
     raise .t1; raiseDelay; update
     lappend result [lsearch -all -inline -glob [wm stackorder .] ".t?"]
 
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: 
-    while executing
-"wm stackorder ."
-    ("uplevel" body line 10)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
+---- Result was:
+1 1 1 1 {.t2 .t1}
+---- Result should have been (exact matching):
+0 0 1 1 {.t1 .t2}
 ==== wm-transient-8.1 FAILED
-
-
-
-==== wm-state-1.1 usage FAILED
-==== Contents of test case:
-
-    wm state
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== wm-state-1.1 FAILED
 
 
 
@@ -6627,17 +5700,6 @@ iconic
 ---- Result should have been (exact matching):
 normal
 ==== wm-state-2.17 FAILED
-
-
-
-==== wm-withdraw-1.1 usage FAILED
-==== Contents of test case:
-
-    wm withdraw
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== wm-withdraw-1.1 FAILED
 
 
 
@@ -6883,4 +5945,4 @@ xmfbox.test
 ---- errorCode: TK LOOKUP WINDOW .foo.top
 ==== xmfbox-2.6 FAILED
 
-wish 13823: suicide: sys: trap: general protection violation pc=0x26f694
+wish 16510: suicide: sys: trap: general protection violation pc=0x26f694
