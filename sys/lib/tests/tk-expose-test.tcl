@@ -21,39 +21,58 @@
 # inside it, relaying out nothing. We relaid out and redrew the whole
 # widget, borders included.
 #
-# TWO PREDICTIONS FROM THE CODE, AND THEY WANT OPPOSITE FIXES. Reading
-# plan9/tkPlan9Init.c:
+# THE ANSWER IS (a): NO EXPOSE AT ALL, IN ANY OF THE FOUR SECTIONS.
+# The first run printed an empty "exposes:" line for every one of them,
+# including section 4, which raises a frame -- and that is the result
+# that pinned it down, because raising is the one path the code says
+# does expose.
+#
+# Reading plan9/tkPlan9Init.c with that in hand:
 #
 #   - XUnmapWindow sends UnmapNotify and NO Expose.
-#   - XDestroyWindow sends no Expose either.
-#   - P9ExposeTree -- the only thing that makes one, and it is reached
-#     only from XMapWindow, XRaiseWindow and XLowerWindow -- always
-#     exposes 0,0,pw->width,pw->height. THE WHOLE WINDOW, NEVER A
-#     RECTANGLE. There is no partial Expose anywhere in this port.
+#   - XDestroyWindow sent none either.
+#   - P9ExposeTree -- the only thing that makes one -- is reached from
+#     XMapWindow, XRaiseWindow and XLowerWindow, and always exposes
+#     0,0,pw->width,pw->height. There was no partial Expose anywhere.
+#   - AND generic Tk only calls XRaiseWindow/XLowerWindow for a
+#     TOPLEVEL. Tk_RestackWindow (tkWindow.c) reorders
+#     parentPtr->childList itself and tells the server about a sibling
+#     with XConfigureWindow + CWStackMode -- which was pure bookkeeping
+#     here, no repaint.
 #
-# So either
+# So this port repaired damage in exactly ONE case, XMapWindow, and:
 #
-#   (a) no Expose reaches .t at all, in which case destroying a window
-#       leaves its pixels on screen -- a visible bug quite apart from
-#       the test -- and the full relayout comes from somewhere else
-#       entirely (a resize, a ConfigureNotify, a geometry re-request),
-#       which is where to look next; or
+#	destroy a widget that overlapped another	-> pixels stayed
+#	place forget a widget				-> pixels stayed
+#	raise/lower a widget among its siblings		-> no repaint
 #
-#   (b) one whole-window Expose reaches .t, in which case the fix is
-#       damage RECTANGLES: on unmap or destroy, expose each sibling
-#       below with the departing window's rectangle intersected with
-#       that sibling and translated into its coordinates.
+# None of it visible from Tcl, because Tk believes it asked. And the
+# stacking tests still passed throughout, because Tk_CoordsToWindow
+# answers from Tk's own childList: the HIT TEST was right and only the
+# pixels were stale -- the trap the stacking section in CLAUDE.md warns
+# about, met from the other side.
 #
-# Those are different bugs in different files. Print the events rather
-# than guessing which -- the record in CLAUDE.md is that a confident
-# mechanism has been wrong here five times, and a printed intermediate
-# value settled it in one round each time.
+# FIXED by P9ExposeRect/P9DamageUnder in tkPlan9Init.c, called from
+# XDestroyWindow, XUnmapWindow and XConfigureWindow's CWStackMode path.
+# Erring towards MORE damage is deliberate: too much costs a repaint,
+# too little leaves stale pixels that nothing here will ever correct,
+# since there is no backing store and no server to ask.
 #
-# BE CAREFUL WITH (b). Sending too LITTLE damage is worse than sending
-# too much: too much costs a repaint, too little leaves stale pixels
-# that nothing will ever correct, because there is no backing store and
-# no server to ask. Any move in that direction wants this file re-run
-# with the rectangles printed, not just the test suite.
+# WHAT THIS FILE STILL HAS TO SETTLE. textDisp-7.1 relaid out the whole
+# widget where X relaid out nothing, and that was NOT the Expose --
+# there wasn't one. So a second cause is still unidentified, and the
+# redraw half of this file is what will name it.
+#
+# THE FIRST RUN COULD NOT MEASURE THAT HALF, and the reason is worth
+# keeping: tk_textRelayout and tk_textRedraw are only recorded while
+# the widget's own debugging is on -- textDisp.test's line 139 is
+#
+#	.t debug on
+#
+# and this file did not do it, so every "relayout:" line came back
+# empty and said nothing. Worse, `build` here *assigns* the two
+# variables, so the "does this Tk report them at all?" check could
+# never fail either. A check that cannot fail is not a check.
 #
 # ORDER: cheap and expected-to-return cases first, each printing a
 # flushed marker before it runs.
@@ -79,9 +98,10 @@ proc exposes {} {
 # on the way textDisp.test turns them on.
 proc build {} {
     destroy .t .f2
-    catch {unset ::tk_textRelayout}
-    catch {unset ::tk_textRedraw}
     pack [text .t -width 40 -height 10 -wrap char -bd 2 -relief sunken]
+    # WITHOUT THIS the two variables are never written and every
+    # "relayout:" line below reads empty for the wrong reason.
+    .t debug on
     for {set i 1} {$i <= 8} {incr i} {
 	.t insert end "Line $i of the text widget, long enough to wrap\n"
     }
@@ -93,14 +113,23 @@ proc build {} {
 }
 
 puts "--- does this Tk report relayout/redraw at all? ---"
+destroy .t
+catch {unset ::tk_textRelayout}
+pack [text .tprobe -width 20 -height 4]
+.tprobe debug on
+.tprobe insert end "probe\n"
+update
+if {![info exists ::tk_textRelayout]} {
+    note "tk_textRelayout still does not exist after '.t debug on' and an"
+    note "insert -- this wish records nothing, so the redraw half of this"
+    note "file cannot report anything. The Expose half still can."
+} else {
+    note "yes: tk_textRelayout is '$::tk_textRelayout'"
+}
+destroy .tprobe
 build
 note ".t is [winfo width .t]x[winfo height .t] at\
  [winfo rootx .t],[winfo rooty .t]"
-if {![info exists ::tk_textRelayout]} {
-    note "tk_textRelayout does not exist -- this wish was not built with"
-    note "the text widget's debugging hooks, so the redraw half of this"
-    note "file cannot report anything. The Expose half still can."
-}
 
 puts ""
 puts "--- 1. map: the case that is known to work ---"
@@ -124,18 +153,23 @@ note "relayout: [expr {[info exists ::tk_textRelayout] ? $::tk_textRelayout : {n
 note "redraw:   [expr {[info exists ::tk_textRedraw] ? $::tk_textRedraw : {n/a}}]"
 puts ""
 if {[llength $e] == 0} {
-    puts "  => (a) NO Expose reached .t."
-    puts "     Destroying a window leaves its pixels on screen here, and"
-    puts "     the relayout above came from something else. Look at what"
-    puts "     else fired: a ConfigureNotify on .t, or a geometry"
-    puts "     re-request from place forgetting the slave."
+    puts "  => REGRESSION: no Expose reached .t."
+    puts "     This is what the first run reported and what P9DamageUnder"
+    puts "     was written to fix. Destroying a window is leaving its"
+    puts "     pixels on screen again."
 } else {
     set r [lindex $e 0]
-    puts "  => (b) an Expose DID reach .t: $r"
-    puts "     Compare its w/h against .t's [winfo width .t]x[winfo height .t]."
-    puts "     Equal means whole-window damage and the fix is rectangles;"
-    puts "     smaller means the granularity is already there and the"
-    puts "     relayout has another cause."
+    puts "  => an Expose reached .t: $r"
+    puts "     .t is [winfo width .t]x[winfo height .t]. The rectangle should"
+    puts "     be .f2's, not the whole widget -- .f2 was 60% x 55% of .t"
+    puts "     placed at 20%,22%, so roughly 148x59 at +49+23."
+    puts "     Whole-widget means P9ExposeRect's clipping is wrong."
+    puts ""
+    puts "     Then read the relayout line above. X relays out NOTHING"
+    puts "     here and redraws six display lines; a full relayout means"
+    puts "     the second cause behind textDisp-7.1 is still there and is"
+    puts "     NOT the Expose -- look for a ConfigureNotify on .t or a"
+    puts "     geometry re-request from place forgetting the slave."
 }
 
 puts ""
@@ -154,7 +188,12 @@ note "relayout: [expr {[info exists ::tk_textRelayout] ? $::tk_textRelayout : {n
 destroy .f3
 
 puts ""
-puts "--- 4. raise/lower, the paths that DO expose today ---"
+# THE DECISIVE SECTION ON THE FIRST RUN. Reading the code, raising is
+# the ONE path that was supposed to expose -- and it reported nothing,
+# which is what sent the search to Tk_RestackWindow and found that a
+# non-toplevel never reaches XRaiseWindow at all. Keep it as the
+# regression test for the CWStackMode path.
+puts "--- 4. raise/lower: the sibling path, which reaches XConfigureWindow ---"
 step "4. two overlapping frames in .t, raise the lower one"
 build
 frame .fa -bg green
@@ -162,13 +201,20 @@ frame .fb -bg yellow
 place .fa -in .t -relx 0.1 -rely 0.1 -relwidth 0.5 -relheight 0.5
 place .fb -in .t -relx 0.3 -rely 0.3 -relwidth 0.5 -relheight 0.5
 watch .fa
+watch .fb
 update
 exposes
 raise .fa
 update
-note "exposes: [exposes]"
-note "(.fa is [winfo width .fa]x[winfo height .fa] -- an Expose of exactly"
-note " that size is P9ExposeTree doing whole-window damage, by design)"
+set e [exposes]
+note "exposes: $e"
+note "(.fa is [winfo width .fa]x[winfo height .fa]; .fb is\
+ [winfo width .fb]x[winfo height .fb])"
+if {[llength $e] == 0} {
+    note "REGRESSION: raising a sibling repainted nothing. raise/lower on"
+    note "a widget goes through XConfigureWindow with CWStackMode, NOT"
+    note "XRaiseWindow -- see Tk_RestackWindow in generic/tkWindow.c."
+}
 destroy .fa .fb
 
 puts ""

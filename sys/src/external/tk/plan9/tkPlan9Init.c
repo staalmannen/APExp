@@ -431,10 +431,14 @@ XCreateSimpleWindow(
                          CopyFromParent, CWBackPixel|CWBorderPixel, &attr);
 }
 
+/* Repair what a window was covering; defined with P9ExposeTree below. */
+static void P9DamageUnder(Display *display, P9Window *pw);
+
 int
 XDestroyWindow(Display *display, Window w)
 {
     TkWindow *winPtr;
+    P9Window *pw;
 
     /*
      * tkPointer.c remembers the window the pointer was last in; a dead
@@ -444,6 +448,16 @@ XDestroyWindow(Display *display, Window w)
     winPtr = (TkWindow *) Tk_IdToWindow(display, w);
     if (winPtr != NULL)
         TkPointerDeadWindow(winPtr);
+
+    /*
+     * Repair the hole BEFORE the slot is freed -- P9DamageUnder needs
+     * this window's rectangle and its parent, and both are gone the
+     * moment TkP9FreeWindow marks the slot unused.
+     */
+    pw = TkP9FindWindow(w);
+    if (pw != NULL && pw->mapped)
+        P9DamageUnder(display, pw);
+
     TkP9FreeWindow(w);
     gP9.pointerDirty = 1;
     return 0;
@@ -544,6 +558,9 @@ XUnmapWindow(Display *display, Window w)
     ev.xunmap.event      = w;
     ev.xunmap.window     = w;
     TkP9EnqueueEvent(&ev);
+
+    /* Whatever it was covering has to repaint; see P9DamageUnder. */
+    P9DamageUnder(display, pw);
     return 0;
 }
 
@@ -591,6 +608,94 @@ P9ExposeTree(Display *display, Window w)
         if (c->inuse && !c->ispixmap && c->parent == w && c->xid != w)
             P9ExposeTree(display, c->xid);
     }
+}
+
+/*
+ * The same thing over a RECTANGLE rather than a whole window: expose w
+ * and its mapped children, each clipped to the part of the rectangle
+ * that falls inside it. x,y,width,height are in w's own coordinates.
+ *
+ * Children are exposed after their parent so they repaint on top of it:
+ * drawing here goes straight into the one rio window with no clipping,
+ * so the order of the events IS the stacking, and P9ExposeTree above
+ * relies on the same thing.
+ */
+static void
+P9ExposeRect(Display *display, Window w, int x, int y, int width, int height)
+{
+    P9Window *pw = TkP9FindWindow(w);
+    XEvent ev;
+    int i;
+
+    if (pw == NULL || !pw->mapped || pw->ispixmap)
+        return;
+
+    /* Clip to the window itself; nothing outside it was ever its to paint. */
+    if (x < 0)          { width  += x; x = 0; }
+    if (y < 0)          { height += y; y = 0; }
+    if (x + width  > pw->width)  width  = pw->width  - x;
+    if (y + height > pw->height) height = pw->height - y;
+    if (width <= 0 || height <= 0)
+        return;
+
+    memset(&ev, 0, sizeof(ev));
+    ev.type            = Expose;
+    ev.xexpose.display = display;
+    ev.xexpose.window  = w;
+    ev.xexpose.x       = x;
+    ev.xexpose.y       = y;
+    ev.xexpose.width   = width;
+    ev.xexpose.height  = height;
+    ev.xexpose.count   = 0;
+    TkP9EnqueueEvent(&ev);
+
+    for (i = 0; i < gP9.nwins; i++) {
+        P9Window *c = &gP9.wins[i];
+        if (c->inuse && !c->ispixmap && c->parent == w && c->xid != w)
+            P9ExposeRect(display, c->xid, x - c->x, y - c->y, width, height);
+    }
+}
+
+/*
+ * A window is going away, or moving, or being restacked: repair what it
+ * was covering.
+ *
+ * NOTHING DID THIS. Damage was repaired in exactly one place --
+ * XMapWindow, which exposes the window that just appeared -- and in
+ * XRaiseWindow/XLowerWindow, which generic Tk only calls for TOPLEVELS
+ * (Tk_RestackWindow sends a sibling through XConfigureWindow with
+ * CWStackMode instead, and that was a pure bookkeeping call here). So
+ *
+ *	destroy a widget that overlapped another	-> its pixels stayed
+ *	place forget a widget				-> same
+ *	raise/lower a widget among its siblings		-> no repaint
+ *
+ * and none of it was visible from Tcl, because Tk believes it asked for
+ * the repaint. sys/lib/tests/tk-expose-test.tcl reports the Expose
+ * events with their rectangles and found all four cases silent.
+ *
+ * The rectangle is the departing window's, in its PARENT's coordinates,
+ * which is where P9Window.x/y already are -- the recurring trap in this
+ * port is confusing those with screen coordinates (see the stacking
+ * section in CLAUDE.md), and here the parent is exactly the frame the
+ * damage is expressed in.
+ *
+ * Erring towards MORE damage is the safe direction and is what this
+ * does: too much costs a repaint, too little leaves stale pixels that
+ * nothing here will ever correct, since there is no backing store and
+ * no server to ask.
+ */
+static void
+P9DamageUnder(Display *display, P9Window *pw)
+{
+    P9Window *parent;
+
+    if (pw == NULL || pw->ispixmap || pw->parent == pw->xid)
+        return;
+    parent = TkP9FindWindow(pw->parent);
+    if (parent == NULL)
+        return;
+    P9ExposeRect(display, parent->xid, pw->x, pw->y, pw->width, pw->height);
 }
 
 int
@@ -735,13 +840,32 @@ XConfigureWindow(Display *display, Window w,
                  unsigned int value_mask, XWindowChanges *values)
 {
     P9Window *pw = TkP9FindWindow(w);
-    (void)display;
+
     if (!pw || !values) return 0;
     if (value_mask & CWX)           pw->x            = values->x;
     if (value_mask & CWY)           pw->y            = values->y;
     if (value_mask & CWWidth)       pw->width        = values->width  > 0 ? values->width  : 1;
     if (value_mask & CWHeight)      pw->height       = values->height > 0 ? values->height : 1;
     if (value_mask & CWBorderWidth) pw->border_width = values->border_width;
+
+    /*
+     * CWStackMode is how "raise"/"lower" reaches a NON-TOPLEVEL. Tk
+     * reorders parentPtr->childList itself and then tells the server
+     * with this call (tkWindow.c Tk_RestackWindow); only a toplevel
+     * goes through TkWmRestackToplevel and so through XRaiseWindow.
+     *
+     * That is why raising a widget among its siblings repainted
+     * nothing here while raising a toplevel worked -- and why the
+     * stacking tests still passed: Tk_CoordsToWindow answers from Tk's
+     * own childList, so the HIT TEST was right and only the pixels were
+     * stale. Exactly the trap the stacking section in CLAUDE.md warns
+     * about, met from the other side.
+     *
+     * The order changed, so everything this window overlaps has to
+     * repaint, itself included -- damage its rectangle in the parent.
+     */
+    if ((value_mask & CWStackMode) && pw->mapped)
+        P9DamageUnder(display, pw);
     return 0;
 }
 
