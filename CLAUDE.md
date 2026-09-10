@@ -1730,21 +1730,24 @@ below. Everything above this line in the section was a 62-file prefix;
 this is the first measurement of the whole thing, and the list has been
 re-derived rather than extended.
 
-**345 failing tests** after the `wm` work below; **485** on the first
-full run, up from 25 -- which was the expected shape of measuring 35
-files for the first time, not a regression. Attributed by file, first
-full run then after `wm`:
+**287 failing tests**, from **485** on the first full run -- which was
+up from 25 only because that run was the first to measure 35 files at
+all, not a regression. Attributed by file across the three runs:
 
-| file | 485-run | 345-run |
-|---|---|---|
-| `wm.test` | 202 | 130 |
-| `unixWm.test` | 129 | 62 |
-| `unixEmbed.test` | 29 | 29 |
-| `textDisp.test` | 23 | 23 |
-| `select.test` | 23 | 23 |
-| `unixSelect.test` | 18 | 18 |
-| `systray.test` | 13 | 13 |
-| `winfo.test` | 6 | 4 |
+| file | run 1 | run 2 | run 3 |
+|---|---|---|---|
+| `wm.test` | 202 | 130 | 74 |
+| `unixWm.test` | 129 | 62 | 60 |
+| `unixEmbed.test` | 29 | 29 | 29 |
+| `textDisp.test` | 23 | 23 | 23 |
+| `select.test` | 23 | 23 | 23 |
+| `unixSelect.test` | 18 | 18 | 18 |
+| `systray.test` | 13 | 13 | 13 |
+| `winfo.test` | 6 | 4 | 4 |
+
+**Everything outside `wm` is untouched so far**, which is the honest
+reading: the 198 fixed are all one area, and the six files below it in
+that table have had no attention at all.
 
 The first-run breakdown, kept because the reasoning below refers to it:
 
@@ -1820,11 +1823,46 @@ to the same question.
 generic-Tk reparenting operations, seven tests, and doing them wrongly
 is worse than not doing them.
 
-**The remaining wm failures are not this.** `state`, `iconify`,
-`deiconify`, `withdraw`, `minsize`, `maxsize`, `resizable`, `geometry`
-and `stackorder` were all *implemented* and still failing, so expect a
-second, different cause underneath. Do not read the next run's drop as
-"the wm work is done".
+**The remaining wm failures were not this**, as predicted -- `state`,
+`iconify`, `minsize`, `maxsize`, `resizable` and `geometry` were all
+implemented and still failing. `wm.test` went 202 -> 130 -> 74 over the
+three runs. Two more causes found, both real behaviour rather than
+bookkeeping:
+
+**`wm minsize`/`maxsize` were clamped in the wrong units.**
+`WmUpdateGeometry` converted grid units to pixels *first* and then
+clamped, so
+
+```tcl
+wm grid .t 1 1 50 50
+wm geom .t 4x4			;# 4 grid units = 200 pixels
+wm minsize .t 8 8		;# 8 GRID UNITS
+```
+
+asked whether `200 < 8` and left the window at 4x4. min/max speak grid
+units whenever the toplevel is gridded, exactly as `wm geometry` does --
+the convention already documented below, which this one place did not
+follow. The clamp now happens in those units and the conversion is last;
+both helpers are the identity when `gridWin` is NULL, so the ungridded
+path needs no branch. **The note below saying this was "inert today,
+since the defaults are 1 and unlimited" was true only while the tests
+that exercise it could not run.**
+
+**`wm transient` is behaviour, not just storage**, and three rules were
+missing:
+
+- the master is resolved to its nearest **toplevel** ancestor, so
+  `wm transient .subject .top.f` records `.top` and reads back as `.top`;
+- a transient **cannot be iconified** -- upstream refuses with
+  `can't iconify "%s": it is a transient`, because a dialog is shown and
+  hidden with the window it belongs to;
+- a transient made transient to an **iconic or withdrawn** master is
+  withdrawn at once.
+
+Only the state *at the moment of the call* is honoured. Upstream also
+tracks the master afterwards through a structure handler on it; that is
+a larger change and its tests are separate, so it is deliberately not
+done here.
 
 The eleven that were already implemented:
 `geometry`, `minsize`, `maxsize`, `withdraw`, `deiconify`, `state`,
