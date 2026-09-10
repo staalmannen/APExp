@@ -1725,7 +1725,82 @@ character put line breaks mid-word and in the wrong place for tabs
 
 ### Tk on Plan 9: what the remaining test failures are, and which are ours
 
-The suite is at **25 failing tests** (`grep -c FAILED` counts two lines
+**THE SUITE NOW RUNS ALL 97 FILES**, since the `TkScrollWindow` fix
+below. Everything above this line in the section was a 62-file prefix;
+this is the first measurement of the whole thing, and the list has been
+re-derived rather than extended.
+
+**485 failing tests** (970 `FAILED` lines, two per test), up from 25 --
+which is the expected shape of measuring 35 files for the first time,
+not a regression. Attributed by file:
+
+| file | failing |
+|---|---|
+| `wm.test` | 202 |
+| `unixWm.test` | 129 |
+| `unixEmbed.test` | 29 |
+| `textDisp.test` | 23 |
+| `select.test` | 23 |
+| `unixSelect.test` | 18 |
+| `systray.test` | 13 |
+| `winfo.test` | 6 |
+| everything else | 42 across 22 files |
+
+**`wm` is 331 of the 485, and it is one cause.** `Tk_WmObjCmd` in
+`tkPlan9Wm.c` lists 33 subcommands and implements **eleven**:
+`geometry`, `minsize`, `maxsize`, `withdraw`, `deiconify`, `state`,
+`stackorder`, `iconname`, `title`, `resizable`, `frame`. The other 22
+fall through to `default:` and answer nothing, which is why almost every
+failure in those two files has the shape
+
+```
+got   {} {} {}
+want  {} {3 4 10 2} {}
+```
+
+-- the test queries (empty), sets, queries again expecting what it set,
+unsets, queries again. **This is `wm title` again, times 22** (see the
+"four wm and keysym stubs that answered plausibly" section): the fact
+that rio makes most of these do nothing is irrelevant to the *query*
+contract, which is what the tests check and what portable Tk code
+reads back. `aspect`, `client`, `colormapwindows`, `command`,
+`focusmodel`, `group`, `iconbitmap`, `iconmask`, `iconphoto`,
+`iconposition`, `iconwindow`, `overrideredirect`, `positionfrom`,
+`protocol`, `sizefrom` and `transient` all need storing in `WmInfo` and
+reporting back, whatever they do or do not do to the screen.
+
+**It does not exit cleanly.** There is still no
+`tk-runall: runAllTests returned` marker, because after the last test
+of the last file `wish` dies:
+
+```
+==== xmfbox-2.6 FAILED
+wish 11179: suicide: sys: trap: general protection violation pc=0x26f694
+```
+
+A crash rather than a hang this time, and at teardown rather than in a
+test. That is its own bug and wants `pc=0x26f694` resolved against the
+binary.
+
+`unixWm.test`, `unixSelect.test`, `unixEmbed.test` and `unixFont.test`
+run here because `tcl_platform(platform)` is `unix`, so the `unix`
+constraint is true; on Windows they are skipped. **Do not assume they
+should all pass** -- they test X server behaviour specifically, and some
+of them are asking for things Plan 9 has no concept of, in the way
+`clipboard-4.*` asks for X selection ownership. Each cluster needs
+reading before it is counted as ours.
+
+`event.test` is down to 2 from 3, which is the `event-9.16`
+nondeterminism noted above showing itself again: it passed this run.
+
+---
+
+**The rest of this section predates that run** and describes the 62-file
+prefix. It is kept because the reasoning about each individual failure
+is still good, but **the counts in it are stale**; the table above
+supersedes them.
+
+The prefix was at **25 failing tests** (`grep -c FAILED` counts two lines
 each, so 50 lines).
 
 **It was 24, and the twenty-fifth is `event-9.16` -- which passed the
