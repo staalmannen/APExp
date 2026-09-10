@@ -1955,16 +1955,51 @@ registers the **`Container *` itself** as client data, so it never
 looks anything up and can never fail to find it. That is a real
 difference and a real hole.
 
-**It is not yet shown to be this crash.** `-singleproc 1` leaves ~30
-toplevels alive at exit -- safe.test's "Untrusted Tcl applet"
-containers among them -- and teardown touches all of them, so there is
-more than one route to a dead window.
-`sys/lib/tests/tk-embed-destroy-test.tcl` exists to make the answer a
-printed line rather than an argument: it builds container/embedded
-pairs, destroys each half first in turn, and **provokes a geometry
-request afterwards**, which is the step that matters -- destroying the
-container proves nothing on its own, because nothing dereferences the
-stale pointer until something asks for a resize.
+**REFUTED, and the reason is worth more than the result.**
+`sys/lib/tests/tk-embed-destroy-test.tcl` runs every ordering --
+destroy the embedded half first, the container first, the container's
+toplevel, five live pairs at once, and Tk's own exit teardown -- and
+**provokes a geometry request after each**, which is the step that
+matters, since nothing dereferences a stale pointer until something
+asks for a resize. All of it returns.
+
+Section 4 says why, in one line:
+
+```
+STEP: 4. destroy the CONTAINER half, then provoke a geometry request
+     .c gone      .c.f gone      .e gone
+  ok: the embedded half went with its container, so nothing to poke
+```
+
+**The embedded half dies with its container**, and that is structural
+rather than luck: `Tk_MakeWindow` creates an embedded toplevel as a
+*child of the container window* -- that substitution *is* the embedding
+here (see the embedding section above). So `containerPtr->parentPtr`
+cannot outlive an embedded half that could still make a request, and
+the `ContainerEventProc` hole above -- real though it is -- cannot
+produce this crash. Fix it on its own merits if you like; do not expect
+the crash to go with it.
+
+**So the caller is still unidentified.** The other things that call
+`Tk_GeometryRequest` on a window they stored earlier are generic Tk's:
+`Tk_MaintainGeometry`, which registers a placed window with *every*
+master between it and its parent -- and which is already implicated in
+the one known-open port bug, `geometry-4.7`.
+
+**Bisect the crash by test file, the way `scrollbar.test` was found.**
+It is deterministic, it is at exit, and it depends on suite state:
+every hand-written test in `sys/lib/tests` ends in `exit 0` without
+crashing, so a bare `wish` teardown is fine. `tk-runall.tcl` forwards
+its arguments to tcltest, so halving is one command and no rebuild:
+
+```
+wish $home/APExp/sys/lib/tests/tk-runall.tcl -file {[a-m]*.test}
+wish $home/APExp/sys/lib/tests/tk-runall.tcl -file {[n-z]*.test}
+```
+
+The marker line at the end distinguishes the two outcomes: with
+`tk-runall: runAllTests returned, N failed` present, that half exits
+cleanly and the state that kills wish is in the other one.
 
 **The crash hides nothing.** `xmfbox` is the last file alphabetically,
 so all 97 files and every failure are already measured; only the
