@@ -1921,29 +1921,43 @@ inside the event loop: the same scroll from an **idle** handler, from a
 **timer** (`after 0`), and from a **`<Key>`** binding, none of which
 touch the pointer machinery.
 
-**`7e1b` hangs -- an idle handler, no event, no binding -- which
-exonerates the whole event and pointer machinery.** But it also
-introduced a second difference and so cannot yet be read that way: the
-sections from `7e1b` on use `build2`, whose widget set is **not** the
-one step 2 scrolled. `build` packs the text first and the scrollbar
-second; `build2` packs the *scrollbar* first, with `-expand 1`, and
-scrolls a different text widget. So "top level vs event loop" and "one
-widget arrangement vs another" changed together -- **the same
-three-differences-at-once trap this file has now been caught by three
-times** (`canvas-23.*`, step 6 versus step 8, and this).
+**The event loop is not the operative half, and every sentence above
+about "inside delivery" was describing the wrong thing.** The control
+settled it: `build2`'s widgets scrolled **at the top level** --
+nothing delivered, no binding, no idle handler -- and the *scroll
+returned*. The **`update` after it** is what hangs. So the sequence is
+scroll completes, then the **redisplay** that follows never settles;
+every earlier section that hung was hanging in its trailing `update`,
+not in the delivery it was written to test.
 
-`7e1a1`..`7e1a3` are the missing controls, and they run first:
-`build2`'s own widgets scrolled at the **top level**, and `build`'s
-widgets scrolled from an **idle handler**. Only one of those can hang,
-and which one it is decides whether any of this is about the event loop
-at all.
+Geometry is ruled out too, and cheaply: both text widgets come out
+`486x246` and mapped, so a text widget laid out into no height -- a
+good way to make `tkTextDisp.c` loop -- is not it.
 
-Both builders now print `winfo width`/`height`/`ismapped` for each
-widget, which is a specific suspicion rather than tidiness: `build2`
-gives the scrollbar the expanding half of the cavity, and **a text
-widget laid out into no height** is a very good way to make
-`tkTextDisp.c` loop while looking exactly like a scrolling bug from
-Tcl.
+What remains is the difference between `build` and `build2`, and there
+are **two**: pack order, and whether the pair is wired to each other.
+The 2x2 in the test asks all four with **one widget name throughout**,
+changing one thing at a time, known-hanging arrangement last:
+
+| | pack order | wired | |
+|---|---|---|---|
+| A | text first | yes | `build`'s; step 2+5 returned |
+| B | text first | no | |
+| C | scrollbar first | yes | |
+| D | scrollbar first | no | `build2`'s; hangs |
+
+and each outcome points somewhere different:
+
+- **only D** -- the pair of differences, not either alone.
+- **C and D** -- **pack order**, i.e. the text widget sitting at `x=10`
+  rather than `x=0`. A scroll is a copy of a rectangle from one place
+  to another, and this port has a documented history of confusing
+  parent-relative with screen coordinates in exactly that way (see the
+  stacking section above, where `WindowAtPoint` and
+  `GenerateMouseEvent` both made it).
+- **B and D** -- the **wiring**: with `-yscrollcommand` set, `.s set`
+  runs after every scroll and evidently settles something that
+  otherwise does not.
 
 **Every binding counts and prints its own invocation number**, because
 the one fact that decides the shape is whether the binding runs once or
