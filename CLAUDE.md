@@ -1727,25 +1727,35 @@ character put line breaks mid-word and in the wrong place for tabs
 
 ### Tk on Plan 9: what the remaining test failures are, and which are ours
 
-**THE SUITE NOW RUNS ALL 97 FILES**, since the `TkScrollWindow` fix
-below. Everything above this line in the section was a 62-file prefix;
-this is the first measurement of the whole thing, and the list has been
-re-derived rather than extended.
+**THE SUITE NOW RUNS ALL 97 FILES AND EXITS CLEANLY**, since the
+`TkScrollWindow` fix below and the window-table leak further down.
+Everything above this line in the section was a 62-file prefix; the
+table below is the whole thing, and the list has been re-derived rather
+than extended.
 
-**287 failing tests**, from **485** on the first full run -- which was
+```
+all.tcl:  Total 10027  Passed 8320  Skipped 1429  Failed 278
+Sourced 97 Test Files.
+```
+
+**278 failing tests**, from **485** on the first full run -- which was
 up from 25 only because that run was the first to measure 35 files at
-all, not a regression. Attributed by file across the three runs:
+all, not a regression. Attributed by file across the runs:
 
-| file | run 1 | run 2 | run 3 |
-|---|---|---|---|
-| `wm.test` | 202 | 130 | 74 |
-| `unixWm.test` | 129 | 62 | 60 |
-| `unixEmbed.test` | 29 | 29 | 29 |
-| `textDisp.test` | 23 | 23 | 23 |
-| `select.test` | 23 | 23 | 23 |
-| `unixSelect.test` | 18 | 18 | 18 |
-| `systray.test` | 13 | 13 | 13 |
-| `winfo.test` | 6 | 4 | 4 |
+| file | run 1 | run 2 | run 3 | run 4 |
+|---|---|---|---|---|
+| `wm.test` | 202 | 130 | 74 | 66 |
+| `unixWm.test` | 129 | 62 | 60 | 59 |
+| `unixEmbed.test` | 29 | 29 | 29 | 29 |
+| `textDisp.test` | 23 | 23 | 23 | 23 |
+| `select.test` | 23 | 23 | 23 | 23 |
+| `unixSelect.test` | 18 | 18 | 18 | 18 |
+| `systray.test` | 13 | 13 | 13 | 13 |
+| `winfo.test` | 6 | 4 | 4 | 4 |
+
+Run 4 is the first one that finished, so it is also the first whose
+total can be checked against tcltest's own rather than against
+`grep -c FAILED` halved. The two agree: 278.
 
 **Everything outside `wm` is untouched so far**, which is the honest
 reading: the 198 fixed are all one area, and the six files below it in
@@ -1894,8 +1904,12 @@ Storing is not the whole of it where a value can be *validated*:
 name that cannot be resolved is the same class of lie as answering the
 empty string.
 
-**It does not exit cleanly.** After the last test of the last file
-`wish` dies, at the same address every run:
+**It used not to exit cleanly, and this is how that was chased.**
+**FIXED** -- the answer is the window-table leak at the end of this
+subsection, and everything between here and there is the route to it,
+kept because most of it is method rather than result. After the last
+test of the last file `wish` used to die, at the same address every
+run:
 
 ```
 ==== xmfbox-2.6 FAILED
@@ -2205,16 +2219,61 @@ in another function twenty minutes later, and the climbing high-water
 mark distinguished a leak from a working set. Neither was visible from
 Tcl at all.
 
-**Both symptoms should go with it, and that is the thing to check on
-the next run.** Once the table is full every `XCreateWindow` answers
-`None`, so a frame exists to Tk and not to this port -- `bad window
-path name ".foo.top"` -- and generic Tk keys `dispPtr->winTable` on the
-window id, so every such window collides on id 0 and they delete each
-other's entries. A use-after-free of a `TkWindow` reached through that
-table is exactly the fault `acid` resolved to `Tk_GeometryRequest`. If
-`xmfbox-2.6` still fails, or the fault survives, then there is a second
-cause and `Tk_MaintainGeometry` is back on the list -- but do not
-assume that in advance.
+**Both symptoms went with it, and the suite now finishes and exits.**
+The next run has no occupancy line at all -- so the table never passed
+256, where it used to climb to 2048 -- and it ends:
+
+```
+xmfbox.test
+
+Tests ended at 2026-09-10 15:04:38 +0200
+all.tcl:  Total 10027  Passed 8320  Skipped 1429  Failed 278
+Sourced 97 Test Files.
+...
+tk-runall: every file ran, now entering exit (code 0)
+```
+
+`xmfbox.test` reports **no failure at all** now, and there is no
+general protection violation. Both were downstream of the exhaustion,
+as expected: with the table full every `XCreateWindow` answered `None`,
+so a frame existed to Tk and not to this port -- `bad window path name
+".foo.top"` -- and generic Tk keys `dispPtr->winTable` on the window
+id, so every such window collided on id 0 and they deleted each other's
+entries. A use-after-free of a `TkWindow` reached through that table is
+exactly the fault `acid` resolved to `Tk_GeometryRequest`. So
+`Tk_MaintainGeometry` is off the list for the crash; it is still the
+suspect for `geometry-4.7`, which is a different and much smaller
+thing.
+
+**This is the first complete accounting of the whole suite**, and it
+supersedes every count above it. `Total 10027` -- the `[n-z]` half
+alone had said 5007, and no earlier run reached a total at all.
+
+| file | failing |
+|---|---|
+| `wm.test` | 66 |
+| `unixWm.test` | 59 |
+| `unixEmbed.test` | 29 |
+| `textDisp.test` | 23 |
+| `select.test` | 23 |
+| `unixSelect.test` | 18 |
+| `systray.test` | 13 |
+| `winfo`, `font`, `event`, `clipboard` | 4 each |
+| `tk`, `textTag`, `imgListFormat` | 3 each |
+| `textWind`, `place`, `pack` | 2 each |
+| `winWm`, `visual`, `unixFont` and 9 more | 1 each |
+
+**278, and `wm` plus `unixWm` are 125 of them.** Everything below
+`unixSelect` in that table is a handful, so the shape of the remaining
+work is: two files that have had attention and need more, four that
+have had none (`unixEmbed`, `textDisp`, `select`, `systray`), and a
+long tail of ones and twos that the sections below already account for
+individually.
+
+`Skipped 1429` is constraints and is not a target: `win` 337, `fonts`
+126, `nonPortable`, `aqua` 30, `winSend` 51, plus the `test*`
+constraints (`testwrapper` 54, `testtext` 31, `testutils` 20) which
+need `tktest` rather than `wish` -- see the `imgListFormat` note below.
 
 `unixWm.test`, `unixSelect.test`, `unixEmbed.test` and `unixFont.test`
 run here because `tcl_platform(platform)` is `unix`, so the `unix`
