@@ -1751,27 +1751,48 @@ wrong order, so keep them apart:
   byte-identical 535 lines, so `runAllTests` never returned. The first
   two explanations were both true and neither was the cause.
 
-`sys/lib/tests/tk-runall.tcl` now sets line buffering before anything is
-written and prints
+`sys/lib/tests/tk-runall.tcl` sets line buffering before anything is
+written and prints `tk-runall: runAllTests returned, N failed` when the
+suite completes. With both in place the answer is settled:
+
+**The hang is in `scrollbar.test`.** The marker is absent, so
+`runAllTests` never returned, and with line buffering the last name in
+the log is now genuinely where it stopped rather than wherever the 4 KB
+boundary fell. It is not `select.test` -- that was a guess from the
+buffered log, and the buffered log could not have supported it.
+
+**It spins rather than blocks.** The CPU meter stays high for as long as
+it is wedged while nothing is written. That rules out a blocked read --
+a child wish that never answers, a `/dev/mouse` read, a pipe -- and
+points at a loop: either the notifier never sleeping, or a layout or
+event cycle that never settles.
+
+**The notifier is prior art for exactly this.** `DisplaySetupProc` sets
+a zero maximum block time whenever `TkP9EventsPending()`, and only
+otherwise sleeps `P9_POLL_US`. An event that is regenerated as fast as
+it is drained therefore pins the CPU with no progress -- which is the
+100% CPU spin this port already had once, when the block time was zero
+unconditionally. `gP9.pointerDirty` is the obvious way to reach that
+state: `DisplayCheckProc` clears it and calls `TkP9UpdatePointer`, so
+anything that maps, unmaps or destroys a window from a crossing handler
+sets it again.
+
+**Suspected, not established**: `scrollbar-10.1` is the first test in
+the suite to wire a text widget and a scrollbar to each other --
+`text .t -yscrollcommand {.s set}` with `scrollbar .s -command
+{.t yview}` -- which is a feedback loop by construction, and it then
+sends `<Enter>` and `<MouseWheel>` at it. Neither ingredient is new on
+its own (four earlier files create a text widget, and `bind.test` sends
+MouseWheel), so it is the combination or nothing.
+
+**Name the test before touching anything.** No rebuild is needed:
 
 ```
-tk-runall: runAllTests returned, N failed
+wish $home/APExp/sys/lib/tests/tk-runall.tcl -file scrollbar.test -verbose t
 ```
 
-which is the discriminator. **Present**: every file ran, and whatever is
-wedged is in `exit` -- `Tcl_Exit` destroying the main window, i.e. this
-port's teardown, which the leftover windows on screen also point at.
-**Absent**: a test file hung, and with line buffering the last name in
-the log is now genuinely where it stopped.
-
-The next file after `scrollbar.test` is `select.test`, and `select.test`
-and `send.test` are the only two of the remaining 35 that spawn a child
-wish (`childTkProcess`) -- the handshake that already cost a round trip
-once, see `tk-childproc-test.tcl`. Note `send` itself is not built here:
-`unix/tkUnixSend.c` is absent from the libtk mkfile and the port
-supplies only `TkpTestsendCmd`, which errors. Bisect with
-`wish .../tk-runall.tcl -file select.test`; every option is forwarded to
-tcltest.
+`-verbose t` prints each test name as it *starts*, so the last line
+names the hanging test exactly. Every option is forwarded to tcltest.
 
 The leftover windows are a third thing and not a mystery: `all.tcl` sets
 `-singleproc 1`, so all 97 files are sourced into one wish and every
