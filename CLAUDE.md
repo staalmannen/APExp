@@ -1730,9 +1730,23 @@ below. Everything above this line in the section was a 62-file prefix;
 this is the first measurement of the whole thing, and the list has been
 re-derived rather than extended.
 
-**485 failing tests** (970 `FAILED` lines, two per test), up from 25 --
-which is the expected shape of measuring 35 files for the first time,
-not a regression. Attributed by file:
+**345 failing tests** after the `wm` work below; **485** on the first
+full run, up from 25 -- which was the expected shape of measuring 35
+files for the first time, not a regression. Attributed by file, first
+full run then after `wm`:
+
+| file | 485-run | 345-run |
+|---|---|---|
+| `wm.test` | 202 | 130 |
+| `unixWm.test` | 129 | 62 |
+| `unixEmbed.test` | 29 | 29 |
+| `textDisp.test` | 23 | 23 |
+| `select.test` | 23 | 23 |
+| `unixSelect.test` | 18 | 18 |
+| `systray.test` | 13 | 13 |
+| `winfo.test` | 6 | 4 |
+
+The first-run breakdown, kept because the reasoning below refers to it:
 
 | file | failing |
 |---|---|
@@ -1755,13 +1769,38 @@ an implementation cannot repeat this silently. (A check that the two
 lists match: `awk` the `enum` block for `OPT_*` and compare against
 `grep -o 'case OPT_[A-Z]*'` -- 33 and 33 today.)
 
+**Result: 485 -> 345.** `wm.test` 202 -> 130, `unixWm.test` 129 -> 62.
+Every storage subcommand dropped to one remaining failure each, and
+that one is the usage case below.
+
 Three of them were worth more than the storage:
 
-- **`wm stackorder` answered an empty list**, which is 32 tests on its
-  own and was needless: `TkWmStackorderToplevel` is implemented *in the
-  same file* and `dispPtr->firstWmPtr` has kept the order all along.
-  It now returns the list, and the `isabove`/`isbelow` form with
-  upstream's not-a-toplevel and not-mapped errors.
+- **`wm stackorder` answered an empty list**, 32 tests on its own.
+  **The first attempt at this made it worse, on a claim that was
+  false.** The note here said `TkWmStackorderToplevel` was "implemented
+  in the same file" -- read out of a `grep` of the *name*, never the
+  body. It was a three-line stub returning NULL. So rewriting
+  `wm stackorder` to call it turned 31 of the 32 from answering an
+  empty list into raising an error. **Open the function before saying
+  it exists**; a grep hit is a name, not an implementation.
+
+  It is real now. On X this needs `XQueryTree`, because the server owns
+  the order and a window manager may have reparented every toplevel;
+  here *this port* owns it and `dispPtr->firstWmPtr` is already the
+  order the function must return, bottom first. So the whole job is to
+  intersect that list with the mapped, non-embedded toplevels under
+  `parentPtr` -- upstream's `TkWmStackorderToplevelWrapperMap` walk,
+  minus the hash table, since there are no wrapper windows to key on.
+
+- **The usage message was per-subcommand where it must be generic.**
+  `wm stackorder` with no window answered
+  `wm stackorder window ?isabove|isbelow window?`; every Tk answers
+  `wm option window ?arg ...?`. Upstream checks `objc < 3` once, after
+  resolving the subcommand index and before dispatching, so a
+  subcommand's own `Tcl_WrongNumArgs` is only ever reached with a
+  window present. That is **one failing test per subcommand** -- the
+  `wm-*-1.1` "usage" cases -- and it is why the storage subcommands
+  each still had exactly one failure after being implemented.
 - **`wm iconify` and `wm grid` had no case at all**, so the new erroring
   `default:` would have turned two silent no-ops into hard failures --
   caught before shipping only by listing `opts[]` against the cases.
