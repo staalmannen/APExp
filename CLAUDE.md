@@ -1728,23 +1728,55 @@ character put line breaks mid-word and in the wrong place for tabs
 The suite is at **24 failing tests** (`grep -c FAILED` counts two lines
 each, so 48 lines).
 
-**Read that number with the caveat below.** Every `tk-all.out` collected
-so far stops after `scrollbar.test`, 62 files of 97 -- and it is not a
-hang. Tk's `all.tcl` ends with its only `exit` inside
-`if {... && [info exists env(ERROR_ON_FAILURES)]}`, so with that
-variable unset the script falls off the end, **wish enters
-`Tk_MainLoop`**, and stdout redirected to a file is block buffered: the
-tail of the run is still in a stdio buffer that never gets flushed.
-The leftover windows on screen are the same cause -- `all.tcl` sets
-`-singleproc 1`, so all 97 files share one wish and every toplevel a
-test forgets to destroy stays up for the life of a process that never
-exits. Use `sys/lib/tests/tk-runall.tcl`, which sources `all.tcl` and
-then exits (exit flushes); if the log still stops short of tcltest's
-summary after that, then it really is a hang and the last file named is
-where to look. **So 35 files -- `select`, `send`, all of `text*`,
-`unixFont`, `unixWm`, `winfo`, `wm` and the `ttk` set -- have never been
-measured**, and every count in this section has silently been about the
-same 62-file prefix.
+**Read that number with the caveat below: the suite does not finish.**
+Every `tk-all.out` collected so far stops after `scrollbar.test`, 62
+files of 97, and **`grep -c FAILED` has therefore always been counting a
+62-file prefix**. 35 files -- `select`, `send`, `spinbox`, `systray`,
+all of `text*`, `unixFont`, `unixWm`, `winfo`, `wm` and the `ttk` set --
+have never been measured at all.
+
+Three separate things were tangled here, and they were sorted out in the
+wrong order, so keep them apart:
+
+- **`wish all.tcl` never exits, even on success.** Its only `exit` is
+  inside `if {... && [info exists env(ERROR_ON_FAILURES)]}`; Github CI
+  sets that variable and nothing else does, so the script falls off the
+  end and wish enters `Tk_MainLoop`. Under `tclsh` the same file exits,
+  which is why upstream does not notice.
+- **The log lies about where the run stopped.** stdout redirected to a
+  file is block buffered, so the last file name visible is an upper
+  bound on progress, not the truth.
+- **There is also a real hang**, and this is the one that matters.
+  Adding the exit did *not* change the log: `tk-runall.tcl` produced a
+  byte-identical 535 lines, so `runAllTests` never returned. The first
+  two explanations were both true and neither was the cause.
+
+`sys/lib/tests/tk-runall.tcl` now sets line buffering before anything is
+written and prints
+
+```
+tk-runall: runAllTests returned, N failed
+```
+
+which is the discriminator. **Present**: every file ran, and whatever is
+wedged is in `exit` -- `Tcl_Exit` destroying the main window, i.e. this
+port's teardown, which the leftover windows on screen also point at.
+**Absent**: a test file hung, and with line buffering the last name in
+the log is now genuinely where it stopped.
+
+The next file after `scrollbar.test` is `select.test`, and `select.test`
+and `send.test` are the only two of the remaining 35 that spawn a child
+wish (`childTkProcess`) -- the handshake that already cost a round trip
+once, see `tk-childproc-test.tcl`. Note `send` itself is not built here:
+`unix/tkUnixSend.c` is absent from the libtk mkfile and the port
+supplies only `TkpTestsendCmd`, which errors. Bisect with
+`wish .../tk-runall.tcl -file select.test`; every option is forwarded to
+tcltest.
+
+The leftover windows are a third thing and not a mystery: `all.tcl` sets
+`-singleproc 1`, so all 97 files are sourced into one wish and every
+toplevel a test forgets to destroy stays up for the life of a process
+that never ends.
 
 **23 of the 24 are known not to be the Plan 9 backend's**, and are worth
 recording so they are not chased again:
