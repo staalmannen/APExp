@@ -472,27 +472,19 @@ proc pair {sbfirst wired} {
 # Those two want completely different fixes, and the log will now say
 # which in one word.
 
-foreach {tag cmd what} {
-    8a {yview moveto 1.0}   {to the very end -- no overlap at all}
-    8b {yview moveto 0.5}   {to the middle: this is what steps 2..4 left behind, and step 5's update returned}
-    8c {yview scroll 100 units} {further than the window is tall, so still no overlap}
-    8d {yview scroll 20 units}  {about one windowful}
-    8e {yview scroll 3 units}   {THE ONE THAT HANGS: a small scroll, most of the window reusable}
-    8f {yview scroll 1 units}   {the smallest scroll there is}
-} {
-    step "$tag. .t $cmd -- $what"
-    pair 0 1
-    eval .t $cmd
-    done "scroll returned; index is [.t index @0,0]"
-
-    step "$tag. ... update idletasks (redisplay ONLY, no events)"
-    update idletasks
-    done "update idletasks returned"
-
-    step "$tag. ... update (redisplay AND events)"
-    update
-    done "update returned"
-}
+# Section 8's distance loop lived here and has been REMOVED, because it
+# hung at its fourth case and so nothing after it in this file could
+# ever run -- which is exactly what happened on the run that was meant
+# to answer section 10. Its results are recorded above and its question
+# is asked properly, in the right order, by
+#
+#	sys/lib/tests/tk-textscroll-hang-test.tcl
+#
+# That file is where this bug is worked on now: it is the four lines
+# that reproduce it, with the same cases ordered so that every one
+# expected to return prints before any one expected to hang. Everything
+# above in this file is answered and is kept only as the record of how
+# the suspects were excluded.
 
 # ------------------------------------------------------------------
 # SECTION 9, and it is the one that matters now.
