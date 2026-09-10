@@ -1986,20 +1986,47 @@ the crash to go with it.
 master between it and its parent -- and which is already implicated in
 the one known-open port bug, `geometry-4.7`.
 
-**Bisect the crash by test file, the way `scrollbar.test` was found.**
-It is deterministic, it is at exit, and it depends on suite state:
-every hand-written test in `sys/lib/tests` ends in `exit 0` without
-crashing, so a bare `wish` teardown is fine. `tk-runall.tcl` forwards
-its arguments to tcltest, so halving is one command and no rebuild:
+**Bisecting by test file: NEITHER HALF CRASHES.** `tk-runall.tcl`
+forwards its arguments to tcltest, so this needs no rebuild:
 
 ```
 wish $home/APExp/sys/lib/tests/tk-runall.tcl -file {[a-m]*.test}
 wish $home/APExp/sys/lib/tests/tk-runall.tcl -file {[n-z]*.test}
 ```
 
-The marker line at the end distinguishes the two outcomes: with
-`tk-runall: runAllTests returned, N failed` present, that half exits
-cleanly and the state that kills wish is in the other one.
+Both run to completion. So **the crash is cumulative or a cross-half
+interaction**, and cannot be found by splitting in two -- one half
+"containing" it is exactly what did not happen.
+
+**Bisect a prefix instead.** `a-m` is clean and `a-z` crashes, so the
+threshold is somewhere in between and the lower bound never moves:
+
+```
+wish .../tk-runall.tcl -file {[a-s]*.test}	;# then narrow
+```
+
+Three or four runs name the file whose *addition* is fatal, which is a
+different and more useful fact than which file contains the bug: with
+`-singleproc 1` every file is sourced into one wish, so the answer is
+likely "the Nth toplevel" or "the Nth of something" rather than a
+misbehaving test.
+
+**The `[n-z]` half also gave the first proper accounting**, which no
+earlier run reached because none of them finished:
+
+```
+all.tcl:  Total 5007  Passed 3945  Skipped 805  Failed 257
+Sourced 47 Test Files.
+```
+
+**That corroborates the counting method used throughout this section.**
+`grep -c FAILED` halved gave 287 for all 97 files; tcltest says 257 for
+these 47, leaving ~30 for `[a-m]`, which adds up. The numbers in the
+table above are not an artefact of how they were counted.
+
+The 805 skips are constraints, and the big ones are all legitimately
+absent here: `win` 280, `secureserver` 71, `nonPortable` 69, `nt` 55,
+`winSend` 51, `fonts` 50. **Do not read `Total 5007` as a target.**
 
 **The crash hides nothing.** `xmfbox` is the last file alphabetically,
 so all 97 files and every failure are already measured; only the
