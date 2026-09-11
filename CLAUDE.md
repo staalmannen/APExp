@@ -2499,6 +2499,7 @@ git merge-base --is-ancestor <fix> origin/main && echo in || echo NOT in
 One command, before reading any result, whenever the build happens
 somewhere this session cannot see.
 
+
 What it unlocks, from the skip tally of run 6:
 
 | constraint | tests |
