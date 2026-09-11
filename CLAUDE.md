@@ -1734,24 +1734,52 @@ table below is the whole thing, and the list has been re-derived rather
 than extended.
 
 ```
-all.tcl:  Total 10027  Passed 8330  Skipped 1429  Failed 268
+all.tcl:  Total 10027  Passed 8427  Skipped 1429  Failed 171
 Sourced 97 Test Files.
 ```
 
-**268 failing tests**, from **485** on the first full run -- which was
+**171 failing tests**, from **485** on the first full run -- which was
 up from 25 only because that run was the first to measure 35 files at
 all, not a regression. Attributed by file across the runs:
 
-| file | run 1 | run 2 | run 3 | run 4 | run 5 | run 6 |
-|---|---|---|---|---|---|---|
-| `wm.test` | 202 | 130 | 74 | 66 | 62 | 62 |
-| `unixWm.test` | 129 | 62 | 60 | 59 | 59 | 59 |
-| `unixEmbed.test` | 29 | 29 | 29 | 29 | 28 | 28 |
-| `textDisp.test` | 23 | 23 | 23 | 23 | 23 | **14** |
-| `select.test` | 23 | 23 | 23 | 23 | 23 | 23 |
-| `unixSelect.test` | 18 | 18 | 18 | 18 | 18 | 18 |
-| `systray.test` | 13 | 13 | 13 | 13 | 12 | 12 |
-| `winfo.test` | 6 | 4 | 4 | 4 | 4 | 4 |
+| file | run 1 | run 2 | run 3 | run 4 | run 5 | run 6 | run 7 |
+|---|---|---|---|---|---|---|---|
+| `wm.test` | 202 | 130 | 74 | 66 | 62 | 62 | **14** |
+| `unixWm.test` | 129 | 62 | 60 | 59 | 59 | 59 | **10** |
+| `unixEmbed.test` | 29 | 29 | 29 | 29 | 28 | 28 | **30** |
+| `textDisp.test` | 23 | 23 | 23 | 23 | 23 | 14 | 14 |
+| `select.test` | 23 | 23 | 23 | 23 | 23 | 23 | 23 |
+| `unixSelect.test` | 18 | 18 | 18 | 18 | 18 | 18 | 18 |
+| `systray.test` | 13 | 13 | 13 | 13 | 12 | 12 | 12 |
+| `winfo.test` | 6 | 4 | 4 | 4 | 4 | 4 | 4 |
+
+**Run 7 is the wm work: 268 -> 171, and `wm` plus `unixWm` went 121 to
+24.** It is also the run that shows why the per-file comparison is
+worth doing rather than reading a total -- **`unixEmbed` went UP, 28 to
+30**, and the total falling by 97 would have hidden it completely.
+
+The two are `unixEmbed-10.1` and `10.2`, and `10.2` is one this file
+had recorded as *fixed* two runs earlier. Both want `+0+0` from
+`wm geometry` on an embedded toplevel and got back what was set. The
+cause is the negative-geometry change in the same commit: the query now
+reports `wmPtr->x/y` rather than `winPtr->changes.x/y`, which is right
+for every other toplevel -- a window asked for at `-0-0` has to read
+back as `-0-0`, not as the large positive coordinate it landed on --
+and wrong for an embedded one, which has no position of its own.
+Upstream zeroes it explicitly, with its own comment saying why:
+
+```c
+/* UpdateGeometryInfo, tkUnixWm.c */
+wmPtr->x = wmPtr->y = 0;
+wmPtr->flags &= ~(WM_NEGATIVE_X|WM_NEGATIVE_Y);
+```
+
+"embedded windows are not allowed to move". Upstream gates that on
+`TK_EMBEDDED|TK_BOTH_HALVES` -- embedded *and* the container in this
+same process, since otherwise it cannot know where the other
+application put it; here both halves always share the process, so
+`TK_EMBEDDED` alone is the same condition. Fixed in
+`WmUpdateGeometry`'s embedded branch.
 
 **Compare two runs by file before reading anything into a total.**
 Run 6 differs from run 5 in exactly one line of that table -- textDisp
@@ -2405,11 +2433,47 @@ anyway in the attempt before this one, so that would have been a
 working `tktest` with quietly wrong image tables -- a fault that would
 have surfaced as image tests failing and been chased in `plan9/`.
 
-So `STUBCFLAGS` in `cmd/wish/mkfile` carries both trees' include paths
-and leaves `MODULE_SCOPE` at its default, and the two stub objects use
-it. **`nm` on the host settles this class of question in one command**
-and is worth reaching for whenever an object is compiled with flags it
-was not written for.
+**AND THE SCOPE OF THAT WAS MISJUDGED TWICE.** The first attempt built
+all four extra objects with `CFLAGS` and did not link. The second moved
+only the two **stub** files -- because the link error named only the
+stub symbols -- and left `tkTest.c` and `tkSquare.c` on `CFLAGS`. They
+linked, and `tktest` then died before printing a byte:
+
+```
+tktest 10315: suicide: sys: trap: fault read addr=0x0 pc=0x5523a1
+acid: src(0x5523a1)  ->  ap/arch/amd64/strlen.s:11, REPN SCASB
+```
+
+`strlen(NULL)` -- which is what a string table that should have been
+initialised and is all zeroes gives you. `tkTest.o` was defining 35
+extra symbols including `tkMainWindowList`, `tkPhotoImageType`,
+`tkImgFmtGIF`, `tkStateStrings` and `tkTextCharType`, and the linker
+kept the zeroed copies.
+
+| object | `CFLAGS` | `TESTCFLAGS` |
+|---|---|---|
+| `tkTest.o` | 36 | **1** |
+| `tkSquare.o` | 25 | **1** |
+| `tclStubLib.o` | 38 | **6** |
+| `tkStubLib.o` | 30 | **6** |
+
+**A link error is a poor guide to which objects are wrong**: the two it
+named were wrong, and so were the two it did not. The right value is
+not a judgement call either -- `sys/src/ape/lib/tk/mkfile:198` and
+`lib/tcl/mkfile:107` build the libraries with `-DMODULE_SCOPE=extern`,
+so that is simply what anything linked beside them wants.
+
+`TESTCFLAGS` in `cmd/wish/mkfile` carries both trees' include paths and
+`-DMODULE_SCOPE=extern`, and all four use it. `CFLAGS` keeps the empty
+`MODULE_SCOPE` and is harmless for the two objects that use it, because
+`tkAppInit.c` includes `tk.h` and **not** `tkInt.h` -- 2 symbols either
+way, measured. That is why the flag survived there for the life of the
+port, and why anything else added to that directory needs `TESTCFLAGS`.
+
+**Check every object built against a library for the flags that library
+was built with, not just the ones the linker complained about.** One
+`nm -g --defined-only x.o | wc -l` per object answers it, and it is the
+cheapest check in this whole file -- no VM, no link, one second.
 
 What it unlocks, from the skip tally of run 6:
 
