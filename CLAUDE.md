@@ -2315,14 +2315,16 @@ nondeterminism noted above showing itself again: it passed this run.
 **`Skipped 1429` is not all constraints that cannot be met here.** 448
 of it is a missing *binary*, and it is the exact counterpart of the
 `tcltest` that runs Tcl's suite: `tktest` is wish with Tk's own test
-commands compiled in. `sys/src/ape/cmd/tktest/mkfile` builds it, and it
-needed no new code at all -- three objects, all of them already in the
-tree:
+commands compiled in. The `tktest:V:` target in
+`sys/src/ape/cmd/wish/mkfile` builds it, and it needed no new code at
+all -- five objects, every one of them already in the tree:
 
 ```
 tkTestInit.$O	unix/tkAppInit.c again, with -DTK_TEST
 tkTest.$O	generic/tkTest.c
 tkSquare.$O	generic/tkSquare.c
+tclStubLib.$O	generic/tclStubLib.c	-- the client side of the
+tkStubLib.$O	generic/tkStubLib.c	   stub interfaces; see below
 ```
 
 That is upstream's `TKTEST_OBJS` exactly. The
@@ -2334,6 +2336,42 @@ porting. Everything `tkTest.c` reaches on this side already existed:
 (`tkInt.h:1341`), `TkpTestembedCmd` is in `plan9/tkPlan9Stubs.c`, and
 `TkpTesttextCmd` is generic Tk's in `tkText.c`. Both files pass the host
 gcc syntax check under `-DPLAN9` unmodified.
+
+**The two stub objects are the whole of why a first attempt did not
+link**, and they are the part worth reading. `tkTest.c` and
+`tkSquare.c` both open with
+
+```c
+#undef STATIC_BUILD
+#ifndef USE_TCL_STUBS
+#   define USE_TCL_STUBS
+```
+
+so they compile as a stub-using **extension** whatever the command line
+says -- that `#undef` is there precisely to stop `-DSTATIC_BUILD`
+turning it off. Six symbols then go missing:
+
+```
+Tktest_Init: undefined: Tcl_InitStubs
+Tktest_Init: undefined: Tk_InitStubs
+_convM2D: tclStubsPtr: not defined
+_convM2D: tkStubsPtr / tkIntStubsPtr / tkIntPlatStubsPtr: not defined
+```
+
+all of them in `generic/tclStubLib.c` and `generic/tkStubLib.c`, which
+are the **client** side of the stub interfaces and are therefore in
+neither archive: `libtcl.a` and `libtk.a` are the *core* and carry the
+stub tables, not the things that reach them. `../tclsh/mkfile` hit
+exactly this for `tcltest` and answers it the same way.
+
+**The tempting alternative is wrong, and was tried first.** Plan 9 has
+no dlopen, so nothing is ever loaded at run time and the stubs
+mechanism has nothing to do; disabling it under `#ifdef PLAN9` in those
+two files works. It is still the wrong trade -- it edits two vendored
+*generic* files that the next Tk update would silently revert, to avoid
+compiling two vendored files that already exist and already build
+clean. **Prefer the link over the patch** whenever the missing symbols
+turn out to live in a file the upstream tree already ships.
 
 What it unlocks, from the skip tally of run 6:
 
@@ -2370,21 +2408,31 @@ test file exercising Tk's option-database machinery very thoroughly, so
 if it goes badly it will dominate every count taken afterwards and say
 little about the rest of the port.
 
-**`tktest` is deliberately not in `sys/src/ape/cmd/mkfile`.** It is a
-test binary, built by hand when the suite is to be run, like everything
-in `sys/lib/tests`:
+**Both test binaries live beside the shipped binary they extend**, as a
+`:V:` target rather than `default` -- `tktest` in `cmd/wish/mkfile`,
+`tcltest` in `cmd/tclsh/mkfile` -- so `mk` and `mk install` in either
+directory still build and install only the real command, and neither
+test binary is ever installed:
 
 ```
-cd sys/src/ape/cmd/tktest && mk install
-tktest $home/APExp/sys/lib/tests/tk-runall.tcl >/tmp/tk-all.out 2>&1
+cd sys/src/ape/cmd/wish && mk tktest
+./tktest $home/APExp/sys/lib/tests/tk-runall.tcl >/tmp/tk-all.out >[2=1]
 ```
 
-**`tcltest` is the same idea and is NOT built by a mkfile here**, though
-the Tcl section above runs one. It is a bigger job -- upstream's
-`TCLTEST_OBJS` is eight objects including `tclUnixTest.c`,
-`tclThreadTest.c` and `tclMutexTest.c`, so unlike tktest it has a
-genuinely unix-specific member that would need reading before it could
-be built. Worth doing, and not free.
+**A separate `cmd/tktest` directory was written first and thrown away**,
+and the reason generalises. It had to copy `cmd/wish/mkfile`'s entire
+`CFLAGS` block -- including the `-DWCHAR=char` that file's own comment
+calls load-bearing -- and its whole `LIB` list. A copy of a build rule
+is a copy that silently stops matching: the day wish gains a `-D`, the
+test binary is built differently and nothing says so. That is the
+`HFILES` lesson in another form, and on this build system a
+configuration that drifts is expensive to diagnose. **Put a test binary
+in the directory whose flags it shares.**
+
+No object collides between the two targets in `cmd/wish`: `tkAppInit.$O`
+is wish's and `tkTestInit.$O` is tktest's, from the same source built
+with and without `-DTK_TEST`, which is why upstream renames it too
+(`Makefile.in:992`).
 
 #### The four untouched files: 106 failures, and three of them are ours
 
