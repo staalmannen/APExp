@@ -2378,7 +2378,10 @@ port's code:
   record of it". They redraw *less* than X does, which is the expected
   direction.
 - **8 are Expose granularity** (`7.1`..`7.8`), and chasing them found a
-  bug far bigger than the tests -- see the next section.
+  bug far bigger than the tests -- see the next section. They are
+  likely fixed by it: the damage the port now reports for exactly
+  `textDisp-7.1`'s sequence is a partial rectangle with an **empty**
+  relayout, which is X's answer.
 
 The arithmetic for the whole exercise: of 106 failures in the four
 untouched files, **3 were ours** and 103 need a second wish (53),
@@ -2452,18 +2455,56 @@ there is no backing store and no server to ask. That asymmetry is why
 this went in as "expose the parent subtree over the rectangle" rather
 than anything cleverer.
 
-**This is not yet known to fix `textDisp-7.1..7.8`, and probably does
-not.** Those eight relayout the whole widget where X relays out
-nothing -- and with *no* Expose arriving before this change, the
-relayout must have had another cause all along. The test file's redraw
-half will name it, and **it could not on the first run**: `tk_textRelayout`
-and `tk_textRedraw` are only recorded while the widget's own debugging
-is on (`textDisp.test:139` is `.t debug on`), which the script did not
-do, so every `relayout:` line came back empty for the wrong reason.
-Worse, its `build` proc *assigned* both variables, so the "does this Tk
-report them at all?" check could never fail either. **A check that
-cannot fail is not a check** -- it now probes with a separate widget
-before `build` touches anything.
+**It works, and the rectangles are right.** With `.t debug on` added
+so the redraw half reports at all -- `tk_textRelayout` and
+`tk_textRedraw` are only recorded while the widget's own debugging is
+on, `textDisp.test:139` -- the second run of the script says:
+
+```
+STEP: 2. destroy .f2, then update
+      exposes: {.t 52 26 144 55 count=0}
+      relayout:
+      redraw:   2.0 2.40 3.0 3.40 4.0 4.40
+STEP: 3. rebuild, map a frame over .t, then 'place forget' it
+      exposes: {.t 28 14 96 40 count=0}
+STEP: 4. two overlapping frames in .t, raise the lower one
+      exposes: {.t 28 14 120 50} {.fb 0 0 72 30} {.fa 0 0 120 50}
+```
+
+`.f2` was 60% x 55% of a 248x108 `.t` at 20%,22%, so `52 26 144 55` is
+its rectangle: **partial damage, clipped correctly**, not the whole
+widget. Section 4 shows the recursion doing the right thing too -- the
+parent over `.fa`'s rectangle, then `.fb` clipped to the *intersection*
+(72x30), then `.fa` whole.
+
+**And the relayout line is empty**, which is exactly what X does and
+what `textDisp-7.1` asks for (`{}` relayout, a redraw of the display
+lines in the damaged strip). **So the prediction written here -- "this
+is not yet known to fix textDisp-7.1..7.8, and probably does not" --
+was wrong, in the good direction.** Those eight have a real chance now;
+the next full run says.
+
+**Section 4 was right by luck, though, and that is a second bug.**
+`P9ExposeRect` walks `gP9.wins` in **slot order**, which is roughly
+creation order and has nothing to do with what is on top -- while the
+events *are* the stacking here, because drawing is immediate into the
+one rio window with no clipping and whoever repaints last wins the
+pixels. `.fa` had just been raised above `.fb` and happened to sit in a
+later slot. Create the two frames the other way round and the raise
+would have repainted `.fb` last, i.e. done nothing visible.
+
+Tk owns the order and always has: `parentPtr->childList`, lowest first
+(`Tk_RestackWindow`). `P9ExposeRectStacked` walks that instead, falling
+back to the slot walk when `Tk_IdToWindow` cannot answer -- during
+teardown it returns NULL for a window this table still has. The comment
+claiming "the order of the events is the stacking" is true now rather
+than accidentally true.
+
+**A check that cannot fail is not a check**, and the first run of this
+script had one: its `build` proc *assigned* `tk_textRelayout`, so the
+"does this Tk report it at all?" test could never fire, and every
+`relayout:` line read empty for the wrong reason. It probes with a
+separate widget before `build` touches anything now.
 
 #### Tk on Plan 9: TkpClaimFocus, and an embedded wm geometry
 

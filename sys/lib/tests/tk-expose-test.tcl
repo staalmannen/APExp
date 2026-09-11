@@ -58,19 +58,49 @@
 # too little leaves stale pixels that nothing here will ever correct,
 # since there is no backing store and no server to ask.
 #
-# WHAT THIS FILE STILL HAS TO SETTLE. textDisp-7.1 relaid out the whole
-# widget where X relaid out nothing, and that was NOT the Expose --
-# there wasn't one. So a second cause is still unidentified, and the
-# redraw half of this file is what will name it.
+# SECOND RUN: IT WORKS, AND THE RECTANGLES ARE RIGHT.
 #
-# THE FIRST RUN COULD NOT MEASURE THAT HALF, and the reason is worth
-# keeping: tk_textRelayout and tk_textRedraw are only recorded while
-# the widget's own debugging is on -- textDisp.test's line 139 is
+#	STEP: 2. destroy .f2, then update
+#	      exposes: {.t 52 26 144 55 count=0}
+#	      relayout:
+#	      redraw:   2.0 2.40 3.0 3.40 4.0 4.40
+#	STEP: 3. ... 'place forget' it
+#	      exposes: {.t 28 14 96 40 count=0}
+#	STEP: 4. ... raise the lower one
+#	      exposes: {.t 28 14 120 50} {.fb 0 0 72 30} {.fa 0 0 120 50}
+#
+# .f2 was 60% x 55% of a 248x108 .t at 20%,22%, so "52 26 144 55" is its
+# rectangle -- partial damage, clipped, not the whole widget. Section 4
+# shows the recursion right too: the parent over .fa's rectangle, then
+# .fb clipped to the INTERSECTION, then .fa whole.
+#
+# AND THE RELAYOUT LINE IS EMPTY, which is what X does and what
+# textDisp-7.1 asks for. The prediction in the commit that added the fix
+# -- "probably does not fix textDisp-7.1..7.8" -- was wrong in the good
+# direction; the suite says whether those eight go with it.
+#
+# SECTION 4 WAS RIGHT BY LUCK, AND THAT WAS A SECOND BUG. P9ExposeRect
+# walked gP9.wins in SLOT order, roughly creation order, which has
+# nothing to do with what is on top -- while the events ARE the
+# stacking here, since drawing is immediate with no clipping and
+# whoever repaints last wins the pixels. .fa had just been raised above
+# .fb and happened to sit in a later slot. Create the two frames the
+# other way round and the raise would have repainted .fb last, i.e.
+# done nothing visible. P9ExposeRectStacked walks
+# parentPtr->childList instead, which is Tk's own order, lowest first.
+#
+# SO KEEP SECTION 4, and read its order rather than just its presence:
+# .fa must come after .fb in the list whichever way round they were
+# created.
+#
+# The first run could not measure the redraw half at all:
+# tk_textRelayout and tk_textRedraw are only recorded while the widget's
+# own debugging is on -- textDisp.test's line 139 is
 #
 #	.t debug on
 #
 # and this file did not do it, so every "relayout:" line came back
-# empty and said nothing. Worse, `build` here *assigns* the two
+# empty and said nothing. Worse, `build` here *assigned* the two
 # variables, so the "does this Tk report them at all?" check could
 # never fail either. A check that cannot fail is not a check.
 #
@@ -80,9 +110,10 @@
 proc step {m} { puts "STEP: $m"; flush stdout }
 proc note {m} { puts "      $m"; flush stdout }
 
-# Every Expose that arrives anywhere we care about, with its rectangle.
-# The rectangle is the whole point: "0 0 <full width> <full height>" is
-# prediction (b), nothing at all is (a).
+# Every Expose that arrives anywhere we care about, with its rectangle
+# and in ARRIVAL ORDER. Both halves matter: the rectangle says whether
+# the clipping is right, and the order says whether the stacking is --
+# whoever repaints last wins the pixels here.
 set exposes {}
 proc watch {w} {
     bind $w <Expose> [list lappend ::exposes "$w %x %y %w %h count=%c"]
@@ -214,6 +245,25 @@ if {[llength $e] == 0} {
     note "REGRESSION: raising a sibling repainted nothing. raise/lower on"
     note "a widget goes through XConfigureWindow with CWStackMode, NOT"
     note "XRaiseWindow -- see Tk_RestackWindow in generic/tkWindow.c."
+} else {
+    # THE ORDER IS THE POINT, not the presence. .fa was just raised
+    # above .fb, so .fa must repaint LAST or the raise is invisible.
+    # This was right by luck once, when the walk was in slot order.
+    set ia -1; set ib -1
+    for {set i 0} {$i < [llength $e]} {incr i} {
+	set win [lindex [lindex $e $i] 0]
+	if {$win eq ".fa"} { set ia $i }
+	if {$win eq ".fb"} { set ib $i }
+    }
+    if {$ia < 0} {
+	note "REGRESSION: .fa was raised and got no Expose at all."
+    } elseif {$ib >= 0 && $ia < $ib} {
+	note "REGRESSION: .fb repaints AFTER .fa, so the raise is invisible."
+	note "The child walk is not in stacking order -- it must follow"
+	note "parentPtr->childList (lowest first), not gP9.wins slot order."
+    } else {
+	note "ok: .fa repaints last, so the raise is visible"
+    }
 }
 destroy .fa .fb
 
