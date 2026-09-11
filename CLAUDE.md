@@ -1735,13 +1735,109 @@ table below is the whole thing, and the list has been re-derived rather
 than extended.
 
 ```
-all.tcl:  Total 10027  Passed 8427  Skipped 1429  Failed 171
+all.tcl:  Total 10027  Passed 8877  Skipped 924  Failed 226
 Sourced 97 Test Files.
 ```
 
-**171 failing tests**, from **485** on the first full run -- which was
-up from 25 only because that run was the first to measure 35 files at
-all, not a regression. Attributed by file across the runs:
+**That is run 10, under `tktest`, and it is the first complete run of
+the whole suite with Tk's own test commands available.** Read it against
+run 7 -- the last complete `wish` run -- one column at a time rather
+than by the total:
+
+| | run 7 (`wish`) | run 10 (`tktest`) | |
+|---|---|---|---|
+| Total | 10027 | 10027 | the same suite |
+| **Skipped** | 1429 | **924** | **505 newly measured** |
+| **Passed** | 8427 | **8877** | +450 |
+| **Failed** | 171 | **226** | +55 |
+
+**The count rose by 55 and nothing regressed.** Of the 505 tests that
+had never run here, **450 pass**. That is the "expect the failure count
+to rise" case the tktest section predicts, and this is what it looks
+like when it goes well.
+
+Attributed by file, which is the comparison that actually settles it:
+
+| file | run 1 | run 4 | run 6 | run 7 | run 10 |
+|---|---|---|---|---|---|
+| `unixWm.test` | 129 | 59 | 59 | 10 | **44** |
+| `unixEmbed.test` | 29 | 29 | 28 | 30 | **38** |
+| `select.test` | 23 | 23 | 23 | 23 | 23 |
+| `unixSelect.test` | 18 | 18 | 18 | 18 | 18 |
+| `wm.test` | 202 | 66 | 62 | 14 | 14 |
+| `textDisp.test` | 23 | 23 | 14 | 14 | 14 |
+| `systray.test` | 13 | 13 | 12 | 12 | 12+1 |
+| `focus.test` | 1 | 1 | 1 | 1 | **11** |
+| `winfo.test` | 6 | 4 | 4 | 4 | **5** |
+| everything else | 42 | 46 | 46 | 46 | 47 |
+
+**The whole of the +55 is in four files, and the long tail did not
+move** (46 -> 47, and that one is `systray`/`sysnotify` splitting into
+two names under this file's `sed`). `wm`, `textDisp`, `select` and
+`unixSelect` are identical to the test. A change touching
+`WmUpdateGeometry` and `TkWmDeadWindow` -- which every toplevel in the
+suite goes through -- could not have come out flatter, and a total
+alone could not have said so.
+
+**Every `test*` constraint that can be met here is now met.** What is
+left skipped is legitimately absent: `win` 342, `fonts` 126,
+`nonPortable` 98, `secureserver` 72, `nt` 55, `winSend` 51, `aqua` 30,
+`defaultPseudocolor8` 21, plus `testutils` 20 (Tcl-side) and the
+genuinely Windows-only `testmetrics` 11 and `testwinevent` 7. **Do not
+read `Total 10027` as a target**; 924 of it cannot run on this machine.
+
+#### Where the 226 actually are, read rather than counted
+
+`unixEmbed` 38 and `unixWm` 44 are 36% of the total and most of it had
+never been read. Splitting `unixEmbed` by what each test *does*:
+
+| | |
+|---|---|
+| **19** | `childTkProcess` -- a **second wish process** doing `toplevel .t -use $w` on this one's container. Cross-application embedding is the one thing this port's embedding structurally cannot do; the whole reduction in `Tk_MakeWindow` rests on both halves sharing the process. They report `couldn't create child of window "0x575e"` and `bad window path name ".t1"` |
+| **19** | in-process: the `-Na` variants (a child *interpreter*, runnable at last now `tktest` exists) plus `1.7`, `2.3`, `2.4`, `8.2`, `9.1` |
+
+**Eleven of the in-process nineteen failed on one stub**, and it is the
+`XLoadFont` family for the third time in this port: **`testembed`
+answered "cannot" where the truth was "here it is".**
+
+```
+---- errorInfo: testembed not supported on Plan 9
+```
+
+`unixEmbed-1.7` and `-2.3` are the clean cases -- two containers, two
+embedded toplevels, entirely in this process, then `testembed` and
+nothing else. Embedding has worked here since `Tk_UseWindow` was
+written, and the list the command exists to print is
+`firstContainerPtr`, ten lines from where the refusal was.
+
+`TkpTestembedCmd` is real now, in `tkPlan9Wm.c` beside that list, and it
+is `unix/tkUnixEmbed.c`'s structure line for line. **Three of upstream's
+four fields are already in the port's `Container`**; the fourth is the
+**wrapper**, and the empty string printed for it is not a stand-in --
+it is exactly what upstream prints when `containerPtr->wrapper` is
+`None`, and there are no wrappers here.
+
+Upstream's one oddity is reproduced deliberately: `embeddedInterp` and
+`parentInterp` are declared *outside* the loop and assigned only when
+the pointer is non-NULL, so a container missing one is filtered against
+whatever the previous container had. The expected strings were written
+against that. **A test command's contract is to match the other
+implementations, not to be better than them.**
+
+**Do not expect all eleven to pass**: several also need a second wish
+somewhere in the same test, and the count that matters is the next run,
+per file. `1.7` and `2.3` are the two that should go outright.
+
+`focus.test` 1 -> 11 and `winfo.test` 4 -> 5 are newly *measured*, not
+newly broken. Worth noting for later: `focus-6.1`, "embedded application
+in same process", is **ours and known** -- it is the second half of
+`unixEmbed-8.2`, the missing ordinary FocusIn on the embedded toplevel,
+left alone deliberately in the `TkpClaimFocus` note below. The rest of
+`focus-2.*` is `TkFocusFilterEvent`, unmeasured until now; `winfo`'s are
+`atomname`, two `interps` (which need `send`), `pathname` and a
+destroyed embedded toplevel.
+
+The historical table, kept because the reasoning below refers to it:
 
 | file | run 1 | run 2 | run 3 | run 4 | run 5 | run 6 | run 7 |
 |---|---|---|---|---|---|---|---|
@@ -2729,6 +2825,9 @@ so that today's limitation is not frozen in as the requirement.
 
 #### Run 9: the freeze is gone and the run still does not finish
 
+**Fixed in run 10 -- see the totals at the top of this section.** Kept
+because the way this run was misread is the useful part.
+
 **IT CRASHED, AND IT LOOKED LIKE IT HAD FINISHED.** `tk-menubar-test.tcl`
 passes every case, and the suite no longer hangs -- but the log ends
 
@@ -2794,18 +2893,34 @@ that separates the orderings -- child menubar, sibling menubar, and the
 `deleteWindows` / `wm withdraw .` / new-toplevel sequence `unixWm.test`
 runs immediately after 49.2 -- so it can answer without the suite.
 
-**The decisive step is the pc, and it needs no rebuild** -- static
-`acid` on the binary, as the crash section above already records:
+**IT WAS THAT FIX, AND THE HEDGE WAS WRONG.** Run 10 completes: the
+`acid` line was never needed. Recorded as a correction rather than
+edited away, because the *reasoning* that produced the hedge is worth
+keeping and the conclusion drawn from it is not.
 
-```
-acid $home/APExp/sys/src/ape/cmd/wish/tktest
-acid: src(0x2d1856)
-```
+What the hedge got right: `.t.menu` really is a child, generic Tk really
+does destroy the whole `childList` before `TkWmDeadWindow`, and
+`MenubarDestroyProc` therefore really does run with a live `wmPtr`. What
+it missed is that `unixWm.test` does not only use `testmenubar`. It also
+reaches `TkUnixSetMenubar` through `$w configure -menu`, and a **menu
+widget is a sibling** -- so the dangling `wmInfoPtr` this fix closes was
+reachable in the suite after all, a few tests past the one that
+happened to be printing when the fault landed.
 
-Do that before anything else. Reading the shape of the fault matters as
-much as the line: a wild pointer here shows up at the first *double*
-indirection, so the function that faults is often one step past the one
-that is wrong.
+**The lesson is about which test to read, not about hedging.** The
+faulting write came immediately after `unixWm-49.2`'s result, so both
+this analysis and the round before it went looking at what 49.2 does --
+and 49.2 is merely the last thing that *printed*. A use-after-free on
+this allocator does not fail where it is created; it fails at the first
+double indirection, which can be any number of tests later. **A crash
+that lands after test N is evidence about N only if nothing between N
+and the fault could have armed it**, and with `-singleproc 1` a great
+deal runs between them.
+
+The hedge itself was still the right call: the fix went in on upstream's
+authority rather than on a guess about this crash, and it would have
+been worth keeping even if the fault had turned out to be something
+else.
 
 #### The four untouched files: 106 failures, and three of them are ours
 

@@ -1018,6 +1018,118 @@ GetContainer(Window parent)
     return c;
 }
 
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkpTestembedCmd --
+ *
+ *	Tk's own "testembed" test command: report the container list, one
+ *	sublist per container, as {parent-id parent-path wrapper embedded-
+ *	path}. "testembed all" prints the real window ids where the plain
+ *	form prints "XXX", because the ids vary from run to run.
+ *
+ *	IT WAS A STUB THAT RAISED "testembed not supported on Plan 9",
+ *	which is the XLoadFont mistake one more time and the third
+ *	instance of it in this port: **answering "cannot" where the truth
+ *	is "here it is".** Embedding has worked here since Tk_UseWindow
+ *	was written, and the list this command exists to print is
+ *	firstContainerPtr, ten lines up. The refusal is what made
+ *	unixEmbed-1.7 and -2.3 fail -- both build two containers and two
+ *	embedded toplevels entirely in this process, do nothing else, and
+ *	ask for exactly this.
+ *
+ *	Three of upstream's four fields are in the Container above. The
+ *	fourth is the WRAPPER, and there is none here -- so the empty
+ *	string this prints for it is not an approximation: it is the same
+ *	thing upstream prints when containerPtr->wrapper is None.
+ *
+ *	The structure follows unix/tkUnixEmbed.c line for line, including
+ *	its one oddity: embeddedInterp and parentInterp are declared
+ *	OUTSIDE the loop and assigned only when the pointer is non-NULL,
+ *	so a container missing one of them is filtered against whatever
+ *	the previous container had. That is upstream's behaviour and the
+ *	expected strings were written against it, so it is reproduced
+ *	rather than tidied -- a test command's contract is to match the
+ *	other implementations, not to be better than them.
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+TkpTestembedCmd(
+    void *dummy,
+    Tcl_Interp *interp,
+    Tcl_Size objc,
+    Tcl_Obj *const objv[])
+{
+    Container *containerPtr;
+    Tcl_DString dString;
+    Tcl_Interp *embeddedInterp = NULL, *parentInterp = NULL;
+    char buffer[50];
+    int all;
+    (void)dummy;
+
+    all = (objc > 1) && (strcmp(Tcl_GetString(objv[1]), "all") == 0);
+
+    Tcl_DStringInit(&dString);
+    for (containerPtr = firstContainerPtr; containerPtr != NULL;
+	    containerPtr = containerPtr->nextPtr) {
+	if (containerPtr->embeddedPtr != NULL)
+	    embeddedInterp = containerPtr->embeddedPtr->mainPtr->interp;
+	if (containerPtr->parentPtr != NULL)
+	    parentInterp = containerPtr->parentPtr->mainPtr->interp;
+
+	/*
+	 * A container belonging to neither this interpreter's embedded
+	 * half nor its container half is none of this interpreter's
+	 * business -- that is how the child-interpreter tests tell the
+	 * two sides apart.
+	 */
+	if (embeddedInterp != interp && parentInterp != interp)
+	    continue;
+
+	Tcl_DStringStartSublist(&dString);
+
+	/* The container's window id. */
+	if (containerPtr->parent == None) {
+	    Tcl_DStringAppendElement(&dString, "");
+	} else if (all) {
+	    snprintf(buffer, sizeof(buffer), "0x%lx",
+		    (unsigned long) containerPtr->parent);
+	    Tcl_DStringAppendElement(&dString, buffer);
+	} else {
+	    Tcl_DStringAppendElement(&dString, "XXX");
+	}
+
+	/* The container's path name, if it belongs to this interpreter. */
+	if (containerPtr->parentPtr == NULL || parentInterp != interp)
+	    Tcl_DStringAppendElement(&dString, "");
+	else
+	    Tcl_DStringAppendElement(&dString,
+		    containerPtr->parentPtr->pathName);
+
+	/*
+	 * The wrapper. Always empty: on X a toplevel is reparented into
+	 * a wrapper window owned by tkUnixWm.c, and there are none here
+	 * -- a toplevel IS its window. Upstream prints the empty string
+	 * for a container whose wrapper is None, so this is its answer
+	 * and not a stand-in for one.
+	 */
+	Tcl_DStringAppendElement(&dString, "");
+
+	/* The embedded window's path name, likewise. */
+	if (containerPtr->embeddedPtr == NULL || embeddedInterp != interp)
+	    Tcl_DStringAppendElement(&dString, "");
+	else
+	    Tcl_DStringAppendElement(&dString,
+		    containerPtr->embeddedPtr->pathName);
+
+	Tcl_DStringEndSublist(&dString);
+    }
+    Tcl_DStringResult(interp, &dString);
+    return TCL_OK;
+}
+
 static void
 EmbedWindowDeleted(TkWindow *winPtr)
 {

@@ -710,15 +710,13 @@ TkDrawAngledChars(Display *display, Drawable drawable, GC gc,
 /* Interp names (send is not supported on Plan 9)                     */
 /* ------------------------------------------------------------------ */
 
-int
-TkpTestembedCmd(void *dummy, Tcl_Interp *interp,
-                Tcl_Size objc, Tcl_Obj *const objv[])
-{
-    (void)dummy; (void)objc; (void)objv;
-    Tcl_SetObjResult(interp,
-        Tcl_NewStringObj("testembed not supported on Plan 9", -1));
-    return TCL_ERROR;
-}
+/*
+ * TkpTestembedCmd lives in tkPlan9Wm.c now, beside the Container list
+ * it reports. It used to raise "testembed not supported on Plan 9"
+ * from here -- the XLoadFont mistake again, since embedding has worked
+ * in this port since Tk_UseWindow was written and the command had an
+ * answer to give all along.
+ */
 
 int
 TkGetInterpNames(Tcl_Interp *interp, Tk_Window tkwin)
