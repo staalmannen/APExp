@@ -154,8 +154,9 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c` and
-`stdio-test.c`. The nineteen `tk-*.tcl` scripts there are Tcl, run with
-`wish`; see the Tk section below. `tk-runall.tcl` is the harness for
+`stdio-test.c`. The twenty-one `tk-*.tcl` scripts there are Tcl, run
+with `wish` -- except `tk-menubar-test.tcl`, which needs `tktest` and
+skips itself under `wish`; see the Tk section below. `tk-runall.tcl` is the harness for
 Tk's own suite rather than a test of its own, and `tk-runtest.tcl` runs
 a single file from it. `sys/src/ape/lib/libressl/test/` is separate: it is
 upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
@@ -2516,10 +2517,30 @@ What it unlocks, from the skip tally of run 6:
 `no library with prefix "Tktest" is loaded statically`, plus
 `imgListFormat-3.*` and `image-6.2`.
 
-**Still skipped, and correctly**: `testwrapper` 54, `testmenubar` 21,
-`testmetrics` 11, `testwinevent` 7, `testpressbutton` 3, `testmovemouse`
-1 -- every one of those is inside `#if defined(_WIN32)` in `tkTest.c`.
-`testutils` 20 is a Tcl-side thing and is unaffected.
+**That list was read wrong, and the run corrected it.** `tkTest.c:248`
+is
+
+```c
+#if defined(_WIN32)
+    ... testmetrics ...
+#elif !defined(__CYGWIN__) && !defined(MAC_OSX_TK)
+    ... testmenubar, testsend, testwrapper ...
+#endif /* _WIN32 */
+```
+
+-- an `#elif`, not a plain `#if`, and the closing comment says
+`_WIN32` whatever arm you are in. So **`testwrapper` 54, `testmenubar`
+21 and the `testsend` group are on the X11 arm and are available
+here**, not Windows-only; that is another ~75 tests unlocked on top of
+the 448, and the `unixWm-N.2`/`N.3` variants that appeared in the first
+tktest run are exactly the `testwrapper` ones. Only `testmetrics` 11 is
+genuinely Windows-only, with `testwinevent` 7, `testpressbutton` 3 and
+`testmovemouse` 1. `testutils` 20 is Tcl-side and unaffected.
+
+**Read the arm, not the `#endif` comment.** A closing comment naming
+the *first* condition is the normal way to label a long `#if/#elif`
+chain, and taking it for the whole block is how 75 tests got written
+off in the table above.
 
 **EXPECT THE FAILURE COUNT TO RISE, and do not read that as a
 regression.** A skipped test is not a passing test; these 448 are
@@ -2567,6 +2588,144 @@ No object collides between the two targets in `cmd/wish`: `tkAppInit.$O`
 is wish's and `tkTestInit.$O` is tktest's, from the same source built
 with and without `-DTK_TEST`, which is why upstream renames it too
 (`Makefile.in:992`).
+
+#### Run 8: the first tktest run, and where it stops
+
+`tktest` builds and runs. The direct confirmation is that **`no library
+with prefix "Tktest" is loaded statically` appears nowhere in the log**,
+where it used to account for fourteen `unixEmbed` failures.
+
+**It is a PREFIX and its total means nothing yet.** The run freezes in
+`unixWm.test` just after `unixWm-50.1`, so `visual`, `winfo`, `winWm`,
+`wm` and `xmfbox` are unmeasured -- about the last 10% of the files.
+`grep -c FAILED` halved gives 185 against run 7's 171 for the whole
+suite, and that comparison is not one to lean on in either direction:
+run 8 is missing five files and has ~520 extra tests running.
+
+What it does settle, per file:
+
+| file | run 7 (wish) | run 8 (tktest) | |
+|---|---|---|---|
+| `image` | 1 | **0** | `testImageType` |
+| `imgListFormat` | 3 | **0** | `testphotostringmatch` |
+| `unixEmbed` | 30 | 38 | 7 `-Na` variants fixed, 17 new |
+| `focus` | 1 | 11 | 10 new, `testwrapper`/embedding |
+| `unixWm` | 10 | 30 | 25 new, mostly `testwrapper` -- and truncated |
+
+`image-6.2` and `imgListFormat-3.*` are gone, which is exactly what the
+section above predicted of them. **`unixEmbed-10.1` and `10.2` are gone
+too**, so the embedded `wmPtr->x/y` fix is confirmed by the suite rather
+than by reasoning.
+
+**The freeze is a blocking wait, not the `scrollbar-10.1` spin.** The
+CPU is *constantly but lightly* loaded, which is this port's notifier
+sleeping `P9_POLL_US` between polls and finding nothing -- i.e.
+something is waiting for an event that will never arrive. A tight loop
+inside one Tk call pins a core; this does not.
+
+**THE SUSPECT NAMED HERE WAS WRONG, AND THE RUN THAT SETTLED IT TOOK
+ONE LINE.** What was written was `unixWm-50.3`/`50.4`, the first tests
+in the file to do `interp create child; load {} Tk child` -- the first
+time two Tk main windows have existed in one process here, and a
+configuration nothing in `gP9` had ever been under. The frozen
+screenshot's coloured rectangles seemed to match `50.3`'s `.t`, `.t.f`
+and `.x`.
+
+```
+tktest $home/APExp/sys/lib/tests/tk-runall.tcl -file unixWm.test -verbose t
+```
+
+`-verbose t` prints each test name as it *starts*, and the log ends
+
+```
+---- unixWm-50.2 start
+---- unixWm-50.3 start
+---- unixWm-50.4 start
+---- unixWm-50.5 start
+```
+
+with nothing after it. `50.2`, `50.3` and `50.4` all started **and
+returned** -- so the two-interpreter tests are innocent, and the answer
+is **`unixWm-50.5`**. **Ask the harness which test before reasoning
+about which mechanism**; that is the fourth time in this file a
+confident mechanism was wrong and one printed intermediate settled it
+in a single run.
+
+#### The freeze: TkUnixSetMenubar never mapped the menubar
+
+`unixWm-50.5` is
+
+```tcl
+testmenubar window .t .t.menu
+tkwait visibility .t.menu
+```
+
+and `TkUnixSetMenubar` in `plan9/tkPlan9Stubs.c` was
+`(void)tkwin; (void)menubar;` under a comment reading "no separate
+menubar on Plan 9". That was true of the **decoration** and false of
+everything else the function does -- upstream's own doc comment leads
+with "the window given by menubar **will be mapped**". So the menubar
+stayed unmapped, `XMapWindow` never ran, no `VisibilityNotify` was ever
+sent for it, and `tkwait` waited for an event that could not arrive.
+
+It is the `XLoadFont` family one more time, and the widest instance of
+it yet: **a stub that does nothing is not the same as a platform that
+has nothing to do.** rio draws no menu bar, so the decoration really is
+absent; the window, its size, its map state and its destruction are
+ordinary Tk and were simply missing. One unmapped frame cost five
+unmeasured test files.
+
+**The shape of the wait is what said "blocked" rather than "spinning"**,
+and it was read correctly from the start: constant but *light* CPU is
+this port's notifier sleeping `P9_POLL_US` and finding nothing. A loop
+inside one Tk call pins a core -- that is what `scrollbar-10.1` looked
+like, and it was a genuinely different bug. Keep the two apart.
+
+**What is implemented, and what is deliberately not.** `TkUnixSetMenubar`
+lives in `tkPlan9Wm.c` now, beside the `WmInfo` it writes, as upstream
+keeps it in `tkUnixWm.c`: it sizes the menubar to the toplevel's width,
+maps it, manages its geometry (`menubarMgrType`), and clears
+`wmPtr->menubar` when it is destroyed -- without which
+`WmUpdateGeometry` would go on sizing a freed `TkWindow`, the
+use-after-free shape this port has hit twice (`TkpDeleteFont`,
+`TkpFreeColor`).
+
+**The menubar stays an ordinary child of its toplevel**, and that is the
+half a wrapper would be needed for. On X the toplevel is reparented into
+a **wrapper** window; the menubar becomes a second child of it *above*
+the toplevel, and the toplevel moves down by `menuHeight`. There are no
+wrapper windows here -- a toplevel *is* its window, and
+`dispPtr->firstWmPtr`, `Tk_CoordsToWindow` and `Tk_GetRootCoords` are
+all written that way. So two things stay wrong, and they are recorded
+rather than guessed at:
+
+- `unixWm-49.2` -- contents are not pushed down, so a child placed at
+  y=30 reports 32 where X says 62;
+- `unixWm-50.5` -- a point *above* the toplevel does not hit the
+  menubar, because `Tk_CoordsToWindow` descends only into a toplevel
+  whose rectangle already contains the point.
+
+**Half-way was tried first and is worse than either end**: putting the
+menubar out at the root with screen coordinates in `changes.x/y` makes
+`Tk_GetRootCoords` **double-count** for it -- it adds the menubar's
+coordinates and then the toplevel's -- so `winfo rootx` goes from wrong
+to wrong *and* inconsistent. Upstream needs a whole extra arm in that
+function for a menubar (subtract `menuHeight`, switch to the toplevel)
+precisely because of this. A wrapper is the real fix and is a large
+change: every toplevel in the port gains a window.
+
+Every line that acts on `menuHeight`/`menubar` is guarded on
+`menuHeight > 0`, so a toplevel without a menubar takes exactly the path
+it took before. That guard is load-bearing: this is the first change to
+`WmUpdateGeometry` since the one that regressed `unixEmbed-10.1`, and
+**the next run must be compared per file, not by total.**
+
+`sys/lib/tests/tk-menubar-test.tcl` covers it -- map, cancel, replace,
+and destroy-while-in-force followed by a resize (the step that would
+touch a stale pointer). It needs `tktest`, since `testmenubar` is one of
+Tk's own test commands, and it skips itself under `wish`. Its last
+section *prints* the two known-wrong answers rather than asserting them,
+so that today's limitation is not frozen in as the requirement.
 
 #### The four untouched files: 106 failures, and three of them are ours
 
