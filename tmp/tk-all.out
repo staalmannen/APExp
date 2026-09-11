@@ -1,5 +1,5 @@
 tk-runall: starting, line buffered, default bgerror dialog replaced by a log line (tkerror delegation kept), exit wrapped for the marker
-Tests running in interp:  /bin/wish
+Tests running in interp:  /usr/glenda/APExp/sys/src/ape/cmd/wish/tktest
 Tests located in:  /usr/glenda/APExp/sys/src/external/tk/tests
 Tests running in:  /usr/glenda/APExp/sys/src/external/tk/tests
 Temporary files stored in /usr/glenda/APExp/sys/src/external/tk/tests
@@ -7,7 +7,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-11 07:17:03 +0200
+Tests began at 2026-09-11 10:58:53 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -199,6 +199,295 @@ focus.test
 {} .t.b1
 ==== focus-1.19 FAILED
 
+
+
+==== focus-2.6 TkFocusFilterEvent procedure, FocusIn events FAILED
+==== Contents of test case:
+
+    focus .t.b1
+    focus .
+    update
+    event gen [testwrapper .t] <FocusIn> -detail NotifyAncestor
+    set focusInfo {}
+    set x [focus]
+    event gen . <x>
+    list $x $focusInfo
+
+---- Result was:
+{} {}
+---- Result should have been (exact matching):
+.t.b1 {press .t.b1 x}
+==== focus-2.6 FAILED
+
+
+
+==== focus-2.7 TkFocusFilterEvent procedure, FocusOut events FAILED
+==== Contents of test case:
+
+    set result {}
+    foreach detail {NotifyAncestor NotifyInferior NotifyNonlinear
+	    NotifyNonlinearVirtual NotifyPointer NotifyPointerRoot
+	    NotifyVirtual} {
+	focus -force .t.b1
+	event gen [testwrapper .t] <FocusOut> -detail $detail
+	update
+	lappend result [focus]
+    }
+    return $result
+
+---- Result was:
+.t.b1 .t.b1 .t.b1 .t.b1 .t.b1 .t.b1 .t.b1
+---- Result should have been (exact matching):
+{} .t.b1 {} {} .t.b1 .t.b1 {}
+==== focus-2.7 FAILED
+
+
+
+==== focus-2.9 TkFocusFilterEvent procedure, FocusOut events FAILED
+==== Contents of test case:
+
+    focus .t.b1
+    event gen [testwrapper .] <FocusOut> -detail NotifyAncestor
+    focus
+
+---- Result was:
+.t.b1
+---- Result should have been (exact matching):
+
+==== focus-2.9 FAILED
+
+
+
+==== focus-2.10 TkFocusFilterEvent procedure, Enter events FAILED
+==== Contents of test case:
+
+    set result {}
+    focus .t.b1
+    focusClear
+    foreach detail {NotifyAncestor NotifyInferior NotifyNonlinear
+	    NotifyNonlinearVirtual NotifyVirtual} {
+	event gen [testwrapper .t] <Enter> -detail $detail -focus 1
+	update
+	lappend result [focus]
+	event gen [testwrapper .t] <Leave> -detail NotifyAncestor
+	update
+    }
+    return $result
+
+---- Result was:
+.t.b1 .t.b1 .t.b1 .t.b1 .t.b1
+---- Result should have been (exact matching):
+.t.b1 {} .t.b1 .t.b1 .t.b1
+==== focus-2.10 FAILED
+
+
+
+==== focus-2.13 TkFocusFilterEvent procedure, Enter events FAILED
+==== Contents of test case:
+
+    focus .t.b1
+    focusClear
+    event gen [testwrapper .t] <Enter> -detail NotifyAncestor -focus 1
+    set focusInfo {}
+    update
+    return $focusInfo
+
+---- Result was:
+
+---- Result should have been (exact matching):
+in .t NotifyVirtual
+in .t.b1 NotifyAncestor
+
+==== focus-2.13 FAILED
+
+
+
+==== focus-2.15 TkFocusFilterEvent procedure, Leave events FAILED
+==== Contents of test case:
+
+    set result {}
+    focus .t.b1
+    foreach detail {NotifyAncestor NotifyInferior NotifyNonlinear
+	    NotifyNonlinearVirtual NotifyVirtual} {
+	focusClear
+	event gen [testwrapper .t] <Enter> -detail NotifyAncestor -focus 1
+	update
+	event gen [testwrapper .t] <Leave> -detail $detail
+	update
+	lappend result [focus]
+    }
+    return $result
+
+---- Result was:
+.t.b1 .t.b1 .t.b1 .t.b1 .t.b1
+---- Result should have been (exact matching):
+{} .t.b1 {} {} {}
+==== focus-2.15 FAILED
+
+
+
+==== focus-2.16 TkFocusFilterEvent procedure, Leave events FAILED
+==== Contents of test case:
+
+    focusClear
+    focus .t.b1
+    event gen [testwrapper .t] <Enter> -detail NotifyAncestor -focus 1
+    update
+    set focusInfo {}
+    event gen [testwrapper .t] <Leave> -detail NotifyAncestor
+    update
+    return $focusInfo
+
+---- Result was:
+
+---- Result should have been (exact matching):
+out .t.b1 NotifyAncestor
+out .t NotifyVirtual
+
+==== focus-2.16 FAILED
+
+
+
+==== focus-2.17 TkFocusFilterEvent procedure, Leave events FAILED
+==== Contents of test case:
+
+    focusClear
+    focus .t.b1
+    event gen [testwrapper .t] <Enter> -detail NotifyAncestor -focus 1
+    update
+    set focusInfo {}
+    event gen .t.b1 <Leave> -detail NotifyAncestor
+    event gen [testwrapper .] <Leave> -detail NotifyAncestor
+    update
+    list $focusInfo [focus]
+
+---- Result was:
+{} .t.b1
+---- Result should have been (exact matching):
+{out .t.b1 NotifyAncestor
+out .t NotifyVirtual
+} {}
+==== focus-2.17 FAILED
+
+
+
+==== focus-6.1 miscellaneous - embedded application in same process FAILED
+==== Contents of test case:
+
+    toplevel .t
+    wm geometry .t +0+0
+    frame .t.f1 -container 1
+    frame .t.f2
+    pack .t.f1 .t.f2
+    entry .t.f2.e1 -bg red
+    pack .t.f2.e1
+    bind all <FocusIn> {lappend x "focus in %W %d"}
+    bind all <FocusOut> {lappend x "focus out %W %d"}
+    interp create child
+    child eval "set argv {-use [winfo id .t.f1]}"
+    load {} Tk child
+    child eval {
+	entry .e1 -bg lightBlue
+	pack .e1
+	bind all <FocusIn> {lappend x "focus in %W %d"}
+	bind all <FocusOut> {lappend x "focus out %W %d"}
+	set x {}
+    }
+
+    # Claim the focus and wait long enough for it to really arrive.
+
+    focus -force .t.f2.e1
+    after 300 {set timer 1}
+    vwait timer
+    set x {}
+    lappend x [focus] [child eval focus]
+
+    # See if a "focus" command will move the focus to the embedded
+    # application.
+
+    child eval {focus .e1}
+    after 300 {set timer 1}
+    vwait timer
+    lappend x |
+    child eval {lappend x |}
+
+    # Bring the focus back to the main application.
+
+    focus .t.f2.e1
+    after 300 {set timer 1}
+    vwait timer
+    set result [list $x [child eval {set x}]]
+    return $result
+
+---- Result was:
+{.t.f2.e1 {} {focus out .t.f2.e1 NotifyNonlinear} {focus out .t.f2 NotifyNonlinearVirtual} {focus in .t.f1 NotifyNonlinear} | {focus out .t.f1 NotifyNonlinear} {focus in .t.f2 NotifyNonlinearVirtual} {focus in .t.f2.e1 NotifyNonlinear}} |
+---- Result should have been (exact matching):
+{.t.f2.e1 {} {focus out .t.f2.e1 NotifyNonlinear} {focus out .t.f2 NotifyNonlinearVirtual} {focus in .t.f1 NotifyNonlinear} | {focus out .t.f1 NotifyNonlinear} {focus in .t.f2 NotifyNonlinearVirtual} {focus in .t.f2.e1 NotifyNonlinear}} {{focus in . NotifyVirtual} {focus in .e1 NotifyAncestor} | {focus out .e1 NotifyAncestor} {focus out . NotifyVirtual}}
+==== focus-6.1 FAILED
+
+
+
+==== focus-6.2 miscellaneous - embedded application in different process FAILED
+==== Contents of test case:
+
+    childTkProcess create
+    toplevel .t
+    wm geometry .t +0+0
+    frame .t.f1 -container 1
+    frame .t.f2
+    pack .t.f1 .t.f2
+    entry .t.f2.e1 -bg red
+    pack .t.f2.e1
+    bind all <FocusIn> {lappend x "focus in %W %d"}
+    bind all <FocusOut> {lappend x "focus out %W %d"}
+    childTkProcess create -use [winfo id .t.f1]
+    childTkProcess eval {
+	entry .e1 -bg lightBlue
+	pack .e1
+	bind all <FocusIn> {lappend x "focus in %W %d"}
+	bind all <FocusOut> {lappend x "focus out %W %d"}
+	set x {}
+    }
+
+    # Claim the focus and wait long enough for it to really arrive.
+
+    focus -force .t.f2.e1
+    after 300 {set timer 1}
+    vwait timer
+    set x {}
+    lappend x [focus] [childTkProcess eval focus]
+
+    # See if a "focus" command will move the focus to the embedded
+    # application.
+
+    childTkProcess eval {focus .e1}
+    after 300 {set timer 1}
+    vwait timer
+    lappend x |
+    childTkProcess eval {lappend x |}
+
+    # Bring the focus back to the main application.
+
+    focus .t.f2.e1
+    after 300 {set timer 1}
+    vwait timer
+    set result [list $x [childTkProcess eval {set x}]]
+    return $result
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: unexpected EOF from "/usr/glenda/APExp/sys/src/ape/cmd/wish/tktest"
+    while executing
+"error "unexpected EOF from \"[::tcltest::interpreter]\"""
+    (procedure "childTkProcess" line 21)
+    invoked from within
+"childTkProcess create -use [winfo id .t.f1]"
+    ("uplevel" body line 12)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== focus-6.2 FAILED
+
 focusTcl.test
 font.test
 
@@ -347,64 +636,8 @@ get.test
 grab.test
 grid.test
 image.test
-
-
-==== image-6.2 Tk_ImageCmd procedure, "types" option FAILED
-==== Contents of test case:
-
-    lsort [image types]
-
----- Result was:
-bitmap photo
----- Result should have been (glob matching):
-bitmap*photo test
-==== image-6.2 FAILED
-
 imgBmap.test
 imgListFormat.test
-
-
-==== imgListFormat-3.1 StringMatchDef: data is not a list FAILED
-==== Contents of test case:
-
-    testphotostringmatch {not a " proper list}
-    # " (this comment is here only for editor highlighting)
-
----- Result was:
-invalid command name "testphotostringmatch"
----- Result should have been (exact matching):
-unmatched open quote in list
-==== imgListFormat-3.1 FAILED
-
-
-
-==== imgListFormat-3.2 StringMatchDef:  list element not a proper list FAILED
-==== Contents of test case:
-
-    testphotostringmatch {{red white} {not "} {blue green}}
-    # "
-
----- Result was:
-invalid command name "testphotostringmatch"
----- Result should have been (exact matching):
-unmatched open quote in list
-==== imgListFormat-3.2 FAILED
-
-
-
-==== imgListFormat-3.3 StringMatchDef:  sublists with differen lengths FAILED
-==== Contents of test case:
-
-    testphotostringmatch {{#001122 #334455 #667788}
-		{#99AABB #CCDDEE}
-		{#FF0011 #223344 #556677}}
-
----- Result was:
-invalid command name "testphotostringmatch"
----- Result should have been (exact matching):
-invalid row # 1: all rows must have the same number of elements
-==== imgListFormat-3.3 FAILED
-
 imgPNG.test
 imgPPM.test
 imgPhoto.test
@@ -1920,6 +2153,336 @@ unixButton.test
 unixEmbed.test
 
 
+==== unixEmbed-1.5 Tk_UseWindow procedure, creating Container records FAILED
+==== Contents of test case:
+
+    frame .f1 -container 1 -width 200 -height 50
+    frame .f2 -container 1 -width 200 -height 50
+    pack .f1 .f2
+    childTkProcess eval "set w [winfo id .f1]"
+    childTkProcess eval {
+	destroy {*}[winfo children .]
+	toplevel .t -use $w
+	list [testembed] [expr [lindex [lindex [testembed all] 0] 0] - $w]
+    }
+
+---- Result was:
+couldn't create child of window "0x5749"
+---- Result should have been (exact matching):
+{{XXX {} {} .t}} 0
+==== unixEmbed-1.5 FAILED
+
+
+
+==== unixEmbed-1.5a Tk_UseWindow procedure, creating Container records FAILED
+==== Contents of test case:
+
+    frame .f1 -container 1 -width 200 -height 50
+    frame .f2 -container 1 -width 200 -height 50
+    pack .f1 .f2
+    child alias w winfo id .f1
+    child eval {
+	destroy {*}[winfo children .]
+	toplevel .t -use [w]
+	list [testembed] [expr {[lindex [lindex [testembed all] 0] 0] - [w]}]
+    }
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: testembed not supported on Plan 9
+    while executing
+"testembed"
+    ("interp eval" body line 4)
+    invoked from within
+"child eval {
+	destroy {*}[winfo children .]
+	toplevel .t -use [w]
+	list [testembed] [expr {[lindex [lindex [testembed all] 0] 0] - [w]}]
+    }"
+    ("uplevel" body line 6)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== unixEmbed-1.5a FAILED
+
+
+
+==== unixEmbed-1.6 Tk_UseWindow procedure, creating Container records FAILED
+==== Contents of test case:
+
+    frame .f1 -container 1 -width 200 -height 50
+    frame .f2 -container 1 -width 200 -height 50
+    pack .f1 .f2
+    childTkProcess eval "set w1 [winfo id .f1]"
+    childTkProcess eval "set w2 [winfo id .f2]"
+    childTkProcess eval {
+	destroy {*}[winfo children .]
+	toplevel .t1 -use $w1
+	toplevel .t2 -use $w2
+	testembed
+    }
+
+---- Result was:
+couldn't create child of window "0x5753"
+---- Result should have been (exact matching):
+{XXX {} {} .t2} {XXX {} {} .t1}
+==== unixEmbed-1.6 FAILED
+
+
+
+==== unixEmbed-1.6a Tk_UseWindow procedure, creating Container records FAILED
+==== Contents of test case:
+
+    frame .f1 -container 1 -width 200 -height 50
+    frame .f2 -container 1 -width 200 -height 50
+    pack .f1 .f2
+    child alias w1 winfo id .f1
+    child alias w2 winfo id .f2
+    child eval {
+	destroy {*}[winfo children .]
+	toplevel .t1 -use [w1]
+	toplevel .t2 -use [w2]
+	testembed
+    }
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: testembed not supported on Plan 9
+    while executing
+"testembed"
+    ("interp eval" body line 5)
+    invoked from within
+"child eval {
+	destroy {*}[winfo children .]
+	toplevel .t1 -use [w1]
+	toplevel .t2 -use [w2]
+	testembed
+    }"
+    ("uplevel" body line 7)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== unixEmbed-1.6a FAILED
+
+
+
+==== unixEmbed-1.7 Tk_UseWindow procedure, container and embedded in same app FAILED
+==== Contents of test case:
+
+    frame .f1 -container 1 -width 200 -height 50
+    frame .f2 -container 1 -width 200 -height 50
+    pack .f1 .f2
+    toplevel .t1 -use [winfo id .f1]
+    toplevel .t2 -use [winfo id .f2]
+    testembed
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: testembed not supported on Plan 9
+    while executing
+"testembed"
+    ("uplevel" body line 7)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== unixEmbed-1.7 FAILED
+
+
+
+==== unixEmbed-2.1 EmbeddedEventProc procedure FAILED
+==== Contents of test case:
+
+    frame .f1 -container 1 -width 200 -height 50
+    pack .f1
+    childTkProcess eval "set w1 [winfo id .f1]"
+    childTkProcess eval {
+	destroy {*}[winfo children .]
+	toplevel .t1 -use $w1
+	testembed
+    }
+    destroy .f1
+    update
+    childTkProcess eval {
+	testembed
+    }
+
+---- Result was:
+testembed not supported on Plan 9
+---- Result should have been (exact matching):
+
+==== unixEmbed-2.1 FAILED
+
+
+
+==== unixEmbed-2.1a EmbeddedEventProc procedure FAILED
+==== Contents of test case:
+
+    frame .f1 -container 1 -width 200 -height 50
+    pack .f1
+    child alias w1 winfo id .f1
+    child eval {
+	destroy {*}[winfo children .]
+	toplevel .t1 -use [w1]
+	testembed
+    }
+    destroy .f1
+    update
+    child eval {
+	testembed
+    }
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: testembed not supported on Plan 9
+    while executing
+"testembed"
+    ("interp eval" body line 4)
+    invoked from within
+"child eval {
+	destroy {*}[winfo children .]
+	toplevel .t1 -use [w1]
+	testembed
+    }"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== unixEmbed-2.1a FAILED
+
+
+
+==== unixEmbed-2.2 EmbeddedEventProc procedure FAILED
+==== Contents of test case:
+
+    frame .f1 -container 1 -width 200 -height 50
+    pack .f1
+    childTkProcess eval "set w1 [winfo id .f1]"
+    childTkProcess eval {
+	destroy {*}[winfo children .]
+	toplevel .t1 -use $w1
+	testembed
+	destroy .t1
+	testembed
+    }
+
+---- Result was:
+couldn't create child of window "0x5768"
+---- Result should have been (exact matching):
+
+==== unixEmbed-2.2 FAILED
+
+
+
+==== unixEmbed-2.2a EmbeddedEventProc procedure FAILED
+==== Contents of test case:
+
+    frame .f1 -container 1 -width 200 -height 50
+    pack .f1
+    child alias w1 winfo id .f1
+    child eval {
+	destroy {*}[winfo children .]
+	toplevel .t1 -use [w1]
+	testembed
+	destroy .t1
+	testembed
+    }
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: testembed not supported on Plan 9
+    while executing
+"testembed"
+    ("interp eval" body line 4)
+    invoked from within
+"child eval {
+	destroy {*}[winfo children .]
+	toplevel .t1 -use [w1]
+	testembed
+	destroy .t1
+	testembed
+    }"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== unixEmbed-2.2a FAILED
+
+
+
+==== unixEmbed-2.3 EmbeddedEventProc procedure FAILED
+==== Contents of test case:
+
+    frame .f1 -container 1 -width 200 -height 50
+    pack .f1
+    toplevel .t1 -use [winfo id .f1]
+    update
+    destroy .f1
+    testembed
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: testembed not supported on Plan 9
+    while executing
+"testembed"
+    ("uplevel" body line 7)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== unixEmbed-2.3 FAILED
+
+
+
+==== unixEmbed-2.4 EmbeddedEventProc procedure FAILED
+==== Contents of test case:
+
+    pack [frame .f1 -container 1 -width 200 -height 50]
+    toplevel .t1 -use [winfo id .f1]
+    set x [testembed]
+    update
+    destroy .t1
+    update
+    list $x [winfo exists .t1] [winfo exists .f1] [testembed]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: testembed not supported on Plan 9
+    while executing
+"testembed"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== unixEmbed-2.4 FAILED
+
+
+
+==== unixEmbed-3.1a ContainerEventProc procedure, detect creation FAILED
+==== Contents of test case:
+
+    frame .f1 -container 1 -width 200 -height 50
+    pack .f1
+    child alias w1 winfo id .f1
+    set x [testembed]
+    child eval {
+	destroy {*}[winfo children .]
+	toplevel .t1 -use [w1]
+	wm withdraw .t1
+    }
+    list $x [testembed]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: testembed not supported on Plan 9
+    while executing
+"testembed"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== unixEmbed-3.1a FAILED
+
+
+
 ==== unixEmbed-3.3 ContainerEventProc procedure, disallow position changes FAILED
 ==== Contents of test case:
 
@@ -1942,34 +2505,6 @@ bad window path name ".t1"
 ---- Result should have been (exact matching):
 200x200+0+0
 ==== unixEmbed-3.3 FAILED
-
-
-
-==== unixEmbed-3.3a ContainerEventProc procedure, disallow position changes FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    child alias w1 winfo id .f1
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1] -bd 2 -relief raised
-	update
-	wm geometry .t1 +30+40
-	update
-	wm geometry .t1
-    }
-
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
-==== unixEmbed-3.3a FAILED
 
 
 
@@ -1998,34 +2533,6 @@ bad window path name ".t1"
 
 
 
-==== unixEmbed-3.4a ContainerEventProc procedure, disallow position changes FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    child alias w1 winfo id .f1
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	update
-	wm geometry .t1 300x100+30+40
-	update
-	wm geometry .t1
-    }
-
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
-==== unixEmbed-3.4a FAILED
-
-
-
 ==== unixEmbed-3.5 ContainerEventProc procedure, geometry requests FAILED
 ==== Contents of test case:
 
@@ -2048,33 +2555,6 @@ no library with prefix "Tktest" is loaded statically
 ---- Result should have been (exact matching):
 300 80 300x80+0+0
 ==== unixEmbed-3.5 FAILED
-
-
-
-==== unixEmbed-3.5a ContainerEventProc procedure, geometry requests FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    child alias w1 winfo id .f1
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	.t1 configure -width 300 -height 80
-	update
-    }
-    list [winfo width .f1] [winfo height .f1] [child eval {wm geometry .t1}]
-
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
-==== unixEmbed-3.5a FAILED
 
 
 
@@ -2102,36 +2582,6 @@ can't read "x": no such variable
 ---- Result should have been (exact matching):
 mapped
 ==== unixEmbed-3.6 FAILED
-
-
-
-==== unixEmbed-3.6a ContainerEventProc procedure, map requests FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    child alias w1 winfo id .f1
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	set x unmapped
-	bind .t1 <Map> {set x mapped}
-	update
-	after 100
-	update
-	set x
-    }
-
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
-==== unixEmbed-3.6a FAILED
 
 
 
@@ -2179,15 +2629,10 @@ dead 0
     update
     list $x [winfo exists .f1]
 
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
+---- Result was:
+alive 1
+---- Result should have been (exact matching):
+dead 0
 ==== unixEmbed-3.7a FAILED
 
 
@@ -2219,31 +2664,60 @@ bad window path name ".t1"
 
 
 
-==== unixEmbed-4.1a EmbedStructureProc procedure, configure events FAILED
+==== unixEmbed-4.2 EmbedStructureProc procedure, destroy events FAILED
 ==== Contents of test case:
 
     frame .f1 -container 1 -width 200 -height 50
     pack .f1
+    childTkProcess eval "set w1 [winfo id .f1]"
+    childTkProcess eval {
+	destroy {*}[winfo children .]
+	toplevel .t1 -use $w1
+    }
+    update
+    set x [testembed]
+    destroy .f1
+    update
+    list $x [testembed]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: testembed not supported on Plan 9
+    while executing
+"testembed"
+    ("uplevel" body line 10)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== unixEmbed-4.2 FAILED
+
+
+
+==== unixEmbed-4.2a EmbedStructureProc procedure, destroy events FAILED
+==== Contents of test case:
+
+    frame .f1 -container 1 -width 200 -height 50
+    pack .f1
+    update
     child alias w1 winfo id .f1
     child eval {
 	destroy {*}[winfo children .]
 	toplevel .t1 -use [w1]
-	update
-	.t1 configure -width 180 -height 100
-	update
-	winfo geometry .t1
     }
+    set x [testembed]
+    destroy .f1
+    list $x [testembed]
 
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: testembed not supported on Plan 9
     while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
+"testembed"
+    ("uplevel" body line 10)
     invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
-==== unixEmbed-4.1a FAILED
+"uplevel 1 $script"
+---- errorCode: NONE
+==== unixEmbed-4.2a FAILED
 
 
 
@@ -2292,46 +2766,11 @@ can't read "x": no such variable
     update
     child eval {set x}
 
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
+---- Result was:
+
+---- Result should have been (exact matching):
+{focus in .t1}
 ==== unixEmbed-5.1a FAILED
-
-
-
-==== unixEmbed-5.2a EmbedFocusProc procedure, focusing on dead window FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    update
-    child alias w1 winfo id .f1
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	update
-	after 200 {destroy .t1}
-    }
-    after 400
-    focus -force .f1
-    update
-
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
-==== unixEmbed-5.2a FAILED
 
 
 
@@ -2386,15 +2825,10 @@ no library with prefix "Tktest" is loaded statically
     update
     list $x [child eval {update; set x}]
 
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
+---- Result was:
+{} {}
+---- Result should have been (exact matching):
+{{focus in .t1}} {{focus in .t1} {focus out .t1}}
 ==== unixEmbed-5.3a FAILED
 
 
@@ -2417,40 +2851,10 @@ no library with prefix "Tktest" is loaded statically
     }
 
 ---- Result was:
-couldn't create child of window "0x5420"
+couldn't create child of window "0x5813"
 ---- Result should have been (exact matching):
 {{configure .t1 300 120}} 300x120+0+0
 ==== unixEmbed-6.1 FAILED
-
-
-
-==== unixEmbed-6.1a EmbedGeometryRequest procedure, window changes size FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    child alias w1 winfo id .f1
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	update
-	bind .t1 <Configure> {set x {configure .t1 %w %h}}
-	set x {}
-	.t1 configure -width 300 -height 120
-	update
-	list $x [winfo geom .t1]
-    }
-
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
-==== unixEmbed-6.1a FAILED
 
 
 
@@ -2472,7 +2876,7 @@ no library with prefix "Tktest" is loaded statically
     }
 
 ---- Result was:
-couldn't create child of window "0x5424"
+couldn't create child of window "0x5825"
 ---- Result should have been (exact matching):
 {{configure .t1 200 200}} 200x200+0+0
 ==== unixEmbed-6.2 FAILED
@@ -2497,15 +2901,10 @@ couldn't create child of window "0x5424"
 	list $x [winfo geom .t1]
     }
 
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
+---- Result was:
+{} 200x200+0+0
+---- Result should have been (exact matching):
+{configure .t1 200 200} 200x200+0+0
 ==== unixEmbed-6.2a FAILED
 
 
@@ -2566,15 +2965,10 @@ no library with prefix "Tktest" is loaded statically
     update
     list $x $y
 
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
+---- Result was:
+{} {}
+---- Result should have been (exact matching):
+{{key a 1}} {}
 ==== unixEmbed-7.1a FAILED
 
 
@@ -2637,15 +3031,10 @@ no library with prefix "Tktest" is loaded statically
     update
     list $x $y
 
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
+---- Result was:
+{} {}
+---- Result should have been (exact matching):
+{} {{key b}}
 ==== unixEmbed-7.2a FAILED
 
 
@@ -2702,15 +3091,10 @@ no library with prefix "Tktest" is loaded statically
 	lappend x [focus]
     }] [focus]
 
----- Test setup failed:
-no library with prefix "Tktest" is loaded statically
----- errorInfo(setup): no library with prefix "Tktest" is loaded statically
-    while executing
-"load {} Tktest child"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL OPERATION LOAD NOTSTATIC
+---- Result was:
+{{} {}} .f1
+---- Result should have been (exact matching):
+{{} .t1} .f1
 ==== unixEmbed-8.1a FAILED
 
 
@@ -2745,42 +3129,92 @@ no library with prefix "Tktest" is loaded statically
 
 
 
-==== unixEmbed-10.1 geometry propagation in tkUnixWm.c/UpdateGeometryInfo FAILED
+==== unixEmbed-9.1 EmbedWindowDeleted procedure, check parentPtr FAILED
+==== Contents of test case:
+
+    frame .f1 -container 1 -width 200 -height 50
+    frame .f2 -container 1 -width 200 -height 50
+    frame .f3 -container 1 -width 200 -height 50
+    frame .f4 -container 1 -width 200 -height 50
+    pack .f1 .f2 .f3 .f4
+    set x {}
+    lappend x [testembed]
+    foreach w {.f3 .f4 .f1 .f2} {
+	destroy $w
+	lappend x [testembed]
+    }
+    set x
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: testembed not supported on Plan 9
+    while executing
+"testembed"
+    ("uplevel" body line 8)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== unixEmbed-9.1 FAILED
+
+
+
+==== unixEmbed-9.2 EmbedWindowDeleted procedure, check embeddedPtr FAILED
 ==== Contents of test case:
 
     frame .f1 -container 1 -width 200 -height 50
     pack .f1
-    toplevel .t1 -use [winfo id .f1] -width 150 -height 80
     update
-    wm geometry .t1 +40+50
-    update
-    wm geometry .t1
+    childTkProcess eval "set w1 [winfo id .f1]"
+    childTkProcess eval {
+	destroy {*}[winfo children .]
+	toplevel .t1 -use $w1 -highlightthickness 2 -bd 2 -relief sunken
+	set x {}
+	lappend x [testembed]
+	destroy .t1
+	lappend x [testembed]
+    }
 
 ---- Result was:
-150x80+40+50
+couldn't create child of window "0x5875"
 ---- Result should have been (exact matching):
-150x80+0+0
-==== unixEmbed-10.1 FAILED
+{{XXX {} {} .t1}} {}
+==== unixEmbed-9.2 FAILED
 
 
 
-==== unixEmbed-10.2 geometry propagation in tkUnixWm.c/UpdateGeometryInfo FAILED
+==== unixEmbed-9.2a EmbedWindowDeleted procedure, check embeddedPtr FAILED
 ==== Contents of test case:
 
     frame .f1 -container 1 -width 200 -height 50
     pack .f1
-    update
-    toplevel .t1 -use [winfo id .f1] -width 150 -height 80
-    update
-    wm geometry .t1 70x300+10+20
-    update
-    wm geometry .t1
+    child alias w1 winfo id .f1
+    child eval {
+	destroy {*}[winfo children .]
+	toplevel .t1 -use [w1] -highlightthickness 2 -bd 2 -relief sunken
+	set x {}
+	lappend x [testembed]
+	destroy .t1
+	lappend x [testembed]
+    }
 
----- Result was:
-70x300+10+20
----- Result should have been (exact matching):
-70x300+0+0
-==== unixEmbed-10.2 FAILED
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: testembed not supported on Plan 9
+    while executing
+"testembed"
+    ("interp eval" body line 5)
+    invoked from within
+"child eval {
+	destroy {*}[winfo children .]
+	toplevel .t1 -use [w1] -highlightthickness 2 -bd 2 -relief sunken
+	set x {}
+	lappend x [testembed]
+	destr..."
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== unixEmbed-9.2a FAILED
 
 unixFont.test
 
@@ -3297,6 +3731,88 @@ unixWm.test
 
 
 
+==== unixWm-9.1 TkWmMapWindow procedure, client property FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t -width 100 -height 50
+    wm geom .t +0+0
+    wm client .t Test_String
+    update
+    testprop [testwrapper .t] WM_CLIENT_MACHINE
+
+---- Result was:
+
+---- Result should have been (exact matching):
+Test_String
+==== unixWm-9.1 FAILED
+
+
+
+==== unixWm-9.2 TkWmMapWindow procedure, command property FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t -width 100 -height 50
+    wm geom .t +0+0
+    wm command .t "test command"
+    update
+    testprop [testwrapper .t] WM_COMMAND
+
+---- Result was:
+
+---- Result should have been (exact matching):
+test
+command
+
+==== unixWm-9.2 FAILED
+
+
+
+==== unixWm-10.2 TkWmDeadWindow procedure, destroying menubar FAILED
+==== Contents of test case:
+
+    destroy .t
+    destroy .f
+    toplevel .t -width 300 -height 200 -bd 2 -relief raised
+    wm geom .t +0+0
+    update
+    frame .f -width 400 -height 30 -bd 2 -relief raised -bg green
+    bind .f <Destroy> {lappend result destroyed}
+    testmenubar window .t .f
+    update
+    set result {}
+    destroy .t
+    lappend result [winfo exists .f]
+
+---- Result was:
+1
+---- Result should have been (exact matching):
+destroyed 0
+==== unixWm-10.2 FAILED
+
+
+
+==== unixWm-13.2 Tk_WmCmd procedure, "client" option FAILED
+==== Contents of test case:
+
+    set result {}
+    lappend result [wm client .t]
+    wm client .t Test_String
+    lappend result [testprop [testwrapper .t] WM_CLIENT_MACHINE]
+    wm client .t New
+    lappend result [wm client .t]
+    wm client .t {}
+    lappend result [wm client .t] [testprop [testwrapper .t] WM_CLIENT_MACHINE]
+
+---- Result was:
+{} {} New {} {}
+---- Result should have been (exact matching):
+{} Test_String New {} {}
+==== unixWm-13.2 FAILED
+
+
+
 ==== unixWm-14.2 Tk_WmCmd procedure, "colormapwindows" option FAILED
 ==== Contents of test case:
 
@@ -3318,6 +3834,564 @@ unixWm.test
 ---- Result should have been (exact matching):
 {.t2.b .t2} {.t2.b .t2.c .t2}
 ==== unixWm-14.2 FAILED
+
+
+
+==== unixWm-15.3 Tk_WmCmd procedure, "command" option FAILED
+==== Contents of test case:
+
+    set result {}
+    lappend result [wm command .t]
+    wm command .t "test command"
+    lappend result [testprop [testwrapper .t] WM_COMMAND]
+    wm command .t "new command"
+    lappend result [wm command .t]
+    wm command .t {}
+    lappend result [wm command .t] [testprop [testwrapper .t] WM_COMMAND]
+
+---- Result was:
+{} {} {new command} {} {}
+---- Result should have been (exact matching):
+{} {test
+command
+} {new command} {} {}
+==== unixWm-15.3 FAILED
+
+
+
+==== unixWm-21.3 Tk_WmCmd procedure, "group" option FAILED
+==== Contents of test case:
+
+    set result {}
+    lappend result [wm group .t]
+    wm group .t .
+    set bit [format 0x%x [expr 0x40 & [lindex [testprop [testwrapper .t]  WM_HINTS] 0]]]
+    lappend result [wm group .t] $bit
+    wm group .t {}
+    set bit [format 0x%x [expr 0x40 & [lindex [testprop [testwrapper .t]  WM_HINTS] 0]]]
+    lappend result [wm group .t] $bit
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: missing operand at _@_
+in expression "0x40 & _@_"
+    (parsing expression "0x40 & ")
+    invoked from within
+"expr 0x40 & [lindex [testprop [testwrapper .t]  WM_HINTS] 0]"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL PARSE EXPR MISSING
+==== unixWm-21.3 FAILED
+
+
+
+==== unixWm-21.4 Tk_WmCmd procedure, "group" option, make window exist FAILED
+==== Contents of test case:
+
+    destroy .t2
+    toplevel .t2
+    wm geom .t2 +0+0
+    wm group .t .t2
+    set hints [testprop [testwrapper .t] WM_HINTS]
+    set result [expr [testwrapper .t2] - [lindex $hints 8]]
+    destroy .t2
+    set result
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: missing operand at _@_
+in expression "0x0 - _@_"
+    (parsing expression "0x0 - ")
+    invoked from within
+"expr [testwrapper .t2] - [lindex $hints 8]"
+    ("uplevel" body line 7)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL PARSE EXPR MISSING
+==== unixWm-21.4 FAILED
+
+
+
+==== unixWm-21.5 Tk_WmCmd procedure, "group" option, create leader wrapper FAILED
+==== Contents of test case:
+
+    destroy .t2
+    destroy .t3
+    toplevel .t2 -width 120 -height 300
+    wm geometry .t2 +0+0
+    toplevel .t3 -width 120 -height 300
+    wm geometry .t2 +0+0
+    set result [list [testwrapper .t2]]
+    wm group .t3 .t2
+    lappend result [expr {[testwrapper .t2] == ""}]
+    destroy .t2 .t3
+    set result
+
+---- Result was:
+0x0 0
+---- Result should have been (exact matching):
+{} 0
+==== unixWm-21.5 FAILED
+
+
+
+==== unixWm-22.2 Tk_WmCmd procedure, "iconbitmap" option FAILED
+==== Contents of test case:
+
+    set result {}
+    lappend result [wm iconbitmap .t]
+    wm iconbitmap .t questhead
+    set bit [format 0x%x [expr 0x4 & [lindex [testprop [testwrapper .t]  WM_HINTS] 0]]]
+    lappend result [wm iconbitmap .t] $bit
+    wm iconbitmap .t {}
+    set bit [format 0x%x [expr 0x4 & [lindex [testprop [testwrapper .t]  WM_HINTS] 0]]]
+    lappend result [wm iconbitmap .t] $bit
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: missing operand at _@_
+in expression "0x4 & _@_"
+    (parsing expression "0x4 & ")
+    invoked from within
+"expr 0x4 & [lindex [testprop [testwrapper .t]  WM_HINTS] 0]"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL PARSE EXPR MISSING
+==== unixWm-22.2 FAILED
+
+
+
+==== unixWm-24.2 Tk_WmCmd procedure, "iconmask" option FAILED
+==== Contents of test case:
+
+    set result {}
+    lappend result [wm iconmask .t]
+    wm iconmask .t questhead
+    set bit [format 0x%x [expr 0x20 & [lindex [testprop [testwrapper .t]  WM_HINTS] 0]]]
+    lappend result [wm iconmask .t] $bit
+    wm iconmask .t {}
+    set bit [format 0x%x [expr 0x20 & [lindex [testprop [testwrapper .t]  WM_HINTS] 0]]]
+    lappend result [wm iconmask .t] $bit
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: missing operand at _@_
+in expression "0x20 & _@_"
+    (parsing expression "0x20 & ")
+    invoked from within
+"expr 0x20 & [lindex [testprop [testwrapper .t]  WM_HINTS] 0]"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL PARSE EXPR MISSING
+==== unixWm-24.2 FAILED
+
+
+
+==== unixWm-25.3 Tk_WmCmd procedure, "iconname" option FAILED
+==== Contents of test case:
+
+    set result {}
+    lappend result [wm iconname .t]
+    wm iconname .t test_name
+    lappend result [wm iconname .t] [testprop [testwrapper .t] WM_ICON_NAME]
+    wm iconname .t {}
+    lappend result [wm iconname .t] [testprop [testwrapper .t] WM_ICON_NAME]
+
+---- Result was:
+{} test_name {} {} {}
+---- Result should have been (exact matching):
+{} test_name test_name {} {}
+==== unixWm-25.3 FAILED
+
+
+
+==== unixWm-26.3 Tk_WmCmd procedure, "iconposition" option FAILED
+==== Contents of test case:
+
+    set result {}
+    lappend result [wm iconposition .t]
+    wm iconposition .t 10 15
+    set prop [testprop [testwrapper .t] WM_HINTS]
+    lappend result [wm iconposition .t] [lindex $prop 5] [lindex $prop 6]
+    lappend result  [format 0x%x [expr 0x10 & [lindex $prop 0]]]
+    wm iconposition .t {} {}
+    set bit [format 0x%x [expr 0x10 & [lindex [testprop [testwrapper .t]  WM_HINTS] 0]]]
+    lappend result [wm iconposition .t] $bit
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: missing operand at _@_
+in expression "0x10 & _@_"
+    (parsing expression "0x10 & ")
+    invoked from within
+"expr 0x10 & [lindex $prop 0]"
+    ("uplevel" body line 7)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL PARSE EXPR MISSING
+==== unixWm-26.3 FAILED
+
+
+
+==== unixWm-27.2 Tk_WmCmd procedure, "iconwindow" option FAILED
+==== Contents of test case:
+
+    destroy .icon
+    toplevel .icon -width 50 -height 50 -bg green
+    set result {}
+    lappend result [wm iconwindow .t]
+    wm iconwindow .t .icon
+    set prop [testprop [testwrapper .t] WM_HINTS]
+    lappend result [wm iconwindow .t] [wm state .icon]
+    lappend result [format 0x%x [expr 0x8 & [lindex $prop 0]]]
+    lappend result [expr [testwrapper .icon] == [lindex $prop 4]]
+    wm iconwindow .t {}
+    set bit [format 0x%x [expr 0x8 & [lindex [testprop [testwrapper .t]  WM_HINTS] 0]]]
+    lappend result [wm iconwindow .t]  [wm state .icon] $bit
+    destroy .icon
+    set result
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: missing operand at _@_
+in expression "0x8 & _@_"
+    (parsing expression "0x8 & ")
+    invoked from within
+"expr 0x8 & [lindex $prop 0]"
+    ("uplevel" body line 9)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL PARSE EXPR MISSING
+==== unixWm-27.2 FAILED
+
+
+
+==== unixWm-28.1 Tk_WmCmd procedure, "maxsize" option, setting the
+	maxsize should update WM_NORMAL_HINTS FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t
+    wm maxsize .t 300 300
+    update
+    set hints [testprop [testwrapper .t] WM_NORMAL_HINTS]
+    format {%d %d} [lindex $hints 7] [lindex $hints 8]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: expected integer but got ""
+    while executing
+"format {%d %d} [lindex $hints 7] [lindex $hints 8]"
+    ("uplevel" body line 7)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE NUMBER
+==== unixWm-28.1 FAILED
+
+
+
+==== unixWm-28.2 Tk_WmCmd procedure, "maxsize" option, setting the
+	maxsize to a value smaller than the current size should
+	set the maxsize in WM_NORMAL_HINTS FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t
+    wm geom .t 400x400
+    wm maxsize .t 300 300
+    update
+    set hints [testprop [testwrapper .t] WM_NORMAL_HINTS]
+    format {%d %d} [lindex $hints 7] [lindex $hints 8]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: expected integer but got ""
+    while executing
+"format {%d %d} [lindex $hints 7] [lindex $hints 8]"
+    ("uplevel" body line 8)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE NUMBER
+==== unixWm-28.2 FAILED
+
+
+
+==== unixWm-28.3 Tk_WmCmd procedure, "maxsize" option, setting the
+	maxsize to a value smaller than the current size should
+	set the maxsize in WM_NORMAL_HINTS even if the
+	interactive resizable flag is set to 0 FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t
+    wm geom .t 400x400
+    wm resizable .t 0 0
+    wm maxsize .t 300 300
+    update
+    set hints [testprop [testwrapper .t] WM_NORMAL_HINTS]
+    format {%d %d} [lindex $hints 7] [lindex $hints 8]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: expected integer but got ""
+    while executing
+"format {%d %d} [lindex $hints 7] [lindex $hints 8]"
+    ("uplevel" body line 9)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE NUMBER
+==== unixWm-28.3 FAILED
+
+
+
+==== unixWm-29.1 Tk_WmCmd procedure, "minsize" option, setting the
+	minsize should update WM_NORMAL_HINTS FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t
+    wm minsize .t 300 300
+    update
+    set hints [testprop [testwrapper .t] WM_NORMAL_HINTS]
+    format {%d %d} [lindex $hints 5] [lindex $hints 6]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: expected integer but got ""
+    while executing
+"format {%d %d} [lindex $hints 5] [lindex $hints 6]"
+    ("uplevel" body line 7)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE NUMBER
+==== unixWm-29.1 FAILED
+
+
+
+==== unixWm-29.2 Tk_WmCmd procedure, "minsize" option, setting the
+	minsize to a value larger than the current size should
+	set the maxsize in WM_NORMAL_HINTS FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t
+    wm geom .t 200x200
+    wm minsize .t 300 300
+    update
+    set hints [testprop [testwrapper .t] WM_NORMAL_HINTS]
+    format {%d %d} [lindex $hints 5] [lindex $hints 6]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: expected integer but got ""
+    while executing
+"format {%d %d} [lindex $hints 5] [lindex $hints 6]"
+    ("uplevel" body line 8)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE NUMBER
+==== unixWm-29.2 FAILED
+
+
+
+==== unixWm-29.3 Tk_WmCmd procedure, "minsize" option, setting the
+	minsize to a value larger than the current size should
+	set the minsize in WM_NORMAL_HINTS even if the
+	interactive resizable flag is set to 0 FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t
+    wm geom .t 200x200
+    wm resizable .t 0 0
+    wm minsize .t 300 300
+    update
+    set hints [testprop [testwrapper .t] WM_NORMAL_HINTS]
+    format {%d %d} [lindex $hints 5] [lindex $hints 6]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: expected integer but got ""
+    while executing
+"format {%d %d} [lindex $hints 5] [lindex $hints 6]"
+    ("uplevel" body line 9)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE NUMBER
+==== unixWm-29.3 FAILED
+
+
+
+==== unixWm-31.2 Tk_WmCmd procedure, "positionfrom" option FAILED
+==== Contents of test case:
+
+    set result {}
+    lappend result [wm positionfrom .t]
+    wm positionfrom .t program
+    update
+    set bit [format 0x%x [expr 0x5 & [lindex [testprop [testwrapper .t]  WM_NORMAL_HINTS] 0]]]
+    lappend result [wm positionfrom .t] $bit
+    wm positionfrom .t user
+    update
+    set bit [format 0x%x [expr 0x5 & [lindex [testprop [testwrapper .t]  WM_NORMAL_HINTS] 0]]]
+    lappend result [wm positionfrom .t] $bit
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: missing operand at _@_
+in expression "0x5 & _@_"
+    (parsing expression "0x5 & ")
+    invoked from within
+"expr 0x5 & [lindex [testprop [testwrapper .t]  WM_NORMAL_HINTS] 0]"
+    ("uplevel" body line 6)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL PARSE EXPR MISSING
+==== unixWm-31.2 FAILED
+
+
+
+==== unixWm-32.3 Tk_WmCmd procedure, "protocol" option FAILED
+==== Contents of test case:
+
+    set result {}
+    lappend result [wm protocol .t]
+    set x {}
+    foreach i [testprop [testwrapper .t] WM_PROTOCOLS] {
+	lappend x [winfo atomname $i]
+    }
+    lappend result $x
+    wm protocol .t foo {test script}
+    wm protocol .t bar {test script}
+    set x {}
+    foreach i [testprop [testwrapper .t] WM_PROTOCOLS] {
+	lappend x [winfo atomname $i]
+    }
+    lappend result [wm protocol .t] $x
+    wm protocol .t foo {}
+    wm protocol .t bar {}
+    set x {}
+    foreach i [testprop [testwrapper .t] WM_PROTOCOLS] {
+	lappend x [winfo atomname $i]
+    }
+    lappend result [wm protocol .t] $x
+
+---- Result was:
+{} {} {bar foo} {} {} {}
+---- Result should have been (exact matching):
+{} WM_DELETE_WINDOW {bar foo} {WM_DELETE_WINDOW bar foo} {} WM_DELETE_WINDOW
+==== unixWm-32.3 FAILED
+
+
+
+==== unixWm-34.2 Tk_WmCmd procedure, "sizefrom" option FAILED
+==== Contents of test case:
+
+    set result {}
+    lappend result [wm sizefrom .t]
+    wm sizefrom .t program
+    update
+    set bit [format 0x%x [expr 0xa & [lindex [testprop [testwrapper .t]  WM_NORMAL_HINTS] 0]]]
+    lappend result [wm sizefrom .t] $bit
+    wm sizefrom .t user
+    update
+    set bit [format 0x%x [expr 0xa & [lindex [testprop [testwrapper .t]  WM_NORMAL_HINTS] 0]]]
+    lappend result [wm sizefrom .t] $bit
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: missing operand at _@_
+in expression "0xa & _@_"
+    (parsing expression "0xa & ")
+    invoked from within
+"expr 0xa & [lindex [testprop [testwrapper .t]  WM_NORMAL_HINTS] 0]"
+    ("uplevel" body line 6)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL PARSE EXPR MISSING
+==== unixWm-34.2 FAILED
+
+
+
+==== unixWm-36.2 Tk_WmCmd procedure, "title" option FAILED
+==== Contents of test case:
+
+    set result {}
+    lappend result [wm title .t] [testprop [testwrapper .t] WM_NAME]
+    wm title .t "Test window"
+    set bit [format 0x%x [expr 0xa & [lindex [testprop [testwrapper .t]  WM_NORMAL_HINTS] 0]]]
+    lappend result [wm title .t] [testprop [testwrapper .t] WM_NAME]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: missing operand at _@_
+in expression "0xa & _@_"
+    (parsing expression "0xa & ")
+    invoked from within
+"expr 0xa & [lindex [testprop [testwrapper .t]  WM_NORMAL_HINTS] 0]"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL PARSE EXPR MISSING
+==== unixWm-36.2 FAILED
+
+
+
+==== unixWm-37.3 Tk_WmCmd procedure, "transient" option FAILED
+==== Contents of test case:
+
+    set result {}
+    destroy .t2
+    toplevel .t2 -width 120 -height 300
+    wm geometry .t2 +0+0
+    update
+    lappend result [wm transient .t2]  [testprop [testwrapper .t2] WM_TRANSIENT_FOR]
+    wm transient .t2 .t
+    set transient [testprop [testwrapper .t2] WM_TRANSIENT_FOR]
+    lappend result [wm transient .t2] [expr [testwrapper .t] - $transient]
+    wm transient .t2 {}
+    lappend result [wm transient .t2]  [testprop [testwrapper .t2] WM_TRANSIENT_FOR]
+    destroy .t2
+    set result
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: missing operand at _@_
+in expression "0x5b08 - _@_"
+    (parsing expression "0x5b08 - ")
+    invoked from within
+"expr [testwrapper .t] - $transient"
+    ("uplevel" body line 10)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL PARSE EXPR MISSING
+==== unixWm-37.3 FAILED
+
+
+
+==== unixWm-37.5 Tk_WmCmd procedure, "transient" option, create toplevel wrapper FAILED
+==== Contents of test case:
+
+    destroy .t2
+    destroy .t3
+    toplevel .t2 -width 120 -height 300
+    wm geometry .t2 +0+0
+    toplevel .t3 -width 120 -height 300
+    wm geometry .t2 +0+0
+    set result [list [testwrapper .t2]]
+    wm transient .t3 .t2
+    lappend result [expr {[testwrapper .t2] == ""}]
+    destroy .t2 .t3
+    set result
+
+---- Result was:
+0x0 0
+---- Result should have been (exact matching):
+{} 0
+==== unixWm-37.5 FAILED
 
 
 
@@ -3371,6 +4445,173 @@ unmapped 0 mapped 1
 
 
 
+==== unixWm-44.9 UpdateGeometryInfo procedure, updating fixed dimensions FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t -width 80 -height 60
+    wm resizable .t 0 0
+    wm geometry .t +0+0
+    tkwait visibility .t
+    .t configure  -width 180 -height 20
+    update
+    set property [testprop [testwrapper .t] WM_NORMAL_HINTS]
+    list [expr [lindex $property 5]] [expr [lindex $property 6]]  [expr [lindex $property 7]] [expr [lindex $property 8]]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: empty expression
+in expression ""
+    (parsing expression "")
+    invoked from within
+"expr [lindex $property 5]"
+    ("uplevel" body line 10)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL PARSE EXPR EMPTY
+==== unixWm-44.9 FAILED
+
+
+
+==== unixWm-45.1 UpdateSizeHints procedure, grid information FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t -width 80 -height 60
+    wm grid .t 6 10 10 5
+    wm minsize .t 2 4
+    wm maxsize .t 30 40
+    wm geometry .t +0+0
+    tkwait visibility .t
+    set property [testprop [testwrapper .t] WM_NORMAL_HINTS]
+    list [expr [lindex $property 5]] [expr [lindex $property 6]]  [expr [lindex $property 7]] [expr [lindex $property 8]]  [expr [lindex $property 9]] [expr [lindex $property 10]]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: empty expression
+in expression ""
+    (parsing expression "")
+    invoked from within
+"expr [lindex $property 5]"
+    ("uplevel" body line 10)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL PARSE EXPR EMPTY
+==== unixWm-45.1 FAILED
+
+
+
+==== unixWm-45.2 UpdateSizeHints procedure FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t -width 80 -height 60
+    wm minsize .t 30 40
+    wm maxsize .t 200 500
+    wm geometry .t +0+0
+    tkwait visibility .t
+    set property [testprop [testwrapper .t] WM_NORMAL_HINTS]
+    list [expr [lindex $property 5]] [expr [lindex $property 6]]  [expr [lindex $property 7]] [expr [lindex $property 8]]  [expr [lindex $property 9]] [expr [lindex $property 10]]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: empty expression
+in expression ""
+    (parsing expression "")
+    invoked from within
+"expr [lindex $property 5]"
+    ("uplevel" body line 9)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL PARSE EXPR EMPTY
+==== unixWm-45.2 FAILED
+
+
+
+==== unixWm-45.3 UpdateSizeHints procedure, grid with menu FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t -width 80 -height 60
+    frame .t.menu -height 23 -width 50
+    testmenubar window .t .t.menu
+    wm grid .t 6 10 10 5
+    wm minsize .t 2 4
+    wm maxsize .t 30 40
+    wm geometry .t +0+0
+    tkwait visibility .t
+    set property [testprop [testwrapper .t] WM_NORMAL_HINTS]
+    list [winfo height .t]  [expr [lindex $property 5]] [expr [lindex $property 6]]  [expr [lindex $property 7]] [expr [lindex $property 8]]  [expr [lindex $property 9]] [expr [lindex $property 10]]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: empty expression
+in expression ""
+    (parsing expression "")
+    invoked from within
+"expr [lindex $property 5]"
+    ("uplevel" body line 12)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL PARSE EXPR EMPTY
+==== unixWm-45.3 FAILED
+
+
+
+==== unixWm-45.4 UpdateSizeHints procedure, not resizable with menu FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t -width 80 -height 60
+    frame .t.menu -height 23 -width 50
+    testmenubar window .t .t.menu
+    wm resizable .t 0 0
+    wm geometry .t +0+0
+    tkwait visibility .t
+    set property [testprop [testwrapper .t] WM_NORMAL_HINTS]
+    list [winfo height .t]  [expr [lindex $property 5]] [expr [lindex $property 6]]  [expr [lindex $property 7]] [expr [lindex $property 8]]  [expr [lindex $property 9]] [expr [lindex $property 10]]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: empty expression
+in expression ""
+    (parsing expression "")
+    invoked from within
+"expr [lindex $property 5]"
+    ("uplevel" body line 10)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL PARSE EXPR EMPTY
+==== unixWm-45.4 FAILED
+
+
+
+==== unixWm-49.2 Tk_GetRootCoords procedure, menubars FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t -width 300 -height 200 -bd 2 -relief raised
+    wm geom .t +0+0
+    update
+    set x [winfo rootx .t]
+    set y [winfo rooty .t]
+    frame .t.m -bd 2 -relief raised -width 100 -height 30
+    frame .t.m.f -width 20 -height 10 -bd 2 -relief raised
+    place .t.m.f -x 50 -y 5
+    frame .t.f -width 20 -height 30 -bd 2 -relief raised
+    place .t.f -x 10 -y 30
+    testmenubar window .t .t.m
+    update
+    list [expr [winfo rootx .t.m.f] - $x] [expr [winfo rooty .t.m.f] - $y]  [expr [winfo rootx .t.f] - $x] [expr [winfo rooty .t.f] - $y]
+
+---- Result was:
+52 7 12 32
+---- Result should have been (exact matching):
+52 7 12 62
+==== unixWm-49.2 FAILED
+
+
+
 ==== unixWm-50.1 Tk_CoordsToWindow procedure, finding a toplevel, x-coords, title bar FAILED
 ==== Contents of test case:
 
@@ -3392,743 +4633,3 @@ unmapped 0 mapped 1
 {} {} .t {} .t2 {} .t2 {} .t
 ==== unixWm-50.1 FAILED
 
-
-
-==== unixWm-52.2 TkWmAddToColormapWindows procedure FAILED
-==== Contents of test case:
-
-    destroy .t
-    toplevel .t -colormap new -relief raised -bd 2
-    wm geom .t +0+0
-    frame .t.f -width 100 -height 100 -colormap new -relief sunken -bd 2
-    pack .t.f
-    update
-    wm colormap .t
-
----- Result was:
-
----- Result should have been (exact matching):
-.t.f .t
-==== unixWm-52.2 FAILED
-
-
-
-==== unixWm-52.3 TkWmAddToColormapWindows procedure FAILED
-==== Contents of test case:
-
-    destroy .t
-    toplevel .t -colormap new
-    wm geom .t +0+0
-    frame .t.f -width 100 -height 100 -colormap new -relief sunken -bd 2
-    pack .t.f
-    frame .t.f2 -width 100 -height 100 -colormap new -relief sunken -bd 2
-    pack .t.f2
-    update
-    wm colormap .t
-
----- Result was:
-
----- Result should have been (exact matching):
-.t.f .t.f2 .t
-==== unixWm-52.3 FAILED
-
-
-
-==== unixWm-53.1 TkWmRemoveFromColormapWindows procedure FAILED
-==== Contents of test case:
-
-    destroy .t
-    toplevel .t -colormap new
-    wm geom .t +0+0
-    frame .t.f -width 100 -height 100 -colormap new -relief sunken -bd 2
-    pack .t.f
-    frame .t.f2 -width 100 -height 100 -colormap new -relief sunken -bd 2
-    pack .t.f2
-    update
-    destroy .t.f2
-    wm colormap .t
-
----- Result was:
-
----- Result should have been (exact matching):
-.t.f .t
-==== unixWm-53.1 FAILED
-
-
-
-==== unixWm-53.2 TkWmRemoveFromColormapWindows procedure FAILED
-==== Contents of test case:
-
-    destroy .t
-    toplevel .t -colormap new
-    wm geom .t +0+0
-    frame .t.f -width 100 -height 100 -colormap new -relief sunken -bd 2
-    pack .t.f
-    frame .t.f2 -width 100 -height 100 -colormap new -relief sunken -bd 2
-    pack .t.f2
-    update
-    wm colormapwindows .t .t.f2
-    destroy .t.f2
-    wm colormap .t
-
----- Result was:
-.t.f2
----- Result should have been (exact matching):
-
-==== unixWm-53.2 FAILED
-
-
-
-==== unixWm-54.2 TkpMakeMenuWindow procedure, setting override_redirect FAILED
-==== Contents of test case:
-
-    destroy .m
-    menu .m
-    .m add command -label First
-    .m add command -label Second
-    .m add command -label Third
-    .m post 30 30
-    update
-    set result [wm overrideredirect .m]
-    destroy .m
-    set result
-
----- Result was:
-0
----- Result should have been (exact matching):
-1
-==== unixWm-54.2 FAILED
-
-util.test
-visual.test
-
-
-==== visual-3.1 Tk_GetVisual, parsing visual string FAILED
-==== Contents of test case:
-
-    toplevel .t1 -width 250 -height 100  -visual "[winfo visual .][winfo depth .]"
-    wm geometry .t1 +0+0
-    update
-    concat "[winfo visual .t1] [winfo depth .t1]"
-
----- Result was:
-truecolor 8
----- Result should have been (exact matching):
-truecolor 32
-==== visual-3.1 FAILED
-
-visual_bb.test
-winButton.test
-winClipboard.test
-winDialog.test
-winFont.test
-winMenu.test
-winMsgbox.test
-winSend.test
-winWm.test
-
-
-==== winWm-9.2 check wm forget for unmapped parent (#3205464,#2967911) FAILED
-==== Contents of test case:
-
-    pack .t.f.x
-    pack .t.f
-    lappend aid [after 5000 {set ::winwm92 timeout}] [after 500 {
-	wm manage .t.f
-	wm iconify .t
-	lappend aid [after 500 {
-	    wm forget .t.f
-	    wm deiconify .t
-	    lappend aid [after 500 {
-		pack .t.f
-		lappend aid [after 500 {
-		    set ::winwm92 [expr {
-			    [winfo rooty .t.f.x] == 0 ? "failed" : "ok"}]}]
-	    }]
-	}]
-    }]
-    vwait ::winwm92
-    foreach id $aid {
-	after cancel $id
-    }
-    set winwm92
-
----- Result was:
-failed
----- Result should have been (exact matching):
-ok
-==== winWm-9.2 FAILED
-
-window.test
-winfo.test
-
-
-==== winfo-2.5 "winfo atomname" command FAILED
-==== Contents of test case:
-
-    winfo atomname 44215
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== winfo-2.5 FAILED
-
-
-
-==== winfo-5.4 "winfo interps" command FAILED
-==== Contents of test case:
-
-    expr {[lsearch -exact [winfo interps] [tk appname]] >= 0}
-
----- Result was:
-0
----- Result should have been (exact matching):
-1
-==== winfo-5.4 FAILED
-
-
-
-==== winfo-5.5 "winfo interps" command FAILED
-==== Contents of test case:
-
-    expr {[lsearch -exact [winfo interps -displayof .] [tk appname]] >= 0}
-
----- Result was:
-0
----- Result should have been (exact matching):
-1
-==== winfo-5.5 FAILED
-
-
-
-==== winfo-13.2 destroying embedded toplevel FAILED
-==== Contents of test case:
-
-    frame .con -container 1
-    pack .con -expand yes -fill both
-    toplevel .emb -use [winfo id .con] -bd 0 -highlightthickness 0
-    button .emb.b
-    pack .emb.b -expand yes -fill both
-    update
-
-    destroy .emb
-    update
-    list embedded [winfo exists .emb.b] container [winfo exists .con]
-
----- Result was:
-embedded 0 container 1
----- Result should have been (exact matching):
-embedded 0 container 0
-==== winfo-13.2 FAILED
-
-wm.test
-
-
-==== wm-colormapwindows-2.1 reading values FAILED
-==== Contents of test case:
-
-    toplevel .t2 -width 200 -height 200 -colormap new
-    wm geom .t2 +0+0
-    frame .t2.a -width 100 -height 30
-    frame .t2.b -width 100 -height 30 -colormap new
-    pack .t2.a .t2.b -side top
-    update
-    set x [wm colormapwindows .t2]
-    frame .t2.c -width 100 -height 30 -colormap new
-    pack .t2.c -side top
-    update
-    list $x [wm colormapwindows .t2]
-
----- Result was:
-{} {}
----- Result should have been (exact matching):
-{.t2.b .t2} {.t2.b .t2.c .t2}
-==== wm-colormapwindows-2.1 FAILED
-
-
-
-==== wm-stackorder-4.3 wm stackorder isabove|isbelow FAILED
-==== Contents of test case:
-
-    toplevel .t
-    tkwait visibility .t
-    raise .
-    raiseDelay
-    wm stackorder .t isabove .
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: TkWmStackorderToplevel failed
-    while executing
-"wm stackorder .t isabove ."
-    ("uplevel" body line 6)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-4.3 FAILED
-
-
-
-==== wm-stackorder-4.4 wm stackorder isabove|isbelow FAILED
-==== Contents of test case:
-
-    toplevel .t ; update
-    raise .
-    raiseDelay
-    wm stackorder .t isb .
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: TkWmStackorderToplevel failed
-    while executing
-"wm stackorder .t isb ."
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-4.4 FAILED
-
-
-
-==== wm-stackorder-5.2 A normal toplevel can't be raised above an  overrideredirect toplevel on unix FAILED
-==== Contents of test case:
-
-    toplevel .t
-    wm overrideredirect .t 1
-    tkwait visibility .t
-    raise .
-    update
-    raiseDelay
-    wm stackorder . isabove .t
-
----- Result was:
-1
----- Result should have been (exact matching):
-0
-==== wm-stackorder-5.2 FAILED
-
-
-
-==== wm-stackorder-5.3 An overrideredirect window can be explicitly lowered FAILED
-==== Contents of test case:
-
-    toplevel .t
-    wm overrideredirect .t 1
-    tkwait visibility .t
-    lower .t
-    update
-    raiseDelay
-    wm stackorder .t isbelow .
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: TkWmStackorderToplevel failed
-    while executing
-"wm stackorder .t isbelow ."
-    ("uplevel" body line 8)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-5.3 FAILED
-
-
-
-==== wm-transient-3.1 transient toplevel is withdrawn
-	when mapped if toplevel is withdrawn FAILED
-==== Contents of test case:
-
-    toplevel .top
-    wm withdraw .top
-    update
-    toplevel .subject
-    wm transient .subject .top
-    update
-    list [wm state .subject] [winfo ismapped .subject]
-
----- Result was:
-withdrawn 1
----- Result should have been (exact matching):
-withdrawn 0
-==== wm-transient-3.1 FAILED
-
-
-
-==== wm-transient-3.3 withdraw/deiconify on the toplevel
-	also does a withdraw/deiconify on the transient FAILED
-==== Contents of test case:
-
-    toplevel .top
-    toplevel .subject
-    update
-    wm transient .subject .top
-    wm withdraw .top
-    update
-    lappend results [wm state .subject] [winfo ismapped .subject]
-    wm deiconify .top
-    update
-    lappend results [wm state .subject] [winfo ismapped .subject]
-
----- Result was:
-normal 1 normal 1
----- Result should have been (exact matching):
-withdrawn 0 normal 1
-==== wm-transient-3.3 FAILED
-
-
-
-==== wm-transient-4.1 transient toplevel is withdrawn
-	when mapped if toplevel is iconic FAILED
-==== Contents of test case:
-
-    toplevel .top
-    wm iconify .top
-    update
-    toplevel .subject
-    wm transient .subject .top
-    update
-    list [wm state .subject] [winfo ismapped .subject]
-
----- Result was:
-withdrawn 1
----- Result should have been (exact matching):
-withdrawn 0
-==== wm-transient-4.1 FAILED
-
-
-
-==== wm-transient-4.3 iconify/deiconify on the toplevel
-	does a withdraw/deiconify on the transient FAILED
-==== Contents of test case:
-
-    toplevel .top
-    toplevel .subject
-    update idletasks
-    wm transient .subject .top
-    wm iconify .top
-    update idletasks
-    lappend results [wm state .subject] [winfo ismapped .subject]
-    wm deiconify .top
-    update idletasks
-    lappend results [wm state .subject] [winfo ismapped .subject]
-
----- Result was:
-normal 1 normal 1
----- Result should have been (exact matching):
-withdrawn 0 normal 1
-==== wm-transient-4.3 FAILED
-
-
-
-==== wm-transient-5.1 an error during transient command should not
-	cause the map/unmap binding to be deleted FAILED
-==== Contents of test case:
-
-    toplevel .top
-    toplevel .subject
-    update
-    wm transient .subject .top
-    # Expect a bad window path error here
-    lappend results [catch {wm transient .subject .bad}]
-    wm withdraw .top
-    update
-    lappend results [wm state .subject]
-    wm deiconify .top
-    update
-    lappend results [wm state .subject]
-
----- Result was:
-1 normal normal
----- Result should have been (exact matching):
-1 withdrawn normal
-==== wm-transient-5.1 FAILED
-
-
-
-==== wm-transient-6.2 a withdrawn transient does not track
-	state changes in the toplevel FAILED
-==== Contents of test case:
-
-    toplevel .top
-    toplevel .subject
-    update
-    wm transient .subject .top
-    wm withdraw .subject
-    wm withdraw .top
-    wm deiconify .top
-    # idle handler should not map the transient
-    update
-    lappend results [wm state .subject]
-    wm deiconify .subject
-    lappend results [wm state .subject]
-    wm withdraw .top
-    lappend results [wm state .subject]
-    wm deiconify .top
-    # idle handler should map transient
-    update
-    lappend results [wm state .subject]
-
----- Result was:
-withdrawn normal normal normal
----- Result should have been (exact matching):
-withdrawn normal withdrawn normal
-==== wm-transient-6.2 FAILED
-
-
-
-==== wm-transient-8.1 transient to withdrawn window, Bug 1163496 FAILED
-==== Contents of test case:
-
-    # Verifies that transients stay on top of their toplevels, even if they were
-    # made transients when those toplevels were withdrawn.
-    toplevel .t1; wm withdraw  .t1;     update
-    toplevel .t2; wm transient .t2 .t1; update
-    lappend result [winfo ismapped .t1] [winfo ismapped .t2]
-    wm deiconify .t1; update
-    lappend result [winfo ismapped .t1] [winfo ismapped .t2]
-    raise .t1; raiseDelay; update
-    lappend result [lsearch -all -inline -glob [wm stackorder .] ".t?"]
-
----- Result was:
-1 1 1 1 {.t2 .t1}
----- Result should have been (exact matching):
-0 0 1 1 {.t1 .t2}
-==== wm-transient-8.1 FAILED
-
-
-
-==== wm-manage-1.1 managing a frame FAILED
-==== Contents of test case:
-
-    toplevel .t
-    frame .t.f
-    pack [label .t.f.l -text hello]
-    wm manage .t.f
-    raise .t.f
-    update
-    lappend result [winfo manage .t.f]
-    lappend result [winfo toplevel .t.f]
-
----- Result was:
-{} .t
----- Result should have been (exact matching):
-wm .t.f
-==== wm-manage-1.1 FAILED
-
-
-
-==== wm-manage-1.3 managing a labelframe FAILED
-==== Contents of test case:
-
-    toplevel .t
-    labelframe .t.f -text Labelframe
-    pack [label .t.f.l -text hello]
-    wm manage .t.f
-    raise .t.f
-    update
-    lappend result [winfo manage .t.f]
-    lappend result [winfo toplevel .t.f]
-
----- Result was:
-{} .t
----- Result should have been (exact matching):
-wm .t.f
-==== wm-manage-1.3 FAILED
-
-
-
-==== wm-manage-1.4 managing a ttk::frame FAILED
-==== Contents of test case:
-
-    toplevel .t
-    ttk::frame .t.f
-    pack [label .t.f.l -text hello]
-    wm manage .t.f
-    raise .t.f
-    update
-    lappend result [winfo manage .t.f]
-    lappend result [winfo toplevel .t.f]
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== wm-manage-1.4 FAILED
-
-
-
-==== wm-manage-1.5 managing a text widget FAILED
-==== Contents of test case:
-
-    toplevel .t
-    text .t.f
-    .t.f insert end "Manage text\n" {}
-    wm manage .t.f
-    raise .t.f
-    update
-    lappend result [winfo manage .t.f]
-    lappend result [winfo toplevel .t.f]
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== wm-manage-1.5 FAILED
-
-
-
-==== wm-manage-1.6 managing a button FAILED
-==== Contents of test case:
-
-    toplevel .t
-    button .t.f -text Button
-    wm manage .t.f
-    raise .t.f
-    update
-    lappend result [winfo manage .t.f]
-    lappend result [winfo toplevel .t.f]
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== wm-manage-1.6 FAILED
-
-
-
-==== wm-manage-1.7 managing a frame FAILED
-==== Contents of test case:
-
-    toplevel .t
-    frame .t.f
-    pack [label .t.f.l -text Label]
-    pack .t.f
-    update
-    lappend result [winfo manage .t.f]
-    lappend result [winfo toplevel .t.f]
-    wm manage .t.f
-    raise .t.f
-    update
-    lappend result [winfo manage .t.f]
-    lappend result [winfo toplevel .t.f]
-    wm forget .t.f
-    pack .t.f
-    update
-    lappend result [winfo manage .t.f]
-    lappend result [winfo toplevel .t.f]
-
----- Result was:
-pack .t pack .t pack .t
----- Result should have been (exact matching):
-pack .t wm .t.f pack .t
-==== wm-manage-1.7 FAILED
-
-
-
-==== wm-manage-1.8 unmanaging a toplevel FAILED
-==== Contents of test case:
-
-    toplevel .t
-    toplevel .t.t
-    button .t.t.b -text "Manage This"
-    pack .t.t.b
-    update
-    lappend result [winfo manage .t.t]
-    lappend result [winfo toplevel .t.t.b]
-    wm forget .t.t
-    wm forget .t.t ; # second call should be a no-op
-    pack .t.t
-    update
-    lappend result [winfo manage .t.t]
-    lappend result [winfo toplevel .t.t.b]
-    wm manage .t.t
-    wm manage .t.t ; # second call should be a no-op
-    wm deiconify .t.t
-    update
-    lappend result [winfo manage .t.t]
-    lappend result [winfo toplevel .t.t.b]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: can't pack ".t.t": it's a top-level window
-    while executing
-"pack .t.t"
-    ("uplevel" body line 11)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: TK GEOMETRY TOPLEVEL
-==== wm-manage-1.8 FAILED
-
-
-
-==== wm-forget-2 bug [e9112ef96e] - [wm forget] doesn't completely FAILED
-==== Contents of test case:
-
-    label .l -text "Top Dot"
-    frame .f
-    button .f.b -text Hello -command "puts Hello!"
-    pack .l -side top
-    pack .f.b
-    pack .f -side bottom
-    set res [winfo manager .f]
-    pack forget .f
-    update
-    lappend res [winfo manager .f]
-    wm manage .f
-    update
-    lappend res [winfo manager .f]
-    wm forget .f
-    update
-    lappend res [winfo manager .f]
-
----- Result was:
-pack {} {} {}
----- Result should have been (exact matching):
-pack {} wm {}
-==== wm-forget-2 FAILED
-
-xmfbox.test
-
-Tests ended at 2026-09-11 07:18:57 +0200
-all.tcl:	Total	10027	Passed	8427	Skipped	1429	Failed	171
-Sourced 97 Test Files.
-Files with failing tests: clipboard.test event.test filebox.test focus.test font.test frame.test geometry.test image.test imgListFormat.test imgPhoto.test pack.test pkgconfig.test place.test select.test systray.test text.test textDisp.test textImage.test textTag.test textWind.test tk.test unixEmbed.test unixFont.test unixSelect.test unixWm.test visual.test winWm.test winfo.test wm.test
-Number of tests skipped for each constraint:
-	12	altDisplay
-	30	aqua
-	7	aquaOrWin32
-	1	cliboardManagerPresent
-	16	colorsFree
-	21	defaultPseudocolor8
-	10	emptyTest
-	126	fonts
-	1	hasArial
-	1	hasCourierNew
-	1	hasTimesNew
-	2	haveDISPLAY
-	1	haveDefault24bitsVisual
-	3	haveFixedFamilyFont
-	5	haveOtherVisual
-	1	havePseudocolorVisual
-	8	knownBug
-	1	memory
-	9	needsICU
-	89	nonPortable
-	55	nt
-	2	pseudocolor8
-	71	secureserver
-	154	testImageType
-	5	testbitmap
-	7	testborder
-	5	testcursor
-	18	testembed
-	5	testfont
-	7	testmakeexist
-	21	testmenubar
-	11	testmetrics
-	1	testmovemouse
-	215	testobjconfig
-	3	testpressbutton
-	1	testprintf
-	31	testtext
-	20	testutils
-	7	testwinevent
-	54	testwrapper
-	1	userInteraction
-	337	win
-	2	win32
-	51	winSend
-tk-runall: every file ran, now entering exit (code 0)
-tk-runall: anything below this line is Tcl_Exit and Tk teardown
