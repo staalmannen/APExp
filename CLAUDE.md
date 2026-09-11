@@ -1859,6 +1859,101 @@ a test *mentions*, and what decides a pass is what it *compares*. So
 count of it -- the 19 attributed to a second wish above is really "19
 mention one", and some of those are reachable.
 
+#### unixWm's 44, and the one number that matters is 28
+
+Classified by what each test *compares*, per the rule just above:
+
+| | |
+|---|---|
+| **28** | `testprop [testwrapper .t] WM_HINTS` and friends -- an **X PROPERTY**. See below; not reachable without inventing a property store. |
+| **10** | the menubar offset, which needs the **wrapper** -- `49.2`, `50.5`, `55.*`, `56.1`, `57.*`. Already recorded in the menubar section. |
+| **5** | `wm colormapwindows`: `TkWmAddToColormapWindows`/`TkWmRemoveFromColormapWindows` are not implemented (`14.2`, `52.2`, `52.3`, `53.1`, `53.2`). |
+| **7** | individual -- and **the constraints settle four of them in one command.** |
+
+**Check the constraint line before reading a failure.** Of the seven:
+
+```
+unixWm-8.4     unix failsOnUbuntu failsOnXQuartz
+unixWm-42.1    unix failsOnUbuntu failsOnXQuartz
+unixWm-50.1    unix failsOnUbuntu failsOnXQuartz
+unixWm-21.5    unix testwrapper
+unixWm-37.5    unix testwrapper
+unixWm-54.2    unix nonUnixUserInteraction
+unixWm-40.2    (none)
+```
+
+`8.4`, `42.1` and `50.1` carry `failsOnUbuntu failsOnXQuartz`, which is
+the group already documented under `place-8.*`: the constraint is true
+everywhere except CI on Linux, so those tests **fail on an ordinary
+Linux/X11 desktop too**. `42.1` is the clearest -- it wants `<Map>` and
+`<Unmap>` to have fired after `update idletasks`, and `update
+idletasks` services idle handlers, not window events, on any platform.
+**Three failures disposed of by one `grep` of the test file**, and the
+first of them (`8.4`) had been sitting in the icon-window notes as
+though it were ours.
+
+**The other four were ours and are fixed:**
+
+- **`unixWm-54.2` -- `TkpMakeMenuWindow` was an empty stub**, on the
+  reasoning that rio owns the frame so there is no window manager to
+  keep its hands off. True, and beside the point:
+  `override_redirect` lives in `Tk_Attributes(tkwin)`, generic Tk reads
+  it there, and `wm overrideredirect` reports it -- the note above
+  records that the port keeps it there deliberately so there is only
+  one answer to the question. **The flag had a reader all along and
+  nothing set it.** A posted menu answered 0 where every Tk says 1.
+- **`unixWm-21.5`, `37.5` -- `TkpGetWrapperWindow` answered `0x0` for a
+  toplevel with no window yet.** On X the wrapper is created at first
+  map, so `testwrapper` is empty before that;
+  `TestwrapperObjCmd` sets no result at all when the hook returns NULL.
+  Returning the toplevel regardless produced **`0x0`, which is not a
+  window id -- it is `None` wearing the format of one**, the
+  `XLoadFont` mistake in miniature. Safe for the only non-test caller:
+  `tkFocus.c:666` hands the result to `TkpChangeFocus`, which already
+  returns early both for NULL and for a window whose id is `None`.
+- **`unixWm-40.2` -- `Tk_SetGrid` converted a pre-gridding size where
+  upstream discards it.** `wm geometry .t 200x100` then `-setgrid 1` on
+  a 20x20 listbox must report `20x20`; the port reported **`17x4`**,
+  which is 200/widthInc by 100/heightInc. tkUnixWm.c sets
+  `wmPtr->width = wmPtr->height = -1` instead, with its own comment
+  saying why the conversion cannot be done: *"there's no easy way to
+  translate them to grid units since the new requested size of the
+  top-level window in pixels may not yet have been registered yet (it
+  may filter up the hierarchy in DoWhenIdle handlers)"* -- which is
+  precisely this test, the listbox not having propagated 20x20 yet.
+  With the size discarded, `WmUpdateGeometry` falls back to the
+  requested size and the answer is the listbox's own.
+
+  **The fix that was there had been reasoned out rather than read.**
+  The grid note above used to state the conversion as a requirement;
+  upstream had already considered it and written down why it fails.
+  The `WM_NEVER_MAPPED` half is upstream's too -- a size given before
+  the window was ever mapped is left alone, on the assumption that it
+  was meant as grid units and merely arrived early.
+
+**The 28 are the real question, and the answer is probably no.**
+Every one reads an ICCCM property off the toplevel: `WM_HINTS`,
+`WM_NORMAL_HINTS`, `WM_CLIENT_MACHINE`, `WM_COMMAND`, `WM_ICON_NAME`,
+`WM_PROTOCOLS`. **A property is the transport to a window manager**, and
+the thing being tested is whether Tk *published* the value, not whether
+it stored it -- the port already stores every one of them in `WmInfo`
+and answers the `wm` query correctly, which is why `wm minsize .t`
+reads back right while `unixWm-29.1` fails.
+
+Implementing `XChangeProperty`/`XGetWindowProperty` as a real per-window
+store would be honest -- it would return what was put in, and claim
+nothing about a window manager having seen it -- but **nothing on Plan 9
+would ever read it**, and the port would then also have to grow
+`UpdateSizeHints`, `UpdateHints` and `UpdateCommand` from `tkUnixWm.c`
+purely to fill it. That is a mechanism whose only consumer is the test
+suite. It sits with `systray` and `clipboard-4.*`: the machine has no
+concept of the thing being asked about.
+
+**So unixWm's floor is about 38 of 44** -- 28 properties, 10 menubar
+(the second of which needs a wrapper, a change that gives every toplevel
+in the port an extra window) -- with the 5 colormapwindows as the one
+remaining cluster that is cheap-ish and genuinely ours.
+
 `focus.test` 1 -> 11 and `winfo.test` 4 -> 5 are newly *measured*, not
 newly broken. Worth noting for later: `focus-6.1`, "embedded application
 in same process", is **ours and known** -- it is the second half of
@@ -4032,10 +4127,15 @@ The convention is `tkUnixWm.c`'s and is the thing to remember: while
 `wmPtr->gridWin` is non-NULL, **`wmPtr->width`/`height` hold grid units,
 not pixels**. The conversion is confined to the three places a size
 crosses that boundary -- `WmUpdateGeometry` on the way out, and the `wm
-geometry` query and setter -- plus `Tk_SetGrid` itself, which must
-reinterpret a size that was set in pixels *before* gridding, or a
-`wm geometry` from earlier silently becomes a character count a few
-hundred times too large. `Tk_UnsetGrid` converts back.
+geometry` query and setter. `Tk_UnsetGrid` converts back.
+
+**`Tk_SetGrid` is the exception, and this note used to get it wrong.**
+It said `Tk_SetGrid` "must reinterpret a size that was set in pixels
+before gridding, or a `wm geometry` from earlier silently becomes a
+character count a few hundred times too large". The *concern* is real;
+the remedy was reasoned out here rather than read from upstream, and
+upstream had already rejected it in a comment. See `unixWm-40.2` in the
+run-11 section: the answer is to **forget** the size, not convert it.
 
 Note `wm minsize`/`maxsize` are also in grid units on X and are still
 clamped as pixels here; inert today, since the defaults are 1 and

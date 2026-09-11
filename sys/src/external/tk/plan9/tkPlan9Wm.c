@@ -861,15 +861,58 @@ TkpGetWrapperWindow(TkWindow *winPtr)
 {
     /* On Plan 9 there is no separate wrapper; return the toplevel itself */
     TkWindow *w = winPtr;
+
     while (w && !(w->flags & TK_TOP_LEVEL))
         w = w->parentPtr;
-    return w ? w : winPtr;
+    if (w == NULL)
+	w = winPtr;
+
+    /*
+     * A TOPLEVEL WITH NO WINDOW YET HAS NO WRAPPER YET. On X the wrapper
+     * is created when the toplevel is first mapped, so testwrapper
+     * answers the empty string before that (TestwrapperObjCmd sets no
+     * result at all when this returns NULL). Returning the toplevel
+     * regardless made it answer "0x0", which is not a window id -- it is
+     * None wearing the format of one, the XLoadFont mistake in miniature.
+     * unixWm-21.5 and 37.5 ask exactly that: is the wrapper empty before
+     * the window exists.
+     *
+     * Safe for the one caller outside the test command: tkFocus.c:666
+     * passes the result straight to TkpChangeFocus, which already
+     * returns early for NULL *and* for a window whose id is None -- so
+     * the focus path behaves identically either way.
+     */
+    if (w->window == None)
+	return NULL;
+    return w;
 }
 
+/*
+ * A POSTED MENU IS OVERRIDE-REDIRECT, AND THAT IS TK'S OWN STATE HERE.
+ *
+ * This was an empty stub on the reasoning that rio owns the frame, so
+ * there is no window manager to keep its hands off -- true, and beside
+ * the point. `override_redirect` lives in Tk_Attributes(tkwin), generic
+ * Tk reads it there, and "wm overrideredirect" reports it (see the "four
+ * wm stubs that answered plausibly" note above, which records that the
+ * port deliberately keeps it in the attributes rather than in WmInfo so
+ * there is only one answer to the question).
+ *
+ * So the flag had a reader all along and nothing set it: unixWm-54.2
+ * posts a menu and asks "wm overrideredirect .m", and got 0 where every
+ * Tk says 1. The X call upstream makes on top of this -- telling the
+ * server not to reparent -- is the part that genuinely has nothing to
+ * do here.
+ */
 void
 TkpMakeMenuWindow(Tk_Window tkwin, int transient)
 {
-    (void)tkwin; (void)transient;
+    TkWindow *winPtr = (TkWindow *) tkwin;
+
+    (void)transient;
+    if (winPtr == NULL)
+	return;
+    winPtr->atts.override_redirect = True;
 }
 
 /* ------------------------------------------------------------------ */
@@ -2021,28 +2064,44 @@ Tk_SetGrid(Tk_Window tkwin, int reqWidth, int reqHeight,
 	return;
 
     /*
-     * An explicit "wm geometry" set BEFORE gridding is in pixels and has
-     * to be reinterpreted, or it would silently become a character count
-     * a few hundred times too large.
+     * AN EXPLICIT "wm geometry" SET BEFORE GRIDDING IS FORGOTTEN, NOT
+     * CONVERTED -- and the difference is the whole of unixWm-40.2.
+     *
+     * The concern is real: a size stored in pixels would otherwise be
+     * read back as a character count a few hundred times too large. But
+     * converting it, which is what this did, is upstream's *rejected*
+     * answer, and tkUnixWm.c says why in its own comment: "there's no
+     * easy way to translate them to grid units since the new requested
+     * size of the top-level window in pixels may not yet have been
+     * registered yet (it may filter up the hierarchy in DoWhenIdle
+     * handlers)."
+     *
+     * That is exactly what 40.2 does -- "wm geometry .t 200x100", then
+     * "-setgrid 1" on a 20x20 listbox that has not yet propagated its
+     * request. Converting gave 200/widthInc x 100/heightInc = 17x4,
+     * a thoroughly plausible wrong answer; discarding it lets
+     * WmUpdateGeometry fall back to the requested size, which is the
+     * listbox's own 20x20.
+     *
+     * The WM_NEVER_MAPPED half is upstream's too: a size given before
+     * the window was ever mapped is left alone, on the assumption that
+     * it was meant as grid units and merely arrived early.
+     *
+     * **The note this file used to carry -- "Tk_SetGrid must
+     * reinterpret a size set in pixels" -- was a fix reasoned out
+     * rather than read.** Upstream had already considered it and
+     * written down why it does not work.
      */
-    if (wmPtr->gridWin == NULL && wmPtr->width >= 0) {
-	int gw, gh;
-
-	wmPtr->gridWin = (TkWindow *) tkwin;
-	wmPtr->reqGridWidth = reqWidth;
-	wmPtr->reqGridHeight = reqHeight;
-	wmPtr->widthInc = gridWidth;
-	wmPtr->heightInc = gridHeight;
-	WmPixelsToGrid(wmPtr, wmPtr->width, wmPtr->height, &gw, &gh);
-	wmPtr->width = gw;
-	wmPtr->height = gh;
-    } else {
-	wmPtr->gridWin = (TkWindow *) tkwin;
-	wmPtr->reqGridWidth = reqWidth;
-	wmPtr->reqGridHeight = reqHeight;
-	wmPtr->widthInc = gridWidth;
-	wmPtr->heightInc = gridHeight;
+    if (wmPtr->gridWin == NULL && !(wmPtr->flags & WM_NEVER_MAPPED)) {
+	wmPtr->width = -1;
+	wmPtr->height = -1;
     }
+
+    wmPtr->gridWin = (TkWindow *) tkwin;
+    wmPtr->reqGridWidth = reqWidth;
+    wmPtr->reqGridHeight = reqHeight;
+    wmPtr->widthInc = gridWidth;
+    wmPtr->heightInc = gridHeight;
     WmGridChanged(winPtr);
 }
 
