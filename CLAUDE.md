@@ -1786,6 +1786,48 @@ left skipped is legitimately absent: `win` 342, `fonts` 126,
 genuinely Windows-only `testmetrics` 11 and `testwinevent` 7. **Do not
 read `Total 10027` as a target**; 924 of it cannot run on this machine.
 
+#### Where the 226 actually are, read rather than counted
+
+`unixEmbed` 38 and `unixWm` 44 are 36% of the total and most of it had
+never been read. Splitting `unixEmbed` by what each test *does*:
+
+| | |
+|---|---|
+| **19** | `childTkProcess` -- a **second wish process** doing `toplevel .t -use $w` on this one's container. Cross-application embedding is the one thing this port's embedding structurally cannot do; the whole reduction in `Tk_MakeWindow` rests on both halves sharing the process. They report `couldn't create child of window "0x575e"` and `bad window path name ".t1"` |
+| **19** | in-process: the `-Na` variants (a child *interpreter*, runnable at last now `tktest` exists) plus `1.7`, `2.3`, `2.4`, `8.2`, `9.1` |
+
+**Eleven of the in-process nineteen failed on one stub**, and it is the
+`XLoadFont` family for the third time in this port: **`testembed`
+answered "cannot" where the truth was "here it is".**
+
+```
+---- errorInfo: testembed not supported on Plan 9
+```
+
+`unixEmbed-1.7` and `-2.3` are the clean cases -- two containers, two
+embedded toplevels, entirely in this process, then `testembed` and
+nothing else. Embedding has worked here since `Tk_UseWindow` was
+written, and the list the command exists to print is
+`firstContainerPtr`, ten lines from where the refusal was.
+
+`TkpTestembedCmd` is real now, in `tkPlan9Wm.c` beside that list, and it
+is `unix/tkUnixEmbed.c`'s structure line for line. **Three of upstream's
+four fields are already in the port's `Container`**; the fourth is the
+**wrapper**, and the empty string printed for it is not a stand-in --
+it is exactly what upstream prints when `containerPtr->wrapper` is
+`None`, and there are no wrappers here.
+
+Upstream's one oddity is reproduced deliberately: `embeddedInterp` and
+`parentInterp` are declared *outside* the loop and assigned only when
+the pointer is non-NULL, so a container missing one is filtered against
+whatever the previous container had. The expected strings were written
+against that. **A test command's contract is to match the other
+implementations, not to be better than them.**
+
+**Do not expect all eleven to pass**: several also need a second wish
+somewhere in the same test, and the count that matters is the next run,
+per file. `1.7` and `2.3` are the two that should go outright.
+
 `focus.test` 1 -> 11 and `winfo.test` 4 -> 5 are newly *measured*, not
 newly broken. Worth noting for later: `focus-6.1`, "embedded application
 in same process", is **ours and known** -- it is the second half of
