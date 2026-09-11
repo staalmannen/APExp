@@ -152,6 +152,47 @@ typedef struct TkWmInfo {
      */
     TkWindow *container;
 
+    /*
+     * The menubar, as "testmenubar window" and "$w configure -menu" set
+     * it. On X a toplevel is reparented into a WRAPPER window owned by
+     * tkUnixWm.c, and the menubar becomes a second child of that wrapper
+     * ABOVE the toplevel: the wrapper keeps the position the toplevel
+     * was asked for, the menubar takes the top menuHeight pixels of it,
+     * and the toplevel itself is moved down by menuHeight. That is why
+     * unixWm-49.2 wants a child placed at y=30 inside a toplevel at +0+0
+     * to report rooty 62 once a 30-pixel menubar is set.
+     *
+     * THERE ARE NO WRAPPER WINDOWS HERE. A toplevel IS its window, and
+     * dispPtr->firstWmPtr, Tk_CoordsToWindow and Tk_GetRootCoords are
+     * all written that way. So the menubar stays an ordinary child of
+     * its toplevel, at the toplevel's own origin, sized to its width:
+     * it is created, sized, mapped and destroyed correctly, and it is
+     * NOT outside the toplevel's rectangle the way X puts it.
+     *
+     * WHAT THAT COSTS, so it is not re-derived: the toplevel's contents
+     * are not pushed down by menuHeight (unixWm-49.2 reports 32 where X
+     * says 62), and a point above the toplevel does not hit the menubar,
+     * because Tk_CoordsToWindow only descends into a toplevel whose
+     * rectangle already contains the point (unixWm-50.5). Both follow
+     * from the missing wrapper and neither can be fixed without one --
+     * and a wrapper is not a small change here: every toplevel in the
+     * port would gain a window, and the two coordinate conventions in
+     * Tk_GetRootCoords (upstream has a whole extra arm for a menubar,
+     * subtracting menuHeight and switching to the toplevel) would both
+     * have to be honoured. Placing the menubar half-way -- out at the
+     * root with screen coordinates in changes.x/y, which was written
+     * first -- makes "winfo rootx" DOUBLE-COUNT for it, which is worse
+     * than reporting it in the wrong place consistently.
+     *
+     * menuHeight is 0 exactly when there is no menubar, and every line
+     * that acts on these fields is guarded on that, so a toplevel
+     * without one follows precisely the path it followed before. That
+     * matters more than usual here: this is the first change to
+     * WmUpdateGeometry since the one that regressed unixEmbed-10.1.
+     */
+    TkWindow *menubar;
+    int menuHeight;
+
     struct TkWmInfo *nextPtr;
 } WmInfo;
 
@@ -364,6 +405,21 @@ WmUpdateGeometry(void *clientData)
      */
     WmScreenPosition(wmPtr, width, height, &x, &y);
 
+    /*
+     * A menubar spans the width of the toplevel it belongs to, so it has
+     * to follow every resize. It stays a plain child at the toplevel's
+     * own origin -- see the menubar note in WmInfo above for what that
+     * costs and why the alternative was not taken.
+     *
+     * This runs before the no-change guard below on purpose: a menubar
+     * can be set on a toplevel whose size is already settled, and the
+     * guard would then return before the menubar had ever been placed.
+     * Tk_MoveResizeWindow is silent for a move that changes nothing.
+     */
+    if (wmPtr->menuHeight > 0 && wmPtr->menubar != NULL)
+	Tk_MoveResizeWindow((Tk_Window) wmPtr->menubar, 0, 0,
+		width, wmPtr->menuHeight);
+
     if (width == winPtr->changes.width && height == winPtr->changes.height
 	    && x == winPtr->changes.x && y == winPtr->changes.y)
 	return;
@@ -396,6 +452,175 @@ WmUpdateNow(TkWindow *winPtr)
 	wmPtr->flags &= ~WM_UPDATE_PENDING;
     }
     WmUpdateGeometry(winPtr);
+}
+
+/* Ask for a geometry update at idle time, as the menubar code does. */
+static void
+WmScheduleUpdate(WmInfo *wmPtr)
+{
+    if (!(wmPtr->flags & (WM_UPDATE_PENDING|WM_NEVER_MAPPED))) {
+	Tcl_DoWhenIdle(WmUpdateGeometry, wmPtr->winPtr);
+	wmPtr->flags |= WM_UPDATE_PENDING;
+    }
+}
+
+/* ------------------------------------------------------------------ */
+/* Menubars                                                            */
+/* ------------------------------------------------------------------ */
+
+/*
+ * TkUnixSetMenubar WAS AN EMPTY STUB, AND THAT FROZE THE TEST SUITE.
+ *
+ * It is what "testmenubar window .t .t.menu" and "$w configure -menu"
+ * reach (tkUnixMenu.c:268), and the FIRST thing upstream's doc comment
+ * promises is that the menubar "will be mapped". Doing nothing therefore
+ * left the window unmapped -- and unixWm-50.5 is
+ *
+ *	testmenubar window .t .t.menu
+ *	tkwait visibility .t.menu
+ *
+ * so it waited for a VisibilityNotify that could not arrive, forever.
+ * That stopped unixWm.test dead and with it the last five files of the
+ * suite (visual, winfo, winWm, wm, xmfbox), which is why runs 8 and 9
+ * were prefixes rather than results.
+ *
+ * The tell was the shape of the wait, and it is worth keeping: the CPU
+ * was loaded CONSTANTLY BUT LIGHTLY, which is this port's notifier
+ * sleeping P9_POLL_US and finding nothing -- something waiting for an
+ * event that will never come. A loop inside one Tk call pins a core
+ * instead; that is what scrollbar-10.1 looked like, and it was a
+ * genuinely different bug. THE SUSPECT NAMED FROM THE SCREENSHOT ALONE
+ * (unixWm-50.3, the first test to put two Tk main windows in one
+ * process) WAS WRONG; one "-verbose t" run named 50.5 in one line,
+ * because -verbose t prints each test as it STARTS and 50.2, 50.3 and
+ * 50.4 all reported before it. Ask the harness which test, before
+ * reasoning about which mechanism.
+ *
+ * What is done here is upstream's function with the wrapper taken out;
+ * see the menubar note in WmInfo above for why a sibling under the root
+ * is the same picture as a second child of a wrapper.
+ *
+ * NOT DONE, deliberately: upstream also gives the menubar its own
+ * colormap handling and resizes it from the WRAPPER's width rather than
+ * the toplevel's. There is one visual here and the two widths are the
+ * same thing, so neither has anything to do.
+ */
+
+static void
+MenubarDestroyProc(void *clientData, XEvent *eventPtr)
+{
+    TkWindow *menubarPtr = (TkWindow *) clientData;
+    WmInfo *wmPtr;
+
+    if (eventPtr->type != DestroyNotify)
+	return;
+    wmPtr = menubarPtr->wmInfoPtr;
+    if (wmPtr == NULL)
+	return;
+    wmPtr->menubar = NULL;
+    wmPtr->menuHeight = 0;
+    WmScheduleUpdate(wmPtr);
+}
+
+static void
+MenubarReqProc(void *clientData, Tk_Window tkwin)
+{
+    WmInfo *wmPtr = (WmInfo *) clientData;
+
+    wmPtr->menuHeight = Tk_ReqHeight(tkwin);
+    if (wmPtr->menuHeight <= 0)
+	wmPtr->menuHeight = 1;
+    WmScheduleUpdate(wmPtr);
+}
+
+static const Tk_GeomMgr menubarMgrType = {
+    "menubar",			/* name */
+    MenubarReqProc,		/* requestProc */
+    NULL			/* lostContentProc */
+};
+
+void
+TkUnixSetMenubar(
+    Tk_Window tkwin,		/* Toplevel the menubar belongs to. */
+    Tk_Window menubar)		/* The menubar, or NULL to cancel one. */
+{
+    TkWindow *winPtr = (TkWindow *) tkwin;
+    TkWindow *menubarPtr = (TkWindow *) menubar;
+    WmInfo *wmPtr = winPtr->wmInfoPtr;
+
+    /*
+     * Can be called for something that is not a toplevel at all, in
+     * which case there is no wm information and nothing to do.
+     */
+    if (wmPtr == NULL)
+	return;
+
+    if (wmPtr->menubar != NULL) {
+	if (wmPtr->menubar == menubarPtr)
+	    return;
+
+	/*
+	 * Put the old one back where it came from: unmap it, return it
+	 * to its Tk parent, and stop managing it. Leaving it mapped
+	 * where the new menubar is about to go would paint one over the
+	 * other, and there is no server here to sort that out.
+	 */
+	wmPtr->menubar->wmInfoPtr = NULL;
+	Tk_UnmapWindow((Tk_Window) wmPtr->menubar);
+	Tk_DeleteEventHandler((Tk_Window) wmPtr->menubar,
+		StructureNotifyMask, MenubarDestroyProc, wmPtr->menubar);
+	Tk_ManageGeometry((Tk_Window) wmPtr->menubar, NULL, NULL);
+    }
+
+    wmPtr->menubar = menubarPtr;
+    if (menubarPtr == NULL) {
+	wmPtr->menuHeight = 0;
+    } else {
+	if (menubarPtr->flags & TK_TOP_LEVEL)
+	    Tcl_Panic("TkUnixSetMenubar got bad menubar");
+
+	/*
+	 * A zero height would make the menubar invisible AND make
+	 * menuHeight indistinguishable from "no menubar", which is the
+	 * condition every guard in WmUpdateGeometry is written on.
+	 */
+	wmPtr->menuHeight = Tk_ReqHeight((Tk_Window) menubarPtr);
+	if (wmPtr->menuHeight <= 0)
+	    wmPtr->menuHeight = 1;
+
+	Tk_MakeWindowExist(tkwin);
+	Tk_MakeWindowExist((Tk_Window) menubarPtr);
+	menubarPtr->wmInfoPtr = wmPtr;
+	Tk_MoveResizeWindow((Tk_Window) menubarPtr, 0, 0,
+		Tk_Width(tkwin), wmPtr->menuHeight);
+
+	/*
+	 * THE MAP IS THE POINT. Upstream's own doc comment leads with it,
+	 * and leaving it out is what hung the suite: "tkwait visibility"
+	 * waits for the VisibilityNotify that XMapWindow sends here.
+	 */
+	Tk_MapWindow((Tk_Window) menubarPtr);
+	Tk_CreateEventHandler((Tk_Window) menubarPtr, StructureNotifyMask,
+		MenubarDestroyProc, menubarPtr);
+	Tk_ManageGeometry((Tk_Window) menubarPtr, &menubarMgrType, wmPtr);
+
+	/*
+	 * TK_REPARENTED is NOT set, and that is deliberate rather than an
+	 * omission: it is upstream's mark for "this window is no longer
+	 * under its Tk parent", which is exactly what is not true here.
+	 * tkWindow.c:1913 and :2764 read it when deciding whether a
+	 * window can be reached from its parent, and claiming a move that
+	 * did not happen would make both of them wrong.
+	 */
+    }
+
+    /*
+     * The toplevel has to move down (or back up) by the menubar's
+     * height, and WmUpdateGeometry is the one place that knows where it
+     * goes. Do it now rather than at idle time: the caller is usually
+     * "tkwait visibility" away from asking where things are.
+     */
+    WmUpdateNow(winPtr);
 }
 
 /* ------------------------------------------------------------------ */

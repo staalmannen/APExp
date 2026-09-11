@@ -424,12 +424,14 @@ TkUnixDoOneXEvent(Tcl_Time *timePtr)
     return 0;
 }
 
-/* TkUnixSetMenubar: no separate menubar on Plan 9 */
-void
-TkUnixSetMenubar(Tk_Window tkwin, Tk_Window menubar)
-{
-    (void)tkwin; (void)menubar;
-}
+/*
+ * TkUnixSetMenubar lives in tkPlan9Wm.c now, beside the WmInfo it has to
+ * write. It used to be an empty stub here, under a comment reading "no
+ * separate menubar on Plan 9" -- which was true of the DECORATION and
+ * false of everything else the function does: it never mapped the
+ * menubar window, so "tkwait visibility" on one waited forever and
+ * unixWm-50.5 froze the whole test suite.
+ */
 
 /* TkWmCleanup: wm cleanup on display close */
 void

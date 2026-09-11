@@ -154,8 +154,9 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c` and
-`stdio-test.c`. The nineteen `tk-*.tcl` scripts there are Tcl, run with
-`wish`; see the Tk section below. `tk-runall.tcl` is the harness for
+`stdio-test.c`. The twenty-one `tk-*.tcl` scripts there are Tcl, run
+with `wish` -- except `tk-menubar-test.tcl`, which needs `tktest` and
+skips itself under `wish`; see the Tk section below. `tk-runall.tcl` is the harness for
 Tk's own suite rather than a test of its own, and `tk-runtest.tcl` runs
 a single file from it. `sys/src/ape/lib/libressl/test/` is separate: it is
 upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
@@ -2622,33 +2623,109 @@ sleeping `P9_POLL_US` between polls and finding nothing -- i.e.
 something is waiting for an event that will never arrive. A tight loop
 inside one Tk call pins a core; this does not.
 
-`unixWm-50.3` and `50.4` are the first two tests in the file that do
-
-```tcl
-interp create child
-load {} Tk child
-```
-
-and they could not run under `wish` at all, so **this is the first time
-two Tk main windows have existed in one process here**. `50.3` then
-does `tkwait visibility` on a `-container` frame and, inside the child,
-on an embedded toplevel. The screenshot of the frozen display shows
-blue, red and yellow rectangles, which are `50.3`'s `.t`, `.t.f` and
-`.x`, beside a green one.
-
-That is a suspect, not an answer, and this file has a bad record of
-calling suspects answers. **The cheap decisive step is the one the
-`scrollbar.test` section already records**, and it needs no rebuild:
+**THE SUSPECT NAMED HERE WAS WRONG, AND THE RUN THAT SETTLED IT TOOK
+ONE LINE.** What was written was `unixWm-50.3`/`50.4`, the first tests
+in the file to do `interp create child; load {} Tk child` -- the first
+time two Tk main windows have existed in one process here, and a
+configuration nothing in `gP9` had ever been under. The frozen
+screenshot's coloured rectangles seemed to match `50.3`'s `.t`, `.t.f`
+and `.x`.
 
 ```
 tktest $home/APExp/sys/lib/tests/tk-runall.tcl -file unixWm.test -verbose t
 ```
 
-`-verbose t` prints each test name as it *starts*, so the last line
-names the test that did not return. Only then is it worth looking at
-`gP9` -- the port keeps one global display state, one window table and
-one event ring, and a second main window in the same process is a
-configuration nothing here has ever been under.
+`-verbose t` prints each test name as it *starts*, and the log ends
+
+```
+---- unixWm-50.2 start
+---- unixWm-50.3 start
+---- unixWm-50.4 start
+---- unixWm-50.5 start
+```
+
+with nothing after it. `50.2`, `50.3` and `50.4` all started **and
+returned** -- so the two-interpreter tests are innocent, and the answer
+is **`unixWm-50.5`**. **Ask the harness which test before reasoning
+about which mechanism**; that is the fourth time in this file a
+confident mechanism was wrong and one printed intermediate settled it
+in a single run.
+
+#### The freeze: TkUnixSetMenubar never mapped the menubar
+
+`unixWm-50.5` is
+
+```tcl
+testmenubar window .t .t.menu
+tkwait visibility .t.menu
+```
+
+and `TkUnixSetMenubar` in `plan9/tkPlan9Stubs.c` was
+`(void)tkwin; (void)menubar;` under a comment reading "no separate
+menubar on Plan 9". That was true of the **decoration** and false of
+everything else the function does -- upstream's own doc comment leads
+with "the window given by menubar **will be mapped**". So the menubar
+stayed unmapped, `XMapWindow` never ran, no `VisibilityNotify` was ever
+sent for it, and `tkwait` waited for an event that could not arrive.
+
+It is the `XLoadFont` family one more time, and the widest instance of
+it yet: **a stub that does nothing is not the same as a platform that
+has nothing to do.** rio draws no menu bar, so the decoration really is
+absent; the window, its size, its map state and its destruction are
+ordinary Tk and were simply missing. One unmapped frame cost five
+unmeasured test files.
+
+**The shape of the wait is what said "blocked" rather than "spinning"**,
+and it was read correctly from the start: constant but *light* CPU is
+this port's notifier sleeping `P9_POLL_US` and finding nothing. A loop
+inside one Tk call pins a core -- that is what `scrollbar-10.1` looked
+like, and it was a genuinely different bug. Keep the two apart.
+
+**What is implemented, and what is deliberately not.** `TkUnixSetMenubar`
+lives in `tkPlan9Wm.c` now, beside the `WmInfo` it writes, as upstream
+keeps it in `tkUnixWm.c`: it sizes the menubar to the toplevel's width,
+maps it, manages its geometry (`menubarMgrType`), and clears
+`wmPtr->menubar` when it is destroyed -- without which
+`WmUpdateGeometry` would go on sizing a freed `TkWindow`, the
+use-after-free shape this port has hit twice (`TkpDeleteFont`,
+`TkpFreeColor`).
+
+**The menubar stays an ordinary child of its toplevel**, and that is the
+half a wrapper would be needed for. On X the toplevel is reparented into
+a **wrapper** window; the menubar becomes a second child of it *above*
+the toplevel, and the toplevel moves down by `menuHeight`. There are no
+wrapper windows here -- a toplevel *is* its window, and
+`dispPtr->firstWmPtr`, `Tk_CoordsToWindow` and `Tk_GetRootCoords` are
+all written that way. So two things stay wrong, and they are recorded
+rather than guessed at:
+
+- `unixWm-49.2` -- contents are not pushed down, so a child placed at
+  y=30 reports 32 where X says 62;
+- `unixWm-50.5` -- a point *above* the toplevel does not hit the
+  menubar, because `Tk_CoordsToWindow` descends only into a toplevel
+  whose rectangle already contains the point.
+
+**Half-way was tried first and is worse than either end**: putting the
+menubar out at the root with screen coordinates in `changes.x/y` makes
+`Tk_GetRootCoords` **double-count** for it -- it adds the menubar's
+coordinates and then the toplevel's -- so `winfo rootx` goes from wrong
+to wrong *and* inconsistent. Upstream needs a whole extra arm in that
+function for a menubar (subtract `menuHeight`, switch to the toplevel)
+precisely because of this. A wrapper is the real fix and is a large
+change: every toplevel in the port gains a window.
+
+Every line that acts on `menuHeight`/`menubar` is guarded on
+`menuHeight > 0`, so a toplevel without a menubar takes exactly the path
+it took before. That guard is load-bearing: this is the first change to
+`WmUpdateGeometry` since the one that regressed `unixEmbed-10.1`, and
+**the next run must be compared per file, not by total.**
+
+`sys/lib/tests/tk-menubar-test.tcl` covers it -- map, cancel, replace,
+and destroy-while-in-force followed by a resize (the step that would
+touch a stale pointer). It needs `tktest`, since `testmenubar` is one of
+Tk's own test commands, and it skips itself under `wish`. Its last
+section *prints* the two known-wrong answers rather than asserting them,
+so that today's limitation is not frozen in as the requirement.
 
 #### The four untouched files: 106 failures, and three of them are ours
 
