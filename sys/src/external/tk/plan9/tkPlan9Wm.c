@@ -55,6 +55,15 @@ typedef struct TkWmInfo {
     int maxWidth, maxHeight;	/* 0 means unlimited. */
     int withdrawn;
     int iconified;		/* "wm iconify"; distinct from withdrawn */
+    /*
+     * withdrawnExplicit is upstream's WM_WITHDRAWN flag, and it exists
+     * only for transients: a transient follows its container's map
+     * state (WmWaitMapProc below), UNLESS the caller withdrew it
+     * itself, in which case the container coming back must not map it
+     * again (wm-transient-6.2). "withdrawn" alone cannot say which of
+     * the two withdrew it.
+     */
+    int withdrawnExplicit;
     int flags;
     char *title;		/* "wm title", or NULL for the default. */
     /*
@@ -784,6 +793,8 @@ WmScreenPosition(WmInfo *wmPtr, int width, int height, int *xPtr, int *yPtr)
  * and the stored pointer would otherwise dangle. dispPtr->firstWmPtr is
  * every toplevel, so this is the whole search space.
  */
+static void	WmUntrackContainer(TkWindow *winPtr, TkWindow *container);
+
 static void
 WmForgetTransientsOf(TkWindow *winPtr)
 {
@@ -791,6 +802,7 @@ WmForgetTransientsOf(TkWindow *winPtr)
 
     for (p = winPtr->dispPtr->firstWmPtr; p != NULL; p = p->nextPtr) {
 	if (p->container == winPtr) {
+	    WmUntrackContainer(p->winPtr, winPtr);
 	    p->container = NULL;
 	    WmSetString(&p->transient, NULL);
 	}
@@ -807,6 +819,79 @@ WmTransientOf(TkWindow *winPtr)
     if (winPtr == NULL || winPtr->wmInfoPtr == NULL)
 	return NULL;
     return winPtr->wmInfoPtr->container;
+}
+
+/*
+ * A TRANSIENT TRACKS ITS CONTAINER'S MAP STATE, not just the state the
+ * container happened to be in when "wm transient" was called. Upstream
+ * registers this on the CONTAINER with StructureNotifyMask and passes
+ * the TRANSIENT as client data (tkUnixWm.c's WmWaitMapProc); withdraw
+ * the container and the dialog goes with it, deiconify it and the
+ * dialog comes back. wm-transient-3.3, 4.3, 5.1, 6.2 and 8.1.
+ *
+ * The one exception is a transient the caller withdrew itself: the
+ * container reappearing must not undo that (6.2), which is what
+ * withdrawnExplicit is for.
+ *
+ * This port has no wrapper windows, so the events arrive on the
+ * container's own window rather than on a wrapper -- which is exactly
+ * why registering on the toplevel is right here and would not be on X.
+ */
+static void
+WmWaitMapProc(void *clientData, XEvent *eventPtr)
+{
+    TkWindow *winPtr = (TkWindow *) clientData;
+    WmInfo *wmPtr;
+
+    if (winPtr == NULL || (wmPtr = winPtr->wmInfoPtr) == NULL)
+	return;
+    if (wmPtr->container == NULL)
+	return;
+
+    if (eventPtr->type == MapNotify) {
+	if (wmPtr->withdrawnExplicit)
+	    return;
+	wmPtr->withdrawn = 0;
+	wmPtr->iconified = 0;
+	TkpWmSetState(winPtr, NormalState);
+    } else if (eventPtr->type == UnmapNotify) {
+	wmPtr->withdrawn = 1;
+	TkpWmSetState(winPtr, WithdrawnState);
+    }
+}
+
+/*
+ * Attach or detach the tracking handler. Every place that changes
+ * wmPtr->container goes through these two, so the handler and the
+ * pointer cannot get out of step -- a stale handler would run with a
+ * freed TkWindow as its client data.
+ */
+static void
+WmTrackContainer(TkWindow *winPtr, TkWindow *container)
+{
+    Tk_CreateEventHandler((Tk_Window) container, StructureNotifyMask,
+	    WmWaitMapProc, winPtr);
+}
+
+static void
+WmUntrackContainer(TkWindow *winPtr, TkWindow *container)
+{
+    if (container == NULL)
+	return;
+    Tk_DeleteEventHandler((Tk_Window) container, StructureNotifyMask,
+	    WmWaitMapProc, winPtr);
+}
+
+/*
+ * Override-redirect lives in Tk_Attributes rather than in WmInfo -- see
+ * the "wm overrideredirect" note -- so there is one answer to the
+ * question and this is where to ask it.
+ */
+static int
+WmIsOverrideRedirect(WmInfo *p)
+{
+    return p != NULL && p->winPtr != NULL
+	    && Tk_Attributes((Tk_Window) p->winPtr)->override_redirect;
 }
 
 static WmInfo *
@@ -1783,6 +1868,7 @@ TkWmDeadWindow(TkWindow *winPtr)
      */
     WmReleaseIcon(wmPtr);
     WmForgetTransientsOf(winPtr);
+    WmUntrackContainer(winPtr, wmPtr->container);
     wmPtr->container = NULL;
     if (wmPtr->iconFor != NULL && wmPtr->iconFor->wmInfoPtr != NULL) {
 	wmPtr->iconFor->wmInfoPtr->icon = NULL;
@@ -1845,6 +1931,23 @@ TkWmRestackToplevel(TkWindow *winPtr, int aboveBelow, TkWindow *otherPtr)
     WmUnlink(dispPtr, wmPtr);
     if (otherWmPtr == NULL) {
 	afterPtr = (aboveBelow == Above) ? WmLast(dispPtr) : NULL;
+	/*
+	 * AN OVERRIDE-REDIRECT TOPLEVEL STAYS ON TOP. On X the window
+	 * manager keeps them there and an ordinary "raise" cannot get
+	 * above one (wm-stackorder-5.2). There is no window manager
+	 * here, so this port has to hold the rule itself -- and it is
+	 * not only a test: TkpMakeMenuWindow marks every posted menu
+	 * override-redirect, so without this a "raise" on the window a
+	 * menu belongs to buries the menu under it.
+	 */
+	if (afterPtr != NULL && !WmIsOverrideRedirect(wmPtr)) {
+	    WmInfo *p, *below = NULL;
+
+	    for (p = dispPtr->firstWmPtr; p != NULL; p = p->nextPtr)
+		if (!WmIsOverrideRedirect(p))
+		    below = p;
+	    afterPtr = below;
+	}
     } else if (aboveBelow == Above) {
 	afterPtr = otherWmPtr;
     } else {
@@ -2658,6 +2761,7 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
             return WmIconForError(interp, "withdraw", "WITHDRAW", objv[2],
                     wmPtr);
         wmPtr->withdrawn = 1;
+        wmPtr->withdrawnExplicit = 1;
         TkpWmSetState(winPtr, WithdrawnState);
         return TCL_OK;
 
@@ -2685,6 +2789,7 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
          * wm-state-2.15, 2.17.
          */
         wmPtr->withdrawn = 0;
+        wmPtr->withdrawnExplicit = 0;
         wmPtr->iconified = 0;
         TkpWmSetState(winPtr, NormalState);
         return TCL_OK;
@@ -2726,6 +2831,7 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
                     sizeof(char *), "argument", 0, &st) != TCL_OK)
                 return TCL_ERROR;
             wmPtr->withdrawn = (st == ST_WITHDRAWN);
+            wmPtr->withdrawnExplicit = (st == ST_WITHDRAWN);
             wmPtr->iconified = (st == ST_ICONIC);
             TkpWmSetState(winPtr, st == ST_NORMAL ? NormalState :
                     st == ST_ICONIC ? IconicState : WithdrawnState);
@@ -3223,13 +3329,39 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
             return WmReturnString(interp, wmPtr->leaderName);
         {
             const char *s = Tcl_GetString(objv[3]);
+            Tk_Window leader;
 
             if (*s == '\0') {
                 WmSetString(&wmPtr->leaderName, NULL);
                 return TCL_OK;
             }
-            if (Tk_NameToWindow(interp, s, (Tk_Window) clientData) == NULL)
+            leader = Tk_NameToWindow(interp, s, (Tk_Window) clientData);
+            if (leader == NULL)
                 return TCL_ERROR;
+            /*
+             * The leader is resolved to its nearest TOPLEVEL ancestor,
+             * as with "wm transient" above and for the same reason.
+             */
+            while (leader != NULL && !Tk_TopWinHierarchy((TkWindow *) leader))
+                leader = (Tk_Window) ((TkWindow *) leader)->parentPtr;
+            if (leader == NULL) {
+                Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+                        "can't find a toplevel for \"%s\"", s));
+                Tcl_SetErrorCode(interp, "TK", "WM", "GROUP", (char *) NULL);
+                return TCL_ERROR;
+            }
+            /*
+             * THE LEADER'S WINDOW IS CREATED HERE, and that is not
+             * bookkeeping. Upstream's WmGroupCmd does Tk_MakeWindowExist
+             * on the leader and then CreateWrapper if it has no wrapper
+             * yet, because the group hint has to name a window id and a
+             * never-mapped toplevel has none. There are no wrappers in
+             * this port -- a toplevel IS its window -- so the first half
+             * alone is the whole of it, and unixWm-21.5 tests exactly
+             * that: testwrapper on the leader is empty before the "wm
+             * group" and must be a real id after it.
+             */
+            Tk_MakeWindowExist(leader);
             WmSetString(&wmPtr->leaderName, s);
         }
         return TCL_OK;
@@ -3249,6 +3381,7 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
 
             if (*s == '\0') {
                 WmSetString(&wmPtr->transient, NULL);
+                WmUntrackContainer(winPtr, wmPtr->container);
                 wmPtr->container = NULL;
                 return TCL_OK;
             }
@@ -3325,7 +3458,16 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
             }
             Tk_MakeWindowExist(master);
             WmSetString(&wmPtr->transient, Tk_PathName(master));
-            wmPtr->container = (TkWindow *) master;
+            /*
+             * The handler moves with the pointer, and only when the
+             * container actually changes -- re-registering would give
+             * the window two handlers and every state change twice.
+             */
+            if (wmPtr->container != (TkWindow *) master) {
+                WmUntrackContainer(winPtr, wmPtr->container);
+                WmTrackContainer(winPtr, (TkWindow *) master);
+                wmPtr->container = (TkWindow *) master;
+            }
 
             /*
              * A transient follows its master's state: while the master
@@ -3335,10 +3477,8 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
              * exactly this, and it is the one part of "transient" that
              * is behaviour rather than bookkeeping.
              *
-             * Only the state at the moment of the call is honoured
-             * here. Upstream also *tracks* the master afterwards, with
-             * a structure handler on it; that is a larger change and
-             * the tests for it are separate.
+             * This is the state at the moment of the call; WmWaitMapProc
+             * above keeps it in step afterwards.
              */
             {
                 WmInfo *mPtr = ((TkWindow *) master)->wmInfoPtr;
