@@ -116,7 +116,58 @@ puts "  ok: no fault"
 flush stdout
 
 # ------------------------------------------------------------------
-step "5. KNOWN WRONG, recorded rather than asserted"
+step "5. destroy the TOPLEVEL while a menubar is in force"
+
+# This is the half section 4 does not cover, and it is where the suite
+# faulted: run 9 crashed immediately after unixWm-49.2, which is a
+# menubar test, with
+#
+#	tktest: suicide: sys: trap: fault write addr=0x3a3a79007393
+#
+# -- a write through a pointer whose bytes read like text, i.e. one
+# fetched out of a block that has been freed and reused. Two orderings
+# have to be told apart, so they are separate steps.
+
+step "5a. menubar is a CHILD of the toplevel (what unixWm-49.2 does)"
+destroy .t
+toplevel .t -width 300 -height 200 -bd 2 -relief raised
+frame .t.m -bd 2 -relief raised -width 100 -height 30
+testmenubar window .t .t.m
+update
+destroy .t
+update
+puts "  ok: no fault"
+flush stdout
+
+# The ordinary way a program sets a menubar is "$w configure -menu .m",
+# and tkUnixMenu.c then hands TkUnixSetMenubar the MENU WIDGET -- which
+# is a SIBLING, not a child. Nothing destroys it with the toplevel, so
+# this is the ordering where the menubar can outlive the WmInfo it
+# points at. Upstream's TkWmDeadWindow destroys it explicitly.
+step "5b. menubar is NOT a child of the toplevel"
+destroy .t .m
+toplevel .t -width 300 -height 200
+frame .m -bd 2 -relief raised -width 100 -height 30
+testmenubar window .t .m
+update
+destroy .t
+update
+check "menubar went with its toplevel" [winfo exists .m] 0
+
+step "5c. what unixWm.test does next: withdraw . and build a toplevel"
+destroy .t
+wm geom . +700+700
+wm withdraw .
+toplevel .t -width 200 -height 200 -bg green
+update
+destroy .t
+wm deiconify .
+update
+puts "  ok: no fault"
+flush stdout
+
+# ------------------------------------------------------------------
+step "6. KNOWN WRONG, recorded rather than asserted"
 
 # There are no wrapper windows in this port, so a menubar stays an
 # ordinary child of its toplevel instead of sitting above it in a
