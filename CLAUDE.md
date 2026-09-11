@@ -1735,21 +1735,23 @@ table below is the whole thing, and the list has been re-derived rather
 than extended.
 
 ```
-all.tcl:  Total 10027  Passed 8877  Skipped 924  Failed 226
+all.tcl:  Total 10027  Passed 8888  Skipped 924  Failed 215
 Sourced 97 Test Files.
 ```
 
-**That is run 10, under `tktest`, and it is the first complete run of
-the whole suite with Tk's own test commands available.** Read it against
-run 7 -- the last complete `wish` run -- one column at a time rather
-than by the total:
+**That is run 11. Run 10 was the first complete run under `tktest`**,
+and is the one to read against run 7 -- the last complete `wish` run --
+one column at a time rather than by the total:
 
-| | run 7 (`wish`) | run 10 (`tktest`) | |
+| | run 7 (`wish`) | run 10 (`tktest`) | run 11 |
 |---|---|---|---|
-| Total | 10027 | 10027 | the same suite |
-| **Skipped** | 1429 | **924** | **505 newly measured** |
-| **Passed** | 8427 | **8877** | +450 |
-| **Failed** | 171 | **226** | +55 |
+| Total | 10027 | 10027 | 10027 |
+| **Skipped** | 1429 | **924** | 924 |
+| **Passed** | 8427 | **8877** | **8888** |
+| **Failed** | 171 | **226** | **215** |
+
+Run 10 -> 11 is the `testembed` work below: eleven moved from failed to
+passed, nothing else changed at all.
 
 **The count rose by 55 and nothing regressed.** Of the 505 tests that
 had never run here, **450 pass**. That is the "expect the failure count
@@ -1770,6 +1772,9 @@ Attributed by file, which is the comparison that actually settles it:
 | `focus.test` | 1 | 1 | 1 | 1 | **11** |
 | `winfo.test` | 6 | 4 | 4 | 4 | **5** |
 | everything else | 42 | 46 | 46 | 46 | 47 |
+
+Run 11 changes exactly one cell of that table -- `unixEmbed` 38 -> **27**
+-- and no other file moves by a single test.
 
 **The whole of the +55 is in four files, and the long tail did not
 move** (46 -> 47, and that one is `systray`/`sysnotify` splitting into
@@ -1827,6 +1832,32 @@ implementations, not to be better than them.**
 **Do not expect all eleven to pass**: several also need a second wish
 somewhere in the same test, and the count that matters is the next run,
 per file. `1.7` and `2.3` are the two that should go outright.
+
+**ALL ELEVEN PASSED, AND ONE OF THEM WAS IN THE OTHER BUCKET.** Run 11:
+
+```
+all.tcl:  Total 10027  Passed 8888  Skipped 924  Failed 215
+```
+
+Failed 226 -> 215, Passed 8877 -> 8888, Skipped identical -- and the
+per-file table moved in **exactly one line**, `unixEmbed` 38 -> 27, with
+nothing else changing by a single test and nothing newly failing. The
+eleven are `1.5a 1.6a 1.7 2.1 2.1a 2.2a 2.3 3.1a 4.2a 9.1 9.2a`.
+
+`unixEmbed-2.1` is the interesting one: it was filed above under
+**cross-application, structurally unfixable**, and it passes. The split
+was made by asking whether the word `childTkProcess` appears in the
+test body, and `2.1` does use one -- but its **expected result is the
+empty string**, so what the second wish makes of `-use $w1` never
+reaches the comparison. Only the parent's own `testembed` answer does.
+
+**Grepping for a command is not the same as knowing the test depends on
+its result.** Same family as "a grep hit is a name, not an
+implementation" from the `wm stackorder` note: the classifier read what
+a test *mentions*, and what decides a pass is what it *compares*. So
+`unixEmbed`'s remaining 27 are an upper bound on the unfixable, not a
+count of it -- the 19 attributed to a second wish above is really "19
+mention one", and some of those are reachable.
 
 `focus.test` 1 -> 11 and `winfo.test` 4 -> 5 are newly *measured*, not
 newly broken. Worth noting for later: `focus-6.1`, "embedded application
