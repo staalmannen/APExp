@@ -2310,6 +2310,82 @@ reading before it is counted as ours.
 `event.test` is down to 2 from 3, which is the `event-9.16`
 nondeterminism noted above showing itself again: it passed this run.
 
+#### tktest: 448 skipped tests that have never been measured
+
+**`Skipped 1429` is not all constraints that cannot be met here.** 448
+of it is a missing *binary*, and it is the exact counterpart of the
+`tcltest` that runs Tcl's suite: `tktest` is wish with Tk's own test
+commands compiled in. `sys/src/ape/cmd/tktest/mkfile` builds it, and it
+needed no new code at all -- three objects, all of them already in the
+tree:
+
+```
+tkTestInit.$O	unix/tkAppInit.c again, with -DTK_TEST
+tkTest.$O	generic/tkTest.c
+tkSquare.$O	generic/tkSquare.c
+```
+
+That is upstream's `TKTEST_OBJS` exactly. The
+`$(@TK_WINDOWINGSYSTEM@_TKTEST_OBJS)` it appends is **empty for X11 in
+this Tk**, so there is no fourth, platform-specific object to write --
+which is the thing worth checking before assuming a test binary needs
+porting. Everything `tkTest.c` reaches on this side already existed:
+`TkplatformtestInit` is `#define ... TCL_OK` for anything but Windows
+(`tkInt.h:1341`), `TkpTestembedCmd` is in `plan9/tkPlan9Stubs.c`, and
+`TkpTesttextCmd` is generic Tk's in `tkText.c`. Both files pass the host
+gcc syntax check under `-DPLAN9` unmodified.
+
+What it unlocks, from the skip tally of run 6:
+
+| constraint | tests |
+|---|---|
+| `testobjconfig` | 215 |
+| `testImageType` | 154 |
+| `testtext` | 31 |
+| `testembed` | 18 |
+| `testborder`, `testmakeexist` | 7 each |
+| `testbitmap`, `testcursor`, `testfont` | 5 each |
+| `testprintf` | 1 |
+
+448, plus the fourteen `unixEmbed` `-3.3a`/`-5.1a` variants that report
+`no library with prefix "Tktest" is loaded statically`, plus
+`imgListFormat-3.*` and `image-6.2`.
+
+**Still skipped, and correctly**: `testwrapper` 54, `testmenubar` 21,
+`testmetrics` 11, `testwinevent` 7, `testpressbutton` 3, `testmovemouse`
+1 -- every one of those is inside `#if defined(_WIN32)` in `tkTest.c`.
+`testutils` 20 is a Tcl-side thing and is unaffected.
+
+**EXPECT THE FAILURE COUNT TO RISE, and do not read that as a
+regression.** A skipped test is not a passing test; these 448 are
+*unmeasured*, and measuring them is the point. This has happened once
+already and was misread once already: the first run to reach all 97
+files took the count from 25 to 485, and none of it was new breakage --
+34 of those files had simply never been measured. Compare per file, as
+the table at the top of this section says, and read the tktest run as a
+new baseline rather than against run 6.
+
+`testobjconfig` alone being 215 is worth a word of warning: it is one
+test file exercising Tk's option-database machinery very thoroughly, so
+if it goes badly it will dominate every count taken afterwards and say
+little about the rest of the port.
+
+**`tktest` is deliberately not in `sys/src/ape/cmd/mkfile`.** It is a
+test binary, built by hand when the suite is to be run, like everything
+in `sys/lib/tests`:
+
+```
+cd sys/src/ape/cmd/tktest && mk install
+tktest $home/APExp/sys/lib/tests/tk-runall.tcl >/tmp/tk-all.out 2>&1
+```
+
+**`tcltest` is the same idea and is NOT built by a mkfile here**, though
+the Tcl section above runs one. It is a bigger job -- upstream's
+`TCLTEST_OBJS` is eight objects including `tclUnixTest.c`,
+`tclThreadTest.c` and `tclMutexTest.c`, so unlike tktest it has a
+genuinely unix-specific member that would need reading before it could
+be built. Worth doing, and not free.
+
 #### The four untouched files: 106 failures, and three of them are ours
 
 `unixEmbed` 29, `select` 23, `textDisp` 23, `unixSelect` 18, `systray`
@@ -3145,7 +3221,8 @@ family does *not* come back as itself.
 **`imgListFormat-3.1/3.2/3.3` and `image-6.2` need `tktest`, not
 `wish`**: `invalid command name "testphotostringmatch"`, and `image
 types` must list `test`, which `generic/tkTest.c` registers only in Tk's
-own test binary. A harness limitation, not a port bug.
+own test binary. A harness limitation, not a port bug -- **and it is
+built now**; see the tktest section below.
 
 **`focus-1.19` needs two applications.** `focusClear` in `focus.test` is
 `childTkProcess eval {focus -force .}` -- it takes the focus away by
