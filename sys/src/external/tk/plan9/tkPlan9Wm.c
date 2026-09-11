@@ -1545,6 +1545,37 @@ TkWmDeadWindow(TkWindow *winPtr)
 
     if (wmPtr == NULL)
 	return;
+
+    /*
+     * THE MENUBAR HOLDS A POINTER TO THIS WmInfo AND MUST NOT OUTLIVE IT.
+     * Upstream's TkWmDeadWindow opens with exactly this line, and the
+     * reason is not obvious from unixWm.test, where the menubar happens
+     * to be a CHILD of its toplevel (.t.menu) and so is already gone by
+     * the time this runs -- generic Tk destroys the whole childList
+     * before reaching here (tkWindow.c:1485).
+     *
+     * The case it is for is "$w configure -menu .menubar", which is the
+     * ordinary way a program sets one: tkUnixMenu.c hands us the MENU
+     * WIDGET, which is usually a sibling rather than a child. Nothing
+     * then destroys it with the toplevel, so without this the ckfree
+     * below leaves menubarPtr->wmInfoPtr pointing at freed memory, and
+     * MenubarDestroyProc later writes wmPtr->menubar through it and
+     * reads wmPtr->winPtr back out to schedule an update.
+     *
+     * Same shape as the icon relationship below, and the same reason it
+     * is worth the line: on this allocator a freed WmInfo stays readable
+     * and writable, so nothing fails until the garbage read out of it is
+     * dereferenced, somewhere else entirely.
+     */
+    if (wmPtr->menubar != NULL) {
+	TkWindow *menubarPtr = wmPtr->menubar;
+
+	wmPtr->menubar = NULL;
+	wmPtr->menuHeight = 0;
+	menubarPtr->wmInfoPtr = NULL;
+	Tk_DestroyWindow((Tk_Window) menubarPtr);
+    }
+
     WmUnlink(winPtr->dispPtr, wmPtr);
     if (wmPtr->flags & WM_UPDATE_PENDING)
 	Tcl_CancelIdleCall(WmUpdateGeometry, winPtr);

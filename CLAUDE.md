@@ -2727,6 +2727,86 @@ Tk's own test commands, and it skips itself under `wish`. Its last
 section *prints* the two known-wrong answers rather than asserting them,
 so that today's limitation is not frozen in as the requirement.
 
+#### Run 9: the freeze is gone and the run still does not finish
+
+**IT CRASHED, AND IT LOOKED LIKE IT HAD FINISHED.** `tk-menubar-test.tcl`
+passes every case, and the suite no longer hangs -- but the log ends
+
+```
+==== unixWm-49.2 FAILED
+
+tktest 17077: suicide: sys: trap: fault write addr=0x3a3a79007393 pc=0x2d1856
+```
+
+with no `Tests ended`, no `all.tcl: Total`, and no
+`tk-runall: every file ran` marker. `visual`, `winfo`, `winWm`, `wm` and
+`xmfbox` are **still unmeasured**, and `grep -c FAILED` halved gives 185
+-- the same 185 as run 8, off a prefix that is slightly *shorter*
+(run 8 reached `unixWm-50.1`; this stops at `49.2`).
+
+**A fault returns you to the shell prompt exactly as a clean finish
+does.** That is the whole of why this read as a complete run: there is
+no `$` to tell them apart. **The discriminator is the marker, and it is
+there for this** -- `tk-runall: every file ran, now entering exit` is
+printed from inside the `::exit` wrapper, so its absence means the run
+did not reach the end. Check for it before reading a total, the same way
+`git merge-base` is checked before reading a result. `79174e01` *was* in
+the build, so this is ours.
+
+**Both menubar tests report exactly what the section above predicted** --
+`unixWm-49.2` gives `52 7 12 32` against `52 7 12 62`, the missing
+`menuHeight` offset -- so the diagnosis holds and the fault is something
+else, after the result was printed.
+
+**The address is the useful part.** `0x3a3a79007393` is not a plausible
+heap or stack address; its bytes read as text (`:`, `:`, `y`). That is a
+**pointer fetched out of a block that has been freed and reused for a
+string** -- the shape this file already records twice (`TkpDeleteFont`,
+`TkpFreeColor`), and on this allocator the first thing that fails is the
+dereference, not the read.
+
+**One hole found by reading upstream rather than guessing, and it is
+fixed -- but it is NOT established to be this crash.** Upstream's
+`TkWmDeadWindow` opens with
+
+```c
+if (wmPtr->menubar != NULL) {
+    Tk_DestroyWindow(wmPtr->menubar);
+}
+```
+
+and the port's did not. Why it matters is invisible from `unixWm.test`,
+where the menubar is a **child** (`.t.menu`) and so is already gone --
+generic Tk destroys the whole `childList` at `tkWindow.c:1485`, well
+before `TkWmDeadWindow` at :1580. The case it is for is
+`$w configure -menu .menubar`, the ordinary way a program sets one:
+`tkUnixMenu.c` hands `TkUnixSetMenubar` the **menu widget**, normally a
+*sibling*. Nothing destroys that with the toplevel, so the `ckfree`
+leaves `menubarPtr->wmInfoPtr` dangling and `MenubarDestroyProc` later
+writes `wmPtr->menubar` through it and reads `wmPtr->winPtr` back out to
+schedule an update. Same shape as the icon relationship in the same
+function.
+
+Because the suite's menubar is a child, **that fix probably does not
+explain this fault**, and saying otherwise would be the mistake this
+file has recorded four times. `tk-menubar-test.tcl` grew a section 5
+that separates the orderings -- child menubar, sibling menubar, and the
+`deleteWindows` / `wm withdraw .` / new-toplevel sequence `unixWm.test`
+runs immediately after 49.2 -- so it can answer without the suite.
+
+**The decisive step is the pc, and it needs no rebuild** -- static
+`acid` on the binary, as the crash section above already records:
+
+```
+acid $home/APExp/sys/src/ape/cmd/wish/tktest
+acid: src(0x2d1856)
+```
+
+Do that before anything else. Reading the shape of the fault matters as
+much as the line: a wild pointer here shows up at the first *double*
+indirection, so the function that faults is often one step past the one
+that is wrong.
+
 #### The four untouched files: 106 failures, and three of them are ours
 
 `unixEmbed` 29, `select` 23, `textDisp` 23, `unixSelect` 18, `systray`
