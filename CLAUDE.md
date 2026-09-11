@@ -1734,11 +1734,11 @@ table below is the whole thing, and the list has been re-derived rather
 than extended.
 
 ```
-all.tcl:  Total 10027  Passed 8320  Skipped 1429  Failed 278
+all.tcl:  Total 10027  Passed 8321  Skipped 1429  Failed 277
 Sourced 97 Test Files.
 ```
 
-**278 failing tests**, from **485** on the first full run -- which was
+**277 failing tests**, from **485** on the first full run -- which was
 up from 25 only because that run was the first to measure 35 files at
 all, not a regression. Attributed by file across the runs:
 
@@ -2377,28 +2377,93 @@ port's code:
   picked up the sibling's pixels, and with no backing store there is no
   record of it". They redraw *less* than X does, which is the expected
   direction.
-- **8 are Expose granularity** (`7.1`..`7.8`), and this is the one that
-  is a genuine open question. **There is no partial Expose anywhere in
-  this port**: `P9ExposeTree` always reports `0,0,width,height` and is
-  reached only from `XMapWindow`, `XRaiseWindow` and `XLowerWindow` --
-  `XUnmapWindow` and `XDestroyWindow` send **none at all**.
-
-  Those two facts predict two different bugs, and they want opposite
-  fixes: either no Expose reaches the text widget (in which case
-  destroying a window leaves its pixels on screen, which is worse than
-  the test, and the full relayout has another cause) or a whole-window
-  one does (in which case the fix is damage rectangles). **Print the
-  events before choosing**: `sys/lib/tests/tk-expose-test.tcl` runs
-  `textDisp-7.1` with an `<Expose>` binding that reports `%x %y %w %h`,
-  and says which. Note the asymmetry it warns about -- too *much*
-  damage costs a repaint, too *little* leaves stale pixels nothing will
-  ever correct.
+- **8 are Expose granularity** (`7.1`..`7.8`), and chasing them found a
+  bug far bigger than the tests -- see the next section.
 
 The arithmetic for the whole exercise: of 106 failures in the four
 untouched files, **3 were ours** and 103 need a second wish (53),
 `tktest` (14), a system tray (13), a scalable font (13), or the backing
 store this port does not have (2), with 8 still open. That ratio is the
 thing to carry into the next file rather than the raw count.
+
+#### Tk on Plan 9: nothing repaired what a window had been covering
+
+**Destroying a widget left its pixels on the screen.** So did
+`place forget`. So did raising a widget above its siblings. This port
+repaired damage in exactly **one** place -- `XMapWindow`, which exposes
+the window that has just appeared -- and nowhere else, for the whole
+life of the port.
+
+`sys/lib/tests/tk-expose-test.tcl` says it in four empty lines: it
+binds `<Expose>`, prints `%x %y %w %h`, and reported
+
+```
+STEP: 2. destroy .f2, then update
+      exposes:
+STEP: 3. rebuild, map a frame over .t, then 'place forget' it
+      exposes:
+STEP: 4. two overlapping frames in .t, raise the lower one
+      exposes:
+```
+
+**Section 4 is what pinned it down**, and it is the one that reads as a
+contradiction: `XRaiseWindow` *does* call `P9ExposeTree`, so raising
+was the one path the code said should work. It reported nothing, which
+sends you to `Tk_RestackWindow` in `generic/tkWindow.c`:
+
+```c
+if (winPtr->window != None) {
+    XWindowChanges changes;
+    unsigned int mask = CWStackMode;
+    ...
+    XConfigureWindow(winPtr->display, winPtr->window, mask, &changes);
+```
+
+**A non-toplevel never reaches `XRaiseWindow` at all.** Tk reorders
+`parentPtr->childList` itself and tells the server about a *sibling*
+with `CWStackMode`; only a toplevel goes through `TkWmRestackToplevel`
+and so through `XRaiseWindow`. And `XConfigureWindow` here was pure
+bookkeeping -- it copied x/y/width/height into the `P9Window` and
+returned.
+
+**Why every test still passed.** `Tk_CoordsToWindow` answers from Tk's
+own `childList`, so `winfo containing` was right the whole time and
+`raise.test` was satisfied: **the hit test was correct and only the
+pixels were stale.** That is precisely the trap the stacking section
+above warns about -- "restacking with no hit-test reports nothing and
+hit-testing with no restacking reports a stale but plausible answer" --
+met from the other side, and it hid this for the whole port.
+
+**The fix** is `P9ExposeRect` and `P9DamageUnder` in `tkPlan9Init.c`.
+`P9ExposeRect` is `P9ExposeTree` over a rectangle: expose a window and
+its mapped children, each clipped to the part of the rectangle that
+falls inside it, children after their parent so they repaint on top --
+drawing here goes straight into the one rio window with no clipping, so
+the order of the events *is* the stacking. `P9DamageUnder` takes a
+window's rectangle **in its parent's coordinates**, which is where
+`P9Window.x/y` already are, and exposes the parent over it. Called from
+`XDestroyWindow` (before the slot is freed -- the rectangle and the
+parent are both gone the moment `TkP9FreeWindow` runs), `XUnmapWindow`,
+and `XConfigureWindow`'s `CWStackMode` path.
+
+**Err towards more damage, always.** Too much costs a repaint; too
+little leaves stale pixels that nothing here will ever correct, because
+there is no backing store and no server to ask. That asymmetry is why
+this went in as "expose the parent subtree over the rectangle" rather
+than anything cleverer.
+
+**This is not yet known to fix `textDisp-7.1..7.8`, and probably does
+not.** Those eight relayout the whole widget where X relays out
+nothing -- and with *no* Expose arriving before this change, the
+relayout must have had another cause all along. The test file's redraw
+half will name it, and **it could not on the first run**: `tk_textRelayout`
+and `tk_textRedraw` are only recorded while the widget's own debugging
+is on (`textDisp.test:139` is `.t debug on`), which the script did not
+do, so every `relayout:` line came back empty for the wrong reason.
+Worse, its `build` proc *assigned* both variables, so the "does this Tk
+report them at all?" check could never fail either. **A check that
+cannot fail is not a check** -- it now probes with a separate widget
+before `build` touches anything.
 
 #### Tk on Plan 9: TkpClaimFocus, and an embedded wm geometry
 
@@ -2417,6 +2482,29 @@ Here both halves share this process and this window table, so the round
 trip is the identity: `Tk_GetOtherWindow` to find the container, then
 `TkSetFocusWin` on it. Same reduction as the rest of this port's
 embedding.
+
+**Result: `unixEmbed-10.2` passes; `8.2` is half fixed.** `[focus]` in
+the container's interpreter is `.f1` now, where it used to be `.f2`, so
+the claim reaches the container. What is still wrong is the *other*
+half -- the embedded application's own `[focus]` is `{}` where it
+should be `.`.
+
+That is `displayFocusPtr->focusWinPtr`, which is per main window, and
+`TkSetFocusWin` (tkFocus.c:633) deliberately leaves it NULL on the
+claiming side: on X the application learns it has the focus from the
+**real FocusIn the server then delivers to the embedded window**, and
+`TkFocusFilterEvent`'s ordinary path sets it. Windows does the same
+thing concretely -- its container answers `TK_CLAIMFOCUS` with
+`SetFocus(containerPtr->embeddedHWnd)`, i.e. it moves the OS focus *to
+the embedded window*, and Tk sees `WM_SETFOCUS` there.
+
+So the missing step is generating that second FocusIn on the embedded
+toplevel. **Do not send it with mode `EMBEDDED_APP_WANTS_FOCUS`**: that
+mode routes back into `TkSetFocusWin` (tkFocus.c:295) and would claim
+again, which is a loop. It wants an ordinary FocusIn, and getting the
+mode and detail wrong in the focus machinery is how `bind.test` went
+from 3 failures to 116 once already -- so it is left alone until it can
+be measured rather than guessed.
 
 **`WmUpdateGeometry` threw away an explicit `wm geometry` on an
 embedded toplevel.** The `TK_EMBEDDED` branch sat *above* the size
