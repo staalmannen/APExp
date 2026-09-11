@@ -329,6 +329,28 @@ WmUpdateGeometry(void *clientData)
      * other thing the early return skipped.
      */
     if (winPtr->flags & TK_EMBEDDED) {
+	/*
+	 * AN EMBEDDED TOPLEVEL HAS NO POSITION OF ITS OWN. It sits at its
+	 * container's origin, so upstream zeroes x/y here -- "embedded
+	 * windows are not allowed to move", UpdateGeometryInfo's own
+	 * comment -- and clears the negative flags with them.
+	 *
+	 * This was invisible until "wm geometry" started reporting
+	 * wmPtr->x/y rather than winPtr->changes.x/y, which is right for
+	 * every other toplevel (a window asked for at "-0-0" must read
+	 * back as "-0-0", not as the large positive coordinate it landed
+	 * on). For an embedded one it meant "wm geometry .t1 +40+50"
+	 * read back as +40+50 where X says +0+0: unixEmbed-10.1 and
+	 * 10.2, which had been passing and broke on that change.
+	 *
+	 * Upstream gates this on TK_EMBEDDED|TK_BOTH_HALVES -- embedded
+	 * AND the container in this same process -- because otherwise it
+	 * cannot know where the other application put it. Here both
+	 * halves always share the process, so TK_EMBEDDED alone is the
+	 * same condition.
+	 */
+	wmPtr->x = wmPtr->y = 0;
+	wmPtr->flags &= ~(WM_NEGATIVE_X | WM_NEGATIVE_Y);
 	TkP9EmbedGeometryRequest(winPtr, width, height);
 	return;
     }
