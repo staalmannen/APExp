@@ -53,5 +53,88 @@ OFILES=tkAppInit.$O
 tkAppInit.$O: $TKSRC/unix/tkAppInit.c
 	$CC $CFLAGS $TKSRC/unix/tkAppInit.c
 
+# ------------------------------------------------------------------
+# tktest -- wish with Tk's own test commands compiled in, the exact
+# counterpart of the tcltest target in ../tclsh/mkfile, and here for the
+# same reason it is there: it shares every CFLAG and every library with
+# the binary beside it. A separate cmd/tktest directory was written
+# first and thrown away, because it had to copy this file's whole CFLAGS
+# block -- including the -DWCHAR=char note above, which is load-bearing
+# -- and a copy of a build rule is a copy that silently stops matching.
+#
+# It is a ":V:" target and not "default", so "mk" and "mk install" here
+# still build and install wish alone; tktest is never installed.
+#
+#	cd sys/src/ape/cmd/wish && mk tktest
+#	./tktest $home/APExp/sys/lib/tests/tk-runall.tcl >/tmp/tk-all.out >[2=1]
+#
+# The three objects are upstream's TKTEST_OBJS exactly. The
+# $(@TK_WINDOWINGSYSTEM@_TKTEST_OBJS) it appends is empty for X11 in
+# this Tk, so there is no fourth, platform-specific object to find or
+# write -- worth checking before assuming a test binary needs porting.
+# Everything tkTest.c reaches on this side already existed:
+# TkplatformtestInit is "TCL_OK" for anything but Windows (tkInt.h:1341),
+# TkpTestembedCmd is in plan9/tkPlan9Stubs.c, TkpTesttextCmd is generic
+# Tk's in tkText.c.
+#
+# THE STUB OBJECTS ARE THE WHOLE OF WHY A FIRST ATTEMPT DID NOT LINK.
+# tkTest.c and tkSquare.c both open with
+#
+#	#undef STATIC_BUILD
+#	#ifndef USE_TCL_STUBS
+#	#   define USE_TCL_STUBS
+#
+# so they compile as a stub-using EXTENSION whatever the command line
+# says -- that #undef exists precisely to stop -DSTATIC_BUILD turning it
+# off. Without the two stub objects the link ends
+#
+#	Tktest_Init: undefined: Tcl_InitStubs
+#	Tktest_Init: undefined: Tk_InitStubs
+#	_convM2D: tclStubsPtr: not defined
+#	_convM2D: tkStubsPtr / tkIntStubsPtr / tkIntPlatStubsPtr: not defined
+#
+# -- six symbols, all of them in generic/tclStubLib.c and
+# generic/tkStubLib.c, which are the CLIENT side of the stub interfaces
+# and so are in neither archive: libtcl.a and libtk.a are the core and
+# carry the tables, not the things that reach them. ../tclsh/mkfile hit
+# exactly this and answers it the same way.
+#
+# The tempting alternative is to disable the stubs under #ifdef PLAN9 --
+# there is no dlopen here, nothing is ever loaded at run time, and the
+# mechanism has nothing to do. That works, and it was tried first, and
+# it is still the wrong trade: it edits two vendored generic files that
+# the next Tk update would silently revert, to avoid compiling two
+# vendored files that already exist and already build clean.
+#
+# WHY IT IS WORTH BUILDING: 448 tests in Tk's suite are SKIPPED for want
+# of these commands -- a third as many again as the 268 that fail --
+# and none of them has ever been measured here. EXPECT THE FAILURE COUNT
+# TO GO UP; a skipped test is not a passing test. See the tktest section
+# in CLAUDE.md for the breakdown and for how to read the first run.
+
+TESTOFILES=tkTestInit.$O tkTest.$O tkSquare.$O tclStubLib.$O tkStubLib.$O
+
+tktest:V: $TESTOFILES $LIB
+	$LD $LDFLAGS -o $target $prereq
+
+# Named tkTestInit rather than tkAppInit because it is the SAME source
+# as wish's above, built with -DTK_TEST. Upstream renames the object for
+# the same reason (Makefile.in:992): so that a wish object built without
+# the flag is never picked up here, or the other way round.
+tkTestInit.$O: $TKSRC/unix/tkAppInit.c
+	$CC $CFLAGS -DTK_TEST -o $target $TKSRC/unix/tkAppInit.c
+
+tkTest.$O: $TKSRC/generic/tkTest.c
+	$CC $CFLAGS $TKSRC/generic/tkTest.c
+
+tkSquare.$O: $TKSRC/generic/tkSquare.c
+	$CC $CFLAGS $TKSRC/generic/tkSquare.c
+
+tclStubLib.$O: $TCLSRC/generic/tclStubLib.c
+	$CC $CFLAGS -DSTATIC_BUILD $TCLSRC/generic/tclStubLib.c
+
+tkStubLib.$O: $TKSRC/generic/tkStubLib.c
+	$CC $CFLAGS -DSTATIC_BUILD $TKSRC/generic/tkStubLib.c
+
 clean:V:
-	rm -f *.[$OS] $BIN/$TARG
+	rm -f *.[$OS] tktest $BIN/$TARG
