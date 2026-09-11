@@ -657,6 +657,81 @@ P9ExposeRect(Display *display, Window w, int x, int y, int width, int height)
 }
 
 /*
+ * Expose w and its children over a rectangle, IN STACKING ORDER.
+ *
+ * P9ExposeRect above walks gP9.wins in slot order, which is roughly
+ * creation order and has nothing to do with what is on top. The events
+ * are the stacking here -- drawing is immediate into the one rio window
+ * with no clipping, so whoever repaints last wins the pixels -- so slot
+ * order is a coin toss. tk-expose-test.tcl section 4 got the right
+ * answer by luck:
+ *
+ *	exposes: {.t 28 14 120 50} {.fb 0 0 72 30} {.fa 0 0 120 50}
+ *
+ * .fa had just been raised above .fb and happened to sit in a later
+ * slot. Create the two frames the other way round and the raise would
+ * have repainted .fb last, i.e. done nothing visible.
+ *
+ * Tk owns the order and always has: parentPtr->childList, lowest
+ * first (Tk_RestackWindow). Use it when the window is one Tk knows,
+ * and fall back to the slot walk when it is not -- during teardown
+ * Tk_IdToWindow can answer NULL for a window this table still has.
+ */
+static void
+P9ExposeRectStacked(Display *display, Window w, int x, int y, int w0, int h0)
+{
+    TkWindow *winPtr = (TkWindow *) Tk_IdToWindow(display, w);
+    P9Window *pw = TkP9FindWindow(w);
+    TkWindow *childPtr;
+
+    if (pw == NULL || !pw->mapped || pw->ispixmap)
+        return;
+    if (winPtr == NULL) {
+        P9ExposeRect(display, w, x, y, w0, h0);
+        return;
+    }
+
+    /* The window itself, clipped, without P9ExposeRect's child walk. */
+    {
+        int cx = x, cy = y, cw = w0, ch = h0;
+        XEvent ev;
+
+        if (cx < 0) { cw += cx; cx = 0; }
+        if (cy < 0) { ch += cy; cy = 0; }
+        if (cx + cw > pw->width)  cw = pw->width  - cx;
+        if (cy + ch > pw->height) ch = pw->height - cy;
+        if (cw <= 0 || ch <= 0)
+            return;
+
+        memset(&ev, 0, sizeof(ev));
+        ev.type            = Expose;
+        ev.xexpose.display = display;
+        ev.xexpose.window  = w;
+        ev.xexpose.x       = cx;
+        ev.xexpose.y       = cy;
+        ev.xexpose.width   = cw;
+        ev.xexpose.height  = ch;
+        ev.xexpose.count   = 0;
+        TkP9EnqueueEvent(&ev);
+
+        x = cx; y = cy; w0 = cw; h0 = ch;
+    }
+
+    for (childPtr = winPtr->childList; childPtr != NULL;
+            childPtr = childPtr->nextPtr) {
+        P9Window *c;
+
+        if (childPtr->window == None)
+            continue;
+        c = TkP9FindWindow(childPtr->window);
+        if (c == NULL)
+            continue;
+        P9ExposeRectStacked(display, childPtr->window,
+                x - c->x, y - c->y, w0, h0);
+    }
+}
+
+/*
  * A window is going away, or moving, or being restacked: repair what it
  * was covering.
  *
@@ -695,7 +770,8 @@ P9DamageUnder(Display *display, P9Window *pw)
     parent = TkP9FindWindow(pw->parent);
     if (parent == NULL)
         return;
-    P9ExposeRect(display, parent->xid, pw->x, pw->y, pw->width, pw->height);
+    P9ExposeRectStacked(display, parent->xid,
+            pw->x, pw->y, pw->width, pw->height);
 }
 
 int
