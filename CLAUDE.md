@@ -2516,10 +2516,30 @@ What it unlocks, from the skip tally of run 6:
 `no library with prefix "Tktest" is loaded statically`, plus
 `imgListFormat-3.*` and `image-6.2`.
 
-**Still skipped, and correctly**: `testwrapper` 54, `testmenubar` 21,
-`testmetrics` 11, `testwinevent` 7, `testpressbutton` 3, `testmovemouse`
-1 -- every one of those is inside `#if defined(_WIN32)` in `tkTest.c`.
-`testutils` 20 is a Tcl-side thing and is unaffected.
+**That list was read wrong, and the run corrected it.** `tkTest.c:248`
+is
+
+```c
+#if defined(_WIN32)
+    ... testmetrics ...
+#elif !defined(__CYGWIN__) && !defined(MAC_OSX_TK)
+    ... testmenubar, testsend, testwrapper ...
+#endif /* _WIN32 */
+```
+
+-- an `#elif`, not a plain `#if`, and the closing comment says
+`_WIN32` whatever arm you are in. So **`testwrapper` 54, `testmenubar`
+21 and the `testsend` group are on the X11 arm and are available
+here**, not Windows-only; that is another ~75 tests unlocked on top of
+the 448, and the `unixWm-N.2`/`N.3` variants that appeared in the first
+tktest run are exactly the `testwrapper` ones. Only `testmetrics` 11 is
+genuinely Windows-only, with `testwinevent` 7, `testpressbutton` 3 and
+`testmovemouse` 1. `testutils` 20 is Tcl-side and unaffected.
+
+**Read the arm, not the `#endif` comment.** A closing comment naming
+the *first* condition is the normal way to label a long `#if/#elif`
+chain, and taking it for the whole block is how 75 tests got written
+off in the table above.
 
 **EXPECT THE FAILURE COUNT TO RISE, and do not read that as a
 regression.** A skipped test is not a passing test; these 448 are
@@ -2567,6 +2587,68 @@ No object collides between the two targets in `cmd/wish`: `tkAppInit.$O`
 is wish's and `tkTestInit.$O` is tktest's, from the same source built
 with and without `-DTK_TEST`, which is why upstream renames it too
 (`Makefile.in:992`).
+
+#### Run 8: the first tktest run, and where it stops
+
+`tktest` builds and runs. The direct confirmation is that **`no library
+with prefix "Tktest" is loaded statically` appears nowhere in the log**,
+where it used to account for fourteen `unixEmbed` failures.
+
+**It is a PREFIX and its total means nothing yet.** The run freezes in
+`unixWm.test` just after `unixWm-50.1`, so `visual`, `winfo`, `winWm`,
+`wm` and `xmfbox` are unmeasured -- about the last 10% of the files.
+`grep -c FAILED` halved gives 185 against run 7's 171 for the whole
+suite, and that comparison is not one to lean on in either direction:
+run 8 is missing five files and has ~520 extra tests running.
+
+What it does settle, per file:
+
+| file | run 7 (wish) | run 8 (tktest) | |
+|---|---|---|---|
+| `image` | 1 | **0** | `testImageType` |
+| `imgListFormat` | 3 | **0** | `testphotostringmatch` |
+| `unixEmbed` | 30 | 38 | 7 `-Na` variants fixed, 17 new |
+| `focus` | 1 | 11 | 10 new, `testwrapper`/embedding |
+| `unixWm` | 10 | 30 | 25 new, mostly `testwrapper` -- and truncated |
+
+`image-6.2` and `imgListFormat-3.*` are gone, which is exactly what the
+section above predicted of them. **`unixEmbed-10.1` and `10.2` are gone
+too**, so the embedded `wmPtr->x/y` fix is confirmed by the suite rather
+than by reasoning.
+
+**The freeze is a blocking wait, not the `scrollbar-10.1` spin.** The
+CPU is *constantly but lightly* loaded, which is this port's notifier
+sleeping `P9_POLL_US` between polls and finding nothing -- i.e.
+something is waiting for an event that will never arrive. A tight loop
+inside one Tk call pins a core; this does not.
+
+`unixWm-50.3` and `50.4` are the first two tests in the file that do
+
+```tcl
+interp create child
+load {} Tk child
+```
+
+and they could not run under `wish` at all, so **this is the first time
+two Tk main windows have existed in one process here**. `50.3` then
+does `tkwait visibility` on a `-container` frame and, inside the child,
+on an embedded toplevel. The screenshot of the frozen display shows
+blue, red and yellow rectangles, which are `50.3`'s `.t`, `.t.f` and
+`.x`, beside a green one.
+
+That is a suspect, not an answer, and this file has a bad record of
+calling suspects answers. **The cheap decisive step is the one the
+`scrollbar.test` section already records**, and it needs no rebuild:
+
+```
+tktest $home/APExp/sys/lib/tests/tk-runall.tcl -file unixWm.test -verbose t
+```
+
+`-verbose t` prints each test name as it *starts*, so the last line
+names the test that did not return. Only then is it worth looking at
+`gP9` -- the port keeps one global display state, one window table and
+one event ring, and a second main window in the same process is a
+configuration nothing here has ever been under.
 
 #### The four untouched files: 106 failures, and three of them are ours
 
