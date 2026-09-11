@@ -1734,32 +1734,54 @@ table below is the whole thing, and the list has been re-derived rather
 than extended.
 
 ```
-all.tcl:  Total 10027  Passed 8321  Skipped 1429  Failed 277
+all.tcl:  Total 10027  Passed 8330  Skipped 1429  Failed 268
 Sourced 97 Test Files.
 ```
 
-**277 failing tests**, from **485** on the first full run -- which was
+**268 failing tests**, from **485** on the first full run -- which was
 up from 25 only because that run was the first to measure 35 files at
 all, not a regression. Attributed by file across the runs:
 
-| file | run 1 | run 2 | run 3 | run 4 |
-|---|---|---|---|---|
-| `wm.test` | 202 | 130 | 74 | 66 |
-| `unixWm.test` | 129 | 62 | 60 | 59 |
-| `unixEmbed.test` | 29 | 29 | 29 | 29 |
-| `textDisp.test` | 23 | 23 | 23 | 23 |
-| `select.test` | 23 | 23 | 23 | 23 |
-| `unixSelect.test` | 18 | 18 | 18 | 18 |
-| `systray.test` | 13 | 13 | 13 | 13 |
-| `winfo.test` | 6 | 4 | 4 | 4 |
+| file | run 1 | run 2 | run 3 | run 4 | run 5 | run 6 |
+|---|---|---|---|---|---|---|
+| `wm.test` | 202 | 130 | 74 | 66 | 62 | 62 |
+| `unixWm.test` | 129 | 62 | 60 | 59 | 59 | 59 |
+| `unixEmbed.test` | 29 | 29 | 29 | 29 | 28 | 28 |
+| `textDisp.test` | 23 | 23 | 23 | 23 | 23 | **14** |
+| `select.test` | 23 | 23 | 23 | 23 | 23 | 23 |
+| `unixSelect.test` | 18 | 18 | 18 | 18 | 18 | 18 |
+| `systray.test` | 13 | 13 | 13 | 13 | 12 | 12 |
+| `winfo.test` | 6 | 4 | 4 | 4 | 4 | 4 |
+
+**Compare two runs by file before reading anything into a total.**
+Run 6 differs from run 5 in exactly one line of that table -- textDisp
+23 -> 14, nine tests, and every other file identical to the test. That
+is the check that matters for a change touching `XDestroyWindow`,
+`XUnmapWindow` and `XConfigureWindow`, which every widget in the suite
+goes through: a mistake there would have been broad, and a total alone
+cannot tell "nine fixed" from "fifteen fixed and six broken". The
+commands are
+
+```sh
+grep '^==== ' run.out | grep ' FAILED$' |
+	grep -v '^==== [a-zA-Z0-9._-]* FAILED$' |
+	sed 's/^==== //; s/-[0-9].*//; s/^wm-.*/wm/' | sort | uniq -c
+```
+
+on each, then `diff`. The second `grep -v` drops tcltest's bare
+repetition of the name, which is why `grep -c FAILED` doubles; the
+`wm-*` collapse is because `wm.test` names its tests `wm-transient-1.1`
+rather than `wm-1.1`.
 
 Run 4 is the first one that finished, so it is also the first whose
 total can be checked against tcltest's own rather than against
 `grep -c FAILED` halved. The two agree: 278.
 
-**Everything outside `wm` is untouched so far**, which is the honest
-reading: the 198 fixed are all one area, and the six files below it in
-that table have had no attention at all.
+**That was written when everything outside `wm` was untouched**, and it
+no longer holds: runs 5 and 6 fixed twelve in `unixEmbed` and
+`textDisp`, and the four files that had had no attention have now been
+read end to end -- see the section on them below. `wm` and `unixWm` are
+still 121 of the 268 and are still where the bulk is.
 
 The first-run breakdown, kept because the reasoning below refers to it:
 
@@ -2245,11 +2267,13 @@ exactly the fault `acid` resolved to `Tk_GeometryRequest`. So
 suspect for `geometry-4.7`, which is a different and much smaller
 thing.
 
-**This is the first complete accounting of the whole suite**, and it
-supersedes every count above it. `Total 10027` -- the `[n-z]` half
-alone had said 5007, and no earlier run reached a total at all.
+**This is the first complete accounting of the whole suite.**
+`Total 10027` -- the `[n-z]` half alone had said 5007, and no earlier
+run reached a total at all. **It is run 4, and is kept as history: the
+current numbers are the six-column table at the top of this section**,
+which was re-derived per file rather than extended.
 
-| file | failing |
+| file | failing (run 4) |
 |---|---|
 | `wm.test` | 66 |
 | `unixWm.test` | 59 |
@@ -2285,6 +2309,82 @@ reading before it is counted as ours.
 
 `event.test` is down to 2 from 3, which is the `event-9.16`
 nondeterminism noted above showing itself again: it passed this run.
+
+#### tktest: 448 skipped tests that have never been measured
+
+**`Skipped 1429` is not all constraints that cannot be met here.** 448
+of it is a missing *binary*, and it is the exact counterpart of the
+`tcltest` that runs Tcl's suite: `tktest` is wish with Tk's own test
+commands compiled in. `sys/src/ape/cmd/tktest/mkfile` builds it, and it
+needed no new code at all -- three objects, all of them already in the
+tree:
+
+```
+tkTestInit.$O	unix/tkAppInit.c again, with -DTK_TEST
+tkTest.$O	generic/tkTest.c
+tkSquare.$O	generic/tkSquare.c
+```
+
+That is upstream's `TKTEST_OBJS` exactly. The
+`$(@TK_WINDOWINGSYSTEM@_TKTEST_OBJS)` it appends is **empty for X11 in
+this Tk**, so there is no fourth, platform-specific object to write --
+which is the thing worth checking before assuming a test binary needs
+porting. Everything `tkTest.c` reaches on this side already existed:
+`TkplatformtestInit` is `#define ... TCL_OK` for anything but Windows
+(`tkInt.h:1341`), `TkpTestembedCmd` is in `plan9/tkPlan9Stubs.c`, and
+`TkpTesttextCmd` is generic Tk's in `tkText.c`. Both files pass the host
+gcc syntax check under `-DPLAN9` unmodified.
+
+What it unlocks, from the skip tally of run 6:
+
+| constraint | tests |
+|---|---|
+| `testobjconfig` | 215 |
+| `testImageType` | 154 |
+| `testtext` | 31 |
+| `testembed` | 18 |
+| `testborder`, `testmakeexist` | 7 each |
+| `testbitmap`, `testcursor`, `testfont` | 5 each |
+| `testprintf` | 1 |
+
+448, plus the fourteen `unixEmbed` `-3.3a`/`-5.1a` variants that report
+`no library with prefix "Tktest" is loaded statically`, plus
+`imgListFormat-3.*` and `image-6.2`.
+
+**Still skipped, and correctly**: `testwrapper` 54, `testmenubar` 21,
+`testmetrics` 11, `testwinevent` 7, `testpressbutton` 3, `testmovemouse`
+1 -- every one of those is inside `#if defined(_WIN32)` in `tkTest.c`.
+`testutils` 20 is a Tcl-side thing and is unaffected.
+
+**EXPECT THE FAILURE COUNT TO RISE, and do not read that as a
+regression.** A skipped test is not a passing test; these 448 are
+*unmeasured*, and measuring them is the point. This has happened once
+already and was misread once already: the first run to reach all 97
+files took the count from 25 to 485, and none of it was new breakage --
+34 of those files had simply never been measured. Compare per file, as
+the table at the top of this section says, and read the tktest run as a
+new baseline rather than against run 6.
+
+`testobjconfig` alone being 215 is worth a word of warning: it is one
+test file exercising Tk's option-database machinery very thoroughly, so
+if it goes badly it will dominate every count taken afterwards and say
+little about the rest of the port.
+
+**`tktest` is deliberately not in `sys/src/ape/cmd/mkfile`.** It is a
+test binary, built by hand when the suite is to be run, like everything
+in `sys/lib/tests`:
+
+```
+cd sys/src/ape/cmd/tktest && mk install
+tktest $home/APExp/sys/lib/tests/tk-runall.tcl >/tmp/tk-all.out 2>&1
+```
+
+**`tcltest` is the same idea and is NOT built by a mkfile here**, though
+the Tcl section above runs one. It is a bigger job -- upstream's
+`TCLTEST_OBJS` is eight objects including `tclUnixTest.c`,
+`tclThreadTest.c` and `tclMutexTest.c`, so unlike tktest it has a
+genuinely unix-specific member that would need reading before it could
+be built. Worth doing, and not free.
 
 #### The four untouched files: 106 failures, and three of them are ours
 
@@ -2369,25 +2469,48 @@ port's code:
   have some tolerance on actually used font size" -- the tolerance is
   one character, and Plan 9 bitmap fonts come in whole sizes. Same
   family as `frame-14.1`. Nothing to fix without a scalable font.
-- **2 are the `TkScrollWindow` trade-off, already documented above.**
-  `6.5` and `6.6` place a frame over the text, scroll, and expect the
-  obscured source region to be repaired -- which is precisely the
-  `GraphicsExpose` case the note above says this port gives up:
-  "a copy whose source was overlapped by a sibling window has already
-  picked up the sibling's pixels, and with no backing store there is no
-  record of it". They redraw *less* than X does, which is the expected
-  direction.
-- **8 are Expose granularity** (`7.1`..`7.8`), and chasing them found a
-  bug far bigger than the tests -- see the next section. They are
-  likely fixed by it: the damage the port now reports for exactly
-  `textDisp-7.1`'s sequence is a partial rectangle with an **empty**
-  relayout, which is X's answer.
+- **1 is the `TkScrollWindow` trade-off, already documented above.**
+  `6.5` places a frame over the text, scrolls **while it is still
+  there**, and expects the obscured source region to be repaired --
+  which is precisely the `GraphicsExpose` case the note above says this
+  port gives up: "a copy whose source was overlapped by a sibling
+  window has already picked up the sibling's pixels, and with no
+  backing store there is no record of it". It reports
 
-The arithmetic for the whole exercise: of 106 failures in the four
-untouched files, **3 were ours** and 103 need a second wish (53),
+```
+got   {1.0 9.0 10.0} {1.0 9.0 10.0}
+want  {1.0 9.0 10.0} {1.0 4.0 5.0 9.0 10.0}
+```
+
+  -- relayout identical, the redraw short by exactly the two display
+  lines that were under the frame. Redrawing *less* than X is the
+  expected direction.
+- **9 were the damage bug, and all nine are fixed** -- `7.1`..`7.8`,
+  which chasing found it, and `6.6`. **`6.6` was attributed to the
+  `TkScrollWindow` trade-off here and that was wrong**, on nothing
+  better than its sitting beside `6.5` and reading similarly. The two
+  differ in one line of ordering, and it is the whole difference:
+  `6.5` calls `update` with the frame still up and never updates after
+  the `destroy`, so it asks only what the *scroll* redrew while
+  obscured; `6.6` destroys the frame **before** its `update`, so the
+  destroy's damage is folded into the same redisplay -- which this port
+  simply never reported. **Read what a test does in order before
+  putting it in a group**; a pair that looks like one cause was two.
+
+The arithmetic for the whole exercise, **settled by run 6 rather than
+predicted**: of 106 failures in the four untouched files, **12 were
+ours and all 12 are fixed** -- `unixEmbed-8.2` (half) and `-10.2`, and
+the nine damage ones -- and the other 94 need a second wish (53),
 `tktest` (14), a system tray (13), a scalable font (13), or the backing
-store this port does not have (2), with 8 still open. That ratio is the
-thing to carry into the next file rather than the raw count.
+store this port does not have (1). Nothing is left open in them.
+
+That ratio is the thing to carry into the next file rather than the raw
+count, and it is better than it looked: the first pass through these
+four said "3 are ours" and the real answer was four times that. **A
+failure that reads as environmental is worth one look at what the test
+actually does** -- nine of these twelve were sitting under "Expose
+granularity", a heading that sounds like a platform limit and was a
+missing call.
 
 #### Tk on Plan 9: nothing repaired what a window had been covering
 
@@ -2481,8 +2604,17 @@ parent over `.fa`'s rectangle, then `.fb` clipped to the *intersection*
 what `textDisp-7.1` asks for (`{}` relayout, a redraw of the display
 lines in the damaged strip). **So the prediction written here -- "this
 is not yet known to fix textDisp-7.1..7.8, and probably does not" --
-was wrong, in the good direction.** Those eight have a real chance now;
-the next full run says.
+was wrong, in the good direction.**
+
+**The suite agrees: all eight are fixed, and so is `textDisp-6.6`,
+which nothing here predicted.** `textDisp.test` went 23 -> 14 and no
+other file moved by a single test, which is the whole of the 277 -> 268
+difference. The prediction being wrong twice in a row -- once
+pessimistic about the eight, once silent about the ninth -- is the
+argument for `tk-expose-test.tcl` asserting rather than advising: what
+it measured (a clipped rectangle, an empty relayout, `.fa` repainting
+last) was right every time, and only the inferences drawn from it were
+not.
 
 **Section 4 was right by luck, though, and that is a second bug.**
 `P9ExposeRect` walks `gP9.wins` in **slot order**, which is roughly
@@ -3089,7 +3221,8 @@ family does *not* come back as itself.
 **`imgListFormat-3.1/3.2/3.3` and `image-6.2` need `tktest`, not
 `wish`**: `invalid command name "testphotostringmatch"`, and `image
 types` must list `test`, which `generic/tkTest.c` registers only in Tk's
-own test binary. A harness limitation, not a port bug.
+own test binary. A harness limitation, not a port bug -- **and it is
+built now**; see the tktest section below.
 
 **`focus-1.19` needs two applications.** `focusClear` in `focus.test` is
 `childTkProcess eval {focus -force .}` -- it takes the focus away by

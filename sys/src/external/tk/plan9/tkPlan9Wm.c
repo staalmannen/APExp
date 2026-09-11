@@ -114,6 +114,44 @@ typedef struct TkWmInfo {
     char *transient;		/* wm transient, as a path name */
     struct WmProto *protoPtr;	/* wm protocol handlers */
 
+    /*
+     * "wm resizable" was answering a hardcoded "1 1" to every query,
+     * which is the "wm title" mistake again: nothing here can stop a
+     * user resizing a window, because rio owns the frame, but what the
+     * caller set is still what a query has to report.
+     * wm-resizable-2.1, unixWm-33.6.
+     */
+    int widthResizable, heightResizable;
+
+    /*
+     * A window named by someone else's "wm iconwindow". On X this is
+     * handed to the window manager, which draws it while the toplevel is
+     * iconified; rio has no icons, so nothing is drawn -- but the STATE
+     * is still real and is what the tests ask about. Such a window
+     * reports "icon" from "wm state" and refuses withdraw, deiconify and
+     * iconify, because it is no longer its own to show or hide.
+     * unixWm-8.*, 16.2, 23.4, 27.*, 38.2.
+     */
+    TkWindow *iconFor;
+
+    /*
+     * The other half of the same relationship: the window THIS toplevel
+     * uses as its icon, if any. iconWindow above is the same thing as a
+     * path name, kept in step with it because that is what the query
+     * reports; this is the pointer, because setting the relationship has
+     * to reach into the other window's WmInfo and clearing it has to
+     * find the previous holder.
+     */
+    TkWindow *icon;
+
+    /*
+     * "wm transient" as a pointer, kept in step with the path name in
+     * transient above for the same reason icon is: the loop check has to
+     * walk the chain of containers, and a chain of path names cannot be
+     * walked without a lookup at every step.
+     */
+    TkWindow *container;
+
     struct TkWmInfo *nextPtr;
 } WmInfo;
 
@@ -162,6 +200,24 @@ WmReturnString(Tcl_Interp *interp, const char *s)
 
 #define WM_UPDATE_PENDING	1
 #define WM_NEVER_MAPPED		2
+/*
+ * X's geometry has a SIGN as well as a value: "-10+5" means ten pixels
+ * from the RIGHT edge, and "-0-0" is the bottom right corner. wmPtr->x
+ * holds the magnitude and these two say which edge it is measured from,
+ * as tkUnixWm.c does.
+ *
+ * Without them a negative offset was parsed by sscanf into a plain
+ * integer and the sign was gone: every one of "wm geometry .t -0-0",
+ * "+0-0" and "-0+0" was stored as 0,0 and read back as "+0+0", and a
+ * window asked for at "-10+5" was placed ten pixels off the left edge
+ * instead of ten in from the right. unixWm-2.4..2.9, 3.4..3.9, 44.7,
+ * 44.8, 48.13.
+ */
+#define WM_NEGATIVE_X		4
+#define WM_NEGATIVE_Y		8
+
+static void WmScreenPosition(WmInfo *wmPtr, int width, int height,
+	int *xPtr, int *yPtr);
 
 static void WmUpdateGeometry(void *clientData);
 static void WmGridToPixels(WmInfo *wmPtr, int gw, int gh,
@@ -204,7 +260,7 @@ WmUpdateGeometry(void *clientData)
 {
     TkWindow *winPtr = (TkWindow *) clientData;
     WmInfo *wmPtr = winPtr->wmInfoPtr;
-    int width, height;
+    int width, height, x, y;
 
     if (wmPtr == NULL)
 	return;
@@ -277,9 +333,17 @@ WmUpdateGeometry(void *clientData)
 	return;
     }
 
+    /*
+     * A NEGATIVE OFFSET IS RESOLVED HERE, not when it was parsed: it is
+     * measured from the far edge to the far edge of the window, so it
+     * depends on the width and height that were just settled. "-10+5" on
+     * a 1024-wide screen with a 121-wide window is x = 893, which is
+     * what unixWm-44.7 and 44.8 read back through "winfo rootx".
+     */
+    WmScreenPosition(wmPtr, width, height, &x, &y);
+
     if (width == winPtr->changes.width && height == winPtr->changes.height
-	    && wmPtr->x == winPtr->changes.x
-	    && wmPtr->y == winPtr->changes.y)
+	    && x == winPtr->changes.x && y == winPtr->changes.y)
 	return;
 
     /*
@@ -288,13 +352,13 @@ WmUpdateGeometry(void *clientData)
      * it directly; XMoveResizeWindow still sends the ConfigureNotify, so
      * <Configure> bindings and the widgets that relayout on them work.
      */
-    winPtr->changes.x      = wmPtr->x;
-    winPtr->changes.y      = wmPtr->y;
+    winPtr->changes.x      = x;
+    winPtr->changes.y      = y;
     winPtr->changes.width  = width;
     winPtr->changes.height = height;
     if (winPtr->window != None)
 	XMoveResizeWindow(winPtr->display, winPtr->window,
-		wmPtr->x, wmPtr->y, (unsigned) width, (unsigned) height);
+		x, y, (unsigned) width, (unsigned) height);
 }
 
 /* Force the update now rather than at idle time. */
@@ -323,6 +387,180 @@ WmUpdateNow(TkWindow *winPtr)
  * stacks them -- so this port keeps them in dispPtr->firstWmPtr, in the
  * same convention: first is bottom, last is top.
  */
+
+/*
+ * "can't <verb> <name>: it is an icon for <other>", which withdraw,
+ * deiconify and state share verbatim -- and which "iconify" does NOT,
+ * because upstream quotes the two names there and not here. The tests
+ * check the text, so the inconsistency is upstream's to keep:
+ *
+ *	unixWm-38.2  can't withdraw .t2: it is an icon for .t
+ *	unixWm-23.4  can't iconify ".t2": it is an icon for ".t"
+ *
+ * The name reported is the one the CALLER WROTE (objv[2]), not the
+ * window's path name; they differ whenever a window is named through
+ * "." or a relative form.
+ */
+static int
+WmIconForError(Tcl_Interp *interp, const char *verb, const char *code,
+	Tcl_Obj *nameObj, WmInfo *wmPtr)
+{
+    Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+	    "can't %s %s: it is an icon for %s", verb,
+	    Tcl_GetString(nameObj), Tk_PathName(wmPtr->iconFor)));
+    Tcl_SetErrorCode(interp, "TK", "WM", code, "ICON", (char *) NULL);
+    return TCL_ERROR;
+}
+
+/*
+ * Break the icon relationship this toplevel holds, if it holds one. The
+ * released window stays WITHDRAWN rather than reappearing: it was taken
+ * off the screen when it became an icon, and upstream leaves it off --
+ * a window that was only ever shown as somebody's icon has no position
+ * of its own to come back to.
+ */
+static void
+WmReleaseIcon(WmInfo *wmPtr)
+{
+    if (wmPtr->icon != NULL) {
+	wmPtr->icon->wmInfoPtr->iconFor = NULL;
+	wmPtr->icon->wmInfoPtr->withdrawn = 1;
+	wmPtr->icon = NULL;
+    }
+    WmSetString(&wmPtr->iconWindow, NULL);
+}
+
+/*
+ * "=wxh+x+y", with every part optional and the leading "=" optional too.
+ * This is tkUnixWm.c's ParseGeometry, character by character, and it
+ * replaces four sscanf attempts in a row.
+ *
+ * sscanf could not do this job. It cannot tell "+0" from "-0" once the
+ * value is an int, so the sign was lost; it stops at the first
+ * unconvertible character, so "+20+10z" parsed as "+20+10" and the
+ * trailing junk was accepted (unixWm-48.10); and "=100x120" matched
+ * nothing at all, though the "=" is part of the standard X geometry
+ * syntax and optional by definition (unixWm-48.1).
+ *
+ * Nothing is written into wmPtr until the whole string has parsed, so a
+ * bad specifier leaves the window exactly as it was.
+ */
+static int
+WmParseGeometry(Tcl_Interp *interp, const char *string, TkWindow *winPtr)
+{
+    WmInfo *wmPtr = winPtr->wmInfoPtr;
+    int x, y, width, height, flags;
+    char *end;
+    const char *p = string;
+
+    if (*p == '=')
+	p++;
+
+    width  = wmPtr->width;
+    height = wmPtr->height;
+    x      = wmPtr->x;
+    y      = wmPtr->y;
+    flags  = wmPtr->flags;
+
+    if (isdigit(UCHAR(*p))) {
+	width = (int) strtoul(p, &end, 10);
+	p = end;
+	if (*p != 'x')
+	    goto error;
+	p++;
+	if (!isdigit(UCHAR(*p)))
+	    goto error;
+	height = (int) strtoul(p, &end, 10);
+	p = end;
+    }
+
+    if (*p != '\0') {
+	flags &= ~(WM_NEGATIVE_X | WM_NEGATIVE_Y);
+	if (*p == '-')
+	    flags |= WM_NEGATIVE_X;
+	else if (*p != '+')
+	    goto error;
+	p++;
+	if (!isdigit(UCHAR(*p)) && *p != '-')
+	    goto error;
+	x = (int) strtol(p, &end, 10);
+	p = end;
+	if (*p == '-')
+	    flags |= WM_NEGATIVE_Y;
+	else if (*p != '+')
+	    goto error;
+	p++;
+	if (!isdigit(UCHAR(*p)) && *p != '-')
+	    goto error;
+	y = (int) strtol(p, &end, 10);
+	if (*end != '\0')	/* trailing junk */
+	    goto error;
+    }
+
+    wmPtr->width  = width;
+    wmPtr->height = height;
+    wmPtr->x      = x;
+    wmPtr->y      = y;
+    wmPtr->flags  = flags;
+    return TCL_OK;
+
+  error:
+    Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+	    "bad geometry specifier \"%s\"", string));
+    Tcl_SetErrorCode(interp, "TK", "VALUE", "GEOMETRY", (char *) NULL);
+    return TCL_ERROR;
+}
+
+/*
+ * Where a window asked for at wmPtr->x/y actually goes, resolving a
+ * negative offset against the screen. "-10" is ten pixels from the right
+ * edge to the window's right edge, so the left edge is screenwidth minus
+ * the width minus ten.
+ */
+static void
+WmScreenPosition(WmInfo *wmPtr, int width, int height, int *xPtr, int *yPtr)
+{
+    TkWindow *winPtr = wmPtr->winPtr;
+
+    *xPtr = (wmPtr->flags & WM_NEGATIVE_X)
+	    ? WidthOfScreen(Tk_Screen((Tk_Window) winPtr)) - width - wmPtr->x
+	    : wmPtr->x;
+    *yPtr = (wmPtr->flags & WM_NEGATIVE_Y)
+	    ? HeightOfScreen(Tk_Screen((Tk_Window) winPtr)) - height - wmPtr->y
+	    : wmPtr->y;
+}
+
+/*
+ * A DESTROYED CONTAINER LEAVES NO TRANSIENTS BEHIND. "wm transient" on
+ * a dialog whose master has been destroyed must answer the empty string,
+ * not the name of a window that is gone -- wm-transient-5.2, 5.3, 7.2 --
+ * and the stored pointer would otherwise dangle. dispPtr->firstWmPtr is
+ * every toplevel, so this is the whole search space.
+ */
+static void
+WmForgetTransientsOf(TkWindow *winPtr)
+{
+    WmInfo *p;
+
+    for (p = winPtr->dispPtr->firstWmPtr; p != NULL; p = p->nextPtr) {
+	if (p->container == winPtr) {
+	    p->container = NULL;
+	    WmSetString(&p->transient, NULL);
+	}
+    }
+}
+
+/*
+ * The container this window is a transient of, or NULL. One step of the
+ * chain the loop check walks.
+ */
+static TkWindow *
+WmTransientOf(TkWindow *winPtr)
+{
+    if (winPtr == NULL || winPtr->wmInfoPtr == NULL)
+	return NULL;
+    return winPtr->wmInfoPtr->container;
+}
 
 static WmInfo *
 WmLast(TkDisplay *dispPtr)
@@ -981,6 +1219,8 @@ TkWmNewWindow(TkWindow *winPtr)
     wmPtr->minHeight = 1;
     wmPtr->widthInc  = 1;
     wmPtr->heightInc = 1;
+    wmPtr->widthResizable  = 1;	/* both default to true, as on X */
+    wmPtr->heightResizable = 1;
     wmPtr->flags     = WM_NEVER_MAPPED;
     wmPtr->nextPtr   = NULL;
     /*
@@ -1063,6 +1303,24 @@ TkWmDeadWindow(TkWindow *winPtr)
 	Tcl_CancelIdleCall(WmUpdateGeometry, winPtr);
     if (wmPtr->title != NULL)
 	ckfree(wmPtr->title);
+
+    /*
+     * BOTH HALVES OF THE ICON RELATIONSHIP POINT AT A WmInfo, so either
+     * window going away must clear the other end or the survivor is left
+     * holding a freed pointer -- and on this allocator a freed WmInfo
+     * stays readable, so the first thing that would actually fail is the
+     * pathName chase inside an error message, a long way from here.
+     * (See the "wild pointer shows at the first double indirection" note
+     * in CLAUDE.md; this is the same shape as TkpDeleteFont was.)
+     */
+    WmReleaseIcon(wmPtr);
+    WmForgetTransientsOf(winPtr);
+    wmPtr->container = NULL;
+    if (wmPtr->iconFor != NULL && wmPtr->iconFor->wmInfoPtr != NULL) {
+	wmPtr->iconFor->wmInfoPtr->icon = NULL;
+	WmSetString(&wmPtr->iconFor->wmInfoPtr->iconWindow, NULL);
+	wmPtr->iconFor = NULL;
+    }
 
     /*
      * Everything "wm" stores. Each of these is a ckalloc'd string, so a
@@ -1806,8 +2064,36 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
         wmPtr  = winPtr->wmInfoPtr;
     }
 
+    /*
+     * A NON-TOPLEVEL IS REFUSED ONCE, HERE, for every subcommand but the
+     * two whose whole job is to take one. Upstream does exactly this,
+     * immediately after resolving the window and before dispatching.
+     *
+     * This used not to happen at all: wmPtr was simply NULL for such a
+     * window and every case below guarded on it and returned TCL_OK, so
+     * "wm geometry .b" on a button answered "1x1+0+0" and "wm iconbadge
+     * .f 3" on a frame succeeded. A believable answer to a question that
+     * should have been refused -- the same family as "wm title" being
+     * write-only. wm-1.5, unixWm-11.4, wm-iconbadge-1.2.
+     *
+     * Having it here is also what lets the cases below stop testing
+     * wmPtr for NULL: past this point a resolved window always has one.
+     */
+    if (winPtr != NULL && !Tk_IsTopLevel(winPtr)
+            && index != OPT_MANAGE && index != OPT_FORGET) {
+        Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+                "window \"%s\" isn't a top-level window", winPtr->pathName));
+        Tcl_SetErrorCode(interp, "TK", "LOOKUP", "TOPLEVEL", winPtr->pathName,
+                (char *) NULL);
+        return TCL_ERROR;
+    }
+
     switch (index) {
     case OPT_GEOMETRY:
+        if (objc != 3 && objc != 4) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window ?newGeometry?");
+            return TCL_ERROR;
+        }
         if (objc == 3) {
             char buf[TCL_INTEGER_SPACE * 4 + 4];
             int w = winPtr->changes.width, h = winPtr->changes.height;
@@ -1817,46 +2103,30 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
              * pixels -- that is the whole point of "-setgrid 1", and the
              * setter above already reads WxH in the same units.
              */
-            if (wmPtr != NULL)
-                WmPixelsToGrid(wmPtr, w, h, &w, &h);
-            snprintf(buf, sizeof buf, "%dx%d+%d+%d", w, h,
-                    winPtr->changes.x, winPtr->changes.y);
+            WmPixelsToGrid(wmPtr, w, h, &w, &h);
+            /*
+             * THE POSITION IS wmPtr's, WITH ITS SIGN, not changes.x/y.
+             * changes.x/y is where the window ended up on the screen; a
+             * window asked for at "-0-0" is at some large positive
+             * coordinate there, and reporting that would not be
+             * something the caller could hand back to "wm geometry".
+             */
+            snprintf(buf, sizeof buf, "%dx%d%c%d%c%d", w, h,
+                    (wmPtr->flags & WM_NEGATIVE_X) ? '-' : '+', wmPtr->x,
+                    (wmPtr->flags & WM_NEGATIVE_Y) ? '-' : '+', wmPtr->y);
             Tcl_SetObjResult(interp, Tcl_NewStringObj(buf, -1));
             return TCL_OK;
         }
-        if (objc == 4 && wmPtr != NULL) {
+        {
             const char *s = Tcl_GetString(objv[3]);
-            int w, h, x, y;
 
             if (*s == '\0') {		/* revert to the requested size */
                 wmPtr->width = wmPtr->height = -1;
                 WmUpdateNow(winPtr);
                 return TCL_OK;
             }
-            /*
-             * WxH, +X+Y, or both. A position-only form must leave the
-             * size following the requested one, or packing a toplevel
-             * after "wm geometry .t +0+0" would freeze it at 1x1.
-             */
-            if (sscanf(s, "%dx%d%d%d", &w, &h, &x, &y) == 4) {
-                /* WxH-X-Y, the negative-offset form. */
-                wmPtr->width = w; wmPtr->height = h;
-                wmPtr->x = x; wmPtr->y = y;
-            } else if (sscanf(s, "%dx%d+%d+%d", &w, &h, &x, &y) == 4) {
-                wmPtr->width = w; wmPtr->height = h;
-                wmPtr->x = x; wmPtr->y = y;
-            } else if (sscanf(s, "%dx%d", &w, &h) == 2) {
-                wmPtr->width = w; wmPtr->height = h;
-            } else if (sscanf(s, "+%d+%d", &x, &y) == 2
-                    || sscanf(s, "%d%d", &x, &y) == 2) {
-                wmPtr->x = x; wmPtr->y = y;
-            } else {
-                Tcl_SetObjResult(interp, Tcl_ObjPrintf(
-                        "bad geometry specifier \"%s\"", s));
-                Tcl_SetErrorCode(interp, "TK", "VALUE", "GEOMETRY",
-                        (char *)NULL);
+            if (WmParseGeometry(interp, s, winPtr) != TCL_OK)
                 return TCL_ERROR;
-            }
             WmUpdateNow(winPtr);
         }
         return TCL_OK;
@@ -1865,53 +2135,87 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
     case OPT_MAXSIZE: {
         int w, h;
 
+        if (objc != 3 && objc != 5) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window ?width height?");
+            return TCL_ERROR;
+        }
         if (objc == 3) {
-            if (wmPtr == NULL) {
-                Tcl_SetObjResult(interp, Tcl_NewStringObj("0 0", -1));
-                return TCL_OK;
-            }
             Tcl_SetObjResult(interp, Tcl_ObjPrintf("%d %d",
                     (index == OPT_MINSIZE) ? wmPtr->minWidth : wmPtr->maxWidth,
                     (index == OPT_MINSIZE) ? wmPtr->minHeight : wmPtr->maxHeight));
             return TCL_OK;
         }
-        if (objc == 5 && wmPtr != NULL) {
-            if (Tcl_GetIntFromObj(interp, objv[3], &w) != TCL_OK
-                    || Tcl_GetIntFromObj(interp, objv[4], &h) != TCL_OK)
-                return TCL_ERROR;
-            if (index == OPT_MINSIZE) {
-                wmPtr->minWidth = w; wmPtr->minHeight = h;
-            } else {
-                wmPtr->maxWidth = w; wmPtr->maxHeight = h;
-            }
-            WmUpdateNow(winPtr);
+        /*
+         * A SCREEN DISTANCE, not an integer. "wm minsize . 10c" is legal
+         * and so is the error message the tests check -- "expected screen
+         * distance but got ..." rather than "expected integer but got
+         * ...". wm-minsize-1.4/1.5, wm-maxsize-1.4/1.5.
+         */
+        if (Tk_GetPixelsFromObj(interp, (Tk_Window) winPtr, objv[3], &w)
+                    != TCL_OK
+                || Tk_GetPixelsFromObj(interp, (Tk_Window) winPtr, objv[4], &h)
+                    != TCL_OK)
+            return TCL_ERROR;
+        if (index == OPT_MINSIZE) {
+            wmPtr->minWidth = w; wmPtr->minHeight = h;
+        } else {
+            wmPtr->maxWidth = w; wmPtr->maxHeight = h;
         }
+        WmUpdateNow(winPtr);
         return TCL_OK;
     }
 
     case OPT_WITHDRAW:
-        if (winPtr != NULL) {
-            if (wmPtr != NULL)
-                wmPtr->withdrawn = 1;
-            TkpWmSetState(winPtr, WithdrawnState);
+        if (objc != 3) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window");
+            return TCL_ERROR;
         }
+        if (wmPtr->iconFor != NULL)
+            return WmIconForError(interp, "withdraw", "WITHDRAW", objv[2],
+                    wmPtr);
+        wmPtr->withdrawn = 1;
+        TkpWmSetState(winPtr, WithdrawnState);
         return TCL_OK;
 
     case OPT_DEICONIFY:
-        if (winPtr != NULL) {
-            if (wmPtr != NULL)
-                wmPtr->withdrawn = 0;
-            TkpWmSetState(winPtr, NormalState);
+        if (objc != 3) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window");
+            return TCL_ERROR;
         }
+        if (wmPtr->iconFor != NULL)
+            return WmIconForError(interp, "deiconify", "DEICONIFY", objv[2],
+                    wmPtr);
+        if (winPtr->flags & TK_EMBEDDED) {
+            Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+                    "can't deiconify %s: it is an embedded window",
+                    winPtr->pathName));
+            Tcl_SetErrorCode(interp, "TK", "WM", "DEICONIFY", "EMBEDDED",
+                    (char *) NULL);
+            return TCL_ERROR;
+        }
+        /*
+         * DEICONIFY CLEARS ICONIFIED AS WELL AS WITHDRAWN. It used to
+         * clear only the latter, so "wm iconify .t; wm deiconify .t;
+         * wm state .t" answered "iconic" -- the window was shown again
+         * and went on reporting that it was not. unixWm-16.3, 35.3,
+         * wm-state-2.15, 2.17.
+         */
+        wmPtr->withdrawn = 0;
+        wmPtr->iconified = 0;
+        TkpWmSetState(winPtr, NormalState);
         return TCL_OK;
 
     case OPT_STATE:
+        if (objc != 3 && objc != 4) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window ?state?");
+            return TCL_ERROR;
+        }
         if (objc == 3) {
-            const char *s = "normal";
+            const char *s;
 
-            if (wmPtr != NULL)
-                s = wmPtr->withdrawn ? "withdrawn"
-                  : wmPtr->iconified ? "iconic" : "normal";
+            s = wmPtr->iconFor != NULL ? "icon"
+              : wmPtr->withdrawn ? "withdrawn"
+              : wmPtr->iconified ? "iconic" : "normal";
             Tcl_SetObjResult(interp, Tcl_NewStringObj(s, -1));
             return TCL_OK;
         }
@@ -1919,23 +2223,30 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
          * "wm state .t normal|iconic|withdrawn" is the setting form and
          * is the same three operations under another name.
          */
-        if (objc == 4 && winPtr != NULL) {
+        {
+            /*
+             * ALPHABETICAL, because Tcl_GetIndexFromObjStruct builds the
+             * error message by listing this array in order and the test
+             * checks it verbatim: "must be iconic, normal, or withdrawn".
+             * unixWm-35.1.1.
+             */
             static const char *const states[] = {
-                "normal", "iconic", "withdrawn", NULL };
+                "iconic", "normal", "withdrawn", NULL };
+            enum { ST_ICONIC, ST_NORMAL, ST_WITHDRAWN };
             int st;
 
+            if (wmPtr->iconFor != NULL)
+                return WmIconForError(interp, "change state of", "STATE",
+                        objv[2], wmPtr);
             if (Tcl_GetIndexFromObjStruct(interp, objv[3], states,
                     sizeof(char *), "argument", 0, &st) != TCL_OK)
                 return TCL_ERROR;
-            if (wmPtr != NULL) {
-                wmPtr->withdrawn = (st == 2);
-                wmPtr->iconified = (st == 1);
-            }
-            TkpWmSetState(winPtr, st == 0 ? NormalState :
-                    st == 1 ? IconicState : WithdrawnState);
+            wmPtr->withdrawn = (st == ST_WITHDRAWN);
+            wmPtr->iconified = (st == ST_ICONIC);
+            TkpWmSetState(winPtr, st == ST_NORMAL ? NormalState :
+                    st == ST_ICONIC ? IconicState : WithdrawnState);
             return TCL_OK;
         }
-        return TCL_OK;
 
     case OPT_ICONIFY:
         /*
@@ -1949,7 +2260,11 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
          * not on its own. wm-transient-1.4..1.9 are exactly this, and
          * they check the message.
          */
-        if (wmPtr != NULL && wmPtr->transient != NULL) {
+        if (objc != 3) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window");
+            return TCL_ERROR;
+        }
+        if (wmPtr->transient != NULL) {
             Tcl_SetObjResult(interp, Tcl_ObjPrintf(
                     "can't iconify \"%s\": it is a transient",
                     winPtr->pathName));
@@ -1957,13 +2272,40 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
                     (char *) NULL);
             return TCL_ERROR;
         }
-        if (winPtr != NULL) {
-            if (wmPtr != NULL) {
-                wmPtr->withdrawn = 0;
-                wmPtr->iconified = 1;
-            }
-            TkpWmSetState(winPtr, IconicState);
+        /*
+         * Three more refusals, all upstream's and all checked by name.
+         * An override-redirect window is not the window manager's to
+         * iconify; an icon window is already someone else's icon; an
+         * embedded toplevel belongs to its container.
+         * unixWm-23.2, 23.4, wm-iconify-2.1, 2.3, 2.4.2.
+         */
+        if (Tk_Attributes((Tk_Window) winPtr)->override_redirect) {
+            Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+                    "can't iconify \"%s\": override-redirect flag is set",
+                    winPtr->pathName));
+            Tcl_SetErrorCode(interp, "TK", "WM", "ICONIFY", "OVERRIDE_REDIRECT",
+                    (char *) NULL);
+            return TCL_ERROR;
         }
+        if (wmPtr->iconFor != NULL) {
+            Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+                    "can't iconify \"%s\": it is an icon for \"%s\"",
+                    winPtr->pathName, wmPtr->iconFor->pathName));
+            Tcl_SetErrorCode(interp, "TK", "WM", "ICONIFY", "ICON",
+                    (char *) NULL);
+            return TCL_ERROR;
+        }
+        if (winPtr->flags & TK_EMBEDDED) {
+            Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+                    "can't iconify \"%s\": it is an embedded window",
+                    winPtr->pathName));
+            Tcl_SetErrorCode(interp, "TK", "WM", "ICONIFY", "EMBEDDED",
+                    (char *) NULL);
+            return TCL_ERROR;
+        }
+        wmPtr->withdrawn = 0;
+        wmPtr->iconified = 1;
+        TkpWmSetState(winPtr, IconicState);
         return TCL_OK;
 
     case OPT_GRID: {
@@ -2004,10 +2346,34 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
          || Tcl_GetIntFromObj(interp, objv[5], &dx) != TCL_OK
          || Tcl_GetIntFromObj(interp, objv[6], &dy) != TCL_OK)
             return TCL_ERROR;
-        if (w < 0 || h < 0 || dx <= 0 || dy <= 0) {
+        /*
+         * FOUR SEPARATE MESSAGES, one per argument, as upstream has --
+         * naming the argument that is wrong is the whole value of the
+         * diagnostic, and the tests check each by name (wm-grid-1.9..12,
+         * unixWm-20.5/20.7/20.9/20.11). One combined message describing
+         * all four conditions passes none of them and helps nobody.
+         */
+        if (w < 0) {
             Tcl_SetObjResult(interp, Tcl_NewStringObj(
-                    "baseWidth or baseHeight can't be < 0, and"
-                    " widthInc or heightInc can't be <= 0", -1));
+                    "baseWidth can't be < 0", -1));
+            Tcl_SetErrorCode(interp, "TK", "VALUE", "GRID", (char *) NULL);
+            return TCL_ERROR;
+        }
+        if (h < 0) {
+            Tcl_SetObjResult(interp, Tcl_NewStringObj(
+                    "baseHeight can't be < 0", -1));
+            Tcl_SetErrorCode(interp, "TK", "VALUE", "GRID", (char *) NULL);
+            return TCL_ERROR;
+        }
+        if (dx <= 0) {
+            Tcl_SetObjResult(interp, Tcl_NewStringObj(
+                    "widthInc can't be <= 0", -1));
+            Tcl_SetErrorCode(interp, "TK", "VALUE", "GRID", (char *) NULL);
+            return TCL_ERROR;
+        }
+        if (dy <= 0) {
+            Tcl_SetObjResult(interp, Tcl_NewStringObj(
+                    "heightInc can't be <= 0", -1));
             Tcl_SetErrorCode(interp, "TK", "VALUE", "GRID", (char *) NULL);
             return TCL_ERROR;
         }
@@ -2152,14 +2518,33 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
         Tcl_WrongNumArgs(interp, 2, objv, "window ?newTitle?");
         return TCL_ERROR;
 
-    case OPT_RESIZABLE:
-        /* query returns "1 1" */
-        if (objc == 3)
-            Tcl_SetObjResult(interp, Tcl_NewStringObj("1 1", -1));
+    case OPT_RESIZABLE: {
+        int rw, rh;
+
+        if (objc != 3 && objc != 5) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window ?width height?");
+            return TCL_ERROR;
+        }
+        if (objc == 3) {
+            Tcl_SetObjResult(interp, Tcl_ObjPrintf("%d %d",
+                    wmPtr->widthResizable, wmPtr->heightResizable));
+            return TCL_OK;
+        }
+        if (Tcl_GetBooleanFromObj(interp, objv[3], &rw) != TCL_OK
+                || Tcl_GetBooleanFromObj(interp, objv[4], &rh) != TCL_OK)
+            return TCL_ERROR;
+        wmPtr->widthResizable  = rw;
+        wmPtr->heightResizable = rh;
+        WmUpdateNow(winPtr);
         return TCL_OK;
+    }
 
     case OPT_FRAME:
         /* return "0x0" — Plan 9 has no separate frame window */
+        if (objc != 3) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window");
+            return TCL_ERROR;
+        }
         Tcl_SetObjResult(interp, Tcl_NewStringObj("0x0", -1));
         return TCL_OK;
 
@@ -2327,6 +2712,7 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
 
             if (*s == '\0') {
                 WmSetString(&wmPtr->transient, NULL);
+                wmPtr->container = NULL;
                 return TCL_OK;
             }
             master = Tk_NameToWindow(interp, s, (Tk_Window) clientData);
@@ -2349,15 +2735,60 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
                 Tcl_SetErrorCode(interp, "TK", "WM", "TRANSIENT", (char *) NULL);
                 return TCL_ERROR;
             }
-            if (master == tkwin) {
+            /*
+             * Neither end may be somebody's icon: an icon is already
+             * owned, and a dialog attached to one could never be shown.
+             * wm-transient-1.5 and 1.6, and note they are DIFFERENT
+             * messages -- "a transient" for this window, "a container"
+             * for the one named.
+             */
+            if (wmPtr->iconFor != NULL) {
                 Tcl_SetObjResult(interp, Tcl_ObjPrintf(
-                        "can't make \"%s\" its own master", s));
-                Tcl_SetErrorCode(interp, "TK", "WM", "TRANSIENT", "SELF",
+                        "can't make \"%s\" a transient: it is an icon for %s",
+                        Tcl_GetString(objv[2]),
+                        Tk_PathName(wmPtr->iconFor)));
+                Tcl_SetErrorCode(interp, "TK", "WM", "TRANSIENT", "ICON",
                         (char *) NULL);
                 return TCL_ERROR;
             }
+            if (((TkWindow *) master)->wmInfoPtr->iconFor != NULL) {
+                Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+                        "can't make \"%s\" a container: it is an icon for %s",
+                        s,
+                        Tk_PathName(((TkWindow *) master)->wmInfoPtr->iconFor)));
+                Tcl_SetErrorCode(interp, "TK", "WM", "TRANSIENT", "ICON",
+                        (char *) NULL);
+                return TCL_ERROR;
+            }
+            /*
+             * A LOOP IS NOT JUST THE SELF CASE. Walking the chain of
+             * containers from the proposed one and finding this window
+             * catches "a transient of b, b transient of a" as well, which
+             * the self test alone does not -- wm-transient-1.8 is exactly
+             * that pair. The message names the CONTAINER, and is the same
+             * for both lengths, which is why the old "can't make %s its
+             * own master" failed 1.7 and 1.9 as well.
+             */
+            {
+                TkWindow *w;
+
+                for (w = (TkWindow *) master;
+                        w != NULL && w->wmInfoPtr != NULL;
+                        w = WmTransientOf(w)) {
+                    if (w == winPtr) {
+                        Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+                                "can't set \"%s\" as container:"
+                                " would cause management loop",
+                                Tk_PathName(master)));
+                        Tcl_SetErrorCode(interp, "TK", "WM", "TRANSIENT",
+                                "SELF", (char *) NULL);
+                        return TCL_ERROR;
+                    }
+                }
+            }
             Tk_MakeWindowExist(master);
             WmSetString(&wmPtr->transient, Tk_PathName(master));
+            wmPtr->container = (TkWindow *) master;
 
             /*
              * A transient follows its master's state: while the master
@@ -2439,28 +2870,53 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
                     return TCL_ERROR;
                 }
             }
+            /*
+             * A PHOTO specifically, not any image, and the message says
+             * so: "can't use %s as iconphoto: not a photo image". Going
+             * through Tk_GetImage accepted a bitmap and reported a
+             * missing name as 'image "x" does not exist', which is true
+             * and is not what iconphoto is being asked (wm-iconphoto-1.3).
+             */
             for (; i < objc; i++) {
-                Tk_Image img = Tk_GetImage(interp, tkwin,
-                        Tcl_GetString(objv[i]), NULL, NULL);
-
-                if (img == NULL)
+                if (Tk_FindPhoto(interp, Tcl_GetString(objv[i])) == NULL) {
+                    Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+                            "can't use \"%s\" as iconphoto: not a photo image",
+                            Tcl_GetString(objv[i])));
+                    Tcl_SetErrorCode(interp, "TK", "WM", "ICONPHOTO",
+                            "PHOTO", (char *) NULL);
                     return TCL_ERROR;
-                Tk_FreeImage(img);
+                }
             }
-            if (wmPtr != NULL)
-                WmSetString(&wmPtr->iconPhoto, Tcl_GetString(objv[objc-1]));
+            WmSetString(&wmPtr->iconPhoto, Tcl_GetString(objv[objc-1]));
         }
         return TCL_OK;
 
-    case OPT_ICONBADGE:
-        /* "wm iconbadge window badge" -- set only, no query form. */
+    case OPT_ICONBADGE: {
+        /*
+         * "wm iconbadge window badge" -- set only, no query form.
+         *
+         * DELEGATED TO ::tk::icons::IconBadge, exactly as tkUnixWm.c
+         * does, rather than stored here. All the validation lives in
+         * that proc -- the base icon must have been set and must be a
+         * photo, the badge must be a positive integer or one of the
+         * permitted words -- and reimplementing it in C would mean
+         * reimplementing five error messages the tests check verbatim
+         * (wm-iconbadge-1.3..1.7) and keeping them in step with a Tcl
+         * file sitting in the same tree.
+         */
+        char cmd[4096];
+
         if (objc != 4) {
             Tcl_WrongNumArgs(interp, 2, objv, "window badge");
             return TCL_ERROR;
         }
-        if (wmPtr != NULL)
-            WmSetString(&wmPtr->iconBadge, Tcl_GetString(objv[3]));
+        snprintf(cmd, sizeof(cmd), "::tk::icons::IconBadge {%s} {%s}",
+                Tcl_GetString(objv[2]), Tcl_GetString(objv[3]));
+        if (Tcl_EvalEx(interp, cmd, TCL_INDEX_NONE, TCL_EVAL_DIRECT) != TCL_OK)
+            return TCL_ERROR;
+        WmSetString(&wmPtr->iconBadge, Tcl_GetString(objv[3]));
         return TCL_OK;
+    }
 
     case OPT_ICONPOS: {
         int x, y;
@@ -2499,16 +2955,15 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
             Tcl_WrongNumArgs(interp, 2, objv, "window ?pathName?");
             return TCL_ERROR;
         }
-        if (wmPtr == NULL)
-            return TCL_OK;
         if (objc == 3)
             return WmReturnString(interp, wmPtr->iconWindow);
         {
             const char *s = Tcl_GetString(objv[3]);
             Tk_Window icon;
+            TkWindow *iconPtr;
 
             if (*s == '\0') {
-                WmSetString(&wmPtr->iconWindow, NULL);
+                WmReleaseIcon(wmPtr);
                 return TCL_OK;
             }
             icon = Tk_NameToWindow(interp, s, (Tk_Window) clientData);
@@ -2521,6 +2976,30 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
                         "INNER", (char *) NULL);
                 return TCL_ERROR;
             }
+            iconPtr = (TkWindow *) icon;
+            if (iconPtr->wmInfoPtr->iconFor != NULL) {
+                Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+                        "%s is already an icon for %s", s,
+                        Tk_PathName(iconPtr->wmInfoPtr->iconFor)));
+                Tcl_SetErrorCode(interp, "TK", "WM", "ICONWINDOW",
+                        "ICON", (char *) NULL);
+                return TCL_ERROR;
+            }
+            WmReleaseIcon(wmPtr);	/* a previous icon, if any */
+
+            /*
+             * BECOMING AN ICON TAKES THE WINDOW OFF THE SCREEN. On X the
+             * window manager owns it from here and draws it only while
+             * the toplevel is iconified; rio has no icons at all, so it
+             * is simply unmapped -- but "wm state" answers "icon" rather
+             * than "withdrawn", because iconFor is what it is now for.
+             * unixWm-27.6 checks exactly that pair, and 27.7 checks that
+             * "winfo ismapped" goes to 0.
+             */
+            wmPtr->icon = iconPtr;
+            iconPtr->wmInfoPtr->iconFor = winPtr;
+            iconPtr->wmInfoPtr->withdrawn = 1;
+            TkpWmSetState(iconPtr, WithdrawnState);
             WmSetString(&wmPtr->iconWindow, Tk_PathName(icon));
         }
         return TCL_OK;
@@ -2637,24 +3116,48 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
          * asking "wm attributes .t -topmost" wants an answer, and 0 is
          * the true one here.
          */
+        /*
+         * ALPHABETICAL, because that is the order X reports them in and
+         * unixWm-60.1.1 compares the whole string. The old order was the
+         * order they came to mind in.
+         */
         if (objc == 3) {
             Tcl_SetObjResult(interp, Tcl_NewStringObj(
-                    "-alpha 1.0 -topmost 0 -zoomed 0 -fullscreen 0"
-                    " -type {}", -1));
+                    "-alpha 1.0 -fullscreen 0 -topmost 0 -type {}"
+                    " -zoomed 0", -1));
             return TCL_OK;
         }
-        if (objc == 4) {
-            const char *a = Tcl_GetString(objv[3]);
+        {
+            static const char *const attrs[] = {
+                "-alpha", "-fullscreen", "-topmost", "-type",
+                "-zoomed", NULL };
+            enum { AT_ALPHA, AT_FULLSCREEN, AT_TOPMOST, AT_TYPE, AT_ZOOMED };
+            int at;
 
-            if (strcmp(a, "-alpha") == 0)
-                Tcl_SetObjResult(interp, Tcl_NewDoubleObj(1.0));
-            else if (strcmp(a, "-type") == 0)
-                Tcl_SetObjResult(interp, Tcl_NewStringObj("", -1));
-            else
-                Tcl_SetObjResult(interp, Tcl_NewBooleanObj(0));
+            /*
+             * An UNKNOWN attribute is an error, not silently ignored:
+             * "wm attributes .t -foo" must say so (unixWm-60.5,
+             * wm-attributes-1.2.5.1). Tcl_GetIndexFromObjStruct builds
+             * the "bad attribute ..., must be ..." message itself.
+             */
+            if (Tcl_GetIndexFromObjStruct(interp, objv[3], attrs,
+                    sizeof(char *), "attribute", 0, &at) != TCL_OK)
+                return TCL_ERROR;
+            /*
+             * Setting is accepted and does nothing -- there is no window
+             * manager to be topmost or fullscreen with respect to -- but
+             * a query has to answer, and 0 is the true answer here.
+             */
+            if (objc == 4) {
+                if (at == AT_ALPHA)
+                    Tcl_SetObjResult(interp, Tcl_NewDoubleObj(1.0));
+                else if (at == AT_TYPE)
+                    Tcl_SetObjResult(interp, Tcl_NewStringObj("", -1));
+                else
+                    Tcl_SetObjResult(interp, Tcl_NewBooleanObj(0));
+            }
             return TCL_OK;
         }
-        return TCL_OK;
 
     case OPT_FORGET:
     case OPT_MANAGE:
