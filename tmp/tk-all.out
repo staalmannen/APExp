@@ -7,7 +7,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-10 18:52:54 +0200
+Tests began at 2026-09-11 05:40:02 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -1465,189 +1465,6 @@ textDisp.test
 
 
 
-==== textDisp-6.6 scrolling in DisplayText, Expose events after scroll FAILED
-==== Contents of test case:
-
-# constrained by aquaKnownBug until ticket [aad0231f07] is fixed
-    # this test depends on all of the expose events being handled at once
-    .t configure -wrap char
-    frame .f2 -bg #ff0000
-    place .f2 -in .t -relx 0.2 -rely 0.5 -relwidth 0.5 -relheight 0.5
-    .t configure -bd 2 -relief raised
-    .t delete 1.0 end
-    # Line 1 must wrap exactly twice to get the expected result
-    .t insert 1.0 "Line 1 is so long that it occupies 3 display lines"
-    foreach i {2 3 4 5 6 7 8 9 10 11 12 13 14 15} {
-	.t insert end "\nLine $i"
-    }
-    update
-    .t delete 1.6 1.end
-    destroy .f2
-    update
-    list $tk_textRelayout $tk_textRedraw
-
----- Result was:
-{1.0 9.0 10.0} {1.0 9.0 10.0}
----- Result should have been (exact matching):
-{1.0 9.0 10.0} {1.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0}
-==== textDisp-6.6 FAILED
-
-
-
-==== textDisp-7.1 TkTextRedrawRegion FAILED
-==== Contents of test case:
-
-# constrained by aquaKnownBug until ticket [aad0231f07] is fixed
-    frame .f2 -bg #ff0000
-    place .f2 -in .t -relx 0.2 -relwidth 0.6 -rely 0.22 -relheight 0.55
-    update
-    destroy .f2
-    update
-    list $tk_textRelayout $tk_textRedraw
-
----- Result was:
-{1.0 1.20 1.40 2.0 3.0 4.0 5.0 6.0 7.0 8.0} {borders 1.0 1.20 1.40 2.0 3.0 4.0 5.0 6.0 7.0 8.0}
----- Result should have been (exact matching):
-{} {1.40 2.0 3.0 4.0 5.0 6.0}
-==== textDisp-7.1 FAILED
-
-
-
-==== textDisp-7.2 TkTextRedrawRegion FAILED
-==== Contents of test case:
-
-# constrained by aquaKnownBug until ticket [aad0231f07] is fixed
-    frame .f2 -bg #ff0000
-    place .f2 -in .t -relx 0 -relwidth 0.5 -rely 0 -relheight 0.5
-    update
-    destroy .f2
-    update
-    list $tk_textRelayout $tk_textRedraw
-
----- Result was:
-{1.0 1.20 1.40 2.0 3.0 4.0 5.0 6.0 7.0 8.0} {borders 1.0 1.20 1.40 2.0 3.0 4.0 5.0 6.0 7.0 8.0}
----- Result should have been (exact matching):
-{} {1.0 1.20 1.40 2.0 3.0}
-==== textDisp-7.2 FAILED
-
-
-
-==== textDisp-7.3 TkTextRedrawRegion FAILED
-==== Contents of test case:
-
-# constrained by aquaKnownBug until ticket [aad0231f07] is fixed
-    frame .f2 -bg #ff0000
-    place .f2 -in .t -relx 0.5 -relwidth 0.5 -rely 0.5 -relheight 0.5
-    update
-    destroy .f2
-    update
-    list $tk_textRelayout $tk_textRedraw
-
----- Result was:
-{1.0 1.20 1.40 2.0 3.0 4.0 5.0 6.0 7.0 8.0} {borders 1.0 1.20 1.40 2.0 3.0 4.0 5.0 6.0 7.0 8.0}
----- Result should have been (exact matching):
-{} {4.0 5.0 6.0 7.0 8.0}
-==== textDisp-7.3 FAILED
-
-
-
-==== textDisp-7.4 TkTextRedrawRegion FAILED
-==== Contents of test case:
-
- # constrained by aquaKnownBug until ticket [aad0231f07] is fixed
-   frame .f2 -bg #ff0000
-    place .f2 -in .t -relx 0.4 -relwidth 0.2 -rely 0 -relheight 0.2  -bordermode ignore
-    update
-    destroy .f2
-    update
-    list $tk_textRelayout $tk_textRedraw
-
----- Result was:
-{1.0 1.20 1.40 2.0 3.0 4.0 5.0 6.0 7.0 8.0} {borders 1.0 1.20 1.40 2.0 3.0 4.0 5.0 6.0 7.0 8.0}
----- Result should have been (exact matching):
-{} {borders 1.0 1.20}
-==== textDisp-7.4 FAILED
-
-
-
-==== textDisp-7.5 TkTextRedrawRegion FAILED
-==== Contents of test case:
-
-# constrained by aquaKnownBug until ticket [aad0231f07] is fixed
-    frame .f2 -bg #ff0000
-    place .f2 -in .t -relx 0.4 -relwidth 0.2 -rely 1.0 -relheight 0.2  -anchor s -bordermode ignore
-    update
-    destroy .f2
-    update
-    list $tk_textRelayout $tk_textRedraw
-
----- Result was:
-{1.0 1.20 1.40 2.0 3.0 4.0 5.0 6.0 7.0 8.0} {borders 1.0 1.20 1.40 2.0 3.0 4.0 5.0 6.0 7.0 8.0}
----- Result should have been (exact matching):
-{} {borders 7.0 8.0}
-==== textDisp-7.5 FAILED
-
-
-
-==== textDisp-7.6 TkTextRedrawRegion FAILED
-==== Contents of test case:
-
-# constrained by aquaKnownBug until ticket [aad0231f07] is fixed
-    frame .f2 -bg #ff0000
-    place .f2 -in .t -relx 0 -relwidth 0.2 -rely 0.55 -relheight 0.2  -anchor w -bordermode ignore
-    update
-    destroy .f2
-    update
-    list $tk_textRelayout $tk_textRedraw
-
----- Result was:
-{1.0 1.20 1.40 2.0 3.0 4.0 5.0 6.0 7.0 8.0} {borders 1.0 1.20 1.40 2.0 3.0 4.0 5.0 6.0 7.0 8.0}
----- Result should have been (exact matching):
-{} {borders 3.0 4.0 5.0}
-==== textDisp-7.6 FAILED
-
-
-
-==== textDisp-7.7 TkTextRedrawRegion FAILED
-==== Contents of test case:
-
-# constrained by aquaKnownBug until ticket [aad0231f07] is fixed
-    frame .f2 -bg #ff0000
-    place .f2 -in .t -relx 1.0 -relwidth 0.2 -rely 0.55 -relheight 0.2  -anchor e -bordermode ignore
-    update
-    destroy .f2
-    update
-    list $tk_textRelayout $tk_textRedraw
-
----- Result was:
-{1.0 1.20 1.40 2.0 3.0 4.0 5.0 6.0 7.0 8.0} {borders 1.0 1.20 1.40 2.0 3.0 4.0 5.0 6.0 7.0 8.0}
----- Result should have been (exact matching):
-{} {borders 3.0 4.0 5.0}
-==== textDisp-7.7 FAILED
-
-
-
-==== textDisp-7.8 TkTextRedrawRegion FAILED
-==== Contents of test case:
-
-# constrained by aquaKnownBug until ticket [aad0231f07] is fixed
-    .t delete 1.0 end
-    .t insert 1.0 "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\n"
-    frame .f2 -bg #ff0000
-    place .f2 -in .t -relx 0.0 -relwidth 0.4 -rely 0.35 -relheight 0.4  -anchor nw -bordermode ignore
-    update
-    destroy .f2
-    update
-    list $tk_textRelayout $tk_textRedraw
-
----- Result was:
-{1.0 2.0 3.0 4.0 5.0 6.0 7.0} {1.0 2.0 3.0 4.0 5.0 6.0 7.0 eof}
----- Result should have been (exact matching):
-{} {borders 4.0 5.0 6.0 7.0 eof}
-==== textDisp-7.8 FAILED
-
-
-
 ==== textDisp-9.1 TkTextRedrawTag FAILED
 ==== Contents of test case:
 
@@ -2600,7 +2417,7 @@ no library with prefix "Tktest" is loaded statically
     }
 
 ---- Result was:
-couldn't create child of window "0x4b7a"
+couldn't create child of window "0x5421"
 ---- Result should have been (exact matching):
 {{configure .t1 300 120}} 300x120+0+0
 ==== unixEmbed-6.1 FAILED
@@ -2655,7 +2472,7 @@ no library with prefix "Tktest" is loaded statically
     }
 
 ---- Result was:
-couldn't create child of window "0x4b7c"
+couldn't create child of window "0x5425"
 ---- Result should have been (exact matching):
 {{configure .t1 200 200}} 200x200+0+0
 ==== unixEmbed-6.2 FAILED
@@ -4252,7 +4069,7 @@ unmapped 0 mapped 1
 ---- Result was:
 5 -10
 ---- Result should have been (exact matching):
-5 875
+5 893
 ==== unixWm-44.7 FAILED
 
 
@@ -4270,7 +4087,7 @@ unmapped 0 mapped 1
 ---- Result was:
 -30 2
 ---- Result should have been (exact matching):
-822 2
+873 2
 ==== unixWm-44.8 FAILED
 
 
@@ -5744,8 +5561,8 @@ pack {} wm {}
 
 xmfbox.test
 
-Tests ended at 2026-09-10 18:54:40 +0200
-all.tcl:	Total	10027	Passed	8321	Skipped	1429	Failed	277
+Tests ended at 2026-09-11 05:41:55 +0200
+all.tcl:	Total	10027	Passed	8330	Skipped	1429	Failed	268
 Sourced 97 Test Files.
 Files with failing tests: clipboard.test event.test filebox.test focus.test font.test frame.test geometry.test image.test imgListFormat.test imgPhoto.test pack.test pkgconfig.test place.test select.test systray.test text.test textDisp.test textImage.test textTag.test textWind.test tk.test unixEmbed.test unixFont.test unixSelect.test unixWm.test visual.test winWm.test winfo.test wm.test
 Number of tests skipped for each constraint:
