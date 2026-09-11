@@ -7,7 +7,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-11 15:01:04 +0200
+Tests began at 2026-09-11 15:30:33 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -2167,7 +2167,7 @@ unixEmbed.test
     }
 
 ---- Result was:
-couldn't create child of window "0x575f"
+couldn't create child of window "0x5757"
 ---- Result should have been (exact matching):
 {{XXX {} {} .t}} 0
 ==== unixEmbed-1.5 FAILED
@@ -2190,7 +2190,7 @@ couldn't create child of window "0x575f"
     }
 
 ---- Result was:
-couldn't create child of window "0x5769"
+couldn't create child of window "0x5761"
 ---- Result should have been (exact matching):
 {XXX {} {} .t2} {XXX {} {} .t1}
 ==== unixEmbed-1.6 FAILED
@@ -2212,7 +2212,7 @@ couldn't create child of window "0x5769"
     }
 
 ---- Result was:
-couldn't create child of window "0x577f"
+couldn't create child of window "0x5777"
 ---- Result should have been (exact matching):
 
 ==== unixEmbed-2.2 FAILED
@@ -2573,7 +2573,7 @@ can't read "x": no such variable
     }
 
 ---- Result was:
-couldn't create child of window "0x5834"
+couldn't create child of window "0x582c"
 ---- Result should have been (exact matching):
 {{configure .t1 300 120}} 300x120+0+0
 ==== unixEmbed-6.1 FAILED
@@ -2598,7 +2598,7 @@ couldn't create child of window "0x5834"
     }
 
 ---- Result was:
-couldn't create child of window "0x5846"
+couldn't create child of window "0x583e"
 ---- Result should have been (exact matching):
 {{configure .t1 200 200}} 200x200+0+0
 ==== unixEmbed-6.2 FAILED
@@ -2868,7 +2868,7 @@ couldn't create child of window "0x5846"
     }
 
 ---- Result was:
-couldn't create child of window "0x5896"
+couldn't create child of window "0x588e"
 ---- Result should have been (exact matching):
 {{XXX {} {} .t1}} {}
 ==== unixEmbed-9.2 FAILED
@@ -3360,34 +3360,6 @@ i\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE4\xC4\xE
 unixWm.test
 
 
-==== unixWm-8.4 icon windows FAILED
-==== Contents of test case:
-
-    destroy .t
-    destroy .icon
-    toplevel .t -width 100 -height 30
-    wm geom .t +0+0
-    update idletasks
-    set result [wm iconwindow .t]
-    toplevel .icon -width 50 -height 50 -bg red
-    wm iconwindow .t .icon
-    lappend result [wm iconwindow .t] [wm state .icon]
-    wm iconwindow .t {}
-    lappend result [wm iconwindow .t] [wm state .icon]
-    update
-    lappend result [winfo ismapped .t] [winfo ismapped .icon]
-    wm iconify .t
-    update idletasks
-    lappend result [winfo ismapped .t] [winfo ismapped .icon]
-
----- Result was:
-.icon icon {} withdrawn 1 1 0 1
----- Result should have been (exact matching):
-.icon icon {} withdrawn 1 0 0 0
-==== unixWm-8.4 FAILED
-
-
-
 ==== unixWm-9.1 TkWmMapWindow procedure, client property FAILED
 ==== Contents of test case:
 
@@ -3534,8 +3506,8 @@ in expression "0x40 & _@_"
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
 ---- errorInfo: missing operand at _@_
-in expression "0x0 - _@_"
-    (parsing expression "0x0 - ")
+in expression " - _@_"
+    (parsing expression " - ")
     invoked from within
 "expr [testwrapper .t2] - [lindex $hints 8]"
     ("uplevel" body line 7)
@@ -3562,7 +3534,7 @@ in expression "0x0 - _@_"
     set result
 
 ---- Result was:
-0x0 0
+{} 1
 ---- Result should have been (exact matching):
 {} 0
 ==== unixWm-21.5 FAILED
@@ -3993,8 +3965,8 @@ in expression "0xa & _@_"
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
 ---- errorInfo: missing operand at _@_
-in expression "0x5b2c - _@_"
-    (parsing expression "0x5b2c - ")
+in expression "0x5b23 - _@_"
+    (parsing expression "0x5b23 - ")
     invoked from within
 "expr [testwrapper .t] - $transient"
     ("uplevel" body line 10)
@@ -4002,52 +3974,6 @@ in expression "0x5b2c - _@_"
 "uplevel 1 $script"
 ---- errorCode: TCL PARSE EXPR MISSING
 ==== unixWm-37.3 FAILED
-
-
-
-==== unixWm-37.5 Tk_WmCmd procedure, "transient" option, create toplevel wrapper FAILED
-==== Contents of test case:
-
-    destroy .t2
-    destroy .t3
-    toplevel .t2 -width 120 -height 300
-    wm geometry .t2 +0+0
-    toplevel .t3 -width 120 -height 300
-    wm geometry .t2 +0+0
-    set result [list [testwrapper .t2]]
-    wm transient .t3 .t2
-    lappend result [expr {[testwrapper .t2] == ""}]
-    destroy .t2 .t3
-    set result
-
----- Result was:
-0x0 0
----- Result should have been (exact matching):
-{} 0
-==== unixWm-37.5 FAILED
-
-
-
-==== unixWm-40.2 Tk_SetGrid procedure, turning on grid when dimensions already set FAILED
-==== Contents of test case:
-
-    update
-    destroy .t
-    update
-    toplevel .t
-    wm geometry .t 200x100+100+$Y0
-    listbox .t.l -height 20 -width 20
-    pack .t.l -fill both -expand 1
-    update
-    .t.l configure -setgrid 1
-    update
-    wm geometry .t
-
----- Result was:
-17x4+100+0
----- Result should have been (exact matching):
-20x20+100+0
-==== unixWm-40.2 FAILED
 
 
 
@@ -4353,51 +4279,6 @@ in expression ""
 ---- Result should have been (exact matching):
 .t.f .t
 ==== unixWm-53.1 FAILED
-
-
-
-==== unixWm-53.2 TkWmRemoveFromColormapWindows procedure FAILED
-==== Contents of test case:
-
-    destroy .t
-    toplevel .t -colormap new
-    wm geom .t +0+0
-    frame .t.f -width 100 -height 100 -colormap new -relief sunken -bd 2
-    pack .t.f
-    frame .t.f2 -width 100 -height 100 -colormap new -relief sunken -bd 2
-    pack .t.f2
-    update
-    wm colormapwindows .t .t.f2
-    destroy .t.f2
-    wm colormap .t
-
----- Result was:
-.t.f2
----- Result should have been (exact matching):
-
-==== unixWm-53.2 FAILED
-
-
-
-==== unixWm-54.2 TkpMakeMenuWindow procedure, setting override_redirect FAILED
-==== Contents of test case:
-
-    destroy .m
-    menu .m
-    .m add command -label First
-    .m add command -label Second
-    .m add command -label Third
-    .m post 30 30
-    update
-    set result [wm overrideredirect .m]
-    destroy .m
-    set result
-
----- Result was:
-0
----- Result should have been (exact matching):
-1
-==== unixWm-54.2 FAILED
 
 
 
@@ -4791,49 +4672,6 @@ wm.test
 
 
 
-==== wm-stackorder-4.3 wm stackorder isabove|isbelow FAILED
-==== Contents of test case:
-
-    toplevel .t
-    tkwait visibility .t
-    raise .
-    raiseDelay
-    wm stackorder .t isabove .
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: TkWmStackorderToplevel failed
-    while executing
-"wm stackorder .t isabove ."
-    ("uplevel" body line 6)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-4.3 FAILED
-
-
-
-==== wm-stackorder-4.4 wm stackorder isabove|isbelow FAILED
-==== Contents of test case:
-
-    toplevel .t ; update
-    raise .
-    raiseDelay
-    wm stackorder .t isb .
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: TkWmStackorderToplevel failed
-    while executing
-"wm stackorder .t isb ."
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-4.4 FAILED
-
-
-
 ==== wm-stackorder-5.2 A normal toplevel can't be raised above an  overrideredirect toplevel on unix FAILED
 ==== Contents of test case:
 
@@ -4850,50 +4688,6 @@ wm.test
 ---- Result should have been (exact matching):
 0
 ==== wm-stackorder-5.2 FAILED
-
-
-
-==== wm-stackorder-5.3 An overrideredirect window can be explicitly lowered FAILED
-==== Contents of test case:
-
-    toplevel .t
-    wm overrideredirect .t 1
-    tkwait visibility .t
-    lower .t
-    update
-    raiseDelay
-    wm stackorder .t isbelow .
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: TkWmStackorderToplevel failed
-    while executing
-"wm stackorder .t isbelow ."
-    ("uplevel" body line 8)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== wm-stackorder-5.3 FAILED
-
-
-
-==== wm-transient-3.1 transient toplevel is withdrawn
-	when mapped if toplevel is withdrawn FAILED
-==== Contents of test case:
-
-    toplevel .top
-    wm withdraw .top
-    update
-    toplevel .subject
-    wm transient .subject .top
-    update
-    list [wm state .subject] [winfo ismapped .subject]
-
----- Result was:
-withdrawn 1
----- Result should have been (exact matching):
-withdrawn 0
-==== wm-transient-3.1 FAILED
 
 
 
@@ -4917,26 +4711,6 @@ normal 1 normal 1
 ---- Result should have been (exact matching):
 withdrawn 0 normal 1
 ==== wm-transient-3.3 FAILED
-
-
-
-==== wm-transient-4.1 transient toplevel is withdrawn
-	when mapped if toplevel is iconic FAILED
-==== Contents of test case:
-
-    toplevel .top
-    wm iconify .top
-    update
-    toplevel .subject
-    wm transient .subject .top
-    update
-    list [wm state .subject] [winfo ismapped .subject]
-
----- Result was:
-withdrawn 1
----- Result should have been (exact matching):
-withdrawn 0
-==== wm-transient-4.1 FAILED
 
 
 
@@ -5033,7 +4807,7 @@ withdrawn normal withdrawn normal
     lappend result [lsearch -all -inline -glob [wm stackorder .] ".t?"]
 
 ---- Result was:
-1 1 1 1 {.t2 .t1}
+0 0 1 0 .t1
 ---- Result should have been (exact matching):
 0 0 1 1 {.t1 .t2}
 ==== wm-transient-8.1 FAILED
@@ -5226,8 +5000,8 @@ pack {} wm {}
 
 xmfbox.test
 
-Tests ended at 2026-09-11 15:03:20 +0200
-all.tcl:	Total	10027	Passed	8888	Skipped	924	Failed	215
+Tests ended at 2026-09-11 15:32:48 +0200
+all.tcl:	Total	10027	Passed	8898	Skipped	924	Failed	205
 Sourced 97 Test Files.
 Files with failing tests: clipboard.test event.test filebox.test focus.test font.test frame.test geometry.test imgPhoto.test pack.test pkgconfig.test place.test select.test systray.test text.test textDisp.test textImage.test textTag.test textWind.test tk.test unixEmbed.test unixFont.test unixSelect.test unixWm.test visual.test winWm.test winfo.test wm.test
 Number of tests skipped for each constraint:
