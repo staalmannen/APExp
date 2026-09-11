@@ -154,9 +154,10 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c` and
-`stdio-test.c`. The twenty-one `tk-*.tcl` scripts there are Tcl, run
+`stdio-test.c`. The twenty-two `tk-*.tcl` scripts there are Tcl, run
 with `wish` -- except `tk-menubar-test.tcl`, which needs `tktest` and
-skips itself under `wish`; see the Tk section below. `tk-runall.tcl` is the harness for
+skips itself under `wish`, and `tk-transient-test.tcl`, whose last
+section alone does; see the Tk section below. `tk-runall.tcl` is the harness for
 Tk's own suite rather than a test of its own, and `tk-runtest.tcl` runs
 a single file from it. `sys/src/ape/lib/libressl/test/` is separate: it is
 upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
@@ -1735,23 +1736,51 @@ table below is the whole thing, and the list has been re-derived rather
 than extended.
 
 ```
-all.tcl:  Total 10027  Passed 8888  Skipped 924  Failed 215
+all.tcl:  Total 10027  Passed 8898  Skipped 924  Failed 205
 Sourced 97 Test Files.
 ```
 
-**That is run 11. Run 10 was the first complete run under `tktest`**,
+**That is run 12. Run 10 was the first complete run under `tktest`**,
 and is the one to read against run 7 -- the last complete `wish` run --
 one column at a time rather than by the total:
 
-| | run 7 (`wish`) | run 10 (`tktest`) | run 11 |
-|---|---|---|---|
-| Total | 10027 | 10027 | 10027 |
-| **Skipped** | 1429 | **924** | 924 |
-| **Passed** | 8427 | **8877** | **8888** |
-| **Failed** | 171 | **226** | **215** |
+| | run 7 (`wish`) | run 10 (`tktest`) | run 11 | run 12 |
+|---|---|---|---|---|
+| Total | 10027 | 10027 | 10027 | 10027 |
+| **Skipped** | 1429 | **924** | 924 | 924 |
+| **Passed** | 8427 | **8877** | **8888** | **8898** |
+| **Failed** | 171 | **226** | **215** | **205** |
 
 Run 10 -> 11 is the `testembed` work below: eleven moved from failed to
 passed, nothing else changed at all.
+
+**Run 11 -> 12 is the `unixWm` and `wm.test` batch below, and the
+prediction written before it was exactly right**: "expect 215 -> roughly
+205, and the per-file check should move `unixWm` and `wm` and nothing
+else -- if a third file moves, that's the signal, since `TkWmMapWindow`
+is on every toplevel's path." The per-file table moves in exactly those
+two lines, `unixWm` 44 -> 39 and `wm` 14 -> 11.
+
+**Diff the failing test NAMES, not just the per-file counts.** One
+command, and it answers "what was fixed" and "what broke" in the same
+output, which a count cannot:
+
+```sh
+grep '^==== ' run.out | grep ' FAILED$' | sed 's/^==== //; s/ FAILED$//' |
+	awk '{print $1}' | sort -u > names
+```
+
+then `diff` the two. For run 11 -> 12 it is ten removals and **no
+additions**: `unixWm-8.4`, `-37.5`, `-40.2`, `-53.2`, `-54.2`,
+`wm-stackorder-4.3`, `-4.4`, `-5.3`, `wm-transient-3.1`, `-4.1`. Every
+one of them is a test the round was aimed at, except `unixWm-8.4` --
+which is one of the three `failsOnUbuntu failsOnXQuartz` tests written
+off above, and which the `TkpGetWrapperWindow` fix evidently carried
+along with it. **A constraint saying a test fails on Linux too is a
+reason not to chase it, not proof it cannot pass.**
+
+`unixWm-21.5` was expected to go with `-37.5` and did not; see the `wm
+group` note below, which is what it actually wanted.
 
 **The count rose by 55 and nothing regressed.** Of the 505 tests that
 had never run here, **450 pass**. That is the "expect the failure count
@@ -2041,6 +2070,60 @@ and the transient must follow -- which is the structure handler upstream
 registers and this port still does not; and `wm manage`/`wm forget`,
 seven tests, are generic-Tk reparenting.
 
+**The tracking is done now** -- see the run-12 section below. `wm
+manage`/`wm forget` are still the seven.
+
+#### Run 12's round: tracking a transient, and two smaller ones
+
+**`wm transient` now tracks the container instead of sampling it.** The
+note above (and the one further down) recorded this as deliberately not
+done, on the grounds that it is a larger change. It is about forty
+lines: upstream's `WmWaitMapProc` registered on the **container** with
+`StructureNotifyMask`, carrying the **transient** as client data, which
+maps or withdraws the transient as the container is mapped or
+unmapped. `wm-transient-3.3`, `4.3`, `5.1`, `6.2`, `8.1` -- five tests,
+and `6.2` is the one that decides whether the implementation is right.
+
+**A transient the caller withdrew itself must not be mapped again when
+the container comes back** (`6.2`), and `wmPtr->withdrawn` cannot say
+which of the two withdrew it. That is what upstream's `WM_WITHDRAWN`
+flag is for, and it is `withdrawnExplicit` here: set by `wm withdraw`
+and `wm state withdrawn`, cleared by `wm deiconify` and `wm state
+normal`, and read in exactly one place.
+
+**Registering on the toplevel is right here and would be wrong on X.**
+Upstream registers on the container's **wrapper**, because that is the
+window the server sends `MapNotify` for. There are no wrappers here --
+a toplevel is its window -- so the events arrive on the toplevel
+itself. Every place that assigns `wmPtr->container` goes through
+`WmTrackContainer`/`WmUntrackContainer`, including `TkWmDeadWindow` and
+`WmForgetTransientsOf`: a handler left registered after either end dies
+runs with a freed `TkWindow` as its client data, which is the
+use-after-free shape this port has now hit three times.
+
+**`wm group` has to create the leader's window** (`unixWm-21.5`, which
+the `TkpGetWrapperWindow` fix was expected to carry and did not).
+Upstream's `WmGroupCmd` does `Tk_MakeWindowExist` on the leader and
+then `CreateWrapper`, because the group hint has to name a window id
+and a never-mapped toplevel has none. The test asks `testwrapper` on
+the leader before and after and requires empty then non-empty. Only the
+first half of upstream's pair exists here, and it is the whole of it.
+The leader is also resolved to its nearest toplevel ancestor now, as
+`wm transient` already was.
+
+**An override-redirect toplevel stays on top** (`wm-stackorder-5.2`).
+On X the window manager keeps it there and an ordinary `raise` cannot
+get above one; there is no window manager here, so `TkWmRestackToplevel`
+holds the rule itself when raising to the top. **This is not only a
+test**: `TkpMakeMenuWindow` marks every posted menu override-redirect,
+so without it a `raise` on the window a menu belongs to buries the
+menu.
+
+Covered by `sys/lib/tests/tk-transient-test.tcl`, which separates the
+follow cases from the explicitly-withdrawn one and destroys each end in
+turn; its last section needs `tktest` for `testwrapper` and says so
+under `wish`.
+
 `focus-2.*` is deliberately untouched. It is `TkFocusFilterEvent`, and
 the warning three sections down stands: getting the mode and detail
 wrong there is how `bind.test` went from 3 failures to 116.
@@ -2235,10 +2318,12 @@ missing:
 - a transient made transient to an **iconic or withdrawn** master is
   withdrawn at once.
 
-Only the state *at the moment of the call* is honoured. Upstream also
-tracks the master afterwards through a structure handler on it; that is
-a larger change and its tests are separate, so it is deliberately not
-done here.
+**Corrected:** this used to say that only the state *at the moment of
+the call* is honoured, and that upstream's structure handler on the
+master was "a larger change" left undone. It was about forty lines, and
+it is done -- see the run-12 section above. The rule stated here is
+still the one that applies at the moment of the call; the handler keeps
+it true afterwards.
 
 The eleven that were already implemented:
 `geometry`, `minsize`, `maxsize`, `withdraw`, `deiconify`, `state`,
