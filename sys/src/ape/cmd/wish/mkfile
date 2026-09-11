@@ -23,13 +23,14 @@ TCLSRC=$APEXPROOT/sys/src/external/tcl
 # "extern int strcmp(const wchar_t *, const wchar_t *)" to collide with
 # the real one in string.h.
 CFLAGS=\
-	-FVp -c\
+	-c\
 	-I$TKSRC/generic\
 	-I$TKSRC/xlib\
 	-I$TKSRC/plan9\
 	-I$TCLSRC/generic\
 	-I$APEXPROOT/sys/include/ape\
 	-I$APEXPROOT/$objtype/include/ape\
+	-I$APEXPROOT/sys/ape/lib/tcl\
 	-DHAVE_TCL_CONFIG_H\
 	-DPLAN9\
 	-DMODULE_SCOPE=/***/\
