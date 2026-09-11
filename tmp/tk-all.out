@@ -7,7 +7,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-11 15:30:33 +0200
+Tests began at 2026-09-11 18:40:22 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -2167,7 +2167,7 @@ unixEmbed.test
     }
 
 ---- Result was:
-couldn't create child of window "0x5757"
+couldn't create child of window "0x5756"
 ---- Result should have been (exact matching):
 {{XXX {} {} .t}} 0
 ==== unixEmbed-1.5 FAILED
@@ -2190,7 +2190,7 @@ couldn't create child of window "0x5757"
     }
 
 ---- Result was:
-couldn't create child of window "0x5761"
+couldn't create child of window "0x5760"
 ---- Result should have been (exact matching):
 {XXX {} {} .t2} {XXX {} {} .t1}
 ==== unixEmbed-1.6 FAILED
@@ -2212,7 +2212,7 @@ couldn't create child of window "0x5761"
     }
 
 ---- Result was:
-couldn't create child of window "0x5777"
+couldn't create child of window "0x5776"
 ---- Result should have been (exact matching):
 
 ==== unixEmbed-2.2 FAILED
@@ -2573,7 +2573,7 @@ can't read "x": no such variable
     }
 
 ---- Result was:
-couldn't create child of window "0x582c"
+couldn't create child of window "0x582b"
 ---- Result should have been (exact matching):
 {{configure .t1 300 120}} 300x120+0+0
 ==== unixEmbed-6.1 FAILED
@@ -2598,7 +2598,7 @@ couldn't create child of window "0x582c"
     }
 
 ---- Result was:
-couldn't create child of window "0x583e"
+couldn't create child of window "0x583d"
 ---- Result should have been (exact matching):
 {{configure .t1 200 200}} 200x200+0+0
 ==== unixEmbed-6.2 FAILED
@@ -2868,7 +2868,7 @@ couldn't create child of window "0x583e"
     }
 
 ---- Result was:
-couldn't create child of window "0x588e"
+couldn't create child of window "0x588d"
 ---- Result should have been (exact matching):
 {{XXX {} {} .t1}} {}
 ==== unixEmbed-9.2 FAILED
@@ -3506,8 +3506,8 @@ in expression "0x40 & _@_"
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
 ---- errorInfo: missing operand at _@_
-in expression " - _@_"
-    (parsing expression " - ")
+in expression "0x5afb - _@_"
+    (parsing expression "0x5afb - ")
     invoked from within
 "expr [testwrapper .t2] - [lindex $hints 8]"
     ("uplevel" body line 7)
@@ -3515,29 +3515,6 @@ in expression " - _@_"
 "uplevel 1 $script"
 ---- errorCode: TCL PARSE EXPR MISSING
 ==== unixWm-21.4 FAILED
-
-
-
-==== unixWm-21.5 Tk_WmCmd procedure, "group" option, create leader wrapper FAILED
-==== Contents of test case:
-
-    destroy .t2
-    destroy .t3
-    toplevel .t2 -width 120 -height 300
-    wm geometry .t2 +0+0
-    toplevel .t3 -width 120 -height 300
-    wm geometry .t2 +0+0
-    set result [list [testwrapper .t2]]
-    wm group .t3 .t2
-    lappend result [expr {[testwrapper .t2] == ""}]
-    destroy .t2 .t3
-    set result
-
----- Result was:
-{} 1
----- Result should have been (exact matching):
-{} 0
-==== unixWm-21.5 FAILED
 
 
 
@@ -3965,8 +3942,8 @@ in expression "0xa & _@_"
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
 ---- errorInfo: missing operand at _@_
-in expression "0x5b23 - _@_"
-    (parsing expression "0x5b23 - ")
+in expression "0x5b22 - _@_"
+    (parsing expression "0x5b22 - ")
     invoked from within
 "expr [testwrapper .t] - $transient"
     ("uplevel" body line 10)
@@ -4672,48 +4649,6 @@ wm.test
 
 
 
-==== wm-stackorder-5.2 A normal toplevel can't be raised above an  overrideredirect toplevel on unix FAILED
-==== Contents of test case:
-
-    toplevel .t
-    wm overrideredirect .t 1
-    tkwait visibility .t
-    raise .
-    update
-    raiseDelay
-    wm stackorder . isabove .t
-
----- Result was:
-1
----- Result should have been (exact matching):
-0
-==== wm-stackorder-5.2 FAILED
-
-
-
-==== wm-transient-3.3 withdraw/deiconify on the toplevel
-	also does a withdraw/deiconify on the transient FAILED
-==== Contents of test case:
-
-    toplevel .top
-    toplevel .subject
-    update
-    wm transient .subject .top
-    wm withdraw .top
-    update
-    lappend results [wm state .subject] [winfo ismapped .subject]
-    wm deiconify .top
-    update
-    lappend results [wm state .subject] [winfo ismapped .subject]
-
----- Result was:
-normal 1 normal 1
----- Result should have been (exact matching):
-withdrawn 0 normal 1
-==== wm-transient-3.3 FAILED
-
-
-
 ==== wm-transient-4.3 iconify/deiconify on the toplevel
 	does a withdraw/deiconify on the transient FAILED
 ==== Contents of test case:
@@ -4734,31 +4669,6 @@ normal 1 normal 1
 ---- Result should have been (exact matching):
 withdrawn 0 normal 1
 ==== wm-transient-4.3 FAILED
-
-
-
-==== wm-transient-5.1 an error during transient command should not
-	cause the map/unmap binding to be deleted FAILED
-==== Contents of test case:
-
-    toplevel .top
-    toplevel .subject
-    update
-    wm transient .subject .top
-    # Expect a bad window path error here
-    lappend results [catch {wm transient .subject .bad}]
-    wm withdraw .top
-    update
-    lappend results [wm state .subject]
-    wm deiconify .top
-    update
-    lappend results [wm state .subject]
-
----- Result was:
-1 normal normal
----- Result should have been (exact matching):
-1 withdrawn normal
-==== wm-transient-5.1 FAILED
 
 
 
@@ -4807,7 +4717,7 @@ withdrawn normal withdrawn normal
     lappend result [lsearch -all -inline -glob [wm stackorder .] ".t?"]
 
 ---- Result was:
-0 0 1 0 .t1
+0 0 1 1 {.t2 .t1}
 ---- Result should have been (exact matching):
 0 0 1 1 {.t1 .t2}
 ==== wm-transient-8.1 FAILED
@@ -5000,8 +4910,8 @@ pack {} wm {}
 
 xmfbox.test
 
-Tests ended at 2026-09-11 15:32:48 +0200
-all.tcl:	Total	10027	Passed	8898	Skipped	924	Failed	205
+Tests ended at 2026-09-11 18:42:36 +0200
+all.tcl:	Total	10027	Passed	8902	Skipped	924	Failed	201
 Sourced 97 Test Files.
 Files with failing tests: clipboard.test event.test filebox.test focus.test font.test frame.test geometry.test imgPhoto.test pack.test pkgconfig.test place.test select.test systray.test text.test textDisp.test textImage.test textTag.test textWind.test tk.test unixEmbed.test unixFont.test unixSelect.test unixWm.test visual.test winWm.test winfo.test wm.test
 Number of tests skipped for each constraint:
