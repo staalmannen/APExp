@@ -7,7 +7,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-11 11:33:39 +0200
+Tests began at 2026-09-11 11:47:42 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -2052,29 +2052,6 @@ textTag.test
 textWind.test
 
 
-==== textWind-10.8 EmbWinLayoutProc procedure, error in creating window FAILED
-==== Contents of test case:
-
-    .t insert 1.0 "Some sample text"
-    .t window create 1.5 -create {
-	toplevel .t2 -width 100 -height 150
-	wm geom .t2 +0+0
-	concat .t2
-    }
-    set msg {}
-    update
-    set i 0
-    while {[llength $msg] == 1 && [incr i] < 200} { update }
-    return $msg
-
----- Result was:
-{{can't embed .t2 relative to .t}}
----- Result should have been (exact matching):
-{{can't embed .t2 relative to .t}} {{window name "t2" already exists in parent}}
-==== textWind-10.8 FAILED
-
-
-
 ==== textWind-12.1 EmbWinUndisplayProc procedure, mapping/unmapping FAILED
 ==== Contents of test case:
 
@@ -2246,7 +2223,7 @@ couldn't create child of window "0x575e"
     }
 
 ---- Result was:
-couldn't create child of window "0x5764"
+couldn't create child of window "0x5768"
 ---- Result should have been (exact matching):
 {XXX {} {} .t2} {XXX {} {} .t1}
 ==== unixEmbed-1.6 FAILED
@@ -2389,7 +2366,7 @@ testembed not supported on Plan 9
     }
 
 ---- Result was:
-couldn't create child of window "0x5773"
+couldn't create child of window "0x577d"
 ---- Result should have been (exact matching):
 
 ==== unixEmbed-2.2 FAILED
@@ -2874,7 +2851,7 @@ can't read "x": no such variable
     }
 
 ---- Result was:
-couldn't create child of window "0x581d"
+couldn't create child of window "0x5828"
 ---- Result should have been (exact matching):
 {{configure .t1 300 120}} 300x120+0+0
 ==== unixEmbed-6.1 FAILED
@@ -2899,7 +2876,7 @@ couldn't create child of window "0x581d"
     }
 
 ---- Result was:
-couldn't create child of window "0x582c"
+couldn't create child of window "0x583a"
 ---- Result should have been (exact matching):
 {{configure .t1 200 200}} 200x200+0+0
 ==== unixEmbed-6.2 FAILED
@@ -3198,7 +3175,7 @@ couldn't create child of window "0x582c"
     }
 
 ---- Result was:
-couldn't create child of window "0x587a"
+couldn't create child of window "0x588a"
 ---- Result should have been (exact matching):
 {{XXX {} {} .t1}} {}
 ==== unixEmbed-9.2 FAILED
@@ -3792,30 +3769,6 @@ command
 
 
 
-==== unixWm-10.2 TkWmDeadWindow procedure, destroying menubar FAILED
-==== Contents of test case:
-
-    destroy .t
-    destroy .f
-    toplevel .t -width 300 -height 200 -bd 2 -relief raised
-    wm geom .t +0+0
-    update
-    frame .f -width 400 -height 30 -bd 2 -relief raised -bg green
-    bind .f <Destroy> {lappend result destroyed}
-    testmenubar window .t .f
-    update
-    set result {}
-    destroy .t
-    lappend result [winfo exists .f]
-
----- Result was:
-1
----- Result should have been (exact matching):
-destroyed 0
-==== unixWm-10.2 FAILED
-
-
-
 ==== unixWm-13.2 Tk_WmCmd procedure, "client" option FAILED
 ==== Contents of test case:
 
@@ -4383,8 +4336,8 @@ in expression "0xa & _@_"
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
 ---- errorInfo: missing operand at _@_
-in expression "0x5b12 - _@_"
-    (parsing expression "0x5b12 - ")
+in expression "0x5b20 - _@_"
+    (parsing expression "0x5b20 - ")
     invoked from within
 "expr [testwrapper .t] - $transient"
     ("uplevel" body line 10)
@@ -4633,4 +4586,1025 @@ in expression ""
 52 7 12 62
 ==== unixWm-49.2 FAILED
 
-tktest 17077: suicide: sys: trap: fault write addr=0x3a3a79007393 pc=0x2d1856
+
+
+==== unixWm-50.1 Tk_CoordsToWindow procedure, finding a toplevel, x-coords, title bar FAILED
+==== Contents of test case:
+
+    update
+    toplevel .t -width 300 -height 400 -bg green
+    wm geom .t +100+100
+    tkwait visibility .t
+    toplevel .t2 -width 100 -height 200 -bg red
+    wm geom .t2 +200+200
+    tkwait visibility .t2
+    raise .t2
+    update
+    set x [winfo rootx .t]
+    set y [winfo rooty .t]
+    list [winfo containing [expr $x - 30]  [expr $y + 250]]  [winfo containing [expr $x - 1]   [expr $y + 250]]  [winfo containing $x              [expr $y + 250]]  [winfo containing [expr $x + 99]  [expr $y + 250]]  [winfo containing [expr $x + 100] [expr $y + 250]]  [winfo containing [expr $x + 150] [expr $y + 90]]  [winfo containing [expr $x + 199] [expr $y + 250]]  [winfo containing [expr $x + 200] [expr $y + 250]]  [winfo containing [expr $x + 220] [expr $y + 250]]  
+---- Result was:
+{} {} .t .t .t2 .t .t2 .t .t
+---- Result should have been (exact matching):
+{} {} .t {} .t2 {} .t2 {} .t
+==== unixWm-50.1 FAILED
+
+
+
+==== unixWm-50.5 Tk_CoordsToWindow procedure, handling menubars FAILED
+==== Contents of test case:
+
+    deleteWindows
+    toplevel .t -width 300 -height 400 -bd 2 -relief raised
+    frame .t.f -width 150 -height 120 -bg green
+    place .t.f -x 10 -y 150
+    wm geom .t +0+50
+    frame .t.menu -width 100 -height 30 -bd 2 -relief raised
+    frame .t.menu.f -width 40 -height 20 -bg purple
+    place .t.menu.f -x 30 -y 10
+    testmenubar window .t .t.menu
+    tkwait visibility .t.menu
+    update
+    set x [winfo rootx .t]
+    set y [winfo rooty .t]
+    list [winfo containing $x             [expr $y - 31]]  [winfo containing $x             [expr $y - 30]]  [winfo containing [expr $x + 50] [expr $y - 19]]  [winfo containing [expr $x + 50] [expr $y - 18]]  [winfo containing [expr $x + 50] $y]  [winfo containing [expr $x + 11] [expr $y + 152]]  [winfo containing [expr $x + 12] [expr $y + 152]]
+
+---- Result was:
+{} {} {} {} .t.menu .t .t.f
+---- Result should have been (exact matching):
+{} .t.menu .t.menu .t.menu.f .t .t .t.f
+==== unixWm-50.5 FAILED
+
+
+
+==== unixWm-52.2 TkWmAddToColormapWindows procedure FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t -colormap new -relief raised -bd 2
+    wm geom .t +0+0
+    frame .t.f -width 100 -height 100 -colormap new -relief sunken -bd 2
+    pack .t.f
+    update
+    wm colormap .t
+
+---- Result was:
+
+---- Result should have been (exact matching):
+.t.f .t
+==== unixWm-52.2 FAILED
+
+
+
+==== unixWm-52.3 TkWmAddToColormapWindows procedure FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t -colormap new
+    wm geom .t +0+0
+    frame .t.f -width 100 -height 100 -colormap new -relief sunken -bd 2
+    pack .t.f
+    frame .t.f2 -width 100 -height 100 -colormap new -relief sunken -bd 2
+    pack .t.f2
+    update
+    wm colormap .t
+
+---- Result was:
+
+---- Result should have been (exact matching):
+.t.f .t.f2 .t
+==== unixWm-52.3 FAILED
+
+
+
+==== unixWm-53.1 TkWmRemoveFromColormapWindows procedure FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t -colormap new
+    wm geom .t +0+0
+    frame .t.f -width 100 -height 100 -colormap new -relief sunken -bd 2
+    pack .t.f
+    frame .t.f2 -width 100 -height 100 -colormap new -relief sunken -bd 2
+    pack .t.f2
+    update
+    destroy .t.f2
+    wm colormap .t
+
+---- Result was:
+
+---- Result should have been (exact matching):
+.t.f .t
+==== unixWm-53.1 FAILED
+
+
+
+==== unixWm-53.2 TkWmRemoveFromColormapWindows procedure FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t -colormap new
+    wm geom .t +0+0
+    frame .t.f -width 100 -height 100 -colormap new -relief sunken -bd 2
+    pack .t.f
+    frame .t.f2 -width 100 -height 100 -colormap new -relief sunken -bd 2
+    pack .t.f2
+    update
+    wm colormapwindows .t .t.f2
+    destroy .t.f2
+    wm colormap .t
+
+---- Result was:
+.t.f2
+---- Result should have been (exact matching):
+
+==== unixWm-53.2 FAILED
+
+
+
+==== unixWm-54.2 TkpMakeMenuWindow procedure, setting override_redirect FAILED
+==== Contents of test case:
+
+    destroy .m
+    menu .m
+    .m add command -label First
+    .m add command -label Second
+    .m add command -label Third
+    .m post 30 30
+    update
+    set result [wm overrideredirect .m]
+    destroy .m
+    set result
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== unixWm-54.2 FAILED
+
+
+
+==== unixWm-55.1 TkUnixSetMenubar procedure FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t -width 300 -height 200 -bd 2 -relief raised
+    wm geom .t +0+0
+    update
+    frame .t.f -width 400 -height 30 -bd 2 -relief raised -bg green
+    testmenubar window .t .t.f
+    update
+    list [winfo ismapped .t.f] [winfo geometry .t.f]  [expr [winfo rootx .t] - [winfo rootx .t.f]]  [expr [winfo rooty .t] - [winfo rooty .t.f]]
+
+---- Result was:
+1 300x30+0+0 0 0
+---- Result should have been (exact matching):
+1 300x30+0+0 0 30
+==== unixWm-55.1 FAILED
+
+
+
+==== unixWm-55.4 TkUnixSetMenubar procedure, toplevel not yet created FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t -width 300 -height 200 -bd 2 -relief raised
+    frame .t.f -width 400 -height 30 -bd 2 -relief raised -bg green
+    testmenubar window .t .t.f
+    wm geom .t +0+0
+    update
+    list [winfo ismapped .t.f] [winfo geometry .t.f]  [expr [winfo rootx .t] - [winfo rootx .t.f]]  [expr [winfo rooty .t] - [winfo rooty .t.f]]
+
+---- Result was:
+1 300x30+0+0 0 0
+---- Result should have been (exact matching):
+1 300x30+0+0 0 30
+==== unixWm-55.4 FAILED
+
+
+
+==== unixWm-55.5 TkUnixSetMenubar procedure, changing menubar FAILED
+==== Contents of test case:
+
+    destroy .t
+    destroy .f
+    toplevel .t -width 300 -height 200 -bd 2 -relief raised
+    frame .t.f -width 400 -height 30 -bd 2 -relief raised -bg green
+    wm geom .t +0+0
+    update
+    set y [winfo rooty .t]
+    frame .f -width 400 -height 50 -bd 2 -relief raised -bg green
+    testmenubar window .t .t.f
+    update
+    set result {}
+    lappend result [winfo ismapped .f] [winfo ismapped .t.f]
+    lappend result [expr [winfo rooty .t.f] - $y]
+    testmenubar window .t .f
+    update
+    lappend result [winfo ismapped .f] [winfo ismapped .t.f]
+    lappend result [expr [winfo rooty .f] - $y]
+
+---- Result was:
+0 1 0 1 0 300
+---- Result should have been (exact matching):
+0 1 0 1 0 0
+==== unixWm-55.5 FAILED
+
+
+
+==== unixWm-55.6 TkUnixSetMenubar procedure, changing menubar to self FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t -width 300 -height 200 -bd 2 -relief raised
+    frame .t.f -width 400 -height 30 -bd 2 -relief raised -bg green
+    testmenubar window .t .t.f
+    wm geom .t +0+0
+    update
+    testmenubar window .t .t.f
+    update
+    list [winfo ismapped .t.f] [winfo geometry .t.f]  [expr [winfo rootx .t] - [winfo rootx .t.f]]  [expr [winfo rooty .t] - [winfo rooty .t.f]]
+
+---- Result was:
+1 300x30+0+0 0 0
+---- Result should have been (exact matching):
+1 300x30+0+0 0 30
+==== unixWm-55.6 FAILED
+
+
+
+==== unixWm-55.7 TkUnixSetMenubar procedure, unsetting event handler FAILED
+==== Contents of test case:
+
+    destroy .t
+    destroy .f
+    toplevel .t -width 300 -height 200 -bd 2 -relief raised
+    frame .t.f -width 400 -height 30 -bd 2 -relief raised -bg green
+    frame .f -width 400 -height 40 -bd 2 -relief raised -bg blue
+    wm geom .t +0+0
+    update
+    set y [winfo rooty .t]
+    testmenubar window .t .t.f
+    update
+    set result [expr [winfo rooty .t] - $y]
+    testmenubar window .t .f
+    update
+    lappend result [expr [winfo rooty .t] - $y]
+    destroy .t.f
+    update
+    lappend result [expr [winfo rooty .t] - $y]
+
+---- Result was:
+0 0 0
+---- Result should have been (exact matching):
+30 40 40
+==== unixWm-55.7 FAILED
+
+
+
+==== unixWm-56.1 MenubarDestroyProc procedure FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t -width 300 -height 200 -bd 2 -relief raised
+    wm geom .t +0+0
+    update
+    set y [winfo rooty .t]
+    frame .t.f -width 400 -height 30 -bd 2 -relief raised -bg green
+    testmenubar window .t .t.f
+    update
+    set result [expr [winfo rooty .t] - $y]
+    destroy .t.f
+    update
+    lappend result [expr [winfo rooty .t] - $y]
+
+---- Result was:
+0 0
+---- Result should have been (exact matching):
+30 0
+==== unixWm-56.1 FAILED
+
+
+
+==== unixWm-57.1 MenubarReqProc procedure FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t -width 300 -height 200 -bd 2 -relief raised
+    wm geom .t +0+0
+    update
+    set x [winfo rootx .t]
+    set y [winfo rooty .t]
+    frame .t.f -width 400 -height 10 -bd 2 -relief raised -bg green
+    testmenubar window .t .t.f
+    update
+    set result "[expr [winfo rootx .t] - $x] [expr [winfo rooty .t] - $y]"
+    .t.f configure -height 100
+    update
+    lappend result [expr [winfo rootx .t] - $x] [expr [winfo rooty .t] - $y]
+
+---- Result was:
+0 0 0 0
+---- Result should have been (exact matching):
+0 10 0 100
+==== unixWm-57.1 FAILED
+
+
+
+==== unixWm-57.2 MenubarReqProc procedure FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t -width 300 -height 200 -bd 2 -relief raised
+    wm geom .t +0+0
+    update
+    set x [winfo rootx .t]
+    set y [winfo rooty .t]
+    frame .t.f -width 400 -height 20 -bd 2 -relief raised -bg green
+    testmenubar window .t .t.f
+    update
+    set result "[expr [winfo rootx .t] - $x] [expr [winfo rooty .t] - $y]"
+    .t.f configure -height 0
+    update
+    lappend result [expr [winfo rootx .t] - $x] [expr [winfo rooty .t] - $y]
+
+---- Result was:
+0 0 0 0
+---- Result should have been (exact matching):
+0 20 0 1
+==== unixWm-57.2 FAILED
+
+
+
+==== unixWm-58.1 UpdateCommand procedure, DString gets reallocated FAILED
+==== Contents of test case:
+
+    destroy .t
+    toplevel .t -width 100 -height 50
+    wm geom .t +0+0
+    wm command .t "argumentNumber0 argumentNumber1 argumentNumber2 argumentNumber0 argumentNumber3 argumentNumber4 argumentNumber5 argumentNumber6 argumentNumber0 argumentNumber7 argumentNumber8 argumentNumber9 argumentNumber10 argumentNumber0 argumentNumber11 argumentNumber12 argumentNumber13 argumentNumber14 argumentNumber15 argumentNumber16 argumentNumber17 argumentNumber18"
+    update
+    testprop [testwrapper .t] WM_COMMAND
+
+---- Result was:
+
+---- Result should have been (exact matching):
+argumentNumber0
+argumentNumber1
+argumentNumber2
+argumentNumber0
+argumentNumber3
+argumentNumber4
+argumentNumber5
+argumentNumber6
+argumentNumber0
+argumentNumber7
+argumentNumber8
+argumentNumber9
+argumentNumber10
+argumentNumber0
+argumentNumber11
+argumentNumber12
+argumentNumber13
+argumentNumber14
+argumentNumber15
+argumentNumber16
+argumentNumber17
+argumentNumber18
+
+==== unixWm-58.1 FAILED
+
+util.test
+visual.test
+
+
+==== visual-3.1 Tk_GetVisual, parsing visual string FAILED
+==== Contents of test case:
+
+    toplevel .t1 -width 250 -height 100  -visual "[winfo visual .][winfo depth .]"
+    wm geometry .t1 +0+0
+    update
+    concat "[winfo visual .t1] [winfo depth .t1]"
+
+---- Result was:
+truecolor 8
+---- Result should have been (exact matching):
+truecolor 32
+==== visual-3.1 FAILED
+
+visual_bb.test
+winButton.test
+winClipboard.test
+winDialog.test
+winFont.test
+winMenu.test
+winMsgbox.test
+winSend.test
+winWm.test
+
+
+==== winWm-9.2 check wm forget for unmapped parent (#3205464,#2967911) FAILED
+==== Contents of test case:
+
+    pack .t.f.x
+    pack .t.f
+    lappend aid [after 5000 {set ::winwm92 timeout}] [after 500 {
+	wm manage .t.f
+	wm iconify .t
+	lappend aid [after 500 {
+	    wm forget .t.f
+	    wm deiconify .t
+	    lappend aid [after 500 {
+		pack .t.f
+		lappend aid [after 500 {
+		    set ::winwm92 [expr {
+			    [winfo rooty .t.f.x] == 0 ? "failed" : "ok"}]}]
+	    }]
+	}]
+    }]
+    vwait ::winwm92
+    foreach id $aid {
+	after cancel $id
+    }
+    set winwm92
+
+---- Result was:
+failed
+---- Result should have been (exact matching):
+ok
+==== winWm-9.2 FAILED
+
+window.test
+winfo.test
+
+
+==== winfo-2.5 "winfo atomname" command FAILED
+==== Contents of test case:
+
+    winfo atomname 44215
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== winfo-2.5 FAILED
+
+
+
+==== winfo-5.4 "winfo interps" command FAILED
+==== Contents of test case:
+
+    expr {[lsearch -exact [winfo interps] [tk appname]] >= 0}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== winfo-5.4 FAILED
+
+
+
+==== winfo-5.5 "winfo interps" command FAILED
+==== Contents of test case:
+
+    expr {[lsearch -exact [winfo interps -displayof .] [tk appname]] >= 0}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== winfo-5.5 FAILED
+
+
+
+==== winfo-7.8 "winfo pathname" command FAILED
+==== Contents of test case:
+
+    winfo pathname [testwrapper .]
+
+---- Result was:
+.
+---- Result should have been (exact matching):
+
+==== winfo-7.8 FAILED
+
+
+
+==== winfo-13.2 destroying embedded toplevel FAILED
+==== Contents of test case:
+
+    frame .con -container 1
+    pack .con -expand yes -fill both
+    toplevel .emb -use [winfo id .con] -bd 0 -highlightthickness 0
+    button .emb.b
+    pack .emb.b -expand yes -fill both
+    update
+
+    destroy .emb
+    update
+    list embedded [winfo exists .emb.b] container [winfo exists .con]
+
+---- Result was:
+embedded 0 container 1
+---- Result should have been (exact matching):
+embedded 0 container 0
+==== winfo-13.2 FAILED
+
+wm.test
+
+
+==== wm-colormapwindows-2.1 reading values FAILED
+==== Contents of test case:
+
+    toplevel .t2 -width 200 -height 200 -colormap new
+    wm geom .t2 +0+0
+    frame .t2.a -width 100 -height 30
+    frame .t2.b -width 100 -height 30 -colormap new
+    pack .t2.a .t2.b -side top
+    update
+    set x [wm colormapwindows .t2]
+    frame .t2.c -width 100 -height 30 -colormap new
+    pack .t2.c -side top
+    update
+    list $x [wm colormapwindows .t2]
+
+---- Result was:
+{} {}
+---- Result should have been (exact matching):
+{.t2.b .t2} {.t2.b .t2.c .t2}
+==== wm-colormapwindows-2.1 FAILED
+
+
+
+==== wm-stackorder-4.3 wm stackorder isabove|isbelow FAILED
+==== Contents of test case:
+
+    toplevel .t
+    tkwait visibility .t
+    raise .
+    raiseDelay
+    wm stackorder .t isabove .
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: TkWmStackorderToplevel failed
+    while executing
+"wm stackorder .t isabove ."
+    ("uplevel" body line 6)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== wm-stackorder-4.3 FAILED
+
+
+
+==== wm-stackorder-4.4 wm stackorder isabove|isbelow FAILED
+==== Contents of test case:
+
+    toplevel .t ; update
+    raise .
+    raiseDelay
+    wm stackorder .t isb .
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: TkWmStackorderToplevel failed
+    while executing
+"wm stackorder .t isb ."
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== wm-stackorder-4.4 FAILED
+
+
+
+==== wm-stackorder-5.2 A normal toplevel can't be raised above an  overrideredirect toplevel on unix FAILED
+==== Contents of test case:
+
+    toplevel .t
+    wm overrideredirect .t 1
+    tkwait visibility .t
+    raise .
+    update
+    raiseDelay
+    wm stackorder . isabove .t
+
+---- Result was:
+1
+---- Result should have been (exact matching):
+0
+==== wm-stackorder-5.2 FAILED
+
+
+
+==== wm-stackorder-5.3 An overrideredirect window can be explicitly lowered FAILED
+==== Contents of test case:
+
+    toplevel .t
+    wm overrideredirect .t 1
+    tkwait visibility .t
+    lower .t
+    update
+    raiseDelay
+    wm stackorder .t isbelow .
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: TkWmStackorderToplevel failed
+    while executing
+"wm stackorder .t isbelow ."
+    ("uplevel" body line 8)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== wm-stackorder-5.3 FAILED
+
+
+
+==== wm-transient-3.1 transient toplevel is withdrawn
+	when mapped if toplevel is withdrawn FAILED
+==== Contents of test case:
+
+    toplevel .top
+    wm withdraw .top
+    update
+    toplevel .subject
+    wm transient .subject .top
+    update
+    list [wm state .subject] [winfo ismapped .subject]
+
+---- Result was:
+withdrawn 1
+---- Result should have been (exact matching):
+withdrawn 0
+==== wm-transient-3.1 FAILED
+
+
+
+==== wm-transient-3.3 withdraw/deiconify on the toplevel
+	also does a withdraw/deiconify on the transient FAILED
+==== Contents of test case:
+
+    toplevel .top
+    toplevel .subject
+    update
+    wm transient .subject .top
+    wm withdraw .top
+    update
+    lappend results [wm state .subject] [winfo ismapped .subject]
+    wm deiconify .top
+    update
+    lappend results [wm state .subject] [winfo ismapped .subject]
+
+---- Result was:
+normal 1 normal 1
+---- Result should have been (exact matching):
+withdrawn 0 normal 1
+==== wm-transient-3.3 FAILED
+
+
+
+==== wm-transient-4.1 transient toplevel is withdrawn
+	when mapped if toplevel is iconic FAILED
+==== Contents of test case:
+
+    toplevel .top
+    wm iconify .top
+    update
+    toplevel .subject
+    wm transient .subject .top
+    update
+    list [wm state .subject] [winfo ismapped .subject]
+
+---- Result was:
+withdrawn 1
+---- Result should have been (exact matching):
+withdrawn 0
+==== wm-transient-4.1 FAILED
+
+
+
+==== wm-transient-4.3 iconify/deiconify on the toplevel
+	does a withdraw/deiconify on the transient FAILED
+==== Contents of test case:
+
+    toplevel .top
+    toplevel .subject
+    update idletasks
+    wm transient .subject .top
+    wm iconify .top
+    update idletasks
+    lappend results [wm state .subject] [winfo ismapped .subject]
+    wm deiconify .top
+    update idletasks
+    lappend results [wm state .subject] [winfo ismapped .subject]
+
+---- Result was:
+normal 1 normal 1
+---- Result should have been (exact matching):
+withdrawn 0 normal 1
+==== wm-transient-4.3 FAILED
+
+
+
+==== wm-transient-5.1 an error during transient command should not
+	cause the map/unmap binding to be deleted FAILED
+==== Contents of test case:
+
+    toplevel .top
+    toplevel .subject
+    update
+    wm transient .subject .top
+    # Expect a bad window path error here
+    lappend results [catch {wm transient .subject .bad}]
+    wm withdraw .top
+    update
+    lappend results [wm state .subject]
+    wm deiconify .top
+    update
+    lappend results [wm state .subject]
+
+---- Result was:
+1 normal normal
+---- Result should have been (exact matching):
+1 withdrawn normal
+==== wm-transient-5.1 FAILED
+
+
+
+==== wm-transient-6.2 a withdrawn transient does not track
+	state changes in the toplevel FAILED
+==== Contents of test case:
+
+    toplevel .top
+    toplevel .subject
+    update
+    wm transient .subject .top
+    wm withdraw .subject
+    wm withdraw .top
+    wm deiconify .top
+    # idle handler should not map the transient
+    update
+    lappend results [wm state .subject]
+    wm deiconify .subject
+    lappend results [wm state .subject]
+    wm withdraw .top
+    lappend results [wm state .subject]
+    wm deiconify .top
+    # idle handler should map transient
+    update
+    lappend results [wm state .subject]
+
+---- Result was:
+withdrawn normal normal normal
+---- Result should have been (exact matching):
+withdrawn normal withdrawn normal
+==== wm-transient-6.2 FAILED
+
+
+
+==== wm-transient-8.1 transient to withdrawn window, Bug 1163496 FAILED
+==== Contents of test case:
+
+    # Verifies that transients stay on top of their toplevels, even if they were
+    # made transients when those toplevels were withdrawn.
+    toplevel .t1; wm withdraw  .t1;     update
+    toplevel .t2; wm transient .t2 .t1; update
+    lappend result [winfo ismapped .t1] [winfo ismapped .t2]
+    wm deiconify .t1; update
+    lappend result [winfo ismapped .t1] [winfo ismapped .t2]
+    raise .t1; raiseDelay; update
+    lappend result [lsearch -all -inline -glob [wm stackorder .] ".t?"]
+
+---- Result was:
+1 1 1 1 {.t2 .t1}
+---- Result should have been (exact matching):
+0 0 1 1 {.t1 .t2}
+==== wm-transient-8.1 FAILED
+
+
+
+==== wm-manage-1.1 managing a frame FAILED
+==== Contents of test case:
+
+    toplevel .t
+    frame .t.f
+    pack [label .t.f.l -text hello]
+    wm manage .t.f
+    raise .t.f
+    update
+    lappend result [winfo manage .t.f]
+    lappend result [winfo toplevel .t.f]
+
+---- Result was:
+{} .t
+---- Result should have been (exact matching):
+wm .t.f
+==== wm-manage-1.1 FAILED
+
+
+
+==== wm-manage-1.3 managing a labelframe FAILED
+==== Contents of test case:
+
+    toplevel .t
+    labelframe .t.f -text Labelframe
+    pack [label .t.f.l -text hello]
+    wm manage .t.f
+    raise .t.f
+    update
+    lappend result [winfo manage .t.f]
+    lappend result [winfo toplevel .t.f]
+
+---- Result was:
+{} .t
+---- Result should have been (exact matching):
+wm .t.f
+==== wm-manage-1.3 FAILED
+
+
+
+==== wm-manage-1.4 managing a ttk::frame FAILED
+==== Contents of test case:
+
+    toplevel .t
+    ttk::frame .t.f
+    pack [label .t.f.l -text hello]
+    wm manage .t.f
+    raise .t.f
+    update
+    lappend result [winfo manage .t.f]
+    lappend result [winfo toplevel .t.f]
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-manage-1.4 FAILED
+
+
+
+==== wm-manage-1.5 managing a text widget FAILED
+==== Contents of test case:
+
+    toplevel .t
+    text .t.f
+    .t.f insert end "Manage text\n" {}
+    wm manage .t.f
+    raise .t.f
+    update
+    lappend result [winfo manage .t.f]
+    lappend result [winfo toplevel .t.f]
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-manage-1.5 FAILED
+
+
+
+==== wm-manage-1.6 managing a button FAILED
+==== Contents of test case:
+
+    toplevel .t
+    button .t.f -text Button
+    wm manage .t.f
+    raise .t.f
+    update
+    lappend result [winfo manage .t.f]
+    lappend result [winfo toplevel .t.f]
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== wm-manage-1.6 FAILED
+
+
+
+==== wm-manage-1.7 managing a frame FAILED
+==== Contents of test case:
+
+    toplevel .t
+    frame .t.f
+    pack [label .t.f.l -text Label]
+    pack .t.f
+    update
+    lappend result [winfo manage .t.f]
+    lappend result [winfo toplevel .t.f]
+    wm manage .t.f
+    raise .t.f
+    update
+    lappend result [winfo manage .t.f]
+    lappend result [winfo toplevel .t.f]
+    wm forget .t.f
+    pack .t.f
+    update
+    lappend result [winfo manage .t.f]
+    lappend result [winfo toplevel .t.f]
+
+---- Result was:
+pack .t pack .t pack .t
+---- Result should have been (exact matching):
+pack .t wm .t.f pack .t
+==== wm-manage-1.7 FAILED
+
+
+
+==== wm-manage-1.8 unmanaging a toplevel FAILED
+==== Contents of test case:
+
+    toplevel .t
+    toplevel .t.t
+    button .t.t.b -text "Manage This"
+    pack .t.t.b
+    update
+    lappend result [winfo manage .t.t]
+    lappend result [winfo toplevel .t.t.b]
+    wm forget .t.t
+    wm forget .t.t ; # second call should be a no-op
+    pack .t.t
+    update
+    lappend result [winfo manage .t.t]
+    lappend result [winfo toplevel .t.t.b]
+    wm manage .t.t
+    wm manage .t.t ; # second call should be a no-op
+    wm deiconify .t.t
+    update
+    lappend result [winfo manage .t.t]
+    lappend result [winfo toplevel .t.t.b]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: can't pack ".t.t": it's a top-level window
+    while executing
+"pack .t.t"
+    ("uplevel" body line 11)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TK GEOMETRY TOPLEVEL
+==== wm-manage-1.8 FAILED
+
+
+
+==== wm-forget-2 bug [e9112ef96e] - [wm forget] doesn't completely FAILED
+==== Contents of test case:
+
+    label .l -text "Top Dot"
+    frame .f
+    button .f.b -text Hello -command "puts Hello!"
+    pack .l -side top
+    pack .f.b
+    pack .f -side bottom
+    set res [winfo manager .f]
+    pack forget .f
+    update
+    lappend res [winfo manager .f]
+    wm manage .f
+    update
+    lappend res [winfo manager .f]
+    wm forget .f
+    update
+    lappend res [winfo manager .f]
+
+---- Result was:
+pack {} {} {}
+---- Result should have been (exact matching):
+pack {} wm {}
+==== wm-forget-2 FAILED
+
+xmfbox.test
+
+Tests ended at 2026-09-11 11:49:58 +0200
+all.tcl:	Total	10027	Passed	8877	Skipped	924	Failed	226
+Sourced 97 Test Files.
+Files with failing tests: clipboard.test event.test filebox.test focus.test font.test frame.test geometry.test imgPhoto.test pack.test pkgconfig.test place.test select.test systray.test text.test textDisp.test textImage.test textTag.test textWind.test tk.test unixEmbed.test unixFont.test unixSelect.test unixWm.test visual.test winWm.test winfo.test wm.test
+Number of tests skipped for each constraint:
+	12	altDisplay
+	30	aqua
+	7	aquaOrWin32
+	1	cliboardManagerPresent
+	16	colorsFree
+	21	defaultPseudocolor8
+	10	emptyTest
+	126	fonts
+	1	hasArial
+	1	hasCourierNew
+	1	hasTimesNew
+	2	haveDISPLAY
+	1	haveDefault24bitsVisual
+	3	haveFixedFamilyFont
+	5	haveOtherVisual
+	1	havePseudocolorVisual
+	8	knownBug
+	1	memory
+	9	needsICU
+	98	nonPortable
+	55	nt
+	5	pseudocolor8
+	72	secureserver
+	11	testmetrics
+	1	testmovemouse
+	3	testpressbutton
+	20	testutils
+	7	testwinevent
+	1	userInteraction
+	342	win
+	2	win32
+	51	winSend
+tk-runall: every file ran, now entering exit (code 0)
+tk-runall: anything below this line is Tcl_Exit and Tk teardown
