@@ -107,37 +107,21 @@ tkAppInit.$O: $TKSRC/unix/tkAppInit.c
 # the next Tk update would silently revert, to avoid compiling two
 # vendored files that already exist and already build clean.
 #
-# AND THEY DO NOT BUILD WITH THIS FILE'S CFLAGS, which is the second
-# thing a first attempt got wrong. A stub object is compiled against the
-# tree it is the client of, so tclStubLib.c wants TCL's flags -- see
-# STUBCFLAGS below -- and only tkStubLib.c can use the ones above. Two
-# separate reasons:
+# AND NONE OF THE FOUR BUILDS WITH THIS FILE'S CFLAGS, which took two
+# further attempts to get right. See the TESTCFLAGS block below: the
+# short of it is that CFLAGS empties MODULE_SCOPE, which is fine for
+# tkAppInit.c and wrong for anything that includes tkInt.h or tclInt.h.
 #
-#  1. -I. tclStubLib.c reaches tclInt.h -> tclPort.h -> tclUnixPort.h,
-#     and neither that nor tclConfig.h is on Tk's include path. The
-#     symptom is honest ("tclUnixPort.h: No such file"), so this half
-#     announces itself.
+# The scope of that was misjudged twice. The first attempt used CFLAGS
+# for all four and did not link. The second moved the two STUB files and
+# left tkTest.c and tkSquare.c on CFLAGS -- because the link error named
+# only the stub symbols, and a link error is a poor guide to which
+# objects are wrong: the other two linked and then died at run time,
+# before printing anything.
 #
-#  2. -DMODULE_SCOPE=/***/ IS SILENT AND IS THE DANGEROUS ONE. Emptying
-#     it turns every "MODULE_SCOPE const Tcl_ObjType tclFooType;" in
-#     tclInt.h from an extern DECLARATION into a tentative DEFINITION,
-#     so the object defines them. Measured on the host with nm:
-#
-#	tclStubLib.o, tclsh's flags	 6 symbols -- the wanted ones
-#	tclStubLib.o, this file's flags	38 symbols
-#	tkStubLib.o,  MODULE_SCOPE kept	 6 symbols
-#	tkStubLib.o,  MODULE_SCOPE empty 30 symbols
-#
-#     The extras are tclEmptyString, tclBignumType, tkPhotoImageType,
-#     tkImgFmtGIF, tkMainWindowList and so on -- every one of which
-#     libtcl.a and libtk.a also define, properly initialised. Which
-#     copy the linker keeps is not something to leave to chance: take
-#     the stub object's and Tk has a NULL photo image type. tkStubLib.c
-#     linked anyway in the attempt before this one, so this would have
-#     been a working tktest with quietly wrong image tables.
-#
-# So MODULE_SCOPE is left at its default (extern) for both stub objects,
-# and that is what STUBCFLAGS exists for.
+# **Check every object built against a library for the flags that
+# library was built with, not just the ones the linker complained
+# about.** One "nm | wc -l" per object would have shown all four.
 #
 # WHY IT IS WORTH BUILDING: 448 tests in Tk's suite are SKIPPED for want
 # of these commands -- a third as many again as the 268 that fail --
@@ -158,16 +142,49 @@ tkTestInit.$O: $TKSRC/unix/tkAppInit.c
 	$CC $CFLAGS -DTK_TEST -o $target $TKSRC/unix/tkAppInit.c
 
 tkTest.$O: $TKSRC/generic/tkTest.c
-	$CC $CFLAGS $TKSRC/generic/tkTest.c
+	$CC $TESTCFLAGS $TKSRC/generic/tkTest.c
 
 tkSquare.$O: $TKSRC/generic/tkSquare.c
-	$CC $CFLAGS $TKSRC/generic/tkSquare.c
+	$CC $TESTCFLAGS $TKSRC/generic/tkSquare.c
 
-# The client side of the stub interfaces, compiled against the tree each
-# belongs to. MODULE_SCOPE is deliberately NOT overridden here -- see the
-# measured symbol counts above; emptying it makes these objects define
-# variables that libtcl.a and libtk.a already define for real.
-STUBCFLAGS=\
+# EVERY OBJECT THAT INCLUDES tkInt.h OR tclInt.h USES THESE, not CFLAGS
+# above, and the difference that matters is MODULE_SCOPE.
+#
+# -DMODULE_SCOPE=extern is what sys/src/ape/lib/tk/mkfile:198 and
+# lib/tcl/mkfile:107 build the libraries with, so it is simply the right
+# value; CFLAGS above empties it instead, which turns every
+# "MODULE_SCOPE const Tk_ObjType tkFooType;" in tkInt.h from an extern
+# DECLARATION into a tentative DEFINITION. Measured on the host with nm:
+#
+#	object		CFLAGS above	these flags
+#	tkTest.o	36 symbols	 1   (Tktest_Init)
+#	tkSquare.o	25		 1
+#	tclStubLib.o	38		 6
+#	tkStubLib.o	30		 6
+#
+# The 35 extras in tkTest.o are tkMainWindowList, tkPhotoImageType,
+# tkImgFmtGIF, tkStateStrings, tkTextCharType and the rest -- every one
+# of which libtk.a also defines, initialised. The linker keeps one, and
+# when it kept the zeroed one tktest died before printing anything:
+#
+#	tktest 10315: suicide: sys: trap: fault read addr=0x0 pc=0x5523a1
+#	acid: src(0x5523a1)  ->  ap/arch/amd64/strlen.s:11, REPN SCASB
+#
+# strlen(NULL), which is what a string table that should have been
+# initialised and is all zeroes gives you.
+#
+# CFLAGS above is harmless for the two objects that use it because
+# tkAppInit.c includes tk.h and NOT tkInt.h, so it has no MODULE_SCOPE
+# variable declarations to turn into definitions -- 2 symbols either way,
+# measured. That is exactly why the flag has survived there, and why
+# anything else added to this directory must take TESTCFLAGS instead.
+#
+# The include path differs too, and that half announces itself:
+# tclStubLib.c reaches tclInt.h -> tclPort.h -> tclUnixPort.h, and
+# neither that nor tclConfig.h is on Tk's path. A stub object is
+# compiled against the tree it is the CLIENT of, not the binary it is
+# linked into.
+TESTCFLAGS=\
 	-c\
 	-I$TKSRC/generic\
 	-I$TKSRC/xlib\
@@ -182,14 +199,15 @@ STUBCFLAGS=\
 	-DHAVE_TCL_CONFIG_H\
 	-DHAVE_TK_CONFIG_H\
 	-DPLAN9\
+	-DMODULE_SCOPE=extern\
 	-DWCHAR=char\
 	-DSTATIC_BUILD\
 
 tclStubLib.$O: $TCLSRC/generic/tclStubLib.c
-	$CC $STUBCFLAGS $TCLSRC/generic/tclStubLib.c
+	$CC $TESTCFLAGS $TCLSRC/generic/tclStubLib.c
 
 tkStubLib.$O: $TKSRC/generic/tkStubLib.c
-	$CC $STUBCFLAGS $TKSRC/generic/tkStubLib.c
+	$CC $TESTCFLAGS $TKSRC/generic/tkStubLib.c
 
 clean:V:
 	rm -f *.[$OS] tktest $BIN/$TARG
