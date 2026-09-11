@@ -30,7 +30,7 @@ CFLAGS=\
 	-I$TCLSRC/generic\
 	-I$APEXPROOT/sys/include/ape\
 	-I$APEXPROOT/$objtype/include/ape\
-	-I$APEXPROOT/sys/ape/lib/tcl\
+	-I$APEXPROOT/sys/src/ape/lib/tcl\
 	-DHAVE_TCL_CONFIG_H\
 	-DPLAN9\
 	-DMODULE_SCOPE=/***/\
@@ -69,7 +69,7 @@ tkAppInit.$O: $TKSRC/unix/tkAppInit.c
 #	cd sys/src/ape/cmd/wish && mk tktest
 #	./tktest $home/APExp/sys/lib/tests/tk-runall.tcl >/tmp/tk-all.out >[2=1]
 #
-# The three objects are upstream's TKTEST_OBJS exactly. The
+# The first three objects are upstream's TKTEST_OBJS exactly. The
 # $(@TK_WINDOWINGSYSTEM@_TKTEST_OBJS) it appends is empty for X11 in
 # this Tk, so there is no fourth, platform-specific object to find or
 # write -- worth checking before assuming a test binary needs porting.
@@ -107,6 +107,38 @@ tkAppInit.$O: $TKSRC/unix/tkAppInit.c
 # the next Tk update would silently revert, to avoid compiling two
 # vendored files that already exist and already build clean.
 #
+# AND THEY DO NOT BUILD WITH THIS FILE'S CFLAGS, which is the second
+# thing a first attempt got wrong. A stub object is compiled against the
+# tree it is the client of, so tclStubLib.c wants TCL's flags -- see
+# STUBCFLAGS below -- and only tkStubLib.c can use the ones above. Two
+# separate reasons:
+#
+#  1. -I. tclStubLib.c reaches tclInt.h -> tclPort.h -> tclUnixPort.h,
+#     and neither that nor tclConfig.h is on Tk's include path. The
+#     symptom is honest ("tclUnixPort.h: No such file"), so this half
+#     announces itself.
+#
+#  2. -DMODULE_SCOPE=/***/ IS SILENT AND IS THE DANGEROUS ONE. Emptying
+#     it turns every "MODULE_SCOPE const Tcl_ObjType tclFooType;" in
+#     tclInt.h from an extern DECLARATION into a tentative DEFINITION,
+#     so the object defines them. Measured on the host with nm:
+#
+#	tclStubLib.o, tclsh's flags	 6 symbols -- the wanted ones
+#	tclStubLib.o, this file's flags	38 symbols
+#	tkStubLib.o,  MODULE_SCOPE kept	 6 symbols
+#	tkStubLib.o,  MODULE_SCOPE empty 30 symbols
+#
+#     The extras are tclEmptyString, tclBignumType, tkPhotoImageType,
+#     tkImgFmtGIF, tkMainWindowList and so on -- every one of which
+#     libtcl.a and libtk.a also define, properly initialised. Which
+#     copy the linker keeps is not something to leave to chance: take
+#     the stub object's and Tk has a NULL photo image type. tkStubLib.c
+#     linked anyway in the attempt before this one, so this would have
+#     been a working tktest with quietly wrong image tables.
+#
+# So MODULE_SCOPE is left at its default (extern) for both stub objects,
+# and that is what STUBCFLAGS exists for.
+#
 # WHY IT IS WORTH BUILDING: 448 tests in Tk's suite are SKIPPED for want
 # of these commands -- a third as many again as the 268 that fail --
 # and none of them has ever been measured here. EXPECT THE FAILURE COUNT
@@ -131,11 +163,33 @@ tkTest.$O: $TKSRC/generic/tkTest.c
 tkSquare.$O: $TKSRC/generic/tkSquare.c
 	$CC $CFLAGS $TKSRC/generic/tkSquare.c
 
+# The client side of the stub interfaces, compiled against the tree each
+# belongs to. MODULE_SCOPE is deliberately NOT overridden here -- see the
+# measured symbol counts above; emptying it makes these objects define
+# variables that libtcl.a and libtk.a already define for real.
+STUBCFLAGS=\
+	-c\
+	-I$TKSRC/generic\
+	-I$TKSRC/xlib\
+	-I$TKSRC/plan9\
+	-I$TCLSRC/generic\
+	-I$TCLSRC/plan9\
+	-I$TCLSRC/unix\
+	-I$TCLSRC/libtommath\
+	-I$APEXPROOT/sys/src/ape/lib/tcl\
+	-I$APEXPROOT/sys/include/ape\
+	-I$APEXPROOT/$objtype/include/ape\
+	-DHAVE_TCL_CONFIG_H\
+	-DHAVE_TK_CONFIG_H\
+	-DPLAN9\
+	-DWCHAR=char\
+	-DSTATIC_BUILD\
+
 tclStubLib.$O: $TCLSRC/generic/tclStubLib.c
-	$CC $CFLAGS -DSTATIC_BUILD $TCLSRC/generic/tclStubLib.c
+	$CC $STUBCFLAGS $TCLSRC/generic/tclStubLib.c
 
 tkStubLib.$O: $TKSRC/generic/tkStubLib.c
-	$CC $CFLAGS -DSTATIC_BUILD $TKSRC/generic/tkStubLib.c
+	$CC $STUBCFLAGS $TKSRC/generic/tkStubLib.c
 
 clean:V:
 	rm -f *.[$OS] tktest $BIN/$TARG

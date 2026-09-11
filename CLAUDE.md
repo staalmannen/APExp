@@ -2373,6 +2373,44 @@ compiling two vendored files that already exist and already build
 clean. **Prefer the link over the patch** whenever the missing symbols
 turn out to live in a file the upstream tree already ships.
 
+**A STUB OBJECT IS COMPILED AGAINST THE TREE IT IS THE CLIENT OF, not
+against the binary it is being linked into.** This is the second thing
+a first attempt got wrong, and half of it is silent. Both stub files
+were built with `cmd/wish/mkfile`'s `CFLAGS`, and they must not be:
+
+- **The include path.** `tclStubLib.c` reaches `tclInt.h` ->
+  `tclPort.h` -> `tclUnixPort.h`, and neither that nor `tclConfig.h` is
+  on Tk's. It needs `$TCLSRC/plan9`, `$TCLSRC/unix`,
+  `$TCLSRC/libtommath` and `sys/src/ape/lib/tcl`, which is what
+  `cmd/tclsh/mkfile` passes. This half announces itself --
+  `tclUnixPort.h: No such file`.
+- **`-DMODULE_SCOPE=/***/`, and this one does not.** Emptying it turns
+  every `MODULE_SCOPE const Tcl_ObjType tclFooType;` in `tclInt.h` from
+  an extern *declaration* into a tentative *definition*, so the object
+  defines them. Measured on the build host with `nm`:
+
+| object | flags | symbols |
+|---|---|---|
+| `tclStubLib.o` | tclsh's | **6** |
+| `tclStubLib.o` | wish's | 38 |
+| `tkStubLib.o` | `MODULE_SCOPE` kept | **6** |
+| `tkStubLib.o` | `MODULE_SCOPE` empty | 30 |
+
+The extras are `tclEmptyString`, `tclBignumType`, `tkPhotoImageType`,
+`tkImgFmtGIF`, `tkMainWindowList` and the rest -- every one of which
+`libtcl.a` and `libtk.a` also define, properly initialised. Which copy
+the linker keeps is not a thing to leave to chance: take the stub
+object's and Tk has a **NULL photo image type**. `tkStubLib.c` linked
+anyway in the attempt before this one, so that would have been a
+working `tktest` with quietly wrong image tables -- a fault that would
+have surfaced as image tests failing and been chased in `plan9/`.
+
+So `STUBCFLAGS` in `cmd/wish/mkfile` carries both trees' include paths
+and leaves `MODULE_SCOPE` at its default, and the two stub objects use
+it. **`nm` on the host settles this class of question in one command**
+and is worth reaching for whenever an object is compiled with flags it
+was not written for.
+
 What it unlocks, from the skip tally of run 6:
 
 | constraint | tests |
@@ -2428,6 +2466,13 @@ test binary is built differently and nothing says so. That is the
 `HFILES` lesson in another form, and on this build system a
 configuration that drifts is expensive to diagnose. **Put a test binary
 in the directory whose flags it shares.**
+
+**But read that rule with the stub note above beside it**, because as
+first written it was too simple and it is what produced the second bad
+attempt. `tktest` shares wish's flags for the three Tk objects and
+*does not* for `tclStubLib.c`, which belongs to the other tree. "The
+directory whose flags it shares" is the right home for a test binary;
+it does not follow that every object in it takes the same flags.
 
 No object collides between the two targets in `cmd/wish`: `tkAppInit.$O`
 is wish's and `tkTestInit.$O` is tktest's, from the same source built
