@@ -7,7 +7,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-11 10:58:53 +0200
+Tests began at 2026-09-11 11:33:39 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -2052,6 +2052,29 @@ textTag.test
 textWind.test
 
 
+==== textWind-10.8 EmbWinLayoutProc procedure, error in creating window FAILED
+==== Contents of test case:
+
+    .t insert 1.0 "Some sample text"
+    .t window create 1.5 -create {
+	toplevel .t2 -width 100 -height 150
+	wm geom .t2 +0+0
+	concat .t2
+    }
+    set msg {}
+    update
+    set i 0
+    while {[llength $msg] == 1 && [incr i] < 200} { update }
+    return $msg
+
+---- Result was:
+{{can't embed .t2 relative to .t}}
+---- Result should have been (exact matching):
+{{can't embed .t2 relative to .t}} {{window name "t2" already exists in parent}}
+==== textWind-10.8 FAILED
+
+
+
 ==== textWind-12.1 EmbWinUndisplayProc procedure, mapping/unmapping FAILED
 ==== Contents of test case:
 
@@ -2167,7 +2190,7 @@ unixEmbed.test
     }
 
 ---- Result was:
-couldn't create child of window "0x5749"
+couldn't create child of window "0x575e"
 ---- Result should have been (exact matching):
 {{XXX {} {} .t}} 0
 ==== unixEmbed-1.5 FAILED
@@ -2223,7 +2246,7 @@ couldn't create child of window "0x5749"
     }
 
 ---- Result was:
-couldn't create child of window "0x5753"
+couldn't create child of window "0x5764"
 ---- Result should have been (exact matching):
 {XXX {} {} .t2} {XXX {} {} .t1}
 ==== unixEmbed-1.6 FAILED
@@ -2366,7 +2389,7 @@ testembed not supported on Plan 9
     }
 
 ---- Result was:
-couldn't create child of window "0x5768"
+couldn't create child of window "0x5773"
 ---- Result should have been (exact matching):
 
 ==== unixEmbed-2.2 FAILED
@@ -2851,7 +2874,7 @@ can't read "x": no such variable
     }
 
 ---- Result was:
-couldn't create child of window "0x5813"
+couldn't create child of window "0x581d"
 ---- Result should have been (exact matching):
 {{configure .t1 300 120}} 300x120+0+0
 ==== unixEmbed-6.1 FAILED
@@ -2876,7 +2899,7 @@ couldn't create child of window "0x5813"
     }
 
 ---- Result was:
-couldn't create child of window "0x5825"
+couldn't create child of window "0x582c"
 ---- Result should have been (exact matching):
 {{configure .t1 200 200}} 200x200+0+0
 ==== unixEmbed-6.2 FAILED
@@ -3175,7 +3198,7 @@ couldn't create child of window "0x5825"
     }
 
 ---- Result was:
-couldn't create child of window "0x5875"
+couldn't create child of window "0x587a"
 ---- Result should have been (exact matching):
 {{XXX {} {} .t1}} {}
 ==== unixEmbed-9.2 FAILED
@@ -4360,8 +4383,8 @@ in expression "0xa & _@_"
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
 ---- errorInfo: missing operand at _@_
-in expression "0x5b08 - _@_"
-    (parsing expression "0x5b08 - ")
+in expression "0x5b12 - _@_"
+    (parsing expression "0x5b12 - ")
     invoked from within
 "expr [testwrapper .t] - $transient"
     ("uplevel" body line 10)
@@ -4610,26 +4633,4 @@ in expression ""
 52 7 12 62
 ==== unixWm-49.2 FAILED
 
-
-
-==== unixWm-50.1 Tk_CoordsToWindow procedure, finding a toplevel, x-coords, title bar FAILED
-==== Contents of test case:
-
-    update
-    toplevel .t -width 300 -height 400 -bg green
-    wm geom .t +100+100
-    tkwait visibility .t
-    toplevel .t2 -width 100 -height 200 -bg red
-    wm geom .t2 +200+200
-    tkwait visibility .t2
-    raise .t2
-    update
-    set x [winfo rootx .t]
-    set y [winfo rooty .t]
-    list [winfo containing [expr $x - 30]  [expr $y + 250]]  [winfo containing [expr $x - 1]   [expr $y + 250]]  [winfo containing $x              [expr $y + 250]]  [winfo containing [expr $x + 99]  [expr $y + 250]]  [winfo containing [expr $x + 100] [expr $y + 250]]  [winfo containing [expr $x + 150] [expr $y + 90]]  [winfo containing [expr $x + 199] [expr $y + 250]]  [winfo containing [expr $x + 200] [expr $y + 250]]  [winfo containing [expr $x + 220] [expr $y + 250]]  
----- Result was:
-{} {} .t .t .t2 .t .t2 .t .t
----- Result should have been (exact matching):
-{} {} .t {} .t2 {} .t2 {} .t
-==== unixWm-50.1 FAILED
-
+tktest 17077: suicide: sys: trap: fault write addr=0x3a3a79007393 pc=0x2d1856
