@@ -7,7 +7,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-11 11:47:42 +0200
+Tests began at 2026-09-11 15:01:04 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -2167,43 +2167,10 @@ unixEmbed.test
     }
 
 ---- Result was:
-couldn't create child of window "0x575e"
+couldn't create child of window "0x575f"
 ---- Result should have been (exact matching):
 {{XXX {} {} .t}} 0
 ==== unixEmbed-1.5 FAILED
-
-
-
-==== unixEmbed-1.5a Tk_UseWindow procedure, creating Container records FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    frame .f2 -container 1 -width 200 -height 50
-    pack .f1 .f2
-    child alias w winfo id .f1
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t -use [w]
-	list [testembed] [expr {[lindex [lindex [testembed all] 0] 0] - [w]}]
-    }
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: testembed not supported on Plan 9
-    while executing
-"testembed"
-    ("interp eval" body line 4)
-    invoked from within
-"child eval {
-	destroy {*}[winfo children .]
-	toplevel .t -use [w]
-	list [testembed] [expr {[lindex [lindex [testembed all] 0] 0] - [w]}]
-    }"
-    ("uplevel" body line 6)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== unixEmbed-1.5a FAILED
 
 
 
@@ -2223,131 +2190,10 @@ couldn't create child of window "0x575e"
     }
 
 ---- Result was:
-couldn't create child of window "0x5768"
+couldn't create child of window "0x5769"
 ---- Result should have been (exact matching):
 {XXX {} {} .t2} {XXX {} {} .t1}
 ==== unixEmbed-1.6 FAILED
-
-
-
-==== unixEmbed-1.6a Tk_UseWindow procedure, creating Container records FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    frame .f2 -container 1 -width 200 -height 50
-    pack .f1 .f2
-    child alias w1 winfo id .f1
-    child alias w2 winfo id .f2
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	toplevel .t2 -use [w2]
-	testembed
-    }
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: testembed not supported on Plan 9
-    while executing
-"testembed"
-    ("interp eval" body line 5)
-    invoked from within
-"child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	toplevel .t2 -use [w2]
-	testembed
-    }"
-    ("uplevel" body line 7)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== unixEmbed-1.6a FAILED
-
-
-
-==== unixEmbed-1.7 Tk_UseWindow procedure, container and embedded in same app FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    frame .f2 -container 1 -width 200 -height 50
-    pack .f1 .f2
-    toplevel .t1 -use [winfo id .f1]
-    toplevel .t2 -use [winfo id .f2]
-    testembed
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: testembed not supported on Plan 9
-    while executing
-"testembed"
-    ("uplevel" body line 7)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== unixEmbed-1.7 FAILED
-
-
-
-==== unixEmbed-2.1 EmbeddedEventProc procedure FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    childTkProcess eval "set w1 [winfo id .f1]"
-    childTkProcess eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use $w1
-	testembed
-    }
-    destroy .f1
-    update
-    childTkProcess eval {
-	testembed
-    }
-
----- Result was:
-testembed not supported on Plan 9
----- Result should have been (exact matching):
-
-==== unixEmbed-2.1 FAILED
-
-
-
-==== unixEmbed-2.1a EmbeddedEventProc procedure FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    child alias w1 winfo id .f1
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	testembed
-    }
-    destroy .f1
-    update
-    child eval {
-	testembed
-    }
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: testembed not supported on Plan 9
-    while executing
-"testembed"
-    ("interp eval" body line 4)
-    invoked from within
-"child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	testembed
-    }"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== unixEmbed-2.1a FAILED
 
 
 
@@ -2366,69 +2212,10 @@ testembed not supported on Plan 9
     }
 
 ---- Result was:
-couldn't create child of window "0x577d"
+couldn't create child of window "0x577f"
 ---- Result should have been (exact matching):
 
 ==== unixEmbed-2.2 FAILED
-
-
-
-==== unixEmbed-2.2a EmbeddedEventProc procedure FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    child alias w1 winfo id .f1
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	testembed
-	destroy .t1
-	testembed
-    }
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: testembed not supported on Plan 9
-    while executing
-"testembed"
-    ("interp eval" body line 4)
-    invoked from within
-"child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	testembed
-	destroy .t1
-	testembed
-    }"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== unixEmbed-2.2a FAILED
-
-
-
-==== unixEmbed-2.3 EmbeddedEventProc procedure FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    toplevel .t1 -use [winfo id .f1]
-    update
-    destroy .f1
-    testembed
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: testembed not supported on Plan 9
-    while executing
-"testembed"
-    ("uplevel" body line 7)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== unixEmbed-2.3 FAILED
 
 
 
@@ -2443,43 +2230,11 @@ couldn't create child of window "0x577d"
     update
     list $x [winfo exists .t1] [winfo exists .f1] [testembed]
 
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: testembed not supported on Plan 9
-    while executing
-"testembed"
-    ("uplevel" body line 4)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
+---- Result was:
+{{XXX .f1 {} .t1}} 0 1 {{XXX .f1 {} {}}}
+---- Result should have been (exact matching):
+{{XXX .f1 {} .t1}} 0 0 {}
 ==== unixEmbed-2.4 FAILED
-
-
-
-==== unixEmbed-3.1a ContainerEventProc procedure, detect creation FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    child alias w1 winfo id .f1
-    set x [testembed]
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	wm withdraw .t1
-    }
-    list $x [testembed]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: testembed not supported on Plan 9
-    while executing
-"testembed"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== unixEmbed-3.1a FAILED
 
 
 
@@ -2680,44 +2435,11 @@ bad window path name ".t1"
     update
     list $x [testembed]
 
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: testembed not supported on Plan 9
-    while executing
-"testembed"
-    ("uplevel" body line 10)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
+---- Result was:
+{{XXX .f1 {} {}}} {}
+---- Result should have been (exact matching):
+{{XXX .f1 XXX {}}} {}
 ==== unixEmbed-4.2 FAILED
-
-
-
-==== unixEmbed-4.2a EmbedStructureProc procedure, destroy events FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    update
-    child alias w1 winfo id .f1
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-    }
-    set x [testembed]
-    destroy .f1
-    list $x [testembed]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: testembed not supported on Plan 9
-    while executing
-"testembed"
-    ("uplevel" body line 10)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== unixEmbed-4.2a FAILED
 
 
 
@@ -2851,7 +2573,7 @@ can't read "x": no such variable
     }
 
 ---- Result was:
-couldn't create child of window "0x5828"
+couldn't create child of window "0x5834"
 ---- Result should have been (exact matching):
 {{configure .t1 300 120}} 300x120+0+0
 ==== unixEmbed-6.1 FAILED
@@ -2876,7 +2598,7 @@ couldn't create child of window "0x5828"
     }
 
 ---- Result was:
-couldn't create child of window "0x583a"
+couldn't create child of window "0x5846"
 ---- Result should have been (exact matching):
 {{configure .t1 200 200}} 200x200+0+0
 ==== unixEmbed-6.2 FAILED
@@ -3129,35 +2851,6 @@ couldn't create child of window "0x583a"
 
 
 
-==== unixEmbed-9.1 EmbedWindowDeleted procedure, check parentPtr FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    frame .f2 -container 1 -width 200 -height 50
-    frame .f3 -container 1 -width 200 -height 50
-    frame .f4 -container 1 -width 200 -height 50
-    pack .f1 .f2 .f3 .f4
-    set x {}
-    lappend x [testembed]
-    foreach w {.f3 .f4 .f1 .f2} {
-	destroy $w
-	lappend x [testembed]
-    }
-    set x
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: testembed not supported on Plan 9
-    while executing
-"testembed"
-    ("uplevel" body line 8)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== unixEmbed-9.1 FAILED
-
-
-
 ==== unixEmbed-9.2 EmbedWindowDeleted procedure, check embeddedPtr FAILED
 ==== Contents of test case:
 
@@ -3175,46 +2868,10 @@ couldn't create child of window "0x583a"
     }
 
 ---- Result was:
-couldn't create child of window "0x588a"
+couldn't create child of window "0x5896"
 ---- Result should have been (exact matching):
 {{XXX {} {} .t1}} {}
 ==== unixEmbed-9.2 FAILED
-
-
-
-==== unixEmbed-9.2a EmbedWindowDeleted procedure, check embeddedPtr FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    child alias w1 winfo id .f1
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1] -highlightthickness 2 -bd 2 -relief sunken
-	set x {}
-	lappend x [testembed]
-	destroy .t1
-	lappend x [testembed]
-    }
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: testembed not supported on Plan 9
-    while executing
-"testembed"
-    ("interp eval" body line 5)
-    invoked from within
-"child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1] -highlightthickness 2 -bd 2 -relief sunken
-	set x {}
-	lappend x [testembed]
-	destr..."
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: NONE
-==== unixEmbed-9.2a FAILED
 
 unixFont.test
 
@@ -4336,8 +3993,8 @@ in expression "0xa & _@_"
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
 ---- errorInfo: missing operand at _@_
-in expression "0x5b20 - _@_"
-    (parsing expression "0x5b20 - ")
+in expression "0x5b2c - _@_"
+    (parsing expression "0x5b2c - ")
     invoked from within
 "expr [testwrapper .t] - $transient"
     ("uplevel" body line 10)
@@ -5569,8 +5226,8 @@ pack {} wm {}
 
 xmfbox.test
 
-Tests ended at 2026-09-11 11:49:58 +0200
-all.tcl:	Total	10027	Passed	8877	Skipped	924	Failed	226
+Tests ended at 2026-09-11 15:03:20 +0200
+all.tcl:	Total	10027	Passed	8888	Skipped	924	Failed	215
 Sourced 97 Test Files.
 Files with failing tests: clipboard.test event.test filebox.test focus.test font.test frame.test geometry.test imgPhoto.test pack.test pkgconfig.test place.test select.test systray.test text.test textDisp.test textImage.test textTag.test textWind.test tk.test unixEmbed.test unixFont.test unixSelect.test unixWm.test visual.test winWm.test winfo.test wm.test
 Number of tests skipped for each constraint:
