@@ -2475,6 +2475,31 @@ was built with, not just the ones the linker complained about.** One
 `nm -g --defined-only x.o | wc -l` per object answers it, and it is the
 cheapest check in this whole file -- no VM, no link, one second.
 
+**AND THEN CHECK THAT THE FIX WAS IN THE BINARY BEFORE READING THE NEXT
+RUN.** The round after that one, `tktest` failed at the same
+`strlen(NULL)` with the pc moved by nineteen bytes, and the obvious
+reading -- "the flags fix was necessary but not sufficient, so the Tk
+stub table must be at fault too" -- was wrong. The commit carrying
+`TESTCFLAGS` had **not been merged**; the build under test still had
+`tkTest.c` on `CFLAGS`. The pc had moved because a *different* commit,
+the one before it, changed those objects' sizes.
+
+That nearly cost a reversal of a correct decision: three rounds of
+inference had made "disable the stubs under `#ifdef PLAN9`" look like
+the pragmatic call, and it was written and then thrown away again. It
+is the ramp-test mistake from the window-table section in another form
+-- *a measurement of a build that does not contain the change measures
+nothing* -- and the pc moving is exactly the kind of detail that makes
+a stale build look like a fresh one.
+
+```sh
+git merge-base --is-ancestor <fix> origin/main && echo in || echo NOT in
+```
+
+One command, before reading any result, whenever the build happens
+somewhere this session cannot see.
+
+
 What it unlocks, from the skip tally of run 6:
 
 | constraint | tests |
