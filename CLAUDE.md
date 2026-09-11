@@ -2498,7 +2498,16 @@ Tk owns the order and always has: `parentPtr->childList`, lowest first
 back to the slot walk when `Tk_IdToWindow` cannot answer -- during
 teardown it returns NULL for a window this table still has. The comment
 claiming "the order of the events is the stacking" is true now rather
-than accidentally true.
+than accidentally true, and the third run confirms it: **`ok: .fa
+repaints last, so the raise is visible`**.
+
+**The script checks rather than advises now.** Sections 2 and 4 used to
+print a paragraph explaining how to read their own output -- what the
+rectangle ought to be, what an empty relayout would mean. That is one
+more thing to get wrong at two in the morning, so they assert instead:
+the rectangle must be smaller than the widget, the relayout must be
+empty, and `.fa` must repaint after `.fb`. They say `ok` or
+`REGRESSION` and name what to look at only when something is wrong.
 
 **A check that cannot fail is not a check**, and the first run of this
 script had one: its `build` proc *assigned* `tk_textRelayout`, so the

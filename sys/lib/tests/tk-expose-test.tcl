@@ -89,9 +89,15 @@
 # done nothing visible. P9ExposeRectStacked walks
 # parentPtr->childList instead, which is Tk's own order, lowest first.
 #
-# SO KEEP SECTION 4, and read its order rather than just its presence:
-# .fa must come after .fb in the list whichever way round they were
-# created.
+# THIRD RUN CONFIRMS IT: "ok: .fa repaints last, so the raise is
+# visible", now by construction rather than by luck.
+#
+# THIS FILE CHECKS RATHER THAN ADVISES, from here on. Sections 2 and 4
+# used to print instructions for reading their own output, which is one
+# more thing to get wrong at 2am; they now say "ok" or "REGRESSION" and
+# name what to look at only when something is wrong. Section 4 reads the
+# ORDER, not the presence: .fa must come after .fb whichever way round
+# they were created.
 #
 # The first run could not measure the redraw half at all:
 # tk_textRelayout and tk_textRedraw are only recorded while the widget's
@@ -189,18 +195,29 @@ if {[llength $e] == 0} {
     puts "     was written to fix. Destroying a window is leaving its"
     puts "     pixels on screen again."
 } else {
-    set r [lindex $e 0]
-    puts "  => an Expose reached .t: $r"
-    puts "     .t is [winfo width .t]x[winfo height .t]. The rectangle should"
-    puts "     be .f2's, not the whole widget -- .f2 was 60% x 55% of .t"
-    puts "     placed at 20%,22%, so roughly 148x59 at +49+23."
-    puts "     Whole-widget means P9ExposeRect's clipping is wrong."
-    puts ""
-    puts "     Then read the relayout line above. X relays out NOTHING"
-    puts "     here and redraws six display lines; a full relayout means"
-    puts "     the second cause behind textDisp-7.1 is still there and is"
-    puts "     NOT the Expose -- look for a ConfigureNotify on .t or a"
-    puts "     geometry re-request from place forgetting the slave."
+    # CHECK the rectangle and the relayout rather than printing advice
+    # about them. .f2 was 60% x 55% of .t placed at 20%,22%, so the
+    # damage must be roughly that box -- a whole-widget rectangle means
+    # P9ExposeRect's clipping is wrong -- and X relays out NOTHING here,
+    # so a non-empty relayout means the second cause behind textDisp-7.1
+    # is still present and is not the Expose.
+    lassign [lindex $e 0] w rx ry rw rh
+    set tw [winfo width .t]; set th [winfo height .t]
+    puts "  => an Expose reached .t: [lindex $e 0]  (.t is ${tw}x${th})"
+    if {$rw >= $tw && $rh >= $th} {
+	puts "     REGRESSION: that is the WHOLE widget. P9ExposeRect is not"
+	puts "     clipping to the departing window's rectangle."
+    } else {
+	puts "     ok: partial damage, roughly .f2's box"
+    }
+    set rl [expr {[info exists ::tk_textRelayout] ? $::tk_textRelayout : {n/a}}]
+    if {$rl eq ""} {
+	puts "     ok: relayout is empty, which is what X does"
+    } else {
+	puts "     REGRESSION: relayout is '$rl'. X relays out nothing here."
+	puts "     Look for a ConfigureNotify on .t, or a geometry"
+	puts "     re-request from place forgetting the slave."
+    }
 }
 
 puts ""
