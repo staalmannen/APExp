@@ -1951,8 +1951,99 @@ concept of the thing being asked about.
 
 **So unixWm's floor is about 38 of 44** -- 28 properties, 10 menubar
 (the second of which needs a wrapper, a change that gives every toplevel
-in the port an extra window) -- with the 5 colormapwindows as the one
-remaining cluster that is cheap-ish and genuinely ours.
+in the port an extra window).
+
+#### wm.test's 14, read the same way -- three more fixed
+
+Batched into the same rebuild rather than spending a round trip on four
+tests. `wm.test` had not been read since `tktest` arrived either:
+
+| | |
+|---|---|
+| **7** | `wm-transient-*` |
+| **7** | `wm-manage-*` and `wm-forget-2` -- the deliberate no-ops recorded above; real generic-Tk reparenting |
+| **4** | `wm-stackorder-*` |
+| **1** | `wm-colormapwindows-2.1` |
+
+**`wm stackorder isabove|isbelow` walked from the wrong root** -- three
+tests, all reporting `TkWmStackorderToplevel failed`, which is this
+port's own message for "one of the two windows was not in the list".
+
+The collector was never at fault. **Upstream calls it from two
+different roots and means to**: `tkUnixWm.c:3307` passes the *named*
+window for `wm stackorder .t`, whose answer is that window's own
+subtree, and `tkUnixWm.c:3359` passes `winPtr->mainPtr->winPtr` for
+`isabove`/`isbelow`, because **the two windows being compared need not
+be related at all**. Passing the named window for both meant
+`wm stackorder .t isabove .` walked `.t` and its children, `.` was not
+among them, the index came back -1, and the code read that as the
+collector having failed. `wm-stackorder-4.3`, `4.4`, `5.3`.
+
+**`TkWmMapWindow` mapped a toplevel that was already withdrawn.**
+`wm-transient-3.1` and `4.1` reported `wm state` = `withdrawn` beside
+`winfo ismapped` = **1**, which is a contradiction on its face.
+
+The note above says only the state at the moment of the `wm transient`
+call is honoured, and that upstream additionally *tracks* the master
+afterwards. Both true, and **they skipped the case in between**, which
+is upstream's own and is three lines of `TkWmMapWindow`:
+
+```c
+if (wmPtr->containerPtr != NULL) {
+    /* Don't map a transient if the container is not mapped. */
+    if (!Tk_IsMapped(wmPtr->containerPtr)) {
+	wmPtr->withdrawn = 1;
+	wmPtr->hints.initial_state = WithdrawnState;
+    }
+```
+
+The test creates `.subject` (unmapped), makes it transient to a
+withdrawn master, and lets the idle queue map it. At the moment of the
+`wm transient` there was nothing to unmap -- `TK_MAPPED` was not set, so
+`TkpWmSetState` found nothing to do -- and the map then went ahead
+regardless. **The check belongs at map time, against the master's
+current state**, not only at the call. A general `wmPtr->withdrawn`
+guard went in beside it, which is upstream's `hints.initial_state ==
+WithdrawnState` return in this port's vocabulary; `wm deiconify` clears
+`withdrawn` before asking for the map, so the ordinary path is
+untouched.
+
+**`wm colormapwindows` reported windows that had been destroyed.** The
+setter already refuses a name that cannot be resolved -- the rule this
+section states twice -- but the list is kept as a *string*, so the
+invariant broke the moment a listed window died and nothing noticed.
+`wm colormapwindows .t .t.f2; destroy .t.f2` went on naming `.t.f2`
+(`unixWm-53.2`). Upstream keeps a `TkWindow` array and drops the entry
+from `TkWmRemoveFromColormapWindows`; **filtering on read** reaches the
+same answer with no second copy of the window set to keep in step, and
+cannot go stale between a destroy and the next query.
+
+**The other four colormapwindows tests are NOT ours, and the reason is
+one line of the port.** `unixWm-52.2`, `52.3`, `53.1` and
+`wm-colormapwindows-2.1` all turn on `-colormap new`, and
+
+```c
+XCreateColormap(...)  { return DefaultColormap(display, DefaultScreen(display)); }
+```
+
+There is one visual here and `XAllocColor` packs an RGB triple without
+allocating anything, so **`-colormap new` genuinely does not produce a
+distinct colormap** and generic Tk is *correct* not to call
+`TkWmAddToColormapWindows`. Minting distinct colormap ids to satisfy
+the tests would be inventing a resource nothing installs -- the
+`systray` mistake again. `WM_COLORMAP_WINDOWS` is in any case a property
+the window manager reads, so it belongs with the 28 above.
+
+**Still open in `wm.test`, and both are real work rather than
+oversights:** the four remaining `wm-transient-*` (`3.3`, `4.3`, `5.1`,
+`8.1`) want the master *tracked* after the fact -- withdraw the master
+and the transient must follow -- which is the structure handler upstream
+registers and this port still does not; and `wm manage`/`wm forget`,
+seven tests, are generic-Tk reparenting.
+
+`focus-2.*` is deliberately untouched. It is `TkFocusFilterEvent`, and
+the warning three sections down stands: getting the mode and detail
+wrong there is how `bind.test` went from 3 failures to 116.
 
 `focus.test` 1 -> 11 and `winfo.test` 4 -> 5 are newly *measured*, not
 newly broken. Worth noting for later: `focus-6.1`, "embedded application

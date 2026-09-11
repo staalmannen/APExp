@@ -1677,7 +1677,42 @@ TkWmMapWindow(TkWindow *winPtr)
     if (wmPtr != NULL && (wmPtr->flags & WM_NEVER_MAPPED)) {
 	wmPtr->flags &= ~WM_NEVER_MAPPED;
 	WmUpdateGeometry(winPtr);
+
+	/*
+	 * A TRANSIENT IS NOT MAPPED WHILE ITS MASTER IS NOT, AND THE
+	 * TEST IS MADE HERE RATHER THAN WHEN "wm transient" WAS CALLED.
+	 *
+	 * The note under Tk_WmObjCmd says only the state at the moment
+	 * of the call is honoured, and that upstream additionally
+	 * *tracks* the master afterwards. Both are true, but they
+	 * skipped the case in between, which is upstream's own and is
+	 * three lines: `toplevel .subject` is created unmapped, made
+	 * transient to a withdrawn master, and mapped by the idle queue
+	 * afterwards. At the moment of the `wm transient` there was
+	 * nothing to unmap -- TK_MAPPED was not set yet, so
+	 * TkpWmSetState found nothing to do -- and the map then went
+	 * ahead regardless. `wm state` said withdrawn while
+	 * `winfo ismapped` said 1 (wm-transient-3.1, 4.1).
+	 *
+	 * tkUnixWm.c's TkWmMapWindow does it in the same place, guarded
+	 * on containerPtr and phrased the same way: "Don't map a
+	 * transient if the container is not mapped."
+	 */
+	if (wmPtr->container != NULL
+		&& !Tk_IsMapped((Tk_Window) wmPtr->container))
+	    wmPtr->withdrawn = 1;
     }
+
+    /*
+     * A withdrawn toplevel is not mapped, whoever asked. Upstream
+     * returns here on hints.initial_state == WithdrawnState; this port
+     * keeps the same fact in wmPtr->withdrawn, which "wm deiconify"
+     * clears before it asks for the map, so the ordinary path is
+     * unaffected.
+     */
+    if (wmPtr != NULL && wmPtr->withdrawn)
+	return;
+
     if (winPtr->flags & TK_MAPPED)
 	return;
     winPtr->flags |= TK_MAPPED;
@@ -2847,7 +2882,23 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
                     "window ?isabove|isbelow window?");
             return TCL_ERROR;
         }
-        windows = TkWmStackorderToplevel(winPtr);
+        /*
+         * THE TWO FORMS WALK FROM DIFFERENT ROOTS, AND UPSTREAM MEANS
+         * THEM TO. tkUnixWm.c:3307 passes the named window for
+         * "wm stackorder .t" -- the answer is that window's own
+         * subtree -- and tkUnixWm.c:3359 passes
+         * winPtr->mainPtr->winPtr for isabove/isbelow, because the two
+         * windows being compared need not be related at all.
+         *
+         * Passing the named window for both is why
+         * "wm stackorder .t isabove ." reported
+         * "TkWmStackorderToplevel failed": the walk covered `.t` and
+         * its children, `.` is not among them, so the second index came
+         * back -1 and the code read that as the collector having
+         * failed. wm-stackorder-4.3, 4.4, 5.3.
+         */
+        windows = TkWmStackorderToplevel(
+                (objc == 5) ? winPtr->mainPtr->winPtr : winPtr);
         if (windows == NULL)
             return TCL_ERROR;
         if (objc == 3) {
@@ -3086,8 +3137,45 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
         }
         if (wmPtr == NULL)
             return TCL_OK;
-        if (objc == 3)
-            return WmReturnString(interp, wmPtr->cmapWindows);
+        if (objc == 3) {
+            /*
+             * A WINDOW THAT HAS BEEN DESTROYED IS NOT IN THE LIST ANY
+             * MORE, and this used to report it for ever.
+             *
+             * The setter above already refuses a name that cannot be
+             * resolved, on the rule stated in the wm section: accepting
+             * one is the same class of lie as answering the empty
+             * string. That invariant breaks the moment a listed window
+             * dies, and the list is kept as a string, so nothing
+             * noticed -- `wm colormapwindows .t .t.f2; destroy .t.f2`
+             * went on naming `.t.f2` (unixWm-53.2).
+             *
+             * Upstream keeps a TkWindow array and drops the entry from
+             * TkWmRemoveFromColormapWindows as the window is destroyed.
+             * Filtering on read reaches the same answer with no second
+             * copy of the window set to keep in step, and it cannot go
+             * stale between a destroy and the next query.
+             */
+            Tcl_Obj *stored, *out, **el;
+            Tcl_Size n, i;
+
+            if (wmPtr->cmapWindows == NULL)
+                return TCL_OK;
+            stored = Tcl_NewStringObj(wmPtr->cmapWindows, -1);
+            Tcl_IncrRefCount(stored);
+            if (Tcl_ListObjGetElements(NULL, stored, &n, &el) != TCL_OK) {
+                Tcl_DecrRefCount(stored);
+                return WmReturnString(interp, wmPtr->cmapWindows);
+            }
+            out = Tcl_NewObj();
+            for (i = 0; i < n; i++)
+                if (Tk_NameToWindow(NULL, Tcl_GetString(el[i]),
+                        (Tk_Window) clientData) != NULL)
+                    Tcl_ListObjAppendElement(NULL, out, el[i]);
+            Tcl_DecrRefCount(stored);
+            Tcl_SetObjResult(interp, out);
+            return TCL_OK;
+        }
         {
             Tcl_Size n, i;
             Tcl_Obj **el;
