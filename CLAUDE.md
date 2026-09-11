@@ -1735,21 +1735,23 @@ table below is the whole thing, and the list has been re-derived rather
 than extended.
 
 ```
-all.tcl:  Total 10027  Passed 8877  Skipped 924  Failed 226
+all.tcl:  Total 10027  Passed 8888  Skipped 924  Failed 215
 Sourced 97 Test Files.
 ```
 
-**That is run 10, under `tktest`, and it is the first complete run of
-the whole suite with Tk's own test commands available.** Read it against
-run 7 -- the last complete `wish` run -- one column at a time rather
-than by the total:
+**That is run 11. Run 10 was the first complete run under `tktest`**,
+and is the one to read against run 7 -- the last complete `wish` run --
+one column at a time rather than by the total:
 
-| | run 7 (`wish`) | run 10 (`tktest`) | |
+| | run 7 (`wish`) | run 10 (`tktest`) | run 11 |
 |---|---|---|---|
-| Total | 10027 | 10027 | the same suite |
-| **Skipped** | 1429 | **924** | **505 newly measured** |
-| **Passed** | 8427 | **8877** | +450 |
-| **Failed** | 171 | **226** | +55 |
+| Total | 10027 | 10027 | 10027 |
+| **Skipped** | 1429 | **924** | 924 |
+| **Passed** | 8427 | **8877** | **8888** |
+| **Failed** | 171 | **226** | **215** |
+
+Run 10 -> 11 is the `testembed` work below: eleven moved from failed to
+passed, nothing else changed at all.
 
 **The count rose by 55 and nothing regressed.** Of the 505 tests that
 had never run here, **450 pass**. That is the "expect the failure count
@@ -1770,6 +1772,9 @@ Attributed by file, which is the comparison that actually settles it:
 | `focus.test` | 1 | 1 | 1 | 1 | **11** |
 | `winfo.test` | 6 | 4 | 4 | 4 | **5** |
 | everything else | 42 | 46 | 46 | 46 | 47 |
+
+Run 11 changes exactly one cell of that table -- `unixEmbed` 38 -> **27**
+-- and no other file moves by a single test.
 
 **The whole of the +55 is in four files, and the long tail did not
 move** (46 -> 47, and that one is `systray`/`sysnotify` splitting into
@@ -1827,6 +1832,218 @@ implementations, not to be better than them.**
 **Do not expect all eleven to pass**: several also need a second wish
 somewhere in the same test, and the count that matters is the next run,
 per file. `1.7` and `2.3` are the two that should go outright.
+
+**ALL ELEVEN PASSED, AND ONE OF THEM WAS IN THE OTHER BUCKET.** Run 11:
+
+```
+all.tcl:  Total 10027  Passed 8888  Skipped 924  Failed 215
+```
+
+Failed 226 -> 215, Passed 8877 -> 8888, Skipped identical -- and the
+per-file table moved in **exactly one line**, `unixEmbed` 38 -> 27, with
+nothing else changing by a single test and nothing newly failing. The
+eleven are `1.5a 1.6a 1.7 2.1 2.1a 2.2a 2.3 3.1a 4.2a 9.1 9.2a`.
+
+`unixEmbed-2.1` is the interesting one: it was filed above under
+**cross-application, structurally unfixable**, and it passes. The split
+was made by asking whether the word `childTkProcess` appears in the
+test body, and `2.1` does use one -- but its **expected result is the
+empty string**, so what the second wish makes of `-use $w1` never
+reaches the comparison. Only the parent's own `testembed` answer does.
+
+**Grepping for a command is not the same as knowing the test depends on
+its result.** Same family as "a grep hit is a name, not an
+implementation" from the `wm stackorder` note: the classifier read what
+a test *mentions*, and what decides a pass is what it *compares*. So
+`unixEmbed`'s remaining 27 are an upper bound on the unfixable, not a
+count of it -- the 19 attributed to a second wish above is really "19
+mention one", and some of those are reachable.
+
+#### unixWm's 44, and the one number that matters is 28
+
+Classified by what each test *compares*, per the rule just above:
+
+| | |
+|---|---|
+| **28** | `testprop [testwrapper .t] WM_HINTS` and friends -- an **X PROPERTY**. See below; not reachable without inventing a property store. |
+| **10** | the menubar offset, which needs the **wrapper** -- `49.2`, `50.5`, `55.*`, `56.1`, `57.*`. Already recorded in the menubar section. |
+| **5** | `wm colormapwindows`: `TkWmAddToColormapWindows`/`TkWmRemoveFromColormapWindows` are not implemented (`14.2`, `52.2`, `52.3`, `53.1`, `53.2`). |
+| **7** | individual -- and **the constraints settle four of them in one command.** |
+
+**Check the constraint line before reading a failure.** Of the seven:
+
+```
+unixWm-8.4     unix failsOnUbuntu failsOnXQuartz
+unixWm-42.1    unix failsOnUbuntu failsOnXQuartz
+unixWm-50.1    unix failsOnUbuntu failsOnXQuartz
+unixWm-21.5    unix testwrapper
+unixWm-37.5    unix testwrapper
+unixWm-54.2    unix nonUnixUserInteraction
+unixWm-40.2    (none)
+```
+
+`8.4`, `42.1` and `50.1` carry `failsOnUbuntu failsOnXQuartz`, which is
+the group already documented under `place-8.*`: the constraint is true
+everywhere except CI on Linux, so those tests **fail on an ordinary
+Linux/X11 desktop too**. `42.1` is the clearest -- it wants `<Map>` and
+`<Unmap>` to have fired after `update idletasks`, and `update
+idletasks` services idle handlers, not window events, on any platform.
+**Three failures disposed of by one `grep` of the test file**, and the
+first of them (`8.4`) had been sitting in the icon-window notes as
+though it were ours.
+
+**The other four were ours and are fixed:**
+
+- **`unixWm-54.2` -- `TkpMakeMenuWindow` was an empty stub**, on the
+  reasoning that rio owns the frame so there is no window manager to
+  keep its hands off. True, and beside the point:
+  `override_redirect` lives in `Tk_Attributes(tkwin)`, generic Tk reads
+  it there, and `wm overrideredirect` reports it -- the note above
+  records that the port keeps it there deliberately so there is only
+  one answer to the question. **The flag had a reader all along and
+  nothing set it.** A posted menu answered 0 where every Tk says 1.
+- **`unixWm-21.5`, `37.5` -- `TkpGetWrapperWindow` answered `0x0` for a
+  toplevel with no window yet.** On X the wrapper is created at first
+  map, so `testwrapper` is empty before that;
+  `TestwrapperObjCmd` sets no result at all when the hook returns NULL.
+  Returning the toplevel regardless produced **`0x0`, which is not a
+  window id -- it is `None` wearing the format of one**, the
+  `XLoadFont` mistake in miniature. Safe for the only non-test caller:
+  `tkFocus.c:666` hands the result to `TkpChangeFocus`, which already
+  returns early both for NULL and for a window whose id is `None`.
+- **`unixWm-40.2` -- `Tk_SetGrid` converted a pre-gridding size where
+  upstream discards it.** `wm geometry .t 200x100` then `-setgrid 1` on
+  a 20x20 listbox must report `20x20`; the port reported **`17x4`**,
+  which is 200/widthInc by 100/heightInc. tkUnixWm.c sets
+  `wmPtr->width = wmPtr->height = -1` instead, with its own comment
+  saying why the conversion cannot be done: *"there's no easy way to
+  translate them to grid units since the new requested size of the
+  top-level window in pixels may not yet have been registered yet (it
+  may filter up the hierarchy in DoWhenIdle handlers)"* -- which is
+  precisely this test, the listbox not having propagated 20x20 yet.
+  With the size discarded, `WmUpdateGeometry` falls back to the
+  requested size and the answer is the listbox's own.
+
+  **The fix that was there had been reasoned out rather than read.**
+  The grid note above used to state the conversion as a requirement;
+  upstream had already considered it and written down why it fails.
+  The `WM_NEVER_MAPPED` half is upstream's too -- a size given before
+  the window was ever mapped is left alone, on the assumption that it
+  was meant as grid units and merely arrived early.
+
+**The 28 are the real question, and the answer is probably no.**
+Every one reads an ICCCM property off the toplevel: `WM_HINTS`,
+`WM_NORMAL_HINTS`, `WM_CLIENT_MACHINE`, `WM_COMMAND`, `WM_ICON_NAME`,
+`WM_PROTOCOLS`. **A property is the transport to a window manager**, and
+the thing being tested is whether Tk *published* the value, not whether
+it stored it -- the port already stores every one of them in `WmInfo`
+and answers the `wm` query correctly, which is why `wm minsize .t`
+reads back right while `unixWm-29.1` fails.
+
+Implementing `XChangeProperty`/`XGetWindowProperty` as a real per-window
+store would be honest -- it would return what was put in, and claim
+nothing about a window manager having seen it -- but **nothing on Plan 9
+would ever read it**, and the port would then also have to grow
+`UpdateSizeHints`, `UpdateHints` and `UpdateCommand` from `tkUnixWm.c`
+purely to fill it. That is a mechanism whose only consumer is the test
+suite. It sits with `systray` and `clipboard-4.*`: the machine has no
+concept of the thing being asked about.
+
+**So unixWm's floor is about 38 of 44** -- 28 properties, 10 menubar
+(the second of which needs a wrapper, a change that gives every toplevel
+in the port an extra window).
+
+#### wm.test's 14, read the same way -- three more fixed
+
+Batched into the same rebuild rather than spending a round trip on four
+tests. `wm.test` had not been read since `tktest` arrived either:
+
+| | |
+|---|---|
+| **7** | `wm-transient-*` |
+| **7** | `wm-manage-*` and `wm-forget-2` -- the deliberate no-ops recorded above; real generic-Tk reparenting |
+| **4** | `wm-stackorder-*` |
+| **1** | `wm-colormapwindows-2.1` |
+
+**`wm stackorder isabove|isbelow` walked from the wrong root** -- three
+tests, all reporting `TkWmStackorderToplevel failed`, which is this
+port's own message for "one of the two windows was not in the list".
+
+The collector was never at fault. **Upstream calls it from two
+different roots and means to**: `tkUnixWm.c:3307` passes the *named*
+window for `wm stackorder .t`, whose answer is that window's own
+subtree, and `tkUnixWm.c:3359` passes `winPtr->mainPtr->winPtr` for
+`isabove`/`isbelow`, because **the two windows being compared need not
+be related at all**. Passing the named window for both meant
+`wm stackorder .t isabove .` walked `.t` and its children, `.` was not
+among them, the index came back -1, and the code read that as the
+collector having failed. `wm-stackorder-4.3`, `4.4`, `5.3`.
+
+**`TkWmMapWindow` mapped a toplevel that was already withdrawn.**
+`wm-transient-3.1` and `4.1` reported `wm state` = `withdrawn` beside
+`winfo ismapped` = **1**, which is a contradiction on its face.
+
+The note above says only the state at the moment of the `wm transient`
+call is honoured, and that upstream additionally *tracks* the master
+afterwards. Both true, and **they skipped the case in between**, which
+is upstream's own and is three lines of `TkWmMapWindow`:
+
+```c
+if (wmPtr->containerPtr != NULL) {
+    /* Don't map a transient if the container is not mapped. */
+    if (!Tk_IsMapped(wmPtr->containerPtr)) {
+	wmPtr->withdrawn = 1;
+	wmPtr->hints.initial_state = WithdrawnState;
+    }
+```
+
+The test creates `.subject` (unmapped), makes it transient to a
+withdrawn master, and lets the idle queue map it. At the moment of the
+`wm transient` there was nothing to unmap -- `TK_MAPPED` was not set, so
+`TkpWmSetState` found nothing to do -- and the map then went ahead
+regardless. **The check belongs at map time, against the master's
+current state**, not only at the call. A general `wmPtr->withdrawn`
+guard went in beside it, which is upstream's `hints.initial_state ==
+WithdrawnState` return in this port's vocabulary; `wm deiconify` clears
+`withdrawn` before asking for the map, so the ordinary path is
+untouched.
+
+**`wm colormapwindows` reported windows that had been destroyed.** The
+setter already refuses a name that cannot be resolved -- the rule this
+section states twice -- but the list is kept as a *string*, so the
+invariant broke the moment a listed window died and nothing noticed.
+`wm colormapwindows .t .t.f2; destroy .t.f2` went on naming `.t.f2`
+(`unixWm-53.2`). Upstream keeps a `TkWindow` array and drops the entry
+from `TkWmRemoveFromColormapWindows`; **filtering on read** reaches the
+same answer with no second copy of the window set to keep in step, and
+cannot go stale between a destroy and the next query.
+
+**The other four colormapwindows tests are NOT ours, and the reason is
+one line of the port.** `unixWm-52.2`, `52.3`, `53.1` and
+`wm-colormapwindows-2.1` all turn on `-colormap new`, and
+
+```c
+XCreateColormap(...)  { return DefaultColormap(display, DefaultScreen(display)); }
+```
+
+There is one visual here and `XAllocColor` packs an RGB triple without
+allocating anything, so **`-colormap new` genuinely does not produce a
+distinct colormap** and generic Tk is *correct* not to call
+`TkWmAddToColormapWindows`. Minting distinct colormap ids to satisfy
+the tests would be inventing a resource nothing installs -- the
+`systray` mistake again. `WM_COLORMAP_WINDOWS` is in any case a property
+the window manager reads, so it belongs with the 28 above.
+
+**Still open in `wm.test`, and both are real work rather than
+oversights:** the four remaining `wm-transient-*` (`3.3`, `4.3`, `5.1`,
+`8.1`) want the master *tracked* after the fact -- withdraw the master
+and the transient must follow -- which is the structure handler upstream
+registers and this port still does not; and `wm manage`/`wm forget`,
+seven tests, are generic-Tk reparenting.
+
+`focus-2.*` is deliberately untouched. It is `TkFocusFilterEvent`, and
+the warning three sections down stands: getting the mode and detail
+wrong there is how `bind.test` went from 3 failures to 116.
 
 `focus.test` 1 -> 11 and `winfo.test` 4 -> 5 are newly *measured*, not
 newly broken. Worth noting for later: `focus-6.1`, "embedded application
@@ -4001,10 +4218,15 @@ The convention is `tkUnixWm.c`'s and is the thing to remember: while
 `wmPtr->gridWin` is non-NULL, **`wmPtr->width`/`height` hold grid units,
 not pixels**. The conversion is confined to the three places a size
 crosses that boundary -- `WmUpdateGeometry` on the way out, and the `wm
-geometry` query and setter -- plus `Tk_SetGrid` itself, which must
-reinterpret a size that was set in pixels *before* gridding, or a
-`wm geometry` from earlier silently becomes a character count a few
-hundred times too large. `Tk_UnsetGrid` converts back.
+geometry` query and setter. `Tk_UnsetGrid` converts back.
+
+**`Tk_SetGrid` is the exception, and this note used to get it wrong.**
+It said `Tk_SetGrid` "must reinterpret a size that was set in pixels
+before gridding, or a `wm geometry` from earlier silently becomes a
+character count a few hundred times too large". The *concern* is real;
+the remedy was reasoned out here rather than read from upstream, and
+upstream had already rejected it in a comment. See `unixWm-40.2` in the
+run-11 section: the answer is to **forget** the size, not convert it.
 
 Note `wm minsize`/`maxsize` are also in grid units on X and are still
 clamped as pixels here; inert today, since the defaults are 1 and

@@ -861,15 +861,58 @@ TkpGetWrapperWindow(TkWindow *winPtr)
 {
     /* On Plan 9 there is no separate wrapper; return the toplevel itself */
     TkWindow *w = winPtr;
+
     while (w && !(w->flags & TK_TOP_LEVEL))
         w = w->parentPtr;
-    return w ? w : winPtr;
+    if (w == NULL)
+	w = winPtr;
+
+    /*
+     * A TOPLEVEL WITH NO WINDOW YET HAS NO WRAPPER YET. On X the wrapper
+     * is created when the toplevel is first mapped, so testwrapper
+     * answers the empty string before that (TestwrapperObjCmd sets no
+     * result at all when this returns NULL). Returning the toplevel
+     * regardless made it answer "0x0", which is not a window id -- it is
+     * None wearing the format of one, the XLoadFont mistake in miniature.
+     * unixWm-21.5 and 37.5 ask exactly that: is the wrapper empty before
+     * the window exists.
+     *
+     * Safe for the one caller outside the test command: tkFocus.c:666
+     * passes the result straight to TkpChangeFocus, which already
+     * returns early for NULL *and* for a window whose id is None -- so
+     * the focus path behaves identically either way.
+     */
+    if (w->window == None)
+	return NULL;
+    return w;
 }
 
+/*
+ * A POSTED MENU IS OVERRIDE-REDIRECT, AND THAT IS TK'S OWN STATE HERE.
+ *
+ * This was an empty stub on the reasoning that rio owns the frame, so
+ * there is no window manager to keep its hands off -- true, and beside
+ * the point. `override_redirect` lives in Tk_Attributes(tkwin), generic
+ * Tk reads it there, and "wm overrideredirect" reports it (see the "four
+ * wm stubs that answered plausibly" note above, which records that the
+ * port deliberately keeps it in the attributes rather than in WmInfo so
+ * there is only one answer to the question).
+ *
+ * So the flag had a reader all along and nothing set it: unixWm-54.2
+ * posts a menu and asks "wm overrideredirect .m", and got 0 where every
+ * Tk says 1. The X call upstream makes on top of this -- telling the
+ * server not to reparent -- is the part that genuinely has nothing to
+ * do here.
+ */
 void
 TkpMakeMenuWindow(Tk_Window tkwin, int transient)
 {
-    (void)tkwin; (void)transient;
+    TkWindow *winPtr = (TkWindow *) tkwin;
+
+    (void)transient;
+    if (winPtr == NULL)
+	return;
+    winPtr->atts.override_redirect = True;
 }
 
 /* ------------------------------------------------------------------ */
@@ -1634,7 +1677,42 @@ TkWmMapWindow(TkWindow *winPtr)
     if (wmPtr != NULL && (wmPtr->flags & WM_NEVER_MAPPED)) {
 	wmPtr->flags &= ~WM_NEVER_MAPPED;
 	WmUpdateGeometry(winPtr);
+
+	/*
+	 * A TRANSIENT IS NOT MAPPED WHILE ITS MASTER IS NOT, AND THE
+	 * TEST IS MADE HERE RATHER THAN WHEN "wm transient" WAS CALLED.
+	 *
+	 * The note under Tk_WmObjCmd says only the state at the moment
+	 * of the call is honoured, and that upstream additionally
+	 * *tracks* the master afterwards. Both are true, but they
+	 * skipped the case in between, which is upstream's own and is
+	 * three lines: `toplevel .subject` is created unmapped, made
+	 * transient to a withdrawn master, and mapped by the idle queue
+	 * afterwards. At the moment of the `wm transient` there was
+	 * nothing to unmap -- TK_MAPPED was not set yet, so
+	 * TkpWmSetState found nothing to do -- and the map then went
+	 * ahead regardless. `wm state` said withdrawn while
+	 * `winfo ismapped` said 1 (wm-transient-3.1, 4.1).
+	 *
+	 * tkUnixWm.c's TkWmMapWindow does it in the same place, guarded
+	 * on containerPtr and phrased the same way: "Don't map a
+	 * transient if the container is not mapped."
+	 */
+	if (wmPtr->container != NULL
+		&& !Tk_IsMapped((Tk_Window) wmPtr->container))
+	    wmPtr->withdrawn = 1;
     }
+
+    /*
+     * A withdrawn toplevel is not mapped, whoever asked. Upstream
+     * returns here on hints.initial_state == WithdrawnState; this port
+     * keeps the same fact in wmPtr->withdrawn, which "wm deiconify"
+     * clears before it asks for the map, so the ordinary path is
+     * unaffected.
+     */
+    if (wmPtr != NULL && wmPtr->withdrawn)
+	return;
+
     if (winPtr->flags & TK_MAPPED)
 	return;
     winPtr->flags |= TK_MAPPED;
@@ -2021,28 +2099,44 @@ Tk_SetGrid(Tk_Window tkwin, int reqWidth, int reqHeight,
 	return;
 
     /*
-     * An explicit "wm geometry" set BEFORE gridding is in pixels and has
-     * to be reinterpreted, or it would silently become a character count
-     * a few hundred times too large.
+     * AN EXPLICIT "wm geometry" SET BEFORE GRIDDING IS FORGOTTEN, NOT
+     * CONVERTED -- and the difference is the whole of unixWm-40.2.
+     *
+     * The concern is real: a size stored in pixels would otherwise be
+     * read back as a character count a few hundred times too large. But
+     * converting it, which is what this did, is upstream's *rejected*
+     * answer, and tkUnixWm.c says why in its own comment: "there's no
+     * easy way to translate them to grid units since the new requested
+     * size of the top-level window in pixels may not yet have been
+     * registered yet (it may filter up the hierarchy in DoWhenIdle
+     * handlers)."
+     *
+     * That is exactly what 40.2 does -- "wm geometry .t 200x100", then
+     * "-setgrid 1" on a 20x20 listbox that has not yet propagated its
+     * request. Converting gave 200/widthInc x 100/heightInc = 17x4,
+     * a thoroughly plausible wrong answer; discarding it lets
+     * WmUpdateGeometry fall back to the requested size, which is the
+     * listbox's own 20x20.
+     *
+     * The WM_NEVER_MAPPED half is upstream's too: a size given before
+     * the window was ever mapped is left alone, on the assumption that
+     * it was meant as grid units and merely arrived early.
+     *
+     * **The note this file used to carry -- "Tk_SetGrid must
+     * reinterpret a size set in pixels" -- was a fix reasoned out
+     * rather than read.** Upstream had already considered it and
+     * written down why it does not work.
      */
-    if (wmPtr->gridWin == NULL && wmPtr->width >= 0) {
-	int gw, gh;
-
-	wmPtr->gridWin = (TkWindow *) tkwin;
-	wmPtr->reqGridWidth = reqWidth;
-	wmPtr->reqGridHeight = reqHeight;
-	wmPtr->widthInc = gridWidth;
-	wmPtr->heightInc = gridHeight;
-	WmPixelsToGrid(wmPtr, wmPtr->width, wmPtr->height, &gw, &gh);
-	wmPtr->width = gw;
-	wmPtr->height = gh;
-    } else {
-	wmPtr->gridWin = (TkWindow *) tkwin;
-	wmPtr->reqGridWidth = reqWidth;
-	wmPtr->reqGridHeight = reqHeight;
-	wmPtr->widthInc = gridWidth;
-	wmPtr->heightInc = gridHeight;
+    if (wmPtr->gridWin == NULL && !(wmPtr->flags & WM_NEVER_MAPPED)) {
+	wmPtr->width = -1;
+	wmPtr->height = -1;
     }
+
+    wmPtr->gridWin = (TkWindow *) tkwin;
+    wmPtr->reqGridWidth = reqWidth;
+    wmPtr->reqGridHeight = reqHeight;
+    wmPtr->widthInc = gridWidth;
+    wmPtr->heightInc = gridHeight;
     WmGridChanged(winPtr);
 }
 
@@ -2788,7 +2882,23 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
                     "window ?isabove|isbelow window?");
             return TCL_ERROR;
         }
-        windows = TkWmStackorderToplevel(winPtr);
+        /*
+         * THE TWO FORMS WALK FROM DIFFERENT ROOTS, AND UPSTREAM MEANS
+         * THEM TO. tkUnixWm.c:3307 passes the named window for
+         * "wm stackorder .t" -- the answer is that window's own
+         * subtree -- and tkUnixWm.c:3359 passes
+         * winPtr->mainPtr->winPtr for isabove/isbelow, because the two
+         * windows being compared need not be related at all.
+         *
+         * Passing the named window for both is why
+         * "wm stackorder .t isabove ." reported
+         * "TkWmStackorderToplevel failed": the walk covered `.t` and
+         * its children, `.` is not among them, so the second index came
+         * back -1 and the code read that as the collector having
+         * failed. wm-stackorder-4.3, 4.4, 5.3.
+         */
+        windows = TkWmStackorderToplevel(
+                (objc == 5) ? winPtr->mainPtr->winPtr : winPtr);
         if (windows == NULL)
             return TCL_ERROR;
         if (objc == 3) {
@@ -3027,8 +3137,45 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
         }
         if (wmPtr == NULL)
             return TCL_OK;
-        if (objc == 3)
-            return WmReturnString(interp, wmPtr->cmapWindows);
+        if (objc == 3) {
+            /*
+             * A WINDOW THAT HAS BEEN DESTROYED IS NOT IN THE LIST ANY
+             * MORE, and this used to report it for ever.
+             *
+             * The setter above already refuses a name that cannot be
+             * resolved, on the rule stated in the wm section: accepting
+             * one is the same class of lie as answering the empty
+             * string. That invariant breaks the moment a listed window
+             * dies, and the list is kept as a string, so nothing
+             * noticed -- `wm colormapwindows .t .t.f2; destroy .t.f2`
+             * went on naming `.t.f2` (unixWm-53.2).
+             *
+             * Upstream keeps a TkWindow array and drops the entry from
+             * TkWmRemoveFromColormapWindows as the window is destroyed.
+             * Filtering on read reaches the same answer with no second
+             * copy of the window set to keep in step, and it cannot go
+             * stale between a destroy and the next query.
+             */
+            Tcl_Obj *stored, *out, **el;
+            Tcl_Size n, i;
+
+            if (wmPtr->cmapWindows == NULL)
+                return TCL_OK;
+            stored = Tcl_NewStringObj(wmPtr->cmapWindows, -1);
+            Tcl_IncrRefCount(stored);
+            if (Tcl_ListObjGetElements(NULL, stored, &n, &el) != TCL_OK) {
+                Tcl_DecrRefCount(stored);
+                return WmReturnString(interp, wmPtr->cmapWindows);
+            }
+            out = Tcl_NewObj();
+            for (i = 0; i < n; i++)
+                if (Tk_NameToWindow(NULL, Tcl_GetString(el[i]),
+                        (Tk_Window) clientData) != NULL)
+                    Tcl_ListObjAppendElement(NULL, out, el[i]);
+            Tcl_DecrRefCount(stored);
+            Tcl_SetObjResult(interp, out);
+            return TCL_OK;
+        }
         {
             Tcl_Size n, i;
             Tcl_Obj **el;
