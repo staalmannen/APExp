@@ -711,14 +711,130 @@ Tk_FreePixmap(Display *display, Pixmap pixmap)
  */
 
 /* ------------------------------------------------------------------ */
-/* App name (no send/register on Plan 9)                              */
+/* App name, and the registry behind it                                */
 /* ------------------------------------------------------------------ */
+
+/*
+ * THE REGISTRY IS THE POINT, AND IT IS NOT ABOUT "send". Tk_SetAppName
+ * used to hand its argument straight back, which loses two separate
+ * contracts:
+ *
+ *  - THE NAME IT RETURNS IS THE NAME ACTUALLY REGISTERED. Every Tk
+ *    appends " #2", " #3" ... when the name is taken, and
+ *    Tk_CreateMainWindow does
+ *
+ *	winPtr->nameUid = Tk_GetUid(Tk_SetAppName(tkwin, baseName));
+ *
+ *    so two Tk main windows in one process both came out called
+ *    "tktest" here where every other Tk gives the second "tktest #2".
+ *    That is not hypothetical any more: `interp create child; load {}
+ *    Tk child` is exactly what unixWm-50.3 and the unixEmbed "-Na"
+ *    variants do, and this port has had two main windows since tktest
+ *    arrived.
+ *
+ *  - "winfo interps" REPORTS IT, and answered the empty list -- so it
+ *    denied that even the asking interpreter existed. `tk appname foo`
+ *    claiming success while `winfo interps` says there is nothing is
+ *    self-contradictory, and it is the "answers nothing" family again
+ *    (tk-2.3, winfo-5.4, winfo-5.5).
+ *
+ * macosx/tkMacOSXSend.c keeps exactly this list and answers exactly
+ * these two questions from it.
+ *
+ * **NO "send" COMMAND IS REGISTERED, and that is deliberate.** The Mac
+ * port registers one beside this list; there is no transport here and
+ * inventing one that fails would be the systray mistake. Listing the
+ * interpreters that exist is a different question from being able to
+ * reach them, and it is one this port can answer truthfully.
+ *
+ * The Mac port's own comment says "TODO: DeleteProc" and it never
+ * removes an entry. This does, through Tcl_CallWhenDeleted: a registry
+ * naming an interpreter that has gone is the same class of lie as
+ * "wm colormapwindows" naming a destroyed window.
+ */
+
+typedef struct RegisteredInterp {
+    Tcl_Interp *interp;
+    char *name;
+    struct RegisteredInterp *nextPtr;
+} RegisteredInterp;
+
+static RegisteredInterp *interpListPtr = NULL;
+
+static void
+InterpDeleteProc(void *clientData, Tcl_Interp *interp)
+{
+    RegisteredInterp *riPtr = (RegisteredInterp *) clientData;
+    RegisteredInterp **prevPtrPtr;
+
+    (void)interp;
+    for (prevPtrPtr = &interpListPtr; *prevPtrPtr != NULL;
+	    prevPtrPtr = &(*prevPtrPtr)->nextPtr) {
+	if (*prevPtrPtr == riPtr) {
+	    *prevPtrPtr = riPtr->nextPtr;
+	    ckfree(riPtr->name);
+	    ckfree(riPtr);
+	    return;
+	}
+    }
+}
 
 const char *
 Tk_SetAppName(Tk_Window tkwin, const char *name)
 {
-    (void)tkwin;
-    return name;
+    TkWindow *winPtr = (TkWindow *) tkwin;
+    Tcl_Interp *interp;
+    RegisteredInterp *riPtr, *p;
+    Tcl_DString ds;
+    const char *actual;
+    int suffix;
+
+    if (winPtr == NULL || winPtr->mainPtr == NULL)
+	return name;
+    interp = winPtr->mainPtr->interp;
+
+    for (riPtr = interpListPtr; riPtr != NULL; riPtr = riPtr->nextPtr) {
+	if (riPtr->interp == interp)
+	    break;
+    }
+
+    /*
+     * Pick a name that is not taken. This interpreter's own entry is
+     * skipped, so renaming an application to what it is already called
+     * does not push it to " #2".
+     */
+    Tcl_DStringInit(&ds);
+    actual = name;
+    for (suffix = 2; ; suffix++) {
+	char buf[TCL_INTEGER_SPACE + 3];
+
+	for (p = interpListPtr; p != NULL; p = p->nextPtr) {
+	    if (p != riPtr && strcmp(p->name, actual) == 0)
+		break;
+	}
+	if (p == NULL)
+	    break;
+	snprintf(buf, sizeof buf, " #%d", suffix);
+	Tcl_DStringSetLength(&ds, 0);
+	Tcl_DStringAppend(&ds, name, -1);
+	Tcl_DStringAppend(&ds, buf, -1);
+	actual = Tcl_DStringValue(&ds);
+    }
+
+    if (riPtr == NULL) {
+	riPtr = (RegisteredInterp *) ckalloc(sizeof(RegisteredInterp));
+	riPtr->interp = interp;
+	riPtr->name = NULL;
+	riPtr->nextPtr = interpListPtr;
+	interpListPtr = riPtr;
+	Tcl_CallWhenDeleted(interp, InterpDeleteProc, riPtr);
+    } else {
+	ckfree(riPtr->name);
+    }
+    riPtr->name = (char *) ckalloc(strlen(actual) + 1);
+    strcpy(riPtr->name, actual);
+    Tcl_DStringFree(&ds);
+    return riPtr->name;
 }
 
 /* ------------------------------------------------------------------ */
@@ -758,10 +874,23 @@ TkDrawAngledChars(Display *display, Drawable drawable, GC gc,
  * answer to give all along.
  */
 
+/*
+ * The interpreters registered by Tk_SetAppName above -- which on this
+ * machine is all of them, since a display here is one process. It used
+ * to set no result at all, i.e. answer the empty list.
+ */
 int
 TkGetInterpNames(Tcl_Interp *interp, Tk_Window tkwin)
 {
-    (void)interp; (void)tkwin;
+    RegisteredInterp *riPtr;
+    Tcl_Obj *listPtr;
+
+    (void)tkwin;
+    listPtr = Tcl_NewListObj(0, NULL);
+    for (riPtr = interpListPtr; riPtr != NULL; riPtr = riPtr->nextPtr)
+	Tcl_ListObjAppendElement(interp, listPtr,
+		Tcl_NewStringObj(riPtr->name, -1));
+    Tcl_SetObjResult(interp, listPtr);
     return TCL_OK;
 }
 
