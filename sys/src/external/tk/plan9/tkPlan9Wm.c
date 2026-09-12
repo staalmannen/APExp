@@ -1257,6 +1257,20 @@ TkpTestembedCmd(
     return TCL_OK;
 }
 
+/*
+ * Destroy a container whose embedded application has gone. Deferred to
+ * idle time -- see the note in EmbedWindowDeleted below, which is the
+ * only thing that schedules it.
+ */
+static void
+EmbedDestroyContainer(void *clientData)
+{
+    TkWindow *winPtr = (TkWindow *) clientData;
+
+    if (winPtr != NULL && !(winPtr->flags & TK_ALREADY_DEAD))
+	Tk_DestroyWindow((Tk_Window) winPtr);
+}
+
 static void
 EmbedWindowDeleted(TkWindow *winPtr)
 {
@@ -1281,6 +1295,17 @@ EmbedWindowDeleted(TkWindow *winPtr)
 	     * other direction was already structural -- an embedded
 	     * toplevel is a CHILD of the container window, so it dies
 	     * with it (see tk-embed-destroy-test.tcl section 4).
+	     *
+	     * **IT IS DEFERRED, AND THAT IS NOT A DETAIL.** Upstream
+	     * destroys the container from an X DestroyNotify, which is
+	     * a QUEUED event -- so on X the container is still there
+	     * until the next time the queue is serviced. Doing it
+	     * synchronously here passed winfo-13.2, which says
+	     * "destroy .emb; update", and broke unixWm-50.3, which
+	     * deletes the child interpreter and asks "winfo containing"
+	     * with no update in between and requires the container to
+	     * answer. An idle handler is serviced by "update" and not
+	     * by a bare command, which is the same boundary.
 	     */
 	    if (c->parentPtr != NULL
 		    && !(c->parentPtr->flags & TK_ALREADY_DEAD))
@@ -1288,6 +1313,11 @@ EmbedWindowDeleted(TkWindow *winPtr)
 	    c->embeddedPtr = NULL;
 	}
 	if (c->parentPtr == winPtr) {
+	    /*
+	     * The container is going anyway, so cancel the deferred
+	     * destroy -- otherwise it fires with a freed TkWindow.
+	     */
+	    Tcl_CancelIdleCall(EmbedDestroyContainer, winPtr);
 	    c->parentPtr = NULL;
 	    c->parent = None;
 	}
@@ -1299,13 +1329,8 @@ EmbedWindowDeleted(TkWindow *winPtr)
 	}
     }
 
-    /*
-     * After the walk, never during it: Tk_DestroyWindow comes straight
-     * back here for the container and would be relinking the list this
-     * loop is standing in.
-     */
     if (orphanPtr != NULL)
-	Tk_DestroyWindow((Tk_Window) orphanPtr);
+	Tcl_DoWhenIdle(EmbedDestroyContainer, orphanPtr);
 }
 
 /* Give the embedded toplevel exactly the container's size. */

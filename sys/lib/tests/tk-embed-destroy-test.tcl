@@ -197,6 +197,58 @@ for {set i 0} {$i < 5} {incr i} { if {[winfo exists .e$i]} { destroy .e$i } }
 update
 ok "returned"
 
+step "6c. THE CONTAINER GOES WITH THE EMBEDDED HALF -- BUT NOT UNTIL\
+ THE QUEUE IS SERVICED"
+
+# Upstream destroys the container from an X DestroyNotify, which is a
+# QUEUED event, so on X the container is still there until the next
+# time the queue runs. This port has no substructure machinery and
+# notices in EmbedWindowDeleted instead -- and doing it SYNCHRONOUSLY
+# there passed winfo-13.2 ("destroy .emb; update") and broke
+# unixWm-50.3, which deletes the embedded half and asks
+# "winfo containing" with NO update in between and requires the
+# container to answer.
+#
+# Both halves of that are asserted here, in order, because a fix for
+# either one alone looks complete.
+
+proc pair {} {
+    catch {destroy .cc .ee}
+    toplevel .cc
+    pack [frame .cc.f -container 1 -width 120 -height 90]
+    update
+    toplevel .ee -use [winfo id .cc.f]
+    update
+}
+
+pair
+destroy .ee
+if {[winfo exists .cc.f]} {
+    ok "container still there before the update (unixWm-50.3)"
+} else {
+    puts "  REGRESSION: container destroyed synchronously -- unixWm-50.3\
+ asks for it with no update"
+    flush stdout
+}
+update
+if {[winfo exists .cc.f]} {
+    puts "  REGRESSION: container survived the update -- winfo-13.2 wants it gone"
+    flush stdout
+} else {
+    ok "container gone after the update (winfo-13.2)"
+}
+catch {destroy .cc}
+
+step "6d. destroy the container first: the deferred destroy must be cancelled"
+
+# If the idle handler is left scheduled it fires with a freed TkWindow,
+# which on this allocator surfaces at the first double indirection and
+# a long way from here.
+pair
+destroy .cc
+update
+ok "no fault"
+
 step "7. and the real exit path: build five more and let Tk tear them\
  down itself"
 for {set i 0} {$i < 5} {incr i} {

@@ -1736,20 +1736,20 @@ table below is the whole thing, and the list has been re-derived rather
 than extended.
 
 ```
-all.tcl:  Total 10027  Passed 8902  Skipped 924  Failed 201
+all.tcl:  Total 10027  Passed 8913  Skipped 924  Failed 190
 Sourced 97 Test Files.
 ```
 
-**That is run 13. Run 10 was the first complete run under `tktest`**,
+**That is run 14. Run 10 was the first complete run under `tktest`**,
 and is the one to read against run 7 -- the last complete `wish` run --
 one column at a time rather than by the total:
 
-| | run 7 (`wish`) | run 10 (`tktest`) | run 11 | run 12 | run 13 |
-|---|---|---|---|---|---|
-| Total | 10027 | 10027 | 10027 | 10027 | 10027 |
-| **Skipped** | 1429 | **924** | 924 | 924 | 924 |
-| **Passed** | 8427 | **8877** | **8888** | **8898** | **8902** |
-| **Failed** | 171 | **226** | **215** | **205** | **201** |
+| | run 7 (`wish`) | run 10 (`tktest`) | run 11 | run 12 | run 13 | run 14 |
+|---|---|---|---|---|---|---|
+| Total | 10027 | 10027 | 10027 | 10027 | 10027 | 10027 |
+| **Skipped** | 1429 | **924** | 924 | 924 | 924 | 924 |
+| **Passed** | 8427 | **8877** | **8888** | **8898** | **8902** | **8913** |
+| **Failed** | 171 | **226** | **215** | **205** | **201** | **190** |
 
 Run 10 -> 11 is the `testembed` work below: eleven moved from failed to
 passed, nothing else changed at all.
@@ -2258,6 +2258,51 @@ the depth. That is a **vendored generic file shared with win and mac**,
 so it is not the one-token "no X server" case that justified touching
 `tkWindow.c`; it is an upstream shortcut that happens to hold where
 `bits_per_rgb` equals the depth.
+
+#### Run 14: twelve fixed, ONE REGRESSION, and it is the timing again
+
+**201 -> 190, predicted "roughly 191".** The name diff is **twelve
+removals and one addition**, and the addition is the useful part.
+
+Removed: `textWind-12.1`, `-14.1` (the doubled map events), `tk-5.5`,
+`-5.6` (caret), `unixfont-8.2` (font size 0), `winfo-2.5` (atom name),
+`winfo-13.2` (container destroy), `wm-transient-4.3`, `-6.2`, `-8.1`
+(the synchronous transient tracking) -- and **`unixEmbed-2.4` and
+`-3.7a`, which nothing predicted**. Those two are in the bucket written
+off as needing a second wish; the map-event gate reached them.
+
+**Added: `unixWm-50.3`, and the container-destroy fix caused it.**
+
+```tcl
+winfo-13.2     destroy .emb ; update ; winfo exists .con   -> 0 wanted
+unixWm-50.3    interp delete child  ; winfo containing ... -> .t.f wanted
+```
+
+The first wants the container **gone**, the second wants it **still
+there** -- and they are not in conflict, because of *when*. Upstream
+destroys the container from an X `DestroyNotify` delivered to the
+container's `SubstructureNotify` handler, which is a **queued event**:
+on X the container survives until the next time the queue is serviced.
+`winfo-13.2` says `update` and so sees it gone; `unixWm-50.3` asks with
+no update in between and so sees it alive.
+
+`EmbedWindowDeleted` did it synchronously, so it passed the first and
+broke the second. It is a `Tcl_DoWhenIdle` now -- serviced by `update`
+and not by a bare command, which is the same boundary -- with a
+`Tcl_CancelIdleCall` for the case where the container itself dies
+first, since a handler left scheduled fires with a freed `TkWindow`.
+
+**That is the run-13 lesson a second time, and it is worth stating as a
+rule: when upstream does something from an event, ask what the EVENT
+costs in time before reimplementing it as a call.** Run 13 was the same
+mistake in the other direction -- an event where the work had to be
+synchronous. Both were found by a test that differed from a passing one
+only in whether it said `update`.
+
+`sys/lib/tests/tk-embed-destroy-test.tcl` grew sections 6c and 6d for
+it: 6c asserts the container is present **before** the update and gone
+**after** it, in that order, because a fix for either half alone looks
+complete; 6d destroys the container first and checks nothing faults.
 
 `focus-2.*` is deliberately untouched. It is `TkFocusFilterEvent`, and
 the warning three sections down stands: getting the mode and detail
