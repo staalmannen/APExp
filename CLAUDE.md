@@ -1736,20 +1736,23 @@ table below is the whole thing, and the list has been re-derived rather
 than extended.
 
 ```
-all.tcl:  Total 10027  Passed 8917  Skipped 924  Failed 186
+all.tcl:  Total 10027  Passed 8925  Skipped 924  Failed 178
 Sourced 97 Test Files.
 ```
 
-**That is run 15. Run 10 was the first complete run under `tktest`**,
+**That is run 16. Run 10 was the first complete run under `tktest`**,
 and is the one to read against run 7 -- the last complete `wish` run --
 one column at a time rather than by the total:
 
-| | run 7 (`wish`) | run 10 (`tktest`) | run 11 | run 12 | run 13 | run 14 | run 15 |
+| | run 7 (`wish`) | run 10 (`tktest`) | run 12 | run 13 | run 14 | run 15 | run 16 |
 |---|---|---|---|---|---|---|---|
 | Total | 10027 | 10027 | 10027 | 10027 | 10027 | 10027 | 10027 |
 | **Skipped** | 1429 | **924** | 924 | 924 | 924 | 924 | 924 |
-| **Passed** | 8427 | **8877** | **8888** | **8898** | **8902** | **8913** | **8917** |
-| **Failed** | 171 | **226** | **215** | **205** | **201** | **190** | **186** |
+| **Passed** | 8427 | **8877** | **8898** | **8902** | **8913** | **8917** | **8925** |
+| **Failed** | 171 | **226** | **205** | **201** | **190** | **186** | **178** |
+
+(Run 11 was 215/8888 and is dropped from the table for width; the
+`testembed` note below still refers to it.)
 
 Run 10 -> 11 is the `testembed` work below: eleven moved from failed to
 passed, nothing else changed at all.
@@ -1910,6 +1913,13 @@ unixWm-37.5    unix testwrapper
 unixWm-54.2    unix nonUnixUserInteraction
 unixWm-40.2    (none)
 ```
+
+**The full `failsOnUbuntu` roster, since this keeps being rediscovered
+one member at a time:** `unixWm-8.4`, `-42.1`, `-50.1`, the four
+`place-8.*`/`pack-18.*`, and **`winWm-9.2`** -- which was carried
+through two rounds of notes as part of the `wm manage` work before
+anyone read its constraint line (see run 16). `grep -n
+failsOnUbuntu tests/*.test` is the whole check.
 
 `8.4`, `42.1` and `50.1` carry `failsOnUbuntu failsOnXQuartz`, which is
 the group already documented under `place-8.*`: the constraint is true
@@ -2391,7 +2401,56 @@ round.
 
 Covered by `sys/lib/tests/tk-manage-test.tcl`, which separates the
 manage, the refusal, the round trip and the "is the content still laid
-out" question (`winWm-9.2`) into their own sections.
+out" question into their own sections.
+
+#### Run 16: eight fixed, nothing added -- and the ninth was never ours
+
+**186 -> 178.** The name diff is `wm-manage-1.1`, `1.3`..`1.8` and
+`wm-forget-2` removed, **no additions** -- so turning a frame into a
+toplevel, which adds a window to `dispPtr->firstWmPtr` that was never
+one, moved nothing in `raise.test`, `event-9.*` or anything else using
+`winfo containing`. That was the watch item and it is clear.
+
+**`winWm-9.2` did not move, and it is not ours:**
+
+```tcl
+test winWm-9.2 "check wm forget for unmapped parent (#3205464,#2967911)" \
+	-constraints {failsOnUbuntu failsOnXQuartz} ...
+```
+
+**That is the fourth member of the `failsOnUbuntu` group** -- with
+`unixWm-8.4`, `-42.1`, `-50.1` and the four `place-8.*`/`pack-18.*` --
+and the constraint means the test **fails on an ordinary Linux/X11
+desktop too**. It asks whether `winfo rooty .t.f.x` is non-zero after a
+manage/iconify/forget/deiconify/repack round trip, which on X is
+non-zero only because the window manager puts a title bar above `.t`.
+rio owns the frame here and a toplevel lands at +0+0, so a grandchild
+at the top-left corner is **genuinely at rooty 0**.
+
+**This file already tells you to check the constraint line first, and
+this round did not.** `winWm-9.2` was carried through two rounds of
+notes as though it were the eighth or ninth of the `wm manage` set. The
+count came out right by luck: the prediction said "eight tests" while
+listing nine, and the eight real ones moved.
+
+**Where the remaining 178 sit**, per file, so the next reader starts
+from the shape rather than the number:
+
+| | |
+|---|---|
+| `unixWm` 44 | 28 `testprop` (an X property, no consumer here), 10 menubar offset (needs a wrapper), the rest colormap/constraint |
+| `unixEmbed` 25 | a second wish process |
+| `select` 23, `unixSelect` 18 | a second wish process |
+| `textDisp` 14 | 13 font metrics, 1 the `TkScrollWindow` trade-off |
+| `systray` 12 + `sysnotify` 1 | no tray, no dlopen |
+| `focus` 11 | 8 are `TkFocusFilterEvent`, deliberately untouched |
+| the tail, 24 | `font` 4 (upstream test bug), `event` 4, `clipboard` 4 (selection ownership), `textTag` 3, `place`/`pack` 4 (`failsOnUbuntu`), and eleven ones |
+
+**The port's own remaining share is small and specific**: `focus-6.1`
+(the second half of `unixEmbed-8.2`), `geometry-4.7`, `event-9.13`/`9.14`
+and `visual-3.1`. Everything else in that table is a second process, a
+scalable font, an X property, a system tray, or a constraint that fails
+on Linux too.
 
 `focus-2.*` is deliberately untouched. It is `TkFocusFilterEvent`, and
 the warning three sections down stands: getting the mode and detail
