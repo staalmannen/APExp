@@ -7,7 +7,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-12 07:24:36 +0200
+Tests began at 2026-09-12 07:37:01 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -2070,7 +2070,7 @@ unixEmbed.test
     }
 
 ---- Result was:
-couldn't create child of window "0x573f"
+couldn't create child of window "0x573d"
 ---- Result should have been (exact matching):
 {{XXX {} {} .t}} 0
 ==== unixEmbed-1.5 FAILED
@@ -2093,7 +2093,7 @@ couldn't create child of window "0x573f"
     }
 
 ---- Result was:
-couldn't create child of window "0x5749"
+couldn't create child of window "0x5747"
 ---- Result should have been (exact matching):
 {XXX {} {} .t2} {XXX {} {} .t1}
 ==== unixEmbed-1.6 FAILED
@@ -2115,7 +2115,7 @@ couldn't create child of window "0x5749"
     }
 
 ---- Result was:
-couldn't create child of window "0x575f"
+couldn't create child of window "0x575d"
 ---- Result should have been (exact matching):
 
 ==== unixEmbed-2.2 FAILED
@@ -2432,7 +2432,7 @@ can't read "x": no such variable
     }
 
 ---- Result was:
-couldn't create child of window "0x5811"
+couldn't create child of window "0x580f"
 ---- Result should have been (exact matching):
 {{configure .t1 300 120}} 300x120+0+0
 ==== unixEmbed-6.1 FAILED
@@ -2457,7 +2457,7 @@ couldn't create child of window "0x5811"
     }
 
 ---- Result was:
-couldn't create child of window "0x5823"
+couldn't create child of window "0x5821"
 ---- Result should have been (exact matching):
 {{configure .t1 200 200}} 200x200+0+0
 ==== unixEmbed-6.2 FAILED
@@ -2727,7 +2727,7 @@ couldn't create child of window "0x5823"
     }
 
 ---- Result was:
-couldn't create child of window "0x5873"
+couldn't create child of window "0x5871"
 ---- Result should have been (exact matching):
 {{XXX {} {} .t1}} {}
 ==== unixEmbed-9.2 FAILED
@@ -3352,8 +3352,8 @@ in expression "0x40 & _@_"
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
 ---- errorInfo: missing operand at _@_
-in expression "0x5ae1 - _@_"
-    (parsing expression "0x5ae1 - ")
+in expression "0x5adf - _@_"
+    (parsing expression "0x5adf - ")
     invoked from within
 "expr [testwrapper .t2] - [lindex $hints 8]"
     ("uplevel" body line 7)
@@ -3788,8 +3788,8 @@ in expression "0xa & _@_"
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
 ---- errorInfo: missing operand at _@_
-in expression "0x5b08 - _@_"
-    (parsing expression "0x5b08 - ")
+in expression "0x5b06 - _@_"
+    (parsing expression "0x5b06 - ")
     invoked from within
 "expr [testwrapper .t] - $transient"
     ("uplevel" body line 10)
@@ -4434,196 +4434,10 @@ wm.test
 {.t2.b .t2} {.t2.b .t2.c .t2}
 ==== wm-colormapwindows-2.1 FAILED
 
-
-
-==== wm-manage-1.1 managing a frame FAILED
-==== Contents of test case:
-
-    toplevel .t
-    frame .t.f
-    pack [label .t.f.l -text hello]
-    wm manage .t.f
-    raise .t.f
-    update
-    lappend result [winfo manage .t.f]
-    lappend result [winfo toplevel .t.f]
-
----- Result was:
-{} .t
----- Result should have been (exact matching):
-wm .t.f
-==== wm-manage-1.1 FAILED
-
-
-
-==== wm-manage-1.3 managing a labelframe FAILED
-==== Contents of test case:
-
-    toplevel .t
-    labelframe .t.f -text Labelframe
-    pack [label .t.f.l -text hello]
-    wm manage .t.f
-    raise .t.f
-    update
-    lappend result [winfo manage .t.f]
-    lappend result [winfo toplevel .t.f]
-
----- Result was:
-{} .t
----- Result should have been (exact matching):
-wm .t.f
-==== wm-manage-1.3 FAILED
-
-
-
-==== wm-manage-1.4 managing a ttk::frame FAILED
-==== Contents of test case:
-
-    toplevel .t
-    ttk::frame .t.f
-    pack [label .t.f.l -text hello]
-    wm manage .t.f
-    raise .t.f
-    update
-    lappend result [winfo manage .t.f]
-    lappend result [winfo toplevel .t.f]
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== wm-manage-1.4 FAILED
-
-
-
-==== wm-manage-1.5 managing a text widget FAILED
-==== Contents of test case:
-
-    toplevel .t
-    text .t.f
-    .t.f insert end "Manage text\n" {}
-    wm manage .t.f
-    raise .t.f
-    update
-    lappend result [winfo manage .t.f]
-    lappend result [winfo toplevel .t.f]
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== wm-manage-1.5 FAILED
-
-
-
-==== wm-manage-1.6 managing a button FAILED
-==== Contents of test case:
-
-    toplevel .t
-    button .t.f -text Button
-    wm manage .t.f
-    raise .t.f
-    update
-    lappend result [winfo manage .t.f]
-    lappend result [winfo toplevel .t.f]
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== wm-manage-1.6 FAILED
-
-
-
-==== wm-manage-1.7 managing a frame FAILED
-==== Contents of test case:
-
-    toplevel .t
-    frame .t.f
-    pack [label .t.f.l -text Label]
-    pack .t.f
-    update
-    lappend result [winfo manage .t.f]
-    lappend result [winfo toplevel .t.f]
-    wm manage .t.f
-    raise .t.f
-    update
-    lappend result [winfo manage .t.f]
-    lappend result [winfo toplevel .t.f]
-    wm forget .t.f
-    pack .t.f
-    update
-    lappend result [winfo manage .t.f]
-    lappend result [winfo toplevel .t.f]
-
----- Result was:
-pack .t pack .t pack .t
----- Result should have been (exact matching):
-pack .t wm .t.f pack .t
-==== wm-manage-1.7 FAILED
-
-
-
-==== wm-manage-1.8 unmanaging a toplevel FAILED
-==== Contents of test case:
-
-    toplevel .t
-    toplevel .t.t
-    button .t.t.b -text "Manage This"
-    pack .t.t.b
-    update
-    lappend result [winfo manage .t.t]
-    lappend result [winfo toplevel .t.t.b]
-    wm forget .t.t
-    wm forget .t.t ; # second call should be a no-op
-    pack .t.t
-    update
-    lappend result [winfo manage .t.t]
-    lappend result [winfo toplevel .t.t.b]
-    wm manage .t.t
-    wm manage .t.t ; # second call should be a no-op
-    wm deiconify .t.t
-    update
-    lappend result [winfo manage .t.t]
-    lappend result [winfo toplevel .t.t.b]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: can't pack ".t.t": it's a top-level window
-    while executing
-"pack .t.t"
-    ("uplevel" body line 11)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: TK GEOMETRY TOPLEVEL
-==== wm-manage-1.8 FAILED
-
-
-
-==== wm-forget-2 bug [e9112ef96e] - [wm forget] doesn't completely FAILED
-==== Contents of test case:
-
-    label .l -text "Top Dot"
-    frame .f
-    button .f.b -text Hello -command "puts Hello!"
-    pack .l -side top
-    pack .f.b
-    pack .f -side bottom
-    set res [winfo manager .f]
-    pack forget .f
-    update
-    lappend res [winfo manager .f]
-    wm manage .f
-    update
-    lappend res [winfo manager .f]
-    wm forget .f
-    update
-    lappend res [winfo manager .f]
-
----- Result was:
-pack {} {} {}
----- Result should have been (exact matching):
-pack {} wm {}
-==== wm-forget-2 FAILED
-
 xmfbox.test
 
-Tests ended at 2026-09-12 07:26:35 +0200
-all.tcl:	Total	10027	Passed	8917	Skipped	924	Failed	186
+Tests ended at 2026-09-12 07:39:00 +0200
+all.tcl:	Total	10027	Passed	8925	Skipped	924	Failed	178
 Sourced 97 Test Files.
 Files with failing tests: clipboard.test event.test filebox.test focus.test font.test frame.test geometry.test imgPhoto.test pack.test pkgconfig.test place.test select.test systray.test text.test textDisp.test textImage.test textTag.test unixEmbed.test unixSelect.test unixWm.test visual.test winWm.test winfo.test wm.test
 Number of tests skipped for each constraint:
