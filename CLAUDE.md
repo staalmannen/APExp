@@ -154,7 +154,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c` and
-`stdio-test.c`. The twenty-four `tk-*.tcl` scripts there are Tcl, run
+`stdio-test.c`. The twenty-five `tk-*.tcl` scripts there are Tcl, run
 with `wish` -- except `tk-menubar-test.tcl`, which needs `tktest` and
 skips itself under `wish`, and `tk-transient-test.tcl`, whose last
 section alone does; see the Tk section below. `tk-runall.tcl` is the harness for
@@ -1736,20 +1736,20 @@ table below is the whole thing, and the list has been re-derived rather
 than extended.
 
 ```
-all.tcl:  Total 10027  Passed 8913  Skipped 924  Failed 190
+all.tcl:  Total 10027  Passed 8917  Skipped 924  Failed 186
 Sourced 97 Test Files.
 ```
 
-**That is run 14. Run 10 was the first complete run under `tktest`**,
+**That is run 15. Run 10 was the first complete run under `tktest`**,
 and is the one to read against run 7 -- the last complete `wish` run --
 one column at a time rather than by the total:
 
-| | run 7 (`wish`) | run 10 (`tktest`) | run 11 | run 12 | run 13 | run 14 |
-|---|---|---|---|---|---|---|
-| Total | 10027 | 10027 | 10027 | 10027 | 10027 | 10027 |
-| **Skipped** | 1429 | **924** | 924 | 924 | 924 | 924 |
-| **Passed** | 8427 | **8877** | **8888** | **8898** | **8902** | **8913** |
-| **Failed** | 171 | **226** | **215** | **205** | **201** | **190** |
+| | run 7 (`wish`) | run 10 (`tktest`) | run 11 | run 12 | run 13 | run 14 | run 15 |
+|---|---|---|---|---|---|---|---|
+| Total | 10027 | 10027 | 10027 | 10027 | 10027 | 10027 | 10027 |
+| **Skipped** | 1429 | **924** | 924 | 924 | 924 | 924 | 924 |
+| **Passed** | 8427 | **8877** | **8888** | **8898** | **8902** | **8913** | **8917** |
+| **Failed** | 171 | **226** | **215** | **205** | **201** | **190** | **186** |
 
 Run 10 -> 11 is the `testembed` work below: eleven moved from failed to
 passed, nothing else changed at all.
@@ -1990,7 +1990,7 @@ tests. `wm.test` had not been read since `tktest` arrived either:
 | | |
 |---|---|
 | **7** | `wm-transient-*` |
-| **7** | `wm-manage-*` and `wm-forget-2` -- the deliberate no-ops recorded above; real generic-Tk reparenting |
+| **7** | `wm-manage-*` and `wm-forget-2` -- deliberate no-ops when this was written; implemented in run 15's round, and three of them wanted the *refusal* rather than the action |
 | **4** | `wm-stackorder-*` |
 | **1** | `wm-colormapwindows-2.1` |
 
@@ -2336,14 +2336,62 @@ it, so the absence stays a decision on the record.
 
 **`wm manage`/`wm forget` are the next round's headline and were
 deliberately NOT batched here** -- eight tests (`wm-manage-1.*`,
-`wm-forget-2`, `winWm-9.2`), and upstream's `WmManageCmd` is mostly
-generic Tk: the X-specific half is `TK_HAS_WRAPPER` and
-`RemapWindows(winPtr, wmPtr->wrapperPtr)`, and with no wrappers here
-that reduces to reparenting the frame to the root, which
-`XReparentWindow` in `tkPlan9Init.c` already does. It is smaller than
-the note above it claims. But it turns a frame into a toplevel and so
+`wm-forget-2`, `winWm-9.2`). It turns a frame into a toplevel and so
 edits `dispPtr->firstWmPtr`, the list the last three rounds have all
 touched, and it wants a run of its own to read.
+
+#### Run 15: four fixed, nothing added, exactly as predicted
+
+**190 -> 186**, and the name diff is `unixWm-50.3`, `tk-2.3`,
+`winfo-5.4`, `winfo-5.5` removed with **no additions** -- so the
+deferred container destroy satisfies both `winfo-13.2` (which stayed
+fixed) and `unixWm-50.3`, and the app-name registry does what it was
+written for. Three rounds running now where the per-file check found
+nothing unexpected; the method is doing its job.
+
+#### wm manage / wm forget: the note above overstated the job
+
+**Both were `return TCL_OK`** -- silent no-ops -- on the grounds that
+they are "real generic-Tk reparenting" and that doing them wrongly is
+worse than not doing them. The second half of that is still true. The
+first was an overestimate, and **reading upstream rather than the note
+is what settled it**: `WmManageCmd` and `WmForgetCmd` are generic Tk
+with exactly one X-specific step, setting `TK_HAS_WRAPPER` and calling
+`RemapWindows(winPtr, wmPtr->wrapperPtr)` to reparent the frame into
+the wrapper just created for it.
+
+**There are no wrappers here**, so the flag is not set and the reparent
+target is the **root** -- which is what being a toplevel *means* in this
+port. Same reduction as embedding, stacking and the menubar: the
+wrapper is the thing upstream needs and this port does not have, and
+removing it usually removes the difficulty with it rather than adding
+to it. `XReparentWindow` in `tkPlan9Init.c` was already real.
+
+Everything else was already present and is called unchanged:
+`Tk_IsManageable`, `TkFocusSplit`/`TkFocusJoin`, `TkMapTopFrame`, and
+`TkWmDeadWindow` -- which upstream calls **on a window that is still
+alive**, and which this port's version is already right for: it
+unlinks from `firstWmPtr`, cancels the pending geometry update,
+destroys the menubar, forgets the transients and ends with
+`wmInfoPtr = NULL`, so a later `wm manage` takes the `TkWmNewWindow`
+branch and starts clean.
+
+**Three of the eight tests want the REFUSAL, not the action.**
+`wm-manage-1.4`, `1.5` and `1.6` call `wm manage` on a `ttk::frame`, a
+`text` and a `button` and require a **non-zero return code**; a silent
+no-op answers `TCL_OK` and so fails them in the same direction as doing
+nothing at all. `Tk_IsManageable` is the whole of it. Worth noticing
+because a count of "eight tests about reparenting" is wrong about three
+of them -- **read what each test compares**, the rule this file states
+twice already.
+
+`wm-manage-1.8` calls each command **twice** on purpose: the second must
+be a no-op, which is upstream's `if (Tk_IsTopLevel(...))` either way
+round.
+
+Covered by `sys/lib/tests/tk-manage-test.tcl`, which separates the
+manage, the refusal, the round trip and the "is the content still laid
+out" question (`winWm-9.2`) into their own sections.
 
 `focus-2.*` is deliberately untouched. It is `TkFocusFilterEvent`, and
 the warning three sections down stands: getting the mode and detail
@@ -2499,9 +2547,13 @@ rather than in `WmInfo`, as upstream does: generic Tk reads it there
 (menus and tooltips set it), so a private copy would be a second answer
 to the same question.
 
-`wm forget` and `wm manage` are still no-ops -- they are real
-generic-Tk reparenting operations, seven tests, and doing them wrongly
-is worse than not doing them.
+**Corrected:** this used to say `wm forget` and `wm manage` were still
+no-ops because they are "real generic-Tk reparenting operations" and
+doing them wrongly is worse than not doing them. They are implemented
+-- see the run-15 section above. The caution was right and the estimate
+was not: upstream's two commands are generic Tk with a single
+X-specific step, and that step is the wrapper, which this port does not
+have.
 
 **The remaining wm failures were not this**, as predicted -- `state`,
 `iconify`, `minsize`, `maxsize`, `resizable` and `geometry` were all

@@ -893,6 +893,30 @@ WmIsOverrideRedirect(WmInfo *p)
 	    && Tk_Attributes((Tk_Window) p->winPtr)->override_redirect;
 }
 
+/*
+ * Reparent one window, for "wm manage" and "wm forget" -- upstream's
+ * RemapWindows, which despite the plural moves only the window it is
+ * given. A NULL parent means the root, i.e. "make this a toplevel".
+ *
+ * Upstream reads the position back with XGetWindowAttributes; this uses
+ * winPtr->changes, which is Tk's own record and the one this port keeps
+ * in step (see the "no server sends ConfigureNotify" note above), so
+ * there is one fewer thing that has to agree.
+ */
+static void
+WmRemapWindow(TkWindow *winPtr, TkWindow *parentPtr)
+{
+    if (winPtr->window == None)
+	return;
+    if (parentPtr == NULL)
+	XReparentWindow(winPtr->display, winPtr->window,
+		XRootWindow(winPtr->display, winPtr->screenNum),
+		winPtr->changes.x, winPtr->changes.y);
+    else if (parentPtr->window != None)
+	XReparentWindow(winPtr->display, winPtr->window, parentPtr->window,
+		winPtr->changes.x, winPtr->changes.y);
+}
+
 static WmInfo *
 WmLast(TkDisplay *dispPtr)
 {
@@ -3905,16 +3929,91 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
             return TCL_OK;
         }
 
-    case OPT_FORGET:
-    case OPT_MANAGE:
-        /*
-         * Turning a toplevel into an ordinary child and back. Both are
-         * real generic-Tk operations and neither needs a window manager;
-         * they are left alone here because doing them wrongly is worse
-         * than not doing them, and wm-forget/wm-manage are seven tests.
-         * See the note in CLAUDE.md.
-         */
+    /*
+     * "wm manage" turns an ordinary widget into a toplevel and
+     * "wm forget" turns it back. Both are upstream's WmManageCmd and
+     * WmForgetCmd almost line for line -- they are generic Tk with one
+     * X-specific step, and it is the one that shrinks here.
+     *
+     * Upstream sets TK_HAS_WRAPPER and calls
+     * RemapWindows(winPtr, wmPtr->wrapperPtr), reparenting the frame
+     * into the wrapper it just made for it. **There are no wrappers in
+     * this port** -- a toplevel is its own window -- so the flag is not
+     * set and the reparent target is the ROOT, which is what being a
+     * toplevel means here. That is the same reduction as the embedding
+     * and stacking work above, and it is why this was smaller than the
+     * note that used to sit here claimed.
+     *
+     * Everything else is shared: Tk_IsManageable refuses anything that
+     * is not a frame, labelframe or toplevel (wm-manage-1.4, 1.5, 1.6
+     * want the *error*, for a ttk::frame, a text and a button);
+     * TkFocusSplit/TkFocusJoin move the focus record between the two
+     * focus domains; TkMapTopFrame makes the widget redraw itself as
+     * what it has become. A second "wm manage" on a toplevel, or a
+     * second "wm forget" on a child, is a no-op -- wm-manage-1.8 calls
+     * each twice on purpose.
+     */
+    case OPT_MANAGE: {
+        Tk_Window frameWin = (Tk_Window) winPtr;
+
+        if (objc != 3) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window");
+            return TCL_ERROR;
+        }
+        if (Tk_IsTopLevel(frameWin))
+            return TCL_OK;
+        if (!Tk_IsManageable(frameWin)) {
+            Tcl_SetObjResult(interp, Tcl_ObjPrintf(
+                    "window \"%s\" is not manageable: must be a frame,"
+                    " labelframe or toplevel", Tk_PathName(frameWin)));
+            Tcl_SetErrorCode(interp, "TK", "WM", "MANAGE", (char *) NULL);
+            return TCL_ERROR;
+        }
+        TkFocusSplit(winPtr);
+        Tk_UnmapWindow(frameWin);
+        winPtr->flags |= TK_TOP_HIERARCHY|TK_TOP_LEVEL|TK_WIN_MANAGED;
+        if (winPtr->wmInfoPtr == NULL) {
+            TkWmNewWindow(winPtr);
+            TkWmMapWindow(winPtr);
+            Tk_UnmapWindow(frameWin);
+        }
+        winPtr->flags &= ~TK_MAPPED;
+        WmRemapWindow(winPtr, NULL);
+        TkMapTopFrame(frameWin);
         return TCL_OK;
+    }
+
+    case OPT_FORGET: {
+        Tk_Window frameWin = (Tk_Window) winPtr;
+
+        if (objc != 3) {
+            Tcl_WrongNumArgs(interp, 2, objv, "window");
+            return TCL_ERROR;
+        }
+        if (!Tk_IsTopLevel(frameWin))
+            return TCL_OK;
+        TkFocusJoin(winPtr);
+        Tk_UnmapWindow(frameWin);
+        /*
+         * TkWmDeadWindow on a window that is still alive is upstream's
+         * own call here, and it is what this port needs too: it unlinks
+         * the toplevel from firstWmPtr, cancels its pending geometry
+         * update, destroys its menubar, forgets its transients and ends
+         * with winPtr->wmInfoPtr = NULL -- so a later "wm manage" takes
+         * the TkWmNewWindow branch above and starts clean.
+         */
+        TkWmDeadWindow(winPtr);
+        winPtr->flags &= ~(TK_TOP_HIERARCHY|TK_TOP_LEVEL|TK_WIN_MANAGED);
+        WmRemapWindow(winPtr, winPtr->parentPtr);
+        /*
+         * The wm is no longer this window's geometry manager. Without
+         * this "winfo manager" still answers "wm" after the forget
+         * (wm-forget-2 reads it back at every step).
+         */
+        Tk_ManageGeometry(frameWin, NULL, NULL);
+        TkMapTopFrame(frameWin);
+        return TCL_OK;
+    }
 
     default:
         /*
