@@ -405,7 +405,18 @@ TkpGetFontFromAttributes(
      */
     p9f->header.fa          = *faPtr;
     p9f->header.fa.family   = Tk_GetUid(family);
-    p9f->header.fa.size     = TkFontGetPoints(tkwin, faPtr->size);
+    /*
+     * A SIZE OF 0 MEANS "THE DEFAULT SIZE", AND WHAT IS REPORTED IS THE
+     * SIZE THAT WAS ACTUALLY CHOSEN -- the same rule as the family just
+     * above, which this half did not follow. ChooseFont already
+     * substitutes Tk's 13-pixel fallback for a request of 0, and then
+     * "font actual {-family times -size 0}" reported the 0 back
+     * (unixfont-8.2). tkUnixFont.c reports the size it parsed out of
+     * the XLFD it opened, which can never be 0.
+     */
+    p9f->header.fa.size     = (faPtr->size == 0)
+	    ? TkFontGetPoints(tkwin, -p9f->height)
+	    : TkFontGetPoints(tkwin, faPtr->size);
     p9f->header.fm.ascent   = p9f->ascent;
     p9f->header.fm.descent  = p9f->descent;
     p9f->header.fm.fixed    = FontIsFixed(fnt);

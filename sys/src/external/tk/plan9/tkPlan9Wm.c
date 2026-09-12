@@ -1261,11 +1261,32 @@ static void
 EmbedWindowDeleted(TkWindow *winPtr)
 {
     Container *c, **prevPtrPtr;
+    TkWindow *orphanPtr = NULL;
 
     prevPtrPtr = &firstContainerPtr;
     for (c = firstContainerPtr; c != NULL; c = *prevPtrPtr) {
-	if (c->embeddedPtr == winPtr)
+	if (c->embeddedPtr == winPtr) {
+	    /*
+	     * THE CONTAINER GOES WITH THE EMBEDDED APPLICATION, which is
+	     * upstream's rule and its own comment: "The embedded
+	     * application is gone. Destroy the container window."
+	     * (unix/tkUnixEmbed.c, ContainerEventProc's DestroyNotify
+	     * arm, which sees the child's destroy through
+	     * SubstructureNotify on the container.) There is no
+	     * substructure machinery here, so this is where it is
+	     * noticed instead.
+	     *
+	     * winfo-13.2 destroys an embedded toplevel and asks whether
+	     * the container frame is still there; it must not be. The
+	     * other direction was already structural -- an embedded
+	     * toplevel is a CHILD of the container window, so it dies
+	     * with it (see tk-embed-destroy-test.tcl section 4).
+	     */
+	    if (c->parentPtr != NULL
+		    && !(c->parentPtr->flags & TK_ALREADY_DEAD))
+		orphanPtr = c->parentPtr;
 	    c->embeddedPtr = NULL;
+	}
 	if (c->parentPtr == winPtr) {
 	    c->parentPtr = NULL;
 	    c->parent = None;
@@ -1277,6 +1298,14 @@ EmbedWindowDeleted(TkWindow *winPtr)
 	    prevPtrPtr = &c->nextPtr;
 	}
     }
+
+    /*
+     * After the walk, never during it: Tk_DestroyWindow comes straight
+     * back here for the container and would be relinking the list this
+     * loop is standing in.
+     */
+    if (orphanPtr != NULL)
+	Tk_DestroyWindow((Tk_Window) orphanPtr);
 }
 
 /* Give the embedded toplevel exactly the container's size. */

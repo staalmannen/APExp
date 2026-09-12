@@ -154,7 +154,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c` and
-`stdio-test.c`. The twenty-two `tk-*.tcl` scripts there are Tcl, run
+`stdio-test.c`. The twenty-three `tk-*.tcl` scripts there are Tcl, run
 with `wish` -- except `tk-menubar-test.tcl`, which needs `tktest` and
 skips itself under `wish`, and `tk-transient-test.tcl`, whose last
 section alone does; see the Tk section below. `tk-runall.tcl` is the harness for
@@ -2174,6 +2174,90 @@ stacking alone: `raise .t1` put the container on top of its own dialog,
 window it belongs to and moves with it**, which on X the window manager
 enforces. `TkWmRestackToplevel` holds it now, one level deep, beside the
 override-redirect rule and for the same reason.
+
+#### Reading the long tail, and the one broad bug in it
+
+The tail outside `wm`/`unixWm`/`select`/`systray`/`textDisp` had never
+been read end to end. Five things came out of it, and **the first is
+worth more than the other four together**.
+
+**EVERY `<Map>` AND `<Unmap>` BINDING ON AN ORDINARY WIDGET FIRED
+TWICE**, for the whole life of the port. `textWind-12.1` says it
+plainly once you count rather than read:
+
+```
+got   created mapped mapped modified replaced unmapped unmapped ...
+want  created mapped        modified replaced unmapped        ...
+```
+
+Generic Tk **synthesises these events itself** for the windows an X
+server would not report to it -- a server only tells a client about a
+window it selected `StructureNotifyMask` on -- so the platform's job is
+exactly the *complement*. `generic/tkWindow.c` states it twice, with
+**two different flags**, and that is upstream's and not a slip:
+
+```
+Tk_MapWindow    hands TK_WIN_MANAGED to TkWmMapWindow and returns;
+                everything else it maps and then synthesises MapNotify for.
+Tk_UnmapWindow  hands TK_WIN_MANAGED to TkWmUnmapWindow, and synthesises
+                UnmapNotify only when !TK_TOP_HIERARCHY.
+```
+
+So `XMapWindow` reports iff `TK_WIN_MANAGED` and `XUnmapWindow` iff
+`TK_TOP_HIERARCHY`. The asymmetry is what covers an **embedded**
+toplevel, which has `TK_TOP_HIERARCHY` without `TK_WIN_MANAGED`: Tk
+synthesises its map and not its unmap. `win/tkWinWindow.c` gates the
+same two calls the same way, being the other port with no server.
+`plan9/tkPlan9Init.c` sent both unconditionally.
+
+**A doubled event looks exactly like a single one unless something
+counts.** That is why twelve suite runs went past it: nothing else in
+`sys/lib/tests` counts an event, and the two tests that do are in a file
+nobody had read. `sys/lib/tests/tk-mapevent-test.tcl` counts, on a
+child, a grandchild, a toplevel and a text-embedded window -- and its
+last section does a `tkwait visibility` on a child, because
+`VisibilityNotify` is a *separate* event that is still sent
+unconditionally and is what `tkwait` and the deferred `focus -force`
+wait on. Silencing that by accident would be the menubar freeze again.
+
+**The other four are one-liners of the families this file already
+names:**
+
+- **`Tk_SetCaretPos` was an empty stub** (`tk-5.5`, `tk-5.6`). Plan 9
+  has no input method, so the half of `tkUnixKey.c`'s version that
+  talks to one really has nothing to do -- but `tk caret` is a **query**
+  as well, answered by generic Tk out of `dispPtr->caret`. So
+  `tk caret . -x 10 -y 11 -h 12` read back as `-height 0 -x 0 -y 0`.
+  **`wm title` again**: the platform having nothing to display is no
+  reason for the value not to read back.
+- **`XGetAtomName` returned a ckalloc'd `""`** where Xlib returns NULL
+  (`winfo-2.5`). `Tk_GetAtomName` turns NULL into the sentinel
+  `"?bad atom?"`, which is what `winfo atomname 44215` reports as
+  `no atom exists with id "44215"`; an empty *name* made every id look
+  valid. **The `XLoadFont` family**, and both other server-less ports
+  (`win/stubs.c`, `macosx/tkMacOSXXStubs.c`) return NULL.
+- **`font actual -size` reported the size that was ASKED FOR when it was
+  0** (`unixfont-8.2`). `ChooseFont` already substitutes Tk's 13-pixel
+  fallback for a request of 0 and then the 0 was reported back. This is
+  the *family* rule from the font section applied to the size: **report
+  what was resolved, not what was requested.**
+- **Destroying an embedded toplevel left its container behind**
+  (`winfo-13.2`). Upstream's `ContainerEventProc` has the rule and its
+  own comment -- "The embedded application is gone. Destroy the
+  container window." -- reached through `SubstructureNotify` on the
+  container. There is no substructure machinery here, so
+  `EmbedWindowDeleted` notices instead. The other direction was already
+  structural: an embedded toplevel is a *child* of the container window,
+  so it dies with it.
+
+**Not fixed, and recorded so it is not re-derived:** `visual-3.1` wants
+`winfo depth` on a toplevel created with `-visual "truecolor32"` to be
+32 and gets 8, because `xlib/xutil.c`'s `XGetVisualInfo` sets
+`info->depth = info->visual->bits_per_rgb` -- bits per *component*, not
+the depth. That is a **vendored generic file shared with win and mac**,
+so it is not the one-token "no X server" case that justified touching
+`tkWindow.c`; it is an upstream shortcut that happens to hold where
+`bits_per_rgb` equals the depth.
 
 `focus-2.*` is deliberately untouched. It is `TkFocusFilterEvent`, and
 the warning three sections down stands: getting the mode and detail

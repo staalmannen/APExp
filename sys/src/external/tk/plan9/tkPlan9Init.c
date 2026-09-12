@@ -463,6 +463,51 @@ XDestroyWindow(Display *display, Window w)
     return 0;
 }
 
+/*
+ * DOES THIS PORT HAVE TO REPORT THE MAP OR UNMAP, or has generic Tk
+ * already done it? Getting this wrong doubles every one of those
+ * events, which is what it did for the whole life of the port.
+ *
+ * Generic Tk synthesises these itself for the windows an X server would
+ * not report to it, because the server only tells a client about a
+ * window it selected StructureNotifyMask on. So the platform's job is
+ * exactly the complement, and generic/tkWindow.c states it twice, with
+ * two DIFFERENT flags -- which is upstream's, not a slip:
+ *
+ *	Tk_MapWindow    hands TK_WIN_MANAGED to TkWmMapWindow and
+ *			returns; everything else it maps and then
+ *			synthesises MapNotify for.
+ *	Tk_UnmapWindow  hands TK_WIN_MANAGED to TkWmUnmapWindow, and
+ *			synthesises UnmapNotify only when
+ *			!TK_TOP_HIERARCHY.
+ *
+ * So: send MapNotify iff TK_WIN_MANAGED, and UnmapNotify iff
+ * TK_TOP_HIERARCHY. The asymmetry is what covers an EMBEDDED toplevel,
+ * which has TK_TOP_HIERARCHY without TK_WIN_MANAGED: Tk synthesises its
+ * map and not its unmap.
+ *
+ * textWind-12.1 is what said so -- "created mapped mapped modified"
+ * where X gives "created mapped modified" -- so every <Map> and <Unmap>
+ * binding on an ordinary widget has been firing twice.
+ * win/tkWinWindow.c is the other port with no server and gates the same
+ * two calls the same way.
+ *
+ * An id Tk cannot resolve keeps the old behaviour and sends:
+ * Tk_IdToWindow answers NULL during teardown for a window this table
+ * still has, and a missing MapNotify is much the more expensive
+ * mistake -- it is what hung the suite once (see the menubar note in
+ * CLAUDE.md).
+ */
+static int
+P9ReportMapEvent(Display *display, Window w, int flag)
+{
+    Tk_Window tkwin = Tk_IdToWindow(display, w);
+
+    if (tkwin == NULL)
+	return 1;
+    return (((TkWindow *) tkwin)->flags & flag) != 0;
+}
+
 int
 XMapWindow(Display *display, Window w)
 {
@@ -476,14 +521,16 @@ XMapWindow(Display *display, Window w)
     pw->mapped = 1;
     gP9.pointerDirty = 1;
 
-    /* Send MapNotify */
-    memset(&ev, 0, sizeof(ev));
-    ev.type                    = MapNotify;
-    ev.xmap.display            = display;
-    ev.xmap.event              = w;
-    ev.xmap.window             = w;
-    ev.xmap.override_redirect  = False;
-    TkP9EnqueueEvent(&ev);
+    /* MapNotify iff TK_WIN_MANAGED; see P9ReportMapEvent above. */
+    if (P9ReportMapEvent(display, w, TK_WIN_MANAGED)) {
+	memset(&ev, 0, sizeof(ev));
+	ev.type                    = MapNotify;
+	ev.xmap.display            = display;
+	ev.xmap.event              = w;
+	ev.xmap.window             = w;
+	ev.xmap.override_redirect  = False;
+	TkP9EnqueueEvent(&ev);
+    }
 
     /*
      * Send VisibilityNotify. X sends one when a window becomes viewable,
@@ -552,12 +599,15 @@ XUnmapWindow(Display *display, Window w)
     pw->mapped = 0;
     gP9.pointerDirty = 1;
 
-    memset(&ev, 0, sizeof(ev));
-    ev.type              = UnmapNotify;
-    ev.xunmap.display    = display;
-    ev.xunmap.event      = w;
-    ev.xunmap.window     = w;
-    TkP9EnqueueEvent(&ev);
+    /* UnmapNotify iff TK_TOP_HIERARCHY; see P9ReportMapEvent above. */
+    if (P9ReportMapEvent(display, w, TK_TOP_HIERARCHY)) {
+	memset(&ev, 0, sizeof(ev));
+	ev.type              = UnmapNotify;
+	ev.xunmap.display    = display;
+	ev.xunmap.event      = w;
+	ev.xunmap.window     = w;
+	TkP9EnqueueEvent(&ev);
+    }
 
     /* Whatever it was covering has to repaint; see P9DamageUnder. */
     P9DamageUnder(display, pw);
