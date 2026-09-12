@@ -7,7 +7,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-12 06:49:17 +0200
+Tests began at 2026-09-12 07:24:36 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -2051,20 +2051,6 @@ textTag.test
 
 textWind.test
 tk.test
-
-
-==== tk-2.3 tk command: appname FAILED
-==== Contents of test case:
-
-    tk appname bazfoogarply
-    expr {[lsearch -exact [winfo interps] [tk appname]] >= 0}
-
----- Result was:
-0
----- Result should have been (exact matching):
-1
-==== tk-2.3 FAILED
-
 this wish doesn't have XIM (X Input Methods) support
 unixButton.test
 unixEmbed.test
@@ -2084,7 +2070,7 @@ unixEmbed.test
     }
 
 ---- Result was:
-couldn't create child of window "0x5740"
+couldn't create child of window "0x573f"
 ---- Result should have been (exact matching):
 {{XXX {} {} .t}} 0
 ==== unixEmbed-1.5 FAILED
@@ -2107,7 +2093,7 @@ couldn't create child of window "0x5740"
     }
 
 ---- Result was:
-couldn't create child of window "0x574a"
+couldn't create child of window "0x5749"
 ---- Result should have been (exact matching):
 {XXX {} {} .t2} {XXX {} {} .t1}
 ==== unixEmbed-1.6 FAILED
@@ -2129,7 +2115,7 @@ couldn't create child of window "0x574a"
     }
 
 ---- Result was:
-couldn't create child of window "0x5760"
+couldn't create child of window "0x575f"
 ---- Result should have been (exact matching):
 
 ==== unixEmbed-2.2 FAILED
@@ -2446,7 +2432,7 @@ can't read "x": no such variable
     }
 
 ---- Result was:
-couldn't create child of window "0x5812"
+couldn't create child of window "0x5811"
 ---- Result should have been (exact matching):
 {{configure .t1 300 120}} 300x120+0+0
 ==== unixEmbed-6.1 FAILED
@@ -2471,7 +2457,7 @@ couldn't create child of window "0x5812"
     }
 
 ---- Result was:
-couldn't create child of window "0x5824"
+couldn't create child of window "0x5823"
 ---- Result should have been (exact matching):
 {{configure .t1 200 200}} 200x200+0+0
 ==== unixEmbed-6.2 FAILED
@@ -2741,7 +2727,7 @@ couldn't create child of window "0x5824"
     }
 
 ---- Result was:
-couldn't create child of window "0x5874"
+couldn't create child of window "0x5873"
 ---- Result should have been (exact matching):
 {{XXX {} {} .t1}} {}
 ==== unixEmbed-9.2 FAILED
@@ -3366,8 +3352,8 @@ in expression "0x40 & _@_"
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
 ---- errorInfo: missing operand at _@_
-in expression "0x5ae2 - _@_"
-    (parsing expression "0x5ae2 - ")
+in expression "0x5ae1 - _@_"
+    (parsing expression "0x5ae1 - ")
     invoked from within
 "expr [testwrapper .t2] - [lindex $hints 8]"
     ("uplevel" body line 7)
@@ -3802,8 +3788,8 @@ in expression "0xa & _@_"
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
 ---- errorInfo: missing operand at _@_
-in expression "0x5b09 - _@_"
-    (parsing expression "0x5b09 - ")
+in expression "0x5b08 - _@_"
+    (parsing expression "0x5b08 - ")
     invoked from within
 "expr [testwrapper .t] - $transient"
     ("uplevel" body line 10)
@@ -4028,43 +4014,6 @@ in expression ""
 ---- Result should have been (exact matching):
 {} {} .t {} .t2 {} .t2 {} .t
 ==== unixWm-50.1 FAILED
-
-
-
-==== unixWm-50.3 Tk_CoordsToWindow procedure, finding a toplevel with embedding FAILED
-==== Contents of test case:
-
-    deleteWindows
-    catch {interp delete child}
-    toplevel .t -width 300 -height 400 -bg blue
-    wm geom .t +100+100
-    frame .t.f -container 1 -bg red
-    place .t.f -x 150 -y 50
-    tkwait visibility .t.f
-    update
-    interp create child
-    load {} Tk child
-    child alias frameid winfo id .t.f
-    child eval {
-	wm withdraw .
-	toplevel .x -width 100 -height 80 -use [frameid] -bg yellow
-	tkwait visibility .x
-	update
-	set x [winfo rootx .x]
-	set y [winfo rooty .x]
-    }
-    set result [list [child eval {winfo containing [expr $x - 1]  [expr $y + 50]}]  [child eval {winfo containing $x [expr $y + 50]}]]
-    interp delete child
-    set x [winfo rootx .t]
-    set y [winfo rooty .t]
-    lappend result [winfo containing [expr $x + 200] [expr $y + 49]]  [winfo containing [expr $x + 200] [expr $y +50]]
-    set result
-
----- Result was:
-{} .x .t .t
----- Result should have been (exact matching):
-{} .x .t .t.f
-==== unixWm-50.3 FAILED
 
 
 
@@ -4450,32 +4399,6 @@ window.test
 winfo.test
 
 
-==== winfo-5.4 "winfo interps" command FAILED
-==== Contents of test case:
-
-    expr {[lsearch -exact [winfo interps] [tk appname]] >= 0}
-
----- Result was:
-0
----- Result should have been (exact matching):
-1
-==== winfo-5.4 FAILED
-
-
-
-==== winfo-5.5 "winfo interps" command FAILED
-==== Contents of test case:
-
-    expr {[lsearch -exact [winfo interps -displayof .] [tk appname]] >= 0}
-
----- Result was:
-0
----- Result should have been (exact matching):
-1
-==== winfo-5.5 FAILED
-
-
-
 ==== winfo-7.8 "winfo pathname" command FAILED
 ==== Contents of test case:
 
@@ -4699,10 +4622,10 @@ pack {} wm {}
 
 xmfbox.test
 
-Tests ended at 2026-09-12 06:51:23 +0200
-all.tcl:	Total	10027	Passed	8913	Skipped	924	Failed	190
+Tests ended at 2026-09-12 07:26:35 +0200
+all.tcl:	Total	10027	Passed	8917	Skipped	924	Failed	186
 Sourced 97 Test Files.
-Files with failing tests: clipboard.test event.test filebox.test focus.test font.test frame.test geometry.test imgPhoto.test pack.test pkgconfig.test place.test select.test systray.test text.test textDisp.test textImage.test textTag.test tk.test unixEmbed.test unixSelect.test unixWm.test visual.test winWm.test winfo.test wm.test
+Files with failing tests: clipboard.test event.test filebox.test focus.test font.test frame.test geometry.test imgPhoto.test pack.test pkgconfig.test place.test select.test systray.test text.test textDisp.test textImage.test textTag.test unixEmbed.test unixSelect.test unixWm.test visual.test winWm.test winfo.test wm.test
 Number of tests skipped for each constraint:
 	12	altDisplay
 	30	aqua
