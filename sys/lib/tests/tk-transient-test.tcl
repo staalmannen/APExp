@@ -60,14 +60,28 @@ step "2. iconify/deiconify the container (wm-transient-4.3)"
 
 # The transient goes WITHDRAWN, not iconic -- it is not the thing that
 # was iconified.
+#
+# NOTE THE "update idletasks", WHICH IS THE WHOLE POINT OF THIS SECTION
+# and is what 4.3 uses. It services idle handlers, NOT events -- so a
+# first version of this that tracked the container with an event handler
+# passed section 1 (which says "update") and failed here. The state
+# change has to have happened by the time the command returns.
 fresh
 wm iconify .top
-update
+update idletasks
 check "state after container iconify"   [wm state .subject]      withdrawn
 check "ismapped after container iconify" [winfo ismapped .subject] 0
 wm deiconify .top
-update
+update idletasks
 check "state after container deiconify"  [wm state .subject]      normal
+
+step "2a. and with NO update at all (wm-transient-6.2 reads it so)"
+fresh
+wm withdraw .top
+check "state immediately after container withdraw" [wm state .subject] withdrawn
+wm deiconify .top
+check "state immediately after container deiconify" [wm state .subject] normal
+update
 
 # ------------------------------------------------------------------
 step "3. a failed 'wm transient' must not lose the tracking (5.1)"
@@ -115,14 +129,23 @@ check "both mapped once the container is shown" \
 check "both in the stacking order" \
 	[lsearch -all -inline -glob [wm stackorder .] ".t?"] {.t1 .t2}
 
+# A transient stays ABOVE the window it belongs to, and moves with it.
+# On X the window manager enforces this; here TkWmRestackToplevel does,
+# and without it "raise .t1" reads back as {.t2 .t1}.
+raise .t1
+update
+check "raising the container keeps the transient above it" \
+	[lsearch -all -inline -glob [wm stackorder .] ".t?"] {.t1 .t2}
+
 # ------------------------------------------------------------------
 step "6. destroy the container while it is being tracked"
 
-# The handler holds the TRANSIENT as its client data and is registered
-# on the CONTAINER, so destroying either end has to unregister it --
-# otherwise the next map or unmap runs with a freed TkWindow, the
-# use-after-free shape this port has hit three times (TkpDeleteFont,
-# TkpFreeColor, the menubar).
+# The tracking walks dispPtr->firstWmPtr at map and unmap time, so a
+# destroyed end has to be off that list or out of the container field
+# before anything maps again -- the use-after-free shape this port has
+# hit three times (TkpDeleteFont, TkpFreeColor, the menubar). The first
+# version of this used an event handler holding the transient as client
+# data, which had the same hazard in a worse place.
 fresh
 destroy .top
 update

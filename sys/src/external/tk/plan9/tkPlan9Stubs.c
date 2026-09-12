@@ -371,18 +371,28 @@ Tk_PrintObjCmd(void *clientData, Tcl_Interp *interp,
 }
 
 /* ------------------------------------------------------------------ */
-/* Atom name lookup (no real X server; return empty string)           */
+/* Atom name lookup                                                    */
 /* ------------------------------------------------------------------ */
 
+/*
+ * NULL MEANS "NO SUCH ATOM", AND AN EMPTY STRING DOES NOT. This used to
+ * return a ckalloc'd "", the XLoadFont mistake again: Tk_GetAtomName
+ * (generic/tkAtom.c) turns a NULL into the sentinel "?bad atom?", which
+ * is what "winfo atomname 44215" tests for and reports as `no atom
+ * exists with id "44215"`. An empty name made every id look valid
+ * (winfo-2.5).
+ *
+ * There is nothing to look up. Atoms here are Tk's own -- xlib/xutil.c
+ * XInternAtom is a counter -- and generic Tk caches every one it
+ * interns in dispPtr->atomTable, so this is only ever reached for an id
+ * Tk has never seen. win/stubs.c and macosx/tkMacOSXXStubs.c, the other
+ * two ports with no server, both return NULL unconditionally.
+ */
 char *
 XGetAtomName(Display *display, Atom atom)
 {
-    char *s;
     (void)display; (void)atom;
-    /* Must return a ckalloc'd string — caller frees with XFree */
-    s = (char *) ckalloc(1);
-    s[0] = '\0';
-    return s;
+    return NULL;
 }
 
 /* ------------------------------------------------------------------ */
@@ -540,10 +550,40 @@ TkGetDefaultScreenName(Tcl_Interp *interp, const char *screenName)
 /* Key binding stubs (Plan 9 has no XKB)                             */
 /* ------------------------------------------------------------------ */
 
+/*
+ * THE STORE IS THE POINT, not the XIM adjustment. Plan 9 has no input
+ * method, so the half of tkUnixKey.c's Tk_SetCaretPos that talks to one
+ * genuinely has nothing to do here -- but "tk caret" is a QUERY as well,
+ * and generic Tk answers it out of dispPtr->caret (tkCmds.c's
+ * CaretCmd). An empty stub therefore made
+ *
+ *	tk caret . -x 10 -y 11 -h 12 ; tk caret .
+ *
+ * answer "-height 0 -x 0 -y 0" (tk-5.5, tk-5.6). Same mistake as
+ * "wm title" was: the platform having nothing to display is no reason
+ * for the value not to read back.
+ *
+ * The early return when nothing changed is upstream's and is kept,
+ * since on X it is what suppresses a round trip to the input method.
+ */
 void
 Tk_SetCaretPos(Tk_Window tkwin, int x, int y, int height)
 {
-    (void)tkwin; (void)x; (void)y; (void)height;
+    TkWindow *winPtr = (TkWindow *) tkwin;
+    TkDisplay *dispPtr;
+
+    if (winPtr == NULL || (dispPtr = winPtr->dispPtr) == NULL)
+	return;
+    if (dispPtr->caret.winPtr == winPtr
+	    && dispPtr->caret.x == x
+	    && dispPtr->caret.y == y
+	    && dispPtr->caret.height == height)
+	return;
+
+    dispPtr->caret.winPtr = winPtr;
+    dispPtr->caret.x = x;
+    dispPtr->caret.y = y;
+    dispPtr->caret.height = height;
 }
 
 /*

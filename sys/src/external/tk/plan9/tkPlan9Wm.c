@@ -793,8 +793,6 @@ WmScreenPosition(WmInfo *wmPtr, int width, int height, int *xPtr, int *yPtr)
  * and the stored pointer would otherwise dangle. dispPtr->firstWmPtr is
  * every toplevel, so this is the whole search space.
  */
-static void	WmUntrackContainer(TkWindow *winPtr, TkWindow *container);
-
 static void
 WmForgetTransientsOf(TkWindow *winPtr)
 {
@@ -802,7 +800,6 @@ WmForgetTransientsOf(TkWindow *winPtr)
 
     for (p = winPtr->dispPtr->firstWmPtr; p != NULL; p = p->nextPtr) {
 	if (p->container == winPtr) {
-	    WmUntrackContainer(p->winPtr, winPtr);
 	    p->container = NULL;
 	    WmSetString(&p->transient, NULL);
 	}
@@ -823,63 +820,65 @@ WmTransientOf(TkWindow *winPtr)
 
 /*
  * A TRANSIENT TRACKS ITS CONTAINER'S MAP STATE, not just the state the
- * container happened to be in when "wm transient" was called. Upstream
- * registers this on the CONTAINER with StructureNotifyMask and passes
- * the TRANSIENT as client data (tkUnixWm.c's WmWaitMapProc); withdraw
+ * container happened to be in when "wm transient" was called: withdraw
  * the container and the dialog goes with it, deiconify it and the
- * dialog comes back. wm-transient-3.3, 4.3, 5.1, 6.2 and 8.1.
+ * dialog comes back. wm-transient-3.3, 4.3, 5.1, 6.2, 8.1.
  *
  * The one exception is a transient the caller withdrew itself: the
  * container reappearing must not undo that (6.2), which is what
  * withdrawnExplicit is for.
  *
- * This port has no wrapper windows, so the events arrive on the
- * container's own window rather than on a wrapper -- which is exactly
- * why registering on the toplevel is right here and would not be on X.
+ * **IT HAS TO BE SYNCHRONOUS, AND THAT IS WHY THIS IS NOT AN EVENT
+ * HANDLER.** The first version of this was upstream's structure
+ * handler, registered on the container with StructureNotifyMask
+ * (tkUnixWm.c's WmWaitMapProc), and it fixed only the two tests that
+ * say `update` -- because this port's MapNotify/UnmapNotify are merely
+ * *enqueued* by XMapWindow/XUnmapWindow, and `update idletasks`
+ * services idle handlers, not events. wm-transient-4.3 uses `update
+ * idletasks` and 6.2 reads `wm state` with no update at all.
+ *
+ * Upstream gets away with the handler because TkpWmSetState ends in
+ * WaitForMapNotify, which pumps the queue until the server's notify
+ * arrives -- so on X the handler HAS already run by the time the
+ * command returns. There is no server here to wait for, so the
+ * equivalent of that wait is simply to do the work in the map and
+ * unmap paths themselves.
+ *
+ * It also removes a hazard: a handler holds the transient as client
+ * data and is registered on the container, so either end dying with it
+ * still attached is a freed TkWindow in a callback -- the shape this
+ * port has hit three times. Nothing is registered now, so there is
+ * nothing to unregister.
  */
 static void
-WmWaitMapProc(void *clientData, XEvent *eventPtr)
+WmNotifyTransients(TkWindow *containerPtr, int mapped)
 {
-    TkWindow *winPtr = (TkWindow *) clientData;
-    WmInfo *wmPtr;
+    WmInfo *p, *next;
 
-    if (winPtr == NULL || (wmPtr = winPtr->wmInfoPtr) == NULL)
+    if (containerPtr == NULL || containerPtr->dispPtr == NULL)
 	return;
-    if (wmPtr->container == NULL)
-	return;
+    for (p = containerPtr->dispPtr->firstWmPtr; p != NULL; p = next) {
+	TkWindow *tPtr;
 
-    if (eventPtr->type == MapNotify) {
-	if (wmPtr->withdrawnExplicit)
-	    return;
-	wmPtr->withdrawn = 0;
-	wmPtr->iconified = 0;
-	TkpWmSetState(winPtr, NormalState);
-    } else if (eventPtr->type == UnmapNotify) {
-	wmPtr->withdrawn = 1;
-	TkpWmSetState(winPtr, WithdrawnState);
+	/*
+	 * Held before the call: mapping a transient runs arbitrary Tk
+	 * (its own transients, geometry, bindings), and a list this
+	 * walk is standing in could be relinked under it.
+	 */
+	next = p->nextPtr;
+	if (p->container != containerPtr || (tPtr = p->winPtr) == NULL)
+	    continue;
+	if (mapped) {
+	    if (p->withdrawnExplicit)
+		continue;
+	    p->withdrawn = 0;
+	    p->iconified = 0;
+	    TkpWmSetState(tPtr, NormalState);
+	} else {
+	    p->withdrawn = 1;
+	    TkpWmSetState(tPtr, WithdrawnState);
+	}
     }
-}
-
-/*
- * Attach or detach the tracking handler. Every place that changes
- * wmPtr->container goes through these two, so the handler and the
- * pointer cannot get out of step -- a stale handler would run with a
- * freed TkWindow as its client data.
- */
-static void
-WmTrackContainer(TkWindow *winPtr, TkWindow *container)
-{
-    Tk_CreateEventHandler((Tk_Window) container, StructureNotifyMask,
-	    WmWaitMapProc, winPtr);
-}
-
-static void
-WmUntrackContainer(TkWindow *winPtr, TkWindow *container)
-{
-    if (container == NULL)
-	return;
-    Tk_DeleteEventHandler((Tk_Window) container, StructureNotifyMask,
-	    WmWaitMapProc, winPtr);
 }
 
 /*
@@ -1262,11 +1261,32 @@ static void
 EmbedWindowDeleted(TkWindow *winPtr)
 {
     Container *c, **prevPtrPtr;
+    TkWindow *orphanPtr = NULL;
 
     prevPtrPtr = &firstContainerPtr;
     for (c = firstContainerPtr; c != NULL; c = *prevPtrPtr) {
-	if (c->embeddedPtr == winPtr)
+	if (c->embeddedPtr == winPtr) {
+	    /*
+	     * THE CONTAINER GOES WITH THE EMBEDDED APPLICATION, which is
+	     * upstream's rule and its own comment: "The embedded
+	     * application is gone. Destroy the container window."
+	     * (unix/tkUnixEmbed.c, ContainerEventProc's DestroyNotify
+	     * arm, which sees the child's destroy through
+	     * SubstructureNotify on the container.) There is no
+	     * substructure machinery here, so this is where it is
+	     * noticed instead.
+	     *
+	     * winfo-13.2 destroys an embedded toplevel and asks whether
+	     * the container frame is still there; it must not be. The
+	     * other direction was already structural -- an embedded
+	     * toplevel is a CHILD of the container window, so it dies
+	     * with it (see tk-embed-destroy-test.tcl section 4).
+	     */
+	    if (c->parentPtr != NULL
+		    && !(c->parentPtr->flags & TK_ALREADY_DEAD))
+		orphanPtr = c->parentPtr;
 	    c->embeddedPtr = NULL;
+	}
 	if (c->parentPtr == winPtr) {
 	    c->parentPtr = NULL;
 	    c->parent = None;
@@ -1278,6 +1298,14 @@ EmbedWindowDeleted(TkWindow *winPtr)
 	    prevPtrPtr = &c->nextPtr;
 	}
     }
+
+    /*
+     * After the walk, never during it: Tk_DestroyWindow comes straight
+     * back here for the container and would be relinking the list this
+     * loop is standing in.
+     */
+    if (orphanPtr != NULL)
+	Tk_DestroyWindow((Tk_Window) orphanPtr);
 }
 
 /* Give the embedded toplevel exactly the container's size. */
@@ -1802,6 +1830,7 @@ TkWmMapWindow(TkWindow *winPtr)
 	return;
     winPtr->flags |= TK_MAPPED;
     XMapWindow(winPtr->display, winPtr->window);
+    WmNotifyTransients(winPtr, 1);
 }
 
 void
@@ -1811,6 +1840,7 @@ TkWmUnmapWindow(TkWindow *winPtr)
 	return;
     winPtr->flags &= ~TK_MAPPED;
     XUnmapWindow(winPtr->display, winPtr->window);
+    WmNotifyTransients(winPtr, 0);
 }
 
 void
@@ -1868,7 +1898,6 @@ TkWmDeadWindow(TkWindow *winPtr)
      */
     WmReleaseIcon(wmPtr);
     WmForgetTransientsOf(winPtr);
-    WmUntrackContainer(winPtr, wmPtr->container);
     wmPtr->container = NULL;
     if (wmPtr->iconFor != NULL && wmPtr->iconFor->wmInfoPtr != NULL) {
 	wmPtr->iconFor->wmInfoPtr->icon = NULL;
@@ -1961,6 +1990,31 @@ TkWmRestackToplevel(TkWindow *winPtr, int aboveBelow, TkWindow *otherPtr)
 	}
     }
     WmLinkAfter(dispPtr, wmPtr, afterPtr);
+
+    /*
+     * A TRANSIENT STAYS ABOVE THE WINDOW IT BELONGS TO, and moves with
+     * it. On X the window manager enforces that; there is none here, so
+     * "raise .t1" put .t1 on top of its own dialog and wm-transient-8.1
+     * read back {.t2 .t1} where it wants {.t1 .t2}. Same reason as the
+     * override-redirect rule above, and the same remedy: hold the rule
+     * in the one place that owns the order.
+     *
+     * One level deep. A transient of a transient is left where it is --
+     * nothing in Tk or the suite builds one, and doing it properly means
+     * relinking recursively while walking the list this is relinking.
+     */
+    {
+	WmInfo *p, *next, *afterPtr = wmPtr;
+
+	for (p = dispPtr->firstWmPtr; p != NULL; p = next) {
+	    next = p->nextPtr;
+	    if (p->container != winPtr || p == wmPtr)
+		continue;
+	    WmUnlink(dispPtr, p);
+	    WmLinkAfter(dispPtr, p, afterPtr);
+	    afterPtr = p;
+	}
+    }
 
     if (aboveBelow == Above)
 	XRaiseWindow(winPtr->display, winPtr->window);
@@ -3381,7 +3435,6 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
 
             if (*s == '\0') {
                 WmSetString(&wmPtr->transient, NULL);
-                WmUntrackContainer(winPtr, wmPtr->container);
                 wmPtr->container = NULL;
                 return TCL_OK;
             }
@@ -3458,16 +3511,7 @@ Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
             }
             Tk_MakeWindowExist(master);
             WmSetString(&wmPtr->transient, Tk_PathName(master));
-            /*
-             * The handler moves with the pointer, and only when the
-             * container actually changes -- re-registering would give
-             * the window two handlers and every state change twice.
-             */
-            if (wmPtr->container != (TkWindow *) master) {
-                WmUntrackContainer(winPtr, wmPtr->container);
-                WmTrackContainer(winPtr, (TkWindow *) master);
-                wmPtr->container = (TkWindow *) master;
-            }
+            wmPtr->container = (TkWindow *) master;
 
             /*
              * A transient follows its master's state: while the master
