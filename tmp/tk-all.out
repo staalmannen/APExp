@@ -7,7 +7,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-11 18:40:22 +0200
+Tests began at 2026-09-12 06:49:17 +0200
 bell.test
 Bell should ring now ...
 bgerror.test
@@ -2050,63 +2050,6 @@ textTag.test
 ==== textTag-16.7 FAILED
 
 textWind.test
-
-
-==== textWind-12.1 EmbWinUndisplayProc procedure, mapping/unmapping FAILED
-==== Contents of test case:
-
-    .t insert 1.0 "Some sample text"
-    frame .f -width 30 -height 20 -bg $color
-    .t window create 1.2 -window .f
-    bind .f <Map> {lappend x mapped}
-    bind .f <Unmap> {lappend x unmapped}
-    set x created
-    update
-    lappend x modified
-    .t delete 1.0
-    update
-    lappend x replaced
-    .t window configure .f -window {}
-    .t delete 1.1
-    update
-    .t window create 1.4 -window .f
-    update
-    lappend x off-screen
-    .t configure -wrap none
-    .t insert 1.0 "Enough text to make the line run off-screen"
-    update
-    return $x
-
----- Result was:
-created mapped mapped modified replaced unmapped unmapped mapped mapped off-screen unmapped unmapped
----- Result should have been (exact matching):
-created mapped modified replaced unmapped mapped off-screen unmapped
-==== textWind-12.1 FAILED
-
-
-
-==== textWind-14.1 EmbWinDelayedUnmap procedure FAILED
-==== Contents of test case:
-
-    .t insert 1.0 "Some sample text"
-    frame .f -width 30 -height 20 -bg $color
-    .t window create 1.2 -window .f
-    update
-    bind .f <Unmap> {lappend x unmapped}
-    set x modified
-    .t insert 1.0 x
-    lappend x removed
-    .t window configure .f -window {}
-    lappend x updated
-    update
-    return $x
-
----- Result was:
-modified removed unmapped updated unmapped
----- Result should have been (exact matching):
-modified removed unmapped updated
-==== textWind-14.1 FAILED
-
 tk.test
 
 
@@ -2123,32 +2066,6 @@ tk.test
 ==== tk-2.3 FAILED
 
 this wish doesn't have XIM (X Input Methods) support
-
-
-==== tk-5.5 tk caret FAILED
-==== Contents of test case:
-
-    tk caret . -x 10 -y 11 -h 12; tk caret .
-
----- Result was:
--height 0 -x 0 -y 0
----- Result should have been (exact matching):
--height 12 -x 10 -y 11
-==== tk-5.5 FAILED
-
-
-
-==== tk-5.6 tk caret FAILED
-==== Contents of test case:
-
-    tk caret . -x 20 -y 25 -h 30; tk caret . -hei
-
----- Result was:
-0
----- Result should have been (exact matching):
-30
-==== tk-5.6 FAILED
-
 unixButton.test
 unixEmbed.test
 
@@ -2167,7 +2084,7 @@ unixEmbed.test
     }
 
 ---- Result was:
-couldn't create child of window "0x5756"
+couldn't create child of window "0x5740"
 ---- Result should have been (exact matching):
 {{XXX {} {} .t}} 0
 ==== unixEmbed-1.5 FAILED
@@ -2190,7 +2107,7 @@ couldn't create child of window "0x5756"
     }
 
 ---- Result was:
-couldn't create child of window "0x5760"
+couldn't create child of window "0x574a"
 ---- Result should have been (exact matching):
 {XXX {} {} .t2} {XXX {} {} .t1}
 ==== unixEmbed-1.6 FAILED
@@ -2212,29 +2129,10 @@ couldn't create child of window "0x5760"
     }
 
 ---- Result was:
-couldn't create child of window "0x5776"
+couldn't create child of window "0x5760"
 ---- Result should have been (exact matching):
 
 ==== unixEmbed-2.2 FAILED
-
-
-
-==== unixEmbed-2.4 EmbeddedEventProc procedure FAILED
-==== Contents of test case:
-
-    pack [frame .f1 -container 1 -width 200 -height 50]
-    toplevel .t1 -use [winfo id .f1]
-    set x [testembed]
-    update
-    destroy .t1
-    update
-    list $x [winfo exists .t1] [winfo exists .f1] [testembed]
-
----- Result was:
-{{XXX .f1 {} .t1}} 0 1 {{XXX .f1 {} {}}}
----- Result should have been (exact matching):
-{{XXX .f1 {} .t1}} 0 0 {}
-==== unixEmbed-2.4 FAILED
 
 
 
@@ -2364,31 +2262,6 @@ alive 1
 ---- Result should have been (exact matching):
 dead 0
 ==== unixEmbed-3.7 FAILED
-
-
-
-==== unixEmbed-3.7a ContainerEventProc procedure, destroy events FAILED
-==== Contents of test case:
-
-    frame .f1 -container 1 -width 200 -height 50
-    pack .f1
-    child alias w1 winfo id .f1
-    bind .f1 <Destroy> {set x dead}
-    set x alive
-    child eval {
-	destroy {*}[winfo children .]
-	toplevel .t1 -use [w1]
-	update
-	destroy .t1
-    }
-    update
-    list $x [winfo exists .f1]
-
----- Result was:
-alive 1
----- Result should have been (exact matching):
-dead 0
-==== unixEmbed-3.7a FAILED
 
 
 
@@ -2573,7 +2446,7 @@ can't read "x": no such variable
     }
 
 ---- Result was:
-couldn't create child of window "0x582b"
+couldn't create child of window "0x5812"
 ---- Result should have been (exact matching):
 {{configure .t1 300 120}} 300x120+0+0
 ==== unixEmbed-6.1 FAILED
@@ -2598,7 +2471,7 @@ couldn't create child of window "0x582b"
     }
 
 ---- Result was:
-couldn't create child of window "0x583d"
+couldn't create child of window "0x5824"
 ---- Result should have been (exact matching):
 {{configure .t1 200 200}} 200x200+0+0
 ==== unixEmbed-6.2 FAILED
@@ -2868,25 +2741,12 @@ couldn't create child of window "0x583d"
     }
 
 ---- Result was:
-couldn't create child of window "0x588d"
+couldn't create child of window "0x5874"
 ---- Result should have been (exact matching):
 {{XXX {} {} .t1}} {}
 ==== unixEmbed-9.2 FAILED
 
 unixFont.test
-
-
-==== unixfont-8.2 InitFont procedure: parse information from XLFD FAILED
-==== Contents of test case:
-
-    expr {[lindex [font actual {-family times -size 0}] 3] == 0}
-
----- Result was:
-1
----- Result should have been (exact matching):
-0
-==== unixfont-8.2 FAILED
-
 unixMenu.test
 unixSelect.test
 
@@ -3506,8 +3366,8 @@ in expression "0x40 & _@_"
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
 ---- errorInfo: missing operand at _@_
-in expression "0x5afb - _@_"
-    (parsing expression "0x5afb - ")
+in expression "0x5ae2 - _@_"
+    (parsing expression "0x5ae2 - ")
     invoked from within
 "expr [testwrapper .t2] - [lindex $hints 8]"
     ("uplevel" body line 7)
@@ -3942,8 +3802,8 @@ in expression "0xa & _@_"
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
 ---- errorInfo: missing operand at _@_
-in expression "0x5b22 - _@_"
-    (parsing expression "0x5b22 - ")
+in expression "0x5b09 - _@_"
+    (parsing expression "0x5b09 - ")
     invoked from within
 "expr [testwrapper .t] - $transient"
     ("uplevel" body line 10)
@@ -4168,6 +4028,43 @@ in expression ""
 ---- Result should have been (exact matching):
 {} {} .t {} .t2 {} .t2 {} .t
 ==== unixWm-50.1 FAILED
+
+
+
+==== unixWm-50.3 Tk_CoordsToWindow procedure, finding a toplevel with embedding FAILED
+==== Contents of test case:
+
+    deleteWindows
+    catch {interp delete child}
+    toplevel .t -width 300 -height 400 -bg blue
+    wm geom .t +100+100
+    frame .t.f -container 1 -bg red
+    place .t.f -x 150 -y 50
+    tkwait visibility .t.f
+    update
+    interp create child
+    load {} Tk child
+    child alias frameid winfo id .t.f
+    child eval {
+	wm withdraw .
+	toplevel .x -width 100 -height 80 -use [frameid] -bg yellow
+	tkwait visibility .x
+	update
+	set x [winfo rootx .x]
+	set y [winfo rooty .x]
+    }
+    set result [list [child eval {winfo containing [expr $x - 1]  [expr $y + 50]}]  [child eval {winfo containing $x [expr $y + 50]}]]
+    interp delete child
+    set x [winfo rootx .t]
+    set y [winfo rooty .t]
+    lappend result [winfo containing [expr $x + 200] [expr $y + 49]]  [winfo containing [expr $x + 200] [expr $y +50]]
+    set result
+
+---- Result was:
+{} .x .t .t
+---- Result should have been (exact matching):
+{} .x .t .t.f
+==== unixWm-50.3 FAILED
 
 
 
@@ -4553,17 +4450,6 @@ window.test
 winfo.test
 
 
-==== winfo-2.5 "winfo atomname" command FAILED
-==== Contents of test case:
-
-    winfo atomname 44215
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== winfo-2.5 FAILED
-
-
-
 ==== winfo-5.4 "winfo interps" command FAILED
 ==== Contents of test case:
 
@@ -4601,28 +4487,6 @@ winfo.test
 
 ==== winfo-7.8 FAILED
 
-
-
-==== winfo-13.2 destroying embedded toplevel FAILED
-==== Contents of test case:
-
-    frame .con -container 1
-    pack .con -expand yes -fill both
-    toplevel .emb -use [winfo id .con] -bd 0 -highlightthickness 0
-    button .emb.b
-    pack .emb.b -expand yes -fill both
-    update
-
-    destroy .emb
-    update
-    list embedded [winfo exists .emb.b] container [winfo exists .con]
-
----- Result was:
-embedded 0 container 1
----- Result should have been (exact matching):
-embedded 0 container 0
-==== winfo-13.2 FAILED
-
 wm.test
 
 
@@ -4646,81 +4510,6 @@ wm.test
 ---- Result should have been (exact matching):
 {.t2.b .t2} {.t2.b .t2.c .t2}
 ==== wm-colormapwindows-2.1 FAILED
-
-
-
-==== wm-transient-4.3 iconify/deiconify on the toplevel
-	does a withdraw/deiconify on the transient FAILED
-==== Contents of test case:
-
-    toplevel .top
-    toplevel .subject
-    update idletasks
-    wm transient .subject .top
-    wm iconify .top
-    update idletasks
-    lappend results [wm state .subject] [winfo ismapped .subject]
-    wm deiconify .top
-    update idletasks
-    lappend results [wm state .subject] [winfo ismapped .subject]
-
----- Result was:
-normal 1 normal 1
----- Result should have been (exact matching):
-withdrawn 0 normal 1
-==== wm-transient-4.3 FAILED
-
-
-
-==== wm-transient-6.2 a withdrawn transient does not track
-	state changes in the toplevel FAILED
-==== Contents of test case:
-
-    toplevel .top
-    toplevel .subject
-    update
-    wm transient .subject .top
-    wm withdraw .subject
-    wm withdraw .top
-    wm deiconify .top
-    # idle handler should not map the transient
-    update
-    lappend results [wm state .subject]
-    wm deiconify .subject
-    lappend results [wm state .subject]
-    wm withdraw .top
-    lappend results [wm state .subject]
-    wm deiconify .top
-    # idle handler should map transient
-    update
-    lappend results [wm state .subject]
-
----- Result was:
-withdrawn normal normal normal
----- Result should have been (exact matching):
-withdrawn normal withdrawn normal
-==== wm-transient-6.2 FAILED
-
-
-
-==== wm-transient-8.1 transient to withdrawn window, Bug 1163496 FAILED
-==== Contents of test case:
-
-    # Verifies that transients stay on top of their toplevels, even if they were
-    # made transients when those toplevels were withdrawn.
-    toplevel .t1; wm withdraw  .t1;     update
-    toplevel .t2; wm transient .t2 .t1; update
-    lappend result [winfo ismapped .t1] [winfo ismapped .t2]
-    wm deiconify .t1; update
-    lappend result [winfo ismapped .t1] [winfo ismapped .t2]
-    raise .t1; raiseDelay; update
-    lappend result [lsearch -all -inline -glob [wm stackorder .] ".t?"]
-
----- Result was:
-0 0 1 1 {.t2 .t1}
----- Result should have been (exact matching):
-0 0 1 1 {.t1 .t2}
-==== wm-transient-8.1 FAILED
 
 
 
@@ -4910,10 +4699,10 @@ pack {} wm {}
 
 xmfbox.test
 
-Tests ended at 2026-09-11 18:42:36 +0200
-all.tcl:	Total	10027	Passed	8902	Skipped	924	Failed	201
+Tests ended at 2026-09-12 06:51:23 +0200
+all.tcl:	Total	10027	Passed	8913	Skipped	924	Failed	190
 Sourced 97 Test Files.
-Files with failing tests: clipboard.test event.test filebox.test focus.test font.test frame.test geometry.test imgPhoto.test pack.test pkgconfig.test place.test select.test systray.test text.test textDisp.test textImage.test textTag.test textWind.test tk.test unixEmbed.test unixFont.test unixSelect.test unixWm.test visual.test winWm.test winfo.test wm.test
+Files with failing tests: clipboard.test event.test filebox.test focus.test font.test frame.test geometry.test imgPhoto.test pack.test pkgconfig.test place.test select.test systray.test text.test textDisp.test textImage.test textTag.test tk.test unixEmbed.test unixSelect.test unixWm.test visual.test winWm.test winfo.test wm.test
 Number of tests skipped for each constraint:
 	12	altDisplay
 	30	aqua
