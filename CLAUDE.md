@@ -154,7 +154,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c` and
-`stdio-test.c`. The twenty-three `tk-*.tcl` scripts there are Tcl, run
+`stdio-test.c`. The twenty-four `tk-*.tcl` scripts there are Tcl, run
 with `wish` -- except `tk-menubar-test.tcl`, which needs `tktest` and
 skips itself under `wish`, and `tk-transient-test.tcl`, whose last
 section alone does; see the Tk section below. `tk-runall.tcl` is the harness for
@@ -2303,6 +2303,47 @@ only in whether it said `update`.
 it: 6c asserts the container is present **before** the update and gone
 **after** it, in that order, because a fix for either half alone looks
 complete; 6d destroys the container first and checks nothing faults.
+
+**Batched into the same rebuild: `Tk_SetAppName` registers nothing.**
+It handed its argument straight back, and that loses two contracts:
+
+- **the name it returns is the name actually registered.** Every Tk
+  appends `" #2"`, `" #3"` … when the name is taken, and
+  `Tk_CreateMainWindow` does
+  `winPtr->nameUid = Tk_GetUid(Tk_SetAppName(tkwin, baseName))` -- so
+  **two Tk main windows in one process both came out with the same
+  name**. That stopped being hypothetical when `tktest` arrived:
+  `interp create child; load {} Tk child` is what `unixWm-50.3` and
+  the `unixEmbed` `-Na` variants do.
+- **`winfo interps` reports it**, and answered the empty list, denying
+  that even the asking interpreter existed. `tk appname foo` reporting
+  success while `winfo interps` says there is nothing is
+  self-contradictory. `tk-2.3`, `winfo-5.4`, `winfo-5.5`.
+
+`macosx/tkMacOSXSend.c` keeps exactly this list and answers exactly
+these two questions from it. **No `send` command is registered, and
+that is deliberate**: the Mac port registers one beside its list, there
+is no transport here, and inventing one that fails would be the
+`systray` mistake. *Listing the interpreters that exist is a different
+question from being able to reach them*, and it is one this port can
+answer truthfully. The Mac port's own comment says `TODO: DeleteProc`
+and it never removes an entry; this does, through
+`Tcl_CallWhenDeleted` -- a registry naming an interpreter that has gone
+is the same class of lie as `wm colormapwindows` naming a destroyed
+window. Covered by `sys/lib/tests/tk-appname-test.tcl`, whose last
+section *prints* whether a `send` command exists rather than asserting
+it, so the absence stays a decision on the record.
+
+**`wm manage`/`wm forget` are the next round's headline and were
+deliberately NOT batched here** -- eight tests (`wm-manage-1.*`,
+`wm-forget-2`, `winWm-9.2`), and upstream's `WmManageCmd` is mostly
+generic Tk: the X-specific half is `TK_HAS_WRAPPER` and
+`RemapWindows(winPtr, wmPtr->wrapperPtr)`, and with no wrappers here
+that reduces to reparenting the frame to the root, which
+`XReparentWindow` in `tkPlan9Init.c` already does. It is smaller than
+the note above it claims. But it turns a frame into a toplevel and so
+edits `dispPtr->firstWmPtr`, the list the last three rounds have all
+touched, and it wants a run of its own to read.
 
 `focus-2.*` is deliberately untouched. It is `TkFocusFilterEvent`, and
 the warning three sections down stands: getting the mode and detail
