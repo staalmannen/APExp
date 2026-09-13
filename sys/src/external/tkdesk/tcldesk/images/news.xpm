@@ -1,0 +1,43 @@
+/* XPM */
+static char *newspap_xpm[] = {
+/* width height ncolors chars_per_pixel */
+"32 32 4 1",
+/* colors */
+"` c black",
+"a c grey",
+"b c white",
+"c c slate grey",
+/* pixels */
+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+"aaaaaaaaaaaa```aaaaaaaaaaaaaaaaa",
+"aaaaaaaaaaa`bbb``aaaaaaaaaaaaaaa",
+"aaaaaaaaaa`bb`bbb``aaaaaaaaaaaaa",
+"aaaaaaaaa`bb``b`bbb``aaaaaaaaaaa",
+"aaaaaaaa`bb`b``bb`cbb``aaaaaaaaa",
+"aaaaaaa`bb`bb`bb`bc`bbb``aaaaaaa",
+"aaaaaa`babbb`bb`a`bb`bbbb``aaaaa",
+"aaaaa`bbc`cbbb`cbbb`bcbcbbb``aaa",
+"aaaa`babbbc`abba`b`bccb`b`cbb``a",
+"aaa`bbc`cbbba`cbbb```b`b`bc`bbb`",
+"aa`babbbc`abbbc`cbbb``bbb`bbbb`a",
+"a`bbc`cbbba`cbbbab`bbb`cb`bbb`a`",
+"`cabbbc`abbbc`cbb`b``bbc`bbb`a`a",
+"`bc`cbbba`cbbbab`abbb``bbbb`a`a`",
+"`bbbc`abbbc`cbb`aaaabbb`bb`a`a`a",
+"`a`cbba`cbbbab`cccaaaa`bb`a`a`a`",
+"`caa`cbbc`cbbb``cccca`bb`a`a`a`a",
+"a``caaacbbcaabbb``cc`bb`a`a`a`aa",
+"aaa``caa`cbba`cbbb``bb`a`a`a`aaa",
+"aaaaa``caa`cbbc`cbbbb`a`a`a`aaaa",
+"aaaaaaa``cabacbbc`bb`a`a`a`aaaaa",
+"aaaaaaaaa``cac`cbbb`a`a`a`aaaaaa",
+"aaaaaaaaaaa``caa`b`a`a`a`aaaaaaa",
+"aaaaaaaaaaaaa``caa`a``a`aaaaaaaa",
+"aaaaaaaaaaaaaaa``c`caa`aaaaaaaaa",
+"aaaaaaaaaaaaaaaaa`````aaaaaaaaaa",
+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+};

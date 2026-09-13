@@ -1,0 +1,560 @@
+### -------------------------------------------------------------------------
+###
+###  AppBar (TkDesk Configuration File)
+###
+###  This file defines the contents and appearance of the Application Bar,
+###  which can be opened from the "TkDesk" menu.
+###
+###  *** Press F5 to save changes and reload this file into TkDesk, 
+###  *** F6 to do the same plus to close this window.
+###
+### -------------------------------------------------------------------------
+
+### Whether to let the application bar be managed by the window manager.
+### The "disadvantage" of this is that you get a border around the appbar
+### window and that the appbar is not automatically present on all virtual
+### screens. Note that you can MOVE the appbar by invoking the menu-entry
+### "Application Bar/Move..." from the popup menu of the very first button.
+### You can then drag the appbar around your screen by pressing the left
+### mouse button and moving your mouse simultaneously. Strange, but this
+### is by far the MFAQ.
+
+set tkdesk(appbar,wm_managed) 0
+
+###
+### Whether to display the drag/minimize button on top/left of the appbar:
+
+set tkdesk(appbar,dragger) 1
+
+### Max. number of buttons in one column resp. row of the application bar
+### (when layout is vertical resp. horizontal):
+
+set tkdesk(appbar,max) 19
+
+### =========================================================================
+###  Date and Time Button
+### =========================================================================
+
+###
+### Definitions of fonts used in the time and date "button" (special:date):
+
+set tkdesk(appbar,font,time) -*-courier-medium-r-*-*-12-*-*-*-*-*-*-*
+set tkdesk(appbar,font,weekday) -*-helvetica-medium-r-*-*-12-*-*-*-*-*-*-*
+set tkdesk(appbar,font,day) -*-times-bold-r-*-*-24-*-*-*-*-*-*-*
+set tkdesk(appbar,font,month) -*-helvetica-medium-o-*-*-12-*-*-*-*-*-*-*
+
+###
+### Define several aspects of the time display:
+
+set tkdesk(appbar,time,background) black
+set tkdesk(appbar,time,foreground) green
+set tkdesk(appbar,time,borderwidth) 2
+set tkdesk(appbar,time,relief) flat
+
+###
+### Set to 1 if you prefer 12-hour time display:
+
+set tkdesk(appbar,12hour) 0
+
+### =========================================================================
+###  Mail and System Load Buttons
+### =========================================================================
+
+###
+### Delay between updates of the load and mail display in seconds:
+
+set tkdesk(appbar,load,delay) 15
+set tkdesk(appbar,mail,delay) 30
+
+###
+### If your incoming mail folder is not in a standard location, point
+### TkDesk to it by uncommenting the following line.  TkDesk also honors
+### the "MAIL" environment variable.
+### Note that you can have TkDesk watch multiple incoming mail folders
+### by setting the following variable to something like
+### {folder1 folder2 folder3}.
+
+#set tkdesk(appbar,mail,folders) {/usr/spool/mail/your_user_id}
+
+# MH users (or others looking for ideas) might be interested in
+# this alternative...
+
+#set tkdesk(appbar,mail,folders) {
+#   "|/usr/bin/flist +inbox +lists/tkdesk -nototal -noshowzero"
+#}
+
+###
+### Set to 1 if you want TkDesk to bring up an alert box telling you
+### which mail folder received new mail when new mail arrived.  Alternatively,
+### you can set this to "bell" to have X's bell ring at the arrival of new
+### mail.  (Still, you might prefer to use JCC's header flasher below.)
+
+set tkdesk(appbar,mail,notifier) 0
+
+###
+### Images to be used for the mail notifier (special:mail):
+
+set tkdesk(appbar,mail,nomail) mailbox_empty.xpm
+set tkdesk(appbar,mail,oldmail) mailbox_old.xpm
+set tkdesk(appbar,mail,newmail) mailbox_full.xpm
+
+###
+### Background colour to change the mail icon to when new mail arrived,
+### use "" if the colour should not be changed:
+
+set tkdesk(appbar,mail,newbg) SlateGray
+
+###
+### Command to use for J. Chris Coppick's incoming mail header flasher
+### that is brought up by pressing the middle mouse button over the mailbox
+### button (to enable this feature remove the "#" at the beginning of the
+### following line; an alternative command may be mailx):
+
+#set tkdesk(appbar,mail,headers,cmd) "mail -H"
+
+###
+### Number of seconds to auto-display mail headers when new mail arrives.
+### Set to zero to disable auto-display of mail headers.
+
+set tkdesk(appbar,mail,headers,autotime) 5
+
+###
+### Background and foreground color, and font to use for the headers window:
+
+set tkdesk(appbar,mail,headers,bg) black
+set tkdesk(appbar,mail,headers,fg) yellow
+set tkdesk(appbar,mail,headers,font) 9x15bold
+
+### =========================================================================
+###  Dial-up Networking Button
+### =========================================================================
+
+###
+### Images to be used for the dial-up networking button (special:dialup):
+
+set tkdesk(appbar,dialup,down) next/PhoneTT.xpm
+set tkdesk(appbar,dialup,up)   next/PhoneTTOffhook.xpm
+#set tkdesk(appbar,dialup,down) next/netscape.xpm
+#set tkdesk(appbar,dialup,up)   next/netscape.xpm
+
+###
+### The commands to use to bring the dial-up connection up or down:
+### (Note: The command specified in tkdesk(appbar,dialup,cmd_up) will
+### get the phone number selected in dsk_dialup passed as first 
+### argument, to be able to dial the correct phone number.)
+
+set tkdesk(appbar,dialup,cmd_up)   "/etc/ppp/ppp-on"
+set tkdesk(appbar,dialup,cmd_down) "/etc/ppp/ppp-off"
+
+# Another possible dialing alternative...
+#set tkdesk(appbar,dialup,cmd_up)   "/usr/bin/wvdial"
+#set tkdesk(appbar,dialup,cmd_down) "/usr/bin/killall wvdial"
+
+### =========================================================================
+###  Trash Button
+### =========================================================================
+
+###
+### Images to be used for the trash button (sepcial:trash):
+
+set tkdesk(appbar,trash,empty) next/recycle.xpm
+set tkdesk(appbar,trash,full) next/recycle_full.xpm
+
+###
+### Whether to display the disk usage of trash folder, and font to use:
+
+set tkdesk(appbar,trash,label) 0
+set tkdesk(appbar,trash,font) fixed
+
+### =========================================================================
+###  AppBar Definition
+### =========================================================================
+
+### Definition of the Application Bar (AB): The Application Bar is defined
+### by the elements of a Tcl list.  (In the following I try to explain its
+### structure, although it will probably best to just have a look at the
+### example definition below.)
+### 
+### Each element of the list is again a Tcl list, whose first element is
+### the file name of the image to use while the second is another Tcl list
+### defining the popup menu associated with that button. If the image file
+### name is not absolute, TkDesk will look for the image in each directory
+### given by the variable tkdesk(path,images), which is defined in the
+### config file "System". Supported formats are XBM, XPM, GIF, and P?M.
+### If the image name starts with "special:" it is a special display button.
+### Currently the following displays are implemented:
+###
+###   special:date   - time and date display
+###   special:load   - system load display
+###   special:mail   - displays the status of your mailbox
+###   special:dialup - displays the status of your dial-up network connection
+###   special:trash  - displays the status of your trash can
+###
+### The popup menu list contains usually a set of 2-element lists. The
+### first element always gives the label of the menu entry, while the
+### second element contains a Tcl script to execute when this menu entry
+### is invoked.
+### 
+### One label has a special meaning: If the label of an entry is "dd", the
+### respective action will be executed when files are dropped on the
+### button (their names can be accessed via %A in the action
+### specification).  One-element lists inside the menu list are handled as
+### follows: {-} adds a separator to the menu. If the list is one of
+### {history:...}  or {config}, TkDesk will insert the corresponding menu
+### at that place.  Otherwise the element is treated as a (disabled) menu
+### entry, and can be used for inserting "headlines." Cascaded menus are
+### also possible, have a look at the example below to see how they are to
+### be defined.
+### 
+### A single click with the left mouse button always invokes the first
+### menu entry of the corresponding popup menu. The menu gets posted when
+### the right mouse button is pressed over an AB button.
+###
+### TkDesk commands that can be used in the list definition:
+### (Only the most common ones are listed here. For a complete overview
+### and a detailed explanation refer to the User's Guide.)
+###
+### dsk_exec cmd ...   : Executes shell command cmd in background.
+### dsk_path_exec path cmd ... : Execute cmd in path.
+### dsk_view cmd ...   : Executes cmd, displays output in Editor window.
+### dsk_open_dir path  : Opens a new file list for directory path.
+### dsk_open_browser path    : Opens a new file browser for directory path.
+### dsk_edit file      : Edits file.
+### dsk_du path        : Displays disk usage of directory path.
+### dsk_periodic cmd seconds : Executes cmd every x seconds.
+### dsk_confirm text script  : Executes script when confirmation was positive.
+### dsk_read_string label script  : Executes script when entered string is
+###                      not empty. "label" will be displayed in the dialog.
+### dsk_sound id       : Plays sound id (defined in config-file Sounds). 
+### dsk_cbhelp file regexp   : Invokes TkDesk's help system on file.
+### dsk_ask_exec       : Asks for a command to execute.
+### dsk_ask_dir        : Asks for a directory to open.
+### dsk_save_config    : Saves window layout, history, bookmarks etc.
+### dsk_exit ?ask?     : Quits TkDesk. "ask" may be one 1 or 0.
+###
+### Abbreviations that will be replaced with file names etc.:
+###
+### %s : Full pathname of the first selected file.
+### %f : Its filename only.
+### %b : "Basename": just the filename without extension.
+### %d : Its directory only.
+### %A : List containing full pathnames of all selected resp. dropped files.
+### %B : Same as %A, but will be replaced with "" if no files are selected.
+### %D : Directory of last "ative" viewer.
+### %x : Current X selection.
+###
+### The very first Button provides access to a few functions of TkDesk,
+### like history menus, configuration menu etc. Its labels are mostly
+### "internally reserved" keywords.
+### The second button is only defined by the magic word "date" which inserts
+### TkDesk's date display at that place into the AB.
+
+set tkdesk(appbar) {
+    {{desk2.xpm} {
+	{{TkDesk Version $tkdesk(version)}}
+	{-}
+	{{Execute/Open...} {dsk_ask_exec}}
+	{{Home Directory} {dsk_open_dir ~}}
+	{{Open Directory...} {dsk_ask_dir}}
+	{{Open Browser...} {dsk_ask_dir browser}}
+	{{Find Files...} {dsk_find_files}}
+        {bookmarks}
+	{{Visited...}
+ 	  {history:files}
+	  {history:dirs}
+	  {history:execs}
+	  {{dd} {dsk_openall %A}}
+	}
+	-
+	{{Application Bar}
+	  {{Be'ish AppBar} {dsk_reread_config AppBar_Be}}
+	  {{Games AppBar} {dsk_reread_config AppBar_Games}}
+	  -
+	  {{Edit this AppBar} {dsk_edit_configs AppBar}}
+	  {{Reload this AppBar} {dsk_reread_config AppBar}}
+	  {-}
+	  {{Vertical} {dsk_appbar layout vertical}}
+	  {{Horizontal } {dsk_appbar layout horizontal}}
+	  {{Raise} {dsk_appbar raise}}
+	  {{Lower} {dsk_appbar lower}}
+	  {{Hide} {dsk_appbar close}}
+	  {-}
+	  {{Move Top Left} {dsk_appbar move topleft}}
+	  {{Move Bottom Left} {dsk_appbar move bottomleft}}
+	  {{Move Top Right} {dsk_appbar move topright}}
+	  {{Move Bottom Right} {dsk_appbar move bottomright}}
+	}
+	{config}
+	{{Quit TkDesk...} {dsk_exit 1}}
+    }}
+    
+    {{next/books.xpm} {
+    	{{Documentation}}
+    	-
+    	{{TkDesk User's Guide } {dsk_help guide}}
+    	{{FAQ } {dsk_help faq}}
+    	{{Changes} {dsk_help changes}}
+	{{TkDesk Homepage } {dsk_netscape url http://tkdesk.sourceforge.net/ window}}
+    	-
+    	{{Manual Page ...} {
+    		dsk_read_string {Show manual page for: (e.g. col(1))} {
+		        # view_manual_page is defined below
+			view_manual_page $dsk_read_string
+    		}
+    	}}
+    	{{XMan } {dsk_exec xman}}
+    	{{TkMan } {dsk_raise_or_exec tkman tkman .man}}
+    	{{TkMan Remote ...} {
+    		dsk_read_string {Show manual page for (requires a running TkMan):} {
+    		    catch {send -async tkman \
+		    "wm deiconify .man; manShowMan $dsk_read_string"}
+    		}
+    	}}
+	{{TkInfo } {dsk_raise_or_exec tkinfo tkinfo .tki1}}
+    	{{dd} {dsk_view man %f | col -b}}
+    }}
+    
+    {{special:date} {
+    	{{Diary and Calendar}}
+    	-
+    	{{This Month} {dsk_view cal}}
+    	{{This Year} {dsk_view cal -y}}
+    	{{Year...} {dsk_read_string "Show calendar for year:" {
+    		dsk_view cal -y $dsk_read_string
+    	}}}
+    	-
+    	{{Plan} {dsk_exec plan}}
+    	{{xcalendar} {dsk_exec xcalendar}}
+    }}
+    
+    {{special:load} {
+    	{{System Statistics}}
+    	-
+	{{Processes } {dsk_periodic "ps" 60}}
+	{{File Systems } {dsk_periodic "df" 60}}
+    	{{Top} {eval dsk_exec $tkdesk(cmd,xterm) -geometry 80x40 -e top}}
+    	{{NetStat} {dsk_view netstat}}
+    }}
+    
+    {{special:mail} {
+    	{{Electronic Mail}}
+    	-
+	{{Communicator: Inbox} {dsk_netscape rcmd mail}}
+	{{Communicator: Send Mail} {dsk_netscape rcmd send}}
+        {{Thunderbird} {dsk_exec thunderbird}}
+	{{Netscape Mail} {dsk_netscape url mailbox:}}
+    	{{Elm} {eval dsk_exec $tkdesk(cmd,xterm) -geometry 80x40 -e elm}}
+    	-
+	{{Outgoing Mail} {dsk_view mailq}}
+	{{Directory } {dsk_open_dir ~/Mail}}
+    }}
+    
+    {{next/Computer.xpm} {
+    	{{System Management}}
+    	-
+	{{XTerm } {dsk_exec xterm -T "XTerm" -sb -ls}}
+	{{XTerm (root)} {dsk_exec xterm -sb -e su}}
+	{{Rxvt } {dsk_exec rxvt -ls}}
+	{{Locate...} {
+            dsk_read_string {Enter filename to locate:} {
+            dsk_view locate $dsk_read_string}}
+        }	
+	-
+    	{{CD-ROM}
+    	    {{Open } {dsk_open_dir /cdrom}}
+    	    {{Mount } {
+    	    	set err [catch {exec mount /cdrom} errmsg]
+    	    	if {$err} {
+    	    	    dsk_errbell
+    	    	    cb_error "An error occured: $errmsg."
+    	    	}
+    	    }}
+    	    {{Unmount } {
+    	    	set err [catch {exec umount /cdrom} errmsg]
+    	    	if {$err} {
+    	    	    dsk_errbell
+    	    	    cb_error "An error occured: $errmsg."
+    	    	}
+    	    }}
+    	}
+    	{{Floppy}
+    	    {{Open } {dsk_open_dir /floppy}}
+    	    {{Mount } {
+    	    	set err [catch {exec mount /floppy} errmsg]
+    	    	if {$err} {
+    	    	    dsk_errbell
+    	    	    cb_error "An error occured: $errmsg."
+    	    	}
+    	    }}
+    	    {{Unmount } {
+    	    	set err [catch {exec umount /floppy} errmsg]
+    	    	if {$err} {
+    	    	    dsk_errbell
+    	    	    cb_error "An error occured: $errmsg."
+    	    	}
+    	    }}
+    	}
+    	-
+	{{Configuration}
+    	    {{.fvwmrc} {dsk_edit ~/.fvwmrc}}
+    	    {{.xinitrc} {dsk_edit ~/.xinitrc}}
+    	    {{.profile} {dsk_edit ~/.profile}}
+    	    {{.Xresources}
+    	    	{{Edit} {dsk_edit ~/.Xresources}}
+    	    	{{Reread } {dsk_exec xrdb ~/.Xresources}}
+    	    }
+	}
+	{{Superuser}
+	    {{Edit password file} {dsk_exec_as_root vi /etc/passwd}}
+	    {{Edit /etc/hosts} {dsk_exec_as_root vi /etc/hosts}}
+	}
+	-
+	{{Screen Saver} {dsk_exec xlock -nolock -mode flame}}
+	{{Blank Screen} {dsk_exec xlock -nolock -mode blank}}
+    }}
+    
+    {{next/Write.xpm} {
+    	{{Text Editing }}
+    	-
+	{{Edit File... } {dsk_edit}}
+	{{New File} {dsk_edit "New File"}}
+	{buffers}
+	-
+	{{XEmacs} {dsk_exec xemacs}}
+	{{Clipboard} {dsk_exec xclipboard}}
+	{{dd} {dsk_edit %A}}
+    }}
+
+    {{xemacs.xpm} {
+        {{XEmacs }}
+        {{About this button...} {
+            cb_info "To take advantage of this button you have to start the XEmacs server from inside XEmacs via M-x gnuserv-start. Files dropped on this button will be loaded into a running XEmacs."
+        }}
+        -
+        {{Edit File... } {xemacs_load .}}
+        {{New File} {xemacs_load *scratch*}}
+        -
+        {{X-Selection}
+            {{Open file } {xemacs_load %x }}
+            {{Open file New Frame } {xemacs_load %x frame }}
+        }
+        {{FTP}
+            {{Sunsite} {xemacs_load {//sunsite.unc.edu:/pub/Linux/.}}}
+            {{Neosoft} {xemacs_load {//ftp.neosoft.com:/pub/tcl/.}}}
+            {{XEmacs FTP-Site} {xemacs_load {//ftp.xemacs.org:/pub/xemacs/.}}}
+        }
+        {{dd} {foreach f [list %A] {xemacs_load $f}}}
+    }}
+
+    {{next/paintbrush.xpm} {
+    	{{Graphics etc.}}
+    	-
+    	{{XV} {dsk_exec xv}}
+    	{{The Gimp} {dsk_exec gimp}}
+    	{{XPaint} {dsk_exec xpaint}}
+    	{{XFig} {dsk_exec xfig}}
+    	-
+    	{{XSpread} {dsk_exec xspread}}
+    	{{dd} {dsk_exec xv %A}}
+    }}
+    
+    {{next/netscape.xpm} {
+    	{{Internet}}
+    	-
+    	{{Netscape} {dsk_exec netscape}}
+    	{{Open URL...} {
+    		dsk_read_string {Open URL using Netscape:} {
+		        # view_manual_page is defined in file Local
+			dsk_netscape url $dsk_read_string window
+    		}
+    	}}
+    	{{X-Selection}
+	    {{Go to URL } {dsk_netscape url %x raise}}
+	    {{New window } {dsk_netscape url %x window}}
+	    {{Everything2 Search} {dsk_netscape url http://www.everything2.com/index.pl?node=%x window}}
+	    {{Desk Item... } {
+	        dsk_read_string {Label of URL Desk Item:} {
+	            global tkdesk
+	            catch {exec mkdir $tkdesk(configdir)/urls}
+	            set err [catch {set fd [open $tkdesk(configdir)/urls/$dsk_read_string.url w]} errmsg]
+	            if !$err {
+	                puts -nonewline $fd %x
+	                close $fd
+	                dsk_DeskItem .di[dsk_DeskItem :: id] \
+	            	    -file $tkdesk(configdir)/urls/$dsk_read_string.url
+	            } else {
+	                dsk_errbell
+	                cb_error $errmsg
+	            }
+	        } {dontpaste}
+	    }}
+	}
+	{{Locations}
+	    {{TkDesk Home } {dsk_netscape url http://tkdesk.sourceforge.net window}}
+	    -
+	    {{Freshmeat } {dsk_netscape url http://www.freshmeat.net window}}
+	    {{Slashdot } {dsk_netscape url http://www.slashdot.org window}}
+	    {{Tcl/Tk } {dsk_netscape url http://www.tcl.tk window}}
+	    {{Google } {dsk_netscape url http://www.google.com window}}
+	    {{Yahoo } {dsk_netscape url http://www.yahoo.com window}}
+	}
+    	{{Communicator} 
+    	    {{Message Center } {dsk_netscape rcmd news}}
+    	    {{Messenger } {dsk_netscape rcmd mail}}
+    	    {{Composer } {dsk_netscape rcmd edit}}
+    	}
+	-
+	{&~/bookmarks}
+	{{dd} {foreach f "%A" {dsk_netscape file \$f window}}}
+    }}
+    
+    {{special:dialup} {
+    	{{Dial-up Networking}}
+    	-
+    	{{Connect/Disconnect} {dsk_dialup}}
+    	{{Information (ifconfig)} {dsk_view ifconfig}}
+    }}
+    
+    {{next/PrinterHP.xpm} {
+    	{{Printer}}
+    	-
+    	{{Print Selected } {dsk_print}}
+    	{{Print X-Selection } {
+    	    eval exec echo [list \{%x\}] | $tkdesk(cmd,print)
+    	}}
+    	{{Watch Queue } 
+    	    {{Default } {dsk_periodic lpq 60}}
+    	    {{ascii } {dsk_periodic {lpq -Pascii} 60}}
+    	    {{lp1} {dsk_periodic {lpq -Plp1} 60}}
+    	}
+    	{{dd} {dsk_print %A}}
+    }}
+    	
+    {{special:trash} {
+    	{{Recycling}}
+    	-
+    	{{Delete Files } {dsk_delete}}
+    	{{Open Trash Can} {dsk_open_dir $tkdesk(trashdir)}}
+    	{{Empty Trash Can} {dsk_empty_trash}}
+    	{{dd} {dsk_delete {%A}}}
+    }}
+}
+
+# ---------------------------------------------------------------------------
+# view_manual_page names:
+# Example of an extension proc.  This one's used by the default application
+# bar to look up manual pages. 
+# Example for $names: "col socket(2) malloc(3)"
+
+proc view_manual_page {names} {
+    foreach name $names {
+	set l [split $name ()]
+	if {[llength $l] == 1} {
+	    #dsk_cbhelp "| man $l | col -b" man
+	    dsk_view man $l | col -b
+	} else {
+	    #dsk_cbhelp "| man [lindex $l 1] [lindex $l 0] | col -b" man
+	    dsk_view man [lindex $l 1] [lindex $l 0] | col -b
+	}
+    }
+}

@@ -1,0 +1,55 @@
+# This is the Makefile for the BLT subset needed by TkDesk.
+# It is called from the main Makefile in .., which passes the CFLAGS.
+
+#----------------------------------------------------------------
+# Things you can change to personalize the Makefile for your own
+# site (you can make these changes in either Makefile.in or
+# Makefile, but changes to Makefile will get lost if you re-run
+# the configuration script).
+#----------------------------------------------------------------
+
+# Location of Tcl header files:
+TCL_INCLUDE_DIR =	@TCL_INCLUDE_PATH@
+
+# Location of Tk header files:
+TK_INCLUDE_DIR =	@TK_INCLUDE_PATH@
+
+# Location of X11 header files:
+X_INCLUDE_FLAG =	@TK_XINCLUDES@
+
+# Configuration compiler flags:
+AC_FLAGS =		@DEFS@
+
+# Miscellaneous settings:
+RANLIB =		@RANLIB@
+CC =			@CC@
+AR =			ar rc
+RM =			rm -f
+
+#----------------------------------------------------------------
+# The information below should be usable as is.  The configure
+# script won't modify it and you shouldn't need to modify it
+# either.
+#----------------------------------------------------------------
+
+CFLAGS =	${CC_OPTS} ${AC_FLAGS} -I.. -I. -I${TCL_INCLUDE_DIR} -I${TK_INCLUDE_DIR} ${X_INCLUDE_FLAG}
+BLT_LIBRARY =	$(LIB_DIR)
+
+libname	=	libBLT.a
+
+OBJS = 		bltBgexec.o bltBusy.o bltUnixPipe.o \
+		bltText.o bltDnd.o bltInit.o bltList.o bltUtil.o \
+		bltConfig.o bltWindow.o bltChain.o bltUnixDnd.o
+
+lib: $(libname)
+
+$(libname):  $(OBJS)
+	$(RM) $@
+	$(AR) $@ $(OBJS)
+	$(RANLIB) $@
+
+bltInit.o: bltInit.c
+	$(CC) -c $(CFLAGS) -DBLT_LIBRARY=\"$(BLT_LIBRARY)\" $<
+
+clean:
+	$(RM) $(OBJS) $(libname) *\~ "#"*

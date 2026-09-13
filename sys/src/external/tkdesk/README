@@ -1,0 +1,86 @@
+	
+README                        TkDesk 2.0                        April, 2004
+--------------------------------------------------------------------------
+
+This is release 2.0 of TkDesk.
+
+Release Summary
+
+   This release is a first attempt at providing compatibility with
+   Tcl/Tk 8.4.  There are some other minor fixes and new features
+   (see the ChangeLog file for details), but the main intent is to
+   provide compatability support for the latest versions of Tcl/Tk,
+   Itcl, and BLT.  As of this release, TkDesk may no longer provide
+   compatability support for versions of Tcl/Tk older that 8.0.
+
+Release 2.0 Highlights
+
+   * Tcl/Tk 8.4 compatibility
+   
+     See the INSTALL file for detailed release requirements.
+
+   * Dropped support for Tcl/Tk 7.x.
+
+   * Mouse-wheel support
+       
+     Most text boxes and the file listings are now mouse-wheel enabled.
+     The usage details haven't made it into the documentation yet,
+     so here's the quick summary:
+
+        o Your X11 server needs to be configured for mouse-wheel support.
+        o The mouse wheel scrolls 5 lines at a time by default
+        o Shift + the mouse wheel scrolls 1 line at a time
+        o Ctrl + the mouse wheel scrolls 1 page at a time
+
+   * Select two files, press a button, get a diff!
+
+     This works great in conjunction with tkDiff.  The diff command used
+     can be configured in your .tkdesk/System file.  The default "diff"
+     button (on the button bar) is a picture of two overlapped pages.
+
+   * Improved (hopefully) configure script
+
+   * New TkDesk logo
+
+What is TkDesk?
+
+   TkDesk is a graphical desktop and file manager for several types
+   of UNIX (such as Linux) and the X Window System.  It offers a very
+   rich set of file operations and services, and gives the user the
+   ability to configure most aspects of TkDesk in a powerful way.  The
+   reason for this is the use of Tcl/Tk as the configuration and (for
+   the biggest part of TkDesk) implementation language.
+
+   TkDesk was conceived and originally implemented by Christian Bolik.
+
+Licensing
+
+   For licensing details, see the file COPYING.  Apart for the exceptions
+   detailed in there, TkDesk is released under the terms of the GNU General
+   Public License.
+
+   TkDesk is copyrighted by Christian Bolik.
+
+How do I install TkDesk?
+
+   See the file INSTALL for instructions on how to install TkDesk.
+   For the impatient, here's the summary: Install Tcl/Tk 8.4, along
+   with the latest releases of Incr Tcl and BLT, if you don't have 
+   have them, and then run "./configure", "make", and "make install".
+   (The absolute latest versions of Tcl/Tk, Itcl & BLT may not be needed.
+   See the INSTALL file for detailed requirements.)
+
+Is there a Web page for TkDesk?
+
+   Yes, please take a look at: http://tkdesk.sourceforge.net
+
+   Latest source releases and patches will be available first from there,
+   along with TkDesk news, mailing-list information, etc.
+
+Hope you enjoy TkDesk!
+
+     J. Chris Coppick
+     jchris@users.sourceforge.net
+
+
+

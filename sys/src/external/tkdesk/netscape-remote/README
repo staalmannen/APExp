@@ -1,0 +1,187 @@
+README,v 1.1.1.1 2004/02/29 21:52:24 jcc Exp
+
+Netscape-Remote - A Tcl/Tk extension to communicate with Netscape
+
+Version 1.2
+
+By Ken Hornstein <kenh@cmf.nrl.navy.mil>
+
+CHANGES FROM PREVIOUS VERSION
+=============================
+
+- netscape-remote has been renamed to netscape_remote, so as to better work
+  with the "load" command.
+- Support for being loaded as a "package".
+
+INTRODUCTION
+============
+
+On my Unix desktop, I almost always have a Netscape running.  But I quickly
+discovered that if I came across a URL somewhere on my desktop, it was
+a pain in the ass to go to my Netscape window, open the "Go To URL" dialog
+box, paste in the string, delete the old string, etc etc.
+
+The good people at Netscape, however, already thought up a solution to this
+problem.  Unix Netscape supports the -remote option on the command line.
+This uses X Windows properties to send a command to a currently-running
+Netscape, which means you can easily send it a command from another program.
+
+So, this sounds great.  However, I quickly discovered this also has it's
+problems:
+
+- It requires you loading in most of the Netscape executable.  Many times
+  I don't run Netscape on my desktop machine (because it will really swap
+  like hell if Netscape is loaded), but instead on another machine.  But
+  if I want to control it from a process on my desktop, I have to load
+  most of Netscape, and since I'm not running it on my desktop, it's not
+  in my buffer cache, and that takes forever.  Since the size of Netscape
+  increases with every release, this problem is only going to get worse.
+
+- For every command, it requires one to do an XQueryTree call and iterate
+  over all windows on your display and checking to see which one is Netscape.
+  On a Unix domain socket this isn't so bad, but over the net this takes
+  a noticable amount of time.
+
+The net result is that using netscape -remote takes a lot more resources
+and time than I'd like.
+
+Since I use a lot of Tk applications (and in fact I use a small Tcl/Tk
+app to yank URL's out of the cut buffer and send them to Netscape), I
+decided it would be a lot more efficient if Tk could just talk to Netscape
+directly.  Thus, Netscape-Remote was born.
+
+Netscape-Remote is a dyanmically loadable extension to for Tcl 7.5/Tk 4.1
+and Tcl 7.6/Tk 4.2 that uses the same protocol that is used by the -remote
+flag.  This protocol is documented by the following URL:
+
+	http://home.netscape.com/newsref/std/x-remote-proto.html
+
+Essentially, it uses X Windows properties to communicate with the remote
+version of Netscape.
+
+This has the following advantages over using netscape -remote:
+
+- It's less resource-intensive.
+	Since it's a Tcl extension, all you need is the Tcl/Tk runtime
+	loaded instead of all of Netscape.  And if you're controlling
+	Netscape from a Tcl/Tk application, there is practically no
+	overhead at all.
+
+- It's faster.
+	Since Netscape-Remote caches the window Id from the XQueryTree
+	call, it doesn't need to look at every window on your display to
+	see if it's a Netscape window.
+
+
+INSTALLATION
+============
+
+To install this extension, you must have Tcl 7.5/Tk 4.1 or higher (it
+has been tested with Tcl 7.6/Tk 4.2) with dyanmically loadable extension
+support.  I imagine it would be possible to compile this extension into
+wish statically, but I have not done it.  (You can probably just invoke
+Netscape_remote_Init() from tkAppInit.c).
+
+Edit the supplied Makefile and fill in the defaults for your system.
+Included are sample configurations for SunOS 4.x, SunOS 5.x, NetBSD, and
+IRIX 5.x systems.  If you don't have one of these systems, you'll have
+to figure out what to use for PICFLAG, SHAREDLIBEXTENSION, and SHAREDLIBFLAGS.
+You can probably gain some hints for this from your "tclConfig.sh"
+script, which will be located somewhere in your lib directory.
+
+Once that's done, "make" should compile netscape_remote.so (or whatever
+is your shared library extension).
+
+You should then probably install this shared library whereever you place
+loadable extensions.  A pkgIndex.tcl script has been provided, but you
+can generate your own if you prefer by using pkg_mkIndex.  Once this
+has been installed properly, you should be able to load the extension by
+doing:
+
+% package require netscape_remote
+
+Alternatively, you can load netscape_remote directly with "load", as exampled
+below.
+
+% load ./netscape_remote.so
+
+USE
+===
+
+This extension creates a new command in your interpreter called
+"send-netscape".  This command accepts only one argument: the command
+string to send to netscape.  For example:
+
+% send-netscape openURL(http://www.nrl.navy.mil/CCS/people/kenh/carp/)
+
+Will tell Netscape to go to the above URL.
+
+The function names come from the Xt action arguments that can be found
+in the Netscape.ad file.  For a partial list of possible actions and
+arguments to them, see the following URL:
+
+	http://home.netscape.com/newsref/std/x-remote.html
+
+If you wish to emulate the "-noraise" flag that the command-line netscape
+has, add it as an extra option to the Xt action command.  For example:
+
+% send-netscape {openURL(http://www.nrl.navy.mil/CCS/people/kenh/carp/, noraise)}
+% send-netscape openURL(noraise)
+
+The return value from send-netscape is the response string from Netscape.
+This is a 3-digit response code and an optional text string.  See the
+above documentation for more info on this code (a quick summary - if the
+code begins with "2", it's a succesfull command.  If it begins with "5",
+it's a failed command).
+
+send-netscape supports some additional options.  They are:
+
+	-id windowId	- Send the command to the window specified by
+			  "windowId", rather than searching through all
+			  the windows on your display.  "windowId" is
+			  a hexadecimal string indicating the X identifier
+			  for the window.
+
+	-idvar var	- Store the X identifier for the window found
+			  in the variable "var", suitable for passing
+			  to the "-id" flag.
+
+	-timeout ms	- Set the protocol timeout for "ms" milliseconds.
+			  The default is 10000 (10 seconds).  Note that a
+			  timeout of 0 is a really short timeout, not an
+			  infinite timout!
+
+New in 1.1 is the "info-netscape" command.  Valid arguments to info-netscape
+are:
+
+	list		 - Return a list of X identifiers for all Netscape
+			   windows on your display.
+
+	version	windowID - Return the version of Netscape that is running
+			   on window "windowID".
+
+	url windowID	 - Returns the current URL for the Netscape that is
+			   running on window "windowID".
+
+BUGS
+====
+
+Send-netscape doesn't check the Netscape version number for validity, even
+now that there is a "info-netscape version" command.  I'm not sure what I
+would do with a version number if I did check it.
+
+Errors during the protocol unlock phase are not checked.
+
+There is no way to specify a unlimited timeout.
+
+MISC
+====
+
+The "ClientWin.c" file distributed with this package is from the X Consortium
+X11R6 distribution.  This implements XmuClientWindow, which is used by
+Netscape-Remote.  This source code is Copyright 1989 by the X Consortium.
+Please see ClientWin.c for the complete copyright notice.
+
+Netscape-Remote is Copyright (c) 1996 by Ken Hornstein.  Please see the
+COPYRIGHT file included with this distribution for a complete copyright
+notice.

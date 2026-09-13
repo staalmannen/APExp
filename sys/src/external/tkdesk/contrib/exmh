@@ -1,0 +1,201 @@
+From tkdesk-owner@mrj.com  Thu Oct 16 09:57:29 1997
+Return-Path: <tkdesk-owner@mrj.com>
+Received: from mail.wiesbaden.netsurf.de (bolik@localhost [127.0.0.1])
+	by deepthought.mainz.netsurf.de (8.8.5/8.8.5) with ESMTP id JAA00303
+	for <bolik>; Thu, 16 Oct 1997 09:57:27 +0200
+Received: from turtle.mrj.com by wiesbaden.netsurf.de with smtp
+	(Smail3.1.28.1 #10) id m0xHGBw-001ljDa; Fri, 3 Oct 97 23:27 MET
+Received: (from majordomo@localhost) by turtle.mrj.com (8.6.10/8.6.10) id QAA26474 for tkdesk-outgoing; Fri, 3 Oct 1997 16:30:57 -0400
+Received: from frodo.tucc.uab.edu (frodo.tucc.uab.edu [138.26.25.10]) by turtle.mrj.com (8.6.10/8.6.10) with ESMTP id QAA26466 for <tkdesk@mrj.com>; Fri, 3 Oct 1997 16:30:43 -0400
+Received: from frodo (localhost [127.0.0.1])
+          by frodo.tucc.uab.edu (8.8.4/8.8.4) with ESMTP
+	  id PAA08236 for <tkdesk@mrj.com>; Fri, 3 Oct 1997 15:27:41 -0500
+Message-Id: <199710032027.PAA08236@frodo.tucc.uab.edu>
+X-Mailer: exmh version 2.0zeta 7/24/97
+To: tkdesk@mrj.com
+Subject: [TkDesk] useful script for users of exmh
+Reply-To: jdblair@uab.edu
+X-Url: http://frodo.tucc.uab.edu
+X-Pgp-Fingerprint: CA F3 47 79 62 05 50 78  6C 8A A2 FA D6 42 4B 19
+X-Face: )tQhsYv#dM8;9?k0LWo:ZU!Ar~E4yZ^labAQ_OhdHl"Ij)AOPi,I+_..N*Cb27&Z>hFHp,-
+ X<bytMwJb$~SvC#hzmMmf*~Zl%&>PshW[<mmL?gRu|Dl9OD1Bks0BC881p7Ktm=<+]wZQ5fF0M7Ucu
+ vjuZQC'u"cG2O+ClS3Xk/yf7&w\y8G#Q?QIO[-;$<PWH*3J/\]`YvhxX:"}`
+Date: Fri, 03 Oct 1997 15:27:41 -0500
+From: John Blair <jdblair@frodo.tucc.uab.edu>
+Sender: owner-tkdesk@mrj.com
+Precedence: bulk
+Content-Type: text
+X-Mozilla-Status: 0001
+Content-Length: 5628
+
+-----BEGIN PGP SIGNED MESSAGE-----
+
+
+
+Hello,
+
+I think any other users of TkDesk that use exmh as their mailer will 
+find this short script really useful.
+
+(If you don't know what exmh is, you should probably check it out.  
+You can learn more about it at http://www.sunlabs.com/~bwelch/exmh/)
+
+This script is sort of an extended variation on the jdb_raise_or_exec 
+script I just posted.  The script performs several functions.  If 
+exmh is not already running it starts exmh.  If exmh is already 
+running is deiconifies and raises exmh, which will make it visible no 
+matter where its currently lost on your desktop.
+
+Following that step, if the X-selection is not empty the script tries 
+to parse  an e-mail address out of the selection.  If it succeeds in 
+finding an e-mail address it then tells exmh to create a new compose 
+box addressed to the address it found.  If there is more than one 
+address in the selection, the first address will be used.
+
+I added these procedures to my Local file, then set my appbar config 
+file to run jdb_exmh when I click the mailbox. The upshot of this is 
+that I can select an e-mail address in a document, like a README file 
+or a web page and click the mailbox.  I immediately am presented with 
+an exmh compose window with a blank message addressed to the address 
+I selected.  Its very convenient.
+
+Some details about the script.  It is two functions.  The first 
+procedure, jdb_exmh, does the checking to see if exmh is running, and 
+tries to parse an address out of the selection.  The second procedure 
+does the work to create a new mh message with the proper address, 
+then tells exmh to use it.  This procedure can be reused in other 
+scripts (I pulled it from a totally different script I wrote quite a 
+while ago).  If you try it out, let me know what you think of it.
+
+Here's the script:
+
+#
+# fancy exmh startup script
+#
+proc jdb_exmh {} {
+    # by John Blair, jdblair@uab.edu
+    
+    set not_found 1
+    foreach interp [winfo interps] {
+	if {[string compare $interp exmh] == 0} {
+	    set not_found 0
+	}
+    }
+
+    # either start exmh or diconify and raise it
+    if $not_found {
+	dsk_exec exmh
+    } else {
+	send -async exmh "wm deiconify .; raise ."
+    }
+    
+    # if the selection isn't empty parse out an address and
+    # create a new exmh compose window
+    if {! [catch {set string [selection get -type STRING]}]} {
+	# this is an embarrasing kludge-- wait for exmh to start
+	if $not_found {
+	    after 500
+	}
+	# I think this regex contains all characters legal in an e-mail
+	# address.  Please contact me if I've forgotten any.
+	regexp {[a-zA-Z0-9!%\-]+@[a-zA-Z\.\-]+} $string address
+	if [info exists address] {
+	    jdb_email_exmh $address
+	}
+    }
+}
+
+# jdb_email_exmh needs a temporary directory to store a custom created
+# mh form.  If you don't want it to use /tmp, set the variable
+# 'tkdesk(exmh,tmp)' to some other directory
+
+#
+# tell exmh to create a new message to a given address
+#
+proc jdb_email_exmh {address} {
+    global jdb_email_exmh tkdesk
+
+    # settings
+    set defaultform "To:\ncc:\nSubject:\n-------"
+    set mhlib /usr/lib/mh
+
+    # get main window name
+    set name [winfo name .]
+
+    # get the location of the mh directory from exmh
+    send exmh send $name set jdb_email_exmh(exmh,path) 
+{$mhProfile(path)}
+
+    # does a 'components' file exist?
+    if [file exists "$jdb_email_exmh(exmh,path)/components"] {
+	set file [open "$jdb_email_exmh(exmh,path)/components"]
+	set jdb_email_exmh(exmh,form) [read $file]
+	close $file
+
+    # then try to load the library components file
+    } elseif [file exists "$mhlib/components"] {
+	set file [open "$mhlib/components"]
+	set jdb_email_exmh(exmh,form) [read $file]
+	close $file
+
+    } else {
+	set jdb_email_exmh(exmh,form) $defaultform
+    }
+
+    # write form to temporary file, changing To: line to proper value
+    set pid [pid]
+    if [info exists tkdesk(exmh,tmp)] {
+	set tmpform "$tkdesk(exmh,tmp)/$pid.mhform"
+    } else {
+	set tmpform "/tmp/$pid.mhform"
+    }
+    set form [open $tmpform w]
+    foreach line [split $jdb_email_exmh(exmh,form) \n] {
+	if [regexp -nocase {^to:} $line match] {
+	    puts $form "To: $address"
+	} else {
+	    puts $form $line
+	}
+    }
+    close $form
+
+    # tell exmh to open a window
+    send exmh Msg_Compose -form $tmpform
+
+    # delete the temporary form
+    file delete $tmpform
+}
+
+take care,
+ -john.
+
+
+.......................................................................
+..                                                                    .
+......John.D.Blair...   mailto:jdblair@uab.edu   phoneto:205.975.7123 .
+                   .   http://frodo.tucc.uab.edu  faxto:205.975.7129 .
+ ..sys|net.admin....                                                 .
+ .                     the university computer center            .....
+ ..... g.e.e.k.n.i.k...the.university.of.alabama.at.birmingham....
+
+
+
+
+-----BEGIN PGP SIGNATURE-----
+Version: 2.6.3a
+Charset: noconv
+
+iQCVAwUBNDVVPQJjTpK3AXhBAQF+qwP9Hgk7zZGG+EtkbZs3uDVCQS2bEMIko3zz
+eQJXPysqcxjiLyKQDGTFmEXaILlmVqYWo8iKHgegM+h43e9AogyoJmjNK++QqiDE
+0qVMtwUSuB9H6JWR0JvNeqrbJXqqOQ4N0N9kNuY4BzRLafLpgF7PTJrQUjQM5oYL
+QhhMAIdrRqI=
+=8tIF
+-----END PGP SIGNATURE-----
+
+# ---------------------------------------------------------------------- #
+# To post to the list, send email to 'tkdesk@mrj.com'.                   #
+# To unsubscribe from this list, send email to 'majordomo@mrj.com' with  #
+# no subject and the following line in the body of the message:          #
+# unsubscribe tkdesk                                                     #
+# ---------------------------------------------------------------------- #
+

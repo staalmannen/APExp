@@ -1,0 +1,22 @@
+/* XPM */
+static char * lightning_xpm[] = {
+"16 16 3 1",
+" 	c grey51",
+".	c grey4",
+"X	c yellow1",
+"       .XXXX.   ",
+"       .XXXX.   ",
+"      .XXXX.    ",
+"      .XXX.     ",
+"     .XXX.      ",
+"     .XX.       ",
+"    .XXX....    ",
+"    ...XXX.     ",
+"      .XX.      ",
+"     .XX.       ",
+"    .XX.        ",
+"    .X.         ",
+"   .X.          ",
+"   ..           ",
+"  ..            ",
+"  .             "};

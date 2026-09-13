@@ -1,0 +1,23 @@
+/* XPM */
+static char * magnify_xpm[] = {
+"16 16 4 1",
+" 	s None	c None",
+".	c grey4",
+"X	c white",
+"o	c firebrick3",
+"                ",
+"    .....       ",
+"  .........     ",
+"  ...XXX...     ",
+" ...XXXXX...    ",
+" ..XXX    ..    ",
+" ..XX     ..    ",
+" ..XX     ..    ",
+" ...X    ...    ",
+"  ...   ...     ",
+"  .........o    ",
+"    ..... ooo   ",
+"           ooo  ",
+"            ooo ",
+"             ooo",
+"              o "};

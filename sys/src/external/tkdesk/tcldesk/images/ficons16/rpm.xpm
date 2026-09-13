@@ -1,0 +1,23 @@
+/* XPM */
+static char * rpmfile_xpm[] = {
+"16 16 4 1",
+" 	c None",
+".	c red1",
+"X	c firebrick3",
+"o	c brown4",
+"                ",
+"                ",
+"                ",
+"                ",
+"                ",
+"     .....X     ",
+"    XXXXXXX     ",
+"    XXXXX.XX    ",
+" XXXoXXXX..X    ",
+" XXXooooX...X   ",
+" XXXXoooX...XXX ",
+"   XXX.X....XXX ",
+"     XXX...XXXX ",
+"       XX..XX   ",
+"                ",
+"                "};

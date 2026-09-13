@@ -1,0 +1,16 @@
+*** /usr/tmp/TclTk/blt2.4j/src/bltUnixDnd.c	Wed Sep 22 23:32:03 1999
+--- bltUnixDnd.c	Mon Nov  8 19:11:05 1999
+***************
+*** 792,798 ****
+--- 792,802 ----
+  {
+      int size;
+  
++ #if (XT_REVISION < 6)
++     size = XMaxRequestSize(display);
++ #else
+      size = MAX(XExtendedMaxRequestSize(display), XMaxRequestSize(display));
++ #endif
+      size *= 4;			/* Convert to bytes. */
+      size -= 32;
+      return size;

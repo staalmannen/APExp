@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# Usage: od-tkdesk [directory]
+# Opens directory in a new TkDesk window, or, if no arg is given, does
+# the same for the current working directory.
+
+if [ $# -gt 0 ]; then
+  DIR=$1
+  if [ "$DIR" = "." ]; then
+    DIR=`pwd`
+  elif [ "$DIR" = ".." ]; then
+    DIR=`dirname $(pwd)`
+  elif [ "x`echo $DIR | grep '^[/~]'`" = "x" ]; then
+    DIR=`pwd`/$DIR
+  fi
+  tkdeskclient "dsk_open_dir $DIR" >/dev/null
+else
+  tkdeskclient "dsk_open_dir `pwd`" >/dev/null
+fi

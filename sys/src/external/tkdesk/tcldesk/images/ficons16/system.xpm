@@ -1,0 +1,23 @@
+/* XPM */
+static char * system_xpm[] = {
+"16 16 4 1",
+" 	s None	c None",
+".	c grey4",
+"X	c grey51",
+"o	c grey76",
+"                ",
+"     ....       ",
+"    .Xoo..      ",
+"    ..X...      ",
+"  ..XXoo.X..    ",
+" .ooo....Xo..   ",
+" .oooooooo.X.   ",
+" .ooooooo.XX.   ",
+"  ..ooooo...    ",
+"    ......      ",
+"   ..Xoo...     ",
+" ..oXXoo.Xo..   ",
+" .oooX..Xo...   ",
+" .ooooooo.XX.   ",
+" ..oooooo.X..   ",
+"   .X......     "};

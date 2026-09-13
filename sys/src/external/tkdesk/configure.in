@@ -1,0 +1,360 @@
+dnl Process this file with autoconf to produce a configure script.
+
+AC_INIT(TkDesk, [ver-2-0])
+AC_PREREQ([2.57])
+AC_REVISION(1.4)
+AC_CONFIG_SRCDIR([tkdesk.main])
+
+AC_CONFIG_HEADERS(config.h)
+
+AC_ARG_WITH(tcl, 
+   [AC_HELP_STRING([--with-tcl=DIR],[read Tcl configuration from DIR])],
+   TCLCONF_PATH=$withval)
+
+AC_ARG_WITH(tk,
+   [AC_HELP_STRING([--with-tk=DIR],[read Tk configuration from DIR])],
+   TKCONF_PATH=$withval)
+
+AC_ARG_WITH(itcl,
+   [AC_HELP_STRING([--with-itcl=DIR],[read itcl configuration from DIR])],
+   ITCLCONF_PATH=$withval)
+
+AC_ARG_WITH(tclconfig,
+   [AC_HELP_STRING([--with-tclconfig=FILE],
+                  [use specific tcl config file [tclConfig.sh]])],
+   TCLCONF_FILE=$withval,
+   TCLCONF_FILE=tclConfig.sh)
+
+AC_ARG_WITH(tkconfig,
+   [AC_HELP_STRING([--with-tkconfig=FILE],
+                  [use specific tk config file [tkConfig.sh]])],
+   TKCONF_FILE=$withval,
+   TKCONF_FILE=tkConfig.sh)
+
+AC_ARG_WITH(itclconfig,
+   [AC_HELP_STRING([--with-itclconfig=FILE],
+                  [use specific itcl config file [itclConfig.sh]])],
+   ITCLCONF_FILE=$withval,
+   ITCLCONF_FILE=itclConfig.sh)
+
+AC_ARG_WITH(blt,
+   [AC_HELP_STRING([--with-blt=DIR],[link with BLT library installed in DIR])],
+   BLT_LIB_PATH=$withval)
+
+AC_ARG_ENABLE(tkstep,
+   [AC_HELP_STRING([--enable-tkstep],[link using TkStep libraries])],
+   ENABLE_TKSTEP=yes,
+   ENABLE_TKSTEP=no)
+
+AC_ARG_ENABLE(unsupported,
+   [AC_HELP_STRING([--enable-unsupported],[override checks for unsupported versions of Tcl/Tk, etc.])],
+   ENABLE_UNSUPPORTED=yes,
+   ENABLE_UNSUPPORTED=no)
+	
+#
+# Read tclConfig.sh and tkConfig.sh:
+#
+
+AC_MSG_CHECKING(for $TCLCONF_FILE)
+if test -z "$TCLCONF_PATH" ; then
+  TCLCONF_PATH="$HOME/lib /usr/local/lib /usr/lib /usr/X11/lib /usr/share/lib"
+fi
+success=0
+for d in $TCLCONF_PATH ; do
+  if test -r $d/$TCLCONF_FILE ; then
+    TCLCONF_PATH=$d
+    success=1
+    break
+  fi
+done
+if test $success = 1 ; then
+  AC_MSG_RESULT($TCLCONF_PATH/$TCLCONF_FILE)
+else
+  AC_MSG_RESULT([not found])
+  echo
+  AC_MSG_ERROR([could not find $TCLCONF_FILE - Please restart configure with the argument --with-tcl=dir, where dir is the path of tclConfig.sh.  You may use --with-tclconfig=file to use a specific Tcl config file name.  If you cannot locate this file, maybe Tcl/Tk needs to be installed first.  Note that TkDesk 2.x requires Tcl/Tk 8.x.])
+fi
+
+AC_MSG_CHECKING(for $TKCONF_FILE)
+if test -z "$TKCONF_PATH" ; then
+  TKCONF_PATH="$TCLCONF_PATH $HOME/lib /usr/local/lib /usr/lib /usr/X11/lib /usr/share/lib"
+fi
+success=0
+for d in $TKCONF_PATH $TKCONF_PATH/lib ; do
+  if test -r $d/$TKCONF_FILE ; then
+    TKCONF_PATH=$d
+    success=1
+    break
+  fi
+done
+if test $success = 1 ; then
+  AC_MSG_RESULT($TKCONF_PATH/$TKCONF_FILE)
+else
+  AC_MSG_RESULT([not found])
+  echo
+  AC_MSG_ERROR([could not find $TKCONF_FILE - Please restart configure with the argument --with-tk=dir, where dir is the path of tkConfig.sh.  You may use --with-tkconfig=file to use a specific Tk config file name.  If you cannot locate this file, maybe Tcl/Tk needs to be installed first.  Note that TkDesk 2.x requires 8.x.])
+fi
+
+dnl Look Mom!  No security!  :-)
+
+. $TCLCONF_PATH/$TCLCONF_FILE
+. $TKCONF_PATH/$TKCONF_FILE
+
+TCL_LIB_STATIC=${TCLCONF_PATH}/libtcl${TCL_VERSION}.a
+TK_LIB_STATIC=${TKCONF_PATH}/libtk${TK_VERSION}.a
+
+#
+# Check for the TkStep libraries (if needed)...
+#
+
+if test "$ENABLE_TKSTEP" == "yes" ; then
+  TK_LIB_SPEC="-ltkstep -lXpm -ltiff"
+  AC_MSG_NOTICE([will link using TkStep libraries])
+fi
+
+#
+# Check version of installed Tcl/Tk libraries:
+#
+
+AC_MSG_CHECKING(version of Tcl)
+AC_MSG_RESULT($TCL_VERSION)
+if test "$TCL_MAJOR_VERSION" -lt 8; then
+   echo
+   if test "$ENABLE_UNSUPPORTED" == "yes" ; then
+      AC_MSG_WARN([you may be attempting to use TkDesk 2.x with an unsupported version of Tcl.  Good luck.  Hope it works out for you.])
+   else
+      AC_MSG_ERROR([TkDesk version 2.x requires Tcl version 8 or higher.  Please upgrade your Tcl or, if that is not possible, you might prefer to use TkDesk version 1.2 instead.])
+   fi
+fi
+
+AC_MSG_CHECKING(version of Tk)
+AC_MSG_RESULT($TK_VERSION)
+if test "$TK_MAJOR_VERSION" -lt 8; then
+   echo
+   if test "$ENABLE_UNSUPPORTED" == "yes" ; then
+      AC_MSG_WARN([you may be attempting to use TkDesk 2.x with an unsupported version of Tk.  Good luck.  Hope it works out for you.])
+   else
+      AC_MSG_ERROR([TkDesk version 2.x requires Tk version 8 or higher.  Please upgrade your Tk or, if that is not possible, you might prefer to use TkDesk version 1.2 instead.])
+   fi
+fi
+
+#
+# Check for itcl 3.x
+#
+# Sometimes the itclConfig.sh file is missing (e.g. on my redhat 9 install)
+# so if we can't find it we'll take a look around for the itcl libs and
+# includes anyway.
+
+# First look for an itclConfig.sh...
+
+AC_MSG_CHECKING(for $ITCLCONF_FILE)
+if test -z "$ITCLCONF_PATH" ; then
+  ITCLCONF_PATH="$TCLCONF_PATH $HOME/lib /usr/local/lib /usr/lib /usr/X11/lib /usr/share/lib"
+fi
+success=0
+for d in $ITCLCONF_PATH ; do
+  if test -r $d/$ITCLCONF_FILE ; then
+    ITCLCONF_PATH=$d
+    success=1
+    break
+  fi
+done
+if test $success = 1 ; then
+   AC_MSG_RESULT($ITCLCONF_PATH/$ITCLCONF_FILE)
+   . $ITCLCONF_PATH/$ITCLCONF_FILE
+
+   AC_MSG_CHECKING(version of Itcl)
+   AC_MSG_RESULT($ITCL_VERSION)
+   if test "$ITCL_MAJOR_VERSION" -ne 3; then
+      echo
+      if test "$ENABLE_UNSUPPORTED" == "yes" ; then
+	 AC_MSG_WARN([you may be attempting to use TkDesk 2.x with an unsupported version of Itcl.  Good luck.  Hope it works out for you.])
+      else
+	 AC_MSG_ERROR([found Itcl, but it appears to be the wrong version.  TkDesk 2.x requires itcl 3.x to be installed.  Please get it from: http://www.incrtcl.sourceforge.net.])
+      fi
+   fi
+else
+   AC_MSG_RESULT([not found])
+   ITCLCONF_PATH=[[N/A]]
+   ITCL_VERSION="no"
+   ITCL_MAJOR_VERSION=0
+   AC_MSG_WARN([could not find $ITCLCONF_FILE - going to keep going, but I am not making any promises.])
+fi
+
+if test "$ITCL_VERSION" != "no" ; then
+  # ITCL_LIB_SPEC already set in itclConfig.sh
+  ITCL_LIB_STATIC=${TCLCONF_PATH}/libitcl${ITCL_VERSION}.a
+else
+
+  # Guess... [This is annoying]
+
+  ITCL_GUESSING="[[I guessed]]"
+
+  if test -f "${TCLCONF_PATH}/libitcl.so" -o -f "${TCLCONF_PATH}/libitcl.a"
+  then
+     ITCL_LIB_SPEC="-L${TCLCONF_PATH} -litcl"
+     ITCL_LIB_STATIC=${TCLCONF_PATH}/libitcl.a
+  fi
+  if test -f "${TCLCONF_PATH}/libitcl3.0.so" -o -f "${TCLCONF_PATH}/libitcl3.0.a"
+  then
+     ITCL_LIB_SPEC="-L${TCLCONF_PATH} -litcl3.0"
+     ITCL_LIB_STATIC=${TCLCONF_PATH}/libitcl3.0.a
+  fi
+  if test -f "${TCLCONF_PATH}/libitcl3.1.so" -o -f "${TCLCONF_PATH}/libitcl3.1.a"
+  then
+     ITCL_LIB_SPEC="-L${TCLCONF_PATH} -litcl3.1"
+     ITCL_LIB_STATIC=${TCLCONF_PATH}/libitcl3.1.a
+  fi
+  if test -f "${TCLCONF_PATH}/libitcl3.2.so" -o -f "${TCLCONF_PATH}/libitcl3.2.a"
+  then
+     ITCL_LIB_SPEC="-L${TCLCONF_PATH} -litcl3.2"
+     ITCL_LIB_STATIC=${TCLCONF_PATH}/libitcl3.2.a
+  fi
+fi
+
+#
+# Check whether to link with installed BLT
+#
+AC_MSG_CHECKING(for BLT library)
+if test -z "$BLT_LIB_PATH" ; then
+   BLT_LIB_SPEC=blt/libBLT.a
+   BLT_LIB_STATIC=blt/libBLT.a
+   NEED_BLT_LIB=lib_blt
+   AC_MSG_RESULT(./blt)
+else
+   BLT_LIB_SPEC="-L$BLT_LIB_PATH -lBLT"
+   BLT_LIB_STATIC=$BLT_LIB_PATH/libBLT.a
+   NEED_BLT_LIB=
+   if test   ! -f $BLT_LIB_PATH/libBLT.a \
+          -a ! -f $BLT_LIB_PATH/libBLT.so
+   then
+      if test   ! -f $BLT_LIB_PATH/lib/libBLT.a \
+	     -a ! -f $BLT_LIB_PATH/lib/libBLT.so
+      then
+	 echo
+	 AC_MSG_ERROR([could not find libBLT.a or libBLT.so in $BLT_LIB_PATH or in $BLT_LIB_PATH/lib.])
+      else
+	 BLT_LIB_PATH=$BLT_LIB_PATH/lib
+      fi
+   fi
+   AC_MSG_RESULT($BLT_LIB_PATH)
+fi
+
+#
+# Determine include directories
+#
+
+TCL_INCLUDE_PATH=$TCL_EXEC_PREFIX/include
+TK_INCLUDE_PATH=$TCL_INCLUDE_PATH
+
+#
+# Perform substitutions
+#
+AC_SUBST(TCL_LD_SEARCH_FLAGS)
+AC_SUBST(TCL_EXEC_PREFIX)
+AC_SUBST(TK_EXEC_PREFIX)
+AC_SUBST(TCL_INCLUDE_PATH)
+AC_SUBST(TK_INCLUDE_PATH)
+AC_SUBST(TK_XINCLUDES)
+AC_SUBST(TCL_LIB_SPEC)
+AC_SUBST(TK_LIB_SPEC)
+AC_SUBST(TK_LIBS)
+
+AC_SUBST(TCL_LIB_STATIC)
+AC_SUBST(TK_LIB_STATIC)
+
+AC_SUBST(ITCL_LIB_SPEC)
+AC_SUBST(ITCL_LIB_STATIC)
+
+AC_SUBST(NEED_BLT_LIB)
+AC_SUBST(BLT_LIB_SPEC)
+AC_SUBST(BLT_LIB_STATIC)
+
+dnl Checks for programs.
+AC_PATH_PROG(TKDESK, tkdesk)
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
+
+dnl Checks for header files.
+AC_PATH_X
+AC_HEADER_DIRENT
+AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
+AC_CHECK_HEADERS(errno.h fcntl.h float.h limits.h malloc.h memory.h sys/time.h statvfs.h sys/statvfs.h unistd.h waitflags.h sys/vfs.h sys/param.h sys/mount.h)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_TYPE_MODE_T
+AC_TYPE_SIZE_T
+AC_TYPE_PID_T
+AC_HEADER_TIME
+AC_STRUCT_TM
+
+dnl Checks for library functions.
+AC_TYPE_SIGNAL
+AC_CHECK_FUNCS(gethostname gettimeofday socket strdup strcasecmp statvfs statfs)
+AC_CHECK_LIB(socket, socket, LIBS="-lsocket -lnsl", , -lnsl)
+AC_SUBST(LIBS)
+
+#
+# Custom Tests:	union wait and long string declaration
+#
+
+
+#
+#	Check whether <sys/wait.h> defines the type "union wait" 
+#	correctly.  It's needed because of weirdness in HP-UX where 
+#	"union wait" is defined in both the BSD and SYS-V  environments.  
+#	Checking the usability of WIFEXITED seems to do	the trick.
+#
+
+AC_MSG_CHECKING([whether union wait is defined correctly])
+AC_CACHE_VAL(blt_cv_struct_wait_works,
+   [AC_TRY_COMPILE([#include <sys/types.h> 
+#include <sys/wait.h>], [
+union wait x;
+WIFEXITED(x);		/* Generates compiler error if WIFEXITED
+			 * uses an int. */
+], 
+    	[blt_cv_struct_wait_works="yes"], 
+	[blt_cv_struct_wait_works="no"])])
+
+if test "${blt_cv_struct_wait_works}" = "no"; then
+    AC_DEFINE(NO_UNION_WAIT,1,[Define if union wait type is defined incorrectly.])
+fi
+AC_MSG_RESULT([$blt_cv_struct_wait_works])
+
+AC_CONFIG_FILES([Makefile libdesk/Makefile blt/Makefile netscape-remote/Makefile tkdeskclient/Makefile])
+
+AC_OUTPUT
+
+echo
+echo $PACKAGE_NAME $PACKAGE_VERSION
+
+echo
+eval echo Override Version Checks....... : $ENABLE_UNSUPPORTED
+eval echo Use TkStep.................... : $ENABLE_TKSTEP
+eval echo Tcl Config Path............... : $TCLCONF_PATH/$TCLCONF_FILE
+eval echo Tk Config Path................ : $TKCONF_PATH/$TKCONF_FILE
+eval echo Tcl Include Path.............. : $TCL_INCLUDE_PATH
+eval echo Tk Include Path............... : $TK_INCLUDE_PATH
+eval echo Tcl Library Spec.............. : $TCL_LIB_SPEC
+eval echo Tcl Static Library Spec....... : $TCL_LIB_STATIC
+eval echo Tk Library Spec............... : $TK_LIB_SPEC
+eval echo Tk Static Library Spec........ : $TK_LIB_STATIC
+eval echo Itcl Library Spec............. : $ITCL_LIB_SPEC $ITCL_GUESSING
+eval echo Itcl Static Library Spec...... : $ITCL_LIB_STATIC $ITCL_GUESSING
+eval echo BLT Library Spec.............. : $BLT_LIB_SPEC
+eval echo BLT Static Library Spec....... : $BLT_LIB_STATIC
+echo
+eval eval echo Will install TkDesk binaries in ${bindir}.
+eval eval echo Will install TkDesk man pages under ${prefix}/man/.
+eval eval echo Will install the TkDesk library under ${exec_prefix}/lib/TkDesk.
+if test "x$TKDESK" != "x" ; then
+	echo Warning: You have an old copy of TkDesk at $TKDESK.
+fi
+echo
+echo configure complete, now type \'make\'
+echo

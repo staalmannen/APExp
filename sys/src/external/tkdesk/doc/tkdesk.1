@@ -1,0 +1,209 @@
+.\"
+.\" Copyright 1996 by Christian Bolik (Christian.Bolik@mainz.netsurf.de)
+.\"
+.TH TKDESK 1 "TkDesk 2.0, 04/15/2004" "" ""
+.UC 4
+.SH NAME
+TkDesk \- a Graphical File and Desktop Manager for the X Window System
+.SH SYNOPSIS
+.B tkdesk
+.RB [ \-configdir\ \fIdir ]
+.RB [ \-debug ] 
+.RB [ \-default ] 
+.RB [ \-develop ] 
+.RB [ \-iconic ] 
+.RB [ \-layout\ \fIfile ] 
+.RB [ \-startdir\ \fIdir ] 
+.RB [ \-twm ] 
+.RB [ \-?  |  \-\-help ] 
+.br
+.SH DESCRIPTION
+TkDesk provides a rich set of functions to help you manage your files and
+efficiently navigate your file systems.  It also provides several
+desktop and system  managing capabilities such as accessing the external
+devices of your workstation, starting programs, monitoring the system
+load and mailbox etc.
+.PP
+The main parts of
+TkDesk are the following:
+.PP
+1. One or more
+.I file browser windows
+(or just "browsers").
+These display the contents of the currently selected directory in
+the rightmost listbox and the contents of a configurable number of
+parent directories in the listboxes left to it.  In addition this window 
+contains a menu bar, a button bar, and a status bar.
+.PP
+2. One or more
+.I file list windows.
+These display the contents of just the currently selected directory.
+These windows also
+contain a menu bar, a button bar, and may also contain a status bar.
+.PP
+3. An
+.I application bar
+(or "appbar").
+This is a set of buttons displaying icons or other graphical output
+that can be configured to execute certain commands.  All of the buttons
+provide a possibly cascaded popup menu that is accessed by pressing the
+right mouse button over any appbar button.  Files may be dragged from any
+file browser or list window and dropped onto appbar buttons that have
+been configured to be drag'n'drop targets.  The contents of the appbar
+is configured in the "AppBar"
+configuration file (located in "~/.tkdesk").
+.PP
+4. The
+.I built-in editor
+(or just "editor").
+The editor provides multiple buffers in the same window, virtually unlimited
+"undo", marks, search and replace, etc.  Files may be dropped onto any
+editor window from TkDesk's file listboxes or the desktop.
+.SH BASIC USAGE
+The listboxes contained in the file browser and list windows display the
+contents of their respective directory.  They provide the following
+mouse button bindings:
+.IP Single-1
+Select the file under the mouse pointer, deselect all others.
+.IP Control-Single-1
+Select or deselect the file under the mouse pointer, without deselecting
+any other file.
+.IP Shift-Single-1
+Select all files between and including the one under the mouse pointer
+and the one that
+was last selected by Single-1 or Control-Single-1.  Deselect all others.
+.IP Double-1
+Select and open the file under the mouse pointer, deselect all others.
+The command that will be used to open the file is the first entry of the
+file's popup menu (see next item).
+.IP Control-Double-1
+Select the file under the mouse pointer, and ask for a command to be
+executed on that file.
+.IP Press-2
+Used to initiate a drag and drop operation.  Valid drop targets are all
+other file listboxes, appbar buttons that have been configured to be
+drag'n'drop targets, editor windows, and the root window (a.k.a. desktop).
+.IP Press-3
+Display the file's or directory's popup menu.  The contents of these menus
+are configured in the "Popups" configuration file (located in "~/.tkdesk").
+.PP
+The display options of any file listbox can be configured through the
+menubutton right above the listbox, displaying the name of the displayed
+directory, and the file mask currently set.  It can also be used as a
+drag and drop source (by pressing mouse button 2) and target.
+.PP
+TkDesk makes heavy use of cascading popup menus. Basically in every text entry field
+that's used for entering paths of file names pressing the right mouse button
+brings up a popup menu of parent directories.  Next to most test entry
+field there is a menu button displaying a turned-over triangle that
+gives access to a menu containing a history of entered strings.
+.SH OPTIONS
+.IP \-configdir\ \fIdir
+By default
+TkDesk reads its configuration either from the files contained
+in the directory "~/.tkdesk" (see section
+.I FILES
+below), or if it does not exist, from
+TkDesk's library directory (usually
+"/usr/local/lib/TkDesk").  This options lets
+TkDesk load its configuration
+files from directory
+.I dir.
+.IP \-debug
+Switch on "debug mode".  This generates some output on stderr that may
+be used for debugging purposes.
+.IP \-default
+Let
+TkDesk read its configuration from its library directory.  This means
+that
+TkDesk will start using the default configuration.
+.IP \-develop
+Switch on "development mode".  This adds a "Development" submenu to the
+"TkDesk" menu.
+.IP \-iconic
+Open all file browser and list windows in iconic state when
+TkDesk starts up.
+.IP \-layout\ \fIfile
+Load and save TkDesk's window layout from and to
+.I file.
+If
+.I file
+doesn't exist the default layout is used.
+.IP \-startdir\ \fIdir
+Display
+.I dir
+in the first file browser window that's opened.
+.IP \-twm
+Some window managers, namely
+.I twm
+cannot handle icon windows correctly.
+TkDesk uses these for colored icons.
+This options switches to monochrome icons.
+.IP "\-?, \-\-help"
+Displays the command line options available.
+.SH "FILES"
+All of the following configuration files are accessible directly inside
+the "Configuration" submenu of the "TkDesk" menu.  The default application
+bar contains the same menu in the first button (the one with the comet).
+.IP ~/.tkdesk/AppBar
+Definition of the application bar.
+.IP ~/.tkdesk/ButtonBar
+Definition of the button bars used in file browser and file list windows,
+and of directory-specific button bars.
+.IP ~/.tkdesk/Commands
+Contains a list of menu entries that will be added to the "Commands" menu.
+.IP ~/.tkdesk/Directories
+Definition of the contents of the "Directory" menu and of actions
+performed when specific directories are opened.
+.IP ~/.tkdesk/FileTags
+Defines how files and directories are displayed, both by default and on
+a per-object basis (using shell-like "glob" patterns).
+.IP ~/.tkdesk/Local
+Initially, this file does not exist.  If it does though, it is sourced
+(evaluated) when
+TkDesk starts up.  This is the right place to put any
+local extensions.
+.IP ~/.tkdesk/Popups
+Definition of the file- and directory-specific popup menus.  Also contains
+the definition of the popup menu used in the "Copy, Move, ..." dialog.
+.IP ~/.tkdesk/Sounds
+Defines which command should be used for playing sounds, if any, plus
+defines which sounds should be played at which TkDesk event.
+.IP ~/.tkdesk/System
+Contains definitions of colours and fonts to be used, which commands
+should be used for copying, deleting etc.  Also contains options that
+affect the built-in editor and some other configuration variables.
+.SH "ENVIRONMENT"
+The static version of
+TkDesk is affected just by one environment variable:
+.IP TKDESK_LIBRARY
+This determines where
+TkDesk will look for its library (by default usually
+"/usr/local/lib/TkDesk").
+.PP
+The dynamically linked version is affected by the following variables:
+.IP TCL_LIBRARY
+Location of the Tcl library files.
+.IP TK_LIBRARY
+Location of the Tk library files.
+.PP
+Note that other more general variables like PATH may also affect
+TkDesk.
+.SH "SEE ALSO"
+cd-tkdesk(1), ed-tkdesk(1), od-tkdesk(1)
+.SH "AUTHOR"
+Christian Bolik (Christian.Bolik@mainz.netsurf.de)
+.SH "BUGS"
+TkDesk may still have problems with files containing spaces, brackets, and
+braces. This is due to the fact that the largest part of
+TkDesk is
+written using Tcl, the Tool Command Language created by John Ousterhout,
+for which these characters are "special" in some respects.
+.sp
+If you can't get the application bar back on the screen, delete the
+line starting with "Toplevel dsk_appbar" from the file ~/.tkdesk/_layout
+and restart
+TkDesk.
+.sp
+Some Sun machines seem to have problems with Drag&Drop. It seems these
+problems go away when a more recent X server is used.

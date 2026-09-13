@@ -1,0 +1,293 @@
+
+#
+# appbar-dialup.tcl
+#
+# Author:	J. Chris Coppick, 1998
+#		[This contains lots of Christian Bolik's code.
+#		The route checking code was stolen from the PPPui
+#		script by Nathan Meyers.]
+#
+# Description:
+#
+#	This is a drop-in replacement for the TkDesk appbar-dialup.tcl
+#	library module.  This version is designed to work "well" with
+#	an external dialup-control program, specifically Xisp, and the
+#	GNU-Linux OS. (The Xisp program can be found at
+#	"http://users.hol.gr/~dbouras/".)  This version is also a little
+#	more reality bound, in that it actually checks the availability
+#	of the dialup-network route and uses that to adjust its status,
+#	i.e. the picture on the button and the connection-time display.
+#	Also, this version updates the connection-time in increments of
+#	5 seconds instead of every second in hopes of saving cycles, or
+#	you can turn off the time display completely since Xisp has its own.
+#
+#	This may work with other programs besides Xisp, provided they
+#	support using SIGUSR1 and SIGUSR2 to control the dialup link
+#	status.
+#
+# Installation:
+#
+#	In the TkDesk library directory (/usr/local/lib/TkDesk for example)
+#	make a copy of the original appbar-dialup.tcl file, in case you end
+#	up hating this one...
+#
+#		% cp appbar-dialup.tcl appbar-dialup.tcl.orig
+#
+#	Then copy the new version over the old...
+#
+#		% cp appbar-dialup.tcl.jcc appbar-dialup.tcl
+#
+#	In your Appbar configuration file, use the button type 'special:dialup'
+#	just as before.  However, there are some new configuration variables
+#	you may need to set.  (See below)  The old cmd_up and cmd_down
+#	variables are not used in this version, but it won't hurt to leave
+#	them.  The dialup-button image variables *are* still used.
+#
+#	When you got everything configured, quit TkDesk and restart it.
+#	Note that you cannot just reload the Appbar.  The new appbar-dialup.tcl
+#	module needs to be loaded as well, so TkDesk must be restarted.
+#
+# Usage:
+#
+#	The Appbar button type 'special:dialup' creates a button that displays
+#	the current status of the dialup link.  The dsk_dialup procedure can
+#	be used with the button to toggle the link on and off
+#	when the button is pushed.  Left-clicking on the button pulls down
+#	a normal Appbar menu.  This version is designed to launch Xisp as
+#	necessary and signal it to bring the link up and down.
+#
+#	If the button is pushed when the link is down, then the Xisp program
+#	is launched PROVIDED IT IS NOT ALREADY RUNNING.  Then Xisp is sent
+#	a signal that tells it to bring the link up.  (Personally, I use
+#	autoStart with Xisp, but that doesn't make any difference.)
+#
+#	If the button is pushed when the link is up, then Xisp is
+#	sent a link telling it to bring the link down.  Note that the
+#	running Xisp program is NOT killed.  You have to do that yourself
+#	using the program's Quit button, or whatever.  If the program is
+#	iconified, it shouldn't be bothering you anyway and it'll be there
+#	already the next time you need to dialup... IMHO.  :-)
+#
+#	This version monitors the link status independently of button pushes,
+#	so the button image will change when the link status changes, and
+#	not when the button is pushed.
+#
+# Variables:
+#
+#	You can use the following variables in your Appbar file to override
+#	the defaults.
+#
+#	tkdesk(appbar,dialup,program) - The external program used to control
+#	dialup networking.  The default for this is 'xisp -iconic'.
+#	Note that the tkdesk(appbar,dialup,cmd_*) variables are NOT used.
+#
+#	tkdesk(appbar,dialup,device) - The network device used for dialup.
+#	The default is 'ppp0'.
+#
+#	tkdesk(appbar,dialup,timer) - A boolean controlling the connection-time
+#	display.  Set this to 0 to remove the time display from the dialup
+#	button.  The default is 1.
+#
+# Bugs:
+#
+#	This uses the 'pidof' (i.e. 'killall') program to find process pids.
+#	If you have more than one Xisp (or whatever) running on your system,
+#	you will likely lose.  I had a better algorithm, but... um, my dog
+#	ate it.  Yeah, that's the ticket.  My dog ate it right before the
+#	aliens dognapped him.  (By the way, on my RedHat distribution,
+#	kill is in /bin, killall is in /usr/bin/, and pidof is in /sbin.
+#	Now I'm a dyed-in-the-wool unix bigot, but still... am I the only
+#	one who thinks there's something wrong with that picture?)
+#
+#	I did some quick testing and it seems to do the trick.  Any problems
+#	you find are more than likely due to some Tcl/Tk bug (heh heh heh...)
+#
+########
+
+# Variable defaults...
+if [catch {set tkdesk(appbar,dialup,program)}] {
+   set tkdesk(appbar,dialup,program) "xisp -iconic"
+}
+
+if [catch {set tkdesk(appbar,dialup,device)}] {
+   set tkdesk(appbar,dialup,device) "ppp0"
+}
+
+if [catch {set tkdesk(appbar,dialup,timer)}] {
+   set tkdesk(appbar,dialup,timer) 1
+}
+
+set dsk_appbar(dialup,button) ""
+set dsk_appbar(dialup,label) ""
+
+# special:dialup init...
+proc _appbar_dialup {but count} {
+   global tkdesk dsk_appbar
+    
+   # set images to use:
+   foreach img {up down} {
+      set bitmap $tkdesk(appbar,dialup,$img)
+      set dsk_appbar(dialup,img,$img) [dsk_image $bitmap]
+   }
+
+   # create button:
+   set dsk_appbar(dialup,button) $but
+   button $but -activebackground $dsk_appbar(bgcolor) \
+      -activeforeground $dsk_appbar(fgcolor) \
+      -cursor top_left_arrow \
+      -command $dsk_appbar(defaction) \
+      -padx 0 -pady 0 -highlightthickness 0 \
+      -image $dsk_appbar(dialup,img,down)
+
+   set dsk_appbar(dialup,count) $count
+
+   dsk_dialup_init_timer
+   catch {after cancel $dsk_appbar(dialup,after)}
+   dsk_dialup_update
+}
+
+# User hook to activate/deactivate the dialup link...
+proc dsk_dialup {} {
+   global tkdesk dsk_appbar
+
+   set cmd $tkdesk(appbar,dialup,program)
+   if {$cmd == ""} {
+      dsk_errbell
+      cb_error "Please first define tkdesk(appbar,dialup,program) in the AppBar config file."
+      return
+   }
+
+   if {$dsk_appbar(dialup,state) == "down"} {
+      if [set pid [dsk_dialup_running $cmd]] {
+         dsk_dialup_signal $pid "SIGUSR1"
+      } else {
+         dsk_dialup_exec $cmd
+	 # Try twice to find pid of dialing program...
+	 after 1000
+         set pid [dsk_dialup_running $cmd] 
+	 if {$pid == 0} {
+	    after 1000
+	    set pid [dsk_dialup_running $cmd] 
+	 }
+	 if {$pid == 0} {
+	    cb_error "$cmd doesn't seem to have started..."
+	    return
+	 }
+	 dsk_dialup_signal $pid "SIGUSR1"
+      }
+
+   } else {
+      if [set pid [dsk_dialup_running $cmd]] {
+         dsk_dialup_signal $pid "SIGUSR2"
+      }
+   }
+}
+
+# Periodically check the link status...
+proc dsk_dialup_update {} {
+   global dsk_appbar tkdesk
+
+   if [dsk_dialup_route_up $tkdesk(appbar,dialup,device)] {
+
+      dsk_debug "network route is up"
+
+      set dsk_appbar(dialup,state) up
+      $dsk_appbar(dialup,button) config -image $dsk_appbar(dialup,img,up)
+
+      if ![winfo exists $dsk_appbar(dialup,label)] {
+         dsk_dialup_init_timer
+      }
+    
+      dsk_dialup_inc_timer
+
+   } else {
+
+      dsk_debug "network route is down"
+      set dsk_appbar(dialup,state) down
+      $dsk_appbar(dialup,button) config -image $dsk_appbar(dialup,img,down)
+      dsk_dialup_kill_timer
+
+   }
+      
+   set dsk_appbar(dialup,after) [after 5000 dsk_dialup_update]
+}
+
+# Create and initialize the connection-time display...
+proc dsk_dialup_init_timer {} {
+   global dsk_appbar tkdesk
+
+   if {$tkdesk(appbar,dialup,timer)} {
+      set but $dsk_appbar(dialup,button)
+      set lab $but.l
+      set dsk_appbar(dialup,label) $lab
+      label $lab -text "00:00" -font fixed -cursor top_left_arrow
+      bind $lab <ButtonPress-1> "$but config -relief sunken"
+      bind $lab <ButtonRelease-1> "$but invoke; $but config -relief raised"
+      bind $lab <3> "_appbar_show_menu $dsk_appbar(dialup,count) %X %Y"
+      bind $lab <B3-Motion> "break"
+      bindtags $lab "appbar $lab all"
+      set x 0
+      set y [expr [winfo reqheight $but] - [winfo reqheight $lab]]
+      place $lab -x $x -y $y
+      set dsk_appbar(dialup,secsup) 0
+   }
+}
+
+# Remove the connection-time display...
+proc dsk_dialup_kill_timer {} {
+   global dsk_appbar
+
+   if [winfo exists $dsk_appbar(dialup,label)] {
+      dsk_debug "removing label"
+      destroy $dsk_appbar(dialup,label)
+   }
+}
+
+# Update the connection-time display...
+proc dsk_dialup_inc_timer {} {
+   global dsk_appbar
+
+   if [winfo exists $dsk_appbar(dialup,label)] {
+      incr dsk_appbar(dialup,secsup) 5
+      set s [expr $dsk_appbar(dialup,secsup) % 60]
+      set m [expr $dsk_appbar(dialup,secsup) / 60]
+      $dsk_appbar(dialup,label) config -text [format "%02d:%02d" $m $s]
+   }
+}
+
+# Exec an external program...  Probably a lot of bugs in this one... :-)
+proc dsk_dialup_exec {cmd} {
+
+   catch {eval dsk_exec $cmd}
+
+}
+
+# Find the pid of a given command...
+proc dsk_dialup_running {cmd} {
+   if [catch {set pid [exec /sbin/pidof -s [lindex [split $cmd] 0]]}] {
+      set pid 0
+   }
+   return $pid
+}
+
+# Send a given signal to a given pid...
+proc dsk_dialup_signal {pid sig} {
+   catch {exec /bin/kill -s $sig $pid}
+}
+
+# Check for a route to a given device.  Returns 1 if the route exists, else 0.
+proc dsk_dialup_route_up {device} {
+
+   set routes [ open /proc/net/route r ]
+   gets $routes
+   set done 0
+   while { [ gets $routes line ] >= 0  && !$done } {
+      dsk_debug "looking at route: $line"
+      if { [ string first $device $line ] == 0 } {
+	 set done 1
+      }
+   }
+   close $routes
+   return $done
+}
+

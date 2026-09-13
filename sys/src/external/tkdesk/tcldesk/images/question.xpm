@@ -1,0 +1,22 @@
+/* XPM */
+static char * question_xpm[] = {
+"16 16 3 1",
+" 	s None	c None",
+".	c grey4",
+"X	c white",
+"  ............  ",
+" .XXXXXXXXXXXX. ",
+".XXXXX....XXXXX.",
+".XXXX..XX..XXXX.",
+".XXXX..XX..XXXX.",
+".XXXXXXX..XXXXX.",
+".XXXXXX..XXXXXX.",
+".XXXXXX..XXXXXX.",
+".XXXXXXXXXXXXXX.",
+".XXXXXX..XXXXXX.",
+".XXXXXX..XXXXXX.",
+" .XXXXXXXXXXXX. ",
+"  .XX.........  ",
+"  .X.           ",
+"  ..            ",
+"  .             "};

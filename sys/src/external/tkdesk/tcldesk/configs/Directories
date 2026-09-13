@@ -1,0 +1,106 @@
+### -------------------------------------------------------------------------
+###
+###  Directories (TkDesk Configuration File)
+###
+###  This file defines the configurable part of TkDesk's "Directories" menu,
+###  as well as directories which are to be "hidden" when displayed in
+###  browser windows. Also contains a list for executing a Tcl script
+###  when certain directories are opened (to facilitate "auto-mounting").
+###
+###  *** Press F5 to save changes and reload this file into TkDesk, 
+###  *** F6 to do the same plus to close this window.
+###
+### -------------------------------------------------------------------------
+
+### Definition of "Directories" menu entries:
+### The entries are defined by the elements of a Tcl list.
+### (In the following I try to explain its structure, although it will
+### probably be best to just have a look at the example definition below.)
+### Basically, each list element contains a path, that will be added to
+### the "Directories" menu. If this element contains more than one element
+### a cascaded menu is created, and so on. See below for an example.
+### The element {-} adds a separator to the menu. If a path is preceded
+### by an "*", TkDesk will automatically create a recursive cascaded
+### submenu for that path. These entries will be marked by a trailing "(*)"
+### in the "Directories" menu.  Roughly the same applies to elements
+### starting with an "&".  In this case the recursive submenus will also
+### contain the files.
+
+set tkdesk(directories) {
+    {*~}
+    {&~/Mail}
+    -
+    {/
+	{*/etc}
+	{/lib}
+	{/tmp}
+    }
+    {/usr
+        .
+	{/usr/bin}
+	{/usr/include
+	    {/usr/include/sys}
+	    {-}
+	    {/usr/include/X11}
+	    {/usr/include/X11/Xaw}
+	}
+	{/usr/lib}
+	{*/usr/src}
+	{*/usr/tmp}
+    }
+    {/usr/local
+	{/usr/local/bin}
+	{/usr/local/include}
+	{/usr/local/lib}
+    }
+}
+
+
+### "Strip" Directories:
+### Here you can define directories whose parent directories are not to be
+### displayed in file browser windows, as is usually the case with your
+### home directory. This means: if you add /usr/local/lib to the list below,
+### the leftmost listbox in a file browser window will contain the contents
+### of /usr/local/lib, if you change to that directory or any child directory. 
+### The contents of /usr and /usr/local is not displayed.
+### This can speed things up, especially with AFS directory trees.
+### Note: More specific items should be added before more general ones.
+### Wildcards are also accepted.  (Thanks to Martin Szummer for pointing
+### this out.)
+
+set tkdesk(strip_parents) {
+    /afs/*
+    /usr/X11/lib/X11
+}
+
+
+### On Open Actions:
+### This list lets you define actions TkDesk should execute before opening
+### or refreshing the specified directories. The main purpose of this is the
+### "auto-mounting" of removable media devices, but you could also have a
+### certain sound played when entering a directory, or whatever.
+### The structure is similar to the popup lists: Each element of the list
+### defined in the following consists of two elements. The first is a list
+### of shell-like "glob" patterns. If a directory matches any of the patterns
+### defined for an entry, the script given by the second element of each
+### entry will be executed.
+### This script may contain the following abbreviations:
+###
+### %s : Full pathname of the first selected file.
+### %f : Its filename only.
+### %b : "Basename": just the filename without extension.
+### %d : Its directory only.
+### %A : List containing full pathnames of all selected resp. dropped files.
+### %B : Same as %A, but will be replaced with "" if no files are selected.
+### %D : Directory of last "active" viewer.
+
+set tkdesk(action_on_open) {
+    {{/floppy} {
+    	catch {exec umount /floppy}
+    	catch {exec mount /floppy}
+    }}
+    {{/cdrom} {
+    	catch {exec umount /cdrom}
+    	catch {exec mount /cdrom}
+    }}
+}

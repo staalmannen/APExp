@@ -1,0 +1,83 @@
+(Note: I shamelessly cut and pasted this from Linus Torvalds' CREDITS
+file that he distributes with the Linux sources.  I just thought the format
+looks pretty useful.)
+
+	This is at least a partial credits-file of people that have
+	contributed to the TkDesk project.  It is sorted by name, and
+	formatted in a format that allows for easy grepping and
+	beautification by scripts.  The fields are: name (N), email (E),
+	web-address (W), PGP key ID and fingerprint (P), description (D)
+	and snail-mail address (S).
+
+	I apologize in advance to everybody I forgot to put on this list
+	(and I'm sure I forgot at least some of you).  I'd appreciate it
+	if you sent me a short mail to refresh my memory so I can get
+	this list a little more complete.
+	
+	Thanks,
+			Christian Bolik
+			
+----------
+
+N: Alan Shackelford
+E: alan_s@shaknet.clark.net
+D: Former maintainer of the TkDesk mailing list
+
+N: Carl Iorio
+E: iorio@i-cafe.net 
+D: Afterstep drop script, fix
+
+N: J. Chris Coppick
+E: jchris@users.sourceforge.net
+D: Contributor and current TkDesk maintainer
+
+N: Chris Sterritt
+E: sterritt@mrj.com
+D: Former maintainer of the TkDesk mailing list (tkdesk@mrj.com)
+D: Various installation hints (SGI, Solaris).
+
+N: Dave Cinege
+E: dcinege@psychosis.com
+D: Some configuration ideas and code snippets.
+
+N: David M.Cook
+E: dmcook@cts.com
+D: Maintains RPM packages of TkDesk
+
+N: Duncan Barclay
+E: dmlb@ragnet.demon.co.uk
+D: "Unofficial-official" FreeBSD maintainer of TkDesk
+
+N: Erez Strauss
+E: erez@newplaces.com
+D: Improved xemacs_load proc, sent in code for XEmacs appbar button.
+
+N: Gerald Willmann
+E: gerald@willmann.stanford.edu
+D: Former maintainer of the TkDesk mailing list
+
+N: John Blair
+E: jdblair@uab.edu
+W: http://frodo.tucc.uab.edu
+D: Author of a very nice article about TkDesk that appeared in
+D: the 3/98 issue of the Linux Journal!
+D: Contributed TkDesk's RCS procs (see popup for *.{c,h,cpp,tcl} files).
+D: Contributed additional mouse button bindings for the info box's
+D: permission buttons.
+
+N: Kazuya Kawasaki
+E: kawakazu@yk.rim.or.jp
+D: Japanize patch
+
+N: Martin Andrews
+E: andrewm@dev1.eeg.ccf.org
+D: Idea and code for auto-raising of the appbar.
+
+N: Mikhail Teterin
+E: mi@ALDAN.ziplink.net
+D: Patch for Tk's tkRecolorTree routine.
+
+N: Johannes Drechsel-Burkhard
+E: jdb@chello.at
+D: Contributed initial patches for mouse-wheel support
+

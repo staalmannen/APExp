@@ -1,0 +1,201 @@
+### -------------------------------------------------------------------------
+###
+###  ButtonBar (TkDesk Configuration File)
+###
+###  This file defines the contents and appearance of the Button Bar,
+###  which is displayed underneath the menu bar of TkDesk's file browser
+###  or file list windows.
+###
+###  *** Press F5 to save changes and reload this file into TkDesk, 
+###  *** F6 to do the same plus to close this window.
+###
+### -------------------------------------------------------------------------
+
+### Definition of the Button Bar (BB): The Button Bar is defined by the
+### elements of a Tcl list.  (In the following I try to explain its
+### structure, although it will probably best to just have a look at the
+### example definition below.)
+### 
+### Each element of the list is again a Tcl list, whose first element is
+### the file name of the image to use. If the image file name is not
+### absolute, TkDesk will look for the image in each directory given by
+### the variable tkdesk(path,images), which is defined in the config file
+### "System". Supported formats are XBM, XPM, GIF, and P?M.
+### 
+### The second element is another Tcl list.  Its first element is a Tcl
+### script that is to be executed when the resp. button is clicked on, and
+### the second element is a short help message that will be displayed when
+### the mouse pointer is above the button.
+###
+### TkDesk commands that can be used in the list definition:
+### (Only the most common ones are listed here. For a complete overview
+### and a detailed explanation refer to the User's Guide.)
+###
+### dsk_fileinfo       : Displays infos about selected files.
+### dsk_create what    : Creates a file or directory.
+### dsk_copy           : Copies selected files.
+### dsk_delete         : Deletes selected files.
+### dsk_cd path        : Changes directory of browser to path.
+### dsk_select X       : Copies full pathnames of sel. files to X clipboard.
+### dsk_exec cmd ...   : Executes shell command cmd in background.
+### dsk_path_exec path cmd ... : Execute cmd in path.
+### dsk_view cmd ...   : Executes cmd, displays output in Editor window.
+### dsk_open_dir path  : Opens a new file list for directory path.
+### dsk_edit file      : Edits file.
+### dsk_print file     : Prints file.
+### dsk_du path        : Displays disk usage of directory path.
+### dsk_periodic cmd seconds : Executes cmd every x seconds.
+### dsk_confirm text script  : Executes script when confirmation was positive.
+### dsk_read_string label script  : Executes script when entered string is
+###                      not empty. "label" will be displayed in the dialog.
+### dsk_sound id       : Plays sound id (defined in config-file Sounds). 
+### dsk_cbhelp file regexp   : Invokes TkDesk's help system on file.
+### dsk_ask_exec       : Asks for a command to execute.
+### dsk_ask_dir        : Asks for a directory to open.
+### dsk_save_config    : Saves window layout, history, bookmarks etc.
+### dsk_exit ?ask?     : Quits TkDesk. "ask" may be one 1 or 0.
+###
+### Abbreviations that will be replaced with file names etc.:
+###
+### %s : Full pathname of the first selected file.
+### %f : Its filename only.
+### %b : "Basename": just the filename without extension.
+### %d : Its directory only.
+### %A : List containing full pathnames of all selected resp. dropped files.
+### %B : Same as %A, but will be replaced with "" if no files are selected.
+### %D : Directory of last "ative" viewer.
+
+set tkdesk(button_bar) {
+    {{info.xpm} {
+	dsk_fileinfo
+	{Display information about all selected files.}
+    }}
+    {{file_doc.xpm} {
+	{dsk_create file}
+	{Create a new file.}
+    }}
+    {{folder.xpm} {
+	{dsk_create directory}
+	{Create a new directory.}
+    }}
+    {{copy.xpm} {
+	dsk_copy
+	{Copy, move or link files.}
+    }}
+    {{trash.xpm} {
+	dsk_delete
+	{Delete files.}
+    }}
+    {-}
+    {{~/pics/twotexts.xpm} { 
+        dsk_diff_files
+        {Show differences between two selected files.}
+    }}
+    {{magnify2.xpm} {
+    	dsk_find_files
+    	{Find files.}
+    }}
+    {{lightning.xpm} {
+	{dsk_ask_exec}
+	{Ask for a command to execute.}
+    }}
+    {{edit.xpm} {
+	{dsk_edit %B}
+	{Edit all selected files or open a new editor.}
+    }}
+    {{printer16.xpm} {
+	{dsk_print %A}
+	{Print all selected files.}
+    }}
+    {{xlogo16.xpm} {
+	{dsk_select X}
+	{Copy names of selected files to\nX clipboard.}
+    }}
+    {-}
+    {{home.xpm} {
+	{dsk_cd $env(HOME)}
+	{Change to home directory.}
+    }}
+    {{up.xpm} {
+    	{dsk_cd ..}
+    	{"Up": Change to parent directory.}
+    }}
+    {{arrleft.xpm} {
+    	{dsk_cd [list [history back]]}
+    	{Go back in the directory history.}
+    }}
+    {{arrright.xpm} {
+    	{dsk_cd [list [dir_history forward]]}
+    	{Go forward in the directory history.}
+    }}
+}
+
+### small_button_bar:
+### This is exactly the same as tkdesk(button_bar) but will be used
+### for the file list windows (the ones with just one column).
+
+set tkdesk(small_button_bar) {
+    {{file_doc.xpm} {
+	{dsk_create file}
+	{Create a new file.}
+    }}
+    {{folder.xpm} {
+	{dsk_create directory}
+	{Create a new directory.}
+    }}
+    {{trash.xpm} {
+	dsk_delete
+	{Delete files.}
+    }}
+    {{~/pics/twotexts.xpm} { 
+        dsk_diff_files
+        {Show differences between two selected files.}
+    }}
+    {{xlogo16.xpm} {
+	{dsk_select X}
+	{Copy names of selected files to\nX clipboard.}
+    }}
+    {{up.xpm} {
+    	{dsk_cd ..}
+    	{"Up": Change to parent directory.}
+    }}
+    {{arrleft.xpm} {
+    	{dsk_cd [list [dir_history back]]}
+    	{Go back in the directory history.}
+    }}
+    {{arrright.xpm} {
+    	{dsk_cd [list [dir_history forward]]}
+    	{Go forward in the directory history.}
+    }}
+}
+
+### dir_button_bar:
+### Another list that defines additional button bars for specific directories.
+### The format is a mixture of action_on_open defined in "Directories" and the
+### standard button bars defined in the config file ButtonBar.
+
+set tkdesk(dir_button_bar) {
+    {{~/bookmarks/*} {
+        {{ficons16/html.xpm} {
+	    {
+	        dsk_read_string {Name of URL Bookmark:} {
+	            global tkdesk
+	            set err [catch {set fd [open [dsk_active dir]/$dsk_read_string.url w]} errmsg]
+	            if !$err {
+		        # write contents of the current X selection:
+	                puts -nonewline $fd %x
+	                close $fd
+			dsk_refresh [dsk_active dir]
+	            } else {
+	                dsk_errbell
+	                cb_error $errmsg
+	            }
+	        } {dontpaste}
+	    }
+	    {Bookmark selected URL}
+	}}
+    }}
+}
+
+
+

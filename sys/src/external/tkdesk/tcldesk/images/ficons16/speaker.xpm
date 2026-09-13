@@ -1,0 +1,23 @@
+/* XPM */
+static char * speaker_xpm[] = {
+"16 16 4 1",
+" 	s None	c None",
+".	c grey4",
+"X	c grey76",
+"o	c grey51",
+"                ",
+"              . ",
+"              ..",
+" X.........   . ",
+"Xo.........   . ",
+"oX...ooo...   . ",
+"Xo..o...o.. ... ",
+"oo.o.ooooo. ... ",
+"Xo.o.oXoXo.     ",
+"oo.oooooXo.     ",
+"oo..oXXXo..     ",
+"o....ooo...     ",
+"oo.........     ",
+"o..........     ",
+".o.........     ",
+" ..........     "};

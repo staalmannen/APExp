@@ -1,0 +1,29 @@
+/* XPM */
+static char * html2_xpm[] = {
+/* width height num_colors chars_per_pixel */
+"16 16 7 1",
+/* colors */
+" 	s None	c None",
+".	c #808080",
+"X	c black",
+"o	c white",
+"O	c #000080",
+"+	c #0000ff",
+"@	c #008080",
+/* pixels */
+"                ",
+" ...........    ",
+" .ooooooooo..   ",
+" .oXXO++ooo.o.  ",
+" .o+oOo+oooXXX  ",
+" .o@ooo@o..ooX  ",
+" .o@oX@@oooooX  ",
+" .oXXXXXo...oX  ",
+" .oooooooooooX  ",
+" .o......o..oX  ",
+" .oooooooo..oX  ",
+" .o......o..oX  ",
+" .oooooooooooX  ",
+" .o.........oX  ",
+" .oooooooooooX  ",
+" XXXXXXXXXXXXX  "};

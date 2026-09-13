@@ -1,0 +1,43 @@
+Date: Fri, 06 Feb 1998 14:28:14 -0800
+From: Chris Coppick <jcc@eiq.com>
+Sender: owner-tkdesk@mrj.com
+
+This posting is not strictly TkDesk related, but I'm contributing
+this script to the TkDesk distribution, or to whomever wants it.
+
+Termite is yet another graphical 'tail -f'-like application.  It supports
+the following features:
+
+	- Autoscroll to view new, dynamically added contents
+	- Line numbering
+	- Highlighting using a regular expression (e.g. 'error|warning|fail')
+	- Filtering using a regular expression
+	- File/Selection saving/printing
+
+It also supports the usual suspects for X resources, as well as resources
+that mirror the command-line options.
+
+As an example, the following command will continously display the end of my
+system messages file, highlighting errors, etc., in red:
+
+	termite -hp 'error|warning|fail' -hc red -as /var/adm/messages
+
+In TkDesk, I use this as a drop target for my "sys admin'ish" appbar icon,
+as well as in the popup menu for files with names like "*.log", etc.
+
+I originally wrote this several years ago as one of my first Tcl/Tk attempts,
+then I dragged it back out, dusted it off, and added a few new features, so
+it consists of a mishmash of old and new code.  If some of the code seems
+particularly silly, I'm sure that's the reason (ahem).
+
+I've only tested the new version under Tcl/Tk 7.6/4.2.  If it doesn't
+work under 8.0, etc., feel free to fix it. :-)
+
+Enjoy.
+
+     -- Chris
+____________________________________________________________________________
+"You're not allowed to call them dinosaurs anymore... It's speciesist.
+You have to call them pre-petroleum persons."
+	-- Terry Pratchett, "Johnny and the Bomb"
+

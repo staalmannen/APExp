@@ -1,0 +1,294 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
+ <TITLE>TkDesk User's Guide: Frequently Asked Questions </TITLE>
+ <LINK HREF="guide-11.html" REL=next>
+ <LINK HREF="guide-9.html" REL=previous>
+ <LINK HREF="guide.html#toc10" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="guide-11.html">Next</A>
+<A HREF="guide-9.html">Previous</A>
+<A HREF="guide.html#toc10">Contents</A>
+<HR>
+<H2><A NAME="s10">10.</A> <A HREF="guide.html#toc10">Frequently Asked Questions </A></H2>
+
+
+
+<H2><A NAME="apppos"></A> <A NAME="ss10.1">10.1</A> <A HREF="guide.html#toc10.1">How can I change the position of the application bar?</A>
+</H2>
+
+
+<P>The appbar should have a &quot;handle&quot; at the
+upper or left edge that can be used to drag the appbar around the
+screen by just pressing the left mouse button over it.</P>
+<P>You can also drag the application bar around simply by holding down the
+Alt- or Meta-key and simultaneously pressing the left mouse button
+over the application bar. You can also invoke the
+&quot;Move...&quot; entry from the desk-button's popup menu to do
+the same without having to press Alt/Meta.</P>
+<P>The application-bar configuration file, &quot;AppBar&quot;, allows you
+to set a variable named tkdesk(appbar,wm_managed) which can be used to have
+the apllication bar managed by the window manager, although this is
+usually not necessary.</P>
+
+<H2><A NAME="ss10.2">10.2</A> <A HREF="guide.html#toc10.2">Can I have transparent icons?</A>
+</H2>
+
+
+<P>No, but have a look at the answer to the next question.  As far as I
+know to have transparent icons in X you need to make use of X11's
+SHAPE extension.  Now as raw X programming is something only for the
+very brave, I didn't look into this any deeper yet.  Any takers?</P>
+
+<H2><A NAME="ss10.3">10.3</A> <A HREF="guide.html#toc10.3">How can I change the background colour of the icons and desk items?</A>
+</H2>
+
+
+<P>The background colour of icons used when the window manager iconifies
+a window can be set in the configuration file "System". The variable
+you are looking for is tkdesk(color,icon_background). By setting this
+variable to the same colour as your root window you can achieve the
+effect of transparent icons. You can define the colour either as a
+normal name (such as "grey", "blue") or in the form #rrggbb.</P>
+
+<H2><A NAME="ss10.4">10.4</A> <A HREF="guide.html#toc10.4">How can I have a different set of desk items on each virtual screen? </A>
+</H2>
+
+
+
+<H3>FVWM and similar or derived window managers</H3>
+
+
+<P>First, you have to set the variable
+<CODE>tkdesk(desk_items,wm_managed)</CODE> in the System config file to 1.
+Then you have to configure fvwm to not decorate windows of class
+<CODE>dsk_DeskItem</CODE>. For instance:
+<BLOCKQUOTE><CODE>
+<PRE>
+Style "dsk_DeskItem"    NoTitle, NoHandles, WindowListSkip, BorderWidth 0
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H3>CDE window manager</H3>
+
+
+<P>As for FVWM, you first have to set the variable
+<CODE>tkdesk(desk_items,wm_managed)</CODE> in the System config file to 1.
+To tell the CDE window manager (dtwm) to not decorate desk items you
+have to add the following line to either the file Dtwm or .Xdefaults
+in your home directory, and then restart dtwm:
+<BLOCKQUOTE><CODE>
+<PRE>
+Dtwm*dsk_DeskItem*clientDecoration:  none
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss10.5">10.5</A> <A HREF="guide.html#toc10.5">How do I configure FVWM mini-icons for TkDesk?</A>
+</H2>
+
+<P>For fvwm95's Style command (like fvwm2 from which it comes) you can
+use a variety of things to identify a tkdesk window - you don't have
+to use the name only; you can also use the window's class name or
+resource string.  To find out what the window class and resource
+string are for a certain type of tkdesk window, use the FvwmIdent
+module (if you use Debian, this will be under the Window
+Managers->Modules menu; if you're using the default fvwm95rc that
+comes with the fvwm95 distribution, this will be under the
+Programs->Modules menu; I don't know about others).</P>
+<P>Anyway, FvwmIdent tells me that the window opened by tkDesk's "Open
+Browser..." menu has a class name of dsk_FileViewer, so I open the
+FvwmConsole (or FvwmTalk) module, and enter the commands:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+Style dsk_FileViewer TitleIcon mini-filemgr.xpm
+Recapture
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Then the browser window appears with the appropriate icon.  To get the 
+window opened by the "Open Directory..." menu, use:
+Style dsk_FileList TitleIcon mini-filemgr.xpm</P>
+<P>(The "recapture" command is only necessary to apply the command to
+windows already open; it isn't necessary in your config. file)
+(Contributed by Daniel Martin, <CODE>dtm12@jhunix.hcf.jhu.edu</CODE>)</P>
+
+<H2><A NAME="ss10.6">10.6</A> <A HREF="guide.html#toc10.6">Configuring the appbar or popup menus to execute (export foo=bar; program;) doesn't work.</A>
+</H2>
+
+
+<P>Yes, this is a bit tricky. What you need to do is the following:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+dsk_exec sh -c {export foo=bar; program}
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss10.7">10.7</A> <A HREF="guide.html#toc10.7">Composing characters doesn't work in TkDesk's editor.</A>
+</H2>
+
+
+<P>Currently you have to edit the file cb_tools/bindings.tcl in TkDesk's
+library directory to make this work.  Locate the two lines containing
+the word &quot;XKB&quot;; all you need to do is to comment out the
+following lines by prepending a '#'.</P>
+
+<H2><A NAME="ss10.8">10.8</A> <A HREF="guide.html#toc10.8">TkDesk's layout seems to be screwed.  I can't get the appbar displayed anymore. </A>
+</H2>
+
+
+<P>TkDesk saves all layout information in the file &nbsp;/.tkdesk/_layout, so
+this is the place to look for bad lines.  If in doubt you can safely
+delete this file and all should be back to normal.</P>
+<P>In case of the appbar not showing up you can try the following (sent by
+Jochem Huhmann, joh@unidui.uni-duisburg.de):</P>
+<P>
+<OL>
+<LI> Quit tkdesk</LI>
+<LI> Open the file ".tkdesk/_layout" within your home directory with your
+favorite editor</LI>
+<LI> Delete the line looking like "Toplevel dsk_appbar 1 66x740+956+0"</LI>
+<LI> Write the file back to disk</LI>
+<LI> Restart tkdesk. It will place the AppBar according to its defaults 
+now.</LI>
+<LI> Place the AppBar as you like (it doesn't like horizontal layout too
+much)</LI>
+<LI> Do a "TkDesk/Save All Now"</LI>
+</OL>
+</P>
+
+<H2><A NAME="ss10.9">10.9</A> <A HREF="guide.html#toc10.9">On my RedHat 5.x system the appbar clock shows the wrong time. </A>
+</H2>
+
+
+<P>This is from Bryan Venable, spif@vousi.com:</P>
+<P>This may have to do with the location of the zoneinfo directory.  For libc5
+I believe it's /usr/lib/zoneinfo, whereas for glibc it'd be
+/usr/share/zoneinfo.  Try making a symbolic link from whichever you have to
+whichever you don't.  There is a fix to Red Hat 5.0 which has to do with
+this, but in that situation the problem is with libc5 programs running on a
+system "optimized" for glibc.</P>
+<P>And Raul Quiroga, quiroga@cartan.math.cinvestav.mx, also has got some
+advice for this:</P>
+<P>Concerning the problem described below I received several suggestions.
+Some allowed to get the date in the tkdesk right but an incorrect one with
+the date command. Finally what I did is set the time with timeconfig to
+Universal with "Hardware clock set to GMT" checked; after a reboot both
+the appbar and date reported the correct time. Thanks all for your
+help.</P>
+
+<H2><A NAME="ss10.10">10.10</A> <A HREF="guide.html#toc10.10">TkDesk complains about &quot;invalid command name wm&quot; and won't start up</A>
+</H2>
+
+
+<P>There seem to be two solutions to this problem: One is if you're
+running on a RedHad Linux 5.x system, the libc5 that's packaged and
+installed in /lib may be too old a version.  If <CODE>ls
+/lib/libc.so.5.*</CODE> on your system gives something like
+<CODE>/lib/libc.so.5.3.xx</CODE> you should upgrade to at least 5.4.20.  I
+think you can get a newer version of libc from sunsite.unc.edu in
+/pub/Linux/GCC.</P>
+<P>The other solution that should always work is to do the following
+(thanks to Ike Hishikawa, ike@hishikawa.f.uunet.de, for this one):</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+Assuming that the tarball was unpacked under /usr/local,
+open /usr/local/bin/tkdesk with your favorite editor.
+At the very top of the file it should say:
+
+  #!/bin/sh
+  #-*- tcl -*- \
+  PATH=/usr/local/bin:$PATH ;#\
+  exec tkdesksh "$0" "$@"
+
+After the 3rd line, insert two lines pointing to the location of
+tcl/tk libs,  so that you get:
+
+  #!/bin/sh
+  #-*- tcl -*- \
+  PATH=/usr/local/bin:$PATH ;#\
+  export TCL_LIBRARY=/usr/local/lib/TkDesk/tcl_lib ;#\
+  export TK_LIBRARY=/usr/local/lib/TkDesk/tk_lib ;#\
+  exec tkdesksh "$0" "$@"
+
+This did the trick for me :)
+Hope this helps,
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss10.11">10.11</A> <A HREF="guide.html#toc10.11">I cannot launch other Tcl/Tk applications from within TkDesk</A>
+</H2>
+
+<P>Probably your version of TkDesk sets the environment variables
+TK_LIBRARY and TCL_LIBRARY, which confuses other Tcl/Tk apps.
+Unset these variables in the config files before the invocation of
+the problematic commands, eg. replace xterm with</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        sh -c {unset TK_LIBRARY TCL_LIBRARY; xterm}
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>(contributed by Christoph Dalitz, <CODE>dalitz@infotech.de</CODE>)</P>
+
+<H2><A NAME="ss10.12">10.12</A> <A HREF="guide.html#toc10.12">I'd like TkDesk to do this and that. How can I achieve this?</A>
+</H2>
+
+
+<P>The first place to start are the various configuration files of TkDesk.
+These can be accessed either by the "TkDesk/Configuration" menu
+of the file browser windows, or by the "Configuration" submenu of the
+popup menu of the very first button of the application bar of TkDesk.</P>
+<P>Since TkDesk uses Tcl as the language for its configuration, and these
+configuration files are simply "source"ed, you could add any sort of
+Tcl proc for instance to the configuration file "System". This proc
+would then be available in every other configuration file as well.
+With the set of commands provided by TkDesk, which are listed e.g.
+in the configuration file "Popups", TkDesk provides a very powerful
+platform for the user who knows Tcl.</P>
+
+<H2><A NAME="ss10.13">10.13</A> <A HREF="guide.html#toc10.13">Is there a TkDesk mailing list? </A>
+</H2>
+
+
+<P>There two mailing lists dedicated to TkDesk, one for discussing general
+installation/usage topics (tkdesk-users) and one targeted more for
+TkDesk-related development topics (tkdesk-code).  You can subscribe
+to the tkdesk-users list here:
+<CODE>
+<A HREF="https://lists.sourceforge.net/lists/listinfo/tkdesk-users">https://lists.sourceforge.net/lists/listinfo/tkdesk-users</A>.</CODE>
+To post questions, etc., send email to <CODE>
+<A HREF="mailto:tkdesk-users@lists.sourceforge.net">tkdesk-users@lists.sourceforge.net</A>.</CODE></P>
+<P>It you are interested in contributing to the development of TkDesk, you can
+subscribe to the tkdesk-code list here:
+<CODE>
+<A HREF="https://lists.sourceforge.net/lists/listinfo/tkdesk-code">https://lists.sourceforge.net/lists/listinfo/tkdesk-code</A>.</CODE>
+Once you have subscribed, you can post using the address <CODE>
+<A HREF="mailto:tkdesk-code@lists.sourceforge.net">tkdesk-code@lists.sourceforge.net</A>.</CODE></P>
+
+<H2><A NAME="tcltk"></A> <A NAME="ss10.14">10.14</A> <A HREF="guide.html#toc10.14">Where can I find out more about Tcl/Tk?</A>
+</H2>
+
+
+<P>The official Tcl/Tk homepage is at
+<CODE>
+<A HREF="http://www.tcl.tk/">http://www.tcl.tk/</A></CODE>.</P>
+<P>There is also a newsgroup dedicated
+to Tcl/Tk: <CODE>
+<A HREF="news:comp.lang.tcl">comp.lang.tcl</A></CODE>.</P>
+
+<HR>
+<A HREF="guide-11.html">Next</A>
+<A HREF="guide-9.html">Previous</A>
+<A HREF="guide.html#toc10">Contents</A>
+</BODY>
+</HTML>

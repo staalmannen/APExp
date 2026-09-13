@@ -1,0 +1,799 @@
+From POPmail Sun Jun 29 21:56:19 1997
+Return-Path: <tkdesk-owner@mrj.com>
+Received: from turtle.mrj.com by wiesbaden.netsurf.de with smtp
+	(Smail3.1.28.1 #10) id m0wiA9M-001lp5a; Sun, 29 Jun 97 04:55 MET DST
+Received: (from majordomo@localhost) by turtle.mrj.com (8.6.10/8.6.10) id VAA28238 for tkdesk-outgoing; Sat, 28 Jun 1997 21:15:50 -0400
+Received: from steve.prima.ruhr.de (root@steve.prima.ruhr.de [141.39.232.6]) by turtle.mrj.com (8.6.10/8.6.10) with ESMTP id VAA28233 for <tkdesk@mrj.com>; Sat, 28 Jun 1997 21:15:43 -0400
+Received: (from news@localhost) by steve.prima.ruhr.de (8.8.5/8.8.2) with UUCP id DAA31393 for tkdesk@mrj.com; Sun, 29 Jun 1997 03:13:48 +0200
+X-Authentication-Warning: steve.prima.ruhr.de: news set sender to stefan@asgaard.prima.ruhr.de using -f
+Received: from asgaard.prima.ruhr.de (stefan@localhost [127.0.0.1])
+          by asgaard.prima.ruhr.de (8.8.4/8.8.4) with ESMTP
+	  id DAA09326 for <tkdesk@mrj.com>; Sun, 29 Jun 1997 03:14:02 +0200
+Message-Id: <199706290114.DAA09326@asgaard.prima.ruhr.de>
+X-Mailer: exmh version 1.6.9 8/22/96
+To: tkdesk@mrj.com
+Subject: [TkDesk] AppBar Mail Button Hacks
+Mime-Version: 1.0
+Content-Type: multipart/mixed ;
+	boundary="===_0_Sun_Jun_29_02:40:03_CEST_1997"
+Date: Sun, 29 Jun 1997 03:14:01 +0200
+From: Stefan Gronemeier <stefan@asgaard.prima.ruhr.de>
+Sender: owner-tkdesk@mrj.com
+Precedence: bulk
+X-Mozilla-Status: 0001
+Content-Length: 19566
+
+This is a multipart MIME message.
+
+--===_0_Sun_Jun_29_02:40:03_CEST_1997
+Content-Type: text/plain; charset=iso-8859-1
+Content-Description: mail_hacks.tcl
+Content-Transfer-Encoding: quoted-printable
+
+# Hello !
+#
+# I have hacked up a little extension for TkDesk's Mail button that
+# can also announce new mail arriving in MH folders (mail sorted into
+# folders by procmail).
+#
+# Since you can mark mail as "unread" with most mail programs, new
+# mail is announced only once as new, and after that only as old mail.
+# status information about unread (not announced as new) mail =
+
+# is kept in a hidden file (YourMailFolderDir)/.tkdesk_newmail
+# =
+
+# This mail folder hack also contains a hacked-up version of the =
+
+# "mail-headers flasher" by J. Chris Coppick (original message =
+
+# appended).
+#
+# Just copy the following file to ~/.tkdesk/mail_hacks.tcl and
+# add the following line to ~/.tkdesk/Local :
+#
+#   uplevel #0 "source $tkdesk(configdir)/mail_hacks.tcl"
+#
+# I use it with tkdesk-1.0b4, mh-6.8.4-linux and exmh.
+# If it does not work for you, you may have to tweak the config =
+
+# lines at the beginning of the file. For me, it works perfect ...
+#
+# Please let me know if you find major bugs.
+
+
+
+########################### MAIL HACKS ##################################=
+
+
+#########################################################################=
+
+### MAIL-HACKS CONFIGURATION
+#########################################################################=
+
+
+
+### MH-Folder Hack (mh-6.8.4-linux / exmh)
+### Author: STG
+
+## set to false if you don't use MH
+set tkdesk(appbar,mail,use_mh) true
+
+## directory where MH keeps the folders
+## (lock in $HOME/.mh_profile)
+set tkdesk(appbar,mail,mh_mail_dir) "~/.MAIL"
+
+## filename where MH puts information about unread mails
+## in the folders
+## (search for a hidden file in a folder with unread mail
+##  that contains something like "unseen: 3-6 7 29 31-42")
+set tkdesk(appbar,mail,mh_mail_seqfile) ".mh_sequences"
+
+## the sequence in .mh_sequences file that marks unseen mails
+set tkdesk(appbar,mail,mh_unseen) "unseen"
+
+## list of folders you want to be watched by tkdesk
+set tkdesk(appbar,mail,mh_folders) "inbox from_me tkdesk exmh"
+
+
+
+###
+### TkDesk mail-headers display
+### Author:  J. Chris Coppick, 1997
+###
+
+# background color for headers window
+set tkdesk(color,headers_background) black
+
+# background color for headers window
+set tkdesk(color,headers_foreground) yellow
+
+# font for headers window
+set tkdesk(font,headers) 9x15bold
+
+# command for summarizing mail contents
+set tkdesk(cmd,headers) "/usr/bin/mailx -H"
+
+# (STG) command for getting headers of MH folders =
+
+set tkdesk(cmd,mh_scan) "/usr/local/mh/bin/scan"
+
+### Number of seconds to auto-display mail headers when new mail arrives.=
+
+### Set to zero to disable auto-display of mail headers.
+set tkdesk(headers_display_time) 5
+
+### Maximum number lines of mail headers to display
+### Set to zero to for unlimited number of lines.
+set tkdesk(headers_max) 30
+
+
+
+#########################################################################=
+
+### MAIL-HACKS
+#########################################################################=
+
+
+
+## STG
+## make a list of numbers (1 3 7 8 9 10 13) out of a shortened
+## list of numbers (1 3 7-10 13)
+proc _appbar_expand_mh_sequence {seq} {
+    set exp_seq {}
+    foreach s $seq {
+        set _range [split $s -]
+        if {[llength $_range] > 1} {
+            set _l [lindex $_range 0]
+            set _h [lindex $_range 1]
+            for {set _cnt $_l} { $_cnt <=3D $_h } {incr _cnt} {
+                lappend exp_seq $_cnt
+            }
+        } else {
+            lappend exp_seq $_range
+        }
+    }
+    ## puts stderr "*** $exp_seq"
+
+    return $exp_seq
+}
+## /STG
+
+### TkDesk MH-Folder Scanning
+### Author: Stefan Gronemeier, 1997 (STG)
+###
+### TkDesk mail-headers display
+### Author:  J. Chris Coppick, 1997
+###
+proc _appbar_check_mail {} {
+    global dsk_appbar tkdesk
+    =
+
+    set b $dsk_appbar(mail,button)
+    if ![winfo exists $b] return
+    =
+
+    set f $dsk_appbar(mail,folder)
+    if ![file exists $f] {
+        set ns nomail
+    } else {
+        file stat $f stat
+        if {$stat(size) =3D=3D 0} {
+            set ns nomail
+	    =
+
+            # JCC
+            catch {destroy .dsk_mail_headers}
+	    =
+
+        } else {
+            if {$stat(mtime) > $stat(atime)} {
+                set ns newmail
+            } else {
+                set ns oldmail
+            }
+        }
+    }
+    =
+
+    ## STG
+    if [info exists tkdesk(appbar,mail,use_mh)] {
+	## list of lines in .tkdesk_newmail sequence file
+	set lines {}
+	=
+
+	foreach folder $tkdesk(appbar,mail,mh_folders) {
+	    set tkdesk(mail,mh,unseen,$folder) ""
+	}
+	## read $tkdesk(appbar,mail,mh_mail_dir)/.tkdesk_newmail file
+	if ![catch {open "$tkdesk(appbar,mail,mh_mail_dir)/.tkdesk_newmail" r} i=
+nf] {
+	    while {![eof $inf]} {
+		gets $inf line
+		if [string match folder-*:* $line] {
+		    set seq [lrange $line 1 end]
+		    set l1 [split $line :]
+		    set folder [string range [lindex $l1 0] \
+			    7 [string length [lindex $l1 0]]]
+		    set tkdesk(mail,mh,unseen,$folder) \
+			    "[_appbar_expand_mh_sequence $seq]"
+		}
+	    }
+	    close $inf
+	}
+	=
+
+        ## scan MH folders for new mail
+        foreach folder $tkdesk(appbar,mail,mh_folders) {
+            ## folder path
+            set fpath "$tkdesk(appbar,mail,mh_mail_dir)/$folder"
+            ## sequence-file
+            set fseq "$fpath/$tkdesk(appbar,mail,mh_mail_seqfile)"
+            dsk_debug "mh_check_sequence $fseq"
+	    =
+
+            if ![catch {open "$fseq" r} inf] {
+		fconfigure $inf -blocking 0
+		=
+
+		## unseen-sequence
+		set _mh_unseen {}
+		set _mh_unseen_full {}
+		## read sequence file
+		while {![eof $inf]} {
+		    gets $inf line
+		    if [string match $tkdesk(appbar,mail,mh_unseen):* $line] {
+			## found unseen-sequence
+			if { [llength $line] > 1 } {
+			    set _mh_unseen "[lrange $line 1 end]"
+			    set _mh_unseen_full \
+				    [_appbar_expand_mh_sequence $_mh_unseen]
+			}
+		    }
+		}
+		close $inf
+		=
+
+		### puts stderr "********** $folder * $_mh_unseen_full"
+		=
+
+		if { $tkdesk(mail,mh,unseen,$folder) !=3D $_mh_unseen_full } {
+		    foreach z $_mh_unseen_full {
+			if {[lsearch -exact $tkdesk(mail,mh,unseen,$folder) $z] =3D=3D -1} {
+			    set ns newmail
+			    break
+			} elseif { $ns =3D=3D "nomail" } {
+			    ## mail in MH-folder was already announced as new
+			    ## and it is now oldmail, but only if there is no
+			    ## newmail in system folder (/var/spool/news/...)
+			    set ns oldmail
+			}
+		    }
+		} elseif { $ns =3D=3D "nomail" } {
+		    if {[llength $_mh_unseen_full] > 0} {
+			set ns oldmail
+		    }
+		}
+		## set tkdesk-newmail sequence to unseen-sequence
+		set tkdesk(mail,mh,unseen,$folder) "$_mh_unseen_full"
+            }
+        }
+	=
+
+        ## write back .tkdesk_newmail sequence file
+        ## all lines go out unchangend, except for
+        ## 'tkdesk-newmail:', which is set to the
+        ## value of 'unseen:'
+        set inf [open $tkdesk(appbar,mail,mh_mail_dir)/.tkdesk_newmail w]=
+
+        foreach folder $tkdesk(appbar,mail,mh_folders) {
+            ## avoid empty lines
+            if { [info exists tkdesk(mail,mh,unseen,$folder)] } {
+                puts $inf "folder-$folder: $tkdesk(mail,mh,unseen,$folder=
+)"
+            }
+            ## puts stderr "folder-$folder: $tkdesk(mail,mh,unseen,$folde=
+r)"
+        }
+        close $inf
+    }
+    ## /STG
+    =
+
+    # JCC
+    if {$ns !=3D "nomail"} {
+        dsk_mail_headers
+    }
+    =
+
+    if {$ns !=3D $dsk_appbar(mail,laststat)} {
+        set dsk_appbar(mail,laststat) $ns
+        $b config -image $dsk_appbar(mail,img,$ns)
+        if {$ns =3D=3D "newmail"} {
+            if {$tkdesk(appbar,mail,newbg) !=3D ""} {
+                $b config -bg $tkdesk(appbar,mail,newbg)
+            }
+            dsk_sound dsk_new_mail beep
+	    =
+
+            # JCC
+            dsk_show_mail_headers
+	    =
+
+        } else {
+            if [info exists tkdesk(color,basic)] {
+                $b config -bg $tkdesk(color,basic)
+            }
+        }
+    }
+    =
+
+    if [info exists dsk_appbar(mail,afterid)] {
+        catch {after cancel $dsk_appbar(mail,afterid)}
+    }
+    set dsk_appbar(mail,afterid) \
+            [after [expr $tkdesk(appbar,mail,delay) * 1000] _appbar_check=
+_mail]
+}
+
+### TkDesk mail-headers display
+### Author:  J. Chris Coppick, 1997
+###
+### TkDesk MH-Folder Scanning
+### Author: Stefan Gronemeier, 1997 (STG)
+###
+proc dsk_mail_headers {} {
+    =
+
+    global tkdesk dsk_appbar
+    =
+
+    if {[catch "set tkdesk(cmd,headers)"] || $tkdesk(cmd,headers) =3D=3D =
+""} {
+	return
+    }
+    =
+
+    set t .dsk_mail_headers
+    if [winfo exists $t] {
+	destroy $t
+    }
+    =
+
+    toplevel $t
+    wm withdraw $t
+    wm title $t {New Mail}
+    frame $t.f -bd 1 -relief raised
+    pack $t.f -fill x
+    =
+
+    text $t.lb -width 60 -height 10 -font $tkdesk(font,headers) \
+	    -bg $tkdesk(color,headers_background) \
+	    -fg $tkdesk(color,headers_foreground)
+    =
+
+    pack $t.lb -in $t.f -fill both -expand yes
+    =
+
+    set cmd $tkdesk(cmd,headers)
+    set cmd [string_replace $cmd \[ \\\[]
+    set cmd [string_replace $cmd \] \\\]]
+    append cmd " 2>/dev/null"
+    if $tkdesk(debug) {
+	catch {puts stderr "$cmd"}
+    }
+    =
+
+    if [catch "set headers \[exec $cmd]"] {
+	#catch {$t.lb insert end "Mail headers retrieval failed."}
+    } else {
+    }
+    =
+
+    if ![info exists headers] { set headers "" }
+    =
+
+    if [info exists tkdesk(appbar,mail,use_mh)] {
+	foreach folder $tkdesk(appbar,mail,mh_folders) {
+	    set fpath "$tkdesk(appbar,mail,mh_mail_dir)/$folder"
+	    set fseq "$fpath/$tkdesk(appbar,mail,mh_mail_seqfile)"
+	    if [catch {open $fseq} inf] {
+		continue
+	    }
+	    fconfigure $inf -blocking 0
+	    while {![eof $inf]} {
+		gets $inf line
+		if [string match $tkdesk(appbar,mail,mh_unseen):* $line] {
+		    if { [llength $line] > 1 } {
+			set _mh_unseen [lrange $line 1 end]
+			foreach _unseen $_mh_unseen {
+			    set _range [split $_unseen -]
+			    if {[llength $_range] > 1} {
+				set _l [lindex $_range 0]
+				set _h [lindex $_range 1]
+				for {set _cnt $_l} { $_cnt <=3D $_h } {incr _cnt} {
+				    set header1 "+$folder:[string trim [exec $tkdesk(cmd,mh_scan) +$f=
+older =
+
+$_cnt] \n]"
+				    if { $headers =3D=3D ""} {
+					set headers $header1
+				    } else {
+					set headers "$headers\n$header1"
+				    }
+				}
+			    } else {
+				set header1 "+$folder:[string trim [exec /$tkdesk(cmd,mh_scan) +$fold=
+er =
+
+$_range] \n]"
+				if { $headers =3D=3D ""} {
+				    set headers $header1
+				} else {
+				    set headers "$headers\n$header1"
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	    close $inf
+	}
+    }
+    set hl [split $headers \n]
+    set ll [llength $hl]
+    set ml 0
+    set cnt 0
+    foreach h $hl {
+	set h [string trim $h { }]
+	set hlen [string length $h]
+	incr cnt
+	if {$hlen > $ml} {
+	    set ml $hlen
+	}
+	if {$cnt > $tkdesk(headers_max) && $tkdesk(headers_max) > 0 } {
+	    set ll $cnt
+	    $t.lb insert end "..."
+	    break
+	} else {
+	    $t.lb insert end "$h\n"
+	}
+    }
+    $t.lb configure -height $ll -width $ml
+    =
+
+    cb_centerToplevel $t
+    =
+
+    if [winfo exists $dsk_appbar(mail,button)] {
+	wm transient $t $dsk_appbar(mail,button)
+	=
+
+	#
+	# Mouse bindings for showing headers on demand...
+	#
+	bind $dsk_appbar(mail,button) <Button-2> \
+		"catch {wm deiconify .dsk_mail_headers; raise .dsk_mail_headers}"
+	bind $dsk_appbar(mail,button) <ButtonRelease-2> \
+		"catch {wm withdraw .dsk_mail_headers}"
+	=
+
+    }
+    update idletasks
+}
+
+proc dsk_show_mail_headers {} {
+    =
+
+    global tkdesk
+    =
+
+    if [catch {set tkdesk(headers_display_time)}] {
+	return
+    }
+    =
+
+    if {$tkdesk(headers_display_time) =3D=3D 0 || \
+	    $tkdesk(headers_display_time) =3D=3D ""} {
+	return
+    }
+    =
+
+    if [winfo exists .dsk_mail_headers] {
+	wm deiconify .dsk_mail_headers
+	raise .dsk_mail_headers
+	update idletasks
+	after [expr 1000 * $tkdesk(headers_display_time)] \
+		"catch {wm withdraw .dsk_mail_headers}"
+    }
+}
+
+########################### EOF #########################################=
+
+
+
+
+
+
+--===_0_Sun_Jun_29_02:40:03_CEST_1997
+Content-Type: text/plain; charset=iso-8859-1
+Content-Description: mailfolderfun.txt
+Content-Transfer-Encoding: quoted-printable
+
+>From tkdesk-owner@mrj.com  Wed Jan  8 01:57:48 1997
+Received: (from uucp@localhost) by asgaard.prima.ruhr.de (8.7.5/8.7.3) wi=
+th =
+
+UUCP id BAA00785 for stefan@asgaard.prima.ruhr.de; Wed, 8 Jan 1997 01:57:=
+47 =
+
++0100
+Received: from turtle.mrj.com (turtle.mrj.com [205.160.13.11]) by =
+
+steve.prima.ruhr.de (8.8.2/8.8.2) with SMTP id AAA17628 for =
+
+<stefan@asgaard.prima.ruhr.de>; Wed, 8 Jan 1997 00:10:58 +0100
+Received: (from majordomo@localhost) by turtle.mrj.com (8.6.10/8.6.10) id=
+ =
+
+QAA18575 for tkdesk-outgoing; Tue, 7 Jan 1997 16:17:27 -0500
+Received: from dreadnought.netjammer.com (dreadnought.netjammer.com =
+
+[199.245.28.254]) by turtle.mrj.com (8.6.10/8.6.10) with SMTP id QAA18568=
+ for =
+
+<tkdesk@mrj.com>; Tue, 7 Jan 1997 16:17:19 -0500
+Received: from shard.snm.com by dreadnought.netjammer.com
+          via smtpd (for turtle.mrj.com [205.160.13.11]) with SMTP; 7 Jan=
+ 1997 =
+
+21:12:01 UT
+Received: (from jcc@localhost) by snm.com (8.7.5/8.7.3) id QAA24150 for =
+
+tkdesk@mrj.com; Tue, 7 Jan 1997 16:19:46 -0500 (EST)
+Message-Id: <199701072119.QAA24150@snm.com>
+From: jcc@snm.com (J. Chris Coppick)
+Date: Tue, 7 Jan 1997 16:19:45 -0500
+X-Mailer: Mail User's Shell (7.2.6 alpha(2) 7/9/95)
+To: tkdesk@mrj.com
+Subject: Mail Folder Fun
+Sender: owner-tkdesk@mrj.com
+Precedence: bulk
+
+I like TkDesk's mail button, but I missed my mail-folder flasher, so
+I wrote one.  It'll flash your headers whenever you receive new mail
+and show them on demand in conjunction with the mail button.  For
+example, if I put the mouse pointer over the mail button and press
+mouse-button #2, it pops up a window containing a summary of the
+mail in my incoming folder.  When I release the mouse button, the window
+disappears.  If you're stuck with a two-button mouse, you'll probably
+want to change the bindings.
+
+Supported variables (from my System file):
+
+# background color for headers window
+set tkdesk(color,headers_background) black
+
+# background color for headers window
+set tkdesk(color,headers_foreground) yellow
+
+# font for headers window
+set tkdesk(font,headers) 9x15bold
+
+# command for summarizing mail contents
+set tkdesk(cmd,headers) "/usr/bin/mailx -H"
+
+### Number of seconds to auto-display mail headers when new mail arrives.=
+
+### Set to zero to disable auto-display of mail headers.
+set tkdesk(headers_display_time) 5
+
+
+You'll need to change the _appbar_check_mail() procedure in "appbar.tcl".=
+
+Here's my version.  The changes are marked with my initials (JCC).
+(There's only 5 new lines.)
+
+######
+proc _appbar_check_mail {} {
+    global dsk_appbar tkdesk
+
+    set b $dsk_appbar(mail,button)
+    if ![winfo exists $b] return
+    =
+
+    set f $dsk_appbar(mail,folder)
+    if ![file exists $f] {
+	set ns nomail
+    } else {
+	file stat $f stat
+	if {$stat(size) =3D=3D 0} {
+	    set ns nomail
+
+            # JCC
+            catch {destroy .dsk_mail_headers}
+
+	} else {
+	    if {$stat(mtime) > $stat(atime)} {
+		set ns newmail
+	    } else {
+		set ns oldmail
+	    }
+	}
+    }
+
+    # JCC
+    if {$ns !=3D "nomail"} {
+        dsk_mail_headers
+    }
+
+    if {$ns !=3D $dsk_appbar(mail,laststat)} {
+	set dsk_appbar(mail,laststat) $ns
+	$b config -image $dsk_appbar(mail,img,$ns)
+	if {$ns =3D=3D "newmail"} {
+	    if {$tkdesk(appbar,mail,newbg) !=3D ""} {
+		$b config -bg $tkdesk(appbar,mail,newbg)
+	    }
+	    dsk_sound dsk_new_mail beep
+
+            # JCC
+            dsk_show_mail_headers
+
+	} else {
+	    if [info exists tkdesk(color,basic)] {
+		$b config -bg $tkdesk(color,basic)
+	    }
+	}
+    }
+    =
+
+    if [info exists dsk_appbar(mail,afterid)] {
+	catch {after cancel $dsk_appbar(mail,afterid)}
+    }
+    set dsk_appbar(mail,afterid) \
+	    [after [expr $tkdesk(appbar,mail,delay) * 1000] _appbar_check_mail]
+}
+#######
+
+Either include this code in your Local config. file or source it from
+there.  I have it in a file called "mail.tcl".  Then I put the following
+in my Local file:  source $tkdesk(configdir)/mail.tcl
+
+###
+### TkDesk mail-headers display
+### Author:  J. Chris Coppick, 1997
+###
+
+proc dsk_mail_headers {} {
+
+   global tkdesk dsk_appbar
+
+   if {[catch "set tkdesk(cmd,headers)"] || $tkdesk(cmd,headers) =3D=3D "=
+"} {
+      return
+   }
+   =
+
+   set t .dsk_mail_headers
+   if [winfo exists $t] {
+      destroy $t
+   }
+
+   toplevel $t
+   wm withdraw $t
+   wm title $t {New Mail}
+   frame $t.f -bd 1 -relief raised
+   pack $t.f -fill x
+
+   text $t.lb -width 60 -height 10 -font $tkdesk(font,headers) \
+       -bg $tkdesk(color,headers_background) \
+       -fg $tkdesk(color,headers_foreground)
+  =
+
+   pack $t.lb -in $t.f -fill both -expand yes
+
+   set cmd $tkdesk(cmd,headers)
+   set cmd [string_replace $cmd \[ \\\[]
+   set cmd [string_replace $cmd \] \\\]]
+   append cmd " 2>/dev/null"
+   if $tkdesk(debug) {
+      catch {puts stderr "$cmd"}
+   }
+
+   if [catch "set headers \[exec $cmd]"] {
+      catch {$t.lb insert end "Mail headers retrieval failed."}
+   } else {
+      set hl [split $headers \n]
+      set ll [llength $hl]
+      set ml 0
+      foreach h $hl {
+         set h [string trim $h { }]
+         set hlen [string length $h]
+         if {$hlen > $ml} {
+            set ml $hlen
+         }
+         $t.lb insert end "$h\n"
+      }
+      $t.lb configure -height $ll -width $ml
+   }
+
+   cb_centerToplevel $t
+
+   if [winfo exists $dsk_appbar(mail,button)] {
+      wm transient $t $dsk_appbar(mail,button)
+
+      #
+      # Mouse bindings for showing headers on demand...
+      #
+      bind $dsk_appbar(mail,button) <Button-2> \
+         "catch {wm deiconify .dsk_mail_headers; raise .dsk_mail_headers}=
+"
+      bind $dsk_appbar(mail,button) <ButtonRelease-2> \
+         "catch {wm withdraw .dsk_mail_headers}"
+
+   }
+   update idletasks
+}
+ =
+
+proc dsk_show_mail_headers {} {
+
+   global tkdesk
+
+   if [catch {set tkdesk(headers_display_time)}] {
+      return
+   }
+
+   if {$tkdesk(headers_display_time) =3D=3D 0 || \
+       $tkdesk(headers_display_time) =3D=3D ""} {
+      return
+   }
+
+   if [winfo exists .dsk_mail_headers] {
+      wm deiconify .dsk_mail_headers
+      raise .dsk_mail_headers
+      update idletasks
+      after [expr 1000 * $tkdesk(headers_display_time)]
+      catch {wm withdraw .dsk_mail_headers}
+   }
+}
+
+#######
+
+
+Enjoy.
+
+
+
+     -- Chris
+_________________________________________________________________________=
+___
+"...when I have understanding of computers, =
+
+I will be the supreme being."
+	-- Time Bandits
+# ---------------------------------------------------------------------- =
+#
+# To post to the list, send email to 'tkdesk@mrj.com'.                   =
+#
+# To unsubscribe from this list, send email to 'majordomo@mrj.com' with  =
+#
+# no subject and the following line in the body of the message:          =
+#
+# unsubscribe tkdesk                                                     =
+#
+# ---------------------------------------------------------------------- =
+#
+
+
+--===_0_Sun_Jun_29_02:40:03_CEST_1997--
+
+
+# ---------------------------------------------------------------------- #
+# To post to the list, send email to 'tkdesk@mrj.com'.                   #
+# To unsubscribe from this list, send email to 'majordomo@mrj.com' with  #
+# no subject and the following line in the body of the message:          #
+# unsubscribe tkdesk                                                     #
+# ---------------------------------------------------------------------- #
+
+

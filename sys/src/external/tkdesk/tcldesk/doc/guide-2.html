@@ -1,0 +1,639 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
+ <TITLE>TkDesk User's Guide: The File Browser Window </TITLE>
+ <LINK HREF="guide-3.html" REL=next>
+ <LINK HREF="guide-1.html" REL=previous>
+ <LINK HREF="guide.html#toc2" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="guide-3.html">Next</A>
+<A HREF="guide-1.html">Previous</A>
+<A HREF="guide.html#toc2">Contents</A>
+<HR>
+<H2><A NAME="s2">2.</A> <A HREF="guide.html#toc2">The File Browser Window </A></H2>
+
+
+<P>The file browser window is the largest window when TkDesk is started
+for the first time.
+It contains a menu bar, a configurable button bar (for fast
+access to the most often used file operations and other functions),
+an entry field (displaying the current path),
+a horizontal scrollbar,
+a certain number of file listboxes (three by default), and a
+status and information bar.</P>
+
+
+
+<H2><A NAME="ss2.1">2.1</A> <A HREF="guide.html#toc2.1">The Menu Bar </A>
+</H2>
+
+
+<P>The following sections describe the entries of the individual menus of
+the file browser windows.</P>
+
+
+
+<H3>TkDesk Menu </H3>
+
+
+<P>The &quot;TkDesk&quot; menu contains the following entries:</P>
+<P>
+<DL>
+
+<DT><B>New Browser...</B><DD><P>Asks for a directory for which to open a new file browser window.  If
+the directory is the empty string, the operation is cancelled.  By
+default the checkbox &quot;In Browser&quot; is checked, but if you
+uncheck it a file list window will be opened instead.  The button to
+the right of the text entry field gives access to a menu containing
+previously visited directories.</P>
+
+<DT><B>Clone Window</B><DD><P>Creates a new file browser window with the same directory as the
+current one (that is, the directory of the file browser from which
+this menu entry was invoked).</P>
+
+<DT><B>Display AppBar/Hide AppBar</B><DD><P>Opens the application bar if it had been closed before, or hides
+(closes) it otherwise.  This menu entry's label changes based on
+whether the AppBar is currently displayed or not.</P>
+
+<DT><B>Configuration</B><DD><P>This is a submenu from which individual or all configuration files of
+TkDesk can be opened to modify them.</P>
+
+<DT><B>Auto Save</B><DD><P>Here you can select which parts of TkDesk are automatically saved
+periodically and when TkDesk exits.</P>
+
+<DT><B>Save All Now</B><DD><P>Saves all parts of TkDesk's configuration no matter what the settings
+in the previous submenu.</P>
+
+<DT><B>Close Window</B><DD><P>Closes the file browser window.</P>
+
+<DT><B>Quit</B><DD><P>Quits TkDesk.</P>
+
+</DL>
+</P>
+
+
+<H3>File Menu </H3>
+
+
+<P>This menu provides all the usual file operations plus entries for
+finding files.  The contained menu entries are:</P>
+<P>
+<DL>
+
+<DT><B>Information</B><DD><P>Opens a file information window for each
+currently selected file.  This window, which can also be used to add
+annotations to files, is described in section
+<A HREF="guide-4.html#fileinfo">File Information</A>.</P>
+
+<DT><B>New File...</B><DD><P>Asks for the name of a file which will be
+created in the current directory of the file browser or list.  If
+&quot;Open in Editor&quot; is checked the new file will
+automatically be opened in the configured editor.</P>
+
+<DT><B>New Directory...</B><DD><P>Asks for the name of a directory which will be
+created in the current directory of the file browser or list.  If
+&quot;Open after Creation&quot; is checked the current window will
+switch to the new directory after it is created.</P>
+
+<DT><B>Open</B><DD><P>Opens the selected files using their default action,
+which corresponds to the first action defined in their popup menus as
+configured in the &quot;Popups&quot; configuration file.</P>
+
+<DT><B>Print...</B><DD><P>Asks for a command to print the currently selected
+files.  The names of the selected files will be appended to the
+command.  The default command can be defined in the configuration file
+&quot;System&quot;.</P>
+
+<DT><B>Copy, Move, Link...</B><DD><P>Opens a dialog box for copying, moving,
+linking, symbolic linking etc. of files.  This dialog window is
+described in more detail in
+section 
+<A HREF="guide-4.html#copydel">Copying, Moving and Deleting Files</A>.</P>
+
+<DT><B>Rename...</B><DD><P>For each selected file, TkDesk asks for a new
+name.  Before actually renaming TkDesk checks for an existing file with
+the same name.</P>
+
+<DT><B>Delete...</B><DD><P>Opens a dialog to delete files.  The
+section 
+<A HREF="guide-4.html#copydel">Copying, Moving and Deleting Files</A>
+gives more details.</P>
+
+<DT><B>Find Files...</B><DD><P>Opens a dialog window which can be used to
+search for files, using a variety of characteristics.  This dialog is
+described in more detail in section
+<A HREF="guide-4.html#findfiles">Finding Files</A>.</P>
+
+<DT><B>Find Annotation...</B><DD><P>Lets you search for files with a certain
+annotation.  More details in section 
+<A HREF="guide-4.html#findfiles">Finding Files</A>.</P>
+
+<DT><B>Copy To X Selection</B><DD><P>Copies the complete names of all currently selected files
+(i.e. including their paths) to the X clipboard.  They can then be
+pasted into any other X application using the middle mouse button.</P>
+
+<DT><B>Copy Names Only</B><DD><P>Same as previous one, but copies only the files' names (i.e. not their
+paths.)</P>
+
+<DT><B>History</B><DD><P>Displays a submenu containing recently opened files.</P>
+
+<DT><B>Close Window</B><DD><P>Closes the window.</P>
+
+</DL>
+</P>
+
+
+<H3><A NAME="dir"></A> Directory Menu </H3>
+
+
+<P>The main purpose of this menu is to select directories which are to be
+opened.  It also manages TkDesk's trash can.  The menu contains the
+following entries:</P>
+<P>
+<DL>
+
+<DT><B>Open...</B><DD><P>Asks for a directory.  A new file list or file browser window will be
+created, baesed on the setting of the &quot;In Browser&quot; checkbutton.</P>
+
+<DT><B>New...</B><DD><P>Asks for the name of a directory which will be
+created in the current directory of the file browser or list.</P>
+
+<DT><B>Home Directory</B><DD><P>Changes the directory of the window from
+which this entry is invoked to the user's home directory.</P>
+
+<DT><B><I>A number of path entries</I></B><DD><P>These can be configured in the configuration file
+<CODE>Directories</CODE>.  See section 
+<A HREF="guide-9.html#config">Configuration of TkDesk</A> for details on how to do this.   If one of these menu
+entries is invoked, the path of the file browser will change to that
+directory.   If such an entry is invoked while at the same time
+pressing the &quot;Control&quot; key,
+a new file list window will be created (if
+the option &quot;Always In Browser&quot; is selected a file browser
+window will be created), displaying the contents of the selected
+directory.  <B>This feature applies to all menus that contain
+directory names!</B></P>
+
+<DT><B>Trees</B><DD><P>Contains two cascaded submenus: &quot;Home&quot;
+and &quot;Root&quot;.  The contents of these submenus is dynamically
+generated and corresponds to the directory hierarchy rooted either at
+the user's home directory or at &quot;/&quot;.  Selecting an entry
+from these submenus changes the directory of the window to the
+selected directory.  Pressing <CODE>Control</CODE> at the same time opens a
+new window with this directory.</P>
+
+<DT><B>Open Trash Can</B><DD><P>Opens a file list window displaying the contents of
+the trash can.  When this window is iconified and TkDesk uses icon
+windows the icon can be used as a Mac-like trash can.</P>
+
+<DT><B>Empty Trash Can</B><DD><P>Empties the trash can after confirmation from
+the user.  <B>This erases the files contained in the trash can for
+good!</B></P>
+
+<DT><B>History</B><DD><P>Displays a submenu containing recently opened directories.</P>
+
+</DL>
+</P>
+
+
+
+<H3>Commands Menu </H3>
+
+
+<P>This menu provides entries to execute commands either once or
+periodically, edit files, and provides some very basic form of
+&quot;job control&quot;.  Its entries are:  </P>
+<P>
+<DL>
+
+<DT><B>Execute...</B><DD><P>Asks for a command to execute.  The button to the right of the command
+entry contains a history of previously executed commands.  Selecting
+one of these copies its name to the entry widget.  Checking the
+&quot;View Output&quot; button will open an editor window after the
+command completed displaying its output (stdout and stderr).</P>
+
+<DT><B>Execute as root...</B><DD><P>The same as the previous entry but TkDesk will ask you for the root
+password before executing the command.  The command will then run
+under root permission.</P>
+
+<DT><B>Periodic Execution...</B><DD><P>Opens a window which can be used to
+execute a command and watch its output periodically.  If the
+&quot;Don't execute&quot; checkbutton is selected, the execution is
+paused. </P>
+
+<DT><B>Job Control</B><DD><P>Opens a window which allows to stop, terminate,
+kill etc. processes which have been started by TkDesk.</P>
+
+<DT><B>Environment...</B><DD><P>Opens the &quot;Edit Environment&quot;
+dialog which can be used to display and modify TkDesk's environment
+variables.  Programs and commands started from TkDesk after any
+modification in this dialog has been made
+will pick up the modified environment.</P>
+
+<DT><B>Edit File...</B><DD><P>Asks for the name of a file to edit, and opens it in the editor you
+selected in the &quot;System&quot; configuration file (defaults to
+the built-in editor).  The &quot;Browse...&quot; button opens a file
+selector from which a file may be selected.</P>
+
+<DT><B>New File</B><DD><P>Opens a new blank editor window.</P>
+
+<DT><B>Edit Selected</B><DD><P>Opens all currently selected files in one new editor window.</P>
+
+<DT><B>Buffers</B><DD><P>Displays a submenu of all current editor buffers (both files and
+command output).</P>
+
+<DT><B><I>A number of custom command entries</I></B><DD><P>These can be defined in the configuration file
+<CODE>Commands</CODE>.  See section
+<A HREF="guide-9.html#config">Configuration of TkDesk</A> for details on how to
+do this.  If one of these menu entries is invoked, the corresponding
+command will be executed.</P>
+
+<DT><B>History</B><DD><P>Displays a submenu containing commands recently executed.</P>
+
+</DL>
+</P>
+
+
+
+<H3>Bookmarks Menu </H3>
+
+
+<P>This menu lets you create bookmarks for often used files and
+directories.  To do this, select at least one file/directory and invoke
+the &quot;Add Bookmark&quot; menu entry.  The name(s) of the selected
+files and directories will now appear alphabetically sorted
+in the &quot;Bookmarks&quot;
+menu.  You can remove any bookmark from the menu by selecting its
+corresponding entry from the &quot;Remove Bookmark&quot; submenu.</P>
+<P>The bookmarks you add will be automatically saved, if the
+&quot;Bookmarks&quot; entry of the &quot;Auto Save&quot; submenu
+contained in the &quot;TkDesk&quot; menu is selected
+(which is the default).</P>
+
+
+<H3>Options Menu </H3>
+
+
+<P>The <CODE>Options</CODE> menu lets you configure many aspects of TkDesk
+&quot;on the fly&quot;.  The entries are:</P>
+<P>
+<DL>
+
+<DT><B>Long Listing</B><DD><P>Select this to let the details of all files
+and directories be displayed in the file listboxes.  This slightly
+decreases performance and for that reason is switched off by default.</P>
+
+<DT><B>Show All Files</B><DD><P>Whether to show files in the file
+lists whose name start with &quot;.&quot;.</P>
+
+<DT><B>Add Icons</B><DD><P>If selected, small icons will be displayed to the
+left of the file names in the file listboxes.  Turn this off for
+faster scrolling.</P>
+
+<DT><B>Folders On Top</B><DD><P>If selected (default) folders will
+always appear on top of the file lists.</P>
+
+<DT><B>Append Type Char</B><DD><P>Whether to append a file-type
+specific character to the file names.  This is mainly intended for
+monochrome displays and is then automatically selected.</P>
+
+<DT><B>Single Click (Dirs)</B><DD><P>Lets you open directories with a single
+click of the left mouse button.  Individual directories can still be
+selected by pressing <CODE>Control</CODE> at the same time.</P>
+
+<DT><B>Always In Browser</B><DD><P>If this option is selected, the &quot;In
+Browser&quot; checkbutton of the &quot;Open Directory&quot; dialog
+will always be selected. <CODE>Control-Doubleclick</CODE> on a directory
+will open a file browser instead of a file list window.</P>
+
+<DT><B>Status in List Windows</B><DD><P>Whether the singly columned file
+list windows should have a status bar as well.</P>
+
+<DT><B>Sort by ...</B><DD><P>Sort all file listboxes by one of these criteria: Name, Name (fold,
+meaning that upper and lower case characters will be
+&quot;folded&quot;, i.e. disregard case when sorting), Size, Date,
+Extension, or Don't Sort to display directory entries as they are read
+from disk.</P>
+
+<DT><B>Strip &lt;your home directory&gt;</B><DD><P>If this is
+selected, and the current path of the browser is somewhere under your
+home directory, the leftmost file listbox will contain your home
+directory rather than the root directory. This speeds up the display
+of directory hierarchies under your home directory.</P>
+
+<DT><B>Overwrite Always</B><DD><P>If this option is selected, TkDesk
+won't ask if the destination file already exists when copying or
+moving files.</P>
+
+<DT><B>Really Delete</B><DD><P>Relates to the deletion of files. If
+this option is selected, the &quot;Delete Files&quot; dialog box
+will always have the &quot;Delete permanently&quot; checkbutton
+selected by default.</P>
+
+<DT><B>Quick Drag'n'Drop</B><DD><P>Normally when you drop files onto a
+file list, the copy dialog appears. If this option is selected,
+dropped files will be moved to the destination directory without
+further questions. If <CODE>Control</CODE> is pressed during dropping, the
+files will be copied. If the drop target is the trash can, TkDesk will
+ask if the files are to be deleted &quot;really&quot;.</P>
+
+<DT><B>Sort History</B><DD><P>This option determines whether the
+history menus are to be sorted alphabetically or not.</P>
+
+<DT><B>TkDesk Server</B><DD><P>Start or stop the built-in server to remote
+execute TkDesk commands.  See also section
+<A HREF="guide-8.html#server">Using the TkDesk Server</A>. </P>
+
+<DT><B>Dialogs at Pointer</B><DD><P>If selected, TkDesk will always try to
+place new windows right under the mouse pointer.</P>
+
+<DT><B>Autoraise AppBar</B><DD><P>Whether to raise the AppBar above any
+obscuring window when it is entered by the mouse pointer.</P>
+
+<DT><B>Use Sound</B><DD><P>If you have sound working with TkDesk on your
+machine, you can temporarily disable sound by selecting this
+option. Handy when playing Audio CDROMs, for instance.</P>
+
+<DT><B>Number Of Listboxes</B><DD><P>This relates to the number of
+listboxes in the file browser window. Between 1 and 6 can be
+displayed, though 18 would theoratically not be a problem.</P>
+
+<DT><B>Balloon Help</B><DD><P>Whether to display a small window at the mouse
+pointer if it is placed over part of TkDesk, e.g. an AppBar button.</P>
+
+<DT><B>Use Netscape for Help</B><DD><P>Whether to use Netscape rather than
+the built-in help viewer for displaying TkDesk online help.</P>
+
+</DL>
+</P>
+<P>The settings of these options are by default automatically saved to
+<CODE>~/.tkdesk/_options</CODE>.
+This can be disabled by deselecting the &quot;Options&quot; entry of
+the &quot;TkDesk/Auto Save&quot; submenu.</P>
+
+
+
+<H3>Help Menu </H3>
+
+
+<P>This menu tries to give you some help with using TkDesk.  It also
+contains entries for displaying the list of FAQs, recently made
+changes to TkDesk, and the license for using and
+distributing TkDesk:</P>
+<P>
+<DL>
+<DT><B>User's Guide</B><DD><P>Displays the TkDesk User's Guide either in the
+built-in help viewer or using Netscape (see previous section).</P>
+
+<DT><B>Manual Page...</B><DD><P>Asks for a command for which to display the
+system's manual page in an editor window.</P>
+
+<DT><B>Getting Started</B><DD><P>Displays the &quot;Getting Started&quot;
+guide.</P>
+
+<DT><B>TkDesk FAQ</B><DD><P>Jumps directly to the FAQ section of the TkDesk
+help volume.</P>
+
+<DT><B>Changes</B><DD><P>Displays recent changes to TkDesk.  Make sure you
+invoke this entry after upgrading to a newer version of TkDesk.</P>
+
+<DT><B>License</B><DD><P>Restates that TkDesk is distributed under the GNU
+Public License (GPL).</P>
+
+<DT><B>About TkDesk...</B><DD><P>Some info about TkDesk (version, author
+etc.), plus a link to the TkDesk web page.</P>
+</DL>
+</P>
+
+
+
+<H2><A NAME="ss2.2">2.2</A> <A HREF="guide.html#toc2.2">The Button Bar </A>
+</H2>
+
+
+<P>The button bar that's located right underneath the menu bar allows for
+fast access to any of the commands of TkDesk.  It's also possible to
+configure each button individually to run customized Tcl scripts, that
+e.g. work on the currently selected files.  By default, the buttons in
+the button bar provide access to the more often used functions of
+TkDesk (copy, create, delete etc.).  When you place the mouse button
+over any of
+these buttons, a small help window will appear telling you what this
+button does (provided the &quot;Balloon Help&quot; option is activated).</P>
+<P>The contents of this button bar can be defined via the
+configuration file <CODE>ButtonBar</CODE>. See section
+<A HREF="guide-9.html#config">Configuration of TkDesk</A> and the configuration
+file itself for details on how to do this.  Note that by not defining
+the variable <CODE>tkdesk(button_bar)</CODE> in that file or by not
+defining <CODE>tkdesk(small_button_bar)</CODE> the button for file viewer
+or list windows may be surpressed respectively.</P>
+
+
+
+<H2><A NAME="ss2.3">2.3</A> <A HREF="guide.html#toc2.3">The Path Entry </A>
+</H2>
+
+
+<P>This entry field displays the current path of the file browser or
+file list. You can
+also type directly into this field to change the display to another
+directory.  There is a sort of &quot;auto-completion&quot;
+available; if you type only the first part of a directory's name and
+press <CODE>Control-Tab</CODE>, its name will be automatically completed
+as far as there's no ambiguity.</P>
+<P>If you click the right mouse button over this field a popup menu
+appears which lets you select any of the current directory's parent
+directories and their subdirectories.  You can also open files
+directly from this popup menu.</P>
+<P>The button to the right of the entry field contains a menu of the last
+30 (default value this may be changed in the &quot;System&quot;
+configuration file) directories you have visited. If you select one of these,
+the current path of the browser will change to it. The
+&quot;Control-trick&quot; to open the selected path in a new list
+window that's been described in section
+<A HREF="#dir">Directories</A> works here as well!</P>
+
+
+
+<H2><A NAME="ss2.4">2.4</A> <A HREF="guide.html#toc2.4">The File Listboxes </A>
+</H2>
+
+
+<P>The main part of the file browser and list windows is
+taken up by the file listboxes.  Directories
+are by default displayed in blue with a bold font, executable files
+in red and bold, and regular files in black and a medium
+font.  These settings as well as the color, font and icons used for
+individual file types may be
+configured via the <CODE>FileTags</CODE> configuration file.  See section
+<A HREF="guide-9.html#config">Configuration of TkDesk</A> for details on how to
+do this.</P>
+<P>Right above each listbox the name of the directory whose contents it
+shows is displayed, together with the current file mask settings.
+Clicking on this label reveals a menu with the following entries:</P>
+<P>
+<DL>
+<DT><B>Refresh</B><DD><P>Refreshes the listbox contents.  Although TkDesk refreshes all its file
+lists every 5 seconds (default), sometimes you may want to have a file
+listbox instantaneously updated.</P>
+
+<DT><B>Set Mask...</B><DD><P>Sets a mask for this listbox's display.  For example, you can
+configure the listbox to only display or select files matching the pattern
+<CODE>*.gif</CODE>.  Multiple masks separated by spaces may be entered to
+display files matching any of these.  A history menu button for
+reusing masks previously entered is also provided, as well as a
+checkbutton for inverting the mask's effect (i.e. only files <B>not</B>
+matching the given mask will be displayed).</P>
+
+<DT><B>No Mask</B><DD><P>Removes a previously activated file mask.</P>
+
+<DT><B>Disk Usage</B><DD><P>Calculates the directory's disk usage, i.e. the number of
+kilobytes (default)
+occupied by that directory and all its subdirectories.  A window
+will appear when the calculation is complete, containing a sorted list of all
+subdirectories and their individual disk usages.  If you double-click
+on any of its entries, a new file list window will appear displaying the
+directory's contents.  Clicking the right mouse button over any of the
+directories displays its associated popup menu.</P>
+
+<DT><B>Free Space</B><DD><P>Displays the space available in the file system of this listbox's
+directory, using TkDesk's &quot;Periodic Execution&quot; window.</P>
+
+<DT><B>Execute here...</B><DD><P>Asks for a command to execute in the directory displayed by this
+listbox.  All the usual TkDesk %-sequences to work with the
+names of selected files may be used, e.g. <CODE>%A</CODE> to pass
+all currently selected files to the command.</P>
+
+<DT><B>Execute as root...</B><DD><P>The same as the previous one, except the command will be run under
+root permission after asking you for the root password (and you
+entered the correct one...).</P>
+
+
+<DT><B>Long Listing</B><DD><P>Instead of just the file names displays a &quot;long listing&quot;
+i.e. a listing containing all the details such as size, permission
+bits, date and time of last modification etc.</P>
+
+<DT><B>Show All Files</B><DD><P>Whether to display files starting with a dot (&quot;.&quot;) or not.</P>
+
+<DT><B>Inverse Order</B><DD><P>Whether to invert the current sorting order.</P>
+
+<DT><B>Sort by...</B><DD><P>This is identical to the entry of the same name in the menu bar's
+&quot;Options&quot; menu, but affects this single listbox only.</P>
+
+<DT><B>Open List Window</B><DD><P>If this listbox is part of a file browser window, open a new list
+window displaying this listbox's directory.</P>
+
+<DT><B>Open Browser</B><DD><P>Else, open a browser with this directory.</P>
+</DL>
+</P>
+<P>This menubutton can also be used to drag and drop files,
+as well as to drag the
+directory displayed in the associated listbox to another target, e.g.
+the root window by pressing the middle mouse button over the listbox
+title menu button.</P>
+
+
+
+<H3><A NAME="bind"></A> Handling of the Listboxes (Bindings) </H3>
+
+
+<P>The handling of the file browser windows is very similar to that of the NeXT
+file manager: when you double click on a directory, the listbox to the
+right of the current one will display this directory's contents.  You can
+open a directory in this listbox, and the listbox to the right of this one
+will display its contents.  This way you can browse through complete
+directory hierarchies, while having instant access to the contents of
+the complete directory tree. When the number of opened directories
+exceeds the number of visible listboxes, you can scroll the listboxes
+with the horizontal scrollbar which is located right above the file
+listboxes.</P>
+<P>Files are selected in the file listboxes using
+the left mouse button.  A single click selects
+a single file, deselecting all other files. If the Control key is
+pressed simultaneously, the old selection will be retained. By
+dragging the mouse pointer over a file list, while at the same time
+pressing the left mouse button, a set of files can be selected.
+Shift-doubleclick selects all files in that file list.  Holding down
+the shift button extends the current selection unto that file
+(a.k.a. &quot;range-selection&quot;).</P>
+<P>Note that if the option &quot;Single Click (Dirs)&quot; is set in
+the &quot;Options&quot; menu a
+single click on a directory will suffice open it. In this case
+you need to use
+Control-Click to select a single directory.</P>
+<P>A double click on any listbox item performs its default action.  For
+directories this is to open it, for executables this is to execute
+it, and for files it invokes the first entry of the corresponding popup
+menu as defined in the &quot;Popups&quot; configuration file
+(see below). If the Control key is pressed while double-clicking
+a directory, a new file list or file browser window (depending on the
+setting of the &quot;Always In Browser&quot; option)
+is created displaying the contents
+of that directory.  For files, a dialog box will appear asking for a
+command to execute on that file.</P>
+<P>Files can be dragged by pressing the middle mouse button over any
+selected file. If no file is selected, the clicked-over file will be
+selected.  Files can be dropped by releasing the mouse button over any
+other file listbox and the menubutton above them,
+over windows of the built-in editor, over the
+application bar (if the corresponding button has been configured to
+handle dropped files), over iconified file browsers and file lists
+and in general over any
+other application supporting the <CODE>file</CODE> protocol of the BLT
+package's drag and drop implementation.
+Valid drop targets can be identified by looking at the window
+that is displayed while files are dragged: the window's relief appears
+raised if over a valid target, flat if not.</P>
+<P>The right mouse button is used in the file listboxes to access the
+file-specific popup menu. Every popup menu contains a submenu, labeled
+with the file's name, which contains entries for the most common file
+operations. The remaining entries of the menu can be configured via
+the configuration file <CODE>Popups</CODE>. See section
+<A HREF="guide-9.html#config">Configuration of TkDesk</A> for details on how to
+do this.</P>
+<P>The file listboxes may also be fully controlled using the keyboard:</P>
+<P>
+<DL>
+<DT><B>Up-/Down Arrow</B><DD><P>Move the selection one file up/down.</P>
+<DT><B>Page Up/Down</B><DD><P>Move the selection one page up/down.</P>
+<DT><B>Home/End</B><DD><P>Move the selection to first/last item in the listbox.</P>
+<DT><B>A-Z</B><DD><P>Select the first file matching the character pressed, cycle through
+subsequent matches on repeated pressing of the same key.</P>
+<DT><B>Return</B><DD><P>Open selected file.</P>
+<DT><B>Menu (the key left to the right Control key on W95
+keyboards)</B><DD><P>Display the currently selected file's popup menu, the menu itself may
+also be operated using Up/Down, Return, and Esc.</P>
+<DT><B>Backspace</B><DD><P>Change directory to the parent directory.</P>
+<DT><B>F11</B><DD><P>Open the current file listbox's menu.</P>
+</DL>
+</P>
+
+
+
+<H2><A NAME="ss2.5">2.5</A> <A HREF="guide.html#toc2.5">The Status Bar </A>
+</H2>
+
+
+<P>The status bar is located at the bottom edge of file browser windows.
+If &quot;Status in List Windows&quot; is selected in the
+&quot;Options&quot; menu file list windows will contain a status bar
+as well.</P>
+<P>It displays either</P>
+<P>
+<UL>
+<LI> the current state of TkDesk,</LI>
+<LI> the amount of free space in the current file system,</LI>
+<LI> details about the currently selected file, or</LI>
+<LI> number and total size of currently selected files.</LI>
+</UL>
+</P>
+
+
+
+<HR>
+<A HREF="guide-3.html">Next</A>
+<A HREF="guide-1.html">Previous</A>
+<A HREF="guide.html#toc2">Contents</A>
+</BODY>
+</HTML>

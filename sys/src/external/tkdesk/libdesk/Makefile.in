@@ -1,0 +1,53 @@
+# This is the Makefile for the C library of TkDesk.
+# It is called from the main Makefile in .., which passes the CC_OPTS.
+
+#----------------------------------------------------------------
+# Things you can change to personalize the Makefile for your own
+# site (you can make these changes in either Makefile.in or
+# Makefile, but changes to Makefile will get lost if you re-run
+# the configuration script).
+#----------------------------------------------------------------
+
+# Location of Tcl header files:
+TCL_INCLUDE_DIR =	@TCL_INCLUDE_PATH@
+
+# Location of Tk header files:
+TK_INCLUDE_DIR =	@TK_INCLUDE_PATH@
+
+# Location of X11 header files:
+X_INCLUDE_FLAG =	@TK_XINCLUDES@
+
+# Configuration compiler flags:
+AC_FLAGS =		@DEFS@
+
+# Miscellaneous settings:
+RANLIB =		@RANLIB@
+CC =			@CC@
+AR =			ar rc
+RM =			rm -f
+
+#----------------------------------------------------------------
+# The information below should be usable as is.  The configure
+# script won't modify it and you shouldn't need to modify it
+# either.
+#----------------------------------------------------------------
+
+CFLAGS =	${CC_OPTS} ${AC_FLAGS} -I.. -I${TCL_INCLUDE_DIR} -I${TK_INCLUDE_DIR} ${X_INCLUDE_FLAG}
+
+libname	=	libdesk.a
+
+OBJS = 		init.o dsk_ls.o misc.o util.o ot.o o_FileListbox.o \
+		tixImgXpm.o
+
+default:
+	cd ..; make -k shell
+
+lib: $(libname)
+
+$(libname):  $(OBJS)
+	$(RM) $@
+	$(AR) $@ $(OBJS)
+	$(RANLIB) $@
+
+clean:
+	$(RM) $(OBJS) $(libname) *\~ "#"*

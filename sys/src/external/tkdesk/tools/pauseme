@@ -1,0 +1,8 @@
+#!/bin/sh
+
+PROG=$1
+shift
+$PROG "$@"
+
+echo "Press return ..."
+read dummy

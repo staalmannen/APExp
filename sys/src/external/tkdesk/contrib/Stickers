@@ -1,0 +1,601 @@
+#!/usr/bin/wish
+# -*-Mode: Tcl;-*-
+# Stickers package
+# One of: Stickers, ToDo manager, Schedule/Calendar, Addresses book,
+# one global variable stk contains all the information about the stickers.
+#
+# This is a GPL Program. See GPL licenses agreement.
+# It comes WITHOUT any warranty of any kind, what so ever.
+#
+# Written By: Erez Strauss,
+#    All Rights reserved, DORAN Software Technologies Ltd., (C) 1997.
+# mailto: Erez Strauss <erez@newplaces.com>
+# http://www.newplaces.com/~erez/stickers/
+#
+# ToDo:
+#   Move all  text messages to private variables, enable multiple languages.
+#   Merge with taskspace code (as improved todo management tool).
+#   More Help text.
+#   .lsm / README file, .rpm package., .tar.gz file, Web site.
+#   Printing, Keywords/Subjects.
+#   Import/Export file in few formats: Text, HTML, Postscript.
+#   Tile/Cascade/One locations,same size
+#   Setting the location of new window near the last active window, or
+#    settable by the user.
+#   Code comments.
+#   Stickers mail to.
+#   Handling Sticky windows geometry, and virtual desktops like fvwmPager.
+#   Stickers Alarm, date time.
+#   User defined fields.
+#
+# Done:
+#  July 11 1997 - v0.6 - Stickers List - Sort (Number, Dates, Color).
+#  July 11 1997 - v0.6 - Stickers List - Search stickers text for regular expresion.
+#
+#
+# Note: All the $stk(*) variables (not including $stk(-*)) are saved
+#    in the users private ~/.stickers file.
+#    So changes from within this file will be overwritten by those in
+#    the private file.
+#
+# program starts at  stk_start, last function in this file.
+
+# Function: stk_save
+#  Purpose: save the stk(*) values into the user stickers file.
+#  Note: all the stk(-*) names are NOT saved.
+proc stk_save {} {
+    global stk
+    if [file exists $stk(file)] {
+	file copy -force $stk(file) $stk(file)~
+    }
+    set fd [open $stk(file) w]
+    puts $fd {# Stickers file.}
+    foreach e [lsort [array names stk]] {
+	# For those variable that are private to the program,
+	#  and are not to be saved in the private user file.
+	if {[string index $e 0] == "-"} continue
+	puts $fd "set stk($e) [list $stk($e)]"
+    }
+    puts $fd {# End of the tickers file.}
+    close $fd
+}
+
+# Function: stk_read
+#  Purpose: read user stickers file
+#  Note: overwrites the program defaults values.
+proc stk_read {} {
+    global stk
+    if [file exists $stk(file)] {
+	source $stk(file)
+    }
+}
+
+# Function:
+#  Purpose: return list of stickers IDs
+proc stk_ids {} {
+    global stk
+    set ids {}
+    foreach n [array names stk *,text] {
+	lappend ids [string range $n 0 [expr [string length $n] - 6]]
+    }
+    return [lsort -integer $ids]
+}
+
+# Function: stk_id_next
+#  Purpose: find the next id for a new sticker id.
+proc stk_id_next {} {
+    global stk
+    set id [lindex [stk_ids] end]
+    if {$id == {}} {return 1}
+    return [expr $id + 1]
+}
+
+# Function: stk_ids_sort
+#  Purpose: Return a list of ids
+proc stk_ids_sort {} {
+    global stk
+    set ids [stk_ids]
+    return [lsort -command "stk_cmp $stk(sort,key)" $ids]
+}
+
+proc stk_cmp {field a b} {
+    global stk
+    if {$field == "id"} {return [expr $a - $b]}
+    if {$field == "size"} {return [expr [string length $stk($a,text)] - [string length $stk($b,text)]]}
+    if {$field == "mdate" || $field == "cdate"} {return [expr $stk($b,$field) - $stk($a,$field)]}
+    return [expr $stk($a,$field) - $stk($b,$field)]
+}
+
+# Function: stk_win
+#  Purpose: Create the sticker window for that id.
+proc stk_win {id} {
+    global stk
+    set w .stk-$id
+    if {[winfo exists $w]} {
+	if $stk($id,mapped) {
+	    wm deiconify $w
+	    raise $w
+	} {
+	    destroy $w
+	}
+	return
+    }
+    if !$stk($id,mapped) return
+    toplevel $w
+    if {$stk($id,title) == {}} {
+	regsub "\n.*$" $stk($id,text) {} t
+	wm title $w "Sticker $id - $t."
+    } {
+	wm title $w $stk($id,title)
+    }
+    wm geometry $w $stk($id,geometry)
+    frame $w.bar -relief raised -borderwidth 2
+    pack $w.bar -fill x
+    frame $w.data
+    pack $w.data -expand on -fill both
+    # -------------
+    menubutton $w.bar.file -text File -menu $w.bar.file.m -padx 1 -pady 1
+    pack $w.bar.file -side left
+
+    menubutton $w.bar.help -text Help -menu $w.bar.help.m -padx 1 -pady 1
+    pack $w.bar.help -side right
+
+    button $w.bar.new -text New -padx 1 -pady 1 -relief flat -bd 0 \
+	-command stk_win_new
+    pack $w.bar.new -side left
+    button $w.bar.list -text List -relief flat -bd 0 -padx 1 -pady 1 \
+	-command "stk_list_win"
+    pack $w.bar.list -side left
+    menubutton $w.bar.color -text Color -menu $w.bar.color.m -padx 1 -pady 1
+    pack $w.bar.color -side left
+    # -------------
+    menu $w.bar.file.m
+    $w.bar.file.m add command -label New \
+	-command stk_win_new
+    $w.bar.file.m add command -label Minimize -command "wm iconify $w"
+    $w.bar.file.m add command -label Delete -command "stk_win_delete $id"
+    $w.bar.file.m add command -label Save -command {stk_sync;stk_save}
+    $w.bar.file.m add command -label "Show List" -command stk_list_win
+    $w.bar.file.m add command -label "Set color" -command \
+	"tk_popup $w.bar.color.m \[winfo pointerx $w] \[winfo pointery $w]"
+    $w.bar.file.m add command -label Quit -command {stk_quit}
+    $w.bar.file.m add command -label Exit -command {stk_sync;stk_save;exit 0}
+
+    # -------------
+    menu $w.bar.color.m
+    foreach c $stk(bg,colors) {
+	$w.bar.color.m add command -label $c -command \
+	    "$w.data.text configure -bg \[set stk($id,bg) $c]"
+    }
+    $w.bar.color.m add command -label "Other ..." -command \
+	"set t \[tk_chooseColor -initialcolor \$stk($id,bg) -title {Background color}] ; if {\$t != {}} {$w.data.text configure -bg \[set stk($id,bg) \$t]}"
+    # -------------
+    stk_help_menu $w.bar.help.m
+    # -------------
+    scrollbar $w.data.scrl -command "$w.data.text yview " -width 10
+    pack $w.data.scrl -side right -fill y
+    # -------------
+    text $w.data.text -bg $stk($id,bg) -wrap word -yscrollcommand "$w.data.scrl set "
+    $w.data.text insert end $stk($id,text)
+    pack $w.data.text -expand on -fill both
+    # wm geometry $w $stk($id,geometry)
+}
+
+# reset the given window id attributes to default values.
+proc stk_win_reset {id} {
+    global stk
+    foreach f $stk(fields) {
+	if {![info exists stk($id,$f)]} {
+	    set stk($id,$f) $stk($f,default)
+	}
+    }
+}
+
+# Create New window.
+proc stk_win_new {} {
+    global stk
+    set id [stk_id_next]
+    stk_win_reset $id
+    set stk($id,cdate) [clock seconds]
+    stk_win $id
+}
+
+# Delete one window with the given id.
+proc stk_win_delete {id} {
+    global stk
+    if {[tk_dialog .rus "Delete onfirmation" \
+	     "Are you sure you want to remove Sticker $id ?" \
+	     question 0 "Yes, delete" Cancel] == 0} {
+	foreach f [array names stk $id,*] {
+	    unset stk($f)
+	}
+	destroy .stk-$id
+    }
+}
+
+# create all the windows
+proc stk_wins {} {
+    global stk
+    foreach id [stk_ids] {
+	stk_win_reset $id
+	stk_win $id
+    }
+    if $stk(list,mapped) stk_list_win
+}
+
+# stk_all_show - Show all the stickers windows.
+proc stk_all_show {state} {
+    global stk
+    stk_sync
+    foreach id [stk_ids] {
+	set stk($id,mapped) $state
+	stk_win $id
+    }
+    set stk(list,mapped) 1
+    stk_list_win
+}
+
+# Synchronize the information in the stk array with widgets information.
+proc stk_sync {} {
+    global stk
+    foreach id [stk_ids] {
+	stk_sync_id $id
+    }
+    if [winfo exists .stk-list] {
+	set stk(list,geometry) [wm geometry .stk-list]
+	set stk(list,mapped) [winfo ismapped .stk-list]
+    } {
+	set stk(list,mapped) 0
+    }
+}
+
+# Function: stk_sync_id
+#  Purpose: copy all information from the id associated widget to the stk array elements.
+proc stk_sync_id {id} {
+    global stk
+
+    if {![winfo exists .stk-$id]} {
+	set stk($id,mapped) 0
+	return
+    }
+    regsub "\n*$" [.stk-$id.data.text get 1.0 end] "\n" newvalue
+    if {[string compare $stk($id,text) $newvalue]} {
+	set stk($id,mdate) [clock seconds]
+    }
+    set stk($id,text) $newvalue
+    if [winfo ismapped .stk-$id] {
+	set stk($id,geometry) [wm geometry .stk-$id]
+    }
+    set stk($id,mapped) [winfo ismapped .stk-$id]
+}
+
+# Create The windows list window.
+proc stk_list_win {} {
+    global stk
+    stk_sync
+    set w .stk-list
+    if [winfo exists $w] {
+	wm deiconify $w
+	raise $w
+	$w.data.list delete 0 end
+    } {
+	toplevel $w
+	wm title $w "Stickers List"
+	wm geometry $w $stk(list,geometry)
+	# ------------
+	frame $w.btns
+	button $w.btns.show -text "Show All" -command {stk_all_show 1}
+	button $w.btns.hide -text "Hide All" -command {stk_all_show 0}
+	pack $w.btns.show -side left -expand 1
+	pack $w.btns.hide -side right -expand 1
+	pack $w.btns -side bottom -fill x
+	# ------------
+	frame $w.bar -relief raised -borderwidth 2
+	pack $w.bar -fill x
+	# menubuttons File & Help.
+	menubutton $w.bar.file -text File -menu $w.bar.file.m -padx 1 -pady 1
+	pack $w.bar.file -side left
+	# ------------
+	menubutton $w.bar.sort -text Sort -menu $w.bar.sort.m -padx 1 -pady 1
+	pack $w.bar.sort -side left
+
+	menubutton $w.bar.help -text Help -menu $w.bar.help.m -padx 1 -pady 1
+	pack $w.bar.help -side right
+	stk_help_menu $w.bar.help.m
+
+	button $w.bar.new -text New -padx 1 -pady 1 -relief flat -bd 0 \
+	    -command stk_win_new
+	pack $w.bar.new -side left
+
+	menu $w.bar.file.m
+	$w.bar.file.m add command -label New -command stk_win_new
+	$w.bar.file.m add command -label Minimize -command "wm iconify $w"
+	$w.bar.file.m add command -label Save -command {stk_sync;stk_save}
+	$w.bar.file.m add command -label "Refresh List" -command stk_list_win
+	$w.bar.file.m add command -label Quit -command {stk_quit}
+	$w.bar.file.m add command -label Exit -command {stk_sync;stk_save;exit 0}
+	# ------------
+	menu $w.bar.sort.m
+	$w.bar.sort.m add command -label "Sticker ID" \
+	    -command {set stk(sort,key) id ; stk_list_win}
+	$w.bar.sort.m add command -label "Modify Date" \
+	    -command {set stk(sort,key) mdate ; stk_list_win}
+	$w.bar.sort.m add command -label "Create Date" \
+	    -command {set stk(sort,key) cdate ; stk_list_win}
+	# $w.bar.sort.m add command -label "Alarm Date" \
+	    -command {set stk(sort,key) alarm ; stk_list_win}
+	# $w.bar.sort.m add command -label "Color" \
+	    -command {set stk(sort,key) color ; stk_list_win}
+	$w.bar.sort.m add command -label "Size" \
+	    -command {set stk(sort,key) size ; stk_list_win}
+	# ------------
+	frame $w.filter -relief groove -bd 2
+	pack $w.filter -side bottom -fill x
+	button $w.filter.all -text All -padx 1 -pady 1 \
+	    -command {set stk(list,filter) "" ; stk_list_win}
+	button $w.filter.filter -text Filter -padx 1 -pady 1 -command {stk_list_win}
+	entry $w.filter.pattern -textvariable stk(list,filter)
+	bind $w.filter.pattern <Any-Key-Return> "$w.filter.filter invoke"
+	pack $w.filter.all $w.filter.filter -side left 
+	pack $w.filter.pattern -side right -fill x
+	# ------------
+	frame $w.data
+	scrollbar $w.data.scrl -command "$w.data.list yview " -width 10
+	pack $w.data.scrl -side right -fill y
+	pack $w.data -fill both -expand 1
+	listbox $w.data.list -bg $stk(list,bg) -takefocus on \
+	    -yscrollcommand "$w.data.scrl set "
+	bind $w.data.list <Any-Button-1> {+
+	    regsub {:.*$} [%W get [%W nearest %y]] {} id
+	    if [info exists stk($id,mapped)] {
+		set stk($id,mapped) 1
+		stk_win $id
+	    } {
+		stk_list_win
+	    }
+	}
+	bind $w.data.list <Any-Button-3> {+
+	    regsub {:.*$} [%W get [%W nearest %y]] {} id
+	    stk_sync_id $id
+	    if [info exists stk($id,mapped)] {
+		set stk($id,mapped) 0
+		stk_win $id
+	    } {
+		stk_list_win
+	    }
+	}
+	pack $w.data.list -fill both -expand on
+    }
+    foreach id [stk_ids_sort] {
+	if {[string compare $stk(list,filter) ""]
+	    && ![stk_contains $id $stk(list,filter)]} continue
+	regsub "\n.*$" $stk($id,text) {} t
+	set t [string range $t 0 39]  ;# up to 40 characters in the title.
+	$w.data.list insert end "$id: $stk($id,title) - $t"
+    }
+    focus $w.data.list
+}
+
+# Function: stk_defaults
+#  Purpose: set the default values for many variables.
+# set stk(fields) {x y title keywords text}
+# set stk(file) "[glob ~]/.stickers"
+# stk(<id>,title)
+# stk(<id>,keywords)
+# stk(<id>,subject)
+# stk(<id>,text)
+# stk(<id>,win_state) {open close}
+# stk(<id>,status)
+# stk(<id>,bg)
+# stk(<id>,mdate) - modify date
+# stk(<id>,cdate) - create date
+# stk(<id>,adate) - alarm date
+proc stk_defaults {} {
+    global stk
+
+    wm withdraw .
+
+    # init few internal variables.
+    set stk(-version) 0.6
+
+    option add Button*font -Adobe-Helvetica-Bold-R-Normal--*-100-*-*-*-*-*-*
+
+    set stk(fields) {title keywords text geometry bg mapped}
+    set stk(bg,colors) {yellow white red green blue gray80 gray30 pink}
+    set stk(file) "[glob ~]/.stickers"
+
+    set stk(title,default) {}
+    set stk(keywords,default) {}
+    set stk(text,default) {}
+    set stk(geometry,default) 240x140+100+50
+    set stk(bg,default) yellow
+    set stk(mapped,default) 1
+    # set stk(mdate,default) [clock seconds]
+
+    set stk(list,geometry) 150x250+100+250
+    set stk(list,mapped) 0
+    set stk(list,bg) yellow
+    set stk(list,filter) ""
+    set stk(sort,key) id
+
+    # Some global keyboard bindings.
+    bind all <Alt-Key-q> {stk_quit}
+    bind all <Alt-Key-e> {stk_sync;stk_save;exit 0}
+    bind all <Alt-Key-s> {stk_sync;stk_save}
+    bind all <Alt-Key-l> {stk_list_win}
+    bind all <Alt-Key-n> {puts stderr "Next sticker not yet implemented"}
+    bind all <Alt-Key-p> {puts stderr "Prev sticker not yet implemented"}
+    bind all <Alt-Key-h> {puts stderr "Help window not yet implemented"}
+    bind all <Enter> {focus %W}
+}
+
+# Draw the startup window, with all the information about this software
+proc stk_start_msg {state} {
+    global stk
+    set w .start-msg
+    catch {destroy $w}
+    if $state {
+	toplevel $w
+	label $w.msg -padx 10 -pady 10 -bg yellow -bd 5 -relief ridge -text \
+"Stickers  Version $stk(-version)\n\n
+By Erez Strauss\n\n
+DORAN Software Technologies Ltd.
+erez@newplaces.com\n
+http://www.newplaces.com\n
+Free software\n"
+	pack $w.msg -padx 4 -pady 4
+	bind $w.msg <Any-KeyPress> "catch {destroy $w}"
+	bind $w.msg <Any-ButtonPress> "catch {destroy $w}"
+	stk_toplevel_center $w
+	update
+    } {
+	after 400
+	catch {destroy $w}
+    }
+}
+
+proc stk_help {type} {
+    set text {
+The Stickers Program.
+
+Unfortunatly there is no help for this subject.
+for comments e-mail:
+Erez Strauss <erez@newplaces.com>
+}
+
+    switch $type {
+	0 {
+	    set text {
+The Stickers program.
+
+Thank you for using the Stickers program.
+
+This program provide you with a simple to use notes/stickers management utility. You can use stickers with different colors and keep them in different location on the screen for different subject. Each sticker remembers it's location on the screen from one session to the other. The program provides you with a list of the stickers, where each sticker has an id and the first text line as title.
+
+The program is using Tcl/Tk as User Interface environment. The program should execute on any environment that can run Tcl/Tk, for example: Linux, other Unix system, Win?? and Mac. The software was developed and tested on Linux system. Please send me an e-mail in case you are using it on other platform, my e-mail address is:
+Erez Strauss <erez@newplaces.com>
+}
+	}
+	1 {
+	    set text {
+The Stickers Hot Keys.
+
+Thank you for using the Stickers program.
+
+<Alt-s> - Save the ~/.stickers file.
+<Alt-e> - Save & Exit
+<Alt-l> - Popup the stickers list window.
+<Alt-h> - Help window
+<Alt-q> - Quit
+}
+	}
+	2 {
+	    set text {
+The Stickers Users Guide
+
+Thank you for using the Stickers program.
+
+The stickers program is useful tool to manage sticker/note on your computer. You can create with it many stickers, each one of the stickers keeps it location on the screen from one run to the other. The stickers can have any color you wand and they are saved in the ~/.stickers file for each user. This file contains all the information the program needs for the next run.
+
+Each sticker window contains two parts:
+1. The Menubar were you can find: File menu, New Button, List Button and Help Menu.
+2. The text part with scrollbar were you can enter your text for that specific sticker. you can also use the scrollbar to move in the text.
+
+The File menu provide you with few sticker operations and few global actions.
+
+ ... To Be Continued.
+please send comments and updated to:
+Erez Strauss <erez.newplaces.com>
+}
+	}
+	3 {
+	    set text {
+The Stickers List Window.
+
+This window shows a list of the stickers with their titles. You can press the first mouse button on the list item to display its sticker. The third mouse button is used to hide the specific sticker.
+The 'Shaw All' and the 'Hide All' act on all the stickers in the system. You can hide the, and show them all in one button press.
+The Stickers filtering section of the window enables you to search for those stickers that contain the given string/regular-expression. You can set the string in the entry on the right side and activate it by pressing the Filter button.
+}
+	}
+    }
+    if {![winfo exists .help]} {
+	toplevel .help
+	wm title .help "Stickers Help"
+
+	frame .help.btns -relief raised -bd 1
+	pack .help.btns -side bottom -fill both
+	frame .help.bar -relief raised -bd 2
+	pack .help.bar -side top -fill both
+	frame .help.data -relief raised -bd 1
+	pack .help.data -side top -fill both -expand 1
+
+	scrollbar .help.data.scrl -command ".help.data.text yview " -width 10
+	pack .help.data.scrl -side right -fill y
+	text .help.data.text -wrap word -yscrollcommand ".help.data.scrl set " -width 60 -height 20
+	pack .help.data.text -expand 1 -fill both
+
+	menubutton .help.bar.help -text Help -menu .help.bar.help.m -padx 1 -pady 1
+	pack .help.bar.help -side right
+	stk_help_menu .help.bar.help.m
+
+	button .help.btns.ok -text OK -command {destroy .help}
+	pack .help.btns.ok -side left -expand 1 -padx 3m -pady 2m
+ 	stk_toplevel_center .help
+    }
+    .help.data.text configure -state normal
+    .help.data.text delete 1.0 end
+    .help.data.text insert end $text
+    .help.data.text configure -state disabled
+    raise .help
+}
+
+# Create help menu with a specific widget name.
+proc stk_help_menu {w} {
+    menu $w
+    $w add command -label "Startup Window" -command {stk_start_msg 1}
+    $w add command -label "About Stickers" -command {stk_help 0}
+    $w add command -label "Hot Keys      " -command {stk_help 1}
+    $w add command -label "Users Guide   " -command {stk_help 2}
+    $w add command -label "Sticker List  " -command {stk_help 3}
+}
+
+# Function: stk_quit
+#  Purpose: Confirm the quit operation.
+proc stk_quit {} {
+    if {![tk_dialog .quit "Quit Confirmation" "Are you sure you want to end this Stickers session  WITHOUT saving the stickers" question 1 "Yes, really Quit" Cancel]} {
+	exit 0
+    }
+}
+
+# Function: stk_toplevel_center
+#  Purpose: Set window to the center of the window.
+proc stk_toplevel_center {w} {
+    wm withdraw $w
+    update idletasks
+    set x [expr [winfo screenwidth $w]/2 - [winfo reqwidth $w]/2 \
+               - [winfo vrootx [winfo parent $w]]]
+    set y [expr [winfo screenheight $w]/2 - [winfo reqheight $w]/2 \
+               - [winfo vrooty [winfo parent $w]]]
+    wm geom $w +$x+$y
+    wm deiconify $w
+}
+
+# Sticker check regexp
+proc stk_contains {id exp} {
+    global stk
+    return [regexp -nocase -- $exp $stk($id,text)]
+}
+
+# The stk_start - Stickers Start function, start the program.
+proc stk_start {} {
+    stk_defaults
+    stk_start_msg 1
+    stk_read
+    if {[stk_ids] == {}} stk_win_new
+    stk_wins
+    update
+    stk_start_msg 0
+}
+
+stk_start
+# End of the sticker program.

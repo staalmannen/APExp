@@ -1,0 +1,106 @@
+### -------------------------------------------------------------------------
+###
+###  FileTags (TkDesk Configuration File)
+###
+###  Contains definitions for color and font of specific file types, that
+###  will be used in TkDesk's file lists.
+###
+###  *** Press F5 to save changes and reload this file into TkDesk, 
+###  *** F6 to do the same plus to close this window.
+###
+### -------------------------------------------------------------------------
+
+### List of files to be ignored (these are not listed unless "Show All Files"
+### is selected):
+
+set tkdesk(file_tags,ignore) {{*~} {*.flc}}
+
+### Definition of file tags respectively appearance:
+### The entries are defined by the elements of a Tcl list.
+### (In the following I try to explain its structure, although it will
+### probably best to just have a look at the example definition below.)
+### Each element of the list is again a Tcl list, which contains between
+### 2 and 4 elements. The first element is a list of "glob" patterns
+### that match this definition. The second element is the color to use
+### for files matching one of those patterns. Elements number 3 and 4 are
+### optional. The third element, if given, defines a font to use for these
+### files, while the fourth element, gives the filename of an icon that
+### is to be used if the "Add Icons" option has been activated (the path
+### defaults to the "images" directory in TkDesk library path). Note that
+### if you want the definition to contain an icon, but no font, that the
+### third element has to be given as an empty list: {}.
+
+### Tags for directories:
+### ({patterns} {fgcolor} {font} {listicon} {deskicon})
+
+set tkdesk(file_tags,directories) {
+    {{!default} {blue2} {-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*}
+		{ficons16/dir.xpm} {ficons32/dir.xpm}}
+    {{!symlink} {blue2} {-*-helvetica-bold-o-*-*-12-*-*-*-*-*-*-*}
+		{ficons16/symdir.xpm} {ficons32/dir.xpm}}
+    {{!opened}  {blue2} {-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*}
+		{ficons16/diropen.xpm} {ficons32/dir.xpm}}
+}
+
+### Tags for executables:
+### ({patterns} {fgcolor} {font} {listicon} {deskicon})
+
+set tkdesk(file_tags,executables) {
+    {{!default} {red} {-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*}
+		{ficons16/exec.xpm} {ficons32/exec.xpm}}
+    {{!symlink} {red} {-*-helvetica-bold-o-*-*-12-*-*-*-*-*-*-*}
+		{ficons16/symexec.xpm} {ficons32/exec.xpm}}
+    {{tkdesk}	{red} {-*-helvetica-*-r-*-*-18-*-*-*-*-*-*-*}}
+}
+
+### Tags for regular files:
+### ({{patterns} {fgcolor} {font} {listicon} {deskicon}})
+
+set tkdesk(file_tags) {
+    {{!default} {$tkdesk(color,foreground)}
+                {$tkdesk(font,file_lbs)}
+		{ficons16/file.xpm} {ficons32/file.xpm}}
+    {{!symlink} {$tkdesk(color,foreground)}
+                {-*-helvetica-medium-o-*-*-12-*-*-*-*-*-*-*}
+		{ficons16/sym.xpm} {ficons32/file.xpm}}
+    {{*README*} {SteelBlue} {} {ficons16/text.xpm} {ficons32/info.xpm}}
+    {{*.c}	{$tkdesk(color,foreground)} {}
+                {ficons16/c.xpm} {ficons32/dot_c.xpm}}
+    {{*.dvi}	{purple}}
+    {{{*.gif} {*.jpg} {*.jpeg} {*.bmp} {*.pcx} {*.p?m} {*.rle} {*.tif} {*.tga} {*.png}}
+	        {brown} {} {ficons16/image.xpm} {ficons32/gif.xpm}}
+    {{*.h}	{$tkdesk(color,foreground)} {}
+                {ficons16/h.xpm} {ficons32/dot_h.xpm}}
+    {{*.html}   {$tkdesk(color,foreground)} {}
+		{ficons16/html2.xpm} {navigator.xpm}}
+    {{*akefile}	{$tkdesk(color,foreground)} {}
+                {ficons16/system.xpm} {ficons32/makefile.xpm}}
+    {{{*.mpg} {*.mpeg}}
+	        {magenta} {} {ficons16/video.xpm}}
+    {{*.pdf}	{orange3} {} {ficons16/pdf.xpm} {ficons32/file.xpm}}
+    {{*.ps}	{orange3} {} {ficons16/archive.xpm} {ficons32/postscript.xpm}}
+    {{.*rc}	{$tkdesk(color,foreground)} {}
+                {ficons16/system.xpm} {ficons32/system.xpm}}
+    {{*.rpm}    {$tkdesk(color,foreground)} {} {ficons16/rpm.xpm}}
+    {{*.sgml}	{SeaGreen}}
+    {{{*.tar.z} {*.tar.gz} {*.tgz} {*.tar.Z} {*.taz} {*.t.Z}}
+		{$tkdesk(color,foreground)} {}
+		{ficons16/parcel.xpm} {ficons32/tar.xpm}}
+    {{*.tcl}	{$tkdesk(color,foreground)} {}
+                {ficons16/tcl.xpm} {ficons32/bracket.xpm}}
+    {{*.tex}	{blue2} {} {ficons16/tex.xpm} {ficons32/tex.xpm}}
+    {{*.txt}	{$tkdesk(color,foreground)} {}
+                {ficons16/text.xpm} {ficons32/text.xpm}}
+    {{*.url}    {$tkdesk(color,foreground)} {}
+		{ficons16/html.xpm} {navigator.xpm}}
+    {{*.viff}	{SeaGreen}}
+    {{{*.wav} {*.au} {*.voc}}
+	        {maroon} {} {ficons16/sound.xpm} {ficons32/sound.xpm}}
+    {{*.xbm}	{$tkdesk(color,foreground)} {}
+                {ficons16/xbm.xpm} {ficons32/xbm.xpm}}
+    {{*.xpm}	{$tkdesk(color,foreground)} {}
+                {ficons16/xpm.xpm} {ficons32/xpm.xpm}}
+    {{*.xv}	{SeaGreen}}
+    {{{*~} {#*#} {*.flc}}
+		{slategray}}
+}

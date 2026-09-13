@@ -1,0 +1,90 @@
+### -------------------------------------------------------------------------
+###
+###  Commands (TkDesk Configuration File)
+###
+###  This file defines the configurable part of TkDesk's "Command" menu.
+###
+###  *** Press F5 to save changes and reload this file into TkDesk, 
+###  *** F6 to do the same plus to close this window.
+###
+### -------------------------------------------------------------------------
+
+### Definition of "Command" menu entries:
+### The entries are defined by the elements of a Tcl list.
+### (In the following I try to explain its structure, although it will
+### probably best to just have a look at the example definition below.)
+### Each element of the list is again a Tcl list, whose first element
+### is the label of the entry, while the second element contains a Tcl
+### script that is to be executed when this entry is invoked.
+### Cascaded menus are also possible, see below for an example.
+###
+### TkDesk commands that can be used in the list definition:
+### (Only the most common ones are listed here. For a complete overview
+### and a detailed explanation refer to the User's Guide.)
+###
+### dsk_exec cmd ...   : Executes shell command cmd in background.
+### dsk_path_exec path cmd ... : Execute cmd in path.
+### dsk_view cmd ...   : Executes cmd, displays output in Editor window.
+### dsk_open_dir path  : Opens a new file list for directory path.
+### dsk_edit file      : Edits file.
+### dsk_du path        : Displays disk usage of directory path.
+### dsk_periodic cmd seconds : Executes cmd every x seconds.
+### dsk_confirm text script  : Executes script when confirmation was positive.
+### dsk_sound id       : Plays sound id (defined in config-file Sounds). 
+### dsk_cbhelp file regexp   : Invokes TkDesk's help system on file.
+### dsk_ask_exec       : Asks for a command to execute.
+### dsk_ask_dir        : Asks for a directory to open.
+### dsk_save_config    : Saves window layout, history, bookmarks etc.
+### dsk_exit ?ask?     : Quits TkDesk. "ask" may be one 1 or 0.
+###
+### Abbreviations that will be replaced with file names etc.:
+###
+### %s : Full pathname of the first selected file.
+### %f : Its filename only.
+### %d : Its directory only.
+### %A : List containing full pathnames of all selected resp. dropped files.
+### %B : Same as %A, but will be replaced with "" if no files are selected.
+### %D : Directory of last "ative" viewer.
+
+set tkdesk(commands) {
+    {{All my C files...} {dsk_find_files -path ~ -name *.c -type file}}
+    {{All my core files!} {dsk_find_files -path ~ -name core -type file -size +10 -doit}}
+    {{Top} {eval dsk_exec $tkdesk(cmd,xterm) -e top}}
+    {{Compression...}
+    	{{Gzip selected} {dsk_exec gzip %A}}
+	{{Un-gzip selected} {dsk_exec gzip -d %A}}
+	-
+    	{{Bzip2 selected} {dsk_exec bzip2 %A}}
+	{{Un-bzip2 selected} {dsk_exec bzip2 -d %A}}
+	-
+    	{{Compress selected} {dsk_exec compress %A}}
+	{{Un-compress selected} {dsk_exec uncompress %A}}
+    }
+    {{Dump File...}
+    	{{Hexadecimal} {dsk_view od -t x -A x -w %s}}
+    	{{Octal} {dsk_view od -t o -A x %s}}
+    	{{Characters} {dsk_view od -t c -A x %s}}
+    	{{Strings} {dsk_view od -s -A x %s}}
+    }
+    {{RPM...}
+        {.}
+    	{{Installed RPM's} {dsk_view rpm -q -a | sort}}
+    	{{Info about RPM...} {
+    		dsk_read_string {Display info about RPM package:} {
+    			dsk_view rpm -q -i $dsk_read_string
+    		}
+    	}}
+    	{{Show An RPM's Files...} {
+    		dsk_read_string {Display files of RPM package:} {
+    			dsk_view rpm -q -l $dsk_read_string
+    		}
+    	}}
+    	{{Uninstall RPM...} {
+    		dsk_read_string {Uninstall RPM package:} {
+    			dsk_exec_as_root rpm -e $dsk_read_string
+    		}
+    	}}
+    }
+}
+
+

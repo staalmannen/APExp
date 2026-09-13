@@ -1,0 +1,23 @@
+/* XPM */
+static char * trash_xpm[] = {
+"16 16 4 1",
+" 	s None	c None",
+".	c grey4",
+"X	c grey76",
+"o	c grey51",
+"                ",
+"      ....      ",
+"     ..  ..     ",
+"  ............  ",
+"   .Xooooooo.   ",
+"   .Xooooooo.   ",
+"   .Xooooooo.   ",
+"   .Xooooooo.   ",
+"   .Xooooooo.   ",
+"   .Xooooooo.   ",
+"   .Xooooooo.   ",
+"   .Xooooooo.   ",
+"   .Xooooooo.   ",
+"   .Xooooooo.   ",
+"   .Xooooooo.   ",
+"   ..........   "};

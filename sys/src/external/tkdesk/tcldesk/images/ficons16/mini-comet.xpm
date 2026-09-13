@@ -1,0 +1,32 @@
+/* XPM */
+static char * mini_comet_xpm[] = {
+/* width height num_colors chars_per_pixel */
+"16 16 10 1",
+/* colors */
+" 	c #0a0a0a",
+".	c black",
+"X	c #ffc125",
+"o	c #ff0000",
+"O	c #0000ff",
+"+	c #ffff00",
+"@	c #00ffff",
+"#	c #ff7f00",
+"$	c #f5deb3",
+"%	c white",
+/* pixels */
+"      .         ",
+"      X  ooo    ",
+"  X     oOOOo   ",
+"    +  oO@@@Oo  ",
+"       oO@@@@o  ",
+"      #OO@@@@o  ",
+"  +  X#OO@@@Oo  ",
+"     X#oOOOOo   ",
+"    XX##oo##    ",
+"    XXX##X   +  ",
+"   +XXXXX       ",
+"  ++++$       % ",
+"  +++    %      ",
+" ++      .  +   ",
+"......+.........",
+"................"};

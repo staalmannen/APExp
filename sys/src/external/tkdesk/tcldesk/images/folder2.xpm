@@ -1,0 +1,23 @@
+/* XPM */
+static char * folder_xpm[] = {
+"16 16 4 1",
+" 	s None	c None",
+".	c grey4",
+"X	c white",
+"o	c goldenrod1",
+"       ... . .  ",
+"    ...X.X....  ",
+"  ..X.X.X..oo.  ",
+"  .......oooo.  ",
+"  .ooooo.oooo.  ",
+"  .o...o.oooo.  ",
+"  .o.X.o.oooo.  ",
+"  .o.X.o.oooo.  ",
+"  .o...o.oooo.  ",
+"  .ooooo.oooo.  ",
+"  .oo.oo.oooo.  ",
+"  .o.X.o.oooo.  ",
+"  .oo.oo.oooo.  ",
+"  .ooooo.oo..   ",
+"  .ooooo...     ",
+"  .......       "};

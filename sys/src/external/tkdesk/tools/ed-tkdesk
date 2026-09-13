@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# Usage: ed-tkdesk [-wait] [+linenum] [file ...]
+# Opens a new editor window, and loads files if any are given.
+
+EDITCMD=dsk_edit_wait
+
+if [ $# -gt 0 ]; then
+  FILES=
+  for f in $@; do
+    if [ "$f" = "-q" ]; then
+      EDITCMD=dsk_edit
+    elif [ -z "`echo $f | egrep '^[/~]|^\+[1-90]+$'`" ]; then
+      FILES="$FILES `pwd`/$f"
+    else
+      FILES="$FILES $f"
+    fi
+  done
+  tkdeskclient "cd `pwd`; $EDITCMD `echo $FILES`; cd" >/dev/null
+else
+  tkdeskclient "cd `pwd`; $EDITCMD \"New File\"; cd"
+fi

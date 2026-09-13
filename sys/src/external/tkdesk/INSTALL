@@ -1,0 +1,181 @@
+#    TkDesk - a file manager for Unix and the X Window System
+#    Copyright (C) 1996-1999  Christian Bolik
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, write to the Free Software
+#    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#    See the file "COPYING" in the base directory of this distribution
+#    for more.
+
+
+INSTALL                        TkDesk 2.x                       April, 2004
+--------------------------------------------------------------------------
+
+ 	        Building and Installation of TkDesk 2.x
+
+
+This file describes how to compile and install the source release of
+TkDesk.  Links to the latest source release can be found at the
+TkDesk homepage:
+
+            http://tkdesk.sourceforge.net
+
+
+Requirements
+------------
+
+[Tcl/Tk]
+
+TkDesk now requires Tcl/Tk 8.0 - 8.4.  As of version TkDesk 2.0, older
+versions of Tcl/Tk (ver. 7.x or less) are no longer supported.
+
+Tcl/Tk source distributions can be downloaded from:
+
+   http://tcl.tk/software/tcltk/choose.html
+
+
+[Incr Tcl]
+
+Itcl version 3.0.1 or higher is required.  Version 3.2 or higher is
+recommended.  If you intend to use Itcl 3.0.1 you'll have to apply the
+patch contained in the file contrib/itcl_fix.diff.  To apply the patch go
+into the base directory of the unpacked Itcl 3.0.1 distribution, cd to
+itcl/generic, and issue the command:
+
+   patch <../tkdesk-1.2/contrib/itcl_fix.diff
+
+This assumes you unpacked TkDesk into the same directory as itcl.
+
+If you intend to use Tcl/Tk 8.4, make sure your Itcl installation
+(preferrably version 3.2) was compiled against Tcl/Tk 8.4, or you
+will likely get some very nasty segmentation faults.
+
+Itcl distributions can be found at:
+
+   http://sourceforge.net/projects/incrtcl/
+
+
+[BLT]
+
+TkDesk also requires a subset of the functions provided by the BLT library.
+By default the subset of BLT 2.4j that comes with TkDesk will be compiled,
+but you can also have TkDesk link against an already installed BLT by
+using the configure flag '--with-blt=<path>', where <path> is the directory
+that contains libBLT.a (or libBLT.so).
+
+If you are using Tcl/Tk 8.4, you should be using BLT version 2.4z or newer.
+
+BLT distributions can be found at:
+
+   http://blt.sourceforge.net/
+
+
+Compilation
+-----------
+
+To compile TkDesk you first have to create the Makefiles for your system
+by running "./configure".  If you don't want to install TkDesk underneath
+/usr/local, which is the default, do "./configure --prefix=<path>".
+
+TkDesk's configure looks for the file tclConfig.sh and tkConfig.sh
+that are installed with Tcl/Tk, usually in the corresponding "lib"
+directory.  It looks in a few "standard" places, but if you installed
+Tcl/Tk in a non-standard place you need to point configure to these
+directories using the "--with-tcl=DIR" and "--with-tk=DIR" options.
+The "--with-tk" option can be omitted if tkConfig.sh is in the same 
+directory that's given to "--with-tcl".
+
+Similarly, if you have itcl 3.x installed in a non-standard place you can
+use the "--with-itcl=DIR" option to have TkDesk pick up the right
+itclConfig.sh.  (Note that some Itcl installations do not provide an
+itclConfig.sh file.  In this case, the configure script with look for
+Itcl in some standard places, defaulting to the same location used for
+Tcl/Tk.
+
+For example, if you installed Tcl/Tk 8.4, Itcl 3.2, and BLT 2.4z into
+/usr/local/tcltk, you might invoke configure like this:
+
+    ./configure --with-tcl=/usr/local/tcltk/lib \
+                --with-itcl=/usr/local/tcltk/lib \
+		--with-blt=/usr/local/tcltk/lib
+
+TkStep:
+		
+[NOTE: TkStep support is more or less deprecated as of TkDesk 2.0.  If anyone
+       can find a recent distribution of TkStep, or better yet a TkStep
+       homepage, please inform the TkDesk maintainer.  Thanks.]
+
+If you're compiling with version 8.x of Tcl/Tk and you got the corresponding
+version of TkStep installed on your system (in the default paths), you
+can give the option "--enable-tkstep" to configure to have tkdesksh be
+linked with the TkStep instead of the Tk libraries.
+
+Executing "./configure --help" displays a lot of additional options not
+described here.  Not all of these apply to TkDesk and are acknowledged by
+the build process.
+
+When configure exits successfully, review the generated configuration summary
+and when you're satisfied, run "make".
+
+If you get an error message saying that "ranlib" could not be found:
+This error is ignored by make, and you can safely do the same. Some
+systems require archives to be ranlib'ed, others don't.
+
+
+Test Drive
+----------
+
+After compiling, if you'd like to have a look at TkDesk prior to actually
+installing it, use the "testdrive" script:
+
+   ./testdrive
+
+   
+Installation
+------------
+
+Use the command "make install" to install the TkDesk binaries, scripts,
+library files, and manual pages. Note that you may have to become the root
+user first to gain write access to the installation directories.
+
+And that's it! You now should be able to start TkDesk from the command
+line by typing "tkdesk".
+
+
+Where To Go From Here
+---------------------
+
+There is a short "Quick Start Guide" available that's automatically
+displayed when TkDesk is run for the first time.  It's also available
+from the browser window's "Help" menu.
+
+The TkDesk User's Guide is available both as PostScript in the "doc"
+subdirectory (of the directory created when you untar'ed the TkDesk
+package), as well as online via the help button of the application bar
+or the "Help" menu.
+
+You may also want to take a look inside the contrib subdirectory
+of the TkDesk distribution.  It contains some very interesting extensions,
+patches and configuration files contributed by users of TkDesk.
+Thank you if you're one of them!
+
+For news about releases, patches, etc., please visit the TkDesk homepage:
+
+            http://tkdesk.sourceforge.net
+
+Or you may wish to join the TkDesk users mailing list.  To subscribe,
+please visit:
+
+   https://lists.sourceforge.net/lists/listinfo/tkdesk-users
+
+

@@ -1,0 +1,57 @@
+### ----------------------------------------------------------------------
+###
+###  TkDesk configuration file: Sounds
+###
+###  This file is used to associate various sound files to internal
+###  events of TkDesk, such as opening a folder, starting a program,
+###  as well as to custom events defined by you.
+###
+###  *** Press F5 to save changes and reload this file into TkDesk, 
+###  *** F6 to do the same plus to close this window.
+###
+### ----------------------------------------------------------------------
+
+### The command for playing sound files. %s will be replaced by the sounds
+### filename. Just comment out this line if you don't want to have sound.
+### (Note: this must be a shell command, not a Tcl command. If the first
+### element of the command can't be executed, sound is automatically
+### disabled. The "play" command is part of the sox sound utilities
+### ("play" is just a link to "sox") available from:
+### ftp://sunsite.unc.edu/apps/sound/convert/Lsox-linux.tar.gz)
+
+set tkdesk(soundcmd) "cat %s >/dev/audio &"
+#set tkdesk(soundcmd) "play %s &"
+
+### The following lines define the file names of sounds for various TkDesk
+### events. If the sound file name is not absolute, TkDesk will look for
+### the sound in each directory given by the variable tkdesk(path,sounds),
+### which is defined in the config file "System". The sound files of the
+### lines that are commented out (and some more) can be obtained from the
+### TkDesk WWW page: http://sun1.rrzn-user.uni-hannover.de/~zzhibol/tkdesk/
+### All sound files found there are higher quality VOC and WAV files.
+### These have been replaced in this distribution with AU files as these
+### can be sent directly to /dev/audio.
+
+set tkdesk(sound,dsk_new_mail) newmail.au
+set tkdesk(sound,dsk_bell) metal.au
+set tkdesk(sound,dsk_error) halt.au
+set tkdesk(sound,dsk_about) start.au
+set tkdesk(sound,dsk_welcome_begin) start.au
+set tkdesk(sound,dsk_welcome_end) herewego.au
+set tkdesk(sound,dsk_bug) ""
+set tkdesk(sound,dsk_quit_tkdesk) robot_dead.au
+set tkdesk(sound,dsk_new_filelist) ""
+set tkdesk(sound,dsk_new_filebrowser) ""
+set tkdesk(sound,dsk_exec_launch) door_open.au
+set tkdesk(sound,dsk_exec_exit) door_shut.au
+#set tkdesk(sound,dsk_really_deleting) fire.voc
+#set tkdesk(sound,dsk_copying) camera.wav
+#set tkdesk(sound,dsk_moving) hold_st.wav
+#set tkdesk(sound,dsk_linking) cloak_en.wav
+#set tkdesk(sound,dsk_symlinking) cloak_en.wav
+set tkdesk(sound,dsk_untaring) ""
+
+###
+### Add user defined sound events/ids here!
+
+#set tkdesk(sound,my_sound_event) ""
