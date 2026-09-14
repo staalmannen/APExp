@@ -1,0 +1,19 @@
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libsqlite.a
+BIN=$APEXPROOT/$objtype/ape/bin
+TARG=sqlite
+
+OFILES= shell.$O
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+SQSOURCE=../../../external/sqlite
+
+CFLAGS=-c -I$SQSOURCE
+
+%.$O: $SQSOURCE/%.c
+	$CC $CFLAGS $SQSOURCE/$stem.c
+

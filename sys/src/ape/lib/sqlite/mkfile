@@ -1,0 +1,17 @@
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libsqlite.a
+
+OFILES= sqlite3.$O
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+SQSOURCE=../../../external/sqlite
+
+CFLAGS=-c -I$SQSOURCE
+
+%.$O: $SQSOURCE/%.c
+	$CC $CFLAGS $SQSOURCE/$stem.c
+
