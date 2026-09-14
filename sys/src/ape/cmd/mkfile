@@ -52,10 +52,11 @@ _OPTIONAL_APPS=\
 	tar\
 	pax\
 # languages \
+#	go\
 	lua\
+	sqlite\
 	tclsh\
 	perl\
-#	go\
 # GUI \
 	wish\
 # transpilers \

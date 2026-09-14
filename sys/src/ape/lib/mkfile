@@ -28,6 +28,7 @@ _OPTIONAL_LIBS=\
 	png\
 	readline\
 		history\
+	sqlite\
 	tcl\
 		tk\
 	xml2\
