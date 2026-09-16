@@ -115,7 +115,7 @@ p9err(void)
 int
 main(void)
 {
-	int s, r;
+	int s, r, bound;
 	struct sockaddr_in sa;
 	socklen_t slen;
 
@@ -138,9 +138,9 @@ main(void)
 	sa.sin_addr.s_addr = inet_addr("127.0.0.1");
 
 	errno = 0;
-	r = bind(s, (struct sockaddr *)&sa, sizeof sa);
-	ok(r == 0, "bind(127.0.0.1, port 0)");
-	if(r < 0)
+	bound = bind(s, (struct sockaddr *)&sa, sizeof sa);
+	ok(bound == 0, "bind(127.0.0.1, port 0)");
+	if(bound < 0)
 		printf("       plan 9 says: %s\n", p9err());
 
 	/*
@@ -161,11 +161,44 @@ main(void)
 			"a real port was assigned, not still 0");
 	}
 
-	errno = 0;
-	r = listen(s, 5);
-	ok(r == 0, "listen(backlog 5)");
-	if(r < 0)
-		printf("       plan 9 says: %s\n", p9err());
+	/*
+	 * LISTEN AFTER A FAILED BIND MEANS NOTHING, AND REPORTING IT AS A
+	 * PASS IS WORSE THAN SAYING NOTHING.
+	 *
+	 * The first run of this file printed
+	 *
+	 *	FAIL bind(127.0.0.1, port 0)   not a local IP address
+	 *	FAIL listen(backlog 5)         connection in use
+	 *
+	 * and the second, after one entry was added to the errno table,
+	 *
+	 *	FAIL bind(127.0.0.1, port 0)   Address not available
+	 *	PASS listen(backlog 5)
+	 *
+	 * -- a PASS on a socket with no address and no port, which is not
+	 * a working listener by any reading. The sequence is bind THEN
+	 * listen; once bind has failed, whatever listen does next is
+	 * undefined and its result is not evidence of anything.
+	 *
+	 * (Why it moved at all is the coupling documented in
+	 * ap/network/bind.c: the announce fallback there is gated on
+	 * errno == EPLAN9, meaning "an error nothing recognised", so
+	 * naming an error in the table stops the fallback from running for
+	 * it. One less announce attempt is the whole difference.)
+	 *
+	 * "A check that cannot fail is not a check" is in CLAUDE.md; this
+	 * is its twin -- a check that can PASS for the wrong reason.
+	 */
+	if(bound < 0)
+		printf("  SKIP listen: bind failed, so listen's result would\n"
+			"       mean nothing either way\n");
+	else {
+		errno = 0;
+		r = listen(s, 5);
+		ok(r == 0, "listen(backlog 5)");
+		if(r < 0)
+			printf("       plan 9 says: %s\n", p9err());
+	}
 
 	close(s);
 
