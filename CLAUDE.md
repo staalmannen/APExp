@@ -5171,18 +5171,122 @@ into a function printing "no errstr on this system" on every line. A
 whole round trip for a test that cannot report the one thing it exists
 to report.
 
-**This is very likely the same bug as both hangs.** `io.test` stops
-after `io-53.5`, "CopyData: error during fcopy", which fails with that
-exact socket error; its neighbours end in a bare `vwait` on an `fcopy`
-callback, and a callback that cannot fire is a wait that never ends.
-`chanio.test` is the same file in the newer API. **That is a hypothesis
-the logs cannot confirm** -- both are lower bounds, per the buffering
-note above -- but it is one measurement away, and the same measurement
-would unlock the 86.
+#### The answer: 127.0.0.1 is not a local address on this machine
 
-Expect `ioCmd`, `ioTrans`, `iogt` and `socket.test` to be in that
-family too. **Nothing is known about them: no run has ever reached
-them.**
+**The probe ran, and it settles both questions at once.**
+
+```
+FAIL bind(127.0.0.1, port 0) (errno 41: OP not supported)
+     plan 9 says: not a local IP address
+FAIL listen(backlog 5) (errno 38: Connection refused)
+     plan 9 says: connection in use
+
+  YES  "announce 0" accepted
+  YES  "announce *!0" accepted
+  no   "announce 127.0.0.1!0"   -> not a local IP address
+  no   "bind 127.0.0.1!0"       -> not a local IP address
+  no   "announce tcp!*!0"       -> bad ip address syntax
+```
+
+**Binding to ANY address works and binding to the loopback does not.**
+Nothing is missing from the stack, from libap, or from Tcl: the machine
+simply does not believe 127.0.0.1 is one of its own addresses. Note
+`announce tcp!*!0` is refused as well -- the control file does not take
+a protocol prefix, which is worth knowing before anyone "fixes" the
+address syntax in `_sock_inaddr2string`.
+
+**So the first thing to try is not a code change.** `/net/ipselftab` is
+the list the stack decides this from, and on 9front the loopback is
+configured by
+
+```
+ip/ipconfig loopback /dev/null 127.1
+```
+
+which the standard startup normally does. `socket-server-test.c`
+section 1a prints that table and says which way it came out, so the
+next run answers the configuration question without another round trip.
+**If 127.0.0.1 is absent, that one line is the whole fix** and none of
+the C below was needed for it.
+
+**Do NOT make `bind()` fall back to `*` when the requested address is
+not local.** It would make these tests pass and it would silently widen
+a loopback-only server to every interface -- inventing semantics in the
+one direction where it matters, which is the `systray` rule with a
+security edge.
+
+#### The errno was lying about the category, and that is ours
+
+`_errno.c` already holds a Plan 9 -> POSIX table with a "from sockets"
+section, matched by substring; `_syserrno()` falls back to `EPLAN9`
+when nothing matches, and `bind.c` then turns `EPLAN9` into
+`EOPNOTSUPP`. "not a local IP address" was not in the table, so:
+
+```
+plan 9:  not a local IP address
+errno:   EOPNOTSUPP
+Tcl:     couldn't open socket: operation not supported
+read as: this system has no sockets
+```
+
+and that reading cost several rounds. **An error that names the wrong
+category sends everyone to the wrong place**, which is the `XLoadFont`
+lesson in its errno form. `EADDRNOTAVAIL` is POSIX's "Cannot assign
+requested address" and says exactly what happened.
+
+Two entries added, **measured rather than copied out of a header** --
+they are the strings the probe printed:
+
+```c
+{EADDRNOTAVAIL,	"not a local IP address"},
+{EINVAL,	"bad ip address syntax"},
+```
+
+**In the table rather than special-cased in `bind()`**, so `connect()`,
+`sendto()` and everything else report it too. `bind.c`'s
+`EPLAN9 -> EOPNOTSUPP` fallback is left alone: it only fires for errors
+nothing recognises, and the specific case is now matched before it.
+
+#### chan-io-28.7, and the hypothesis was wrong by twenty tests
+
+`-singleproc 1 -file chanio.test -verbose t` did what it was supposed
+to. The log ends
+
+```
+---- chan-io-28.6 start
+---- chan-io-28.7 start
+```
+
+so the hang is **`chan-io-28.7`**, not `chan-io-8.2`. That guess was
+recorded as "a hypothesis the log cannot support, however plausible it
+looks", and it was wrong by twenty tests -- the whole `8.x` block
+starts *and returns*. **The fifth time in this file a confident
+mechanism was wrong and one printed intermediate settled it in a single
+run**, and the first where the guess was labelled as one beforehand.
+
+And it is a **socket** test, which the 8.2 guess would have hidden
+completely:
+
+```tcl
+set ff [openpipe r $echo]	;# child runs "socket -server accept 0"
+gets $ff port
+set s [socket 127.0.0.1 $port]	;# <- blocking connect to a
+                                 ;#    non-local address
+```
+
+The child's `socket -server ... 0` binds to any address and works; the
+parent then makes a **blocking connect to 127.0.0.1**, and that is the
+call that never returns. The `after 1000` timeout that would have
+rescued the `vwait` is set on the *next* line and is never reached.
+
+So both hangs and the 86 `http11` failures are one cause after all --
+which the previous round guessed and could not show. **The guess being
+right about the cause and wrong about the test is worth keeping**: the
+mechanism and the location are separate claims, and only one of them
+was checkable from the log.
+
+Expect `ioCmd`, `ioTrans`, `iogt` and `socket.test` in the same family.
+**Nothing is known about them: no run has ever reached them.**
 
 #### A skip list is not a substitute for a timeout
 
