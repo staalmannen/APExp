@@ -6451,6 +6451,55 @@ position is that **nothing is known about those six files** -- the
 count will rise as they are measured for the first time, and that is
 the "expect the failure count to rise" case, not a regression.
 
+#### The child's buffering is settable, and that trap is closed
+
+**`chanio.test` stops the full run again**, with the log's tail at
+`chan-io-41.8` -- and that is a **LOWER BOUND**, for the fourth time.
+`all.tcl` leaves `-singleproc` at 0, so each file is a child whose
+stdout is a pipe, and up to a bufferful of a wedged child's output dies
+with it. Guessing from the last line has been wrong by twenty tests and
+by six; every answer has cost a second run with
+`-singleproc 1 -file X -verbose t`.
+
+**That was avoidable and is now avoided.** `RunAllTests` passes **every
+non-default option** through to the child (`tcltest.tcl:2941`), and each
+child evaluates `-load` with `uplevel 1 [loadScript]` (`:3042`) before
+running anything. So the harness sets
+
+```tcl
+::tcltest::configure -load {
+    catch {fconfigure stdout -buffering line}
+    ...
+}
+```
+
+and every child line-buffers itself, at the right moment, with no
+wrapper process and no change to how files are run. It is tcltest's own
+mechanism rather than a trick.
+
+Two things to know about it:
+
+- **the script must write NOTHING.** Anything a child prints on stderr
+  during `-load` is reported by the parent as `Test file error: ...`
+  -- measured, not assumed, by giving it a `puts` and watching the
+  parent turn the line into an error. Every call is inside `catch` and
+  silent.
+- **if `-load` is ever wanted for its real purpose** -- loading the
+  commands under test -- **append to it**, or the buffering goes and
+  the trap comes back with nothing to say so. The harness only sets it
+  when it is empty, so a caller who passes `-load` keeps theirs.
+
+Checked on the host against a baseline run with no `-load`: identical
+summary, same single pre-existing host failure, so the option is inert
+apart from the buffering.
+
+**This does not make the last line the hung test.** `-verbose t` is
+still what prints a name as a test *starts*; what it does buy is that
+everything a child actually wrote is in the log, so the last line is
+the truth about what was reported rather than an artefact of a 4 KB
+boundary. The `-singleproc 1 ... -verbose t` run is still the way to
+name a hang, and is still one command.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the

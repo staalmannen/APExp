@@ -200,6 +200,37 @@ fconfigure stderr -buffering line
 catch {fconfigure $::tcltest::outputChannel -buffering line}
 catch {fconfigure $::tcltest::errorChannel -buffering line}
 
+# AND THE SAME IN EVERY CHILD, which is the half that has cost a round
+# trip every single time a file has hung.
+#
+# The four lines above buffer THIS process. all.tcl leaves -singleproc
+# at 0, so every test file runs in its own tcltest whose stdout is a
+# PIPE -- block buffered, and nothing here was setting it. Up to a
+# bufferful of a wedged child's output dies with it, so the last test
+# named in the log is a LOWER BOUND on where the run got to and not the
+# answer. That has been misread once and correctly distrusted three
+# times, and each time the only way to the real name was a second run
+# with -singleproc 1 -file X -verbose t.
+#
+# -load is the way in, and it is tcltest's own mechanism rather than a
+# trick: RunAllTests passes EVERY non-default option through to the
+# child (tcltest.tcl:2941), and each child evaluates the script with
+# `uplevel 1 [loadScript]` (:3042) before it runs anything. So this
+# runs in the child, at the right moment, with no wrapper process and
+# no change to how the files are run.
+#
+# If -load is ever wanted for its real purpose -- loading the commands
+# under test -- APPEND to it rather than replacing it, or the buffering
+# goes and the trap comes back silently.
+if {[::tcltest::configure -load] eq ""} {
+    ::tcltest::configure -load {
+	catch {fconfigure stdout -buffering line}
+	catch {fconfigure stderr -buffering line}
+	catch {fconfigure $::tcltest::outputChannel -buffering line}
+	catch {fconfigure $::tcltest::errorChannel -buffering line}
+    }
+}
+
 # The marker. Under tclsh -- unlike wish -- tcltest::cleanupTests does
 # NOT exit the application: that exit is guarded by
 #
