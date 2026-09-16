@@ -6125,16 +6125,104 @@ makes `n` nonzero and returns immediately, which is exactly the shape
 that starves `event-11.5`'s reader; waiting first means the first call
 can be right rather than merely recovering on the second.
 
-**Prediction for the next run**, on the record as usual: `select-test`
-reports **0 failures** -- section 2 passes, 3a/3b/3c become vacuous
-(section 3 only runs when 2 fails), and nothing else moves. Tcl's
-`event-1.1` should go from `{0 0} {0 0} {0 0}` to `{0 0} {1 0} {2 0}`.
-**`event-11.5` should still hang**: section 8 already showed `select()`
-reporting both sources, so this fix removes one missed poll and not the
-cause of `y = 0`. If `event-11.5` clears as well, the reasoning above
-is wrong somewhere and the run says so.
+**CONFIRMED, and the prediction was right for once in every part.**
+
+```
+2  PASS a pipe with bytes in it is readable to a zero-timeout poll
+3  note section 2 already passed, so there is nothing to ask
+0 failure(s)
+```
+
+Section 3 going *silent* is the part worth noticing: it only runs when
+2 fails, so the file reporting nothing there is the fix confirming
+itself. Sections 1 and 4..9 are unchanged, so the wait costs nothing
+elsewhere -- and section 8 still reports **both** sources, which is
+what says the 10ms grace has not turned the mixed read/write set into
+something slower or stranger.
+
+**What this does NOT fix, restated so the next run is read correctly.**
+Section 8 was already reporting both sources *before* this change, so
+`event-11.5`'s `y = 0` was never this call. It should still hang. Tcl's
+`event-1.1` is the one that should move, from `{0 0} {0 0} {0 0}` to
+`{0 0} {1 0} {2 0}`, and `tcl-fileevent-test.tcl` section **5a** is the
+same question one layer up. **7b and 8 should still fail**: they are
+above `select()`, which is exactly what section 9 established.
 
 No header changed, so the `HFILES` trap is not in play for this one.
+
+#### event-11.5 NEVER ACCEPTS THE CONNECTION, and that is the whole of it
+
+**Both predictions landed.** `tcl-fileevent-test.tcl` section **5a now
+passes** -- the `update`/`DONT_WAIT` poll, which is the poll fix showing
+itself one layer up -- and `event.test` under `-singleproc 1 -verbose t`
+prints **no `==== event-1.1 FAILED`** at all, so `event-1.1` passes too.
+The file still stops at `---- event-11.5 start`, and 7b and 8 still
+fail with `x = 2751547`, `y = 0`.
+
+**Then reading upstream's actual test answered it in one look**, which
+is where this should have started:
+
+```tcl
+set s1 [socket -server accept -myaddr 127.0.0.1 0]
+after 1000
+set s2 [socket 127.0.0.1 [lindex [fconfigure $s1 -sockname] 2]]
+close $s1
+```
+
+**THE ACCEPT SCRIPT NEVER RUNS.** An accept script only runs inside the
+event loop; `after 1000` with no argument is a blocking sleep, not an
+event loop, and `close $s1` follows the connect immediately. So the
+server side never accepts, never writes `foobar`, and never closes --
+and the test still expects `3 3 done`. **Upstream is relying on a
+connection ABANDONED IN THE ACCEPT QUEUE becoming readable when the
+listener goes.** On X11 the kernel resets it, and `select-test.c`
+section 10 now says so in as many words on the build host:
+
+```
+--- 10. the listener closed with the connection NEVER ACCEPTED ---
+  PASS a connection abandoned in the accept queue becomes readable
+  note read answered -1 (Connection reset by peer)
+```
+
+**That is a completely different question from the one nine sections
+have been answering.** "Is a closed peer readable" is YES, measured
+four ways on the VM. "Is a connection nobody accepted readable once the
+listener closes" had never been asked, in C or in Tcl, and it is the
+only thing left that can produce `y = 0`.
+
+**I got the correction backwards first, and the real test is what
+caught it.** On seeing that section 3 waits for its accept and 7b/8 do
+not, I rewrote 7b and 8 to wait -- and that made them *unfaithful*,
+because upstream does not wait either. The sections are restored to
+upstream's shape, and the waiting version is **section 7c**, a control
+rather than a correction. The pair is the point: 7b failing while 7c
+passes says the fault is the abandoned queue and not the close.
+
+**A second, genuine bug in 7b, and the host caught it as the convention
+says it should.** The handler asked `[eof $ch]` *without reading*, and
+Tcl's `eof` reports whether a read has already hit the end, not whether
+the peer has gone -- so it answered `data` both on the fire carrying the
+line and on the fire carrying the end of file. The section failed with
+`got 'data'` against a channel behaving perfectly. It drains and stays
+registered now, which is section 7 of the C file in Tcl.
+
+With both fixed the whole file reports **0 failures on a Linux tclsh**
+-- 7b, 7c and 8 included, and section 8 reproduces upstream's own
+`3 3 done`. Before this, section 8 could not have been trusted to mean
+anything on the VM, since it passed on the host for the wrong reason.
+
+**What the next VM run decides.** If section 10 fails and 7c passes,
+`event-11.5` is fully explained: the port does not report an abandoned
+accept-queue connection, and upstream's test needs it. That is then a
+real question about what `ap/network/listen.c`'s listener process does
+with a connection it has opened and never handed over -- it holds the
+`/net/tcp` connection open in a separate process, so closing the
+*pipe* the parent holds need not close the *connection* at all, which
+would leave the client waiting on a peer that is still there.
+
+**And that would make it the `XLoadFont` family again, in its widest
+form yet**: a listener process that exits without closing what it
+opened leaves a live connection nobody will ever serve.
 
 #### A skip list is not a substitute for a timeout
 
