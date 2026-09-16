@@ -305,10 +305,39 @@ goteof:
 	return ngot;
 }
 
+/*
+ * Give the copy processes started by this very select() a bounded
+ * chance to have read something, and return the moment one of them
+ * has. See the long note at the call site: this is the only answer the
+ * copy-process design leaves for a zero-timeout poll on a descriptor
+ * nothing has read yet, and it is paid once per descriptor.
+ */
+#define FRESHTRIES	10		/* at most 10ms, once per fd */
+#define FRESHMS		1
+
+static void
+waitfresh(fd_set *fresh, int nfds)
+{
+	int i, j;
+	Muxbuf *b;
+
+	for(j = 0; j < FRESHTRIES; j++){
+		for(i = 0; i < nfds; i++){
+			if(!FD_ISSET(i, fresh))
+				continue;
+			b = _fdinfo[i].buf;
+			if(b != 0 && (b->n > 0 || b->eof))
+				return;
+		}
+		_SLEEP(FRESHMS);
+	}
+}
+
 int
 select(int nfds, fd_set *rfds, fd_set *wfds, fd_set *efds, struct timeval *timeout)
 {
-	int n, i, t, slots, fd, err;
+	int n, i, t, slots, fd, err, nfresh;
+	fd_set fresh;
 	long long tms;
 	Fdinfo *f;
 	Muxbuf *b;
@@ -331,6 +360,8 @@ select(int nfds, fd_set *rfds, fd_set *wfds, fd_set *efds, struct timeval *timeo
 		return -1;
 
 	/* make sure all requested rfds and efds are buffered */
+	FD_ZERO(&fresh);
+	nfresh = 0;
 	if(nfds >= OPEN_MAX)
 		nfds = OPEN_MAX;
 	for(i = 0; i < nfds; i++)
@@ -340,10 +371,52 @@ select(int nfds, fd_set *rfds, fd_set *wfds, fd_set *efds, struct timeval *timeo
 				errno = EBADF;
 				return -1;
 			}
-			if((f->flags&FD_BUFFERED) == 0)
+			if((f->flags&FD_BUFFERED) == 0){
 				if(_startbuf(i) != 0)
 					return -1;
+				FD_SET(i, &fresh);
+				nfresh++;
+			}
 		}
+
+	/*
+	 * A DESCRIPTOR THIS CALL HAS JUST BUFFERED CANNOT BE ANSWERED
+	 * YET, and with t == 0 there is nothing else to make us wait.
+	 *
+	 * Measured by sys/lib/tests/select-test.c: a pipe with six bytes
+	 * already in it is reported by a blocking select (section 1) and
+	 * not by a zero-timeout poll on the same descriptor (section 2),
+	 * while a poll a second later (3b) or straight after a blocking
+	 * select (3c) does report it. So it is a race and not a dead
+	 * path, and it is a race with the copy process this call has just
+	 * forked: _startbuf already rendezvouses, so the child is running
+	 * by the time it returns, but its first _READ has not finished.
+	 * Everything below then reads b->n and b->eof as zero and the
+	 * t == 0 arm returns at once.
+	 *
+	 * What it costs is every Tcl_DoOneEvent(TCL_DONT_WAIT) in every
+	 * Tcl program -- `update`, the suite's `testfilehandler oneevent`
+	 * -- on its first look at any descriptor. Tcl's event-1.1 reports
+	 * {0 0} {0 0} {0 0} where it wants {0 0} {1 0} {2 0}, which is
+	 * exactly this.
+	 *
+	 * THIS IS AN APPROXIMATION AND THE DESIGN LEAVES NO ALTERNATIVE.
+	 * Plan 9 has no non-destructive way to ask whether a file has
+	 * data, which is the whole reason select() here is a copy process
+	 * rather than a system call -- so a poll on a descriptor nothing
+	 * has read yet cannot be answered without giving that process a
+	 * moment. Waiting for its first read to COMPLETE would be exact
+	 * and is not available: on an idle descriptor that read blocks,
+	 * and a poll that blocks for ever is worse than one that answers
+	 * "not ready".
+	 *
+	 * So it is bounded, and it is paid ONCE PER DESCRIPTOR -- the fd
+	 * is FD_BUFFERED from here on, so no later poll comes through
+	 * here at all. It also returns the moment anything is ready, so
+	 * the common case costs a single check.
+	 */
+	if(nfresh > 0 && t == 0)
+		waitfresh(&fresh, nfds);
 
 	/* check wfds;  for now, we'll say they are all ready */
 	n = 0;

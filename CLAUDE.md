@@ -6069,6 +6069,73 @@ search on this side, which is why it is worth a run.
 All nine sections are correct on glibc, where the file reports 0
 failures.
 
+#### Section 9 passes, so libap is CLEAR -- and the one real bug is fixed
+
+**`7b` end to end in C works.** The select-driven accept, the accept
+after it, the data the closed peer left, the EOF after draining, and a
+read answering 0 -- five assertions, all `PASS`. So the listener-pipe
+hypothesis is **refuted**: a copy process forked onto the pipe
+`listen()` puts on a listening descriptor does not break the handshake,
+even when the accepted end is closed at once.
+
+That was worth writing precisely because either answer ended the search
+here, and this is the answer that ends it: **every shape `event-11.5`
+uses behaves correctly in C.** Tcl's `y = 0` is above `select()`, and
+the next place to look is Tcl's notifier and channel layer.
+
+**Section 3a differed between the two runs, and that is the tell.**
+Run 1: ten immediate polls, still nothing. Run 2: **"poll number 2
+reported it ready"**. Same binary, same machine. A result that moves
+between runs is a **race**, which is what 3b and 3c had already said
+and what the withdrawn "NEVER" would have denied.
+
+#### The fix: a poll cannot answer for a descriptor it has just buffered
+
+`_startbuf` **already rendezvouses** with the copy process -- `select`
+does not return until the child is running -- so fork and scheduling
+latency were never the gap. What is left is the window between that
+rendezvous and the child's **first `_READ` completing**. The scan below
+then reads `b->n` and `b->eof` as zero and the `t == 0` arm returns at
+once.
+
+`waitfresh()` in `_buf.c` closes it: descriptors buffered **by this
+call** are collected in an `fd_set`, and a zero-timeout select waits
+for one of them to have something, in 1ms steps, up to 10ms -- 
+returning the instant anything is ready.
+
+**It is an approximation and the design leaves no alternative.** Plan 9
+has no non-destructive way to ask whether a file has data -- which is
+the entire reason `select()` here is a copy process rather than a
+system call -- so a poll on a descriptor nothing has read yet cannot be
+answered without giving that process a moment. Waiting for the first
+read to *complete* would be exact and is not available: on an idle
+descriptor that read blocks, and **a poll that blocks for ever is worse
+than one that answers "not ready"**.
+
+Two things keep the cost bounded, and both matter:
+
+- **it is paid once per descriptor.** The fd is `FD_BUFFERED` from here
+  on, so no later poll reaches this code at all. Tcl registers its
+  channels once.
+- **it returns the moment anything is ready**, so the common case is a
+  single check and no sleep.
+
+It sits *before* the `wfds` scan deliberately. A writable descriptor
+makes `n` nonzero and returns immediately, which is exactly the shape
+that starves `event-11.5`'s reader; waiting first means the first call
+can be right rather than merely recovering on the second.
+
+**Prediction for the next run**, on the record as usual: `select-test`
+reports **0 failures** -- section 2 passes, 3a/3b/3c become vacuous
+(section 3 only runs when 2 fails), and nothing else moves. Tcl's
+`event-1.1` should go from `{0 0} {0 0} {0 0}` to `{0 0} {1 0} {2 0}`.
+**`event-11.5` should still hang**: section 8 already showed `select()`
+reporting both sources, so this fix removes one missed poll and not the
+cause of `y = 0`. If `event-11.5` clears as well, the reasoning above
+is wrong somewhere and the run says so.
+
+No header changed, so the `HFILES` trap is not in play for this one.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
