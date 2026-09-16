@@ -297,5 +297,149 @@ if {[catch {
     }
 }
 
+puts "\n--- 7. WRITABLE, and readable at END OF FILE ---"
+# THE HANG IS event-11.5, NOT event-1.1. `-singleproc 1 -verbose t`
+# named it: event-1.1 fails and RETURNS, the file runs on through
+# 3.1, 5.*, 6.1, 7.*, 8.1, 9.*, 10.1, 11.1, 11.3, 11.4, and stops at
+#
+#	---- event-11.5 start
+#
+# with nothing after it. So the 5a/5b sections above are still about a
+# real failure -- event-1.1 -- but they are NOT about the hang, and
+# saying otherwise would be the "a crash after test N is evidence about
+# N" mistake from the Tk section in its other form.
+#
+# event-11.5 is round-robin scheduling across TWO sources:
+#
+#	fileevent $f1 writable {incr x; if {$y == 3} {set z done}}
+#	fileevent $s2 readable {incr y; if {$x == 3} {set z done}}
+#	vwait z
+#
+# and neither handler can end the wait on its own -- each tests the
+# OTHER one's counter. So if either source never reports, `vwait z`
+# never returns however busy the other one is. That is a hang with no
+# error and no output, which is exactly what the log shows.
+#
+# Sections 2-4 already cover readable on a pipe, a socket and a file.
+# The two things event-11.5 needs that nothing here has asked about are
+# WRITABLE, and readable at END OF FILE -- the socket in the test has
+# been closed by the server, so what makes it readable is the EOF and
+# not data. Both are asked separately, because they fail separately.
+step "7a. writable fileevent on a plain file"
+if {[catch {
+    set wtmp [file join [pwd] tcl-fileevent-test.w]
+    set w7 [open $wtmp w]
+    set ::done TIMEOUT
+    fileevent $w7 writable [list apply {{ch} {
+	fileevent $ch writable {}
+	set ::done writable
+    }} $w7]
+    set got [waitfor 3000]
+    catch {close $w7}
+    file delete $wtmp
+} err]} {
+    ok 0 "writable fileevent on a file ($err)"
+} else {
+    ok [expr {$got eq "writable"}] "writable fileevent on a file fired"
+    if {$got eq "TIMEOUT"} {
+	note "a file open for writing is ALWAYS writable, so this is the"
+	note "cheapest possible writable event and it never came. This"
+	note "is half of event-11.5."
+    }
+}
+
+step "7b. readable fileevent at END OF FILE (peer closed)"
+if {[catch {
+    set srv7 [socket -server {apply {{ch a p} {
+	puts $ch foobar
+	close $ch
+    }}} -myaddr 127.0.0.1 0]
+    set cli7 [socket 127.0.0.1 [lindex [fconfigure $srv7 -sockname] 2]]
+    close $srv7
+    # drain the line the server sent, so the next readable is the EOF
+    set ::done TIMEOUT
+    fileevent $cli7 readable [list apply {{ch} {
+	fileevent $ch readable {}
+	set ::done [expr {[eof $ch] ? "eof" : "data"}]
+    }} $cli7]
+    set got [waitfor 3000]
+    if {$got eq "data"} {
+	gets $cli7
+	set ::done TIMEOUT
+	fileevent $cli7 readable [list apply {{ch} {
+	    fileevent $ch readable {}
+	    set ::done [expr {[eof $ch] ? "eof" : "data"}]
+	}} $cli7]
+	set got [waitfor 3000]
+    }
+    catch {close $cli7}
+} err]} {
+    ok 0 "readable at EOF ($err)"
+} else {
+    ok [expr {$got eq "eof"}] "a closed peer reports readable (got '$got')"
+    if {$got eq "TIMEOUT"} {
+	note "the peer closed and the notifier never said so. A channel at"
+	note "end of file must report READABLE -- that is how every Tcl"
+	note "program learns the other end went away."
+    }
+}
+
+puts "\n--- 8. event-11.5 itself, with a timeout ---"
+# The whole test, reduced, with the one thing tcltest cannot give it.
+# THE DECISIVE OUTPUT IS x AND y, not the pass or fail: each handler
+# ends the wait only when the OTHER has reached 3, so whichever counter
+# is stuck at 0 names the source that never reported. A pass needs
+# both; a timeout with one of them climbing is a complete diagnosis.
+step "8. two sources, round robin, neither can finish alone"
+if {[catch {
+    set t8 [file join [pwd] tcl-fileevent-test.rr]
+    set f8 [open $t8 w]
+    set srv8 [socket -server {apply {{ch a p} {
+	puts $ch foobar
+	close $ch
+    }}} -myaddr 127.0.0.1 0]
+    set s8 [socket 127.0.0.1 [lindex [fconfigure $srv8 -sockname] 2]]
+    close $srv8
+    set ::x 0
+    set ::y 0
+    set ::z 0
+    fileevent $s8 readable {incr ::z}
+    set tt [after 3000 [list set ::z TIMEOUT1]]
+    vwait ::z
+    after cancel $tt
+    if {$::z eq "TIMEOUT1"} {
+	note "the first vwait never saw the socket become readable at all"
+    }
+    set ::z 0
+    fileevent $f8 writable {incr ::x; if {$::y == 3} {set ::z done}}
+    fileevent $s8 readable {incr ::y; if {$::x == 3} {set ::z done}}
+    set tt [after 3000 [list set ::z TIMEOUT]]
+    vwait ::z
+    after cancel $tt
+    fileevent $f8 writable {}
+    fileevent $s8 readable {}
+    catch {close $f8}
+    catch {close $s8}
+    file delete $t8
+} err]} {
+    ok 0 "event-11.5 reduced ($err)"
+} else {
+    note "x (writable on the file) = $::x"
+    note "y (readable on the socket) = $::y"
+    ok [expr {$::z eq "done"}] "both sources were scheduled (z = '$::z')"
+    if {$::z ne "done"} {
+	if {$::x == 0} {
+	    note "x never moved: the WRITABLE source is the starved one."
+	} elseif {$::y == 0} {
+	    note "y never moved: the socket READABLE source is starved,"
+	    note "and section 7b says whether that is the EOF specifically."
+	} else {
+	    note "both moved but neither reached 3 in 3s -- that is a"
+	    note "round-robin fairness problem rather than a dead source,"
+	    note "and a different fix from either of the above."
+	}
+    }
+}
+
 puts "\n$failures failure(s)"
 exit $failures

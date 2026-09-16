@@ -5730,6 +5730,68 @@ bug**, which is why sections 5a/5b exist: a handler on a pipe that never
 reports, where the pipe demonstrably carries the data. If 5a fails, the
 two are one cause and the fix is in whichever path `DONT_WAIT` takes.
 
+#### The hang is event-11.5, and event-1.1 was the wrong suspect
+
+**`-singleproc 1 -file event.test -verbose t` named it, and it is not
+the test that was failing.** The log runs `event-1.1`, `3.1`, the
+fifteen `5.*`, `6.1`, the seven `7.*`, `8.1`, the four `9.*`, `10.1`,
+`11.1`, `11.3`, `11.4` -- all of them **start and return** -- and ends
+
+```
+---- event-11.5 start
+```
+
+with nothing after it. So **`event-1.1` fails and returns**; it is
+merely the last thing that *printed* in the multi-process log, because
+that log is a pipe and block-buffered.
+
+**That is the "a crash after test N is evidence about N" rule from the
+Tk section, met in its other form**, and the section above walked into
+it: 5a/5b were written on the reading that `event-1.1`'s
+`Tcl_DoOneEvent(DONT_WAIT)` shape was the hang. It is not. Those two
+sections are still worth having -- `event-1.1` is a real failure and
+the poll/block distinction is a real question about this notifier --
+but they were aimed at the wrong target, and the prediction attached to
+them ("if 5a fails, the two are one cause") was answering a question
+nobody had asked.
+
+**`event-11.5` cannot finish if EITHER of its two sources is silent**,
+which is what makes it a hang rather than a failure:
+
+```tcl
+fileevent $f1 writable {incr x; if {$y == 3} {set z done}}
+fileevent $s2 readable {incr y; if {$x == 3} {set z done}}
+vwait z
+```
+
+Neither handler can end the wait on its own -- **each tests the other
+one's counter**. One live source and one dead one spins forever with no
+error and no output; `vwait` has nothing to time out against.
+
+**The two things it needs that nothing here had asked about are
+WRITABLE and readable AT END OF FILE.** Sections 2, 3 and 4 cover
+readable on a pipe, a socket and a file, and all three pass -- but
+`$f1` is a plain file opened for *writing*, and `$s2` is a socket whose
+server has already `close`d, so what must make it readable is the
+**EOF** rather than data. `tcl-fileevent-test.tcl` sections 7a and 7b
+ask those separately, because they fail separately.
+
+**Section 8 is `event-11.5` itself with a timeout, and its verdict is
+the two counters rather than the pass.** Each handler ends the wait
+only when the other has reached 3, so whichever counter is stuck at
+**0** names the source that never reported -- a timeout with one of
+them climbing is already a complete diagnosis, and the script says
+which in so many words. All eight sections pass on a Linux tclsh, where
+section 8 reproduces the suite's own `3 3 done`.
+
+**A note on what "writable" costs if it is the dead one.** A file open
+for writing is *always* writable, so `fileevent writable` on it is the
+cheapest event a notifier can be asked for; if that never fires, the
+writable half of the notifier is missing outright, and every Tcl
+program that drives an output channel from the event loop -- which is
+how `http` posts a body and how any non-blocking write works -- is
+affected, not just this test.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
