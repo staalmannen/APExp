@@ -6125,14 +6125,28 @@ makes `n` nonzero and returns immediately, which is exactly the shape
 that starves `event-11.5`'s reader; waiting first means the first call
 can be right rather than merely recovering on the second.
 
-**Prediction for the next run**, on the record as usual: `select-test`
-reports **0 failures** -- section 2 passes, 3a/3b/3c become vacuous
-(section 3 only runs when 2 fails), and nothing else moves. Tcl's
-`event-1.1` should go from `{0 0} {0 0} {0 0}` to `{0 0} {1 0} {2 0}`.
-**`event-11.5` should still hang**: section 8 already showed `select()`
-reporting both sources, so this fix removes one missed poll and not the
-cause of `y = 0`. If `event-11.5` clears as well, the reasoning above
-is wrong somewhere and the run says so.
+**CONFIRMED, and the prediction was right for once in every part.**
+
+```
+2  PASS a pipe with bytes in it is readable to a zero-timeout poll
+3  note section 2 already passed, so there is nothing to ask
+0 failure(s)
+```
+
+Section 3 going *silent* is the part worth noticing: it only runs when
+2 fails, so the file reporting nothing there is the fix confirming
+itself. Sections 1 and 4..9 are unchanged, so the wait costs nothing
+elsewhere -- and section 8 still reports **both** sources, which is
+what says the 10ms grace has not turned the mixed read/write set into
+something slower or stranger.
+
+**What this does NOT fix, restated so the next run is read correctly.**
+Section 8 was already reporting both sources *before* this change, so
+`event-11.5`'s `y = 0` was never this call. It should still hang. Tcl's
+`event-1.1` is the one that should move, from `{0 0} {0 0} {0 0}` to
+`{0 0} {1 0} {2 0}`, and `tcl-fileevent-test.tcl` section **5a** is the
+same question one layer up. **7b and 8 should still fail**: they are
+above `select()`, which is exactly what section 9 established.
 
 No header changed, so the `HFILES` trap is not in play for this one.
 
