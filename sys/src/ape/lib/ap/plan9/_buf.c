@@ -508,7 +508,22 @@ alarmed(int)
 static void
 _killtimerproc(void)
 {
-	if(timerpid > 0)
+	/*
+	 * ONLY THE PROCESS THAT FORKED THE TIMER MAY KILL IT, which is
+	 * the guard _killmuxsid beside this has always had and this one
+	 * did not. Both are atexit handlers, so both are inherited by
+	 * every fork; the asymmetry meant any forked child that left
+	 * through exit() rather than _exit() took the parent's timer with
+	 * it, and `timerpid` stayed > 0 afterwards so _resettimer() went
+	 * on signalling a corpse -- no timeout ever firing again, and
+	 * every blocking select() that needed one waiting for ever.
+	 *
+	 * ap/network/listen.c's listener process is where that was
+	 * measured, and it says _exit(0) now, which is the real fix. This
+	 * closes the class rather than the instance: the next child to
+	 * leave through exit() should not be able to do it again.
+	 */
+	if(timerpid > 0 && (_mainpid == getpid() || _mainpid == -1))
 		kill(timerpid, SIGKILL);
 }
 

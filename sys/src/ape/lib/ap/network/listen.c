@@ -158,7 +158,36 @@ listenproc(Rock *r, int fd)
 	 */
 	if(dfd >= 0)
 		close(dfd);
-	exit(0);
+
+	/*
+	 * _exit, NOT exit -- A FORKED CHILD MUST NOT RUN THE PARENT'S
+	 * atexit HANDLERS, and this one used to.
+	 *
+	 * It got away with it only because it never reached this line:
+	 * before the close(fd) above, the read never returned and the
+	 * process never left the loop. Making it exit correctly is what
+	 * exposed the second half of the bug.
+	 *
+	 * The handlers it inherits are _buf.c's. _killmuxsid is guarded --
+	 * `_mainpid == getpid()` -- and so does nothing here. **
+	 * _killtimerproc is NOT**, and it is `kill(timerpid, SIGKILL)` on
+	 * a pid inherited straight from the parent, so this process was
+	 * killing the parent's TIMER. After that `timerpid` is still > 0,
+	 * so _resettimer() only ever signals a corpse and no timeout ever
+	 * fires again: every blocking select() that needs the timer to
+	 * wake it waits for ever.
+	 *
+	 * Measured: tcl-fileevent-test.tcl section 7c stopped reporting
+	 * TIMEOUT and began to FREEZE the moment the listener started
+	 * exiting, with `at: waitfor` the last line printed and the
+	 * handler never reached -- a `vwait` with a 3000ms `after` on it
+	 * that never came back, which can only mean the event loop was
+	 * never re-entered.
+	 *
+	 * _copyproc two hundred lines away in _buf.c has always said
+	 * _exit(0), for exactly this reason.
+	 */
+	_exit(0);
 	return 0;
 }
 
