@@ -5401,6 +5401,155 @@ was checkable from the log.
 Expect `ioCmd`, `ioTrans`, `iogt` and `socket.test` in the same family.
 **Nothing is known about them: no run has ever reached them.**
 
+#### The loopback worked, and chanio now hangs sixty tests later
+
+**The one-line network fix paid for itself and the prediction was still
+wrong.** With `ip/ipconfig loopback /dev/null 127.1` run and both files
+unskipped, `chan-io-28.7` -- the blocking connect to 127.0.0.1 that had
+wedged the parent for two rounds -- **starts, connects and returns**.
+It now merely fails. The run gets from `chan-io-28.7` to `chan-io-41.8`,
+about sixty tests further in, and then stops again.
+
+The prediction said "all 167 files, the marker printed, the 86 `http11`
+failures gone". None of that happened, because the run never leaves
+`chanio.test`: twelve files, 455 lines, no marker. **Fixing the cause of
+one hang does not mean it was the cause of every hang**, and a file with
+several hundred socket tests in it can have more than one.
+
+What did move is real and is worth separating from what did not:
+
+| | before the loopback | after |
+|---|---|---|
+| `chan-io-28.7` | **hung**, killing 155 files | fails, run continues |
+| reached in `chanio.test` | test 28 of ~44 sections | **test 41** |
+| failures visible in `chanio` | 8 | 17 |
+
+The nine new ones are **newly measured, not newly broken** -- the same
+case as the tktest 25 -> 485 jump, and the third time this file has had
+to say so.
+
+**THE LAST LINE IS STILL A LOWER BOUND.** This is multi-process mode, so
+`chanio.test` is a child whose stdout is a pipe, and up to a bufferful
+of it is still inside the child. `chan-io-41.8` is where the log stops,
+not necessarily where the process did. The command that answers it is
+the same one that settled `chan-io-28.7`:
+
+```
+tcltest .../tcl-runall.tcl -singleproc 1 -file chanio.test -verbose t
+```
+
+**Do not guess from what sits after 41.8.** That guess was made once
+already, cost a round trip, and was wrong by twenty tests.
+
+**Measuring the other 155 files does not have to wait for it**, and the
+two runs are independent. The skip needs no rebuild and no edit --
+`-notfile` on the command line replaces the harness's default, and the
+harness leaves the caller's alone:
+
+```
+tcltest .../tcl-runall.tcl -notfile {l.*.test chanio.test}
+```
+
+Keep `l.*.test` in it: that is tcltest's own default for SCCS lock
+files, and naming `-notfile` at all replaces it.
+
+#### shutdown() answered success and did nothing, and closed the fd
+
+`chan-io-28.7` is the first test in the suite to reach `shutdown()`, and
+`ap/network/shutdown.c` was four lines:
+
+```c
+int
+shutdown(int fd, int how)
+{
+	if(how == 2)
+		close(fd);
+	return 0;
+}
+```
+
+**Two bugs, and the second is the worse one.**
+
+**It reported success without doing anything** -- the `XLoadFont` family
+arriving in libap, and here the cost is a HANG rather than a wrong
+answer, because a half-close is a protocol step the peer is waiting on.
+The test is
+
+```tcl
+set s [socket 127.0.0.1 $port]
+puts $s Hey
+close $s w			;# shutdown(fd, SHUT_WR)
+... vwait for the server's reply ...
+```
+
+and the server half reads to end of file before answering. With no FIN
+sent, the EOF never arrives, the server never replies:
+
+```
+Result was:              Failed Hey
+Result should have been: Succeeded {Hey DONE}
+```
+
+`Failed` there is the test's own `after 1000` firing. **A program
+without a timer waits for ever**, which is exactly the shape of the
+hangs this file has spent three rounds on -- and worth noting as a
+class: *a stub that returns success in a protocol handshake does not
+produce a wrong answer, it produces a wait.*
+
+**And `SHUT_RDWR` closed the descriptor, which POSIX does not.**
+`shutdown()` shuts the connection down; the descriptor stays open and
+the caller still has to `close()` it -- which every caller does. So
+every `shutdown(fd, SHUT_RDWR)` was followed by the caller closing a
+descriptor this library had already released, and in between the fd
+*number* is free for any `open`, `socket` or `accept` to take. The
+caller's `close()` then shuts an unrelated file belonging to someone
+else, with no diagnostic anywhere. Nothing in the suite has caught this
+yet and it is the reason the file could not simply be left alone.
+
+**What Plan 9 can do about a half-close is NOT guessed at here.** The
+candidate control messages are a list in `shutdown.c`, tried in order,
+and `socket-server-test.c` section 4 writes the same list to a real
+connection's ctl file and prints `errstr()` for each -- the method that
+settled the announce spelling, rather than reasoning from a manual page.
+Shorten the list to whatever comes back `YES`; if nothing does, this
+stack has no half-close and the note below applies.
+
+**A failure is reported rather than swallowed.** With nothing accepted
+`shutdown` returns -1 where it used to return 0. A caller that ignores
+the result is no worse off; a caller that checks gets an error instead
+of a wait, which is the direction this file has preferred every time the
+two were in tension -- and it is the only way the absence stays visible.
+
+`SHUT_RD` returns 0 and does nothing, **and that is honest rather than a
+fifth instance of the stub**: a socket fd in APE *is* the
+`/net/tcp/n/data` file, `read()` goes straight to it with no wrapper in
+this library, so there is no point at which a later read could be made
+to return 0. There is nothing to intercept and nothing in the kernel to
+ask.
+
+`socket-server-test.c` section 3 is `chan-io-28.7` in C -- write,
+`shutdown(SHUT_WR)`, then `select()` with a two-second timeout on the
+server half -- and **the assertion is on the EOF, not on the write**.
+The data arrives whatever `shutdown` does, so a test that only looked
+for `Hey` would have passed on the stub. It also checks that the
+descriptor survives `SHUT_RDWR`, which is the second bug. Every
+assertion in it passes on glibc, which is how both it and the
+replacement were checked.
+
+#### Two other things chanio now reports
+
+Newly reachable and recorded rather than chased:
+
+- **`file link -symbolic` gives ENOSYS** (`chan-io-41.8`, and
+  `chan-io-41.6`'s neighbours). `symlink()` is not implemented in libap.
+  Whether it should be is a real question -- 9front's own file servers
+  vary in whether they have symbolic links at all -- so this wants a
+  probe before any code.
+- The **`chan-io-6.4x` cluster is unchanged** (`6.31`, `6.43`..`6.47`,
+  `8.1`): `-buffersize 16` with `testchannel inputbuffered` reporting 0
+  where a partial buffer should remain. Nothing this round touched it,
+  and it is still the oldest open item in this file.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
