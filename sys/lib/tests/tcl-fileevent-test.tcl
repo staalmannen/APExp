@@ -190,5 +190,112 @@ if {[catch {
     ok [expr {$got eq "filedata"}] "readable fileevent on a file fired (got '$got')"
 }
 
+puts "\n--- 5. NON-BLOCKING poll vs blocking wait ---"
+# THE SECTION THE FIRST RUN DEMANDED. Sections 2-4 all PASS on 9front,
+# so a readable fileevent on a pipe does fire and the chan-io-44.1
+# diagnosis in the header above is refuted -- kept as written, because
+# the reasoning that produced it is worth more than the conclusion.
+#
+# But event-1.1 in the suite fails with exactly the shape those
+# sections were built to catch:
+#
+#	testfilehandler fillpartial 0 ; testfilehandler oneevent
+#	got  {0 0} {0 0} {0 0}     want  {0 0} {1 0} {2 0}
+#
+# -- a handler on a pipe that never reports. The difference from
+# section 2 is not the channel and not the pipe: it is HOW THE EVENT
+# LOOP IS ENTERED. `testfilehandler oneevent` is
+# Tcl_DoOneEvent(TCL_FILE_EVENTS|TCL_DONT_WAIT), a non-blocking poll,
+# and section 2 uses `vwait`, which blocks.
+#
+# A notifier that only learns about readiness on the path where it is
+# about to sleep answers a blocking wait correctly and a poll not at
+# all. `update` is the Tcl-level DONT_WAIT, so these two lines ask the
+# question without any test command.
+#
+# IF 5a FAILS AND 5b PASSES, that is the bug and it is one function.
+# If both pass, the difference is somewhere in testfilehandler's own
+# raw-fd path rather than in the notifier, and event.test is the place
+# to look rather than here.
+step "5a. write to a pipe, then poll with \[update\] (non-blocking)"
+if {[catch {
+    set f5 [open "|[list cat -u]" r+]
+    set ::fired 0
+    fileevent $f5 readable [list apply {{ch} {
+	set ::fired 1
+	set ::done [gets $ch]
+	fileevent $ch readable {}
+    }} $f5]
+    puts $f5 poll
+    flush $f5
+    # give the child a moment to write it back, WITHOUT entering the
+    # event loop -- after+vwait would be the blocking path again.
+    after 500
+    update
+    set pollfired $::fired
+    catch {close $f5}
+} err]} {
+    ok 0 "readable fileevent seen by update ($err)"
+} else {
+    ok [expr {$pollfired}] "a readable pipe is reported to a non-blocking poll"
+    if {!$pollfired} {
+	note "update did not see it. This is event-1.1's shape: the"
+	note "notifier learns about readiness only where it blocks."
+    }
+}
+
+step "5b. the same pipe, entered with \[vwait\] (blocking)"
+if {[catch {
+    set f6 [open "|[list cat -u]" r+]
+    fileevent $f6 readable [list apply {{ch} {
+	set ::done [gets $ch]
+	fileevent $ch readable {}
+    }} $f6]
+    puts $f6 block
+    flush $f6
+    set got [waitfor 3000]
+    catch {close $f6}
+} err]} {
+    ok 0 "readable fileevent seen by vwait ($err)"
+} else {
+    ok [expr {$got eq "block"}] "a readable pipe is reported to a blocking wait (got '$got')"
+}
+
+puts "\n--- 6. chan-io-44.1 exactly, two pipes and a namespace ---"
+# Section 2 is 44.1 SIMPLIFIED, and it passes, so the difference is in
+# what was simplified away. 44.1's -setup opens a SECOND pipe it never
+# uses, and its variable is namespaced. Both are reproduced here rather
+# than assumed irrelevant -- the same mistake as step 6 of
+# tk-mousewheel-test.tcl, which differed from the hanging case in three
+# ways at once and so settled nothing.
+step "6. two |cat -u pipes, read one by fileevent"
+if {[catch {
+    namespace eval ::t441 {
+	variable x initial
+	variable f2 [open "|[list cat -u]" r+]
+	variable f3 [open "|[list cat -u]" r+]
+	chan event $f2 readable [namespace code {
+	    variable x
+	    variable f2
+	    set x [chan gets $f2]
+	    chan event $f2 readable {}
+	    set ::done $x
+	}]
+	chan puts $f2 text
+	chan flush $f2
+    }
+    set got [waitfor 3000]
+    catch {chan close $::t441::f2}
+    catch {chan close $::t441::f3}
+} err]} {
+    ok 0 "44.1 as written ($err)"
+} else {
+    ok [expr {$got eq "text"}] "44.1 as written fired (got '$got')"
+    if {$got eq "TIMEOUT"} {
+	note "so the SECOND pipe is the variable -- section 2 differs"
+	note "from this only in opening one instead of two."
+    }
+}
+
 puts "\n$failures failure(s)"
 exit $failures

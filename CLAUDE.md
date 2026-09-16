@@ -5638,6 +5638,98 @@ first, and rc's metacharacters are not sh's.** `{}` is a block, `()` is
 a list, and only `''` quotes. The same trap is waiting for any
 `-constraints`, `-match` or `-skip` argument with a space in it.
 
+#### The reproducer passed, so the diagnosis above is REFUTED
+
+`tcl-fileevent-test.tcl` reports **0 failures on the VM**. All four
+sections pass, including section 2 -- the readable fileevent on a
+`|cat -u` pipe that `chan-io-44.1` is built from.
+
+So the prediction written for it ("section 2 times out, sections 3 and
+4 pass, 9front's notifier does not watch pipes") was **wrong in every
+part**, and the question it was asked to settle is still open. The
+reasoning is kept above rather than edited away, because the *method*
+was right and produced a clean refutation in one run: 29.26 really does
+prove the pipe works, 28.x really does prove the notifier reports
+sockets, and the thing left over really was worth isolating. What it
+got wrong is that the isolation is not faithful.
+
+**Two sections were added for exactly the ways it is not faithful**,
+and they are the next thing to read:
+
+- **5a/5b: a non-blocking poll against a blocking wait.** Section 2
+  enters the event loop with `vwait`, which **blocks**. The suite's
+  `event-1.1` enters it with `testfilehandler oneevent`, which is
+  `Tcl_DoOneEvent(TCL_FILE_EVENTS|TCL_DONT_WAIT)` -- a **poll**. *A
+  notifier that only learns about readiness on the path where it is
+  about to sleep answers a blocking wait correctly and a poll not at
+  all.* `update` is the Tcl-level `DONT_WAIT`, so 5a writes to a pipe,
+  sleeps with `after` (which does not enter the loop), and then calls
+  `update`. **If 5a fails and 5b passes, that is the bug and it is one
+  function.**
+- **6: `chan-io-44.1` character for character**, including the second
+  `|cat -u` pipe its `-setup` opens and never uses, and the namespaced
+  variable. Section 2 is 44.1 *simplified*, and it passes, so the
+  difference is in what was simplified away -- which is the
+  three-differences-at-once trap from `tk-mousewheel-test.tcl` met
+  again. The second pipe is the obvious candidate and is now asked
+  about directly.
+
+All six pass on a Linux tclsh. The host caught two mistakes on the way
+there, both of them Tcl quoting: `ok {$got eq "x"}` does not
+substitute, and `step "...poll with [update]..."` **runs** `update`
+inside the message. Neither would have been visible from the VM as
+anything but a strange result.
+
+#### The full run now reaches 32 files, and something regressed
+
+With the quoting corrected, `-notfile 'l.*.test chanio.test'` works and
+the run gets through **32 files** before stopping in `event.test`,
+immediately after
+
+```
+==== event-1.1 Tcl_CreateFileHandler, reading FAILED
+---- Result was:              {0 0} {0 0} {0 0}
+---- Result should have been: {0 0} {1 0} {2 0}
+```
+
+**THAT IS EARLIER THAN THE 66-FILE RUN, AND EARLIER IS THE SIGNAL.**
+The run that produced the 195-failure table reached `io.test`, far past
+`event.test` alphabetically, and recorded `event` with **2** failures --
+so `event.test` used to start, report and *return*. It does not now.
+Something between those two runs made it stop, and the candidates are
+this round's two behaviour changes (the `shutdown()` rewrite and the two
+`_errno.c` entries) and one environment change (the loopback now
+exists, which `event.test` has socket tests for).
+
+**Do not pick between them by reading `event.test`.** The command that
+names the test is the same one that has settled this five times:
+
+```
+tcltest .../tcl-runall.tcl -singleproc 1 -file event.test -verbose t
+```
+
+**What DID move, and it is real.** Comparing per file against the
+195-failure table, over the 32 files both runs reached:
+
+| file | 195-run | now |
+|---|---|---|
+| `cmdAH` | 12 | **0** |
+| `chan` | 1 | **0** |
+| `binary` | 2 | 2 |
+| `clock` | 16 | 16 |
+| `env` | 9 | 9 |
+
+`chan-16.9` is the one that wanted `socket -server`, so the loopback
+accounts for it. **`cmdAH`'s twelve are not explained** and are worth a
+look before they are assumed to be the loopback as well -- twelve tests
+moving with no attribution is the shape that has hidden a regression
+elsewhere twice in this file.
+
+**`event-1.1` is the same shape as `chan-io-44.1` and may be the same
+bug**, which is why sections 5a/5b exist: a handler on a pipe that never
+reports, where the pipe demonstrably carries the data. If 5a fails, the
+two are one cause and the fix is in whichever path `DONT_WAIT` takes.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
