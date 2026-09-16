@@ -164,8 +164,10 @@ suite, run under `tcltest`; both harnesses exist because a fault, a
 kill and a clean finish are indistinguishable from the shell, so a run
 without a completion marker cannot be read at all.
 `tcl-fileevent-test.tcl` is a test rather than a harness -- it runs
-under plain `tclsh` and isolates the `chan-io-44.1` hang, with a
-timeout on every section so it reports where the suite would wait.
+under plain `tclsh` and isolates the `chan-io-44.1` and `event-11.5`
+hangs, with a timeout on every section so it reports where the suite
+would wait; `select-test.c` takes the two bugs it found down to the
+`select()` call underneath them.
 `sys/src/ape/lib/libressl/test/` is separate: it is
 upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
 
@@ -5791,6 +5793,110 @@ writable half of the notifier is missing outright, and every Tcl
 program that drives an output channel from the event loop -- which is
 how `http` posts a body and how any non-blocking write works -- is
 affected, not just this test.
+
+#### TWO BUGS IN select(), MEASURED -- and the prediction was half wrong
+
+The run answers both questions and contradicts the half of the
+prediction that was specific:
+
+```
+5a  FAIL  a readable pipe is reported to a non-blocking poll
+5b  PASS  a readable pipe is reported to a blocking wait
+7a  PASS  writable fileevent on a plain file fired
+7b  FAIL  a closed peer reports readable          (TIMEOUT)
+8         x (writable on the file)  = 2533503
+          y (readable on the socket) = 0
+```
+
+**5a/5b came out exactly as predicted**: the notifier learns about
+readiness only where it blocks. **7a and 8 did not.** The prediction
+said "7a fails and 8 reports `x = 0`", i.e. the writable half is the
+dead one. It is the *live* one -- `x` reached **two and a half
+million** while `y` never moved at all, and 7b names what `y` was
+waiting for.
+
+**So `event-11.5` is not a fairness problem.** One source ran
+2,533,503 times and the other zero times, and the test can only finish
+when both reach 3. That is a dead source, and section 8's two counters
+said so without anyone having to reason about scheduling.
+
+**A third fact fell out of section 8 that nothing asked for**: its
+*first* `vwait` -- plain readable on a socket the server had written to
+-- also timed out, and reported so. Section 3 of the same file passes
+the same shape. The difference is that section 3's server **stays
+open** and section 8's writes and **closes at once**. So it is not
+"readable on a socket" that is broken; it is *readable on a connection
+whose peer has gone*, which is 7b again from the other side.
+
+#### select() on Plan 9 is a copy process, and that is where to look
+
+`ap/select/` holds only `poll.c`; **`select()` itself is in
+`ap/plan9/_buf.c`**, and it is not a system call. It forks a **copy
+process** per descriptor -- `_startbuf()`, on the first `select` that
+names the fd -- which reads into a shared `Muxbuf`, and select then
+answers from
+
+```c
+if(!err && (b->n > 0 || b->eof))
+	n++;
+```
+
+rather than from the kernel.
+
+**That design makes bug 1 nearly predictable.** With `t == 0` select
+returns at the bottom of its first pass, which is *before the copy
+process it has just forked can have run*. So the first poll on a
+descriptor cannot report it ready, whatever is waiting on it.
+
+**Bug 2 is NOT explained by reading that file, and that is the point.**
+The copy process does `if(n <= 0) b->eof = 1;` -- which covers a read
+*error* as well as a zero read -- and select counts `eof` as readable.
+The code says it should work and the machine says it does not. **That
+is exactly the position the announce spelling and the missing loopback
+were in**, and both were settled by printing what the machine did
+rather than by reading more code.
+
+`sys/lib/tests/select-test.c` is that probe, in C, with no notifier, no
+channel layer and no event loop in the way. Six sections, every one
+correct on glibc, none able to hang (every `select` carries a
+two-second timeout):
+
+| | |
+|---|---|
+| 1 | a pipe with data, blocking -- the control |
+| 2 | the same pipe, **zero-timeout poll** (5a in C) |
+| 3 | **does a LATER poll see it?** |
+| 4 | a socket whose peer wrote and closed (7b in C) |
+| 5 | a socket whose peer closed having written **nothing** |
+| 6 | writable on a plain file -- the other control |
+
+**Section 3 is the one a fix turns on, and the Tcl test could not ask
+it.** "Never ready to a poll" and "not ready to the *first* poll" want
+completely different repairs, and `update` does not say how many times
+it polled. If polls 2..10 report ready, the fix is about the first call
+waiting for the copy process to exist; if none ever does, the copy
+process is not the explanation at all.
+
+**Section 5 splits bug 2 once more**, because the two shapes reach the
+copy process differently: a peer that writes before closing gives it a
+*successful* read followed by a failing one, and a peer that closes
+having written nothing makes the very first read the one that ends the
+stream. A fix for one need not be a fix for the other.
+
+**What bug 1 costs if it is what it looks like.** Every
+`Tcl_DoOneEvent(TCL_DONT_WAIT)` in every Tcl program -- which is what
+`update` is, and what `testfilehandler oneevent` is, and what any
+program polling its own event loop does -- gets "nothing is ready" on
+the first look at any descriptor. `event-1.1`'s `{0 0} {0 0} {0 0}` is
+that, exactly.
+
+**What bug 2 costs.** *End of file must be readable* -- that is how
+every program learns the other end went away, and a `read` answering 0
+is the POSIX way to say so. A connection whose peer has closed and is
+never reported readable is a program that waits for ever on a
+conversation that is already over: `http` waiting for the end of a
+response, any `-server` accepting a client that disconnects, and
+`event-11.5`.
 
 #### A skip list is not a substitute for a timeout
 
