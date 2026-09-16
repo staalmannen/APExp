@@ -504,6 +504,109 @@ main(void)
 		}
 	}
 
+	printf("\n--- 9. a SELECT-DRIVEN accept, then the closed peer ---\n");
+	/*
+	 * THE LAST STRUCTURAL DIFFERENCE BETWEEN THIS FILE AND THE TCL
+	 * TEST, and it is the reason section 9 exists at all. Sections 4,
+	 * 5, 7 and 8 all build their loopback pair with a BLOCKING
+	 * accept(), so nothing here has ever named a LISTENING descriptor
+	 * to select(). Tcl's `socket -server` has no choice but to: its
+	 * accept is an event, so the notifier selects on the listener.
+	 *
+	 * That is not a small difference on Plan 9. ap/network/listen.c
+	 * does not leave the socket's own file on the descriptor -- it
+	 * REPLACES THE FD WITH A PIPE and forks a listener process, and
+	 * its comment says why in so many words: "this is all to make
+	 * select work". accept() then reads the new connection's ctl file
+	 * name out of that pipe and WRITES "OK" BACK INTO IT, so the fd
+	 * carries a two-way handshake.
+	 *
+	 * Now put select() on it. _startbuf() forks a COPY PROCESS that
+	 * sits in _READ() on that same pipe, so a third party is reading
+	 * one direction of a handshake between two others. accept()'s own
+	 * read goes through _readbuf and so still sees the name, which is
+	 * why this can work at all -- and section 3 of the Tcl test, whose
+	 * server stays open, does work. Whether it keeps working once the
+	 * accepted end is closed straight away is exactly what 7b asks and
+	 * what nothing in C has yet reproduced.
+	 *
+	 * THIS IS A HYPOTHESIS AND IT IS LABELLED AS ONE. The last three
+	 * rounds all had a confident mechanism that one printed
+	 * intermediate refuted, so what matters here is the measurement:
+	 * if this section fails, the fault is in libap after all and the
+	 * listener pipe is where to look; if it passes, libap is clear for
+	 * every shape event-11.5 uses and the question is Tcl's.
+	 */
+	{
+		int srv, cli, acc, ready;
+		struct sockaddr_in sa;
+		socklen_t len;
+		char buf[32];
+		int n;
+
+		srv = socket(AF_INET, SOCK_STREAM, 0);
+		memset(&sa, 0, sizeof sa);
+		sa.sin_family = AF_INET;
+		sa.sin_port = 0;
+		sa.sin_addr.s_addr = inet_addr("127.0.0.1");
+		if(srv < 0
+		|| bind(srv, (struct sockaddr *)&sa, sizeof sa) < 0
+		|| listen(srv, 5) < 0)
+			note("could not listen; run socket-server-test");
+		else {
+			len = sizeof sa;
+			getsockname(srv, (struct sockaddr *)&sa, &len);
+			cli = socket(AF_INET, SOCK_STREAM, 0);
+			if(cli < 0
+			|| connect(cli, (struct sockaddr *)&sa, sizeof sa) < 0)
+				note("could not connect to our own listener");
+			else {
+				/*
+				 * The step Tcl takes and nothing here ever
+				 * has: ask select whether the LISTENER is
+				 * readable. This is what forks a copy process
+				 * onto the pipe listen() put there.
+				 */
+				ready = readable(srv, -1);
+				ok(ready == 1,
+					"a listening socket with a pending"
+					" connection is readable");
+				if(ready != 1)
+					note("so a select-driven accept can"
+						" never run, which is every"
+						" Tcl `socket -server`");
+
+				acc = accept(srv, NULL, NULL);
+				ok(acc >= 0, "accept after select returns a"
+					" connection");
+				if(acc >= 0) {
+					write(acc, "foobar\n", 7);
+					close(acc);	/* THE PEER GOES */
+
+					ready = readable(cli, -1);
+					ok(ready == 1, "the client sees the"
+						" data its peer left");
+					if(ready == 1) {
+						n = read(cli, buf, sizeof buf);
+						printf("  note drained %d\n", n);
+						ready = readable(cli, -1);
+						ok(ready == 1, "and the EOF"
+							" after it (this is"
+							" 7b end to end)");
+						if(ready == 1) {
+							n = read(cli, buf,
+								sizeof buf);
+							ok(n == 0, "the read"
+								" answers 0");
+						}
+					}
+				}
+				close(cli);
+			}
+			close(srv);
+		}
+	}
+
 	printf("\n%d failure(s)\n", fail);
 	return fail;
 }

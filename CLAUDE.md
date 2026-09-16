@@ -5977,6 +5977,98 @@ output rather than leaving it to be inferred.
 All eight sections are correct on glibc, where the extended file
 reports 0 failures.
 
+#### The poll is a FIRST-CALL race, and select() is now clear of event-11.5
+
+**The extended probe answers both open questions, and the second answer
+is the one that moves the work somewhere else entirely.**
+
+```
+2   FAIL  ... to a zero-timeout poll
+3a  note  ten more immediate polls: still not ready
+3b  PASS  a poll ONE SECOND LATER is ready
+3c  PASS  a poll straight after a blocking select agrees
+7   PASS  still readable once drained (the EOF), read answers 0
+8   note  4 selects, writable 4 times, readable 3 times
+    PASS  both sources were reported
+1 failure(s)
+```
+
+**Bug 1 is a race with the copy process, exactly as reading `_buf.c`
+predicted, and NOT "a poll never works".** 3b and 3c both pass: given a
+second, or given that a blocking select has already answered on the
+same descriptor, a zero-timeout poll reports it. So `_startbuf()` forks
+the copy process and `select()` returns on the `t == 0` arm before that
+process has been scheduled -- **the first poll on any descriptor cannot
+report it, and every later one can.** That is one function's worth of
+fix, and the "NEVER" the previous round printed would have sent it
+looking somewhere else.
+
+**And section 3a is why that round's conclusion was withdrawn**: the
+ten back-to-back polls *still* report nothing, and they still prove
+nothing, because they take microseconds. The same output line with
+3b/3c beside it now means something; alone it meant nothing at all.
+
+**SECTION 8 CLEARS `select()` OF `event-11.5`.** Four selects, writable
+four times, readable **three** -- so the socket was missed once (the
+first-call race) and reported every time after. Tcl's `x = 2533503`
+with `y = 0` is therefore **not this call misbehaving**: libap reports
+both sources, and a fix for bug 1 would only remove the one miss.
+
+Section 8 also confirms the reading of the code beside it: with a
+writable descriptor in the set, `n` is nonzero before the read loop and
+`select` returns at once, so **it never blocks and `mux->selwait` is
+never set**. Four iterations in the time C takes to count to four is
+the same spin that gives Tcl two and a half million.
+
+**`recv()` was checked and is not the gap.** `ap/network/send.c`'s
+`recv` is `read(fd, a, n)`, and `unistd/read.c` is the **only** caller
+of `_readbuf` in the whole library -- so Tcl's socket reads go through
+the copy-process buffer like everything else. Worth a minute to check
+rather than to assume; it was a plausible way for the copy process to
+eat bytes Tcl never saw, and it is closed.
+
+#### listen() replaces the fd with a PIPE, and select has never met one here
+
+**Section 9 exists because C and Tcl still disagree and only one
+structural difference is left.** Sections 4, 5, 7 and 8 all build their
+loopback pair with a **blocking `accept()`**, so nothing in this file
+had ever named a *listening* descriptor to `select()`. Tcl's
+`socket -server` has no choice but to -- its accept is an event.
+
+That is not a small difference on Plan 9. `ap/network/listen.c` does
+not leave the socket's own file on the descriptor:
+
+```c
+/* replace fd with a pipe */
+nfd = dup(fd);
+dup2(pfd[0], fd);
+```
+
+with the function's own comment reading **"this is all to make select
+work"**. A forked listener process then opens `/net/tcp/n/listen`,
+writes the new connection's **ctl file name** into the pipe, and waits
+to `read` an `"OK"` back -- `accept()` supplies it. The descriptor
+carries a **two-way handshake between two processes**.
+
+Now put `select()` on it. `_startbuf()` forks a **copy process** that
+sits in `_READ()` on that same pipe, so a third party is reading one
+direction of someone else's handshake. It can work -- `accept()`'s own
+read goes through `_readbuf` and so still sees the name, which is why
+section 3 of the Tcl test, whose server stays open, passes. Whether it
+keeps working when the accepted end is closed immediately is precisely
+what 7b asks and what no C section had reproduced.
+
+**This is a hypothesis and section 9 labels it as one.** The last three
+rounds each had a confident mechanism that one printed intermediate
+refuted, so the measurement is what counts: **fail and the fault is in
+libap after all, with the listener pipe the place to look; pass and
+libap is clear for every shape `event-11.5` uses, and the question
+belongs to Tcl's notifier and channel layer.** Either answer ends the
+search on this side, which is why it is worth a run.
+
+All nine sections are correct on glibc, where the file reports 0
+failures.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
