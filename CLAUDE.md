@@ -5227,6 +5227,59 @@ missing feature in libap, and the answer was a line of network
 configuration.** What turned it round was printing what the machine
 says rather than what the code implies -- the probe, not the reasoning.
 
+**CONFIRMED.** After `ip/ipconfig loopback /dev/null 127.1` the test
+reports **0 failures**: bind succeeds, a real port is assigned (53941),
+listen succeeds, `/net/ipselftab` grows `127.0.0.0`, `127.0.0.1` and
+`127.255.255.255`, and section 2 now answers
+
+```
+YES  "announce 0"            YES  "announce 127.0.0.1!0"
+YES  "announce *!0"          YES  "bind 127.0.0.1!0"
+no   "announce tcp!*!0"   -> bad ip address syntax
+```
+
+**`bind 127.0.0.1!0` is accepted, which is new information about the
+fallback.** `bind.c`'s comment says "some 9front network stacks reject
+the standalone bind control message" -- this stack does not, so the
+primary path works and the announce fallback is dead code here. It
+stays, because the comment is about *some* stacks and this is one
+machine; but nothing on this VM exercises it, so it is not covered by
+anything we run.
+
+`announce tcp!*!0` is still refused: the control file does not take a
+protocol prefix. Worth knowing before anyone "fixes" the address
+syntax in `_sock_inaddr2string`, which is correct as it stands.
+
+#### Do not put ip/ipconfig in apexp-sh
+
+Asked and answered once, so it does not get asked again. **`apexp-sh`
+opens with `rfork en`**, and every other thing it does --
+`mount-include` and the four `bind -b` lines -- is **namespace-local**
+and gone when the shell exits. `ip/ipconfig` writes to `/net`, a kernel
+device rather than a namespace mount: it would change the whole
+machine's network stack for every process and leave it changed
+afterwards. That would be the only line in the script with that
+property, and a shell wrapper that silently reconfigures the network is
+a surprise for someone who meant to build a program.
+
+Two smaller reasons: it can fail where `/net` is not writable (a cpu
+server, say), and `apexp-sh` would then print an error on every launch
+for something most users never need; and **whether re-running it on an
+already-configured loopback is a clean no-op or adds a duplicate is not
+known here** -- which is exactly the sort of thing to measure before
+putting it in a startup path.
+
+**It belongs in the machine's own startup** (`/rc/bin/termrc` or
+wherever the network is configured), because a machine with no loopback
+is misconfigured for anything that uses one, not just APExp. This was
+never an APExp bug.
+
+The diagnosis is already in the right place: `socket-server-test.c`
+prints `/net/ipselftab` and names the command when 127.0.0.1 is
+missing, so **the thing that needs the loopback is the thing that says
+it is absent** -- better than a check in `apexp-sh` that runs for
+everyone regardless.
+
 **Do NOT make `bind()` fall back to `*` when the requested address is
 not local.** It would make these tests pass and it would silently widen
 a loopback-only server to every interface -- inventing semantics in the
