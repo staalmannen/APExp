@@ -169,6 +169,56 @@ main(void)
 
 	close(s);
 
+	printf("\n--- 1a. which addresses does this machine call its own? ---\n");
+	/*
+	 * THE ANSWER TO SECTION 1 TURNED OUT TO BE A CONFIGURATION
+	 * QUESTION, NOT A LIBRARY ONE. The first run of this test said
+	 *
+	 *	FAIL bind(127.0.0.1, port 0)  plan 9 says: not a local IP address
+	 *	YES  "announce 0" accepted
+	 *	YES  "announce *!0" accepted
+	 *
+	 * -- binding to ANY address works and binding to the loopback
+	 * does not, because the stack does not think 127.0.0.1 belongs to
+	 * it. /net/ipselftab is the list it decides that from, so print it
+	 * rather than asking for another round trip.
+	 *
+	 * On 9front the loopback is configured by
+	 *
+	 *	ip/ipconfig loopback /dev/null 127.1
+	 *
+	 * which the standard startup normally does. If 127.0.0.1 is
+	 * absent below, that line is the whole fix and no C changes are
+	 * needed for any of it.
+	 */
+	{
+		int f;
+		char buf[1024];
+		ssize_t n;
+
+		f = open("/net/ipselftab", O_RDONLY);
+		if(f < 0)
+			printf("  no /net/ipselftab (%s)\n", strerror(errno));
+		else {
+			n = read(f, buf, sizeof buf - 1);
+			close(f);
+			if(n <= 0)
+				printf("  /net/ipselftab is empty\n");
+			else {
+				buf[n] = '\0';
+				printf("%s", buf);
+				if(strstr(buf, "127.0.0.1") != NULL)
+					printf("  -> 127.0.0.1 IS local; a bind to it"
+						" should work\n");
+				else
+					printf("  -> 127.0.0.1 is NOT listed, which is"
+						" exactly what\n     \"not a local IP"
+						" address\" means. Try:\n"
+						"        ip/ipconfig loopback /dev/null 127.1\n");
+			}
+		}
+	}
+
 	printf("\n--- 2. what the Plan 9 stack actually accepts ---\n");
 	/*
 	 * THE DECISIVE SECTION. ap/network/bind.c writes one of these

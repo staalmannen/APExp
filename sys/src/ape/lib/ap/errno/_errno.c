@@ -101,6 +101,27 @@ static struct errmap {
 	{ENOBUFS,	"insufficient buffer space"},
 	{EOPNOTSUPP,	"operation not supported"},
 	{EADDRINUSE,	"address in use"},
+
+	/*
+	 * From the IP stack, and MEASURED rather than copied out of a
+	 * header: sys/lib/tests/socket-server-test.c writes each spelling
+	 * of an announce message to /net/tcp/clone and prints errstr for
+	 * each. These two are what 9front answered.
+	 *
+	 * "not a local IP address" is the one that mattered. Without it
+	 * the error fell through to EPLAN9 and bind.c turned that into
+	 * EOPNOTSUPP, so Tcl reported "couldn't open socket: operation
+	 * not supported" -- which reads as "this system has no sockets"
+	 * and cost several rounds of believing exactly that. The sockets
+	 * are fine; the ADDRESS was not local. EADDRNOTAVAIL is POSIX's
+	 * "Cannot assign requested address" and says so.
+	 *
+	 * Putting them here rather than special-casing bind() is what
+	 * makes connect(), sendto() and everything else report it too.
+	 */
+	{EADDRNOTAVAIL,	"not a local IP address"},
+	{EINVAL,	"bad ip address syntax"},
+
 	{EGREG,		"unnamed error message"},
 };
 
