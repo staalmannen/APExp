@@ -5,6 +5,15 @@ LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 
 # split malloc into malloc, free and realloc
 
+# mksyslib makes every object depend on $HFILES AND NOTHING ELSE -- mk
+# does not scan #includes -- so a header left out of this list is a
+# header that changes nothing. malloc_impl.h carries the block layout
+# shared by malloc.c, free.c and realloc.c, which is precisely the kind
+# of edit that must not reach only one of them.
+HFILES=\
+	malloc_impl.h\
+	malloc_align.h\
+
 OFILES=\
 	calloc.$O\
 	malloc.$O\
