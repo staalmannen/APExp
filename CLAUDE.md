@@ -5204,10 +5204,28 @@ ip/ipconfig loopback /dev/null 127.1
 ```
 
 which the standard startup normally does. `socket-server-test.c`
-section 1a prints that table and says which way it came out, so the
-next run answers the configuration question without another round trip.
-**If 127.0.0.1 is absent, that one line is the whole fix** and none of
-the C below was needed for it.
+section 1a prints that table and says which way it came out.
+
+**CONFIRMED: THE LOOPBACK IS NOT CONFIGURED ON THIS VM.** The whole of
+`/net/ipselftab`:
+
+```
+10.0.0.0        224.0.0.1       10.0.2.255      ff02::1     10.0.2.0
+fec0::5054:ff:fe12:3456         ff02::1:ff12:3456
+fe80::5054:ff:fe12:3456         10.0.2.15
+255.255.255.255                 10.255.255.255
+```
+
+Ten addresses and **no 127.0.0.1**, which is exactly what "not a local
+IP address" means. `10.0.2.15` is the QEMU user-mode address, so the
+machine has a network; it simply has no loopback. **That one
+`ip/ipconfig` line is the fix for the 86 `http11` failures and both
+hangs**, and no C change was needed for any of it.
+
+That is worth keeping as a shape: **three rounds of this looked like a
+missing feature in libap, and the answer was a line of network
+configuration.** What turned it round was printing what the machine
+says rather than what the code implies -- the probe, not the reasoning.
 
 **Do NOT make `bind()` fall back to `*` when the requested address is
 not local.** It would make these tests pass and it would silently widen
@@ -5243,9 +5261,51 @@ they are the strings the probe printed:
 ```
 
 **In the table rather than special-cased in `bind()`**, so `connect()`,
-`sendto()` and everything else report it too. `bind.c`'s
-`EPLAN9 -> EOPNOTSUPP` fallback is left alone: it only fires for errors
-nothing recognises, and the specific case is now matched before it.
+`sendto()` and everything else report it too. The errno reads
+`48: Address not available` on the VM now, confirmed.
+
+#### ADDING TO THAT TABLE CHANGES CONTROL FLOW, WHICH THIS DID NOT NOTICE
+
+`bind.c`'s announce fallback is gated on
+
+```c
+_syserrno();
+if(errno == EPLAN9){		/* i.e. "nothing recognised this" */
+	... close, reopen, "announce" instead ...
+```
+
+so **naming an error in the table stops the fallback running for it**.
+A change that looks like pure naming is a change of behaviour, and it
+was not predicted.
+
+The tell was in the test's own output, across the two runs:
+
+```
+FAIL bind(127.0.0.1, port 0)   not a local IP address
+FAIL listen(backlog 5)         connection in use      <- before
+
+FAIL bind(127.0.0.1, port 0)   Address not available
+PASS listen(backlog 5)                                 <- after
+```
+
+**`listen` moved from FAIL to PASS on a socket with no address and no
+port**, because bind no longer makes the second announce attempt that
+used to leave the connection in a state listen then tripped over.
+
+It is the right way round for these two entries -- an address the stack
+does not own, and one it cannot parse, would fail an `announce`
+identically, so retrying buys nothing and only muddies the errno. **But
+before adding another entry, ask whether `announce` might have
+succeeded where `bind` did not**: that case is the whole reason the
+fallback exists, and naming its error would silently disable it. The
+comment in `bind.c` says so at the gate.
+
+**And that PASS was hollow, which the test should not have printed.**
+The sequence is bind *then* listen; once bind has failed, what listen
+does next is undefined and its result is evidence of nothing.
+`socket-server-test.c` skips it now and says why. **"A check that
+cannot fail is not a check" has a twin: a check that can PASS for the
+wrong reason**, and this is the first instance of it in this file.
 
 #### chan-io-28.7, and the hypothesis was wrong by twenty tests
 

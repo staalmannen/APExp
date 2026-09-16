@@ -69,6 +69,24 @@ bind(int fd, void *a, int alen)
 			 * listen() when it requested port zero, so merely deferring the
 			 * operation loses the assigned port.  Announce now and let
 			 * listen() only start its accept proxy.
+			 *
+			 * NOTE THIS IS GATED ON EPLAN9, WHICH MEANS "AN ERROR
+			 * NOTHING RECOGNISED" -- so adding an entry to the table
+			 * in ap/errno/_errno.c STOPS THIS FALLBACK RUNNING for
+			 * that error.  That is a control-flow change out of what
+			 * looks like a pure naming change, and it was not noticed
+			 * until socket-server-test.c reported listen() moving from
+			 * FAIL to PASS across the commit that named "not a local
+			 * IP address".
+			 *
+			 * It is the right way round for the two entries added so
+			 * far: an address the stack does not own, and an address
+			 * it cannot parse, would fail an "announce" identically,
+			 * so retrying buys nothing and only muddies the errno.
+			 * But BEFORE ADDING ANOTHER ENTRY, ask whether "announce"
+			 * might have succeeded where "bind" did not -- that case
+			 * is the whole reason this fallback exists, and naming its
+			 * error here would silently disable it.
 			 */
 			close(cfd);
 			cfd = open(r->ctl, O_RDWR);
