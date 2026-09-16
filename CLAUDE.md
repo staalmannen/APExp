@@ -5898,6 +5898,85 @@ conversation that is already over: `http` waiting for the end of a
 response, any `-server` accepting a client that disconnects, and
 `event-11.5`.
 
+#### ONE BUG, NOT TWO: select() handles a closed peer correctly
+
+**The probe ran, and it refuted more of the prediction than it
+confirmed.**
+
+```
+1  PASS  a pipe with bytes in it is readable to a blocking select
+2  FAIL  ... to a zero-timeout poll
+3  FAIL  ten more polls, still not ready
+4  PASS  a closed peer with data pending is readable   (read gave 7)
+5  PASS  a closed peer with no data is readable        (read gave 0)
+6  PASS  a file open for writing is writable
+2 failure(s)
+```
+
+**Bug 1 is real and is in `select()`.** A zero-timeout poll does not
+report a pipe that a blocking select on the same descriptor reports
+immediately. That is `event-1.1`, `update`, and every
+`Tcl_DoOneEvent(TCL_DONT_WAIT)` in every Tcl program.
+
+**BUG 2 DOES NOT EXIST AT THIS LEVEL, and that is the useful half.**
+Sections 4 and 5 both pass -- a connection whose peer has closed is
+reported readable with data pending *and* with nothing written, and the
+`read` that follows answers 7 and 0 exactly as POSIX requires. So
+`_buf.c`'s `if(n <= 0) b->eof = 1;` does what reading it said it did,
+and the code being right was not the illusion; **the Tcl-level 7b
+failure is somewhere above `select()`**, which is a completely
+different place to look and was worth one run to learn.
+
+**Section 3's answer had to be thrown away, and it is my mistake rather
+than the machine's.** It polled ten more times *back to back* and
+printed **"NEVER, not merely late"**. Ten zero-timeout selects take
+**microseconds**, and the polling process never yields -- so a copy
+process that has only just been forked has not been scheduled either,
+and the negative answer has a second explanation. **A check whose
+negative result has two explanations is not a check**, which is the
+"a check that cannot fail is not a check" rule in its other form, and
+the third time this file has had to record it.
+
+It is three cases now and they separate cleanly: **3a** the ten
+immediate polls, kept for the record; **3b** a poll after `sleep(1)`,
+so lateness is impossible; and **3c** the decisive one -- **a poll
+immediately after a blocking select on the same descriptor has already
+answered ready.** By then `b->n > 0` is a fact and the copy process
+demonstrably exists, and the poll reads the identical test. If 3c still
+fails, the copy process is not the explanation at all and no amount of
+waiting for it would help.
+
+**Sections 7 and 8 close the gap the run opened**, because every
+descriptor in it behaves correctly *on its own* and Tcl's do not:
+
+- **7 is the state section 4 skipped.** 4 selects once, finds seven
+  bytes waiting, and reads them. Tcl's 7b then *drains the line and
+  asks again* -- and with the data gone the only thing left to report
+  is the end of file. Those are different fields (`b->n > 0` against
+  `b->eof`) joined by one `||`, so they can come apart. Reading a
+  passing section as covering the case after it is the
+  `textDisp-6.5`/`6.6` mistake.
+- **8 is `event-11.5` in C**, the two descriptors in the *same* select.
+  Two things in `_buf.c` make the mixed set worth suspecting rather
+  than assuming: the writable count is added to `n` **before** the read
+  loop and the function returns as soon as `n` is nonzero, so **a
+  select carrying any writable descriptor never blocks** -- it becomes
+  a spin, `mux->selwait` is never set, and the copy process's wakeup
+  path is never used; and a descriptor the read loop finds not ready is
+  `FD_CLR`'d into `mux->rwant`, which the early return then discards.
+  `x = 2533503` is exactly what a select that always returns at once
+  looks like from Tcl.
+
+**Both outcomes of 8 are worth having, which is the point of running
+it.** `nread` at 0 while `nwrite` climbs reproduces the Tcl failure in
+C and puts the fault in libap. **Both climbing exonerates `select()`**
+and moves the question up to Tcl's notifier and channel layer -- a
+result just as useful as the other, and the file says so in its own
+output rather than leaving it to be inferred.
+
+All eight sections are correct on glibc, where the extended file
+reports 0 failures.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
