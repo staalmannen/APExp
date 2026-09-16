@@ -1,12 +1,12 @@
 Tests running in interp:  /usr/glenda/APExp/sys/src/ape/cmd/tclsh/tcltest
 Tests located in:  /usr/glenda/APExp/sys/src/external/tcl/tests
-Tests running in:  /usr/glenda/APExp/sys/src/ape/cmd/tclsh
-Temporary files stored in /usr/glenda/APExp/sys/src/ape/cmd/tclsh
+Tests running in:  /usr/glenda/APExp/sys/src/external/tcl/tests
+Temporary files stored in /usr/glenda/APExp/sys/src/external/tcl/tests
 Test files run in separate interpreters
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-09 17:29:26 +0200
+Tests began at 2026-09-16 04:32:47 +0200
 aaa_exit.test
 abstractlist.test
 append.test
@@ -49,7 +49,6 @@ binary.test
 1
 ==== binary-53.26 FAILED
 
-Test file error: tcltest 69507: Killed: Insufficient physical memory
 brodnik.test
 chan.test
 
