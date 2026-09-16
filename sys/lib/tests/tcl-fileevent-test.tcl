@@ -71,6 +71,18 @@ proc note {what} {
     flush stdout
 }
 
+# A flushed marker before a single STATEMENT, where `step` marks a whole
+# section. Section 7c needs this: it stopped being a TIMEOUT and became
+# a FREEZE, and a freeze means the process is blocked in a call rather
+# than waiting in the event loop -- `waitfor`'s timer cannot fire if
+# nothing reaches the loop. So the last `at:` line names the statement
+# that did not return, which is the one thing the section could not say
+# for itself.
+proc at {what} {
+    puts "    at: $what"
+    flush stdout
+}
+
 # Wait for ::done to be set, but never longer than $ms. Returns the
 # value, or the string TIMEOUT. THIS IS THE WHOLE REASON THE FILE CAN
 # BE RUN AT ALL: the suite's version of each case below has no timeout.
@@ -400,80 +412,97 @@ if {[catch {
     }
 }
 
-step "7b. readable fileevent at END OF FILE (peer closed)"
+step "7b. readable at END OF FILE, peer REALLY accepted and closed"
+# THE CONTROL, AND IT RUNS FIRST NOW. It used to be 7c, after the
+# upstream-shaped case -- and when that case stopped merely failing and
+# began to FREEZE, the control never ran at all. **Every case expected
+# to return must come before every case expected to hang**, which this
+# file's own header says and which the ordering broke; one wasted run.
+#
+# select-test.c's closedpeer() does a blocking accept before writing
+# and closing, and its sections 4, 5, 7 and 9 all pass on the VM. So if
+# this passes and 7c does not, the fault is NOT "a closed peer is never
+# readable" -- it is a connection ABANDONED IN THE ACCEPT QUEUE, which
+# is a different thing and is what upstream's event-11.5 depends on.
+#
+# THE HANDLER HAS TO READ BEFORE ASKING [eof], and the first version of
+# this did not. Tcl's `eof` reports whether a read has ALREADY hit the
+# end, not whether the peer has gone -- so a handler that only asks
+# `eof $ch` answers "data" both on the fire carrying the line and on the
+# fire carrying the end of file. The host caught it, as it should.
 if {[catch {
-    #
-    # UPSTREAM'S SHAPE, deliberately: event-11.5 closes the listener
-    # with the connection never accepted, so this does too. Section 7c
-    # below is the same question with a peer that really accepted.
-    #
+    set cli7b [closedpeer 1]
+    if {$cli7b eq ""} {
+	error "the server never accepted the connection"
+    }
+    set ::done TIMEOUT
+    fileevent $cli7b readable [list apply {{ch} {
+	gets $ch
+	if {[eof $ch]} {
+	    fileevent $ch readable {}
+	    set ::done eof
+	}
+    }} $cli7b]
+    set got [waitfor 3000]
+    catch {close $cli7b}
+} err]} {
+    ok 0 "readable at EOF, peer accepted ($err)"
+} else {
+    ok [expr {$got eq "eof"}] "an accepted-and-closed peer reports readable (got '$got')"
+}
+
+step "7c. UPSTREAM'S SHAPE: the listener closed, never accepted"
+# event-11.5's own setup, and **the case that now freezes rather than
+# failing**. Before the listen() fix it reported TIMEOUT: the handler
+# never fired, the event loop kept running, and `waitfor`'s timer ended
+# the wait. Now nothing comes back at all -- so the process is blocked
+# in a CALL, and the event loop is never reached for the timer to fire.
+#
+# A section cannot report which of its own statements blocked, so this
+# one marks each with `at:` and the last one printed is the answer. That
+# is tk-scrollbar-hang-test.tcl's technique, and it is the only thing
+# that has ever settled a question of this shape here in one run.
+#
+# The suspects, in the order they are marked: the listener now exits
+# when the parent closes the listening socket, so `close $srv7` is
+# doing something it never did before; and the client now reaches a
+# real end of file, so `gets` in the handler is running against a
+# channel state it never saw. Both are new since the fix, and only one
+# printed line separates them.
+if {[catch {
+    at "socket -server"
     set srv7 [socket -server {apply {{ch a p} {
 	puts $ch foobar
 	close $ch
     }}} -myaddr 127.0.0.1 0]
+    at "socket 127.0.0.1 (connect)"
     set cli7 [socket 127.0.0.1 [lindex [fconfigure $srv7 -sockname] 2]]
+    at "close \$srv7 (the listener)"
     close $srv7
-    #
-    # THE HANDLER HAS TO READ BEFORE ASKING [eof], and the first version
-    # of this section did not. Tcl's `eof` reports whether a read has
-    # ALREADY hit the end, not whether the peer has gone -- so a handler
-    # that only asks `eof $ch` answers "data" on the fire that delivers
-    # the line AND on the fire that delivers the end of file, and the
-    # section failed with 'data' against a channel behaving perfectly.
-    # The host caught it, as the convention says it should.
-    #
-    # So this drains and stays registered: the line arrives on one fire,
-    # the EOF on the next, which is select-test.c section 7 in Tcl.
+    at "fileevent readable"
     set ::done TIMEOUT
     fileevent $cli7 readable [list apply {{ch} {
+	at "handler: gets"
 	gets $ch
+	at "handler: eof?"
 	if {[eof $ch]} {
 	    fileevent $ch readable {}
 	    set ::done eof
 	}
     }} $cli7]
+    at "waitfor"
     set got [waitfor 3000]
+    at "close \$cli7"
     catch {close $cli7}
+    at "done"
 } err]} {
-    ok 0 "readable at EOF ($err)"
+    ok 0 "readable at EOF, listener closed unaccepted ($err)"
 } else {
-    ok [expr {$got eq "eof"}] "a closed peer reports readable (got '$got')"
+    ok [expr {$got eq "eof"}] "an abandoned accept queue reports readable (got '$got')"
     if {$got eq "TIMEOUT"} {
-	note "the listener closed with the connection never accepted, and"
-	note "the notifier never said so. Section 7c is the same question"
-	note "with a peer that really did accept, write and close."
-    }
-}
-
-step "7c. the same, but the peer REALLY accepted and closed"
-# THE CONTROL 7b NEEDS, and the one C has been measuring all along:
-# select-test.c's closedpeer() does a blocking accept before writing
-# and closing, and sections 4, 5, 7 and 9 all pass on the VM. So if 7c
-# passes here and 7b does not, the fault is NOT "a closed peer is never
-# readable" -- it is a connection ABANDONED IN THE ACCEPT QUEUE, which
-# is a different thing and is what upstream's event-11.5 depends on.
-if {[catch {
-    set cli7c [closedpeer 1]
-    if {$cli7c eq ""} {
-	error "the server never accepted the connection"
-    }
-    set ::done TIMEOUT
-    fileevent $cli7c readable [list apply {{ch} {
-	gets $ch
-	if {[eof $ch]} {
-	    fileevent $ch readable {}
-	    set ::done eof
-	}
-    }} $cli7c]
-    set got [waitfor 3000]
-    catch {close $cli7c}
-} err]} {
-    ok 0 "readable at EOF, peer accepted ($err)"
-} else {
-    ok [expr {$got eq "eof"}] "an accepted-and-closed peer reports readable (got '$got')"
-    if {$got eq "eof"} {
-	note "so a real closed peer IS reported, and 7b's case is the"
-	note "abandoned accept queue rather than the close."
+	note "the handler never fired and the event loop kept running, so"
+	note "this is a silent source rather than a blocked process -- the"
+	note "shape it had BEFORE the listen() fix."
     }
 }
 
