@@ -159,7 +159,10 @@ with `wish` -- except `tk-menubar-test.tcl`, which needs `tktest` and
 skips itself under `wish`, and `tk-transient-test.tcl`, whose last
 section alone does; see the Tk section below. `tk-runall.tcl` is the harness for
 Tk's own suite rather than a test of its own, and `tk-runtest.tcl` runs
-a single file from it. `sys/src/ape/lib/libressl/test/` is separate: it is
+a single file from it. `tcl-runall.tcl` is the same thing for Tcl's own
+suite, run under `tcltest`; both harnesses exist because a fault, a
+kill and a clean finish are indistinguishable from the shell, so a run
+without a completion marker cannot be read at all. `sys/src/ape/lib/libressl/test/` is separate: it is
 upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
 
 Beyond that, testing is still mostly ad-hoc — compile a program under
@@ -4805,18 +4808,63 @@ Run from `sys/src/ape/cmd/tclsh`:
 ./tcltest $home/APExp/sys/src/external/tcl/tests/all.tcl >/tmp/tcl-all.out 2>&1
 ```
 
+**Use the harness, not that command.** `sys/lib/tests/tcl-runall.tcl` is
+the counterpart of `tk-runall.tcl` and exists for the same reason: a
+fault, a kill and a clean finish all just give the shell prompt back,
+so without a completion marker a log cannot be read at all. It sets
+line buffering, wraps `::exit` for the marker, and carries the skip
+list below.
+
+```
+cd sys/src/external/tcl/tests
+$home/APExp/sys/src/ape/cmd/tclsh/tcltest \
+	$home/APExp/sys/lib/tests/tcl-runall.tcl >/tmp/tcl-all.out >[2=1]
+```
+
 **It does not finish**, and that is the most important result in it. Of
-167 test files it reaches six -- `binary.test` is killed and the run
-stops during `chanio.test`, with no summary line:
+167 test files it reaches twelve; the run stops in the middle of
+`chanio.test` with no summary line.
 
-```
-Test file error: tcltest 69507: Killed: Insufficient physical memory
+**A KILLED FILE AND A HUNG FILE ARE COMPLETELY DIFFERENT HERE, and the
+first round of reading this log ran them together.** Tcl's `all.tcl`
+leaves `-singleproc` at its default of **0**, so tcltest runs each file
+in **its own process** and reads the child's output through a pipe
+(`tcltest.tcl:2940`):
+
+```tcl
+set cmd [linsert $childargv 0 | $shell $file]
+set pipeFd [open $cmd "r"]
+while {[gets $pipeFd line] >= 0} { ... }
+close $pipeFd
 ```
 
-That note is the 9front kernel refusing to grow the process, and the
-same wall is expected to stop bash on a configure script. **Do not read
-the failure list as a survey**: it covers the first 4% of the suite in
-alphabetical order, so everything after `chanio` is simply unmeasured.
+- **A child that dies costs only itself.** `close` raises, tcltest
+  catches it, prints `Test file error: ...` and goes on. That is
+  exactly what the allocator's OOM does to `binary.test`, and the log
+  proves it -- `brodnik.test` is the very next line after
+  `Test file error: tcltest 69507: Killed: Insufficient physical
+  memory`.
+- **A child that hangs costs every file after it.** That `gets` is
+  blocking and there is no timeout anywhere in tcltest, so the parent
+  sits in it forever writing nothing more.
+
+**So the OOM was never what stopped the run**, and CLAUDE.md's own
+earlier advice -- "skip the files that cannot fit in the VM so the
+other 161 are measured" -- was written before anyone read that loop and
+assumed a kill was fatal to the whole suite. It is `chanio.test`
+hanging that costs the other 155 files, and skipping *that* is what
+buys a measurement. **Read the loop that runs the tests before drawing
+conclusions from the shape of the log.**
+
+`chanio.test` is full of `openpipe` and blocking `chan gets` against a
+child `cat`, and the `chan-io-6.4x` cluster beside it reports a
+blocking `gets` answering `-1` where it should have returned a line --
+so a `gets` that never returns is what to expect there. **That is a
+hypothesis, not a finding.** Run the file on its own with `-verbose t`
+and the log will name the test, the way one line settled `unixWm-50.5`.
+
+**Do not read the failure list as a survey**: it covers the first 7% of
+the suite in alphabetical order.
 
 Two findings, both worth a test of their own.
 
@@ -4863,19 +4911,85 @@ own class and nowhere else. So
 Growth by realloc is how every interpreter builds a big string, so this
 is the shape behind the OOM.
 
-**Splitting is the obvious fix and does not work as written.** A block
-of class k occupies `16 + 2**k` bytes -- the header is padded to 16 for
-`max_align_t` -- so two class-k blocks need `32 + 2**(k+1)`, which is
-sixteen bytes **more** than the class-(k+1) block they would be carved
-from. The layout has no room for it, which is presumably why Plan 9
-never did it. Making this allocator return memory means changing the
-block layout or replacing the allocator.
+#### realloc extends at the top of the heap now, and that was the half that mattered
 
-`sys/lib/tests/malloc-reuse-test.c` measures it through `sbrk(0)` --
-what the process took from the kernel, which is the quantity the note is
-about, rather than what malloc believes it handed out. Its sizes are
-under glibc's 128 KB mmap threshold on purpose, so both assertions hold
-on glibc, which is how it was checked.
+**The third bullet is fixed and the second is not**, and measuring the
+two separately is what decided which to do. Building the three files on
+the build host against a private `sbrk` -- the same technique as the
+libm work -- gives the numbers before and after:
+
+| | before | after |
+|---|---|---|
+| growing 1 KB -> 1 MB by realloc | 2005575 bytes | **1075488** |
+| peak heap for one 32 MB string | 62 MB | **32 MB** |
+| three 32 MB strings, total heap | 64 MB | **58 MB** |
+| random alloc/realloc/free, 400k ops | 81.6 MB | 81.6 MB |
+
+`realloc` now asks whether the block is the **last thing on the heap**
+and, if so, extends the break instead of allocating a new block,
+copying, and stranding the old one on its class's free list. A buffer
+being grown by doubling nearly always is the last thing on the heap, so
+the whole strand ladder disappears. `_malloc_growtop` in `malloc.c`.
+
+**MEMORY ALREADY OWNED MUST BEAT MEMORY FROM THE KERNEL, and the first
+cut of this got it backwards.** Without a check that the target class's
+free list is empty, extending at the break walks straight past the
+block the *previous* string freed: three 32 MB strings in a row cost
+**97 MB** where the unfixed allocator cost 64. Every other number in
+the table improved at the same time, so only the total said so. That is
+section 4 of the test, and removing the check makes it fail and nothing
+else does -- checked, because a check that cannot fail is not a check.
+
+Two smaller things went with it, and the first is a prerequisite:
+
+- **each large allocation leaked its own alignment slack.** The code
+  sbrk'd `size+15` and aligned *inside* the block, throwing the gap
+  away -- measurably 47 bytes of overhead on a 1 MB block where the
+  layout says 32. It also meant a block did not *end* where the break
+  was, so the top-of-heap test above could never have matched.
+  `_malloc_brk` aligns the break itself, which costs the gap once.
+- **`1<<pow` is an `int`**, so for `pow` 31 it is signed overflow; it
+  converts to a vast `size_t` and every allocation above 1 GB quietly
+  failed. `(size_t)1<<pow` throughout.
+
+**Splitting is the obvious fix for the second bullet and does not
+work.** A block of class k occupies **`32 + 2**k`** bytes -- a 16-byte
+header padded for `max_align_t`, the payload, the whole rounded up to
+16 -- so two class-k blocks need `64 + 2**(k+1)`, **thirty-two** bytes
+more than the single `32 + 2**(k+1)` they would be carved from.
+Tightening the padding does not rescue it: with an exact `16 + 2**k`
+stride two still need `32 + 2**(k+1)` against `16 + 2**(k+1)`. A header
+living outside the power of two cannot buddy-split, whatever the
+padding.
+
+**Corrected:** this used to say `16 + 2**k` and so understated the
+slack by sixteen bytes a block. The conclusion survives and the
+arithmetic did not -- **the stride is one line to measure and was
+derived instead.**
+
+And splitting is not clearly wanted even so. Searching upward for any
+larger free block means a 1 KB request shreds a 64 MB block that
+nothing can reassemble, there being no coalescing; so it would have to
+be bounded, and bounded splitting buys much less than the realloc
+change did. Section 5 of the test is the adversary that would show it.
+
+**The block layout now lives in one place**, `malloc_impl.h`. It used
+to be copied verbatim into `malloc.c`, `free.c` and `realloc.c`, and
+realloc.c's copy had already drifted -- it carried a `static Arena
+arena` that nothing used, beside the real `__malloc_arena` the other
+two share. Three copies of a struct layout is the `HFILES` trap in
+miniature. **And `HFILES` in that mkfile was empty**, so the new header
+is listed there; without it `mk` rebuilds nothing when the layout
+changes, which is precisely how Tk's event source broke once.
+
+`sys/lib/tests/malloc-reuse-test.c` measures all of this through
+`sbrk(0)` -- what the process took from the kernel, which is the
+quantity the note is about, rather than what malloc believes it handed
+out. **Checking it against glibc first caught a bad assertion**, as the
+convention says it should: "the finished buffer is reusable at its own
+size" is not a library rule but an allocator policy, and glibc hands a
+block that size back to the kernel instead. It is reported, not
+asserted.
 
 **The rest of the list is not new work.** `chan-16.9` wants
 `socket -server`, which libap answers `ENOTSUP`; the seven
@@ -4884,9 +4998,19 @@ on glibc, which is how it was checked.
 remain, on a pipe and on a file alike. Tcl channels use `read`/`write`
 directly, not stdio, so the stdio work above is not implicated.
 
-**Getting a full run is the first job here**, not fixing the ten. Skip
-the files that cannot fit in the VM (`bigdata.test`, and `binary.test`
-until the allocator is dealt with) so the other 161 are measured at all.
+**Getting a full run is the first job here**, not fixing the ten -- and
+the thing in the way is `chanio.test` hanging the parent, not the OOM.
+`tcl-runall.tcl` skips that one file and says so loudly; take it out of
+the skip list the moment the `chan-io-6.4x` cluster is understood.
+
+**What to expect of the next run, written down before it happens so it
+can be wrong on the record:** with `chanio.test` skipped the run should
+reach all 167 files and print the marker, giving the first real total
+this suite has ever produced -- and like Tk's first complete run, **the
+failure count will look enormous compared to the ten above, and that is
+measurement, not regression.** `binary.test` may or may not survive on
+the halved peak; the honest answer is that it is a prediction. If it is
+still killed, the log will say so on its own line and cost nothing else.
 
 ### Build order for compiler changes
 ```

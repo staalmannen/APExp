@@ -3,52 +3,14 @@
 #include <string.h>
 
 #include <lock.h>
-
-enum
-{
-	MAGIC		= 0xbada110c,
-	MAX2SIZE	= 32,
-	CUTOFF		= 12,
-};
-
-#define NPAD(t, align) \
-	((sizeof(t) + align - 1) & ~(align - 1))
-typedef struct Bucket Bucket;
-typedef struct Header Header;
-struct Header {
-	int	size;
-	int	magic;
-	Bucket	*next;
-};
-
-struct Bucket
-{
-	union {
-		Header;
-		char _pad[NPAD(Header, 16)];
-	};
-	char	data[1];
-};
-
-typedef struct Arena Arena;
-struct Arena
-{
-	Bucket	*btab[MAX2SIZE];	
-	Lock;
-};
-static Arena arena;
-
-#define datoff		((int)((Bucket*)0)->data)
-#define nil		((void*)0)
-
-extern	void	*sbrk(unsigned long);
-
+#include "malloc_impl.h"
 
 void*
 realloc(void *ptr, size_t n)
 {
 	void *new;
 	size_t osize;
+	int pow;
 	Bucket *bp;
 
 	if(ptr == nil)
@@ -59,10 +21,28 @@ realloc(void *ptr, size_t n)
 
 	if(bp->magic != MAGIC)
 		abort();
+	if(bp->size <= 0 || bp->size >= MAX2SIZE)
+		abort();
 
 	/* enough space in this bucket */
-	osize = 1<<bp->size;
-	if(osize >= n)
+	osize = (size_t)1<<bp->size;
+	if(n <= osize)
+		return ptr;
+
+	/* the class the new size wants */
+	for(pow = bp->size+1; pow < MAX2SIZE; pow++)
+		if(n <= ((size_t)1<<pow))
+			break;
+	if(pow >= MAX2SIZE)
+		return nil;
+
+	/*
+	 * A buffer grown by doubling is nearly always the most recent
+	 * thing on the heap, so try to extend it where it lies before
+	 * paying for a new block, a copy, and a dead block stranded on
+	 * the old class's free list. See _malloc_growtop.
+	 */
+	if(_malloc_growtop(bp, pow))
 		return ptr;
 
 	new = malloc(n);
@@ -74,4 +54,3 @@ realloc(void *ptr, size_t n)
 
 	return new;
 }
-
