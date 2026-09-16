@@ -4859,9 +4859,63 @@ conclusions from the shape of the log.**
 `chanio.test` is full of `openpipe` and blocking `chan gets` against a
 child `cat`, and the `chan-io-6.4x` cluster beside it reports a
 blocking `gets` answering `-1` where it should have returned a line --
-so a `gets` that never returns is what to expect there. **That is a
-hypothesis, not a finding.** Run the file on its own with `-verbose t`
-and the log will name the test, the way one line settled `unixWm-50.5`.
+so a `gets` that never returns is what to expect there.
+
+**Two runs now end at the same place: after `chan-io-8.1`'s failure
+report, with nothing after it.** The CPU during the freeze is
+**constant but low**, which is the BLOCKED shape rather than the
+spinning one -- a process waiting for something that will never arrive,
+not a loop inside one command. Tk's suite had one of each and they
+wanted completely different fixes; keep them apart.
+
+**And the last line of that log is a LOWER BOUND, not the answer.**
+This is the "the log lies about where the run stopped" trap from the Tk
+section, met one process further down than before: `tcl-runall.tcl`
+sets line buffering on **itself**, but in multi-process mode every test
+file is a separate `tcltest` whose stdout is a **pipe**, and nothing
+sets that child's buffering. Up to a bufferful of the child's output is
+still inside the child when it wedges.
+
+So the obvious reading -- that `chan-io-8.2` is the hang, it being the
+next test and the first in the file to pair a `chan event` with two
+`vwait`s -- **is a hypothesis the log cannot support**, however
+plausible it looks.
+
+**The command that settles it runs the file in the harness's own
+process**, where the line buffering does apply:
+
+```
+tcltest .../tcl-runall.tcl -singleproc 1 -file chanio.test -verbose t
+```
+
+`-verbose t` prints each name as it *starts*, so the last one is
+genuinely the test that did not return -- the same one line that
+settled `unixWm-50.5`.
+
+**The option is `-notfile`, not `-skipfile`**, and the first version of
+the harness said the latter and was refused outright:
+
+```
+unknown option -skipfile: should be one of -asidefromdir, -constraints,
+-debug, -errfile, -file, -limitconstraints, -load, -loadfile, -match,
+-notfile, -outfile, -preservecore, -relateddir, -singleproc, -skip,
+-testdir, -tmpdir, or -verbose
+```
+
+`skipFiles` is the internal accessor (`tcltest.tcl:63`) and `-notfile`
+is the option that sets it. **Reading the proc name for the option name
+is the same mistake as reading a grep hit for an implementation**, and
+the error message lists every valid option -- the cheapest possible
+check, there to be read.
+
+`-notfile` also has a **non-empty default**, `l.*.test`, whose comment
+says "skip files that appear to be SCCS lock files"; setting the option
+replaces it, so the harness repeats it. It costs nothing either way --
+the glob wants a literal dot as the second character, so it matches
+`l.foo.test` and **not** `lindex.test`, and Tcl's seventeen `l*.test`
+files do run. Worth checking rather than assuming: "the whole `l*`
+family is silently skipped" would have been a far bigger finding than
+the one that round actually had.
 
 **Do not read the failure list as a survey**: it covers the first 7% of
 the suite in alphabetical order.
@@ -4930,6 +4984,25 @@ and, if so, extends the break instead of allocating a new block,
 copying, and stranding the old one on its class's free list. A buffer
 being grown by doubling nearly always is the last thing on the heap, so
 the whole strand ladder disappears. `_malloc_growtop` in `malloc.c`.
+
+**CONFIRMED ON THE VM, AND IT BOUGHT BACK A WHOLE TEST FILE.**
+`malloc-reuse-test` reports **0 failures** there, with 1063072 bytes
+for 1 KB -> 1 MB against the host's predicted 1075488 -- and, more to
+the point, `binary.test` **no longer dies**:
+
+```
+binary.test                                      <- used to be followed by
+==== binary-53.25 Binary float round to Inf FAILED     "Test file error:
+==== binary-53.26 FAILED                                tcltest 69507: Killed:
+brodnik.test                                            Insufficient physical
+                                                        memory"
+```
+
+It now runs to the end and reports only the two `binary-53.2x` Inf
+tests, which are the separate and much smaller question below. That was
+written down beforehand as a genuine guess -- "`binary.test` may or may
+not survive on the halved peak" -- so it is worth recording that
+halving the peak was enough.
 
 **MEMORY ALREADY OWNED MUST BEAT MEMORY FROM THE KERNEL, and the first
 cut of this got it backwards.** Without a check that the target class's
@@ -5003,14 +5076,24 @@ the thing in the way is `chanio.test` hanging the parent, not the OOM.
 `tcl-runall.tcl` skips that one file and says so loudly; take it out of
 the skip list the moment the `chan-io-6.4x` cluster is understood.
 
-**What to expect of the next run, written down before it happens so it
-can be wrong on the record:** with `chanio.test` skipped the run should
-reach all 167 files and print the marker, giving the first real total
-this suite has ever produced -- and like Tk's first complete run, **the
-failure count will look enormous compared to the ten above, and that is
-measurement, not regression.** `binary.test` may or may not survive on
-the halved peak; the honest answer is that it is a prediction. If it is
-still killed, the log will say so on its own line and cost nothing else.
+**The prediction written before the last run, and how it did.** It said
+the run should reach all 167 files and print the marker, and that
+`binary.test` might or might not survive the halved peak.
+`binary.test` survived -- that half was right. The run did not reach
+the marker, for a reason that had nothing to do with the allocator: the
+harness named an option that does not exist and tcltest refused
+everything (see `-notfile` above). **A harness bug and a suite bug look
+identical from the shell**, which is the whole argument for the marker
+-- and the marker did its job, reporting `exit called (code 1)` rather
+than letting a refused run read as a finished one.
+
+**What to expect of the next run:** with `-notfile` spelled correctly
+and `chanio.test` skipped, the run should reach all 167 files and print
+`tcl-runall: every file ran`. That gives the first real total this
+suite has ever produced -- and like Tk's first complete run, **the
+failure count will look enormous next to the ten above, and that is
+measurement, not regression.** The run to compare it against does not
+exist yet; this is the baseline.
 
 ### Build order for compiler changes
 ```
