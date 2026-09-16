@@ -1,12 +1,15 @@
+tcl-runall: starting, line buffered, exit wrapped for the marker
+tcl-runall: -notfile is l.*.test chanio.test -- l.*.test is tcltest's own default (SCCS lock files, matches nothing here) and is repeated so that setting the option does not drop it; the rest wedge the parent
+tcl-runall: note tcltest runs each file in its OWN process, so a file that is KILLED costs only itself; a file that HANGS costs every file after it. A child's stdout is a PIPE and is block buffered, so the last test named below is a LOWER BOUND on where a hang happened -- use -singleproc 1 -file X -verbose t to get the real name.
 Tests running in interp:  /usr/glenda/APExp/sys/src/ape/cmd/tclsh/tcltest
 Tests located in:  /usr/glenda/APExp/sys/src/external/tcl/tests
 Tests running in:  /usr/glenda/APExp/sys/src/external/tcl/tests
 Temporary files stored in /usr/glenda/APExp/sys/src/external/tcl/tests
 Test files run in separate interpreters
 Running tests that match:  *
-Skipping test files that match:  l.*.test
+Skipping test files that match:  l.*.test chanio.test
 Only running test files that match:  *.test
-Tests began at 2026-09-16 04:32:47 +0200
+Tests began at 2026-09-16 04:50:23 +0200
 aaa_exit.test
 abstractlist.test
 append.test
@@ -71,161 +74,4811 @@ couldn't open socket: operation not supported
 ---- errorCode(setup): POSIX ENOTSUP {operation not supported}
 ==== chan-16.9 FAILED
 
-chanio.test
+clock-ivm.test
+  Validity default mode: off
 
 
-==== chan-io-6.31 Tcl_GetsObj: crlf mode: buffer exhausted, blocked FAILED
+==== clock-38.3sc.vm:0 ensure cache of base is correct for :localtime if TZ-env changing / scan FAILED
+==== Contents of test case:
+
+	set res {}
+	foreach env(TZ) {GMT-11:30 GMT-07:30 GMT-03:30 GMT}  i {{07:30:00} {03:30:00} {23:30:00} {20:00:00}}  {
+	    lappend res [clock scan $i -format "%H:%M:%S" -base [expr {20*60*60}] -timezone :localtime]
+	}
+	set res
+    
+---- Result was:
+23400 9000 81000 68400
+---- Result should have been (exact matching):
+72000 72000 72000 72000
+==== clock-38.3sc.vm:0 FAILED
+
+
+
+==== clock-38.3fm.vm:0 ensure cache of base is correct for :localtime if TZ-env changing / format FAILED
+==== Contents of test case:
+
+	set res {}
+	foreach env(TZ) {GMT-11:30 GMT-07:30 GMT-03:30 GMT} {
+	    lappend res [clock format [expr {20*60*60}] -format "%Y-%m-%dT%H:%M:%S %Z" -timezone :localtime]
+	}
+	set res
+    
+---- Result was:
+{1970-01-01T21:00:00 +0100} {1970-01-01T21:00:00 +0100} {1970-01-01T21:00:00 +0100} {1970-01-01T21:00:00 +0100}
+---- Result should have been (exact matching):
+{1970-01-02T07:30:00 +1130} {1970-01-02T03:30:00 +0730} {1970-01-01T23:30:00 +0330} {1970-01-01T20:00:00 +0000}
+==== clock-38.3fm.vm:0 FAILED
+
+
+
+==== clock-40.1.vm:0 regression - bad month with -timezone :localtime FAILED
+==== Contents of test case:
+
+	clock scan 2000-01-01T00:00:00 -timezone :localtime  -format %Y-%m-%dT%H:%M:%S
+    
+---- Result was:
+946681200
+---- Result should have been (exact matching):
+946684800
+==== clock-40.1.vm:0 FAILED
+
+
+
+==== clock-42.1.vm:0 regression test - %z in :localtime when west of Greenwich FAILED
+==== Contents of test case:
+
+	clock format 0 -format %z -timezone :localtime
+    
+---- Result was:
++0100
+---- Result should have been (exact matching):
+-0500
+==== clock-42.1.vm:0 FAILED
+
+clock.test
+  Validity default mode: on
+
+
+==== clock-38.3sc.vm:1 ensure cache of base is correct for :localtime if TZ-env changing / scan FAILED
+==== Contents of test case:
+
+	set res {}
+	foreach env(TZ) {GMT-11:30 GMT-07:30 GMT-03:30 GMT}  i {{07:30:00} {03:30:00} {23:30:00} {20:00:00}}  {
+	    lappend res [clock scan $i -format "%H:%M:%S" -base [expr {20*60*60}] -timezone :localtime]
+	}
+	set res
+    
+---- Result was:
+23400 9000 81000 68400
+---- Result should have been (exact matching):
+72000 72000 72000 72000
+==== clock-38.3sc.vm:1 FAILED
+
+
+
+==== clock-38.3fm.vm:1 ensure cache of base is correct for :localtime if TZ-env changing / format FAILED
+==== Contents of test case:
+
+	set res {}
+	foreach env(TZ) {GMT-11:30 GMT-07:30 GMT-03:30 GMT} {
+	    lappend res [clock format [expr {20*60*60}] -format "%Y-%m-%dT%H:%M:%S %Z" -timezone :localtime]
+	}
+	set res
+    
+---- Result was:
+{1970-01-01T21:00:00 +0100} {1970-01-01T21:00:00 +0100} {1970-01-01T21:00:00 +0100} {1970-01-01T21:00:00 +0100}
+---- Result should have been (exact matching):
+{1970-01-02T07:30:00 +1130} {1970-01-02T03:30:00 +0730} {1970-01-01T23:30:00 +0330} {1970-01-01T20:00:00 +0000}
+==== clock-38.3fm.vm:1 FAILED
+
+
+
+==== clock-40.1.vm:1 regression - bad month with -timezone :localtime FAILED
+==== Contents of test case:
+
+	clock scan 2000-01-01T00:00:00 -timezone :localtime  -format %Y-%m-%dT%H:%M:%S
+    
+---- Result was:
+946681200
+---- Result should have been (exact matching):
+946684800
+==== clock-40.1.vm:1 FAILED
+
+
+
+==== clock-42.1.vm:1 regression test - %z in :localtime when west of Greenwich FAILED
+==== Contents of test case:
+
+	clock format 0 -format %z -timezone :localtime
+    
+---- Result was:
++0100
+---- Result should have been (exact matching):
+-0500
+==== clock-42.1.vm:1 FAILED
+
+cmdAH.test
+
+
+==== cmdAH-20.5 Tcl_FileObjCmd: atime touch FAILED
+==== Contents of test case:
+
+    set atime [file atime $file]
+    after 1100; # pause a sec to notice change in atime
+    set newatime [clock seconds]
+    set modatime [file atime $file $newatime]
+    expr {$newatime == $modatime ? 1 : "$newatime != $modatime"}
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not set access time for file "/tmp/touch.me": no such file or directory
+    while executing
+"file atime $file $newatime"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== cmdAH-20.5 FAILED
+
+
+
+==== cmdAH-23.8 Tcl_FileObjCmd: mkdir FAILED
+==== Contents of test case:
+
+    file mkdir $dirA/b
+    file isdirectory $dirA/b
+
+---- Test cleanup failed:
+error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/a": invalid operation
+---- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/a": invalid operation
+    while executing
+"file delete -force $dirA"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== cmdAH-23.8 FAILED
+
+
+
+==== cmdAH-23.9 Tcl_FileObjCmd: mkdir FAILED
+==== Contents of test case:
+
+    file mkdir $dirA/b/c
+    file isdirectory $dirA/b/c
+
+---- Test cleanup failed:
+error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/a": invalid operation
+---- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/a": invalid operation
+    while executing
+"file delete -force $dirA"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== cmdAH-23.9 FAILED
+
+
+
+==== cmdAH-23.10 Tcl_FileObjCmd: mkdir FAILED
+==== Contents of test case:
+
+    file mkdir $dirA/b $dirB/a/c
+    list [file isdirectory $dirA/b] [file isdirectory $dirB/a/c]
+
+---- Test cleanup failed:
+error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/a": invalid operation
+---- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/a": invalid operation
+    while executing
+"file delete -force $dirA"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== cmdAH-23.10 FAILED
+
+
+
+==== cmdAH-24.8 Tcl_FileObjCmd: mtime touch FAILED
+==== Contents of test case:
+
+    set mtime [file mtime $file]
+    after 1100; # pause a sec to notice change in mtime
+    set newmtime [clock seconds]
+    set modmtime [file mtime $file $newmtime]
+    expr {$newmtime == $modmtime ? 1 : "$newmtime != $modmtime"}
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not set modification time for file "/usr/glenda/APExp/sys/src/external/tcl/tests/touch.me": no such file or directory
+    while executing
+"file mtime $file $newmtime"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== cmdAH-24.8 FAILED
+
+
+
+==== cmdAH-24.9 Tcl_FileObjCmd: mtime touch with non-ascii chars FAILED
+==== Contents of test case:
+
+    # introduce some non-ascii characters.
+    append file •
+    file delete -force $file
+    file rename $oldfile $file
+    set mtime [file mtime $file]
+    after 1100; # pause a sec to notice change in mtime
+    set newmtime [clock seconds]
+    set modmtime [file mtime $file $newmtime]
+    expr {$newmtime == $modmtime ? 1 : "$newmtime != $modmtime"}
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not set modification time for file "/usr/glenda/APExp/sys/src/external/tcl/tests/touch.me•": no such file or directory
+    while executing
+"file mtime $file $newmtime"
+    ("uplevel" body line 9)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== cmdAH-24.9 FAILED
+
+
+
+==== cmdAH-24.12 Tcl_FileObjCmd: mtime and daylight savings FAILED
+==== Contents of test case:
+
+    set time [clock scan "21:00:00 October 30 2004 GMT"]
+    file mtime $name $time
+    set newmtime [file mtime $name]
+    expr {$newmtime == $time ? 1 : "$newmtime != $time"}
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not set modification time for file "/usr/glenda/APExp/sys/src/external/tcl/tests/clockchange": no such file or directory
+    while executing
+"file mtime $name $time"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== cmdAH-24.12 FAILED
+
+
+
+==== cmdAH-24.13 Tcl_FileObjCmd: directory mtime FAILED
+==== Contents of test case:
+
+    file mkdir $dirname
+    set old [file mtime $dirname]
+    file mtime $dirname 0
+    set new [file mtime $dirname]
+    list $new [expr {$old != $new}]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not set modification time for file "/usr/glenda/APExp/sys/src/external/tcl/tests/tmp4772": no such file or directory
+    while executing
+"file mtime $dirname 0"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== cmdAH-24.13 FAILED
+
+
+
+==== cmdAH-25.3 Tcl_FileObjCmd: owned FAILED
+==== Contents of test case:
+
+    file owned /
+
+---- Result was:
+1
+---- Result should have been (exact matching):
+0
+==== cmdAH-25.3 FAILED
+
+
+
+==== cmdAH-29.4 Tcl_FileObjCmd: type FAILED
+==== Contents of test case:
+
+    # Unlike [exec ln -s], [file link] requires an existing target
+    file link -symbolic $linkfile $gorpfile
+    file type $linkfile
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "/usr/glenda/APExp/sys/src/external/tcl/tests/link.file" pointing to "/usr/glenda/APExp/sys/src/external/tcl/tests/górp.file": function not implemented
+    while executing
+"file link -symbolic $linkfile $gorpfile"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== cmdAH-29.4 FAILED
+
+
+
+==== cmdAH-29.4.1 Tcl_FileObjCmd: type FAILED
+==== Contents of test case:
+
+    set linkdir [file join [temporaryDirectory] link.dir]
+    file link -symbolic $linkdir $tempdir
+    file type $linkdir
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "/usr/glenda/APExp/sys/src/external/tcl/tests/link.dir" pointing to "/usr/glenda/APExp/sys/src/external/tcl/tests/temp": function not implemented
+    while executing
+"file link -symbolic $linkdir $tempdir"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== cmdAH-29.4.1 FAILED
+
+
+
+==== cmdAH-33.5 file tempdir FAILED
+==== Contents of test case:
+
+    set pre [glob -nocomplain -directory $base *]
+    set d [file normalize [file tempdir $base/gorp]]
+    list [string map [list $base GORP:] $d] [file exists $d] [file type $d]  $pre [glob -nocomplain -directory $d *]
+
+---- Result was:
+GORP:/gorp_jJhokj 1 directory /usr/glenda/APExp/sys/src/external/tcl/tests/gorp/tcl_dBkpNJ {}
+---- Result should have been (glob matching):
+GORP:/gorp_* 1 directory {} {}
+==== cmdAH-33.5 FAILED
+
+Test file error: error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/dir.file": invalid operation
+    while executing
+"file delete -force -- $fullName"
+    (procedure "removeDirectory" line 21)
+    invoked from within
+"removeDirectory $dirfile"
+    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/cmdAH.test" line 2218)
+cmdIL.test
+cmdInfo.test
+cmdMZ.test
+compExpr-old.test
+compExpr.test
+compile.test
+concat.test
+config.test
+coroutine.test
+dcall.test
+dict.test
+dstring.test
+encoding.test
+Test file error: error copying "cp932.chars" to "shiftjis.chars": no such file or directory
+    while executing
+"file copy -force cp932.chars shiftjis.chars"
+    (procedure "runtests" line 982)
+    invoked from within
+"runtests"
+    (in namespace eval "::tcl::test::encoding" script line 1067)
+    invoked from within
+"namespace eval ::tcl::test::encoding {
+    variable x
+
+catch {
+    ::tcltest::loadTestedCommands
+    package require -exact tcl::test [info patchlevel..."
+    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/encoding.test" line 17)
+env.test
+
+
+==== env-2.1 adding environment variables FAILED
+==== Contents of test case:
+
+    getenv
+
+---- Result was:
+_fdinfo=0 34 0\u000a1 2 2\u000a2 2 2\u000a3 2 0\u000a4 2 0\u000a
+_sighdlr=
+path=/bin\u0001.
+---- Result should have been (exact matching):
+
+==== env-2.1 FAILED
+
+
+
+==== env-2.2 adding environment variables FAILED
+==== Contents of test case:
+
+    set env(NAME1) "test string"
+    getenv
+
+---- Result was:
+NAME1=test string
+_fdinfo=0 34 0\u000a1 2 2\u000a2 2 2\u000a3 2 0\u000a4 2 0\u000a
+_sighdlr=
+path=/bin\u0001.
+---- Result should have been (exact matching):
+NAME1=test string
+==== env-2.2 FAILED
+
+
+
+==== env-2.3 adding environment variables FAILED
+==== Contents of test case:
+
+    set env(NAME2) "more"
+    getenv
+
+---- Result was:
+NAME1=test string
+NAME2=more
+_fdinfo=0 34 0\u000a1 2 2\u000a2 2 2\u000a3 2 0\u000a4 2 0\u000a
+_sighdlr=
+path=/bin\u0001.
+---- Result should have been (exact matching):
+NAME1=test string
+NAME2=more
+==== env-2.3 FAILED
+
+
+
+==== env-2.4 adding environment variables FAILED
+==== Contents of test case:
+
+    set env(XYZZY) "garbage"
+    getenv
+
+---- Result was:
+NAME1=test string
+NAME2=more
+XYZZY=garbage
+_fdinfo=0 34 0\u000a1 2 2\u000a2 2 2\u000a3 2 0\u000a4 2 0\u000a
+_sighdlr=
+path=/bin\u0001.
+---- Result should have been (exact matching):
+NAME1=test string
+NAME2=more
+XYZZY=garbage
+==== env-2.4 FAILED
+
+
+
+==== env-3.1 changing environment variables FAILED
+==== Contents of test case:
+
+    set result [getenv]
+    unset env(NAME2)
+    set result
+
+---- Result was:
+NAME1=test string
+NAME2=new value
+XYZZY=garbage
+_fdinfo=0 34 0\u000a1 2 2\u000a2 2 2\u000a3 2 0\u000a4 2 0\u000a
+_sighdlr=
+path=/bin\u0001.
+---- Result should have been (exact matching):
+NAME1=test string
+NAME2=new value
+XYZZY=garbage
+==== env-3.1 FAILED
+
+
+
+==== env-4.1 unsetting environment variables FAILED
+==== Contents of test case:
+
+    unset -nocomplain env(NAME2)
+    getenv
+
+---- Result was:
+NAME1=test string
+XYZZY=garbage
+_fdinfo=0 34 0\u000a1 2 2\u000a2 2 2\u000a3 2 0\u000a4 2 0\u000a
+_sighdlr=
+path=/bin\u0001.
+---- Result should have been (exact matching):
+NAME1=test string
+XYZZY=garbage
+==== env-4.1 FAILED
+
+
+
+==== env-4.3 setting international environment variables FAILED
+==== Contents of test case:
+
+    set env(\ua7) \ub6
+    getenv
+
+---- Result was:
+_fdinfo=0 34 0\u000a1 2 2\u000a2 2 2\u000a3 2 0\u000a4 2 0\u000a
+_sighdlr=
+path=/bin\u0001.
+\u00a7=\u00b6
+---- Result should have been (exact matching):
+\u00a7=\u00b6
+==== env-4.3 FAILED
+
+
+
+==== env-4.4 changing international environment variables FAILED
+==== Contents of test case:
+
+    set env(\ua7) \ua7
+    getenv
+
+---- Result was:
+_fdinfo=0 34 0\u000a1 2 2\u000a2 2 2\u000a3 2 0\u000a4 2 0\u000a
+_sighdlr=
+path=/bin\u0001.
+\u00a7=\u00a7
+---- Result should have been (exact matching):
+\u00a7=\u00a7
+==== env-4.4 FAILED
+
+
+
+==== env-4.5 unsetting international environment variables FAILED
+==== Contents of test case:
+
+    set env(\ub6) \ua7
+    unset env(\ua7)
+    getenv
+
+---- Result was:
+_fdinfo=0 34 0\u000a1 2 2\u000a2 2 2\u000a3 2 0\u000a4 2 0\u000a
+_sighdlr=
+path=/bin\u0001.
+\u00b6=\u00a7
+---- Result should have been (exact matching):
+\u00b6=\u00a7
+==== env-4.5 FAILED
+
+error.test
+eval.test
+event.test
+
+
+==== event-1.1 Tcl_CreateFileHandler, reading FAILED
+==== Contents of test case:
+
+    testfilehandler create 0 readable off
+    testfilehandler clear 0
+    testfilehandler oneevent
+    lappend result [testfilehandler counts 0]
+    testfilehandler fillpartial 0
+    update idletasks
+    testfilehandler oneevent
+    lappend result [testfilehandler counts 0]
+    testfilehandler oneevent
+    lappend result [testfilehandler counts 0]
+
+---- Result was:
+{0 0} {0 0} {0 0}
+---- Result should have been (exact matching):
+{0 0} {1 0} {2 0}
+==== event-1.1 FAILED
+
+
+
+==== event-11.5 Tcl_VwaitCmd procedure: round robin scheduling, 2 sources FAILED
+==== Contents of test case:
+
+    set f1 [open $test1file w]
+    proc accept {s args} {
+	puts $s foobar
+	close $s
+    }
+    set s1 [socket -server accept -myaddr 127.0.0.1 0]
+    after 1000
+    set s2 [socket 127.0.0.1 [lindex [fconfigure $s1 -sockname] 2]]
+    close $s1
+    set x 0
+    set y 0
+    set z 0
+    fileevent $s2 readable {incr z}
+    vwait z
+    fileevent $f1 writable {incr x; if {$y == 3} {set z done}}
+    fileevent $s2 readable {incr y; if {$x == 3} {set z done}}
+    vwait z
+    close $f1
+    close $s2
+    list $x $y $z
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: couldn't open socket: operation not supported
+    while executing
+"socket -server accept -myaddr 127.0.0.1 0"
+    ("uplevel" body line 7)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOTSUP {operation not supported}
+==== event-11.5 FAILED
+
+Warning: files left behind:
+	event.test:	00000000000e162d
+exec.test
+
+
+==== exec-10.15 errors in exec invocation FAILED
+==== Contents of test case:
+
+    exec cat < a/b/c
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== exec-10.15 FAILED
+
+
+
+==== exec-10.16 errors in exec invocation FAILED
+==== Contents of test case:
+
+    exec cat << foo > a/b/c
+
+---- Result was:
+couldn't write file "a/b/c": is a directory: 'a/b/c'
+---- Result should have been (exact matching):
+couldn't write file "a/b/c": no such file or directory
+==== exec-10.16 FAILED
+
+
+
+==== exec-10.17 errors in exec invocation FAILED
+==== Contents of test case:
+
+    exec cat << foo > a/b/c
+
+---- Result was:
+couldn't write file "a/b/c": is a directory: 'a/b/c'
+---- Result should have been (exact matching):
+couldn't write file "a/b/c": no such file or directory
+==== exec-10.17 FAILED
+
+
+
+==== exec-10.20.1 errors in exec invocation FAILED
+==== Contents of test case:
+
+    exec ~non_existent_user/foo/bar
+
+---- Result was:
+TclpCreateProcess: unable to write to errPipeOut
+---- Result should have been (exact matching):
+couldn't execute "~non_existent_user/foo/bar": no such file or directory
+==== exec-10.20.1 FAILED
+
+
+
+==== exec-10.21.1 errors in exec invocation FAILED
+==== Contents of test case:
+
+    exec [interpreter] true | ~xyzzy_bad_user/x | false
+
+---- Result was:
+TclpCreateProcess: unable to write to errPipeOut
+couldn't read file "true": no such file or directory
+---- Result should have been (exact matching):
+couldn't execute "~xyzzy_bad_user/x": no such file or directory
+==== exec-10.21.1 FAILED
+
+
+
+==== exec-13.1 setting errorCode variable FAILED
+==== Contents of test case:
+
+    list [catch {exec [interpreter] $path(cat) < a/b/c} msg] [string tolower $errorCode]
+
+---- Result was:
+0 {posix enoent {no such file or directory}}
+---- Result should have been (exact matching):
+1 {posix enoent {no such file or directory}}
+==== exec-13.1 FAILED
+
+
+
+==== exec-13.2 setting errorCode variable FAILED
+==== Contents of test case:
+
+    list [catch {exec [interpreter] $path(cat) > a/b/c} msg] [string tolower $errorCode]
+
+---- Result was:
+1 {posix {unknown error} {is a directory: 'a/b/c'}}
+---- Result should have been (exact matching):
+1 {posix enoent {no such file or directory}}
+==== exec-13.2 FAILED
+
+
+
+==== exec-19.1 exec >> uses O_APPEND FAILED
+==== Contents of test case:
+
+    # Note that we have to allow for the current contents of the temporary
+    # file, which is why the result is 14 and not 12
+    exec /bin/sh -c  {for a in 1 2 3; do sleep 1; echo $a; done} >>$tmpfile &
+    exec /bin/sh -c  {for a in 4 5 6; do sleep 1; echo $a >&2; done} 2>>$tmpfile &
+    exec /bin/sh -c  {for a in a b c; do sleep 1; echo $a; done} >>$tmpfile &
+    exec /bin/sh -c  {for a in d e f; do sleep 1; echo $a >&2; done} 2>>$tmpfile &
+    # The above four shell invocations take about 3 seconds to finish, so allow
+    # 5s (in case the machine is busy)
+    after 5000
+    # Check that no bytes have got lost through mixups with overlapping
+    # appends, which is only guaranteed to work when we set O_APPEND on the
+    # file descriptor in the [exec >>...]
+    file size $tmpfile
+
+---- Result was:
+8
+---- Result should have been (exact matching):
+26
+==== exec-19.1 FAILED
+
+execute.test
+expr-old.test
+
+
+==== expr-old-37.21 Tcl_ExprDouble handles overflows FAILED
+==== Contents of test case:
+
+    testexprdouble 17976931348623157[string repeat 0 292].
+
+---- Result was:
+This is a result: Inf
+---- Result should have been (exact matching):
+This is a result: 1.7976931348623157e+308
+==== expr-old-37.21 FAILED
+
+expr.test
+
+
+==== expr-28.527 input floating-point conversion FAILED
+==== Contents of test case:
+
+    # Ad2b d UN -929963218616126365 E290 x -108dcc0c505461_01111111111111111111111111111111111111111111111111111111111111110& E1023
+    convertToDouble -929963218616126365E290
+
+---- Result was:
+0xfff0000000000000
+---- Result should have been (exact matching):
+0xffe08dcc0c505461
+==== expr-28.527 FAILED
+
+
+
+==== expr-30.1 largest representible number FAILED
+==== Contents of test case:
+
+    list [catch {convertToDouble 1.7976931348623155e+308} result]  $result  [catch {convertToDouble 1.7976931348623157e+308} result]  $result  [catch {convertToDouble 1.7976931348623159e+308} result]  $result
+
+---- Result was:
+0 0x7ff0000000000000 0 0x7ff0000000000000 0 0x7ff0000000000000
+---- Result should have been (exact matching):
+0 0x7feffffffffffffe 0 0x7fefffffffffffff 0 0x7ff0000000000000
+==== expr-30.1 FAILED
+
+
+
+==== expr-30.2 largest representible number FAILED
+==== Contents of test case:
+
+    list [catch {convertToDouble -1.7976931348623155e+308} result]  $result  [catch {convertToDouble -1.7976931348623157e+308} result]  $result  [catch {convertToDouble -1.7976931348623159e+308} result]  $result
+
+---- Result was:
+0 0xfff0000000000000 0 0xfff0000000000000 0 0xfff0000000000000
+---- Result should have been (exact matching):
+0 0xffeffffffffffffe 0 0xffefffffffffffff 0 0xfff0000000000000
+==== expr-30.2 FAILED
+
+
+
+==== expr-39.21 Tcl_ExprDoubleObj handles overflows FAILED
+==== Contents of test case:
+
+	testexprdoubleobj 17976931348623157[string repeat 0 292].
+    
+---- Result was:
+This is a result: Inf
+---- Result should have been (exact matching):
+This is a result: 1.7976931348623157e+308
+==== expr-39.21 FAILED
+
+
+
+==== expr-50.1 test sqrt() of bignums with non-Inf answer FAILED
+==== Contents of test case:
+
+    expr {sqrt("1[string repeat 0 616]") == 1e308}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== expr-50.1 FAILED
+
+fCmd.test
+
+
+==== fCmd-2.1 TclFileCopyCmd FAILED
+==== Contents of test case:
+
+    createfile tf1
+    file copy tf1 tf2
+    lsort [glob tf*]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tf1" to "tf2": no such file or directory
+    while executing
+"file copy tf1 tf2"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-2.1 FAILED
+
+
+
+==== fCmd-2.2 TclFileCopyCmd when target is ~ FAILED
+==== Contents of test case:
+
+    file copy tf1 ~
+    list [file exists tf1] [file exists ~]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tf1" to "~": no such file or directory
+    while executing
+"file copy tf1 ~"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-2.2 FAILED
+
+
+
+==== fCmd-2.3 TclFileCopyCmd when target is ~user FAILED
+==== Contents of test case:
+
+    file copy tf1 ~$user
+    list [file exists tf1] [file exists ~$user]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tf1" to "~glenda": no such file or directory
+    while executing
+"file copy tf1 ~$user"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-2.3 FAILED
+
+
+
+==== fCmd-2.4 TclFileCopyCmd when source is ~ FAILED
+==== Contents of test case:
+
+    file copy ~ tf1
+    list [file exists ~] [file exists tf1]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "~" to "tf1": no such file or directory
+    while executing
+"file copy ~ tf1"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-2.4 FAILED
+
+
+
+==== fCmd-2.5 TclFileCopyCmd when source is ~user FAILED
+==== Contents of test case:
+
+    file copy ~$user tf1
+    list [file exists ~$user] [file exists tf1]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "~glenda" to "tf1": no such file or directory
+    while executing
+"file copy ~$user tf1"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-2.5 FAILED
+
+
+
+==== fCmd-3.12 FileCopyRename: move each source: 1 source FAILED
+==== Contents of test case:
+
+    createfile tf1 tf1
+    file mkdir td1
+    file rename tf1 td1
+    contents [file join td1 tf1]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error renaming "tf1" to "td1/tf1": file exists
+    while executing
+"file rename tf1 td1"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX EEXIST {file exists}
+==== fCmd-3.12 FAILED
+
+
+
+==== fCmd-3.13 FileCopyRename: move each source: multiple sources FAILED
+==== Contents of test case:
+
+    createfile tf1 tf1
+    createfile tf2 tf2
+    createfile tf3 tf3
+    createfile tf4 tf4
+    file mkdir td1
+    file rename tf1 tf2 tf3 tf4 td1
+    list [contents [file join td1 tf1]] [contents [file join td1 tf2]]  [contents [file join td1 tf3]] [contents [file join td1 tf4]]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error renaming "tf1" to "td1/tf1": file exists
+    while executing
+"file rename tf1 tf2 tf3 tf4 td1"
+    ("uplevel" body line 7)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX EEXIST {file exists}
+==== fCmd-3.13 FAILED
+
+
+
+==== fCmd-3.16 FileCopyRename: break on first error FAILED
+==== Contents of test case:
+
+    createfile tf1
+    createfile tf2
+    createfile tf3
+    createfile tf4
+    file mkdir td1
+    createfile [file join td1 tf3]
+    file rename tf1 tf2 tf3 tf4 td1
+
+---- Result was:
+error renaming "tf1" to "td1/tf1": file exists
+---- Result should have been (exact matching):
+error renaming "tf3" to "td1/tf3": file exists
+==== fCmd-3.16 FAILED
+
+
+
+==== fCmd-4.11 TclFileMakeDirsCmd: doesn't exist: errno != ENOENT FAILED
+==== Contents of test case:
+
+    file mkdir td1/td2/td3
+    testchmod 0 td1/td2
+    file mkdir td1/td2/td3/td4
+
+---- Result was:
+can't create directory "td1/td2/td3": operation not permitted
+---- Result should have been (exact matching):
+can't create directory "td1/td2/td3": permission denied
+==== fCmd-4.11 FAILED
+
+
+
+==== fCmd-4.13 TclFileMakeDirsCmd: doesn't exist: errno == ENOENT FAILED
+==== Contents of test case:
+
+    set x [file exists td1]
+    file mkdir td1
+    list $x [file exists td1]
+
+---- Result was:
+1 1
+---- Result should have been (exact matching):
+0 1
+==== fCmd-4.13 FAILED
+
+
+
+==== fCmd-4.14 TclFileMakeDirsCmd: TclpCreateDirectory fails FAILED
+==== Contents of test case:
+
+    file mkdir foo
+    file attr foo -perm 0o40000
+    file mkdir foo/tf1
+
+---- Result was:
+can't create directory "foo/tf1": operation not permitted
+---- Result should have been (exact matching):
+can't create directory "foo/tf1": permission denied
+==== fCmd-4.14 FAILED
+
+
+
+==== fCmd-5.4 TclFileDeleteCmd: multiple files FAILED
+==== Contents of test case:
+
+    createfile tf1
+    createfile tf2
+    file mkdir td1
+    set x [list [file exists tf1] [file exists tf2] [file exists td1]]
+    file delete tf1 td1 tf2
+    lappend x [file exists tf1] [file exists tf2] [file exists tf3]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error deleting "td1": invalid operation
+    while executing
+"file delete tf1 td1 tf2"
+    ("uplevel" body line 6)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX {unknown error} {invalid operation}
+==== fCmd-5.4 FAILED
+
+
+
+==== fCmd-5.9 TclFileDeleteCmd: is directory FAILED
+==== Contents of test case:
+
+    file mkdir td1
+    file delete td1
+    file exists td1
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error deleting "td1": invalid operation
+    while executing
+"file delete td1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX {unknown error} {invalid operation}
+==== fCmd-5.9 FAILED
+
+
+
+==== fCmd-5.10 TclFileDeleteCmd: TclpRemoveDirectory fails FAILED
+==== Contents of test case:
+
+    file mkdir [file join td1 td2]
+    file delete td1
+
+---- Result was:
+error deleting "td1": invalid operation
+---- Result should have been (exact matching):
+error deleting "td1": directory not empty
+==== fCmd-5.10 FAILED
+
+
+
+==== fCmd-5.11 TclFileDeleteCmd: TclpRemoveDirectory with cwd inside FAILED
+==== Contents of test case:
+
+    file mkdir [file join td1 td2]
+    cd [file join td1 td2]
+    set res [list [catch {file delete -force [file dirname [pwd]]} msg]]
+    cd $dir
+    lappend res [file exists td1] $msg
+
+---- Result was:
+1 1 {error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/td1": invalid operation}
+---- Result should have been (exact matching):
+0 0 {}
+==== fCmd-5.11 FAILED
+
+
+
+==== fCmd-5.12 TclFileDeleteCmd: TclpRemoveDirectory with bad perms FAILED
+==== Contents of test case:
+
+    file mkdir [file join td1 td2]
+    file attributes [file join td1 td2] -permissions u+rwx
+    set res [list [catch {file delete -force td1} msg]]
+    lappend res [file exists td1] $msg
+
+---- Result was:
+1 1 {error deleting "td1": invalid operation}
+---- Result should have been (exact matching):
+0 0 {}
+==== fCmd-5.12 FAILED
+
+
+
+==== fCmd-6.6 CopyRenameOneFile: errno != ENOENT FAILED
+==== Contents of test case:
+
+    file mkdir td1
+    testchmod 0 td1
+    createfile tf1
+    file rename tf1 td1
+
+---- Result was:
+error renaming "tf1" to "td1/tf1": operation not permitted
+---- Result should have been (exact matching):
+error renaming "tf1" to "td1/tf1": permission denied
+==== fCmd-6.6 FAILED
+
+
+
+==== fCmd-6.14 CopyRenameOneFile: source is file, target is dir FAILED
+==== Contents of test case:
+
+    createfile tf1
+    file mkdir [file join td1 tf1]
+    file rename -force tf1 td1
+
+---- Result was:
+can't create directory "td1/tf1": file exists
+---- Result should have been (exact matching):
+can't overwrite directory "td1/tf1" with file "tf1"
+==== fCmd-6.14 FAILED
+
+Test file error: tcltest 5093: suicide: sys: trap: fault write addr=0x0 pc=0x446929
+fileName.test
+
+
+==== filename-11.17.2 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    cd $globname
+    file link -symbolic link a1
+    cd $dir
+    lsort [glob -directory $globname -join * b1]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "link" pointing to "a1": function not implemented
+    while executing
+"file link -symbolic link a1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== filename-11.17.2 FAILED
+
+
+
+==== filename-11.17.3 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    cd $globname
+    file link -symbolic link a1
+    cd $dir
+    lsort [glob -directory $globname -type d *]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "link" pointing to "a1": function not implemented
+    while executing
+"file link -symbolic link a1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== filename-11.17.3 FAILED
+
+
+
+==== filename-11.17.4 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    cd $globname
+    file link -symbolic link a1
+    cd $dir
+    lsort [glob -directory $globname -type l *]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "link" pointing to "a1": function not implemented
+    while executing
+"file link -symbolic link a1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== filename-11.17.4 FAILED
+
+
+
+==== filename-11.17.7 Tcl_GlobCmd: broken link and glob -l FAILED
+==== Contents of test case:
+
+    cd $globname
+    file mkdir nonexistent
+    file link -symbolic link nonexistent
+    file delete nonexistent
+    cd $dir
+    lsort [glob -nocomplain -directory $globname -type l *]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "link" pointing to "nonexistent": function not implemented
+    while executing
+"file link -symbolic link nonexistent"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== filename-11.17.7 FAILED
+
+
+
+==== filename-11.17.8 Tcl_GlobCmd: broken link and glob -l FAILED
+==== Contents of test case:
+
+    cd $globname
+    touch "nonexistent"
+    file link -symbolic link nonexistent
+    file delete nonexistent
+    cd $dir
+    lsort [glob -nocomplain -directory $globname -type l *]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "link" pointing to "nonexistent": function not implemented
+    while executing
+"file link -symbolic link nonexistent"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== filename-11.17.8 FAILED
+
+
+
+==== filename-11.18 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -path $globname/ *]
+
+---- Result was:
+globTest/a1 globTest/a2 globTest/a3 globTest/nonexistent {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
+---- Result should have been (exact matching):
+globTest/a1 globTest/a2 globTest/a3 {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
+==== filename-11.18 FAILED
+
+
+
+==== filename-11.19 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -join -path [string range $globname 0 5] * *]
+
+---- Result was:
+globTest/a1 globTest/a2 globTest/a3 globTest/nonexistent {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
+---- Result should have been (exact matching):
+globTest/a1 globTest/a2 globTest/a3 {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
+==== filename-11.19 FAILED
+
+
+
+==== filename-11.20 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -type d -dir $globname *]
+
+---- Result was:
+globTest/a1 globTest/a2 globTest/a3 globTest/nonexistent
+---- Result should have been (exact matching):
+globTest/a1 globTest/a2 globTest/a3
+==== filename-11.20 FAILED
+
+
+
+==== filename-11.22 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -dir $globname *]
+
+---- Result was:
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
+---- Result should have been (exact matching):
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
+==== filename-11.22 FAILED
+
+
+
+==== filename-11.23 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -path $globname/ *]
+
+---- Result was:
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
+---- Result should have been (exact matching):
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
+==== filename-11.23 FAILED
+
+
+
+==== filename-11.24 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -join -path [string range $globname 0 5] * *]
+
+---- Result was:
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
+---- Result should have been (exact matching):
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
+==== filename-11.24 FAILED
+
+
+
+==== filename-11.25 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -type d -dir $globname *]
+
+---- Result was:
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent
+---- Result should have been (exact matching):
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3
+==== filename-11.25 FAILED
+
+
+
+==== filename-11.25.1 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -type {d r} -dir $globname *]
+
+---- Result was:
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent
+---- Result should have been (exact matching):
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3
+==== filename-11.25.1 FAILED
+
+
+
+==== filename-11.25.2 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -type {d r w} -dir $globname *]
+
+---- Result was:
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent
+---- Result should have been (exact matching):
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3
+==== filename-11.25.2 FAILED
+
+Test file error: tcltest 5104: suicide: sys: trap: fault write addr=0x0 pc=0x446929
+fileSystem.test
+Test file error: error deleting "dir2": invalid operation
+    while executing
+"file delete -force dir2"
+    (in namespace eval "::tcl::test::fileSystem" script line 238)
+    invoked from within
+"namespace eval ::tcl::test::fileSystem {
+
+    if {"::tcltest" ni [namespace children]} {
+	package require tcltest 2.5
+	namespace import -force ::tclte..."
+    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/fileSystem.test" line 12)
+fileSystemEncoding.test
+for-old.test
+for.test
+foreach.test
+format.test
+get.test
+history.test
+http.test
+Test file error: error copying "/usr/glenda/APExp/sys/src/external/tcl/tests/httpd" to "/usr/glenda/APExp/sys/src/external/tcl/tests/httpd_5113": no such file or directory
+    while executing
+"file copy $origFile $httpdFile"
+    invoked from within
+"if {![file exists $httpdFile]} {
+    makeFile "" $httpdFile
+    file delete $httpdFile
+    file copy $origFile $httpdFile
+    set removeHttpd 1
+}"
+    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/http.test" line 43)
+http11.test
+==== Test with ThreadLevel 0 ====
+
+
+==== http11-1.0.0 normal request for document FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html -timeout 10000]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok] [meta $tok connection]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.0.0 FAILED
+
+
+
+==== http11-1.1.0 normal,gzip,non-chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 10000 -headers {accept-encoding gzip}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok content-encoding] [meta $tok transfer-encoding]  [http::meta $tok content-encoding] [http::meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.1.0 FAILED
+
+
+
+==== http11-1.2.0 normal,deflated,non-chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 10000 -headers {accept-encoding deflate}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.2.0 FAILED
+
+
+
+==== http11-1.2.1.0 normal,deflated,non-chunked,msdeflate FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1&msdeflate=1  -timeout 10000 -headers {accept-encoding deflate}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.2.1.0 FAILED
+
+
+
+==== http11-1.4.0 normal,identity,non-chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 10000 -headers {accept-encoding identity}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.4.0 FAILED
+
+
+
+==== http11-1.5.0 normal request for document, unsupported coding FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 10000 -headers {accept-encoding unsupported}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok content-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.5.0 FAILED
+
+
+
+==== http11-1.6.0 normal, specify 1.1 FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -protocol 1.1 -timeout 10000]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok connection] [meta $tok transfer-encoding]  [http::meta $tok connection] [http::meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.6.0 FAILED
+
+
+
+==== http11-1.7.0 normal, 1.1 and keepalive FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -protocol 1.1 -keepalive 1 -timeout 10000]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok connection] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.7.0 FAILED
+
+
+
+==== http11-1.8.0 normal, 1.1 and keepalive, server close FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -protocol 1.1 -keepalive 1 -timeout 10000]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok connection] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.8.0 FAILED
+
+
+
+==== http11-1.9.0 normal,gzip,chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 10000 -headers {accept-encoding gzip}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.9.0 FAILED
+
+
+
+==== http11-1.10.0 normal,deflate,chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 10000 -headers {accept-encoding deflate}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.10.0 FAILED
+
+
+
+==== http11-1.10.1.0 normal,deflate,chunked,msdeflate FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?msdeflate=1  -timeout 10000 -headers {accept-encoding deflate}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.10.1.0 FAILED
+
+
+
+==== http11-1.12.0 normal,identity,chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 10000 -headers {accept-encoding identity}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.12.0 FAILED
+
+
+
+==== http11-1.13.0 normal, 1.1 and keepalive as server default, no zip FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?transfer=  -protocol 1.1 -keepalive 1 -timeout 10000]
+    http::wait $tok
+    set res1 [list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok connection] [meta $tok transfer-encoding] [state $tok reusing] [state $tok connection]]
+    set toj [http::geturl http://localhost:$httpd_port/testdoc.html?transfer=  -protocol 1.1 -keepalive 1 -timeout 10000]
+    http::wait $toj
+    set res2 [list [http::status $toj] [http::code $toj] [check_crc $toj]  [meta $toj connection] [meta $toj transfer-encoding] [state $toj reusing] [state $toj connection]]
+    concat $res1 -- $res2
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "zipTmp": no such variable
+---- errorInfo(cleanup): can't read "zipTmp": no such variable
+    while executing
+"http::config -zip $zipTmp"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME zipTmp
+==== http11-1.13.0 FAILED
+
+
+
+==== http11-2.0.0 -channel FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 5000 -channel $chan]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.0.0 FAILED
+
+
+
+==== http11-2.1.0 -channel, encoding gzip FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 5000 -channel $chan -headers {accept-encoding gzip}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    set diff [expr {[file size testdoc.html] - [file size testfile.tmp]}]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding] -- $diff bytes lost
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.1.0 FAILED
+
+
+
+==== http11-2.1.1.0 -channel, encoding gzip FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/$fileName  -timeout 5000 -channel $chan -headers {accept-encoding gzip}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    set diff [expr {[file size $fileName] - [file size testfile.tmp]}]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding] -- $diff bytes lost
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.1.1.0 FAILED
+
+
+
+==== http11-2.2.0 -channel, encoding deflate FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 5000 -channel $chan -headers {accept-encoding deflate}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.2.0 FAILED
+
+
+
+==== http11-2.2.1.0 -channel, encoding deflate,msdeflate FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?msdeflate=1  -timeout 5000 -channel $chan -headers {accept-encoding deflate}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.2.1.0 FAILED
+
+
+
+==== http11-2.4.0 -channel,encoding identity FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 5000 -channel $chan  -headers {accept-encoding identity}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.4.0 FAILED
+
+
+
+==== http11-2.4.1.0 -channel,encoding identity with -progress FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 5000 -channel $chan  -headers {accept-encoding identity}  -progress [namespace code [list progress logdata]]]
+
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding]  [expr {[lindex $logdata 0] - [lindex $logdata 1]}]  [expr {[lindex $logdata 0] - [string length $data]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.4.1.0 FAILED
+
+
+
+==== http11-2.5.0 -channel,encoding unsupported FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 5000 -channel $chan  -headers {accept-encoding unsupported}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.5.0 FAILED
+
+
+
+==== http11-2.6.0 -channel,encoding gzip,non-chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 5000 -channel $chan -headers {accept-encoding gzip}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding] [expr {[file size testdoc.html]-[file size testfile.tmp]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.6.0 FAILED
+
+
+
+==== http11-2.7.0 -channel,encoding deflate,non-chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 5000 -channel $chan -headers {accept-encoding deflate}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding] [expr {[file size testdoc.html]-[file size testfile.tmp]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.7.0 FAILED
+
+
+
+==== http11-2.9.0 -channel,encoding identity,non-chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 5000 -channel $chan -headers {accept-encoding identity}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding] [expr {[file size testdoc.html]-[file size testfile.tmp]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.9.0 FAILED
+
+
+
+==== http11-2.10.0 -channel,deflate,keepalive FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 5000 -channel $chan -keepalive 1  -headers {accept-encoding deflate}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding] [expr {[file size testdoc.html]-[file size testfile.tmp]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.10.0 FAILED
+
+
+
+==== http11-2.10.1.0 -channel,deflate,keepalive,msdeflate FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?msdeflate=1  -timeout 5000 -channel $chan -keepalive 1  -headers {accept-encoding deflate}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding] [expr {[file size testdoc.html]-[file size testfile.tmp]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.10.1.0 FAILED
+
+
+
+==== http11-2.11.0 -channel,identity,keepalive FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -headers {accept-encoding identity}  -timeout 5000 -channel $chan -keepalive 1]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.11.0 FAILED
+
+
+
+==== http11-2.12.0 -channel,negotiate,keepalive FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 5000 -channel $chan -keepalive 1]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding] [meta $tok x-requested-encodings] [expr {[file size testdoc.html]-[file size testfile.tmp]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.12.0 FAILED
+
+
+
+==== http11-3.0.0 -handler,close,identity FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 10000 -handler [namespace code [list handler testdata]]]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok $testdata] [meta $tok connection] [meta $tok content-encoding]  [meta $tok transfer-encoding]  [expr {[file size testdoc.html]-[string length $testdata]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-3.0.0 FAILED
+
+
+
+==== http11-3.1.0 -handler,protocol1.0 FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 10000 -protocol 1.0  -handler [namespace code [list handler testdata]]]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok $testdata] [meta $tok connection] [meta $tok content-encoding]  [meta $tok transfer-encoding]  [expr {[file size testdoc.html]-[string length $testdata]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-3.1.0 FAILED
+
+
+
+==== http11-3.2.0 -handler,close,chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 10000 -keepalive 0 -binary 1 -handler [namespace code [list handler testdata]]]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok $testdata] [meta $tok connection] [meta $tok content-encoding]  [meta $tok transfer-encoding]  [expr {[file size testdoc.html]-[string length $testdata]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-3.2.0 FAILED
+
+
+
+==== http11-3.3.0 -handler,keepalive,chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 10000 -keepalive 1 -binary 1 -handler [namespace code [list handler testdata]]]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok $testdata] [meta $tok connection] [meta $tok content-encoding]  [meta $tok transfer-encoding]  [expr {[file size testdoc.html]-[string length $testdata]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-3.3.0 FAILED
+
+
+
+==== http11-3.4.0 -handler,close,identity; HTTP/1.0 server does not send Connection: close header or Content-Length FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1&nosendclose=any  -timeout 10000 -handler [namespace code [list handler testdata]]]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok $testdata] [meta $tok connection] [meta $tok content-encoding]  [meta $tok transfer-encoding]  [expr {[file size testdoc.html]-[string length $testdata]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-3.4.0 FAILED
+
+
+
+==== http11-3.5.0 -handler,close,identity as http11-3.0 but handlerPause enters event loop FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 10000 -handler [namespace code [list handlerPause testdata]]]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok $testdata] [meta $tok connection] [meta $tok content-encoding]  [meta $tok transfer-encoding]  [expr {[file size testdoc.html]-[string length $testdata]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-3.5.0 FAILED
+
+
+
+==== http11-3.6.0 -handler,close,identity as http11-3.0 but with -progress FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 10000 -handler [namespace code [list handler testdata]]  -progress [namespace code [list progress logdata]]]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok $testdata] [meta $tok connection] [meta $tok content-encoding]  [meta $tok transfer-encoding]  [expr {[file size testdoc.html]-[string length $testdata]}]  [expr {[lindex $logdata 0] - [lindex $logdata 1]}]  [expr {[lindex $logdata 0] - [string length $testdata]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-3.6.0 FAILED
+
+
+
+==== http11-3.7.0 -handler,close,identity as http11-3.0 but with -progress progressPause enters event loop FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 10000 -handler [namespace code [list handler testdata]]  -progress [namespace code [list progressPause logdata]]]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok $testdata] [meta $tok connection] [meta $tok content-encoding]  [meta $tok transfer-encoding]  [expr {[file size testdoc.html]-[string length $testdata]}]  [expr {[lindex $logdata 0] - [lindex $logdata 1]}]  [expr {[lindex $logdata 0] - [string length $testdata]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-3.7.0 FAILED
+
+
+
+==== http11-3.8.0 close,identity no -handler but with -progress FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 10000  -progress [namespace code [list progress logdata]]  -headers {accept-encoding {}}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok] [meta $tok connection] [meta $tok content-encoding]  [meta $tok transfer-encoding]  [expr {[file size testdoc.html]-[string length [http::data $tok]]}]  [expr {[lindex $logdata 0] - [lindex $logdata 1]}]  [expr {[lindex $logdata 0] - [string length [http::data $tok]]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-3.8.0 FAILED
+
+
+
+==== http11-3.9.0 close,identity no -handler but with -progress progressPause enters event loop FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 10000  -progress [namespace code [list progressPause logdata]]  -headers {accept-encoding {}}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok] [meta $tok connection] [meta $tok content-encoding]  [meta $tok transfer-encoding]  [expr {[file size testdoc.html]-[string length [http::data $tok]]}]  [expr {[lindex $logdata 0] - [lindex $logdata 1]}]  [expr {[lindex $logdata 0] - [string length [http::data $tok]]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-3.9.0 FAILED
+
+
+
+==== http11-4.0.0 normal post request FAILED
+==== Contents of test case:
+
+    set query [http::formatQuery q 1 z 2]
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -query $query -timeout 10000]
+    http::wait $tok
+    list status [http::status $tok] code [http::code $tok] crc [check_crc $tok] connection [meta $tok connection] query-length [meta $tok x-query-length]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-4.0.0 FAILED
+
+
+
+==== http11-4.1.0 normal post request, check query length FAILED
+==== Contents of test case:
+
+    set query [http::formatQuery q 1 z 2]
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -headers [list x-check-query yes]  -query $query -timeout 10000]
+    http::wait $tok
+    list status [http::status $tok] code [http::code $tok] crc [check_crc $tok] connection [meta $tok connection] query-length [meta $tok x-query-length]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-4.1.0 FAILED
+
+
+
+==== http11-4.2.0 normal post request, check long query length FAILED
+==== Contents of test case:
+
+    set query [string repeat a 24576]
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html -headers [list x-check-query yes] -query $query -timeout 10000]
+    http::wait $tok
+    list status [http::status $tok] code [http::code $tok] crc [check_crc $tok] connection [meta $tok connection] query-length [meta $tok x-query-length]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-4.2.0 FAILED
+
+
+
+==== http11-4.3.0 normal post request, check channel query length FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html -headers [list x-check-query yes] -querychannel $chan -timeout 10000]
+    http::wait $tok
+    list status [http::status $tok] code [http::code $tok] crc [check_crc $tok] connection [meta $tok connection] query-length [meta $tok x-query-length]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-4.3.0 FAILED
+
+==== Test with ThreadLevel 1 ====
+
+
+==== http11-1.0.1 normal request for document FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html -timeout 10000]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok] [meta $tok connection]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.0.1 FAILED
+
+
+
+==== http11-1.1.1 normal,gzip,non-chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 10000 -headers {accept-encoding gzip}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok content-encoding] [meta $tok transfer-encoding]  [http::meta $tok content-encoding] [http::meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.1.1 FAILED
+
+
+
+==== http11-1.2.1 normal,deflated,non-chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 10000 -headers {accept-encoding deflate}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.2.1 FAILED
+
+
+
+==== http11-1.2.1.1 normal,deflated,non-chunked,msdeflate FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1&msdeflate=1  -timeout 10000 -headers {accept-encoding deflate}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.2.1.1 FAILED
+
+
+
+==== http11-1.4.1 normal,identity,non-chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 10000 -headers {accept-encoding identity}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.4.1 FAILED
+
+
+
+==== http11-1.5.1 normal request for document, unsupported coding FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 10000 -headers {accept-encoding unsupported}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok content-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.5.1 FAILED
+
+
+
+==== http11-1.6.1 normal, specify 1.1 FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -protocol 1.1 -timeout 10000]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok connection] [meta $tok transfer-encoding]  [http::meta $tok connection] [http::meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.6.1 FAILED
+
+
+
+==== http11-1.7.1 normal, 1.1 and keepalive FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -protocol 1.1 -keepalive 1 -timeout 10000]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok connection] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.7.1 FAILED
+
+
+
+==== http11-1.8.1 normal, 1.1 and keepalive, server close FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -protocol 1.1 -keepalive 1 -timeout 10000]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok connection] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.8.1 FAILED
+
+
+
+==== http11-1.9.1 normal,gzip,chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 10000 -headers {accept-encoding gzip}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.9.1 FAILED
+
+
+
+==== http11-1.10.1 normal,deflate,chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 10000 -headers {accept-encoding deflate}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.10.1 FAILED
+
+
+
+==== http11-1.10.1.1 normal,deflate,chunked,msdeflate FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?msdeflate=1  -timeout 10000 -headers {accept-encoding deflate}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.10.1.1 FAILED
+
+
+
+==== http11-1.12.1 normal,identity,chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 10000 -headers {accept-encoding identity}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-1.12.1 FAILED
+
+
+
+==== http11-1.13.1 normal, 1.1 and keepalive as server default, no zip FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?transfer=  -protocol 1.1 -keepalive 1 -timeout 10000]
+    http::wait $tok
+    set res1 [list [http::status $tok] [http::code $tok] [check_crc $tok]  [meta $tok connection] [meta $tok transfer-encoding] [state $tok reusing] [state $tok connection]]
+    set toj [http::geturl http://localhost:$httpd_port/testdoc.html?transfer=  -protocol 1.1 -keepalive 1 -timeout 10000]
+    http::wait $toj
+    set res2 [list [http::status $toj] [http::code $toj] [check_crc $toj]  [meta $toj connection] [meta $toj transfer-encoding] [state $toj reusing] [state $toj connection]]
+    concat $res1 -- $res2
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "zipTmp": no such variable
+---- errorInfo(cleanup): can't read "zipTmp": no such variable
+    while executing
+"http::config -zip $zipTmp"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME zipTmp
+==== http11-1.13.1 FAILED
+
+
+
+==== http11-2.0.1 -channel FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 5000 -channel $chan]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.0.1 FAILED
+
+
+
+==== http11-2.1.1 -channel, encoding gzip FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 5000 -channel $chan -headers {accept-encoding gzip}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    set diff [expr {[file size testdoc.html] - [file size testfile.tmp]}]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding] -- $diff bytes lost
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.1.1 FAILED
+
+
+
+==== http11-2.1.1.1 -channel, encoding gzip FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/$fileName  -timeout 5000 -channel $chan -headers {accept-encoding gzip}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    set diff [expr {[file size $fileName] - [file size testfile.tmp]}]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding] -- $diff bytes lost
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.1.1.1 FAILED
+
+
+
+==== http11-2.2.1 -channel, encoding deflate FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 5000 -channel $chan -headers {accept-encoding deflate}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.2.1 FAILED
+
+
+
+==== http11-2.2.1.1 -channel, encoding deflate,msdeflate FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?msdeflate=1  -timeout 5000 -channel $chan -headers {accept-encoding deflate}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.2.1.1 FAILED
+
+
+
+==== http11-2.4.1 -channel,encoding identity FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 5000 -channel $chan  -headers {accept-encoding identity}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.4.1 FAILED
+
+
+
+==== http11-2.4.1.1 -channel,encoding identity with -progress FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 5000 -channel $chan  -headers {accept-encoding identity}  -progress [namespace code [list progress logdata]]]
+
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding]  [expr {[lindex $logdata 0] - [lindex $logdata 1]}]  [expr {[lindex $logdata 0] - [string length $data]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.4.1.1 FAILED
+
+
+
+==== http11-2.5.1 -channel,encoding unsupported FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 5000 -channel $chan  -headers {accept-encoding unsupported}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.5.1 FAILED
+
+
+
+==== http11-2.6.1 -channel,encoding gzip,non-chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 5000 -channel $chan -headers {accept-encoding gzip}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding] [expr {[file size testdoc.html]-[file size testfile.tmp]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.6.1 FAILED
+
+
+
+==== http11-2.7.1 -channel,encoding deflate,non-chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 5000 -channel $chan -headers {accept-encoding deflate}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding] [expr {[file size testdoc.html]-[file size testfile.tmp]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.7.1 FAILED
+
+
+
+==== http11-2.9.1 -channel,encoding identity,non-chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 5000 -channel $chan -headers {accept-encoding identity}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding] [expr {[file size testdoc.html]-[file size testfile.tmp]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.9.1 FAILED
+
+
+
+==== http11-2.10.1 -channel,deflate,keepalive FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 5000 -channel $chan -keepalive 1  -headers {accept-encoding deflate}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding] [expr {[file size testdoc.html]-[file size testfile.tmp]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.10.1 FAILED
+
+
+
+==== http11-2.10.1.1 -channel,deflate,keepalive,msdeflate FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?msdeflate=1  -timeout 5000 -channel $chan -keepalive 1  -headers {accept-encoding deflate}]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding] [expr {[file size testdoc.html]-[file size testfile.tmp]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.10.1.1 FAILED
+
+
+
+==== http11-2.11.1 -channel,identity,keepalive FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -headers {accept-encoding identity}  -timeout 5000 -channel $chan -keepalive 1]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.11.1 FAILED
+
+
+
+==== http11-2.12.1 -channel,negotiate,keepalive FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 5000 -channel $chan -keepalive 1]
+    http::wait $tok
+    seek $chan 0
+    set data [read $chan]
+    list [http::status $tok] [http::code $tok] [check_crc $tok $data] [meta $tok connection] [meta $tok content-encoding] [meta $tok transfer-encoding] [meta $tok x-requested-encodings] [expr {[file size testdoc.html]-[file size testfile.tmp]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-2.12.1 FAILED
+
+
+
+==== http11-3.0.1 -handler,close,identity FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 10000 -handler [namespace code [list handler testdata]]]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok $testdata] [meta $tok connection] [meta $tok content-encoding]  [meta $tok transfer-encoding]  [expr {[file size testdoc.html]-[string length $testdata]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-3.0.1 FAILED
+
+
+
+==== http11-3.1.1 -handler,protocol1.0 FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 10000 -protocol 1.0  -handler [namespace code [list handler testdata]]]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok $testdata] [meta $tok connection] [meta $tok content-encoding]  [meta $tok transfer-encoding]  [expr {[file size testdoc.html]-[string length $testdata]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-3.1.1 FAILED
+
+
+
+==== http11-3.2.1 -handler,close,chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 10000 -keepalive 0 -binary 1 -handler [namespace code [list handler testdata]]]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok $testdata] [meta $tok connection] [meta $tok content-encoding]  [meta $tok transfer-encoding]  [expr {[file size testdoc.html]-[string length $testdata]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-3.2.1 FAILED
+
+
+
+==== http11-3.3.1 -handler,keepalive,chunked FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -timeout 10000 -keepalive 1 -binary 1 -handler [namespace code [list handler testdata]]]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok $testdata] [meta $tok connection] [meta $tok content-encoding]  [meta $tok transfer-encoding]  [expr {[file size testdoc.html]-[string length $testdata]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-3.3.1 FAILED
+
+
+
+==== http11-3.4.1 -handler,close,identity; HTTP/1.0 server does not send Connection: close header or Content-Length FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1&nosendclose=any  -timeout 10000 -handler [namespace code [list handler testdata]]]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok $testdata] [meta $tok connection] [meta $tok content-encoding]  [meta $tok transfer-encoding]  [expr {[file size testdoc.html]-[string length $testdata]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-3.4.1 FAILED
+
+
+
+==== http11-3.5.1 -handler,close,identity as http11-3.0 but handlerPause enters event loop FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 10000 -handler [namespace code [list handlerPause testdata]]]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok $testdata] [meta $tok connection] [meta $tok content-encoding]  [meta $tok transfer-encoding]  [expr {[file size testdoc.html]-[string length $testdata]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-3.5.1 FAILED
+
+
+
+==== http11-3.6.1 -handler,close,identity as http11-3.0 but with -progress FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 10000 -handler [namespace code [list handler testdata]]  -progress [namespace code [list progress logdata]]]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok $testdata] [meta $tok connection] [meta $tok content-encoding]  [meta $tok transfer-encoding]  [expr {[file size testdoc.html]-[string length $testdata]}]  [expr {[lindex $logdata 0] - [lindex $logdata 1]}]  [expr {[lindex $logdata 0] - [string length $testdata]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-3.6.1 FAILED
+
+
+
+==== http11-3.7.1 -handler,close,identity as http11-3.0 but with -progress progressPause enters event loop FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 10000 -handler [namespace code [list handler testdata]]  -progress [namespace code [list progressPause logdata]]]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok $testdata] [meta $tok connection] [meta $tok content-encoding]  [meta $tok transfer-encoding]  [expr {[file size testdoc.html]-[string length $testdata]}]  [expr {[lindex $logdata 0] - [lindex $logdata 1]}]  [expr {[lindex $logdata 0] - [string length $testdata]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-3.7.1 FAILED
+
+
+
+==== http11-3.8.1 close,identity no -handler but with -progress FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 10000  -progress [namespace code [list progress logdata]]  -headers {accept-encoding {}}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok] [meta $tok connection] [meta $tok content-encoding]  [meta $tok transfer-encoding]  [expr {[file size testdoc.html]-[string length [http::data $tok]]}]  [expr {[lindex $logdata 0] - [lindex $logdata 1]}]  [expr {[lindex $logdata 0] - [string length [http::data $tok]]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-3.8.1 FAILED
+
+
+
+==== http11-3.9.1 close,identity no -handler but with -progress progressPause enters event loop FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html?close=1  -timeout 10000  -progress [namespace code [list progressPause logdata]]  -headers {accept-encoding {}}]
+    http::wait $tok
+    list [http::status $tok] [http::code $tok] [check_crc $tok] [meta $tok connection] [meta $tok content-encoding]  [meta $tok transfer-encoding]  [expr {[file size testdoc.html]-[string length [http::data $tok]]}]  [expr {[lindex $logdata 0] - [lindex $logdata 1]}]  [expr {[lindex $logdata 0] - [string length [http::data $tok]]}]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-3.9.1 FAILED
+
+
+
+==== http11-4.0.1 normal post request FAILED
+==== Contents of test case:
+
+    set query [http::formatQuery q 1 z 2]
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -query $query -timeout 10000]
+    http::wait $tok
+    list status [http::status $tok] code [http::code $tok] crc [check_crc $tok] connection [meta $tok connection] query-length [meta $tok x-query-length]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-4.0.1 FAILED
+
+
+
+==== http11-4.1.1 normal post request, check query length FAILED
+==== Contents of test case:
+
+    set query [http::formatQuery q 1 z 2]
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html  -headers [list x-check-query yes]  -query $query -timeout 10000]
+    http::wait $tok
+    list status [http::status $tok] code [http::code $tok] crc [check_crc $tok] connection [meta $tok connection] query-length [meta $tok x-query-length]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-4.1.1 FAILED
+
+
+
+==== http11-4.2.1 normal post request, check long query length FAILED
+==== Contents of test case:
+
+    set query [string repeat a 24576]
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html -headers [list x-check-query yes] -query $query -timeout 10000]
+    http::wait $tok
+    list status [http::status $tok] code [http::code $tok] crc [check_crc $tok] connection [meta $tok connection] query-length [meta $tok x-query-length]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+==== http11-4.2.1 FAILED
+
+
+
+==== http11-4.3.1 normal post request, check channel query length FAILED
+==== Contents of test case:
+
+    set tok [http::geturl http://localhost:$httpd_port/testdoc.html -headers [list x-check-query yes] -querychannel $chan -timeout 10000]
+    http::wait $tok
+    list status [http::status $tok] code [http::code $tok] crc [check_crc $tok] connection [meta $tok connection] query-length [meta $tok x-query-length]
+
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(setup): can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"vwait httpd_output"
+    (procedure "create_httpd" line 19)
+    invoked from within
+"create_httpd"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL EVENT NO_SOURCES
+---- Test cleanup failed:
+can't read "chan": no such variable
+---- errorInfo(cleanup): can't read "chan": no such variable
+    while executing
+"close $chan"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME chan
+==== http11-4.3.1 FAILED
+
+Test file error: eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+eof from httpd
+httpPipeline.test
+==== Test with ThreadLevel 0 ====
+==== Test with ThreadLevel 1 ====
+httpProxy.test
+==== Test with ThreadLevel 0 ====
+==== Test with ThreadLevel 1 ====
+
+- Constraints needsTls, knownTwapiFullBugThreadlevelAny, knownTwapiFullBugThreadUsed are
+  always set by the script, not by the caller.
+- Set one of needsTclTls, needsTwapi, needsTwapiFull instead of needsTls.
+- Set knownBug instead of knownTwapiFullBugThreadlevelAny, knownTwapiFullBugThreadUsed.
+- If the caller sets constraint needsTwapi, the script forces needsSquidNoAuth and needsSquidAuth to 0.
+
+httpcookie.test
+icu.test
+if-old.test
+if.test
+incr-old.test
+incr.test
+indexObj.test
+info.test
+init.test
+interp.test
+io.test
+
+
+==== io-6.31 Tcl_GetsObj: crlf mode: buffer exhausted, blocked FAILED
 ==== Contents of test case:
 
     # (FilterInputBytes() != 0)
-    set f [openpipe w+ $path(cat)]
-    chan configure $f -translation {crlf lf} -buffering none
-    chan puts -nonewline $f "bbbbbbbbbbbbbb\r\n123456789012345\r"
-    chan configure $f -buffersize 16
-    lappend x [chan gets $f]
-    chan configure $f -blocking 0
-    lappend x [chan gets $f line] $line [chan blocked $f]  [testchannel inputbuffered $f]
+
+    set f [open "|[list [interpreter] $path(cat)]" w+]
+    fconfigure $f -translation {crlf lf} -buffering none
+    puts -nonewline $f "bbbbbbbbbbbbbb\r\n123456789012345\r"
+    fconfigure $f -buffersize 16
+    set x [gets $f]
+    fconfigure $f -blocking 0
+    lappend x [gets $f line] $line [fblocked $f] [testchannel inputbuffered $f]
+    close $f
+    set x
 
 ---- Result was:
 bbbbbbbbbbbbbb -1 {} 1 0
 ---- Result should have been (exact matching):
 bbbbbbbbbbbbbb -1 {} 1 16
-==== chan-io-6.31 FAILED
+==== io-6.31 FAILED
 
 
 
-==== chan-io-6.43 Tcl_GetsObj: input saw cr FAILED
+==== io-6.43 Tcl_GetsObj: input saw cr FAILED
 ==== Contents of test case:
 
     # if (chanPtr->flags & INPUT_SAW_CR)
-    set f [openpipe w+ $path(cat)]
-    chan configure $f -translation {auto lf} -buffering none
-    chan puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
-    chan configure $f -buffersize 16
-    lappend x [chan gets $f]
-    chan configure $f -blocking 0
-    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
-    chan configure $f -blocking 1
-    chan puts -nonewline $f "\nabcd\refg\x1A"
-    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
-    lappend x [chan gets $f line] $line
+
+    set f [open "|[list [interpreter] $path(cat)]" w+]
+    fconfigure $f -translation {auto lf} -buffering none
+    puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    fconfigure $f -buffersize 16
+    set x [list [gets $f]]
+    fconfigure $f -blocking 0
+    lappend x [gets $f line] $line [testchannel queuedcr $f]
+    fconfigure $f -blocking 1
+    puts -nonewline $f "\nabcd\refg\x1A"
+    lappend x [gets $f line] $line [testchannel queuedcr $f]
+    lappend x [gets $f line] $line
+    close $f
+    set x
 
 ---- Result was:
 bbbbbbbbbbbbbbb -1 {} 0 15 123456789abcdef 1 4 abcd
 ---- Result should have been (exact matching):
 bbbbbbbbbbbbbbb 15 123456789abcdef 1 4 abcd 0 3 efg
-==== chan-io-6.43 FAILED
+==== io-6.43 FAILED
 
 
 
-==== chan-io-6.44 Tcl_GetsObj: input saw cr, not followed by cr FAILED
+==== io-6.44 Tcl_GetsObj: input saw cr, not followed by cr FAILED
 ==== Contents of test case:
 
     # not (*eol == '\n')
-    set f [openpipe w+ $path(cat)]
-    chan configure $f -translation {auto lf} -buffering none
-    chan puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
-    chan configure $f -buffersize 16
-    lappend x [chan gets $f]
-    chan configure $f -blocking 0
-    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
-    chan configure $f -blocking 1
-    chan puts -nonewline $f "abcd\refg\x1A"
-    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
-    lappend x [chan gets $f line] $line
+
+    set f [open "|[list [interpreter] $path(cat)]" w+]
+    fconfigure $f -translation {auto lf} -buffering none
+    puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    fconfigure $f -buffersize 16
+    set x [list [gets $f]]
+    fconfigure $f -blocking 0
+    lappend x [gets $f line] $line [testchannel queuedcr $f]
+    fconfigure $f -blocking 1
+    puts -nonewline $f "abcd\refg\x1A"
+    lappend x [gets $f line] $line [testchannel queuedcr $f]
+    lappend x [gets $f line] $line
+    close $f
+    set x
 
 ---- Result was:
 bbbbbbbbbbbbbbb -1 {} 0 15 123456789abcdef 1 4 abcd
 ---- Result should have been (exact matching):
 bbbbbbbbbbbbbbb 15 123456789abcdef 1 4 abcd 0 3 efg
-==== chan-io-6.44 FAILED
+==== io-6.44 FAILED
 
 
 
-==== chan-io-6.45 Tcl_GetsObj: input saw cr, skip right number of bytes FAILED
+==== io-6.45 Tcl_GetsObj: input saw cr, skip right number of bytes FAILED
 ==== Contents of test case:
 
     # Tcl_ExternalToUtf()
-    set f [openpipe w+ $path(cat)]
-    chan configure $f -translation {auto lf} -buffering none
-    chan configure $f -encoding utf-16
-    chan puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
-    chan configure $f -buffersize 16
-    chan gets $f
-    chan configure $f -blocking 0
-    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
-    chan configure $f -blocking 1
-    chan puts -nonewline $f "\nabcd\refg"
-    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
+
+    set f [open "|[list [interpreter] $path(cat)]" w+]
+    fconfigure $f -translation {auto lf} -buffering none
+    fconfigure $f -encoding utf-16
+    puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    fconfigure $f -buffersize 16
+    gets $f
+    fconfigure $f -blocking 0
+    set x [list [gets $f line] $line [testchannel queuedcr $f]]
+    fconfigure $f -blocking 1
+    puts -nonewline $f "\nabcd\refg"
+    lappend x [gets $f line] $line [testchannel queuedcr $f]
+    close $f
+    set x
 
 ---- Result was:
 -1 {} 0 15 123456789abcdef 0
 ---- Result should have been (exact matching):
 15 123456789abcdef 1 4 abcd 0
-==== chan-io-6.45 FAILED
+==== io-6.45 FAILED
 
 
 
-==== chan-io-6.46 Tcl_GetsObj: input saw cr, followed by just \n should give eof FAILED
+==== io-6.46 Tcl_GetsObj: input saw cr, followed by just \n should give eof FAILED
 ==== Contents of test case:
 
     # memmove()
-    set f [openpipe w+ $path(cat)]
-    chan configure $f -translation {auto lf} -buffering none
-    chan puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
-    chan configure $f -buffersize 16
-    chan gets $f
-    chan configure $f -blocking 0
-    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
-    chan configure $f -blocking 1
-    chan puts -nonewline $f "\n\x1A"
-    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
+
+    set f [open "|[list [interpreter] $path(cat)]" w+]
+    fconfigure $f -translation {auto lf} -buffering none
+    puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    fconfigure $f -buffersize 16
+    gets $f
+    fconfigure $f -blocking 0
+    set x [list [gets $f line] $line [testchannel queuedcr $f]]
+    fconfigure $f -blocking 1
+    puts -nonewline $f "\n\x1A"
+    lappend x [gets $f line] $line [testchannel queuedcr $f]
+    close $f
+    set x
 
 ---- Result was:
 -1 {} 0 15 123456789abcdef 1
 ---- Result should have been (exact matching):
 15 123456789abcdef 1 -1 {} 0
-==== chan-io-6.46 FAILED
+==== io-6.46 FAILED
 
 
 
-==== chan-io-6.47 Tcl_GetsObj: auto mode: \r at end of buffer, peek for \n FAILED
+==== io-6.47 Tcl_GetsObj: auto mode: \r at end of buffer, peek for \n FAILED
 ==== Contents of test case:
 
     # (eol == dstEnd)
+
     set f [open $path(test1) w]
-    chan configure $f -translation lf
-    chan puts -nonewline $f "123456789012345\r\nabcdefghijklmnopq"
-    chan close $f
+    fconfigure $f -translation lf
+    puts -nonewline $f "123456789012345\r\nabcdefghijklmnopq"
+    close $f
     set f [open $path(test1)]
-    chan configure $f -translation auto -buffersize 16
-    list [chan gets $f] [testchannel inputbuffered $f]
+    fconfigure $f -translation auto -buffersize 16
+    set x [list [gets $f] [testchannel inputbuffered $f]]
+    close $f
+    set x
 
 ---- Result was:
 123456789012345 0
 ---- Result should have been (exact matching):
 123456789012345 15
-==== chan-io-6.47 FAILED
+==== io-6.47 FAILED
 
 
 
-==== chan-io-8.1 PeekAhead: only go to device if no more cached data FAILED
+==== io-8.1 PeekAhead: only go to device if no more cached data FAILED
 ==== Contents of test case:
 
     # (bufPtr->nextPtr == NULL)
+
     set f [open $path(test1) w]
-    chan configure $f -encoding ascii -translation lf
-    chan puts -nonewline $f "123456789012345\r\n2345678"
-    chan close $f
+    fconfigure $f -encoding ascii -translation lf
+    puts -nonewline $f "123456789012345\r\n2345678"
+    close $f
     set f [open $path(test1)]
-    chan configure $f -encoding ascii -translation auto -buffersize 16
+    fconfigure $f -encoding ascii -translation auto -buffersize 16
     # here
-    chan gets $f
-    testchannel inputbuffered $f
+    gets $f
+    set x [testchannel inputbuffered $f]
+    close $f
+    set x
 
 ---- Result was:
 0
 ---- Result should have been (exact matching):
 7
-==== chan-io-8.1 FAILED
+==== io-8.1 FAILED
+
+
+
+==== io-29.27 Tcl_Flush on closed pipeline FAILED
+==== Contents of test case:
+
+    file delete $path(pipe)
+    set f [open $path(pipe) w]
+    puts $f {exit}
+    close $f
+    set f [open "|[list [interpreter] $path(pipe)]" r+]
+    gets $f
+    puts $f output
+    after 50
+    #
+    # The flush below will get a SIGPIPE. This is an expected part of
+    # test and indicates that the test operates correctly. If you run
+    # this test under a debugger, the signal will by intercepted unless
+    # you disable the debugger's signal interception.
+    #
+    if {[catch {flush $f} msg]} {
+	set x [list 1 $msg $::errorCode]
+	catch {close $f}
+    } else {
+	if {[catch {close $f} msg]} {
+	    set x [list 1 $msg $::errorCode]
+	} else {
+	    set x {this was supposed to fail and did not}
+	}
+    }
+    regsub {".*":} $x {"":} x
+    string tolower $x
+
+---- Result was:
+1 {error flushing "": cannot send after transport endpoint shutdown} {posix eshutdown {cannot send after transport endpoint shutdown}}
+---- Result should have been (exact matching):
+1 {error flushing "": broken pipe} {posix epipe {broken pipe}}
+==== io-29.27 FAILED
+
+
+
+==== io-29.33b TIP#398, no implicit flush of nonblocking on exit FAILED
+==== Contents of test case:
+
+    set f [open $path(script) w]
+    puts $f {
+		fconfigure stdout -blocking 0
+		puts -nonewline stdout [string repeat A 655360]
+		flush stdout
+	}
+    close $f
+    set f [open $path(script2) w]
+    puts $f {after 2000}
+    close $f
+	set t1 [clock milliseconds]
+	set ff [open "|[list [interpreter] $path(script2)]" w]
+	catch {unset ::env(TCL_FLUSH_NONBLOCKING_ON_EXIT)}
+	exec [interpreter] $path(script) >@ $ff
+	set t2 [clock milliseconds]
+	close $ff
+	expr {($t2-$t1)/2000 ? $t2-$t1 : 0}
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error writing "stdout": cannot send after transport endpoint shutdown
+    while executing
+"puts -nonewline stdout [string repeat A 655360]"
+    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/script" line 3)
+    while executing
+"exec [interpreter] $path(script) >@ $ff"
+    ("uplevel" body line 15)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: CHILDSTATUS 5519 1
+==== io-29.33b FAILED
+
+
+
+==== io-29.34 Tcl_Close, async flush on close, using sockets FAILED
+==== Contents of test case:
+
+    variable c 0
+    variable x running
+    set l abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz
+    proc writelots {s l} {
+	for {set i 0} {$i < 9000} {incr i} {
+	    puts $s $l
+	}
+    }
+    proc accept {s a p} {
+	variable x
+	fileevent $s readable [namespace code [list readit $s]]
+	fconfigure $s -blocking off
+	set x accepted
+    }
+    proc readit {s} {
+	variable c
+	variable x
+	set l [gets $s]
+
+	if {[eof $s]} {
+	    close $s
+	    set x done
+	} elseif {([string length $l] > 0) || ![fblocked $s]} {
+	    incr c
+	}
+    }
+    set ss [socket -server [namespace code accept] -myaddr 127.0.0.1 0]
+    set cs [socket 127.0.0.1 [lindex [fconfigure $ss -sockname] 2]]
+    vwait [namespace which -variable x]
+    fconfigure $cs -blocking off
+    writelots $cs $l
+    close $cs
+    close $ss
+    vwait [namespace which -variable x]
+    set c
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: couldn't open socket: operation not supported
+    while executing
+"socket -server [namespace code accept] -myaddr 127.0.0.1 0"
+    ("uplevel" body line 28)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOTSUP {operation not supported}
+==== io-29.34 FAILED
+
+
+
+==== io-29.35 Tcl_Close vs fileevent vs multiple interpreters FAILED
+==== Contents of test case:
+
+    # On Mac, this test screws up sockets such that subsequent tests using port 2828
+    # either cause errors or panic().
+
+    catch {interp delete x}
+    catch {interp delete y}
+    interp create x
+    interp create y
+    set s [socket -server [namespace code accept] -myaddr 127.0.0.1 0]
+    proc accept {s a p} {
+	puts $s hello
+	close $s
+    }
+    set c [socket 127.0.0.1 [lindex [fconfigure $s -sockname] 2]]
+    interp share {} $c x
+    interp share {} $c y
+    close $c
+    x eval {
+	proc readit {s} {
+	    gets $s
+	    if {[eof $s]} {
+		close $s
+	    }
+	}
+    }
+    y eval {
+	proc readit {s} {
+	    gets $s
+	    if {[eof $s]} {
+		close $s
+	    }
+	}
+    }
+    x eval "fileevent $c readable \{readit $c\}"
+    y eval "fileevent $c readable \{readit $c\}"
+    y eval [list close $c]
+    update
+    close $s
+    interp delete x
+    interp delete y
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: couldn't open socket: operation not supported
+    while executing
+"socket -server [namespace code accept] -myaddr 127.0.0.1 0"
+    ("uplevel" body line 9)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOTSUP {operation not supported}
+==== io-29.35 FAILED
+
+
+
+==== io-29.36.1 gets on translation auto with "\r" in QA communication mode, possible regression, bug [b3977d199b] FAILED
+==== Contents of test case:
+
+    set port [gets $s]
+    foreach t {{cr lf} {auto lf}} {
+	set c [socket 127.0.0.1 $port]
+	fconfigure $c -buffering line -translation $t
+	lappend result $t
+	while {1} {
+	    set q [gets $c]
+	    switch -- $q {
+		"who are you?"   {puts $c "client"}
+		"really client?" {puts $c "yes"; lappend result $q; break}
+		default {puts $c "wrong"; lappend result "unexpected input \"$q\""; break}
+	    }
+	}
+	lappend result [gets $s]
+	close $c; set c {}
+    }
+    set result
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: expected integer but got ""
+    while executing
+"socket 127.0.0.1 $port"
+    ("foreach" body line 2)
+    invoked from within
+"foreach t {{cr lf} {auto lf}} {
+	set c [socket 127.0.0.1 $port]
+	fconfigure $c -buffering line -translation $t
+	lappend result $t
+	while {1} {
+	    se..."
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL VALUE NUMBER
+---- Test cleanup failed:
+couldn't open socket: operation not supported
+can't read "s": no such variable
+can't wait for variable(s)/channel(s): would wait forever
+---- errorInfo(cleanup): couldn't open socket: operation not supported
+can't read "s": no such variable
+can't wait for variable(s)/channel(s): would wait forever
+    while executing
+"close $s"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): NONE
+==== io-29.36.1 FAILED
+
+
+
+==== io-29.36.2 gets on translation auto with "\r\n" in different buffers, bug [b3977d199b] FAILED
+==== Contents of test case:
+
+    set ::cnt 0
+    proc accept {so args} {
+	fconfigure $so -translation binary
+	puts -nonewline $so "1 line\r"
+	puts -nonewline $so "\n2 li"
+	flush $so
+	# now force separate packets
+	puts -nonewline $so "ne\r"
+	flush $so
+	if {$::cnt & 1} {
+	    vwait ::cli; # simulate short delay (so client can process events, just wait for it)
+	} else {
+	    # we don't have a delay, so client would get the lines as single chunk
+	}
+	# we'll try with "\r" and without "\r" (to cover both branches, where "\r" and "eof" causes exit from [gets] by 3rd line)
+	puts -nonewline $so "\n3 line"
+	if {!($::cnt % 3)} {
+	    puts -nonewline $so "\r"
+	}
+	flush $so
+	close $so
+    }
+    while {$::cnt < 6} { incr ::cnt
+	set c [socket 127.0.0.1 [lindex [fconfigure $s -sockname] 2]]
+	fconfigure $c -blocking 0 -buffering line -translation auto
+	fileevent $c readable [list apply {c {
+	    if {[gets $c line] >= 0} {
+		lappend ::cli <$line>
+	    } elseif {[eof $c]} {
+		set ::done 1
+	    }
+	}} $c]
+	vwait ::done
+	close $c; set c {}
+    }
+    set ::cli
+
+---- Test setup failed:
+couldn't open socket: operation not supported
+---- errorInfo(setup): couldn't open socket: operation not supported
+    while executing
+"socket -server [namespace code accept] -myaddr 127.0.0.1 0"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): POSIX ENOTSUP {operation not supported}
+---- Test cleanup failed:
+can not find channel named "file9"
+---- errorInfo(cleanup): can not find channel named "file9"
+    while executing
+"close $s"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP CHANNEL file9
+==== io-29.36.2 FAILED
+
+
+
+==== io-32.7 Tcl_Read, nonblocking, file FAILED
+==== Contents of test case:
+
+    set f1 [open $path(longfile) r]
+    fconfigure $f1 -blocking off
+    set z [read $f1 20]
+    close $f1
+    set l [string length $z]
+    set x ok
+    if {$l != 20} {
+	set x broken
+    }
+    set x
+
+---- Result was:
+broken
+---- Result should have been (exact matching):
+ok
+==== io-32.7 FAILED
+
+
+
+==== io-32.8 Tcl_Read, nonblocking, file FAILED
+==== Contents of test case:
+
+    set f1 [open $path(longfile) r]
+    fconfigure $f1 -blocking off
+    set z [read $f1 1000000]
+    close $f1
+    set x ok
+    set l [string length $z]
+    set z [file size $path(longfile)]
+    if {$z != $l} {
+	set x broken
+    }
+    set x
+
+---- Result was:
+broken
+---- Result should have been (exact matching):
+ok
+==== io-32.8 FAILED
+
+
+
+==== io-35.4 Tcl_Eof, eof detection on nonblocking file FAILED
+==== Contents of test case:
+
+    file delete $path(test1)
+    set f [open $path(test1) w]
+    close $f
+    set f [open $path(test1) r]
+    fconfigure $f -blocking off
+    set l ""
+    lappend l [gets $f]
+    lappend l [eof $f]
+    close $f
+    set l
+
+---- Result was:
+{} 0
+---- Result should have been (exact matching):
+{} 1
+==== io-35.4 FAILED
+
+
+
+==== io-36.5 Tcl_InputBlocked vs files, short read, nonblocking FAILED
+==== Contents of test case:
+
+    file delete $path(test1)
+    set f [open $path(test1) w]
+    puts $f abcdefghijklmnop
+    close $f
+    set f [open $path(test1) r]
+    fconfigure $f -blocking off
+    set l ""
+    lappend l [fblocked $f]
+    lappend l [read $f 3]
+    lappend l [fblocked $f]
+    lappend l [read -nonewline $f]
+    lappend l [fblocked $f]
+    lappend l [eof $f]
+    close $f
+    set l
+
+---- Result was:
+0 {} 1 {} 1 0
+---- Result should have been (exact matching):
+0 abc 0 defghijklmnop 0 1
+==== io-36.5 FAILED
+
+
+
+==== io-36.6 Tcl_InputBlocked vs files, event driven read FAILED
+==== Contents of test case:
+
+    proc in {f} {
+	variable l
+	variable x
+	lappend l [read $f 3]
+	if {[eof $f]} {lappend l eof; close $f; set x done}
+    }
+    file delete $path(test1)
+    set f [open $path(test1) w]
+    puts $f abcdefghijklmnop
+    close $f
+    set f [open $path(test1) r]
+    fconfigure $f -blocking off
+    set l ""
+    fileevent $f readable [namespace code [list in $f]]
+    variable x
+    vwait [namespace which -variable x]
+    set l
+
+---- Result was:
+abc def ghi jkl mno {p
+} {} eof
+---- Result should have been (exact matching):
+abc def ghi jkl mno {p
+} eof
+==== io-36.6 FAILED
+
+
+
+==== io-39.9 Tcl_SetChannelOption, blocking mode FAILED
+==== Contents of test case:
+
+    file delete $path(test1)
+    set f1 [open $path(test1) w]
+    close $f1
+    set f1 [open $path(test1) r]
+    set x ""
+    lappend x [fconfigure $f1 -blocking]
+    fconfigure $f1 -blocking off
+    lappend x [fconfigure $f1 -blocking]
+    lappend x [gets $f1]
+    lappend x [read $f1 1000]
+    lappend x [fblocked $f1]
+    lappend x [eof $f1]
+    close $f1
+    set x
+
+---- Result was:
+1 0 {} {} 1 0
+---- Result should have been (exact matching):
+1 0 {} {} 0 1
+==== io-39.9 FAILED
+
+
+
+==== io-39.18 Tcl_SetChannelOption, setting read mode independently FAILED
+==== Contents of test case:
+
+    proc accept {s a p} {close $s}
+    set s1 [socket -server [namespace code accept] -myaddr 127.0.0.1 0]
+    set port [lindex [fconfigure $s1 -sockname] 2]
+    set s2 [socket 127.0.0.1 $port]
+    update
+    fconfigure $s2 -translation {auto lf}
+    set modes [fconfigure $s2 -translation]
+    close $s1
+    close $s2
+    set modes
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: couldn't open socket: operation not supported
+    while executing
+"socket -server [namespace code accept] -myaddr 127.0.0.1 0"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOTSUP {operation not supported}
+==== io-39.18 FAILED
+
+
+
+==== io-39.19 Tcl_SetChannelOption, setting read mode independently FAILED
+==== Contents of test case:
+
+    proc accept {s a p} {close $s}
+    set s1 [socket -server [namespace code accept] -myaddr 127.0.0.1 0]
+    set port [lindex [fconfigure $s1 -sockname] 2]
+    set s2 [socket 127.0.0.1 $port]
+    update
+    fconfigure $s2 -translation {auto crlf}
+    set modes [fconfigure $s2 -translation]
+    close $s1
+    close $s2
+    set modes
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: couldn't open socket: operation not supported
+    while executing
+"socket -server [namespace code accept] -myaddr 127.0.0.1 0"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOTSUP {operation not supported}
+==== io-39.19 FAILED
+
+
+
+==== io-39.20 Tcl_SetChannelOption, setting read mode independently FAILED
+==== Contents of test case:
+
+    proc accept {s a p} {close $s}
+    set s1 [socket -server [namespace code accept] -myaddr 127.0.0.1 0]
+    set port [lindex [fconfigure $s1 -sockname] 2]
+    set s2 [socket 127.0.0.1 $port]
+    update
+    fconfigure $s2 -translation {auto cr}
+    set modes [fconfigure $s2 -translation]
+    close $s1
+    close $s2
+    set modes
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: couldn't open socket: operation not supported
+    while executing
+"socket -server [namespace code accept] -myaddr 127.0.0.1 0"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOTSUP {operation not supported}
+==== io-39.20 FAILED
+
+
+
+==== io-39.21 Tcl_SetChannelOption, setting read mode independently FAILED
+==== Contents of test case:
+
+    proc accept {s a p} {close $s}
+    set s1 [socket -server [namespace code accept] -myaddr 127.0.0.1 0]
+    set port [lindex [fconfigure $s1 -sockname] 2]
+    set s2 [socket 127.0.0.1 $port]
+    update
+    fconfigure $s2 -translation {auto auto}
+    set modes [fconfigure $s2 -translation]
+    close $s1
+    close $s2
+    set modes
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: couldn't open socket: operation not supported
+    while executing
+"socket -server [namespace code accept] -myaddr 127.0.0.1 0"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOTSUP {operation not supported}
+==== io-39.21 FAILED
+
+
+
+==== io-39.23 Tcl_GetChannelOption, server socket is not readable or
+	writable, it should still have valid -eofchar and -translation options FAILED
+==== Contents of test case:
+
+    set l [list]
+    set sock [socket -server [namespace code accept] -myaddr 127.0.0.1 0]
+    lappend l [fconfigure $sock -eofchar] [fconfigure $sock -translation]
+    close $sock
+    set l
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: couldn't open socket: operation not supported
+    while executing
+"socket -server [namespace code accept] -myaddr 127.0.0.1 0"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOTSUP {operation not supported}
+==== io-39.23 FAILED
+
+
+
+==== io-39.24 Tcl_SetChannelOption, server socket is not readable or
+	writable so we can't change -eofchar or -translation FAILED
+==== Contents of test case:
+
+    set l [list]
+    set sock [socket -server [namespace code accept] -myaddr 127.0.0.1 0]
+    fconfigure $sock -eofchar D -translation lf
+    lappend l [fconfigure $sock -eofchar] [fconfigure $sock -translation]
+    close $sock
+    set l
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: couldn't open socket: operation not supported
+    while executing
+"socket -server [namespace code accept] -myaddr 127.0.0.1 0"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOTSUP {operation not supported}
+==== io-39.24 FAILED
+
+
+
+==== io-40.3 POSIX open access modes: CREAT FAILED
+==== Contents of test case:
+
+    # This test only works if your umask is 2, like ouster's.
+    file delete $path(test3)
+    set f [open $path(test3) {WRONLY CREAT}]
+    close $f
+    file stat $path(test3) stats
+    format 0o%03o [expr {$stats(mode)&0o777}]
+
+---- Result was:
+0o644
+---- Result should have been (exact matching):
+0o666
+==== io-40.3 FAILED
+
+
+
+==== io-51.1 Test old socket deletion on Macintosh FAILED
+==== Contents of test case:
+
+    set x 0
+    set result ""
+    proc accept {s a p} {
+	variable x
+	variable wait
+	fconfigure $s -blocking off
+	puts $s "sock[incr x]"
+	close $s
+	set wait done
+    }
+    set ss [socket -server [namespace code accept] -myaddr 127.0.0.1 0]
+    set port [lindex [fconfigure $ss -sockname] 2]
+
+    variable wait ""
+    set cs [socket 127.0.0.1 $port]
+    vwait [namespace which -variable wait]
+    lappend result [gets $cs]
+    close $cs
+
+    set wait ""
+    set cs [socket 127.0.0.1 $port]
+    vwait [namespace which -variable wait]
+    lappend result [gets $cs]
+    close $cs
+
+    set wait ""
+    set cs [socket 127.0.0.1 $port]
+    vwait [namespace which -variable wait]
+    lappend result [gets $cs]
+    close $cs
+
+    set wait ""
+    set cs [socket 127.0.0.1 $port]
+    vwait [namespace which -variable wait]
+    lappend result [gets $cs]
+    close $cs
+    close $ss
+    set result
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: couldn't open socket: operation not supported
+    while executing
+"socket -server [namespace code accept] -myaddr 127.0.0.1 0"
+    ("uplevel" body line 12)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOTSUP {operation not supported}
+==== io-51.1 FAILED
+
+
+
+==== io-52.22.1 TclCopyChannel & encodings & tell position FAILED
+==== Contents of test case:
+
+    # binary to encoding => the input has to be
+    # in utf-8 to make sense to the encoder
+
+    set in  [open $path(utf8-fcopy.txt) r]
+    set out [open $path(kyrillic.txt) w]
+
+    # Using "-encoding ascii" means reading the "Á" gives an error
+    fconfigure $in  -encoding ascii -profile strict
+    fconfigure $out -encoding koi8-r -translation lf
+    proc ::xxx args {
+	set ::s0 $args
+    }
+
+    fcopy $in $out -command ::xxx
+    vwait ::s0
+    list [tell $in] [tell $out] {*}[set ::s0]
+
+---- Result was:
+-1 1 1 {error reading "file6": invalid or incomplete multibyte or wide character}
+---- Result should have been (glob matching):
+1 1 1 {error reading "file*": invalid or incomplete multibyte or wide character}
+==== io-52.22.1 FAILED
+
+
+
+==== io-53.5 CopyData: error during fcopy FAILED
+==== Contents of test case:
+
+    variable fcopyTestDone
+    set listen [socket -server [namespace code FcopyTestAccept] -myaddr 127.0.0.1 0]
+    set in [open $thisScript]	;# 126 K
+    set out [socket 127.0.0.1 [lindex [fconfigure $listen -sockname] 2]]
+    catch {unset fcopyTestDone}
+    close $listen	;# This means the socket open never really succeeds
+    fconfigure $in -encoding utf-8
+    fconfigure $out -encoding utf-8
+    fcopy $in $out -command [namespace code FcopyTestDone]
+    variable fcopyTestDone
+    if {![info exists fcopyTestDone]} {
+	vwait [namespace which -variable fcopyTestDone]		;# The error occurs here in the b.g.
+    }
+    close $in
+    close $out
+    set fcopyTestDone	;# 1 for error condition
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: couldn't open socket: operation not supported
+    while executing
+"socket -server [namespace code FcopyTestAccept] -myaddr 127.0.0.1 0"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOTSUP {operation not supported}
+==== io-53.5 FAILED
 
