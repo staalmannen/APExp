@@ -24,6 +24,27 @@
  *   1. A NON-BLOCKING POLL NEVER REPORTS ANYTHING (sections 2 and 3).
  *   2. A CONNECTION WHOSE PEER HAS CLOSED IS NEVER READABLE (4 and 5).
  *
+ * WHAT THE FIRST VM RUN ANSWERED, because half of the above is now
+ * settled and the other half is refuted:
+ *
+ *	1  PASS   blocking select on a pipe with data
+ *	2  FAIL   the same pipe to a zero-timeout poll
+ *	3  FAIL   ten more immediate polls, still nothing
+ *	4  PASS   closed peer, data pending, readable; read gave 7
+ *	5  PASS   closed peer, nothing written, readable; read gave 0
+ *	6  PASS   writable on a plain file
+ *
+ * BUG 1 IS REAL AND IS IN select(). BUG 2 DOES NOT EXIST AT THIS
+ * LEVEL: a closed peer is reported readable both ways round, and the
+ * read that follows answers exactly what POSIX asks. So Tcl's 7b is
+ * failing somewhere above this call, and sections 7 and 8 were added
+ * to find out where -- 7 asks the one state section 4 skipped (the
+ * end of file AFTER the data has been drained), and 8 rebuilds
+ * event-11.5's mixed read/write set in C.
+ *
+ * Section 3's original answer was thrown away as well; see the note on
+ * it below. It said "NEVER" off ten polls that take microseconds.
+ *
  * WHY IT IS WORTH GOING DOWN TO C. Tcl's notifier is select(), and on
  * Plan 9 select() is not a system call: ap/plan9/_buf.c implements it
  * with a COPY PROCESS per descriptor, forked by _startbuf() on the
@@ -68,6 +89,7 @@
 #include <arpa/inet.h>
 #include <sys/select.h>
 #include <sys/time.h>
+#include <time.h>
 
 static int fail = 0;
 
@@ -213,10 +235,29 @@ main(void)
 	 * THE QUESTION A FIX TURNS ON, and the one the Tcl test cannot
 	 * ask. On Plan 9 select forks a copy process for each descriptor
 	 * the first time it is named; with a zero timeout it returns
-	 * before that process can have run. If polls 2..10 report ready,
-	 * the answer is "not the first time" and a fix is about making
-	 * the first call wait for the copy process to be started. If none
-	 * of them ever does, it is "never" and the fault is elsewhere.
+	 * before that process can have run.
+	 *
+	 * THE FIRST VERSION OF THIS SECTION OVERCLAIMED AND ITS ANSWER
+	 * HAD TO BE THROWN AWAY. It polled ten more times back to back
+	 * and printed "NEVER, not merely late" when none of them
+	 * reported. Ten zero-timeout selects take MICROSECONDS, and the
+	 * polling process never yields, so that measured nothing about
+	 * "never" -- a copy process that has only just been forked has
+	 * not been scheduled yet either. A check whose negative answer
+	 * has a second explanation is not a check.
+	 *
+	 * So the three cases are asked separately now, and they want
+	 * different fixes:
+	 *
+	 *   3a  ten immediate polls  -- the original, kept for the record
+	 *   3b  a poll after SLEEPING a second, so the copy process has
+	 *       certainly run
+	 *   3c  a poll AFTER A BLOCKING SELECT HAS ALREADY SAID READY on
+	 *       this same descriptor. By then b->n > 0 is a fact, the
+	 *       copy process demonstrably exists, and the poll reads the
+	 *       identical test. IF 3c STILL FAILS, THE COPY PROCESS IS
+	 *       NOT THE EXPLANATION AT ALL and no amount of waiting for
+	 *       it would help.
 	 */
 	if(polled == 1)
 		note("section 2 already passed, so there is nothing to ask");
@@ -231,16 +272,29 @@ main(void)
 			}
 		}
 		if(firstready < 0)
-			note("ten more polls, still not ready: NEVER, not"
-				" merely late");
-		else {
-			printf("  note poll number %d reported it ready\n",
+			note("3a. ten more immediate polls: still not ready"
+				" (which proves nothing on its own)");
+		else
+			printf("  note 3a. poll number %d reported it ready\n",
 				firstready + 2);
-			note("so the data arrives and only the FIRST poll"
-				" misses it");
+
+		sleep(1);
+		r = readable(p[0], 0);
+		ok(r == 1, "3b. a poll one second later is ready");
+		if(r == 0)
+			note("a whole second is long enough for any copy"
+				" process, so lateness is NOT the explanation");
+
+		i = readable(p[0], -1);
+		printf("  note 3c. a blocking select says %d\n", i);
+		r = readable(p[0], 0);
+		ok(r == 1, "3c. a poll straight after a blocking select agrees");
+		if(i == 1 && r == 0) {
+			note("THE SAME DESCRIPTOR, READY TO A BLOCKING SELECT");
+			note("AND NOT TO A POLL. Both read b->n > 0 || b->eof,");
+			note("so the difference is in select() itself and not");
+			note("in whether the copy process has run.");
 		}
-		ok(firstready >= 0 || readable(p[0], -1) != 1,
-			"a poll eventually agrees with a blocking select");
 	}
 	close(p[0]);
 	close(p[1]);
@@ -320,6 +374,132 @@ main(void)
 			ok(r > 0 && FD_ISSET(fd, &ws),
 				"a file open for writing is writable");
 			close(fd);
+			remove(tmp);
+		}
+	}
+
+	printf("\n--- 7. EOF AFTER THE DATA HAS BEEN DRAINED ---\n");
+	/*
+	 * SECTION 4 DID NOT ASK THIS AND THE TCL TEST'S 7b DOES. 4 selects
+	 * once, finds the connection readable because seven bytes are
+	 * waiting, and reads them. 7b then drains the line and asks AGAIN,
+	 * and the second answer is the one it wants: with the data gone,
+	 * the only thing left to report is the end of file.
+	 *
+	 * Those are different states of the buffer -- `b->n > 0` for the
+	 * first, `b->eof` for the second -- and select tests them with one
+	 * `||`, so they can come apart. Reading a section's own passing
+	 * result as covering the case after it is the "a pair that looks
+	 * like one cause was two" mistake from textDisp-6.5/6.6.
+	 */
+	fd = closedpeer(1);
+	if(fd < 0)
+		note("could not build a loopback pair; run socket-server-test");
+	else {
+		char buf[32];
+		int n;
+
+		r = readable(fd, -1);
+		if(r != 1)
+			note("not readable even with data pending -- that is"
+				" section 4, and this section adds nothing");
+		else {
+			n = read(fd, buf, sizeof buf);
+			printf("  note drained %d bytes\n", n);
+			r = readable(fd, -1);
+			ok(r == 1, "the connection is STILL readable once drained"
+				" (the EOF)");
+			if(r == 0)
+				note("this is Tcl's 7b exactly: data reported,"
+					" end of file not");
+			else {
+				n = read(fd, buf, sizeof buf);
+				ok(n == 0, "and the read that follows answers 0");
+				if(n != 0)
+					printf("  note it answered %d (%s)\n", n,
+						n < 0 ? strerror(errno) : "");
+			}
+		}
+		close(fd);
+	}
+
+	printf("\n--- 8. event-11.5 IN C: a writable file and a dead socket ---\n");
+	/*
+	 * THE TCL TEST'S SECTION 8, WITH NOTHING BUT LIBAP IN THE WAY. It
+	 * reported x = 2533503 and y = 0 -- the writable source ran two and
+	 * a half million times and the socket source never once -- and the
+	 * C sections above say each of those descriptors behaves correctly
+	 * ON ITS OWN. So the remaining difference is that event-11.5 puts
+	 * them in the SAME select, and that is what this asks.
+	 *
+	 * Two things make the mixed set worth suspecting rather than
+	 * assuming, and both are visible in ap/plan9/_buf.c:
+	 *
+	 *   - the writable count is added to `n` BEFORE the read loop, and
+	 *     the function returns as soon as `n` is nonzero, so a select
+	 *     carrying any writable descriptor NEVER BLOCKS. It becomes a
+	 *     spin, and `mux->selwait` is never set, so the copy process's
+	 *     wakeup path is never used either.
+	 *   - a descriptor the read loop finds not ready is FD_CLR'd and
+	 *     recorded in mux->rwant, which the early return then discards.
+	 *
+	 * The counters are the verdict, not the pass: `nread` staying at 0
+	 * while `nwrite` climbs reproduces the Tcl failure here, and puts
+	 * the fault in libap. BOTH CLIMBING EXONERATES libap for this test
+	 * and moves the question up to Tcl's notifier -- which would be a
+	 * result just as useful, and is the reason to run it either way.
+	 * Neither handler reads the socket, exactly as event-11.5's does
+	 * not, so a connection once reported stays reported.
+	 */
+	{
+		char *tmp = "select-test.rr";
+		fd_set rs, ws;
+		struct timeval tv;
+		time_t start;
+		long nwrite = 0, nread = 0, loops = 0;
+		int wfd, sfd;
+
+		sfd = closedpeer(1);
+		wfd = open(tmp, O_WRONLY|O_CREAT|O_TRUNC, 0666);
+		if(sfd < 0 || wfd < 0)
+			note("could not build the pair; run socket-server-test");
+		else {
+			start = time(0);
+			while(time(0) - start < 3 && (nwrite < 3 || nread < 3)) {
+				FD_ZERO(&rs);
+				FD_ZERO(&ws);
+				FD_SET(sfd, &rs);
+				FD_SET(wfd, &ws);
+				tv.tv_sec = 2;
+				tv.tv_usec = 0;
+				r = select((sfd > wfd ? sfd : wfd) + 1,
+					&rs, &ws, NULL, &tv);
+				loops++;
+				if(r < 0)
+					break;
+				if(FD_ISSET(wfd, &ws))
+					nwrite++;
+				if(FD_ISSET(sfd, &rs))
+					nread++;
+			}
+			printf("  note %ld selects, writable %ld times,"
+				" readable %ld times\n", loops, nwrite, nread);
+			ok(nread >= 3 && nwrite >= 3,
+				"both sources were reported (this is event-11.5)");
+			if(nread == 0 && nwrite > 0) {
+				note("THE SOCKET WAS NEVER REPORTED while the file");
+				note("always was -- event-11.5 reproduced in C, so");
+				note("the fault is in select() and not in Tcl.");
+			} else if(nread >= 3 && nwrite >= 3) {
+				note("libap answers this correctly, so Tcl's x=2533503");
+				note("y=0 is NOT this call misbehaving. Look next at");
+				note("Tcl's notifier and channel layer, not at _buf.c.");
+			}
+		}
+		if(sfd >= 0)
+			close(sfd);
+		if(wfd >= 0) {
+			close(wfd);
 			remove(tmp);
 		}
 	}
