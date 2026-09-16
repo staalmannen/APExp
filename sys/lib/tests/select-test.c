@@ -607,6 +607,79 @@ main(void)
 		}
 	}
 
+	printf("\n--- 10. the listener closed with the connection NEVER ACCEPTED ---\n");
+	/*
+	 * UPSTREAM'S event-11.5, AND THE ONE SHAPE NOTHING HERE HAS
+	 * TRIED. Every other section accepts -- blocking in 4, 5 and 7,
+	 * through select in 9 -- and all of them pass. Tcl's 7b and 8 do
+	 * not accept at all:
+	 *
+	 *	set s1 [socket -server accept -myaddr 127.0.0.1 0]
+	 *	after 1000
+	 *	set s2 [socket 127.0.0.1 $port]
+	 *	close $s1		<- the accept script never ran
+	 *
+	 * An accept script only runs inside the event loop and there is
+	 * none before that close, so the server side never accepted,
+	 * never wrote `foobar` and never closed. The test still expects
+	 * `3 3 done`, so it is relying on the CONNECTION ABANDONED IN THE
+	 * ACCEPT QUEUE becoming readable when the listener goes -- on X11
+	 * the kernel resets it and every read answers at once.
+	 *
+	 * That is a different question from "is a closed peer readable",
+	 * which sections 4, 5 and 7 answer YES to, and it is the only one
+	 * left that could explain `y = 0`. Tcl section 7c is its control
+	 * on the other side.
+	 *
+	 * Note what a PASS here would mean: not that the port is fine,
+	 * but that libap answers this too and the fault is higher still.
+	 */
+	{
+		int srv, cli;
+		struct sockaddr_in sa;
+		socklen_t len;
+		char buf[32];
+		int n;
+
+		srv = socket(AF_INET, SOCK_STREAM, 0);
+		memset(&sa, 0, sizeof sa);
+		sa.sin_family = AF_INET;
+		sa.sin_port = 0;
+		sa.sin_addr.s_addr = inet_addr("127.0.0.1");
+		if(srv < 0
+		|| bind(srv, (struct sockaddr *)&sa, sizeof sa) < 0
+		|| listen(srv, 5) < 0)
+			note("could not listen; run socket-server-test");
+		else {
+			len = sizeof sa;
+			getsockname(srv, (struct sockaddr *)&sa, &len);
+			cli = socket(AF_INET, SOCK_STREAM, 0);
+			if(cli < 0
+			|| connect(cli, (struct sockaddr *)&sa, sizeof sa) < 0)
+				note("could not connect to our own listener");
+			else {
+				close(srv);	/* NEVER ACCEPTED */
+				r = readable(cli, -1);
+				ok(r == 1, "a connection abandoned in the accept"
+					" queue becomes readable");
+				if(r == 1) {
+					errno = 0;
+					n = read(cli, buf, sizeof buf);
+					printf("  note read answered %d", n);
+					if(n < 0)
+						printf(" (%s)", strerror(errno));
+					printf("\n");
+				} else {
+					note("THIS IS event-11.5's y = 0, in C.");
+					note("upstream closes the listener without");
+					note("ever accepting, so the client is left");
+					note("on a connection nothing will answer.");
+				}
+				close(cli);
+			}
+		}
+	}
+
 	printf("\n%d failure(s)\n", fail);
 	return fail;
 }

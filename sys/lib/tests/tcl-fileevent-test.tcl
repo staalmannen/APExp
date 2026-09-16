@@ -82,6 +82,58 @@ proc waitfor {ms} {
     return $::done
 }
 
+# Build a loopback pair whose peer has written and CLOSED FOR REAL --
+# the accept waited for, the write and the close done here rather than
+# from a script -- and return the client channel. select-test.c's
+# closedpeer() in Tcl.
+#
+# THIS IS A CONTROL, NOT A CORRECTION, and the difference matters. The
+# first version of this comment claimed sections 7b and 8 had the setup
+# wrong, because they do
+#
+#	set srv [socket -server {... puts $ch foobar; close $ch}]
+#	set cli [socket 127.0.0.1 $port]
+#	close $srv			;# <- no event loop yet
+#
+# and an accept script only runs inside the event loop, so the handler
+# never runs: nothing is written and nothing is closed. All true -- and
+# **upstream's event-11.5 is written exactly that way**, `after 1000`
+# and all, and expects `3 3 done`. So the suite really does require a
+# client whose listener was closed with the connection never accepted
+# to become readable, and 7b/8 were faithful reproductions after all.
+#
+# What that costs on X11 is worth knowing: the connection sits in the
+# kernel's accept queue and closing the listener resets it, so the
+# channel goes readable-with-error and every read answers at once. The
+# test passes on the strength of an error, not of a conversation.
+#
+# So this proc is the OTHER case -- a peer that really did accept,
+# write and close -- and the pair of them separates "a closed peer is
+# never readable" from "a connection abandoned in the accept queue is
+# never readable", which want completely different answers.
+proc closedpeer {withdata} {
+    set ::acc {}
+    set srv [socket -server {apply {{ch a p} {set ::acc $ch}}} \
+	-myaddr 127.0.0.1 0]
+    set cli [socket 127.0.0.1 [lindex [fconfigure $srv -sockname] 2]]
+    set t [after 2000 [list set ::acc TIMEOUT]]
+    while {$::acc eq ""} { vwait ::acc }
+    after cancel $t
+    if {$::acc eq "TIMEOUT"} {
+	catch {close $cli}
+	catch {close $srv}
+	return ""
+    }
+    if {$withdata} {
+	fconfigure $::acc -buffering line
+	puts $::acc foobar
+	flush $::acc
+    }
+    close $::acc			;# THE PEER IS NOW GONE, for real
+    close $srv
+    return $cli
+}
+
 puts "--- 1. blocking read from a bidirectional pipe (chan-io-29.26) ---"
 # The control, and it is known to PASS in the suite. If this fails,
 # nothing below means anything -- the pipe itself is broken and the
@@ -350,37 +402,78 @@ if {[catch {
 
 step "7b. readable fileevent at END OF FILE (peer closed)"
 if {[catch {
+    #
+    # UPSTREAM'S SHAPE, deliberately: event-11.5 closes the listener
+    # with the connection never accepted, so this does too. Section 7c
+    # below is the same question with a peer that really accepted.
+    #
     set srv7 [socket -server {apply {{ch a p} {
 	puts $ch foobar
 	close $ch
     }}} -myaddr 127.0.0.1 0]
     set cli7 [socket 127.0.0.1 [lindex [fconfigure $srv7 -sockname] 2]]
     close $srv7
-    # drain the line the server sent, so the next readable is the EOF
+    #
+    # THE HANDLER HAS TO READ BEFORE ASKING [eof], and the first version
+    # of this section did not. Tcl's `eof` reports whether a read has
+    # ALREADY hit the end, not whether the peer has gone -- so a handler
+    # that only asks `eof $ch` answers "data" on the fire that delivers
+    # the line AND on the fire that delivers the end of file, and the
+    # section failed with 'data' against a channel behaving perfectly.
+    # The host caught it, as the convention says it should.
+    #
+    # So this drains and stays registered: the line arrives on one fire,
+    # the EOF on the next, which is select-test.c section 7 in Tcl.
     set ::done TIMEOUT
     fileevent $cli7 readable [list apply {{ch} {
-	fileevent $ch readable {}
-	set ::done [expr {[eof $ch] ? "eof" : "data"}]
+	gets $ch
+	if {[eof $ch]} {
+	    fileevent $ch readable {}
+	    set ::done eof
+	}
     }} $cli7]
     set got [waitfor 3000]
-    if {$got eq "data"} {
-	gets $cli7
-	set ::done TIMEOUT
-	fileevent $cli7 readable [list apply {{ch} {
-	    fileevent $ch readable {}
-	    set ::done [expr {[eof $ch] ? "eof" : "data"}]
-	}} $cli7]
-	set got [waitfor 3000]
-    }
     catch {close $cli7}
 } err]} {
     ok 0 "readable at EOF ($err)"
 } else {
     ok [expr {$got eq "eof"}] "a closed peer reports readable (got '$got')"
     if {$got eq "TIMEOUT"} {
-	note "the peer closed and the notifier never said so. A channel at"
-	note "end of file must report READABLE -- that is how every Tcl"
-	note "program learns the other end went away."
+	note "the listener closed with the connection never accepted, and"
+	note "the notifier never said so. Section 7c is the same question"
+	note "with a peer that really did accept, write and close."
+    }
+}
+
+step "7c. the same, but the peer REALLY accepted and closed"
+# THE CONTROL 7b NEEDS, and the one C has been measuring all along:
+# select-test.c's closedpeer() does a blocking accept before writing
+# and closing, and sections 4, 5, 7 and 9 all pass on the VM. So if 7c
+# passes here and 7b does not, the fault is NOT "a closed peer is never
+# readable" -- it is a connection ABANDONED IN THE ACCEPT QUEUE, which
+# is a different thing and is what upstream's event-11.5 depends on.
+if {[catch {
+    set cli7c [closedpeer 1]
+    if {$cli7c eq ""} {
+	error "the server never accepted the connection"
+    }
+    set ::done TIMEOUT
+    fileevent $cli7c readable [list apply {{ch} {
+	gets $ch
+	if {[eof $ch]} {
+	    fileevent $ch readable {}
+	    set ::done eof
+	}
+    }} $cli7c]
+    set got [waitfor 3000]
+    catch {close $cli7c}
+} err]} {
+    ok 0 "readable at EOF, peer accepted ($err)"
+} else {
+    ok [expr {$got eq "eof"}] "an accepted-and-closed peer reports readable (got '$got')"
+    if {$got eq "eof"} {
+	note "so a real closed peer IS reported, and 7b's case is the"
+	note "abandoned accept queue rather than the close."
     }
 }
 
@@ -394,6 +487,9 @@ step "8. two sources, round robin, neither can finish alone"
 if {[catch {
     set t8 [file join [pwd] tcl-fileevent-test.rr]
     set f8 [open $t8 w]
+    # UPSTREAM'S SHAPE, character for character -- including closing the
+    # listener with the connection never accepted, which is what the
+    # real event-11.5 does and what 7c exists to contrast.
     set srv8 [socket -server {apply {{ch a p} {
 	puts $ch foobar
 	close $ch

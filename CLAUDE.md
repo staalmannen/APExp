@@ -6150,6 +6150,80 @@ above `select()`, which is exactly what section 9 established.
 
 No header changed, so the `HFILES` trap is not in play for this one.
 
+#### event-11.5 NEVER ACCEPTS THE CONNECTION, and that is the whole of it
+
+**Both predictions landed.** `tcl-fileevent-test.tcl` section **5a now
+passes** -- the `update`/`DONT_WAIT` poll, which is the poll fix showing
+itself one layer up -- and `event.test` under `-singleproc 1 -verbose t`
+prints **no `==== event-1.1 FAILED`** at all, so `event-1.1` passes too.
+The file still stops at `---- event-11.5 start`, and 7b and 8 still
+fail with `x = 2751547`, `y = 0`.
+
+**Then reading upstream's actual test answered it in one look**, which
+is where this should have started:
+
+```tcl
+set s1 [socket -server accept -myaddr 127.0.0.1 0]
+after 1000
+set s2 [socket 127.0.0.1 [lindex [fconfigure $s1 -sockname] 2]]
+close $s1
+```
+
+**THE ACCEPT SCRIPT NEVER RUNS.** An accept script only runs inside the
+event loop; `after 1000` with no argument is a blocking sleep, not an
+event loop, and `close $s1` follows the connect immediately. So the
+server side never accepts, never writes `foobar`, and never closes --
+and the test still expects `3 3 done`. **Upstream is relying on a
+connection ABANDONED IN THE ACCEPT QUEUE becoming readable when the
+listener goes.** On X11 the kernel resets it, and `select-test.c`
+section 10 now says so in as many words on the build host:
+
+```
+--- 10. the listener closed with the connection NEVER ACCEPTED ---
+  PASS a connection abandoned in the accept queue becomes readable
+  note read answered -1 (Connection reset by peer)
+```
+
+**That is a completely different question from the one nine sections
+have been answering.** "Is a closed peer readable" is YES, measured
+four ways on the VM. "Is a connection nobody accepted readable once the
+listener closes" had never been asked, in C or in Tcl, and it is the
+only thing left that can produce `y = 0`.
+
+**I got the correction backwards first, and the real test is what
+caught it.** On seeing that section 3 waits for its accept and 7b/8 do
+not, I rewrote 7b and 8 to wait -- and that made them *unfaithful*,
+because upstream does not wait either. The sections are restored to
+upstream's shape, and the waiting version is **section 7c**, a control
+rather than a correction. The pair is the point: 7b failing while 7c
+passes says the fault is the abandoned queue and not the close.
+
+**A second, genuine bug in 7b, and the host caught it as the convention
+says it should.** The handler asked `[eof $ch]` *without reading*, and
+Tcl's `eof` reports whether a read has already hit the end, not whether
+the peer has gone -- so it answered `data` both on the fire carrying the
+line and on the fire carrying the end of file. The section failed with
+`got 'data'` against a channel behaving perfectly. It drains and stays
+registered now, which is section 7 of the C file in Tcl.
+
+With both fixed the whole file reports **0 failures on a Linux tclsh**
+-- 7b, 7c and 8 included, and section 8 reproduces upstream's own
+`3 3 done`. Before this, section 8 could not have been trusted to mean
+anything on the VM, since it passed on the host for the wrong reason.
+
+**What the next VM run decides.** If section 10 fails and 7c passes,
+`event-11.5` is fully explained: the port does not report an abandoned
+accept-queue connection, and upstream's test needs it. That is then a
+real question about what `ap/network/listen.c`'s listener process does
+with a connection it has opened and never handed over -- it holds the
+`/net/tcp` connection open in a separate process, so closing the
+*pipe* the parent holds need not close the *connection* at all, which
+would leave the client waiting on a peer that is still there.
+
+**And that would make it the `XLoadFont` family again, in its widest
+form yet**: a listener process that exits without closing what it
+opened leaves a live connection nobody will ever serve.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
