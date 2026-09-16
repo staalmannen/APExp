@@ -135,12 +135,40 @@
 # l* family is silently skipped" would have been a much bigger finding
 # than the one this round actually has.)
 
+# ------------------------------------------------------------------
+# THE LOOPBACK NOTE: BOTH SKIPS ARE COMMENTED OUT, AND HERE IS WHY.
+#
+# chanio.test and io.test both hung, and both hangs were the same bug:
+# a blocking connect to 127.0.0.1 on a machine whose network stack did
+# not believe 127.0.0.1 was one of its own addresses. /net/ipselftab
+# listed ten addresses and no loopback. The fix was one line of system
+# configuration and no code at all:
+#
+#	ip/ipconfig loopback /dev/null 127.1
+#
+# sys/lib/tests/socket-server-test.c reports 0 failures after that, and
+# prints /net/ipselftab itself -- so IF EITHER FILE HANGS AGAIN, RUN
+# THAT FIRST. A missing loopback is not persistent across a reboot
+# unless the machine's own startup configures it (see CLAUDE.md on why
+# that does not belong in apexp-sh), so this can come back on a fresh
+# boot and look like a regression in the suite.
+#
+# The two lappends are left in place, commented, rather than deleted:
+# they are the record of which files this bug reached, and putting one
+# back is a one-character edit if some other hang turns up in them.
+#
+# EXPECT THE FAILURE COUNT TO RISE. ioCmd, ioTrans, iogt and
+# socket.test have never been reached by any run, so measuring them for
+# the first time will add failures that were always there. Same as Tk's
+# first complete run going 25 -> 485; compare per file, not by total.
+# ------------------------------------------------------------------
+
 set skipfiles {l.*.test}
 
 # chanio.test -- hangs the parent (see above). Take it out the moment
 # the chan-io-6.4x cluster is understood; run it on its own meanwhile,
 # with the recipe in the next comment block.
-lappend skipfiles chanio.test
+#lappend skipfiles chanio.test	;# see the loopback note below
 
 # io.test -- the same thing in the older API, and the blocker found by
 # the run that skipping chanio.test bought. That run reached io.test,
@@ -159,7 +187,7 @@ lappend skipfiles chanio.test
 # start. Take BOTH out of this list together once that is settled, and
 # expect ioCmd, ioTrans, iogt and socket.test to be in the same family
 # -- they have never been reached, so nothing is known about them.
-lappend skipfiles io.test
+#lappend skipfiles io.test	;# see the loopback note below
 
 # ------------------------------------------------------------------
 package require tcltest 2.5
@@ -218,7 +246,10 @@ if {[llength $skipfiles]
 puts "tcl-runall: starting, line buffered, exit wrapped for the marker"
 puts "tcl-runall: -notfile is $skipfiles -- l.*.test is tcltest's own\
  default (SCCS lock files, matches nothing here) and is repeated so\
- that setting the option does not drop it; the rest wedge the parent"
+ that setting the option does not drop it. Anything BEYOND that in the\
+ list wedges the parent; nothing does today, since chanio.test and\
+ io.test were both the missing loopback -- if either hangs again run\
+ sys/lib/tests/socket-server-test first."
 puts "tcl-runall: note tcltest runs each file in its OWN process, so a\
  file that is KILLED costs only itself; a file that HANGS costs every\
  file after it. A child's stdout is a PIPE and is block buffered, so\
