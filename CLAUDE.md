@@ -6325,6 +6325,70 @@ swapped: **7b is the control now and 7c is upstream's shape.**
 Both pass on a Linux tclsh, with the markers printing in order, so the
 instrumentation itself is not what will hang.
 
+#### `at: waitfor` -- and the listener was killing the parent's TIMER
+
+**One line of output ended it.** 7c prints
+
+```
+at: socket -server
+at: socket 127.0.0.1 (connect)
+at: close $srv7 (the listener)
+at: fileevent readable
+at: waitfor
+```
+
+and stops. The handler markers never appear, so **`vwait` never
+serviced its own 3000ms `after`** -- and a `vwait` that cannot reach
+its own timer means `select()` did not come back, timeout or no
+timeout.
+
+`select()`'s blocking path ends in `_RENDEZVOUS(&mux->selwait, 0)`, and
+exactly two things ever wake it: a copy process that has found
+something, or **the timer process**. A copy process that reaches end of
+file before the parent sets `selwait` simply `_exit(0)`s without waking
+anyone, which is a lost wakeup the timer is there to cover. So a freeze
+rather than a timeout says the timer is gone.
+
+**It was, and I killed it.** `listenproc`'s child left through
+`exit(0)`, which **runs the parent's inherited `atexit` handlers**. Of
+the two `_buf.c` registers:
+
+```c
+_killmuxsid(void)      { if(_muxsid != -1 && (_mainpid == getpid() || ...)) ... }
+_killtimerproc(void)   { if(timerpid > 0) kill(timerpid, SIGKILL); }
+```
+
+`_killmuxsid` is guarded by `_mainpid` and does nothing in a child.
+**`_killtimerproc` is not**, and `timerpid` is inherited straight from
+the parent -- so the listener process killed the parent's timer on its
+way out. `timerpid` stays `> 0` afterwards, so `_resettimer()` goes on
+signalling a corpse, and **every blocking `select()` that needs a
+timeout from then on waits for ever.**
+
+**The previous fix is what exposed it.** Before `close(fd)` the
+listener never returned from its read and never reached `exit(0)` at
+all, so the handler never ran. Making the process exit *correctly* is
+what let it do this -- which is why 7c went from `TIMEOUT` to a freeze
+while C, which does not depend on the timer in section 10, stayed
+green. **A fix that makes a process reach code it never reached before
+is a fix that can expose anything on that path**, and this file has now
+met that twice: the errno table's effect on `bind()`'s fallback was the
+same shape.
+
+**`_copyproc` has always said `_exit(0)`**, two hundred lines away in
+the same file, for exactly this reason. The listener says it now.
+
+`_killtimerproc` also takes `_killmuxsid`'s guard. The `_exit` is the
+real fix; the guard closes the class, so the next child that leaves
+through `exit()` cannot repeat it.
+
+**Prediction:** 7c stops freezing. Whether it then *passes* is a
+separate question and I would not bet on it -- the lost wakeup above is
+real, and the timer merely turns it back into a 3s `TIMEOUT`. So the
+honest prediction is: **7c reports rather than hangs**, 7b and 8 are
+unaffected, and `event.test` either clears `event-11.5` or fails it,
+but does not sit there.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
