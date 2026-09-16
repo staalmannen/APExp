@@ -6285,6 +6285,46 @@ process and a live connection for the life of the program, which is
 `ioCmd`, `ioTrans`, `iogt` and `socket.test` -- four files no run has
 ever reached.
 
+#### C IS FIXED AND TCL GOT WORSE, which is a result and not a setback
+
+**`select-test` reports 0 failures.** Section 10 passes, with
+`read answered 0` -- the abandoned connection is hung up and reports a
+clean end of file, where before it was never readable at all. At the
+`select()` level the port now does the right thing in all ten shapes.
+
+**And Tcl's 7b stopped failing and started FREEZING.** That is a change
+in kind and has to be said plainly: before the `listen()` fix the
+section reported `TIMEOUT`, and now nothing comes back. `event.test`
+still stops at `event-11.5`, which is where it stopped before, so the
+suite is no worse -- but the reproduction is, and the fix caused it.
+
+**A freeze and a timeout are completely different evidence here**, and
+the distinction is the whole value of the run. `waitfor` arms an
+`after` timer, so a section that reports `TIMEOUT` proves the event
+loop kept running and the source was merely silent. A section that
+never comes back proves **the process is blocked in a call** and the
+loop is never reached at all. So the fix turned a silent source into a
+blocked one, and what blocks is new since the fix: the listener now
+*exits* when the listening socket is closed, and the client now reaches
+a real end of file. Only two statements are new, and they are one
+printed line apart.
+
+**A section cannot say which of its own statements blocked**, so the
+upstream-shaped case now marks each with `at:` and the last line
+printed is the answer -- `tk-scrollbar-hang-test.tcl`'s technique,
+which is the only thing that has settled a question of this shape here
+in one run.
+
+**AND THE ORDER WAS WRONG, WHICH COST THE CONTROL.** The accepted-peer
+case was 7c, *after* the upstream-shaped one -- so when that began to
+freeze, the control never ran. This file's own header says every case
+expected to return must come before every case expected to hang, and
+`tk-mousewheel-test.tcl` already paid for that lesson once. The two are
+swapped: **7b is the control now and 7c is upstream's shape.**
+
+Both pass on a Linux tclsh, with the markers printing in order, so the
+instrumentation itself is not what will hang.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
