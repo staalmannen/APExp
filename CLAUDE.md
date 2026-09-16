@@ -153,8 +153,8 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `sigset-test.c`, `posix-spawn-test.c`, `limits-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
-`float-overflow-test.c`, `malloc-reuse-test.c` and
-`stdio-test.c`. The twenty-five `tk-*.tcl` scripts there are Tcl, run
+`float-overflow-test.c`, `malloc-reuse-test.c`,
+`socket-server-test.c` and `stdio-test.c`. The twenty-five `tk-*.tcl` scripts there are Tcl, run
 with `wish` -- except `tk-menubar-test.tcl`, which needs `tktest` and
 skips itself under `wish`, and `tk-transient-test.tcl`, whose last
 section alone does; see the Tk section below. `tk-runall.tcl` is the harness for
@@ -5087,13 +5087,132 @@ identical from the shell**, which is the whole argument for the marker
 -- and the marker did its job, reporting `exit called (code 1)` rather
 than letting a refused run read as a finished one.
 
-**What to expect of the next run:** with `-notfile` spelled correctly
-and `chanio.test` skipped, the run should reach all 167 files and print
-`tcl-runall: every file ran`. That gives the first real total this
-suite has ever produced -- and like Tk's first complete run, **the
-failure count will look enormous next to the ten above, and that is
-measurement, not regression.** The run to compare it against does not
-exist yet; this is the baseline.
+#### The first real measurement: 66 files, 195 failures, and 86 of them are one missing feature
+
+Skipping `chanio.test` bought **twelve files -> about sixty-six**, in
+alphabetical order through `io.test`, and a log of 4883 lines against
+231. The prediction that it would reach all 167 and print the marker
+was **wrong**: it stopped again, in `io.test`, which is `chanio.test`'s
+older-API twin. Constant low CPU again -- blocked, not spinning.
+
+**195 failures, and the shape is what matters, not the number:**
+
+| file | | |
+|---|---|---|
+| `http11` | **86** | one cause -- no `socket -server`; see below |
+| `io` | 27 | partial: the file hung part way, so this is a floor |
+| `fCmd` | 18 | |
+| `clock` | 16 | |
+| `filename` | 14 | |
+| `cmdAH` | 12 | |
+| `env` | 9 | |
+| `exec` | 8 | |
+| `expr` | 5 | |
+| `event`, `binary` | 2 each | `binary` is the two Inf tests above |
+| `expr-old`, `chan` | 1 each | |
+
+**`http11` is 86 of 195 and is a single line repeated**, which is the
+`testobjconfig` warning from the Tk section arriving on this side:
+**one file can dominate a count and say almost nothing about the
+tree.** Every one of them is its `-setup` failing:
+
+```
+---- Test setup failed:
+can't wait for variable(s)/channel(s): would wait forever
+    while executing "vwait httpd_output"  (procedure "create_httpd")
+```
+
+`create_httpd` starts a local server and waits for it; with no server
+the `vwait` has no event source and Tcl refuses it outright. So
+**http11 measures one feature, not 86 things**, and the honest count of
+distinct problems in this run is closer to 110.
+
+#### `socket -server` answers EOPNOTSUPP, and the real message is thrown away
+
+Seen 30 times in the log as `couldn't open socket: operation not
+supported`. **The sockets are not missing** -- `ap/network/` has
+`socket.c`, `bind.c`, `listen.c`, `accept.c` and the whole resolver.
+`bind()` writes a `bind` control message to `/net/tcp`, falls back to
+`announce` when the stack refuses it, and then:
+
+```c
+if(n < 0){
+	if(errno == EPLAN9)
+		errno = EOPNOTSUPP;	/* ap/network/bind.c:87 */
+	return -1;
+}
+```
+
+`EPLAN9` means "a Plan 9 error with no POSIX equivalent" -- **so the
+actual message is sitting in `errstr()` unread**, and EOPNOTSUPP is all
+that survives. `listen.c:147` and `accept.c:106` do the same.
+
+`sys/lib/tests/socket-server-test.c` prints it. Section 1 walks the
+POSIX sequence Tcl uses (`socket`, `bind` to 127.0.0.1 port 0,
+`getsockname`, `listen`) so the log names the call that fails -- and
+checks that a bind which *succeeds* actually assigned a port, since Tcl
+reads it back between bind and listen and a silent zero there is a hang
+rather than an error. Section 2 opens `/net/tcp/clone` itself and tries
+each spelling of the announce message in turn, printing `errstr()` for
+each: **the address syntax is not something to reason about from a
+manual page when the machine will say.**
+
+Section 1 is correct on glibc and was checked there; section 2 cannot
+be and skips itself where there is no `/net/tcp`. That asymmetry is
+deliberate -- a probe of one operating system's network stack is not a
+library rule.
+
+**The `__GNUC__` guard in that file is load-bearing and the obvious
+spellings are wrong.** `pcc` predefines exactly two things
+(`sys/src/cmd/pcc.c:77`), `__STDC__=1` and `_POSIX_SOURCE=`, so
+`_PLAN9_SOURCE` and `__plan9__` are both **absent** from an ordinary
+`pcc -o x x.c` -- and guarding on either would have compiled section 2
+into a function printing "no errstr on this system" on every line. A
+whole round trip for a test that cannot report the one thing it exists
+to report.
+
+**This is very likely the same bug as both hangs.** `io.test` stops
+after `io-53.5`, "CopyData: error during fcopy", which fails with that
+exact socket error; its neighbours end in a bare `vwait` on an `fcopy`
+callback, and a callback that cannot fire is a wait that never ends.
+`chanio.test` is the same file in the newer API. **That is a hypothesis
+the logs cannot confirm** -- both are lower bounds, per the buffering
+note above -- but it is one measurement away, and the same measurement
+would unlock the 86.
+
+Expect `ioCmd`, `ioTrans`, `iogt` and `socket.test` to be in that
+family too. **Nothing is known about them: no run has ever reached
+them.**
+
+#### A skip list is not a substitute for a timeout
+
+Two files skipped so far, one per round, each found by running the
+suite and seeing where it stopped. That is a round trip per hang, and
+`ioCmd`/`ioTrans`/`iogt` may well be three more. **tcltest has no
+timeout anywhere**, so there is no cheaper way inside it; the only
+lever is to fix the cause rather than enumerate the symptoms, which is
+the argument for doing the socket work next rather than skipping
+onward.
+
+**`-notfile` is applied after `-file`, and the harness got that wrong.**
+Asking for exactly the file the skip list skips gave
+
+```
+Only running test files that match:  chanio.test
+Error: No test files remain after applying your match and skip patterns!
+all.tcl:  Total 0  Passed 0  Skipped 0  Failed 0
+```
+
+-- the "run the hanging file on its own" recipe defeated by the
+convenience default meant for the whole-suite run. The harness no
+longer adds its skips when the caller passed `-file`: a caller who
+names files has said what they want.
+
+Note the marker **still printed "every file ran"** there, and was not
+wrong to: every file that matched did run, all zero of them. **A marker
+says the run reached the end, not that the run was the one you asked
+for.** The `Total 0` line is what says that, and it is worth reading
+beside the marker rather than instead of it.
 
 ### Build order for compiler changes
 ```
