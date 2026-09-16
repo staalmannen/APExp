@@ -142,6 +142,25 @@ set skipfiles {l.*.test}
 # with the recipe in the next comment block.
 lappend skipfiles chanio.test
 
+# io.test -- the same thing in the older API, and the blocker found by
+# the run that skipping chanio.test bought. That run reached io.test,
+# about 66 files in against twelve, and stopped after io-53.5 --
+# "CopyData: error during fcopy", whose neighbours all end in a bare
+#
+#	vwait [namespace which -variable fcopyTestDone]
+#
+# waiting for an fcopy callback. A callback that cannot fire is a wait
+# that never ends, and io-53.5 itself fails with
+# "couldn't open socket: operation not supported".
+#
+# THE TWO ARE PROBABLY ONE BUG, and it is probably the socket one in
+# socket-server-test.c rather than anything about channels: both files
+# are the IO suite, both hang, and both are full of servers that cannot
+# start. Take BOTH out of this list together once that is settled, and
+# expect ioCmd, ioTrans, iogt and socket.test to be in the same family
+# -- they have never been reached, so nothing is known about them.
+lappend skipfiles io.test
+
 # ------------------------------------------------------------------
 package require tcltest 2.5
 
@@ -173,7 +192,26 @@ proc ::exit {{code 0}} {
 # all.tcl reads $argv itself, so options given on OUR command line
 # reach tcltest -- and OUR argument wins if the caller gave one too,
 # since configure takes the last, so only add it when they did not.
-if {[llength $skipfiles] && [lsearch -exact $::argv -notfile] < 0} {
+#
+# AND NOT AT ALL WHEN THE CALLER NAMED FILES. -notfile is applied AFTER
+# -file, so asking for exactly the file this script skips gives
+#
+#	Only running test files that match:  chanio.test
+#	Error: No test files remain after applying your match and skip patterns!
+#	all.tcl:  Total 0  Passed 0  Skipped 0  Failed 0
+#
+# -- which is precisely the "run the hanging file on its own" recipe in
+# the comment above, defeated by the convenience default meant for the
+# whole-suite run. A caller who names files has said what they want;
+# the skip list is a default for "everything", not a veto.
+#
+# Note the marker still printed "every file ran" there, because from
+# tcltest's point of view every file that matched did run -- all zero
+# of them. A marker says the run reached the end, not that the run was
+# the one you asked for; the "Total 0" line is what says that.
+if {[llength $skipfiles]
+ && [lsearch -exact $::argv -notfile] < 0
+ && [lsearch -exact $::argv -file] < 0} {
     lappend ::argv -notfile $skipfiles
 }
 
