@@ -162,7 +162,11 @@ Tk's own suite rather than a test of its own, and `tk-runtest.tcl` runs
 a single file from it. `tcl-runall.tcl` is the same thing for Tcl's own
 suite, run under `tcltest`; both harnesses exist because a fault, a
 kill and a clean finish are indistinguishable from the shell, so a run
-without a completion marker cannot be read at all. `sys/src/ape/lib/libressl/test/` is separate: it is
+without a completion marker cannot be read at all.
+`tcl-fileevent-test.tcl` is a test rather than a harness -- it runs
+under plain `tclsh` and isolates the `chan-io-44.1` hang, with a
+timeout on every section so it reports where the suite would wait.
+`sys/src/ape/lib/libressl/test/` is separate: it is
 upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
 
 Beyond that, testing is still mostly ad-hoc — compile a program under
@@ -5549,6 +5553,90 @@ Newly reachable and recorded rather than chased:
   `8.1`): `-buffersize 16` with `testchannel inputbuffered` reporting 0
   where a partial buffer should remain. Nothing this round touched it,
   and it is still the oldest open item in this file.
+
+#### chan-io-44.1, and the pipe is not the variable
+
+`-singleproc 1 -file chanio.test -verbose t` named it in one run, as it
+did for `chan-io-28.7` and `unixWm-50.5` before it. The log ends
+
+```
+---- chan-io-43.1 start
+---- chan-io-43.2 start
+---- chan-io-44.1 start
+```
+
+so the hang is **`chan-io-44.1`**. Nothing was guessed from what sits
+after `41.8` this time, and it is as well: `42.1`..`43.2` all start
+**and return**, so a guess from the log's last line would have been
+wrong by six tests for the third time running.
+
+```tcl
+test chan-io-44.1 {FileEventProc procedure: normal read event} -setup {
+    set f2 [open "|[list cat -u]" r+]
+} -body {
+    chan event $f2 readable {set x [chan gets $f2]; chan event $f2 readable {}}
+    chan puts $f2 text; chan flush $f2
+    vwait x
+}
+```
+
+**THE PIPE AND `cat -u` ARE BOTH KNOWN GOOD, and that is what makes
+this narrow.** `chan-io-29.26` opens the **same** bidirectional
+`cat -u` pipe, writes a line and reads it back with a blocking
+`chan gets` -- and it **passes**. So `open "|cat -u" r+` works, the
+child runs, the write arrives and the data comes back. The single
+difference at `44.1` is that the read is driven by a **readable
+fileevent** instead of a blocking read.
+
+So the question is whether Tcl's notifier ever reports a *pipe* as
+readable here, and the useful control is that it demonstrably reports a
+**socket**: the whole `chan-io-28.x` block fires fileevents on sockets
+and every one of them starts and returns. Those are two different bugs
+-- "the notifier is broken" and "the notifier does not watch pipes" --
+wanting two different fixes, and the suite alone cannot separate them.
+
+`sys/lib/tests/tcl-fileevent-test.tcl` does, in four sections: the
+blocking pipe round trip (`29.26`, the control that must pass before
+anything else means anything), the same pipe under a readable
+fileevent (`44.1`), the same thing on a loopback socket, and on a plain
+file. **Every section carries its own timeout** and reports `TIMEOUT`
+rather than waiting -- which is the one thing tcltest cannot do, and
+the reason a single wedged test there costs 155 files. All four pass on
+a Linux tclsh, which is how the expectations were checked; the brace
+quoting in `ok {$got eq "x"}` was wrong on the first run and the host
+caught it, as the convention says it should.
+
+#### A Tcl list on an rc command line is not a Tcl list
+
+The command written here last round to skip `chanio.test` without an
+edit was
+
+```
+tcltest .../tcl-runall.tcl -notfile {l.*.test chanio.test}
+```
+
+and it does not work, because **`{}` in rc is a brace block, not a
+quoting construct**. rc split it, tcltest got `chanio.test}` as its own
+word, and refused the lot:
+
+```
+unknown option chanio.test}: should be one of -asidefromdir, ...
+tcl-runall: exit called (code 1)
+```
+
+The marker did its job again -- `exit called (code 1)` rather than a
+run that read as finished. The spelling that works quotes it for rc so
+that **one** argument reaches Tcl, which then parses it as a list:
+
+```
+tcltest .../tcl-runall.tcl -notfile 'l.*.test chanio.test'
+```
+
+Worth recording as a class, because this tree writes a lot of Tcl and
+runs all of it from rc: **a Tcl list literal has to survive the shell
+first, and rc's metacharacters are not sh's.** `{}` is a block, `()` is
+a list, and only `''` quotes. The same trap is waiting for any
+`-constraints`, `-match` or `-skip` argument with a space in it.
 
 #### A skip list is not a substitute for a timeout
 
