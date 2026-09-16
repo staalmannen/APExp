@@ -6389,6 +6389,68 @@ honest prediction is: **7c reports rather than hangs**, 7b and 8 are
 unaffected, and `event.test` either clears `event-11.5` or fails it,
 but does not sit there.
 
+#### SOLVED: event.test runs to the end with ZERO failures
+
+```
+Tests ended at 2026-09-16 18:38:02 +0200
+all.tcl:  Total 65  Passed 55  Skipped 10  Failed 0
+Sourced 1 Test Files.
+tcl-runall: every file ran, now entering exit (code 0)
+```
+
+**`event-11.5` clears, and so does everything after it.** `11.6`,
+`11.7`, `11.8`, the four `12.*`, the six `13.*` and the five `14.*` had
+**never run here** -- the file stopped at `11.5` in every run this
+project has ever taken. Fifty-five tests pass, ten skip on
+`nonPortable`, and **nothing fails**, where the last complete-enough
+measurement recorded `event` with 2.
+
+`tcl-fileevent-test.tcl` agrees, with 0 failures and 7c reporting
+`an abandoned accept queue reports readable (got 'eof')` -- and section
+8 giving `x = 3`, `y = 3`, `done`, which is upstream's own expected
+result rather than an approximation of it.
+
+**The prediction was deliberately hedged and the hedge was wrong in the
+good direction.** It said "7c reports rather than hangs" and explicitly
+declined to bet on it passing, because the lost wakeup in `select()`'s
+rendezvous is real and the timer only converts it into a 3s `TIMEOUT`.
+It passes. The lost wakeup evidently does not arise on this path --
+worth remembering as an open hazard rather than a closed one, since
+nothing here has measured it directly.
+
+**Two real libap bugs, and the second was invisible until the first was
+fixed.** They are worth reading as a pair, because the second is the
+price of the first:
+
+1. **`listenproc`'s child kept a copy of the parent's pipe end** --
+   the closing loop was commented out -- so `read(pfd[1])` could never
+   return 0, the listener never left its loop, and a connection it had
+   accepted at the TCP level but never handed over was never hung up.
+2. **It then left through `exit(0)`**, running the parent's inherited
+   `atexit` handlers, of which `_killtimerproc` was **unguarded** --
+   so the listener killed the parent's timer process, and every
+   blocking `select()` needing a timeout afterwards waited for ever.
+
+Neither could have been found from the other end. The first needed C to
+say that an abandoned accept queue is never readable while every other
+closed-peer shape is; the second needed the Tcl reproduction to change
+from `TIMEOUT` to a **freeze**, and then one `at:` marker to say which
+statement blocked.
+
+**What this predicts for the rest of the suite, and it is the largest
+claim this file has made.** Every `socket -server` whose client goes
+away unaccepted was leaking a blocked process and a live connection for
+the life of the program, and the timer went with the first one to exit.
+That is not one test: `ioCmd`, `ioTrans`, `iogt` and `socket.test` are
+four files **no run has ever reached**, and `chanio.test` and `io.test`
+are the two that had to be skipped to measure anything at all. Both are
+unskipped in the harness now.
+
+So the next run is the whole suite with no arguments, and the honest
+position is that **nothing is known about those six files** -- the
+count will rise as they are measured for the first time, and that is
+the "expect the failure count to rise" case, not a regression.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
