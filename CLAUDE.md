@@ -6224,6 +6224,67 @@ would leave the client waiting on a peer that is still there.
 form yet**: a listener process that exits without closing what it
 opened leaves a live connection nobody will ever serve.
 
+#### CONFIRMED, and the listener process never exits at all
+
+**Every prediction landed.** C section 10 **fails** and 1..9 are
+unchanged; Tcl **7c passes and 7b fails**, with section 8 still
+reporting `y = 0`. So `event-11.5` is explained: a connection abandoned
+in the accept queue is never reported readable here, and upstream needs
+it to be.
+
+**The cause is one commented-out loop, and it is worse than "exits
+without closing".** `listenproc` sets the child up like this:
+
+```c
+nfd = dup(fd);
+dup2(pfd[0], fd);		/* the socket fd IS the pipe now */
+...
+/*	for(fd = 0; fd < 30; fd++)
+		if(fd != nfd && fd != pfd[1])
+			close(fd);/**/
+```
+
+That loop is **commented out**, so the listener process keeps a copy of
+`fd` -- which is `pfd[0]`, *the end the parent uses*. A Plan 9 pipe
+reports end of file to one end only when **every** copy of the other
+end is shut, so the child's `read(pfd[1], ...)` could never return 0
+however thoroughly the parent closed the listening socket.
+
+So the listener does not merely fail to tidy up on the way out: **it
+never gets out.** It stays blocked in that read holding `dfd`, a
+connection it has already opened and nobody has accepted, and the peer
+is never hung up. The client is left waiting on a conversation whose
+other party is still there and will never speak -- which is exactly
+`y = 0`, and exactly why `select()` was right to report nothing.
+
+**`close(fd)` in the child is the fix**, with the dangling `dfd` closed
+explicitly before `exit(0)` rather than left to exit -- exit runs
+`atexit` handlers first, and a peer should not wait through them.
+
+Only `fd` is closed. Closing every inherited descriptor would be
+tidier, and a forked listener holding the parent's files open is a real
+leak, but the commented-out version did it with a hardcoded
+`for(fd = 0; fd < 30; fd++)` that both reused the parameter and guessed
+at `OPEN_MAX`. That is a separate change wanting its own measurement.
+**`nfd` must stay open regardless**: it is the announced socket, and
+closing it withdraws the announcement.
+
+**`_sock_data` closes `cfd` on every path**, checked rather than
+assumed -- so the loop leaks no control file, and the only descriptor
+needing care is `dfd`.
+
+**Prediction:** `select-test` section 10 passes and reports a read of 0
+or an error; nothing else moves. Tcl 7b joins 7c in passing, section 8
+reports `3 3 done`, and **`event.test` gets past `event-11.5`** -- the
+first time this file has predicted a hang clearing. What it reaches
+next is unknown; `event.test` has never run to the end here.
+
+**The wider prize, if this is right**: every `socket -server` whose
+client goes away without being accepted has been leaking a blocked
+process and a live connection for the life of the program, which is
+`ioCmd`, `ioTrans`, `iogt` and `socket.test` -- four files no run has
+ever reached.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the

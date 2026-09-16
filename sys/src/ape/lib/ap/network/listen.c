@@ -91,15 +91,52 @@ listenproc(Rock *r, int fd)
 		return 0;
 	}
 
-/*	for(fd = 0; fd < 30; fd++)
-		if(fd != nfd && fd != pfd[1])
-			close(fd);/**/
+	/*
+	 * THE CHILD MUST NOT HOLD THE PARENT'S END OF THE PIPE, and until
+	 * now it did -- the loop that was here to close it was commented
+	 * out, and it is the whole of Tcl's event-11.5 hanging.
+	 *
+	 * `fd` is pfd[0] (the dup2 above), which is the end accept() and
+	 * close() use. A Plan 9 pipe reports end of file to one end only
+	 * when EVERY copy of the other end is shut, so while this process
+	 * kept a copy the read below could never return 0. Closing the
+	 * listening socket therefore did not end this loop: the process
+	 * stayed blocked with `dfd` -- a connection it had already opened
+	 * and nobody had accepted -- still open, so the peer was never
+	 * hung up and the client waited on a conversation that had no
+	 * other party left.
+	 *
+	 * Measured rather than reasoned: sys/lib/tests/select-test.c
+	 * section 10 builds exactly that (connect, close the listener,
+	 * never accept) and the client is never readable, while sections
+	 * 4, 5, 7 and 9 -- every one of which accepts first -- all pass.
+	 * Tcl's tcl-fileevent-test.tcl 7b and 7c are the same pair.
+	 *
+	 * That this matters at all is upstream's doing: event-11.5 closes
+	 * its listener with the connection never accepted and still
+	 * expects the client to become readable, which on a BSD stack it
+	 * does because the kernel resets anything left in the accept
+	 * queue. The queue here is this process, so this process has to
+	 * do it.
+	 *
+	 * Only `fd` is closed. Closing every other inherited descriptor
+	 * would be tidier -- a forked listener holding the parent's files
+	 * open is a real leak -- but the commented-out version did it with
+	 * a hardcoded `for(fd = 0; fd < 30; fd++)`, which both reused the
+	 * parameter and guessed at OPEN_MAX, and that is a separate change
+	 * wanting its own measurement. `nfd` must stay open in any case:
+	 * it is the announced socket, and closing it withdraws the
+	 * announcement.
+	 */
+	close(fd);
 
+	dfd = -1;
 	for(;;){
 		cfd = open(listen, O_RDWR);
 		if(cfd < 0)
 			break;
 
+		/* _sock_data closes cfd itself, on success and on failure */
 		dfd = _sock_data(cfd, net, r->domain, r->stype, r->protocol, &nr);
 		if(dfd < 0)
 			break;
@@ -110,7 +147,17 @@ listenproc(Rock *r, int fd)
 			break;
 
 		close(dfd);
+		dfd = -1;
 	}
+
+	/*
+	 * A connection this process opened and nobody accepted has to be
+	 * hung up, and explicitly rather than by letting exit() do it:
+	 * exit runs atexit handlers first, and the peer should not be left
+	 * waiting through them.
+	 */
+	if(dfd >= 0)
+		close(dfd);
 	exit(0);
 	return 0;
 }
