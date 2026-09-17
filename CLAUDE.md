@@ -16,14 +16,43 @@ The build tool is `mk` (Plan9's native make equivalent). Mkfiles use rc shell sy
 # Full build and install (run from repo root, on Plan9/9front)
 mk install
 
-# Note: run twice — syscalls are not always integrated into libap on the first run
-
 # Clean build artifacts
 mk clean
 
-# Nuke everything
+# clean, plus everything installed into $objtype/bin and $objtype/lib
+mk distclean
+
+# Nuke everything -- clean plus each library's $LIB; see the warning below
 mk nuke
 ```
+
+**`mk install` used to need running twice** -- syscalls were not always
+integrated into libap on the first pass -- and no longer does.
+
+**Prefer `distclean` to `nuke`, and the reason is specific rather than
+general.** `nuke` is `clean` plus `rm -f ... $LIB` (`sys/src/cmd/mksyslib`,
+`mklib`, `mkone`), and `$LIB` is `$APEXPROOT/$objtype/lib/ape/libap.a`.
+**With `$APEXPROOT` empty that is `/$objtype/lib/ape/libap.a`** -- an
+absolute path into the host's own stock APE, not into this tree. Every
+mkfile here assigns `APEXPROOT` itself as a literal, so it takes a
+command-line override or a bad edit to get there; the exposure is one
+named file per library directory rather than a tree, so the failure is
+bounded, but it is a real way to delete something outside the repo and
+there is no reason to run into it. `distclean` removes only
+`./$arch/bin` and `./$arch/lib`, looping over the **literal** `$_ARCHS`
+list, so no expansion can produce an absolute path.
+
+**Those two trees are build output in full.** `git ls-files amd64` is
+`amd64/include/ape` and nothing else, and `.gitignore` carries
+`*/bin/*` and `*/lib/*` for every architecture -- which is why
+`distclean` can remove them outright and `install` recreates them with
+its own `mkdir -p`.
+
+**An ABI change still needs the full removal before the rebuild**, and
+`distclean` is the way to ask for it: nothing in these mkfiles lists a
+system header as a dependency, so `mk` will not rebuild an object
+because `<sys/select.h>` changed. See the `HFILES` section for what a
+half-rebuilt shared struct looks like from the outside.
 
 The install target:
 1. Removes old arch-specific lib/ape files
