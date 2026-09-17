@@ -782,5 +782,82 @@ if {$failures == $before10} {
     note "the bisect is what names it: -match 'chan-io-4*'."
 }
 
+puts "\n--- 11. chan-io-41.6 (A DIRECTORY) AND 41.8, THEN 44.1 ---"
+# THE BISECT LANDED HERE. `-match 'chan-io-4.* chan-io-40.* chan-io-44.*'`
+# runs 24 tests and finishes clean; `-match 'chan-io-41.* chan-io-44.*'`
+# freezes at 44.1. So the whole accumulation is inside `chan-io-41.*`,
+# eight tests, and five of those (41.1..41.5) are argument-error checks
+# that open no channel at all. 41.7 is skipped here (`specialfiles`).
+# That leaves TWO.
+#
+# **41.6 OPENS A DIRECTORY AND SELECTS ON IT.** That is a shape nothing
+# in this port has ever been asked for: `_startbuf` forks a copy process
+# that sits in `_READ` on a *directory* descriptor, which on Plan 9
+# returns stat entries and then end of file.
+#
+# 41.8 is the `file link -symbolic` test. It fails with ENOSYS **before**
+# `$chan` is assigned, so its cleanup closes 41.6's already-closed
+# channel and reports `can not find channel named "file5"`. It therefore
+# leaks nothing, and the cleanup error is a consequence of the ENOSYS
+# rather than a second fault -- but it is cheap to ask about separately
+# rather than assume, so it gets its own step.
+#
+# **"A PRIOR vwait IS ENOUGH" IS ALREADY REFUTED, AND BY THIS FILE.**
+# That was the tempting reading -- the passing half (4.*, 40.*) contains
+# no `vwait` at all, so 44.1's was the first blocking select in that
+# process, while in the freezing half 41.6's came first. It cannot be
+# that: sections 9 and 10 call `run441` eighteen times between them and
+# every call passes, so 44.1 after a previous 44.1 demonstrably works.
+# Worth writing down because it would have cost a run.
+#
+# Each statement carries an `at:` marker, because a freeze cannot say
+# which line it is in and this is the section most likely to find one.
+proc dirstep {} {
+    set d [file join [pwd] tcl-fileevent-test.dir]
+    at "file mkdir"
+    file mkdir $d
+    at "open the DIRECTORY"
+    if {[catch {open $d} c]} {
+	note "this system will not open a directory as a channel ($c)"
+	catch {file delete -force $d}
+	return skipped
+    }
+    at "chan event readable on the directory"
+    chan event $c readable [list set ::done readable]
+    at "waitfor"
+    set got [waitfor 3000]
+    at "close the directory channel"
+    catch {chan close $c}
+    catch {file delete -force $d}
+    return $got
+}
+
+step "11a. run 44.1 with nothing before it (the control)"
+set got [run441]
+ok [expr {$got eq "text"}] "44.1 with nothing before it (got '$got')"
+
+step "11b. 41.6: select on a DIRECTORY, then run 44.1"
+set d [dirstep]
+note "the directory reported '$d'"
+at "44.1 after the directory"
+set got [run441]
+ok [expr {$got eq "text"}] "44.1 after a directory was selected on (got '$got')"
+
+step "11c. 41.8: a failed symbolic link, then run 44.1"
+at "file link -symbolic"
+set tmpf [file join [pwd] tcl-fileevent-test.target]
+set tmpl [file join [pwd] tcl-fileevent-test.link]
+catch {set h [open $tmpf w]; puts $h "not again"; close $h}
+if {[catch {file link -symbolic $tmpl $tmpf} err]} {
+    note "file link -symbolic refused it: $err"
+} else {
+    note "file link -symbolic worked here"
+}
+catch {file delete -force $tmpl}
+catch {file delete -force $tmpf}
+at "44.1 after the symbolic link attempt"
+set got [run441]
+ok [expr {$got eq "text"}] "44.1 after a symlink attempt (got '$got')"
+
 puts "\n$failures failure(s)"
 exit $failures

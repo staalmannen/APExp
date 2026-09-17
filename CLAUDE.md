@@ -6966,6 +6966,212 @@ widen (`'chan-io-[23]* chan-io-4*'`). **Quote it for rc** -- `{}` is a
 brace block there, not quoting, and that mistake has already cost one
 round.
 
+#### The bisect landed: forty tests, and the neighbour is the suspect
+
+**`-match 'chan-io-4*'` freezes at 44.1**, and section 10's buffered
+ramp passes every step. So both ramps are now spent and both answered:
+
+| | |
+|---|---|
+| section 9, descriptors merely **held** | passes to 140 |
+| section 10, descriptors **buffered** (a copy process each) | passes to 40 |
+| `-match 'chan-io-44.*'` | passes |
+| `-match 'chan-io-4*'` | **freezes at 44.1** |
+
+**Neither the descriptor number nor the buffered count is the
+accumulation**, which is exactly what section 10 was written to be able
+to say, and it says it in its own output rather than leaving it to be
+inferred. What is left is the forty tests in the `4x` block, and that is
+a far smaller thing than forty-three sections.
+
+**THE FILE'S TOP-LEVEL CODE IS ALREADY EXCLUDED, and that is worth
+stating because it is not obvious.** `-match` skips *tests*; tcltest
+still evaluates everything between them. So `set f [open $path(foo) w+]`
+at chanio.test:5570 -- the plain-file channel `42.x` and `43.x` drive --
+runs under `-match 'chan-io-44.*'` too, and that run passes. The
+variable is the **test bodies** in `4x`, not the file's own setup.
+
+**`chan-io-43.2` is the nearest neighbour and is nearly 44.1 itself**,
+which makes it the one to ask about first rather than bisecting blindly
+from the far end:
+
+```tcl
+chan-io-43.2  -setup { set f2 [open "|[list cat -u]" r+]
+                       set f3 [open "|[list cat -u]" r+] }
+              ... chan event on $f, $f2, $f3, then all cleared ...
+              -cleanup { catch {chan close $f2}; catch {chan close $f3} }
+
+chan-io-44.1  -setup { set f2 [open "|[list cat -u]" r+]
+                       set f3 [open "|[list cat -u]" r+] }
+```
+
+It opens **the same two `|cat -u` pipes**, registers readable events on
+them, clears the events, and closes both -- and 44.1 then opens two more
+which take the descriptor numbers just released. So the state 43.2 hands
+over is: two descriptors freshly closed whose **copy processes were
+blocked in `_READ`** rather than exited (nothing was ever written to
+those pipes), and a `Muxbuf` slot freed for each.
+
+**That is a reuse question, and `_buf.c` has a real race in it.**
+`_closebuf` sets `b->fd = -1`, then kills `b->copypid` up to ten times
+at 1ms intervals and gives up; it does **not** wait for the process to
+be gone. A stale copy process that survives that window wakes up in
+
+```c
+n = _READ(fd, b->putnext, READMAX);
+lock(&mux->lock);
+if(b->fd != fd){ unlock(&mux->lock); _exit(0); }	/* "we've been closed" */
+```
+
+-- and that check is against the **fd number**, which the parent has by
+then handed to a new pipe, into **the same slot** `_startbuf` reused.
+`b->fd == fd` is true again for the wrong reason, and the slot has two
+copy processes feeding it, with `b->copypid` naming only the newer one.
+
+**This is a hypothesis and is labelled as one**; it is the seventh
+mechanism this file has found plausible and the record for those is
+poor. The difference is that it costs one `-match` to test, and the
+answer is decisive either way:
+
+```
+tcltest .../tcl-runall.tcl -singleproc 1 -file chanio.test -verbose t -match 'chan-io-43.2 chan-io-44.1'
+```
+
+**Freeze and the accumulation is ONE test wide**, with the reuse race
+above the thing to read and `select-test.c` the place to reproduce it in
+C. **Pass and 43.2 is innocent**, and the ladder continues backwards --
+`'chan-io-43.* chan-io-44.*'`, then `42.*`, `41.*`, `40.*`, `4.*` added
+in turn, stopping at the first freeze. Either way it is seconds, not a
+rebuild.
+
+`41.6` is the other thing in that range worth knowing about, since it is
+a shape nothing here has ever selected on: it **opens a directory** and
+registers a readable fileevent on it, so `_startbuf` forks a copy
+process that `_READ`s a directory fd. And `41.8` reports
+`can not find channel named "file5"` from its cleanup, which is **not** a
+leaked channel: `file link -symbolic` fails with ENOSYS before `$chan`
+is assigned, so the cleanup closes 41.6's already-closed channel. The
+cleanup error is a consequence of the ENOSYS and not a second fault.
+
+**`chan-io-40.3` is newly visible and is not ours.** It wants
+`0o666` from `open {WRONLY CREAT}` and gets `0o644`, and the test's own
+comment reads *"This test only works if your umask is 2, like
+ouster's."* It carries a `umask` constraint, which is true here, so it
+runs and fails on the umask rather than on anything in libap.
+
+#### 43.2 is innocent, so halve rather than walk backwards
+
+```
+Running tests that match:  chan-io-43.2 chan-io-44.1
+---- chan-io-43.2 start
+---- chan-io-44.1 start
+all.tcl:  Total 779  Passed 2  Skipped 777  Failed 0
+```
+
+**Both run, both pass, no freeze.** So the descriptor-reuse race written
+up above is not armed by 43.2 alone -- the eighth plausible mechanism in
+this file and the seventh to be refuted by one run. The race in
+`_closebuf` is still real on its own terms (it kills up to ten times and
+does not wait, and the stale copy process re-checks the fd **number**),
+but it is not what 44.1 is waiting for, and it is not worth fixing on
+the strength of a guess.
+
+**Walking backwards one group at a time would cost five runs; halving
+costs two.** The range before 44.1 is about thirty-four tests -- `4.*`
+five, `40.*` sixteen, `41.*` eight, `42.*` three, `43.*` two -- so:
+
+```
+A   -match 'chan-io-4.* chan-io-40.* chan-io-44.*'
+      freeze -> B1  -match 'chan-io-40.* chan-io-44.*'
+                      freeze -> it is 40.*, split 40.1..40.8 / 40.10..40.16
+                      pass   -> it is 4.*, five tests
+      pass   -> B2  -match 'chan-io-41.* chan-io-44.*'
+                      freeze -> it is 41.*, and 41.6 is the standout: it
+                                selects on a DIRECTORY
+                      pass   -> B3  -match 'chan-io-42.* chan-io-43.* chan-io-44.*'
+```
+
+Note `chan-io-4.*` matches `4.1`..`4.5` and **not** `44.1`: the dot is a
+literal in a glob, so the group needs naming separately. That is the
+whole reason `-match 'chan-io-4*'` caught everything.
+
+**IF BOTH HALVES PASS AND THE WHOLE STILL FREEZES, THAT IS THE ANSWER
+AND NOT A FAILED BISECT.** It means the thing is *cumulative* rather
+than one test, and the count is what matters. This file has met exactly
+that once before and misread it for a round: `tk-runall.tcl -file
+'[a-m]*.test'` and `'[n-z]*.test'` both ran clean while the whole suite
+crashed, and the window-table leak was the answer. So a bisect that
+narrows to nothing is evidence, and the next move then is a prefix ramp
+-- keep 44.1 fixed and add groups until it breaks -- rather than a
+narrower `-match`.
+
+#### It is chan-io-41.*, and that is eight tests of which two open anything
+
+**One halving, and the answer is unambiguous:**
+
+```
+-match 'chan-io-4.* chan-io-40.* chan-io-44.*'   24 tests, finishes clean
+-match 'chan-io-41.* chan-io-44.*'               FREEZES at 44.1
+```
+
+So everything that arms `chan-io-44.1` is inside `chan-io-41.*`, and the
+run before it is worth reading as well: **44.1 through 44.5 all ran and
+passed after twenty-four of the `4.x`/`40.x` tests**, so the `4x` block
+is not merely innocent of the freeze -- it leaves the process able to
+run the whole `44` group.
+
+**Five of the eight open nothing.** `41.1`..`41.5` are argument-error
+checks -- `chan event foo`, `chan event gorp readable` -- and `41.7` is
+skipped on `specialfiles`. That leaves two:
+
+- **`41.6` OPENS A DIRECTORY AND SELECTS ON IT.** `set chan [open
+  $tempdir]`, a readable `chan event`, then `vwait`. That is a shape
+  nothing in this port has ever been asked for: `_startbuf` forks a copy
+  process that sits in `_READ` on a **directory** descriptor, which on
+  Plan 9 returns stat entries and then end of file.
+- **`41.8` fails before it opens anything.** `file link -symbolic` is
+  ENOSYS, so `$chan` is never assigned and the cleanup closes 41.6's
+  already-closed channel -- which is the whole of `can not find channel
+  named "file5"`. It leaks nothing, and that error is a consequence of
+  the ENOSYS rather than a second fault.
+
+**"A PRIOR `vwait` IS ENOUGH" WAS THE TEMPTING READING AND THIS FILE
+ALREADY REFUTES IT.** The passing half contains no `vwait` at all -- the
+`4.x` translation tests and the `40.x` open-mode tests never enter the
+event loop -- so 44.1's was the first blocking select in that process,
+while in the freezing half 41.6's came first. Very neat, and wrong:
+**sections 9 and 10 call `run441` eighteen times between them and every
+call passes**, so 44.1 after a previous 44.1 demonstrably works. Worth
+writing down because believing it would have cost a run, and because it
+is the first time in this file that an existing test refuted a new
+hypothesis without anything being run at all.
+
+**Section 11 of `tcl-fileevent-test.tcl` is 41.6 and 41.8 standalone**,
+with `run441` as a control before them and after each: make a directory,
+open it, register a readable event, wait, close, then run 44.1; then
+attempt a symbolic link and run 44.1 again. Every statement carries an
+`at:` marker, because this is the section most likely to find a freeze
+and a freeze cannot say which line it is in. All three steps pass on a
+Linux tclsh, where `open` on a directory succeeds and `file link
+-symbolic` works -- so the host exercises the machinery and only the VM
+can answer the question.
+
+**Two runs, and they are independent of each other:**
+
+```
+tclsh sys/lib/tests/tcl-fileevent-test.tcl
+tcltest .../tcl-runall.tcl -singleproc 1 -file chanio.test -verbose t -match 'chan-io-41.6 chan-io-44.1'
+```
+
+The first reproduces it with no suite at all if the directory is the
+cause; the second says whether 41.6 alone is enough inside tcltest. If
+11b freezes, the reproducer is **four lines** and the next step is to
+write it in C in `select-test.c` -- select on a directory descriptor,
+close it, then select on a fresh pipe -- which is where every one of
+these has ended up being settled. If 11b passes and 11c passes but the
+suite still freezes on `41.6 + 44.1`, then it is the pair or the
+`tempdir` machinery around them, and `41.8 + 44.1` is the next `-match`.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
