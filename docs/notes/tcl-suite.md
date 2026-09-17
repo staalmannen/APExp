@@ -3358,3 +3358,60 @@ later `ps` legible:
 ```
 for(i in `{ps | awk '$6=="Open" && $7=="tcltest" {print $2}'}) echo kill > /proc/$i/ctl
 ```
+
+#### "invalid operation" is Plan 9 for "directory not empty", and rmdir now says so
+
+**The probe answered it in one line**, and section 3 came out identical
+to glibc, so the permissions half was never the problem:
+
+```
+no   rmdir of a non-empty directory (must fail) -> errno 1002
+     (invalid operation); plan 9 says: invalid operation
+FAIL ...and it reported ENOTEMPTY or EEXIST
+YES  rmdir tfa/a while it is 00000
+```
+
+One failure, and it is the whole chain: **1002 is `EPLAN9`** -- libap's
+"a Plan 9 error with no POSIX equivalent" -- because `invalid operation`
+is in no table in `_errno.c`. Tcl's `DoRemoveDirectory` is
+
+```c
+if (rmdir(path) == 0) return TCL_OK;
+if (errno == ENOTEMPTY) errno = EEXIST;
+if ((errno != EEXIST) || (recursive == 0)) goto end;
+... otherwise delete the contents and try again ...
+```
+
+so an unrecognised errno is not a worse message, it is **a `file delete
+-force` that never recurses**. `fCmd-20.1` left its directory behind,
+and `fCmd-20.2`'s unbounded cleanup spun on it for ever.
+
+**NOT an entry in `_errno.c`, and the reason is the rule that section
+already carries.** `invalid operation` is a generic 9P error with no
+single POSIX meaning -- a write of a control message a device will not
+accept reports it too, and answering "Directory not empty" there would
+be a wrong answer in a confident voice. Naming a string in that table
+also changes control flow, since `bind()` gates its announce fallback on
+`errno == EPLAN9`.
+
+So the question is asked where the answer is knowable. `rmdir()` now
+looks: if the remove failed and libap could not name the error, open the
+directory and see whether anything is in it, and report `ENOTEMPTY` only
+then. That holds on any file server whatever string it picks, and it
+needs no guess about what hjfs means.
+
+**Prediction.** `rmdir-test` reports 0 failures. `fCmd-20.1`'s *cleanup*
+succeeds, so `tfa` does not linger and **`fCmd-20.2` does not spin** --
+which is the whole point. `fCmd-20.1` itself may well still fail, and
+that is expected rather than a miss: it wants `catch {file delete -force
+tfa}` to return **1**, i.e. it expects the delete to be refused, which
+on Unix it is because a 00000 directory cannot be traversed. Plan 9
+checks the *parent* for a remove, so the probe shows `rmdir tfa/a while
+it is 00000` succeeding -- the delete may now work and the test then
+fails in the opposite direction. That is the machine differing from
+Unix, not libap being wrong, and it belongs with `chan-io-40.3`'s umask.
+
+**Still open and smaller**: `unlink()` of a directory also reports
+EPLAN9 where POSIX allows EPERM or EISDIR (section 2 of the probe).
+Unfixed deliberately this round -- one measured change at a time, and
+`rmdir` is the one the suite is stuck behind.
