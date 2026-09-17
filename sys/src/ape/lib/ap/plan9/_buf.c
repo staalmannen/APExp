@@ -132,6 +132,41 @@ Found:
 	b->putnext = b->data;
 	b->getnext = b->data;
 	b->eof = 0;
+	/*
+	 * ROOMWAIT AND DATAWAIT ARE RENDEZVOUS FLAGS, AND A SLOT BEING
+	 * REUSED MUST NOT INHERIT THEM. This reset listed four fields and
+	 * these two were not among them, so a descriptor that took over a
+	 * slot could start life believing a process was already waiting
+	 * on it -- and the process that would have answered has been dead
+	 * since before the slot was freed.
+	 *
+	 * Both are addresses handed to _RENDEZVOUS, so a stale one is not
+	 * a wrong answer but a PERMANENT WAIT, in whichever process reads
+	 * it first:
+	 *
+	 *	roomwait	_readbuf drains the buffer, sees the flag,
+	 *			clears it and rendezvouses to wake a copy
+	 *			process that no longer exists -- the
+	 *			PARENT blocks for ever, inside read().
+	 *	datawait	_copyproc reads, sees the flag, clears it
+	 *			and rendezvouses instead of waking the
+	 *			selecting parent -- the COPY PROCESS blocks
+	 *			for ever, and select() is never woken.
+	 *
+	 * Leaving a flag set is easy and is what chanio.test does:
+	 * chan-io-41.7 selects on /dev/zero, whose copy process fills
+	 * PERFDMAX faster than anything drains it, sets roomwait and
+	 * blocks -- and the test then closes the channel, so _closebuf
+	 * SIGKILLs it exactly where it is waiting. The flag survives, the
+	 * slot is freed, and the next descriptor to take it inherits the
+	 * wait.
+	 *
+	 * The rule this is an instance of: when a struct is recycled,
+	 * reset every field that means something, not the ones that
+	 * happen to be about the data.
+	 */
+	b->roomwait = 0;
+	b->datawait = 0;
 	b->fd = fd;
 	if(_mainpid == -1)
 		_mainpid = getpid();
