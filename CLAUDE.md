@@ -7349,6 +7349,93 @@ they are measured for the first time; that is the "newly measured, not
 newly broken" case, and it is the fourth time this file has had to say
 so.
 
+#### chanio.test FINISHES, and 779 tests are measured for the first time
+
+```
+Tests ended at 2026-09-17 10:55:51 +0200
+all.tcl:  Total 779  Passed 743  Skipped 16  Failed 20
+Sourced 1 Test Files.
+tcl-runall: every file ran, now entering exit (code 0)
+```
+
+**`chan-io-44.1` clears and so does everything after it**, which is
+`44.2` through `73.1` -- roughly six hundred tests that **no run in this
+project has ever reached**, the file having stopped at 44.1 or earlier
+every time. 743 pass, 16 skip on constraints (`asyncPipeChan` 3,
+`emptyTest` 8, `extensive`, `nonPortable`, `thread`, `win` 2), and 20
+fail. The marker prints, so the total is the file's own rather than a
+prefix.
+
+**Read the 20 per test before anything else**, and the names are not in
+the screenshot -- the run needs repeating with the log kept:
+
+```sh
+grep '^==== ' /tmp/chanio.out | grep ' FAILED$' | sed 's/^==== //; s/ FAILED$//'
+```
+
+The `chan-io-6.4x` cluster (`-buffersize 16`, `testchannel
+inputbuffered` reporting 0) and `41.8` (`file link -symbolic`, ENOSYS)
+are known and account for about eight of them. **The rest have never
+been seen**, so nothing about them should be assumed from this file's
+older lists.
+
+#### And the whole suite froze in chanio.test, where the file alone does not
+
+The suite run stops with `chan-io-53.7` as the last thing reported, and
+`grep -c FAILED` halved gives **22** -- which is about 20 from
+`chanio.test` plus `binary.test`'s two Inf tests, so the child had
+reported *every* failure the standalone run reports before it wedged.
+The freeze is therefore **after 53.7**, with `53.8`, `53.8a`, `53.9`,
+`53.10`, `54.*`, `55.1`, `56.1`, `57.*`, `58.1`, `59.1`, `60.1`, `61.1`,
+`70.*` and `73.1` still to come -- all of which the standalone run
+completed.
+
+**THE ONE DIFFERENCE IS `-singleproc`, AND IT MOVES THE QUESTION TO A
+SECOND PROCESS.** The run that finishes is
+`-singleproc 1 -file chanio.test -verbose t`: one process, sourcing the
+file. The suite leaves `-singleproc` at 0, so `chanio.test` runs in a
+**fresh child** whose stdout is a **pipe** the parent reads with a
+blocking `gets`.
+
+**So "the child hung" and "the parent hung" are different answers and
+the log cannot tell them apart.** That distinction is new here and is
+worth stating before any mechanism is proposed:
+
+- **the child** is a fresh `tcltest` with no accumulated state, which is
+  the opposite of everything the last six rounds have been chasing;
+- **the parent** has been running since `append.test`, has opened and
+  drained a pipe per file, and every one of those pipes is a **loud**
+  source -- a child flooding its own test output is exactly the shape
+  that fills a 16 KB `Muxbuf` and sets `roomwait`, which is the flag the
+  round before this one was about.
+
+`53.7` being the last thing reported is suggestive rather than
+evidence -- it is `CopyData: Flooding chan copy from pipe`, a grandchild
+writing 3450 bytes in 345 chunks at 10ms with `-buffering none`, driven
+by `fcopy` through the event loop. But **a crash or freeze after test N
+is evidence about N only if nothing between N and the stop could have
+armed it**, and `-verbose t` was not on for the suite run, so 53.7 is
+merely the last *report* and not necessarily the last test started.
+
+**One run settles which process and names the test**, and it is the
+missing cell of the table:
+
+```
+tcltest .../tcl-runall.tcl -file chanio.test -verbose t
+```
+
+**No `-singleproc 1`.** That runs `chanio.test` in a child exactly as
+the suite does, with one file instead of a hundred and sixty-seven and
+with the names printed:
+
+| | |
+|---|---|
+| **it freezes** | multi-process mode alone reproduces it, with a fresh child and nothing before it. The last `start` names the test, and the two-process pair is the whole reproducer. |
+| **it finishes** | the child is fine in isolation, so it is the **parent's** accumulated state -- a hundred and sixty pipes' worth -- and the next question is which files before `chanio.test` are needed, which `-file` takes as a list. |
+
+Either answer is worth the run, and neither is available from the log
+that exists.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
