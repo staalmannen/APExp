@@ -680,6 +680,103 @@ main(void)
 		}
 	}
 
+	printf("\n--- 11. A DESCRIPTOR ABOVE FD_SETSIZE ---\n");
+	/*
+	 * THE SYSTEM HANDS OUT DESCRIPTORS select() CANNOT BE ASKED
+	 * ABOUT, and it answers "nothing is ready" rather than saying so.
+	 *
+	 * <sys/select.h> here is
+	 *
+	 *	typedef struct fd_set { long fds_bits[3]; } fd_set;
+	 *	#define FD_SETSIZE 96
+	 *
+	 * -- the struct is a hardcoded three words whatever FD_SETSIZE
+	 * says -- while <sys/limits.h> sets OPEN_MAX to 256 and _fdinfo[]
+	 * is that long. So descriptors 96..255 are ordinary, usable
+	 * descriptors that no fd_set in the system can represent.
+	 *
+	 * Three separate things go wrong once a program reaches one, and
+	 * only the first is tested here, because the other two corrupt
+	 * memory and a test that provokes them cannot report afterwards:
+	 *
+	 *   - FD_ANYSET in _buf.c reads words 0..2 only, so a select
+	 *     naming ONLY high descriptors takes the "no requested fds"
+	 *     arm: it sleeps out the timeout and returns 0. A notifier
+	 *     waiting on such a descriptor waits for ever, with no error
+	 *     anywhere. That is the shape of a Tcl vwait that never
+	 *     returns.
+	 *   - a MIXED set does reach the scan, and then
+	 *     FD_SET(fd, &mux->rwant) writes past the end of a three-word
+	 *     fd_set living INSIDE THE SHARED SEGMENT -- rwant is
+	 *     followed by ewant and then bufs[], so it lands on another
+	 *     descriptor's buffer state.
+	 *   - Muxbuf.fd is a `char` (include/lib.h), so a descriptor is
+	 *     truncated to eight signed bits on the way into the slot:
+	 *     128 and up read back negative, and 255 reads back as -1,
+	 *     which is this file's marker for a FREE SLOT.
+	 *
+	 * Nothing here says this is what hangs chan-io-44.1. It is a
+	 * latent bug found by reading, and what this section measures is
+	 * only whether the call answers a high descriptor at all.
+	 *
+	 * The set below is padded deliberately: FD_SET on a plain fd_set
+	 * would smash this program's own stack, which is exactly what any
+	 * caller with FD_SETSIZE > 96 in scope already does -- Tcl's
+	 * tclUnixPort.h says `#define FD_SETSIZE OPEN_MAX` and then
+	 * believes it.
+	 */
+	{
+		union { fd_set s; long pad[64]; } u;
+		struct timeval tv;
+		int hifd, n;
+		char c;
+
+		printf("  note FD_SETSIZE %d, fd_set holds %d, OPEN_MAX %ld\n",
+			(int)FD_SETSIZE, (int)(sizeof(fd_set) * 8),
+			(long)sysconf(_SC_OPEN_MAX));
+		ok((int)(sizeof(fd_set) * 8) >= (int)FD_SETSIZE,
+			"fd_set is as wide as FD_SETSIZE claims");
+		/*
+		 * REPORTED, NOT ASSERTED. glibc has the same gap -- its
+		 * FD_SETSIZE is 1024 while RLIMIT_NOFILE is commonly far
+		 * higher -- so "every descriptor fits in an fd_set" is not
+		 * a library rule and a test must not claim it is. What is
+		 * different here is the runtime answer below: glibc's
+		 * fd_set really does hold FD_SETSIZE descriptors, so a
+		 * program that stays under the limit is safe, and this
+		 * one's does not.
+		 */
+		if((long)sysconf(_SC_OPEN_MAX) > (long)FD_SETSIZE)
+			note("the system gives out descriptors no fd_set can name");
+
+		hifd = (int)FD_SETSIZE + 4;
+		if(pipe(p) < 0)
+			note("pipe failed");
+		else if(dup2(p[0], hifd) != hifd)
+			note("could not dup a descriptor up that high");
+		else {
+			write(p[1], "x", 1);
+			memset(&u, 0, sizeof u);
+			FD_SET(hifd, &u.s);
+			tv.tv_sec = 2;
+			tv.tv_usec = 0;
+			n = select(hifd + 1, &u.s, 0, 0, &tv);
+			ok(n == 1, "a high descriptor with data is reported readable");
+			if(n != 1) {
+				printf("  note select answered %d", n);
+				if(n < 0)
+					printf(" (%s)", strerror(errno));
+				printf("\n");
+				note("so a program that reaches this descriptor");
+				note("number waits for ever and is told nothing.");
+			} else if(read(hifd, &c, 1) == 1 && c == 'x')
+				note("and the byte reads back");
+			close(hifd);
+			close(p[0]);
+			close(p[1]);
+		}
+	}
+
 	printf("\n%d failure(s)\n", fail);
 	return fail;
 }

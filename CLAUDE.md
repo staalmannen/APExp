@@ -6500,6 +6500,103 @@ the truth about what was reported rather than an artefact of a 4 KB
 boundary. The `-singleproc 1 ... -verbose t` run is still the way to
 name a hang, and is still one command.
 
+#### chan-io-44.1 confirmed, and the reproducer of it PASSES
+
+`-singleproc 1 -file chanio.test -verbose t` names it again, and the
+`-load` line-buffering from the round before means the log is now a
+faithful record rather than whatever fitted in a 4 KB pipe buffer:
+
+```
+---- chan-io-42.1 start ... ---- chan-io-43.2 start
+---- chan-io-44.1 start
+```
+
+`41.8` (the `file link -symbolic` ENOSYS) fails **and returns**, and so
+does everything through `43.2`. Nothing was guessed from the last line
+this time, which is the fourth running.
+
+**AND SECTION 6 OF `tcl-fileevent-test.tcl` IS chan-io-44.1 CHARACTER
+FOR CHARACTER -- the unused second `|cat -u` pipe, the namespaced
+variable, all of it -- AND IT PASSES ON THE VM.** So the test is not
+the variable. What differs is everything the process did before it:
+forty-three sections of `chanio.test`, several hundred channels opened
+and closed, and at least one that leaked (`41.8`'s cleanup reports
+`can not find channel named "file5"`).
+
+**The next question is therefore "what accumulates", and `-match`
+answers it with no rebuild and no edit**, narrowing from the end:
+
+```
+tcltest .../tcl-runall.tcl -singleproc 1 -file chanio.test -verbose t -match 'chan-io-44.*'
+```
+
+If 44.1 passes there, it is accumulation and the bisect continues
+(`'chan-io-4*'`, then `'chan-io-[34]*'`, ...). If it hangs with nothing
+else in the process, the difference is tcltest's own environment rather
+than the suite's history, and the standalone reproducer is what to
+compare against.
+
+#### The system gives out descriptors select() cannot be asked about
+
+Found by reading `_buf.c` and its headers while the above was waiting on
+a run, so **it is not established to be the 44.1 hang** -- it is a real
+bug found on the way past, and section 11 of `select-test.c` measures
+it. `<sys/select.h>` is
+
+```c
+typedef struct fd_set { long fds_bits[3]; } fd_set;
+#define FD_SETSIZE 96
+```
+
+-- **the struct is a hardcoded three words whatever `FD_SETSIZE` says**
+-- while `<sys/limits.h>` sets `OPEN_MAX` to **256** and `_fdinfo[]` is
+that long. Descriptors 96..255 are ordinary, usable descriptors that no
+`fd_set` in the system can name.
+
+Three things follow, and they get worse in order:
+
+- **`FD_ANYSET` in `_buf.c` reads words 0..2 only.** A select naming
+  only high descriptors takes the `/* no requested fds */` arm: it
+  sleeps out the timeout and **returns 0**. A notifier waiting on such a
+  descriptor waits for ever and is told nothing -- which is the shape of
+  a `vwait` that never returns, and the reason this was worth writing
+  down beside a hang.
+- **A mixed set does reach the scan**, and then
+  `FD_SET(fd, &mux->rwant)` writes past the end of a three-word `fd_set`
+  **living inside the shared segment**. `rwant` is followed by `ewant`
+  and then `bufs[]`, so it lands on another descriptor's buffer state.
+- **`Muxbuf.fd` is a `char`** (`ap/include/lib.h`), so a descriptor is
+  truncated to eight signed bits on the way into the slot: 128 and up
+  read back negative, and **255 reads back as -1, which is that field's
+  marker for a free slot**.
+
+`FD_SETSIZE` is the number *callers* believe, and the callers here do
+not agree with the header: `tcl/unix/tclUnixPort.h:461` says
+`#ifdef OPEN_MAX / #define FD_SETSIZE OPEN_MAX`, so **Tcl thinks an
+`fd_set` holds 256 and is handed one that holds 96.** Its own
+`FD_SET` calls on a high descriptor smash Tcl's memory before libap is
+reached at all.
+
+**The assertion about `OPEN_MAX <= FD_SETSIZE` was written and then
+withdrawn**, because glibc fails it too -- `FD_SETSIZE` 1024 against an
+`RLIMIT_NOFILE` of 20000 -- so "every descriptor fits in an fd_set" is
+not a library rule and a test must not claim it is. It is reported
+instead. What glibc *does* guarantee, and this does not, is that an
+`fd_set` really holds `FD_SETSIZE` descriptors, so a program that stays
+under the limit is safe; that is the assertion section 11 keeps, plus
+the runtime one -- dup a readable pipe end up to `FD_SETSIZE+4` and ask.
+The set it uses is padded deliberately, since `FD_SET` on a plain
+`fd_set` would smash the test's own stack, which is precisely what Tcl
+already does.
+
+**The fix is not batched with the measurement, and deliberately.**
+Widening `fd_set` and changing `Muxbuf.fd` to an `int` both change the
+layout of something shared -- one an ABI every binary in the tree has
+compiled in, the other the mux segment -- so both want a full rebuild
+and neither should be spent before the run says whether a high
+descriptor is ever reached. Section 11 is one command and needs no
+rebuild of libap at all.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
