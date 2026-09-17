@@ -6854,6 +6854,54 @@ do, the honest next question is whether `chanio.test` really reaches
 depth hangs 44.1, not that the suite's process is at that depth -- and
 `-match 'chan-io-4*'` is still the bisect if it is not.
 
+#### CONFIRMED: one fd_set, and the ramp clears every step
+
+```
+--- 11. A DESCRIPTOR ABOVE FD_SETSIZE ---
+  note FD_SETSIZE 256, fd_set holds 256, OPEN_MAX 256
+  note fd_set came from THIS TREE
+  PASS fd_set is as wide as FD_SETSIZE claims
+  PASS FD_ZERO clears every byte of an fd_set
+```
+
+and `tcl-fileevent-test` section 9 passes **every** step --
+`0 40 80 88 92 96 104 120 126 130 140` -- where **126 timed out** before.
+Both files report 0 failures. The constant and the struct agree, the
+whole object clears, and `chan-io-44.1` survives a process holding 140
+descriptors under it.
+
+`mk distclean` before `mk install` was the right ask: `fd_set` grew and
+`Muxbuf.fd` moved every field below it, and no mkfile here lists a
+system header as a dependency.
+
+**THE ONE RUNTIME CASE IN SECTION 11 DID NOT RUN, AND THE FILE STILL
+SAID 0 FAILURES.** The last two lines were
+
+```
+  note highest descriptor reached: 255 (wanted 256)
+  note could not climb that high; nothing to ask
+```
+
+**`OPEN_MAX` is a COUNT.** The highest descriptor is 255, the climb
+asked for `>= 256`, and so it ran to the end of its table, `dup` failed,
+and the section skipped the only question it exists to ask -- reporting
+two passing assertions and a clean total. That is the *same shape* as
+the round where section 11 was missing from the binary altogether: **a
+green run whose interesting question never ran**, and this time nothing
+even hinted at it except a `note` that reads like housekeeping.
+
+It aims at `sysconf(_SC_OPEN_MAX) - 1` now and, more to the point,
+**asks whatever it reached** rather than giving up -- there is no
+outcome where the climb succeeds and the probe is skipped. The number
+is printed either way, so the line that used to hide the skip is now
+the line that proves it happened.
+
+**The rule this file already has covers it and was not applied to my
+own test**: *when a run comes back green, ask what the new case would
+have printed and look for it.* A `note` is not a result. If a section
+can decline to run, it must be impossible to read the output without
+seeing that it did.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
