@@ -2849,3 +2849,81 @@ wrong to: every file that matched did run, all zero of them. **A marker
 says the run reached the end, not that the run was the one you asked
 for.** The `Total 0` line is what says that, and it is worth reading
 beside the marker rather than instead of it.
+
+#### acid named it in one call: the leftovers are listener processes
+
+**`lstk()` on one of the twenty-five is the whole answer**, and it took
+one command rather than another round of mechanism-guessing:
+
+```
+_OPEN(a0=0x7fffffde620)+0xe            ap/syscall/_OPEN.s:6
+open(flags=..., path=...)+0x29e        ap/fcntl/open.c:60
+listenproc(r=0xee2580, fd=0x7)+0x1e4   ap/network/listen.c:135
+listen(fd=0x7)+0x1cb                   ap/network/listen.c:232
+Tcl_OpenTcpServerEx(...)+0x530         tcl/unix/tclUnixSock.c:1818
+Tcl_SocketObjCmd(...)                  tcl/generic/tclIOCmd.c:1718
+```
+
+so every one of them is **`listenproc`, blocked in
+`cfd = open(listen, O_RDWR)`** -- the Plan 9 listener waiting for a call
+that in these tests never comes. `socket -server` forks one of these per
+server, and `chanio.test` creates a great many.
+
+**Closing the socket cannot end that wait.** The `read(pfd[1])` further
+down is what notices a closed pipe, and this process is not at it; it is
+one statement earlier and will stay there for ever. So each leftover sat
+holding **a copy of descriptor 1**, which in a tcltest child is the pipe
+the parent reads results from -- and a Plan 9 pipe reports end of file
+only when *every* copy of the other end is shut. The parent's `gets`
+never returned. Standalone the same processes leak and nothing notices,
+because a terminal has nobody waiting for end of file on stdout, which
+is exactly the two rows of the ladder.
+
+**THE FIX WAS ALREADY WRITTEN DOWN HERE AS DEFERRED.** The comment in
+`listenproc` said, in as many words:
+
+> Only `fd` is closed. Closing every other inherited descriptor would be
+> tidier -- a forked listener holding the parent's files open is a real
+> leak -- but ... that is a separate change wanting its own measurement.
+
+The measurement is this stack. The child now closes every inherited
+descriptor except the two it needs -- `nfd`, the announced socket, whose
+closing would withdraw the announcement, and `pfd[1]`, the end it talks
+to `accept()` over -- with `OPEN_MAX` and `_fdinfo[i].flags & FD_ISOPEN`
+rather than the hardcoded `for(fd = 0; fd < 30; fd++)` that was commented
+out there, which both guessed at the limit and reused the parameter.
+
+**`_CLOSE`, not `close`, and that is not a style choice.** APE's
+`close()` calls `_closebuf` on a buffered descriptor, which SIGKILLs a
+copy process belonging to the **parent**. `_copyproc` closes its
+inherited descriptors with `_CLOSE` for precisely this reason, and the
+single `close(fd)` that was there before this change is a latent instance
+of it -- safe today only because the listener is forked before Tcl ever
+selects on that descriptor. `open()` rewrites `_fdinfo[n].flags`
+wholesale, so skipping close()'s bookkeeping strands nothing.
+
+**This is the `listenproc` shape for the third time**, and all three are
+one sentence: *a forked child holding something the parent's reader is
+waiting on.* First the pipe end, so the listener never left its loop;
+then the parent's timer, through an inherited `atexit` handler; now every
+other inherited descriptor, chiefly stdout.
+
+**Prediction.** `mk install` (one file of libap, no header, no struct
+layout, so no `distclean`) and then:
+
+- `tcltest .../tcl-runall.tcl -file chanio.test -verbose t` -- **no
+  `-singleproc`** -- finishes and prints the summary, where it froze at
+  `chan-io-73.1`;
+- the whole suite gets past `chanio.test` into `clock.test` and beyond,
+  and `ioCmd`, `ioTrans`, `iogt` and `socket.test` are measured for the
+  first time. Expect the failure count to rise: newly measured, not newly
+  broken, for the fifth time in these notes.
+
+**And `ps` should still show leftover listeners**, because this fixes the
+descriptors and not the processes: a `socket -server` closed with no
+connection still leaves a `listenproc` blocked in that `open()` for ever.
+Nothing records the listener's pid, so `close()` cannot kill it today.
+That is the next change if it matters, and **whether it matters is
+readable off the same `ps`** -- which is why the prediction says to look.
+If the freeze does *not* clear, the descriptors were not the whole of it
+and the leftover processes are, and that is where to go.

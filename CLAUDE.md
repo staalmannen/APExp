@@ -443,11 +443,13 @@ or a constraint that fails on Linux too). The port's own share is
 **Tcl's suite**: not yet complete. Open, in order of what the next run
 should touch:
 
-- **`chan-io-73.1` freezes the harness in multi-process mode**, and the
-  file alone finishes. `ps` during the freeze shows twenty-five leftover
-  `tcltest` processes, all blocked in `open()`, holding the child's
-  stdout so the parent never sees EOF. The three measurements that
-  settle it are at the end of `docs/notes/tcl-suite.md`.
+- **`chan-io-73.1` freezing the harness is diagnosed and fixed, not yet
+  confirmed.** `acid`'s `lstk()` named the twenty-five leftovers as
+  `listenproc` children blocked in `open("/net/tcp/n/listen")`, holding
+  a copy of the child's descriptor 1 so the parent never saw EOF. The
+  listener now closes every inherited descriptor but the two it needs.
+  The run to confirm it, and what to expect from `ps` afterwards, are at
+  the end of `docs/notes/tcl-suite.md`.
 - **The 20 `chanio.test` failure names have never been read.** One
   command, no rebuild:
   `grep '^==== ' /tmp/chanio.out | grep ' FAILED$'`.
@@ -462,5 +464,7 @@ should touch:
 
 **Open hazards recorded but not measured**: the lost wakeup in
 `select()`'s rendezvous (a copy process reaching EOF before the parent
-sets `selwait`), and `_closebuf` killing a copy process up to ten times
-without waiting for it to die.
+sets `selwait`); `_closebuf` killing a copy process up to ten times
+without waiting for it to die; and a `socket -server` closed with no
+connection leaving its `listenproc` blocked for ever, since nothing
+records the listener's pid for `close()` to kill.

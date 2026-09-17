@@ -32,7 +32,7 @@ static int
 listenproc(Rock *r, int fd)
 {
 	char listen[Ctlsize], name[Ctlsize], *net, *p;
-	int cfd, nfd, dfd, pfd[2];
+	int cfd, nfd, dfd, pfd[2], i;
 	struct stat d;
 	Rock *nr;
 	void *v;
@@ -119,16 +119,40 @@ listenproc(Rock *r, int fd)
 	 * queue. The queue here is this process, so this process has to
 	 * do it.
 	 *
-	 * Only `fd` is closed. Closing every other inherited descriptor
-	 * would be tidier -- a forked listener holding the parent's files
-	 * open is a real leak -- but the commented-out version did it with
-	 * a hardcoded `for(fd = 0; fd < 30; fd++)`, which both reused the
-	 * parameter and guessed at OPEN_MAX, and that is a separate change
-	 * wanting its own measurement. `nfd` must stay open in any case:
-	 * it is the announced socket, and closing it withdraws the
-	 * announcement.
+	 * AND EVERY OTHER INHERITED DESCRIPTOR GOES WITH IT. That was
+	 * deferred here once, as "tidier, but a separate change wanting
+	 * its own measurement". The measurement arrived: Tcl's suite
+	 * froze after `chan-io-73.1` with the whole file passing, and
+	 * `acid` on one of the twenty-five leftover processes gave
+	 *
+	 *	_OPEN ... open(path=...) ... listen.c:135
+	 *	listenproc(r=..., fd=0x7) ... listen.c:232
+	 *	Tcl_OpenTcpServerEx ... tclUnixSock.c:1818
+	 *
+	 * -- this function, blocked in the `open(listen, ...)` below,
+	 * which is where a Plan 9 listener waits for a call that in those
+	 * tests never comes. Closing the socket cannot end that wait: the
+	 * read further down is what notices, and this process is not at
+	 * it. So each one sat there holding a copy of DESCRIPTOR 1, which
+	 * in a tcltest child is the pipe the parent reads results from --
+	 * and a Plan 9 pipe reports end of file only when every copy of
+	 * the other end is shut, so the parent's `gets` never returned.
+	 * The same leak is invisible from a terminal, where nobody is
+	 * waiting for end of file on stdout.
+	 *
+	 * `nfd` and `pfd[1]` are the two this process needs: the announced
+	 * socket, whose closing would withdraw the announcement, and the
+	 * end of the pipe it talks to accept() over. Everything else goes.
+	 *
+	 * `_CLOSE`, not `close`: APE's close() calls `_closebuf` for a
+	 * buffered descriptor, which SIGKILLs a copy process belonging to
+	 * the parent. `_copyproc` closes its inherited descriptors the
+	 * same way and for the same reason.
 	 */
-	close(fd);
+	for(i = 0; i < OPEN_MAX; i++)
+		if(i != nfd && i != pfd[1] && (_fdinfo[i].flags & FD_ISOPEN))
+			_CLOSE(i);
+	_CLOSE(fd);	/* the dup2'd pipe end, in case _fdinfo disagrees */
 
 	dfd = -1;
 	for(;;){
