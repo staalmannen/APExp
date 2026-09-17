@@ -6638,6 +6638,31 @@ and neither should be spent before the run says whether a high
 descriptor is ever reached. Section 11 is one command and needs no
 rebuild of libap at all.
 
+#### A NUMBERED TEST SAYS FOR ITSELF WHETHER THE BUILD HAS THE CHANGE
+
+`select-test` came back **0 failures** with sections 1..10 -- and
+**section 11 was not in the output**, because the build was from a tree
+without it. Sections 1..10 being green is a real result and worth
+having (the port still does the right thing in all ten shapes it was
+taught), but it says nothing whatever about the question that round was
+asked.
+
+**This is the third instance of "a measurement of a build that does not
+contain the change measures nothing"** -- the window-table ramp test and
+the `TESTCFLAGS` round are the other two, and both cost a reversal of a
+correct decision. What is new is that the check here is free and needs
+nothing but the output already in front of you: **these files number
+their sections, so the highest number printed is the version of the
+source that ran.** Read it before reading the verdict, exactly as
+`git merge-base` is read before a suite result and the `tk-runall`
+marker before a total.
+
+The general form, since every test in `sys/lib/tests` is built by hand
+on the machine under test: **when a run comes back green, ask what the
+new case would have printed and look for it**, rather than taking the
+count. A test that cannot run is indistinguishable from a test that
+passes, if nothing names it.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
