@@ -747,15 +747,14 @@ main(void)
 		 * `long fds_bits[3]` and `long` is 32 bits on amd64, so
 		 * 96. The width came from somewhere else.
 		 *
-		 * The host's stock APE keeps its own <sys/types.h> and
-		 * <sys/select.h> in the ARCHITECTURE directory, which
-		 * pcc searches first, and this tree has no sys/ there --
-		 * mount-include unions that directory rather than
-		 * replacing it, so stock's copies are still what a
-		 * compile sees. FD_SETSIZE came from this tree (96) and
-		 * the struct from stock (128), which is the worst of
-		 * both: every caller sizes its loops by one file and
-		 * indexes memory laid out by the other.
+		 * THE ANSWER WAS NOT WHAT THIS COMMENT FIRST GUESSED. It
+		 * said stock APE's copy in the architecture directory
+		 * had won the search; the marker below reported `fd_set
+		 * came from THIS TREE`, so it had not. The 128 is
+		 * KENCC'S PADDING: it rounds `long fds_bits[3]` -- 12
+		 * bytes -- up to an eight-byte multiple, leaving a
+		 * fourth word that FD_SETSIZE denied, FD_SET could write
+		 * into and FD_ZERO never cleared.
 		 *
 		 * _APEXP_FD_SET_T is defined beside the typedef in all
 		 * three of this tree's copies, so it answers the
@@ -767,8 +766,9 @@ main(void)
 #else
 		note("fd_set did NOT come from this tree (no"
 			" _APEXP_FD_SET_T)");
-		note("-- expected on glibc, and on Plan 9 it means stock");
-		note("APE's copy in the ARCHITECTURE directory won.");
+		note("-- expected on glibc; on Plan 9 it would mean");
+		note("stock APE's copy in the architecture directory"
+			" won.");
 #endif
 		if((long)sysconf(_SC_OPEN_MAX) > (long)FD_SETSIZE)
 			note("the system gives out descriptors no fd_set can name");

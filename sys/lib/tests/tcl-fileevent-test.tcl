@@ -654,16 +654,31 @@ if {[catch {
 	ok [expr {$got eq "text"}] "44.1 with $n held (got '$got')"
 	if {$got ne "text"} {
 	    note "IT BROKE BETWEEN $prev AND $n DESCRIPTORS HELD."
-	    if {$prev < 96 && $n >= 96} {
-		note "that straddles 96, where _buf.c's FD_ANYSET stops"
-		note "looking -- it is three words wide by hand."
-	    } elseif {$prev < 128 && $n >= 128} {
-		note "that straddles 128, where the fd_set STRUCT ends"
-		note "on this machine: see select-test.c section 11."
+	    #
+	    # A HELD COUNT IS NOT A DESCRIPTOR NUMBER, and the first
+	    # version of this message compared it against 96 and 128 as
+	    # though it were -- which read "neither 96 nor 128, so the
+	    # descriptor number is the wrong suspect" off a break
+	    # between 120 and 126, when that is exactly where the
+	    # boundary is. Holding n descriptors puts the next ones at
+	    # roughly n + 4 (stdin, stdout, stderr and the hold file),
+	    # and 44.1 opens TWO |cat -u pipes, so it needs about four
+	    # more on top. So the numbers to compare are the far end of
+	    # that span, not the count.
+	    #
+	    set lo [expr {$prev + 4}]
+	    set hi [expr {$n + 8}]
+	    note "so the pipes it opened landed at about $lo..$hi."
+	    if {$lo < 96 && $hi >= 96} {
+		note "that straddles 96, where _buf.c's FD_ANYSET used"
+		note "to stop looking -- three words wide by hand."
+	    } elseif {$lo < 128 && $hi >= 128} {
+		note "that straddles 128, where the fd_set STRUCT ended"
+		note "before the widening: see select-test.c section 11."
 	    } else {
-		note "that is neither 96 nor 128, so the descriptor"
-		note "NUMBER is the wrong suspect and what accumulates"
-		note "in chanio.test is something else."
+		note "that is clear of both 96 and 128, so the"
+		note "descriptor NUMBER is the wrong suspect and what"
+		note "accumulates in chanio.test is something else."
 	    }
 	    break
 	}

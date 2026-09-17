@@ -6663,7 +6663,7 @@ new case would have printed and look for it**, rather than taking the
 count. A test that cannot run is indistinguishable from a test that
 passes, if nothing names it.
 
-#### THE fd_set THAT COMPILES IS STOCK APE'S, AND THE TWO DISAGREE
+#### FD_SETSIZE AND fd_set DISAGREED, AND IT WAS NOT STOCK APE'S
 
 The run answered every question asked and the headline is one line:
 
@@ -6678,21 +6678,31 @@ The run answered every question asked and the headline is one line:
 32 bits on amd64, so 96. The width came from somewhere else, and the
 constant came from here.
 
-**It is the architecture-directory trap for a fourth header, and this
-time it is a different STRUCT LAYOUT rather than a missing name.**
-`pcc.c:234-235` searches `/$objtype/include/ape` before
-`/sys/include/ape`; stock APE keeps its own `sys/types.h` and
-`sys/select.h` there; and `amd64/include/ape/` **has no `sys/`
-directory at all**. `mount-include`'s `bind -b` unions that directory
-rather than replacing it, so where this tree has no file, stock's is
-still what a compile sees. The float.h fix bound the directory and
-every earlier case was answered by *adding a file* -- and a file that
-was never added cannot shadow anything.
+**THE ARCHITECTURE-DIRECTORY EXPLANATION WAS WRONG, AND THE MARKER IS
+WHAT SAID SO.** The obvious reading was the trap this file records
+three times already -- `pcc.c:234-235` searches `/$objtype/include/ape`
+first, stock APE keeps its own `sys/types.h` and `sys/select.h` there,
+and `amd64/include/ape/` has no `sys/` directory, so stock's copies
+would still be what a compile sees. That was written down as the
+answer. `_APEXP_FD_SET_T` then reported
 
-So every program in the tree is compiled with **FD_SETSIZE 96 from
-here and a 128-bit struct from stock**: loops sized by one file,
-memory laid out by the other. And `_buf.c` makes it a third number,
-because its own
+```
+  note fd_set came from THIS TREE
+```
+
+-- so stock's header was never reached, and the whole paragraph was a
+plausible mechanism refuted by one line of output, for the sixth time
+in this file. **It was worth adding the marker precisely because the
+arithmetic could not distinguish the two**, and the arithmetic is what
+the explanation had rested on.
+
+**The 128 is kencc's padding.** `long fds_bits[3]` is twelve bytes and
+kencc rounds a struct up to an eight-byte multiple, so there was a
+**fourth word of storage** that `FD_SETSIZE` denied, `FD_SET` could
+write into, and `FD_ZERO` -- three assignments *by name* -- never
+cleared. So every program in the tree sized its loops by 96 and
+indexed an object of 128. And `_buf.c` made it a third number, because
+its own
 
 ```c
 /* assume FD_SETSIZE is 96 */
@@ -6728,26 +6738,92 @@ to read before anything else in that section.
   repeated `dup` now, which is also what a real program does, and
   prints the highest number it reached.
 
-#### The descriptor number is NOT what chan-io-44.1 accumulates
+#### The descriptor number IS what chan-io-44.1 accumulates, at 128
 
-**All seven ramp steps passed** -- 44.1 with 0, 40, 80, 88, 92, 96 and
-104 descriptors held underneath it. So the first suspect is wrong, and
-the ramp is the reason that took one run rather than four.
+**The ramp broke between 120 and 126 held.**
 
-**It is not yet fully wrong, though, and the difference is the 128.**
-The ramp was written against a cliff at 96 and stopped at 104; the
-struct actually ends at **128**, so every step was still inside it.
-There are now two numbers worth straddling -- 96, where `FD_ANYSET`
-stops looking, and 128, where the struct ends -- and the ramp runs
-`0 40 80 88 92 96 104 120 126 130 140`, with the script naming which
-boundary a break sits on in its own output.
+```
+  PASS 44.1 with 120 held (got 'text')
+  FAIL 44.1 with 126 held (got 'TIMEOUT')
+```
 
-**If 130 and 140 pass too, the descriptor number is finished as a
-suspect** and the bisect is the honest next move: `-match 'chan-io-4*'`,
-then `'chan-io-[34]*'`. Recording that in advance, because the ramp
-passing at 104 was already a refutation of the shape the last round
-predicted, and the rule this file keeps relearning is that a suspect
-that survives by being re-aimed twice is usually the wrong suspect.
+The first seven steps (0..104) all passed, which is why the round
+before this recorded the descriptor number as refuted -- the ramp
+stopped at 104 and the struct ends at **128**, so every step had still
+been inside it. Extending it two steps found the edge.
+
+**AND THE SCRIPT'S OWN VERDICT READ IT WRONG, which is my mistake and
+not the machine's.** It printed *"that is neither 96 nor 128, so the
+descriptor NUMBER is the wrong suspect"* -- because it compared the
+**held count** against those numbers as though a count were a
+descriptor number. It is not: holding n descriptors puts the next one
+at about n+4, and 44.1 opens **two** `|cat -u` pipes, so it needs about
+four more on top. A break between 120 and 126 held is pipes landing at
+roughly **124..134**, which straddles 128 exactly. The script computes
+that span and names the boundary now.
+
+**A test that draws its own conclusion has to do the arithmetic the
+reader would**, or it reports a refutation where there is a
+confirmation -- which is worse than printing the raw numbers and
+saying nothing, because it is a wrong answer in the voice of a
+measurement.
+
+#### The fix: one fd_set, sized by FD_SETSIZE, and FD_SETSIZE >= OPEN_MAX
+
+Three bugs, all measured above, all in the same two lines of header:
+
+- **`FD_SETSIZE` was 96 and `OPEN_MAX` is 256.** Descriptors 96..255
+  are ordinary and reachable -- section 11 climbed to **136** by
+  repeated `dup`, with nothing worse than the kernel's `warning:
+  process exceeds 100 file descriptors` -- and `select()` could not be
+  asked about them. It did not say so either: it took the *"no
+  requested fds"* arm, slept out the timeout and **returned 0**.
+- **the struct was wider than the constant** (the padding above), so
+  `FD_SET` on 96..127 wrote into a word `FD_ZERO` never cleared.
+- **`Muxbuf.fd` was a `char`**, so 255 read back as **-1**, which is
+  that field's own marker for a free slot.
+
+`sys/include/ape/fdset_generic.h` holds it once now and
+`<select.h>`, `<sys/select.h>`, `<sys/types.h>` and `<poll.h>` include
+it -- `stdint_generic.h`'s arrangement, and for the same reason: there
+were **four** independent copies of these constants, three of the
+struct and one more of `FD_SETSIZE` alone, and none could reach another
+by name because the search would find itself. `FD_SETSIZE` is 256 and
+the array is `long fds_bits[(FD_SETSIZE + 31) / 32]`, so the two cannot
+drift again.
+
+**`FD_ZERO` is a function.** A macro clearing elements by name cannot
+clear what it does not know about, which is exactly what went wrong; a
+`sizeof`-based `do { } while(0)` would fix the clearing and **quietly
+break every use as an expression**, which the comma-expression version
+allowed. `__fd_zero` in `ap/select/fdzero.c` is one `memset` and stays
+an expression.
+
+`_buf.c`'s `FD_ANYSET` derives its width from the struct instead of the
+hand-written three words, and `select()`'s early return can no longer
+fire for a descriptor merely because it is high.
+
+**THIS IS AN ABI CHANGE AND NEEDS `mk nuke` BEFORE `mk install`.**
+`fd_set` grows, so every object that has one on its stack or in a
+struct disagrees with every object that has not been rebuilt; and
+`Muxbuf.fd` widening **moves every field below it** in the shared mux
+segment. An incremental build gives exactly the shape this file already
+records under `HFILES` -- logically inert changes followed by broad,
+unattributable breakage -- and nothing in these mkfiles lists a system
+header as a dependency, so mk will not do it for you.
+
+Tcl needs no change and never did: `tcl/unix/tclUnixPort.h` already
+says `#ifdef OPEN_MAX / #define FD_SETSIZE OPEN_MAX`, so it has been
+asking for 256 all along and being handed 96.
+
+**What the next run decides.** `select-test` section 11 should report
+`FD_SETSIZE 256, fd_set holds 256`, `came from THIS TREE`, both
+assertions passing, and a high descriptor reported readable.
+`tcl-fileevent-test` section 9 should pass every step to 140. If both
+do, the honest next question is whether `chanio.test` really reaches
+~128 live descriptors by test 44 -- the ramp says *a* process at that
+depth hangs 44.1, not that the suite's process is at that depth -- and
+`-match 'chan-io-4*'` is still the bisect if it is not.
 
 #### A skip list is not a substitute for a timeout
 
