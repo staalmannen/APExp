@@ -7436,6 +7436,97 @@ with the names printed:
 Either answer is worth the run, and neither is available from the log
 that exists.
 
+#### It is chan-io-73.1, the LAST test -- and 53.7 never meant anything
+
+```
+tcltest .../tcl-runall.tcl -file chanio.test -verbose t     (no -singleproc)
+---- chan-io-73.1 start
+                          <- nothing
+```
+
+**Multi-process mode alone reproduces it**, with a fresh child, one file
+and nothing before it -- so the child's accumulated state is the whole
+story and the parent's hundred and sixty pipes are not needed. That was
+the question the run was for, and it is answered.
+
+**AND MY READING OF THE SUITE LOG LAST ROUND WAS WRONG.** It said the
+freeze was "after 53.7", because `chan-io-53.7` was the last thing the
+log printed. **Without `-verbose t`, tcltest prints only FAILURES** --
+so 53.7 was merely the last *failure*, and everything after it was
+passing silently. The suite run had almost certainly reached 73.1 too.
+There is **one** freeze here, not two, and the arithmetic that made the
+two look different (22 failures = chanio's 20 + binary's 2) was right
+about the count and wrong about what it implied.
+
+That is the fourth time in this file the last line of a log has been
+over-read, and it is a new variant worth naming: the earlier three were
+**buffering** -- the last line was stale. This one was **verbosity**:
+the last line was current and was not the last *test*. `-verbose t` is
+what makes "last printed" mean "last started", and a log without it
+cannot be read for position at all.
+
+**73.1 CANNOT BLOCK.** It is two lines:
+
+```tcl
+test chan-io-73.1 {channel Tcl_Obj SetChannelFromAny} -body {
+    chan close [lreplace [list a] 0 end]
+} -returnCodes error -match glob -result *
+```
+
+`chan close {}` raises an error and that is the expected result. So the
+freeze is in what comes **after** it, which is the file's own trailing
+cleanup -- `removeFile` thirteen times, `cleanupTests`, `namespace
+delete` -- and then the child exiting and the parent seeing end of file
+on the pipe.
+
+**So the remaining question is which of two processes, and `ps` answers
+it outright.** While it is frozen, on the VM:
+
+```
+ps | grep -v Pread
+```
+
+A live `cat`, `tcltest` or stray child names the holder directly, and
+Plan 9's `ps` shows the state -- `Pread` for something blocked in a
+read. This is the most direct evidence available and costs nothing.
+
+**`_timerproc` and `_copyproc` are both cleared, checked rather than
+assumed.** Each closes **every** descriptor it does not need:
+
+```c
+for(i=0; i<OPEN_MAX; i++)		/* _timerproc */
+	_CLOSE(i);
+for(i=0; i<OPEN_MAX; i++)		/* _copyproc, via _startbuf */
+	if(i!=fd && (_fdinfo[i].flags&FD_ISOPEN))
+		_CLOSE(i);
+```
+
+so neither holds the child's stdout, and the `listenproc` shape does
+not repeat through them. What is left is the test file's own children:
+`chanio.test` runs `exec ... &` and `openpipe ... &` in several places,
+and a background child that inherited descriptor 1 and is still alive
+keeps the parent's `gets` from ever seeing end of file.
+
+**A two-step ladder settles child-versus-parent with no harness at
+all**, by running the child exactly as the parent does and changing only
+what its stdout is:
+
+```
+tcltest $home/APExp/sys/src/external/tcl/tests/chanio.test -verbose t
+tcltest $home/APExp/sys/src/external/tcl/tests/chanio.test -verbose t | cat
+```
+
+| | |
+|---|---|
+| **first finishes, second freezes** | the child completes and the **pipe** is the variable: something still holds the write end, so the reader never sees EOF. That is the `listenproc` shape a third time, and `ps` names the process. |
+| **both freeze** | the child cannot finish as a standalone `tcltest`, which `-singleproc 1` never is, and the teardown after 73.1 is where to look. |
+| **both finish** | it needs the tcltest parent specifically, and the pipe is not enough on its own. |
+
+Note the first command is the child's real command line -- the parent
+builds `| $shell $file $childargv` (`tcltest.tcl:2940`) -- so it is not
+an approximation of what the suite does, it is the same thing with the
+pipe removed.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
