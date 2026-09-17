@@ -7,9 +7,9 @@ Tests running in:  /usr/glenda/APExp/sys/src/external/tcl/tests
 Temporary files stored in /usr/glenda/APExp/sys/src/external/tcl/tests
 Test files run in separate interpreters
 Running tests that match:  *
-Skipping test files that match:  l.*.test chanio.test
+Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-16 07:49:18 +0200
+Tests began at 2026-09-17 17:05:03 +0200
 aaa_exit.test
 abstractlist.test
 append.test
@@ -54,6 +54,476 @@ binary.test
 
 brodnik.test
 chan.test
+chanio.test
+
+
+==== chan-io-6.31 Tcl_GetsObj: crlf mode: buffer exhausted, blocked FAILED
+==== Contents of test case:
+
+    # (FilterInputBytes() != 0)
+    set f [openpipe w+ $path(cat)]
+    chan configure $f -translation {crlf lf} -buffering none
+    chan puts -nonewline $f "bbbbbbbbbbbbbb\r\n123456789012345\r"
+    chan configure $f -buffersize 16
+    lappend x [chan gets $f]
+    chan configure $f -blocking 0
+    lappend x [chan gets $f line] $line [chan blocked $f]  [testchannel inputbuffered $f]
+
+---- Result was:
+bbbbbbbbbbbbbb -1 {} 1 0
+---- Result should have been (exact matching):
+bbbbbbbbbbbbbb -1 {} 1 16
+==== chan-io-6.31 FAILED
+
+
+
+==== chan-io-6.43 Tcl_GetsObj: input saw cr FAILED
+==== Contents of test case:
+
+    # if (chanPtr->flags & INPUT_SAW_CR)
+    set f [openpipe w+ $path(cat)]
+    chan configure $f -translation {auto lf} -buffering none
+    chan puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    chan configure $f -buffersize 16
+    lappend x [chan gets $f]
+    chan configure $f -blocking 0
+    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
+    chan configure $f -blocking 1
+    chan puts -nonewline $f "\nabcd\refg\x1A"
+    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
+    lappend x [chan gets $f line] $line
+
+---- Result was:
+bbbbbbbbbbbbbbb -1 {} 0 15 123456789abcdef 1 4 abcd
+---- Result should have been (exact matching):
+bbbbbbbbbbbbbbb 15 123456789abcdef 1 4 abcd 0 3 efg
+==== chan-io-6.43 FAILED
+
+
+
+==== chan-io-6.44 Tcl_GetsObj: input saw cr, not followed by cr FAILED
+==== Contents of test case:
+
+    # not (*eol == '\n')
+    set f [openpipe w+ $path(cat)]
+    chan configure $f -translation {auto lf} -buffering none
+    chan puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    chan configure $f -buffersize 16
+    lappend x [chan gets $f]
+    chan configure $f -blocking 0
+    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
+    chan configure $f -blocking 1
+    chan puts -nonewline $f "abcd\refg\x1A"
+    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
+    lappend x [chan gets $f line] $line
+
+---- Result was:
+bbbbbbbbbbbbbbb -1 {} 0 15 123456789abcdef 1 4 abcd
+---- Result should have been (exact matching):
+bbbbbbbbbbbbbbb 15 123456789abcdef 1 4 abcd 0 3 efg
+==== chan-io-6.44 FAILED
+
+
+
+==== chan-io-6.45 Tcl_GetsObj: input saw cr, skip right number of bytes FAILED
+==== Contents of test case:
+
+    # Tcl_ExternalToUtf()
+    set f [openpipe w+ $path(cat)]
+    chan configure $f -translation {auto lf} -buffering none
+    chan configure $f -encoding utf-16
+    chan puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    chan configure $f -buffersize 16
+    chan gets $f
+    chan configure $f -blocking 0
+    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
+    chan configure $f -blocking 1
+    chan puts -nonewline $f "\nabcd\refg"
+    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
+
+---- Result was:
+-1 {} 0 15 123456789abcdef 0
+---- Result should have been (exact matching):
+15 123456789abcdef 1 4 abcd 0
+==== chan-io-6.45 FAILED
+
+
+
+==== chan-io-6.46 Tcl_GetsObj: input saw cr, followed by just \n should give eof FAILED
+==== Contents of test case:
+
+    # memmove()
+    set f [openpipe w+ $path(cat)]
+    chan configure $f -translation {auto lf} -buffering none
+    chan puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    chan configure $f -buffersize 16
+    chan gets $f
+    chan configure $f -blocking 0
+    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
+    chan configure $f -blocking 1
+    chan puts -nonewline $f "\n\x1A"
+    lappend x [chan gets $f line] $line [testchannel queuedcr $f]
+
+---- Result was:
+-1 {} 0 15 123456789abcdef 1
+---- Result should have been (exact matching):
+15 123456789abcdef 1 -1 {} 0
+==== chan-io-6.46 FAILED
+
+
+
+==== chan-io-6.47 Tcl_GetsObj: auto mode: \r at end of buffer, peek for \n FAILED
+==== Contents of test case:
+
+    # (eol == dstEnd)
+    set f [open $path(test1) w]
+    chan configure $f -translation lf
+    chan puts -nonewline $f "123456789012345\r\nabcdefghijklmnopq"
+    chan close $f
+    set f [open $path(test1)]
+    chan configure $f -translation auto -buffersize 16
+    list [chan gets $f] [testchannel inputbuffered $f]
+
+---- Result was:
+123456789012345 0
+---- Result should have been (exact matching):
+123456789012345 15
+==== chan-io-6.47 FAILED
+
+
+
+==== chan-io-8.1 PeekAhead: only go to device if no more cached data FAILED
+==== Contents of test case:
+
+    # (bufPtr->nextPtr == NULL)
+    set f [open $path(test1) w]
+    chan configure $f -encoding ascii -translation lf
+    chan puts -nonewline $f "123456789012345\r\n2345678"
+    chan close $f
+    set f [open $path(test1)]
+    chan configure $f -encoding ascii -translation auto -buffersize 16
+    # here
+    chan gets $f
+    testchannel inputbuffered $f
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+7
+==== chan-io-8.1 FAILED
+
+
+
+==== chan-io-14.1 Tcl_SetStdChannel and Tcl_GetStdChannel FAILED
+==== Contents of test case:
+
+    set result ""
+    lappend result [chan configure stdin -buffering]
+    lappend result [chan configure stdout -buffering]
+    lappend result [chan configure stderr -buffering]
+    lappend result [lsort [testchannel open]]
+
+---- Result was:
+line line line {file0 file1 file2}
+---- Result should have been (exact matching):
+line line none {file0 file1 file2}
+==== chan-io-14.1 FAILED
+
+
+
+==== chan-io-14.2 Tcl_SetStdChannel and Tcl_GetStdChannel FAILED
+==== Contents of test case:
+
+    lappend result [x eval {chan configure stdin -buffering}]
+    lappend result [x eval {chan configure stdout -buffering}]
+    lappend result [x eval {chan configure stderr -buffering}]
+
+---- Result was:
+line line line
+---- Result should have been (exact matching):
+line line none
+==== chan-io-14.2 FAILED
+
+
+
+==== chan-io-28.7 Tcl_CloseEx (half-close) socket FAILED
+==== Contents of test case:
+
+    set s [socket 127.0.0.1 $port]
+    puts $s Hey
+    close $s w
+    set timer [after 1000 [namespace code {set done Failed}]]
+    set acc {}
+    fileevent $s readable [namespace code {
+	if {[gets $s line]<0} {
+	    set done Succeeded
+	} else {
+	    lappend acc $line
+	}
+    }]
+    vwait [namespace which -variable done]
+    list $done $acc
+
+---- Result was:
+Succeeded {}
+---- Result should have been (exact matching):
+Succeeded {Hey DONE}
+==== chan-io-28.7 FAILED
+
+
+
+==== chan-io-29.27 Tcl_Flush on chan closed pipeline FAILED
+==== Contents of test case:
+
+    set f [openpipe r+ $path(pipe)]
+    chan gets $f
+    chan puts $f output
+    after 50
+    #
+    # The flush below will get a SIGPIPE. This is an expected part of the test
+    # and indicates that the test operates correctly. If you run this test
+    # under a debugger, the signal will by intercepted unless you disable the
+    # debugger's signal interception.
+    #
+    if {[catch {chan flush $f} msg]} {
+	set x [list 1 $msg $::errorCode]
+	catch {chan close $f}
+    } elseif {[catch {chan close $f} msg]} {
+	set x [list 1 $msg $::errorCode]
+    } else {
+	set x {this was supposed to fail and did not}
+    }
+    string tolower $x
+
+---- Result was:
+1 {error flushing "file8": cannot send after transport endpoint shutdown} {posix eshutdown {cannot send after transport endpoint shutdown}}
+---- Result should have been (glob matching):
+1 {error flushing "*": broken pipe} {posix epipe {broken pipe}}
+==== chan-io-29.27 FAILED
+
+
+
+==== chan-io-32.7 Tcl_Read, nonblocking, file FAILED
+==== Contents of test case:
+
+    set f1 [open $path(longfile) r]
+    chan configure $f1 -blocking off
+    set z [chan read $f1 20]
+    chan close $f1
+    set l [string length $z]
+    set x ok
+    if {$l != 20} {
+	set x "$l != 20"
+    }
+    set x
+
+---- Result was:
+0 != 20
+---- Result should have been (exact matching):
+ok
+==== chan-io-32.7 FAILED
+
+
+
+==== chan-io-32.8 Tcl_Read, nonblocking, file FAILED
+==== Contents of test case:
+
+    set f1 [open $path(longfile) r]
+    chan configure $f1 -blocking off
+    set z [chan read $f1 1000000]
+    chan close $f1
+    set x ok
+    set l [string length $z]
+    set z [file size $path(longfile)]
+    if {$z != $l} {
+	set x "$z != $l"
+    }
+    set x
+
+---- Result was:
+10200 != 0
+---- Result should have been (exact matching):
+ok
+==== chan-io-32.8 FAILED
+
+
+
+==== chan-io-35.4 Tcl_Eof, eof detection on nonblocking file FAILED
+==== Contents of test case:
+
+    chan close [open $path(test1) w]
+    set f [open $path(test1) r]
+    chan configure $f -blocking off
+    lappend l [chan gets $f]
+    lappend l [chan eof $f]
+
+---- Result was:
+{} 0
+---- Result should have been (exact matching):
+{} 1
+==== chan-io-35.4 FAILED
+
+
+
+==== chan-io-36.5 Tcl_InputBlocked vs files, short read, nonblocking FAILED
+==== Contents of test case:
+
+    set f [open $path(test1) w]
+    chan puts $f abcdefghijklmnop
+    chan close $f
+    set f [open $path(test1) r]
+    chan configure $f -blocking off
+    lappend l [chan blocked $f]
+    lappend l [chan read $f 3]
+    lappend l [chan blocked $f]
+    lappend l [chan read -nonewline $f]
+    lappend l [chan blocked $f]
+    lappend l [chan eof $f]
+
+---- Result was:
+0 {} 1 {} 1 0
+---- Result should have been (exact matching):
+0 abc 0 defghijklmnop 0 1
+==== chan-io-36.5 FAILED
+
+
+
+==== chan-io-36.6 Tcl_InputBlocked vs files, event driven read FAILED
+==== Contents of test case:
+
+    set f [open $path(test1) w]
+    chan puts $f abcdefghijklmnop
+    chan close $f
+    set f [open $path(test1) r]
+    chan configure $f -blocking off
+    chan event $f readable [namespace code {
+	lappend l [chan read $f 3]
+	if {[chan eof $f]} {lappend l eof; chan close $f; set x done}
+    }]
+    vwait [namespace which -variable x]
+    return $l
+
+---- Result was:
+abc def ghi jkl mno {p
+} {} eof
+---- Result should have been (exact matching):
+abc def ghi jkl mno {p
+} eof
+==== chan-io-36.6 FAILED
+
+
+
+==== chan-io-39.9 Tcl_SetChannelOption, blocking mode FAILED
+==== Contents of test case:
+
+    set f1 [open $path(test1) w]
+    chan close $f1
+    set f1 [open $path(test1) r]
+    lappend x [chan configure $f1 -blocking]
+    chan configure $f1 -blocking off
+    lappend x [chan configure $f1 -blocking]
+    lappend x [chan gets $f1]
+    lappend x [chan read $f1 1000]
+    lappend x [chan blocked $f1]
+    lappend x [chan eof $f1]
+
+---- Result was:
+1 0 {} {} 1 0
+---- Result should have been (exact matching):
+1 0 {} {} 0 1
+==== chan-io-39.9 FAILED
+
+
+
+==== chan-io-40.3 POSIX open access modes: CREAT FAILED
+==== Contents of test case:
+
+    # This test only works if your umask is 2, like ouster's.
+    chan close [open $path(test3) {WRONLY CREAT}]
+    file stat $path(test3) stats
+    format 0o%03o [expr {$stats(mode) & 0o777}]
+
+---- Result was:
+0o644
+---- Result should have been (exact matching):
+0o666
+==== chan-io-40.3 FAILED
+
+
+
+==== chan-io-41.8 Tcl_FileeventCmd: symbolic link FAILED
+==== Contents of test case:
+
+    set target [makeFile {not again} thefile $tempdir]
+    set link [file join $tempdir thelin]
+    file link -symbolic $link $target
+    set chan [open $link]
+    chan event $chan readable [list ::apply [list {} {
+	variable success
+	set success 1
+    } [namespace current]]]
+    vwait [namespace current]::success
+    return $success
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "/tmp/tcl_HKBeJF/thelin" pointing to "/tmp/tcl_HKBeJF/thefile": function not implemented
+    while executing
+"file link -symbolic $link $target"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+---- Test cleanup failed:
+can not find channel named "file6"
+---- errorInfo(cleanup): can not find channel named "file6"
+    while executing
+"close $chan"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP CHANNEL file6
+==== chan-io-41.8 FAILED
+
+
+
+==== chan-io-53.7 CopyData: Flooding chan copy from pipe FAILED
+==== Contents of test case:
+
+    set fcopyTestCount 0
+    set f1 [open $path(pipe) w]
+    chan puts $f1 {
+	# Write  10 bytes / 10 msec
+	proc Write {count} {
+	    chan puts -nonewline "1234567890"
+	    if {[incr count -1]} {
+		after 10 [list Write $count]
+	    } else {
+		set ::ready 1
+	    }
+	}
+	chan configure stdout -buffering none
+	Write 345 ;# 3450 bytes ~3.45 sec
+	vwait ready
+	exit 0
+    }
+    chan close $f1
+    set in [openpipe r+ $path(pipe) &]
+    set out [open $path(test1) w]
+    doFcopy $in $out
+    variable fcopyTestDone
+    if {![info exists fcopyTestDone]} {
+	vwait [namespace which -variable fcopyTestDone]
+    }
+    # -1=error 0=script error N=number of bytes
+    expr {($fcopyTestDone == 0) ? $fcopyTestCount : -1}
+
+---- Result was:
+-1
+---- Result should have been (exact matching):
+3450
+==== chan-io-53.7 FAILED
+
 clock-ivm.test
   Validity default mode: off
 
@@ -405,3 +875,3394 @@ event.test
 {0 0} {1 0} {2 0}
 ==== event-1.1 FAILED
 
+exec.test
+
+
+==== exec-10.15 errors in exec invocation FAILED
+==== Contents of test case:
+
+    exec cat < a/b/c
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== exec-10.15 FAILED
+
+
+
+==== exec-10.16 errors in exec invocation FAILED
+==== Contents of test case:
+
+    exec cat << foo > a/b/c
+
+---- Result was:
+couldn't write file "a/b/c": is a directory: 'a/b/c'
+---- Result should have been (exact matching):
+couldn't write file "a/b/c": no such file or directory
+==== exec-10.16 FAILED
+
+
+
+==== exec-10.17 errors in exec invocation FAILED
+==== Contents of test case:
+
+    exec cat << foo > a/b/c
+
+---- Result was:
+couldn't write file "a/b/c": is a directory: 'a/b/c'
+---- Result should have been (exact matching):
+couldn't write file "a/b/c": no such file or directory
+==== exec-10.17 FAILED
+
+
+
+==== exec-10.20.1 errors in exec invocation FAILED
+==== Contents of test case:
+
+    exec ~non_existent_user/foo/bar
+
+---- Result was:
+TclpCreateProcess: unable to write to errPipeOut
+---- Result should have been (exact matching):
+couldn't execute "~non_existent_user/foo/bar": no such file or directory
+==== exec-10.20.1 FAILED
+
+
+
+==== exec-10.21.1 errors in exec invocation FAILED
+==== Contents of test case:
+
+    exec [interpreter] true | ~xyzzy_bad_user/x | false
+
+---- Result was:
+TclpCreateProcess: unable to write to errPipeOut
+couldn't read file "true": no such file or directory
+---- Result should have been (exact matching):
+couldn't execute "~xyzzy_bad_user/x": no such file or directory
+==== exec-10.21.1 FAILED
+
+
+
+==== exec-13.1 setting errorCode variable FAILED
+==== Contents of test case:
+
+    list [catch {exec [interpreter] $path(cat) < a/b/c} msg] [string tolower $errorCode]
+
+---- Result was:
+0 {posix enoent {no such file or directory}}
+---- Result should have been (exact matching):
+1 {posix enoent {no such file or directory}}
+==== exec-13.1 FAILED
+
+
+
+==== exec-13.2 setting errorCode variable FAILED
+==== Contents of test case:
+
+    list [catch {exec [interpreter] $path(cat) > a/b/c} msg] [string tolower $errorCode]
+
+---- Result was:
+1 {posix {unknown error} {is a directory: 'a/b/c'}}
+---- Result should have been (exact matching):
+1 {posix enoent {no such file or directory}}
+==== exec-13.2 FAILED
+
+
+
+==== exec-19.1 exec >> uses O_APPEND FAILED
+==== Contents of test case:
+
+    # Note that we have to allow for the current contents of the temporary
+    # file, which is why the result is 14 and not 12
+    exec /bin/sh -c  {for a in 1 2 3; do sleep 1; echo $a; done} >>$tmpfile &
+    exec /bin/sh -c  {for a in 4 5 6; do sleep 1; echo $a >&2; done} 2>>$tmpfile &
+    exec /bin/sh -c  {for a in a b c; do sleep 1; echo $a; done} >>$tmpfile &
+    exec /bin/sh -c  {for a in d e f; do sleep 1; echo $a >&2; done} 2>>$tmpfile &
+    # The above four shell invocations take about 3 seconds to finish, so allow
+    # 5s (in case the machine is busy)
+    after 5000
+    # Check that no bytes have got lost through mixups with overlapping
+    # appends, which is only guaranteed to work when we set O_APPEND on the
+    # file descriptor in the [exec >>...]
+    file size $tmpfile
+
+---- Result was:
+8
+---- Result should have been (exact matching):
+26
+==== exec-19.1 FAILED
+
+execute.test
+expr-old.test
+
+
+==== expr-old-37.21 Tcl_ExprDouble handles overflows FAILED
+==== Contents of test case:
+
+    testexprdouble 17976931348623157[string repeat 0 292].
+
+---- Result was:
+This is a result: Inf
+---- Result should have been (exact matching):
+This is a result: 1.7976931348623157e+308
+==== expr-old-37.21 FAILED
+
+expr.test
+
+
+==== expr-28.527 input floating-point conversion FAILED
+==== Contents of test case:
+
+    # Ad2b d UN -929963218616126365 E290 x -108dcc0c505461_01111111111111111111111111111111111111111111111111111111111111110& E1023
+    convertToDouble -929963218616126365E290
+
+---- Result was:
+0xfff0000000000000
+---- Result should have been (exact matching):
+0xffe08dcc0c505461
+==== expr-28.527 FAILED
+
+
+
+==== expr-30.1 largest representible number FAILED
+==== Contents of test case:
+
+    list [catch {convertToDouble 1.7976931348623155e+308} result]  $result  [catch {convertToDouble 1.7976931348623157e+308} result]  $result  [catch {convertToDouble 1.7976931348623159e+308} result]  $result
+
+---- Result was:
+0 0x7ff0000000000000 0 0x7ff0000000000000 0 0x7ff0000000000000
+---- Result should have been (exact matching):
+0 0x7feffffffffffffe 0 0x7fefffffffffffff 0 0x7ff0000000000000
+==== expr-30.1 FAILED
+
+
+
+==== expr-30.2 largest representible number FAILED
+==== Contents of test case:
+
+    list [catch {convertToDouble -1.7976931348623155e+308} result]  $result  [catch {convertToDouble -1.7976931348623157e+308} result]  $result  [catch {convertToDouble -1.7976931348623159e+308} result]  $result
+
+---- Result was:
+0 0xfff0000000000000 0 0xfff0000000000000 0 0xfff0000000000000
+---- Result should have been (exact matching):
+0 0xffeffffffffffffe 0 0xffefffffffffffff 0 0xfff0000000000000
+==== expr-30.2 FAILED
+
+
+
+==== expr-39.21 Tcl_ExprDoubleObj handles overflows FAILED
+==== Contents of test case:
+
+	testexprdoubleobj 17976931348623157[string repeat 0 292].
+    
+---- Result was:
+This is a result: Inf
+---- Result should have been (exact matching):
+This is a result: 1.7976931348623157e+308
+==== expr-39.21 FAILED
+
+
+
+==== expr-50.1 test sqrt() of bignums with non-Inf answer FAILED
+==== Contents of test case:
+
+    expr {sqrt("1[string repeat 0 616]") == 1e308}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== expr-50.1 FAILED
+
+fCmd.test
+
+
+==== fCmd-2.1 TclFileCopyCmd FAILED
+==== Contents of test case:
+
+    createfile tf1
+    file copy tf1 tf2
+    lsort [glob tf*]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tf1" to "tf2": no such file or directory
+    while executing
+"file copy tf1 tf2"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-2.1 FAILED
+
+
+
+==== fCmd-2.2 TclFileCopyCmd when target is ~ FAILED
+==== Contents of test case:
+
+    file copy tf1 ~
+    list [file exists tf1] [file exists ~]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tf1" to "~": no such file or directory
+    while executing
+"file copy tf1 ~"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-2.2 FAILED
+
+
+
+==== fCmd-2.3 TclFileCopyCmd when target is ~user FAILED
+==== Contents of test case:
+
+    file copy tf1 ~$user
+    list [file exists tf1] [file exists ~$user]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tf1" to "~glenda": no such file or directory
+    while executing
+"file copy tf1 ~$user"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-2.3 FAILED
+
+
+
+==== fCmd-2.4 TclFileCopyCmd when source is ~ FAILED
+==== Contents of test case:
+
+    file copy ~ tf1
+    list [file exists ~] [file exists tf1]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "~" to "tf1": no such file or directory
+    while executing
+"file copy ~ tf1"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-2.4 FAILED
+
+
+
+==== fCmd-2.5 TclFileCopyCmd when source is ~user FAILED
+==== Contents of test case:
+
+    file copy ~$user tf1
+    list [file exists ~$user] [file exists tf1]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "~glenda" to "tf1": no such file or directory
+    while executing
+"file copy ~$user tf1"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-2.5 FAILED
+
+
+
+==== fCmd-3.7 FileCopyRename: target exists & is directory FAILED
+==== Contents of test case:
+
+    file mkdir td1
+    createfile tf1 tf1
+    file rename tf1 td1
+    contents [file join td1 tf1]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error renaming "tf1" to "td1/tf1": file exists
+    while executing
+"file rename tf1 td1"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX EEXIST {file exists}
+==== fCmd-3.7 FAILED
+
+
+
+==== fCmd-3.12 FileCopyRename: move each source: 1 source FAILED
+==== Contents of test case:
+
+    createfile tf1 tf1
+    file mkdir td1
+    file rename tf1 td1
+    contents [file join td1 tf1]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error renaming "tf1" to "td1/tf1": file exists
+    while executing
+"file rename tf1 td1"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX EEXIST {file exists}
+==== fCmd-3.12 FAILED
+
+
+
+==== fCmd-3.13 FileCopyRename: move each source: multiple sources FAILED
+==== Contents of test case:
+
+    createfile tf1 tf1
+    createfile tf2 tf2
+    createfile tf3 tf3
+    createfile tf4 tf4
+    file mkdir td1
+    file rename tf1 tf2 tf3 tf4 td1
+    list [contents [file join td1 tf1]] [contents [file join td1 tf2]]  [contents [file join td1 tf3]] [contents [file join td1 tf4]]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error renaming "tf1" to "td1/tf1": file exists
+    while executing
+"file rename tf1 tf2 tf3 tf4 td1"
+    ("uplevel" body line 7)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX EEXIST {file exists}
+==== fCmd-3.13 FAILED
+
+
+
+==== fCmd-3.16 FileCopyRename: break on first error FAILED
+==== Contents of test case:
+
+    createfile tf1
+    createfile tf2
+    createfile tf3
+    createfile tf4
+    file mkdir td1
+    createfile [file join td1 tf3]
+    file rename tf1 tf2 tf3 tf4 td1
+
+---- Result was:
+error renaming "tf1" to "td1/tf1": file exists
+---- Result should have been (exact matching):
+error renaming "tf3" to "td1/tf3": file exists
+==== fCmd-3.16 FAILED
+
+
+
+==== fCmd-4.1 TclFileMakeDirsCmd: make each dir: 1 dir FAILED
+==== Contents of test case:
+
+    file mkdir td1
+    glob td*
+
+---- Result was:
+td1 td2
+---- Result should have been (exact matching):
+td1
+==== fCmd-4.1 FAILED
+
+
+
+==== fCmd-4.11 TclFileMakeDirsCmd: doesn't exist: errno != ENOENT FAILED
+==== Contents of test case:
+
+    file mkdir td1/td2/td3
+    testchmod 0 td1/td2
+    file mkdir td1/td2/td3/td4
+
+---- Result was:
+can't create directory "td1/td2/td3": operation not permitted
+---- Result should have been (exact matching):
+can't create directory "td1/td2/td3": permission denied
+==== fCmd-4.11 FAILED
+
+
+
+==== fCmd-4.13 TclFileMakeDirsCmd: doesn't exist: errno == ENOENT FAILED
+==== Contents of test case:
+
+    set x [file exists td1]
+    file mkdir td1
+    list $x [file exists td1]
+
+---- Result was:
+1 1
+---- Result should have been (exact matching):
+0 1
+==== fCmd-4.13 FAILED
+
+
+
+==== fCmd-4.14 TclFileMakeDirsCmd: TclpCreateDirectory fails FAILED
+==== Contents of test case:
+
+    file mkdir foo
+    file attr foo -perm 0o40000
+    file mkdir foo/tf1
+
+---- Result was:
+can't create directory "foo/tf1": operation not permitted
+---- Result should have been (exact matching):
+can't create directory "foo/tf1": permission denied
+==== fCmd-4.14 FAILED
+
+
+
+==== fCmd-5.3 TclFileDeleteCmd: 1 file FAILED
+==== Contents of test case:
+
+    createfile tf1
+    createfile tf2
+    file mkdir td1
+    file delete tf2
+    glob tf* td*
+
+---- Result was:
+tf1 td1 td2
+---- Result should have been (exact matching):
+tf1 td1
+==== fCmd-5.3 FAILED
+
+
+
+==== fCmd-5.4 TclFileDeleteCmd: multiple files FAILED
+==== Contents of test case:
+
+    createfile tf1
+    createfile tf2
+    file mkdir td1
+    set x [list [file exists tf1] [file exists tf2] [file exists td1]]
+    file delete tf1 td1 tf2
+    lappend x [file exists tf1] [file exists tf2] [file exists tf3]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error deleting "td1": invalid operation
+    while executing
+"file delete tf1 td1 tf2"
+    ("uplevel" body line 6)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX {unknown error} {invalid operation}
+==== fCmd-5.4 FAILED
+
+
+
+==== fCmd-5.9 TclFileDeleteCmd: is directory FAILED
+==== Contents of test case:
+
+    file mkdir td1
+    file delete td1
+    file exists td1
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error deleting "td1": invalid operation
+    while executing
+"file delete td1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX {unknown error} {invalid operation}
+==== fCmd-5.9 FAILED
+
+
+
+==== fCmd-5.10 TclFileDeleteCmd: TclpRemoveDirectory fails FAILED
+==== Contents of test case:
+
+    file mkdir [file join td1 td2]
+    file delete td1
+
+---- Result was:
+error deleting "td1": invalid operation
+---- Result should have been (exact matching):
+error deleting "td1": directory not empty
+==== fCmd-5.10 FAILED
+
+
+
+==== fCmd-5.11 TclFileDeleteCmd: TclpRemoveDirectory with cwd inside FAILED
+==== Contents of test case:
+
+    file mkdir [file join td1 td2]
+    cd [file join td1 td2]
+    set res [list [catch {file delete -force [file dirname [pwd]]} msg]]
+    cd $dir
+    lappend res [file exists td1] $msg
+
+---- Result was:
+1 1 {error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/td1": invalid operation}
+---- Result should have been (exact matching):
+0 0 {}
+==== fCmd-5.11 FAILED
+
+
+
+==== fCmd-5.12 TclFileDeleteCmd: TclpRemoveDirectory with bad perms FAILED
+==== Contents of test case:
+
+    file mkdir [file join td1 td2]
+    file attributes [file join td1 td2] -permissions u+rwx
+    set res [list [catch {file delete -force td1} msg]]
+    lappend res [file exists td1] $msg
+
+---- Result was:
+1 1 {error deleting "td1": invalid operation}
+---- Result should have been (exact matching):
+0 0 {}
+==== fCmd-5.12 FAILED
+
+
+
+==== fCmd-6.6 CopyRenameOneFile: errno != ENOENT FAILED
+==== Contents of test case:
+
+    file mkdir td1
+    testchmod 0 td1
+    createfile tf1
+    file rename tf1 td1
+
+---- Result was:
+error renaming "tf1" to "td1/tf1": operation not permitted
+---- Result should have been (exact matching):
+error renaming "tf1" to "td1/tf1": permission denied
+==== fCmd-6.6 FAILED
+
+
+
+==== fCmd-6.14 CopyRenameOneFile: source is file, target is dir FAILED
+==== Contents of test case:
+
+    createfile tf1
+    file mkdir [file join td1 tf1]
+    file rename -force tf1 td1
+
+---- Result was:
+can't create directory "td1/tf1": file exists
+---- Result should have been (exact matching):
+can't overwrite directory "td1/tf1" with file "tf1"
+==== fCmd-6.14 FAILED
+
+Test file error: tcltest 6185: suicide: sys: trap: fault write addr=0x0 pc=0x446cd8
+fileName.test
+
+
+==== filename-11.17.2 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    cd $globname
+    file link -symbolic link a1
+    cd $dir
+    lsort [glob -directory $globname -join * b1]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "link" pointing to "a1": function not implemented
+    while executing
+"file link -symbolic link a1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== filename-11.17.2 FAILED
+
+
+
+==== filename-11.17.3 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    cd $globname
+    file link -symbolic link a1
+    cd $dir
+    lsort [glob -directory $globname -type d *]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "link" pointing to "a1": function not implemented
+    while executing
+"file link -symbolic link a1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== filename-11.17.3 FAILED
+
+
+
+==== filename-11.17.4 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    cd $globname
+    file link -symbolic link a1
+    cd $dir
+    lsort [glob -directory $globname -type l *]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "link" pointing to "a1": function not implemented
+    while executing
+"file link -symbolic link a1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== filename-11.17.4 FAILED
+
+
+
+==== filename-11.17.7 Tcl_GlobCmd: broken link and glob -l FAILED
+==== Contents of test case:
+
+    cd $globname
+    file mkdir nonexistent
+    file link -symbolic link nonexistent
+    file delete nonexistent
+    cd $dir
+    lsort [glob -nocomplain -directory $globname -type l *]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "link" pointing to "nonexistent": function not implemented
+    while executing
+"file link -symbolic link nonexistent"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== filename-11.17.7 FAILED
+
+
+
+==== filename-11.17.8 Tcl_GlobCmd: broken link and glob -l FAILED
+==== Contents of test case:
+
+    cd $globname
+    touch "nonexistent"
+    file link -symbolic link nonexistent
+    file delete nonexistent
+    cd $dir
+    lsort [glob -nocomplain -directory $globname -type l *]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "link" pointing to "nonexistent": function not implemented
+    while executing
+"file link -symbolic link nonexistent"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== filename-11.17.8 FAILED
+
+
+
+==== filename-11.18 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -path $globname/ *]
+
+---- Result was:
+globTest/a1 globTest/a2 globTest/a3 globTest/nonexistent {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
+---- Result should have been (exact matching):
+globTest/a1 globTest/a2 globTest/a3 {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
+==== filename-11.18 FAILED
+
+
+
+==== filename-11.19 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -join -path [string range $globname 0 5] * *]
+
+---- Result was:
+globTest/a1 globTest/a2 globTest/a3 globTest/nonexistent {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
+---- Result should have been (exact matching):
+globTest/a1 globTest/a2 globTest/a3 {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
+==== filename-11.19 FAILED
+
+
+
+==== filename-11.20 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -type d -dir $globname *]
+
+---- Result was:
+globTest/a1 globTest/a2 globTest/a3 globTest/nonexistent
+---- Result should have been (exact matching):
+globTest/a1 globTest/a2 globTest/a3
+==== filename-11.20 FAILED
+
+
+
+==== filename-11.22 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -dir $globname *]
+
+---- Result was:
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
+---- Result should have been (exact matching):
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
+==== filename-11.22 FAILED
+
+
+
+==== filename-11.23 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -path $globname/ *]
+
+---- Result was:
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
+---- Result should have been (exact matching):
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
+==== filename-11.23 FAILED
+
+
+
+==== filename-11.24 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -join -path [string range $globname 0 5] * *]
+
+---- Result was:
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
+---- Result should have been (exact matching):
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
+==== filename-11.24 FAILED
+
+
+
+==== filename-11.25 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -type d -dir $globname *]
+
+---- Result was:
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent
+---- Result should have been (exact matching):
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3
+==== filename-11.25 FAILED
+
+
+
+==== filename-11.25.1 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -type {d r} -dir $globname *]
+
+---- Result was:
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent
+---- Result should have been (exact matching):
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3
+==== filename-11.25.1 FAILED
+
+
+
+==== filename-11.25.2 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -type {d r w} -dir $globname *]
+
+---- Result was:
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent
+---- Result should have been (exact matching):
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3
+==== filename-11.25.2 FAILED
+
+Test file error: tcltest 6196: suicide: sys: trap: fault write addr=0x0 pc=0x446cd8
+fileSystem.test
+Test file error: error deleting "dir2": invalid operation
+    while executing
+"file delete -force dir2"
+    (in namespace eval "::tcl::test::fileSystem" script line 238)
+    invoked from within
+"namespace eval ::tcl::test::fileSystem {
+
+    if {"::tcltest" ni [namespace children]} {
+	package require tcltest 2.5
+	namespace import -force ::tclte..."
+    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/fileSystem.test" line 12)
+fileSystemEncoding.test
+for-old.test
+for.test
+foreach.test
+format.test
+get.test
+history.test
+http.test
+Test file error: error copying "/usr/glenda/APExp/sys/src/external/tcl/tests/httpd" to "/usr/glenda/APExp/sys/src/external/tcl/tests/httpd_6213": no such file or directory
+    while executing
+"file copy $origFile $httpdFile"
+    invoked from within
+"if {![file exists $httpdFile]} {
+    makeFile "" $httpdFile
+    file delete $httpdFile
+    file copy $origFile $httpdFile
+    set removeHttpd 1
+}"
+    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/http.test" line 43)
+http11.test
+==== Test with ThreadLevel 0 ====
+==== Test with ThreadLevel 1 ====
+httpPipeline.test
+==== Test with ThreadLevel 0 ====
+==== Test with ThreadLevel 1 ====
+httpProxy.test
+==== Test with ThreadLevel 0 ====
+==== Test with ThreadLevel 1 ====
+
+- Constraints needsTls, knownTwapiFullBugThreadlevelAny, knownTwapiFullBugThreadUsed are
+  always set by the script, not by the caller.
+- Set one of needsTclTls, needsTwapi, needsTwapiFull instead of needsTls.
+- Set knownBug instead of knownTwapiFullBugThreadlevelAny, knownTwapiFullBugThreadUsed.
+- If the caller sets constraint needsTwapi, the script forces needsSquidNoAuth and needsSquidAuth to 0.
+
+httpcookie.test
+icu.test
+if-old.test
+if.test
+incr-old.test
+incr.test
+indexObj.test
+info.test
+init.test
+interp.test
+io.test
+
+
+==== io-6.31 Tcl_GetsObj: crlf mode: buffer exhausted, blocked FAILED
+==== Contents of test case:
+
+    # (FilterInputBytes() != 0)
+
+    set f [open "|[list [interpreter] $path(cat)]" w+]
+    fconfigure $f -translation {crlf lf} -buffering none
+    puts -nonewline $f "bbbbbbbbbbbbbb\r\n123456789012345\r"
+    fconfigure $f -buffersize 16
+    set x [gets $f]
+    fconfigure $f -blocking 0
+    lappend x [gets $f line] $line [fblocked $f] [testchannel inputbuffered $f]
+    close $f
+    set x
+
+---- Result was:
+bbbbbbbbbbbbbb -1 {} 1 0
+---- Result should have been (exact matching):
+bbbbbbbbbbbbbb -1 {} 1 16
+==== io-6.31 FAILED
+
+
+
+==== io-6.43 Tcl_GetsObj: input saw cr FAILED
+==== Contents of test case:
+
+    # if (chanPtr->flags & INPUT_SAW_CR)
+
+    set f [open "|[list [interpreter] $path(cat)]" w+]
+    fconfigure $f -translation {auto lf} -buffering none
+    puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    fconfigure $f -buffersize 16
+    set x [list [gets $f]]
+    fconfigure $f -blocking 0
+    lappend x [gets $f line] $line [testchannel queuedcr $f]
+    fconfigure $f -blocking 1
+    puts -nonewline $f "\nabcd\refg\x1A"
+    lappend x [gets $f line] $line [testchannel queuedcr $f]
+    lappend x [gets $f line] $line
+    close $f
+    set x
+
+---- Result was:
+bbbbbbbbbbbbbbb -1 {} 0 15 123456789abcdef 1 4 abcd
+---- Result should have been (exact matching):
+bbbbbbbbbbbbbbb 15 123456789abcdef 1 4 abcd 0 3 efg
+==== io-6.43 FAILED
+
+
+
+==== io-6.44 Tcl_GetsObj: input saw cr, not followed by cr FAILED
+==== Contents of test case:
+
+    # not (*eol == '\n')
+
+    set f [open "|[list [interpreter] $path(cat)]" w+]
+    fconfigure $f -translation {auto lf} -buffering none
+    puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    fconfigure $f -buffersize 16
+    set x [list [gets $f]]
+    fconfigure $f -blocking 0
+    lappend x [gets $f line] $line [testchannel queuedcr $f]
+    fconfigure $f -blocking 1
+    puts -nonewline $f "abcd\refg\x1A"
+    lappend x [gets $f line] $line [testchannel queuedcr $f]
+    lappend x [gets $f line] $line
+    close $f
+    set x
+
+---- Result was:
+bbbbbbbbbbbbbbb -1 {} 0 15 123456789abcdef 1 4 abcd
+---- Result should have been (exact matching):
+bbbbbbbbbbbbbbb 15 123456789abcdef 1 4 abcd 0 3 efg
+==== io-6.44 FAILED
+
+
+
+==== io-6.45 Tcl_GetsObj: input saw cr, skip right number of bytes FAILED
+==== Contents of test case:
+
+    # Tcl_ExternalToUtf()
+
+    set f [open "|[list [interpreter] $path(cat)]" w+]
+    fconfigure $f -translation {auto lf} -buffering none
+    fconfigure $f -encoding utf-16
+    puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    fconfigure $f -buffersize 16
+    gets $f
+    fconfigure $f -blocking 0
+    set x [list [gets $f line] $line [testchannel queuedcr $f]]
+    fconfigure $f -blocking 1
+    puts -nonewline $f "\nabcd\refg"
+    lappend x [gets $f line] $line [testchannel queuedcr $f]
+    close $f
+    set x
+
+---- Result was:
+-1 {} 0 15 123456789abcdef 0
+---- Result should have been (exact matching):
+15 123456789abcdef 1 4 abcd 0
+==== io-6.45 FAILED
+
+
+
+==== io-6.46 Tcl_GetsObj: input saw cr, followed by just \n should give eof FAILED
+==== Contents of test case:
+
+    # memmove()
+
+    set f [open "|[list [interpreter] $path(cat)]" w+]
+    fconfigure $f -translation {auto lf} -buffering none
+    puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    fconfigure $f -buffersize 16
+    gets $f
+    fconfigure $f -blocking 0
+    set x [list [gets $f line] $line [testchannel queuedcr $f]]
+    fconfigure $f -blocking 1
+    puts -nonewline $f "\n\x1A"
+    lappend x [gets $f line] $line [testchannel queuedcr $f]
+    close $f
+    set x
+
+---- Result was:
+-1 {} 0 15 123456789abcdef 1
+---- Result should have been (exact matching):
+15 123456789abcdef 1 -1 {} 0
+==== io-6.46 FAILED
+
+
+
+==== io-6.47 Tcl_GetsObj: auto mode: \r at end of buffer, peek for \n FAILED
+==== Contents of test case:
+
+    # (eol == dstEnd)
+
+    set f [open $path(test1) w]
+    fconfigure $f -translation lf
+    puts -nonewline $f "123456789012345\r\nabcdefghijklmnopq"
+    close $f
+    set f [open $path(test1)]
+    fconfigure $f -translation auto -buffersize 16
+    set x [list [gets $f] [testchannel inputbuffered $f]]
+    close $f
+    set x
+
+---- Result was:
+123456789012345 0
+---- Result should have been (exact matching):
+123456789012345 15
+==== io-6.47 FAILED
+
+
+
+==== io-8.1 PeekAhead: only go to device if no more cached data FAILED
+==== Contents of test case:
+
+    # (bufPtr->nextPtr == NULL)
+
+    set f [open $path(test1) w]
+    fconfigure $f -encoding ascii -translation lf
+    puts -nonewline $f "123456789012345\r\n2345678"
+    close $f
+    set f [open $path(test1)]
+    fconfigure $f -encoding ascii -translation auto -buffersize 16
+    # here
+    gets $f
+    set x [testchannel inputbuffered $f]
+    close $f
+    set x
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+7
+==== io-8.1 FAILED
+
+
+
+==== io-14.1 Tcl_SetStdChannel and Tcl_GetStdChannel FAILED
+==== Contents of test case:
+
+    set l ""
+    lappend l [fconfigure stdin -buffering]
+    lappend l [fconfigure stdout -buffering]
+    lappend l [fconfigure stderr -buffering]
+    lappend l [lsort [testchannel open]]
+    set l
+
+---- Result was:
+line line line {file0 file1 file2}
+---- Result should have been (exact matching):
+line line none {file0 file1 file2}
+==== io-14.1 FAILED
+
+
+
+==== io-14.2 Tcl_SetStdChannel and Tcl_GetStdChannel FAILED
+==== Contents of test case:
+
+    interp create x
+    set l ""
+    lappend l [x eval {fconfigure stdin -buffering}]
+    lappend l [x eval {fconfigure stdout -buffering}]
+    lappend l [x eval {fconfigure stderr -buffering}]
+    interp delete x
+    set l
+
+---- Result was:
+line line line
+---- Result should have been (exact matching):
+line line none
+==== io-14.2 FAILED
+
+
+
+==== io-29.27 Tcl_Flush on closed pipeline FAILED
+==== Contents of test case:
+
+    file delete $path(pipe)
+    set f [open $path(pipe) w]
+    puts $f {exit}
+    close $f
+    set f [open "|[list [interpreter] $path(pipe)]" r+]
+    gets $f
+    puts $f output
+    after 50
+    #
+    # The flush below will get a SIGPIPE. This is an expected part of
+    # test and indicates that the test operates correctly. If you run
+    # this test under a debugger, the signal will by intercepted unless
+    # you disable the debugger's signal interception.
+    #
+    if {[catch {flush $f} msg]} {
+	set x [list 1 $msg $::errorCode]
+	catch {close $f}
+    } else {
+	if {[catch {close $f} msg]} {
+	    set x [list 1 $msg $::errorCode]
+	} else {
+	    set x {this was supposed to fail and did not}
+	}
+    }
+    regsub {".*":} $x {"":} x
+    string tolower $x
+
+---- Result was:
+1 {error flushing "": cannot send after transport endpoint shutdown} {posix eshutdown {cannot send after transport endpoint shutdown}}
+---- Result should have been (exact matching):
+1 {error flushing "": broken pipe} {posix epipe {broken pipe}}
+==== io-29.27 FAILED
+
+
+
+==== io-29.33b TIP#398, no implicit flush of nonblocking on exit FAILED
+==== Contents of test case:
+
+    set f [open $path(script) w]
+    puts $f {
+		fconfigure stdout -blocking 0
+		puts -nonewline stdout [string repeat A 655360]
+		flush stdout
+	}
+    close $f
+    set f [open $path(script2) w]
+    puts $f {after 2000}
+    close $f
+	set t1 [clock milliseconds]
+	set ff [open "|[list [interpreter] $path(script2)]" w]
+	catch {unset ::env(TCL_FLUSH_NONBLOCKING_ON_EXIT)}
+	exec [interpreter] $path(script) >@ $ff
+	set t2 [clock milliseconds]
+	close $ff
+	expr {($t2-$t1)/2000 ? $t2-$t1 : 0}
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error writing "stdout": cannot send after transport endpoint shutdown
+    while executing
+"puts -nonewline stdout [string repeat A 655360]"
+    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/script" line 3)
+    while executing
+"exec [interpreter] $path(script) >@ $ff"
+    ("uplevel" body line 15)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: CHILDSTATUS 7286 1
+==== io-29.33b FAILED
+
+
+
+==== io-32.7 Tcl_Read, nonblocking, file FAILED
+==== Contents of test case:
+
+    set f1 [open $path(longfile) r]
+    fconfigure $f1 -blocking off
+    set z [read $f1 20]
+    close $f1
+    set l [string length $z]
+    set x ok
+    if {$l != 20} {
+	set x broken
+    }
+    set x
+
+---- Result was:
+broken
+---- Result should have been (exact matching):
+ok
+==== io-32.7 FAILED
+
+
+
+==== io-32.8 Tcl_Read, nonblocking, file FAILED
+==== Contents of test case:
+
+    set f1 [open $path(longfile) r]
+    fconfigure $f1 -blocking off
+    set z [read $f1 1000000]
+    close $f1
+    set x ok
+    set l [string length $z]
+    set z [file size $path(longfile)]
+    if {$z != $l} {
+	set x broken
+    }
+    set x
+
+---- Result was:
+broken
+---- Result should have been (exact matching):
+ok
+==== io-32.8 FAILED
+
+
+
+==== io-35.4 Tcl_Eof, eof detection on nonblocking file FAILED
+==== Contents of test case:
+
+    file delete $path(test1)
+    set f [open $path(test1) w]
+    close $f
+    set f [open $path(test1) r]
+    fconfigure $f -blocking off
+    set l ""
+    lappend l [gets $f]
+    lappend l [eof $f]
+    close $f
+    set l
+
+---- Result was:
+{} 0
+---- Result should have been (exact matching):
+{} 1
+==== io-35.4 FAILED
+
+
+
+==== io-36.5 Tcl_InputBlocked vs files, short read, nonblocking FAILED
+==== Contents of test case:
+
+    file delete $path(test1)
+    set f [open $path(test1) w]
+    puts $f abcdefghijklmnop
+    close $f
+    set f [open $path(test1) r]
+    fconfigure $f -blocking off
+    set l ""
+    lappend l [fblocked $f]
+    lappend l [read $f 3]
+    lappend l [fblocked $f]
+    lappend l [read -nonewline $f]
+    lappend l [fblocked $f]
+    lappend l [eof $f]
+    close $f
+    set l
+
+---- Result was:
+0 {} 1 {} 1 0
+---- Result should have been (exact matching):
+0 abc 0 defghijklmnop 0 1
+==== io-36.5 FAILED
+
+
+
+==== io-36.6 Tcl_InputBlocked vs files, event driven read FAILED
+==== Contents of test case:
+
+    proc in {f} {
+	variable l
+	variable x
+	lappend l [read $f 3]
+	if {[eof $f]} {lappend l eof; close $f; set x done}
+    }
+    file delete $path(test1)
+    set f [open $path(test1) w]
+    puts $f abcdefghijklmnop
+    close $f
+    set f [open $path(test1) r]
+    fconfigure $f -blocking off
+    set l ""
+    fileevent $f readable [namespace code [list in $f]]
+    variable x
+    vwait [namespace which -variable x]
+    set l
+
+---- Result was:
+abc def ghi jkl mno {p
+} {} eof
+---- Result should have been (exact matching):
+abc def ghi jkl mno {p
+} eof
+==== io-36.6 FAILED
+
+
+
+==== io-39.9 Tcl_SetChannelOption, blocking mode FAILED
+==== Contents of test case:
+
+    file delete $path(test1)
+    set f1 [open $path(test1) w]
+    close $f1
+    set f1 [open $path(test1) r]
+    set x ""
+    lappend x [fconfigure $f1 -blocking]
+    fconfigure $f1 -blocking off
+    lappend x [fconfigure $f1 -blocking]
+    lappend x [gets $f1]
+    lappend x [read $f1 1000]
+    lappend x [fblocked $f1]
+    lappend x [eof $f1]
+    close $f1
+    set x
+
+---- Result was:
+1 0 {} {} 1 0
+---- Result should have been (exact matching):
+1 0 {} {} 0 1
+==== io-39.9 FAILED
+
+
+
+==== io-40.3 POSIX open access modes: CREAT FAILED
+==== Contents of test case:
+
+    # This test only works if your umask is 2, like ouster's.
+    file delete $path(test3)
+    set f [open $path(test3) {WRONLY CREAT}]
+    close $f
+    file stat $path(test3) stats
+    format 0o%03o [expr {$stats(mode)&0o777}]
+
+---- Result was:
+0o644
+---- Result should have been (exact matching):
+0o666
+==== io-40.3 FAILED
+
+
+
+==== io-52.22.1 TclCopyChannel & encodings & tell position FAILED
+==== Contents of test case:
+
+    # binary to encoding => the input has to be
+    # in utf-8 to make sense to the encoder
+
+    set in  [open $path(utf8-fcopy.txt) r]
+    set out [open $path(kyrillic.txt) w]
+
+    # Using "-encoding ascii" means reading the "Á" gives an error
+    fconfigure $in  -encoding ascii -profile strict
+    fconfigure $out -encoding koi8-r -translation lf
+    proc ::xxx args {
+	set ::s0 $args
+    }
+
+    fcopy $in $out -command ::xxx
+    vwait ::s0
+    list [tell $in] [tell $out] {*}[set ::s0]
+
+---- Result was:
+-1 1 1 {error reading "file5": invalid or incomplete multibyte or wide character}
+---- Result should have been (glob matching):
+1 1 1 {error reading "file*": invalid or incomplete multibyte or wide character}
+==== io-52.22.1 FAILED
+
+
+
+==== io-53.7 CopyData: Flooding fcopy from pipe FAILED
+==== Contents of test case:
+
+    variable fcopyTestDone
+    file delete $path(pipe)
+    catch {unset fcopyTestDone}
+    set fcopyTestCount 0
+    set f1 [open $path(pipe) w]
+    puts $f1 {
+	# Write  10 bytes / 10 msec
+	proc Write {count} {
+	    puts -nonewline "1234567890"
+	    if {[incr count -1]} {
+		after 10 [list Write $count]
+	    } else {
+		set ::ready 1
+	    }
+	}
+	fconfigure stdout -buffering none
+	Write 345 ;# 3450 bytes ~3.45 sec
+	vwait ready
+	exit 0
+    }
+    close $f1
+    set in [open "|[list [interpreter] $path(pipe) &]" r+]
+    set out [open $path(test1) w]
+    doFcopy $in $out
+    variable fcopyTestDone
+    if {![info exists fcopyTestDone]} {
+	vwait [namespace which -variable fcopyTestDone]
+    }
+    catch {close $in}
+    close $out
+    # -1=error 0=script error N=number of bytes
+    expr {($fcopyTestDone == 0) ? $fcopyTestCount : -1}
+
+---- Result was:
+-1
+---- Result should have been (exact matching):
+3450
+==== io-53.7 FAILED
+
+
+
+==== io-75.6.3 invalid utf-8 encoding, non blocking gets is not ignored (-profile strict) FAILED
+==== Contents of test case:
+
+    gets $f
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== io-75.6.3 FAILED
+
+
+
+==== io-75.6.4 incomplete utf-8 encoding, non blocking gets is not ignored (-profile strict) FAILED
+==== Contents of test case:
+
+    gets $f
+	# only the 2nd gets returns the error
+	gets $f
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== io-75.6.4 FAILED
+
+
+
+==== io-75.11 shiftjis encoding error read results in error (strict profile) FAILED
+==== Contents of test case:
+
+    set d [read $f]
+    binary scan $d H* hd
+    lappend hd [catch {set d [read $f]} msg data] $msg [dict exists $data -data]
+
+---- Result was:
+0 {} 0
+---- Result should have been (glob matching):
+41 1 {error reading "file*": invalid or incomplete multibyte or wide character} 0
+==== io-75.11 FAILED
+
+
+
+==== io-75.13 In nonblocking mode when there is an encoding error the data that has been
+    successfully read so far is returned first and then the error is returned
+    on the next call to [read]. FAILED
+==== Contents of test case:
+
+    set d [read $f]
+    binary scan $d H* hd
+    lappend hd [catch {read $f} msg data] $msg [dict exists $data -data]
+
+---- Result was:
+0 {} 0
+---- Result should have been (glob matching):
+41 1 {error reading "file*": invalid or incomplete multibyte or wide character} 0
+==== io-75.13 FAILED
+
+
+
+==== io-bug-73bb42fb-1 Non-blocking+buffer size+encoding error panic - TCL bug 73bb42fb.
+    Verify error at offset 0. FAILED
+==== Contents of test case:
+
+    set fd [open $path(test1)]
+    fconfigure $fd -encoding utf-8 -profile strict -blocking 0 -buffersize 10 -translation lf -eofchar {}
+    list [catch {read_blocked $fd 1} e d] $e [dict getd $d -code ""] [dict getd $d -errorcode ""] [tell $fd]
+
+---- Result was:
+1 {error reading "file6": invalid or incomplete multibyte or wide character} 1 {POSIX EILSEQ {invalid or incomplete multibyte or wide character}} -1
+---- Result should have been (glob matching):
+1 {error reading *} 1 {POSIX EILSEQ {invalid or incomplete multibyte or wide character}} 0
+==== io-bug-73bb42fb-1 FAILED
+
+
+
+==== io-bug-73bb43fb-2 Non-blocking+buffer size+encoding error panic - TCL bug 73bb42fb.
+    Verify valid data returned before error generated. FAILED
+==== Contents of test case:
+
+    set fd [open $path(test1)]
+    fconfigure $fd -encoding utf-8 -profile strict -blocking 0 -buffersize 10 -translation lf -eofchar {}
+    set result {}
+    lappend result [read_blocked $fd]
+    lappend result [tell $fd]
+    lappend result [catch {read_blocked $fd} e d] $e [dict getd $d -code ""] [dict getd $d -errorcode ""] [tell $fd]
+
+---- Result was:
+X -1 1 {error reading "file6": invalid or incomplete multibyte or wide character} 1 {POSIX EILSEQ {invalid or incomplete multibyte or wide character}} -1
+---- Result should have been (glob matching):
+X 1 1 {error reading *} 1 {POSIX EILSEQ {invalid or incomplete multibyte or wide character}} 1
+==== io-bug-73bb43fb-2 FAILED
+
+ioCmd.test
+ioTrans.test
+iogt.test
+join.test
+lindex.test
+link.test
+linsert.test
+list.test
+listObj.test
+listRep.test
+llength.test
+lmap.test
+load.test
+lpop.test
+lrange.test
+lrepeat.test
+lreplace.test
+lsearch.test
+lseq.test
+
+
+==== lseq-4.21.2 Corner cases: expected Inf FAILED
+==== Contents of test case:
+
+    set res {}
+    lappend res [lseq {1e5555+0} count 5]
+    lappend res [lseq Inf count 5]
+    lappend res [lseq Inf count 5 by 100]
+    lappend res [lseq Inf count 5 by Inf]
+    lappend res [lseq 5 by Inf]
+    lappend res [lseq 0 count 5 by Inf]
+    lappend res [lseq 5 by 1e308]
+    lappend res [lseq 0 count 5 by 1e308]
+    lappend res [lseq 5 by 5e307]
+    lappend res [lseq 0 count 5 by 5e307]
+
+---- Result was:
+{Inf Inf Inf Inf Inf} {Inf Inf Inf Inf Inf} {Inf Inf Inf Inf Inf} {Inf Inf Inf Inf Inf} {0.0 Inf Inf Inf Inf} {0.0 Inf Inf Inf Inf} {0.0 Inf Inf Inf Inf} {0.0 Inf Inf Inf Inf} {0.0 5e+307 1e+308 1.5e+308 Inf} {0.0 5e+307 1e+308 1.5e+308 Inf}
+---- Result should have been (exact matching):
+{Inf Inf Inf Inf Inf} {Inf Inf Inf Inf Inf} {Inf Inf Inf Inf Inf} {Inf Inf Inf Inf Inf} {0.0 Inf Inf Inf Inf} {0.0 Inf Inf Inf Inf} {0.0 1e+308 Inf Inf Inf} {0.0 1e+308 Inf Inf Inf} {0.0 5e+307 1e+308 1.5e+308 Inf} {0.0 5e+307 1e+308 1.5e+308 Inf}
+==== lseq-4.21.2 FAILED
+
+
+
+==== lseq-4.21.3 Corner cases: expected -Inf FAILED
+==== Contents of test case:
+
+    set res {}
+    lappend res [lseq {-1e5555+0} count 5]
+    lappend res [lseq -Inf count 5]
+    lappend res [lseq -Inf count 5 by 100]
+    lappend res [lseq -Inf count 5 by -Inf]
+    lappend res [lseq 5 by -Inf]
+    lappend res [lseq 0 count 5 by -Inf]
+    lappend res [lseq 5 by -1e308]
+    lappend res [lseq 0 count 5 by -1e308]
+    lappend res [lseq 5 by -5e307]
+    lappend res [lseq 0 count 5 by -5e307]
+
+---- Result was:
+{-Inf -Inf -Inf -Inf -Inf} {-Inf -Inf -Inf -Inf -Inf} {-Inf -Inf -Inf -Inf -Inf} {-Inf -Inf -Inf -Inf -Inf} {0.0 -Inf -Inf -Inf -Inf} {0.0 -Inf -Inf -Inf -Inf} {0.0 -Inf -Inf -Inf -Inf} {0.0 -Inf -Inf -Inf -Inf} {0.0 -5e+307 -1e+308 -1.5e+308 -Inf} {0.0 -5e+307 -1e+308 -1.5e+308 -Inf}
+---- Result should have been (exact matching):
+{-Inf -Inf -Inf -Inf -Inf} {-Inf -Inf -Inf -Inf -Inf} {-Inf -Inf -Inf -Inf -Inf} {-Inf -Inf -Inf -Inf -Inf} {0.0 -Inf -Inf -Inf -Inf} {0.0 -Inf -Inf -Inf -Inf} {0.0 -1e+308 -Inf -Inf -Inf} {0.0 -1e+308 -Inf -Inf -Inf} {0.0 -5e+307 -1e+308 -1.5e+308 -Inf} {0.0 -5e+307 -1e+308 -1.5e+308 -Inf}
+==== lseq-4.21.3 FAILED
+
+
+
+==== lseq-4.21.4 Corner cases: unexpected Inf - Inf, result to +/-NaN, unexpected NaN FAILED
+==== Contents of test case:
+
+    set res {}
+    lappend res [list [catch {lseq Inf count 5 by -Inf} msg opt] $msg [dict getd $opt -errorcode ""]]
+    lappend res [list [catch {lseq -Inf count 5 by Inf} msg opt] $msg [dict getd $opt -errorcode ""]]
+    lappend res [list [catch {lseq {Inf - Inf} count 5} msg opt] $msg [dict getd $opt -errorcode ""]]
+    lappend res [list [catch {lseq NaN count 5}         msg opt] $msg [dict getd $opt -errorcode ""]]
+    lappend res [list [catch {lseq NaN count 5 by 100}  msg opt] $msg [dict getd $opt -errorcode ""]]
+    lappend res [list [catch {lseq NaN count 5 by NaN}  msg opt] $msg [dict getd $opt -errorcode ""]]
+    lappend res [list [catch {lseq 5 by NaN}            msg opt] $msg [dict getd $opt -errorcode ""]]
+    lappend res [list [catch {lseq 0 count 5 by NaN}    msg opt] $msg [dict getd $opt -errorcode ""]]
+    join $res \n
+
+---- Result was:
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+0 {} {}
+0 {} {}
+0 {} {}
+---- Result should have been (exact matching):
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+==== lseq-4.21.4 FAILED
+
+lset.test
+lsetComp.test
+macOSXFCmd.test
+macOSXLoad.test
+main.test
+
+
+==== Tcl_Main-5.10 Tcl_Main: exit main loop in mid-interactive command FAILED
+==== Contents of test case:
+
+	type $f "testsetmainloop
+		 after 2000 testexitmainloop
+		 puts \{1 2"
+	after 4000
+	type $f "3 4\}"
+	set code1 [catch {gets $f} line1]
+	set code2 [catch {gets $f} line2]
+	set code3 [catch {gets $f} line3]
+	list $code1 $line1 $code2 $line2 $code3 $line3
+    
+---- Result was:
+0 {} 0 {} 0 {}
+---- Result should have been (exact matching):
+0 {Exit MainLoop} 0 {1 2} 0 {3 4}
+==== Tcl_Main-5.10 FAILED
+
+mathop.test
+misc.test
+msgcat.test
+Test file error: error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/msgdir3": invalid operation
+    while executing
+"file delete -force -- $fullName"
+    (procedure "removeDirectory" line 21)
+    invoked from within
+"removeDirectory msgdir3"
+    (in namespace eval "::msgcat::test" script line 680)
+    invoked from within
+"namespace eval ::msgcat::test {
+    namespace import ::msgcat::*
+    namespace import ::tcltest::test
+    namespace import ::tcltest::cleanupTests
+   ..."
+    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/msgcat.test" line 24)
+mutex.test
+namespace-old.test
+namespace.test
+notify.test
+nre.test
+obj.test
+oo.test
+ooNext2.test
+ooProp.test
+ooUtil.test
+opt.test
+package.test
+parse.test
+parseExpr.test
+parseOld.test
+pid.test
+pkgMkIndex.test
+platform.test
+proc-old.test
+proc.test
+process.test
+pwd.test
+reg.test
+regexp.test
+regexpComp.test
+registry.test
+rename.test
+resolver.test
+result.test
+safe-stock.test
+safe-stock86.test
+safe-zipfs.test
+safe.test
+
+
+==== safe-13.2 mimic the valid glob call by ::tcl::tm::UnknownHandler [Bug 2964715] FAILED
+==== Contents of test case:
+
+    ::safe::interpAddToAccessPath $i $testdir2
+    set result [$i eval glob -nocomplain -directory $testdir2 *.tm]
+    if {$result eq [list $testfile]} {
+	return "glob match"
+    } else {
+	return "no match: $result"
+    }
+
+---- Test cleanup failed:
+error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
+---- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
+    while executing
+"file delete -force -- $fullName"
+    (procedure "removeDirectory" line 21)
+    invoked from within
+"removeDirectory $testdir"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== safe-13.2 FAILED
+
+
+
+==== safe-13.3 cf 13.2 but test glob failure when -directory is outside access path [Bug 2964715] FAILED
+==== Contents of test case:
+
+    $i eval glob -directory $testdir2 *.tm
+
+---- Test cleanup failed:
+error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
+---- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
+    while executing
+"file delete -force -- $fullName"
+    (procedure "removeDirectory" line 21)
+    invoked from within
+"removeDirectory $testdir"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== safe-13.3 FAILED
+
+
+
+==== safe-13.4 another valid glob call [Bug 2964715] FAILED
+==== Contents of test case:
+
+    ::safe::interpAddToAccessPath $i $testdir
+    ::safe::interpAddToAccessPath $i $testdir2
+    set result [$i eval  glob -nocomplain -directory $testdir [file join deletemetoo *.tm]]
+    if {$result eq [list $testfile]} {
+	return "glob match"
+    } else {
+	return "no match: $result"
+    }
+
+---- Test cleanup failed:
+error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
+---- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
+    while executing
+"file delete -force -- $fullName"
+    (procedure "removeDirectory" line 21)
+    invoked from within
+"removeDirectory $testdir"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== safe-13.4 FAILED
+
+
+
+==== safe-13.5 as 13.4 but test glob failure when -directory is outside access path [Bug 2964715] FAILED
+==== Contents of test case:
+
+    ::safe::interpAddToAccessPath $i $testdir2
+    $i eval  glob -directory $testdir [file join deletemetoo *.tm]
+
+---- Test cleanup failed:
+error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
+---- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
+    while executing
+"file delete -force -- $fullName"
+    (procedure "removeDirectory" line 21)
+    invoked from within
+"removeDirectory $testdir"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== safe-13.5 FAILED
+
+
+
+==== safe-13.6 as 13.4 but test silent failure when result is outside access_path [Bug 2964715] FAILED
+==== Contents of test case:
+
+    ::safe::interpAddToAccessPath $i $testdir
+    $i eval  glob -nocomplain -directory $testdir [file join deletemetoo *.tm]
+
+---- Test cleanup failed:
+error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
+---- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
+    while executing
+"file delete -force -- $fullName"
+    (procedure "removeDirectory" line 21)
+    invoked from within
+"removeDirectory $testdir"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== safe-13.6 FAILED
+
+
+
+==== safe-13.7 mimic the glob call by tclPkgUnknown in a safe interpreter [Bug 2964715] FAILED
+==== Contents of test case:
+
+    set safeTD [::safe::interpAddToAccessPath $i $testdir]
+    ::safe::interpAddToAccessPath $i $testdir2
+    mapList [list $safeTD EXPECTED] [$i eval [list  glob -directory $safeTD -join * pkgIndex.tcl]]
+
+---- Test cleanup failed:
+error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
+---- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
+    while executing
+"file delete -force -- $fullName"
+    (procedure "removeDirectory" line 21)
+    invoked from within
+"removeDirectory $testdir"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== safe-13.7 FAILED
+
+
+
+==== safe-13.7.1 mimic the glob call by tclPkgUnknown in a safe interpreter with multiple subdirectories FAILED
+==== Contents of test case:
+
+    set safeTD [::safe::interpAddToAccessPath $i $testdir]
+    ::safe::interpAddToAccessPath $i $testdir2
+    ::safe::interpAddToAccessPath $i $testdir3
+    mapAndSortList [list $safeTD EXPECTED] [$i eval [list  glob -directory $safeTD -join * pkgIndex.tcl]]
+
+---- Test cleanup failed:
+error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
+---- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
+    while executing
+"file delete -force -- $fullName"
+    (procedure "removeDirectory" line 21)
+    invoked from within
+"removeDirectory $testdir"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== safe-13.7.1 FAILED
+
+
+
+==== safe-13.8 mimic the glob call by tclPkgUnknown without the special treatment that is specific to pkgIndex.tcl [Bug 2964715] FAILED
+==== Contents of test case:
+
+    set safeTD [::safe::interpAddToAccessPath $i $testdir]
+    ::safe::interpAddToAccessPath $i $testdir2
+    $i eval [list glob -directory $safeTD -join -nocomplain * notIndex.tcl]
+
+---- Test cleanup failed:
+error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
+---- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
+    while executing
+"file delete -force -- $fullName"
+    (procedure "removeDirectory" line 21)
+    invoked from within
+"removeDirectory $testdir"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== safe-13.8 FAILED
+
+
+
+==== safe-13.9 as 13.8 but test glob failure when -directory is outside access path [Bug 2964715] FAILED
+==== Contents of test case:
+
+    ::safe::interpAddToAccessPath $i $testdir2
+    set result [$i eval  glob -directory $testdir -join -nocomplain * notIndex.tcl]
+    if {$result eq [list $testfile]} {
+	return {glob match}
+    } else {
+	return "no match: $result"
+    }
+
+---- Test cleanup failed:
+error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
+---- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
+    while executing
+"file delete -force -- $fullName"
+    (procedure "removeDirectory" line 21)
+    invoked from within
+"removeDirectory $testdir"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== safe-13.9 FAILED
+
+
+
+==== safe-13.10 as 13.8 but test silent failure when result is outside access_path [Bug 2964715] FAILED
+==== Contents of test case:
+
+    ::safe::interpAddToAccessPath $i $testdir
+    $i eval glob -directory $testdir -join -nocomplain * notIndex.tcl
+
+---- Test cleanup failed:
+error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
+---- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
+    while executing
+"file delete -force -- $fullName"
+    (procedure "removeDirectory" line 21)
+    invoked from within
+"removeDirectory $testdir"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== safe-13.10 FAILED
+
+
+
+==== safe-16.3 Bug 3529949: defang ~ in globs FAILED
+==== Contents of test case:
+
+    ::safe::interpAddToAccessPath $i $syntheticHOME
+    $i eval {glob -nocomplain ~/*}
+
+---- Test cleanup failed:
+error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/foo": invalid operation
+---- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/foo": invalid operation
+    while executing
+"file delete -force -- $fullName"
+    (procedure "removeDirectory" line 21)
+    invoked from within
+"removeDirectory $syntheticHOME"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== safe-16.3 FAILED
+
+Warning: files left behind:
+	safe.test:	foo
+scan.test
+
+
+==== scan-15.1 scan %g overflow for small numbers and big mantissa bug 42d14c495a FAILED
+==== Contents of test case:
+
+    set result [list]
+    # xfail: n<num> = not expected at all, x<num> expected when unfixed
+    foreach {exp numdig ret xfail} {
+	-321  190 1.1116477031428047e-321 n0
+	-321  191 1.1116477031428047e-321 x1
+	-321  300 1.1116477031428047e-321 x2
+	-321 1600 1.1116477031428047e-321 x3
+	-400  110 0 n4
+	-400  111 0 n5
+	-400  300 0 n6
+	-221  290 1.111111111111111e-221 n7
+	-221  291 1.111111111111111e-221 x8
+	-221  400 1.111111111111111e-221 x9
+	-221 1600 1.111111111111111e-221 x10
+	-121  390 1.1111111111111112e-121 n11
+	-121  391 1.1111111111111112e-121 x12
+	-121  500 1.1111111111111112e-121 x13
+	-121 1600 1.1111111111111112e-121 x14
+	 308  202 1.1111111111111112e+308 n15
+	 308  203 1.1111111111111112e+308 n16
+	 308  300 1.1111111111111112e+308 n17
+	 308 1600 1.1111111111111112e+308 x18
+	 400  110 *inf n19
+	 400  111 *inf n20
+	 400  300 *inf n21
+	 221  291 1.1111111111111112e+221 n22
+	 221  292 1.1111111111111112e+221 n23
+	 221  400 1.1111111111111112e+221 n24
+	 221 1600 1.1111111111111112e+221 x25
+	 121  391 1.1111111111111111e+121 n26
+	 121  392 1.1111111111111111e+121 n27
+	 121  500 1.1111111111111111e+121 n28
+	 121 1600 1.1111111111111111e+121 x29
+    } {
+	set s 1.[string repeat 1 $numdig]e$exp
+	set d "no_scan"
+	scan $s %g d
+	set r [format %.17g $d]
+	if {![string match -nocase $ret $r]} {
+	    lappend result $xfail=[format %.17g $d]
+	}
+    }
+    set result
+
+---- Result was:
+n0=1.1125369292536563e-308 x1=1.1125369292536563e-308 x2=1.1125369292536563e-308 x3=1.1125369292536563e-308 n15=Infinity n16=Infinity n17=Infinity x18=Infinity n19=Infinity n20=Infinity n21=Infinity
+---- Result should have been (exact matching):
+
+==== scan-15.1 FAILED
+
+security.test
+set-old.test
+set.test
+socket.test
+
+
+==== socket_inet-2.6 tcp connection FAILED
+==== Contents of test case:
+
+    set status ok
+    if {![catch {set sock [socket $localhost [randport]]}]} {
+	if {![catch {gets $sock}]} {
+	    set status broken
+	}
+	close $sock
+    }
+    set status
+
+---- Result was:
+broken
+---- Result should have been (exact matching):
+ok
+==== socket_inet-2.6 FAILED
+
+
+
+==== socket_inet-2.11 detecting new data FAILED
+==== Contents of test case:
+
+    set s2 [socket $localhost [lindex [fconfigure $s -sockname] 2]]
+    vwait sock
+    puts $s2 one
+    flush $s2
+    after $latency {set x 1}; # Spurious failures in Travis CI, if we do [after idle]
+    vwait x
+    fconfigure $sock -blocking 0
+    set result a:[gets $sock]
+    lappend result b:[gets $sock]
+    fconfigure $sock -blocking 1
+    puts $s2 two
+    flush $s2
+    after $latency {set x 1}; # NetBSD fails here if we do [after idle]
+    vwait x
+    fconfigure $sock -blocking 0
+    lappend result c:[gets $sock]
+
+---- Result was:
+a: b: c:one
+---- Result should have been (exact matching):
+a:one b: c:two
+==== socket_inet-2.11 FAILED
+
+
+
+==== socket_inet-5.1 byte order problems, socket numbers, htons FAILED
+==== Contents of test case:
+
+    if {![catch {socket -server dodo 0x1} msg]} {
+	close $msg
+	return {htons problem, should be disallowed, are you running as SU?}
+    }
+    return {couldn't open socket: not owner}
+
+---- Result was:
+htons problem, should be disallowed, are you running as SU?
+---- Result should have been (exact matching):
+couldn't open socket: not owner
+==== socket_inet-5.1 FAILED
+
+
+
+==== socket_inet-5.3 byte order problems, socket numbers, htons FAILED
+==== Contents of test case:
+
+    if {![catch {socket -server dodo 21} msg]} {
+	close $msg
+	return {htons problem, should be disallowed, are you running as SU?}
+    }
+    return {couldn't open socket: not owner}
+
+---- Result was:
+htons problem, should be disallowed, are you running as SU?
+---- Result should have been (exact matching):
+couldn't open socket: not owner
+==== socket_inet-5.3 FAILED
+
+
+
+==== socket_inet-7.3 testing socket specific options FAILED
+==== Contents of test case:
+
+    set s [socket -server accept -myaddr $localhost 0]
+    set l [fconfigure $s]
+    close $s
+    update
+    llength $l
+
+---- Result was:
+22
+---- Result should have been (exact matching):
+20
+==== socket_inet-7.3 FAILED
+
+
+
+==== socket_inet-8.1 testing -async flag on sockets FAILED
+==== Contents of test case:
+
+    # NOTE: This test may fail on some Solaris 2.4 systems. If it does, check
+    # that you have these patches installed (using showrev -p):
+    #
+    # 101907-05, 101925-02, 101945-14, 101959-03, 101969-05, 101973-03,
+    # 101977-03, 101981-02, 101985-01, 102001-03, 102003-01, 102007-01,
+    # 102011-02, 102024-01, 102039-01, 102044-01, 102048-01, 102062-03,
+    # 102066-04, 102070-01, 102105-01, 102153-03, 102216-01, 102232-01,
+    # 101878-03, 101879-01, 101880-03, 101933-01, 101950-01, 102030-01,
+    # 102057-08, 102140-01, 101920-02, 101921-09, 101922-07, 101923-03
+    #
+    # If after installing these patches you are still experiencing a problem,
+    # please email jyl@eng.sun.com. We have not observed this failure on
+    # Solaris 2.5, so another option (instead of installing these patches) is
+    # to upgrade to Solaris 2.5.
+    set s [socket -server accept -myaddr $localhost 0]
+    proc accept {s a p} {
+	global x
+	puts $s bye
+	close $s
+	set x done
+    }
+    set s1 [socket -async $localhost [lindex [fconfigure $s -sockname] 2]]
+    vwait x
+    gets $s1
+
+---- Result was:
+
+---- Result should have been (exact matching):
+bye
+==== socket_inet-8.1 FAILED
+
+
+
+==== socket_inet-11.1 tcp connection FAILED
+==== Contents of test case:
+
+    set s [socket $remoteServerIP $port]
+    gets $s
+
+---- Test setup failed:
+remote server disappaered
+---- errorInfo(setup): remote server disappaered
+    while executing
+"error "remote server disappaered""
+    (procedure "sendCommand" line 17)
+    invoked from within
+"sendCommand {
+	set server [socket -server accept 0]
+	proc accept {s a p} {
+	    puts $s done
+	    close $s
+	}
+	getPort $server
+    }"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): NONE
+---- Test cleanup failed:
+can not find channel named "sock960440"
+---- errorInfo(cleanup): can not find channel named "sock960440"
+    while executing
+"close $s"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP CHANNEL sock960440
+==== socket_inet-11.1 FAILED
+
+
+
+==== socket_inet-11.2 client specifies its port FAILED
+==== Contents of test case:
+
+    set s [socket -myport $lport $remoteServerIP $rport]
+    set r [gets $s]
+    expr {$r==$lport ? "ok" : "broken: $r != $port"}
+
+---- Test setup failed:
+remote server disappeared
+---- errorInfo(setup): remote server disappeared
+    while executing
+"error "remote server disappeared""
+    (procedure "sendCommand" line 5)
+    invoked from within
+"sendCommand {
+	set server [socket -server accept 0]
+	proc accept {s a p} {
+	    puts $s $p
+	    close $s
+	}
+	getPort $server
+    }"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): NONE
+---- Test cleanup failed:
+can not find channel named "sock960440"
+---- errorInfo(cleanup): can not find channel named "sock960440"
+    while executing
+"close $s"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP CHANNEL sock960440
+==== socket_inet-11.2 FAILED
+
+
+
+==== socket_inet-11.4 remote echo, one line FAILED
+==== Contents of test case:
+
+    set f [socket $remoteServerIP $port]
+    fconfigure $f -translation crlf -buffering line
+    puts $f hello
+    gets $f
+
+---- Test setup failed:
+remote server disappeared
+---- errorInfo(setup): remote server disappeared
+    while executing
+"error "remote server disappeared""
+    (procedure "sendCommand" line 5)
+    invoked from within
+"sendCommand {
+	set server [socket -server accept 0]
+	proc accept {s a p} {
+	    fileevent $s readable [list echo $s]
+	    fconfigure $s -buffering lin..."
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): NONE
+---- Test cleanup failed:
+remote server disappeared
+---- errorInfo(cleanup): remote server disappeared
+    while executing
+"error "remote server disappeared""
+    (procedure "sendCommand" line 5)
+    invoked from within
+"sendCommand {close $server}"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): NONE
+==== socket_inet-11.4 FAILED
+
+
+
+==== socket_inet-11.5 remote echo, 50 lines FAILED
+==== Contents of test case:
+
+    set f [socket $remoteServerIP $port]
+    fconfigure $f -translation crlf -buffering line
+    for {set cnt 0} {$cnt < 50} {incr cnt} {
+	puts $f "hello, $cnt"
+	if {[gets $f] != "hello, $cnt"} {
+	    break
+	}
+    }
+    return $cnt
+
+---- Test setup failed:
+remote server disappeared
+---- errorInfo(setup): remote server disappeared
+    while executing
+"error "remote server disappeared""
+    (procedure "sendCommand" line 5)
+    invoked from within
+"sendCommand {
+	set server [socket -server accept 0]
+	proc accept {s a p} {
+	    fileevent $s readable [list echo $s]
+	    fconfigure $s -buffering lin..."
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): NONE
+---- Test cleanup failed:
+can not find channel named "file5"
+---- errorInfo(cleanup): can not find channel named "file5"
+    while executing
+"close $f"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP CHANNEL file5
+==== socket_inet-11.5 FAILED
+
+
+
+==== socket_inet-11.7 server with several clients FAILED
+==== Contents of test case:
+
+    set s1 [socket $remoteServerIP $port]
+    fconfigure $s1 -buffering line
+    set s2 [socket $remoteServerIP $port]
+    fconfigure $s2 -buffering line
+    set s3 [socket $remoteServerIP $port]
+    fconfigure $s3 -buffering line
+    for {set i 0} {$i < 100} {incr i} {
+	puts $s1 hello,s1
+	gets $s1
+	puts $s2 hello,s2
+	gets $s2
+	puts $s3 hello,s3
+	gets $s3
+    }
+    return $i
+
+---- Test setup failed:
+remote server disappeared
+---- errorInfo(setup): remote server disappeared
+    while executing
+"error "remote server disappeared""
+    (procedure "sendCommand" line 5)
+    invoked from within
+"sendCommand {
+	set server [socket -server accept 0]
+	proc accept {s a p} {
+	    fconfigure $s -buffering line
+	    fileevent $s readable [list echo $s..."
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): NONE
+---- Test cleanup failed:
+can not find channel named "sock90cb00"
+---- errorInfo(cleanup): can not find channel named "sock90cb00"
+    while executing
+"close $s1"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP CHANNEL sock90cb00
+==== socket_inet-11.7 FAILED
+
+
+
+==== socket_inet-11.8 client with several servers FAILED
+==== Contents of test case:
+
+    set s1 [socket $remoteServerIP $p1]
+    set s2 [socket $remoteServerIP $p2]
+    set s3 [socket $remoteServerIP $p3]
+    list [gets $s1] [gets $s1] [eof $s1] [gets $s2] [gets $s2] [eof $s2]  [gets $s3] [gets $s3] [eof $s3]
+
+---- Test setup failed:
+remote server disappeared
+---- errorInfo(setup): remote server disappeared
+    while executing
+"error "remote server disappeared""
+    (procedure "sendCommand" line 5)
+    invoked from within
+"sendCommand {
+	set s1 [socket -server "accept server1" 0]
+	set s2 [socket -server "accept server2" 0]
+	set s3 [socket -server "accept server3" 0]
+	pro..."
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): NONE
+---- Test cleanup failed:
+can not find channel named "sock90cb00"
+---- errorInfo(cleanup): can not find channel named "sock90cb00"
+    while executing
+"close $s1"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP CHANNEL sock90cb00
+==== socket_inet-11.8 FAILED
+
+
+
+==== socket_inet-11.9 accept callback error FAILED
+==== Contents of test case:
+
+    set s [socket -server accept 0]
+    proc accept {s a p} {expr {10 / 0}}
+    sendCommand "set port [getPort $s]"
+    if {[catch {
+	sendCommand {
+	    set peername [fconfigure $callerSocket -peername]
+	    set s [socket [lindex $peername 0] $port]
+	    close $s
+	}
+    } msg]} then {
+	close $s
+	error $msg
+    }
+    vwait x
+    return $x
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: remote server disappeared
+    while executing
+"error "remote server disappeared""
+    (procedure "sendCommand" line 5)
+    invoked from within
+"sendCommand "set port [getPort $s]""
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== socket_inet-11.9 FAILED
+
+
+
+==== socket_inet-11.10 testing socket specific options FAILED
+==== Contents of test case:
+
+    set s [socket $remoteServerIP $port]
+    set p [fconfigure $s -peername]
+    set n [fconfigure $s -sockname]
+    list [expr {[lindex $p 2] == $port}] [llength $p] [llength $n]
+
+---- Test setup failed:
+remote server disappeared
+---- errorInfo(setup): remote server disappeared
+    while executing
+"error "remote server disappeared""
+    (procedure "sendCommand" line 5)
+    invoked from within
+"sendCommand {
+	set server [socket -server accept 0]
+	proc accept {s a p} {close $s}
+	getPort $server
+    }"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): NONE
+---- Test cleanup failed:
+can not find channel named "sock9663c0"
+---- errorInfo(cleanup): can not find channel named "sock9663c0"
+    while executing
+"close $s"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP CHANNEL sock9663c0
+==== socket_inet-11.10 FAILED
+
+
+
+==== socket_inet-11.11 testing spurious events FAILED
+==== Contents of test case:
+
+    proc readlittle {s} {
+	global spurious done len
+	set l [read $s 1]
+	if {[string length $l] == 0} {
+	    if {![eof $s]} {
+		incr spurious
+	    } else {
+		close $s
+		set done 1
+	    }
+	} else {
+	    incr len [string length $l]
+	}
+    }
+    set c [socket $remoteServerIP $port]
+    fileevent $c readable "readlittle $c"
+    vwait done
+    list $spurious $len $done
+
+---- Test setup failed:
+remote server disappeared
+---- errorInfo(setup): remote server disappeared
+    while executing
+"error "remote server disappeared""
+    (procedure "sendCommand" line 5)
+    invoked from within
+"sendCommand {
+	set server [socket -server accept 0]
+	proc accept {s a p} {
+	    fconfigure $s -translation "auto lf"
+	    after idle writesome $s
+	}
+	..."
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): NONE
+---- Test cleanup failed:
+remote server disappeared
+---- errorInfo(cleanup): remote server disappeared
+    while executing
+"error "remote server disappeared""
+    (procedure "sendCommand" line 5)
+    invoked from within
+"sendCommand {close $server}"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): NONE
+==== socket_inet-11.11 FAILED
+
+
+
+==== socket_inet-11.12 testing EOF stickyness FAILED
+==== Contents of test case:
+
+    proc count_up {s} {
+	global counter done
+	set l [gets $s]
+	if {[eof $s]} {
+	    incr counter
+	    if {$counter > 9} {
+		set done {EOF is sticky}
+		close $s
+	    }
+	}
+    }
+    set c [socket $remoteServerIP $port]
+    fileevent $c readable [list count_up $c]
+    vwait done
+    return $done
+
+---- Test setup failed:
+remote server disappeared
+---- errorInfo(setup): remote server disappeared
+    while executing
+"error "remote server disappeared""
+    (procedure "sendCommand" line 5)
+    invoked from within
+"sendCommand {
+	set server [socket -server accept 0]
+	proc accept {s a p} {
+	    after idle close $s
+	}
+	getPort $server
+    }"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): NONE
+---- Test cleanup failed:
+can't read "after_id": no such variable
+---- errorInfo(cleanup): can't read "after_id": no such variable
+    while executing
+"after cancel $after_id"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME after_id
+==== socket_inet-11.12 FAILED
+
+
+
+==== socket_inet-11.13 testing async write, async flush, async close FAILED
+==== Contents of test case:
+
+    proc readit {s} {
+	global count done
+	set l [read $s]
+	incr count [string length $l]
+	if {[eof $s]} {
+	    close $s
+	    set done 1
+	}
+    }
+    set s [socket $remoteServerIP $port]
+    fconfigure $s -blocking 0 -trans lf -buffering line
+    set count 0
+    puts $s hello
+    fileevent $s readable "readit $s"
+    vwait done
+    return $count
+
+---- Test setup failed:
+remote server disappeared
+---- errorInfo(setup): remote server disappeared
+    while executing
+"error "remote server disappeared""
+    (procedure "sendCommand" line 5)
+    invoked from within
+"sendCommand {
+	set firstblock ""
+	for {set i 0} {$i < 5} {incr i} {
+		set firstblock "a$firstblock$firstblock"
+	}
+	set secondblock ""
+	for {set i 0} {..."
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): NONE
+---- Test cleanup failed:
+remote server disappeared
+---- errorInfo(cleanup): remote server disappeared
+    while executing
+"error "remote server disappeared""
+    (procedure "sendCommand" line 5)
+    invoked from within
+"sendCommand {close $l}"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): NONE
+==== socket_inet-11.13 FAILED
+
+
+
+==== socket_inet-12.1 testing inheritance of server sockets FAILED
+==== Contents of test case:
+
+    # Launch script2 and wait 5 seconds
+    ### exec [interpreter] script2 &
+    set p [open "|[list [interpreter] $path(script2)]" r]
+    # If we can still connect to the server, the socket got inherited.
+    if {[catch {close [socket $localhost $listen]}]} {
+	return {server socket was not inherited}
+    } else {
+	return {server socket was inherited}
+    }
+
+---- Result was:
+server socket was inherited
+---- Result should have been (exact matching):
+server socket was not inherited
+==== socket_inet-12.1 FAILED
+
+
+
+==== socket-14.2 [socket -async] fileevent connection refused FAILED
+==== Contents of test case:
+
+	set client [socket -async localhost [randport]]
+	fileevent $client writable {set x ok}
+	set after [after $latency {set x timeout}]
+	vwait x
+	after cancel $after
+	lappend x [fconfigure $client -error]
+    
+---- Result was:
+ok {}
+---- Result should have been (exact matching):
+ok {connection refused}
+==== socket-14.2 FAILED
+
+
+
+==== socket-14.6.0 [socket -async] with no event loop and server listening on IPv4 FAILED
+==== Contents of test case:
+
+	set client [socket -async localhost $port]
+	for {set i 0} {$i < 50} {incr i } {
+	    update
+	    if {$x ne ""} {
+		lappend x [gets $client]
+		break
+	    }
+	    after 100
+	}
+	set x
+    
+---- Result was:
+ok {}
+---- Result should have been (exact matching):
+ok bye
+==== socket-14.6.0 FAILED
+
+
+
+==== socket-14.7.0 pending [socket -async] and blocking [gets], server is IPv4 FAILED
+==== Contents of test case:
+
+	set sock [socket -async localhost $port]
+	list [fconfigure $sock -error] [gets $sock] [fconfigure $sock -error]
+    
+---- Result was:
+{} {} {}
+---- Result should have been (exact matching):
+{} ok {}
+==== socket-14.7.0 FAILED
+
+
+
+==== socket-14.7.2 pending [socket -async] and blocking [gets], no listener FAILED
+==== Contents of test case:
+
+	set sock [socket -async localhost [randport]]
+	catch {gets $sock} x
+	list $x [fconfigure $sock -error] [fconfigure $sock -error]
+    
+---- Result was:
+{} {} {}
+---- Result should have been (glob matching):
+{error reading "sock*": transport endpoint is not connected} {connection refused} {}
+==== socket-14.7.2 FAILED
+
+
+
+==== socket-14.8.2 pending [socket -async] and nonblocking [gets], no listener FAILED
+==== Contents of test case:
+
+	set sock [socket -async localhost [randport]]
+	fconfigure $sock -blocking 0
+	for {set i 0} {$i < 50} {incr i } {
+	    if {[catch {gets $sock} x] || $x ne "" || ![fblocked $sock]} break
+	    after 200
+	}
+	list $x [fconfigure $sock -error] [fconfigure $sock -error]
+    
+---- Result was:
+{} {} {}
+---- Result should have been (glob matching):
+{error reading "sock*": transport endpoint is not connected} {connection refused} {}
+==== socket-14.8.2 FAILED
+
+
+
+==== socket-14.11.0 pending [socket -async] and nonblocking [puts], no listener, no flush FAILED
+==== Contents of test case:
+
+	set sock [socket -async localhost [randport]]
+	fconfigure $sock -blocking 0
+	puts $sock ok
+	fileevent $sock writable {set x 1}
+	vwait x
+	close $sock
+    
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== socket-14.11.0 FAILED
+
+
+
+==== socket-14.11.1 pending [socket -async] and nonblocking [puts], no listener, flush FAILED
+==== Contents of test case:
+
+	set sock [socket -async localhost [randport]]
+	# Set the socket in async test mode.
+	# The async connect will not be continued on the following fconfigure
+	# and puts/flush. Thus, the connect will fail after them.
+	testsocket testflags $sock 1
+	fconfigure $sock -blocking 0
+	puts $sock ok
+	flush $sock
+	testsocket testflags $sock 0
+	fileevent $sock writable {set x 1}
+	vwait x
+	close $sock
+    
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== socket-14.11.1 FAILED
+
+
+
+==== socket-14.12 [socket -async] background progress triggered by [fconfigure -error] FAILED
+==== Contents of test case:
+
+	set s [socket -async localhost [randport]]
+	for {set i 0} {$i < 50} {incr i} {
+	    set x [fconfigure $s -error]
+	    if {$x ne ""} break
+	    after 200
+	}
+	set x
+    
+---- Result was:
+
+---- Result should have been (exact matching):
+connection refused
+==== socket-14.12 FAILED
+
+
+
+==== socket-14.18 bug c6ed4acfd8: running async socket connect made other connect block FAILED
+==== Contents of test case:
+
+	proc accept {channel address port} {}
+	set port [randport]
+	set ssock [socket -server accept $port]
+	set csock1 [socket -async localhost [randport]]
+	set csock2 [socket localhost $port]
+	after 1000 {set done ok}
+	vwait done
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: couldn't open socket: address already in use
+    while executing
+"socket -server accept $port"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX EADDRINUSE {address already in use}
+==== socket-14.18 FAILED
+
+
+
+==== socket-14.19 tip 456 -- introduce the -reuseport option FAILED
+==== Contents of test case:
+
+	proc accept {channel address port} {}
+	set port [randport]
+	set ssock1 [socket -server accept -reuseport yes $port]
+	set ssock2 [socket -server accept -reuseport yes $port]
+	return ok
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: couldn't open socket: SO_REUSEPORT isn't supported by this platform
+    while executing
+"socket -server accept -reuseport yes $port"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== socket-14.19 FAILED
+
+source.test
+split.test
+stack.test
+string.test
+stringObj.test
+subst.test
+switch.test
+tailcall.test
+tcltest.test
+
+
+==== tcltest-8.1 tcltest a.tcl -tmpdir a FAILED
+==== Contents of test case:
+
+    child msg $a -tmpdir thisdirectorydoesnotexist
+    file exists [file join thisdirectorydoesnotexist a.tmp]
+
+---- Test cleanup failed:
+error deleting "thisdirectorydoesnotexist": invalid operation
+---- errorInfo(cleanup): error deleting "thisdirectorydoesnotexist": invalid operation
+    while executing
+"file delete -force thisdirectorydoesnotexist"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== tcltest-8.1 FAILED
+
+
+
+==== tcltest-8.10 tcltest a.tcl -testdir thisdirectorydoesnotexist FAILED
+==== Contents of test case:
+child msg $a -testdir thisdirectorydoesnotexist
+	return $msg
+---- Test setup failed:
+error deleting "thisdirectorydoesnotexist": invalid operation
+---- errorInfo(setup): error deleting "thisdirectorydoesnotexist": invalid operation
+    while executing
+"file delete -force thisdirectorydoesnotexist"
+    ("uplevel" body line 1)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): POSIX {unknown error} {invalid operation}
+==== tcltest-8.10 FAILED
+
+
+
+==== tcltest-9.5 GetMatchingFiles: Bug 1119798 FAILED
+==== Contents of test case:
+
+    child msg [file join [temporaryDirectory] all.tcl] -file f*
+    regexp {exiting with errors:} $msg
+
+---- Test setup failed:
+error copying "/usr/glenda/APExp/sys/src/external/tcl/tests/all.tcl" to "/usr/glenda/APExp/sys/src/external/tcl/tests/tmp/all.tcl": no such file or directory
+---- errorInfo(setup): error copying "/usr/glenda/APExp/sys/src/external/tcl/tests/all.tcl" to "/usr/glenda/APExp/sys/src/external/tcl/tests/tmp/all.tcl": no such file or directory
+    while executing
+"file copy [file join [file dirname [info script]] all.tcl] $d"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): POSIX ENOENT {no such file or directory}
+==== tcltest-9.5 FAILED
+
+Test file error: error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/singleprocdir": invalid operation
+    while executing
+"file delete -force -- $fullName"
+    (procedure "removeDirectory" line 21)
+    invoked from within
+"removeDirectory singleprocdir"
+    (in namespace eval "::tcltest::test" script line 915)
+    invoked from within
+"namespace eval ::tcltest::test {
+
+namespace import ::tcltest::*
+
+makeFile {
+    package require tcltest 2.5
+    namespace import ::tcltest::test
+    t..."
+    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/tcltest.test" line 28)
+thread.test
+timer.test
+tm.test
+trace.test
+unixFCmd.test
+Test file error: error deleting "./td1": invalid operation
+    while executing
+"file delete -force -- $file"
+    (procedure "cleanup" line 13)
+    invoked from within
+"cleanup"
+    invoked from within
+"if {[testConstraint unix] && [testConstraint notRoot]} {
+    testConstraint execMknod [expr {![catch {exec mknod tf1 p}]}]
+    cleanup
+}"
+    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/unixFCmd.test" line 92)
+unixFile.test
+unixForkEvent.test
+unixInit.test
+
+
+==== unixInit-1.2 initialisation: standard channel type deduction FAILED
+==== Contents of test case:
+
+    # pipe1 is a connection to a server that reports what port it starts on,
+    # and delivers a constant string to the first client to connect to that
+    # port before exiting.
+    set pipe1 [open "|[list [interpreter]]" r+]
+    puts $pipe1 {
+	proc accept {channel host port} {
+	    puts $channel {puts [chan configure stdin -peername]; exit}
+	    close $channel
+	    exit
+	}
+	puts [chan configure [socket -server accept -myaddr 127.0.0.1 0] -sockname]
+	vwait forever  }
+    # Note the backslash above; this is important to make sure that the whole
+    # string is read before an [exit] can happen...
+    flush $pipe1
+    set port [lindex [gets $pipe1] 2]
+    set sock [socket localhost $port]
+    # pipe2 is a connection to a Tcl interpreter that takes its orders from
+    # the socket we hand it (i.e. the server we create above.)  These orders
+    # will tell it to print out the details about the socket it is taking
+    # instructions from, hopefully identifying it as a socket.  Which is what
+    # this test is all about.
+    set pipe2 [open "|[list [interpreter] <@$sock]" r]
+    set result [gets $pipe2]
+    # Clear any pending data; stops certain kinds of (non-important) errors
+    chan configure $pipe1 -blocking 0; gets $pipe1
+    chan configure $pipe2 -blocking 0; gets $pipe2
+    # Close the pipes and the socket.
+    close $pipe2
+    close $pipe1
+    catch {close $sock}
+    # Can't use normal comparison, as hostname varies due to some
+    # installations having a messed up /etc/hosts file.
+    if {
+	"127.0.0.1" eq [lindex $result 0] && $port == [lindex $result 2]
+    } then {
+	subst "OK"
+    } else {
+	subst "Expected: `[list 127.0.0.1 localhost $port]', Got `$result'"
+    }
+
+---- Result was:
+Expected: `127.0.0.1 localhost 49906', Got `'
+---- Result should have been (exact matching):
+OK
+==== unixInit-1.2 FAILED
+
+unixNotfy.test
+unknown.test
+unload.test
+uplevel.test
+upvar.test
+utf.test
+utfext.test
+util.test
+var.test
+while-old.test
+while.test
+winConsole.test
+winDde.test
+winFCmd.test
+Test file error: error deleting "td1": invalid operation
+    while executing
+"file delete -force -- td1"
+    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/winFCmd.test" line 105)
+winFile.test
+winNotify.test
+winPipe.test
+winTime.test
+word.test
+zipfs.test
+
+
+==== zipfs-mount-one-arg-2 mount - get mount target - relative path FAILED
+==== Contents of test case:
+
+	zipfs mount $defMountPt
+    
+---- Test setup failed:
+error copying "/usr/glenda/APExp/sys/src/external/tcl/tests/zipfiles/test.zip" to "test.zip": no such file or directory
+---- errorInfo(setup): error copying "/usr/glenda/APExp/sys/src/external/tcl/tests/zipfiles/test.zip" to "test.zip": no such file or directory
+    while executing
+"file copy [zippath test.zip] test.zip"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): POSIX ENOENT {no such file or directory}
+==== zipfs-mount-one-arg-2 FAILED
+
+
+
+==== zipfs-find-native-absolute zipfs find on native file system FAILED
+==== Contents of test case:
+
+	string equal [zipfs find $dir] [list $subdir $file]
+    
+---- Test cleanup failed:
+error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/zipfs-native-absolute": invalid operation
+---- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/zipfs-native-absolute": invalid operation
+    while executing
+"file delete -force -- $fullName"
+    (procedure "removeDirectory" line 21)
+    invoked from within
+"removeDirectory zipfs-native-absolute"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== zipfs-find-native-absolute FAILED
+
+
+
+==== zipfs-find-native-relative zipfs find relative on native file system FAILED
+==== Contents of test case:
+
+	cd [file dirname $dir]
+	# string equal [zipfs find [file tail $subdir]] [list subdir subdir/native]
+	zipfs find [file tail $dir]
+    
+---- Test cleanup failed:
+error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/zipfs-native-relative": invalid operation
+---- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/zipfs-native-relative": invalid operation
+    while executing
+"file delete -force -- $fullName"
+    (procedure "removeDirectory" line 21)
+    invoked from within
+"removeDirectory zipfs-native-relative"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== zipfs-find-native-relative FAILED
+
+
+
+==== zipfs-password-read-cipher-2 zipfs password read cipher-2 FAILED
+==== Contents of test case:
+
+	    set fd [open [file join $defMountPt $filename]]
+	    gets $fd
+	
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: invalid password
+    while executing
+"open [file join $defMountPt $filename]"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL ZIPFS PASSWORD
+==== zipfs-password-read-cipher-2 FAILED
+
+
+
+==== zipfs-password-write-cipher-w-2 zipfs write cipher-w-2 FAILED
+==== Contents of test case:
+
+	    set fd [open $path $mode]
+	    fconfigure $fd -translation binary
+	    puts -nonewline $fd "xyz"
+	    close $fd
+	    set fd [open $path]
+	    fconfigure $fd -translation binary
+	    read $fd
+	
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: invalid password
+    while executing
+"open $path $mode"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL ZIPFS PASSWORD
+==== zipfs-password-write-cipher-w-2 FAILED
+
+
+
+==== zipfs-password-write-cipher-deflate-w zipfs write cipher-deflate-w FAILED
+==== Contents of test case:
+
+	    set fd [open $path $mode]
+	    fconfigure $fd -translation binary
+	    puts -nonewline $fd "xyz"
+	    close $fd
+	    set fd [open $path]
+	    fconfigure $fd -translation binary
+	    read $fd
+	
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: invalid password
+    while executing
+"open $path $mode"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL ZIPFS PASSWORD
+==== zipfs-password-write-cipher-deflate-w FAILED
+
+
+
+==== zipfs-password-write-cipher-deflate-w+ zipfs write cipher-deflate-w+ FAILED
+==== Contents of test case:
+
+	    set fd [open $path $mode]
+	    fconfigure $fd -translation binary
+	    puts -nonewline $fd "xyz"
+	    close $fd
+	    set fd [open $path]
+	    fconfigure $fd -translation binary
+	    read $fd
+	
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: invalid password
+    while executing
+"open $path $mode"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL ZIPFS PASSWORD
+==== zipfs-password-write-cipher-deflate-w+ FAILED
+
+
+
+==== zipfs-password-write-cipher-deflate-a+ zipfs write cipher-deflate-a+ FAILED
+==== Contents of test case:
+
+	    set fd [open $path $mode]
+	    fconfigure $fd -translation binary
+	    puts -nonewline $fd "xyz"
+	    close $fd
+	    set fd [open $path]
+	    fconfigure $fd -translation binary
+	    read $fd
+	
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: invalid password
+    while executing
+"open $path $mode"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL ZIPFS PASSWORD
+==== zipfs-password-write-cipher-deflate-a+ FAILED
+
+
+
+==== zipfs-file-stat-file file stat file FAILED
+==== Contents of test case:
+
+	    lsort -stride 2 [file stat [file join $mountpoint $target]]
+	
+---- Result was:
+atime 1065448002 ctime 1065448002 dev 0 gid 0 ino 0 mode 33133 mtime 1065448002 nlink 0 size 5 type file uid 0
+---- Result should have been (exact matching):
+atime 1065448002 blksize 0 blocks 0 ctime 1065448002 dev 0 gid 0 ino 0 mode 33133 mtime 1065448002 nlink 0 size 5 type file uid 0
+==== zipfs-file-stat-file FAILED
+
+
+
+==== zipfs-file-lstat-file file lstat file FAILED
+==== Contents of test case:
+
+	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
+	
+---- Result was:
+atime 1065448002 ctime 1065448002 dev 0 gid 0 ino 0 mode 33133 mtime 1065448002 nlink 0 size 5 type file uid 0
+---- Result should have been (exact matching):
+atime 1065448002 blksize 0 blocks 0 ctime 1065448002 dev 0 gid 0 ino 0 mode 33133 mtime 1065448002 nlink 0 size 5 type file uid 0
+==== zipfs-file-lstat-file FAILED
+
+
+
+==== zipfs-file-stat-dir file stat dir FAILED
+==== Contents of test case:
+
+	    lsort -stride 2 [file stat [file join $mountpoint $target]]
+	
+---- Result was:
+atime 1105466634 ctime 1105466634 dev 0 gid 0 ino 0 mode 16749 mtime 1105466634 nlink 0 size 0 type directory uid 0
+---- Result should have been (exact matching):
+atime 1105466634 blksize 0 blocks 0 ctime 1105466634 dev 0 gid 0 ino 0 mode 16749 mtime 1105466634 nlink 0 size 0 type directory uid 0
+==== zipfs-file-stat-dir FAILED
+
+
+
+==== zipfs-file-lstat-dir file lstat dir FAILED
+==== Contents of test case:
+
+	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
+	
+---- Result was:
+atime 1105466634 ctime 1105466634 dev 0 gid 0 ino 0 mode 16749 mtime 1105466634 nlink 0 size 0 type directory uid 0
+---- Result should have been (exact matching):
+atime 1105466634 blksize 0 blocks 0 ctime 1105466634 dev 0 gid 0 ino 0 mode 16749 mtime 1105466634 nlink 0 size 0 type directory uid 0
+==== zipfs-file-lstat-dir FAILED
+
+
+
+==== zipfs-file-stat-root-mount file stat root-mount FAILED
+==== Contents of test case:
+
+	    lsort -stride 2 [file stat [file join $mountpoint $target]]
+	
+---- Result was:
+atime 1789657714 ctime 1789657714 dev 0 gid 0 ino 0 mode 16749 mtime 1789657714 nlink 0 size 0 type directory uid 0
+---- Result should have been (regexp matching):
+atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
+==== zipfs-file-stat-root-mount FAILED
+
+
+
+==== zipfs-file-lstat-root-mount file lstat root-mount FAILED
+==== Contents of test case:
+
+	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
+	
+---- Result was:
+atime 1789657714 ctime 1789657714 dev 0 gid 0 ino 0 mode 16749 mtime 1789657714 nlink 0 size 0 type directory uid 0
+---- Result should have been (regexp matching):
+atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
+==== zipfs-file-lstat-root-mount FAILED
+
+
+
+==== zipfs-file-stat-root-subdir-mount file stat root-subdir-mount FAILED
+==== Contents of test case:
+
+	    lsort -stride 2 [file stat [file join $mountpoint $target]]
+	
+---- Result was:
+atime 1789657714 ctime 1789657714 dev 0 gid 0 ino 0 mode 16749 mtime 1789657714 nlink 0 size 0 type directory uid 0
+---- Result should have been (regexp matching):
+atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
+==== zipfs-file-stat-root-subdir-mount FAILED
+
+
+
+==== zipfs-file-lstat-root-subdir-mount file lstat root-subdir-mount FAILED
+==== Contents of test case:
+
+	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
+	
+---- Result was:
+atime 1789657714 ctime 1789657714 dev 0 gid 0 ino 0 mode 16749 mtime 1789657714 nlink 0 size 0 type directory uid 0
+---- Result should have been (regexp matching):
+atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
+==== zipfs-file-lstat-root-subdir-mount FAILED
+
+
+
+==== zipfs-file-stat-mezzo file stat mezzo FAILED
+==== Contents of test case:
+
+	    lsort -stride 2 [file stat [file join $mountpoint $target]]
+	
+---- Result was:
+atime 1789657714 ctime 1789657714 dev 0 gid 0 ino 0 mode 16749 mtime 1789657714 nlink 0 size 0 type directory uid 0
+---- Result should have been (regexp matching):
+atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
+==== zipfs-file-stat-mezzo FAILED
+
+
+
+==== zipfs-file-lstat-mezzo file lstat mezzo FAILED
+==== Contents of test case:
+
+	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
+	
+---- Result was:
+atime 1789657714 ctime 1789657714 dev 0 gid 0 ino 0 mode 16749 mtime 1789657714 nlink 0 size 0 type directory uid 0
+---- Result should have been (regexp matching):
+atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
+==== zipfs-file-lstat-mezzo FAILED
+
+
+
+==== zipfs-file-copydir-fromzip-1 Copy archive dir to native FAILED
+==== Contents of test case:
+
+	file copy [file join $defMountPt testdir] $dst
+	zipfs find $dst
+    
+---- Test cleanup failed:
+error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/dstdir.tmp": invalid operation
+---- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/dstdir.tmp": invalid operation
+    while executing
+"file delete -force $dst"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== zipfs-file-copydir-fromzip-1 FAILED
+
+
+
+==== zipfs-file-copymount-fromzip-new Copy archive mount to native FAILED
+==== Contents of test case:
+
+	file copy $defMountPt $dst
+	list [file isfile [file join $dst test]]  [file isdirectory [file join $dst testdir]]  [file isfile [file join $dst testdir test2]]
+    
+---- Test setup failed:
+/usr/glenda/APExp/sys/src/external/tcl/tests/zipfiles/test.zip is already mounted on //zipfs:/testmount
+---- errorInfo(setup): /usr/glenda/APExp/sys/src/external/tcl/tests/zipfiles/test.zip is already mounted on //zipfs:/testmount
+    while executing
+"zipfs mount $zippath $mountpoint"
+    (procedure "mount" line 2)
+    invoked from within
+"mount [zippath test.zip]"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL ZIPFS MOUNTED
+---- Test cleanup failed:
+error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/dstdir.tmp": invalid operation
+---- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/dstdir.tmp": invalid operation
+    while executing
+"file delete -force $dst"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== zipfs-file-copymount-fromzip-new FAILED
+
+
+
+==== zipfs-file-delete Delete file in zip archive FAILED
+==== Contents of test case:
+
+	set file [file join $defMountPt test]
+	list  [file exists $file]  [catch {file delete $file} msg]  $msg  [file exists $file]
+    
+---- Test setup failed:
+/usr/glenda/APExp/sys/src/external/tcl/tests/zipfiles/test.zip is already mounted on //zipfs:/testmount
+---- errorInfo(setup): /usr/glenda/APExp/sys/src/external/tcl/tests/zipfiles/test.zip is already mounted on //zipfs:/testmount
+    while executing
+"zipfs mount $zippath $mountpoint"
+    (procedure "mount" line 2)
+    invoked from within
+"mount [zippath test.zip]"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): TCL ZIPFS MOUNTED
+==== zipfs-file-delete FAILED
+
+
+
+==== bug-7d5f1c1308 zipfs error on dotfiles FAILED
+==== Contents of test case:
+
+	zipfs mkzip $zipfile $dir [file dirname $dir]
+	zipfs mount $zipfile $mt
+	lsort [zipfs list $mt/*]
+    
+---- Test cleanup failed:
+error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/bug-7d5f1c1308": invalid operation
+---- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/bug-7d5f1c1308": invalid operation
+    while executing
+"file delete -force -- $fullName"
+    (procedure "removeDirectory" line 21)
+    invoked from within
+"removeDirectory $basename"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== bug-7d5f1c1308 FAILED
+
+Warning: files left behind:
+	zipfs.test:	zipfs-native-absolute zipfs-native-relative dstdir.tmp bug-7d5f1c1308
+zlib.test
