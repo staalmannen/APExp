@@ -3082,3 +3082,53 @@ an announced TCP socket -- for a server that was closed long ago. The
 descriptor fix stopped them wedging the harness; nothing stops them
 existing. The change is to record the listener's pid in the `Rock` and
 have `close()` kill it, and this listing is the argument for doing it.
+
+#### The listener is waiting for accept()'s "OK" -- and 9597 is the one to read
+
+**"Acid the newest pid" was wrong advice**, and the ps says why: the
+listener is forked *by* the test process, so it always has the **higher**
+pid. The four `tcltest` processes of a frozen `zlib.test` run are
+
+```
+9588  5832K Pread   the harness parent, blocked on the child's pipe
+9597 23604K Pread   the test process          <- THIS ONE
+9603 23444K Sleep   the timer process, _buf.c:607
+9606 23588K Pread   a listener                <- the one acid'd
+```
+
+Size does not separate 9597 from 9606 either, both being forks of the
+same 23 MB image. **Read the stack, or read both.**
+
+**What 9606 says is still worth having.** It is not in `open(listen)`
+where an idle listener sits; it is at `listen.c:170`:
+
+```c
+write(pfd[1], nr->ctl, strlen(nr->ctl));	/* done */
+read(pfd[1], name, sizeof(name));		/* HERE */
+```
+
+-- the second half of the handover. It has taken a call, opened the
+connection, written the control file's name into the pipe, and is
+waiting for `accept()` to answer `"OK"` (`accept.c`, after
+`_sock_data` succeeds). **So a connection was delivered to the parent
+and the parent never completed the handshake**, and the listener will
+hold that connection open for ever.
+
+`noblock=0` and the frame being `_PREAD` rather than `_readbuf` also
+says the descriptor is neither buffered nor non-blocking, which is
+`read.c:29` -- worth knowing, because a *buffered* read blocks in
+`_RENDEZVOUS` and shows as `Rendez`, not `Pread`. **The state column
+already distinguishes those two waits.**
+
+**What 9597's stack decides.** Two readings are left and they want
+different fixes:
+
+- **inside `accept()`, at `read(fd, name, ...)`** -- then the two
+  processes are deadlocked over the same pipe, the parent waiting for a
+  name the listener has already written, and the question is who
+  swallowed it: a copy process forked by `select()` on that same
+  descriptor is the obvious candidate, and `_readbuf` is then not
+  returning what it holds.
+- **inside `fcopy`/`Tcl_Read` on `$sin`** -- then the accept completed,
+  the 80 KB data channel never reports end of file, and 9606 is a
+  *second* thing to explain rather than the same one.
