@@ -184,7 +184,8 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
-`socket-server-test.c`, `dup-fdinfo-test.c` and `stdio-test.c`. The twenty-five `tk-*.tcl` scripts there are Tcl, run
+`socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c` and
+`stdio-test.c`. The twenty-five `tk-*.tcl` scripts there are Tcl, run
 with `wish` -- except `tk-menubar-test.tcl`, which needs `tktest` and
 skips itself under `wish`, and `tk-transient-test.tcl`, whose last
 section alone does; see `docs/notes/tk-plan9.md`. `tk-runall.tcl` is the harness for
@@ -443,12 +444,19 @@ or a constraint that fails on Linux too). The port's own share is
 **Tcl's suite**: not yet complete. Open, in order of what the next run
 should touch:
 
-- **The `zlib-9.2` freeze is diagnosed and fixed, not yet confirmed**:
+- **The suite spins in `fCmd.test`**, and the loop is upstream's own
+  `while {[catch {file delete -force tfa}]} {}` in `fCmd-20.2`'s
+  cleanup. The bug under it is that deleting a directory fails with the
+  Plan 9 errstr `invalid operation`, which is in no table in
+  `_errno.c`, so Tcl reports `POSIX {unknown error}`.
+  `sys/lib/tests/rmdir-test.c` is the probe: it walks `fCmd-20.1` step
+  by step and prints what the system says for each.
+- **CONFIRMED and closed**: `zlib.test` passes end to end, 73 tests,
+  and `dup-fdinfo-test` reports 0 failures --
   `fcntl(F_DUPFD)` chose its descriptor by scanning `_fdinfo`, which
   does not know about descriptors libap opened with the raw `_OPEN` --
   so `dup()` closed `/dev/bintime` out from under `_NSEC` and every
   later `gettimeofday()` blocked. The kernel picks the number now.
-  Covered by `sys/lib/tests/dup-fdinfo-test.c`.
 - **`file copy`/`file rename` of a directory faulted every time**:
   `fts_alloc` never allocated `fts_statp`, because two `if` bodies were
   commented out and an `if` with no body swallows the next statement.
