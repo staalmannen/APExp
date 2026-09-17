@@ -9,7 +9,7 @@ Test files sourced into current interpreter
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  chanio.test
-Tests began at 2026-09-17 04:56:38 +0200
+Tests began at 2026-09-17 09:52:55 +0200
 chanio.test
 ---- chan-io-1.6 start
 ---- chan-io-1.7 start
