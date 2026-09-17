@@ -7105,6 +7105,73 @@ narrows to nothing is evidence, and the next move then is a prefix ramp
 -- keep 44.1 fixed and add groups until it breaks -- rather than a
 narrower `-match`.
 
+#### It is chan-io-41.*, and that is eight tests of which two open anything
+
+**One halving, and the answer is unambiguous:**
+
+```
+-match 'chan-io-4.* chan-io-40.* chan-io-44.*'   24 tests, finishes clean
+-match 'chan-io-41.* chan-io-44.*'               FREEZES at 44.1
+```
+
+So everything that arms `chan-io-44.1` is inside `chan-io-41.*`, and the
+run before it is worth reading as well: **44.1 through 44.5 all ran and
+passed after twenty-four of the `4.x`/`40.x` tests**, so the `4x` block
+is not merely innocent of the freeze -- it leaves the process able to
+run the whole `44` group.
+
+**Five of the eight open nothing.** `41.1`..`41.5` are argument-error
+checks -- `chan event foo`, `chan event gorp readable` -- and `41.7` is
+skipped on `specialfiles`. That leaves two:
+
+- **`41.6` OPENS A DIRECTORY AND SELECTS ON IT.** `set chan [open
+  $tempdir]`, a readable `chan event`, then `vwait`. That is a shape
+  nothing in this port has ever been asked for: `_startbuf` forks a copy
+  process that sits in `_READ` on a **directory** descriptor, which on
+  Plan 9 returns stat entries and then end of file.
+- **`41.8` fails before it opens anything.** `file link -symbolic` is
+  ENOSYS, so `$chan` is never assigned and the cleanup closes 41.6's
+  already-closed channel -- which is the whole of `can not find channel
+  named "file5"`. It leaks nothing, and that error is a consequence of
+  the ENOSYS rather than a second fault.
+
+**"A PRIOR `vwait` IS ENOUGH" WAS THE TEMPTING READING AND THIS FILE
+ALREADY REFUTES IT.** The passing half contains no `vwait` at all -- the
+`4.x` translation tests and the `40.x` open-mode tests never enter the
+event loop -- so 44.1's was the first blocking select in that process,
+while in the freezing half 41.6's came first. Very neat, and wrong:
+**sections 9 and 10 call `run441` eighteen times between them and every
+call passes**, so 44.1 after a previous 44.1 demonstrably works. Worth
+writing down because believing it would have cost a run, and because it
+is the first time in this file that an existing test refuted a new
+hypothesis without anything being run at all.
+
+**Section 11 of `tcl-fileevent-test.tcl` is 41.6 and 41.8 standalone**,
+with `run441` as a control before them and after each: make a directory,
+open it, register a readable event, wait, close, then run 44.1; then
+attempt a symbolic link and run 44.1 again. Every statement carries an
+`at:` marker, because this is the section most likely to find a freeze
+and a freeze cannot say which line it is in. All three steps pass on a
+Linux tclsh, where `open` on a directory succeeds and `file link
+-symbolic` works -- so the host exercises the machinery and only the VM
+can answer the question.
+
+**Two runs, and they are independent of each other:**
+
+```
+tclsh sys/lib/tests/tcl-fileevent-test.tcl
+tcltest .../tcl-runall.tcl -singleproc 1 -file chanio.test -verbose t -match 'chan-io-41.6 chan-io-44.1'
+```
+
+The first reproduces it with no suite at all if the directory is the
+cause; the second says whether 41.6 alone is enough inside tcltest. If
+11b freezes, the reproducer is **four lines** and the next step is to
+write it in C in `select-test.c` -- select on a directory descriptor,
+close it, then select on a fresh pipe -- which is where every one of
+these has ended up being settled. If 11b passes and 11c passes but the
+suite still freezes on `41.6 + 44.1`, then it is the pair or the
+`tempdir` machinery around them, and `41.8 + 44.1` is the next `-match`.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
