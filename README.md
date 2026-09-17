@@ -208,6 +208,15 @@ Yes, the default build is "bloated" because I enable everything that I believe w
 
 
 
+**Documentation**
+
+Everything but this file lives under `docs/` -- see `docs/README.md`.
+`docs/posix-coverage.md` is what of POSIX is present or missing,
+`docs/compiler-improvements.md` is the state of the C compilers,
+`docs/releases/` is the release notes, and `docs/notes/` is the working
+record of the bugs found in this tree and what each one cost.
+
+
 ***Post scriptum***
 
 The unofficial mascot of the project are the rabbit knights riding snails in medieval art.

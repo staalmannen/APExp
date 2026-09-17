@@ -270,6 +270,12 @@ covers what you are about to touch; do not re-derive from scratch.
 | `docs/notes/tk-plan9.md` | the `sys/src/external/tk/plan9/` backend and Tk's own suite, runs 1 to 16. Also the `HFILES` trap and the gcc syntax check, which apply tree-wide |
 | `docs/notes/tcl-suite.md` | Tcl's suite: the allocator, sockets and the missing loopback, `shutdown()`, `listen()`, `select()` and `ap/plan9/_buf.c`, `fd_set`, and the `chan-io` hangs |
 
+Two more under `docs/`, which are surveys rather than history:
+`posix-coverage.md` (what of POSIX/musl is present, missing or stubbed,
+compared file by file against musl's `src/`) and
+`compiler-improvements.md` (the state of the Plan 9 C compilers and what
+is still open). `docs/releases/` holds the release notes.
+
 **When a round finishes, the finding goes in the topic file and only the
 one-line consequence comes back here.** That is what keeps this file from
 growing back to the 8000 lines it was.
