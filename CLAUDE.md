@@ -6500,6 +6500,169 @@ the truth about what was reported rather than an artefact of a 4 KB
 boundary. The `-singleproc 1 ... -verbose t` run is still the way to
 name a hang, and is still one command.
 
+#### chan-io-44.1 confirmed, and the reproducer of it PASSES
+
+`-singleproc 1 -file chanio.test -verbose t` names it again, and the
+`-load` line-buffering from the round before means the log is now a
+faithful record rather than whatever fitted in a 4 KB pipe buffer:
+
+```
+---- chan-io-42.1 start ... ---- chan-io-43.2 start
+---- chan-io-44.1 start
+```
+
+`41.8` (the `file link -symbolic` ENOSYS) fails **and returns**, and so
+does everything through `43.2`. Nothing was guessed from the last line
+this time, which is the fourth running.
+
+**AND SECTION 6 OF `tcl-fileevent-test.tcl` IS chan-io-44.1 CHARACTER
+FOR CHARACTER -- the unused second `|cat -u` pipe, the namespaced
+variable, all of it -- AND IT PASSES ON THE VM.** So the test is not
+the variable. What differs is everything the process did before it:
+forty-three sections of `chanio.test`, several hundred channels opened
+and closed, and at least one that leaked (`41.8`'s cleanup reports
+`can not find channel named "file5"`).
+
+**The next question is therefore "what accumulates", and `-match`
+answers it with no rebuild and no edit**, narrowing from the end:
+
+```
+tcltest .../tcl-runall.tcl -singleproc 1 -file chanio.test -verbose t -match 'chan-io-44.*'
+```
+
+If 44.1 passes there, it is accumulation and the bisect continues
+(`'chan-io-4*'`, then `'chan-io-[34]*'`, ...). If it hangs with nothing
+else in the process, the difference is tcltest's own environment rather
+than the suite's history, and the standalone reproducer is what to
+compare against.
+
+#### -match 44 PASSES, so it really is accumulation
+
+```
+Running tests that match:  chan-io-44.*
+---- chan-io-44.1 start ... ---- chan-io-44.5 start
+all.tcl:  Total 779  Passed 5  Skipped 774  Failed 0
+tcl-runall: every file ran, now entering exit (code 0)
+```
+
+**44.1 through 44.5 all run and all pass with nothing before them.**
+Between that and section 6 of `tcl-fileevent-test.tcl` -- which is 44.1
+character for character and also passes -- the test itself is now
+excluded twice over. What hangs it is the state forty-three sections of
+`chanio.test` leave behind.
+
+**The blind bisect would be three or four more runs** (`'chan-io-4*'`,
+then `'chan-io-[34]*'`, ...), and each one only halves a range. So the
+next run asks *what* accumulates instead, and the first suspect is the
+**descriptor number**, because there is a measured cliff at 96 and
+nothing in this project had ever crossed it -- see the section below.
+
+**Section 9 of `tcl-fileevent-test.tcl` is a ramp, not one shot.** It
+holds n descriptors open, runs 44.1, reports, releases them and climbs:
+0, 40, 80, 88, 92, 96, 104. Each step prints an `at:` marker *before* it
+runs, so if one never returns the last line names the threshold -- and
+the script says in its own output which way to read it: a break
+straddling 96 is the `fd_set`, and a break anywhere else says the
+descriptor number was the wrong suspect and the accumulation is
+something else. **Either answer is worth the run**, which is the test
+this file keeps asking for.
+
+A crash rather than a hang is no surprise there and is equally
+informative: Tcl believes an `fd_set` holds 256 (see below), so its own
+`FD_SET` on a high descriptor writes past the end of the struct before
+libap is reached at all.
+
+It is the **last** section in the file, because everything above it
+returns and this is the only one written expecting that a case may not
+-- the ordering rule this file has already paid for once. All seven
+steps pass on a Linux tclsh, where `FD_SETSIZE` is 1024.
+
+#### The system gives out descriptors select() cannot be asked about
+
+Found by reading `_buf.c` and its headers while the above was waiting on
+a run, so **it is not established to be the 44.1 hang** -- it is a real
+bug found on the way past, and section 11 of `select-test.c` measures
+it. `<sys/select.h>` is
+
+```c
+typedef struct fd_set { long fds_bits[3]; } fd_set;
+#define FD_SETSIZE 96
+```
+
+-- **the struct is a hardcoded three words whatever `FD_SETSIZE` says**
+-- while `<sys/limits.h>` sets `OPEN_MAX` to **256** and `_fdinfo[]` is
+that long. Descriptors 96..255 are ordinary, usable descriptors that no
+`fd_set` in the system can name.
+
+Three things follow, and they get worse in order:
+
+- **`FD_ANYSET` in `_buf.c` reads words 0..2 only.** A select naming
+  only high descriptors takes the `/* no requested fds */` arm: it
+  sleeps out the timeout and **returns 0**. A notifier waiting on such a
+  descriptor waits for ever and is told nothing -- which is the shape of
+  a `vwait` that never returns, and the reason this was worth writing
+  down beside a hang.
+- **A mixed set does reach the scan**, and then
+  `FD_SET(fd, &mux->rwant)` writes past the end of a three-word `fd_set`
+  **living inside the shared segment**. `rwant` is followed by `ewant`
+  and then `bufs[]`, so it lands on another descriptor's buffer state.
+- **`Muxbuf.fd` is a `char`** (`ap/include/lib.h`), so a descriptor is
+  truncated to eight signed bits on the way into the slot: 128 and up
+  read back negative, and **255 reads back as -1, which is that field's
+  marker for a free slot**.
+
+`FD_SETSIZE` is the number *callers* believe, and the callers here do
+not agree with the header: `tcl/unix/tclUnixPort.h:461` says
+`#ifdef OPEN_MAX / #define FD_SETSIZE OPEN_MAX`, so **Tcl thinks an
+`fd_set` holds 256 and is handed one that holds 96.** Its own
+`FD_SET` calls on a high descriptor smash Tcl's memory before libap is
+reached at all.
+
+**The assertion about `OPEN_MAX <= FD_SETSIZE` was written and then
+withdrawn**, because glibc fails it too -- `FD_SETSIZE` 1024 against an
+`RLIMIT_NOFILE` of 20000 -- so "every descriptor fits in an fd_set" is
+not a library rule and a test must not claim it is. It is reported
+instead. What glibc *does* guarantee, and this does not, is that an
+`fd_set` really holds `FD_SETSIZE` descriptors, so a program that stays
+under the limit is safe; that is the assertion section 11 keeps, plus
+the runtime one -- dup a readable pipe end up to `FD_SETSIZE+4` and ask.
+The set it uses is padded deliberately, since `FD_SET` on a plain
+`fd_set` would smash the test's own stack, which is precisely what Tcl
+already does.
+
+**The fix is not batched with the measurement, and deliberately.**
+Widening `fd_set` and changing `Muxbuf.fd` to an `int` both change the
+layout of something shared -- one an ABI every binary in the tree has
+compiled in, the other the mux segment -- so both want a full rebuild
+and neither should be spent before the run says whether a high
+descriptor is ever reached. Section 11 is one command and needs no
+rebuild of libap at all.
+
+#### A NUMBERED TEST SAYS FOR ITSELF WHETHER THE BUILD HAS THE CHANGE
+
+`select-test` came back **0 failures** with sections 1..10 -- and
+**section 11 was not in the output**, because the build was from a tree
+without it. Sections 1..10 being green is a real result and worth
+having (the port still does the right thing in all ten shapes it was
+taught), but it says nothing whatever about the question that round was
+asked.
+
+**This is the third instance of "a measurement of a build that does not
+contain the change measures nothing"** -- the window-table ramp test and
+the `TESTCFLAGS` round are the other two, and both cost a reversal of a
+correct decision. What is new is that the check here is free and needs
+nothing but the output already in front of you: **these files number
+their sections, so the highest number printed is the version of the
+source that ran.** Read it before reading the verdict, exactly as
+`git merge-base` is read before a suite result and the `tk-runall`
+marker before a total.
+
+The general form, since every test in `sys/lib/tests` is built by hand
+on the machine under test: **when a run comes back green, ask what the
+new case would have printed and look for it**, rather than taking the
+count. A test that cannot run is indistinguishable from a test that
+passes, if nothing names it.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the

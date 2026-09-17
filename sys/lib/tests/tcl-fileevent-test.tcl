@@ -566,5 +566,100 @@ if {[catch {
     }
 }
 
+puts "\n--- 9. chan-io-44.1 WITH DESCRIPTORS HELD OPEN UNDERNEATH ---"
+# WHY THIS EXISTS. Section 6 is chan-io-44.1 character for character
+# and it PASSES on the VM, and `-match 'chan-io-44.*'` runs 44.1..44.5
+# with zero failures -- so the test is innocent and the variable is
+# everything the process did before it. In the suite, forty-three
+# sections of chanio.test have run first, several hundred channels have
+# been opened and closed, and at least one leaked (41.8's cleanup says
+# `can not find channel named "file5"`).
+#
+# THE FIRST THING TO SUSPECT IS THE DESCRIPTOR NUMBER, because there is
+# a measured cliff at 96 and nothing in this file had ever crossed it.
+# <sys/select.h> here is `struct fd_set { long fds_bits[3]; }` -- a
+# hardcoded three words, 96 bits -- while <sys/limits.h> sets OPEN_MAX
+# to 256. Descriptors 96..255 are ordinary descriptors that no fd_set
+# in the system can name, and libap answers a select naming only those
+# by sleeping out the timeout and returning 0 (FD_ANYSET reads words
+# 0..2). See select-test.c section 11, and the CLAUDE.md section beside
+# it.
+#
+# Tcl makes it worse rather than noticing: tclUnixPort.h says
+# `#ifdef OPEN_MAX / #define FD_SETSIZE OPEN_MAX`, so Tcl believes an
+# fd_set holds 256 and is handed one that holds 96. Its own FD_SET on a
+# high descriptor writes past the end of the struct, so a CRASH here is
+# as informative as a hang and neither is a surprise.
+#
+# So this is a RAMP rather than one shot: hold n descriptors open, run
+# 44.1, report, release them, and climb. Each step prints before it
+# runs, so if one of them never returns the last line names the
+# threshold -- and a threshold at 96 is the fd_set and nothing else,
+# while a smooth failure anywhere else says the descriptor number was
+# the wrong suspect and the accumulation is something else.
+#
+# It is LAST in the file deliberately: everything above returns, and
+# this is the only section written in the expectation that one of its
+# cases may not. Every step passes on a Linux tclsh, where FD_SETSIZE
+# is 1024 and the cliff is far above anything asked for here.
+proc run441 {} {
+    namespace eval ::ramp {
+	variable x initial
+	variable f2 [open "|[list cat -u]" r+]
+	variable f3 [open "|[list cat -u]" r+]
+	chan event $f2 readable [namespace code {
+	    variable f2
+	    set ::done [chan gets $f2]
+	    chan event $f2 readable {}
+	}]
+	chan puts $f2 text
+	chan flush $f2
+    }
+    set got [waitfor 3000]
+    catch {chan close $::ramp::f2}
+    catch {chan close $::ramp::f3}
+    namespace delete ::ramp
+    return $got
+}
+
+set holdpath [file join [pwd] tcl-fileevent-test.hold]
+if {[catch {
+    set h [open $holdpath w]
+    puts $h "hold"
+    close $h
+} err]} {
+    note "could not create $holdpath ($err); skipping the ramp"
+} else {
+    set held {}
+    set prev 0
+    foreach n {0 40 80 88 92 96 104} {
+	while {[llength $held] < $n} {
+	    if {[catch {open $holdpath r} c]} {
+		note "could only hold [llength $held] descriptors ($c)"
+		break
+	    }
+	    lappend held $c
+	}
+	at "$n descriptors held, running 44.1"
+	set got [run441]
+	ok [expr {$got eq "text"}] "44.1 with $n held (got '$got')"
+	if {$got ne "text"} {
+	    note "IT BROKE BETWEEN $prev AND $n DESCRIPTORS HELD."
+	    if {$n > 96 || $prev >= 88} {
+		note "that straddles FD_SETSIZE (96), so the fd_set is"
+		note "the suspect: see select-test.c section 11."
+	    } else {
+		note "that is nowhere near FD_SETSIZE (96), so the"
+		note "descriptor NUMBER is the wrong suspect and what"
+		note "accumulates in chanio.test is something else."
+	    }
+	    break
+	}
+	set prev $n
+    }
+    foreach c $held { catch {close $c} }
+    catch {file delete $holdpath}
+}
+
 puts "\n$failures failure(s)"
 exit $failures
