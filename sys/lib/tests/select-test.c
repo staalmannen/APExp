@@ -815,24 +815,41 @@ main(void)
 		else {
 			int held[300], nheld, want, hifd;
 
+			/*
+			 * AIM AT THE HIGHEST DESCRIPTOR THE SYSTEM WILL
+			 * GIVE, not one past it. The first version asked
+			 * for sizeof(fd_set)*8 + 8, clamped to OPEN_MAX
+			 * -- and OPEN_MAX is a COUNT, so the highest
+			 * descriptor is 255 and `held[n] >= 256` was
+			 * never true. The loop ran to the end of the
+			 * table, dup failed, hifd came out -1, and the
+			 * section printed "nothing to ask" and reported
+			 * 0 failures with its one runtime case SKIPPED.
+			 *
+			 * That is the same shape as the round where
+			 * section 11 was missing from the binary
+			 * altogether: a green run whose interesting
+			 * question never ran. So there is no giving up
+			 * here -- whatever the climb reaches is what
+			 * gets asked, and the number is printed either
+			 * way.
+			 */
 			want = (int)(sizeof(fd_set) * 8) + 8;
-			if(want > 256)
-				want = 256;
+			if(want > (int)sysconf(_SC_OPEN_MAX) - 1)
+				want = (int)sysconf(_SC_OPEN_MAX) - 1;
+			hifd = -1;
 			for(nheld = 0; nheld < 300; nheld++){
 				held[nheld] = dup(p[0]);
 				if(held[nheld] < 0)
 					break;
-				if(held[nheld] >= want)
+				hifd = held[nheld];
+				if(hifd >= want)
 					break;
 			}
-			hifd = (nheld < 300 && held[nheld] >= 0)
-				? held[nheld] : -1;
 			printf("  note highest descriptor reached: %d"
-				" (wanted %d)\n",
-				hifd >= 0 ? hifd : (nheld > 0 ? held[nheld-1] : -1),
-				want);
+				" (wanted %d)\n", hifd, want);
 			if(hifd < 0)
-				note("could not climb that high; nothing to ask");
+				note("could not dup at all; nothing to ask");
 			else {
 				write(p[1], "x", 1);
 				memset(&u, 0, sizeof u);
