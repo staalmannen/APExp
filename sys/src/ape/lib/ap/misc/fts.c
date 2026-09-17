@@ -37,6 +37,7 @@
 #include <fcntl.h>
 #include <fts.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <unistd.h>
 #include <limits.h>
@@ -46,9 +47,17 @@
 #ifndef ALIGNBYTES
 #define ALIGNBYTES      (__alignof__ (long double) - 1)
 #endif
-/* Align P to that size.  */
+/* Align P to that size.
+ *
+ * `uintptr_t`, NOT `unsigned long int` as upstream writes it: Plan 9's
+ * `long` is 32 bits on amd64, so upstream's cast truncates every pointer
+ * above 4 GB and quietly produces a `fts_statp` pointing at nothing.
+ * That is almost certainly why the two lines in `fts_alloc` that use
+ * this macro were commented out rather than fixed -- see the note
+ * there. Same family as the `size_t`/`ssize_t` invariant: on this
+ * compiler, an integer that must hold a pointer is `uintptr_t`.  */
 #ifndef ALIGN
-#define ALIGN(p)        (((unsigned long int) (p) + ALIGNBYTES) & ~ALIGNBYTES)
+#define ALIGN(p)        (((uintptr_t) (p) + ALIGNBYTES) & ~(uintptr_t)ALIGNBYTES)
 #endif
 
 #define _D_EXACT_NAMLEN(d) (strlen ((d)->d_name))
@@ -917,9 +926,31 @@ fts_alloc(FTS *sp, char *name, size_t namelen)
 	 * fts_name field is declared to be of size 1, the fts_name pointer is
 	 * namelen + 2 before the first possible address of the stat structure.
 	 */
+	/*
+	 * BOTH OF THESE `if` BODIES WERE COMMENTED OUT WITH `//`, AND AN
+	 * `if` WITH ITS BODY COMMENTED OUT SWALLOWS THE NEXT STATEMENT.
+	 * So `if (!ISSET(FTS_NOSTAT))` governed the `malloc` -- with
+	 * FTS_NOSTAT set, `p` was never assigned at all -- and the second
+	 * one governed the `memcpy` of the name. Either way `fts_statp`
+	 * was never set, and `memset` had left it NULL.
+	 *
+	 * `fts_stat` then does `sbp = ISSET(FTS_NOSTAT) ? &sb :
+	 * p->fts_statp` and hands that NULL to `lstat`, which reaches
+	 * `_dirtostat` and writes through it. Measured: two `tcltest`
+	 * processes sat in state `Broken` after a suite run, and `acid`
+	 * on one gave `_dirtostat` <- `stat` <- `lstat` <- `fts_stat` <-
+	 * `fts_open` <- `TraverseUnixTree` <- `TclpObjCopyDirectory`.
+	 * `file copy` and `file rename` of a DIRECTORY faulted, every
+	 * time, and nothing in any run ever reported it -- a Plan 9
+	 * process that faults is held rather than killed, so the crash
+	 * waits silently in `ps` instead of printing.
+	 *
+	 * `tclUnixFCmd.c:1057` passes FTS_PHYSICAL|FTS_NOCHDIR, so
+	 * FTS_NOSTAT is clear and the stat buffer really is required.
+	 */
 	len = sizeof(FTSENT) + namelen;
 	if (!ISSET(FTS_NOSTAT))
-//		len += sizeof(struct stat) + ALIGNBYTES;
+		len += sizeof(struct stat) + ALIGNBYTES;
 	if ((p = malloc(len)) == NULL)
 		return (NULL);
 
@@ -928,7 +959,7 @@ fts_alloc(FTS *sp, char *name, size_t namelen)
 	p->fts_namelen = namelen;
 	p->fts_instr = FTS_NOINSTR;
 	if (!ISSET(FTS_NOSTAT))
-//		p->fts_statp = (struct stat *)ALIGN(p->fts_name + namelen + 2);
+		p->fts_statp = (struct stat *)ALIGN(p->fts_name + namelen + 2);
 	memcpy(p->fts_name, name, namelen);
 
 	return (p);

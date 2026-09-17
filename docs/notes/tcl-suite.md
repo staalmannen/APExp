@@ -3132,3 +3132,117 @@ different fixes:
 - **inside `fcopy`/`Tcl_Read` on `$sin`** -- then the accept completed,
   the 80 KB data channel never reports end of file, and 9606 is a
   *second* thing to explain rather than the same one.
+
+#### TWO BUGS, AND THE FREEZE IS THAT dup() PICKED A DESCRIPTOR IT DID NOT OWN
+
+**`acid 9597` ended it.** The test process is not in `fcopy` and not in
+`accept`. It is here:
+
+```
+_PREAD(a0=0x7)                 ap/syscall/_PREAD.s:6
+_NSEC()                        ap/plan9/9nsec.c:35
+gettimeofday                   ap/time/gettimeofday.c:13
+NativeGetTime / GetTime / Tcl_GetTime     tclUnixTime.c
+Tcl_AfterObjCmd(ms=0x3e8)      tclTimer.c:869
+```
+
+`ms=0x3e8` is **1000**, so the script is executing `zlib-9.2`'s
+`after 1000 {set ::total timeout}` -- past the client connect, before
+the `vwait`. It never reaches the event loop, which is why the listener
+in the other process is still holding a call nobody accepted, and why
+the 1000 ms timer that should have rescued the test never armed.
+
+**And it is blocked reading `/dev/bintime`.** That file cannot block.
+So descriptor 7 is not `/dev/bintime` any more:
+
+```c
+/* plan9/9nsec.c, and the static is the whole problem */
+static int fd = -1;
+if(fd < 0)
+    fd = _OPEN("/dev/bintime", OREAD|OCEXEC);
+_PREAD(fd, b, sizeof b, 0);
+```
+
+`_OPEN` is the **raw syscall**, so `_fdinfo[7]` never learns the
+descriptor exists -- and `fcntl(F_DUPFD)` chose its slot from that
+table:
+
+```c
+for(i = (arg>0)? arg : 0; i<OPEN_MAX; i++)
+    if(!(_fdinfo[i].flags&FD_ISOPEN))
+        break;
+ans = _DUP(fd, i);        /* SILENTLY CLOSES whatever is really there */
+```
+
+`dup()` *is* `fcntl(F_DUPFD, 0)`, and `listen()` opens with
+`nfd = dup(fd)`. **The listener's own frame reports `nfd=0x7`** -- the
+same descriptor `_NSEC` is reading, in the same frozen run. One
+descriptor, two owners, and the evidence for both halves was in the two
+backtraces already taken.
+
+Afterwards the parent closes `nfd`, something else takes 7, and every
+timestamp in the process reads a pipe or a socket. A read of those does
+not return.
+
+**The fix is that the KERNEL picks the descriptor.** `_DUP(fd, -1)`
+returns the lowest genuinely free one, which cannot collide with
+anything; POSIX wants the lowest free `>= arg`, so anything below `arg`
+is held and released afterwards. That closes the class rather than the
+instance: any raw-`_OPEN` descriptor anywhere in libap was exposed to
+this, and `F_DUPFD` was the only place APE chose a descriptor number
+out of its own table instead of the kernel's.
+
+Covered by `sys/lib/tests/dup-fdinfo-test.c` -- 0 failures on glibc,
+with `alarm()` round the case under test, because the failure mode is a
+read that never returns and a test that hangs reports nothing.
+
+#### The `Broken` pair: `file copy` of a directory faults, every time
+
+`acid 6185` on one of the two held faults:
+
+```
+_dirtostat            ap/plan9/dirtostat.c:14
+stat / lstat
+fts_stat(p=..., follow=0) ap/misc/fts.c:829   <- sbp=0x0
+fts_open                  ap/misc/fts.c:133
+TraverseUnixTree          tclUnixFCmd.c:1057
+TclpObjCopyDirectory / Tcl_FSCopyDirectory / CopyRenameOneFile
+```
+
+and `fts_alloc` says why in two lines:
+
+```c
+	if (!ISSET(FTS_NOSTAT))
+//		len += sizeof(struct stat) + ALIGNBYTES;
+	if ((p = malloc(len)) == NULL)
+		return (NULL);
+```
+
+**An `if` whose body is commented out swallows the next statement.** So
+`if (!ISSET(FTS_NOSTAT))` came to govern the `malloc` -- with
+FTS_NOSTAT set, `p` was never assigned at all -- and the second
+commented line made the other `if` govern the `memcpy` of the name.
+Either way `fts_statp` was never set and `memset` had left it **NULL**,
+so `fts_stat` handed NULL to `lstat` and `_dirtostat` wrote through it.
+`tclUnixFCmd.c` passes `FTS_PHYSICAL|FTS_NOCHDIR`, so the stat buffer
+really is required.
+
+**Why nobody had seen it: a Plan 9 process that faults is HELD, not
+killed.** The crash waits in `ps` as state `Broken` and prints nothing,
+so `file copy` and `file rename` of a directory have been faulting for
+as long as `fts.c` has been here and every run reported it as a plain
+test failure or not at all. **Read the state column for `Broken` after
+any suite run**; it is free evidence and it had been sitting there.
+
+**And the reason those lines were commented out rather than fixed is
+probably the macro above them**, which is upstream's:
+
+```c
+#define ALIGN(p) (((unsigned long int) (p) + ALIGNBYTES) & ~ALIGNBYTES)
+```
+
+`unsigned long` is **32 bits** on amd64 kencc, so that truncates every
+pointer and would have produced a `fts_statp` pointing at nothing --
+faulting differently rather than not at all. It is `uintptr_t` now.
+Commenting out the two lines turned a wrong pointer into a null one,
+which is the same bug wearing a quieter symptom.
