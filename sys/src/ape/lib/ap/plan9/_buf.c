@@ -38,8 +38,36 @@ static void _resettimer(void);
 
 static int copynotehandler(void *, char *);
 
-/* assume FD_SETSIZE is 96 */
-#define FD_ANYSET(p)	((p)->fds_bits[0] || (p)->fds_bits[1] || (p)->fds_bits[2])
+/*
+ * IS ANY DESCRIPTOR SET? This was three words BY HAND, under a comment
+ * reading "assume FD_SETSIZE is 96" -- so it stopped looking at 96
+ * however wide the struct really was, and a select naming only
+ * descriptors above that took the "no requested fds" arm below: it
+ * slept out the timeout and returned 0, with no error anywhere. A
+ * notifier waiting on such a descriptor waits for ever.
+ *
+ * It was measured rather than argued: select-test.c section 11 climbed
+ * to descriptor 136 by repeated dup -- ordinary, allocated, readable
+ * with a byte waiting -- and `select answered 0`. tcl-fileevent-test
+ * section 9 then ran chan-io-44.1 with descriptors held underneath it
+ * and it broke between 120 and 126 held, which is where the pipes it
+ * opens land past the end of the struct.
+ *
+ * Derived from the struct now, so it cannot stop early again whatever
+ * FD_SETSIZE becomes.
+ */
+#define FD_NWORDS	((int)(sizeof(fd_set)/sizeof(long)))
+
+static int
+FD_ANYSET(fd_set *p)
+{
+	int i;
+
+	for(i = 0; i < FD_NWORDS; i++)
+		if(p->fds_bits[i])
+			return 1;
+	return 0;
+}
 
 /*
  * Start making fd read-buffered: make the shared segment, if necessary,

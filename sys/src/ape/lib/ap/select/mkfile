@@ -4,6 +4,7 @@ APE=$APEXPROOT/sys/src/ape
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 OFILES=\
 	poll.$O\
+	fdzero.$O\
 
 
 UPDATE=\

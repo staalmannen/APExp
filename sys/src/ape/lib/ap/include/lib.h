@@ -57,7 +57,22 @@ typedef struct Muxbuf {
 	int n;				/* # unprocessed chars in buf */
 	unsigned char*	putnext;	/* place for copy process to put next data */
 	unsigned char*	getnext;	/* place for parent process to get next data */
-	char		fd;		/* fd for which this is a buffer */
+	/*
+	 * AN int, NOT A char. It was a `char`, so a descriptor was
+	 * truncated to eight signed bits on the way into the slot:
+	 * 128 and up read back negative, and **255 read back as -1,
+	 * which is this field's own marker for a FREE SLOT** -- so a
+	 * process that reached descriptor 255 would have handed its
+	 * buffer to the next caller that asked for one. OPEN_MAX is
+	 * 256 and select-test.c section 11 reached 136 by ordinary
+	 * dup, so the range is real rather than theoretical.
+	 *
+	 * This moves every field below it. Every object that touches a
+	 * Muxbuf must therefore be rebuilt together -- mk nuke, not an
+	 * incremental build; see the HFILES note in CLAUDE.md for what
+	 * a half-rebuilt shared struct looks like from the outside.
+	 */
+	int		fd;		/* fd for which this is a buffer */
 	unsigned char	eof;		/* true if eof after current data exhausted */
 	unsigned char	roomwait;	/* true if copy process is waiting for room */
 	unsigned char	datawait;	/* true if parent process is waiting for data */
