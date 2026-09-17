@@ -7281,6 +7281,74 @@ fix is still right on its own terms; the next thing to ask is which
 *other* test in `41.*` fills a buffer, since the group freeze is a fact
 whatever explains it.
 
+#### CONFIRMED, before and after, and every part of it landed
+
+**On the unfixed binary both froze, at exactly the marked statement:**
+
+```
+    at: close /dev/zero
+    at: 44.1 after /dev/zero was selected on and closed
+					<- nothing, section 12b
+
+---- chan-io-41.7 start
+---- chan-io-44.1 start
+					<- nothing, -match 41.7 + 44.1
+```
+
+**On the rebuilt one both pass**, with sections 1..11 unchanged and
+`0 failure(s)`:
+
+```
+  PASS 44.1 after /dev/zero (got 'text')
+all.tcl:  Total 779  Passed 2  Skipped 777  Failed 0
+```
+
+**That is a genuine before-and-after on one pair of binaries**, which
+this file has not had before: every earlier fix was confirmed by a
+result moving, and this one was confirmed by the *same two commands*
+freezing and then not. The `at:` marker naming `44.1 after /dev/zero`
+rather than the close is what says the stale flag was consumed by the
+next descriptor and not by the dying one.
+
+**The prediction landed in every part** -- which test, which mechanism,
+which statement, and both sides of the rebuild. Worth recording plainly
+because the honest tally in this file runs the other way: this is the
+eighth mechanism written down in the `chan-io-44.1` chase and the first
+that survived contact.
+
+**And it was found by reading the log rather than the code.** Three
+rounds went into `41.6` (a directory) and `41.8` (a failed symlink) on
+the strength of "41.7 is skipped on `specialfiles`", which was read off
+the constraint line. The `---- chan-io-41.7 start` in the log had been
+there the whole time. The rule to carry: **a constraint says what a test
+needs; only the log says whether it ran.**
+
+**Two libap bugs in `_buf.c` now, found from opposite ends**, and both
+were a rendezvous with no partner:
+
+1. the listener's child killed the parent's timer through an inherited
+   `atexit` handler, so every blocking `select()` needing a timeout
+   waited for ever;
+2. a recycled `Muxbuf` slot inherited `roomwait`/`datawait`, so the
+   descriptor that took it over waited on a process that had died
+   before the slot was freed.
+
+**What to run next, and nothing is known about any of it.**
+`chanio.test` has never run past `chan-io-44.1` in this project, so the
+whole-file run is the first measurement of everything after it:
+
+```
+tcltest .../tcl-runall.tcl -singleproc 1 -file chanio.test -verbose t
+tcltest .../tcl-runall.tcl
+```
+
+The second is the whole suite with `chanio.test` and `io.test` both
+unskipped, and `ioCmd`, `ioTrans`, `iogt` and `socket.test` are four
+files **no run has ever reached**. Expect the failure count to rise as
+they are measured for the first time; that is the "newly measured, not
+newly broken" case, and it is the fourth time this file has had to say
+so.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
