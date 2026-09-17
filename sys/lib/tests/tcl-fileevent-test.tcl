@@ -688,5 +688,99 @@ if {[catch {
     catch {file delete $holdpath}
 }
 
+puts "\n--- 10. THE SAME RAMP, BUT EACH HELD DESCRIPTOR IS BUFFERED ---"
+# WHY SECTION 9 PASSING DOES NOT CLEAR THE ACCUMULATION. With the
+# fd_set widened, section 9 passes EVERY step to 140 held -- and
+# chan-io-44.1 still hangs in the suite. So the descriptor NUMBER was a
+# real bug and is not this one, and the thing that accumulates over
+# forty-three sections of chanio.test is something section 9 cannot
+# reach.
+#
+# THE DIFFERENCE IS ONE WORD: section 9 HOLDS descriptors and never
+# SELECTS on them. That matters here more than on any other system,
+# because select() on Plan 9 is not a system call -- ap/plan9/_buf.c
+# forks a COPY PROCESS per descriptor (`_startbuf`) which reads into a
+# slot of a shared segment, and select answers from `b->n > 0 || b->eof`
+# rather than from the kernel. So a descriptor that is merely open costs
+# a number; a descriptor that has been named to select costs a Muxbuf
+# slot (16 KB of shared segment), a process, and an entry in a table of
+# OPEN_MAX slots that `_startbuf` linear-scans for a free one.
+#
+# Every channel chanio.test drives through a fileevent pays that, and
+# nothing in section 9 pays it at all. This section pays it: each held
+# channel is a |cat -u pipe with a readable fileevent registered and an
+# `update` to make the notifier put it in a real select set, so libap
+# buffers it and forks its copy process. Nothing is ever written to
+# these pipes, so each copy process sits blocked in its first _READ --
+# which is the steady state of an idle registered channel.
+#
+# WHAT EACH OUTCOME MEANS, written down before the run so the result
+# cannot be read to taste:
+#
+#   every step passes  -> buffered descriptors are not the accumulation
+#                         either, and the bisect (`-match 'chan-io-4*'`,
+#                         then wider) is the way to name the range.
+#                         That is a real result and ends this line.
+#   a step breaks      -> the count where it breaks is the number of
+#                         BUFFERED descriptors the process can carry,
+#                         and _buf.c's slot table and copy processes are
+#                         where to look. Note the count is not a
+#                         descriptor number -- section 9 had to learn
+#                         that the hard way -- so it is reported as
+#                         itself and nothing is inferred from it.
+#
+# It is cheap to be wrong here and expensive to guess: this is one more
+# section in a run that was happening anyway, and it is independent of
+# the bisect, which should be run in the same round.
+proc holdbuffered {} {
+    # A pipe, registered and serviced once, so libap has really
+    # buffered it. The handler is never expected to fire -- nothing is
+    # written -- so it only has to exist.
+    if {[catch {open "|[list cat -u]" r+} c]} {
+	return ""
+    }
+    chan configure $c -blocking 0
+    chan event $c readable [list apply {{ch} {
+	catch {chan read $ch}
+    }} $c]
+    update
+    return $c
+}
+
+set bheld {}
+set bprev 0
+set before10 $failures
+foreach n {0 4 8 16 24 32 40} {
+    set short 0
+    while {[llength $bheld] < $n} {
+	set c [holdbuffered]
+	if {$c eq ""} {
+	    note "could only buffer [llength $bheld] descriptors"
+	    set short 1
+	    break
+	}
+	lappend bheld $c
+    }
+    at "[llength $bheld] BUFFERED descriptors held, running 44.1"
+    set got [run441]
+    ok [expr {$got eq "text"}] "44.1 with [llength $bheld] buffered (got '$got')"
+    if {$got ne "text"} {
+	note "IT BROKE BETWEEN $bprev AND [llength $bheld] BUFFERED."
+	note "that is a COUNT OF COPY PROCESSES AND MUXBUF SLOTS, not a"
+	note "descriptor number -- do not compare it against 96 or 128."
+	note "_buf.c's _startbuf slot table and _closebuf are where to"
+	note "look, and select-test.c is where to reproduce it in C."
+	break
+    }
+    set bprev [llength $bheld]
+    if {$short} break
+}
+foreach c $bheld { catch {chan close $c} }
+if {$failures == $before10} {
+    note "every buffered step passed too, so the accumulation is"
+    note "neither the descriptor number nor the buffered count, and"
+    note "the bisect is what names it: -match 'chan-io-4*'."
+}
+
 puts "\n$failures failure(s)"
 exit $failures

@@ -6902,6 +6902,70 @@ have printed and look for it.* A `note` is not a result. If a section
 can decline to run, it must be impossible to read the output without
 seeing that it did.
 
+#### The fd_set was a real bug and was NOT the chan-io-44.1 hang
+
+**`select-test` reports 0 failures with every section running**,
+including the runtime probe that used to skip itself: `note highest
+descriptor reached: 255 (wanted 255)` followed by `PASS a high
+descriptor with data is reported readable`. So descriptor 255 -- the
+number that used to read back as **-1** out of `Muxbuf.fd` -- is now
+selected on and reported, measured rather than inferred.
+
+**And `chanio.test` still freezes at `chan-io-44.1`.** The
+`-singleproc 1 -verbose t` run names it again, with `41.8` (the `file
+link -symbolic` ENOSYS) failing and returning as before.
+
+**So the ramp reproduced a DIFFERENT hang from the one in the suite,
+and the two were run together.** Section 9 broke between 120 and 126
+descriptors held, which straddles 128 exactly, and it passes every step
+to 140 now -- that is a genuine confirmation of a genuine fix, and it
+was never evidence about `chanio.test`. The prediction written for it
+said so in as many words: *"the ramp says **a** process at that depth
+hangs 44.1, not that the suite's process is at that depth"*. The hedge
+was right and the temptation to read the green ramp as the suite's
+answer was exactly what it was written against.
+
+**What the ramp cannot reach is one word: it HOLDS descriptors and
+never SELECTS on them.** That is a bigger difference here than on any
+other system. `select()` is `ap/plan9/_buf.c` and forks a **copy
+process** per descriptor, so a descriptor that is merely open costs a
+number, while a descriptor that has been named to `select` costs a
+`Muxbuf` slot -- 16 KB of the shared segment -- a process, and an entry
+in a table of `OPEN_MAX` slots that `_startbuf` linear-scans for a free
+one. Every channel `chanio.test` drives through a fileevent pays that,
+and nothing in section 9 pays it at all.
+
+**Section 10 of `tcl-fileevent-test.tcl` pays it**: the same ramp, but
+each held channel is a `|cat -u` pipe with a readable fileevent
+registered and an `update` to make the notifier put it in a real select
+set, so libap buffers it and forks its copy process. Nothing is written
+to them, so each copy process sits blocked in its first `_READ`, which
+is the steady state of an idle registered channel. It climbs
+`0 4 8 16 24 32 40` and passes every step on a Linux tclsh.
+
+**Both outcomes are written into the script before the run**, because
+this is the third ramp in a row whose verdict was the thing most likely
+to be got wrong: every step passing means buffered descriptors are not
+the accumulation either and **that ends this line of attack**; a break
+names a count of copy processes and Muxbuf slots, and the script says
+outright that a count is **not** a descriptor number and must not be
+compared against 96 or 128 -- which is precisely the arithmetic mistake
+section 9's own verdict made once already.
+
+**Run the bisect in the same round, because it is independent and needs
+no rebuild:**
+
+```
+tcltest .../tcl-runall.tcl -singleproc 1 -file chanio.test -verbose t -match 'chan-io-4*'
+```
+
+`-match 'chan-io-44.*'` already passes with nothing before it, so if
+`'chan-io-4*'` hangs the accumulation is inside the `4x` block and the
+range is forty tests rather than forty-three sections; if it passes,
+widen (`'chan-io-[23]* chan-io-4*'`). **Quote it for rc** -- `{}` is a
+brace block there, not quoting, and that mistake has already cost one
+round.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
