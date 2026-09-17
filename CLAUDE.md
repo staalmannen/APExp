@@ -6536,6 +6536,47 @@ else in the process, the difference is tcltest's own environment rather
 than the suite's history, and the standalone reproducer is what to
 compare against.
 
+#### -match 44 PASSES, so it really is accumulation
+
+```
+Running tests that match:  chan-io-44.*
+---- chan-io-44.1 start ... ---- chan-io-44.5 start
+all.tcl:  Total 779  Passed 5  Skipped 774  Failed 0
+tcl-runall: every file ran, now entering exit (code 0)
+```
+
+**44.1 through 44.5 all run and all pass with nothing before them.**
+Between that and section 6 of `tcl-fileevent-test.tcl` -- which is 44.1
+character for character and also passes -- the test itself is now
+excluded twice over. What hangs it is the state forty-three sections of
+`chanio.test` leave behind.
+
+**The blind bisect would be three or four more runs** (`'chan-io-4*'`,
+then `'chan-io-[34]*'`, ...), and each one only halves a range. So the
+next run asks *what* accumulates instead, and the first suspect is the
+**descriptor number**, because there is a measured cliff at 96 and
+nothing in this project had ever crossed it -- see the section below.
+
+**Section 9 of `tcl-fileevent-test.tcl` is a ramp, not one shot.** It
+holds n descriptors open, runs 44.1, reports, releases them and climbs:
+0, 40, 80, 88, 92, 96, 104. Each step prints an `at:` marker *before* it
+runs, so if one never returns the last line names the threshold -- and
+the script says in its own output which way to read it: a break
+straddling 96 is the `fd_set`, and a break anywhere else says the
+descriptor number was the wrong suspect and the accumulation is
+something else. **Either answer is worth the run**, which is the test
+this file keeps asking for.
+
+A crash rather than a hang is no surprise there and is equally
+informative: Tcl believes an `fd_set` holds 256 (see below), so its own
+`FD_SET` on a high descriptor writes past the end of the struct before
+libap is reached at all.
+
+It is the **last** section in the file, because everything above it
+returns and this is the only one written expecting that a case may not
+-- the ordering rule this file has already paid for once. All seven
+steps pass on a Linux tclsh, where `FD_SETSIZE` is 1024.
+
 #### The system gives out descriptors select() cannot be asked about
 
 Found by reading `_buf.c` and its headers while the above was waiting on
