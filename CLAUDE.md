@@ -7059,6 +7059,52 @@ comment reads *"This test only works if your umask is 2, like
 ouster's."* It carries a `umask` constraint, which is true here, so it
 runs and fails on the umask rather than on anything in libap.
 
+#### 43.2 is innocent, so halve rather than walk backwards
+
+```
+Running tests that match:  chan-io-43.2 chan-io-44.1
+---- chan-io-43.2 start
+---- chan-io-44.1 start
+all.tcl:  Total 779  Passed 2  Skipped 777  Failed 0
+```
+
+**Both run, both pass, no freeze.** So the descriptor-reuse race written
+up above is not armed by 43.2 alone -- the eighth plausible mechanism in
+this file and the seventh to be refuted by one run. The race in
+`_closebuf` is still real on its own terms (it kills up to ten times and
+does not wait, and the stale copy process re-checks the fd **number**),
+but it is not what 44.1 is waiting for, and it is not worth fixing on
+the strength of a guess.
+
+**Walking backwards one group at a time would cost five runs; halving
+costs two.** The range before 44.1 is about thirty-four tests -- `4.*`
+five, `40.*` sixteen, `41.*` eight, `42.*` three, `43.*` two -- so:
+
+```
+A   -match 'chan-io-4.* chan-io-40.* chan-io-44.*'
+      freeze -> B1  -match 'chan-io-40.* chan-io-44.*'
+                      freeze -> it is 40.*, split 40.1..40.8 / 40.10..40.16
+                      pass   -> it is 4.*, five tests
+      pass   -> B2  -match 'chan-io-41.* chan-io-44.*'
+                      freeze -> it is 41.*, and 41.6 is the standout: it
+                                selects on a DIRECTORY
+                      pass   -> B3  -match 'chan-io-42.* chan-io-43.* chan-io-44.*'
+```
+
+Note `chan-io-4.*` matches `4.1`..`4.5` and **not** `44.1`: the dot is a
+literal in a glob, so the group needs naming separately. That is the
+whole reason `-match 'chan-io-4*'` caught everything.
+
+**IF BOTH HALVES PASS AND THE WHOLE STILL FREEZES, THAT IS THE ANSWER
+AND NOT A FAILED BISECT.** It means the thing is *cumulative* rather
+than one test, and the count is what matters. This file has met exactly
+that once before and misread it for a round: `tk-runall.tcl -file
+'[a-m]*.test'` and `'[n-z]*.test'` both ran clean while the whole suite
+crashed, and the window-table leak was the answer. So a bisect that
+narrows to nothing is evidence, and the next move then is a prefix ramp
+-- keep 44.1 fixed and add groups until it breaks -- rather than a
+narrower `-match`.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
