@@ -7527,6 +7527,123 @@ builds `| $shell $file $childargv` (`tcltest.tcl:2940`) -- so it is not
 an approximation of what the suite does, it is the same thing with the
 pipe removed.
 
+#### ps names it: TWENTY-FIVE leftover processes, every one blocked in open()
+
+**The child finishes and the harness does not.** The first rung of the
+ladder was run and it is unambiguous:
+
+```
+tcltest .../tests/chanio.test -verbose t                    finishes
+tcltest .../tcl-runall.tcl -file chanio.test -verbose t     freezes at 73.1
+```
+
+The second is the same file in a **child** with its stdout on a pipe.
+So the test file itself completes, and what does not complete is the
+pair: child exits, parent never sees end of file.
+
+**And `ps | grep -v Pread` during the freeze names the holder.** The
+useful part of it is one shape repeated twenty-five times:
+
+```
+glenda 1785 0:00 0:00  7264K Open      tcltest
+glenda 1791 0:00 0:00  7924K Open      tcltest
+...                            (25 of them, 7264K..9496K)
+glenda 2335 0:00 0:00     0K Wakeme    closeproc
+glenda 2407 0:00 0:00     0K Queueing  closeproc
+```
+
+Four things to read out of that, and only the last is a guess:
+
+- **There is no `cat` and no `rc` left over.** The test file's
+  `|cat -u` children and its `exec ... &` children have all gone. So
+  the "a background child inherited descriptor 1" theory written in the
+  section above is **refuted**: the leftovers are `tcltest` itself.
+- **Twenty-five processes of 7-9.5 MB are forked copies of the child**,
+  and the sizes climb with the pid, which is the heap growing through
+  the run. Nothing execs -- an exec would have renamed them.
+- **The harness parent is not in the listing**, because it is in
+  `Pread`, which is what `grep -v` removed: blocked in its `gets` on
+  the pipe, exactly as predicted.
+- **`Open` is a psstate, not a scheduler state.** Plan 9 sets
+  `up->psstate` for the duration of a syscall and `ps` prints it in
+  preference to the scheduler state, so these twenty-five are blocked
+  **inside an `open()`** -- and they will still print `Open` if the
+  thing they are blocked on is a qlock. The two kernel `closeproc`
+  procs, one of them `Queueing`, are the kernel's own asynchronous
+  channel-close helpers and are consistent with a pile-up.
+
+**So the mechanism is: leftover forked processes hold a copy of the
+child's descriptor 1.** A Plan 9 pipe reports end of file only when
+*every* copy of the write end is shut, which is the `listenproc` shape
+for the third time in this file -- and it explains both rows of the
+ladder at once. Standalone, stdout is the console and nobody is waiting
+for EOF, so the same leftovers cost nothing and the run "finishes".
+
+**Which forked processes?** libap forks in exactly two places here, and
+both close what they do not need (checked above, and unchanged):
+`_timerproc` closes every descriptor, and `_copyproc` closes every
+descriptor but its own. But **a copy process that is blocked in `open()`
+has not reached that loop yet** -- and there is one `open()` on the way
+to everything in libap, because `kill()` is implemented as one:
+
+```c
+/* ap/signal/kill.c */
+sprintf(pname, fmt, pid);		/* "/proc/%d/note" */
+f = open(pname, O_WRONLY);
+```
+
+and `_closebuf` calls it in a loop:
+
+```c
+for(i=0; i<10 && kill(b->copypid, SIGKILL)==0; i++)
+	_SLEEP(1);
+```
+
+so **every channel close in the file is up to ten opens of a dying
+process's note file**, and `chanio.test` closes hundreds of channels.
+`kill(pid, 0)` opens it too -- the `sig == 0` arm skips the *write*, not
+the open.
+
+**That is the ninth mechanism written down in this chase and the record
+for these is one in eight, so it is labelled and not acted on.** Three
+measurements settle it, all cheap, none needing a rebuild, and the
+first two have to be taken *while it is frozen*:
+
+1. **`acid <pid>` then `lstk()`** on one of the stuck processes. This is
+   not the interactive-acid trap the Tk notes warn about -- `tcltest` is
+   not a graphical program, so nothing fights it for the rio window --
+   and it names the blocked function outright instead of by inference.
+   If acid itself hangs attaching, that is an answer too: the target's
+   debug qlock is what is jammed.
+2. **`cat /proc/<pid>/fd`** on two or three of them. It prints the
+   working directory and then one line per descriptor with its path, so
+   it says directly whether these processes hold the pipe -- which is
+   the whole claim above.
+3. **Kill just the leftovers and watch the parent.** If the harness
+   immediately prints its summary, the freeze *is* the held write end
+   and nothing else:
+
+```
+for(i in `{ps | awk '$6=="Open" && $7=="tcltest" {print $2}'})
+	echo kill > /proc/$i/ctl
+```
+
+   Do not use `slay tcltest`: it would kill the parent too, and a
+   harness that dies gives the shell prompt back exactly as one that
+   finishes does -- the discriminator this file has already been caught
+   by four times.
+
+The remaining rung of the ladder is still worth one command, since it
+needs nothing frozen and no `/proc`:
+
+```
+tcltest .../tests/chanio.test -verbose t | cat
+```
+
+If that freezes, the pipe alone reproduces it with no tcltest parent at
+all, and the reproducer is two processes instead of a hundred and
+sixty-seven files.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
