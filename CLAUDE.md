@@ -444,13 +444,14 @@ or a constraint that fails on Linux too). The port's own share is
 **Tcl's suite**: not yet complete. Open, in order of what the next run
 should touch:
 
-- **The suite spins in `fCmd.test`**, and the loop is upstream's own
-  `while {[catch {file delete -force tfa}]} {}` in `fCmd-20.2`'s
-  cleanup. The bug under it is that deleting a directory fails with the
-  Plan 9 errstr `invalid operation`, which is in no table in
-  `_errno.c`, so Tcl reports `POSIX {unknown error}`.
-  `sys/lib/tests/rmdir-test.c` is the probe: it walks `fCmd-20.1` step
-  by step and prints what the system says for each.
+- **The `fCmd.test` spin is diagnosed and fixed, not yet confirmed.**
+  Plan 9 says `invalid operation` when a non-empty directory cannot be
+  removed; that is in no table in `_errno.c`, so `rmdir` reported
+  `EPLAN9` and Tcl's `file delete -force` never recursed -- leaving a
+  directory that upstream's own unbounded `while {[catch ...]} {}`
+  cleanup then spun on. `rmdir()` now looks at the directory rather
+  than guessing at the string, and reports `ENOTEMPTY`.
+  `sys/lib/tests/rmdir-test.c` measures it.
 - **CONFIRMED and closed**: `zlib.test` passes end to end, 73 tests,
   and `dup-fdinfo-test` reports 0 failures --
   `fcntl(F_DUPFD)` chose its descriptor by scanning `_fdinfo`, which
@@ -473,6 +474,11 @@ should touch:
   all wants a probe first.
 - `binary-53.25`/`53.26`: a double one ulp past the float range must
   round to infinity.
+
+**Smaller open items**: `unlink()` of a directory reports `EPLAN9`
+where POSIX allows EPERM or EISDIR; and over a hundred leaked
+`listenproc` processes accumulate across runs, since nothing records the
+listener's pid for `close()` to kill.
 
 **Open hazards recorded but not measured**: the lost wakeup in
 `select()`'s rendezvous (a copy process reaching EOF before the parent
