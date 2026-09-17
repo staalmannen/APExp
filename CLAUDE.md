@@ -443,18 +443,17 @@ or a constraint that fails on Linux too). The port's own share is
 **Tcl's suite**: not yet complete. Open, in order of what the next run
 should touch:
 
-- **`chan-io-73.1` freezing the harness is diagnosed and fixed, not yet
-  confirmed.** `acid`'s `lstk()` named the twenty-five leftovers as
-  `listenproc` children blocked in `open("/net/tcp/n/listen")`, holding
-  a copy of the child's descriptor 1 so the parent never saw EOF. The
-  listener now closes every inherited descriptor but the two it needs.
-  The run to confirm it, and what to expect from `ps` afterwards, are at
-  the end of `docs/notes/tcl-suite.md`.
-- **The 20 `chanio.test` failure names have never been read.** One
-  command, no rebuild:
-  `grep '^==== ' /tmp/chanio.out | grep ' FAILED$'`.
-- **`ioCmd`, `ioTrans`, `iogt` and `socket.test` have never been reached
-  by any run.** Nothing is known about them.
+- **The run now reaches `zlib.test`, the 167th file of 167**, and
+  freezes there in `zlib-8.3` -- a `socket -server` whose accept script
+  writes 80 KB non-blocking and closes at once, read back through
+  `zlib push gunzip`. `tcltest .../tcl-runall.tcl -file zlib.test
+  -verbose t` is a reproducer of minutes. **A listener blocked in
+  `open()` is normal now**; the process to look at is the one that is
+  neither that nor the timer proc.
+- **The whole-suite log has never been read.** About 185 failures, the
+  first such number this project has had. The per-file table is one
+  command and is the thing to read first -- see the end of
+  `docs/notes/tcl-suite.md`.
 - `chan-io-6.4x` cluster: `-buffersize 16` with `testchannel
   inputbuffered` reporting 0. The oldest open item here.
 - `file link -symbolic` is ENOSYS; whether `symlink()` should exist at

@@ -2927,3 +2927,91 @@ That is the next change if it matters, and **whether it matters is
 readable off the same `ps`** -- which is why the prediction says to look.
 If the freeze does *not* clear, the descriptors were not the whole of it
 and the leftover processes are, and that is where to go.
+
+#### CONFIRMED, and the run reaches the 167th file of 167
+
+**`chanio.test` passes through the harness now**, multi-process and all,
+where it froze at `chan-io-73.1` before. The stack from the new freeze
+proves the fix is in the build without a `git merge-base`: the frames
+read `listen.c:159` and `listen.c:256`, which are the line numbers *after*
+the comment this change added -- they were 135 and 232 before it.
+
+**And the whole suite now runs to `zlib.test`, which is the last file
+alphabetically of the 167.** From twelve files, to thirty-two, to
+sixty-six, to all of them. Every one of `ioCmd`, `ioTrans`, `iogt`,
+`socket.test` and `io.test` has been measured for the first time on the
+way past. `grep -c FAILED` halved gives about **185** failing tests,
+which is the first whole-suite number this project has ever had, and it
+is a floor: `zlib.test`'s own tail is missing.
+
+**The freeze is `zlib-8.3`, and the stack names it without a second
+run.** `lstk()` gives `Tcl_FSEvalFileEx` with `numBytes=0x99f6` and
+`TclEvalEx` with `line=0xe5`:
+
+```
+39414 bytes  ->  zlib.test, exactly, of the 167
+line 229     ->  zlib-8.3 {zlib transformation and fileevent}
+```
+
+which opens
+
+```tcl
+set srv [socket -myaddr localhost -server {apply {{c a p} {
+    fconfigure $c -translation binary -buffering none -blocking 0
+    puts -nonewline $c [zlib gzip [string repeat a 81920]]
+    close $c
+}}} 0]
+```
+
+**A byte count and a line number in a backtrace name a test file
+outright**, which is worth remembering: `wc -c` over the test directory
+has exactly one match at 39414, and it cost one command rather than a
+run.
+
+**`localhost` is not the difference**: `socket.test` uses that name 132
+times and the run got past it. What is unusual about `zlib-8.3` is the
+*shape* -- an accept script that writes 80 KB non-blocking and closes at
+once, read back through `zlib push gunzip` and `fcopy`, with the server
+and the client in the same process.
+
+**AND THE LISTENER BLOCKED IN `open()` IS NOW NORMAL.** That is exactly
+what a Plan 9 listener does while no call has arrived, and `zlib-8.3` has
+a live `socket -server` at the moment of the freeze, so one of them is
+*expected*. It was pathological last round because there were
+twenty-five of them, left over from servers long closed, holding
+descriptors. Do not spend another `acid` on it.
+
+The two processes visible in that `ps` are both libap's own helper forks
+and both are healthy:
+
+| | |
+|---|---|
+| `Open` | the listener, `listen.c:159`, waiting for a call |
+| `Sleep` | almost certainly the **timer process**, `_buf.c:607`, `_SLEEP(mux->waittime)` -- a fork, hence the near-identical size |
+
+so the screenshot does not contain the blocked process at all; it was cut
+off above. **The next `ps` needs to be unfiltered and whole.**
+
+**The round, and it is small.** `zlib.test` alone is a reproducer of
+minutes rather than hours:
+
+```
+tcltest .../tcl-runall.tcl -file zlib.test -verbose t
+```
+
+Predicted last line `---- zlib-8.3 start`. While it is frozen, `ps` in
+full, and `acid` on the `tcltest` that is **neither** the listener nor
+the timer -- that is the one with something to say.
+
+**And read the log that already exists**, which needs nothing frozen and
+is the first whole-suite accounting:
+
+```sh
+tail -40 /tmp/tcl-all.out
+grep '^==== ' /tmp/tcl-all.out | grep ' FAILED$' |
+	sed 's/^==== //; s/-[0-9].*//' | sort | uniq -c | sort -rn
+```
+
+The second is the per-file table. **Read that before reading 185 as a
+number**: one file dominating a count and saying nothing about the tree
+has happened twice already here, `http11`'s 86 and `testobjconfig`'s 215.
