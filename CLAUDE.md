@@ -184,7 +184,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
-`socket-server-test.c` and `stdio-test.c`. The twenty-five `tk-*.tcl` scripts there are Tcl, run
+`socket-server-test.c`, `dup-fdinfo-test.c` and `stdio-test.c`. The twenty-five `tk-*.tcl` scripts there are Tcl, run
 with `wish` -- except `tk-menubar-test.tcl`, which needs `tktest` and
 skips itself under `wish`, and `tk-transient-test.tcl`, whose last
 section alone does; see `docs/notes/tk-plan9.md`. `tk-runall.tcl` is the harness for
@@ -443,18 +443,22 @@ or a constraint that fails on Linux too). The port's own share is
 **Tcl's suite**: not yet complete. Open, in order of what the next run
 should touch:
 
-- **`chan-io-73.1` freezing the harness is diagnosed and fixed, not yet
-  confirmed.** `acid`'s `lstk()` named the twenty-five leftovers as
-  `listenproc` children blocked in `open("/net/tcp/n/listen")`, holding
-  a copy of the child's descriptor 1 so the parent never saw EOF. The
-  listener now closes every inherited descriptor but the two it needs.
-  The run to confirm it, and what to expect from `ps` afterwards, are at
-  the end of `docs/notes/tcl-suite.md`.
-- **The 20 `chanio.test` failure names have never been read.** One
-  command, no rebuild:
-  `grep '^==== ' /tmp/chanio.out | grep ' FAILED$'`.
-- **`ioCmd`, `ioTrans`, `iogt` and `socket.test` have never been reached
-  by any run.** Nothing is known about them.
+- **The `zlib-9.2` freeze is diagnosed and fixed, not yet confirmed**:
+  `fcntl(F_DUPFD)` chose its descriptor by scanning `_fdinfo`, which
+  does not know about descriptors libap opened with the raw `_OPEN` --
+  so `dup()` closed `/dev/bintime` out from under `_NSEC` and every
+  later `gettimeofday()` blocked. The kernel picks the number now.
+  Covered by `sys/lib/tests/dup-fdinfo-test.c`.
+- **`file copy`/`file rename` of a directory faulted every time**:
+  `fts_alloc` never allocated `fts_statp`, because two `if` bodies were
+  commented out and an `if` with no body swallows the next statement.
+  Found by `acid` on a process sitting in state `Broken`. **Read the
+  state column for `Broken` after a suite run** -- a Plan 9 fault is
+  held, not killed, so it prints nothing.
+- **The whole-suite log has never been read.** About 185 failures, the
+  first such number this project has had. The per-file table is one
+  command and is the thing to read first -- see the end of
+  `docs/notes/tcl-suite.md`.
 - `chan-io-6.4x` cluster: `-buffersize 16` with `testchannel
   inputbuffered` reporting 0. The oldest open item here.
 - `file link -symbolic` is ENOSYS; whether `symlink()` should exist at

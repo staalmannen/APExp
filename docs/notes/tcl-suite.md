@@ -2927,3 +2927,322 @@ That is the next change if it matters, and **whether it matters is
 readable off the same `ps`** -- which is why the prediction says to look.
 If the freeze does *not* clear, the descriptors were not the whole of it
 and the leftover processes are, and that is where to go.
+
+#### CONFIRMED, and the run reaches the 167th file of 167
+
+**`chanio.test` passes through the harness now**, multi-process and all,
+where it froze at `chan-io-73.1` before. The stack from the new freeze
+proves the fix is in the build without a `git merge-base`: the frames
+read `listen.c:159` and `listen.c:256`, which are the line numbers *after*
+the comment this change added -- they were 135 and 232 before it.
+
+**And the whole suite now runs to `zlib.test`, which is the last file
+alphabetically of the 167.** From twelve files, to thirty-two, to
+sixty-six, to all of them. Every one of `ioCmd`, `ioTrans`, `iogt`,
+`socket.test` and `io.test` has been measured for the first time on the
+way past. `grep -c FAILED` halved gives about **185** failing tests,
+which is the first whole-suite number this project has ever had, and it
+is a floor: `zlib.test`'s own tail is missing.
+
+**The freeze is `zlib-8.3`, and the stack names it without a second
+run.** `lstk()` gives `Tcl_FSEvalFileEx` with `numBytes=0x99f6` and
+`TclEvalEx` with `line=0xe5`:
+
+```
+39414 bytes  ->  zlib.test, exactly, of the 167
+line 229     ->  zlib-8.3 {zlib transformation and fileevent}
+```
+
+which opens
+
+```tcl
+set srv [socket -myaddr localhost -server {apply {{c a p} {
+    fconfigure $c -translation binary -buffering none -blocking 0
+    puts -nonewline $c [zlib gzip [string repeat a 81920]]
+    close $c
+}}} 0]
+```
+
+**A byte count and a line number in a backtrace name a test file
+outright**, which is worth remembering: `wc -c` over the test directory
+has exactly one match at 39414, and it cost one command rather than a
+run.
+
+**`localhost` is not the difference**: `socket.test` uses that name 132
+times and the run got past it. What is unusual about `zlib-8.3` is the
+*shape* -- an accept script that writes 80 KB non-blocking and closes at
+once, read back through `zlib push gunzip` and `fcopy`, with the server
+and the client in the same process.
+
+**AND THE LISTENER BLOCKED IN `open()` IS NOW NORMAL.** That is exactly
+what a Plan 9 listener does while no call has arrived, and `zlib-8.3` has
+a live `socket -server` at the moment of the freeze, so one of them is
+*expected*. It was pathological last round because there were
+twenty-five of them, left over from servers long closed, holding
+descriptors. Do not spend another `acid` on it.
+
+The two processes visible in that `ps` are both libap's own helper forks
+and both are healthy:
+
+| | |
+|---|---|
+| `Open` | the listener, `listen.c:159`, waiting for a call |
+| `Sleep` | almost certainly the **timer process**, `_buf.c:607`, `_SLEEP(mux->waittime)` -- a fork, hence the near-identical size |
+
+so the screenshot does not contain the blocked process at all; it was cut
+off above. **The next `ps` needs to be unfiltered and whole.**
+
+**The round, and it is small.** `zlib.test` alone is a reproducer of
+minutes rather than hours:
+
+```
+tcltest .../tcl-runall.tcl -file zlib.test -verbose t
+```
+
+Predicted last line `---- zlib-8.3 start`. While it is frozen, `ps` in
+full, and `acid` on the `tcltest` that is **neither** the listener nor
+the timer -- that is the one with something to say.
+
+**And read the log that already exists**, which needs nothing frozen and
+is the first whole-suite accounting:
+
+```sh
+tail -40 /tmp/tcl-all.out
+grep '^==== ' /tmp/tcl-all.out | grep ' FAILED$' |
+	sed 's/^==== //; s/-[0-9].*//' | sort | uniq -c | sort -rn
+```
+
+The second is the per-file table. **Read that before reading 185 as a
+number**: one file dominating a count and saying nothing about the tree
+has happened twice already here, `http11`'s 86 and `testobjconfig`'s 215.
+
+#### It is zlib-9.2, and a forked child's backtrace dates from its FORK
+
+**`-file zlib.test -verbose t` stops at `---- zlib-9.2 start`**, not
+8.3. The prediction of 8.3 was wrong, and the reason is worth more than
+the correction:
+
+**`lstk()` on a process forked by `listenproc` shows where it was
+BORN, not where anything is now.** That listener's stack ends in
+`Tcl_OpenTcpServerEx` because that is the call that forked it, and it
+has been sitting in one `open()` ever since. `zlib-8.3` is where that
+particular listener was created; the process that forked it went on to
+run 8.4, 9.1 and 9.2 and froze there. A live listener's stack is a
+timestamp, not a position.
+
+**`zlib-9.2` ends in a BLOCKING `fcopy` with no timer at all:**
+
+```tcl
+after 1000 {set ::total timeout}
+vwait ::total			;# the accept script sets ::total -1
+after cancel {set ::total timeout}
+set total [fcopy $sin [set fout [open $file wb]]]
+```
+
+So the handshake completes -- the `vwait` returns, or the test would
+report `timeout` rather than hang -- and then the synchronous `fcopy`
+reads until end of file with nothing to interrupt it. A channel that
+never reports EOF is a permanent block, in a **`read()`**, so the frozen
+process is in `Pread` and `grep -v Pread` hides exactly the one worth
+looking at.
+
+**80 KB through a 16 KB `Muxbuf` is new here.** Every earlier reproducer
+was a line or two, or `/dev/zero` filling the buffer once before being
+closed. This is the first thing in the project to make `_copyproc` set
+`roomwait`, block, be woken by `_readbuf`, and go round again --
+repeatedly, under a select-driven reader. The lost wakeup already
+recorded as an unmeasured hazard lives on exactly that path. **Labelled
+as a hypothesis**; the two backtraces below settle it.
+
+**Which process to `acid`:**
+
+```
+ps | grep tcltest | grep -v Open
+```
+
+`Open` is the listeners, and there are now more than a hundred of them
+left over from every frozen run since 1785 -- see below. Of what is
+left, `Sleep` is the timer process (`_buf.c:607`) and the **newest pid**
+is the one running the test. If a `Rendez` tcltest appears beside it,
+that is the copy process, and the pair is the answer: reader waiting in
+`_RENDEZVOUS(&b->datawait)` while the copy process waits in
+`_RENDEZVOUS(&b->roomwait)` is a deadlock with both halves visible.
+
+**TWO PROCESSES ARE IN STATE `Broken`** -- 6185 and 6196, 5 MB each. A
+Plan 9 process is `Broken` because it **faulted** and was held rather
+than killed, so those are two crashes that no run ever reported. `acid
+6185` then `lstk()` prints the faulting stack, and it costs nothing:
+they are already dead and waiting.
+
+**And the leak is now measured rather than predicted.** The listener
+processes are not merely lingering, they are *accumulating across runs*:
+pid 1785 in this listing is the same 1785 from the previous round's
+screenshot, hours earlier. Over a hundred of them, each holding `nfd` --
+an announced TCP socket -- for a server that was closed long ago. The
+descriptor fix stopped them wedging the harness; nothing stops them
+existing. The change is to record the listener's pid in the `Rock` and
+have `close()` kill it, and this listing is the argument for doing it.
+
+#### The listener is waiting for accept()'s "OK" -- and 9597 is the one to read
+
+**"Acid the newest pid" was wrong advice**, and the ps says why: the
+listener is forked *by* the test process, so it always has the **higher**
+pid. The four `tcltest` processes of a frozen `zlib.test` run are
+
+```
+9588  5832K Pread   the harness parent, blocked on the child's pipe
+9597 23604K Pread   the test process          <- THIS ONE
+9603 23444K Sleep   the timer process, _buf.c:607
+9606 23588K Pread   a listener                <- the one acid'd
+```
+
+Size does not separate 9597 from 9606 either, both being forks of the
+same 23 MB image. **Read the stack, or read both.**
+
+**What 9606 says is still worth having.** It is not in `open(listen)`
+where an idle listener sits; it is at `listen.c:170`:
+
+```c
+write(pfd[1], nr->ctl, strlen(nr->ctl));	/* done */
+read(pfd[1], name, sizeof(name));		/* HERE */
+```
+
+-- the second half of the handover. It has taken a call, opened the
+connection, written the control file's name into the pipe, and is
+waiting for `accept()` to answer `"OK"` (`accept.c`, after
+`_sock_data` succeeds). **So a connection was delivered to the parent
+and the parent never completed the handshake**, and the listener will
+hold that connection open for ever.
+
+`noblock=0` and the frame being `_PREAD` rather than `_readbuf` also
+says the descriptor is neither buffered nor non-blocking, which is
+`read.c:29` -- worth knowing, because a *buffered* read blocks in
+`_RENDEZVOUS` and shows as `Rendez`, not `Pread`. **The state column
+already distinguishes those two waits.**
+
+**What 9597's stack decides.** Two readings are left and they want
+different fixes:
+
+- **inside `accept()`, at `read(fd, name, ...)`** -- then the two
+  processes are deadlocked over the same pipe, the parent waiting for a
+  name the listener has already written, and the question is who
+  swallowed it: a copy process forked by `select()` on that same
+  descriptor is the obvious candidate, and `_readbuf` is then not
+  returning what it holds.
+- **inside `fcopy`/`Tcl_Read` on `$sin`** -- then the accept completed,
+  the 80 KB data channel never reports end of file, and 9606 is a
+  *second* thing to explain rather than the same one.
+
+#### TWO BUGS, AND THE FREEZE IS THAT dup() PICKED A DESCRIPTOR IT DID NOT OWN
+
+**`acid 9597` ended it.** The test process is not in `fcopy` and not in
+`accept`. It is here:
+
+```
+_PREAD(a0=0x7)                 ap/syscall/_PREAD.s:6
+_NSEC()                        ap/plan9/9nsec.c:35
+gettimeofday                   ap/time/gettimeofday.c:13
+NativeGetTime / GetTime / Tcl_GetTime     tclUnixTime.c
+Tcl_AfterObjCmd(ms=0x3e8)      tclTimer.c:869
+```
+
+`ms=0x3e8` is **1000**, so the script is executing `zlib-9.2`'s
+`after 1000 {set ::total timeout}` -- past the client connect, before
+the `vwait`. It never reaches the event loop, which is why the listener
+in the other process is still holding a call nobody accepted, and why
+the 1000 ms timer that should have rescued the test never armed.
+
+**And it is blocked reading `/dev/bintime`.** That file cannot block.
+So descriptor 7 is not `/dev/bintime` any more:
+
+```c
+/* plan9/9nsec.c, and the static is the whole problem */
+static int fd = -1;
+if(fd < 0)
+    fd = _OPEN("/dev/bintime", OREAD|OCEXEC);
+_PREAD(fd, b, sizeof b, 0);
+```
+
+`_OPEN` is the **raw syscall**, so `_fdinfo[7]` never learns the
+descriptor exists -- and `fcntl(F_DUPFD)` chose its slot from that
+table:
+
+```c
+for(i = (arg>0)? arg : 0; i<OPEN_MAX; i++)
+    if(!(_fdinfo[i].flags&FD_ISOPEN))
+        break;
+ans = _DUP(fd, i);        /* SILENTLY CLOSES whatever is really there */
+```
+
+`dup()` *is* `fcntl(F_DUPFD, 0)`, and `listen()` opens with
+`nfd = dup(fd)`. **The listener's own frame reports `nfd=0x7`** -- the
+same descriptor `_NSEC` is reading, in the same frozen run. One
+descriptor, two owners, and the evidence for both halves was in the two
+backtraces already taken.
+
+Afterwards the parent closes `nfd`, something else takes 7, and every
+timestamp in the process reads a pipe or a socket. A read of those does
+not return.
+
+**The fix is that the KERNEL picks the descriptor.** `_DUP(fd, -1)`
+returns the lowest genuinely free one, which cannot collide with
+anything; POSIX wants the lowest free `>= arg`, so anything below `arg`
+is held and released afterwards. That closes the class rather than the
+instance: any raw-`_OPEN` descriptor anywhere in libap was exposed to
+this, and `F_DUPFD` was the only place APE chose a descriptor number
+out of its own table instead of the kernel's.
+
+Covered by `sys/lib/tests/dup-fdinfo-test.c` -- 0 failures on glibc,
+with `alarm()` round the case under test, because the failure mode is a
+read that never returns and a test that hangs reports nothing.
+
+#### The `Broken` pair: `file copy` of a directory faults, every time
+
+`acid 6185` on one of the two held faults:
+
+```
+_dirtostat            ap/plan9/dirtostat.c:14
+stat / lstat
+fts_stat(p=..., follow=0) ap/misc/fts.c:829   <- sbp=0x0
+fts_open                  ap/misc/fts.c:133
+TraverseUnixTree          tclUnixFCmd.c:1057
+TclpObjCopyDirectory / Tcl_FSCopyDirectory / CopyRenameOneFile
+```
+
+and `fts_alloc` says why in two lines:
+
+```c
+	if (!ISSET(FTS_NOSTAT))
+//		len += sizeof(struct stat) + ALIGNBYTES;
+	if ((p = malloc(len)) == NULL)
+		return (NULL);
+```
+
+**An `if` whose body is commented out swallows the next statement.** So
+`if (!ISSET(FTS_NOSTAT))` came to govern the `malloc` -- with
+FTS_NOSTAT set, `p` was never assigned at all -- and the second
+commented line made the other `if` govern the `memcpy` of the name.
+Either way `fts_statp` was never set and `memset` had left it **NULL**,
+so `fts_stat` handed NULL to `lstat` and `_dirtostat` wrote through it.
+`tclUnixFCmd.c` passes `FTS_PHYSICAL|FTS_NOCHDIR`, so the stat buffer
+really is required.
+
+**Why nobody had seen it: a Plan 9 process that faults is HELD, not
+killed.** The crash waits in `ps` as state `Broken` and prints nothing,
+so `file copy` and `file rename` of a directory have been faulting for
+as long as `fts.c` has been here and every run reported it as a plain
+test failure or not at all. **Read the state column for `Broken` after
+any suite run**; it is free evidence and it had been sitting there.
+
+**And the reason those lines were commented out rather than fixed is
+probably the macro above them**, which is upstream's:
+
+```c
+#define ALIGN(p) (((unsigned long int) (p) + ALIGNBYTES) & ~ALIGNBYTES)
+```
+
+`unsigned long` is **32 bits** on amd64 kencc, so that truncates every
+pointer and would have produced a `fts_statp` pointing at nothing --
+faulting differently rather than not at all. It is `uintptr_t` now.
+Commenting out the two lines turned a wrong pointer into a null one,
+which is the same bug wearing a quieter symptom.
