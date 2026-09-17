@@ -3015,3 +3015,70 @@ grep '^==== ' /tmp/tcl-all.out | grep ' FAILED$' |
 The second is the per-file table. **Read that before reading 185 as a
 number**: one file dominating a count and saying nothing about the tree
 has happened twice already here, `http11`'s 86 and `testobjconfig`'s 215.
+
+#### It is zlib-9.2, and a forked child's backtrace dates from its FORK
+
+**`-file zlib.test -verbose t` stops at `---- zlib-9.2 start`**, not
+8.3. The prediction of 8.3 was wrong, and the reason is worth more than
+the correction:
+
+**`lstk()` on a process forked by `listenproc` shows where it was
+BORN, not where anything is now.** That listener's stack ends in
+`Tcl_OpenTcpServerEx` because that is the call that forked it, and it
+has been sitting in one `open()` ever since. `zlib-8.3` is where that
+particular listener was created; the process that forked it went on to
+run 8.4, 9.1 and 9.2 and froze there. A live listener's stack is a
+timestamp, not a position.
+
+**`zlib-9.2` ends in a BLOCKING `fcopy` with no timer at all:**
+
+```tcl
+after 1000 {set ::total timeout}
+vwait ::total			;# the accept script sets ::total -1
+after cancel {set ::total timeout}
+set total [fcopy $sin [set fout [open $file wb]]]
+```
+
+So the handshake completes -- the `vwait` returns, or the test would
+report `timeout` rather than hang -- and then the synchronous `fcopy`
+reads until end of file with nothing to interrupt it. A channel that
+never reports EOF is a permanent block, in a **`read()`**, so the frozen
+process is in `Pread` and `grep -v Pread` hides exactly the one worth
+looking at.
+
+**80 KB through a 16 KB `Muxbuf` is new here.** Every earlier reproducer
+was a line or two, or `/dev/zero` filling the buffer once before being
+closed. This is the first thing in the project to make `_copyproc` set
+`roomwait`, block, be woken by `_readbuf`, and go round again --
+repeatedly, under a select-driven reader. The lost wakeup already
+recorded as an unmeasured hazard lives on exactly that path. **Labelled
+as a hypothesis**; the two backtraces below settle it.
+
+**Which process to `acid`:**
+
+```
+ps | grep tcltest | grep -v Open
+```
+
+`Open` is the listeners, and there are now more than a hundred of them
+left over from every frozen run since 1785 -- see below. Of what is
+left, `Sleep` is the timer process (`_buf.c:607`) and the **newest pid**
+is the one running the test. If a `Rendez` tcltest appears beside it,
+that is the copy process, and the pair is the answer: reader waiting in
+`_RENDEZVOUS(&b->datawait)` while the copy process waits in
+`_RENDEZVOUS(&b->roomwait)` is a deadlock with both halves visible.
+
+**TWO PROCESSES ARE IN STATE `Broken`** -- 6185 and 6196, 5 MB each. A
+Plan 9 process is `Broken` because it **faulted** and was held rather
+than killed, so those are two crashes that no run ever reported. `acid
+6185` then `lstk()` prints the faulting stack, and it costs nothing:
+they are already dead and waiting.
+
+**And the leak is now measured rather than predicted.** The listener
+processes are not merely lingering, they are *accumulating across runs*:
+pid 1785 in this listing is the same 1785 from the previous round's
+screenshot, hours earlier. Over a hundred of them, each holding `nfd` --
+an announced TCP socket -- for a server that was closed long ago. The
+descriptor fix stopped them wedging the harness; nothing stops them
+existing. The change is to record the listener's pid in the `Rock` and
+have `close()` kill it, and this listing is the argument for doing it.
