@@ -3295,3 +3295,66 @@ tcltest .../tcl-runall.tcl -file <that>.test -verbose t
 **`fCmd.test` is worth reading in the same log whatever happens**, since
 `file copy` and `file rename` of a directory stopped faulting this
 round and nothing has measured what they do now.
+
+#### The spin is fCmd-20.2's own cleanup, and the bug is that a delete fails
+
+`tail -20 /tmp/tcl-all.out` named it without any process hunting:
+
+```
+==== fCmd-20.1 TraverseUnixTree : failure opening a subdirectory FAILED
+---- Test cleanup failed:
+error deleting "tfa": invalid operation
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+```
+
+**Two things in that errorCode.** `invalid operation` is a Plan 9
+errstr, and `unknown error` is Tcl's rendering of an errno libap had no
+name for -- i.e. `EPLAN9`, which means the string is in no table in
+`_errno.c`. So `file delete -force` on a directory fails, and
+`fCmd-20.1` leaves `tfa` behind.
+
+**And the loop is upstream's, one test further on:**
+
+```tcl
+test fCmd-20.2 ... -cleanup {
+    while {[catch {file delete -force tfa}]} {}
+}
+```
+
+An unbounded retry with no limit and no delay. A delete that can never
+succeed spins there at full CPU writing nothing -- which is exactly the
+shape observed, and it is **the first spin in this project's Tcl work**.
+Nothing in libap can stop it; the fix has to be that the delete
+succeeds.
+
+**This is the third instance of "a fix that makes a process reach code
+it never reached before can expose anything on that path".** Before
+last round, `fCmd-20.1` *faulted* in `fts_stat` and the process was
+held as `Broken`; now `TraverseUnixTree` runs, gets a real answer, and
+the next test's cleanup discovers that the delete does not work. The
+`fts` fix is not wrong -- it moved a silent crash to a loud failure,
+which is the direction this file has preferred every time.
+
+`sys/lib/tests/rmdir-test.c` asks the machine which call fails and
+prints Plan 9's own errstr for each step of `fCmd-20.1` -- mkdir,
+chmod 0, rmdir at 0, chmod back, rmdir, rmdir the parent. 0 failures on
+glibc, where the interesting line is that `rmdir` of a 00000 directory
+**succeeds**: removing a directory is governed by the permissions of its
+*parent*, not its own. If Plan 9 disagrees, that is the bug and the
+probe says so in one line.
+
+**Finding a spinning process mechanically**, since a hundred-line `ps`
+defeats reading it by eye -- every leftover listener is `0:00 0:00`, so:
+
+```
+ps | awk '$7=="tcltest" && ($3!="0:00" || $4!="0:00")'
+```
+
+names the ones that have used any CPU at all. Two of those a few
+seconds apart is the comparison; `diff` of two saved listings is the
+same thing without the eye. Killing the leftovers first makes every
+later `ps` legible:
+
+```
+for(i in `{ps | awk '$6=="Open" && $7=="tcltest" {print $2}'}) echo kill > /proc/$i/ctl
+```
