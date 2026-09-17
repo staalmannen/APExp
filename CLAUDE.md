@@ -7172,6 +7172,115 @@ these has ended up being settled. If 11b passes and 11c passes but the
 suite still freezes on `41.6 + 44.1`, then it is the pair or the
 `tempdir` machinery around them, and `41.8 + 44.1` is the next `-match`.
 
+#### FOUND: a reused Muxbuf slot inherited a rendezvous nobody would answer
+
+**The two singles pass and the group freezes**, which is the cumulative
+case this file predicted one round earlier and is worth reading as the
+answer rather than a failed bisect:
+
+```
+-match 'chan-io-41.6 chan-io-44.1'   passes    (the directory)
+-match 'chan-io-41.8 chan-io-44.1'   passes    (the failed symlink)
+-match 'chan-io-41.*  chan-io-44.*'  FREEZES
+```
+
+Sections 11b and 11c reproduce both singles standalone and both pass, so
+neither is it.
+
+**41.7 IS THE ONE, AND IT HAD BEEN WRITTEN OFF AS SKIPPED.** The whole
+of section 11 was built on "five of the eight open nothing and 41.7 is
+skipped on `specialfiles`", which is three tests written off by reading
+a constraint line instead of the log. **tcltest prints `---- NAME start`
+at `tcltest.tcl:2070`, after the `Skipped` check returns at `:2032`**,
+so a skipped test never prints it -- and `chan-io-40.9` proves the rule
+in the same output, being in the file, `nonPortable` here, and absent
+from a run that counted exactly one skip and jumped 40.8 -> 40.10. In
+the freezing run **41.7 printed `start`**. It ran. It opened
+`/dev/zero`.
+
+**One line of the log I already had, read three rounds late.** The rule
+this file states about constraint lines -- *check the constraint before
+reading a failure* -- has a converse that was missing: **a constraint
+says what a test needs, not whether it ran, and the log says which.**
+
+#### /dev/zero is the one source that never ends and never pauses
+
+Every other descriptor anything here has selected on either **ends** (a
+directory, a plain file, a closed peer) or **stays silent** (a `|cat -u`
+pipe nobody writes to). `/dev/zero` does neither, and that is the whole
+difference: its copy process fills the 16 KB `Muxbuf` faster than
+anything drains it, so it reaches
+
+```c
+/* _copyproc, making sure there's room */
+b->roomwait = 1;
+unlock(&mux->lock);
+_RENDEZVOUS(&b->roomwait, 0);
+```
+
+41.7's `vwait` fired on the first fill long before that, the test
+returned, and `close $chan` sent `_closebuf` to SIGKILL the copy process
+**exactly where it was waiting**. And `_startbuf`'s slot reset was
+
+```c
+Found:
+	b->n = 0;
+	b->putnext = b->data;
+	b->getnext = b->data;
+	b->eof = 0;
+	b->fd = fd;		/* roomwait and datawait NOT cleared */
+```
+
+**`roomwait` and `datawait` are rendezvous flags, and the next
+descriptor into that slot inherited one.** Both are addresses handed to
+`_RENDEZVOUS`, so a stale flag is not a wrong answer but a **permanent
+wait**, in whichever process reads it first:
+
+| | |
+|---|---|
+| stale `roomwait` | `_readbuf` drains, sees it, clears it and rendezvouses to wake a copy process that no longer exists -- **the parent blocks for ever, inside `read()`** |
+| stale `datawait` | `_copyproc` reads, sees it, clears it and rendezvouses instead of waking the selecting parent -- **the copy process blocks for ever and `select()` is never woken** |
+
+`chan-io-44.1` is `chan puts $f2 text; chan flush $f2; vwait x`, and a
+`vwait` with no timer calls `select` with a NULL timeout. Either mode is
+a freeze with nothing to interrupt it.
+
+**The fix is two assignments**, in `_buf.c`'s `Found:`, with the reasoning
+beside them. The general rule it is an instance of: **when a struct is
+recycled, reset every field that means something, not the ones that
+happen to be about the data.** Four of six were reset and the two left
+out were the two that name a sleeping process.
+
+**Why nothing here had caught it.** Section 9's ramp holds descriptors
+without selecting on them; section 10's buffers forty of them but writes
+to none, so no buffer ever fills and `roomwait` is never set; `43.2`
+opens two `|cat -u` pipes and writes nothing. Every reproducer so far
+was silent by construction, and **the bug needs a source loud enough to
+fill 16 KB**. That is why eighteen `run441` calls in sections 9 and 10
+all passed while the suite froze.
+
+**Section 12 of `tcl-fileevent-test.tcl` is 41.7 then 44.1**, with
+`run441` as the control in front. The `after 200` in it is load-bearing
+rather than decoration: the copy process has to get from "first read
+delivered" to "buffer full, `roomwait` set" before the close, or the
+reproducer reproduces nothing. It is last in the file because it is the
+only case expected to freeze on an unfixed libap. 0 failures on a Linux
+tclsh, where there is no copy process and it passes trivially.
+
+**Prediction, and the order matters.** On the **current** binary,
+`-match 'chan-io-41.7 chan-io-44.1'` freezes and section 12b freezes --
+run both of those *before* rebuilding, because they are the confirmation
+and they cost nothing. After `mk install` (no `distclean` needed: no
+header, no struct layout, one file of `libap`) both pass, sections 1..11
+are unchanged, and `chanio.test` gets past 44.1 for the first time.
+What it reaches after that is unknown -- nothing has ever run beyond
+`chan-io-44.1` here.
+
+**If 12b passes on the unfixed binary**, the mechanism is wrong and the
+fix is still right on its own terms; the next thing to ask is which
+*other* test in `41.*` fills a buffer, since the group freeze is a fact
+whatever explains it.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the

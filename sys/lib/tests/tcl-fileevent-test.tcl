@@ -859,5 +859,69 @@ at "44.1 after the symbolic link attempt"
 set got [run441]
 ok [expr {$got eq "text"}] "44.1 after a symlink attempt (got '$got')"
 
+puts "\n--- 12. chan-io-41.7 (/dev/zero) THEN 44.1 ---"
+# **41.7 IS THE ONE, AND I HAD WRITTEN IT OFF AS SKIPPED.** Section 11
+# asked about 41.6 and 41.8 because those looked like the only two tests
+# in `chan-io-41.*` that open anything -- and both pass, singly, while
+# the group freezes. 41.7 was assumed skipped on its `specialfiles`
+# constraint.
+#
+# The log said otherwise and it cost nothing to read: tcltest prints
+# `---- NAME start` at tcltest.tcl:2070, AFTER the `Skipped` check
+# returns at :2032, so a skipped test never prints it. `chan-io-40.9`
+# proves the rule -- it is in the file, it is nonPortable here, and the
+# passing run jumps 40.8 -> 40.10 with exactly one skip counted. In the
+# freezing run **41.7 printed `start`**, so it ran, so `/dev/zero` was
+# opened and selected on.
+#
+# WHY THAT ONE DESCRIPTOR IS DIFFERENT FROM EVERY OTHER IN THIS FILE.
+# select() here is a copy process reading into a 16 KB `Muxbuf`, and
+# every other source used above either ends (a directory, a file) or
+# stays silent (a `|cat -u` pipe nobody writes to). **/dev/zero never
+# ends and never pauses**, so its copy process fills the buffer faster
+# than anything drains it, sets `roomwait = 1`, and blocks in
+# `_RENDEZVOUS(&b->roomwait, 0)`. The test's `vwait` has long since
+# fired on the first fill; `close $chan` then SIGKILLs the copy process
+# exactly where it is waiting, and `_startbuf`'s slot reset did not
+# clear `roomwait`. The next descriptor into that slot inherits a wait
+# whose other half died before the slot was freed.
+#
+# So this section is 41.7 followed by 44.1, with `run441` as the control
+# in front. The `after 200` is load-bearing rather than decoration: the
+# copy process has to get from "first read delivered" to "buffer full,
+# roomwait set" before the close, or the reproducer reproduces nothing.
+#
+# It is LAST because it is the only case here expected to freeze on an
+# unfixed libap, and a freeze costs everything after it -- the rule this
+# file has already paid for twice. On a fixed one it passes and the
+# totals print as usual.
+step "12a. run 44.1 with nothing before it (the control)"
+set got [run441]
+ok [expr {$got eq "text"}] "44.1 with nothing before it (got '$got')"
+
+step "12b. 41.7: select on /dev/zero, let it FILL, close, then run 44.1"
+set zero /dev/zero
+if {![file exists $zero]} {
+    note "no $zero here; nothing to ask"
+} else {
+    at "open $zero"
+    if {[catch {open $zero} zc]} {
+	note "could not open $zero ($zc); nothing to ask"
+    } else {
+	at "chan event readable on $zero"
+	chan event $zc readable [list set ::done readable]
+	at "waitfor (fires on the first fill)"
+	set got [waitfor 3000]
+	note "$zero reported '$got'"
+	at "after 200 -- let the copy process fill the buffer and BLOCK"
+	after 200
+	at "close $zero"
+	catch {chan close $zc}
+	at "44.1 after /dev/zero was selected on and closed"
+	set got [run441]
+	ok [expr {$got eq "text"}] "44.1 after /dev/zero (got '$got')"
+    }
+}
+
 puts "\n$failures failure(s)"
 exit $failures
