@@ -632,7 +632,16 @@ if {[catch {
 } else {
     set held {}
     set prev 0
-    foreach n {0 40 80 88 92 96 104} {
+    # 0..104 ALL PASSED ON THE VM, and that did not clear the
+    # descriptor number -- it only said the cliff is not at 96.
+    # select-test.c section 11 reported `FD_SETSIZE 96, fd_set holds
+    # 128` there: the width comes from stock APE's header in the
+    # architecture directory and the constant from this tree, so the
+    # struct really holds 128 and 104 was still inside it. The two
+    # numbers that matter are therefore 96 -- where _buf.c's own
+    # FD_ANYSET stops looking, hardcoded at three words -- and 128,
+    # where the struct itself ends. The ramp straddles both.
+    foreach n {0 40 80 88 92 96 104 120 126 130 140} {
 	while {[llength $held] < $n} {
 	    if {[catch {open $holdpath r} c]} {
 		note "could only hold [llength $held] descriptors ($c)"
@@ -645,13 +654,16 @@ if {[catch {
 	ok [expr {$got eq "text"}] "44.1 with $n held (got '$got')"
 	if {$got ne "text"} {
 	    note "IT BROKE BETWEEN $prev AND $n DESCRIPTORS HELD."
-	    if {$n > 96 || $prev >= 88} {
-		note "that straddles FD_SETSIZE (96), so the fd_set is"
-		note "the suspect: see select-test.c section 11."
+	    if {$prev < 96 && $n >= 96} {
+		note "that straddles 96, where _buf.c's FD_ANYSET stops"
+		note "looking -- it is three words wide by hand."
+	    } elseif {$prev < 128 && $n >= 128} {
+		note "that straddles 128, where the fd_set STRUCT ends"
+		note "on this machine: see select-test.c section 11."
 	    } else {
-		note "that is nowhere near FD_SETSIZE (96), so the"
-		note "descriptor NUMBER is the wrong suspect and what"
-		note "accumulates in chanio.test is something else."
+		note "that is neither 96 nor 128, so the descriptor"
+		note "NUMBER is the wrong suspect and what accumulates"
+		note "in chanio.test is something else."
 	    }
 	    break
 	}

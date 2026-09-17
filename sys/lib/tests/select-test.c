@@ -731,47 +731,130 @@ main(void)
 		int hifd, n;
 		char c;
 
+		unsigned char *raw;
+		size_t k;
+		int dirty;
+
 		printf("  note FD_SETSIZE %d, fd_set holds %d, OPEN_MAX %ld\n",
 			(int)FD_SETSIZE, (int)(sizeof(fd_set) * 8),
 			(long)sysconf(_SC_OPEN_MAX));
-		ok((int)(sizeof(fd_set) * 8) >= (int)FD_SETSIZE,
-			"fd_set is as wide as FD_SETSIZE claims");
+
 		/*
-		 * REPORTED, NOT ASSERTED. glibc has the same gap -- its
-		 * FD_SETSIZE is 1024 while RLIMIT_NOFILE is commonly far
-		 * higher -- so "every descriptor fits in an fd_set" is not
-		 * a library rule and a test must not claim it is. What is
-		 * different here is the runtime answer below: glibc's
-		 * fd_set really does hold FD_SETSIZE descriptors, so a
-		 * program that stays under the limit is safe, and this
-		 * one's does not.
+		 * WHICH HEADER SUPPLIED fd_set, and it is not a
+		 * rhetorical question: the first VM run reported
+		 * `FD_SETSIZE 96, fd_set holds 128`, which no file in
+		 * this tree can produce -- all three copies here are
+		 * `long fds_bits[3]` and `long` is 32 bits on amd64, so
+		 * 96. The width came from somewhere else.
+		 *
+		 * The host's stock APE keeps its own <sys/types.h> and
+		 * <sys/select.h> in the ARCHITECTURE directory, which
+		 * pcc searches first, and this tree has no sys/ there --
+		 * mount-include unions that directory rather than
+		 * replacing it, so stock's copies are still what a
+		 * compile sees. FD_SETSIZE came from this tree (96) and
+		 * the struct from stock (128), which is the worst of
+		 * both: every caller sizes its loops by one file and
+		 * indexes memory laid out by the other.
+		 *
+		 * _APEXP_FD_SET_T is defined beside the typedef in all
+		 * three of this tree's copies, so it answers the
+		 * question outright rather than by arithmetic --
+		 * limits-test.c's technique for float/stdarg/stdint.
 		 */
+#ifdef _APEXP_FD_SET_T
+		note("fd_set came from THIS TREE");
+#else
+		note("fd_set did NOT come from this tree (no"
+			" _APEXP_FD_SET_T)");
+		note("-- expected on glibc, and on Plan 9 it means stock");
+		note("APE's copy in the ARCHITECTURE directory won.");
+#endif
 		if((long)sysconf(_SC_OPEN_MAX) > (long)FD_SETSIZE)
 			note("the system gives out descriptors no fd_set can name");
+		ok((int)(sizeof(fd_set) * 8) >= (int)FD_SETSIZE,
+			"fd_set is as wide as FD_SETSIZE claims");
 
-		hifd = (int)FD_SETSIZE + 4;
+		/*
+		 * FD_ZERO MUST CLEAR THE WHOLE STRUCT, and with the
+		 * width coming from one header and the macros possibly
+		 * from another it is exactly what can come apart: this
+		 * tree's FD_ZERO is three assignments by name, so on a
+		 * four-word struct it leaves the last word holding
+		 * whatever the stack held. A select would then act on
+		 * descriptors nobody asked about, which is not a
+		 * missed event but an invented one.
+		 *
+		 * Filled with 0xff first, so a zeroed word cannot pass
+		 * by luck.
+		 */
+		memset(&u, 0xff, sizeof u);
+		FD_ZERO(&u.s);
+		raw = (unsigned char *)&u.s;
+		dirty = 0;
+		for(k = 0; k < sizeof(fd_set); k++)
+			if(raw[k] != 0)
+				dirty = 1;
+		ok(!dirty, "FD_ZERO clears every byte of an fd_set");
+		if(dirty)
+			note("so the macros and the struct are from different"
+				" headers");
+
+		/*
+		 * A HIGH DESCRIPTOR, REACHED THE WAY THE MACHINE ALLOWS.
+		 * The first attempt used dup2 to FD_SETSIZE+4 and the VM
+		 * answered `could not dup a descriptor up that high`,
+		 * while Tcl's own ramp held 104 descriptors without
+		 * complaint -- so it is dup2 to a specific high number
+		 * that is refused, not high numbers themselves. Opening
+		 * the same file until the numbers climb is what works,
+		 * and it is also what a real program does.
+		 */
 		if(pipe(p) < 0)
 			note("pipe failed");
-		else if(dup2(p[0], hifd) != hifd)
-			note("could not dup a descriptor up that high");
 		else {
-			write(p[1], "x", 1);
-			memset(&u, 0, sizeof u);
-			FD_SET(hifd, &u.s);
-			tv.tv_sec = 2;
-			tv.tv_usec = 0;
-			n = select(hifd + 1, &u.s, 0, 0, &tv);
-			ok(n == 1, "a high descriptor with data is reported readable");
-			if(n != 1) {
-				printf("  note select answered %d", n);
-				if(n < 0)
-					printf(" (%s)", strerror(errno));
-				printf("\n");
-				note("so a program that reaches this descriptor");
-				note("number waits for ever and is told nothing.");
-			} else if(read(hifd, &c, 1) == 1 && c == 'x')
-				note("and the byte reads back");
-			close(hifd);
+			int held[300], nheld, want, hifd;
+
+			want = (int)(sizeof(fd_set) * 8) + 8;
+			if(want > 256)
+				want = 256;
+			for(nheld = 0; nheld < 300; nheld++){
+				held[nheld] = dup(p[0]);
+				if(held[nheld] < 0)
+					break;
+				if(held[nheld] >= want)
+					break;
+			}
+			hifd = (nheld < 300 && held[nheld] >= 0)
+				? held[nheld] : -1;
+			printf("  note highest descriptor reached: %d"
+				" (wanted %d)\n",
+				hifd >= 0 ? hifd : (nheld > 0 ? held[nheld-1] : -1),
+				want);
+			if(hifd < 0)
+				note("could not climb that high; nothing to ask");
+			else {
+				write(p[1], "x", 1);
+				memset(&u, 0, sizeof u);
+				FD_SET(hifd, &u.s);
+				tv.tv_sec = 2;
+				tv.tv_usec = 0;
+				n = select(hifd + 1, &u.s, 0, 0, &tv);
+				ok(n == 1, "a high descriptor with data is"
+					" reported readable");
+				if(n != 1) {
+					printf("  note select answered %d", n);
+					if(n < 0)
+						printf(" (%s)", strerror(errno));
+					printf("\n");
+					note("so a program that reaches this");
+					note("descriptor number waits for ever");
+					note("and is told nothing.");
+				}
+			}
+			while(--nheld >= 0)
+				if(held[nheld] >= 0)
+					close(held[nheld]);
 			close(p[0]);
 			close(p[1]);
 		}

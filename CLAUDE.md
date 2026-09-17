@@ -6663,6 +6663,92 @@ new case would have printed and look for it**, rather than taking the
 count. A test that cannot run is indistinguishable from a test that
 passes, if nothing names it.
 
+#### THE fd_set THAT COMPILES IS STOCK APE'S, AND THE TWO DISAGREE
+
+The run answered every question asked and the headline is one line:
+
+```
+--- 11. A DESCRIPTOR ABOVE FD_SETSIZE ---
+  note FD_SETSIZE 96, fd_set holds 128, OPEN_MAX 256
+```
+
+**No file in this tree can produce that.** All three copies here --
+`sys/include/ape/select.h`, `sys/include/ape/sys/select.h` and
+`sys/include/ape/sys/types.h` -- are `long fds_bits[3]`, and `long` is
+32 bits on amd64, so 96. The width came from somewhere else, and the
+constant came from here.
+
+**It is the architecture-directory trap for a fourth header, and this
+time it is a different STRUCT LAYOUT rather than a missing name.**
+`pcc.c:234-235` searches `/$objtype/include/ape` before
+`/sys/include/ape`; stock APE keeps its own `sys/types.h` and
+`sys/select.h` there; and `amd64/include/ape/` **has no `sys/`
+directory at all**. `mount-include`'s `bind -b` unions that directory
+rather than replacing it, so where this tree has no file, stock's is
+still what a compile sees. The float.h fix bound the directory and
+every earlier case was answered by *adding a file* -- and a file that
+was never added cannot shadow anything.
+
+So every program in the tree is compiled with **FD_SETSIZE 96 from
+here and a 128-bit struct from stock**: loops sized by one file,
+memory laid out by the other. And `_buf.c` makes it a third number,
+because its own
+
+```c
+/* assume FD_SETSIZE is 96 */
+#define FD_ANYSET(p)	((p)->fds_bits[0] || (p)->fds_bits[1] || (p)->fds_bits[2])
+```
+
+is three words **by hand**, so descriptors 96..127 are inside the
+struct, inside what Tcl believes, and invisible to the one test that
+decides whether `select()` looks at the set at all.
+
+**`_APEXP_FD_SET_T` is how the test says so**, defined beside the
+typedef in all three copies here -- `limits-test.c`'s technique for
+float/stdarg/stdint, and it answers outright instead of by arithmetic.
+Section 11 prints which tree the struct came from, and it is the line
+to read before anything else in that section.
+
+**Two more things the same run settled, and one of them is a bug:**
+
+- **`FD_ZERO` clears every byte** -- asserted now, against a struct
+  pre-filled with `0xff`. This was the sharp risk of a split header:
+  this tree's `FD_ZERO` is three assignments *by name*, so on a
+  four-word struct it would leave the last word holding whatever the
+  stack held, and a select would then act on descriptors nobody asked
+  about. Not a missed event but an **invented** one. It passes, so the
+  macros and the struct come from the same file and only `FD_SETSIZE`
+  is ours.
+- **`dup2` to a specific high number is refused.** The section
+  reported `could not dup a descriptor up that high` for
+  `FD_SETSIZE+4`, while Tcl's ramp held 104 descriptors in the same
+  session without complaint (the kernel prints `warning: process
+  exceeds 100 file descriptors` and carries on). So it is dup2 to a
+  chosen number, not high numbers as such. Section 11 climbs with
+  repeated `dup` now, which is also what a real program does, and
+  prints the highest number it reached.
+
+#### The descriptor number is NOT what chan-io-44.1 accumulates
+
+**All seven ramp steps passed** -- 44.1 with 0, 40, 80, 88, 92, 96 and
+104 descriptors held underneath it. So the first suspect is wrong, and
+the ramp is the reason that took one run rather than four.
+
+**It is not yet fully wrong, though, and the difference is the 128.**
+The ramp was written against a cliff at 96 and stopped at 104; the
+struct actually ends at **128**, so every step was still inside it.
+There are now two numbers worth straddling -- 96, where `FD_ANYSET`
+stops looking, and 128, where the struct ends -- and the ramp runs
+`0 40 80 88 92 96 104 120 126 130 140`, with the script naming which
+boundary a break sits on in its own output.
+
+**If 130 and 140 pass too, the descriptor number is finished as a
+suspect** and the bisect is the honest next move: `-match 'chan-io-4*'`,
+then `'chan-io-[34]*'`. Recording that in advance, because the ramp
+passing at 104 was already a refutation of the shape the last round
+predicted, and the rule this file keeps relearning is that a suspect
+that survives by being re-aimed twice is usually the wrong suspect.
+
 #### A skip list is not a substitute for a timeout
 
 Two files skipped so far, one per round, each found by running the
