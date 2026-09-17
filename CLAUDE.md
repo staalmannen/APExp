@@ -443,12 +443,18 @@ or a constraint that fails on Linux too). The port's own share is
 **Tcl's suite**: not yet complete. Open, in order of what the next run
 should touch:
 
-- **The `zlib-9.2` freeze is diagnosed and fixed, not yet confirmed**:
+- **The suite now stops with HIGH CPU -- a spin, not a block**, and the
+  log stops growing. Different shape, different method: the last file
+  name in the log names the file (tcltest echoes it without
+  `-verbose`), the climbing CPU column names the process, and two
+  `lstk()` samples say whether the loop is inside one call or through
+  the event loop. See the end of `docs/notes/tcl-suite.md`.
+- **CONFIRMED and closed**: `zlib.test` passes end to end, 73 tests,
+  and `dup-fdinfo-test` reports 0 failures --
   `fcntl(F_DUPFD)` chose its descriptor by scanning `_fdinfo`, which
   does not know about descriptors libap opened with the raw `_OPEN` --
   so `dup()` closed `/dev/bintime` out from under `_NSEC` and every
   later `gettimeofday()` blocked. The kernel picks the number now.
-  Covered by `sys/lib/tests/dup-fdinfo-test.c`.
 - **`file copy`/`file rename` of a directory faulted every time**:
   `fts_alloc` never allocated `fts_statp`, because two `if` bodies were
   commented out and an `if` with no body swallows the next statement.

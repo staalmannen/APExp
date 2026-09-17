@@ -3246,3 +3246,52 @@ pointer and would have produced a `fts_statp` pointing at nothing --
 faulting differently rather than not at all. It is `uintptr_t` now.
 Commenting out the two lines turned a wrong pointer into a null one,
 which is the same bug wearing a quieter symptom.
+
+#### Both fixes land, and the next failure is a SPIN rather than a block
+
+`dup-fdinfo-test` reports **0 failures** on the VM, and `zlib.test`
+finishes:
+
+```
+all.tcl:  Total 73  Passed 72  Skipped 1  Failed 0
+tcl-runall: every file ran, now entering exit (code 0)
+```
+
+-- the file that froze the last two runs, now clean end to end with one
+`knownBug` skip. So `_NSEC` keeps its clock and the whole
+`zlib-8.x`/`9.x` block, which had never been reached, passes.
+
+**The full suite stops again, and this one is a different animal:
+HIGH CPU, and the log stops growing at 95076 bytes.** Every hang in this
+project so far has been a *block* -- constant light load, a process
+waiting on something that will never arrive. This is the other shape,
+and the Tk notes' rule applies: **a pinned core is a loop, and the two
+want completely different fixes.** Keep them apart from the first
+minute; the last time they were run together it cost several rounds.
+
+**Three cheap measurements, in this order:**
+
+1. **`tail -20 /tmp/tcl-all.out`.** `runAllTests` echoes each test
+   file's name as it starts it, *independently of `-verbose`*, so the
+   last name in the log is the file that is spinning. This is the one
+   piece of position information a suite log gives without `-verbose t`,
+   and it is at file granularity rather than test.
+2. **`ps | grep tcltest` twice, a few seconds apart.** A spin is the one
+   case where the CPU-time columns identify the culprit outright: the
+   process whose time is *climbing* is the one in the loop, and every
+   other one is a bystander. That is cheaper than any backtrace.
+3. **`acid <that pid>` and `lstk()` TWICE.** Two samples separate the
+   two kinds of spin: **identical frames** mean a loop inside one call,
+   and **frames that move** mean a loop through the event loop, an event
+   regenerated as fast as it is drained. Tk had one of each and they
+   were fixed in completely different places.
+
+Then the usual reproducer on whichever file (1) names:
+
+```
+tcltest .../tcl-runall.tcl -file <that>.test -verbose t
+```
+
+**`fCmd.test` is worth reading in the same log whatever happens**, since
+`file copy` and `file rename` of a directory stopped faulting this
+round and nothing has measured what they do now.
