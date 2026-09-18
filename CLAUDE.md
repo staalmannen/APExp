@@ -308,6 +308,13 @@ in the topic file.
   `tcl-runall.tcl`; check for it before reading any total.
 - **A marker says the run reached the end, not that it was the run you
   asked for.** Read the `Total` line beside it.
+- **And check the log's own `Tests ended at` line before reading
+  anything from it.** A copied file that was never committed leaves the
+  previous run in place, and a stale log reads exactly like a real one.
+  It happened: a suite log was fetched, opened and nearly analysed while
+  being byte-identical to the frozen run three rounds earlier. Same
+  family as the libap mark -- *anything measured from outside the source
+  in front of you should say where it came from.*
 - **A constraint says what a test *needs*; only the log says whether it
   ran.** Three tests were written off for three rounds on a constraint
   line while `---- chan-io-41.7 start` sat in the log.

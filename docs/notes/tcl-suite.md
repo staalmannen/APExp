@@ -5819,3 +5819,28 @@ timer: _killtimerproc is ending it pid=18102 by=???
 **This is mark 6 and it is instrumentation only** -- no behaviour
 changes -- so it is safe to run the full suite with it, and the debug
 lines cost nothing unless `$APEXP_DEBUG` or `$APEXP_LISTENDEBUG` is set.
+
+#### A log that was never pushed reads exactly like one that was
+
+`tmp/tcl-all.out` was fetched after "the full suite completed" and is
+**byte-identical to the frozen run's log from three rounds earlier** --
+2440 lines, ending at `socket.test` with nothing after it. `git log` on
+the path says why: its last commit is `a4c7a962c tcl test freeze at a
+later stage now`, and the only newer commits on `main` are merges of
+this branch.
+
+**What caught it was `cmp`, not care.** The file had no `all.tcl: Total`
+line and no completion marker, which I read as "the run did not finish"
+-- a perfectly sensible reading of the wrong file. The `Tests ended at`
+timestamp was there to be checked and was not.
+
+*This is the libap mark again in a third guise. A header can be stock's,
+a library can predate the pull, and a log can be the previous run --
+and in all three the output looks entirely normal.* The rule is in
+CLAUDE.md now: read the log's own `Tests ended at` line first.
+
+**What the round DOES say, from the shell:** `grep -c FAILED` is 298,
+against 322 in the last complete run. Twenty-four fewer lines, and each
+failing test contributes roughly two -- but *compare runs per file,
+never by total* is already a rule here, and a raw grep count is a total.
+The real comparison needs the log.
