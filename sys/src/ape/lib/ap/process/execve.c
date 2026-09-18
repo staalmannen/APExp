@@ -3,7 +3,9 @@
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
+#include <stdlib.h>
 #include "sys9.h"
+#include "dir.h"
 
 extern char **environ;
 
@@ -17,6 +19,53 @@ execve(const char *name, const char *argv[], const char *envp[])
 	char buf[1024];
 
 	_RFORK(RFCENVG);
+
+	/*
+	 * THE CHILD'S ENVIRONMENT IS EXACTLY envp, SO CLEAR /env FIRST.
+	 *
+	 * On Plan 9 the environment is files in /env, and a child builds
+	 * its `environ` by reading that directory (`_envsetup`). This
+	 * function used to CREATE a file per envp entry and never remove
+	 * anything, so every variable in the inherited environment group
+	 * survived into the child whether envp mentioned it or not --
+	 * which makes `unsetenv()` invisible to everything the program
+	 * goes on to exec. musl's `unsetenv` edits only the in-process
+	 * array, correctly, because on a Unix that array IS the
+	 * environment; here it is a working copy and this is where it is
+	 * written out.
+	 *
+	 * Found in Tcl's env.test, which clears the environment and asks a
+	 * child what it sees. It saw `path`, which Tcl had unset.
+	 *
+	 * `RFCENVG` above gives this process its own copy of the group, so
+	 * removing everything touches nothing else -- not the parent, not
+	 * the shell. `_fdinfo`, `_sighdlr` and the `fn#` functions are all
+	 * written below, after this, so clearing first costs nothing.
+	 *
+	 * Only when envp is given: `execve(path, argv, 0)` keeps its old
+	 * meaning rather than quietly handing the child an empty
+	 * environment.
+	 */
+	if(envp){
+		int dfd, nd, j;
+		Dir *d9a;
+
+		if((dfd = _OPEN("/env", OREAD|OCEXEC)) >= 0){
+			nd = _dirreadall(dfd, &d9a);
+			_CLOSE(dfd);
+			for(j = 0; j < nd; j++){
+				n = strlen(d9a[j].name);
+				if(n <= 0 || n >= sizeof(buf)-5)
+					continue;
+				memcpy(buf, "/env/", 5);
+				memcpy(buf+5, d9a[j].name, n+1);
+				_REMOVE(buf);
+			}
+			if(nd > 0)
+				free(d9a);
+		}
+	}
+
 	/*
 	 * To pass _fdinfo[] across exec, put lines like
 	 *   fd flags oflags

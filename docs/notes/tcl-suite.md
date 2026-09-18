@@ -4157,3 +4157,75 @@ even though nothing has shown stock's copy winning.
 NAME_MAX 255` and `came from THIS TREE`, with 0 failures and 141 levels.
 The suite should not move; if it does, something was depending on 1023
 or 27, and the per-file table says what.
+
+#### env.test: nine failures, one interface, and libap was leaking into it
+
+With nothing aborting, the per-file table is finally readable, and
+`env` 9 is the cleanest cluster in it. Every test is "adding", "changing"
+or "unsetting" an environment variable, and `env-2.1` shows what a child
+actually sees where the test expects **nothing**: three names, and the
+first two are libap's own --
+
+```
+_fdinfo=0 34 0 / 1 2 2 / 2 2 2 / ...   (newlines escaped by tcltest)
+_sighdlr=
+path=/bin<0x01>.
+```
+
+**Two separate bugs**, and the test is asking a fair question: it clears
+the environment and asks a child to list it.
+
+**1. `_fdinfo` and `_sighdlr` are libap's own bookkeeping.** They are how
+descriptor flags and ignored signals cross an exec, `execve` writes both,
+and `_envsetup` **consumes them on the spot** -- it calls `_fdinit()` and
+`sigsetup()` with the value -- and then puts them into `environ` anyway.
+A program has no business seeing them. Dropping them is safe precisely
+because `environ` is not the transport: `execve` writes `/env/_fdinfo`
+directly and a child reads `/env` rather than inheriting the array.
+
+That is the `XLoadFont` family **inverted**: not a stub answering for
+work it did not do, but an implementation detail answering as though it
+were data. `nohandle` stays visible -- it is a knob a user sets, not
+something libap writes.
+
+**2. `unsetenv()` never reached a child, and the reason is where the
+environment lives.** musl's `unsetenv` edits the in-process `environ`
+array, which on a Unix *is* the environment. Here it is a working copy:
+the environment is files in `/env`, and `execve` is what writes it out.
+And `execve` only ever **created**:
+
+```c
+_RFORK(RFCENVG);		/* our own copy of the group */
+...
+if(envp)
+	for(e = envp; *e; e++)
+		_CREATE("/env/NAME", ...);	/* and never removes */
+```
+
+So every variable in the inherited group survived into the child whether
+`envp` mentioned it or not, and `path` -- which Tcl had unset -- came
+back. `execve` clears `/env` first now, so **the child's environment is
+exactly `envp`**, which is what POSIX says it is.
+
+`RFCENVG` is what makes that safe: the group is already this process's
+own copy, so removing everything touches neither the parent nor the
+shell. Only done when `envp` is given, so `execve(path, argv, 0)` keeps
+its old meaning rather than quietly handing the child an empty
+environment.
+
+**A hazard to record beside the existing one.** This file already notes
+that *a failed `execve()` is not free* -- by the time the exec is tried
+it has rforked the environment group, rewritten `/env/_fdinfo` and
+`/env/_sighdlr`, and closed every `FD_CLOEXEC` descriptor. **Add "and
+emptied `/env`" to that list.** The damage is bounded: `environ` in the
+surviving process is untouched, so `getenv` still answers, and the next
+`execve` refills `/env` from whatever `envp` it is given.
+
+**Prediction.** `env.test` goes from 9 failures to 0 or nearly 0 -- the
+three lines above are all that stood between it and an exact match, and
+two of them were ours. **`clock`'s 8 are the watch item**: every one is
+`:localtime` with `TZ` changing, so if Tcl's `TZ` was never reaching
+anything, these move with it; if they do not, `localtime()` is reading
+Plan 9's `/env/timezone` rather than `TZ` and that is a separate and
+much smaller question. Nothing else should move; if it does, clearing
+`/env` took something a child needed, and the per-file table says what.
