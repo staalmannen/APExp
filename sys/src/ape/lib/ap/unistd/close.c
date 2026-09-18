@@ -15,6 +15,16 @@ close(int d)
 	if(d<0 || d>=OPEN_MAX || !(f->flags&FD_ISOPEN))
 		errno = EBADF;
 	else{
+		/*
+		 * FIRST, before anything else about this descriptor is taken
+		 * apart: a listening socket is a pipe here and the port is
+		 * held by the process listen() forked, so closing this
+		 * descriptor would otherwise free nothing. No-op for every
+		 * descriptor that is not one. See
+		 * ap/network/_sock_listenpid.c for why it is keyed on the
+		 * file and the owner rather than on the number.
+		 */
+		_sock_killlisten(d);
 		if(f->flags&(FD_BUFFERED|FD_BUFFEREDX)) {
 			if(f->flags&FD_BUFFERED)
 				_closebuf(d);
@@ -26,15 +36,6 @@ close(int d)
 			free(_fdinfo[d].name);
 			_fdinfo[d].name = 0;
 		}
-		/*
-		 * A LISTENING SOCKET IS A PIPE HERE, and the port is held
-		 * by the process listen() forked, so closing this
-		 * descriptor would otherwise free nothing. No-op for every
-		 * descriptor that is not one. See
-		 * ap/network/_sock_listenpid.c for why it is keyed on the
-		 * owner as well as the fd.
-		 */
-		_sock_killlisten(d);
 		n = _CLOSE(d);
 		if(n < 0)
 			_syserrno();

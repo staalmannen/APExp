@@ -56,6 +56,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <signal.h>
 
 #ifndef __GNUC__
 #define HAVE_ERRSTR 1
@@ -142,10 +143,52 @@ listenon(int port, int *got)
 	return fd;
 }
 
+/*
+ * SECTION 3 NEEDS A TIMEOUT RATHER THAN A FREEZE. The thing it is
+ * asking about hangs when it goes wrong -- that is the whole symptom --
+ * and a test that hangs reports nothing at all, while one that times out
+ * says which statement it was in. Every blocking call below is behind an
+ * alarm and a named stage.
+ */
+static const char *stage = "nothing yet";
+
+static void
+alarmed(int sig)
+{
+	(void)sig;
+	/*
+	 * Written with write(2) rather than printf: this is a signal
+	 * handler, and the point of it is to be believed.
+	 */
+	write(1, "  FAIL TIMED OUT at: ", 21);
+	write(1, stage, strlen(stage));
+	write(1, "\n", 1);
+	_exit(1);
+}
+
+static int
+stalled(const char *what)
+{
+	stage = what;
+	alarm(10);
+	return 0;
+}
+
+static void
+arrived(void)
+{
+	alarm(0);
+}
+
 int
 main(void)
 {
 	int fd, port, i, again;
+	int ss, cs, as;
+	struct sockaddr_in a;
+	socklen_t alen;
+	char buf[64];
+	int n;
 
 	printf("--- 1. close a listener, then take its port back ---\n");
 	port = 0;
@@ -195,6 +238,78 @@ main(void)
 	}
 	ok("five close-and-rebind rounds all succeeded", again == 0);
 
+	printf("--- 3. close the LISTENER while a connection is in use ---\n");
+	/*
+	 * Tcl's chan-io-29.34 reduced, and it is where the suite stopped.
+	 * That test accepts a connection, writes 2000 lines into it,
+	 * closes the client, CLOSES THE LISTENING SOCKET, and only then
+	 * waits for the accepted connection to drain and report end of
+	 * file. So closing a listener must not disturb a connection that
+	 * has already been accepted -- and close() now ends the process
+	 * that was listening, which is a new thing for it to do.
+	 *
+	 * The read before the close is a control: without it, a failure
+	 * after the close would not distinguish "the close broke it" from
+	 * "it never worked".
+	 */
+	signal(SIGALRM, alarmed);
+	port = 0;
+	if((ss = listenon(0, &port)) < 0){
+		ok("section 3 could not make a listening socket", 0);
+		goto done;
+	}
+	if((cs = socket(AF_INET, SOCK_STREAM, 0)) < 0){
+		why("socket for the client");
+		ok("section 3 could not make a client", 0);
+		goto done;
+	}
+	memset(&a, 0, sizeof a);
+	a.sin_family = AF_INET;
+	a.sin_port = htons((unsigned short)port);
+	a.sin_addr.s_addr = htonl(0x7f000001);	/* 127.0.0.1 */
+	stalled("connect to the listener");
+	if(connect(cs, (struct sockaddr*)&a, sizeof a) < 0){
+		arrived();
+		why("connect");
+		printf("  note no loopback? see the note about ip/ipconfig\n");
+		ok("section 3 could not connect", 0);
+		goto done;
+	}
+	arrived();
+	alen = sizeof a;
+	stalled("accept the connection");
+	as = accept(ss, (struct sockaddr*)&a, &alen);
+	arrived();
+	if(as < 0){
+		why("accept");
+		ok("section 3 could not accept", 0);
+		goto done;
+	}
+
+	write(cs, "one\n", 4);
+	stalled("read the first message, BEFORE the listener is closed");
+	n = read(as, buf, sizeof buf);
+	arrived();
+	ok("a message arrives before the listener is closed", n == 4);
+
+	/* THE CLOSE UNDER TEST */
+	if(close(ss) < 0)
+		why("close the listening socket");
+
+	write(cs, "two\n", 4);
+	stalled("read the second message, AFTER the listener is closed");
+	n = read(as, buf, sizeof buf);
+	arrived();
+	ok("...and one still arrives after it is closed", n == 4);
+
+	close(cs);
+	stalled("read end of file once the client has gone");
+	n = read(as, buf, sizeof buf);
+	arrived();
+	ok("the accepted connection reports end of file", n == 0);
+	close(as);
+
+done:
 	printf("%d failure(s)\n", failures);
 	return failures;
 }

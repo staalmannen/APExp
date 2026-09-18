@@ -5054,3 +5054,68 @@ that happens.* `_fdinfo` gets away with it because every path that
 retires a descriptor updates it; anything alongside `_fdinfo` that does
 not is a stale entry waiting to be believed. Key on something the file
 itself carries, or be cleared by the same code that clears `_fdinfo`.
+
+#### The harness named it: chan-io-29.34, and the C probe now asks it directly
+
+`-verbose t` on `chanio.test` alone gave what four rounds of totals could
+not:
+
+```
+---- chan-io-29.34 start
+<nothing>
+```
+
+That is the first socket test after `29.27`, which is what the position
+argument had predicted, and it is the last `start` line printed -- so
+this time the name is the answer rather than a lower bound.
+
+**Reading the test is what makes it actionable**, and the order of its
+last four statements is the whole thing:
+
+```tcl
+writelots $cs $l        ;# 2000 lines into a non-blocking client
+chan close $cs
+chan close $ss          ;# CLOSE THE LISTENER
+vwait x                 ;# wait for the ACCEPTED connection to drain and see EOF
+```
+
+The second `vwait` runs **after** the listening socket is closed, and
+what it waits for is the *accepted* connection. So the question is
+exactly: **does ending the listening process disturb a connection that
+has already been accepted?** Nothing before this round made `close()`
+end a process at all, so this is new behaviour meeting a test written
+for the old.
+
+`listenleak-test` section 3 is that question with no Tcl around it:
+listen, connect, accept, read a message (**a control** -- without it, a
+failure after the close would not distinguish "the close broke it" from
+"it never worked"), close the listener, read another message, close the
+client, expect end of file.
+
+**It times out rather than hangs**, ten seconds per blocking call, each
+behind a named stage printed from the handler with `write(2)`. The thing
+under test hangs when it goes wrong, and a test that hangs reports
+nothing; the rule in this file is already that *a freeze and a timeout
+are different evidence*, and this one is built to produce the second.
+0 failures on glibc.
+
+**Two smaller things found while reading, neither of them the hang.**
+`_sock_killlisten` was called after `close()` had already zeroed
+`_fdinfo[d].flags`; `fstat()` goes to the descriptor rather than to
+`_fdinfo`, so it still worked, but the call now happens first, before
+anything about the descriptor is taken apart. And the `setjmp.h`/unused
+flag left over from drafting are gone.
+
+**What is NOT known, and it matters before the next run.** Whether the
+frozen `chanio.test` above ran against a libap containing the `dev`/`ino`
+fix, or against the build that froze the suite. Nothing in the output
+says, and *a measurement of a build that does not contain the change
+measures nothing*. If it was the old build, this run has told us the
+location and nothing about the fix.
+
+So: `listenleak-test` first, on a build that certainly contains the fix.
+0 failures means the kill is innocent of `29.34` and the hang is
+somewhere else in that test; a TIMED OUT line names the statement, and
+if it is the one after the close then ending the listener does break an
+accepted connection and the whole approach needs rethinking rather than
+patching.
