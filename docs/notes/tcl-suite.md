@@ -5844,3 +5844,70 @@ against 322 in the last complete run. Twenty-four fewer lines, and each
 failing test contributes roughly two -- but *compare runs per file,
 never by total* is already a rule here, and a raw grep count is a total.
 The real comparison needs the log.
+
+#### The suite finishes again: 161 -> 149, and the two new failures are the leak's own shadow
+
+`Tests ended at 2026-09-18 16:22:14`, marker, `Total 68118 Passed 62081
+Skipped 5888 Failed 149`, against `Failed 161` in the last complete run.
+
+**Fourteen fixed, and they are one cluster plus two:**
+
+```
+socket_inet-11.1 11.2 11.4 11.5 11.7 11.8 11.9 11.10 11.11 11.12 11.13
+socket_inet-12.1  socket_inet-2.6  socket-14.11.1
+```
+
+The whole of `socket_inet-11.*` went at once. Eleven tests that had been
+failing for as long as this file has recorded them, released by ports
+being released.
+
+**`socket_inet-5.1` and `5.3` appear in neither list -- they were failing
+and they still are, which is what was predicted** when the leak fix went
+in: `notRoot` asks about a user *name* as a proxy for a capability, and
+glenda is the host owner, so the bind succeeds and the test says so.
+That prediction was about the observation and it held.
+
+**Two newly failing, and they were passing for the wrong reason too.**
+`socket-14.14` and `socket-14.15` both do
+
+```tcl
+set s [socket -async localhost [randport]]
+```
+
+and now raise `couldn't open socket: connection refused` at that line.
+`randport` is the explanation, and it is worth reading:
+
+```tcl
+set port [lindex [fconfigure [set s [socket -server {} 0]] -sockname] 2]
+close $s
+while {[catch { close [socket -server {} $port] } msg]} { ...try another... }
+```
+
+It picks a port, then **verifies it is free by opening and closing a
+server socket on it**. With the leak, that verification left a listener
+holding the very port it had just certified as free -- so
+`socket -async localhost $port` connected happily to the leftover, Tcl
+got a working socket, and the test passed. **The leak was answering the
+connection that the test needed refused.**
+
+*That is the third pair of tests in this file found to have been passing
+for the wrong reason, all three uncovered by the same fix. A leaked
+resource does not only waste something; it answers questions, and every
+answer it gives is wrong.*
+
+**And the honest failure exposes a real gap.** `network/connect.c` is
+109 lines with no `O_NONBLOCK`, no `EINPROGRESS` and no deferred
+completion anywhere in it: **`connect()` here is always synchronous, so
+`socket -async` has never worked.** Tcl expects the call to return a
+socket and the outcome to arrive later on a `fileevent`; libap raises
+the error at the `socket` command instead. Nothing was broken by this
+round -- something that never worked stopped being hidden.
+
+**Next, and recorded rather than started**: async connect. `connect()`
+on a descriptor with `O_NONBLOCK` should start the conversation, return
+`-1`/`EINPROGRESS`, and let `select()` report the descriptor writable
+when it completes or fails, with `getsockopt(SO_ERROR)` carrying the
+result. On Plan 9 the connect is a write to the ctl file, so "in
+progress" means a process doing that write while the caller goes back to
+its event loop -- the same shape as `listenproc`, and the machinery for
+it already exists in `_buf.c`.

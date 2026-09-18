@@ -542,8 +542,10 @@ or a constraint that fails on Linux too). The port's own share is
 `focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
 
 **Tcl's suite**: **it finishes and nothing aborts.**
-`Total 68118 Passed 62070 Skipped 5887 Failed 161`, 167 files, marker,
-exit 0, and no `Test files exiting with errors` section.
+`Total 68118 Passed 62081 Skipped 5888 Failed 149`, 167 files, marker,
+exit 0, and no `Test files exiting with errors` section. The listener
+leak fix took **14**: all eleven of `socket_inet-11.*`, plus `12.1`,
+`2.6` and `socket-14.11.1`.
 
 **A count in the per-file table is executions, not tests**: `clock`'s
 16 were 4 tests run twice each (`.vm:0`/`.vm:1`). Size a cluster from
@@ -663,12 +665,23 @@ Open, in order of what the next run should touch:
   appears, the killer is elsewhere and `_sock_killlisten`'s ten-note
   loop is the suspect, being the only new source of SIGKILLs.
 - **`socket_inet-5.1`/`5.3` were passing for the WRONG REASON** -- a
-  leftover listener was refusing the bind, not the system -- so they are
-  not a regression from the errno change. Expect them to **stay
-  failing** once ports are genuinely released: `notRoot` tests a user
-  *name* as a proxy for a capability, and glenda is the host owner.
-  **Clear the leftovers (or reboot) before the next suite run**, or the
-  first run after the fix still meets a process that predates it.
+  leftover listener was refusing the bind, not the system. **Confirmed**:
+  they stayed failing once ports were genuinely released, as predicted.
+  `notRoot` tests a user *name* as a proxy for a capability and glenda
+  is the host owner, so these are not ours.
+- **`socket-14.14`/`14.15` are the same story, and expose a real gap.**
+  They were passing because `randport` certifies a port free by opening
+  and closing a server socket on it -- and the leak left a listener
+  holding the port it had just certified, which then ANSWERED the
+  connection the test needs refused. Now refused honestly, and that
+  raises the error at `socket -async` rather than on a `fileevent`:
+  **`network/connect.c` has no `O_NONBLOCK`/`EINPROGRESS` path at all,
+  so `socket -async` has never worked.** Nothing broke; something that
+  never worked stopped being hidden. **Next piece of work**: async
+  connect -- start the conversation, return `EINPROGRESS`, report
+  writable from `select()` with `getsockopt(SO_ERROR)` carrying the
+  result. Same shape as `listenproc`; `_buf.c` already has the
+  machinery.
 - **Still unread: `io` 23, `chan-io` 19, `socket_inet` 16,
   `filename` 17, `socket` 10.** `filename`'s are all `Tcl_GlobCmd`.
 - **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a
