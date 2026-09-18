@@ -389,7 +389,10 @@ in the topic file.
   logically inert change followed by broad, unattributable breakage is a
   layout problem; ask which objects were actually recompiled.
 - **An ABI change needs `mk distclean` before `mk install`**; no mkfile
-  here lists a system header as a dependency. Prefer `distclean` to
+  here lists a system header as a dependency. **The same goes for a
+  library change that has to reach an existing binary**: `mk install`
+  rebuilds `libap.a` without relinking programs already built against
+  it, so a libap fix can sit unused for rounds. Prefer `distclean` to
   `nuke` (see the Build System section).
 - **Check every object built against a library for the flags that library
   was built with**, not just the ones the linker complained about.
@@ -449,31 +452,21 @@ Failed 178`, clean exit. The remaining 178 are mostly out of reach here
 or a constraint that fails on Linux too). The port's own share is
 `focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
 
-**Tcl's suite**: **it finishes, and `file copy` works.**
-`Total 67898 Passed 61985 Skipped 5695 Failed 218`, 167 files, marker,
-exit 0. Two files still abort (`unixFCmd`, `winFCmd`) where five did.
-**Read the per-file table from the log, not `Failed`**: tcltest counts
-nothing for a file that aborts, so the total rose by 66 while the real
-count fell 239 -> 225. The table and its command are at the end of
-`docs/notes/tcl-suite.md`.
+**Tcl's suite**: **it finishes and nothing aborts.**
+`Total 68118 Passed 62048 Skipped 5887 Failed 183`, 167 files, marker,
+exit 0, and no `Test files exiting with errors` section -- the first run
+here where every file reports its own result, so `Failed` and the
+log-derived count agree at last.
 
 Open, in order of what the next run should touch:
 
-- **Fixed, not yet confirmed: `PATH_MAX` was 255 and `NAME_MAX` 14** --
-  POSIX's *minima* used as this system's maxima, so a 550-character path
-  could not be normalised, walked or deleted and `unixFCmd.test` and
-  `winFCmd.test` aborted on it. 4096 and 255 now; Plan 9 has no
-  inherent path limit. **Needs `mk distclean`**, since `limits.h` is a
-  system header and no mkfile tracks one.
-  `sys/lib/tests/deeppath-test.c` measures it.
-- **`fCmd` 73, `io` 22, `chan-io` 19, `socket_inet` 18, `filename` 17,
+- **`fCmd`, `io` 22, `chan-io` 19, `socket_inet` 18, `filename` 17,
   `clock` 16, `socket` 10, `env` 9** -- none of these clusters has been
   read. `fCmd`'s copy and rename sections `6.x` and `18.x` did *not*
   move with the `utime` fix, so they are separate bugs.
-- **`file home ~USER` / `file tildeexpand ~USER`**, ten tests, newly
-  reachable now that `fCmd.test` no longer aborts. Needs a password
-  database mapping a user to a home directory, which Plan 9 has not --
-  read it before writing it off.
+- **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a
+  password database mapping a user to a home directory, which Plan 9
+  has not -- read it before writing it off.
 - `chan-io-6.4x`: `-buffersize 16` with `testchannel inputbuffered`
   reporting 0. The oldest open item here.
 - `binary-53.25`/`53.26`: a double one ulp past the float range must
@@ -482,12 +475,17 @@ Open, in order of what the next run should touch:
   stays ENOSYS and costs one test. **Do not emulate it with a copy** --
   see `docs/notes/tcl-suite.md`.
 
-**Fixed and confirmed this round**: `utime`/`utimes`/`futimes` returned
-the wstat byte count instead of 0, so `if (utime(...))` read a success
-as a failure. `file copy` deleted every copy it made; `encoding.test`,
-`http.test` and `fCmd.test` aborted behind it; and `cmdAH`'s `file
-mtime`, `file atime` and `file lstat` sections went to zero with it.
-Named by `ratrace` in one run.
+**Fixed this round, and both are corrections**: `sys/include/ape/limits.h`
+had **never been read** -- stock APE's copy in the architecture
+directory shadowed it, for the fourth time in this family, so the
+effective `PATH_MAX` was 1023 and `NAME_MAX` 27. The content is
+`limits_generic.h` now with a wrapper in all eleven architecture
+directories, and `deeppath-test` asks the header which one it got rather
+than inferring from the numbers. And **the deep-path abort was cleared
+by the full rebuild, not by that change** -- most likely the `fts_alloc`
+fix from four rounds ago finally reaching `tcltest`, which gives a new
+rule: **`mk install` rebuilds a library without relinking binaries that
+already exist against it.**
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR; and over a hundred leaked
