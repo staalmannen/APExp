@@ -412,6 +412,12 @@ in the topic file.
   descendants, no fabricated install paths.
 - **When a struct is recycled, reset every field that means something**,
   not just the ones about the data.
+- **A table keyed on a descriptor NUMBER needs invalidating when the
+  number is retired, and there is no single place that happens.**
+  `dup2()` and raw `_CLOSE()` retire one without going through
+  `close()`. Key on something the file itself carries (`dev`/`ino`), or
+  a stale entry will be believed -- one SIGKILL'd the wrong process and
+  froze a suite.
 - **Append to a shared global struct, never insert** -- and see the
   `HFILES` rule below.
 - **Err towards more damage** when repairing pixels: too much costs a
@@ -563,6 +569,14 @@ Open, in order of what the next run should touch:
   `_sock_listenpid.c` records the pid; `close()` kills it, **only if
   `getpid()` matches the recorded owner** -- the table is inherited by
   every fork, which is the trap `_buf.c` records in capitals.
+  **The first version froze the suite in `chanio.test` at low CPU**: it
+  keyed the table on the descriptor NUMBER, which `dup2()` and raw
+  `_CLOSE()` retire without clearing, so a stale pid could SIGKILL a
+  live unrelated process -- and `kill()` opens `/proc/N/note` and
+  *closes* it, re-entering the function on a fresh number every time.
+  Now keyed on `dev`/`ino` and checked with `fstat()`, plus a
+  re-entrancy flag. **Run `tcltest chanio.test -singleproc 1 -verbose t`
+  before the suite**; the freeze is diagnosed but not measured.
 - **`socket_inet-5.1`/`5.3` were passing for the WRONG REASON** -- a
   leftover listener was refusing the bind, not the system -- so they are
   not a regression from the errno change. Expect them to **stay

@@ -4967,3 +4967,90 @@ and the count going the wrong way is not evidence against it.
 of this can be measured**, or the first run after the fix will still see
 the port held by a process that predates it. A reboot of the VM, or
 killing the leftovers, before the next suite run.
+
+#### The listener kill froze the suite, and the bug was mine
+
+The run stopped inside `chanio.test`, the fourteenth file, with low CPU
+-- a block, not a spin. Thirteen files had reported; the last failure
+printed was `chan-io-29.27` and the previous complete run has
+`chan-io-32.7` next, so it stopped somewhere in between. **A child's
+stdout is a pipe and block buffered, so that is a lower bound and not a
+location**; the first socket test after 29.27 is `29.34`, which makes a
+server socket, accepts one connection and closes both ends.
+
+Everything about the shape says it was the change in hand: the previous
+run finished, one commit stands between them, and that commit made
+`close()` send a SIGKILL.
+
+**And it was, by a route worth writing down.**
+
+```c
+static int
+note(int pid, char *msg, char *fmt)
+{
+	f = open(pname, O_WRONLY);
+	...
+	close(f);		/* <- libap's close() */
+}
+```
+
+`kill()` opens `/proc/N/note` and **closes it**, and `close()` now calls
+`_sock_killlisten()`. So every kill from here re-enters the function on
+whatever descriptor number that open happened to get.
+
+That would be harmless on its own. What made it dangerous is that **the
+table was keyed on the descriptor NUMBER and nothing ever cleared a
+retired one.** `close()` clears its entry, but a number can also be
+retired by `dup2()`, or by a raw `_CLOSE()` that does not go through
+`close()` -- libap does both. So a stale pid could sit against a number
+that had since come back as something else entirely, and the next
+`close()` of that number would SIGKILL a live, unrelated process.
+
+**The symptom is one this file has already described, from the other
+direction.** `_buf.c`:
+
+> ONLY THE PROCESS THAT FORKED THE TIMER MAY KILL IT ... the asymmetry
+> meant any forked child leaving through `exit()` took the parent's
+> timer with it, and `timerpid` stayed > 0 afterwards so `_resettimer()`
+> went on signalling a corpse -- no timeout ever firing again, and every
+> blocking `select()` that needed one waiting for ever.
+
+Kill the timer process, or a copy process, and you get a freeze at low
+CPU. Same family, reached by a different route, one round after writing
+the owner guard *specifically because* that precedent was in view. **The
+guard I copied was the one for the case I had thought of; the table's
+key was the part I had not.**
+
+**Two changes, and the first is the real one.**
+
+- **The entry is keyed on the FILE.** `dev`/`ino` are recorded beside
+  the pid at `listen()` time and checked with `fstat()` before the kill.
+  A number that has come back as something else does not match, is
+  cleared, and kills nothing. A missed kill leaks a port; a wrong kill
+  stops the machine, so the check fails towards doing nothing.
+- **A re-entrancy flag**, so that the `kill()` -> `close()` ->
+  `_sock_killlisten()` path cannot loop at all. The dev/ino check already
+  makes it harmless; this makes it impossible, so that the reasoning
+  needed to see it is safe does not have to be redone by the next reader.
+
+**What this does not prove.** The mechanism is real and is a bug whatever
+else is true, but nothing here has *measured* that it was the freeze --
+the run that froze is gone and the evidence is circumstantial (position,
+timing, one commit). So the next run is not "the suite": it is
+`chanio.test` alone, which costs seconds and is where it stopped.
+
+- **`tcltest chanio.test -singleproc 1 -verbose t`** -- if it completes,
+  the file is clear and the suite is worth running. If it hangs, the
+  `-verbose t` output names the test, which is what the harness note in
+  this file has been asking for all along, and the diagnosis above is
+  wrong or incomplete.
+- `listenleak-test` should be 0 failures either way; it exercises the
+  kill path without any of Tcl around it.
+
+**And the rule, which is the general form of the owner guard rather than
+a new one**: *a table keyed on a descriptor number needs an entry
+invalidated when the number is retired, and there is no single place
+that happens.* `_fdinfo` gets away with it because every path that
+retires a descriptor updates it; anything alongside `_fdinfo` that does
+not is a stale entry waiting to be believed. Key on something the file
+itself carries, or be cleared by the same code that clears `_fdinfo`.
