@@ -644,11 +644,17 @@ Open, in order of what the next run should touch:
   could not reach it. 2.11 was already failing before this change
   (a timing result), so the hang is new but the test was never healthy.
   **With mark 5 `socket.test` COMPLETES** -- `Total 114 Passed 54
-  Skipped 41 Failed 19`, same command that froze. Whether the repair is
-  *why* is one grep: `resettimer: the timer process is gone` appearing
-  means the timer was dead as diagnosed; never appearing means the timer
-  was alive and `_apdbg`'s writes changed the timing, which would not be
-  a fix.
+  Skipped 41 Failed 19`, same command that froze -- and `grep
+  resettimer` shows the repair firing **twice**, so the timer really was
+  dead and the diagnosis held end to end.
+  **What KILLS the timer is now the open question and blocks nothing.**
+  `fork()`'s child runs `_detachbuf`, which clears `timerpid`, `_muxsid`
+  and `_mainpid`, so no child can fire either atexit handler; and the
+  `_RFORK` children all leave through `_exit(0)`. Mark 6 is
+  instrumentation only: `_timerproc` prints when a timer is forked and
+  by whom, `_killtimerproc` prints when it fires. If the latter never
+  appears, the killer is elsewhere and `_sock_killlisten`'s ten-note
+  loop is the suspect, being the only new source of SIGKILLs.
 - **`socket_inet-5.1`/`5.3` were passing for the WRONG REASON** -- a
   leftover listener was refusing the bind, not the system -- so they are
   not a regression from the errno change. Expect them to **stay

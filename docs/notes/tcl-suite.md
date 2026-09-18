@@ -5769,3 +5769,53 @@ nearly reverted on a mis-stated stop-condition.*
 
 **What is certain either way**: the file completes, `Failed 19` is a
 number rather than a silence, and the suite can be run again.
+
+#### Confirmed: the timer died twice, and the repair is what unblocked socket.test
+
+```
+$ grep resettimer /tmp/socket.out
+resettimer: the timer process is gone, restarting was=18102
+resettimer: the timer process is gone, restarting was=18148
+```
+
+**Twice in one run of `socket.test`.** So the timer really was dead,
+`_resettimer()` really was signalling a corpse, and the chain --
+`ps` showing no process in `Sleep`, then `acid` showing `select` blocked
+at `_buf.c:544` with `timeout != 0` and `t = 200` in its own frame --
+was right end to end. The file completing is the repair, not a timing
+accident from `_apdbg`'s writes.
+
+*The grep was worth its round. Without it the honest statement would
+have been "the hang stopped reproducing", which is the weakest sentence
+in this whole file and appears in it twice already.*
+
+**What kills the timer is now the open question, and it is no longer
+blocking anything.** Two candidates were read and both hold up as
+correct code: `fork()`'s child runs `_detachbuf`, which clears
+`timerpid`, `_muxsid` AND `_mainpid`, so neither `_killtimerproc` nor
+`_killmuxsid` can fire in a child; and the processes made with `_RFORK`
+rather than `fork()` -- the copy processes, the listener, the timer
+itself -- all leave through `_exit(0)`, which runs no `atexit` handler
+at all.
+
+So instead of an eighth mechanism argued from source, the next debug run
+answers it. `_timerproc()` now prints when a timer is forked and by
+whom, and `_killtimerproc` prints when it fires and from which process:
+
+```
+timer: forked pid=18102 by=17994
+timer: _killtimerproc is ending it pid=18102 by=???
+```
+
+- **`_killtimerproc` appears** -- the handler is the killer, and `by=`
+  names the process that ran it, which settles whether a guard is wrong
+  or a `_mainpid` is stale.
+- **it never appears** -- the timer is dying some other way entirely:
+  a note aimed at a pid that was recycled, or the process group, or a
+  fault. `_sock_killlisten`'s ten-note loop is the obvious suspect to
+  look at then, since it is the only new source of SIGKILLs in the
+  tree.
+
+**This is mark 6 and it is instrumentation only** -- no behaviour
+changes -- so it is safe to run the full suite with it, and the debug
+lines cost nothing unless `$APEXP_DEBUG` or `$APEXP_LISTENDEBUG` is set.
