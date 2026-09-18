@@ -4755,3 +4755,116 @@ and a probe rather than a library rule. The remaining 23 are symlinks
 and `~USER`. **What to watch is `rename()` being reached by code that
 never got past the old failure**: a fix that lets a process reach code
 it never reached before can expose anything on that path.
+
+#### fCmd: every failure that was ours is gone, and the prediction held
+
+`Total 68118 Passed 62070 Skipped 5887 Failed 161`, marker, exit 0.
+175 -> 161.
+
+**Sixteen fixed, and fifteen of them were named in advance:**
+
+```
+fCmd-9.1  9.11  9.14.3  18.3  22.4  6.30  unixFCmd-1.3  1.7   (directory rename)
+fCmd-4.11 4.14  6.6     6.24                              (EPERM -> EACCES)
+fCmd-6.21 6.25  6.26                                      (flagged unread; same families)
+socket_inet-4.2                                           (not ours -- see below)
+```
+
+The twelve predicted all went. `6.21`, `6.25` and `6.26` were recorded
+as "unread and may be in the same families" -- they were, which is worth
+noting as the one place guessing paid, and it paid only because the
+guess was labelled as one.
+
+**What remains in `fCmd` is exactly the two groups that were called out
+of reach**, with nothing left over:
+
+```
+symlink   18.12 18.13 18.14 18.15 18.16 21.7.2 21.8.2 21.9
+          26.1 26.2 26.3 28.9 28.21 28.22 unixFCmd-2.2.2   = 15
+~USER     31.6 31.9 32.5 32.5.1 32.9 32.9.1 32.17 32.17.1  = 8
+Plan 9    unixFCmd-1.1                                     = 1
+```
+
+24 of 24 accounted for. **A cluster read all the way through before
+being worked on came apart exactly as the reading said it would**, which
+is the argument for reading all thirty-five rather than fixing the first
+one and re-running.
+
+`rename-test` on the VM: 0 failures, every section including 5b through
+`..` and section 7's EACCES. Note APE's errno *numbers* are its own --
+`EINVAL` is 12 and `EACCES` is 2 there -- which is why the test compares
+names and never numbers.
+
+#### socket_inet-5.1 and 5.3: a test that had been passing for the wrong reason
+
+Two appeared as the sixteen went, and the first suspicion has to be the
+errno change, because `EPERM` -> `EACCES` is exactly the kind of "pure
+naming change" this file already records as having altered control flow
+once (`bind()`'s fallback is gated on `EPLAN9`, and naming an error stops
+it running).
+
+**It is not that, and the checks are cheap enough to state.**
+
+- Both tests' bodies `return` a *fixed string* whichever way the error
+  goes. Only success versus failure matters, and an errno cannot turn a
+  failure into a success.
+- Tcl's server path tests exactly one errno -- `tclUnixSock.c` greps to
+  `EADDRINUSE`, twice, both guarded by `port == 0`. Neither `EACCES` nor
+  `EPERM` appears anywhere in it.
+- `bind()`'s fallback is gated on `EPLAN9`; `EPERM` was not `EPLAN9` and
+  `EACCES` is not either, so that gate is unchanged.
+
+**`socket_inet-4.2` is the evidence for what it really is.** In the same
+file, in the same run, it went the *other* way: it had been failing with
+
+```
+errorCode: POSIX EADDRINUSE {address already in use}
+```
+
+for `socket -server dodo -myaddr $localhost 0x3000`, and now passes.
+Nothing in this round touches sockets, so **this file's results depend
+on what is already holding ports when the run starts** -- and this tree
+already records "over a hundred leaked `listenproc` processes accumulate
+across runs, since nothing records the listener's pid for `close()` to
+kill".
+
+So the reading is that 5.1 and 5.3, which ask that `socket -server dodo 1`
+and `... 21` be REFUSED, were previously refused with `EADDRINUSE` by a
+leftover listener and **passed for the wrong reason**; with the ports
+free they succeed, because on a 9front terminal glenda is the host owner
+and may announce a privileged port.
+
+**If that is right the constraint is the thing that is wrong, and it is
+upstream's.** `notRoot` comes from
+
+```tcl
+ConstraintInitializer root {expr {($::tcl_platform(platform) eq "unix") &&
+	($::tcl_platform(user) in {root {}})}}
+```
+
+-- a proxy for "may I bind below 1024" that asks about a *user name*.
+Plan 9 has no root, so `notRoot` is true and the test runs, while the
+capability it stands in for is held all the same. The test even
+anticipates it in its own failure message: *"are you running as SU?"*.
+That would make these two permanent and correct failures, not ours.
+
+**Not asserted, because the last step is about port occupancy at the
+start of a run and nothing here measured it.** One command settles it,
+with no rebuild -- in the APExp shell, as glenda, on a machine with no
+suite running:
+
+```
+tclsh
+% socket -server {apply {{c a p} {}}} 1
+```
+
+A channel back means glenda can announce port 1, the constraint is the
+problem, and the two go in the "not ours" list beside `unixFCmd-1.1`. An
+error means the story above is wrong and the cause is still open.
+
+**The rule this pays for**: *a test that newly fails may be a test that
+was previously passing for the wrong reason*. This file already has the
+converse -- "a rising failure count after new tests become runnable is
+newly measured, not newly broken" -- and this is the same coin. Before
+attributing a new failure to the change in hand, ask what the test
+actually asserts and whether anything else in its file moved.

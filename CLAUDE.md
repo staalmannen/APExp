@@ -318,6 +318,11 @@ in the topic file.
   *names*.
 - **A rising failure count after new tests become runnable is newly
   *measured*, not newly broken.**
+- **And its coin's other face: a test that newly FAILS may be one that
+  was passing for the wrong reason.** Before blaming the change in hand,
+  read what the test asserts and ask whether anything else in its file
+  moved. `socket_inet-5.1` wants a port bind refused, and a leftover
+  listener had been refusing it.
 
 **Before believing a result**
 
@@ -495,7 +500,7 @@ or a constraint that fails on Linux too). The port's own share is
 `focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
 
 **Tcl's suite**: **it finishes and nothing aborts.**
-`Total 68118 Passed 62056 Skipped 5887 Failed 175`, 167 files, marker,
+`Total 68118 Passed 62070 Skipped 5887 Failed 161`, 167 files, marker,
 exit 0, and no `Test files exiting with errors` section.
 
 **A count in the per-file table is executions, not tests**: `clock`'s
@@ -535,20 +540,29 @@ Open, in order of what the next run should touch:
   **empty** name when neither parses. **`%Z` changing for every zone is
   the thing to watch beyond `clock`.** No zoneinfo, so
   `TZ=America/New_York` is UTC; glibc does the same here without tzdata.
-- **`fCmd` 35 + `unixFCmd` 4: read and sorted.** 15 need symbolic links
-  and 8 need a password database -- both out of reach. The other 12+ are
-  two bugs, both fixed and **not yet confirmed**: (a) `rename()` of a
-  directory into a *different* directory always failed, because the
-  cross-directory copy path did `_CREATE(to, OWRITE, s->mode)` and a
-  directory cannot be opened for writing -- which also produced the
-  "invalid operation" that two permission tests were reading; an empty
-  one is now recreated and removed, a non-empty one answers `EXDEV`,
-  which Tcl acts on. Plus `EINVAL` for a directory moved into itself,
-  compared **by qid up the tree, not by string** (`../td1/foo`). (b)
-  `_errno.c` mapped Plan 9's "permission denied" to `EPERM`; POSIX wants
-  `EACCES` there and keeps `EPERM` for "not the owner", which is what
-  `wstat -- not owner` still maps to.
-- **Still unread: `io` 23, `chan-io` 19, `socket_inet` 17,
+- **`fCmd` 35 -> 22, CONFIRMED, and everything left is out of reach.**
+  The 16 that went were the two bugs: `rename()` of a directory into a
+  *different* directory always failed (the cross-directory copy path did
+  `_CREATE(to, OWRITE, s->mode)` and a directory cannot be opened for
+  writing), which also produced the "invalid operation" two *permission*
+  tests were reading; plus `EINVAL` for a directory moved into itself,
+  compared **by qid up the tree, not by string**; plus `_errno.c` mapping
+  Plan 9's "permission denied" to `EPERM` where POSIX wants `EACCES`.
+  The remaining 22 + `unixFCmd` 2 are 15 symlink, 8 `~USER`, and
+  `unixFCmd-1.1`. **24 of 24 accounted for** -- reading a cluster all
+  the way through before touching it is what made that possible.
+- **`socket_inet-5.1`/`5.3`: newly failing, and probably not ours.**
+  They ask that `socket -server dodo 1` be refused. Tcl's server path
+  tests only `EADDRINUSE`, and both bodies return a fixed string, so the
+  `EPERM`->`EACCES` change cannot have turned a failure into a success.
+  `socket_inet-4.2` went the *other* way in the same run, having been
+  failing with `EADDRINUSE` -- so this file depends on what holds ports
+  when a run starts (see the leaked `listenproc` item). Likely they were
+  passing for the wrong reason and glenda, as host owner, may announce a
+  privileged port; `notRoot` asks about a *user name*, which is the
+  wrong proxy here. **One command settles it** -- see
+  `docs/notes/tcl-suite.md`.
+- **Still unread: `io` 23, `chan-io` 19, `socket_inet` 16,
   `filename` 17, `socket` 10.** `filename`'s are all `Tcl_GlobCmd`.
 - **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a
   password database mapping a user to a home directory, which Plan 9
