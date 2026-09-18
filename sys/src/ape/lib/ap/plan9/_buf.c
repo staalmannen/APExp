@@ -586,8 +586,11 @@ _killtimerproc(void)
 	 * closes the class rather than the instance: the next child to
 	 * leave through exit() should not be able to do it again.
 	 */
-	if(timerpid > 0 && (_mainpid == getpid() || _mainpid == -1))
+	if(timerpid > 0 && (_mainpid == getpid() || _mainpid == -1)){
+		_apdbg("timer: _killtimerproc is ending it", "pid", timerpid,
+			"by", getpid());
 		kill(timerpid, SIGKILL);
+	}
 }
 
 static void
@@ -626,6 +629,17 @@ _timerproc(void)
 		atexit(_killtimerproc);
 		while(_RENDEZVOUS(&timerpid, 0) == (void*)~0)
 			;
+		/*
+		 * WHO MAKES A TIMER AND WHO ENDS ONE. _resettimer() has now
+		 * been seen restarting a dead timer TWICE in one run of
+		 * socket.test, so something is killing them and nothing
+		 * records what. These two lines and the one in
+		 * _killtimerproc are the whole instrument: if the kill comes
+		 * from that handler, the next debug run names the process
+		 * that ran it; if it does not, the killer is somewhere else
+		 * and that is worth knowing too.
+		 */
+		_apdbg("timer: forked", "pid", timerpid, "by", getpid());
 	}
 }
 
