@@ -4188,43 +4188,40 @@ work it did not do, but an implementation detail answering as though it
 were data. `nohandle` stays visible -- it is a knob a user sets, not
 something libap writes.
 
-**2. `unsetenv()` never reached a child, and the reason is where the
-environment lives.** musl's `unsetenv` edits the in-process `environ`
-array, which on a Unix *is* the environment. Here it is a working copy:
-the environment is files in `/env`, and `execve` is what writes it out.
-And `execve` only ever **created**:
+**2. WITHDRAWN IN FULL -- there was no second bug.** What this section
+said, and what the code change beside it did, rested on reading one
+rfork flag backwards. It is left here rather than deleted because the
+mistake is the useful part; the correction is measured, in the last
+section of this file.
+
+The claim was that `unsetenv()` could not reach a child, because the
+environment lives in `/env` and `execve` only ever **created**:
 
 ```c
-_RFORK(RFCENVG);		/* our own copy of the group */
+_RFORK(RFCENVG);		/* "our own copy of the group" -- WRONG */
 ...
 if(envp)
 	for(e = envp; *e; e++)
 		_CREATE("/env/NAME", ...);	/* and never removes */
 ```
 
-So every variable in the inherited group survived into the child whether
-`envp` mentioned it or not. `execve` clears `/env` first now, so **the
-child's environment is exactly `envp`**, which is what POSIX says it is.
+**`RFCENVG` does not copy the group, it creates an empty one.** The `C`
+in `RFCNAMEG`, `RFCFDG` and `RFCENVG` is *clear*; `RFENVG` is the flag
+that copies. So `execve` was already emptying `/env` on its own line
+one, the creates below it were already the child's whole environment,
+and the behaviour was correct before anything was changed -- exactly
+what POSIX asks for. The `/env`-clearing loop added here was removing an
+empty directory on every exec, and has been reverted.
 
-*(The first version of this paragraph added "and `path` -- which Tcl had
-unset -- came back". That was wrong and the section below is what
-corrected it: Tcl never unsets `path`. The POSIX violation described
-here is real, but `path` was not evidence of it, and no test measured
-it. `execve-env-test.c` does.)*
-
-`RFCENVG` is what makes that safe: the group is already this process's
-own copy, so removing everything touches neither the parent nor the
-shell. Only done when `envp` is given, so `execve(path, argv, 0)` keeps
-its old meaning rather than quietly handing the child an empty
-environment.
-
-**A hazard to record beside the existing one.** This file already notes
-that *a failed `execve()` is not free* -- by the time the exec is tried
-it has rforked the environment group, rewritten `/env/_fdinfo` and
-`/env/_sighdlr`, and closed every `FD_CLOEXEC` descriptor. **Add "and
-emptied `/env`" to that list.** The damage is bounded: `environ` in the
-surviving process is untouched, so `getenv` still answers, and the next
-`execve` refills `/env` from whatever `envp` it is given.
+Two things should have caught this earlier and both were in hand. First,
+`path` was never evidence: the section below shows Tcl does not unset
+it. Second -- and this is the one that stings -- **`HOME`'s absence from
+the child was a refutation sitting in the log the whole time.** It was
+read as an anomaly to be explained later rather than as the measurement
+it was, and the chain was then traced through `unsetenv`, `execvp`,
+`posix_spawnp` and `_envsetup` looking for the mechanism that hid it.
+There was none: it was absent because nothing leaked. **A fact that
+contradicts the diagnosis is not a loose end to come back to.**
 
 **Prediction.** `env.test` goes from 9 failures to 0 or nearly 0 -- the
 three lines above are all that stood between it and an exact match, and
@@ -4408,9 +4405,9 @@ create nothing else -- and then lists `/env`:
   `execve` leaked them into every child, clearing `/env` is
   load-bearing, and `HOME`'s absence has a cause still to find.
 - **only the two** -> `RFCENVG` hands back an empty group, the old code
-  was already correct, and the change should be **reverted**: it empties
-  `/env` on a failed exec, and that is a real cost to carry for a bug
-  that was not there.
+  was already correct, and the change should be **reverted**.
+
+*(It was the second. See the last section.)*
 
 It is a probe, not a check -- it asks what one operating system does, so
 it prints its finding and says which conclusion follows in words, and
@@ -4427,3 +4424,74 @@ in eight for mechanisms guessed from code alone, I have read every step
 of this chain and it contradicts the log, and the two outcomes point in
 opposite directions -- keep the change or revert it. Writing a guess down
 here would only be something to be wrong about.
+
+#### The probe's answer: RFCENVG was already the clear, and the fix is reverted
+
+```
+--- 3. probe: what RFCENVG leaves in /env ---
+  note 2 names in /env after rfork(RFCENVG) + 2 creates; 0 of them are the parent's
+  note SO: RFCENVG hands back an EMPTY group. The old
+  note execve was already correct, and clearing /env
+  note buys nothing for the cost of emptying it on a
+  note failed exec -- the change should be reverted.
+```
+
+**Two names, neither of them the parent's.** `RFCENVG` creates a new
+*empty* environment group -- the `C` in `RFCNAMEG`, `RFCFDG` and
+`RFCENVG` is **clear**, and `RFENVG` is the flag that copies. I had the
+pair the wrong way round, wrote "our own copy of the group" in a comment
+next to the line, and built a whole diagnosis on top of it.
+
+So `execve` was correct before this round began: line one empties the
+group, and the `_CREATE` calls below are the child's entire environment.
+The `/env`-clearing loop was **removing an empty directory on every
+exec** -- a `_dirreadall` and a remove per entry, for nothing. Reverted;
+the comment now states what the flag does and why it is worth saying.
+
+**What remains from the round is the half that was real.** `_fdinfo` and
+`_sighdlr` no longer leak into `environ`, confirmed on the VM; that was
+a genuine bug and is fixed. `env`'s nine failures are the lowercase
+`path`, explained above and not ours. Nothing else changed.
+
+**The failed-exec hazard is unchanged and was never new.** This file
+notes that a failed `execve()` has already rforked the environment
+group, rewritten `/env/_fdinfo` and `/env/_sighdlr` and closed every
+`FD_CLOEXEC` descriptor. Emptying `/env` was always part of that -- it
+is what `RFCENVG` does -- so the line added to CLAUDE.md saying a failed
+`execve()` *now* also empties `/env` was wrong in the one word "now".
+The hazard is old, real, and correctly described in `execpath.c` and
+`posix_spawn.c`, neither of which claims the flag copies.
+
+**Three lessons, and the third is the expensive one.**
+
+**A flag whose name is one letter from another flag's is worth
+checking**, not recalling. `RFENVG` and `RFCENVG` differ by a `C` and
+differ in meaning by exactly the thing the diagnosis turned on. The same
+holds for `RFNAMEG`/`RFCNAMEG` and `RFFDG`/`RFCFDG`, so this is a family,
+not a one-off.
+
+**A comment can be the thing that misleads you, and this one was mine.**
+`/* our own copy of the group */` was written during the change and then
+read back two rounds later as though it were evidence about the kernel.
+A comment restating what a call does is a claim, and it gets no more
+credit than any other unmeasured claim.
+
+**`HOME`'s absence was a refutation, and it was treated as a loose
+end.** It was in the very first log: if `/env` had leaked, `HOME` had to
+be there, and it was not. Instead of taking that as the answer, I filed
+it as an anomaly and spent the next passes reading `unsetenv`,
+`execvp`, `posix_spawnp` and `_envsetup` to find what could have hidden
+it. Nothing had. **A fact that contradicts the diagnosis is not a loose
+end to come back to -- it is the measurement, and it outranks the
+reading.** Every step of that chain was correct; the conclusion they
+were being recruited to defend was not.
+
+**What the probe was worth.** One test file, no rebuild of libap,
+compiled and run in a minute, and it reversed a committed change. The
+rule it came from -- that a build containing a change cannot tell you
+the change was needed -- is now in CLAUDE.md, and replicating the old
+code beside the new is the cheap way to ask. It was written expecting to
+confirm the fix, and its value was entirely in being written so it could
+say the opposite: it prints the conclusion for *both* outcomes and counts
+no failure either way, which is why the answer was readable as soon as
+it ran rather than argued about afterwards.
