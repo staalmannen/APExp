@@ -337,6 +337,12 @@ in the topic file.
   missing loopback, the announce spelling and the `fd_set` width were all
   settled that way after rounds of reasoning went the wrong way.
 - **A grep hit is a name, not an implementation.** Open the function.
+- **Replicate the code in the tree, line by line, not the code you
+  remember.** A probe written from a recollection of `DoCopyFile`
+  skipped its `unlink(dst)` and so reported 0 failures for a copy that
+  did not work -- a probe that skips a call cannot clear it.
+- **Plan 9 has `ratrace`**, and it names a failing system call outright
+  where elimination takes rounds.
 - **Read what a test *compares*, not what it mentions.**
 - **Every case expected to return must come before every case expected to
   hang**, in file order, each behind a flushed marker naming the
@@ -452,19 +458,23 @@ per-file table and the command that produces it are at the end of
 
 Open, in order of what the next run should touch:
 
-- **`file copy` of a file that exists reports ENOENT**, reproducible in
-  four lines of `tclsh`, and it aborts `encoding.test`, `http.test` and
-  `fCmd.test`. Five candidates read out of the source were all wrong, so
-  `sys/lib/tests/copyfile-test.c` makes Tcl's calls in Tcl's order and
-  reports each. Read its destination-`lstat` assertion first: the copy
-  is abandoned unless a missing file reports exactly `ENOENT`.
-- **`symlink()` is ENOSYS, and that costs exactly ONE test** of
+- **`file copy` of a file that exists reports ENOENT**, and it aborts
+  `encoding.test`, `http.test` and `fCmd.test`. **The syscalls are
+  cleared**: `copyfile-test` makes every call Tcl makes, in order, and
+  reported 0 failures on the VM -- but it was missing `DoCopyFile`'s
+  `unlink(dst)`, which tolerates only ENOENT, and that is now section 3.
+  Cleared by `file rename` working: the whole shared prologue,
+  normalisation, the encoding conversion and `Tcl_FSGetNativePath`. If
+  section 3 also passes, trace it: `ratrace tclsh` names the call. See
+  `docs/notes/tcl-suite.md`.
+- **9front has no symbolic links** -- confirmed, `grep DSYM
+  /sys/include/*` is empty -- so `symlink()` stays ENOSYS, and that
+  costs exactly ONE test of
   `fCmd`'s eighty -- the aborting line is a `file copy`, not a link.
   **Do not emulate it with a copy** the way old APE's `ln` did: `lstat`
   must say `S_IFLNK`, `readlink` must return a target, a link to a
   directory is not a copy, a dangling link is normal, and writes would
-  diverge silently. First ask whether 9front has links natively
-  (`grep -n DMSYM /sys/include/libc.h`) -- see `docs/notes/tcl-suite.md`.
+  diverge silently -- see `docs/notes/tcl-suite.md`.
 - **A path ~50 components deep cannot be deleted** -- `invalid
   operation`, with the directory empty, so it is the path and not the
   contents. `unixFCmd` and `winFCmd` both abort on it.
