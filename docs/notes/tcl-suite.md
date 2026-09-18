@@ -4755,3 +4755,215 @@ and a probe rather than a library rule. The remaining 23 are symlinks
 and `~USER`. **What to watch is `rename()` being reached by code that
 never got past the old failure**: a fix that lets a process reach code
 it never reached before can expose anything on that path.
+
+#### fCmd: every failure that was ours is gone, and the prediction held
+
+`Total 68118 Passed 62070 Skipped 5887 Failed 161`, marker, exit 0.
+175 -> 161.
+
+**Sixteen fixed, and fifteen of them were named in advance:**
+
+```
+fCmd-9.1  9.11  9.14.3  18.3  22.4  6.30  unixFCmd-1.3  1.7   (directory rename)
+fCmd-4.11 4.14  6.6     6.24                              (EPERM -> EACCES)
+fCmd-6.21 6.25  6.26                                      (flagged unread; same families)
+socket_inet-4.2                                           (not ours -- see below)
+```
+
+The twelve predicted all went. `6.21`, `6.25` and `6.26` were recorded
+as "unread and may be in the same families" -- they were, which is worth
+noting as the one place guessing paid, and it paid only because the
+guess was labelled as one.
+
+**What remains in `fCmd` is exactly the two groups that were called out
+of reach**, with nothing left over:
+
+```
+symlink   18.12 18.13 18.14 18.15 18.16 21.7.2 21.8.2 21.9
+          26.1 26.2 26.3 28.9 28.21 28.22 unixFCmd-2.2.2   = 15
+~USER     31.6 31.9 32.5 32.5.1 32.9 32.9.1 32.17 32.17.1  = 8
+Plan 9    unixFCmd-1.1                                     = 1
+```
+
+24 of 24 accounted for. **A cluster read all the way through before
+being worked on came apart exactly as the reading said it would**, which
+is the argument for reading all thirty-five rather than fixing the first
+one and re-running.
+
+`rename-test` on the VM: 0 failures, every section including 5b through
+`..` and section 7's EACCES. Note APE's errno *numbers* are its own --
+`EINVAL` is 12 and `EACCES` is 2 there -- which is why the test compares
+names and never numbers.
+
+#### socket_inet-5.1 and 5.3: a test that had been passing for the wrong reason
+
+Two appeared as the sixteen went, and the first suspicion has to be the
+errno change, because `EPERM` -> `EACCES` is exactly the kind of "pure
+naming change" this file already records as having altered control flow
+once (`bind()`'s fallback is gated on `EPLAN9`, and naming an error stops
+it running).
+
+**It is not that, and the checks are cheap enough to state.**
+
+- Both tests' bodies `return` a *fixed string* whichever way the error
+  goes. Only success versus failure matters, and an errno cannot turn a
+  failure into a success.
+- Tcl's server path tests exactly one errno -- `tclUnixSock.c` greps to
+  `EADDRINUSE`, twice, both guarded by `port == 0`. Neither `EACCES` nor
+  `EPERM` appears anywhere in it.
+- `bind()`'s fallback is gated on `EPLAN9`; `EPERM` was not `EPLAN9` and
+  `EACCES` is not either, so that gate is unchanged.
+
+**`socket_inet-4.2` is the evidence for what it really is.** In the same
+file, in the same run, it went the *other* way: it had been failing with
+
+```
+errorCode: POSIX EADDRINUSE {address already in use}
+```
+
+for `socket -server dodo -myaddr $localhost 0x3000`, and now passes.
+Nothing in this round touches sockets, so **this file's results depend
+on what is already holding ports when the run starts** -- and this tree
+already records "over a hundred leaked `listenproc` processes accumulate
+across runs, since nothing records the listener's pid for `close()` to
+kill".
+
+So the reading is that 5.1 and 5.3, which ask that `socket -server dodo 1`
+and `... 21` be REFUSED, were previously refused with `EADDRINUSE` by a
+leftover listener and **passed for the wrong reason**; with the ports
+free they succeed, because on a 9front terminal glenda is the host owner
+and may announce a privileged port.
+
+**If that is right the constraint is the thing that is wrong, and it is
+upstream's.** `notRoot` comes from
+
+```tcl
+ConstraintInitializer root {expr {($::tcl_platform(platform) eq "unix") &&
+	($::tcl_platform(user) in {root {}})}}
+```
+
+-- a proxy for "may I bind below 1024" that asks about a *user name*.
+Plan 9 has no root, so `notRoot` is true and the test runs, while the
+capability it stands in for is held all the same. The test even
+anticipates it in its own failure message: *"are you running as SU?"*.
+That would make these two permanent and correct failures, not ours.
+
+**Not asserted, because the last step is about port occupancy at the
+start of a run and nothing here measured it.** One command settles it,
+with no rebuild -- in the APExp shell, as glenda, on a machine with no
+suite running:
+
+```
+tclsh
+% socket -server {apply {{c a p} {}}} 1
+```
+
+A channel back means glenda can announce port 1, the constraint is the
+problem, and the two go in the "not ours" list beside `unixFCmd-1.1`. An
+error means the story above is wrong and the cause is still open.
+
+**The rule this pays for**: *a test that newly fails may be a test that
+was previously passing for the wrong reason*. This file already has the
+converse -- "a rising failure count after new tests become runnable is
+newly measured, not newly broken" -- and this is the same coin. Before
+attributing a new failure to the change in hand, ask what the test
+actually asserts and whether anything else in its file moved.
+
+#### The probe gave a third answer, and it was the useful one
+
+The question was whether glenda can announce a privileged port, with two
+expected answers: a channel back (the `notRoot` constraint is the
+problem) or an error (the story was wrong). What came back was neither:
+
+```
+% socket -server {apply {{c a p} {}}} 1
+couldn't open socket: address already in use
+```
+
+**The port is held right now**, in a fresh `tclsh`, with no suite
+running. So the capability question is still unanswered -- and something
+better was answered instead.
+
+**Follow the sequence.** The last suite run's own `socket_inet-5.1` bound
+port 1 (which is why it failed), and its body then calls `close $msg`.
+The port is still announced afterwards. So `close()` on a listening
+socket releases nothing, and **the two tests had been passing for the
+wrong reason all along**: a leftover listener from an earlier run was
+refusing the bind, not the system. The run that "broke" them was the
+first one to find the port free.
+
+That also closes the question of whether the `EPERM` -> `EACCES` change
+did it. It did not, and the three reasons stand: both bodies return a
+fixed string whichever way the error goes, Tcl's server path tests only
+`EADDRINUSE`, and `bind()`'s fallback is gated on `EPLAN9` which neither
+errno is. **The probe was worth running even though it refuted its own
+two options** -- an answer outside the menu is still an answer, and this
+one named a bug that had been sitting in the "open hazards, not
+measured" list for months.
+
+#### close() on a listening socket freed nothing, and the reason is the pipe
+
+`listen()` does not keep the socket in the calling process.
+`ap/network/listen.c` replaces the descriptor with a **pipe**, so that
+`select()` can work on it, and forks a child that holds the real network
+descriptor and blocks in `open("/net/tcp/N/listen")`. So:
+
+- the parent's `close()` shuts a pipe;
+- the announcement is held by a descriptor in **another process**;
+- nothing connected the two.
+
+`_killmuxsid` kills that process group from an `atexit` handler, and it
+is not enough twice over. A program that closes a listener and keeps
+running holds the port for its whole life -- which is exactly what Tcl's
+socket tests do. And a run that ends any way other than `exit()` -- an
+interrupt, a note, a fault -- runs no `atexit` handler at all. **That is
+where "over a hundred leaked `listenproc` processes accumulate across
+runs" came from**, an item that had been in the notes without anyone
+connecting it to a test result.
+
+`_sock_listenpid.c` records the listening pid against the descriptor;
+`close()` calls `_sock_killlisten()`, which is a no-op for every
+descriptor that is not one.
+
+**The owner is recorded beside the pid, and that is not belt and
+braces.** The table is inherited by every fork, exactly like the atexit
+handlers, so a child closing an inherited descriptor would kill its
+PARENT's listener. `_buf.c` has this written on it in capitals after it
+cost a round:
+
+> ONLY THE PROCESS THAT FORKED THE TIMER MAY KILL IT
+
+-- the asymmetry there meant any forked child leaving through `exit()`
+took the parent's timer with it, and every blocking `select()` that
+needed a timeout waited for ever. Same table, same trap, same guard:
+`_sock_killlisten` forgets the entry either way and kills only if
+`getpid()` matches the recorded owner.
+
+`SIGKILL` rather than `SIGTERM`, because the listener is blocked in an
+`open()` that will not return until a call arrives. `_closebuf` kills
+its copy processes the same way.
+
+**`network/mkfile` had no `HFILES` at all**, so a change to
+`../include/priv.h` -- which defines `struct Rock`, shared by every file
+in that directory -- rebuilt nothing. Added, because the shape of that
+failure is recorded here already and is unattributable when it happens.
+
+**No struct changed**, so this does not need `mk distclean`: a rebuild of
+libap and a relink of whatever uses it is enough.
+
+**Prediction, and it has two parts.** `listenleak-test` should go from
+failing section 1 to 0 failures -- that is the whole claim. What happens
+to `socket_inet-5.1`/`5.3` is a *separate* question and I expect them to
+**stay failing**, because the leftover that was masking them is what this
+removes: with ports genuinely free, the tests will honestly report
+whether glenda may announce port 1, and on a 9front terminal she is the
+host owner and may. That would put them with `unixFCmd-1.1` as
+upstream's constraint asking the wrong question -- `notRoot` tests a
+*user name* as a proxy for a capability. **A fix that makes two tests
+fail honestly instead of passing dishonestly is still the right fix**,
+and the count going the wrong way is not evidence against it.
+
+**The leftover on port 1 is still there and must be cleared before any
+of this can be measured**, or the first run after the fix will still see
+the port held by a process that predates it. A reboot of the VM, or
+killing the leftovers, before the next suite run.

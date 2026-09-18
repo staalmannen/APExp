@@ -26,6 +26,15 @@ close(int d)
 			free(_fdinfo[d].name);
 			_fdinfo[d].name = 0;
 		}
+		/*
+		 * A LISTENING SOCKET IS A PIPE HERE, and the port is held
+		 * by the process listen() forked, so closing this
+		 * descriptor would otherwise free nothing. No-op for every
+		 * descriptor that is not one. See
+		 * ap/network/_sock_listenpid.c for why it is keyed on the
+		 * owner as well as the fd.
+		 */
+		_sock_killlisten(d);
 		n = _CLOSE(d);
 		if(n < 0)
 			_syserrno();

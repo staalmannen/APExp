@@ -32,7 +32,7 @@ static int
 listenproc(Rock *r, int fd)
 {
 	char listen[Ctlsize], name[Ctlsize], *net, *p;
-	int cfd, nfd, dfd, pfd[2], i;
+	int cfd, nfd, dfd, pfd[2], i, pid;
 	struct stat d;
 	Rock *nr;
 	void *v;
@@ -67,7 +67,7 @@ listenproc(Rock *r, int fd)
 	r->dev = d.st_dev;
 
 	/* start listening process */
-	switch(fork()){
+	switch(pid = fork()){
 	case -1:
 		close(pfd[1]);
 		close(nfd);
@@ -86,6 +86,14 @@ listenproc(Rock *r, int fd)
 			;
 		_muxsid = (int)v;
 		atexit(_killmuxsid);
+		/*
+		 * REMEMBER WHO IS LISTENING, so that close() can end it.
+		 * The socket descriptor is a pipe from here on and the
+		 * announcement is held by that child, so without this a
+		 * closed listening socket keeps its port for the life of
+		 * the program -- see _sock_listenpid.c.
+		 */
+		_sock_setlisten(fd, pid);
 		close(pfd[1]);
 		close(nfd);
 		return 0;

@@ -126,3 +126,13 @@ extern void _fdinit(char*, char*);
 
 
 void checkbug(char *, int);
+
+/*
+ * ap/network/_sock_listenpid.c. Declared here rather than in priv.h
+ * because close() needs the second one and does not otherwise know
+ * anything about sockets; priv.h would bring struct sockaddr with it.
+ * A missing prototype would corrupt the argument -- sizeof is 32-bit
+ * here -- so it is declared rather than assumed.
+ */
+extern void _sock_setlisten(int, int);
+extern void _sock_killlisten(int);

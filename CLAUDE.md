@@ -182,7 +182,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `rol64-test.c` and `u64float-test.c`, and for libap `locale-test.c`,
 `sigset-test.c`, `posix-spawn-test.c`, `limits-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
-`execve-env-test.c`, `tz-test.c`, `rename-test.c`,
+`execve-env-test.c`, `tz-test.c`, `rename-test.c`, `listenleak-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
@@ -318,6 +318,11 @@ in the topic file.
   *names*.
 - **A rising failure count after new tests become runnable is newly
   *measured*, not newly broken.**
+- **And its coin's other face: a test that newly FAILS may be one that
+  was passing for the wrong reason.** Before blaming the change in hand,
+  read what the test asserts and ask whether anything else in its file
+  moved. `socket_inet-5.1` wants a port bind refused, and a leftover
+  listener had been refusing it.
 
 **Before believing a result**
 
@@ -495,7 +500,7 @@ or a constraint that fails on Linux too). The port's own share is
 `focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
 
 **Tcl's suite**: **it finishes and nothing aborts.**
-`Total 68118 Passed 62056 Skipped 5887 Failed 175`, 167 files, marker,
+`Total 68118 Passed 62070 Skipped 5887 Failed 161`, 167 files, marker,
 exit 0, and no `Test files exiting with errors` section.
 
 **A count in the per-file table is executions, not tests**: `clock`'s
@@ -535,20 +540,37 @@ Open, in order of what the next run should touch:
   **empty** name when neither parses. **`%Z` changing for every zone is
   the thing to watch beyond `clock`.** No zoneinfo, so
   `TZ=America/New_York` is UTC; glibc does the same here without tzdata.
-- **`fCmd` 35 + `unixFCmd` 4: read and sorted.** 15 need symbolic links
-  and 8 need a password database -- both out of reach. The other 12+ are
-  two bugs, both fixed and **not yet confirmed**: (a) `rename()` of a
-  directory into a *different* directory always failed, because the
-  cross-directory copy path did `_CREATE(to, OWRITE, s->mode)` and a
-  directory cannot be opened for writing -- which also produced the
-  "invalid operation" that two permission tests were reading; an empty
-  one is now recreated and removed, a non-empty one answers `EXDEV`,
-  which Tcl acts on. Plus `EINVAL` for a directory moved into itself,
-  compared **by qid up the tree, not by string** (`../td1/foo`). (b)
-  `_errno.c` mapped Plan 9's "permission denied" to `EPERM`; POSIX wants
-  `EACCES` there and keeps `EPERM` for "not the owner", which is what
-  `wstat -- not owner` still maps to.
-- **Still unread: `io` 23, `chan-io` 19, `socket_inet` 17,
+- **`fCmd` 35 -> 22, CONFIRMED, and everything left is out of reach.**
+  The 16 that went were the two bugs: `rename()` of a directory into a
+  *different* directory always failed (the cross-directory copy path did
+  `_CREATE(to, OWRITE, s->mode)` and a directory cannot be opened for
+  writing), which also produced the "invalid operation" two *permission*
+  tests were reading; plus `EINVAL` for a directory moved into itself,
+  compared **by qid up the tree, not by string**; plus `_errno.c` mapping
+  Plan 9's "permission denied" to `EPERM` where POSIX wants `EACCES`.
+  The remaining 22 + `unixFCmd` 2 are 15 symlink, 8 `~USER`, and
+  `unixFCmd-1.1`. **24 of 24 accounted for** -- reading a cluster all
+  the way through before touching it is what made that possible.
+- **`close()` on a listening socket freed nothing -- fixed, not yet
+  confirmed.** `listen()` replaces the descriptor with a **pipe** and
+  forks a child holding the real network fd, so `close()` shut a pipe
+  while the announcement lived in another process. `_killmuxsid` only
+  kills that group at `exit()`, which is no help to a program that keeps
+  running and none at all to a run ended by a note. **This is the
+  hundred leaked `listenproc` processes**, and it was found by one
+  command: `socket -server ... 1` in a fresh `tclsh` answered `address
+  already in use` for a port the previous run had bound and closed.
+  `_sock_listenpid.c` records the pid; `close()` kills it, **only if
+  `getpid()` matches the recorded owner** -- the table is inherited by
+  every fork, which is the trap `_buf.c` records in capitals.
+- **`socket_inet-5.1`/`5.3` were passing for the WRONG REASON** -- a
+  leftover listener was refusing the bind, not the system -- so they are
+  not a regression from the errno change. Expect them to **stay
+  failing** once ports are genuinely released: `notRoot` tests a user
+  *name* as a proxy for a capability, and glenda is the host owner.
+  **Clear the leftovers (or reboot) before the next suite run**, or the
+  first run after the fix still meets a process that predates it.
+- **Still unread: `io` 23, `chan-io` 19, `socket_inet` 16,
   `filename` 17, `socket` 10.** `filename`'s are all `Tcl_GlobCmd`.
 - **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a
   password database mapping a user to a home directory, which Plan 9
@@ -582,13 +604,12 @@ mode-0 directory; Plan 9 answers "does not exist". The file server's
 choice, so a probe rather than a library rule.
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
-where POSIX allows EPERM or EISDIR; and over a hundred leaked
-`listenproc` processes accumulate across runs, since nothing records the
-listener's pid for `close()` to kill.
+where POSIX allows EPERM or EISDIR.
 
 **Open hazards recorded but not measured**: the lost wakeup in
 `select()`'s rendezvous (a copy process reaching EOF before the parent
-sets `selwait`); `_closebuf` killing a copy process up to ten times
-without waiting for it to die; and a `socket -server` closed with no
-connection leaving its `listenproc` blocked for ever, since nothing
-records the listener's pid for `close()` to kill.
+sets `selwait`), and `_closebuf` killing a copy process up to ten times
+without waiting for it to die. *(The third -- a closed `socket -server`
+leaving its `listenproc` for ever -- was measured and fixed; see above.
+It had sat here unmeasured while it silently decided the result of two
+tests.)*
