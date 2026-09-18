@@ -449,42 +449,42 @@ Failed 178`, clean exit. The remaining 178 are mostly out of reach here
 or a constraint that fails on Linux too). The port's own share is
 `focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
 
-**Tcl's suite**: **it finishes.** `Total 67008 Passed 61226 Skipped 5630
-Failed 152`, 167 files, marker, exit 0 -- the first complete run this
-project has had, and the first measurement of `io`, `ioCmd`, `ioTrans`,
-`iogt`, `socket` and `socket_inet` at all. Read `152` with the five
-aborting files beside it: tcltest counts nothing for a file that exits
-with an error, and `fCmd.test` alone has eighty failures in the log. The
-per-file table and the command that produces it are at the end of
+**Tcl's suite**: **it finishes, and `file copy` works.**
+`Total 67898 Passed 61985 Skipped 5695 Failed 218`, 167 files, marker,
+exit 0. Two files still abort (`unixFCmd`, `winFCmd`) where five did.
+**Read the per-file table from the log, not `Failed`**: tcltest counts
+nothing for a file that aborts, so the total rose by 66 while the real
+count fell 239 -> 225. The table and its command are at the end of
 `docs/notes/tcl-suite.md`.
 
 Open, in order of what the next run should touch:
 
-- **FOUND and fixed, not yet confirmed: `utime()` returned the wstat
-  byte count instead of 0**, so `CopyFileAtts`' `if (utime(...))` made
-  every `file copy` fail and delete its own output. `utimes` and
-  `futimes` were the same; `chmod`, `chown`, `truncate` and the rest of
-  that directory were already right. Named by **`ratrace`** in one run
-  after six readings of the source chased the wrong errno. See
-  `docs/notes/tcl-suite.md`.
-- **9front has no symbolic links** -- confirmed, `grep DSYM
-  /sys/include/*` is empty -- so `symlink()` stays ENOSYS, and that
-  costs exactly ONE test of
-  `fCmd`'s eighty -- the aborting line is a `file copy`, not a link.
-  **Do not emulate it with a copy** the way old APE's `ln` did: `lstat`
-  must say `S_IFLNK`, `readlink` must return a target, a link to a
-  directory is not a copy, a dangling link is normal, and writes would
-  diverge silently -- see `docs/notes/tcl-suite.md`.
 - **A path ~50 components deep cannot be deleted** -- `invalid
   operation`, with the directory empty, so it is the path and not the
-  contents. `unixFCmd` and `winFCmd` both abort on it.
-- `fCmd` 80, `io` 22, `chan-io` 19, `socket_inet` 18, `filename` 18,
-  `clock` 16, `cmdAH` 10, `env` 9 -- none of these clusters has been
-  read yet.
+  contents. It is the only thing still aborting a file, and it aborts
+  two.
+- **`fCmd` 73, `io` 22, `chan-io` 19, `socket_inet` 18, `filename` 17,
+  `clock` 16, `socket` 10, `env` 9** -- none of these clusters has been
+  read. `fCmd`'s copy and rename sections `6.x` and `18.x` did *not*
+  move with the `utime` fix, so they are separate bugs.
+- **`file home ~USER` / `file tildeexpand ~USER`**, ten tests, newly
+  reachable now that `fCmd.test` no longer aborts. Needs a password
+  database mapping a user to a home directory, which Plan 9 has not --
+  read it before writing it off.
 - `chan-io-6.4x`: `-buffersize 16` with `testchannel inputbuffered`
   reporting 0. The oldest open item here.
 - `binary-53.25`/`53.26`: a double one ulp past the float range must
   round to infinity.
+- **9front has no symbolic links** (confirmed by grep), so `symlink()`
+  stays ENOSYS and costs one test. **Do not emulate it with a copy** --
+  see `docs/notes/tcl-suite.md`.
+
+**Fixed and confirmed this round**: `utime`/`utimes`/`futimes` returned
+the wstat byte count instead of 0, so `if (utime(...))` read a success
+as a failure. `file copy` deleted every copy it made; `encoding.test`,
+`http.test` and `fCmd.test` aborted behind it; and `cmdAH`'s `file
+mtime`, `file atime` and `file lstat` sections went to zero with it.
+Named by `ratrace` in one run.
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR; and over a hundred leaked

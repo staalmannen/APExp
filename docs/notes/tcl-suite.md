@@ -3878,3 +3878,71 @@ are 39 of its 80 -- should move substantially. The count in the suite
 total will *rise*, because three files that reported nothing now report
 their real numbers: newly measured, not newly broken, for the fifth
 time.
+
+#### CONFIRMED: the copy works, three aborts become none, and the tally is honest
+
+`copyfile-test` reports 0 failures with `utime ... returned 0`, and
+`file copy -force a.txt b.txt` in `tclsh` simply returns. The suite:
+
+```
+all.tcl:  Total 67898  Passed 61985  Skipped 5695  Failed 218
+Sourced 167 Test Files.
+Test files exiting with errors:  unixFCmd.test  winFCmd.test
+```
+
+**Five aborting files become two.** `encoding.test`, `http.test` and
+`fCmd.test` now run to the end; what is left is the deep-path delete,
+which is its own bug. `Total` rises by 890 and `Failed` by 66 -- **the
+count going up is three files reporting their real numbers for the first
+time**, which is the fifth instance of "newly measured, not newly
+broken", and this time it was predicted rather than discovered.
+
+**The honest tally is the log, and it went the other way**: 239 -> 225
+by the per-file table, because `Failed` cannot see a file that aborts.
+Two numbers moving in opposite directions is what that looks like.
+
+**Per file, and nothing regressed:**
+
+| | old | new | |
+|---|---|---|---|
+| `cmdAH` | 10 | **4** | sections 23, 24 and 33 to zero |
+| `fCmd` | 80 | **73** | 21 fixed, 10 newly reached |
+| `filename` | 18 | 17 | |
+| `tcltest`, `zipfs-mount-one-arg` | 1 | 0 | |
+| `http` | 0 | 2 | newly measured; it used to abort |
+
+`cmdAH-23.x` is `file lstat`, `24.x` is `file mtime`, `33.x` is `file
+atime` -- every one of them a timestamp, which is exactly the shape of
+the bug.
+
+**And the prediction was half wrong, which is worth recording.** It said
+`fCmd`'s copy and rename clusters -- `2.x`, `6.x`, `18.x`, `21.x`, 39
+tests -- "should move substantially". **21 moved**, across sections 2
+(5->1), 10, 13, 14, 21 (11->8), 22 and 25 (3->0), and `6.x` and `18.x`
+did not move at all. So `utime` was one cause among several in those
+clusters and the rest are separate bugs; the copy and rename work is not
+finished, it is merely unblocked.
+
+**The ten that appeared are newly reachable, and they are one cluster.**
+`fCmd.test` used to abort inside the `28.x` block, so everything after
+it had never run:
+
+```
+fCmd-31.6  file home USER
+fCmd-32.5  file tildeexpand ~USER
+fCmd-32.9  file tildeexpand ~USER/bar
+fCmd-32.17 file tildeexpand ~USER does not mirror HOME
+```
+
+`~USER` expansion, which needs a password database mapping a user name
+to a home directory. Plan 9 has none -- `_getpw` in libap answers
+numeric ids, not homes -- so this is likely the `systray` case again:
+the machine has no concept of the thing being asked about. Worth reading
+properly before it is written off, since `$home` exists and the four
+`31.x`/`32.x` tests that do *not* name a USER pass.
+
+**What is left at the top**, by the per-file table: `fCmd` 73, `io` 22,
+`chan-io` 19, `socket_inet` 18, `filename` 17, `clock` 16, `socket` 10,
+`env` 9. None of these has been read yet, and `fCmd`'s remaining 73 now
+divide into `6.x`/`18.x` (copy and rename, untouched by the timestamp
+fix) and the `~USER` cluster.
