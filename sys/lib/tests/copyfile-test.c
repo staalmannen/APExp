@@ -119,6 +119,37 @@ step(const char *what, int r)
 	return r;
 }
 
+/*
+ * A call whose POSIX contract is "0 on success", checked as such.
+ *
+ * `step()` accepts anything >= 0, which is right for open() but WRONG
+ * for chmod and utime -- and that is how the first two versions of this
+ * probe printed YES for a `utime` that was returning 49. A check that
+ * cannot fail is not a check, and this is the third instance of that
+ * rule in these notes; the first two were in the tree rather than in a
+ * test of mine.
+ */
+static int
+zero(const char *what, int r)
+{
+	const char *pe;
+
+	if(r == 0){
+		printf("  YES  %s\n", what);
+		return r;
+	}
+	if(r > 0){
+		printf("  FAIL %s -> returned %d, and POSIX says 0\n", what, r);
+		failures++;
+		return r;
+	}
+	pe = p9err();
+	printf("  no   %s -> errno %d (%s)%s%s\n", what, errno,
+		strerror(errno), pe[0] ? "; plan 9 says: " : "", pe);
+	failures++;
+	return r;
+}
+
 #define SRC "cft-src.txt"
 #define DST "cft-dst.txt"
 
@@ -214,10 +245,15 @@ main(void)
 		close(dfd);
 
 	printf("--- 5. CopyFileAtts: chmod then utime ---\n");
-	step("chmod " DST, chmod(DST, ss.st_mode & 07777));
+	zero("chmod " DST " returned 0", chmod(DST, ss.st_mode & 07777));
 	tval.actime = ss.st_atime;
 	tval.modtime = ss.st_mtime;
-	step("utime " DST, utime(DST, &tval));
+	/*
+	 * THE BUG. CopyFileAtts is `if (utime(dst, &tval)) return TCL_ERROR;`
+	 * so a utime that answers the wstat byte count rather than 0 makes
+	 * every copy fail and be deleted.
+	 */
+	zero("utime " DST " returned 0", utime(DST, &tval));
 
 	printf("--- 6. the result ---\n");
 	if(lstat(DST, &ds) == 0)
