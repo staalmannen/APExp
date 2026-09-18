@@ -5243,3 +5243,44 @@ socket descriptor. So there is nothing left to find by reading, which
 was the conclusion two rounds ago as well.
 
 `APEXP_LISTENDEBUG=1 ./listenleak-test` is the whole of the next step.
+
+#### Nothing printed, and that was ambiguous too: a mark for the library
+
+`APEXP_LISTENDEBUG=1 ./listenleak-test` produced no `listenpid:` line at
+all -- and the new `note a PASS above...` lines from the commit before
+it were missing too, which is the tell.
+
+**`pcc -o listenleak-test listenleak-test.c` relinks the program against
+the INSTALLED library.** A test rebuilt from a freshly pulled source can
+therefore be running library code from days earlier, and nothing in its
+output says so. That is the same trap as the header search order, and it
+has now cost two rounds in a row on the same bug: once when a numbered
+section printed no header, and once when a debug line that should have
+appeared did not.
+
+**So the library gets a mark, exactly as `<limits.h>` did.**
+`_sock_listenmark()` returns 2, the test prints it first, and the number
+is bumped whenever this file changes in a way a test needs to see:
+
+```
+--- 0. which libap is linked in ---
+  note libap listen bookkeeping: mark 2 (this tree is 2)
+  note if that is not 2, `mk install' has not reached
+  note the installed library and nothing below is
+  note about the code you just pulled
+```
+
+**A link error is also an answer**, and a blunter one: an undefined
+`_sock_listenmark` means the installed libap predates the file entirely.
+
+*`deeppath-test`'s header marker refuted a wrong diagnosis about
+architecture directories in one run. The generalisation was available
+then and was not taken: **anything a test measures that comes from
+somewhere other than its own source should say where it came from.**
+A header, a library, a build -- the same rule, and this is its third
+instance.*
+
+**What is and is not known, plainly.** Whether a kill ever happens is
+still unmeasured; every run so far has been against a library whose
+provenance was not established. The mark is what ends that class of
+round.

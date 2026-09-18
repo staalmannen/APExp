@@ -136,3 +136,4 @@ void checkbug(char *, int);
  */
 extern void _sock_setlisten(int, int);
 extern void _sock_killlisten(int);
+extern int  _sock_listenmark(void);	/* which libap is linked in */

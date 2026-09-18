@@ -113,6 +113,30 @@ static int killing;
  */
 static int dbgon = -1;
 
+/*
+ * WHICH libap A PROGRAM IS ACTUALLY LINKED AGAINST, asked rather than
+ * assumed. `pcc -o x x.c' relinks the program against the INSTALLED
+ * library, so a test can be rebuilt from a freshly pulled source and
+ * still be running library code from days ago -- and nothing in its
+ * output would say so. That cost a round here twice: once when a
+ * section that should have printed a header printed nothing, and once
+ * when a debug line that should have appeared did not.
+ *
+ * This is the `_APEXP_LIMITS_H' marker in deeppath-test, moved from a
+ * header to a library: a program calls it and prints the number, so the
+ * output says which library ran. Bump it whenever this file changes in
+ * a way a test needs to see.
+ *
+ * A LINK ERROR IS ALSO AN ANSWER, and a clearer one: an undefined
+ * `_sock_listenmark' means the installed libap predates this file
+ * entirely.
+ */
+int
+_sock_listenmark(void)
+{
+	return 2;		/* 1: first version; 2: dev/ino + debug */
+}
+
 static void
 dbg(const char *what, int fd, int pid)
 {

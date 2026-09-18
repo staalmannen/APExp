@@ -180,6 +180,21 @@ arrived(void)
 	alarm(0);
 }
 
+/*
+ * WHICH libap THIS BINARY IS LINKED AGAINST. `pcc -o x x.c' links
+ * against the INSTALLED library, so a test rebuilt from a fresh pull can
+ * still be running library code from before it -- and nothing in the
+ * output would say. Two rounds were lost that way here. If the link
+ * fails with an undefined `_sock_listenmark', the installed libap
+ * predates the change entirely, and that is the answer.
+ */
+#ifndef __GNUC__
+extern int _sock_listenmark(void);
+#define LISTENMARK _sock_listenmark()
+#else
+#define LISTENMARK (-1)
+#endif
+
 int
 main(void)
 {
@@ -189,6 +204,17 @@ main(void)
 	socklen_t alen;
 	char buf[64];
 	int n;
+
+	printf("--- 0. which libap is linked in ---\n");
+	if(LISTENMARK < 0)
+		printf("  note built with gcc; libap is not involved\n");
+	else {
+		printf("  note libap listen bookkeeping: mark %d"
+			" (this tree is 2)\n", LISTENMARK);
+		printf("  note if that is not 2, `mk install' has not reached\n");
+		printf("  note the installed library and nothing below is\n");
+		printf("  note about the code you just pulled\n");
+	}
 
 	printf("--- 1. close a listener, then take its port back ---\n");
 	port = 0;
