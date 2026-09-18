@@ -3415,3 +3415,246 @@ Unix, not libap being wrong, and it belongs with `chan-io-40.3`'s umask.
 EPLAN9 where POSIX allows EPERM or EISDIR (section 2 of the probe).
 Unfixed deliberately this round -- one measured change at a time, and
 `rmdir` is the one the suite is stuck behind.
+
+#### THE SUITE FINISHES. 167 files, 67008 tests, and the first real accounting
+
+```
+Tests ended at 2026-09-18 05:03:08 +0200
+all.tcl:  Total 67008  Passed 61226  Skipped 5630  Failed 152
+Sourced 167 Test Files.
+tcl-runall: every file ran, now entering exit (code 0)
+```
+
+**No freeze, no spin, no kill -- it ended by itself.** `rmdir-test`
+reports 0 failures with `errno 27 (Directory not empty)` where it used to
+say 1002, so the `rmdir` fix is confirmed, and `fCmd.test` no longer
+pins a core.
+
+**Read `Failed 152` with the five aborts beside it.** Five files exit
+with a `Test file error`, and tcltest counts nothing at all for a file
+that aborts -- `fCmd.test` reports `Total 0` while the log holds eighty
+of its failures. So 152 is the count from the files that *completed*,
+and the honest per-file table has to come from the log:
+
+```sh
+grep '^==== ' /tmp/tcl-all.out | grep ' FAILED$' |
+	grep -v '^==== [A-Za-z0-9._-]* FAILED$' |
+	sed 's/^==== //; s/-[0-9].*//' | sort | uniq -c | sort -rn
+```
+
+The second `grep -v` drops tcltest's bare repetition of the name, which
+is why a naive count doubles.
+
+| | |
+|---|---|
+| `fCmd` | **80**, and it aborts as well |
+| `io` 22, `chan-io` 19 | the old buffering cluster, still the oldest open item |
+| `socket_inet` 18, `socket` 10 | first measurement ever -- no run had reached these files |
+| `filename` 18 | path handling |
+| `clock` 16 | |
+| `cmdAH` 10, `env` 9, `expr` 5 | |
+| `lseq` 3, `exec` 3, `binary` 2 | `binary` is the two Inf tests |
+| `zipfs` ~12 | one per case, mostly the password/cipher block |
+
+**`Skipped 5630` is not a target**: `win` 409, `thread` 197, `bigdata`
+99, `bigEndian` 78, `cookiejar` 60 and a long tail of feature
+constraints.
+
+**The five aborts, and only one of them is a mystery:**
+
+```
+encoding.test   file copy -force cp932.chars shiftjis.chars  -> ENOENT
+fCmd.test       file copy abc.file abc.dir                   -> ENOENT
+http.test       file copy .../httpd .../httpd_2498           -> ENOENT
+unixFCmd.test   file delete of a ~50-deep path  -> invalid operation
+winFCmd.test    the same
+```
+
+**`fCmd`'s is downstream and is `file link`.** The lines immediately
+before it are `fCmd-28.9 file link: success with file FAILED` with
+`errorCode POSIX ENOSYS`, and the abort is the file's own top-level
+cleanup copying a file those tests should have left behind. `symlink()`
+being unimplemented now costs a whole test file rather than a handful of
+tests, which moves it up the list.
+
+**`encoding`'s is NOT downstream, and that is the one to chase.** The
+file it fails to copy is created two lines earlier, in the same
+directory:
+
+```tcl
+cd [temporaryDirectory]
+foreach enc {cp932 euc-jp iso2022-jp} {
+    set f [open $enc.chars w]
+    ...
+    close $f
+}
+file copy -force cp932.chars shiftjis.chars     ;# ENOENT
+```
+
+So `file copy` of a file that demonstrably exists reports "no such file
+or directory". **The line to suspect first is in `DoCopyFile`**, and it
+is the *destination* stat rather than the source:
+
+```c
+if (TclOSlstat(dst, &dstStatBuf) == 0) {
+    if (S_ISDIR(...)) { errno = EISDIR; return TCL_ERROR; }
+} else if (errno != ENOENT) {
+    return TCL_ERROR;            /* <- a missing destination must be ENOENT */
+}
+```
+
+A destination that does not exist yet is the normal case, and the whole
+copy is refused unless `lstat` reports exactly `ENOENT` -- which in APE
+is **20**, not the 2 a reader expects. Whether libap answers that for
+every shape of missing path is exactly the sort of thing to measure
+rather than reason about.
+
+**The cheapest possible next step, four lines and no rebuild:**
+
+```
+tclsh
+% cd /tmp
+% set f [open a.txt w]; puts $f hi; close $f
+% file copy -force a.txt b.txt
+```
+
+If that reports ENOENT, the reproducer is two commands and the next
+probe writes itself. If it works, the suite's context matters --
+`[temporaryDirectory]`, a long path, a freshly written file whose
+directory entry has not settled -- and *that* is the variable.
+
+**The deep-path delete is the other one**, and it is its own bug:
+`unixFCmd` and `winFCmd` both build a path about fifty components deep
+and fail to delete it with `invalid operation`. That is the same errstr
+`rmdir` now interprets, so the new code looked and found the directory
+**empty** -- the failure is the path, not the contents. A length limit
+somewhere in libap's path handling is the obvious suspect and is worth a
+probe of its own.
+
+#### `file copy` is reproducible in four lines, and five guesses were wrong
+
+```
+% cd /tmp
+% set f [open a.txt w]; puts $f hi; close $f
+% file copy -force a.txt b.txt
+error copying "a.txt" to "b.txt": no such file or directory
+```
+
+So it is **not** the suite's context -- not `[temporaryDirectory]`, not a
+long path, not a file an earlier test failed to leave behind. A file
+written one line earlier cannot be copied, and that alone aborts
+`encoding.test`, `http.test` and `fCmd.test`.
+
+**Five candidates were argued from the source and none survived
+reading:** the `S_IFMT` dispatch in `DoCopyFile` (the mode bits are set
+correctly by `_dirtostat`); `open()`'s `access(path, 0)` precheck (which
+handles a missing file correctly); the mode argument carrying `S_IFREG`
+(masked to `0777` by `open()`); `utime()`'s wstat; and the destination
+`lstat`. **And the error message cannot choose between them**, because
+Tcl prints `Tcl_PosixError` at a common `done:` label -- it reports
+whatever errno holds by then and names both paths whichever call failed.
+
+`sys/lib/tests/copyfile-test.c` makes the same calls in the same order
+instead: `lstat(src)`, `lstat(dst)`, `open(src, O_RDONLY)`,
+`open(dst, O_CREAT|O_TRUNC|O_WRONLY, srcStat.st_mode)`, the copy loop,
+`chmod`, `utime` -- each reporting errno and Plan 9's own errstr.
+0 failures on glibc.
+
+**The assertion to read first is the destination `lstat`**, because it
+is the one Tcl's control flow turns on:
+
+```c
+if (Tcl_FSLstat(target, &targetStatBuf) != 0) {
+    if (errno != ENOENT) { errfile = target; goto done; }
+```
+
+A destination that does not exist yet is the *normal* case, and the copy
+is abandoned before it starts unless `lstat` reports **exactly**
+`ENOENT` -- which in APE is **20**, not the 2 a reader expects. If that
+line says `FAIL`, the bug is one errno in one place and every file
+operation that checks for a missing file is affected, not just copy.
+
+The probe passes the **full** `st_mode` to `open()`, `S_IFREG` and all
+(`0100644`), because that is what `TclUnixCopyFile` does. A faithful
+probe makes the same call, not the tidier one.
+
+#### Would `symlink()` as a copy do? No -- and it is ONE test, not many
+
+**The premise does not survive the log, and I had half-endorsed it
+myself.** Of `fCmd.test`'s eighty failures, the `28.x` link block
+accounts for **one**:
+
+```
+ 1 fCmd-28.x   the link tests
+12 fCmd-6.x    CopyRenameOneFile: lstat(target) != 0 / errno != ENOENT / ...
+11 fCmd-18.x   TclFileRenameCmd
+11 fCmd-21.x   copy : single file to nonexistant, single dir, into directory
+ 5 fCmd-2.x    TclFileCopyCmd
+```
+
+`fCmd-6.4`, `6.5`, `6.6` and `6.9` are *named after* the branch
+`copyfile-test.c` was written around -- `lstat(target) != 0`,
+`errno != ENOENT`, `errno == ENOENT`. So the dominant cluster in the
+file is copy and rename, and one bug plausibly carries most of it.
+
+**And the abort is the copy bug, not the link bug.** The correction is
+mine: last round this file said "`symlink()` being ENOSYS now costs a
+whole test file". The aborting line is `file copy abc.file abc.dir`,
+which is a *copy*, in top-level code that merely happens to sit after
+the link tests. Reading a failure by what precedes it is the same
+mistake as reading a freeze by the last line printed.
+
+**On the design question, which is worth answering anyway.** Old APE
+made `ln` a `cp`, and the question is whether `symlink()` could do the
+same in libap. It should not, and the reason is not squeamishness:
+
+- **`lstat()` must report `S_IFLNK`.** A copy is `S_IFREG`, so
+  `file type` answers `file` where every caller expects `link` -- the
+  `28.x` tests check exactly that, so the emulation would not even buy
+  the one test it is aimed at.
+- **`readlink()` has no target to return.** `file link` would succeed
+  and `file readlink` fail on the thing it just made, which is worse
+  than both failing.
+- **Tcl uses `lstat` rather than `stat` deliberately**, to copy and
+  rename links instead of their targets. With no distinction that
+  choice silently reverses.
+- **A link to a directory cannot be a copy** in any useful sense, and
+  `linkDirectory` tests do exactly that.
+- **A dangling link is a normal state.** A copy outlives its target,
+  so the most commonly tested property is inverted.
+- **Writes diverge silently.** That is the part that reaches real
+  programs rather than tests: a build system that symlinks a config
+  file gets two files that drift apart with no error anywhere.
+
+It is also this file's own standing rule -- *do not invent semantics to
+make a test pass* -- and the precedents are all recorded: no `bind()`
+fallback to `*`, no error on an empty `/dev/snarf`, no unmapping of
+descendants, no minted colormaps, no fabricated install paths.
+
+**The distinction worth keeping is between a command and a library
+call.** `ln(1)` is a one-shot a person invoked, and substituting a copy
+is a defensible convenience with a visible result. `symlink(2)` is an
+API that other code builds invariants on and then *tests*, and a
+success reported for work not done is the `XLoadFont` family in its
+most damaging form -- not a wrong attribute but wrong data.
+
+**What would be worth doing instead**, in order:
+
+1. **Ask whether this 9front has symbolic links at all.** Nothing in
+   APE's headers mentions `DMSYML`, but those are APE's headers, not the
+   kernel's. One grep on the VM settles it:
+
+   ```
+   grep -n DMSYM /sys/include/libc.h
+   ```
+
+   If it is there, `symlink`, `readlink` and an `S_IFLNK` arm in
+   `_dirtostat` are a real implementation rather than an emulation, and
+   the honest way to close the cluster.
+2. If it is not, leave `symlink()` at ENOSYS. It is the truthful answer,
+   and Tcl's `linkFile`/`linkDirectory` constraints are hardcoded to 1
+   on every unix (`fCmd.test:87`), so no amount of libap politeness will
+   make those tests skip -- they are simply tests of a feature this
+   machine does not have, like `systray` in the Tk notes.
+3. Spend the round on `file copy` instead, which is where the eighty
+   are.

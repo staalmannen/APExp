@@ -184,8 +184,8 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
-`socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c` and
-`stdio-test.c`. The twenty-five `tk-*.tcl` scripts there are Tcl, run
+`socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
+`copyfile-test.c` and `stdio-test.c`. The twenty-five `tk-*.tcl` scripts there are Tcl, run
 with `wish` -- except `tk-menubar-test.tcl`, which needs `tktest` and
 skips itself under `wish`, and `tk-transient-test.tcl`, whose last
 section alone does; see `docs/notes/tk-plan9.md`. `tk-runall.tcl` is the harness for
@@ -441,37 +441,38 @@ Failed 178`, clean exit. The remaining 178 are mostly out of reach here
 or a constraint that fails on Linux too). The port's own share is
 `focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
 
-**Tcl's suite**: not yet complete. Open, in order of what the next run
-should touch:
+**Tcl's suite**: **it finishes.** `Total 67008 Passed 61226 Skipped 5630
+Failed 152`, 167 files, marker, exit 0 -- the first complete run this
+project has had, and the first measurement of `io`, `ioCmd`, `ioTrans`,
+`iogt`, `socket` and `socket_inet` at all. Read `152` with the five
+aborting files beside it: tcltest counts nothing for a file that exits
+with an error, and `fCmd.test` alone has eighty failures in the log. The
+per-file table and the command that produces it are at the end of
+`docs/notes/tcl-suite.md`.
 
-- **The `fCmd.test` spin is diagnosed and fixed, not yet confirmed.**
-  Plan 9 says `invalid operation` when a non-empty directory cannot be
-  removed; that is in no table in `_errno.c`, so `rmdir` reported
-  `EPLAN9` and Tcl's `file delete -force` never recursed -- leaving a
-  directory that upstream's own unbounded `while {[catch ...]} {}`
-  cleanup then spun on. `rmdir()` now looks at the directory rather
-  than guessing at the string, and reports `ENOTEMPTY`.
-  `sys/lib/tests/rmdir-test.c` measures it.
-- **CONFIRMED and closed**: `zlib.test` passes end to end, 73 tests,
-  and `dup-fdinfo-test` reports 0 failures --
-  `fcntl(F_DUPFD)` chose its descriptor by scanning `_fdinfo`, which
-  does not know about descriptors libap opened with the raw `_OPEN` --
-  so `dup()` closed `/dev/bintime` out from under `_NSEC` and every
-  later `gettimeofday()` blocked. The kernel picks the number now.
-- **`file copy`/`file rename` of a directory faulted every time**:
-  `fts_alloc` never allocated `fts_statp`, because two `if` bodies were
-  commented out and an `if` with no body swallows the next statement.
-  Found by `acid` on a process sitting in state `Broken`. **Read the
-  state column for `Broken` after a suite run** -- a Plan 9 fault is
-  held, not killed, so it prints nothing.
-- **The whole-suite log has never been read.** About 185 failures, the
-  first such number this project has had. The per-file table is one
-  command and is the thing to read first -- see the end of
-  `docs/notes/tcl-suite.md`.
-- `chan-io-6.4x` cluster: `-buffersize 16` with `testchannel
-  inputbuffered` reporting 0. The oldest open item here.
-- `file link -symbolic` is ENOSYS; whether `symlink()` should exist at
-  all wants a probe first.
+Open, in order of what the next run should touch:
+
+- **`file copy` of a file that exists reports ENOENT**, reproducible in
+  four lines of `tclsh`, and it aborts `encoding.test`, `http.test` and
+  `fCmd.test`. Five candidates read out of the source were all wrong, so
+  `sys/lib/tests/copyfile-test.c` makes Tcl's calls in Tcl's order and
+  reports each. Read its destination-`lstat` assertion first: the copy
+  is abandoned unless a missing file reports exactly `ENOENT`.
+- **`symlink()` is ENOSYS, and that costs exactly ONE test** of
+  `fCmd`'s eighty -- the aborting line is a `file copy`, not a link.
+  **Do not emulate it with a copy** the way old APE's `ln` did: `lstat`
+  must say `S_IFLNK`, `readlink` must return a target, a link to a
+  directory is not a copy, a dangling link is normal, and writes would
+  diverge silently. First ask whether 9front has links natively
+  (`grep -n DMSYM /sys/include/libc.h`) -- see `docs/notes/tcl-suite.md`.
+- **A path ~50 components deep cannot be deleted** -- `invalid
+  operation`, with the directory empty, so it is the path and not the
+  contents. `unixFCmd` and `winFCmd` both abort on it.
+- `fCmd` 80, `io` 22, `chan-io` 19, `socket_inet` 18, `filename` 18,
+  `clock` 16, `cmdAH` 10, `env` 9 -- none of these clusters has been
+  read yet.
+- `chan-io-6.4x`: `-buffersize 16` with `testchannel inputbuffered`
+  reporting 0. The oldest open item here.
 - `binary-53.25`/`53.26`: a double one ulp past the float range must
   round to infinity.
 
