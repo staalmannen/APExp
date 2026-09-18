@@ -143,6 +143,16 @@ sfdinit(int usedproc, char *s, char *se)
 				fi->flags |= FD_ISTTY;
 			else
 				fi->flags &= ~FD_ISTTY;
+			/*
+			 * FD_ISREG is cached by read() and travels in
+			 * $_fdinfo the same way, so it goes stale for
+			 * exactly the reason above: the descriptor may
+			 * have been redirected between the parent's
+			 * record and this child. Forget it rather than
+			 * re-ask, since the next read will ask anyway and
+			 * most descriptors are never read non-blocking.
+			 */
+			fi->flags &= ~(FD_REGCHECKED|FD_ISREG);
 		}
 	}
 

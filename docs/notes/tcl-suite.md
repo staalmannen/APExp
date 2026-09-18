@@ -6149,3 +6149,63 @@ it wants its own, with its own reduction. Recorded.
 (`14.9`), with 5 newly skipped rather than passed -- so `Skipped` rises
 by 5 and `Failed` falls by 16. If `Failed` falls by more than 16, or
 `Skipped` rises by anything but 5, the reading above is incomplete.
+
+#### io 23 and chan-io 19 are not 42 questions: read() ignored what kind of file it had
+
+**The two clusters are mostly the same tests through two APIs.** `io.test`
+drives `fconfigure`, `chanio.test` drives `chan`, and these appear in
+both: `6.31`, `6.43`-`6.47`, `8.1`, `14.1`, `14.2`, `29.27`, `32.7`,
+`32.8`, `35.4`, `36.5`, `36.6`, `39.9`, `40.3`. So forty-two failures
+are about sixteen questions, and reading one file answers two.
+
+**Twelve of them are one line.** `io-39.9` reads an EMPTY file with
+`-blocking off` and gets `fblocked 1, eof 0` where it wants `0, 1`;
+`io-35.4` asks the same through `eof`; `io-32.7` asks for 20 bytes of a
+long file and gets fewer. `unistd/read.c`:
+
+```c
+noblock = f->oflags&O_NONBLOCK;
+isbuf = f->flags&(FD_BUFFERED|FD_BUFFEREDX);
+if(noblock || isbuf){ ...copy process... }
+```
+
+**Any descriptor with `O_NONBLOCK` went into the buffered copy-process
+path, whatever kind of file it was.** For a pipe or socket that is the
+whole design -- Plan 9 has no non-blocking read, so another process does
+the reading and the caller asks what arrived. For a regular file it
+forks a process for something that cannot block, and then
+`_readbuf(..., noblock)` answers "would block" whenever that process has
+not caught up. **A file at end of file said "try again later" for ever,
+and later never comes for a file that has already ended.**
+
+POSIX is explicit: `O_NONBLOCK` affects pipes, FIFOs, terminals and
+sockets. A read of a regular file transfers what is there and returns 0
+at end of file, never EAGAIN.
+
+**Cached, because the alternative is a stat per read on every socket.**
+`FD_ISREG` and `FD_REGCHECKED` join `FD_ISTTY` in `f->flags` -- two bits,
+so "not asked yet" differs from "asked, and it is not". `flags` had
+`0x40` and `0x80` free, so this is a bit rather than a field, and no
+struct changes size.
+
+**And `_fdinfo.c` already records why that cache is dangerous.** The
+flags word travels in `$_fdinfo` across an exec while the descriptor
+behind it may have been redirected -- which is the FD_ISTTY bug written
+up there at length, where a child believed it had a terminal and printed
+`% ` into a pipe. `FD_ISREG`/`FD_REGCHECKED` are therefore cleared on
+the same restore path, so the first read in a child asks again. *The
+lesson was on the screen while the code was being written, which is the
+first time in this sequence that has happened rather than the reverse.*
+
+**`nbread-test.c` section 3 is the point of the file.** Sections 1 and 2
+would both pass if `O_NONBLOCK` were ignored on EVERY descriptor, which
+would wedge every event loop on the system; section 3 reads an empty
+pipe and requires EAGAIN. Without it the test cannot tell a fix from a
+catastrophe. 0 failures on glibc.
+
+**Prediction, observation only.** `io` 23 -> 17 and `chan-io` 19 -> 13,
+so `Failed` falls by 12. **What is NOT claimed**: `6.31`/`6.43`-`6.47`
+(the `Tcl_GetsObj` cr/crlf group, and the oldest open item here),
+`8.1`, `14.1`/`14.2`, `29.27`, `40.3`, and `io`'s encoding tests are
+unread and untouched. If `Failed` falls by more than 12, something in
+those groups shared the cause and the reading above was incomplete.

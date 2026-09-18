@@ -99,6 +99,19 @@ typedef struct Fdinfo{
 #define FD_BUFFERED	0x4
 #define FD_BUFFEREDX	0x8
 #define FD_ISTTY	0x20
+/*
+ * Is this descriptor a REGULAR FILE? Asked once and remembered, because
+ * read() needs it on every non-blocking read and a stat per read on a
+ * socket in an event loop would be a real cost. Two bits, so that "not
+ * asked yet" is distinguishable from "asked, and it is not".
+ *
+ * LIKE FD_ISTTY, THESE GO STALE ACROSS AN EXEC -- the flags word travels
+ * in $_fdinfo while the descriptor behind it may have been redirected,
+ * which is exactly the bug _fdinfo.c records for FD_ISTTY. They are
+ * cleared there on the way back in, so the first read asks again.
+ */
+#define FD_REGCHECKED	0x40
+#define FD_ISREG	0x80
 
 #define MAXSIG SIGPROF
 

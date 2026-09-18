@@ -183,7 +183,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `sigset-test.c`, `posix-spawn-test.c`, `limits-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
 `execve-env-test.c`, `tz-test.c`, `rename-test.c`, `listenleak-test.c`,
-`asyncconnect-test.c`,
+`asyncconnect-test.c`, `nbread-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
@@ -721,8 +721,22 @@ Open, in order of what the next run should touch:
   contain neither**. Synthesising them in `readdir()` changes what every
   directory read in every program sees, for one measured test; it wants
   its own round.
-- **Still unread: `io` 23, `chan-io` 19**, then `expr` 5,
-  `socket_inet` 4, `cmdAH` 4, `lseq` 3, `exec` 3, `io-bug` 2.
+- **`io` 23 and `chan-io` 19 are ~16 questions, not 42** -- `io.test`
+  drives `fconfigure` and `chanio.test` drives `chan`, and `6.31`,
+  `6.43`-`6.47`, `8.1`, `14.1/2`, `29.27`, `32.7/8`, `35.4`, `36.5/6`,
+  `39.9` and `40.3` are in both. **Twelve were one line**: `read()`
+  sent any `O_NONBLOCK` descriptor into the buffered copy-process path
+  whatever kind of file it was, so a REGULAR file reported "would
+  block" when the copy process had not caught up -- an empty file said
+  `fblocked 1, eof 0` for ever. POSIX: `O_NONBLOCK` does nothing to a
+  regular file. Now cached in two free `flags` bits beside `FD_ISTTY`
+  (`FD_ISREG`, `FD_REGCHECKED`), **cleared on the exec-restore path in
+  `_fdinfo.c` for the reason FD_ISTTY records there**. Fixed, not yet
+  confirmed.
+- **Still unread in those two**: the `Tcl_GetsObj` cr/crlf group
+  (`6.31`, `6.43`-`6.47`), `8.1`, `14.1/2`, `29.27`, `40.3`, and
+  `io`'s encoding tests (`75.*`, `io-bug-*`). Then `expr` 5,
+  `socket_inet` 4, `cmdAH` 4, `lseq` 3, `exec` 3.
 - **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a
   password database mapping a user to a home directory, which Plan 9
   has not -- read it before writing it off.
