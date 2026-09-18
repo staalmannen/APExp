@@ -6033,3 +6033,49 @@ are untouched.
 written. 14.14 needs the failed connect to make the socket *readable*,
 which goes through the copy process on the data file, and nothing has
 measured that it does. They stay unpredicted.
+
+#### Async connect: 149 -> 136, thirteen fixed, nothing broken
+
+`Tests ended at 2026-09-18 17:11:30`, marker, `Total 68118 Passed 62095
+Skipped 5887 Failed 136`.
+
+```
+FIXED: socket-14.2 14.6.0 14.7.0 14.7.2 14.8.2 14.11.0 14.12
+       14.14 14.15 14.18  socket_inet-8.1  http-4.14.0 http-4.14.1
+NEWLY FAILING: (none)
+```
+
+**Thirteen, and not one thing moved the other way** -- which matters
+because `connect()` now forks a process on every non-blocking connect
+and `getsockopt(SO_ERROR)` waits where it used to return instantly. Both
+are new behaviour on a path a great many tests touch, and that was the
+thing to watch rather than the two tests this came from.
+
+**`socket-14.14` and `14.15` are fixed, and I declined to predict them.**
+The reason given was that 14.14 needs the failed connect to make the
+socket *readable*, which goes through the copy process on the data
+file, and nothing had measured that it does. It does. *That is now a
+measured fact rather than an assumption, and declining to guess it cost
+nothing while guessing wrong would have cost the credibility of the
+other predictions in the same message.*
+
+**The cluster is bigger than the two tests that exposed it.** Eight more
+`socket-14.*`, `socket_inet-8.1` and two in `http.test` were all waiting
+on the same missing feature -- `http` does asynchronous connects too,
+and nothing had connected those failures to `-async` at all. **A
+feature that has never worked does not fail in one place; it fails
+everywhere it is used, and the failures do not look related until it
+works.**
+
+**Where the suite stands now:**
+
+```
+io 23   fCmd 22   chan-io 19   filename 17   env 9   expr 5
+socket_inet 4   cmdAH 4   lseq 3   exec 3   unixFCmd 2   io-bug 2
+```
+
+`fCmd`'s 22 and `env`'s 9 are accounted for and out of reach (symlinks,
+a password database, and rc's lowercase `path`). The three largest
+unread clusters are `io` 23, `chan-io` 19 and `filename` 17 -- and
+`filename`'s are all `Tcl_GlobCmd`, which is one function rather than
+seventeen questions.

@@ -549,10 +549,15 @@ or a constraint that fails on Linux too). The port's own share is
 `focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
 
 **Tcl's suite**: **it finishes and nothing aborts.**
-`Total 68118 Passed 62081 Skipped 5888 Failed 149`, 167 files, marker,
+`Total 68118 Passed 62095 Skipped 5887 Failed 136`, 167 files, marker,
 exit 0, and no `Test files exiting with errors` section. The listener
-leak fix took **14**: all eleven of `socket_inet-11.*`, plus `12.1`,
-`2.6` and `socket-14.11.1`.
+leak fix took **14** (all eleven of `socket_inet-11.*`, plus `12.1`,
+`2.6`, `socket-14.11.1`); async connect took **13** more with nothing
+moving the other way: `socket-14.2/14.6.0/14.7.0/14.7.2/14.8.2/
+14.11.0/14.12/14.14/14.15/14.18`, `socket_inet-8.1`, and
+`http-4.14.0/4.14.1`. **A feature that has never worked does not fail
+in one place** -- `http.test`'s two were never connected to `-async`
+until it worked.
 
 **A count in the per-file table is executions, not tests**: `clock`'s
 16 were 4 tests run twice each (`.vm:0`/`.vm:1`). Size a cluster from
@@ -694,11 +699,15 @@ Open, in order of what the next run should touch:
   the connect resolves and therefore WAITS rather than answering 0. The
   real fix is `select()` learning about a pending connect. `Rock` gained
   three APPENDED fields; `unistd/mkfile` gained `HFILES` for `priv.h`.
-  **`socket-14.14`/`14.15` themselves are still unmeasured** -- 14.14
-  needs the failed connect to make the socket *readable*, through the
-  copy process on the data file.
-- **Still unread: `io` 23, `chan-io` 19, `socket_inet` 16,
-  `filename` 17, `socket` 10.** `filename`'s are all `Tcl_GlobCmd`.
+  **`socket-14.14`/`14.15` are FIXED**, which was deliberately not
+  predicted: 14.14 needs the failed connect to make the socket
+  *readable*, through the copy process on the data file. It does --
+  now measured rather than assumed.
+- **Still unread, and now the whole of what is left: `io` 23,
+  `chan-io` 19, `filename` 17**, then `expr` 5, `socket_inet` 4,
+  `cmdAH` 4, `lseq` 3, `exec` 3, `io-bug` 2. **`filename`'s seventeen
+  are all `Tcl_GlobCmd`** -- one function, not seventeen questions, and
+  the cheapest of the three to read.
 - **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a
   password database mapping a user to a home directory, which Plan 9
   has not -- read it before writing it off.
