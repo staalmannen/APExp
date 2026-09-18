@@ -489,6 +489,10 @@ in the topic file.
   through `select()`; a reduction that used a blocking `accept()` passed
   three rounds and proved nothing, because `accept()` reads the pipe
   itself while `select()` goes through a copy process.
+- **An instrument built for one question goes where the SECOND question
+  can reach it.** `$APEXP_LISTENDEBUG` lived in `_sock_listenpid.c` and
+  the next question arrived in `_buf.c`; `plan9/_apdbg.c` now serves
+  both. There is always a second question.
 - Anything asking about one operating system's own behaviour is a probe,
   not a library rule -- report it, do not assert it.
 - Write the prediction down before the run, including what would refute
@@ -626,9 +630,18 @@ Open, in order of what the next run should touch:
   fired. **`ps` shows no process in `Sleep`**, and a live timer sits in
   `_SLEEP`. So this is the failure `_killtimerproc` already describes:
   `timerpid` stale, `_resettimer()` signalling a corpse, every blocking
-  `select()` that needs a timeout waiting for ever. Next: `acid 12935`
-  (2800K, `Rendez`) -- either the timer is dead, or that IS the timer
-  stuck in its startup rendezvous and never reaching the sleep loop. 2.11 was already failing before this change
+  `select()` that needs a timeout waiting for ever. `acid 12935` shows a SECOND interpreter
+  (a `socket.test` helper), not the timer -- so the timer simply does
+  not exist. **`_resettimer()` now notices and restarts it** (mark 5):
+  `kill` failing with ESRCH is exact, the failure it prevents is total,
+  and the repair is local. What killed the timer is still unknown and is
+  now a separate, non-blocking question -- `_detachbuf` sets
+  `timerpid = -1` in a forked child, so the documented "child took the
+  parent's timer" route is shut.
+  **`plan9/_apdbg.c`** is the shared debug line-printer
+  (`$APEXP_DEBUG` or `$APEXP_LISTENDEBUG`), moved out of
+  `_sock_listenpid.c` because the next question arrived in a file that
+  could not reach it. 2.11 was already failing before this change
   (a timing result), so the hang is new but the test was never healthy.
 - **`socket_inet-5.1`/`5.3` were passing for the WRONG REASON** -- a
   leftover listener was refusing the bind, not the system -- so they are

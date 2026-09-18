@@ -5656,3 +5656,79 @@ is the second.
 select's `_resettimer()`** -- `kill()` opening `/proc/N/note` and
 closing it. The instrumentation recorded the moment the timer was armed;
 what is missing after it is the tick.
+
+#### 12935 is a second interpreter, and the timer simply is not there
+
+`acid 12935` gives the same stack as 12908, all the way down to
+`Tcl_MainEx` and `tclAppInit.c:99`: it is another full interpreter --
+one of the helpers `socket.test` spawns with `exec [interpreter]` --
+also sitting in `vwait`. Its `select` has `timeout=0x0` and
+`t=0x7fffffff`, a genuinely unbounded wait, where 12908's has
+`timeout != 0` and `t=200`.
+
+So neither `Rendez` process is the timer, and **of seven `tcltest`
+processes not one is in `Sleep`**, which is where `_SLEEP(mux->waittime)`
+puts a live timer. **12908 armed a timer that does not exist.**
+
+**What killed it is still not known, and I stopped looking.** Two
+readings were tried and both hold up as *correct code*: the child of
+`fork()` calls `_detachbuf`, which sets `timerpid = -1` as well as
+`_mainpid = -1`, so `_killtimerproc`'s `timerpid > 0` guard fails in a
+child and the documented "child took the parent's timer" route is shut.
+That would have been the seventh mechanism argued from source on this
+bug, after six were refuted.
+
+**So the change is a repair rather than a guard against a cause.**
+`_resettimer()` was
+
+```c
+static void
+_resettimer(void)
+{
+	kill(timerpid, SIGALRM);
+}
+```
+
+-- and the comment forty lines above it already said what that costs
+once `timerpid` names a corpse: *no timeout ever firing again, and every
+blocking `select()` that needs one waiting for ever*. It now notices and
+makes another:
+
+```c
+if(kill(timerpid, SIGALRM) >= 0)
+	return;
+_apdbg("resettimer: the timer process is gone, restarting", "was", timerpid, 0, 0);
+timerpid = -1;
+_timerproc();
+```
+
+**This is defensible without knowing the cause, and that is the point.**
+The failure is total -- nothing in that process ever times out again --
+the detection is exact (`kill` fails with ESRCH on a process that is
+gone), and the recovery is local. The worst case is a leaked second
+timer if `kill` ever fails on a live process, which is bounded and far
+better than a hang. It is *not* "invent semantics to make a test pass":
+the semantics are unchanged, a resource is replaced.
+
+**And the debug instrument moved to where anything can reach it.**
+`$APEXP_LISTENDEBUG` was written into `network/_sock_listenpid.c`, and
+the very next question arrived in `plan9/_buf.c` where it was not.
+`plan9/_apdbg.c` is now the one line-printer -- `write(2)`, no stdio,
+because it is called from `close()` and `select()` which every program
+links -- and it takes **labels from the caller**, so a line reads
+`fd=4 pid=7898` and not `a=4 b=7898`. `$APEXP_DEBUG` and the old
+`$APEXP_LISTENDEBUG` both switch it on; renaming an environment variable
+mid-investigation costs a round for nothing.
+
+*The general form: an instrument built for one question should be put
+where the second question can reach it, because there is always a
+second question.*
+
+**Prediction, observation only.** With mark 5 installed,
+`resettimer: the timer process is gone, restarting` appears in a
+`APEXP_LISTENDEBUG=1` run if and only if the timer really was dead. If
+it appears and `socket_inet-2.11` then completes, the diagnosis holds
+and what killed the timer becomes a separate, non-blocking question. If
+it never appears, the timer is alive and `_resettimer` is not the
+problem -- and the next thing to ask is why a live timer's `SIGALRM`
+does not wake the select.

@@ -629,10 +629,38 @@ _timerproc(void)
 	}
 }
 
+/*
+ * WAKE THE TIMER -- AND NOTICE IF THERE IS NO LONGER ONE.
+ *
+ * This was `kill(timerpid, SIGALRM);' and nothing else, and the comment
+ * on _killtimerproc above already described what that costs: once
+ * `timerpid' names a process that no longer exists, every reset signals
+ * a corpse, no timeout ever fires again, and every blocking select()
+ * that needs one waits for ever.
+ *
+ * MEASURED, not deduced. Tcl's socket_inet-2.11 froze with acid showing
+ * the interpreter at _buf.c:544 -- select's own rendezvous -- and the
+ * frame's arguments showing `timeout' non-null and `t' 200ms. So a
+ * timer HAD been armed. `ps' then showed seven tcltest processes and
+ * not one in `Sleep', which is where a live timer process sits. The
+ * timer was gone and this function was signalling nothing.
+ *
+ * What killed it is still unknown, and that is exactly why this is
+ * written as a repair rather than as a guard against a particular
+ * cause: the failure is total (nothing times out, ever, in that
+ * process) and the recovery is cheap and local. A second timer would
+ * be leaked if kill() ever failed on a LIVE process, which is bounded
+ * and far better than the alternative.
+ */
 static void
 _resettimer(void)
 {
-	kill(timerpid, SIGALRM);
+	if(kill(timerpid, SIGALRM) >= 0)
+		return;
+	_apdbg("resettimer: the timer process is gone, restarting",
+		"was", timerpid, 0, 0);
+	timerpid = -1;
+	_timerproc();
 }
 
 void
