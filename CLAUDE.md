@@ -359,6 +359,15 @@ in the topic file.
   bug in one run, after six readings of the source had chased an errno
   the failing call never set.
 - **Read what a test *compares*, not what it mentions.**
+- **A fact that contradicts the diagnosis is not a loose end to come
+  back to.** `HOME` was missing from a child's environment in the very
+  first log, which alone refuted the `/env` leak; it was filed as an
+  anomaly and four more source files were read looking for what had
+  hidden it. Nothing had.
+- **A flag one letter from another flag is checked, not recalled**, and
+  a comment restating what a call does is a claim like any other.
+  `RFCENVG` was read as "copy the group" from a comment I had written
+  myself, and a committed change rested on it.
 - **Every case expected to return must come before every case expected to
   hang**, in file order, each behind a flushed marker naming the
   statement about to run.
@@ -452,6 +461,9 @@ the index, so that nothing here is a surprise.
   shadow this tree unless a real file shadows them back.
 - Adding an entry to `_errno.c`'s table changes control flow, because
   `bind()` gates its fallback on `EPLAN9`.
+- `RFCENVG`, `RFCNAMEG` and `RFCFDG` create **empty** groups; the `C` is
+  *clear*. `RFENVG`, `RFNAMEG` and `RFFDG` are the ones that copy. So
+  `execve` has no environment at all after its first line.
 - `/dev/snarf` is the clipboard and has no concept of ownership.
 - Plan 9 has no loopback unless `ip/ipconfig loopback /dev/null 127.1`
   has been run -- and that belongs in the machine's startup, not in
@@ -480,13 +492,12 @@ Open, in order of what the next run should touch:
   while this environment has two spellings, rc's `path` and the `PATH`
   that `apexp-sh` sets for bash. Checked on a host `tclsh`. Do not fix
   by hiding `path`. The `_fdinfo`/`_sighdlr` leak into `environ` **is**
-  fixed and confirmed; the `execve` half (clearing `/env`) fixed no
-  measured test. `execve-env-test` confirms the boundary **is** POSIX
-  now -- a child's environment is exactly `envp` -- but that is true
-  whether or not the change was needed, since the build contains it.
-  **Its section 3 decides whether to keep or revert the change**, by
-  replicating the old code (`rfork(RFCENVG)` + create only) and listing
-  `/env`. Revert if only the two new names are there.
+  fixed and confirmed. **The `execve` half was withdrawn: there was no
+  second bug.** `RFCENVG` creates an *empty* environment group -- the
+  `C` is *clear*, `RFENVG` is the one that copies -- so `execve` already
+  delivered exactly `envp`, and the loop added to clear `/env` was
+  removing an empty directory on every exec. `execve-env-test`'s
+  section 3 measured it in one run without rebuilding libap.
 - **`posix_spawnp` discards the `envp` it is handed**: libap's `spawn()`
   tests `usepath` first and the child calls `execvp`, which passes
   `environ`. POSIX says `envp` is the child's environment either way.
@@ -501,9 +512,10 @@ Open, in order of what the next run should touch:
 - **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a
   password database mapping a user to a home directory, which Plan 9
   has not -- read it before writing it off.
-- **A failed `execve()` now also empties `/env`**, on top of rforking the
-  environment group, rewriting `_fdinfo`/`_sighdlr` and closing every
-  `FD_CLOEXEC` descriptor. `environ` is untouched, so it is bounded.
+- **A failed `execve()` leaves `/env` empty**, on top of rewriting
+  `_fdinfo`/`_sighdlr` and closing every `FD_CLOEXEC` descriptor. This
+  is old, not new: `_RFORK(RFCENVG)` on its first line is what empties
+  it. `environ` is untouched, so it is bounded.
 - `chan-io-6.4x`: `-buffersize 16` with `testchannel inputbuffered`
   reporting 0. The oldest open item here.
 - `binary-53.25`/`53.26`: a double one ulp past the float range must
