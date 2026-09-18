@@ -9,7 +9,7 @@ Test files run in separate interpreters
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-18 09:37:14 +0200
+Tests began at 2026-09-18 10:22:24 +0200
 aaa_exit.test
 abstractlist.test
 append.test
@@ -467,7 +467,7 @@ abc def ghi jkl mno {p
 
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
----- errorInfo: could not create new link "/tmp/tcl_ohiCIM/thelin" pointing to "/tmp/tcl_ohiCIM/thefile": function not implemented
+---- errorInfo: could not create new link "/tmp/tcl_GMnlHH/thelin" pointing to "/tmp/tcl_GMnlHH/thefile": function not implemented
     while executing
 "file link -symbolic $link $target"
     ("uplevel" body line 4)
@@ -622,7 +622,7 @@ cmdAH.test
     expr {$newatime == $modatime ? 1 : "$newatime != $modatime"}
 
 ---- Result was:
-1789717069 != 1789717068
+1789719778 != 1789719777
 ---- Result should have been (exact matching):
 1
 ==== cmdAH-20.5 FAILED
@@ -702,8 +702,6 @@ env.test
     getenv
 
 ---- Result was:
-_fdinfo=0 34 0\u000a1 2 2\u000a2 2 2\u000a3 2 0\u000a4 2 0\u000a
-_sighdlr=
 path=/bin\u0001.
 ---- Result should have been (exact matching):
 
@@ -719,8 +717,6 @@ path=/bin\u0001.
 
 ---- Result was:
 NAME1=test string
-_fdinfo=0 34 0\u000a1 2 2\u000a2 2 2\u000a3 2 0\u000a4 2 0\u000a
-_sighdlr=
 path=/bin\u0001.
 ---- Result should have been (exact matching):
 NAME1=test string
@@ -737,8 +733,6 @@ NAME1=test string
 ---- Result was:
 NAME1=test string
 NAME2=more
-_fdinfo=0 34 0\u000a1 2 2\u000a2 2 2\u000a3 2 0\u000a4 2 0\u000a
-_sighdlr=
 path=/bin\u0001.
 ---- Result should have been (exact matching):
 NAME1=test string
@@ -757,8 +751,6 @@ NAME2=more
 NAME1=test string
 NAME2=more
 XYZZY=garbage
-_fdinfo=0 34 0\u000a1 2 2\u000a2 2 2\u000a3 2 0\u000a4 2 0\u000a
-_sighdlr=
 path=/bin\u0001.
 ---- Result should have been (exact matching):
 NAME1=test string
@@ -779,8 +771,6 @@ XYZZY=garbage
 NAME1=test string
 NAME2=new value
 XYZZY=garbage
-_fdinfo=0 34 0\u000a1 2 2\u000a2 2 2\u000a3 2 0\u000a4 2 0\u000a
-_sighdlr=
 path=/bin\u0001.
 ---- Result should have been (exact matching):
 NAME1=test string
@@ -799,8 +789,6 @@ XYZZY=garbage
 ---- Result was:
 NAME1=test string
 XYZZY=garbage
-_fdinfo=0 34 0\u000a1 2 2\u000a2 2 2\u000a3 2 0\u000a4 2 0\u000a
-_sighdlr=
 path=/bin\u0001.
 ---- Result should have been (exact matching):
 NAME1=test string
@@ -816,8 +804,6 @@ XYZZY=garbage
     getenv
 
 ---- Result was:
-_fdinfo=0 34 0\u000a1 2 2\u000a2 2 2\u000a3 2 0\u000a4 2 0\u000a
-_sighdlr=
 path=/bin\u0001.
 \u00a7=\u00b6
 ---- Result should have been (exact matching):
@@ -833,8 +819,6 @@ path=/bin\u0001.
     getenv
 
 ---- Result was:
-_fdinfo=0 34 0\u000a1 2 2\u000a2 2 2\u000a3 2 0\u000a4 2 0\u000a
-_sighdlr=
 path=/bin\u0001.
 \u00a7=\u00a7
 ---- Result should have been (exact matching):
@@ -851,8 +835,6 @@ path=/bin\u0001.
     getenv
 
 ---- Result was:
-_fdinfo=0 34 0\u000a1 2 2\u000a2 2 2\u000a3 2 0\u000a4 2 0\u000a
-_sighdlr=
 path=/bin\u0001.
 \u00b6=\u00a7
 ---- Result should have been (exact matching):
@@ -932,7 +914,7 @@ couldn't execute "~xyzzy_bad_user/x": no such file or directory
     file size $tmpfile
 
 ---- Result was:
-8
+14
 ---- Result should have been (exact matching):
 26
 ==== exec-19.1 FAILED
@@ -1077,13 +1059,13 @@ error renaming "tf1" to "td1/tf1": permission denied
 
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
----- errorInfo: error renaming "td1" to "/tmp/tcl30269/td1": invalid operation: '/tmp/tcl30269/td1'
+---- errorInfo: error renaming "td1" to "/tmp/tcl37841/td1": invalid operation: '/tmp/tcl37841/td1'
     while executing
 "file rename td1 $tmpspace"
     ("uplevel" body line 3)
     invoked from within
 "uplevel 1 $script"
----- errorCode: POSIX {unknown error} {invalid operation: '/tmp/tcl30269/td1'}
+---- errorCode: POSIX {unknown error} {invalid operation: '/tmp/tcl37841/td1'}
 ==== fCmd-6.21 FAILED
 
 
@@ -1145,7 +1127,7 @@ error copying "/usr/glenda/td1" to "td1": "/usr/glenda/td1/td2": permission deni
     file rename foo/bar $tmpspace
 
 ---- Result was:
-error renaming "foo/bar" to "/tmp/tcl30269/bar": invalid operation: '/tmp/tcl30269/bar'
+error renaming "foo/bar" to "/tmp/tcl37841/bar": invalid operation: '/tmp/tcl37841/bar'
 ---- Result should have been (glob matching):
 *: permission denied
 ==== fCmd-6.30 FAILED
@@ -2288,7 +2270,7 @@ line line none
     ("uplevel" body line 15)
     invoked from within
 "uplevel 1 $script"
----- errorCode: CHILDSTATUS 31532 1
+---- errorCode: CHILDSTATUS 39097 1
 ==== io-29.33b FAILED
 
 
@@ -3119,14 +3101,14 @@ remote server disappeared
 "uplevel 1 $setup"
 ---- errorCode(setup): NONE
 ---- Test cleanup failed:
-can not find channel named "sock90cb10"
----- errorInfo(cleanup): can not find channel named "sock90cb10"
+can not find channel named "sock90c810"
+---- errorInfo(cleanup): can not find channel named "sock90c810"
     while executing
 "close $s1"
     ("uplevel" body line 2)
     invoked from within
 "uplevel 1 $cleanup"
----- errorCode(cleanup): TCL LOOKUP CHANNEL sock90cb10
+---- errorCode(cleanup): TCL LOOKUP CHANNEL sock90c810
 ==== socket_inet-11.7 FAILED
 
 
@@ -3156,14 +3138,14 @@ remote server disappeared
 "uplevel 1 $setup"
 ---- errorCode(setup): NONE
 ---- Test cleanup failed:
-can not find channel named "sock90cb10"
----- errorInfo(cleanup): can not find channel named "sock90cb10"
+can not find channel named "sock90c810"
+---- errorInfo(cleanup): can not find channel named "sock90c810"
     while executing
 "close $s1"
     ("uplevel" body line 2)
     invoked from within
 "uplevel 1 $cleanup"
----- errorCode(cleanup): TCL LOOKUP CHANNEL sock90cb10
+---- errorCode(cleanup): TCL LOOKUP CHANNEL sock90c810
 ==== socket_inet-11.8 FAILED
 
 
@@ -3740,7 +3722,7 @@ unixInit.test
     }
 
 ---- Result was:
-Expected: `127.0.0.1 localhost 57667', Got `'
+Expected: `127.0.0.1 localhost 45853', Got `'
 ---- Result should have been (exact matching):
 OK
 ==== unixInit-1.2 FAILED
@@ -3940,7 +3922,7 @@ atime 1105466634 blksize 0 blocks 0 ctime 1105466634 dev 0 gid 0 ino 0 mode 1674
 	    lsort -stride 2 [file stat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789717323 ctime 1789717323 dev 0 gid 0 ino 0 mode 16749 mtime 1789717323 nlink 0 size 0 type directory uid 0
+atime 1789720005 ctime 1789720005 dev 0 gid 0 ino 0 mode 16749 mtime 1789720005 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-stat-root-mount FAILED
@@ -3953,7 +3935,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789717323 ctime 1789717323 dev 0 gid 0 ino 0 mode 16749 mtime 1789717323 nlink 0 size 0 type directory uid 0
+atime 1789720005 ctime 1789720005 dev 0 gid 0 ino 0 mode 16749 mtime 1789720005 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-lstat-root-mount FAILED
@@ -3966,7 +3948,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file stat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789717323 ctime 1789717323 dev 0 gid 0 ino 0 mode 16749 mtime 1789717323 nlink 0 size 0 type directory uid 0
+atime 1789720005 ctime 1789720005 dev 0 gid 0 ino 0 mode 16749 mtime 1789720005 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-stat-root-subdir-mount FAILED
@@ -3979,7 +3961,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789717323 ctime 1789717323 dev 0 gid 0 ino 0 mode 16749 mtime 1789717323 nlink 0 size 0 type directory uid 0
+atime 1789720005 ctime 1789720005 dev 0 gid 0 ino 0 mode 16749 mtime 1789720005 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-lstat-root-subdir-mount FAILED
@@ -3992,7 +3974,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file stat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789717323 ctime 1789717323 dev 0 gid 0 ino 0 mode 16749 mtime 1789717323 nlink 0 size 0 type directory uid 0
+atime 1789720005 ctime 1789720005 dev 0 gid 0 ino 0 mode 16749 mtime 1789720005 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-stat-mezzo FAILED
@@ -4005,14 +3987,14 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789717323 ctime 1789717323 dev 0 gid 0 ino 0 mode 16749 mtime 1789717323 nlink 0 size 0 type directory uid 0
+atime 1789720005 ctime 1789720005 dev 0 gid 0 ino 0 mode 16749 mtime 1789720005 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-lstat-mezzo FAILED
 
 zlib.test
 
-Tests ended at 2026-09-18 09:42:05 +0200
+Tests ended at 2026-09-18 10:26:47 +0200
 all.tcl:	Total	68118	Passed	62048	Skipped	5887	Failed	183
 Sourced 167 Test Files.
 Files with failing tests: binary.test chanio.test clock.test clock.test cmdAH.test env.test event.test exec.test expr-old.test expr.test fCmd.test fileName.test http.test io.test lseq.test main.test scan.test socket.test unixFCmd.test unixInit.test zipfs.test
