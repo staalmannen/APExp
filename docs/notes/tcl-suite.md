@@ -4626,3 +4626,132 @@ or `EDT` unconditionally and now prints the real name, so anything that
 compared against those two strings by luck will change. If a count rises,
 that is the place to look first. `mktime` calls `localtime_r` and is
 unchanged, which is the other thing to watch.
+
+#### clock: 16 to 0, confirmed, and nothing else moved
+
+`Total 68118 Passed 62056 Skipped 5887 Failed 175`, marker, exit 0.
+183 -> 175, and `clock.test` has left the `Files with failing tests`
+line altogether.
+
+**The per-name diff is the thing to read, and it is exactly the cluster:**
+
+```
+==== clock-38.3fm.vm:0/1  ensure cache of base is correct ... / format
+==== clock-38.3sc.vm:0/1  ensure cache of base is correct ... / scan
+==== clock-40.1.vm:0/1    regression - bad month with -timezone :localtime
+==== clock-42.1.vm:0/1    regression test - %z in :localtime when west of Greenwich
+```
+
+Four tests, each run twice (`.vm:0` and `.vm:1`), so the "16" in the
+per-file table was 8 executions of 4 tests. **A count in that table is
+executions, not tests** -- worth knowing before sizing the next cluster
+from it.
+
+`clock-42.1` is the one that `%z` alone would fix, which is what I said
+before the run. **And the thing I flagged as the risk did not happen**:
+`%Z` now prints the real zone name for every zone instead of always
+`EST` or `EDT`, and not one test anywhere in the suite changed because
+of it. `Total` and `Skipped` are identical, `Passed` is up by exactly 8,
+and the set of failing names is otherwise unchanged.
+
+#### fCmd 35: three groups, and two of them are one bug each
+
+Reading the thirty-five (plus `unixFCmd`'s four) sorts them cleanly:
+
+| group | count | what it needs |
+|---|---|---|
+| symbolic links | 15 | 9front has none -- out of reach |
+| `~USER` | 8 | a password database Plan 9 has not |
+| **renaming a directory** | **8** | ours |
+| **EPERM where POSIX says EACCES** | **4+** | ours |
+
+**The directory bug is one line, and it made every directory rename
+across directories fail.** A wstat can change a name but cannot move a
+file to another directory, so `rename()` copies when the two are in
+different directories -- and the copy path ran for directories too:
+
+```c
+if((tfd = _CREATE(to, OWRITE, s->mode)) < 0)
+```
+
+A directory cannot be opened for writing. So `file rename td1 td3/td3`,
+which `fCmd-9.11` expects to simply **succeed**, came back as
+
+```
+error renaming "td1" to "td3/td3": invalid operation: 'td3/td3'
+errorCode: POSIX {unknown error} {invalid operation: 'td3/td3'}
+```
+
+**and that also explains two failures that read as if they were about
+permissions.** `fCmd-9.1` and `unixFCmd-1.7` set a directory
+unwritable and expect "permission denied"; they got "invalid operation"
+because the create failed for its own reason before the permission on
+the real target was ever tested. **A wrong error can hide the right one,
+and a cluster that looks like two bugs can be one.**
+
+An empty directory is now made at the destination with `OREAD` and
+`DMDIR` and the original removed. A **non-empty** one still answers
+`EXDEV`, and that is an answer rather than a shrug: POSIX's EXDEV means
+"you will have to copy this yourself", and Tcl's `CopyRenameOneFile`
+already branches on exactly that errno and does the recursive copy. The
+divergence is real -- POSIX says a non-empty directory rename within one
+file system succeeds, and on glibc it does -- so `rename-test.c`'s
+section 4 accepts *either* success *or* exactly EXDEV, and still fails
+for the EPLAN9 this bug produced.
+
+**The other half is EINVAL for a directory moved into itself.** POSIX
+requires it when the old pathname is an ancestor of the new one.
+`file rename td1 td1` becomes `rename("td1", "td1/td1")`
+(`unixFCmd-1.3`), and `fCmd-9.14.3` does the same thing through `..`.
+**The check compares qids up the tree rather than strings**: a textual
+prefix test passes `td1/td1` and fails `../td1/foo`, and this name space
+has binds everywhere, so a string is the wrong thing to compare. It
+walks up from the parent of the destination appending `/..` and asking
+the file server, stopping when a stat fails or the qid stops changing.
+`qid.vers` is deliberately not compared -- it changes when a file is
+written, and this is a question of identity.
+
+**And a one-word errno fix with four tests behind it.**
+`_errno.c` had
+
+```c
+{EPERM,	"permission denied"},
+```
+
+POSIX splits the two: **EACCES is "the permission bits say no", EPERM is
+"you are not the owner and only the owner may do this".** Plan 9's
+`Eperm` is raised by the ordinary file permission check, so it is the
+first. `fCmd-4.11`, `4.14`, `6.6` and `6.24` all make a directory mode 0
+and compare the message exactly:
+
+```
+was:    can't create directory "td1/td2/td3": operation not permitted
+wanted: can't create directory "td1/td2/td3": permission denied
+```
+
+`wstat -- not owner` and `wstat -- not in group` stay EPERM, which is
+precisely what EPERM is for. **This is a mapping changed, not an entry
+added** -- the standing warning about `_errno.c` is that adding a name
+changes control flow because `bind()` gates its fallback on `EPLAN9`,
+and this touches neither. Every other EPERM in libap is *set* directly
+rather than read back out of the table, checked by grep.
+
+**`rename-test.c`'s section 7 skips itself as root, and that is not
+politeness.** A superuser bypasses the permission check, the rename
+succeeds, and a test asserting EACCES would report a failure that has
+nothing to do with the library -- a green run for the wrong reason,
+inverted. It was verified by re-running the binary as uid 65534 on the
+build host, which is the only way that section was ever exercised there.
+
+**Prediction, and it is counted rather than hoped.** Twelve failures
+have been read individually and put in one of the two groups:
+directory rename `fCmd-9.1`, `9.11`, `9.14.3`, `18.3`, `22.4`, `6.30`,
+`unixFCmd-1.3`, `1.7`; errno `fCmd-4.11`, `4.14`, `6.6`, `6.24`. Those
+should go. `fCmd-6.21`, `6.25` and `6.26` are unread and may be in the
+same families -- if they are, sixteen. **`unixFCmd-1.1` is not ours to
+fix**: it expects EACCES from walking *through* a mode-0 directory and
+Plan 9 answers "does not exist", which is the file server's own choice
+and a probe rather than a library rule. The remaining 23 are symlinks
+and `~USER`. **What to watch is `rename()` being reached by code that
+never got past the old failure**: a fix that lets a process reach code
+it never reached before can expose anything on that path.
