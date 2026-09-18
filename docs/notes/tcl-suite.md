@@ -4868,3 +4868,102 @@ converse -- "a rising failure count after new tests become runnable is
 newly measured, not newly broken" -- and this is the same coin. Before
 attributing a new failure to the change in hand, ask what the test
 actually asserts and whether anything else in its file moved.
+
+#### The probe gave a third answer, and it was the useful one
+
+The question was whether glenda can announce a privileged port, with two
+expected answers: a channel back (the `notRoot` constraint is the
+problem) or an error (the story was wrong). What came back was neither:
+
+```
+% socket -server {apply {{c a p} {}}} 1
+couldn't open socket: address already in use
+```
+
+**The port is held right now**, in a fresh `tclsh`, with no suite
+running. So the capability question is still unanswered -- and something
+better was answered instead.
+
+**Follow the sequence.** The last suite run's own `socket_inet-5.1` bound
+port 1 (which is why it failed), and its body then calls `close $msg`.
+The port is still announced afterwards. So `close()` on a listening
+socket releases nothing, and **the two tests had been passing for the
+wrong reason all along**: a leftover listener from an earlier run was
+refusing the bind, not the system. The run that "broke" them was the
+first one to find the port free.
+
+That also closes the question of whether the `EPERM` -> `EACCES` change
+did it. It did not, and the three reasons stand: both bodies return a
+fixed string whichever way the error goes, Tcl's server path tests only
+`EADDRINUSE`, and `bind()`'s fallback is gated on `EPLAN9` which neither
+errno is. **The probe was worth running even though it refuted its own
+two options** -- an answer outside the menu is still an answer, and this
+one named a bug that had been sitting in the "open hazards, not
+measured" list for months.
+
+#### close() on a listening socket freed nothing, and the reason is the pipe
+
+`listen()` does not keep the socket in the calling process.
+`ap/network/listen.c` replaces the descriptor with a **pipe**, so that
+`select()` can work on it, and forks a child that holds the real network
+descriptor and blocks in `open("/net/tcp/N/listen")`. So:
+
+- the parent's `close()` shuts a pipe;
+- the announcement is held by a descriptor in **another process**;
+- nothing connected the two.
+
+`_killmuxsid` kills that process group from an `atexit` handler, and it
+is not enough twice over. A program that closes a listener and keeps
+running holds the port for its whole life -- which is exactly what Tcl's
+socket tests do. And a run that ends any way other than `exit()` -- an
+interrupt, a note, a fault -- runs no `atexit` handler at all. **That is
+where "over a hundred leaked `listenproc` processes accumulate across
+runs" came from**, an item that had been in the notes without anyone
+connecting it to a test result.
+
+`_sock_listenpid.c` records the listening pid against the descriptor;
+`close()` calls `_sock_killlisten()`, which is a no-op for every
+descriptor that is not one.
+
+**The owner is recorded beside the pid, and that is not belt and
+braces.** The table is inherited by every fork, exactly like the atexit
+handlers, so a child closing an inherited descriptor would kill its
+PARENT's listener. `_buf.c` has this written on it in capitals after it
+cost a round:
+
+> ONLY THE PROCESS THAT FORKED THE TIMER MAY KILL IT
+
+-- the asymmetry there meant any forked child leaving through `exit()`
+took the parent's timer with it, and every blocking `select()` that
+needed a timeout waited for ever. Same table, same trap, same guard:
+`_sock_killlisten` forgets the entry either way and kills only if
+`getpid()` matches the recorded owner.
+
+`SIGKILL` rather than `SIGTERM`, because the listener is blocked in an
+`open()` that will not return until a call arrives. `_closebuf` kills
+its copy processes the same way.
+
+**`network/mkfile` had no `HFILES` at all**, so a change to
+`../include/priv.h` -- which defines `struct Rock`, shared by every file
+in that directory -- rebuilt nothing. Added, because the shape of that
+failure is recorded here already and is unattributable when it happens.
+
+**No struct changed**, so this does not need `mk distclean`: a rebuild of
+libap and a relink of whatever uses it is enough.
+
+**Prediction, and it has two parts.** `listenleak-test` should go from
+failing section 1 to 0 failures -- that is the whole claim. What happens
+to `socket_inet-5.1`/`5.3` is a *separate* question and I expect them to
+**stay failing**, because the leftover that was masking them is what this
+removes: with ports genuinely free, the tests will honestly report
+whether glenda may announce port 1, and on a 9front terminal she is the
+host owner and may. That would put them with `unixFCmd-1.1` as
+upstream's constraint asking the wrong question -- `notRoot` tests a
+*user name* as a proxy for a capability. **A fix that makes two tests
+fail honestly instead of passing dishonestly is still the right fix**,
+and the count going the wrong way is not evidence against it.
+
+**The leftover on port 1 is still there and must be cleared before any
+of this can be measured**, or the first run after the fix will still see
+the port held by a process that predates it. A reboot of the VM, or
+killing the leftovers, before the next suite run.

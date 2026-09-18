@@ -182,7 +182,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `rol64-test.c` and `u64float-test.c`, and for libap `locale-test.c`,
 `sigset-test.c`, `posix-spawn-test.c`, `limits-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
-`execve-env-test.c`, `tz-test.c`, `rename-test.c`,
+`execve-env-test.c`, `tz-test.c`, `rename-test.c`, `listenleak-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
@@ -551,17 +551,25 @@ Open, in order of what the next run should touch:
   The remaining 22 + `unixFCmd` 2 are 15 symlink, 8 `~USER`, and
   `unixFCmd-1.1`. **24 of 24 accounted for** -- reading a cluster all
   the way through before touching it is what made that possible.
-- **`socket_inet-5.1`/`5.3`: newly failing, and probably not ours.**
-  They ask that `socket -server dodo 1` be refused. Tcl's server path
-  tests only `EADDRINUSE`, and both bodies return a fixed string, so the
-  `EPERM`->`EACCES` change cannot have turned a failure into a success.
-  `socket_inet-4.2` went the *other* way in the same run, having been
-  failing with `EADDRINUSE` -- so this file depends on what holds ports
-  when a run starts (see the leaked `listenproc` item). Likely they were
-  passing for the wrong reason and glenda, as host owner, may announce a
-  privileged port; `notRoot` asks about a *user name*, which is the
-  wrong proxy here. **One command settles it** -- see
-  `docs/notes/tcl-suite.md`.
+- **`close()` on a listening socket freed nothing -- fixed, not yet
+  confirmed.** `listen()` replaces the descriptor with a **pipe** and
+  forks a child holding the real network fd, so `close()` shut a pipe
+  while the announcement lived in another process. `_killmuxsid` only
+  kills that group at `exit()`, which is no help to a program that keeps
+  running and none at all to a run ended by a note. **This is the
+  hundred leaked `listenproc` processes**, and it was found by one
+  command: `socket -server ... 1` in a fresh `tclsh` answered `address
+  already in use` for a port the previous run had bound and closed.
+  `_sock_listenpid.c` records the pid; `close()` kills it, **only if
+  `getpid()` matches the recorded owner** -- the table is inherited by
+  every fork, which is the trap `_buf.c` records in capitals.
+- **`socket_inet-5.1`/`5.3` were passing for the WRONG REASON** -- a
+  leftover listener was refusing the bind, not the system -- so they are
+  not a regression from the errno change. Expect them to **stay
+  failing** once ports are genuinely released: `notRoot` tests a user
+  *name* as a proxy for a capability, and glenda is the host owner.
+  **Clear the leftovers (or reboot) before the next suite run**, or the
+  first run after the fix still meets a process that predates it.
 - **Still unread: `io` 23, `chan-io` 19, `socket_inet` 16,
   `filename` 17, `socket` 10.** `filename`'s are all `Tcl_GlobCmd`.
 - **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a
@@ -596,13 +604,12 @@ mode-0 directory; Plan 9 answers "does not exist". The file server's
 choice, so a probe rather than a library rule.
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
-where POSIX allows EPERM or EISDIR; and over a hundred leaked
-`listenproc` processes accumulate across runs, since nothing records the
-listener's pid for `close()` to kill.
+where POSIX allows EPERM or EISDIR.
 
 **Open hazards recorded but not measured**: the lost wakeup in
 `select()`'s rendezvous (a copy process reaching EOF before the parent
-sets `selwait`); `_closebuf` killing a copy process up to ten times
-without waiting for it to die; and a `socket -server` closed with no
-connection leaving its `listenproc` blocked for ever, since nothing
-records the listener's pid for `close()` to kill.
+sets `selwait`), and `_closebuf` killing a copy process up to ten times
+without waiting for it to die. *(The third -- a closed `socket -server`
+leaving its `listenproc` for ever -- was measured and fixed; see above.
+It had sat here unmeasured while it silently decided the result of two
+tests.)*
