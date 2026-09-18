@@ -182,7 +182,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `rol64-test.c` and `u64float-test.c`, and for libap `locale-test.c`,
 `sigset-test.c`, `posix-spawn-test.c`, `limits-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
-`execve-env-test.c`,
+`execve-env-test.c`, `tz-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
@@ -200,6 +200,13 @@ under plain `tclsh` and isolates the `chan-io-44.1` and `event-11.5`
 hangs, with a timeout on every section so it reports where the suite
 would wait; `select-test.c` takes the two bugs it found down to the
 `select()` call underneath them.
+`tz-xcheck.c` is not a Plan 9 test at all: it links
+`lib/ap/time/tzone.c` into a **glibc** program on the build host and
+sweeps ~1.4 million instants against `localtime_r`, so libap's own
+parser can be checked without a VM round. It found two bugs that way.
+That pattern -- link the unit under test into a host program beside the
+reference implementation -- is worth reaching for whenever the thing
+being written is a pure function of its input.
 `sys/src/ape/lib/libressl/test/` is separate: it is
 upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
 
@@ -435,7 +442,17 @@ in the topic file.
 **Testing**
 
 - Check a new test against gcc or a Linux `tclsh` *first*: it tells you
-  whether the test or the tree is wrong, and it has caught both.
+  whether the test or the tree is wrong, and it has caught both. It
+  caught a *third* thing in `tz-test.c`: that POSIX lets `localtime_r`
+  skip the `tzset()` a `localtime` must do, and glibc takes it
+  literally. The test asserted otherwise and the library was about to
+  match the test.
+- **Better still, link the code under test into a host program beside
+  the reference implementation.** A test run on glibc passes by asking
+  glibc for the answers; it says nothing about your parser until it
+  reaches the VM. `tz-xcheck.c` linked `tzone.c` into a glibc program
+  and swept 1.4M instants -- two bugs, two recompiles, no rebuilds.
+  Applies to anything that is a pure function of its input.
 - Anything asking about one operating system's own behaviour is a probe,
   not a library rule -- report it, do not assert it.
 - Write the prediction down before the run, including what would refute
@@ -502,13 +519,20 @@ Open, in order of what the next run should touch:
   tests `usepath` first and the child calls `execvp`, which passes
   `environ`. POSIX says `envp` is the child's environment either way.
   Recorded, not fixed, not measured. Tcl's `exec` is the caller.
+- **`clock` 16: fixed, not yet confirmed.** `$TZ` reached nothing:
+  `tzset()` parsed `getenv("timezone")`, Plan 9's spelling, while
+  `localtime_r` separately read `/env/timezone` **once per process** into
+  a static of its own, and neither had heard of `TZ`. Nothing set
+  `tm_gmtoff`/`tm_zone` either, so `strftime`'s `%Z` was a hardcoded
+  `{"EST","EDT"}` ("hack for now: assume eastern time zone") and `%z`
+  did not exist. `time/tzone.c` is now the single engine -- POSIX TZ
+  strings with DST rules, `/env/timezone` as the fallback, UTC with an
+  **empty** name when neither parses. **`%Z` changing for every zone is
+  the thing to watch beyond `clock`.** No zoneinfo, so
+  `TZ=America/New_York` is UTC; glibc does the same here without tzdata.
 - **Still unread: `fCmd` 35, `io` 22, `chan-io` 19, `socket_inet` 17,
-  `filename` 17, `clock` 16, `socket` 10.** `filename`'s are all
-  `Tcl_GlobCmd`; `clock`'s are all `:localtime` with `TZ` changing --
-  they did **not** move with the `env` fix, so that is a question about
-  `localtime()` reading `/env/timezone` rather than `TZ`, not about the
-  environment reaching a child. `fCmd` fell 73 -> 35 with the full
-  rebuild alone.
+  `filename` 17, `socket` 10.** `filename`'s are all `Tcl_GlobCmd`.
+  `fCmd` fell 73 -> 35 with the full rebuild alone.
 - **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a
   password database mapping a user to a home directory, which Plan 9
   has not -- read it before writing it off.

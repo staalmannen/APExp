@@ -19,6 +19,7 @@ OFILES=\
 	times.$O\
 	timespec_get.$O\
 	tzset.$O\
+	tzone.$O\
 # musl\
 	__map_file.$O\
 #	asctime.$O\
@@ -27,6 +28,9 @@ OFILES=\
 	strptime.$O\
 	timegm.$O\
 
+
+HFILES=\
+	tzone.h\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
