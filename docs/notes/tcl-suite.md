@@ -4098,3 +4098,62 @@ mistake this section is correcting.
 and `came from THIS TREE`, and 0 failures. The suite should not move at
 all; if it does, the eleven new headers changed something that was
 depending on stock's values, and the per-file table says which.
+
+#### The marker worked, and it proved my own diagnosis wrong
+
+```
+note PATH_MAX 1023, MAXPATHLEN 1023, NAME_MAX 27
+note <limits.h> came from THIS TREE
+```
+
+**Both lines are true, and together they refute the round before.** The
+header *is* this tree's -- so stock APE was never shadowing it, and the
+eleven architecture wrappers fixed nothing. The numbers come from a
+**second file in the same tree**, three lines below the ones I edited:
+
+```c
+/* sys/include/ape/limits_generic.h, last line before the #endif */
+#include <sys/limits.h>
+
+/* sys/include/ape/sys/limits.h */
+#undef	NAME_MAX
+#define	NAME_MAX	27
+#undef	PATH_MAX
+#define	PATH_MAX	1023
+```
+
+`<limits.h>` ends by including `<sys/limits.h>`, which `#undef`s and
+redefines what it has just set. Every value in the outer file that this
+one names is dead, and the `#undef` is why there is no redefinition
+error to notice. Editing the outer file and reading the result measured
+nothing at all.
+
+**The rule this is an instance of: when a constant is wrong, grep for
+EVERY definition of it, not the first one found.** One `grep -rn 'define
+PATH_MAX' sys/include/ape/` answers it in a second, and I did not run it
+until the marker forced the question.
+
+**And the marker is what forced it.** It answered the question I asked
+-- *which limits.h did this compile read?* -- truthfully, and the
+disagreement between a true answer and wrong numbers is what said the
+question was the wrong one. That is worth more than a marker that
+confirms: `_APEXP_FD_SET_T` did the same thing one round earlier in the
+`fd_set` work, refuting the architecture-directory explanation there
+too. **Two for two against my favourite theory about these headers.**
+
+**What stands from last round and what does not.** The correction about
+the deep-path abort stands: it was cleared by the full rebuild, almost
+certainly `fts_alloc` finally reaching `tcltest`, and not by any
+constant. The correction *about the correction* is this: the constant
+was 1023 rather than 255, and the reason was not the architecture
+directory.
+
+**The eleven wrappers stay**, as insurance rather than as a fix, and the
+note in them says so. The guard collision they close is real -- this
+tree's `limits.h` opened `#ifndef __LIMITS`, which is stock's guard --
+even though nothing has shown stock's copy winning.
+
+**Prediction.** `deeppath-test` prints `PATH_MAX 4096, MAXPATHLEN 4096,
+NAME_MAX 255` and `came from THIS TREE`, with 0 failures and 141 levels.
+The suite should not move; if it does, something was depending on 1023
+or 27, and the per-file table says what.
