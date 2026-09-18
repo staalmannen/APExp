@@ -5196,3 +5196,50 @@ pull the whole of it into `close.o`, which every program links.
 
 No prediction. Three have been offered on this bug and the machine has
 refuted each one; the next line should come from the VM, not from here.
+
+#### Section 3 passes, and that is not the good news it looks like
+
+With the tree actually pulled, section 3 ran and passed all three:
+
+```
+--- 3. close the LISTENER while a connection is in use ---
+  PASS a message arrives before the listener is closed
+  PASS ...and one still arrives after it is closed
+  PASS the accepted connection reports end of file
+```
+
+**But sections 1 and 2 still FAIL -- the port is still held -- and those
+two facts together do not say what they appear to.** A PASS in section 3
+has two explanations: the listener was killed and the accepted
+connection was undisturbed, *or* the listener was never killed at all.
+It can **convict** the kill and never clear it.
+
+And sections 1 and 2 are exactly what say whether a kill happened. They
+failed. So the reading is **"no kill happened"**, not "the kill is
+harmless" -- and section 3 is currently evidence about nothing.
+
+That is this file's own rule, *a check whose negative result has two
+explanations is not a check*, met from the positive side, in a test
+written three messages ago to avoid precisely this class. The section
+now prints the ambiguity in its own output rather than leaving a reader
+to reconstruct it:
+
+```
+  note a PASS above means the kill did not break this
+  note connection -- OR that no kill happened. Sections 1
+  note and 2 are what tell those apart; if they FAILED,
+  note nothing was killed and this section proves nothing.
+```
+
+**A test that can pass for two reasons should say so where the result is
+read, not where the source is read.** The comment at the top of the file
+had said it; the output had not, and the output is what gets pasted into
+a message.
+
+**The code path has been re-read and is right** -- `_sock_listenpid.$O`
+is first in `network/mkfile`'s `OFILES`, `pid` is the parent's fork
+return, `_sock_setlisten(fd, pid)` is in the `default:` arm against the
+socket descriptor. So there is nothing left to find by reading, which
+was the conclusion two rounds ago as well.
+
+`APEXP_LISTENDEBUG=1 ./listenleak-test` is the whole of the next step.

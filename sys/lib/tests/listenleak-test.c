@@ -251,6 +251,15 @@ main(void)
 	 * The read before the close is a control: without it, a failure
 	 * after the close would not distinguish "the close broke it" from
 	 * "it never worked".
+	 *
+	 * BUT A PASS HERE HAS TWO EXPLANATIONS, and the output says so
+	 * rather than leaving the reader to notice. This section passes if
+	 * the listener was killed and the accepted connection was
+	 * undisturbed -- and equally if the listener was never killed at
+	 * all. It can only CONVICT the kill, never clear it. Sections 1
+	 * and 2 are what say whether a kill happened, and when they fail
+	 * while this passes, the reading is "no kill happened", not "the
+	 * kill is harmless".
 	 */
 	signal(SIGALRM, alarmed);
 	port = 0;
@@ -308,6 +317,11 @@ main(void)
 	arrived();
 	ok("the accepted connection reports end of file", n == 0);
 	close(as);
+	printf("  note a PASS above means the kill did not break this\n");
+	printf("  note connection -- OR that no kill happened. Sections 1\n");
+	printf("  note and 2 are what tell those apart; if they FAILED,\n");
+	printf("  note nothing was killed and this section proves nothing.\n");
+	printf("  note APEXP_LISTENDEBUG=1 makes libap say which it was.\n");
 
 done:
 	printf("%d failure(s)\n", failures);
