@@ -4330,3 +4330,100 @@ hazard rather than kept for a bug it did not fix.
 output has still not been shown to fix the test.* Two of three lines
 went and not one count moved. Read what the test **compares**, and count
 what is left, before calling a cluster closed.
+
+#### The exec boundary is right; whether it was already right is a separate question, and the first probe could not ask it
+
+`execve-env-test` on the VM:
+
+```
+  note chosen: LANG=C.UTF-8
+  note envp handed to the child is exactly:
+  note   APEXP_KEPT=yes
+  note   APEXP_OMITTED=LANG
+--- child: what the exec boundary delivered ---
+  note child env[0] APEXP_KEPT=yes
+  note child env[1] APEXP_OMITTED=LANG
+  note 2 entries in all
+  PASS a variable the parent had but envp omitted is NOT visible
+  PASS a variable envp DID pass is visible
+  PASS ...and it has the value envp gave it
+0 failure(s)
+```
+
+**So the boundary is POSIX now: a child's environment is exactly `envp`,
+two entries and nothing else.** That is worth having measured; nothing in
+this tree had asked before.
+
+**But it does not answer the question the file was written for, and the
+prediction beside it was reasoned wrongly.** I wrote "if it PASSES, the
+leak was already closed by something else". That does not follow: the
+build under test *contains* the `/env`-clearing change. A PASS is what
+both worlds look like from here -- a fix that was needed and a fix that
+was not. This is the tree's own rule about measuring a build that does
+not contain the change, turned around: **a build that DOES contain the
+change cannot tell you the change was necessary.** Same trap, opposite
+face, and it is the second time this round that a prediction outran what
+the measurement could distinguish.
+
+**What reading did settle, and it removes one candidate explanation.**
+Tcl does not call `execve`. `tclUnixPipe.c` uses
+
+```c
+status = posix_spawnp(&pid, newArgv[0], &actions, &attr, newArgv, environ);
+```
+
+and libap's `spawn()` branches on `usepath` **before** it looks at
+`envp`:
+
+```c
+if(usepath)
+	execvp(path, (const char **)argv);
+else if(envp != NULL)
+	execve(path, (const char **)argv, (const char **)envp);
+```
+
+-- so `posix_spawnp` **discards the `envp` it was handed** and the child
+takes `execvp`, which is `_execpath(name, argv, environ)`. The
+environment a Tcl child gets is the exec'ing process's own `environ`, not
+anything Tcl passed. It reaches `execve` in the end, so `env.test` does
+exercise this code; but anyone reasoning from the `envp` at Tcl's call
+site is reasoning about an argument that is thrown away. (Whether
+`posix_spawnp` *should* ignore `envp` is a separate question -- POSIX
+says the `envp` argument is the child's environment whether or not the
+path is searched. Recorded, not fixed, and not measured.)
+
+**The anomaly that is still open.** If `/env` had been leaking, `HOME`
+should have been in the *before* listing: `env.test`'s keep-list does not
+contain it, so `envprep` unsets it, `unsetenv` edits `environ` only
+(checked -- libap's is musl's, and its `__env_rm_add` is a no-op stub
+here), and only `/env` could have carried it to the child. It was not
+there. Every step of that chain has now been read and each one holds, so
+the reading and the log disagree and the reading is what gets doubted.
+
+**Section 3 is how to ask without rebuilding libap.** It replicates
+pre-change `execve` exactly -- `rfork(RFCENVG)`, create the two names,
+create nothing else -- and then lists `/env`:
+
+- **other names still present** -> `RFCENVG` copies the group, the old
+  `execve` leaked them into every child, clearing `/env` is
+  load-bearing, and `HOME`'s absence has a cause still to find.
+- **only the two** -> `RFCENVG` hands back an empty group, the old code
+  was already correct, and the change should be **reverted**: it empties
+  `/env` on a failed exec, and that is a real cost to carry for a bug
+  that was not there.
+
+It is a probe, not a check -- it asks what one operating system does, so
+it prints its finding and says which conclusion follows in words, and
+counts no failure either way. A PASS/FAIL there would be asserting the
+answer the file exists to find. It runs in a `fork()`, so the parent's
+environment group is untouched whichever way it goes, and `rfork` is
+declared locally rather than by including `<lib9.h>`, which would bring
+its own `Dir`, `uchar` and `open()` in next to `<dirent.h>` and
+`<fcntl.h>`. Both branches syntax-check under gcc; sections 1 and 2 give
+0 failures there.
+
+**No prediction this time.** The honest tally in these notes is about one
+in eight for mechanisms guessed from code alone, I have read every step
+of this chain and it contradicts the log, and the two outcomes point in
+opposite directions -- keep the change or revert it. Writing a guess down
+here would only be something to be wrong about.

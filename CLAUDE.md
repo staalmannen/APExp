@@ -319,6 +319,10 @@ in the topic file.
   decision. `git merge-base --is-ancestor <fix> origin/main` before
   reading anything, and number the sections of a hand-built test so the
   output says which source ran.
+- **And its opposite face: a build that DOES contain the change cannot
+  tell you the change was needed.** A green run looks the same for a fix
+  that was necessary and one that was not. To ask *that*, replicate the
+  old code beside the new -- which is usually cheaper than a rebuild.
 - **When a run comes back green, ask what the new case would have
   printed and look for it.** A test that could not run is
   indistinguishable from one that passed.
@@ -476,9 +480,17 @@ Open, in order of what the next run should touch:
   while this environment has two spellings, rc's `path` and the `PATH`
   that `apexp-sh` sets for bash. Checked on a host `tclsh`. Do not fix
   by hiding `path`. The `_fdinfo`/`_sighdlr` leak into `environ` **is**
-  fixed and confirmed; the `execve` half (clearing `/env` so a child's
-  environment is exactly `envp`) fixed no measured test and is
-  **unconfirmed** -- `execve-env-test.c` is what asks.
+  fixed and confirmed; the `execve` half (clearing `/env`) fixed no
+  measured test. `execve-env-test` confirms the boundary **is** POSIX
+  now -- a child's environment is exactly `envp` -- but that is true
+  whether or not the change was needed, since the build contains it.
+  **Its section 3 decides whether to keep or revert the change**, by
+  replicating the old code (`rfork(RFCENVG)` + create only) and listing
+  `/env`. Revert if only the two new names are there.
+- **`posix_spawnp` discards the `envp` it is handed**: libap's `spawn()`
+  tests `usepath` first and the child calls `execvp`, which passes
+  `environ`. POSIX says `envp` is the child's environment either way.
+  Recorded, not fixed, not measured. Tcl's `exec` is the caller.
 - **Still unread: `fCmd` 35, `io` 22, `chan-io` 19, `socket_inet` 17,
   `filename` 17, `clock` 16, `socket` 10.** `filename`'s are all
   `Tcl_GlobCmd`; `clock`'s are all `:localtime` with `TZ` changing --
