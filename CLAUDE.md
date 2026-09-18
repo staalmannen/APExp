@@ -337,6 +337,12 @@ in the topic file.
   missing loopback, the announce spelling and the `fd_set` width were all
   settled that way after rounds of reasoning went the wrong way.
 - **A grep hit is a name, not an implementation.** Open the function.
+- **Replicate the code in the tree, line by line, not the code you
+  remember.** A probe written from a recollection of `DoCopyFile`
+  skipped its `unlink(dst)` and so reported 0 failures for a copy that
+  did not work -- a probe that skips a call cannot clear it.
+- **Plan 9 has `ratrace`**, and it names a failing system call outright
+  where elimination takes rounds.
 - **Read what a test *compares*, not what it mentions.**
 - **Every case expected to return must come before every case expected to
   hang**, in file order, each behind a flushed marker naming the
@@ -455,9 +461,11 @@ Open, in order of what the next run should touch:
 - **`file copy` of a file that exists reports ENOENT**, and it aborts
   `encoding.test`, `http.test` and `fCmd.test`. **The syscalls are
   cleared**: `copyfile-test` makes every call Tcl makes, in order, and
-  reports 0 failures on the VM. So it is in what Tcl does to the path
-  first -- normalisation (`getcwd`/`realpath`), the filesystem encoding,
-  or the vfs layer. Four `tclsh` lines separate them; see
+  reported 0 failures on the VM -- but it was missing `DoCopyFile`'s
+  `unlink(dst)`, which tolerates only ENOENT, and that is now section 3.
+  Cleared by `file rename` working: the whole shared prologue,
+  normalisation, the encoding conversion and `Tcl_FSGetNativePath`. If
+  section 3 also passes, trace it: `ratrace tclsh` names the call. See
   `docs/notes/tcl-suite.md`.
 - **9front has no symbolic links** -- confirmed, `grep DSYM
   /sys/include/*` is empty -- so `symlink()` stays ENOSYS, and that

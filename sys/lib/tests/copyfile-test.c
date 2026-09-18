@@ -27,6 +27,7 @@
  *
  *	lstat(src)
  *	lstat(dst)			<- must fail with ENOENT exactly
+ *	unlink(dst)			<- ALSO tolerated only for ENOENT
  *	open(src, O_RDONLY)
  *	open(dst, O_CREAT|O_TRUNC|O_WRONLY, srcStat.st_mode)
  *	read/write
@@ -46,6 +47,14 @@
  * (0100644, not 0644). That is upstream's, and POSIX says the file-type
  * bits are ignored; it is here because a faithful probe has to make the
  * same call, not a tidier one.
+ *
+ * A CORRECTION, AND IT IS THE POINT OF THE FILE. The first version of
+ * this probe passed on the VM while `file copy` failed, because it was
+ * written from the Tcl I remembered rather than the Tcl in this tree:
+ * DoCopyFile here unlinks the destination before copying, and tolerates
+ * ONLY ENOENT from that unlink. A probe that skips a call cannot clear
+ * it. Replicate the code in the tree, line by line, and re-read the
+ * function rather than trusting a recollection of it.
  *
  * Correct on glibc, which is where it was checked.
  */
@@ -153,7 +162,35 @@ main(void)
 			e == ENOENT);
 	}
 
-	printf("--- 3. the copy itself ---\n");
+	/*
+	 * 3. THE CALL THE FIRST VERSION OF THIS PROBE SKIPPED.
+	 *
+	 * DoCopyFile removes the destination before copying -- symlink and
+	 * mknod would fail on an existing name -- and it tolerates exactly
+	 * one error from doing so:
+	 *
+	 *	if (unlink(dst) != 0) {
+	 *	    if (errno != ENOENT) return TCL_ERROR;
+	 *	}
+	 *
+	 * So unlink of a file that is not there has to report ENOENT and
+	 * nothing else, on pain of the copy being abandoned before a byte
+	 * moves.
+	 */
+	printf("--- 3. the unlink DoCopyFile does first ---\n");
+	errno = 0;
+	if(unlink(DST) == 0)
+		printf("  note the destination existed and was removed\n");
+	else {
+		e = errno;
+		printf("  note unlink of a missing file: errno %d (%s)%s%s\n",
+			e, strerror(e), p9err()[0] ? "; plan 9 says: " : "",
+			p9err());
+		ok("...and it is exactly ENOENT, which DoCopyFile requires",
+			e == ENOENT);
+	}
+
+	printf("--- 4. the copy itself ---\n");
 	sfd = step("open " SRC " O_RDONLY", open(SRC, O_RDONLY));
 	/*
 	 * The full st_mode, S_IFREG included, exactly as TclUnixCopyFile
@@ -176,13 +213,13 @@ main(void)
 	if(dfd >= 0)
 		close(dfd);
 
-	printf("--- 4. CopyFileAtts: chmod then utime ---\n");
+	printf("--- 5. CopyFileAtts: chmod then utime ---\n");
 	step("chmod " DST, chmod(DST, ss.st_mode & 07777));
 	tval.actime = ss.st_atime;
 	tval.modtime = ss.st_mtime;
 	step("utime " DST, utime(DST, &tval));
 
-	printf("--- 5. the result ---\n");
+	printf("--- 6. the result ---\n");
 	if(lstat(DST, &ds) == 0)
 		ok("the copy is the same size as the source",
 			ds.st_size == ss.st_size);

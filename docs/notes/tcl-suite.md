@@ -3721,3 +3721,82 @@ wrong one is visible on sight.
 Six mechanisms had been argued from the source; the probe did not name
 the bug, but it removed every one of them at once and moved the search
 up a layer. A measurement that refutes is not a wasted round.
+
+#### The path is cleared, rename works -- and my probe was missing a call
+
+```
+% pwd                        -> /tmp
+% file normalize a.txt       -> /tmp/a.txt
+% file normalize b.txt       -> /tmp/b.txt
+% file copy -force /tmp/a.txt /tmp/b.txt   -> no such file or directory
+% file copy -force a.txt d.txt             -> no such file or directory
+% file rename a.txt c.txt                  -> WORKS
+```
+
+Three things fall out of six lines:
+
+- **Normalisation is correct.** `file normalize` prints exactly the
+  right absolute path, so `getcwd()` and `realpath()` are not it.
+- **Absolute and relative fail identically**, so the path is not the
+  variable at all.
+- **`file rename` works**, and that is the one that narrows hardest.
+  `TclFileRenameCmd` and `TclFileCopyCmd` both go through
+  `CopyRenameOneFile`, so the entire prologue is shared and
+  demonstrably fine: `Tcl_FSConvertToPathType`, the
+  `Tcl_UtfToExternalDStringEx` encoding conversion, `Tcl_FSLstat` on
+  both operands including the `errno != ENOENT` branch, and the vfs
+  dispatch. A successful rename returns before ever reaching the copy.
+
+**So `Tcl_FSGetNativePath` is cleared too**, which is worth stating
+because it was the leading suspect: `TclpObjRenameFile` uses it on both
+operands exactly as `TclpObjCopyFile` does.
+
+Two more things cleared from the host, for free:
+`Tcl_StatBuf` is the ordinary `struct stat` on this arm of `tcl.h`, and
+`TclOSlstat` is plain `lstat` because APE defines `S_IFLNK` -- so there
+is no `*64` symbol and no struct-layout mismatch between what Tcl
+compiled against and what libap provides.
+
+**AND THE PROBE WAS UNFAITHFUL, WHICH IS WHY IT PASSED.** `DoCopyFile`
+in *this* tree removes the destination before copying, and tolerates
+exactly one error from doing so:
+
+```c
+if (unlink(dst) != 0) {
+    if (errno != ENOENT) {
+	return TCL_ERROR;
+    }
+}
+```
+
+I wrote the probe from the Tcl I remembered, which had no such call, so
+it reported 0 failures while `file copy` failed -- **a probe that skips
+a call cannot clear it.** The rule to carry, and it is a close cousin of
+*a grep hit is a name, not an implementation*: **replicate the code in
+the tree, line by line, not the code you remember.** `copyfile-test.c`
+has a section 3 for the unlink now, and still 0 failures on glibc.
+
+**That unlink is the last call Tcl makes that nothing here has
+measured**, and APE's `unlink()` is not a thin wrapper -- it is a long
+function that stats the path, walks all `OPEN_MAX` descriptors calling
+`_dirfstat` on each, and renames the file to its qid and reopens it with
+`ORCLOSE` when it is open in this process. Its missing-file path looks
+right on reading, which is exactly what the last six readings looked
+like.
+
+**And if section 3 passes too, stop reading and trace.** Plan 9 has
+`ratrace`, which this project has never used and which answers this
+question directly:
+
+```
+cd /tmp
+echo 'set f [open a.txt w]; puts $f hi; close $f
+catch {file copy -force a.txt b.txt} m; puts $m' > /tmp/c.tcl
+ratrace tclsh /tmp/c.tcl >[2] /tmp/rt.out
+grep -n 'a.txt|b.txt' /tmp/rt.out | tail -40
+```
+
+Every system call on those two names, with its return value, in order.
+That names the failing call outright instead of by elimination -- it is
+the `strace` this file has wanted for several rounds without noticing it
+was there.
