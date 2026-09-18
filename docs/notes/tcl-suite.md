@@ -3530,3 +3530,50 @@ and fail to delete it with `invalid operation`. That is the same errstr
 **empty** -- the failure is the path, not the contents. A length limit
 somewhere in libap's path handling is the obvious suspect and is worth a
 probe of its own.
+
+#### `file copy` is reproducible in four lines, and five guesses were wrong
+
+```
+% cd /tmp
+% set f [open a.txt w]; puts $f hi; close $f
+% file copy -force a.txt b.txt
+error copying "a.txt" to "b.txt": no such file or directory
+```
+
+So it is **not** the suite's context -- not `[temporaryDirectory]`, not a
+long path, not a file an earlier test failed to leave behind. A file
+written one line earlier cannot be copied, and that alone aborts
+`encoding.test`, `http.test` and `fCmd.test`.
+
+**Five candidates were argued from the source and none survived
+reading:** the `S_IFMT` dispatch in `DoCopyFile` (the mode bits are set
+correctly by `_dirtostat`); `open()`'s `access(path, 0)` precheck (which
+handles a missing file correctly); the mode argument carrying `S_IFREG`
+(masked to `0777` by `open()`); `utime()`'s wstat; and the destination
+`lstat`. **And the error message cannot choose between them**, because
+Tcl prints `Tcl_PosixError` at a common `done:` label -- it reports
+whatever errno holds by then and names both paths whichever call failed.
+
+`sys/lib/tests/copyfile-test.c` makes the same calls in the same order
+instead: `lstat(src)`, `lstat(dst)`, `open(src, O_RDONLY)`,
+`open(dst, O_CREAT|O_TRUNC|O_WRONLY, srcStat.st_mode)`, the copy loop,
+`chmod`, `utime` -- each reporting errno and Plan 9's own errstr.
+0 failures on glibc.
+
+**The assertion to read first is the destination `lstat`**, because it
+is the one Tcl's control flow turns on:
+
+```c
+if (Tcl_FSLstat(target, &targetStatBuf) != 0) {
+    if (errno != ENOENT) { errfile = target; goto done; }
+```
+
+A destination that does not exist yet is the *normal* case, and the copy
+is abandoned before it starts unless `lstat` reports **exactly**
+`ENOENT` -- which in APE is **20**, not the 2 a reader expects. If that
+line says `FAIL`, the bug is one errno in one place and every file
+operation that checks for a missing file is affected, not just copy.
+
+The probe passes the **full** `st_mode` to `open()`, `S_IFREG` and all
+(`0100644`), because that is what `TclUnixCopyFile` does. A faithful
+probe makes the same call, not the tidier one.

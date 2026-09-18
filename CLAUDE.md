@@ -184,8 +184,8 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
-`socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c` and
-`stdio-test.c`. The twenty-five `tk-*.tcl` scripts there are Tcl, run
+`socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
+`copyfile-test.c` and `stdio-test.c`. The twenty-five `tk-*.tcl` scripts there are Tcl, run
 with `wish` -- except `tk-menubar-test.tcl`, which needs `tktest` and
 skips itself under `wish`, and `tk-transient-test.tcl`, whose last
 section alone does; see `docs/notes/tk-plan9.md`. `tk-runall.tcl` is the harness for
@@ -452,11 +452,12 @@ per-file table and the command that produces it are at the end of
 
 Open, in order of what the next run should touch:
 
-- **`file copy` of a file that exists reports ENOENT**, which aborts
-  `encoding.test`, `http.test` and `fCmd.test`. Four lines in `tclsh`
-  reproduce it or rule it out; the suspect line in `DoCopyFile` is the
-  *destination* stat, which refuses the copy unless a missing file
-  reports exactly `ENOENT` (20 here, not 2).
+- **`file copy` of a file that exists reports ENOENT**, reproducible in
+  four lines of `tclsh`, and it aborts `encoding.test`, `http.test` and
+  `fCmd.test`. Five candidates read out of the source were all wrong, so
+  `sys/lib/tests/copyfile-test.c` makes Tcl's calls in Tcl's order and
+  reports each. Read its destination-`lstat` assertion first: the copy
+  is abandoned unless a missing file reports exactly `ENOENT`.
 - **`symlink()` is ENOSYS**, and `file link` now costs a whole test file
   rather than a handful of tests.
 - **A path ~50 components deep cannot be deleted** -- `invalid
