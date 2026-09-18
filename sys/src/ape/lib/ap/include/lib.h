@@ -137,3 +137,7 @@ void checkbug(char *, int);
 extern void _sock_setlisten(int, int);
 extern void _sock_killlisten(int);
 extern int  _sock_listenmark(void);	/* which libap is linked in */
+
+/* ap/plan9/_apdbg.c -- one debug line, under $APEXP_DEBUG. Labels may be 0. */
+extern void _apdbg(const char *msg, const char *l1, int v1,
+	const char *l2, int v2);

@@ -3,6 +3,7 @@ APE=$APEXPROOT/sys/src/ape
 <$APE/config
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 OFILES=\
+	_apdbg.$O\
 	_buf.$O\
 	_dirconv.$O\
 	_envsetup.$O\

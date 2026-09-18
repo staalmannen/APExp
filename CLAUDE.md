@@ -395,6 +395,14 @@ in the topic file.
   event loop still ran, a freeze proves the process is blocked in a call.
 - **Blocked and spinning are different bugs**: constant *light* CPU is a
   wait, a pinned core is a loop.
+- **Read the `ps` STATES before taking a stack.** Seven `tcltest`
+  processes and not one in `Sleep` said the timer process was missing,
+  a round before `acid` said the same thing -- and a live timer sits in
+  `_SLEEP(mux->waittime)`.
+- **A stack's ARGUMENTS can refute the mechanism you predicted for the
+  line you predicted.** `select` was blocked exactly where expected, and
+  `timeout != 0`, `t = 200` in the same frame showed the reason was the
+  opposite of the one argued.
 - **A bisect that narrows to nothing is evidence** -- of a cumulative
   cause -- not a failed bisect.
 - **When upstream does something from an event, ask what the event costs
@@ -481,6 +489,10 @@ in the topic file.
   through `select()`; a reduction that used a blocking `accept()` passed
   three rounds and proved nothing, because `accept()` reads the pipe
   itself while `select()` goes through a copy process.
+- **An instrument built for one question goes where the SECOND question
+  can reach it.** `$APEXP_LISTENDEBUG` lived in `_sock_listenpid.c` and
+  the next question arrived in `_buf.c`; `plan9/_apdbg.c` now serves
+  both. There is always a second question.
 - Anything asking about one operating system's own behaviour is a probe,
   not a library rule -- report it, do not assert it.
 - Write the prediction down before the run, including what would refute
@@ -600,12 +612,36 @@ Open, in order of what the next run should touch:
   **the connection is never accepted**. The previous test's listener was
   at the same `fd=10` and had been killed. `listenleak-test` **section 4**
   (three rounds of listen/connect/accept/exchange/close) **passes**, so
-  that reduction was wrong. **Section 5 is the real one**: 2.11 reaches
-  its accept through `select()`, and in libap `select()` on a listening
-  socket is a **copy process** reading the pipe (`plan9/_buf.c`) -- a
-  mechanism a blocking `accept()` never touches, since it reads the pipe
-  itself. Killing a listener closes that pipe's write end under a live
-  copy process, which is new. 2.11 was already failing before this change
+  that reduction was wrong. Section 5 adds `select()` before the
+  accept and **also passes**, so two reductions have failed and the next
+  step is the frozen process, not a third guess. Reading narrows it:
+  2.11's `vwait sock` has no `after` outstanding, so `select()` arms **no
+  timer** and its only possible wakeup is a copy process reaching
+  `_RENDEZVOUS(&mux->selwait, 0)` -- which matches the debug output, where
+  the timer-reset lines tick eight times and stop. **That is the shape of
+  the recorded, never-measured hazard**: *a copy process reaching EOF
+  before the parent sets `selwait`*. `socket_inet-2.10`, just before,
+  closes its server socket **from inside the accept callback**, so the
+  listener is killed at an unusual point and 2.11 reuses the descriptor.
+  `acid` CONFIRMED the line -- `_buf.c:544`, select's
+  `_RENDEZVOUS(&mux->selwait, 0)`, under `TclpWaitForEvent`/`vwait` --
+  **but refuted the mechanism**: the frame's own arguments show
+  `timeout` non-null and `t = 200ms`, so a timer WAS armed and never
+  fired. **`ps` shows no process in `Sleep`**, and a live timer sits in
+  `_SLEEP`. So this is the failure `_killtimerproc` already describes:
+  `timerpid` stale, `_resettimer()` signalling a corpse, every blocking
+  `select()` that needs a timeout waiting for ever. `acid 12935` shows a SECOND interpreter
+  (a `socket.test` helper), not the timer -- so the timer simply does
+  not exist. **`_resettimer()` now notices and restarts it** (mark 5):
+  `kill` failing with ESRCH is exact, the failure it prevents is total,
+  and the repair is local. What killed the timer is still unknown and is
+  now a separate, non-blocking question -- `_detachbuf` sets
+  `timerpid = -1` in a forked child, so the documented "child took the
+  parent's timer" route is shut.
+  **`plan9/_apdbg.c`** is the shared debug line-printer
+  (`$APEXP_DEBUG` or `$APEXP_LISTENDEBUG`), moved out of
+  `_sock_listenpid.c` because the next question arrived in a file that
+  could not reach it. 2.11 was already failing before this change
   (a timing result), so the hang is new but the test was never healthy.
 - **`socket_inet-5.1`/`5.3` were passing for the WRONG REASON** -- a
   leftover listener was refusing the bind, not the system -- so they are

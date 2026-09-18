@@ -5525,3 +5525,210 @@ left behind by killing a listener under a live copy process, and the
 order in `close()` -- `_sock_killlisten` before `_closebuf`, which this
 round's version does and the pre-`chan-io-29.34` version did not -- is
 the first thing to look at.
+
+#### Section 5 passed too: stop reducing, look at the process
+
+Mark 4, sections 1 to 5 all pass -- including three rounds of
+listen/connect/**select**/accept/exchange/close. **Two reductions in a
+row have failed to reproduce `socket_inet-2.11`**, and that is itself
+the finding: whatever the test does, it is not the sequence of calls,
+and guessing a third shape would be the fourth guess in a row.
+
+*This tree's own note says `ratrace` "names a failing system call
+outright where elimination takes rounds", and that elimination is
+exactly what the last two rounds were.*
+
+**What reading DOES give, cheaply, is the place to look.** 2.11's body
+is
+
+```tcl
+set s2 [socket $localhost port]
+vwait sock
+```
+
+with no `after` outstanding, so `select()` is called with **no timeout**.
+In `_buf.c` that path is:
+
+```c
+if(timeout) { ... _resettimer(); }	/* NOT taken */
+mux->selwait = 1;
+unlock(&mux->lock);
+fd = _RENDEZVOUS(&mux->selwait, 0);	/* blocks until a COPY PROCESS wakes it */
+```
+
+**No timer is armed, so the only possible wakeup is a copy process.**
+That is precisely what the debug output shows from outside: the
+`close ... fd=5` lines are timer resets, they tick eight times, and then
+they stop -- because the select that never returned is the one that
+armed no timer.
+
+So the question has narrowed to: **the copy process for 2.11's listening
+socket never reports it readable.** And there is an open hazard in this
+file, recorded and never measured, of exactly that shape: *the lost
+wakeup in `select()`'s rendezvous -- a copy process reaching EOF before
+the parent sets `selwait`*. Killing a listener makes a pipe reach EOF at
+a moment nothing here has produced before.
+
+**The predecessor matters and is worth naming.** `socket_inet-2.10` is
+"close on accept, accepted socket lives": it closes the **server socket
+from inside the accept callback**. So the listener at `fd=10` is killed
+at an unusual point, its copy process is torn down, and 2.11 takes the
+same descriptor number for a new server immediately afterwards.
+
+**One look should settle which of the two it is**, and `ps` alone may do
+it. With the suite frozen:
+
+- **`Rendez`** -- the process is in `_RENDEZVOUS(&mux->selwait, 0)`,
+  which is the lost wakeup: select is waiting for a copy process that
+  will never come.
+- **`Pread`** or **`Open`** -- it is blocked in a call instead, and the
+  rendezvous reading is wrong.
+- **`Broken`** -- it faulted, and everything above is beside the point.
+
+`acid <pid>` + `lstk()` gives the frame outright, which is how the
+`listenproc` leak was named in the first place.
+
+**No prediction.** Three mechanisms have been guessed on this bug and
+the machine refuted each one; the next line comes from `ps`.
+
+#### The stack: select's rendezvous, confirmed -- and the timer is the thing that is missing
+
+```
+_RENDEZVOUS ... syscall/_RENDEZVOUS.s:6
+select(rfds=..., timeout=0x7fffffde4a0, nfds=0xb, ...)+0x30e  _buf.c:544
+    t=0x1000000c8
+TclpWaitForEvent(timePtr=0x6930c0) ... tclSelectNotfy.c:844
+Tcl_WaitForEvent() ... Tcl_DoOneEvent(flags=0xfffffffd) ...
+Tcl_VwaitObjCmd(...) ... tclEvent.c:1734
+```
+
+`_buf.c:544` is `fd = _RENDEZVOUS(&mux->selwait, 0)`, which is the line
+named in advance. **But the reading that went with it was wrong**, and
+the stack says so in its own arguments: `timeout` is NOT null and `t` is
+`0xc8` -- 200 milliseconds. So this is not the no-timer path at all. The
+`if(timeout)` arm was taken, `_resettimer()` ran, and **a timer was
+armed that never fired**.
+
+*Predicting the line and the mechanism together, and getting the line
+right, is not the same as being right. The arguments in the frame are
+what corrected it.*
+
+**And `ps` had already said the same thing, before the stack was taken.**
+A live timer process sits in `_SLEEP(mux->waittime)`, which shows as
+`Sleep`:
+
+```
+12908  5644K Rendez   tcltest    <- the interpreter, in select
+12935  2800K Rendez   tcltest
+12936  2784K Open     tcltest
+12938  2788K Pread    tcltest
+12939  2800K Pread    tcltest
+12950  5636K Open     tcltest    <- 2.11's listener, where it should be
+12952  5644K Pread    tcltest
+```
+
+**Not one process is in `Sleep`.** Seven processes and no timer among
+them. *That was on the screen a round before the stack, and reading it
+would have cost nothing -- `ps` states are already documented in this
+file as the cheapest evidence there is.*
+
+**This file already describes this exact failure**, in `_killtimerproc`:
+
+> ...`timerpid` stayed > 0 afterwards so `_resettimer()` went on
+> signalling a corpse -- no timeout ever firing again, and every
+> blocking `select()` that needed one waiting for ever.
+
+**Two candidates, and `12935` distinguishes them.** It is 2800K and in
+`Rendez`, which is the size of the small forked helpers:
+
+- **the timer is DEAD** and `timerpid` is stale, so `_resettimer()`'s
+  `kill(timerpid, SIGALRM)` signals nothing -- the recorded failure,
+  reached by some new route;
+- **`12935` IS the timer**, stuck in its STARTUP rendezvous,
+  `while(_RENDEZVOUS(&timerpid, 0) == (void*)~0) ;`, never reaching the
+  sleep loop at all. A `SIGALRM` arriving there interrupts the
+  rendezvous, the `while` retries, and it can sit there for ever.
+
+`acid 12935` and `lstk()` says which. If the frame is `_timerproc`, it
+is the second.
+
+**And the last `close ... fd=5` line in the debug output is this very
+select's `_resettimer()`** -- `kill()` opening `/proc/N/note` and
+closing it. The instrumentation recorded the moment the timer was armed;
+what is missing after it is the tick.
+
+#### 12935 is a second interpreter, and the timer simply is not there
+
+`acid 12935` gives the same stack as 12908, all the way down to
+`Tcl_MainEx` and `tclAppInit.c:99`: it is another full interpreter --
+one of the helpers `socket.test` spawns with `exec [interpreter]` --
+also sitting in `vwait`. Its `select` has `timeout=0x0` and
+`t=0x7fffffff`, a genuinely unbounded wait, where 12908's has
+`timeout != 0` and `t=200`.
+
+So neither `Rendez` process is the timer, and **of seven `tcltest`
+processes not one is in `Sleep`**, which is where `_SLEEP(mux->waittime)`
+puts a live timer. **12908 armed a timer that does not exist.**
+
+**What killed it is still not known, and I stopped looking.** Two
+readings were tried and both hold up as *correct code*: the child of
+`fork()` calls `_detachbuf`, which sets `timerpid = -1` as well as
+`_mainpid = -1`, so `_killtimerproc`'s `timerpid > 0` guard fails in a
+child and the documented "child took the parent's timer" route is shut.
+That would have been the seventh mechanism argued from source on this
+bug, after six were refuted.
+
+**So the change is a repair rather than a guard against a cause.**
+`_resettimer()` was
+
+```c
+static void
+_resettimer(void)
+{
+	kill(timerpid, SIGALRM);
+}
+```
+
+-- and the comment forty lines above it already said what that costs
+once `timerpid` names a corpse: *no timeout ever firing again, and every
+blocking `select()` that needs one waiting for ever*. It now notices and
+makes another:
+
+```c
+if(kill(timerpid, SIGALRM) >= 0)
+	return;
+_apdbg("resettimer: the timer process is gone, restarting", "was", timerpid, 0, 0);
+timerpid = -1;
+_timerproc();
+```
+
+**This is defensible without knowing the cause, and that is the point.**
+The failure is total -- nothing in that process ever times out again --
+the detection is exact (`kill` fails with ESRCH on a process that is
+gone), and the recovery is local. The worst case is a leaked second
+timer if `kill` ever fails on a live process, which is bounded and far
+better than a hang. It is *not* "invent semantics to make a test pass":
+the semantics are unchanged, a resource is replaced.
+
+**And the debug instrument moved to where anything can reach it.**
+`$APEXP_LISTENDEBUG` was written into `network/_sock_listenpid.c`, and
+the very next question arrived in `plan9/_buf.c` where it was not.
+`plan9/_apdbg.c` is now the one line-printer -- `write(2)`, no stdio,
+because it is called from `close()` and `select()` which every program
+links -- and it takes **labels from the caller**, so a line reads
+`fd=4 pid=7898` and not `a=4 b=7898`. `$APEXP_DEBUG` and the old
+`$APEXP_LISTENDEBUG` both switch it on; renaming an environment variable
+mid-investigation costs a round for nothing.
+
+*The general form: an instrument built for one question should be put
+where the second question can reach it, because there is always a
+second question.*
+
+**Prediction, observation only.** With mark 5 installed,
+`resettimer: the timer process is gone, restarting` appears in a
+`APEXP_LISTENDEBUG=1` run if and only if the timer really was dead. If
+it appears and `socket_inet-2.11` then completes, the diagnosis holds
+and what killed the timer becomes a separate, non-blocking question. If
+it never appears, the timer is alive and `_resettimer` is not the
+problem -- and the next thing to ask is why a live timer's `SIGALRM`
+does not wake the select.
