@@ -337,6 +337,9 @@ in the topic file.
   missing loopback, the announce spelling and the `fd_set` width were all
   settled that way after rounds of reasoning went the wrong way.
 - **A grep hit is a name, not an implementation.** Open the function.
+- **When a constant is wrong, grep for EVERY definition of it.**
+  `PATH_MAX` had two, and the second was in a file the first one
+  includes at its own last line.
 - **Replicate the code in the tree, line by line, not the code you
   remember.** A probe written from a recollection of `DoCopyFile`
   skipped its `unlink(dst)` and so reported 0 failures for a copy that
@@ -475,17 +478,17 @@ Open, in order of what the next run should touch:
   stays ENOSYS and costs one test. **Do not emulate it with a copy** --
   see `docs/notes/tcl-suite.md`.
 
-**Fixed this round, and both are corrections**: `sys/include/ape/limits.h`
-had **never been read** -- stock APE's copy in the architecture
-directory shadowed it, for the fourth time in this family, so the
-effective `PATH_MAX` was 1023 and `NAME_MAX` 27. The content is
-`limits_generic.h` now with a wrapper in all eleven architecture
-directories, and `deeppath-test` asks the header which one it got rather
-than inferring from the numbers. And **the deep-path abort was cleared
-by the full rebuild, not by that change** -- most likely the `fts_alloc`
-fix from four rounds ago finally reaching `tcltest`, which gives a new
-rule: **`mk install` rebuilds a library without relinking binaries that
-already exist against it.**
+**Fixed this round**: `NAME_MAX` was 27 and `PATH_MAX` 1023, set in
+`sys/include/ape/sys/limits.h`, which `<limits.h>` includes at its very
+end and which `#undef`s and redefines what the outer file had just set.
+255 and 4096 now. **The header marker in `deeppath-test` is what found
+it** -- it reported `came from THIS TREE` while the numbers stayed
+stock-looking, which refuted my own architecture-directory diagnosis.
+**When a constant is wrong, grep for every definition of it.**
+
+**And the deep-path abort was cleared by the full rebuild, not by any
+constant** -- most likely the `fts_alloc` fix from four rounds ago
+finally reaching `tcltest`, which gives the new build rule below.
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR; and over a hundred leaked
