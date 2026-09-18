@@ -3415,3 +3415,118 @@ Unix, not libap being wrong, and it belongs with `chan-io-40.3`'s umask.
 EPLAN9 where POSIX allows EPERM or EISDIR (section 2 of the probe).
 Unfixed deliberately this round -- one measured change at a time, and
 `rmdir` is the one the suite is stuck behind.
+
+#### THE SUITE FINISHES. 167 files, 67008 tests, and the first real accounting
+
+```
+Tests ended at 2026-09-18 05:03:08 +0200
+all.tcl:  Total 67008  Passed 61226  Skipped 5630  Failed 152
+Sourced 167 Test Files.
+tcl-runall: every file ran, now entering exit (code 0)
+```
+
+**No freeze, no spin, no kill -- it ended by itself.** `rmdir-test`
+reports 0 failures with `errno 27 (Directory not empty)` where it used to
+say 1002, so the `rmdir` fix is confirmed, and `fCmd.test` no longer
+pins a core.
+
+**Read `Failed 152` with the five aborts beside it.** Five files exit
+with a `Test file error`, and tcltest counts nothing at all for a file
+that aborts -- `fCmd.test` reports `Total 0` while the log holds eighty
+of its failures. So 152 is the count from the files that *completed*,
+and the honest per-file table has to come from the log:
+
+```sh
+grep '^==== ' /tmp/tcl-all.out | grep ' FAILED$' |
+	grep -v '^==== [A-Za-z0-9._-]* FAILED$' |
+	sed 's/^==== //; s/-[0-9].*//' | sort | uniq -c | sort -rn
+```
+
+The second `grep -v` drops tcltest's bare repetition of the name, which
+is why a naive count doubles.
+
+| | |
+|---|---|
+| `fCmd` | **80**, and it aborts as well |
+| `io` 22, `chan-io` 19 | the old buffering cluster, still the oldest open item |
+| `socket_inet` 18, `socket` 10 | first measurement ever -- no run had reached these files |
+| `filename` 18 | path handling |
+| `clock` 16 | |
+| `cmdAH` 10, `env` 9, `expr` 5 | |
+| `lseq` 3, `exec` 3, `binary` 2 | `binary` is the two Inf tests |
+| `zipfs` ~12 | one per case, mostly the password/cipher block |
+
+**`Skipped 5630` is not a target**: `win` 409, `thread` 197, `bigdata`
+99, `bigEndian` 78, `cookiejar` 60 and a long tail of feature
+constraints.
+
+**The five aborts, and only one of them is a mystery:**
+
+```
+encoding.test   file copy -force cp932.chars shiftjis.chars  -> ENOENT
+fCmd.test       file copy abc.file abc.dir                   -> ENOENT
+http.test       file copy .../httpd .../httpd_2498           -> ENOENT
+unixFCmd.test   file delete of a ~50-deep path  -> invalid operation
+winFCmd.test    the same
+```
+
+**`fCmd`'s is downstream and is `file link`.** The lines immediately
+before it are `fCmd-28.9 file link: success with file FAILED` with
+`errorCode POSIX ENOSYS`, and the abort is the file's own top-level
+cleanup copying a file those tests should have left behind. `symlink()`
+being unimplemented now costs a whole test file rather than a handful of
+tests, which moves it up the list.
+
+**`encoding`'s is NOT downstream, and that is the one to chase.** The
+file it fails to copy is created two lines earlier, in the same
+directory:
+
+```tcl
+cd [temporaryDirectory]
+foreach enc {cp932 euc-jp iso2022-jp} {
+    set f [open $enc.chars w]
+    ...
+    close $f
+}
+file copy -force cp932.chars shiftjis.chars     ;# ENOENT
+```
+
+So `file copy` of a file that demonstrably exists reports "no such file
+or directory". **The line to suspect first is in `DoCopyFile`**, and it
+is the *destination* stat rather than the source:
+
+```c
+if (TclOSlstat(dst, &dstStatBuf) == 0) {
+    if (S_ISDIR(...)) { errno = EISDIR; return TCL_ERROR; }
+} else if (errno != ENOENT) {
+    return TCL_ERROR;            /* <- a missing destination must be ENOENT */
+}
+```
+
+A destination that does not exist yet is the normal case, and the whole
+copy is refused unless `lstat` reports exactly `ENOENT` -- which in APE
+is **20**, not the 2 a reader expects. Whether libap answers that for
+every shape of missing path is exactly the sort of thing to measure
+rather than reason about.
+
+**The cheapest possible next step, four lines and no rebuild:**
+
+```
+tclsh
+% cd /tmp
+% set f [open a.txt w]; puts $f hi; close $f
+% file copy -force a.txt b.txt
+```
+
+If that reports ENOENT, the reproducer is two commands and the next
+probe writes itself. If it works, the suite's context matters --
+`[temporaryDirectory]`, a long path, a freshly written file whose
+directory entry has not settled -- and *that* is the variable.
+
+**The deep-path delete is the other one**, and it is its own bug:
+`unixFCmd` and `winFCmd` both build a path about fifty components deep
+and fail to delete it with `invalid operation`. That is the same errstr
+`rmdir` now interprets, so the new code looked and found the directory
+**empty** -- the failure is the path, not the contents. A length limit
+somewhere in libap's path handling is the obvious suspect and is worth a
+probe of its own.
