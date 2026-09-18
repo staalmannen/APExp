@@ -358,6 +358,14 @@ in the topic file.
 - **Print what the machine says rather than what the code implies.** The
   missing loopback, the announce spelling and the `fd_set` width were all
   settled that way after rounds of reasoning went the wrong way.
+- **An asynchronous call returning 0 says it was ACCEPTED, not done.**
+  `kill()` posts a note; the target dies later and its descriptors close
+  later still. A closed listener's port stayed held for exactly that
+  reason, and the fix was a wait, not a different approach.
+- **Predict the OBSERVATION, never the conclusion.** "Kill succeeds and
+  the port is held -> therefore revert" smuggled a mechanism into what
+  looked like a reading rule, and nearly threw away a working fix on the
+  strength of my own earlier sentence.
 - **A grep hit is a name, not an implementation.** Open the function.
 - **When a constant is wrong, grep for EVERY definition of it.**
   `PATH_MAX` had two, and the second was in a file the first one
@@ -439,6 +447,10 @@ in the topic file.
   `nm -g --defined-only x.o | wc -l` is a one-second check.
 - **Prefer the link over the patch** when missing symbols live in a file
   the upstream tree already ships.
+- **When the library already does the thing you are adding, copy the
+  whole idiom, not the call.** `_closebuf` was cited for `SIGKILL`; the
+  signal was taken and the loop that waits for the death was left
+  behind, which cost two rounds.
 - **Put a test binary in the directory whose flags it shares** -- but it
   does not follow that every object in it takes the same flags.
 - **A macro's identity includes whether there is white space.** Copy an
@@ -586,10 +598,14 @@ Open, in order of what the next run should touch:
   `_fdinfo`; `_closebuf` does not close the descriptor). So
   `$APEXP_LISTENDEBUG=1` now makes `_sock_listenpid.c` print one line
   per decision -- recorded / killing / STALE / NOT OURS / kill FAILED.
-  **Run `APEXP_LISTENDEBUG=1 ./listenleak-test` on a build containing
-  the change and read those lines**; if it kills successfully and the
-  port is still held, the approach is wrong rather than buggy and the
-  `close()` hook should be reverted.
+  That run said: **the kill happens, returns 0, and the port is STILL
+  held** -- which I had pre-committed to reading as "revert". Wrong
+  stop-condition: `kill()` POSTS a note and returns; the listener dies
+  asynchronously and its descriptors close later still. `_closebuf` has
+  had the idiom for this all along -- `for(i=0; i<10 &&
+  kill(pid,SIGKILL)==0; i++) _SLEEP(1);` -- which is a **wait**, not a
+  retry: it ends when `kill` fails, i.e. when the process is gone.
+  `_sock_killlisten` does that now (mark 3).
 - **`socket_inet-5.1`/`5.3` were passing for the WRONG REASON** -- a
   leftover listener was refusing the bind, not the system -- so they are
   not a regression from the errno change. Expect them to **stay
@@ -635,8 +651,9 @@ where POSIX allows EPERM or EISDIR.
 
 **Open hazards recorded but not measured**: the lost wakeup in
 `select()`'s rendezvous (a copy process reaching EOF before the parent
-sets `selwait`), and `_closebuf` killing a copy process up to ten times
-without waiting for it to die. *(The third -- a closed `socket -server`
+sets `selwait`). *(The `_closebuf` "kills ten times without waiting"
+entry was withdrawn: the loop IS the wait -- it ends when `kill` fails
+-- and misreading it is what left `_sock_killlisten` without one.)* *(The third -- a closed `socket -server`
 leaving its `listenproc` for ever -- was measured and fixed; see above.
 It had sat here unmeasured while it silently decided the result of two
 tests.)*
