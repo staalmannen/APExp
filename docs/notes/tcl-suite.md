@@ -5475,3 +5475,53 @@ in this file. If it passes all three, the reduction is wrong and
 `socket_inet-2.11` needs its own next step -- it was already FAILING
 before this change (`a: b: c:one` for `a:one b: c:two`, a timing
 result), so the hang is new but the test was never healthy.
+
+#### Section 4 passed, which refuted the reduction rather than the library
+
+Mark 4, and sections 1 to 4 all pass: three rounds of listen / connect /
+accept / exchange / close, three ports, no hang. **So the plain C
+sequence is not what `socket_inet-2.11` does**, and the reduction was
+wrong -- the second `recorded` on a reused `fd=10` was a true
+observation that I turned into the wrong experiment.
+
+**The difference is one line, and it is the whole mechanism.** 2.11 does
+not call `accept()` and wait. It uses `socket -server` with Tcl's event
+loop, so the listening socket goes to **`select()`**, and `vwait sock`
+returns only when select says it is readable and the accept callback
+runs.
+
+In libap a listening socket is a **pipe**, and `select()` on a pipe is a
+**copy process** reading it (`plan9/_buf.c`). A blocking `accept()`
+reads that pipe *itself* and never involves the copy process at all. So
+section 4 exercised everything except the machinery that 2.11 depends
+on -- and killing a listener closes the pipe's write end underneath a
+running copy process, which is new, and then the descriptor is reused
+for the next server.
+
+Section 5 is section 4 with `select()` before the accept, and **select's
+own timeout reports the failure**: "the listening socket never became
+readable" is a better sentence than "the alarm fired", and it separates
+a socket select ignores from a process stuck elsewhere. 0 failures on
+glibc.
+
+**The rule, and it is a sharper form of one already here.** *A test built
+from a symptom tests the symptom* was the last round's lesson, and
+section 4 obeyed it and still missed. The sharper version: **reproduce
+the CALL the failing code makes, not the outcome it wants.** 2.11 wants
+a connection accepted; it gets there through `select()`, and an
+`accept()` that waits by itself is a different program with the same
+result. The tree already says *replicate the code in the tree, line by
+line, not the code you remember* -- this is that rule pointed at the
+test's own shape rather than at a function's body.
+
+**This costs no libap rebuild** -- `pcc -o listenleak-test
+listenleak-test.c` and run -- which is worth noting, because the
+measurement was available cheaply for two rounds and was not taken.
+
+**Still no prediction about the cause.** If round 0 of section 5 already
+times out, the copy-process path is broken generally and the kill is
+incidental. If round 0 passes and round 1 times out, it is the state
+left behind by killing a listener under a live copy process, and the
+order in `close()` -- `_sock_killlisten` before `_closebuf`, which this
+round's version does and the pre-`chan-io-29.34` version did not -- is
+the first thing to look at.

@@ -476,6 +476,11 @@ in the topic file.
   reaches the VM. `tz-xcheck.c` linked `tzone.c` into a glibc program
   and swept 1.4M instants -- two bugs, two recompiles, no rebuilds.
   Applies to anything that is a pure function of its input.
+- **Reproduce the CALL the failing code makes, not the outcome it
+  wants.** `socket_inet-2.11` wants a connection accepted and gets there
+  through `select()`; a reduction that used a blocking `accept()` passed
+  three rounds and proved nothing, because `accept()` reads the pipe
+  itself while `select()` goes through a copy process.
 - Anything asking about one operating system's own behaviour is a probe,
   not a library rule -- report it, do not assert it.
 - Write the prediction down before the run, including what would refute
@@ -593,10 +598,14 @@ Open, in order of what the next run should touch:
   before printing `---- $name start`, so the listener recorded just
   before that line is 2.11's own, and the body blocks at `vwait sock` --
   **the connection is never accepted**. The previous test's listener was
-  at the same `fd=10` and had been killed. `listenleak-test` **section
-  4** is the reduction: three rounds of listen/connect/accept/exchange/
-  close, because sections 1-3 never accept on a *second* server made
-  after a first was killed. 2.11 was already failing before this change
+  at the same `fd=10` and had been killed. `listenleak-test` **section 4**
+  (three rounds of listen/connect/accept/exchange/close) **passes**, so
+  that reduction was wrong. **Section 5 is the real one**: 2.11 reaches
+  its accept through `select()`, and in libap `select()` on a listening
+  socket is a **copy process** reading the pipe (`plan9/_buf.c`) -- a
+  mechanism a blocking `accept()` never touches, since it reads the pipe
+  itself. Killing a listener closes that pipe's write end under a live
+  copy process, which is new. 2.11 was already failing before this change
   (a timing result), so the hang is new but the test was never healthy.
 - **`socket_inet-5.1`/`5.3` were passing for the WRONG REASON** -- a
   leftover listener was refusing the bind, not the system -- so they are

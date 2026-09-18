@@ -57,6 +57,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <signal.h>
+#include <sys/select.h>
+#include <sys/time.h>
 
 #ifndef __GNUC__
 #define HAVE_ERRSTR 1
@@ -433,6 +435,90 @@ main(void)
 	}
 	if(i == 3)
 		ok("three rounds of listen/accept/close", 1);
+
+	printf("--- 5. ...and waited for with select(), as Tcl does ---\n");
+	/*
+	 * SECTION 4 PASSED, WHICH REFUTED THE REDUCTION RATHER THAN THE
+	 * LIBRARY, and the difference is the whole of it.
+	 *
+	 * socket_inet-2.11 does not call accept() and wait. It uses
+	 * `socket -server' with Tcl's event loop, so the listening socket
+	 * is handed to SELECT, and `vwait sock' returns only when select
+	 * says the socket is readable and the accept callback runs.
+	 *
+	 * In libap a listening socket is a PIPE and select() on it is a
+	 * COPY PROCESS reading that pipe (plan9/_buf.c) -- a whole
+	 * mechanism that a blocking accept() never touches, because it
+	 * reads the pipe itself. Killing a listener closes the pipe's write
+	 * end under that copy process, which is new, and then the
+	 * descriptor is reused for the next server.
+	 *
+	 * So this is section 4 again with one line changed: wait for the
+	 * socket with select() before accepting. select's OWN timeout
+	 * reports the failure -- "never became readable" is a better
+	 * sentence than "the alarm fired", and it distinguishes a socket
+	 * that select ignores from a process stuck somewhere else.
+	 *
+	 * Correct on glibc: three rounds, select returns 1 each time.
+	 */
+	for(i = 0; i < 3; i++){
+		fd_set rd;
+		struct timeval tv;
+		int r;
+
+		port = 0;
+		if((ss = listenon(0, &port)) < 0){
+			printf("  note round %d could not listen\n", i);
+			ok("three rounds waited for with select()", 0);
+			break;
+		}
+		if((cs = socket(AF_INET, SOCK_STREAM, 0)) < 0){
+			why("socket for the client");
+			ok("three rounds waited for with select()", 0);
+			break;
+		}
+		memset(&a, 0, sizeof a);
+		a.sin_family = AF_INET;
+		a.sin_port = htons((unsigned short)port);
+		a.sin_addr.s_addr = htonl(0x7f000001);
+		if(connect(cs, (struct sockaddr*)&a, sizeof a) < 0){
+			why("connect");
+			ok("three rounds waited for with select()", 0);
+			break;
+		}
+		FD_ZERO(&rd);
+		FD_SET(ss, &rd);
+		tv.tv_sec = 5;
+		tv.tv_usec = 0;
+		r = select(ss+1, &rd, 0, 0, &tv);
+		if(r == 0){
+			printf("  note round %d: select TIMED OUT -- the listening\n", i);
+			printf("  note socket never became readable, which is\n");
+			printf("  note precisely what `vwait sock' waits for\n");
+			ok("three rounds waited for with select()", 0);
+			break;
+		}
+		if(r < 0){
+			why("select on the listening socket");
+			ok("three rounds waited for with select()", 0);
+			break;
+		}
+		alen = sizeof a;
+		if((as = accept(ss, (struct sockaddr*)&a, &alen)) < 0){
+			why("accept after select said readable");
+			ok("three rounds waited for with select()", 0);
+			break;
+		}
+		write(cs, "one\n", 4);
+		n = read(as, buf, sizeof buf);
+		printf("  note round %d: select said readable, accepted, read %d\n",
+			i, n);
+		close(as);
+		close(cs);
+		close(ss);
+	}
+	if(i == 3)
+		ok("three rounds waited for with select()", 1);
 
 
 done:
