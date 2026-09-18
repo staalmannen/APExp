@@ -5357,3 +5357,121 @@ means something, since a kill demonstrably happens. **`chan-io-29.34`
 remains genuinely open** -- the earlier freeze was measured against the
 descriptor-keyed version, and nothing since has retested it. Run
 `chanio.test -singleproc 1 -verbose t` before the suite.
+
+#### The leak is fixed, confirmed, and the freeze moved 115 files later
+
+```
+--- 0. which libap is linked in ---
+  note libap listen bookkeeping: mark 3 (this tree is 3)
+--- 1. close a listener, then take its port back ---
+  PASS the port can be bound again once the socket is closed
+--- 2. five times over, which is what makes it sharp ---
+  PASS five close-and-rebind rounds all succeeded
+--- 3. close the LISTENER while a connection is in use ---
+  PASS a message arrives before the listener is closed
+  PASS ...and one still arrives after it is closed
+  PASS the accepted connection reports end of file
+0 failure(s)
+```
+
+**Mark 3, so the library under test is the one that was pulled** -- the
+first run in this whole sequence where that was not in question, and the
+marker is why. Sections 1 and 2 pass, so a kill demonstrably happens and
+the port is demonstrably released; section 3 therefore *means* something
+now, and what it means is that ending the listener leaves an accepted
+connection alone.
+
+`chanio.test` passes too, so the `chan-io-29.34` freeze is gone. It
+belonged to the descriptor-keyed version, as suspected but not
+previously shown.
+
+**The prediction held, and it is worth noting which kind it was**: it
+predicted the OBSERVATION (sections 1 and 2 go to zero) and said nothing
+about what to conclude. The three before it, which bundled a conclusion
+in, were all wrong.
+
+**The suite now freezes in `socket.test`, file 129 of 167.** It was file
+14 before. No marker, no `Total`, and the last line in the log is the
+file name with nothing after it.
+
+**Two candidates, and they are not the same thing:**
+
+- **A regression from the kill.** `socket.test` is full of
+  `socket -server` followed by `close`, which is exactly the new code
+  path, and the file completed in the last full run.
+- **A hang that was never reachable before.** This is the first run in
+  which ports are actually released. Tests that used to fail fast with
+  `EADDRINUSE` -- against a leftover listener from a previous run --
+  now get their socket and proceed into code nothing here has ever
+  executed. *A fix that makes a process reach code it never reached
+  before can expose anything on that path* is already a rule in this
+  file, and it was written for exactly this shape.
+
+**The next run is one command and it should carry the debug lines**, so
+that the listener decisions interleave with the test names and the last
+`recorded`/`killing` before the silence is visible:
+
+```
+APEXP_LISTENDEBUG=1 tcltest socket.test -singleproc 1 -verbose t
+```
+
+`-verbose t` names the test; `APEXP_LISTENDEBUG` says whether a listener
+was being killed when it stopped, and which one. Nothing is predicted
+about the cause -- only that those two lines together will name it.
+
+#### socket_inet-2.11: the debug lines put it exactly, and named what every section missed
+
+```
+listenpid: killing the listener fd=10 pid=12945
+listenpid: ...gone fd=10
+listenpid: recorded a listener fd=10 pid=12950
+---- socket_inet-2.11 start
+listenpid: close of a descriptor with no listener fd=5   (x8)
+<nothing>
+```
+
+**Three facts, none of them a guess.**
+
+**tcltest runs `-setup` BEFORE it prints `---- $name start`.** Its own
+comment says so -- "Verbose notification of $body start" -- so the second
+`recorded` line is *2.11's own* `socket -server accept 0`, and the
+silence is in the **body**. The body's first wait is `vwait sock`: the
+connection is never accepted.
+
+**The `close ... fd=5` flood is the event loop, not a bug.** `kill()`
+opens `/proc/N/note` and closes it, so every timer reset from `select()`
+prints one line. Eight of them, then they stop -- which is what a
+process entering a wait it never leaves looks like from here. *That is
+the debug output paying for itself twice: once for what it says and once
+for what its stopping says.*
+
+**And the descriptor number came back.** The previous test's listener was
+at `fd=10`, was killed, and 2.11's listener is `fd=10` again.
+
+**What every section of `listenleak-test` missed, and it is the same
+gap three times over.** Section 1 closes a listener and rebinds; section
+2 does that five times; section 3 accepts once on a *first* server.
+**Not one of them accepts a connection on a SECOND server made after a
+first was killed.** The descriptor number comes back, and with it
+whatever the library keeps per descriptor -- and killing a listener is
+new, so what it leaves behind has never been exercised twice.
+
+Section 4 is three full rounds of listen / connect / accept / exchange /
+close, each behind a named stage and the ten-second alarm. 0 failures on
+glibc; three rounds, three ports, three exchanges.
+
+**The rule this exposes about the test, not the library:** *a test built
+from a symptom tests the symptom.* Sections 1 and 2 came from "the port
+is not released", section 3 from "does the kill break an accepted
+connection" -- both real questions, and between them they never made the
+library do the same thing twice. **When a change adds an operation
+(here, ending a process), the second use of the thing it acted on is the
+case to write, not the first.**
+
+**No prediction about the cause.** If section 4 hangs on round 1, the
+state left behind by killing a listener is the thing to find, and *When
+a struct is recycled, reset every field that means something* is already
+in this file. If it passes all three, the reduction is wrong and
+`socket_inet-2.11` needs its own next step -- it was already FAILING
+before this change (`a: b: c:one` for `a:one b: c:two`, a timing
+result), so the hang is new but the test was never healthy.

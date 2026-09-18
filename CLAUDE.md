@@ -569,43 +569,35 @@ Open, in order of what the next run should touch:
   The remaining 22 + `unixFCmd` 2 are 15 symlink, 8 `~USER`, and
   `unixFCmd-1.1`. **24 of 24 accounted for** -- reading a cluster all
   the way through before touching it is what made that possible.
-- **`close()` on a listening socket freed nothing -- fixed, not yet
-  confirmed.** `listen()` replaces the descriptor with a **pipe** and
+- **`close()` on a listening socket freed nothing -- FIXED and
+  CONFIRMED.** `listen()` replaces the descriptor with a **pipe** and
   forks a child holding the real network fd, so `close()` shut a pipe
-  while the announcement lived in another process. `_killmuxsid` only
-  kills that group at `exit()`, which is no help to a program that keeps
-  running and none at all to a run ended by a note. **This is the
-  hundred leaked `listenproc` processes**, and it was found by one
-  command: `socket -server ... 1` in a fresh `tclsh` answered `address
-  already in use` for a port the previous run had bound and closed.
-  `_sock_listenpid.c` records the pid; `close()` kills it, **only if
-  `getpid()` matches the recorded owner** -- the table is inherited by
-  every fork, which is the trap `_buf.c` records in capitals.
-  **The first version froze the suite in `chanio.test` at low CPU**: it
-  keyed the table on the descriptor NUMBER, which `dup2()` and raw
-  `_CLOSE()` retire without clearing, so a stale pid could SIGKILL a
-  live unrelated process -- and `kill()` opens `/proc/N/note` and
-  *closes* it, re-entering the function on a fresh number every time.
-  Now keyed on `dev`/`ino` and checked with `fstat()`, plus a
-  re-entrancy flag. **The hang is `chan-io-29.34`**, named by
-  `-verbose t`: it closes the listener and only THEN waits for the
-  *accepted* connection to drain, so the question is whether ending the
-  listening process disturbs a connection already accepted.
-  `listenleak-test` section 3 asks exactly that in C, with a ten-second
-  timeout per blocking call so it reports instead of freezing.
-  **The port is STILL held after a rebuild**, and two mechanisms argued
-  from the source were both wrong (`fstat` does not go through
-  `_fdinfo`; `_closebuf` does not close the descriptor). So
-  `$APEXP_LISTENDEBUG=1` now makes `_sock_listenpid.c` print one line
-  per decision -- recorded / killing / STALE / NOT OURS / kill FAILED.
-  That run said: **the kill happens, returns 0, and the port is STILL
-  held** -- which I had pre-committed to reading as "revert". Wrong
-  stop-condition: `kill()` POSTS a note and returns; the listener dies
-  asynchronously and its descriptors close later still. `_closebuf` has
-  had the idiom for this all along -- `for(i=0; i<10 &&
-  kill(pid,SIGKILL)==0; i++) _SLEEP(1);` -- which is a **wait**, not a
-  retry: it ends when `kill` fails, i.e. when the process is gone.
-  `_sock_killlisten` does that now (mark 3).
+  while the announcement lived in another process. **This was the
+  hundred leaked `listenproc` processes.** `_sock_listenpid.c` records
+  the pid keyed on `dev`/`ino` (a descriptor NUMBER is retired by
+  `dup2()` and raw `_CLOSE()` without clearing, and a stale entry
+  SIGKILLed the wrong process and froze a suite); `close()` kills it,
+  only if `getpid()` matches the recorded owner, and **waits for the
+  death with `_closebuf`'s loop** -- `for(i=0; i<10 &&
+  kill(pid,SIGKILL)==0; i++) _SLEEP(1);` -- because `kill()` POSTS a
+  note and returns. `listenleak-test` 0 failures at mark 3;
+  `chanio.test` passes, so the `chan-io-29.34` freeze belonged to the
+  descriptor-keyed version.
+  **`_sock_listenmark()` is the library's version marker** -- `pcc -o x
+  x.c` relinks against the INSTALLED libap, so a test built from a fresh
+  pull can run days-old library code and say nothing; bump it when the
+  file changes in a way a test must see. `$APEXP_LISTENDEBUG=1` prints
+  one line per decision.
+- **The suite freezes in `socket_inet-2.11`**, file 129 of 167 (it was
+  file 14). The debug lines place it exactly: tcltest runs `-setup`
+  before printing `---- $name start`, so the listener recorded just
+  before that line is 2.11's own, and the body blocks at `vwait sock` --
+  **the connection is never accepted**. The previous test's listener was
+  at the same `fd=10` and had been killed. `listenleak-test` **section
+  4** is the reduction: three rounds of listen/connect/accept/exchange/
+  close, because sections 1-3 never accept on a *second* server made
+  after a first was killed. 2.11 was already failing before this change
+  (a timing result), so the hang is new but the test was never healthy.
 - **`socket_inet-5.1`/`5.3` were passing for the WRONG REASON** -- a
   leftover listener was refusing the bind, not the system -- so they are
   not a regression from the errno change. Expect them to **stay

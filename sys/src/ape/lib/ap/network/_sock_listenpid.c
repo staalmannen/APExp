@@ -134,7 +134,7 @@ static int dbgon = -1;
 int
 _sock_listenmark(void)
 {
-	return 3;	/* 1: first; 2: dev/ino + debug; 3: waits for death */
+	return 4;	/* 1: first; 2: dev/ino+debug; 3: waits; 4: dbg label */
 }
 
 static void
@@ -271,6 +271,6 @@ _sock_killlisten(int fd)
 	if(i >= 10)
 		dbg("...STILL ALIVE after ten notes", fd, pid);
 	else
-		dbg("...gone", fd, i);
+		dbg("...gone", fd, pid);	/* pid, not i: the field says pid */
 	killing = 0;
 }
