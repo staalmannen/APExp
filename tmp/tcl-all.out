@@ -9,7 +9,7 @@ Test files run in separate interpreters
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-18 12:18:25 +0200
+Tests began at 2026-09-18 13:42:54 +0200
 aaa_exit.test
 abstractlist.test
 append.test
@@ -467,7 +467,7 @@ abc def ghi jkl mno {p
 
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
----- errorInfo: could not create new link "/tmp/tcl_KMAHdh/thelin" pointing to "/tmp/tcl_KMAHdh/thefile": function not implemented
+---- errorInfo: could not create new link "/tmp/tcl_hnGNJM/thelin" pointing to "/tmp/tcl_hnGNJM/thefile": function not implemented
     while executing
 "file link -symbolic $link $target"
     ("uplevel" body line 4)
@@ -502,7 +502,7 @@ cmdAH.test
     expr {$newatime == $modatime ? 1 : "$newatime != $modatime"}
 
 ---- Result was:
-1789726739 != 1789726737
+1789731807 != 1789731806
 ---- Result should have been (exact matching):
 1
 ==== cmdAH-20.5 FAILED
@@ -794,7 +794,7 @@ couldn't execute "~xyzzy_bad_user/x": no such file or directory
     file size $tmpfile
 
 ---- Result was:
-16
+20
 ---- Result should have been (exact matching):
 26
 ==== exec-19.1 FAILED
@@ -882,212 +882,6 @@ This is a result: 1.7976931348623157e+308
 ==== expr-50.1 FAILED
 
 fCmd.test
-
-
-==== fCmd-4.11 TclFileMakeDirsCmd: doesn't exist: errno != ENOENT FAILED
-==== Contents of test case:
-
-    file mkdir td1/td2/td3
-    testchmod 0 td1/td2
-    file mkdir td1/td2/td3/td4
-
----- Result was:
-can't create directory "td1/td2/td3": operation not permitted
----- Result should have been (exact matching):
-can't create directory "td1/td2/td3": permission denied
-==== fCmd-4.11 FAILED
-
-
-
-==== fCmd-4.14 TclFileMakeDirsCmd: TclpCreateDirectory fails FAILED
-==== Contents of test case:
-
-    file mkdir foo
-    file attr foo -perm 0o40000
-    file mkdir foo/tf1
-
----- Result was:
-can't create directory "foo/tf1": operation not permitted
----- Result should have been (exact matching):
-can't create directory "foo/tf1": permission denied
-==== fCmd-4.14 FAILED
-
-
-
-==== fCmd-6.6 CopyRenameOneFile: errno != ENOENT FAILED
-==== Contents of test case:
-
-    file mkdir td1
-    testchmod 0 td1
-    createfile tf1
-    file rename tf1 td1
-
----- Result was:
-error renaming "tf1" to "td1/tf1": operation not permitted
----- Result should have been (exact matching):
-error renaming "tf1" to "td1/tf1": permission denied
-==== fCmd-6.6 FAILED
-
-
-
-==== fCmd-6.21 CopyRenameOneFile: copy/rename: S_ISDIR(source) FAILED
-==== Contents of test case:
-
-    file mkdir td1
-    file rename td1 $tmpspace
-    glob -nocomplain td* [file join $tmpspace td*]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: error renaming "td1" to "/tmp/tcl47027/td1": invalid operation: '/tmp/tcl47027/td1'
-    while executing
-"file rename td1 $tmpspace"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX {unknown error} {invalid operation: '/tmp/tcl47027/td1'}
-==== fCmd-6.21 FAILED
-
-
-
-==== fCmd-6.24 CopyRenameOneFile: error uses original name FAILED
-==== Contents of test case:
-
-    file mkdir [file home]/td1/td2
-    set td1name [file join [file dirname [file home]] [file tail [file home]] td1]
-    file attributes $td1name -permissions 0
-    file copy [file home]/td1 td1
-
----- Result was:
-error copying "/usr/glenda/td1": operation not permitted
----- Result should have been (exact matching):
-error copying "/usr/glenda/td1": permission denied
-==== fCmd-6.24 FAILED
-
-
-
-==== fCmd-6.25 CopyRenameOneFile: error uses original name FAILED
-==== Contents of test case:
-
-    file mkdir td2
-    file mkdir [file home]/td1
-    set td1name [file join [file dirname [file home]] [file tail [file home]] td1]
-    file attributes $td1name -permissions 0
-    file copy td2 [file home]/td1
-
----- Result was:
-error copying "td2" to "/usr/glenda/td1/td2": operation not permitted
----- Result should have been (exact matching):
-error copying "td2" to "/usr/glenda/td1/td2": permission denied
-==== fCmd-6.25 FAILED
-
-
-
-==== fCmd-6.26 CopyRenameOneFile: doesn't use original name FAILED
-==== Contents of test case:
-
-    file mkdir [file home]/td1/td2
-    set td2name [file join [file dirname [file home]] [file tail [file home]] td1 td2]
-    file attributes $td2name -permissions 0
-    file copy [file home]/td1 td1
-
----- Result was:
-error copying "/usr/glenda/td1" to "td1": "/usr/glenda/td1/td2": operation not permitted
----- Result should have been (exact matching):
-error copying "/usr/glenda/td1" to "td1": "/usr/glenda/td1/td2": permission denied
-==== fCmd-6.26 FAILED
-
-
-
-==== fCmd-6.30 CopyRenameOneFile: TclpRemoveDirectory failed FAILED
-==== Contents of test case:
-
-    file mkdir foo/bar
-    file attr foo -perm 0o40555
-    file rename foo/bar $tmpspace
-
----- Result was:
-error renaming "foo/bar" to "/tmp/tcl47027/bar": invalid operation: '/tmp/tcl47027/bar'
----- Result should have been (glob matching):
-*: permission denied
-==== fCmd-6.30 FAILED
-
-
-
-==== fCmd-9.1 file rename: comprehensive: EACCES FAILED
-==== Contents of test case:
-
-    file mkdir td1
-    file mkdir td2
-    file attr td2 -perm 0o40000
-    file rename td1 td2/
-
----- Result was:
-error renaming "td1" to "td2/td1": invalid operation: 'td2/td1'
----- Result should have been (exact matching):
-error renaming "td1" to "td2/td1": permission denied
-==== fCmd-9.1 FAILED
-
-
-
-==== fCmd-9.11 file rename: comprehensive: dir to new name and dir FAILED
-==== Contents of test case:
-
-    file mkdir td1
-    file mkdir td2
-    file mkdir td3
-    file rename td1 [file join td3 td3]
-    file rename td2 [file join td3 td4]
-    set w4 0
-    list [lsort [glob td*]] [lsort [glob -directory td3 t*]]  [file writable [file join td3 td3]] $w4
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: error renaming "td1" to "td3/td3": invalid operation: 'td3/td3'
-    while executing
-"file rename td1 [file join td3 td3]"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX {unknown error} {invalid operation: 'td3/td3'}
-==== fCmd-9.11 FAILED
-
-
-
-==== fCmd-9.14.3 file rename: comprehensive: dir into self FAILED
-==== Contents of test case:
-
-    file mkdir td1
-    cd td1
-    file rename [file join .. td1] [file join .. td1 foo]
-
----- Result was:
-error renaming "../td1" to "../td1/foo": invalid operation: '../td1/foo'
----- Result should have been (exact matching):
-error renaming "../td1" to "../td1/foo": trying to rename a volume or move a directory into itself
-==== fCmd-9.14.3 FAILED
-
-
-
-==== fCmd-18.3 TclFileRenameCmd: mixed dirs and files into directory FAILED
-==== Contents of test case:
-
-    set s [createfile tfa1]
-    file mkdir tfad1 tfad2
-    file rename tfa1 tfad1 tfad2
-    list [checkcontent tfad2/tfa1 $s] [file isdir tfad2/tfad1]  [file exists tfa1] [file exists tfad1]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: error renaming "tfad1" to "tfad2/tfad1": invalid operation: 'tfad2/tfad1'
-    while executing
-"file rename tfa1 tfad1 tfad2"
-    ("uplevel" body line 4)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX {unknown error} {invalid operation: 'tfad2/tfad1'}
-==== fCmd-18.3 FAILED
-
 
 
 ==== fCmd-18.12 TclFileRenameCmd : rename a symbolic link to file FAILED
@@ -1261,26 +1055,6 @@ error renaming "../td1" to "../td1/foo": trying to rename a volume or move a dir
 "uplevel 1 $script"
 ---- errorCode: POSIX ENOSYS {function not implemented}
 ==== fCmd-21.9 FAILED
-
-
-
-==== fCmd-22.4 TclpRenameFile: rename dir to dir several levels deep FAILED
-==== Contents of test case:
-
-    file mkdir d1 [file join tfad a b c]
-    file rename d1 [file join tfad a b c d1]
-    list [file isdir d1] [file isdir [file join tfad a b c d1]]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: error renaming "d1" to "tfad/a/b/c/d1": invalid operation: 'tfad/a/b/c/d1'
-    while executing
-"file rename d1 [file join tfad a b c d1]"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX {unknown error} {invalid operation: 'tfad/a/b/c/d1'}
-==== fCmd-22.4 FAILED
 
 
 
@@ -2150,7 +1924,7 @@ line line none
     ("uplevel" body line 15)
     invoked from within
 "uplevel 1 $script"
----- errorCode: CHILDSTATUS 48284 1
+---- errorCode: CHILDSTATUS 5459 1
 ==== io-29.33b FAILED
 
 
@@ -2714,22 +2488,37 @@ a:one b: c:two
 
 
 
-==== socket_inet-4.2 byte order problems, socket numbers, htons FAILED
+==== socket_inet-5.1 byte order problems, socket numbers, htons FAILED
 ==== Contents of test case:
 
-    close [socket -server dodo -myaddr $localhost 0x3000]
-    return ok
+    if {![catch {socket -server dodo 0x1} msg]} {
+	close $msg
+	return {htons problem, should be disallowed, are you running as SU?}
+    }
+    return {couldn't open socket: not owner}
 
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: couldn't open socket: address already in use
-    while executing
-"socket -server dodo -myaddr $localhost 0x3000"
-    ("uplevel" body line 2)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX EADDRINUSE {address already in use}
-==== socket_inet-4.2 FAILED
+---- Result was:
+htons problem, should be disallowed, are you running as SU?
+---- Result should have been (exact matching):
+couldn't open socket: not owner
+==== socket_inet-5.1 FAILED
+
+
+
+==== socket_inet-5.3 byte order problems, socket numbers, htons FAILED
+==== Contents of test case:
+
+    if {![catch {socket -server dodo 21} msg]} {
+	close $msg
+	return {htons problem, should be disallowed, are you running as SU?}
+    }
+    return {couldn't open socket: not owner}
+
+---- Result was:
+htons problem, should be disallowed, are you running as SU?
+---- Result should have been (exact matching):
+couldn't open socket: not owner
+==== socket_inet-5.3 FAILED
 
 
 
@@ -2812,14 +2601,14 @@ remote server disappaered
 "uplevel 1 $setup"
 ---- errorCode(setup): NONE
 ---- Test cleanup failed:
-can not find channel named "sock966280"
----- errorInfo(cleanup): can not find channel named "sock966280"
+can not find channel named "sock9603a0"
+---- errorInfo(cleanup): can not find channel named "sock9603a0"
     while executing
 "close $s"
     ("uplevel" body line 2)
     invoked from within
 "uplevel 1 $cleanup"
----- errorCode(cleanup): TCL LOOKUP CHANNEL sock966280
+---- errorCode(cleanup): TCL LOOKUP CHANNEL sock9603a0
 ==== socket_inet-11.1 FAILED
 
 
@@ -2851,14 +2640,14 @@ remote server disappeared
 "uplevel 1 $setup"
 ---- errorCode(setup): NONE
 ---- Test cleanup failed:
-can not find channel named "sock966280"
----- errorInfo(cleanup): can not find channel named "sock966280"
+can not find channel named "sock9603a0"
+---- errorInfo(cleanup): can not find channel named "sock9603a0"
     while executing
 "close $s"
     ("uplevel" body line 2)
     invoked from within
 "uplevel 1 $cleanup"
----- errorCode(cleanup): TCL LOOKUP CHANNEL sock966280
+---- errorCode(cleanup): TCL LOOKUP CHANNEL sock9603a0
 ==== socket_inet-11.2 FAILED
 
 
@@ -3503,35 +3292,6 @@ error renaming "td1/td2/td3": permission denied
 
 
 
-==== unixFCmd-1.3 TclpRenameFile: EINVAL FAILED
-==== Contents of test case:
-
-    file mkdir td1
-    file rename td1 td1
-
----- Result was:
-error renaming "td1" to "td1/td1": invalid operation: 'td1/td1'
----- Result should have been (exact matching):
-error renaming "td1" to "td1/td1": trying to rename a volume or move a directory into itself
-==== unixFCmd-1.3 FAILED
-
-
-
-==== unixFCmd-1.7 TclpRenameFile: EXDEV FAILED
-==== Contents of test case:
-
-    file mkdir foo/bar
-    file attr foo -perm 0o40555
-    file rename foo/bar /tmp
-
----- Result was:
-error renaming "foo/bar" to "/tmp/bar": invalid operation: '/tmp/bar'
----- Result should have been (glob matching):
-*: permission denied
-==== unixFCmd-1.7 FAILED
-
-
-
 ==== unixFCmd-2.2.2 TclpCopyFile: src is symlink FAILED
 ==== Contents of test case:
 
@@ -3602,7 +3362,7 @@ unixInit.test
     }
 
 ---- Result was:
-Expected: `127.0.0.1 localhost 44785', Got `'
+Expected: `127.0.0.1 localhost 44093', Got `'
 ---- Result should have been (exact matching):
 OK
 ==== unixInit-1.2 FAILED
@@ -3802,7 +3562,7 @@ atime 1105466634 blksize 0 blocks 0 ctime 1105466634 dev 0 gid 0 ino 0 mode 1674
 	    lsort -stride 2 [file stat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789726960 ctime 1789726960 dev 0 gid 0 ino 0 mode 16749 mtime 1789726960 nlink 0 size 0 type directory uid 0
+atime 1789732014 ctime 1789732014 dev 0 gid 0 ino 0 mode 16749 mtime 1789732014 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-stat-root-mount FAILED
@@ -3815,7 +3575,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789726960 ctime 1789726960 dev 0 gid 0 ino 0 mode 16749 mtime 1789726960 nlink 0 size 0 type directory uid 0
+atime 1789732014 ctime 1789732014 dev 0 gid 0 ino 0 mode 16749 mtime 1789732014 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-lstat-root-mount FAILED
@@ -3828,7 +3588,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file stat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789726960 ctime 1789726960 dev 0 gid 0 ino 0 mode 16749 mtime 1789726960 nlink 0 size 0 type directory uid 0
+atime 1789732014 ctime 1789732014 dev 0 gid 0 ino 0 mode 16749 mtime 1789732014 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-stat-root-subdir-mount FAILED
@@ -3841,7 +3601,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789726960 ctime 1789726960 dev 0 gid 0 ino 0 mode 16749 mtime 1789726960 nlink 0 size 0 type directory uid 0
+atime 1789732014 ctime 1789732014 dev 0 gid 0 ino 0 mode 16749 mtime 1789732014 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-lstat-root-subdir-mount FAILED
@@ -3854,7 +3614,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file stat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789726960 ctime 1789726960 dev 0 gid 0 ino 0 mode 16749 mtime 1789726960 nlink 0 size 0 type directory uid 0
+atime 1789732014 ctime 1789732014 dev 0 gid 0 ino 0 mode 16749 mtime 1789732014 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-stat-mezzo FAILED
@@ -3867,15 +3627,15 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789726960 ctime 1789726960 dev 0 gid 0 ino 0 mode 16749 mtime 1789726960 nlink 0 size 0 type directory uid 0
+atime 1789732014 ctime 1789732014 dev 0 gid 0 ino 0 mode 16749 mtime 1789732014 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-lstat-mezzo FAILED
 
 zlib.test
 
-Tests ended at 2026-09-18 12:22:41 +0200
-all.tcl:	Total	68118	Passed	62056	Skipped	5887	Failed	175
+Tests ended at 2026-09-18 13:46:55 +0200
+all.tcl:	Total	68118	Passed	62070	Skipped	5887	Failed	161
 Sourced 167 Test Files.
 Files with failing tests: binary.test chanio.test cmdAH.test env.test event.test exec.test expr-old.test expr.test fCmd.test fileName.test http.test io.test lseq.test main.test scan.test socket.test unixFCmd.test unixInit.test zipfs.test
 Number of tests skipped for each constraint:
