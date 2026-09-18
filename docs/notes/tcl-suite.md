@@ -5590,3 +5590,69 @@ it. With the suite frozen:
 
 **No prediction.** Three mechanisms have been guessed on this bug and
 the machine refuted each one; the next line comes from `ps`.
+
+#### The stack: select's rendezvous, confirmed -- and the timer is the thing that is missing
+
+```
+_RENDEZVOUS ... syscall/_RENDEZVOUS.s:6
+select(rfds=..., timeout=0x7fffffde4a0, nfds=0xb, ...)+0x30e  _buf.c:544
+    t=0x1000000c8
+TclpWaitForEvent(timePtr=0x6930c0) ... tclSelectNotfy.c:844
+Tcl_WaitForEvent() ... Tcl_DoOneEvent(flags=0xfffffffd) ...
+Tcl_VwaitObjCmd(...) ... tclEvent.c:1734
+```
+
+`_buf.c:544` is `fd = _RENDEZVOUS(&mux->selwait, 0)`, which is the line
+named in advance. **But the reading that went with it was wrong**, and
+the stack says so in its own arguments: `timeout` is NOT null and `t` is
+`0xc8` -- 200 milliseconds. So this is not the no-timer path at all. The
+`if(timeout)` arm was taken, `_resettimer()` ran, and **a timer was
+armed that never fired**.
+
+*Predicting the line and the mechanism together, and getting the line
+right, is not the same as being right. The arguments in the frame are
+what corrected it.*
+
+**And `ps` had already said the same thing, before the stack was taken.**
+A live timer process sits in `_SLEEP(mux->waittime)`, which shows as
+`Sleep`:
+
+```
+12908  5644K Rendez   tcltest    <- the interpreter, in select
+12935  2800K Rendez   tcltest
+12936  2784K Open     tcltest
+12938  2788K Pread    tcltest
+12939  2800K Pread    tcltest
+12950  5636K Open     tcltest    <- 2.11's listener, where it should be
+12952  5644K Pread    tcltest
+```
+
+**Not one process is in `Sleep`.** Seven processes and no timer among
+them. *That was on the screen a round before the stack, and reading it
+would have cost nothing -- `ps` states are already documented in this
+file as the cheapest evidence there is.*
+
+**This file already describes this exact failure**, in `_killtimerproc`:
+
+> ...`timerpid` stayed > 0 afterwards so `_resettimer()` went on
+> signalling a corpse -- no timeout ever firing again, and every
+> blocking `select()` that needed one waiting for ever.
+
+**Two candidates, and `12935` distinguishes them.** It is 2800K and in
+`Rendez`, which is the size of the small forked helpers:
+
+- **the timer is DEAD** and `timerpid` is stale, so `_resettimer()`'s
+  `kill(timerpid, SIGALRM)` signals nothing -- the recorded failure,
+  reached by some new route;
+- **`12935` IS the timer**, stuck in its STARTUP rendezvous,
+  `while(_RENDEZVOUS(&timerpid, 0) == (void*)~0) ;`, never reaching the
+  sleep loop at all. A `SIGALRM` arriving there interrupts the
+  rendezvous, the `while` retries, and it can sit there for ever.
+
+`acid 12935` and `lstk()` says which. If the frame is `_timerproc`, it
+is the second.
+
+**And the last `close ... fd=5` line in the debug output is this very
+select's `_resettimer()`** -- `kill()` opening `/proc/N/note` and
+closing it. The instrumentation recorded the moment the timer was armed;
+what is missing after it is the tick.

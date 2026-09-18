@@ -395,6 +395,14 @@ in the topic file.
   event loop still ran, a freeze proves the process is blocked in a call.
 - **Blocked and spinning are different bugs**: constant *light* CPU is a
   wait, a pinned core is a loop.
+- **Read the `ps` STATES before taking a stack.** Seven `tcltest`
+  processes and not one in `Sleep` said the timer process was missing,
+  a round before `acid` said the same thing -- and a live timer sits in
+  `_SLEEP(mux->waittime)`.
+- **A stack's ARGUMENTS can refute the mechanism you predicted for the
+  line you predicted.** `select` was blocked exactly where expected, and
+  `timeout != 0`, `t = 200` in the same frame showed the reason was the
+  opposite of the one argued.
 - **A bisect that narrows to nothing is evidence** -- of a cumulative
   cause -- not a failed bisect.
 - **When upstream does something from an event, ask what the event costs
@@ -611,8 +619,16 @@ Open, in order of what the next run should touch:
   before the parent sets `selwait`*. `socket_inet-2.10`, just before,
   closes its server socket **from inside the accept callback**, so the
   listener is killed at an unusual point and 2.11 reuses the descriptor.
-  **`ps` on the frozen process should settle it**: `Rendez` means the
-  lost wakeup, `Pread`/`Open` means it is blocked in a call instead. 2.11 was already failing before this change
+  `acid` CONFIRMED the line -- `_buf.c:544`, select's
+  `_RENDEZVOUS(&mux->selwait, 0)`, under `TclpWaitForEvent`/`vwait` --
+  **but refuted the mechanism**: the frame's own arguments show
+  `timeout` non-null and `t = 200ms`, so a timer WAS armed and never
+  fired. **`ps` shows no process in `Sleep`**, and a live timer sits in
+  `_SLEEP`. So this is the failure `_killtimerproc` already describes:
+  `timerpid` stale, `_resettimer()` signalling a corpse, every blocking
+  `select()` that needs a timeout waiting for ever. Next: `acid 12935`
+  (2800K, `Rendez`) -- either the timer is dead, or that IS the timer
+  stuck in its startup rendezvous and never reaching the sleep loop. 2.11 was already failing before this change
   (a timing result), so the hang is new but the test was never healthy.
 - **`socket_inet-5.1`/`5.3` were passing for the WRONG REASON** -- a
   leftover listener was refusing the bind, not the system -- so they are
