@@ -134,7 +134,7 @@ static int dbgon = -1;
 int
 _sock_listenmark(void)
 {
-	return 2;		/* 1: first version; 2: dev/ino + debug */
+	return 3;	/* 1: first; 2: dev/ino + debug; 3: waits for death */
 }
 
 static void
@@ -193,7 +193,7 @@ void
 _sock_killlisten(int fd)
 {
 	struct stat st;
-	int pid;
+	int pid, i;
 
 	if(fd < 0 || fd >= OPEN_MAX)
 		return;
@@ -230,11 +230,47 @@ _sock_killlisten(int fd)
 		dbg("RE-ENTERED: declining to kill", fd, pid);
 		return;
 	}
+	/*
+	 * KILL UNTIL IT IS ACTUALLY GONE, which is not what a single kill()
+	 * achieves. Posting a note is asynchronous: kill() returns 0 as
+	 * soon as the note is written to /proc/N/note, and the listener --
+	 * blocked in open("/net/tcp/N/listen") -- takes its own time to
+	 * notice, die, and have its descriptors closed. Until they are, the
+	 * announcement stands.
+	 *
+	 * That is not a deduction, it is what the machine said:
+	 *
+	 *	listenpid: killing the listener fd=4 pid=7898
+	 *	listenpid: ...kill returned 0 fd=4 pid=7898
+	 *	  note listen -> errno 42 (Address in use)
+	 *
+	 * -- kill succeeds, and the very next bind still finds the port
+	 * held. Two rounds of reasoning had put that down to the kill never
+	 * happening, and then to the approach being wrong; it was neither.
+	 *
+	 * The loop is _closebuf's, 200 lines away in plan9/_buf.c, which has
+	 * had it all along for exactly this:
+	 *
+	 *	for(i=0; i<10 && kill(b->copypid, SIGKILL)==0; i++)
+	 *		_SLEEP(1);
+	 *
+	 * It kills AND waits in one: the loop ends when kill() FAILS, which
+	 * is when the process is gone. Ten milliseconds is its bound and is
+	 * kept here, so a wedged listener costs a bounded delay rather than
+	 * a hang.
+	 *
+	 * The pid could in principle be reused inside that window and the
+	 * next note land on an innocent process. _closebuf accepts the same
+	 * risk for the same reason; the window is milliseconds and the
+	 * alternative is waiting for ever.
+	 */
 	killing = 1;
 	dbg("killing the listener", fd, pid);
-	if(kill(pid, SIGKILL) < 0)
-		dbg("...and kill FAILED", fd, pid);
+	for(i = 0; i < 10 && kill(pid, SIGKILL) == 0; i++)
+		_SLEEP(1);
+	if(i >= 10)
+		dbg("...STILL ALIVE after ten notes", fd, pid);
 	else
-		dbg("...kill returned 0", fd, pid);
+		dbg("...gone", fd, i);
 	killing = 0;
 }

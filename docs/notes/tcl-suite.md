@@ -5284,3 +5284,76 @@ instance.*
 still unmeasured; every run so far has been against a library whose
 provenance was not established. The mark is what ends that class of
 round.
+
+#### The debug line refuted my own stop-condition: kill() posts a note, it does not wait
+
+```
+listenpid: recorded a listener fd=4 pid=7898
+  note the system chose port 38649
+listenpid: killing the listener fd=4 pid=7898
+listenpid: ...kill returned 0 fd=4 pid=7898
+  note listen -> errno 42 (Address in use)
+  FAIL the port can be bound again once the socket is closed
+```
+
+**The kill happens, succeeds, and the port is still held on the very next
+bind.** I had written down beforehand that this exact outcome -- "kills
+successfully and the port is still held" -- means *the approach is wrong
+rather than buggy* and the hook should be reverted.
+
+**It was the wrong stop-condition, and the reason is in the word
+"posts".** `kill()` writes a note to `/proc/N/note` and returns; the
+target dies asynchronously. The listener is blocked in
+`open("/net/tcp/N/listen")`, and it has to notice the note, unwind, and
+have its descriptors closed before the announcement goes. `close()`
+returned long before any of that, and the test re-bound immediately.
+
+So the sequence is not "kill, then the port is free". It is "kill, then
+*eventually* the port is free", and nothing was waiting.
+
+**The fix is already in this library, two hundred lines away**, and has
+been all along. `plan9/_buf.c`:
+
+```c
+for(i=0; i<10 && kill(b->copypid, SIGKILL)==0; i++)
+	_SLEEP(1);
+```
+
+That loop is not a retry, it is a **wait**: it ends when `kill()`
+*fails*, which is when the process is gone. `_sock_killlisten` does the
+same now, with the same bound, so a wedged listener costs ten
+milliseconds rather than a hang.
+
+*This tree's notes already contained the line "`_closebuf` killing a copy
+process up to ten times without waiting for it to die", filed under open
+hazards. That reading was wrong twice over: the loop **is** the wait, and
+it was the missing half of the code I was writing while the description
+of it sat in the same file.*
+
+**Three lessons, and the first is about how the round was run.**
+
+**Writing a prediction down is worth as much when it is wrong as when it
+is right -- but only if it is a prediction about the OBSERVATION, not
+about the conclusion.** "Kill succeeds and the port is held" was a fine
+thing to predict. "...therefore revert" was not: it smuggled a mechanism
+("the listener is not the only holder") into what looked like a reading
+rule, and if the debug output had arrived without the sequence being
+re-examined, a working fix would have been thrown away on the strength of
+my own earlier sentence.
+
+**An asynchronous call that returns 0 has told you it was accepted, not
+that it was done.** `kill`, and the same shape in every note, signal and
+interrupt on this system.
+
+**When a library already does the thing you are adding, copy the whole
+idiom, not the call.** `_closebuf` was cited three commits ago for
+`SIGKILL` -- the right signal was taken from it and the loop around it
+was left behind.
+
+**Prediction, and this one is about the observation only.**
+`listenleak-test` sections 1 and 2 go to 0 failures: the port is free
+once the listener is actually gone. Section 3 stays passing and now
+means something, since a kill demonstrably happens. **`chan-io-29.34`
+remains genuinely open** -- the earlier freeze was measured against the
+descriptor-keyed version, and nothing since has retested it. Run
+`chanio.test -singleproc 1 -verbose t` before the suite.

@@ -210,8 +210,8 @@ main(void)
 		printf("  note built with gcc; libap is not involved\n");
 	else {
 		printf("  note libap listen bookkeeping: mark %d"
-			" (this tree is 2)\n", LISTENMARK);
-		printf("  note if that is not 2, `mk install' has not reached\n");
+			" (this tree is 3)\n", LISTENMARK);
+		printf("  note if that is not 3, `mk install' has not reached\n");
 		printf("  note the installed library and nothing below is\n");
 		printf("  note about the code you just pulled\n");
 	}
