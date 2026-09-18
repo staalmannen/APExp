@@ -183,6 +183,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `sigset-test.c`, `posix-spawn-test.c`, `limits-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
 `execve-env-test.c`, `tz-test.c`, `rename-test.c`, `listenleak-test.c`,
+`asyncconnect-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
@@ -308,6 +309,13 @@ in the topic file.
   `tcl-runall.tcl`; check for it before reading any total.
 - **A marker says the run reached the end, not that it was the run you
   asked for.** Read the `Total` line beside it.
+- **And check the log's own `Tests ended at` line before reading
+  anything from it.** A copied file that was never committed leaves the
+  previous run in place, and a stale log reads exactly like a real one.
+  It happened: a suite log was fetched, opened and nearly analysed while
+  being byte-identical to the frozen run three rounds earlier. Same
+  family as the libap mark -- *anything measured from outside the source
+  in front of you should say where it came from.*
 - **A constraint says what a test *needs*; only the log says whether it
   ran.** Three tests were written off for three rounds on a constraint
   line while `---- chan-io-41.7 start` sat in the log.
@@ -535,8 +543,10 @@ or a constraint that fails on Linux too). The port's own share is
 `focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
 
 **Tcl's suite**: **it finishes and nothing aborts.**
-`Total 68118 Passed 62070 Skipped 5887 Failed 161`, 167 files, marker,
-exit 0, and no `Test files exiting with errors` section.
+`Total 68118 Passed 62081 Skipped 5888 Failed 149`, 167 files, marker,
+exit 0, and no `Test files exiting with errors` section. The listener
+leak fix took **14**: all eleven of `socket_inet-11.*`, plus `12.1`,
+`2.6` and `socket-14.11.1`.
 
 **A count in the per-file table is executions, not tests**: `clock`'s
 16 were 4 tests run twice each (`.vm:0`/`.vm:1`). Size a cluster from
@@ -656,12 +666,28 @@ Open, in order of what the next run should touch:
   appears, the killer is elsewhere and `_sock_killlisten`'s ten-note
   loop is the suspect, being the only new source of SIGKILLs.
 - **`socket_inet-5.1`/`5.3` were passing for the WRONG REASON** -- a
-  leftover listener was refusing the bind, not the system -- so they are
-  not a regression from the errno change. Expect them to **stay
-  failing** once ports are genuinely released: `notRoot` tests a user
-  *name* as a proxy for a capability, and glenda is the host owner.
-  **Clear the leftovers (or reboot) before the next suite run**, or the
-  first run after the fix still meets a process that predates it.
+  leftover listener was refusing the bind, not the system. **Confirmed**:
+  they stayed failing once ports were genuinely released, as predicted.
+  `notRoot` tests a user *name* as a proxy for a capability and glenda
+  is the host owner, so these are not ours.
+- **`socket-14.14`/`14.15` are the same story, and expose a real gap.**
+  They were passing because `randport` certifies a port free by opening
+  and closing a server socket on it -- and the leak left a listener
+  holding the port it had just certified, which then ANSWERED the
+  connection the test needs refused. Now refused honestly, and that
+  raises the error at `socket -async` rather than on a `fileevent`:
+  **`network/connect.c` has no `O_NONBLOCK`/`EINPROGRESS` path at all,
+  so `socket -async` has never worked.** Nothing broke; something that
+  never worked stopped being hidden. **Async connect is now implemented** (mark 7),
+  **not yet confirmed**: `connect()` on an `O_NONBLOCK` descriptor forks
+  `_RFORK(RFFDG|RFPROC|RFNOWAIT)` to do the ctl write and returns
+  `EINPROGRESS`; the child reports its errno down a pipe;
+  `getsockopt(SO_ERROR)` -- which returned a hard-coded 0 -- now gives
+  the real answer. **The remaining approximation**: `select()` calls
+  every write descriptor ready at once, so `SO_ERROR` is asked before
+  the connect resolves and therefore WAITS rather than answering 0. The
+  real fix is `select()` learning about a pending connect. `Rock` gained
+  three APPENDED fields; `unistd/mkfile` gained `HFILES` for `priv.h`.
 - **Still unread: `io` 23, `chan-io` 19, `socket_inet` 16,
   `filename` 17, `socket` 10.** `filename`'s are all `Tcl_GlobCmd`.
 - **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a

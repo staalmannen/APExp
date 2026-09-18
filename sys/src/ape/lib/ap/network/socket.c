@@ -63,6 +63,15 @@ _sock_newrock(int fd)
 		}
 		r->dev = d.st_dev;
 		r->inode = d.st_ino;
+		/*
+		 * malloc does not zero, and the tail of this function now
+		 * CLOSES a descriptor it finds in cfd -- so a fresh Rock
+		 * must carry valid values before it gets there, or the
+		 * first close would be of whatever was in that memory.
+		 */
+		r->cpid = 0;
+		r->cfd = -1;
+		r->cerr = -1;
 		r->next = _sock_rock;
 		_sock_rock = r;
 	}
@@ -72,6 +81,24 @@ _sock_newrock(int fd)
 	r->reserved = 0;
 	r->announced = 0;
 	r->other = -1;
+	/*
+	 * A Rock is REUSED when the dev/inode match, and the malloc above
+	 * does not zero one, so every field that means something has to be
+	 * reset here -- which is a rule this tree already carries. A stale
+	 * `cpid' would make connect() answer EALREADY for a socket with
+	 * nothing in flight, and _sock_connectdone() read from whatever
+	 * `cfd' used to be.
+	 *
+	 * And a connect whose result NOBODY EVER COLLECTED still has its
+	 * pipe open, so recycling the Rock is where that descriptor gets
+	 * shut. It is one per socket rather than one per connect, which is
+	 * where the bound comes from; see the note in connect.c.
+	 */
+	if(r->cpid != 0 && r->cfd >= 0)
+		close(r->cfd);
+	r->cpid = 0;
+	r->cfd = -1;
+	r->cerr = -1;
 	return r;
 }
 
@@ -218,8 +245,22 @@ getsockopt(int fd, int level, int opt, void *v, int *len)
 	case SOL_SOCKET:
 		switch(opt){
 		case SO_ERROR:
+			/*
+			 * THIS RETURNED 0 UNCONDITIONALLY, which is the stub
+			 * that answers as though it had done the work -- the
+			 * commonest bug in this tree -- and it is the whole of
+			 * what an asynchronous connect reports through. Tcl
+			 * reads it to find out whether `socket -async'
+			 * succeeded or failed (tclUnixSock.c:1420).
+			 *
+			 * _sock_connectdone() waits for a connect still in
+			 * flight rather than answering 0 for it; see the note
+			 * at the top of network/connect.c for why waiting is
+			 * the lesser evil while select() reports every write
+			 * descriptor ready at once.
+			 */
 			if(*len >= (int)sizeof(int)){
-				*(int*)v = 0;
+				*(int*)v = (r == NULL) ? 0 : _sock_connectdone(r);
 				*len = sizeof(int);
 			}
 			return 0;

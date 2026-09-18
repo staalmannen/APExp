@@ -58,6 +58,9 @@ OFILES=\
 	usleep.$O\
 	mknod.$O\
 
+HFILES=\
+	../include/priv.h\
+
 <$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=$CFLAGS -c -D_POSIX_SOURCE\

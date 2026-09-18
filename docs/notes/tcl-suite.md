@@ -5819,3 +5819,170 @@ timer: _killtimerproc is ending it pid=18102 by=???
 **This is mark 6 and it is instrumentation only** -- no behaviour
 changes -- so it is safe to run the full suite with it, and the debug
 lines cost nothing unless `$APEXP_DEBUG` or `$APEXP_LISTENDEBUG` is set.
+
+#### A log that was never pushed reads exactly like one that was
+
+`tmp/tcl-all.out` was fetched after "the full suite completed" and is
+**byte-identical to the frozen run's log from three rounds earlier** --
+2440 lines, ending at `socket.test` with nothing after it. `git log` on
+the path says why: its last commit is `a4c7a962c tcl test freeze at a
+later stage now`, and the only newer commits on `main` are merges of
+this branch.
+
+**What caught it was `cmp`, not care.** The file had no `all.tcl: Total`
+line and no completion marker, which I read as "the run did not finish"
+-- a perfectly sensible reading of the wrong file. The `Tests ended at`
+timestamp was there to be checked and was not.
+
+*This is the libap mark again in a third guise. A header can be stock's,
+a library can predate the pull, and a log can be the previous run --
+and in all three the output looks entirely normal.* The rule is in
+CLAUDE.md now: read the log's own `Tests ended at` line first.
+
+**What the round DOES say, from the shell:** `grep -c FAILED` is 298,
+against 322 in the last complete run. Twenty-four fewer lines, and each
+failing test contributes roughly two -- but *compare runs per file,
+never by total* is already a rule here, and a raw grep count is a total.
+The real comparison needs the log.
+
+#### The suite finishes again: 161 -> 149, and the two new failures are the leak's own shadow
+
+`Tests ended at 2026-09-18 16:22:14`, marker, `Total 68118 Passed 62081
+Skipped 5888 Failed 149`, against `Failed 161` in the last complete run.
+
+**Fourteen fixed, and they are one cluster plus two:**
+
+```
+socket_inet-11.1 11.2 11.4 11.5 11.7 11.8 11.9 11.10 11.11 11.12 11.13
+socket_inet-12.1  socket_inet-2.6  socket-14.11.1
+```
+
+The whole of `socket_inet-11.*` went at once. Eleven tests that had been
+failing for as long as this file has recorded them, released by ports
+being released.
+
+**`socket_inet-5.1` and `5.3` appear in neither list -- they were failing
+and they still are, which is what was predicted** when the leak fix went
+in: `notRoot` asks about a user *name* as a proxy for a capability, and
+glenda is the host owner, so the bind succeeds and the test says so.
+That prediction was about the observation and it held.
+
+**Two newly failing, and they were passing for the wrong reason too.**
+`socket-14.14` and `socket-14.15` both do
+
+```tcl
+set s [socket -async localhost [randport]]
+```
+
+and now raise `couldn't open socket: connection refused` at that line.
+`randport` is the explanation, and it is worth reading:
+
+```tcl
+set port [lindex [fconfigure [set s [socket -server {} 0]] -sockname] 2]
+close $s
+while {[catch { close [socket -server {} $port] } msg]} { ...try another... }
+```
+
+It picks a port, then **verifies it is free by opening and closing a
+server socket on it**. With the leak, that verification left a listener
+holding the very port it had just certified as free -- so
+`socket -async localhost $port` connected happily to the leftover, Tcl
+got a working socket, and the test passed. **The leak was answering the
+connection that the test needed refused.**
+
+*That is the third pair of tests in this file found to have been passing
+for the wrong reason, all three uncovered by the same fix. A leaked
+resource does not only waste something; it answers questions, and every
+answer it gives is wrong.*
+
+**And the honest failure exposes a real gap.** `network/connect.c` is
+109 lines with no `O_NONBLOCK`, no `EINPROGRESS` and no deferred
+completion anywhere in it: **`connect()` here is always synchronous, so
+`socket -async` has never worked.** Tcl expects the call to return a
+socket and the outcome to arrive later on a `fileevent`; libap raises
+the error at the `socket` command instead. Nothing was broken by this
+round -- something that never worked stopped being hidden.
+
+**Next, and recorded rather than started**: async connect. `connect()`
+on a descriptor with `O_NONBLOCK` should start the conversation, return
+`-1`/`EINPROGRESS`, and let `select()` report the descriptor writable
+when it completes or fails, with `getsockopt(SO_ERROR)` carrying the
+result. On Plan 9 the connect is a write to the ctl file, so "in
+progress" means a process doing that write while the caller goes back to
+its event loop -- the same shape as `listenproc`, and the machinery for
+it already exists in `_buf.c`.
+
+#### Asynchronous connect: it had never worked, and the leak had been hiding that
+
+`socket -async` reaches libap as `fcntl(O_NONBLOCK)` then `connect()`,
+and `network/connect.c` had **no `O_NONBLOCK`, no `EINPROGRESS`, and no
+deferred completion** in its 109 lines -- the ctl write was always done
+in the calling process. `getsockopt(SO_ERROR)`, which is how Tcl reads
+the outcome (`tclUnixSock.c:1420`), was
+
+```c
+case SO_ERROR:
+	*(int*)v = 0;
+	return 0;
+```
+
+-- a hard-coded "no error" for a connection that may never have been
+made. **Both halves were stubs, and the second is the kind that rots
+quietly**: a test exercising only the first would have passed over it.
+
+**Why it took a leak fix to become visible.** `socket-14.14`/`14.15`
+were passing because `randport` certifies a port free by opening and
+closing a server socket on it, and the leak left a listener holding the
+port it had just certified -- so the async connect reached that leftover
+and succeeded. Nothing about `-async` was being tested at all.
+
+**Why an asynchronous connect needs a process.** On Plan 9 a connect is
+`write(ctl, "connect a!p")`, and that write does not return until the
+conversation is made or refused; there is no "start it and tell me
+later" form. So it is another process doing the write while the caller
+returns to its event loop -- the same shape as `listenproc`, for the
+same reason. `_RFORK(RFFDG|RFPROC|RFNOWAIT)` as `_timerproc` uses, so
+there is no wait record for anyone to reap, and the child closes every
+inherited descriptor but its report pipe, which is `listen.c`'s lesson
+about a held descriptor 1 applied before it could cost anything.
+
+**The approximation that remains, stated rather than hidden.**
+`select()` reports every descriptor in the WRITE set ready at once --
+"for now, we'll say they are all ready", which predates this by years --
+so Tcl is told the socket is writable before the connect has resolved
+and asks for `SO_ERROR` immediately. `getsockopt` therefore **waits**
+for the answer rather than returning 0. That is a caller blocking
+briefly; the alternative is an unresolved connect reported as success,
+which is the `XLoadFont` family. The real fix is `select()` learning
+about a pending connect, and it belongs in `_buf.c` with its own
+measurement.
+
+**`_sock_newrock` reuses a Rock when dev/inode match and `malloc` does
+not zero one**, so the three new fields are initialised on the fresh
+path and reset on the reuse path -- and the reuse path *closes* a report
+pipe whose result nobody collected, which bounds that at one descriptor
+per socket rather than one per connect. *When a struct is recycled,
+reset every field that means something* was already a rule here; this is
+the first time it has been applied before the bug rather than after.
+
+**`priv.h` gained three fields, APPENDED**, and `unistd/mkfile` gained
+an `HFILES` for it -- `writev.c` includes `priv.h` without using `Rock`,
+and a header not in `HFILES` is a header `mk` does not rebuild for.
+
+**`asyncconnect-test.c` does not assert EINPROGRESS**, and that is the
+interesting part of writing it. On Linux a non-blocking connect to a
+dead port on the loopback can fail immediately with ECONNREFUSED --
+there is no round trip to be in progress -- so asserting EINPROGRESS
+would fail on glibc and say nothing about either system. What both must
+agree on is the contract: *a non-blocking connect either resolves now or
+reports EINPROGRESS, and if it reported EINPROGRESS then SO_ERROR gives
+the real answer and never a false 0.* Section 3 is the control, an
+ordinary blocking connect still failing with ECONNREFUSED, so a change
+that broke normal connects could not hide behind the sections above.
+0 failures on glibc, which as it happens does report EINPROGRESS there.
+
+**Prediction, observation only.** `asyncconnect-test` reports 0 failures
+on the VM. `socket-14.14` and `14.15` are the reason this was written
+but they are NOT predicted: 14.14 needs the failed connect to make the
+socket readable, which goes through the copy process on the data file,
+and nothing here has measured that it does.
