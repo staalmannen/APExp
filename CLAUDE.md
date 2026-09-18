@@ -580,8 +580,16 @@ Open, in order of what the next run should touch:
   *accepted* connection to drain, so the question is whether ending the
   listening process disturbs a connection already accepted.
   `listenleak-test` section 3 asks exactly that in C, with a ten-second
-  timeout per blocking call so it reports instead of freezing. **Run it
-  before the suite**, on a build that certainly contains the fix.
+  timeout per blocking call so it reports instead of freezing.
+  **The port is STILL held after a rebuild**, and two mechanisms argued
+  from the source were both wrong (`fstat` does not go through
+  `_fdinfo`; `_closebuf` does not close the descriptor). So
+  `$APEXP_LISTENDEBUG=1` now makes `_sock_listenpid.c` print one line
+  per decision -- recorded / killing / STALE / NOT OURS / kill FAILED.
+  **Run `APEXP_LISTENDEBUG=1 ./listenleak-test` on a build containing
+  the change and read those lines**; if it kills successfully and the
+  port is still held, the approach is wrong rather than buggy and the
+  `close()` hook should be reverted.
 - **`socket_inet-5.1`/`5.3` were passing for the WRONG REASON** -- a
   leftover listener was refusing the bind, not the system -- so they are
   not a regression from the errno change. Expect them to **stay

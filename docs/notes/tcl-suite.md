@@ -5119,3 +5119,80 @@ somewhere else in that test; a TIMED OUT line names the statement, and
 if it is the one after the close then ending the listener does break an
 accepted connection and the whole approach needs rethinking rather than
 patching.
+
+#### Still held after the rebuild, and two guesses in a row were wrong
+
+```
+After libap rebuild
+  note the system chose port 48153
+  note listen -> errno 42 (Address in use); plan 9 says: address in use
+  note the port is still held by SOMETHING after the socket was closed
+  FAIL the port can be bound again once the socket is closed
+2 failure(s)
+```
+
+**Two things to read off that before anything else.**
+
+First, **section 3 never printed**, so the binary was built from the test
+as it stood before section 3 was added -- which dates the libap under it
+too. The `chan-io-29.34` question is still unasked. *A measurement of a
+build that does not contain the change measures nothing*, and the way to
+notice it here was that a section which should have printed a header did
+not print one at all. Numbering the sections is what made that legible.
+
+Second, **it is `listen()` that reports "address in use", not `bind()`**.
+On Plan 9 the announcement happens in `listen()`, so the failing call
+names the right place; nothing is wrong with the test's reading.
+
+**And the port is still held with the kill in place, which refutes the
+obvious diagnosis rather than confirming it.**
+
+Two mechanisms were argued for it and both were wrong, and the way they
+were wrong is the same way:
+
+- *"`_sock_killlisten` runs after `close()` has zeroed `_fdinfo`, so
+  `fstat()` fails and the guard declines."* `fstat()` goes through
+  `_dirfstat()`, a raw call on the descriptor, not through `_fdinfo`. It
+  was moved to the front of `close()` anyway, which is tidier, but it
+  was not this.
+- *"`_closebuf` tears the descriptor down first."* `_closebuf` kills the
+  copy process and does not close the descriptor at all.
+
+Both were read out of the source and both were plausible. **That is two
+rounds spent on mechanism where one printed line would have settled it**
+-- which is the oldest rule in this file, *print what the machine says
+rather than what the code implies*, broken twice in succession while
+being quoted.
+
+So `$APEXP_LISTENDEBUG` now makes `_sock_listenpid.c` say what it did,
+one line per decision, on standard error:
+
+```
+listenpid: recorded a listener fd=3 pid=1234
+listenpid: killing the listener fd=3 pid=1234
+listenpid: ...kill returned 0
+```
+
+or one of `close of a descriptor with no listener`, `STALE: fstat says
+this is a different file now`, `NOT OURS: recorded by another process`,
+`RE-ENTERED: declining to kill`, `...and kill FAILED`. `write(2)` and a
+hand-rolled number rather than stdio, because stdio in this file would
+pull the whole of it into `close.o`, which every program links.
+
+**The four answers and what each one means:**
+
+- **nothing printed at all** -- `_sock_listenpid.o` is not in the
+  library, or `close()` is not calling it; a build question, not a
+  logic one.
+- **`recorded` but no `killing`** -- the entry is not surviving to the
+  close. `STALE` says the descriptor changed identity between `listen()`
+  and `close()`, which would mean the pipe is not the thing to key on.
+- **`killing` then `kill returned 0`, and the port still held** -- the
+  listener is not the only holder of the announcement, and the whole
+  approach is wrong rather than buggy. That is the outcome that says
+  revert.
+- **`kill FAILED`** -- the pid is not reachable; look at what `kill()`
+  does with a process in another note group.
+
+No prediction. Three have been offered on this bug and the machine has
+refuted each one; the next line should come from the VM, not from here.
