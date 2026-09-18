@@ -3800,3 +3800,81 @@ Every system call on those two names, with its return value, in order.
 That names the failing call outright instead of by elimination -- it is
 the `strace` this file has wanted for several rounds without noticing it
 was there.
+
+#### FOUND: `utime()` returned the wstat byte count, and `ratrace` named it
+
+**One trace, and every line of it is accounted for.** `ratrace tclsh`
+on the four-line reproducer, grepped for the two names:
+
+```
+1404 Open   "a.txt"  0x0            = 4
+1408 Create "b.txt"  0x1 0x1b4      = 5
+1411 Pread  4 ... 4096 -1           = 0
+1414 Stat   "b.txt"                 = 72
+1415 Wstat  "b.txt" 0x70d520 49     = 49 ""
+1416 Wstat  "b.txt" 0x70d520 49     = 49 ""
+1417 Stat   "b.txt"                 = 72
+1422 Remove "b.txt"                 = 0 ""
+1423 Pwrite ... error copying "a.txt" to "b.txt": no such file or directory
+```
+
+Read it as libap:
+
+- `Open` + `Create` are `TclUnixCopyFile`'s two opens.
+- `Stat` + `Wstat` is `chmod()` -- it stats to keep the non-permission
+  bits, then wstats.
+- the second `Wstat` is `utime()`, and it **returns 49**, which is the
+  size of the wstat message. **A success.**
+- `Stat` + `Remove` is libap's own `unlink()`, which stats before
+  removing. That is `TclUnixCopyFile` deleting the copy it had just made
+  correctly.
+
+```c
+/* CopyFileAtts, tclUnixFCmd.c */
+if (utime(dst, &tval)) {			/* 49 is true */
+    return TCL_ERROR;
+}
+...
+/* TclUnixCopyFile */
+if (!dontCopyAtts && CopyFileAtts(...) == TCL_ERROR) {
+    unlink(dst);
+    return TCL_ERROR;
+}
+```
+
+**`_dirwstat`/`_dirfwstat` answer the number of bytes written, and
+POSIX says `utime` returns 0.** `stat/utime.c`, `stat/utimes.c` and
+`stat/futimes.c` all ended `return n;`. Every caller writing the
+ordinary `if (utime(path, &tval))` was told a successful call had
+failed. `chmod`, `chown`, `truncate`, `ftruncate`, `fchmod`, `rename`
+and `utimensat` in the same directory all test `< 0` and return 0, so
+these three were the only ones -- checked rather than assumed.
+
+**This is why the message named nothing.** Tcl prints `Tcl_PosixError`
+at a common `done:` label, so it reported whatever errno held by then --
+the `ENOENT` left over from stat'ing a destination that did not exist
+yet, five lines earlier. Six readings of the source chased that ENOENT;
+the failing call never set it.
+
+**AND THE PROBE SAID `YES` FOR IT.** `step()` accepts anything `>= 0`,
+which is right for `open()` and wrong for `chmod` and `utime`, so
+`utime` returning 49 printed as a success in two consecutive runs.
+**A check that cannot fail is not a check** -- the third instance of
+that rule in these notes, and the first in a test of my own rather than
+in the tree. `copyfile-test.c` has a `zero()` helper now that requires
+exactly 0 and says so when it gets a positive number.
+
+**What it cost, beyond the three aborted files.** Anything that sets a
+timestamp and checks the result: `cp -p`, `tar` restoring mtimes,
+`make` touching a target, `install -p`, and every `file copy` in every
+Tcl program. It is silent in the other direction too -- the timestamp
+*is* set, so nothing looks wrong until a caller believes the error.
+
+**Prediction.** `copyfile-test` reports 1 failure before the rebuild,
+at `utime ... returned 0`, and 0 after. `file copy -force a.txt b.txt`
+works. `encoding.test`, `http.test` and `fCmd.test` stop aborting, and
+`fCmd`'s copy and rename clusters -- `6.x`, `18.x`, `21.x`, `2.x`, which
+are 39 of its 80 -- should move substantially. The count in the suite
+total will *rise*, because three files that reported nothing now report
+their real numbers: newly measured, not newly broken, for the fifth
+time.

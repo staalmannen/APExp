@@ -342,7 +342,9 @@ in the topic file.
   skipped its `unlink(dst)` and so reported 0 failures for a copy that
   did not work -- a probe that skips a call cannot clear it.
 - **Plan 9 has `ratrace`**, and it names a failing system call outright
-  where elimination takes rounds.
+  where elimination takes rounds. It found the `utime()` return-value
+  bug in one run, after six readings of the source had chased an errno
+  the failing call never set.
 - **Read what a test *compares*, not what it mentions.**
 - **Every case expected to return must come before every case expected to
   hang**, in file order, each behind a flushed marker naming the
@@ -458,14 +460,12 @@ per-file table and the command that produces it are at the end of
 
 Open, in order of what the next run should touch:
 
-- **`file copy` of a file that exists reports ENOENT**, and it aborts
-  `encoding.test`, `http.test` and `fCmd.test`. **The syscalls are
-  cleared**: `copyfile-test` makes every call Tcl makes, in order, and
-  reported 0 failures on the VM -- but it was missing `DoCopyFile`'s
-  `unlink(dst)`, which tolerates only ENOENT, and that is now section 3.
-  Cleared by `file rename` working: the whole shared prologue,
-  normalisation, the encoding conversion and `Tcl_FSGetNativePath`. If
-  section 3 also passes, trace it: `ratrace tclsh` names the call. See
+- **FOUND and fixed, not yet confirmed: `utime()` returned the wstat
+  byte count instead of 0**, so `CopyFileAtts`' `if (utime(...))` made
+  every `file copy` fail and delete its own output. `utimes` and
+  `futimes` were the same; `chmod`, `chown`, `truncate` and the rest of
+  that directory were already right. Named by **`ratrace`** in one run
+  after six readings of the source chased the wrong errno. See
   `docs/notes/tcl-suite.md`.
 - **9front has no symbolic links** -- confirmed, `grep DSYM
   /sys/include/*` is empty -- so `symlink()` stays ENOSYS, and that
