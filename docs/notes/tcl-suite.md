@@ -5418,3 +5418,60 @@ APEXP_LISTENDEBUG=1 tcltest socket.test -singleproc 1 -verbose t
 `-verbose t` names the test; `APEXP_LISTENDEBUG` says whether a listener
 was being killed when it stopped, and which one. Nothing is predicted
 about the cause -- only that those two lines together will name it.
+
+#### socket_inet-2.11: the debug lines put it exactly, and named what every section missed
+
+```
+listenpid: killing the listener fd=10 pid=12945
+listenpid: ...gone fd=10
+listenpid: recorded a listener fd=10 pid=12950
+---- socket_inet-2.11 start
+listenpid: close of a descriptor with no listener fd=5   (x8)
+<nothing>
+```
+
+**Three facts, none of them a guess.**
+
+**tcltest runs `-setup` BEFORE it prints `---- $name start`.** Its own
+comment says so -- "Verbose notification of $body start" -- so the second
+`recorded` line is *2.11's own* `socket -server accept 0`, and the
+silence is in the **body**. The body's first wait is `vwait sock`: the
+connection is never accepted.
+
+**The `close ... fd=5` flood is the event loop, not a bug.** `kill()`
+opens `/proc/N/note` and closes it, so every timer reset from `select()`
+prints one line. Eight of them, then they stop -- which is what a
+process entering a wait it never leaves looks like from here. *That is
+the debug output paying for itself twice: once for what it says and once
+for what its stopping says.*
+
+**And the descriptor number came back.** The previous test's listener was
+at `fd=10`, was killed, and 2.11's listener is `fd=10` again.
+
+**What every section of `listenleak-test` missed, and it is the same
+gap three times over.** Section 1 closes a listener and rebinds; section
+2 does that five times; section 3 accepts once on a *first* server.
+**Not one of them accepts a connection on a SECOND server made after a
+first was killed.** The descriptor number comes back, and with it
+whatever the library keeps per descriptor -- and killing a listener is
+new, so what it leaves behind has never been exercised twice.
+
+Section 4 is three full rounds of listen / connect / accept / exchange /
+close, each behind a named stage and the ten-second alarm. 0 failures on
+glibc; three rounds, three ports, three exchanges.
+
+**The rule this exposes about the test, not the library:** *a test built
+from a symptom tests the symptom.* Sections 1 and 2 came from "the port
+is not released", section 3 from "does the kill break an accepted
+connection" -- both real questions, and between them they never made the
+library do the same thing twice. **When a change adds an operation
+(here, ending a process), the second use of the thing it acted on is the
+case to write, not the first.**
+
+**No prediction about the cause.** If section 4 hangs on round 1, the
+state left behind by killing a listener is the thing to find, and *When
+a struct is recycled, reset every field that means something* is already
+in this file. If it passes all three, the reduction is wrong and
+`socket_inet-2.11` needs its own next step -- it was already FAILING
+before this change (`a: b: c:one` for `a:one b: c:two`, a timing
+result), so the hang is new but the test was never healthy.

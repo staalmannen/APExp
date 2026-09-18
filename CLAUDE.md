@@ -588,10 +588,16 @@ Open, in order of what the next run should touch:
   pull can run days-old library code and say nothing; bump it when the
   file changes in a way a test must see. `$APEXP_LISTENDEBUG=1` prints
   one line per decision.
-- **The suite now freezes in `socket.test`, file 129 of 167** (it was
-  file 14). Either a regression from the kill, or a hang that was never
-  reachable until ports started being released. Next:
-  `APEXP_LISTENDEBUG=1 tcltest socket.test -singleproc 1 -verbose t`.
+- **The suite freezes in `socket_inet-2.11`**, file 129 of 167 (it was
+  file 14). The debug lines place it exactly: tcltest runs `-setup`
+  before printing `---- $name start`, so the listener recorded just
+  before that line is 2.11's own, and the body blocks at `vwait sock` --
+  **the connection is never accepted**. The previous test's listener was
+  at the same `fd=10` and had been killed. `listenleak-test` **section
+  4** is the reduction: three rounds of listen/connect/accept/exchange/
+  close, because sections 1-3 never accept on a *second* server made
+  after a first was killed. 2.11 was already failing before this change
+  (a timing result), so the hang is new but the test was never healthy.
 - **`socket_inet-5.1`/`5.3` were passing for the WRONG REASON** -- a
   leftover listener was refusing the bind, not the system -- so they are
   not a regression from the errno change. Expect them to **stay

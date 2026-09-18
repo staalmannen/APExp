@@ -210,8 +210,8 @@ main(void)
 		printf("  note built with gcc; libap is not involved\n");
 	else {
 		printf("  note libap listen bookkeeping: mark %d"
-			" (this tree is 3)\n", LISTENMARK);
-		printf("  note if that is not 3, `mk install' has not reached\n");
+			" (this tree is 4)\n", LISTENMARK);
+		printf("  note if that is not 4, `mk install' has not reached\n");
 		printf("  note the installed library and nothing below is\n");
 		printf("  note about the code you just pulled\n");
 	}
@@ -348,6 +348,92 @@ main(void)
 	printf("  note and 2 are what tell those apart; if they FAILED,\n");
 	printf("  note nothing was killed and this section proves nothing.\n");
 	printf("  note APEXP_LISTENDEBUG=1 makes libap say which it was.\n");
+
+	printf("--- 4. a SECOND server, on the descriptor the first freed ---\n");
+	/*
+	 * Tcl's socket_inet-2.11 reduced, and it is where the suite stops
+	 * now. The debug lines put it exactly:
+	 *
+	 *	listenpid: killing the listener fd=10 pid=12945
+	 *	listenpid: ...gone fd=10
+	 *	listenpid: recorded a listener fd=10 pid=12950
+	 *	---- socket_inet-2.11 start
+	 *	<the event loop ticks a few times, then nothing>
+	 *
+	 * tcltest runs -setup BEFORE printing `start' ("Verbose
+	 * notification of $body start"), so the second listener is that
+	 * test's own, and the body then blocks at `vwait sock' -- the
+	 * connection is never accepted.
+	 *
+	 * WHAT SECTIONS 1 TO 3 ALL MISS: none of them accepts a connection
+	 * on a SECOND server made after a first one was killed. Section 2
+	 * rebinds five times and never accepts; section 3 accepts once and
+	 * never makes a second server. The descriptor number comes back --
+	 * fd=10 both times above -- and with it whatever state the library
+	 * keeps per descriptor.
+	 *
+	 * So: three full rounds of listen/connect/accept/exchange/close. If
+	 * the first passes and a later one hangs, the state left behind by
+	 * killing a listener is the thing to look at, and *When a struct is
+	 * recycled, reset every field that means something* is already a
+	 * rule in this tree.
+	 */
+	for(i = 0; i < 3; i++){
+		char what[64];
+
+		port = 0;
+		if((ss = listenon(0, &port)) < 0){
+			printf("  note round %d could not listen\n", i);
+			ok("three rounds of listen/accept/close", 0);
+			break;
+		}
+		if((cs = socket(AF_INET, SOCK_STREAM, 0)) < 0){
+			why("socket for the client");
+			ok("three rounds of listen/accept/close", 0);
+			break;
+		}
+		memset(&a, 0, sizeof a);
+		a.sin_family = AF_INET;
+		a.sin_port = htons((unsigned short)port);
+		a.sin_addr.s_addr = htonl(0x7f000001);
+		sprintf(what, "round %d: connect", i);
+		stalled(what);
+		if(connect(cs, (struct sockaddr*)&a, sizeof a) < 0){
+			arrived();
+			why(what);
+			ok("three rounds of listen/accept/close", 0);
+			break;
+		}
+		arrived();
+		sprintf(what, "round %d: ACCEPT (2.11 blocks here)", i);
+		stalled(what);
+		alen = sizeof a;
+		as = accept(ss, (struct sockaddr*)&a, &alen);
+		arrived();
+		if(as < 0){
+			why(what);
+			ok("three rounds of listen/accept/close", 0);
+			break;
+		}
+		write(cs, "one\n", 4);
+		sprintf(what, "round %d: read the message", i);
+		stalled(what);
+		n = read(as, buf, sizeof buf);
+		arrived();
+		if(n != 4){
+			printf("  note round %d read %d bytes, wanted 4\n", i, n);
+			ok("three rounds of listen/accept/close", 0);
+			break;
+		}
+		printf("  note round %d: listened on %d, accepted, exchanged\n",
+			i, port);
+		close(as);
+		close(cs);
+		close(ss);		/* kills the listener; fd numbers freed */
+	}
+	if(i == 3)
+		ok("three rounds of listen/accept/close", 1);
+
 
 done:
 	printf("%d failure(s)\n", failures);
