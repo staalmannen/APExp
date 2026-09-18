@@ -5986,3 +5986,50 @@ on the VM. `socket-14.14` and `14.15` are the reason this was written
 but they are NOT predicted: 14.14 needs the failed connect to make the
 socket readable, which goes through the copy process on the data file,
 and nothing here has measured that it does.
+
+#### Async connect works, and the errstr beside it is a lie
+
+```
+--- 1. a non-blocking connect to a dead port ---
+  note non-blocking connect -> errno 62 (Operation in progress); plan 9
+        says: file does not exist: '/proc/25180'
+  PASS it reported EINPROGRESS, or resolved at once with ECONNREFUSED
+  note SO_ERROR says 38 (Connection refused)
+  PASS ...and SO_ERROR then gives the real failure
+--- 2. a non-blocking connect that SUCCEEDS ---
+  PASS a connect that will succeed reports EINPROGRESS, not an error
+  PASS SO_ERROR is 0 for a connect that succeeded
+--- 3. the control: a BLOCKING connect still fails ---
+  PASS ...and it is ECONNREFUSED, as it always was
+0 failure(s)
+```
+
+0 failures, and each section did the interesting thing rather than the
+trivial one: Plan 9 reports EINPROGRESS for both the dead and the live
+port, `SO_ERROR` then distinguishes them, and an ordinary blocking
+connect is unchanged.
+
+**`plan 9 says: file does not exist: '/proc/25180'` is left over, and
+worth a rule.** `errstr` is per-process and sticky: it holds whatever
+the last *system call* set, and `connect()` here sets `errno =
+EINPROGRESS` **itself**, from C, without any failing call behind it. So
+the string beside it belongs to something else entirely -- a
+`/proc/N/note` open from a `kill()` in the listener or timer machinery,
+minutes earlier in the same process.
+
+*Every test in this directory prints `errno` and `errstr` side by side,
+and that pairing is trustworthy only when the errno came FROM a system
+call. When the library sets errno on its own -- EINPROGRESS, EALREADY,
+ENOTSOCK, EAFNOSUPPORT -- the Plan 9 string is stale and can name a file
+that has nothing to do with the operation.* It has not misled anyone
+yet because errno was checked and the string only read for colour, but
+it is exactly the shape that costs a round.
+
+**What is confirmed**: `connect()` understands `O_NONBLOCK`,
+`getsockopt(SO_ERROR)` reports the real outcome, and blocking connects
+are untouched.
+
+**What is not**: `socket-14.14` and `14.15`, which are why this was
+written. 14.14 needs the failed connect to make the socket *readable*,
+which goes through the copy process on the data file, and nothing has
+measured that it does. They stay unpredicted.

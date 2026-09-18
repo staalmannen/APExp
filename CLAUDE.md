@@ -366,6 +366,12 @@ in the topic file.
 - **Print what the machine says rather than what the code implies.** The
   missing loopback, the announce spelling and the `fd_set` width were all
   settled that way after rounds of reasoning went the wrong way.
+- **...but `errstr` is only trustworthy when the errno came FROM a
+  system call.** It is per-process and sticky, so when libap sets errno
+  itself (`EINPROGRESS`, `EALREADY`, `ENOTSOCK`) the Plan 9 string
+  beside it is left over from something else -- `asyncconnect-test`
+  printed `file does not exist: '/proc/25180'` next to a perfectly
+  correct EINPROGRESS.
 - **An asynchronous call returning 0 says it was ACCEPTED, not done.**
   `kill()` posts a note; the target dies later and its descriptors close
   later still. A closed listener's port stayed held for exactly that
@@ -678,8 +684,8 @@ Open, in order of what the next run should touch:
   raises the error at `socket -async` rather than on a `fileevent`:
   **`network/connect.c` has no `O_NONBLOCK`/`EINPROGRESS` path at all,
   so `socket -async` has never worked.** Nothing broke; something that
-  never worked stopped being hidden. **Async connect is now implemented** (mark 7),
-  **not yet confirmed**: `connect()` on an `O_NONBLOCK` descriptor forks
+  never worked stopped being hidden. **Async connect is implemented and CONFIRMED**
+  at the library level (mark 7, `asyncconnect-test` 0 failures): `connect()` on an `O_NONBLOCK` descriptor forks
   `_RFORK(RFFDG|RFPROC|RFNOWAIT)` to do the ctl write and returns
   `EINPROGRESS`; the child reports its errno down a pipe;
   `getsockopt(SO_ERROR)` -- which returned a hard-coded 0 -- now gives
@@ -688,6 +694,9 @@ Open, in order of what the next run should touch:
   the connect resolves and therefore WAITS rather than answering 0. The
   real fix is `select()` learning about a pending connect. `Rock` gained
   three APPENDED fields; `unistd/mkfile` gained `HFILES` for `priv.h`.
+  **`socket-14.14`/`14.15` themselves are still unmeasured** -- 14.14
+  needs the failed connect to make the socket *readable*, through the
+  copy process on the data file.
 - **Still unread: `io` 23, `chan-io` 19, `socket_inet` 16,
   `filename` 17, `socket` 10.** `filename`'s are all `Tcl_GlobCmd`.
 - **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a
