@@ -458,8 +458,13 @@ Open, in order of what the next run should touch:
   `sys/lib/tests/copyfile-test.c` makes Tcl's calls in Tcl's order and
   reports each. Read its destination-`lstat` assertion first: the copy
   is abandoned unless a missing file reports exactly `ENOENT`.
-- **`symlink()` is ENOSYS**, and `file link` now costs a whole test file
-  rather than a handful of tests.
+- **`symlink()` is ENOSYS, and that costs exactly ONE test** of
+  `fCmd`'s eighty -- the aborting line is a `file copy`, not a link.
+  **Do not emulate it with a copy** the way old APE's `ln` did: `lstat`
+  must say `S_IFLNK`, `readlink` must return a target, a link to a
+  directory is not a copy, a dangling link is normal, and writes would
+  diverge silently. First ask whether 9front has links natively
+  (`grep -n DMSYM /sys/include/libc.h`) -- see `docs/notes/tcl-suite.md`.
 - **A path ~50 components deep cannot be deleted** -- `invalid
   operation`, with the directory empty, so it is the path and not the
   contents. `unixFCmd` and `winFCmd` both abort on it.

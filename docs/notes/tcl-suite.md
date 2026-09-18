@@ -3577,3 +3577,84 @@ operation that checks for a missing file is affected, not just copy.
 The probe passes the **full** `st_mode` to `open()`, `S_IFREG` and all
 (`0100644`), because that is what `TclUnixCopyFile` does. A faithful
 probe makes the same call, not the tidier one.
+
+#### Would `symlink()` as a copy do? No -- and it is ONE test, not many
+
+**The premise does not survive the log, and I had half-endorsed it
+myself.** Of `fCmd.test`'s eighty failures, the `28.x` link block
+accounts for **one**:
+
+```
+ 1 fCmd-28.x   the link tests
+12 fCmd-6.x    CopyRenameOneFile: lstat(target) != 0 / errno != ENOENT / ...
+11 fCmd-18.x   TclFileRenameCmd
+11 fCmd-21.x   copy : single file to nonexistant, single dir, into directory
+ 5 fCmd-2.x    TclFileCopyCmd
+```
+
+`fCmd-6.4`, `6.5`, `6.6` and `6.9` are *named after* the branch
+`copyfile-test.c` was written around -- `lstat(target) != 0`,
+`errno != ENOENT`, `errno == ENOENT`. So the dominant cluster in the
+file is copy and rename, and one bug plausibly carries most of it.
+
+**And the abort is the copy bug, not the link bug.** The correction is
+mine: last round this file said "`symlink()` being ENOSYS now costs a
+whole test file". The aborting line is `file copy abc.file abc.dir`,
+which is a *copy*, in top-level code that merely happens to sit after
+the link tests. Reading a failure by what precedes it is the same
+mistake as reading a freeze by the last line printed.
+
+**On the design question, which is worth answering anyway.** Old APE
+made `ln` a `cp`, and the question is whether `symlink()` could do the
+same in libap. It should not, and the reason is not squeamishness:
+
+- **`lstat()` must report `S_IFLNK`.** A copy is `S_IFREG`, so
+  `file type` answers `file` where every caller expects `link` -- the
+  `28.x` tests check exactly that, so the emulation would not even buy
+  the one test it is aimed at.
+- **`readlink()` has no target to return.** `file link` would succeed
+  and `file readlink` fail on the thing it just made, which is worse
+  than both failing.
+- **Tcl uses `lstat` rather than `stat` deliberately**, to copy and
+  rename links instead of their targets. With no distinction that
+  choice silently reverses.
+- **A link to a directory cannot be a copy** in any useful sense, and
+  `linkDirectory` tests do exactly that.
+- **A dangling link is a normal state.** A copy outlives its target,
+  so the most commonly tested property is inverted.
+- **Writes diverge silently.** That is the part that reaches real
+  programs rather than tests: a build system that symlinks a config
+  file gets two files that drift apart with no error anywhere.
+
+It is also this file's own standing rule -- *do not invent semantics to
+make a test pass* -- and the precedents are all recorded: no `bind()`
+fallback to `*`, no error on an empty `/dev/snarf`, no unmapping of
+descendants, no minted colormaps, no fabricated install paths.
+
+**The distinction worth keeping is between a command and a library
+call.** `ln(1)` is a one-shot a person invoked, and substituting a copy
+is a defensible convenience with a visible result. `symlink(2)` is an
+API that other code builds invariants on and then *tests*, and a
+success reported for work not done is the `XLoadFont` family in its
+most damaging form -- not a wrong attribute but wrong data.
+
+**What would be worth doing instead**, in order:
+
+1. **Ask whether this 9front has symbolic links at all.** Nothing in
+   APE's headers mentions `DMSYML`, but those are APE's headers, not the
+   kernel's. One grep on the VM settles it:
+
+   ```
+   grep -n DMSYM /sys/include/libc.h
+   ```
+
+   If it is there, `symlink`, `readlink` and an `S_IFLNK` arm in
+   `_dirtostat` are a real implementation rather than an emulation, and
+   the honest way to close the cluster.
+2. If it is not, leave `symlink()` at ENOSYS. It is the truthful answer,
+   and Tcl's `linkFile`/`linkDirectory` constraints are hardcoded to 1
+   on every unix (`fCmd.test:87`), so no amount of libap politeness will
+   make those tests skip -- they are simply tests of a feature this
+   machine does not have, like `systray` in the Tk notes.
+3. Spend the round on `file copy` instead, which is where the eighty
+   are.
