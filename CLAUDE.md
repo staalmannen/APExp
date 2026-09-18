@@ -643,6 +643,12 @@ Open, in order of what the next run should touch:
   `_sock_listenpid.c` because the next question arrived in a file that
   could not reach it. 2.11 was already failing before this change
   (a timing result), so the hang is new but the test was never healthy.
+  **With mark 5 `socket.test` COMPLETES** -- `Total 114 Passed 54
+  Skipped 41 Failed 19`, same command that froze. Whether the repair is
+  *why* is one grep: `resettimer: the timer process is gone` appearing
+  means the timer was dead as diagnosed; never appearing means the timer
+  was alive and `_apdbg`'s writes changed the timing, which would not be
+  a fix.
 - **`socket_inet-5.1`/`5.3` were passing for the WRONG REASON** -- a
   leftover listener was refusing the bind, not the system -- so they are
   not a regression from the errno change. Expect them to **stay
