@@ -3658,3 +3658,66 @@ most damaging form -- not a wrong attribute but wrong data.
    machine does not have, like `systray` in the Tk notes.
 3. Spend the round on `file copy` instead, which is where the eighty
    are.
+
+#### The syscalls are CLEAR, so `file copy` is above them
+
+`copyfile-test` reports **0 failures on the VM**. Every call Tcl makes,
+in Tcl's order, works:
+
+```
+note lstat of a missing file: errno 20 (No such file or directory)
+PASS ...and it is exactly ENOENT, which Tcl requires
+YES  open cft-src.txt O_RDONLY
+YES  open cft-dst.txt O_CREAT|O_TRUNC|O_WRONLY with that mode
+YES  chmod / utime
+PASS the copy is the same size as the source
+```
+
+So the destination-`lstat` branch is fine, the full `st_mode` reaching
+`open()` is fine, `chmod` and `utime` are fine -- **a sixth candidate
+refuted, and this one by measurement rather than by reading.** That is
+the answer the probe existed to give, and it is worth as much as a
+confirmation: the bug is **not in the system calls**, so it is in what
+Tcl does to the path before it makes them.
+
+**What Tcl does that the probe does not**, in order of how cheap each is
+to rule out:
+
+- **normalises the path.** `Tcl_FSGetNativePath` runs the operand
+  through `TclpObjNormalizePath`, which on unix uses `Realpath()` and
+  `getcwd()`. A relative name becomes an absolute one first, and a wrong
+  cwd or a wrong `realpath` would produce a path that genuinely does not
+  exist -- ENOENT, from a call on a string the probe never builds.
+- **converts it through the filesystem encoding**
+  (`Tcl_UtfToExternalDStringEx`, `TCLFSENCODING`).
+- **goes through the virtual filesystem layer**, `Tcl_FSLstat` and
+  `Tcl_FSCopyFile`, rather than calling `lstat` directly.
+
+**Four lines in `tclsh` separate the first from the rest**, and they
+need nothing built:
+
+```tcl
+cd /tmp
+set f [open a.txt w]; puts $f hi; close $f
+pwd
+file normalize a.txt
+file normalize b.txt
+file copy -force /tmp/a.txt /tmp/b.txt      ;# ABSOLUTE paths
+file copy -force a.txt d.txt                ;# relative again
+file rename a.txt c.txt
+```
+
+| | |
+|---|---|
+| **absolute works, relative fails** | it is normalisation -- `getcwd()` or `realpath()` -- and `file normalize` prints the wrong answer it is building |
+| **both fail** | the path is not the variable; the vfs layer or the encoding conversion is, and the next thing to read is `Tcl_FSGetNativePath` returning NULL |
+| **`file rename` also fails** | the two share `CopyRenameOneFile`, so it is above the copy-specific code entirely |
+
+`pwd` and the two `file normalize` lines are the whole diagnosis if it is
+the first case: they print the absolute path Tcl is about to use, and a
+wrong one is visible on sight.
+
+**And this is why the probe was worth writing even though it passed.**
+Six mechanisms had been argued from the source; the probe did not name
+the bug, but it removed every one of them at once and moved the search
+up a layer. A measurement that refutes is not a wasted round.
