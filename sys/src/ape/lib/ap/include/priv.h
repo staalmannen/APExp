@@ -34,6 +34,19 @@ struct Rock
 	struct sockaddr	raddr;		/* peer address */
 	char		ctl[Ctlsize];	/* name of control file (if any) */
 	int		other;		/* fd of the remote end for Unix domain */
+	/*
+	 * APPENDED, never inserted: this struct is shared by every object
+	 * in ap/network, and inserting a field would change the offset of
+	 * every one after it for any object that did not get rebuilt.
+	 *
+	 * A connect() in progress on a NON-BLOCKING socket. Plan 9's
+	 * connect is a write to the ctl file and that write blocks until
+	 * the conversation is made or refused, so "in progress" has to be
+	 * another process doing it. See network/connect.c.
+	 */
+	int		cpid;		/* the process doing the connect, 0 none */
+	int		cfd;		/* the pipe it reports its errno on */
+	int		cerr;		/* that errno once read, -1 until then */
 };
 
 extern Rock*	_sock_findrock(int, struct stat*);
@@ -48,3 +61,4 @@ extern int	_sock_inisany(int af, void *addr);
 extern int	_sock_inaddr(int, char*, char*, void*, int*);
 extern void	_sock_ingetaddr(Rock*, void*, int*, char*);
 extern char*	_sock_inaddr2string(Rock *r, char *dest, int dlen);
+extern int	_sock_connectdone(Rock*);

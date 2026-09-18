@@ -5911,3 +5911,78 @@ result. On Plan 9 the connect is a write to the ctl file, so "in
 progress" means a process doing that write while the caller goes back to
 its event loop -- the same shape as `listenproc`, and the machinery for
 it already exists in `_buf.c`.
+
+#### Asynchronous connect: it had never worked, and the leak had been hiding that
+
+`socket -async` reaches libap as `fcntl(O_NONBLOCK)` then `connect()`,
+and `network/connect.c` had **no `O_NONBLOCK`, no `EINPROGRESS`, and no
+deferred completion** in its 109 lines -- the ctl write was always done
+in the calling process. `getsockopt(SO_ERROR)`, which is how Tcl reads
+the outcome (`tclUnixSock.c:1420`), was
+
+```c
+case SO_ERROR:
+	*(int*)v = 0;
+	return 0;
+```
+
+-- a hard-coded "no error" for a connection that may never have been
+made. **Both halves were stubs, and the second is the kind that rots
+quietly**: a test exercising only the first would have passed over it.
+
+**Why it took a leak fix to become visible.** `socket-14.14`/`14.15`
+were passing because `randport` certifies a port free by opening and
+closing a server socket on it, and the leak left a listener holding the
+port it had just certified -- so the async connect reached that leftover
+and succeeded. Nothing about `-async` was being tested at all.
+
+**Why an asynchronous connect needs a process.** On Plan 9 a connect is
+`write(ctl, "connect a!p")`, and that write does not return until the
+conversation is made or refused; there is no "start it and tell me
+later" form. So it is another process doing the write while the caller
+returns to its event loop -- the same shape as `listenproc`, for the
+same reason. `_RFORK(RFFDG|RFPROC|RFNOWAIT)` as `_timerproc` uses, so
+there is no wait record for anyone to reap, and the child closes every
+inherited descriptor but its report pipe, which is `listen.c`'s lesson
+about a held descriptor 1 applied before it could cost anything.
+
+**The approximation that remains, stated rather than hidden.**
+`select()` reports every descriptor in the WRITE set ready at once --
+"for now, we'll say they are all ready", which predates this by years --
+so Tcl is told the socket is writable before the connect has resolved
+and asks for `SO_ERROR` immediately. `getsockopt` therefore **waits**
+for the answer rather than returning 0. That is a caller blocking
+briefly; the alternative is an unresolved connect reported as success,
+which is the `XLoadFont` family. The real fix is `select()` learning
+about a pending connect, and it belongs in `_buf.c` with its own
+measurement.
+
+**`_sock_newrock` reuses a Rock when dev/inode match and `malloc` does
+not zero one**, so the three new fields are initialised on the fresh
+path and reset on the reuse path -- and the reuse path *closes* a report
+pipe whose result nobody collected, which bounds that at one descriptor
+per socket rather than one per connect. *When a struct is recycled,
+reset every field that means something* was already a rule here; this is
+the first time it has been applied before the bug rather than after.
+
+**`priv.h` gained three fields, APPENDED**, and `unistd/mkfile` gained
+an `HFILES` for it -- `writev.c` includes `priv.h` without using `Rock`,
+and a header not in `HFILES` is a header `mk` does not rebuild for.
+
+**`asyncconnect-test.c` does not assert EINPROGRESS**, and that is the
+interesting part of writing it. On Linux a non-blocking connect to a
+dead port on the loopback can fail immediately with ECONNREFUSED --
+there is no round trip to be in progress -- so asserting EINPROGRESS
+would fail on glibc and say nothing about either system. What both must
+agree on is the contract: *a non-blocking connect either resolves now or
+reports EINPROGRESS, and if it reported EINPROGRESS then SO_ERROR gives
+the real answer and never a false 0.* Section 3 is the control, an
+ordinary blocking connect still failing with ECONNREFUSED, so a change
+that broke normal connects could not hide behind the sections above.
+0 failures on glibc, which as it happens does report EINPROGRESS there.
+
+**Prediction, observation only.** `asyncconnect-test` reports 0 failures
+on the VM. `socket-14.14` and `14.15` are the reason this was written
+but they are NOT predicted: 14.14 needs the failed connect to make the
+socket readable, which goes through the copy process on the data file,
+and nothing here has measured that it does.

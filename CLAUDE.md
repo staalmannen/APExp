@@ -183,6 +183,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `sigset-test.c`, `posix-spawn-test.c`, `limits-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
 `execve-env-test.c`, `tz-test.c`, `rename-test.c`, `listenleak-test.c`,
+`asyncconnect-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
@@ -677,11 +678,16 @@ Open, in order of what the next run should touch:
   raises the error at `socket -async` rather than on a `fileevent`:
   **`network/connect.c` has no `O_NONBLOCK`/`EINPROGRESS` path at all,
   so `socket -async` has never worked.** Nothing broke; something that
-  never worked stopped being hidden. **Next piece of work**: async
-  connect -- start the conversation, return `EINPROGRESS`, report
-  writable from `select()` with `getsockopt(SO_ERROR)` carrying the
-  result. Same shape as `listenproc`; `_buf.c` already has the
-  machinery.
+  never worked stopped being hidden. **Async connect is now implemented** (mark 7),
+  **not yet confirmed**: `connect()` on an `O_NONBLOCK` descriptor forks
+  `_RFORK(RFFDG|RFPROC|RFNOWAIT)` to do the ctl write and returns
+  `EINPROGRESS`; the child reports its errno down a pipe;
+  `getsockopt(SO_ERROR)` -- which returned a hard-coded 0 -- now gives
+  the real answer. **The remaining approximation**: `select()` calls
+  every write descriptor ready at once, so `SO_ERROR` is asked before
+  the connect resolves and therefore WAITS rather than answering 0. The
+  real fix is `select()` learning about a pending connect. `Rock` gained
+  three APPENDED fields; `unistd/mkfile` gained `HFILES` for `priv.h`.
 - **Still unread: `io` 23, `chan-io` 19, `socket_inet` 16,
   `filename` 17, `socket` 10.** `filename`'s are all `Tcl_GlobCmd`.
 - **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a

@@ -114,7 +114,7 @@ static int killing;
 int
 _sock_listenmark(void)
 {
-	return 6;	/* 6: _timerproc/_killtimerproc say who makes and ends a timer */
+	return 7;	/* 7: connect() understands O_NONBLOCK */
 }
 
 /*
