@@ -95,12 +95,40 @@ _envsetup(void)
 			if(p[n+1+i]=='\0')
 				p[n+1+i] = '\1';
 		p[n+1+m] = '\0';
+		/*
+		 * `_fdinfo` and `_sighdlr` ARE LIBAP'S OWN BOOKKEEPING AND
+		 * MUST NOT APPEAR IN environ. They are how descriptor flags
+		 * and ignored signals cross an exec (see execve.c, which
+		 * writes both), they are consumed right here by `_fdinit` and
+		 * `sigsetup`, and a program has no business seeing them --
+		 * Tcl's env.test asks a child to list its environment and got
+		 *
+		 *	_fdinfo=0 34 0\n1 2 2\n...
+		 *	_sighdlr=
+		 *
+		 * back. Private bookkeeping leaking into a public interface is
+		 * the `XLoadFont` family inverted: not a stub answering for
+		 * work it did not do, but an implementation detail answering
+		 * as though it were data.
+		 *
+		 * Dropping them is safe because `environ` is not the
+		 * transport: `execve` writes `/env/_fdinfo` and
+		 * `/env/_sighdlr` itself, and a child reads `/env` rather
+		 * than inheriting this array. Both are parsed into tables
+		 * before the buffer is reused, so not advancing `p` simply
+		 * lets the next entry overwrite them.
+		 *
+		 * `nohandle` stays visible: it is a knob a user sets, not
+		 * something libap writes.
+		 */
 		if(strcmp(d9->name, "_fdinfo") == 0) {
 			_fdinit(p+n+1, p+n+1+m);
 			fdinited = 1;
-		} else if(strcmp(d9->name, "_sighdlr") == 0)
+			continue;
+		} else if(strcmp(d9->name, "_sighdlr") == 0) {
 			sigsetup(p+n+1, p+n+1+m);
-		else if(strcmp(d9->name, "nohandle") == 0)
+			continue;
+		} else if(strcmp(d9->name, "nohandle") == 0)
 			nohandle = 1;
 		p += n+m+2;
 		cnt++;

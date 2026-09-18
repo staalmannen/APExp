@@ -463,13 +463,23 @@ log-derived count agree at last.
 
 Open, in order of what the next run should touch:
 
-- **`fCmd`, `io` 22, `chan-io` 19, `socket_inet` 18, `filename` 17,
-  `clock` 16, `socket` 10, `env` 9** -- none of these clusters has been
-  read. `fCmd`'s copy and rename sections `6.x` and `18.x` did *not*
-  move with the `utime` fix, so they are separate bugs.
+- **Fixed, not yet confirmed -- `env` 9, two bugs in one cluster**:
+  `_fdinfo` and `_sighdlr`, libap's own exec bookkeeping, were appearing
+  in `environ`; and `execve` only ever *created* `/env` entries, so
+  `unsetenv()` never reached a child and anything inherited survived
+  whatever `envp` said. The child's environment is exactly `envp` now.
+  See `docs/notes/tcl-suite.md`.
+- **Still unread: `fCmd` 35, `io` 22, `chan-io` 19, `socket_inet` 17,
+  `filename` 17, `clock` 16, `socket` 10.** `filename`'s are all
+  `Tcl_GlobCmd`; `clock`'s are all `:localtime` with `TZ` changing, so
+  they may move with the `env` fix. `fCmd` fell 73 -> 35 with the full
+  rebuild alone.
 - **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a
   password database mapping a user to a home directory, which Plan 9
   has not -- read it before writing it off.
+- **A failed `execve()` now also empties `/env`**, on top of rforking the
+  environment group, rewriting `_fdinfo`/`_sighdlr` and closing every
+  `FD_CLOEXEC` descriptor. `environ` is untouched, so it is bounded.
 - `chan-io-6.4x`: `-buffersize 16` with `testchannel inputbuffered`
   reporting 0. The oldest open item here.
 - `binary-53.25`/`53.26`: a double one ulp past the float range must
