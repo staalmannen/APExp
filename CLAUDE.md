@@ -182,7 +182,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `rol64-test.c` and `u64float-test.c`, and for libap `locale-test.c`,
 `sigset-test.c`, `posix-spawn-test.c`, `limits-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
-`execve-env-test.c`, `tz-test.c`,
+`execve-env-test.c`, `tz-test.c`, `rename-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
@@ -495,10 +495,12 @@ or a constraint that fails on Linux too). The port's own share is
 `focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
 
 **Tcl's suite**: **it finishes and nothing aborts.**
-`Total 68118 Passed 62048 Skipped 5887 Failed 183`, 167 files, marker,
-exit 0, and no `Test files exiting with errors` section -- the first run
-here where every file reports its own result, so `Failed` and the
-log-derived count agree at last.
+`Total 68118 Passed 62056 Skipped 5887 Failed 175`, 167 files, marker,
+exit 0, and no `Test files exiting with errors` section.
+
+**A count in the per-file table is executions, not tests**: `clock`'s
+16 were 4 tests run twice each (`.vm:0`/`.vm:1`). Size a cluster from
+the names, not the number.
 
 Open, in order of what the next run should touch:
 
@@ -519,7 +521,10 @@ Open, in order of what the next run should touch:
   tests `usepath` first and the child calls `execvp`, which passes
   `environ`. POSIX says `envp` is the child's environment either way.
   Recorded, not fixed, not measured. Tcl's `exec` is the caller.
-- **`clock` 16: fixed, not yet confirmed.** `$TZ` reached nothing:
+- **`clock` 16 -> 0, CONFIRMED**, and nothing else moved: `Passed` +8,
+  `Total` and `Skipped` identical, no new failure anywhere -- so `%Z`
+  printing the real zone name instead of always `EST`/`EDT` broke
+  nothing. The cause: `$TZ` reached nothing.
   `tzset()` parsed `getenv("timezone")`, Plan 9's spelling, while
   `localtime_r` separately read `/env/timezone` **once per process** into
   a static of its own, and neither had heard of `TZ`. Nothing set
@@ -530,9 +535,21 @@ Open, in order of what the next run should touch:
   **empty** name when neither parses. **`%Z` changing for every zone is
   the thing to watch beyond `clock`.** No zoneinfo, so
   `TZ=America/New_York` is UTC; glibc does the same here without tzdata.
-- **Still unread: `fCmd` 35, `io` 22, `chan-io` 19, `socket_inet` 17,
+- **`fCmd` 35 + `unixFCmd` 4: read and sorted.** 15 need symbolic links
+  and 8 need a password database -- both out of reach. The other 12+ are
+  two bugs, both fixed and **not yet confirmed**: (a) `rename()` of a
+  directory into a *different* directory always failed, because the
+  cross-directory copy path did `_CREATE(to, OWRITE, s->mode)` and a
+  directory cannot be opened for writing -- which also produced the
+  "invalid operation" that two permission tests were reading; an empty
+  one is now recreated and removed, a non-empty one answers `EXDEV`,
+  which Tcl acts on. Plus `EINVAL` for a directory moved into itself,
+  compared **by qid up the tree, not by string** (`../td1/foo`). (b)
+  `_errno.c` mapped Plan 9's "permission denied" to `EPERM`; POSIX wants
+  `EACCES` there and keeps `EPERM` for "not the owner", which is what
+  `wstat -- not owner` still maps to.
+- **Still unread: `io` 23, `chan-io` 19, `socket_inet` 17,
   `filename` 17, `socket` 10.** `filename`'s are all `Tcl_GlobCmd`.
-  `fCmd` fell 73 -> 35 with the full rebuild alone.
 - **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a
   password database mapping a user to a home directory, which Plan 9
   has not -- read it before writing it off.
@@ -559,6 +576,10 @@ stock-looking, which refuted my own architecture-directory diagnosis.
 **And the deep-path abort was cleared by the full rebuild, not by any
 constant** -- most likely the `fts_alloc` fix from four rounds ago
 finally reaching `tcltest`, which gives the new build rule below.
+
+**Not ours**: `unixFCmd-1.1` wants `EACCES` from walking *through* a
+mode-0 directory; Plan 9 answers "does not exist". The file server's
+choice, so a probe rather than a library rule.
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR; and over a hundred leaked

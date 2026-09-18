@@ -26,7 +26,26 @@ static struct errmap {
 	{EISDIR,	"file is a directory"},
 	{EINVAL,	"bad character in file name"},
 	{EINVAL,	"file name syntax"},
-	{EPERM,	"permission denied"},
+	/*
+	 * EACCES, NOT EPERM. POSIX splits the two: EACCES is "the
+	 * permission bits say no", EPERM is "you are not the owner and
+	 * only the owner may do this". Plan 9's Eperm is raised by the
+	 * ordinary file permission check, so it is the first of those.
+	 *
+	 * It was EPERM here, and Tcl's fCmd-4.11 and fCmd-6.6 are what
+	 * found it: both make a directory mode 0, do something inside it,
+	 * and compare the message exactly --
+	 *
+	 *	was:    can't create directory "td1/td2/td3": operation not permitted
+	 *	wanted: can't create directory "td1/td2/td3": permission denied
+	 *
+	 * `wstat -- not owner' and `wstat -- not in group' below stay
+	 * EPERM, which is exactly the case EPERM is for. Nothing in libap
+	 * reads EPERM back out of this table -- every other use sets it
+	 * directly -- so this changes a message and not a control flow;
+	 * note that `bind()' gates its fallback on EPLAN9, not on this.
+	 */
+	{EACCES,	"permission denied"},
 	{EPERM,	"inappropriate use of fd"},
 	{EINVAL,	"bad arg in system call"},
 	{EBUSY,	"device or object already in use"},
