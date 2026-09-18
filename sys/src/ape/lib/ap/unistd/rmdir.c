@@ -51,6 +51,15 @@ notempty(const char *path)
 	struct dirent *e;
 	int n;
 
+	/*
+	 * A FAILED opendir MEANS "CANNOT TELL", NOT "EMPTY", and the
+	 * caller below is written for that: it leaves the original
+	 * unrecognised errno alone rather than claiming ENOTEMPTY. Saying
+	 * so here because a note elsewhere read this 0 as proof that a
+	 * directory was empty, and it is not -- the answer has two
+	 * explanations, which is the trap this tree has recorded three
+	 * times.
+	 */
 	if((d = opendir(path)) == 0)
 		return 0;
 	n = 0;

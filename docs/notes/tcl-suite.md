@@ -3878,3 +3878,155 @@ are 39 of its 80 -- should move substantially. The count in the suite
 total will *rise*, because three files that reported nothing now report
 their real numbers: newly measured, not newly broken, for the fifth
 time.
+
+#### CONFIRMED: the copy works, three aborts become none, and the tally is honest
+
+`copyfile-test` reports 0 failures with `utime ... returned 0`, and
+`file copy -force a.txt b.txt` in `tclsh` simply returns. The suite:
+
+```
+all.tcl:  Total 67898  Passed 61985  Skipped 5695  Failed 218
+Sourced 167 Test Files.
+Test files exiting with errors:  unixFCmd.test  winFCmd.test
+```
+
+**Five aborting files become two.** `encoding.test`, `http.test` and
+`fCmd.test` now run to the end; what is left is the deep-path delete,
+which is its own bug. `Total` rises by 890 and `Failed` by 66 -- **the
+count going up is three files reporting their real numbers for the first
+time**, which is the fifth instance of "newly measured, not newly
+broken", and this time it was predicted rather than discovered.
+
+**The honest tally is the log, and it went the other way**: 239 -> 225
+by the per-file table, because `Failed` cannot see a file that aborts.
+Two numbers moving in opposite directions is what that looks like.
+
+**Per file, and nothing regressed:**
+
+| | old | new | |
+|---|---|---|---|
+| `cmdAH` | 10 | **4** | sections 23, 24 and 33 to zero |
+| `fCmd` | 80 | **73** | 21 fixed, 10 newly reached |
+| `filename` | 18 | 17 | |
+| `tcltest`, `zipfs-mount-one-arg` | 1 | 0 | |
+| `http` | 0 | 2 | newly measured; it used to abort |
+
+`cmdAH-23.x` is `file lstat`, `24.x` is `file mtime`, `33.x` is `file
+atime` -- every one of them a timestamp, which is exactly the shape of
+the bug.
+
+**And the prediction was half wrong, which is worth recording.** It said
+`fCmd`'s copy and rename clusters -- `2.x`, `6.x`, `18.x`, `21.x`, 39
+tests -- "should move substantially". **21 moved**, across sections 2
+(5->1), 10, 13, 14, 21 (11->8), 22 and 25 (3->0), and `6.x` and `18.x`
+did not move at all. So `utime` was one cause among several in those
+clusters and the rest are separate bugs; the copy and rename work is not
+finished, it is merely unblocked.
+
+**The ten that appeared are newly reachable, and they are one cluster.**
+`fCmd.test` used to abort inside the `28.x` block, so everything after
+it had never run:
+
+```
+fCmd-31.6  file home USER
+fCmd-32.5  file tildeexpand ~USER
+fCmd-32.9  file tildeexpand ~USER/bar
+fCmd-32.17 file tildeexpand ~USER does not mirror HOME
+```
+
+`~USER` expansion, which needs a password database mapping a user name
+to a home directory. Plan 9 has none -- `_getpw` in libap answers
+numeric ids, not homes -- so this is likely the `systray` case again:
+the machine has no concept of the thing being asked about. Worth reading
+properly before it is written off, since `$home` exists and the four
+`31.x`/`32.x` tests that do *not* name a USER pass.
+
+**What is left at the top**, by the per-file table: `fCmd` 73, `io` 22,
+`chan-io` 19, `socket_inet` 18, `filename` 17, `clock` 16, `socket` 10,
+`env` 9. None of these has been read yet, and `fCmd`'s remaining 73 now
+divide into `6.x`/`18.x` (copy and rename, untouched by the timestamp
+fix) and the `~USER` cluster.
+
+#### The deep-path delete: PATH_MAX was 255, and that was ours
+
+The last two aborting files, `unixFCmd.test` and `winFCmd.test`, both
+die in `fCmd.test`'s `cleanup` on a tree about fifty levels deep:
+
+```
+error deleting "./tfad/dir/... x55": invalid operation
+```
+
+**`invalid operation` is hjfs's message for a non-empty directory** --
+measured in `rmdir-test`, not guessed -- so the recursive delete had
+failed to empty it.
+
+**A CORRECTION FIRST, AND IT IS MINE.** This file previously read that
+as "with the directory empty, so it is the path and not the contents".
+That was wrong. `rmdir()`'s `notempty()` returns 0 **both** when the
+directory really is empty and when `opendir()` on it fails -- *a check
+whose negative result has two explanations*, which is a rule already in
+these notes, in code written two rounds ago. The comment in `rmdir.c`
+says so now. The conclusion happened to survive; the evidence for it did
+not exist.
+
+**The limit was a definition in our own header:**
+
+```c
+#define PATH_MAX _POSIX_PATH_MAX	/* 255 */
+#define NAME_MAX _POSIX_NAME_MAX	/*  14 */
+```
+
+Those are the numbers POSIX guarantees every implementation supports
+**at least**, used as though they were what this one supports at most.
+**Plan 9 has no inherent path limit** -- 9P walks one element at a time
+and never carries a whole path -- so the wall was entirely APE's.
+
+What sits behind it:
+
+- **`realpath()` is musl's** and declares `char stack[PATH_MAX+1]` and
+  `char output[PATH_MAX]`, refusing anything longer outright. Tcl's
+  `TclpObjNormalizePath` calls it.
+- **Tcl's own buffers**: `TclpObjRenameFile` has
+  `char srcPath[MAXPATHLEN], dstPath[MAXPATHLEN]`, `tclUnixFile.c` has
+  three more. A 550-character path could be neither normalised nor
+  walked.
+- **14 was already contradicted next door.** `<dirent.h>` sets
+  `MAXNAMLEN` to 255 and `struct dirent` is `char d_name[MAXNAMLEN+1]`,
+  so libap has always returned names longer than `NAME_MAX` said were
+  possible.
+
+`PATH_MAX` is **4096** now, Linux's value and what portable code is
+tested against, with `MAXPATHLEN` derived from it; `NAME_MAX` is 255.
+`_POSIX_NAME_MAX` and `_POSIX_PATH_MAX` keep their standard values --
+they are the guarantee, and code does compare against them.
+
+`NAME_MAX` is spelled as a literal rather than `MAXNAMLEN`, because that
+lives in `<dirent.h>` and a macro expanding to it would break every use
+of `NAME_MAX` without that header. Caught on the host in one compile.
+
+**It costs stack.** `realpath()` now has 8 KB of locals in one frame,
+which is exactly what it costs on Linux; `at_functions.c` has two
+`PATH_MAX` buffers in a few functions.
+
+**THIS NEEDS `mk distclean` BEFORE `mk install`.** `limits.h` is a
+system header, no mkfile here lists one as a dependency, and every
+object with a `char buf[PATH_MAX]` has the old 255 compiled in. A
+partial rebuild is the `HFILES` shape: logically inert, broadly and
+unattributably wrong.
+
+`sys/lib/tests/deeppath-test.c` measures it -- builds 140 levels (~700
+characters), then `stat`s, `opendir`s and `realpath`s the deepest, then
+removes the lot, reporting errno and Plan 9's errstr at whichever step
+first refuses. **Its own buffer is 16 KB rather than `PATH_MAX`**,
+because the constant is the thing under test and a probe sized by the
+value it is measuring cannot report that the value is wrong. It prints
+`PATH_MAX` before anything else, so a green run says which build
+produced it.
+
+**Prediction.** Before the rebuild: `deeppath-test` fails, most likely
+first at `realpath` and then at the `> _POSIX_PATH_MAX` assertion; the
+depth it reaches is the interesting number, because `mkdir` and `rmdir`
+go straight to 9P and may well have no limit at all. After: 0 failures,
+140 levels, and **no test file exits with an error** -- the first suite
+run in this project with none. The failure count should barely move,
+since the two files aborted near their ends.

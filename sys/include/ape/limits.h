@@ -84,13 +84,46 @@
 /*#define MAX_INPUT _POSIX_MAX_INPUT */
 /*#define MQ_OPEN_MAX _POSIX_MQ_OPEN_MAX */
 /*#define MQ_PRIO_MAX _POSIX_MQ_PRIO_MAX */
-#define NAME_MAX _POSIX_NAME_MAX
+/*
+ * NAME_MAX AND PATH_MAX ARE THIS SYSTEM'S LIMITS, NOT THE STANDARD'S
+ * MINIMA. `_POSIX_NAME_MAX` (14) and `_POSIX_PATH_MAX` (255) are what
+ * POSIX guarantees every implementation supports *at least*; defining
+ * the real names as those numbers claims this system can do no better,
+ * and it can.
+ *
+ * 14 was already contradicted inside these headers: `<dirent.h>` sets
+ * `MAXNAMLEN` to 255 and `struct dirent` is `char d_name[MAXNAMLEN+1]`,
+ * so libap has always returned names far longer than `NAME_MAX` said
+ * were possible.
+ *
+ * 255 for a path is worse, because it is a wall rather than a wrong
+ * number. `realpath()` is musl's and declares `char stack[PATH_MAX+1]`
+ * and `char output[PATH_MAX]`, refusing anything longer; Tcl's
+ * `TclpObjNormalizePath` and its directory walker each declare
+ * `char buf[MAXPATHLEN]`. Tcl's `fCmd.test` builds a tree about fifty
+ * levels deep -- roughly 550 characters -- and could then neither
+ * normalise nor traverse nor delete it, which aborted `unixFCmd.test`
+ * and `winFCmd.test` outright with `invalid operation`, hjfs's way of
+ * saying a directory still has something in it.
+ *
+ * Plan 9 has no inherent path limit: 9P walks one element at a time and
+ * the protocol never carries a whole path. 4096 is Linux's value, which
+ * is what portable code is tested against. It costs 8 KB of stack in
+ * `realpath()`, which is what it costs on Linux too.
+ *
+ * `_POSIX_NAME_MAX` and `_POSIX_PATH_MAX` keep their standard values
+ * above: they are the guarantee, and code does compare against them.
+ */
+/* 255, spelled out: MAXNAMLEN lives in <dirent.h> and a macro that
+ * expanded to it would break every use of NAME_MAX without that
+ * header. Keep the two in step by hand. */
+#define NAME_MAX 255
 #define NGROUPS_MAX 10
 /*#define OPEN_MAX _POSIX_OPEN_MAX */
 /*#define PAGESIZE 1 */
 #define PASS_MAX 64
-#define PATH_MAX _POSIX_PATH_MAX
-#define MAXPATHLEN _POSIX_PATH_MAX
+#define PATH_MAX 4096
+#define MAXPATHLEN PATH_MAX
 #define PIPE_BUF _POSIX_PIPE_BUF
 /*#define RTSIG_MAX _POSIX_RTSIG_MAX */
 /*#define SEM_NSEMS_MAX _POSIX_SEM_NSEMS_MAX */
