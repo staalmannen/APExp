@@ -5357,3 +5357,64 @@ means something, since a kill demonstrably happens. **`chan-io-29.34`
 remains genuinely open** -- the earlier freeze was measured against the
 descriptor-keyed version, and nothing since has retested it. Run
 `chanio.test -singleproc 1 -verbose t` before the suite.
+
+#### The leak is fixed, confirmed, and the freeze moved 115 files later
+
+```
+--- 0. which libap is linked in ---
+  note libap listen bookkeeping: mark 3 (this tree is 3)
+--- 1. close a listener, then take its port back ---
+  PASS the port can be bound again once the socket is closed
+--- 2. five times over, which is what makes it sharp ---
+  PASS five close-and-rebind rounds all succeeded
+--- 3. close the LISTENER while a connection is in use ---
+  PASS a message arrives before the listener is closed
+  PASS ...and one still arrives after it is closed
+  PASS the accepted connection reports end of file
+0 failure(s)
+```
+
+**Mark 3, so the library under test is the one that was pulled** -- the
+first run in this whole sequence where that was not in question, and the
+marker is why. Sections 1 and 2 pass, so a kill demonstrably happens and
+the port is demonstrably released; section 3 therefore *means* something
+now, and what it means is that ending the listener leaves an accepted
+connection alone.
+
+`chanio.test` passes too, so the `chan-io-29.34` freeze is gone. It
+belonged to the descriptor-keyed version, as suspected but not
+previously shown.
+
+**The prediction held, and it is worth noting which kind it was**: it
+predicted the OBSERVATION (sections 1 and 2 go to zero) and said nothing
+about what to conclude. The three before it, which bundled a conclusion
+in, were all wrong.
+
+**The suite now freezes in `socket.test`, file 129 of 167.** It was file
+14 before. No marker, no `Total`, and the last line in the log is the
+file name with nothing after it.
+
+**Two candidates, and they are not the same thing:**
+
+- **A regression from the kill.** `socket.test` is full of
+  `socket -server` followed by `close`, which is exactly the new code
+  path, and the file completed in the last full run.
+- **A hang that was never reachable before.** This is the first run in
+  which ports are actually released. Tests that used to fail fast with
+  `EADDRINUSE` -- against a leftover listener from a previous run --
+  now get their socket and proceed into code nothing here has ever
+  executed. *A fix that makes a process reach code it never reached
+  before can expose anything on that path* is already a rule in this
+  file, and it was written for exactly this shape.
+
+**The next run is one command and it should carry the debug lines**, so
+that the listener decisions interleave with the test names and the last
+`recorded`/`killing` before the silence is visible:
+
+```
+APEXP_LISTENDEBUG=1 tcltest socket.test -singleproc 1 -verbose t
+```
+
+`-verbose t` names the test; `APEXP_LISTENDEBUG` says whether a listener
+was being killed when it stopped, and which one. Nothing is predicted
+about the cause -- only that those two lines together will name it.
