@@ -4030,3 +4030,71 @@ go straight to 9P and may well have no limit at all. After: 0 failures,
 140 levels, and **no test file exits with an error** -- the first suite
 run in this project with none. The failure count should barely move,
 since the two files aborted near their ends.
+
+#### NO FILE ABORTS -- and two corrections, both mine
+
+```
+all.tcl:  Total 68118  Passed 62048  Skipped 5887  Failed 183
+```
+
+and **no `Test files exiting with errors:` section at all**. That is the
+first run in this project where every one of the 167 files reports its
+own result. `Failed` 218 -> 183, and the log-derived count 218 -> 183
+with it; the two agree for the first time, because nothing is hiding
+behind an abort any more.
+
+**CORRECTION 1: `PATH_MAX` was never 255, and my change was inert.**
+`deeppath-test` printed
+
+```
+note PATH_MAX 1023, MAXPATHLEN 1023, NAME_MAX 27
+```
+
+-- **identical before and after the rebuild**, and matching neither the
+255/14 this tree used to define nor the 4096/255 it defines now. Those
+are **stock APE's** numbers. `sys/include/ape/limits.h` has never been
+read by anything: `pcc` searches `/$objtype/include/ape` first
+(`pcc.c:234-235`) and stock keeps a `limits.h` there. It is the same
+trap as `float.h`, `stdarg.h` and `stdint.h`, for the **fourth** time,
+and the guard made it worse in the same way -- this tree's file opened
+`#ifndef __LIMITS`, which is stock's guard too, so whichever was read
+second compiled to nothing.
+
+Fixed the way the tree already fixed the other three: the content is
+`limits_generic.h`, `limits.h` is a wrapper, and **the wrapper exists in
+all eleven architecture directories** so stock's copy is never reached.
+`deeppath-test` prints `<limits.h> came from THIS TREE` now, which is
+`_APEXP_FD_SET_T`'s trick again -- **ask the header, do not infer from
+the numbers.**
+
+**CORRECTION 2: the abort was not the constant, it was the rebuild.**
+The two `deeppath-test` runs bracket a `mk distclean; mk install` and
+are byte-identical, so nothing about the limit changed; yet
+`unixFCmd.test` and `winFCmd.test` stopped aborting. The only other
+thing that happened is the full rebuild.
+
+**The likely reason is `fts_alloc`, fixed four rounds ago.** That bug --
+two `if` bodies commented out, so `fts_statp` was never allocated -- is
+in the traversal `TclpObjRemoveDirectory` uses for a recursive delete,
+which is exactly what could not empty that tree. `libap.a` was rebuilt
+when the fix went in; **`tcltest` was not necessarily relinked**, and a
+static library fix reaches nothing until the binary that uses it is
+linked again.
+
+That is a new trap and it belongs with the `HFILES` one, a level up:
+**`mk install` rebuilds a library without relinking the binaries that
+already exist against it.** Everything in this campaign was measured on
+binaries that may have been carrying a mixture of old and new libap, and
+the fix is the same as for a header change -- `distclean` when a library
+change has to reach a program.
+
+`PATH_MAX` is still worth raising: **1023 is a real wall** and
+**`NAME_MAX` 27 is simply wrong**, since `<dirent.h>` gives `struct
+dirent` a `d_name[MAXNAMLEN+1]` with `MAXNAMLEN` 255. But it fixes
+nothing that is currently failing, and saying otherwise would be the
+mistake this section is correcting.
+
+**Prediction.** `deeppath-test` reports `PATH_MAX 4096, NAME_MAX 255`
+and `came from THIS TREE`, and 0 failures. The suite should not move at
+all; if it does, the eleven new headers changed something that was
+depending on stock's values, and the per-file table says which.

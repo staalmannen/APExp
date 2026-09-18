@@ -116,6 +116,19 @@ main(void)
 	printf("  note PATH_MAX %d, NAME_MAX %d (no MAXPATHLEN here)\n",
 		(int)PATH_MAX, (int)NAME_MAX);
 #endif
+	/*
+	 * WHICH limits.h A COMPILE ACTUALLY READ, asked rather than
+	 * inferred. `/$objtype/include/ape` is searched before
+	 * `/sys/include/ape`, so stock APE's copy shadows this tree's
+	 * unless a real file in every architecture directory shadows it
+	 * back. This line is what found that: the numbers above were
+	 * stock's, not the ones sitting in the tree.
+	 */
+#ifdef _APEXP_LIMITS_H
+	printf("  note <limits.h> came from THIS TREE\n");
+#else
+	printf("  note <limits.h> did NOT come from this tree\n");
+#endif
 	printf("  note _POSIX_PATH_MAX %d, _POSIX_NAME_MAX %d"
 		" (the standard's MINIMA)\n",
 		(int)_POSIX_PATH_MAX, (int)_POSIX_NAME_MAX);
