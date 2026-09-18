@@ -600,12 +600,19 @@ Open, in order of what the next run should touch:
   **the connection is never accepted**. The previous test's listener was
   at the same `fd=10` and had been killed. `listenleak-test` **section 4**
   (three rounds of listen/connect/accept/exchange/close) **passes**, so
-  that reduction was wrong. **Section 5 is the real one**: 2.11 reaches
-  its accept through `select()`, and in libap `select()` on a listening
-  socket is a **copy process** reading the pipe (`plan9/_buf.c`) -- a
-  mechanism a blocking `accept()` never touches, since it reads the pipe
-  itself. Killing a listener closes that pipe's write end under a live
-  copy process, which is new. 2.11 was already failing before this change
+  that reduction was wrong. Section 5 adds `select()` before the
+  accept and **also passes**, so two reductions have failed and the next
+  step is the frozen process, not a third guess. Reading narrows it:
+  2.11's `vwait sock` has no `after` outstanding, so `select()` arms **no
+  timer** and its only possible wakeup is a copy process reaching
+  `_RENDEZVOUS(&mux->selwait, 0)` -- which matches the debug output, where
+  the timer-reset lines tick eight times and stop. **That is the shape of
+  the recorded, never-measured hazard**: *a copy process reaching EOF
+  before the parent sets `selwait`*. `socket_inet-2.10`, just before,
+  closes its server socket **from inside the accept callback**, so the
+  listener is killed at an unusual point and 2.11 reuses the descriptor.
+  **`ps` on the frozen process should settle it**: `Rendez` means the
+  lost wakeup, `Pread`/`Open` means it is blocked in a call instead. 2.11 was already failing before this change
   (a timing result), so the hang is new but the test was never healthy.
 - **`socket_inet-5.1`/`5.3` were passing for the WRONG REASON** -- a
   leftover listener was refusing the bind, not the system -- so they are

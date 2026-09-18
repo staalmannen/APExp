@@ -5525,3 +5525,68 @@ left behind by killing a listener under a live copy process, and the
 order in `close()` -- `_sock_killlisten` before `_closebuf`, which this
 round's version does and the pre-`chan-io-29.34` version did not -- is
 the first thing to look at.
+
+#### Section 5 passed too: stop reducing, look at the process
+
+Mark 4, sections 1 to 5 all pass -- including three rounds of
+listen/connect/**select**/accept/exchange/close. **Two reductions in a
+row have failed to reproduce `socket_inet-2.11`**, and that is itself
+the finding: whatever the test does, it is not the sequence of calls,
+and guessing a third shape would be the fourth guess in a row.
+
+*This tree's own note says `ratrace` "names a failing system call
+outright where elimination takes rounds", and that elimination is
+exactly what the last two rounds were.*
+
+**What reading DOES give, cheaply, is the place to look.** 2.11's body
+is
+
+```tcl
+set s2 [socket $localhost port]
+vwait sock
+```
+
+with no `after` outstanding, so `select()` is called with **no timeout**.
+In `_buf.c` that path is:
+
+```c
+if(timeout) { ... _resettimer(); }	/* NOT taken */
+mux->selwait = 1;
+unlock(&mux->lock);
+fd = _RENDEZVOUS(&mux->selwait, 0);	/* blocks until a COPY PROCESS wakes it */
+```
+
+**No timer is armed, so the only possible wakeup is a copy process.**
+That is precisely what the debug output shows from outside: the
+`close ... fd=5` lines are timer resets, they tick eight times, and then
+they stop -- because the select that never returned is the one that
+armed no timer.
+
+So the question has narrowed to: **the copy process for 2.11's listening
+socket never reports it readable.** And there is an open hazard in this
+file, recorded and never measured, of exactly that shape: *the lost
+wakeup in `select()`'s rendezvous -- a copy process reaching EOF before
+the parent sets `selwait`*. Killing a listener makes a pipe reach EOF at
+a moment nothing here has produced before.
+
+**The predecessor matters and is worth naming.** `socket_inet-2.10` is
+"close on accept, accepted socket lives": it closes the **server socket
+from inside the accept callback**. So the listener at `fd=10` is killed
+at an unusual point, its copy process is torn down, and 2.11 takes the
+same descriptor number for a new server immediately afterwards.
+
+**One look should settle which of the two it is**, and `ps` alone may do
+it. With the suite frozen:
+
+- **`Rendez`** -- the process is in `_RENDEZVOUS(&mux->selwait, 0)`,
+  which is the lost wakeup: select is waiting for a copy process that
+  will never come.
+- **`Pread`** or **`Open`** -- it is blocked in a call instead, and the
+  rendezvous reading is wrong.
+- **`Broken`** -- it faulted, and everything above is beside the point.
+
+`acid <pid>` + `lstk()` gives the frame outright, which is how the
+`listenproc` leak was named in the first place.
+
+**No prediction.** Three mechanisms have been guessed on this bug and
+the machine refuted each one; the next line comes from `ps`.
