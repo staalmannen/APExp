@@ -114,7 +114,7 @@ static int killing;
 int
 _sock_listenmark(void)
 {
-	return 5;	/* 5: shared _apdbg, and _resettimer restarts a dead timer */
+	return 6;	/* 6: _timerproc/_killtimerproc say who makes and ends a timer */
 }
 
 /*
