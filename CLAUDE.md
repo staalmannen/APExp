@@ -185,7 +185,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
-`copyfile-test.c` and `stdio-test.c`. The twenty-five `tk-*.tcl` scripts there are Tcl, run
+`copyfile-test.c`, `deeppath-test.c` and `stdio-test.c`. The twenty-five `tk-*.tcl` scripts there are Tcl, run
 with `wish` -- except `tk-menubar-test.tcl`, which needs `tktest` and
 skips itself under `wish`, and `tk-transient-test.tcl`, whose last
 section alone does; see `docs/notes/tk-plan9.md`. `tk-runall.tcl` is the harness for
@@ -459,10 +459,13 @@ count fell 239 -> 225. The table and its command are at the end of
 
 Open, in order of what the next run should touch:
 
-- **A path ~50 components deep cannot be deleted** -- `invalid
-  operation`, with the directory empty, so it is the path and not the
-  contents. It is the only thing still aborting a file, and it aborts
-  two.
+- **Fixed, not yet confirmed: `PATH_MAX` was 255 and `NAME_MAX` 14** --
+  POSIX's *minima* used as this system's maxima, so a 550-character path
+  could not be normalised, walked or deleted and `unixFCmd.test` and
+  `winFCmd.test` aborted on it. 4096 and 255 now; Plan 9 has no
+  inherent path limit. **Needs `mk distclean`**, since `limits.h` is a
+  system header and no mkfile tracks one.
+  `sys/lib/tests/deeppath-test.c` measures it.
 - **`fCmd` 73, `io` 22, `chan-io` 19, `socket_inet` 18, `filename` 17,
   `clock` 16, `socket` 10, `env` 9** -- none of these clusters has been
   read. `fCmd`'s copy and rename sections `6.x` and `18.x` did *not*
