@@ -182,6 +182,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `rol64-test.c` and `u64float-test.c`, and for libap `locale-test.c`,
 `sigset-test.c`, `posix-spawn-test.c`, `limits-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
+`execve-env-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
@@ -321,6 +322,11 @@ in the topic file.
 - **When a run comes back green, ask what the new case would have
   printed and look for it.** A test that could not run is
   indistinguishable from one that passed.
+- **A fix that demonstrably changed the output has still not been shown
+  to fix the test.** Two of `env-2.1`'s three unwanted lines went away
+  and not one count moved: a test comparing exactly does not care how
+  much of the difference is left. Count what remains before calling a
+  cluster closed.
 - **A check that cannot fail is not a check** -- and its twin, a check
   that can PASS for the wrong reason, and its other twin, a check whose
   *negative* result has two explanations.
@@ -463,16 +469,22 @@ log-derived count agree at last.
 
 Open, in order of what the next run should touch:
 
-- **Fixed, not yet confirmed -- `env` 9, two bugs in one cluster**:
-  `_fdinfo` and `_sighdlr`, libap's own exec bookkeeping, were appearing
-  in `environ`; and `execve` only ever *created* `/env` entries, so
-  `unsetenv()` never reached a child and anything inherited survived
-  whatever `envp` said. The child's environment is exactly `envp` now.
-  See `docs/notes/tcl-suite.md`.
+- **`env` 9: understood, and not ours.** All nine are one line,
+  `path=/bin<0x01>.`, in a child's environment. Tcl never unsets `path`
+  (`envprep` keeps anything whose upper case is in its keep-list, which
+  has `PATH`), and the child's filter `lrem` removes **one** match --
+  while this environment has two spellings, rc's `path` and the `PATH`
+  that `apexp-sh` sets for bash. Checked on a host `tclsh`. Do not fix
+  by hiding `path`. The `_fdinfo`/`_sighdlr` leak into `environ` **is**
+  fixed and confirmed; the `execve` half (clearing `/env` so a child's
+  environment is exactly `envp`) fixed no measured test and is
+  **unconfirmed** -- `execve-env-test.c` is what asks.
 - **Still unread: `fCmd` 35, `io` 22, `chan-io` 19, `socket_inet` 17,
   `filename` 17, `clock` 16, `socket` 10.** `filename`'s are all
-  `Tcl_GlobCmd`; `clock`'s are all `:localtime` with `TZ` changing, so
-  they may move with the `env` fix. `fCmd` fell 73 -> 35 with the full
+  `Tcl_GlobCmd`; `clock`'s are all `:localtime` with `TZ` changing --
+  they did **not** move with the `env` fix, so that is a question about
+  `localtime()` reading `/env/timezone` rather than `TZ`, not about the
+  environment reaching a child. `fCmd` fell 73 -> 35 with the full
   rebuild alone.
 - **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a
   password database mapping a user to a home directory, which Plan 9
