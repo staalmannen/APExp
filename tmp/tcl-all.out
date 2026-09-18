@@ -9,7 +9,7 @@ Test files run in separate interpreters
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-17 17:05:03 +0200
+Tests began at 2026-09-18 04:58:44 +0200
 aaa_exit.test
 abstractlist.test
 append.test
@@ -467,7 +467,7 @@ abc def ghi jkl mno {p
 
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
----- errorInfo: could not create new link "/tmp/tcl_HKBeJF/thelin" pointing to "/tmp/tcl_HKBeJF/thefile": function not implemented
+---- errorInfo: could not create new link "/tmp/tcl_MfMhMb/thelin" pointing to "/tmp/tcl_MfMhMb/thefile": function not implemented
     while executing
 "file link -symbolic $link $target"
     ("uplevel" body line 4)
@@ -484,45 +484,6 @@ can not find channel named "file6"
 "uplevel 1 $cleanup"
 ---- errorCode(cleanup): TCL LOOKUP CHANNEL file6
 ==== chan-io-41.8 FAILED
-
-
-
-==== chan-io-53.7 CopyData: Flooding chan copy from pipe FAILED
-==== Contents of test case:
-
-    set fcopyTestCount 0
-    set f1 [open $path(pipe) w]
-    chan puts $f1 {
-	# Write  10 bytes / 10 msec
-	proc Write {count} {
-	    chan puts -nonewline "1234567890"
-	    if {[incr count -1]} {
-		after 10 [list Write $count]
-	    } else {
-		set ::ready 1
-	    }
-	}
-	chan configure stdout -buffering none
-	Write 345 ;# 3450 bytes ~3.45 sec
-	vwait ready
-	exit 0
-    }
-    chan close $f1
-    set in [openpipe r+ $path(pipe) &]
-    set out [open $path(test1) w]
-    doFcopy $in $out
-    variable fcopyTestDone
-    if {![info exists fcopyTestDone]} {
-	vwait [namespace which -variable fcopyTestDone]
-    }
-    # -1=error 0=script error N=number of bytes
-    expr {($fcopyTestDone == 0) ? $fcopyTestCount : -1}
-
----- Result was:
--1
----- Result should have been (exact matching):
-3450
-==== chan-io-53.7 FAILED
 
 clock-ivm.test
   Validity default mode: off
@@ -649,13 +610,198 @@ clock.test
 ==== clock-42.1.vm:1 FAILED
 
 cmdAH.test
-Test file error: error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/dir.file": invalid operation
+
+
+==== cmdAH-20.5 Tcl_FileObjCmd: atime touch FAILED
+==== Contents of test case:
+
+    set atime [file atime $file]
+    after 1100; # pause a sec to notice change in atime
+    set newatime [clock seconds]
+    set modatime [file atime $file $newatime]
+    expr {$newatime == $modatime ? 1 : "$newatime != $modatime"}
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not set access time for file "/tmp/touch.me": no such file or directory
     while executing
-"file delete -force -- $fullName"
-    (procedure "removeDirectory" line 21)
+"file atime $file $newatime"
+    ("uplevel" body line 5)
     invoked from within
-"removeDirectory $dirfile"
-    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/cmdAH.test" line 1312)
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== cmdAH-20.5 FAILED
+
+
+
+==== cmdAH-23.1 Tcl_FileObjCmd: lstat FAILED
+==== Contents of test case:
+
+    file lstat a
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== cmdAH-23.1 FAILED
+
+
+
+==== cmdAH-24.8 Tcl_FileObjCmd: mtime touch FAILED
+==== Contents of test case:
+
+    set mtime [file mtime $file]
+    after 1100; # pause a sec to notice change in mtime
+    set newmtime [clock seconds]
+    set modmtime [file mtime $file $newmtime]
+    expr {$newmtime == $modmtime ? 1 : "$newmtime != $modmtime"}
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not set modification time for file "/usr/glenda/APExp/sys/src/external/tcl/tests/touch.me": no such file or directory
+    while executing
+"file mtime $file $newmtime"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== cmdAH-24.8 FAILED
+
+
+
+==== cmdAH-24.9 Tcl_FileObjCmd: mtime touch with non-ascii chars FAILED
+==== Contents of test case:
+
+    # introduce some non-ascii characters.
+    append file •
+    file delete -force $file
+    file rename $oldfile $file
+    set mtime [file mtime $file]
+    after 1100; # pause a sec to notice change in mtime
+    set newmtime [clock seconds]
+    set modmtime [file mtime $file $newmtime]
+    expr {$newmtime == $modmtime ? 1 : "$newmtime != $modmtime"}
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not set modification time for file "/usr/glenda/APExp/sys/src/external/tcl/tests/touch.me•": no such file or directory
+    while executing
+"file mtime $file $newmtime"
+    ("uplevel" body line 9)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== cmdAH-24.9 FAILED
+
+
+
+==== cmdAH-24.12 Tcl_FileObjCmd: mtime and daylight savings FAILED
+==== Contents of test case:
+
+    set time [clock scan "21:00:00 October 30 2004 GMT"]
+    file mtime $name $time
+    set newmtime [file mtime $name]
+    expr {$newmtime == $time ? 1 : "$newmtime != $time"}
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not set modification time for file "/usr/glenda/APExp/sys/src/external/tcl/tests/clockchange": no such file or directory
+    while executing
+"file mtime $name $time"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== cmdAH-24.12 FAILED
+
+
+
+==== cmdAH-24.13 Tcl_FileObjCmd: directory mtime FAILED
+==== Contents of test case:
+
+    file mkdir $dirname
+    set old [file mtime $dirname]
+    file mtime $dirname 0
+    set new [file mtime $dirname]
+    list $new [expr {$old != $new}]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not set modification time for file "/usr/glenda/APExp/sys/src/external/tcl/tests/tmp2062": no such file or directory
+    while executing
+"file mtime $dirname 0"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== cmdAH-24.13 FAILED
+
+
+
+==== cmdAH-25.3 Tcl_FileObjCmd: owned FAILED
+==== Contents of test case:
+
+    file owned /
+
+---- Result was:
+1
+---- Result should have been (exact matching):
+0
+==== cmdAH-25.3 FAILED
+
+
+
+==== cmdAH-29.4 Tcl_FileObjCmd: type FAILED
+==== Contents of test case:
+
+    # Unlike [exec ln -s], [file link] requires an existing target
+    file link -symbolic $linkfile $gorpfile
+    file type $linkfile
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "/usr/glenda/APExp/sys/src/external/tcl/tests/link.file" pointing to "/usr/glenda/APExp/sys/src/external/tcl/tests/górp.file": function not implemented
+    while executing
+"file link -symbolic $linkfile $gorpfile"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== cmdAH-29.4 FAILED
+
+
+
+==== cmdAH-29.4.1 Tcl_FileObjCmd: type FAILED
+==== Contents of test case:
+
+    set linkdir [file join [temporaryDirectory] link.dir]
+    file link -symbolic $linkdir $tempdir
+    file type $linkdir
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "/usr/glenda/APExp/sys/src/external/tcl/tests/link.dir" pointing to "/usr/glenda/APExp/sys/src/external/tcl/tests/temp": function not implemented
+    while executing
+"file link -symbolic $linkdir $tempdir"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== cmdAH-29.4.1 FAILED
+
+
+
+==== cmdAH-33.4 file tempdir FAILED
+==== Contents of test case:
+
+    set pre [glob -nocomplain -directory $base *]
+    set d [file normalize [file tempdir $base/]]
+    list [string map [list $base GORP:] $d] [file exists $d] [file type $d]  $pre [glob -nocomplain -directory $d *]
+
+---- Result was:
+GORP:/tcl_hGgpjC 1 directory {/usr/glenda/APExp/sys/src/external/tcl/tests/gorp/tcl_dBkpNJ /usr/glenda/APExp/sys/src/external/tcl/tests/gorp/gorp_jJhokj} {}
+---- Result should have been (glob matching):
+GORP:/tcl_* 1 directory {} {}
+==== cmdAH-33.4 FAILED
+
 cmdIL.test
 cmdInfo.test
 cmdMZ.test
@@ -878,43 +1024,6 @@ event.test
 exec.test
 
 
-==== exec-10.15 errors in exec invocation FAILED
-==== Contents of test case:
-
-    exec cat < a/b/c
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== exec-10.15 FAILED
-
-
-
-==== exec-10.16 errors in exec invocation FAILED
-==== Contents of test case:
-
-    exec cat << foo > a/b/c
-
----- Result was:
-couldn't write file "a/b/c": is a directory: 'a/b/c'
----- Result should have been (exact matching):
-couldn't write file "a/b/c": no such file or directory
-==== exec-10.16 FAILED
-
-
-
-==== exec-10.17 errors in exec invocation FAILED
-==== Contents of test case:
-
-    exec cat << foo > a/b/c
-
----- Result was:
-couldn't write file "a/b/c": is a directory: 'a/b/c'
----- Result should have been (exact matching):
-couldn't write file "a/b/c": no such file or directory
-==== exec-10.17 FAILED
-
-
-
 ==== exec-10.20.1 errors in exec invocation FAILED
 ==== Contents of test case:
 
@@ -939,32 +1048,6 @@ couldn't read file "true": no such file or directory
 ---- Result should have been (exact matching):
 couldn't execute "~xyzzy_bad_user/x": no such file or directory
 ==== exec-10.21.1 FAILED
-
-
-
-==== exec-13.1 setting errorCode variable FAILED
-==== Contents of test case:
-
-    list [catch {exec [interpreter] $path(cat) < a/b/c} msg] [string tolower $errorCode]
-
----- Result was:
-0 {posix enoent {no such file or directory}}
----- Result should have been (exact matching):
-1 {posix enoent {no such file or directory}}
-==== exec-13.1 FAILED
-
-
-
-==== exec-13.2 setting errorCode variable FAILED
-==== Contents of test case:
-
-    list [catch {exec [interpreter] $path(cat) > a/b/c} msg] [string tolower $errorCode]
-
----- Result was:
-1 {posix {unknown error} {is a directory: 'a/b/c'}}
----- Result should have been (exact matching):
-1 {posix enoent {no such file or directory}}
-==== exec-13.2 FAILED
 
 
 
@@ -1076,6 +1159,21 @@ This is a result: 1.7976931348623157e+308
 fCmd.test
 
 
+==== fCmd-1.1 TclFileRenameCmd FAILED
+==== Contents of test case:
+
+    createfile tf1
+    file rename tf1 tf2
+    glob tf*
+
+---- Result was:
+tfad tf2
+---- Result should have been (exact matching):
+tf2
+==== fCmd-1.1 FAILED
+
+
+
 ==== fCmd-2.1 TclFileCopyCmd FAILED
 ==== Contents of test case:
 
@@ -1172,105 +1270,6 @@ fCmd.test
 
 
 
-==== fCmd-3.7 FileCopyRename: target exists & is directory FAILED
-==== Contents of test case:
-
-    file mkdir td1
-    createfile tf1 tf1
-    file rename tf1 td1
-    contents [file join td1 tf1]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: error renaming "tf1" to "td1/tf1": file exists
-    while executing
-"file rename tf1 td1"
-    ("uplevel" body line 4)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX EEXIST {file exists}
-==== fCmd-3.7 FAILED
-
-
-
-==== fCmd-3.12 FileCopyRename: move each source: 1 source FAILED
-==== Contents of test case:
-
-    createfile tf1 tf1
-    file mkdir td1
-    file rename tf1 td1
-    contents [file join td1 tf1]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: error renaming "tf1" to "td1/tf1": file exists
-    while executing
-"file rename tf1 td1"
-    ("uplevel" body line 4)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX EEXIST {file exists}
-==== fCmd-3.12 FAILED
-
-
-
-==== fCmd-3.13 FileCopyRename: move each source: multiple sources FAILED
-==== Contents of test case:
-
-    createfile tf1 tf1
-    createfile tf2 tf2
-    createfile tf3 tf3
-    createfile tf4 tf4
-    file mkdir td1
-    file rename tf1 tf2 tf3 tf4 td1
-    list [contents [file join td1 tf1]] [contents [file join td1 tf2]]  [contents [file join td1 tf3]] [contents [file join td1 tf4]]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: error renaming "tf1" to "td1/tf1": file exists
-    while executing
-"file rename tf1 tf2 tf3 tf4 td1"
-    ("uplevel" body line 7)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX EEXIST {file exists}
-==== fCmd-3.13 FAILED
-
-
-
-==== fCmd-3.16 FileCopyRename: break on first error FAILED
-==== Contents of test case:
-
-    createfile tf1
-    createfile tf2
-    createfile tf3
-    createfile tf4
-    file mkdir td1
-    createfile [file join td1 tf3]
-    file rename tf1 tf2 tf3 tf4 td1
-
----- Result was:
-error renaming "tf1" to "td1/tf1": file exists
----- Result should have been (exact matching):
-error renaming "tf3" to "td1/tf3": file exists
-==== fCmd-3.16 FAILED
-
-
-
-==== fCmd-4.1 TclFileMakeDirsCmd: make each dir: 1 dir FAILED
-==== Contents of test case:
-
-    file mkdir td1
-    glob td*
-
----- Result was:
-td1 td2
----- Result should have been (exact matching):
-td1
-==== fCmd-4.1 FAILED
-
-
-
 ==== fCmd-4.11 TclFileMakeDirsCmd: doesn't exist: errno != ENOENT FAILED
 ==== Contents of test case:
 
@@ -1283,21 +1282,6 @@ can't create directory "td1/td2/td3": operation not permitted
 ---- Result should have been (exact matching):
 can't create directory "td1/td2/td3": permission denied
 ==== fCmd-4.11 FAILED
-
-
-
-==== fCmd-4.13 TclFileMakeDirsCmd: doesn't exist: errno == ENOENT FAILED
-==== Contents of test case:
-
-    set x [file exists td1]
-    file mkdir td1
-    list $x [file exists td1]
-
----- Result was:
-1 1
----- Result should have been (exact matching):
-0 1
-==== fCmd-4.13 FAILED
 
 
 
@@ -1326,100 +1310,40 @@ can't create directory "foo/tf1": permission denied
     glob tf* td*
 
 ---- Result was:
-tf1 td1 td2
+tfad tf1 td1
 ---- Result should have been (exact matching):
 tf1 td1
 ==== fCmd-5.3 FAILED
 
 
 
-==== fCmd-5.4 TclFileDeleteCmd: multiple files FAILED
+==== fCmd-6.4 CopyRenameOneFile: lstat(source) == 0 FAILED
 ==== Contents of test case:
 
     createfile tf1
-    createfile tf2
-    file mkdir td1
-    set x [list [file exists tf1] [file exists tf2] [file exists td1]]
-    file delete tf1 td1 tf2
-    lappend x [file exists tf1] [file exists tf2] [file exists tf3]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: error deleting "td1": invalid operation
-    while executing
-"file delete tf1 td1 tf2"
-    ("uplevel" body line 6)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX {unknown error} {invalid operation}
-==== fCmd-5.4 FAILED
-
-
-
-==== fCmd-5.9 TclFileDeleteCmd: is directory FAILED
-==== Contents of test case:
-
-    file mkdir td1
-    file delete td1
-    file exists td1
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: error deleting "td1": invalid operation
-    while executing
-"file delete td1"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX {unknown error} {invalid operation}
-==== fCmd-5.9 FAILED
-
-
-
-==== fCmd-5.10 TclFileDeleteCmd: TclpRemoveDirectory fails FAILED
-==== Contents of test case:
-
-    file mkdir [file join td1 td2]
-    file delete td1
+    file rename tf1 tf2
+    glob tf*
 
 ---- Result was:
-error deleting "td1": invalid operation
+tfad tf2
 ---- Result should have been (exact matching):
-error deleting "td1": directory not empty
-==== fCmd-5.10 FAILED
+tf2
+==== fCmd-6.4 FAILED
 
 
 
-==== fCmd-5.11 TclFileDeleteCmd: TclpRemoveDirectory with cwd inside FAILED
+==== fCmd-6.5 CopyRenameOneFile: lstat(target) != 0 FAILED
 ==== Contents of test case:
 
-    file mkdir [file join td1 td2]
-    cd [file join td1 td2]
-    set res [list [catch {file delete -force [file dirname [pwd]]} msg]]
-    cd $dir
-    lappend res [file exists td1] $msg
+    createfile tf1
+    file rename tf1 tf2
+    glob tf*
 
 ---- Result was:
-1 1 {error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/td1": invalid operation}
+tfad tf2
 ---- Result should have been (exact matching):
-0 0 {}
-==== fCmd-5.11 FAILED
-
-
-
-==== fCmd-5.12 TclFileDeleteCmd: TclpRemoveDirectory with bad perms FAILED
-==== Contents of test case:
-
-    file mkdir [file join td1 td2]
-    file attributes [file join td1 td2] -permissions u+rwx
-    set res [list [catch {file delete -force td1} msg]]
-    lappend res [file exists td1] $msg
-
----- Result was:
-1 1 {error deleting "td1": invalid operation}
----- Result should have been (exact matching):
-0 0 {}
-==== fCmd-5.12 FAILED
+tf2
+==== fCmd-6.5 FAILED
 
 
 
@@ -1439,20 +1363,1471 @@ error renaming "tf1" to "td1/tf1": permission denied
 
 
 
-==== fCmd-6.14 CopyRenameOneFile: source is file, target is dir FAILED
+==== fCmd-6.9 CopyRenameOneFile: errno == ENOENT FAILED
 ==== Contents of test case:
 
     createfile tf1
-    file mkdir [file join td1 tf1]
-    file rename -force tf1 td1
+    file rename tf1 tf2
+    glob tf*
 
 ---- Result was:
-can't create directory "td1/tf1": file exists
+tfad tf2
 ---- Result should have been (exact matching):
-can't overwrite directory "td1/tf1" with file "tf1"
-==== fCmd-6.14 FAILED
+tf2
+==== fCmd-6.9 FAILED
 
-Test file error: tcltest 6185: suicide: sys: trap: fault write addr=0x0 pc=0x446cd8
+
+
+==== fCmd-6.12 CopyRenameOneFile: force != 0 FAILED
+==== Contents of test case:
+
+    createfile tf1
+    createfile tf2
+    file rename -force tf1 tf2
+    glob tf*
+
+---- Result was:
+tfad tf2
+---- Result should have been (exact matching):
+tf2
+==== fCmd-6.12 FAILED
+
+
+
+==== fCmd-6.19 CopyRenameOneFile: errno == EXDEV FAILED
+==== Contents of test case:
+
+    createfile tf1
+    file rename tf1 $tmpspace
+    glob -nocomplain tf* [file join $tmpspace tf1]
+
+---- Result was:
+tfad /tmp/tcl2382/tf1
+---- Result should have been (exact matching):
+/tmp/tcl2382/tf1
+==== fCmd-6.19 FAILED
+
+
+
+==== fCmd-6.21 CopyRenameOneFile: copy/rename: S_ISDIR(source) FAILED
+==== Contents of test case:
+
+    file mkdir td1
+    file rename td1 $tmpspace
+    glob -nocomplain td* [file join $tmpspace td*]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error renaming "td1" to "/tmp/tcl2382/td1": invalid operation: '/tmp/tcl2382/td1'
+    while executing
+"file rename td1 $tmpspace"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX {unknown error} {invalid operation: '/tmp/tcl2382/td1'}
+==== fCmd-6.21 FAILED
+
+
+
+==== fCmd-6.22 CopyRenameOneFile: copy/rename: !S_ISDIR(source) FAILED
+==== Contents of test case:
+
+    createfile tf1
+    file rename tf1 $tmpspace
+    glob -nocomplain tf* [file join $tmpspace tf*]
+
+---- Result was:
+tfad /tmp/tcl2382/tf1
+---- Result should have been (exact matching):
+/tmp/tcl2382/tf1
+==== fCmd-6.22 FAILED
+
+
+
+==== fCmd-6.24 CopyRenameOneFile: error uses original name FAILED
+==== Contents of test case:
+
+    file mkdir [file home]/td1/td2
+    set td1name [file join [file dirname [file home]] [file tail [file home]] td1]
+    file attributes $td1name -permissions 0
+    file copy [file home]/td1 td1
+
+---- Result was:
+error copying "/usr/glenda/td1": operation not permitted
+---- Result should have been (exact matching):
+error copying "/usr/glenda/td1": permission denied
+==== fCmd-6.24 FAILED
+
+
+
+==== fCmd-6.25 CopyRenameOneFile: error uses original name FAILED
+==== Contents of test case:
+
+    file mkdir td2
+    file mkdir [file home]/td1
+    set td1name [file join [file dirname [file home]] [file tail [file home]] td1]
+    file attributes $td1name -permissions 0
+    file copy td2 [file home]/td1
+
+---- Result was:
+error copying "td2" to "/usr/glenda/td1/td2": operation not permitted
+---- Result should have been (exact matching):
+error copying "td2" to "/usr/glenda/td1/td2": permission denied
+==== fCmd-6.25 FAILED
+
+
+
+==== fCmd-6.26 CopyRenameOneFile: doesn't use original name FAILED
+==== Contents of test case:
+
+    file mkdir [file home]/td1/td2
+    set td2name [file join [file dirname [file home]] [file tail [file home]] td1 td2]
+    file attributes $td2name -permissions 0
+    file copy [file home]/td1 td1
+
+---- Result was:
+error copying "/usr/glenda/td1" to "td1": "/usr/glenda/td1/td2": operation not permitted
+---- Result should have been (exact matching):
+error copying "/usr/glenda/td1" to "td1": "/usr/glenda/td1/td2": permission denied
+==== fCmd-6.26 FAILED
+
+
+
+==== fCmd-6.30 CopyRenameOneFile: TclpRemoveDirectory failed FAILED
+==== Contents of test case:
+
+    file mkdir foo/bar
+    file attr foo -perm 0o40555
+    file rename foo/bar $tmpspace
+
+---- Result was:
+error renaming "foo/bar" to "/tmp/tcl2382/bar": invalid operation: '/tmp/tcl2382/bar'
+---- Result should have been (glob matching):
+*: permission denied
+==== fCmd-6.30 FAILED
+
+
+
+==== fCmd-9.1 file rename: comprehensive: EACCES FAILED
+==== Contents of test case:
+
+    file mkdir td1
+    file mkdir td2
+    file attr td2 -perm 0o40000
+    file rename td1 td2/
+
+---- Result was:
+error renaming "td1" to "td2/td1": invalid operation: 'td2/td1'
+---- Result should have been (exact matching):
+error renaming "td1" to "td2/td1": permission denied
+==== fCmd-9.1 FAILED
+
+
+
+==== fCmd-9.3 file rename: comprehensive: file to new name FAILED
+==== Contents of test case:
+
+    createfile tf1
+    createfile tf2
+    testchmod 0o444 tf2
+    file rename tf1 tf3
+    file rename tf2 tf4
+    list [lsort [glob tf*]] [file writable tf3] [file writable tf4]
+
+---- Result was:
+{tf3 tf4 tfad} 1 0
+---- Result should have been (exact matching):
+{tf3 tf4} 1 0
+==== fCmd-9.3 FAILED
+
+
+
+==== fCmd-9.10 file rename: comprehensive: file to new name and dir FAILED
+==== Contents of test case:
+
+    createfile tf1
+    createfile tf2
+    file mkdir td1
+    testchmod 0o444 tf2
+    file rename tf1 [file join td1 tf3]
+    file rename tf2 [file join td1 tf4]
+    list [glob tf*] [lsort [glob -directory td1 t*]]  [file writable [file join td1 tf3]] [file writable [file join td1 tf4]]
+
+---- Result was:
+tfad {td1/tf3 td1/tf4} 1 0
+---- Result should have been (exact matching):
+{} {td1/tf3 td1/tf4} 1 0
+==== fCmd-9.10 FAILED
+
+
+
+==== fCmd-9.11 file rename: comprehensive: dir to new name and dir FAILED
+==== Contents of test case:
+
+    file mkdir td1
+    file mkdir td2
+    file mkdir td3
+    file rename td1 [file join td3 td3]
+    file rename td2 [file join td3 td4]
+    set w4 0
+    list [lsort [glob td*]] [lsort [glob -directory td3 t*]]  [file writable [file join td3 td3]] $w4
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error renaming "td1" to "td3/td3": invalid operation: 'td3/td3'
+    while executing
+"file rename td1 [file join td3 td3]"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX {unknown error} {invalid operation: 'td3/td3'}
+==== fCmd-9.11 FAILED
+
+
+
+==== fCmd-9.14.3 file rename: comprehensive: dir into self FAILED
+==== Contents of test case:
+
+    file mkdir td1
+    cd td1
+    file rename [file join .. td1] [file join .. td1 foo]
+
+---- Result was:
+error renaming "../td1" to "../td1/foo": invalid operation: '../td1/foo'
+---- Result should have been (exact matching):
+error renaming "../td1" to "../td1/foo": trying to rename a volume or move a directory into itself
+==== fCmd-9.14.3 FAILED
+
+
+
+==== fCmd-10.2 file copy: comprehensive: file to new name FAILED
+==== Contents of test case:
+
+    createfile tf1 tf1
+    createfile tf2 tf2
+    testchmod 0o444 tf2
+    file copy tf1 tf3
+    file copy tf2 tf4
+    list [lsort [glob tf*]] [contents tf3] [contents tf4] [file writable tf3] [file writable tf4]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tf1" to "tf3": no such file or directory
+    while executing
+"file copy tf1 tf3"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-10.2 FAILED
+
+
+
+==== fCmd-10.3 file copy: comprehensive: dir to new name FAILED
+==== Contents of test case:
+
+    file mkdir [file join td1 tdx]
+    file mkdir [file join td2 tdy]
+    testchmod 0o555 td2
+    file copy td1 td3
+    file copy td2 td4
+    list [lsort [glob td*]] [glob -directory td3 t*]  [glob -directory td4 t*] [file writable td3] [file writable td4]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "td1" to "td3": "td3/tdx": no such file or directory
+    while executing
+"file copy td1 td3"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+---- Test cleanup failed:
+td4: no such file or directory
+---- errorInfo(cleanup): td4: no such file or directory
+    while executing
+"testchmod 0o755 td4"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX ENOENT {no such file or directory}
+==== fCmd-10.3 FAILED
+
+
+
+==== fCmd-10.7 file rename: comprehensive: file to new name and dir FAILED
+==== Contents of test case:
+
+    createfile tf1
+    createfile tf2
+    file mkdir td1
+    testchmod 0o444 tf2
+    file copy tf1 [file join td1 tf3]
+    file copy tf2 [file join td1 tf4]
+    list [lsort [glob tf*]] [lsort [glob -directory td1 t*]]  [file writable [file join td1 tf3]] [file writable [file join td1 tf4]]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tf1" to "td1/tf3": no such file or directory
+    while executing
+"file copy tf1 [file join td1 tf3]"
+    ("uplevel" body line 6)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-10.7 FAILED
+
+
+
+==== fCmd-10.8 file rename: comprehensive: dir to new name and dir FAILED
+==== Contents of test case:
+
+    file mkdir td1
+    file mkdir td2
+    file mkdir td3
+    testchmod 0o555 td2
+    file copy td1 [file join td3 td3]
+    file copy td2 [file join td3 td4]
+    list [lsort [glob td*]] [lsort [glob -directory td3 t*]]  [file writable [file join td3 td3]] [file writable [file join td3 td4]]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "td1" to "td3/td3": no such file or directory
+    while executing
+"file copy td1 [file join td3 td3]"
+    ("uplevel" body line 6)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-10.8 FAILED
+
+
+
+==== fCmd-11.6 TclFileRenameCmd: : single file into directory FAILED
+==== Contents of test case:
+
+    set s [createfile tfa1]
+    file mkdir tfad
+    file rename tfa1 tfad
+    list [checkcontent tfad/tfa1 $s] [file exists tfa1]
+
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfad"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-11.6 FAILED
+
+
+
+==== fCmd-11.7 TclFileRenameCmd: : multiple files into directory FAILED
+==== Contents of test case:
+
+    set s1 [createfile tfa1]
+    set s2 [createfile tfa2]
+    file mkdir tfad
+    file rename tfa1 tfa2 tfad
+    list [checkcontent tfad/tfa1 $s1] [checkcontent tfad/tfa2 $s2]  [file exists tfa1] [file exists tfa2]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error renaming "tfa1" to "tfad/tfa1": file exists
+    while executing
+"file rename tfa1 tfa2 tfad"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX EEXIST {file exists}
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfad"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-11.7 FAILED
+
+
+
+==== fCmd-11.8 TclFileRenameCmd: error renaming file to directory FAILED
+==== Contents of test case:
+
+    set s [createfile tfa]
+    file mkdir tfad
+    file mkdir tfad/tfa
+    list [catch {file rename tfa tfad}] [checkcontent tfa $s] [file isdir tfad]
+
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfa tfad"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-11.8 FAILED
+
+
+
+==== fCmd-12.2 renamefile: src filename translation failing FAILED
+==== Contents of test case:
+
+    global env
+    unset env(HOME)
+    set s [createfile tfa1]
+    file mkdir tfad
+    catch {file rename tfa1 ~/tfa2 tfad}
+
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfad"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-12.2 FAILED
+
+
+
+==== fCmd-12.4 renamefile: error renaming file to directory FAILED
+==== Contents of test case:
+
+    set s1 [createfile tfa]
+    file mkdir tfad
+    file mkdir tfad/tfa
+    list [catch {file rename tfa tfad}] [checkcontent tfa $s1]  [file isdir tfad/tfa]
+
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfa tfad"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-12.4 FAILED
+
+
+
+==== fCmd-12.5 renamefile: error renaming directory to file FAILED
+==== Contents of test case:
+
+    file mkdir tfa
+    file mkdir tfad
+    set s [createfile tfad/tfa]
+    list [catch {file rename tfa tfad}] [checkcontent tfad/tfa $s]  [file isdir tfad] [file isdir tfa]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: couldn't open "tfad/tfa": is a directory: 'tfad/tfa'
+    while executing
+"open $file w"
+    (procedure "createfile" line 2)
+    invoked from within
+"createfile tfad/tfa"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX {unknown error} {is a directory: 'tfad/tfa'}
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfa tfad"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-12.5 FAILED
+
+
+
+==== fCmd-12.7 renamefile: renaming directory into offspring FAILED
+==== Contents of test case:
+
+    file mkdir tfad
+    file mkdir tfad/dir
+    catch {file rename tfad tfad/dir}
+
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfad"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-12.7 FAILED
+
+
+
+==== fCmd-13.1 TclCopyFilesCmd: -force option FAILED
+==== Contents of test case:
+
+    set s [createfile tfa1]
+    file copy -force  tfa1 tfa2
+    list [checkcontent tfa2 $s] [checkcontent tfa1 $s]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tfa1" to "tfa2": no such file or directory
+    while executing
+"file copy -force  tfa1 tfa2"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-13.1 FAILED
+
+
+
+==== fCmd-13.2 TclCopyFilesCmd: -- option FAILED
+==== Contents of test case:
+
+    set s [createfile -tfa1]
+    file copy --  -tfa1 tfa2
+    list [checkcontent tfa2 $s] [checkcontent -tfa1 $s]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "-tfa1" to "tfa2": no such file or directory
+    while executing
+"file copy --  -tfa1 tfa2"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-13.2 FAILED
+
+
+
+==== fCmd-13.7 TclCopyFilesCmd: single file into directory FAILED
+==== Contents of test case:
+
+    set s [createfile tfa1]
+    file mkdir tfad
+    file copy tfa1 tfad
+    list [checkcontent tfad/tfa1 $s] [checkcontent tfa1 $s]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tfa1" to "tfad/tfa1": file exists
+    while executing
+"file copy tfa1 tfad"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX EEXIST {file exists}
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfad tfa1"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-13.7 FAILED
+
+
+
+==== fCmd-13.8 TclCopyFilesCmd: multiple files into directory FAILED
+==== Contents of test case:
+
+    set s1 [createfile tfa1]
+    set s2 [createfile tfa2]
+    file mkdir tfad
+    file copy tfa1 tfa2 tfad
+    list [checkcontent tfad/tfa1 $s1] [checkcontent tfad/tfa2 $s2]  [checkcontent tfa1 $s1] [checkcontent tfa2 $s2]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tfa1" to "tfad/tfa1": file exists
+    while executing
+"file copy tfa1 tfa2 tfad"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX EEXIST {file exists}
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfad tfa1 tfa2"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-13.8 FAILED
+
+
+
+==== fCmd-13.9 TclCopyFilesCmd: error copying file to directory FAILED
+==== Contents of test case:
+
+    set s [createfile tfa]
+    file mkdir tfad
+    file mkdir tfad/tfa
+    list [catch {file copy tfa tfad}] [checkcontent tfa $s]  [file isdir tfad/tfa] [file isdir tfad]
+
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfa tfad"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-13.9 FAILED
+
+
+
+==== fCmd-14.2 copyfile: dst filename translation failing FAILED
+==== Contents of test case:
+
+    global env
+    unset env(HOME)
+    set s [createfile tfa1]
+    file mkdir tfad
+    list [catch {file copy tfa1 ~/tfa2 tfad}] [checkcontent tfad/tfa1 $s]
+
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfa1 tfad"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-14.2 FAILED
+
+
+
+==== fCmd-14.4 copyfile: error copying file to directory FAILED
+==== Contents of test case:
+
+    set s1 [createfile tfa]
+    file mkdir tfad
+    file mkdir tfad/tfa
+    list [catch {file copy tfa tfad}] [checkcontent tfa $s1]  [file isdir tfad] [file isdir tfad/tfa]
+
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfa tfad"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-14.4 FAILED
+
+
+
+==== fCmd-14.5 copyfile: error copying directory to file FAILED
+==== Contents of test case:
+
+    file mkdir tfa
+    file mkdir tfad
+    set s [createfile tfad/tfa]
+    list [catch {file copy tfa tfad}] [checkcontent tfad/tfa $s]  [file isdir tfad] [file isdir tfa]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: couldn't open "tfad/tfa": is a directory: 'tfad/tfa'
+    while executing
+"open $file w"
+    (procedure "createfile" line 2)
+    invoked from within
+"createfile tfad/tfa"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX {unknown error} {is a directory: 'tfad/tfa'}
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfa tfad"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-14.5 FAILED
+
+
+
+==== fCmd-14.6 copyfile: copy file succeeding FAILED
+==== Contents of test case:
+
+    set s [createfile tfa]
+    file copy tfa tfa2
+    list [checkcontent tfa $s] [checkcontent tfa2 $s]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tfa" to "tfa2": no such file or directory
+    while executing
+"file copy tfa tfa2"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-14.6 FAILED
+
+
+
+==== fCmd-14.7 copyfile: copy directory succeeding FAILED
+==== Contents of test case:
+
+    file mkdir tfa
+    set s [createfile tfa/file]
+    file copy tfa tfa2
+    list [checkcontent tfa/file $s] [checkcontent tfa2/file $s]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tfa" to "tfa2": "tfa2/file": no such file or directory
+    while executing
+"file copy tfa tfa2"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-14.7 FAILED
+
+
+
+==== fCmd-18.1 TclFileRenameCmd: rename (first form) in the same directory FAILED
+==== Contents of test case:
+
+    file mkdir tfad/dir
+    cd tfad/dir
+    set s [createfile foo]
+    file rename  foo bar
+    file rename bar ./foo
+    file rename ./foo bar
+    file rename ./bar ./foo
+    file rename foo ../dir/bar
+    file rename ../dir/bar ./foo
+    file rename ../../tfad/dir/foo ../../tfad/dir/bar
+    file rename [file join [pwd] bar] foo
+    file rename foo [file join [pwd] bar]
+    list [checkcontent bar $s] [file exists foo]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error renaming "foo" to "bar": file exists
+    while executing
+"file rename  foo bar"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX EEXIST {file exists}
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfad"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-18.1 FAILED
+
+
+
+==== fCmd-18.3 TclFileRenameCmd: mixed dirs and files into directory FAILED
+==== Contents of test case:
+
+    set s [createfile tfa1]
+    file mkdir tfad1 tfad2
+    file rename tfa1 tfad1 tfad2
+    list [checkcontent tfad2/tfa1 $s] [file isdir tfad2/tfad1]  [file exists tfa1] [file exists tfad1]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error renaming "tfad1" to "tfad2/tfad1": invalid operation: 'tfad2/tfad1'
+    while executing
+"file rename tfa1 tfad1 tfad2"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX {unknown error} {invalid operation: 'tfad2/tfad1'}
+==== fCmd-18.3 FAILED
+
+
+
+==== fCmd-18.4 TclFileRenameCmd: attempt to replace non-dir with dir FAILED
+==== Contents of test case:
+
+    set s [createfile tfa]
+    file mkdir tfad
+    list [catch {file rename tfad tfa}] [checkcontent tfa $s] [file isdir tfad]
+
+---- Test cleanup failed:
+error deleting "tfad": directory not empty
+---- errorInfo(cleanup): error deleting "tfad": directory not empty
+    while executing
+"file delete tfa tfad"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX EEXIST {file exists}
+==== fCmd-18.4 FAILED
+
+
+
+==== fCmd-18.5 TclFileRenameCmd: attempt to replace dir with non-dir FAILED
+==== Contents of test case:
+
+    set s [createfile tfa]
+    file mkdir tfad/tfa
+    list [catch {file rename tfa tfad}] [checkcontent tfa $s]  [file isdir tfad/tfa]
+
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfa tfad"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-18.5 FAILED
+
+
+
+==== fCmd-18.7 TclFileRenameCmd: rename dir on top of another empty dir w/o -force FAILED
+==== Contents of test case:
+
+    file mkdir tfa tfad/tfa
+    list [catch {file rename tfa tfad}] [file isdir tfa]
+
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfa tfad"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-18.7 FAILED
+
+
+
+==== fCmd-18.9 TclFileRenameCmd: rename dir on top of a non-empty dir w/o -force FAILED
+==== Contents of test case:
+
+    file mkdir tfa tfad/tfa/file
+    list [catch {file rename tfa tfad}] [file isdir tfa]  [file isdir tfad/tfa/file]
+
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfa tfad"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-18.9 FAILED
+
+
+
+==== fCmd-18.12 TclFileRenameCmd : rename a symbolic link to file FAILED
+==== Contents of test case:
+
+    set s [createfile tfa1]
+    file link -symbolic tfa2 tfa1
+    file rename tfa2 tfa3
+    file type tfa3
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "tfa2" pointing to "tfa1": function not implemented
+    while executing
+"file link -symbolic tfa2 tfa1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-18.12 FAILED
+
+
+
+==== fCmd-18.13 TclFileRenameCmd : rename a symbolic link to dir FAILED
+==== Contents of test case:
+
+    file mkdir tfa1
+    file link -symbolic tfa2 tfa1
+    file rename tfa2 tfa3
+    file type tfa3
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "tfa2" pointing to "tfa1": function not implemented
+    while executing
+"file link -symbolic tfa2 tfa1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-18.13 FAILED
+
+
+
+==== fCmd-18.14 TclFileRenameCmd : rename a path with sym link FAILED
+==== Contents of test case:
+
+    file mkdir tfa1/a/b/c/d
+    file mkdir tfa2
+    set f [file join [pwd] tfa1/a/b]
+    set f2 [file join [pwd] {tfa2/b alias}]
+    file link -symbolic $f2 $f
+    file rename {tfa2/b alias/c} tfa3
+    list [file isdir tfa3] [file exists tfa1/a/b/c]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "/usr/glenda/APExp/sys/src/external/tcl/tests/tfa2/b alias" pointing to "/usr/glenda/APExp/sys/src/external/tcl/tests/tfa1/a/b": function not implemented
+    while executing
+"file link -symbolic $f2 $f"
+    ("uplevel" body line 6)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-18.14 FAILED
+
+
+
+==== fCmd-18.15 TclFileRenameCmd : rename a file to a symlink dir FAILED
+==== Contents of test case:
+
+    file mkdir tfa1
+    set s [createfile tfa2]
+    file link -symbolic tfalink tfa1
+    file rename tfa2 tfalink
+    checkcontent tfa1/tfa2 $s
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "tfalink" pointing to "tfa1": function not implemented
+    while executing
+"file link -symbolic tfalink tfa1"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-18.15 FAILED
+
+
+
+==== fCmd-18.16 TclFileRenameCmd: rename a dangling symlink FAILED
+==== Contents of test case:
+
+    file mkdir tfa1
+    file link -symbolic tfalink tfa1
+    file delete tfa1
+    file rename tfalink tfa2
+    file type tfa2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "tfalink" pointing to "tfa1": function not implemented
+    while executing
+"file link -symbolic tfalink tfa1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-18.16 FAILED
+
+
+
+==== fCmd-21.1 copy : single file to nonexistant FAILED
+==== Contents of test case:
+
+    set s [createfile tfa1]
+    file copy tfa1 tfa2
+    list [checkcontent tfa2 $s] [checkcontent tfa1 $s]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tfa1" to "tfa2": no such file or directory
+    while executing
+"file copy tfa1 tfa2"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-21.1 FAILED
+
+
+
+==== fCmd-21.2 copy : single dir to nonexistant FAILED
+==== Contents of test case:
+
+    file mkdir tfa1
+    file copy tfa1 tfa2
+    list [file isdir tfa2] [file isdir tfa1]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tfa1" to "tfa2": no such file or directory
+    while executing
+"file copy tfa1 tfa2"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-21.2 FAILED
+
+
+
+==== fCmd-21.3 copy : single file into directory FAILED
+==== Contents of test case:
+
+    set s [createfile tfa1]
+    file mkdir tfad
+    file copy tfa1 tfad
+    list [checkcontent tfad/tfa1 $s] [checkcontent tfa1 $s]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tfa1" to "tfad/tfa1": file exists
+    while executing
+"file copy tfa1 tfad"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX EEXIST {file exists}
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid argument
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid argument
+    while executing
+"file delete -force tfa1 tfad"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX EINVAL {invalid argument}
+==== fCmd-21.3 FAILED
+
+
+
+==== fCmd-21.5 copy : multiple files into directory FAILED
+==== Contents of test case:
+
+    set s1 [createfile tfa1]
+    set s2 [createfile tfa2]
+    file mkdir tfad
+    file copy tfa1 tfa2 tfad
+    list [checkcontent tfad/tfa1 $s1] [checkcontent tfad/tfa2 $s2]  [checkcontent tfa1 $s1] [checkcontent tfa2 $s2]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tfa1" to "tfad/tfa1": file exists
+    while executing
+"file copy tfa1 tfa2 tfad"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX EEXIST {file exists}
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfa1 tfa2 tfad"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-21.5 FAILED
+
+
+
+==== fCmd-21.6 copy: mixed dirs and files into directory FAILED
+==== Contents of test case:
+
+    set s [createfile tfa1]
+    file mkdir tfad1 tfad2
+    file copy tfa1 tfad1 tfad2
+    list [checkcontent [file join tfad2 tfa1] $s]  [file isdir [file join tfad2 tfad1]]  [checkcontent tfa1 $s] [file isdir tfad1]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tfa1" to "tfad2/tfa1": no such file or directory
+    while executing
+"file copy tfa1 tfad1 tfad2"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-21.6 FAILED
+
+
+
+==== fCmd-21.7.2 TclCopyFilesCmd: copy a dangling link FAILED
+==== Contents of test case:
+
+    file mkdir tfad1
+    file link -symbolic tfalink tfad1
+    file delete tfad1
+    file copy tfalink tfalink2
+    file type tfalink2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "tfalink" pointing to "tfad1": function not implemented
+    while executing
+"file link -symbolic tfalink tfad1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-21.7.2 FAILED
+
+
+
+==== fCmd-21.8.2 TclCopyFilesCmd: copy a link FAILED
+==== Contents of test case:
+
+    file mkdir tfad1
+    file link -symbolic tfalink tfad1
+    file copy tfalink tfalink2
+    list [file type tfalink] [file type tfalink2] [file isdir tfad1]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "tfalink" pointing to "tfad1": function not implemented
+    while executing
+"file link -symbolic tfalink tfad1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-21.8.2 FAILED
+
+
+
+==== fCmd-21.9 TclCopyFilesCmd: copy dir with a link in it FAILED
+==== Contents of test case:
+
+    file mkdir tfad1
+    file link -symbolic tfad1/tfalink "[pwd]/tfad1"
+    file copy tfad1 tfad2
+    file type tfad2/tfalink
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "tfad1/tfalink" pointing to "/usr/glenda/APExp/sys/src/external/tcl/tests/tfad1": function not implemented
+    while executing
+"file link -symbolic tfad1/tfalink "[pwd]/tfad1""
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-21.9 FAILED
+
+
+
+==== fCmd-21.10 TclFileCopyCmd: copy dir on top of another empty dir w/o -force FAILED
+==== Contents of test case:
+
+    file mkdir tfa [file join tfad tfa]
+    list [catch {file copy tfa tfad}] [file isdir tfa]
+
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfa tfad"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-21.10 FAILED
+
+
+
+==== fCmd-21.11 TclFileCopyCmd: copy dir on top of a dir w/o -force FAILED
+==== Contents of test case:
+
+    file mkdir tfa [file join tfad tfa file]
+    list [catch {file copy tfa tfad}] [file isdir tfa]  [file isdir [file join tfad tfa file]]
+
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfa tfad"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-21.11 FAILED
+
+
+
+==== fCmd-21.12 TclFileCopyCmd: copy dir on top of a non-empty dir w/ -force FAILED
+==== Contents of test case:
+
+    file mkdir tfa [file join tfad tfa file]
+    list [catch {file copy -force tfa tfad}] [file isdir tfa]  [file isdir [file join tfad tfa file]]
+
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfa tfad"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-21.12 FAILED
+
+
+
+==== fCmd-22.3 TclpRenameFile: rename dir to existing dir FAILED
+==== Contents of test case:
+
+    file mkdir d1 [file join tfad d1]
+    list [catch {file rename d1 tfad}] [file isdir d1]  [file isdir [file join tfad d1]]
+
+---- Test cleanup failed:
+error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+---- errorInfo(cleanup): error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force d1 tfad"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): POSIX {unknown error} {invalid operation}
+==== fCmd-22.3 FAILED
+
+
+
+==== fCmd-22.4 TclpRenameFile: rename dir to dir several levels deep FAILED
+==== Contents of test case:
+
+    file mkdir d1 [file join tfad a b c]
+    file rename d1 [file join tfad a b c d1]
+    list [file isdir d1] [file isdir [file join tfad a b c d1]]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error renaming "d1" to "tfad/a/b/c/d1": invalid operation: 'tfad/a/b/c/d1'
+    while executing
+"file rename d1 [file join tfad a b c d1]"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX {unknown error} {invalid operation: 'tfad/a/b/c/d1'}
+==== fCmd-22.4 FAILED
+
+
+
+==== fCmd-22.5 TclMacCopyFile: copy and overwrite in a single dir FAILED
+==== Contents of test case:
+
+    set s [createfile tfa1]
+    set s2 [createfile tfa2 q]
+    set result [catch {file copy tfa1 tfa2}]
+    file copy -force tfa1 tfa2
+    lappend result [checkcontent tfa2 $s] [checkcontent tfa1 $s]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tfa1" to "tfa2": no such file or directory
+    while executing
+"file copy -force tfa1 tfa2"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-22.5 FAILED
+
+
+
+==== fCmd-23.1 TclMacRmdir: trying to remove a nonempty directory FAILED
+==== Contents of test case:
+
+    file mkdir [file join tfad dir]
+    list [catch {file delete tfad}] [file delete -force tfad]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error deleting "tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
+    while executing
+"file delete -force tfad"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX {unknown error} {invalid operation}
+==== fCmd-23.1 FAILED
+
+
+
+==== fCmd-25.1 TclMacCopyDirectory: copying a normal directory FAILED
+==== Contents of test case:
+
+    file mkdir [file join tfad1 a b c]
+    file copy tfad1 tfad2
+    list [file isdir [file join tfad1 a b c]]  [file isdir [file join tfad2 a b c]]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tfad1" to "tfad2": "tfad2/a/b/c": no such file or directory
+    while executing
+"file copy tfad1 tfad2"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-25.1 FAILED
+
+
+
+==== fCmd-25.2 TclMacCopyDirectory: copying a short path normal directory FAILED
+==== Contents of test case:
+
+    file mkdir tfad1
+    file copy tfad1 tfad2
+    list [file isdir tfad1] [file isdir tfad2]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tfad1" to "tfad2": no such file or directory
+    while executing
+"file copy tfad1 tfad2"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-25.2 FAILED
+
+
+
+==== fCmd-25.3 TclMacCopyDirectory: copying dirs between different dirs FAILED
+==== Contents of test case:
+
+    file mkdir [file join tfad1 x y z]
+    file mkdir [file join tfad2 dir]
+    file copy tfad1 [file join tfad2 dir]
+    list [file isdir [file join tfad1 x y z]]  [file isdir [file join tfad2 dir tfad1 x y z]]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error copying "tfad1" to "tfad2/dir/tfad1": "tfad2/dir/tfad1/x/y/z": no such file or directory
+    while executing
+"file copy tfad1 [file join tfad2 dir]"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOENT {no such file or directory}
+==== fCmd-25.3 FAILED
+
+
+
+==== fCmd-26.1 TclDeleteFilesCmd: delete symlink FAILED
+==== Contents of test case:
+
+    file mkdir tfad1
+    file link -symbolic tfalink tfad1
+    file delete tfalink
+    list [file isdir tfad1] [file exists tfalink]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "tfalink" pointing to "tfad1": function not implemented
+    while executing
+"file link -symbolic tfalink tfad1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-26.1 FAILED
+
+
+
+==== fCmd-26.2 TclDeleteFilesCmd: delete dir with symlink FAILED
+==== Contents of test case:
+
+    file mkdir tfad1
+    file mkdir tfad2
+    file link -symbolic [file join tfad2 link] [file join .. tfad1]
+    file delete -force tfad2
+    list [file isdir tfad1] [file exists tfad2]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "tfad2/link" pointing to "../tfad1": function not implemented
+    while executing
+"file link -symbolic [file join tfad2 link] [file join .. tfad1]"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-26.2 FAILED
+
+
+
+==== fCmd-26.3 TclDeleteFilesCmd: delete dangling symlink FAILED
+==== Contents of test case:
+
+    file mkdir tfad1
+    file link -symbolic tfad2 tfad1
+    file delete tfad1
+    file delete tfad2
+    list [file exists tfad1] [file exists tfad2]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "tfad2" pointing to "tfad1": function not implemented
+    while executing
+"file link -symbolic tfad2 tfad1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-26.3 FAILED
+
+
+
+==== fCmd-28.9 file link: success with file FAILED
+==== Contents of test case:
+
+    file link abc.link abc.file
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "abc.link" pointing to "abc.file": function not implemented
+    while executing
+"file link abc.link abc.file"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-28.9 FAILED
+
+Test file error: error copying "abc.file" to "abc.dir/abc.file": no such file or directory
+    while executing
+"file copy abc.file abc.dir"
+    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/fCmd.test" line 2606)
 fileName.test
 
 
@@ -1680,19 +3055,73 @@ glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent
 glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3
 ==== filename-11.25.2 FAILED
 
-Test file error: tcltest 6196: suicide: sys: trap: fault write addr=0x0 pc=0x446cd8
-fileSystem.test
-Test file error: error deleting "dir2": invalid operation
-    while executing
-"file delete -force dir2"
-    (in namespace eval "::tcl::test::fileSystem" script line 238)
-    invoked from within
-"namespace eval ::tcl::test::fileSystem {
 
-    if {"::tcltest" ni [namespace children]} {
-	package require tcltest 2.5
-	namespace import -force ::tclte..."
-    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/fileSystem.test" line 12)
+
+==== filename-14.5 asterisks, question marks, and brackets FAILED
+==== Contents of test case:
+
+    lsort [glob */*/*/*.c]
+
+---- Test setup failed:
+error renaming "globTest" to "globTestContext/globTest": "globTestContext/globTest/a1/b1/x2.c": no such file or directory
+---- errorInfo(setup): error renaming "globTest" to "globTestContext/globTest": "globTestContext/globTest/a1/b1/x2.c": no such file or directory
+    while executing
+"file rename globTest [file join globTestContext globTest]"
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): POSIX ENOENT {no such file or directory}
+---- Test cleanup failed:
+can't read "savepwd": no such variable
+---- errorInfo(cleanup): can't read "savepwd": no such variable
+    while executing
+"cd $savepwd"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP VARNAME savepwd
+==== filename-14.5 FAILED
+
+
+
+==== filename-14.7 asterisks, question marks, and brackets FAILED
+==== Contents of test case:
+
+    lsort [glob globTest/*]
+
+---- Result was:
+globTest/a1 globTest/a2 globTest/a3 globTest/nonexistent {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
+---- Result should have been (exact matching):
+globTest/a1 globTest/a2 globTest/a3 {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
+==== filename-14.7 FAILED
+
+
+
+==== filename-14.9 asterisks, question marks, and brackets FAILED
+==== Contents of test case:
+
+    lsort [glob globTest/.*]
+
+---- Result was:
+globTest/.1
+---- Result should have been (exact matching):
+globTest/. globTest/.. globTest/.1
+==== filename-14.9 FAILED
+
+
+
+==== filename-14.15 asterisks, question marks, and brackets FAILED
+==== Contents of test case:
+
+    lsort [glob globTest/*/]
+
+---- Result was:
+globTest/a1/ globTest/a2/ globTest/a3/ globTest/nonexistent/
+---- Result should have been (exact matching):
+globTest/a1/ globTest/a2/ globTest/a3/
+==== filename-14.15 FAILED
+
+fileSystem.test
 fileSystemEncoding.test
 for-old.test
 for.test
@@ -1701,7 +3130,7 @@ format.test
 get.test
 history.test
 http.test
-Test file error: error copying "/usr/glenda/APExp/sys/src/external/tcl/tests/httpd" to "/usr/glenda/APExp/sys/src/external/tcl/tests/httpd_6213": no such file or directory
+Test file error: error copying "/usr/glenda/APExp/sys/src/external/tcl/tests/httpd" to "/usr/glenda/APExp/sys/src/external/tcl/tests/httpd_2498": no such file or directory
     while executing
 "file copy $origFile $httpdFile"
     invoked from within
@@ -2026,7 +3455,7 @@ line line none
     ("uplevel" body line 15)
     invoked from within
 "uplevel 1 $script"
----- errorCode: CHILDSTATUS 7286 1
+---- errorCode: CHILDSTATUS 3551 1
 ==== io-29.33b FAILED
 
 
@@ -2221,54 +3650,10 @@ abc def ghi jkl mno {p
     list [tell $in] [tell $out] {*}[set ::s0]
 
 ---- Result was:
--1 1 1 {error reading "file5": invalid or incomplete multibyte or wide character}
+-1 1 1 {error reading "file6": invalid or incomplete multibyte or wide character}
 ---- Result should have been (glob matching):
 1 1 1 {error reading "file*": invalid or incomplete multibyte or wide character}
 ==== io-52.22.1 FAILED
-
-
-
-==== io-53.7 CopyData: Flooding fcopy from pipe FAILED
-==== Contents of test case:
-
-    variable fcopyTestDone
-    file delete $path(pipe)
-    catch {unset fcopyTestDone}
-    set fcopyTestCount 0
-    set f1 [open $path(pipe) w]
-    puts $f1 {
-	# Write  10 bytes / 10 msec
-	proc Write {count} {
-	    puts -nonewline "1234567890"
-	    if {[incr count -1]} {
-		after 10 [list Write $count]
-	    } else {
-		set ::ready 1
-	    }
-	}
-	fconfigure stdout -buffering none
-	Write 345 ;# 3450 bytes ~3.45 sec
-	vwait ready
-	exit 0
-    }
-    close $f1
-    set in [open "|[list [interpreter] $path(pipe) &]" r+]
-    set out [open $path(test1) w]
-    doFcopy $in $out
-    variable fcopyTestDone
-    if {![info exists fcopyTestDone]} {
-	vwait [namespace which -variable fcopyTestDone]
-    }
-    catch {close $in}
-    close $out
-    # -1=error 0=script error N=number of bytes
-    expr {($fcopyTestDone == 0) ? $fcopyTestCount : -1}
-
----- Result was:
--1
----- Result should have been (exact matching):
-3450
-==== io-53.7 FAILED
 
 
 
@@ -2491,20 +3876,6 @@ main.test
 mathop.test
 misc.test
 msgcat.test
-Test file error: error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/msgdir3": invalid operation
-    while executing
-"file delete -force -- $fullName"
-    (procedure "removeDirectory" line 21)
-    invoked from within
-"removeDirectory msgdir3"
-    (in namespace eval "::msgcat::test" script line 680)
-    invoked from within
-"namespace eval ::msgcat::test {
-    namespace import ::msgcat::*
-    namespace import ::tcltest::test
-    namespace import ::tcltest::cleanupTests
-   ..."
-    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/msgcat.test" line 24)
 mutex.test
 namespace-old.test
 namespace.test
@@ -2538,269 +3909,6 @@ safe-stock.test
 safe-stock86.test
 safe-zipfs.test
 safe.test
-
-
-==== safe-13.2 mimic the valid glob call by ::tcl::tm::UnknownHandler [Bug 2964715] FAILED
-==== Contents of test case:
-
-    ::safe::interpAddToAccessPath $i $testdir2
-    set result [$i eval glob -nocomplain -directory $testdir2 *.tm]
-    if {$result eq [list $testfile]} {
-	return "glob match"
-    } else {
-	return "no match: $result"
-    }
-
----- Test cleanup failed:
-error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
----- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
-    while executing
-"file delete -force -- $fullName"
-    (procedure "removeDirectory" line 21)
-    invoked from within
-"removeDirectory $testdir"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): POSIX {unknown error} {invalid operation}
-==== safe-13.2 FAILED
-
-
-
-==== safe-13.3 cf 13.2 but test glob failure when -directory is outside access path [Bug 2964715] FAILED
-==== Contents of test case:
-
-    $i eval glob -directory $testdir2 *.tm
-
----- Test cleanup failed:
-error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
----- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
-    while executing
-"file delete -force -- $fullName"
-    (procedure "removeDirectory" line 21)
-    invoked from within
-"removeDirectory $testdir"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): POSIX {unknown error} {invalid operation}
-==== safe-13.3 FAILED
-
-
-
-==== safe-13.4 another valid glob call [Bug 2964715] FAILED
-==== Contents of test case:
-
-    ::safe::interpAddToAccessPath $i $testdir
-    ::safe::interpAddToAccessPath $i $testdir2
-    set result [$i eval  glob -nocomplain -directory $testdir [file join deletemetoo *.tm]]
-    if {$result eq [list $testfile]} {
-	return "glob match"
-    } else {
-	return "no match: $result"
-    }
-
----- Test cleanup failed:
-error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
----- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
-    while executing
-"file delete -force -- $fullName"
-    (procedure "removeDirectory" line 21)
-    invoked from within
-"removeDirectory $testdir"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): POSIX {unknown error} {invalid operation}
-==== safe-13.4 FAILED
-
-
-
-==== safe-13.5 as 13.4 but test glob failure when -directory is outside access path [Bug 2964715] FAILED
-==== Contents of test case:
-
-    ::safe::interpAddToAccessPath $i $testdir2
-    $i eval  glob -directory $testdir [file join deletemetoo *.tm]
-
----- Test cleanup failed:
-error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
----- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
-    while executing
-"file delete -force -- $fullName"
-    (procedure "removeDirectory" line 21)
-    invoked from within
-"removeDirectory $testdir"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): POSIX {unknown error} {invalid operation}
-==== safe-13.5 FAILED
-
-
-
-==== safe-13.6 as 13.4 but test silent failure when result is outside access_path [Bug 2964715] FAILED
-==== Contents of test case:
-
-    ::safe::interpAddToAccessPath $i $testdir
-    $i eval  glob -nocomplain -directory $testdir [file join deletemetoo *.tm]
-
----- Test cleanup failed:
-error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
----- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
-    while executing
-"file delete -force -- $fullName"
-    (procedure "removeDirectory" line 21)
-    invoked from within
-"removeDirectory $testdir"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): POSIX {unknown error} {invalid operation}
-==== safe-13.6 FAILED
-
-
-
-==== safe-13.7 mimic the glob call by tclPkgUnknown in a safe interpreter [Bug 2964715] FAILED
-==== Contents of test case:
-
-    set safeTD [::safe::interpAddToAccessPath $i $testdir]
-    ::safe::interpAddToAccessPath $i $testdir2
-    mapList [list $safeTD EXPECTED] [$i eval [list  glob -directory $safeTD -join * pkgIndex.tcl]]
-
----- Test cleanup failed:
-error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
----- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
-    while executing
-"file delete -force -- $fullName"
-    (procedure "removeDirectory" line 21)
-    invoked from within
-"removeDirectory $testdir"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): POSIX {unknown error} {invalid operation}
-==== safe-13.7 FAILED
-
-
-
-==== safe-13.7.1 mimic the glob call by tclPkgUnknown in a safe interpreter with multiple subdirectories FAILED
-==== Contents of test case:
-
-    set safeTD [::safe::interpAddToAccessPath $i $testdir]
-    ::safe::interpAddToAccessPath $i $testdir2
-    ::safe::interpAddToAccessPath $i $testdir3
-    mapAndSortList [list $safeTD EXPECTED] [$i eval [list  glob -directory $safeTD -join * pkgIndex.tcl]]
-
----- Test cleanup failed:
-error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
----- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
-    while executing
-"file delete -force -- $fullName"
-    (procedure "removeDirectory" line 21)
-    invoked from within
-"removeDirectory $testdir"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): POSIX {unknown error} {invalid operation}
-==== safe-13.7.1 FAILED
-
-
-
-==== safe-13.8 mimic the glob call by tclPkgUnknown without the special treatment that is specific to pkgIndex.tcl [Bug 2964715] FAILED
-==== Contents of test case:
-
-    set safeTD [::safe::interpAddToAccessPath $i $testdir]
-    ::safe::interpAddToAccessPath $i $testdir2
-    $i eval [list glob -directory $safeTD -join -nocomplain * notIndex.tcl]
-
----- Test cleanup failed:
-error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
----- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
-    while executing
-"file delete -force -- $fullName"
-    (procedure "removeDirectory" line 21)
-    invoked from within
-"removeDirectory $testdir"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): POSIX {unknown error} {invalid operation}
-==== safe-13.8 FAILED
-
-
-
-==== safe-13.9 as 13.8 but test glob failure when -directory is outside access path [Bug 2964715] FAILED
-==== Contents of test case:
-
-    ::safe::interpAddToAccessPath $i $testdir2
-    set result [$i eval  glob -directory $testdir -join -nocomplain * notIndex.tcl]
-    if {$result eq [list $testfile]} {
-	return {glob match}
-    } else {
-	return "no match: $result"
-    }
-
----- Test cleanup failed:
-error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
----- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
-    while executing
-"file delete -force -- $fullName"
-    (procedure "removeDirectory" line 21)
-    invoked from within
-"removeDirectory $testdir"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): POSIX {unknown error} {invalid operation}
-==== safe-13.9 FAILED
-
-
-
-==== safe-13.10 as 13.8 but test silent failure when result is outside access_path [Bug 2964715] FAILED
-==== Contents of test case:
-
-    ::safe::interpAddToAccessPath $i $testdir
-    $i eval glob -directory $testdir -join -nocomplain * notIndex.tcl
-
----- Test cleanup failed:
-error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
----- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/deletethisdir": invalid operation
-    while executing
-"file delete -force -- $fullName"
-    (procedure "removeDirectory" line 21)
-    invoked from within
-"removeDirectory $testdir"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): POSIX {unknown error} {invalid operation}
-==== safe-13.10 FAILED
-
-
-
-==== safe-16.3 Bug 3529949: defang ~ in globs FAILED
-==== Contents of test case:
-
-    ::safe::interpAddToAccessPath $i $syntheticHOME
-    $i eval {glob -nocomplain ~/*}
-
----- Test cleanup failed:
-error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/foo": invalid operation
----- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/foo": invalid operation
-    while executing
-"file delete -force -- $fullName"
-    (procedure "removeDirectory" line 21)
-    invoked from within
-"removeDirectory $syntheticHOME"
-    ("uplevel" body line 4)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): POSIX {unknown error} {invalid operation}
-==== safe-16.3 FAILED
-
-Warning: files left behind:
-	safe.test:	foo
 scan.test
 
 
@@ -3024,14 +4132,14 @@ remote server disappaered
 "uplevel 1 $setup"
 ---- errorCode(setup): NONE
 ---- Test cleanup failed:
-can not find channel named "sock960440"
----- errorInfo(cleanup): can not find channel named "sock960440"
+can not find channel named "sock960630"
+---- errorInfo(cleanup): can not find channel named "sock960630"
     while executing
 "close $s"
     ("uplevel" body line 2)
     invoked from within
 "uplevel 1 $cleanup"
----- errorCode(cleanup): TCL LOOKUP CHANNEL sock960440
+---- errorCode(cleanup): TCL LOOKUP CHANNEL sock960630
 ==== socket_inet-11.1 FAILED
 
 
@@ -3063,14 +4171,14 @@ remote server disappeared
 "uplevel 1 $setup"
 ---- errorCode(setup): NONE
 ---- Test cleanup failed:
-can not find channel named "sock960440"
----- errorInfo(cleanup): can not find channel named "sock960440"
+can not find channel named "sock960630"
+---- errorInfo(cleanup): can not find channel named "sock960630"
     while executing
 "close $s"
     ("uplevel" body line 2)
     invoked from within
 "uplevel 1 $cleanup"
----- errorCode(cleanup): TCL LOOKUP CHANNEL sock960440
+---- errorCode(cleanup): TCL LOOKUP CHANNEL sock960630
 ==== socket_inet-11.2 FAILED
 
 
@@ -3145,14 +4253,14 @@ remote server disappeared
 "uplevel 1 $setup"
 ---- errorCode(setup): NONE
 ---- Test cleanup failed:
-can not find channel named "file5"
----- errorInfo(cleanup): can not find channel named "file5"
+can not find channel named "file6"
+---- errorInfo(cleanup): can not find channel named "file6"
     while executing
 "close $f"
     ("uplevel" body line 2)
     invoked from within
 "uplevel 1 $cleanup"
----- errorCode(cleanup): TCL LOOKUP CHANNEL file5
+---- errorCode(cleanup): TCL LOOKUP CHANNEL file6
 ==== socket_inet-11.5 FAILED
 
 
@@ -3193,14 +4301,14 @@ remote server disappeared
 "uplevel 1 $setup"
 ---- errorCode(setup): NONE
 ---- Test cleanup failed:
-can not find channel named "sock90cb00"
----- errorInfo(cleanup): can not find channel named "sock90cb00"
+can not find channel named "sock90cb10"
+---- errorInfo(cleanup): can not find channel named "sock90cb10"
     while executing
 "close $s1"
     ("uplevel" body line 2)
     invoked from within
 "uplevel 1 $cleanup"
----- errorCode(cleanup): TCL LOOKUP CHANNEL sock90cb00
+---- errorCode(cleanup): TCL LOOKUP CHANNEL sock90cb10
 ==== socket_inet-11.7 FAILED
 
 
@@ -3230,14 +4338,14 @@ remote server disappeared
 "uplevel 1 $setup"
 ---- errorCode(setup): NONE
 ---- Test cleanup failed:
-can not find channel named "sock90cb00"
----- errorInfo(cleanup): can not find channel named "sock90cb00"
+can not find channel named "sock90cb10"
+---- errorInfo(cleanup): can not find channel named "sock90cb10"
     while executing
 "close $s1"
     ("uplevel" body line 2)
     invoked from within
 "uplevel 1 $cleanup"
----- errorCode(cleanup): TCL LOOKUP CHANNEL sock90cb00
+---- errorCode(cleanup): TCL LOOKUP CHANNEL sock90cb10
 ==== socket_inet-11.8 FAILED
 
 
@@ -3302,14 +4410,14 @@ remote server disappeared
 "uplevel 1 $setup"
 ---- errorCode(setup): NONE
 ---- Test cleanup failed:
-can not find channel named "sock9663c0"
----- errorInfo(cleanup): can not find channel named "sock9663c0"
+can not find channel named "sock966610"
+---- errorInfo(cleanup): can not find channel named "sock966610"
     while executing
 "close $s"
     ("uplevel" body line 2)
     invoked from within
 "uplevel 1 $cleanup"
----- errorCode(cleanup): TCL LOOKUP CHANNEL sock9663c0
+---- errorCode(cleanup): TCL LOOKUP CHANNEL sock966610
 ==== socket_inet-11.10 FAILED
 
 
@@ -3695,42 +4803,6 @@ tailcall.test
 tcltest.test
 
 
-==== tcltest-8.1 tcltest a.tcl -tmpdir a FAILED
-==== Contents of test case:
-
-    child msg $a -tmpdir thisdirectorydoesnotexist
-    file exists [file join thisdirectorydoesnotexist a.tmp]
-
----- Test cleanup failed:
-error deleting "thisdirectorydoesnotexist": invalid operation
----- errorInfo(cleanup): error deleting "thisdirectorydoesnotexist": invalid operation
-    while executing
-"file delete -force thisdirectorydoesnotexist"
-    ("uplevel" body line 2)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): POSIX {unknown error} {invalid operation}
-==== tcltest-8.1 FAILED
-
-
-
-==== tcltest-8.10 tcltest a.tcl -testdir thisdirectorydoesnotexist FAILED
-==== Contents of test case:
-child msg $a -testdir thisdirectorydoesnotexist
-	return $msg
----- Test setup failed:
-error deleting "thisdirectorydoesnotexist": invalid operation
----- errorInfo(setup): error deleting "thisdirectorydoesnotexist": invalid operation
-    while executing
-"file delete -force thisdirectorydoesnotexist"
-    ("uplevel" body line 1)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): POSIX {unknown error} {invalid operation}
-==== tcltest-8.10 FAILED
-
-
-
 ==== tcltest-9.5 GetMatchingFiles: Bug 1119798 FAILED
 ==== Contents of test case:
 
@@ -3748,29 +4820,12 @@ error copying "/usr/glenda/APExp/sys/src/external/tcl/tests/all.tcl" to "/usr/gl
 ---- errorCode(setup): POSIX ENOENT {no such file or directory}
 ==== tcltest-9.5 FAILED
 
-Test file error: error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/singleprocdir": invalid operation
-    while executing
-"file delete -force -- $fullName"
-    (procedure "removeDirectory" line 21)
-    invoked from within
-"removeDirectory singleprocdir"
-    (in namespace eval "::tcltest::test" script line 915)
-    invoked from within
-"namespace eval ::tcltest::test {
-
-namespace import ::tcltest::*
-
-makeFile {
-    package require tcltest 2.5
-    namespace import ::tcltest::test
-    t..."
-    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/tcltest.test" line 28)
 thread.test
 timer.test
 tm.test
 trace.test
 unixFCmd.test
-Test file error: error deleting "./td1": invalid operation
+Test file error: error deleting "./tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
     while executing
 "file delete -force -- $file"
     (procedure "cleanup" line 13)
@@ -3832,7 +4887,7 @@ unixInit.test
     }
 
 ---- Result was:
-Expected: `127.0.0.1 localhost 49906', Got `'
+Expected: `127.0.0.1 localhost 40602', Got `'
 ---- Result should have been (exact matching):
 OK
 ==== unixInit-1.2 FAILED
@@ -3851,10 +4906,16 @@ while.test
 winConsole.test
 winDde.test
 winFCmd.test
-Test file error: error deleting "td1": invalid operation
+Test file error: error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir/tfad/dir": invalid operation
     while executing
-"file delete -force -- td1"
-    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/winFCmd.test" line 105)
+"file delete -force $victim"
+    (procedure "cleanupRecurse" line 9)
+    invoked from within
+"cleanupRecurse {*}[glob -nocomplain -directory $p tf* td*]"
+    (procedure "cleanup" line 3)
+    invoked from within
+"cleanup"
+    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/winFCmd.test" line 1428)
 winFile.test
 winNotify.test
 winPipe.test
@@ -3878,50 +4939,6 @@ error copying "/usr/glenda/APExp/sys/src/external/tcl/tests/zipfiles/test.zip" t
 "uplevel 1 $setup"
 ---- errorCode(setup): POSIX ENOENT {no such file or directory}
 ==== zipfs-mount-one-arg-2 FAILED
-
-
-
-==== zipfs-find-native-absolute zipfs find on native file system FAILED
-==== Contents of test case:
-
-	string equal [zipfs find $dir] [list $subdir $file]
-    
----- Test cleanup failed:
-error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/zipfs-native-absolute": invalid operation
----- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/zipfs-native-absolute": invalid operation
-    while executing
-"file delete -force -- $fullName"
-    (procedure "removeDirectory" line 21)
-    invoked from within
-"removeDirectory zipfs-native-absolute"
-    ("uplevel" body line 2)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): POSIX {unknown error} {invalid operation}
-==== zipfs-find-native-absolute FAILED
-
-
-
-==== zipfs-find-native-relative zipfs find relative on native file system FAILED
-==== Contents of test case:
-
-	cd [file dirname $dir]
-	# string equal [zipfs find [file tail $subdir]] [list subdir subdir/native]
-	zipfs find [file tail $dir]
-    
----- Test cleanup failed:
-error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/zipfs-native-relative": invalid operation
----- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/zipfs-native-relative": invalid operation
-    while executing
-"file delete -force -- $fullName"
-    (procedure "removeDirectory" line 21)
-    invoked from within
-"removeDirectory zipfs-native-relative"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): POSIX {unknown error} {invalid operation}
-==== zipfs-find-native-relative FAILED
 
 
 
@@ -4098,7 +5115,7 @@ atime 1105466634 blksize 0 blocks 0 ctime 1105466634 dev 0 gid 0 ino 0 mode 1674
 	    lsort -stride 2 [file stat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789657714 ctime 1789657714 dev 0 gid 0 ino 0 mode 16749 mtime 1789657714 nlink 0 size 0 type directory uid 0
+atime 1789700586 ctime 1789700586 dev 0 gid 0 ino 0 mode 16749 mtime 1789700586 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-stat-root-mount FAILED
@@ -4111,7 +5128,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789657714 ctime 1789657714 dev 0 gid 0 ino 0 mode 16749 mtime 1789657714 nlink 0 size 0 type directory uid 0
+atime 1789700586 ctime 1789700586 dev 0 gid 0 ino 0 mode 16749 mtime 1789700586 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-lstat-root-mount FAILED
@@ -4124,7 +5141,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file stat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789657714 ctime 1789657714 dev 0 gid 0 ino 0 mode 16749 mtime 1789657714 nlink 0 size 0 type directory uid 0
+atime 1789700586 ctime 1789700586 dev 0 gid 0 ino 0 mode 16749 mtime 1789700586 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-stat-root-subdir-mount FAILED
@@ -4137,7 +5154,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789657714 ctime 1789657714 dev 0 gid 0 ino 0 mode 16749 mtime 1789657714 nlink 0 size 0 type directory uid 0
+atime 1789700586 ctime 1789700586 dev 0 gid 0 ino 0 mode 16749 mtime 1789700586 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-lstat-root-subdir-mount FAILED
@@ -4150,7 +5167,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file stat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789657714 ctime 1789657714 dev 0 gid 0 ino 0 mode 16749 mtime 1789657714 nlink 0 size 0 type directory uid 0
+atime 1789700586 ctime 1789700586 dev 0 gid 0 ino 0 mode 16749 mtime 1789700586 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-stat-mezzo FAILED
@@ -4163,106 +5180,95 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789657714 ctime 1789657714 dev 0 gid 0 ino 0 mode 16749 mtime 1789657714 nlink 0 size 0 type directory uid 0
+atime 1789700586 ctime 1789700586 dev 0 gid 0 ino 0 mode 16749 mtime 1789700586 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-lstat-mezzo FAILED
 
-
-
-==== zipfs-file-copydir-fromzip-1 Copy archive dir to native FAILED
-==== Contents of test case:
-
-	file copy [file join $defMountPt testdir] $dst
-	zipfs find $dst
-    
----- Test cleanup failed:
-error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/dstdir.tmp": invalid operation
----- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/dstdir.tmp": invalid operation
-    while executing
-"file delete -force $dst"
-    ("uplevel" body line 2)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): POSIX {unknown error} {invalid operation}
-==== zipfs-file-copydir-fromzip-1 FAILED
-
-
-
-==== zipfs-file-copymount-fromzip-new Copy archive mount to native FAILED
-==== Contents of test case:
-
-	file copy $defMountPt $dst
-	list [file isfile [file join $dst test]]  [file isdirectory [file join $dst testdir]]  [file isfile [file join $dst testdir test2]]
-    
----- Test setup failed:
-/usr/glenda/APExp/sys/src/external/tcl/tests/zipfiles/test.zip is already mounted on //zipfs:/testmount
----- errorInfo(setup): /usr/glenda/APExp/sys/src/external/tcl/tests/zipfiles/test.zip is already mounted on //zipfs:/testmount
-    while executing
-"zipfs mount $zippath $mountpoint"
-    (procedure "mount" line 2)
-    invoked from within
-"mount [zippath test.zip]"
-    ("uplevel" body line 2)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL ZIPFS MOUNTED
----- Test cleanup failed:
-error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/dstdir.tmp": invalid operation
----- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/dstdir.tmp": invalid operation
-    while executing
-"file delete -force $dst"
-    ("uplevel" body line 2)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): POSIX {unknown error} {invalid operation}
-==== zipfs-file-copymount-fromzip-new FAILED
-
-
-
-==== zipfs-file-delete Delete file in zip archive FAILED
-==== Contents of test case:
-
-	set file [file join $defMountPt test]
-	list  [file exists $file]  [catch {file delete $file} msg]  $msg  [file exists $file]
-    
----- Test setup failed:
-/usr/glenda/APExp/sys/src/external/tcl/tests/zipfiles/test.zip is already mounted on //zipfs:/testmount
----- errorInfo(setup): /usr/glenda/APExp/sys/src/external/tcl/tests/zipfiles/test.zip is already mounted on //zipfs:/testmount
-    while executing
-"zipfs mount $zippath $mountpoint"
-    (procedure "mount" line 2)
-    invoked from within
-"mount [zippath test.zip]"
-    ("uplevel" body line 2)
-    invoked from within
-"uplevel 1 $setup"
----- errorCode(setup): TCL ZIPFS MOUNTED
-==== zipfs-file-delete FAILED
-
-
-
-==== bug-7d5f1c1308 zipfs error on dotfiles FAILED
-==== Contents of test case:
-
-	zipfs mkzip $zipfile $dir [file dirname $dir]
-	zipfs mount $zipfile $mt
-	lsort [zipfs list $mt/*]
-    
----- Test cleanup failed:
-error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/bug-7d5f1c1308": invalid operation
----- errorInfo(cleanup): error deleting "/usr/glenda/APExp/sys/src/external/tcl/tests/bug-7d5f1c1308": invalid operation
-    while executing
-"file delete -force -- $fullName"
-    (procedure "removeDirectory" line 21)
-    invoked from within
-"removeDirectory $basename"
-    ("uplevel" body line 4)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): POSIX {unknown error} {invalid operation}
-==== bug-7d5f1c1308 FAILED
-
-Warning: files left behind:
-	zipfs.test:	zipfs-native-absolute zipfs-native-relative dstdir.tmp bug-7d5f1c1308
 zlib.test
+
+Tests ended at 2026-09-18 05:03:08 +0200
+all.tcl:	Total	67008	Passed	61226	Skipped	5630	Failed	152
+Sourced 167 Test Files.
+Files with failing tests: binary.test chanio.test clock.test clock.test cmdAH.test env.test event.test exec.test expr-old.test expr.test fileName.test io.test lseq.test main.test scan.test socket.test tcltest.test unixInit.test zipfs.test
+Number of tests skipped for each constraint:
+	9	!ieeeFloatingPoint
+	1	!singleTestInterp notWsl
+	1	DBIGMEM: string size overflow: unable to alloc -2147483648 bytes
+	1	GetelementsShimmer
+	18	RangeShimmer
+	11	ReplaceShimmer
+	4	ReverseShimmer
+	16	SetelementShimmer
+	3	asyncPipeChan
+	8	badCompress
+	78	bigEndian
+	99	bigdata
+	2	bugOutOfMemoryPanic
+	6	bugTakesTooLong
+	5	bug_3057639
+	1	bug_30e4e9102f
+	1	bug_4ae42446ab
+	2	bug_fa00fbbbab
+	60	cookiejar
+	49	dde
+	51	emptyTest
+	1	enableUnixInit32
+	2	extensive
+	2	filetime64bit
+	2	has32BitLengths
+	2	hasIsoLocale
+	16	hasLinks
+	2	hasMemUsage
+	1	haveWinget
+	58	icu
+	1	knownBadTest
+	51	knownBug
+	2	lgen
+	100	localeRegexp
+	2	localhost_v6
+	4	longIs64bit
+	14	macosxFileAttr
+	1	makeFileInHome
+	94	memory
+	2	memoryAllocationPanic
+	72	needsSquidAuth
+	12	needsSquidNoAuth
+	8	needsTls
+	42	nonPortable
+	1	notValgrind
+	1	notenoughmemoryexception
+	1	obsolete
+	1	panicInEnterCmdStartData
+	8	perf
+	3992	serverNeeded
+	12	supported_inet6
+	19	tcl9pkgaRequired
+	20	tcl9pkguaRequired
+	1	testCPUID
+	1	testWithLimit
+	1	testexprparser && !ieeeFloatingPoint
+	5	testhandlecount
+	12	testmutex
+	11	testsaveresult
+	1	testwinclock
+	197	thread
+	1	tildeexpansion
+	409	win
+	19	zipfslib
+
+Test files exiting with errors:  
+
+  encoding.test
+
+  fCmd.test
+
+  http.test
+
+  unixFCmd.test
+
+  winFCmd.test
+
+tcl-runall: every file ran, now entering exit (code 0)
+tcl-runall: anything below this line is Tcl_Exit teardown
+tcl-runall: exit called (code 0)
