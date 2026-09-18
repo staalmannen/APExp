@@ -73,6 +73,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <signal.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "lib.h"
 #include "sys9.h"
@@ -98,6 +100,79 @@ static Lproc lproc[OPEN_MAX];
  */
 static int killing;
 
+/*
+ * WHAT ACTUALLY HAPPENED, ON DEMAND. Two rounds went on guesses about
+ * why a closed listener still held its port -- an ordering that turned
+ * out not to matter, and a teardown that turned out not to close the
+ * descriptor. Both were reasoning where a printed line would have
+ * settled it in one run, which is this tree's oldest rule.
+ *
+ * $APEXP_LISTENDEBUG turns on one line per decision, on standard error.
+ * write(2) and a hand-rolled number: stdio here would pull the whole of
+ * it into close.o, which every program links.
+ */
+static int dbgon = -1;
+
+/*
+ * WHICH libap A PROGRAM IS ACTUALLY LINKED AGAINST, asked rather than
+ * assumed. `pcc -o x x.c' relinks the program against the INSTALLED
+ * library, so a test can be rebuilt from a freshly pulled source and
+ * still be running library code from days ago -- and nothing in its
+ * output would say so. That cost a round here twice: once when a
+ * section that should have printed a header printed nothing, and once
+ * when a debug line that should have appeared did not.
+ *
+ * This is the `_APEXP_LIMITS_H' marker in deeppath-test, moved from a
+ * header to a library: a program calls it and prints the number, so the
+ * output says which library ran. Bump it whenever this file changes in
+ * a way a test needs to see.
+ *
+ * A LINK ERROR IS ALSO AN ANSWER, and a clearer one: an undefined
+ * `_sock_listenmark' means the installed libap predates this file
+ * entirely.
+ */
+int
+_sock_listenmark(void)
+{
+	return 2;		/* 1: first version; 2: dev/ino + debug */
+}
+
+static void
+dbg(const char *what, int fd, int pid)
+{
+	char buf[128], *p, *q, n[16];
+	int v, i;
+
+	if(dbgon < 0)
+		dbgon = getenv("APEXP_LISTENDEBUG") != 0;
+	if(dbgon == 0)
+		return;
+	p = buf;
+	q = buf + sizeof buf - 2;
+	for(i = 0; "listenpid: "[i] && p < q; i++)
+		*p++ = "listenpid: "[i];
+	for(i = 0; what[i] && p < q; i++)
+		*p++ = what[i];
+	for(i = 0; " fd="[i] && p < q; i++)
+		*p++ = " fd="[i];
+	v = fd;
+	i = 0;
+	if(v < 0){ *p++ = '-'; v = -v; }
+	do { n[i++] = '0' + v%10; v /= 10; } while(v && i < (int)sizeof n);
+	while(i > 0 && p < q)
+		*p++ = n[--i];
+	for(i = 0; " pid="[i] && p < q; i++)
+		*p++ = " pid="[i];
+	v = pid;
+	i = 0;
+	if(v < 0){ *p++ = '-'; v = -v; }
+	do { n[i++] = '0' + v%10; v /= 10; } while(v && i < (int)sizeof n);
+	while(i > 0 && p < q)
+		*p++ = n[--i];
+	*p++ = '\n';
+	write(2, buf, p - buf);
+}
+
 void
 _sock_setlisten(int fd, int pid)
 {
@@ -111,6 +186,7 @@ _sock_setlisten(int fd, int pid)
 	lproc[fd].owner = getpid();
 	lproc[fd].dev = st.st_dev;
 	lproc[fd].ino = st.st_ino;
+	dbg("recorded a listener", fd, pid);
 }
 
 void
@@ -121,8 +197,10 @@ _sock_killlisten(int fd)
 
 	if(fd < 0 || fd >= OPEN_MAX)
 		return;
-	if((pid = lproc[fd].pid) <= 0)
+	if((pid = lproc[fd].pid) <= 0){
+		dbg("close of a descriptor with no listener", fd, 0);
 		return;
+	}
 	/*
 	 * IS THIS STILL THE SAME FILE? If the number has come back as
 	 * something else the entry is stale, and killing on it would kill
@@ -135,6 +213,7 @@ _sock_killlisten(int fd)
 	|| st.st_dev != lproc[fd].dev || st.st_ino != lproc[fd].ino){
 		lproc[fd].pid = 0;
 		lproc[fd].owner = 0;
+		dbg("STALE: fstat says this is a different file now", fd, pid);
 		return;
 	}
 	/*
@@ -142,12 +221,20 @@ _sock_killlisten(int fd)
 	 * and the number is about to be reused.
 	 */
 	lproc[fd].pid = 0;
-	if(lproc[fd].owner != getpid())
+	if(lproc[fd].owner != getpid()){
+		dbg("NOT OURS: recorded by another process", fd, pid);
 		return;			/* not ours to kill -- see above */
+	}
 	lproc[fd].owner = 0;
-	if(killing)
+	if(killing){
+		dbg("RE-ENTERED: declining to kill", fd, pid);
 		return;
+	}
 	killing = 1;
-	kill(pid, SIGKILL);
+	dbg("killing the listener", fd, pid);
+	if(kill(pid, SIGKILL) < 0)
+		dbg("...and kill FAILED", fd, pid);
+	else
+		dbg("...kill returned 0", fd, pid);
 	killing = 0;
 }

@@ -5119,3 +5119,168 @@ somewhere else in that test; a TIMED OUT line names the statement, and
 if it is the one after the close then ending the listener does break an
 accepted connection and the whole approach needs rethinking rather than
 patching.
+
+#### Still held after the rebuild, and two guesses in a row were wrong
+
+```
+After libap rebuild
+  note the system chose port 48153
+  note listen -> errno 42 (Address in use); plan 9 says: address in use
+  note the port is still held by SOMETHING after the socket was closed
+  FAIL the port can be bound again once the socket is closed
+2 failure(s)
+```
+
+**Two things to read off that before anything else.**
+
+First, **section 3 never printed**, so the binary was built from the test
+as it stood before section 3 was added -- which dates the libap under it
+too. The `chan-io-29.34` question is still unasked. *A measurement of a
+build that does not contain the change measures nothing*, and the way to
+notice it here was that a section which should have printed a header did
+not print one at all. Numbering the sections is what made that legible.
+
+Second, **it is `listen()` that reports "address in use", not `bind()`**.
+On Plan 9 the announcement happens in `listen()`, so the failing call
+names the right place; nothing is wrong with the test's reading.
+
+**And the port is still held with the kill in place, which refutes the
+obvious diagnosis rather than confirming it.**
+
+Two mechanisms were argued for it and both were wrong, and the way they
+were wrong is the same way:
+
+- *"`_sock_killlisten` runs after `close()` has zeroed `_fdinfo`, so
+  `fstat()` fails and the guard declines."* `fstat()` goes through
+  `_dirfstat()`, a raw call on the descriptor, not through `_fdinfo`. It
+  was moved to the front of `close()` anyway, which is tidier, but it
+  was not this.
+- *"`_closebuf` tears the descriptor down first."* `_closebuf` kills the
+  copy process and does not close the descriptor at all.
+
+Both were read out of the source and both were plausible. **That is two
+rounds spent on mechanism where one printed line would have settled it**
+-- which is the oldest rule in this file, *print what the machine says
+rather than what the code implies*, broken twice in succession while
+being quoted.
+
+So `$APEXP_LISTENDEBUG` now makes `_sock_listenpid.c` say what it did,
+one line per decision, on standard error:
+
+```
+listenpid: recorded a listener fd=3 pid=1234
+listenpid: killing the listener fd=3 pid=1234
+listenpid: ...kill returned 0
+```
+
+or one of `close of a descriptor with no listener`, `STALE: fstat says
+this is a different file now`, `NOT OURS: recorded by another process`,
+`RE-ENTERED: declining to kill`, `...and kill FAILED`. `write(2)` and a
+hand-rolled number rather than stdio, because stdio in this file would
+pull the whole of it into `close.o`, which every program links.
+
+**The four answers and what each one means:**
+
+- **nothing printed at all** -- `_sock_listenpid.o` is not in the
+  library, or `close()` is not calling it; a build question, not a
+  logic one.
+- **`recorded` but no `killing`** -- the entry is not surviving to the
+  close. `STALE` says the descriptor changed identity between `listen()`
+  and `close()`, which would mean the pipe is not the thing to key on.
+- **`killing` then `kill returned 0`, and the port still held** -- the
+  listener is not the only holder of the announcement, and the whole
+  approach is wrong rather than buggy. That is the outcome that says
+  revert.
+- **`kill FAILED`** -- the pid is not reachable; look at what `kill()`
+  does with a process in another note group.
+
+No prediction. Three have been offered on this bug and the machine has
+refuted each one; the next line should come from the VM, not from here.
+
+#### Section 3 passes, and that is not the good news it looks like
+
+With the tree actually pulled, section 3 ran and passed all three:
+
+```
+--- 3. close the LISTENER while a connection is in use ---
+  PASS a message arrives before the listener is closed
+  PASS ...and one still arrives after it is closed
+  PASS the accepted connection reports end of file
+```
+
+**But sections 1 and 2 still FAIL -- the port is still held -- and those
+two facts together do not say what they appear to.** A PASS in section 3
+has two explanations: the listener was killed and the accepted
+connection was undisturbed, *or* the listener was never killed at all.
+It can **convict** the kill and never clear it.
+
+And sections 1 and 2 are exactly what say whether a kill happened. They
+failed. So the reading is **"no kill happened"**, not "the kill is
+harmless" -- and section 3 is currently evidence about nothing.
+
+That is this file's own rule, *a check whose negative result has two
+explanations is not a check*, met from the positive side, in a test
+written three messages ago to avoid precisely this class. The section
+now prints the ambiguity in its own output rather than leaving a reader
+to reconstruct it:
+
+```
+  note a PASS above means the kill did not break this
+  note connection -- OR that no kill happened. Sections 1
+  note and 2 are what tell those apart; if they FAILED,
+  note nothing was killed and this section proves nothing.
+```
+
+**A test that can pass for two reasons should say so where the result is
+read, not where the source is read.** The comment at the top of the file
+had said it; the output had not, and the output is what gets pasted into
+a message.
+
+**The code path has been re-read and is right** -- `_sock_listenpid.$O`
+is first in `network/mkfile`'s `OFILES`, `pid` is the parent's fork
+return, `_sock_setlisten(fd, pid)` is in the `default:` arm against the
+socket descriptor. So there is nothing left to find by reading, which
+was the conclusion two rounds ago as well.
+
+`APEXP_LISTENDEBUG=1 ./listenleak-test` is the whole of the next step.
+
+#### Nothing printed, and that was ambiguous too: a mark for the library
+
+`APEXP_LISTENDEBUG=1 ./listenleak-test` produced no `listenpid:` line at
+all -- and the new `note a PASS above...` lines from the commit before
+it were missing too, which is the tell.
+
+**`pcc -o listenleak-test listenleak-test.c` relinks the program against
+the INSTALLED library.** A test rebuilt from a freshly pulled source can
+therefore be running library code from days earlier, and nothing in its
+output says so. That is the same trap as the header search order, and it
+has now cost two rounds in a row on the same bug: once when a numbered
+section printed no header, and once when a debug line that should have
+appeared did not.
+
+**So the library gets a mark, exactly as `<limits.h>` did.**
+`_sock_listenmark()` returns 2, the test prints it first, and the number
+is bumped whenever this file changes in a way a test needs to see:
+
+```
+--- 0. which libap is linked in ---
+  note libap listen bookkeeping: mark 2 (this tree is 2)
+  note if that is not 2, `mk install' has not reached
+  note the installed library and nothing below is
+  note about the code you just pulled
+```
+
+**A link error is also an answer**, and a blunter one: an undefined
+`_sock_listenmark` means the installed libap predates the file entirely.
+
+*`deeppath-test`'s header marker refuted a wrong diagnosis about
+architecture directories in one run. The generalisation was available
+then and was not taken: **anything a test measures that comes from
+somewhere other than its own source should say where it came from.**
+A header, a library, a build -- the same rule, and this is its third
+instance.*
+
+**What is and is not known, plainly.** Whether a kill ever happens is
+still unmeasured; every run so far has been against a library whose
+provenance was not established. The mark is what ends that class of
+round.

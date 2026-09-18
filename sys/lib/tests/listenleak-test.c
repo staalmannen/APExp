@@ -180,6 +180,21 @@ arrived(void)
 	alarm(0);
 }
 
+/*
+ * WHICH libap THIS BINARY IS LINKED AGAINST. `pcc -o x x.c' links
+ * against the INSTALLED library, so a test rebuilt from a fresh pull can
+ * still be running library code from before it -- and nothing in the
+ * output would say. Two rounds were lost that way here. If the link
+ * fails with an undefined `_sock_listenmark', the installed libap
+ * predates the change entirely, and that is the answer.
+ */
+#ifndef __GNUC__
+extern int _sock_listenmark(void);
+#define LISTENMARK _sock_listenmark()
+#else
+#define LISTENMARK (-1)
+#endif
+
 int
 main(void)
 {
@@ -189,6 +204,17 @@ main(void)
 	socklen_t alen;
 	char buf[64];
 	int n;
+
+	printf("--- 0. which libap is linked in ---\n");
+	if(LISTENMARK < 0)
+		printf("  note built with gcc; libap is not involved\n");
+	else {
+		printf("  note libap listen bookkeeping: mark %d"
+			" (this tree is 2)\n", LISTENMARK);
+		printf("  note if that is not 2, `mk install' has not reached\n");
+		printf("  note the installed library and nothing below is\n");
+		printf("  note about the code you just pulled\n");
+	}
 
 	printf("--- 1. close a listener, then take its port back ---\n");
 	port = 0;
@@ -251,6 +277,15 @@ main(void)
 	 * The read before the close is a control: without it, a failure
 	 * after the close would not distinguish "the close broke it" from
 	 * "it never worked".
+	 *
+	 * BUT A PASS HERE HAS TWO EXPLANATIONS, and the output says so
+	 * rather than leaving the reader to notice. This section passes if
+	 * the listener was killed and the accepted connection was
+	 * undisturbed -- and equally if the listener was never killed at
+	 * all. It can only CONVICT the kill, never clear it. Sections 1
+	 * and 2 are what say whether a kill happened, and when they fail
+	 * while this passes, the reading is "no kill happened", not "the
+	 * kill is harmless".
 	 */
 	signal(SIGALRM, alarmed);
 	port = 0;
@@ -308,6 +343,11 @@ main(void)
 	arrived();
 	ok("the accepted connection reports end of file", n == 0);
 	close(as);
+	printf("  note a PASS above means the kill did not break this\n");
+	printf("  note connection -- OR that no kill happened. Sections 1\n");
+	printf("  note and 2 are what tell those apart; if they FAILED,\n");
+	printf("  note nothing was killed and this section proves nothing.\n");
+	printf("  note APEXP_LISTENDEBUG=1 makes libap say which it was.\n");
 
 done:
 	printf("%d failure(s)\n", failures);
