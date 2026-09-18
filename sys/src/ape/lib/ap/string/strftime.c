@@ -10,7 +10,6 @@ static char *amon[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
 static char *mon[12] = {"January", "February", "March", "April", "May", "June",
 		"July", "August", "September", "October", "November", "December"};
 static char *ampm[2] = {"AM", "PM"};
-static char *tz[2] = {"EST", "EDT"};
 
 static int jan1(int);
 static char *strval(char *, char *, char **, int, int);
@@ -19,7 +18,7 @@ static char *dval(char *, char *, int, int);
 size_t
 strftime(char *s, size_t maxsize, const char *format, const struct tm *t)
 {
-	char *sp, *se, *fp;
+	char *sp, *se, *fp, *cp;
 	int i;
 
 	sp = s;
@@ -111,9 +110,46 @@ strftime(char *s, size_t maxsize, const char *format, const struct tm *t)
 				sp = dval(sp, se, t->tm_year+1900, 4);
 				break;
 			case 'Z':
-				/* hack for now: assume eastern time zone */
-				i = t->tm_isdst? 1 : 0;
-				sp = strval(sp, se, tz, i, 2);
+				/*
+				 * This was `strval(sp, se, tz, t->tm_isdst, 2)'
+				 * against a static {"EST", "EDT"}, under the
+				 * comment "hack for now: assume eastern time
+				 * zone" -- every zone in the world printed as
+				 * one of two names. struct tm carries tm_zone
+				 * here; nothing had ever filled it in, which is
+				 * why the hack looked necessary. It does now
+				 * (see time/tzone.c), so read it.
+				 *
+				 * An empty name is not an error and must print
+				 * as nothing: that is what a zone we could not
+				 * identify looks like, and glibc prints nothing
+				 * for it too.
+				 */
+				if(t->tm_zone != 0)
+					for(cp = (char *)t->tm_zone; *cp && sp < se; cp++)
+						*sp++ = *cp;
+				break;
+			case 'z':
+				/*
+				 * Did not exist at all, so `%z' fell through to
+				 * `default:' and printed a literal `z'.
+				 * +hhmm/-hhmm, EAST of Greenwich positive --
+				 * the opposite sign from the `timezone' global
+				 * four lines from it in <time.h>.
+				 */
+				{
+					long off;
+					int neg;
+
+					off = t->tm_gmtoff;
+					neg = off < 0;
+					if(neg)
+						off = -off;
+					if(sp < se)
+						*sp++ = neg ? '-' : '+';
+					sp = dval(sp, se, (int)(off/3600), 2);
+					sp = dval(sp, se, (int)(off/60%60), 2);
+				}
 				break;
 			case 0:
 				fp--; /* stop loop after next fp incr */

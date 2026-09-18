@@ -4495,3 +4495,134 @@ confirm the fix, and its value was entirely in being written so it could
 say the opposite: it prints the conclusion for *both* outcomes and counts
 no failure either way, which is why the answer was readable as soon as
 it ran rather than argued about afterwards.
+
+#### clock 16: $TZ reached nothing, and there were two timezone implementations
+
+The characterisation from two rounds ago held up: every one of `clock`'s
+sixteen is `-timezone :localtime`, the mode where Tcl stops using its own
+tzdata and asks the C library. The test names say what is wanted outright:
+
+```
+clock-38.3sc {ensure cache of base is correct for :localtime
+               if TZ-env changing / scan}
+```
+
+**libap had two timezone implementations that could not see each other,
+and neither had heard of `$TZ`.**
+
+```c
+/* tzset.c */		if((p = getenv("timezone")) == 0)	/* Plan 9's spelling */
+/* ctime.c */		if(tz.stname[0] == 0) readtimezone();	/* once per process */
+/* ctime.c */		i = open("/env/timezone", 0);		/* its own static */
+```
+
+So `tzset()` had no effect on `localtime()`, setting `TZ` had no effect
+on anything, and `readtimezone()` ran once ever -- there was no path by
+which a changed variable could reach an answer. Two more gaps came with
+it, and they are the same bug seen from the other end: nothing set
+`tm_gmtoff` or `tm_zone`, though `struct tm` here has both, so
+`strftime`'s `%Z` was
+
+```c
+case 'Z':
+	/* hack for now: assume eastern time zone */
+	i = t->tm_isdst? 1 : 0;
+	sp = strval(sp, se, tz, i, 2);	/* static {"EST", "EDT"} */
+```
+
+-- every zone on earth printing as one of two names -- and `%z` did not
+exist at all, so it fell to `default:` and printed a literal `z`. **The
+hack looked necessary because the field it should have read was never
+filled in.**
+
+`time/tzone.c` is now the one place that knows: `$TZ` parsed as a POSIX
+TZ string when set, `/env/timezone` in Plan 9's own format when not, UTC
+with an empty name when neither parses. `tzset.c` is thirty lines that
+publish the result in the four globals; `localtime_r` asks for an offset
+and fills in `tm_isdst`, `tm_gmtoff` and `tm_zone`; `%Z` reads the name
+and `%z` exists.
+
+**The sign conventions are worth stating once because two of the three
+disagree.** A TZ string's offset is positive **west** (`EST5` is five
+hours behind); `tm_gmtoff` is positive **east**; and the `timezone`
+global is positive **west** again, four lines from `tm_gmtoff` in the
+same header. The conversion happens in exactly one function, `getoff()`.
+
+**WHO RE-READS `$TZ`, WHICH THE TEST GOT WRONG BEFORE THE LIBRARY DID.**
+POSIX says `localtime()` behaves as if it called `tzset()`, and that
+`localtime_r()` *need not*. glibc takes that literally:
+
+```
+setenv("TZ","EST5",1); tzset();
+setenv("TZ","GMT-11:30",1);	/* no tzset() */
+localtime_r -> -18000		(the OLD zone)
+localtime   -> +41400		(the new one)
+```
+
+`tz-test.c` asserted that `localtime_r` picks the change up, and failed
+on glibc -- **writing the test first is what caught it.** libap was about
+to refresh on every call and quietly differ from every Linux this code is
+developed against. It does not; `_tzrefresh()` is called from
+`localtime()` and from `tzset()`, and `localtime_r` uses the state it
+finds. Tcl needs nothing more: it watches `$TZ` itself and calls
+`tzset()` when it changes (`tclClock.c:4699`), then uses `localtime_r`.
+
+#### tz-xcheck: linking the parser under test into a glibc program
+
+The useful thing this round produced is not the engine, it is how it was
+checked. `tz-test.c` on the build host passes by asking glibc for the
+answers -- it cannot say whether **libap's** parser is right until it
+runs on the VM, and each round trip there is a full rebuild.
+`sys/lib/tests/tz-xcheck.c` links `time/tzone.c` into a glibc program and
+sweeps ~1.4 million instants over nineteen TZ strings, comparing offset,
+`tm_isdst` and zone name against `localtime_r` for each.
+
+**It found two bugs before Plan 9 ever saw the code**, and the counts are
+the interesting part:
+
+- **102,970 mismatches.** `TZ=GMT` -- a name with no offset. POSIX
+  requires the offset; glibc treats it as +0 and keeps the name. The
+  first parser rejected it and fell through to the UTC fallback, losing
+  the name. **`tz-test.c` has a `check("GMT", ...)` line, so this would
+  have failed on the VM** -- the cross-check turned a rebuild round into
+  a recompile.
+- **6,048 mismatches.** Rule-less `EST5EDT` before 2007, which turned out
+  to be a divergence to document rather than a bug to fix (below).
+- **0.**
+
+**Two divergences are deliberate, and deciding that is the whole of the
+judgement here.** Both are glibc artifacts, not rules, and the standing
+rule is that one operating system's own behaviour is a probe:
+
+- **Before 1970** glibc computes no transitions at all for a POSIX-rule
+  zone, so `CET-1CEST,M3.5.0,M10.5.0` is never DST in 1968. That falls
+  out of a transition table starting at the epoch. libap applies the
+  rules for every year.
+- **A DST name with no rule part** is implementation-defined. glibc
+  resolves `EST5EDT` against real US historical tzdata -- it has
+  1974-01-06 and 1975-02-23, the emergency DST years -- which needs a
+  database this system does not carry. libap uses the US rules since
+  2007, which is exactly what glibc's own answer becomes from 2007 on.
+
+**No zoneinfo, and that is a limit rather than something unfinished.**
+`TZ=America/New_York` needs tzdata. `TZ=US/East-Indiana` appears in
+clock.test and gets UTC with an empty `%Z`, which is what glibc does here
+too -- measured. Plan 9's `/adm/timezone` files hold the same information
+in a different format and could be looked up by name later. Tcl does not
+need it: it ships its own tzdata and only falls back to us for
+`:localtime`.
+
+**An empty zone name is deliberate, and it is the `XLoadFont` rule
+applied to a string.** An unparseable `TZ` gives `%Z` as nothing rather
+than `"UTC"`, because a caller can tell "no zone" from a zone that really
+is UTC. `"UTC"` would be a confident wrong answer.
+
+**Prediction.** `clock` goes from 16 to single figures or zero; the tests
+are named for the mechanism that was missing and the mechanism is there.
+`%z` existing at all should move `clock-42.1` (`%z` in `:localtime` west
+of Greenwich) on its own. What I am NOT predicting is the rest of the
+suite: `strftime` is used well beyond `clock`, `%Z` used to print `EST`
+or `EDT` unconditionally and now prints the real name, so anything that
+compared against those two strings by luck will change. If a count rises,
+that is the place to look first. `mktime` calls `localtime_r` and is
+unchanged, which is the other thing to watch.

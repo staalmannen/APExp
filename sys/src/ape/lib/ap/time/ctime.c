@@ -36,6 +36,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <string.h>
+#include "tzone.h"
 
 static	char	dmsize[12] =
 {
@@ -50,21 +51,6 @@ static	char	dmsize[12] =
 
 static	int	dysize(int);
 static	void	ct_numb(char*, int);
-static	void	readtimezone(void);
-static	int	rd_name(char**, char*);
-static	int	rd_long(char**, long*);
-
-#define	TZSIZE	150
-
-static
-struct
-{
-	char	stname[4];
-	char	dlname[4];
-	long	stdiff;
-	long	dldiff;
-	long	dlpairs[TZSIZE];
-} tz;
 
 char*
 ctime(const time_t *t)
@@ -131,6 +117,8 @@ gmtime_r(const time_t *timp, struct tm *result)
 	result->tm_mday = d0 + 1;
 	result->tm_mon = d1;
 	result->tm_isdst = 0;
+	result->tm_gmtoff = 0;
+	result->tm_zone = "GMT";
 	return result;
 }
 
@@ -146,24 +134,28 @@ struct tm*
 localtime_r(const time_t *timp, struct tm *result)
 {
 	struct tm *ct;
-	time_t t, tim;
-	long *p;
-	int dlflag;
+	time_t t;
+	const char *name;
+	long off;
+	int isdst;
 
-	tim = *timp;
-	if(tz.stname[0] == 0)
-		readtimezone();
-	t = tim + tz.stdiff;
-	dlflag = 0;
-	for(p = tz.dlpairs; *p; p += 2)
-		if(t >= p[0])
-		if(t < p[1]) {
-			t = tim + tz.dldiff;
-			dlflag++;
-			break;
-		}
+	/*
+	 * All of the zone logic is in tzone.c now. This used to read
+	 * /env/timezone into a static of its own, once per process, with
+	 * no idea that $TZ or tzset() existed; see the note there.
+	 *
+	 * tm_gmtoff and tm_zone are set here because struct tm in this
+	 * system HAS both and nothing ever filled them in, so strftime's
+	 * %z and %Z had nothing to read and invented an answer.
+	 */
+	off = _tzoffset(*timp, &name, &isdst);
+	t = *timp + off;
 	ct = gmtime_r(&t, result);
-	ct->tm_isdst = dlflag;
+	if(ct == 0)
+		return 0;
+	ct->tm_isdst = isdst;
+	ct->tm_gmtoff = off;
+	ct->tm_zone = name;
 	return ct;
 }
 
@@ -172,6 +164,12 @@ localtime(const time_t *timp)
 {
 	static struct tm xtime;
 
+	/*
+	 * POSIX: localtime() behaves as if it called tzset(), and
+	 * localtime_r() need not -- so the refresh is HERE and not in the
+	 * function below. glibc draws the same line; see time/tzone.c.
+	 */
+	_tzrefresh();
 	return localtime_r(timp, &xtime);
 }
 
@@ -225,97 +223,4 @@ ct_numb(char *cp, int n)
 	if(n >= 10)
 		cp[0] = (n/10)%10 + '0';
 	cp[1] = n%10 + '0';
-}
-
-static
-void
-readtimezone(void)
-{
-	char buf[TZSIZE*11+30], *p;
-	int i;
-
-	memset(buf, 0, sizeof(buf));
-	i = open("/env/timezone", 0);
-	if(i < 0)
-		goto error;
-	if(read(i, buf, sizeof(buf)) >= sizeof(buf))
-		goto error;
-	close(i);
-	p = buf;
-	if(rd_name(&p, tz.stname))
-		goto error;
-	if(rd_long(&p, &tz.stdiff))
-		goto error;
-	if(rd_name(&p, tz.dlname))
-		goto error;
-	if(rd_long(&p, &tz.dldiff))
-		goto error;
-	for(i=0; i<TZSIZE; i++) {
-		if(rd_long(&p, &tz.dlpairs[i]))
-			goto error;
-		if(tz.dlpairs[i] == 0)
-			return;
-	}
-
-error:
-	tz.stdiff = 0;
-	strcpy(tz.stname, "GMT");
-	tz.dlpairs[0] = 0;
-}
-
-static
-rd_name(char **f, char *p)
-{
-	int c, i;
-
-	for(;;) {
-		c = *(*f)++;
-		if(c != ' ' && c != '\n')
-			break;
-	}
-	for(i=0; i<3; i++) {
-		if(c == ' ' || c == '\n')
-			return 1;
-		*p++ = c;
-		c = *(*f)++;
-	}
-	if(c != ' ' && c != '\n')
-		return 1;
-	*p = 0;
-	return 0;
-}
-
-static
-rd_long(char **f, long *p)
-{
-	int c, s;
-	long l;
-
-	s = 0;
-	for(;;) {
-		c = *(*f)++;
-		if(c == '-') {
-			s++;
-			continue;
-		}
-		if(c != ' ' && c != '\n')
-			break;
-	}
-	if(c == 0) {
-		*p = 0;
-		return 0;
-	}
-	l = 0;
-	for(;;) {
-		if(c == ' ' || c == '\n')
-			break;
-		if(c < '0' || c > '9')
-			return 1;
-		l = l*10 + c-'0';
-		c = *(*f)++;
-	}
-	if(s)
-		l = -l;
-	*p = l;
-	return 0;
 }

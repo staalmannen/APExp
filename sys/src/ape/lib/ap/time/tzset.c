@@ -1,10 +1,22 @@
-#include <stdlib.h>
-#include <sys/types.h>
-#include <fcntl.h>
+/*
+ * tzset() -- now a reporter rather than a second implementation.
+ *
+ * It used to parse getenv("timezone") itself, into tzname/timezone/
+ * altzone/daylight, while localtime_r() separately read /env/timezone
+ * into a static of its own. Neither had heard of $TZ and neither could
+ * see the other's answer, so tzset() had no effect on localtime(). All
+ * of the parsing is in tzone.c now and this just publishes the result in
+ * the four globals POSIX names.
+ *
+ * `timezone' and `altzone' are seconds WEST of Greenwich, which is the
+ * opposite sign from what tzone.c carries internally -- hence the
+ * negations. POSIX made that choice for these two variables alone and it
+ * disagrees with tm_gmtoff four lines away in the same struct.
+ */
+
 #include <time.h>
-#include <ctype.h>
 #include <string.h>
-#include <unistd.h>
+#include "tzone.h"
 
 static char std[32] = "GMT0";
 static char dst[32];
@@ -18,47 +30,17 @@ int daylight;
 void
 tzset(void)
 {
-	char *env, *p, *q;
-	
-	env = NULL;
-	if((p = getenv("timezone")) == 0)
-		goto error;
-	if((env = malloc(strlen(p) + 1)) == 0)
-		goto error;
-	strcpy(env, p);
-	if((p = strchr(env, ' ')) == 0)
-		goto error;
-	*p = 0;
-	strncpy(std, env, sizeof std);
-	q = p + 1;
-	if((p = strchr(q, ' ')) == 0)
-		goto error;
-	timezone = - atoi(q);
-	q = p + 1;
-	if((p = strchr(q, ' ')) == 0)
-		goto nodst;
-	*p = 0;
-	strncpy(dst, q, sizeof dst);
-	q = p + 1;
-	altzone = - atoi(q);
-	daylight = 1;
-	free(env);
-	return;
+	const char *sn, *dn;
+	long so, dof;
+	int hasdst;
 
-error:
-	strcpy(std, "GMT0");
-	dst[0] = '\0';
-	timezone = 0;
-	altzone = 0;
-	daylight = 0;
-	if(env != 0)
-		free(env);
-	return;
+	_tzstate(&so, &dof, &sn, &dn, &hasdst);
 
-nodst:
-	dst[0] = '\0';
-	daylight = 0;
-	altzone = timezone;
-	free(env);
-	return;
+	strncpy(std, sn, sizeof std - 1);
+	std[sizeof std - 1] = 0;
+	strncpy(dst, dn, sizeof dst - 1);
+	dst[sizeof dst - 1] = 0;
+	timezone = -so;
+	altzone = -dof;
+	daylight = hasdst;
 }
