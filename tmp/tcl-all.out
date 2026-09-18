@@ -9,7 +9,7 @@ Test files run in separate interpreters
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-18 16:18:28 +0200
+Tests began at 2026-09-18 17:07:33 +0200
 aaa_exit.test
 abstractlist.test
 append.test
@@ -467,7 +467,7 @@ abc def ghi jkl mno {p
 
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
----- errorInfo: could not create new link "/tmp/tcl_BEBipo/thelin" pointing to "/tmp/tcl_BEBipo/thefile": function not implemented
+---- errorInfo: could not create new link "/tmp/tcl_HNMGBa/thelin" pointing to "/tmp/tcl_HNMGBa/thefile": function not implemented
     while executing
 "file link -symbolic $link $target"
     ("uplevel" body line 4)
@@ -502,7 +502,7 @@ cmdAH.test
     expr {$newatime == $modatime ? 1 : "$newatime != $modatime"}
 
 ---- Result was:
-1789741140 != 1789741139
+1789744087 != 1789744085
 ---- Result should have been (exact matching):
 1
 ==== cmdAH-20.5 FAILED
@@ -794,7 +794,7 @@ couldn't execute "~xyzzy_bad_user/x": no such file or directory
     file size $tmpfile
 
 ---- Result was:
-14
+18
 ---- Result should have been (exact matching):
 26
 ==== exec-19.1 FAILED
@@ -1573,43 +1573,7 @@ get.test
 history.test
 http.test
 ==== Test with ThreadLevel 0 ====
-
-
-==== http-4.14.0 http::Event FAILED
-==== Contents of test case:
-
-    set token [http::geturl $badurl/?timeout=10 -timeout 10000 -command \#]
-    if {$token eq ""} {
-	error "bogus return from http::geturl"
-    }
-    http::wait $token
-    lindex [http::error $token] 0
-
----- Result was:
-couldn't open socket: connection refused
----- Result should have been (exact matching):
-connect failed: connection refused
-==== http-4.14.0 FAILED
-
 ==== Test with ThreadLevel 1 ====
-
-
-==== http-4.14.1 http::Event FAILED
-==== Contents of test case:
-
-    set token [http::geturl $badurl/?timeout=10 -timeout 10000 -command \#]
-    if {$token eq ""} {
-	error "bogus return from http::geturl"
-    }
-    http::wait $token
-    lindex [http::error $token] 0
-
----- Result was:
-couldn't open socket: connection refused
----- Result should have been (exact matching):
-connect failed: connection refused
-==== http-4.14.1 FAILED
-
 http11.test
 ==== Test with ThreadLevel 0 ====
 ==== Test with ThreadLevel 1 ====
@@ -1924,7 +1888,7 @@ line line none
     ("uplevel" body line 15)
     invoked from within
 "uplevel 1 $script"
----- errorCode: CHILDSTATUS 20327 1
+---- errorCode: CHILDSTATUS 27470 1
 ==== io-29.33b FAILED
 
 
@@ -2519,295 +2483,6 @@ couldn't open socket: not owner
 
 
 
-==== socket_inet-8.1 testing -async flag on sockets FAILED
-==== Contents of test case:
-
-    # NOTE: This test may fail on some Solaris 2.4 systems. If it does, check
-    # that you have these patches installed (using showrev -p):
-    #
-    # 101907-05, 101925-02, 101945-14, 101959-03, 101969-05, 101973-03,
-    # 101977-03, 101981-02, 101985-01, 102001-03, 102003-01, 102007-01,
-    # 102011-02, 102024-01, 102039-01, 102044-01, 102048-01, 102062-03,
-    # 102066-04, 102070-01, 102105-01, 102153-03, 102216-01, 102232-01,
-    # 101878-03, 101879-01, 101880-03, 101933-01, 101950-01, 102030-01,
-    # 102057-08, 102140-01, 101920-02, 101921-09, 101922-07, 101923-03
-    #
-    # If after installing these patches you are still experiencing a problem,
-    # please email jyl@eng.sun.com. We have not observed this failure on
-    # Solaris 2.5, so another option (instead of installing these patches) is
-    # to upgrade to Solaris 2.5.
-    set s [socket -server accept -myaddr $localhost 0]
-    proc accept {s a p} {
-	global x
-	puts $s bye
-	close $s
-	set x done
-    }
-    set s1 [socket -async $localhost [lindex [fconfigure $s -sockname] 2]]
-    vwait x
-    gets $s1
-
----- Result was:
-
----- Result should have been (exact matching):
-bye
-==== socket_inet-8.1 FAILED
-
-
-
-==== socket-14.2 [socket -async] fileevent connection refused FAILED
-==== Contents of test case:
-
-	set client [socket -async localhost [randport]]
-	fileevent $client writable {set x ok}
-	set after [after $latency {set x timeout}]
-	vwait x
-	after cancel $after
-	lappend x [fconfigure $client -error]
-    
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: couldn't open socket: connection refused
-    while executing
-"socket -async localhost [randport]"
-    ("uplevel" body line 2)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ECONNREFUSED {connection refused}
----- Test cleanup failed:
-can not find channel named "sock954a00"
----- errorInfo(cleanup): can not find channel named "sock954a00"
-    while executing
-"close $client"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): TCL LOOKUP CHANNEL sock954a00
-==== socket-14.2 FAILED
-
-
-
-==== socket-14.6.0 [socket -async] with no event loop and server listening on IPv4 FAILED
-==== Contents of test case:
-
-	set client [socket -async localhost $port]
-	for {set i 0} {$i < 50} {incr i } {
-	    update
-	    if {$x ne ""} {
-		lappend x [gets $client]
-		break
-	    }
-	    after 100
-	}
-	set x
-    
----- Result was:
-ok {}
----- Result should have been (exact matching):
-ok bye
-==== socket-14.6.0 FAILED
-
-
-
-==== socket-14.7.0 pending [socket -async] and blocking [gets], server is IPv4 FAILED
-==== Contents of test case:
-
-	set sock [socket -async localhost $port]
-	list [fconfigure $sock -error] [gets $sock] [fconfigure $sock -error]
-    
----- Result was:
-{} {} {}
----- Result should have been (exact matching):
-{} ok {}
-==== socket-14.7.0 FAILED
-
-
-
-==== socket-14.7.2 pending [socket -async] and blocking [gets], no listener FAILED
-==== Contents of test case:
-
-	set sock [socket -async localhost [randport]]
-	catch {gets $sock} x
-	list $x [fconfigure $sock -error] [fconfigure $sock -error]
-    
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: couldn't open socket: connection refused
-    while executing
-"socket -async localhost [randport]"
-    ("uplevel" body line 2)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ECONNREFUSED {connection refused}
----- Test cleanup failed:
-can not find channel named "sock974440"
----- errorInfo(cleanup): can not find channel named "sock974440"
-    while executing
-"close $sock"
-    ("uplevel" body line 2)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): TCL LOOKUP CHANNEL sock974440
-==== socket-14.7.2 FAILED
-
-
-
-==== socket-14.8.2 pending [socket -async] and nonblocking [gets], no listener FAILED
-==== Contents of test case:
-
-	set sock [socket -async localhost [randport]]
-	fconfigure $sock -blocking 0
-	for {set i 0} {$i < 50} {incr i } {
-	    if {[catch {gets $sock} x] || $x ne "" || ![fblocked $sock]} break
-	    after 200
-	}
-	list $x [fconfigure $sock -error] [fconfigure $sock -error]
-    
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: couldn't open socket: connection refused
-    while executing
-"socket -async localhost [randport]"
-    ("uplevel" body line 2)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ECONNREFUSED {connection refused}
----- Test cleanup failed:
-can not find channel named "sock954a00"
----- errorInfo(cleanup): can not find channel named "sock954a00"
-    while executing
-"close $sock"
-    ("uplevel" body line 2)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): TCL LOOKUP CHANNEL sock954a00
-==== socket-14.8.2 FAILED
-
-
-
-==== socket-14.11.0 pending [socket -async] and nonblocking [puts], no listener, no flush FAILED
-==== Contents of test case:
-
-	set sock [socket -async localhost [randport]]
-	fconfigure $sock -blocking 0
-	puts $sock ok
-	fileevent $sock writable {set x 1}
-	vwait x
-	close $sock
-    
----- Result was:
-couldn't open socket: connection refused
----- Result should have been (exact matching):
-transport endpoint is not connected
-==== socket-14.11.0 FAILED
-
-
-
-==== socket-14.12 [socket -async] background progress triggered by [fconfigure -error] FAILED
-==== Contents of test case:
-
-	set s [socket -async localhost [randport]]
-	for {set i 0} {$i < 50} {incr i} {
-	    set x [fconfigure $s -error]
-	    if {$x ne ""} break
-	    after 200
-	}
-	set x
-    
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: couldn't open socket: connection refused
-    while executing
-"socket -async localhost [randport]"
-    ("uplevel" body line 2)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ECONNREFUSED {connection refused}
----- Test cleanup failed:
-can not find channel named "sock9a1800"
----- errorInfo(cleanup): can not find channel named "sock9a1800"
-    while executing
-"close $s"
-    ("uplevel" body line 2)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): TCL LOOKUP CHANNEL sock9a1800
-==== socket-14.12 FAILED
-
-
-
-==== socket-14.14 testing fileevent readable on failed async socket connect FAILED
-==== Contents of test case:
-
-    # Test for bug 581937ab1e
-
-    set a1 [after 5000 {set x timeout}]
-    # This connect should fail
-    set s [socket -async localhost [randport]]
-    fileevent $s readable {set x readable}
-    vwait x
-    set x
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: couldn't open socket: connection refused
-    while executing
-"socket -async localhost [randport]"
-    ("uplevel" body line 6)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ECONNREFUSED {connection refused}
-==== socket-14.14 FAILED
-
-
-
-==== socket-14.15 blocking read on async socket should not trigger event handlers FAILED
-==== Contents of test case:
-
-	set s [socket -async localhost [randport]]
-	set x ok
-	fileevent $s writable {set x fail}
-	catch {read $s}
-	close $s
-	set x
-    
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: couldn't open socket: connection refused
-    while executing
-"socket -async localhost [randport]"
-    ("uplevel" body line 2)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ECONNREFUSED {connection refused}
-==== socket-14.15 FAILED
-
-
-
-==== socket-14.18 bug c6ed4acfd8: running async socket connect made other connect block FAILED
-==== Contents of test case:
-
-	proc accept {channel address port} {}
-	set port [randport]
-	set ssock [socket -server accept $port]
-	set csock1 [socket -async localhost [randport]]
-	set csock2 [socket localhost $port]
-	after 1000 {set done ok}
-	vwait done
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: couldn't open socket: connection refused
-    while executing
-"socket -async localhost [randport]"
-    ("uplevel" body line 5)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ECONNREFUSED {connection refused}
-==== socket-14.18 FAILED
-
-
-
 ==== socket-14.19 tip 456 -- introduce the -reuseport option FAILED
 ==== Contents of test case:
 
@@ -2929,7 +2604,7 @@ unixInit.test
     }
 
 ---- Result was:
-Expected: `127.0.0.1 localhost 42231', Got `'
+Expected: `127.0.0.1 localhost 40532', Got `'
 ---- Result should have been (exact matching):
 OK
 ==== unixInit-1.2 FAILED
@@ -3129,7 +2804,7 @@ atime 1105466634 blksize 0 blocks 0 ctime 1105466634 dev 0 gid 0 ino 0 mode 1674
 	    lsort -stride 2 [file stat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789741333 ctime 1789741333 dev 0 gid 0 ino 0 mode 16749 mtime 1789741333 nlink 0 size 0 type directory uid 0
+atime 1789744289 ctime 1789744289 dev 0 gid 0 ino 0 mode 16749 mtime 1789744289 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-stat-root-mount FAILED
@@ -3142,7 +2817,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789741333 ctime 1789741333 dev 0 gid 0 ino 0 mode 16749 mtime 1789741333 nlink 0 size 0 type directory uid 0
+atime 1789744289 ctime 1789744289 dev 0 gid 0 ino 0 mode 16749 mtime 1789744289 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-lstat-root-mount FAILED
@@ -3155,7 +2830,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file stat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789741333 ctime 1789741333 dev 0 gid 0 ino 0 mode 16749 mtime 1789741333 nlink 0 size 0 type directory uid 0
+atime 1789744289 ctime 1789744289 dev 0 gid 0 ino 0 mode 16749 mtime 1789744289 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-stat-root-subdir-mount FAILED
@@ -3168,7 +2843,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789741333 ctime 1789741333 dev 0 gid 0 ino 0 mode 16749 mtime 1789741333 nlink 0 size 0 type directory uid 0
+atime 1789744289 ctime 1789744289 dev 0 gid 0 ino 0 mode 16749 mtime 1789744289 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-lstat-root-subdir-mount FAILED
@@ -3181,7 +2856,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file stat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789741333 ctime 1789741333 dev 0 gid 0 ino 0 mode 16749 mtime 1789741333 nlink 0 size 0 type directory uid 0
+atime 1789744289 ctime 1789744289 dev 0 gid 0 ino 0 mode 16749 mtime 1789744289 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-stat-mezzo FAILED
@@ -3194,17 +2869,17 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789741333 ctime 1789741333 dev 0 gid 0 ino 0 mode 16749 mtime 1789741333 nlink 0 size 0 type directory uid 0
+atime 1789744289 ctime 1789744289 dev 0 gid 0 ino 0 mode 16749 mtime 1789744289 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-lstat-mezzo FAILED
 
 zlib.test
 
-Tests ended at 2026-09-18 16:22:14 +0200
-all.tcl:	Total	68118	Passed	62081	Skipped	5888	Failed	149
+Tests ended at 2026-09-18 17:11:30 +0200
+all.tcl:	Total	68118	Passed	62095	Skipped	5887	Failed	136
 Sourced 167 Test Files.
-Files with failing tests: binary.test chanio.test cmdAH.test env.test event.test exec.test expr-old.test expr.test fCmd.test fileName.test http.test io.test lseq.test main.test scan.test socket.test unixFCmd.test unixInit.test zipfs.test
+Files with failing tests: binary.test chanio.test cmdAH.test env.test event.test exec.test expr-old.test expr.test fCmd.test fileName.test io.test lseq.test main.test scan.test socket.test unixFCmd.test unixInit.test zipfs.test
 Number of tests skipped for each constraint:
 	9	!ieeeFloatingPoint
 	1	!singleTestInterp notWsl
@@ -3273,7 +2948,6 @@ Number of tests skipped for each constraint:
 	5	testhandlecount
 	12	testmutex
 	11	testsaveresult
-	1	testsocket_testflags
 	1	testwinclock
 	197	thread
 	1	tildeexpansion
