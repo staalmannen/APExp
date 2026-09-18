@@ -575,8 +575,13 @@ Open, in order of what the next run should touch:
   live unrelated process -- and `kill()` opens `/proc/N/note` and
   *closes* it, re-entering the function on a fresh number every time.
   Now keyed on `dev`/`ino` and checked with `fstat()`, plus a
-  re-entrancy flag. **Run `tcltest chanio.test -singleproc 1 -verbose t`
-  before the suite**; the freeze is diagnosed but not measured.
+  re-entrancy flag. **The hang is `chan-io-29.34`**, named by
+  `-verbose t`: it closes the listener and only THEN waits for the
+  *accepted* connection to drain, so the question is whether ending the
+  listening process disturbs a connection already accepted.
+  `listenleak-test` section 3 asks exactly that in C, with a ten-second
+  timeout per blocking call so it reports instead of freezing. **Run it
+  before the suite**, on a build that certainly contains the fix.
 - **`socket_inet-5.1`/`5.3` were passing for the WRONG REASON** -- a
   leftover listener was refusing the bind, not the system -- so they are
   not a regression from the errno change. Expect them to **stay
