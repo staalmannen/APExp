@@ -6079,3 +6079,73 @@ a password database, and rc's lowercase `path`). The three largest
 unread clusters are `io` 23, `chan-io` 19 and `filename` 17 -- and
 `filename`'s are all `Tcl_GlobCmd`, which is one function rather than
 seventeen questions.
+
+#### filename 17: five need symlinks, eleven are their litter, one is ours
+
+Read all seventeen before touching any, and they are three things.
+
+**Five need symbolic links** -- `11.17.2`, `.3`, `.4`, `.7`, `.8` -- all
+doing `file link -symbolic`, which is ENOSYS here and stays that way.
+
+**Eleven fail because of what those five leave behind.** `11.17.7` is
+
+```tcl
+cd $globname
+file mkdir nonexistent
+file link -symbolic link nonexistent	;# raises here
+file delete nonexistent			;# so this never runs
+```
+
+and its `-cleanup` removes only `link`. `nonexistent` stays in
+`globTest`, and `11.18`, `11.19`, `11.20`, `11.22`, `11.23`, `11.24`,
+`11.25`, `11.25.1`, `11.25.2`, `14.7` and `14.15` then each report one
+extra entry. **Every one of the eleven differs from its expected result
+by exactly that one word and nothing else** -- checked across all of
+them, not sampled, which is what made it safe to treat as one cause.
+
+**And the constraint that should have prevented it is hardcoded:**
+
+```tcl
+testConstraint linkDirectory 1
+testConstraint symbolicLinkFile 1
+if {[testConstraint win]} { ...only Windows turns them off... }
+```
+
+Upstream assumes every non-Windows platform has symbolic links.
+
+**The patch, and the line drawn around it.** `fileName.test` now probes
+for the capability instead of assuming it -- the same guard upstream
+already writes for Windows, asked rather than assumed. That is the only
+Tcl test file touched, and the justification is specific: **the litter
+makes eleven tests report a result that is not about their subject.**
+The suite is the measuring instrument here, and an instrument
+miscalibrated by an assumption in its own setup is worth calibrating.
+
+**`fCmd.test` and `cmdAH.test` hardcode the same constraint and are
+deliberately NOT touched.** Their symlink tests fail on their own,
+contaminating nothing, and turning fifteen honest "this platform cannot
+do that" failures into skips would flatter the count without changing
+anything. *The line is: fix the instrument where it misreports something
+unrelated; never where it would only make the score look better.*
+
+**One is genuinely ours, and is recorded rather than fixed.**
+`filename-14.9`:
+
+```
+glob globTest/.*  ->  globTest/.1
+wanted                globTest/. globTest/.. globTest/.1
+```
+
+**Plan 9 directories contain no `.` or `..` entries at all**, so
+`readdir()` never returns them -- a fact already written in
+`unistd/rmdir.c` ("Plan 9 directories hold no . or .. , but skip them
+anyway"). Synthesising the two in `readdir()` would make this pass and
+is a real compatibility question, but it changes what EVERY directory
+read in every program sees, and the measured benefit so far is one test.
+That is not a trade to make in the same round as eleven other changes;
+it wants its own, with its own reduction. Recorded.
+
+**Prediction, observation only.** `filename` goes from 17 failures to 1
+(`14.9`), with 5 newly skipped rather than passed -- so `Skipped` rises
+by 5 and `Failed` falls by 16. If `Failed` falls by more than 16, or
+`Skipped` rises by anything but 5, the reading above is incomplete.

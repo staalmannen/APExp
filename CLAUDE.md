@@ -703,11 +703,26 @@ Open, in order of what the next run should touch:
   predicted: 14.14 needs the failed connect to make the socket
   *readable*, through the copy process on the data file. It does --
   now measured rather than assumed.
-- **Still unread, and now the whole of what is left: `io` 23,
-  `chan-io` 19, `filename` 17**, then `expr` 5, `socket_inet` 4,
-  `cmdAH` 4, `lseq` 3, `exec` 3, `io-bug` 2. **`filename`'s seventeen
-  are all `Tcl_GlobCmd`** -- one function, not seventeen questions, and
-  the cheapest of the three to read.
+- **`filename` 17: read in full, and it is three things.** Five need
+  symbolic links (ENOSYS, out of reach). **Eleven fail only because
+  those five litter**: `11.17.7` does `file mkdir nonexistent`, then
+  `file link -symbolic` raises, so its `file delete nonexistent` never
+  runs and `-cleanup` removes only `link` -- every later glob test then
+  sees one extra entry, and all eleven differ from expected by exactly
+  that word. The constraint that should have stopped this is hardcoded
+  to 1 outside Windows, so **`fileName.test` now PROBES for the
+  capability** -- the only Tcl test patched, justified because the
+  litter makes eleven tests misreport something unrelated.
+  **`fCmd.test`/`cmdAH.test` hardcode the same constraint and are
+  deliberately left alone**: their symlink tests fail honestly and
+  contaminate nothing, and skipping them would only flatter the count.
+  **One is ours and is recorded, not fixed**: `filename-14.9` wants
+  `glob globTest/.*` to yield `.` and `..`, and **Plan 9 directories
+  contain neither**. Synthesising them in `readdir()` changes what every
+  directory read in every program sees, for one measured test; it wants
+  its own round.
+- **Still unread: `io` 23, `chan-io` 19**, then `expr` 5,
+  `socket_inet` 4, `cmdAH` 4, `lseq` 3, `exec` 3, `io-bug` 2.
 - **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a
   password database mapping a user to a home directory, which Plan 9
   has not -- read it before writing it off.
