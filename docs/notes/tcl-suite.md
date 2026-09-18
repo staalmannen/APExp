@@ -4203,9 +4203,14 @@ if(envp)
 ```
 
 So every variable in the inherited group survived into the child whether
-`envp` mentioned it or not, and `path` -- which Tcl had unset -- came
-back. `execve` clears `/env` first now, so **the child's environment is
-exactly `envp`**, which is what POSIX says it is.
+`envp` mentioned it or not. `execve` clears `/env` first now, so **the
+child's environment is exactly `envp`**, which is what POSIX says it is.
+
+*(The first version of this paragraph added "and `path` -- which Tcl had
+unset -- came back". That was wrong and the section below is what
+corrected it: Tcl never unsets `path`. The POSIX violation described
+here is real, but `path` was not evidence of it, and no test measured
+it. `execve-env-test.c` does.)*
 
 `RFCENVG` is what makes that safe: the group is already this process's
 own copy, so removing everything touches neither the parent nor the
@@ -4229,3 +4234,99 @@ anything, these move with it; if they do not, `localtime()` is reading
 Plan 9's `/env/timezone` rather than `TZ` and that is a separate and
 much smaller question. Nothing else should move; if it does, clearing
 `/env` took something a child needed, and the per-file table says what.
+
+#### The `env` result: one half confirmed, the other half unmeasured, and the last line is not a bug
+
+The run came back with the two libap names gone and everything else
+unchanged:
+
+```
+before:  _fdinfo=0 34 0
+1 2 2
+...
+         _sighdlr=
+         path=/bin.
+after:   path=/bin.
+```
+
+`Total 68118 Passed 62048 Skipped 5887 Failed 183` -- **identical to the
+previous run, and the per-file diff is empty.** So the prediction above
+("9 failures to 0 or nearly 0") was wrong, and it was wrong in the way
+worth recording: the `_envsetup` half demonstrably landed and changed the
+output, while the count did not move at all, because one surviving line
+is as good as three for a test matching exactly.
+
+**All nine of `env`'s failures are that one line.** `env-2.1`, `2.2`,
+`2.3`, `2.4`, `3.1`, `4.1`, `4.3`, `4.4` and `4.5` are every test in the
+file that calls `getenv` and compares exactly; nine tests, nine failures.
+Nothing else in the file fails. So the cluster is one fact, not nine.
+
+**And the fact is not libap's.** Two things have to be read together.
+
+First, `env.test`'s `envprep` does not clear the environment; it clears
+everything *except* a keep-list, and the comparison works because the
+child script removes the same list from what it prints:
+
+```tcl
+if {[string toupper $name] ni [string toupper $keep]} { unset env($name) }
+...
+proc lrem {listname name} {
+    upvar $listname list
+    set i [lsearch -nocase $list $name]
+    if {$i >= 0} { set list [lreplace $list $i $i] }
+}
+foreach name @keep@ { lrem names $name }
+```
+
+`keep` contains `PATH`. Both halves are case-insensitive, so Plan 9's
+lowercase `path` is *kept* by the parent -- **Tcl never unsets it** --
+and then matched by the child's filter.
+
+Second, **`lrem` removes one element, and this environment has two.**
+`apexp-sh` sets `PATH=/bin` because bash cannot see rc's `$path`, and rc
+already had `path`. So the child's sorted `names` is `... PATH path ...`;
+`lrem names PATH` deletes the uppercase one and returns, and the
+lowercase one is printed. Checked on the host with a real `tclsh`, which
+is the only reason this is stated rather than guessed:
+
+```
+names: HOME LANG PATH path
+after: HOME path
+```
+
+That is upstream's code meeting a genuine property of this environment:
+two spellings of one variable, which no Unix has. **Not something to fix
+by inventing semantics** -- libap must not hide `path` because `PATH`
+exists, and `apexp-sh` cannot drop `PATH` (the comment there explains
+what breaks). `env`'s nine stay, and they are now *understood* rather
+than open, which is a different thing from fixed.
+
+**The half that is still unmeasured is the `execve` change**, and
+noticing that is the useful part of the round. If `/env` had been
+leaking, `HOME` should have appeared in the *before* output too:
+`envprep` unsets it (it is not in `keep`), so it was not in `environ`,
+not in `envp`, and only `/env` could have carried it. It was not there.
+So either the leak is not what the code reading says it is, or Tcl's exec
+path does something else.
+
+**A `/env`-clearing `execve` is not a change to keep on a reading
+alone** -- it empties `/env` on a failed exec, which is a real hazard --
+so `sys/lib/tests/execve-env-test.c` now asks the question directly: a
+parent omits a variable it really has from the `envp` it passes, and the
+child says whether it can still see it. Section 2 passes a variable that
+*is* in `envp`, because a child that saw nothing at all would otherwise
+pass section 1 while proving nothing. 0 failures on glibc.
+
+**Prediction, written before the run.** Section 2 passes -- `envp` has
+always been delivered, or nothing would work at all. Section 1 is the
+open question and I am not guessing it; the point of the file is that
+both answers are useful. If it FAILS, the `execve` change is
+load-bearing, `HOME`'s absence has some other cause, and that cause is
+the next thing to find. If it PASSES, the leak was already closed by
+something else, and the `execve` change should be reconsidered on its
+hazard rather than kept for a bug it did not fix.
+
+**The rule this round pays for**: *a fix that demonstrably changes the
+output has still not been shown to fix the test.* Two of three lines
+went and not one count moved. Read what the test **compares**, and count
+what is left, before calling a cluster closed.
