@@ -9,7 +9,7 @@ Test files run in separate interpreters
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-18 14:09:58 +0200
+Tests began at 2026-09-18 15:22:08 +0200
 aaa_exit.test
 abstractlist.test
 append.test
@@ -301,3 +301,2140 @@ Succeeded {Hey DONE}
 1 {error flushing "*": broken pipe} {posix epipe {broken pipe}}
 ==== chan-io-29.27 FAILED
 
+
+
+==== chan-io-32.7 Tcl_Read, nonblocking, file FAILED
+==== Contents of test case:
+
+    set f1 [open $path(longfile) r]
+    chan configure $f1 -blocking off
+    set z [chan read $f1 20]
+    chan close $f1
+    set l [string length $z]
+    set x ok
+    if {$l != 20} {
+	set x "$l != 20"
+    }
+    set x
+
+---- Result was:
+0 != 20
+---- Result should have been (exact matching):
+ok
+==== chan-io-32.7 FAILED
+
+
+
+==== chan-io-32.8 Tcl_Read, nonblocking, file FAILED
+==== Contents of test case:
+
+    set f1 [open $path(longfile) r]
+    chan configure $f1 -blocking off
+    set z [chan read $f1 1000000]
+    chan close $f1
+    set x ok
+    set l [string length $z]
+    set z [file size $path(longfile)]
+    if {$z != $l} {
+	set x "$z != $l"
+    }
+    set x
+
+---- Result was:
+10200 != 0
+---- Result should have been (exact matching):
+ok
+==== chan-io-32.8 FAILED
+
+
+
+==== chan-io-35.4 Tcl_Eof, eof detection on nonblocking file FAILED
+==== Contents of test case:
+
+    chan close [open $path(test1) w]
+    set f [open $path(test1) r]
+    chan configure $f -blocking off
+    lappend l [chan gets $f]
+    lappend l [chan eof $f]
+
+---- Result was:
+{} 0
+---- Result should have been (exact matching):
+{} 1
+==== chan-io-35.4 FAILED
+
+
+
+==== chan-io-36.5 Tcl_InputBlocked vs files, short read, nonblocking FAILED
+==== Contents of test case:
+
+    set f [open $path(test1) w]
+    chan puts $f abcdefghijklmnop
+    chan close $f
+    set f [open $path(test1) r]
+    chan configure $f -blocking off
+    lappend l [chan blocked $f]
+    lappend l [chan read $f 3]
+    lappend l [chan blocked $f]
+    lappend l [chan read -nonewline $f]
+    lappend l [chan blocked $f]
+    lappend l [chan eof $f]
+
+---- Result was:
+0 {} 1 {} 1 0
+---- Result should have been (exact matching):
+0 abc 0 defghijklmnop 0 1
+==== chan-io-36.5 FAILED
+
+
+
+==== chan-io-36.6 Tcl_InputBlocked vs files, event driven read FAILED
+==== Contents of test case:
+
+    set f [open $path(test1) w]
+    chan puts $f abcdefghijklmnop
+    chan close $f
+    set f [open $path(test1) r]
+    chan configure $f -blocking off
+    chan event $f readable [namespace code {
+	lappend l [chan read $f 3]
+	if {[chan eof $f]} {lappend l eof; chan close $f; set x done}
+    }]
+    vwait [namespace which -variable x]
+    return $l
+
+---- Result was:
+abc def ghi jkl mno {p
+} {} eof
+---- Result should have been (exact matching):
+abc def ghi jkl mno {p
+} eof
+==== chan-io-36.6 FAILED
+
+
+
+==== chan-io-39.9 Tcl_SetChannelOption, blocking mode FAILED
+==== Contents of test case:
+
+    set f1 [open $path(test1) w]
+    chan close $f1
+    set f1 [open $path(test1) r]
+    lappend x [chan configure $f1 -blocking]
+    chan configure $f1 -blocking off
+    lappend x [chan configure $f1 -blocking]
+    lappend x [chan gets $f1]
+    lappend x [chan read $f1 1000]
+    lappend x [chan blocked $f1]
+    lappend x [chan eof $f1]
+
+---- Result was:
+1 0 {} {} 1 0
+---- Result should have been (exact matching):
+1 0 {} {} 0 1
+==== chan-io-39.9 FAILED
+
+
+
+==== chan-io-40.3 POSIX open access modes: CREAT FAILED
+==== Contents of test case:
+
+    # This test only works if your umask is 2, like ouster's.
+    chan close [open $path(test3) {WRONLY CREAT}]
+    file stat $path(test3) stats
+    format 0o%03o [expr {$stats(mode) & 0o777}]
+
+---- Result was:
+0o644
+---- Result should have been (exact matching):
+0o666
+==== chan-io-40.3 FAILED
+
+
+
+==== chan-io-41.8 Tcl_FileeventCmd: symbolic link FAILED
+==== Contents of test case:
+
+    set target [makeFile {not again} thefile $tempdir]
+    set link [file join $tempdir thelin]
+    file link -symbolic $link $target
+    set chan [open $link]
+    chan event $chan readable [list ::apply [list {} {
+	variable success
+	set success 1
+    } [namespace current]]]
+    vwait [namespace current]::success
+    return $success
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "/tmp/tcl_OnmbLP/thelin" pointing to "/tmp/tcl_OnmbLP/thefile": function not implemented
+    while executing
+"file link -symbolic $link $target"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+---- Test cleanup failed:
+can not find channel named "file6"
+---- errorInfo(cleanup): can not find channel named "file6"
+    while executing
+"close $chan"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): TCL LOOKUP CHANNEL file6
+==== chan-io-41.8 FAILED
+
+clock-ivm.test
+  Validity default mode: off
+clock.test
+  Validity default mode: on
+cmdAH.test
+
+
+==== cmdAH-20.5 Tcl_FileObjCmd: atime touch FAILED
+==== Contents of test case:
+
+    set atime [file atime $file]
+    after 1100; # pause a sec to notice change in atime
+    set newatime [clock seconds]
+    set modatime [file atime $file $newatime]
+    expr {$newatime == $modatime ? 1 : "$newatime != $modatime"}
+
+---- Result was:
+1789737758 != 1789737757
+---- Result should have been (exact matching):
+1
+==== cmdAH-20.5 FAILED
+
+
+
+==== cmdAH-25.3 Tcl_FileObjCmd: owned FAILED
+==== Contents of test case:
+
+    file owned /
+
+---- Result was:
+1
+---- Result should have been (exact matching):
+0
+==== cmdAH-25.3 FAILED
+
+
+
+==== cmdAH-29.4 Tcl_FileObjCmd: type FAILED
+==== Contents of test case:
+
+    # Unlike [exec ln -s], [file link] requires an existing target
+    file link -symbolic $linkfile $gorpfile
+    file type $linkfile
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "/usr/glenda/APExp/sys/src/external/tcl/tests/link.file" pointing to "/usr/glenda/APExp/sys/src/external/tcl/tests/górp.file": function not implemented
+    while executing
+"file link -symbolic $linkfile $gorpfile"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== cmdAH-29.4 FAILED
+
+
+
+==== cmdAH-29.4.1 Tcl_FileObjCmd: type FAILED
+==== Contents of test case:
+
+    set linkdir [file join [temporaryDirectory] link.dir]
+    file link -symbolic $linkdir $tempdir
+    file type $linkdir
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "/usr/glenda/APExp/sys/src/external/tcl/tests/link.dir" pointing to "/usr/glenda/APExp/sys/src/external/tcl/tests/temp": function not implemented
+    while executing
+"file link -symbolic $linkdir $tempdir"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== cmdAH-29.4.1 FAILED
+
+cmdIL.test
+cmdInfo.test
+cmdMZ.test
+compExpr-old.test
+compExpr.test
+compile.test
+concat.test
+config.test
+coroutine.test
+dcall.test
+dict.test
+dstring.test
+encoding.test
+env.test
+
+
+==== env-2.1 adding environment variables FAILED
+==== Contents of test case:
+
+    getenv
+
+---- Result was:
+path=/bin\u0001.
+---- Result should have been (exact matching):
+
+==== env-2.1 FAILED
+
+
+
+==== env-2.2 adding environment variables FAILED
+==== Contents of test case:
+
+    set env(NAME1) "test string"
+    getenv
+
+---- Result was:
+NAME1=test string
+path=/bin\u0001.
+---- Result should have been (exact matching):
+NAME1=test string
+==== env-2.2 FAILED
+
+
+
+==== env-2.3 adding environment variables FAILED
+==== Contents of test case:
+
+    set env(NAME2) "more"
+    getenv
+
+---- Result was:
+NAME1=test string
+NAME2=more
+path=/bin\u0001.
+---- Result should have been (exact matching):
+NAME1=test string
+NAME2=more
+==== env-2.3 FAILED
+
+
+
+==== env-2.4 adding environment variables FAILED
+==== Contents of test case:
+
+    set env(XYZZY) "garbage"
+    getenv
+
+---- Result was:
+NAME1=test string
+NAME2=more
+XYZZY=garbage
+path=/bin\u0001.
+---- Result should have been (exact matching):
+NAME1=test string
+NAME2=more
+XYZZY=garbage
+==== env-2.4 FAILED
+
+
+
+==== env-3.1 changing environment variables FAILED
+==== Contents of test case:
+
+    set result [getenv]
+    unset env(NAME2)
+    set result
+
+---- Result was:
+NAME1=test string
+NAME2=new value
+XYZZY=garbage
+path=/bin\u0001.
+---- Result should have been (exact matching):
+NAME1=test string
+NAME2=new value
+XYZZY=garbage
+==== env-3.1 FAILED
+
+
+
+==== env-4.1 unsetting environment variables FAILED
+==== Contents of test case:
+
+    unset -nocomplain env(NAME2)
+    getenv
+
+---- Result was:
+NAME1=test string
+XYZZY=garbage
+path=/bin\u0001.
+---- Result should have been (exact matching):
+NAME1=test string
+XYZZY=garbage
+==== env-4.1 FAILED
+
+
+
+==== env-4.3 setting international environment variables FAILED
+==== Contents of test case:
+
+    set env(\ua7) \ub6
+    getenv
+
+---- Result was:
+path=/bin\u0001.
+\u00a7=\u00b6
+---- Result should have been (exact matching):
+\u00a7=\u00b6
+==== env-4.3 FAILED
+
+
+
+==== env-4.4 changing international environment variables FAILED
+==== Contents of test case:
+
+    set env(\ua7) \ua7
+    getenv
+
+---- Result was:
+path=/bin\u0001.
+\u00a7=\u00a7
+---- Result should have been (exact matching):
+\u00a7=\u00a7
+==== env-4.4 FAILED
+
+
+
+==== env-4.5 unsetting international environment variables FAILED
+==== Contents of test case:
+
+    set env(\ub6) \ua7
+    unset env(\ua7)
+    getenv
+
+---- Result was:
+path=/bin\u0001.
+\u00b6=\u00a7
+---- Result should have been (exact matching):
+\u00b6=\u00a7
+==== env-4.5 FAILED
+
+error.test
+eval.test
+event.test
+
+
+==== event-1.1 Tcl_CreateFileHandler, reading FAILED
+==== Contents of test case:
+
+    testfilehandler create 0 readable off
+    testfilehandler clear 0
+    testfilehandler oneevent
+    lappend result [testfilehandler counts 0]
+    testfilehandler fillpartial 0
+    update idletasks
+    testfilehandler oneevent
+    lappend result [testfilehandler counts 0]
+    testfilehandler oneevent
+    lappend result [testfilehandler counts 0]
+
+---- Result was:
+{0 0} {0 0} {0 0}
+---- Result should have been (exact matching):
+{0 0} {1 0} {2 0}
+==== event-1.1 FAILED
+
+exec.test
+
+
+==== exec-10.20.1 errors in exec invocation FAILED
+==== Contents of test case:
+
+    exec ~non_existent_user/foo/bar
+
+---- Result was:
+TclpCreateProcess: unable to write to errPipeOut
+---- Result should have been (exact matching):
+couldn't execute "~non_existent_user/foo/bar": no such file or directory
+==== exec-10.20.1 FAILED
+
+
+
+==== exec-10.21.1 errors in exec invocation FAILED
+==== Contents of test case:
+
+    exec [interpreter] true | ~xyzzy_bad_user/x | false
+
+---- Result was:
+TclpCreateProcess: unable to write to errPipeOut
+couldn't read file "true": no such file or directory
+---- Result should have been (exact matching):
+couldn't execute "~xyzzy_bad_user/x": no such file or directory
+==== exec-10.21.1 FAILED
+
+
+
+==== exec-19.1 exec >> uses O_APPEND FAILED
+==== Contents of test case:
+
+    # Note that we have to allow for the current contents of the temporary
+    # file, which is why the result is 14 and not 12
+    exec /bin/sh -c  {for a in 1 2 3; do sleep 1; echo $a; done} >>$tmpfile &
+    exec /bin/sh -c  {for a in 4 5 6; do sleep 1; echo $a >&2; done} 2>>$tmpfile &
+    exec /bin/sh -c  {for a in a b c; do sleep 1; echo $a; done} >>$tmpfile &
+    exec /bin/sh -c  {for a in d e f; do sleep 1; echo $a >&2; done} 2>>$tmpfile &
+    # The above four shell invocations take about 3 seconds to finish, so allow
+    # 5s (in case the machine is busy)
+    after 5000
+    # Check that no bytes have got lost through mixups with overlapping
+    # appends, which is only guaranteed to work when we set O_APPEND on the
+    # file descriptor in the [exec >>...]
+    file size $tmpfile
+
+---- Result was:
+20
+---- Result should have been (exact matching):
+26
+==== exec-19.1 FAILED
+
+execute.test
+expr-old.test
+
+
+==== expr-old-37.21 Tcl_ExprDouble handles overflows FAILED
+==== Contents of test case:
+
+    testexprdouble 17976931348623157[string repeat 0 292].
+
+---- Result was:
+This is a result: Inf
+---- Result should have been (exact matching):
+This is a result: 1.7976931348623157e+308
+==== expr-old-37.21 FAILED
+
+expr.test
+
+
+==== expr-28.527 input floating-point conversion FAILED
+==== Contents of test case:
+
+    # Ad2b d UN -929963218616126365 E290 x -108dcc0c505461_01111111111111111111111111111111111111111111111111111111111111110& E1023
+    convertToDouble -929963218616126365E290
+
+---- Result was:
+0xfff0000000000000
+---- Result should have been (exact matching):
+0xffe08dcc0c505461
+==== expr-28.527 FAILED
+
+
+
+==== expr-30.1 largest representible number FAILED
+==== Contents of test case:
+
+    list [catch {convertToDouble 1.7976931348623155e+308} result]  $result  [catch {convertToDouble 1.7976931348623157e+308} result]  $result  [catch {convertToDouble 1.7976931348623159e+308} result]  $result
+
+---- Result was:
+0 0x7ff0000000000000 0 0x7ff0000000000000 0 0x7ff0000000000000
+---- Result should have been (exact matching):
+0 0x7feffffffffffffe 0 0x7fefffffffffffff 0 0x7ff0000000000000
+==== expr-30.1 FAILED
+
+
+
+==== expr-30.2 largest representible number FAILED
+==== Contents of test case:
+
+    list [catch {convertToDouble -1.7976931348623155e+308} result]  $result  [catch {convertToDouble -1.7976931348623157e+308} result]  $result  [catch {convertToDouble -1.7976931348623159e+308} result]  $result
+
+---- Result was:
+0 0xfff0000000000000 0 0xfff0000000000000 0 0xfff0000000000000
+---- Result should have been (exact matching):
+0 0xffeffffffffffffe 0 0xffefffffffffffff 0 0xfff0000000000000
+==== expr-30.2 FAILED
+
+
+
+==== expr-39.21 Tcl_ExprDoubleObj handles overflows FAILED
+==== Contents of test case:
+
+	testexprdoubleobj 17976931348623157[string repeat 0 292].
+    
+---- Result was:
+This is a result: Inf
+---- Result should have been (exact matching):
+This is a result: 1.7976931348623157e+308
+==== expr-39.21 FAILED
+
+
+
+==== expr-50.1 test sqrt() of bignums with non-Inf answer FAILED
+==== Contents of test case:
+
+    expr {sqrt("1[string repeat 0 616]") == 1e308}
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+1
+==== expr-50.1 FAILED
+
+fCmd.test
+
+
+==== fCmd-18.12 TclFileRenameCmd : rename a symbolic link to file FAILED
+==== Contents of test case:
+
+    set s [createfile tfa1]
+    file link -symbolic tfa2 tfa1
+    file rename tfa2 tfa3
+    file type tfa3
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "tfa2" pointing to "tfa1": function not implemented
+    while executing
+"file link -symbolic tfa2 tfa1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-18.12 FAILED
+
+
+
+==== fCmd-18.13 TclFileRenameCmd : rename a symbolic link to dir FAILED
+==== Contents of test case:
+
+    file mkdir tfa1
+    file link -symbolic tfa2 tfa1
+    file rename tfa2 tfa3
+    file type tfa3
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "tfa2" pointing to "tfa1": function not implemented
+    while executing
+"file link -symbolic tfa2 tfa1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-18.13 FAILED
+
+
+
+==== fCmd-18.14 TclFileRenameCmd : rename a path with sym link FAILED
+==== Contents of test case:
+
+    file mkdir tfa1/a/b/c/d
+    file mkdir tfa2
+    set f [file join [pwd] tfa1/a/b]
+    set f2 [file join [pwd] {tfa2/b alias}]
+    file link -symbolic $f2 $f
+    file rename {tfa2/b alias/c} tfa3
+    list [file isdir tfa3] [file exists tfa1/a/b/c]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "/usr/glenda/APExp/sys/src/external/tcl/tests/tfa2/b alias" pointing to "/usr/glenda/APExp/sys/src/external/tcl/tests/tfa1/a/b": function not implemented
+    while executing
+"file link -symbolic $f2 $f"
+    ("uplevel" body line 6)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-18.14 FAILED
+
+
+
+==== fCmd-18.15 TclFileRenameCmd : rename a file to a symlink dir FAILED
+==== Contents of test case:
+
+    file mkdir tfa1
+    set s [createfile tfa2]
+    file link -symbolic tfalink tfa1
+    file rename tfa2 tfalink
+    checkcontent tfa1/tfa2 $s
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "tfalink" pointing to "tfa1": function not implemented
+    while executing
+"file link -symbolic tfalink tfa1"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-18.15 FAILED
+
+
+
+==== fCmd-18.16 TclFileRenameCmd: rename a dangling symlink FAILED
+==== Contents of test case:
+
+    file mkdir tfa1
+    file link -symbolic tfalink tfa1
+    file delete tfa1
+    file rename tfalink tfa2
+    file type tfa2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "tfalink" pointing to "tfa1": function not implemented
+    while executing
+"file link -symbolic tfalink tfa1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-18.16 FAILED
+
+
+
+==== fCmd-21.7.2 TclCopyFilesCmd: copy a dangling link FAILED
+==== Contents of test case:
+
+    file mkdir tfad1
+    file link -symbolic tfalink tfad1
+    file delete tfad1
+    file copy tfalink tfalink2
+    file type tfalink2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "tfalink" pointing to "tfad1": function not implemented
+    while executing
+"file link -symbolic tfalink tfad1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-21.7.2 FAILED
+
+
+
+==== fCmd-21.8.2 TclCopyFilesCmd: copy a link FAILED
+==== Contents of test case:
+
+    file mkdir tfad1
+    file link -symbolic tfalink tfad1
+    file copy tfalink tfalink2
+    list [file type tfalink] [file type tfalink2] [file isdir tfad1]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "tfalink" pointing to "tfad1": function not implemented
+    while executing
+"file link -symbolic tfalink tfad1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-21.8.2 FAILED
+
+
+
+==== fCmd-21.9 TclCopyFilesCmd: copy dir with a link in it FAILED
+==== Contents of test case:
+
+    file mkdir tfad1
+    file link -symbolic tfad1/tfalink "[pwd]/tfad1"
+    file copy tfad1 tfad2
+    file type tfad2/tfalink
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "tfad1/tfalink" pointing to "/usr/glenda/APExp/sys/src/external/tcl/tests/tfad1": function not implemented
+    while executing
+"file link -symbolic tfad1/tfalink "[pwd]/tfad1""
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-21.9 FAILED
+
+
+
+==== fCmd-26.1 TclDeleteFilesCmd: delete symlink FAILED
+==== Contents of test case:
+
+    file mkdir tfad1
+    file link -symbolic tfalink tfad1
+    file delete tfalink
+    list [file isdir tfad1] [file exists tfalink]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "tfalink" pointing to "tfad1": function not implemented
+    while executing
+"file link -symbolic tfalink tfad1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-26.1 FAILED
+
+
+
+==== fCmd-26.2 TclDeleteFilesCmd: delete dir with symlink FAILED
+==== Contents of test case:
+
+    file mkdir tfad1
+    file mkdir tfad2
+    file link -symbolic [file join tfad2 link] [file join .. tfad1]
+    file delete -force tfad2
+    list [file isdir tfad1] [file exists tfad2]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "tfad2/link" pointing to "../tfad1": function not implemented
+    while executing
+"file link -symbolic [file join tfad2 link] [file join .. tfad1]"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-26.2 FAILED
+
+
+
+==== fCmd-26.3 TclDeleteFilesCmd: delete dangling symlink FAILED
+==== Contents of test case:
+
+    file mkdir tfad1
+    file link -symbolic tfad2 tfad1
+    file delete tfad1
+    file delete tfad2
+    list [file exists tfad1] [file exists tfad2]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "tfad2" pointing to "tfad1": function not implemented
+    while executing
+"file link -symbolic tfad2 tfad1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-26.3 FAILED
+
+
+
+==== fCmd-28.9 file link: success with file FAILED
+==== Contents of test case:
+
+    file link abc.link abc.file
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "abc.link" pointing to "abc.file": function not implemented
+    while executing
+"file link abc.link abc.file"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-28.9 FAILED
+
+
+
+==== fCmd-28.21 file link: relative paths FAILED
+==== Contents of test case:
+
+    file mkdir d1/d2/d3
+    file link d1/l2 d2
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "d1/l2" pointing to "d2": function not implemented
+    while executing
+"file link d1/l2 d2"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-28.21 FAILED
+
+
+
+==== fCmd-28.22 file link: relative paths FAILED
+==== Contents of test case:
+
+    file mkdir d1/d2/d3
+    catch {file delete -force d1/l2}
+    file link d1/l2 d2/d3
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "d1/l2" pointing to "d2/d3": function not implemented
+    while executing
+"file link d1/l2 d2/d3"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== fCmd-28.22 FAILED
+
+
+
+==== fCmd-31.6 file home USER FAILED
+==== Contents of test case:
+
+    # Note - as in 8.x this form does NOT necessarily give same result as
+    # env(HOME) even when user is current user. Assume result contains user
+    # name, else not sure how to check
+    string tolower [file home $::tcl_platform(user)]
+
+---- Result was:
+/usr/glenda
+---- Result should have been (glob matching):
+~glenda
+==== fCmd-31.6 FAILED
+
+
+
+==== fCmd-31.9 file home USER does not follow env(HOME) FAILED
+==== Contents of test case:
+
+    string tolower [file home $::tcl_platform(user)]
+
+---- Result was:
+/usr/glenda
+---- Result should have been (glob matching):
+~glenda
+==== fCmd-31.9 FAILED
+
+
+
+==== fCmd-32.5 file tildeexpand ~USER FAILED
+==== Contents of test case:
+
+    # Note - as in 8.x this form does NOT necessarily give same result as
+    # env(HOME) even when user is current user. Assume result contains user
+    # name, else not sure how to check
+    string tolower [file tildeexpand ~$::tcl_platform(user)]
+
+---- Result was:
+/usr/glenda
+---- Result should have been (glob matching):
+~glenda
+==== fCmd-32.5 FAILED
+
+
+
+==== fCmd-32.5.1 Tcl_FSTildeExpand ~USER FAILED
+==== Contents of test case:
+
+    # Note - as in 8.x this form does NOT necessarily give same result as
+    # env(HOME) even when user is current user. Assume result contains user
+    # name, else not sure how to check
+    string tolower [testfstildeexpand ~$::tcl_platform(user)]
+
+---- Result was:
+/usr/glenda
+---- Result should have been (glob matching):
+~glenda
+==== fCmd-32.5.1 FAILED
+
+
+
+==== fCmd-32.9 file tildeexpand ~USER/bar FAILED
+==== Contents of test case:
+
+    # Note - as in 8.x this form does NOT necessarily give same result as
+    # env(HOME) even when user is current user. Assume result contains user
+    # name, else not sure how to check
+    string tolower [file tildeexpand ~$::tcl_platform(user)/bar]
+
+---- Result was:
+/usr/glenda/bar
+---- Result should have been (glob matching):
+~glenda/bar
+==== fCmd-32.9 FAILED
+
+
+
+==== fCmd-32.9.1 Tcl_FSTildeExpand ~USER/bar FAILED
+==== Contents of test case:
+
+    # Note - as in 8.x this form does NOT necessarily give same result as
+    # env(HOME) even when user is current user. Assume result contains user
+    # name, else not sure how to check
+    string tolower [testfstildeexpand ~$::tcl_platform(user)/bar]
+
+---- Result was:
+/usr/glenda/bar
+---- Result should have been (glob matching):
+~glenda/bar
+==== fCmd-32.9.1 FAILED
+
+
+
+==== fCmd-32.17 file tildeexpand ~USER does not mirror HOME FAILED
+==== Contents of test case:
+
+    string tolower [file tildeexpand ~$::tcl_platform(user)]
+
+---- Result was:
+/usr/glenda
+---- Result should have been (glob matching):
+~glenda
+==== fCmd-32.17 FAILED
+
+
+
+==== fCmd-32.17.1 Tcl_FSTildeExpand ~USER does not mirror HOME FAILED
+==== Contents of test case:
+
+    string tolower [testfstildeexpand ~$::tcl_platform(user)]
+
+---- Result was:
+/usr/glenda
+---- Result should have been (glob matching):
+~glenda
+==== fCmd-32.17.1 FAILED
+
+fileName.test
+
+
+==== filename-11.17.2 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    cd $globname
+    file link -symbolic link a1
+    cd $dir
+    lsort [glob -directory $globname -join * b1]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "link" pointing to "a1": function not implemented
+    while executing
+"file link -symbolic link a1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== filename-11.17.2 FAILED
+
+
+
+==== filename-11.17.3 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    cd $globname
+    file link -symbolic link a1
+    cd $dir
+    lsort [glob -directory $globname -type d *]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "link" pointing to "a1": function not implemented
+    while executing
+"file link -symbolic link a1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== filename-11.17.3 FAILED
+
+
+
+==== filename-11.17.4 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    cd $globname
+    file link -symbolic link a1
+    cd $dir
+    lsort [glob -directory $globname -type l *]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "link" pointing to "a1": function not implemented
+    while executing
+"file link -symbolic link a1"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== filename-11.17.4 FAILED
+
+
+
+==== filename-11.17.7 Tcl_GlobCmd: broken link and glob -l FAILED
+==== Contents of test case:
+
+    cd $globname
+    file mkdir nonexistent
+    file link -symbolic link nonexistent
+    file delete nonexistent
+    cd $dir
+    lsort [glob -nocomplain -directory $globname -type l *]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "link" pointing to "nonexistent": function not implemented
+    while executing
+"file link -symbolic link nonexistent"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== filename-11.17.7 FAILED
+
+
+
+==== filename-11.17.8 Tcl_GlobCmd: broken link and glob -l FAILED
+==== Contents of test case:
+
+    cd $globname
+    touch "nonexistent"
+    file link -symbolic link nonexistent
+    file delete nonexistent
+    cd $dir
+    lsort [glob -nocomplain -directory $globname -type l *]
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: could not create new link "link" pointing to "nonexistent": function not implemented
+    while executing
+"file link -symbolic link nonexistent"
+    ("uplevel" body line 4)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: POSIX ENOSYS {function not implemented}
+==== filename-11.17.8 FAILED
+
+
+
+==== filename-11.18 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -path $globname/ *]
+
+---- Result was:
+globTest/a1 globTest/a2 globTest/a3 globTest/nonexistent {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
+---- Result should have been (exact matching):
+globTest/a1 globTest/a2 globTest/a3 {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
+==== filename-11.18 FAILED
+
+
+
+==== filename-11.19 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -join -path [string range $globname 0 5] * *]
+
+---- Result was:
+globTest/a1 globTest/a2 globTest/a3 globTest/nonexistent {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
+---- Result should have been (exact matching):
+globTest/a1 globTest/a2 globTest/a3 {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
+==== filename-11.19 FAILED
+
+
+
+==== filename-11.20 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -type d -dir $globname *]
+
+---- Result was:
+globTest/a1 globTest/a2 globTest/a3 globTest/nonexistent
+---- Result should have been (exact matching):
+globTest/a1 globTest/a2 globTest/a3
+==== filename-11.20 FAILED
+
+
+
+==== filename-11.22 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -dir $globname *]
+
+---- Result was:
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
+---- Result should have been (exact matching):
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
+==== filename-11.22 FAILED
+
+
+
+==== filename-11.23 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -path $globname/ *]
+
+---- Result was:
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
+---- Result should have been (exact matching):
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
+==== filename-11.23 FAILED
+
+
+
+==== filename-11.24 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -join -path [string range $globname 0 5] * *]
+
+---- Result was:
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
+---- Result should have been (exact matching):
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
+==== filename-11.24 FAILED
+
+
+
+==== filename-11.25 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -type d -dir $globname *]
+
+---- Result was:
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent
+---- Result should have been (exact matching):
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3
+==== filename-11.25 FAILED
+
+
+
+==== filename-11.25.1 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -type {d r} -dir $globname *]
+
+---- Result was:
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent
+---- Result should have been (exact matching):
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3
+==== filename-11.25.1 FAILED
+
+
+
+==== filename-11.25.2 Tcl_GlobCmd FAILED
+==== Contents of test case:
+
+    lsort [glob -type {d r w} -dir $globname *]
+
+---- Result was:
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent
+---- Result should have been (exact matching):
+glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3
+==== filename-11.25.2 FAILED
+
+
+
+==== filename-14.7 asterisks, question marks, and brackets FAILED
+==== Contents of test case:
+
+    lsort [glob globTest/*]
+
+---- Result was:
+globTest/a1 globTest/a2 globTest/a3 globTest/nonexistent {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
+---- Result should have been (exact matching):
+globTest/a1 globTest/a2 globTest/a3 {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
+==== filename-14.7 FAILED
+
+
+
+==== filename-14.9 asterisks, question marks, and brackets FAILED
+==== Contents of test case:
+
+    lsort [glob globTest/.*]
+
+---- Result was:
+globTest/.1
+---- Result should have been (exact matching):
+globTest/. globTest/.. globTest/.1
+==== filename-14.9 FAILED
+
+
+
+==== filename-14.15 asterisks, question marks, and brackets FAILED
+==== Contents of test case:
+
+    lsort [glob globTest/*/]
+
+---- Result was:
+globTest/a1/ globTest/a2/ globTest/a3/ globTest/nonexistent/
+---- Result should have been (exact matching):
+globTest/a1/ globTest/a2/ globTest/a3/
+==== filename-14.15 FAILED
+
+fileSystem.test
+fileSystemEncoding.test
+for-old.test
+for.test
+foreach.test
+format.test
+get.test
+history.test
+http.test
+==== Test with ThreadLevel 0 ====
+
+
+==== http-4.14.0 http::Event FAILED
+==== Contents of test case:
+
+    set token [http::geturl $badurl/?timeout=10 -timeout 10000 -command \#]
+    if {$token eq ""} {
+	error "bogus return from http::geturl"
+    }
+    http::wait $token
+    lindex [http::error $token] 0
+
+---- Result was:
+couldn't open socket: connection refused
+---- Result should have been (exact matching):
+connect failed: connection refused
+==== http-4.14.0 FAILED
+
+==== Test with ThreadLevel 1 ====
+
+
+==== http-4.14.1 http::Event FAILED
+==== Contents of test case:
+
+    set token [http::geturl $badurl/?timeout=10 -timeout 10000 -command \#]
+    if {$token eq ""} {
+	error "bogus return from http::geturl"
+    }
+    http::wait $token
+    lindex [http::error $token] 0
+
+---- Result was:
+couldn't open socket: connection refused
+---- Result should have been (exact matching):
+connect failed: connection refused
+==== http-4.14.1 FAILED
+
+http11.test
+==== Test with ThreadLevel 0 ====
+==== Test with ThreadLevel 1 ====
+httpPipeline.test
+==== Test with ThreadLevel 0 ====
+==== Test with ThreadLevel 1 ====
+httpProxy.test
+==== Test with ThreadLevel 0 ====
+==== Test with ThreadLevel 1 ====
+
+- Constraints needsTls, knownTwapiFullBugThreadlevelAny, knownTwapiFullBugThreadUsed are
+  always set by the script, not by the caller.
+- Set one of needsTclTls, needsTwapi, needsTwapiFull instead of needsTls.
+- Set knownBug instead of knownTwapiFullBugThreadlevelAny, knownTwapiFullBugThreadUsed.
+- If the caller sets constraint needsTwapi, the script forces needsSquidNoAuth and needsSquidAuth to 0.
+
+httpcookie.test
+icu.test
+if-old.test
+if.test
+incr-old.test
+incr.test
+indexObj.test
+info.test
+init.test
+interp.test
+io.test
+
+
+==== io-6.31 Tcl_GetsObj: crlf mode: buffer exhausted, blocked FAILED
+==== Contents of test case:
+
+    # (FilterInputBytes() != 0)
+
+    set f [open "|[list [interpreter] $path(cat)]" w+]
+    fconfigure $f -translation {crlf lf} -buffering none
+    puts -nonewline $f "bbbbbbbbbbbbbb\r\n123456789012345\r"
+    fconfigure $f -buffersize 16
+    set x [gets $f]
+    fconfigure $f -blocking 0
+    lappend x [gets $f line] $line [fblocked $f] [testchannel inputbuffered $f]
+    close $f
+    set x
+
+---- Result was:
+bbbbbbbbbbbbbb -1 {} 1 0
+---- Result should have been (exact matching):
+bbbbbbbbbbbbbb -1 {} 1 16
+==== io-6.31 FAILED
+
+
+
+==== io-6.43 Tcl_GetsObj: input saw cr FAILED
+==== Contents of test case:
+
+    # if (chanPtr->flags & INPUT_SAW_CR)
+
+    set f [open "|[list [interpreter] $path(cat)]" w+]
+    fconfigure $f -translation {auto lf} -buffering none
+    puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    fconfigure $f -buffersize 16
+    set x [list [gets $f]]
+    fconfigure $f -blocking 0
+    lappend x [gets $f line] $line [testchannel queuedcr $f]
+    fconfigure $f -blocking 1
+    puts -nonewline $f "\nabcd\refg\x1A"
+    lappend x [gets $f line] $line [testchannel queuedcr $f]
+    lappend x [gets $f line] $line
+    close $f
+    set x
+
+---- Result was:
+bbbbbbbbbbbbbbb -1 {} 0 15 123456789abcdef 1 4 abcd
+---- Result should have been (exact matching):
+bbbbbbbbbbbbbbb 15 123456789abcdef 1 4 abcd 0 3 efg
+==== io-6.43 FAILED
+
+
+
+==== io-6.44 Tcl_GetsObj: input saw cr, not followed by cr FAILED
+==== Contents of test case:
+
+    # not (*eol == '\n')
+
+    set f [open "|[list [interpreter] $path(cat)]" w+]
+    fconfigure $f -translation {auto lf} -buffering none
+    puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    fconfigure $f -buffersize 16
+    set x [list [gets $f]]
+    fconfigure $f -blocking 0
+    lappend x [gets $f line] $line [testchannel queuedcr $f]
+    fconfigure $f -blocking 1
+    puts -nonewline $f "abcd\refg\x1A"
+    lappend x [gets $f line] $line [testchannel queuedcr $f]
+    lappend x [gets $f line] $line
+    close $f
+    set x
+
+---- Result was:
+bbbbbbbbbbbbbbb -1 {} 0 15 123456789abcdef 1 4 abcd
+---- Result should have been (exact matching):
+bbbbbbbbbbbbbbb 15 123456789abcdef 1 4 abcd 0 3 efg
+==== io-6.44 FAILED
+
+
+
+==== io-6.45 Tcl_GetsObj: input saw cr, skip right number of bytes FAILED
+==== Contents of test case:
+
+    # Tcl_ExternalToUtf()
+
+    set f [open "|[list [interpreter] $path(cat)]" w+]
+    fconfigure $f -translation {auto lf} -buffering none
+    fconfigure $f -encoding utf-16
+    puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    fconfigure $f -buffersize 16
+    gets $f
+    fconfigure $f -blocking 0
+    set x [list [gets $f line] $line [testchannel queuedcr $f]]
+    fconfigure $f -blocking 1
+    puts -nonewline $f "\nabcd\refg"
+    lappend x [gets $f line] $line [testchannel queuedcr $f]
+    close $f
+    set x
+
+---- Result was:
+-1 {} 0 15 123456789abcdef 0
+---- Result should have been (exact matching):
+15 123456789abcdef 1 4 abcd 0
+==== io-6.45 FAILED
+
+
+
+==== io-6.46 Tcl_GetsObj: input saw cr, followed by just \n should give eof FAILED
+==== Contents of test case:
+
+    # memmove()
+
+    set f [open "|[list [interpreter] $path(cat)]" w+]
+    fconfigure $f -translation {auto lf} -buffering none
+    puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    fconfigure $f -buffersize 16
+    gets $f
+    fconfigure $f -blocking 0
+    set x [list [gets $f line] $line [testchannel queuedcr $f]]
+    fconfigure $f -blocking 1
+    puts -nonewline $f "\n\x1A"
+    lappend x [gets $f line] $line [testchannel queuedcr $f]
+    close $f
+    set x
+
+---- Result was:
+-1 {} 0 15 123456789abcdef 1
+---- Result should have been (exact matching):
+15 123456789abcdef 1 -1 {} 0
+==== io-6.46 FAILED
+
+
+
+==== io-6.47 Tcl_GetsObj: auto mode: \r at end of buffer, peek for \n FAILED
+==== Contents of test case:
+
+    # (eol == dstEnd)
+
+    set f [open $path(test1) w]
+    fconfigure $f -translation lf
+    puts -nonewline $f "123456789012345\r\nabcdefghijklmnopq"
+    close $f
+    set f [open $path(test1)]
+    fconfigure $f -translation auto -buffersize 16
+    set x [list [gets $f] [testchannel inputbuffered $f]]
+    close $f
+    set x
+
+---- Result was:
+123456789012345 0
+---- Result should have been (exact matching):
+123456789012345 15
+==== io-6.47 FAILED
+
+
+
+==== io-8.1 PeekAhead: only go to device if no more cached data FAILED
+==== Contents of test case:
+
+    # (bufPtr->nextPtr == NULL)
+
+    set f [open $path(test1) w]
+    fconfigure $f -encoding ascii -translation lf
+    puts -nonewline $f "123456789012345\r\n2345678"
+    close $f
+    set f [open $path(test1)]
+    fconfigure $f -encoding ascii -translation auto -buffersize 16
+    # here
+    gets $f
+    set x [testchannel inputbuffered $f]
+    close $f
+    set x
+
+---- Result was:
+0
+---- Result should have been (exact matching):
+7
+==== io-8.1 FAILED
+
+
+
+==== io-14.1 Tcl_SetStdChannel and Tcl_GetStdChannel FAILED
+==== Contents of test case:
+
+    set l ""
+    lappend l [fconfigure stdin -buffering]
+    lappend l [fconfigure stdout -buffering]
+    lappend l [fconfigure stderr -buffering]
+    lappend l [lsort [testchannel open]]
+    set l
+
+---- Result was:
+line line line {file0 file1 file2}
+---- Result should have been (exact matching):
+line line none {file0 file1 file2}
+==== io-14.1 FAILED
+
+
+
+==== io-14.2 Tcl_SetStdChannel and Tcl_GetStdChannel FAILED
+==== Contents of test case:
+
+    interp create x
+    set l ""
+    lappend l [x eval {fconfigure stdin -buffering}]
+    lappend l [x eval {fconfigure stdout -buffering}]
+    lappend l [x eval {fconfigure stderr -buffering}]
+    interp delete x
+    set l
+
+---- Result was:
+line line line
+---- Result should have been (exact matching):
+line line none
+==== io-14.2 FAILED
+
+
+
+==== io-29.27 Tcl_Flush on closed pipeline FAILED
+==== Contents of test case:
+
+    file delete $path(pipe)
+    set f [open $path(pipe) w]
+    puts $f {exit}
+    close $f
+    set f [open "|[list [interpreter] $path(pipe)]" r+]
+    gets $f
+    puts $f output
+    after 50
+    #
+    # The flush below will get a SIGPIPE. This is an expected part of
+    # test and indicates that the test operates correctly. If you run
+    # this test under a debugger, the signal will by intercepted unless
+    # you disable the debugger's signal interception.
+    #
+    if {[catch {flush $f} msg]} {
+	set x [list 1 $msg $::errorCode]
+	catch {close $f}
+    } else {
+	if {[catch {close $f} msg]} {
+	    set x [list 1 $msg $::errorCode]
+	} else {
+	    set x {this was supposed to fail and did not}
+	}
+    }
+    regsub {".*":} $x {"":} x
+    string tolower $x
+
+---- Result was:
+1 {error flushing "": cannot send after transport endpoint shutdown} {posix eshutdown {cannot send after transport endpoint shutdown}}
+---- Result should have been (exact matching):
+1 {error flushing "": broken pipe} {posix epipe {broken pipe}}
+==== io-29.27 FAILED
+
+
+
+==== io-29.33b TIP#398, no implicit flush of nonblocking on exit FAILED
+==== Contents of test case:
+
+    set f [open $path(script) w]
+    puts $f {
+		fconfigure stdout -blocking 0
+		puts -nonewline stdout [string repeat A 655360]
+		flush stdout
+	}
+    close $f
+    set f [open $path(script2) w]
+    puts $f {after 2000}
+    close $f
+	set t1 [clock milliseconds]
+	set ff [open "|[list [interpreter] $path(script2)]" w]
+	catch {unset ::env(TCL_FLUSH_NONBLOCKING_ON_EXIT)}
+	exec [interpreter] $path(script) >@ $ff
+	set t2 [clock milliseconds]
+	close $ff
+	expr {($t2-$t1)/2000 ? $t2-$t1 : 0}
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: error writing "stdout": cannot send after transport endpoint shutdown
+    while executing
+"puts -nonewline stdout [string repeat A 655360]"
+    (file "/usr/glenda/APExp/sys/src/external/tcl/tests/script" line 3)
+    while executing
+"exec [interpreter] $path(script) >@ $ff"
+    ("uplevel" body line 15)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: CHILDSTATUS 12064 1
+==== io-29.33b FAILED
+
+
+
+==== io-32.7 Tcl_Read, nonblocking, file FAILED
+==== Contents of test case:
+
+    set f1 [open $path(longfile) r]
+    fconfigure $f1 -blocking off
+    set z [read $f1 20]
+    close $f1
+    set l [string length $z]
+    set x ok
+    if {$l != 20} {
+	set x broken
+    }
+    set x
+
+---- Result was:
+broken
+---- Result should have been (exact matching):
+ok
+==== io-32.7 FAILED
+
+
+
+==== io-32.8 Tcl_Read, nonblocking, file FAILED
+==== Contents of test case:
+
+    set f1 [open $path(longfile) r]
+    fconfigure $f1 -blocking off
+    set z [read $f1 1000000]
+    close $f1
+    set x ok
+    set l [string length $z]
+    set z [file size $path(longfile)]
+    if {$z != $l} {
+	set x broken
+    }
+    set x
+
+---- Result was:
+broken
+---- Result should have been (exact matching):
+ok
+==== io-32.8 FAILED
+
+
+
+==== io-35.4 Tcl_Eof, eof detection on nonblocking file FAILED
+==== Contents of test case:
+
+    file delete $path(test1)
+    set f [open $path(test1) w]
+    close $f
+    set f [open $path(test1) r]
+    fconfigure $f -blocking off
+    set l ""
+    lappend l [gets $f]
+    lappend l [eof $f]
+    close $f
+    set l
+
+---- Result was:
+{} 0
+---- Result should have been (exact matching):
+{} 1
+==== io-35.4 FAILED
+
+
+
+==== io-36.5 Tcl_InputBlocked vs files, short read, nonblocking FAILED
+==== Contents of test case:
+
+    file delete $path(test1)
+    set f [open $path(test1) w]
+    puts $f abcdefghijklmnop
+    close $f
+    set f [open $path(test1) r]
+    fconfigure $f -blocking off
+    set l ""
+    lappend l [fblocked $f]
+    lappend l [read $f 3]
+    lappend l [fblocked $f]
+    lappend l [read -nonewline $f]
+    lappend l [fblocked $f]
+    lappend l [eof $f]
+    close $f
+    set l
+
+---- Result was:
+0 {} 1 {} 1 0
+---- Result should have been (exact matching):
+0 abc 0 defghijklmnop 0 1
+==== io-36.5 FAILED
+
+
+
+==== io-36.6 Tcl_InputBlocked vs files, event driven read FAILED
+==== Contents of test case:
+
+    proc in {f} {
+	variable l
+	variable x
+	lappend l [read $f 3]
+	if {[eof $f]} {lappend l eof; close $f; set x done}
+    }
+    file delete $path(test1)
+    set f [open $path(test1) w]
+    puts $f abcdefghijklmnop
+    close $f
+    set f [open $path(test1) r]
+    fconfigure $f -blocking off
+    set l ""
+    fileevent $f readable [namespace code [list in $f]]
+    variable x
+    vwait [namespace which -variable x]
+    set l
+
+---- Result was:
+abc def ghi jkl mno {p
+} {} eof
+---- Result should have been (exact matching):
+abc def ghi jkl mno {p
+} eof
+==== io-36.6 FAILED
+
+
+
+==== io-39.9 Tcl_SetChannelOption, blocking mode FAILED
+==== Contents of test case:
+
+    file delete $path(test1)
+    set f1 [open $path(test1) w]
+    close $f1
+    set f1 [open $path(test1) r]
+    set x ""
+    lappend x [fconfigure $f1 -blocking]
+    fconfigure $f1 -blocking off
+    lappend x [fconfigure $f1 -blocking]
+    lappend x [gets $f1]
+    lappend x [read $f1 1000]
+    lappend x [fblocked $f1]
+    lappend x [eof $f1]
+    close $f1
+    set x
+
+---- Result was:
+1 0 {} {} 1 0
+---- Result should have been (exact matching):
+1 0 {} {} 0 1
+==== io-39.9 FAILED
+
+
+
+==== io-40.3 POSIX open access modes: CREAT FAILED
+==== Contents of test case:
+
+    # This test only works if your umask is 2, like ouster's.
+    file delete $path(test3)
+    set f [open $path(test3) {WRONLY CREAT}]
+    close $f
+    file stat $path(test3) stats
+    format 0o%03o [expr {$stats(mode)&0o777}]
+
+---- Result was:
+0o644
+---- Result should have been (exact matching):
+0o666
+==== io-40.3 FAILED
+
+
+
+==== io-52.22.1 TclCopyChannel & encodings & tell position FAILED
+==== Contents of test case:
+
+    # binary to encoding => the input has to be
+    # in utf-8 to make sense to the encoder
+
+    set in  [open $path(utf8-fcopy.txt) r]
+    set out [open $path(kyrillic.txt) w]
+
+    # Using "-encoding ascii" means reading the "Á" gives an error
+    fconfigure $in  -encoding ascii -profile strict
+    fconfigure $out -encoding koi8-r -translation lf
+    proc ::xxx args {
+	set ::s0 $args
+    }
+
+    fcopy $in $out -command ::xxx
+    vwait ::s0
+    list [tell $in] [tell $out] {*}[set ::s0]
+
+---- Result was:
+-1 1 1 {error reading "file6": invalid or incomplete multibyte or wide character}
+---- Result should have been (glob matching):
+1 1 1 {error reading "file*": invalid or incomplete multibyte or wide character}
+==== io-52.22.1 FAILED
+
+
+
+==== io-75.6.3 invalid utf-8 encoding, non blocking gets is not ignored (-profile strict) FAILED
+==== Contents of test case:
+
+    gets $f
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== io-75.6.3 FAILED
+
+
+
+==== io-75.6.4 incomplete utf-8 encoding, non blocking gets is not ignored (-profile strict) FAILED
+==== Contents of test case:
+
+    gets $f
+	# only the 2nd gets returns the error
+	gets $f
+
+---- Test completed normally; Return code was: 0
+---- Return code should have been one of: 1
+==== io-75.6.4 FAILED
+
+
+
+==== io-75.11 shiftjis encoding error read results in error (strict profile) FAILED
+==== Contents of test case:
+
+    set d [read $f]
+    binary scan $d H* hd
+    lappend hd [catch {set d [read $f]} msg data] $msg [dict exists $data -data]
+
+---- Result was:
+0 {} 0
+---- Result should have been (glob matching):
+41 1 {error reading "file*": invalid or incomplete multibyte or wide character} 0
+==== io-75.11 FAILED
+
+
+
+==== io-75.13 In nonblocking mode when there is an encoding error the data that has been
+    successfully read so far is returned first and then the error is returned
+    on the next call to [read]. FAILED
+==== Contents of test case:
+
+    set d [read $f]
+    binary scan $d H* hd
+    lappend hd [catch {read $f} msg data] $msg [dict exists $data -data]
+
+---- Result was:
+0 {} 0
+---- Result should have been (glob matching):
+41 1 {error reading "file*": invalid or incomplete multibyte or wide character} 0
+==== io-75.13 FAILED
+
+
+
+==== io-bug-73bb42fb-1 Non-blocking+buffer size+encoding error panic - TCL bug 73bb42fb.
+    Verify error at offset 0. FAILED
+==== Contents of test case:
+
+    set fd [open $path(test1)]
+    fconfigure $fd -encoding utf-8 -profile strict -blocking 0 -buffersize 10 -translation lf -eofchar {}
+    list [catch {read_blocked $fd 1} e d] $e [dict getd $d -code ""] [dict getd $d -errorcode ""] [tell $fd]
+
+---- Result was:
+1 {error reading "file6": invalid or incomplete multibyte or wide character} 1 {POSIX EILSEQ {invalid or incomplete multibyte or wide character}} -1
+---- Result should have been (glob matching):
+1 {error reading *} 1 {POSIX EILSEQ {invalid or incomplete multibyte or wide character}} 0
+==== io-bug-73bb42fb-1 FAILED
+
+
+
+==== io-bug-73bb43fb-2 Non-blocking+buffer size+encoding error panic - TCL bug 73bb42fb.
+    Verify valid data returned before error generated. FAILED
+==== Contents of test case:
+
+    set fd [open $path(test1)]
+    fconfigure $fd -encoding utf-8 -profile strict -blocking 0 -buffersize 10 -translation lf -eofchar {}
+    set result {}
+    lappend result [read_blocked $fd]
+    lappend result [tell $fd]
+    lappend result [catch {read_blocked $fd} e d] $e [dict getd $d -code ""] [dict getd $d -errorcode ""] [tell $fd]
+
+---- Result was:
+X -1 1 {error reading "file6": invalid or incomplete multibyte or wide character} 1 {POSIX EILSEQ {invalid or incomplete multibyte or wide character}} -1
+---- Result should have been (glob matching):
+X 1 1 {error reading *} 1 {POSIX EILSEQ {invalid or incomplete multibyte or wide character}} 1
+==== io-bug-73bb43fb-2 FAILED
+
+ioCmd.test
+ioTrans.test
+iogt.test
+join.test
+lindex.test
+link.test
+linsert.test
+list.test
+listObj.test
+listRep.test
+llength.test
+lmap.test
+load.test
+lpop.test
+lrange.test
+lrepeat.test
+lreplace.test
+lsearch.test
+lseq.test
+
+
+==== lseq-4.21.2 Corner cases: expected Inf FAILED
+==== Contents of test case:
+
+    set res {}
+    lappend res [lseq {1e5555+0} count 5]
+    lappend res [lseq Inf count 5]
+    lappend res [lseq Inf count 5 by 100]
+    lappend res [lseq Inf count 5 by Inf]
+    lappend res [lseq 5 by Inf]
+    lappend res [lseq 0 count 5 by Inf]
+    lappend res [lseq 5 by 1e308]
+    lappend res [lseq 0 count 5 by 1e308]
+    lappend res [lseq 5 by 5e307]
+    lappend res [lseq 0 count 5 by 5e307]
+
+---- Result was:
+{Inf Inf Inf Inf Inf} {Inf Inf Inf Inf Inf} {Inf Inf Inf Inf Inf} {Inf Inf Inf Inf Inf} {0.0 Inf Inf Inf Inf} {0.0 Inf Inf Inf Inf} {0.0 Inf Inf Inf Inf} {0.0 Inf Inf Inf Inf} {0.0 5e+307 1e+308 1.5e+308 Inf} {0.0 5e+307 1e+308 1.5e+308 Inf}
+---- Result should have been (exact matching):
+{Inf Inf Inf Inf Inf} {Inf Inf Inf Inf Inf} {Inf Inf Inf Inf Inf} {Inf Inf Inf Inf Inf} {0.0 Inf Inf Inf Inf} {0.0 Inf Inf Inf Inf} {0.0 1e+308 Inf Inf Inf} {0.0 1e+308 Inf Inf Inf} {0.0 5e+307 1e+308 1.5e+308 Inf} {0.0 5e+307 1e+308 1.5e+308 Inf}
+==== lseq-4.21.2 FAILED
+
+
+
+==== lseq-4.21.3 Corner cases: expected -Inf FAILED
+==== Contents of test case:
+
+    set res {}
+    lappend res [lseq {-1e5555+0} count 5]
+    lappend res [lseq -Inf count 5]
+    lappend res [lseq -Inf count 5 by 100]
+    lappend res [lseq -Inf count 5 by -Inf]
+    lappend res [lseq 5 by -Inf]
+    lappend res [lseq 0 count 5 by -Inf]
+    lappend res [lseq 5 by -1e308]
+    lappend res [lseq 0 count 5 by -1e308]
+    lappend res [lseq 5 by -5e307]
+    lappend res [lseq 0 count 5 by -5e307]
+
+---- Result was:
+{-Inf -Inf -Inf -Inf -Inf} {-Inf -Inf -Inf -Inf -Inf} {-Inf -Inf -Inf -Inf -Inf} {-Inf -Inf -Inf -Inf -Inf} {0.0 -Inf -Inf -Inf -Inf} {0.0 -Inf -Inf -Inf -Inf} {0.0 -Inf -Inf -Inf -Inf} {0.0 -Inf -Inf -Inf -Inf} {0.0 -5e+307 -1e+308 -1.5e+308 -Inf} {0.0 -5e+307 -1e+308 -1.5e+308 -Inf}
+---- Result should have been (exact matching):
+{-Inf -Inf -Inf -Inf -Inf} {-Inf -Inf -Inf -Inf -Inf} {-Inf -Inf -Inf -Inf -Inf} {-Inf -Inf -Inf -Inf -Inf} {0.0 -Inf -Inf -Inf -Inf} {0.0 -Inf -Inf -Inf -Inf} {0.0 -1e+308 -Inf -Inf -Inf} {0.0 -1e+308 -Inf -Inf -Inf} {0.0 -5e+307 -1e+308 -1.5e+308 -Inf} {0.0 -5e+307 -1e+308 -1.5e+308 -Inf}
+==== lseq-4.21.3 FAILED
+
+
+
+==== lseq-4.21.4 Corner cases: unexpected Inf - Inf, result to +/-NaN, unexpected NaN FAILED
+==== Contents of test case:
+
+    set res {}
+    lappend res [list [catch {lseq Inf count 5 by -Inf} msg opt] $msg [dict getd $opt -errorcode ""]]
+    lappend res [list [catch {lseq -Inf count 5 by Inf} msg opt] $msg [dict getd $opt -errorcode ""]]
+    lappend res [list [catch {lseq {Inf - Inf} count 5} msg opt] $msg [dict getd $opt -errorcode ""]]
+    lappend res [list [catch {lseq NaN count 5}         msg opt] $msg [dict getd $opt -errorcode ""]]
+    lappend res [list [catch {lseq NaN count 5 by 100}  msg opt] $msg [dict getd $opt -errorcode ""]]
+    lappend res [list [catch {lseq NaN count 5 by NaN}  msg opt] $msg [dict getd $opt -errorcode ""]]
+    lappend res [list [catch {lseq 5 by NaN}            msg opt] $msg [dict getd $opt -errorcode ""]]
+    lappend res [list [catch {lseq 0 count 5 by NaN}    msg opt] $msg [dict getd $opt -errorcode ""]]
+    join $res \n
+
+---- Result was:
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+0 {} {}
+0 {} {}
+0 {} {}
+---- Result should have been (exact matching):
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+1 {domain error: argument not in valid range} {ARITH DOMAIN {domain error: argument not in valid range}}
+==== lseq-4.21.4 FAILED
+
+lset.test
+lsetComp.test
+macOSXFCmd.test
+macOSXLoad.test
+main.test
+
+
+==== Tcl_Main-5.10 Tcl_Main: exit main loop in mid-interactive command FAILED
+==== Contents of test case:
+
+	type $f "testsetmainloop
+		 after 2000 testexitmainloop
+		 puts \{1 2"
+	after 4000
+	type $f "3 4\}"
+	set code1 [catch {gets $f} line1]
+	set code2 [catch {gets $f} line2]
+	set code3 [catch {gets $f} line3]
+	list $code1 $line1 $code2 $line2 $code3 $line3
+    
+---- Result was:
+0 {} 0 {} 0 {}
+---- Result should have been (exact matching):
+0 {Exit MainLoop} 0 {1 2} 0 {3 4}
+==== Tcl_Main-5.10 FAILED
+
+mathop.test
+misc.test
+msgcat.test
+mutex.test
+namespace-old.test
+namespace.test
+notify.test
+nre.test
+obj.test
+oo.test
+ooNext2.test
+ooProp.test
+ooUtil.test
+opt.test
+package.test
+parse.test
+parseExpr.test
+parseOld.test
+pid.test
+pkgMkIndex.test
+platform.test
+proc-old.test
+proc.test
+process.test
+pwd.test
+reg.test
+regexp.test
+regexpComp.test
+registry.test
+rename.test
+resolver.test
+result.test
+safe-stock.test
+safe-stock86.test
+safe-zipfs.test
+safe.test
+scan.test
+
+
+==== scan-15.1 scan %g overflow for small numbers and big mantissa bug 42d14c495a FAILED
+==== Contents of test case:
+
+    set result [list]
+    # xfail: n<num> = not expected at all, x<num> expected when unfixed
+    foreach {exp numdig ret xfail} {
+	-321  190 1.1116477031428047e-321 n0
+	-321  191 1.1116477031428047e-321 x1
+	-321  300 1.1116477031428047e-321 x2
+	-321 1600 1.1116477031428047e-321 x3
+	-400  110 0 n4
+	-400  111 0 n5
+	-400  300 0 n6
+	-221  290 1.111111111111111e-221 n7
+	-221  291 1.111111111111111e-221 x8
+	-221  400 1.111111111111111e-221 x9
+	-221 1600 1.111111111111111e-221 x10
+	-121  390 1.1111111111111112e-121 n11
+	-121  391 1.1111111111111112e-121 x12
+	-121  500 1.1111111111111112e-121 x13
+	-121 1600 1.1111111111111112e-121 x14
+	 308  202 1.1111111111111112e+308 n15
+	 308  203 1.1111111111111112e+308 n16
+	 308  300 1.1111111111111112e+308 n17
+	 308 1600 1.1111111111111112e+308 x18
+	 400  110 *inf n19
+	 400  111 *inf n20
+	 400  300 *inf n21
+	 221  291 1.1111111111111112e+221 n22
+	 221  292 1.1111111111111112e+221 n23
+	 221  400 1.1111111111111112e+221 n24
+	 221 1600 1.1111111111111112e+221 x25
+	 121  391 1.1111111111111111e+121 n26
+	 121  392 1.1111111111111111e+121 n27
+	 121  500 1.1111111111111111e+121 n28
+	 121 1600 1.1111111111111111e+121 x29
+    } {
+	set s 1.[string repeat 1 $numdig]e$exp
+	set d "no_scan"
+	scan $s %g d
+	set r [format %.17g $d]
+	if {![string match -nocase $ret $r]} {
+	    lappend result $xfail=[format %.17g $d]
+	}
+    }
+    set result
+
+---- Result was:
+n0=1.1125369292536563e-308 x1=1.1125369292536563e-308 x2=1.1125369292536563e-308 x3=1.1125369292536563e-308 n15=Infinity n16=Infinity n17=Infinity x18=Infinity n19=Infinity n20=Infinity n21=Infinity
+---- Result should have been (exact matching):
+
+==== scan-15.1 FAILED
+
+security.test
+set-old.test
+set.test
+socket.test
