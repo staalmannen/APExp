@@ -549,7 +549,7 @@ or a constraint that fails on Linux too). The port's own share is
 `focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
 
 **Tcl's suite**: **it finishes and nothing aborts.**
-`Total 68118 Passed 62095 Skipped 5887 Failed 136`, 167 files, marker,
+`Total 68118 Passed 62130 Skipped 5892 Failed 96`, 167 files, marker,
 exit 0, and no `Test files exiting with errors` section. The listener
 leak fix took **14** (all eleven of `socket_inet-11.*`, plus `12.1`,
 `2.6`, `socket-14.11.1`); async connect took **13** more with nothing
@@ -558,6 +558,20 @@ moving the other way: `socket-14.2/14.6.0/14.7.0/14.7.2/14.8.2/
 `http-4.14.0/4.14.1`. **A feature that has never worked does not fail
 in one place** -- `http.test`'s two were never connected to `-async`
 until it worked.
+
+**136 -> 96 CONFIRMED: forty fixed, none broken, all forty named.**
+`Total` identical, `Skipped` **+5 exactly** (the symlink probe),
+`Passed` +35, empty new-failure column. 12 were `O_NONBLOCK` on a
+regular file, 4 were `6.47`/`8.1`, 2 were `29.27`, 16 were `filename`,
+and **6 were `io`'s encoding tests -- which were on the UNREAD list**
+(`io-75.6.3/75.6.4/75.11/75.13`, `io-bug-73bb42fb-1`,
+`io-bug-73bb43fb-2`). The previous note said a fall of more than twelve
+would mean the reading was incomplete; **it fired and it pointed at the
+right six.** Write the refutation condition down.
+**EPIPE is confirmed twice**: `29.27` passes, and `io-29.33b` -- still
+failing -- changed from `cannot send after transport endpoint shutdown`
+to `broken pipe`, so the mapping reaches the code and `29.33b` is a
+different bug the wrong errno was dressing up as a socket problem.
 
 **A count in the per-file table is executions, not tests**: `clock`'s
 16 were 4 tests run twice each (`.vm:0`/`.vm:1`). Size a cluster from
@@ -703,7 +717,8 @@ Open, in order of what the next run should touch:
   predicted: 14.14 needs the failed connect to make the socket
   *readable*, through the copy process on the data file. It does --
   now measured rather than assumed.
-- **`filename` 17: read in full, and it is three things.** Five need
+- **`filename` 17 -> 1, CONFIRMED** (`Skipped` rose by exactly the five
+  predicted). Read in full, it was three things. Five need
   symbolic links (ENOSYS, out of reach). **Eleven fail only because
   those five litter**: `11.17.7` does `file mkdir nonexistent`, then
   `file link -symbolic` raises, so its `file delete nonexistent` never
@@ -731,14 +746,14 @@ Open, in order of what the next run should touch:
   `fblocked 1, eof 0` for ever. POSIX: `O_NONBLOCK` does nothing to a
   regular file. Now cached in two free `flags` bits beside `FD_ISTTY`
   (`FD_ISREG`, `FD_REGCHECKED`), **cleared on the exec-restore path in
-  `_fdinfo.c` for the reason FD_ISTTY records there**. Fixed, not yet
-  confirmed.
-- **`6.47` and `8.1` are that same line**, found by reading
-  `PeekAhead()` rather than the tests: when `gets` sees `\r` at the end
-  of a buffer, **Tcl sets the channel non-blocking itself for one read**
-  and puts it back -- so an ordinary blocking read of a regular file
-  went through `O_NONBLOCK` after all. **Prediction raised before the
-  run**: `io` 23 -> 15, `chan-io` 19 -> 11, not 17 and 13.
+  `_fdinfo.c` for the reason FD_ISTTY records there**. **CONFIRMED.**
+- **`6.47` and `8.1` were that same line -- CONFIRMED**, and called for
+  before the run by reading `PeekAhead()` rather than the tests: when
+  `gets` sees `\r` at the end of a buffer, **Tcl sets the channel
+  non-blocking itself for one read** and puts it back, so an ordinary
+  blocking read of a regular file went through `O_NONBLOCK` after all.
+  `io` 23 -> 10 and `chan-io` 19 -> 10, better than the 15 and 11
+  predicted, by the six encoding tests nobody had opened.
 - **`6.31` and `6.43`-`6.46` are NOT that**, and are recorded rather
   than fixed: every one uses `openpipe w+ $path(cat)`, and that `cat` is
   a second tclsh doing **non-blocking reads of its own**, so the bytes
@@ -752,13 +767,47 @@ Open, in order of what the next run should touch:
   own round.
 - **`29.27`: `i/o on hungup channel` mapped to ESHUTDOWN, POSIX wants
   EPIPE** -- one write with no reader left, one answer, pipe and socket
-  alike. Fixed, unmeasured; `epipe-test.c` asks it without Tcl.
+  alike. **FIXED and CONFIRMED**; `epipe-test.c` asks it without Tcl.
 - **`40.3` is not ours**: no umask on Plan 9, and the file server hands
-  out `perm & (dirperm | ~0666)`, so 0664 where the test computes 0666.
-- **Still unread**: `14.1`/`14.2` -- their failure text is not in the
-  surviving log, and *a test whose output has not been seen has not been
-  read*. Then `io`'s encoding tests (`75.*`, `io-bug-*`), `expr` 5,
-  `socket_inet` 4, `cmdAH` 4, `lseq` 3, `exec` 3.
+  out `perm & (dirperm | ~0666)`, so **0644** where the test computes
+  0666. *(The note said 0664 before the log was read. The mechanism was
+  right and the number was a guess written as though measured.)*
+- **`zipfs` 13 is the biggest unread cluster and ten of it is two
+  `#define`s.** Every `zipfs-file-stat-*`/`-lstat-*` regexp-matches the
+  whole key list of `file stat`, and ours was two keys short: Tcl wraps
+  them in `HAVE_STRUCT_STAT_ST_BLKSIZE`/`_ST_BLOCKS`, which
+  `sys/src/ape/lib/tcl/tclConfig.h` never declared **although APE's
+  `struct stat` has both fields and `dirtostat.c` fills both**. Not a
+  missing capability, a capability not declared -- `file stat` has been
+  short two keys for every program. Declared now; `st_rdev` deliberately
+  NOT, because `dirtostat.c` always sets it to 0 and *a field that is
+  always zero reads as information and is not*. Predict 13 -> 3 (the
+  three left are zipfs's own `invalid password`).
+- **`14.1`/`14.2` (four tests) are read at last and are a PROBE**:
+  stderr's buffering is `line` and must be `none` -- while
+  `TclpGetDefaultStdChannel` asks for exactly that and is passed a NULL
+  interp, so a failure is silent. `testchannel open` says
+  `file0 file1 file2`, so `isatty` is answering correctly and this is
+  not the tty path. One line settles it: print
+  `fconfigure stderr -buffering` at a terminal and again under
+  `>out 2>&1`. Same answer both ways means the option call is failing;
+  different means the redirect is the condition.
+- **`cmdAH` 4: two symlink, two ours.** `cmdAH-25.3` has `file owned /`
+  answering 1 -- and `dirtostat.c` takes `st_uid` from `_getpw()`, which
+  parses **`/adm/users`**, a fossil/kenfs file a 9front hjfs or cwfs
+  terminal need not have. When it cannot be opened every file gets the
+  default `st_uid = 1` and **ownership is a constant system-wide**.
+  Probe `ls -l /adm/users` before writing anything; the honest repair
+  compares the Dir's owner string against `/dev/user`, not a fabricated
+  password database. `cmdAH-20.5`: `file atime $f $t` reads back the
+  current time, so the wstat did not carry it -- `ratrace` first.
+- **`chan-io-28.7`, one test and ours**: `close $s w` (half-close) and
+  the far end reads `{}` where it should read `{Hey DONE}`. `shutdown()`
+  is already in this tree's list of stubs that answered the wrong thing.
+- **Still unread**: `expr` 5, `socket_inet` 4, `lseq` 3, `exec` 3, and
+  eleven singletons (`io-29.33b`, `io-52.22.1`, `chan-io-41.8`,
+  `scan-15.1`, `event-1.1`, `unixInit-1.2`, `Tcl_Main-5.10`,
+  `socket-14.19`, `expr-old-37.21`, `unixFCmd-2.2.2`).
 - **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a
   password database mapping a user to a home directory, which Plan 9
   has not -- read it before writing it off.
