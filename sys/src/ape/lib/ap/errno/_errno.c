@@ -53,8 +53,30 @@ static struct errmap {
 	{EIO,		"read or write too large"},
 	{EIO,		"read or write too small"},
 	{EADDRINUSE,	"network port not available"},
-	{ESHUTDOWN,	"write to hungup stream"},
-	{ESHUTDOWN,	"i/o on hungup channel"},
+	/*
+	 * EPIPE, NOT ESHUTDOWN. These are what Plan 9 raises when the
+	 * other end of a pipe or a network connection has gone away, and
+	 * POSIX has one answer for all of it: a write with no reader left
+	 * is EPIPE, on a pipe and on a socket alike -- Linux gives EPIPE
+	 * after shutdown(SHUT_WR) too. ESHUTDOWN is a BSD name for a
+	 * socket whose transport was shut down, and is not what a pipe
+	 * write ever reports anywhere.
+	 *
+	 * The kernel posts "sys: write on closed pipe" beside this, which
+	 * signal/signal.c maps to SIGPIPE, so the note half was already
+	 * right and only the errno half was not.
+	 *
+	 * Nothing in libap reads ESHUTDOWN back out of this table, so this
+	 * changes a message and not a control flow; bind()'s fallback is
+	 * gated on EPLAN9, which neither errno is.
+	 *
+	 * Tcl's io-29.27/chan-io-29.27 are what named it: they spell the
+	 * middle word of {posix epipe {broken pipe}} from errno and
+	 * compare exactly. Unmeasured -- see sys/lib/tests/epipe-test.c,
+	 * which asks the question without Tcl in the way.
+	 */
+	{EPIPE,	"write to hungup stream"},
+	{EPIPE,	"i/o on hungup channel"},
 	{EINVAL,	"bad process or channel control request"},
 	{EBUSY,	"no free devices"},
 	{ESRCH,		"process exited"},

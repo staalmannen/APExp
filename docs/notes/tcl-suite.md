@@ -6209,3 +6209,104 @@ so `Failed` falls by 12. **What is NOT claimed**: `6.31`/`6.43`-`6.47`
 `8.1`, `14.1`/`14.2`, `29.27`, `40.3`, and `io`'s encoding tests are
 unread and untouched. If `Failed` falls by more than 12, something in
 those groups shared the cause and the reading above was incomplete.
+
+#### Reading the rest of io/chan-io: two of the six were the same bug, and the prediction goes up before the run
+
+The previous section fixed twelve and explicitly did not claim
+`6.31`, `6.43`-`6.47`, `8.1`, `14.1`/`14.2`, `29.27` or `40.3`. Reading
+them now, **before the measurement rather than after it**, splits the
+six that are left four ways -- and two of them turn out to be the bug
+already fixed, which raises the prediction while it can still be wrong.
+
+**`6.47` and `8.1` are the same one line.** Both open a *regular* file,
+set `-buffersize 16`, do one blocking `chan gets`, and ask
+`testchannel inputbuffered`. Both wanted a residue -- 15 and 7 -- and
+both got **0**. `tclIO.c`'s `PeekAhead()`, called when `gets` finds a
+`\r` at the end of a buffer and wants to know whether a `\n` follows:
+
+```c
+	if (bytesLeft == 0) {
+	    if (!IsBufferFull(bufPtr)) {
+		goto cleanup;			/* short read: device is empty */
+	    }
+	    if (!GotFlag(statePtr, CHANNEL_NONBLOCKING)) {
+		...
+		StackSetBlockMode(chanPtr, TCL_MODE_NONBLOCKING);
+	    }
+	}
+```
+
+**Tcl makes the channel non-blocking itself, for one read, and puts it
+back.** So a plain blocking read of an ordinary file went through
+`O_NONBLOCK` after all -- into the copy-process path, `EAGAIN`, no
+bytes, `inputbuffered 0`. The channel was never non-blocking in the
+test; Tcl made it so for the length of a peek. That is why reading the
+test body was not enough to find it and reading the *implementation of
+the call the test makes* was.
+
+So `io` should go 23 -> **15** and `chan-io` 19 -> **11**, not 17 and 13.
+**The earlier prediction said that a fall of more than twelve would mean
+the reading was incomplete. It was, this is where, and the correction is
+on the record before the run rather than after it.**
+
+**`6.31` and `6.43`-`6.46` are a different thing and are not fixed.**
+Every one of them uses `openpipe w+ $path(cat)`, and the `cat` script at
+the top of the file is not `cat`:
+
+```tcl
+	chan configure $f -translation binary -blocking 0 -eofchar \x1A
+	chan event $f readable "foo $f"
+	proc foo {f} { set x [chan read $f]; catch {chan puts -nonewline $x} ... }
+```
+
+**The child is a second tclsh doing non-blocking reads of its own**, so
+the data crosses two copy processes and two event loops before the
+parent's next `gets` asks for it. The results say exactly that:
+`6.43` and `6.44` produce the right values *shifted by one extra
+blocked result*, and `6.31` wants `inputbuffered 16` and gets 0. On
+Linux the bytes are in the kernel the instant they are written; here
+they are in a process that has not been scheduled yet.
+
+**The cheap fix is wrong and worth naming, because `select()` already
+has the expensive version of it.** `waitfresh()` in `_buf.c` gives a
+freshly-forked copy process a bounded chance -- ten tries at a
+millisecond -- and that is defensible because it is paid once per
+descriptor at the moment the descriptor is first watched. Doing the
+same in `_readbuf`'s `noblock` path would tax *every* poll of *every*
+idle descriptor in every event loop on the system, to make six tests
+agree about scheduling. **`EAGAIN` would still be a lie, just a slower
+one.** The honest fix is a real non-blocking read for pipes -- Plan 9's
+`stat` on a pipe reports what is queued, so the copy process may not be
+needed for them at all -- and that is its own round, with its own
+measurement, not a rider on this one.
+
+**`29.27` is ours and is one table entry.** It expects
+`{posix epipe {broken pipe}}`, and Tcl spells that middle word from
+`errno`. `_errno.c` mapped Plan 9's `i/o on hungup channel` and
+`write to hungup stream` to **ESHUTDOWN** -- a BSD name for a *socket*
+whose transport has been shut down. POSIX gives one answer for the
+whole family: a write with no reader left is **EPIPE**, on a pipe and
+on a socket alike, and Linux answers EPIPE after `shutdown(SHUT_WR)`
+too. The note half was already right: the kernel posts
+`sys: write on closed pipe` and `signal/signal.c` already maps it to
+SIGPIPE. `sys/lib/tests/epipe-test.c` asks it without Tcl in the way --
+section 0 disarms SIGPIPE (or the test would die rather than report),
+section 2 is the control that a live pipe still takes a write, and
+section 3 does the socket half, because the two entries are reached
+through the same table and measuring only the pipe would leave half the
+change unobserved. 0 failures on glibc.
+
+**`40.3` is not ours.** It creates a file `{WRONLY CREAT}` and compares
+the mode against `0666 & ~umask`. Plan 9 has no umask -- `stat/umask.c`
+returns 0 and always has -- so the test computes `0o666`, while the
+file server hands out `perm & (dirperm | ~0666)`, which in a 0775
+directory is `0o664`. That is the *file server's* rule about creation,
+not a library one, and there is nothing to set: a probe, like
+`unixFCmd-1.1`.
+
+**`14.1` and `14.2` are still unread**, and deliberately so: they ask
+what `chan configure stdout -buffering` says and what
+`testchannel open` lists, and the surviving log is the truncated one
+that stops at `8.1`, so their actual output is not in hand. *A test
+whose failure text has not been seen is not a test that has been read* --
+that is what `env`'s nine cost. They wait for the next full run.
