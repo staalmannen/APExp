@@ -32,6 +32,42 @@ if {[testConstraint win]} {
     testConstraint symbolicLinkFile 0
     testConstraint sharedCdrive [expr {![catch {cd //[info hostname]/c}]}]
 }
+#
+# APExp: THIS CONSTRAINT IS A CAPABILITY, SO ASK THE SYSTEM FOR IT.
+#
+# The two lines above set linkDirectory and symbolicLinkFile to 1 and
+# only Windows ever turns them off, so every non-Windows platform is
+# assumed to have symbolic links. Plan 9 has none -- `file link
+# -symbolic' raises ENOSYS -- and the cost is not the five tests that
+# need them. filename-11.17.7 is
+#
+#	cd $globname
+#	file mkdir nonexistent
+#	file link -symbolic link nonexistent	;# raises here
+#	file delete nonexistent			;# so this never runs
+#
+# and its -cleanup removes only `link'. `nonexistent' is left in
+# globTest, and ELEVEN later tests in this file -- 11.18 through
+# 11.25.2, 14.7 and 14.15 -- then report one extra entry and fail for a
+# reason that has nothing to do with what they test.
+#
+# So the probe below is not there to make anything pass: the five tests
+# that genuinely need symbolic links become SKIPPED, which is what a
+# constraint is for, and the eleven stop being contaminated. It is the
+# same guard upstream already writes for Windows, asked rather than
+# assumed.
+#
+if {[catch {
+    set apexpLink [file join [temporaryDirectory] apexp-symlink-probe]
+    file delete -force $apexpLink
+    file link -symbolic $apexpLink [temporaryDirectory]
+}]} {
+    testConstraint linkDirectory 0
+    testConstraint symbolicLinkFile 0
+}
+catch {file delete -force $apexpLink}
+unset -nocomplain apexpLink
+
 testConstraint notWine [expr {![info exists ::env(CI_USING_WINE)]}]
 # This match compares the first two words of the result. If the wanted result
 # is "equal", then this is successful if the words are equal. If the wanted

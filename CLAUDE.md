@@ -183,7 +183,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `sigset-test.c`, `posix-spawn-test.c`, `limits-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
 `execve-env-test.c`, `tz-test.c`, `rename-test.c`, `listenleak-test.c`,
-`asyncconnect-test.c`,
+`asyncconnect-test.c`, `nbread-test.c`, `epipe-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
@@ -549,10 +549,15 @@ or a constraint that fails on Linux too). The port's own share is
 `focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
 
 **Tcl's suite**: **it finishes and nothing aborts.**
-`Total 68118 Passed 62081 Skipped 5888 Failed 149`, 167 files, marker,
+`Total 68118 Passed 62095 Skipped 5887 Failed 136`, 167 files, marker,
 exit 0, and no `Test files exiting with errors` section. The listener
-leak fix took **14**: all eleven of `socket_inet-11.*`, plus `12.1`,
-`2.6` and `socket-14.11.1`.
+leak fix took **14** (all eleven of `socket_inet-11.*`, plus `12.1`,
+`2.6`, `socket-14.11.1`); async connect took **13** more with nothing
+moving the other way: `socket-14.2/14.6.0/14.7.0/14.7.2/14.8.2/
+14.11.0/14.12/14.14/14.15/14.18`, `socket_inet-8.1`, and
+`http-4.14.0/4.14.1`. **A feature that has never worked does not fail
+in one place** -- `http.test`'s two were never connected to `-async`
+until it worked.
 
 **A count in the per-file table is executions, not tests**: `clock`'s
 16 were 4 tests run twice each (`.vm:0`/`.vm:1`). Size a cluster from
@@ -694,11 +699,66 @@ Open, in order of what the next run should touch:
   the connect resolves and therefore WAITS rather than answering 0. The
   real fix is `select()` learning about a pending connect. `Rock` gained
   three APPENDED fields; `unistd/mkfile` gained `HFILES` for `priv.h`.
-  **`socket-14.14`/`14.15` themselves are still unmeasured** -- 14.14
-  needs the failed connect to make the socket *readable*, through the
-  copy process on the data file.
-- **Still unread: `io` 23, `chan-io` 19, `socket_inet` 16,
-  `filename` 17, `socket` 10.** `filename`'s are all `Tcl_GlobCmd`.
+  **`socket-14.14`/`14.15` are FIXED**, which was deliberately not
+  predicted: 14.14 needs the failed connect to make the socket
+  *readable*, through the copy process on the data file. It does --
+  now measured rather than assumed.
+- **`filename` 17: read in full, and it is three things.** Five need
+  symbolic links (ENOSYS, out of reach). **Eleven fail only because
+  those five litter**: `11.17.7` does `file mkdir nonexistent`, then
+  `file link -symbolic` raises, so its `file delete nonexistent` never
+  runs and `-cleanup` removes only `link` -- every later glob test then
+  sees one extra entry, and all eleven differ from expected by exactly
+  that word. The constraint that should have stopped this is hardcoded
+  to 1 outside Windows, so **`fileName.test` now PROBES for the
+  capability** -- the only Tcl test patched, justified because the
+  litter makes eleven tests misreport something unrelated.
+  **`fCmd.test`/`cmdAH.test` hardcode the same constraint and are
+  deliberately left alone**: their symlink tests fail honestly and
+  contaminate nothing, and skipping them would only flatter the count.
+  **One is ours and is recorded, not fixed**: `filename-14.9` wants
+  `glob globTest/.*` to yield `.` and `..`, and **Plan 9 directories
+  contain neither**. Synthesising them in `readdir()` changes what every
+  directory read in every program sees, for one measured test; it wants
+  its own round.
+- **`io` 23 and `chan-io` 19 are ~16 questions, not 42** -- `io.test`
+  drives `fconfigure` and `chanio.test` drives `chan`, and `6.31`,
+  `6.43`-`6.47`, `8.1`, `14.1/2`, `29.27`, `32.7/8`, `35.4`, `36.5/6`,
+  `39.9` and `40.3` are in both. **Twelve were one line**: `read()`
+  sent any `O_NONBLOCK` descriptor into the buffered copy-process path
+  whatever kind of file it was, so a REGULAR file reported "would
+  block" when the copy process had not caught up -- an empty file said
+  `fblocked 1, eof 0` for ever. POSIX: `O_NONBLOCK` does nothing to a
+  regular file. Now cached in two free `flags` bits beside `FD_ISTTY`
+  (`FD_ISREG`, `FD_REGCHECKED`), **cleared on the exec-restore path in
+  `_fdinfo.c` for the reason FD_ISTTY records there**. Fixed, not yet
+  confirmed.
+- **`6.47` and `8.1` are that same line**, found by reading
+  `PeekAhead()` rather than the tests: when `gets` sees `\r` at the end
+  of a buffer, **Tcl sets the channel non-blocking itself for one read**
+  and puts it back -- so an ordinary blocking read of a regular file
+  went through `O_NONBLOCK` after all. **Prediction raised before the
+  run**: `io` 23 -> 15, `chan-io` 19 -> 11, not 17 and 13.
+- **`6.31` and `6.43`-`6.46` are NOT that**, and are recorded rather
+  than fixed: every one uses `openpipe w+ $path(cat)`, and that `cat` is
+  a second tclsh doing **non-blocking reads of its own**, so the bytes
+  cross two copy processes and two event loops. `6.43`/`6.44` give the
+  right values *shifted by one extra blocked result*. **Do not pay for
+  it in `_readbuf`** -- `select()`'s `waitfresh()` is defensible because
+  it is once per descriptor; the same wait in the `noblock` read path
+  would tax every poll of every idle descriptor to make six tests agree
+  about scheduling. The honest fix is a real non-blocking read for
+  pipes (Plan 9's `stat` reports what a pipe has queued), and it is its
+  own round.
+- **`29.27`: `i/o on hungup channel` mapped to ESHUTDOWN, POSIX wants
+  EPIPE** -- one write with no reader left, one answer, pipe and socket
+  alike. Fixed, unmeasured; `epipe-test.c` asks it without Tcl.
+- **`40.3` is not ours**: no umask on Plan 9, and the file server hands
+  out `perm & (dirperm | ~0666)`, so 0664 where the test computes 0666.
+- **Still unread**: `14.1`/`14.2` -- their failure text is not in the
+  surviving log, and *a test whose output has not been seen has not been
+  read*. Then `io`'s encoding tests (`75.*`, `io-bug-*`), `expr` 5,
+  `socket_inet` 4, `cmdAH` 4, `lseq` 3, `exec` 3.
 - **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a
   password database mapping a user to a home directory, which Plan 9
   has not -- read it before writing it off.
@@ -706,8 +766,6 @@ Open, in order of what the next run should touch:
   `_fdinfo`/`_sighdlr` and closing every `FD_CLOEXEC` descriptor. This
   is old, not new: `_RFORK(RFCENVG)` on its first line is what empties
   it. `environ` is untouched, so it is bounded.
-- `chan-io-6.4x`: `-buffersize 16` with `testchannel inputbuffered`
-  reporting 0. The oldest open item here.
 - `binary-53.25`/`53.26`: a double one ulp past the float range must
   round to infinity.
 - **9front has no symbolic links** (confirmed by grep), so `symlink()`

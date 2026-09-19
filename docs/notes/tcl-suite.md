@@ -6033,3 +6033,280 @@ are untouched.
 written. 14.14 needs the failed connect to make the socket *readable*,
 which goes through the copy process on the data file, and nothing has
 measured that it does. They stay unpredicted.
+
+#### Async connect: 149 -> 136, thirteen fixed, nothing broken
+
+`Tests ended at 2026-09-18 17:11:30`, marker, `Total 68118 Passed 62095
+Skipped 5887 Failed 136`.
+
+```
+FIXED: socket-14.2 14.6.0 14.7.0 14.7.2 14.8.2 14.11.0 14.12
+       14.14 14.15 14.18  socket_inet-8.1  http-4.14.0 http-4.14.1
+NEWLY FAILING: (none)
+```
+
+**Thirteen, and not one thing moved the other way** -- which matters
+because `connect()` now forks a process on every non-blocking connect
+and `getsockopt(SO_ERROR)` waits where it used to return instantly. Both
+are new behaviour on a path a great many tests touch, and that was the
+thing to watch rather than the two tests this came from.
+
+**`socket-14.14` and `14.15` are fixed, and I declined to predict them.**
+The reason given was that 14.14 needs the failed connect to make the
+socket *readable*, which goes through the copy process on the data
+file, and nothing had measured that it does. It does. *That is now a
+measured fact rather than an assumption, and declining to guess it cost
+nothing while guessing wrong would have cost the credibility of the
+other predictions in the same message.*
+
+**The cluster is bigger than the two tests that exposed it.** Eight more
+`socket-14.*`, `socket_inet-8.1` and two in `http.test` were all waiting
+on the same missing feature -- `http` does asynchronous connects too,
+and nothing had connected those failures to `-async` at all. **A
+feature that has never worked does not fail in one place; it fails
+everywhere it is used, and the failures do not look related until it
+works.**
+
+**Where the suite stands now:**
+
+```
+io 23   fCmd 22   chan-io 19   filename 17   env 9   expr 5
+socket_inet 4   cmdAH 4   lseq 3   exec 3   unixFCmd 2   io-bug 2
+```
+
+`fCmd`'s 22 and `env`'s 9 are accounted for and out of reach (symlinks,
+a password database, and rc's lowercase `path`). The three largest
+unread clusters are `io` 23, `chan-io` 19 and `filename` 17 -- and
+`filename`'s are all `Tcl_GlobCmd`, which is one function rather than
+seventeen questions.
+
+#### filename 17: five need symlinks, eleven are their litter, one is ours
+
+Read all seventeen before touching any, and they are three things.
+
+**Five need symbolic links** -- `11.17.2`, `.3`, `.4`, `.7`, `.8` -- all
+doing `file link -symbolic`, which is ENOSYS here and stays that way.
+
+**Eleven fail because of what those five leave behind.** `11.17.7` is
+
+```tcl
+cd $globname
+file mkdir nonexistent
+file link -symbolic link nonexistent	;# raises here
+file delete nonexistent			;# so this never runs
+```
+
+and its `-cleanup` removes only `link`. `nonexistent` stays in
+`globTest`, and `11.18`, `11.19`, `11.20`, `11.22`, `11.23`, `11.24`,
+`11.25`, `11.25.1`, `11.25.2`, `14.7` and `14.15` then each report one
+extra entry. **Every one of the eleven differs from its expected result
+by exactly that one word and nothing else** -- checked across all of
+them, not sampled, which is what made it safe to treat as one cause.
+
+**And the constraint that should have prevented it is hardcoded:**
+
+```tcl
+testConstraint linkDirectory 1
+testConstraint symbolicLinkFile 1
+if {[testConstraint win]} { ...only Windows turns them off... }
+```
+
+Upstream assumes every non-Windows platform has symbolic links.
+
+**The patch, and the line drawn around it.** `fileName.test` now probes
+for the capability instead of assuming it -- the same guard upstream
+already writes for Windows, asked rather than assumed. That is the only
+Tcl test file touched, and the justification is specific: **the litter
+makes eleven tests report a result that is not about their subject.**
+The suite is the measuring instrument here, and an instrument
+miscalibrated by an assumption in its own setup is worth calibrating.
+
+**`fCmd.test` and `cmdAH.test` hardcode the same constraint and are
+deliberately NOT touched.** Their symlink tests fail on their own,
+contaminating nothing, and turning fifteen honest "this platform cannot
+do that" failures into skips would flatter the count without changing
+anything. *The line is: fix the instrument where it misreports something
+unrelated; never where it would only make the score look better.*
+
+**One is genuinely ours, and is recorded rather than fixed.**
+`filename-14.9`:
+
+```
+glob globTest/.*  ->  globTest/.1
+wanted                globTest/. globTest/.. globTest/.1
+```
+
+**Plan 9 directories contain no `.` or `..` entries at all**, so
+`readdir()` never returns them -- a fact already written in
+`unistd/rmdir.c` ("Plan 9 directories hold no . or .. , but skip them
+anyway"). Synthesising the two in `readdir()` would make this pass and
+is a real compatibility question, but it changes what EVERY directory
+read in every program sees, and the measured benefit so far is one test.
+That is not a trade to make in the same round as eleven other changes;
+it wants its own, with its own reduction. Recorded.
+
+**Prediction, observation only.** `filename` goes from 17 failures to 1
+(`14.9`), with 5 newly skipped rather than passed -- so `Skipped` rises
+by 5 and `Failed` falls by 16. If `Failed` falls by more than 16, or
+`Skipped` rises by anything but 5, the reading above is incomplete.
+
+#### io 23 and chan-io 19 are not 42 questions: read() ignored what kind of file it had
+
+**The two clusters are mostly the same tests through two APIs.** `io.test`
+drives `fconfigure`, `chanio.test` drives `chan`, and these appear in
+both: `6.31`, `6.43`-`6.47`, `8.1`, `14.1`, `14.2`, `29.27`, `32.7`,
+`32.8`, `35.4`, `36.5`, `36.6`, `39.9`, `40.3`. So forty-two failures
+are about sixteen questions, and reading one file answers two.
+
+**Twelve of them are one line.** `io-39.9` reads an EMPTY file with
+`-blocking off` and gets `fblocked 1, eof 0` where it wants `0, 1`;
+`io-35.4` asks the same through `eof`; `io-32.7` asks for 20 bytes of a
+long file and gets fewer. `unistd/read.c`:
+
+```c
+noblock = f->oflags&O_NONBLOCK;
+isbuf = f->flags&(FD_BUFFERED|FD_BUFFEREDX);
+if(noblock || isbuf){ ...copy process... }
+```
+
+**Any descriptor with `O_NONBLOCK` went into the buffered copy-process
+path, whatever kind of file it was.** For a pipe or socket that is the
+whole design -- Plan 9 has no non-blocking read, so another process does
+the reading and the caller asks what arrived. For a regular file it
+forks a process for something that cannot block, and then
+`_readbuf(..., noblock)` answers "would block" whenever that process has
+not caught up. **A file at end of file said "try again later" for ever,
+and later never comes for a file that has already ended.**
+
+POSIX is explicit: `O_NONBLOCK` affects pipes, FIFOs, terminals and
+sockets. A read of a regular file transfers what is there and returns 0
+at end of file, never EAGAIN.
+
+**Cached, because the alternative is a stat per read on every socket.**
+`FD_ISREG` and `FD_REGCHECKED` join `FD_ISTTY` in `f->flags` -- two bits,
+so "not asked yet" differs from "asked, and it is not". `flags` had
+`0x40` and `0x80` free, so this is a bit rather than a field, and no
+struct changes size.
+
+**And `_fdinfo.c` already records why that cache is dangerous.** The
+flags word travels in `$_fdinfo` across an exec while the descriptor
+behind it may have been redirected -- which is the FD_ISTTY bug written
+up there at length, where a child believed it had a terminal and printed
+`% ` into a pipe. `FD_ISREG`/`FD_REGCHECKED` are therefore cleared on
+the same restore path, so the first read in a child asks again. *The
+lesson was on the screen while the code was being written, which is the
+first time in this sequence that has happened rather than the reverse.*
+
+**`nbread-test.c` section 3 is the point of the file.** Sections 1 and 2
+would both pass if `O_NONBLOCK` were ignored on EVERY descriptor, which
+would wedge every event loop on the system; section 3 reads an empty
+pipe and requires EAGAIN. Without it the test cannot tell a fix from a
+catastrophe. 0 failures on glibc.
+
+**Prediction, observation only.** `io` 23 -> 17 and `chan-io` 19 -> 13,
+so `Failed` falls by 12. **What is NOT claimed**: `6.31`/`6.43`-`6.47`
+(the `Tcl_GetsObj` cr/crlf group, and the oldest open item here),
+`8.1`, `14.1`/`14.2`, `29.27`, `40.3`, and `io`'s encoding tests are
+unread and untouched. If `Failed` falls by more than 12, something in
+those groups shared the cause and the reading above was incomplete.
+
+#### Reading the rest of io/chan-io: two of the six were the same bug, and the prediction goes up before the run
+
+The previous section fixed twelve and explicitly did not claim
+`6.31`, `6.43`-`6.47`, `8.1`, `14.1`/`14.2`, `29.27` or `40.3`. Reading
+them now, **before the measurement rather than after it**, splits the
+six that are left four ways -- and two of them turn out to be the bug
+already fixed, which raises the prediction while it can still be wrong.
+
+**`6.47` and `8.1` are the same one line.** Both open a *regular* file,
+set `-buffersize 16`, do one blocking `chan gets`, and ask
+`testchannel inputbuffered`. Both wanted a residue -- 15 and 7 -- and
+both got **0**. `tclIO.c`'s `PeekAhead()`, called when `gets` finds a
+`\r` at the end of a buffer and wants to know whether a `\n` follows:
+
+```c
+	if (bytesLeft == 0) {
+	    if (!IsBufferFull(bufPtr)) {
+		goto cleanup;			/* short read: device is empty */
+	    }
+	    if (!GotFlag(statePtr, CHANNEL_NONBLOCKING)) {
+		...
+		StackSetBlockMode(chanPtr, TCL_MODE_NONBLOCKING);
+	    }
+	}
+```
+
+**Tcl makes the channel non-blocking itself, for one read, and puts it
+back.** So a plain blocking read of an ordinary file went through
+`O_NONBLOCK` after all -- into the copy-process path, `EAGAIN`, no
+bytes, `inputbuffered 0`. The channel was never non-blocking in the
+test; Tcl made it so for the length of a peek. That is why reading the
+test body was not enough to find it and reading the *implementation of
+the call the test makes* was.
+
+So `io` should go 23 -> **15** and `chan-io` 19 -> **11**, not 17 and 13.
+**The earlier prediction said that a fall of more than twelve would mean
+the reading was incomplete. It was, this is where, and the correction is
+on the record before the run rather than after it.**
+
+**`6.31` and `6.43`-`6.46` are a different thing and are not fixed.**
+Every one of them uses `openpipe w+ $path(cat)`, and the `cat` script at
+the top of the file is not `cat`:
+
+```tcl
+	chan configure $f -translation binary -blocking 0 -eofchar \x1A
+	chan event $f readable "foo $f"
+	proc foo {f} { set x [chan read $f]; catch {chan puts -nonewline $x} ... }
+```
+
+**The child is a second tclsh doing non-blocking reads of its own**, so
+the data crosses two copy processes and two event loops before the
+parent's next `gets` asks for it. The results say exactly that:
+`6.43` and `6.44` produce the right values *shifted by one extra
+blocked result*, and `6.31` wants `inputbuffered 16` and gets 0. On
+Linux the bytes are in the kernel the instant they are written; here
+they are in a process that has not been scheduled yet.
+
+**The cheap fix is wrong and worth naming, because `select()` already
+has the expensive version of it.** `waitfresh()` in `_buf.c` gives a
+freshly-forked copy process a bounded chance -- ten tries at a
+millisecond -- and that is defensible because it is paid once per
+descriptor at the moment the descriptor is first watched. Doing the
+same in `_readbuf`'s `noblock` path would tax *every* poll of *every*
+idle descriptor in every event loop on the system, to make six tests
+agree about scheduling. **`EAGAIN` would still be a lie, just a slower
+one.** The honest fix is a real non-blocking read for pipes -- Plan 9's
+`stat` on a pipe reports what is queued, so the copy process may not be
+needed for them at all -- and that is its own round, with its own
+measurement, not a rider on this one.
+
+**`29.27` is ours and is one table entry.** It expects
+`{posix epipe {broken pipe}}`, and Tcl spells that middle word from
+`errno`. `_errno.c` mapped Plan 9's `i/o on hungup channel` and
+`write to hungup stream` to **ESHUTDOWN** -- a BSD name for a *socket*
+whose transport has been shut down. POSIX gives one answer for the
+whole family: a write with no reader left is **EPIPE**, on a pipe and
+on a socket alike, and Linux answers EPIPE after `shutdown(SHUT_WR)`
+too. The note half was already right: the kernel posts
+`sys: write on closed pipe` and `signal/signal.c` already maps it to
+SIGPIPE. `sys/lib/tests/epipe-test.c` asks it without Tcl in the way --
+section 0 disarms SIGPIPE (or the test would die rather than report),
+section 2 is the control that a live pipe still takes a write, and
+section 3 does the socket half, because the two entries are reached
+through the same table and measuring only the pipe would leave half the
+change unobserved. 0 failures on glibc.
+
+**`40.3` is not ours.** It creates a file `{WRONLY CREAT}` and compares
+the mode against `0666 & ~umask`. Plan 9 has no umask -- `stat/umask.c`
+returns 0 and always has -- so the test computes `0o666`, while the
+file server hands out `perm & (dirperm | ~0666)`, which in a 0775
+directory is `0o664`. That is the *file server's* rule about creation,
+not a library one, and there is nothing to set: a probe, like
+`unixFCmd-1.1`.
+
+**`14.1` and `14.2` are still unread**, and deliberately so: they ask
+what `chan configure stdout -buffering` says and what
+`testchannel open` lists, and the surviving log is the truncated one
+that stops at `8.1`, so their actual output is not in hand. *A test
+whose failure text has not been seen is not a test that has been read* --
+that is what `env`'s nine cost. They wait for the next full run.

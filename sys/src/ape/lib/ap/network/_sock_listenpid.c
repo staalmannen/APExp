@@ -114,7 +114,7 @@ static int killing;
 int
 _sock_listenmark(void)
 {
-	return 7;	/* 7: connect() understands O_NONBLOCK */
+	return 8;	/* 8: read() ignores O_NONBLOCK on a regular file */
 }
 
 /*
