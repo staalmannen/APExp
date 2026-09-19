@@ -9,7 +9,7 @@ Test files run in separate interpreters
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-18 17:07:33 +0200
+Tests began at 2026-09-19 05:49:35 +0200
 aaa_exit.test
 abstractlist.test
 append.test
@@ -172,48 +172,6 @@ bbbbbbbbbbbbbbb 15 123456789abcdef 1 4 abcd 0 3 efg
 
 
 
-==== chan-io-6.47 Tcl_GetsObj: auto mode: \r at end of buffer, peek for \n FAILED
-==== Contents of test case:
-
-    # (eol == dstEnd)
-    set f [open $path(test1) w]
-    chan configure $f -translation lf
-    chan puts -nonewline $f "123456789012345\r\nabcdefghijklmnopq"
-    chan close $f
-    set f [open $path(test1)]
-    chan configure $f -translation auto -buffersize 16
-    list [chan gets $f] [testchannel inputbuffered $f]
-
----- Result was:
-123456789012345 0
----- Result should have been (exact matching):
-123456789012345 15
-==== chan-io-6.47 FAILED
-
-
-
-==== chan-io-8.1 PeekAhead: only go to device if no more cached data FAILED
-==== Contents of test case:
-
-    # (bufPtr->nextPtr == NULL)
-    set f [open $path(test1) w]
-    chan configure $f -encoding ascii -translation lf
-    chan puts -nonewline $f "123456789012345\r\n2345678"
-    chan close $f
-    set f [open $path(test1)]
-    chan configure $f -encoding ascii -translation auto -buffersize 16
-    # here
-    chan gets $f
-    testchannel inputbuffered $f
-
----- Result was:
-0
----- Result should have been (exact matching):
-7
-==== chan-io-8.1 FAILED
-
-
-
 ==== chan-io-14.1 Tcl_SetStdChannel and Tcl_GetStdChannel FAILED
 ==== Contents of test case:
 
@@ -272,169 +230,6 @@ Succeeded {Hey DONE}
 
 
 
-==== chan-io-29.27 Tcl_Flush on chan closed pipeline FAILED
-==== Contents of test case:
-
-    set f [openpipe r+ $path(pipe)]
-    chan gets $f
-    chan puts $f output
-    after 50
-    #
-    # The flush below will get a SIGPIPE. This is an expected part of the test
-    # and indicates that the test operates correctly. If you run this test
-    # under a debugger, the signal will by intercepted unless you disable the
-    # debugger's signal interception.
-    #
-    if {[catch {chan flush $f} msg]} {
-	set x [list 1 $msg $::errorCode]
-	catch {chan close $f}
-    } elseif {[catch {chan close $f} msg]} {
-	set x [list 1 $msg $::errorCode]
-    } else {
-	set x {this was supposed to fail and did not}
-    }
-    string tolower $x
-
----- Result was:
-1 {error flushing "file8": cannot send after transport endpoint shutdown} {posix eshutdown {cannot send after transport endpoint shutdown}}
----- Result should have been (glob matching):
-1 {error flushing "*": broken pipe} {posix epipe {broken pipe}}
-==== chan-io-29.27 FAILED
-
-
-
-==== chan-io-32.7 Tcl_Read, nonblocking, file FAILED
-==== Contents of test case:
-
-    set f1 [open $path(longfile) r]
-    chan configure $f1 -blocking off
-    set z [chan read $f1 20]
-    chan close $f1
-    set l [string length $z]
-    set x ok
-    if {$l != 20} {
-	set x "$l != 20"
-    }
-    set x
-
----- Result was:
-0 != 20
----- Result should have been (exact matching):
-ok
-==== chan-io-32.7 FAILED
-
-
-
-==== chan-io-32.8 Tcl_Read, nonblocking, file FAILED
-==== Contents of test case:
-
-    set f1 [open $path(longfile) r]
-    chan configure $f1 -blocking off
-    set z [chan read $f1 1000000]
-    chan close $f1
-    set x ok
-    set l [string length $z]
-    set z [file size $path(longfile)]
-    if {$z != $l} {
-	set x "$z != $l"
-    }
-    set x
-
----- Result was:
-10200 != 0
----- Result should have been (exact matching):
-ok
-==== chan-io-32.8 FAILED
-
-
-
-==== chan-io-35.4 Tcl_Eof, eof detection on nonblocking file FAILED
-==== Contents of test case:
-
-    chan close [open $path(test1) w]
-    set f [open $path(test1) r]
-    chan configure $f -blocking off
-    lappend l [chan gets $f]
-    lappend l [chan eof $f]
-
----- Result was:
-{} 0
----- Result should have been (exact matching):
-{} 1
-==== chan-io-35.4 FAILED
-
-
-
-==== chan-io-36.5 Tcl_InputBlocked vs files, short read, nonblocking FAILED
-==== Contents of test case:
-
-    set f [open $path(test1) w]
-    chan puts $f abcdefghijklmnop
-    chan close $f
-    set f [open $path(test1) r]
-    chan configure $f -blocking off
-    lappend l [chan blocked $f]
-    lappend l [chan read $f 3]
-    lappend l [chan blocked $f]
-    lappend l [chan read -nonewline $f]
-    lappend l [chan blocked $f]
-    lappend l [chan eof $f]
-
----- Result was:
-0 {} 1 {} 1 0
----- Result should have been (exact matching):
-0 abc 0 defghijklmnop 0 1
-==== chan-io-36.5 FAILED
-
-
-
-==== chan-io-36.6 Tcl_InputBlocked vs files, event driven read FAILED
-==== Contents of test case:
-
-    set f [open $path(test1) w]
-    chan puts $f abcdefghijklmnop
-    chan close $f
-    set f [open $path(test1) r]
-    chan configure $f -blocking off
-    chan event $f readable [namespace code {
-	lappend l [chan read $f 3]
-	if {[chan eof $f]} {lappend l eof; chan close $f; set x done}
-    }]
-    vwait [namespace which -variable x]
-    return $l
-
----- Result was:
-abc def ghi jkl mno {p
-} {} eof
----- Result should have been (exact matching):
-abc def ghi jkl mno {p
-} eof
-==== chan-io-36.6 FAILED
-
-
-
-==== chan-io-39.9 Tcl_SetChannelOption, blocking mode FAILED
-==== Contents of test case:
-
-    set f1 [open $path(test1) w]
-    chan close $f1
-    set f1 [open $path(test1) r]
-    lappend x [chan configure $f1 -blocking]
-    chan configure $f1 -blocking off
-    lappend x [chan configure $f1 -blocking]
-    lappend x [chan gets $f1]
-    lappend x [chan read $f1 1000]
-    lappend x [chan blocked $f1]
-    lappend x [chan eof $f1]
-
----- Result was:
-1 0 {} {} 1 0
----- Result should have been (exact matching):
-1 0 {} {} 0 1
-==== chan-io-39.9 FAILED
-
-
-
 ==== chan-io-40.3 POSIX open access modes: CREAT FAILED
 ==== Contents of test case:
 
@@ -467,7 +262,7 @@ abc def ghi jkl mno {p
 
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
----- errorInfo: could not create new link "/tmp/tcl_HNMGBa/thelin" pointing to "/tmp/tcl_HNMGBa/thefile": function not implemented
+---- errorInfo: could not create new link "/tmp/tcl_eOMlEf/thelin" pointing to "/tmp/tcl_eOMlEf/thefile": function not implemented
     while executing
 "file link -symbolic $link $target"
     ("uplevel" body line 4)
@@ -502,7 +297,7 @@ cmdAH.test
     expr {$newatime == $modatime ? 1 : "$newatime != $modatime"}
 
 ---- Result was:
-1789744087 != 1789744085
+1789789808 != 1789789806
 ---- Result should have been (exact matching):
 1
 ==== cmdAH-20.5 FAILED
@@ -794,7 +589,7 @@ couldn't execute "~xyzzy_bad_user/x": no such file or directory
     file size $tmpfile
 
 ---- Result was:
-18
+14
 ---- Result should have been (exact matching):
 26
 ==== exec-19.1 FAILED
@@ -1300,245 +1095,6 @@ fCmd.test
 fileName.test
 
 
-==== filename-11.17.2 Tcl_GlobCmd FAILED
-==== Contents of test case:
-
-    cd $globname
-    file link -symbolic link a1
-    cd $dir
-    lsort [glob -directory $globname -join * b1]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "link" pointing to "a1": function not implemented
-    while executing
-"file link -symbolic link a1"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== filename-11.17.2 FAILED
-
-
-
-==== filename-11.17.3 Tcl_GlobCmd FAILED
-==== Contents of test case:
-
-    cd $globname
-    file link -symbolic link a1
-    cd $dir
-    lsort [glob -directory $globname -type d *]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "link" pointing to "a1": function not implemented
-    while executing
-"file link -symbolic link a1"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== filename-11.17.3 FAILED
-
-
-
-==== filename-11.17.4 Tcl_GlobCmd FAILED
-==== Contents of test case:
-
-    cd $globname
-    file link -symbolic link a1
-    cd $dir
-    lsort [glob -directory $globname -type l *]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "link" pointing to "a1": function not implemented
-    while executing
-"file link -symbolic link a1"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== filename-11.17.4 FAILED
-
-
-
-==== filename-11.17.7 Tcl_GlobCmd: broken link and glob -l FAILED
-==== Contents of test case:
-
-    cd $globname
-    file mkdir nonexistent
-    file link -symbolic link nonexistent
-    file delete nonexistent
-    cd $dir
-    lsort [glob -nocomplain -directory $globname -type l *]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "link" pointing to "nonexistent": function not implemented
-    while executing
-"file link -symbolic link nonexistent"
-    ("uplevel" body line 4)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== filename-11.17.7 FAILED
-
-
-
-==== filename-11.17.8 Tcl_GlobCmd: broken link and glob -l FAILED
-==== Contents of test case:
-
-    cd $globname
-    touch "nonexistent"
-    file link -symbolic link nonexistent
-    file delete nonexistent
-    cd $dir
-    lsort [glob -nocomplain -directory $globname -type l *]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "link" pointing to "nonexistent": function not implemented
-    while executing
-"file link -symbolic link nonexistent"
-    ("uplevel" body line 4)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== filename-11.17.8 FAILED
-
-
-
-==== filename-11.18 Tcl_GlobCmd FAILED
-==== Contents of test case:
-
-    lsort [glob -path $globname/ *]
-
----- Result was:
-globTest/a1 globTest/a2 globTest/a3 globTest/nonexistent {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
----- Result should have been (exact matching):
-globTest/a1 globTest/a2 globTest/a3 {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
-==== filename-11.18 FAILED
-
-
-
-==== filename-11.19 Tcl_GlobCmd FAILED
-==== Contents of test case:
-
-    lsort [glob -join -path [string range $globname 0 5] * *]
-
----- Result was:
-globTest/a1 globTest/a2 globTest/a3 globTest/nonexistent {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
----- Result should have been (exact matching):
-globTest/a1 globTest/a2 globTest/a3 {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
-==== filename-11.19 FAILED
-
-
-
-==== filename-11.20 Tcl_GlobCmd FAILED
-==== Contents of test case:
-
-    lsort [glob -type d -dir $globname *]
-
----- Result was:
-globTest/a1 globTest/a2 globTest/a3 globTest/nonexistent
----- Result should have been (exact matching):
-globTest/a1 globTest/a2 globTest/a3
-==== filename-11.20 FAILED
-
-
-
-==== filename-11.22 Tcl_GlobCmd FAILED
-==== Contents of test case:
-
-    lsort [glob -dir $globname *]
-
----- Result was:
-glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
----- Result should have been (exact matching):
-glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
-==== filename-11.22 FAILED
-
-
-
-==== filename-11.23 Tcl_GlobCmd FAILED
-==== Contents of test case:
-
-    lsort [glob -path $globname/ *]
-
----- Result was:
-glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
----- Result should have been (exact matching):
-glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
-==== filename-11.23 FAILED
-
-
-
-==== filename-11.24 Tcl_GlobCmd FAILED
-==== Contents of test case:
-
-    lsort [glob -join -path [string range $globname 0 5] * *]
-
----- Result was:
-glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
----- Result should have been (exact matching):
-glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/weird\ name.c glob\[\{Test/x,z1.c glob\[\{Test/x1.c glob\[\{Test/y1.c glob\[\{Test/z1.c
-==== filename-11.24 FAILED
-
-
-
-==== filename-11.25 Tcl_GlobCmd FAILED
-==== Contents of test case:
-
-    lsort [glob -type d -dir $globname *]
-
----- Result was:
-glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent
----- Result should have been (exact matching):
-glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3
-==== filename-11.25 FAILED
-
-
-
-==== filename-11.25.1 Tcl_GlobCmd FAILED
-==== Contents of test case:
-
-    lsort [glob -type {d r} -dir $globname *]
-
----- Result was:
-glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent
----- Result should have been (exact matching):
-glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3
-==== filename-11.25.1 FAILED
-
-
-
-==== filename-11.25.2 Tcl_GlobCmd FAILED
-==== Contents of test case:
-
-    lsort [glob -type {d r w} -dir $globname *]
-
----- Result was:
-glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3 glob\[\{Test/nonexistent
----- Result should have been (exact matching):
-glob\[\{Test/a1 glob\[\{Test/a2 glob\[\{Test/a3
-==== filename-11.25.2 FAILED
-
-
-
-==== filename-14.7 asterisks, question marks, and brackets FAILED
-==== Contents of test case:
-
-    lsort [glob globTest/*]
-
----- Result was:
-globTest/a1 globTest/a2 globTest/a3 globTest/nonexistent {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
----- Result should have been (exact matching):
-globTest/a1 globTest/a2 globTest/a3 {globTest/weird name.c} globTest/x,z1.c globTest/x1.c globTest/y1.c globTest/z1.c
-==== filename-14.7 FAILED
-
-
-
 ==== filename-14.9 asterisks, question marks, and brackets FAILED
 ==== Contents of test case:
 
@@ -1549,19 +1105,6 @@ globTest/.1
 ---- Result should have been (exact matching):
 globTest/. globTest/.. globTest/.1
 ==== filename-14.9 FAILED
-
-
-
-==== filename-14.15 asterisks, question marks, and brackets FAILED
-==== Contents of test case:
-
-    lsort [glob globTest/*/]
-
----- Result was:
-globTest/a1/ globTest/a2/ globTest/a3/ globTest/nonexistent/
----- Result should have been (exact matching):
-globTest/a1/ globTest/a2/ globTest/a3/
-==== filename-14.15 FAILED
 
 fileSystem.test
 fileSystemEncoding.test
@@ -1733,54 +1276,6 @@ bbbbbbbbbbbbbbb 15 123456789abcdef 1 4 abcd 0 3 efg
 
 
 
-==== io-6.47 Tcl_GetsObj: auto mode: \r at end of buffer, peek for \n FAILED
-==== Contents of test case:
-
-    # (eol == dstEnd)
-
-    set f [open $path(test1) w]
-    fconfigure $f -translation lf
-    puts -nonewline $f "123456789012345\r\nabcdefghijklmnopq"
-    close $f
-    set f [open $path(test1)]
-    fconfigure $f -translation auto -buffersize 16
-    set x [list [gets $f] [testchannel inputbuffered $f]]
-    close $f
-    set x
-
----- Result was:
-123456789012345 0
----- Result should have been (exact matching):
-123456789012345 15
-==== io-6.47 FAILED
-
-
-
-==== io-8.1 PeekAhead: only go to device if no more cached data FAILED
-==== Contents of test case:
-
-    # (bufPtr->nextPtr == NULL)
-
-    set f [open $path(test1) w]
-    fconfigure $f -encoding ascii -translation lf
-    puts -nonewline $f "123456789012345\r\n2345678"
-    close $f
-    set f [open $path(test1)]
-    fconfigure $f -encoding ascii -translation auto -buffersize 16
-    # here
-    gets $f
-    set x [testchannel inputbuffered $f]
-    close $f
-    set x
-
----- Result was:
-0
----- Result should have been (exact matching):
-7
-==== io-8.1 FAILED
-
-
-
 ==== io-14.1 Tcl_SetStdChannel and Tcl_GetStdChannel FAILED
 ==== Contents of test case:
 
@@ -1818,44 +1313,6 @@ line line none
 
 
 
-==== io-29.27 Tcl_Flush on closed pipeline FAILED
-==== Contents of test case:
-
-    file delete $path(pipe)
-    set f [open $path(pipe) w]
-    puts $f {exit}
-    close $f
-    set f [open "|[list [interpreter] $path(pipe)]" r+]
-    gets $f
-    puts $f output
-    after 50
-    #
-    # The flush below will get a SIGPIPE. This is an expected part of
-    # test and indicates that the test operates correctly. If you run
-    # this test under a debugger, the signal will by intercepted unless
-    # you disable the debugger's signal interception.
-    #
-    if {[catch {flush $f} msg]} {
-	set x [list 1 $msg $::errorCode]
-	catch {close $f}
-    } else {
-	if {[catch {close $f} msg]} {
-	    set x [list 1 $msg $::errorCode]
-	} else {
-	    set x {this was supposed to fail and did not}
-	}
-    }
-    regsub {".*":} $x {"":} x
-    string tolower $x
-
----- Result was:
-1 {error flushing "": cannot send after transport endpoint shutdown} {posix eshutdown {cannot send after transport endpoint shutdown}}
----- Result should have been (exact matching):
-1 {error flushing "": broken pipe} {posix epipe {broken pipe}}
-==== io-29.27 FAILED
-
-
-
 ==== io-29.33b TIP#398, no implicit flush of nonblocking on exit FAILED
 ==== Contents of test case:
 
@@ -1879,7 +1336,7 @@ line line none
 
 ---- Test generated error; Return code was: 1
 ---- Return code should have been one of: 0 2
----- errorInfo: error writing "stdout": cannot send after transport endpoint shutdown
+---- errorInfo: error writing "stdout": broken pipe
     while executing
 "puts -nonewline stdout [string repeat A 655360]"
     (file "/usr/glenda/APExp/sys/src/external/tcl/tests/script" line 3)
@@ -1888,159 +1345,8 @@ line line none
     ("uplevel" body line 15)
     invoked from within
 "uplevel 1 $script"
----- errorCode: CHILDSTATUS 27470 1
+---- errorCode: CHILDSTATUS 4774 1
 ==== io-29.33b FAILED
-
-
-
-==== io-32.7 Tcl_Read, nonblocking, file FAILED
-==== Contents of test case:
-
-    set f1 [open $path(longfile) r]
-    fconfigure $f1 -blocking off
-    set z [read $f1 20]
-    close $f1
-    set l [string length $z]
-    set x ok
-    if {$l != 20} {
-	set x broken
-    }
-    set x
-
----- Result was:
-broken
----- Result should have been (exact matching):
-ok
-==== io-32.7 FAILED
-
-
-
-==== io-32.8 Tcl_Read, nonblocking, file FAILED
-==== Contents of test case:
-
-    set f1 [open $path(longfile) r]
-    fconfigure $f1 -blocking off
-    set z [read $f1 1000000]
-    close $f1
-    set x ok
-    set l [string length $z]
-    set z [file size $path(longfile)]
-    if {$z != $l} {
-	set x broken
-    }
-    set x
-
----- Result was:
-broken
----- Result should have been (exact matching):
-ok
-==== io-32.8 FAILED
-
-
-
-==== io-35.4 Tcl_Eof, eof detection on nonblocking file FAILED
-==== Contents of test case:
-
-    file delete $path(test1)
-    set f [open $path(test1) w]
-    close $f
-    set f [open $path(test1) r]
-    fconfigure $f -blocking off
-    set l ""
-    lappend l [gets $f]
-    lappend l [eof $f]
-    close $f
-    set l
-
----- Result was:
-{} 0
----- Result should have been (exact matching):
-{} 1
-==== io-35.4 FAILED
-
-
-
-==== io-36.5 Tcl_InputBlocked vs files, short read, nonblocking FAILED
-==== Contents of test case:
-
-    file delete $path(test1)
-    set f [open $path(test1) w]
-    puts $f abcdefghijklmnop
-    close $f
-    set f [open $path(test1) r]
-    fconfigure $f -blocking off
-    set l ""
-    lappend l [fblocked $f]
-    lappend l [read $f 3]
-    lappend l [fblocked $f]
-    lappend l [read -nonewline $f]
-    lappend l [fblocked $f]
-    lappend l [eof $f]
-    close $f
-    set l
-
----- Result was:
-0 {} 1 {} 1 0
----- Result should have been (exact matching):
-0 abc 0 defghijklmnop 0 1
-==== io-36.5 FAILED
-
-
-
-==== io-36.6 Tcl_InputBlocked vs files, event driven read FAILED
-==== Contents of test case:
-
-    proc in {f} {
-	variable l
-	variable x
-	lappend l [read $f 3]
-	if {[eof $f]} {lappend l eof; close $f; set x done}
-    }
-    file delete $path(test1)
-    set f [open $path(test1) w]
-    puts $f abcdefghijklmnop
-    close $f
-    set f [open $path(test1) r]
-    fconfigure $f -blocking off
-    set l ""
-    fileevent $f readable [namespace code [list in $f]]
-    variable x
-    vwait [namespace which -variable x]
-    set l
-
----- Result was:
-abc def ghi jkl mno {p
-} {} eof
----- Result should have been (exact matching):
-abc def ghi jkl mno {p
-} eof
-==== io-36.6 FAILED
-
-
-
-==== io-39.9 Tcl_SetChannelOption, blocking mode FAILED
-==== Contents of test case:
-
-    file delete $path(test1)
-    set f1 [open $path(test1) w]
-    close $f1
-    set f1 [open $path(test1) r]
-    set x ""
-    lappend x [fconfigure $f1 -blocking]
-    fconfigure $f1 -blocking off
-    lappend x [fconfigure $f1 -blocking]
-    lappend x [gets $f1]
-    lappend x [read $f1 1000]
-    lappend x [fblocked $f1]
-    lappend x [eof $f1]
-    close $f1
-    set x
-
----- Result was:
-1 0 {} {} 1 0
----- Result should have been (exact matching):
-1 0 {} {} 0 1
-==== io-39.9 FAILED
 
 
 
@@ -2087,97 +1393,6 @@ abc def ghi jkl mno {p
 ---- Result should have been (glob matching):
 1 1 1 {error reading "file*": invalid or incomplete multibyte or wide character}
 ==== io-52.22.1 FAILED
-
-
-
-==== io-75.6.3 invalid utf-8 encoding, non blocking gets is not ignored (-profile strict) FAILED
-==== Contents of test case:
-
-    gets $f
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== io-75.6.3 FAILED
-
-
-
-==== io-75.6.4 incomplete utf-8 encoding, non blocking gets is not ignored (-profile strict) FAILED
-==== Contents of test case:
-
-    gets $f
-	# only the 2nd gets returns the error
-	gets $f
-
----- Test completed normally; Return code was: 0
----- Return code should have been one of: 1
-==== io-75.6.4 FAILED
-
-
-
-==== io-75.11 shiftjis encoding error read results in error (strict profile) FAILED
-==== Contents of test case:
-
-    set d [read $f]
-    binary scan $d H* hd
-    lappend hd [catch {set d [read $f]} msg data] $msg [dict exists $data -data]
-
----- Result was:
-0 {} 0
----- Result should have been (glob matching):
-41 1 {error reading "file*": invalid or incomplete multibyte or wide character} 0
-==== io-75.11 FAILED
-
-
-
-==== io-75.13 In nonblocking mode when there is an encoding error the data that has been
-    successfully read so far is returned first and then the error is returned
-    on the next call to [read]. FAILED
-==== Contents of test case:
-
-    set d [read $f]
-    binary scan $d H* hd
-    lappend hd [catch {read $f} msg data] $msg [dict exists $data -data]
-
----- Result was:
-0 {} 0
----- Result should have been (glob matching):
-41 1 {error reading "file*": invalid or incomplete multibyte or wide character} 0
-==== io-75.13 FAILED
-
-
-
-==== io-bug-73bb42fb-1 Non-blocking+buffer size+encoding error panic - TCL bug 73bb42fb.
-    Verify error at offset 0. FAILED
-==== Contents of test case:
-
-    set fd [open $path(test1)]
-    fconfigure $fd -encoding utf-8 -profile strict -blocking 0 -buffersize 10 -translation lf -eofchar {}
-    list [catch {read_blocked $fd 1} e d] $e [dict getd $d -code ""] [dict getd $d -errorcode ""] [tell $fd]
-
----- Result was:
-1 {error reading "file6": invalid or incomplete multibyte or wide character} 1 {POSIX EILSEQ {invalid or incomplete multibyte or wide character}} -1
----- Result should have been (glob matching):
-1 {error reading *} 1 {POSIX EILSEQ {invalid or incomplete multibyte or wide character}} 0
-==== io-bug-73bb42fb-1 FAILED
-
-
-
-==== io-bug-73bb43fb-2 Non-blocking+buffer size+encoding error panic - TCL bug 73bb42fb.
-    Verify valid data returned before error generated. FAILED
-==== Contents of test case:
-
-    set fd [open $path(test1)]
-    fconfigure $fd -encoding utf-8 -profile strict -blocking 0 -buffersize 10 -translation lf -eofchar {}
-    set result {}
-    lappend result [read_blocked $fd]
-    lappend result [tell $fd]
-    lappend result [catch {read_blocked $fd} e d] $e [dict getd $d -code ""] [dict getd $d -errorcode ""] [tell $fd]
-
----- Result was:
-X -1 1 {error reading "file6": invalid or incomplete multibyte or wide character} 1 {POSIX EILSEQ {invalid or incomplete multibyte or wide character}} -1
----- Result should have been (glob matching):
-X 1 1 {error reading *} 1 {POSIX EILSEQ {invalid or incomplete multibyte or wide character}} 1
-==== io-bug-73bb43fb-2 FAILED
 
 ioCmd.test
 ioTrans.test
@@ -2604,7 +1819,7 @@ unixInit.test
     }
 
 ---- Result was:
-Expected: `127.0.0.1 localhost 40532', Got `'
+Expected: `127.0.0.1 localhost 58609', Got `'
 ---- Result should have been (exact matching):
 OK
 ==== unixInit-1.2 FAILED
@@ -2804,7 +2019,7 @@ atime 1105466634 blksize 0 blocks 0 ctime 1105466634 dev 0 gid 0 ino 0 mode 1674
 	    lsort -stride 2 [file stat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789744289 ctime 1789744289 dev 0 gid 0 ino 0 mode 16749 mtime 1789744289 nlink 0 size 0 type directory uid 0
+atime 1789789992 ctime 1789789992 dev 0 gid 0 ino 0 mode 16749 mtime 1789789992 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-stat-root-mount FAILED
@@ -2817,7 +2032,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789744289 ctime 1789744289 dev 0 gid 0 ino 0 mode 16749 mtime 1789744289 nlink 0 size 0 type directory uid 0
+atime 1789789992 ctime 1789789992 dev 0 gid 0 ino 0 mode 16749 mtime 1789789992 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-lstat-root-mount FAILED
@@ -2830,7 +2045,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file stat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789744289 ctime 1789744289 dev 0 gid 0 ino 0 mode 16749 mtime 1789744289 nlink 0 size 0 type directory uid 0
+atime 1789789992 ctime 1789789992 dev 0 gid 0 ino 0 mode 16749 mtime 1789789992 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-stat-root-subdir-mount FAILED
@@ -2843,7 +2058,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789744289 ctime 1789744289 dev 0 gid 0 ino 0 mode 16749 mtime 1789744289 nlink 0 size 0 type directory uid 0
+atime 1789789992 ctime 1789789992 dev 0 gid 0 ino 0 mode 16749 mtime 1789789992 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-lstat-root-subdir-mount FAILED
@@ -2856,7 +2071,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file stat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789744289 ctime 1789744289 dev 0 gid 0 ino 0 mode 16749 mtime 1789744289 nlink 0 size 0 type directory uid 0
+atime 1789789992 ctime 1789789992 dev 0 gid 0 ino 0 mode 16749 mtime 1789789992 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-stat-mezzo FAILED
@@ -2869,15 +2084,15 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789744289 ctime 1789744289 dev 0 gid 0 ino 0 mode 16749 mtime 1789744289 nlink 0 size 0 type directory uid 0
+atime 1789789992 ctime 1789789992 dev 0 gid 0 ino 0 mode 16749 mtime 1789789992 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-lstat-mezzo FAILED
 
 zlib.test
 
-Tests ended at 2026-09-18 17:11:30 +0200
-all.tcl:	Total	68118	Passed	62095	Skipped	5887	Failed	136
+Tests ended at 2026-09-19 05:53:13 +0200
+all.tcl:	Total	68118	Passed	62130	Skipped	5892	Failed	96
 Sourced 167 Test Files.
 Files with failing tests: binary.test chanio.test cmdAH.test env.test event.test exec.test expr-old.test expr.test fCmd.test fileName.test io.test lseq.test main.test scan.test socket.test unixFCmd.test unixInit.test zipfs.test
 Number of tests skipped for each constraint:
@@ -2919,6 +2134,7 @@ Number of tests skipped for each constraint:
 	54	knownBug
 	2	knownProfileBug
 	2	lgen
+	4	linkDirectory
 	100	localeRegexp
 	2	localhost_v6
 	4	longIs64bit
@@ -2940,6 +2156,7 @@ Number of tests skipped for each constraint:
 	4	readonlyAttr
 	3992	serverNeeded
 	12	supported_inet6
+	1	symbolicLinkFile
 	19	tcl9pkgaRequired
 	20	tcl9pkguaRequired
 	1	testCPUID
