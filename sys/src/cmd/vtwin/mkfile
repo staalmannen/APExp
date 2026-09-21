@@ -1,0 +1,11 @@
+</$objtype/mkfile
+APEXPROOT=../../../..
+BIN=$APEXPROOT/$objtype/bin
+
+TARG=vtwin
+OFILES=\
+	main.$O\
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+$O.out:	/$objtype/lib/libdraw.a /$objtype/lib/libthread.a /$objtype/lib/libc.a

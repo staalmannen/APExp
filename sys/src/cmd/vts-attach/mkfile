@@ -1,0 +1,11 @@
+</$objtype/mkfile
+APEXPROOT=../../../..
+BIN=$APEXPROOT/$objtype/bin
+
+TARG=vts-attach
+OFILES=\
+	main.$O\
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+$O.out:	/$objtype/lib/libc.a

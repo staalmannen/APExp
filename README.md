@@ -129,7 +129,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - slibtool (version 0.7.4) for libtool
 - curl (version 8.21.0)
 - openssl (libressl 4.3.2)
-
+- libvterm (0.3.3) / vts / vtwin from Agent9 [16]
 
 ***Languages***
 
@@ -197,7 +197,7 @@ Yes, the default build is "bloated" because I enable everything that I believe w
 
 [9] https://github.com/lufia/plan9/pulls
 
-[10] https://inbox.vuxu.org/9front/0e170f2c1818fb21b795c2151e52adaf.squirrel@mx.sdf.org/
+[10] https://inbox.vuxu.org/9front/0e170f2c1818fb21b795c2151e52adzip:///home/jens/Downloads/src.zip/src/libvtermaf.squirrel@mx.sdf.org/
 
 [11] https://github.com/archiecobbs/libnbcompat
 
@@ -208,6 +208,8 @@ Yes, the default build is "bloated" because I enable everything that I believe w
 [14] https://github.com/sabotage-linux/gettext-tiny
 
 [15] https://core.suckless.org/sbase/
+
+[16] https://github.com/Alino/agent9
 
 
 
@@ -223,7 +225,7 @@ record of the bugs found in this tree and what each one cost.
 ***Post scriptum***
 
 The unofficial mascot of the project are the rabbit knights riding snails in medieval art.
-![a jousting rabbit riding a snail with a human head](rabbit_riding_snail.jpg)
+![a jousting rabbit riding a snail with a human head](docs/rabbit_riding_snail.jpg)
 
 It would be fun to have a Glenda-themed variant of this.
 
