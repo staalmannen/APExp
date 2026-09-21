@@ -3,8 +3,9 @@
 APEXPROOT=.
 
 DIRS= \
-		sys/src/lib\
 		sys/src/cmd\
+		sys/src/lib\
+		sys/src/cmd2\
 		sys/src/ape/9src\
 		sys/src/ape/lib\
 		sys/src/ape/cmd

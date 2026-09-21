@@ -23,4 +23,9 @@ HFILES=dat.h\
 
 <$APEXPROOT/sys/src/cmd/mkone
 
+CFLAGS= -I$APEXPROOT/sys/include
+
 $O.out:	$APEXPROOT/$objtype/lib/libvterm.a /$objtype/lib/lib9p.a /$objtype/lib/libthread.a /$objtype/lib/libc.a
+
+
+

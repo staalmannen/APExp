@@ -5,7 +5,7 @@ APE=$APEXPROOT/sys/src/ape
 MUSRC=$APEXPROOT/sys/src/external/muon
 
 BIN=$APEXPROOT/$objtype/bin/ape
-TARG=muon init
+TARG=muon
 
 OFILES=\
 # .\

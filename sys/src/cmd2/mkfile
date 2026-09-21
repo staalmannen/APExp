@@ -1,0 +1,107 @@
+</$objtype/mkfile
+
+APEXPROOT=../../..
+
+TARG=`{ls | sed -n '/\.c$/s/\.c$//p'}
+HFILES=/$objtype/include/u.h /sys/include/libc.h /sys/include/bio.h
+
+BIN=$APEXPROOT/$objtype/bin
+LDFLAGS=
+YFLAGS=-d
+
+DIRS=\
+	cc\
+	cpp\
+	1a\
+	1c\
+	1l\
+	2a\
+	2c\
+	2l\
+	5a\
+	5c\
+	5e\
+	5i\
+	5l\
+	6a\
+	6c\
+	6l\
+	7a\
+	7c\
+	7l\
+	8a\
+	8c\
+	8l\
+	9a\
+	9c\
+	9l\
+	ka\
+	kc\
+	ki\
+	kl\
+	qa\
+	qc\
+	qi\
+	ql\
+	va\
+	vc\
+	vl\
+
+usage:VQ:
+	echo 'usage: mk all, all.cpus, cmds, $O.$cmd'
+	echo '	install, install.cpus, $cmd.install, $cmd.install.cpus'
+	echo '	clean, nuke'
+
+%.c %.tab.h:D: %.y
+	yacc $YFLAGS -o $stem.c -s $stem $stem.y
+
+%.$O: $HFILES
+
+%.$O: %.c
+	$CC $CFLAGS $stem.c
+
+$O.%: %.$O
+	$LD $LDFLAGS -o $target $stem.$O
+
+$BIN/%: $O.%
+	cp $O.$stem $target
+
+%.acid: %.c $HFILES
+	$CC $CFLAGS -a $stem.c >$target
+
+%.cpus:V:
+	for(objtype in $CPUS) mk $MKFLAGS $stem
+
+%.dirs:V:
+	for(i in $DIRS) @{
+		cd $i
+		echo mk $i
+		mk $MKFLAGS $stem
+	}
+
+cmds:V: ${TARG:%=$O.%}
+
+all:V: cmds
+	chmod +x mount-include
+	./mount-include
+	mk $MKFLAGS all.dirs
+
+%.install:V: $BIN/%
+
+install:V:
+	mk $MKFLAGS $TARG.install
+	mk $MKFLAGS install.dirs
+
+installall:V: install.cpus
+
+cleancmds:V:
+	rm -f *.[$OS] 
+	rm -f [$OS].*
+	rm -f y.tab.? y.debug y.output
+	rm -f *.tab.h
+
+clean:V: clean.dirs cleancmds
+
+nuke:V: cleancmds nuke.dirs
+	rm -f *.acid
+

@@ -1,6 +1,6 @@
 </$objtype/mkfile
 
-APEXPROOT=../../..
+APEXPROOT=../../../..
 LIB=$APEXPROOT/$objtype/lib/libvterm.a
 
 OFILES=\
