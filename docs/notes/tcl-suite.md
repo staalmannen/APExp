@@ -7070,3 +7070,46 @@ before the call that sets it. The loop underneath, which sequences
 properly, found zero differences. A probe that reads its own output
 argument inside the same printf is measuring the compiler's argument
 order.)*
+
+#### The machexp probe, ready to run
+
+`tclStrToD.c`'s `MakeHighPrecisionDouble()` is instrumented behind
+**`$APEXP_STRTOD_DEBUG`**, and `sys/lib/tests/tcl-machexp-probe.tcl`
+drives it. Both exits that can answer `HUGE_VAL` name themselves --
+`QUICK overflow` for the exponent/digit check and `MACHEXP overflow`
+for the computed binary exponent -- because a count of failures cannot
+tell two exits apart.
+
+**The line to read** is `Pow10TimesFrExp -> ... machexp=N | limit
+1024`. `1.7976931348623157e+308` is 0.99999... x 2^1024, so `machexp`
+should be **1024**: not greater than the limit, no overflow. **1025
+means one binade in Tcl's own scaling**, and the tables it scales with
+are `pow10_wide` and `pow_10_2_n`.
+
+The entry line carries the startup constants -- `maxDigits`,
+`minDigits`, `log2FLT_RADIX`, `mantBits` -- beside the arguments, on
+purpose: a wrong constant and a wrong computation look identical from
+outside, and only one of them would have been libap's fault. The
+arithmetic says `maxDigits` is 308 and `log2FLT_RADIX` is 1; the line
+will say whether the machine agrees.
+
+**Absence of APEXP lines for a value is an answer, not a failed run**
+-- it reached a different function. `expr-50.1` is `sqrt()` of a
+bignum and may well be one of those.
+
+Run:
+
+```
+cd sys/src/ape/lib/tcl && mk install
+cd ../../cmd/tclsh && mk install
+APEXP_STRTOD_DEBUG=1 tclsh /sys/lib/tests/tcl-machexp-probe.tcl
+```
+
+The reference, from the host's own Tcl 8.6 where every value is right:
+`...155e+308` is `0x7feffffffffffffe`, `...157e+308` is
+`0x7fefffffffffffff`, `...159e+308` is `+inf`, and
+`-929963218616126365E290` is `0xffe08dcc0c505461`. **Do not set the
+variable for a full suite run**: it prints a line per conversion.
+
+*(The instrumentation is a probe and is marked as one in the source:
+delete the block once the answer is in.)*

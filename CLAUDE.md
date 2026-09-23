@@ -198,7 +198,9 @@ kill and a clean finish are indistinguishable from the shell, so a run
 without a completion marker cannot be read at all.
 `tcl-stdchan-test.tcl` asks what buffering the three standard
 channels get, and is a PROBE rather than a rule -- report what it
-prints. `tcl-fileevent-test.tcl` is a test rather than a harness -- it runs
+prints. `tcl-machexp-probe.tcl` is the same kind of thing for
+Tcl's own float parser, and needs `$APEXP_STRTOD_DEBUG` set or it
+says nothing. `tcl-fileevent-test.tcl` is a test rather than a harness -- it runs
 under plain `tclsh` and isolates the `chan-io-44.1` and `event-11.5`
 hangs, with a timeout on every section so it reports where the suite
 would wait; `select-test.c` takes the two bugs it found down to the
@@ -922,9 +924,15 @@ Open, in order of what the next run should touch:
   were cross-checked on the host: 299876 values and every boundary,
   0 wrong.** What is left is `Pow10TimesFrExp`,
   `BignumToBiasedFrExp` and `RefineApproximation` -- Tcl over
-  libtommath, no libap floating point in the path. **Print `machexp`
-  and rebuild `tclsh`**: 1025 where 1024 is right means one binade in
-  Tcl's own scaling.
+  libtommath, no libap floating point in the path. **The probe is
+  written and waiting**: `tclStrToD.c` is instrumented behind
+  `$APEXP_STRTOD_DEBUG` and `tcl-machexp-probe.tcl` drives it. Both
+  `HUGE_VAL` exits name themselves, and the entry line carries the
+  startup constants beside the arguments. **1025 where 1024 is right
+  means one binade in Tcl's own scaling** (`pow10_wide`,
+  `pow_10_2_n`). No APEXP lines for a value is an answer, not a failed
+  run. Needs `mk install` in `lib/tcl` then `cmd/tclsh`; do not set the
+  variable for a full suite run.
   Everything at or above `1.797693134862315 5 e308` comes back
   infinite, including two values that are representable.
   `strtod-xcheck` **refuted the obvious answer**: libap's `strtod`
