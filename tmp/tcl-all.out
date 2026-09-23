@@ -9,7 +9,7 @@ Test files run in separate interpreters
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-23 12:49:48 +0200
+Tests began at 2026-09-23 13:41:30 +0200
 aaa_exit.test
 abstractlist.test
 append.test
@@ -22,36 +22,6 @@ autoMkindex.test
 basic.test
 bigdata.test
 binary.test
-
-
-==== binary-53.25 Binary float round to Inf FAILED
-==== Contents of test case:
-
-    binary scan [binary format H* 47effffff0000001] Q round_to_inf
-    binary scan [binary format R $round_to_inf] R inf1
-    expr {$inf1 eq Inf}
-
----- Result was:
-0
----- Result should have been (exact matching):
-1
-==== binary-53.25 FAILED
-
-
-
-==== binary-53.26 Binary float round to -Inf FAILED
-==== Contents of test case:
-
-    binary scan [binary format H* c7effffff0000001] Q round_to_inf
-    binary scan [binary format R $round_to_inf] R inf1
-    expr {$inf1 eq -Inf}
-
----- Result was:
-0
----- Result should have been (exact matching):
-1
-==== binary-53.26 FAILED
-
 brodnik.test
 chan.test
 chanio.test
@@ -229,7 +199,7 @@ cmdAH.test
     expr {$newatime == $modatime ? 1 : "$newatime != $modatime"}
 
 ---- Result was:
-1790160623 != 1790160622
+1790163721 != 1790163720
 ---- Result should have been (exact matching):
 1
 ==== cmdAH-20.5 FAILED
@@ -454,7 +424,7 @@ exec.test
     file size $tmpfile
 
 ---- Result was:
-14
+18
 ---- Result should have been (exact matching):
 26
 ==== exec-19.1 FAILED
@@ -798,7 +768,7 @@ bbbbbbbbbbbbbbb 15 123456789abcdef 1 4 abcd 0 3 efg
     ("uplevel" body line 15)
     invoked from within
 "uplevel 1 $script"
----- errorCode: CHILDSTATUS 71045 1
+---- errorCode: CHILDSTATUS 75880 1
 ==== io-29.33b FAILED
 
 
@@ -1204,7 +1174,7 @@ unixInit.test
     }
 
 ---- Result was:
-Expected: `127.0.0.1 localhost 45028', Got `'
+Expected: `127.0.0.1 localhost 45307', Got `'
 ---- Result should have been (exact matching):
 OK
 ==== unixInit-1.2 FAILED
@@ -1346,10 +1316,10 @@ zipfs.test
 
 zlib.test
 
-Tests ended at 2026-09-23 12:53:51 +0200
-all.tcl:	Total	68118	Passed	62148	Skipped	5916	Failed	54
+Tests ended at 2026-09-23 13:45:07 +0200
+all.tcl:	Total	68118	Passed	62150	Skipped	5916	Failed	52
 Sourced 167 Test Files.
-Files with failing tests: binary.test chanio.test cmdAH.test env.test event.test exec.test fCmd.test fileName.test io.test lseq.test main.test scan.test socket.test unixFCmd.test unixInit.test zipfs.test
+Files with failing tests: chanio.test cmdAH.test env.test event.test exec.test fCmd.test fileName.test io.test lseq.test main.test scan.test socket.test unixFCmd.test unixInit.test zipfs.test
 Number of tests skipped for each constraint:
 	9	!ieeeFloatingPoint
 	1	!singleTestInterp notWsl
