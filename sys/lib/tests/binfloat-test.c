@@ -51,6 +51,9 @@
 #include <math.h>
 #include <float.h>
 
+#define STR_(x)	#x
+#define STR(x)	STR_(x)
+
 static int failures;
 
 static void
@@ -96,8 +99,15 @@ main(void)
 		FLT_MAX_EXP - FLT_MANT_DIG - 1,
 		ldexp(1.0, FLT_MAX_EXP - FLT_MANT_DIG - 1));
 	ok("fabs() leaves a positive value alone", fabs(dvalue) == dvalue);
+	/*
+	 * Compared against a BIT PATTERN, not a decimal literal. Whether
+	 * this compiler converts a 32-digit constant exactly is a separate
+	 * question, and a test that leans on it would report the wrong
+	 * thing if the answer were no.
+	 */
 	ok("ldexp(1.0, 103) is 2^103",
-		ldexp(1.0, FLT_MAX_EXP - FLT_MANT_DIG - 1) == 10141204801825835211973625643008.0);
+		ldexp(1.0, FLT_MAX_EXP - FLT_MANT_DIG - 1) ==
+			dbits(0x4660000000000000ULL));
 
 	printf("--- 2. INFINITY has to BE infinity ---\n");
 	/*
@@ -142,7 +152,48 @@ main(void)
 	ok("a plain cast of a value past the boundary is +Inf too",
 		fbits(fvalue) == 0x7f800000);
 
-	printf("--- 6. THE CONTROL: values that must NOT become infinity ---\n");
+	printf("--- 6. WHICH float.h, and are its constants EXACT ---\n");
+	/*
+	 * This section is the answer, added after the first run. FLT_MAX
+	 * came back as 3.4028234999999998e+38 where the real one is
+	 * 3.4028234663852886e+38 -- about 3e31 too big -- so the
+	 * threshold in section 3 sat ABOVE the value the test feeds it
+	 * and `binary format R' wrote FLT_MAX instead of +Inf.
+	 *
+	 * The cause is that C says FLT_MAX, FLT_MIN and FLT_EPSILON have
+	 * type FLOAT, and APE's float_arch.h wrote them without the `F'
+	 * suffix -- so they were doubles holding the nearest double to a
+	 * rounded decimal rather than the float they name.
+	 *
+	 * Two things are printed rather than one, because the numbers
+	 * alone could not tell a wrong constant from the WRONG HEADER:
+	 * /$objtype/include/ape is searched before /sys/include/ape and
+	 * stock APE's copy shadows this tree unless a real file shadows
+	 * it back. The marker says which file was read; the stringified
+	 * macro says what it actually contained. deeppath-test settled a
+	 * question of exactly this shape by printing where its numbers
+	 * came from, while the numbers themselves stayed plausible.
+	 */
+#ifdef __APEXP_FLOAT_ARCH
+	printf("  note float_arch.h    = THIS TREE (marker present)\n");
+#else
+	printf("  note float_arch.h    = NOT this tree -- no marker\n");
+#endif
+	printf("  note FLT_MAX spelled = %s\n", STR(FLT_MAX));
+	printf("  note sizeof FLT_MAX  = %d  (4 means it is a float, as C says)\n",
+		(int) sizeof(FLT_MAX));
+	ok("FLT_MAX is exactly 2^128 - 2^104",
+		(double) FLT_MAX == dbits(0x47efffffe0000000ULL));
+	ok("FLT_MIN is exactly 2^-126",
+		(double) FLT_MIN == dbits(0x3810000000000000ULL));
+	ok("FLT_EPSILON is exactly 2^-23",
+		(double) FLT_EPSILON == dbits(0x3e80000000000000ULL));
+	ok("DBL_MAX is exactly 0x7fefffffffffffff",
+		DBL_MAX == dbits(0x7fefffffffffffffULL));
+	ok("DBL_MIN is exactly 2^-1022", DBL_MIN == dbits(0x0010000000000000ULL));
+	ok("DBL_EPSILON is exactly 2^-52", DBL_EPSILON == dbits(0x3cb0000000000000ULL));
+
+	printf("--- 7. THE CONTROL: values that must NOT become infinity ---\n");
 	/*
 	 * Without this, "everything becomes Inf" would look like a fix.
 	 */

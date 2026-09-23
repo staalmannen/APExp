@@ -675,3 +675,63 @@ of the six staying, which would mean `RefineApproximation` has a
 second fault behind this one; or a count below 56, which would mean
 something else in the suite was also reaching a subnormal through
 `ldexp` and nobody had connected it.
+
+#### FLT_MAX was not FLT_MAX, and the probe named it in one run
+
+`binfloat-test` was written with four suspects listed -- `fabs`,
+`ldexp(1.0,103)`, the `INFINITY` macro and the plain cast -- because a
+failing test cannot tell them apart. The run:
+
+```
+  note FLT_MAX         = 3.4028234999999998e+38
+  note threshold       = 3.4028235714120479e+38
+  PASS  fabs, ldexp(1.0,103), INFINITY, and the plain cast
+  FAIL  dvalue is above the overflow threshold TOO
+  FAIL  binary format R of that double is +Inf
+```
+
+**The real FLT_MAX is 3.4028234663852886e+38.** APE's was about 3e31
+too big, so the boundary Tcl computes -- `FLT_MAX + 2^103` -- sat
+*above* the value `binary-53.25` feeds it, and `binary format R` wrote
+FLT_MAX where it had to write +Inf.
+
+**The cause is one missing letter.** C says `FLT_MAX`, `FLT_MIN` and
+`FLT_EPSILON` have type **float**; `float_arch.h` wrote them with no
+`F` suffix:
+
+```c
+#define FLT_MAX		3.40282347e+38
+```
+
+so each was a *double* holding the nearest double to a rounded
+decimal, rather than the float it names. With the suffix, even that
+short spelling rounds to the right float and `(double) FLT_MAX` is
+exact. They now carry the suffix and full precision both -- the suffix
+alone leaves about half a digit of margin and there is no reason to
+spend it.
+
+**Every one of the four named suspects was innocent**, including the
+one this file's own comment called "not an idle suspect". Listing them
+and printing all four is what turned that into one run instead of four.
+
+**And the numbers alone could not have finished it.** A constant that
+is wrong and a *header* that is the wrong file look identical from
+outside -- the invariant that `/$objtype/include/ape` is searched
+before `/sys/include/ape` is exactly this trap, and `deeppath-test`
+has been caught by it before. So section 6 prints three things: a
+`__APEXP_FLOAT_ARCH` marker saying which file was read, the
+stringified macro saying what it contained, and `sizeof(FLT_MAX)`
+saying whether it is a float at all. It also audits `FLT_MIN`,
+`FLT_EPSILON`, `DBL_MAX`, `DBL_MIN` and `DBL_EPSILON` against bit
+patterns while it is there.
+
+*The comparisons use bit patterns rather than long decimal literals on
+purpose: whether this compiler converts a 39-digit constant exactly is
+a separate question, and a test that leaned on it would misreport if
+the answer were no.*
+
+**Prediction**: `binary-53.25` and `binary-53.26` go, `Failed` 56 ->
+54, and `binfloat-test` reports 0 failures with the marker line saying
+`THIS TREE`. **What would refute it**: the marker saying *not* this
+tree, which would mean the header being read is not the one that was
+edited and the whole diagnosis is about the wrong file.

@@ -947,19 +947,23 @@ Open, in order of what the next run should touch:
   lists of `1e5555`, `Inf`, `1e308`, `5e307`. Read by the total alone
   this would have been logged as "binary fixed", exactly backwards.
   *Compare per name, never by total.*
-- **`binary-53.25`/`53.26` have OUTLIVED the whole float campaign**
-  and are not a parsing question. `Q` is a big-endian double, so the
-  value is `(2^128 - 2^103) + 2^75` -- strictly above the boundary
-  where narrowing must give infinity -- and `binary format R` must
-  write +Inf. `tclBinary.c`'s `FormatNumber` does not cast for
-  out-of-range values, so **four** things can be wrong and the test
-  cannot tell them apart: `fabs`, `ldexp(1.0,103)`, the `INFINITY`
-  macro, and the plain cast. **`binfloat-test.c` prints all four**,
-  replicated from the tree line by line, with a control so that
-  "everything became Inf" cannot look like a fix. `INFINITY` is a real
-  suspect -- APE's `HUGE_VAL` is a finite decimal literal, which is
-  why `tclConfig.h` redefines both. `ldexp(1.0,103)` is not: 103 never
-  reached `scalbn`'s broken arm.
+- **`binary-53.25`/`53.26`: FLT_MAX was not FLT_MAX.** C says
+  `FLT_MAX`, `FLT_MIN` and `FLT_EPSILON` have type **float**, and
+  `float_arch.h` wrote them with **no `F` suffix** -- so each was a
+  double holding the nearest double to a rounded decimal.
+  `(double)FLT_MAX` came out `3.4028234999999998e+38` against a true
+  `3.4028234663852886e+38`, about 3e31 too big, so the boundary Tcl
+  computes (`FLT_MAX + 2^103`) sat above the value the test feeds it
+  and `binary format R` wrote FLT_MAX where +Inf was required. Fixed
+  with the suffix and full precision.
+  **`binfloat-test.c` named it in ONE run** by listing four suspects
+  and printing all four; every one of them was innocent, including the
+  one the file's own comment called "not an idle suspect". It also
+  prints a `__APEXP_FLOAT_ARCH` marker and the stringified macro,
+  because a wrong constant and the WRONG HEADER look identical from
+  outside -- the `/$objtype/include/ape` shadowing invariant is exactly
+  that trap. Predict `Failed` 56 -> 54; refuted if the marker says the
+  header read was not this tree's.
 - **9front has no symbolic links** (confirmed by grep), so `symlink()`
   stays ENOSYS. **Do not emulate it with a copy** -- see
   `docs/notes/tcl-suite.md`. **`tests/apexp-links.tcl` is the one probe
