@@ -8,27 +8,44 @@
 # tclBinary.c's FormatNumber compares against FLT_MAX, and APE's
 # float_arch.h wrote FLT_MAX, FLT_MIN and FLT_EPSILON without the `F'
 # suffix -- so each was a double holding the nearest double to a
-# rounded decimal, and (double)FLT_MAX came out about 3.4e30 too big.
-# That is fixed in the header.
+# rounded decimal. That is fixed in the header.
 #
-# AND THE TWO TESTS STILL FAIL, while sys/lib/tests/binfloat-test --
-# which replicates FormatNumber line by line and is compiled fresh by
-# hand -- reports 0 failures and prints the marker saying it read THIS
-# TREE's float_arch.h. Two readings:
+# AND THE TWO TESTS STILL FAIL after a full mk distclean and mk
+# install, while sys/lib/tests/binfloat-test -- which replicates
+# FormatNumber line by line and is compiled by hand with pcc -- reports
+# 0 failures and prints the marker saying it read THIS TREE's
+# float_arch.h. So the first reading, that tclBinary.$O was simply
+# stale, has been REFUTED: distclean removes ./$objtype/lib and runs mk
+# clean in every directory, so the object was rebuilt and still has the
+# wrong constant.
 #
-#   (a) tclBinary.$O was compiled BEFORE the header was fixed and has
-#	the old constant baked into it. Nothing in these mkfiles lists
-#	a system header as a dependency, so `mk install' will not
-#	rebuild an object because <float.h> changed.
+# WHAT IS LEFT IS THE HEADER-SHADOWING INVARIANT:
+# /$objtype/include/ape is searched before /sys/include/ape, and the
+# repo's copies only win through the union mount that ./mount-include
+# sets up -- which no-ops entirely if /sys/include/ape/THIS_IS_APExp
+# already exists.
 #
-#   (b) the header fix is not sufficient and something else in
-#	FormatNumber's path is wrong.
+# AND THERE ARE AT LEAST THREE float.h's IN PLAY, which is why this
+# needs measuring rather than arguing. Three constants have been seen:
 #
-# WHY NOT A MARKER COMPILED IN SOMEWHERE. Because editing a file makes
-# mk recompile THAT file: a marker in tclStrToD.c would report a fresh
-# header while tclBinary.$O sat stale beside it, which is the very
-# thing being asked. The object has to be read as it stands.
+#   3.4028234663852886e+38   this tree's float_arch.h, after the fix
+#   3.40282347e+38           this tree's float_arch.h BEFORE the fix,
+#                            and what libtcl is compiled with now
+#   3.4028235e+38            what binfloat-test measured before the
+#                            fix, which is NEITHER of the above
 #
+# That third value sat in docs/notes/libap.md as a transcription of one
+# run and was never reconciled with the header in git. It cannot come
+# from this tree, so something else was being read -- stock 9front APE
+# ships its own float.h in the architecture directory, and an older
+# APExp installed a float_arch.h there too.
+#
+# THE NUMBER ALONE CANNOT FINISH THIS. 3.40282347e+38 is what a stale
+# installed copy of this tree's header would say AND what a machine's
+# own leftover copy would say. tclBinary.c therefore prints the marker,
+# the sizeof and the spelling of the FLT_MAX it was compiled with, under
+# $APEXP_FLOAT_DEBUG -- see the RESULT text below.
+
 # WHAT THIS MEASURES, AND HOW. FormatNumber answers +Inf exactly when
 #
 #	fabs(d) > FLT_MAX + ldexp(1.0, FLT_MAX_EXP-FLT_MANT_DIG-1)
@@ -109,7 +126,7 @@ while {$hi - $lo > 1} {
 }
 set thresh [dfrom $lo]
 puts ""
-puts [format "measured threshold        = %.17g   (bits %016x)" $thresh $lo]
+puts [format "measured threshold        = %.17g   (bits %016llx)" $thresh $lo]
 set implied [expr {$thresh - $TWO103}]
 puts [format "implied compiled FLT_MAX  = %.17g" $implied]
 puts [format "true FLT_MAX              = %.17g" [dfrom $FLT_MAX_BITS]]
@@ -120,12 +137,19 @@ if {$implied == [dfrom $FLT_MAX_BITS]} {
     puts "        If binary-53.25/53.26 still fail, the header is ruled out"
     puts "        and the next step is FormatNumber itself -- reading (b)."
 } else {
-    puts [format "RESULT: libtcl's FLT_MAX is too big by %.6g -- reading (a)." \
+    puts [format "RESULT: libtcl's FLT_MAX is too big by %.6g." \
 	    [expr {$implied - [dfrom $FLT_MAX_BITS]}]]
-    puts "        The header is fixed and binfloat-test, compiled fresh,"
-    puts "        agrees; so this object predates the fix. A header change"
-    puts "        needs mk distclean before mk install -- no mkfile here"
-    puts "        lists a system header as a dependency."
+    puts "        3.40282347e+38 is stock APE's constant AND what this"
+    puts "        tree's float_arch.h said before the F-suffix fix, so the"
+    puts "        NUMBER cannot tell 'read the wrong file' from 'read an"
+    puts "        old copy of the right file'. Reading (a) -- staleness --"
+    puts "        was already refuted once, by a full mk distclean and mk"
+    puts "        install that did not move it."
+    puts ""
+    puts "        To tell them apart, run this again as"
+    puts "            APEXP_FLOAT_DEBUG=1 tclsh tcl-fltmax-probe.tcl"
+    puts "        which makes tclBinary.c print the marker, sizeof and"
+    puts "        spelling of the FLT_MAX it was compiled with, on stderr."
 }
 
 # And the test's own value, for the record.
