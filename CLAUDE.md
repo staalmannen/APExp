@@ -1295,12 +1295,10 @@ them:
   Tcl 9, not proven.** The first three differ by an extra `oo` child:
   `namespace children ::dog` answers `{::dog:: oo }` where the test
   wants it empty.
-**Predict 14 -> 10** on the rebuild, exactly the four `sfbug`s.
-Refuted if any other count moves, and if the four do NOT go the
-pkgIndex is not being found -- check `/sys/lib` is on `auto_path`
-(`init.tcl` adds `[file dirname $tcl_library]`, and `tcl_library` is
-`/sys/lib/tcl` because `Itcl_Init`'s own search found `itcl.tcl` at
-`/sys/lib/itcl4.2.3`).
+**14 -> 10 CONFIRMED, exactly the four `sfbug`s**: `Total` and
+`Skipped` identical, `Passed` 712 -> 716, empty new-failure column.
+**itcl is DONE as a port** -- the remaining ten are upstream or
+Tcl-9's, two of them settled at source, and none is ours.
 
 **Fixed this round**: `NAME_MAX` was 27 and `PATH_MAX` 1023, set in
 `sys/include/ape/sys/limits.h`, which `<limits.h>` includes at its very
