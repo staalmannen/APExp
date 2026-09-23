@@ -198,6 +198,11 @@ a single file from it. `tcl-runall.tcl` is the same thing for Tcl's own
 suite, run under `tcltest`; both harnesses exist because a fault, a
 kill and a clean finish are indistinguishable from the shell, so a run
 without a completion marker cannot be read at all.
+`itcl-runall.tcl` is the third, for itcl's 26 `.test` files, and it
+**must be run under `itclsh` rather than `tclsh`** -- it says so itself
+and reports whether `package require Itcl` worked before running
+anything, because a suite failing every test for a missing package and
+one failing because the port is broken give the same count.
 `tcl-stdchan-test.tcl` asks what buffering the three standard
 channels get, and is a PROBE rather than a rule -- report what it
 prints. `tcl-machexp-probe.tcl` is the same kind of thing for
@@ -1188,6 +1193,31 @@ steps are a per-session `consctl` in vts, the shell's fds being a
 `cons` bound to `/dev/cons` rather than the pipe `session.c:124` dups
 (with a pipe, `isatty(0)` is false and bash never starts readline at
 all), and vts spawning bash rather than hardcoded `/bin/rc`.
+
+**itcl is wired up and NOT BUILT YET.** `sys/src/ape/lib/itcl` builds
+`libitcl.a` from configure.ac's own `TEA_ADD_SOURCES` list -- taken
+from there and not from `ls generic/*.c`, because the two differ:
+`itclStubLib.c` is `TEA_ADD_STUB_SOURCES` and is the one file that
+forces `USE_TCL_STUBS` on itself, so building it in would put a second
+stub-indirected copy of the entry points beside the real ones.
+`itclTestRegisterC.c` IS in the main list, which is upstream's own
+placement -- so unlike Tcl and Tk **there is no separate `itcltest`
+binary to write**, and looking for one is how a round gets spent.
+**Nothing uses stubs**: Plan 9 has no dlopen, so itcl is linked
+straight into `sys/src/ape/cmd/itclsh` -- Tcl's shell plus an appInit
+we write, since itcl ships none. **`Tcl_StaticLibrary` is the
+load-bearing call there, not `Itcl_Init`**: without it the commands
+exist but `package require Itcl` goes looking for something to load,
+and that is the first line of every test file. Same wall as perl's XS.
+The script library installs to `/sys/lib/itcl4.2.3`, which is where
+`itclBase.c`'s embedded search script looks
+(`[file dirname $tcl_library]/itcl$patchLevel`); `$ITCL_LIBRARY`
+overrides it. The extra `install:V:` rule copies **only** the scripts
+-- `mkone`'s own rule already copies the binary, and in Plan 9 mk every
+`V:` rule for a target runs. *(That is also why `clean` worked in
+`lib/tcl`: both its rule and `mklib`'s ran.)*
+**The appInit syntax-checks clean on the host** against the real
+`tcl.h` and `itcl.h`.
 
 **Fixed this round**: `NAME_MAX` was 27 and `PATH_MAX` 1023, set in
 `sys/include/ape/sys/limits.h`, which `<limits.h>` includes at its very
