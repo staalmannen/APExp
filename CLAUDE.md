@@ -1194,7 +1194,12 @@ steps are a per-session `consctl` in vts, the shell's fds being a
 (with a pipe, `isatty(0)` is false and bash never starts readline at
 all), and vts spawning bash rather than hardcoded `/bin/rc`.
 
-**itcl is wired up and NOT BUILT YET.** `sys/src/ape/lib/itcl` builds
+**itcl BUILDS AND RUNS, first try: `Total 792 Passed 712 Skipped 66
+Failed 14`**, marker present, exit 0, no file errors. The header line
+that matters reads `Itcl 4.2.3, Tcl 9.0.3` -- so `Tcl_StaticLibrary`
+did its job and `package require Itcl` found the compiled-in package
+with nothing to load. See the itcl section of `docs/notes/tcl-suite.md`
+for the 14. `sys/src/ape/lib/itcl` builds
 `libitcl.a` from configure.ac's own `TEA_ADD_SOURCES` list -- taken
 from there and not from `ls generic/*.c`, because the two differ:
 `itclStubLib.c` is `TEA_ADD_STUB_SOURCES` and is the one file that
@@ -1247,6 +1252,55 @@ in this round by a wide margin:
   with `nameLen` retyped would promote to 64 bits and shift every
   argument after it. Cast back, explicitly. *A fix in a variadic call
   changes an ABI, not just a type.*
+
+**"They all look upstream" WAS WRONG, and reading the eight unread
+ones is what showed it.** FOUR of the fourteen were OURS -- a missing
+file -- and the comfortable conclusion would have shipped without
+them:
+- **`sfbug-254.1/.2/.3` and `sfbug-257`: `can't find package itcl`,
+  inside a slave `interp create`. OURS, FIXED, not yet measured.**
+  The main interpreter never needed a package index: `itclAppInit.c`
+  calls `Itcl_Init` directly and it ends by providing both `Itcl` and
+  `itcl` (`itclBase.c:475-476`). **A slave has never run `Itcl_Init`**,
+  and no `pkgIndex.tcl` was installed, so `package require itcl` there
+  had nothing to find. `cmd/itclsh/pkgIndex.tcl` is ours rather than
+  upstream's, because upstream's names a shared library to load and
+  Plan 9 has none: **`load` with an EMPTY filename** is how Tcl reaches
+  a `Tcl_StaticLibrary` registration (`tclLoad.c:251` matches by name
+  when `fullFileName` is empty) and it works from any interpreter in
+  the process. Both spellings, since Tcl package names are
+  case-sensitive.
+  *The general shape: `Tcl_StaticLibrary` makes the package reachable;
+  a pkgIndex is what makes it FINDABLE. Two different things, and the
+  main interp needs only the first.*
+- **`local-1.2`/`1.3`/`1.4` -- upstream, settled at source.**
+  `library/itcl.tcl:35` calls `trace variable`, and **Tcl 9 removed
+  it**: `tclTrace.c:196` lists the options as exactly `add`, `info`,
+  `remove`. `itcl::local` cannot work on this Tcl at all.
+- **`mkindex-1.3` -- upstream, settled at source.** Three of fifteen
+  index entries read `source -encoding utf-8` where the test wants a
+  bare `source`. `auto.tcl:597` emits that string literally, and the
+  three are the plain `proc`s (`mkindex.itcl:59,67,68`) Tcl's own
+  parser handles while itcl's class-aware one writes the rest. No
+  path, no filesystem encoding, nothing platform-shaped.
+- **`fossil-9.0` -- the bug the test regression-tests, still failing;
+  `fossil-9.1` is its cascade.** `9.0`'s setup makes class `N::B`,
+  which creates `::N` as an ordinary namespace; the body then asks for
+  class `N` and must adopt it (fossil `d0126511d9`). It answers
+  `can't create namespace "N": already exists`. `9.1`'s SETUP then
+  finds `N::B` still there from `9.0`'s failed cleanup, so it is one
+  bug and one consequence. No platform surface -- pure namespace
+  bookkeeping -- but not proven upstream either.
+- **`rename-1.3`/`1.4`, `destroy-1.1`, `import-2.5` -- consistent with
+  Tcl 9, not proven.** The first three differ by an extra `oo` child:
+  `namespace children ::dog` answers `{::dog:: oo }` where the test
+  wants it empty.
+**Predict 14 -> 10** on the rebuild, exactly the four `sfbug`s.
+Refuted if any other count moves, and if the four do NOT go the
+pkgIndex is not being found -- check `/sys/lib` is on `auto_path`
+(`init.tcl` adds `[file dirname $tcl_library]`, and `tcl_library` is
+`/sys/lib/tcl` because `Itcl_Init`'s own search found `itcl.tcl` at
+`/sys/lib/itcl4.2.3`).
 
 **Fixed this round**: `NAME_MAX` was 27 and `PATH_MAX` 1023, set in
 `sys/include/ape/sys/limits.h`, which `<limits.h>` includes at its very

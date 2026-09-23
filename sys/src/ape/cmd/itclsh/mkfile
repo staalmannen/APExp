@@ -47,6 +47,13 @@ $O.out: $OFILES $LIB
 # it, which is the way to run against a working copy without
 # installing.
 #
+# pkgIndex.tcl is OURS rather than upstream's, and it is what lets a
+# slave interpreter find the package at all -- see the file itself.
+# /sys/lib is on auto_path, because init.tcl adds
+# [file dirname $tcl_library] and tcl_library is /sys/lib/tcl; Tcl
+# scans each auto_path entry AND its immediate subdirectories for a
+# pkgIndex.tcl, so /sys/lib/itcl4.2.3 is reached.
+#
 # The fourth script in upstream's library/, test_Itcl_CreateObject.tcl,
 # is deliberately NOT installed: it is not in TEA_ADD_TCL_SOURCES
 # either, being a fixture for one test rather than part of the package.
@@ -63,3 +70,4 @@ install installall:V:
 	cp $ITCLSRC/library/itcl.tcl $ITCLLIB
 	cp $ITCLSRC/library/itclWidget.tcl $ITCLLIB
 	cp $ITCLSRC/library/itclHullCmds.tcl $ITCLLIB
+	cp pkgIndex.tcl $ITCLLIB
