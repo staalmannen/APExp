@@ -540,6 +540,13 @@ The reasoning for all of these is in `docs/notes/invariants.md`; this is
 the index, so that nothing here is a surprise.
 
 - `size_t`/`ssize_t` are 64-bit on amd64 and `long` is not.
+- **`fconv.h` must be included BEFORE `<float.h>`**: `float_arch.h`
+  defines `IEEE_8087` only under `_RESEARCH_SOURCE`, which fconv.h
+  defines just before pulling `<float.h>` -- include them the other way
+  round and fconv.h reaches its own deliberate syntax error.
+- **amd64 underflow is GRADUAL**: `fenv.s` loads MXCSR `0x1f80`, FTZ
+  and DAZ both clear, so `Sudden_Underflow` is not defined for it any
+  more. The other seven architectures still claim it, unchecked.
 - `sizeof` is 32-bit, so a call with **no prototype in scope** corrupts
   the argument. An argument that arrives half right means a missing
   prototype.

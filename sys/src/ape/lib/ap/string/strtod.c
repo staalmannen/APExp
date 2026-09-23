@@ -323,7 +323,13 @@ strtodg(CONST char *s00, char **se, int *pcmp)
 	Dul rv, rv0;
 	long L;
 	ULong y, z;
-	Bigint *bb, *bb1, *bd, *bd0, *bs, *delta;
+	/*
+	 * Initialised because retfree frees all of them and is reachable
+	 * from the overflow and underflow exits before the loop has run.
+	 * Bfree(0) is a no-op by design. kencc says "used and not set"
+	 * otherwise, and it is right to.
+	 */
+	Bigint *bb = 0, *bb1, *bd = 0, *bd0 = 0, *bs = 0, *delta = 0;
 
 	sign = nz0 = nz = 0;
 	rv.d = 0.;
@@ -458,7 +464,6 @@ dig_done:
 	rv.d = y;
 	if (k > 9)
 		rv.d = _tens[k - 9] * rv.d + z;
-	bd0 = 0;
 	if (nd <= DBL_DIG
 		&& FLT_ROUNDS == 1
 		&& pcmp == 0

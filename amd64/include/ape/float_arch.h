@@ -47,7 +47,27 @@ union FPdbleword
 #ifdef _RESEARCH_SOURCE
 /* define stuff needed for floating conversion */
 #define IEEE_8087	1
-#define Sudden_Underflow 1
+/*
+ * Sudden_Underflow is NOT defined, and used to be. It tells Gay's
+ * conversion code that this machine FLUSHES denormals to zero, and
+ * amd64 under APExp does not: fesetenv(FE_DFL_ENV) loads MXCSR 0x1f80
+ * (arch/amd64/fenv.s) -- all exceptions masked, round to nearest, and
+ * bit 15 FTZ and bit 6 DAZ both CLEAR. Underflow here is gradual.
+ *
+ * It matters because `_d2b' has two arms. Under Sudden_Underflow it
+ * reports `*bits = P - k' for everything and has no denormal case at
+ * all, so strtod's correction loop was being told that subnormal
+ * inputs have 53 significand bits -- and _dtoa was printing them the
+ * same way. The gradual arm is the one strtod-xcheck, strtof-xcheck
+ * and dtoa-xcheck all measure on the build host, where no
+ * float_arch.h is in sight and the macro was never defined.
+ *
+ * The claim is stock APE's, inherited from a Plan 9 that did flush.
+ * SEVEN OTHER ARCHITECTURES still carry it, and none of them has been
+ * checked: this is a statement about one machine's FP environment, so
+ * it is a probe, not a library rule, and only the machine that was
+ * looked at is changed.
+ */
 #endif
 #ifdef _PLAN9_SOURCE
 /* MXCSR */

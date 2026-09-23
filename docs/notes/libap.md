@@ -537,3 +537,55 @@ and underflow exits, where the result is an infinity or a zero and
 `_d2b` has nothing to take apart. The comparison is computed only for
 a finite non-zero result -- and no caller needs it otherwise, since
 neither an infinity nor a zero is a midpoint between floats.)*
+
+#### The first Plan 9 build broke, and it found a lie in float_arch.h
+
+```
+.../string/../include/fconv.h:55 not a function
+.../string/../include/fconv.h:55 syntax error, last name: one
+```
+
+Line 55 is Gay's deliberate trap -- *"Exactly one of IEEE_8087,
+IEEE_MC68k, VAX, or IBM should be defined."* -- a sentence that is a
+syntax error unless the `#if` above it is satisfied. So none of the
+four was defined while compiling `strtof.c`, and `strtod.c` next to it
+compiled fine.
+
+**The difference was include order, and the reason is a macro gate.**
+`amd64/include/ape/float_arch.h` defines `IEEE_8087` only under
+`#ifdef _RESEARCH_SOURCE`, and `fconv.h` defines `_RESEARCH_SOURCE`
+itself immediately before pulling `<float.h>`. `strtod.c` includes
+`fconv.h` first, so that works. `strtof.c` included `<stdlib.h>`,
+`<math.h>`, `<float.h>` and `<errno.h>` first out of habit, `float.h`
+set its own `__FLOAT` guard with `IEEE_8087` undefined, and fconv.h's
+later `#include <float.h>` was a no-op. **`fconv.h` first is
+load-bearing in any file that uses it**, and it says so now.
+
+**And two lines below IEEE_8087 sat `#define Sudden_Underflow 1`.**
+
+That tells Gay's code the machine FLUSHES denormals to zero. **It does
+not.** `arch/amd64/fenv.s` loads MXCSR `0x1f80` for the default
+environment -- all exceptions masked, round to nearest, and bit 15
+(FTZ) and bit 6 (DAZ) both **clear**. Underflow on amd64 under APExp is
+gradual.
+
+It is not cosmetic. `_d2b` has two arms: under `Sudden_Underflow` it
+reports `*bits = P - k` for everything and has no denormal case at all.
+So on Plan 9, strtod's correction loop was being told that subnormal
+inputs carry 53 significand bits, and `_dtoa` was printing them on the
+same assumption -- while every measurement in `strtod-xcheck`,
+`strtof-xcheck` and `dtoa-xcheck` was made on the build host, where no
+`float_arch.h` is in sight and the macro was never defined. **The two
+configurations were different, and only one of them had been
+measured.** They are the same one now.
+
+The claim is stock APE's, inherited from a Plan 9 that did flush.
+**Seven other architectures still carry it and none has been checked**
+-- this is a statement about one machine's floating-point environment,
+so it is a probe rather than a library rule, and only the machine that
+was looked at is changed.
+
+*(Also from that build: kencc's `used and not set: bd bb bs delta`. It
+is right -- `retfree` frees all four and is reachable from the overflow
+and underflow exits before the loop has run. `Bfree(0)` is a no-op by
+design, so they are initialised to 0.)*

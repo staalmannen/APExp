@@ -38,11 +38,20 @@
  * an error.
  */
 
+/*
+ * fconv.h FIRST, and that is load-bearing. It defines _RESEARCH_SOURCE
+ * before pulling <float.h>, and amd64's float_arch.h only defines
+ * IEEE_8087 under that name. Including <float.h> ahead of it leaves
+ * the guard set with IEEE_8087 undefined, and fconv.h then reaches its
+ * own deliberate syntax error -- "Exactly one of IEEE_8087,
+ * IEEE_MC68k, VAX, or IBM should be defined." -- which is what the
+ * first build of this file hit.
+ */
+#include "fconv.h"
 #include <stdlib.h>
 #include <math.h>
 #include <float.h>
 #include <errno.h>
-#include "fconv.h"
 
 /*
  * Is d exactly halfway between two adjacent floats?
