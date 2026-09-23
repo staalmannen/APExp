@@ -6919,3 +6919,87 @@ that will say whether it worked, before any of it reaches a VM.
 
 `strtof` and `strtold` are the same file three times over and will need
 the same treatment.
+
+#### Gay's strtod: two transcription bugs found, a third still open, and it is NOT shipping
+
+Written against the Bigint kit already in the tree --
+`stdio/_fconv.c`'s `_Balloc`, `_multadd`, `_mult`, `_pow5mult`,
+`_lshift`, `_cmp`, `_diff`, `_d2b`, `_i2b` and the `_tens` tables --
+plus `ulp`, `b2d` and `s2b`, which are the three pieces of Gay's
+package this tree never kept. It lives at
+`lib/ap/string/strtod-gay.c` and is **deliberately not in any
+mkfile**; `strtod.c` still ships the old one.
+
+**Two things had to change before the kit could be used at all, and
+both are improvements in their own right.**
+
+- **`fconv.h` had no include guard.** It declares a struct and two
+  typedefs, and it never showed while `_fconv.c` and `_dtoa.c` were the
+  only includers -- separate translation units each see it once. It
+  shows the instant anything includes both, which the cross-check does.
+- **The bignum word is 32 bits and the code said so only by accident.**
+  Gay's arithmetic hard-assumes it -- `n = k >> 5`, `k &= 0x1f`,
+  `Storeinc`'s two `unsigned short` halves, `Pack_32` -- while spelling
+  the type `unsigned long`, which is 32 bits under kencc and **64 under
+  any LP64 compiler**. Correct here, wrong anywhere else, including the
+  build host. It is now `typedef unsigned int ULong`, which is 32 bits
+  under kencc and gcc alike: no change on Plan 9, and the same source
+  becomes testable beside glibc. *This is the `long` invariant from the
+  other side -- the tree knows `long` is not 64-bit on amd64, and here
+  was code relying on that without saying so.*
+
+**The two transcription bugs, both invisible to reading, each settled
+by one instrumented run.**
+
+1. **The scaling.** In the correction loop `j` is `P + 1 - bbbits`
+   normally and `bbe + (P - Emin)` for a denormal. An earlier version
+   computed `bbe - P + 1` and assigned the normal case to `i` instead
+   of `j`. Everything that needed correcting diverged: `1e100` spun
+   with `aadj = 8.8e71` and returned -inf. Capping the loop and
+   printing `i`, `dsign`, `aadj` and `rv` per pass named it
+   immediately; six readings of the source had not.
+2. **The sign scan.** Gay writes it as a fall-through switch inside
+   `for(s = s00;;s++)`; the `'+'`/`'-'` arm advances `s` past the sign
+   and then breaks out of the **switch**, so the loop's own `s++`
+   advances again and the first digit is lost. Every negative number
+   came back at **0.44** of its size -- which is exactly what
+   `-1.797e308` gives when read as `.797e308`. The cross-check named it
+   by having all three positive values right and all three negative
+   ones wrong, in the same run. It is written out plainly now.
+
+**Where it stands, measured rather than asserted** (the candidate
+built, which the cross-check now says in a comment at the include):
+
+```
+  section 1, the seven strings Tcl's expr tests use:
+      6 of 7 EXACT, including DBL_MAX and the overflow one ulp past it
+      (the old file got 0 of 7). The seventh is 18 digits and is
+      128 ulp out.
+  section 2, 200000 round-trips through "%.17g":
+      140173 wrong, against 148018 for the old file. 16 inputs SPIN.
+```
+
+**So it is right where the old one was catastrophic and no better
+where the old one was merely bad, and that is not good enough to
+ship.** Putting it in the mkfile now would trade a known-bad parser for
+an unknown-bad one, and the one thing worse than a library that is
+wrong is a library that is wrong in a way nobody has characterised.
+
+**The third bug is the same family and the evidence already narrows
+it.** For `-5.5098193881687261e+58` the floating-point approximation is
+**already bit-exact before the correction loop**, and the loop then
+moves it 2048 ulp away: `cmp(delta, bs)` says the error exceeds half an
+ulp when it is zero. So `bd` -- the digits as an exact Bigint -- or the
+shifts around it disagree with `bb` when they should agree exactly.
+**The next step is to print `bd` and `bb` for that one input, not to
+read `s2b` again**: two readings have already passed it as correct, and
+this file's own tally for mechanisms guessed from code alone is about
+one in eight.
+
+**One process note worth keeping.** A `python3` `s.replace()` with a
+mismatched anchor silently does nothing, and twice in this round an
+edit "succeeded" while changing no bytes -- once leaving a stale binary
+that reproduced the previous run's symptom exactly. Every anchored edit
+here now asserts its anchor first. It is the same rule as the libap
+version mark, one layer up: *a change you have not proved arrived is a
+change you cannot measure.*

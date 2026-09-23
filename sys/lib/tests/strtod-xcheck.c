@@ -77,11 +77,17 @@
  * reachable as the reference. -std=c99 keeps <math.h> from declaring
  * pow10 itself, which would clash with libap's (int) signature.
  */
-#define pow10	ap_pow10
 #define strtod	ap_strtod
-#include "../../src/ape/lib/ap/stdio/pow10.c"
-#include "../../src/ape/lib/ap/string/strtod.c"
-#undef pow10
+#define IEEE_8087	1
+#include "../../src/ape/lib/ap/stdio/_fconv.c"
+/*
+ * WHICH strtod THIS MEASURES. strtod-gay.c is the candidate and is not
+ * in any mkfile yet; strtod.c is what actually ships. Swap the two
+ * lines to measure the other one, and say in the write-up which was
+ * built -- a number from this file means nothing without that.
+ */
+#include "../../src/ape/lib/ap/string/strtod-gay.c"
+/* #include "../../src/ape/lib/ap/string/strtod.c" */
 #undef strtod
 
 static int failures;
@@ -205,6 +211,13 @@ main(void)
 	int i;
 	long j;
 
+	/*
+	 * Line buffered, and that is not a stylistic choice: this file is
+	 * run by redirecting it to a file, and a block-buffered run that
+	 * hangs prints nothing at all -- the trap this tree has already
+	 * paid for once, in tcl-runall.tcl.
+	 */
+	setvbuf(stdout, 0, _IOLBF, 0);
 	printf("strtod-xcheck: libap's strtod against glibc's\n");
 
 	printf("--- 1. the exact strings the six failing Tcl tests use ---\n");
@@ -245,6 +258,8 @@ main(void)
 		snprintf(buf, sizeof buf, "%.17g", d);
 		strcpy(keep, buf);
 		check(&s2, buf, keep);
+		if((j % 20000) == 0)
+			printf("  ... %ld\n", j);	/* so a hang has a place */
 	}
 	report(&s2);
 

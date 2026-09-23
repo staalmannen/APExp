@@ -9,6 +9,16 @@
 	U.S.A.
 	dmg@research.bell-labs.com
  */
+/*
+ * An include guard, because this header declares a struct and two
+ * typedefs and had none. It never showed while _fconv.c and _dtoa.c
+ * were the only includers -- separate translation units each see it
+ * once -- and it shows the moment anything includes both, which
+ * sys/lib/tests/strtod-xcheck.c does on the build host.
+ */
+#ifndef __FCONV_H
+#define __FCONV_H
+
 #include <stdlib.h>
 #include <string.h>
 #define _RESEARCH_SOURCE
@@ -45,9 +55,23 @@
 Exactly one of IEEE_8087, IEEE_MC68k, VAX, or IBM should be defined.
 #endif
 
+/*
+ * THE BIGNUM WORD IS 32 BITS, and it used to say so only by accident.
+ * Gay's code hard-assumes it -- `n = k >> 5', `k &= 0x1f', Storeinc's
+ * two unsigned shorts, Pack_32 -- while spelling the type `unsigned
+ * long', which is 32 bits under kencc and 64 under any LP64 compiler.
+ * So the file was correct here and wrong anywhere else, including the
+ * build host, which is where strtod-xcheck.c has to run it.
+ *
+ * ULong says what was meant. `unsigned int' is 32 bits under kencc and
+ * under gcc alike, so this changes nothing on Plan 9 and makes the
+ * same source testable beside glibc.
+ */
+typedef unsigned int ULong;
+
 typedef union {
 	double d;
-	unsigned long ul[2];
+	ULong ul[2];
 } Dul;
 
 #ifdef IEEE_8087
@@ -187,7 +211,7 @@ typedef union {
 Bigint {
 	struct Bigint *next;
 	int k, maxwds, sign, wds;
-	unsigned long x[1];
+	ULong x[1];
 	};
 
  typedef struct Bigint Bigint;
@@ -196,7 +220,7 @@ Bigint {
 extern Bigint	*_Balloc(int);
 extern void	_Bfree(Bigint *);
 extern Bigint	*_multadd(Bigint *, int, int);
-extern int	_hi0bits(unsigned long);
+extern int	_hi0bits(ULong);
 extern Bigint	*_mult(Bigint *, Bigint *);
 extern Bigint	*_pow5mult(Bigint *, int);
 extern Bigint	*_lshift(Bigint *, int);
@@ -234,3 +258,5 @@ y->wds*sizeof(long) + 2*sizeof(int))
 #define tens _tens
 #define bigtens _bigtens
 #define tinytens _tinytens
+
+#endif /* __FCONV_H */

@@ -868,6 +868,22 @@ Open, in order of what the next run should touch:
   top of it -- **Gay's `strtod` is the missing other half of that same
   package**, so the parser can be written against machinery already
   linked. `strtof`/`strtold` are the same file again.
+  **Written, and NOT SHIPPING**: `string/strtod-gay.c`, deliberately in
+  no mkfile. 6 of 7 of the expr strings exact where the old file got 0,
+  but still 140173/199887 round-trips wrong against 148018, and 16
+  inputs spin. *Right where the old one was catastrophic, no better
+  where it was merely bad* -- not good enough to trade a known-bad
+  parser for an uncharacterised one. Two transcription bugs found and
+  fixed (the correction loop's `j`; Gay's sign scan, whose fall-through
+  switch loses the first digit -- every negative came back at 0.44 of
+  its size). **The third is narrowed**: for `-5.5098193881687261e+58`
+  the approximation is bit-exact *before* the loop and the loop moves
+  it 2048 ulp; print `bd` and `bb`, do not re-read `s2b`.
+  Two by-products that stand on their own: **`fconv.h` gained an
+  include guard**, and its bignum word is now `ULong` -- Gay's code
+  hard-assumes 32 bits while spelling it `unsigned long`, true under
+  kencc and false under any LP64 compiler, which is the `long`
+  invariant from the other side.
 - **`expr` 5 + `expr-old` 1 are one question and are UNEXPLAINED.**
   Everything at or above `1.797693134862315 5 e308` comes back
   infinite, including two values that are representable.
