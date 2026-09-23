@@ -28,6 +28,14 @@
  */
 #include <string.h>
 
+/*
+ * The definition lives here rather than in misc/getopt_long.c, where it
+ * used to, for a linking reason: _callmain is in every APE binary and
+ * getopt_long is not, so a program that never parsed an option would
+ * not have pulled the object in at all.
+ */
+char *argv0 = NULL;
+
 extern	void _envsetup(void);
 extern	char **environ;
 extern	int *_errnoloc;
@@ -55,6 +63,27 @@ _callmain(int (*f)(int, char**), int argc, char *arg0)
 	_nprivates = NPRIVATES;
 	_errnoloc = &errno;
 	_plan9err = &err[0];
+
+	/*
+	 * argv0 is set HERE because this is the only place that always
+	 * runs. It is lib9's global, and lib9 fills it from ARGBEGIN --
+	 * an rc-and-Plan-9 idiom no APE program ever executes, so for
+	 * every program in this tree it stayed as getopt_long.c left it:
+	 * NULL, or argv[0] only if the program happened to call
+	 * getopt_long.
+	 *
+	 * That is what getprogname() returns, and gnulib's error() IS
+	 * getprogname() (gnulib/error.c:128), so every GNU program built
+	 * here printed its diagnostics with an EMPTY program name:
+	 *
+	 *	: This does not look like a tar archive
+	 *
+	 * where GNU tar on any other system says "tar:". One assignment,
+	 * and it covers every caller rather than each program setting its
+	 * own.
+	 */
+	argv0 = arg0;
+
 	exit(f(argc, &arg0));
 }
 

@@ -1300,6 +1300,44 @@ them:
 **itcl is DONE as a port** -- the remaining ten are upstream or
 Tcl-9's, two of them settled at source, and none is ours.
 
+**GNU tar's messages had NO PROGRAM NAME, and it was every GNU
+program in the tree.** `tar xf` on a `.tgz` printed
+`: This does not look like a tar archive` where tar anywhere else
+says `tar:`. gnulib's `error()` is literally
+`#define program_name getprogname ()` (`gnulib/error.c:128`), and
+libap's `getprogname()` returned **`argv0`** -- lib9's global, which
+lib9 fills from `ARGBEGIN`, **an rc idiom no APE program executes**.
+So it was NULL unless the program happened to call `getopt_long`,
+which set it as a side effect -- which is why some programs named
+themselves and others did not, and why nobody had chased it.
+`argv0` is now set in **`plan9/callmain.c`**, the one path every APE
+program takes, and its DEFINITION moved there from
+`misc/getopt_long.c` for a linking reason: `_callmain` is in every
+binary and `getopt_long` is not. `getprogname()` returns the
+**basename** -- what BSD, Solaris, glibc and gnulib's own fallback all
+return, and what `tar:` rather than `/bin/tar:` depends on -- and
+never NULL, since every caller prints it with `%s`.
+`progname-test.c` asks all four; its section 3 is what separates a fix
+from a half-fix, since returning `argv[0]` whole would pass the rest.
+**This is NOT the tar extraction bug** -- it is a second one that was
+standing next to it, and the extraction failure is still open. See the
+tar entry below.
+
+**`tar xf` of a `.tgz` still fails, and it is NOT diagnosed.** The
+shape: `tar` detects gzip magic and execs a decompressor, and
+`sys/src/ape/cmd/tar/config.h:59` points `GZIP_PROGRAM` at
+**`minigzip`** -- zlib's own test program, built here from
+`zlib/test/minigzip.c` against `libz.a`. `gtar/src/system.c:515`
+appends `"-d"` and `execvp`s it, and minigzip's `-d` with no file
+arguments does `gzdopen(fileno(stdin))` into `gz_uncompress(..., stdout)`,
+which is exactly what tar needs. So the design is right and something
+in it is not working: tar reported `Child returned status 1` *after*
+reading far enough to find `A lone zero block at 580`.
+**Do not guess between the two halves -- split them.** `minigzip -d`
+alone, into a file, then `tar tf` that file. Also worth one line:
+whether the archive is gzipped at all, since 9front's own `tar`
+extracted it and the native tar does not decompress.
+
 **Fixed this round**: `NAME_MAX` was 27 and `PATH_MAX` 1023, set in
 `sys/include/ape/sys/limits.h`, which `<limits.h>` includes at its very
 end and which `#undef`s and redefines what the outer file had just set.

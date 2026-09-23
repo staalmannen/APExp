@@ -90,7 +90,8 @@ char    *gnu_optarg;		/* argument associated with option */
 #define gnu_optarg optarg
 int optreset;
 #endif
-char* argv0 = NULL;
+/* argv0 is DEFINED in plan9/callmain.c -- see the note there. */
+extern char *argv0;
 
 #define PRINT_ERROR	((gnu_opterr) && (*options != ':'))
 
@@ -388,7 +389,7 @@ getopt_internal(int nargc, char * const *nargv, const char *options,
 	int optchar, short_too;
 	int posixly_correct;	/* no static, can be changed on the fly */
 	
-	if(!argv0) argv0 = nargv[0];
+	if(!argv0) argv0 = nargv[0];	/* belt and braces; _callmain sets it */
 
 	if (options == NULL)
 		return (-1);
