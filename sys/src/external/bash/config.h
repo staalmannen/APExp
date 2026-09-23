@@ -48,7 +48,24 @@
 /* Define READLINE to get the nifty/glitzy editing features.
    This is on by default.  You can turn it off interactively
    with the -nolineediting flag. */
-/* #undef READLINE */
+/*
+ * APEXP: ON. It was `#undef' here -- upstream's unconfigured default,
+ * since bash ships config.h with everything off and `configure' turns
+ * it on, and APExp hand-maintains this file the way it does perl's.
+ * So `no_line_editing' was 1 from shell.c:230 and every line-editing
+ * feature was compiled out of the shell.
+ *
+ * That is why Tab only inserted a tab: bash was reading whole lines
+ * with getc and the console driver was echoing the keystroke. Nothing
+ * was missing -- libreadline.a is built from sys/src/ape/lib/readline,
+ * its headers are installed at sys/include/ape/readline, bashline.c,
+ * bashhist.c, pcomplete.c and pcomplib.c are all in the mkfile's
+ * OFILES, and bi-bind, bi-complete, bi-fc, bi-history and bi-shopt are
+ * all in OBJBUILTINS. The whole apparatus was compiled, linked and
+ * switched off by this one line: a capability present and not
+ * declared, the same shape as the two `file stat' keys zipfs wanted.
+ */
+#define READLINE 1
 
 /* Define BANG_HISTORY if you want to have Csh style "!" history expansion.
    This is unrelated to READLINE. */
@@ -62,7 +79,16 @@
 
    If only HISTORY is defined, the `fc' and `history' builtins are
    available. */
-/* #undef HISTORY */
+/*
+ * APEXP: ON, with READLINE. Independent of it in principle, but it is
+ * what the arrow keys scroll through, and bashhist.c, bi-fc and
+ * bi-history are already in the build waiting for it. BANG_HISTORY
+ * (csh-style `!!') is left off deliberately: it is a separate switch
+ * that changes what `!' means inside double quotes, which is a change
+ * to the LANGUAGE rather than to line editing, and not what was asked
+ * for here.
+ */
+#define HISTORY 1
 
 /* Define this if you want completion that puts all alternatives into
    a brace expansion shell expression. */

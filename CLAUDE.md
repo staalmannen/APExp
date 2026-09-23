@@ -1142,6 +1142,34 @@ libedit, PDCurses. *A fix that makes a process reach code it never
 reached before can expose anything on that path.* A crash while raw
 self-heals, because the console reverts when the last consctl
 descriptor closes and a dead process has closed it.
+**Section 5 CONFIRMED too**: `read(0) -> 1, byte 0x6a` -- one
+keystroke, no Enter. Raw mode works end to end on 9front.
+**But bash's Tab still only inserted a tab, and that was a SECOND
+bug in a different place.** `sys/src/external/bash/config.h` said
+`/* #undef READLINE */` -- upstream's unconfigured default, since bash
+ships everything off and `configure` turns it on, and APExp
+hand-maintains that file the way it does perl's. So
+`no_line_editing` was 1 from `shell.c:230` and line editing was
+compiled out of the shell; bash read whole lines with `getc` and the
+console echoed the Tab. **Nothing was missing**: `libreadline.a` is
+built from `sys/src/ape/lib/readline`, its headers are installed,
+`bashline.c`/`bashhist.c`/`pcomplete.c`/`pcomplib.c` are all in
+OFILES, and `bi-bind`/`bi-complete`/`bi-fc`/`bi-history`/`bi-shopt`
+are all in OBJBUILTINS. The entire apparatus was compiled, linked and
+switched off by one commented-out line -- *a capability present and
+not declared*, the same shape as zipfs's two missing `file stat` keys.
+`READLINE` and `HISTORY` are now on; `BANG_HISTORY` deliberately is
+not, being a change to what `!` means rather than to line editing.
+**Not built yet.** This compiles code that has never been compiled
+here, so expect kencc to have opinions about it. And **`$TERM` needs
+printing before anything is concluded**: `apexp-sh` never sets it,
+bash's `STREQ` would fault on a NULL, and it does not -- so something
+sets it and the value decides what readline does. rio is not a
+terminal emulator, so `dumb` is the honest value for it and `vt100`
+only becomes right under vts. readline defaults a null `TERM` to
+`dumb` itself (`terminal.c:580`) and binds Tab from the keymap
+regardless, so completion does not depend on the answer -- redisplay
+does.
 **And vts's key interception is the OPPOSITE of what is wanted here**:
 `lined.c` batches keystrokes and flushes whole LINES to the shell, so
 bash's completion needs `edit off`, not `edit on`. The remaining three
