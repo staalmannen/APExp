@@ -138,7 +138,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - perl (version 5.42.2)
 - sqlite (version 3.53.4)
 - Tcl (tclsh) & Tk (wish) (version 9.0.3)
-	Tcl/Tk extensions itcl (4.2.3) and TkBlt (3.2.23)
+	Tcl/Tk extensions itcl (4.2.3)
 
 
 
