@@ -1160,16 +1160,22 @@ switched off by one commented-out line -- *a capability present and
 not declared*, the same shape as zipfs's two missing `file stat` keys.
 `READLINE` and `HISTORY` are now on; `BANG_HISTORY` deliberately is
 not, being a change to what `!` means rather than to line editing.
-**Not built yet.** This compiles code that has never been compiled
-here, so expect kencc to have opinions about it. And **`$TERM` needs
-printing before anything is concluded**: `apexp-sh` never sets it,
-bash's `STREQ` would fault on a NULL, and it does not -- so something
-sets it and the value decides what readline does. rio is not a
-terminal emulator, so `dumb` is the honest value for it and `vt100`
-only becomes right under vts. readline defaults a null `TERM` to
-`dumb` itself (`terminal.c:580`) and binds Tab from the keymap
-regardless, so completion does not depend on the answer -- redisplay
-does.
+**TAB COMPLETION WORKS.** Built, and it took on the first try --
+kencc had no opinions about four files' worth of code that had never
+been compiled here. `$TERM` is **`dumb`**, which is the honest value
+for rio and costs nothing: `terminal.c:583` only clears
+`_rl_term_isansi`, `sys/lib/ape/termcap` has a `dumb` entry, and Tab
+is bound from the keymap regardless.
+**ARROW KEYS DO NOT WORK, AND THAT IS rio, NOT US.** They scroll the
+window instead -- measured with readline running and raw mode on, so
+rio is eating them before bash sees them; a program cannot get those
+keys back under rio at all. **`^P`/`^N` give history today**
+(`emacs_keymap.c:49`/`51`), which is the whole of what the arrows
+would have bought.
+**So vts is no longer on the critical path for completion** -- but it
+is still what would buy arrow keys, colour, cursor addressing and
+anything else needing escape sequences rio does not speak, plus
+session persistence. Keep it; it is a want rather than a blocker.
 **And vts's key interception is the OPPOSITE of what is wanted here**:
 `lined.c` batches keystrokes and flushes whole LINES to the shell, so
 bash's completion needs `edit off`, not `edit on`. The remaining three
