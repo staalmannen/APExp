@@ -25,6 +25,43 @@ typedef struct VTerm VTerm;
 typedef struct VTermState VTermState;
 typedef struct VTermScreen VTermScreen;
 
+/*
+ * PLAN 9: these three are opaque HERE and completed elsewhere -- VTerm
+ * and VTermState in vterm_internal.h, VTermScreen in screen.c alone.
+ *
+ * kencc hashes a function's whole type into a "type signature" that the
+ * linker compares across object files, and it is on by default: 9front's
+ * /$objtype/mkfile sets CFLAGS=-FTVw, and -T is what emits them
+ * (6c/swt.c's zname). The hash FOLLOWS POINTERS into the struct they
+ * point at -- cc/dcl.c's signat() treats TIND by continuing along
+ * t->link -- so screen.c, the one file with a complete struct
+ * VTermScreen, computed a different signature from every other file for
+ * every function that can reach a VTermScreen. That includes functions
+ * which never mention one, because struct VTerm has a VTermScreen
+ * *screen member and the walk goes through it:
+ *
+ *	alloc_buffer: incompatible type signatures
+ *	  f5aeb94b(libvterm.a(vterm_state_free)) and
+ *	  d13cf1a8(libvterm.a(vterm_screen_set_callbacks))
+ *	  for vterm_allocator_malloc
+ *
+ * and fourteen more like it, which is why the whole of vts failed to
+ * link.
+ *
+ * #pragma incomplete is Plan 9's answer and is precisely what it is
+ * for: signat() returns as soon as it sees GINCOMPLETE, so every file
+ * agrees whether or not it has the definition. Completing the struct
+ * afterwards does NOT clear the flag -- only the enum rule in cc.y does
+ * that -- and the struct rule's "redeclare tag" check tests link, which
+ * the pragma does not touch, so screen.c still compiles unchanged.
+ * GINCOMPLETE is read in exactly one place in the compiler, signat(),
+ * so this weakens the cross-object check for these three types and
+ * changes nothing else.
+ */
+#pragma incomplete VTerm
+#pragma incomplete VTermState
+#pragma incomplete VTermScreen
+
 typedef struct {
   int row;
   int col;
