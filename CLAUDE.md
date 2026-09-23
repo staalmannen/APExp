@@ -1128,9 +1128,14 @@ holding until Enter. Tab arrived inside a finished line. Both halves
 silent. `plan9/tty.c` now owns the one switch Plan 9 offers
 (`rawon`/`rawoff` on `/dev/consctl`) and termios drives it; see
 `docs/notes/libap.md`.
-**Predict**: `rawmode-test` sections 3 and 4 PASS on the rebuilt
-library and FAIL on the installed one. **Refuted if `_ttymark` is not
-1** -- then the test measured an old libap and says nothing.
+**CONFIRMED**, and the refutation condition did better than refute:
+against the OLD library the test would not LINK -- `main: undefined:
+_ttymark` -- so measuring the stale libap and calling it a pass was
+impossible. That idiom has now paid three times (`_sock_listenmark`,
+`_execmark`, `_ttymark`). On the rebuilt library `_ttymark = 1` and
+`c_lflag` runs `0x57 -> 0x40 -> 0x57` across sections 3 and 4, with
+`ICANON` and `ECHO` reading back clear and then set again. 0 failures.
+**`tcsetattr` now does something.**
 **Watch for**: this makes raw mode actually happen, so every program
 that asked for it and silently did not get it now does -- bash,
 libedit, PDCurses. *A fix that makes a process reach code it never
