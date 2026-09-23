@@ -182,13 +182,30 @@ EnsembleErrorProc(
     Tcl_Interp *interp,
     Tcl_Obj *procNameObj)
 {
-    int overflow, limit = 60, nameLen;
+    /*
+     * APEXP: nameLen is Tcl_Size, not int. Tcl 9's
+     * Tcl_GetStringFromObj takes a Tcl_Size * -- ptrdiff_t, so 64-bit
+     * on amd64 -- and passing an int * writes four bytes where eight
+     * are expected. itcl 4.2.3 is Tcl_Size-aware everywhere else and
+     * carries the 8.6 shim in itcl.h:136; this one site was missed,
+     * and a compiler that only warns lets it through.
+     */
+    int overflow, limit = 60;
+    Tcl_Size nameLen;
     const char *procName = Tcl_GetStringFromObj(procNameObj, &nameLen);
 
     overflow = (nameLen > limit);
     Tcl_AppendObjToErrorInfo(interp, Tcl_ObjPrintf(
             "\n    (itcl ensemble part \"%.*s%s\" line %d)",
-            (overflow ? limit : nameLen), procName,
+            /*
+             * The cast is required, not tidiness: "%.*s" reads an INT
+             * precision from the variadic list, and with nameLen now a
+             * Tcl_Size the ternary would promote to 64 bits and shift
+             * every argument after it. overflow is (nameLen > limit),
+             * so the value reaching here is at most limit -- 60 -- and
+             * the narrowing cannot lose anything.
+             */
+            (int)(overflow ? limit : nameLen), procName,
             (overflow ? "..." : ""), Tcl_GetErrorLine(interp)));
 }
 

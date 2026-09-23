@@ -1216,8 +1216,37 @@ overrides it. The extra `install:V:` rule copies **only** the scripts
 -- `mkone`'s own rule already copies the binary, and in Plan 9 mk every
 `V:` rule for a target runs. *(That is also why `clean` worked in
 `lib/tcl`: both its rule and `mklib`'s ran.)*
-**The appInit syntax-checks clean on the host** against the real
-`tcl.h` and `itcl.h`.
+**Four things had to be fixed before it compiled, and the HOST found
+three of them** -- the gcc sweep in `docs/notes/tk-plan9.md` applied to
+a whole package rather than one backend, which is the cheapest thing
+in this round by a wide margin:
+- **`-DBUILD_itcl` is not optional and does not look like a missing
+  define.** `itcl.h:105` turns `USE_ITCL_STUBS` **on** in its absence,
+  so the package compiles as a stub CONSUMER of itself and
+  `itclDecls.h` rewrites every entry point as `(itclStubsPtr->x)`.
+  `itclStubInit.c`, whose whole job is to build the table those macros
+  read, produced **152 errors**. Exactly Tk's `-DBUILD_tk`.
+- **`itclUuid.h` is generated upstream from fossil**, which APExp has
+  not; hand-written now in `lib/itcl` from the tarball's own
+  `manifest.uuid`, the counterpart of `lib/tcl/tclUuid.h`.
+- **`PACKAGE_VERSION` collides.** `tclConfig.h:5` defines it as an
+  UNQUOTED `9.0.3`; `itclBase.c` concatenates it as a string literal.
+  Defining itcl's on the command line is a redefinition cpp refuses,
+  and letting Tcl's stand is a syntax error -- so `itclBase.c` uses
+  itcl's own already-quoted `ITCL_PATCH_LEVEL`.
+- **Two `Tcl_Size` sites**, `itcl2TclOO.c:186` and `itclParse.c:1367`:
+  Tcl 9's `Tcl_GetStringFromObj` takes a `Tcl_Size *` and itcl 4.2.3
+  passes an `int *` in two places, being `Tcl_Size`-aware everywhere
+  else. **6c ERRORS where gcc only WARNS**, which is why a sweep
+  counting errors alone found one of them and a second sweep for
+  `-Wincompatible-pointer-types` found the other. *Sweep for the
+  warning class the target compiler treats as fatal, not for gcc's
+  errors.*
+- **And one the fix itself introduced**: `%.*s` reads an **int**
+  precision from the variadic list, so `(overflow ? limit : nameLen)`
+  with `nameLen` retyped would promote to 64 bits and shift every
+  argument after it. Cast back, explicitly. *A fix in a variadic call
+  changes an ABI, not just a type.*
 
 **Fixed this round**: `NAME_MAX` was 27 and `PATH_MAX` 1023, set in
 `sys/include/ape/sys/limits.h`, which `<limits.h>` includes at its very

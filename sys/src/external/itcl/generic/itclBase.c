@@ -409,7 +409,17 @@ Initialize (
 
     if (Tcl_GetCommandInfo(interp, "::tcl::build-info", &info)) {
 	Tcl_CreateObjCommand(interp, "::itcl::build-info",
-		info.objProc, (void *)(PACKAGE_VERSION "+" STRINGIFY(ITCL_VERSION_UUID)
+		/*
+		 * APEXP: ITCL_PATCH_LEVEL, not PACKAGE_VERSION. Both are
+		 * "4.2.3" in a TEA build, but this tree compiles against
+		 * tclConfig.h, which defines PACKAGE_VERSION itself -- as an
+		 * UNQUOTED 9.0.3, Tcl's version. Defining itcl's on the
+		 * command line as well is a macro redefinition cpp refuses,
+		 * and letting Tcl's stand puts a bare 9.0.3 where a string
+		 * literal has to be concatenated. ITCL_PATCH_LEVEL is itcl's
+		 * own, already quoted, in itcl.h.
+		 */
+		info.objProc, (void *)(ITCL_PATCH_LEVEL "+" STRINGIFY(ITCL_VERSION_UUID)
 #if defined(__clang__) && defined(__clang_major__)
 	    ".clang-" STRINGIFY(__clang_major__)
 #if __clang_minor__ < 10
