@@ -1,0 +1,79 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libitcl.a
+
+ITCLSRC=$APEXPROOT/sys/src/external/itcl
+TCLSRC=$APEXPROOT/sys/src/external/tcl
+
+#
+# Exactly configure.ac's TEA_ADD_SOURCES list, in its order. Taken from
+# there rather than from `ls generic/*.c', because the two differ:
+# itclStubLib.c is NOT here. It is TEA_ADD_STUB_SOURCES -- the stub
+# library that OTHER extensions link against to call itcl through a
+# table -- and it is the one file in the package that forces
+# USE_TCL_STUBS on itself. Building it into libitcl.a would put a
+# second, stub-indirected copy of the entry points beside the real
+# ones.
+#
+# itclTestRegisterC.c IS here, and that is upstream's placement rather
+# than an oversight: it is in TEA_ADD_SOURCES, so the shipped library
+# carries it. Tcl and Tk keep their test commands in a separate object
+# for a separate binary; itcl does not, so there is no itcltest object
+# to hunt for -- see the note in cmd/itclsh/mkfile.
+#
+OFILES=\
+	itcl2TclOO.$O\
+	itclBase.$O\
+	itclBuiltin.$O\
+	itclClass.$O\
+	itclCmd.$O\
+	itclEnsemble.$O\
+	itclHelpers.$O\
+	itclInfo.$O\
+	itclLinkage.$O\
+	itclMethod.$O\
+	itclObject.$O\
+	itclParse.$O\
+	itclStubs.$O\
+	itclStubInit.$O\
+	itclResolve.$O\
+	itclTclIntStubsFcn.$O\
+	itclUtil.$O\
+	itclMigrate2TclCore.$O\
+	itclTestRegisterC.$O\
+
+UPDATE=\
+	mkfile\
+	$LIB\
+	${OFILES:%.$O=%.c}\
+
+<$APEXPROOT/sys/src/cmd/mklib
+
+CC=pcc
+
+#
+# NO -DUSE_TCL_STUBS, and that is the whole shape of this build.
+#
+# itcl is normally a loadable extension: it calls Tcl through a stub
+# table so one binary works against any Tcl. Plan 9 has no dlopen, so
+# nothing is ever loaded here and itcl is linked straight into an
+# interpreter (see cmd/itclsh). Without the macro, itclBase.c's
+# Tcl_InitStubs becomes Tcl_PkgInitStubsCheck -- tcl.h does that
+# substitution itself -- and every other call binds directly to
+# libtcl.a. This is the same reasoning that put perl's XS extensions
+# out of reach: no dlopen means static or nothing.
+#
+# -I$APEXPROOT/sys/src/ape/lib/tcl is for tclConfig.h, which is this
+# tree's hand-maintained answer to what configure would have produced;
+# itclInt.h reaches tclInt.h, which wants it.
+#
+CFLAGS=-c -I. -I$ITCLSRC/generic\
+	-I$TCLSRC/generic -I$TCLSRC/unix -I$TCLSRC/libtommath\
+	-I$APEXPROOT/sys/src/ape/lib/tcl\
+	-DHAVE_TCL_CONFIG_H -DPLAN9 -DMODULE_SCOPE=extern\
+	-DPACKAGE_VERSION="4.2.3"\
+
+%.$O: $ITCLSRC/generic/%.c
+	$CC $CFLAGS $ITCLSRC/generic/$stem.c

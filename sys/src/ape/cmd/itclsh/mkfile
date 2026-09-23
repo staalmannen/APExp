@@ -1,0 +1,65 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+ITCLSRC=$APEXPROOT/sys/src/external/itcl
+TCLSRC=$APEXPROOT/sys/src/external/tcl
+
+BIN=$APEXPROOT/$objtype/bin
+TARG=itclsh
+
+OFILES=itclAppInit.$O
+
+#
+# Order matters: libitcl.a calls into libtcl.a, so it comes first.
+# libz.a is there because libtcl.a's zipfs wants it, exactly as in
+# ../tclsh/mkfile.
+#
+LIB=\
+	$APEXPROOT/$objtype/lib/ape/libitcl.a\
+	$APEXPROOT/$objtype/lib/ape/libtcl.a\
+	$APEXPROOT/$objtype/lib/ape/libz.a\
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+#
+# No -DUSE_TCL_STUBS here either, for the reason in
+# ../../lib/itcl/mkfile: nothing is loaded on Plan 9, so itcl is bound
+# directly rather than through its stub table.
+#
+CFLAGS=-c -I$ITCLSRC/generic\
+	-I$TCLSRC/generic -I$TCLSRC/unix -I$TCLSRC/libtommath\
+	-I$APEXPROOT/sys/src/ape/lib/tcl\
+	-DHAVE_TCL_CONFIG_H -DPLAN9\
+
+$O.out: $OFILES $LIB
+	$LD $LDFLAGS -o $target $prereq
+
+#
+# THE SCRIPT LIBRARY HAS TO BE FINDABLE OR Itcl_Init FAILS. itclBase.c
+# carries an embedded Tcl script that hunts for itcl.tcl, and the entry
+# that matters here is
+#
+#	[file join [file dirname $tcl_library] itcl$patchLevel]
+#
+# With tcl_library at /sys/lib/tcl that is /sys/lib/itcl4.2.3, which is
+# where these three go. $env(ITCL_LIBRARY) is tried first and overrides
+# it, which is the way to run against a working copy without
+# installing.
+#
+# The fourth script in upstream's library/, test_Itcl_CreateObject.tcl,
+# is deliberately NOT installed: it is not in TEA_ADD_TCL_SOURCES
+# either, being a fixture for one test rather than part of the package.
+#
+# This rule installs ONLY the scripts. mkone's own install:V: already
+# copies the binary, and in Plan 9 mk every V: rule for a target runs --
+# so this appends rather than replaces, and duplicating the cp would
+# just do the same work twice. (cmd/cfront/mkfile records the same
+# idiom.)
+ITCLLIB=$APEXPROOT/sys/lib/itcl4.2.3
+
+install installall:V:
+	mkdir -p $ITCLLIB
+	cp $ITCLSRC/library/itcl.tcl $ITCLLIB
+	cp $ITCLSRC/library/itclWidget.tcl $ITCLLIB
+	cp $ITCLSRC/library/itclHullCmds.tcl $ITCLLIB
