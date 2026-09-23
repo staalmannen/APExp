@@ -87,6 +87,8 @@ testConstraint notFileSharing 1
 testConstraint linkFile 1
 testConstraint linkDirectory 1
 testConstraint testfstildeexpand [llength [info commands testfstildeexpand]]
+# APExp: symbolic links are a capability, not a platform. See the file.
+source [file join [file dirname [info script]] apexp-links.tcl]
 
 # Several tests require need to match results against the Unix username
 set user {}
@@ -1958,7 +1960,7 @@ test fCmd-18.11 {TclFileRenameCmd: rename a non-existant file} -setup {
 } -result {1 0 0}
 test fCmd-18.12 {TclFileRenameCmd : rename a symbolic link to file} -setup {
     catch {file delete -force -- tfa1 tfa2 tfa3}
-} -constraints {unix notRoot} -body {
+} -constraints {unix notRoot symlinks} -body {
     set s [createfile tfa1]
     file link -symbolic tfa2 tfa1
     file rename tfa2 tfa3
@@ -1968,7 +1970,7 @@ test fCmd-18.12 {TclFileRenameCmd : rename a symbolic link to file} -setup {
 } -result link
 test fCmd-18.13 {TclFileRenameCmd : rename a symbolic link to dir} -setup {
     catch {file delete -force -- tfa1 tfa2 tfa3}
-} -constraints {unix notRoot} -body {
+} -constraints {unix notRoot symlinks} -body {
     file mkdir tfa1
     file link -symbolic tfa2 tfa1
     file rename tfa2 tfa3
@@ -1978,7 +1980,7 @@ test fCmd-18.13 {TclFileRenameCmd : rename a symbolic link to dir} -setup {
 } -result link
 test fCmd-18.14 {TclFileRenameCmd : rename a path with sym link} -setup {
     catch {file delete -force -- tfa1 tfa2 tfa3}
-} -constraints {unix notRoot} -body {
+} -constraints {unix notRoot symlinks} -body {
     file mkdir tfa1/a/b/c/d
     file mkdir tfa2
     set f [file join [pwd] tfa1/a/b]
@@ -1991,7 +1993,7 @@ test fCmd-18.14 {TclFileRenameCmd : rename a path with sym link} -setup {
 } -result {1 0}
 test fCmd-18.15 {TclFileRenameCmd : rename a file to a symlink dir} -setup {
     catch {file delete -force -- tfa1 tfa2 tfalink}
-} -constraints {unix notRoot} -body {
+} -constraints {unix notRoot symlinks} -body {
     file mkdir tfa1
     set s [createfile tfa2]
     file link -symbolic tfalink tfa1
@@ -2002,7 +2004,7 @@ test fCmd-18.15 {TclFileRenameCmd : rename a file to a symlink dir} -setup {
 } -result 1
 test fCmd-18.16 {TclFileRenameCmd: rename a dangling symlink} -setup {
     catch {file delete -force -- tfa1 tfalink}
-} -constraints {unix notRoot} -body {
+} -constraints {unix notRoot symlinks} -body {
     file mkdir tfa1
     file link -symbolic tfalink tfa1
     file delete tfa1
@@ -2150,7 +2152,7 @@ test fCmd-21.7.1 {TclCopyFilesCmd: copy a dangling link} -setup {
 } -result {error copying "tfalink": the target of this link doesn't exist}
 test fCmd-21.7.2 {TclCopyFilesCmd: copy a dangling link} -setup {
     catch {file delete -force tfad1 tfalink tfalink2}
-} -constraints {unix notRoot} -body {
+} -constraints {unix notRoot symlinks} -body {
     file mkdir tfad1
     file link -symbolic tfalink tfad1
     file delete tfad1
@@ -2171,7 +2173,7 @@ test fCmd-21.8.1 {TclCopyFilesCmd: copy a link} -setup {
 } -result {link directory 1}
 test fCmd-21.8.2 {TclCopyFilesCmd: copy a link} -setup {
     catch {file delete -force tfad1 tfalink tfalink2}
-} -constraints {unix notRoot} -body {
+} -constraints {unix notRoot symlinks} -body {
     file mkdir tfad1
     file link -symbolic tfalink tfad1
     file copy tfalink tfalink2
@@ -2181,7 +2183,7 @@ test fCmd-21.8.2 {TclCopyFilesCmd: copy a link} -setup {
 } -result {link link 1}
 test fCmd-21.9 {TclCopyFilesCmd: copy dir with a link in it} -setup {
     catch {file delete -force tfad1 tfad2}
-} -constraints {unix notRoot} -body {
+} -constraints {unix notRoot symlinks} -body {
     file mkdir tfad1
     file link -symbolic tfad1/tfalink "[pwd]/tfad1"
     file copy tfad1 tfad2
@@ -2344,7 +2346,7 @@ test fCmd-25.3 {TclMacCopyDirectory: copying dirs between different dirs} -setup
 #
 test fCmd-26.1 {TclDeleteFilesCmd: delete symlink} -setup {
     catch {file delete -force -- tfad1 tfad2}
-} -constraints {unix notRoot} -body {
+} -constraints {unix notRoot symlinks} -body {
     file mkdir tfad1
     file link -symbolic tfalink tfad1
     file delete tfalink
@@ -2355,7 +2357,7 @@ test fCmd-26.1 {TclDeleteFilesCmd: delete symlink} -setup {
 } -result {1 0}
 test fCmd-26.2 {TclDeleteFilesCmd: delete dir with symlink} -setup {
     catch {file delete -force -- tfad1 tfad2}
-} -constraints {unix notRoot} -body {
+} -constraints {unix notRoot symlinks} -body {
     file mkdir tfad1
     file mkdir tfad2
     file link -symbolic [file join tfad2 link] [file join .. tfad1]
@@ -2366,7 +2368,7 @@ test fCmd-26.2 {TclDeleteFilesCmd: delete dir with symlink} -setup {
 } -result {1 0}
 test fCmd-26.3 {TclDeleteFilesCmd: delete dangling symlink} -setup {
     catch {file delete -force -- tfad1 tfad2}
-} -constraints {unix notRoot} -body {
+} -constraints {unix notRoot symlinks} -body {
     file mkdir tfad1
     file link -symbolic tfad2 tfad1
     file delete tfad1

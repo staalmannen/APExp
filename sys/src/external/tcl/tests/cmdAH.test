@@ -48,6 +48,8 @@ testConstraint linkDirectory [expr {
      && [lindex [file system [temporaryDirectory]] 1] eq "NTFS")
 }]
 testConstraint notWine [expr {![info exists ::env(CI_USING_WINE)]}]
+# APExp: symbolic links are a capability, not a platform. See the file.
+source [file join [file dirname [info script]] apexp-links.tcl]
 # File permissions broken on wsl without some "exotic" wsl configuration
 testConstraint notWsl [expr {[llength [array names ::env *WSL*]] == 0}]
 
@@ -1975,7 +1977,7 @@ test cmdAH-29.3.0 {Tcl_FileObjCmd: delete removes link not file} {unix nonPortab
 test cmdAH-29.3 {Tcl_FileObjCmd: type} {
     file type $gorpfile
 } file
-test cmdAH-29.4 {Tcl_FileObjCmd: type} -constraints {unix} -setup {
+test cmdAH-29.4 {Tcl_FileObjCmd: type} -constraints {unix symlinks} -setup {
     catch {file delete $linkfile}
 } -body {
     # Unlike [exec ln -s], [file link] requires an existing target

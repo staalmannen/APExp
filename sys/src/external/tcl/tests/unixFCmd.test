@@ -18,6 +18,8 @@ if {"::tcltest" ni [namespace children]} {
 catch [list package require -exact tcl::test [info patchlevel]]
 
 testConstraint testchmod [llength [info commands testchmod]]
+# APExp: symbolic links are a capability, not a platform. See the file.
+source [file join [file dirname [info script]] apexp-links.tcl]
 # File permissions broken on wsl without some "exotic" wsl configuration
 testConstraint notWsl [expr {[llength [array names ::env *WSL*]] == 0}]
 
@@ -192,7 +194,7 @@ test unixFCmd-2.2.1 {TclpCopyFile: src is symlink} -setup {
 } -result file
 test unixFCmd-2.2.2 {TclpCopyFile: src is symlink} -setup {
     cleanup
-} -constraints {unix notRoot} -body {
+} -constraints {unix notRoot symlinks} -body {
     # copying links should end up with the links copied
     close [open tf1 a]
     file link -symbolic tf2 tf1

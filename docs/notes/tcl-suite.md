@@ -6310,3 +6310,228 @@ what `chan configure stdout -buffering` says and what
 that stops at `8.1`, so their actual output is not in hand. *A test
 whose failure text has not been seen is not a test that has been read* --
 that is what `env`'s nine cost. They wait for the next full run.
+
+#### 136 -> 96: forty gone, none broken, and every one of them named
+
+```
+all.tcl:	Total 68118  Passed 62130  Skipped 5892  Failed 96
+Sourced 167 Test Files.   marker present, exit 0
+```
+
+`Total` identical, `Skipped` **+5 exactly** -- the five symbolic-link
+tests the `fileName.test` probe now skips -- `Passed` +35, and the
+per-name diff against the 136 run has **forty in the fixed column and
+nothing in the new column**. The four library tests agree:
+`nbread-test` 0 failures, `epipe-test` 0 failures with
+`plan 9 says: i/o on hungup channel` printed beside EPIPE, and
+`listenleak-test` reports **mark 8**, so the installed library is the
+one that was pulled.
+
+**All forty account for:**
+
+| what | how many |
+|---|---|
+| `O_NONBLOCK` on a regular file: `32.7`, `32.8`, `35.4`, `36.5`, `36.6`, `39.9`, both APIs | 12 |
+| `6.47` and `8.1`, both APIs -- the `PeekAhead()` reading | 4 |
+| `29.27`, both APIs -- ESHUTDOWN -> EPIPE | 2 |
+| `filename` litter and its five skips | 16 |
+| **`io`'s encoding tests, which were on the unread list** | 6 |
+
+**The last row is the one worth keeping.** The previous note said: *if
+`Failed` falls by more than predicted, something in the untouched groups
+shared the cause and the reading was incomplete.* It did, and it was:
+`io-75.6.3`, `io-75.6.4`, `io-75.11`, `io-75.13`, `io-bug-73bb42fb-1`
+and `io-bug-73bb43fb-2` all went with the rest, having never been
+opened. They are `io`-only, with no `chan-io` twins, which is why the
+cluster arithmetic never put them with the others. **The refutation
+condition was written down, it fired, and it pointed at the right six.**
+
+**And the raised prediction held.** `6.47`/`8.1` were called for this
+run *from reading `PeekAhead()`*, before the measurement, on the
+argument that Tcl makes a blocking channel non-blocking for one read.
+Both passed, in both files. `io` went 23 -> 10 and `chan-io` 19 -> 10,
+against the 15 and 11 predicted -- better by the six encoding tests.
+
+**The EPIPE change is confirmed twice, and the second way is the more
+useful.** `29.27` passes in both files; and `io-29.33b`, which still
+fails, changed its message:
+
+```
+was:	error writing "stdout": cannot send after transport endpoint shutdown
+now:	error writing "stdout": broken pipe
+```
+
+So the mapping demonstrably reaches the code, and `29.33b` is a
+*different* bug that the wrong errno had been dressing up as a socket
+problem. It writes 640KB to a non-blocking stdout whose reader sleeps
+two seconds and expects no failure at all; EPIPE says the pipe is
+closed, not full. Recorded, not diagnosed.
+
+**One correction to my own note.** `40.3` was written up as giving
+`0o664` in a `0775` directory. The log says **`0o644`**. The mechanism
+is the one described -- Plan 9's file server hands out
+`perm & (dirperm | ~0666)` and there is no umask to consult -- but the
+number was a guess dressed as a measurement, and the directory is 0755.
+*A number that was not read off the machine should not be written as
+though it was.*
+
+#### What the 96 are, now that the log has been read rather than counted
+
+`fCmd` 22, `io` 10, `chan-io` 10, `env` 9, **`zipfs` 13**, `expr` 5,
+`socket_inet` 4, `cmdAH` 4, `lseq` 3, `exec` 3, and eleven singletons.
+Three groups are newly read.
+
+**`zipfs` 13 is ten plus three, and the ten are two `#define`s.**
+Every `zipfs-file-stat-*` and `zipfs-file-lstat-*` compares the whole
+key list of `file stat` with a regexp, and ours is two keys short:
+
+```
+was:	atime .. ctime .. dev 0 gid 0 ino 0 mode 16749 mtime .. nlink 0 size 0 type directory uid 0
+want:	atime .. blksize 0 blocks 0 ctime .. dev 0 ...
+```
+
+`tclCmdAH.c`'s `StoreStatData` wraps them in
+`HAVE_STRUCT_STAT_ST_BLKSIZE` and `HAVE_STRUCT_STAT_ST_BLOCKS`, and
+APExp's hand-maintained `sys/src/ape/lib/tcl/tclConfig.h` declared
+neither -- **while APE's `struct stat` has had both fields all along and
+`plan9/dirtostat.c` fills both**. So this is not a missing capability,
+it is a capability not declared: `file stat` has been returning a
+dictionary two keys short of every POSIX platform, for every program,
+not only in tests. Both are defined now.
+
+**`st_rdev` is deliberately NOT declared**, although the field exists
+and Tcl has a third guard for it. `dirtostat.c` sets it to 0
+unconditionally, because Plan 9 has no minor number to report. *A field
+that is always zero reads as information and is not*; leaving it out
+says "this platform has no such thing", which is true. Prediction:
+`zipfs` 13 -> 3. The three that remain are `invalid password` from
+zipfs's own cipher and are unrelated.
+
+**`14.1`/`14.2` are four tests and one line, and they are a probe rather
+than a diagnosis.** The failure text finally came with a complete log:
+
+```
+was:	line line line
+want:	line line none
+```
+
+**stderr's buffering is `line` and must be `none`.** And
+`tclUnixChan.c`'s `TclpGetDefaultStdChannel` asks for exactly that --
+`bufMode = "none"` for `TCL_STDERR`, then
+`Tcl_SetChannelOption(NULL, channel, "-buffering", bufMode)`. So either
+that call fails (it is passed a NULL interp, so a failure is silent) or
+something afterwards resets it. Reading further would be guessing: the
+channel exists and is a `file` channel (`testchannel open` says
+`file0 file1 file2`, so `isatty` is answering correctly and this is not
+the tty path). **One line settles it**, and it belongs in the next run:
+
+```
+echo 'puts [list [fconfigure stderr -buffering] [fconfigure stdout -buffering]]' >/tmp/b.tcl
+tclsh /tmp/b.tcl              # at a terminal
+tclsh /tmp/b.tcl >/tmp/b.out 2>&1   # redirected, as the suite runs it
+```
+
+If both say `line` when redirected and `none` at a terminal, the
+difference is the redirect and the next question is `TclOSseek(2,...)`;
+if it says `line` either way, the `Tcl_SetChannelOption` call is
+failing and the question is which check inside it says no.
+
+**`cmdAH` 4 read in full: two symlink, two ours.**
+
+- **`cmdAH-25.3`: `file owned /` answers 1, and should answer 0.**
+  `file owned` compares `st_uid` against `geteuid()`, and
+  `plan9/dirtostat.c` gets `st_uid` from `_getpw()`, which parses
+  **`/adm/users`**. That is a fossil/kenfs file; a 9front terminal on
+  hjfs or cwfs need not have one, and when `_getpw` cannot open it the
+  function returns 0 and `dirtostat` leaves the `s->st_uid = 1` it set
+  as a default. **Then every file on the system has uid 1, everything
+  is owned by whoever geteuid() says, and `file owned` is a constant.**
+  That is a one-command probe (`ls -l /adm/users`) before anything is
+  written, and if it is the cause the honest repair is to compare the
+  Dir's owner *string* against `/dev/user` rather than to invent a
+  password database.
+- **`cmdAH-20.5`: `file atime $f $newatime` does not take.** The value
+  read back is two seconds later than the one set, which is the
+  *current* time -- so the wstat either did not carry the atime or was
+  ignored. `utime()` has been wrong here before, and `ratrace` named
+  that one in a single run where six readings of the source did not.
+
+**`chan-io-28.7` is one test and is ours**: `close $s w` on a socket --
+a half-close -- and the far end then reads `{}` where it should read
+`{Hey DONE}`. The bytes written before the half-close did not arrive.
+`shutdown()` is in this file's list of stubs that answered the wrong
+thing once already.
+
+#### The symlink constraint, done properly: one probe file, and a name of our own
+
+Authorised this round: *"it is OK to patch the test files that look for
+symlinks to be ignored by Windows AND Plan 9."* The previous round had
+patched only `fileName.test`, on the narrow ground that its five
+failures **contaminated eleven others**, and had deliberately left
+`fCmd.test` and `cmdAH.test` alone because their symlink tests fail
+honestly. With the wider permission the right shape is one file,
+`tests/apexp-links.tcl`, sourced by the five test files that need it.
+
+**Eighteen tests, and only four of them declared what they needed.**
+
+| file | tests | already constrained? |
+|---|---|---|
+| `fCmd` `18.12`-`18.16`, `21.7.2`, `21.8.2`, `21.9`, `26.1`-`26.3` | 11 | no -- `{unix notRoot}` |
+| `fCmd` `28.9`, `28.21`, `28.22` | 3 | yes (`linkFile`/`linkDirectory`) |
+| `cmdAH-29.4` | 1 | no -- `{unix}` |
+| `cmdAH-29.4.1` | 1 | yes (`linkDirectory`) |
+| `chan-io-41.8` | 1 | no -- `{fileevent unix}` |
+| `unixFCmd-2.2.2` | 1 | no -- `{unix notRoot}` |
+
+Upstream guards the `file link` **API** tests and not the tests that
+merely *use* a link, because on every unix it builds on there was never
+a reason to. So the four constrained ones need the constraint turned
+off and the fourteen others need a constraint at all.
+
+**A name of our own, and that is the interesting part.** The first
+version tried to tell "this file never declared `linkFile`" from "this
+file declared it 0", so that it could default the former to 1. It
+cannot be done, and the host tclsh said so in one run: `linkFile` and
+`symbolicLinkFile` came back **0 on a machine that has symbolic links**.
+`tcltest` puts a read trace on the array --
+
+```tcl
+# Side effects:
+#	sets testConstraints($n2) to 0 if it's referenced but never
+#       before used
+proc tcltest::SafeFetch {n1 n2 op} { ... }
+```
+
+-- so *looking* creates the entry as 0, and absent and false are the
+same observation. Reading `SafeFetch` after the run confirmed what the
+run had already shown. **Had this gone to the VM instead, fourteen
+tests would have been silently skipped on Linux too and the constraint
+would have looked like it worked.**
+
+So `apexp-links.tcl` declares **`symlinks`**, which is APExp's name and
+collides with nothing (checked), sets it from the probe, and touches
+upstream's three constraints **only when the probe fails**. On a system
+that has links it changes nothing at all: `symlinks` is 1 and
+`linkDirectory`, `linkFile` and `symbolicLinkFile` are left exactly as
+the test file left them, so nothing Windows disabled can be switched
+back on. Both branches were run on the host tclsh -- a file that had
+declared `linkDirectory 0` keeps 0, and the forced branch takes all
+four to 0.
+
+**Prediction: `Failed` 96 -> 78, `Skipped` up by exactly 18**, `Total`
+unchanged, and nothing moves in the other direction. `fCmd` 22 -> 8
+(the eight `~USER` tests, which are a different question), `cmdAH` 4 ->
+2, `chan-io` 10 -> 9, `unixFCmd` 2 -> 1. **What would refute it**: a
+`Skipped` rise of anything other than 18, or any test that is neither
+skipped nor still failing -- a symlink test that starts *passing* would
+mean the probe answered yes and something else is wrong.
+
+#### Tk moved by one, and that is the whole point of the datapoint
+
+`grep -c FAILED` on Tk's log went 356 -> 354, which is 178 -> **177**:
+two lines per failure. So the whole Tcl campaign -- forty tests this
+round, eighty-seven in all -- bought Tk exactly one. That is not
+disappointing, it is *information*: it says Tk's remaining 177 do not
+share a cause with Tcl's, and the three-item Tk list can be worked on
+without waiting for Tcl to finish. Tcl was one of those three items and
+is now effectively off it.

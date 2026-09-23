@@ -45,6 +45,21 @@
 #define	HAVE_STDLIB_H	1
 #define	HAVE_STRING_H	1
 #define	HAVE_STRTOL	1
+/*
+ * APE's struct stat carries st_blksize and st_blocks, and plan9/dirtostat.c
+ * fills both from the Dir -- 8192 and (length+511)/512. Without these two
+ * names Tcl's StoreStatData silently leaves the fields out, so `file stat'
+ * returned a dictionary two keys short of the one POSIX platforms return.
+ * Thirteen of zipfs.test's failures were that and nothing else: they match
+ * the whole key list with a regexp.
+ *
+ * st_rdev is NOT declared here although the field exists, because
+ * dirtostat.c sets it to 0 unconditionally -- there is no minor number to
+ * report on Plan 9. A field that is always zero reads as information and is
+ * not; leaving it out says "this platform has no such thing", which is true.
+ */
+#define	HAVE_STRUCT_STAT_ST_BLKSIZE	1
+#define	HAVE_STRUCT_STAT_ST_BLOCKS	1
 #define	HAVE_SYS_IOCTL_H	1
 #define	HAVE_SYS_PARAM_H	1
 #define	HAVE_SYS_SELECT_H	1
