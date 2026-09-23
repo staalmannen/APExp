@@ -20,7 +20,7 @@
  * C says FLT_MAX, FLT_MIN and FLT_EPSILON have type FLOAT. Without the
  * suffix they are doubles holding the nearest double to a rounded
  * decimal -- so `(double) FLT_MAX' was 3.4028234999999998e+38 where
- * the real FLT_MAX is 3.4028234663852886e+38, about 3e31 too big.
+ * the real FLT_MAX is 3.4028234663852886e+38, about 3.4e30 too big.
  *
  * Tcl's binary-53.25 and binary-53.26 are what found it.
  * tclBinary.c's FormatNumber decides whether a double overflows the

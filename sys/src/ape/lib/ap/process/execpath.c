@@ -27,12 +27,22 @@
  * The ENOEXEC-means-run-it-as-a-shell-script rule is not implemented,
  * as it was not before.
  *
- * Each candidate is checked with access(X_OK) before exec is attempted,
- * because in APE a failed execve() is not free: it has already done
- * _RFORK(RFCENVG), rewritten /env/_fdinfo and /env/_sighdlr, and closed
- * every FD_CLOEXEC descriptor by the time the exec itself is tried.  A
- * search that blindly exec'd each candidate would pay all of that once
- * per PATH element.
+ * Each candidate is checked with access(X_OK) before exec is attempted.
+ * That used to be load-bearing: a failed execve() had already done
+ * _RFORK(RFCENVG), rewritten /env/_fdinfo and /env/_sighdlr and closed
+ * every FD_CLOEXEC descriptor by the time the exec itself was tried, so
+ * a search that blindly exec'd each candidate paid all of that once per
+ * PATH element -- and the FIRST such failure left the caller without the
+ * descriptors and environment it still needed.
+ *
+ * execve now opens the file with OEXEC before it touches anything, so
+ * the common failure is free there too and this check is no longer the
+ * only thing standing between a PATH search and a wrecked process.  It
+ * stays because it is still the cheaper of the two and because it is
+ * what distinguishes EACCES from ENOENT for the errno POSIX asks for
+ * here.  Note that the check only happens when a search happens: a name
+ * containing '/' is used as given, which is why the protection had to
+ * move into execve rather than be extended here.
  *
  * If PATH is unset, "/bin" is used -- the same place the old code
  * looked.  /bin is also tried as a last resort when PATH is set but

@@ -865,17 +865,61 @@ Open, in order of what the next run should touch:
 - **`chan-io-28.7`, one test and ours**: `close $s w` (half-close) and
   the far end reads `{}` where it should read `{Hey DONE}`. `shutdown()`
   is already in this tree's list of stubs that answered the wrong thing.
-- **Still unread**: `expr` 5, `socket_inet` 4, `lseq` 3, `exec` 3, and
+- **`lseq-4.21.4`, read and not diagnosed.** Eight cases; the first
+  five raise `domain error` correctly and the last three do not. The
+  discriminator is not NaN as such -- `lseq NaN count 5` and
+  `lseq NaN count 5 by 100` both raise -- it is **`by NaN`**, which
+  turns the error OFF even for `lseq NaN count 5 by NaN`, where the
+  start alone was enough a line earlier. So a NaN step takes a
+  different path in `tclArithSeries.c` rather than a NaN check being
+  broken, and the next step is to read that path before blaming an
+  `isnan` here. `expr`'s five and `lseq`'s other two went with
+  `scalbn`.
+- **Still unread**: `socket_inet` 4 and
   eleven singletons (`io-29.33b`, `io-52.22.1`, `chan-io-41.8`,
   `scan-15.1`, `event-1.1`, `unixInit-1.2`, `Tcl_Main-5.10`,
   `socket-14.19`, `expr-old-37.21`, `unixFCmd-2.2.2`).
 - **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a
   password database mapping a user to a home directory, which Plan 9
   has not -- read it before writing it off.
-- **A failed `execve()` leaves `/env` empty**, on top of rewriting
-  `_fdinfo`/`_sighdlr` and closing every `FD_CLOEXEC` descriptor. This
-  is old, not new: `_RFORK(RFCENVG)` on its first line is what empties
-  it. `environ` is untouched, so it is bounded.
+- **A failed `execve()` destroyed the caller -- FIXED, not measured
+  yet, and it was the whole `exec` cluster.** POSIX: "If the exec
+  function returns to the calling process image, an error has occurred;
+  ... the process image is unchanged." libap's did the opposite --
+  `_RFORK(RFCENVG)` on its first line, then `/env/_fdinfo` and
+  `/env/_sighdlr` rewritten, then every `FD_CLOEXEC` descriptor closed,
+  all before `_EXEC` was so much as tried. **`exec-10.20.1`/`10.21.1`
+  are what that costs**: Tcl's child reports a failed exec down an
+  error pipe whose *closing* is how the parent tells success from
+  failure -- so it is close-on-exec, so libap had already closed it,
+  so the write got EBADF and Tcl panicked `unable to write to
+  errPipeOut` instead of naming the missing program. Now `execve`
+  **opens the file `OEXEC` first** -- which is the same question Plan
+  9's own exec asks, `namec(..., Aopen, OEXEC, 0)` -- and returns
+  with nothing touched if that fails; and the `FD_CLOEXEC` closes moved
+  from the first loop to immediately before `_EXEC`. **Not a
+  guarantee**: an exec can still fail *after* a successful open, and
+  that case is as destructive as the whole function used to be.
+  `_execpath` already did this with `access(X_OK)`, **but only when it
+  searches** -- a name containing `/` is used as given, and
+  `~non_existent_user/foo/bar` is such a name, which is why the check
+  had to move into `execve`. `execfail-test.c` asks it without Tcl,
+  and its **section 5 is the control that matters**: "never close them"
+  passes everything else and breaks `FD_CLOEXEC` for every program in
+  the tree. `_execmark()` is the version marker, as `_sock_listenmark`
+  is for the listener fix.
+- **`exec-19.1` is the append race, and it is a platform limit.** Four
+  shells `>>` the same file; the test checks only the SIZE, so 24
+  against 26 cannot distinguish "truncated at open, losing the seeded
+  two bytes" from "one two-byte `echo` lost to an overlapping append".
+  `append-test.c` asks the two separately. Plan 9 has no `O_APPEND`:
+  9P's `Twrite` carries an explicit offset and there is no write-at-end
+  request, so libap emulates it with a seek in `open()` and another in
+  `write()` -- **two calls with a window between them**, which is
+  exactly what the test is built to catch. Plan 9's one atomic append
+  is `DMAPPEND`, a permanent mode bit on the **file**; setting it would
+  change that file for every other program and every later open, which
+  is not what `O_APPEND` means for a descriptor. Recorded, not fixed.
 - **libap's `strtod` is now Gay's, and it is CORRECT**: `strtod-xcheck`
   against glibc gives **0 wrong** in all four sections -- 199887
   round-trips through `%.17g`, the 629 powers of ten, the seven strings
@@ -952,7 +996,7 @@ Open, in order of what the next run should touch:
   `float_arch.h` wrote them with **no `F` suffix** -- so each was a
   double holding the nearest double to a rounded decimal.
   `(double)FLT_MAX` came out `3.4028234999999998e+38` against a true
-  `3.4028234663852886e+38`, about 3e31 too big, so the boundary Tcl
+  `3.4028234663852886e+38`, about 3.4e30 too big, so the boundary Tcl
   computes (`FLT_MAX + 2^103`) sat above the value the test feeds it
   and `binary format R` wrote FLT_MAX where +Inf was required. Fixed
   with the suffix and full precision.
@@ -964,6 +1008,25 @@ Open, in order of what the next run should touch:
   outside -- the `/$objtype/include/ape` shadowing invariant is exactly
   that trap. Predict `Failed` 56 -> 54; refuted if the marker says the
   header read was not this tree's.
+  **The prediction was refuted, and not the way the file allowed for**:
+  `binfloat-test` gives **0 failures** with the marker saying THIS
+  TREE, and `Failed` stayed at **56**. A freshly compiled translation
+  unit has the right constant and `tclBinary.$O` does not -- which is
+  the `mk distclean` rule, met for the first time in a measurable form.
+  **A marker cannot settle this**, and that is the general point:
+  editing a file is what makes `mk` recompile it, so a marker added to
+  `tclStrToD.c` would report a fresh header while the stale object sat
+  beside it. **`tcl-fltmax-probe.tcl` reads the object as it stands**
+  -- `binary format R` answers +Inf exactly above `FLT_MAX + 2^103`,
+  so bisecting on the BIT PATTERN recovers the compiled-in `FLT_MAX`
+  exactly, and the probe prints the constant rather than a verdict.
+  Checked on the host first, which earned its keep twice: `binary
+  format Q` takes a **double**, not a bit pattern (`W` then `Q` is the
+  reinterpretation), and **tclsh 8.6 has no +Inf arm at all** -- it
+  clamps everything to FLT_MAX, so the host cannot validate this and
+  the probe says so instead of reporting a false (a). Both arms were
+  then exercised against a modelled `FormatNumber`, because the arm
+  that matters never ran on the host.
 - **9front has no symbolic links** (confirmed by grep), so `symlink()`
   stays ENOSYS. **Do not emulate it with a copy** -- see
   `docs/notes/tcl-suite.md`. **`tests/apexp-links.tcl` is the one probe

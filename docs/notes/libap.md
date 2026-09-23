@@ -280,6 +280,103 @@ close-on-exec report pipe is gone before exec is attempted, so an exec failure
 surfaces only as the child exiting 127. POSIX leaves that unspecified;
 glibc reports it, APE does not.
 
+### process/ — a failed execve destroyed the caller
+
+POSIX is unusually blunt about this: *"If the exec function returns to
+the calling process image, an error has occurred; ... the process image
+is unchanged."* libap's `execve` did the opposite. Before `_EXEC` was so
+much as attempted it had
+
+- run `_RFORK(RFCENVG)`, which creates an **empty** environment group
+  (the `C` is *clear*; `RFENVG` is the one that copies), so the caller
+  had no environment left;
+- rewritten `/env/_fdinfo` and `/env/_sighdlr`;
+- **closed every `FD_CLOEXEC` descriptor**, zeroing its `_fdinfo` entry.
+
+None of that can be undone, so a caller that got control back was a
+different process from the one that made the call.
+
+**What it cost: Tcl's `exec-10.20.1` and `exec-10.21.1`.**
+
+	exec ~non_existent_user/foo/bar
+	  wanted: couldn't execute "~non_existent_user/foo/bar":
+		  no such file or directory
+	  got:    TclpCreateProcess: unable to write to errPipeOut
+
+`TclpCreateProcess` forks, execs, and on failure writes the reason down
+an error pipe for the parent. That pipe is close-on-exec **because its
+closing is how the parent tells a successful exec from a failed one** --
+EOF means the exec took. So libap had already closed it, the child's
+`write` got EBADF, and `Tcl_Panic` fired. The actual error, which is the
+only thing the test is asking about, was never sent.
+
+**The fix is a preflight.** `execve` now opens the file with `OEXEC`
+before touching anything, and returns `-1` with that errno if the open
+fails. This is the same question Plan 9's own exec asks -- `namec(file,
+Aopen, OEXEC, 0)` -- of the same namespace, so a missing file, a
+directory, a file without execute permission and an unreachable path all
+fail here for free. The `FD_CLOEXEC` closes also moved from the first
+loop to immediately before `_EXEC`: they cannot be avoided (Plan 9 has
+no close-on-exec for a descriptor not opened `OCEXEC`, and
+`fcntl(F_SETFD)` cannot add it afterwards), so the only thing available
+is to do them as late as possible.
+
+**Not a guarantee, and worth saying rather than implying.** An exec can
+still fail *after* a successful open -- a bad binary format, or the file
+changing underneath -- and that case is exactly as destructive as the
+whole function used to be. What the preflight buys is that the
+overwhelmingly common failure, "no such file", is free.
+
+**`_execpath` already did this and it was not enough**, which is the
+part worth remembering. It checks each PATH candidate with
+`access(X_OK)` before exec'ing it, and its comment said why. But it only
+checks *when it searches*: a name containing `/` is used as given, with
+no search and no check -- and `~non_existent_user/foo/bar` is such a
+name. A guard placed at the call site covers the call sites it knows
+about.
+
+`sys/lib/tests/execfail-test.c` asks all of it without Tcl in the way.
+**Section 5 is the control and is not optional**: "stop closing
+close-on-exec descriptors" passes every other section and breaks
+`FD_CLOEXEC` for every program in the tree, Tcl included -- its parent
+would wait for an EOF that never came. It checks a *successful* exec
+still closes them, through the same pipe-EOF mechanism Tcl uses.
+`_execmark()` is the library version marker, the same idiom as
+`_sock_listenmark()` and for the same reason: `pcc -o x x.c` links
+against the installed library, so the test declares it `extern` and an
+old libap fails to **link** rather than passing quietly.
+
+### fcntl/, unistd/ — O_APPEND is not atomic, and cannot be
+
+Tcl's `exec-19.1` appends to one file from four shells at once and
+checks the size. It wants 26 and gets 24. Its own comment says what it
+is for: *"Check that no bytes have got lost through mixups with
+overlapping appends."*
+
+**Plan 9 has no `O_APPEND`.** 9P's `Twrite` carries an explicit offset;
+there is no write-at-the-end request for an ordinary file. libap
+emulates it with `_SEEK(fd, 0, 2)` in `fcntl/open.c` once at open, and
+again in `unistd/write.c` before every write. That is **two calls with a
+window between them**, so two processes can both seek to N and both
+write at N. `exec-19.1` puts a `sleep 1` between echoes, which makes
+four shells wake on the same second boundary -- the collision is the
+thing it is provoking.
+
+**The size alone cannot say which bug it is**, which is why
+`sys/lib/tests/append-test.c` exists rather than a second reading of the
+test: 24 is equally consistent with the file being truncated at open
+(losing the two seeded bytes) and with one two-byte `echo` being lost.
+Sections 2 and 3 ask those separately, and section 3 uses 256 rounds
+rather than three, because a clean run with a handful of writes means
+"they never overlapped" just as readily as "they cannot overlap" -- *a
+negative result with two explanations is not a result.*
+
+**Not fixed, and deliberately.** Plan 9's one atomic append is
+`DMAPPEND`, a permanent mode bit on the **file**. Setting it would change
+that file for every other program and every later open, which is not
+what `O_APPEND` means for a descriptor. This is the same shape as
+`symlink()`: do not invent semantics to make a test pass.
+
 ### process/ — posix_spawn honours file actions
 
 `sys/src/ape/lib/ap/process/posix_spawn.c` was fork+exec with every file
@@ -690,7 +787,7 @@ failing test cannot tell them apart. The run:
   FAIL  binary format R of that double is +Inf
 ```
 
-**The real FLT_MAX is 3.4028234663852886e+38.** APE's was about 3e31
+**The real FLT_MAX is 3.4028234663852886e+38.** APE's was about 3.4e30
 too big, so the boundary Tcl computes -- `FLT_MAX + 2^103` -- sat
 *above* the value `binary-53.25` feeds it, and `binary format R` wrote
 FLT_MAX where it had to write +Inf.

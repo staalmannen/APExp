@@ -7,6 +7,25 @@
 
 extern char **environ;
 
+/*
+ * Which libap is actually linked in.
+ *
+ * `pcc -o x x.c' links against the INSTALLED library, so a test built
+ * from a fresh pull can be running days-old library code and say
+ * nothing about it -- a measurement of a build that does not contain
+ * the change measures nothing. execfail-test declares this extern for
+ * itself, so an old libap fails to LINK rather than passing quietly.
+ * The same idiom as _sock_listenmark(); bump it whenever this file
+ * changes in a way a test has to be able to see.
+ *
+ *	1  the preflight open, and the FD_CLOEXEC closes moved last
+ */
+int
+_execmark(void)
+{
+	return 1;
+}
+
 int
 execve(const char *name, const char *argv[], const char *envp[])
 {
@@ -15,6 +34,51 @@ execve(const char *name, const char *argv[], const char *envp[])
 	Fdinfo *fi;
 	unsigned long flags;
 	char buf[1024];
+
+	/*
+	 * PREFLIGHT, BEFORE ANYTHING IS DESTROYED.
+	 *
+	 * POSIX: "If the exec function returns to the calling process
+	 * image, an error has occurred; ... the process image is
+	 * unchanged."  Everything below this point changes it -- the
+	 * environment group is cleared, /env/_fdinfo and /env/_sighdlr are
+	 * rewritten, and every FD_CLOEXEC descriptor is closed -- and none
+	 * of it can be undone once _EXEC has declined to happen.
+	 *
+	 * Tcl's exec-10.20.1 is what this costs in practice.  Its child
+	 * forks, execs a program that does not exist, and reports the
+	 * failure down an error pipe that the parent reads; the pipe is
+	 * close-on-exec, which is precisely how the parent tells success
+	 * from failure.  By the time execvp returned, that pipe had been
+	 * closed underneath it, so the write got EBADF and Tcl panicked
+	 * with "unable to write to errPipeOut" instead of saying which
+	 * program was missing.
+	 *
+	 * Plan 9's exec opens the file with OEXEC itself (namec(..., Aopen,
+	 * OEXEC, 0)), so opening it that way here asks the same question of
+	 * the same namespace and answers it without touching anything: a
+	 * missing file, a directory, a file without execute permission and
+	 * an unreachable path all fail here, with the errno the caller
+	 * wanted, and the process carries on exactly as it was.
+	 *
+	 * This is not a guarantee, and saying so rather than implying it:
+	 * an exec can still fail after a successful open -- a bad binary
+	 * format, or the file changing underneath -- and that case is as
+	 * destructive as the whole function used to be.  What it does is
+	 * make the overwhelmingly common failure, "no such file", free.
+	 *
+	 * _execpath does the same thing with access(X_OK) for each PATH
+	 * candidate, but only when it searches: a name containing '/' is
+	 * used as given, with no search and no check, and
+	 * `~non_existent_user/foo/bar' is such a name.  Checking here
+	 * covers both routes and every direct caller of execve besides.
+	 */
+	n = _OPEN(name, OEXEC);
+	if(n < 0){
+		_syserrno();
+		return -1;
+	}
+	_CLOSE(n);
 
 	/*
 	 * RFCENVG IS ALREADY THE CLEAR. The `C' in RFCENVG, RFCNAMEG and
@@ -47,10 +111,18 @@ execve(const char *name, const char *argv[], const char *envp[])
 			continue;
 		fi = &_fdinfo[i];
 		flags = fi->flags;
+		/*
+		 * FD_CLOEXEC descriptors are LEFT ALONE HERE and closed in
+		 * the loop at the end, immediately before _EXEC.  They used
+		 * to be closed on this pass, which is the earliest possible
+		 * moment and the one with the most left to go wrong after
+		 * it; the closing has to happen before the exec and cannot
+		 * be undone, so the only thing available is to do it as late
+		 * as possible.  They are simply omitted from /env/_fdinfo,
+		 * which is what makes them close-on-exec for the child.
+		 */
 		if(flags&FD_CLOEXEC){
-			_CLOSE(i);
-			fi->flags = 0;
-			fi->oflags = 0;
+			continue;
 		}else if(flags&FD_ISOPEN){
 			if(f < 0)
 				continue;
@@ -148,6 +220,24 @@ execve(const char *name, const char *argv[], const char *envp[])
 			}
 		}
 	}
+	/*
+	 * LAST, and as close to _EXEC as it can be got.  Plan 9 has no
+	 * close-on-exec for a descriptor that was not opened with OCEXEC,
+	 * and fcntl(F_SETFD) cannot add it after the fact, so FD_CLOEXEC
+	 * is implemented by closing them by hand.  Nothing between here
+	 * and _EXEC can fail, so a caller that gets control back has lost
+	 * its close-on-exec descriptors only in the case where _EXEC
+	 * itself refused a file this function has already opened.
+	 */
+	for(i = 0; i < OPEN_MAX; i++){
+		fi = &_fdinfo[i];
+		if(fi->flags&FD_CLOEXEC){
+			_CLOSE(i);
+			fi->flags = 0;
+			fi->oflags = 0;
+		}
+	}
+
 	n = _EXEC(name, argv);
 	_syserrno();
 	return n;
