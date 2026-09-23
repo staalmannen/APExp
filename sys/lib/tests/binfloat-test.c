@@ -156,7 +156,7 @@ main(void)
 	/*
 	 * This section is the answer, added after the first run. FLT_MAX
 	 * came back as 3.4028234999999998e+38 where the real one is
-	 * 3.4028234663852886e+38 -- about 3e31 too big -- so the
+	 * 3.4028234663852886e+38 -- about 3.4e30 too big -- so the
 	 * threshold in section 3 sat ABOVE the value the test feeds it
 	 * and `binary format R' wrote FLT_MAX instead of +Inf.
 	 *

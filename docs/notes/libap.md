@@ -690,7 +690,7 @@ failing test cannot tell them apart. The run:
   FAIL  binary format R of that double is +Inf
 ```
 
-**The real FLT_MAX is 3.4028234663852886e+38.** APE's was about 3e31
+**The real FLT_MAX is 3.4028234663852886e+38.** APE's was about 3.4e30
 too big, so the boundary Tcl computes -- `FLT_MAX + 2^103` -- sat
 *above* the value `binary-53.25` feeds it, and `binary format R` wrote
 FLT_MAX where it had to write +Inf.

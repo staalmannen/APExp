@@ -952,7 +952,7 @@ Open, in order of what the next run should touch:
   `float_arch.h` wrote them with **no `F` suffix** -- so each was a
   double holding the nearest double to a rounded decimal.
   `(double)FLT_MAX` came out `3.4028234999999998e+38` against a true
-  `3.4028234663852886e+38`, about 3e31 too big, so the boundary Tcl
+  `3.4028234663852886e+38`, about 3.4e30 too big, so the boundary Tcl
   computes (`FLT_MAX + 2^103`) sat above the value the test feeds it
   and `binary format R` wrote FLT_MAX where +Inf was required. Fixed
   with the suffix and full precision.
@@ -964,6 +964,25 @@ Open, in order of what the next run should touch:
   outside -- the `/$objtype/include/ape` shadowing invariant is exactly
   that trap. Predict `Failed` 56 -> 54; refuted if the marker says the
   header read was not this tree's.
+  **The prediction was refuted, and not the way the file allowed for**:
+  `binfloat-test` gives **0 failures** with the marker saying THIS
+  TREE, and `Failed` stayed at **56**. A freshly compiled translation
+  unit has the right constant and `tclBinary.$O` does not -- which is
+  the `mk distclean` rule, met for the first time in a measurable form.
+  **A marker cannot settle this**, and that is the general point:
+  editing a file is what makes `mk` recompile it, so a marker added to
+  `tclStrToD.c` would report a fresh header while the stale object sat
+  beside it. **`tcl-fltmax-probe.tcl` reads the object as it stands**
+  -- `binary format R` answers +Inf exactly above `FLT_MAX + 2^103`,
+  so bisecting on the BIT PATTERN recovers the compiled-in `FLT_MAX`
+  exactly, and the probe prints the constant rather than a verdict.
+  Checked on the host first, which earned its keep twice: `binary
+  format Q` takes a **double**, not a bit pattern (`W` then `Q` is the
+  reinterpretation), and **tclsh 8.6 has no +Inf arm at all** -- it
+  clamps everything to FLT_MAX, so the host cannot validate this and
+  the probe says so instead of reporting a false (a). Both arms were
+  then exercised against a modelled `FormatNumber`, because the arm
+  that matters never ran on the host.
 - **9front has no symbolic links** (confirmed by grep), so `symlink()`
   stays ENOSYS. **Do not emulate it with a copy** -- see
   `docs/notes/tcl-suite.md`. **`tests/apexp-links.tcl` is the one probe
