@@ -25,5 +25,14 @@ CFLAGS=$CFLAGS -I.
 <$APEXPROOT/sys/src/cmd/mksyslib
 
 # Install the public headers so vts (engine.c) can find them.
+#
+# NOTE THAT BOTH COPIES ARE TRACKED IN GIT -- these three files exist
+# here AND in sys/src/../sys/include, and nothing runs this target
+# automatically, so an edit to one of them silently leaves the other
+# behind. vts compiles with -I$APEXPROOT/sys/include and libvterm with
+# -I., so they would then be compiled against different declarations,
+# and with kencc's type signatures on (-T, from 9front's own CFLAGS)
+# that is a link error rather than a quiet mismatch. Keep them
+# identical, or run this target after editing.
 installheaders:V:
 	cp vterm.h vterm_keycodes.h vtcompat.h $APEXPROOT/sys/include

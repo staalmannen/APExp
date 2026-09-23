@@ -570,6 +570,14 @@ the index, so that nothing here is a surprise.
 - `RFCENVG`, `RFCNAMEG` and `RFCFDG` create **empty** groups; the `C` is
   *clear*. `RFENVG`, `RFNAMEG` and `RFFDG` are the ones that copy. So
   `execve` has no environment at all after its first line.
+- **kencc's type signatures follow POINTERS into the struct they point
+  at**, and 9front's `CFLAGS=-FTVw` turns them on for every native
+  build. So a struct that is opaque in a public header and completed in
+  one `.c` makes that one file disagree with every other about every
+  function that can *reach* it, transitively through members. The fix is
+  `#pragma incomplete` on the opaque types; it is read only by
+  `signat()`, and completing the struct afterwards does not clear it.
+  Fifteen link errors in `libvterm` were this one thing.
 - `/dev/snarf` is the clipboard and has no concept of ownership.
 - Plan 9 has no loopback unless `ip/ipconfig loopback /dev/null 127.1`
   has been run -- and that belongs in the machine's startup, not in
