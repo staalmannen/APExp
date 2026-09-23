@@ -890,8 +890,8 @@ Open, in order of what the next run should touch:
 - **`file home ~USER` / `file tildeexpand ~USER`**, ten tests. Needs a
   password database mapping a user to a home directory, which Plan 9
   has not -- read it before writing it off.
-- **A failed `execve()` destroyed the caller -- FIXED, not measured
-  yet, and it was the whole `exec` cluster.** POSIX: "If the exec
+- **A failed `execve()` destroyed the caller -- FIXED and CONFIRMED,
+  56 -> 54.** POSIX: "If the exec
   function returns to the calling process image, an error has occurred;
   ... the process image is unchanged." libap's did the opposite --
   `_RFORK(RFCENVG)` on its first line, then `/env/_fdinfo` and
@@ -915,7 +915,10 @@ Open, in order of what the next run should touch:
   and its **section 5 is the control that matters**: "never close them"
   passes everything else and breaks `FD_CLOEXEC` for every program in
   the tree. `_execmark()` is the version marker, as `_sock_listenmark`
-  is for the listener fix.
+  is for the listener fix -- and it earned its place: the run reported
+  `_execmark = 1`, so the INSTALLED library was the one measured.
+  **Exactly `exec-10.20.1` and `exec-10.21.1` went, empty new-failure
+  column, `execfail-test` 0 failures.**
 - **`exec-19.1` is the append race, and it is a platform limit.** Four
   shells `>>` the same file; the test checks only the SIZE, so 24
   against 26 cannot distinguish "truncated at open, losing the seeded
@@ -928,6 +931,12 @@ Open, in order of what the next run should touch:
   is `DMAPPEND`, a permanent mode bit on the **file**; setting it would
   change that file for every other program and every later open, which
   is not what `O_APPEND` means for a descriptor. Recorded, not fixed.
+  **MEASURED, and it is not marginal**: `append-test` section 3 loses
+  **1280 of 2050 bytes** with four processes appending flat out, while
+  section 2 shows no truncation and section 4 (one writer, same loop)
+  is exact. So reading (b) is confirmed and (a) is excluded -- and the
+  256-round count was what made the answer unambiguous rather than a
+  coin toss. On glibc the same file reports 0 lost.
 - **libap's `strtod` is now Gay's, and it is CORRECT**: `strtod-xcheck`
   against glibc gives **0 wrong** in all four sections -- 199887
   round-trips through `%.17g`, the 629 powers of ten, the seven strings
@@ -1016,25 +1025,39 @@ Open, in order of what the next run should touch:
   outside -- the `/$objtype/include/ape` shadowing invariant is exactly
   that trap. Predict `Failed` 56 -> 54; refuted if the marker says the
   header read was not this tree's.
-  **The prediction was refuted, and not the way the file allowed for**:
-  `binfloat-test` gives **0 failures** with the marker saying THIS
-  TREE, and `Failed` stayed at **56**. A freshly compiled translation
-  unit has the right constant and `tclBinary.$O` does not -- which is
-  the `mk distclean` rule, met for the first time in a measurable form.
-  **A marker cannot settle this**, and that is the general point:
-  editing a file is what makes `mk` recompile it, so a marker added to
-  `tclStrToD.c` would report a fresh header while the stale object sat
-  beside it. **`tcl-fltmax-probe.tcl` reads the object as it stands**
-  -- `binary format R` answers +Inf exactly above `FLT_MAX + 2^103`,
-  so bisecting on the BIT PATTERN recovers the compiled-in `FLT_MAX`
-  exactly, and the probe prints the constant rather than a verdict.
-  Checked on the host first, which earned its keep twice: `binary
-  format Q` takes a **double**, not a bit pattern (`W` then `Q` is the
-  reinterpretation), and **tclsh 8.6 has no +Inf arm at all** -- it
-  clamps everything to FLT_MAX, so the host cannot validate this and
-  the probe says so instead of reporting a false (a). Both arms were
-  then exercised against a modelled `FormatNumber`, because the arm
-  that matters never ran on the host.
+  **REFUTED TWICE, and the second one is the interesting half.**
+  First: `binfloat-test` gave 0 failures with the marker saying THIS
+  TREE while `Failed` stayed at 56, which looked like the `mk
+  distclean` rule. **`tcl-fltmax-probe.tcl` measures what libtcl was
+  actually compiled with** -- `binary format R` answers +Inf exactly
+  above `FLT_MAX + 2^103`, so bisecting on the BIT PATTERN recovers the
+  constant exactly, and the probe prints the constant rather than a
+  verdict. After `mk distclean` **and** `mk install` it still reports
+  **`3.40282347e+38`, too big by 3.61471e+29** -- so the object WAS
+  rebuilt and staleness is out. What is left is the header-shadowing
+  invariant, and `./mount-include` **no-ops entirely** when
+  `/sys/include/ape/THIS_IS_APExp` exists.
+  **THREE different float.h constants have now been seen**, which is
+  the fact that was hiding in plain sight: `3.4028234663852886e+38`
+  (this tree, after the fix), `3.40282347e+38` (this tree, before it,
+  and what libtcl has now) and **`3.4028235e+38`** -- which is what
+  `binfloat-test` measured before the fix and is transcribed in
+  `docs/notes/libap.md`. *That third value is in neither version of
+  this tree's header*, so something outside the repo was being read,
+  and the note sat there for a round without anyone reconciling it
+  against the file in git. **A transcription is evidence; check it
+  against the source before building on it.**
+  The number cannot finish the job -- `3.40282347e+38` is equally what
+  a stale installed copy and a machine's own leftover would say -- so
+  `tclBinary.c` now prints the marker, `sizeof` and spelling of its
+  `FLT_MAX` under `$APEXP_FLOAT_DEBUG`. It has to be in THAT file: a
+  marker in `tclStrToD.c` answers for `tclStrToD.c`.
+  Two host-check lessons on the way: `binary format Q` takes a
+  **double**, not a bit pattern (`W` then `Q` is the reinterpretation),
+  **Tcl's `%x` truncates to 32 bits** without `ll`, and **tclsh 8.6 has
+  no +Inf arm at all**, so the host cannot validate this probe and it
+  says so rather than reporting a false result. Both arms were
+  exercised against a modelled `FormatNumber`.
 - **9front has no symbolic links** (confirmed by grep), so `symlink()`
   stays ENOSYS. **Do not emulate it with a copy** -- see
   `docs/notes/tcl-suite.md`. **`tests/apexp-links.tcl` is the one probe
