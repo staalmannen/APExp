@@ -1,102 +1,105 @@
+/*
+ * strtof -- decimal to float, correctly rounded.
+ *
+ * WHAT WAS HERE BEFORE was a second copy of the old APE parser, with
+ * the same bug: digits accumulated in a double and multiplied by
+ * pow10(exp), two roundings and neither of them the one the standard
+ * asks for. strtod-xcheck measured the strtod copy of it at 148018 of
+ * 199887 round-trips wrong.
+ *
+ * AND `(float)strtod(s)' IS NOT ENOUGH, which was measured rather than
+ * assumed. Rounding a decimal to 53 bits and then to 24 is not the
+ * same operation as rounding it to 24: when the correctly rounded
+ * double lands exactly on a midpoint between two floats, the second
+ * rounding no longer knows which side of that midpoint the decimal was
+ * on and falls back on round-half-to-even. Ordinary inputs never
+ * notice -- 200000 float round-trips and 200000 seventeen-digit random
+ * decimals were all correct -- but decimals BUILT to sit a hair off a
+ * float midpoint fail, and sys/lib/tests/strtof-xcheck.c section 5
+ * measured 12709 of 39694 wrong. So the shortcut had to go.
+ *
+ * WHAT IT DOES INSTEAD. `_strtod_cmp' returns the nearest double AND
+ * which side of it the exact decimal lay, because strtod's correction
+ * loop has the decimal as an exact Bigint and can simply be asked. If
+ * that double is a float midpoint and the decimal was not on it, one
+ * step of nextafter in the right direction moves it off the tie before
+ * the narrowing, and the narrowing then rounds the way it should. If
+ * the decimal WAS the midpoint, the tie is real and round-half-to-even
+ * is the right answer, so nothing is done.
+ *
+ * The nudge is conditional on being exactly on a midpoint, and that is
+ * not fussiness: a double one ulp away from a midpoint would be moved
+ * ONTO one by an unconditional nudge, turning a decided case into a
+ * tie.
+ *
+ * ERRNO. strtod reports ERANGE for the DOUBLE range; the float range
+ * is narrower at both ends, so overflow to infinity and underflow to
+ * zero are reported here as well. Landing on a subnormal float is not
+ * an error.
+ */
+
 #include <stdlib.h>
 #include <math.h>
+#include <float.h>
 #include <errno.h>
+#include "fconv.h"
 
 /*
- * strtof - convert string to float
- * Written in Plan9 APE style, derived from the APE strtod.
- * Returns float rather than double; uses HUGE_VALF for overflow.
+ * Is d exactly halfway between two adjacent floats?
+ *
+ * Asked by averaging the two floats that bracket d rather than by
+ * picking the bits apart: that is exact (both are doubles, and their
+ * sum has at most 25 significand bits), and it stays correct in the
+ * subnormal range, where a float's step is a fixed 2^-149 and the
+ * bit pattern argument for normal floats does not hold.
  */
+static int
+floatmidpoint(double d)
+{
+	float a;
+	double lo, hi;
+
+	if(d == 0 || !isfinite(d))
+		return 0;
+	a = (float)d;
+	if((double)a == d)		/* d IS a float: not a midpoint */
+		return 0;
+	if(isinf(a)){
+		/*
+		 * Above FLT_MAX the neighbour is not a float at all. The
+		 * boundary that decides overflow is the midpoint between
+		 * FLT_MAX and 2^128, which is where the narrowing switches
+		 * to infinity.
+		 */
+		lo = (double)FLT_MAX;
+		hi = ldexp(1.0, 128);
+		if(d < 0){
+			lo = -lo;
+			hi = -hi;
+		}
+		return d == (lo + hi) / 2;
+	}
+	lo = (double)a;
+	hi = (double)nextafterf(a, d < (double)a ? -INFINITY : INFINITY);
+	if(!isfinite(hi))
+		return 0;
+	return d == (lo + hi) / 2;
+}
+
 float
 strtof(const char *cp, char **endptr)
 {
-	double num, dem;
-	extern double pow10(int);
-	int neg, eneg, dig, predig, exp, c;
-	const char *p;
+	double d;
+	float f;
+	int cmp;
 
-	p = cp;
-	num = 0;
-	neg = 0;
-	dig = 0;
-	predig = 0;
-	exp = 0;
-	eneg = 0;
-
-	c = *p++;
-	while(c == ' ' || c == '\t' || c == '\n' || c == '\f' || c == '\v' || c == '\r')
-		c = *p++;
-	if(c == '-' || c == '+'){
-		if(c == '-')
-			neg = 1;
-		c = *p++;
-	}
-	while(c >= '0' && c <= '9'){
-		num = num*10 + c-'0';
-		predig++;
-		c = *p++;
-	}
-	if(c == '.')
-		c = *p++;
-	while(c >= '0' && c <= '9'){
-		num = num*10 + c-'0';
-		dig++;
-		c = *p++;
-	}
-	if(dig+predig == 0){
-		if(endptr)
-			*endptr = (char *)cp;
-		return 0.0f;
-	}
-	if(c == 'e' || c == 'E'){
-		c = *p++;
-		if(c == '-' || c == '+'){
-			if(c == '-'){
-				dig = -dig;
-				eneg = 1;
-			}
-			c = *p++;
-		}
-		while(c >= '0' && c <= '9'){
-			exp = exp*10 + c-'0';
-			c = *p++;
-		}
-	}
-	exp -= dig;
-	if(exp < 0){
-		exp = -exp;
-		eneg = !eneg;
-	}
-	dem = pow10(exp);
-	if(dem == HUGE_VAL)
-		num = eneg ? 0.0 : HUGE_VAL;
-	else if(dem == 0)
-		num = eneg ? HUGE_VAL : 0.0;
-	else if(eneg)
-		num /= dem;
-	else
-		num *= dem;
-	if(neg)
-		num = -num;
-	if(endptr){
-		*endptr = (char *)--p;
-		/*
-		 * Fix cases like 2.3e+
-		 */
-		while(p > cp){
-			c = *--p;
-			if(c != '-' && c != '+' && c != 'e' && c != 'E')
-				break;
-			(*endptr)--;
-		}
-	}
-
-	/* narrow to float, check for overflow */
-	{
-		float result = (float)num;
-		/* isinf promotes result to double, avoiding float constant overflow */
-		if(isinf(result) && num != HUGE_VAL && num != -HUGE_VAL)
-			errno = ERANGE;
-		return result;
-	}
+	d = _strtod_cmp(cp, endptr, &cmp);
+	if(cmp != 0 && floatmidpoint(d))
+		d = nextafter(d, cmp > 0 ? INFINITY : -INFINITY);
+	f = (float)d;
+	if(isinf(f) && isfinite(d))
+		errno = ERANGE;
+	else if(f == 0 && d != 0)
+		errno = ERANGE;
+	return f;
 }

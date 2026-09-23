@@ -332,3 +332,208 @@ deadline.tv_sec  += ts->tv_sec;
 deadline.tv_nsec += ts->tv_nsec;
 if(deadline.tv_nsec >= 1000000000L) { deadline.tv_sec++; deadline.tv_nsec -= 1000000000L; }
 ```
+
+#### Gay's strtod, round two: four bugs, three of them in the shared kit
+
+`string/strtod-gay.c` is a correctly-rounded `strtod` on the Bigint kit
+in `stdio/_fconv.c`. **Still not in any mkfile.** Section 1 of
+`strtod-xcheck` -- the seven strings Tcl's `expr` tests use, including
+DBL_MAX, the value one ulp past it, and an 18-digit case -- is now
+**7 of 7 exact**, where the shipping file gets 0 of 7. Section 2, the
+200000 round-trips, is not clean and the reason is no longer arithmetic.
+
+**Three of the four bugs were not in the new file at all, and all three
+are one assumption**: Gay's code needs a 32-bit word and spells it
+`long`, which is true under kencc and false under every LP64 compiler
+-- so the kit was correct on Plan 9 *by accident* and wrong on the
+build host the cross-check has to run on.
+
+- **`typedef unsigned int ULong`** for the Bigint word. `Pack_32`,
+  `n = k >> 5`, `k &= 0x1f` and `Storeinc`'s two `unsigned short`
+  halves all assume it.
+- **`typedef int Long`** for the borrow arithmetic in `_diff` and
+  `quorem`. They write `borrow = y >> 16` and need an *arithmetic*
+  shift of a negative 32-bit value; the subtraction happens in
+  `unsigned int` and wraps, and a 32-bit `long` reinterprets that as
+  the intended negative number while a 64-bit one converts it to a
+  large positive and the shift yields `0xffff`. **Off by 0x10001 per
+  word** -- which is exactly what a dumped `bd`/`bb` pair showed, and
+  what made the 18-digit case 128 ulp out.
+- **`Bcopy` copied `wds*sizeof(long)`** of an array whose element is
+  `ULong`: twice as much as it should, off the end of the allocation.
+- and **`fconv.h` had no include guard**, which only shows when
+  something includes it twice.
+
+`_dtoa.c` shares `quorem` and `Bcopy`, so it carried the same latent
+hazards; none of this changes a byte of behaviour under kencc.
+
+**The two bugs that were mine** are in the file's own header: the
+correction loop's `j`, and Gay's sign-scan idiom, whose fall-through
+switch inside `for(s = s00;;s++)` advances past the sign and then lets
+the loop advance again, losing the first digit -- every negative number
+came back at 0.44 of its size.
+
+**What remains is two separate problems and they have been separated by
+experiment rather than by reading.** Disabling the freelist -- `_Balloc`
+always mallocs, `_Bfree` returns at once -- over the same 200000 inputs:
+
+```
+wrong  169725 -> 3656
+spin       40 -> 2334
+```
+
+So **~98% of the errors are a Bigint lifetime bug**: something is freed
+while still referenced, or freed twice, and the freelist hands it back.
+The symptom in the failing cases is a *single corrupted nibble* on
+inputs the parser gets exactly right when called on its own -- which is
+what sent the search to state rather than to arithmetic in the first
+place. The residue, 3656, is all near the bottom of the range
+(2.1e-293 and neighbours) and mostly spins: the denormal arm does not
+converge. Neither is the rounding logic.
+
+**The freelist experiment is also the acceptance test for the fix**:
+with the lifetime bug repaired, the counts with the freelist ON must
+meet the counts with it OFF.
+
+#### strtod finished: 0 of 199887 wrong, and the last two bugs were both `long`
+
+`string/strtod.c` **is now Gay's parser** and the old one is gone.
+`strtod-xcheck` against glibc, all four sections:
+
+```
+the seven strings Tcl's expr tests use     7 checked, 0 wrong   PASS
+200000 round-trips through "%.17g"    199887 checked, 0 wrong   PASS
+the powers of ten, 1e-320..1e308         629 checked, 0 wrong   PASS
+values a naive parser still gets right    10 checked, 0 wrong   PASS
+```
+
+The file it replaced was wrong on **148018** of those 199887.
+
+**The freelist was never the bug, and the experiment that said so was
+still the right one.** Disabling `_Balloc`'s freelist took the failures
+from 169725 to 3656, which was read as "a Bigint lifetime bug". It was
+not: it was `ulp()` returning garbage, and the *damage* varied with
+what the freelist handed back. **An experiment that isolates a variable
+tells you the variable matters, not which way the causation runs** --
+and the way to tell them apart was to keep instrumenting rather than to
+act on the first reading.
+
+Two bugs remained after that, and both were the `long` assumption again:
+
+- **`ulp()`**. `(word0(a) & Exp_mask) - (P-1)*Exp_msk1` is
+  `unsigned int` minus `int`, so it wraps; a 32-bit signed `L`
+  reinterprets the wrap as the negative number that was meant, a
+  64-bit one keeps `0xffe00000`, takes the `L > 0` arm and returns
+  **-0x1p+1023 as the ulp of 2.1e-293**. Every value whose ulp is
+  subnormal went through that, and the correction loop then chased its
+  own tail: **169673 of the 169725 failures and every one of the spins
+  were this single line.** `Long L;`.
+- **The scale-up-by-2^53 dance** in the correction loop's underflow
+  arm is guarded upstream by `#ifdef Sudden_Underflow`, which is for
+  machines that *flush* to zero. IEEE has gradual underflow and takes
+  the plain arm. Applying it anyway meant that for a subnormal --
+  exponent field 0 -- `word0(rv) += P*Exp_msk1` makes the field exactly
+  `P`, which is the very test the next line uses to decide the value
+  underflowed. So every subnormal was rewritten to the smallest
+  subnormal and then driven to zero. `1e-308` came out `0`. That was
+  the last 52.
+
+**Six bugs in all, and four were in the shared kit rather than in the
+new file**: `ULong`, `Long` in `_diff`/`quorem`, `Bcopy`'s
+`sizeof(long)`, and `_d2b` leaving `i` unset. Every one of them is the
+same sentence -- *Gay's arithmetic needs a 32-bit word and says
+`long'* -- and every one was correct under kencc and wrong under gcc,
+which is why none had ever been seen and why the cross-check could not
+run until they were fixed.
+
+#### And _dtoa was broken too, in the shipping printf path
+
+`_d2b`'s missing `i` is read by its **denormal** arm, `x[i-1]`, and
+`_dtoa` calls `_d2b` for every conversion. `sys/lib/tests/dtoa-xcheck.c`
+is the new host program that measures what mode 0 promises -- the
+shortest string that reads back as the same double -- with the same
+100000 values, before and after:
+
+```
+before:  99941 checked, 52 wrong   (subnormals printed as "?")
+after:   99941 checked,  3 wrong   (all at 2^-1016 and below, 1 ulp)
+```
+
+**`?` is Gay's internal "cannot happen" marker**, and it was what this
+system printed for a denormal. Nothing in the tree would have noticed:
+there was no test that formatted one. AddressSanitizer with the
+freelist disabled named the line in a single run, after the symptom --
+*correct in isolation, one corrupted nibble in bulk* -- had already said
+the fault was state rather than arithmetic.
+
+**`strtof` and `strtold` are still the old algorithm**, the same
+91-line file twice more, and still wrong in the same way.
+
+#### strtof and strtold: one forwards, and one needed a real fix
+
+**`strtold` forwards to `strtod`.** kencc has no extended precision --
+`sub.c`'s `simplet()` maps `BDOUBLE|BLONG` to `types[TDOUBLE]`, so
+`long double` IS `double` on every architecture here, which is the same
+fact perl's `config.h` had to be corrected to admit. The file it
+replaced was a third copy of the old parser, with the same bug as the
+other two. On this platform forwarding is not a shortcut, it is what
+the function means; and three copies of a parser is three places for
+the next bug to live.
+
+**`strtof` looked like the same one-liner and was not.** The obvious
+`(float)strtod(s)` rounds twice -- decimal to 53 bits, then 53 to 24 --
+and that is not the same operation as rounding once to 24. When the
+correctly rounded double lands exactly on a midpoint between two
+floats, the narrowing has no tie-break left and falls back on
+round-half-to-even, which is right only by luck.
+
+**The question was settled by measurement, not by argument.**
+`sys/lib/tests/strtof-xcheck.c`, against glibc:
+
+```
+1. 200000 float round-trips through "%.9g"    0 wrong
+2. 200000 random 17-digit decimals            0 wrong
+3. the powers of ten, 1e-50..1e40             0 wrong
+4. the edges of the float range               1 wrong
+5. decimals BUILT to sit on a float midpoint  12709 of 39694 wrong
+```
+
+Sections 1 to 3 say ordinary use never notices. **Section 5 is the
+point of the file**: for a float `f` the midpoint `M` between it and
+the next float up is exactly representable as a double and its decimal
+expansion is finite, so `M` and `M` with a digit appended can both be
+written exactly -- and a third of those come out wrong. A sweep that
+only drew random numbers would have reported this as correct.
+
+Section 4's single failure was the same thing at the top end:
+`3.4028235677973366e+38` is below the overflow boundary and must give
+FLT_MAX; it gave infinity, because the boundary is itself a midpoint.
+
+**The fix asks strtod a question it already knows the answer to.** The
+correction loop holds the decimal as an exact Bigint, so
+`_strtod_cmp()` returns the nearest double *and* which side of it the
+decimal lay (`decimalcmp` does one more exact scaled comparison at the
+end; the floating-point fast paths are skipped when the comparison is
+wanted, since they never build the Bigint). If the double is a float
+midpoint and the decimal was not on it, one `nextafter` in the right
+direction moves it off the tie before the narrowing. If the decimal
+*was* the midpoint, the tie is real and half-to-even is correct, so
+nothing is done.
+
+**The nudge is conditional on being exactly on a midpoint, and that is
+not fussiness**: a double one ulp away from a midpoint would be moved
+*onto* one by an unconditional nudge, turning a decided case into a
+tie. `floatmidpoint()` asks by averaging the two floats that bracket
+the double -- exact, and still right in the subnormal range where a
+float's step is a fixed 2^-149 and the bit-pattern argument does not
+hold.
+
+After it: **all five sections 0 wrong**, and `strtod-xcheck` and
+`dtoa-xcheck` are unchanged, which is the check that the plumbing added
+to `strtod` cost nothing.
+
+*(One guard worth naming: `retfree` is also reached from the overflow
+and underflow exits, where the result is an infinity or a zero and
+`_d2b` has nothing to take apart. The comparison is computed only for
+a finite non-zero result -- and no caller needs it otherwise, since
+neither an infinity nor a zero is a midpoint between floats.)*

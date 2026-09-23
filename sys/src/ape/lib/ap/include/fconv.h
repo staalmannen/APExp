@@ -9,6 +9,16 @@
 	U.S.A.
 	dmg@research.bell-labs.com
  */
+/*
+ * An include guard, because this header declares a struct and two
+ * typedefs and had none. It never showed while _fconv.c and _dtoa.c
+ * were the only includers -- separate translation units each see it
+ * once -- and it shows the moment anything includes both, which
+ * sys/lib/tests/strtod-xcheck.c does on the build host.
+ */
+#ifndef __FCONV_H
+#define __FCONV_H
+
 #include <stdlib.h>
 #include <string.h>
 #define _RESEARCH_SOURCE
@@ -45,9 +55,40 @@
 Exactly one of IEEE_8087, IEEE_MC68k, VAX, or IBM should be defined.
 #endif
 
+/*
+ * THE BIGNUM WORD IS 32 BITS, and it used to say so only by accident.
+ * Gay's code hard-assumes it -- `n = k >> 5', `k &= 0x1f', Storeinc's
+ * two unsigned shorts, Pack_32 -- while spelling the type `unsigned
+ * long', which is 32 bits under kencc and 64 under any LP64 compiler.
+ * So the file was correct here and wrong anywhere else, including the
+ * build host, which is where strtod-xcheck.c has to run it.
+ *
+ * ULong says what was meant. `unsigned int' is 32 bits under kencc and
+ * under gcc alike, so this changes nothing on Plan 9 and makes the
+ * same source testable beside glibc.
+ */
+typedef unsigned int ULong;
+
+/*
+ * And a SIGNED 32-bit companion, for the borrow arithmetic in _diff
+ * and quorem. Those write
+ *
+ *	y = (*xa & 0xffff) - (*xb & 0xffff) + borrow;
+ *	borrow = y >> 16;		-- wants an arithmetic shift
+ *
+ * and the subtraction happens in `unsigned int', wrapping, before the
+ * result is assigned. With a 32-BIT long the wrapped value reinterprets
+ * as the negative number that was meant and the shift gives -1; with a
+ * 64-bit long it converts to a large POSITIVE number and the shift
+ * gives 0xffff. That is off by 0x10001 per word, which is exactly what
+ * a bignum subtraction on the build host produced -- correct under
+ * kencc, wrong under gcc, and silent in both directions.
+ */
+typedef int Long;
+
 typedef union {
 	double d;
-	unsigned long ul[2];
+	ULong ul[2];
 } Dul;
 
 #ifdef IEEE_8087
@@ -187,7 +228,7 @@ typedef union {
 Bigint {
 	struct Bigint *next;
 	int k, maxwds, sign, wds;
-	unsigned long x[1];
+	ULong x[1];
 	};
 
  typedef struct Bigint Bigint;
@@ -196,7 +237,7 @@ Bigint {
 extern Bigint	*_Balloc(int);
 extern void	_Bfree(Bigint *);
 extern Bigint	*_multadd(Bigint *, int, int);
-extern int	_hi0bits(unsigned long);
+extern int	_hi0bits(ULong);
 extern Bigint	*_mult(Bigint *, Bigint *);
 extern Bigint	*_pow5mult(Bigint *, int);
 extern Bigint	*_lshift(Bigint *, int);
@@ -206,6 +247,14 @@ extern Bigint	*_d2b(double, int *, int *);
 extern Bigint	*_i2b(int);
 
 extern double	_tens[], _bigtens[], _tinytens[];
+
+/*
+ * strtod with the exact comparison: *pcmp is -1, 0 or +1 for
+ * value < = > the double returned. strtof needs it -- once the
+ * correctly rounded double sits on a midpoint between two floats, the
+ * narrowing has no tie-break left. Private to libap.
+ */
+extern double	_strtod_cmp(const char *, char **, int *);
 
 #ifdef IEEE_Arith
 #define n_bigtens 5
@@ -219,8 +268,17 @@ extern double	_tens[], _bigtens[], _tinytens[];
 
 #define Balloc(x) _Balloc(x)
 #define Bfree(x) _Bfree(x)
+/*
+ * sizeof(ULong), not sizeof(long): this copies wds WORDS of the x[]
+ * array, and the array is ULong. With a 64-bit long it copies twice as
+ * much as it should, straight off the end of the allocation and into
+ * whatever _Balloc's freelist put there -- which on the build host
+ * made every call after the first one wrong, while any single call in
+ * isolation was correct. Third instance of the same assumption in this
+ * one header.
+ */
 #define Bcopy(x,y) memcpy((char *)&x->sign, (char *)&y->sign, \
-y->wds*sizeof(long) + 2*sizeof(int))
+y->wds*sizeof(ULong) + 2*sizeof(int))
 #define multadd(x,y,z) _multadd(x,y,z)
 #define hi0bits(x) _hi0bits(x)
 #define i2b(x) _i2b(x)
@@ -234,3 +292,5 @@ y->wds*sizeof(long) + 2*sizeof(int))
 #define tens _tens
 #define bigtens _bigtens
 #define tinytens _tinytens
+
+#endif /* __FCONV_H */

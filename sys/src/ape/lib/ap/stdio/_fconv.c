@@ -44,7 +44,7 @@ _Balloc(int k)
 		}
 	else {
 		x = 1 << k;
-		rv = (Bigint *)malloc(sizeof(Bigint) + (x-1)*sizeof(long));
+		rv = (Bigint *)malloc(sizeof(Bigint) + (x-1)*sizeof(ULong));
 		rv->k = k;
 		rv->maxwds = x;
 		}
@@ -66,9 +66,9 @@ _Bfree(Bigint *v)
 _multadd(Bigint *b, int m, int a)	/* multiply by m and add a */
 {
 	int i, wds;
-	unsigned long *x, y;
+	ULong *x, y;
 #ifdef Pack_32
-	unsigned long xi, z;
+	ULong xi, z;
 #endif
 	Bigint *b1;
 
@@ -103,7 +103,7 @@ _multadd(Bigint *b, int m, int a)	/* multiply by m and add a */
 	}
 
  int
-_hi0bits(register unsigned long x)
+_hi0bits(register ULong x)
 {
 	register int k = 0;
 
@@ -132,10 +132,10 @@ _hi0bits(register unsigned long x)
 	}
 
  static int
-lo0bits(unsigned long *y)
+lo0bits(ULong *y)
 {
 	register int k;
-	register unsigned long x = *y;
+	register ULong x = *y;
 
 	if (x & 7) {
 		if (x & 1)
@@ -190,10 +190,10 @@ _mult(Bigint *a, Bigint *b)
 {
 	Bigint *c;
 	int k, wa, wb, wc;
-	unsigned long carry, y, z;
-	unsigned long *x, *xa, *xae, *xb, *xbe, *xc, *xc0;
+	ULong carry, y, z;
+	ULong *x, *xa, *xae, *xb, *xbe, *xc, *xc0;
 #ifdef Pack_32
-	unsigned long z2;
+	ULong z2;
 #endif
 
 	if (a->wds < b->wds) {
@@ -309,7 +309,7 @@ _lshift(Bigint *b, int k)
 {
 	int i, k1, n, n1;
 	Bigint *b1;
-	unsigned long *x, *x1, *xe, z;
+	ULong *x, *x1, *xe, z;
 
 #ifdef Pack_32
 	n = k >> 5;
@@ -362,7 +362,7 @@ _lshift(Bigint *b, int k)
  int
 _cmp(Bigint *a, Bigint *b)
 {
-	unsigned long *xa, *xa0, *xb, *xb0;
+	ULong *xa, *xa0, *xb, *xb0;
 	int i, j;
 
 	i = a->wds;
@@ -393,10 +393,10 @@ _diff(Bigint *a, Bigint *b)
 {
 	Bigint *c;
 	int i, wa, wb;
-	long borrow, y;	/* We need signed shifts here. */
-	unsigned long *xa, *xae, *xb, *xbe, *xc;
+	Long borrow, y;	/* We need signed shifts here, and 32-bit ones. */
+	ULong *xa, *xae, *xb, *xbe, *xc;
 #ifdef Pack_32
-	long z;
+	Long z;
 #endif
 
 	i = cmp(a,b);
@@ -470,10 +470,10 @@ _d2b(double darg, int *e, int *bits)
 {
 	Bigint *b;
 	int de, i, k;
-	unsigned long *x, y, z;
+	ULong *x, y, z;
 	Dul d;
 #ifdef VAX
-	unsigned long d0, d1;
+	ULong d0, d1;
 	d.d = darg;
 	d0 = word0(d) >> 16 | word0(d) << 16;
 	d1 = word1(d) >> 16 | word1(d) << 16;
@@ -509,7 +509,7 @@ _d2b(double darg, int *e, int *bits)
 			}
 		else
 			x[0] = y;
-		b->wds = (x[1] = z) ? 2 : 1;
+		i = b->wds = (x[1] = z) ? 2 : 1;
 		}
 	else {
 #ifdef DEBUG
@@ -518,7 +518,7 @@ _d2b(double darg, int *e, int *bits)
 #endif
 		k = lo0bits(&z);
 		x[0] = z;
-		b->wds = 1;
+		i = b->wds = 1;
 		k += 32;
 		}
 #else
@@ -579,6 +579,23 @@ _d2b(double darg, int *e, int *bits)
 #ifndef Sudden_Underflow
 		}
 	else {
+		/*
+		 * THE DENORMAL ARM READS i, AND UNDER Pack_32 NOTHING SET
+		 * IT. Gay writes `i = b->wds = ...' in both arms above; this
+		 * copy had dropped the `i ='. So for a denormal, *bits came
+		 * from `x[i-1]' with i a stack leftover -- a read outside the
+		 * Bigint, and then a wrong bbbits, which is the input to
+		 * `j = P + 1 - bbbits' and so to the whole scaling of the
+		 * correction loop.
+		 *
+		 * It was invisible for two reasons. dtoa reaches here only
+		 * for a denormal, and with _Balloc's freelist on, the bad
+		 * read lands in a recycled Bigint rather than off the heap --
+		 * so it corrupts an answer instead of faulting. That is what
+		 * made strtod-gay wrong in bulk and right in isolation, and
+		 * AddressSanitizer with the freelist disabled named the line
+		 * in one run.
+		 */
 		*e = de - Bias - (P-1) + 1 + k;
 #ifdef Pack_32
 		*bits = 32*i - hi0bits(x[i-1]);

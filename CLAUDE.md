@@ -203,7 +203,10 @@ under plain `tclsh` and isolates the `chan-io-44.1` and `event-11.5`
 hangs, with a timeout on every section so it reports where the suite
 would wait; `select-test.c` takes the two bugs it found down to the
 `select()` call underneath them.
-`tz-xcheck.c` is not a Plan 9 test at all: it links
+`strtod-xcheck.c`, `strtof-xcheck.c` and `dtoa-xcheck.c` are the same
+idea for `strtod`, `strtof` and `_dtoa`, and are likewise HOST programs, not Plan 9 tests. The
+second checks the two against each other -- the shortest string that
+reads back -- which is a real test of both. `tz-xcheck.c` is not a Plan 9 test at all: it links
 `lib/ap/time/tzone.c` into a **glibc** program on the build host and
 sweeps ~1.4 million instants against `localtime_r`, so libap's own
 parser can be checked without a VM round. It found two bugs that way.
@@ -570,7 +573,7 @@ or a constraint that fails on Linux too). The port's own share is
 `focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
 
 **Tcl's suite**: **it finishes and nothing aborts.**
-`Total 68118 Passed 62134 Skipped 5916 Failed 68`, 167 files, marker,
+`Total 68118 Passed 62138 Skipped 5916 Failed 64`, 167 files, marker,
 exit 0, and no `Test files exiting with errors` section. The listener
 leak fix took **14** (all eleven of `socket_inet-11.*`, plus `12.1`,
 `2.6`, `socket-14.11.1`); async connect took **13** more with nothing
@@ -820,7 +823,8 @@ Open, in order of what the next run should touch:
   orders a log better than line buffering -- and `errorChannel` is
   stderr, so that line was the same bug twice. Fixed in both harnesses;
   `stdout` keeps its line buffering, which is the half that was needed.
-  Predict `Failed` 68 -> 64.
+  **68 -> 64 CONFIRMED**: exactly those four, empty new column, and the
+  log's tail did not truncate -- the thing those lines were for.
   **The general shape, met three times now**: a table keyed on a
   descriptor number, a constraint claiming a capability, a log's own
   buffering. *An instrument that shares state with the thing it
@@ -853,8 +857,60 @@ Open, in order of what the next run should touch:
   `_fdinfo`/`_sighdlr` and closing every `FD_CLOEXEC` descriptor. This
   is old, not new: `_RFORK(RFCENVG)` on its first line is what empties
   it. `environ` is untouched, so it is bounded.
+- **libap's `strtod` is now Gay's, and it is CORRECT**: `strtod-xcheck`
+  against glibc gives **0 wrong** in all four sections -- 199887
+  round-trips through `%.17g`, the 629 powers of ten, the seven strings
+  Tcl's `expr` tests use, and the exact values. **The file it replaced
+  was wrong on 148018 of those 199887 (74%)**, and said so in its own
+  first line for as long as it existed. Built on `stdio/_fconv.c`'s
+  Bigint kit, which is Gay's other half; `string/mkfile` gained
+  `HFILES=../include/fconv.h`.
+  **Six bugs, and FOUR were in the shared kit** -- `ULong` for the
+  bignum word, `Long` for the borrow arithmetic in `_diff`/`quorem`,
+  `Bcopy`'s `sizeof(long)`, and **`_d2b` leaving `i` unset** while its
+  denormal arm reads `x[i-1]`. All four are one sentence: *Gay's
+  arithmetic needs a 32-bit word and spells it `long`*, true under
+  kencc and false under gcc -- correct on Plan 9 by accident, and why
+  the cross-check could not run at all until they were fixed.
+  **`_dtoa` was broken by the same `_d2b` bug**, in the shipping printf
+  path: `dtoa-xcheck.c` measures 52 of 99941 wrong before and 3 after,
+  and **subnormals printed as `?`** -- Gay's internal "cannot happen"
+  marker. No test in the tree had ever formatted one.
+  **The freelist was never the bug**, though disabling it took failures
+  169725 -> 3656: it was `ulp()` returning `-0x1p+1023` for the ulp of
+  2.1e-293 (the same `long` wrap), and the *damage* varied with what
+  the freelist handed back. **An experiment that isolates a variable
+  says the variable matters, not which way the causation runs.**
+  The last 52 were the scale-up-by-2^53 arm, which upstream guards with
+  `#ifdef Sudden_Underflow` -- for machines that FLUSH to zero. IEEE
+  has gradual underflow; applying it made `1e-308` come out `0`.
+- **`strtof` and `strtold` are done too.** `strtold` forwards to
+  `strtod`: kencc has no extended precision, so `long double` IS
+  `double` here. **`strtof` needed more than `(float)strtod`** --
+  rounding to 53 bits and then to 24 is not rounding to 24, and when
+  the double lands on a midpoint between two floats the narrowing has
+  no tie-break left. Measured, not argued: `strtof-xcheck` found
+  200000 float round-trips and 200000 random 17-digit decimals all
+  correct, and **12709 of 39694 wrong among decimals BUILT to sit on a
+  float midpoint** -- a sweep of random numbers would have called it
+  clean. `_strtod_cmp()` now returns the nearest double *and* which
+  side of it the decimal lay (strtod's loop has the decimal exactly;
+  the fast paths are skipped when the comparison is wanted), and one
+  `nextafter` moves it off the tie. **Conditional on being exactly on a
+  midpoint**: an unconditional nudge would move a double one ulp away
+  ONTO one. All five sections 0 wrong, with `strtod-xcheck` and
+  `dtoa-xcheck` unchanged.
+- **`expr` 5 + `expr-old` 1 are one question and are still
+  UNEXPLAINED**, and `strtod` is now cleared of it entirely.
+  Everything at or above `1.797693134862315 5 e308` comes back
+  infinite, including two values that are representable.
+  `strtod-xcheck` **refuted the obvious answer**: libap's `strtod`
+  returns `7feffffffffffffd` for the value Tcl reports as Inf, and
+  stays finite where glibc overflows -- so it is not this function.
+  **Tcl parses numbers in its own `tclStrToD.c`.** Ask what the code
+  calls, not what looks guilty.
 - `binary-53.25`/`53.26`: a double one ulp past the float range must
-  round to infinity.
+  round to infinity. Possibly the same question as `expr`'s six.
 - **9front has no symbolic links** (confirmed by grep), so `symlink()`
   stays ENOSYS. **Do not emulate it with a copy** -- see
   `docs/notes/tcl-suite.md`. **`tests/apexp-links.tcl` is the one probe
