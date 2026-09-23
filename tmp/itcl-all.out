@@ -1,0 +1,462 @@
+itcl-runall: /bin/itclsh
+itcl-runall: Itcl 4.2.3, Tcl 9.0.3
+itcl-runall: starting, line buffered, exit wrapped for the marker
+Tests running in interp:  /bin/itclsh
+Tests located in:  /usr/glenda/APExp/sys/src/external/itcl/tests
+Tests running in:  /usr/glenda/APExp/sys/src/external/itcl/tests
+Temporary files stored in /usr/glenda/APExp/sys/src/external/itcl/tests
+Test files run in separate interpreters
+Running tests that match:  *
+Skipping test files that match:  l.*.test
+Only running test files that match:  *.test
+Tests began at 2026-09-23 16:41:38 +0200
+basic.test
+body.test
+chain.test
+delete.test
+eclasscomponent.test
+ensemble.test
+general1.test
+import.test
+
+
+==== import-2.5 itcl::class will overwrite stubs in an existing namespace FAILED
+==== Contents of test case:
+
+    $interp eval {
+        proc auto_load {cmd {namespace {}}} {
+            itcl::class $cmd { }
+            return 1
+        }
+        namespace eval test::buried { }
+        itcl::import::stub create ::test::buried
+        itcl::import::stub create ::test::buried::stub
+        list [catch {::test::buried xx} result] $result [xx info class]
+    }
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: command "info" already exists in namespace "::"
+    while executing
+"::itcl::parser::handleClass xx ::xx info class"
+    invoked from within
+"xx info class"
+    ("interp eval" body line 9)
+    invoked from within
+"$interp eval {
+        proc auto_load {cmd {namespace {}}} {
+            itcl::class $cmd { }
+            return 1
+        }
+        namespace eval te..."
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: NONE
+==== import-2.5 FAILED
+
+info.test
+inherit.test
+interp.test
+local.test
+
+
+==== local-1.2  FAILED
+==== Contents of test case:
+
+    test_local::clear
+    test_local::test
+    test_local::check
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: bad option "variable": must be add, info, or remove
+    while executing
+"trace variable itcl-local-test_local1 u {::itcl::delete_helper ::test_local::test_local1}"
+    ("uplevel" body line 1)
+    invoked from within
+"uplevel [list trace variable itcl-local-$ptr u  "::itcl::delete_helper $cmd"]"
+    (procedure "itcl::local" line 5)
+    invoked from within
+"itcl::local test_local #auto"
+    invoked from within
+"test_local::test"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL LOOKUP INDEX option variable
+==== local-1.2 FAILED
+
+
+
+==== local-1.3  FAILED
+==== Contents of test case:
+
+    test_local::clear
+    test_local::test2
+    test_local::check
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: bad option "variable": must be add, info, or remove
+    while executing
+"trace variable itcl-local-test_local2 u {::itcl::delete_helper ::test_local::test_local2}"
+    ("uplevel" body line 1)
+    invoked from within
+"uplevel [list trace variable itcl-local-$ptr u  "::itcl::delete_helper $cmd"]"
+    (procedure "itcl::local" line 5)
+    invoked from within
+"itcl::local test_local #auto"
+    invoked from within
+"test_local::test2"
+    ("uplevel" body line 3)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL LOOKUP INDEX option variable
+==== local-1.3 FAILED
+
+
+
+==== local-1.4  FAILED
+==== Contents of test case:
+
+    itcl::find objects -isa test_local
+
+---- Result was:
+test_local0 ::test_local::test_local1 ::test_local::test_local2
+---- Result should have been (exact matching):
+test_local0
+==== local-1.4 FAILED
+
+methods.test
+mkindex.test
+
+
+==== mkindex-1.3 examine tclIndex FAILED
+==== Contents of test case:
+
+    namespace eval itcl_mkindex_tmp {
+        set dir "."
+        variable auto_index
+        source tclIndex
+        set result ""
+        foreach elem [lsort [array names auto_index]] {
+            lappend result [list $elem $auto_index($elem)]
+        }
+        set result
+    }
+
+---- Result was:
+{::Simple2::bump {source ./mkindex.itcl}} {::Simple2::by {source ./mkindex.itcl}} {::buried::deep::within {source ./mkindex.itcl}} {::buried::ens {source ./mkindex.itcl}} {::buried::inside {source ./mkindex.itcl}} {::buried::inside::bump {source ./mkindex.itcl}} {::buried::inside::by {source ./mkindex.itcl}} {::buried::inside::find {source -encoding utf-8 ./mkindex.itcl}} {::buried::under::neath {source ./mkindex.itcl}} {::top::find {source -encoding utf-8 ./mkindex.itcl}} {::top::notice {source -encoding utf-8 ./mkindex.itcl}} {Simple1 {source ./mkindex.itcl}} {Simple2 {source ./mkindex.itcl}} {ens {source ./mkindex.itcl}} {top {source ./mkindex.itcl}}
+---- Result should have been (exact matching):
+{::Simple2::bump {source ./mkindex.itcl}} {::Simple2::by {source ./mkindex.itcl}} {::buried::deep::within {source ./mkindex.itcl}} {::buried::ens {source ./mkindex.itcl}} {::buried::inside {source ./mkindex.itcl}} {::buried::inside::bump {source ./mkindex.itcl}} {::buried::inside::by {source ./mkindex.itcl}} {::buried::inside::find {source ./mkindex.itcl}} {::buried::under::neath {source ./mkindex.itcl}} {::top::find {source ./mkindex.itcl}} {::top::notice {source ./mkindex.itcl}} {Simple1 {source ./mkindex.itcl}} {Simple2 {source ./mkindex.itcl}} {ens {source ./mkindex.itcl}} {top {source ./mkindex.itcl}}
+==== mkindex-1.3 FAILED
+
+namespace.test
+protection.test
+scope.test
+sfbugs.test
+
+
+==== sfbug-254.1 SF bug #254 + bug [1dc2d851eb] FAILED
+==== Contents of test case:
+
+    set interp [interp create]
+    set ::test_status ""
+    $interp eval {
+      oo::class destroy
+    }
+    lappend ::test_status "::oo::class destroy worked"
+    if {[catch {
+      $interp eval [::tcltest::loadScript]
+      $interp eval {
+        package require itcl
+      }
+    } msg]} {
+      lappend ::test_status $msg
+    }
+
+---- Result was:
+{::oo::class destroy worked} {can't find package itcl}
+---- Result should have been (exact matching):
+{::oo::class destroy worked} {::oo::class does not refer to an object}
+==== sfbug-254.1 FAILED
+
+
+
+==== sfbug-254.2 SF bug #254 + bug [1dc2d851eb] FAILED
+==== Contents of test case:
+
+    set interp [interp create]
+    set ::test_status ""
+    $interp eval {set ::tcl::inl_mem_test 0}
+    $interp eval [::tcltest::loadScript]
+    $interp eval {
+      package require itcl
+
+      oo::class destroy
+    }
+    lappend ::test_status "::oo::class destroy worked"
+    if {[catch {
+      $interp eval {
+        ::itcl::class ::test {}
+      }
+    } msg]} {
+      lappend ::test_status $msg
+    }
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: can't find package itcl
+    while executing
+"package require itcl"
+    ("interp eval" body line 2)
+    invoked from within
+"$interp eval {
+      package require itcl
+
+      oo::class destroy
+    }"
+    ("uplevel" body line 6)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL PACKAGE UNFOUND
+==== sfbug-254.2 FAILED
+
+
+
+==== sfbug-254.3 delete oo-subsystem should remove all classes + summary of bug [1dc2d851eb] FAILED
+==== Contents of test case:
+
+    set interp [interp create]
+    set ::test_status ""
+    $interp eval {set ::tcl::inl_mem_test 0}
+    $interp eval [::tcltest::loadScript]
+    $interp eval {
+      package require itcl
+
+      ::itcl::class ::test {}
+    }
+    lappend ::test_status "::test class created"
+    $interp eval {
+      oo::class destroy
+    }
+    lappend ::test_status "::oo::class destroy worked"
+    if {[catch {
+      $interp eval {
+        ::test x
+      }
+    } msg]} {
+      lappend ::test_status $msg
+    }
+    if {[catch {
+      $interp eval {
+        ::itcl::class ::test2 {inherit ::test}
+      }
+    } msg]} {
+      lappend ::test_status $msg
+    }
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: can't find package itcl
+    while executing
+"package require itcl"
+    ("interp eval" body line 2)
+    invoked from within
+"$interp eval {
+      package require itcl
+
+      ::itcl::class ::test {}
+    }"
+    ("uplevel" body line 6)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL PACKAGE UNFOUND
+==== sfbug-254.3 FAILED
+
+
+
+==== sfbug-257 SF bug #257 FAILED
+==== Contents of test case:
+
+    set interp [interp create]
+    $interp eval {set ::tcl::inl_mem_test 0}
+    $interp eval [::tcltest::loadScript]
+    $interp eval {
+      package require itcl
+      set ::test_status ""
+      ::itcl::class ::cl1 {
+        method m1 {} {
+          ::oo::class destroy
+          lappend ::test_status "method Hello World"
+        }
+        proc p1 {} {
+          lappend ::test_status "proc Hello World"
+        }
+      }
+      set obj1 [::cl1 #auto]
+      ::cl1::p1
+      $obj1 p1
+      $obj1 m1
+
+      catch {
+      $obj1 m1
+      ::cl1::p1
+      } msg
+      lappend ::test_status $msg
+    }
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: can't find package itcl
+    while executing
+"package require itcl"
+    ("interp eval" body line 2)
+    invoked from within
+"$interp eval {
+      package require itcl
+      set ::test_status ""
+      ::itcl::class ::cl1 {
+        method m1 {} {
+          ::oo::class destroy
+..."
+    ("uplevel" body line 5)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL PACKAGE UNFOUND
+==== sfbug-257 FAILED
+
+
+
+==== fossil-9.0 d0126511d9 FAILED
+==== Contents of test case:
+
+    itcl::class N {}
+
+---- Test generated error; Return code was: 1
+---- Return code should have been one of: 0 2
+---- errorInfo: can't create namespace "N": already existsITCL: cannot create Tcl_NewObjectInstance for class "::N"
+    while executing
+"itcl::class N {}"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $script"
+---- errorCode: TCL OPERATION NAMESPACE CREATEEXISTING
+---- Test cleanup failed:
+class "N" not found in context "::"
+---- errorInfo(cleanup): class "N" not found in context "::"
+    while executing
+"itcl::delete class N::B N"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): NONE
+==== fossil-9.0 FAILED
+
+
+
+==== fossil-9.1 d0126511d9 FAILED
+==== Contents of test case:
+
+    itcl::class N {}
+
+---- Test setup failed:
+class "N::B" already exists
+---- errorInfo(setup): class "N::B" already exists
+    while executing
+"itcl::class N::B {}"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $setup"
+---- errorCode(setup): NONE
+---- Test cleanup failed:
+class "N" not found in context "::"
+---- errorInfo(cleanup): class "N" not found in context "::"
+    while executing
+"itcl::delete class N"
+    ("uplevel" body line 2)
+    invoked from within
+"uplevel 1 $cleanup"
+---- errorCode(cleanup): NONE
+==== fossil-9.1 FAILED
+
+typeclass.test
+
+
+==== rename-1.3 rename to "" deletes an instance FAILED
+==== Contents of test case:
+
+    type dog { }
+
+    dog fido
+    rename fido ""
+    namespace children ::dog
+
+---- Result was:
+{::dog:: oo }
+---- Result should have been (exact matching):
+
+==== rename-1.3 FAILED
+
+
+
+==== rename-1.4 rename to "" deletes an instance even after a rename FAILED
+==== Contents of test case:
+
+    type dog { }
+
+    dog fido
+    rename fido spot
+    rename spot ""
+    namespace children ::dog
+
+---- Result was:
+{::dog:: oo }
+---- Result should have been (exact matching):
+
+==== rename-1.4 FAILED
+
+
+
+==== destroy-1.1 destroy cleans up the instance FAILED
+==== Contents of test case:
+
+    type dog {
+        option -color golden
+    }
+
+    set a [namespace children ::dog::]
+    dog create spot
+    set ns [info object namespace spot]
+    set b [namespace children ::itcl::internal::variables$ns]
+    spot destroy
+    set c [namespace which ::itcl::internal::variables$ns]
+    list $a $b $c [info commands ::dog::spot]
+
+---- Result was:
+{{::dog:: oo }} ::itcl::internal::variables::oo::Obj121::dog {} {}
+---- Result should have been (glob matching):
+{} ::itcl::internal::variables::*::dog {} {}
+==== destroy-1.1 FAILED
+
+typedelegation.test
+typefunction.test
+typeinfo.test
+typeoption.test
+typevariable.test
+widgetadaptor.test
+widgetclass.test
+
+Tests ended at 2026-09-23 16:41:41 +0200
+all.tcl:	Total	792	Passed	712	Skipped	66	Failed	14
+Sourced 26 Test Files.
+Files with failing tests: import.test local.test mkindex.test sfbugs.test typeclass.test
+Number of tests skipped for each constraint:
+	1	knownBug
+	4	needs_frq_1773103
+	2	only_working_in_itcl3.4
+	59	tk
+itcl-runall: every file ran, now entering exit (code 0)
+itcl-runall: anything below this line is Tcl_Exit teardown
+itcl-runall: exit called (code 0)
