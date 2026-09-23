@@ -9,7 +9,7 @@ Test files run in separate interpreters
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-23 06:55:22 +0200
+Tests began at 2026-09-23 09:09:16 +0200
 aaa_exit.test
 abstractlist.test
 append.test
@@ -229,7 +229,7 @@ cmdAH.test
     expr {$newatime == $modatime ? 1 : "$newatime != $modatime"}
 
 ---- Result was:
-1790139354 != 1790139353
+1790147390 != 1790147389
 ---- Result should have been (exact matching):
 1
 ==== cmdAH-20.5 FAILED
@@ -904,7 +904,7 @@ bbbbbbbbbbbbbbb 15 123456789abcdef 1 4 abcd 0 3 efg
     ("uplevel" body line 15)
     invoked from within
 "uplevel 1 $script"
----- errorCode: CHILDSTATUS 16513 1
+---- errorCode: CHILDSTATUS 24186 1
 ==== io-29.33b FAILED
 
 
@@ -1356,7 +1356,7 @@ unixInit.test
     }
 
 ---- Result was:
-Expected: `127.0.0.1 localhost 63764', Got `'
+Expected: `127.0.0.1 localhost 58830', Got `'
 ---- Result should have been (exact matching):
 OK
 ==== unixInit-1.2 FAILED
@@ -1498,7 +1498,7 @@ zipfs.test
 
 zlib.test
 
-Tests ended at 2026-09-23 06:58:57 +0200
+Tests ended at 2026-09-23 09:13:04 +0200
 all.tcl:	Total	68118	Passed	62138	Skipped	5916	Failed	64
 Sourced 167 Test Files.
 Files with failing tests: binary.test chanio.test cmdAH.test env.test event.test exec.test expr-old.test expr.test fCmd.test fileName.test io.test lseq.test main.test scan.test socket.test unixFCmd.test unixInit.test zipfs.test
