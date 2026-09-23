@@ -5,6 +5,7 @@ if(! test -e /sys/include/ape/THIS_IS_APExp) {
     bind -b sys/include /sys/include
     bind -b $cputype/include/ape /$cputype/include/ape
     bind -b $cputype/include/ape /sys/include/ape
+	bind -b $cputype/lib /$cputype/lib
     bind -b $cputype/lib/ape /$cputype/lib/ape
     bind -b sys/include/ape /sys/include/ape
     bind -b $cputype/bin /bin

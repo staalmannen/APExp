@@ -43,13 +43,6 @@ typedef uintptr  size_t;
 typedef uintptr  uintptr_t;
 typedef intptr   intptr_t;
 
-/* stdbool */
-#ifndef __cplusplus
-typedef int bool;
-#define true  1
-#define false 0
-#endif
-
 #ifndef NULL
 #define NULL ((void*)0)
 #endif

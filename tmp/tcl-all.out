@@ -9,7 +9,7 @@ Test files run in separate interpreters
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-19 05:49:35 +0200
+Tests began at 2026-09-23 05:21:59 +0200
 aaa_exit.test
 abstractlist.test
 append.test
@@ -244,42 +244,6 @@ Succeeded {Hey DONE}
 0o666
 ==== chan-io-40.3 FAILED
 
-
-
-==== chan-io-41.8 Tcl_FileeventCmd: symbolic link FAILED
-==== Contents of test case:
-
-    set target [makeFile {not again} thefile $tempdir]
-    set link [file join $tempdir thelin]
-    file link -symbolic $link $target
-    set chan [open $link]
-    chan event $chan readable [list ::apply [list {} {
-	variable success
-	set success 1
-    } [namespace current]]]
-    vwait [namespace current]::success
-    return $success
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "/tmp/tcl_eOMlEf/thelin" pointing to "/tmp/tcl_eOMlEf/thefile": function not implemented
-    while executing
-"file link -symbolic $link $target"
-    ("uplevel" body line 4)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
----- Test cleanup failed:
-can not find channel named "file6"
----- errorInfo(cleanup): can not find channel named "file6"
-    while executing
-"close $chan"
-    ("uplevel" body line 2)
-    invoked from within
-"uplevel 1 $cleanup"
----- errorCode(cleanup): TCL LOOKUP CHANNEL file6
-==== chan-io-41.8 FAILED
-
 clock-ivm.test
   Validity default mode: off
 clock.test
@@ -297,7 +261,7 @@ cmdAH.test
     expr {$newatime == $modatime ? 1 : "$newatime != $modatime"}
 
 ---- Result was:
-1789789808 != 1789789806
+1790133751 != 1790133750
 ---- Result should have been (exact matching):
 1
 ==== cmdAH-20.5 FAILED
@@ -314,46 +278,6 @@ cmdAH.test
 ---- Result should have been (exact matching):
 0
 ==== cmdAH-25.3 FAILED
-
-
-
-==== cmdAH-29.4 Tcl_FileObjCmd: type FAILED
-==== Contents of test case:
-
-    # Unlike [exec ln -s], [file link] requires an existing target
-    file link -symbolic $linkfile $gorpfile
-    file type $linkfile
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "/usr/glenda/APExp/sys/src/external/tcl/tests/link.file" pointing to "/usr/glenda/APExp/sys/src/external/tcl/tests/górp.file": function not implemented
-    while executing
-"file link -symbolic $linkfile $gorpfile"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== cmdAH-29.4 FAILED
-
-
-
-==== cmdAH-29.4.1 Tcl_FileObjCmd: type FAILED
-==== Contents of test case:
-
-    set linkdir [file join [temporaryDirectory] link.dir]
-    file link -symbolic $linkdir $tempdir
-    file type $linkdir
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "/usr/glenda/APExp/sys/src/external/tcl/tests/link.dir" pointing to "/usr/glenda/APExp/sys/src/external/tcl/tests/temp": function not implemented
-    while executing
-"file link -symbolic $linkdir $tempdir"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== cmdAH-29.4.1 FAILED
 
 cmdIL.test
 cmdInfo.test
@@ -679,302 +603,6 @@ This is a result: 1.7976931348623157e+308
 fCmd.test
 
 
-==== fCmd-18.12 TclFileRenameCmd : rename a symbolic link to file FAILED
-==== Contents of test case:
-
-    set s [createfile tfa1]
-    file link -symbolic tfa2 tfa1
-    file rename tfa2 tfa3
-    file type tfa3
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "tfa2" pointing to "tfa1": function not implemented
-    while executing
-"file link -symbolic tfa2 tfa1"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== fCmd-18.12 FAILED
-
-
-
-==== fCmd-18.13 TclFileRenameCmd : rename a symbolic link to dir FAILED
-==== Contents of test case:
-
-    file mkdir tfa1
-    file link -symbolic tfa2 tfa1
-    file rename tfa2 tfa3
-    file type tfa3
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "tfa2" pointing to "tfa1": function not implemented
-    while executing
-"file link -symbolic tfa2 tfa1"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== fCmd-18.13 FAILED
-
-
-
-==== fCmd-18.14 TclFileRenameCmd : rename a path with sym link FAILED
-==== Contents of test case:
-
-    file mkdir tfa1/a/b/c/d
-    file mkdir tfa2
-    set f [file join [pwd] tfa1/a/b]
-    set f2 [file join [pwd] {tfa2/b alias}]
-    file link -symbolic $f2 $f
-    file rename {tfa2/b alias/c} tfa3
-    list [file isdir tfa3] [file exists tfa1/a/b/c]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "/usr/glenda/APExp/sys/src/external/tcl/tests/tfa2/b alias" pointing to "/usr/glenda/APExp/sys/src/external/tcl/tests/tfa1/a/b": function not implemented
-    while executing
-"file link -symbolic $f2 $f"
-    ("uplevel" body line 6)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== fCmd-18.14 FAILED
-
-
-
-==== fCmd-18.15 TclFileRenameCmd : rename a file to a symlink dir FAILED
-==== Contents of test case:
-
-    file mkdir tfa1
-    set s [createfile tfa2]
-    file link -symbolic tfalink tfa1
-    file rename tfa2 tfalink
-    checkcontent tfa1/tfa2 $s
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "tfalink" pointing to "tfa1": function not implemented
-    while executing
-"file link -symbolic tfalink tfa1"
-    ("uplevel" body line 4)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== fCmd-18.15 FAILED
-
-
-
-==== fCmd-18.16 TclFileRenameCmd: rename a dangling symlink FAILED
-==== Contents of test case:
-
-    file mkdir tfa1
-    file link -symbolic tfalink tfa1
-    file delete tfa1
-    file rename tfalink tfa2
-    file type tfa2
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "tfalink" pointing to "tfa1": function not implemented
-    while executing
-"file link -symbolic tfalink tfa1"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== fCmd-18.16 FAILED
-
-
-
-==== fCmd-21.7.2 TclCopyFilesCmd: copy a dangling link FAILED
-==== Contents of test case:
-
-    file mkdir tfad1
-    file link -symbolic tfalink tfad1
-    file delete tfad1
-    file copy tfalink tfalink2
-    file type tfalink2
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "tfalink" pointing to "tfad1": function not implemented
-    while executing
-"file link -symbolic tfalink tfad1"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== fCmd-21.7.2 FAILED
-
-
-
-==== fCmd-21.8.2 TclCopyFilesCmd: copy a link FAILED
-==== Contents of test case:
-
-    file mkdir tfad1
-    file link -symbolic tfalink tfad1
-    file copy tfalink tfalink2
-    list [file type tfalink] [file type tfalink2] [file isdir tfad1]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "tfalink" pointing to "tfad1": function not implemented
-    while executing
-"file link -symbolic tfalink tfad1"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== fCmd-21.8.2 FAILED
-
-
-
-==== fCmd-21.9 TclCopyFilesCmd: copy dir with a link in it FAILED
-==== Contents of test case:
-
-    file mkdir tfad1
-    file link -symbolic tfad1/tfalink "[pwd]/tfad1"
-    file copy tfad1 tfad2
-    file type tfad2/tfalink
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "tfad1/tfalink" pointing to "/usr/glenda/APExp/sys/src/external/tcl/tests/tfad1": function not implemented
-    while executing
-"file link -symbolic tfad1/tfalink "[pwd]/tfad1""
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== fCmd-21.9 FAILED
-
-
-
-==== fCmd-26.1 TclDeleteFilesCmd: delete symlink FAILED
-==== Contents of test case:
-
-    file mkdir tfad1
-    file link -symbolic tfalink tfad1
-    file delete tfalink
-    list [file isdir tfad1] [file exists tfalink]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "tfalink" pointing to "tfad1": function not implemented
-    while executing
-"file link -symbolic tfalink tfad1"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== fCmd-26.1 FAILED
-
-
-
-==== fCmd-26.2 TclDeleteFilesCmd: delete dir with symlink FAILED
-==== Contents of test case:
-
-    file mkdir tfad1
-    file mkdir tfad2
-    file link -symbolic [file join tfad2 link] [file join .. tfad1]
-    file delete -force tfad2
-    list [file isdir tfad1] [file exists tfad2]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "tfad2/link" pointing to "../tfad1": function not implemented
-    while executing
-"file link -symbolic [file join tfad2 link] [file join .. tfad1]"
-    ("uplevel" body line 4)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== fCmd-26.2 FAILED
-
-
-
-==== fCmd-26.3 TclDeleteFilesCmd: delete dangling symlink FAILED
-==== Contents of test case:
-
-    file mkdir tfad1
-    file link -symbolic tfad2 tfad1
-    file delete tfad1
-    file delete tfad2
-    list [file exists tfad1] [file exists tfad2]
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "tfad2" pointing to "tfad1": function not implemented
-    while executing
-"file link -symbolic tfad2 tfad1"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== fCmd-26.3 FAILED
-
-
-
-==== fCmd-28.9 file link: success with file FAILED
-==== Contents of test case:
-
-    file link abc.link abc.file
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "abc.link" pointing to "abc.file": function not implemented
-    while executing
-"file link abc.link abc.file"
-    ("uplevel" body line 2)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== fCmd-28.9 FAILED
-
-
-
-==== fCmd-28.21 file link: relative paths FAILED
-==== Contents of test case:
-
-    file mkdir d1/d2/d3
-    file link d1/l2 d2
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "d1/l2" pointing to "d2": function not implemented
-    while executing
-"file link d1/l2 d2"
-    ("uplevel" body line 3)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== fCmd-28.21 FAILED
-
-
-
-==== fCmd-28.22 file link: relative paths FAILED
-==== Contents of test case:
-
-    file mkdir d1/d2/d3
-    catch {file delete -force d1/l2}
-    file link d1/l2 d2/d3
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "d1/l2" pointing to "d2/d3": function not implemented
-    while executing
-"file link d1/l2 d2/d3"
-    ("uplevel" body line 4)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== fCmd-28.22 FAILED
-
-
-
 ==== fCmd-31.6 file home USER FAILED
 ==== Contents of test case:
 
@@ -1250,32 +878,6 @@ bbbbbbbbbbbbbbb 15 123456789abcdef 1 4 abcd 0 3 efg
 
 
 
-==== io-6.46 Tcl_GetsObj: input saw cr, followed by just \n should give eof FAILED
-==== Contents of test case:
-
-    # memmove()
-
-    set f [open "|[list [interpreter] $path(cat)]" w+]
-    fconfigure $f -translation {auto lf} -buffering none
-    puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
-    fconfigure $f -buffersize 16
-    gets $f
-    fconfigure $f -blocking 0
-    set x [list [gets $f line] $line [testchannel queuedcr $f]]
-    fconfigure $f -blocking 1
-    puts -nonewline $f "\n\x1A"
-    lappend x [gets $f line] $line [testchannel queuedcr $f]
-    close $f
-    set x
-
----- Result was:
--1 {} 0 15 123456789abcdef 1
----- Result should have been (exact matching):
-15 123456789abcdef 1 -1 {} 0
-==== io-6.46 FAILED
-
-
-
 ==== io-14.1 Tcl_SetStdChannel and Tcl_GetStdChannel FAILED
 ==== Contents of test case:
 
@@ -1345,7 +947,7 @@ line line none
     ("uplevel" body line 15)
     invoked from within
 "uplevel 1 $script"
----- errorCode: CHILDSTATUS 4774 1
+---- errorCode: CHILDSTATUS 4584 1
 ==== io-29.33b FAILED
 
 
@@ -1747,28 +1349,6 @@ error renaming "td1/td2/td3": no such file or directory
 error renaming "td1/td2/td3": permission denied
 ==== unixFCmd-1.1 FAILED
 
-
-
-==== unixFCmd-2.2.2 TclpCopyFile: src is symlink FAILED
-==== Contents of test case:
-
-    # copying links should end up with the links copied
-    close [open tf1 a]
-    file link -symbolic tf2 tf1
-    file copy tf2 tf3
-    file type tf3
-
----- Test generated error; Return code was: 1
----- Return code should have been one of: 0 2
----- errorInfo: could not create new link "tf2" pointing to "tf1": function not implemented
-    while executing
-"file link -symbolic tf2 tf1"
-    ("uplevel" body line 4)
-    invoked from within
-"uplevel 1 $script"
----- errorCode: POSIX ENOSYS {function not implemented}
-==== unixFCmd-2.2.2 FAILED
-
 unixFile.test
 unixForkEvent.test
 unixInit.test
@@ -1819,7 +1399,7 @@ unixInit.test
     }
 
 ---- Result was:
-Expected: `127.0.0.1 localhost 58609', Got `'
+Expected: `127.0.0.1 localhost 62663', Got `'
 ---- Result should have been (exact matching):
 OK
 ==== unixInit-1.2 FAILED
@@ -2019,7 +1599,7 @@ atime 1105466634 blksize 0 blocks 0 ctime 1105466634 dev 0 gid 0 ino 0 mode 1674
 	    lsort -stride 2 [file stat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789789992 ctime 1789789992 dev 0 gid 0 ino 0 mode 16749 mtime 1789789992 nlink 0 size 0 type directory uid 0
+atime 1790133939 ctime 1790133939 dev 0 gid 0 ino 0 mode 16749 mtime 1790133939 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-stat-root-mount FAILED
@@ -2032,7 +1612,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789789992 ctime 1789789992 dev 0 gid 0 ino 0 mode 16749 mtime 1789789992 nlink 0 size 0 type directory uid 0
+atime 1790133939 ctime 1790133939 dev 0 gid 0 ino 0 mode 16749 mtime 1790133939 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-lstat-root-mount FAILED
@@ -2045,7 +1625,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file stat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789789992 ctime 1789789992 dev 0 gid 0 ino 0 mode 16749 mtime 1789789992 nlink 0 size 0 type directory uid 0
+atime 1790133939 ctime 1790133939 dev 0 gid 0 ino 0 mode 16749 mtime 1790133939 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-stat-root-subdir-mount FAILED
@@ -2058,7 +1638,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789789992 ctime 1789789992 dev 0 gid 0 ino 0 mode 16749 mtime 1789789992 nlink 0 size 0 type directory uid 0
+atime 1790133939 ctime 1790133939 dev 0 gid 0 ino 0 mode 16749 mtime 1790133939 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-lstat-root-subdir-mount FAILED
@@ -2071,7 +1651,7 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file stat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789789992 ctime 1789789992 dev 0 gid 0 ino 0 mode 16749 mtime 1789789992 nlink 0 size 0 type directory uid 0
+atime 1790133939 ctime 1790133939 dev 0 gid 0 ino 0 mode 16749 mtime 1790133939 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-stat-mezzo FAILED
@@ -2084,15 +1664,15 @@ atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink
 	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
 	
 ---- Result was:
-atime 1789789992 ctime 1789789992 dev 0 gid 0 ino 0 mode 16749 mtime 1789789992 nlink 0 size 0 type directory uid 0
+atime 1790133939 ctime 1790133939 dev 0 gid 0 ino 0 mode 16749 mtime 1790133939 nlink 0 size 0 type directory uid 0
 ---- Result should have been (regexp matching):
 atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
 ==== zipfs-file-lstat-mezzo FAILED
 
 zlib.test
 
-Tests ended at 2026-09-19 05:53:13 +0200
-all.tcl:	Total	68118	Passed	62130	Skipped	5892	Failed	96
+Tests ended at 2026-09-23 05:25:40 +0200
+all.tcl:	Total	68118	Passed	62125	Skipped	5916	Failed	77
 Sourced 167 Test Files.
 Files with failing tests: binary.test chanio.test cmdAH.test env.test event.test exec.test expr-old.test expr.test fCmd.test fileName.test io.test lseq.test main.test scan.test socket.test unixFCmd.test unixInit.test zipfs.test
 Number of tests skipped for each constraint:
@@ -2117,7 +1697,7 @@ Number of tests skipped for each constraint:
 	2	bug_fa00fbbbab
 	60	cookiejar
 	49	dde
-	4	dontCopyLinks
+	3	dontCopyLinks
 	64	emptyTest
 	1	enableUnixInit32
 	1	execMknod
@@ -2134,7 +1714,8 @@ Number of tests skipped for each constraint:
 	54	knownBug
 	2	knownProfileBug
 	2	lgen
-	4	linkDirectory
+	21	linkDirectory
+	4	linkFile
 	100	localeRegexp
 	2	localhost_v6
 	4	longIs64bit
@@ -2148,7 +1729,7 @@ Number of tests skipped for each constraint:
 	49	nonPortable
 	5	notNetworkFilesystem
 	1	notValgrind
-	17	notWine
+	10	notWine
 	1	notenoughmemoryexception
 	1	obsolete
 	1	panicInEnterCmdStartData
@@ -2157,6 +1738,7 @@ Number of tests skipped for each constraint:
 	3992	serverNeeded
 	12	supported_inet6
 	1	symbolicLinkFile
+	14	symlinks
 	19	tcl9pkgaRequired
 	20	tcl9pkguaRequired
 	1	testCPUID
@@ -2168,8 +1750,7 @@ Number of tests skipped for each constraint:
 	1	testwinclock
 	197	thread
 	1	tildeexpansion
-	594	win
-	1	winLessThan10
+	592	win
 	6	xdev
 	19	zipfslib
 tcl-runall: every file ran, now entering exit (code 0)
