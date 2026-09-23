@@ -468,3 +468,72 @@ the fault was state rather than arithmetic.
 
 **`strtof` and `strtold` are still the old algorithm**, the same
 91-line file twice more, and still wrong in the same way.
+
+#### strtof and strtold: one forwards, and one needed a real fix
+
+**`strtold` forwards to `strtod`.** kencc has no extended precision --
+`sub.c`'s `simplet()` maps `BDOUBLE|BLONG` to `types[TDOUBLE]`, so
+`long double` IS `double` on every architecture here, which is the same
+fact perl's `config.h` had to be corrected to admit. The file it
+replaced was a third copy of the old parser, with the same bug as the
+other two. On this platform forwarding is not a shortcut, it is what
+the function means; and three copies of a parser is three places for
+the next bug to live.
+
+**`strtof` looked like the same one-liner and was not.** The obvious
+`(float)strtod(s)` rounds twice -- decimal to 53 bits, then 53 to 24 --
+and that is not the same operation as rounding once to 24. When the
+correctly rounded double lands exactly on a midpoint between two
+floats, the narrowing has no tie-break left and falls back on
+round-half-to-even, which is right only by luck.
+
+**The question was settled by measurement, not by argument.**
+`sys/lib/tests/strtof-xcheck.c`, against glibc:
+
+```
+1. 200000 float round-trips through "%.9g"    0 wrong
+2. 200000 random 17-digit decimals            0 wrong
+3. the powers of ten, 1e-50..1e40             0 wrong
+4. the edges of the float range               1 wrong
+5. decimals BUILT to sit on a float midpoint  12709 of 39694 wrong
+```
+
+Sections 1 to 3 say ordinary use never notices. **Section 5 is the
+point of the file**: for a float `f` the midpoint `M` between it and
+the next float up is exactly representable as a double and its decimal
+expansion is finite, so `M` and `M` with a digit appended can both be
+written exactly -- and a third of those come out wrong. A sweep that
+only drew random numbers would have reported this as correct.
+
+Section 4's single failure was the same thing at the top end:
+`3.4028235677973366e+38` is below the overflow boundary and must give
+FLT_MAX; it gave infinity, because the boundary is itself a midpoint.
+
+**The fix asks strtod a question it already knows the answer to.** The
+correction loop holds the decimal as an exact Bigint, so
+`_strtod_cmp()` returns the nearest double *and* which side of it the
+decimal lay (`decimalcmp` does one more exact scaled comparison at the
+end; the floating-point fast paths are skipped when the comparison is
+wanted, since they never build the Bigint). If the double is a float
+midpoint and the decimal was not on it, one `nextafter` in the right
+direction moves it off the tie before the narrowing. If the decimal
+*was* the midpoint, the tie is real and half-to-even is correct, so
+nothing is done.
+
+**The nudge is conditional on being exactly on a midpoint, and that is
+not fussiness**: a double one ulp away from a midpoint would be moved
+*onto* one by an unconditional nudge, turning a decided case into a
+tie. `floatmidpoint()` asks by averaging the two floats that bracket
+the double -- exact, and still right in the subnormal range where a
+float's step is a fixed 2^-149 and the bit-pattern argument does not
+hold.
+
+After it: **all five sections 0 wrong**, and `strtod-xcheck` and
+`dtoa-xcheck` are unchanged, which is the check that the plumbing added
+to `strtod` cost nothing.
+
+*(One guard worth naming: `retfree` is also reached from the overflow
+and underflow exits, where the result is an infinity or a zero and
+`_d2b` has nothing to take apart. The comparison is computed only for
+a finite non-zero result -- and no caller needs it otherwise, since
+neither an infinity nor a zero is a midpoint between floats.)*

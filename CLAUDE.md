@@ -203,8 +203,8 @@ under plain `tclsh` and isolates the `chan-io-44.1` and `event-11.5`
 hangs, with a timeout on every section so it reports where the suite
 would wait; `select-test.c` takes the two bugs it found down to the
 `select()` call underneath them.
-`strtod-xcheck.c` and `dtoa-xcheck.c` are the same idea for `strtod`
-and `_dtoa`, and are likewise HOST programs, not Plan 9 tests. The
+`strtod-xcheck.c`, `strtof-xcheck.c` and `dtoa-xcheck.c` are the same
+idea for `strtod`, `strtof` and `_dtoa`, and are likewise HOST programs, not Plan 9 tests. The
 second checks the two against each other -- the shortest string that
 reads back -- which is a real test of both. `tz-xcheck.c` is not a Plan 9 test at all: it links
 `lib/ap/time/tzone.c` into a **glibc** program on the build host and
@@ -884,8 +884,22 @@ Open, in order of what the next run should touch:
   The last 52 were the scale-up-by-2^53 arm, which upstream guards with
   `#ifdef Sudden_Underflow` -- for machines that FLUSH to zero. IEEE
   has gradual underflow; applying it made `1e-308` come out `0`.
-  **`strtof`/`strtold` are still the old algorithm** and still wrong in
-  the same way: the same 91-line file twice more.
+- **`strtof` and `strtold` are done too.** `strtold` forwards to
+  `strtod`: kencc has no extended precision, so `long double` IS
+  `double` here. **`strtof` needed more than `(float)strtod`** --
+  rounding to 53 bits and then to 24 is not rounding to 24, and when
+  the double lands on a midpoint between two floats the narrowing has
+  no tie-break left. Measured, not argued: `strtof-xcheck` found
+  200000 float round-trips and 200000 random 17-digit decimals all
+  correct, and **12709 of 39694 wrong among decimals BUILT to sit on a
+  float midpoint** -- a sweep of random numbers would have called it
+  clean. `_strtod_cmp()` now returns the nearest double *and* which
+  side of it the decimal lay (strtod's loop has the decimal exactly;
+  the fast paths are skipped when the comparison is wanted), and one
+  `nextafter` moves it off the tie. **Conditional on being exactly on a
+  midpoint**: an unconditional nudge would move a double one ulp away
+  ONTO one. All five sections 0 wrong, with `strtod-xcheck` and
+  `dtoa-xcheck` unchanged.
 - **`expr` 5 + `expr-old` 1 are one question and are still
   UNEXPLAINED**, and `strtod` is now cleared of it entirely.
   Everything at or above `1.797693134862315 5 e308` comes back

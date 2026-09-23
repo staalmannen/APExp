@@ -248,6 +248,14 @@ extern Bigint	*_i2b(int);
 
 extern double	_tens[], _bigtens[], _tinytens[];
 
+/*
+ * strtod with the exact comparison: *pcmp is -1, 0 or +1 for
+ * value < = > the double returned. strtof needs it -- once the
+ * correctly rounded double sits on a midpoint between two floats, the
+ * narrowing has no tie-break left. Private to libap.
+ */
+extern double	_strtod_cmp(const char *, char **, int *);
+
 #ifdef IEEE_Arith
 #define n_bigtens 5
 #else

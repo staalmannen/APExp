@@ -256,8 +256,64 @@ ratio(Bigint *a, Bigint *b)
 }
 
 
-double
-strtod(CONST char *s00, char **se)
+/*
+ * THE EXACT COMPARISON, for callers that round again afterwards.
+ * strtod returns the nearest double; a caller narrowing that to float
+ * needs to know which side of it the decimal actually lay, because
+ * once the double is on a midpoint between two floats the second
+ * rounding has nothing left to break the tie with. decimalcmp asks the
+ * question the correction loop already knows how to ask: scale both
+ * the decimal and the candidate to common terms and compare exactly.
+ *
+ * Returns -1, 0 or +1 for value < = > rv.
+ */
+static int
+decimalcmp(Bigint *bd0, int e, double rv)
+{
+	Bigint *bb, *bd;
+	int bb2, bb5, bd2, bd5, bbe, bbbits, i, j;
+
+	bd = Balloc(bd0->k);
+	Bcopy(bd, bd0);
+	bb = _d2b(rv, &bbe, &bbbits);
+	if (e >= 0) {
+		bb2 = bb5 = 0;
+		bd2 = bd5 = e;
+	}
+	else {
+		bb2 = bb5 = -e;
+		bd2 = bd5 = 0;
+	}
+	if (bbe >= 0)
+		bb2 += bbe;
+	else
+		bd2 -= bbe;
+	i = bb2 < bd2 ? bb2 : bd2;
+	if (i > 0) {
+		bb2 -= i;
+		bd2 -= i;
+	}
+	if (bb5 > 0)
+		bb = pow5mult(bb, bb5);
+	if (bb2 > 0)
+		bb = lshift(bb, bb2);
+	if (bd5 > 0)
+		bd = pow5mult(bd, bd5);
+	if (bd2 > 0)
+		bd = lshift(bd, bd2);
+	j = cmp(bd, bb);
+	Bfree(bb);
+	Bfree(bd);
+	return j < 0 ? -1 : j > 0 ? 1 : 0;
+}
+
+/*
+ * pcmp non-null asks for that comparison, and also turns off the
+ * floating-point fast paths: they return without ever building the
+ * decimal as a Bigint, so there would be nothing to compare against.
+ */
+static double
+strtodg(CONST char *s00, char **se, int *pcmp)
 {
 	int bb2, bb5, bbe, bd2, bd5, bbbits, bs2, c, dsign,
 		e, e1, esign, i, j, k, nd, nd0, nf, nz, nz0, sign;
@@ -405,6 +461,7 @@ dig_done:
 	bd0 = 0;
 	if (nd <= DBL_DIG
 		&& FLT_ROUNDS == 1
+		&& pcmp == 0
 		) {
 		if (!e)
 			goto ret;
@@ -714,8 +771,19 @@ cont:
 ret0:
 	s = s00;
 	sign = 0;
+	if (pcmp)
+		*pcmp = 0;
 	goto ret;
 retfree:
+	/*
+	 * Only for a finite, non-zero result: retfree is also reached from
+	 * the overflow and underflow exits inside the loop, where rv is
+	 * an infinity or a zero and _d2b has nothing to take apart. The
+	 * caller that wants this comparison does not need one there --
+	 * neither an infinity nor a zero is a midpoint between floats.
+	 */
+	if (pcmp && rv.d != 0 && (word0(rv) & Exp_mask) != Exp_mask)
+		*pcmp = decimalcmp(bd0, e, rv.d);
 	Bfree(bb);
 	Bfree(bd);
 	Bfree(bs);
@@ -725,4 +793,20 @@ ret:
 	if (se)
 		*se = (char *)s;
 	return sign ? -rv.d : rv.d;
+}
+
+double
+strtod(CONST char *s00, char **se)
+{
+	return strtodg(s00, se, 0);
+}
+
+/*
+ * Private to libap: strtof uses it. See decimalcmp above for why.
+ */
+double
+_strtod_cmp(CONST char *s00, char **se, int *pcmp)
+{
+	*pcmp = 0;
+	return strtodg(s00, se, pcmp);
 }
