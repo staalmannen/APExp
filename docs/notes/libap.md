@@ -589,3 +589,89 @@ was looked at is changed.
 is right -- `retfree` frees all four and is reachable from the overflow
 and underflow exits before the loop has run. `Bfree(0)` is a no-op by
 design, so they are initialised to 0.)*
+
+#### `2^1023` is not a power of two, and every subnormal from ldexp was wrong
+
+The `machexp` probe answered in one run, and it did not say what was
+predicted. `MakeHighPrecisionDouble` had the right answer in hand:
+
+```
+APEXP MakeHighPrecisionDouble: numSigDigs=17 exponent=292 | maxDigits=308 minDigits=-324 log2FLT_RADIX=1 mantBits=53
+APEXP   Pow10TimesFrExp(292) -> 0.99999999999999967 machexp=1024 | limit 1024
+APEXP   SafeLdExp -> 2041.9999999999993
+APEXP   after two RefineApproximation -> Infinity
+```
+
+Every constant is right, `machexp` is **1024** against a limit of 1024,
+so neither overflow test fires -- and then `SafeLdExp`, which is
+`ldexp`, which is `scalbn`, turns `0.99999999999999967 x 2^1024` into
+**2042**.
+
+`math/scalbn.c`:
+
+```c
+	if (n > 1023) {
+		y *= 2^1023 ;
+```
+
+**`2^1023` is `2 XOR 1023` -- an integer bitwise exclusive-or, 1021.**
+musl writes `0x1p1023`, a C99 hex float; someone read the `p` as
+"power of" and wrote it out with a caret. It compiles without a
+murmur, because both operands are integers, and multiplies by 1021.
+The observed factor was 2042 = 1021 x 2, the second 2 being scalbn's
+own `u.f` for the leftover exponent. `scalbnf.c` had the same thing
+with 127, where `2 XOR 127` is 125.
+
+**This is not a compiler bug.** 89 other files under `math/` use
+`0x1p...` literals and are fine, so kencc's hex floats work. These two
+were mistyped, not miscompiled -- and `^` on two doubles would not
+compile at all, which is why the mistake could only survive where both
+operands happened to be integers.
+
+**It was never only Tcl's six tests.** Replicating the old code beside
+the new -- cheaper than a rebuild, and this tree's rule for asking
+whether a fix was needed -- `ldexp-test` fails **13** checks on it:
+
+```
+52 of 2098 double exponents wrong, first at e=-1074
+23 of  277 float exponents wrong, first at e=-149
+scalbn(1.0, -1074) = -2.2693e-13     (a NEGATIVE number, from +1.0)
+scalbn(1.0, 1024)  = 2042            (should be infinity)
+```
+
+**Every subnormal that any program reached through `ldexp` or
+`scalbn` was wrong, and some had the wrong sign.** The two arms are
+only entered when `|n|` exceeds what one multiplication can do -- above
+1023, or below -1022, which is exactly the subnormal range -- so
+ordinary use never went near them.
+
+#### And the host cross-check had already passed scalbn
+
+That is the part worth keeping. `scalbn` was swept against glibc's over
+**299876 values and reported 0 wrong** two rounds ago, in the same
+program that cleared `frexp`. The sweep drew its exponent from
+`rand()%200 - 100`.
+
+**It never once entered the branch that was wrong.** *A check that
+cannot fail is not a check* -- this file's own rule -- and a sweep that
+cannot reach a branch has not tested it. The window looked generous
+and was chosen without asking what the code does differently outside
+it.
+
+`sys/lib/tests/ldexp-test.c` is the replacement, and every section is
+bounded by the format's own limits rather than by a comfortable
+window: all 2098 double exponents from the smallest subnormal to the
+largest power of two, all 277 float ones, both multi-step arms, and
+overflow and underflow at both ends. The expected values are built
+from IEEE bit patterns, never from `ldexp` itself, because a test that
+asks the unit under test for its own answer cannot fail either. 0
+failures on glibc, 13 on the old code.
+
+**Prediction for the next suite run**: `expr` 5 and `expr-old-37.21`
+go, so `Failed` 64 -> 58. `binary-53.25`/`53.26` -- "a double one ulp
+past the float range must round to infinity" -- are the same shape and
+may go with them, which would make it 56. **What would refute it**: any
+of the six staying, which would mean `RefineApproximation` has a
+second fault behind this one; or a count below 56, which would mean
+something else in the suite was also reaching a subnormal through
+`ldexp` and nobody had connected it.
