@@ -184,6 +184,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
 `execve-env-test.c`, `tz-test.c`, `rename-test.c`, `listenleak-test.c`,
 `asyncconnect-test.c`, `nbread-test.c`, `epipe-test.c`,
+`ldexp-test.c`, `binfloat-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
@@ -939,10 +940,26 @@ Open, in order of what the next run should touch:
   entered the broken branch. *A check that cannot fail is not a check*,
   and a sweep that cannot reach a branch has not tested it.
   `ldexp-test.c` bounds every section by the format's own limits
-  instead. Predict `Failed` 64 -> 58, or 56 if `binary-53.25/53.26` go
-  with them.
-- `binary-53.25`/`53.26`: a double one ulp past the float range must
-  round to infinity. **Likely the same `scalbn` bug** -- watch them.
+  instead. **64 -> 56 CONFIRMED**, eight gone and nothing new, with
+  `ldexp-test` 0 failures on the rebuilt library. **The number was
+  right for the wrong reason**: the six were called, `binary-53.25`/
+  `53.26` did NOT move, and `lseq-4.21.2`/`4.21.3` did -- they are
+  lists of `1e5555`, `Inf`, `1e308`, `5e307`. Read by the total alone
+  this would have been logged as "binary fixed", exactly backwards.
+  *Compare per name, never by total.*
+- **`binary-53.25`/`53.26` have OUTLIVED the whole float campaign**
+  and are not a parsing question. `Q` is a big-endian double, so the
+  value is `(2^128 - 2^103) + 2^75` -- strictly above the boundary
+  where narrowing must give infinity -- and `binary format R` must
+  write +Inf. `tclBinary.c`'s `FormatNumber` does not cast for
+  out-of-range values, so **four** things can be wrong and the test
+  cannot tell them apart: `fabs`, `ldexp(1.0,103)`, the `INFINITY`
+  macro, and the plain cast. **`binfloat-test.c` prints all four**,
+  replicated from the tree line by line, with a control so that
+  "everything became Inf" cannot look like a fix. `INFINITY` is a real
+  suspect -- APE's `HUGE_VAL` is a finite decimal literal, which is
+  why `tclConfig.h` redefines both. `ldexp(1.0,103)` is not: 103 never
+  reached `scalbn`'s broken arm.
 - **9front has no symbolic links** (confirmed by grep), so `symlink()`
   stays ENOSYS. **Do not emulate it with a copy** -- see
   `docs/notes/tcl-suite.md`. **`tests/apexp-links.tcl` is the one probe
