@@ -6831,3 +6831,91 @@ the `st_uid = 1` default had stood, `/` would have read as owned by
 *tor* and the test would have passed for the wrong reason. The
 fallback was not in play, and the reading that said it was would have
 been wrong in the other direction as well.
+
+#### 68 -> 64, exactly the four named, nothing else
+
+```
+all.tcl:	Total 68118  Passed 62138  Skipped 5916  Failed 64
+```
+
+`Skipped` and `Total` identical, `Passed` **+4**, and the per-name diff
+is `io-14.1`, `io-14.2`, `chan-io-14.1`, `chan-io-14.2` out and an
+**empty** new column. The refutation condition -- the log's tail
+truncating now that stderr is left alone -- did not fire: the marker is
+there, `Sourced 167 Test Files`, `Tests ended at` present. **The
+harness was the whole of it**, and nothing was lost by taking the
+stderr lines out.
+
+Remaining 64: `env` 9, `io` 8, `fCmd` 8, `chan-io` 7, `expr` 5,
+`socket_inet` 4, `lseq` 3, `exec` 3, `cmdAH` 2, `binary` 2, `zipfs` 3,
+and singletons.
+
+#### expr's six are one question, and the cross-check refuted the answer
+
+All six are the top of the double range:
+
+```
+expr-30.1    convertToDouble 1.7976931348623155e+308 -> 0x7ff0000000000000
+             ...157e+308 -> 0x7ff0000000000000   ...159e+308 -> 0x7ff0000000000000
+             wanted        0x7feffffffffffffe, 0x7fefffffffffffff, 0x7ff0000000000000
+expr-30.2    the same, negative
+expr-28.527  -929963218616126365E290 -> -Inf, wanted -0x7fe08dcc0c505461
+expr-39.21 / expr-old-37.21   17976931348623157e292. -> Inf
+expr-50.1    sqrt(1e616) == 1e308 -> false
+```
+
+**Everything at or above `1.79769313486231 55 e308` comes back as
+infinity**, including the two values that are perfectly representable.
+`lib/ap/string/strtod.c` was the obvious suspect -- it is the old APE
+one, it accumulates digits in a double and multiplies by `pow10(exp)`,
+and its own first line says *"bug: should detect overflow"*.
+
+So the unit went into a glibc program beside glibc's own, the way
+`tz-xcheck` did: **`sys/lib/tests/strtod-xcheck.c`**. And the first run
+**refuted the diagnosis that built it**:
+
+```
+  1.7976931348623157e+308    ours 7feffffffffffffd   glibc 7fefffffffffffff
+  1.7976931348623159e+308    ours 7fefffffffffffff   glibc 7ff0000000000000 (+inf)
+```
+
+libap's `strtod` does **not** return infinity for the value Tcl reports
+as infinite -- it returns something two ulp *low*, and where glibc
+overflows it stays finite. Whatever produces `expr-30.1`'s Inf, it is
+not this function; **Tcl parses numbers in its own `tclStrToD.c`**. The
+expr cluster is therefore *unexplained*, and saying so is the result.
+The next step for it is the same one that worked for the stderr
+cluster: ask what the code actually calls, rather than what looks
+guilty.
+
+**And the file found something much larger on the way past.**
+
+```
+  2. round-trip of random doubles     199887 checked, 148018 wrong
+  3. the powers of ten, 1e-320..1e308    629 checked,    445 wrong
+       worst: 1e308, off by 202402253307311 ulp
+  4. values that must be exact            10 checked,      0 wrong
+```
+
+**Seventy-four per cent of doubles do not survive `printf("%.17g")`
+followed by `strtod`.** `%.17g` names a double uniquely, so a correct
+`strtod` must return exactly what was printed; three times in four this
+one does not. `1e308` is wrong by 2e14 ulp. Every program on this
+system that reads a floating-point number gets this, and it has been
+true for as long as the file has existed -- the comment at the top says
+so and nobody had put a number to it.
+
+Section 4 is the control: ten values a naive parser still gets right,
+all correct, so this is a rounding result and not a build mistake.
+
+**The fix has a shape already.** `stdio/_fconv.c` and
+`include/fconv.h` are David Gay's bignum kit -- `_Balloc`, `_multadd`,
+`_mult`, `_pow5mult`, `_lshift`, `_cmp`, `_diff`, `_d2b`, `_i2b` -- and
+`_dtoa.c` is Gay's dtoa built on it. **Gay's `strtod` is the other half
+of that package and the half this tree does not have.** So the correct
+parser can be written against machinery already here and already
+linked, rather than vendored fresh; and `strtod-xcheck` is the harness
+that will say whether it worked, before any of it reaches a VM.
+
+`strtof` and `strtold` are the same file three times over and will need
+the same treatment.

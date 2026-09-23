@@ -203,7 +203,8 @@ under plain `tclsh` and isolates the `chan-io-44.1` and `event-11.5`
 hangs, with a timeout on every section so it reports where the suite
 would wait; `select-test.c` takes the two bugs it found down to the
 `select()` call underneath them.
-`tz-xcheck.c` is not a Plan 9 test at all: it links
+`strtod-xcheck.c` is the same idea for `strtod`, and is likewise a
+HOST program, not a Plan 9 test. `tz-xcheck.c` is not a Plan 9 test at all: it links
 `lib/ap/time/tzone.c` into a **glibc** program on the build host and
 sweeps ~1.4 million instants against `localtime_r`, so libap's own
 parser can be checked without a VM round. It found two bugs that way.
@@ -570,7 +571,7 @@ or a constraint that fails on Linux too). The port's own share is
 `focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
 
 **Tcl's suite**: **it finishes and nothing aborts.**
-`Total 68118 Passed 62134 Skipped 5916 Failed 68`, 167 files, marker,
+`Total 68118 Passed 62138 Skipped 5916 Failed 64`, 167 files, marker,
 exit 0, and no `Test files exiting with errors` section. The listener
 leak fix took **14** (all eleven of `socket_inet-11.*`, plus `12.1`,
 `2.6`, `socket-14.11.1`); async connect took **13** more with nothing
@@ -820,7 +821,8 @@ Open, in order of what the next run should touch:
   orders a log better than line buffering -- and `errorChannel` is
   stderr, so that line was the same bug twice. Fixed in both harnesses;
   `stdout` keeps its line buffering, which is the half that was needed.
-  Predict `Failed` 68 -> 64.
+  **68 -> 64 CONFIRMED**: exactly those four, empty new column, and the
+  log's tail did not truncate -- the thing those lines were for.
   **The general shape, met three times now**: a table keyed on a
   descriptor number, a constraint claiming a capability, a log's own
   buffering. *An instrument that shares state with the thing it
@@ -853,8 +855,29 @@ Open, in order of what the next run should touch:
   `_fdinfo`/`_sighdlr` and closing every `FD_CLOEXEC` descriptor. This
   is old, not new: `_RFORK(RFCENVG)` on its first line is what empties
   it. `environ` is untouched, so it is bounded.
+- **libap's `strtod` is inaccurate EVERYWHERE, and that is measured**:
+  `strtod-xcheck.c` links it into a glibc program beside glibc's own
+  and reports **148018 of 199887 round-trips wrong (74%)** -- a double
+  printed with `%.17g` does not come back -- and **445 of 629 powers of
+  ten**, with `1e308` off by 2e14 ulp. `string/strtod.c` accumulates
+  digits in a double and multiplies by `pow10(exp)`: two roundings,
+  neither the one the standard asks for. Its own first line has said
+  *"bug: should detect overflow"* for as long as it has existed; nobody
+  had put a number to it. **The fix has a shape**: `stdio/_fconv.c` and
+  `include/fconv.h` are Gay's bignum kit and `_dtoa.c` is Gay's dtoa on
+  top of it -- **Gay's `strtod` is the missing other half of that same
+  package**, so the parser can be written against machinery already
+  linked. `strtof`/`strtold` are the same file again.
+- **`expr` 5 + `expr-old` 1 are one question and are UNEXPLAINED.**
+  Everything at or above `1.797693134862315 5 e308` comes back
+  infinite, including two values that are representable.
+  `strtod-xcheck` **refuted the obvious answer**: libap's `strtod`
+  returns `7feffffffffffffd` for the value Tcl reports as Inf, and
+  stays finite where glibc overflows -- so it is not this function.
+  **Tcl parses numbers in its own `tclStrToD.c`.** Ask what the code
+  calls, not what looks guilty.
 - `binary-53.25`/`53.26`: a double one ulp past the float range must
-  round to infinity.
+  round to infinity. Possibly the same question as `expr`'s six.
 - **9front has no symbolic links** (confirmed by grep), so `symlink()`
   stays ENOSYS. **Do not emulate it with a copy** -- see
   `docs/notes/tcl-suite.md`. **`tests/apexp-links.tcl` is the one probe
