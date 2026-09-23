@@ -7113,3 +7113,75 @@ variable for a full suite run**: it prints a line per conversion.
 
 *(The instrumentation is a probe and is marked as one in the source:
 delete the block once the answer is in.)*
+
+#### 64 -> 56 CONFIRMED, and the number was right for the wrong reason
+
+```
+all.tcl:	Total 68118  Passed 62146  Skipped 5916  Failed 56
+```
+
+`Total` and `Skipped` identical, `Passed` +8, **eight gone and nothing
+new**. `ldexp-test` reports 0 failures on the rebuilt library, so the
+build under the suite is the one with the fix.
+
+The prediction was "58, or 56 if `binary-53.25`/`53.26` go with them".
+**It came out 56 -- and not one of those two moved.** The eight were:
+
+```
+expr-28.527  expr-30.1  expr-30.2  expr-39.21  expr-50.1  expr-old-37.21
+lseq-4.21.2  lseq-4.21.3
+```
+
+The six were called. **The two `lseq` ones were not**, and they are
+obvious in hindsight: `lseq-4.21.2` is a list of `1e5555`, `Inf`,
+`1e308` and `5e307`, every one of them an extreme exponent reaching
+`ldexp`. *Had this been read by the total alone it would have been
+recorded as "binary-53.25/53.26 fixed", which is exactly backwards.*
+**Compare per name, never by total** -- the rule earned its keep on a
+run where the total was right.
+
+#### binary-53.25/53.26 have outlived the whole float campaign
+
+`strtod`, `strtof`, `strtold`, `_dtoa` and `scalbn` are all correct now
+and these two still fail. They are not a parsing question at all:
+
+```tcl
+binary scan [binary format H* 47effffff0000001] Q round_to_inf
+binary scan [binary format R $round_to_inf] R inf1
+expr {$inf1 eq Inf}		;# -> 0, wanted 1
+```
+
+`Q` is a big-endian **double**, so `round_to_inf` is the double whose
+bits are `0x47effffff0000001`, which is `(2^128 - 2^103) + 2^75` --
+one binade above FLT_MAX and **strictly above** the boundary where a
+narrowing conversion must give infinity. `binary format R` must write
++Inf.
+
+And `tclBinary.c`'s `FormatNumber` does not simply cast -- some
+compilers trap on an overflowing one -- so there are **four** things
+that can be wrong and a failing test cannot tell them apart:
+
+```c
+	if (fabs(dvalue) > (double) FLT_MAX) {
+	    if (fabs(dvalue) > (FLT_MAX +
+		    ldexp(1.0, FLT_MAX_EXP - FLT_MANT_DIG - 1))) {
+		fvalue = (dvalue >= 0.0) ? INFINITY : -INFINITY;
+```
+
+`fabs`, `ldexp(1.0, 103)`, the `INFINITY` macro, and the plain cast on
+the other branch. **`sys/lib/tests/binfloat-test.c` prints all four**,
+replicated from the tree line by line rather than from a recollection
+of what it does, plus a control section so that "everything became
+infinity" cannot look like a fix. 0 failures on glibc.
+
+`INFINITY` is not an idle suspect: **APE's `HUGE_VAL` is a finite
+decimal literal**, which is why `sys/src/ape/lib/tcl/tclConfig.h`
+already carries `#undef HUGE_VAL` / `#define HUGE_VAL Inf(1)` and the
+same for `INFINITY`. If that redefinition is not in force wherever
+`tclBinary.c` is compiled, section 2 is where it shows. `ldexp(1.0,
+103)` is *not* a suspect any more -- 103 is far inside one
+multiplication's range, so `scalbn`'s broken arm was never involved.
+
+Run it with `pcc -o binfloat-test binfloat-test.c && ./binfloat-test`
+and read which section fails; that names the cause in one run instead
+of by elimination.
