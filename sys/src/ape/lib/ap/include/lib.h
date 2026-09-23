@@ -152,6 +152,23 @@ extern void _sock_killlisten(int);
 extern int  _sock_listenmark(void);	/* which libap is linked in */
 extern int  _execmark(void);		/* which libap is linked in */
 
+/*
+ * ap/plan9/tty.c -- the console's raw/cooked switch, owned in ONE
+ * place. Plan 9 has no per-flag terminal control: /dev/consctl's
+ * "rawon" stops echo and line assembly together, namespace-wide, and
+ * the descriptor must stay open for it to hold. termios and getpass
+ * both go through here; two files each keeping their own consctl
+ * descriptor would fight, the last close dropping the console back to
+ * cooked under the other one.
+ *
+ * _tty_raw() is absolute and returns the PREVIOUS state (0 or 1), or
+ * -1 if the mode could not be changed. Asking for the state it is
+ * already in is not a failure and does not touch consctl.
+ */
+extern int  _tty_raw(int);
+extern int  _tty_israw(void);
+extern int  _ttymark(void);		/* which libap is linked in */
+
 /* ap/plan9/_apdbg.c -- one debug line, under $APEXP_DEBUG. Labels may be 0. */
 extern void _apdbg(const char *msg, const char *l1, int v1,
 	const char *l2, int v2);

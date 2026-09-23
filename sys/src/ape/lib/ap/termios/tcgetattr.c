@@ -43,11 +43,23 @@ tcgetattr(int fd, struct termios *t)
 
 	if(!isptty(fd)) {
 		if(isatty(fd)) {
-			/* If there is no emulation return sensible defaults */
+			/*
+			 * Most of this is a polite fiction -- Plan 9's
+			 * console driver has no baud rate and no per-flag
+			 * control -- but ICANON and ECHO are NOT, and they
+			 * used to be. They were hardcoded on, so a program
+			 * that set raw mode and read the state back was told
+			 * its own change had not happened. A platform having
+			 * only one switch is no reason for a value not to
+			 * read back; _tty_israw() is that switch.
+			 */
 			t->c_iflag = ISTRIP|ICRNL|IXON|IXOFF;
 			t->c_oflag = OPOST|TAB3|ONLCR;
 			t->c_cflag = CS8 | CREAD | CLOCAL | (B9600 << 9);
-			t->c_lflag = ISIG|ICANON|ECHO|ECHOE|ECHOK;
+			if(_tty_israw())
+				t->c_lflag = ISIG;
+			else
+				t->c_lflag = ISIG|ICANON|ECHO|ECHOE|ECHOK;
 			t->c_cc[VINTR] = CINTR;
 			t->c_cc[VQUIT] = CQUIT;
 			t->c_cc[VERASE] = CERASE;
@@ -84,12 +96,17 @@ tcgetattr(int fd, struct termios *t)
 	return 0;
 }
 
-/* BUG: ignores optional actions */
+/*
+ * BUG: ignores optional_actions. TCSANOW, TCSADRAIN and TCSAFLUSH are
+ * all treated as TCSANOW, which is harmless here because Plan 9's
+ * console has no output queue to drain and no input queue to flush --
+ * see tcdrain() and tcflush() below, which say the same thing.
+ */
 
 int
 tcsetattr(int fd, int optional_actions, const struct termios *t)
 {
-	int n, i;
+	int n, i, want, was;
 	char buf[100];
 
 	(void)optional_actions;	/* see the BUG note above */
@@ -98,8 +115,44 @@ tcsetattr(int fd, int optional_actions, const struct termios *t)
 		if(!isatty(fd)) {
 			errno = ENOTTY;
 			return -1;
-		} else
-			return 0;
+		}
+		/*
+		 * THIS USED TO `return 0' AND DO NOTHING, which is the
+		 * worst answer available: the caller is told its request
+		 * succeeded and the console carries on cooking. readline
+		 * asks for ICANON and ECHO off, is told it got them, and
+		 * then waits for keystrokes that the driver is holding
+		 * back until Enter -- which is why tab completion has
+		 * never worked under APE.
+		 *
+		 * Plan 9 gives one switch, not a flag set: /dev/consctl's
+		 * "rawon" stops echo AND line assembly together. So the
+		 * request is reduced to that one bit -- raw if EITHER
+		 * ICANON or ECHO is being cleared. When only ECHO is
+		 * wanted off (a password prompt asking for cooked input
+		 * with no echo) raw is the closer of the two answers, as
+		 * echoing a password is the worse failure.
+		 *
+		 * VMIN and VTIME have no equivalent and are ignored;
+		 * raw mode delivers each byte as it arrives, which is
+		 * VMIN=1 VTIME=0 and nothing else.
+		 */
+		want = !(t->c_lflag & ICANON) || !(t->c_lflag & ECHO);
+		was = _tty_raw(want);
+		if(was < 0) {
+			/*
+			 * Could not reach /dev/consctl. Report it rather
+			 * than claiming success -- but note that _tty_raw
+			 * does not touch consctl at all when the console is
+			 * already in the requested state, so "nothing to do"
+			 * still returns 0 here. A stub that answers
+			 * "failure" and one that answers "nothing to do" are
+			 * different, and so are the cases.
+			 */
+			_syserrno();
+			return -1;
+		}
+		return 0;
 	}
 	n = sprintf(buf, "IOW %4.4x %4.4x %4.4x %4.4x ",
 		t->c_iflag, t->c_oflag, t->c_cflag, t->c_lflag);

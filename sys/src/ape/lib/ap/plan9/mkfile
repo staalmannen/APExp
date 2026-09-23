@@ -74,6 +74,10 @@ UPDATE=\
 	$APEXPROOT/$objtype/lib/ape/libap.a\
 	${OFILES:%.$O=%.c}\
 
+# tty.c and getpass.c share the console's raw/cooked state through
+# ../include/lib.h; mk has to rebuild them when it changes.
+HFILES=../include/lib.h
+
 <$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=$CFLAGS -c -D_POSIX_SOURCE -D_PLAN9_SOURCE -D_BSD_EXTENSION\

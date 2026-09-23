@@ -184,7 +184,8 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
 `execve-env-test.c`, `tz-test.c`, `rename-test.c`, `listenleak-test.c`,
 `asyncconnect-test.c`, `nbread-test.c`, `epipe-test.c`,
-`ldexp-test.c`, `binfloat-test.c`,
+`ldexp-test.c`, `binfloat-test.c`, `rawmode-test.c`,
+`execfail-test.c`, `append-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
@@ -210,6 +211,10 @@ under plain `tclsh` and isolates the `chan-io-44.1` and `event-11.5`
 hangs, with a timeout on every section so it reports where the suite
 would wait; `select-test.c` takes the two bugs it found down to the
 `select()` call underneath them.
+`tty-xcheck.c` is a host program too: it links `ap/plan9/tty.c`
+with counting fakes for open/write/close and asserts the raw/cooked
+contract, which is awkward to provoke on a live console. It needs
+`-I ttystub`.
 `strtod-xcheck.c`, `strtof-xcheck.c` and `dtoa-xcheck.c` are the same
 idea for `strtod`, `strtof` and `_dtoa`, and are likewise HOST programs, not Plan 9 tests. The
 second checks the two against each other -- the shortest string that
@@ -1112,6 +1117,33 @@ Open, in order of what the next run should touch:
   `chan-io-6.46` still fails, so count that group by whether the twins
   agree. **CONFIRMED the next run** -- it came back with nothing
   touching it.
+
+**Next after Tcl: a vt, and the first step is DONE but NOT MEASURED.**
+The goal is bash's own tab completion under `vts`, and the blocker was
+not `vts` at all. **`tcsetattr` on a real `/dev/cons` returned 0 and
+changed nothing**, while `tcgetattr` reported a hardcoded
+`ICANON|ECHO` whatever the console was doing -- so readline asked for
+raw, was told it got it, and waited for keystrokes the driver was
+holding until Enter. Tab arrived inside a finished line. Both halves
+silent. `plan9/tty.c` now owns the one switch Plan 9 offers
+(`rawon`/`rawoff` on `/dev/consctl`) and termios drives it; see
+`docs/notes/libap.md`.
+**Predict**: `rawmode-test` sections 3 and 4 PASS on the rebuilt
+library and FAIL on the installed one. **Refuted if `_ttymark` is not
+1** -- then the test measured an old libap and says nothing.
+**Watch for**: this makes raw mode actually happen, so every program
+that asked for it and silently did not get it now does -- bash,
+libedit, PDCurses. *A fix that makes a process reach code it never
+reached before can expose anything on that path.* A crash while raw
+self-heals, because the console reverts when the last consctl
+descriptor closes and a dead process has closed it.
+**And vts's key interception is the OPPOSITE of what is wanted here**:
+`lined.c` batches keystrokes and flushes whole LINES to the shell, so
+bash's completion needs `edit off`, not `edit on`. The remaining three
+steps are a per-session `consctl` in vts, the shell's fds being a
+`cons` bound to `/dev/cons` rather than the pipe `session.c:124` dups
+(with a pipe, `isatty(0)` is false and bash never starts readline at
+all), and vts spawning bash rather than hardcoded `/bin/rc`.
 
 **Fixed this round**: `NAME_MAX` was 27 and `PATH_MAX` 1023, set in
 `sys/include/ape/sys/limits.h`, which `<limits.h>` includes at its very

@@ -280,6 +280,99 @@ close-on-exec report pipe is gone before exec is attempted, so an exec failure
 surfaces only as the child exiting 127. POSIX leaves that unspecified;
 glibc reports it, APE does not.
 
+### termios/ — tcsetattr said "done" and did nothing
+
+The single reason bash's tab completion has never worked under APE,
+and it is this tree's most common bug shape rather than anything
+exotic. `termios/tcgetattr.c`, handed a real `/dev/cons`:
+
+	int
+	tcsetattr(int fd, int optional_actions, const struct termios *t)
+	{
+		if(!isptty(fd)) {
+			if(!isatty(fd)) { errno = ENOTTY; return -1; }
+			else return 0;        /* <- and nothing else */
+		}
+		...
+
+It reported success and changed nothing. `tcgetattr` was the matching
+half: for a tty it returned a hardcoded
+`c_lflag = ISIG|ICANON|ECHO|ECHOE|ECHOK` whatever the console was
+actually doing, described in its own comment as "sensible defaults".
+
+**So readline's sequence could not work and could not fail visibly.**
+It reads the state, clears `ICANON` and `ECHO`, calls `tcsetattr`, is
+told it worked — and the Plan 9 console driver carries on assembling
+lines. Tab arrives as a byte inside a finished line, which is far too
+late to complete anything. Every part of that is silent.
+
+*A stub that answers "failure" is not the same as one that answers
+"nothing to do"* — and neither is the same as one that answers "done".
+Same family as `shutdown()`, `wm title`, `TkUnixSetMenubar`.
+
+**Plan 9 has the switch, and libap was already using it.**
+`/dev/consctl` takes `rawon` and `rawoff`, and `plan9/tty.c` had been
+writing them for `getpass()` since for ever. What it does not have is
+per-flag control: raw stops echo AND line assembly together, it is
+namespace-wide rather than per descriptor, and **the descriptor has to
+stay open** — the console reverts when the last consctl descriptor
+closes.
+
+**One owner, because two would have fought.** `tty.c` now holds the
+state and both callers go through it. Two files each keeping their own
+consctl descriptor would have raced: whichever closed last would drop
+the console back to cooked under the other one.
+
+- `_tty_raw(on)` is absolute and returns the **previous** state, or -1.
+  Asking for the state it is already in does not touch consctl and is
+  not a failure.
+- `_tty_israw()` reports what **this process** has set. `/dev/consctl`
+  is write-only, so there is no way to ask the console; a console left
+  raw by another process reads as cooked here, and a fresh `exec`
+  starts out believing cooked. Said plainly rather than papered over,
+  since pretending to report the console is the failure being undone.
+- The descriptor is opened `O_CLOEXEC`, so a child started by a shell
+  in raw mode does not inherit a consctl it knows nothing about. The
+  parent keeps its own, so the shell stays raw.
+
+`getpass()` now **saves and restores** instead of "off then on". The
+old `tty_echoon()` cooked the console unconditionally, which would
+have quietly ended a caller's raw mode the first time anything asked
+for a password.
+
+`tcsetattr` reduces the request to that one bit: **raw if either
+`ICANON` or `ECHO` is being cleared.** When only `ECHO` is wanted off —
+a password prompt asking for cooked input with no echo — raw is the
+closer of the two available answers, because echoing a password is the
+worse failure. `VMIN`/`VTIME` have no equivalent and are ignored; raw
+delivers each byte as it arrives, which is `VMIN=1 VTIME=0`.
+
+**Two tests, and they ask different things.**
+`sys/lib/tests/rawmode-test.c` runs on 9front and asks the real
+question: set raw, then **read the state back** and check the bits
+asked for are clear. Not "did tcsetattr return 0" — the broken version
+returned 0 too, which is exactly how this survived. Its section 5 is
+the end-to-end proof (a keystroke arriving before Enter) and needs a
+human, so it sits behind `$APEXP_RAWTEST_KEYS`; sections 3 and 4
+separate the fixed library from the old one with no keystrokes at all.
+
+`sys/lib/tests/tty-xcheck.c` is a **host** program in the `*-xcheck`
+family: it links `tty.c` with counting fakes for open/write/close and
+asserts the contract — that a redundant request is nothing-to-do
+rather than failure, that the return value is the previous state, that
+a consctl which will not open leaves the state cooked rather than
+half-set, and that the cooked path *closes* the descriptor. None of
+those is comfortable to provoke on a live console. It needs
+`-I ttystub`, two three-line headers, because the real `lib.h` has no
+include guard and pulls `<ureg.h>`.
+
+**What this opens, and what it does not.** readline emits VT100 cursor
+and erase sequences, so raw mode alone is not a terminal — it wants an
+emulator and a termcap entry (`sys/lib/ape/termcap` is present). The
+deeper limit is unchanged: **Plan 9 has no PTYs**, so `tcsetpgrp`,
+job control and a controlling terminal stay out of reach, and
+`vts`'s own man page lists the same gap.
+
 ### process/ — a failed execve destroyed the caller
 
 POSIX is unusually blunt about this: *"If the exec function returns to
