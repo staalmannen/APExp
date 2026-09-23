@@ -7003,3 +7003,70 @@ that reproduced the previous run's symptom exactly. Every anchored edit
 here now asserts its anchor first. It is the same rule as the libap
 version mark, one layer up: *a change you have not proved arrived is a
 change you cannot measure.*
+
+#### The float rewrite moved nothing, and that is the result it should have
+
+`Total 68118 Passed 62138 Skipped 5916 Failed 64` -- **identical to the
+run before it, and the per-name diff is empty in both directions.**
+
+That is worth stating plainly, because the change was not small. Gay's
+`strtod` replaced a parser that was wrong on 74% of round-trips;
+`strtof` and `strtold` were rewritten on top of it; and
+`Sudden_Underflow` was removed for amd64, which switches `_dtoa` --
+**the shipping printf path for every float on the system** -- to its
+gradual-underflow arm. An empty diff after that is the confirmation
+that it was safe, and it is the only confirmation available: no test in
+this suite formats a denormal.
+
+It also settles the prediction made when `strtod-xcheck` first refuted
+itself: **`expr`'s six are not libap's parser.** They were not going to
+move, and they did not.
+
+#### expr's six: three libap suspects eliminated, and the next step is on the VM
+
+All six say the same thing -- everything at or above
+`1.7976931348623155e+308` comes back infinite, including two values
+that are perfectly representable. Tcl parses numbers in its own
+`tclStrToD.c`, and `MakeHighPrecisionDouble()` has exactly two places
+that can answer `HUGE_VAL`:
+
+```c
+    if (exponent >= 0 && exponent-1 > maxDigits-numSigDigs) {
+	retval = HUGE_VAL;			/* the quick check */
+...
+    retval = BignumToBiasedFrExp(significand, &machexp);
+    retval = Pow10TimesFrExp(exponent, retval, &machexp);
+    if (machexp > DBL_MAX_EXP*log2FLT_RADIX) {
+	retval = HUGE_VAL;			/* the real one */
+```
+
+Both are computed from libap at startup, so both had a libap suspect.
+**All three are now eliminated:**
+
+- **`maxDigits`** is `(DBL_MAX_EXP*log(2) + 0.5*log(10))/log(10)`,
+  which is **308.75**. Reaching 307 needs a 0.6% error in `log`, and
+  libap's is ARM's sub-ulp routine. For the failing inputs the quick
+  check wants `291 > 308-17` and `289 > 308-18`; both are false.
+  *Eliminated by arithmetic, not by a run -- and said so rather than
+  dressed up as a measurement.*
+- **`log2FLT_RADIX`** comes from `frexp((double)FLT_RADIX, &e)` and a
+  `--`, so it is 1, and a wrong `frexp` there would `Tcl_Panic`, not
+  overflow.
+- **`frexp` and `scalbn`**, which `BignumToBiasedFrExp` and
+  `SafeLdExp` rest on, were linked into a host program beside glibc's:
+  **299876 random doubles and every boundary value, 0 wrong.**
+
+So the remaining suspects are `Pow10TimesFrExp`, `BignumToBiasedFrExp`
+and `RefineApproximation` -- Tcl's own code over libtommath, with none
+of libap's floating point left in the path. **The next step is a
+one-line `printf` of `machexp` in `MakeHighPrecisionDouble` and a
+rebuild of `tclsh`**: if it is 1025 where 1024 is correct, the fault is
+one binade in Tcl's own scaling, and the tables it scales with are
+`pow10_wide` and `pow_10_2_n`.
+
+*(A note on the probe itself: its first line printed `frexp(2.0)` with
+`e=0` for **both** implementations, because `printf` may read `e`
+before the call that sets it. The loop underneath, which sequences
+properly, found zero differences. A probe that reads its own output
+argument inside the same printf is measuring the compiler's argument
+order.)*
