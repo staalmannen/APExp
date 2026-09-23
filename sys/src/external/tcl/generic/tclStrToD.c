@@ -1811,6 +1811,43 @@ MakeLowPrecisionDouble(
  *----------------------------------------------------------------------
  */
 
+
+/*
+ * APExp INSTRUMENTATION, off unless $APEXP_STRTOD_DEBUG is set.
+ *
+ * Six tests -- expr-28.527, expr-30.1, expr-30.2, expr-39.21,
+ * expr-50.1 and expr-old-37.21 -- report that everything at or above
+ * 1.7976931348623155e+308 comes back infinite, INCLUDING two values
+ * that are perfectly representable. libap has been eliminated from the
+ * path: its strtod is correctly rounded (0 wrong in 199887 round-trips
+ * against glibc), `maxDigits' works out at 308.75 so the quick check
+ * below cannot fire for these inputs, and frexp and scalbn were
+ * cross-checked on the build host at 0 wrong in 299876 values. What is
+ * left is this function.
+ *
+ * It has TWO exits that answer HUGE_VAL, and a count of failures
+ * cannot tell them apart -- a check whose negative result has two
+ * explanations is not a check -- so each one says which it is.
+ *
+ * The startup constants are printed on the entry line beside the
+ * arguments, because a wrong constant and a wrong computation look the
+ * same from the outside and only one of them is libap's fault.
+ *
+ * Delete this block once the answer is in; it is a probe, not a patch.
+ */
+static int
+ApexpDbg(void)
+{
+    static int on = -1;
+
+    if (on < 0) {
+	const char *e = getenv("APEXP_STRTOD_DEBUG");
+
+	on = (e != NULL && *e != '\0');
+    }
+    return on;
+}
+
 static double
 MakeHighPrecisionDouble(
     int signum,			/* 1=negative, 0=nonnegative */
@@ -1835,6 +1872,14 @@ MakeHighPrecisionDouble(
      */
     volatile double retval;
 
+    if (ApexpDbg()) {
+	fprintf(stderr, "APEXP MakeHighPrecisionDouble: signum=%d "
+		"numSigDigs=%d exponent=%d | maxDigits=%d minDigits=%d "
+		"log2FLT_RADIX=%d mantBits=%d\n",
+		signum, numSigDigs, exponent,
+		maxDigits, minDigits, log2FLT_RADIX, mantBits);
+    }
+
     /*
      * A zero significand requires explicit construction of -0.0.
      * (Unary minus returns positive zero.)
@@ -1854,6 +1899,11 @@ MakeHighPrecisionDouble(
      * integer overflow when calculating with 'exponent'.
      */
     if (exponent >= 0 && exponent-1 > maxDigits-numSigDigs) {
+	if (ApexpDbg()) {
+	    fprintf(stderr, "APEXP   QUICK overflow: exponent-1=%d > "
+		    "maxDigits-numSigDigs=%d\n",
+		    exponent-1, maxDigits-numSigDigs);
+	}
 	retval = HUGE_VAL;
 	goto returnValue;
     } else if (exponent < 0 && numSigDigs+exponent < minDigits+1) {
@@ -1908,8 +1958,22 @@ MakeHighPrecisionDouble(
     }
 
     retval = BignumToBiasedFrExp(significand, &machexp);
+    if (ApexpDbg()) {
+	fprintf(stderr, "APEXP   BignumToBiasedFrExp -> %.17g machexp=%d\n",
+		(double) retval, machexp);
+    }
     retval = Pow10TimesFrExp(exponent, retval, &machexp);
+    if (ApexpDbg()) {
+	fprintf(stderr, "APEXP   Pow10TimesFrExp(%d) -> %.17g machexp=%d "
+		"| limit DBL_MAX_EXP*log2FLT_RADIX=%d\n",
+		exponent, (double) retval, machexp,
+		DBL_MAX_EXP*log2FLT_RADIX);
+    }
     if (machexp > DBL_MAX_EXP*log2FLT_RADIX) {
+	if (ApexpDbg()) {
+	    fprintf(stderr, "APEXP   MACHEXP overflow: %d > %d\n",
+		    machexp, DBL_MAX_EXP*log2FLT_RADIX);
+	}
 	retval = HUGE_VAL;
 	goto returnValue;
     }
@@ -1926,8 +1990,15 @@ MakeHighPrecisionDouble(
      * only if the best approximation is a power of 2 minus 1/2 ulp).
      */
 
+    if (ApexpDbg()) {
+	fprintf(stderr, "APEXP   SafeLdExp -> %.17g\n", (double) retval);
+    }
     retval = RefineApproximation(retval, significand, exponent);
     retval = RefineApproximation(retval, significand, exponent);
+    if (ApexpDbg()) {
+	fprintf(stderr, "APEXP   after two RefineApproximation -> %.17g\n",
+		(double) retval);
+    }
 
     /*
      * Come here to return the computed value.
@@ -1939,6 +2010,9 @@ MakeHighPrecisionDouble(
     }
     if (signum) {
 	retval = -retval;
+    }
+    if (ApexpDbg()) {
+	fprintf(stderr, "APEXP   returning %.17g\n", (double) retval);
     }
 
     /*

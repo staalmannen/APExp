@@ -50,7 +50,6 @@
  * non-IEEE path is worse than an absent one, so this file requires
  * IEEE_Arith and says so at compile time rather than pretending.
  *
-
  * STATUS: SHIPPING, and measured. sys/lib/tests/strtod-xcheck.c,
  * against glibc on the build host:
  *
@@ -102,8 +101,10 @@
  *     underflow. Applying it anyway rewrote every subnormal result to
  *     the smallest subnormal and then to zero: 1e-308 came out 0.
  *
- * `strtof' and `strtold' are still the old algorithm and still wrong
- * in the same way; they are the same file twice more.
+ * `strtof' and `strtold' are built on this one now: strtold forwards
+ * (long double IS double under kencc) and strtof narrows, with the
+ * float-midpoint tie broken by `_strtod_cmp' at the bottom of this
+ * file. See their own headers.
  *
  * Checked with sys/lib/tests/strtod-xcheck.c, which links this file
  * into a glibc program beside glibc's own strtod.

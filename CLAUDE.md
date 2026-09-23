@@ -198,7 +198,9 @@ kill and a clean finish are indistinguishable from the shell, so a run
 without a completion marker cannot be read at all.
 `tcl-stdchan-test.tcl` asks what buffering the three standard
 channels get, and is a PROBE rather than a rule -- report what it
-prints. `tcl-fileevent-test.tcl` is a test rather than a harness -- it runs
+prints. `tcl-machexp-probe.tcl` is the same kind of thing for
+Tcl's own float parser, and needs `$APEXP_STRTOD_DEBUG` set or it
+says nothing. `tcl-fileevent-test.tcl` is a test rather than a harness -- it runs
 under plain `tclsh` and isolates the `chan-io-44.1` and `event-11.5`
 hangs, with a timeout on every section so it reports where the suite
 would wait; `select-test.c` takes the two bugs it found down to the
@@ -581,7 +583,12 @@ or a constraint that fails on Linux too). The port's own share is
 
 **Tcl's suite**: **it finishes and nothing aborts.**
 `Total 68118 Passed 62138 Skipped 5916 Failed 64`, 167 files, marker,
-exit 0, and no `Test files exiting with errors` section. The listener
+exit 0, and no `Test files exiting with errors` section. **The whole
+float rewrite -- Gay's `strtod`, `strtof`, `strtold`, and
+`Sudden_Underflow` off for amd64, which switches `_dtoa` to its
+gradual arm -- moved NOTHING: identical totals, empty per-name diff
+both ways.** That is the confirmation it was safe, and the only one
+available, since no test here formats a denormal. The listener
 leak fix took **14** (all eleven of `socket_inet-11.*`, plus `12.1`,
 `2.6`, `socket-14.11.1`); async connect took **13** more with nothing
 moving the other way: `socket-14.2/14.6.0/14.7.0/14.7.2/14.8.2/
@@ -907,8 +914,25 @@ Open, in order of what the next run should touch:
   midpoint**: an unconditional nudge would move a double one ulp away
   ONTO one. All five sections 0 wrong, with `strtod-xcheck` and
   `dtoa-xcheck` unchanged.
-- **`expr` 5 + `expr-old` 1 are one question and are still
-  UNEXPLAINED**, and `strtod` is now cleared of it entirely.
+- **`expr` 5 + `expr-old` 1: three libap suspects eliminated, next
+  step is on the VM.** `MakeHighPrecisionDouble()` has two places that
+  return `HUGE_VAL`, both computed from libap at startup. `maxDigits`
+  is 308.75 -- reaching 307 needs a 0.6% error in `log`, and the
+  failing inputs want `291 > 291` and `289 > 290`, both false
+  (arithmetic, not a run). `log2FLT_RADIX` comes from `frexp(2.0)` and
+  a `--`, and a wrong one would `Tcl_Panic`. And **`frexp`/`scalbn`
+  were cross-checked on the host: 299876 values and every boundary,
+  0 wrong.** What is left is `Pow10TimesFrExp`,
+  `BignumToBiasedFrExp` and `RefineApproximation` -- Tcl over
+  libtommath, no libap floating point in the path. **The probe is
+  written and waiting**: `tclStrToD.c` is instrumented behind
+  `$APEXP_STRTOD_DEBUG` and `tcl-machexp-probe.tcl` drives it. Both
+  `HUGE_VAL` exits name themselves, and the entry line carries the
+  startup constants beside the arguments. **1025 where 1024 is right
+  means one binade in Tcl's own scaling** (`pow10_wide`,
+  `pow_10_2_n`). No APEXP lines for a value is an answer, not a failed
+  run. Needs `mk install` in `lib/tcl` then `cmd/tclsh`; do not set the
+  variable for a full suite run.
   Everything at or above `1.797693134862315 5 e308` comes back
   infinite, including two values that are representable.
   `strtod-xcheck` **refuted the obvious answer**: libap's `strtod`
