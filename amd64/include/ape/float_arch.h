@@ -2,16 +2,46 @@
 #define __FLOAT
 /* IEEE, default rounding */
 
+/*
+ * A marker, so a test can say WHICH float.h it got. The invariant in
+ * CLAUDE.md is that /$objtype/include/ape is searched before
+ * /sys/include/ape and stock APE's copy shadows this tree unless a
+ * real file shadows it back; deeppath-test has already settled one
+ * question of this shape by printing where its numbers came from.
+ */
+#define __APEXP_FLOAT_ARCH	1
+
 #define FLT_ROUNDS	1
 #define FLT_RADIX	2
 
+/*
+ * THE F SUFFIX IS NOT DECORATION, and its absence was a bug.
+ *
+ * C says FLT_MAX, FLT_MIN and FLT_EPSILON have type FLOAT. Without the
+ * suffix they are doubles holding the nearest double to a rounded
+ * decimal -- so `(double) FLT_MAX' was 3.4028234999999998e+38 where
+ * the real FLT_MAX is 3.4028234663852886e+38, about 3e31 too big.
+ *
+ * Tcl's binary-53.25 and binary-53.26 are what found it.
+ * tclBinary.c's FormatNumber decides whether a double overflows the
+ * float range by comparing against `FLT_MAX + ldexp(1.0, 103)', and
+ * with FLT_MAX too large that boundary moved above the value the test
+ * feeds it: `binary format R' wrote FLT_MAX where it had to write
+ * +Inf. sys/lib/tests/binfloat-test.c prints each piece and named
+ * this one in a single run, after four candidates had been listed and
+ * none of them was the one guessed at.
+ *
+ * Full precision as well as the suffix: with the suffix alone a
+ * rounded decimal still lands on the right float, but only by about
+ * half a digit's margin, and there is no reason to spend it.
+ */
 #define FLT_DIG		6
-#define FLT_EPSILON	1.19209290e-07
+#define FLT_EPSILON	1.19209289550781250000000000000000000e-07F
 #define FLT_MANT_DIG	24
-#define FLT_MAX		3.40282347e+38
+#define FLT_MAX		3.40282346638528859811704183484516925440e+38F
 #define FLT_MAX_10_EXP	38
 #define FLT_MAX_EXP	128
-#define FLT_MIN		1.17549435e-38
+#define FLT_MIN		1.17549435082228750796873653722224568e-38F
 #define FLT_MIN_10_EXP	-37
 #define FLT_MIN_EXP	-125
 
