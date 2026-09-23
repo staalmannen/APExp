@@ -1360,7 +1360,14 @@ Itcl_ClassInheritCmd(
         baseClsPtr = Itcl_FindClass(interp, token, /* autoload */ 1);
         if (!baseClsPtr) {
             Tcl_Obj *resultPtr = Tcl_GetObjResult(interp);
-            int errlen;
+            /*
+             * APEXP: Tcl_Size, not int -- Tcl 9's
+             * Tcl_GetStringFromObj takes a Tcl_Size *. The second of
+             * two sites itcl 4.2.3 missed; see itcl2TclOO.c. errlen is
+             * only compared against 0 below, never passed to a
+             * variadic, so this one needs no cast.
+             */
+            Tcl_Size errlen;
             char *errmsg;
 
             Tcl_IncrRefCount(resultPtr);

@@ -44,6 +44,13 @@ OFILES=\
 	itclMigrate2TclCore.$O\
 	itclTestRegisterC.$O\
 
+#
+# itclUuid.h is hand-written and lives HERE, not in the upstream tree --
+# the counterpart of lib/tcl's tclUuid.h. Listed so mk rebuilds when it
+# changes: a header not in HFILES is a header mk does not rebuild for.
+#
+HFILES=itclUuid.h
+
 UPDATE=\
 	mkfile\
 	$LIB\
@@ -69,11 +76,32 @@ CC=pcc
 # tree's hand-maintained answer to what configure would have produced;
 # itclInt.h reaches tclInt.h, which wants it.
 #
+#
+# -DBUILD_itcl IS NOT OPTIONAL, and leaving it out does not look like a
+# missing define. itcl.h:105 reads
+#
+#	#if defined(BUILD_itcl)
+#	    define ITCLAPI MODULE_SCOPE
+#	#else
+#	    undef USE_ITCL_STUBS
+#	    define USE_ITCL_STUBS 1
+#
+# so WITHOUT it the package compiles as a stub CONSUMER of itself:
+# itclDecls.h turns every entry point into (itclStubsPtr->x), and the
+# file that suffers most is itclStubInit.c, whose whole job is to build
+# the table those macros read -- 152 errors in one file, all of them
+# "expected ')' before '->'". Exactly Tk's -DBUILD_tk.
+#
+# NO -DPACKAGE_VERSION, and that is deliberate: tclConfig.h:5 already
+# defines it, as an UNQUOTED 9.0.3, and defining it here as well is a
+# macro redefinition that stops cpp. The two cannot both be right --
+# itclBase.c wants a quoted string to concatenate -- so itclBase.c uses
+# itcl's own ITCL_PATCH_LEVEL instead. See the note there.
+#
 CFLAGS=-c -I. -I$ITCLSRC/generic\
 	-I$TCLSRC/generic -I$TCLSRC/unix -I$TCLSRC/libtommath\
 	-I$APEXPROOT/sys/src/ape/lib/tcl\
-	-DHAVE_TCL_CONFIG_H -DPLAN9 -DMODULE_SCOPE=extern\
-	-DPACKAGE_VERSION="4.2.3"\
+	-DHAVE_TCL_CONFIG_H -DPLAN9 -DMODULE_SCOPE=extern -DBUILD_itcl\
 
 %.$O: $ITCLSRC/generic/%.c
 	$CC $CFLAGS $ITCLSRC/generic/$stem.c
