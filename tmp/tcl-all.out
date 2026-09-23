@@ -9,7 +9,7 @@ Test files run in separate interpreters
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-23 11:09:07 +0200
+Tests began at 2026-09-23 11:28:38 +0200
 aaa_exit.test
 abstractlist.test
 append.test
@@ -229,7 +229,7 @@ cmdAH.test
     expr {$newatime == $modatime ? 1 : "$newatime != $modatime"}
 
 ---- Result was:
-1790154581 != 1790154579
+1790155753 != 1790155752
 ---- Result should have been (exact matching):
 1
 ==== cmdAH-20.5 FAILED
@@ -481,93 +481,14 @@ couldn't execute "~xyzzy_bad_user/x": no such file or directory
     file size $tmpfile
 
 ---- Result was:
-14
+24
 ---- Result should have been (exact matching):
 26
 ==== exec-19.1 FAILED
 
 execute.test
 expr-old.test
-
-
-==== expr-old-37.21 Tcl_ExprDouble handles overflows FAILED
-==== Contents of test case:
-
-    testexprdouble 17976931348623157[string repeat 0 292].
-
----- Result was:
-This is a result: Inf
----- Result should have been (exact matching):
-This is a result: 1.7976931348623157e+308
-==== expr-old-37.21 FAILED
-
 expr.test
-
-
-==== expr-28.527 input floating-point conversion FAILED
-==== Contents of test case:
-
-    # Ad2b d UN -929963218616126365 E290 x -108dcc0c505461_01111111111111111111111111111111111111111111111111111111111111110& E1023
-    convertToDouble -929963218616126365E290
-
----- Result was:
-0xfff0000000000000
----- Result should have been (exact matching):
-0xffe08dcc0c505461
-==== expr-28.527 FAILED
-
-
-
-==== expr-30.1 largest representible number FAILED
-==== Contents of test case:
-
-    list [catch {convertToDouble 1.7976931348623155e+308} result]  $result  [catch {convertToDouble 1.7976931348623157e+308} result]  $result  [catch {convertToDouble 1.7976931348623159e+308} result]  $result
-
----- Result was:
-0 0x7ff0000000000000 0 0x7ff0000000000000 0 0x7ff0000000000000
----- Result should have been (exact matching):
-0 0x7feffffffffffffe 0 0x7fefffffffffffff 0 0x7ff0000000000000
-==== expr-30.1 FAILED
-
-
-
-==== expr-30.2 largest representible number FAILED
-==== Contents of test case:
-
-    list [catch {convertToDouble -1.7976931348623155e+308} result]  $result  [catch {convertToDouble -1.7976931348623157e+308} result]  $result  [catch {convertToDouble -1.7976931348623159e+308} result]  $result
-
----- Result was:
-0 0xfff0000000000000 0 0xfff0000000000000 0 0xfff0000000000000
----- Result should have been (exact matching):
-0 0xffeffffffffffffe 0 0xffefffffffffffff 0 0xfff0000000000000
-==== expr-30.2 FAILED
-
-
-
-==== expr-39.21 Tcl_ExprDoubleObj handles overflows FAILED
-==== Contents of test case:
-
-	testexprdoubleobj 17976931348623157[string repeat 0 292].
-    
----- Result was:
-This is a result: Inf
----- Result should have been (exact matching):
-This is a result: 1.7976931348623157e+308
-==== expr-39.21 FAILED
-
-
-
-==== expr-50.1 test sqrt() of bignums with non-Inf answer FAILED
-==== Contents of test case:
-
-    expr {sqrt("1[string repeat 0 616]") == 1e308}
-
----- Result was:
-0
----- Result should have been (exact matching):
-1
-==== expr-50.1 FAILED
-
 fCmd.test
 
 
@@ -904,7 +825,7 @@ bbbbbbbbbbbbbbb 15 123456789abcdef 1 4 abcd 0 3 efg
     ("uplevel" body line 15)
     invoked from within
 "uplevel 1 $script"
----- errorCode: CHILDSTATUS 34964 1
+---- errorCode: CHILDSTATUS 41522 1
 ==== io-29.33b FAILED
 
 
@@ -972,52 +893,6 @@ lrepeat.test
 lreplace.test
 lsearch.test
 lseq.test
-
-
-==== lseq-4.21.2 Corner cases: expected Inf FAILED
-==== Contents of test case:
-
-    set res {}
-    lappend res [lseq {1e5555+0} count 5]
-    lappend res [lseq Inf count 5]
-    lappend res [lseq Inf count 5 by 100]
-    lappend res [lseq Inf count 5 by Inf]
-    lappend res [lseq 5 by Inf]
-    lappend res [lseq 0 count 5 by Inf]
-    lappend res [lseq 5 by 1e308]
-    lappend res [lseq 0 count 5 by 1e308]
-    lappend res [lseq 5 by 5e307]
-    lappend res [lseq 0 count 5 by 5e307]
-
----- Result was:
-{Inf Inf Inf Inf Inf} {Inf Inf Inf Inf Inf} {Inf Inf Inf Inf Inf} {Inf Inf Inf Inf Inf} {0.0 Inf Inf Inf Inf} {0.0 Inf Inf Inf Inf} {0.0 Inf Inf Inf Inf} {0.0 Inf Inf Inf Inf} {0.0 5e+307 1e+308 1.5e+308 Inf} {0.0 5e+307 1e+308 1.5e+308 Inf}
----- Result should have been (exact matching):
-{Inf Inf Inf Inf Inf} {Inf Inf Inf Inf Inf} {Inf Inf Inf Inf Inf} {Inf Inf Inf Inf Inf} {0.0 Inf Inf Inf Inf} {0.0 Inf Inf Inf Inf} {0.0 1e+308 Inf Inf Inf} {0.0 1e+308 Inf Inf Inf} {0.0 5e+307 1e+308 1.5e+308 Inf} {0.0 5e+307 1e+308 1.5e+308 Inf}
-==== lseq-4.21.2 FAILED
-
-
-
-==== lseq-4.21.3 Corner cases: expected -Inf FAILED
-==== Contents of test case:
-
-    set res {}
-    lappend res [lseq {-1e5555+0} count 5]
-    lappend res [lseq -Inf count 5]
-    lappend res [lseq -Inf count 5 by 100]
-    lappend res [lseq -Inf count 5 by -Inf]
-    lappend res [lseq 5 by -Inf]
-    lappend res [lseq 0 count 5 by -Inf]
-    lappend res [lseq 5 by -1e308]
-    lappend res [lseq 0 count 5 by -1e308]
-    lappend res [lseq 5 by -5e307]
-    lappend res [lseq 0 count 5 by -5e307]
-
----- Result was:
-{-Inf -Inf -Inf -Inf -Inf} {-Inf -Inf -Inf -Inf -Inf} {-Inf -Inf -Inf -Inf -Inf} {-Inf -Inf -Inf -Inf -Inf} {0.0 -Inf -Inf -Inf -Inf} {0.0 -Inf -Inf -Inf -Inf} {0.0 -Inf -Inf -Inf -Inf} {0.0 -Inf -Inf -Inf -Inf} {0.0 -5e+307 -1e+308 -1.5e+308 -Inf} {0.0 -5e+307 -1e+308 -1.5e+308 -Inf}
----- Result should have been (exact matching):
-{-Inf -Inf -Inf -Inf -Inf} {-Inf -Inf -Inf -Inf -Inf} {-Inf -Inf -Inf -Inf -Inf} {-Inf -Inf -Inf -Inf -Inf} {0.0 -Inf -Inf -Inf -Inf} {0.0 -Inf -Inf -Inf -Inf} {0.0 -1e+308 -Inf -Inf -Inf} {0.0 -1e+308 -Inf -Inf -Inf} {0.0 -5e+307 -1e+308 -1.5e+308 -Inf} {0.0 -5e+307 -1e+308 -1.5e+308 -Inf}
-==== lseq-4.21.3 FAILED
-
 
 
 ==== lseq-4.21.4 Corner cases: unexpected Inf - Inf, result to +/-NaN, unexpected NaN FAILED
@@ -1167,7 +1042,7 @@ scan.test
     set result
 
 ---- Result was:
-n0=1.1125369292536563e-308 x1=1.1125369292536563e-308 x2=1.1125369292536563e-308 x3=1.1125369292536563e-308 n15=Infinity n16=Infinity n17=Infinity x18=Infinity n19=Infinity n20=Infinity n21=Infinity
+n0=1.1125369292536563e-308 x1=1.1125369292536563e-308 x2=1.1125369292536563e-308 x3=1.1125369292536563e-308 n19=Infinity n20=Infinity n21=Infinity
 ---- Result should have been (exact matching):
 
 ==== scan-15.1 FAILED
@@ -1356,7 +1231,7 @@ unixInit.test
     }
 
 ---- Result was:
-Expected: `127.0.0.1 localhost 65324', Got `'
+Expected: `127.0.0.1 localhost 38082', Got `'
 ---- Result should have been (exact matching):
 OK
 ==== unixInit-1.2 FAILED
@@ -1498,10 +1373,10 @@ zipfs.test
 
 zlib.test
 
-Tests ended at 2026-09-23 11:13:09 +0200
-all.tcl:	Total	68118	Passed	62138	Skipped	5916	Failed	64
+Tests ended at 2026-09-23 11:32:37 +0200
+all.tcl:	Total	68118	Passed	62146	Skipped	5916	Failed	56
 Sourced 167 Test Files.
-Files with failing tests: binary.test chanio.test cmdAH.test env.test event.test exec.test expr-old.test expr.test fCmd.test fileName.test io.test lseq.test main.test scan.test socket.test unixFCmd.test unixInit.test zipfs.test
+Files with failing tests: binary.test chanio.test cmdAH.test env.test event.test exec.test fCmd.test fileName.test io.test lseq.test main.test scan.test socket.test unixFCmd.test unixInit.test zipfs.test
 Number of tests skipped for each constraint:
 	9	!ieeeFloatingPoint
 	1	!singleTestInterp notWsl
