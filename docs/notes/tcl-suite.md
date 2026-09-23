@@ -6535,3 +6535,213 @@ disappointing, it is *information*: it says Tk's remaining 177 do not
 share a cause with Tcl's, and the three-item Tk list can be worked on
 without waiting for Tcl to finish. Tcl was one of those three items and
 is now effectively off it.
+
+#### 96 -> 77, and the refutation condition fired usefully
+
+```
+all.tcl:	Total 68118  Passed 62125  Skipped 5916  Failed 77
+```
+
+The prediction was `Failed` 78 with `Skipped` **+18**. What arrived was
+77 and **+24**, and `Passed` went **down by 5**:
+
+| | run 5 | run 6 | delta |
+|---|---|---|---|
+| Passed | 62130 | 62125 | **-5** |
+| Skipped | 5892 | 5916 | **+24** |
+| Failed | 96 | 77 | **-19** |
+
+The three deltas sum to zero, so nothing was created or lost -- 19
+failures became skips, and **five passes became skips**. The written
+condition was *"a `Skipped` rise of anything other than 18 refutes
+it"*. It rose by 24 and reading out why was the useful part of the
+round.
+
+**The per-constraint skip table is the instrument, and it had been sat
+on for months.** tcltest prints the number of tests skipped for each
+constraint at the end of every run; diffing that table between two runs
+says exactly where skips moved:
+
+```
+symlinks         0 -> 14     the fourteen newly constrained tests
+linkFile         0 ->  4
+linkDirectory    4 -> 21
+notWine         17 -> 10     reattributed, not newly skipped
+win            594 -> 592    ditto
+winLessThan10    1 ->  0     ditto
+dontCopyLinks    4 ->  3     ditto
+```
+
+35 new skips, 11 of them **reattributions**: tcltest charges a skip to
+one constraint out of the list, so a test that was charged to `notWine`
+is charged to `linkDirectory` once that one is false too. 35 - 11 = 24,
+which is the whole of the change. *Nothing else in the suite moved.*
+
+#### The five lost passes were FALSE passes, and they have names
+
+`fCmd-28.5`, `28.7`, `28.10`, `28.10.1`, `28.20` -- and `28.14`, which
+makes six candidates for five slots. Five of the six are
+`-returnCodes error` tests:
+
+```tcl
+test fCmd-28.5 {file link: source already exists} \
+    -constraints {linkDirectory} -body {
+    file link abc.dir abc2.dir
+} -returnCodes error ...
+```
+
+**They assert only that `file link` raises.** On Plan 9 it raises
+ENOSYS, so every one of them passed -- for a reason that has nothing to
+do with what it tests. `28.5` wants "source already exists", `28.10`
+wants "the target does not exist", `28.20` wants a relative path
+rejected. `28.14` is the same family from the other side: it deletes a
+link a previous test made and checks the directory survives, and
+without links the link was never there.
+
+**A check that can PASS for the wrong reason is not a check** -- this
+tree's own rule, and here are five of them by name. So `Passed` falling
+by 5 is not a loss of coverage; it is five false positives leaving the
+count. **A constraint that removes passes is doing its job as much as
+one that removes failures**, and a round that had only watched `Failed`
+would have recorded this as a clean win and learned nothing.
+
+#### io-6.46 is the nineteenth, and it is FLAKY rather than fixed
+
+19 failures went, not 18. The extra is `io-6.46` -- and **its twin
+`chan-io-6.46` still fails**. The twins are the same test through two
+APIs and they now disagree, which is the signature of the scheduling
+race written up for that group: the data crosses two copy processes and
+two event loops, and whether it has arrived is a matter of timing.
+Nothing was fixed there. **Count that group by whether the twins agree**,
+not by either one.
+
+#### zipfs is still 13, and that is unmeasured rather than refuted
+
+The `HAVE_STRUCT_STAT_ST_BLKSIZE`/`_ST_BLOCKS` change is in
+`sys/src/ape/lib/tcl/tclConfig.h`, and this run was the suite alone --
+no `mk install`, so `libtcl.a` and `tcltest` are the old binaries. The
+header **is** in that directory's `HFILES`, so a rebuild will pick it
+up. The one-line check that says which world the binary is in, before
+reading the suite at all:
+
+```
+echo 'file stat /tmp x; puts [lsort [array names x]]' >/tmp/s.tcl; tclsh /tmp/s.tcl
+```
+
+`blksize` and `blocks` in that list means the rebuilt Tcl is running.
+
+#### The three queued ports, surveyed before any work
+
+- **itcl 4.2.3** -- 22 `.c`, 7 `.tcl`, an ordinary autoconf extension.
+  Nothing in the shape of it says it cannot be an APExp package.
+- **tkblt 3.2 is C++ and is therefore BLOCKED.** 48 `.C` files with
+  `namespace Blt {`, `class Axis;` and `#include <cfloat>`. kencc has no
+  C++, and `sys/src/external/cfront-C4` is pre-standard cfront -- no
+  namespaces, no templates, no STL -- so it will not translate this.
+  Worth knowing before a directory is created rather than after.
+- **tkdesk does not need tkblt.** It ships **its own BLT subset in C**,
+  `tkdesk/blt/`: 12 `.c` files and not one `.C` -- `bltBgexec`,
+  `bltBusy`, `bltChain`, `bltConfig`, `bltDnd`, `bltInit` and the rest,
+  which is the part of BLT tkdesk actually uses. So the stress-test
+  application is reachable through itcl plus a bundled C library, and
+  the C++ problem is confined to the widget set nobody has asked for
+  yet.
+
+#### 77 -> 68: zipfs 13 -> 3 exactly as predicted, and the flake came back on cue
+
+```
+all.tcl:	Total 68118  Passed 62134  Skipped 5916  Failed 68
+```
+
+`Skipped` and `Total` identical, `Passed` **+9**, `Failed` **-9**, and
+the per-name diff is ten out and one in:
+
+- out: every `zipfs-file-stat-*` and `zipfs-file-lstat-*`, all ten.
+  **`HAVE_STRUCT_STAT_ST_BLKSIZE`/`_ST_BLOCKS` CONFIRMED**, and the
+  three `zipfs-password-*` that remain are zipfs's own cipher, as read.
+  13 -> 3, which is what the note said.
+- in: **`io-6.46`**, which left last round while its twin
+  `chan-io-6.46` stayed. It was called flaky on exactly that evidence,
+  and it came back in the very next run without anything touching it.
+  That is as clean a confirmation as a flake gives, and it settles how
+  that group is to be counted: **by whether the twins agree.**
+
+#### The /adm/users hypothesis is REFUTED, and the probe cost one command
+
+`cmdAH-25.3` has `file owned /` answering 1 where it should answer 0,
+and the mechanism argued from the source was: `dirtostat.c` takes
+`st_uid` from `_getpw()`, `_getpw()` parses `/adm/users`, that is a
+fossil/kenfs file, a 9front hjfs or cwfs terminal need not have one,
+and without it every file falls back to the default `st_uid = 1`.
+
+```
+% ls -l /adm/users
+-rw-rw-r-- 1 adm adm 139 Sun 26  2024 /adm/users
+```
+
+**It is there.** So `_getpw` opens it, the fallback is not what is
+happening, and the constant-ownership story is wrong as stated. What
+remains is much simpler and may not be a bug at all: `file owned /` is
+`st_uid == geteuid()`, and on a 9front terminal the owner of `/` may
+genuinely *be* the user running the tests. That would put this with
+`socket_inet-5.1` -- upstream testing a *name* (`notRoot`) as a proxy
+for a capability, on a system where the proxy does not hold.
+
+Three commands settle it and none of them needs a build:
+
+```
+ls -ld /          # who owns the root
+cat /dev/user     # who we are
+cat /adm/users    # 139 bytes: the whole mapping
+```
+
+**The guess was cheap and the refutation was cheaper.** It is the
+fourth time in this file that a mechanism read off the source was wrong
+and one command said so; the running tally is about one in eight
+correct for mechanisms guessed from code alone, and this round did not
+improve it.
+
+#### An instruction for the other machine has to name the program that runs it
+
+The second probe asked for was
+
+> print `fconfigure stderr -buffering` at a terminal and again under
+> `>out 2>&1`
+
+and it came back as
+
+```
+$ fconfigure stderr -buffering
+bash: fconfigure: command not found
+```
+
+**That is my fault, not a misreading.** `fconfigure` is a Tcl command
+and the line was written as though it were a shell one; nothing in it
+said `tclsh`. The instruction travelled to a machine I cannot see, and
+the only thing that can make it unambiguous there is the text itself.
+
+So the probe is now a file, `sys/lib/tests/tcl-stdchan-test.tcl`, which
+is this tree's own convention and removes the ambiguity permanently --
+and while writing it, it turned out to answer more than the original
+line did. **It tells the two hypotheses apart in ONE run** rather than
+by comparing two runs by eye:
+
+- section 1 prints all three channels and whether each is a terminal;
+- **section 2 tries to SET `-buffering none` itself**, which is the
+  same call `TclpGetDefaultStdChannel` makes with a NULL interp and
+  therefore cannot see the result of. If the set raises, the option
+  call is what fails; if it is accepted and does not take, the same; if
+  it works, something reset it afterwards;
+- section 3 asks the same of a freshly opened file channel, so "the
+  standard channels are special" can be told from "nothing can be set
+  to none";
+- section 4 says which Tcl ran.
+
+**Section 2 prints no verdict when section 1 already said `none`** --
+on a system where nothing is wrong there is nothing to tell apart, and
+a verdict printed anyway would be read as one.
+
+**And the host run already refutes one story.** On glibc, redirected
+exactly as the suite runs it, Linux still answers `line line none`. So
+**the redirect is not the condition**, and APExp's `line line line` is
+ours rather than an artefact of how the suite is invoked.
