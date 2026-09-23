@@ -6646,3 +6646,102 @@ echo 'file stat /tmp x; puts [lsort [array names x]]' >/tmp/s.tcl; tclsh /tmp/s.
   application is reachable through itcl plus a bundled C library, and
   the C++ problem is confined to the widget set nobody has asked for
   yet.
+
+#### 77 -> 68: zipfs 13 -> 3 exactly as predicted, and the flake came back on cue
+
+```
+all.tcl:	Total 68118  Passed 62134  Skipped 5916  Failed 68
+```
+
+`Skipped` and `Total` identical, `Passed` **+9**, `Failed` **-9**, and
+the per-name diff is ten out and one in:
+
+- out: every `zipfs-file-stat-*` and `zipfs-file-lstat-*`, all ten.
+  **`HAVE_STRUCT_STAT_ST_BLKSIZE`/`_ST_BLOCKS` CONFIRMED**, and the
+  three `zipfs-password-*` that remain are zipfs's own cipher, as read.
+  13 -> 3, which is what the note said.
+- in: **`io-6.46`**, which left last round while its twin
+  `chan-io-6.46` stayed. It was called flaky on exactly that evidence,
+  and it came back in the very next run without anything touching it.
+  That is as clean a confirmation as a flake gives, and it settles how
+  that group is to be counted: **by whether the twins agree.**
+
+#### The /adm/users hypothesis is REFUTED, and the probe cost one command
+
+`cmdAH-25.3` has `file owned /` answering 1 where it should answer 0,
+and the mechanism argued from the source was: `dirtostat.c` takes
+`st_uid` from `_getpw()`, `_getpw()` parses `/adm/users`, that is a
+fossil/kenfs file, a 9front hjfs or cwfs terminal need not have one,
+and without it every file falls back to the default `st_uid = 1`.
+
+```
+% ls -l /adm/users
+-rw-rw-r-- 1 adm adm 139 Sun 26  2024 /adm/users
+```
+
+**It is there.** So `_getpw` opens it, the fallback is not what is
+happening, and the constant-ownership story is wrong as stated. What
+remains is much simpler and may not be a bug at all: `file owned /` is
+`st_uid == geteuid()`, and on a 9front terminal the owner of `/` may
+genuinely *be* the user running the tests. That would put this with
+`socket_inet-5.1` -- upstream testing a *name* (`notRoot`) as a proxy
+for a capability, on a system where the proxy does not hold.
+
+Three commands settle it and none of them needs a build:
+
+```
+ls -ld /          # who owns the root
+cat /dev/user     # who we are
+cat /adm/users    # 139 bytes: the whole mapping
+```
+
+**The guess was cheap and the refutation was cheaper.** It is the
+fourth time in this file that a mechanism read off the source was wrong
+and one command said so; the running tally is about one in eight
+correct for mechanisms guessed from code alone, and this round did not
+improve it.
+
+#### An instruction for the other machine has to name the program that runs it
+
+The second probe asked for was
+
+> print `fconfigure stderr -buffering` at a terminal and again under
+> `>out 2>&1`
+
+and it came back as
+
+```
+$ fconfigure stderr -buffering
+bash: fconfigure: command not found
+```
+
+**That is my fault, not a misreading.** `fconfigure` is a Tcl command
+and the line was written as though it were a shell one; nothing in it
+said `tclsh`. The instruction travelled to a machine I cannot see, and
+the only thing that can make it unambiguous there is the text itself.
+
+So the probe is now a file, `sys/lib/tests/tcl-stdchan-test.tcl`, which
+is this tree's own convention and removes the ambiguity permanently --
+and while writing it, it turned out to answer more than the original
+line did. **It tells the two hypotheses apart in ONE run** rather than
+by comparing two runs by eye:
+
+- section 1 prints all three channels and whether each is a terminal;
+- **section 2 tries to SET `-buffering none` itself**, which is the
+  same call `TclpGetDefaultStdChannel` makes with a NULL interp and
+  therefore cannot see the result of. If the set raises, the option
+  call is what fails; if it is accepted and does not take, the same; if
+  it works, something reset it afterwards;
+- section 3 asks the same of a freshly opened file channel, so "the
+  standard channels are special" can be told from "nothing can be set
+  to none";
+- section 4 says which Tcl ran.
+
+**Section 2 prints no verdict when section 1 already said `none`** --
+on a system where nothing is wrong there is nothing to tell apart, and
+a verdict printed anyway would be read as one.
+
+**And the host run already refutes one story.** On glibc, redirected
+exactly as the suite runs it, Linux still answers `line line none`. So
+**the redirect is not the condition**, and APExp's `line line line` is
+ours rather than an artefact of how the suite is invoked.

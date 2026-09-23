@@ -196,7 +196,9 @@ a single file from it. `tcl-runall.tcl` is the same thing for Tcl's own
 suite, run under `tcltest`; both harnesses exist because a fault, a
 kill and a clean finish are indistinguishable from the shell, so a run
 without a completion marker cannot be read at all.
-`tcl-fileevent-test.tcl` is a test rather than a harness -- it runs
+`tcl-stdchan-test.tcl` asks what buffering the three standard
+channels get, and is a PROBE rather than a rule -- report what it
+prints. `tcl-fileevent-test.tcl` is a test rather than a harness -- it runs
 under plain `tclsh` and isolates the `chan-io-44.1` and `event-11.5`
 hangs, with a timeout on every section so it reports where the suite
 would wait; `select-test.c` takes the two bugs it found down to the
@@ -568,7 +570,7 @@ or a constraint that fails on Linux too). The port's own share is
 `focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
 
 **Tcl's suite**: **it finishes and nothing aborts.**
-`Total 68118 Passed 62125 Skipped 5916 Failed 77`, 167 files, marker,
+`Total 68118 Passed 62134 Skipped 5916 Failed 68`, 167 files, marker,
 exit 0, and no `Test files exiting with errors` section. The listener
 leak fix took **14** (all eleven of `socket_inet-11.*`, plus `12.1`,
 `2.6`, `socket-14.11.1`); async connect took **13** more with nothing
@@ -803,29 +805,36 @@ Open, in order of what the next run should touch:
   short two keys for every program. Declared now; `st_rdev` deliberately
   NOT, because `dirtostat.c` always sets it to 0 and *a field that is
   always zero reads as information and is not*. Predict 13 -> 3 (the
-  three left are zipfs's own `invalid password`). **Still 13, and that
-  is UNMEASURED**: the last run was the suite alone, so `libtcl.a` and
-  `tcltest` are the old binaries. `tclConfig.h` is in that directory's
-  `HFILES`, so `mk install` picks it up. `file stat` printing `blksize`
-  is the one-line check for which binary is running.
+  three left are zipfs's own `invalid password`). **13 -> 3 CONFIRMED**
+  after `mk install`: all ten `-stat-`/`-lstat-` gone, `Passed` +9,
+  `Skipped` and `Total` identical, nothing else moved.
 - **`14.1`/`14.2` (four tests) are read at last and are a PROBE**:
   stderr's buffering is `line` and must be `none` -- while
   `TclpGetDefaultStdChannel` asks for exactly that and is passed a NULL
   interp, so a failure is silent. `testchannel open` says
   `file0 file1 file2`, so `isatty` is answering correctly and this is
-  not the tty path. One line settles it: print
-  `fconfigure stderr -buffering` at a terminal and again under
-  `>out 2>&1`. Same answer both ways means the option call is failing;
-  different means the redirect is the condition.
-- **`cmdAH` 4: two symlink, two ours.** `cmdAH-25.3` has `file owned /`
-  answering 1 -- and `dirtostat.c` takes `st_uid` from `_getpw()`, which
-  parses **`/adm/users`**, a fossil/kenfs file a 9front hjfs or cwfs
-  terminal need not have. When it cannot be opened every file gets the
-  default `st_uid = 1` and **ownership is a constant system-wide**.
-  Probe `ls -l /adm/users` before writing anything; the honest repair
-  compares the Dir's owner string against `/dev/user`, not a fabricated
-  password database. `cmdAH-20.5`: `file atime $f $t` reads back the
-  current time, so the wstat did not carry it -- `ratrace` first.
+  not the tty path. **`sys/lib/tests/tcl-stdchan-test.tcl` is the
+  probe**, and it tells the two stories apart in ONE run: section 2
+  makes the same `-buffering none` call Tcl's startup makes and can see
+  the result, section 3 asks it of a freshly opened channel. **The host
+  already refutes one story**: glibc redirected exactly as the suite
+  runs it still answers `line line none`, so the redirect is not the
+  condition and this is ours.
+  *(The earlier one-line version came back as `bash: fconfigure:
+  command not found` -- **an instruction for the other machine has to
+  name the program that runs it**, and a file is the way to say it.)*
+- **`cmdAH` 2: `25.3` and `20.5`.** `cmdAH-25.3` has `file owned /`
+  answering 1 where it should answer 0. **The `/adm/users` mechanism is
+  REFUTED** -- the probe found the file present (`-rw-rw-r-- adm adm
+  139`), so `_getpw` opens it and the `st_uid = 1` fallback is not what
+  happens. What is left is simpler and may not be a bug: `file owned` is
+  `st_uid == geteuid()`, and on a 9front terminal the owner of `/` may
+  genuinely be the user running the tests -- which would put it with
+  `socket_inet-5.1`, upstream testing a *name* as a proxy for a
+  capability. Three commands settle it, no build: `ls -ld /`,
+  `cat /dev/user`, `cat /adm/users`. `cmdAH-20.5`: `file atime $f $t`
+  reads back the current time, so the wstat did not carry it --
+  `ratrace` first.
 - **`chan-io-28.7`, one test and ours**: `close $s w` (half-close) and
   the far end reads `{}` where it should read `{Hey DONE}`. `shutdown()`
   is already in this tree's list of stubs that answered the wrong thing.
@@ -869,7 +878,8 @@ Open, in order of what the next run should touch:
   that removes failures.**
   The nineteenth, `io-6.46`, is **flaky not fixed**: its twin
   `chan-io-6.46` still fails, so count that group by whether the twins
-  agree.
+  agree. **CONFIRMED the next run** -- it came back with nothing
+  touching it.
 
 **Fixed this round**: `NAME_MAX` was 27 and `PATH_MAX` 1023, set in
 `sys/include/ape/sys/limits.h`, which `<limits.h>` includes at its very
