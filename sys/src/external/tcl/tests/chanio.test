@@ -46,6 +46,9 @@ namespace eval ::tcl::test::io {
     }
     source [file join [file dirname [info script]] tcltests.tcl]
 
+    # APExp: symbolic links are a capability, not a platform. See the file.
+    source [file join [file dirname [info script]] apexp-links.tcl]
+
     testConstraint testbytestring   [llength [info commands testbytestring]]
     testConstraint testchannel      [llength [info commands testchannel]]
     testConstraint testfevent       [llength [info commands testfevent]]
@@ -5545,7 +5548,7 @@ test chan-io-41.7 {Tcl_FileeventCmd: special} -constraints {
 } -result 1
 
 
-test chan-io-41.8 {Tcl_FileeventCmd: symbolic link} -constraints {fileevent unix} -setup {
+test chan-io-41.8 {Tcl_FileeventCmd: symbolic link} -constraints {fileevent unix symlinks} -setup {
     set tempdir [::tcltests::tempdir]
 } -body {
     set target [makeFile {not again} thefile $tempdir]

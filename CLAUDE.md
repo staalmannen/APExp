@@ -221,6 +221,16 @@ APExp and see whether it builds and runs.
 - C11/C23 compiler features — `_Generic`, and `bool` as a real type
 - perl 5.42.2 — see the section below
 
+**Queued after Tcl/Tk: three more ports, chosen as stress tests.** Tcl
+and Tk have been the most productive bug-finders in this tree, so the
+next round of the same: **itcl** and **tkblt** become ordinary APExp
+packages under `sys/src/ape/lib` and `sys/src/ape/cmd`, and **tkdesk**
+-- an application that needs both -- gets its mkfile in
+**`sys/src/ape/app`** and is **not built by default**, being a
+proof-of-concept rather than part of APExp. The point is not tkdesk; it
+is what a large Tcl/Tk application drags out of libap and the
+compilers on the way up.
+
 ### perl
 
 `sys/src/ape/lib/perl` builds `libperl.a`; `sys/src/ape/cmd/perl` builds
@@ -543,7 +553,10 @@ the index, so that nothing here is a surprise.
 ## Where things stand
 
 **Tk's suite**: 97 files, `Total 10027 Passed 8925 Skipped 924
-Failed 178`, clean exit. The remaining 178 are mostly out of reach here
+Failed 178` -> **177** after the whole Tcl campaign, clean exit. **One
+test.** That is information rather than a disappointment: Tk's
+remaining 177 do not share a cause with Tcl's, so the Tk list can be
+worked without waiting on Tcl -- and Tcl was one of its three items. The remaining 178 are mostly out of reach here
 (a second wish process, an X property, a system tray, a scalable font,
 or a constraint that fails on Linux too). The port's own share is
 `focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
@@ -618,9 +631,11 @@ Open, in order of what the next run should touch:
   tests were reading; plus `EINVAL` for a directory moved into itself,
   compared **by qid up the tree, not by string**; plus `_errno.c` mapping
   Plan 9's "permission denied" to `EPERM` where POSIX wants `EACCES`.
-  The remaining 22 + `unixFCmd` 2 are 15 symlink, 8 `~USER`, and
-  `unixFCmd-1.1`. **24 of 24 accounted for** -- reading a cluster all
-  the way through before touching it is what made that possible.
+  The remaining 22 + `unixFCmd` 2 are 14 symlink, 8 `~USER`,
+  `unixFCmd-1.1` and `unixFCmd-2.2.2`. **24 of 24 accounted for** --
+  reading a cluster all the way through before touching it is what made
+  that possible. **The symlink half is now constrained rather than
+  failing** -- see the `symlinks` entry below.
 - **`close()` on a listening socket freed nothing -- FIXED and
   CONFIRMED.** `listen()` replaces the descriptor with a **pipe** and
   forks a child holding the real network fd, so `close()` shut a pipe
@@ -728,9 +743,9 @@ Open, in order of what the next run should touch:
   to 1 outside Windows, so **`fileName.test` now PROBES for the
   capability** -- the only Tcl test patched, justified because the
   litter makes eleven tests misreport something unrelated.
-  **`fCmd.test`/`cmdAH.test` hardcode the same constraint and are
-  deliberately left alone**: their symlink tests fail honestly and
-  contaminate nothing, and skipping them would only flatter the count.
+  *(`fCmd.test`/`cmdAH.test` were deliberately left alone at the time;
+  that was reversed the next round with explicit permission -- see
+  `symlinks` below.)*
   **One is ours and is recorded, not fixed**: `filename-14.9` wants
   `glob globTest/.*` to yield `.` and `..`, and **Plan 9 directories
   contain neither**. Synthesising them in `readdir()` changes what every
@@ -818,8 +833,20 @@ Open, in order of what the next run should touch:
 - `binary-53.25`/`53.26`: a double one ulp past the float range must
   round to infinity.
 - **9front has no symbolic links** (confirmed by grep), so `symlink()`
-  stays ENOSYS and costs one test. **Do not emulate it with a copy** --
-  see `docs/notes/tcl-suite.md`.
+  stays ENOSYS. **Do not emulate it with a copy** -- see
+  `docs/notes/tcl-suite.md`. **`tests/apexp-links.tcl` is the one probe
+  for it**, sourced by `fCmd`, `cmdAH`, `chanio`, `unixFCmd` and
+  `fileName`. It declares **`symlinks`**, APExp's own constraint name,
+  and touches upstream's `linkDirectory`/`linkFile`/`symbolicLinkFile`
+  **only when the probe fails** -- so on a system with links it changes
+  nothing and cannot re-enable what Windows disabled. Fourteen tests
+  that used a link without declaring they needed one now carry
+  `symlinks`. **It cannot ask whether a constraint was declared**:
+  `tcltest::SafeFetch` is a read trace that "sets testConstraints($n2)
+  to 0 if it's referenced but never before used", so looking creates it
+  as 0 and absent and false are one observation. The host tclsh caught
+  the first version doing exactly that. Predict `Failed` 96 -> 78 with
+  `Skipped` up by exactly 18.
 
 **Fixed this round**: `NAME_MAX` was 27 and `PATH_MAX` 1023, set in
 `sys/include/ape/sys/limits.h`, which `<limits.h>` includes at its very

@@ -6461,3 +6461,77 @@ a half-close -- and the far end then reads `{}` where it should read
 `{Hey DONE}`. The bytes written before the half-close did not arrive.
 `shutdown()` is in this file's list of stubs that answered the wrong
 thing once already.
+
+#### The symlink constraint, done properly: one probe file, and a name of our own
+
+Authorised this round: *"it is OK to patch the test files that look for
+symlinks to be ignored by Windows AND Plan 9."* The previous round had
+patched only `fileName.test`, on the narrow ground that its five
+failures **contaminated eleven others**, and had deliberately left
+`fCmd.test` and `cmdAH.test` alone because their symlink tests fail
+honestly. With the wider permission the right shape is one file,
+`tests/apexp-links.tcl`, sourced by the five test files that need it.
+
+**Eighteen tests, and only four of them declared what they needed.**
+
+| file | tests | already constrained? |
+|---|---|---|
+| `fCmd` `18.12`-`18.16`, `21.7.2`, `21.8.2`, `21.9`, `26.1`-`26.3` | 11 | no -- `{unix notRoot}` |
+| `fCmd` `28.9`, `28.21`, `28.22` | 3 | yes (`linkFile`/`linkDirectory`) |
+| `cmdAH-29.4` | 1 | no -- `{unix}` |
+| `cmdAH-29.4.1` | 1 | yes (`linkDirectory`) |
+| `chan-io-41.8` | 1 | no -- `{fileevent unix}` |
+| `unixFCmd-2.2.2` | 1 | no -- `{unix notRoot}` |
+
+Upstream guards the `file link` **API** tests and not the tests that
+merely *use* a link, because on every unix it builds on there was never
+a reason to. So the four constrained ones need the constraint turned
+off and the fourteen others need a constraint at all.
+
+**A name of our own, and that is the interesting part.** The first
+version tried to tell "this file never declared `linkFile`" from "this
+file declared it 0", so that it could default the former to 1. It
+cannot be done, and the host tclsh said so in one run: `linkFile` and
+`symbolicLinkFile` came back **0 on a machine that has symbolic links**.
+`tcltest` puts a read trace on the array --
+
+```tcl
+# Side effects:
+#	sets testConstraints($n2) to 0 if it's referenced but never
+#       before used
+proc tcltest::SafeFetch {n1 n2 op} { ... }
+```
+
+-- so *looking* creates the entry as 0, and absent and false are the
+same observation. Reading `SafeFetch` after the run confirmed what the
+run had already shown. **Had this gone to the VM instead, fourteen
+tests would have been silently skipped on Linux too and the constraint
+would have looked like it worked.**
+
+So `apexp-links.tcl` declares **`symlinks`**, which is APExp's name and
+collides with nothing (checked), sets it from the probe, and touches
+upstream's three constraints **only when the probe fails**. On a system
+that has links it changes nothing at all: `symlinks` is 1 and
+`linkDirectory`, `linkFile` and `symbolicLinkFile` are left exactly as
+the test file left them, so nothing Windows disabled can be switched
+back on. Both branches were run on the host tclsh -- a file that had
+declared `linkDirectory 0` keeps 0, and the forced branch takes all
+four to 0.
+
+**Prediction: `Failed` 96 -> 78, `Skipped` up by exactly 18**, `Total`
+unchanged, and nothing moves in the other direction. `fCmd` 22 -> 8
+(the eight `~USER` tests, which are a different question), `cmdAH` 4 ->
+2, `chan-io` 10 -> 9, `unixFCmd` 2 -> 1. **What would refute it**: a
+`Skipped` rise of anything other than 18, or any test that is neither
+skipped nor still failing -- a symlink test that starts *passing* would
+mean the probe answered yes and something else is wrong.
+
+#### Tk moved by one, and that is the whole point of the datapoint
+
+`grep -c FAILED` on Tk's log went 356 -> 354, which is 178 -> **177**:
+two lines per failure. So the whole Tcl campaign -- forty tests this
+round, eighty-seven in all -- bought Tk exactly one. That is not
+disappointing, it is *information*: it says Tk's remaining 177 do not
+share a cause with Tcl's, and the three-item Tk list can be worked on
+without waiting for Tcl to finish. Tcl was one of those three items and
+is now effectively off it.
