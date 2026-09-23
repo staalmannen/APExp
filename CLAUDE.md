@@ -221,7 +221,13 @@ APExp and see whether it builds and runs.
 - C11/C23 compiler features — `_Generic`, and `bool` as a real type
 - perl 5.42.2 — see the section below
 
-**Queued after Tcl/Tk: three more ports, chosen as stress tests.** Tcl
+**Queued after Tcl/Tk: three more ports, chosen as stress tests.**
+**Surveyed, and one is blocked: `tkblt` 3.2 is C++** -- 48 `.C` files
+with `namespace Blt {` and `#include <cfloat>` -- and kencc has no C++
+(`external/cfront-C4` is pre-standard cfront: no namespaces, no
+templates, no STL). **tkdesk does not need it**: it ships its own BLT
+subset in **C**, `tkdesk/blt/`, 12 `.c` files and not one `.C`. `itcl`
+4.2.3 is 22 `.c` files and an ordinary autoconf extension. Tcl
 and Tk have been the most productive bug-finders in this tree, so the
 next round of the same: **itcl** and **tkblt** become ordinary APExp
 packages under `sys/src/ape/lib` and `sys/src/ape/cmd`, and **tkdesk**
@@ -562,7 +568,7 @@ or a constraint that fails on Linux too). The port's own share is
 `focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
 
 **Tcl's suite**: **it finishes and nothing aborts.**
-`Total 68118 Passed 62130 Skipped 5892 Failed 96`, 167 files, marker,
+`Total 68118 Passed 62125 Skipped 5916 Failed 77`, 167 files, marker,
 exit 0, and no `Test files exiting with errors` section. The listener
 leak fix took **14** (all eleven of `socket_inet-11.*`, plus `12.1`,
 `2.6`, `socket-14.11.1`); async connect took **13** more with nothing
@@ -797,7 +803,11 @@ Open, in order of what the next run should touch:
   short two keys for every program. Declared now; `st_rdev` deliberately
   NOT, because `dirtostat.c` always sets it to 0 and *a field that is
   always zero reads as information and is not*. Predict 13 -> 3 (the
-  three left are zipfs's own `invalid password`).
+  three left are zipfs's own `invalid password`). **Still 13, and that
+  is UNMEASURED**: the last run was the suite alone, so `libtcl.a` and
+  `tcltest` are the old binaries. `tclConfig.h` is in that directory's
+  `HFILES`, so `mk install` picks it up. `file stat` printing `blksize`
+  is the one-line check for which binary is running.
 - **`14.1`/`14.2` (four tests) are read at last and are a PROBE**:
   stderr's buffering is `line` and must be `none` -- while
   `TclpGetDefaultStdChannel` asks for exactly that and is passed a NULL
@@ -845,8 +855,21 @@ Open, in order of what the next run should touch:
   `tcltest::SafeFetch` is a read trace that "sets testConstraints($n2)
   to 0 if it's referenced but never before used", so looking creates it
   as 0 and absent and false are one observation. The host tclsh caught
-  the first version doing exactly that. Predict `Failed` 96 -> 78 with
-  `Skipped` up by exactly 18.
+  the first version doing exactly that.
+  **96 -> 77 CONFIRMED, and the refutation condition fired usefully.**
+  Predicted `Skipped` +18; it rose **24**, and `Passed` fell **5**. The
+  per-constraint skip table at the end of every run is what named the
+  difference -- 35 new skips, 11 of them **reattributions** (tcltest
+  charges a skip to one constraint of the list, so `notWine` -7,
+  `win` -2). **The five lost passes were FALSE passes**: `fCmd-28.5`,
+  `28.7`, `28.10`, `28.10.1`, `28.20` are `-returnCodes error` tests
+  asserting only that `file link` RAISES, and on Plan 9 it raises
+  ENOSYS -- so they passed for a reason unrelated to what they test.
+  **A constraint that removes passes is doing its job as much as one
+  that removes failures.**
+  The nineteenth, `io-6.46`, is **flaky not fixed**: its twin
+  `chan-io-6.46` still fails, so count that group by whether the twins
+  agree.
 
 **Fixed this round**: `NAME_MAX` was 27 and `PATH_MAX` 1023, set in
 `sys/include/ape/sys/limits.h`, which `<limits.h>` includes at its very
