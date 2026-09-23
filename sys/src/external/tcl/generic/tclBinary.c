@@ -55,10 +55,19 @@ ApexpFloatMark(void)
 {
     static int done = 0;
 
-    if (done || getenv("APEXP_FLOAT_DEBUG") == NULL) {
+    /*
+     * `done' is set before the getenv, not after: FormatNumber runs this
+     * on every `binary format R', and the version that tested the
+     * environment first did a getenv per call for ever when the variable
+     * was unset. One lookup per process is what was wanted.
+     */
+    if (done) {
 	return;
     }
     done = 1;
+    if (getenv("APEXP_FLOAT_DEBUG") == NULL) {
+	return;
+    }
     fprintf(stderr, "APEXP tclBinary.c float.h: marker=%s sizeof(FLT_MAX)=%d "
 	    "FLT_MAX=%.17g spelled=%s\n",
 #ifdef __APEXP_FLOAT_ARCH

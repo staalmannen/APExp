@@ -1025,33 +1025,44 @@ Open, in order of what the next run should touch:
   outside -- the `/$objtype/include/ape` shadowing invariant is exactly
   that trap. Predict `Failed` 56 -> 54; refuted if the marker says the
   header read was not this tree's.
-  **REFUTED TWICE, and the second one is the interesting half.**
-  First: `binfloat-test` gave 0 failures with the marker saying THIS
-  TREE while `Failed` stayed at 56, which looked like the `mk
-  distclean` rule. **`tcl-fltmax-probe.tcl` measures what libtcl was
-  actually compiled with** -- `binary format R` answers +Inf exactly
-  above `FLT_MAX + 2^103`, so bisecting on the BIT PATTERN recovers the
-  constant exactly, and the probe prints the constant rather than a
-  verdict. After `mk distclean` **and** `mk install` it still reports
-  **`3.40282347e+38`, too big by 3.61471e+29** -- so the object WAS
-  rebuilt and staleness is out. What is left is the header-shadowing
-  invariant, and `./mount-include` **no-ops entirely** when
-  `/sys/include/ape/THIS_IS_APExp` exists.
-  **THREE different float.h constants have now been seen**, which is
-  the fact that was hiding in plain sight: `3.4028234663852886e+38`
-  (this tree, after the fix), `3.40282347e+38` (this tree, before it,
-  and what libtcl has now) and **`3.4028235e+38`** -- which is what
-  `binfloat-test` measured before the fix and is transcribed in
-  `docs/notes/libap.md`. *That third value is in neither version of
-  this tree's header*, so something outside the repo was being read,
-  and the note sat there for a round without anyone reconciling it
-  against the file in git. **A transcription is evidence; check it
-  against the source before building on it.**
-  The number cannot finish the job -- `3.40282347e+38` is equally what
-  a stale installed copy and a machine's own leftover would say -- so
-  `tclBinary.c` now prints the marker, `sizeof` and spelling of its
-  `FLT_MAX` under `$APEXP_FLOAT_DEBUG`. It has to be in THAT file: a
-  marker in `tclStrToD.c` answers for `tclStrToD.c`.
+  **It took three rounds and the answer was the FIRST one, which I had
+  then argued my way out of.** `tcl-fltmax-probe.tcl` measures what
+  libtcl was actually compiled with -- `binary format R` answers +Inf
+  exactly above `FLT_MAX + 2^103`, so bisecting on the BIT PATTERN
+  recovers the constant exactly, and it prints the constant rather than
+  a verdict. Round 1: `Failed` stayed 56 and the probe said
+  `3.40282347e+38`. Round 2: `mk distclean` **and** `mk install`, and
+  the probe said `3.40282347e+38` again -- from which I concluded the
+  object had been rebuilt and staleness was out. **That conclusion was
+  read off the `distclean` target, not measured.** Round 3: a marker
+  added to `tclBinary.c` -- which is itself an edit, so `mk` recompiled
+  that file -- and the probe now says the CORRECT constant, the marker
+  says `PRESENT (this tree)`, `sizeof(FLT_MAX)=4`, and `binary format
+  R` of `binary-53.25`'s own input gives **`7f800000`**, which is what
+  the test wants.
+  **So `tclBinary.$O` was not rebuilt with the current header until the
+  source file changed, and `mk distclean; mk install` did not do it.**
+  Which of two mechanisms that is, is still open and is a build-system
+  question rather than a float one: either `mk clean` does not reach
+  these objects, or `mk install`'s build ran without the union mount --
+  **`./mount-include` no-ops entirely when
+  `/sys/include/ape/THIS_IS_APExp` exists, and on this machine it
+  does** (`-rw-r--r-- glenda 32 Sun 19 2026`). The build prints
+  `APExp mounted` or `APExp already mounted`; that one word tells them
+  apart.
+  **The rule that failed here is one already in this file**: *a
+  measurement of a build that does not contain the change measures
+  nothing* -- and its harder half, which is that **arguing a build
+  DOES contain the change, from the build system's source, is not a
+  measurement either.** The marker is what settled it, and it had to be
+  in `tclBinary.c`: a marker in `tclStrToD.c` answers for
+  `tclStrToD.c`.
+  A loose end that turned out not to be one: three different constants
+  appear across the rounds -- `3.4028234663852886e+38` (correct),
+  `3.40282347e+38` (this tree before the fix, and stock APE) and
+  `3.4028235e+38` transcribed in `docs/notes/libap.md`. The third is in
+  neither version of the header in git, so it came from a build reading
+  something outside the repo. Worth remembering, not worth chasing now.
   Two host-check lessons on the way: `binary format Q` takes a
   **double**, not a bit pattern (`W` then `Q` is the reinterpretation),
   **Tcl's `%x` truncates to 32 bits** without `ll`, and **tclsh 8.6 has
