@@ -200,7 +200,11 @@ without a completion marker cannot be read at all.
 channels get, and is a PROBE rather than a rule -- report what it
 prints. `tcl-machexp-probe.tcl` is the same kind of thing for
 Tcl's own float parser, and needs `$APEXP_STRTOD_DEBUG` set or it
-says nothing. `tcl-fileevent-test.tcl` is a test rather than a harness -- it runs
+says nothing. **It paid for itself in one run**: it named
+`scalbn`'s `2^1023`. `ldexp-test.c` is the regression test that came
+out of it, and it walks the WHOLE exponent range because the host
+cross-check that had passed `scalbn` used a window that never reached
+the broken branch. `tcl-fileevent-test.tcl` is a test rather than a harness -- it runs
 under plain `tclsh` and isolates the `chan-io-44.1` and `event-11.5`
 hangs, with a timeout on every section so it reports where the suite
 would wait; `select-test.c` takes the two bugs it found down to the
@@ -914,34 +918,31 @@ Open, in order of what the next run should touch:
   midpoint**: an unconditional nudge would move a double one ulp away
   ONTO one. All five sections 0 wrong, with `strtod-xcheck` and
   `dtoa-xcheck` unchanged.
-- **`expr` 5 + `expr-old` 1: three libap suspects eliminated, next
-  step is on the VM.** `MakeHighPrecisionDouble()` has two places that
-  return `HUGE_VAL`, both computed from libap at startup. `maxDigits`
-  is 308.75 -- reaching 307 needs a 0.6% error in `log`, and the
-  failing inputs want `291 > 291` and `289 > 290`, both false
-  (arithmetic, not a run). `log2FLT_RADIX` comes from `frexp(2.0)` and
-  a `--`, and a wrong one would `Tcl_Panic`. And **`frexp`/`scalbn`
-  were cross-checked on the host: 299876 values and every boundary,
-  0 wrong.** What is left is `Pow10TimesFrExp`,
-  `BignumToBiasedFrExp` and `RefineApproximation` -- Tcl over
-  libtommath, no libap floating point in the path. **The probe is
-  written and waiting**: `tclStrToD.c` is instrumented behind
-  `$APEXP_STRTOD_DEBUG` and `tcl-machexp-probe.tcl` drives it. Both
-  `HUGE_VAL` exits name themselves, and the entry line carries the
-  startup constants beside the arguments. **1025 where 1024 is right
-  means one binade in Tcl's own scaling** (`pow10_wide`,
-  `pow_10_2_n`). No APEXP lines for a value is an answer, not a failed
-  run. Needs `mk install` in `lib/tcl` then `cmd/tclsh`; do not set the
-  variable for a full suite run.
-  Everything at or above `1.797693134862315 5 e308` comes back
-  infinite, including two values that are representable.
-  `strtod-xcheck` **refuted the obvious answer**: libap's `strtod`
-  returns `7feffffffffffffd` for the value Tcl reports as Inf, and
-  stays finite where glibc overflows -- so it is not this function.
-  **Tcl parses numbers in its own `tclStrToD.c`.** Ask what the code
-  calls, not what looks guilty.
+- **`expr`'s six are FOUND, and it was `2^1023` in `math/scalbn.c`.**
+  That is `2 XOR 1023` -- an integer exclusive-or, **1021** -- where
+  musl writes `0x1p1023`, a hex float. Someone read the `p` as "power
+  of". `scalbnf.c` had the same with 127 (`2 XOR 127` = 125). The
+  `machexp` probe said it in one run: every constant right, `machexp`
+  1024 against a limit of 1024, and then `SafeLdExp -> 2041.9999999`
+  -- 1021 x 2 exactly. **Not a compiler bug**: 89 other `math/` files
+  use `0x1p...` and are fine.
+  **It was never only those six.** Replicating the old code beside the
+  new, `ldexp-test` fails 13 checks on it: **52 of 2098 double
+  exponents and 23 of 277 float ones**, `scalbn(1.0,-1074)` giving
+  **-2.27e-13** from +1.0 and `scalbn(1.0,1024)` giving 2042 instead of
+  infinity. *Every subnormal any program reached through `ldexp` was
+  wrong, some with the wrong sign.* The arms are only entered when
+  `|n|` exceeds one multiplication's range, which is why nothing had
+  noticed.
+  **And the host cross-check had already passed `scalbn`** -- 299876
+  values, 0 wrong, with `n` from `rand()%200 - 100`, so it never
+  entered the broken branch. *A check that cannot fail is not a check*,
+  and a sweep that cannot reach a branch has not tested it.
+  `ldexp-test.c` bounds every section by the format's own limits
+  instead. Predict `Failed` 64 -> 58, or 56 if `binary-53.25/53.26` go
+  with them.
 - `binary-53.25`/`53.26`: a double one ulp past the float range must
-  round to infinity. Possibly the same question as `expr`'s six.
+  round to infinity. **Likely the same `scalbn` bug** -- watch them.
 - **9front has no symbolic links** (confirmed by grep), so `symlink()`
   stays ENOSYS. **Do not emulate it with a copy** -- see
   `docs/notes/tcl-suite.md`. **`tests/apexp-links.tcl` is the one probe
