@@ -9,7 +9,7 @@ Test files run in separate interpreters
 Running tests that match:  *
 Skipping test files that match:  l.*.test
 Only running test files that match:  *.test
-Tests began at 2026-09-23 05:21:59 +0200
+Tests began at 2026-09-23 05:47:41 +0200
 aaa_exit.test
 abstractlist.test
 append.test
@@ -261,7 +261,7 @@ cmdAH.test
     expr {$newatime == $modatime ? 1 : "$newatime != $modatime"}
 
 ---- Result was:
-1790133751 != 1790133750
+1790135295 != 1790135293
 ---- Result should have been (exact matching):
 1
 ==== cmdAH-20.5 FAILED
@@ -878,6 +878,32 @@ bbbbbbbbbbbbbbb 15 123456789abcdef 1 4 abcd 0 3 efg
 
 
 
+==== io-6.46 Tcl_GetsObj: input saw cr, followed by just \n should give eof FAILED
+==== Contents of test case:
+
+    # memmove()
+
+    set f [open "|[list [interpreter] $path(cat)]" w+]
+    fconfigure $f -translation {auto lf} -buffering none
+    puts -nonewline $f "bbbbbbbbbbbbbbb\n123456789abcdef\r"
+    fconfigure $f -buffersize 16
+    gets $f
+    fconfigure $f -blocking 0
+    set x [list [gets $f line] $line [testchannel queuedcr $f]]
+    fconfigure $f -blocking 1
+    puts -nonewline $f "\n\x1A"
+    lappend x [gets $f line] $line [testchannel queuedcr $f]
+    close $f
+    set x
+
+---- Result was:
+-1 {} 0 15 123456789abcdef 1
+---- Result should have been (exact matching):
+15 123456789abcdef 1 -1 {} 0
+==== io-6.46 FAILED
+
+
+
 ==== io-14.1 Tcl_SetStdChannel and Tcl_GetStdChannel FAILED
 ==== Contents of test case:
 
@@ -947,7 +973,7 @@ line line none
     ("uplevel" body line 15)
     invoked from within
 "uplevel 1 $script"
----- errorCode: CHILDSTATUS 4584 1
+---- errorCode: CHILDSTATUS 9542 1
 ==== io-29.33b FAILED
 
 
@@ -1399,7 +1425,7 @@ unixInit.test
     }
 
 ---- Result was:
-Expected: `127.0.0.1 localhost 62663', Got `'
+Expected: `127.0.0.1 localhost 38938', Got `'
 ---- Result should have been (exact matching):
 OK
 ==== unixInit-1.2 FAILED
@@ -1539,140 +1565,10 @@ zipfs.test
 ---- errorCode: TCL ZIPFS PASSWORD
 ==== zipfs-password-write-cipher-deflate-a+ FAILED
 
-
-
-==== zipfs-file-stat-file file stat file FAILED
-==== Contents of test case:
-
-	    lsort -stride 2 [file stat [file join $mountpoint $target]]
-	
----- Result was:
-atime 1065448002 ctime 1065448002 dev 0 gid 0 ino 0 mode 33133 mtime 1065448002 nlink 0 size 5 type file uid 0
----- Result should have been (exact matching):
-atime 1065448002 blksize 0 blocks 0 ctime 1065448002 dev 0 gid 0 ino 0 mode 33133 mtime 1065448002 nlink 0 size 5 type file uid 0
-==== zipfs-file-stat-file FAILED
-
-
-
-==== zipfs-file-lstat-file file lstat file FAILED
-==== Contents of test case:
-
-	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
-	
----- Result was:
-atime 1065448002 ctime 1065448002 dev 0 gid 0 ino 0 mode 33133 mtime 1065448002 nlink 0 size 5 type file uid 0
----- Result should have been (exact matching):
-atime 1065448002 blksize 0 blocks 0 ctime 1065448002 dev 0 gid 0 ino 0 mode 33133 mtime 1065448002 nlink 0 size 5 type file uid 0
-==== zipfs-file-lstat-file FAILED
-
-
-
-==== zipfs-file-stat-dir file stat dir FAILED
-==== Contents of test case:
-
-	    lsort -stride 2 [file stat [file join $mountpoint $target]]
-	
----- Result was:
-atime 1105466634 ctime 1105466634 dev 0 gid 0 ino 0 mode 16749 mtime 1105466634 nlink 0 size 0 type directory uid 0
----- Result should have been (exact matching):
-atime 1105466634 blksize 0 blocks 0 ctime 1105466634 dev 0 gid 0 ino 0 mode 16749 mtime 1105466634 nlink 0 size 0 type directory uid 0
-==== zipfs-file-stat-dir FAILED
-
-
-
-==== zipfs-file-lstat-dir file lstat dir FAILED
-==== Contents of test case:
-
-	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
-	
----- Result was:
-atime 1105466634 ctime 1105466634 dev 0 gid 0 ino 0 mode 16749 mtime 1105466634 nlink 0 size 0 type directory uid 0
----- Result should have been (exact matching):
-atime 1105466634 blksize 0 blocks 0 ctime 1105466634 dev 0 gid 0 ino 0 mode 16749 mtime 1105466634 nlink 0 size 0 type directory uid 0
-==== zipfs-file-lstat-dir FAILED
-
-
-
-==== zipfs-file-stat-root-mount file stat root-mount FAILED
-==== Contents of test case:
-
-	    lsort -stride 2 [file stat [file join $mountpoint $target]]
-	
----- Result was:
-atime 1790133939 ctime 1790133939 dev 0 gid 0 ino 0 mode 16749 mtime 1790133939 nlink 0 size 0 type directory uid 0
----- Result should have been (regexp matching):
-atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
-==== zipfs-file-stat-root-mount FAILED
-
-
-
-==== zipfs-file-lstat-root-mount file lstat root-mount FAILED
-==== Contents of test case:
-
-	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
-	
----- Result was:
-atime 1790133939 ctime 1790133939 dev 0 gid 0 ino 0 mode 16749 mtime 1790133939 nlink 0 size 0 type directory uid 0
----- Result should have been (regexp matching):
-atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
-==== zipfs-file-lstat-root-mount FAILED
-
-
-
-==== zipfs-file-stat-root-subdir-mount file stat root-subdir-mount FAILED
-==== Contents of test case:
-
-	    lsort -stride 2 [file stat [file join $mountpoint $target]]
-	
----- Result was:
-atime 1790133939 ctime 1790133939 dev 0 gid 0 ino 0 mode 16749 mtime 1790133939 nlink 0 size 0 type directory uid 0
----- Result should have been (regexp matching):
-atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
-==== zipfs-file-stat-root-subdir-mount FAILED
-
-
-
-==== zipfs-file-lstat-root-subdir-mount file lstat root-subdir-mount FAILED
-==== Contents of test case:
-
-	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
-	
----- Result was:
-atime 1790133939 ctime 1790133939 dev 0 gid 0 ino 0 mode 16749 mtime 1790133939 nlink 0 size 0 type directory uid 0
----- Result should have been (regexp matching):
-atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
-==== zipfs-file-lstat-root-subdir-mount FAILED
-
-
-
-==== zipfs-file-stat-mezzo file stat mezzo FAILED
-==== Contents of test case:
-
-	    lsort -stride 2 [file stat [file join $mountpoint $target]]
-	
----- Result was:
-atime 1790133939 ctime 1790133939 dev 0 gid 0 ino 0 mode 16749 mtime 1790133939 nlink 0 size 0 type directory uid 0
----- Result should have been (regexp matching):
-atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
-==== zipfs-file-stat-mezzo FAILED
-
-
-
-==== zipfs-file-lstat-mezzo file lstat mezzo FAILED
-==== Contents of test case:
-
-	    lsort -stride 2 [file lstat [file join $mountpoint $target]]
-	
----- Result was:
-atime 1790133939 ctime 1790133939 dev 0 gid 0 ino 0 mode 16749 mtime 1790133939 nlink 0 size 0 type directory uid 0
----- Result should have been (regexp matching):
-atime .* blksize 0 blocks 0 ctime .* dev 0 gid 0 ino 0 mode 16749 mtime .* nlink 0 size 0 type directory uid 0
-==== zipfs-file-lstat-mezzo FAILED
-
 zlib.test
 
-Tests ended at 2026-09-23 05:25:40 +0200
-all.tcl:	Total	68118	Passed	62125	Skipped	5916	Failed	77
+Tests ended at 2026-09-23 05:51:29 +0200
+all.tcl:	Total	68118	Passed	62134	Skipped	5916	Failed	68
 Sourced 167 Test Files.
 Files with failing tests: binary.test chanio.test cmdAH.test env.test event.test exec.test expr-old.test expr.test fCmd.test fileName.test io.test lseq.test main.test scan.test socket.test unixFCmd.test unixInit.test zipfs.test
 Number of tests skipped for each constraint:
