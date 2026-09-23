@@ -82,10 +82,16 @@ package require tcltest 2.2
 # the log is lost on any abnormal end, and the last file named is
 # wherever the 4 KB boundary fell -- which is indistinguishable from
 # where the suite actually stopped.
+#
+# STDOUT ONLY, AND THAT IS A BUG FIX carried over from tcl-runall.tcl:
+# setting stderr here made io-14.1, io-14.2 and their chan-io twins
+# read back `line line line' where Tcl leaves `line line none'. Four
+# failures caused by the instrument. Nothing is lost -- stderr is
+# UNBUFFERED, which orders a log better than line buffering does -- and
+# errorChannel is stderr by default, so that line was the same bug
+# under a second name.
 fconfigure stdout -buffering line
-fconfigure stderr -buffering line
 catch {fconfigure $::tcltest::outputChannel -buffering line}
-catch {fconfigure $::tcltest::errorChannel -buffering line}
 
 # A background error inside a binding reaches bgerror, and Tk's default
 # bgerror puts up a MODAL dialog and waits for a click. Nothing in a

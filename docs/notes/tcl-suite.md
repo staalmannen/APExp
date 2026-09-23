@@ -6745,3 +6745,89 @@ a verdict printed anyway would be read as one.
 exactly as the suite runs it, Linux still answers `line line none`. So
 **the redirect is not the condition**, and APExp's `line line line` is
 ours rather than an artefact of how the suite is invoked.
+
+#### The four stderr failures were the HARNESS, and the probe is what sent the search outward
+
+`tcl-stdchan-test.tcl` on 9front, under a plain `tclsh`, at a terminal
+and redirected alike:
+
+```
+  stdin -buffering    line   (terminal: no)
+  stdout -buffering   line   (terminal: no)
+  stderr -buffering   none   (terminal: no)
+  wanted              line line none
+```
+
+**Correct, both ways.** So libap is not in it, `TclpGetDefaultStdChannel`
+works, the redirect is not the condition, and section 2 rightly printed
+no verdict because there was nothing to tell apart. Every story the
+probe was built to distinguish was wrong -- and that is what made it
+useful, because it left only one place to look: between `tclsh` and the
+test, which is `tcltest` and the harness. One grep:
+
+```
+sys/lib/tests/tcl-runall.tcl:199:fconfigure stderr -buffering line
+sys/lib/tests/tcl-runall.tcl:201:catch {fconfigure $::tcltest::errorChannel -buffering line}
+```
+
+**I wrote those, and they are the bug.** The harness sets line
+buffering so that a wedged run's log is not truncated, and it sets it
+in every child through `-load` -- which is the very interpreter
+`io-14.1` then asks. Four failures produced by the instrument that was
+measuring them.
+
+**It was working against its own purpose, too.** stderr starts
+*unbuffered*, and `none` orders a log strictly better than `line` does;
+there was never anything to gain. And `::tcltest::errorChannel` is
+`stderr` by default, so the fourth line was the same bug under a second
+name. `stdout` keeps its line buffering, which is the half that was
+needed; `outputChannel` is `stdout` and keeps it too.
+
+`tk-runall.tcl` had the same four lines and is fixed the same way.
+
+**Prediction: `io-14.1`, `io-14.2`, `chan-io-14.1`, `chan-io-14.2`
+pass, `Failed` 68 -> 64**, `Skipped` and `Total` unchanged, nothing
+else moving. `io-14.1` also compares `[lsort [testchannel open]]`, and
+the log shows that half already matching (`{file0 file1 file2}`), so
+the buffering is the whole of it. **What would refute it**: the log's
+tail truncating on an abnormal end -- the thing the removed lines were
+for -- or any of the four still failing, which would mean `tcltest`
+sets it somewhere else as well.
+
+**The general shape, which this file has now met from three
+directions.** The listener table was keyed on a descriptor number; the
+`fileName.test` constraint claimed a capability the system did not
+have; and now the log's own buffering was a property the tests could
+read. *An instrument that shares state with the thing it measures can
+be the thing it reports.* The first question about a measurement that
+disagrees with a direct probe is what sits between them.
+
+#### cmdAH-25.3 is NOT OURS, and the three commands said so exactly
+
+```
+% ls -ld /
+dr-xr-xr-x 1 glenda glenda 0 Sun 28  2024 /
+% cat /dev/user
+glenda
+% cat /adm/users
+-1:adm:adm:glenda
+0:none:adm:
+1:tor:tor:
+2:glenda:glenda:
+10000:sys::glenda
+...
+```
+
+**`/` is owned by glenda and the user is glenda**, so `file owned /`
+answering 1 is *correct*. The test wants 0 because on a unix `/` is
+root's and the test user is not root; on a 9front terminal the host
+owner owns the root. That is `notRoot` again -- upstream testing a
+*name* as a proxy for a capability -- and it joins `socket_inet-5.1`,
+`5.3` and `unixFCmd-1.1` as a probe rather than a library rule.
+
+**And the table settles the refuted mechanism twice over.** glenda is
+uid **2**, not 1; uid 1 is `tor`. So even if `_getpw` had failed and
+the `st_uid = 1` default had stood, `/` would have read as owned by
+*tor* and the test would have passed for the wrong reason. The
+fallback was not in play, and the reading that said it was would have
+been wrong in the other direction as well.

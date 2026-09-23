@@ -808,33 +808,37 @@ Open, in order of what the next run should touch:
   three left are zipfs's own `invalid password`). **13 -> 3 CONFIRMED**
   after `mk install`: all ten `-stat-`/`-lstat-` gone, `Passed` +9,
   `Skipped` and `Total` identical, nothing else moved.
-- **`14.1`/`14.2` (four tests) are read at last and are a PROBE**:
-  stderr's buffering is `line` and must be `none` -- while
-  `TclpGetDefaultStdChannel` asks for exactly that and is passed a NULL
-  interp, so a failure is silent. `testchannel open` says
-  `file0 file1 file2`, so `isatty` is answering correctly and this is
-  not the tty path. **`sys/lib/tests/tcl-stdchan-test.tcl` is the
-  probe**, and it tells the two stories apart in ONE run: section 2
-  makes the same `-buffering none` call Tcl's startup makes and can see
-  the result, section 3 asks it of a freshly opened channel. **The host
-  already refutes one story**: glibc redirected exactly as the suite
-  runs it still answers `line line none`, so the redirect is not the
-  condition and this is ours.
+- **`14.1`/`14.2` (four tests) were the HARNESS, not the library.**
+  `tcl-stdchan-test.tcl` under a plain `tclsh` on 9front answers
+  `line line none` -- correct, at a terminal and redirected alike. That
+  took libap out of it and left only what sits between `tclsh` and the
+  test, and one grep found it: `tcl-runall.tcl` set
+  `fconfigure stderr -buffering line`, **in every child through
+  `-load`**, which is the very interpreter `io-14.1` then asks. *Four
+  failures produced by the instrument measuring them.* It was working
+  against its own purpose too -- stderr starts **unbuffered**, which
+  orders a log better than line buffering -- and `errorChannel` is
+  stderr, so that line was the same bug twice. Fixed in both harnesses;
+  `stdout` keeps its line buffering, which is the half that was needed.
+  Predict `Failed` 68 -> 64.
+  **The general shape, met three times now**: a table keyed on a
+  descriptor number, a constraint claiming a capability, a log's own
+  buffering. *An instrument that shares state with the thing it
+  measures can be the thing it reports* -- when a measurement disagrees
+  with a direct probe, ask what sits between them.
   *(The earlier one-line version came back as `bash: fconfigure:
   command not found` -- **an instruction for the other machine has to
   name the program that runs it**, and a file is the way to say it.)*
-- **`cmdAH` 2: `25.3` and `20.5`.** `cmdAH-25.3` has `file owned /`
-  answering 1 where it should answer 0. **The `/adm/users` mechanism is
-  REFUTED** -- the probe found the file present (`-rw-rw-r-- adm adm
-  139`), so `_getpw` opens it and the `st_uid = 1` fallback is not what
-  happens. What is left is simpler and may not be a bug: `file owned` is
-  `st_uid == geteuid()`, and on a 9front terminal the owner of `/` may
-  genuinely be the user running the tests -- which would put it with
-  `socket_inet-5.1`, upstream testing a *name* as a proxy for a
-  capability. Three commands settle it, no build: `ls -ld /`,
-  `cat /dev/user`, `cat /adm/users`. `cmdAH-20.5`: `file atime $f $t`
-  reads back the current time, so the wstat did not carry it --
-  `ratrace` first.
+- **`cmdAH-25.3` is NOT OURS -- settled.** `ls -ld /` says
+  `glenda glenda`, `/dev/user` says `glenda`, so `file owned /`
+  answering 1 is *correct*; the test wants 0 because on a unix `/` is
+  root's. `notRoot` again, joining `socket_inet-5.1`/`5.3` and
+  `unixFCmd-1.1`. **The `/adm/users` mechanism was refuted twice over**:
+  the file exists, and glenda is uid **2** there while the fallback
+  default is 1 (`tor`) -- so even had `_getpw` failed, `/` would have
+  read as someone else's and the test would have *passed* for the wrong
+  reason. `cmdAH-20.5` remains: `file atime $f $t` reads back the
+  current time, so the wstat did not carry it -- `ratrace` first.
 - **`chan-io-28.7`, one test and ours**: `close $s w` (half-close) and
   the far end reads `{}` where it should read `{Hey DONE}`. `shutdown()`
   is already in this tree's list of stubs that answered the wrong thing.

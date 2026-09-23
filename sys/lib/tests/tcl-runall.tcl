@@ -195,10 +195,30 @@ package require tcltest 2.5
 # Line buffering, before anything is written. Without it the tail of
 # the log is lost on any abnormal end and the last file named is an
 # upper bound on progress rather than the truth.
+#
+# STDOUT ONLY, AND THAT IS A BUG FIX. This block used to set stderr and
+# tcltest's errorChannel to `line' as well, and io-14.1, io-14.2 and
+# their chan-io twins -- four failures -- were reading it back:
+#
+#	was:    line line line
+#	wanted: line line none
+#
+# Tcl sets stderr to `none' at startup and the tests check that it
+# stayed there. The harness was overwriting it, in this process and,
+# through -load below, in every child -- which is the very interpreter
+# the test then asks. FOUR FAILURES CAUSED BY THE INSTRUMENT.
+#
+# `tcl-stdchan-test.tcl' under a plain tclsh answers `line line none'
+# on 9front, at a terminal and redirected alike, which is what took the
+# library out of it and sent the search outward to here.
+#
+# Nothing is lost by leaving stderr alone: it is UNBUFFERED, which
+# orders a log better than line buffering does, so the old lines were
+# working against their own purpose as well as against the tests.
+# errorChannel is stderr by default, so setting that was the same bug
+# under a second name.
 fconfigure stdout -buffering line
-fconfigure stderr -buffering line
 catch {fconfigure $::tcltest::outputChannel -buffering line}
-catch {fconfigure $::tcltest::errorChannel -buffering line}
 
 # AND THE SAME IN EVERY CHILD, which is the half that has cost a round
 # trip every single time a file has hung.
@@ -224,10 +244,11 @@ catch {fconfigure $::tcltest::errorChannel -buffering line}
 # goes and the trap comes back silently.
 if {[::tcltest::configure -load] eq ""} {
     ::tcltest::configure -load {
+	# stdout only -- see the note above the first block. stderr is
+	# unbuffered already, and setting it here is what io-14.1 and its
+	# three relatives were reading back.
 	catch {fconfigure stdout -buffering line}
-	catch {fconfigure stderr -buffering line}
 	catch {fconfigure $::tcltest::outputChannel -buffering line}
-	catch {fconfigure $::tcltest::errorChannel -buffering line}
     }
 }
 
