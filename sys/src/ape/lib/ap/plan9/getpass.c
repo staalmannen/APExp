@@ -2,6 +2,7 @@
 #include <signal.h>
 #include <limits.h>
 #include <libv.h>
+#include "lib.h"
 
 char *
 getpass(char *prompt)
@@ -11,13 +12,21 @@ getpass(char *prompt)
 	FILE *fi;
 	static char pbuf[PASS_MAX];
 	void (*sig)(int);
+	int wasraw;
 
 	if ((fi = fopen("/dev/cons", "r")) == NULL)
 		fi = stdin;
 	else
 		setbuf(fi, NULL);
 	sig = signal(SIGINT, SIG_IGN);
-	tty_echooff(fileno(fi));
+	/*
+	 * Save and restore rather than "off then on": the console may
+	 * already be raw because the caller's own line editor put it
+	 * there, and unconditionally cooking it on the way out would
+	 * leave that caller reading whole lines from then on.  _tty_raw
+	 * returns the previous state for exactly this.
+	 */
+	wasraw = _tty_raw(1);
 	fprintf(stderr, "%s", prompt);
 	fflush(stderr);
 
@@ -33,7 +42,8 @@ getpass(char *prompt)
 
 	fprintf(stderr, "\n");
 	fflush(stderr);
-	tty_echoon(fileno(fi));
+	if(wasraw >= 0)
+		_tty_raw(wasraw);
 	signal(SIGINT, sig);
 	if (fi != stdin)
 		fclose(fi);

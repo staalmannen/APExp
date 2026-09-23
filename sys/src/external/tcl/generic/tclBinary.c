@@ -14,62 +14,6 @@
 #include "tclInt.h"
 #include "tclTomMath.h"
 
-/*
- * APEXP PROBE -- which <float.h> did THIS translation unit read?
- *
- * Delete this block once the question below is answered; it is an
- * instrument, not a feature.
- *
- * WHY IT IS HERE. binary-53.25 and binary-53.26 fail because
- * FormatNumber compares against FLT_MAX, and APE's float_arch.h wrote
- * FLT_MAX with no `F' suffix -- so it was a double holding the nearest
- * double to a rounded decimal instead of the float C says it is. That
- * is fixed in amd64/include/ape/float_arch.h, and binfloat-test, built
- * by hand with pcc, reports the fixed value and the marker.
- *
- * tcl-fltmax-probe.tcl then measured what libtcl was ACTUALLY compiled
- * with, by bisecting on the bit pattern for the boundary at which
- * `binary format R' switches to +Inf, and recovered 3.40282347e+38 --
- * stock APE's constant -- AFTER a full mk distclean and mk install. So
- * the staleness diagnosis was wrong and this is the header-shadowing
- * invariant instead: /$objtype/include/ape is searched before
- * /sys/include/ape.
- *
- * THE NUMBER CANNOT SETTLE THE REST. 3.40282347e+38 is what stock
- * APE's float.h says AND what this tree's float_arch.h said before the
- * fix, so "read the wrong file" and "read an old copy of the right
- * file" are one observation. The marker tells them apart, and
- * sizeof(FLT_MAX) says whether the F suffix was in force -- a wrong
- * constant and a wrong header look identical from outside, which is
- * the trap binfloat-test was built around.
- *
- * It has to live in THIS file. A marker in tclStrToD.c would answer
- * for tclStrToD.c; the question is what tclBinary.c saw.
- */
-#include <float.h>
-#define APEXP_STR_(x)	#x
-#define APEXP_STR(x)	APEXP_STR_(x)
-
-static void
-ApexpFloatMark(void)
-{
-    static int done = 0;
-
-    if (done || getenv("APEXP_FLOAT_DEBUG") == NULL) {
-	return;
-    }
-    done = 1;
-    fprintf(stderr, "APEXP tclBinary.c float.h: marker=%s sizeof(FLT_MAX)=%d "
-	    "FLT_MAX=%.17g spelled=%s\n",
-#ifdef __APEXP_FLOAT_ARCH
-	    "PRESENT (this tree)",
-#else
-	    "ABSENT (not this tree's float_arch.h)",
-#endif
-	    (int) sizeof(FLT_MAX), (double) FLT_MAX, APEXP_STR(FLT_MAX));
-    fflush(stderr);
-}
-
 #include <math.h>
 
 /*
@@ -2091,7 +2035,6 @@ FormatNumber(
 	 * valid range for float.
 	 */
 
-	ApexpFloatMark();
 	if (fabs(dvalue) > (double) FLT_MAX) {
 	    if (fabs(dvalue) > (FLT_MAX +
 		    ldexp(1.0, FLT_MAX_EXP - FLT_MANT_DIG - 1))) {

@@ -184,7 +184,8 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `format-arg-test.c`, `unget-pipe-test.c`, `isatty-test.c`,
 `execve-env-test.c`, `tz-test.c`, `rename-test.c`, `listenleak-test.c`,
 `asyncconnect-test.c`, `nbread-test.c`, `epipe-test.c`,
-`ldexp-test.c`, `binfloat-test.c`,
+`ldexp-test.c`, `binfloat-test.c`, `rawmode-test.c`,
+`execfail-test.c`, `append-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
@@ -210,6 +211,10 @@ under plain `tclsh` and isolates the `chan-io-44.1` and `event-11.5`
 hangs, with a timeout on every section so it reports where the suite
 would wait; `select-test.c` takes the two bugs it found down to the
 `select()` call underneath them.
+`tty-xcheck.c` is a host program too: it links `ap/plan9/tty.c`
+with counting fakes for open/write/close and asserts the raw/cooked
+contract, which is awkward to provoke on a live console. It needs
+`-I ttystub`.
 `strtod-xcheck.c`, `strtof-xcheck.c` and `dtoa-xcheck.c` are the same
 idea for `strtod`, `strtof` and `_dtoa`, and are likewise HOST programs, not Plan 9 tests. The
 second checks the two against each other -- the shortest string that
@@ -1025,33 +1030,58 @@ Open, in order of what the next run should touch:
   outside -- the `/$objtype/include/ape` shadowing invariant is exactly
   that trap. Predict `Failed` 56 -> 54; refuted if the marker says the
   header read was not this tree's.
-  **REFUTED TWICE, and the second one is the interesting half.**
-  First: `binfloat-test` gave 0 failures with the marker saying THIS
-  TREE while `Failed` stayed at 56, which looked like the `mk
-  distclean` rule. **`tcl-fltmax-probe.tcl` measures what libtcl was
-  actually compiled with** -- `binary format R` answers +Inf exactly
-  above `FLT_MAX + 2^103`, so bisecting on the BIT PATTERN recovers the
-  constant exactly, and the probe prints the constant rather than a
-  verdict. After `mk distclean` **and** `mk install` it still reports
-  **`3.40282347e+38`, too big by 3.61471e+29** -- so the object WAS
-  rebuilt and staleness is out. What is left is the header-shadowing
-  invariant, and `./mount-include` **no-ops entirely** when
-  `/sys/include/ape/THIS_IS_APExp` exists.
-  **THREE different float.h constants have now been seen**, which is
-  the fact that was hiding in plain sight: `3.4028234663852886e+38`
-  (this tree, after the fix), `3.40282347e+38` (this tree, before it,
-  and what libtcl has now) and **`3.4028235e+38`** -- which is what
-  `binfloat-test` measured before the fix and is transcribed in
-  `docs/notes/libap.md`. *That third value is in neither version of
-  this tree's header*, so something outside the repo was being read,
-  and the note sat there for a round without anyone reconciling it
-  against the file in git. **A transcription is evidence; check it
-  against the source before building on it.**
-  The number cannot finish the job -- `3.40282347e+38` is equally what
-  a stale installed copy and a machine's own leftover would say -- so
-  `tclBinary.c` now prints the marker, `sizeof` and spelling of its
-  `FLT_MAX` under `$APEXP_FLOAT_DEBUG`. It has to be in THAT file: a
-  marker in `tclStrToD.c` answers for `tclStrToD.c`.
+  **It took three rounds and the answer was the FIRST one, which I had
+  then argued my way out of.** `tcl-fltmax-probe.tcl` measures what
+  libtcl was actually compiled with -- `binary format R` answers +Inf
+  exactly above `FLT_MAX + 2^103`, so bisecting on the BIT PATTERN
+  recovers the constant exactly, and it prints the constant rather than
+  a verdict. Round 1: `Failed` stayed 56 and the probe said
+  `3.40282347e+38`. Round 2: `mk distclean` **and** `mk install`, and
+  the probe said `3.40282347e+38` again -- from which I concluded the
+  object had been rebuilt and staleness was out. **That conclusion was
+  read off the `distclean` target, not measured.** Round 3: a marker
+  added to `tclBinary.c` -- which is itself an edit, so `mk` recompiled
+  that file -- and the probe now says the CORRECT constant, the marker
+  says `PRESENT (this tree)`, `sizeof(FLT_MAX)=4`, and `binary format
+  R` of `binary-53.25`'s own input gives **`7f800000`**, which is what
+  the test wants.
+  **54 -> 52 CONFIRMED**: exactly those two, empty new-failure column,
+  `Total` and `Skipped` identical, `Passed` +2. The probe is removed
+  from `tclBinary.c` again -- it was an instrument and it answered.
+  **What is left is a BUILD-SYSTEM question, and it is not small**:
+  `tclBinary.$O` was not rebuilt with the current header until the
+  source file changed, so `mk distclean; mk install` did not do it. Two
+  candidates, and **the mount one is refuted by this very round**:
+  `./mount-include` no-ops entirely when `/sys/include/ape/THIS_IS_APExp`
+  exists, and on this machine it does (`-rw-r--r-- glenda 32 Sun 19
+  2026`) -- but if the build had been running without the union mount,
+  the recompile that fixed this would have read the old header too, and
+  it did not. **So the suspect is `mk clean` not reaching these
+  objects**, which would mean every header change in that directory has
+  been silently ignored. Do not argue it -- that is what cost three
+  rounds here. Measure it:
+
+	cd $home/APExp/sys/src/ape/lib/tcl
+	ls tclBinary.6
+	mk clean
+	ls tclBinary.6
+
+  Two lines of output settle it. Note that `sys/src/ape/lib/tcl/mkfile`
+  defines its own `clean:V:` AFTER including `mklib`, which defines one
+  too, so there are two rules for the same target.
+  **The rule that failed here is one already in this file**: *a
+  measurement of a build that does not contain the change measures
+  nothing* -- and its harder half, which is that **arguing a build
+  DOES contain the change, from the build system's source, is not a
+  measurement either.** The marker is what settled it, and it had to be
+  in `tclBinary.c`: a marker in `tclStrToD.c` answers for
+  `tclStrToD.c`.
+  A loose end that turned out not to be one: three different constants
+  appear across the rounds -- `3.4028234663852886e+38` (correct),
+  `3.40282347e+38` (this tree before the fix, and stock APE) and
+  `3.4028235e+38` transcribed in `docs/notes/libap.md`. The third is in
+  neither version of the header in git, so it came from a build reading
+  something outside the repo. Worth remembering, not worth chasing now.
   Two host-check lessons on the way: `binary format Q` takes a
   **double**, not a bit pattern (`W` then `Q` is the reinterpretation),
   **Tcl's `%x` truncates to 32 bits** without `ll`, and **tclsh 8.6 has
@@ -1087,6 +1117,33 @@ Open, in order of what the next run should touch:
   `chan-io-6.46` still fails, so count that group by whether the twins
   agree. **CONFIRMED the next run** -- it came back with nothing
   touching it.
+
+**Next after Tcl: a vt, and the first step is DONE but NOT MEASURED.**
+The goal is bash's own tab completion under `vts`, and the blocker was
+not `vts` at all. **`tcsetattr` on a real `/dev/cons` returned 0 and
+changed nothing**, while `tcgetattr` reported a hardcoded
+`ICANON|ECHO` whatever the console was doing -- so readline asked for
+raw, was told it got it, and waited for keystrokes the driver was
+holding until Enter. Tab arrived inside a finished line. Both halves
+silent. `plan9/tty.c` now owns the one switch Plan 9 offers
+(`rawon`/`rawoff` on `/dev/consctl`) and termios drives it; see
+`docs/notes/libap.md`.
+**Predict**: `rawmode-test` sections 3 and 4 PASS on the rebuilt
+library and FAIL on the installed one. **Refuted if `_ttymark` is not
+1** -- then the test measured an old libap and says nothing.
+**Watch for**: this makes raw mode actually happen, so every program
+that asked for it and silently did not get it now does -- bash,
+libedit, PDCurses. *A fix that makes a process reach code it never
+reached before can expose anything on that path.* A crash while raw
+self-heals, because the console reverts when the last consctl
+descriptor closes and a dead process has closed it.
+**And vts's key interception is the OPPOSITE of what is wanted here**:
+`lined.c` batches keystrokes and flushes whole LINES to the shell, so
+bash's completion needs `edit off`, not `edit on`. The remaining three
+steps are a per-session `consctl` in vts, the shell's fds being a
+`cons` bound to `/dev/cons` rather than the pipe `session.c:124` dups
+(with a pipe, `isatty(0)` is false and bash never starts readline at
+all), and vts spawning bash rather than hardcoded `/bin/rc`.
 
 **Fixed this round**: `NAME_MAX` was 27 and `PATH_MAX` 1023, set in
 `sys/include/ape/sys/limits.h`, which `<limits.h>` includes at its very

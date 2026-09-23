@@ -13,6 +13,11 @@ UPDATE=\
 	$APEXPROOT/$objtype/lib/ape/libap.a\
 	${OFILES:%.$O=%.c}\
 
+# tcgetattr.c reaches _tty_raw()/_tty_israw() through ../include/lib.h,
+# so mk has to rebuild it when that header changes. See the HFILES rule
+# in CLAUDE.md: a header not listed here is one mk does not rebuild for.
+HFILES=../include/lib.h
+
 <$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=$CFLAGS -c -D_POSIX_SOURCE -D_PLAN9_SOURCE -D_BSD_EXTENSION\
