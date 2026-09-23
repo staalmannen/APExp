@@ -1040,16 +1040,30 @@ Open, in order of what the next run should touch:
   says `PRESENT (this tree)`, `sizeof(FLT_MAX)=4`, and `binary format
   R` of `binary-53.25`'s own input gives **`7f800000`**, which is what
   the test wants.
-  **So `tclBinary.$O` was not rebuilt with the current header until the
-  source file changed, and `mk distclean; mk install` did not do it.**
-  Which of two mechanisms that is, is still open and is a build-system
-  question rather than a float one: either `mk clean` does not reach
-  these objects, or `mk install`'s build ran without the union mount --
-  **`./mount-include` no-ops entirely when
-  `/sys/include/ape/THIS_IS_APExp` exists, and on this machine it
-  does** (`-rw-r--r-- glenda 32 Sun 19 2026`). The build prints
-  `APExp mounted` or `APExp already mounted`; that one word tells them
-  apart.
+  **54 -> 52 CONFIRMED**: exactly those two, empty new-failure column,
+  `Total` and `Skipped` identical, `Passed` +2. The probe is removed
+  from `tclBinary.c` again -- it was an instrument and it answered.
+  **What is left is a BUILD-SYSTEM question, and it is not small**:
+  `tclBinary.$O` was not rebuilt with the current header until the
+  source file changed, so `mk distclean; mk install` did not do it. Two
+  candidates, and **the mount one is refuted by this very round**:
+  `./mount-include` no-ops entirely when `/sys/include/ape/THIS_IS_APExp`
+  exists, and on this machine it does (`-rw-r--r-- glenda 32 Sun 19
+  2026`) -- but if the build had been running without the union mount,
+  the recompile that fixed this would have read the old header too, and
+  it did not. **So the suspect is `mk clean` not reaching these
+  objects**, which would mean every header change in that directory has
+  been silently ignored. Do not argue it -- that is what cost three
+  rounds here. Measure it:
+
+	cd $home/APExp/sys/src/ape/lib/tcl
+	ls tclBinary.6
+	mk clean
+	ls tclBinary.6
+
+  Two lines of output settle it. Note that `sys/src/ape/lib/tcl/mkfile`
+  defines its own `clean:V:` AFTER including `mklib`, which defines one
+  too, so there are two rules for the same target.
   **The rule that failed here is one already in this file**: *a
   measurement of a build that does not contain the change measures
   nothing* -- and its harder half, which is that **arguing a build
