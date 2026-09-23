@@ -104,6 +104,11 @@ OFILES=\
 	obstack.$O\
 
 
+# strtod.c is Gay's parser and is built on the Bigint kit whose
+# declarations live in ../include/fconv.h; without this, mk does not
+# rebuild it when that header changes. See the HFILES rule in CLAUDE.md.
+HFILES=../include/fconv.h
+
 <$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=$CFLAGS -c -I../include -D_POSIX_SOURCE\

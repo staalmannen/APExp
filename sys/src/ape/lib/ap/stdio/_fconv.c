@@ -509,7 +509,7 @@ _d2b(double darg, int *e, int *bits)
 			}
 		else
 			x[0] = y;
-		b->wds = (x[1] = z) ? 2 : 1;
+		i = b->wds = (x[1] = z) ? 2 : 1;
 		}
 	else {
 #ifdef DEBUG
@@ -518,7 +518,7 @@ _d2b(double darg, int *e, int *bits)
 #endif
 		k = lo0bits(&z);
 		x[0] = z;
-		b->wds = 1;
+		i = b->wds = 1;
 		k += 32;
 		}
 #else
@@ -579,6 +579,23 @@ _d2b(double darg, int *e, int *bits)
 #ifndef Sudden_Underflow
 		}
 	else {
+		/*
+		 * THE DENORMAL ARM READS i, AND UNDER Pack_32 NOTHING SET
+		 * IT. Gay writes `i = b->wds = ...' in both arms above; this
+		 * copy had dropped the `i ='. So for a denormal, *bits came
+		 * from `x[i-1]' with i a stack leftover -- a read outside the
+		 * Bigint, and then a wrong bbbits, which is the input to
+		 * `j = P + 1 - bbbits' and so to the whole scaling of the
+		 * correction loop.
+		 *
+		 * It was invisible for two reasons. dtoa reaches here only
+		 * for a denormal, and with _Balloc's freelist on, the bad
+		 * read lands in a recycled Bigint rather than off the heap --
+		 * so it corrupts an answer instead of faulting. That is what
+		 * made strtod-gay wrong in bulk and right in isolation, and
+		 * AddressSanitizer with the freelist disabled named the line
+		 * in one run.
+		 */
 		*e = de - Bias - (P-1) + 1 + k;
 #ifdef Pack_32
 		*bits = 32*i - hi0bits(x[i-1]);

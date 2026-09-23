@@ -203,8 +203,10 @@ under plain `tclsh` and isolates the `chan-io-44.1` and `event-11.5`
 hangs, with a timeout on every section so it reports where the suite
 would wait; `select-test.c` takes the two bugs it found down to the
 `select()` call underneath them.
-`strtod-xcheck.c` is the same idea for `strtod`, and is likewise a
-HOST program, not a Plan 9 test. `tz-xcheck.c` is not a Plan 9 test at all: it links
+`strtod-xcheck.c` and `dtoa-xcheck.c` are the same idea for `strtod`
+and `_dtoa`, and are likewise HOST programs, not Plan 9 tests. The
+second checks the two against each other -- the shortest string that
+reads back -- which is a real test of both. `tz-xcheck.c` is not a Plan 9 test at all: it links
 `lib/ap/time/tzone.c` into a **glibc** program on the build host and
 sweeps ~1.4 million instants against `localtime_r`, so libap's own
 parser can be checked without a VM round. It found two bugs that way.
@@ -855,44 +857,37 @@ Open, in order of what the next run should touch:
   `_fdinfo`/`_sighdlr` and closing every `FD_CLOEXEC` descriptor. This
   is old, not new: `_RFORK(RFCENVG)` on its first line is what empties
   it. `environ` is untouched, so it is bounded.
-- **libap's `strtod` is inaccurate EVERYWHERE, and that is measured**:
-  `strtod-xcheck.c` links it into a glibc program beside glibc's own
-  and reports **148018 of 199887 round-trips wrong (74%)** -- a double
-  printed with `%.17g` does not come back -- and **445 of 629 powers of
-  ten**, with `1e308` off by 2e14 ulp. `string/strtod.c` accumulates
-  digits in a double and multiplies by `pow10(exp)`: two roundings,
-  neither the one the standard asks for. Its own first line has said
-  *"bug: should detect overflow"* for as long as it has existed; nobody
-  had put a number to it. **The fix has a shape**: `stdio/_fconv.c` and
-  `include/fconv.h` are Gay's bignum kit and `_dtoa.c` is Gay's dtoa on
-  top of it -- **Gay's `strtod` is the missing other half of that same
-  package**, so the parser can be written against machinery already
-  linked. `strtof`/`strtold` are the same file again.
-  **Written, and still NOT SHIPPING**: `string/strtod-gay.c`,
-  deliberately in no mkfile. **7 of 7 of the expr strings now exact**
-  where the shipping file gets 0 -- DBL_MAX, the value one ulp past it,
-  and the 18-digit case. The 200000 round-trips are not clean and the
-  reason is no longer arithmetic. **Four bugs, and THREE were in the
-  shared kit, all one assumption**: Gay's code needs a 32-bit word and
-  says `long` -- true under kencc, false under any LP64 compiler, so
-  `_fconv.c`/`_dtoa.c` were right on Plan 9 *by accident*. `ULong` for
-  the Bigint word; **`Long` for the borrow arithmetic in `_diff` and
-  `quorem`**, which need `y >> 16` to be an arithmetic shift of a
-  wrapped `unsigned int` (a 64-bit `long` makes it positive and the
-  shift yields 0xffff -- **off by 0x10001 per word**, seen directly in
-  a dumped `bd`); `Bcopy` copying `wds*sizeof(long)` of a `ULong`
-  array; and an include guard. None of it changes a byte under kencc.
-  Two were mine: the correction loop's `j`, and Gay's sign scan, whose
-  fall-through switch loses the first digit (every negative came back
-  at 0.44 of its size).
-  **What is left is two problems, separated by experiment**: disabling
-  the freelist takes wrong 169725 -> **3656** and spins 40 -> 2334, so
-  ~98% is a **Bigint lifetime bug** -- the symptom is a single
-  corrupted nibble on inputs that are exact when parsed alone. The
-  residue is all near 2.1e-293 and mostly spins: the denormal arm does
-  not converge. **The freelist experiment is the acceptance test** --
-  with it on, the counts must meet the counts with it off.
-- **`expr` 5 + `expr-old` 1 are one question and are UNEXPLAINED.**
+- **libap's `strtod` is now Gay's, and it is CORRECT**: `strtod-xcheck`
+  against glibc gives **0 wrong** in all four sections -- 199887
+  round-trips through `%.17g`, the 629 powers of ten, the seven strings
+  Tcl's `expr` tests use, and the exact values. **The file it replaced
+  was wrong on 148018 of those 199887 (74%)**, and said so in its own
+  first line for as long as it existed. Built on `stdio/_fconv.c`'s
+  Bigint kit, which is Gay's other half; `string/mkfile` gained
+  `HFILES=../include/fconv.h`.
+  **Six bugs, and FOUR were in the shared kit** -- `ULong` for the
+  bignum word, `Long` for the borrow arithmetic in `_diff`/`quorem`,
+  `Bcopy`'s `sizeof(long)`, and **`_d2b` leaving `i` unset** while its
+  denormal arm reads `x[i-1]`. All four are one sentence: *Gay's
+  arithmetic needs a 32-bit word and spells it `long`*, true under
+  kencc and false under gcc -- correct on Plan 9 by accident, and why
+  the cross-check could not run at all until they were fixed.
+  **`_dtoa` was broken by the same `_d2b` bug**, in the shipping printf
+  path: `dtoa-xcheck.c` measures 52 of 99941 wrong before and 3 after,
+  and **subnormals printed as `?`** -- Gay's internal "cannot happen"
+  marker. No test in the tree had ever formatted one.
+  **The freelist was never the bug**, though disabling it took failures
+  169725 -> 3656: it was `ulp()` returning `-0x1p+1023` for the ulp of
+  2.1e-293 (the same `long` wrap), and the *damage* varied with what
+  the freelist handed back. **An experiment that isolates a variable
+  says the variable matters, not which way the causation runs.**
+  The last 52 were the scale-up-by-2^53 arm, which upstream guards with
+  `#ifdef Sudden_Underflow` -- for machines that FLUSH to zero. IEEE
+  has gradual underflow; applying it made `1e-308` come out `0`.
+  **`strtof`/`strtold` are still the old algorithm** and still wrong in
+  the same way: the same 91-line file twice more.
+- **`expr` 5 + `expr-old` 1 are one question and are still
+  UNEXPLAINED**, and `strtod` is now cleared of it entirely.
   Everything at or above `1.797693134862315 5 e308` comes back
   infinite, including two values that are representable.
   `strtod-xcheck` **refuted the obvious answer**: libap's `strtod`

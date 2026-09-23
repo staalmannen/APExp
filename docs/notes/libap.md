@@ -394,3 +394,77 @@ converge. Neither is the rounding logic.
 **The freelist experiment is also the acceptance test for the fix**:
 with the lifetime bug repaired, the counts with the freelist ON must
 meet the counts with it OFF.
+
+#### strtod finished: 0 of 199887 wrong, and the last two bugs were both `long`
+
+`string/strtod.c` **is now Gay's parser** and the old one is gone.
+`strtod-xcheck` against glibc, all four sections:
+
+```
+the seven strings Tcl's expr tests use     7 checked, 0 wrong   PASS
+200000 round-trips through "%.17g"    199887 checked, 0 wrong   PASS
+the powers of ten, 1e-320..1e308         629 checked, 0 wrong   PASS
+values a naive parser still gets right    10 checked, 0 wrong   PASS
+```
+
+The file it replaced was wrong on **148018** of those 199887.
+
+**The freelist was never the bug, and the experiment that said so was
+still the right one.** Disabling `_Balloc`'s freelist took the failures
+from 169725 to 3656, which was read as "a Bigint lifetime bug". It was
+not: it was `ulp()` returning garbage, and the *damage* varied with
+what the freelist handed back. **An experiment that isolates a variable
+tells you the variable matters, not which way the causation runs** --
+and the way to tell them apart was to keep instrumenting rather than to
+act on the first reading.
+
+Two bugs remained after that, and both were the `long` assumption again:
+
+- **`ulp()`**. `(word0(a) & Exp_mask) - (P-1)*Exp_msk1` is
+  `unsigned int` minus `int`, so it wraps; a 32-bit signed `L`
+  reinterprets the wrap as the negative number that was meant, a
+  64-bit one keeps `0xffe00000`, takes the `L > 0` arm and returns
+  **-0x1p+1023 as the ulp of 2.1e-293**. Every value whose ulp is
+  subnormal went through that, and the correction loop then chased its
+  own tail: **169673 of the 169725 failures and every one of the spins
+  were this single line.** `Long L;`.
+- **The scale-up-by-2^53 dance** in the correction loop's underflow
+  arm is guarded upstream by `#ifdef Sudden_Underflow`, which is for
+  machines that *flush* to zero. IEEE has gradual underflow and takes
+  the plain arm. Applying it anyway meant that for a subnormal --
+  exponent field 0 -- `word0(rv) += P*Exp_msk1` makes the field exactly
+  `P`, which is the very test the next line uses to decide the value
+  underflowed. So every subnormal was rewritten to the smallest
+  subnormal and then driven to zero. `1e-308` came out `0`. That was
+  the last 52.
+
+**Six bugs in all, and four were in the shared kit rather than in the
+new file**: `ULong`, `Long` in `_diff`/`quorem`, `Bcopy`'s
+`sizeof(long)`, and `_d2b` leaving `i` unset. Every one of them is the
+same sentence -- *Gay's arithmetic needs a 32-bit word and says
+`long'* -- and every one was correct under kencc and wrong under gcc,
+which is why none had ever been seen and why the cross-check could not
+run until they were fixed.
+
+#### And _dtoa was broken too, in the shipping printf path
+
+`_d2b`'s missing `i` is read by its **denormal** arm, `x[i-1]`, and
+`_dtoa` calls `_d2b` for every conversion. `sys/lib/tests/dtoa-xcheck.c`
+is the new host program that measures what mode 0 promises -- the
+shortest string that reads back as the same double -- with the same
+100000 values, before and after:
+
+```
+before:  99941 checked, 52 wrong   (subnormals printed as "?")
+after:   99941 checked,  3 wrong   (all at 2^-1016 and below, 1 ulp)
+```
+
+**`?` is Gay's internal "cannot happen" marker**, and it was what this
+system printed for a denormal. Nothing in the tree would have noticed:
+there was no test that formatted one. AddressSanitizer with the
+freelist disabled named the line in a single run, after the symptom --
+*correct in isolation, one corrupted nibble in bulk* -- had already said
+the fault was state rather than arithmetic.
+
+**`strtof` and `strtold` are still the old algorithm**, the same
+91-line file twice more, and still wrong in the same way.

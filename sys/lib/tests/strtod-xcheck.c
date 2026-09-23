@@ -80,14 +80,7 @@
 #define strtod	ap_strtod
 #define IEEE_8087	1
 #include "../../src/ape/lib/ap/stdio/_fconv.c"
-/*
- * WHICH strtod THIS MEASURES. strtod-gay.c is the candidate and is not
- * in any mkfile yet; strtod.c is what actually ships. Swap the two
- * lines to measure the other one, and say in the write-up which was
- * built -- a number from this file means nothing without that.
- */
-#include "../../src/ape/lib/ap/string/strtod-gay.c"
-/* #include "../../src/ape/lib/ap/string/strtod.c" */
+#include "../../src/ape/lib/ap/string/strtod.c"
 #undef strtod
 
 static int failures;
@@ -138,7 +131,14 @@ struct sect {
 	long n;
 	long bad;
 	double worst;		/* worst ulp distance among finite pairs */
-	const char *worsts;	/* the string that produced it */
+	/*
+	 * A COPY, not a pointer. The caller passes a buffer it reuses on
+	 * every iteration, so keeping the pointer made every section
+	 * report its LAST input as its worst one -- a report that
+	 * misnames its own evidence.
+	 */
+	char worsts[80];
+	int haveworst;
 	long inf;		/* mismatches where ours went infinite */
 };
 
@@ -161,7 +161,8 @@ check(struct sect *s, const char *str, char *keep)
 
 		if(!(d <= s->worst)){	/* NaN-safe: takes inf too */
 			s->worst = d;
-			s->worsts = keep;
+			snprintf(s->worsts, sizeof s->worsts, "%s", keep);
+			s->haveworst = 1;
 		}
 	}
 }
@@ -178,7 +179,7 @@ report(struct sect *s)
 	printf("   FAIL\n");
 	printf("      %ld of them returned infinity for a finite value\n",
 		s->inf);
-	if(s->worsts != 0){
+	if(s->haveworst){
 		if(isinf(s->worst))
 			printf("      worst: %s (not a finite distance)\n",
 				s->worsts);
