@@ -238,21 +238,25 @@ APExp and see whether it builds and runs.
 - C11/C23 compiler features — `_Generic`, and `bool` as a real type
 - perl 5.42.2 — see the section below
 
-**Queued after Tcl/Tk: three more ports, chosen as stress tests.**
-**Surveyed, and one is blocked: `tkblt` 3.2 is C++** -- 48 `.C` files
-with `namespace Blt {` and `#include <cfloat>` -- and kencc has no C++
-(`external/cfront-C4` is pre-standard cfront: no namespaces, no
-templates, no STL). **tkdesk does not need it**: it ships its own BLT
-subset in **C**, `tkdesk/blt/`, 12 `.c` files and not one `.C`. `itcl`
-4.2.3 is 22 `.c` files and an ordinary autoconf extension. Tcl
-and Tk have been the most productive bug-finders in this tree, so the
-next round of the same: **itcl** and **tkblt** become ordinary APExp
-packages under `sys/src/ape/lib` and `sys/src/ape/cmd`, and **tkdesk**
--- an application that needs both -- gets its mkfile in
+**Queued after Tcl/Tk: two more ports, chosen as stress tests.**
+**`tkblt` was one of three and is GONE from the tree**: 3.2 is C++, 48
+`.C` files with `namespace Blt {` and `#include <cfloat>`, and kencc
+has no C++ (`external/cfront-C4` is pre-standard cfront: no
+namespaces, no templates, no STL). **tkdesk never needed it** -- it
+ships its own BLT subset in **C**, `tkdesk/blt/`, 12 `.c` files and
+not one `.C`.
+So: **itcl** (4.2.3, 22 `.c` files, an ordinary autoconf extension)
+becomes a regular APExp package under `sys/src/ape/lib` and
+`sys/src/ape/cmd`, and **tkdesk** gets its mkfile in
 **`sys/src/ape/app`** and is **not built by default**, being a
-proof-of-concept rather than part of APExp. The point is not tkdesk; it
-is what a large Tcl/Tk application drags out of libap and the
-compilers on the way up.
+proof-of-concept rather than part of APExp.
+**itcl goes first, and the reason is measurability**: it ships its own
+test suite, so it is new surface that can be counted, where tkdesk is
+an application that either runs or does not and whose failures are
+hard to localise. Tcl and Tk have been the most productive bug-finders
+here, and every large find in this tree came from new software
+reaching an untouched path rather than from grinding a suite already
+at its floor.
 
 ### perl
 
@@ -1050,25 +1054,26 @@ Open, in order of what the next run should touch:
   from `tclBinary.c` again -- it was an instrument and it answered.
   **What is left is a BUILD-SYSTEM question, and it is not small**:
   `tclBinary.$O` was not rebuilt with the current header until the
-  source file changed, so `mk distclean; mk install` did not do it. Two
-  candidates, and **the mount one is refuted by this very round**:
-  `./mount-include` no-ops entirely when `/sys/include/ape/THIS_IS_APExp`
-  exists, and on this machine it does (`-rw-r--r-- glenda 32 Sun 19
-  2026`) -- but if the build had been running without the union mount,
-  the recompile that fixed this would have read the old header too, and
-  it did not. **So the suspect is `mk clean` not reaching these
-  objects**, which would mean every header change in that directory has
-  been silently ignored. Do not argue it -- that is what cost three
-  rounds here. Measure it:
-
-	cd $home/APExp/sys/src/ape/lib/tcl
-	ls tclBinary.6
-	mk clean
-	ls tclBinary.6
-
-  Two lines of output settle it. Note that `sys/src/ape/lib/tcl/mkfile`
-  defines its own `clean:V:` AFTER including `mklib`, which defines one
-  too, so there are two rules for the same target.
+  source file changed, so `mk distclean; mk install` did not do it.
+  **`mk clean` was the suspect and is REFUTED by measurement**: run in
+  `sys/src/ape/lib/tcl` it removes `libtcl.a` and `*.6`, and
+  `tclBinary.6` is gone afterwards. So the objects do get cleaned, and
+  the two `clean:V:` rules -- the mkfile's own, after `mklib`'s -- are
+  not the problem.
+  **Which puts the NAMESPACE back, and my refutation of it was
+  UNSOUND.** I argued that a build without the union mount would have
+  given the fixing recompile the old header too; that assumes both
+  builds ran in the same namespace, and they need not have.
+  `./mount-include` no-ops entirely when
+  `/sys/include/ape/THIS_IS_APExp` exists, and on this machine it does
+  (`-rw-r--r-- glenda 32 Sun 19 2026`) -- so `mk install` from a plain
+  `rc` compiles against the machine's INSTALLED headers while the same
+  command inside `apexp-sh` compiles against the repo's. That explains
+  both readings exactly, and it would mean every `mk install` not
+  started from `apexp-sh` has been building against an old APExp.
+  **One word settles it**: the build prints `APExp mounted` or
+  `APExp already mounted`. This is not specific to float and is worth
+  knowing before the next port goes in.
   **The rule that failed here is one already in this file**: *a
   measurement of a build that does not contain the change measures
   nothing* -- and its harder half, which is that **arguing a build
