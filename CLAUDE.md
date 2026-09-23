@@ -1194,7 +1194,12 @@ steps are a per-session `consctl` in vts, the shell's fds being a
 (with a pipe, `isatty(0)` is false and bash never starts readline at
 all), and vts spawning bash rather than hardcoded `/bin/rc`.
 
-**itcl is wired up and NOT BUILT YET.** `sys/src/ape/lib/itcl` builds
+**itcl BUILDS AND RUNS, first try: `Total 792 Passed 712 Skipped 66
+Failed 14`**, marker present, exit 0, no file errors. The header line
+that matters reads `Itcl 4.2.3, Tcl 9.0.3` -- so `Tcl_StaticLibrary`
+did its job and `package require Itcl` found the compiled-in package
+with nothing to load. See the itcl section of `docs/notes/tcl-suite.md`
+for the 14. `sys/src/ape/lib/itcl` builds
 `libitcl.a` from configure.ac's own `TEA_ADD_SOURCES` list -- taken
 from there and not from `ls generic/*.c`, because the two differ:
 `itclStubLib.c` is `TEA_ADD_STUB_SOURCES` and is the one file that
@@ -1247,6 +1252,26 @@ in this round by a wide margin:
   with `nameLen` retyped would promote to 64 bits and shift every
   argument after it. Cast back, explicitly. *A fix in a variadic call
   changes an ABI, not just a type.*
+
+**The 14 look like itcl-vs-Tcl-9, not like a port**, which is worth
+saying carefully because it is the kind of conclusion that is
+comfortable and often wrong. Only one group is PROVEN:
+- **`local-1.2`/`1.3`/`1.4` -- upstream, settled at source.**
+  `library/itcl.tcl:35` calls `trace variable`, and **Tcl 9 removed
+  it**: `tclTrace.c:196` lists the options as exactly `add`, `info`,
+  `remove`. `itcl::local` cannot work on this Tcl at all.
+- **`rename-1.3`/`1.4` and `destroy-1.1` -- consistent, not proven.**
+  All three differ by an extra `oo` child: `namespace children ::dog`
+  answers `{::dog:: oo }` where the test wants it empty. That smells
+  like TclOO's namespace, but smelling is not measuring.
+- **`fossil-9.0`/`9.1`, `sfbug-254.1/.2/.3`, `sfbug-257`,
+  `import-2.5`, `mkindex-1.3` -- UNREAD.** `fossil-9.0` says
+  `can't create namespace "N": already exists`, which reads like
+  state left by an earlier test rather than a fresh failure.
+**The discriminator, if it is ever worth the trouble**: run the same
+suite on a Linux Tcl 9.0.3. An identical 14 would settle it; this
+machine has only 8.6, so the question stays open rather than being
+answered by assertion.
 
 **Fixed this round**: `NAME_MAX` was 27 and `PATH_MAX` 1023, set in
 `sys/include/ape/sys/limits.h`, which `<limits.h>` includes at its very
