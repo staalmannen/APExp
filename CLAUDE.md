@@ -868,22 +868,30 @@ Open, in order of what the next run should touch:
   top of it -- **Gay's `strtod` is the missing other half of that same
   package**, so the parser can be written against machinery already
   linked. `strtof`/`strtold` are the same file again.
-  **Written, and NOT SHIPPING**: `string/strtod-gay.c`, deliberately in
-  no mkfile. 6 of 7 of the expr strings exact where the old file got 0,
-  but still 140173/199887 round-trips wrong against 148018, and 16
-  inputs spin. *Right where the old one was catastrophic, no better
-  where it was merely bad* -- not good enough to trade a known-bad
-  parser for an uncharacterised one. Two transcription bugs found and
-  fixed (the correction loop's `j`; Gay's sign scan, whose fall-through
-  switch loses the first digit -- every negative came back at 0.44 of
-  its size). **The third is narrowed**: for `-5.5098193881687261e+58`
-  the approximation is bit-exact *before* the loop and the loop moves
-  it 2048 ulp; print `bd` and `bb`, do not re-read `s2b`.
-  Two by-products that stand on their own: **`fconv.h` gained an
-  include guard**, and its bignum word is now `ULong` -- Gay's code
-  hard-assumes 32 bits while spelling it `unsigned long`, true under
-  kencc and false under any LP64 compiler, which is the `long`
-  invariant from the other side.
+  **Written, and still NOT SHIPPING**: `string/strtod-gay.c`,
+  deliberately in no mkfile. **7 of 7 of the expr strings now exact**
+  where the shipping file gets 0 -- DBL_MAX, the value one ulp past it,
+  and the 18-digit case. The 200000 round-trips are not clean and the
+  reason is no longer arithmetic. **Four bugs, and THREE were in the
+  shared kit, all one assumption**: Gay's code needs a 32-bit word and
+  says `long` -- true under kencc, false under any LP64 compiler, so
+  `_fconv.c`/`_dtoa.c` were right on Plan 9 *by accident*. `ULong` for
+  the Bigint word; **`Long` for the borrow arithmetic in `_diff` and
+  `quorem`**, which need `y >> 16` to be an arithmetic shift of a
+  wrapped `unsigned int` (a 64-bit `long` makes it positive and the
+  shift yields 0xffff -- **off by 0x10001 per word**, seen directly in
+  a dumped `bd`); `Bcopy` copying `wds*sizeof(long)` of a `ULong`
+  array; and an include guard. None of it changes a byte under kencc.
+  Two were mine: the correction loop's `j`, and Gay's sign scan, whose
+  fall-through switch loses the first digit (every negative came back
+  at 0.44 of its size).
+  **What is left is two problems, separated by experiment**: disabling
+  the freelist takes wrong 169725 -> **3656** and spins 40 -> 2334, so
+  ~98% is a **Bigint lifetime bug** -- the symptom is a single
+  corrupted nibble on inputs that are exact when parsed alone. The
+  residue is all near 2.1e-293 and mostly spins: the denormal arm does
+  not converge. **The freelist experiment is the acceptance test** --
+  with it on, the counts must meet the counts with it off.
 - **`expr` 5 + `expr-old` 1 are one question and are UNEXPLAINED.**
   Everything at or above `1.797693134862315 5 e308` comes back
   infinite, including two values that are representable.

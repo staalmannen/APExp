@@ -69,6 +69,23 @@ Exactly one of IEEE_8087, IEEE_MC68k, VAX, or IBM should be defined.
  */
 typedef unsigned int ULong;
 
+/*
+ * And a SIGNED 32-bit companion, for the borrow arithmetic in _diff
+ * and quorem. Those write
+ *
+ *	y = (*xa & 0xffff) - (*xb & 0xffff) + borrow;
+ *	borrow = y >> 16;		-- wants an arithmetic shift
+ *
+ * and the subtraction happens in `unsigned int', wrapping, before the
+ * result is assigned. With a 32-BIT long the wrapped value reinterprets
+ * as the negative number that was meant and the shift gives -1; with a
+ * 64-bit long it converts to a large POSITIVE number and the shift
+ * gives 0xffff. That is off by 0x10001 per word, which is exactly what
+ * a bignum subtraction on the build host produced -- correct under
+ * kencc, wrong under gcc, and silent in both directions.
+ */
+typedef int Long;
+
 typedef union {
 	double d;
 	ULong ul[2];
@@ -243,8 +260,17 @@ extern double	_tens[], _bigtens[], _tinytens[];
 
 #define Balloc(x) _Balloc(x)
 #define Bfree(x) _Bfree(x)
+/*
+ * sizeof(ULong), not sizeof(long): this copies wds WORDS of the x[]
+ * array, and the array is ULong. With a 64-bit long it copies twice as
+ * much as it should, straight off the end of the allocation and into
+ * whatever _Balloc's freelist put there -- which on the build host
+ * made every call after the first one wrong, while any single call in
+ * isolation was correct. Third instance of the same assumption in this
+ * one header.
+ */
 #define Bcopy(x,y) memcpy((char *)&x->sign, (char *)&y->sign, \
-y->wds*sizeof(long) + 2*sizeof(int))
+y->wds*sizeof(ULong) + 2*sizeof(int))
 #define multadd(x,y,z) _multadd(x,y,z)
 #define hi0bits(x) _hi0bits(x)
 #define i2b(x) _i2b(x)

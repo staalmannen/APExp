@@ -646,11 +646,11 @@ _dtoa(double darg, int mode, int ndigits, int *decpt, int *sign, char **rve)
 quorem(Bigint *b, Bigint *S)
 {
 	int n;
-	long borrow, y;
+	Long borrow, y;
 	ULong carry, q, ys;
 	ULong *bx, *bxe, *sx, *sxe;
 #ifdef Pack_32
-	long z;
+	Long z;
 	ULong si, zs;
 #endif
 

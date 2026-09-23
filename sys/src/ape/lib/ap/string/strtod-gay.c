@@ -56,46 +56,80 @@
  * IEEE_Arith and says so at compile time rather than pretending.
  *
 
- * STATUS, measured rather than asserted. Built into
- * sys/lib/tests/strtod-xcheck.c on the build host, beside glibc:
+ * STATUS, measured rather than asserted.
  *
- *	section 1, the seven strings Tcl's expr tests use:
- *		6 of 7 EXACT, including DBL_MAX and the overflow to
- *		infinity one ulp past it. The old file got 0 of 7.
- *		The seventh, -929963218616126365E290 (18 digits), is
- *		off by 128 ulp.
- *	section 2, 200000 round-trips through "%.17g":
- *		140173 still wrong, against 148018 for the old file.
- *		Sixteen inputs also SPIN -- the correction loop does
- *		not converge and is only stopped by a cap.
+ *	section 1 of strtod-xcheck, the seven strings Tcl's expr tests
+ *	use: 7 of 7 EXACT, including DBL_MAX, the value one ulp past it
+ *	overflowing to infinity, and the 18-digit case. The old file
+ *	got 0 of 7.
  *
- * So it is right where the old one was catastrophic and no better
- * where the old one was merely bad. Two transcription bugs have been
- * found and fixed and are worth keeping written down, because both
- * were invisible to reading and took one instrumented run each:
+ *	section 2, 200000 round-trips through "%.17g": still wrong in
+ *	bulk, and NOT for an arithmetic reason -- see below.
  *
- *   1. THE SCALING. `j' in the correction loop is `P + 1 - bbbits' in
- *	the normal case and `bbe + (P - Emin)' for a denormal; an
- *	earlier version computed `bbe - P + 1' and assigned the normal
- *	case to `i' instead of `j'. Every value that needed correcting
- *	diverged: 1e100 spun with aadj = 8.8e71 and came out -inf.
+ * FOUR BUGS FOUND AND FIXED, and three of them were not in this file.
  *
- *   2. THE SIGN SCAN. Gay writes it as a fall-through switch inside a
- *	`for(s = s00;;s++)'; the '+'/'-' arm advances s past the sign
- *	and then breaks out of the SWITCH, so the loop's own s++
- *	advances again and the first digit is lost. Every negative
- *	number came back at 0.44 of its size -- which is what
- *	"-1.797e308" gives when read as ".797e308". Written out
+ *   1. The correction loop's `j' is `P + 1 - bbbits' normally and
+ *	`bbe + (P - Emin)' for a denormal; computing `bbe - P + 1' and
+ *	assigning the normal case to `i' made everything that needed
+ *	correcting diverge -- 1e100 spun with aadj = 8.8e71 and came
+ *	out -inf.
+ *
+ *   2. Gay writes the sign scan as a fall-through switch inside
+ *	`for(s = s00;;s++)': the '+'/'-' arm advances s and breaks out
+ *	of the SWITCH, so the loop's own s++ advances again and the
+ *	first digit is lost. Every negative number came back at 0.44 of
+ *	its size, which is "-1.797e308" read as ".797e308". Written out
  *	plainly here instead.
  *
- * WHAT IS STILL WRONG is a third one of the same kind, and the
- * evidence narrows it: for -5.5098193881687261e+58 the floating-point
- * approximation is ALREADY BIT-EXACT before the loop, and the loop
- * then moves it 2048 ulp away. So `bd' -- the decimal digits as an
- * exact Bigint -- or the shifts around it disagree with `bb' by more
- * than half an ulp when they should agree exactly. The next step is to
- * print bd and bb for that input rather than to read s2b again: two
- * readings have already passed it as correct.
+ *   3. `_diff' and `quorem' declare their borrow arithmetic `long'
+ *	and rely on `y >> 16' being an ARITHMETIC shift of a negative
+ *	32-bit value. The subtraction happens in `unsigned int' and
+ *	wraps; a 32-bit long reinterprets that as the intended negative
+ *	number, a 64-bit one converts it to a large positive and the
+ *	shift yields 0xffff. Off by 0x10001 per word. fconv.h now has
+ *	`typedef int Long' and those variables use it. THIS is what
+ *	made the 18-digit case 128 ulp out.
+ *
+ *   4. `Bcopy' copied `y->wds*sizeof(long)' of an array whose element
+ *	is ULong -- twice as much as it should on any LP64 host, off
+ *	the end of the allocation.
+ *
+ * Three of those four were in the shared kit rather than here, and all
+ * three are the same assumption: Gay's code needs a 32-bit word and
+ * says `long', which is true under kencc and false everywhere else.
+ * They are fixed in fconv.h/_fconv.c/_dtoa.c and are worth having
+ * whatever happens to this file.
+ *
+ * WHAT IS STILL WRONG, and the evidence is sharp. Values that this
+ * parser gets EXACTLY RIGHT when called on their own come back with a
+ * single corrupted nibble when called after 200000 other parses:
+ *
+ *	-7.3427721993599825e+62   alone: ccfc8f11c26658ab  (correct)
+ *	                       in bulk: ccfc4f11c26658ab
+ *	8.6764193450286287e+173   alone: 640c1070e6b1865a  (correct)
+ *	                       in bulk: 640a1070e6b1865a
+ *
+ * One nibble, in the first pass of the correction loop, on inputs that
+ * need no correction at all. That is not rounding; it is state carried
+ * between calls -- the Bigint freelist.
+ *
+ * CONFIRMED, by disabling the freelist: make _Balloc always malloc and
+ * _Bfree return at once, and over the same 200000 inputs
+ *
+ *	wrong  169725 -> 3656
+ *	spin       40 -> 2334
+ *
+ * So ~98% of the errors are a Bigint LIFETIME bug -- something is
+ * freed while still referenced, or freed twice, and the freelist hands
+ * it straight back. That is the next thing to fix, and the experiment
+ * above is the instrument that will say whether it is fixed: the
+ * counts with the freelist on must meet the counts with it off.
+ *
+ * And the residue is a SECOND, separate problem: the 3656 that remain
+ * are all near the bottom of the range (2.1e-293 and its neighbours)
+ * and most of them SPIN, so the denormal arm of the correction loop
+ * does not converge. Two problems, cleanly separated, neither of them
+ * the rounding arithmetic.
  *
  * Checked with sys/lib/tests/strtod-xcheck.c, which links this file
  * into a glibc program beside glibc's own strtod.
@@ -252,6 +286,14 @@ strtod(CONST char *s00, char **se)
 
 	sign = nz0 = nz = 0;
 	rv.d = 0.;
+	/*
+	 * rv0 is read by the denormal arm of the correction loop
+	 * (`y == 0 && rv0.d') and is only assigned on the underflow and
+	 * overflow scaling paths, so on every other path Gay's original
+	 * reads it uninitialised. Harmless there by construction and
+	 * undefined behaviour anyway; initialise it.
+	 */
+	rv0.d = 0.;
 	/*
 	 * The sign scan, written out rather than as Gay's fall-through
 	 * switch inside a for. His spelling advances past the sign and

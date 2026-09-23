@@ -332,3 +332,65 @@ deadline.tv_sec  += ts->tv_sec;
 deadline.tv_nsec += ts->tv_nsec;
 if(deadline.tv_nsec >= 1000000000L) { deadline.tv_sec++; deadline.tv_nsec -= 1000000000L; }
 ```
+
+#### Gay's strtod, round two: four bugs, three of them in the shared kit
+
+`string/strtod-gay.c` is a correctly-rounded `strtod` on the Bigint kit
+in `stdio/_fconv.c`. **Still not in any mkfile.** Section 1 of
+`strtod-xcheck` -- the seven strings Tcl's `expr` tests use, including
+DBL_MAX, the value one ulp past it, and an 18-digit case -- is now
+**7 of 7 exact**, where the shipping file gets 0 of 7. Section 2, the
+200000 round-trips, is not clean and the reason is no longer arithmetic.
+
+**Three of the four bugs were not in the new file at all, and all three
+are one assumption**: Gay's code needs a 32-bit word and spells it
+`long`, which is true under kencc and false under every LP64 compiler
+-- so the kit was correct on Plan 9 *by accident* and wrong on the
+build host the cross-check has to run on.
+
+- **`typedef unsigned int ULong`** for the Bigint word. `Pack_32`,
+  `n = k >> 5`, `k &= 0x1f` and `Storeinc`'s two `unsigned short`
+  halves all assume it.
+- **`typedef int Long`** for the borrow arithmetic in `_diff` and
+  `quorem`. They write `borrow = y >> 16` and need an *arithmetic*
+  shift of a negative 32-bit value; the subtraction happens in
+  `unsigned int` and wraps, and a 32-bit `long` reinterprets that as
+  the intended negative number while a 64-bit one converts it to a
+  large positive and the shift yields `0xffff`. **Off by 0x10001 per
+  word** -- which is exactly what a dumped `bd`/`bb` pair showed, and
+  what made the 18-digit case 128 ulp out.
+- **`Bcopy` copied `wds*sizeof(long)`** of an array whose element is
+  `ULong`: twice as much as it should, off the end of the allocation.
+- and **`fconv.h` had no include guard**, which only shows when
+  something includes it twice.
+
+`_dtoa.c` shares `quorem` and `Bcopy`, so it carried the same latent
+hazards; none of this changes a byte of behaviour under kencc.
+
+**The two bugs that were mine** are in the file's own header: the
+correction loop's `j`, and Gay's sign-scan idiom, whose fall-through
+switch inside `for(s = s00;;s++)` advances past the sign and then lets
+the loop advance again, losing the first digit -- every negative number
+came back at 0.44 of its size.
+
+**What remains is two separate problems and they have been separated by
+experiment rather than by reading.** Disabling the freelist -- `_Balloc`
+always mallocs, `_Bfree` returns at once -- over the same 200000 inputs:
+
+```
+wrong  169725 -> 3656
+spin       40 -> 2334
+```
+
+So **~98% of the errors are a Bigint lifetime bug**: something is freed
+while still referenced, or freed twice, and the freelist hands it back.
+The symptom in the failing cases is a *single corrupted nibble* on
+inputs the parser gets exactly right when called on its own -- which is
+what sent the search to state rather than to arithmetic in the first
+place. The residue, 3656, is all near the bottom of the range
+(2.1e-293 and neighbours) and mostly spins: the denormal arm does not
+converge. Neither is the rounding logic.
+
+**The freelist experiment is also the acceptance test for the fix**:
+with the lifetime bug repaired, the counts with the freelist ON must
+meet the counts with it OFF.
