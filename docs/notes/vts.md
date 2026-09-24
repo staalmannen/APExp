@@ -617,3 +617,81 @@ the caller's frame. The store succeeds, so nothing complains; what shows
 up is a neighbouring variable being zero for no reason, somewhere else.
 Fixed. **Recorded as found, not measured**: it is not what made bash
 exit, and saying so is the point.
+
+## rc lives, bash does not: the split came out on the libap side
+
+`SHELL=/bin/rc ./vts-bash` **gives a `term%` prompt that stays, and
+takes typing.** So vts delivers keystrokes, the tty file serves reads,
+and the bind is right. **Everything from here is APE-side**, and one
+command bought that — the control was worth more than another reading
+of bash.
+
+*(Typing still renders badly — a few characters out of what was typed.
+That is a separate question, and rc having got far enough to show it is
+progress. It belongs to `lined` and the cell diff, not to this.)*
+
+And from the other end, with `read()` traced:
+
+```
+read: enter fd=3 n=139     ...  read:  -> direct n=139 errno=20
+read: enter fd=5 n=2048    ...  read:  -> direct n=2048 errno=0
+read: enter fd=5 n=4220    ...  read:  -> direct n=4220 errno=0
+vts: ttyctl write 5 [rawon]
+vts: tty write 8 [<1b>[?2004h]
+vts: tty write 2 [$ ]
+vts: tty write 9 [<1b>[?2004l<0d>]
+```
+
+**Not one `read: enter fd=0` in the whole session**, while reads on fd 3
+and fd 5 work perfectly. bash never asked for input, confirmed from
+inside libap this time rather than inferred from a missing 9P message.
+
+### rl_getc puts select in front of the read, and trusts it
+
+```c
+      result = 0;
+#if defined (HAVE_PSELECT) || defined (HAVE_SELECT)
+      result = _rl_timeout_select (fd + 1, &readfds, NULL, NULL, NULL, ...);
+      if (result == 0)
+        _rl_timeout_handle ();
+#endif
+      if (result >= 0)
+	result = read (fd, &c, sizeof (unsigned char));
+      ...
+      if (errno != EINTR)
+	return (RL_ISSTATE (RL_STATE_READCMD) ? READERR : EOF);
+```
+
+`sys/src/external/readline/config.h` has `HAVE_SELECT 1` and
+`/* #undef HAVE_PSELECT */`, so that block is compiled in and
+`_rl_timeout_select` is `select()`. **A negative return means `read` is
+never called at all, and readline turns it straight into EOF** — which
+is the measurement exactly.
+
+So libap's `select(1, {fd 0}, 0, 0, NULL)` answered negative. Reading
+the function narrows it to three returns, and **eliminates the rest**:
+
+- a return of **0** cannot be it: `result >= 0` still calls `read`, and
+  no read happened;
+- **EBADF on `_fdinfo[0]`** is ruled out separately by `_fdinit`'s own
+  safety net, which forces `FD_ISOPEN` on 0, 1 and 2;
+- and the blocking arm is right: with `timeout == NULL` no timer is
+  armed, `rwant` gets fd 0 and the call waits on the rendezvous, which
+  is what rc's shell is doing now.
+
+That leaves `_startbuf(-1)` (the `RFORK(RFREND)` and the `SEGATTACH`
+that build the shared segment), `_startbuf(0)` (EBADF, `FD_BUFFEREDX`,
+ENFILE), and the copy-process fork. **Every one of them now names
+itself under `$APEXP_DEBUG`**, so the next run picks one instead of me
+picking one.
+
+### And an unchecked fork that hangs for ever
+
+`_startbuf` did not test the result of
+`_RFORK(RFFDG|RFPROC|RFNOWAIT)`. A failure stored `-1` as the copy
+process's pid and the parent went straight to
+`_RENDEZVOUS(&b->copypid, 0)` — **waiting for a process that was never
+created, inside `read()` or `select()`, with nothing printed.** Fixed.
+**Found while instrumenting, not measured**: bash exits rather than
+hangs, so it is not this bug. An unchecked fork whose failure mode is
+an unbreakable wait is wrong on its own terms.
