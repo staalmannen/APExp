@@ -1323,20 +1323,36 @@ from a half-fix, since returning `argv[0]` whole would pass the rest.
 standing next to it, and the extraction failure is still open. See the
 tar entry below.
 
-**`tar xf` of a `.tgz` still fails, and it is NOT diagnosed.** The
-shape: `tar` detects gzip magic and execs a decompressor, and
-`sys/src/ape/cmd/tar/config.h:59` points `GZIP_PROGRAM` at
-**`minigzip`** -- zlib's own test program, built here from
-`zlib/test/minigzip.c` against `libz.a`. `gtar/src/system.c:515`
-appends `"-d"` and `execvp`s it, and minigzip's `-d` with no file
-arguments does `gzdopen(fileno(stdin))` into `gz_uncompress(..., stdout)`,
-which is exactly what tar needs. So the design is right and something
-in it is not working: tar reported `Child returned status 1` *after*
-reading far enough to find `A lone zero block at 580`.
-**Do not guess between the two halves -- split them.** `minigzip -d`
-alone, into a file, then `tar tf` that file. Also worth one line:
-whether the archive is gzipped at all, since 9front's own `tar`
-extracted it and the native tar does not decompress.
+**`tar` CANNOT READ A PLAIN TAR FILE, and decompression was never
+involved.** The split settled it in one round and eliminated
+everything I had been looking at:
+- `xd -c` shows `1f 8b 08` -- genuinely gzip;
+- `minigzip -d <x.tgz >/tmp/n.tar` exits **status=0**;
+- `tar tf /tmp/n.tar` on the ALREADY-DECOMPRESSED file gives the
+  **byte-identical** failure, same `A lone zero block at 580`.
+Identical output from both runs also says run 1's tar had decompressed
+correctly all along, so `Child returned status 1` was minigzip taking
+EPIPE when tar gave up -- *a consequence, not a cause*. **Every one of
+`GZIP_PROGRAM`, `minigzip` and the exec plumbing is innocent.**
+**WHERE IT ACTUALLY FAILS**, read off the source: the message comes
+from `buffer.c:451`/`456` in `open_compressed_archive`, and it is
+printed when `shortfile` is true -- which is
+`*pshort = find_next_block () == 0` in `check_compressed_archive`.
+**So tar's FIRST read of the archive yields no block at all.**
+That also explains the `.tgz` run's shape exactly: with no bytes to
+inspect, the magic test could not fire, so tar fell through to
+`set_compression_program_by_suffix` -- it ran minigzip because the
+NAME ended in `.tgz`, not because it had seen `1f 8b`.
+`O_BINARY` is 0 in all four places that define it, so the `rmtopen
+(..., O_RDONLY|O_BINARY)` is not it, and tar's `config.h` makes no
+type-size claims.
+**NEXT STEP IS `ratrace`, not more source.** It names a failing system
+call outright where elimination takes rounds -- it found the `utime()`
+bug in one run after six readings chased an errno the failing call
+never set. Ask it on the smallest case: whether `tar` can read an
+archive **it wrote itself** separates "tar's read path is broken" from
+"this archive is unusual", and `ratrace` on that says which call
+returns what.
 
 **Fixed this round**: `NAME_MAX` was 27 and `PATH_MAX` 1023, set in
 `sys/include/ape/sys/limits.h`, which `<limits.h>` includes at its very
