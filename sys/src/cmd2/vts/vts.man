@@ -19,7 +19,9 @@ with the namespace
 /ctl             daemon control
 /<sess>/         per session
 /<sess>/ctl      per-session control
-/<sess>/cons     bidirectional shell I/O
+/<sess>/cons     viewer side: write keystrokes in, read them back
+/<sess>/tty      shell side: bound over /dev/cons in the shell
+/<sess>/ttyctl   shell side: bound over /dev/consctl; rawon/rawoff
 /<sess>/cells    binary cell-diff stream
 .EE
 .PP
@@ -31,6 +33,46 @@ inside it. rc's stdout is fed through a VT100 state machine into a
 cell buffer.  Writes to
 .B /<sess>/cons
 deliver keystrokes to rc's stdin. Reads from
+.B /<sess>/tty
+is the same terminal seen from the shell's end, and is the reason the
+shell can run
+.IR bash (1)
+with its own line editing. A read BLOCKS until a keystroke arrives
+(a zero-length read would mean the terminal had closed) and a write
+goes straight into the VT parser. It exists as a file separate from
+.B cons
+because a viewer and a shell face opposite ways: the viewer writes the
+keystrokes the shell reads.
+.PP
+.I Vts
+binds it over
+.B /dev/cons
+in a namespace of the shell's own, and that bind is load-bearing rather
+than tidy: APE's
+.I isatty
+asks
+.I fd2path
+and matches a path ending in
+.BR /dev/cons ,
+so a pipe -- or this file opened as /mnt/1/tty -- is not a terminal
+however well it behaves, and
+.I bash
+compiles its line editing out when it is told it has none.
+.B /<sess>/ttyctl
+is bound over
+.B /dev/consctl
+alongside it and takes
+.B rawon
+and
+.BR rawoff ,
+which is the whole of what Plan 9's consctl accepts and therefore the
+whole of what APE's
+.I tcsetattr
+writes. Neither a file nor a pipe has a line discipline to switch, so
+what it really does is turn
+.IR vts 's
+own line editor off.
+.PP
 .B /<sess>/cells
 return a binary diff frame (header + changed cells); see
 .IR vts-9p (5).
@@ -41,8 +83,21 @@ no rc is spawned. Useful for testing the 9P interface in isolation.
 .SH OPTIONS
 .TP
 .B -n
-Do not spawn rc. The server still serves /srv/vts; writes to cons are
-fed directly through the parser.
+Do not spawn a shell. The server still serves /srv/vts; writes to cons
+are fed directly through the parser.
+.PP
+The shell is
+.B $SHELL
+if it is set and
+.B /bin/rc
+otherwise; a bare name without a slash is looked for in
+.BR /bin .
+.I Apexp-sh
+sets SHELL=bash, so running
+.I vts
+from inside it is what puts bash within reach -- from a plain
+.IR rc ,
+bash is not in the namespace at all.
 .SH CONTROL COMMANDS
 Writes to
 .B /srv/vts/ctl

@@ -327,6 +327,7 @@ covers what you are about to touch; do not re-derive from scratch.
 | `docs/notes/libap.md` | `sys/src/ape/lib/ap/` by directory: locale, math, malloc, thread, signal, process, aio |
 | `docs/notes/invariants.md` | the traps that bite silently: ABI widths, variadic sentinels, missing prototypes, `free()`'s contract, amd64 setjmp/longjmp, the FP environment, header search order, and the stdio bugs found through flex |
 | `docs/notes/tk-plan9.md` | the `sys/src/external/tk/plan9/` backend and Tk's own suite, runs 1 to 16. Also the `HFILES` trap and the gcc syntax check, which apply tree-wide |
+| `docs/notes/vts.md` | the VT emulator and its two clients: what `vtwin` and `vts-attach` are, why the missing piece is inside `vts/session.c`, and the order of work |
 | `docs/notes/tcl-suite.md` | Tcl's suite: the allocator, sockets and the missing loopback, `shutdown()`, `listen()`, `select()` and `ap/plan9/_buf.c`, `fd_set`, and the `chan-io` hangs |
 
 Two more under `docs/`, which are surveys rather than history:
@@ -1210,6 +1211,27 @@ would have bought.
 is still what would buy arrow keys, colour, cursor addressing and
 anything else needing escape sequences rio does not speak, plus
 session persistence. Keep it; it is a want rather than a blocker.
+**KEEP `vtwin` AND `vts-attach`, AND WRITE NO GLUE.** They are not
+glue -- they are two front ends onto the same 9P interface
+(`/n/vts/<sess>/cells` read for diff frames, `.../cons` written for
+keys). `vtwin` (1281 lines) is the **graphical** half, a rio window;
+`vts-attach` (302 lines) is the **dumb-TTY** half for ssh, drawterm or
+a bare `rc`, which is the session persistence. *Two clients is also
+what makes `cells`/`cons` a real interface rather than vtwin's private
+back door.*
+**The missing piece is not between vts and bash -- it is inside
+`vts/session.c`**, which gives the shell a **pipe** on fd 0, does not
+take `RFNAMEG`, and execs a hardcoded `/bin/rc`.
+**And `isatty` decides the design**: `ap/unistd/isatty.c` matches on
+the PATH ending in `/dev/cons` (the suffix test is there for
+`/mnt/term/dev/cons`), so a cons opened as `/n/vts/1/cons` is not a
+tty however well it behaves. **`rfork(RFNAMEG)` and BIND** the
+session's `cons` and `consctl` over `/dev/cons` and `/dev/consctl`,
+then open `/dev/cons` for 0/1/2 -- `fd2path` then answers `/dev/cons`,
+**no libap change is needed**, and it is what rio does for its own
+windows. Loosening `_isatty` instead would be the "invent semantics to
+make a test pass" shape. That bind is also where the **per-session
+`consctl`** lands, so the two recorded steps are one edit.
 **And vts's key interception is the OPPOSITE of what is wanted here**:
 `lined.c` batches keystrokes and flushes whole LINES to the shell, so
 bash's completion needs `edit off`, not `edit on`. The remaining three
@@ -1550,18 +1572,43 @@ named limit**: the sweep only matches structs whose every member is a
 plain `char`, so it misses the three tar structs with a nested
 `struct sparse sp[N]` -- *the tool that found the bug's family cannot
 find the whole family.*
-**Predict**: rebuilt, `tarblock-probe` (with `-DPLAN9`) reports PASS
-and 0 disagreements, `tar cf` then `tar tf` round-trips, and
-`tarhdr-probe` matches the host reference block for block. **Refuted
-if** the sizes still differ -- which would mean the pragma did not
-reach, and the probe now carries a `-DPLAN9` marker saying which build
-it measured, because without it a wrong command reads exactly like the
-bug returning.
-**Still open**: the ORIGINAL archive, which came from outside and
-failed differently (`This does not look like a tar archive`, `A lone
-zero block at 580`). A reader mis-striding by 8 is a plausible cause
-for that too, but it is not yet measured -- run `tar tf` on it again
-after the rebuild before calling it closed.
+**CONFIRMED END TO END, AND TAR IS CLOSED.** `tarblock-probe` reports
+PASS and 0 disagreements with its `-DPLAN9` marker; all nine sizes
+match the host and the block table reads 0/512/1024/1536 with
+`record_end` at 10240. Then the same command on the same archive,
+across the rebuild:
+
+```
+Before rebuild                     After rebuild
+$ tar cf /tmp/t2.tar /tmp/h        $ tar cf /tmp/t2.tar /tmp/h
+tar: Removing leading `/' ...      tar: Removing leading `/' ...
+$ tar tf /tmp/t2.tar               $ tar tf /tmp/t2.tar
+tar: This does not look like       tmp/h
+     a tar archive                 $
+tar: Skipping to next header
+tar: Exiting with failure status
+```
+
+**And the ORIGINAL archive extracts**: `rm -rf NetHack-5.0.0`,
+`tar xf nethack-500-src.tgz`, and the tree is back. **That was the
+last open question and it is answered -- BOTH failures were the same
+bug.** With `union block` at 520 the *reader* mis-strides exactly as
+the writer did, so a correctly-formed foreign archive walked into its
+own payload and reported `This does not look like a tar archive` /
+`A lone zero block at 580`. **I was right to refuse to assume they
+shared a cause, and the measurement is what joined them** -- the
+before/after pair is the control, since only the build changed.
+*(The before-rebuild run of `tar tf` on tar's OWN archive printed the
+foreign archive's message this time, where the earlier run printed
+`tmp/h` first: the same bug, differing only in what heap garbage the
+mis-strided blocks happened to land on. Another reason not to have
+matched them by message.)*
+**WORTH A LOOK NEXT, and not urgent**: the archivers -- bzip2, xz,
+unrar, unace, unarj, clzip -- are exactly the class of program that
+walks on-disk records with struct pointers, which is the one thing the
+padding breaks. None has been tested since. The `external/` sweep is a
+lower bound by construction (see the note), so *the way to find these
+is to run each archiver on a real archive*, not to grep.
 Detail in `docs/notes/kencc.md` and `docs/notes/libap.md`.
 
 **readline wraps at 80 columns under rio, and the mechanism is already

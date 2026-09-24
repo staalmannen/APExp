@@ -908,3 +908,61 @@ with integers. *The tool that found the bug's family cannot find the
 whole family.* A real answer wants `sizeof` compared between pcc and
 gcc for every struct in a package, which is what `tarblock-probe` does
 by hand for one.
+
+#### CONFIRMED end to end, and the two tar failures were one bug
+
+`tarblock-probe` reports **PASS, 0 disagreements**, with the `-DPLAN9`
+marker saying which build it measured: all nine sizes match the host,
+and the block table reads 0/512/1024/1536 with `record_end` at 10240.
+
+Then the same command on the same archive, across the rebuild -- which
+is the control, because nothing changed but the build:
+
+```
+Before rebuild                     After rebuild
+$ tar cf /tmp/t2.tar /tmp/h        $ tar cf /tmp/t2.tar /tmp/h
+tar: Removing leading `/' ...      tar: Removing leading `/' ...
+$ tar tf /tmp/t2.tar               $ tar tf /tmp/t2.tar
+tar: This does not look like       tmp/h
+     a tar archive                 $
+tar: Skipping to next header
+tar: Exiting with failure status
+```
+
+**And the original archive extracts.** `rm -rf NetHack-5.0.0`,
+`tar xf nethack-500-src.tgz`, and the tree is back -- 500 files,
+through the gzip path, from an archive made on another system.
+
+**So both failures were this one bug.** The writer mis-strided, which
+malformed what it produced; and the *reader* mis-strided by the same
+eight bytes, which is why a correctly-formed foreign archive walked
+into its own payload and reported `This does not look like a tar
+archive` and `A lone zero block at 580`. One `sizeof`, both
+directions.
+
+**Refusing to assume they shared a cause was right, and so was
+measuring it rather than arguing it.** The evidence at the time --
+two different messages, two different archives, one of them written
+locally and one not -- supported either reading, and a wrong guess
+would have sent the next round at the reader or the writer alone.
+*A fact is what joins two symptoms; a resemblance is not.*
+
+One detail that argues the same point from the other side: the
+before-rebuild run of `tar tf` on tar's **own** archive printed the
+*foreign* archive's message here, where an earlier run of the same
+command had printed `tmp/h` first and then failed. Same bug both
+times, differing only in what heap garbage the mis-strided blocks
+happened to land on. **Matching two failures by their message would
+have been wrong in both directions.**
+
+#### What to look at next, and how
+
+The archivers in this tree -- bzip2, xz, unrar, unace, unarj, clzip --
+are exactly the class of program the padding breaks: they walk on-disk
+records with struct pointers, which is the one use of `sizeof` that
+goes wrong. None has been exercised since this was found.
+
+**The way to find them is to run each one on a real archive**, not to
+grep. The `external/` sweep above is a lower bound by construction --
+it cannot see a struct with a nested struct member, which is three of
+the five tar structs that were wrong.
