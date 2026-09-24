@@ -38,6 +38,9 @@ fn fail {
 	exit fail
 }
 
+# Where vts's own output goes. See the note beside the start below.
+vtslog=/tmp/vts.log
+
 # Turn on vts's terminal tracing. Only the shell touches `tty' -- the
 # viewers write `cons' and poll `cells' -- so this is three or four
 # lines at startup, not a flood, and it is the difference between
@@ -101,11 +104,16 @@ if(test -e /srv/vts){
 }
 if not {
 	# vts talks to fd 2 about what it is doing -- which shell it
-	# forked, where the tty is, and any bind that failed -- and that
-	# is the log to read when a session comes up blank, so it stays
-	# pointed at this window rather than /dev/null.
-	echo 'vts-bash: starting vts...'
-	vts &
+	# forked, where the tty is, any bind that failed, and (under
+	# $vtsdebug) every byte the shell exchanged with its terminal.
+	#
+	# IT GOES TO A FILE, and that is not tidiness. vtwin's window
+	# opens over this one, so the most interesting lines -- the ones
+	# printed in the second before the session appears -- were being
+	# read off a PHOTOGRAPH of the screen. A log that outlives the
+	# window can be read at leisure, twice, and pasted.
+	echo 'vts-bash: starting vts, log in '^$vtslog
+	vts >[2]$vtslog &
 	vtspid=$apid
 
 	# Wait for the post rather than racing it: vtwin exits if
@@ -151,8 +159,15 @@ echo 'vts-bash: starting vtwin (close the window to finish)'
 vtwin
 
 # 7. Again on the way out -- the interesting state is usually the one
-#    after something went wrong, not the one a second after boot.
+#    after something went wrong, not the one a second after boot --
+#    and then the log, which by now has the whole conversation between
+#    the shell and its terminal in it.
 report
+if(test -e $vtslog){
+	echo 'vts-bash: ---- '^$vtslog^' ----'
+	cat $vtslog
+	echo 'vts-bash: ---- end of log ----'
+}
 
 if(~ $mine yes){
 	# `kill' on Plan 9 PRINTS the commands to do it, for piping into

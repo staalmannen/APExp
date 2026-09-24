@@ -427,3 +427,60 @@ this script has now paid for.
 it is vts's own version marker, and the same idiom as
 `_sock_listenmark`/`_execmark`/`_ttymark` in libap. When a session
 behaves like the previous build, that line is what says whether it is.)*
+
+## The trace came back, and the interesting line is the one that is missing
+
+```
+vts: /bin/bash forked pid=531 on /mnt/1/tty
+vts: ttyctl write 5 [rawon]
+vts: tty write 8 [<1b>[?2004h]
+vts: tty write 2 [$ ]
+vts: tty write 9 [<1b>[?2004l<0d>]
+vts: tty write 1 [<0a>]
+vts: ttyctl write 6 [rawoff]
+vts: tty write 4 [exit]
+vts: tty write 1 [<0a>]
+vts: shell 531 exited: ok
+```
+
+**What this settles, and it is most of the earlier guesswork.** The
+mount and both binds worked. `isatty(0)` was true -- readline emits
+`ESC [ ? 2004 h` only when it is driving the line. `rawon` ARRIVED, so
+`tcsetattr` reached `/dev/consctl` and `lined` was turned off; **both
+competing "double echo" stories from the previous rounds are dead.**
+bash printed its prompt, immediately terminated the line, sent `rawoff`,
+printed `exit` and exited 0 -- which is precisely bash's behaviour on
+reading **EOF at a prompt**.
+
+**The decisive fact is the absence.** There is no `tty read` line of any
+kind, and the trace has one for every arm: served, blocked, EOF, and no
+session. So the read that should have hung either never reached vts or
+never happened. *A missing line is evidence exactly as much as a present
+one, PROVIDED every arm prints* -- which is why the silent arms were
+filled in before this run rather than after.
+
+Two instruments, at the two ends, because the source cannot separate
+them:
+
+- **`$vtsdebug=2` turns on `chatty9p`**, lib9p's own T/R trace. If a
+  `Tread` on the tty fid appears and is answered before `fsread` sees
+  it, that is lib9p; if none appears, libap never issued one. The two
+  look identical from inside `fsread`.
+- **The child prints `fd2path` of 0, 1 and 2 immediately before
+  `exec`.** *Every trace so far proves fd 1 and fd 2 -- the shell's
+  output arrives. Nothing has ever proved fd 0*, and a wrong fd 0 is
+  exactly this shape: writes land on the terminal, the read lands
+  somewhere else and ends at once. `dup()`'s return value is unchecked
+  in that block, and a silent failure there looks like success from
+  outside; and vts is started in the BACKGROUND, where rc gives a
+  command `/dev/null` on fd 0 -- so the wrong answer is sitting right
+  there waiting to be inherited.
+
+*Ask the kernel which file a descriptor is on rather than trusting the
+three calls that were supposed to put it there.*
+
+And the log now goes to a **file** (`/tmp/vts.log`, via `vts >[2]$vtslog
+&` in `vts-bash`, catted on the way out). That is not tidiness: vtwin's
+window opens over the launching one, so the lines printed in the second
+before the session appears were being read off a **photograph of the
+screen**. A log that outlives the window can be read twice and pasted.

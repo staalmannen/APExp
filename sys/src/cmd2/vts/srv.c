@@ -87,16 +87,24 @@ static Srv vts_srv;
 static int vtsdebug = -1;
 
 static int
-dbg(void)
+dbglevel(void)
 {
 	char *p;
 
 	if(vtsdebug < 0){
 		p = getenv("vtsdebug");
-		vtsdebug = p != nil && *p != '\0';
+		vtsdebug = 0;
+		if(p != nil && *p != '\0')
+			vtsdebug = atoi(p) > 1 ? 2 : 1;
 		free(p);
 	}
 	return vtsdebug;
+}
+
+static int
+dbg(void)
+{
+	return dbglevel() >= 1;
 }
 
 /* Print up to n bytes readably -- a terminal stream is mostly escapes,
@@ -298,6 +306,13 @@ fsread(Req *r)
 	case Faux_sess_tty:
 		s = sessof(r->fid->file);
 		if(s == nil){
+			/*
+			 * An error answer reads as EOF to the shell, exactly
+			 * as a zero count does -- so this arm must not be
+			 * silent either.
+			 */
+			if(dbg())
+				fprint(2, "vts: tty read: NO SESSION\n");
 			respond(r, "no session");
 			return;
 		}
@@ -428,6 +443,14 @@ fsread(Req *r)
 		return;
 	}
 
+	/*
+	 * Reached only if `aux' matched no case. If a tty read ever lands
+	 * here, the file's aux is not what add_session_files set -- which
+	 * would explain a read that never appears in the trace while
+	 * writes on the same fid do.
+	 */
+	if(dbg())
+		fprint(2, "vts: READ of unknown file (aux=%d)\n", aux);
 	respond(r, "vts: unknown file");
 }
 
@@ -670,6 +693,9 @@ fswrite(Req *r)
 		return;
 	}
 
+	/* Reached only if `aux' matched no case. */
+	if(dbg())
+		fprint(2, "vts: WRITE of unknown file (aux=%d)\n", aux);
 	respond(r, "vts: unknown file");
 }
 
@@ -910,6 +936,21 @@ srvinit(int spawn_rc)
 void
 srvstart(void)
 {
+	/*
+	 * $vtsdebug=2 turns on lib9p's own message trace.
+	 *
+	 * IT ANSWERS A QUESTION NOTHING ELSE CAN. The shell's writes all
+	 * arrive at fswrite and not one read arrives at fsread -- on the
+	 * SAME fid, since fds 0, 1 and 2 are dups of one open. So either
+	 * libap never issued a Tread, or one arrived and was answered
+	 * before reaching us. `chatty9p' prints every T- and R-message,
+	 * so the walk, the open and any read are all visible, and the
+	 * two cases stop looking alike.
+	 */
+	if(dbglevel() >= 2){
+		chatty9p = 1;
+		fprint(2, "vts: chatty9p on ($vtsdebug=2)\n");
+	}
 	threadpostsrv(&vts_srv, vts_srvname);
 	print("vts: posted at /srv/%s\n", vts_srvname);
 }
