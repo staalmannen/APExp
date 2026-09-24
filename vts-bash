@@ -38,6 +38,12 @@ fn fail {
 	exit fail
 }
 
+# Turn on vts's terminal tracing. Only the shell touches `tty' -- the
+# viewers write `cons' and poll `cells' -- so this is three or four
+# lines at startup, not a flood, and it is the difference between
+# "the shell exited" and knowing whether it ever read anything.
+vtsdebug=1
+
 # The one readout worth having. `ctl' carries raw= and lined=, which
 # together say whether the shell ever reached tcsetattr -- and that is
 # the difference between "the terminal works" and "two things are
@@ -104,12 +110,24 @@ if not {
 
 	# Wait for the post rather than racing it: vtwin exits if
 	# /srv/vts is not there yet, and losing that race reads as a
-	# vtwin bug. (Plan 9's sleep takes WHOLE SECONDS -- `sleep 0.1'
-	# sleeps zero and turns this into a spin.)
+	# vtwin bug.
+	#
+	# TWO rc FACTS, both learned the hard way in one run:
+	#   - `sleep' takes WHOLE SECONDS. `sleep 0.1' sleeps zero and
+	#     turns a wait into a spin.
+	#   - **rc HAS NO `break'.** It is not a keyword, so rc went
+	#     looking for a command called break and printed
+	#     "./vts-bash:111: break: file does not exist" once per
+	#     iteration. A flag is the way to leave a loop early; the
+	#     remaining turns then cost one `test' each.
+	got=no
 	for(i in 1 2 3 4 5){
-		if(test -e /srv/vts)
-			break
-		sleep 1
+		if(~ $got no){
+			if(test -e /srv/vts)
+				got=yes
+			if not
+				sleep 1
+		}
 	}
 	if(! test -e /srv/vts)
 		fail 'vts did not post /srv/vts within 5s -- read its output above'

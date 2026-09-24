@@ -1243,6 +1243,32 @@ From a plain `rc` none of it is true and vts falls back to `/bin/rc`.
 9front's rc neither echoes nor cooks, so lined-off would blank every
 non-bash session -- and *the failure mode decides it*, since lined-on
 still gives a usable cooked shell if bash never reaches `tcsetattr`.
+**SECOND RUN: THE SHELL NOW EXITS IMMEDIATELY, AND THAT RETIRES THE
+DOUBLE-ECHO STORY BELOW.** The launching window says
+`/bin/bash forked pid=532 on /mnt/1/tty` -- so `$SHELL` resolved, the
+bind path is right, and **no child complaint appeared**, which clears
+`open /srv/vts`, `mount /mnt`, both binds and `open /dev/cons`, since
+each prints to fd 2 and fd 2 is still that window. Then
+`shell 532 exited: ok` -- and `ok` is not a figure of speech: every
+`_exits` in the child passes a NAME (`srv`, `mount`, `bind`, `cons`,
+`exec`), so an empty message means **bash ran and exited 0**.
+**A shell that exits 0 the instant it starts read EOF on stdin.**
+`fsread` on `tty` has three arms -- serve, **EOF when `!rc_alive`**, or
+block -- and only the middle one ends a shell; `rc_alive` is set right
+after `rfork`, long before the child finishes mounting and exec'ing, so
+that race is not close. **So either something else answers 0 or bash
+never reaches the read, and both are one log line away.**
+`$vtsdebug` now traces the shell's side: what it wrote, whether
+`rawon` arrived, whether it blocked, whether it got EOF. **Not noisy --
+only the shell touches `tty`**; viewers write `cons` and poll `cells`.
+`vts-bash` sets it.
+**And rc HAS NO `break`** (it looked for `./break` four times). A flag
+is how to leave an rc loop; that joins *`sleep` takes whole seconds* on
+the list this script has paid for.
+*(The garbling below is a DIFFERENT build and a different failure --
+that session at least stayed alive to be typed at. Do not carry it
+forward.)*
+
 **FIRST RUN: readline IS RUNNING -- the bind works -- AND THE INPUT IS
 GARBLED.** The session printed `2004h$ 20041`, which is readline's
 bracketed-paste `ESC [ ? 2004 h`/`l` with the `ESC [ ?` missing, and
