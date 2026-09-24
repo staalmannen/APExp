@@ -41,6 +41,9 @@ enum {
 	Faux_sess_cons,
 	Faux_sess_cells,
 	Faux_sess_scroll,
+	/* The shell's side of the terminal; see add_session_files. */
+	Faux_sess_tty,
+	Faux_sess_ttyctl,
 };
 
 /* Find session by name. Returns NULL if not found. */
