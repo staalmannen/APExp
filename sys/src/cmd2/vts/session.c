@@ -267,6 +267,36 @@ session_spawn_rc(Session *s)
 			putenv("LINES", num);
 			putenv("vts", s->name);
 
+			/*
+			 * SAY WHAT THE THREE DESCRIPTORS ACTUALLY ARE.
+			 *
+			 * Every trace so far proves fd 1 and fd 2 -- the
+			 * shell's output arrives at vts. NOTHING has ever
+			 * proved fd 0, and the shell reading EOF at its first
+			 * prompt is exactly what a wrong fd 0 looks like:
+			 * writes land on the terminal, the read lands
+			 * somewhere else and ends at once. (vts is started in
+			 * the background, and rc gives a background command
+			 * /dev/null on fd 0.)
+			 *
+			 * dup(2)'s return value is not checked above, and a
+			 * silent failure there is indistinguishable from
+			 * success from the outside -- so ask the kernel which
+			 * file each descriptor is on rather than trusting the
+			 * three calls. This prints on fd 2, which is the
+			 * session's own window.
+			 */
+			{
+				char p0[128], p1[128], p2[128];
+
+				strcpy(p0, "?"); strcpy(p1, "?"); strcpy(p2, "?");
+				fd2path(0, p0, sizeof p0);
+				fd2path(1, p1, sizeof p1);
+				fd2path(2, p2, sizeof p2);
+				fprint(2, "vts: child: fd0=%s fd1=%s fd2=%s\n",
+					p0, p1, p2);
+			}
+
 			execl(sh, sh, "-i", nil);
 			fprint(2, "vts: child: exec %s: %r\n", sh);
 			_exits("exec");
