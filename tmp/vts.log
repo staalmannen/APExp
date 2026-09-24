@@ -1,137 +1,48 @@
-vts: chatty9p on ($vtsdebug=2)
-<-5- Tversion tag 65535 msize 32792 version '9P2000'
-vts: /bin/bash forked pid=4294 on /mnt/1/tty
--5-> Rversion tag 65535 msize 32792 version '9P2000'
-<-5- Tattach tag 4 fid 358 afid -1 uname glenda aname 
--5-> Rattach tag 4 qid (0000000000000000 0 d)
-<-5- Twalk tag 4 fid 358 newfid 331 nwname 2 0:1 1:tty 
--5-> Rwalk tag 4 nwqid 2 0:(0000000000000002 0 d) 1:(0000000000000007 0 ) 
-<-5- Twalk tag 4 fid 331 newfid 303 nwname 0 
--5-> Rwalk tag 4 nwqid 0 
-<-5- Topen tag 4 fid 303 mode 2
-fid mode is 2
--5-> Ropen tag 4 qid (0000000000000007 0 ) iounit 0 
-<-5- Twalk tag 4 fid 358 newfid 365 nwname 2 0:1 1:ttyctl 
--5-> Rwalk tag 4 nwqid 2 0:(0000000000000002 0 d) 1:(0000000000000008 0 ) 
-<-5- Twrite tag 4 fid 303 offset 0 count 54 'vts: child: fd0=/dev/cons fd1=/dev/cons fd2=/dev/cons
-'
+vts: /bin/bash forked pid=7242 on /mnt/1/tty
 vts: tty write 54 [vts: child: fd0=/dev/cons fd1=/dev/cons fd2=/dev/cons<0a>]
--5-> Rwrite tag 4 count 54
-<-5- Tstat tag 4 fid 303
--5-> Rstat tag 4  stat 'tty' 'vts' 'vts' 'vts' q (0000000000000007 1 ) m 0666 at 1790261361 mt 1790261361 l 0 t 0 d 0
-<-5- Tstat tag 4 fid 303
--5-> Rstat tag 4  stat 'tty' 'vts' 'vts' 'vts' q (0000000000000007 1 ) m 0666 at 1790261361 mt 1790261361 l 0 t 0 d 0
-<-5- Tstat tag 4 fid 303
--5-> Rstat tag 4  stat 'tty' 'vts' 'vts' 'vts' q (0000000000000007 1 ) m 0666 at 1790261361 mt 1790261361 l 0 t 0 d 0
-<-5- Tstat tag 4 fid 303
--5-> Rstat tag 4  stat 'tty' 'vts' 'vts' 'vts' q (0000000000000007 1 ) m 0666 at 1790261361 mt 1790261361 l 0 t 0 d 0
-<-5- Tstat tag 4 fid 303
--5-> Rstat tag 4  stat 'tty' 'vts' 'vts' 'vts' q (0000000000000007 1 ) m 0666 at 1790261361 mt 1790261361 l 0 t 0 d 0
-<-5- Tstat tag 4 fid 303
--5-> Rstat tag 4  stat 'tty' 'vts' 'vts' 'vts' q (0000000000000007 1 ) m 0666 at 1790261361 mt 1790261361 l 0 t 0 d 0
-<-5- Tstat tag 4 fid 303
--5-> Rstat tag 4  stat 'tty' 'vts' 'vts' 'vts' q (0000000000000007 1 ) m 0666 at 1790261361 mt 1790261361 l 0 t 0 d 0
-<-5- Tstat tag 4 fid 303
--5-> Rstat tag 4  stat 'tty' 'vts' 'vts' 'vts' q (0000000000000007 1 ) m 0666 at 1790261361 mt 1790261361 l 0 t 0 d 0
-<-5- Twalk tag 4 fid 365 newfid 329 nwname 0 
--5-> Rwalk tag 4 nwqid 0 
-<-5- Topen tag 4 fid 329 mode 1
-fid mode is 1
--5-> Ropen tag 4 qid (0000000000000008 0 ) iounit 0 
-<-5- Twrite tag 4 fid 329 offset 0 count 5 'rawon'
+vts: tty write 50 [close of a descriptor with no listener fd=3 pid=0<0a>]
+vts: tty write 23 [read: enter fd=3 n=139<0a>]
+vts: tty write 31 [read:  fdinfo flags=2 oflags=0<0a>]
+vts: tty write 32 [read:  -> direct n=139 errno=20<0a>]
+vts: tty write 23 [read: enter fd=5 n=127<0a>]
+vts: tty write 31 [read:  fdinfo flags=2 oflags=0<0a>]
+vts: tty write 30 [read:  -> direct n=7 errno=12<0a>]
+vts: tty write 50 [close of a descriptor with no listener fd=5 pid=0<0a>]
+vts: tty write 22 [read: enter fd=5 n=31<0a>]
+vts: tty write 31 [read:  fdinfo flags=2 oflags=0<0a>]
+vts: tty write 30 [read:  -> direct n=12 errno=0<0a>]
+vts: tty write 50 [close of a descriptor with no listener fd=5 pid=0<0a>]
+vts: tty write 22 [read: enter fd=5 n=31<0a>]
+vts: tty write 31 [read:  fdinfo flags=2 oflags=0<0a>]
+vts: tty write 30 [read:  -> direct n=12 errno=0<0a>]
+vts: tty write 50 [close of a descriptor with no listener fd=5 pid=0<0a>]
+vts: tty write 22 [read: enter fd=5 n=31<0a>]
+vts: tty write 31 [read:  fdinfo flags=2 oflags=0<0a>]
+vts: tty write 30 [read:  -> direct n=12 errno=0<0a>]
+vts: tty write 50 [close of a descriptor with no listener fd=5 pid=0<0a>]
+vts: tty write 24 [read: enter fd=5 n=2048<0a>]
+vts: tty write 31 [read:  fdinfo flags=2 oflags=0<0a>]
+vts: tty write 32 [read:  -> direct n=2048 errno=0<0a>]
+vts: tty write 50 [close of a descriptor with no listener fd=5 pid=0<0a>]
+vts: tty write 24 [read: enter fd=5 n=4220<0a>]
+vts: tty write 31 [read:  fdinfo flags=2 oflags=0<0a>]
+vts: tty write 32 [read:  -> direct n=4220 errno=0<0a>]
+vts: tty write 50 [close of a descriptor with no listener fd=5 pid=0<0a>]
+vts: tty write 24 [read: enter fd=5 n=4220<0a>]
+vts: tty write 31 [read:  fdinfo flags=2 oflags=0<0a>]
+vts: tty write 32 [read:  -> direct n=4220 errno=0<0a>]
+vts: tty write 50 [close of a descriptor with no listener fd=5 pid=0<0a>]
+vts: tty write 24 [read: enter fd=5 n=2048<0a>]
+vts: tty write 31 [read:  fdinfo flags=2 oflags=0<0a>]
+vts: tty write 32 [read:  -> direct n=2048 errno=0<0a>]
+vts: tty write 50 [close of a descriptor with no listener fd=5 pid=0<0a>]
 vts: ttyctl write 5 [rawon]
--5-> Rwrite tag 4 count 5
-<-5- Twrite tag 4 fid 303 offset 54 count 8 '1b5b3f32 30303468'
 vts: tty write 8 [<1b>[?2004h]
--5-> Rwrite tag 4 count 8
-<-5- Twrite tag 4 fid 303 offset 62 count 2 '$ '
 vts: tty write 2 [$ ]
--5-> Rwrite tag 4 count 2
-<-5- Twrite tag 4 fid 303 offset 64 count 9 '1b5b3f32 3030346c 0d'
 vts: tty write 9 [<1b>[?2004l<0d>]
--5-> Rwrite tag 4 count 9
-<-5- Twrite tag 4 fid 303 offset 73 count 1 '
-'
 vts: tty write 1 [<0a>]
--5-> Rwrite tag 4 count 1
-<-5- Tstat tag 4 fid 303
--5-> Rstat tag 4  stat 'tty' 'vts' 'vts' 'vts' q (0000000000000007 5 ) m 0666 at 1790261361 mt 1790261361 l 0 t 0 d 0
-<-5- Twrite tag 4 fid 329 offset 5 count 6 'rawoff'
 vts: ttyctl write 6 [rawoff]
--5-> Rwrite tag 4 count 6
-<-5- Tclunk tag 4 fid 329
--5-> Rclunk tag 4
-<-5- Twrite tag 4 fid 303 offset 74 count 4 'exit'
+vts: tty write 50 [close of a descriptor with no listener fd=5 pid=0<0a>]
 vts: tty write 4 [exit]
--5-> Rwrite tag 4 count 4
-<-5- Twrite tag 4 fid 303 offset 78 count 1 '
-'
 vts: tty write 1 [<0a>]
--5-> Rwrite tag 4 count 1
-<-5- Tclunk tag 4 fid 303
--5-> Rclunk tag 4
-vts: shell 4294 exited: ok
-<-5- Tclunk tag 17 fid 358
--5-> Rclunk tag 17
-<-5- Tclunk tag 5 fid 331
--5-> Rclunk tag 5
-<-5- Tclunk tag 10 fid 365
--5-> Rclunk tag 10
-<-5- Tauth tag 10 afid 365 uname glenda aname 
--5-> Rerror tag 10 ename vts: authentication not required
-<-5- Tattach tag 10 fid 365 afid -1 uname glenda aname 
--5-> Rattach tag 10 qid (0000000000000000 0 d)
-<-5- Twalk tag 10 fid 365 newfid 358 nwname 2 0:1 1:ctl 
--5-> Rwalk tag 10 nwqid 2 0:(0000000000000002 0 d) 1:(0000000000000003 0 ) 
-<-5- Topen tag 10 fid 358 mode 0
-fid mode is 0
--5-> Ropen tag 10 qid (0000000000000003 0 ) iounit 0 
-<-5- Tstat tag 10 fid 358
--5-> Rstat tag 10  stat 'ctl' 'vts' 'vts' 'vts' q (0000000000000003 0 ) m 0666 at 1790261361 mt 1790261361 l 0 t 0 d 0
-<-5- Tread tag 10 fid 358 offset 0 count 32768
--5-> Rread tag 10 count 73 'session 1; size=24x80; cursor=3,4; visible=1; rc_alive=0; raw=0;'
-<-5- Tread tag 10 fid 358 offset 73 count 32768
--5-> Rread tag 10 count 0 ''
-<-5- Tclunk tag 10 fid 358
--5-> Rclunk tag 10
-<-5- Twalk tag 10 fid 365 newfid 358 nwname 2 0:1 1:ttyctl 
--5-> Rwalk tag 10 nwqid 2 0:(0000000000000002 0 d) 1:(0000000000000008 2 ) 
-<-5- Topen tag 10 fid 358 mode 0
-fid mode is 0
--5-> Ropen tag 10 qid (0000000000000008 2 ) iounit 0 
-<-5- Tstat tag 10 fid 358
--5-> Rstat tag 10  stat 'ttyctl' 'vts' 'vts' 'vts' q (0000000000000008 2 ) m 0666 at 1790261361 mt 1790261361 l 0 t 0 d 0
-<-5- Tread tag 10 fid 358 offset 0 count 32768
--5-> Rread tag 10 count 7 'rawoff
-'
-<-5- Tread tag 10 fid 358 offset 7 count 32768
--5-> Rread tag 10 count 0 ''
-<-5- Tclunk tag 10 fid 358
--5-> Rclunk tag 10
-<-5- Twalk tag 10 fid 365 newfid 358 nwname 2 0:1 1:ctl 
--5-> Rwalk tag 10 nwqid 2 0:(0000000000000002 0 d) 1:(0000000000000003 0 ) 
-<-5- Topen tag 10 fid 358 mode 0
-fid mode is 0
--5-> Ropen tag 10 qid (0000000000000003 0 ) iounit 0 
-<-5- Tstat tag 10 fid 358
--5-> Rstat tag 10  stat 'ctl' 'vts' 'vts' 'vts' q (0000000000000003 0 ) m 0666 at 1790261361 mt 1790261361 l 0 t 0 d 0
-<-5- Tread tag 10 fid 358 offset 0 count 32768
--5-> Rread tag 10 count 73 'session 1; size=24x80; cursor=3,4; visible=1; rc_alive=0; raw=0;'
-<-5- Tread tag 10 fid 358 offset 73 count 32768
--5-> Rread tag 10 count 0 ''
-<-5- Tclunk tag 10 fid 358
--5-> Rclunk tag 10
-<-5- Twalk tag 10 fid 365 newfid 358 nwname 2 0:1 1:ttyctl 
--5-> Rwalk tag 10 nwqid 2 0:(0000000000000002 0 d) 1:(0000000000000008 2 ) 
-<-5- Topen tag 10 fid 358 mode 0
-fid mode is 0
--5-> Ropen tag 10 qid (0000000000000008 2 ) iounit 0 
-<-5- Tstat tag 10 fid 358
--5-> Rstat tag 10  stat 'ttyctl' 'vts' 'vts' 'vts' q (0000000000000008 2 ) m 0666 at 1790261361 mt 1790261361 l 0 t 0 d 0
-<-5- Tread tag 10 fid 358 offset 0 count 32768
--5-> Rread tag 10 count 7 'rawoff
-'
-<-5- Tread tag 10 fid 358 offset 7 count 32768
--5-> Rread tag 10 count 0 ''
-<-5- Tclunk tag 10 fid 358
--5-> Rclunk tag 10
+vts: shell 7242 exited: ok
