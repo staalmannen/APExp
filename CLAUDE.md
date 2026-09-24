@@ -1572,21 +1572,43 @@ named limit**: the sweep only matches structs whose every member is a
 plain `char`, so it misses the three tar structs with a nested
 `struct sparse sp[N]` -- *the tool that found the bug's family cannot
 find the whole family.*
-**THE PRAGMA IS CONFIRMED: `tarblock-probe` reports PASS and 0
-disagreements**, with the `-DPLAN9` marker line saying which build it
-measured. All nine sizes now match the host -- `union block` 512,
-`posix_header` 500, `oldgnu_header` 495, `star_in_header` 512 -- and
-the block table reads 0/512/1024/1536 with `record_end` at 10240.
-**NOT YET CONFIRMED is tar itself**: the layout is right, but no
-archive has been written and read back since. `tar cf /tmp/t2.tar
-/tmp/h` then `tar tf /tmp/t2.tar`, and `tarhdr-probe` on it against
-the host reference, is what closes it. *A build that contains the
-change is not a measurement of the thing the change was for.*
-**Still open**: the ORIGINAL archive, which came from outside and
-failed differently (`This does not look like a tar archive`, `A lone
-zero block at 580`). A reader mis-striding by 8 is a plausible cause
-for that too, but it is not yet measured -- run `tar tf` on it again
-after the rebuild before calling it closed.
+**CONFIRMED END TO END, AND TAR IS CLOSED.** `tarblock-probe` reports
+PASS and 0 disagreements with its `-DPLAN9` marker; all nine sizes
+match the host and the block table reads 0/512/1024/1536 with
+`record_end` at 10240. Then the same command on the same archive,
+across the rebuild:
+
+```
+Before rebuild                     After rebuild
+$ tar cf /tmp/t2.tar /tmp/h        $ tar cf /tmp/t2.tar /tmp/h
+tar: Removing leading `/' ...      tar: Removing leading `/' ...
+$ tar tf /tmp/t2.tar               $ tar tf /tmp/t2.tar
+tar: This does not look like       tmp/h
+     a tar archive                 $
+tar: Skipping to next header
+tar: Exiting with failure status
+```
+
+**And the ORIGINAL archive extracts**: `rm -rf NetHack-5.0.0`,
+`tar xf nethack-500-src.tgz`, and the tree is back. **That was the
+last open question and it is answered -- BOTH failures were the same
+bug.** With `union block` at 520 the *reader* mis-strides exactly as
+the writer did, so a correctly-formed foreign archive walked into its
+own payload and reported `This does not look like a tar archive` /
+`A lone zero block at 580`. **I was right to refuse to assume they
+shared a cause, and the measurement is what joined them** -- the
+before/after pair is the control, since only the build changed.
+*(The before-rebuild run of `tar tf` on tar's OWN archive printed the
+foreign archive's message this time, where the earlier run printed
+`tmp/h` first: the same bug, differing only in what heap garbage the
+mis-strided blocks happened to land on. Another reason not to have
+matched them by message.)*
+**WORTH A LOOK NEXT, and not urgent**: the archivers -- bzip2, xz,
+unrar, unace, unarj, clzip -- are exactly the class of program that
+walks on-disk records with struct pointers, which is the one thing the
+padding breaks. None has been tested since. The `external/` sweep is a
+lower bound by construction (see the note), so *the way to find these
+is to run each archiver on a real archive*, not to grep.
 Detail in `docs/notes/kencc.md` and `docs/notes/libap.md`.
 
 **readline wraps at 80 columns under rio, and the mechanism is already
