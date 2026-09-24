@@ -155,6 +155,9 @@ tty_serve(Session *s, Req *r)
 		n = r->ifcall.count;
 	memmove(r->ofcall.data, s->ttyin, n);
 	r->ofcall.count = n;
+	/* What the shell is handed, against what the viewer sent above. */
+	if(dbg())
+		dbgbytes("tty read: HANDED", (uchar*)r->ofcall.data, n);
 
 	/* A terminal is a stream: the read CONSUMES what it took, and
 	 * ifcall.offset means nothing. (The viewer-facing `cons' file is
@@ -572,6 +575,18 @@ fswrite(Req *r)
 		 *   - on LINEED_PASSTHROUGH: forward raw
 		 * If editor disabled, write straight through.
 		 */
+		/*
+		 * WHAT THE VIEWER SENT. The trace has always shown what the
+		 * shell WROTE and never what it was given, so a keystroke
+		 * that goes missing could be lost in the viewer, here, in
+		 * the tty queue, or inside libap's copy process, and the log
+		 * could not tell those apart. These two lines and the one in
+		 * tty_serve below turn that into a comparison: sent, then
+		 * handed over.
+		 */
+		if(dbg())
+			dbgbytes("cons write (from viewer)",
+				(uchar*)r->ifcall.data, n);
 		if(s->editor.enabled){
 			long i;
 			for(i = 0; i < n; i++){
