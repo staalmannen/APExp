@@ -189,7 +189,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
-`copyfile-test.c`, `deeppath-test.c` and `stdio-test.c`. The twenty-five `tk-*.tcl` scripts there are Tcl, run
+`copyfile-test.c`, `deeppath-test.c`, `bufexec-test.c` and `stdio-test.c`. The twenty-five `tk-*.tcl` scripts there are Tcl, run
 with `wish` -- except `tk-menubar-test.tcl`, which needs `tktest` and
 skips itself under `wish`, and `tk-transient-test.tcl`, whose last
 section alone does; see `docs/notes/tk-plan9.md`. `tk-runall.tcl` is the harness for
@@ -617,6 +617,11 @@ the index, so that nothing here is a surprise.
   `#pragma incomplete` on the opaque types; it is read only by
   `signat()`, and completing the struct afterwards does not clear it.
   Fifteen link errors in `libvterm` were this one thing.
+- **`FD_BUFFERED`/`FD_BUFFEREDX` are facts about a PROCESS IMAGE, not
+  about a descriptor**, and `sfdinit` scrubs them on exec for the same
+  reason it scrubs `FD_ISTTY` and `FD_ISREG`. `FD_BUFFEREDX` is poison:
+  `read()` and `select()` both answer EIO for it without touching the
+  fd.
 - `/dev/snarf` is the clipboard and has no concept of ownership.
 - Plan 9 has no loopback unless `ip/ipconfig loopback /dev/null 127.1`
   has been run -- and that belongs in the machine's startup, not in
@@ -1717,6 +1722,48 @@ padding breaks. None has been tested since. The `external/` sweep is a
 lower bound by construction (see the note), so *the way to find these
 is to run each archiver on a real archive*, not to grep.
 Detail in `docs/notes/kencc.md` and `docs/notes/libap.md`.
+
+**A DESCRIPTOR ARRIVED POISONED FROM AN EXEC, and it was every APE
+program, not bash and not vts.** bash under vts printed its prompt and
+exited 0 with no read of fd 0 ever reaching the server. One
+instrumented run: `_startbuf: EIO, FD_BUFFEREDX fd=0 flags=42`, then
+`select: -> -1`. readline's `rl_getc()` guards its `read()` with
+`if (result >= 0)` on what `select()` returned, so a negative answer
+means the read never happens and readline calls it EOF.
+**The chain is ordinary**: readline `select()`s on fd 0, so libap
+buffers it (`FD_BUFFERED`); `fork()`'s child runs `_detachbuf`, which
+turns that into `FD_BUFFEREDX`, "poisoned"; and `execve` wrote the
+flags word **verbatim** into `/env/_fdinfo`, where the new image's
+`sfdinit` applied it **verbatim**. So any program started by an APE
+parent that had ever select()ed on a descriptor inherited it
+unreadable. **It only became reachable when `READLINE` was turned on**
+-- nothing here had ever asked select() about a terminal before. *A fix
+that makes a process reach code it never reached before can expose
+anything on that path*, twice now.
+Fixed in the CONSUMER (`sfdinit`), beside the existing `FD_ISTTY` and
+`FD_ISREG` scrubs, because a child cannot trust those bits whoever
+wrote them. `bufexec-test.c` is the regression test and calls
+`_fdinfomark()`, so it **will not link** against a libap predating the
+fix. **Not fixed, and recorded**: the parent's copy process is still
+alive and reading the same open file, so parent and child compete for
+keystrokes -- inherent in select() being a copy process, and its own
+round.
+**Four rounds of diagnosis and vts was innocent from the first**, which
+is the part worth keeping: `chatty9p` said no read ever arrived;
+`fd2path` said the descriptor was right; **`SHELL=/bin/rc` gave a
+prompt that stayed** and put the fault on the APE side in one command;
+then `$APEXP_DEBUG` named the flag. *Three of the four were controls
+rather than measurements of the thing itself, and each was cheaper than
+the reading it replaced.*
+**Two more found on the way, both recorded as found-not-measured**:
+`_startbuf` never checked its `_RFORK`, so a failed fork left the
+parent waiting for ever on a rendezvous with a process that did not
+exist; and `ioctl(FIONREAD)` stored `*(long*)arg` where every caller
+passes an `int *`, writing eight bytes and smashing four of the
+caller's frame.
+**Still open in vts, and it is rendering rather than plumbing**: under
+rc the prompt is right and typed characters come back partial --
+`lined` and the cell diff.
 
 **readline wraps at 80 columns under rio, and the mechanism is already
 there.** `READLINE` being on means bash redraws the line, and a long

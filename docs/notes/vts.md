@@ -695,3 +695,42 @@ created, inside `read()` or `select()`, with nothing printed.** Fixed.
 **Found while instrumenting, not measured**: bash exits rather than
 hangs, so it is not this bug. An unchecked fork whose failure mode is
 an unbreakable wait is wrong on its own terms.
+
+## It was never vts, and the trace said so twice before the answer came
+
+```
+select: enter nfds=1 t=-1
+_startbuf: EIO, FD_BUFFEREDX fd=0 flags=42
+select: -> -1, _startbuf fd=0 errno=13
+```
+
+fd 0 arrived from the exec already marked poisoned, `select()` refused
+with EIO without touching it, and readline turns any error from
+`rl_getc`'s select into end of file. **Diagnosed in libap, fixed in
+libap** -- see the `FD_BUFFEREDX` section of `docs/notes/libap.md`.
+
+**Four rounds, and vts was innocent from the first one.** Worth reading
+as a sequence, because each step removed a whole area and none of them
+needed the next guess:
+
+1. `chatty9p` -- no `Tread` on the shell's fid at all, while `ctl` and
+   `ttyctl` reads in the same log worked. *bash never asked.*
+2. `fd2path` before exec -- `fd0=fd1=fd2=/dev/cons`. *The descriptor
+   was right.*
+3. `SHELL=/bin/rc` -- an rc prompt that stays and takes typing.
+   *vts delivers input; the fault is APE-side.* One command.
+4. `$APEXP_DEBUG` in `read()` and then in `select()` -- the flag, the
+   fd and the errno, in one line.
+
+*Each of the four was cheaper than the reading it replaced, and three
+of them were controls rather than measurements of the thing itself.*
+
+The instruments stay. `$vtsdebug=1` traces the terminal, `=2` adds
+lib9p's `chatty9p` and skips vtwin, and vts passes `APEXP_DEBUG` to the
+shell so libap's own lines come back through the server into the same
+log -- both halves of the conversation, in order, in one file.
+
+**What is open in vts now is rendering, not plumbing**: under rc the
+prompt is right but typed characters come back partial, which is
+`lined` and the cell diff. That is the next question here, and it is a
+better one than the last four.

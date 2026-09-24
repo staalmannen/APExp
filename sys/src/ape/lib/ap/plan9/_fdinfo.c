@@ -153,9 +153,82 @@ sfdinit(int usedproc, char *s, char *se)
 			 * most descriptors are never read non-blocking.
 			 */
 			fi->flags &= ~(FD_REGCHECKED|FD_ISREG);
+			/*
+			 * AND THE THIRD OF THE SAME FAMILY, WHICH COST THE
+			 * MOST: FD_BUFFERED and FD_BUFFEREDX.
+			 *
+			 * They are not facts about the descriptor at all.
+			 * They say that THIS process image has a copy
+			 * process reading that descriptor into a shared
+			 * segment, and `buf' points into that segment.
+			 * _EXEC replaces the image: the segment is gone,
+			 * the pointer is meaningless, and no copy process
+			 * of ours exists. Carrying either flag across is
+			 * carrying a claim about a process that is not
+			 * here.
+			 *
+			 * FD_BUFFEREDX is the damaging one, because it is
+			 * not merely stale -- it is POISON. read() and
+			 * select() both answer EIO for it and never touch
+			 * the descriptor, so an fd that arrives with it set
+			 * can never be read again by this program.
+			 *
+			 * HOW IT GOT SET, and it is an ordinary path:
+			 * fork()'s child runs _detachbuf(), which turns
+			 * every FD_BUFFERED into FD_BUFFEREDX; that child
+			 * then execs. So ANY program started by an APE
+			 * parent that had ever select()ed on a descriptor
+			 * inherited that descriptor poisoned.
+			 *
+			 * WHAT IT COST: bash under vts printed its prompt
+			 * and exited 0 with no read of fd 0 ever reaching
+			 * the server. readline's rl_getc() guards the read
+			 * with select(), select() answered -1/EIO from
+			 * _startbuf, and readline turns any error into end
+			 * of file. The chain was apexp-sh's own bash --
+			 * readline select()s on fd 0, so fd 0 was buffered
+			 * -- forking, poisoning, and exec'ing down to the
+			 * new shell. *It was never about vts, and it is not
+			 * specific to bash*: it reaches every APE program
+			 * started from an interactive APE shell.
+			 *
+			 * It only became reachable when READLINE was turned
+			 * on in bash's config.h, because nothing before
+			 * that ever asked select() about a terminal. *A fix
+			 * that makes a process reach code it never reached
+			 * before can expose anything on that path.*
+			 *
+			 * SCRUBBED HERE, IN THE CONSUMER, and deliberately
+			 * not in execve's writer: a child cannot trust
+			 * these bits whoever wrote them, including a
+			 * $_fdinfo left by an older libap, so the place
+			 * that must not believe them is the place that
+			 * reads them.
+			 */
+			fi->flags &= ~(FD_BUFFERED|FD_BUFFEREDX);
+			fi->buf = 0;
 		}
 	}
 
+}
+
+/*
+ * Which libap is linked in. `pcc -o x x.c' relinks against the
+ * INSTALLED library, so a test built from a fresh pull can run
+ * days-old library code and say nothing -- and a test for the
+ * FD_BUFFEREDX scrub above would then PASS against a tree that
+ * still has the bug only if the old code happened to agree. Bump
+ * it when this file changes in a way a test must see.
+ *
+ * Its real value is the link error: a test that calls this will not
+ * build against a libap that predates it, so measuring the stale
+ * library by accident is impossible. That idiom has now paid four
+ * times (_sock_listenmark, _execmark, _ttymark, this).
+ */
+int
+_fdinfomark(void)
+{
+	return 1;
 }
 
 void

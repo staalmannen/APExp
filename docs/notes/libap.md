@@ -1392,3 +1392,96 @@ each member's size beside the host's answer.
 The host run of `tarblock-probe` is 0 disagreements and prints
 `REFUTED` for gcc, which is what says the probe is right rather than
 that the tree is.
+
+## A descriptor arrived POISONED from an exec, and it was every APE program
+
+**`select: -> -1, _startbuf fd=0 errno=13` after `_startbuf: EIO,
+FD_BUFFEREDX fd=0 flags=42`.** One instrumented run, after three rounds
+on vts and on bash, neither of which had anything to do with it.
+
+`0x2A` is `FD_ISOPEN | FD_BUFFEREDX | FD_ISTTY`. bash's fd 0 was marked
+**poisoned before bash had buffered anything**, and `read()` and
+`select()` both answer EIO for that flag without going near the
+descriptor.
+
+**The chain, and none of it is exotic:**
+
+- `apexp-sh` gives you an interactive bash. readline's `rl_getc()`
+  calls `select()` on fd 0 for every keystroke, and libap's `select()`
+  buffers anything it is asked to watch -- `_startbuf` forks a copy
+  process and sets **`FD_BUFFERED`**.
+- bash forks. **`fork()`'s child runs `_detachbuf()`**, which turns
+  every `FD_BUFFERED` into **`FD_BUFFEREDX`** -- correctly, for that
+  child: the shared segment is detached and the copy process belongs to
+  the parent.
+- the child execs. **`execve` writes the flags word VERBATIM into
+  `/env/_fdinfo`** (`process/execve.c`), and the new image's
+  `sfdinit()` applies it **verbatim**.
+
+So any program started by an APE parent that had ever `select()`ed on a
+descriptor inherited that descriptor **unreadable, permanently**.
+
+**It only became reachable when `READLINE` was turned on in bash's
+`config.h`**, because until then nothing in this tree ever asked
+`select()` about a terminal. *A fix that makes a process reach code it
+never reached before can expose anything on that path* -- the rule was
+already written down from the `tcsetattr` round, and this is its next
+instance.
+
+**The fix is one line of masking and it goes in the CONSUMER.**
+`sfdinit()` already scrubs `FD_ISTTY` and `FD_REGCHECKED|FD_ISREG` for
+exactly this reason, with comments about per-process staleness; the
+buffering flags are the third member of the same family and were the
+one left in. They are not facts about a descriptor at all -- they say
+*this process image has a copy process reading it into a shared
+segment*, and `_EXEC` replaces the image. `fi->buf` is cleared with
+them, being a pointer into a segment that no longer exists.
+
+Deliberately **not** masked in `execve`'s writer: a child cannot trust
+those bits whoever wrote them, including a `$_fdinfo` left by an older
+libap, so the place that must not believe them is the place that reads
+them.
+
+`sys/lib/tests/bufexec-test.c` is the regression test -- pipe on fd 0,
+`select()` to force buffering, then fork and exec itself and check that
+the child's `select()` and `read()` reach the descriptor instead of
+refusing. It calls `_fdinfomark()`, so it **will not link** against a
+libap predating the fix; measuring the stale library by accident is
+impossible. Fourth use of that idiom after `_sock_listenmark`,
+`_execmark` and `_ttymark`.
+
+### What it does NOT fix, recorded rather than assumed away
+
+The test asserts the descriptor is **usable**, not that the bytes are
+all there, and the difference is a real open problem: **the parent's
+copy process is still alive and still reading the same open file.** On
+an interactive shell that means bash's fd-0 copy process is sitting in
+`_READ` on the terminal while a child runs, and the two compete for
+keystrokes. `_detachbuf` in the forked child detaches the segment; it
+does not stop the parent's reader.
+
+That is inherent in `select()` being a copy process rather than a system
+call, and it wants its own round. Asserting delivery in the test would
+have been asserting something the design does not provide -- the
+"invent semantics to make a test pass" shape.
+
+### And an unchecked fork on the way
+
+`_startbuf` did not test `_RFORK(RFFDG|RFPROC|RFNOWAIT)`. A failure
+stored `-1` as the copy process's pid and the parent went straight to
+`_RENDEZVOUS(&b->copypid, 0)` -- waiting for a process that was never
+created, inside `read()` or `select()`, printing nothing. Fixed; found
+while instrumenting, not measured.
+
+### The other thing the reading turned up
+
+`ioctl(FIONREAD)` stored `*(long*)arg` where the argument is an `int *`
+on BSD, on Linux and in every caller here -- readline passes
+`&chars_avail`, an `int` local -- so on amd64 it wrote **eight** bytes
+and smashed the four beyond, whatever the compiler had put next in the
+caller's frame. The store succeeds and nothing complains. Fixed;
+recorded as found, not measured. Its ANSWER is still an approximation:
+`st_size` is the bytes available only for a file that has a size, so for
+a terminal, pipe or socket it says 0 always. Plan 9's `stat` on a pipe
+does report what is queued, so a real answer exists for that case and
+wants its own round.
