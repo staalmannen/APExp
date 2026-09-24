@@ -966,3 +966,97 @@ goes wrong. None has been exercised since this was found.
 grep. The `external/` sweep above is a lower bound by construction --
 it cannot see a struct with a nested struct member, which is three of
 the five tar structs that were wrong.
+
+#### Fixing it properly: a flag, not a global change, and not a bootstrap
+
+Two options were raised for getting past the `#pragma pack` workaround
+-- port the native code in this tree to APE so nothing links 9front's
+own libraries, or bootstrap in two stages, host compiler first and the
+new rule second. Both are pointed at the right problem. Neither is the
+cheapest way there, and one of them does not work.
+
+**Start with what is already NOT at risk.** `sys/src/cmd/mkfile` has
+`BIN=$APEXPROOT/$objtype/bin`, so APExp's compilers install into the
+**repo**, not the system. The machine's own `6c`, and the
+`/$objtype/lib/*.a` it built, are untouched by anything done here.
+The blast radius is not "every struct on the machine"; it is
+**whatever this tree links from the host**, and that is a short list:
+
+```
+cmd2/vts/mkfile     /$objtype/lib/lib9p.a  libthread.a  libc.a
+cmd2/vtwin/mkfile   /$objtype/lib/libdraw.a  libthread.a  libc.a
+```
+
+**Porting those to APE is a rewrite, not a port.** `sys/src/ape/lib`
+has `draw`, but **no `9p` and no `thread`** -- and vts *is* a 9P server
+built on libthread. Reimplementing lib9p and libthread on APE to avoid
+a struct-padding rule is a much larger project than the rule.
+
+**And the two-stage bootstrap does not close the gap.** Stage two's
+compiler would be *built* with the new rule and still *link* the host's
+`libc.a`, which was built with the old one. The canonical example is
+`Lock`: a struct of one `int` is 4 bytes naturally and **8 under the
+current rule**, and it is embedded in `QLock`, `Ref` and `Rendez` --
+so the layout of libc's own locks moves. Stage two would have to
+rebuild the whole native world from source, and this tree does not
+vendor 9front's libc. *(`Lock`'s definition is recalled rather than
+read: `/sys/include/libc.h` is the host's and is not in this tree. It
+is the first thing to check, not to believe.)*
+
+#### What would work: `-P` in APE's CFLAGS
+
+APE is **already a separate ABI** -- its own libc, its own headers, its
+own include path. Making the struct rule part of that difference is
+coherent rather than a hack, and it removes the bootstrap question
+entirely:
+
+- APE code gets conforming layout. Everything it links -- `libap.a` and
+  every library under `sys/src/ape/lib` -- is built in this tree, so it
+  is self-consistent by construction.
+- Native code (`cmd2`, `sys/src/lib`) keeps the 9front ABI and goes on
+  linking the host's libraries.
+- **The compilers themselves are native, so they are unaffected.** No
+  stage one, no stage two.
+
+**The flag is free to add.** `cc/lex.c`'s `ARGBEGIN` has a `default:`
+arm that does `debug[c]++` for any letter it does not know, so `-P`
+needs no parsing at all; `sys/src/ape/config`'s `CFLAGS` is where it
+goes. `#pragma pack` keeps working on top, since `pragpack` sets
+`packflg` and that is checked separately.
+
+#### But it is not flipping a constant, and that is the thing to know first
+
+**kencc has no notion of a type's alignment.** `struct Type` in
+`cc/cc.h` carries `width`, `offset` and `alignas_req` -- and no natural
+alignment. That is *why* `align()` reaches for `SZ_VLONG`: there is
+nothing else to reach for.
+
+So a conforming rule means adding one: track the maximum member
+alignment in `sualign()` (`cc/dcl.c`), store it on the `Type`, and have
+`align()`'s `Asu2` and `Ael1` use it. That is the type system rather
+than a backend tweak -- roughly forty lines in `cc/` plus one line in
+each of the eight `[1-9]c/swt.c`. Worth doing; worth knowing the size
+of before starting.
+
+#### Measure before deciding, and the tool is already in the mkfiles
+
+`cc -a` emits acid type definitions with sizes -- it is what `mkone`'s
+`%.acid` rule uses. Build the flagged compiler, run old and new over
+the APE headers and libap's sources, and diff. That names **every
+struct whose layout moves inside APE**, which is the set that actually
+has to be reasoned about, and it is far smaller than "every struct".
+
+**One hazard this sharpens**, already in CLAUDE.md for a different
+reason: `/$objtype/include/ape` and `/$objtype/lib/ape/libap.a` are the
+host's stock APE unless `apexp-sh`'s union mount is up. Building
+outside it already picks the wrong *headers* -- the FLT_MAX round cost
+three passes to that. With a conforming compiler it would pick the
+wrong **ABI** as well, and the failure would be silent rather than a
+wrong constant.
+
+**Recommendation: the flag, and as its own round -- after the archiver
+sweep.** If bzip2, xz, unrar, unace, unarj and clzip all come back
+clean, `#pragma pack` at the two or three places that model bytes is
+the whole of what this costs in practice, and the type-system change
+buys conformance rather than a bug fix. If they do not, the flag is
+already justified and the sweep has named the callers to check.

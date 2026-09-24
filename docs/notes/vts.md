@@ -140,3 +140,71 @@ a build that does not contain the change measures nothing* -- one step
 earlier, at the source rather than the binary. Re-read the hunks
 before pushing, and grep for each new identifier's **declaration** as
 well as its uses.
+
+## Running it: `./vts-bash`, from inside `apexp-sh`
+
+`vts-bash` at the repo root starts vts and a vtwin window. **It must be
+run from inside `apexp-sh`**, and that is the mechanism rather than a
+convenience -- three things `apexp-sh` does are load-bearing:
+
+```
+bind -b $cputype/bin /bin        vts, vtwin, vts-attach get on the path
+bind -b $cputype/bin/ape /bin    bash gets on the path
+SHELL=bash                       what vts reads to know what to exec
+```
+
+vts forks the shell with `RFNAMEG|RFENVG`, **both of which copy**, so
+the shell inherits that namespace and that environment. Started from a
+plain `rc`, none of the three is true and vts falls back to `/bin/rc`
+having found no bash.
+
+Every check in the script is there because its failure is silent or
+reads as something else -- a second vts posting over the first looks
+exactly like the new one dying; `vtwin` started before `/srv/vts`
+exists looks like a vtwin bug. Two Plan 9 idioms it gets right that are
+easy to get wrong: **`sleep` takes whole seconds**, so `sleep 0.1` is a
+spin, and **`kill` PRINTS the commands** for piping into a shell rather
+than doing anything, so the note is written directly.
+
+### `lined` is left ON at spawn, and the shell turns it off
+
+`session_spawn_rc` deliberately does **not** force raw mode. The shell
+does it by writing `rawon` to `ttyctl`, which is what readline's
+`tcsetattr` already sends through libap. Two reasons, and the second
+decides it:
+
+- **rc does not echo and does not cook.** 9front's rc expects a console
+  driver to do both, so a session running rc with `lined` off shows
+  nothing of what you type -- a regression for every session that is
+  not bash.
+- **The failure mode.** If bash never reaches `tcsetattr` -- wrong
+  shell, a build without `READLINE`, `isatty` answering no for a reason
+  not yet found -- then with `lined` on there is still a usable cooked
+  shell, and with it off there is a window swallowing keystrokes in
+  silence. *Choose the default whose failure is legible.*
+
+readline preps and unpreps the terminal around **every line**, so
+`lined` flips back on between commands. Harmless: nothing is typed
+while a command runs, and type-ahead merely gets cooked rather than
+passed through.
+
+### What to read if the window comes up blank
+
+vts talks to fd 2 about every step, and the script leaves that pointed
+at the window it was launched from rather than `/dev/null`. The child's
+own failures print there too, because it closes descriptors 3 and up
+*before* mounting and only dups `/dev/cons` over 0/1/2 at the end --
+so `open /srv/vts`, `mount /mnt`, `bind ... /dev/cons` and
+`open /dev/cons` all report to the launching window. Only the `exec`
+failure lands in the session's own grid, where vtwin shows it.
+
+**The first question to ask of a session that runs but does not
+complete**, in order:
+
+1. `cat /n/vts/1/ttyctl` -- `rawon` means the shell reached
+   `tcsetattr`, so `isatty(0)` was true and readline started. `rawoff`
+   means it did not, and the bind is the thing to doubt.
+2. `echo $TERM` in the session -- `vt100`, not `dumb`.
+3. `echo $COLUMNS` -- 80 today, because `srv.c` still hardcodes
+   `session_init(s, name, 24, 80)`. Correct, but not yet true of the
+   window.
