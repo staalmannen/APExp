@@ -1792,9 +1792,23 @@ parent waiting for ever on a rendezvous with a process that did not
 exist; and `ioctl(FIONREAD)` stored `*(long*)arg` where every caller
 passes an `int *`, writing eight bytes and smashing four of the
 caller's frame.
-**Still open in vts, and it is rendering rather than plumbing**: under
-rc the prompt is right and typed characters come back partial --
-`lined` and the cell diff.
+**AND THE SESSION NOW WORKS**: `tty read: blocked (1 waiting)`,
+`read: enter fd=0 n=1`, `-> buffered n=1`, then `tty write 1 [c]` --
+bash waits for a keystroke, gets it and echoes it, with `flags=38`
+(`FD_ISOPEN|FD_BUFFERED|FD_ISTTY`) where the failing run had `0x2A`.
+**The diagonal text on screen was the INSTRUMENT, for the third
+time**: `_apdbg` ended lines with `
+` and no ``, and since
+`tcsetattr` started working fd 2 is a RAW terminal, where `
+` keeps
+its column -- a staircase that looked exactly like a VT bug. It writes
+`
+` now. Two noise fixes with it: `$APEXP_DEBUG` reaches the shell
+only at `$vtsdebug=2` (its lines land on the session's own SCREEN,
+where vts's own trace goes to a log file), and `close of a descriptor
+with no listener` -- which fired on every close in every program and
+said nothing -- is under `$APEXP_LISTENDEBUG` alone. *An instrument
+sized for a dead shell is the wrong size for a live one.*
 
 **readline wraps at 80 columns under rio, and the mechanism is already
 there.** `READLINE` being on means bash redraws the line, and a long

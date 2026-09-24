@@ -268,17 +268,26 @@ session_spawn_rc(Session *s)
 			putenv("vts", s->name);
 
 			/*
-			 * Carry $APEXP_DEBUG through to the shell when vts
-			 * is being traced. libap's _apdbg() reads it, and
-			 * its lines go to fd 2 -- which is this terminal, so
-			 * they travel back through the server and land in
-			 * vts's own log beside the 9P trace. The two halves
-			 * of the conversation in one file, in order.
+			 * Carry $APEXP_DEBUG through to the shell, but only
+			 * at $vtsdebug=2 AND UP.
+			 *
+			 * libap's _apdbg() writes to fd 2, which here is the
+			 * session's own terminal -- so its lines are both
+			 * rendered on the screen the user is typing at and
+			 * logged by vts as tty writes. That was the right
+			 * trade while the shell was dying before its first
+			 * read; it is the wrong one now that the shell
+			 * works, because three lines per keystroke bury the
+			 * session in its own diagnostics.
+			 *
+			 * Level 1 keeps vts's own view -- reads blocked,
+			 * reads served, every write -- which goes to vts's
+			 * fd 2, a LOG FILE, and never touches the screen.
 			 */
 			{
 				char *dbg = getenv("vtsdebug");
 
-				if(dbg != nil && *dbg != '\0')
+				if(dbg != nil && atoi(dbg) >= 2)
 					putenv("APEXP_DEBUG", "1");
 				free(dbg);
 			}

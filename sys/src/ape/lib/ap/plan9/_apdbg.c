@@ -98,6 +98,25 @@ _apdbg(const char *msg, const char *l1, int v1, const char *l2, int v2)
 		p = putstr(p, e, "=");
 		p = putnum(p, e, v2);
 	}
+	/*
+	 * CR AND THEN LF, and the CR is not decoration.
+	 *
+	 * This writes to fd 2, and since tcsetattr started working
+	 * (plan9/tty.c) fd 2 is often a terminal in RAW mode -- where
+	 * `\n' is a pure line feed and the cursor stays in the column it
+	 * was in. Every line then starts one further right than the last,
+	 * and the output marches diagonally off the screen. Measured
+	 * under vts, where the debug lines were unreadable for exactly
+	 * this reason and looked like a terminal-emulator bug.
+	 *
+	 * Harmless everywhere else: a cooked terminal drops the CR, and a
+	 * log file gains one byte per line.
+	 *
+	 * *A debug line that cannot be read is not a debug line*, and the
+	 * fix that made raw mode real is what made this reachable -- the
+	 * same rule, a third time.
+	 */
+	*p++ = '\r';
 	*p++ = '\n';
 	write(2, buf, p - buf);
 }

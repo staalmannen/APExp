@@ -143,6 +143,17 @@ _sock_setlisten(int fd, int pid)
 	dbg("recorded a listener", fd, pid);
 }
 
+/* Cached: this is on the path of every close() in every program. */
+static int
+listendbg(void)
+{
+	static int on = -1;
+
+	if(on < 0)
+		on = getenv("APEXP_LISTENDEBUG") != 0;
+	return on;
+}
+
 void
 _sock_killlisten(int fd)
 {
@@ -152,7 +163,18 @@ _sock_killlisten(int fd)
 	if(fd < 0 || fd >= OPEN_MAX)
 		return;
 	if((pid = lproc[fd].pid) <= 0){
-		dbg("close of a descriptor with no listener", fd, 0);
+		/*
+		 * NOT under the general $APEXP_DEBUG: every close of every
+		 * descriptor in every program comes through here, and
+		 * almost none of them has a listener, so this one line
+		 * drowned the read() and select() traces it was sitting
+		 * beside -- three lines of noise per useful line under vts.
+		 * It is kept for $APEXP_LISTENDEBUG, whose whole subject
+		 * is this table, and where "nothing was recorded for this
+		 * fd" is a real answer.
+		 */
+		if(listendbg() != 0)
+			dbg("close of a descriptor with no listener", fd, 0);
 		return;
 	}
 	/*

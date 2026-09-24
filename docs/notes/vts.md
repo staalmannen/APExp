@@ -734,3 +734,64 @@ log -- both halves of the conversation, in order, in one file.
 prompt is right but typed characters come back partial, which is
 `lined` and the cell diff. That is the next question here, and it is a
 better one than the last four.
+
+## bash READS, BLOCKS AND ECHOES: the session works
+
+```
+vts: tty write 2 [$ ]
+vts: tty read: blocked (1 waiting)          <- waiting for a keystroke
+select: buffered now fd=0 flags=38
+read: enter fd=0 n=1
+read:  fdinfo flags=38 oflags=0
+read:  -> buffered n=1 errno=0
+vts: tty write 1 [c]                        <- and echoes it
+```
+
+**`flags=38` is `0x26` = `FD_ISOPEN|FD_BUFFERED|FD_ISTTY`** -- buffered
+and **not** poisoned, where the failing run showed `0x2A` with
+`FD_BUFFEREDX` set. The whole chain works: `select()` buffers fd 0,
+`read()` takes the buffered path, the shell blocks on `tty read`, vts
+serves the keystroke, bash echoes it. **Four rounds of diagnosis and
+the fix was one line in `sfdinit`.**
+
+`vts: tty read: blocked (1 waiting)` is the line that never appeared
+before and is the one that matters: *the shell is waiting for input
+rather than deciding it has none.*
+
+### The diagonal text was the instrument, for the third time
+
+Typing produced text marching diagonally down and right across the
+screen. That is not vts and not the VT parser -- it is `_apdbg()`
+ending every line with `\n` and no `\r`.
+
+**Since `tcsetattr` started working, fd 2 is often a terminal in RAW
+mode**, where `\n` is a pure line feed and the cursor keeps its
+column. Each line therefore starts one further right than the last.
+Classic staircase, and it looked exactly like a terminal-emulator bug.
+
+`_apdbg` now writes `\r\n`. Harmless elsewhere: a cooked terminal
+drops the CR and a log file gains a byte per line. *A debug line that
+cannot be read is not a debug line* -- and **the rule that keeps
+firing is `a fix that makes a process reach code it never reached
+before can expose anything on that path`**: raw mode becoming real is
+what made this visible, the third thing that fix has surfaced.
+
+Two more noise fixes, because the useful lines were being drowned:
+
+- **`$APEXP_DEBUG` now reaches the shell only at `$vtsdebug=2`.**
+  libap's lines go to fd 2, which under vts is *the session's own
+  screen*, so three lines per keystroke bury the session in its own
+  diagnostics. Level 1 keeps vts's view -- blocked, served, every
+  write -- which goes to vts's fd 2, a **log file**, and never touches
+  the screen. The old behaviour was right while the shell was dying
+  before its first read and is wrong now that it works.
+- **`close of a descriptor with no listener` was printing on EVERY
+  close in every program**, under the general `$APEXP_DEBUG`, and
+  almost no descriptor has a listener -- so it said nothing and
+  drowned the `read()` and `select()` traces beside it. It is now
+  under `$APEXP_LISTENDEBUG` alone, whose subject is that table and
+  where "nothing recorded for this fd" is a real answer. Cached,
+  because `close()` is on everyone's hot path.
+
+*An instrument sized for a dead shell is the wrong size for a live
+one.* Worth remembering when the next one goes in.
