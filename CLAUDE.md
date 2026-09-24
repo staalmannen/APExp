@@ -185,7 +185,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `execve-env-test.c`, `tz-test.c`, `rename-test.c`, `listenleak-test.c`,
 `asyncconnect-test.c`, `nbread-test.c`, `epipe-test.c`,
 `ldexp-test.c`, `binfloat-test.c`, `rawmode-test.c`,
-`execfail-test.c`, `append-test.c`,
+`execfail-test.c`, `append-test.c`, `strerror-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
@@ -1359,32 +1359,63 @@ never set. Ask it on the smallest case: whether `tar` can read an
 archive **it wrote itself** separates "tar's read path is broken" from
 "this archive is unusual", and `ratrace` on that says which call
 returns what.
-**THAT QUESTION IS STILL UNANSWERED, because `tar cf` never finished
-writing one**: `tar cf /tmp/t.tar /tmp/h` dies with
-`tar 2288: suicide: bad address in notify`. **A SECOND BUG, and it is
-not assumed to share a cause with the read failure** -- one is `tf`
-giving a wrong answer, the other is `cf` crashing.
-**The 270-line ratrace is ordinary to its last line and every call in
-it SUCCEEDS**, ending at `Stat "/tmp/h" = 68`. So the fault is in user
-code after that call returned, and ratrace traces syscalls -- **note
-delivery is not one**, which is why the trace names nothing.
-**`suicide: bad address in notify` is a second failure standing on a
-first**: the kernel only enters `notify()` because a note was already
-posted, and the suicide message REPLACES the note text
-(`sys: trap: fault ... pc=...`) that would name the fault.
-**So the next run is `nohandle=1 tar cf /tmp/t.tar /tmp/h`.**
-`_envsetup.c:151` skips `_NOTIFY(_notehandler)` when `/env` holds a
-variable called `nohandle`, and with no handler the kernel prints the
-note itself. Beside it, `nm` for the handler address the trace shows
-(`0x292f63`), and `ps | grep tar` in case a **Broken** tar is sitting
-in `/proc` -- `acid <pid>`, `lstk()` beats both.
-**One hypothesis, with half of it already excluded**: both symptoms sit
-at tar's first touch of its record buffer, and the shared allocator is
-`page_aligned_alloc`. But `getpagesize()` is APE's and returns 4096
-with a prototype in scope (`$GTARSRC/gnu` is off the include path), so
-the obvious NULL-from-zero-alignment route is shut and the hypothesis
-has no mechanism behind it yet. A shape, not a diagnosis. Detail in
-`docs/notes/libap.md`.
+**THE `tar cf` CRASH IS SOLVED, AND IT WAS NEVER TAR'S: gnulib's
+`strerror` CALLED ITSELF FOR EVER.** `nohandle=1` named it in one run
+and `acid` on the Broken process finished it:
+
+```
+tar 2459: suicide: sys: trap: fault write addr=0x7ffffeffefc8 pc=0x247ba3
+strerror(n=0x14)+0x1e  .../external/gnulib/strerror.c:56   (x N)
+```
+
+`strerror.c:52` is `msg = strerror (n);` and is *meant* to be the
+system's; gnulib arranges that with one macro in its **generated**
+`string.h` (`#define strerror rpl_strerror`), so the definition defines
+`rpl_strerror` and the `#undef` between declarator and body makes the
+inner call reach the real one. **Nothing generates those headers here**
+-- `sys/src/external/gnulib` has `string.in.h` and no `string.h` -- so
+`<string.h>` was APE's, the function defined the plain name, and line
+52 was a call to itself. Legal C, no warning. `n=0x14` is ENOENT.
+**And it was every GNU program in the tree**: `strerror.$O` was in
+`libgnu.a`, which every GNU package links, and `error(0, errno, ...)`
+is how all of them report a failed system call -- so tar, sed, awk,
+grep, m4, gettext, diff, patch and bison each died with a stack fault
+instead of a message, reading as a different bug every time.
+**No link error said so, and the reason is worth keeping**: the
+archive's own README rule 1 is *never add a module libap already
+provides*, and libap provides `strerror` -- but libap's is an archive
+MEMBER THE LINKER NEVER HAD A REASON TO PULL, since gnulib's satisfied
+the symbol first. *A module libap already provides is a problem whether
+or not `ar` says so.* Fixed by one line out of OFILES; libap's has an
+`EPLAN9` arm that returns Plan 9's own `errstr`, so this improves
+diagnostics rather than costing anything.
+**`nm` for the handler address was the WRONG QUESTION and is closed.**
+The faulting address is ~16MB below the stack top: tar had run out of
+stack, so the kernel could not push the note frame, which is exactly
+what `bad address in notify` means. **A crash whose own message is
+about the crash-reporting machinery is reporting the SECOND failure**
+-- take the machinery out (`nohandle`) rather than investigate it.
+**The sweep matters more than the instance**: the idiom (a definition
+of NAME followed by `#undef NAME`) is in **34 places across 24 files**
+in the gnulib tree and **exactly one, `strerror.c`, was in OFILES**.
+The command is README rule 6 so it can be repeated when OFILES grows --
+the next module added could be `fcntl`, `readdir`, `access` or `raise`.
+**`strerror-test.c` must be linked against `libgnu.a`** or it passes
+against the broken tree and proves nothing; the command is in the file.
+**Predict**: after a full `mk distclean; mk install` (libgnu.a changing
+has to reach every GNU binary already linked) `tar cf` completes and
+`strerror-test` reports 0 failures. **Refuted if `tar cf` still
+faults.** **And the third outcome is the useful one**: if `tar cf`
+works but `tar tf` on the archive it just wrote still says `does not
+look like a tar archive`, the read bug is confirmed independent -- the
+question the last two rounds could not reach, because tar never
+finished writing an archive.
+**The `tar tf` bug is STILL OPEN and is still separate.** Its messages
+come from `error(0, 0, ...)` -- errnum zero, so `strerror` is never
+reached. Consistent with this finding, unified by nothing.
+*(The `page_aligned_alloc` hypothesis is withdrawn: `getpagesize()` is
+APE's, has a prototype in scope and returns 4096.)*
+Detail in `docs/notes/libap.md` and `sys/src/ape/cmd/gnulib/README`.
 
 **Fixed this round**: `NAME_MAX` was 27 and `PATH_MAX` 1023, set in
 `sys/include/ape/sys/limits.h`, which `<limits.h>` includes at its very

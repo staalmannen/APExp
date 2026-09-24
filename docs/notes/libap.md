@@ -988,46 +988,132 @@ Two facts fall out of this that are worth keeping:
   reason about the kernel's exact test from memory — 9front's source is
   not in this tree and was not reachable from here.
 
-#### The two probes, in order
-
-Both are cheap and neither needs a rebuild.
+#### The two probes, in order — and the first one answered in one run
 
 1. **`nohandle=1 tar cf /tmp/t.tar /tmp/h`.** `_envsetup` scans `/env`
    and skips `_NOTIFY(_notehandler)` entirely when it finds a variable
    named `nohandle` (the value is not read). With no handler installed
-   the kernel takes the default action and **prints the note itself**,
-   so the real message — trap kind, faulting address and PC — reaches
-   the screen instead of being swallowed by the suicide path. This is
-   the run that names the bug.
-2. **`nm` on the binary, for the handler address.**
+   the kernel takes the default action and **prints the note itself**.
+   It did:
 
    ```
-   nm `which tar` | grep -i 'notehandler|notetramp'
+   tar 2459: suicide: sys: trap: fault write addr=0x7ffffeffefc8 pc=0x247ba3
    ```
 
-   If `_notehandler` is `0x292f63`, registration is doing what it
-   means to and the fault is elsewhere. If it is not, the finding is
-   much larger than tar.
+2. **`acid` on a Broken process.** All three dead tars were still in
+   `/proc` — `pexit` keeps the image — and `lstk()` printed one frame
+   over and over:
 
-And if the kernel left a **Broken** tar in `/proc` — `ps | grep tar`
-will show it — `acid <pid>` and `lstk()` give the faulting frame
-outright, which is better than either.
+   ```
+   strerror(n=0x14)+0x19  .../external/gnulib/strerror.c:52
+   strerror(n=0x14)+0x1e  .../external/gnulib/strerror.c:56
+   strerror(n=0x14)+0x1e  .../external/gnulib/strerror.c:56
+   ...
+   ```
 
-#### One hypothesis, recorded so the probe can refute it
+**`nm` for the handler address was the wrong question and is closed.**
+The faulting address is `0x7ffffeffefc8`, about 16MB below the top of
+the stack: tar had *run out of stack*. So `suicide: bad address in
+notify` was never about the handler at all — the kernel could not push
+the note frame onto an exhausted stack, which is precisely what that
+message is for. **A crash whose own error message is about the crash
+reporting machinery is reporting the second failure, not the first**,
+and the way past it is to take the machinery out (`nohandle`) rather
+than to investigate it.
 
-Both tar symptoms sit at tar's first touch of its record buffer: `tf`
-reads into it and gets nothing, `cf` writes the header into it and
-faults. The one allocator they share is `page_aligned_alloc`
-(`gtar/src/misc.c:1229`, called from `buffer.c:657`), so a bad
-`record_start` would explain both with one cause.
+#### gnulib's `strerror` called itself, and it was every GNU program
 
-**Half of it is already excluded.** `page_aligned_alloc` takes its
-alignment from `getpagesize()`, and the obvious failure — a zero
-alignment making `ptr_align` return NULL — does not happen here:
-`HAVE_GETPAGESIZE` is undef in tar's `config.h` and gnulib's
-`getpagesize.c` compiles to nothing outside Windows, but
-`$GTARSRC/gnu` is deliberately off tar's include path (see the mkfile),
-so `<unistd.h>` is APE's, which declares `getpagesize` and whose
-`sysconf(_SC_PAGESIZE)` returns a plain 4096. Prototype in scope,
-right answer. So this hypothesis currently has no mechanism behind it
-and is a shape, not a diagnosis — which is exactly what probe 1 is for.
+`strerror.c:52` is `msg = strerror (n);`, and it is *meant* to be the
+system's. gnulib arranges that with one macro in its **generated**
+`string.h` — `#define strerror rpl_strerror` — so that
+
+```c
+char *
+strerror (int n)
+#undef strerror
+{
+  ...
+  msg = strerror (n);
+```
+
+defines `rpl_strerror`, and the `#undef` between the declarator and the
+body makes the inner call reach the real one. **The whole mechanism is
+that macro.**
+
+**Nothing generates those headers here.** `sys/src/external/gnulib`
+holds `string.in.h` and no `string.h`, so `<string.h>` was APE's, the
+macro did not exist, the function defined the plain `strerror`, and
+line 52 was a call to itself. No warning: it is a legal recursive call.
+
+`n=0x14` is **20, ENOENT** in APE's `errno.h`. tar reached an ENOENT,
+called `error (0, errno, ...)`, and `error.c:203` reached `strerror`.
+
+**It was never tar's, and it was never one program.** `strerror.$O` was
+in `libgnu.a`, which is on the link line of every GNU package in this
+tree — tar, sed, awk, grep, m4, gettext, diff, patch, bison — and
+`error (0, errno, ...)` is gnulib's standard way for all of them to
+report a failed system call. **Every one of them died on its first
+one**, and died with a stack fault rather than a message, which is why
+it read as a different bug each time it was met.
+
+#### Why no link error said so
+
+`sys/src/ape/cmd/gnulib/README` rule 1 has always been *never add a
+module that libap already provides*, and libap provides `strerror`
+(`string/strerror.c`, complete, and with an `EPLAN9` arm that returns
+Plan 9's own `errstr` — so dropping gnulib's **improves** diagnostics
+rather than costing anything). The reason that rule did not fire is
+worth keeping: **libap's is an archive member the linker never had a
+reason to pull.** gnulib's definition satisfied the symbol first, so
+`ar` saw no duplicate and the link was clean. *A module libap already
+provides is a problem whether or not the linker says so.*
+
+The fix is one line out of OFILES. `strerror-override.$O` stays: it is
+now unreferenced, but it is the companion of `strerror_r.c`, which is
+how gnulib's `strerror_r` would be supplied if a package ever wants it.
+
+#### The sweep, because one instance of a mechanism is never the question
+
+The idiom is a definition of NAME immediately followed by `#undef NAME`.
+Across `sys/src/external/gnulib` it appears in **34 places in 24
+files**; **exactly one of them, `strerror.c`, was in OFILES.** The
+command is in the README's rule 6 so the check can be repeated when
+OFILES grows — which is the point, since the next module added could
+be `fcntl`, `readdir`, `access` or `raise` and would fail the same
+silent way.
+
+#### `strerror-test.c`, and why the usual build command would have passed
+
+`sys/lib/tests/strerror-test.c` reproduces it, and it **must be linked
+against `libgnu.a`**:
+
+```
+pcc -o strerror-test strerror-test.c $home/APExp/$objtype/lib/ape/libgnu.a
+```
+
+A test built the ordinary way links `libap.a` alone and would have
+passed against the broken tree, proving nothing — *reproduce the call
+the failing code makes, not the outcome it wants*. Section 1 either
+returns or kills the process, so there is no failing answer it can
+print; every section therefore flushes a marker **before** the call, and
+the last line on the screen names the call that did not come back. It
+passes on glibc, which says the test is right rather than that the tree
+is.
+
+#### What this does not explain
+
+**`tar tf` is still open and is still a separate bug.** That one
+returns a wrong answer (`This does not look like a tar archive`, first
+read yields no block) rather than crashing, and its messages come out
+of `error (0, 0, ...)` — errnum zero, so `strerror` is never reached.
+Consistent with this finding, unified by nothing. Do not assume.
+
+**Prediction**: after `mk distclean; mk install` — a full one, because
+`libgnu.a` changing has to reach every GNU binary already linked
+against it — `tar cf /tmp/t.tar /tmp/h` completes silently apart from
+the "Removing leading /" note, and `strerror-test` reports 0 failures.
+**Refuted if** `tar cf` still faults. **And the useful third outcome**:
+if `tar cf` works but `tar tf` on the archive it just wrote still says
+`does not look like a tar archive`, the read bug is confirmed
+independent of this one — which is the question the last two rounds
+could not reach because tar never finished writing an archive.
