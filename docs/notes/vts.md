@@ -123,3 +123,20 @@ window instead of namespace-wide. The two steps are one edit.
 flushes whole LINES to the shell. That is the opposite of what bash's
 completion needs -- it wants every keystroke as it happens -- so the
 session must run with `edit off`.
+
+## vts cannot be syntax-checked on the host, so read the diff twice
+
+The gcc sweep in `docs/notes/tk-plan9.md` does not reach here: vts is
+native Plan 9 and needs `<9p.h>`, `<thread.h>` and `<libc.h>`, none of
+which this tree vendors. **Every vts change is VM-only**, so a typo
+costs a full round trip where a Tcl or libap change would not.
+
+The first build of the tty change proved it, and the way it failed is
+worth the line: two `enum` members were missing, because the script
+that added them asserted on a *later* edit in the same pass and wrote
+nothing. **The file was pushed in a state I believed I had edited.**
+That is the same shape as this tree's oldest rule -- *a measurement of
+a build that does not contain the change measures nothing* -- one step
+earlier, at the source rather than the binary. Re-read the hunks
+before pushing, and grep for each new identifier's **declaration** as
+well as its uses.
