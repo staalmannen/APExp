@@ -53,19 +53,42 @@
  * mean kencc is padding one of them -- which would shift every block
  * after the first and is a compiler question, not a tar one.
  *
- * WHAT EACH ANSWER MEANS, written down before the run:
+ * IT CAME BACK 520, AND SEVEN OF THE NINE SIZES DISAGREED WITH THE
+ * HOST -- so this file is now a regression check rather than an open
+ * question. The cause is in 6c, not in tar:
  *
- *   520 (or anything but 512): CONFIRMED. The union is the bug, the
- *       member this prints as oversized is the one to look at, and
- *       every archive this tar has ever written is malformed the same
- *       way. It would also explain the second symptom, since the
- *       zero-fill in dump_regular_file and write_eot are computed in
- *       BLOCKSIZE units while the pointers step in sizeof(union block).
+ *	                       kencc   gcc
+ *	sizeof(posix_header)     504   500
+ *	sizeof(star_header)      504   500
+ *	sizeof(oldgnu_header)    504   495
+ *	sizeof(sparse_header)    512   505
+ *	sizeof(star_in_header)   520   512
+ *	sizeof(star_ext_header)  512   505
+ *	sizeof(union block)      520   512
+ *	sizeof(struct sparse)     24    24   <- the one that agrees
  *
- *   512: REFUTED, and that is worth as much. The union is innocent,
- *       the 8-byte shift is in the copy loop or in what read() does
- *       with the buffer it is handed, and the next probe belongs
- *       there instead. Do not go on believing the union.
+ * `sys/src/cmd/6c/swt.c', align():
+ *
+ *	case Asu2:	/* padding at end of a struct *[/]
+ *		w = SZ_VLONG;			/* 8 on amd64 *[/]
+ *		if(packflg) w = packflg;
+ *
+ *	case Ael1:	/* initial align of struct element *[/]
+ *		w = ewidth[v->etype];
+ *		if(w <= 0 || w >= SZ_VLONG) w = SZ_VLONG;
+ *		if(packflg) w = packflg;
+ *
+ * So the end of EVERY struct is rounded to 8 regardless of what its
+ * members need, and a nested struct member is aligned to 8 as well.
+ * Both numbers above fall out of those two lines exactly -- oldgnu's
+ * 495 -> 504 is its `struct sparse sp[4]' pushed from 386 to 392 and
+ * then the tail rounded; star_in_header's 512 -> 520 is the same thing
+ * followed by a round that had nowhere to go but the next multiple.
+ * `struct sparse' is 24 already, which is why it alone agrees -- and
+ * why a smaller sample would have missed this.
+ *
+ * FIXED by `#pragma pack on' around tar.h's on-disk structs, which is
+ * the `packflg' override both cases read. See the note in tar.h.
  *
  * The second symptom -- blocks 2 and 3 holding `b6 01 00 00 cd 98 b4
  * 6a' and the like -- is NOT explained yet either way, and is recorded
@@ -157,20 +180,29 @@ main(void)
 	printf("  record_end (blocking_factor 20) at %ld   (must be 10240)\n",
 		20 * b);
 
+	/*
+	 * THE MARKER. Built without -DPLAN9 the pragma in tar.h is not
+	 * compiled at all, so this would report 520 and read exactly
+	 * like the bug coming back -- when the only thing wrong was the
+	 * command. Say which build this is before saying anything else.
+	 */
 	printf("\n");
-	if(b != BLOCKSIZE){
-		printf("CONFIRMED: union block is %ld, not %d.\n", b, BLOCKSIZE);
-		printf("The member marked DIFFERENT above is the one padded.\n");
-		printf("Every block after the first is %ld bytes late, which is\n",
-			b - BLOCKSIZE);
-		printf("exactly the shift tarhdr-probe measured in the archive.\n");
-	}else{
-		printf("REFUTED: union block is %d, so it is NOT the cause.\n",
-			BLOCKSIZE);
-		printf("The 8-byte shift comes from somewhere else -- the copy\n");
-		printf("loop in create.c, or what read() does with the buffer\n");
-		printf("it is handed. Stop believing the union and probe there.\n");
+#ifdef PLAN9
+	printf("built WITH -DPLAN9, so tar.h's `#pragma pack on' is in.\n");
+	if(b == BLOCKSIZE && disagreements == 0)
+		printf("PASS: every size matches the host. The pragma works.\n");
+	else {
+		printf("FAIL: union block is %ld, want %d.\n", b, BLOCKSIZE);
+		printf("The pragma is present but did not take -- check that\n");
+		printf("this cc still reads packflg in 6c/swt.c's align().\n");
 	}
+#else
+	printf("built WITHOUT -DPLAN9, so tar.h's pragma was skipped.\n");
+	printf("On kencc this MUST report 520 and seven disagreements;\n");
+	printf("that is the unfixed layout, not a regression. On gcc it\n");
+	printf("reports 512 and none, because gcc was never wrong here.\n");
+	printf("Rebuild with -DPLAN9 to measure the shipping tar.\n");
+#endif
 	printf("\n%d disagreement%s with the host\n",
 		disagreements, disagreements == 1 ? "" : "s");
 	return disagreements;
