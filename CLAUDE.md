@@ -205,7 +205,11 @@ anything, because a suite failing every test for a missing package and
 one failing because the port is broken give the same count.
 `tarhdr-probe.c` is a PROBE rather than a test -- it prints a tar
 file block by block and asserts nothing; the host reference output to
-compare it against is in `docs/notes/libap.md`.
+compare it against is in `docs/notes/libap.md`. `tarblock-probe.c` is
+its companion and **must be built with tar's own `-I` flags**, which
+are in the file: it measures `sizeof(union block)` against the host's
+512, and with a different include order it would measure a different
+`tar.h` and say nothing.
 `tcl-stdchan-test.tcl` asks what buffering the three standard
 channels get, and is a PROBE rather than a rule -- report what it
 prints. `tcl-machexp-probe.tcl` is the same kind of thing for
@@ -1469,14 +1473,37 @@ is broken, or **(b) the archive is fine** and tar's READ path is --
 most likely in how far it advances past the data, since landing one
 block short would read the file's own contents as a header and give
 exactly this.
-**`tarhdr-probe.c` splits those in one run.** It prints a tar file
-block by block -- every header field as raw bytes, size and checksum
-decoded, the computed checksum beside the stored one, and where the
-zero blocks start -- and **asserts nothing**, being a probe. It decodes
-octal with its own loop rather than tar's `from_header()`: *a probe
-that reuses the code under suspicion cannot clear it.* **The host
-reference output is in `docs/notes/libap.md`** -- anything the 9front
-run says that the reference does not is the bug.
+**`tarhdr-probe.c` SPLIT THEM IN ONE RUN, and it is (a): the archive
+is MALFORMED, so it is tar's WRITE path.** The header block is perfect
+-- name, size, magic, and the checksum recomputes, so the reader was
+right to accept it and right to refuse what came next. But **`hello\n`
+sits 8 bytes INTO block 1** where the host reference has it at offset
+0, and **blocks 2 and 3 are not zero**.
+**The offset of the data is itself a measurement.**
+`create.c`'s `dump_regular_file()` does `start_header` (which returns
+`record_start`), `finish_header` (which advances to `record_start + 1`)
+and then `blocking_read (fd, blk->buffer, ...)` -- so the file offset
+of the member's data is exactly **`1 * sizeof(union block)`**. It came
+out **520**. Every member of that union is an array of `char` and gcc
+makes it 512, so 520 would mean kencc pads one of them: every block
+after the first shifted, and a **compiler** question rather than a tar
+one. **`tarblock-probe.c` asks it directly**, each member's size beside
+the host's answer, and **must be built with tar's own flags** (the
+command is in the file) or it measures a different `tar.h`.
+**Not 512 = CONFIRMED** -- the oversized member is named, every archive
+this tar ever wrote is malformed the same way, and it would explain the
+second symptom too, since the zero-fill counts in `BLOCKSIZE` while the
+pointers step in `sizeof(union block)`. **512 = REFUTED and worth as
+much**: the shift is in the copy loop or in what `read()` does with the
+buffer, and *do not go on believing the union*.
+**Recorded, not folded in**: blocks 2/3 hold `b6 01 00 00 cd 98 b4 6a`
+-- `0x1b6` is **0666** and `0x6ab498cd` little-endian is a plausible
+2026 `time_t`, so those are `struct stat` fields, not litter. A fresh
+Plan 9 allocation is newly sbrk'd and therefore **zero**, so every
+non-zero byte there was *written* by something. Second question.
+*(`tarhdr-probe`'s own host reference is in `docs/notes/libap.md`;
+`tarblock-probe` prints `REFUTED` and 0 disagreements under gcc, which
+is what says the probe is right rather than the tree.)*
 *(The `page_aligned_alloc` hypothesis is withdrawn: `getpagesize()` is
 APE's, has a prototype in scope and returns 4096.)*
 Detail in `docs/notes/libap.md` and `sys/src/ape/cmd/gnulib/README`.
