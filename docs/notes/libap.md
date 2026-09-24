@@ -1450,6 +1450,39 @@ libap predating the fix; measuring the stale library by accident is
 impossible. Fourth use of that idiom after `_sock_listenmark`,
 `_execmark` and `_ttymark`.
 
+### CONFIRMED on the rebuilt library, and the run measured the open problem too
+
+```
+bufexec-test
+_fdinfomark = 1  (libap with the exec scrub)
+PASS: fd 0 was usable when this test started
+--- child, fd 0 inherited across exec ---
+PASS: select() on an exec-inherited fd does not fail -- select returned 0, errno 0
+PASS: read() on an exec-inherited fd does not fail with EIO -- read returned -1, errno 3
+0 failures
+```
+
+`_fdinfomark = 1` says the INSTALLED library is the fixed one, and the
+link would have failed rather than the test passing otherwise. Both
+calls reach the descriptor instead of refusing: **the scrub is
+measured.**
+
+**And `errno 3` is `EWOULDBLOCK`** (`sys/include/ape/errno.h:15`), where
+the same child on glibc reads all six seeded bytes. So the bytes were
+not there -- which is the parent/copy-process competition below, in its
+first sighting.
+
+**But one non-blocking read at one instant cannot tell that from "they
+had not arrived yet"**, so the test now carries a bounded PROBE that
+waits and prints which. It asserts nothing, so it cannot go flaky.
+**gcc caught the first version of that probe being worthless**: run
+unconditionally, it found nothing on glibc *because the earlier read
+had already taken all six*, and announced the loss -- a refutation
+where there was a confirmation. It now runs only when the first read
+came back empty. *A check whose negative result has two explanations is
+not a check*, and checking a new test on the host first is what said
+so, again.
+
 ### What it does NOT fix, recorded rather than assumed away
 
 The test asserts the descriptor is **usable**, not that the bytes are

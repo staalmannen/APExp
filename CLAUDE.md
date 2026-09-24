@@ -1766,10 +1766,19 @@ Fixed in the CONSUMER (`sfdinit`), beside the existing `FD_ISTTY` and
 `FD_ISREG` scrubs, because a child cannot trust those bits whoever
 wrote them. `bufexec-test.c` is the regression test and calls
 `_fdinfomark()`, so it **will not link** against a libap predating the
-fix. **Not fixed, and recorded**: the parent's copy process is still
-alive and reading the same open file, so parent and child compete for
-keystrokes -- inherent in select() being a copy process, and its own
-round.
+fix. **CONFIRMED on the rebuilt library**: `_fdinfomark = 1`, both
+calls reach the descriptor, 0 failures.
+**Not fixed, and the same run gave it its first measurement**: the
+child's read answered `errno 3` = **EWOULDBLOCK** where glibc's reads
+all six seeded bytes, so the parent's copy process -- still alive and
+reading the same open file -- had them. Parent and child compete;
+inherent in select() being a copy process, and its own round. The test
+now carries a bounded PROBE (asserting nothing) that waits and says
+whether the bytes ever arrive, because one non-blocking read cannot
+tell "taken" from "not yet here". **gcc caught the first version of
+that probe being worthless** -- run unconditionally it found nothing on
+glibc *because the earlier read had already taken the six*, and
+announced a loss that had not happened.
 **Four rounds of diagnosis and vts was innocent from the first**, which
 is the part worth keeping: `chatty9p` said no read ever arrived;
 `fd2path` said the descriptor was right; **`SHELL=/bin/rc` gave a
