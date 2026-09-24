@@ -38,9 +38,22 @@ mkfile here assigns `APEXPROOT` itself as a literal, so it takes a
 command-line override or a bad edit to get there; the exposure is one
 named file per library directory rather than a tree, so the failure is
 bounded, but it is a real way to delete something outside the repo and
-there is no reason to run into it. `distclean` removes only
+there is no reason to run into it. `distclean` touches only
 `./$arch/bin` and `./$arch/lib`, looping over the **literal** `$_ARCHS`
 list, so no expansion can produce an absolute path.
+
+**And it EMPTIES those directories rather than removing them, because
+`apexp-sh` binds two of them.** A Plan 9 bind captures the directory's
+**channel** at bind time; `rm -rf` destroys what that channel names,
+`mk install`'s `mkdir -p` then makes a new directory with a new qid,
+and the shell still running goes on looking at the removed one. Every
+lookup in that union component falls through to the host's own
+`/$objtype/bin` -- so the next native compile runs **stock 9front's
+`6c`** and dies on `syntax error, last name: bool`, `bool` being
+exactly what APExp's kencc adds. *A library that built yesterday stops
+building and nothing in the message is about binds.* **If it ever
+happens anyway, a FRESH `apexp-sh` is the fix** -- it rebinds whatever
+exists now.
 
 **Those two trees are build output in full.** `git ls-files amd64` is
 `amd64/include/ape` and nothing else, and `.gitignore` carries
@@ -516,6 +529,12 @@ in the topic file.
   propagates the failure up through every enclosing directory, **one
   missing file failed the whole tree's distclean**. The sweep (a `test`
   dir beside an mkfile, without one of its own) found exactly that one.
+- **`rm -rf` on a directory something has BOUND does not unbind it.**
+  The bind still names the removed directory, a recreated one has a new
+  qid, and the union component silently falls through to whatever is
+  next. That is why `distclean` empties `./$arch/bin` and `./$arch/lib`
+  instead of removing them, and why a fresh `apexp-sh` fixes a build
+  that suddenly cannot compile `bool`.
 - **An ABI change needs `mk distclean` before `mk install`**; no mkfile
   here lists a system header as a dependency. **The same goes for a
   library change that has to reach an existing binary**: `mk install`
