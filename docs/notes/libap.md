@@ -1311,3 +1311,84 @@ spawn is a hardcoded `execl("/bin/rc", ...)`. So the order is:
 Steps 1 and 2 are already on the list for tab completion. 3 to 5 are
 what this question adds, and 3 is the one that changes what the screen
 looks like.
+
+#### The archive is MALFORMED: it is tar's WRITE path, and the data sits 8 bytes late
+
+`tarhdr-probe` on `/tmp/t.tar` -- the archive tar itself had just
+written -- settles (a) against (b) in one run:
+
+```
+size   10240 bytes = 20 blocks of 512, remainder 0
+block 0: member 1, ustar header
+  size       [00000000006\0]      decoded size   = 6
+  chksum     [011250\0 ]          decoded chksum = 4776, computed = 4776  -- MATCH
+  magic      [ustar ]
+  1 data block, so the next header belongs at block 2
+    block 1 (the member's data):
+      first 16 bytes: 00 00 00 00 00 00 00 00 68 65 6c 6c 6f 0a 00 00
+      as text:      "........hello..."
+block 2: NOT a ustar header and NOT zero
+      first 32 bytes: 00 ... 00 b6 01 00 00 cd 98 b4 6a 00 ...
+block 3: NOT a ustar header and NOT zero
+      first 32 bytes: 00 ... 00 b5 65 47 00 ...
+blocks 4..19: ALL ZERO (16 blocks)
+```
+
+Against the host reference for the same one-file archive, where block 1
+begins `68 65 6c 6c 6f 0a` at **offset 0** and blocks 2..19 are all
+zero. Three things follow, and the first two are firm:
+
+- **The header block is perfect** -- name, size, magic, typeflag, and
+  the checksum recomputes. So tar's reader was right to accept it, and
+  right to refuse what came next.
+- **"hello\n" is 8 bytes into block 1.** The archive is malformed;
+  tar's *write* path is the bug, and the reader is behaving correctly.
+  This closes the (a)/(b) split.
+- **Blocks 2 and 3 are not zero, and the bytes are not random.**
+  `b6 01 00 00` is 0x1b6 = **0666**, and `cd 98 b4 6a` read
+  little-endian is a plausible 2026 `time_t`. Those are the fields of a
+  `struct stat`, not heap litter -- and on Plan 9 a fresh allocation
+  comes from newly sbrk'd pages, which are **zero**, so every non-zero
+  byte in there was *written* by something. That is a second question
+  and it is recorded, not folded into the first.
+
+#### The offset of the data IS a measurement, and it named a suspect
+
+`create.c`'s `dump_regular_file()`:
+
+```c
+  blk = start_header (st);        /* record_start */
+  finish_header (st, blk, ...);   /* set_next_block_after -> record_start + 1 */
+  ...
+  blk = find_next_block ();       /* record_start + 1 */
+  count = blocking_read (fd, blk->buffer, bufsize);
+```
+
+so the file offset of the member's data is exactly
+`1 * sizeof(union block)`. It came out **520**.
+
+Every member of that union is an array of `char`, and gcc makes the
+whole thing 512, so 520 would mean kencc pads one of them -- shifting
+every block after the first, and a compiler question rather than a tar
+one. **`sys/lib/tests/tarblock-probe.c` asks it directly**, printing
+each member's size beside the host's answer.
+
+**It must be built with tar's own flags** -- the command is in the file
+-- because tar.h is reached through tar's include path and its
+`config.h`, and a different `-I` order measures a different header.
+
+**What each answer means, written down before the run:**
+
+- **not 512: CONFIRMED.** The member printed as oversized is the one to
+  look at, every archive this tar has written is malformed the same
+  way, and it would explain the second symptom too, since the zero-fill
+  in `dump_regular_file` and `write_eot` counts in `BLOCKSIZE` while
+  the pointers step in `sizeof(union block)`.
+- **512: REFUTED, and worth as much.** The union is innocent, the shift
+  is in the copy loop or in what `read()` does with the buffer it is
+  handed, and the next probe belongs there. *Do not go on believing the
+  union.*
+
+The host run of `tarblock-probe` is 0 disagreements and prints
+`REFUTED` for gcc, which is what says the probe is right rather than
+that the tree is.
