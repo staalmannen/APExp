@@ -45,7 +45,20 @@ vtslog=/tmp/vts.log
 # viewers write `cons' and poll `cells' -- so this is three or four
 # lines at startup, not a flood, and it is the difference between
 # "the shell exited" and knowing whether it ever read anything.
-vtsdebug=1
+#
+#   1  the terminal trace above
+#   2  that plus lib9p's chatty9p, every T- and R-message
+#
+# ONLY IF IT IS NOT ALREADY SET, and that `if' is the whole point of
+# these three lines. `vtsdebug=2 ./vts-bash' was run to turn chatty9p
+# on; this script then assigned 1 over it, the trace came back without
+# a single 9P message in it, and the one instrument that could answer
+# the open question had been switched off by the script written to
+# switch it on. *A script that sets the variable its caller passes is
+# an instrument that overwrites its own input.*
+if(~ $#vtsdebug 0)
+	vtsdebug=1
+echo 'vts-bash: vtsdebug='^$vtsdebug
 
 # The one readout worth having. `ctl' carries raw= and lined=, which
 # together say whether the shell ever reached tcsetattr -- and that is
@@ -155,8 +168,25 @@ sleep 1
 report
 
 # 6. And the window. vtwin mounts /srv/vts for itself.
-echo 'vts-bash: starting vtwin (close the window to finish)'
-vtwin
+#
+#    NOT AT $vtsdebug=2, and that is about what the log would be worth.
+#    chatty9p prints every T- and R-message, and vtwin POLLS `cells'
+#    several times a second -- so the startup exchange, which is the
+#    whole question, would be at the top of a file with thousands of
+#    Tread/Rread pairs after it. The shell is forked when vts starts,
+#    with or without a viewer, and it has been dying before the window
+#    ever mattered; so at level 2 this waits instead, and the log holds
+#    exactly the conversation being asked about.
+if(~ $vtsdebug 2){
+	echo 'vts-bash: $vtsdebug=2 -- NOT starting vtwin.'
+	echo 'vts-bash: its cells polling would bury the startup exchange'
+	echo 'vts-bash: in chatty9p output. Waiting for the shell instead.'
+	sleep 3
+}
+if not {
+	echo 'vts-bash: starting vtwin (close the window to finish)'
+	vtwin
+}
 
 # 7. Again on the way out -- the interesting state is usually the one
 #    after something went wrong, not the one a second after boot --
@@ -172,7 +202,7 @@ if(test -e $vtslog){
 if(~ $mine yes){
 	# `kill' on Plan 9 PRINTS the commands to do it, for piping into
 	# a shell; the note is what actually does it, so write it direct.
-	echo 'vts-bash: vtwin exited, stopping the vts this script started'
+	echo 'vts-bash: stopping the vts this script started'
 	if(test -e /proc/$vtspid/note)
 		echo kill >/proc/$vtspid/note
 	rm -f /srv/vts

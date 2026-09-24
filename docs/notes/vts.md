@@ -484,3 +484,33 @@ And the log now goes to a **file** (`/tmp/vts.log`, via `vts >[2]$vtslog
 window opens over the launching one, so the lines printed in the second
 before the session appears were being read off a **photograph of the
 screen**. A log that outlives the window can be read twice and pasted.
+
+### fd 0 is the terminal, and the instrument was switched off by its own script
+
+```
+vts: child: fd0=/dev/cons fd1=/dev/cons fd2=/dev/cons
+```
+
+So `dup()` did what it was written to do, all three descriptors are the
+bound `tty`, and **the background-`/dev/null` reading is dead.** That
+was one line and it closed a whole branch.
+
+**`chatty9p` never came on, and that was my own bug.** `vtsdebug=2
+./vts-bash` was the command; the script then did `vtsdebug=1`
+unconditionally, over the top of it. The log came back with the terminal
+trace and not one 9P message, which reads exactly like "no `Tread`
+arrived" -- the answer being looked for -- when the truth is that
+nothing was watching. It now assigns only `if(~ $#vtsdebug 0)`.
+
+*A script that sets the variable its caller passes is an instrument
+that overwrites its own input.* Same family as `tcl-runall.tcl`'s
+`fconfigure stderr -buffering line`, which produced the four `io-14.*`
+failures it was there to measure: **an instrument that shares state
+with the thing it measures can be the thing it reports.**
+
+And at level 2 it does **not** start vtwin. vtwin polls `cells` several
+times a second, so with every T- and R-message printed the startup
+exchange -- the whole question -- would sit at the top of a file with
+thousands of `Tread`/`Rread` pairs after it. The shell is forked when
+vts starts, viewer or no viewer, and it has been dying before the
+window ever mattered.
