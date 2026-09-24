@@ -38,9 +38,25 @@ mkfile here assigns `APEXPROOT` itself as a literal, so it takes a
 command-line override or a bad edit to get there; the exposure is one
 named file per library directory rather than a tree, so the failure is
 bounded, but it is a real way to delete something outside the repo and
-there is no reason to run into it. `distclean` removes only
+there is no reason to run into it. `distclean` touches only
 `./$arch/bin` and `./$arch/lib`, looping over the **literal** `$_ARCHS`
 list, so no expansion can produce an absolute path.
+
+**And it EMPTIES those directories rather than removing them, because
+`apexp-sh` binds two of them.** A Plan 9 bind captures the directory's
+**channel** at bind time; `rm -rf` destroys what that channel names,
+`mk install`'s `mkdir -p` then makes a new directory with a new qid,
+and the shell still running goes on looking at the removed one. Every
+lookup in that union component falls through to the host's own
+`/$objtype/bin` -- so the next native compile runs **stock 9front's
+`6c`** and dies on `syntax error, last name: bool`, `bool` being
+exactly what APExp's kencc adds. *A library that built yesterday stops
+building and nothing in the message is about binds.* **CONFIRMED by the cleanest
+control available**: the window was killed, a fresh `apexp-sh` started,
+and `mk install` run again with no other change -- and it built. Only
+the namespace differed. **A fresh `apexp-sh` is the fix whenever this
+shape appears**, since any `rm -rf` of a bound directory, by any means,
+leaves a window whose `/bin` is quietly the host's.
 
 **Those two trees are build output in full.** `git ls-files amd64` is
 `amd64/include/ape` and nothing else, and `.gitignore` carries
@@ -516,6 +532,12 @@ in the topic file.
   propagates the failure up through every enclosing directory, **one
   missing file failed the whole tree's distclean**. The sweep (a `test`
   dir beside an mkfile, without one of its own) found exactly that one.
+- **`rm -rf` on a directory something has BOUND does not unbind it.**
+  The bind still names the removed directory, a recreated one has a new
+  qid, and the union component silently falls through to whatever is
+  next. That is why `distclean` empties `./$arch/bin` and `./$arch/lib`
+  instead of removing them, and why a fresh `apexp-sh` fixes a build
+  that suddenly cannot compile `bool`.
 - **An ABI change needs `mk distclean` before `mk install`**; no mkfile
   here lists a system header as a dependency. **The same goes for a
   library change that has to reach an existing binary**: `mk install`
@@ -1744,10 +1766,19 @@ Fixed in the CONSUMER (`sfdinit`), beside the existing `FD_ISTTY` and
 `FD_ISREG` scrubs, because a child cannot trust those bits whoever
 wrote them. `bufexec-test.c` is the regression test and calls
 `_fdinfomark()`, so it **will not link** against a libap predating the
-fix. **Not fixed, and recorded**: the parent's copy process is still
-alive and reading the same open file, so parent and child compete for
-keystrokes -- inherent in select() being a copy process, and its own
-round.
+fix. **CONFIRMED on the rebuilt library**: `_fdinfomark = 1`, both
+calls reach the descriptor, 0 failures.
+**Not fixed, and the same run gave it its first measurement**: the
+child's read answered `errno 3` = **EWOULDBLOCK** where glibc's reads
+all six seeded bytes, so the parent's copy process -- still alive and
+reading the same open file -- had them. Parent and child compete;
+inherent in select() being a copy process, and its own round. The test
+now carries a bounded PROBE (asserting nothing) that waits and says
+whether the bytes ever arrive, because one non-blocking read cannot
+tell "taken" from "not yet here". **gcc caught the first version of
+that probe being worthless** -- run unconditionally it found nothing on
+glibc *because the earlier read had already taken the six*, and
+announced a loss that had not happened.
 **Four rounds of diagnosis and vts was innocent from the first**, which
 is the part worth keeping: `chatty9p` said no read ever arrived;
 `fd2path` said the descriptor was right; **`SHELL=/bin/rc` gave a
@@ -1761,9 +1792,23 @@ parent waiting for ever on a rendezvous with a process that did not
 exist; and `ioctl(FIONREAD)` stored `*(long*)arg` where every caller
 passes an `int *`, writing eight bytes and smashing four of the
 caller's frame.
-**Still open in vts, and it is rendering rather than plumbing**: under
-rc the prompt is right and typed characters come back partial --
-`lined` and the cell diff.
+**AND THE SESSION NOW WORKS**: `tty read: blocked (1 waiting)`,
+`read: enter fd=0 n=1`, `-> buffered n=1`, then `tty write 1 [c]` --
+bash waits for a keystroke, gets it and echoes it, with `flags=38`
+(`FD_ISOPEN|FD_BUFFERED|FD_ISTTY`) where the failing run had `0x2A`.
+**The diagonal text on screen was the INSTRUMENT, for the third
+time**: `_apdbg` ended lines with `
+` and no ``, and since
+`tcsetattr` started working fd 2 is a RAW terminal, where `
+` keeps
+its column -- a staircase that looked exactly like a VT bug. It writes
+`
+` now. Two noise fixes with it: `$APEXP_DEBUG` reaches the shell
+only at `$vtsdebug=2` (its lines land on the session's own SCREEN,
+where vts's own trace goes to a log file), and `close of a descriptor
+with no listener` -- which fired on every close in every program and
+said nothing -- is under `$APEXP_LISTENDEBUG` alone. *An instrument
+sized for a dead shell is the wrong size for a live one.*
 
 **readline wraps at 80 columns under rio, and the mechanism is already
 there.** `READLINE` being on means bash redraws the line, and a long
@@ -1796,6 +1841,22 @@ finally reaching `tcltest`, which gives the new build rule below.
 **Not ours**: `unixFCmd-1.1` wants `EACCES` from walking *through* a
 mode-0 directory; Plan 9 answers "does not exist". The file server's
 choice, so a probe rather than a library rule.
+
+**bash cannot be `/bin/sh` yet: it dies `Killed: Insufficient physical
+memory` during a full rebuild** -- but the log warns twice first, at
+**100 and then 200 file descriptors**, and a shell running build
+recipes has no business holding 200. So it is a leak with a shape.
+`plan9/_buf.c` is the lead: `_startbuf` deliberately *"leave[s] fd open
+in parent so system doesn't reuse it"* and forks a copy process per
+buffered descriptor, both for the life of the process unless `close()`
+reaches `_closebuf`. (`Muxseg` is also ~4.2 MB -- `Muxbuf bufs[256]`
+at 16 KB of `data` each -- but that is demand-paged address space, so
+it is the weaker candidate and is written down to be excluded.)
+**Newly reachable when `READLINE` went on**, like the `FD_BUFFEREDX`
+bug. **The test needs no new code**: run the failing build with
+`APEXP_DEBUG=1` and count `select: buffered now fd=` lines against the
+descriptor warnings. Recorded, not measured; back on dash meanwhile,
+and the goal is one shell rather than two.
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR.

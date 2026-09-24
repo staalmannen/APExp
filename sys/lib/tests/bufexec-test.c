@@ -64,6 +64,14 @@
  * the failure mode this tree has a rule about. The competition is
  * recorded in docs/notes/libap.md instead.
  *
+ * It does PROBE it, at the end of the child, because the first run on
+ * 9front answered `read returned -1, errno 3' -- EWOULDBLOCK -- where
+ * glibc reads all six seeded bytes. That is consistent with the
+ * competition and ALSO with the bytes merely not having arrived yet,
+ * and one non-blocking read at one instant cannot tell those apart.
+ * The probe waits a bounded while and prints which; it asserts
+ * nothing, so it cannot make the test flaky.
+ *
  * _fdinfomark() is why the test cannot be run against a stale libap by
  * accident: a library that predates the fix does not define it, so the
  * link fails rather than the test passing. The same idiom as
@@ -104,7 +112,7 @@ child(void)
 	fd_set rfds;
 	struct timeval tv;
 	char buf[16];
-	int r, e, flags;
+	int r, e, flags, got;
 
 	printf("--- child, fd 0 inherited across exec ---\n");
 	fflush(stdout);
@@ -141,11 +149,69 @@ child(void)
 	errno = 0;
 	r = read(0, buf, sizeof buf);
 	e = errno;
+	got = r > 0 ? r : 0;
 	{
 		char d[128];
 		sprintf(d, "read returned %d, errno %d", r, r < 0 ? e : 0);
 		ok("read() on an exec-inherited fd does not fail with EIO",
 			r >= 0 || e != EIO, d);
+	}
+
+	/*
+	 * A PROBE, NOT A CHECK -- it prints and never fails.
+	 *
+	 * The parent seeded the pipe with six bytes before forking. On
+	 * glibc the child reads all six. Here the first read above came
+	 * back EWOULDBLOCK, which has two explanations and a single
+	 * non-blocking read at one instant cannot separate them:
+	 *
+	 *   (a) the PARENT'S copy process already took them into a buffer
+	 *       this process detached from -- the competition recorded in
+	 *       docs/notes/libap.md, and a real loss;
+	 *   (b) they simply had not arrived yet, and a later read gets
+	 *       them -- a race, and no loss at all.
+	 *
+	 * So wait a bounded while and say which. It cannot make the test
+	 * flaky because it asserts nothing; it turns an observation that
+	 * was inferred into one that is measured.
+	 */
+	if(got > 0)
+		printf("PROBE: the seeded bytes were there straight away"
+			" (%d of 6), so there is nothing to wait for\n", got);
+	else {
+		int i, n;
+
+		/*
+		 * ONLY WHEN THE FIRST READ CAME BACK EMPTY. Running it
+		 * regardless is what the host caught on the very first
+		 * try: glibc's child had already consumed all six above,
+		 * so the loop below found nothing and announced reading
+		 * (a) -- a refutation where there was a confirmation.
+		 * *A check whose negative result has two explanations is
+		 * not a check*, and this one had exactly that shape until
+		 * gcc ran it.
+		 */
+		for(i = 0; i < 40; i++){
+			errno = 0;
+			n = read(0, buf, sizeof buf);
+			if(n > 0){
+				printf("PROBE: the seeded bytes arrived after"
+					" ~%d ms (%d of 6) -- reading (b), a race\n",
+					i * 50, n);
+				break;
+			}
+			if(n == 0){
+				printf("PROBE: end of file at ~%d ms with the"
+					" seeded bytes never seen -- reading (a)\n",
+					i * 50);
+				break;
+			}
+			usleep(50000);
+		}
+		if(i == 40)
+			printf("PROBE: 2s and the seeded bytes never arrived"
+				" -- reading (a), the parent's copy process has"
+				" them\n");
 	}
 
 	printf("child failures: %d\n", failures);

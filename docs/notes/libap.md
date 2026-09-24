@@ -1450,6 +1450,39 @@ libap predating the fix; measuring the stale library by accident is
 impossible. Fourth use of that idiom after `_sock_listenmark`,
 `_execmark` and `_ttymark`.
 
+### CONFIRMED on the rebuilt library, and the run measured the open problem too
+
+```
+bufexec-test
+_fdinfomark = 1  (libap with the exec scrub)
+PASS: fd 0 was usable when this test started
+--- child, fd 0 inherited across exec ---
+PASS: select() on an exec-inherited fd does not fail -- select returned 0, errno 0
+PASS: read() on an exec-inherited fd does not fail with EIO -- read returned -1, errno 3
+0 failures
+```
+
+`_fdinfomark = 1` says the INSTALLED library is the fixed one, and the
+link would have failed rather than the test passing otherwise. Both
+calls reach the descriptor instead of refusing: **the scrub is
+measured.**
+
+**And `errno 3` is `EWOULDBLOCK`** (`sys/include/ape/errno.h:15`), where
+the same child on glibc reads all six seeded bytes. So the bytes were
+not there -- which is the parent/copy-process competition below, in its
+first sighting.
+
+**But one non-blocking read at one instant cannot tell that from "they
+had not arrived yet"**, so the test now carries a bounded PROBE that
+waits and prints which. It asserts nothing, so it cannot go flaky.
+**gcc caught the first version of that probe being worthless**: run
+unconditionally, it found nothing on glibc *because the earlier read
+had already taken all six*, and announced the loss -- a refutation
+where there was a confirmation. It now runs only when the first read
+came back empty. *A check whose negative result has two explanations is
+not a check*, and checking a new test on the host first is what said
+so, again.
+
 ### What it does NOT fix, recorded rather than assumed away
 
 The test asserts the descriptor is **usable**, not that the bytes are
@@ -1485,3 +1518,59 @@ recorded as found, not measured. Its ANSWER is still an approximation:
 a terminal, pipe or socket it says 0 always. Plan 9's `stat` on a pipe
 does report what is queued, so a real answer exists for that case and
 wants its own round.
+
+## bash as /bin/sh dies out of memory, and select() is the lead
+
+Recorded from a full rebuild with bash in place of dash as `/bin/sh`,
+**not measured**:
+
+```
+sh 28439: warning: process exceeds 100 file descriptors
+sh 28439: warning: process exceeds 200 file descriptors
+sh 28439: Killed: Insufficient physical memory
+mk: .../amd64/bin/ape/bison -y -d ... : exit status=rc 28429: sh 28439:
+    Killed: Insufficient physical memory
+```
+
+**The descriptor warnings are the part worth keeping.** A shell running
+build recipes has no business holding 200 descriptors, and the kernel
+said so twice before the kill. That is a leak with a shape, not a
+program that merely wanted more memory.
+
+`plan9/_buf.c` is where to look, and there are two candidates. Both are
+consequences of `select()` being a **copy process** here rather than a
+system call, so both got newly reachable when `READLINE` was turned on
+in bash's `config.h` -- nothing in this tree had asked `select()` about
+much before that.
+
+- **`_startbuf` leaves the descriptor open on purpose**: *"leave fd open
+  in parent so system doesn't reuse it"*. Every descriptor a process
+  ever selects on therefore stays open for the life of the process
+  unless `close()` runs `_closebuf` on it, **and forks a copy process
+  that stays alive too**. A shell that selects on a pipe per command
+  accumulates one of each per command.
+- **The shared segment is big.** `Muxseg` is
+  `Lock + 3 ints + 2 fd_set + Muxbuf bufs[OPEN_MAX]`, `OPEN_MAX` is
+  **256**, and each `Muxbuf` carries `data[PERFDMAX]` = `2*8192` =
+  **16 KB**. So the segment `_SEGATTACH`es **about 4.2 MB**, per process
+  that ever calls `select()`. *That is address space rather than
+  resident memory* -- Plan 9 pages it in on demand, and `INITBUFS = 4`
+  says only a few slots are expected to be touched -- so this is the
+  weaker of the two and is written down to be excluded rather than
+  assumed. It becomes the answer only if something touches many slots.
+
+**The cheap test already exists and needs no new code.** `$APEXP_DEBUG`
+prints one line per newly buffered descriptor:
+
+```
+select: buffered now fd=N flags=...
+```
+
+so running the failing build with `APEXP_DEBUG=1` and counting those
+lines says directly whether the buffer count climbs with the descriptor
+count. If it does, the leak is the first candidate and the fix is about
+when `_closebuf` runs. If it does not, `select()` is exonerated and the
+next question is bash's own descriptor handling.
+
+*Back on dash for now. The goal is one shell rather than two, so this
+is on the way rather than optional -- but it is a round of its own.*
