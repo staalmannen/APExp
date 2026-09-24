@@ -62,8 +62,8 @@ predate the 2026 gnulib being linked, so their platform answers no
 longer describe the objects.
 
 
-Five rules for editing any of this
-----------------------------------
+Six rules for editing any of this
+---------------------------------
 
 1. Never add a module that libap already provides.
 
@@ -84,6 +84,16 @@ Five rules for editing any of this
    xnmalloc, xnrealloc, xcharalloc, xzalloc, x2realloc, x2nrealloc,
    xpalloc and the idx_t variants (ximalloc, xirealloc, xicalloc,
    xizalloc, ximemdup, ximemdup0).
+
+   And strerror, which is the case that shows the failure does not
+   have to be a link error at all. strerror.$O sat in OFILES for as
+   long as this archive has existed and produced no diagnostic,
+   because libap's strerror lives in an archive member the linker
+   never had a reason to pull: gnulib's definition satisfied the
+   symbol first. What it satisfied it with was a function that calls
+   itself for ever -- see rule 6 -- so every GNU program here died on
+   its first error(0, errno, ...). A module libap already provides is
+   a problem whether or not 'ar' says so.
 
 2. Do not let a package rebuild a module that lives here.
 
@@ -158,6 +168,46 @@ Five rules for editing any of this
 
    If a future module turns out to read PACKAGE_*, it belongs here for
    the same reason.
+
+6. A gnulib module that wraps a system function needs gnulib's own
+   generated header, and this tree has none of them.
+
+   Several modules are written to REPLACE a system function while still
+   calling it. gnulib does that with a macro in its generated header --
+   string.h carries `#define strerror rpl_strerror' -- so the definition
+
+       char *
+       strerror (int n)
+       #undef strerror
+       {
+         ...
+         msg = strerror (n);
+
+   defines rpl_strerror, and the #undef between the declarator and the
+   body makes the inner call reach the real one. The whole mechanism is
+   that one macro.
+
+   Nothing generates those headers here. sys/src/external/gnulib holds
+   string.in.h and no string.h, so <string.h> is APE's, the macro does
+   not exist, the function defines the plain name, and the inner call is
+   a call to itself. Infinite recursion, no warning, and the only
+   symptom is the stack running out:
+
+       tar: suicide: sys: trap: fault write addr=0x7ffffeffefc8
+
+   Checked all of sys/src/external/gnulib for the idiom -- a definition
+   of NAME immediately followed by `#undef NAME' -- and it appears in 34
+   places across 24 files. Exactly one of them, strerror.c, was in
+   OFILES; the rest are not built. The command, so the check can be
+   repeated when OFILES grows:
+
+       for f in *.c; do awk -v F=$f '/^#undef [a-z_0-9]+$/ \
+           {u=$2; if (prev ~ ("^" u "[ ]*\\(")) print F": "u} {prev=$0}' $f; done
+
+   strerror-override.c stays in OFILES although nothing references it
+   now: it is the companion of strerror_r.c, which is the other module
+   that calls strerror_override and which would be the right way to
+   supply strerror_r if a package ever needs gnulib's.
 
 The mkfile deletes libgnu.a before re-archiving rather than using
 'ar vu' in place, so dropping a module from OFILES actually removes it.

@@ -353,7 +353,6 @@ OFILES=\
 	stdopen.$O\
 	stpcpy.$O\
 	str_endswith.$O\
-	strerror.$O\
 	strerror-override.$O\
 	striconv.$O\
 	strintcmp.$O\
