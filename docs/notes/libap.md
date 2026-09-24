@@ -925,3 +925,109 @@ the answer were no.*
 `THIS TREE`. **What would refute it**: the marker saying *not* this
 tree, which would mean the header being read is not the one that was
 edited and the whole diagnosis is about the wrong file.
+
+### signal/ — `tar cf` dies in note delivery, and the ratrace names where
+
+`getprogname` is CONFIRMED by the same screenshot that produced this:
+`tar cf /tmp/t.tar /tmp/h` now prints
+
+```
+tar: Removing leading `/' from member names
+```
+
+where before the fix the same diagnostic came out as `: ...`. gnulib's
+`error()` reaches `getprogname()`, so that one line certifies the whole
+chain — `_callmain` sets `argv0`, `getprogname()` takes its basename,
+and `tar:` rather than `/bin/tar:` says the basename half works too.
+
+**And then tar dies:**
+
+```
+tar 2288: suicide: bad address in notify
+```
+
+**This is not the extraction bug.** The recorded diagnosis — *tar's
+first read of the archive yields no block* — was measured on `tar tf`.
+This is `tar cf`, a different code path, and a crash rather than a
+wrong answer. They may share a cause and they may not; nothing measured
+so far connects them, so they are two entries until something does.
+
+#### What the trace says, and what it does not
+
+`ratrace -c tar cf /tmp/t.tar /tmp/h` (270 lines, `tmp/rt.out` on
+`main`) is completely ordinary up to its last line:
+
+```
+2292 tar Notify   2827ff 0x292f63 = 0
+...
+2292 tar Open     0x7fffffffefa6/"/tmp/t.tar" 0x11 = 4
+2292 tar Fstat    4 ... = 72
+2292 tar Open     0x42c518/"/adm/users" 0x0 = 5
+2292 tar Pread    5 ... = 139
+2292 tar Pwrite   2 "t" ... "a" ... "r" ... ":" ...      (the message, a byte at a time)
+2292 tar Brk      0x47d0c0 = 0
+2292 tar Stat     0x7ffffffdd8c0/"/tmp/h" 0x478400 115 = 68
+```
+
+and stops. **Every call succeeds, including the last.** So the fault is
+in user code after `Stat` returned, not in a system call, and `ratrace`
+cannot see notes — it traces syscalls, and note delivery is not one.
+
+Two facts fall out of this that are worth keeping:
+
+- **`suicide: bad address in notify` is a SECOND failure standing on a
+  first.** The kernel only enters `notify()` because a note was already
+  posted, and the only thing that posts a note to a process doing
+  nothing unusual is a trap — a fault in tar. The suicide message
+  *replaces* the note text we actually want (`sys: trap: fault
+  read addr=0x... pc=0x...`), which is why this trace names nothing.
+- **The handler registered is `0x292f63`**, from the one `Notify` call
+  (`_envsetup.c:151`, `_NOTIFY(_notehandler)`). Whether that address is
+  `_notehandler` at all, and whether its low bits matter to this
+  kernel, are both questions `nm` answers in a second on the VM. Do not
+  reason about the kernel's exact test from memory — 9front's source is
+  not in this tree and was not reachable from here.
+
+#### The two probes, in order
+
+Both are cheap and neither needs a rebuild.
+
+1. **`nohandle=1 tar cf /tmp/t.tar /tmp/h`.** `_envsetup` scans `/env`
+   and skips `_NOTIFY(_notehandler)` entirely when it finds a variable
+   named `nohandle` (the value is not read). With no handler installed
+   the kernel takes the default action and **prints the note itself**,
+   so the real message — trap kind, faulting address and PC — reaches
+   the screen instead of being swallowed by the suicide path. This is
+   the run that names the bug.
+2. **`nm` on the binary, for the handler address.**
+
+   ```
+   nm `which tar` | grep -i 'notehandler|notetramp'
+   ```
+
+   If `_notehandler` is `0x292f63`, registration is doing what it
+   means to and the fault is elsewhere. If it is not, the finding is
+   much larger than tar.
+
+And if the kernel left a **Broken** tar in `/proc` — `ps | grep tar`
+will show it — `acid <pid>` and `lstk()` give the faulting frame
+outright, which is better than either.
+
+#### One hypothesis, recorded so the probe can refute it
+
+Both tar symptoms sit at tar's first touch of its record buffer: `tf`
+reads into it and gets nothing, `cf` writes the header into it and
+faults. The one allocator they share is `page_aligned_alloc`
+(`gtar/src/misc.c:1229`, called from `buffer.c:657`), so a bad
+`record_start` would explain both with one cause.
+
+**Half of it is already excluded.** `page_aligned_alloc` takes its
+alignment from `getpagesize()`, and the obvious failure — a zero
+alignment making `ptr_align` return NULL — does not happen here:
+`HAVE_GETPAGESIZE` is undef in tar's `config.h` and gnulib's
+`getpagesize.c` compiles to nothing outside Windows, but
+`$GTARSRC/gnu` is deliberately off tar's include path (see the mkfile),
+so `<unistd.h>` is APE's, which declares `getpagesize` and whose
+`sysconf(_SC_PAGESIZE)` returns a plain 4096. Prototype in scope,
+right answer. So this hypothesis currently has no mechanism behind it
+and is a shape, not a diagnosis — which is exactly what probe 1 is for.

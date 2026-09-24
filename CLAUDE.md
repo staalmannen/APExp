@@ -1322,6 +1322,12 @@ from a half-fix, since returning `argv[0]` whole would pass the rest.
 **This is NOT the tar extraction bug** -- it is a second one that was
 standing next to it, and the extraction failure is still open. See the
 tar entry below.
+**CONFIRMED, and by the very next command run**: `tar cf` now prints
+``tar: Removing leading `/' from member names`` where the previous
+round's run printed `: `. That one prefix certifies the whole chain --
+`_callmain` sets `argv0`, `getprogname()` takes the basename, gnulib's
+`error()` reaches it -- and `tar:` rather than `/bin/tar:` says the
+basename half works too.
 
 **`tar` CANNOT READ A PLAIN TAR FILE, and decompression was never
 involved.** The split settled it in one round and eliminated
@@ -1353,6 +1359,32 @@ never set. Ask it on the smallest case: whether `tar` can read an
 archive **it wrote itself** separates "tar's read path is broken" from
 "this archive is unusual", and `ratrace` on that says which call
 returns what.
+**THAT QUESTION IS STILL UNANSWERED, because `tar cf` never finished
+writing one**: `tar cf /tmp/t.tar /tmp/h` dies with
+`tar 2288: suicide: bad address in notify`. **A SECOND BUG, and it is
+not assumed to share a cause with the read failure** -- one is `tf`
+giving a wrong answer, the other is `cf` crashing.
+**The 270-line ratrace is ordinary to its last line and every call in
+it SUCCEEDS**, ending at `Stat "/tmp/h" = 68`. So the fault is in user
+code after that call returned, and ratrace traces syscalls -- **note
+delivery is not one**, which is why the trace names nothing.
+**`suicide: bad address in notify` is a second failure standing on a
+first**: the kernel only enters `notify()` because a note was already
+posted, and the suicide message REPLACES the note text
+(`sys: trap: fault ... pc=...`) that would name the fault.
+**So the next run is `nohandle=1 tar cf /tmp/t.tar /tmp/h`.**
+`_envsetup.c:151` skips `_NOTIFY(_notehandler)` when `/env` holds a
+variable called `nohandle`, and with no handler the kernel prints the
+note itself. Beside it, `nm` for the handler address the trace shows
+(`0x292f63`), and `ps | grep tar` in case a **Broken** tar is sitting
+in `/proc` -- `acid <pid>`, `lstk()` beats both.
+**One hypothesis, with half of it already excluded**: both symptoms sit
+at tar's first touch of its record buffer, and the shared allocator is
+`page_aligned_alloc`. But `getpagesize()` is APE's and returns 4096
+with a prototype in scope (`$GTARSRC/gnu` is off the include path), so
+the obvious NULL-from-zero-alignment route is shut and the hypothesis
+has no mechanism behind it yet. A shape, not a diagnosis. Detail in
+`docs/notes/libap.md`.
 
 **Fixed this round**: `NAME_MAX` was 27 and `PATH_MAX` 1023, set in
 `sys/include/ape/sys/limits.h`, which `<limits.h>` includes at its very
