@@ -1204,6 +1204,28 @@ steps are a per-session `consctl` in vts, the shell's fds being a
 `cons` bound to `/dev/cons` rather than the pipe `session.c:124` dups
 (with a pipe, `isatty(0)` is false and bash never starts readline at
 all), and vts spawning bash rather than hardcoded `/bin/rc`.
+**And vts would fix the 80-column wrapping too -- but as TWO fixes, and
+the bigger one is `$TERM`.** *Columns*: vts has a real character grid
+(`cells.h`), so there is an exact number where rio has none -- but
+`srv.c:488`/`594` hardcode `session_init(s, name, 24, 80)`, so today it
+would report a *correct* 80 rather than a *guessed* one. `cellbuf_resize()`
+exists and nothing calls it from a window-size path. Carrying it to the
+shell is two `putenv` calls beside the `putenv("vts"...)` already in
+`session.c` -- `RFENVG` **copies** the environment, and libap's
+`TIOCGWINSZ` already reads `$COLUMNS`/`$LINES`. Resize is still not
+automatic (no `SIGWINCH`), but vts owns both ends and can post a note:
+*the difference is not that vts can measure and rio cannot, it is that
+vts can TELL.* *Wrapping*: correct width alone would NOT have fixed the
+screen. `sys/lib/ape/termcap`'s whole `dumb` entry is
+`:am:co#80:li#24:` -- **no `ce`, no `up`, no `cm`**, so readline
+reprints instead of redrawing, and `terminal.c:584` forces
+`_rl_term_isansi = 0` for that name. vts is what makes a real `$TERM`
+honest, since the engine is **libvterm** (upstream's full state
+machine) and the termcap already ships `vt100|vt100-am` and `xterm`.
+Which VT level is claimed is not the question; having anything true to
+claim is. **Order**: bash on a `cons` not a pipe, per-session
+`consctl`, then `$TERM` (the one that changes the screen), then the
+real grid size, then `COLUMNS`/`LINES` at spawn plus a note on resize.
 
 **itcl BUILDS AND RUNS, first try: `Total 792 Passed 712 Skipped 66
 Failed 14`**, marker present, exit 0, no file errors. The header line

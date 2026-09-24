@@ -1236,3 +1236,78 @@ buy**, and it is the strongest of the three as an argument for it: vts
 keeps a real character grid (`cells.c`), so it knows the answer exactly
 and can set `$COLUMNS` per session. Same shape as the earlier finding
 that the blocker for completion was never vts — this one genuinely is.
+
+#### Would vts fix the columns and the wrapping? Partly, and they are two fixes
+
+Asked directly, and worth answering from the source rather than the
+shape of the question, because the two halves come apart.
+
+**COLUMNS: yes, and exactly -- but vts has to be made to say it, and
+its grid is a constant today.**
+
+vts has what rio has not: a real character grid. `cells.h` carries
+`rows`/`cols` and a `rows x cols` cell array, so there IS an exact
+number to report. What is missing is two things, both small and
+neither automatic:
+
+- **The number is hardcoded.** `srv.c:488` and `srv.c:594` both call
+  `session_init(s, name, 24, 80)`. So today vts would report a
+  *correct* 80 rather than a *guessed* 80 -- no visible change.
+  `cellbuf_resize()` exists (`cells.h:77`) and nothing calls it from a
+  window-size path, so making the grid follow the rio window it draws
+  into is the real work.
+- **Nothing carries it to the shell.** The spawn in `session.c` is
+  `rfork(RFPROC|RFFDG|RFNOTEG|RFENVG)` -- and `RFENVG` **copies** the
+  environment, so the child gets a private one -- followed by
+  `putenv("vts", ...)` and `putenv("prompt", ...)`. Two more `putenv`
+  calls for `COLUMNS` and `LINES` is the whole of it at that end,
+  because **libap's `TIOCGWINSZ` already reads exactly those two
+  names**. That half is done.
+
+**Resize still is not automatic, and cannot be made so in libap.** Plan
+9 has no `SIGWINCH`. But vts owns both ends -- it knows when its grid
+changed and it knows the shell's pid -- so it can post a note itself,
+which is precisely what rio cannot do for us. *The difference is not
+that vts can measure and rio cannot; it is that vts can TELL.*
+
+**WRAPPING: that is `$TERM`, a different fix, and the bigger half.**
+
+Correct width alone would not have fixed what was on the screen. The
+line was garbled rather than merely wrapped in the wrong column, and
+the reason is the terminal description:
+
+```
+dumb|dumb terminal:\
+	:am:co#80:li#24:
+```
+
+That is the whole entry in `sys/lib/ape/termcap`. **No `ce`** (clear to
+end of line), **no `up`**, **no `cm`** -- so readline has almost
+nothing to redraw a changed line with and falls back to reprinting.
+`terminal.c:584` also makes `dumb` one of three names that force
+`_rl_term_isansi = 0`. And note `co#80` is hardcoded *in the termcap
+entry*, a second place the 80 comes from.
+
+**vts is what makes a real `$TERM` honest**, and that is the point
+rather than which VT level it claims: the engine is **libvterm**,
+upstream's full state machine, and `sys/lib/ape/termcap` already ships
+`vt100|vt100-am` and `xterm` entries. Naming either one is then a
+statement that is true, which is the only reason to make it -- *a
+capability declared and not present is the same bug as one present and
+not declared, from the other side.*
+
+**Neither reaches bash until the fd question is fixed, and that comes
+first.** `session.c:124` dups a **pipe** onto the shell's fd 0, so
+`isatty(0)` is false and bash never starts readline at all; and the
+spawn is a hardcoded `execl("/bin/rc", ...)`. So the order is:
+
+1. bash under vts, on a `cons` bound to `/dev/cons` rather than a pipe;
+2. a per-session `consctl`, so raw mode is per window;
+3. `$TERM=vt100` (or `xterm`) -- this is the one that fixes the redraw;
+4. vts's grid driven by its real window size, `cellbuf_resize()` wired
+   to it;
+5. `putenv("COLUMNS"/"LINES")` at spawn, and a note on resize.
+
+Steps 1 and 2 are already on the list for tab completion. 3 to 5 are
+what this question adds, and 3 is the one that changes what the screen
+looks like.
