@@ -33,5 +33,8 @@ sys/src/ape/cmd/**/lib*.a[01256789kqtv]
 sys/src/cmd/*c/enam.c
 sys/src/external/f2c/lib/arithchk
 
+# vts's host test binaries, built by sys/src/cmd2/vts/test/run_tests.sh
+sys/src/cmd2/vts/test/bin/
+
 # Claude Code harness artifacts
 .claude/

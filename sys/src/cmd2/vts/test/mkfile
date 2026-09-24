@@ -1,0 +1,61 @@
+# vts's tests.
+#
+# WHY THIS FILE EXISTS. sys/src/cmd/mkone -- which ../mkfile includes --
+# treats a subdirectory called ./test as a mk directory of its own:
+#
+#	clean:V:
+#		test -d ./test && @{cd test && mk $MKFLAGS clean}
+#
+#	test:QV: $O.out $TESTDEP
+#		if(test -d ./test){ ... @{cd ./test && mk $MKFLAGS test} }
+#
+# The same two lines are in mkmany, mkelf, mkelves, mklib and mksyslib.
+# This directory had the name and not the mkfile, so a tree-wide
+# `mk distclean' walked into it and stopped:
+#
+#	mk: don't know how to make 'clean' in directory .../cmd2/vts/test
+#	mk: test -d ./test : exit status=rc 2708: mk 2710: error
+#
+# and because mk propagates that up through every enclosing directory,
+# one missing file failed the whole distclean. Swept the tree: this was
+# the only ./test sitting beside an mkfile without one of its own.
+#
+# WHAT IS IN HERE, because the two halves run in different places.
+#
+#   test_cells.c, test_celldiff.c, test_lined.c, test_parser.c are HOST
+#   programs, compiled with -DHOST against the portable C of vts (the
+#   cell buffer, the line editor, the VT100 parser) and run on the build
+#   machine. run_tests.sh drives them; it is bash and puts its binaries
+#   in ./bin. Nothing here builds them, and that is deliberate -- they
+#   exist so those parts can be checked WITHOUT a VM round, which is the
+#   same reason tz-xcheck.c and tty-xcheck.c are host programs.
+#
+#   The twelve .rc scripts are the other half and run inside 9front.
+#   They are integration tests: they mount /srv/vts, read /n/vts/ctl,
+#   and some of them remove /srv/vts and start a fresh vts first.
+#
+# THERE IS NO BATCH `mk test', and inventing one would be wrong rather
+# than merely incomplete. The scripts are not uniform -- smoke.rc
+# requires a vts already running and inspects the state it finds, while
+# smoke_cells.rc kills any existing instance and starts its own -- so
+# running them in sequence would have each one disturb the next, and
+# every one of them exits 1 on the first failure, so the run would stop
+# at whichever script the ordering broke. `mk test' therefore says what
+# to run instead of pretending to run it.
+
+nuke:V: clean
+
+clean:V:
+	rm -rf bin
+
+# Named by mkone's test:QV:. Reports rather than runs; see above.
+test:V:
+	echo 'vts tests are run by hand, and in two places:'
+	echo
+	echo '  on the BUILD HOST, for the portable C:'
+	echo '      sh test/run_tests.sh'
+	echo
+	echo '  inside 9front, one at a time, because they share /srv/vts:'
+	echo '      rc sys/src/cmd2/vts/test/smoke.rc'
+	echo '      rc sys/src/cmd2/vts/test/smoke_cells.rc'
+	echo '      ... and the other .rc scripts in this directory'

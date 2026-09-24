@@ -500,6 +500,14 @@ in the topic file.
 - **A header not in `HFILES` is a header `mk` does not rebuild for.** A
   logically inert change followed by broad, unattributable breakage is a
   layout problem; ask which objects were actually recompiled.
+- **A subdirectory called `test` is a mk directory, whether or not it
+  has an mkfile.** `mkone`, `mkmany`, `mkelf`, `mkelves`, `mklib` and
+  `mksyslib` all carry `test -d ./test && @{cd test && mk $MKFLAGS
+  clean}` and the matching `test:QV:`. `cmd2/vts/test` had the name and
+  no mkfile, so `mk distclean` stopped there -- and because mk
+  propagates the failure up through every enclosing directory, **one
+  missing file failed the whole tree's distclean**. The sweep (a `test`
+  dir beside an mkfile, without one of its own) found exactly that one.
 - **An ABI change needs `mk distclean` before `mk install`**; no mkfile
   here lists a system header as a dependency. **The same goes for a
   library change that has to reach an existing binary**: `mk install`
