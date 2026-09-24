@@ -288,3 +288,62 @@ echo`), because the symptom and the cause are three layers apart.
 `vts/parser.c` is 593 lines and **is not in OFILES** -- the engine uses
 libvterm. Dead code, not a bug, but it is the file someone will read
 first when a sequence goes wrong.
+
+## A mount lives in a namespace, and that invalidated the instructions
+
+`cat /n/vts/1/ctl` came back `file does not exist` -- and `lc /n` showed
+`vts/` there all along, so the directory exists and the mount does not.
+**That is correct rather than broken, and the instruction was the thing
+at fault.**
+
+`/srv/vts` is global; `/srv` is. But **what you get by MOUNTING it is
+per-namespace**, and `apexp-sh` opens with `rfork en`, so every
+apexp-sh window has a namespace of its own. vtwin mounts for itself.
+The session's shell mounts for itself, on `/mnt`. A third window has
+neither, and sees an empty `/n/vts`.
+
+So a session's files are reachable from exactly three places:
+
+```
+/mnt/<sess>/...     inside the session's own shell   (vts mounts there)
+/n/vts/<sess>/...   in the window that ran vts-bash  (it mounts now)
+/n/vts/<sess>/...   in vtwin's window                (it mounts itself)
+```
+
+**Asking for `cat /n/vts/1/ctl` without saying which window is asking
+for nothing.** Same family as the rule about instructions for the other
+machine having to name the program that runs them -- on Plan 9 a path
+is not an address until you say whose namespace it is in.
+
+### So the script reports for itself
+
+`vts-bash` now mounts `/srv/vts` on `/n/vts` in the launching window --
+which is shared with the shell that ran it, since nothing rforks in
+between -- and prints the `ctl` readout **twice**: once a second after
+the shell starts, and again after vtwin exits. The second is usually
+the interesting one, because the state worth seeing is the one after
+something went wrong rather than a second after boot.
+
+The readout spells out what each answer means, because `raw=0` on its
+own tells you nothing unless you already know that `rawon` is what
+`tcsetattr` sends and that it is what moves `lined` out of the way.
+
+### And `/srv/vts` already existing now ATTACHES
+
+Refusing was defensible -- a second vts posts over the first and looks
+exactly like the new one having failed -- but it left no way forward
+that did not involve knowing which process to kill, which is not
+knowledge the error message supplied.
+
+**It still warns, and the warning is the one that matters**: an
+attached window shows the session as it is, *including a session
+started by an older vts*. Rebuild vts, attach to the server that was
+already running, and every conclusion drawn from that window is about
+the old binary. The message names the two commands that replace it:
+
+```
+kill vts | rc ; rm -f /srv/vts
+```
+
+*(`kill` on Plan 9 PRINTS the commands rather than doing anything,
+which is why it is piped into `rc`.)*
