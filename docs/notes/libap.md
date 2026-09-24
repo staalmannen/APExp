@@ -1117,3 +1117,122 @@ if `tar cf` works but `tar tf` on the archive it just wrote still says
 `does not look like a tar archive`, the read bug is confirmed
 independent of this one — which is the question the last two rounds
 could not reach because tar never finished writing an archive.
+
+### The strerror fix is CONFIRMED, and the tar read bug is now proven separate
+
+Both halves of the prediction came back, and so did the third outcome
+that was the point of writing it down.
+
+```
+$ tar cf /tmp/t.tar /tmp/h
+tar: Removing leading `/' from member names
+$ tar tf /tmp/t.tar
+tmp/h
+tar: Skipping to next header
+tar: Exiting with failure status due to previous errors
+```
+
+- **`tar cf` completes.** No fault, no `suicide`. gnulib's
+  self-recursive `strerror` was the whole of that crash.
+- **`strerror-test` reports 0 failures**, linked against `libgnu.a`,
+  every section — including section 1, whose only possible failure was
+  to kill the process.
+- **And `tar tf` on the archive tar just wrote fails.** That is the
+  third outcome: the read bug is **CONFIRMED independent** of
+  `strerror`, which the last two rounds could not establish because tar
+  never finished writing an archive to try.
+
+#### What the new symptom says, and what it retires
+
+**It is not the same failure as the original archive.** That one said
+`This does not look like a tar archive` and `A lone zero block at 580`.
+This one **lists `tmp/h` correctly** and then fails. So:
+
+- the first header parsed, **and its checksum verified** — tar does not
+  print a member name it has not accepted;
+- `list.c:294` prints `Skipping to next header` **only when the
+  previous status was `HEADER_STILL_OK`**, so the failure is on the
+  *second* `read_header`: a block that is neither a valid header nor
+  all zeros.
+
+**So the recorded conclusion "tar's FIRST read of the archive yields no
+block" is about that archive, and does not generalise.** Here the first
+read plainly yields a block. Whether the two failures share a cause is
+open; nothing measured connects them, and assuming it would put the
+next round on the wrong file.
+
+For a one-file archive there is nothing between the member and the
+end-of-archive zero blocks, so exactly one of two things is true and
+they need completely different fixes:
+
+- **(a) the archive is malformed** — tar's WRITE path is broken and the
+  read is correctly refusing garbage;
+- **(b) the archive is fine** — tar's READ path is broken, most likely
+  in how far it advances past the member's data. Landing one block
+  short would make it read the file's own contents as a header, which
+  is exactly this symptom.
+
+#### `tarhdr-probe.c`, and the reference output to compare against
+
+`sys/lib/tests/tarhdr-probe.c` prints what is in a tar file block by
+block — every header field as raw bytes, the size and checksum decoded,
+the computed checksum beside the stored one, where the data blocks are,
+and where the zero blocks start. **It asserts nothing**; it is a probe,
+and anything it could assert would be an assertion about GNU tar's
+format rather than about this tree.
+
+It decodes the octal fields with its own three-line loop rather than
+tar's `from_header()`, deliberately: *a probe that reuses the code under
+suspicion cannot clear it.*
+
+Checked on the host against an archive made by a working tar, which is
+what says whether the probe or the tree is wrong. That run is the
+reference:
+
+```
+size   10240 bytes = 20 blocks of 512, remainder 0
+block 0: member 1, ustar header
+  name       [h\0\0...]
+  size       [00000000006\0]
+  chksum     [007724\0 ]
+  magic      [ustar ]
+  decoded size   = 6
+  decoded chksum = 4052, computed = 4052  -- MATCH
+  1 data block, so the next header belongs at block 2
+    block 1 (the member's data):
+      first 16 bytes: 68 65 6c 6c 6f 0a 00 00 ...
+blocks 2..19: ALL ZERO (18 blocks)
+```
+
+Anything the 9front run says that this does not is the bug.
+
+### readline wraps at 80 columns under rio, and the mechanism is already there
+
+Turning `READLINE` on made bash redraw the input line, and a long
+command now wraps in the wrong place. **libap already answers
+`TIOCGWINSZ`** (`misc/ioctl.c`) and answers it the right way: `80x24`
+by default, overridden by **`$COLUMNS`** and **`$LINES`**. Nothing under
+rio sets either, so readline gets 80 while the window is whatever it
+is.
+
+```
+export COLUMNS=136        # or whatever the window really is
+```
+
+fixes it, and it stays fixed: bash's `checkwinsize` re-asks through the
+same ioctl, which reads the variable bash exported, so the two agree
+rather than fighting.
+
+**There is no better answer available under rio, and that is a fact
+about rio rather than a gap here.** rio is graphical: a window is a
+pixel rectangle (`/dev/wctl`), the font is proportional in general, and
+there is no character grid to ask about and no `SIGWINCH` when the
+window is resized. Computing columns would mean libc opening a font
+file and measuring glyphs, which is not a libc's job and would still be
+a guess for a proportional font.
+
+**It joins arrow keys and colour on the list of things `vts` would
+buy**, and it is the strongest of the three as an argument for it: vts
+keeps a real character grid (`cells.c`), so it knows the answer exactly
+and can set `$COLUMNS` per session. Same shape as the earlier finding
+that the blocker for completion was never vts — this one genuinely is.
