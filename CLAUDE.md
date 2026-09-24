@@ -1559,12 +1559,42 @@ itcl already does. It is spelled `pack on`, not `pack 1`: `pragpack`
 does `atoi(s->name+1)` and only matches `on`/`yes` by name. tar's own
 `tar_stat_info`/`xheader` are deliberately left unpacked; they hold
 real `off_t` and pointers.
-**`6c` ITSELF WAS NOT CHANGED, and that is a decision rather than
-timidity**: it would resize a large share of every struct in the
-system, and this tree links `/$objtype/lib/*.a` that 9front built with
-the current rule. **A conforming 6c is the right end state** for a
-project whose aim is that C written for UNIX builds here unmodified,
-but it is a machine-wide ABI change and wants deciding on its own.
+**`6c` ITSELF WAS NOT CHANGED, and the way to change it is a FLAG.**
+The blast radius is smaller than it looks: `sys/src/cmd/mkfile` has
+`BIN=$APEXPROOT/$objtype/bin`, so APExp's compilers install into the
+**repo**, and the machine's own `6c` and the `/$objtype/lib/*.a` it
+built are untouched. What is exposed is only what this tree links from
+the host -- `cmd2/vts` (lib9p, libthread, libc) and `cmd2/vtwin`
+(libdraw, libthread, libc).
+**Porting those to APE would be a rewrite, not a port**: `ape/lib` has
+`draw` but **no `9p` and no `thread`**, and vts *is* a 9P server on
+libthread. **And a two-stage bootstrap does not close the gap** --
+stage two's compiler would be built with the new rule and still link
+the host's `libc.a` built with the old one (`Lock`, one `int`, is 4
+naturally and 8 under the current rule, and sits inside `QLock`,
+`Ref` and `Rendez`). It would need the whole native world rebuilt from
+source, which this tree does not vendor.
+**So: `-P` in `sys/src/ape/config`'s CFLAGS.** APE is already a
+separate ABI -- own libc, own headers, own include path -- and
+everything it links is built in this tree, so it is self-consistent by
+construction; native code keeps the 9front ABI; **and the compilers,
+being native, are unaffected, so there is no bootstrap question at
+all.** The flag costs nothing to parse: `cc/lex.c`'s `ARGBEGIN`
+`default:` arm does `debug[c]++` for any unknown letter.
+**The work is NOT flipping a constant**: `struct Type` in `cc/cc.h`
+has `width`, `offset` and `alignas_req` and **no natural alignment**,
+which is exactly why `align()` reaches for `SZ_VLONG`. A conforming
+rule means tracking max member alignment in `sualign()` and storing it
+on the Type -- the type system, ~40 lines in `cc/` plus one per
+backend.
+**Measure first with `cc -a`** (acid definitions carry sizes; it is
+what `mkone`'s `%.acid` rule uses): diff old against new over the APE
+headers and libap, and it names every struct whose layout moves
+*inside APE*.
+**Order: after the archiver sweep.** If bzip2, xz, unrar, unace,
+unarj and clzip come back clean, `#pragma pack` at the two or three
+places that model bytes is the whole cost in practice and the flag
+buys conformance rather than a bug fix. Detail in `docs/notes/kencc.md`.
 **The sweep found six all-char structs in `external/` whose size is
 not already a multiple of 8**, two of them tar's; the rest are
 `memcpy`-into-a-local and cost nothing. **That is a LOWER BOUND with a
