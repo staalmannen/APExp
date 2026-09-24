@@ -262,13 +262,25 @@ session_spawn_rc(Session *s)
 	s->shellout_rfd = -1;
 
 	/*
-	 * The shell does its own line editing now, so vts must not do it
-	 * too -- `lined' batches keystrokes into whole lines, which is
-	 * exactly what completion cannot work with. A shell that wants
-	 * cooking back writes rawoff to ttyctl.
+	 * `lined' is LEFT AS session_init set it -- enabled -- and the
+	 * shell turns it off itself by writing rawon to ttyctl. Forcing
+	 * raw here looked right and is not, for two reasons:
+	 *
+	 *   - rc does not echo and does not cook, because 9front's rc
+	 *     expects a console driver to do both. A session running rc
+	 *     with lined off shows nothing at all of what you type. That
+	 *     is a regression for every session that is not bash.
+	 *   - and the FAILURE MODE decides it. If bash never reaches
+	 *     tcsetattr -- wrong shell, a build without READLINE, isatty
+	 *     answering no for a reason not yet found -- then with lined
+	 *     on you still have a usable cooked shell, and with it off you
+	 *     have a window that swallows keystrokes in silence.
+	 *
+	 * readline preps and unpreps the terminal around every line, so
+	 * lined flips back on between commands. That is harmless: nothing
+	 * is being typed while a command runs, and type-ahead merely gets
+	 * cooked instead of passed through.
 	 */
-	s->raw = 1;
-	lined_set_enabled(&s->editor, 0);
 
 	fprint(2, "vts: %s forked pid=%d on /mnt/%s/tty\n", sh, pid, s->name);
 	return 0;

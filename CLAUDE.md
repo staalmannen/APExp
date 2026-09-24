@@ -1232,6 +1232,20 @@ then open `/dev/cons` for 0/1/2 -- `fd2path` then answers `/dev/cons`,
 windows. Loosening `_isatty` instead would be the "invent semantics to
 make a test pass" shape. That bind is also where the **per-session
 `consctl`** lands, so the two recorded steps are one edit.
+**`./vts-bash` IS THE LAUNCHER, and it must run from inside
+`apexp-sh`** -- that is the mechanism, not a convenience: apexp-sh's
+two `bind -b` lines are what put `vts`/`vtwin` and `bash` on the path,
+and its `SHELL=bash` is what vts reads to know what to exec. vts forks
+with `RFNAMEG|RFENVG`, both of which COPY, so the shell inherits both.
+From a plain `rc` none of it is true and vts falls back to `/bin/rc`.
+**`lined` is left ON at spawn and the shell turns it off** by writing
+`rawon` to `ttyctl` (which readline's `tcsetattr` already sends):
+9front's rc neither echoes nor cooks, so lined-off would blank every
+non-bash session -- and *the failure mode decides it*, since lined-on
+still gives a usable cooked shell if bash never reaches `tcsetattr`.
+**First thing to read when a session runs but does not complete**:
+`cat /n/vts/1/ttyctl`. `rawon` means `isatty(0)` was true and readline
+started; `rawoff` means doubt the bind.
 **And vts's key interception is the OPPOSITE of what is wanted here**:
 `lined.c` batches keystrokes and flushes whole LINES to the shell, so
 bash's completion needs `edit off`, not `edit on`. The remaining three
