@@ -347,3 +347,83 @@ kill vts | rc ; rm -f /srv/vts
 
 *(`kill` on Plan 9 PRINTS the commands rather than doing anything,
 which is why it is piped into `rc`.)*
+
+## The shell exits immediately, and that retires the double-echo story
+
+The launching window, photographed before the session went black:
+
+```
+vts-bash: starting vts...
+vts: hello (build 2026-06-28.libvterm)
+vts: posted at /srv/vts
+vts: /bin/bash forked pid=532 on /mnt/1/tty
+vts: shell 532 exited: ok
+./vts-bash:111: break: file does not exist: './break'   (x4)
+vts-bash: /srv/vts posted
+```
+
+**Three things, and the middle one changes the question entirely.**
+
+**`/bin/bash forked pid=532 on /mnt/1/tty`** -- `$SHELL` resolved,
+bash was found through apexp-sh's bind, and the session's tty path is
+right. And **no child complaint appeared**: the child prints to fd 2 on
+every failure of `open /srv/vts`, `mount /mnt`, either bind or
+`open /dev/cons`, and fd 2 is still the launching window at that point.
+So the mount and both binds worked.
+
+**`shell 532 exited: ok`** -- and `ok` is not a figure of speech.
+`session_wait_rc` prints `w->msg` when it is non-empty and `ok` when it
+is not, and every `_exits` in the child passes a *name*: `srv`,
+`mount`, `bind`, `cons`, `exec`. An empty message means **bash itself
+ran and exited 0**.
+
+**A shell that exits 0 the instant it starts has read end of file on
+stdin.** Which means the double-echo reading from the round before is
+about a *different* build and a *different* failure -- the session that
+garbled `echo $SHELL` at least stayed alive to be typed at. **Do not
+carry that diagnosis forward.**
+
+### Where EOF can come from, and why it is worth instrumenting rather than guessing
+
+`fsread` on `tty` has exactly three arms: serve queued bytes, answer
+**EOF when `!s->rc_alive`**, or block. Only the middle one ends a
+shell, and `rc_alive` is set by the parent immediately after `rfork` --
+before the child has closed 97 descriptors, mounted, bound twice,
+opened, dupped, `putenv`'d four times and exec'd a shell that then
+runs its own startup. That race is not close.
+
+So either something else answers 0, or bash never reaches the read.
+**Both are one log line away, and neither is reachable by reading the
+source again** -- which is the point at which this tree's own rule says
+to stop reasoning.
+
+`$vtsdebug` now turns on a trace of the shell's side of the terminal:
+
+```
+vts: tty write 12 [<1b>[?2004h$ ]          what the shell emitted
+vts: ttyctl write 5 [rawon]                whether tcsetattr arrived
+vts: tty read: blocked (1 waiting)         the read that should hang
+vts: tty read: EOF (rc_alive=0)            the one that kills it
+```
+
+It is not noisy: **only the shell touches `tty`.** Viewers write `cons`
+and poll `cells`, so nothing else appears. `vts-bash` sets the variable,
+and the four lines answer, in order: did bash write a prompt, did it ask
+for raw mode, did it read, and was it told the terminal had closed.
+
+### And rc has no `break`
+
+```
+./vts-bash:111: break: file does not exist: './break'
+```
+
+`break` is not an rc keyword, so rc went looking for a command by that
+name -- once per remaining turn of the loop. A flag is the way to leave
+an rc loop early; the turns after it then cost one `test` each. That
+joins **`sleep` takes whole seconds** on the short list of rc facts
+this script has now paid for.
+
+*(`vts: hello (build 2026-06-28.libvterm)` is worth keeping in view:
+it is vts's own version marker, and the same idiom as
+`_sock_listenmark`/`_execmark`/`_ttymark` in libap. When a session
+behaves like the previous build, that line is what says whether it is.)*

@@ -76,6 +76,50 @@ static char Estatus[1024];
 static Srv vts_srv;
 
 /*
+ * Terminal tracing, gated on $vtsdebug.
+ *
+ * The shell exits the moment it starts and says `ok', so the question
+ * is what its very first exchange with the terminal looked like -- and
+ * that is three lines of log rather than another round of reasoning.
+ * Only the shell touches `tty' (viewers write `cons'), so this is not
+ * noisy: vtwin polls `cells' and never appears here.
+ */
+static int vtsdebug = -1;
+
+static int
+dbg(void)
+{
+	char *p;
+
+	if(vtsdebug < 0){
+		p = getenv("vtsdebug");
+		vtsdebug = p != nil && *p != '\0';
+		free(p);
+	}
+	return vtsdebug;
+}
+
+/* Print up to n bytes readably -- a terminal stream is mostly escapes,
+ * and "1b 5b 3f" says more here than a row of dots. */
+static void
+dbgbytes(char *what, uchar *b, long n)
+{
+	char buf[128];
+	int i, o;
+
+	o = 0;
+	for(i = 0; i < n && o < (int)sizeof buf - 8; i++){
+		if(b[i] >= 32 && b[i] < 127)
+			o += snprint(buf+o, sizeof buf - o, "%c", b[i]);
+		else
+			o += snprint(buf+o, sizeof buf - o, "<%02x>", b[i]);
+	}
+	buf[o] = 0;
+	fprint(2, "vts: %s %ld [%s]%s\n", what, n, buf,
+		i < n ? "..." : "");
+}
+
+/*
  * THE BLOCKING TERMINAL READ.
  *
  * A read of `tty' is the shell asking for a keystroke, so with nothing
@@ -259,12 +303,24 @@ fsread(Req *r)
 		}
 		qlock(&s->ttylock);
 		if(s->ttyin_len > 0){
+			if(dbg())
+				fprint(2, "vts: tty read: serving %d queued byte(s)\n",
+					s->ttyin_len);
 			tty_serve(s, r);
 			qunlock(&s->ttylock);
 			return;
 		}
 		if(!s->rc_alive){
 			qunlock(&s->ttylock);
+			/*
+			 * END OF FILE, and it is the one answer that kills a
+			 * shell outright -- bash reads EOF on stdin and exits
+			 * 0, which looks exactly like a clean quit. If this
+			 * line appears before anything was typed, the shell
+			 * was told its terminal had closed.
+			 */
+			if(dbg())
+				fprint(2, "vts: tty read: EOF (rc_alive=0)\n");
 			r->ofcall.count = 0;
 			respond(r, nil);
 			return;
@@ -276,6 +332,8 @@ fsread(Req *r)
 			return;
 		}
 		s->ttyq[s->ttynq++] = r;
+		if(dbg())
+			fprint(2, "vts: tty read: blocked (%d waiting)\n", s->ttynq);
 		qunlock(&s->ttylock);
 		return;
 
@@ -566,6 +624,8 @@ fswrite(Req *r)
 		 * its reader proc: the shell writes here, so there is nothing
 		 * left to drain.
 		 */
+		if(dbg())
+			dbgbytes("tty write", (uchar*)r->ifcall.data, n);
 		qlock(&s->lock);
 		engine_feed(&s->engine, (uchar*)r->ifcall.data, n);
 		qunlock(&s->lock);
@@ -594,6 +654,8 @@ fswrite(Req *r)
 		 * one that got it silently -- which is the most common bug
 		 * shape in this tree.
 		 */
+		if(dbg())
+			dbgbytes("ttyctl write", (uchar*)r->ifcall.data, n);
 		if(n >= 5 && strncmp((char*)r->ifcall.data, "rawon", 5) == 0)
 			s->raw = 1;
 		else if(n >= 6 && strncmp((char*)r->ifcall.data, "rawoff", 6) == 0)
