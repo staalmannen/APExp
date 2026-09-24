@@ -514,3 +514,106 @@ exchange -- the whole question -- would sit at the top of a file with
 thousands of `Tread`/`Rread` pairs after it. The shell is forked when
 vts starts, viewer or no viewer, and it has been dying before the
 window ever mattered.
+
+## chatty9p answered, and it took vts out of it
+
+The whole session, in T-messages (`vtsdebug=2`, no vtwin):
+
+```
+Topen  fid 303 mode 2                 the shell's /dev/cons, ORDWR
+Twrite fid 303 offset 0  count 54     vts: child: fd0=/dev/cons ...
+Tstat  fid 303                        x8, during bash's startup
+Topen  fid 329 mode 1                 /dev/consctl
+Twrite fid 329 count 5 'rawon'
+Twrite fid 303 count 8  ESC[?2004h
+Twrite fid 303 count 2  '$ '
+Twrite fid 303 count 9  ESC[?2004l CR      <- readline giving up
+Twrite fid 303 count 1  '\n'
+Tstat  fid 303
+Twrite fid 329 count 6 'rawoff'
+Twrite fid 303 count 4 'exit'
+```
+
+**There is not one `Tread` on the shell's fid in the entire session** --
+and reads plainly work, because the `ctl` and `ttyctl` reads a moment
+later are right there in the same log. Between the prompt and readline's
+`ESC [ ? 2004 l` there is **no 9P message at all**: not a read, not a
+stat, nothing. So bash did not ask vts for input and get a wrong answer.
+**It never asked.**
+
+*A missing message is the strongest evidence in this log, and it is only
+readable because every other message is present.*
+
+`fd0=/dev/cons fd1=/dev/cons fd2=/dev/cons` in the same log says the
+descriptor is the right file, so this is not a plumbing mistake either.
+
+### Three mechanisms read out of the source, and all three refuted
+
+Worth recording because each looked convincing and each cost a pass:
+
+- **`FIONREAD` returning `st_size`.** libap implements it as an
+  `fstat`, which is what the eight `Tstat`s are, and our served file has
+  `l 0` -- so it always answers "nothing to read". That is a real
+  approximation and it is *not this*: readline only reaches `FIONREAD`
+  through `rl_gather_tyi()`, which `rl_read_key()` calls **only when
+  `rl_event_hook` is set**, and this bash never sets it
+  (`grep -rn 'rl_event_hook *=' sys/src/external/bash` finds only
+  readline's own definition). The decisive point is simpler: there is no
+  stat between the prompt and the EOF.
+- **`O_NONBLOCK` diverting the read into `_readbuf`**, which could
+  answer EOF from a shared buffer with no syscall. Dead on the numbers:
+  `readprocfdinit()` sets `oflags` to `O_RDWR`, which is **2**, and
+  `O_NONBLOCK` is **4** (`sys/include/ape/fcntl.h`). `isregular()` is
+  behind `noblock &&`, so it is never even called -- which independently
+  says the stat could not have come from libap's read path.
+- **`_fdinfo[0]` not marked open**, giving `EBADF` before the syscall.
+  Not refuted, and it is now instrumented rather than argued.
+
+*Three mechanisms, three refutations, one of them by a constant I had to
+look up. The honest tally in this tree is about one in eight for
+mechanisms guessed from code alone; this round ran true to it.*
+
+### What the next run asks, and the cheap control comes first
+
+**Control, no rebuild at all: run the session's shell as `rc`.**
+
+```
+SHELL=/bin/rc ./vts-bash
+```
+
+`rc` is a native Plan 9 program and links none of libap. If rc gets EOF
+and exits at once too, the fault is in what vts answers and the APE side
+is innocent; if rc sits at a prompt and takes typing, vts is exonerated
+and everything above stays on the libap side. **One variable, one
+command, and it halves the space** -- which is worth more than another
+reading of bash.
+
+Then, on the next rebuild, `$APEXP_DEBUG` traces `read()` itself
+(`ap/unistd/read.c`, gated on `_apdbgon()` so a normal run costs one
+load and one branch):
+
+```
+read: enter fd=0 n=1
+read:  fdinfo flags=... oflags=...
+read:  -> direct n=... errno=...
+read: EBADF, no syscall fd=0        <- the answer that never leaves libap
+```
+
+**Nothing printed means bash never called `read`**, which sends the next
+round into bash rather than libap; `enter` with no `->` means it went in
+and did not come out. vts now puts `APEXP_DEBUG` in the shell's
+environment whenever `$vtsdebug` is set, and those lines go to fd 2 --
+the terminal -- so they travel back through the server and land in
+**vts's own log, interleaved with the 9P trace**. Both halves of the
+conversation, one file, in order.
+
+### One real bug found on the way, and not the one being hunted
+
+`ioctl(FIONREAD)` wrote its answer as `*(long*)arg`. The argument is an
+**`int *`** on BSD, on Linux and in every caller here -- readline passes
+`&chars_avail`, an `int` local -- so on amd64 this stored **eight** bytes
+and smashed the four beyond it, whatever the compiler had put next in
+the caller's frame. The store succeeds, so nothing complains; what shows
+up is a neighbouring variable being zero for no reason, somewhere else.
+Fixed. **Recorded as found, not measured**: it is not what made bash
+exit, and saying so is the point.

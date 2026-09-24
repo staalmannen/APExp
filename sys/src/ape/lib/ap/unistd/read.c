@@ -58,12 +58,23 @@ pread(int d, void *buf, size_t nbytes, off_t offset)
 	int n, noblock, isbuf;
 	Fdinfo *f;
 
+	/*
+	 * The two answers that never reach the kernel, and so are
+	 * invisible to anything watching the other side. A reader that
+	 * turns any error into EOF -- readline does exactly that -- makes
+	 * both of these look like a closed terminal.
+	 */
 	if(d<0 || d>=OPEN_MAX || !(_fdinfo[d].flags & FD_ISOPEN)){
+		if(_apdbgon())
+			_apdbg("read: EBADF, no syscall", "fd", d, 0, 0);
 		errno = EBADF;
 		return -1;
 	}
-	if(nbytes <= 0)
+	if(nbytes <= 0){
+		if(_apdbgon())
+			_apdbg("read: 0 bytes asked, no syscall", "fd", d, 0, 0);
 		return 0;
+	}
 	if(buf == 0){
 		errno = EFAULT;
 		return -1;
@@ -71,6 +82,27 @@ pread(int d, void *buf, size_t nbytes, off_t offset)
 	f = &_fdinfo[d];
 	noblock = f->oflags&O_NONBLOCK;
 	isbuf = f->flags&(FD_BUFFERED|FD_BUFFEREDX);
+	/*
+	 * $APEXP_DEBUG: which branch a read took, and what it answered.
+	 *
+	 * WHY HERE. Under vts, bash printed its prompt and then read EOF
+	 * with NO 9P MESSAGE AT ALL -- chatty9p shows every T-message on
+	 * the shell's fid, and there is not one Tread in the whole
+	 * session. So either read() was never called, or it answered
+	 * before reaching the kernel; the two are indistinguishable from
+	 * the server's side, and three rounds of reading bash's and
+	 * readline's source guessed wrong about which.
+	 *
+	 * These lines separate them in one run: nothing printed means
+	 * bash never called read; `enter' with no `->' means it never
+	 * returned; anything else names the branch and the answer.
+	 * They go to fd 2 -- which under vts is the terminal, so they
+	 * travel back through the server and land in its log.
+	 */
+	if(_apdbgon()){
+		_apdbg("read: enter", "fd", d, "n", (int)nbytes);
+		_apdbg("read:  fdinfo", "flags", f->flags, "oflags", f->oflags);
+	}
 	/*
 	 * Even when something else has already buffered it -- select()
 	 * does that to anything it is asked to watch -- a regular file
@@ -92,10 +124,14 @@ pread(int d, void *buf, size_t nbytes, off_t offset)
 			}
 		}
 		n = _readbuf(d, buf, nbytes, noblock);
+		if(_apdbgon())
+			_apdbg("read:  -> buffered", "n", n, "errno", errno);
 	}else{
 		n = _PREAD(d, buf, nbytes, offset);
 		if(n < 0)
 			_syserrno();
+		if(_apdbgon())
+			_apdbg("read:  -> direct", "n", n, "errno", errno);
 	}
 	return n;
 }
