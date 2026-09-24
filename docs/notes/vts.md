@@ -208,3 +208,83 @@ complete**, in order:
 3. `echo $COLUMNS` -- 80 today, because `srv.c` still hardcodes
    `session_init(s, name, 24, 80)`. Correct, but not yet true of the
    window.
+
+## First run: readline IS running, and the input is garbled
+
+The first live session came up looking like this:
+
+```
+2004h$ 20041
+exit
+cho Scho SH
+echo S
+SHL
+SHL
+```
+
+**Two things are in there, and the first is the good news.**
+
+**`2004h` and `2004l` are readline's bracketed-paste sequences**
+(`ESC [ ? 2 0 0 4 h` / `l`), printed as *text* with the `ESC [ ?`
+missing. readline only emits those when it is actually driving the
+line. **So `isatty(0)` was true, the bind over `/dev/cons` worked, and
+bash started readline** -- which is the whole thing this change was
+for. That half is CONFIRMED.
+
+**The garbling is two writers feeding one VT parser.** `echo $SHELL`
+comes back as `cho Scho SH` / `echo S` / `SHL` -- the same characters
+appearing twice in different groupings, with letters missing. That is
+double echo, and torn escape sequences are its signature: `engine_feed`
+is a bare pass-through to `vterm_input_write`, which holds parser state
+across calls perfectly well, so a `ESC [ ?` that loses its tail was
+interrupted by *someone else's bytes*, not by a write boundary.
+
+There are exactly two writers into the engine, and only one
+circumstance puts them both there at once:
+
+- `fswrite` on `tty` -- the shell's output;
+- `lined`'s redraw -- vts's own local echo, which runs **only while
+  `s->editor.enabled`**.
+
+So `lined` was on while bash was also echoing, which means the `rawon`
+that should have turned it off never arrived. *(The other candidate --
+`fsread` on `cells` serialising the grid while the engine mutates it --
+is excluded: it holds `s->lock`, and so does the write.)*
+
+### Do not guess which, ask
+
+Two stories fit "rawon never arrived", they need different fixes, and I
+have already changed my mind about this once:
+
+1. **The consctl bind failed**, so libap's `tcsetattr` could not open
+   `/dev/consctl`, `_tty_raw` returned -1, and readline carried on
+   regardless -- which it does.
+2. **`rawon` arrived and something put lined back.** readline preps and
+   unpreps around *every line*, so `rawoff` follows each Enter.
+
+```
+cat /n/vts/1/ctl        raw= and lined= now say it outright
+cat /n/vts/1/ttyctl     rawon or rawoff
+```
+
+`rawoff` with a bind failure in the launching window is (1).
+`rawon` is (2), and then the per-line toggle is the thing to fix --
+`lined` would have to stay off once a shell has ever asked for raw.
+
+### Two changes that are not guesses
+
+**The session `ctl` readout now carries `raw=` and `lined=`.** The
+question above should never need a round of its own again.
+
+**And the consctl bind moved to LAST, after fd 2 is the terminal**, so
+its complaint lands in the window the user is looking at rather than in
+the one vts was launched from -- which is easy to lose behind the
+session, and is not where anyone looks when a shell misbehaves. The
+message now says what the failure will look like (`expect double
+echo`), because the symptom and the cause are three layers apart.
+
+### Noted in passing
+
+`vts/parser.c` is 593 lines and **is not in OFILES** -- the engine uses
+libvterm. Dead code, not a bug, but it is the file someone will read
+first when a sequence goes wrong.
