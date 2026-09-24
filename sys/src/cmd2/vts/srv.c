@@ -72,6 +72,121 @@ sessof(File *f)
 static char Estatus[1024];
 static Srv vts_srv;
 
+/*
+ * THE BLOCKING TERMINAL READ.
+ *
+ * A read of `tty' is the shell asking for a keystroke, so with nothing
+ * queued it must WAIT rather than answer zero -- a zero-length read is
+ * end of file, and a shell told its terminal had closed would exit at
+ * once. lib9p's way to wait is to keep the Req and respond() to it
+ * later, so the request goes on s->ttyq (linked through Req.aux) and
+ * comes back here when session_feed_keystrokes has something, or when
+ * the session dies.
+ *
+ * Because a Req can sit there indefinitely, the server MUST answer
+ * Tflush -- see fsflush below. Without it an interrupted client hangs
+ * for ever holding a fid, which is the classic way a lib9p server with
+ * deferred replies wedges.
+ */
+/* Caller holds s->ttylock. respond() under a QLock is fine: lib9p
+ * does its own locking and does not call back into us. */
+static void
+tty_serve(Session *s, Req *r)
+{
+	long n;
+
+	n = s->ttyin_len;
+	if(n > (long)r->ifcall.count)
+		n = r->ifcall.count;
+	memmove(r->ofcall.data, s->ttyin, n);
+	r->ofcall.count = n;
+
+	/* A terminal is a stream: the read CONSUMES what it took, and
+	 * ifcall.offset means nothing. (The viewer-facing `cons' file is
+	 * the opposite -- a snapshot indexed by offset.) */
+	s->ttyin_len -= n;
+	if(s->ttyin_len > 0)
+		memmove(s->ttyin, s->ttyin + n, s->ttyin_len);
+	respond(r, nil);
+}
+
+/* Take the oldest queued read off the front. */
+static Req*
+tty_pop(Session *s)
+{
+	Req *r;
+	int i;
+
+	if(s->ttynq <= 0)
+		return nil;
+	r = (Req*)s->ttyq[0];
+	for(i = 1; i < s->ttynq; i++)
+		s->ttyq[i-1] = s->ttyq[i];
+	s->ttynq--;
+	return r;
+}
+
+void
+session_tty_wake(Session *s)
+{
+	Req *r;
+
+	qlock(&s->ttylock);
+	while(s->ttynq > 0){
+		/* Nothing to hand over and the shell is still alive: the
+		 * reader keeps waiting, which is the whole point. */
+		if(s->ttyin_len == 0 && s->rc_alive){
+			qunlock(&s->ttylock);
+			return;
+		}
+		r = tty_pop(s);
+		if(s->ttyin_len == 0){
+			/* The session is gone. Answer end of file rather than
+			 * leave a reader hanging on a dead shell. */
+			r->ofcall.count = 0;
+			respond(r, nil);
+			continue;
+		}
+		tty_serve(s, r);
+	}
+	qunlock(&s->ttylock);
+}
+
+/*
+ * Tflush: a client gave up on a read that is still queued. Take it off
+ * the queue and respond to the FLUSHED request; lib9p answers the
+ * Tflush itself once we respond to this one. A Req that is on no queue
+ * has already been answered, and flushing it is a no-op.
+ */
+static void
+fsflush(Req *r)
+{
+	Req *v;
+	Session *s;
+	int i, j, k;
+
+	for(i = 0; i < nsessions; i++){
+		s = gsessions[i];
+		if(s == nil)
+			continue;
+		qlock(&s->ttylock);
+		for(j = 0; j < s->ttynq; j++){
+			if(s->ttyq[j] != (void*)r->oldreq)
+				continue;
+			v = (Req*)s->ttyq[j];
+			for(k = j+1; k < s->ttynq; k++)
+				s->ttyq[k-1] = s->ttyq[k];
+			s->ttynq--;
+			qunlock(&s->ttylock);
+			respond(v, "interrupted");
+			respond(r, nil);
+			return;
+		}
+		qunlock(&s->ttylock);
+	}
+	respond(r, nil);
+}
+
 static void
 fsread(Req *r)
 {
@@ -130,6 +245,47 @@ fsread(Req *r)
 			n = r->ifcall.count;
 		memmove(r->ofcall.data, s->keyin_buf + off, n);
 		r->ofcall.count = n;
+		respond(r, nil);
+		return;
+
+	case Faux_sess_tty:
+		s = sessof(r->fid->file);
+		if(s == nil){
+			respond(r, "no session");
+			return;
+		}
+		qlock(&s->ttylock);
+		if(s->ttyin_len > 0){
+			tty_serve(s, r);
+			qunlock(&s->ttylock);
+			return;
+		}
+		if(!s->rc_alive){
+			qunlock(&s->ttylock);
+			r->ofcall.count = 0;
+			respond(r, nil);
+			return;
+		}
+		/* Block: queue it and do NOT respond. See tty_serve above. */
+		if(s->ttynq >= (int)(sizeof s->ttyq / sizeof s->ttyq[0])){
+			qunlock(&s->ttylock);
+			respond(r, "vts: too many readers on tty");
+			return;
+		}
+		s->ttyq[s->ttynq++] = r;
+		qunlock(&s->ttylock);
+		return;
+
+	case Faux_sess_ttyctl:
+		s = sessof(r->fid->file);
+		if(s == nil){
+			respond(r, "no session");
+			return;
+		}
+		/* Readable so a program can ASK rather than assume. Plan 9's
+		 * own consctl is write-only; answering here costs nothing and
+		 * is how the smoke tests check that rawon arrived. */
+		readstr(r, s->raw ? "rawon\n" : "rawoff\n");
 		respond(r, nil);
 		return;
 
@@ -393,6 +549,57 @@ fswrite(Req *r)
 		respond(r, nil);
 		return;
 
+	case Faux_sess_tty:
+		s = sessof(r->fid->file);
+		if(s == nil){
+			respond(r, "no session");
+			return;
+		}
+		/*
+		 * The shell's stdout and stderr. Straight into the VT parser,
+		 * with no line editor in the way -- `lined' exists to cook
+		 * INPUT for a viewer, and cooking output would be nonsense.
+		 * This is the half that replaces the old shellout pipe and
+		 * its reader proc: the shell writes here, so there is nothing
+		 * left to drain.
+		 */
+		qlock(&s->lock);
+		engine_feed(&s->engine, (uchar*)r->ifcall.data, n);
+		qunlock(&s->lock);
+		r->ofcall.count = n;
+		respond(r, nil);
+		return;
+
+	case Faux_sess_ttyctl:
+		s = sessof(r->fid->file);
+		if(s == nil){
+			respond(r, "no session");
+			return;
+		}
+		/*
+		 * `rawon'/`rawoff', which is the whole of what Plan 9's
+		 * /dev/consctl accepts and therefore the whole of what
+		 * libap's tcsetattr writes (ap/plan9/tty.c). Neither a pipe
+		 * nor a 9P file has a line discipline to switch, so what this
+		 * actually does is turn vts's OWN line editor off: `lined'
+		 * batches keystrokes and flushes whole lines, and a shell
+		 * doing its own editing needs every keystroke as it happens.
+		 *
+		 * It must SUCCEED even when there is nothing to do. A stub
+		 * answering "failure" would fail tcsetattr, and a program
+		 * told it could not have raw mode behaves differently from
+		 * one that got it silently -- which is the most common bug
+		 * shape in this tree.
+		 */
+		if(n >= 5 && strncmp((char*)r->ifcall.data, "rawon", 5) == 0)
+			s->raw = 1;
+		else if(n >= 6 && strncmp((char*)r->ifcall.data, "rawoff", 6) == 0)
+			s->raw = 0;
+		lined_set_enabled(&s->editor, !s->raw);
+		r->ofcall.count = n;
+		respond(r, nil);
+		return;
+
 	case Faux_sess_cells:
 		respond(r, "cells is read-only");
 		return;
@@ -434,6 +641,21 @@ add_session_files(Session *s)
 	axp = (void*)(uintptr)Faux_sess_scroll;
 	s->files[4] = createfile(sess_dir, "scroll", "vts", 0444, axp);
 
+	/*
+	 * The shell's side. `cons' above is the VIEWER's file and keeps
+	 * the meaning it has always had; these two are what get bound
+	 * over /dev/cons and /dev/consctl in the shell's own namespace.
+	 * Keeping them separate is what lets vtwin and vts-attach go on
+	 * working unchanged -- and it is honest, because the two sides of
+	 * a terminal really are different files here: a viewer WRITES
+	 * keystrokes, the shell READS them.
+	 */
+	axp = (void*)(uintptr)Faux_sess_tty;
+	s->files[5] = createfile(sess_dir, "tty", "vts", 0666, axp);
+
+	axp = (void*)(uintptr)Faux_sess_ttyctl;
+	s->files[6] = createfile(sess_dir, "ttyctl", "vts", 0666, axp);
+
 	return 0;
 }
 
@@ -448,7 +670,7 @@ remove_session_files(Session *s)
 	 * and drops the createfile reference; if a client still has the
 	 * file open, lib9p keeps the (now unlinked) File alive until the
 	 * last fid clunks, so this is safe even mid-use. No walkfile. */
-	for(i = 1; i < 5; i++){
+	for(i = 1; i < 7; i++){
 		if(s->files[i] != nil){
 			removefile((File*)s->files[i]);
 			s->files[i] = nil;
@@ -463,8 +685,20 @@ static void
 spawn_rc_proc(void *arg)
 {
 	Session *s = (Session*)arg;
-	if(session_spawn_rc(s) < 0)
-		fprint(2, "vts: warning: could not spawn rc for %s\n", s->name);
+	if(session_spawn_rc(s) < 0){
+		fprint(2, "vts: warning: could not spawn a shell for %s\n", s->name);
+		threadexits(nil);
+	}
+	/*
+	 * And then WAIT here, in the proc that forked. Plan 9's wait
+	 * reports to the process that did the rfork, so this cannot be
+	 * moved to a proc of its own -- and it is safe to block, because
+	 * this proc exists to do nothing else. It is also what replaces
+	 * the old reader proc: the shell writes its output to `tty' over
+	 * 9P now, so there is no pipe left to drain and the only thing
+	 * still worth watching for is the shell's death.
+	 */
+	session_wait_rc(s);
 	threadexits(nil);
 }
 
@@ -538,6 +772,9 @@ kill_session(const char *name)
 		close(s->keyin_wfd);
 		s->keyin_wfd = -1;
 	}
+	/* Answer any tty read still queued, or its client waits for ever
+	 * on a shell that is not coming back. */
+	session_tty_wake(s);
 
 	remove_session_files(s);
 	fprint(2, "vts: killed session %s\n", name);
@@ -576,6 +813,7 @@ fsstart(Srv *srv)
 static Srv vts_srv = {
 	.read = fsread,
 	.write = fswrite,
+	.flush = fsflush,
 	.start = fsstart,
 };
 
