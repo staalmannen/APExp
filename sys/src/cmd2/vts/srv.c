@@ -222,11 +222,11 @@ fsread(Req *r)
 			return;
 		}
 		snprint(Estatus, sizeof Estatus,
-			"session %s; size=%dx%d; cursor=%d,%d; visible=%d; rc_alive=%d\n",
+			"session %s; size=%dx%d; cursor=%d,%d; visible=%d; rc_alive=%d; raw=%d; lined=%d\n",
 			s->name, s->buf.rows, s->buf.cols,
 			s->buf.cur_row, s->buf.cur_col,
 			(int)s->buf.cur_visible,
-			s->rc_alive);
+			s->rc_alive, s->raw, s->editor.enabled);
 		readstr(r, Estatus);
 		respond(r, nil);
 		return;

@@ -1243,9 +1243,31 @@ From a plain `rc` none of it is true and vts falls back to `/bin/rc`.
 9front's rc neither echoes nor cooks, so lined-off would blank every
 non-bash session -- and *the failure mode decides it*, since lined-on
 still gives a usable cooked shell if bash never reaches `tcsetattr`.
-**First thing to read when a session runs but does not complete**:
-`cat /n/vts/1/ttyctl`. `rawon` means `isatty(0)` was true and readline
-started; `rawoff` means doubt the bind.
+**FIRST RUN: readline IS RUNNING -- the bind works -- AND THE INPUT IS
+GARBLED.** The session printed `2004h$ 20041`, which is readline's
+bracketed-paste `ESC [ ? 2004 h`/`l` with the `ESC [ ?` missing, and
+`echo $SHELL` came back as `cho Scho SH` / `echo S` / `SHL`. readline
+only emits those sequences when it is driving the line, so
+**`isatty(0)` was true and `/dev/cons` is a real terminal** -- the half
+this change was for is CONFIRMED.
+**The garbling is TWO WRITERS FEEDING ONE VT PARSER.** `engine_feed`
+is a bare pass-through to `vterm_input_write`, which holds parser state
+across calls, so a torn `ESC [ ?` was interrupted by someone else's
+bytes rather than by a write boundary; and the doubled character groups
+are double echo. The only two writers are `fswrite` on `tty` (the
+shell's output) and **`lined`'s redraw, which runs only while
+`s->editor.enabled`** -- so `lined` was on while bash echoed, and the
+`rawon` that should have turned it off never arrived. *(The `cells`
+read is excluded: it holds `s->lock`, and so does the write.)*
+**Two stories fit, they need different fixes, and I have changed my
+mind about this once already -- so ASK**: `cat /n/vts/1/ctl` (which now
+reports `raw=` and `lined=`) and `cat /n/vts/1/ttyctl`. `rawoff` plus a
+bind complaint means the consctl bind failed; `rawon` means readline's
+per-line unprep put lined back, and lined must then stay off once a
+shell has ever asked for raw.
+**The consctl bind now happens LAST, after fd 2 is the terminal**, so
+its complaint lands in the window being looked at rather than the one
+vts was launched from.
 **And vts's key interception is the OPPOSITE of what is wanted here**:
 `lined.c` batches keystrokes and flushes whole LINES to the shell, so
 bash's completion needs `edit off`, not `edit on`. The remaining three

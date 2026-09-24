@@ -206,15 +206,6 @@ session_spawn_rc(Session *s)
 				fprint(2, "vts: child: bind %s /dev/cons: %r\n", path);
 				_exits("bind");
 			}
-			/*
-			 * consctl is NOT fatal. Without it tcsetattr fails and
-			 * the shell falls back to cooked input, which is worse
-			 * than raw but is still a working shell; without
-			 * /dev/cons there is no shell at all.
-			 */
-			snprint(path, sizeof path, "/mnt/%s/ttyctl", s->name);
-			if(bind(path, "/dev/consctl", MREPL) < 0)
-				fprint(2, "vts: child: bind %s /dev/consctl: %r\n", path);
 
 			fd = open("/dev/cons", ORDWR);
 			if(fd < 0){
@@ -226,6 +217,33 @@ session_spawn_rc(Session *s)
 			dup(fd, 2);
 			if(fd > 2)
 				close(fd);
+
+			/*
+			 * consctl LAST, and deliberately after fd 2 is the
+			 * terminal, so that if it fails the complaint lands in
+			 * the WINDOW the user is looking at rather than in the
+			 * one vts was launched from -- which is easy to lose
+			 * behind the session and is not where anyone looks when
+			 * a shell misbehaves.
+			 *
+			 * It is not fatal. Without it tcsetattr fails, the
+			 * shell falls back to cooked input, and vts's own line
+			 * editor keeps cooking -- worse than raw, still a
+			 * working shell. Without /dev/cons there is no shell
+			 * at all, which is why that one exits.
+			 *
+			 * WATCH THIS ONE. Everything the shell needs for raw
+			 * mode hangs off it: libap's tcsetattr writes rawon
+			 * here (ap/plan9/tty.c), that write is what turns
+			 * `lined' off, and with lined ON while bash echoes
+			 * there are TWO writers feeding one VT parser --
+			 * double echo, and escape sequences torn in half.
+			 */
+			snprint(path, sizeof path, "/mnt/%s/ttyctl", s->name);
+			if(bind(path, "/dev/consctl", MREPL) < 0)
+				fprint(2, "vts: child: bind %s /dev/consctl: %r\n"
+					"vts: raw mode will not work; expect double echo\n",
+					path);
 
 			/*
 			 * TERM is the one that changes what the screen looks
