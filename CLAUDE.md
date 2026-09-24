@@ -1819,6 +1819,22 @@ finally reaching `tcltest`, which gives the new build rule below.
 mode-0 directory; Plan 9 answers "does not exist". The file server's
 choice, so a probe rather than a library rule.
 
+**bash cannot be `/bin/sh` yet: it dies `Killed: Insufficient physical
+memory` during a full rebuild** -- but the log warns twice first, at
+**100 and then 200 file descriptors**, and a shell running build
+recipes has no business holding 200. So it is a leak with a shape.
+`plan9/_buf.c` is the lead: `_startbuf` deliberately *"leave[s] fd open
+in parent so system doesn't reuse it"* and forks a copy process per
+buffered descriptor, both for the life of the process unless `close()`
+reaches `_closebuf`. (`Muxseg` is also ~4.2 MB -- `Muxbuf bufs[256]`
+at 16 KB of `data` each -- but that is demand-paged address space, so
+it is the weaker candidate and is written down to be excluded.)
+**Newly reachable when `READLINE` went on**, like the `FD_BUFFEREDX`
+bug. **The test needs no new code**: run the failing build with
+`APEXP_DEBUG=1` and count `select: buffered now fd=` lines against the
+descriptor warnings. Recorded, not measured; back on dash meanwhile,
+and the goal is one shell rather than two.
+
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR.
 

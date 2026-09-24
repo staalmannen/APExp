@@ -1485,3 +1485,59 @@ recorded as found, not measured. Its ANSWER is still an approximation:
 a terminal, pipe or socket it says 0 always. Plan 9's `stat` on a pipe
 does report what is queued, so a real answer exists for that case and
 wants its own round.
+
+## bash as /bin/sh dies out of memory, and select() is the lead
+
+Recorded from a full rebuild with bash in place of dash as `/bin/sh`,
+**not measured**:
+
+```
+sh 28439: warning: process exceeds 100 file descriptors
+sh 28439: warning: process exceeds 200 file descriptors
+sh 28439: Killed: Insufficient physical memory
+mk: .../amd64/bin/ape/bison -y -d ... : exit status=rc 28429: sh 28439:
+    Killed: Insufficient physical memory
+```
+
+**The descriptor warnings are the part worth keeping.** A shell running
+build recipes has no business holding 200 descriptors, and the kernel
+said so twice before the kill. That is a leak with a shape, not a
+program that merely wanted more memory.
+
+`plan9/_buf.c` is where to look, and there are two candidates. Both are
+consequences of `select()` being a **copy process** here rather than a
+system call, so both got newly reachable when `READLINE` was turned on
+in bash's `config.h` -- nothing in this tree had asked `select()` about
+much before that.
+
+- **`_startbuf` leaves the descriptor open on purpose**: *"leave fd open
+  in parent so system doesn't reuse it"*. Every descriptor a process
+  ever selects on therefore stays open for the life of the process
+  unless `close()` runs `_closebuf` on it, **and forks a copy process
+  that stays alive too**. A shell that selects on a pipe per command
+  accumulates one of each per command.
+- **The shared segment is big.** `Muxseg` is
+  `Lock + 3 ints + 2 fd_set + Muxbuf bufs[OPEN_MAX]`, `OPEN_MAX` is
+  **256**, and each `Muxbuf` carries `data[PERFDMAX]` = `2*8192` =
+  **16 KB**. So the segment `_SEGATTACH`es **about 4.2 MB**, per process
+  that ever calls `select()`. *That is address space rather than
+  resident memory* -- Plan 9 pages it in on demand, and `INITBUFS = 4`
+  says only a few slots are expected to be touched -- so this is the
+  weaker of the two and is written down to be excluded rather than
+  assumed. It becomes the answer only if something touches many slots.
+
+**The cheap test already exists and needs no new code.** `$APEXP_DEBUG`
+prints one line per newly buffered descriptor:
+
+```
+select: buffered now fd=N flags=...
+```
+
+so running the failing build with `APEXP_DEBUG=1` and counting those
+lines says directly whether the buffer count climbs with the descriptor
+count. If it does, the leak is the first candidate and the fix is about
+when `_closebuf` runs. If it does not, `select()` is exonerated and the
+next question is bash's own descriptor handling.
+
+*Back on dash for now. The goal is one shell rather than two, so this
+is on the way rather than optional -- but it is a round of its own.*
