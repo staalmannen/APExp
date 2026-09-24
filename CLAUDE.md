@@ -51,9 +51,12 @@ lookup in that union component falls through to the host's own
 `/$objtype/bin` -- so the next native compile runs **stock 9front's
 `6c`** and dies on `syntax error, last name: bool`, `bool` being
 exactly what APExp's kencc adds. *A library that built yesterday stops
-building and nothing in the message is about binds.* **If it ever
-happens anyway, a FRESH `apexp-sh` is the fix** -- it rebinds whatever
-exists now.
+building and nothing in the message is about binds.* **CONFIRMED by the cleanest
+control available**: the window was killed, a fresh `apexp-sh` started,
+and `mk install` run again with no other change -- and it built. Only
+the namespace differed. **A fresh `apexp-sh` is the fix whenever this
+shape appears**, since any `rm -rf` of a bound directory, by any means,
+leaves a window whose `/bin` is quietly the host's.
 
 **Those two trees are build output in full.** `git ls-files amd64` is
 `amd64/include/ape` and nothing else, and `.gitignore` carries

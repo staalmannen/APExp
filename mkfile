@@ -72,10 +72,15 @@ clean:V:
 # the outlier. rm's -f is what makes an unmatched glob silent, so an
 # already-empty directory is not an error.
 #
-# REASONED FROM Plan 9's bind semantics, and consistent with the one
-# failure seen; not measured by a controlled before/after. The
-# workaround if it ever bites again is a FRESH apexp-sh, which rebinds
-# whatever exists now.
+# CONFIRMED, and by the cleanest control available: the window was
+# killed, a fresh apexp-sh started, and `mk install' run again with NO
+# other change -- and it built. Only the namespace differed. So the
+# stale bind is the cause rather than a plausible story about one.
+#
+# THE WORKAROUND IS THAT SAME FRESH apexp-sh, which rebinds whatever
+# exists now, and it is worth knowing independently of this rule: any
+# `rm -rf' of a bound directory, by any means, leaves a window whose
+# /bin is quietly the host's.
 #
 distclean:V:
 	for (i in $DIRS)
