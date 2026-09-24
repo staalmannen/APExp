@@ -1260,11 +1260,26 @@ shell's output) and **`lined`'s redraw, which runs only while
 `rawon` that should have turned it off never arrived. *(The `cells`
 read is excluded: it holds `s->lock`, and so does the write.)*
 **Two stories fit, they need different fixes, and I have changed my
-mind about this once already -- so ASK**: `cat /n/vts/1/ctl` (which now
-reports `raw=` and `lined=`) and `cat /n/vts/1/ttyctl`. `rawoff` plus a
-bind complaint means the consctl bind failed; `rawon` means readline's
+mind about this once already -- so the script now ASKS for me.** `ctl`
+carries `raw=` and `lined=`, and `vts-bash` prints it twice: a second
+after the shell starts and again after vtwin exits. `rawoff` plus a
+consctl bind complaint means the bind failed; `rawon` means readline's
 per-line unprep put lined back, and lined must then stay off once a
 shell has ever asked for raw.
+**AND THE FIRST ASKING WAS UNANSWERABLE, WHICH WAS MY FAULT**:
+`cat /n/vts/1/ctl` in another window says `file does not exist`, and
+that is CORRECT. `/srv/vts` is global but **a MOUNT is
+per-namespace**, and `apexp-sh` opens with `rfork en`, so every window
+has its own. The files are reachable from exactly three places --
+`/mnt/<sess>/` inside the session's shell, and `/n/vts/<sess>/` in
+vtwin's window or the one that ran `vts-bash` (which now mounts).
+*On Plan 9 a path is not an address until you say whose namespace it
+is in* -- the same family as an instruction for the other machine
+having to name the program that runs it.
+**`/srv/vts` already existing now ATTACHES rather than refusing**, and
+warns that an already-running server is the OLD binary if vts was
+rebuilt since -- so every conclusion drawn from that window is about
+the old code. `kill vts | rc ; rm -f /srv/vts` replaces it.
 **The consctl bind now happens LAST, after fd 2 is the terminal**, so
 its complaint lands in the window being looked at rather than the one
 vts was launched from.

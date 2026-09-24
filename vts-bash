@@ -1,5 +1,5 @@
 #!/bin/rc
-# vts-bash -- start bash under vts, in a vtwin window.
+# vts-bash -- start bash under vts in a vtwin window, or attach to one.
 #
 # RUN THIS FROM INSIDE apexp-sh. That is not a convenience, it is the
 # whole mechanism:
@@ -15,17 +15,51 @@
 # the shell inherits that namespace and that environment. Started from
 # a plain rc, none of the three is true and vts falls back to /bin/rc.
 #
-# Every check below is here because its failure is silent or reads as
-# something else. Nothing in this script is decoration.
+# ------------------------------------------------------------------
+# A MOUNT LIVES IN A NAMESPACE, AND THAT IS WHY THIS SCRIPT MOUNTS.
+#
+# /srv/vts is visible everywhere -- /srv is global -- but what you get
+# by MOUNTING it is not. apexp-sh begins with `rfork en', so every
+# apexp-sh window has a namespace of its own, and a mount made in one
+# is invisible in the next. `lc /n/vts' in another window shows
+# nothing, and that is CORRECT rather than a sign the server is broken.
+#
+# So a session's files are reachable from exactly three places:
+#
+#   /mnt/<sess>/...    inside the session's own shell -- vts mounts there
+#   /n/vts/<sess>/...  in THIS window, because of the mount below
+#   /n/vts/<sess>/...  in vtwin's window, which mounts for itself
+#
+# Asking for `cat /n/vts/1/ctl' without saying which window is asking
+# for nothing. That was the instruction, and this is the fix.
 
 fn fail {
 	echo 'vts-bash: '^$"* >[1=2]
 	exit fail
 }
 
-# 1. Inside apexp-sh? The test is the two binds, not $SHELL -- a
-#    variable can be set by hand and prove nothing, while the binds are
-#    what actually decides whether the exec finds anything.
+# The one readout worth having. `ctl' carries raw= and lined=, which
+# together say whether the shell ever reached tcsetattr -- and that is
+# the difference between "the terminal works" and "two things are
+# echoing into one VT parser".
+fn report {
+	echo
+	echo 'vts-bash: session state ----------------------------------'
+	cat /n/vts/1/ctl >[2]/dev/null
+	echo -n 'vts-bash:   ttyctl says: '
+	cat /n/vts/1/ttyctl >[2]/dev/null
+	echo 'vts-bash:   rawon  = the shell reached tcsetattr, so isatty'
+	echo 'vts-bash:            was true, readline started, and lined is'
+	echo 'vts-bash:            out of the way.'
+	echo 'vts-bash:   rawoff = it did not. Look above for a consctl bind'
+	echo 'vts-bash:            complaint; without it, expect double echo.'
+	echo 'vts-bash: ----------------------------------------------------'
+	echo
+}
+
+# 1. Inside apexp-sh? The test is the binds, not $SHELL -- a variable
+#    can be set by hand and prove nothing, while the binds are what
+#    actually decide whether the exec finds anything.
 if(! test -e /bin/bash)
 	fail 'no /bin/bash -- run this from inside ./apexp-sh'
 if(! test -e /bin/vts)
@@ -39,43 +73,76 @@ if(~ $#SHELL 0)
 	fail 'SHELL is not set, so vts would exec /bin/rc; apexp-sh sets it'
 echo 'vts-bash: shell is '^$SHELL
 
-# 3. Is a vts already posted? Starting a second one is not an error --
-#    it posts under the same name and the first is replaced, which
-#    looks exactly like the new one having failed.
-if(test -e /srv/vts)
-	fail '/srv/vts already exists; `rm /srv/vts'' or attach to it with vtwin'
-
-# 4. Start it. vts talks to fd 2 about what it is doing -- which pipes
-#    it made, which shell it forked, where the tty is -- and that is
-#    the log to read when a session comes up blank, so it is left
-#    pointed at this window rather than /dev/null.
-echo 'vts-bash: starting vts...'
-vts &
-vtspid=$apid
-
-# 5. Wait for the post rather than racing it. vtwin exits if
-#    /srv/vts is not there yet, and the race is won often enough that
-#    losing it reads as a vtwin bug.
-#    (Plan 9's sleep takes WHOLE SECONDS -- `sleep 0.1' sleeps zero and
-#    turns this into a spin. Hence five one-second tries rather than
-#    fifty tenths.)
-for(i in 1 2 3 4 5){
-	if(test -e /srv/vts)
-		break
-	sleep 1
+# 3. Already running? ATTACH rather than refuse.
+#
+#    Posting a second vts under the same name replaces the first, and
+#    that looks exactly like the new one having failed -- so this used
+#    to stop with an error. But attaching is almost always what was
+#    meant, and refusing left no way forward that did not involve
+#    knowing which process to kill.
+#
+#    IT IS STILL WORTH READING. An attached window shows the session as
+#    it is, INCLUDING a session started by an older vts: if the binary
+#    was rebuilt since, the running server is the old code, and every
+#    conclusion drawn from that window is about the old code.
+mine=yes
+if(test -e /srv/vts){
+	mine=no
+	echo 'vts-bash: /srv/vts exists -- ATTACHING to the vts already running.'
+	echo 'vts-bash: if you rebuilt vts since it started, that server is the'
+	echo 'vts-bash: OLD binary, and so is everything you see. To replace it:'
+	echo 'vts-bash:     kill vts | rc ; rm -f /srv/vts'
 }
-if(! test -e /srv/vts)
-	fail 'vts did not post /srv/vts within 5s -- read its output above'
-echo 'vts-bash: /srv/vts posted'
+if not {
+	# vts talks to fd 2 about what it is doing -- which shell it
+	# forked, where the tty is, and any bind that failed -- and that
+	# is the log to read when a session comes up blank, so it stays
+	# pointed at this window rather than /dev/null.
+	echo 'vts-bash: starting vts...'
+	vts &
+	vtspid=$apid
 
-# 6. And the window. vtwin mounts /srv/vts itself.
+	# Wait for the post rather than racing it: vtwin exits if
+	# /srv/vts is not there yet, and losing that race reads as a
+	# vtwin bug. (Plan 9's sleep takes WHOLE SECONDS -- `sleep 0.1'
+	# sleeps zero and turns this into a spin.)
+	for(i in 1 2 3 4 5){
+		if(test -e /srv/vts)
+			break
+		sleep 1
+	}
+	if(! test -e /srv/vts)
+		fail 'vts did not post /srv/vts within 5s -- read its output above'
+	echo 'vts-bash: /srv/vts posted'
+}
+
+# 4. Mount it HERE, so this window can read the session's files at all.
+#    See the namespace note at the top: without this, /n/vts is empty
+#    in every window but vtwin's.
+if(! mount -c /srv/vts /n/vts)
+	fail 'could not mount /srv/vts on /n/vts'
+
+# 5. Give the shell a moment to reach its first prompt, then say what
+#    state the terminal is in. This is the whole point of mounting: the
+#    answer arrives without anyone having to know where to look.
+sleep 1
+report
+
+# 6. And the window. vtwin mounts /srv/vts for itself.
 echo 'vts-bash: starting vtwin (close the window to finish)'
 vtwin
 
-# 7. Tear down, so a second run does not trip check 3.
-#    `kill' on Plan 9 PRINTS the commands to do it, for piping into a
-#    shell; the note is what actually does it, so write it directly.
-echo 'vts-bash: vtwin exited, stopping vts'
-if(test -e /proc/$vtspid/note)
-	echo kill >/proc/$vtspid/note
-rm -f /srv/vts
+# 7. Again on the way out -- the interesting state is usually the one
+#    after something went wrong, not the one a second after boot.
+report
+
+if(~ $mine yes){
+	# `kill' on Plan 9 PRINTS the commands to do it, for piping into
+	# a shell; the note is what actually does it, so write it direct.
+	echo 'vts-bash: vtwin exited, stopping the vts this script started'
+	if(test -e /proc/$vtspid/note)
+		echo kill >/proc/$vtspid/note
+	rm -f /srv/vts
+}
+if not
+	echo 'vts-bash: vtwin exited; leaving the vts that was already running'
