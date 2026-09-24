@@ -87,11 +87,17 @@ _startbuf(int fd)
 	if(mux == 0){
 		if(_RFORK(RFREND) == -1){
 			_syserrno();
+			if(_apdbgon())
+				_apdbg("_startbuf: RFORK(RFREND) failed",
+					"errno", errno, 0, 0);
 			return -1;
 		}
 		m = (Muxseg*)_SEGATTACH(0, "shared", 0, sizeof(Muxseg));
 		if(m == (void*)-1){
 			_syserrno();
+			if(_apdbgon())
+				_apdbg("_startbuf: SEGATTACH failed",
+					"errno", errno, 0, 0);
 			return -1;
 		}
 		mux = m;
@@ -106,6 +112,8 @@ _startbuf(int fd)
 	f = &_fdinfo[fd];
 	if((f->flags&FD_ISOPEN) == 0){
 		unlock(&mux->lock);
+		if(_apdbgon())
+			_apdbg("_startbuf: EBADF", "fd", fd, "flags", f->flags);
 		errno = EBADF;
 		return -1;
 	}
@@ -115,6 +123,9 @@ _startbuf(int fd)
 	}
 	if((f->flags&FD_BUFFEREDX) != 0){
 		unlock(&mux->lock);
+		if(_apdbgon())
+			_apdbg("_startbuf: EIO, FD_BUFFEREDX", "fd", fd,
+				"flags", f->flags);
 		errno = EIO;
 		return -1;
 	}
@@ -123,6 +134,8 @@ _startbuf(int fd)
 			goto Found;
 	if(mux->curfds >= OPEN_MAX){
 		unlock(&mux->lock);
+		if(_apdbgon())
+			_apdbg("_startbuf: ENFILE", "curfds", mux->curfds, 0, 0);
 		errno = ENFILE;
 		return -1;
 	}
@@ -185,6 +198,28 @@ Found:
 			;
 		_copyproc(fd, b);
 	}
+	/*
+	 * A FAILED FORK HERE USED TO HANG THE CALLER FOR EVER, silently.
+	 * The return value was not checked, so `pid' of -1 was stored as
+	 * the copy process's id and the parent went straight to the
+	 * rendezvous below -- waiting for a process that was never
+	 * created, inside read() or select(), with nothing to report.
+	 *
+	 * Found while instrumenting this file, NOT measured: bash under
+	 * vts exits rather than hangs, so this is not that bug. An
+	 * unchecked fork whose failure mode is an unbreakable wait is
+	 * wrong on its own terms.
+	 */
+	if(pid == -1){
+		_syserrno();
+		b->fd = -1;
+		unlock(&mux->lock);
+		if(_apdbgon())
+			_apdbg("_startbuf: fork of copy process failed",
+				"fd", fd, "errno", errno);
+		return -1;
+	}
+
 	/* parent process continues ... */
 	b->copypid = pid;
 	f->buf = b;
@@ -411,16 +446,42 @@ select(int nfds, fd_set *rfds, fd_set *wfds, fd_set *efds, struct timeval *timeo
 		t = (tms > 0x7fffffff) ? 0x7fffffff : (int)tms;
 	} else
 		t = -1;
+	/*
+	 * $APEXP_DEBUG. THE CALLER THAT MADE THESE NECESSARY: readline's
+	 * rl_getc() does
+	 *
+	 *	result = 0;
+	 *	result = _rl_timeout_select(fd+1, &readfds, 0,0,0, ...);
+	 *	if (result >= 0)
+	 *		result = read (fd, &c, 1);
+	 *	...
+	 *	if (errno != EINTR) return EOF;
+	 *
+	 * so a select() that answers WRONG -- either a negative return or
+	 * a zero with a NULL timeout -- makes the read never happen and
+	 * readline call it end of file. Under vts that is exactly what
+	 * was measured: reads on fd 3 and fd 5 in the trace and not one
+	 * on fd 0, then `exit'. Every return below therefore says which
+	 * one it was.
+	 */
+	if(_apdbgon())
+		_apdbg("select: enter", "nfds", nfds, "t", t);
+
 	if(!((rfds && FD_ANYSET(rfds)) || (wfds && FD_ANYSET(wfds))
 			|| (efds && FD_ANYSET(efds)))) {
 		/* no requested fds */
+		if(_apdbgon())
+			_apdbg("select: -> 0, NO FDS SET", "t", t, 0, 0);
 		if(t > 0)
 			_SLEEP(t);
 		return 0;
 	}
 
-	if(_startbuf(-1) != 0)
+	if(_startbuf(-1) != 0){
+		if(_apdbgon())
+			_apdbg("select: -> -1, _startbuf(init)", "errno", errno, 0, 0);
 		return -1;
+	}
 
 	/* make sure all requested rfds and efds are buffered */
 	FD_ZERO(&fresh);
@@ -431,12 +492,22 @@ select(int nfds, fd_set *rfds, fd_set *wfds, fd_set *efds, struct timeval *timeo
 		if((rfds && FD_ISSET(i, rfds)) || (efds && FD_ISSET(i, efds))){
 			f = &_fdinfo[i];
 			if((f->flags&FD_ISOPEN) == 0){
+				if(_apdbgon())
+					_apdbg("select: -> -1, EBADF", "fd", i,
+						"flags", f->flags);
 				errno = EBADF;
 				return -1;
 			}
 			if((f->flags&FD_BUFFERED) == 0){
-				if(_startbuf(i) != 0)
+				if(_startbuf(i) != 0){
+					if(_apdbgon())
+						_apdbg("select: -> -1, _startbuf",
+							"fd", i, "errno", errno);
 					return -1;
+				}
+				if(_apdbgon())
+					_apdbg("select: buffered now", "fd", i,
+						"flags", f->flags);
 				FD_SET(i, &fresh);
 				nfresh++;
 			}
