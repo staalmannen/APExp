@@ -170,5 +170,6 @@ extern int  _tty_israw(void);
 extern int  _ttymark(void);		/* which libap is linked in */
 
 /* ap/plan9/_apdbg.c -- one debug line, under $APEXP_DEBUG. Labels may be 0. */
+extern int _apdbgon(void);
 extern void _apdbg(const char *msg, const char *l1, int v1,
 	const char *l2, int v2);

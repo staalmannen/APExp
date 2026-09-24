@@ -268,6 +268,22 @@ session_spawn_rc(Session *s)
 			putenv("vts", s->name);
 
 			/*
+			 * Carry $APEXP_DEBUG through to the shell when vts
+			 * is being traced. libap's _apdbg() reads it, and
+			 * its lines go to fd 2 -- which is this terminal, so
+			 * they travel back through the server and land in
+			 * vts's own log beside the 9P trace. The two halves
+			 * of the conversation in one file, in order.
+			 */
+			{
+				char *dbg = getenv("vtsdebug");
+
+				if(dbg != nil && *dbg != '\0')
+					putenv("APEXP_DEBUG", "1");
+				free(dbg);
+			}
+
+			/*
 			 * SAY WHAT THE THREE DESCRIPTORS ACTUALLY ARE.
 			 *
 			 * Every trace so far proves fd 1 and fd 2 -- the

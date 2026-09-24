@@ -61,15 +61,27 @@ putnum(char *p, char *e, int v)
  * numbers are -- a line reading `fd=4 pid=7898' can be read by someone
  * who has never seen this file, and one reading `a=4 b=7898' cannot.
  */
+/*
+ * Is it on? For callers on a hot path, so that a run with debugging
+ * off costs one load and one branch rather than one call per line.
+ * read() is the reason: three lines per read is three calls in the
+ * inner loop of every program in the tree.
+ */
+int
+_apdbgon(void)
+{
+	if(dbgon < 0)
+		dbgon = getenv("APEXP_DEBUG") != 0
+			|| getenv("APEXP_LISTENDEBUG") != 0;
+	return dbgon;
+}
+
 void
 _apdbg(const char *msg, const char *l1, int v1, const char *l2, int v2)
 {
 	char buf[160], *p, *e;
 
-	if(dbgon < 0)
-		dbgon = getenv("APEXP_DEBUG") != 0
-			|| getenv("APEXP_LISTENDEBUG") != 0;
-	if(dbgon == 0)
+	if(_apdbgon() == 0)
 		return;
 	p = buf;
 	e = buf + sizeof buf - 2;

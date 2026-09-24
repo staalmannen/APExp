@@ -22,13 +22,37 @@ ioctl(int fd, unsigned long request, void* arg)
 	int n;
 
 	switch(request) {
+	/*
+	 * FIONREAD'S ARGUMENT IS AN `int *', NOT A `long *'.
+	 *
+	 * BSD, Linux and every caller in this tree pass the address of an
+	 * `int'; readline's rl_gather_tyi() passes `&chars_avail', an int
+	 * local. Writing a `long' through it stores EIGHT bytes on amd64
+	 * and smashes the four beyond -- whatever the compiler put next in
+	 * the caller's frame. The store even succeeds, so nothing
+	 * complains; what shows up is the neighbouring variable being zero
+	 * for no reason, somewhere else entirely.
+	 *
+	 * Found while reading a vts trace, NOT measured: it is not what
+	 * made bash exit there (the EOF happened with no stat before it).
+	 * It is wrong on its own terms, which is enough.
+	 *
+	 * The ANSWER is still an approximation and worth saying out loud:
+	 * st_size is the number of bytes available only for a file that
+	 * has a size. For a terminal, a pipe or a socket Plan 9 reports 0,
+	 * so this says "nothing to read" always -- which is the safe
+	 * direction (a caller waits rather than reading what is not there)
+	 * but is not the truth. Plan 9's stat on a PIPE does report what
+	 * is queued, so a real answer is available for that case; it needs
+	 * its own round and a test, not a guess here.
+	 */
 	case FIONREAD:
 		if(fstat(fd, &d) < 0) {
 			errno = EBADF;
 			return -1;
 		}
 		/* this works if the file is buffered somehow */
-		*(long*)arg = d.st_size;
+		*(int*)arg = (int)d.st_size;
 		return 0;
 
 	case TIOCGWINSZ:
