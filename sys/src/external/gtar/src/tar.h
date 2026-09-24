@@ -19,6 +19,50 @@
 
 /* tar Header Block, from POSIX 1003.1-1990.  */
 
+/*
+ * APExp: THESE STRUCTS ARE AN ON-DISK FORMAT, AND kencc PADS STRUCTS.
+ *
+ * 6c's align() rounds the end of EVERY struct to SZ_VLONG -- 8 on
+ * amd64 -- rather than to the alignment its members actually need
+ * (sys/src/cmd/6c/swt.c, case Asu2), and aligns a nested struct member
+ * to 8 as well (case Ael1, where ewidth[TSTRUCT] falls through to
+ * `w = SZ_VLONG'). So a struct of nothing but char arrays does not
+ * have the size C says it has:
+ *
+ *	                       kencc   gcc
+ *	sizeof(posix_header)     504   500
+ *	sizeof(oldgnu_header)    504   495     (sp[] aligned to 8 too)
+ *	sizeof(sparse_header)    512   505
+ *	sizeof(star_in_header)   520   512
+ *	sizeof(union block)      520   512   <-- and this one is fatal
+ *
+ * tar walks the record with `union block *' arithmetic while every
+ * length in the tar format is a multiple of BLOCKSIZE, so a 520-byte
+ * union put every block after the first EIGHT BYTES LATE and every
+ * archive tar wrote here was malformed. sys/lib/tests/tarblock-probe.c
+ * measures it; sys/lib/tests/tarhdr-probe.c shows what it did to an
+ * archive.
+ *
+ * `#pragma pack on' sets packflg, which is exactly the override both
+ * of those align() cases read, so the layout becomes the one the
+ * format specifies. It is the established Plan 9 idiom for a struct
+ * that models bytes on a disk or a wire -- sys/src/cmd/5e/proc.c uses
+ * it for the same reason.
+ *
+ * SCOPE IS DELIBERATE. Only the header structs and `union block' are
+ * wrapped: they are a byte layout. tar's own structures further down
+ * this file -- tar_stat_info, xheader, exclist -- hold real off_t,
+ * time_t and pointers, and packing those would misalign members for no
+ * reason, so `pack off' comes back before them.
+ *
+ * PLAN9 comes from sys/src/ape/cmd/tar/mkfile, the way -DPLAN9 is
+ * passed for itcl. gcc does not know this pragma and the guard keeps
+ * the host syntax check quiet.
+ */
+#ifdef PLAN9
+#pragma pack on
+#endif
+
 /* POSIX header.  */
 
 struct posix_header
@@ -240,6 +284,15 @@ struct star_ext_header
   char isextended;
 };
 
+#ifdef PLAN9
+/*
+ * End of the on-disk layout. Everything below here is tar's own
+ * bookkeeping and holds real off_t, time_t and pointers, so it keeps
+ * the platform's normal alignment. See the note at `pack on'.
+ */
+#pragma pack off
+#endif
+
 /* END */
 
 
@@ -376,6 +429,16 @@ struct tar_stat_info
   struct exclist *exclude_list;
 };
 
+/*
+ * And the union is packed too, although with the members above fixed
+ * it would already come out 512: stating it is cheaper than relying on
+ * 512 happening to be a multiple of 8. This is the type tar does its
+ * pointer arithmetic in, so its size IS the block stride.
+ */
+#ifdef PLAN9
+#pragma pack on
+#endif
+
 union block
 {
   char buffer[BLOCKSIZE];
@@ -386,3 +449,7 @@ union block
   struct star_in_header star_in_header;
   struct star_ext_header star_ext_header;
 };
+
+#ifdef PLAN9
+#pragma pack off
+#endif

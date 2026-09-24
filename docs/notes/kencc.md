@@ -772,3 +772,139 @@ pointer and float return values.
 The math.h gap (30 functions) and the other missing declarations has been fixed.
 
 
+
+### Every struct's size is rounded to 8, whatever its members are (NOT fixed; worked around)
+
+**`sizeof(struct { char a[500]; })` is 504 here.** C says 500. This is
+not a corner case in a corner of the compiler; it is the layout rule
+6c uses for every struct in the system, and it is why GNU tar wrote
+archives no tar could read.
+
+`sys/src/cmd/6c/swt.c`, `align()`:
+
+```c
+case Asu2:	/* padding at end of a struct */
+	w = SZ_VLONG;			/* 8 on amd64 */
+	if(packflg)
+		w = packflg;
+	break;
+
+case Ael1:	/* initial align of struct element */
+	for(v=t; v->etype==TARRAY; v=v->link)
+		;
+	...
+	w = ewidth[v->etype];
+	if(w <= 0 || w >= SZ_VLONG)
+		w = SZ_VLONG;
+	if(packflg)
+		w = packflg;
+	break;
+```
+
+Two things fall out of those lines. **The end of every struct is
+rounded to `SZ_VLONG`** rather than to the alignment its members
+actually require; and **a nested struct or union member is aligned to
+8 as well**, because `ewidth[TSTRUCT]` fails the `w <= 0 || w >=
+SZ_VLONG` test and drops through to the same constant. `sualign()` in
+`cc/dcl.c` applies both.
+
+#### The measurement, which is what made it certain
+
+`sys/lib/tests/tarblock-probe.c` on GNU tar's header definitions --
+nine sizes, each printed beside gcc's answer for the same file:
+
+```
+  BLOCKSIZE                =  512   host says  512   same
+  sizeof(union block)      =  520   host says  512   *** DIFFERENT ***
+  sizeof(struct sparse)    =   24   host says   24   same
+  sizeof(posix_header)     =  504   host says  500   *** DIFFERENT ***
+  sizeof(star_header)      =  504   host says  500   *** DIFFERENT ***
+  sizeof(oldgnu_header)    =  504   host says  495   *** DIFFERENT ***
+  sizeof(sparse_header)    =  512   host says  505   *** DIFFERENT ***
+  sizeof(star_in_header)   =  520   host says  512   *** DIFFERENT ***
+  sizeof(star_ext_header)  =  512   host says  505   *** DIFFERENT ***
+```
+
+Every one of those numbers is predicted by the two `align()` cases,
+and two of them only make sense together:
+
+- `oldgnu_header` 495 -> **504**, not 496. Its `struct sparse sp[4]`
+  sits at byte 386 on the host; `Ael1` pushes it to 392, which moves
+  everything after it by six, and then `Asu2` rounds the tail. *The
+  nested-member rule and the tail rule are not the same rule, and this
+  struct needs both to explain it.*
+- `star_in_header` 512 -> **520**: same push, then a tail round that
+  had nowhere to go but the next multiple of 8. **This is the one that
+  set `union block`'s size**, since it is the union's largest member.
+
+**`struct sparse` is 24 and agrees**, which is the useful part of the
+table rather than filler: it is all char, it is a multiple of 8 by
+accident, and it looks perfectly healthy. *A sample of one struct
+could have been that one.*
+
+#### What it actually breaks, stated narrowly
+
+**Field offsets are fine.** Members of an all-char struct land where
+the format says, which is why tar read its own header back correctly,
+checksum and all, and why `memcpy(&hdr, buf, sizeof hdr)` into a local
+still gets the right values (it over-reads the source by the padding,
+which is harmless when the source is a larger buffer).
+
+**What breaks is `sizeof` used as a STRIDE or a LENGTH**:
+
+- `p + 1` on a pointer to the padded type. tar's whole record walk is
+  `union block *` arithmetic (`find_next_block`, `set_next_block_after`,
+  `record_end = record_start + blocking_factor`) while every length in
+  the tar format is a multiple of `BLOCKSIZE`. 520 put every block
+  after the first **eight bytes late**, and the zero-fill -- counted in
+  `BLOCKSIZE` -- then missed the gaps, which is the second symptom
+  `tarhdr-probe` saw as garbage in blocks 2 and 3.
+- `write(fd, &s, sizeof s)` for an on-disk or on-wire record, which
+  would emit the padding.
+- Any array of the type read or written as a whole.
+
+#### The fix used, and why not the other one
+
+**`#pragma pack on` / `#pragma pack off`** around the on-disk structs.
+`pragpack()` in `cc/dpchk.c` sets `packflg`, which is exactly the
+override both `align()` cases already read, so the layout becomes the
+one the format specifies. It is the established Plan 9 idiom for this
+-- `sys/src/cmd/5e/proc.c` and go1.4's `defs_*.h` use it -- and it is
+spelled `pack on` rather than `pack 1`, because `pragpack` does
+`atoi(s->name+1)`, skipping the first character, and only `on`/`yes`
+are matched by name.
+
+In tar it is guarded by `PLAN9`, passed from
+`sys/src/ape/cmd/tar/mkfile` the way `-DPLAN9` already is for itcl, so
+the host syntax check does not trip over a pragma gcc spells
+differently.
+
+**CHANGING `Asu2` TO THE CORRECT ALIGNMENT WAS NOT DONE, and the
+reason is the host's libraries rather than timidity.** It would change
+the size of a large share of the structs in the system, and this tree
+links against `/$objtype/lib/*.a` that 9front built with the current
+rule -- `lib9p.a`, `libthread.a`, `libc.a` for `sys/src/cmd2/vts`, and
+every native header shared through `sys/include`. A conforming 6c is
+the right end state for a project whose stated aim is that C written
+for UNIX builds here unmodified, but it is an ABI change across the
+whole machine and wants to be decided rather than slipped in beside a
+tar fix.
+
+#### The sweep, and its known limit
+
+Looking for all-char structs whose size is not already a multiple of 8,
+across `sys/src/external`: **six**, of which two are tar's. The others
+-- `psf1_header` in PDCursesMod, `ops_table_s` and `buildid_s` in
+libdwarf, `ModeInfo` in sqlite's shell -- are all `memcpy`-into-a-local
+or in-memory tables, so the padding costs them nothing by the rule
+above.
+
+**That count is a LOWER BOUND and the limitation is specific**: the
+sweep only matches structs whose every member is a plain `char` or
+`char[N]` declaration, so it misses exactly the three tar structs that
+have a nested `struct sparse sp[N]` -- `oldgnu_header`,
+`sparse_header`, `star_in_header` -- and it misses anything mixing char
+with integers. *The tool that found the bug's family cannot find the
+whole family.* A real answer wants `sizeof` compared between pcc and
+gcc for every struct in a package, which is what `tarblock-probe` does
+by hand for one.

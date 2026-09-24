@@ -599,6 +599,15 @@ the index, so that nothing here is a surprise.
 - `RFCENVG`, `RFCNAMEG` and `RFCFDG` create **empty** groups; the `C` is
   *clear*. `RFENVG`, `RFNAMEG` and `RFFDG` are the ones that copy. So
   `execve` has no environment at all after its first line.
+- **kencc rounds EVERY struct's size up to 8, and aligns a nested
+  struct member to 8 too** (`6c/swt.c`'s `align()`, cases `Asu2` and
+  `Ael1`). So `sizeof(struct{char a[500];})` is **504**, not 500.
+  Field offsets are still right, so a `memcpy` into a local is fine --
+  **what breaks is `sizeof` used as a STRIDE or a LENGTH**: `p + 1` on
+  a pointer to the type, or writing it as an on-disk record.
+  `#pragma pack on`/`off` is the override (both cases read `packflg`),
+  spelled `on` and not `1`. This made `union block` 520 and every
+  archive GNU tar wrote malformed.
 - **kencc's type signatures follow POINTERS into the struct they point
   at**, and 9front's `CFLAGS=-FTVw` turns them on for every native
   build. So a struct that is opaque in a public header and completed in
@@ -1490,23 +1499,70 @@ after the first shifted, and a **compiler** question rather than a tar
 one. **`tarblock-probe.c` asks it directly**, each member's size beside
 the host's answer, and **must be built with tar's own flags** (the
 command is in the file) or it measures a different `tar.h`.
-**Not 512 = CONFIRMED** -- the oversized member is named, every archive
-this tar ever wrote is malformed the same way, and it would explain the
-second symptom too, since the zero-fill counts in `BLOCKSIZE` while the
-pointers step in `sizeof(union block)`. **512 = REFUTED and worth as
-much**: the shift is in the copy loop or in what `read()` does with the
-buffer, and *do not go on believing the union*.
-**Recorded, not folded in**: blocks 2/3 hold `b6 01 00 00 cd 98 b4 6a`
--- `0x1b6` is **0666** and `0x6ab498cd` little-endian is a plausible
-2026 `time_t`, so those are `struct stat` fields, not litter. A fresh
-Plan 9 allocation is newly sbrk'd and therefore **zero**, so every
-non-zero byte there was *written* by something. Second question.
-*(`tarhdr-probe`'s own host reference is in `docs/notes/libap.md`;
-`tarblock-probe` prints `REFUTED` and 0 disagreements under gcc, which
-is what says the probe is right rather than the tree.)*
-*(The `page_aligned_alloc` hypothesis is withdrawn: `getpagesize()` is
-APE's, has a prototype in scope and returns 4096.)*
-Detail in `docs/notes/libap.md` and `sys/src/ape/cmd/gnulib/README`.
+**CONFIRMED: `union block` is 520, and SEVEN of the nine sizes
+disagree with the host.** It is not tar's bug at all -- it is 6c's
+struct layout, and `tarblock-probe`'s whole table is predicted by two
+lines of `sys/src/cmd/6c/swt.c`'s `align()`: `Asu2` rounds the end of
+**every** struct to `SZ_VLONG` rather than to what its members need,
+and `Ael1` aligns a **nested** struct member to 8 as well, because
+`ewidth[TSTRUCT]` drops through the same test.
+
+```
+  sizeof(union block)      =  520   host says  512   *** DIFFERENT ***
+  sizeof(posix_header)     =  504   host says  500   *** DIFFERENT ***
+  sizeof(oldgnu_header)    =  504   host says  495   *** DIFFERENT ***
+  sizeof(star_in_header)   =  520   host says  512   *** DIFFERENT ***
+  sizeof(struct sparse)    =   24   host says   24   same
+```
+
+**Two of those numbers need BOTH rules to explain**: `oldgnu_header`
+495 -> **504** rather than 496, because its `struct sparse sp[4]` is
+pushed from 386 to 392 first; and `star_in_header` 512 -> **520**, the
+same push then a tail round -- **and that is the member that set the
+union's size.** *`struct sparse` is 24 and agrees, because it is a
+multiple of 8 by accident* -- a sample of one struct could have been
+that one.
+**What breaks is narrow and worth stating narrowly**: field offsets
+are still right, which is why tar read its own header back correctly,
+checksum and all. **`sizeof` used as a STRIDE or a LENGTH** is what
+fails -- tar's entire record walk is `union block *` arithmetic while
+every length in the format is a multiple of `BLOCKSIZE`, so 520 put
+every block eight bytes late, and the zero-fill (counted in
+`BLOCKSIZE`) then missed the gaps, which **is the second symptom**.
+Both are one cause after all.
+**FIXED with `#pragma pack on`/`off` around tar.h's on-disk structs
+only** -- `pragpack()` sets `packflg`, the override both `align()`
+cases already read -- guarded by `PLAN9` from `cmd/tar/mkfile`, as
+itcl already does. It is spelled `pack on`, not `pack 1`: `pragpack`
+does `atoi(s->name+1)` and only matches `on`/`yes` by name. tar's own
+`tar_stat_info`/`xheader` are deliberately left unpacked; they hold
+real `off_t` and pointers.
+**`6c` ITSELF WAS NOT CHANGED, and that is a decision rather than
+timidity**: it would resize a large share of every struct in the
+system, and this tree links `/$objtype/lib/*.a` that 9front built with
+the current rule. **A conforming 6c is the right end state** for a
+project whose aim is that C written for UNIX builds here unmodified,
+but it is a machine-wide ABI change and wants deciding on its own.
+**The sweep found six all-char structs in `external/` whose size is
+not already a multiple of 8**, two of them tar's; the rest are
+`memcpy`-into-a-local and cost nothing. **That is a LOWER BOUND with a
+named limit**: the sweep only matches structs whose every member is a
+plain `char`, so it misses the three tar structs with a nested
+`struct sparse sp[N]` -- *the tool that found the bug's family cannot
+find the whole family.*
+**Predict**: rebuilt, `tarblock-probe` (with `-DPLAN9`) reports PASS
+and 0 disagreements, `tar cf` then `tar tf` round-trips, and
+`tarhdr-probe` matches the host reference block for block. **Refuted
+if** the sizes still differ -- which would mean the pragma did not
+reach, and the probe now carries a `-DPLAN9` marker saying which build
+it measured, because without it a wrong command reads exactly like the
+bug returning.
+**Still open**: the ORIGINAL archive, which came from outside and
+failed differently (`This does not look like a tar archive`, `A lone
+zero block at 580`). A reader mis-striding by 8 is a plausible cause
+for that too, but it is not yet measured -- run `tar tf` on it again
+after the rebuild before calling it closed.
+Detail in `docs/notes/kencc.md` and `docs/notes/libap.md`.
 
 **readline wraps at 80 columns under rio, and the mechanism is already
 there.** `READLINE` being on means bash redraws the line, and a long

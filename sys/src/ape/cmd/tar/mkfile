@@ -94,8 +94,19 @@ CC=pcc -c
 # config-common.h. -I$GNUSRC comes next so the module headers match the
 # objects in libgnu.a. Nothing in $GTARSRC/src or $GTARSRC/lib shadows
 # an APE header, so they can follow.
+#
+# -DPLAN9 is what turns on the `#pragma pack' around tar.h's on-disk
+# header structs, and it is NOT cosmetic. 6c rounds the end of every
+# struct to 8 (swt.c, case Asu2) rather than to what its members need,
+# so `union block' -- nothing but char arrays -- came out 520 instead
+# of 512. tar steps through the record with `union block *' arithmetic
+# while every length in the format is a multiple of BLOCKSIZE, so every
+# block after the first was written eight bytes late and every archive
+# this tar produced was malformed. The long version is in tar.h;
+# sys/lib/tests/tarblock-probe.c measures it.
+#
 CFLAGS=-B -p -I. -I$GNUSRC -I$GTARSRC -I$GTARSRC/src -I$GTARSRC/lib\
-	-DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale"
+	-DHAVE_CONFIG_H -DPLAN9 -DLOCALEDIR="/sys/lib/ape/locale"
 
 %.$O: $GTARSRC/src/%.c
 	$CC $CFLAGS $GTARSRC/src/$stem.c
