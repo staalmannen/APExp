@@ -203,6 +203,9 @@ without a completion marker cannot be read at all.
 and reports whether `package require Itcl` worked before running
 anything, because a suite failing every test for a missing package and
 one failing because the port is broken give the same count.
+`tarhdr-probe.c` is a PROBE rather than a test -- it prints a tar
+file block by block and asserts nothing; the host reference output to
+compare it against is in `docs/notes/libap.md`.
 `tcl-stdchan-test.tcl` asks what buffering the three standard
 channels get, and is a PROBE rather than a rule -- report what it
 prints. `tcl-machexp-probe.tcl` is the same kind of thing for
@@ -1201,6 +1204,28 @@ steps are a per-session `consctl` in vts, the shell's fds being a
 `cons` bound to `/dev/cons` rather than the pipe `session.c:124` dups
 (with a pipe, `isatty(0)` is false and bash never starts readline at
 all), and vts spawning bash rather than hardcoded `/bin/rc`.
+**And vts would fix the 80-column wrapping too -- but as TWO fixes, and
+the bigger one is `$TERM`.** *Columns*: vts has a real character grid
+(`cells.h`), so there is an exact number where rio has none -- but
+`srv.c:488`/`594` hardcode `session_init(s, name, 24, 80)`, so today it
+would report a *correct* 80 rather than a *guessed* one. `cellbuf_resize()`
+exists and nothing calls it from a window-size path. Carrying it to the
+shell is two `putenv` calls beside the `putenv("vts"...)` already in
+`session.c` -- `RFENVG` **copies** the environment, and libap's
+`TIOCGWINSZ` already reads `$COLUMNS`/`$LINES`. Resize is still not
+automatic (no `SIGWINCH`), but vts owns both ends and can post a note:
+*the difference is not that vts can measure and rio cannot, it is that
+vts can TELL.* *Wrapping*: correct width alone would NOT have fixed the
+screen. `sys/lib/ape/termcap`'s whole `dumb` entry is
+`:am:co#80:li#24:` -- **no `ce`, no `up`, no `cm`**, so readline
+reprints instead of redrawing, and `terminal.c:584` forces
+`_rl_term_isansi = 0` for that name. vts is what makes a real `$TERM`
+honest, since the engine is **libvterm** (upstream's full state
+machine) and the termcap already ships `vt100|vt100-am` and `xterm`.
+Which VT level is claimed is not the question; having anything true to
+claim is. **Order**: bash on a `cons` not a pipe, per-session
+`consctl`, then `$TERM` (the one that changes the screen), then the
+real grid size, then `COLUMNS`/`LINES` at spawn plus a note on resize.
 
 **itcl BUILDS AND RUNS, first try: `Total 792 Passed 712 Skipped 66
 Failed 14`**, marker present, exit 0, no file errors. The header line
@@ -1410,20 +1435,67 @@ The command is README rule 6 so it can be repeated when OFILES grows --
 the next module added could be `fcntl`, `readdir`, `access` or `raise`.
 **`strerror-test.c` must be linked against `libgnu.a`** or it passes
 against the broken tree and proves nothing; the command is in the file.
-**Predict**: after a full `mk distclean; mk install` (libgnu.a changing
-has to reach every GNU binary already linked) `tar cf` completes and
-`strerror-test` reports 0 failures. **Refuted if `tar cf` still
-faults.** **And the third outcome is the useful one**: if `tar cf`
-works but `tar tf` on the archive it just wrote still says `does not
-look like a tar archive`, the read bug is confirmed independent -- the
-question the last two rounds could not reach, because tar never
-finished writing an archive.
-**The `tar tf` bug is STILL OPEN and is still separate.** Its messages
-come from `error(0, 0, ...)` -- errnum zero, so `strerror` is never
-reached. Consistent with this finding, unified by nothing.
+**CONFIRMED, all three outcomes.** `tar cf` completes; `strerror-test`
+reports **0 failures** linked against `libgnu.a`, section 1 included --
+whose only possible failure was to kill the process; **and `tar tf` on
+the archive tar had just written FAILED**, which was the third outcome
+and the useful one. *The read bug is now proven independent of
+`strerror`* -- the question the two rounds before this could not reach,
+because tar never finished writing an archive to try.
+
+**THE READ BUG IS OPEN, AND THE SYMPTOM HAS CHANGED -- which retires
+part of the old diagnosis.**
+
+```
+$ tar tf /tmp/t.tar
+tmp/h
+tar: Skipping to next header
+tar: Exiting with failure status due to previous errors
+```
+
+**`tmp/h` is listed correctly**, so the first header parsed AND its
+checksum verified -- tar does not print a member name it has not
+accepted. And `list.c:294` prints `Skipping to next header` **only when
+the previous status was `HEADER_STILL_OK`**, so the failure is on the
+**SECOND** `read_header`: a block that is neither a valid header nor
+all zeros. **So "tar's FIRST read yields no block" was about the
+original archive and does NOT generalise** -- here the first read
+plainly yields one. Whether the two failures share a cause is open, and
+assuming it would put the next round on the wrong file.
+For a one-file archive nothing sits between the member and the zero
+blocks, so exactly one of two things is true and they need completely
+different fixes: **(a) the archive is malformed** and tar's WRITE path
+is broken, or **(b) the archive is fine** and tar's READ path is --
+most likely in how far it advances past the data, since landing one
+block short would read the file's own contents as a header and give
+exactly this.
+**`tarhdr-probe.c` splits those in one run.** It prints a tar file
+block by block -- every header field as raw bytes, size and checksum
+decoded, the computed checksum beside the stored one, and where the
+zero blocks start -- and **asserts nothing**, being a probe. It decodes
+octal with its own loop rather than tar's `from_header()`: *a probe
+that reuses the code under suspicion cannot clear it.* **The host
+reference output is in `docs/notes/libap.md`** -- anything the 9front
+run says that the reference does not is the bug.
 *(The `page_aligned_alloc` hypothesis is withdrawn: `getpagesize()` is
 APE's, has a prototype in scope and returns 4096.)*
 Detail in `docs/notes/libap.md` and `sys/src/ape/cmd/gnulib/README`.
+
+**readline wraps at 80 columns under rio, and the mechanism is already
+there.** `READLINE` being on means bash redraws the line, and a long
+command wraps in the wrong place. libap **already** answers
+`TIOCGWINSZ` (`misc/ioctl.c`) correctly: 80x24 by default, overridden
+by **`$COLUMNS`**/**`$LINES`**. Nothing under rio sets either.
+`export COLUMNS=<real width>` fixes it and stays fixed -- bash's
+`checkwinsize` re-asks through the same ioctl, which reads the variable
+bash exported, so the two agree rather than fight.
+**There is no better answer under rio, and that is about rio**: a
+window is a pixel rectangle, the font is proportional, there is no
+character grid to ask and no `SIGWINCH` on resize. **It joins arrow
+keys and colour on the list of what `vts` would buy, and it is the
+strongest of the three** -- vts keeps a real character grid
+(`cells.c`), so it knows the answer exactly and can set `$COLUMNS` per
+session.
 
 **Fixed this round**: `NAME_MAX` was 27 and `PATH_MAX` 1023, set in
 `sys/include/ape/sys/limits.h`, which `<limits.h>` includes at its very
