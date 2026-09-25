@@ -78,6 +78,33 @@ typedef struct Muxbuf {
 	unsigned char	datawait;	/* true if parent process is waiting for data */
 	int		copypid;	/* pid of copyproc */
 	unsigned char	data[PERFDMAX];
+	/*
+	 * APPENDED, and deliberately after `data' -- see the note above.
+	 * Every existing field keeps its offset, so a half-rebuilt tree
+	 * still agrees about all of them. sizeof(Muxbuf) changes, so
+	 * Muxseg's layout does: this still needs `mk distclean'.
+	 *
+	 * ON-DEMAND READING, for terminals only. The copy process used to
+	 * read its descriptor continuously for the life of the caller,
+	 * wanted or not -- which is right for a pipe nobody else reads
+	 * and WRONG for a console, where it steals input from every other
+	 * program sharing the window. Measured: with an interactive bash
+	 * in a rio window, `echo $SHELL' typed into a vtwin running there
+	 * arrived as `e c h $ S L' at the terminal and `o HEL' at bash's
+	 * own prompt -- the two readers partitioned it exactly.
+	 *
+	 *	ondemand  this buffer's fd is a terminal: do not read ahead
+	 *	want      a reader has asked and has not been answered yet
+	 *	readwait  the copy process is asleep waiting for `want'
+	 *
+	 * `want' is STATE, not an event, and is always tested under
+	 * mux->lock -- so a request that arrives while the copy process
+	 * is between the unlock and its own test is seen rather than
+	 * lost.
+	 */
+	unsigned char	ondemand;
+	unsigned char	want;
+	unsigned char	readwait;
 } Muxbuf;
 
 /* be sure to change _fdinfo[] init in _fdinfo if you change this */
@@ -169,6 +196,7 @@ extern int  _tty_raw(int);
 extern int  _tty_israw(void);
 extern int  _ttymark(void);		/* which libap is linked in */
 extern int  _fdinfomark(void);		/* ditto, for _fdinfo.c */
+extern int  _bufmark(void);		/* ditto, for plan9/_buf.c */
 
 /* ap/plan9/_apdbg.c -- one debug line, under $APEXP_DEBUG. Labels may be 0. */
 extern int _apdbgon(void);

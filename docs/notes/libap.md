@@ -1680,3 +1680,54 @@ outstanding read per request rather than a permanent one.
 worth doing on its own terms -- after `_EXEC` the new image cannot
 reach them -- but it does **not** cure this: the thief here is a
 living parent that never exec'd.
+
+### The fix, written
+
+`Muxbuf` gains three fields, **appended after `data[]`** so every
+existing offset is unchanged (`ondemand`, `want`, `readwait`);
+`sizeof(Muxbuf)` still moves, so **`mk distclean` before `mk install`**.
+`_bufmark()` is the version marker, so a test cannot link against the
+old library and report a pass.
+
+**The rule**: for `FD_ISTTY` buffers only, `_copyproc` sleeps at the
+top of its loop unless `want` is set, and clears `want` the moment it
+delivers. One outstanding read per request instead of one for ever.
+Pipes and sockets keep the greedy path untouched -- Tcl's suite drives
+those hard and there is no reason to re-measure them; a human types
+slowly, so a rendezvous per keystroke costs nothing.
+
+**`want` is STATE, not an event, and that is what makes the handshake
+safe.** It is written and tested under `mux->lock`, so a request
+arriving while the copy process is between its unlock and its
+rendezvous is *seen* rather than lost -- the copy process simply does
+not go to sleep. There is no window to miss.
+
+**The deadlock this design could produce is "both asleep", and every
+asking site prevents it the same way:** set `want` under the lock,
+clear `readwait` under the same lock (so two callers cannot both try
+to pair with one sleeper), release the lock, wake, and only then wait.
+Three sites ask:
+
+- `_readbuf`, in its empty-buffer branch, before setting `datawait`;
+- `select()`, for every watched descriptor as it buffers them --
+  **before `waitfresh`**, which would otherwise spin its 10ms against
+  a copy process that is deliberately asleep and answer "not ready"
+  for ever;
+- `wantdata()` itself returns early when `b->n > 0 || b->eof`, so
+  asking when the answer is already in hand cannot cause a read.
+
+**An interrupted rendezvous falls through to the read** -- the old
+greedy behaviour, which is the safe direction for a note arriving at
+the wrong moment.
+
+`_startbuf` resets all three on a recycled slot, for the reason the
+`roomwait`/`datawait` note beside it already gives: a slot inheriting
+`readwait` has a sleeper that died with the previous descriptor.
+
+**The regression test is the partition itself**, and it is exact: type
+`echo $SHELL` into vtwin, quit with `kill vtwin | rc`, and look at the
+launching bash's prompt. **Eleven bytes must reach the session and the
+prompt must be empty.** Anything in that prompt is a byte the copy
+process took. That is a better test than any assertion I could write,
+because it conserves bytes -- a partial fix shows up as a shorter
+theft rather than as a pass.

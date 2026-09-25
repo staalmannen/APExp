@@ -1807,11 +1807,23 @@ so an interactive bash permanently reads its window's `/dev/cons`.
 **Workaround shipped: `./apexp-sh -r`** runs the same environment with
 **rc** as the launching shell -- no `select()`, no copy process, no
 competition -- while `$SHELL` stays `bash` so the session still runs
-bash. **The fix is designed in `docs/notes/libap.md` and deliberately
-not rushed**: read on demand for `FD_ISTTY` only, a `want` flag set by
-`_readbuf`/`select()` and cleared on delivery; the hazard is a second
-rendezvous between the same two processes, and `_buf.c`'s history is a
-list of races. **`execve` killing copy processes is a separate smaller
+bash. **FIXED, NOT YET MEASURED**: `Muxbuf` gains `ondemand`/`want`/
+`readwait`, **appended after `data[]`** so no existing offset moves
+(but `sizeof` does -- **`mk distclean` first**), and for `FD_ISTTY`
+only the copy process sleeps unless `want` is set, clearing it on
+delivery. One outstanding read per request instead of one for ever;
+pipes and sockets keep the greedy path Tcl exercises. **`want` is
+STATE, tested under `mux->lock`**, so a request arriving while the
+copy process is between its unlock and its rendezvous is seen rather
+than lost -- there is no window to miss. The "both asleep" deadlock is
+prevented identically at all three asking sites: set `want` under the
+lock, clear `readwait` under the same lock, release, wake, *then*
+wait. `select()` asks **before `waitfresh`**, which would otherwise
+spin against a deliberately sleeping copy process. `_bufmark()` is the
+marker. **The regression test is the partition**: `echo $SHELL` into
+vtwin, `kill vtwin | rc`, and the outer bash's prompt must be EMPTY --
+it conserves bytes, so a partial fix shows as a shorter theft rather
+than a pass. **`execve` killing copy processes is a separate smaller
 fix that does NOT cure this** -- the thief is a living parent.
 **And a win: ARROW KEYS WORK under vtwin**, which rio could never give
 -- one of the three things vts was for.

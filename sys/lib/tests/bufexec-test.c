@@ -234,6 +234,14 @@ main(int argc, char **argv)
 #ifndef __linux__
 	printf("_fdinfomark = %d  (libap with the exec scrub)\n",
 		_fdinfomark());
+	/*
+	 * Not what this test asks about, but printed here because this is
+	 * the test that lives closest to the copy-process machinery and a
+	 * run should say which library it measured. 1 = terminals are read
+	 * ON DEMAND rather than continuously.
+	 */
+	printf("_bufmark    = %d  (libap with on-demand tty reads)\n",
+		_bufmark());
 #endif
 
 	/*
