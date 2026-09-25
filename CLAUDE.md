@@ -1807,7 +1807,11 @@ so an interactive bash permanently reads its window's `/dev/cons`.
 **Workaround shipped: `./apexp-sh -r`** runs the same environment with
 **rc** as the launching shell -- no `select()`, no copy process, no
 competition -- while `$SHELL` stays `bash` so the session still runs
-bash. **FIXED, NOT YET MEASURED**: `Muxbuf` gains `ondemand`/`want`/
+bash. **FIXED AND CONFIRMED** -- all eleven bytes of `echo $SHELL` show
+`cons write -> HANDED -> tty write`, bash ran it and printed `bash`,
+and **the outer prompt is EMPTY**: no theft at all, on a test that
+conserves bytes so a partial fix would have shown as a shorter theft.
+`Muxbuf` gains `ondemand`/`want`/
 `readwait`, **appended after `data[]`** so no existing offset moves
 (but `sizeof` does -- **`mk distclean` first**), and for `FD_ISTTY`
 only the copy process sleeps unless `want` is set, clearing it on
@@ -1823,7 +1827,7 @@ spin against a deliberately sleeping copy process. `_bufmark()` is the
 marker. **The regression test is the partition**: `echo $SHELL` into
 vtwin, `kill vtwin | rc`, and the outer bash's prompt must be EMPTY --
 it conserves bytes, so a partial fix shows as a shorter theft rather
-than a pass. **`execve` killing copy processes is a separate smaller
+than a pass. **It passed on the first run.** **`execve` killing copy processes is a separate smaller
 fix that does NOT cure this** -- the thief is a living parent.
 **And a win: ARROW KEYS WORK under vtwin**, which rio could never give
 -- one of the three things vts was for.

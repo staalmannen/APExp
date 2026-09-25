@@ -1731,3 +1731,34 @@ prompt must be empty.** Anything in that prompt is a byte the copy
 process took. That is a better test than any assertion I could write,
 because it conserves bytes -- a partial fix shows up as a shorter
 theft rather than as a pass.
+
+### CONFIRMED on the first run
+
+`echo $SHELL` typed into vtwin, with the launching shell an ordinary
+interactive **bash** -- the thief itself, deliberately, rather than
+`apexp-sh -r`:
+
+```
+cons write (from viewer) 1 [e]   tty read: HANDED 1 [e]   tty write 1 [e]
+                         1 [c]                    1 [c]                1 [c]
+                         1 [h] [o] [ ] [$] [S] [H] [E] [L] [L] [<0a>]
+tty write 4 [bash]
+```
+
+**Eleven for eleven**, and `kill vtwin | rc` left the outer bash's
+prompt **empty**. Nothing was taken.
+
+*The test conserves bytes, which is what makes it worth more than an
+assertion*: a fix that only narrowed the race would have shown up as a
+shorter theft in that prompt, not as a pass. There was no theft.
+
+No deadlock, no hang, and the session is responsive -- so the
+"both asleep" arm the design was most exposed to did not fire, on the
+path that exercises it hardest (a read per keystroke, each one finding
+the buffer empty and waking a sleeping copy process).
+
+**What is NOT shown by this run**: the pipe and socket paths, which
+keep the greedy behaviour and are untouched by the `FD_ISTTY` gate.
+Tcl's suite is where those live, and it has not been re-run since.
+That is the honest gap, and it is a cheap one to close the next time
+the suite runs.
