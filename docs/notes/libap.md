@@ -1574,3 +1574,41 @@ next question is bash's own descriptor handling.
 
 *Back on dash for now. The goal is one shell rather than two, so this
 is on the way rather than optional -- but it is a round of its own.*
+
+## The copy process is a keystroke thief, and it has a workaround now
+
+The competition recorded above stopped being theoretical. Under `vts`,
+typing `echo $SHELL` reached the session as `hoLL`: vts's own trace
+showed five `cons write (from viewer)` bytes, all five HANDED to the
+shell and echoed one for one, and **the other six never arrived at
+all**.
+
+**The chain**: `apexp-sh` ends in `exec bash -l`; that bash is
+interactive, so readline calls `select()` on fd 0; so libap forks a
+copy process that reads the rio window's `/dev/cons` **continuously,
+for as long as bash lives, whether or not bash wants the data**. While
+`vtwin` runs in that window, vtwin's keyboard proc and that copy
+process are both blocked reading the same console, and the kernel
+wakes exactly one per keystroke.
+
+*Not polling but reading* is the whole of it: `select()` here converts
+"a descriptor this process may read later" into "a descriptor this
+process is reading right now, always".
+
+**It also outlives the image that made it.** `_killmuxsid` is an
+**atexit** handler and `execve` never calls it, so `exec` does not
+clear it; and `fork`'s child only `_detachbuf()`s its own view, since
+the processes belong to the parent.
+
+**Workaround, not a fix**: `./apexp-sh -r` gives the same environment
+with **rc** as the launching shell. rc does not use `select()`, so
+there is no copy process and no competition; `$SHELL` stays `bash`, so
+a vts session still runs bash. It doubles as the control -- *if typing
+works under `-r` and not under bash, the diagnosis is confirmed with
+one variable changed.*
+
+**The real fix is its own round** and is not small: either the copy
+process reads only on demand, or a process gives up its copy processes
+when it is not going to read (there is no `SIGTTIN` here to lean on),
+or `execve` tears them down -- which would help a child but not this
+case, where the thief is the living parent.

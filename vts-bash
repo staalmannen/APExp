@@ -15,6 +15,21 @@
 # the shell inherits that namespace and that environment. Started from
 # a plain rc, none of the three is true and vts falls back to /bin/rc.
 #
+# PREFER `./apexp-sh -r' FOR THIS, AND THE REASON IS MEASURED.
+#
+# An interactive bash calls select() on fd 0, and libap's select()
+# forks a copy process that reads that descriptor CONTINUOUSLY for as
+# long as the process lives. So a bash window has a second process
+# permanently reading its /dev/cons -- and while vtwin is running,
+# vtwin and that copy process are both blocked reading the same
+# console, with the kernel handing each keystroke to exactly one of
+# them. Typing `echo $SHELL' reached the session as `hoLL'; the log
+# showed vts and libap exact and the bytes simply never arriving.
+#
+# `./apexp-sh -r' gives the same environment with rc as the launching
+# shell. rc does not use select(), so there is no copy process and no
+# competition. $SHELL is still bash, so the SESSION still runs bash.
+#
 # ------------------------------------------------------------------
 # A MOUNT LIVES IN A NAMESPACE, AND THAT IS WHY THIS SCRIPT MOUNTS.
 #
