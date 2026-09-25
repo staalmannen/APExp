@@ -1807,7 +1807,11 @@ so an interactive bash permanently reads its window's `/dev/cons`.
 **Workaround shipped: `./apexp-sh -r`** runs the same environment with
 **rc** as the launching shell -- no `select()`, no copy process, no
 competition -- while `$SHELL` stays `bash` so the session still runs
-bash. **FIXED, NOT YET MEASURED**: `Muxbuf` gains `ondemand`/`want`/
+bash. **FIXED AND CONFIRMED** -- all eleven bytes of `echo $SHELL` show
+`cons write -> HANDED -> tty write`, bash ran it and printed `bash`,
+and **the outer prompt is EMPTY**: no theft at all, on a test that
+conserves bytes so a partial fix would have shown as a shorter theft.
+`Muxbuf` gains `ondemand`/`want`/
 `readwait`, **appended after `data[]`** so no existing offset moves
 (but `sizeof` does -- **`mk distclean` first**), and for `FD_ISTTY`
 only the copy process sleeps unless `want` is set, clearing it on
@@ -1823,10 +1827,26 @@ spin against a deliberately sleeping copy process. `_bufmark()` is the
 marker. **The regression test is the partition**: `echo $SHELL` into
 vtwin, `kill vtwin | rc`, and the outer bash's prompt must be EMPTY --
 it conserves bytes, so a partial fix shows as a shorter theft rather
-than a pass. **`execve` killing copy processes is a separate smaller
+than a pass. **It passed on the first run.** **`execve` killing copy processes is a separate smaller
 fix that does NOT cure this** -- the thief is a living parent.
 **And a win: ARROW KEYS WORK under vtwin**, which rio could never give
 -- one of the three things vts was for.
+
+**What is left in vts is the OUTPUT half, and it is isolated**: vts
+receives `<1b>[?2004h` whole and the screen shows `2004h` as text --
+proved arithmetically, since `ctl` said `cursor=1,60` and 53+5+2 = 60.
+**Hypothesis, not yet measured**: libvterm holds its escape flag as
+**`bool in_esc : 1`** and consumes the sequence by CLEARING it; a
+one-bit field that accepts a 1 and ignores a 0 leaves the parser
+inside an escape, which is exactly this shape. **kencc's bit fields
+predate `bool` being a real type here.** `bitfield-test.c` **section
+10** asks it -- set, clear with `false`, clear with `0`, the same for
+an `unsigned : 1` **beside it** so the answer is attributable, plus
+the neighbours. Passes on gcc. *Both passing refutes the reading and
+sends the next round into libvterm's parser.* (The far-right
+indentation is separate and mine: `session.c`'s child prints with `
+`
+and no `` into a raw console.)
 
 **AND THE SESSION NOW WORKS**: `tty read: blocked (1 waiting)`,
 `read: enter fd=0 n=1`, `-> buffered n=1`, then `tty write 1 [c]` --
