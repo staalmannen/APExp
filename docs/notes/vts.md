@@ -795,3 +795,73 @@ Two more noise fixes, because the useful lines were being drowned:
 
 *An instrument sized for a dead shell is the wrong size for a live
 one.* Worth remembering when the next one goes in.
+
+## Characters are swallowed, and the log cannot yet say by whom
+
+Typing `echo $SHELL` came back as `eho$SELL`.
+
+```
+  e  c  h  o     $  S  H  E  L  L      typed
+  0  1  2  3  4  5  6  7  8  9 10
+     x        x        x               lost
+```
+
+**Indices 1, 4 and 7 -- every third byte.** That is not "certain
+characters", it is an accounting or racing bug, and it is worth saying
+so before looking at the code: a reader that blamed the *characters*
+would go hunting for a control-code filter that does not exist.
+
+**bash really did receive less than was typed** -- `bash: S: command
+not found` means the word it parsed was `S`. So this is not only a
+rendering fault. But `2004h$` on screen *is* rendering: readline's
+`ESC [ ? 2004 h` arriving with `ESC [ ?` missing. **Two directions are
+losing bytes**, and whether they share a cause is exactly the question
+that should not be assumed either way.
+
+### What was read, and what it eliminated
+
+- **`tty_serve` is correct.** It copies `min(queued, count)`, then
+  `ttyin_len -= n` and shifts the remainder down. A partial read keeps
+  the rest.
+- **`session_feed_keystrokes` is correct.** It appends under
+  `ttylock`, drops only when the 8K queue is full, and says so.
+- **The `cons` write arm is correct when `lined` is off** -- a straight
+  `session_feed_keystrokes` of the whole write.
+- **A keystroke arriving while no reader is queued is NOT lost**: the
+  write appends to `ttyin` regardless, and the copy process's next
+  `_READ` collects it. That window was the obvious suspect and it is
+  shut by construction.
+- **`_readbuf` consumes correctly**: `ngot = putnext - getnext`,
+  clamped to `nwant`, `getnext += ngot`.
+
+### So the instrument, not a sixth guess
+
+**The one step the log has never covered is the delivery itself.**
+`$vtsdebug=1` traces what the shell *wrote* and whether a read blocked;
+it never traced what a viewer *sent* nor what the shell was *handed*.
+So a lost keystroke could be dropped in vtwin, in the `cons` arm, in
+the tty queue, or inside libap's copy process, and the log could not
+tell those four apart.
+
+Two lines fix that:
+
+```
+vts: cons write (from viewer) 1 [c]
+vts: tty read: HANDED 1 [c]
+```
+
+**What the next run decides, written down first:**
+
+- both lines show every byte typed -> vts delivered everything, and
+  the loss is **inside libap's buffering**, where *bash reading ONE
+  BYTE AT A TIME* is an unusual pattern for code every other caller
+  exercises in big chunks;
+- `HANDED` is short of `cons write` -> the loss is **in vts**, and
+  `lined` is the first place to look;
+- `cons write` is itself short of what was typed -> the loss is **in
+  vtwin**, before vts sees anything.
+
+And the same log answers the output half independently: every
+`tty write` is already traced, so whether bash emitted a whole
+`ESC [ ? 2004 h` is readable off the same file. *Two symptoms, one
+run, and no need to decide in advance whether they are one bug.*
