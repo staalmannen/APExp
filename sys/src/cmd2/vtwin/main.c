@@ -782,39 +782,16 @@ cellpoll(void *arg)
 }
 
 /*
- * Keyboard proc: read /dev/cons-like events, forward to /sess/cons.
- * For now, just read directly from the keyboard channel via libdraw.
+ * (There used to be a kbdthread()/init_kbd_thread() pair here: a second
+ * initkeyboard() feeding a `kbdc' Channel that was never created and a
+ * thread that was never started -- its own comment said "Actually
+ * simpler: do this inline in the main loop using alt()", which is what
+ * threadmain does. Deleted rather than left, because while hunting
+ * swallowed keystrokes it read EXACTLY like a second reader of
+ * /dev/cons splitting the keyboard with the live one. It was not; it
+ * was never called. *A grep hit is a name, not an implementation* --
+ * opening the function is what stopped a confident wrong fix.)
  */
-static Channel *kbdc;
-
-static void
-kbdthread(void *arg)
-{
-	Rune r;
-	char buf[8];
-	int n;
-	USED(arg);
-	for(;;){
-		r = (Rune)(uintptr)recvp(kbdc);
-		if(consfd < 0) continue;
-		n = runetochar(buf, &r);
-		write(consfd, buf, n);
-	}
-}
-
-static int
-init_kbd_thread(void)
-{
-	Keyboardctl *kc;
-	kc = initkeyboard(nil);
-	if(kc == nil) return -1;
-
-	threadcreate((void(*)(void*))kbdthread, kc, 16*1024);
-
-	/* Spawn a relay proc that puts keyboard runes onto kbdc */
-	/* Actually simpler: do this inline in the main loop using alt() */
-	return 0;
-}
 
 void
 threadmain(int argc, char **argv)

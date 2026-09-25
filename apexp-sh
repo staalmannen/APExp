@@ -1,6 +1,34 @@
 #!/bin/rc
 # set up a shell running the APExp environment
 # APExp must already have been built for $cputype
+#
+#	./apexp-sh		the environment, with bash as the shell
+#	./apexp-sh -r		the same environment, with rc as the shell
+#
+# WHY -r EXISTS, and it is not a preference.
+#
+# libap's select() does not POLL a descriptor -- it forks a copy
+# process that reads it CONTINUOUSLY, into a shared buffer, for as long
+# as the process lives (ap/plan9/_buf.c, _startbuf/_copyproc). bash is
+# interactive, so readline calls select() on fd 0, so this bash has a
+# process of its own permanently reading the window's /dev/cons.
+#
+# That is invisible while bash is the only thing in the window. It is
+# NOT invisible when bash runs a program that reads the console itself:
+# both are then blocked in a read on the same file, and the kernel
+# hands each keystroke to exactly ONE of them. Under `vts-bash' that
+# showed up as characters silently vanishing -- `echo $SHELL' reaching
+# the session as `hoLL' -- with vts and libap measured exact and the
+# bytes simply never arriving.
+#
+# rc does not use select(), so `-r' has no copy process and no thief.
+# $SHELL stays `bash' either way, so a vts session still runs bash;
+# only the LAUNCHING shell changes.
+#
+# This is a workaround for a real libap problem, recorded in
+# docs/notes/libap.md and not yet fixed: a copy process outlives the
+# image that created it (_killmuxsid is an atexit handler, and execve
+# never calls it), and it reads whether or not anyone wants the data.
 ip/ipconfig loopback /dev/null 127.1
 rfork en
 fn sigterm{}
@@ -28,4 +56,14 @@ bind -b $cputype/bin /bin
 bind -b rc/bin /bin
 bind -b rc/bin/ape /bin
 bind -b $cputype/bin/ape /bin
+
+# The shell for THIS window. $SHELL above is what vts execs inside a
+# session and is deliberately left as bash.
+if(~ $1 -r r rc){
+	echo 'apexp-sh: rc as the launching shell (no readline, so no'
+	echo 'apexp-sh: copy process competing for the console -- see the'
+	echo 'apexp-sh: note at the top of this script). $SHELL is still'
+	echo 'apexp-sh: bash, so ./vts-bash still runs bash in the session.'
+	exec rc -i
+}
 exec bash -l

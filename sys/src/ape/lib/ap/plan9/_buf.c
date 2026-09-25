@@ -39,6 +39,56 @@ static void _resettimer(void);
 static int copynotehandler(void *, char *);
 
 /*
+ * Which libap is linked in; bump when this file changes in a way a
+ * test must see. Same idiom as _sock_listenmark, _execmark, _ttymark
+ * and _fdinfomark -- a test that calls it will not LINK against an
+ * older library, so measuring the stale one by accident is impossible.
+ *
+ * 1: on-demand reading for terminals (the keystroke thief).
+ */
+int
+_bufmark(void)
+{
+	return 1;
+}
+
+/*
+ * ASK THE COPY PROCESS FOR DATA, and wake it if it is asleep.
+ *
+ * Only means anything for an on-demand (terminal) buffer; for a pipe
+ * or a socket the copy process never sleeps and this is two lock
+ * operations and nothing else.
+ *
+ * THE WAKE MUST HAPPEN WITH THE LOCK RELEASED, like every other wake
+ * in this file, and `readwait' is cleared by the WAKER under the lock
+ * so that two callers cannot both try to pair with one sleeper.
+ */
+static void
+wantdata(Muxbuf *b)
+{
+	int wake;
+
+	if(b == 0 || mux == 0 || !b->ondemand)
+		return;
+	lock(&mux->lock);
+	if(b->n > 0 || b->eof){
+		/* Already answerable; asking would only read ahead. */
+		unlock(&mux->lock);
+		return;
+	}
+	b->want = 1;
+	wake = b->readwait;
+	if(wake)
+		b->readwait = 0;
+	unlock(&mux->lock);
+	if(wake){
+		if(_apdbgon())
+			_apdbg("copyproc: woken to read", "fd", b->fd, 0, 0);
+		_RENDEZVOUS(&b->readwait, 0);
+	}
+}
+
+/*
  * IS ANY DESCRIPTOR SET? This was three words BY HAND, under a comment
  * reading "assume FD_SETSIZE is 96" -- so it stopped looking at 96
  * however wide the struct really was, and a select naming only
@@ -180,6 +230,15 @@ Found:
 	 */
 	b->roomwait = 0;
 	b->datawait = 0;
+	/*
+	 * And the three appended ones, for the same reason: a recycled
+	 * slot that inherits `readwait' has a sleeper that died with the
+	 * previous descriptor, and one that inherits `want' reads ahead
+	 * on a terminal exactly once for nobody.
+	 */
+	b->want = 0;
+	b->readwait = 0;
+	b->ondemand = (f->flags & FD_ISTTY) != 0;
 	b->fd = fd;
 	if(_mainpid == -1)
 		_mainpid = getpid();
@@ -282,6 +341,26 @@ _copyproc(int fd, Muxbuf *b)
 		} else
 			unlock(&mux->lock);
 		/*
+		 * ON DEMAND: a terminal must not be read before somebody
+		 * asks, or this process takes keystrokes belonging to every
+		 * other program sharing the console. `want' is state and is
+		 * tested under the lock, so a request arriving between the
+		 * unlock and the rendezvous is seen and not lost.
+		 *
+		 * An interrupted rendezvous falls through to the read, which
+		 * is the old greedy behaviour -- the safe direction.
+		 */
+		lock(&mux->lock);
+		if(b->fd == fd && b->ondemand && !b->want){
+			b->readwait = 1;
+			unlock(&mux->lock);
+			if(_apdbgon())
+				_apdbg("copyproc: idle, nobody asking", "fd", fd, 0, 0);
+			_RENDEZVOUS(&b->readwait, 0);
+		} else
+			unlock(&mux->lock);
+
+		/*
 		 * A Zero-length _READ might mean a zero-length write
 		 * happened, or it might mean eof; try several times to
 		 * disambiguate (posix read() discards 0-length messages)
@@ -318,6 +397,8 @@ _copyproc(int fd, Muxbuf *b)
 		} else {
 			b->putnext += n;
 			b->n += n;
+			/* The request is answered; do not read again unasked. */
+			b->want = 0;
 			if(b->n > 0) {
 				/* parent process cannot be both in datawait and selwait */
 				if(b->datawait) {
@@ -343,7 +424,7 @@ int
 _readbuf(int fd, void *addr, int nwant, int noblock)
 {
 	Muxbuf *b;
-	int ngot;
+	int ngot, wantwake;
 
 	b = _fdinfo[fd].buf;
 	if(b == nil || b->fd != fd){
@@ -372,9 +453,28 @@ goteof:
 			unlock(&mux->lock);
 			goto goteof;
 		}
-		/* sleep until there's data */
+		/*
+		 * Sleep until there's data -- but on an on-demand buffer
+		 * ASK FIRST, and wake the copy process BEFORE going to
+		 * sleep. Both sleeping is the one deadlock this design can
+		 * produce, and this ordering is what prevents it: `want' is
+		 * set under the lock we already hold, and the pairing
+		 * rendezvous happens with it released.
+		 */
 		b->datawait = 1;
+		wantwake = 0;
+		if(b->ondemand){
+			b->want = 1;
+			wantwake = b->readwait;
+			if(wantwake)
+				b->readwait = 0;
+		}
 		unlock(&mux->lock);
+		if(wantwake){
+			if(_apdbgon())
+				_apdbg("copyproc: woken by read", "fd", fd, 0, 0);
+			_RENDEZVOUS(&b->readwait, 0);
+		}
 		_RENDEZVOUS(&b->datawait, 0);
 		lock(&mux->lock);
 		if(b->fd != fd){
@@ -511,6 +611,14 @@ select(int nfds, fd_set *rfds, fd_set *wfds, fd_set *efds, struct timeval *timeo
 				FD_SET(i, &fresh);
 				nfresh++;
 			}
+			/*
+			 * Watching a descriptor IS asking for its data, so
+			 * tell an on-demand copy process now -- before
+			 * waitfresh below, which otherwise spins out its
+			 * 10ms against a copy process that is deliberately
+			 * asleep and would answer "not ready" for ever.
+			 */
+			wantdata(f->buf);
 		}
 
 	/*

@@ -1574,3 +1574,160 @@ next question is bash's own descriptor handling.
 
 *Back on dash for now. The goal is one shell rather than two, so this
 is on the way rather than optional -- but it is a round of its own.*
+
+## The copy process is a keystroke thief, and it has a workaround now
+
+The competition recorded above stopped being theoretical. Under `vts`,
+typing `echo $SHELL` reached the session as `hoLL`: vts's own trace
+showed five `cons write (from viewer)` bytes, all five HANDED to the
+shell and echoed one for one, and **the other six never arrived at
+all**.
+
+**The chain**: `apexp-sh` ends in `exec bash -l`; that bash is
+interactive, so readline calls `select()` on fd 0; so libap forks a
+copy process that reads the rio window's `/dev/cons` **continuously,
+for as long as bash lives, whether or not bash wants the data**. While
+`vtwin` runs in that window, vtwin's keyboard proc and that copy
+process are both blocked reading the same console, and the kernel
+wakes exactly one per keystroke.
+
+*Not polling but reading* is the whole of it: `select()` here converts
+"a descriptor this process may read later" into "a descriptor this
+process is reading right now, always".
+
+**It also outlives the image that made it.** `_killmuxsid` is an
+**atexit** handler and `execve` never calls it, so `exec` does not
+clear it; and `fork`'s child only `_detachbuf()`s its own view, since
+the processes belong to the parent.
+
+**Workaround, not a fix**: `./apexp-sh -r` gives the same environment
+with **rc** as the launching shell. rc does not use `select()`, so
+there is no copy process and no competition; `$SHELL` stays `bash`, so
+a vts session still runs bash. It doubles as the control -- *if typing
+works under `-r` and not under bash, the diagnosis is confirmed with
+one variable changed.*
+
+**The real fix is its own round** and is not small: either the copy
+process reads only on demand, or a process gives up its copy processes
+when it is not going to read (there is no `SIGTTIN` here to lean on),
+or `execve` tears them down -- which would help a child but not this
+case, where the thief is the living parent.
+
+### CONFIRMED, and the partition is exact
+
+`echo $SHELL` typed into vtwin. vts's log shows it received
+`e c h $ S L`. Then `kill vtwin | rc`, and the launching bash's prompt
+read:
+
+```
+$ o HEL
+bash: o: command not found
+```
+
+**`o ␣ H E L`.** Six bytes plus five is eleven, no byte duplicated and
+none lost: **the two readers PARTITION the input.** That is the
+signature of two processes blocked in a read on the same file and
+nothing else produces it -- a rendering fault would not conserve
+bytes, and a dropped write would not deliver them somewhere else.
+
+`ps` names them:
+
+```
+1778 Rendez bash    1779 Pread bash     apexp-sh's bash + its copy process
+1867 Rendez bash    1868 Pread bash     a leftover pair
+1919 Await  bash    1946 Pread bash     another leftover copy process
+1964 Rendez bash    1965 Pread bash     the SESSION's shell + its own
+```
+
+**`Rendez` is a parent waiting in `_readbuf`; `Pread` is a copy process
+inside `_READ` on the console.** Four of them, and only the 1964/1965
+pair is legitimate. **Two pairs are leftovers from earlier runs** --
+the same accumulation the `bash`-as-`/bin/sh` memory failure pointed
+at, seen from the other side.
+
+### The fix, designed here and NOT written in a hurry
+
+`ap/plan9/_buf.c` is the most delicate file in libap and its history
+is a list of races. So the design, with the hazards named, and the
+code in its own round:
+
+**Read ON DEMAND for a terminal, and only for a terminal.** Add a
+`want` flag to `Muxbuf`. `_copyproc` waits for it before each `_READ`
+instead of looping straight back; `_readbuf` and `select()` set it
+when they actually want data, and it is **cleared on delivery**. One
+outstanding read per request rather than a permanent one.
+
+- *It fixes this case exactly*: bash's last read takes the newline,
+  `want` clears, the copy process sleeps -- and it is asleep for the
+  whole time bash sits in `wait()` while vtwin owns the console.
+- *It is gated on `FD_ISTTY`* so pipes and sockets keep the greedy
+  path. Tcl's suite drives those hard and there is no reason to
+  re-measure it; a human types slowly, so a rendezvous per keystroke
+  costs nothing.
+- **The residue, stated rather than hidden**: a zero-timeout poll
+  leaves one read outstanding, so a program that polls and then walks
+  away can still take one keystroke. That is a bounded thief instead
+  of an unbounded one, and going further means teaching `select()` to
+  withdraw a request.
+- **The hazard is deadlock**, and it is the reason this is not a
+  five-minute change: the parent already rendezvouses on `datawait`
+  for the copy process to fill the buffer, and adding a rendezvous the
+  other way makes two, on the same pair of processes. Every arm has to
+  be ordered so that "parent wants, copy is asleep" and "copy has
+  data, parent is asleep" cannot both be believed at once.
+
+**`execve` killing the copy processes is a separate, smaller fix** and
+worth doing on its own terms -- after `_EXEC` the new image cannot
+reach them -- but it does **not** cure this: the thief here is a
+living parent that never exec'd.
+
+### The fix, written
+
+`Muxbuf` gains three fields, **appended after `data[]`** so every
+existing offset is unchanged (`ondemand`, `want`, `readwait`);
+`sizeof(Muxbuf)` still moves, so **`mk distclean` before `mk install`**.
+`_bufmark()` is the version marker, so a test cannot link against the
+old library and report a pass.
+
+**The rule**: for `FD_ISTTY` buffers only, `_copyproc` sleeps at the
+top of its loop unless `want` is set, and clears `want` the moment it
+delivers. One outstanding read per request instead of one for ever.
+Pipes and sockets keep the greedy path untouched -- Tcl's suite drives
+those hard and there is no reason to re-measure them; a human types
+slowly, so a rendezvous per keystroke costs nothing.
+
+**`want` is STATE, not an event, and that is what makes the handshake
+safe.** It is written and tested under `mux->lock`, so a request
+arriving while the copy process is between its unlock and its
+rendezvous is *seen* rather than lost -- the copy process simply does
+not go to sleep. There is no window to miss.
+
+**The deadlock this design could produce is "both asleep", and every
+asking site prevents it the same way:** set `want` under the lock,
+clear `readwait` under the same lock (so two callers cannot both try
+to pair with one sleeper), release the lock, wake, and only then wait.
+Three sites ask:
+
+- `_readbuf`, in its empty-buffer branch, before setting `datawait`;
+- `select()`, for every watched descriptor as it buffers them --
+  **before `waitfresh`**, which would otherwise spin its 10ms against
+  a copy process that is deliberately asleep and answer "not ready"
+  for ever;
+- `wantdata()` itself returns early when `b->n > 0 || b->eof`, so
+  asking when the answer is already in hand cannot cause a read.
+
+**An interrupted rendezvous falls through to the read** -- the old
+greedy behaviour, which is the safe direction for a note arriving at
+the wrong moment.
+
+`_startbuf` resets all three on a recycled slot, for the reason the
+`roomwait`/`datawait` note beside it already gives: a slot inheriting
+`readwait` has a sleeper that died with the previous descriptor.
+
+**The regression test is the partition itself**, and it is exact: type
+`echo $SHELL` into vtwin, quit with `kill vtwin | rc`, and look at the
+launching bash's prompt. **Eleven bytes must reach the session and the
+prompt must be empty.** Anything in that prompt is a byte the copy
+process took. That is a better test than any assertion I could write,
+because it conserves bytes -- a partial fix shows up as a shorter
+theft rather than as a pass.
