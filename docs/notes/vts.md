@@ -865,3 +865,85 @@ And the same log answers the output half independently: every
 `tty write` is already traced, so whether bash emitted a whole
 `ESC [ ? 2004 h` is readable off the same file. *Two symptoms, one
 run, and no need to decide in advance whether they are one bug.*
+
+## The keystrokes never reach vts, and the thief is almost certainly the launching bash
+
+The trace answered on the first run, and it is the third branch of the
+three written down before it:
+
+```
+vts: tty write 2 [$ ]
+vts: cons write (from viewer) 1 [h]
+vts: tty read: HANDED 1 [h]
+vts: tty write 1 [h]
+vts: cons write (from viewer) 1 [o]
+vts: tty read: HANDED 1 [o]
+vts: tty write 1 [o]
+vts: cons write (from viewer) 1 [L]        ... and [L], [<0a>]
+```
+
+`echo $SHELL` was typed. **Five `cons write`s arrived: `h o L L \n`.**
+Every one of them was HANDED to the shell and echoed, one for one.
+
+**So vts and libap are exact, and the missing bytes never arrived at
+all.** The loss is upstream of the server, in or before vtwin. That
+also retires "every third byte": with only 4 of 11 surviving and no
+pattern, it is a *race*, not an accounting slip -- and the earlier
+1/4/7 reading was a four-sample coincidence I should have hedged
+harder.
+
+**First suspect, opened and cleared**: `vtwin/main.c` had a
+`kbdthread`/`init_kbd_thread` pair calling a SECOND `initkeyboard()`,
+which would have been precisely a second reader of `/dev/cons`
+splitting the keyboard. **It was never called** -- the channel it read
+was never even created. *A grep hit is a name, not an implementation.*
+Deleted, because it reads like the bug.
+
+### The mechanism that fits, and it is one we already measured
+
+**libap's `select()` does not poll a descriptor -- it forks a copy
+process that READS IT CONTINUOUSLY** into a shared buffer, whether or
+not anybody wants the data, for as long as the process lives.
+
+`apexp-sh` ends in `exec bash -l`. That bash is interactive, so
+readline calls `select()` on fd 0, so **libap forked a copy process
+that is reading the rio window's `/dev/cons` and never stops.** When
+`./vts-bash` runs, bash forks and waits -- but its copy process is
+still sitting in `_READ` on that same console, beside vtwin's libdraw
+keyboard proc. **Each keystroke wakes exactly one of them, and which
+one is the kernel's choice.**
+
+That fits every part of the observation: roughly half to two thirds
+lost, no pattern, and worse the longer it runs (the thief has 16K of
+room and never stops taking). And it is **the same root** as the thing
+`bufexec-test` measured two rounds ago and this file already records
+as unfixed: *the parent's copy process is still alive and reading the
+same open file, so parent and child compete.* This is that, with a
+visible consequence.
+
+**It also survives `exec`.** `_killmuxsid` is an **atexit** handler and
+`execve` never calls it, so a copy process outlives the image that
+created it. So does `fork`'s: the child `_detachbuf()`s its own view,
+and the processes belong to the parent regardless.
+
+### The control costs one look and no code
+
+**Type into vtwin, quit vtwin, and look at the bash prompt underneath.**
+If the missing characters are sitting there -- a prompt reading
+something like `ec $SHE` -- then bash's copy process took them, and
+the diagnosis is closed by a glance. If the prompt is clean, they were
+lost somewhere else and this whole reading is wrong.
+
+*Predict the observation, not the conclusion*: the prediction is
+"the launching shell's command line contains the bytes vts never saw",
+and its refutation is an empty prompt.
+
+### And the output half is now isolated too
+
+The same log has `vts: tty write 8 [<1b>[?2004h]` -- bash emitted the
+**whole** bracketed-paste sequence, and vts received it whole. So the
+`2004h` visible on screen is not a torn write and not an input
+problem: either libvterm is not consuming the private-mode form, or
+the cell diff is rendering what it should have swallowed. **A separate
+bug, now with its own evidence**, and not to be folded into the
+keystroke question.
