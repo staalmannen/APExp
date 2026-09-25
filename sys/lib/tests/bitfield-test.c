@@ -49,6 +49,10 @@
 
 #include <stdio.h>
 #include <string.h>
+/* Section 10 needs `bool'. kencc has it as a real type now, and this
+   header is what a portable program includes for it; on gcc it is the
+   same type, which is the point of checking there first. */
+#include <stdbool.h>
 
 typedef unsigned short U16;
 typedef unsigned char U8;
@@ -329,6 +333,85 @@ main(void)
 		    a.op_sibparent_test == parentp ? "= parent" : "= other");
 		check("OpMAYBESIB_set without a sibling",
 		    got == NULL && a.op_sibparent_test == parentp, detail);
+	}
+
+	/*
+	 * 10. A `bool' BIT FIELD, and CLEARING one that is already set.
+	 *
+	 * WHERE THIS CAME FROM. Under vts, readline's bracketed-paste
+	 * sequence `ESC [ ? 2 0 0 4 h' reached the terminal whole -- the
+	 * server logged all eight bytes -- and the screen showed the last
+	 * five, `2004h', as text. The cursor column confirmed it
+	 * arithmetically: 53 (a debug line) + 5 + 2 for the prompt = 60,
+	 * exactly what the session's ctl file reported.
+	 *
+	 * libvterm's parser holds its escape flag as
+	 *
+	 *	bool in_esc : 1;		(vterm_internal.h:205)
+	 *
+	 * and the sequence is consumed by setting it on ESC and CLEARING
+	 * it when the following byte is hoisted into a C1 control. A
+	 * one-bit field that accepts a 1 and ignores a 0 -- a store that
+	 * ORs in the new value without first masking the old one out --
+	 * would leave the parser believing it is still inside an escape,
+	 * which is the shape of what the screen showed.
+	 *
+	 * THAT IS A HYPOTHESIS, and this section is how it is settled
+	 * rather than argued: kencc's bit fields came from a patch that
+	 * predates `bool' being a real type here, so a `bool' bit field
+	 * may take a path `unsigned' does not.
+	 *
+	 * The `unsigned u : 1' beside it is what makes the answer
+	 * ATTRIBUTABLE. If bool fails and unsigned passes, the base type
+	 * is the discriminator; if both fail, it is clearing in general;
+	 * if both pass, the reading above is wrong and libvterm's parser
+	 * must be looked at directly. *A check whose negative result has
+	 * two explanations is not a check.*
+	 */
+	{
+		struct flags {
+			enum { P_NORMAL, P_CSI_LEADER, P_CSI_ARGS } state;
+			bool b : 1;
+			unsigned u : 1;
+			int after;
+		} f;
+
+		memset(&f, 0, sizeof f);
+		f.state = P_CSI_LEADER;
+		f.after = 12345;
+
+		f.b = true;
+		sprintf(detail, "b=%d after setting true", (int)f.b);
+		check("bool bit field holds true", f.b != 0, detail);
+
+		f.b = false;
+		sprintf(detail, "b=%d after setting false over true",
+		    (int)f.b);
+		check("bool bit field CLEARS to false", f.b == 0, detail);
+
+		/* libvterm writes this one as `= 0' rather than `= false',
+		   and both spellings appear in the same function, so ask
+		   for both -- a store that works for one constant and not
+		   the other would otherwise read as flaky. */
+		f.b = true;
+		f.b = 0;
+		sprintf(detail, "b=%d after setting 0 over true", (int)f.b);
+		check("bool bit field clears when assigned 0", f.b == 0,
+		    detail);
+
+		f.u = 1;
+		sprintf(detail, "u=%u after setting 1", f.u);
+		check("unsigned:1 bit field holds 1", f.u != 0, detail);
+
+		f.u = 0;
+		sprintf(detail, "u=%u after setting 0 over 1", f.u);
+		check("unsigned:1 bit field CLEARS to 0", f.u == 0, detail);
+
+		/* And the neighbours, because a store that writes a whole
+		   word to set one bit takes its neighbours with it. */
+		sprintf(detail, "state=%d after=%d", (int)f.state, f.after);
+		check("bit field stores leave their neighbours alone",
+		    f.state == P_CSI_LEADER && f.after == 12345, detail);
 	}
 
 	if (failures == 0)

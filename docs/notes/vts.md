@@ -947,3 +947,65 @@ problem: either libvterm is not consuming the private-mode form, or
 the cell diff is rendering what it should have swallowed. **A separate
 bug, now with its own evidence**, and not to be folded into the
 keystroke question.
+
+## The keystrokes are fixed; the remaining ugliness is `2004h`
+
+The partition test passed on its first run with an ordinary bash as the
+launching shell -- eleven bytes in, eleven handed over, outer prompt
+empty. **The input half is done.**
+
+What is left on screen is the output half, and it is now fully
+isolated:
+
+```
+vts: tty write 8 [<1b>[?2004h]      vts received all eight bytes
+screen:  ...cons2004h$ echo $SHELL  and five of them are TEXT
+```
+
+**The cursor column proves it arithmetically rather than by eye**: the
+session's `ctl` reported `cursor=1,60`, and 53 (the debug line above
+it) + **5** (`2004h`) + 2 (`$ `) is exactly 60. So libvterm printed
+those five characters; `ESC`, `[` and `?` were consumed.
+
+*(The far-right indentation is a second, separate thing and it is mine:
+`session.c`'s child prints its `fd0=... fd2=...` line with `\n` and no
+`\r`, and the console is in raw mode. Same staircase `_apdbg` had.)*
+
+### The hypothesis, and how it is settled rather than argued
+
+libvterm consumes that sequence by setting an escape flag on `ESC` and
+**clearing it** when the next byte is hoisted into a C1 control:
+
+```c
+bool in_esc : 1;		/* vterm_internal.h:205 */
+```
+
+**A one-bit field that accepts a 1 and ignores a 0** -- a store that
+ORs the new value in without masking the old one out -- leaves the
+parser believing it is still inside an escape, and the bytes after it
+are then eaten as a bogus escape and printed. That is the shape of
+what the screen shows.
+
+**kencc's bit fields came from a patch that predates `bool` being a
+real type here**, so a `bool` bit field may take a path `unsigned`
+does not.
+
+`sys/lib/tests/bitfield-test.c` **section 10** asks it: set true, clear
+to false, clear with `= 0` (libvterm uses both spellings in the same
+function), the same two for an `unsigned : 1` **beside it**, and a
+check that neighbouring fields survive. *The `unsigned` twin is what
+makes the answer attributable* -- bool failing while unsigned passes
+names the base type; both failing names clearing in general; both
+passing refutes this reading entirely and sends the next round into
+libvterm's parser directly. **It passes on gcc**, so a failure on
+kencc is kencc's.
+
+```
+cd sys/lib/tests && pcc -o bitfield-test bitfield-test.c && ./bitfield-test
+```
+
+*Note it is `pcc`, i.e. APE's compiler, while libvterm is built NATIVE
+by `6c`. They share the front end (`sys/src/cmd/cc`), which is where
+bit fields live, so the test is honest about the mechanism -- but if
+section 10 passes and the screen still shows `2004h`, that difference
+is the first thing to suspect.*

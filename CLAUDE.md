@@ -1832,6 +1832,22 @@ fix that does NOT cure this** -- the thief is a living parent.
 **And a win: ARROW KEYS WORK under vtwin**, which rio could never give
 -- one of the three things vts was for.
 
+**What is left in vts is the OUTPUT half, and it is isolated**: vts
+receives `<1b>[?2004h` whole and the screen shows `2004h` as text --
+proved arithmetically, since `ctl` said `cursor=1,60` and 53+5+2 = 60.
+**Hypothesis, not yet measured**: libvterm holds its escape flag as
+**`bool in_esc : 1`** and consumes the sequence by CLEARING it; a
+one-bit field that accepts a 1 and ignores a 0 leaves the parser
+inside an escape, which is exactly this shape. **kencc's bit fields
+predate `bool` being a real type here.** `bitfield-test.c` **section
+10** asks it -- set, clear with `false`, clear with `0`, the same for
+an `unsigned : 1` **beside it** so the answer is attributable, plus
+the neighbours. Passes on gcc. *Both passing refutes the reading and
+sends the next round into libvterm's parser.* (The far-right
+indentation is separate and mine: `session.c`'s child prints with `
+`
+and no `` into a raw console.)
+
 **AND THE SESSION NOW WORKS**: `tty read: blocked (1 waiting)`,
 `read: enter fd=0 n=1`, `-> buffered n=1`, then `tty write 1 [c]` --
 bash waits for a keystroke, gets it and echoes it, with `flags=38`
