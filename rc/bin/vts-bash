@@ -1,34 +1,48 @@
 #!/bin/rc
 # vts-bash -- start bash under vts in a vtwin window, or attach to one.
 #
-# RUN THIS FROM INSIDE apexp-sh. That is not a convenience, it is the
-# whole mechanism:
+# RUN IT FROM INSIDE apexp-sh -- `vts-bash', no ./ , since it lives in
+# rc/bin, which apexp-sh binds onto /bin. `apexp-sh -v' does both in
+# one step.
+#
+# Being inside apexp-sh is not a convenience, it is the whole
+# mechanism:
 #
 #   - apexp-sh does `bind -b $cputype/bin /bin', which is what puts
 #     vts, vtwin and vts-attach on the path at all;
 #   - and `bind -b $cputype/bin/ape /bin', which is what puts bash
 #     there;
+#   - and `bind -b rc/bin /bin', which is what puts THIS script there;
 #   - and it sets SHELL=bash, which is how vts knows what to exec
 #     (sys/src/cmd2/vts/session.c, shellpath()).
 #
 # vts forks the shell with RFNAMEG and RFENVG, both of which COPY, so
 # the shell inherits that namespace and that environment. Started from
-# a plain rc, none of the three is true and vts falls back to /bin/rc.
+# a plain rc, none of the four is true and vts falls back to /bin/rc.
 #
-# PREFER `./apexp-sh -r' FOR THIS, AND THE REASON IS MEASURED.
+# IT LIVES IN rc/bin RATHER THAN rc/bin/ape, AND THE DISTINCTION IS
+# REAL: rc/bin/ape holds the APE toolchain wrappers (c89, cc, libtool,
+# ranlib). This drives vts, vtwin and vts-attach, which are NATIVE
+# cmd2 binaries built with 6c. Filing it under ape/ would assert
+# something false about what it is.
 #
-# An interactive bash calls select() on fd 0, and libap's select()
-# forks a copy process that reads that descriptor CONTINUOUSLY for as
-# long as the process lives. So a bash window has a second process
-# permanently reading its /dev/cons -- and while vtwin is running,
-# vtwin and that copy process are both blocked reading the same
-# console, with the kernel handing each keystroke to exactly one of
-# them. Typing `echo $SHELL' reached the session as `hoLL'; the log
-# showed vts and libap exact and the bytes simply never arriving.
+# `apexp-sh -r' IS A FALLBACK NOW, NOT THE RECOMMENDED WAY.
 #
-# `./apexp-sh -r' gives the same environment with rc as the launching
-# shell. rc does not use select(), so there is no copy process and no
-# competition. $SHELL is still bash, so the SESSION still runs bash.
+# It used to be required, and the reason was measured: an interactive
+# bash calls select() on fd 0, libap's select() forks a copy process
+# that reads that descriptor CONTINUOUSLY, and so a bash window had a
+# second process permanently reading its /dev/cons. With vtwin running,
+# both were blocked on the same console and the kernel handed each
+# keystroke to exactly one of them -- `echo $SHELL' reached the session
+# as `hoLL', while vts and libap measured exact and the bytes simply
+# never arrived. `-r' launches with rc, which does not use select().
+#
+# **THAT BUG IS FIXED** (ap/plan9/_buf.c, the `ondemand'/`want' fields;
+# _bufmark() is the marker), and the fix is CONFIRMED from a plain
+# `apexp-sh' with no -r: a full session typed clean. Keep -r for
+# bisecting a suspected recurrence -- if input goes missing again,
+# -r working and plain apexp-sh not is the one-command split between
+# the copy process and everything else.
 #
 # ------------------------------------------------------------------
 # A MOUNT LIVES IN A NAMESPACE, AND THAT IS WHY THIS SCRIPT MOUNTS.

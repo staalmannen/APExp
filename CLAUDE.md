@@ -1264,12 +1264,19 @@ then open `/dev/cons` for 0/1/2 -- `fd2path` then answers `/dev/cons`,
 windows. Loosening `_isatty` instead would be the "invent semantics to
 make a test pass" shape. That bind is also where the **per-session
 `consctl`** lands, so the two recorded steps are one edit.
-**`./vts-bash` IS THE LAUNCHER, and it must run from inside
+**`vts-bash` IS THE LAUNCHER, and it must run from inside
 `apexp-sh`** -- that is the mechanism, not a convenience: apexp-sh's
-two `bind -b` lines are what put `vts`/`vtwin` and `bash` on the path,
+`bind -b` lines are what put `vts`/`vtwin` and `bash` on the path,
 and its `SHELL=bash` is what vts reads to know what to exec. vts forks
 with `RFNAMEG|RFENVG`, both of which COPY, so the shell inherits both.
 From a plain `rc` none of it is true and vts falls back to `/bin/rc`.
+**It lives in `rc/bin/vts-bash`**, which `apexp-sh` binds onto `/bin`,
+so it is `vts-bash` and not `./vts-bash` -- and **`./apexp-sh -v` does
+both steps in one**, dropping back to the shell afterwards rather than
+exec'ing, because the script ends by printing the whole server log and
+a window that closes on it makes that log unreadable. `rc/bin` rather
+than `rc/bin/ape`: it drives NATIVE `cmd2` binaries, and `rc/bin/ape`
+is the APE toolchain wrappers.
 **`lined` is left ON at spawn and the shell turns it off** by writing
 `rawon` to `ttyctl` (which readline's `tcsetattr` already sends):
 9front's rc neither echoes nor cooks, so lined-off would blank every
@@ -1927,6 +1934,30 @@ indentation is separate and mine: `session.c`'s child prints with `
 `
 and no `
 ` into a raw console.)
+
+**THE SCREEN IS CLEAN: `2004h` IS GONE AND THE WHOLE CHAIN IS
+MEASURED.** A session shows a bare `$` prompt, `echo $SHELL` answers
+`bash`, `echo $TERM` answers **`vt100`**. So: fixed `false` ->
+`in_esc = false` clears -> the parser stays in CSI -> vts consumes the
+bracketed-paste sequence instead of printing it.
+**Two things in that run were better than what was asked for.**
+*`$TERM` is already `vt100`*, not `dumb` -- vts sets it, so the item
+listed as "next" was done, the termcap entry with `ce`/`up`/`cm` is in
+play and readline is redrawing rather than reprinting. And *the run
+was from a PLAIN `apexp-sh`, not `-r`* -- which is a better control
+than the one I proposed, since `-r` existed to dodge the copy-process
+thief and running without it exercises the `want` fix in the exact
+configuration that used to fail. **`-r` is a fallback now, not the
+recommended path**, and it is kept for one good reason: if input ever
+goes missing again, "-r works and plain apexp-sh does not" splits the
+copy process from every other explanation in one command.
+**And the far-right staircase was `\n` into a VT, as recorded** --
+fixed at last: `session.c`'s child now writes `\r\n` for the three
+messages printed AFTER the dup that makes fd 2 the session terminal,
+and `\n` for the ones before it, which go to the launching rio
+window. *The boundary is the `dup()`, not the file* -- the same
+fprint is correct above it and wrong below. Fourth time an instrument
+or a diagnostic has been the visible fault in this area.
 
 **AND THE SESSION NOW WORKS**: `tty read: blocked (1 waiting)`,
 `read: enter fd=0 n=1`, `-> buffered n=1`, then `tty write 1 [c]` --

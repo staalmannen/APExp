@@ -207,6 +207,24 @@ session_spawn_rc(Session *s)
 				_exits("bind");
 			}
 
+			/*
+			 * FROM HERE ON, EVERY MESSAGE ON fd 2 NEEDS \r\n.
+			 *
+			 * Below this point fd 2 is the session's own terminal,
+			 * and that terminal is a VT: `\n' is LINE FEED, which
+			 * moves down a row and KEEPS THE COLUMN. rio's console
+			 * is not a VT and does the newline people expect, so
+			 * the same fprint is correct above and wrong below --
+			 * the boundary is the dup() three lines down, not the
+			 * file.
+			 *
+			 * The symptom is a staircase marching right, which
+			 * reads as a VT bug rather than a printf one. It cost
+			 * a round under exactly that reading when _apdbg.c had
+			 * it (see docs/notes/libap.md), and this file had it
+			 * too: the `fd0=... fd2=...' line below pushed the
+			 * shell's first prompt to the middle of the screen.
+			 */
 			fd = open("/dev/cons", ORDWR);
 			if(fd < 0){
 				fprint(2, "vts: child: open /dev/cons: %r\n");
@@ -241,8 +259,8 @@ session_spawn_rc(Session *s)
 			 */
 			snprint(path, sizeof path, "/mnt/%s/ttyctl", s->name);
 			if(bind(path, "/dev/consctl", MREPL) < 0)
-				fprint(2, "vts: child: bind %s /dev/consctl: %r\n"
-					"vts: raw mode will not work; expect double echo\n",
+				fprint(2, "vts: child: bind %s /dev/consctl: %r\r\n"
+					"vts: raw mode will not work; expect double echo\r\n",
 					path);
 
 			/*
@@ -318,12 +336,12 @@ session_spawn_rc(Session *s)
 				fd2path(0, p0, sizeof p0);
 				fd2path(1, p1, sizeof p1);
 				fd2path(2, p2, sizeof p2);
-				fprint(2, "vts: child: fd0=%s fd1=%s fd2=%s\n",
+				fprint(2, "vts: child: fd0=%s fd1=%s fd2=%s\r\n",
 					p0, p1, p2);
 			}
 
 			execl(sh, sh, "-i", nil);
-			fprint(2, "vts: child: exec %s: %r\n", sh);
+			fprint(2, "vts: child: exec %s: %r\r\n", sh);
 			_exits("exec");
 		}
 	}
