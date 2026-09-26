@@ -1,6 +1,0 @@
-#!/bin/sh
-
-TKDESK_LIBRARY=`pwd`/tcldesk
-export TKDESK_LIBRARY
-
-./tkdesksh tkdesk -default
