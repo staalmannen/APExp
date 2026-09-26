@@ -1117,3 +1117,76 @@ kind.* The table first used `\x` hex escapes (risky on kencc) and
 bytes, not eight. Octal escapes and `strlen` now, so no length in this
 file is written by hand. A probe whose constants are wrong reports
 about a string nobody sent.
+
+## Every row consumes exactly three bytes, and that names the bug
+
+```
+hi               2 printed  "hi"      <- positive control, good
+ESC M            0 printed  ""
+ESC [ H          0 printed  ""
+ESC [ 2 J        1 printed  "J"
+ESC [ 1 m        1 printed  "m"
+ESC [ ? h        1 printed  "h"
+ESC [ ? 1 h      2 printed  "1h"
+ESC [ 2004 h     4 printed  "004h"
+ESC [ ? 2004 h   5 printed  "2004h"
+```
+
+Subtract: **every sequence consumes exactly three bytes and prints the
+rest.** `ESC [ H` looked healthy only because it *is* three bytes long
+-- and reading the table row by row would have called it a pass. *The
+information was in the arithmetic across rows, not in any one of
+them.*
+
+So after `[`, exactly ONE more byte is handled in a CSI state and the
+parser is back in `NORMAL` for the next -- `vt->parser.state` is not
+surviving from one iteration of the byte loop to the next, while
+`in_esc`, in the same struct, plainly survives from `ESC` to `[`.
+
+### One mechanism explains all seven rows, with no slack
+
+```c
+    enum { NORMAL, CSI_LEADER, ... } state;
+    bool in_esc : 1;
+```
+
+**Suppose a store to `state` sets the `in_esc` bit** -- the two
+overlap. Then:
+
+- `ESC [ 2 J`: `[` hoists to CSI and `ENTER_STATE(CSI_LEADER)` writes
+  **1**, which lights `in_esc`. `2` therefore finds `in_esc` true,
+  fails the hoist test (0x32 is below 0x40), takes the `else` --
+  **`state = NORMAL`** -- and is then eaten by `do_escape`. `J`
+  arrives in NORMAL with `in_esc` clear: **printed**. Consumed three.
+- `ESC [ ? h`: identical with `?` (0x3f, also below 0x40). `h`
+  printed.
+- `ESC [ H`: `H` is **0x48**, which IS in `0x40..0x60`, so it hoists
+  to `0x88` and `do_control` consumes it as HTS. Clean -- *for the
+  wrong reason*, and that is why the row looked fine.
+- `ESC M`: same hoist, `M` is 0x4d. Clean, genuinely.
+- the three long ones: first post-`[` byte eaten by `do_escape`, all
+  the rest printed. `2004h`, `004h`, `1h` -- exactly what the table
+  shows.
+
+Seven rows, one mechanism, no leftovers.
+
+### The test already had this struct and still missed it
+
+`bitfield-test.c` section 10 declares that exact shape -- an `enum`
+followed by `bool b : 1` -- and checks `bit field stores leave their
+neighbours alone`. It passes. **Because it only ever writes the BIT
+FIELD and reads the neighbour.** An overlap is symmetric; testing one
+direction and treating the pair as covered is the
+"negative result with two explanations" trap one level up.
+
+The missing direction is now there: set the bit, **write the enum**,
+read the bit back -- both polarities, for `bool` and for
+`unsigned : 1`, and the struct's size printed rather than asserted so
+an overlap is visible without inferring it from four FAILs. Passes on
+gcc (`sizeof` 12: enum 4, the two bit fields sharing one word, int 4).
+
+**Prediction: on 9front those four lines FAIL and `sizeof` is 8**, one
+word short, with `state` and the bit fields sharing it. Refuted if
+they pass -- and then the overlap story is wrong and the next place is
+`vterm_input_write`'s chunking, since the probe feeds whole prefixes
+in one call and libvterm may not.

@@ -412,6 +412,63 @@ main(void)
 		sprintf(detail, "state=%d after=%d", (int)f.state, f.after);
 		check("bit field stores leave their neighbours alone",
 		    f.state == P_CSI_LEADER && f.after == 12345, detail);
+
+		/*
+		 * AND THE OTHER DIRECTION, WHICH THIS TEST MISSED THE FIRST
+		 * TIME AND WHICH IS THE ONE THAT MATTERS.
+		 *
+		 * The checks above all write the BIT FIELD and then read
+		 * the neighbours. They say nothing about writing a
+		 * NEIGHBOUR and reading the bit field -- and an overlap is
+		 * symmetric, so testing one direction and calling the pair
+		 * covered is exactly the "check whose negative result has
+		 * two explanations" trap, one level up.
+		 *
+		 * WHAT ASKED FOR IT. libvterm's parser holds
+		 *
+		 *	enum { NORMAL, CSI_LEADER, ... } state;
+		 *	bool in_esc : 1;
+		 *
+		 * and mis-parses every CSI sequence longer than three
+		 * bytes, consuming ESC, `[' and exactly one more and then
+		 * printing the rest -- measured for seven different
+		 * sequences by sys/src/cmd2/vts/test/vtparse-probe.c. Every
+		 * one of those seven is explained, exactly, if a store to
+		 * `state' sets the `in_esc' bit: the byte after `[' then
+		 * finds in_esc true, takes the escape path instead of the
+		 * CSI path, resets the state to NORMAL and the rest is
+		 * text.
+		 *
+		 * So: set the bit, write the neighbour, read the bit back.
+		 */
+		f.b = 0;
+		f.u = 0;
+		f.state = P_CSI_LEADER;		/* == 1, one bit set */
+		sprintf(detail, "after state=%d: b=%d u=%u",
+		    (int)f.state, (int)f.b, f.u);
+		check("writing the enum neighbour leaves a false bool bit "
+		    "field false", f.b == 0, detail);
+		check("writing the enum neighbour leaves a 0 unsigned bit "
+		    "field 0", f.u == 0, detail);
+
+		f.b = 1;
+		f.u = 1;
+		f.state = P_NORMAL;		/* == 0 */
+		sprintf(detail, "after state=%d: b=%d u=%u",
+		    (int)f.state, (int)f.b, f.u);
+		check("writing the enum neighbour leaves a true bool bit "
+		    "field true", f.b != 0, detail);
+		check("writing the enum neighbour leaves a 1 unsigned bit "
+		    "field 1", f.u != 0, detail);
+
+		/*
+		 * And the layout itself, printed rather than asserted --
+		 * if the two do overlap, the sizes say so and a reader
+		 * should not have to infer it from four FAILs.
+		 */
+		printf("      (sizeof struct flags = %d; an enum is %d, "
+		    "an int %d)\n",
+		    (int)sizeof f, (int)sizeof f.state, (int)sizeof(int));
 	}
 
 	if (failures == 0)
