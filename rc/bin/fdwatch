@@ -1,0 +1,157 @@
+#!/bin/rc
+# fdwatch -- sample a process's open descriptors while it runs.
+#
+#	fdwatch <pid> [interval] [logfile]
+#	fdwatch -n <name> [interval] [logfile]
+#
+# Default interval 2 seconds, default log /tmp/fdwatch.log.
+#
+# WHY THIS RATHER THAN COUNTING DEBUG LINES.
+#
+# `bash cannot be /bin/sh yet' has been an open item for several
+# rounds, with a recorded plan: run the failing build with
+# $APEXP_DEBUG=1 and count `select: buffered now fd=' lines against
+# the kernel's `process exceeds 100 file descriptors' warnings.
+#
+# **That plan can only confirm what is already known.** It counts
+# BUFFERING EVENTS, so it can say "libap buffered a lot of
+# descriptors" -- which was the hypothesis -- and it cannot say which
+# descriptors are still open, what they are, or whether buffering is
+# involved at all. If the leak is ordinary open() without close(), or
+# a pipe, or something bash does that has nothing to do with libap,
+# that instrument reports zero and the conclusion drawn from zero
+# would be wrong.
+#
+# /proc/<pid>/fd answers the actual question: it lists every open
+# descriptor of a live process WITH ITS PATH. A hundred lines saying
+# /tmp/bashtst-NNNN is a different bug from a hundred saying
+# /dev/cons, and both are different from a hundred pipes. *Print what
+# the machine says rather than what the code implies.*
+#
+# READING THE OUTPUT.
+#
+# Each sample prints the total, then the paths grouped and counted,
+# commonest first. What to look for, in order:
+#
+#   - a count that RISES MONOTONICALLY across samples. A count that
+#     rises and falls is a busy shell, not a leak.
+#   - ONE path repeated many times -- that names the call site.
+#   - many DISTINCT paths under one directory (e.g. $TMPDIR) -- that
+#     is a create/unlink loop whose descriptors are never closed.
+#   - `|' or a pipe qid with a large count -- pipes, so pipe() or
+#     popen() or a here-document.
+#
+# The first line of /proc/<pid>/fd is the process's CWD, not a
+# descriptor, which is why the count below subtracts one. Getting
+# that wrong would report an off-by-one leak that is not there.
+#
+# LIMITS, SO THEY ARE NOT DISCOVERED AS SURPRISES.
+#
+# Sampling is not tracing: a descriptor opened and closed between two
+# samples is invisible, which is correct here (it is not leaking) but
+# means this cannot show you WHERE one was opened. It shows you WHAT.
+# Once a path is named, `ratrace' on the same program narrows it to
+# the call -- and ratrace on a whole test suite is unreadable, which
+# is why this comes first.
+#
+# The process usually DIES at the end, taking /proc/<pid> with it, so
+# the log is the artefact rather than the screen. The last sample
+# before the process vanishes is the interesting one.
+
+fn usage {
+	echo 'usage: fdwatch <pid> [interval] [logfile]' >[1=2]
+	echo '       fdwatch -n <name> [interval] [logfile]' >[1=2]
+	exit usage
+}
+
+if(~ $#* 0)
+	usage
+
+if(~ $1 -n){
+	if(~ $#* 1)
+		usage
+	name=$2
+	shift
+	shift
+	# The LAST match, deliberately: a test suite's shell is started
+	# after the one being typed into, so the newest is the one meant.
+	# Printed below either way, so a wrong guess is visible rather
+	# than silent.
+	pid=`{ps | awk -v name=$name '$NF == name { p = $2 } END { if(p != "") print p }'}
+	if(~ $#pid 0){
+		echo 'fdwatch: no process called '^$name >[1=2]
+		exit nopid
+	}
+	echo 'fdwatch: '^$name^' is pid '^$pid
+}
+if not {
+	pid=$1
+	shift
+}
+
+interval=2
+if(! ~ $#* 0){
+	interval=$1
+	shift
+}
+
+log=/tmp/fdwatch.log
+if(! ~ $#* 0){
+	log=$1
+	shift
+}
+
+if(! test -e /proc/$pid/fd){
+	echo 'fdwatch: /proc/'^$pid^'/fd does not exist -- no such process,' >[1=2]
+	echo 'fdwatch: or it is not yours to look at' >[1=2]
+	exit noproc
+}
+
+echo 'fdwatch: watching pid '^$pid^', every '^$interval^'s, into '^$log
+echo 'fdwatch: stop with Del; the log outlives the process'
+
+{
+	echo '==== fdwatch pid='^$pid^' started '^`{date}
+	# The command line, so the log says WHAT was watched. A log that
+	# does not name its subject reads exactly like one that does.
+	if(test -e /proc/$pid/args)
+		echo 'args: '^`{cat /proc/$pid/args}
+	echo
+} >> $log
+
+# rc has no `break', and `sleep' takes whole seconds -- both learned
+# the hard way in vts-bash. A flag is how to leave the loop, and the
+# loop ends when the process does.
+running=yes
+while(~ $running yes){
+	if(test -e /proc/$pid/fd){
+		{
+			echo '---- '^`{date}
+			# -1 for the cwd line at the top.
+			n=`{wc -l < /proc/$pid/fd}
+			echo 'total descriptors: '^`{echo $n 1 - p | dc}
+			# Field 10 onwards is the name; earlier fields are
+			# the fd number, mode and qid. Print the name, count
+			# duplicates, commonest first -- one repeated path is
+			# the whole answer when it appears.
+			sed 1d /proc/$pid/fd | awk '{
+				name = $10
+				for(i = 11; i <= NF; i++)
+					name = name " " $i
+				if(name == "")
+					name = "(unnamed)"
+				print name
+			}' | sort | uniq -c | sort -nr
+			echo
+		} >> $log
+		sleep $interval
+	}
+	if not {
+		running=no
+		{
+			echo '==== process '^$pid^' is gone, '^`{date}
+			echo
+		} >> $log
+		echo 'fdwatch: pid '^$pid^' exited; log in '^$log
+	}
+}
