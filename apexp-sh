@@ -4,19 +4,28 @@
 #
 #	./apexp-sh		the environment, with bash as the shell
 #	./apexp-sh -r		the same environment, with rc as the shell
+#	./apexp-sh -v		the environment, then straight into vts-bash
 #
-# WHY -r EXISTS, and it is not a preference.
+# WHY -v EXISTS.
+#
+# Starting a vts session took two commands and the first one did
+# nothing but set up a namespace: `./apexp-sh' and then `vts-bash'.
+# -v does both, and it drops back into the shell afterwards rather
+# than exiting -- vts-bash prints the server's whole log on the way
+# out, and a window that closes on it makes that log unreadable.
+#
+# WHY -r EXISTS. IT IS NOW A FALLBACK, NOT A PREFERENCE.
 #
 # libap's select() does not POLL a descriptor -- it forks a copy
 # process that reads it CONTINUOUSLY, into a shared buffer, for as long
 # as the process lives (ap/plan9/_buf.c, _startbuf/_copyproc). bash is
-# interactive, so readline calls select() on fd 0, so this bash has a
+# interactive, so readline calls select() on fd 0, so this bash had a
 # process of its own permanently reading the window's /dev/cons.
 #
-# That is invisible while bash is the only thing in the window. It is
-# NOT invisible when bash runs a program that reads the console itself:
-# both are then blocked in a read on the same file, and the kernel
-# hands each keystroke to exactly ONE of them. Under `vts-bash' that
+# That is invisible while bash is the only thing in the window. It was
+# NOT invisible when bash ran a program that reads the console itself:
+# both were then blocked in a read on the same file, and the kernel
+# handed each keystroke to exactly ONE of them. Under `vts-bash' that
 # showed up as characters silently vanishing -- `echo $SHELL' reaching
 # the session as `hoLL' -- with vts and libap measured exact and the
 # bytes simply never arriving.
@@ -25,10 +34,17 @@
 # $SHELL stays `bash' either way, so a vts session still runs bash;
 # only the LAUNCHING shell changes.
 #
-# This is a workaround for a real libap problem, recorded in
-# docs/notes/libap.md and not yet fixed: a copy process outlives the
-# image that created it (_killmuxsid is an atexit handler, and execve
-# never calls it), and it reads whether or not anyone wants the data.
+# **THE LIBAP BUG IS FIXED** -- terminals are read ON DEMAND now, one
+# outstanding read per request instead of one for ever (the
+# `ondemand'/`want'/`readwait' fields in Muxbuf; _bufmark() is the
+# version marker). CONFIRMED from a plain `apexp-sh': a whole session
+# typed clean with no -r anywhere.
+#
+# So -r is kept for one purpose, and it is a good one: if input ever
+# goes missing again, `-r works and plain apexp-sh does not' separates
+# the copy process from every other explanation in a single command.
+# A workaround that survives as a bisecting tool is worth the eight
+# lines.
 ip/ipconfig loopback /dev/null 127.1
 rfork en
 fn sigterm{}
@@ -59,11 +75,26 @@ bind -b $cputype/bin/ape /bin
 
 # The shell for THIS window. $SHELL above is what vts execs inside a
 # session and is deliberately left as bash.
+if(~ $1 -v v vts){
+	# vts-bash is on the path because of the rc/bin bind above.
+	#
+	# Run it, THEN fall through to the shell. vts-bash ends by
+	# printing the whole of /tmp/vts.log, which is where every
+	# answer about a session that misbehaved lives; exec'ing it
+	# would close the window on that output the moment vtwin
+	# exits, which is the one thing worth reading.
+	vts-bash
+	echo
+	echo 'apexp-sh: vts-bash finished; this is the launching shell.'
+	echo 'apexp-sh: run vts-bash again to reattach or start over.'
+}
 if(~ $1 -r r rc){
-	echo 'apexp-sh: rc as the launching shell (no readline, so no'
-	echo 'apexp-sh: copy process competing for the console -- see the'
-	echo 'apexp-sh: note at the top of this script). $SHELL is still'
-	echo 'apexp-sh: bash, so ./vts-bash still runs bash in the session.'
+	echo 'apexp-sh: rc as the launching shell. This is a FALLBACK --'
+	echo 'apexp-sh: the copy-process bug it worked around is fixed, and'
+	echo 'apexp-sh: plain ./apexp-sh is confirmed clean. Keep it for'
+	echo 'apexp-sh: bisecting: if keystrokes go missing again, -r'
+	echo 'apexp-sh: working and plain apexp-sh not is the split.'
+	echo 'apexp-sh: $SHELL is still bash, so vts-bash still runs bash.'
 	exec rc -i
 }
 exec bash -l

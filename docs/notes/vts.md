@@ -141,14 +141,28 @@ earlier, at the source rather than the binary. Re-read the hunks
 before pushing, and grep for each new identifier's **declaration** as
 well as its uses.
 
-## Running it: `./vts-bash`, from inside `apexp-sh`
+## Running it: `vts-bash`, from inside `apexp-sh`
 
-`vts-bash` at the repo root starts vts and a vtwin window. **It must be
-run from inside `apexp-sh`**, and that is the mechanism rather than a
-convenience -- three things `apexp-sh` does are load-bearing:
+**`./apexp-sh -v` is the one-command form** and is what to reach for:
+it builds the namespace and runs `vts-bash` in it, then falls back to
+the shell rather than exec'ing, so the log the script prints on the
+way out can still be read.
+
+`rc/bin/vts-bash` starts vts and a vtwin window. It is in `rc/bin`
+because `apexp-sh` binds that onto `/bin` -- so the command is
+`vts-bash`, no `./`. **Not `rc/bin/ape`**, which holds the APE
+toolchain wrappers (`c89`, `cc`, `libtool`): this drives `vts`,
+`vtwin` and `vts-attach`, which are native `cmd2` binaries built with
+`6c`, and filing it under `ape/` would assert something false about
+what it is.
+
+**It must be run from inside `apexp-sh`**, and that is the mechanism
+rather than a convenience -- these things `apexp-sh` does are
+load-bearing:
 
 ```
 bind -b $cputype/bin /bin        vts, vtwin, vts-attach get on the path
+bind -b rc/bin /bin              vts-bash itself gets on the path
 bind -b $cputype/bin/ape /bin    bash gets on the path
 SHELL=bash                       what vts reads to know what to exec
 ```
