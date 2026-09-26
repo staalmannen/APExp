@@ -1153,3 +1153,37 @@ names `/amd64/lib/libvterm.a`, the system path that `#pragma lib` in
 `$APEXPROOT/$objtype/lib/libvterm.a` in the repo. Worth an `ls -l` on
 both before trusting any measurement of libvterm, for the same reason
 every other stale-build trap in this file exists.)*
+
+### `false` is not the same token in APE and in a native build
+
+Found while writing a test, not by it, and it explains why the test
+could not have found it.
+
+- **Native** (libvterm, vts, anything under `sys/src/lib` or
+  `sys/src/cmd2`): there is no `<stdbool.h>`, and `vtcompat.h`
+  deliberately does not define `true`/`false`. So `false` is
+  **kencc's own C23 keyword**.
+- **APE** (everything under `sys/src/ape`, and every test in
+  `sys/lib/tests` built with `pcc`): `sys/include/ape/stdbool.h` says
+
+  ```c
+  #define true  1
+  #define false 0
+  ```
+
+  and explains why it must not `#define bool _Bool`. So in an APE
+  program `false` is a **macro for `0`** before the compiler sees it.
+
+**Consequence for testing, and it bit immediately.**
+`bitfield-test.c` section 10 was written to ask both spellings of a
+clear, `= false` and `= 0`, because libvterm uses both in one
+function. Under APE those two lines preprocess to the same thing:
+**one check written twice**, which cannot tell a broken `false` from a
+working one. The pair is kept with a comment saying so, because
+removing it would leave the next person to make the same mistake.
+
+*The general shape: a test in `sys/lib/tests` measures the APE
+dialect. A bug in the NATIVE dialect needs a native probe, and the
+two differ in more than the libc.* That is a second reason beside the
+flags one already recorded -- `sys/lib/tests` cannot answer for
+`sys/src/lib`.

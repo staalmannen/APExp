@@ -114,6 +114,50 @@ main(int, char**)
 	}
 
 	/*
+	 * 2b. `= false' SPECIFICALLY, because that is the spelling on the
+	 *     failing path and it is not the spelling that works.
+	 *
+	 *     libvterm clears the flag in two places with two different
+	 *     constants:
+	 *
+	 *	parser.c, the ESC-to-C1 hoist:  vt->parser.in_esc = false;
+	 *	parser.c, case NORMAL:          vt->parser.in_esc = 0;
+	 *
+	 *     A second model fits every row of vtparse-probe's table just
+	 *     as well as an overlap does: the hoist's clear never takes,
+	 *     so `[' is swallowed as an unhandled escape byte, the next
+	 *     byte is eaten by do_escape (which uses `= 0' and DOES
+	 *     work), and everything after that prints. `ESC [ H' survives
+	 *     because H is 0x48 and hoists into a C1 control either way.
+	 *
+	 *     So ask for both spellings on the real struct. If `= 0'
+	 *     clears and `= false' does not, that is the bug and the
+	 *     line is one character long.
+	 */
+	memset(&vt.parser, 0, sizeof vt.parser);
+	vt.parser.in_esc = 1;
+	vt.parser.in_esc = 0;
+	print("    in_esc=1 then =0     -> in_esc=%d (want 0)\n",
+		(int)vt.parser.in_esc);
+	if(vt.parser.in_esc != 0){
+		print("    *** `= 0' does not clear it.\n");
+		bad++;
+	}
+
+	memset(&vt.parser, 0, sizeof vt.parser);
+	vt.parser.in_esc = true;
+	vt.parser.in_esc = false;
+	print("    in_esc=true then =false -> in_esc=%d (want 0)\n",
+		(int)vt.parser.in_esc);
+	if(vt.parser.in_esc != 0){
+		print("    *** `= false' does NOT clear it, while `= 0'\n");
+		print("    *** above did. That is the bug: the ESC-to-C1\n");
+		print("    *** hoist in parser.c uses `= false', so the\n");
+		print("    *** parser never leaves escape state after `['.\n");
+		bad++;
+	}
+
+	/*
 	 * 3. Does the state survive a write to the member AFTER the bit
 	 *    field? The parser sets intermedlen on the CSI_ARGS ->
 	 *    CSI_INTERMED fallthrough, and if that store reaches `state'

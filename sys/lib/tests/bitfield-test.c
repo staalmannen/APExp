@@ -389,10 +389,32 @@ main(void)
 		    (int)f.b);
 		check("bool bit field CLEARS to false", f.b == 0, detail);
 
-		/* libvterm writes this one as `= 0' rather than `= false',
-		   and both spellings appear in the same function, so ask
-		   for both -- a store that works for one constant and not
-		   the other would otherwise read as flaky. */
+		/*
+		 * WARNING: UNDER APE THESE TWO ARE THE SAME TEST.
+		 *
+		 * The intent was to ask both spellings, because libvterm
+		 * clears the same flag with `= false' in one place and
+		 * `= 0' in another. But APE's <stdbool.h> is literally
+		 *
+		 *	#define false 0
+		 *
+		 * so `f.b = false' preprocesses to `f.b = 0' and the two
+		 * checks are one check written twice. **A duplicate dressed
+		 * as two cases**, and it cannot distinguish a broken
+		 * `false' from a working one.
+		 *
+		 * It CANNOT be fixed here. Native Plan 9 has no
+		 * <stdbool.h>, so libvterm's `false' is kencc's own C23
+		 * keyword, and no APE program can reach that spelling --
+		 * the header is on the include path whether or not this
+		 * file asks for it. The question therefore belongs to a
+		 * NATIVE probe, and it is asked by
+		 * sys/src/cmd2/vts/test/vtlayout-probe.c section 2b.
+		 *
+		 * Kept anyway: as a pair it is redundant, but it still
+		 * checks that clearing works at all, and the comment is
+		 * worth more than the line.
+		 */
 		f.b = true;
 		f.b = 0;
 		sprintf(detail, "b=%d after setting 0 over true", (int)f.b);
