@@ -1057,3 +1057,63 @@ is binary and a reader should not have to count columns. *A probe that
 reuses the code under suspicion cannot clear it*, so it calls libvterm
 directly and formats the screen itself rather than going near
 `celldiff`.
+
+## libvterm PRINTS it, and the byte is the first digit
+
+`vtparse-probe`, built the way vts is (`6c -I/sys/include`, no `-T`):
+
+```
+first 1 byte  -> 0 chars on row 0  ""
+first 2 bytes -> 0 chars on row 0  ""
+first 3 bytes -> 0 chars on row 0  ""
+first 4 bytes -> 1 char  on row 0  "2"
+first 5 bytes -> 2 chars on row 0  "20"
+...
+first 8 bytes -> 5 chars on row 0  "2004h"
+```
+
+**`ESC`, `[` and `?` are all consumed; the first `2` is where text
+starts.** So this is libvterm, with no vts, no 9P and no terminal
+anywhere near it -- branch (a), and vts is cleared.
+
+### And the source says that byte cannot print, which is the interesting part
+
+After `?` the parser must be in `CSI_LEADER`: `parser.c`'s C1 dispatch
+for `0x9b` is exactly `leaderlen = 0; ENTER_STATE(CSI_LEADER)`, and
+`?` (0x3f) is stored by the `0x3c..0x3f` arm, which `break`s with the
+state unchanged. A digit arriving in `CSI_LEADER` then falls through
+to `CSI_ARGS` and is accumulated. It is not being accumulated.
+
+**So one of those assumptions is wrong, and reading further is how the
+last two rounds were spent.** The next iteration of the probe asks
+instead -- a table of sequences, each to a fresh terminal, each
+expected to leave the screen empty:
+
+| sequence | what it isolates |
+|---|---|
+| `hi` | **positive control** -- must print 2 |
+| `ESC M` | a bare escape, no CSI at all |
+| `ESC [ H` | CSI with no leader and no arguments |
+| `ESC [ 2 J` | CSI with one argument |
+| `ESC [ 1 m` | CSI, SGR |
+| `ESC [ 2004 h` | arguments, **no leader** |
+| `ESC [ ? h` | leader, **no arguments** |
+| `ESC [ ? 1 h` | leader plus one digit |
+| `ESC [ ? 2004 h` | the failing one |
+
+**The control is not decoration.** Without it, a `row0()` that always
+answered 0 would make every other line read as a pass -- *a check that
+cannot fail is not a check*, and this table is nine of them.
+
+How it will read: only the control printing means the parser is fine
+and the failing sequence is not what we think; `ESC [ H` printing too
+means CSI never starts and the fault is the ESC-to-C1 hoist or the
+`0x9b` dispatch; `ESC [ H` clean but `ESC [ 2 J` printing means the
+arguments; only the leader forms printing means the `?` path.
+
+*Two of my own slips are worth recording, because both were the same
+kind.* The table first used `\x` hex escapes (risky on kencc) and
+**hand-counted lengths, two of them wrong** -- `ESC [ 2004 h` is seven
+bytes, not eight. Octal escapes and `strlen` now, so no length in this
+file is written by hand. A probe whose constants are wrong reports
+about a string nobody sent.

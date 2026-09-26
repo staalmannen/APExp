@@ -8,9 +8,37 @@
  * NATIVE, not APE -- libvterm is built by 6c against Plan 9's own libc
  * (see ../mkfile), so this is too. From this directory:
  *
- *	6c -FTVw -I.. -I../../../lib/libvterm vtparse-probe.c
+ *	6c -I../../../../../sys/include vtparse-probe.c
  *	6l -o vtparse-probe vtparse-probe.6
  *	./vtparse-probe
+ *
+ * THOSE FLAGS ARE COPIED FROM ../mkfile AND THE COPYING IS THE POINT.
+ * vts builds with
+ *
+ *	CFLAGS= -I$APEXPROOT/sys/include
+ *
+ * which REPLACES the CFLAGS mkone inherited from /$objtype/mkfile
+ * rather than adding to them -- so vts compiles with **no `-T`**, and
+ * its objects carry no type signatures. libvterm, whose mkfile says
+ * `CFLAGS=$CFLAGS -I.', keeps 9front's `-FTVw' and does carry them.
+ * kencc's linker only objects when BOTH sides have a signature for
+ * the same symbol, which is why vts links and why a probe built with
+ * `-FTVw' does not:
+ *
+ *	sb_pushline_from_row: incompatible type signatures
+ *	bce1af83(vtparse-probe.6) and be0d91f(libvterm.a(vterm_obtain_screen))
+ *	for vterm_screen_get_cell
+ *
+ * *Put a test binary in the directory whose flags it shares* is
+ * already a rule here; this is the same rule for a directory whose
+ * mkfile overrides the flags rather than extending them. **Build a
+ * probe the way the thing it probes is built, and read the mkfile to
+ * find out how -- do not assume the tree-wide CFLAGS apply.**
+ *
+ * And the include path is `sys/include', not `sys/src/lib/libvterm',
+ * because libvterm keeps TWO tracked copies of its public headers and
+ * vts compiles against the installed one. They are identical today --
+ * diffed -- but its mkfile warns that nothing keeps them so.
  *
  * ------------------------------------------------------------------
  * WHY IT EXISTS, and what it SPLITS.
@@ -138,11 +166,58 @@ feedprefix(int n, char *out, int nout)
 	return got;
 }
 
+/*
+ * A TABLE OF SEQUENCES, because the prefix scan localised the byte and
+ * then the source said that byte cannot print.
+ *
+ * After `?' the parser must be in CSI_LEADER (parser.c's `case 0x9b'
+ * does `leaderlen = 0; ENTER_STATE(CSI_LEADER)'), and a digit there
+ * falls through to CSI_ARGS and is accumulated. It is not accumulated.
+ * So an assumption is wrong, and these ask which one -- each to a
+ * fresh terminal, each expecting to leave the screen EMPTY.
+ *
+ * `hi' is the POSITIVE CONTROL and is not decoration: without it, a
+ * row0() that always answered 0 would make every other line read as a
+ * pass. *A check that cannot fail is not a check.*
+ */
+static struct {
+	char *what;
+	char *seq;		/* NUL-terminated: strlen, never a hand count */
+	int wantprinted;	/* how many characters SHOULD reach the screen */
+} table[] = {
+	{ "plain text (POSITIVE CONTROL -- must print)",	"hi",		2 },
+	{ "ESC M     (RI, a bare escape)",		"\033M",	0 },
+	{ "ESC [ H   (CSI, no leader, no args)",	"\033[H",	0 },
+	{ "ESC [ 2 J (CSI, one argument)",		"\033[2J",	0 },
+	{ "ESC [ 1 m (CSI, SGR)",			"\033[1m",	0 },
+	{ "ESC [ 2004 h  (CSI, args, NO leader)",	"\033[2004h",	0 },
+	{ "ESC [ ? h (CSI, leader, no args)",		"\033[?h",	0 },
+	{ "ESC [ ? 1 h  (CSI, leader + one digit)",	"\033[?1h",	0 },
+	{ "ESC [ ? 2004 h  (the one that fails)",	"\033[?2004h",	0 },
+};
+
+static int
+feedbytes(char *p, int n, char *out, int nout)
+{
+	VTerm *vt;
+	VTermScreen *vs;
+	int got;
+
+	vt = vterm_new(Rows, Cols);
+	vterm_set_utf8(vt, 1);
+	vs = vterm_obtain_screen(vt);
+	vterm_screen_reset(vs, 1);
+	vterm_input_write(vt, p, n);
+	got = row0(vs, out, nout);
+	vterm_free(vt);
+	return got;
+}
+
 void
 main(int, char**)
 {
 	char buf[256];
-	int i, got, first;
+	int i, got, first, bad;
 
 	print("vtparse-probe: ESC [ ? 2 0 0 4 h, fed as prefixes of 1..8 bytes\n");
 	print("  (each to a FRESH terminal, so nothing carries over)\n\n");
@@ -173,6 +248,35 @@ main(int, char**)
 			got, got == 1 ? "" : "s", buf);
 		vterm_free(vt);
 	}
+
+	/*
+	 * The table. Run it whatever the prefix scan said: if the
+	 * sequence turns out to be consumed after all, these still say
+	 * whether CSI works at all, and that is worth knowing either way.
+	 */
+	print("\n  ---- other sequences, each to a fresh terminal ----\n");
+	bad = 0;
+	for(i = 0; i < (int)(sizeof table / sizeof table[0]); i++){
+		got = feedbytes(table[i].seq, strlen(table[i].seq),
+			buf, sizeof buf);
+		print("  %-44s -> %d printed \"%s\"%s\n",
+			table[i].what, got, buf,
+			got == table[i].wantprinted ? "" : "   <<< UNEXPECTED");
+		if(got != table[i].wantprinted)
+			bad++;
+	}
+	print("  (%d of %d unexpected)\n", bad,
+		(int)(sizeof table / sizeof table[0]));
+	print("\n  HOW TO READ THE TABLE:\n");
+	print("    the control prints and NOTHING else does -> the parser\n");
+	print("        is fine and the failing sequence is not what we think.\n");
+	print("    `ESC [ H' prints too -> CSI never starts; the fault is\n");
+	print("        the ESC-to-C1 hoist or the 0x9b dispatch, not the\n");
+	print("        leader or the arguments.\n");
+	print("    `ESC [ H' is clean but `ESC [ 2 J' prints -> ARGUMENTS.\n");
+	print("    only the leader forms print -> the `?' path.\n");
+	print("    the CONTROL prints 0 -> row0() is broken and every other\n");
+	print("        line above is meaningless. Fix that first.\n");
 
 	print("\n");
 	if(first == 0){
