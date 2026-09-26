@@ -1190,3 +1190,73 @@ word short, with `state` and the bit fields sharing it. Refuted if
 they pass -- and then the overlap story is wrong and the next place is
 `vterm_input_write`'s chunking, since the probe feeds whole prefixes
 in one call and libvterm may not.
+
+## The overlap is refuted too, and on the WRONG SIDE of the number
+
+`bitfield-test` section 10 passes on 9front, all four new directions,
+and `sizeof struct flags` came back **16** where gcc says 12. I
+predicted 8. **An overlap would have made it smaller; padding made it
+bigger** -- 12 rounded up to 16 is the tail-rounding rule already in
+the invariants list, not a new bug. So the reading was wrong and the
+number contradicted it in a direction I had not even allowed for.
+
+*Two mechanisms proposed for libvterm, two refuted, both by tests that
+took thirty seconds because the refutation condition was written down
+first.* The honest tally in this file says about one in eight for
+mechanisms guessed from code alone; this investigation is running
+worse than that.
+
+### And the reason the test could pass while the bug is real
+
+**The struct in `bitfield-test` is one I RETYPED.** libvterm's is not
+that struct:
+
+```c
+  struct { unsigned int utf8:1; unsigned int ctrl8bit:1; } mode;
+  struct {
+    enum VTermParserState { NORMAL, CSI_LEADER, ... } state;
+    bool in_esc : 1;
+    int intermedlen;
+    ...
+  } parser;
+```
+
+`parser` is a **nested anonymous struct inside `VTerm`, preceded by
+another nested struct of bit fields**, and kencc has a documented rule
+about nested struct members (`6c/swt.c`'s `align()`, case `Ael1`).
+A retyped copy can pass while the original does not.
+
+*A model of a struct is not the struct* -- which is
+"replicate the code in the tree, line by line, not the code you
+remember" with a different noun, and I have now paid for it twice
+inside one investigation.
+
+### So ask the real one
+
+`sys/src/cmd2/vts/test/vtlayout-probe.c` includes libvterm's own
+`vterm_internal.h` and pokes the actual declaration with the actual
+compiler:
+
+```
+6c -I../../../lib/libvterm vtlayout-probe.c
+6l -o vtlayout-probe vtlayout-probe.6
+./vtlayout-probe
+```
+
+**It links, and that is not luck**: completing the opaque types is
+what broke `vtparse-probe`, but only because that one *calls*
+libvterm. This calls nothing from the library, so there is no second
+object to disagree with.
+
+It writes `state` and reads `in_esc` (the direction the parser
+actually takes), then the reverse, then checks that a store to
+`intermedlen` leaves `state` alone -- and **hex-dumps the first
+sixteen bytes after each**, so an overlap is visible rather than
+inferred. Section 4 is the positive control: all three fields set to
+distinct values at once. If the control fails, every section above it
+is meaningless and *that* is the finding.
+
+**If it comes back clean, the layout is innocent** and the state is
+being kept but lost some other way -- and the next suspect is named in
+the output: whether `vterm_input_write` hands the parser one byte per
+call, since the probe feeds whole prefixes and libvterm may not.
