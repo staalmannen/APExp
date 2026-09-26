@@ -205,7 +205,12 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
-`copyfile-test.c`, `deeppath-test.c`, `bufexec-test.c` and `stdio-test.c`. The twenty-five `tk-*.tcl` scripts there are Tcl, run
+`copyfile-test.c`, `deeppath-test.c`, `bufexec-test.c` and `stdio-test.c`.
+**`truefalse-test.c` is the one NATIVE test in this directory** --
+`6c`/`6l`, not `pcc` -- and it has to be, because APE's `<stdbool.h>`
+`#define`s `true`/`false` to 1 and 0, so an APE build never reaches
+kencc's own C23 keywords. *A test here measures the APE dialect; a
+bug in the native dialect needs a native test.* The twenty-five `tk-*.tcl` scripts there are Tcl, run
 with `wish` -- except `tk-menubar-test.tcl`, which needs `tktest` and
 skips itself under `wish`, and `tk-transient-test.tcl`, whose last
 section alone does; see `docs/notes/tk-plan9.md`. `tk-runall.tcl` is the harness for
@@ -1847,6 +1852,32 @@ libvterm uses. *The branch was written down beforehand and cost one
 it** -- both failing would have meant clearing in general, bool alone
 failing the base type; both passing is informative only because they
 were asked together.
+**FOUND, AND IT IS `false` ITSELF: kencc's C23 `false` keyword did
+not evaluate to 0.** `itab` in `cc/lex.c` is
+`{char *name; ushort lexical; ushort type;}` -- the third column is a
+**type index** applied by `lexinit()` as `s->type = types[...]` -- and
+`true`/`false` were written into it as `1` and `0` as though it were a
+value. Nothing set **`yylval.vval`**, which is what the grammar reads
+for `LCONST` (`cc.y`: `$$->vconst = $1`), and `yylex` had already done
+`yylval.sym = s` into the same union member. **So both keywords
+arrived carrying a pointer.** Fixed in `yylex`, which now supplies the
+value on the `LCONST` arm; the table entries are 0/0 with a note
+saying why a value cannot live there.
+**Not bit-field-specific and not libvterm-specific**: every
+`x = false`, `return true;` and `flag == false` in every **native**
+C23 program had the same junk. **APE code was untouched** because
+APE's `<stdbool.h>` `#define`s them to 1 and 0 -- *which is exactly
+why no test under `sys/lib/tests` could catch it*, and why
+`truefalse-test.c` is native.
+**It cost two refuted hypotheses**, a bit-field overlap and a
+bit-field clear bug, and **both passed their tests because the tests
+were APE, where `false` is a macro** -- `bitfield-test`'s two "clear"
+checks were literally the same line twice after preprocessing.
+`vtlayout-probe` named it by asking `= 0` and `= false` side by side
+on the real struct in the native dialect: `= 0` cleared, `= false`
+did not, and the hex dump showed `state` at offset 0 and `in_esc` at
+offset 4 with no overlap at all.
+
 **`vtparse-probe` CLEARED vts and named the byte**: libvterm prints
 it with no vts, no 9P and no terminal involved. **And its table of
 nine sequences says the shape exactly -- EVERY CSI consumes exactly

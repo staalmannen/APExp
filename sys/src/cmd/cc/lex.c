@@ -1121,6 +1121,36 @@ talph:
 		lasttok = s->lexical;
 		return s->lexical;
 	}
+	/*
+	 * C23 `true' and `false' are the only keywords whose token
+	 * carries a VALUE, and the keyword table has nowhere to put one
+	 * (see the note beside them in itab). Supply it here, or the
+	 * grammar reads whatever `yylval.sym = s' left in the union
+	 * above -- which is a pointer, not 0 or 1.
+	 *
+	 * WHAT THAT COST, because it was silent and it was not small:
+	 * libvterm's VT parser clears its escape flag with
+	 * `vt->parser.in_esc = false;' in one place and
+	 * `vt->parser.in_esc = 0;' in another. The second worked and the
+	 * first did not, so the parser never left escape state after
+	 * `ESC [' -- every CSI sequence consumed exactly three bytes and
+	 * printed the rest, and a terminal under vts showed `2004h' on
+	 * screen instead of turning on bracketed paste. Measured by
+	 * sys/src/cmd2/vts/test/vtparse-probe.c (nine sequences) and
+	 * localised to this one store by vtlayout-probe.c.
+	 *
+	 * NOT bit-field-specific and NOT libvterm-specific: every
+	 * `x = false', `return true;' and `== false' in every NATIVE C23
+	 * program had the same junk. APE code was unaffected only
+	 * because APE's <stdbool.h> #defines them to 1 and 0, so the
+	 * preprocessor answered before the lexer could get it wrong --
+	 * which is also why no test under sys/lib/tests could catch it.
+	 */
+	if(s->lexical == LCONST){
+		yylval.vval = strcmp(s->name, "true") == 0;
+		lasttok = LCONST;
+		return LCONST;
+	}
 	lasttok = s->lexical;
 	return s->lexical;
 
@@ -1653,9 +1683,23 @@ struct
 	"bool",			LBOOL,		0,
 
 	/*
-	 * C23 true and false, mapped to LCONST 1 and 0.
+	 * C23 true and false. THEIR VALUE CANNOT LIVE IN THIS TABLE --
+	 * the third column is `ushort type', an index into types[] that
+	 * lexinit() applies as `s->type = types[...]'. It is not a value
+	 * and never was.
+	 *
+	 * They were written here as `1' and `0' as though it were one.
+	 * `true' therefore set s->type = types[1] (nonsense, though
+	 * harmless on a keyword symbol) and `false' set nothing, and
+	 * NEITHER set yylval.vval -- which is what the grammar reads for
+	 * LCONST (cc.y: `$$->vconst = $1'). yylex had already done
+	 * `yylval.sym = s', and sym and vval are the same union member,
+	 * so both keywords arrived carrying junk.
+	 *
+	 * The value is supplied in yylex() instead; see the LCONST arm
+	 * there. Zero here means "no type", which is correct.
 	 */
-	"true",			LCONST,		1,
+	"true",			LCONST,		0,
 	"false",		LCONST,		0,
 
 	/*
