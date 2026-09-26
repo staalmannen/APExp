@@ -1106,3 +1106,50 @@ person: a test or probe that includes a library's INTERNAL header is
 a different translation unit from the library as far as kencc's
 signatures are concerned, `#pragma incomplete` or not. Ask through the
 public API when the question allows it.*
+
+### And the actual cause: the consumer had signatures, the working build has none
+
+The `#pragma incomplete` story above is **withdrawn as the
+explanation**. The same link error appeared with the internal header
+removed entirely, which refutes it, and the two tracked copies of
+`vterm.h` are byte-identical (diffed), which refutes the header-drift
+story the mkfile warns about.
+
+What differs is the **flags**, and `sys/src/cmd2/vts/mkfile` says so
+in one line:
+
+```
+CFLAGS= -I$APEXPROOT/sys/include
+```
+
+That **replaces** the CFLAGS `mkone` inherited from `/$objtype/mkfile`
+rather than extending them, so **vts compiles with no `-T` and its
+objects carry no type signatures at all.** `libvterm`'s mkfile says
+`CFLAGS=$CFLAGS -I.` and keeps 9front's `-FTVw`, so its objects do.
+kencc's linker only complains when **both** sides have a signature for
+a symbol -- so vts links, and a probe built with the tree-wide
+`-FTVw` does not.
+
+**The rule, and it is a sharpening of one already here.** *Put a test
+binary in the directory whose flags it shares* was written for
+include order; this is the same rule where the mkfile **overrides**
+the flags instead of adding to them. **Read the mkfile of the thing
+you are probing and copy its CFLAGS; do not assume the tree-wide ones
+apply.** A directory can quietly opt out of `-T`, and the only symptom
+is that everything built the normal way suddenly will not link
+against it.
+
+*(Left open and unmeasured, since it stopped blocking anything: with
+`-T` on both sides the signatures genuinely do disagree, and
+`vterm.h`'s `#pragma incomplete` did not prevent that. Whether the
+pragma is narrower than the invariant claims, or the diverging type is
+one the internal header completes without a pragma, is a question for
+whoever turns `-T` back on for vts -- `6c -T` output or `nm` on the
+two objects names it in one run.)*
+
+*(One more thing seen in passing and NOT chased: the linker's message
+names `/amd64/lib/libvterm.a`, the system path that `#pragma lib` in
+`vtcompat.h` resolves to, while the mkfile installs to
+`$APEXPROOT/$objtype/lib/libvterm.a` in the repo. Worth an `ls -l` on
+both before trusting any measurement of libvterm, for the same reason
+every other stale-build trap in this file exists.)*

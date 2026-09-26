@@ -8,9 +8,37 @@
  * NATIVE, not APE -- libvterm is built by 6c against Plan 9's own libc
  * (see ../mkfile), so this is too. From this directory:
  *
- *	6c -FTVw -I.. -I../../../lib/libvterm vtparse-probe.c
+ *	6c -I../../../../../sys/include vtparse-probe.c
  *	6l -o vtparse-probe vtparse-probe.6
  *	./vtparse-probe
+ *
+ * THOSE FLAGS ARE COPIED FROM ../mkfile AND THE COPYING IS THE POINT.
+ * vts builds with
+ *
+ *	CFLAGS= -I$APEXPROOT/sys/include
+ *
+ * which REPLACES the CFLAGS mkone inherited from /$objtype/mkfile
+ * rather than adding to them -- so vts compiles with **no `-T`**, and
+ * its objects carry no type signatures. libvterm, whose mkfile says
+ * `CFLAGS=$CFLAGS -I.', keeps 9front's `-FTVw' and does carry them.
+ * kencc's linker only objects when BOTH sides have a signature for
+ * the same symbol, which is why vts links and why a probe built with
+ * `-FTVw' does not:
+ *
+ *	sb_pushline_from_row: incompatible type signatures
+ *	bce1af83(vtparse-probe.6) and be0d91f(libvterm.a(vterm_obtain_screen))
+ *	for vterm_screen_get_cell
+ *
+ * *Put a test binary in the directory whose flags it shares* is
+ * already a rule here; this is the same rule for a directory whose
+ * mkfile overrides the flags rather than extending them. **Build a
+ * probe the way the thing it probes is built, and read the mkfile to
+ * find out how -- do not assume the tree-wide CFLAGS apply.**
+ *
+ * And the include path is `sys/include', not `sys/src/lib/libvterm',
+ * because libvterm keeps TWO tracked copies of its public headers and
+ * vts compiles against the installed one. They are identical today --
+ * diffed -- but its mkfile warns that nothing keeps them so.
  *
  * ------------------------------------------------------------------
  * WHY IT EXISTS, and what it SPLITS.
