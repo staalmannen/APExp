@@ -1241,6 +1241,19 @@ exactly: set a one-bit `bool` with `= true`, clear it with `= false`,
 keyword carried was whatever the union last held, so an intervening
 constant could hide it.
 
+### Measured
+
+**0 failures, 8 of 8, on the rebuilt compilers.** The pair that
+carries the result is section 3 (`= false` straight after `= true`,
+on a `bool:1`) beside section 4 (`= 0`, the control): section 4
+passed *before* the fix as well, so only both passing in one run
+distinguishes a fixed keyword from a working bit field. Asking one
+without the other would have been the "a check whose negative result
+has two explanations" trap for the third time in this investigation.
+
+Not yet measured: libvterm recompiled with the fixed `6c`, which is
+what `vtparse-probe` exists to ask.
+
 ### What it cost, and the two lessons
 
 Two hypotheses were proposed and refuted before this one: a bit-field

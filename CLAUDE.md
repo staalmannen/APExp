@@ -1863,6 +1863,14 @@ for `LCONST` (`cc.y`: `$$->vconst = $1`), and `yylex` had already done
 arrived carrying a pointer.** Fixed in `yylex`, which now supplies the
 value on the `LCONST` arm; the table entries are 0/0 with a note
 saying why a value cannot live there.
+**FIX CONFIRMED on the rebuilt compilers**: `truefalse-test` reports
+**0 failures**, 8 of 8, and the two that carry the finding are
+**section 3** (`bool:1 = false clears, straight after = true`) beside
+**section 4** (`= 0`, the control). Section 4 passed before the fix
+too -- *both passing in one run is what separates a fixed keyword
+from a working bit field*, and either alone would have been the
+"two explanations" trap again. Still to measure: libvterm rebuilt
+with this compiler, which is what `vtparse-probe` asks.
 **Not bit-field-specific and not libvterm-specific**: every
 `x = false`, `return true;` and `flag == false` in every **native**
 C23 program had the same junk. **APE code was untouched** because
