@@ -220,6 +220,48 @@ engine_init(Engine *e, Buffer *b, int rows, int cols, EngineOut out, void *outct
 	vterm_screen_enable_altscreen(vs, 1);
 
 	vterm_screen_reset(vs, 1);
+
+	/*
+	 * LNM ON: a bare LF also returns to column 0.
+	 *
+	 * WHY, AND WHY IT IS NOT A HACK. On a unix the tty DRIVER does
+	 * this, with OPOST|ONLCR, and the terminal never sees a bare LF
+	 * at all. Plan 9 has no output post-processing and libap's
+	 * termios has nowhere to put ONLCR -- /dev/cons has one switch,
+	 * rawon/rawoff. **vts is the driver here as well as the
+	 * terminal**, so the translation has to happen on this side of
+	 * the wire, and LNM is the mechanism the terminal already has
+	 * for it (ANSI X3.4-1977; `ESC [ 20 l' turns it off again).
+	 *
+	 * The symptom without it: every program that ends a line with
+	 * `\n' -- which is every program -- staircases down and to the
+	 * right. `ls' was unreadable. Under rio it never showed, because
+	 * rio's console is not a VT and moves to column 0 for LF.
+	 *
+	 * SAFE BECAUSE OF SOMETHING MEASURED, not assumed. On a real DEC
+	 * terminal LNM is symmetric: it changes what the RETURN key
+	 * sends as well, and a shell would then read CR LF for one
+	 * keypress. In this libvterm it is not -- `state->mode.newline'
+	 * is read in exactly one place, the LF arm of state.c's control
+	 * dispatch (state.c:471), and nothing in the key path reads it
+	 * at all. *Checked before relying on it, because the failure it
+	 * would have caused looks nothing like this one.*
+	 *
+	 * A program that emits `\r\n' itself gets CR twice, which is
+	 * idempotent -- column 0 is column 0.
+	 *
+	 * Fed as the escape sequence rather than poked into the struct
+	 * because `set_mode' is static and there is no public setter;
+	 * this goes through upstream's own parser.
+	 *
+	 * Octal escape and strlen, not `\x1b' and a hand-counted 5: this
+	 * tree has been bitten by both, in a probe two directories away.
+	 */
+	{
+		static char lnm[] = "\033[20h";
+
+		vterm_input_write(vt, lnm, strlen(lnm));
+	}
 }
 
 void
