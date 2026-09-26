@@ -1959,6 +1959,30 @@ window. *The boundary is the `dup()`, not the file* -- the same
 fprint is correct above it and wrong below. Fourth time an instrument
 or a diagnostic has been the visible fault in this area.
 
+**AND THEN `ls` STAIRCASED, WHICH IS THE SAME BUG ONE LAYER OUT.**
+Fixing `session.c`'s own `fprint`s fixed only vts's own messages;
+every *program* ending a line with `\n` still walked down and to the
+right, and `ls` was unreadable. **On a unix the TTY DRIVER does this
+translation** -- `OPOST|ONLCR` -- and the terminal never sees a bare
+LF. Plan 9 has no output post-processing, and libap's termios has
+nowhere to put `ONLCR`: `/dev/cons` offers one switch, `rawon`/
+`rawoff`. **vts is the driver here as well as the terminal**, so the
+translation belongs on its side, and the terminal already has the
+mechanism -- **LNM** (ANSI X3.4-1977), set at `engine_init` by
+feeding `ESC [ 20 h` through upstream's own parser, since `set_mode`
+is static and there is no public setter.
+**Safe for a MEASURED reason, not an assumed one.** On a real DEC
+terminal LNM is symmetric -- it changes what RETURN sends, so a shell
+would read CR LF for one keypress. **In this libvterm it is not**:
+`state->mode.newline` is read in exactly one place, the LF arm at
+`state.c:471`, and nothing in the key path reads it. *That was
+checked before relying on it, because the failure it would have
+caused looks nothing like the one being fixed.* A program emitting
+`\r\n` itself gets CR twice, which is idempotent.
+**The width is a SEPARATE question and is now separable**: the window
+is far wider than the hardcoded `session_init(s, name, 24, 80)`, and
+whatever remains after LNM is that.
+
 **AND THE SESSION NOW WORKS**: `tty read: blocked (1 waiting)`,
 `read: enter fd=0 n=1`, `-> buffered n=1`, then `tty write 1 [c]` --
 bash waits for a keystroke, gets it and echoes it, with `flags=38`
