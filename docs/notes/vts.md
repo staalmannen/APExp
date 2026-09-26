@@ -1009,3 +1009,51 @@ by `6c`. They share the front end (`sys/src/cmd/cc`), which is where
 bit fields live, so the test is honest about the mechanism -- but if
 section 10 passes and the screen still shows `2004h`, that difference
 is the first thing to suspect.*
+
+## The bit-field hypothesis is REFUTED, and cleanly
+
+`bitfield-test.c` section 10 passes on 9front: a `bool` bit field
+holds true, **clears to false**, clears when assigned `0`, and the
+`unsigned : 1` beside it does the same, with the neighbours intact.
+
+**The caveat I raised closes rather than lingering.** APE's
+`<stdbool.h>` deliberately does *not* redefine `bool` -- it is kencc's
+own keyword, an `unsigned char`, and the header says so and explains
+why (a `#define bool _Bool` round-trip once emitted `_Bool` as an
+undefined external symbol). And `pcc` **is** `6c` with APE flags. So
+the test measured the same type, compiled by the same compiler, as
+libvterm gets natively. *The refutation is total; the reading was
+simply wrong.*
+
+**That is the branch written down before the run**, and it cost one
+30-second command rather than a rebuild. Worth noting which part did
+the work: not the passing `bool` cases on their own, but the
+`unsigned : 1` **beside** them. Had both failed it would have been
+clearing in general; had bool alone failed it would have been the base
+type. Both passing is only informative because the two were asked
+together.
+
+### So: libvterm, and a probe that splits it in one run
+
+`sys/src/cmd2/vts/test/vtparse-probe.c` is **native** (libvterm is
+built by `6c` against Plan 9's libc, so the probe is too; the build
+command is in the file). It feeds exactly the eight bytes the server
+logged, one at a time, printing the parser's state and `in_esc` after
+each, then writes `$ ` and prints the screen row.
+
+**It separates the two candidates without touching either:**
+
+- screen row 0 is `$ ` -> **libvterm consumed it**, with no vts, no 9P
+  and no terminal in the picture. The fault is then in what vts
+  *feeds* the engine -- `engine_feed`, the `tty` write arm, or a
+  second writer interleaving into one parser, which this file has
+  suspected once before.
+- row 0 contains `2004h` -> **libvterm printed it**, and the per-byte
+  trace names where: byte 1 (`[`) should reach `CSI_LEADER`, byte 2
+  (`?`) should stay there, bytes 3-6 should be `CSI_ARGS`.
+
+It prints the evidence and then one verdict line, because the question
+is binary and a reader should not have to count columns. *A probe that
+reuses the code under suspicion cannot clear it*, so it calls libvterm
+directly and formats the screen itself rather than going near
+`celldiff`.

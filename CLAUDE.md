@@ -1835,18 +1835,28 @@ fix that does NOT cure this** -- the thief is a living parent.
 **What is left in vts is the OUTPUT half, and it is isolated**: vts
 receives `<1b>[?2004h` whole and the screen shows `2004h` as text --
 proved arithmetically, since `ctl` said `cursor=1,60` and 53+5+2 = 60.
-**Hypothesis, not yet measured**: libvterm holds its escape flag as
-**`bool in_esc : 1`** and consumes the sequence by CLEARING it; a
-one-bit field that accepts a 1 and ignores a 0 leaves the parser
-inside an escape, which is exactly this shape. **kencc's bit fields
-predate `bool` being a real type here.** `bitfield-test.c` **section
-10** asks it -- set, clear with `false`, clear with `0`, the same for
-an `unsigned : 1` **beside it** so the answer is attributable, plus
-the neighbours. Passes on gcc. *Both passing refutes the reading and
-sends the next round into libvterm's parser.* (The far-right
+**My kencc hypothesis is REFUTED** -- `bool in_esc : 1` being a
+one-bit field that takes a 1 and ignores a 0. `bitfield-test.c`
+**section 10** passes on 9front: bool holds true, clears to false,
+clears when assigned `0`, and the `unsigned : 1` beside it does the
+same. **The caveat closes too**: APE's `<stdbool.h>` does NOT redefine
+`bool` (it is kencc's own keyword, an `unsigned char`) and `pcc` IS
+`6c` with APE flags, so the test measured the same type and compiler
+libvterm uses. *The branch was written down beforehand and cost one
+30-second command.* **What did the work was the `unsigned : 1` beside
+it** -- both failing would have meant clearing in general, bool alone
+failing the base type; both passing is informative only because they
+were asked together.
+**Next: `sys/src/cmd2/vts/test/vtparse-probe.c`**, NATIVE (libvterm is
+built by `6c`), feeding those eight bytes one at a time and printing
+the parser state after each, then the screen row. Row 0 = `$ ` means
+libvterm consumed it and the fault is in what **vts feeds** the engine
+(`engine_feed`, the tty write arm, or a second writer); row 0 holding
+`2004h` means libvterm printed it and the trace names the byte. (The far-right
 indentation is separate and mine: `session.c`'s child prints with `
 `
-and no `` into a raw console.)
+and no `
+` into a raw console.)
 
 **AND THE SESSION NOW WORKS**: `tty read: blocked (1 waiting)`,
 `read: enter fd=0 n=1`, `-> buffered n=1`, then `tty write 1 [c]` --
