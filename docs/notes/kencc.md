@@ -1187,3 +1187,74 @@ dialect. A bug in the NATIVE dialect needs a native probe, and the
 two differ in more than the libc.* That is a second reason beside the
 flags one already recorded -- `sys/lib/tests` cannot answer for
 `sys/src/lib`.
+
+## `false` was not 0: the C23 keywords never set `yylval.vval`
+
+**Measured, fixed, and it reached every native C23 program in the
+tree.**
+
+`vtlayout-probe` on libvterm's real struct, in the native dialect:
+
+```
+in_esc=1 then =0        -> in_esc=0 (want 0)    OK
+in_esc=true then =false -> in_esc=1 (want 0)    WRONG
+after state=CSI_LEADER: 01 00 00 00 00 00 ...   state at offset 0
+after in_esc=1:         00 00 00 00 01 00 ...   in_esc at offset 4
+```
+
+So the layout is innocent -- no overlap, control passes -- and the
+fault is the **spelling of the constant**.
+
+### The cause, in three lines of `cc/lex.c`
+
+```c
+struct { char *name; ushort lexical; ushort type; } itab[] = {
+	"true",		LCONST,		1,
+	"false",	LCONST,		0,
+```
+
+**That third column is a TYPE INDEX**, applied by `lexinit()` as
+`s->type = types[itab[i].type]`. It is not a value and never was. So
+`true` set `s->type = types[1]` and `false` set nothing, and **neither
+set `yylval.vval`** -- which is precisely what the grammar reads for
+`LCONST` (`cc.y`: `$$->vconst = $1`). `yylex` had already executed
+`yylval.sym = s`, and `sym` and `vval` are the same union member, so
+each keyword arrived carrying a pointer reinterpreted as an integer.
+
+Fixed in `yylex`, on the keyword return path, because the table has
+nowhere to put a value; the entries are `0`/`0` now with a note saying
+why.
+
+### Why nothing caught it for so long
+
+**APE's `<stdbool.h>` `#define`s `true` and `false` to 1 and 0.** The
+preprocessor answers before the compiler sees the words, so every APE
+program -- which is every program in `sys/src/ape`, and every test in
+`sys/lib/tests` -- was immune, and no test there *could* have found
+it. Only native code (`sys/src/lib`, `sys/src/cmd2`) reaches the
+keywords.
+
+`truefalse-test.c` is therefore the one **native** test in
+`sys/lib/tests`, and its section 3 reproduces the failing sequence
+exactly: set a one-bit `bool` with `= true`, clear it with `= false`,
+**with nothing numeric lexed in between** -- because the junk the
+keyword carried was whatever the union last held, so an intervening
+constant could hide it.
+
+### What it cost, and the two lessons
+
+Two hypotheses were proposed and refuted before this one: a bit-field
+**overlap**, and a bit-field **clear** bug. Both were tested; both
+passed; **and both passed for the same wrong reason** -- the tests
+were APE, where `false` is a macro for `0`, so
+`bitfield-test`'s "clears to false" and "clears when assigned 0" were
+*the same line twice* after preprocessing. A duplicate dressed as two
+cases.
+
+1. **A model of a struct is not the struct.** The retyped copy in
+   `bitfield-test` behaved correctly while the original misbehaved,
+   because the difference was never in the struct.
+2. **A test is written in a dialect.** `sys/lib/tests` is APE;
+   `sys/src/lib` is native; they differ in the libc *and in the
+   preprocessor*. That is now two separate reasons an APE test cannot
+   answer for native code -- this one and the CFLAGS one above.
