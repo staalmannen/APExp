@@ -1905,9 +1905,24 @@ overlap is symmetric, and testing one direction is the
 "two explanations" trap one level up. The missing direction is added:
 write the enum, read the bit back, both polarities, both field types,
 with `sizeof` printed. Passes on gcc at 12 bytes.
-**Predict: those four FAIL on 9front and `sizeof` is 8.** Refuted if
-they pass -- then the overlap story is wrong and the next suspect is
-`vterm_input_write` chunking its input. (The far-right
+**AND IT IS CLOSED: `0 of 9 unexpected`, `CONSUMED`, on the rebuilt
+compiler.** All eight prefixes give 0 chars, every CSI row is empty,
+and the `hi` control still prints -- exactly the prediction, written
+down before the run. libvterm's source did not change a character;
+only `cc/lex.c` did. *The chain is measured end to end: fixed
+keyword -> `in_esc = false` clears -> the parser stays in CSI ->
+`ESC [ ? 2004 h` is swallowed whole.*
+**The probe's own closing text had to be corrected**, and that is
+worth more than the result. It said *"the fault is NOT in libvterm"*
+on a clean run -- true as a branch written while libvterm was
+suspected, false now, because the run came back clean for the OTHER
+reason: libvterm was recompiled. **A clean run of this probe is
+ambiguous from here on** -- it clears the libvterm in front of it,
+built by the compiler in front of it, and a stale `libvterm.a` or a
+vts still linked against one reads identically. So a clean table
+beside a dirty screen is a BUILD question before it is a vts
+question. *An instrument that bakes in the conclusion for a branch
+keeps asserting it after the branch stops being the live one.* (The far-right
 indentation is separate and mine: `session.c`'s child prints with `
 `
 and no `

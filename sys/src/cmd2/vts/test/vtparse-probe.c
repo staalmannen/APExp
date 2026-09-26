@@ -61,6 +61,19 @@
  *       has suspected once already. Then this comes back clean and the
  *       next round is in vts, not upstream.
  *
+ * IT ANSWERED (a), AND THE ANSWER WAS NOT IN LIBVTERM'S SOURCE.
+ * Every CSI consumed exactly three bytes and printed the rest -- seven
+ * sequences, no slack -- because kencc's C23 `false' carried a stale
+ * pointer rather than 0, so parser.c's `vt->parser.in_esc = false' in
+ * the ESC-to-C1 hoist never cleared the flag while the `= 0' beside it
+ * did. sys/src/cmd/cc/lex.c, three lines; libvterm untouched.
+ *
+ * **WHICH MAKES A CLEAN RUN OF THIS PROBE AMBIGUOUS FROM NOW ON.** It
+ * clears the libvterm in front of it, built by the compiler in front
+ * of it. A stale libvterm.a, or a vts still linked against one, reads
+ * identically to a fixed tree from here -- so a clean table beside a
+ * dirty SCREEN is a build question before it is a vts question.
+ *
  * A probe that reuses the code under suspicion cannot clear it, so
  * this one calls libvterm directly and never goes near celldiff.
  *
@@ -281,10 +294,20 @@ main(int, char**)
 	print("\n");
 	if(first == 0){
 		print("CONSUMED: libvterm swallowed the whole sequence.\n");
-		print("  So the fault is NOT in libvterm. It is in what vts\n");
-		print("  FEEDS the engine -- engine_feed, the tty write arm,\n");
-		print("  or a second writer interleaving into one parser --\n");
-		print("  and the next round belongs in vts rather than here.\n");
+		print("  This clears the libvterm YOU JUST BUILT. It does not\n");
+		print("  say libvterm was always innocent, and the history here\n");
+		print("  is exactly that trap: this probe once printed `2004h'\n");
+		print("  and the cause was kencc's C23 `false' evaluating to a\n");
+		print("  stale pointer, so `in_esc = false' never cleared. The\n");
+		print("  fix was in sys/src/cmd/cc/lex.c and libvterm's source\n");
+		print("  did not change a character.\n");
+		print("  So if the SCREEN still shows the text while this says\n");
+		print("  CONSUMED, ask FIRST whether vts was relinked against\n");
+		print("  this libvterm.a -- `mk clean' in cmd2, not just mk.\n");
+		print("  Only once the two disagree on the SAME build is the\n");
+		print("  answer in what vts feeds the engine: engine_feed, the\n");
+		print("  tty write arm, or a second writer interleaving into\n");
+		print("  one parser.\n");
 		exits(nil);
 	}
 	print("PRINTED: libvterm emitted part of the sequence as text.\n");

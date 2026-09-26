@@ -1260,3 +1260,59 @@ is meaningless and *that* is the finding.
 being kept but lost some other way -- and the next suspect is named in
 the output: whether `vterm_input_write` hands the parser one byte per
 call, since the probe feeds whole prefixes and libvterm may not.
+
+## It came back clean, and the answer was the spelling of the constant
+
+```
+in_esc=1 then =0        -> in_esc=0 (want 0)
+in_esc=true then =false -> in_esc=1 (want 0)
+*** `= false' does NOT clear it, while `= 0' above did.
+after state=CSI_LEADER: 01 00 00 00 00 00 ...
+after in_esc=1:         00 00 00 00 01 00 ...
+CONTROL, all three set: state=3 in_esc=1 intermedlen=7
+1 problem
+```
+
+`state` at offset 0, `in_esc` at offset 4, **no overlap**, and the
+control passes -- so the layout is innocent, as section 2 of the probe
+was written to be able to say. What named the bug was **section 2b,
+asking `= 0` and `= false` side by side on the same field in the same
+run**: one clears and the other does not, which leaves nothing about
+the struct to blame and only the constant.
+
+**It is `false` itself.** kencc's C23 keywords never set
+`yylval.vval`; see `docs/notes/kencc.md`. libvterm's parser.c clears
+the flag in two places with two different constants -- the ESC-to-C1
+hoist uses `= false` and the `NORMAL` case uses `= 0` -- so the hoist's
+clear never took, `[` was swallowed as an unhandled escape byte, the
+next byte was eaten by `do_escape`, and everything after it printed.
+**That is the three-byte consumption, all seven rows, from one line.**
+
+## Confirmed, and the probe's own conclusion had to be rewritten
+
+Rebuilt compilers, rebuilt libvterm, `vtparse-probe` again:
+**0 chars for all eight prefixes, `0 of 9 unexpected`, `CONSUMED`**,
+with `hi` still printing 2. Predicted before the run, including the
+refutation condition (any CSI row still printing would have meant
+`false` was only part of it).
+
+**And the probe was saying something false by then.** Its `CONSUMED`
+arm read *"the fault is NOT in libvterm -- it is in what vts feeds the
+engine"*: correct as the branch to take while libvterm was the
+suspect, wrong the moment the table came back clean *because libvterm
+had been recompiled*. Left alone it would have sent the next round to
+`engine_feed` with a confident false lead.
+
+So the arm now says what a clean run actually licenses: it clears
+**the libvterm in front of you, built by the compiler in front of
+you**. A stale `libvterm.a`, or a `vts` still linked against one,
+reads identically. **A clean table beside a dirty screen is a BUILD
+question first** -- relink vts -- and only a disagreement on the
+*same* build puts the next round in `engine_feed`, the tty write arm
+or a second writer.
+
+*An instrument that bakes in the conclusion for one branch goes on
+asserting it after that branch stops being the live one.* Same family
+as the harness that set `-buffering line` in the interpreter it was
+measuring, and the `vts-bash` that overwrote the `$vtsdebug` its
+caller passed.
