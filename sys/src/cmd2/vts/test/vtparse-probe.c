@@ -1,12 +1,12 @@
 /*
  * vtparse-probe -- does libvterm consume `ESC [ ? 2004 h', or print it?
  *
- * THIS IS A PROBE. It asserts almost nothing; it feeds a fixed byte
- * string to libvterm and prints what landed on the screen and what the
- * parser's state was after every byte.
+ * THIS IS A PROBE. It feeds a fixed byte string to libvterm and prints
+ * what landed on the screen; the only thing it asserts is the one
+ * binary answer, at the end.
  *
  * NATIVE, not APE -- libvterm is built by 6c against Plan 9's own libc
- * (see ../mkfile), so this is too:
+ * (see ../mkfile), so this is too. From this directory:
  *
  *	6c -FTVw -I.. -I../../../lib/libvterm vtparse-probe.c
  *	6l -o vtparse-probe vtparse-probe.6
@@ -24,148 +24,172 @@
  *
  * Two places can do that and they need completely different fixes:
  *
- *   (a) LIBVTERM mis-parses the sequence. Then this probe reproduces
- *       it with no vts, no 9P and no terminal in the picture at all,
- *       and the state trace names the byte where it goes wrong.
- *   (b) LIBVTERM IS FINE and vts feeds it something other than what
- *       the log printed -- engine_feed, the tty write arm, or a
- *       second writer interleaving into one parser (which this tree
- *       has already suspected once). Then this probe comes back
- *       clean and the next round is in vts, not upstream.
+ *   (a) LIBVTERM mis-parses it. Then this probe reproduces it with no
+ *       vts, no 9P and no terminal in the picture, and the per-prefix
+ *       table below names the byte at which the text appears.
+ *   (b) LIBVTERM IS FINE and vts feeds the engine something other than
+ *       what its own log printed -- engine_feed, the tty write arm, or
+ *       a second writer interleaving into one parser, which this tree
+ *       has suspected once already. Then this comes back clean and the
+ *       next round is in vts, not upstream.
  *
  * A probe that reuses the code under suspicion cannot clear it, so
- * this one calls libvterm directly and formats the screen itself.
+ * this one calls libvterm directly and never goes near celldiff.
  *
  * ------------------------------------------------------------------
- * WHAT WAS ALREADY RULED OUT, so nobody re-runs it.
+ * PUBLIC API ONLY, AND THAT IS NOT A STYLE CHOICE.
+ *
+ * The first version of this file included <vterm_internal.h> to print
+ * `parser.state' after each byte. It compiled and then would not link:
+ *
+ *	sb_pushline_from_row: incompatible type signatures
+ *	bce1af83(vtparse-probe.6) and be0d91f(libvterm.a(vterm_obtain_screen))
+ *	for vterm_screen_get_cell
+ *
+ * which is the FAMILY of an invariant this tree already had written
+ * down: **kencc's type signatures follow POINTERS into the struct they
+ * point at**, and 9front's `-FTVw' turns them on for every native
+ * build, so completing an opaque type in one file makes that file
+ * disagree with every other about every function that can reach it.
+ * *Fifteen link errors in libvterm were this one thing.*
+ *
+ * BUT NOT EXACTLY, AND THE DIFFERENCE IS RECORDED RATHER THAN GUESSED.
+ * `vterm.h' already carries `#pragma incomplete' for VTerm,
+ * VTermState and VTermScreen, and the note says the pragma is read by
+ * signat() and that completing the struct afterwards does NOT clear
+ * it. On that reading this link should have worked. It did not. So
+ * either the pragma's protection is narrower than the note claims, or
+ * the type that actually diverged is something else the internal
+ * header drags in. **Unresolved, and left unresolved** -- it is not
+ * what this probe is for, and the probe does not need the internal
+ * header at all once the question is asked behaviourally.
+ *
+ * So the state trace is gone and the question is asked BEHAVIOURALLY
+ * instead: feed the first n bytes to a fresh terminal, for n = 1..8,
+ * and count what is on screen. The n at which characters first appear
+ * is the byte the parser stopped consuming at -- the same information,
+ * through the public API, and immune to the trap.
+ *
+ * ------------------------------------------------------------------
+ * ALREADY RULED OUT, so nobody re-runs it.
  *
  * The first hypothesis was kencc: libvterm holds its escape flag as
- * `bool in_esc : 1' (vterm_internal.h), the sequence is consumed by
- * CLEARING that flag, and a one-bit field that takes a 1 and ignores a
- * 0 would leave the parser inside an escape -- which is this exact
- * shape. **REFUTED**: sys/lib/tests/bitfield-test.c section 10 sets a
- * bool bit field, clears it with `false', clears it with `0', does the
- * same for an `unsigned : 1' beside it and checks the neighbours --
- * all pass on 9front. And the types match: APE's <stdbool.h> does not
- * redefine `bool' (it is kencc's own keyword, an unsigned char) and
- * `pcc' IS `6c' with APE flags, so the test measured the same type and
- * the same compiler libvterm is built with.
+ * `bool in_esc : 1', the sequence is consumed by CLEARING that flag,
+ * and a one-bit field that takes a 1 and ignores a 0 would leave the
+ * parser inside an escape -- this exact shape. **REFUTED**:
+ * sys/lib/tests/bitfield-test.c section 10 passes on 9front, and the
+ * types match (APE's <stdbool.h> does not redefine `bool' -- it is
+ * kencc's own keyword -- and `pcc' IS `6c' with APE flags).
  */
 
 #include <u.h>
 #include <libc.h>
 #include <vterm.h>
-#include "vterm_internal.h"	/* for parser.state and parser.in_esc */
 
-static char *
-statename(int s)
-{
-	switch(s){
-	case NORMAL:		return "NORMAL";
-	case CSI_LEADER:	return "CSI_LEADER";
-	case CSI_ARGS:		return "CSI_ARGS";
-	case CSI_INTERMED:	return "CSI_INTERMED";
-	case OSC_COMMAND:	return "OSC_COMMAND";
-	case DCS_COMMAND:	return "DCS_COMMAND";
-	case OSC:		return "OSC";
-	case DCS:		return "DCS";
-	case APC:		return "APC";
-	case PM:		return "PM";
-	case SOS:		return "SOS";
-	}
-	return "?";
-}
+/* Exactly what the server logged, and nothing else. */
+static char seq[] = { 0x1b, '[', '?', '2', '0', '0', '4', 'h' };
 
-static void
-showrow(VTermScreen *vs, int row, int cols)
+enum { Rows = 24, Cols = 80 };
+
+/*
+ * How many characters are on row 0, and what they are. Blank cells
+ * read back as a space or as nothing depending on how the row was
+ * touched, so both count as empty.
+ */
+static int
+row0(VTermScreen *vs, char *out, int nout)
 {
 	VTermPos pos;
 	VTermScreenCell cell;
-	int col, last;
+	int col, n, o;
 
-	/* Find the last non-blank so the line is readable. */
-	last = -1;
-	for(col = 0; col < cols; col++){
-		pos.row = row;
+	n = 0;
+	o = 0;
+	for(col = 0; col < Cols; col++){
+		pos.row = 0;
 		pos.col = col;
-		if(vterm_screen_get_cell(vs, pos, &cell) && cell.chars[0] != 0
-		    && cell.chars[0] != ' ')
-			last = col;
+		if(!vterm_screen_get_cell(vs, pos, &cell))
+			break;
+		if(cell.chars[0] == 0 || cell.chars[0] == ' ')
+			continue;
+		n++;
+		if(o < nout - 8)
+			o += snprint(out+o, nout-o, "%C", (Rune)cell.chars[0]);
 	}
-	print("  row %d: \"", row);
-	for(col = 0; col <= last; col++){
-		pos.row = row;
-		pos.col = col;
-		if(!vterm_screen_get_cell(vs, pos, &cell) || cell.chars[0] == 0)
-			print(" ");
-		else
-			print("%C", (Rune)cell.chars[0]);
-	}
-	print("\"  (last non-blank column %d)\n", last);
+	out[o] = 0;
+	return n;
+}
+
+/* Feed the first n bytes to a FRESH terminal and report row 0. */
+static int
+feedprefix(int n, char *out, int nout)
+{
+	VTerm *vt;
+	VTermScreen *vs;
+	int got;
+
+	vt = vterm_new(Rows, Cols);
+	vterm_set_utf8(vt, 1);
+	vs = vterm_obtain_screen(vt);
+	vterm_screen_reset(vs, 1);
+	vterm_input_write(vt, seq, n);
+	got = row0(vs, out, nout);
+	vterm_free(vt);
+	return got;
 }
 
 void
 main(int, char**)
 {
-	VTerm *vt;
-	VTermScreen *vs;
-	/* Exactly what the server logged, and nothing else. */
-	static char seq[] = { 0x1b, '[', '?', '2', '0', '0', '4', 'h' };
-	int i, rows = 24, cols = 80;
+	char buf[256];
+	int i, got, first;
 
-	vt = vterm_new(rows, cols);
-	vterm_set_utf8(vt, 1);
-	vs = vterm_obtain_screen(vt);
-	vterm_screen_reset(vs, 1);
+	print("vtparse-probe: ESC [ ? 2 0 0 4 h, fed as prefixes of 1..8 bytes\n");
+	print("  (each to a FRESH terminal, so nothing carries over)\n\n");
 
-	print("vtparse-probe: feeding ESC [ ? 2 0 0 4 h, one byte at a time\n");
-	print("  (state BEFORE any byte: %s, in_esc=%d)\n",
-		statename(vt->parser.state), (int)vt->parser.in_esc);
-
-	for(i = 0; i < (int)sizeof seq; i++){
-		vterm_input_write(vt, &seq[i], 1);
-		print("  byte %d = 0x%02x %c -> state %s, in_esc=%d\n",
-			i, (uchar)seq[i],
-			(seq[i] >= 32 && seq[i] < 127) ? seq[i] : '.',
-			statename(vt->parser.state),
-			(int)vt->parser.in_esc);
+	first = 0;
+	for(i = 1; i <= (int)sizeof seq; i++){
+		got = feedprefix(i, buf, sizeof buf);
+		print("  first %d byte%s -> %d char%s on row 0  \"%s\"\n",
+			i, i == 1 ? " " : "s", got, got == 1 ? " " : "s", buf);
+		if(got > 0 && first == 0)
+			first = i;
 	}
 
-	/*
-	 * Then the prompt bash sends next, because the SCREEN is what the
-	 * question is really about and `$ ' is what it landed beside.
-	 */
-	vterm_input_write(vt, "$ ", 2);
-
-	print("\nscreen after the sequence and `$ ':\n");
-	showrow(vs, 0, cols);
-
-	print("\nHOW TO READ IT:\n");
-	print("  row 0 == \"$ \" and last non-blank column 0  ->  libvterm\n");
-	print("      CONSUMED the sequence. The fault is in vts: what it\n");
-	print("      feeds the engine is not what its own log printed.\n");
-	print("  row 0 contains \"2004h\"  ->  libvterm PRINTED it, with no\n");
-	print("      vts anywhere. The per-byte trace above names where:\n");
-	print("      byte 1 ([) should reach CSI_LEADER, byte 2 (?) should\n");
-	print("      stay there, and bytes 3..6 should be CSI_ARGS.\n");
-
-	/*
-	 * ONE assertion, because the whole question is binary and a reader
-	 * should not have to count columns. Everything above is the
-	 * evidence; this is the verdict.
-	 */
+	/* And the whole thing followed by the prompt bash sends next,
+	 * because `$ ' is what the text landed beside on the real screen. */
 	{
-		VTermPos pos;
-		VTermScreenCell cell;
-		int printed = 0;
+		VTerm *vt;
+		VTermScreen *vs;
 
-		pos.row = 0;
-		pos.col = 0;
-		if(vterm_screen_get_cell(vs, pos, &cell) && cell.chars[0] == '2')
-			printed = 1;
-		print("\n%s\n", printed ?
-			"PRINTED: libvterm emitted the sequence as text." :
-			"CONSUMED: libvterm swallowed the sequence.");
-		exits(printed ? "printed" : nil);
+		vt = vterm_new(Rows, Cols);
+		vterm_set_utf8(vt, 1);
+		vs = vterm_obtain_screen(vt);
+		vterm_screen_reset(vs, 1);
+		vterm_input_write(vt, seq, sizeof seq);
+		vterm_input_write(vt, "$ ", 2);
+		got = row0(vs, buf, sizeof buf);
+		print("\n  the eight bytes then \"$ \" -> %d char%s  \"%s\"\n",
+			got, got == 1 ? "" : "s", buf);
+		vterm_free(vt);
 	}
+
+	print("\n");
+	if(first == 0){
+		print("CONSUMED: libvterm swallowed the whole sequence.\n");
+		print("  So the fault is NOT in libvterm. It is in what vts\n");
+		print("  FEEDS the engine -- engine_feed, the tty write arm,\n");
+		print("  or a second writer interleaving into one parser --\n");
+		print("  and the next round belongs in vts rather than here.\n");
+		exits(nil);
+	}
+	print("PRINTED: libvterm emitted part of the sequence as text.\n");
+	print("  It first appears at byte %d (0x%02x '%c'), so everything\n",
+		first, (uchar)seq[first-1],
+		(seq[first-1] >= 32 && seq[first-1] < 127) ? seq[first-1] : '.');
+	print("  before it was consumed and the parser stopped there.\n");
+	print("  Expected: byte 2 ([) reaches CSI_LEADER, byte 3 (?) stays,\n");
+	print("  bytes 4..8 are arguments and the final. Read parser.c's\n");
+	print("  case for whichever state byte %d should have been in.\n", first);
+	exits("printed");
 }
