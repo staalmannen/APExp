@@ -1847,12 +1847,28 @@ libvterm uses. *The branch was written down beforehand and cost one
 it** -- both failing would have meant clearing in general, bool alone
 failing the base type; both passing is informative only because they
 were asked together.
-**Next: `sys/src/cmd2/vts/test/vtparse-probe.c`**, NATIVE (libvterm is
-built by `6c`), feeding those eight bytes one at a time and printing
-the parser state after each, then the screen row. Row 0 = `$ ` means
-libvterm consumed it and the fault is in what **vts feeds** the engine
-(`engine_feed`, the tty write arm, or a second writer); row 0 holding
-`2004h` means libvterm printed it and the trace names the byte. (The far-right
+**`vtparse-probe` CLEARED vts and named the byte**: libvterm prints
+it with no vts, no 9P and no terminal involved. **And its table of
+nine sequences says the shape exactly -- EVERY CSI consumes exactly
+THREE bytes and prints the rest** (`ESC [ 2 J` -> `J`, `ESC [ ? h` ->
+`h`, `ESC [ ? 2004 h` -> `2004h`). `ESC [ H` is clean only because it
+*is* three bytes; *the information was in the arithmetic across rows,
+not in any one row*.
+**One mechanism fits all seven with no slack**: libvterm holds
+`enum {...} state;` immediately followed by `bool in_esc : 1`, and if
+a store to `state` sets the `in_esc` bit, then `ENTER_STATE(CSI_LEADER)`
+(== 1) lights `in_esc`, the next byte takes the escape path instead of
+the CSI path, resets state to NORMAL, and everything after is text.
+`ESC [ H` survives because `H` is 0x48 and hoists to a C1 control.
+**`bitfield-test.c` section 10 HAD that struct and still missed it**,
+because it only ever wrote the bit field and read the neighbour -- an
+overlap is symmetric, and testing one direction is the
+"two explanations" trap one level up. The missing direction is added:
+write the enum, read the bit back, both polarities, both field types,
+with `sizeof` printed. Passes on gcc at 12 bytes.
+**Predict: those four FAIL on 9front and `sizeof` is 8.** Refuted if
+they pass -- then the overlap story is wrong and the next suspect is
+`vterm_input_write` chunking its input. (The far-right
 indentation is separate and mine: `session.c`'s child prints with `
 `
 and no `
