@@ -1060,3 +1060,49 @@ clean, `#pragma pack` at the two or three places that model bytes is
 the whole of what this costs in practice, and the type-system change
 buys conformance rather than a bug fix. If they do not, the flag is
 already justified and the sweep has named the callers to check.
+
+### `#pragma incomplete` did not protect a file that completes the type anyway
+
+Recorded as a refinement of the type-signature invariant, **and left
+open** rather than guessed at.
+
+`sys/src/cmd2/vts/test/vtparse-probe.c` included `<vterm.h>` and then
+`<vterm_internal.h>`, to read the parser's state. It compiled, and the
+link failed:
+
+```
+sb_pushline_from_row: incompatible type signatures
+bce1af83(vtparse-probe.6) and be0d91f(libvterm.a(vterm_obtain_screen))
+for vterm_screen_get_cell
+```
+
+That is the family already in the invariants list -- kencc's
+signatures follow pointers into the struct they point at, so a file
+that COMPLETES an opaque type disagrees with every file that does not.
+**But the invariant as written predicts this link should have
+worked**: `vterm.h` carries `#pragma incomplete` for `VTerm`,
+`VTermState` and `VTermScreen`, and the note says the pragma is read
+only by `signat()` and that completing the struct afterwards does not
+clear it.
+
+So one of two things is true and neither has been measured:
+
+- the pragma's protection is **narrower** than the note claims -- for
+  instance it may not survive the type being completed in the same
+  translation unit, only in a different one; or
+- the type that actually diverged is **not one of the three** --
+  something `vterm_internal.h` drags in and completes that has no
+  pragma of its own, reachable from `vterm_screen_get_cell` through
+  `VTermScreenCell`.
+
+`nm` on the two objects, or `6c -T` output for the probe, would name
+it in one run. **Not chased**, because the probe stopped needing the
+internal header: the question it was asking -- where the parser stops
+consuming -- is answerable behaviourally by feeding prefixes and
+counting what reaches the screen, through the public API alone.
+
+*The useful half is the rule that still holds, restated for the next
+person: a test or probe that includes a library's INTERNAL header is
+a different translation unit from the library as far as kencc's
+signatures are concerned, `#pragma incomplete` or not. Ask through the
+public API when the question allows it.*
