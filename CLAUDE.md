@@ -1979,9 +1979,17 @@ would read CR LF for one keypress. **In this libvterm it is not**:
 checked before relying on it, because the failure it would have
 caused looks nothing like the one being fixed.* A program emitting
 `\r\n` itself gets CR twice, which is idempotent.
-**The width is a SEPARATE question and is now separable**: the window
-is far wider than the hardcoded `session_init(s, name, 24, 80)`, and
-whatever remains after LNM is that.
+**CONFIRMED**: clean columns, every line at the left margin, prompt
+at column 0, `ls` readable. **And the refutation condition answered
+too** -- four commands ran in that session, each producing one line,
+so Enter did not double. That is what would have fired had LNM been
+symmetric here, and it confirms the reading of `state.c` rather than
+only the fix.
+**The width did not need fixing after all, at that window size**:
+`ls` columnated correctly. The hardcoded `session_init(s, name, 24,
+80)` is still a hardcode and still wrong for a window that is not
+80 wide -- but it is now the only thing left on the vts list, and it
+is a feature rather than a bug to chase.
 
 **AND THE SESSION NOW WORKS**: `tty read: blocked (1 waiting)`,
 `read: enter fd=0 n=1`, `-> buffered n=1`, then `tty write 1 [c]` --
