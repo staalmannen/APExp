@@ -2290,10 +2290,39 @@ break moves ~480 bytes each, and with `CUTOFF = 12` and
 gives 48 x 10 = 480 exactly**. So these are allocations of **<= 16
 bytes, ten per sbrk pair: about 17 million tiny objects, none
 freed.**
-**NEXT, AND IT NEEDS NO RE-RUN**: `grep -v ' Brk ' /tmp/rt.log` with
-`head` and `tail` shows what bash was doing on either side of the
-storm. The log has answered two questions already while I asked it
-the wrong ones twice.
+**THE DEATH IS A JUMP TO ZERO, AND IT IS THE CONSEQUENCE RATHER THAN
+THE EVENT.** The last non-`Brk` lines:
+
+```
+5878 bash Exits ... = process exited            <- the $( ) child
+5875 bash Await ... "5878 0 0 40 ''" = 14       <- parent reaps it
+5875 bash Pread ... 255 ... ".BASH_TSTOUT=${TMPDIR}/..." = 1149
+5875 bash Stat  ... "/proc/5875/wait"    (x3)
+5875 bash Noted 2d10a7 1 = 0
+bash 5875: suicide: sys: trap: fault read addr=0x0 pc=0x0
+```
+
+**`pc=0x0` is a JUMP to address zero** -- a call through a null
+function pointer, not a bad data pointer -- and `Noted 1` is
+`noted(NDFLT)`, libap's note handler returning, immediately before
+it. Plan 9's `Insufficient physical memory` **is a note**, so the
+order reads: memory exhausted -> kernel posts the note -> libap's
+handler runs -> control goes to 0. *The crash is downstream of the
+storm; do not chase `pc=0` as the bug.*
+**`fd 255` is bash reading its own script** -- which is also the
+`move_to_high_fd` that explains the descriptor warnings.
+**`wait4`'s WNOHANG path allocates (`_dirstat`) but is NOT the
+storm**: the trace shows THREE stats of `/proc/5875/wait`, not
+millions. *It does hold a real bug, recorded not measured*: when
+`_dirstat` returns nil it falls through to the **blocking** `_WAIT()`
+with `WNOHANG` set, and the same happens when the pending message
+belongs to a different pid.
+**NEXT, AND IT NEEDS NO RE-RUN**:
+`grep -n -v ' Brk ' /tmp/rt.log | tail -40`. The LINE NUMBERS say
+which inter-event gap holds the 3.4 million `Brk` lines, which names
+the call site without another guess. *Four mechanisms have been
+guessed from source in this hunt and the log has out-argued every
+one of them.*
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR.
