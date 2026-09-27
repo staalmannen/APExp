@@ -50,6 +50,27 @@
 #                          regardless of forking. Look at the loop
 #                          itself before libap.
 #
+# **TWO THINGS THE FIRST VERSION OF THIS FILE GOT WRONG**, both of
+# which made its output unreadable, and both worth keeping because
+# they are easy to repeat:
+#
+#   1. Section 1 was supposed to be the FORK-FREE control and was not:
+#      the loop counter was `i=`expr $i + 1``, and **expr is an
+#      external command**. All three sections forked 400 times, so the
+#      pair that was meant to carry the whole result could not
+#      distinguish anything. *A control that does the thing it is
+#      controlling for is not a control.* Bash's own `$((i+1))` is a
+#      builtin and forks nothing; that is what is used now.
+#
+#   2. Every message went to STDOUT, which is buffered. The kernel's
+#      own warnings go straight to the console, so the two streams
+#      interleaved meaninglessly -- the run printed its warnings
+#      *before* the script's first line, which looks like the
+#      descriptors being gone before the script started and is really
+#      just a buffer. **Everything here goes to stderr now**, which is
+#      unbuffered, so the order on screen is the order in time and
+#      "how far did it get" can be read off it.
+#
 # **A SECTION THAT PRINTS ITS `survived' LINE HAS NOT LEAKED ENOUGH TO
 # MATTER, WHICH IS NOT THE SAME AS NOT LEAKING.** The kernel warns at
 # 100 and 200; below 100 nothing is said. So a clean pass here bounds
@@ -76,8 +97,11 @@
 # stays low, the two numbers have separated and the memory message
 # was the true one all along.
 
-echo "bash-fdloop-test: pid $$"
-echo
+# stderr, so the order against the kernel's own warnings is real.
+say() { echo "$@" >&2; }
+
+say "bash-fdloop-test: pid $$"
+say ""
 
 N=400
 
@@ -108,18 +132,39 @@ pcount() {
 	ps 2>/dev/null | grep -c -e ' bash$' -e ' sh$'
 }
 
-echo "start: `fdcount` descriptors, `pcount` bash/sh processes"
-echo
+say "start: `fdcount` descriptors, `pcount` bash/sh processes"
+say ""
+
+# --- 0. THE SLOPE.  This is the section that measures rather than
+#        merely surviving or dying: fork a known number of times and
+#        print the descriptor and process counts as it goes, so the
+#        answer is a RATE rather than a verdict.
+#
+#        It comes first deliberately. The process may not survive the
+#        later sections, and a run that dies having printed a slope
+#        has still answered the question; one that dies before
+#        printing anything has not.
+say "0. fork + exec 200 times, counting every 25"
+i=0
+while [ $i -lt 200 ]; do
+	sh -c :
+	i=$((i+1))
+	case $i in
+	25|50|75|100|125|150|175|200)
+		say "   after $i forks: `fdcount` descriptors, `pcount` processes" ;;
+	esac
+done
+say ""
 
 # --- 1. NO FORK.  `:' is a builtin; nothing is spawned. -------------
-echo "1. $N iterations, no fork (: is a builtin)"
+say "1. $N iterations, NO FORK -- both : and \$((...)) are builtins"
 i=0
 while [ $i -lt $N ]; do
 	:
-	i=`expr $i + 1`
+	i=$((i+1))
 done
-echo "   survived $N: `fdcount` descriptors, `pcount` processes"
-echo
+say "   survived $N: `fdcount` descriptors, `pcount` processes"
+say ""
 
 # --- 2. FORK AND EXEC, which is what run-all's loop does. -----------
 #
@@ -127,14 +172,14 @@ echo
 # fork, an exec of a real program, and a wait. Nothing is redirected
 # and no file is opened, so any descriptor this gains came from the
 # machinery rather than from the work.
-echo "2. $N iterations of fork + exec + wait (sh -c :)"
+say "2. $N iterations of fork + exec + wait (sh -c :)"
 i=0
 while [ $i -lt $N ]; do
 	sh -c :
-	i=`expr $i + 1`
+	i=$((i+1))
 done
-echo "   survived $N: `fdcount` descriptors, `pcount` processes"
-echo
+say "   survived $N: `fdcount` descriptors, `pcount` processes"
+say ""
 
 # --- 3. THE SAME AGAIN, with a redirection. -------------------------
 #
@@ -142,13 +187,13 @@ echo
 # the parent -- the path with the descriptor-number bookkeeping in it
 # (close() -> _closebuf, dup2() -> close()), and the one most likely
 # to strand a Muxbuf slot if anything does.
-echo "3. $N iterations of fork + exec + wait, with a redirection"
+say "3. $N iterations of fork + exec + wait, with a redirection"
 i=0
 while [ $i -lt $N ]; do
 	sh -c : > /dev/null
-	i=`expr $i + 1`
+	i=$((i+1))
 done
-echo "   survived $N: `fdcount` descriptors, `pcount` processes"
-echo
+say "   survived $N: `fdcount` descriptors, `pcount` processes"
+say ""
 
-echo "bash-fdloop-test: finished all three sections"
+say "bash-fdloop-test: finished all sections"

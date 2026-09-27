@@ -2175,9 +2175,37 @@ exec, and fork plus exec plus a redirection, each printing the
 descriptor count *and the bash/sh process count* from `/proc`. **The
 pair is what carries the result**: 1 surviving while 2 dies puts the
 leak in fork/exec/wait and turns an 83-file suite into three lines.
-**Reference measured on glibc: 5 descriptors, flat across all
-three.** *`/proc/<pid>/fd` is a FILE on Plan 9 and a DIRECTORY on
-Linux*, which the host run caught by reporting -1 everywhere.
+**Reference measured on glibc: 5 descriptors, flat throughout.**
+*`/proc/<pid>/fd` is a FILE on Plan 9 and a DIRECTORY on Linux*,
+which the host run caught by reporting -1 everywhere.
+**IT REPLICATES THE CRASH -- 400 iterations of a shell loop, no test
+suite at all.** So the 83-file suite really was incidental.
+**But the first version could not say WHICH loop**, and both faults
+were mine: (1) section 1 was meant to be the fork-free control and
+was not, because the counter was `` `expr $i + 1` `` and **`expr` is
+an external command** -- all three sections forked 400 times, so the
+pair that carried the whole result distinguished nothing. *A control
+that does the thing it is controlling for is not a control.* Bash's
+`$((i+1))` is a builtin. (2) everything went to **stdout, which is
+buffered**, while the kernel's warnings go straight to the console --
+so the run printed `exceeds 100 file descriptors` *before* the
+script's own first line, which reads like the descriptors being gone
+before the script started and is only a buffer. Everything goes to
+**stderr** now, and a **section 0** forks 200 times printing the
+counts every 25, so the output is a RATE rather than a verdict --
+and it comes first, because a run that dies having printed a slope
+has still answered.
+**AND THE ratrace LOG ALREADY HELD THE ANSWER while I asked it the
+wrong question.** I said I would not guess the format and then told
+the user to `grep -c ' open'`; ratrace capitalises, so all four
+counts came back 0 from a 272 MB, 3.4-million-line log. Its last
+twenty lines are `Brk` over and over, the break climbing ~480 bytes
+a time, ending in `fault read addr=0x0` -- **a null dereference,
+which is `malloc` returning 0.** So the primary phenomenon is MEMORY
+and the descriptors may be the side effect, which is the opposite of
+the framing every round so far has used. The histogram
+(`awk '{print $3}' /tmp/rt.log | sort | uniq -c | sort -nr`) names
+every syscall by frequency and needs no re-run.
 Back on dash meanwhile, and the goal is one shell rather than two.
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
