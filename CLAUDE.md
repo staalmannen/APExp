@@ -568,6 +568,13 @@ in the topic file.
   and a round trip to the VM costs a full rebuild.
 - **A Tcl list literal has to survive rc first.** `{}` is a block, `()`
   is a list, only `''` quotes.
+- **And `=` is a SYNTAX CHARACTER in rc**, legal only as an assignment
+  at the start of a command or inside quotes. `awk -v name=$name` is
+  not an argument, it is a parse error -- `token '=': syntax error` --
+  and so is any `key=value` passed to any program. Write
+  `'name='^$name`, or build the whole thing by concatenation. This
+  cost a round on `fdwatch` *after* the `{}`/`()`/`''` rule above was
+  already written down, which is why it is its own line.
 
 **Testing**
 
@@ -2073,7 +2080,17 @@ ASSUMED.** It counts buffering events, so it measures the
 hypothesis rather than the leak: if the descriptors are ordinary
 `open()`s, or pipes, or something of bash's own, it reports zero,
 and zero would be read as exoneration.
-**`rc/bin/fdwatch` is the instrument instead.** `/proc/<pid>/fd`
+**`rc/bin/fdwatch` is the instrument instead, and its FIRST version
+was wrong in a way worth keeping.** It found the process by name and
+took the last match -- but **a buffered descriptor gives its process
+a copy process of the SAME NAME** (`ps` shows the shell in `Rendez`
+and the copy process in `Pread`), so it would have watched the copy
+process, which holds almost nothing, reported a flat count, and read
+as *no leak*. *A measurement of the wrong process is not a null
+result, it is a false one.* `-n` now prints every match and refuses
+to choose; **`-c` runs the program itself**
+(`THIS_SH=bash fdwatch -c /bin/bash run-all`), which removes both the
+ambiguity and the race the user had to win by hand. `/proc/<pid>/fd`
 lists every open descriptor of a live process **with its path**, so
 one run says *what* is leaking rather than *that* something is; the
 script samples it, counts (subtracting the cwd line at the top,
