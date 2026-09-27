@@ -2255,6 +2255,45 @@ the fix.
 **Why it survived**: the failure arrives only at the 27th, so a
 program making a handful of temporaries is fine for ever and one
 making dozens dies.
+**CONFIRMED ON THE VM**: `_tempmark = 1`, 5 of 5, 0 failures.
+
+**THE BASH FAILURE IS NOT A DESCRIPTOR LEAK. IT IS MALLOC, AND THE
+HISTOGRAM SAYS SO IN ONE LINE.** Over the whole 3.4-million-line
+ratrace log:
+
+```
+3456769 Brk          447 Close       142 Open
+    251 Dup          160 Pread        86 Stat
+     58 Create        56 Pwrite        2 Rfork      1 Exec
+```
+
+**142 opens and 251 dups against 447 closes** -- it closes MORE than
+it opens, so there is no descriptor leak at all, and every round of
+this hunt was chasing one. **`Brk` outnumbers everything else by four
+orders of magnitude.**
+**And `2 Rfork`, `1 Exec`: the process died before the suite ran a
+single test**, so the storm is the whole run rather than something
+the tests provoked.
+**THE KERNEL'S fd WARNINGS ARE ALMOST CERTAINLY NOT A LEAK EITHER.**
+bash's `move_to_high_fd()` dups its internal bookkeeping descriptors
+up near the reported limit, and Plan 9's fd *table* grows to the
+highest index used -- so 251 dups give `exceeds 100/200 file
+descriptors` with a handful of files actually open. That is why the
+warnings arrive **before the script's first line**: it is bash
+starting up, not the script leaking. *Two warnings printed together
+are not one story, and I treated them as one for six rounds.*
+**THE ARITHMETIC NAMES THE SIZE CLASS.** `_malloc_brk` does
+`sbrk(0)` then `sbrk(gap+n)` -- **two Brk syscalls per call**, which
+is why the log shows each address twice. So ~1.73M allocations. The
+break moves ~480 bytes each, and with `CUTOFF = 12` and
+`BLKSZ(pow) = 32 + 2^pow` batched `(CUTOFF-pow)+2` at a time, **pow 4
+gives 48 x 10 = 480 exactly**. So these are allocations of **<= 16
+bytes, ten per sbrk pair: about 17 million tiny objects, none
+freed.**
+**NEXT, AND IT NEEDS NO RE-RUN**: `grep -v ' Brk ' /tmp/rt.log` with
+`head` and `tail` shows what bash was doing on either side of the
+storm. The log has answered two questions already while I asked it
+the wrong ones twice.
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR.
