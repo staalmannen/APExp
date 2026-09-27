@@ -196,6 +196,7 @@ extern int  _tty_raw(int);
 extern int  _tty_israw(void);
 extern int  _ttymark(void);		/* which libap is linked in */
 extern int  _fdinfomark(void);		/* ditto, for _fdinfo.c */
+extern int  _tempmark(void);		/* ditto, for temp/mktemp.c */
 extern int  _bufmark(void);		/* ditto, for plan9/_buf.c */
 
 /* ap/plan9/_apdbg.c -- one debug line, under $APEXP_DEBUG. Labels may be 0. */

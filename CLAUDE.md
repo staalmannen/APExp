@@ -205,7 +205,8 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `sincos-test.c`, `explog-test.c`, `fparith-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
-`copyfile-test.c`, `deeppath-test.c`, `bufexec-test.c` and `stdio-test.c`.
+`copyfile-test.c`, `deeppath-test.c`, `bufexec-test.c`,
+`mkstemp-test.c` and `stdio-test.c`.
 **`bash-fdloop-test.sh` is a SHELL script rather than a C program**,
 and has to be: it asks whether *bash* leaks a descriptor per fork,
 so the thing under test is the shell itself. Run it with
@@ -2206,7 +2207,54 @@ and the descriptors may be the side effect, which is the opposite of
 the framing every round so far has used. The histogram
 (`awk '{print $3}' /tmp/rt.log | sort | uniq -c | sort -nr`) names
 every syscall by frequency and needs no re-run.
+**THE INSTRUMENT WAS STILL THE PROBLEM, A THIRD TIME, AND THE SHAPE
+IS ALWAYS THE SAME.** Moving to stderr did NOT fix the ordering: the
+warnings still printed before the script's first line, and `start:`
+never appeared at all. **Because counting the descriptors FORKED** --
+`fdcount` ran `wc -l` inside `$( )`, a subshell plus an exec, per
+sample, *in a test whose entire subject is what forking costs*. The
+run could die inside its own first measurement, which is exactly
+what "pid, then nothing" looks like. `fdcount()` now forks NOTHING:
+a `read` loop on Plan 9 (where `/proc/<pid>/fd` is a FILE), a glob
+on Linux (where it is a DIRECTORY), both builtins, answering in a
+**variable** rather than through `$( )`. And every step appends to
+**`/tmp/fdloop.log`**, which survives the kill and is in the order
+it happened -- *console ordering is not evidence when one writer is
+the kernel*. Counts at 1, 2, 5, 10, 20, 50, 100, 200 forks, so the
+slope near zero is visible before anything can die. glibc: flat at
+5 throughout.
 Back on dash meanwhile, and the goal is one shell rather than two.
+
+**coreutils `sort` COULD NOT MAKE A TEMPORARY FILE, AND IT IS OURS
+-- FIXED, NOT YET MEASURED ON THE VM.** `sort: cannot create
+temporary file in '/tmp': empty file name`, hit while trying to
+histogram a 272 MB ratrace log. **libap's `mktemp` could produce 26
+names per process, ever**: it wrote `getpid() % 100000` into five of
+the six X's and tried one trailing letter `a`..`z`, then set
+`*template = 0`. So the 27th temporary any program asked for failed,
+the caller opened `""`, and Plan 9 said `empty file name` -- **a
+Plan 9 errstr arriving through libap's `EPLAN9` arm, so the text
+after the colon describes the last system call rather than the
+directory the message names.** Read as a `/tmp` problem it leads
+nowhere. `mkstemp`'s twenty retries re-derived *the same twenty-six*,
+since nothing in them varied but the pid: **a retry is only a retry
+if something varies between the tries.**
+**The tree already had the right generator and was not using it** --
+musl's `__randname` sits in the same directory, is already in
+`OFILES`, and `mkdtemp.c` beside it has always used it. So libap
+held a working name generator and a broken one at once. Both now use
+it (~1.07e9 names); `mkstemp` is shaped like `mkdtemp`, retries only
+on `EEXIST`, and restores the template on failure; `mkostemp` now
+applies `O_CLOEXEC` with `fcntl` rather than dropping it.
+**Measured, not argued**: the old algorithm replicated on the host
+gives up at **exactly file 27**, 26 of 64. `mkstemp-test.c` asks for
+**64 at once** precisely because anything at or below 26 would have
+passed against the bug; 0 failures on glibc. `_tempmark()` is the
+version marker, so the test will not LINK against a libap predating
+the fix.
+**Why it survived**: the failure arrives only at the 27th, so a
+program making a handful of temporaries is fine for ever and one
+making dozens dies.
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR.
