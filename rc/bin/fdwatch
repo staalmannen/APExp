@@ -1,103 +1,154 @@
 #!/bin/rc
 # fdwatch -- sample a process's open descriptors while it runs.
 #
-#	fdwatch -c <command> [args...]	start it, watch it, log it
+#	fdwatch -c <command> [args...]	start it, watch it, summarise
 #	fdwatch <pid>			watch a process already running
 #	fdwatch -n <name>		find it by name (see the warning)
+#	fdwatch -s [logfile]		re-summarise a log, watching nothing
 #
-# $fdwinterval sets the sampling period in seconds (default 2) and
-# $fdwlog the log file (default /tmp/fdwatch.log). They are variables
-# rather than positional arguments because -c has to swallow the whole
-# rest of the line.
-#
-# **PREFER -c.** It starts the program itself, so there is no race to
-# win and no guess about which process is meant:
+# $fdwinterval is the sampling period in SECONDS, default **0**, which
+# means as fast as the loop goes round. $fdwlog is the log, default
+# /tmp/fdwatch.log. They are variables rather than arguments because
+# -c has to swallow the rest of the line.
 #
 #	THIS_SH=bash fdwatch -c /bin/bash run-all
 #
-# WHY -c EXISTS, AND WHY -n IS DANGEROUS.
+# WHY IT DUMPS RAW AND ANALYSES AFTERWARDS.
 #
-# The first version of this script had only -n, and it was wrong twice
-# over in one line.
+# The first working version slept a second before its first sample and
+# then did six forks per sample -- sed, wc, awk, sort, uniq, sort -- to
+# group the paths. **bash's test suite exhausts its descriptors and
+# dies in well under a second**, so that version's log was empty and
+# its only output was
 #
-#  1. A process that libap has buffered a descriptor for has a COPY
-#     PROCESS, forked by _startbuf, and that child has THE SAME NAME.
-#     `ps' during a bash session shows
+#	/proc/4314/fd does not exist -- no such process
+#
+# Both halves were wrong. Sleeping BEFORE the first sample throws away
+# the one moment guaranteed to exist, and analysing inside the loop
+# makes the instrument slower than the thing it measures. *An
+# instrument whose sampling period exceeds the lifetime of its subject
+# measures nothing, and says so in a way that reads like a missing
+# process.*
+#
+# So the loop now does the least it can -- one `cat' per sample,
+# appended raw -- and the grouping happens once at the end, over the
+# log. `-s' re-runs just that part, so a log can be re-read without
+# re-running anything.
+#
+# WHY -c, AND WHY -n IS DANGEROUS.
+#
+# A process that libap has buffered a descriptor for has a COPY
+# PROCESS, forked by _startbuf, and it has THE SAME NAME. `ps' during
+# a bash session shows
 #
 #	1709  1080K Rendez  bash      <- the shell
 #	1710  1052K Pread   bash      <- its copy process
 #
-#     -- the parent blocked in a rendezvous, the copy process inside
-#     _READ. **The old -n took the LAST match**, which is the copy
-#     process: it holds almost nothing, so the count would have been
-#     flat and the run would have reported NO LEAK. *A measurement of
-#     the wrong process is not a null result, it is a false one.*
-#
-#  2. Finding a short-lived process by name is a race the user has to
-#     win by hand, and the answer is worth nothing if they lose it.
-#
-# So -n now prints EVERY match with its state and size and stops
-# unless there is exactly one. Naming the ambiguity is the whole
-# point; picking silently is what went wrong.
+# and an earlier -n took the LAST match, which is the copy process: it
+# holds almost nothing, so the count would have been flat and the run
+# would have reported NO LEAK. *A measurement of the wrong process is
+# not a null result, it is a false one.* -n now prints every match and
+# refuses to choose. -c avoids the question entirely, and avoids the
+# race of finding a short-lived process by hand.
 #
 # WHY /proc/<pid>/fd RATHER THAN COUNTING DEBUG LINES.
 #
-# The plan recorded for the bash descriptor leak was to run with
-# $APEXP_DEBUG=1 and count `select: buffered now fd=' lines. **That
-# can only confirm what it assumes**: it counts BUFFERING EVENTS, so
-# if the descriptors turn out to be ordinary open()s, or pipes, or
-# something of bash's own, it reports zero -- and zero would read as
-# exoneration. A check whose negative result has two explanations is
-# not a check.
+# The plan recorded for this leak was $APEXP_DEBUG=1 and counting
+# `select: buffered now fd=' lines. That counts BUFFERING EVENTS, so
+# it measures the hypothesis: if the descriptors are ordinary open()s,
+# pipes, or something of bash's own, it reports zero -- and zero would
+# read as exoneration. /proc/<pid>/fd lists every open descriptor WITH
+# ITS PATH, so it answers *what* rather than *whether*.
 #
-# /proc/<pid>/fd lists every open descriptor of a live process WITH
-# ITS PATH. It answers *what* rather than *whether*.
+# READING THE SUMMARY, in order of what to look for:
 #
-# READING THE OUTPUT.
-#
-# Each sample prints the total, then paths grouped and counted,
-# commonest first. In order of what to look for:
-#
-#   - a count that RISES MONOTONICALLY. One that rises and falls is a
-#     busy shell, not a leak -- and if the count is flat while the
-#     kernel still warns, the warning is about a DIFFERENT process
-#     and this is the wrong pid.
+#   - a count that RISES MONOTONICALLY. Rising and falling is a busy
+#     shell. FLAT while the kernel still warns means the descriptors
+#     are in the CHILDREN, not here, and `ps | grep bash | wc -l'
+#     during the run is the next question.
 #   - ONE path repeated many times: that names the call site.
-#   - many DISTINCT paths under one directory ($TMPDIR, say): a
-#     create/unlink loop whose descriptors are never closed.
+#   - many DISTINCT paths under one directory: a create/unlink loop.
 #   - pipes with a large count: pipe(), popen(), or a here-document.
 #
-# The first line of /proc/<pid>/fd is the process's CWD, not a
-# descriptor, which is why the count below subtracts one.
+# The first line of /proc/<pid>/fd is the CWD, not a descriptor, which
+# is why the counts below subtract one.
 #
-# LIMITS, so they are not discovered as surprises.
-#
-# Sampling is not tracing: a descriptor opened and closed between two
-# samples is invisible. That is correct here -- it is not leaking --
-# but it means this says WHAT leaks, never WHERE it was opened. Once
-# a path is named, `ratrace' on the same program narrows it to the
-# call; ratrace on a whole suite is unreadable, which is why this
-# comes first.
-#
-# The process usually dies at the end and takes /proc/<pid> with it,
-# so the LOG is the artefact rather than the screen, and the last
-# sample before it vanishes is the interesting one.
+# LIMITS. Sampling is not tracing: this says WHAT is open, never where
+# it was opened. Once a path is named, `ratrace' narrows it to the
+# call; ratrace on a whole suite is unreadable, which is why it is
+# second. And the process usually dies at the end, so the LOG is the
+# artefact -- the last sample before it vanishes is the interesting
+# one.
 
 fn usage {
 	echo 'usage: fdwatch -c <command> [args...]   (preferred)' >[1=2]
 	echo '       fdwatch <pid>' >[1=2]
 	echo '       fdwatch -n <name>' >[1=2]
-	echo '$fdwinterval seconds (default 2), $fdwlog file' >[1=2]
+	echo '       fdwatch -s [logfile]' >[1=2]
+	echo '$fdwinterval seconds (default 0 = flat out), $fdwlog file' >[1=2]
 	exit usage
 }
 
 if(~ $#* 0)
 	usage
-
 if(~ $#fdwinterval 0)
-	fdwinterval=2
+	fdwinterval=0
 if(~ $#fdwlog 0)
 	fdwlog=/tmp/fdwatch.log
+
+# The summary. Reads the raw log, so it works after the fact and can
+# be re-run; the loop above it stays as cheap as possible.
+fn summarise {
+	if(! test -e $fdwlog){
+		echo 'fdwatch: no '^$fdwlog >[1=2]
+		return
+	}
+	echo
+	echo 'fdwatch: ---- descriptor count per sample ----'
+	# -1 per sample for the cwd line. A sample with 0 descriptors is
+	# a process that died mid-read; printed rather than hidden.
+	awk '
+	/^==== fdwatch sample/ {
+		if(n > 0) printf "  sample %d: %d descriptors\n", s, n-1
+		s++; n = 0; next
+	}
+	/^====/ { next }
+	{ n++ }
+	END { if(n > 0) printf "  sample %d: %d descriptors\n", s, n-1 }
+	' $fdwlog
+
+	echo
+	echo 'fdwatch: ---- paths in the LAST sample, commonest first ----'
+	# The last sample is the one just before the process vanished,
+	# which is where a leak is largest and clearest.
+	awk '
+	/^==== fdwatch sample/ { delete L; k = 0; first = 1; next }
+	/^====/ { next }
+	{ if(first) { first = 0; next }   # cwd line, not a descriptor
+	  L[k++] = $0 }
+	END {
+		for(i = 0; i < k; i++){
+			name = ""
+			nf = split(L[i], f, " ")
+			for(j = 10; j <= nf; j++)
+				name = (name == "" ? f[j] : name " " f[j])
+			if(name == "")
+				name = "(unnamed)"
+			c[name]++
+		}
+		for(nm in c)
+			printf "%6d  %s\n", c[nm], nm
+	}
+	' $fdwlog | sort -nr
+	echo
+}
+
+if(~ $1 -s){
+	if(! ~ $#* 1)
+		fdwlog=$2
+	summarise
+	exit 0
+}
 
 cmd=()
 pid=()
@@ -112,13 +163,10 @@ if not if(~ $1 -n){
 	if(~ $#* 1)
 		usage
 	name=$2
-
-	# Every match, with its state and size, and no silent choice.
-	# The awk program is built by rc concatenation rather than with
-	# -v: `=' is a SYNTAX CHARACTER in rc, so a bare name=value
-	# argument is parsed as an assignment and rejected outright
-	# (`token '=': syntax error'). Same family as the {} vs () vs ''
-	# rule -- rc's quoting is not the shell's.
+	# Built by concatenation rather than `awk -v name=$name': `=' is
+	# a SYNTAX CHARACTER in rc, so a bare name=value argument is
+	# parsed as an assignment and rejected -- `token '=': syntax
+	# error'. Not the shell's quoting.
 	pids=`{ps | awk '$NF == "'^$name^'" {print $2}'}
 	if(~ $#pids 0){
 		echo 'fdwatch: no process called '^$name >[1=2]
@@ -127,13 +175,11 @@ if not if(~ $1 -n){
 	if(! ~ $#pids 1){
 		echo 'fdwatch: '^$#pids^' processes are called '^$name^':' >[1=2]
 		ps | awk '$NF == "'^$name^'"' >[1=2]
-		echo >[1=2]
-		echo 'fdwatch: REFUSING TO GUESS. A buffered descriptor gives' >[1=2]
-		echo 'fdwatch: its process a COPY PROCESS of the same name --' >[1=2]
-		echo 'fdwatch: the parent sits in Rendez, the copy process in' >[1=2]
-		echo 'fdwatch: Pread -- and watching the copy process reports a' >[1=2]
-		echo 'fdwatch: flat count, which reads as "no leak".' >[1=2]
-		echo 'fdwatch: Pass the pid, or use -c and avoid the question.' >[1=2]
+		echo 'fdwatch: REFUSING TO GUESS -- a buffered descriptor' >[1=2]
+		echo 'fdwatch: gives its process a COPY PROCESS of the same' >[1=2]
+		echo 'fdwatch: name (parent in Rendez, copy in Pread), and' >[1=2]
+		echo 'fdwatch: watching the copy process reports a flat count,' >[1=2]
+		echo 'fdwatch: which reads as "no leak". Pass the pid, or -c.' >[1=2]
 		exit ambiguous
 	}
 	pid=$pids
@@ -143,71 +189,45 @@ if not {
 	pid=$1
 }
 
+rm -f $fdwlog
+
 if(! ~ $#cmd 0){
-	# Start it ourselves. No race, and $apid is the pid beyond doubt
-	# -- which also means the copy processes it forks later are not
-	# candidates, because we never have to search for it.
 	echo 'fdwatch: running: '^$"cmd
 	$cmd &
 	pid=$apid
 	echo 'fdwatch: pid '^$pid
-	# One second so /proc/<pid> exists before the first sample; the
-	# program has barely started, which is the baseline worth having.
-	sleep 1
+	# **NO SLEEP HERE.** The subject may live well under a second --
+	# bash's test suite exhausts its descriptors and dies in less
+	# than one -- and a sleep before the first sample throws away the
+	# only moment certain to exist.
 }
 
-if(! test -e /proc/$pid/fd){
-	echo 'fdwatch: /proc/'^$pid^'/fd does not exist -- no such process,' >[1=2]
-	echo 'fdwatch: or it is not yours to look at' >[1=2]
-	exit noproc
-}
+echo '==== fdwatch pid='^$pid^' '^`{date} >> $fdwlog
 
-echo 'fdwatch: watching pid '^$pid^', every '^$fdwinterval^'s, into '^$fdwlog
-
-{
-	echo '==== fdwatch pid='^$pid^' started '^`{date}
-	# Say WHAT was watched: a log that does not name its subject
-	# reads exactly like one that does.
-	if(test -e /proc/$pid/args)
-		echo 'args: '^`{cat /proc/$pid/args}
-	echo
-} >> $fdwlog
-
-# rc has no `break', and `sleep' takes whole seconds -- both learned
-# the hard way in vts-bash. A flag leaves the loop; the loop ends when
-# the process does.
+# rc has no `break', and `sleep' takes whole seconds -- both learned in
+# vts-bash. A flag leaves the loop; the loop ends when the process
+# does. ONE fork per sample, and nothing else: the analysis is
+# summarise(), over the log, afterwards.
 running=yes
+nsamp=0
 while(~ $running yes){
 	if(test -e /proc/$pid/fd){
-		{
-			echo '---- '^`{date}
-			# -1 for the cwd line at the top, which is not a
-			# descriptor. Getting that wrong would report an
-			# off-by-one leak that is not there.
-			echo 'total descriptors: '^`{
-				sed 1d /proc/$pid/fd | wc -l
-			}
-			# Field 10 onwards is the name; the earlier fields
-			# are the fd number, mode and qid. One repeated path
-			# is the whole answer when it appears.
-			sed 1d /proc/$pid/fd | awk '{
-				name = $10
-				for(i = 11; i <= NF; i++)
-					name = name " " $i
-				if(name == "")
-					name = "(unnamed)"
-				print name
-			}' | sort | uniq -c | sort -nr
-			echo
-		} >> $fdwlog
-		sleep $fdwinterval
+		echo '==== fdwatch sample' >> $fdwlog
+		cat /proc/$pid/fd >> $fdwlog >[2]/dev/null
+		nsamp=`{echo $nsamp 1 + p | dc}
+		if(! ~ $fdwinterval 0)
+			sleep $fdwinterval
 	}
 	if not {
 		running=no
-		{
-			echo '==== process '^$pid^' is gone, '^`{date}
-			echo
-		} >> $fdwlog
-		echo 'fdwatch: pid '^$pid^' exited; log in '^$fdwlog
 	}
 }
+
+echo '==== gone '^`{date} >> $fdwlog
+echo 'fdwatch: pid '^$pid^' exited after '^$nsamp^' samples; log in '^$fdwlog
+if(~ $nsamp 0){
+	echo 'fdwatch: NO SAMPLES -- the process was gone before the first' >[1=2]
+	echo 'fdwatch: read. With -c that should not happen; without it,' >[1=2]
+	echo 'fdwatch: the pid was already dead. Use -c.' >[1=2]
+}
+summarise

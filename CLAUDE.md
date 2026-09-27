@@ -575,6 +575,10 @@ in the topic file.
   `'name='^$name`, or build the whole thing by concatenation. This
   cost a round on `fdwatch` *after* the `{}`/`()`/`''` rule above was
   already written down, which is why it is its own line.
+  **But rc DOES allow white space around it in an assignment** --
+  `LC_ALL = C.UTF-8` in `apexp-sh` is valid and always has been, so
+  "no spaces" is a sh rule, not an rc one. A checker written from the
+  sh habit flags those eight lines and is wrong.
 
 **Testing**
 
@@ -2101,6 +2105,20 @@ and a different bug. *Print what the machine says rather than what
 the code implies*, and **`ratrace` comes after**, once a path is
 named -- ratrace on a whole suite is unreadable, which is why it is
 second and not first.
+**AND THE SECOND VERSION MEASURED NOTHING EITHER, for a reason worth
+more than the leak**: `run-all` exhausts its descriptors and dies in
+**well under a second**, while the script slept one second *before*
+its first sample and then did six forks per sample (sed, wc, awk,
+sort, uniq, sort) to group paths inside the loop. Its entire output
+was `/proc/4314/fd does not exist -- no such process`, *which reads
+exactly like a pid that was never right*. **An instrument whose
+sampling period exceeds the lifetime of its subject reports a
+missing subject, not a missing measurement.** Fixed by inverting
+both: sample FIRST and sleep after, default interval **0** (flat
+out), **one `cat` per sample** appended raw, and all the grouping
+moved to a `summarise` that runs once at the end over the log --
+`-s` re-runs just that, so a log can be re-read without re-running
+anything.
 Back on dash meanwhile, and the goal is one shell rather than two.
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
