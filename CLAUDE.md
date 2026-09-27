@@ -206,6 +206,11 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
 `copyfile-test.c`, `deeppath-test.c`, `bufexec-test.c` and `stdio-test.c`.
+**`bash-fdloop-test.sh` is a SHELL script rather than a C program**,
+and has to be: it asks whether *bash* leaks a descriptor per fork,
+so the thing under test is the shell itself. Run it with
+`/bin/bash bash-fdloop-test.sh`; it is correct on glibc too, where
+it reports 5 descriptors flat.
 **`truefalse-test.c` is the one NATIVE test in this directory** --
 `6c`/`6l`, not `pcc` -- and it has to be, because APE's `<stdbool.h>`
 `#define`s `true`/`false` to 1 and 0, so an APE build never reaches
@@ -2119,6 +2124,60 @@ out), **one `cat` per sample** appended raw, and all the grouping
 moved to a `summarise` that runs once at the end over the log --
 `-s` re-runs just that, so a log can be re-read without re-running
 anything.
+**AND THE THIRD VERSION TOOK 0 SAMPLES TOO, WHICH IS NOW A
+MEASUREMENT RATHER THAN A FAILURE.** The pid was right -- fdwatch
+said 5579 and the kernel's warnings said `bash 5579` -- the loop was
+reached, and `/proc/5579/fd` was **already gone at the first
+`test -e`**. Between the fork and that test an rc script must run
+`date`, `echo` and `test`, each a fork and an exec, and **rc cannot
+read a file without forking at all**. So `run-all` dies in less time
+than three forks, and *no amount of tuning makes an rc loop win
+this*: it is a property of the shell, not of the interval.
+**`ratrace` is therefore the tool now, and the objection to it has
+expired.** It runs the command under control from the first
+instruction, so there is no race:
+`ratrace /bin/bash run-all >[2] /tmp/rt.log`, then the difference
+between `grep -c ' open'` and `grep -c ' close'` is the leak and the
+`open` lines name the paths. It was second before because ratrace on
+a whole suite is unreadable -- **but a run that dies in under a
+second is not a whole suite**, and that is what changed.
+fdwatch keeps its job for the case it was built for: the long
+`mk install` this leak was first seen in.
+**Also fixed there: `^` in rc is a CROSS PRODUCT, not concatenation.**
+`'x'^(a b c)` is `xa xb xc`, and `` `{date} `` is a list of six
+words, so one log line came out as
+`==== fdwatch pid=5579 Sun ==== fdwatch pid=5579 Sep ...`. Pass
+separate arguments to `echo` rather than concatenating with a list.
+**AND ratrace APPEARS TO CHANGE THE OUTCOME, WHICH WOULD RETIRE MOST
+OF THE ABOVE.** Under `ratrace` the same suite runs for a long time
+with heavy load instead of dying at once. *Not yet confirmed -- it
+may still die later* -- but if it holds, **the failure is
+RATE-dependent, and a forgotten `close` is not**: 100 descriptors is
+100 descriptors however slowly you reach them, so a count-leak
+cannot be outrun. What speed CAN change is how many things are alive
+at once, and libap's `select()` forks a copy process per buffered
+descriptor whose number at any instant is a race between the parent
+making them and the children exiting. **That would also explain why
+the kernel's last word is `Insufficient physical memory` rather than
+anything about descriptors** -- a pile of live copy processes is
+both at once, and I have been treating the two warnings as one story
+without evidence.
+**AND run-all's TOP LEVEL BARELY TOUCHES FILES**, which is the
+reading that should have come first: its whole loop is
+`for x in run-*; do echo $x ; sh $x ; rm -f $BASH_TSTOUT ; done` --
+about forty iterations of fork, exec and wait. **Forty iterations
+cannot reach 200 descriptors by opening files, because it hardly
+opens any.** So the descriptors come a few at a time from the
+machinery rather than from the work, and the suite is incidental.
+**`sys/lib/tests/bash-fdloop-test.sh` is that loop with the tests
+taken out** -- three sections of 400 iterations: no fork, fork plus
+exec, and fork plus exec plus a redirection, each printing the
+descriptor count *and the bash/sh process count* from `/proc`. **The
+pair is what carries the result**: 1 surviving while 2 dies puts the
+leak in fork/exec/wait and turns an 83-file suite into three lines.
+**Reference measured on glibc: 5 descriptors, flat across all
+three.** *`/proc/<pid>/fd` is a FILE on Plan 9 and a DIRECTORY on
+Linux*, which the host run caught by reporting -1 everywhere.
 Back on dash meanwhile, and the goal is one shell rather than two.
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
