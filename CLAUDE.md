@@ -1979,9 +1979,17 @@ would read CR LF for one keypress. **In this libvterm it is not**:
 checked before relying on it, because the failure it would have
 caused looks nothing like the one being fixed.* A program emitting
 `\r\n` itself gets CR twice, which is idempotent.
-**The width is a SEPARATE question and is now separable**: the window
-is far wider than the hardcoded `session_init(s, name, 24, 80)`, and
-whatever remains after LNM is that.
+**CONFIRMED**: clean columns, every line at the left margin, prompt
+at column 0, `ls` readable. **And the refutation condition answered
+too** -- four commands ran in that session, each producing one line,
+so Enter did not double. That is what would have fired had LNM been
+symmetric here, and it confirms the reading of `state.c` rather than
+only the fix.
+**The width did not need fixing after all, at that window size**:
+`ls` columnated correctly. The hardcoded `session_init(s, name, 24,
+80)` is still a hardcode and still wrong for a window that is not
+80 wide -- but it is now the only thing left on the vts list, and it
+is a feature rather than a bug to chase.
 
 **AND THE SESSION NOW WORKS**: `tty read: blocked (1 waiting)`,
 `read: enter fd=0 n=1`, `-> buffered n=1`, then `tty write 1 [c]` --
@@ -2045,10 +2053,38 @@ reaches `_closebuf`. (`Muxseg` is also ~4.2 MB -- `Muxbuf bufs[256]`
 at 16 KB of `data` each -- but that is demand-paged address space, so
 it is the weaker candidate and is written down to be excluded.)
 **Newly reachable when `READLINE` went on**, like the `FD_BUFFEREDX`
-bug. **The test needs no new code**: run the failing build with
-`APEXP_DEBUG=1` and count `select: buffered now fd=` lines against the
-descriptor warnings. Recorded, not measured; back on dash meanwhile,
-and the goal is one shell rather than two.
+bug.
+**THERE IS A REPRODUCER NOW, and it is far smaller than a full
+rebuild**: `cd sys/src/external/bash/tests && /bin/bash run-all`
+warns at 100 and 200 descriptors and then dies. (`THIS_SH` unset
+makes line 21 run `-c` as a command; that is an artefact of running
+`run-all` outside `make tests` and is **not** related -- the warnings
+fire regardless, which is itself useful, since it means the leak
+does not need the suite to work.)
+**Three obvious suspects are already ELIMINATED by reading**, so the
+next round should not spend itself there: `close()` calls
+`_closebuf`, clears the flags and `_CLOSE`s the fd; Muxbuf slots
+**are** recycled (`_startbuf` scans for `b->fd == -1`, which
+`_closebuf` sets, so `curfds` never falling is a scan bound and not
+a leak); and `dup2()` goes through `close()` rather than round it.
+**The recorded plan -- `APEXP_DEBUG=1` and count
+`select: buffered now fd=` -- CAN ONLY CONFIRM WHAT IS ALREADY
+ASSUMED.** It counts buffering events, so it measures the
+hypothesis rather than the leak: if the descriptors are ordinary
+`open()`s, or pipes, or something of bash's own, it reports zero,
+and zero would be read as exoneration.
+**`rc/bin/fdwatch` is the instrument instead.** `/proc/<pid>/fd`
+lists every open descriptor of a live process **with its path**, so
+one run says *what* is leaking rather than *that* something is; the
+script samples it, counts (subtracting the cwd line at the top,
+which is not a descriptor) and groups the paths commonest first. A
+hundred lines of one path names the call site; many distinct paths
+under `$TMPDIR` is a create/unlink loop; pipes are a third answer
+and a different bug. *Print what the machine says rather than what
+the code implies*, and **`ratrace` comes after**, once a path is
+named -- ratrace on a whole suite is unreadable, which is why it is
+second and not first.
+Back on dash meanwhile, and the goal is one shell rather than two.
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR.
