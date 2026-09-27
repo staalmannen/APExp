@@ -73,6 +73,31 @@
 # The first line of /proc/<pid>/fd is the CWD, not a descriptor, which
 # is why the counts below subtract one.
 #
+# **IT CANNOT WATCH A PROCESS THAT DIES IN UNDER ~3 FORKS, AND THAT
+# IS A PROPERTY OF rc RATHER THAN OF THE TUNING.** Measured: with -c
+# and no sleep at all, `bash run-all' was already gone at the first
+# `test -e' -- 0 samples, though the pid was right (fdwatch said 5579
+# and the kernel's warnings said `bash 5579'). Between the fork and
+# the first read this script must run `date', `echo' and `test', each
+# a fork and exec, and rc has no way to read a file without one.
+#
+# So for a subject that lives milliseconds, reach for **ratrace**
+# instead -- it runs the command under control from the first
+# instruction, so there is no race to lose:
+#
+#	ratrace /bin/bash run-all >[2] /tmp/rt.log
+#	grep -c ' open' /tmp/rt.log
+#	grep -c ' close' /tmp/rt.log
+#
+# The difference between those two counts is the leak, and the `open'
+# lines name the paths. ratrace on a long suite is unreadable, which
+# is why it was second before -- but *a run that dies in under a
+# second is not a long suite*, and that is what changed.
+#
+# fdwatch remains the right tool for the case it was built for: a
+# long-lived process, such as the full `mk install' this leak was
+# first seen in.
+#
 # LIMITS. Sampling is not tracing: this says WHAT is open, never where
 # it was opened. Once a path is named, `ratrace' narrows it to the
 # call; ratrace on a whole suite is unreadable, which is why it is
@@ -202,7 +227,13 @@ if(! ~ $#cmd 0){
 	# only moment certain to exist.
 }
 
-echo '==== fdwatch pid='^$pid^' '^`{date} >> $fdwlog
+# `^' in rc is a CROSS PRODUCT, not string concatenation:
+# 'x'^(a b c) is `xa xb xc'. `{date} is a LIST of six words, so
+# '...pid='^$pid^' '^`{date} wrote the whole prefix six times --
+# `==== fdwatch pid=5579 Sun ==== fdwatch pid=5579 Sep ...'.
+# Separate arguments to echo instead; nothing is concatenated
+# with a list.
+echo '==== fdwatch pid='^$pid `{date} >> $fdwlog
 
 # rc has no `break', and `sleep' takes whole seconds -- both learned in
 # vts-bash. A flag leaves the loop; the loop ends when the process
@@ -223,7 +254,7 @@ while(~ $running yes){
 	}
 }
 
-echo '==== gone '^`{date} >> $fdwlog
+echo '==== gone' `{date} >> $fdwlog
 echo 'fdwatch: pid '^$pid^' exited after '^$nsamp^' samples; log in '^$fdwlog
 if(~ $nsamp 0){
 	echo 'fdwatch: NO SAMPLES -- the process was gone before the first' >[1=2]

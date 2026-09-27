@@ -2119,6 +2119,30 @@ out), **one `cat` per sample** appended raw, and all the grouping
 moved to a `summarise` that runs once at the end over the log --
 `-s` re-runs just that, so a log can be re-read without re-running
 anything.
+**AND THE THIRD VERSION TOOK 0 SAMPLES TOO, WHICH IS NOW A
+MEASUREMENT RATHER THAN A FAILURE.** The pid was right -- fdwatch
+said 5579 and the kernel's warnings said `bash 5579` -- the loop was
+reached, and `/proc/5579/fd` was **already gone at the first
+`test -e`**. Between the fork and that test an rc script must run
+`date`, `echo` and `test`, each a fork and an exec, and **rc cannot
+read a file without forking at all**. So `run-all` dies in less time
+than three forks, and *no amount of tuning makes an rc loop win
+this*: it is a property of the shell, not of the interval.
+**`ratrace` is therefore the tool now, and the objection to it has
+expired.** It runs the command under control from the first
+instruction, so there is no race:
+`ratrace /bin/bash run-all >[2] /tmp/rt.log`, then the difference
+between `grep -c ' open'` and `grep -c ' close'` is the leak and the
+`open` lines name the paths. It was second before because ratrace on
+a whole suite is unreadable -- **but a run that dies in under a
+second is not a whole suite**, and that is what changed.
+fdwatch keeps its job for the case it was built for: the long
+`mk install` this leak was first seen in.
+**Also fixed there: `^` in rc is a CROSS PRODUCT, not concatenation.**
+`'x'^(a b c)` is `xa xb xc`, and `` `{date} `` is a list of six
+words, so one log line came out as
+`==== fdwatch pid=5579 Sun ==== fdwatch pid=5579 Sep ...`. Pass
+separate arguments to `echo` rather than concatenating with a list.
 Back on dash meanwhile, and the goal is one shell rather than two.
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
