@@ -2684,6 +2684,51 @@ lines instead of an 83-file suite:
 `APEXP_MALLOCMAX=32 /bin/bash /tmp/bli-5.sh`, `ps | grep bash`,
 `acid <pid>`, `stk()`, then `echo kill > /proc/<pid>/ctl`.
 
+**IT RAN, AND "ANY COMMAND SPANNING A NEWLINE" IS REFUTED TOO.**
+
+```
+1  backslash continuation   (lexer)   hi there   returned
+2  a quote across a newline (lexer)   a / b      returned
+3  a { ... } group          (parser)  KILLED
+4  a pipeline broken after| (parser)  hi         returned
+5  if/then/fi               (parser)  KILLED
+```
+
+**Case 4 is the one that carries it.** `echo hi |` then `cat` spans
+a newline, the parser wants another line, and it **returns** -- so
+"the input layer delivering more text mid-command" is cleared as
+well, and so is the lexer's refill (1 and 2). What is left is
+**`{ }` and `if/fi`: a newline token reaching the GRAMMAR inside an
+open COMPOUND command.** In 1, 2 and 4 the newline never becomes a
+token -- the backslash removes it, the quote absorbs it, and bash
+skips newlines after `|`. *Eight mechanisms refuted by measurement
+now, and the reproducer is three lines: `{`, `echo hi`, `}`.*
+**Still open and cheap after the stack**: whether it is the
+RESERVED WORD or the compound command, which a multi-line
+**subshell** `( ... )` would split, since it is compound and not a
+reserved word.
+**AND THE WATCHDOG COULD NEVER HAVE LEFT A BROKEN PROCESS -- note
+semantics, measured.** The limit fired at 33554656 bytes in 72507
+sbrk calls, and then the process was simply GONE: `ps` showed
+nothing, `acid 13576` answered `can't open /proc/13576/text`.
+`abort()` is `kill(getpid(), SIGABRT)`, which posts a note whose
+string is an ordinary word; libap does not handle it, so
+`signal.c:102` reaches `_NOTED(1)` (NDFLT) and **the kernel's
+default for a plain note is to EXIT**. Only a `sys:` note -- a real
+trap -- makes a process break and stay. *So the instrument promised
+a Broken process that its own mechanism could not produce.*
+**`wd_fail` now SLEEPS instead**, printing the pid twice (to attach
+and to kill) and napping for up to fifteen minutes before
+`_EXITS`. Faulting deliberately would also break it, but that puts
+the instrument back on note semantics and on whatever SIGSEGV
+handler the subject has installed; **sleeping removes the question
+-- `acid` attaches to a LIVE process**, which is how `_buf.c:544`
+was found here, and `ps` shows the subject sitting in `Sleep`
+rather than needing to be caught. *Seventh instrument fault.* The
+`_SLEEP`/`_EXITS` prototypes are copied exactly from `sys9.h`
+rather than recalled, since kencc widens an argument only when a
+prototype is visible.
+
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR.
 
