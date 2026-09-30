@@ -8,6 +8,15 @@
 
 extern char **environ;
 
+/*
+ * Prototypes copied EXACTLY from ap/include/sys9.h rather than by
+ * including it: kencc widens an argument at the call site only when a
+ * prototype is visible, so a remembered signature is a corrupted
+ * argument. `_SLEEP' takes a long and `_EXITS' a char*.
+ */
+extern	void	_EXITS(char *);
+extern	int	_SLEEP(long);
+
 Arena __malloc_arena;
 
 /*
@@ -108,7 +117,8 @@ wd_num(char *p, char *e, size_t v)
 static void
 wd_fail(void)
 {
-	char buf[200], *p, *e;
+	char buf[240], *p, *e;
+	int nap;
 
 	/*
 	 * DISARM FIRST, AND THIS LINE IS THE WHOLE FUNCTION'S CORRECTNESS.
@@ -145,14 +155,46 @@ wd_fail(void)
 	p = wd_num(p, e, wd_got);
 	p = wd_str(p, e, " bytes from the break in ");
 	p = wd_num(p, e, (size_t)wd_calls);
-	p = wd_str(p, e, " sbrk calls; aborting so a stack can be taken"
-		" (acid <pid>; stk(); then KILL it -- a Broken process"
-		" keeps its memory)");
+	p = wd_str(p, e, " sbrk calls.  SLEEPING so a stack can be taken:"
+		"  acid ");
+	p = wd_num(p, e, (size_t)getpid());
+	p = wd_str(p, e, "  then stk()  then echo kill > /proc/");
+	p = wd_num(p, e, (size_t)getpid());
+	p = wd_str(p, e, "/ctl");
 	*p++ = '\r';
 	*p++ = '\n';
 	write(2, buf, p - buf);
 
-	abort();
+	/*
+	 * SLEEP RATHER THAN abort(), AND THE REASON IS MEASURED.
+	 *
+	 * The first version called abort(), and the process was simply
+	 * GONE -- `ps' showed nothing and `acid <pid>' answered
+	 * `can't open /proc/13576/text'. Plan 9 note semantics explain
+	 * it exactly: abort() is kill(getpid(), SIGABRT), which posts a
+	 * note whose string is an ordinary word; libap does not handle
+	 * it, so signal.c:102 reaches `_NOTED(1)' (NDFLT), and the
+	 * kernel's default for a plain note is to **EXIT**. Only a note
+	 * beginning `sys:' -- a real trap -- makes a process BREAK and
+	 * stay for a debugger. *So abort() could never have produced
+	 * the Broken process this instrument promised.*
+	 *
+	 * Faulting deliberately would break it, but that puts the
+	 * instrument's correctness back on note semantics and on
+	 * whatever SIGSEGV handler the subject happens to have
+	 * installed. Sleeping removes the question: **`acid` attaches
+	 * to a LIVE process**, which is how `_buf.c:544` was found in
+	 * this tree, and `ps` shows the subject sitting in `Sleep`
+	 * rather than needing to be caught.
+	 *
+	 * Bounded at fifteen minutes so a forgotten run releases its
+	 * memory by itself; the message names the pid twice, once to
+	 * attach and once to kill.
+	 */
+	for(nap = 0; nap < 900; nap++)
+		_SLEEP(1000);
+
+	_EXITS("mallocmax");
 }
 
 /*

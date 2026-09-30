@@ -2495,3 +2495,91 @@ echo kill > /proc/<pid>/ctl     # a Broken process KEEPS its memory
 
 The ladder itself is deliberately unarmed: five armed cases would
 leave five Broken processes holding 32 MB each.
+
+### Not any newline: a newline token inside an open COMPOUND command
+
+```
+1  backslash continuation   (lexer)   hi there   returned
+2  a quote across a newline (lexer)   a / b      returned
+3  a { ... } group          (parser)  KILLED
+4  a pipeline broken after| (parser)  hi         returned
+5  if/then/fi               (parser)  KILLED
+```
+
+**Case 4 carries it.** `echo hi |` followed by `cat` spans a newline,
+the parser genuinely wants another line to finish the command, and it
+**returns**. So "bash's input layer delivering more text while a
+command is open" — last round's conclusion — is cleared too, along
+with the lexer's refill (cases 1 and 2).
+
+What survives is narrow: **`{ }` and `if/fi`**. The difference from
+the three clean cases is what happens to the newline itself:
+
+| | the newline is |
+|---|---|
+| 1 backslash | removed by the lexer |
+| 2 quote | absorbed into the string |
+| 4 after `\|` | skipped — bash eats newlines after `\|` |
+| 3, 5 | **a token the grammar sees**, inside an open compound |
+
+And a one-line compound is fine: `bash-fileladder`'s case 1 was
+`f() { echo hi; }` — a `{ }` group on one line — and it returned.
+
+**Eight mechanisms refuted by measurement**, one run each: descriptor
+leak, copy processes, `wait4`, `pc=0x0`, `read_comsub`, forking, IFS,
+and now both the lexer refill and the parser's "wants another line".
+The reproducer is three lines.
+
+Left open, and cheap once the stack is in hand: whether it is the
+**reserved word** or the **compound command**. A multi-line subshell
+`( ... )` splits them — compound, but no reserved word.
+
+### The watchdog could never have left a Broken process
+
+The limit fired exactly as designed:
+
+```
+libap: APEXP_MALLOCMAX exceeded: 33554656 bytes from the break in
+72507 sbrk calls; aborting so a stack can be taken
+```
+
+and then the process was **gone**. `ps | grep bash` showed only the
+interactive shell and its copy process; `acid 13576` answered
+`can't open /proc/13576/text: file does not exist`.
+
+Plan 9 note semantics account for it exactly, and the code is three
+lines:
+
+- `abort()` is `kill(getpid(), SIGABRT)` (`stdlib/abort.c:8`);
+- that posts a note whose string is an ordinary word;
+- libap does not handle it, so `signal/signal.c:102` reaches
+  `_NOTED(1)` — NDFLT;
+- **the kernel's default for a plain note is to EXIT.** Only a note
+  beginning `sys:` — a real trap — makes a process *break* and stay
+  for a debugger.
+
+So the instrument promised a Broken process that its own mechanism
+could not produce. The earlier `fault read addr=0x2e` stack existed
+only because that was a genuine `sys: trap:` note.
+
+**`wd_fail` now sleeps instead.** It disarms, prints the message with
+the pid twice — once to attach, once to kill — and naps for up to
+fifteen minutes before `_EXITS`.
+
+Faulting on purpose (`*(int*)0 = 0`) would also break the process, and
+was the obvious alternative. Sleeping is better for a reason worth
+keeping: **it removes note semantics from the instrument altogether.**
+A deliberate fault still depends on NDFLT behaving as expected and on
+whatever SIGSEGV handler the subject happens to have installed —
+exactly the class of assumption that just cost a round. `acid`
+attaches to a *live* process perfectly well; that is how `_buf.c:544`
+was found in this tree. And `ps` shows the subject sitting in `Sleep`
+instead of having to be caught in flight.
+
+The fifteen-minute bound is so a forgotten run releases its memory by
+itself. The `_SLEEP` and `_EXITS` prototypes are copied character for
+character out of `ap/include/sys9.h` rather than recalled, because
+kencc widens an argument at the call site only when a prototype is
+visible — a remembered signature is a corrupted argument.
+
+*Seventh time the instrument has been the visible fault.*
