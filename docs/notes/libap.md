@@ -2583,3 +2583,66 @@ kencc widens an argument at the call site only when a prototype is
 visible — a remembered signature is a corrupted argument.
 
 *Seventh time the instrument has been the visible fault.*
+
+### The stack, at last: the LEXER hands the parser endless WORDs
+
+The sleeping watchdog did its job — `ps` showed `33540K Sleep bash`,
+`acid <pid>` attached to a live process, and `stk()` gave:
+
+```
+_SLEEP(a0=0x3e8)+0xe                  ap/syscall/_SLEEP.s:6
+wd_fail()+0x19e                       ap/malloc/malloc.c:195
+_malloc_brk(n=0x1e0)+0x65             ap/malloc/malloc.c:261
+malloc()+0xe7                         ap/malloc/malloc.c:361
+xmalloc(bytes=0x10)+0xe               external/bash/xmalloc.c:104
+make_word_list(word=0x247a760, wlink=0x247a730)+0x55   make_cmd.c:156
+make_simple_command(command=0x489370, line=0x2, element=0x247a760)+0x4a
+                                      make_cmd.c:488
+yyparse()+0x1c13                      y.tab.c:2629
+parse_command()+0x5d                  eval.c:369
+read_command()+0x92                   eval.c:414
+reader_loop()+0xe9                    eval.c:147
+main(argc=0x2, ...)                   shell.c:836
+```
+
+**`y.tab.c:2629` is inside case 62:**
+
+```c
+  case 62: /* simple_command: simple_command simple_command_element */
+      (yyval.command) = make_simple_command ((yyvsp[0].element),
+                                             (yyvsp[-1].command), line_number);
+```
+
+— the rule that appends *another word* to an existing simple command.
+Case 61 is the same call with `(COMMAND *)NULL` for the command, and
+the frame shows `command=0x489370`, **non-null**, so the sample is
+unambiguously case 62.
+
+**Therefore `yylex` is returning an endless stream of WORD tokens.**
+The parser is behaving correctly: given word after word it keeps
+extending one simple command, allocating a `WORD_LIST` node each time.
+`xmalloc(bytes=0x10)` is 16 bytes — `sizeof(WORD_LIST)`, two pointers
+— which is exactly the `<= 16 byte` size class derived from the
+`sbrk` deltas in the ratrace log.
+
+**Those two routes are genuinely independent**, which the last
+"convergence" was not: one is arithmetic over break steps in a dead
+process, the other an argument in a live frame. Nothing downstream
+links them.
+
+**Calibration.** Three rounds ago, reasoning from the `ifs_value`
+fault, I wrote that the storm would be *"millions of words — and
+every word is a retained `WORD_DESC` plus `WORD_LIST` node, small and
+never freed"*. The **object** was right and the **producer** was
+wrong: `list_string` versus the parser. *Predicting the artefact
+correctly is not predicting the code that makes it*, and the two
+should be scored separately.
+
+**So the subject is now the lexer**, and it has to explain a very
+specific shape: endless WORDs when a compound command spans a
+newline in a file, and clean termination for a backslash
+continuation, a quote across a newline, a dangling `|`, and every
+one-line command. `shell_getc` (`parse.y:2475`) and the buffered
+reader in `input.c` are the two places left, and the lexer's line
+state is all `size_t` (`shell_input_line_index`, `_len`, `_size`) with
+`shell_input_line_terminator` an `int`.

@@ -2729,6 +2729,44 @@ rather than needing to be caught. *Seventh instrument fault.* The
 rather than recalled, since kencc widens an argument only when a
 prototype is visible.
 
+**AND THE SLEEPING WATCHDOG WORKED: `33540K Sleep bash`, `acid`
+attached, FULL STACK.**
+
+```
+_SLEEP(a0=0x3e8)                      syscall/_SLEEP.s:6
+wd_fail()                             malloc.c:195
+_malloc_brk(n=0x1e0)                  malloc.c:261
+malloc()                              malloc.c:361
+xmalloc(bytes=0x10)                   bash/xmalloc.c:104
+make_word_list(word=.., wlink=..)     bash/make_cmd.c:156
+make_simple_command(command=0x489370, line=0x2, element=..)  make_cmd.c:488
+yyparse()+0x1c13                      y.tab.c:2629
+parse_command() / read_command() / reader_loop() / main
+```
+
+**`y.tab.c:2629` is inside case 62, `simple_command: simple_command
+simple_command_element`** -- the rule that appends ANOTHER WORD to
+an existing simple command. Case 61 is the same call with
+`(COMMAND *)NULL`, and the frame's `command=0x489370` is non-null,
+**so it is case 62 and not 61**.
+**So the parser is appending word after word to one simple command
+for ever, which means `yylex` is returning an ENDLESS STREAM OF
+WORD TOKENS.** The parser is doing exactly the right thing with the
+tokens it is handed; **the bug is in the LEXER**, and every
+allocation is a 16-byte `WORD_LIST` node.
+**`xmalloc(bytes=0x10)` is `sizeof(WORD_LIST)` exactly** -- two
+pointers -- which is the `<= 16 bytes` class the ratrace break
+steps predicted. *Those two routes really are independent*: one is
+arithmetic over `sbrk` deltas in a dead process, the other a live
+frame's argument. Unlike the `ifs_value` "convergence", neither is
+downstream of the other.
+**Calibration worth keeping**: the `ifs_value` reading got the
+OBJECT right -- "every word is a retained `WORD_DESC` plus
+`WORD_LIST` node, small and never freed" -- and the PRODUCER wrong,
+naming `list_string` where it is the parser. *A correct prediction
+about the artefact is not a correct prediction about the code that
+makes it.*
+
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR.
 
