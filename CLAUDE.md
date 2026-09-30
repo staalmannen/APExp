@@ -212,6 +212,12 @@ and has to be: it asks whether *bash* leaks a descriptor per fork,
 so the thing under test is the shell itself. Run it with
 `/bin/bash bash-fdloop-test.sh`; it is correct on glibc too, where
 it reports 5 descriptors flat.
+**`bash-comsub-test.sh` is the second, and is a BISECT rather than a
+test**: ten sections of bash's own `run-all` lines 17-27, each
+writing a durable marker to `/tmp/comsub.log` before the statement it
+runs, so the log's last line names the statement that did not return.
+It asserts nothing and has no failure count -- *read the log, not the
+exit status*. All ten return on glibc in 13ms.
 **`truefalse-test.c` is the one NATIVE test in this directory** --
 `6c`/`6l`, not `pcc` -- and it has to be, because APE's `<stdbool.h>`
 `#define`s `true`/`false` to 1 and 0, so an APE build never reaches
@@ -2255,6 +2261,133 @@ the fix.
 **Why it survived**: the failure arrives only at the 27th, so a
 program making a handful of temporaries is fine for ever and one
 making dozens dies.
+**CONFIRMED ON THE VM**: `_tempmark = 1`, 5 of 5, 0 failures.
+
+**THE BASH FAILURE IS NOT A DESCRIPTOR LEAK. IT IS MALLOC, AND THE
+HISTOGRAM SAYS SO IN ONE LINE.** Over the whole 3.4-million-line
+ratrace log:
+
+```
+3456769 Brk          447 Close       142 Open
+    251 Dup          160 Pread        86 Stat
+     58 Create        56 Pwrite        2 Rfork      1 Exec
+```
+
+**142 opens and 251 dups against 447 closes** -- it closes MORE than
+it opens, so there is no descriptor leak at all, and every round of
+this hunt was chasing one. **`Brk` outnumbers everything else by four
+orders of magnitude.**
+**And `2 Rfork`, `1 Exec`: the process died before the suite ran a
+single test**, so the storm is the whole run rather than something
+the tests provoked.
+**THE KERNEL'S fd WARNINGS ARE ALMOST CERTAINLY NOT A LEAK EITHER.**
+bash's `move_to_high_fd()` dups its internal bookkeeping descriptors
+up near the reported limit, and Plan 9's fd *table* grows to the
+highest index used -- so 251 dups give `exceeds 100/200 file
+descriptors` with a handful of files actually open. That is why the
+warnings arrive **before the script's first line**: it is bash
+starting up, not the script leaking. *Two warnings printed together
+are not one story, and I treated them as one for six rounds.*
+**THE ARITHMETIC NAMES THE SIZE CLASS.** `_malloc_brk` does
+`sbrk(0)` then `sbrk(gap+n)` -- **two Brk syscalls per call**, which
+is why the log shows each address twice. So ~1.73M allocations. The
+break moves ~480 bytes each, and with `CUTOFF = 12` and
+`BLKSZ(pow) = 32 + 2^pow` batched `(CUTOFF-pow)+2` at a time, **pow 4
+gives 48 x 10 = 480 exactly**. So these are allocations of **<= 16
+bytes, ten per sbrk pair: about 17 million tiny objects, none
+freed.**
+**THE DEATH IS A JUMP TO ZERO, AND IT IS THE CONSEQUENCE RATHER THAN
+THE EVENT.** The last non-`Brk` lines:
+
+```
+5878 bash Exits ... = process exited            <- the $( ) child
+5875 bash Await ... "5878 0 0 40 ''" = 14       <- parent reaps it
+5875 bash Pread ... 255 ... ".BASH_TSTOUT=${TMPDIR}/..." = 1149
+5875 bash Stat  ... "/proc/5875/wait"    (x3)
+5875 bash Noted 2d10a7 1 = 0
+bash 5875: suicide: sys: trap: fault read addr=0x0 pc=0x0
+```
+
+**`pc=0x0` is a JUMP to address zero** -- a call through a null
+function pointer, not a bad data pointer -- and `Noted 1` is
+`noted(NDFLT)`, libap's note handler returning, immediately before
+it. Plan 9's `Insufficient physical memory` **is a note**, so the
+order reads: memory exhausted -> kernel posts the note -> libap's
+handler runs -> control goes to 0. *The crash is downstream of the
+storm; do not chase `pc=0` as the bug.*
+**`fd 255` is bash reading its own script** -- which is also the
+`move_to_high_fd` that explains the descriptor warnings.
+**`wait4`'s WNOHANG path allocates (`_dirstat`) but is NOT the
+storm**: the trace shows THREE stats of `/proc/5875/wait`, not
+millions. *It does hold a real bug, recorded not measured*: when
+`_dirstat` returns nil it falls through to the **blocking** `_WAIT()`
+with `WNOHANG` set, and the same happens when the pending message
+belongs to a different pid.
+**THE LINE NUMBERS LOCALISED IT TO ONE BURST, AND EXCLUDED EVERY I/O
+MECHANISM.** `grep -n -v ' Brk ' /tmp/rt.log | tail -40`:
+
+```
+   1581:5875 bash Stat ... "/proc/5875/wait" = 71
+3458015:5875 bash Noted 2d10a7 1 = 0
+3458016:bash 5875: suicide: fault read addr=0x0 pc=0x0
+```
+
+**3458015 - 1581 = 3456434 of the 3456769 `Brk` lines -- 99.99% -- in
+a SINGLE gap**, so the storm is one event rather than something
+accumulating across the run. The prediction written before the grep
+(gap opens after the `Pread` of fd 255, closes at the `Noted`) held,
+and its refutation condition (a gap before the `Await`, which would
+have put `wait4` back in frame) did not fire.
+**And the gap contains NO SYSCALL OF ANY KIND**, which is an
+exclusion rather than a detail: a spinning READ loop would show
+`Pread`, a spinning WAIT loop `Await`/`Stat`, a create/retry loop
+`Open`/`Create`. None appear. So the loop is pure computation holding
+~17M objects of <= 16 bytes.
+**`read_comsub` is refuted by that same fact** -- it calls `zread`
+every iteration and grows by doubling `realloc`, so a loop there
+would show `Pread` lines. Five mechanisms argued from source now,
+five refuted by the log.
+**malloc and free are NOT at fault, checked rather than assumed**:
+`free()` pushes straight onto `btab[size]` so the free list does
+refill, `BLKSZ(4)=48` and `(CUTOFF-4)+2 = 10` give the observed 480
+exactly, and the batching loop links all nine spare blocks
+correctly. The 17 million objects are genuinely live. It is a bash
+loop, and the trace places it after line 21's `$( )` child was
+reaped -- line 1563 shows that child writing `"30465"` to fd 1, so
+it RAN AND SUCCEEDED.
+**AND THAT IS WHY SIX ROUNDS FOUND NOTHING: `Insufficient physical
+memory` IS A KILL.** The kernel destroys the process, so there is no
+stack to take and nothing for `acid` to attach to -- every round of
+this hunt examined a corpse the kernel had already disposed of, and
+the only evidence available was a trace of the one syscall the loop
+happened to make. **Two instruments now, and neither needs the
+other:**
+- **`sys/lib/tests/bash-comsub-test.sh`** bisects run-all's lines
+  17-27 into ten sections, each writing a durable marker to
+  `/tmp/comsub.log` *before* the statement it runs, so **the last
+  line names the statement that did not return**. Simplest first,
+  every case expected to return ahead of every case expected to
+  hang. Nothing in it forks but the sections about forking -- `echo`
+  plus `>>` is a builtin and a redirection, the mistake `fdwatch`
+  and `bash-fdloop-test` each made twice. glibc: all ten ok in 13ms.
+- **`$APEXP_MALLOCMAX` (megabytes), a heap watchdog in
+  `malloc/malloc.c`.** Abort EARLY, while the machine is healthy:
+  `APEXP_MALLOCMAX=64` breaks the process after 64 MB instead of
+  ~800, leaving it Broken rather than gone, and `acid <pid>` then
+  `stk()` names the calling function -- how gnulib's self-recursive
+  `strerror` and `_buf.c:544` were both settled after source reading
+  failed on them. Counts **both** sbrk sites: `_malloc_growtop` has
+  the same two-`Brk` signature as `_malloc_brk`, so a trace cannot
+  tell them apart and a watchdog watching one could report a flat
+  heap while the break ran away. Safe from inside the allocator --
+  `getenv` is a plain scan of `environ` and allocates nothing, and
+  `write(2)` with a hand-rolled number is `_apdbg`'s idiom for the
+  same reason; `wd_fail` unlocks the arena before `abort()`, since
+  aborting under our own lock would hang where a break was wanted.
+  Off unless set, at one load and one branch per sbrk.
+*The general shape, and it is new: a failure mode that KILLS leaves
+nothing to measure, so the instrument's job is to fail earlier and
+more politely than the kernel does.*
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR.
