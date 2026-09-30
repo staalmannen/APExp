@@ -2567,6 +2567,49 @@ returns and writes its log, the failure has stopped reproducing and
 the whole reading above is about a bug that is no longer there,
 which is worth knowing at once rather than after another reduction.
 
+**IT RAN, AND THE FORK HYPOTHESIS IS REFUTED -- CASE 5 ALONE
+STORMS.**
+
+```
+1  -c with an EXTERNAL echo        hi            returned
+2  -c with a COMMAND SUBSTITUTION  hi            returned
+3  a FILE with an external echo    hi            returned
+4  a FILE with a substitution      hi            returned
+5  bash-comsub-test.sh's opening   KILLED, no log
+```
+
+The refutation condition was written down and it fired: 1 to 4
+fork, exec, build a pipe, read a child's output and reap it, from
+`-c` and from a file, and **every one came back**. *Four mechanisms
+cleared in a single run, which is what a ladder is for -- and case
+5 still dying is what says the bug has not evaporated under us.*
+**So it is what case 5 has and case 4 has not**: an external command
+taking a VARIABLE-expanded argument, a function DEFINITION, a
+function CALL, a `>>` redirection inside a function, and **`"$*"`**.
+**`$*` IS THE SUSPECT, AND THE REASON IS NOT TASTE: it is the one
+construct in case 5 that reads IFS.** It joins the positional
+parameters with IFS's first character through
+`string_list_dollar_star` (`subst.c:2900`), which reads
+`ifs_firstc`/`ifs_firstc_len`; nothing in cases 1 to 4 touches IFS
+at all. **And that is where the single stack this hunt has produced
+already pointed** -- `fault read addr=0x2e` in `list_string` on
+`s = ifs_value`, with `ifs_value` holding `'.'`. *Two independent
+lines arriving at IFS from opposite directions -- a stack that
+faulted on it, and a ladder whose only storming case is the only
+one that reads it -- and the convergence is worth more than either
+alone.* It also makes the unsettled provenance of that stack much
+less important.
+**`rc/bin/bash-ifsladder` splits case 5 into its five parts**, IFS
+last: `${#IFS}` as a **direct probe** (pure builtin, and a healthy
+bash answers **3**), an external with a variable argument, a
+function definition, a definition plus call, a `>>` inside a
+function, then `"$@"` and `"$*"` at top level, then case 5 again
+unchanged. **`$@` is asked beside `$*` deliberately**: they differ
+in exactly the thing under suspicion, since `$*` JOINS with IFS's
+first character and `$@` does not join at all -- *asking only one
+would leave a negative result with two explanations*. All eight
+return on glibc and case 1 answers 3.
+
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR.
 
