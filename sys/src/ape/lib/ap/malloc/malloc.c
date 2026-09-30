@@ -1,11 +1,132 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <lock.h>
 #include "malloc_impl.h"
 
 Arena __malloc_arena;
+
+/*
+ * ------------------------------------------------------------------
+ * THE HEAP WATCHDOG: $APEXP_MALLOCMAX, in megabytes. Off unless set.
+ *
+ * WHY IT EXISTS. bash could not become /bin/sh here because it died
+ * `Killed: Insufficient physical memory'. `ratrace' over one run gave
+ * 3458016 lines, and numbering the non-Brk ones put 3456434 of the
+ * 3456769 Brk lines -- 99.99% -- in ONE uninterrupted gap containing
+ * no other system call at all. Two Brk per _malloc_brk, the break
+ * stepping ~480 bytes, and BLKSZ(4)*((CUTOFF-4)+2) = 48*10 = 480
+ * exactly: about 17 million live allocations of <= 16 bytes.
+ *
+ * **AND THAT IS WHERE EVERY ROUND OF THAT HUNT STOPPED, BECAUSE
+ * `Insufficient physical memory' IS A KILL.** The kernel destroys the
+ * process, so there is no stack to take and nothing for `acid' to
+ * attach to -- six rounds were spent examining a corpse the kernel
+ * had already disposed of, and the only evidence available was a
+ * 272 MB trace of the one syscall the loop happened to make.
+ *
+ * So: abort EARLY, while the machine is still healthy. With
+ * APEXP_MALLOCMAX=64 a runaway breaks after 64 MB instead of after
+ * 800, the process is Broken rather than gone, and
+ *
+ *	acid <pid>
+ *	stk()
+ *
+ * names the calling function -- which is how gnulib's self-recursive
+ * `strerror' and _buf.c:544 were both settled after source reading
+ * had failed on them.
+ *
+ * SAFE TO CALL FROM HERE. getenv() is a plain scan of `environ' and
+ * allocates nothing (ap/env/getenv.c), and write(2) with a
+ * hand-rolled number is the same idiom plan9/_apdbg.c uses for
+ * exactly this reason. Nothing on this path can re-enter malloc.
+ *
+ * Cost when off: one load and one branch per sbrk, which is already
+ * two system calls.
+ */
+static size_t	wd_got;		/* bytes taken from the break so far */
+static size_t	wd_max;		/* 0 means off */
+static long	wd_calls;
+static int	wd_init;
+
+static char *
+wd_str(char *p, char *e, const char *s)
+{
+	while(*s && p < e)
+		*p++ = *s++;
+	return p;
+}
+
+static char *
+wd_num(char *p, char *e, size_t v)
+{
+	char n[24];
+	int i;
+
+	i = 0;
+	do {
+		n[i++] = '0' + (int)(v%10);
+		v /= 10;
+	} while(v != 0 && i < (int)sizeof n);
+	while(i > 0 && p < e)
+		*p++ = n[--i];
+	return p;
+}
+
+/*
+ * Called with the arena LOCKED, and it unlocks before aborting.
+ * abort() runs the signal machinery, which may allocate; doing that
+ * under our own lock would deadlock and give a hang where a break was
+ * wanted. The process is dying either way, so releasing the arena
+ * first costs nothing and keeps the failure legible.
+ */
+static void
+wd_fail(void)
+{
+	char buf[200], *p, *e;
+
+	unlock(&__malloc_arena);
+
+	p = buf;
+	e = buf + sizeof buf - 2;
+	p = wd_str(p, e, "libap: APEXP_MALLOCMAX exceeded: ");
+	p = wd_num(p, e, wd_got);
+	p = wd_str(p, e, " bytes from the break in ");
+	p = wd_num(p, e, (size_t)wd_calls);
+	p = wd_str(p, e, " sbrk calls; aborting so a stack can be taken"
+		" (acid <pid>; stk())");
+	*p++ = '\r';
+	*p++ = '\n';
+	write(2, buf, p - buf);
+
+	abort();
+}
+
+/* Returns non-zero when the limit has been passed. */
+static int
+wd_note(size_t n)
+{
+	const char *s;
+	size_t v;
+
+	if(wd_init == 0){
+		wd_init = 1;
+		s = getenv("APEXP_MALLOCMAX");
+		if(s != 0){
+			v = 0;
+			while(*s >= '0' && *s <= '9')
+				v = v*10 + (size_t)(*s++ - '0');
+			wd_max = v * 1024 * 1024;
+		}
+	}
+	if(wd_max == 0)
+		return 0;
+	wd_calls++;
+	wd_got += n;
+	return wd_got > wd_max;
+}
 
 /*
  * Take n bytes from the break, 16-aligned. See malloc_impl.h for why
@@ -26,6 +147,8 @@ _malloc_brk(size_t n)
 	p = sbrk(gap + n);
 	if(p == (void*)-1)
 		return nil;
+	if(wd_note(gap + n))
+		wd_fail();
 	return p + gap;
 }
 
@@ -77,6 +200,15 @@ _malloc_growtop(Bucket *bp, int pow)
 	&& sbrk(want - have) != (void*)-1){
 		bp->size = pow;
 		ok = 1;
+		/*
+		 * The OTHER sbrk site, and it must be counted too: it has
+		 * the same two-Brk signature as _malloc_brk, so a trace
+		 * cannot tell the two apart and a watchdog that watched
+		 * only one could report a flat heap while the break ran
+		 * away. wd_fail unlocks for itself.
+		 */
+		if(wd_note(want - have))
+			wd_fail();
 	}
 	unlock(&__malloc_arena);
 

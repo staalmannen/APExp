@@ -1762,3 +1762,143 @@ keep the greedy behaviour and are untouched by the `FD_ISTTY` gate.
 Tcl's suite is where those live, and it has not been re-run since.
 That is the honest gap, and it is a cheap one to close the next time
 the suite runs.
+
+## malloc/ — the heap watchdog, and what the bash Brk storm is not
+
+`$APEXP_MALLOCMAX`, in megabytes, off unless set. It exists because
+of the bash-as-`/bin/sh` failure, and the reason it is a *library*
+change rather than a bash one is worth stating first.
+
+### The log localised the storm to one burst, and excluded every I/O mechanism
+
+`ratrace /bin/bash run-all >[2] /tmp/rt.log` gave 3458016 lines.
+Numbering the non-`Brk` ones — `grep -n -v ' Brk ' /tmp/rt.log |
+tail -40` — put the whole storm in one place:
+
+```
+   1581:5875 bash Stat 265107 ... "/proc/5875/wait" ... = 71
+3458015:5875 bash Noted 2d10a7 1 = 0
+3458016:bash 5875: suicide: sys: trap: fault read addr=0x0 pc=0x0
+```
+
+`3458015 - 1581 = 3456434`, against 3456769 `Brk` lines in the whole
+run. **99.99% of the storm is a single uninterrupted burst**, so it is
+one event and not something accumulating over the suite. That alone
+retires the "leak with a shape" framing that six rounds used.
+
+The prediction was written before the grep: the gap would open after
+the `Pread` of fd 255 and close at the `Noted`, and a gap sitting
+*before* the `Await` would put `wait4`'s WNOHANG path back in frame.
+Line 1580 is that `Pread`, 1573 is the `Await`, and the gap opens
+after both. Confirmed; refutation did not fire.
+
+**The stronger fact is what the gap does NOT contain: any system call
+at all.** That is an exclusion rather than a description —
+
+| a loop that... | would show | appears? |
+|---|---|---|
+| spins on a read | `Pread` | no |
+| spins waiting for a child | `Await`, `Stat` | no |
+| retries a create | `Open`, `Create` | no |
+
+so the loop is pure computation. It allocates and never frees, and
+makes no syscall but the allocator's own.
+
+**`read_comsub` is refuted by that same fact**, which matters because
+it was the obvious next suspect: `subst.c:6680` calls `zread` on every
+buffer refill and grows `istring` with `RESIZE_MALLOCED_BUFFER`
+(doubling `realloc`). A loop there shows `Pread` lines and a handful
+of large allocations. Neither is present. **Five mechanisms have now
+been argued from source in this hunt — a descriptor leak, `_buf.c`'s
+copy processes, `wait4`'s `_dirstat`, `pc=0x0`, `read_comsub` — and
+the log has refuted all five.**
+
+### malloc and free were CHECKED, not assumed innocent
+
+- `free()` (`malloc/free.c:31`) sets `magic = 0` and pushes the block
+  straight onto `btab[bp->size]`, so the free list does refill. There
+  is no path by which a freed small block fails to come back.
+- The size class is measured, not guessed: `sizeof(Bucket)` is 24, so
+  `BLKSZ(4) = (24+16+15) & ~15 = 48`, and `n = (CUTOFF-4)+2 = 10`
+  gives `48 * 10 = 480` — exactly the step the trace shows the break
+  taking. Two `Brk` per `_malloc_brk` (`sbrk(0)` then `sbrk(gap+n)`),
+  so ~1.73M calls, ten objects each: **about 17 million live
+  allocations of ≤ 16 bytes.**
+- The batching loop links all nine spare blocks correctly (`nbp`
+  walks blocks 1..9, block 0 is returned and gets its `size`/`magic`
+  after the unlock).
+
+So the allocator is doing what it is told. The objects are genuinely
+live and it is a bash loop. The trace places it after `run-all`'s line
+21 — line 1563 shows the `$( )` child writing `"30465"` to fd 1, which
+is `$RANDOM + $BASHPID`, so **the child ran and succeeded**; whatever
+loops is in the parent, after the reap.
+
+### Why six rounds found nothing: `Insufficient physical memory` is a KILL
+
+This is the part worth keeping regardless of what the bash bug turns
+out to be. The kernel *destroys* the process — there is no stack to
+take, nothing for `acid` to attach to, no core. Every round of this
+hunt was an examination of a corpse the kernel had already disposed
+of, and the only evidence obtainable was a 272 MB trace of the one
+syscall the loop happened to make.
+
+**So the instrument's job is to fail earlier and more politely than
+the kernel does.** With `APEXP_MALLOCMAX=64` a runaway breaks after
+64 MB instead of ~800, the process is *Broken* rather than gone, and
+
+```
+acid <pid>
+stk()
+```
+
+names the calling function. That is exactly how gnulib's
+self-recursive `strerror` and `_buf.c:544` were both settled after
+source reading had failed on them.
+
+### The implementation, and the three things it has to get right
+
+1. **It counts BOTH sbrk sites.** `_malloc_growtop` does `sbrk(0)`
+   then `sbrk(want-have)` — the same two-`Brk` signature as
+   `_malloc_brk` — so a trace cannot tell them apart, and a watchdog
+   watching only one could report a flat heap while the break ran
+   away. Same family as *a measurement of the wrong process is not a
+   null result, it is a false one*.
+2. **Nothing on the path can re-enter malloc.** `getenv` is a plain
+   scan of `environ` (`ap/env/getenv.c` — no allocation, checked
+   rather than assumed), and the message is built with a hand-rolled
+   `wd_num` and written with `write(2, ...)`, which is
+   `plan9/_apdbg.c`'s idiom for this exact reason. The `\r\n` is
+   there for `_apdbg`'s reason too: since `tcsetattr` started
+   working, fd 2 is often a raw terminal.
+3. **`wd_fail` unlocks the arena before `abort()`.** `_malloc_brk` is
+   called with `__malloc_arena` held; `abort()` runs the signal
+   machinery, which may allocate, and doing that under our own lock
+   would deadlock — giving a *hang* where a *break* was wanted. The
+   process is dying either way, so releasing it first costs nothing.
+
+Off unless set: one load and one branch per sbrk, next to two system
+calls. Verified on the host by extracting the block into a standalone
+program — clean under `-Wall -Wextra`, fires on the 65th MB with a
+64 MB limit, and `wd_calls = 0` after 3000 calls with the variable
+unset.
+
+### `sys/lib/tests/bash-comsub-test.sh`, the cheap half
+
+The watchdog needs a rebuild; the bisect does not. Ten sections of
+`run-all`'s lines 17–27, each writing a durable marker to
+`/tmp/comsub.log` **before** the statement it is about to run, so the
+last line in the log names the statement that did not return. Ordered
+simplest first, because *every case expected to return must come
+before every case expected to hang*.
+
+It forks nothing except in the sections that are about forking —
+`echo` is a builtin and `>>` a redirection. That is deliberate: the
+same instrument-perturbs-subject mistake was made by `fdwatch` (six
+forks per sample against a subject that lived under a second), by
+`bash-fdloop-test`'s `expr` counter, and by the same file's `wc -l`
+inside `$( )` *in a test about what forking costs*. Three times in
+one investigation.
+
+All ten sections return on glibc in 13 ms, which is what makes a
+stall on 9front attributable.

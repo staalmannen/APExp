@@ -212,6 +212,12 @@ and has to be: it asks whether *bash* leaks a descriptor per fork,
 so the thing under test is the shell itself. Run it with
 `/bin/bash bash-fdloop-test.sh`; it is correct on glibc too, where
 it reports 5 descriptors flat.
+**`bash-comsub-test.sh` is the second, and is a BISECT rather than a
+test**: ten sections of bash's own `run-all` lines 17-27, each
+writing a durable marker to `/tmp/comsub.log` before the statement it
+runs, so the log's last line names the statement that did not return.
+It asserts nothing and has no failure count -- *read the log, not the
+exit status*. All ten return on glibc in 13ms.
 **`truefalse-test.c` is the one NATIVE test in this directory** --
 `6c`/`6l`, not `pcc` -- and it has to be, because APE's `<stdbool.h>`
 `#define`s `true`/`false` to 1 and 0, so an APE build never reaches
@@ -2317,12 +2323,71 @@ millions. *It does hold a real bug, recorded not measured*: when
 `_dirstat` returns nil it falls through to the **blocking** `_WAIT()`
 with `WNOHANG` set, and the same happens when the pending message
 belongs to a different pid.
-**NEXT, AND IT NEEDS NO RE-RUN**:
-`grep -n -v ' Brk ' /tmp/rt.log | tail -40`. The LINE NUMBERS say
-which inter-event gap holds the 3.4 million `Brk` lines, which names
-the call site without another guess. *Four mechanisms have been
-guessed from source in this hunt and the log has out-argued every
-one of them.*
+**THE LINE NUMBERS LOCALISED IT TO ONE BURST, AND EXCLUDED EVERY I/O
+MECHANISM.** `grep -n -v ' Brk ' /tmp/rt.log | tail -40`:
+
+```
+   1581:5875 bash Stat ... "/proc/5875/wait" = 71
+3458015:5875 bash Noted 2d10a7 1 = 0
+3458016:bash 5875: suicide: fault read addr=0x0 pc=0x0
+```
+
+**3458015 - 1581 = 3456434 of the 3456769 `Brk` lines -- 99.99% -- in
+a SINGLE gap**, so the storm is one event rather than something
+accumulating across the run. The prediction written before the grep
+(gap opens after the `Pread` of fd 255, closes at the `Noted`) held,
+and its refutation condition (a gap before the `Await`, which would
+have put `wait4` back in frame) did not fire.
+**And the gap contains NO SYSCALL OF ANY KIND**, which is an
+exclusion rather than a detail: a spinning READ loop would show
+`Pread`, a spinning WAIT loop `Await`/`Stat`, a create/retry loop
+`Open`/`Create`. None appear. So the loop is pure computation holding
+~17M objects of <= 16 bytes.
+**`read_comsub` is refuted by that same fact** -- it calls `zread`
+every iteration and grows by doubling `realloc`, so a loop there
+would show `Pread` lines. Five mechanisms argued from source now,
+five refuted by the log.
+**malloc and free are NOT at fault, checked rather than assumed**:
+`free()` pushes straight onto `btab[size]` so the free list does
+refill, `BLKSZ(4)=48` and `(CUTOFF-4)+2 = 10` give the observed 480
+exactly, and the batching loop links all nine spare blocks
+correctly. The 17 million objects are genuinely live. It is a bash
+loop, and the trace places it after line 21's `$( )` child was
+reaped -- line 1563 shows that child writing `"30465"` to fd 1, so
+it RAN AND SUCCEEDED.
+**AND THAT IS WHY SIX ROUNDS FOUND NOTHING: `Insufficient physical
+memory` IS A KILL.** The kernel destroys the process, so there is no
+stack to take and nothing for `acid` to attach to -- every round of
+this hunt examined a corpse the kernel had already disposed of, and
+the only evidence available was a trace of the one syscall the loop
+happened to make. **Two instruments now, and neither needs the
+other:**
+- **`sys/lib/tests/bash-comsub-test.sh`** bisects run-all's lines
+  17-27 into ten sections, each writing a durable marker to
+  `/tmp/comsub.log` *before* the statement it runs, so **the last
+  line names the statement that did not return**. Simplest first,
+  every case expected to return ahead of every case expected to
+  hang. Nothing in it forks but the sections about forking -- `echo`
+  plus `>>` is a builtin and a redirection, the mistake `fdwatch`
+  and `bash-fdloop-test` each made twice. glibc: all ten ok in 13ms.
+- **`$APEXP_MALLOCMAX` (megabytes), a heap watchdog in
+  `malloc/malloc.c`.** Abort EARLY, while the machine is healthy:
+  `APEXP_MALLOCMAX=64` breaks the process after 64 MB instead of
+  ~800, leaving it Broken rather than gone, and `acid <pid>` then
+  `stk()` names the calling function -- how gnulib's self-recursive
+  `strerror` and `_buf.c:544` were both settled after source reading
+  failed on them. Counts **both** sbrk sites: `_malloc_growtop` has
+  the same two-`Brk` signature as `_malloc_brk`, so a trace cannot
+  tell them apart and a watchdog watching one could report a flat
+  heap while the break ran away. Safe from inside the allocator --
+  `getenv` is a plain scan of `environ` and allocates nothing, and
+  `write(2)` with a hand-rolled number is `_apdbg`'s idiom for the
+  same reason; `wd_fail` unlocks the arena before `abort()`, since
+  aborting under our own lock would hang where a break was wanted.
+  Off unless set, at one load and one branch per sbrk.
+*The general shape, and it is new: a failure mode that KILLS leaves
+nothing to measure, so the instrument's job is to fail earlier and
+more politely than the kernel does.*
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR.
