@@ -6,6 +6,8 @@
 #include <lock.h>
 #include "malloc_impl.h"
 
+extern char **environ;
+
 Arena __malloc_arena;
 
 /*
@@ -38,10 +40,31 @@ Arena __malloc_arena;
  * `strerror' and _buf.c:544 were both settled after source reading
  * had failed on them.
  *
- * SAFE TO CALL FROM HERE. getenv() is a plain scan of `environ' and
- * allocates nothing (ap/env/getenv.c), and write(2) with a
- * hand-rolled number is the same idiom plan9/_apdbg.c uses for
- * exactly this reason. Nothing on this path can re-enter malloc.
+ * THE LIMIT IS READ FROM _apemain, NOT FROM IN HERE, AND THE FIRST
+ * VERSION OF THIS FILE BROKE EVERY APE PROGRAM BY GETTING THAT
+ * WRONG. It called getenv() lazily on the first sbrk, reasoning that
+ * getenv is a plain scan of `environ' and allocates nothing --
+ * which is true, and was the wrong question. **`environ' is created
+ * BY a malloc**: plan9/_envsetup.c:140 is
+ *
+ *	environ = pp = malloc((1+cnt)*sizeof(char *));
+ *
+ * so on the FIRST allocation of every APE program `environ' is still
+ * null, and ap/env/getenv.c has no null check -- `char **p = environ;
+ * while(*p != NULL)'. Every program died before main with
+ * `fault read addr=0x0'. *Not a re-entrancy bug: a circular
+ * dependency, where the allocator asked for state the allocation was
+ * being made to create.*
+ *
+ * So _malloc_watchinit() is called from _apemain immediately after
+ * _envsetup(), where environ is complete and main has not started.
+ * The allocator itself now only tests a static, and allocations
+ * before that point are simply unwatched -- there are a handful, and
+ * an instrument that cannot run before its subject exists is the
+ * right trade against one that kills it.
+ *
+ * write(2) with a hand-rolled number is still plan9/_apdbg.c's idiom,
+ * and that part was fine: it has no such dependency.
  *
  * Cost when off: one load and one branch per sbrk, which is already
  * two system calls.
@@ -96,7 +119,8 @@ wd_fail(void)
 	p = wd_str(p, e, " bytes from the break in ");
 	p = wd_num(p, e, (size_t)wd_calls);
 	p = wd_str(p, e, " sbrk calls; aborting so a stack can be taken"
-		" (acid <pid>; stk())");
+		" (acid <pid>; stk(); then KILL it -- a Broken process"
+		" keeps its memory)");
 	*p++ = '\r';
 	*p++ = '\n';
 	write(2, buf, p - buf);
@@ -104,23 +128,39 @@ wd_fail(void)
 	abort();
 }
 
-/* Returns non-zero when the limit has been passed. */
-static int
-wd_note(size_t n)
+/*
+ * Called once from _apemain, after _envsetup() and before main. NOT
+ * from inside the allocator -- see above; that is what broke every
+ * APE program. Calling it twice is harmless, and never calling it
+ * leaves the watchdog off, which is the safe direction.
+ */
+void
+_malloc_watchinit(void)
 {
 	const char *s;
 	size_t v;
 
-	if(wd_init == 0){
-		wd_init = 1;
-		s = getenv("APEXP_MALLOCMAX");
-		if(s != 0){
-			v = 0;
-			while(*s >= '0' && *s <= '9')
-				v = v*10 + (size_t)(*s++ - '0');
-			wd_max = v * 1024 * 1024;
-		}
-	}
+	if(wd_init)
+		return;
+	wd_init = 1;
+	if(environ == 0)		/* belt and braces: see above */
+		return;
+	s = getenv("APEXP_MALLOCMAX");
+	if(s == 0)
+		return;
+	v = 0;
+	while(*s >= '0' && *s <= '9')
+		v = v*10 + (size_t)(*s++ - '0');
+	wd_max = v * 1024 * 1024;
+}
+
+/*
+ * Returns non-zero when the limit has been passed. Touches nothing
+ * outside this file and calls nothing at all -- the whole point.
+ */
+static int
+wd_note(size_t n)
+{
 	if(wd_max == 0)
 		return 0;
 	wd_calls++;

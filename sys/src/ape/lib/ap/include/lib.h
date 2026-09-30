@@ -199,6 +199,11 @@ extern int  _fdinfomark(void);		/* ditto, for _fdinfo.c */
 extern int  _tempmark(void);		/* ditto, for temp/mktemp.c */
 extern int  _bufmark(void);		/* ditto, for plan9/_buf.c */
 
+/* ap/malloc/malloc.c -- read $APEXP_MALLOCMAX. Called from _apemain
+ * ONLY: the allocator cannot read it itself, because environ is made
+ * by a malloc and getenv does not check for null. */
+extern void _malloc_watchinit(void);
+
 /* ap/plan9/_apdbg.c -- one debug line, under $APEXP_DEBUG. Labels may be 0. */
 extern int _apdbgon(void);
 extern void _apdbg(const char *msg, const char *l1, int v1,
