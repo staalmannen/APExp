@@ -2417,3 +2417,81 @@ paid off here by showing `$*` innocent rather than merely unproven.
 
 Indentation is a tab everywhere, as case 8's was, so it is not a
 hidden variable between cases. All six return on glibc.
+
+### It is a command that spans a newline in a script file
+
+```
+1  a ONE-LINE function in a file       hi      returned
+2  the same function over THREE lines  KILLED
+3  multi-line + "$*"                   KILLED
+4  multi-line + >>                     KILLED
+5  a multi-line if/then/fi             KILLED   <- NOT a function
+6  case 8 unchanged                    KILLED
+```
+
+**Case 5 is what carries it.** A compound command that is not a
+function, dying exactly like the rest — so functions are cleared
+entirely, and with them `$*`, `>>`, the variable-expanded argument and
+the external command. Every one of those was a live suspect an hour
+ago and all four went in a single run, which is what the case was put
+there for.
+
+The discriminator is the one thing cases 2–6 share and case 1 does
+not: **a newline inside a command.** That is the first construct in
+this whole investigation that makes bash's input layer deliver more
+text *while a command is still open*. `-c` holds the program in memory
+and never enters that path; a file containing only one-line commands
+never needs it either — which is exactly why every earlier file case
+passed and why the storm looked, for two rounds, like it had nothing
+to do with files.
+
+**Seven mechanisms have now been refuted by measurement** — a
+descriptor leak, `_buf.c`'s copy processes, `wait4`'s `_dirstat`,
+`pc=0x0`, `read_comsub`, forking, and IFS — at one run each. Every one
+of them was argued from source first.
+
+### The last question that changes which file to read
+
+"Spans a newline" has two quite different implementations behind it:
+
+- **the LEXER wants another line** — a backslash continuation or an
+  unterminated quote. `shell_getc` (`parse.y:2475`) refills
+  `shell_input_line` and the *grammar* never sees an incomplete
+  command at all.
+- **the PARSER wants another line** — an open compound command (`if`,
+  `{`, a function body, a dangling `|`). The grammar is mid-rule and
+  the newline arrives as a token.
+
+They are different code and a fix would be in different files, so
+`rc/bin/bash-lineladder` spends one run on it before any reading:
+
+| | | |
+|---|---|---|
+| 1 | `echo hi \` + `there` | lexer only |
+| 2 | `echo "a` + `b"` | lexer only |
+| 3 | `{` / `echo hi` / `}` | parser, simplest compound |
+| 4 | `echo hi \|` + `cat` | parser, no compound at all |
+| 5 | `if/then/fi` | the known-storming control |
+
+**1 or 2 storming** puts it in the lexer's refill — `shell_getc` and
+`input.c` — and shrinks the reproducer to two lines. **Only 3, 4 and
+5** puts it in the parser holding an incomplete command. **All of
+them** is the broadest statement: any second line while anything is
+open.
+
+All five return on glibc.
+
+### And then the stack
+
+This is what the watchdog was built for, and it is finally cheap
+because the subject is four lines rather than an 83-file suite:
+
+```
+APEXP_MALLOCMAX=32 /bin/bash /tmp/bli-5.sh
+ps | grep bash                  # find the Broken one
+acid <pid>                      # stk()
+echo kill > /proc/<pid>/ctl     # a Broken process KEEPS its memory
+```
+
+The ladder itself is deliberately unarmed: five armed cases would
+leave five Broken processes holding 32 MB each.
