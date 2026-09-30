@@ -1,0 +1,147 @@
+#!/bin/rc
+# bash-forkladder -- DOES THE STORM NEED A FORK?
+#
+#	bash-forkladder
+#
+# Run it from inside apexp-sh. An rc script for the same reason
+# bash-scriptladder is one: the subject dies, and a harness written in
+# the dying shell dies with it.
+#
+# ------------------------------------------------------------------
+# WHAT bash-scriptladder MEASURED, AND THE ONE THING IT REFUTED.
+#
+#	1  bash -c 'echo hi'      hi        no warnings   returned
+#	2  an EMPTY script file   (nothing) WARNINGS      returned
+#	3  a one-line file        hi        WARNINGS      returned
+#	4  the same on stdin      hi        no warnings   returned
+#
+# **NOTHING STORMED.** So it is not the script file, not parsing, not
+# a named file, not reading a script at all.
+#
+# **AND THE fd WARNINGS ARE NOW SEPARATED FROM THE STORM, WHICH
+# REFUTES WHAT I WROTE ONE ROUND EARLIER.** After `bash -c' came back
+# with neither, I recorded that the warnings and the storm "arrive
+# together and vanish together". Case 2 breaks that in the cleanest
+# possible way: an **empty** script file raises both warnings and then
+# **exits successfully**. So the warnings are `move_to_high_fd()' on
+# the script descriptor -- which is what they were predicted to be --
+# they are produced by the NAMED FILE and by nothing else here, and
+# **they are harmless**. A run that warns has told you nothing about
+# whether it will die.
+# *Two rounds ago they were conflated; one round ago they were linked
+# on weaker evidence than it looked; now they are separated by a
+# measurement. Stop reading them as a symptom.*
+#
+# ------------------------------------------------------------------
+# WHAT ALL FOUR CLEAN CASES HAVE IN COMMON: NOT ONE OF THEM FORKS.
+#
+# `echo' is a bash BUILTIN, so cases 1, 3 and 4 run it in the shell
+# itself and case 2 runs nothing at all. Four clean results and zero
+# forks between them.
+#
+# Against that, every case that HAS stormed forks:
+#
+#   run-all              line 21 is SUFFIX=$( ${THIS_SH} -c ... )
+#   bash-comsub-test.sh  its third statement is `rm -f $LOG'
+#   bash-fdloop-test.sh  400 iterations of fork+exec+wait
+#
+# and the ratrace histogram over the whole dying run was **`2 Rfork,
+# 1 Exec`** -- the storm begins right after the one child was reaped.
+#
+# That is why this ladder is about forking rather than about files.
+#
+# ------------------------------------------------------------------
+# THE CASES, simplest first, each expected to print `hi' and return.
+#
+#   1  -c with an EXTERNAL echo        one fork + exec + wait, no file
+#   2  -c with a command substitution  fork + PIPE + read + reap
+#   3  a FILE with an external echo    fork, with the file as well
+#   4  a FILE with a substitution      both, which is run-all line 21
+#   5  the first four statements of bash-comsub-test.sh, verbatim
+#
+# Reading it:
+#
+#   1 storms          -> one fork is enough, and the reproducer is now
+#                        a single command with no file. Smallest it
+#                        can get.
+#   1 ok, 2 storms    -> it is command SUBSTITUTION, not forking as
+#                        such: the pipe, the read of the child's
+#                        output, or the reap
+#   1,2 ok; 3 or 4    -> the file and the fork are BOTH needed, which
+#     storms              points at fd 255 interacting with the fork
+#   only 5 storms     -> it is none of these alone; bisect case 5's
+#                        four statements, which are an assignment, an
+#                        external command, a function DEFINITION and
+#                        a call
+#   nothing storms    -> the storm needs scale or repetition, and
+#                        bash-fdloop-test.sh is the instrument again
+#
+# **Case 5 is the control that keeps the ladder honest.** If nothing
+# storms including 5, then the tree has changed under us since
+# bash-comsub-test.sh last died and the whole reading above is about
+# a bug that is no longer there -- which is worth knowing immediately
+# rather than after another round of reduction.
+#
+# ------------------------------------------------------------------
+# NO WATCHDOG HERE, for the reason in bash-scriptladder: a Broken
+# process KEEPS ITS MEMORY, so arming it would cost 32 MB per failing
+# case. Classify first, then re-run the smallest storming case alone:
+#
+#	APEXP_MALLOCMAX=32 <that case>
+#	ps | grep bash ; acid <pid>   # stk()
+#	echo kill > /proc/<pid>/ctl
+
+f3=/tmp/bfl-3.sh
+f4=/tmp/bfl-4.sh
+f5=/tmp/bfl-5.sh
+
+echo '/bin/echo hi' > $f3
+
+echo 'v=$(/bin/echo hi)' > $f4
+echo 'echo $v' >> $f4
+
+# The opening of bash-comsub-test.sh, verbatim in shape: an
+# assignment, an external command, a function definition, a call.
+echo 'LOG=/tmp/bfl5.log' > $f5
+echo 'rm -f $LOG' >> $f5
+echo 'mark() {' >> $f5
+echo '	echo "$*" >> $LOG' >> $f5
+echo '}' >> $f5
+echo 'mark reached-the-first-mark' >> $f5
+
+rm -f /tmp/bfl5.log
+
+echo '=== bash-forkladder: does the storm need a fork? ==='
+echo
+
+echo '--- 1. -c with an EXTERNAL echo (one fork+exec+wait) ---'
+/bin/bash -c '/bin/echo hi'
+echo '--- 1 returned ---'
+echo
+
+echo '--- 2. -c with a COMMAND SUBSTITUTION (fork+pipe+reap) ---'
+/bin/bash -c 'v=$(/bin/echo hi); echo $v'
+echo '--- 2 returned ---'
+echo
+
+echo '--- 3. a FILE containing an external echo ---'
+/bin/bash $f3
+echo '--- 3 returned ---'
+echo
+
+echo '--- 4. a FILE containing a substitution (run-all line 21) ---'
+/bin/bash $f4
+echo '--- 4 returned ---'
+echo
+
+echo '--- 5. bash-comsub-test.sh''s first four statements ---'
+/bin/bash $f5
+echo '--- 5 returned ---'
+echo '    (the log it should have written:)'
+cat /tmp/bfl5.log
+echo
+
+echo '=== ladder finished. A missing "returned" line names the case'
+echo '=== that storms. If 5 returned and wrote its log, the failure'
+echo '=== bash-comsub-test.sh showed is NOT reproduced by its own'
+echo '=== opening, and the next question is what else that file has.'

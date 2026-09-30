@@ -2154,3 +2154,84 @@ Broken process holding 32 MB *per failing case*, and four of those
 would flatten the VM before the ladder finished. Re-run only the
 smallest storming case with the watchdog, take `stk()`, then
 `echo kill > /proc/<pid>/ctl`.
+
+### The ladder ran, nothing stormed, and the fd warnings are now separated
+
+```
+1  bash -c 'echo hi'      hi         no warnings   returned
+2  an EMPTY script file   (nothing)  WARNINGS      returned
+3  a one-line file        hi         WARNINGS      returned
+4  the same on stdin      hi         no warnings   returned
+```
+
+Two results, and the second is a correction of my own claim from the
+round before.
+
+**The storm is not the script file.** Not parsing, not a named file,
+not reading a script at all. Every way in came back.
+
+**And the fd warnings are separated from the storm — which refutes
+"present together, absent together".** After `bash -c` returned with
+neither, I wrote that the warnings and the storm arrive together and
+vanish together, and allowed that as a real constraint where
+co-printing had not been. Case 2 breaks it as cleanly as anything
+could: an **empty** script file — no parsing, no commands, nothing to
+execute — raises `exceeds 100 file descriptors` and `exceeds 200`, and
+then **exits successfully**.
+
+So:
+
+- they are `move_to_high_fd()` on the script descriptor, which is what
+  they were predicted to be two rounds ago;
+- they are produced by the **named file** and by nothing else here
+  (stdin and `-c` are both silent);
+- **they are harmless.** A run that warns has told you nothing about
+  whether it will die.
+
+*The progression is worth keeping as a shape: conflated → linked on
+weaker evidence than it looked → separated by one measurement, each
+step taking one round.* The middle step is the dangerous one, because
+"absent together" felt like data and was a sample of one.
+
+### What every clean case has in common: none of them forks
+
+`echo` is a bash builtin. Cases 1, 3 and 4 run it inside the shell;
+case 2 runs nothing at all. Four clean results, zero forks.
+
+Every case that *has* stormed forks:
+
+| | the fork in it |
+|---|---|
+| `run-all` | line 21, `SUFFIX=$( ${THIS_SH} -c ... )` |
+| `bash-comsub-test.sh` | its third statement, `rm -f $LOG` |
+| `bash-fdloop-test.sh` | 400 iterations of fork/exec/wait |
+
+and the ratrace histogram over the whole dying run was `2 Rfork,
+1 Exec`, with the storm beginning immediately after the one child was
+reaped.
+
+`rc/bin/bash-forkladder` asks it, in the same rc harness:
+
+| | |
+|---|---|
+| 1 | `-c '/bin/echo hi'` — one fork + exec + wait, no file |
+| 2 | `-c 'v=$(/bin/echo hi); echo $v'` — fork + pipe + read + reap |
+| 3 | a file containing an external echo |
+| 4 | a file containing a substitution — run-all's line 21 |
+| 5 | `bash-comsub-test.sh`'s first four statements, verbatim in shape |
+
+Reading it: **1 storms** → one fork is enough and the reproducer is a
+single command with no file; **1 ok, 2 storms** → it is command
+substitution rather than forking, so the pipe, the read of the child's
+output, or the reap; **3 or 4 only** → the file and the fork are both
+needed, which points at fd 255 interacting with the fork; **only 5** →
+bisect its four statements (assignment, external command, function
+*definition*, call).
+
+**Case 5 is what keeps the ladder honest.** If even it returns and
+writes its log, then the failure has stopped reproducing since
+`bash-comsub-test.sh` last died, and everything reasoned above is
+about a bug that is no longer present — which is worth discovering in
+the same run rather than after another round of reduction.
+
+All five return on glibc, and case 5 writes its log there.
