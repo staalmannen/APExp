@@ -110,6 +110,33 @@ wd_fail(void)
 {
 	char buf[200], *p, *e;
 
+	/*
+	 * DISARM FIRST, AND THIS LINE IS THE WHOLE FUNCTION'S CORRECTNESS.
+	 *
+	 * **abort() ALLOCATES on Plan 9.** Measured, not assumed -- the
+	 * first version without this line produced an `acid' stack that
+	 * was nothing but its own recursion, thousands of frames deep:
+	 *
+	 *	wd_fail()            malloc.c
+	 *	_malloc_brk(n=0x1e0) malloc.c
+	 *	malloc()             malloc.c
+	 *	open(flags=0x1, ...) fcntl/open.c:76
+	 *	note(...)            signal/kill.c:16
+	 *	kill(sig=0x5, ...)   signal/kill.c:58
+	 *	abort()              stdlib/abort.c:8
+	 *	wd_fail()            <- round again
+	 *
+	 * abort() raises SIGABRT, libap's kill() posts a note, and note()
+	 * OPENS /proc/<pid>/note -- and open() mallocs. So the over-limit
+	 * allocator is re-entered from inside its own abort, fires again,
+	 * and buries the stack it exists to expose.
+	 *
+	 * Clearing wd_max makes every later wd_note() return 0, so the
+	 * abort path allocates freely and the message prints once. The
+	 * limit has already done its job by the time we are here.
+	 */
+	wd_max = 0;
+
 	unlock(&__malloc_arena);
 
 	p = buf;
