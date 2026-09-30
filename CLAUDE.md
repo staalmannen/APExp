@@ -207,6 +207,12 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
 `copyfile-test.c`, `deeppath-test.c`, `bufexec-test.c`,
 `mkstemp-test.c` and `stdio-test.c`.
+**`ctype-xcheck.c` is a HOST program** like `tz-xcheck.c`: it links
+libap's own `_ctype[]` into a glibc program and sweeps **256 values
+by 12 classifications**, printing every disagreement. It needs TWO
+compiles (the command is in the file) because `ctype.c` wants
+APExp's `<ctype.h>` for the `_IS*` bits while the checker wants
+glibc's headers, and one `-I` cannot serve both.
 **`bash-fdloop-test.sh` is a SHELL script rather than a C program**,
 and has to be: it asks whether *bash* leaks a descriptor per fork,
 so the thing under test is the shell itself. Run it with
@@ -2728,6 +2734,108 @@ rather than needing to be caught. *Seventh instrument fault.* The
 `_SLEEP`/`_EXITS` prototypes are copied exactly from `sys9.h`
 rather than recalled, since kencc widens an argument only when a
 prototype is visible.
+
+**AND THE SLEEPING WATCHDOG WORKED: `33540K Sleep bash`, `acid`
+attached, FULL STACK.**
+
+```
+_SLEEP(a0=0x3e8)                      syscall/_SLEEP.s:6
+wd_fail()                             malloc.c:195
+_malloc_brk(n=0x1e0)                  malloc.c:261
+malloc()                              malloc.c:361
+xmalloc(bytes=0x10)                   bash/xmalloc.c:104
+make_word_list(word=.., wlink=..)     bash/make_cmd.c:156
+make_simple_command(command=0x489370, line=0x2, element=..)  make_cmd.c:488
+yyparse()+0x1c13                      y.tab.c:2629
+parse_command() / read_command() / reader_loop() / main
+```
+
+**`y.tab.c:2629` is inside case 62, `simple_command: simple_command
+simple_command_element`** -- the rule that appends ANOTHER WORD to
+an existing simple command. Case 61 is the same call with
+`(COMMAND *)NULL`, and the frame's `command=0x489370` is non-null,
+**so it is case 62 and not 61**.
+**So the parser is appending word after word to one simple command
+for ever, which means `yylex` is returning an ENDLESS STREAM OF
+WORD TOKENS.** The parser is doing exactly the right thing with the
+tokens it is handed; **the bug is in the LEXER**, and every
+allocation is a 16-byte `WORD_LIST` node.
+**`xmalloc(bytes=0x10)` is `sizeof(WORD_LIST)` exactly** -- two
+pointers -- which is the `<= 16 bytes` class the ratrace break
+steps predicted. *Those two routes really are independent*: one is
+arithmetic over `sbrk` deltas in a dead process, the other a live
+frame's argument. Unlike the `ifs_value` "convergence", neither is
+downstream of the other.
+**Calibration worth keeping**: the `ifs_value` reading got the
+OBJECT right -- "every word is a retained `WORD_DESC` plus
+`WORD_LIST` node, small and never freed" -- and the PRODUCER wrong,
+naming `list_string` where it is the parser. *A correct prediction
+about the artefact is not a correct prediction about the code that
+makes it.*
+
+**FOUND, AND IT IS ONE MISSING FLAG ON ONE TABLE ENTRY:
+`isblank('\t')` ANSWERED FALSE.** The second sample named it --
+`read_token_word(character=0x9)`, TAB, with `xmalloc(bytes=0x1)`,
+so `1 + token_index` is 1 and **the word is EMPTY**.
+The chain, every link measured:
+1. `ap/ctype/ctype.c` gave TAB `_ISspace|_IScntrl` with **no
+   `_ISblank`** (the offsets in that file are OCTAL: entry 11 is 9).
+   C99 7.4.1.3 wants isblank true for exactly space and tab.
+2. bash's `syntax.c` is **generated** by its own `mksyntax`, whose
+   `addblanks()` is `if (isblank (uc)) lsyntax[uc] |= CBLANK;` --
+   with the comment *"the default blank characters will be space and
+   tab"*. So the shipped table gave TAB `CSHBRK` and no `CBLANK`,
+   **contradicting its own generator's stated intent**, which is what
+   proves it was generated against a broken `isblank`.
+3. `shellblank()` reads CBLANK, `shellbreak()` reads CSHBRK. So a tab
+   was **not whitespace to skip** but **was a word delimiter**.
+4. `read_token` therefore handed the tab to `read_token_word`, which
+   ungot it and returned a zero-length WORD; the parser appended the
+   empty word (case 62) and asked for another token. For ever, one
+   16-byte `WORD_LIST` per turn.
+**EVERY LADDER RESULT FALLS OUT OF IT**: one-line commands, the
+backslash continuation, the quote across a newline and the dangling
+`|` have no tab; `{`/`if`/the function bodies were all written
+TAB-INDENTED. So "compound command" was never the discriminator.
+**AND I MADE IT INVISIBLE MYSELF.** `bash-fileladder`'s header says
+*"Indentation is a TAB everywhere, as case 8's was, so it is not a
+hidden variable between the cases."* Holding a variable constant
+removes it as a confound **and removes any chance of detecting it**
+-- it was the cause, and I had frozen it deliberately in every case
+of three ladders. *Control for a variable and you also blind
+yourself to it; the things you standardise are the things a bisect
+can never name.*
+**FIXED IN FOUR PLACES, and the library alone would not have been
+enough**: `_ctype[9]` gains `_ISblank`; **`isprint` had to change
+with it**, because its mask was `(graph bits | _ISblank)` and used
+_ISblank as a stand-in for "space" -- correct only while space was
+the sole character carrying it, so the tab fix alone would have made
+`isprint('\t')` true. It is a FUNCTION now, not a macro, since
+`isgraph(c) || c == ' '` cannot be a macro without evaluating `c`
+twice. And **`bash/syntax.c` is corrected by hand**, because it is
+checked in and the mkfile compiles rather than regenerates it, so
+the wrong answer was frozen there at generation time.
+**`ctype-xcheck.c` sweeps all 256 x 12 rather than asking about
+tab**, since the table is hand-written and one wrong entry is as
+likely as another: **0 of 3072 wrong** now, and the old table
+replicated beside it gives **exactly 1** -- `TAB isblank glibc=1
+libap=0` -- which both confirms the fix and says nothing else in the
+table was wrong.
+**The sweep for other frozen answers is bounded and clean**:
+`mksyntax` is the only build-time generator in `external/` that asks
+`isblank`, and `syntax.c` the only file it produces. Every other
+`isblank` caller is a runtime one and simply gets the right answer
+now.
+**The watchdog now SAYS WHEN IT IS ARMED, and a wasted round is
+why.** A run went out as `APEX__MALLOCMAX=8` -- two underscores, no
+`P` -- so the watchdog never armed, bash ran to full exhaustion and
+was killed exactly as it had been for weeks, and `acid` found
+nothing. **That output is indistinguishable from a watchdog that
+armed and never reached its limit.** The instrument's silence when
+unset is correct and must stay, so the repair is one line when it
+IS set: `libap: heap watchdog ARMED at N MB`. No line now means not
+armed. *Same family as everything else here -- an instrument has to
+say whether it is running, or a null result has two explanations.*
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR.

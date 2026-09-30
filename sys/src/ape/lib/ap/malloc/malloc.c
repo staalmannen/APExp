@@ -221,6 +221,38 @@ _malloc_watchinit(void)
 	while(*s >= '0' && *s <= '9')
 		v = v*10 + (size_t)(*s++ - '0');
 	wd_max = v * 1024 * 1024;
+
+	/*
+	 * SAY SO, and the reason is a round that was spent on nothing.
+	 *
+	 * A run was made with `APEX__MALLOCMAX=8' -- two underscores, no
+	 * P. The watchdog was simply not armed, bash ran to full
+	 * exhaustion and was killed exactly as it had been for weeks, and
+	 * the output was indistinguishable from a watchdog that had armed
+	 * and never reached its limit. **A misspelled variable name is
+	 * invisible**, and the instrument's silence when unset -- which
+	 * is correct and must stay -- is what makes it so.
+	 *
+	 * One line when it IS set repairs that: no line means not armed,
+	 * so "nothing happened" can be told from "nothing happened yet".
+	 * Silent when unset, so it costs no program anything.
+	 *
+	 * Same family as every other lesson in this hunt: *an instrument
+	 * has to say whether it is running*, or a null result has two
+	 * explanations.
+	 */
+	if(wd_max != 0){
+		char buf[100], *p, *e;
+
+		p = buf;
+		e = buf + sizeof buf - 2;
+		p = wd_str(p, e, "libap: heap watchdog ARMED at ");
+		p = wd_num(p, e, v);
+		p = wd_str(p, e, " MB");
+		*p++ = '\r';
+		*p++ = '\n';
+		write(2, buf, p - buf);
+	}
 }
 
 /*

@@ -45,7 +45,20 @@ extern unsigned char _ctype[];
 #define	isdigit(c)	(_ctype[(unsigned char)(c)]&_ISdigit)
 #define	isgraph(c)	(_ctype[(unsigned char)(c)]&(_ISpunct|_ISupper|_ISlower|_ISdigit))
 #define	islower(c)	(_ctype[(unsigned char)(c)]&_ISlower)
-#define	isprint(c)	(_ctype[(unsigned char)(c)]&(_ISpunct|_ISupper|_ISlower|_ISdigit|_ISblank))
+/*
+ * isprint has NO MACRO, deliberately: it is the one classification
+ * that cannot be a single mask.
+ *
+ * It used to be (graph bits | _ISblank), which was correct only
+ * because SPACE was the sole character carrying _ISblank -- the mask
+ * was using "blank" as a stand-in for "space". Giving TAB its
+ * standard _ISblank (C99 7.4.1.3) would then have made isprint('\t')
+ * true, so the two could not both be right while isprint was a mask.
+ * A macro cannot say `isgraph(c) || c == ' '' without evaluating c
+ * twice, which breaks isprint(*p++), so the FUNCTION in
+ * ap/ctype/isprint.c is the definition. One call instead of one
+ * lookup; isprint is not on a hot path here.
+ */
 #define	ispunct(c)	(_ctype[(unsigned char)(c)]&_ISpunct)
 #undef isspace
 #define	isspace(c)	(_ctype[(unsigned char)(c)]&_ISspace)
