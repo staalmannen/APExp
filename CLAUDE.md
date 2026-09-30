@@ -2496,8 +2496,34 @@ reproducer is not a script at all:
 APEXP_MALLOCMAX=32 /bin/bash -c 'echo hi'
 ```
 
-If that storms, the reproducer has gone from an 83-file suite to one
-command, and the stack off it is as small as this can get.
+**AND IT IS CLEAN: `hi`, no storm, AND NO fd WARNINGS EITHER.** The
+second half was not asked for and is the more useful of the two: the
+`exceeds 100/200 file descriptors` pair did not appear at all, so the
+warnings and the storm arrive *together*. They may still be two
+effects of one cause rather than one story -- but "printed together
+and absent together" is a good deal more than they had before.
+**So the whole remaining search space is the gap between `-c` and a
+script file**, and it is small. `rc/bin/bash-scriptladder` walks it
+in one run: `-c` (the control), an **EMPTY** file, a one-line file,
+and the same content on **stdin**. **It is an rc script on purpose**
+-- the subject dies, and a harness written in the dying shell dies
+with it; rc survives every case and prints a `returned` line after
+each, so a missing one names the case that storms. No loop (rc has
+no `break`), no `^`, and the only `=` are leading assignments, which
+rc does allow.
+Reading it: **empty file storms** -> parsing and execution are
+innocent and it is the script-FILE setup, where fd 255 and
+`move_to_high_fd()` live, which is the smallest possible target;
+**3 storms but 4 does not** -> the NAMED FILE specifically rather
+than reading a script as such; **3 and 4 both** -> reading a script
+at all; **nothing storms** -> it needs something
+`bash-comsub-test.sh` has and these do not, and its HEADER is what
+to bisect next, not its sections.
+**No watchdog in the ladder, deliberately**: it only needs to know
+*which* cases storm, and `hi` versus a death message answers that,
+while `APEXP_MALLOCMAX` would leave a Broken process holding 32 MB
+*per failing case*. Re-run only the smallest storming case with the
+watchdog, take the stack, then `echo kill > /proc/<pid>/ctl`.
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR.
