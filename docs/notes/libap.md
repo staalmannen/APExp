@@ -2688,3 +2688,122 @@ two explanations.* That rule has now been paid for by the sampling
 period, the copy process, the `expr` control, the forking `fdcount`,
 `getenv` before `environ`, `abort()` re-entering the allocator,
 `abort()` not leaving a Broken process, and now a variable name.
+
+### ctype/ — `isblank('\t')` answered FALSE, and that was the whole bash bug
+
+The second watchdog sample named it outright:
+
+```
+xmalloc(bytes=0x1)                   bash/xmalloc.c:104
+read_token_word(character=0x9)       parse.y:5775
+read_token() / yylex() / yyparse() / ...
+```
+
+`0x9` is TAB. `parse.y:5775` is `the_word->word = xmalloc (1 + token_index)`,
+and `bytes=0x1` means **`token_index == 0` — the word is empty.**
+
+**The chain, every link measured:**
+
+1. `ap/ctype/ctype.c` gave TAB `_ISspace|_IScntrl` and **no
+   `_ISblank`**. (The offsets in that file are *octal*: the row marked
+   `10` starts at 8, so entry 11 is 9.) C99 7.4.1.3: isblank is true
+   for exactly space and horizontal tab in the C locale.
+2. bash's `syntax.c` is **generated** by its own `mksyntax`, whose
+   `addblanks()` is literally
+
+   ```c
+   /* ... the default blank characters will be space and tab. */
+   if (isblank (uc)) lsyntax[uc] |= CBLANK;
+   ```
+
+   so the table here got TAB `CSHBRK` with no `CBLANK` —
+   **contradicting its own generator's stated intent**, which is what
+   proves it was generated against a libc whose `isblank` was wrong.
+3. bash reads the two bits through *different* macros:
+   `shellblank(c)` is `CBLANK`, `shellbreak(c)` is `CSHBRK`. So a tab
+   was **not whitespace to skip** but **was a word delimiter**.
+4. `read_token`'s blank-skip therefore passed the tab straight to
+   `read_token_word`, which saw a break character at position 0,
+   ungot it, and returned a zero-length WORD. The parser appended the
+   empty word (grammar case 62) and asked for another token. For
+   ever, at one 16-byte `WORD_LIST` per turn — ~17 million of them,
+   then `Killed: Insufficient physical memory`.
+
+**Every ladder result falls out of this.** One-line commands, the
+backslash continuation, the quote across a newline and the dangling
+`|` have no tab in them. `{ }`, `if/fi` and the function bodies were
+all written tab-indented. "A compound command spanning a newline" was
+never the discriminator — **tab indentation was**, and it happened to
+live only inside compound bodies in every file I wrote.
+
+**And I made it invisible on purpose.** `bash-fileladder`'s own header
+says:
+
+> *Indentation is a TAB everywhere, as case 8's was, so it is not a
+> hidden variable between the cases.*
+
+That is sound reasoning about confounds and it blinded the whole
+bisect. **Holding a variable constant removes it as a confound and
+removes any chance of detecting it.** Three ladders, fifteen cases,
+and the cause was the thing I had standardised across all of them so
+it could not interfere. *The things you control for are exactly the
+things a bisect can never name — so when a bisect narrows to a
+property shared by every failing case, list what you held fixed and
+check that list too.*
+
+### The fix is four places, and the library alone was not enough
+
+1. **`ap/ctype/ctype.c`** — entry 9 gains `_ISblank`. The root cause.
+2. **`sys/include/ape/ctype.h` and `ap/ctype/isprint.c`** — `isprint`
+   had to change *with* it. Its mask was
+   `(_ISpunct|_ISupper|_ISlower|_ISdigit|_ISblank)`, using `_ISblank`
+   as a stand-in for "space" — correct only while space was the sole
+   character carrying that bit. Giving tab its standard `_ISblank`
+   would have made `isprint('\t')` true. It is a **function** now
+   rather than a macro, because `isgraph(c) || c == ' '` cannot be a
+   macro without evaluating `c` twice and breaking `isprint(*p++)`.
+   *A one-bit fix in a shared table is never local: grep every mask
+   that reads the bit.*
+3. **`sys/src/external/bash/syntax.c`** — corrected by hand, with a
+   comment saying why a "DO NOT EDIT" file was edited. It is checked
+   in and the mkfile **compiles** it rather than regenerating it, so
+   the wrong answer was frozen there at generation time and the
+   library fix alone would not have reached bash.
+
+### `ctype-xcheck.c`, and why it sweeps everything
+
+A test asking only `isblank('\t')` would pass the moment the flag went
+in and say nothing about the other 255 entries or eleven
+classifications — and the table is hand-written, so one wrong entry is
+exactly as likely as another. The cross-check links libap's own
+`_ctype[]` into a glibc program and compares **256 × 12 = 3072**
+answers.
+
+- Fixed table: **0 of 3072 wrong.**
+- Old table replicated beside it: **exactly 1** — `TAB isblank
+  glibc=1 libap=0`.
+
+That second run is the control (*a check that cannot fail is not a
+check*) and it does double duty: one disagreement and no others means
+the fix works **and** nothing else in the table was ever wrong.
+
+Two practical notes it records for itself: it needs **two compiles**,
+because `ctype.c` wants APExp's `<ctype.h>` for the `_IS*` values
+while the checker wants glibc's headers and the same `-I` would drag
+in APExp's `<stdio.h>` (which includes a per-architecture
+`stdarg_arch.h` that does not exist on the host); and its section 0
+prints the derived classes of `'A'`, `'0'`, SPC and TAB, because the
+`_IS*` constants are *copied* from the header and a miscopy would make
+every comparison meaningless while still looking like a real test.
+
+### The sweep for other frozen answers
+
+**`mksyntax` is the only build-time generator in `external/` that asks
+`isblank`, and `syntax.c` the only file it produces.** Everything else
+that mentions `isblank` is a runtime caller and simply gets the right
+answer now.
+
+*The general hazard is worth keeping even though this instance is
+closed*: a build-time generator bakes the building libc's answers into
+a checked-in file, so a libc bug becomes a permanent data error in
+another program, and fixing the libc does not fix it.

@@ -207,6 +207,12 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
 `copyfile-test.c`, `deeppath-test.c`, `bufexec-test.c`,
 `mkstemp-test.c` and `stdio-test.c`.
+**`ctype-xcheck.c` is a HOST program** like `tz-xcheck.c`: it links
+libap's own `_ctype[]` into a glibc program and sweeps **256 values
+by 12 classifications**, printing every disagreement. It needs TWO
+compiles (the command is in the file) because `ctype.c` wants
+APExp's `<ctype.h>` for the `_IS*` bits while the checker wants
+glibc's headers, and one `-I` cannot serve both.
 **`bash-fdloop-test.sh` is a SHELL script rather than a C program**,
 and has to be: it asks whether *bash* leaks a descriptor per fork,
 so the thing under test is the shell itself. Run it with
@@ -2766,6 +2772,60 @@ OBJECT right -- "every word is a retained `WORD_DESC` plus
 naming `list_string` where it is the parser. *A correct prediction
 about the artefact is not a correct prediction about the code that
 makes it.*
+
+**FOUND, AND IT IS ONE MISSING FLAG ON ONE TABLE ENTRY:
+`isblank('\t')` ANSWERED FALSE.** The second sample named it --
+`read_token_word(character=0x9)`, TAB, with `xmalloc(bytes=0x1)`,
+so `1 + token_index` is 1 and **the word is EMPTY**.
+The chain, every link measured:
+1. `ap/ctype/ctype.c` gave TAB `_ISspace|_IScntrl` with **no
+   `_ISblank`** (the offsets in that file are OCTAL: entry 11 is 9).
+   C99 7.4.1.3 wants isblank true for exactly space and tab.
+2. bash's `syntax.c` is **generated** by its own `mksyntax`, whose
+   `addblanks()` is `if (isblank (uc)) lsyntax[uc] |= CBLANK;` --
+   with the comment *"the default blank characters will be space and
+   tab"*. So the shipped table gave TAB `CSHBRK` and no `CBLANK`,
+   **contradicting its own generator's stated intent**, which is what
+   proves it was generated against a broken `isblank`.
+3. `shellblank()` reads CBLANK, `shellbreak()` reads CSHBRK. So a tab
+   was **not whitespace to skip** but **was a word delimiter**.
+4. `read_token` therefore handed the tab to `read_token_word`, which
+   ungot it and returned a zero-length WORD; the parser appended the
+   empty word (case 62) and asked for another token. For ever, one
+   16-byte `WORD_LIST` per turn.
+**EVERY LADDER RESULT FALLS OUT OF IT**: one-line commands, the
+backslash continuation, the quote across a newline and the dangling
+`|` have no tab; `{`/`if`/the function bodies were all written
+TAB-INDENTED. So "compound command" was never the discriminator.
+**AND I MADE IT INVISIBLE MYSELF.** `bash-fileladder`'s header says
+*"Indentation is a TAB everywhere, as case 8's was, so it is not a
+hidden variable between the cases."* Holding a variable constant
+removes it as a confound **and removes any chance of detecting it**
+-- it was the cause, and I had frozen it deliberately in every case
+of three ladders. *Control for a variable and you also blind
+yourself to it; the things you standardise are the things a bisect
+can never name.*
+**FIXED IN FOUR PLACES, and the library alone would not have been
+enough**: `_ctype[9]` gains `_ISblank`; **`isprint` had to change
+with it**, because its mask was `(graph bits | _ISblank)` and used
+_ISblank as a stand-in for "space" -- correct only while space was
+the sole character carrying it, so the tab fix alone would have made
+`isprint('\t')` true. It is a FUNCTION now, not a macro, since
+`isgraph(c) || c == ' '` cannot be a macro without evaluating `c`
+twice. And **`bash/syntax.c` is corrected by hand**, because it is
+checked in and the mkfile compiles rather than regenerates it, so
+the wrong answer was frozen there at generation time.
+**`ctype-xcheck.c` sweeps all 256 x 12 rather than asking about
+tab**, since the table is hand-written and one wrong entry is as
+likely as another: **0 of 3072 wrong** now, and the old table
+replicated beside it gives **exactly 1** -- `TAB isblank glibc=1
+libap=0` -- which both confirms the fix and says nothing else in the
+table was wrong.
+**The sweep for other frozen answers is bounded and clean**:
+`mksyntax` is the only build-time generator in `external/` that asks
+`isblank`, and `syntax.c` the only file it produces. Every other
+`isblank` caller is a runtime one and simply gets the right answer
+now.
 **The watchdog now SAYS WHEN IT IS ARMED, and a wasted round is
 why.** A run went out as `APEX__MALLOCMAX=8` -- two underscores, no
 `P` -- so the watchdog never armed, bash ran to full exhaustion and
