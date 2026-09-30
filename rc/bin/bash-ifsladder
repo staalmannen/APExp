@@ -1,0 +1,163 @@
+#!/bin/rc
+# bash-ifsladder -- IS IT `$*', AND IS IT IFS?
+#
+#	bash-ifsladder
+#
+# Run it from inside apexp-sh. rc again, for the reason the other two
+# ladders are rc: the subject dies, and a harness written in the dying
+# shell dies with it.
+#
+# ------------------------------------------------------------------
+# WHERE THIS COMES FROM: bash-forkladder, and MY HYPOTHESIS WAS WRONG.
+#
+#	1  -c with an EXTERNAL echo          hi          returned
+#	2  -c with a COMMAND SUBSTITUTION    hi          returned
+#	3  a FILE with an external echo      hi          returned
+#	4  a FILE with a substitution        hi          returned
+#	5  bash-comsub-test.sh's opening     KILLED, no log
+#
+# **FORKING IS NOT IT.** I predicted it was, on the grounds that none
+# of the four clean cases in bash-scriptladder forked while everything
+# that had ever stormed did -- and wrote the refutation condition down.
+# It fired: cases 1 to 4 fork, exec, build a pipe, read a child's
+# output and reap it, from `-c' and from a file, and every one came
+# back. *That is four mechanisms cleared in one run, which is what the
+# ladder was for.*
+#
+# So the storm is in what case 5 has and case 4 has not. Case 5 is:
+#
+#	LOG=/tmp/bfl5.log
+#	rm -f $LOG
+#	mark() {
+#		echo "$*" >> $LOG
+#	}
+#	mark reached-the-first-mark
+#
+# Five candidates: an external command taking a VARIABLE-expanded
+# argument; a function DEFINITION; a function CALL; a `>>' redirection
+# inside a function; and **`"$*"`**.
+#
+# ------------------------------------------------------------------
+# WHY `$*' IS THE SUSPECT, AND WHY THAT IS NOT JUST A GUESS.
+#
+# **`$*' is the one construct in case 5 that reads IFS.** It joins the
+# positional parameters with IFS's first character, through
+# `string_list_dollar_star' (subst.c:2900), which reads `ifs_firstc'
+# and `ifs_firstc_len'. Nothing in cases 1 to 4 touches IFS at all.
+#
+# And that is where the ONE stack this hunt has produced already
+# pointed. Two rounds ago the watchdog caught a bash mid-flight:
+#
+#	fault read addr=0x2e
+#	list_string(...) subst.c:3133 -- `s = ifs_value; s && *s'
+#	expand_word_internal ... ifs_chars=0x2e
+#
+# **`ifs_value' holding 0x2e is a `.' in a `char *`.** At the time I
+# recorded the provenance of that stack as unsettled. It is two
+# independent lines arriving at IFS from opposite directions -- a
+# stack that faulted on `ifs_value', and a ladder whose only storming
+# case is the only one that reads it -- and *that convergence is worth
+# more than either on its own*.
+#
+# ------------------------------------------------------------------
+# THE CASES, simplest first; the two IFS ones are LAST because they
+# are the ones expected to die.
+#
+#   1  ${#IFS}          A DIRECT PROBE OF THE SUSPECT, and pure
+#                       builtin -- no fork, no file, nothing. **A
+#                       healthy bash answers 3** (space, tab,
+#                       newline). Any other number, or a death here,
+#                       settles it before the ladder even starts.
+#   2  rm -f $X         an external command whose ARGUMENT comes from
+#                       a variable -- case 1 of the fork ladder used
+#                       a literal
+#   3  f() { :; }       a function DEFINITION, never called
+#   4  f(){ echo hi;}   defined and called, no IFS, no redirection
+#   5  f(){ echo hi>>F;}  a `>>' redirection INSIDE a function
+#   6  echo "$*"        `$*' at top level, no function  <-- IFS
+#   7  case 5's shape   function + "$*" + >>            <-- IFS
+#
+# Reading it:
+#
+#   1 wrong or fatal  -> IFS is already corrupt before anything runs,
+#                        and `setifs' (subst.c:12303) is where to look
+#   6 storms          -> it is `$*' itself, with no function and no
+#                        redirection involved. The reproducer becomes
+#                        one -c command.
+#   6 ok, 7 storms    -> `$*' needs the function or the redirection
+#                        too, so it is not IFS alone
+#   2..5 storms       -> the suspect is wrong and the case names the
+#                        replacement
+#   nothing storms    -> case 5 needed all four together; re-run
+#                        bash-forkladder to confirm it still dies at
+#                        all before reducing further
+#
+# **`$@' is asked beside `$*' deliberately.** They differ in exactly
+# the thing under suspicion: `$*' JOINS with IFS's first character,
+# `$@' does not join at all. Both dying means IFS reading generally;
+# `$*' alone dying isolates the join. *Asking only one would leave a
+# negative result with two explanations* -- the trap this tree has a
+# named rule for.
+#
+# No watchdog: a Broken process keeps its memory, and classification
+# needs only the output. Re-run the smallest storming case with
+# APEXP_MALLOCMAX=32, take `stk()`, then
+# `echo kill > /proc/<pid>/ctl`.
+
+f7=/tmp/bil-7.sh
+echo 'LOG=/tmp/bil7.log' > $f7
+echo 'rm -f $LOG' >> $f7
+echo 'mark() {' >> $f7
+echo '	echo "$*" >> $LOG' >> $f7
+echo '}' >> $f7
+echo 'mark reached-the-first-mark' >> $f7
+
+rm -f /tmp/bil5.log /tmp/bil7.log
+
+echo '=== bash-ifsladder: is it $* , and is it IFS? ==='
+echo
+
+echo '--- 1. ${#IFS}  (pure builtin; a healthy bash says 3) ---'
+/bin/bash -c 'echo ${#IFS}'
+echo '--- 1 returned ---'
+echo
+
+echo '--- 2. an external command with a VARIABLE argument ---'
+/bin/bash -c 'X=/tmp/bil-nothing; rm -f $X; echo hi'
+echo '--- 2 returned ---'
+echo
+
+echo '--- 3. a function DEFINITION, never called ---'
+/bin/bash -c 'f() { :; }; echo hi'
+echo '--- 3 returned ---'
+echo
+
+echo '--- 4. a function defined AND CALLED ---'
+/bin/bash -c 'f() { echo hi; }; f'
+echo '--- 4 returned ---'
+echo
+
+echo '--- 5. a >> REDIRECTION inside a function ---'
+/bin/bash -c 'L=/tmp/bil5.log; f() { echo hi >> $L; }; f; cat $L'
+echo '--- 5 returned ---'
+echo
+
+echo '--- 6. "$@" at top level (joins WITHOUT IFS) ---'
+/bin/bash -c 'set -- a b c; echo "$@"'
+echo '--- 6 returned ---'
+echo
+
+echo '--- 7. "$*" at top level (JOINS WITH IFS) ---'
+/bin/bash -c 'set -- a b c; echo "$*"'
+echo '--- 7 returned ---'
+echo
+
+echo '--- 8. case 5 of the fork ladder, unchanged ---'
+/bin/bash $f7
+echo '--- 8 returned ---'
+echo '    (the log it should have written:)'
+cat /tmp/bil7.log
+echo
+
+echo '=== ladder finished. A missing "returned" line, or a wrong'
+echo '=== answer at 1, names where to look next.'

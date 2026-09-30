@@ -2235,3 +2235,96 @@ about a bug that is no longer present — which is worth discovering in
 the same run rather than after another round of reduction.
 
 All five return on glibc, and case 5 writes its log there.
+
+### The fork hypothesis is refuted, and case 5 alone storms
+
+```
+1  -c with an EXTERNAL echo        hi            returned
+2  -c with a COMMAND SUBSTITUTION  hi            returned
+3  a FILE with an external echo    hi            returned
+4  a FILE with a substitution      hi            returned
+5  bash-comsub-test.sh's opening   KILLED, no log
+```
+
+I predicted forking was the discriminator, on the grounds that none of
+the four clean cases in `bash-scriptladder` forked while everything
+that had ever stormed did — and wrote the refutation condition down.
+**It fired.** Cases 1 to 4 fork, exec, build a pipe, read a child's
+output and reap it, from `-c` and from a named file, and every one
+returned.
+
+That is four mechanisms cleared in one run, which is what a ladder is
+for. And case 5 still dying is the other half of the result: the bug
+has not evaporated under the rebuilds, so everything reduced so far is
+still about a live failure.
+
+### What case 5 has that case 4 has not
+
+```sh
+LOG=/tmp/bfl5.log
+rm -f $LOG
+mark() {
+	echo "$*" >> $LOG
+}
+mark reached-the-first-mark
+```
+
+Five candidates: an external command taking a **variable-expanded**
+argument (case 1 used a literal); a function **definition**; a
+function **call**; a `>>` redirection **inside a function**; and
+**`"$*"`**.
+
+**`$*` is the suspect, and not by taste: it is the only construct in
+case 5 that reads IFS.** It joins the positional parameters with IFS's
+first character, through `string_list_dollar_star` (`subst.c:2900`):
+
+```c
+  if (ifs_firstc_len == 1)
+    { sep[0] = ifs_firstc[0]; sep[1] = '\0'; }
+  else
+    { memcpy (sep, ifs_firstc, ifs_firstc_len); sep[ifs_firstc_len] = '\0'; }
+  ret = string_list_internal (list, sep);
+```
+
+Nothing in cases 1 to 4 touches IFS at all.
+
+**And that is where the one stack this hunt has produced already
+pointed.** Two rounds ago the watchdog caught a bash mid-flight and
+`acid` gave `fault read addr=0x2e` at `subst.c:3133`, which is
+`s = ifs_value; s && *s` — **`ifs_value` holding `0x2e`, a `'.'` in a
+`char *`.**
+
+*Two independent lines arriving at IFS from opposite directions: a
+stack that faulted on `ifs_value`, and a ladder whose only storming
+case is the only one that reads it.* The convergence is worth more
+than either on its own, and it also makes the unsettled provenance of
+that stack much less load-bearing — it no longer has to be trusted
+alone.
+
+### `rc/bin/bash-ifsladder`
+
+Case 5 split into its parts, IFS last:
+
+| | | |
+|---|---|---|
+| 1 | `${#IFS}` | **direct probe**, pure builtin; a healthy bash says **3** |
+| 2 | `rm -f $X` | external command with a *variable* argument |
+| 3 | `f() { :; }` | function definition, never called |
+| 4 | `f(){ echo hi;}; f` | defined and called |
+| 5 | `f(){ echo hi >> $L;}; f` | `>>` inside a function |
+| 6 | `set -- a b c; echo "$@"` | joins *without* IFS |
+| 7 | `set -- a b c; echo "$*"` | **joins WITH IFS** |
+| 8 | case 5 unchanged | the control |
+
+Case 1 is the cheapest thing in the whole investigation: if it answers
+anything but 3, IFS is already corrupt before a single command runs
+and `setifs` (`subst.c:12303`) is where to look, with no reduction
+needed at all.
+
+**`$@` is asked beside `$*` deliberately.** They differ in exactly the
+property under suspicion — `$*` joins with IFS's first character, `$@`
+does not join — so both dying means IFS reading generally while `$*`
+alone dying isolates the join. Asking only one would leave a negative
+result with two explanations, which this tree has a named rule about.
+
+All eight return on glibc and case 1 answers 3.
