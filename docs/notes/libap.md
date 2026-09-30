@@ -2646,3 +2646,45 @@ one-line command. `shell_getc` (`parse.y:2475`) and the buffered
 reader in `input.c` are the two places left, and the lexer's line
 state is all `size_t` (`shell_input_line_index`, `_len`, `_size`) with
 `shell_input_line_terminator` an `int`.
+
+### The watchdog says when it is armed, and a wasted round is why
+
+A run went out as:
+
+```
+$ APEX__MALLOCMAX=8 /bin/bash /tmp/bli-3.sh
+bash 15495: warning: process exceeds 100 file descriptors
+bash 15495: warning: process exceeds 200 file descriptors
+bash 15495: Killed: Insufficient physical memory
+```
+
+**Two underscores and no `P`.** The variable is `APEXP_MALLOCMAX`, so
+the watchdog was never armed, bash ran to full exhaustion and was
+killed exactly as it had been for weeks, and `acid 15495` found no
+such process.
+
+**The point is not the typo, it is that the output was
+indistinguishable from a watchdog that armed and never reached its
+limit.** Both give the same three lines and the same absent process.
+Nothing on screen could separate "not armed" from "armed, nothing
+happened".
+
+The instrument's silence when *unset* is correct and has to stay —
+every APE program calls `_malloc_watchinit`, and an unarmed watchdog
+must cost nothing and print nothing. So the repair is one line on the
+other branch:
+
+```
+libap: heap watchdog ARMED at 8 MB
+```
+
+No line means not armed. Verified on the host against both spellings:
+the misspelling prints nothing and reaches the end normally; the
+correct one prints the armed line and then the limit message.
+
+*Same family as every other lesson in this investigation — an
+instrument has to say whether it is running, or its null result has
+two explanations.* That rule has now been paid for by the sampling
+period, the copy process, the `expr` control, the forking `fdcount`,
+`getenv` before `environ`, `abort()` re-entering the allocator,
+`abort()` not leaving a Broken process, and now a variable name.

@@ -2766,6 +2766,16 @@ OBJECT right -- "every word is a retained `WORD_DESC` plus
 naming `list_string` where it is the parser. *A correct prediction
 about the artefact is not a correct prediction about the code that
 makes it.*
+**The watchdog now SAYS WHEN IT IS ARMED, and a wasted round is
+why.** A run went out as `APEX__MALLOCMAX=8` -- two underscores, no
+`P` -- so the watchdog never armed, bash ran to full exhaustion and
+was killed exactly as it had been for weeks, and `acid` found
+nothing. **That output is indistinguishable from a watchdog that
+armed and never reached its limit.** The instrument's silence when
+unset is correct and must stay, so the repair is one line when it
+IS set: `libap: heap watchdog ARMED at N MB`. No line now means not
+armed. *Same family as everything else here -- an instrument has to
+say whether it is running, or a null result has two explanations.*
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR.
