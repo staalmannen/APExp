@@ -2328,3 +2328,92 @@ alone dying isolates the join. Asking only one would leave a negative
 result with two explanations, which this tree has a named rule about.
 
 All eight return on glibc and case 1 answers 3.
+
+### IFS is refuted, and the one stack turns out to show a victim
+
+```
+1  ${#IFS}                      3        returned
+2  external with a VARIABLE arg hi       returned
+3  function DEFINITION          hi       returned
+4  function defined AND CALLED  hi       returned
+5  >> inside a function         hi       returned
+6  "$@" at top level            a b c    returned
+7  "$*" at top level            a b c    returned   <- reads IFS
+8  the same thing in a FILE     KILLED, no log
+```
+
+`${#IFS}` is **3**, and `"$*"` joins to `a b c`. So IFS is intact and
+the one construct in case 8 that reads it works perfectly through
+`-c`. That was the suspect, it had two independent lines pointing at
+it, and it is wrong.
+
+**The more valuable half is what this does to the `acid` stack.** The
+watchdog's catch was:
+
+```
+fault read addr=0x2e
+list_string(...) subst.c:3133   -- s = ifs_value; s && *s
+```
+
+`ifs_value` holding `0x2e`, a `'.'` in a `char *`. If reading IFS is
+healthy in isolation — and case 7 says it is — then **memory was
+already corrupt by the time that frame executed.** *The stack shows a
+victim, not a culprit.* Something had written a character into a
+pointer in BSS; `list_string` was simply the next code to read it.
+
+Two consequences worth keeping:
+
+- **Chasing `setifs` would have been chasing the wrong end.** The
+  value was not computed wrongly, it was overwritten.
+- **The convergence I trusted was two lines pointing at the same
+  casualty.** A stack that faults on X and a ladder whose only
+  storming case reads X look like corroboration, and are not, when X
+  is downstream of the real event. *Corroboration requires the two
+  lines to be independent of each other, not merely to arrive at the
+  same symbol.*
+
+It also means the earlier provenance question is moot: whichever
+binary produced that stack, it was showing damage rather than cause.
+
+### The untested difference: a command that spans lines in a file
+
+Every `-c` case passes. Every file case so far passed too — an empty
+file, a one-line file, a file with a command substitution. So it is
+not "a file" as such.
+
+**But every file tested held one-line commands, and case 8's function
+definition spans three:**
+
+```sh
+mark() {
+	echo "$*" >> $LOG
+}
+```
+
+A multi-line compound command is the first thing in this whole
+investigation that makes bash's *parser* ask its input for more while
+a command is still open — `shell_getc` refilling `shell_input_line`
+from fd 255 with a partial command held. Through `-c` the text is
+already in memory and that path is never entered. It is the one
+structural difference left and it has not been asked once.
+
+`rc/bin/bash-fileladder`, all from files:
+
+| | |
+|---|---|
+| 1 | a **one-line** function, called |
+| 2 | the same function over **three lines** ← the new variable |
+| 3 | multi-line, body `echo "$*"` |
+| 4 | multi-line, body `echo hi >> $L` |
+| 5 | a multi-line **`if/then/fi`** — compound, but not a function |
+| 6 | case 8 unchanged, as the control |
+
+**Case 5 is what makes this a bisect rather than a guess.** If a
+multi-line `if` storms, functions are cleared entirely and the subject
+is the parser's refill; if it does not and case 2 does, the opposite.
+Asking only the function form would leave that undecided — the same
+reason `$@` was asked beside `$*`, and the same reason that pairing
+paid off here by showing `$*` innocent rather than merely unproven.
+
+Indentation is a tab everywhere, as case 8's was, so it is not a
+hidden variable between cases. All six return on glibc.

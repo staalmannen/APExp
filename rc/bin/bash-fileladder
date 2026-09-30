@@ -1,0 +1,179 @@
+#!/bin/rc
+# bash-fileladder -- WHAT IS IT ABOUT THE FILE?
+#
+#	bash-fileladder
+#
+# rc again: the subject dies, and a harness written in the dying shell
+# dies with it.
+#
+# ------------------------------------------------------------------
+# bash-ifsladder RAN, AND IFS IS REFUTED TOO.
+#
+#	1  ${#IFS}                      3        returned
+#	2  external with a VARIABLE arg hi       returned
+#	3  function DEFINITION          hi       returned
+#	4  function defined AND CALLED  hi       returned
+#	5  >> inside a function         hi       returned
+#	6  "$@" at top level            a b c    returned
+#	7  "$*" at top level            a b c    returned   <-- reads IFS
+#	8  the same thing in a FILE     KILLED, no log
+#
+# **`${#IFS}` is 3 and `"$*"` joins correctly**, so IFS is intact and
+# the one construct in case 8 that reads it works perfectly through
+# `-c`. That was my suspect, it had two independent lines pointing at
+# it, and it is wrong.
+#
+# **AND IT REFRAMES THE ONE STACK THIS HUNT HAS PRODUCED.** The
+# watchdog's `fault read addr=0x2e` at `subst.c:3133` was
+# `s = ifs_value` with `ifs_value` holding a `'.'`. If reading IFS is
+# healthy in isolation -- and case 7 says it is -- then by the time
+# that frame ran, **memory was ALREADY corrupt**. *That stack shows a
+# VICTIM, not a culprit.* `ifs_value` is a `char *` in BSS beside
+# other globals; something had written a character into it. Chasing
+# `setifs` would have been chasing the wrong end.
+#
+# ------------------------------------------------------------------
+# WHAT IS LEFT IS THE FILE, AND ONE DIFFERENCE HAS NEVER BEEN TESTED.
+#
+# Every `-c` case passes; every FILE case so far also passed -- an
+# empty file, a one-line file, a file with a substitution. So it is
+# not "a file" as such.
+#
+# **But every file tested so far held ONE-LINE commands, and case 8's
+# function definition SPANS THREE LINES:**
+#
+#	mark() {
+#		echo "$*" >> $LOG
+#	}
+#
+# A multi-line compound command is the first thing in this whole
+# investigation that makes bash's PARSER ask its input for more while
+# a command is still open -- `shell_getc` refilling `shell_input_line`
+# mid-command, from fd 255, with the partial command held. Through
+# `-c` the whole text is already in memory and that path is never
+# entered. *It is the one structural difference left, and it has not
+# been asked once.*
+#
+# ------------------------------------------------------------------
+# THE CASES, simplest first, all from FILES.
+#
+#   1  a ONE-LINE function in a file, called
+#   2  a MULTI-LINE function, body `echo hi'      <-- the new variable
+#   3  a multi-line function, body `echo "$*"'
+#   4  a multi-line function, body `echo hi >> $L'
+#   5  a multi-line `if/then/fi' -- a compound command that is NOT a
+#      function, which separates "reading a command across lines"
+#      from "defining a function"
+#   6  case 8 unchanged, as the control
+#
+# Reading it:
+#
+#   1 ok, 2 storms   -> it is reading a command ACROSS LINES from a
+#                       file, with nothing else needed. That is
+#                       `shell_getc'/`shell_input_line', and the
+#                       reproducer is four lines.
+#   2 ok, 5 storms   -> multi-line compound commands generally, and
+#                       the function is incidental
+#   2,5 ok; 3 or 4   -> the combination, and the case names which
+#     storms             half
+#   nothing but 6    -> case 8 needs all of it together; the next cut
+#                       is to delete ONE line at a time from it
+#
+# **Case 5 is the one that makes this a bisect rather than a guess.**
+# If a multi-line `if' storms, functions are cleared entirely and the
+# subject is the parser's refill; if it does not and 2 does, the
+# opposite. Asking only the function form would have left that
+# undecided -- the same reason `$@' was asked beside `$*'.
+#
+# All indentation below is a TAB, as case 8's was, so indentation is
+# not a hidden variable between the cases.
+#
+# No watchdog: a Broken process keeps its memory. Re-run the smallest
+# storming case with APEXP_MALLOCMAX=32, take `stk()`, then
+# `echo kill > /proc/<pid>/ctl`.
+
+f1=/tmp/bfi-1.sh
+f2=/tmp/bfi-2.sh
+f3=/tmp/bfi-3.sh
+f4=/tmp/bfi-4.sh
+f5=/tmp/bfi-5.sh
+f6=/tmp/bfi-6.sh
+
+# 1. one line, no newline inside the command
+echo 'f() { echo hi; }' > $f1
+echo 'f' >> $f1
+
+# 2. THE NEW VARIABLE: the same function spread over three lines
+echo 'f() {' > $f2
+echo '	echo hi' >> $f2
+echo '}' >> $f2
+echo 'f' >> $f2
+
+# 3. multi-line, with the IFS-reading join that case 7 proved fine
+echo 'f() {' > $f3
+echo '	echo "$*"' >> $f3
+echo '}' >> $f3
+echo 'f a b c' >> $f3
+
+# 4. multi-line, with the redirection
+echo 'L=/tmp/bfi4.log' > $f4
+echo 'f() {' >> $f4
+echo '	echo hi >> $L' >> $f4
+echo '}' >> $f4
+echo 'f' >> $f4
+echo 'cat $L' >> $f4
+
+# 5. a multi-line compound command that is NOT a function
+echo 'if true' > $f5
+echo 'then' >> $f5
+echo '	echo hi' >> $f5
+echo 'fi' >> $f5
+
+# 6. case 8, unchanged
+echo 'LOG=/tmp/bfi6.log' > $f6
+echo 'rm -f $LOG' >> $f6
+echo 'mark() {' >> $f6
+echo '	echo "$*" >> $LOG' >> $f6
+echo '}' >> $f6
+echo 'mark reached-the-first-mark' >> $f6
+
+rm -f /tmp/bfi4.log /tmp/bfi6.log
+
+echo '=== bash-fileladder: what is it about the file? ==='
+echo
+
+echo '--- 1. a ONE-LINE function in a file ---'
+/bin/bash $f1
+echo '--- 1 returned ---'
+echo
+
+echo '--- 2. a MULTI-LINE function, body: echo hi ---'
+/bin/bash $f2
+echo '--- 2 returned ---'
+echo
+
+echo '--- 3. a multi-line function, body: echo "$*" ---'
+/bin/bash $f3
+echo '--- 3 returned ---'
+echo
+
+echo '--- 4. a multi-line function, body: echo hi >> $L ---'
+/bin/bash $f4
+echo '--- 4 returned ---'
+echo
+
+echo '--- 5. a multi-line if/then/fi -- NOT a function ---'
+/bin/bash $f5
+echo '--- 5 returned ---'
+echo
+
+echo '--- 6. case 8 of the ifs ladder, unchanged ---'
+/bin/bash $f6
+echo '--- 6 returned ---'
+echo '    (the log it should have written:)'
+cat /tmp/bfi6.log
+echo
+
+echo '=== ladder finished. A missing "returned" line names the case.'
+echo '=== 2 storming means the parser refilling its input across a'
+echo '=== newline; 5 storming too means compound commands generally.'

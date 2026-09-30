@@ -2610,6 +2610,41 @@ first character and `$@` does not join at all -- *asking only one
 would leave a negative result with two explanations*. All eight
 return on glibc and case 1 answers 3.
 
+**IT RAN, AND IFS IS REFUTED TOO -- ONLY THE FILE STORMS.**
+`${#IFS}` answers **3**, `"$*"` joins to `a b c`, `"$@"` likewise,
+and the variable argument, the function definition, the call and
+the `>>` inside a function all return. **Cases 1 to 7 clean; case
+8, the same thing in a FILE, killed.** So the construct my two
+converging lines pointed at works perfectly.
+**AND THAT REFRAMES THE ONE STACK THIS HUNT HAS PRODUCED.** The
+watchdog's `fault read addr=0x2e` was `s = ifs_value` with
+`ifs_value` holding a `'.'`. If reading IFS is healthy in isolation
+-- and case 7 says it is -- then **memory was ALREADY corrupt by
+the time that frame ran**. *The stack shows a VICTIM, not a
+culprit*: something had written a character into a `char *` in BSS.
+Chasing `setifs` would have been chasing the wrong end, and the
+convergence I called worth more than either line alone was two
+lines pointing at the same casualty.
+**ONE STRUCTURAL DIFFERENCE HAS NEVER BEEN ASKED.** Every `-c` case
+passes and every FILE case so far passed -- empty, one-line, with a
+substitution -- so it is not "a file" as such. **But every file
+tested held ONE-LINE commands, and case 8's function definition
+spans three lines.** A multi-line compound command is the first
+thing in this investigation that makes bash's PARSER ask its input
+for more *while a command is still open* -- `shell_getc` refilling
+`shell_input_line` from fd 255 mid-command. Through `-c` the whole
+text is in memory and that path is never entered.
+**`rc/bin/bash-fileladder` asks it**, all from files: a ONE-LINE
+function; the same function over THREE lines; multi-line with
+`"$*"`; multi-line with `>>`; **a multi-line `if/then/fi`, which is
+a compound command that is not a function**; and case 8 unchanged.
+*That fifth case is what makes it a bisect rather than a guess* --
+if a multi-line `if` storms, functions are cleared entirely and the
+subject is the parser's refill; if it does not and the multi-line
+function does, the opposite. Same reason `$@` was asked beside
+`$*`. Indentation is a TAB everywhere, as case 8's was, so it is
+not a hidden variable. All six return on glibc.
+
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR.
 
