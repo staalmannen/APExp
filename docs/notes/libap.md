@@ -2010,3 +2010,90 @@ which would make the stack clean evidence about bash rather than about
 the patch. *That is an inference from two observations, not a
 measurement.* Re-run it on the fixed tree; if the same stack returns,
 it is bash's.
+
+### abort() allocates on Plan 9, so the watchdog re-fired inside its own abort
+
+With the `_apemain` fix in place bash starts again, and the first real
+run of the watchdog produced an `acid` stack that was nothing but its
+own recursion:
+
+```
+wd_fail()             malloc.c
+_malloc_brk(n=0x1e0)  malloc.c
+malloc()              malloc.c
+open(flags=0x1, path=...)  fcntl/open.c:76
+note(fmt=..., msg=...)     signal/kill.c:16
+kill(sig=0x5, pid=...)     signal/kill.c:58
+abort()                    stdlib/abort.c:8
+wd_fail()                  <- round again
+```
+
+`abort()` raises SIGABRT; libap's `kill()` posts a note; `note()`
+opens `/proc/<pid>/note`; and `open()` calls `malloc`. The allocator
+is therefore re-entered *from inside its own abort*, still over the
+limit, and fires again — thousands of times, printing the message
+thousands of times and burying the one stack the instrument exists to
+expose.
+
+**The galling part is that the comment two lines above already said
+it.** `wd_fail` unlocks the arena before aborting, and the reason
+written there is "abort() runs the signal machinery, which may
+allocate". Having established that, I guarded against the *deadlock*
+and not against the *recursion*. Knowing a fact is not the same as
+following it to its second consequence.
+
+The fix is one statement, first in the function:
+
+```c
+	wd_max = 0;	/* disarm before aborting; abort() allocates */
+```
+
+Every later `wd_note()` then returns 0, the abort path allocates
+freely, and the message prints once. Verified on the host against a
+deliberately allocating `abort()`: one entry, one message, no
+recursion.
+
+**A free confirmation in the same stack**: `_malloc_brk(n=0x1e0)` —
+0x1e0 is **480**, exactly the step derived from the ratrace break
+addresses, and `BLKSZ(4) * ((CUTOFF-4)+2) = 48 * 10 = 480`. The size
+class was inferred from a log; here it is read directly off a live
+frame.
+
+### The bisect answered by producing no log at all
+
+`/bin/bash bash-comsub-test.sh` gave the two fd warnings, died
+`Insufficient physical memory`, and then:
+
+```
+cat: /tmp/comsub.log: No such file or directory
+```
+
+The log's first line comes from `mark "bash-comsub-test: pid $$"`,
+which is the script's first statement. **The file does not exist, so
+bash never ran one line of the script.**
+
+That is a real measurement and it retires the bisect's own premise:
+the storm is **not** in `run-all`'s lines 17–27, and none of the ten
+sections is the trigger. It sits in bash's startup, or in its very
+first statement. Two things already on record agree:
+
+- the histogram's `2 Rfork, 1 Exec` — the process died before the
+  suite could run anything;
+- the fd warnings printing *before* the script's first line, which was
+  attributed to `move_to_high_fd` at startup.
+
+**And it hands over a discriminator that was not asked for:
+interactive bash works.** The prompt all of these commands were typed
+at is bash, and it is healthy; it is non-interactive `bash <script>`
+that dies. So the next reduction is not a script at all:
+
+```
+APEXP_MALLOCMAX=32 /bin/bash -c 'echo hi'
+```
+
+If that storms, the reproducer has gone from an 83-file test suite to
+a single command with no file, no fork and no expansion worth the
+name — and the stack taken off it is the smallest this bug can
+produce. If it does *not* storm, the difference between it and a
+script file is the next thing to bisect, and that is a much smaller
+space than bash.

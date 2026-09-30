@@ -2447,6 +2447,58 @@ install, which would make the stack clean evidence about bash. That
 is an inference, not a measurement. **Re-run it after the rebuild**;
 if the same stack comes back, it is bash's and this is the bug.
 
+**SECOND INSTRUMENT BUG, SAME FUNCTION: `abort()` ALLOCATES ON
+PLAN 9, so the watchdog re-fired inside its own abort.** The fixed
+libap starts bash again, and the run gave an `acid` stack that was
+nothing but its own recursion, thousands of frames deep:
+
+```
+wd_fail()             malloc.c
+_malloc_brk(n=0x1e0)  malloc.c
+malloc()              malloc.c
+open(flags=0x1, ...)  fcntl/open.c:76
+note(...)             signal/kill.c:16
+kill(sig=0x5, ...)    signal/kill.c:58
+abort()               stdlib/abort.c:8
+wd_fail()             <- round again
+```
+
+`abort()` raises SIGABRT, libap's `kill()` posts a note, `note()`
+OPENS `/proc/<pid>/note`, and `open()` mallocs -- so the over-limit
+allocator is re-entered from inside its own abort and buries the
+stack it exists to expose. **I had written "abort() may allocate" in
+the comment justifying the unlock and then not drawn the
+conclusion**: `wd_fail` now clears `wd_max` as its FIRST statement,
+so the abort path allocates freely and the message prints once.
+*Sixth instrument fault; and unlike the others this one was named in
+my own comment one line above the bug.*
+**One thing that stack settles for free**: `_malloc_brk(n=0x1e0)` is
+**480**, which independently confirms the size class derived from
+the trace's break steps -- `BLKSZ(4) * ((CUTOFF-4)+2) = 48 * 10`.
+
+**AND THE BISECT ANSWERED BY RETURNING NOTHING, WHICH RETIRES ITS
+OWN PREMISE.** `/bin/bash bash-comsub-test.sh` printed the two fd
+warnings, died `Insufficient physical memory`, and then
+`cat: /tmp/comsub.log: No such file or directory`. The log's first
+line is written by `mark "bash-comsub-test: pid $$"`, the script's
+first statement -- **so bash never executed one line of it.**
+Therefore the storm is NOT in `run-all`'s lines 17-27, and none of
+the ten sections is the trigger; it is in bash's startup or its
+first statement. That agrees with two things already recorded: the
+histogram's `2 Rfork, 1 Exec` (dead before the suite ran anything)
+and the fd warnings arriving before the script's first line.
+**And it gives a sharp discriminator nobody had asked for:
+INTERACTIVE bash works -- the prompt those commands were typed at is
+bash -- while NON-INTERACTIVE `bash <script>` dies.** So the next
+reproducer is not a script at all:
+
+```
+APEXP_MALLOCMAX=32 /bin/bash -c 'echo hi'
+```
+
+If that storms, the reproducer has gone from an 83-file suite to one
+command, and the stack off it is as small as this can get.
+
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR.
 
