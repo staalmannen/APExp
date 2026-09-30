@@ -2525,6 +2525,48 @@ while `APEXP_MALLOCMAX` would leave a Broken process holding 32 MB
 *per failing case*. Re-run only the smallest storming case with the
 watchdog, take the stack, then `echo kill > /proc/<pid>/ctl`.
 
+**THE LADDER RAN AND NOTHING STORMED -- AND IT REFUTED WHAT I WROTE
+ONE ROUND EARLIER.**
+
+```
+1  bash -c 'echo hi'      hi         no warnings   returned
+2  an EMPTY script file   (nothing)  WARNINGS      returned
+3  a one-line file        hi         WARNINGS      returned
+4  the same on stdin      hi         no warnings   returned
+```
+
+**The fd warnings are now SEPARATED from the storm.** Having seen
+`bash -c` come back with neither, I recorded that they "arrive
+together and vanish together" -- and case 2 breaks that in the
+cleanest way available: an **empty** script file raises both
+warnings and then **exits successfully**. So they are
+`move_to_high_fd()` on the script descriptor exactly as predicted,
+they are produced by the NAMED FILE and nothing else here, and
+**they are harmless**. *A run that warns has said nothing about
+whether it will die.* Two rounds ago they were conflated with the
+storm; one round ago I linked them on evidence that looked stronger
+than it was; a single measurement has now separated them. **Stop
+reading them as a symptom.**
+**And the storm is not the script file at all** -- not parsing, not
+a named file, not reading a script.
+**WHAT ALL FOUR CLEAN CASES SHARE IS THAT NOT ONE OF THEM FORKS.**
+`echo` is a bash builtin, so 1, 3 and 4 run it in the shell itself
+and 2 runs nothing. Against that, **every case that has ever
+stormed forks**: run-all's line 21 is `SUFFIX=$( ... )`,
+`bash-comsub-test.sh`'s third statement is `rm -f $LOG`,
+`bash-fdloop-test.sh` is 400 iterations of fork/exec/wait -- and
+the histogram over the whole dying run was `2 Rfork, 1 Exec`, with
+the storm starting right after the one child was reaped.
+**`rc/bin/bash-forkladder` asks that**, same rc harness: `-c` with
+an EXTERNAL echo (one fork), `-c` with a command substitution
+(fork + pipe + reap), each again from a FILE, and **case 5, the
+first four statements of `bash-comsub-test.sh` verbatim in shape**
+-- an assignment, an external command, a function definition and a
+call. *Case 5 is what keeps the ladder honest*: if even that
+returns and writes its log, the failure has stopped reproducing and
+the whole reading above is about a bug that is no longer there,
+which is worth knowing at once rather than after another reduction.
+
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR.
 
