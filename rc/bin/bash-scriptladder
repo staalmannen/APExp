@@ -1,0 +1,121 @@
+#!/bin/rc
+# bash-scriptladder -- WHICH WAY OF FEEDING bash A SCRIPT STORMS?
+#
+#	bash-scriptladder
+#
+# Run it from inside apexp-sh. **It is an rc script on purpose**: the
+# subject dies, and a harness written in the dying shell dies with it.
+# rc survives every case and gets all four answers in one run.
+#
+# ------------------------------------------------------------------
+# WHAT IS ALREADY MEASURED.
+#
+#   APEXP_MALLOCMAX=32 /bin/bash -c 'echo hi'     -> hi.  CLEAN.
+#   /bin/bash bash-comsub-test.sh                 -> fd warnings at
+#                                                    100 and 200, then
+#                                                    Insufficient
+#                                                    physical memory,
+#                                                    and NO log file
+#
+# The log's first line is that script's first statement, so **bash
+# never ran one line of it** -- the ten-section bisect inside it was
+# never reached and none of those sections is the trigger.
+#
+# So the storm is not in any script's CONTENT. It is in how bash is
+# started. And `-c' is clean *including the fd warnings*, which did
+# not appear at all -- so the warnings and the storm arrive together
+# and probably share a cause.
+#
+# ------------------------------------------------------------------
+# WHAT THIS ASKS, AND WHAT EACH ANSWER MEANS.
+#
+# Four ways in, simplest first, each expected to print `hi' (or
+# nothing, for the empty one) and come back:
+#
+#   1  -c 'echo hi'        the control. Known clean; re-run so the
+#                          whole ladder is one measurement rather
+#                          than three plus a memory.
+#   2  an EMPTY file       a script file with no content at all. If
+#                          this storms, PARSING AND EXECUTION ARE
+#                          INNOCENT -- it is opening and setting up a
+#                          script file, which is where fd 255 and
+#                          move_to_high_fd() live.
+#   3  a one-line file     the same content as 1, reached through a
+#                          named file.
+#   4  the same on STDIN   `bash < file': non-interactive, reads a
+#                          script, but was given no filename and does
+#                          no move_to_high_fd.
+#
+# Reading the result:
+#
+#   2 storms            -> the script-FILE setup path, no parsing
+#                          involved. Smallest possible target.
+#   2 ok, 3 storms      -> parsing or executing from a file
+#   3 storms, 4 ok      -> the NAMED FILE specifically (fd 255,
+#                          move_to_high_fd) rather than reading a
+#                          script as such
+#   3 and 4 both storm  -> reading a script at all, however supplied
+#   nothing storms      -> it needs something bash-comsub-test.sh has
+#                          and these do not; bisect that file's
+#                          HEADER next, not its sections
+#
+# ------------------------------------------------------------------
+# NO WATCHDOG HERE, DELIBERATELY.
+#
+# $APEXP_MALLOCMAX is NOT set. This run only needs to know which cases
+# storm, and `hi' versus a death message answers that. Setting it
+# would leave a Broken process holding 32 MB per failing case -- **a
+# Broken process keeps its memory** -- and four of those would flatten
+# a small VM before the ladder finished.
+#
+# Once the smallest storming case is known, re-run THAT ONE with the
+# watchdog to get the stack:
+#
+#	APEXP_MALLOCMAX=32 /bin/bash <the smallest storming case>
+#	ps | grep bash          # find the Broken one
+#	acid <pid>              # stk()
+#	echo kill > /proc/<pid>/ctl
+#
+# ------------------------------------------------------------------
+# rc NOTES, each of which has cost a round in this tree.
+#
+#   - A LEADING assignment is fine in rc (`x=1 cmd'); it is `key=value'
+#     as an ARGUMENT to a program that is a parse error. Nothing here
+#     passes one.
+#   - `^' is a CROSS PRODUCT, not concatenation, so nothing is built
+#     by concatenating with a list.
+#   - rc has no `break', so there is no loop here at all -- four
+#     straight-line cases, which is also what makes each survive the
+#     one before it.
+
+one=/tmp/bsl-one.sh
+empty=/tmp/bsl-empty.sh
+
+echo 'echo hi' > $one
+> $empty
+
+echo '=== bash-scriptladder: four ways in, simplest first ==='
+echo
+
+echo '--- 1. bash -c (the control; known clean) ---'
+/bin/bash -c 'echo hi'
+echo '--- 1 returned ---'
+echo
+
+echo '--- 2. an EMPTY script file (no parsing, no execution) ---'
+/bin/bash $empty
+echo '--- 2 returned ---'
+echo
+
+echo '--- 3. a one-line script FILE ---'
+/bin/bash $one
+echo '--- 3 returned ---'
+echo
+
+echo '--- 4. the same content on STDIN (no filename) ---'
+/bin/bash < $one
+echo '--- 4 returned ---'
+echo
+
+echo '=== ladder finished; every "returned" line above means that'
+echo '=== case survived. A missing one is the case that storms.'

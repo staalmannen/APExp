@@ -2097,3 +2097,60 @@ name — and the stack taken off it is the smallest this bug can
 produce. If it does *not* storm, the difference between it and a
 script file is the next thing to bisect, and that is a much smaller
 space than bash.
+
+### `bash -c` is clean, and that leaves a very small space
+
+```
+$ APEXP_MALLOCMAX=32 /bin/bash -c 'echo hi'
+hi
+```
+
+No storm, and — the part that was not asked for — **no fd warnings
+either**. The `exceeds 100 file descriptors` / `exceeds 200` pair that
+has accompanied every failing run did not appear. So the warnings and
+the storm arrive together and vanish together.
+
+That does not make them one story; they can still be two effects of a
+single cause, which is what `move_to_high_fd()` on the script
+descriptor would produce. But "present together, absent together" is a
+real constraint where before there was only "printed together", and
+the earlier note in this file explicitly refused to treat them as one
+thing on the strength of co-printing alone. It can now be treated as a
+live hypothesis rather than a conflation.
+
+**The remaining space is the difference between `-c` and a script
+file.** `rc/bin/bash-scriptladder` walks it:
+
+| | how bash is started | what it isolates |
+|---|---|---|
+| 1 | `-c 'echo hi'` | control, known clean |
+| 2 | an **empty** file | script-file setup with no parsing at all |
+| 3 | a one-line file | same content as 1, through a named file |
+| 4 | `< one-line file` | reads a script, but no filename |
+
+- **2 storms** → parsing and execution are innocent; it is opening and
+  setting up a script file, which is where fd 255 and
+  `move_to_high_fd()` live. That is about as small as a target gets.
+- **2 ok, 3 storms** → parsing or executing from a file.
+- **3 storms, 4 ok** → the *named file* specifically, not reading a
+  script as such.
+- **3 and 4 both** → reading a script at all, however supplied.
+- **nothing storms** → it needs something `bash-comsub-test.sh` has
+  and these do not, and the thing to bisect next is that file's
+  header, not its sections.
+
+**It is an rc script on purpose.** The subject dies, and a harness
+written in the dying shell dies with it — which is exactly how
+`bash-comsub-test.sh` came back with an empty answer. rc survives every
+case, so one run yields all four verdicts; each case prints a
+`returned` line after it, and a missing one names the case that
+stormed. Straight-line, no loop (rc has no `break`), no `^`, and the
+only `=` are leading assignments, which rc permits — it is `key=value`
+as an *argument* that is a parse error.
+
+**No watchdog in the ladder, deliberately.** Classification only needs
+`hi` versus a death message. Setting `APEXP_MALLOCMAX` would leave a
+Broken process holding 32 MB *per failing case*, and four of those
+would flatten the VM before the ladder finished. Re-run only the
+smallest storming case with the watchdog, take `stk()`, then
+`echo kill > /proc/<pid>/ctl`.
