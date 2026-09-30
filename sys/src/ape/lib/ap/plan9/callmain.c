@@ -37,6 +37,7 @@
 char *argv0 = NULL;
 
 extern	void _envsetup(void);
+extern	void _malloc_watchinit(void);
 extern	char **environ;
 extern	int *_errnoloc;
 
@@ -91,6 +92,20 @@ int
 _apemain(int argc, char **argv)
 {
 	_envsetup();
+	/*
+	 * HERE, and the position is the whole point. The heap watchdog
+	 * ($APEXP_MALLOCMAX, malloc/malloc.c) needs one getenv, and it
+	 * CANNOT take it from inside the allocator: `environ' is
+	 * created by a malloc (_envsetup.c:140), so on a program's
+	 * first allocation it is still null and libap's getenv -- which
+	 * has no null check -- faults at address 0. That broke every
+	 * APE program in the tree for one round.
+	 *
+	 * After _envsetup() the environment is complete; before main()
+	 * nothing of the program has run. Allocations made earlier go
+	 * unwatched, which is the safe direction to be wrong in.
+	 */
+	_malloc_watchinit();
 	extern int main(int, char**, char**);
 	return main(argc, argv, environ);
 }

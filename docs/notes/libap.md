@@ -1902,3 +1902,111 @@ one investigation.
 
 All ten sections return on glibc in 13 ms, which is what makes a
 stall on 9front attributable.
+
+### The watchdog's first version broke every APE program, and the reason generalises
+
+It read `$APEXP_MALLOCMAX` lazily on the first `sbrk`. I checked the
+question that seemed to matter — *does `getenv` allocate?* — and it
+does not; `ap/env/getenv.c` is a plain scan of `environ`.
+
+**That was the wrong question.** `environ` is created BY a malloc:
+
+```c
+/* plan9/_envsetup.c:140 */
+environ = pp = malloc((1+cnt)*sizeof(char *));
+```
+
+So on the **first allocation of every APE program** `environ` is still
+null, and getenv has no null check — `char **p = environ; while (*p !=
+NULL)` faults at address 0, before `main`. Every APE binary relinked
+against that libap died on startup:
+
+```
+bash 2487: suicide: sys: trap: fault read addr=0x0 pc=0x263312
+```
+
+*It is not a re-entrancy bug. It is a **circular dependency**: the
+allocator asked for state that the allocation was being made to
+create.* The general form is worth carrying past this instance:
+
+> **"Does it allocate?" is only half of "is it safe to call from the
+> allocator". The other half is "does it depend on anything that was
+> allocated?" — and for a libc global, the answer is usually yes.**
+
+`_malloc_watchinit()` is now called from **`_apemain`, immediately
+after `_envsetup()`** and before `main`. That is the same "one path
+every APE program takes" argument that put `argv0` in `callmain.c`.
+The allocator now calls nothing at all and only tests a static;
+allocations before that point go unwatched, which is the safe
+direction to be wrong in. A defensive `environ == 0` test stays in
+`_malloc_watchinit` anyway, because the cost is one branch once.
+
+Verified on the host across all three paths before shipping: the
+null-`environ` call returns harmlessly, `wd_calls` is **0** after 3000
+notes before init (so an unwatched program pays nothing), and with
+`APEXP_MALLOCMAX=64` it still fires on the 65th MB.
+
+**This is the fifth time in this one investigation that the instrument
+was the visible fault** — fdwatch's sampling period exceeding its
+subject's lifetime, fdwatch's `-n` taking the copy process,
+`bash-fdloop-test`'s `expr` control that forked, the same file's
+`fdcount` forking inside a test about forking, and now this. The tally
+is not an accident: every one was an instrument sharing state or
+resources with the thing it measured.
+
+**Operational note that cost the user a reboot attempt: a Broken
+process KEEPS ITS MEMORY.** `acid` needs the process alive, so the
+watchdog deliberately leaves it Broken — but a few aborted 64 MB runs
+will exhaust a small VM by themselves. Kill each one after taking the
+stack.
+
+### What the one run that did happen says about bash: `ifs_value` is not a pointer
+
+Whatever its provenance, the `acid` stack is specific:
+
+```
+bash 1764: suicide: sys: trap: fault read addr=0x2e pc=0x2310ad
+list_string(separators=0x428891, quoted=..., string=0x486eb0)  subst.c:3133
+expand_word_internal(...)                                      subst.c:12072
+  ifs_chars=0x2e
+call_expand_word_internal          subst.c:4285
+expand_string_assignment           subst.c:4377
+expand_string_to_string_internal   subst.c:3855
+expand_assignment_string_to_string subst.c:3881
+assign_in_env                      variables.c:3598
+do_assignment_statements           subst.c:13156
+expand_word_list_internal          subst.c:13261
+expand_words                       subst.c:12571
+execute_simple_command             execute_cmd.c:4617
+```
+
+- `subst.c:12072` is `list = list_string (istring, "", quoted);`, so
+  `separators` is the string literal `""` — and `0x428891` is a
+  plausible text address, so that argument is fine.
+- `subst.c:3133` is `for (xflags = 0, s = ifs_value; s && *s; s++)`.
+
+So the faulting dereference is **`*ifs_value`, with `ifs_value` holding
+`0x2e`** — the byte `'.'` sitting in a `char *`. The caller's own
+`ifs_chars=0x2e` agrees, and `setifs` (subst.c:12309) sets
+`ifs_value = (v && value_cell (v)) ? value_cell (v) : " \t\n"`, neither
+arm of which can yield 46. Declarations are consistent — `extern char
+*ifs_value` at `subst.h:353`, `char *ifs_value` at `subst.c:161` — so
+this is runtime corruption rather than the kencc prototype/width family.
+
+**Why it is worth chasing: one corruption would explain both symptoms.**
+With `ifs_value` garbage, `list_string` either faults on it (this run)
+or, when the garbage happens to address readable bytes, splits its
+input into an enormous number of words — and each word is a retained
+`WORD_DESC` plus a `WORD_LIST` node, both small, both live until the
+list is freed. **That is precisely the storm's signature: ~17 million
+live objects of ≤ 16 bytes, no syscall anywhere in the loop.** It is
+also the same code path the line numbers had already localised the
+storm to: assignment expansion, immediately after line 21's `$( )`.
+
+**Provenance is unsettled and must be settled before anything is built
+on it.** The broken libap faults at 0x0 before `main`, yet 1764 reached
+`reader_loop` — so 1764 was most likely a bash predating that install,
+which would make the stack clean evidence about bash rather than about
+the patch. *That is an inference from two observations, not a
+measurement.* Re-run it on the fixed tree; if the same stack returns,
+it is bash's.

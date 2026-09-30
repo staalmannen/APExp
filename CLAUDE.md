@@ -2379,15 +2379,73 @@ other:**
   failed on them. Counts **both** sbrk sites: `_malloc_growtop` has
   the same two-`Brk` signature as `_malloc_brk`, so a trace cannot
   tell them apart and a watchdog watching one could report a flat
-  heap while the break ran away. Safe from inside the allocator --
-  `getenv` is a plain scan of `environ` and allocates nothing, and
-  `write(2)` with a hand-rolled number is `_apdbg`'s idiom for the
-  same reason; `wd_fail` unlocks the arena before `abort()`, since
-  aborting under our own lock would hang where a break was wanted.
-  Off unless set, at one load and one branch per sbrk.
+  heap while the break ran away. `wd_fail` unlocks the arena before
+  `abort()`, since aborting under our own lock would hang where a
+  break was wanted. Off unless set, at one load and one branch per
+  sbrk.
+  **ITS FIRST VERSION BROKE EVERY APE PROGRAM IN THE TREE, and the
+  reason is worth more than the instrument.** It read
+  `$APEXP_MALLOCMAX` lazily on the first sbrk, and I checked the
+  thing that seemed to matter -- *does `getenv` allocate?* It does
+  not (`ap/env/getenv.c` is a plain scan). **That was the wrong
+  question.** `environ` is CREATED BY a malloc:
+  `plan9/_envsetup.c:140` is `environ = pp = malloc(...)`. So on the
+  first allocation of every APE program `environ` is still null, and
+  getenv has no null check -- so `while(*p != NULL)` faults at
+  address 0 before `main`. *Not a re-entrancy bug but a CIRCULAR
+  DEPENDENCY: the allocator asked for state that the allocation was
+  being made to create.* The general form is worth carrying:
+  **"does it allocate?" is only half of "is it safe to call from the
+  allocator" -- the other half is "does it depend on anything
+  allocated?"**, and for libc globals the answer is usually yes.
+  `_malloc_watchinit()` is now called from **`_apemain`, right after
+  `_envsetup()`** -- the same "one path every APE program takes"
+  that `argv0` uses -- so the allocator calls nothing at all and
+  only tests a static. Allocations before that point are unwatched,
+  which is the safe direction to be wrong in.
 *The general shape, and it is new: a failure mode that KILLS leaves
 nothing to measure, so the instrument's job is to fail earlier and
-more politely than the kernel does.*
+more politely than the kernel does.* **And its cost, immediately:
+that is the FIFTH time in this investigation the instrument has been
+the visible fault** (fdwatch's sampling period, fdwatch's `-n`,
+fdloop's `expr` control, fdloop's forking `fdcount`, and now this).
+**A Broken process KEEPS ITS MEMORY**, so `acid` must be followed by
+a kill, or a few aborted runs exhaust a small VM by themselves.
+
+**AND THE ACCIDENT NAMED A LINE IN bash: `ifs_value` IS NOT A
+POINTER.** The one run that happened gave a full `acid` stack:
+
+```
+bash 1764: suicide: sys: trap: fault read addr=0x2e pc=0x2310ad
+list_string(separators=0x428891, ...) subst.c:3133
+expand_word_internal(...)  subst.c:12072   ifs_chars=0x2e
+call_expand_word_internal / expand_string_assignment / 
+expand_assignment_string_to_string / assign_in_env variables.c:3598
+do_assignment_statements / expand_words / execute_simple_command
+```
+
+`subst.c:3133` is `for (xflags = 0, s = ifs_value; s && *s; s++)`,
+and 12072 is `list = list_string (istring, "", quoted)` -- so
+`separators` is the literal `""` and the fault is
+**`*ifs_value` with `ifs_value == 0x2e`**, i.e. the byte `'.'` in a
+`char *`. The caller's `ifs_chars=0x2e` agrees. Declarations are
+consistent (`char *` in `subst.h:353` and `subst.c:161`), so it is
+runtime corruption, not a type mismatch.
+**One corruption would explain BOTH symptoms**, which is why it is
+worth chasing: with `ifs_value` garbage, `list_string` either faults
+on it (this run) or, if the garbage happens to address readable
+bytes, splits a string into millions of words -- and every word is a
+retained `WORD_DESC` plus `WORD_LIST` node, small and never freed.
+*That is exactly the storm's signature: ~17M live objects of <= 16
+bytes and no syscall in the loop.* And the path is the same one the
+line numbers localised the storm to: assignment expansion, straight
+after line 21's `$( )`.
+**PROVENANCE IS UNSETTLED AND MUST BE BEFORE THIS IS BUILT ON.**
+The new libap faults at 0x0 before `main`, yet 1764 reached
+`reader_loop` -- so 1764 was most likely a bash predating the libap
+install, which would make the stack clean evidence about bash. That
+is an inference, not a measurement. **Re-run it after the rebuild**;
+if the same stack comes back, it is bash's and this is the bug.
 
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR.
