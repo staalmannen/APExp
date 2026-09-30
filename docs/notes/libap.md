@@ -2807,3 +2807,51 @@ answer now.
 closed*: a build-time generator bakes the building libc's answers into
 a checked-in file, so a libc bug becomes a permanent data error in
 another program, and fixing the libc does not fix it.
+
+### CONFIRMED on the VM: the storm is gone
+
+After `mk install` with the four changes, `cd sys/src/external/bash/tests
+&& /bin/bash run-all` **gets past the crash** and runs real tests. The
+screen shows actual suite output — `comsub-posix.tests` reporting
+`recho: command not found` at three lines, `comsub-posix6.sub` syntax
+errors, `argv[1] = <abcde>`, `ok 2`, `inside outside`, `ok 3` — all of
+it normal test chatter from a shell that is working.
+
+The only changes between the failing run and this one were
+`_ctype[9]` gaining `_ISblank`, `isprint` becoming a function, and one
+entry in bash's `syntax.c`. So the chain from a missing table flag to
+an out-of-memory kill in another program is measured end to end, not
+argued.
+
+*It took eleven refuted mechanisms and eight instrument faults to get
+from "bash leaks file descriptors" to one bit in a 256-entry array.*
+
+### Now it freezes at `run-comsub2`, which is a different failure
+
+`run-all`'s loop is `echo $x ; sh $x ; rm -f ${BASH_TSTOUT}`, so the
+name printing and nothing following means `sh run-comsub2` has not
+returned. That file is two lines:
+
+```sh
+${THIS_SH} ./comsub2.tests > ${BASH_TSTOUT} 2>&1
+diff ${BASH_TSTOUT} comsub2.right && rm -f ${BASH_TSTOUT}
+```
+
+and `comsub2.tests` is bash 5.3's **`${ command; }` nofork command
+substitution** — a feature that captures a command's output without
+forking, so it is new surface for this port rather than something
+that has been exercised all along.
+
+**Three processes could be holding it**: the `sh` running the script,
+the `bash` running the tests, or `diff`. Two rules in this tree apply
+before any reading:
+
+- *Read the `ps` STATES before taking a stack.* `Pread`/`Rendez`/`Sleep`
+  is blocked; `Ready` with CPU time climbing is spinning.
+- *Blocked and spinning are different bugs.* Constant light CPU is a
+  wait; a pinned core is a loop. They need entirely different next
+  steps, and `ps` separates them in one command.
+
+So: `ps | grep -e bash -e diff -e ' sh'`, read the state and the CPU
+column, and only then decide whether `acid` wants a stack or the
+question is which call is blocked.

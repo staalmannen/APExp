@@ -2826,6 +2826,26 @@ table was wrong.
 `isblank`, and `syntax.c` the only file it produces. Every other
 `isblank` caller is a runtime one and simply gets the right answer
 now.
+**CONFIRMED ON THE VM: `run-all` GETS PAST THE STORM.** The same
+command that has died for weeks now runs real tests and prints real
+output -- `comsub-posix.tests`, `comsub-posix6.sub`, the
+syntax-error cases, `argv[1] = <abcde>` and the rest. **bash no
+longer dies of the allocation storm**, and since the only changes
+were `_ctype[9]`, `isprint` and one entry in `syntax.c`, the chain
+is measured end to end rather than argued.
+**It now FREEZES at `run-comsub2`**, which is a different failure
+and needs its own round. `run-all`'s loop is `echo $x ; sh $x`, so
+the name printed and the script did not return; `run-comsub2` is
+`${THIS_SH} ./comsub2.tests > $BASH_TSTOUT 2>&1` then a `diff`, and
+`comsub2.tests` exercises bash 5.3's **`${ command; }` nofork
+command substitution**. Three processes could be holding it -- the
+`sh` running the script, the `bash` running the tests, or `diff`.
+**`ps` names which and says blocked-or-spinning in one command**,
+and this tree has the rule already: *read the `ps` STATES before
+taking a stack*, and *blocked and spinning are different bugs --
+constant light CPU is a wait, a pinned core is a loop.* Do not
+reach for `acid` first.
+
 **The watchdog now SAYS WHEN IT IS ARMED, and a wasted round is
 why.** A run went out as `APEX__MALLOCMAX=8` -- two underscores, no
 `P` -- so the watchdog never armed, bash ran to full exhaustion and
