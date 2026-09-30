@@ -2645,6 +2645,45 @@ function does, the opposite. Same reason `$@` was asked beside
 `$*`. Indentation is a TAB everywhere, as case 8's was, so it is
 not a hidden variable. All six return on glibc.
 
+**AND IT ANSWERED: A COMMAND THAT SPANS A NEWLINE IN A SCRIPT
+FILE.**
+
+```
+1  a ONE-LINE function in a file       hi      returned
+2  the same function over THREE lines  KILLED
+3  multi-line + "$*"                   KILLED
+4  multi-line + >>                     KILLED
+5  a multi-line if/then/fi             KILLED   <- NOT a function
+6  case 8 unchanged                    KILLED
+```
+
+**Case 5 carries the result**: a compound command that is not a
+function, dying exactly like the rest. So **functions are cleared
+entirely**, and with them `$*`, `>>`, the variable argument and the
+external command. The discriminator is the single thing cases 2-6
+share and case 1 does not -- a newline *inside* a command -- which
+is the first thing in this investigation that makes bash's input
+layer deliver more text **while a command is still open**. `-c` has
+the program in memory and never enters it; a file of one-line
+commands never needs it, which is why every earlier file case
+passed. *Seven mechanisms refuted by measurement now -- descriptor
+leak, copy processes, `wait4`, `pc=0`, `read_comsub`, forking, IFS
+-- one run each.*
+**`rc/bin/bash-lineladder` asks the one remaining question that
+changes WHICH FILE to read**, since "spans a newline" has two
+implementations behind it: the **LEXER** wanting another line (a
+backslash continuation, an unterminated quote -- `shell_getc` at
+`parse.y:2475` refills `shell_input_line` and the grammar never
+sees an incomplete command) versus the **PARSER** wanting one (an
+open `if`, `{`, function body or dangling `|`, where the grammar is
+mid-rule). Five cases: a continuation, a quote across a newline, a
+`{ }` group, a pipeline broken after `|`, and the `if` as control.
+All five return on glibc.
+**Then the stack, which is finally cheap** -- the subject is four
+lines instead of an 83-file suite:
+`APEXP_MALLOCMAX=32 /bin/bash /tmp/bli-5.sh`, `ps | grep bash`,
+`acid <pid>`, `stk()`, then `echo kill > /proc/<pid>/ctl`.
+
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR.
 

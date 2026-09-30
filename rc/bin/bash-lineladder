@@ -1,0 +1,137 @@
+#!/bin/rc
+# bash-lineladder -- LEXER OR PARSER? and the smallest reproducer.
+#
+#	bash-lineladder
+#
+# ------------------------------------------------------------------
+# bash-fileladder ANSWERED IT: A COMMAND THAT SPANS A NEWLINE.
+#
+#	1  a ONE-LINE function in a file      hi       returned
+#	2  the same function over THREE lines KILLED
+#	3  multi-line + "$*"                  KILLED
+#	4  multi-line + >>                    KILLED
+#	5  a multi-line if/then/fi            KILLED   <-- NOT a function
+#	6  case 8 unchanged                   KILLED
+#
+# **Case 5 is the one that carries the result.** It is a compound
+# command that is not a function, and it dies exactly like the rest --
+# so FUNCTIONS ARE CLEARED ENTIRELY, and so are `$*', `>>', the
+# variable argument and the external command. The discriminator is the
+# one thing cases 2 to 6 share and case 1 does not: **a command that
+# spans a newline.**
+#
+# That is the first thing in this whole investigation that makes
+# bash's input layer deliver more text WHILE A COMMAND IS STILL OPEN.
+# `-c' has the program in memory and never enters it; a file with only
+# one-line commands never needs it either, which is why every earlier
+# file case passed.
+#
+# *Seven mechanisms have now been refuted by measurement -- descriptor
+# leak, copy processes, wait4, pc=0, read_comsub, forking, IFS -- and
+# each ladder cost one run.*
+#
+# ------------------------------------------------------------------
+# THE ONE QUESTION LEFT THAT CHANGES WHICH FILE TO READ.
+#
+# "Spans a newline" has two quite different implementations behind it:
+#
+#   the LEXER wants another line -- a backslash continuation or an
+#     unterminated quote. `shell_getc' (parse.y:2475) refills
+#     `shell_input_line' and the GRAMMAR never sees an incomplete
+#     command at all.
+#   the PARSER wants another line -- an open compound command
+#     (`if', `{', a function body, a dangling `|'). The grammar is
+#     mid-rule and the newline is a token.
+#
+# **They live in different code and the fix would be in different
+# files, so this is worth one run before reading anything.**
+#
+#   1  a backslash continuation      lexer only
+#   2  a quote spanning a newline    lexer only
+#   3  a `{ ... }' group             parser, simplest compound
+#   4  a pipeline broken after `|'   parser, no compound at all
+#   5  the if/then/fi                the known-storming control
+#
+#   1 or 2 storms   -> the LEXER's refill; read parse.y's shell_getc
+#                      and input.c, and the reproducer is TWO lines
+#   only 3,4,5      -> the PARSER holding an incomplete command; the
+#                      grammar's newline handling and read_secondary
+#   everything      -> any second line at all while something is
+#                      open, which is the refill again and the
+#                      broadest statement of it
+#
+# ------------------------------------------------------------------
+# AND THEN THE STACK, which is now cheap because the subject is four
+# lines rather than an 83-file suite:
+#
+#	APEXP_MALLOCMAX=32 /bin/bash /tmp/bli-5.sh
+#	ps | grep bash                  # find the Broken one
+#	acid <pid>                      # then: stk()
+#	echo kill > /proc/<pid>/ctl     # a Broken process KEEPS its memory
+#
+# No watchdog in this ladder, for that same reason: five armed cases
+# would leave five Broken processes holding 32 MB each.
+
+f1=/tmp/bli-1.sh
+f2=/tmp/bli-2.sh
+f3=/tmp/bli-3.sh
+f4=/tmp/bli-4.sh
+f5=/tmp/bli-5.sh
+
+# 1. backslash continuation: the lexer joins the lines, the grammar
+#    only ever sees one command.
+echo 'echo hi \' > $f1
+echo 'there' >> $f1
+
+# 2. a quote left open at end of line: again purely the lexer.
+echo 'echo "a' > $f2
+echo 'b"' >> $f2
+
+# 3. the simplest compound command there is.
+echo '{' > $f3
+echo '	echo hi' >> $f3
+echo '}' >> $f3
+
+# 4. a pipeline broken after the bar -- the parser wants a second
+#    line with no compound command anywhere.
+echo 'echo hi |' > $f4
+echo 'cat' >> $f4
+
+# 5. the known-storming case, as the control.
+echo 'if true' > $f5
+echo 'then' >> $f5
+echo '	echo hi' >> $f5
+echo 'fi' >> $f5
+
+echo '=== bash-lineladder: is the refill the LEXER or the PARSER? ==='
+echo
+
+echo '--- 1. backslash continuation  (lexer) ---'
+/bin/bash $f1
+echo '--- 1 returned ---'
+echo
+
+echo '--- 2. a quote spanning a newline  (lexer) ---'
+/bin/bash $f2
+echo '--- 2 returned ---'
+echo
+
+echo '--- 3. a { ... } group  (parser) ---'
+/bin/bash $f3
+echo '--- 3 returned ---'
+echo
+
+echo '--- 4. a pipeline broken after |  (parser, no compound) ---'
+/bin/bash $f4
+echo '--- 4 returned ---'
+echo
+
+echo '--- 5. if/then/fi  (the known-storming control) ---'
+/bin/bash $f5
+echo '--- 5 returned ---'
+echo
+
+echo '=== ladder finished. Then take the stack:'
+echo '===   APEXP_MALLOCMAX=32 /bin/bash <smallest storming file>'
+echo '===   ps | grep bash ; acid <pid> ; stk()'
+echo '===   echo kill > /proc/<pid>/ctl'
