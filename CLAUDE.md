@@ -3122,6 +3122,53 @@ now LOUD -- a harmless message that lands in a captured stream stops
 being harmless to the measurement.* Size it from the harness summary
 before touching anything.
 
+**`date` CRASHES, and `/proc/n/ppid` is what stopped me blaming it.**
+The full `ps` -- ungrepped, after two rounds of grep hiding things --
+showed **two `Broken date` processes** beside the stalled harness, and
+a `Broken` process is ALIVE to the kernel (stopped at a fault), so
+`await` on one can never return. That fit the `Await` perfectly and
+was wrong: `ppid` says 7273473 and 7287195, **both gone**, so the two
+dates are ORPHANS and nothing waits on them. The actual child of
+`bash-runtests` is an **`awk` in `Pwrite`** -- my own summary, so that
+stall is mine. *Three mechanisms offered, the right one not among
+them: a list of alternatives is only exhaustive over what you thought
+of.* **`ppid` costs nothing and would have saved the whole detour.**
+**The crash itself is real and new**, with a complete stack:
+
+```
+save_abbr(...)+0x3d        gnulib/time_rz.c:127
+mktime_z(tm=.., tz=0x43f480) gnulib/time_rz.c:310
+__strftime_internal(...)   gnulib/strftime.c:2092   <- the %s arm
+fprintftime(...)           gnulib/strftime.c:1198
+show_date(...)             coreutils/src/show-date.c:32
+show_date_helper(...)      coreutils/src/date.c:397
+main                       coreutils/src/date.c:709
+```
+
+`time_rz.c:127` is `char const *zone = tm->tm_zone;` and the only
+dereference below it is `if (*zone)`, guarded by `if (!zone || zone
+points INSIDE tm) return true;`. **So the fault is `*zone` with a
+non-null `tm_zone` that is neither NULL nor internal** -- a stale or
+invalid pointer.
+**Sitting directly under it: libap's `mktime` never writes
+`tm_zone`, `tm_gmtoff` or `tm_isdst` back into `*t`.** It is 132
+lines and only normalises the date fields. glibc and the BSDs set all
+three, and `mktime_z` is written around that -- it does
+`struct tm tm_1 = *tm; mktime(&tm_1); save_abbr(tz, &tm_1);`.
+*Recorded as a conformance gap, NOT as the diagnosis*: `localtime_rz`
+should already have repointed `tm_zone` into the `tz` object, so the
+chain is not closed.
+**It prints correct output and THEN dies** -- both manual runs showed
+the right time -- which points at teardown or at a later `%`
+conversion rather than at the formatting that produced the visible
+line. *A program that answers correctly and then faults is reporting
+something after the answer.*
+**Next, and cheap, because a Broken process keeps everything**:
+`acid <pid>` then `lstk()` prints the LOCALS, so `zone`'s actual
+value is one command away -- NULL, inside-tm, or garbage are three
+different bugs. And `date` twice in a row with `ps | grep date`
+between says whether it leaves a corpse every time.
+
 **The watchdog now SAYS WHEN IT IS ARMED, and a wasted round is
 why.** A run went out as `APEX__MALLOCMAX=8` -- two underscores, no
 `P` -- so the watchdog never armed, bash ran to full exhaustion and
