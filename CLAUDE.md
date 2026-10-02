@@ -3028,6 +3028,10 @@ used to KILL rather than fail**, so reaching section 3 at all is the
 result; **section 4 is the control** (`getcwd(buf,0)` must be EINVAL),
 since an implementation that allocated unconditionally would pass
 everything else. 0 failures on glibc.
+**CONFIRMED ON THE VM**: `_getcwdmark = 1`, all four sections PASS,
+0 failures -- and section 2 is bash's exact `getcwd(NULL, PATH_MAX)`,
+which used to kill the process rather than fail, so reaching section 3
+was itself the result.
 **Why it had not bitten before is NOT settled and is not worth a
 round**: `set_pwd` reaches `get_working_directory` only when `PWD` is
 absent from the environment or does not match `.`, so the path was
@@ -3085,6 +3089,38 @@ this needs no `distclean` of its own. `getcwd.c` takes
 `<sys/limits.h>` as `at_functions.c` beside it already does -- *the
 include with a working neighbour under the same flags beats the one
 that only ought to work*.
+
+**AND THE SUITE NOW MEASURES REAL THINGS -- then STOPS at
+`run-jobs`.** The diffs are genuine at last: `< 1.0000` against
+`> 1,0000` (a decimal comma, so `LC_NUMERIC`), and `Passed all 1318
+Unicode tests` against `1770`. That shape is only possible with
+`THIS_SH` resolving and the fourteen features compiled in, so the
+config change reached the shell.
+**`run-jobs` is the stop**, and the log stood still for four minutes
+while the longest thing in `jobs.tests` is `sleep 30`. The file is
+`sleep N &` and `wait` throughout -- `wait %1`, `kill -n9 $pid; wait
+$pid`, `kill -sHUP $pid2; wait $pid2`, and two bare `wait`s with
+several children outstanding. **This tree already records a
+never-measured bug exactly there**: `wait4`'s `WNOHANG` path falls
+through to the BLOCKING `_WAIT()` when `_dirstat` returns nil, and
+again when the pending message belongs to a different pid -- which is
+what `wait -n` and a bare `wait` do. *A live suspect rather than a
+guess, but `ps` decides it, not the reading.*
+**AND THE KERNEL'S fd WARNINGS NOW CORRUPT TEST OUTPUT, which is new
+and is NOT a new bug.** `< bash NNNN: warning: process exceeds 100
+file descriptors` appears as a diff line in `run-invert`,
+`run-invocation` and `run-iquote` -- files with nothing to do with
+descriptors. The mechanism was settled two rounds ago and is
+`move_to_high_fd` (`general.c:681`): with `maxfd < 20` it takes
+`getdtablesize()`, capped by `HIGH_FD_MAX` **256**, and libap reports
+`OPEN_MAX` 256, so bash `dup2`s its script to ~254 and Plan 9's fd
+table grows past both thresholds. **Recorded, not fixed**:
+`getdtablesize()` is telling the truth, and shrinking it to dodge a
+kernel message is the "invent semantics" shape. *The warnings were
+proven HARMLESS by the empty-script case; what is new is that they are
+now LOUD -- a harmless message that lands in a captured stream stops
+being harmless to the measurement.* Size it from the harness summary
+before touching anything.
 
 **The watchdog now SAYS WHEN IT IS ARMED, and a wasted round is
 why.** A run went out as `APEX__MALLOCMAX=8` -- two underscores, no
