@@ -138,7 +138,24 @@
 
 /* Define HELP_BUILTIN if you want the `help' shell builtin and the long
    documentation strings compiled into the shell. */
-/* #undef HELP_BUILTIN */
+/*
+ * ON. A FIFTEENTH capability that was present and not declared, found
+ * by reading run-builtins rather than by anything failing to build.
+ *
+ * `bi-help.$O' is already in the mkfile's OBJBUILTINS and `help.def'
+ * already in DEFFILES, so the code is compiled and linked -- and
+ * `help.def' opens with `$DEPENDS_ON HELP_BUILTIN', so mkbuiltins
+ * emitted no builtin and `help' answered `command not found'.
+ * **175 of run-builtins' 225 differing lines are that**, including
+ * every `help <name>' usage block on the expected side.
+ * Same shape as READLINE, as zipfs's two missing `file stat' keys, and
+ * as the fourteen turned on in the round before this: *compiled,
+ * linked, and switched off by one commented-out line.*
+ *
+ * Upstream's `configure' turns this on by default; APExp hand-maintains
+ * this file, which is why it had never been set.
+ */
+#define HELP_BUILTIN 1
 
 /* Define RESTRICTED_SHELL if you want the generated shell to have the
    ability to be a restricted one.  The shell thus generated can become

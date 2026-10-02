@@ -50,7 +50,12 @@ open(const char *path, int flags, ...)
 			va_start(va, flags);
 			mode = va_arg(va, int);
 			va_end(va);
-			n = _CREATE(path, f, mode&0777);
+			/*
+			 * POSIX: the file-creation mask removes bits here.
+			 * The mask starts at 0, so this changes nothing for
+			 * a program that never calls umask(); see stat/umask.c.
+			 */
+			n = _CREATE(path, f, (mode&0777) & ~_umaskbits());
 		}
 		if(n < 0)
 			_syserrno();

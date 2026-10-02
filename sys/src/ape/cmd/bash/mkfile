@@ -128,8 +128,10 @@ BASHSRC=$APEXPROOT/sys/src/external/bash
 # for the def-generated case cannot handle them because there is no
 # corresponding .def.
 #
-# All shell fragments use 'cd DIR && cmd' — portable across rc, bash,
-# and dash. No loops, no rc-only syntax.
+# All shell fragments use 'cd DIR && cmd', which any of rc, bash or a
+# POSIX sh will run. No loops, no rc-only syntax. (dash was the third
+# shell this was written for and is no longer in the tree; the rule is
+# unchanged, since $MKSHELL still decides who runs these.)
 
 MKBUILTINS=./mkbuiltins
 

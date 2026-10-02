@@ -206,7 +206,8 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
 `copyfile-test.c`, `deeppath-test.c`, `bufexec-test.c`,
-`mkstemp-test.c`, `printfmod-test.c` and `stdio-test.c`.
+`mkstemp-test.c`, `printfmod-test.c`, `umask-test.c` and
+`stdio-test.c`.
 **`ctype-xcheck.c` is a HOST program** like `tz-xcheck.c`: it links
 libap's own `_ctype[]` into a glibc program and sweeps **256 values
 by 12 classifications**, printing every disagreement. It needs TWO
@@ -2088,7 +2089,85 @@ finally reaching `tcltest`, which gives the new build rule below.
 mode-0 directory; Plan 9 answers "does not exist". The file server's
 choice, so a probe rather than a library rule.
 
-**bash cannot be `/bin/sh` yet: it dies `Killed: Insufficient physical
+**BASH IS `/bin/sh` AND IT BUILDS APExp. The whole hunt below is
+CLOSED -- read it as history, not as an open problem.** `cmd/bash/mkfile`'s
+`install:V:` adds `cp $BIN/bash $BIN/sh`, `dash` is gone from
+`_CORE_APPS` and from `sys/src/external`, and a full `mk distclean`
+plus `mk install` completes with bash serving every `sh` the build
+asks for. *One shell in the tree instead of two*, which was the goal
+named at the end of the fdwatch round below.
+**What actually got it there, in order**: `isblank('\t')` (the
+allocation storm -- the one that mattered), `getcwd(NULL,n)`, the
+fourteen `config.h` features, the `FD_BUFFEREDX` exec poison, and
+`mktemp`'s 26 names. **Not one of them was the descriptor leak the
+first six rounds were spent on**, and the histogram that ended that
+framing -- 142 opens, 251 dups, 447 closes -- is in the section below.
+**AND THE SUITE WENT 0 PASSING -> 46**, measured twice in a row with
+the same count. The kernel's fd warnings fell from **176 lines across
+all 87 sections to 4**, and `move_to_high_fd` was never the thing to
+change -- see the next paragraph.
+**THE fd WARNINGS WERE THE `sh` SWAP, NOT `move_to_high_fd`, AND THE
+CHAIN IS CORRECT AS IT STANDS.** `shell.c:1701` -> `getdtablesize()`
+-> `sysconf(_SC_OPEN_MAX)` -> `OPEN_MAX` **256**, capped by
+`HIGH_FD_MAX` 256; the loop walks DOWN from 255 for the first free
+descriptor and `dup2`s there. *Every link of that is right*, and
+shrinking `getdtablesize()` to dodge a kernel message would have been
+the "invent semantics" shape -- **and it would also have been
+unnecessary**, which is the part worth keeping.
+**What changed is WHO runs the wrapper.** Before, `sh` was dash:
+`dash run-X` never dups high, then forks bash for the `.tests` **with
+`2>&1`**, and that bash inherits dash's SMALL fd group, grows it past
+100 and 200, and puts two warnings **inside `$BASH_TSTOUT`** -- in
+every one of 87 sections. Now `sh` IS bash: the top-level
+`bash run-all` grows the table **once**, and Plan 9's fd group is
+copied by fork and kept across exec, so every descendant starts at
+`nfd` 256 and never crosses a threshold again. The surviving two
+warnings sit at the very top of the log, before any section header,
+from one pid. *A harmless message stopped being captured, rather than
+stopping.*
+**The rule: a message that corrupts a measurement can be fixed by
+changing who is measured, not only by silencing the message.** The
+recorded plan had been to touch `getdtablesize()` -- a wrong fix to a
+problem that then dissolved on its own.
+**NOT FULLY EXPLAINED, and held loosely because of it**:
+`run-input-test` is the one descendant that still warns, and the
+inheritance reading says it should not. It is also the only test that
+feeds the script on **stdin** (`${THIS_SH} < ./input-line.sh`) and the
+only one without `2>&1` -- so its warnings land in the log rather than
+in a comparison, and it passes.
+**`run-test` 33 -> PASS is UNEXPLAINED and BOTH readings were
+REFUTED.** Its old failures were `chgrp: missing operand`,
+`/dev/tty: No such file or directory`, **`ln: ... Too many links`** and
+`rm: cannot remove '/tmp/ghi'` -- `Too many links` is STATEFUL, so the
+first reading was litter in `/tmp` from the storm-era aborted runs,
+with the refutation condition "it fails on a second consecutive run".
+**Two runs back to back give the same count**, so that is refuted.
+*And the replacement reading was REFUTED BY THE MACHINE*, which is
+what the probe was for. I argued that `getgroups()` being a stub
+returning -1 leaves `GROUPS` empty, so `chgrp ${GROUPS[0]} <file>`
+gets one operand and must still fail. **`echo ${#GROUPS[@]}
+"[${GROUPS[0]}]"` answers `0 [0]`** -- the element expands to **`0`**,
+so chgrp gets two operands and never prints `missing operand`.
+**bash seeds the array from `getgid()` when `getgroups()` reports
+nothing** (`general.c:1341`, `get_group_list`), and I had read
+`get_groupset` and stopped one function short. *A grep hit is a name,
+not an implementation* -- a rule quoted in this file two rounds
+earlier.
+**And the probe found something nobody asked for**: `${#GROUPS[@]}` is
+**0** while `${GROUPS[0]}` has a value, so the count and the element
+disagree -- the dynamic getter fills the element but not the array the
+count reads. Recorded, not chased.
+**What is still unexplained is the REST of run-test**: `t -t 0 <
+/dev/tty` sits OUTSIDE both `(( $UID != 0 ))` guards, so neither it
+nor the `ln: ... Too many links` line was gated, and both are gone
+too. The chgrp family is accounted for and the other two are not.
+`run-trap` 16 -> 14 is unattributed as well. *Stop here rather than
+offer a fourth story: the pass is stable over two runs and the real
+list is where the work is.*
+*Everything from here to the ratrace histogram is the record of how it
+was found; the standing lesson is the instrument tally, not the bug.*
+
+**(HISTORICAL, now fixed)** **bash could not be `/bin/sh`: it died `Killed: Insufficient physical
 memory` during a full rebuild** -- but the log warns twice first, at
 **100 and then 200 file descriptors**, and a shell running build
 recipes has no business holding 200. So it is a leak with a shape.
@@ -2253,6 +2332,8 @@ the kernel*. Counts at 1, 2, 5, 10, 20, 50, 100, 200 forks, so the
 slope near zero is visible before anything can die. glibc: flat at
 5 throughout.
 Back on dash meanwhile, and the goal is one shell rather than two.
+*(That goal is MET -- bash is `/bin/sh` and dash is out of the tree.
+See the top of this section.)*
 
 **coreutils `sort` COULD NOT MAKE A TEMPORARY FILE, AND IT IS OURS
 -- FIXED, NOT YET MEASURED ON THE VM.** `sort: cannot create
@@ -3296,10 +3377,96 @@ thing between them was the same log the measurement came from.
 **So the real failure list is 40 files**, largest first: `run-histexpand`
 287, `run-builtins` 225, `run-jobs` 176, `run-glob-bracket` 103,
 `run-printf` 86, `run-redir` 78, `run-func` 70, `run-glob-test` 63,
-`run-dirstack` 53, `run-procsub` 35. **Nothing has passed yet**, and
-the 46 warnings-only files are one `move_to_high_fd` message away from
-passing -- which makes the fd warnings the largest single entry in the
-list and no longer merely noisy.
+`run-dirstack` 53, `run-procsub` 35. **AND THAT PREDICTION CAME IN: 46 OF 86 NOW PASS**, the same count on
+two consecutive runs. 45 are the warnings-only set exactly as called,
+plus `run-test`; `run-input-test` is clean as well. The real list is
+**39**, with the same ten at the top and the same counts --
+`run-histexpand` 287, `run-builtins` 225, `run-jobs` 176 -- so
+*nothing in the real list moved*, which is what says the 46 were noise
+rather than a shared cause.
+**The fd warnings are CLOSED as an item** (see the top of this
+section): they were the largest single entry in the failure list and
+they went without one line of libap changing.
+
+**AND THE TWO BIGGEST REAL FILES ARE THREE SWITCHES AND ONE STUB.**
+`run-histexpand` 287 and `run-builtins` 225 are 512 of the remaining
+~1500 differing lines, and reading them cost one round rather than
+several because each partitions cleanly.
+- **`run-histexpand` is `BANG_HISTORY`, ALL 287 lines of it.**
+  `set: -H: invalid option` and `!!: command not found` throughout;
+  the switch is `#undef` and gates **43 sites**, `set -H`
+  (`flags.c:199`, `histexp_flag`) among them. **The file's own first
+  line says so** -- *"warning: all of these tests will fail if history
+  has not been compiled into the shell"* -- which is the third time a
+  suite's unconditional warning turned out to be accurate.
+  **LEFT OFF, and it is a DECISION rather than an oversight**: it
+  changes what `!` means in every interactive line, where `READLINE`
+  and `HISTORY` only changed how a line is edited. The code is already
+  compiled and linked, so it is one `#define` whenever that trade is
+  wanted.
+- **`run-builtins` 225 partitions 175 / 42 / 6 / 2**, and only the
+  second is ours:
+  **175 are `HELP_BUILTIN`** -- `help: command not found`,
+  `builtin: help: not a shell builtin`, and pages of `help <name>`
+  usage on the expected side. `bi-help.$O` is already in OBJBUILTINS
+  and `help.def` in DEFFILES, and `help.def` opens `$DEPENDS_ON
+  HELP_BUILTIN`, so mkbuiltins emitted no builtin. **A capability
+  present and not declared, for the FIFTH time** (READLINE, zipfs's
+  two `file stat` keys, the fourteen features, this). **Turned ON.**
+  **42 are `umask` and they ARE ours** -- see below.
+  **6 are `enable -f`** (dynamic loading; Plan 9 has no dlopen, the
+  same wall as perl's XS) and **2 are process substitution**, off
+  deliberately because `/dev/fd` does not exist.
+- **gcc-swept before shipping, and the control was VACUOUS the first
+  time.** `help.c` and `builtins.c` give **0 errors** in the class 6c
+  treats as fatal (`-Werror=incompatible-pointer-types`,
+  `implicit-function-declaration`, `int-conversion`) -- gcc's own
+  `-Wparentheses` and `-Wdiscarded-qualifiers` complaints are
+  upstream's style. But my first control compared `-DHELP_BUILTIN`
+  against nothing *while `-DHAVE_CONFIG_H` was supplying the define
+  from the header both ways*, and reported 5537 lines twice.
+  Preprocessed against a `config.h` with the line reverted it is
+  **625 -> 5537**. *A control that cannot differ is not a control* --
+  the same trap as the check that cannot fail, met from a new angle.
+
+**`umask()` DISCARDED ITS ARGUMENT AND ALWAYS ANSWERED 0 -- FIXED.**
+The whole of `ap/stat/umask.c` was `mode_t umask(mode_t){ return 0; }`
+under the comment *"No such concept in plan9, but supposed to be
+always successful"*. The first half is true of the KERNEL and false of
+this library; the second half is not what the call is for. **This is
+the most common bug shape in this tree** -- a stub answering the wrong
+thing rather than "nothing to do" -- and the rule it breaks is already
+written down: *a platform having nothing to DISPLAY is no reason for a
+value not to read back.*
+**Storing it is not "inventing semantics", for a locatable reason**:
+libap is the code that chooses the permission it hands `_CREATE`, at
+exactly **two** user-facing sites (`fcntl/open.c`'s O_CREAT arm and
+`unistd/mkdir.c`). The other `_CREATE` callers are internal
+(`/env/_fdinfo`, `/env/_sighdlr`, `tmpfile`, `access`'s probe) or copy
+an existing mode (`rename`), and POSIX puts no umask on any of them.
+**And it composes with the file server rather than fighting it**: Plan
+9 already hands out `perm & (dirperm | ~0666)`, so the result is the
+intersection -- a umask may only ever REMOVE bits, which is exactly
+its contract.
+**Two limits, both deliberate and both recorded**: the initial mask is
+**0, not 022**, so by default nothing differs and only a program that
+calls `umask()` sees any change -- *a conformance fix should not also
+be a default change*; and it does **not survive `exec`**, since the
+static lives in the process image and carrying it over means another
+`/env/` variable beside `_fdinfo` and `_sighdlr`. `umask-test.c`
+**section 4 is a PROBE that measures that gap** rather than asserting
+it, so the next reader gets a number instead of this paragraph.
+**Section 3 is the one that matters**: an implementation that stored
+the mask and never applied it -- *a value that reads back and does
+nothing* -- passes sections 1 and 2 and fails only there. It asserts
+only that the masked bits are ABSENT, never that the others are
+present, because the latter would be a test of the file server.
+**Measured old beside new**: 0 failures on glibc, and the old stub
+replicated beside it gives **5**, with section 3 printing `0755` under
+mask 027. `_umaskmark()` is the version marker. NOT YET MEASURED ON
+THE VM; predict `run-builtins` 225 -> ~8, and refuted if the umask
+block survives or if `help` output differs from `.right` in ways that
+are not just presence.
 
 **The watchdog now SAYS WHEN IT IS ARMED, and a wasted round is
 why.** A run went out as `APEX__MALLOCMAX=8` -- two underscores, no
