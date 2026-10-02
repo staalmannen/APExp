@@ -2101,11 +2101,53 @@ fourteen `config.h` features, the `FD_BUFFEREDX` exec poison, and
 `mktemp`'s 26 names. **Not one of them was the descriptor leak the
 first six rounds were spent on**, and the histogram that ended that
 framing -- 142 opens, 251 dups, 447 closes -- is in the section below.
-**Two things are still open and are NOT blockers**: bash's own suite
-has 40 files with real diffs and 46 that differ only by the kernel's
-fd warnings (see further down), and *the fd warnings now fire for
-every build recipe bash runs*, which is noise rather than failure
-since the build completes.
+**AND THE SUITE WENT 0 PASSING -> 46**, measured twice in a row with
+the same count. The kernel's fd warnings fell from **176 lines across
+all 87 sections to 4**, and `move_to_high_fd` was never the thing to
+change -- see the next paragraph.
+**THE fd WARNINGS WERE THE `sh` SWAP, NOT `move_to_high_fd`, AND THE
+CHAIN IS CORRECT AS IT STANDS.** `shell.c:1701` -> `getdtablesize()`
+-> `sysconf(_SC_OPEN_MAX)` -> `OPEN_MAX` **256**, capped by
+`HIGH_FD_MAX` 256; the loop walks DOWN from 255 for the first free
+descriptor and `dup2`s there. *Every link of that is right*, and
+shrinking `getdtablesize()` to dodge a kernel message would have been
+the "invent semantics" shape -- **and it would also have been
+unnecessary**, which is the part worth keeping.
+**What changed is WHO runs the wrapper.** Before, `sh` was dash:
+`dash run-X` never dups high, then forks bash for the `.tests` **with
+`2>&1`**, and that bash inherits dash's SMALL fd group, grows it past
+100 and 200, and puts two warnings **inside `$BASH_TSTOUT`** -- in
+every one of 87 sections. Now `sh` IS bash: the top-level
+`bash run-all` grows the table **once**, and Plan 9's fd group is
+copied by fork and kept across exec, so every descendant starts at
+`nfd` 256 and never crosses a threshold again. The surviving two
+warnings sit at the very top of the log, before any section header,
+from one pid. *A harmless message stopped being captured, rather than
+stopping.*
+**The rule: a message that corrupts a measurement can be fixed by
+changing who is measured, not only by silencing the message.** The
+recorded plan had been to touch `getdtablesize()` -- a wrong fix to a
+problem that then dissolved on its own.
+**NOT FULLY EXPLAINED, and held loosely because of it**:
+`run-input-test` is the one descendant that still warns, and the
+inheritance reading says it should not. It is also the only test that
+feeds the script on **stdin** (`${THIS_SH} < ./input-line.sh`) and the
+only one without `2>&1` -- so its warnings land in the log rather than
+in a comparison, and it passes.
+**`run-test` 33 -> PASS is UNEXPLAINED and BOTH readings were
+REFUTED.** Its old failures were `chgrp: missing operand`,
+`/dev/tty: No such file or directory`, **`ln: ... Too many links`** and
+`rm: cannot remove '/tmp/ghi'` -- `Too many links` is STATEFUL, so the
+first reading was litter in `/tmp` from the storm-era aborted runs,
+with the refutation condition "it fails on a second consecutive run".
+**Two runs back to back give the same count**, so that is refuted.
+*And the replacement reading does not survive either*: `getgroups()`
+is a stub returning -1 (one definition in the tree), so bash's
+`get_groupset` leaves `GROUPS` empty, `${GROUPS[0]}` expands to
+nothing, `chgrp` should STILL get one operand -- and `test.right` does
+not expect that error. **So something I can show must fail is
+passing.** Next step is `echo ${#GROUPS[@]}` in bash on the VM, not a
+third story. `run-trap` 16 -> 14 is unattributed too.
 *Everything from here to the ratrace histogram is the record of how it
 was found; the standing lesson is the instrument tally, not the bug.*
 
@@ -3319,10 +3361,16 @@ thing between them was the same log the measurement came from.
 **So the real failure list is 40 files**, largest first: `run-histexpand`
 287, `run-builtins` 225, `run-jobs` 176, `run-glob-bracket` 103,
 `run-printf` 86, `run-redir` 78, `run-func` 70, `run-glob-test` 63,
-`run-dirstack` 53, `run-procsub` 35. **Nothing has passed yet**, and
-the 46 warnings-only files are one `move_to_high_fd` message away from
-passing -- which makes the fd warnings the largest single entry in the
-list and no longer merely noisy.
+`run-dirstack` 53, `run-procsub` 35. **AND THAT PREDICTION CAME IN: 46 OF 86 NOW PASS**, the same count on
+two consecutive runs. 45 are the warnings-only set exactly as called,
+plus `run-test`; `run-input-test` is clean as well. The real list is
+**39**, with the same ten at the top and the same counts --
+`run-histexpand` 287, `run-builtins` 225, `run-jobs` 176 -- so
+*nothing in the real list moved*, which is what says the 46 were noise
+rather than a shared cause.
+**The fd warnings are CLOSED as an item** (see the top of this
+section): they were the largest single entry in the failure list and
+they went without one line of libap changing.
 
 **The watchdog now SAYS WHEN IT IS ARMED, and a wasted round is
 why.** A run went out as `APEX__MALLOCMAX=8` -- two underscores, no
