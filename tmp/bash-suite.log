@@ -1,5 +1,5 @@
-bash 7386399: warning: process exceeds 100 file descriptors
-bash 7386399: warning: process exceeds 200 file descriptors
+bash 7407659: warning: process exceeds 100 file descriptors
+bash 7407659: warning: process exceeds 200 file descriptors
 declare -r SHELLOPTS="braceexpand:hashall:interactive-comments"
 Testing /bin/bash
 version: 5.3.0(2)-release
@@ -71,31 +71,14 @@ warning: /dev/fd.
 > declare -a c=([0]="1" [1]="2" [2]="3")
 > unset
 > unset
-330,341c336,477
-< ./builtins10.sub: line 17: help: command not found
-< ./builtins10.sub: line 19: help: command not found
-< ./builtins10.sub: line 21: help: command not found
-< ./builtins10.sub: line 22: builtin: help: not a shell builtin
-< shift: help not available in this version
-< ./builtins10.sub: line 24: help: command not found
-< ./builtins10.sub: line 27: help: command not found
-< ./builtins10.sub: line 29: help: command not found
-< ./builtins10.sub: line 31: help: command not found
-< ./builtins10.sub: line 33: help: command not found
-< ./builtins10.sub: line 36: help: command not found
-< ./builtins10.sub: line 39: help: command not found
+341,346c347,353
+<  (( expression ))                        kill [-s sigspec | -n signum | -sigs>
+<  . [-p path] filename [arguments]        let arg [arg ...]
+<  :                                       local [option] name[=value] ...
+<  [ arg... ]                              logout [n]
+<  [[ expression ]]                        mapfile [-d delim] [-n count] [-O or>
+<  alias [-p] [name[=value] ... ]          popd [-n] [+N | -N]
 ---
-> ./builtins10.sub: line 17: help: -x: invalid option
-> help: usage: help [-dms] [pattern ...]
-> These shell commands are defined internally.  Type `help' to see this list.
-> Type `help name' to find out more about the function `name'.
-> Use `info bash' to find out more about the shell in general.
-> Use `man -k' or `info' to find out more about commands not in this list.
-> 
-> A star (*) next to a name means that the command is disabled.
-> 
->  ! PIPELINE                              history [-c] [-d offset] [n] or hist>
->  job_spec [&]                            if COMMANDS; then COMMANDS; [ elif C>
 >  (( expression ))                        jobs [-lnprs] [jobspec ...] or jobs >
 >  . [-p path] filename [arguments]        kill [-s sigspec | -n signum | -sigs>
 >  :                                       let arg [arg ...]
@@ -103,29 +86,21 @@ warning: /dev/fd.
 >  [[ expression ]]                        logout [n]
 >  alias [-p] [name[=value] ... ]          mapfile [-d delim] [-n count] [-O or>
 >  bg [job_spec ...]                       popd [-n] [+N | -N]
->  bind [-lpsvPSVX] [-m keymap] [-f file>  printf [-v var] format [arguments]
->  break [n]                               pushd [-n] [+N | -N | dir]
->  builtin [shell-builtin [arg ...]]       pwd [-LP]
->  caller [expr]                           read [-Eers] [-a array] [-d delim] [>
->  case WORD in [PATTERN [| PATTERN]...)>  readarray [-d delim] [-n count] [-O >
->  cd [-L|[-P [-e]]] [-@] [dir]            readonly [-aAf] [name[=value] ...] o>
->  command [-pVv] command [arg ...]        return [n]
->  compgen [-V varname] [-abcdefgjksuv] >  select NAME [in WORDS ... ;] do COMM>
->  complete [-abcdefgjksuv] [-pr] [-DEI]>  set [-abefhkmnptuvxBCEHPT] [-o optio>
->  compopt [-o|+o option] [-DEI] [name .>  shift [n]
->  continue [n]                            shopt [-pqsu] [-o] [optname ...]
->  coproc [NAME] command [redirections]    source [-p path] filename [argument>
+359,360c366,368
+<  declare [-aAfFgiIlnrtux] [name[=value>  test [expr]
+<  dirs [-clpv] [+N] [-N]                  time [-p] pipeline
+---
 >  declare [-aAfFgiIlnrtux] [name[=value>  suspend [-f]
 >  dirs [-clpv] [+N] [-N]                  test [expr]
 >  disown [-h] [-ar] [jobspec ... | pid >  time [-p] pipeline
->  echo [-neE] [arg ...]                   times
->  enable [-a] [-dnps] [-f filename] [na>  trap [-Plp] [[action] signal_spec ..>
->  eval [arg ...]                          true
->  exec [-cl] [-a name] [command [argume>  type [-afptP] name [name ...]
->  exit [n]                                typeset [-aAfFgiIlnrtux] name[=value>
->  export [-fn] [name[=value] ...] or ex>  ulimit [-SHabcdefiklmnpqrstuvxPRT] [>
->  false                                   umask [-p] [-S] [mode]
->  fc [-e ename] [-lnr] [first] [last] o>  unalias [-a] name [name ...]
+369,374c377,383
+<  for NAME [in WORDS ... ] ; do COMMAND>  unset [-f] [-v] [-n] [name ...]
+<  for (( exp1; exp2; exp3 )); do COMMAN>  until COMMANDS; do COMMANDS-2; done
+<  function name { COMMANDS ; } or name >  variables - Names and meanings of so>
+<  getopts optstring name [arg ...]        wait [pid ...]
+<  hash [-lr] [-p pathname] [-dt] [name >  while COMMANDS; do COMMANDS-2; done
+<  help [-dms] [pattern ...]               { COMMANDS ; }
+---
 >  fg [job_spec]                           unset [-f] [-v] [-n] [name ...]
 >  for NAME [in WORDS ... ] ; do COMMAND>  until COMMANDS; do COMMANDS-2; done
 >  for (( exp1; exp2; exp3 )); do COMMAN>  variables - Names and meanings of so>
@@ -133,62 +108,14 @@ warning: /dev/fd.
 >  getopts optstring name [arg ...]        while COMMANDS; do COMMANDS-2; done
 >  hash [-lr] [-p pathname] [-dt] [name >  { COMMANDS ; }
 >  help [-dms] [pattern ...]
-> help: help [-dms] [pattern ...]
-> shift - Shift positional parameters.
-> shift: shift [n]
->     Shift positional parameters.
->     
->     Rename the positional parameters $N+1,$N+2 ... to $1,$2 ...  If N is
->     not given, it is assumed to be 1.
->     
->     Exit Status:
->     Returns success unless N is negative or greater than $#.
-> builtin: builtin [shell-builtin [arg ...]]
-> shift: shift [n]
-> Shell commands matching keyword `read*'
-> 
-> read: read [-Eers] [-a array] [-d delim] [-i text] [-n nchars] [-N nchars] [-p prompt] [-t timeout] [-u fd] [name ...]
-> readarray: readarray [-d delim] [-n count] [-O origin] [-s count] [-t] [-u fd] [-C callback] [-c quantum] [array]
-> readonly: readonly [-aAf] [name[=value] ...] or readonly -p
-> read: read [-Eers] [-a array] [-d delim] [-i text] [-n nchars] [-N nchars] [-p prompt] [-t timeout] [-u fd] [name ...]
-> readarray: readarray [-d delim] [-n count] [-O origin] [-s count] [-t] [-u fd] [-C callback] [-c quantum] [array]
-> readonly: readonly [-aAf] [name[=value] ...] or readonly -p
-> :: :
->     Null command.
->     
->     No effect; the command does nothing.
->     
->     Exit Status:
->     Always succeeds.
-> NAME
->     : - Null command.
-> 
-> SYNOPSIS
->     :
-> 
-> DESCRIPTION
->     Null command.
->     
->     No effect; the command does nothing.
->     
->     Exit Status:
->     Always succeeds.
-> 
-> SEE ALSO
->     bash(1)
-> 
-> IMPLEMENTATION
->     Copyright (C) 2025 Free Software Foundation, Inc.
-> 
-> These shell commands are defined internally.  Type `help' to see this list.
-> Type `help name' to find out more about the function `name'.
-> Use `info bash' to find out more about the shell in general.
-> Use `man -k' or `info' to find out more about commands not in this list.
-> 
-> A star (*) next to a name means that the command is disabled.
-> 
->  ! PIPELINE                              history [-c] [-d offset] [n] or hist>
->  job_spec [&]                            if COMMANDS; then COMMANDS; [ elif C>
+431,436c440,446
+<  (( expression ))                        kill [-s sigspec | -n signum | -sigs>
+<  . [-p path] filename [arguments]        let arg [arg ...]
+<  :                                       local [option] name[=value] ...
+<  [ arg... ]                              logout [n]
+<  [[ expression ]]                        mapfile [-d delim] [-n count] [-O or>
+<  alias [-p] [name[=value] ... ]          popd [-n] [+N | -N]
+---
 >  (( expression ))                        jobs [-lnprs] [jobspec ...] or jobs >
 >  . [-p path] filename [arguments]        kill [-s sigspec | -n signum | -sigs>
 >  :                                       let arg [arg ...]
@@ -196,29 +123,21 @@ warning: /dev/fd.
 >  [[ expression ]]                        logout [n]
 >  alias [-p] [name[=value] ... ]          mapfile [-d delim] [-n count] [-O or>
 >  bg [job_spec ...]                       popd [-n] [+N | -N]
->  bind [-lpsvPSVX] [-m keymap] [-f file>  printf [-v var] format [arguments]
->  break [n]                               pushd [-n] [+N | -N | dir]
->  builtin [shell-builtin [arg ...]]       pwd [-LP]
->  caller [expr]                           read [-Eers] [-a array] [-d delim] [>
->  case WORD in [PATTERN [| PATTERN]...)>  readarray [-d delim] [-n count] [-O >
->  cd [-L|[-P [-e]]] [-@] [dir]            readonly [-aAf] [name[=value] ...] o>
->  command [-pVv] command [arg ...]        return [n]
->  compgen [-V varname] [-abcdefgjksuv] >  select NAME [in WORDS ... ;] do COMM>
->  complete [-abcdefgjksuv] [-pr] [-DEI]>  set [-abefhkmnptuvxBCEHPT] [-o optio>
->  compopt [-o|+o option] [-DEI] [name .>  shift [n]
->  continue [n]                            shopt [-pqsu] [-o] [optname ...]
->  coproc [NAME] command [redirections]    source [-p path] filename [argument>
+449,450c459,461
+<  declare [-aAfFgiIlnrtux] [name[=value>  test [expr]
+<  dirs [-clpv] [+N] [-N]                  time [-p] pipeline
+---
 >  declare [-aAfFgiIlnrtux] [name[=value>  suspend [-f]
 >  dirs [-clpv] [+N] [-N]                  test [expr]
 >  disown [-h] [-ar] [jobspec ... | pid >  time [-p] pipeline
->  echo [-neE] [arg ...]                   times
->  enable [-a] [-dnps] [-f filename] [na>  trap [-Plp] [[action] signal_spec ..>
->  eval [arg ...]                          true
->  exec [-cl] [-a name] [command [argume>  type [-afptP] name [name ...]
->  exit [n]                                typeset [-aAfFgiIlnrtux] name[=value>
->  export [-fn] [name[=value] ...] or ex>  ulimit [-SHabcdefiklmnpqrstuvxPRT] [>
->  false                                   umask [-p] [-S] [mode]
->  fc [-e ename] [-lnr] [first] [last] o>  unalias [-a] name [name ...]
+459,464c470,476
+<  for NAME [in WORDS ... ] ; do COMMAND>  unset [-f] [-v] [-n] [name ...]
+<  for (( exp1; exp2; exp3 )); do COMMAN>  until COMMANDS; do COMMANDS-2; done
+<  function name { COMMANDS ; } or name >  variables - Names and meanings of so>
+<  getopts optstring name [arg ...]        wait [pid ...]
+<  hash [-lr] [-p pathname] [-dt] [name >  while COMMANDS; do COMMANDS-2; done
+<  help [-dms] [pattern ...]               { COMMANDS ; }
+---
 >  fg [job_spec]                           unset [-f] [-v] [-n] [name ...]
 >  for NAME [in WORDS ... ] ; do COMMAND>  until COMMANDS; do COMMANDS-2; done
 >  for (( exp1; exp2; exp3 )); do COMMAN>  variables - Names and meanings of so>
@@ -226,14 +145,13 @@ warning: /dev/fd.
 >  getopts optstring name [arg ...]        while COMMANDS; do COMMANDS-2; done
 >  hash [-lr] [-p pathname] [-dt] [name >  { COMMANDS ; }
 >  help [-dms] [pattern ...]
-> ./builtins10.sub: line 39: help: no help topics match `bash'.  Try `help help' or `man -k bash' or `info bash'.
-345,346c481,482
+469,470c481,482
 < unlimited
 < unlimited
 ---
 > 0
 > 0
-348a485
+472a485
 > ./builtins11.sub: line 39: ulimit: max user processes: cannot modify limit: Operation not permitted
 run-case
 run-casemod
@@ -244,45 +162,39 @@ run-complete
 > disown
 100a103
 > fg
-105a109
-> help
-107a112
+108a112
 > jobs
-125a131
+126a131
 > suspend
-148a155
+149a155
 > histexpand
-152a160
+153a160
 > monitor
-156a165
+157a165
 > notify
-172a182
+173a182
 > checkjobs
-218a229
+219a229
 > restricted_shell
-226a238
+227a238
 > bg
-238a251
+239a251
 > disown
-246a260
+247a260
 > fg
-248a263
-> help
-249a265
+251a265
 > jobs
-266a283
+268a283
 > suspend
-281a299
+283a299
 > bg
-293a312
+295a312
 > disown
-301a321
+303a321
 > fg
-303a324
-> help
-304a326
+307a326
 > jobs
-321a344
+324a344
 > suspend
 run-comsub
 run-comsub-eof
@@ -1235,8 +1147,8 @@ run-ifs
 > argv[1] = <*>
 run-ifs-posix
 run-input-test
-bash 7399854: warning: process exceeds 100 file descriptors
-bash 7399854: warning: process exceeds 200 file descriptors
+bash 7421107: warning: process exceeds 100 file descriptors
+bash 7421107: warning: process exceeds 200 file descriptors
 run-intl
 ./intl2.sub: line 16: locale: command not found
 intl2.sub: warning: you do not have the de_DE.UTF-8 locale installed;
@@ -1288,7 +1200,7 @@ warning: SIGHUP.  Please disregard.
 < ./jobs1.sub: line 15: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 < ./jobs1.sub: line 21: jobs: command not found
-< ./jobs1.sub: line 25: [: 7400131: unary operator expected
+< ./jobs1.sub: line 25: [: 7421384: unary operator expected
 < ./jobs2.sub: line 3: set: monitor: invalid option name
 < ./jobs2.sub: line 8: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
@@ -1346,7 +1258,7 @@ warning: SIGHUP.  Please disregard.
 < ./jobs6.sub: line 2: set: monitor: invalid option name
 < wait: usage: wait [pid ...]
 < child1 exit status 2
-< ./jobs6.sub: line 6: kill: (7400202) - No such process
+< ./jobs6.sub: line 6: kill: (7421454) - No such process
 < ./jobs7.sub: line 2: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 < ./jobs7.sub: line 4: jobs: command not found
@@ -1674,7 +1586,7 @@ run-printf
 > 9B3A59A5
 283,291c283,290
 < e-May-2010 T
-< current time mismatch:1790960044|s|
+< current time mismatch:1790960820|s|
 < Sun May 30, 2010 15:09:15
 < current time: F r
 < epoch time: F r -0500
@@ -1869,7 +1781,7 @@ warning: white space to be an error.
 > timeout 3: ok
 104,107c100
 < ./read7.sub: redirection error: cannot duplicate fd: Unknown error
-< ./read7.sub: line 60: 5114048: Unknown error
+< ./read7.sub: line 60: 5173888: Unknown error
 < 
 < ./read7.sub: line 64: /dev/tty: No such file or directory
 ---
@@ -1947,37 +1859,35 @@ warning: output, please do not consider it a test failure
 > exec 0<&9-
 > read line
 > echo $line
-67d106
-< ./redir6.sub: line 3: help: command not found
-120,121c159
+119,120c159
 < ./redir10.sub: line 29: syntax error near unexpected token `<'
 < ./redir10.sub: line 29: `	done 3< <(echo x)'
 ---
 > ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-125,126d162
+124,125d162
 < redir11 bad 3
 < redir11 bad 4
-134c170
+133c170
 < ./redir12.sub: line 27: unwritable-file: Access denied
 ---
 > ./redir12.sub: line 27: unwritable-file: Permission denied
-138c174
+137c174
 < ./redir12.sub: line 34: unwritable-file: Access denied
 ---
 > ./redir12.sub: line 34: unwritable-file: Permission denied
-140,141c176,177
+139,140c176,177
 < ./redir12.sub: line 38: unreadable-file: Access denied
 < ./redir12.sub: line 44: unwritable-file: Access denied
 ---
 > ./redir12.sub: line 38: unreadable-file: Permission denied
 > ./redir12.sub: line 44: unwritable-file: Permission denied
-144,145c180,181
+143,144c180,181
 < ./redir12.sub: line 48: unwritable-file: Access denied
 < ./redir12.sub: line 53: unreadable-file: Access denied
 ---
 > ./redir12.sub: line 48: unwritable-file: Permission denied
 > ./redir12.sub: line 53: unreadable-file: Permission denied
-147c183
+146c183
 < ./redir12.sub: line 56: unreadable-file: Access denied
 ---
 > ./redir12.sub: line 56: unreadable-file: Permission denied
@@ -1998,7 +1908,7 @@ run-rsh
 < ./rsh.tests: line 31: ./source.sub3: No such file or directory
 < oops 1 -- output
 < oops 2 -- append
-< Fri Oct  2 18:54:08 CES 2026
+< Fri Oct  2 19:07:04 CES 2026
 ---
 > ./rsh1.sub: line 22: /bin/sh: restricted
 > ./rsh1.sub: line 24: sh: not found
@@ -2016,7 +1926,7 @@ run-rsh
 > ./rsh.tests: line 38: /tmp/restricted: restricted: cannot redirect output
 > ./rsh.tests: line 43: command: -p: restricted
 19c19,20
-< Fri Oct  2 18:54:08 CES 2026
+< Fri Oct  2 19:07:04 CES 2026
 ---
 > ./rsh.tests: line 48: exec: restricted
 > ./rsh.tests: after exec
