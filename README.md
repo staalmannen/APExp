@@ -106,7 +106,7 @@ Install paths have been modified so that libraries and binaries are installed in
 
 ***Utilities***
 
-- The original APE pdksh shell replaced by GNU bash (version 5.3) as /bin/bash and Dash (version 0.5.13) as /bin/sh. Bash is the default login shell in apexp-sh.
+- The original APE pdksh shell replaced by GNU bash (version 5.3).
 - APE make has been replaced by a port of GNU make (version 4.4.1)
 - APE sed has been replaced by a port of GNU sed (version 4.9)
 - patch has been replaced by a port of GNU patch (version 2.8)
