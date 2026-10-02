@@ -2983,6 +2983,13 @@ every other section. Section 6 is the regression control: `%zu` already
 worked, so a fix that rebuilt the table wrongly would show up there and
 nowhere else.
 
+**CONFIRMED ON THE VM**: `_printfmark = 1`, all six sections PASS,
+**0 failures**. The marker is what makes that readable -- the test
+could not have LINKED against the libap that had the bug, so a stale
+library would have given a link error rather than a pass. Fifth time
+that idiom has paid, after `_sock_listenmark`, `_execmark`, `_ttymark`
+and `_getcwdmark`.
+
 And the tables and the cracking loop were lifted verbatim into a host
 program and **run**, old beside new: **5 failures before, 0 after**,
 with `%zu`, `%hd`, `%lld`, `%ld`, `%Lf` and plain `%d` identical both

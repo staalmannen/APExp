@@ -3249,7 +3249,12 @@ on glibc; **its section 4 is the one that matters**, putting a second
 conversion after the first and asking what THAT printed, because an
 implementation with the number right and the argument wrong passes
 everything else. `_printfmark()` is the marker. `vfwprintf` needs no
-change -- it narrows and calls `vfprintf`. NOT YET MEASURED ON THE VM.
+change -- it narrows and calls `vfprintf`.
+**CONFIRMED ON THE VM**: `_printfmark = 1`, all six sections PASS,
+**0 failures** -- and the marker is what makes that readable, since the
+test could not have LINKED against the libap that had the bug. The
+idiom has now paid five times (`_sock_listenmark`, `_execmark`,
+`_ttymark`, `_getcwdmark`, this).
 **It changes NO test result** -- diff's exit status and its `<`/`>`
 lines were always right -- and it is **not** `date`'s crash, since
 `strftime.c`/`time_rz.c` use none of these modifiers. *The suite's
