@@ -2865,11 +2865,55 @@ it for buffering.*
 if the program reads stdin**; one that exits produces a wrong diff
 and reads as an ordinary failure, so the hang is the loud case
 rather than the only one.
-**To measure the rest of the suite: `/bin/bash run-all </dev/null`.**
-`p` then reads EOF and exits, `comsub2` fails its diff (correctly --
-it wanted `p: command not found`), and the remaining files run.
-Read that as "the rest of the suite" rather than a clean number:
-it changes every test's stdin, not just this one's.
+**With `</dev/null` the suite RUNS TO THE END** -- `p` reads EOF and
+exits, `comsub2` fails its diff (correctly -- it wanted
+`p: command not found`), and the loop reaches `run-vredir` and
+beyond. Read that as "the rest of the suite" rather than a clean
+number: it changes every test's stdin, not just this one's.
+
+**AND THAT FIRST COMPLETE RUN MEASURED NOTHING -- 14795 lines, 86
+test files, and `../bash: not found` in 75 of them.** `run-all:49`
+is `: ${THIS_SH:=../bash}`, upstream's default, because bash is
+normally built in its own source directory and the Makefile sets
+`THIS_SH = $(BUILD_DIR)/$(Program)`. **APExp installs bash to
+`/bin/bash` and never builds it at `../bash`**, so almost every file
+invoked a program that does not exist. *The log is indistinguishable
+at a glance from a real one*: right shape, right file names, a
+plausible amount of diff -- `run-array` 855 lines, `run-new-exp` 813
+-- and those are whole `.right` files showing as ABSENT OUTPUT, not
+failures. **Zero files passed.** Same family as the stale suite log
+and the `tclBinary` staleness: *anything measured from outside the
+source in front of you should say where it came from.*
+**THREE conditions, each failing silently on its own**: `THIS_SH`
+naming a bash that exists; `recho`, `zecho`, `printenv` and `xcase`
+built in `tests/` (the Makefile's `TESTS_SUPPORT`, built from
+`../support/*.c` -- **nothing in APExp's build makes them**, which is
+what the earlier `recho: command not found` was); and stdin on
+`/dev/null` for `/bin/p`.
+**`rc/bin/bash-runtests` is the harness**, and it exists because
+three preconditions that fail silently are three ways to spend a
+round on a worthless log. It builds the four helpers, sets `THIS_SH`,
+redirects stdin, prints `bash-runtests: COMPLETE`, and **prints the
+`../bash` count FIRST and refuses the result if it is not 0**. rc,
+like the five ladders, because a harness written in the shell under
+test cannot report that shell dying.
+**Its own summary had the bug it is meant to catch, twice.** The
+"passed" list printed every section unconditionally; and `/^run-/`
+also matches an ERROR line -- `run-rhs-exp: 1: ../bash: not found` --
+which reads as a header with nothing after it, *i.e. as a PASS*, and
+was the one file the first summary reported as passing. Anchored at
+both ends (`/^run-[-A-Za-z0-9_.]+$/`) it reports 86 sections and none
+passing, which is the true answer. *Eighth time in this campaign the
+instrument was the visible fault.*
+**Read which SIDE of a diff a line is on before reading what it
+says.** `run-vredir`'s screenful of `cannot duplicate fd: Invalid
+argument` and `$fd: Bad file descriptor` looked exactly like a libap
+`fcntl` bug, and `fcntl.c`'s `F_DUPFD` does carry an `EGREG` arm for
+buffered descriptors -- but `run-vredir` is `diff $BASH_TSTOUT
+vredir.right`, so `<` is ours and `>` is expected, every line on
+screen was `>`, and those were `vredir.right` lines 95-123 verbatim.
+`vredir6.sub` sets `ulimit -n 6` and *wants* the failure. Nothing of
+ours was in frame.
 **`set -m` is a red herring and was excluded by reading**: the two
 `set: -m: invalid option` lines are `config.h:33`'s
 `/* #undef JOB_CONTROL */` showing through, an expected diff.
