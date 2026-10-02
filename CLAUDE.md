@@ -206,7 +206,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
 `copyfile-test.c`, `deeppath-test.c`, `bufexec-test.c`,
-`mkstemp-test.c` and `stdio-test.c`.
+`mkstemp-test.c`, `printfmod-test.c` and `stdio-test.c`.
 **`ctype-xcheck.c` is a HOST program** like `tz-xcheck.c`: it links
 libap's own `_ctype[]` into a glibc program and sweeps **256 values
 by 12 classifications**, printing every disagreement. It needs TWO
@@ -3208,6 +3208,76 @@ holding digit TEXT, which is the `ifs_value` shape a second time, and
 the fault is in strftime's **`%s` arm**, the one conversion that
 formats a number. *Two independent bugs in this tree have now been a
 pointer containing characters.*
+
+**THE SUITE RAN TO THE END AGAIN -- 21 minutes, not stuck -- AND THE
+LOG HELD A LIBAP BUG NOBODY WAS LOOKING FOR: `printf` DID NOT KNOW
+`%td`, `%jd` OR `%hhd`.** `stdio/vfprintf.c`'s `tflag` table had `h`,
+`l`, `L` and `z` and not `t` (ptrdiff_t), `j` (intmax_t) or a second-`h`
+rule for `hh`. **An unrecognised conversion prints the letter and
+CONSUMES NO ARGUMENT**, so `printf("%td", n)` printed the literal text
+`td` and left `n` in the va_list -- *every conversion after it in that
+format string took the wrong argument*. A `%s` after a `%td` reads a
+string from an integer. *A conversion that prints garbage is a bug in
+one value; one that eats no argument is a bug in every value after it.*
+**So EVERY DIFF POSITION LINE ON THIS SYSTEM HAS ALWAYS BEEN GARBAGE**:
+diffutils has `#define pI "t"` and prints every line number through
+`fprintf(outfile, "%"pI"d%c%"pI"d", trans_a, sepchar, trans_b)`, so
+`1,2d0` came out `td\x01tddtd` -- `td` per number, and the `%c` taking
+`trans_a` instead of the comma. **The corruption decodes, which is the
+only reason it was readable**: `td(tdctd,td` is `(`=40 and `,`=44, and
+40 and 44 are that hunk's own first lines; `tdM-9...M-;` is 185/187,
+likewise. *A wrong value that decodes back to the right one names the
+mechanism, not just the fault.*
+**~370 literal sites** across coreutils, gnulib, diffutils, patch,
+bison, tar, flex, pcre2, grep and sed. **Two things hid it**: `z` --
+1439 of the ~1800 uses -- was the one modifier someone had already
+added; and **the `PRI*` macros dodge it**, since APE's `<inttypes.h>`
+spells `PRIdMAX` as `"lld"` rather than `"jd"`.
+**And `vfscanf.c` HAS HANDLED ALL THREE SINCE IT WAS WRITTEN** --
+`case 'j'`, `case 'z'`, `case 't'`, right pointer types. The library
+knew these on the INPUT side and not the output side: third time it
+contained a working version of the thing it could not do, after
+`mktemp` ignoring `__randname` and `getcwd` beside
+`get_current_dir_name`.
+**Measured old beside new, which is cheaper than a rebuild**: the real
+tables and the real cracking loop lifted verbatim into a host program
+give **5 failures before and 0 after**, `%zu`/`%hd`/`%lld`/`%ld`/`%Lf`
+identical both ways -- and the old run reports `conv='t'`, the
+conversion character *being* the modifier letter, which is exactly the
+`td` on screen. `printfmod-test.c` is the regression test, 0 failures
+on glibc; **its section 4 is the one that matters**, putting a second
+conversion after the first and asking what THAT printed, because an
+implementation with the number right and the argument wrong passes
+everything else. `_printfmark()` is the marker. `vfwprintf` needs no
+change -- it narrows and calls `vfprintf`. NOT YET MEASURED ON THE VM.
+**It changes NO test result** -- diff's exit status and its `<`/`>`
+lines were always right -- and it is **not** `date`'s crash, since
+`strftime.c`/`time_rz.c` use none of these modifiers. *The suite's
+value here was as a corpus, not as a scoreboard.*
+
+**AND THE HARNESS WAS DEFEATED BY THE BUG IN THE LOG IT WAS READING.**
+`bash-runtests` identified a diff position line by its leading DIGIT
+(`/^[0-9]/ { next }`) -- true of `2,3d1`, and false of `td^Atddtd`. So
+~37 files whose only real difference was the two kernel fd warnings
+were each counted as having one differing line, and the summary
+reported **9 warnings-only against 76 real where the truth is 46
+against 40**. *Tenth instrument fault, and the sharpest: it assumed
+diff can print a number.* A section's content is now exactly its `<`
+and `>` lines -- which assumes only that diff marks which side a line
+came from, the one thing the format is for -- and that rule holds
+whether or not printf is fixed.
+**The prediction written down last round was RIGHT and the instrument
+said otherwise**: ~35 warnings-only and ~50 real, against 46 and 40.
+*When a measurement contradicts a prediction, ask what sits between
+them* -- the rule was already in this file from `io-14.1`, and the
+thing between them was the same log the measurement came from.
+**So the real failure list is 40 files**, largest first: `run-histexpand`
+287, `run-builtins` 225, `run-jobs` 176, `run-glob-bracket` 103,
+`run-printf` 86, `run-redir` 78, `run-func` 70, `run-glob-test` 63,
+`run-dirstack` 53, `run-procsub` 35. **Nothing has passed yet**, and
+the 46 warnings-only files are one `move_to_high_fd` message away from
+passing -- which makes the fd warnings the largest single entry in the
+list and no longer merely noisy.
 
 **The watchdog now SAYS WHEN IT IS ARMED, and a wasted round is
 why.** A run went out as `APEX__MALLOCMAX=8` -- two underscores, no

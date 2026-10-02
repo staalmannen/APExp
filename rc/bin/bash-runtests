@@ -172,9 +172,25 @@ if(! ~ $nbad 0){
 # header with no output after it, i.e. as a PASS. That is precisely the
 # file the first summary reported as the only one passing.
 #
-# Diff POSITION lines (`2,3d1', `5c6') are skipped: they are structure
-# rather than content, so a file's size is counted in the lines that
-# actually differ.
+# A SECTION'S CONTENT IS EXACTLY ITS `<' AND `>' LINES. Everything
+# else between two headers -- diff position lines, the `---' separator,
+# a test's own prose -- is structure and is skipped.
+#
+# **That rule replaces `/^[0-9]/ { next }', which this log broke.** The
+# first version identified a position line by its leading DIGIT, which
+# is true of `2,3d1' and `5c6' -- and on this system every one of them
+# read `td^Atddtd' instead, because libap's printf did not know the
+# C99 `t' (ptrdiff_t) length modifier and GNU diffutils prints every
+# line number through `#define pI "t"'. So ~37 files whose only real
+# difference was the two kernel fd warnings were counted as having one
+# differing line each, and the summary reported 9 warnings-only against
+# 76 real where the truth is 46 against 40.
+#
+# *The instrument was defeated by the very bug in the log it was
+# reading* -- it assumed diff can print a number. Keying on `<' and
+# `>' assumes only that diff marks which side a line came from, which
+# is the one thing the format is for. See CLAUDE.md; libap is fixed,
+# and this rule holds either way.
 echo
 echo '==== files whose diff is REAL (differing lines, name) ===='
 awk '
@@ -186,9 +202,9 @@ function bucket(   ) {
 }
 /^run-[-A-Za-z0-9_.]+$/                            { bucket(); n = $0; c = 0; w = 0; next }
 /^warning:/                                        { next }
-/^[0-9]/                                           { next }
 /warning: process exceeds [0-9]+ file descriptors/ { if (n != "") { c++; w++ } ; next }
-                                                   { if (n != "") c++ }
+/^[<>]/                                            { if (n != "") c++ ; next }
+                                                   { next }
 END {
     bucket()
     printf "\n==== files differing ONLY by the kernel fd warnings ====\n"
@@ -203,8 +219,8 @@ END {
 awk '
 /^run-[-A-Za-z0-9_.]+$/ { if (n != "" && c == 0) print "   " n; n = $0; c = 0; next }
 /^warning:/ { next }
-/^[0-9]/    { next }
-       { if (n != "") c++ }
+/^[<>]/     { if (n != "") c++ ; next }
+            { next }
 END    { if (n != "" && c == 0) print "   " n }
 ' $log
 

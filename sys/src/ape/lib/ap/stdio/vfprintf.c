@@ -1,6 +1,53 @@
 /*
  * pANS stdio -- vfprintf
  * APExp: Fixed to use __overflow() directly instead of putc() macro to avoid circular dependency
+ *
+ * ------------------------------------------------------------------
+ * THE C99 LENGTH MODIFIERS `t' (ptrdiff_t), `j' (intmax_t) AND `hh'
+ * (char) WERE MISSING, AND THE WAY THEY FAILED IS WHAT MATTERS.
+ *
+ * An unrecognised conversion falls through to the `else if(*s)' arm at
+ * the bottom of the cracking loop, which prints the character and moves
+ * on **without consuming an argument**. So `printf("%td", n)' did not
+ * print a wrong number -- it printed the literal text `td' and left `n'
+ * sitting in the va_list, so **every conversion after it in the same
+ * format string took the wrong argument.**
+ *
+ * That is why it was found by accident rather than by anyone noticing a
+ * bad number. GNU diffutils prints every line number through
+ *
+ *	src/system.h:115	#define pI "t"
+ *	src/util.c:1223		fprintf(outfile, "%"pI"d%c%"pI"d", a, sep, b)
+ *
+ * so EVERY position line in EVERY diff this system produced came out as
+ * garbage. `1,2d0' printed as
+ *
+ *	t d \x01 t d d t d
+ *
+ * -- `td' for each number, and the `%c' separator receiving `trans_a'
+ * (1) instead of the comma, so it printed chr(1). Three independent
+ * lines in bash's suite log decode exactly: `td(tdctd,td' is `(' = 40
+ * and `,' = 44, and those two numbers are the first lines of that
+ * hunk in each file. *The corruption was arithmetically checkable, which
+ * is the only reason it could be read at all.*
+ *
+ * ~370 conversion sites across coreutils, gnulib, diffutils, patch,
+ * bison, tar, flex, pcre2, grep and sed use these three modifiers
+ * literally. **`z' was the one that worked**, because someone had
+ * already added it -- the line below with the `sizeof(void*)' test.
+ *
+ * **The PRI* macros dodge it entirely**: <inttypes.h> here spells
+ * PRIdMAX as "lld", not "jd", so only literal `%j'/`%t'/`%hh' in source
+ * was affected. That is also why this survived so long.
+ *
+ * **And `vfscanf.c' HAS HANDLED ALL THREE SINCE IT WAS WRITTEN** --
+ * its switch carries `case 'j'', `case 'z'', `case 't''. The library
+ * knew these modifiers existed on the input side and not on the output
+ * side. Third time in this tree the library contained a working version
+ * of the thing it could not do (`mktemp' ignoring `__randname',
+ * `getcwd' beside `get_current_dir_name').
+ *
+ * vfwprintf.c needs no change: it narrows the format and calls this.
  */
 #include "stdio_impl.h"
 #include <stdarg.h>
@@ -38,6 +85,7 @@ static inline int _putc_impl(int c, FILE *f)
 #define	LDBL	128		/* 'L' convert a long double */
 #define	PTR	256		/*     convert a void * (%p) */
 #define	VLONG	512		/* 'll' convert a long long integer */
+#define	CHAR	1024		/* 'hh' convert a signed/unsigned char */
 
 static int lflag[] = {	/* leading flags */
 0,	0,	0,	0,	0,	0,	0,	0,	/* ^@ ^A ^B ^C ^D ^E ^F ^G */
@@ -89,8 +137,8 @@ static int tflag[] = {	/* trailing flags */
 0,	0,	0,	0,	0,	0,	0,	0,	/*  P  Q  R  S  T  U  V  W */
 0,	0,	0,	0,	0,	0,	0,	0,	/*  X  Y  Z  [  \  ]  ^  _ */
 0,	0,	0,	0,	0,	0,	0,	0,	/*  `  a  b  c  d  e  f  g */
-SHORT,	0,	0,	0,	LONG,	0,	0,	0,	/*  h  i  j  k  l  m  n  o */
-0,	0,	0,	0,	0,	0,	0,	0,	/*  p  q  r  s  t  u  v  w */
+SHORT,	0,	VLONG,	0,	LONG,	0,	0,	0,	/*  h  i  j  k  l  m  n  o */
+0,	0,	0,	0,	LONG,	0,	0,	0,	/*  p  q  r  s  t  u  v  w */
 0,	0,	LONG,	0,	0,	0,	0,	0,	/*  x  y  z  {  |  }  ~ ^? */
 
 0,	0,	0,	0,	0,	0,	0,	0,
@@ -205,13 +253,31 @@ vfprintf(FILE *f, const char *s, va_list args)
 		else
 			precision = -1;
 
-		if(sizeof(void*) == sizeof(long long))
+		/*
+		 * `z' (size_t) and `t' (ptrdiff_t) are as wide as a
+		 * pointer; the table holds LONG for both because kencc's
+		 * long is 32-bit on amd64, so on a 64-bit target they have
+		 * to be promoted. `j' (intmax_t) is long long everywhere
+		 * and is VLONG in the table already.
+		 *
+		 * Written on every call, as the `z' line always was: the
+		 * value stored never varies, so a second thread doing the
+		 * same store is harmless.
+		 */
+		if(sizeof(void*) == sizeof(long long)){
 			tflag['z'] = VLONG;
+			tflag['t'] = VLONG;
+		}
 
 		while(tfl = tflag[*s&_IO_CHMASK]){
 			if(tfl == LONG && (flags & LONG)){
 				flags &= ~LONG;
 				tfl = VLONG;
+			}
+			/* `hh': a second h narrows to char, as ll widens */
+			else if(tfl == SHORT && (flags & SHORT)){
+				flags &= ~SHORT;
+				tfl = CHAR;
 			}
 			flags |= tfl;
 			s++;
@@ -354,7 +420,9 @@ ocvt_s(FILE *f, va_list *args, int flags, int width, int precision)
 static int
 ocvt_n(FILE *, va_list *args, int flags, int, int)
 {
-	if(flags&SHORT)
+	if(flags&CHAR)
+		*va_arg(*args, signed char *) = nprint;
+	else if(flags&SHORT)
 		*va_arg(*args, short *) = nprint;
 	else if(flags&LONG)
 		*va_arg(*args, long *) = nprint;
@@ -388,6 +456,7 @@ ocvt_fixed(FILE *f, va_list *args, int flags, int width, int precision,
 
 	if(sgned){
 		if(flags&PTR) snum = (uintptr_t)va_arg(*args, void *);
+		else if(flags&CHAR) snum = (signed char)va_arg(*args, int);
 		else if(flags&SHORT) snum = va_arg(*args, short);
 		else if(flags&LONG) snum = va_arg(*args, long);
 		else if(flags&VLONG) snum = va_arg(*args, long long);
@@ -404,6 +473,7 @@ ocvt_fixed(FILE *f, va_list *args, int flags, int width, int precision,
 	} else {
 		sign = "";
 		if(flags&PTR) num = (uintptr_t)va_arg(*args, void *);
+		else if(flags&CHAR) num = (unsigned char)va_arg(*args, int);
 		else if(flags&SHORT) num = va_arg(*args, unsigned short);
 		else if(flags&LONG) num = va_arg(*args, unsigned long);
 		else if(flags&VLONG) num = va_arg(*args, unsigned long long);
@@ -658,3 +728,16 @@ ocvt_flt(FILE *f, va_list *args, int flags, int width, int precision, char afmt)
 }
 
 
+
+/*
+ * Version marker, as `_getcwdmark' and `_ttymark' are for their files.
+ * `pcc -o x x.c' relinks against the INSTALLED libap, so a test built
+ * from a fresh pull can run days-old library code and report a pass on
+ * it. A test that calls this will not LINK against a libap predating
+ * the t/j/hh fix, which is the only way to be sure what was measured.
+ */
+int
+_printfmark(void)
+{
+	return 1;
+}
