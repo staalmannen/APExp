@@ -2833,18 +2833,50 @@ syntax-error cases, `argv[1] = <abcde>` and the rest. **bash no
 longer dies of the allocation storm**, and since the only changes
 were `_ctype[9]`, `isprint` and one entry in `syntax.c`, the chain
 is measured end to end rather than argued.
-**It now FREEZES at `run-comsub2`**, which is a different failure
-and needs its own round. `run-all`'s loop is `echo $x ; sh $x`, so
-the name printed and the script did not return; `run-comsub2` is
-`${THIS_SH} ./comsub2.tests > $BASH_TSTOUT 2>&1` then a `diff`, and
-`comsub2.tests` exercises bash 5.3's **`${ command; }` nofork
-command substitution**. Three processes could be holding it -- the
-`sh` running the script, the `bash` running the tests, or `diff`.
-**`ps` names which and says blocked-or-spinning in one command**,
-and this tree has the rule already: *read the `ps` STATES before
-taking a stack*, and *blocked and spinning are different bugs --
-constant light CPU is a wait, a pinned core is a loop.* Do not
-reach for `acid` first.
+**It then FROZE at `run-comsub2`, and that one is NOT OURS: the
+test picks a command name that EXISTS on Plan 9.**
+`comsub2.tests:68` is `echo NOT${ p; }FOUND`, under the comment
+*"command not found should still echo error messages to stderr"* --
+the name `p` is chosen precisely because a unix has no such
+command. **9front's `/bin/p` is the pager.** bash found it, exec'd
+it, and `p` blocked reading stdin for ever.
+**Measured end to end, and `ps` did most of it.** Four processes,
+one chain: `1771 bash` (`/bin/bash run-all`) -> `2298 sh`
+(`sh run-comsub2`) -> `2299 bash` (`bash ./comsub2.tests`) ->
+**`2306 p`, in `Pread`** -- every one of the first three in
+`Await` at 0:00 CPU. Both stacks name their child by pid and the
+arithmetic closes it: 2299's `wait_for(pid=0x8fa)` is **2298**,
+and 2299's `wait_for(pid=0x902)` is **2306**, the pager. 1771's
+frames are `execute_for_command`/`execute_case_command`, which is
+`run-all`'s own `for x in run-*` loop. *No libap call is
+misbehaving*: `wait4` is blocked on a child that genuinely has not
+exited.
+**The output file is what placed it, with no instrument at all.**
+`$BASH_TSTOUT` survives the freeze (the `trap ... 0` that removes
+it never fires), and its last line is line 65's `set: +m: invalid
+option`. Normally a block-buffered log's tail is a lower bound --
+but that line is **stderr**, unbuffered, and line 68's whole
+purpose is to write to stderr too, so its ABSENCE is real position.
+*Check which stream a log's last line came from before discounting
+it for buffering.*
+**The collision is checkable and `p` may not be alone.** The
+`.right` files expect these to be missing: `a`, `after`, `foobar`,
+`hijkl`, `notthere`, `p`, `qfoo`, `quux`. **A collision only HANGS
+if the program reads stdin**; one that exits produces a wrong diff
+and reads as an ordinary failure, so the hang is the loud case
+rather than the only one.
+**To measure the rest of the suite: `/bin/bash run-all </dev/null`.**
+`p` then reads EOF and exits, `comsub2` fails its diff (correctly --
+it wanted `p: command not found`), and the remaining files run.
+Read that as "the rest of the suite" rather than a clean number:
+it changes every test's stdin, not just this one's.
+**`set -m` is a red herring and was excluded by reading**: the two
+`set: -m: invalid option` lines are `config.h:33`'s
+`/* #undef JOB_CONTROL */` showing through, an expected diff.
+**`function_substitute` does not fork** (`subst.c:6925` dup2s
+stdout onto an anonymous file) and `anonopen` falls through to
+`sh_mktmpfd`, a real unlinked temp file rather than a pipe -- so
+there was never a funsub child or a pipe deadlock to look for.
 
 **The watchdog now SAYS WHEN IT IS ARMED, and a wasted round is
 why.** A run went out as `APEX__MALLOCMAX=8` -- two underscores, no
