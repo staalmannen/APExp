@@ -3,7 +3,15 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
-#include <limits.h>
+/*
+ * <sys/limits.h> and not <limits.h>: `at_functions.c' in this very
+ * directory does the same, under the same mkfile flags, and compiles.
+ * <limits.h> here would be read AFTER <unistd.h> has already pulled
+ * <sys/limits.h>, which used to be a cpp error -- see the note in
+ * limits_generic.h. That is fixed, but the shorter include is the one
+ * with a working neighbour beside it.
+ */
+#include <sys/limits.h>
 #include <string.h>
 #include <stdio.h>
 #include "sys9.h"
