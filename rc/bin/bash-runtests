@@ -1,0 +1,156 @@
+#!/bin/rc
+# bash-runtests -- run bash's own test suite so that the result MEANS
+# something, and say so.
+#
+#	bash-runtests [logfile]
+#
+# Default log: /tmp/bash-suite.log
+#
+# ------------------------------------------------------------------
+# WHY THIS EXISTS: A FULL-LOOKING LOG THAT MEASURED NOTHING.
+#
+# The first complete run of `run-all' on 9front produced a 14795-line
+# log, every test file named, the loop reaching the end -- and **75 of
+# its ~85 sections contained `../bash: not found'.**
+#
+# `run-all' line 49 is
+#
+#	: ${THIS_SH:=../bash}
+#
+# upstream's default, because bash is normally built in its own source
+# directory and the Makefile sets `THIS_SH = $(BUILD_DIR)/$(Program)'.
+# **APExp installs bash to /bin/bash and never builds it at `../bash'**,
+# so almost every test file invoked a program that does not exist. The
+# enormous diffs -- run-array 855 lines, run-new-exp 813 -- were whole
+# `.right' files showing as absent output, not failures.
+#
+# *That log is indistinguishable at a glance from a real one.* It has
+# the right shape, the right file names and a plausible amount of diff.
+# Only grepping for one string says it is worthless.
+#
+# THREE things have to be true, and missing any one fails silently:
+#
+#   1. THIS_SH names a bash that exists.
+#   2. recho, zecho, printenv and xcase are built in tests/. The
+#      Makefile builds them from ../support/*.c (TESTS_SUPPORT, line
+#      598); nothing in APExp's build does. Without them tests report
+#      `recho: command not found' and diff against expected output.
+#   3. stdin is /dev/null. `comsub2.tests:68' is `echo NOT${ p; }FOUND'
+#      and picks `p' because a unix has no such command -- but 9front's
+#      /bin/p is the PAGER, so bash finds it, execs it, and it blocks
+#      reading the terminal for ever. The suite stops there. See
+#      CLAUDE.md; this is not a bug in APExp and there is nothing to fix.
+#
+# ------------------------------------------------------------------
+# WHAT IT PRINTS, AND WHY THE MARKER MATTERS.
+#
+# A fault, a kill and a clean finish all just give the prompt back, so
+# the log ends with `bash-runtests: COMPLETE'. **No marker means the
+# run did not finish, whatever the log's last line says.** It also
+# prints the count of `../bash' complaints, which must be 0; a non-zero
+# count means condition 1 was not met after all and nothing below it
+# should be read.
+#
+# The per-file summary lists every `run-*' whose diff was non-empty,
+# with its line count. `warning:' lines are dropped -- several of the
+# run-* scripts print them deliberately (run-vredir emits two about
+# system error messages varying between systems), so counting them
+# would mark passing files as failing.
+#
+# ------------------------------------------------------------------
+# rc, not bash, and not by accident: the subject of this harness is
+# bash itself, and a harness written in the shell under test cannot
+# report that shell dying. (That is why bash-scriptladder and its four
+# successors are rc too.) rc rules this file obeys: no `break' (rc has
+# none), no `^' against a list (it is a CROSS PRODUCT), `=' only as a
+# leading assignment.
+
+log = /tmp/bash-suite.log
+if(! ~ $#* 0)
+	log = $1
+
+# $APEXPROOT is assigned by every mkfile but need not be set in a
+# shell. **An UNSET variable in rc is an EMPTY LIST, and the implicit
+# caret between adjacent words is a CROSS PRODUCT** -- so
+# `$APEXPROOT/sys/src/...' with APEXPROOT unset is not the relative
+# path, it is the EMPTY LIST; and comparing it against the empty
+# string does not catch that either, because there is no element to
+# match against. Test $#APEXPROOT, and set the default first.
+tests = ./sys/src/external/bash/tests
+if(! ~ $#APEXPROOT 0)
+	tests = $APEXPROOT/sys/src/external/bash/tests
+if(! test -d $tests){
+	echo 'bash-runtests: no tests directory at' $tests >[1=2]
+	echo 'bash-runtests: run this from the repo root, or set $APEXPROOT' >[1=2]
+	exit notests
+}
+
+if(! test -x /bin/bash){
+	echo 'bash-runtests: /bin/bash is not there -- run from inside apexp-sh' >[1=2]
+	exit nobash
+}
+
+cd $tests
+
+# 2. the four support programs. Built here rather than by the mkfile
+#    because they belong to the suite, not to the shell.
+built = ()
+for(p in recho zecho printenv xcase){
+	if(! test -f $p){
+		if(pcc -o $p ../support/$p.c >[2]/dev/null)
+			built = ($built $p)
+		if not
+			echo 'bash-runtests: WARNING could not build' $p >[1=2]
+	}
+}
+if(! ~ $#built 0)
+	echo 'bash-runtests: built' $built
+
+for(p in recho zecho printenv xcase)
+	if(! test -f $p)
+		echo 'bash-runtests: WARNING' $p 'is missing; some tests will misreport' >[1=2]
+
+echo 'bash-runtests: THIS_SH=/bin/bash, stdin /dev/null, log' $log
+echo 'bash-runtests: started' `{date}
+
+THIS_SH=/bin/bash /bin/bash run-all </dev/null >$log >[2=1]
+
+echo 'bash-runtests: run returned' >[1=2]
+
+# --- the validity check, before any result is read ---
+nbad = `{grep -c '\.\./bash' $log}
+echo
+echo '==== validity ===='
+echo 'lines mentioning ../bash (MUST be 0):' $nbad
+if(! ~ $nbad 0){
+	echo 'bash-runtests: THIS_SH DID NOT REACH THE TESTS.'
+	echo 'bash-runtests: the log below measures nothing -- do not read it.'
+}
+
+# --- per-file summary ---
+echo
+echo '==== files whose diff was NOT empty (lines, name) ===='
+# The header regex is ANCHORED AT BOTH ENDS on purpose. `run-all'
+# echoes the bare file name, so a header is exactly that and nothing
+# else -- while a plain /^run-/ also matches an ERROR line such as
+# `run-rhs-exp: 1: ../bash: not found', which then reads as a section
+# header with no output after it, i.e. as a PASS. That is precisely the
+# file the first summary reported as the only one passing.
+awk '
+/^run-[-A-Za-z0-9_.]+$/ { if (n != "" && c > 0) print c"\t"n; n = $0; c = 0; next }
+/^warning:/ { next }
+       { if (n != "") c++ }
+END    { if (n != "" && c > 0) print c"\t"n }
+' $log
+
+echo
+echo '==== files with an EMPTY diff (these passed) ===='
+awk '
+/^run-[-A-Za-z0-9_.]+$/ { if (n != "" && c == 0) print n; n = $0; c = 0; next }
+/^warning:/ { next }
+       { if (n != "") c++ }
+END    { if (n != "" && c == 0) print n }
+' $log
+
+echo
+echo 'bash-runtests: COMPLETE' `{date}

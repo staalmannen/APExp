@@ -2826,6 +2826,102 @@ table was wrong.
 `isblank`, and `syntax.c` the only file it produces. Every other
 `isblank` caller is a runtime one and simply gets the right answer
 now.
+**CONFIRMED ON THE VM: `run-all` GETS PAST THE STORM.** The same
+command that has died for weeks now runs real tests and prints real
+output -- `comsub-posix.tests`, `comsub-posix6.sub`, the
+syntax-error cases, `argv[1] = <abcde>` and the rest. **bash no
+longer dies of the allocation storm**, and since the only changes
+were `_ctype[9]`, `isprint` and one entry in `syntax.c`, the chain
+is measured end to end rather than argued.
+**It then FROZE at `run-comsub2`, and that one is NOT OURS: the
+test picks a command name that EXISTS on Plan 9.**
+`comsub2.tests:68` is `echo NOT${ p; }FOUND`, under the comment
+*"command not found should still echo error messages to stderr"* --
+the name `p` is chosen precisely because a unix has no such
+command. **9front's `/bin/p` is the pager.** bash found it, exec'd
+it, and `p` blocked reading stdin for ever.
+**Measured end to end, and `ps` did most of it.** Four processes,
+one chain: `1771 bash` (`/bin/bash run-all`) -> `2298 sh`
+(`sh run-comsub2`) -> `2299 bash` (`bash ./comsub2.tests`) ->
+**`2306 p`, in `Pread`** -- every one of the first three in
+`Await` at 0:00 CPU. Both stacks name their child by pid and the
+arithmetic closes it: 2299's `wait_for(pid=0x8fa)` is **2298**,
+and 2299's `wait_for(pid=0x902)` is **2306**, the pager. 1771's
+frames are `execute_for_command`/`execute_case_command`, which is
+`run-all`'s own `for x in run-*` loop. *No libap call is
+misbehaving*: `wait4` is blocked on a child that genuinely has not
+exited.
+**The output file is what placed it, with no instrument at all.**
+`$BASH_TSTOUT` survives the freeze (the `trap ... 0` that removes
+it never fires), and its last line is line 65's `set: +m: invalid
+option`. Normally a block-buffered log's tail is a lower bound --
+but that line is **stderr**, unbuffered, and line 68's whole
+purpose is to write to stderr too, so its ABSENCE is real position.
+*Check which stream a log's last line came from before discounting
+it for buffering.*
+**The collision is checkable and `p` may not be alone.** The
+`.right` files expect these to be missing: `a`, `after`, `foobar`,
+`hijkl`, `notthere`, `p`, `qfoo`, `quux`. **A collision only HANGS
+if the program reads stdin**; one that exits produces a wrong diff
+and reads as an ordinary failure, so the hang is the loud case
+rather than the only one.
+**With `</dev/null` the suite RUNS TO THE END** -- `p` reads EOF and
+exits, `comsub2` fails its diff (correctly -- it wanted
+`p: command not found`), and the loop reaches `run-vredir` and
+beyond. Read that as "the rest of the suite" rather than a clean
+number: it changes every test's stdin, not just this one's.
+
+**AND THAT FIRST COMPLETE RUN MEASURED NOTHING -- 14795 lines, 86
+test files, and `../bash: not found` in 75 of them.** `run-all:49`
+is `: ${THIS_SH:=../bash}`, upstream's default, because bash is
+normally built in its own source directory and the Makefile sets
+`THIS_SH = $(BUILD_DIR)/$(Program)`. **APExp installs bash to
+`/bin/bash` and never builds it at `../bash`**, so almost every file
+invoked a program that does not exist. *The log is indistinguishable
+at a glance from a real one*: right shape, right file names, a
+plausible amount of diff -- `run-array` 855 lines, `run-new-exp` 813
+-- and those are whole `.right` files showing as ABSENT OUTPUT, not
+failures. **Zero files passed.** Same family as the stale suite log
+and the `tclBinary` staleness: *anything measured from outside the
+source in front of you should say where it came from.*
+**THREE conditions, each failing silently on its own**: `THIS_SH`
+naming a bash that exists; `recho`, `zecho`, `printenv` and `xcase`
+built in `tests/` (the Makefile's `TESTS_SUPPORT`, built from
+`../support/*.c` -- **nothing in APExp's build makes them**, which is
+what the earlier `recho: command not found` was); and stdin on
+`/dev/null` for `/bin/p`.
+**`rc/bin/bash-runtests` is the harness**, and it exists because
+three preconditions that fail silently are three ways to spend a
+round on a worthless log. It builds the four helpers, sets `THIS_SH`,
+redirects stdin, prints `bash-runtests: COMPLETE`, and **prints the
+`../bash` count FIRST and refuses the result if it is not 0**. rc,
+like the five ladders, because a harness written in the shell under
+test cannot report that shell dying.
+**Its own summary had the bug it is meant to catch, twice.** The
+"passed" list printed every section unconditionally; and `/^run-/`
+also matches an ERROR line -- `run-rhs-exp: 1: ../bash: not found` --
+which reads as a header with nothing after it, *i.e. as a PASS*, and
+was the one file the first summary reported as passing. Anchored at
+both ends (`/^run-[-A-Za-z0-9_.]+$/`) it reports 86 sections and none
+passing, which is the true answer. *Eighth time in this campaign the
+instrument was the visible fault.*
+**Read which SIDE of a diff a line is on before reading what it
+says.** `run-vredir`'s screenful of `cannot duplicate fd: Invalid
+argument` and `$fd: Bad file descriptor` looked exactly like a libap
+`fcntl` bug, and `fcntl.c`'s `F_DUPFD` does carry an `EGREG` arm for
+buffered descriptors -- but `run-vredir` is `diff $BASH_TSTOUT
+vredir.right`, so `<` is ours and `>` is expected, every line on
+screen was `>`, and those were `vredir.right` lines 95-123 verbatim.
+`vredir6.sub` sets `ulimit -n 6` and *wants* the failure. Nothing of
+ours was in frame.
+**`set -m` is a red herring and was excluded by reading**: the two
+`set: -m: invalid option` lines are `config.h:33`'s
+`/* #undef JOB_CONTROL */` showing through, an expected diff.
+**`function_substitute` does not fork** (`subst.c:6925` dup2s
+stdout onto an anonymous file) and `anonopen` falls through to
+`sh_mktmpfd`, a real unlinked temp file rather than a pipe -- so
+there was never a funsub child or a pipe deadlock to look for.
+
 **The watchdog now SAYS WHEN IT IS ARMED, and a wasted round is
 why.** A run went out as `APEX__MALLOCMAX=8` -- two underscores, no
 `P` -- so the watchdog never armed, bash ran to full exhaustion and
