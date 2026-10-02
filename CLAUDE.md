@@ -2980,6 +2980,76 @@ fails to BUILD, or if the list barely moves -- which would mean the
 features are reaching the shell but something underneath them is
 wrong, and that is a different investigation.
 
+**AND THE REBUILD WOULD NOT START: `getcwd(NULL, n)` KILLED THE
+PROCESS, AND IT IS LIBAP'S, NOT THE CONFIG CHANGE.**
+
+```
+bash 7263782: suicide: invalid address 0x0/4096 in sys call
+_FD2PATH(a0=0x5)             syscall/_FD2PATH.s:6
+getcwd(buf=0x0, len=0x1000)  ap/unistd/getcwd.c:21
+get_working_directory(...)   bash/builtins/common.c:603
+set_pwd() / initialize_shell_variables() / shell_initialize()
+```
+
+**`buf=0x0` is the whole bug.** libap's getcwd passed its argument
+straight to `_FD2PATH` with no null check, so `getcwd(NULL, n)` -- the
+glibc/musl/POSIX.1-2008 "allocate it for me" form, which a great deal
+of GNU code uses -- handed the kernel address zero. `0x1000` is 4096,
+`PATH_MAX`, which is what bash asks for at `builtins/common.c:603`.
+**bash HAD ALREADY DETECTED THIS AND SHIPPED THE FIX, AND THE LINK
+ORDER THREW IT AWAY.** `config.h` says `#define GETCWD_BROKEN 1`, so
+`config-bot.h:66` does `#undef HAVE_GETCWD`, so `lib/sh/getcwd.c`
+compiles a getcwd that DOES allocate, and `getcwd.$O` is in the
+mkfile's `OBJSH`. But that object lands inside **`libsh.a`**, and
+`sys/src/ape/cmd/bash/mkfile` links deliberately:
+`#link libap first to already occupy symbols supported by the system
+libap` / `LIB= .../libap.a $BASHLIBS ...`. So `getcwd` resolved out of
+libap and bash's own copy was never pulled from the archive.
+*A program's workaround for a library bug is only as good as the link
+order* -- **the gnulib `strerror` finding pointing the other way**:
+there libap's correct version lost to gnulib's broken one, here bash's
+correct version lost to libap's broken one. *A symbol libap provides
+decides which implementation runs, whichever direction the quality
+runs in.*
+**And libap held the right idiom NEXT DOOR**: `misc/get_current_dir.c`
+implements `get_current_dir_name()` with the comment *"like
+getcwd(NULL, 0) on Linux -- allocates"*, by malloc'ing PATH_MAX and
+calling getcwd into it. Same shape as `mktemp` ignoring `__randname`
+in its own directory -- *the library contained a working version of
+the thing it could not do*, for the second time.
+**FIXED IN LIBAP rather than by reordering the link**, which is the
+right half of the choice: every program calling `getcwd(NULL, ...)` is
+fixed, and the mkfile's "libap first" policy stays intact.
+`getcwd(NULL,0)` takes PATH_MAX because **Plan 9's `fd2path` truncates
+SILENTLY** -- it returns -1 only for a bad descriptor -- so a
+grow-until-it-fits loop has nothing to test. `_getcwdmark()` is the
+version marker. `getcwd-test.c`'s **section 2 is bash's exact call and
+used to KILL rather than fail**, so reaching section 3 at all is the
+result; **section 4 is the control** (`getcwd(buf,0)` must be EINVAL),
+since an implementation that allocated unconditionally would pass
+everything else. 0 failures on glibc.
+**Why it had not bitten before is NOT settled and is not worth a
+round**: `set_pwd` reaches `get_working_directory` only when `PWD` is
+absent from the environment or does not match `.`, so the path was
+always one import away. Recorded as unexplained rather than guessed.
+**`/dev/fd` DOES NOT EXIST -- measured, and `HAVE_DEV_FD 1` was a
+lie.** `ls /dev/fd` says `file does not exist`; `ls /fd` lists
+`/fd/0 /fd/0ctl /fd/1 ...`. **Not re-pointed at `/fd`**: a Plan 9
+`/fd` entry is the descriptor of *the process that opens it*, so
+handing the name to a CHILD -- the whole point of `<(...)` -- names
+the child's own descriptor. *Do not invent semantics to make a feature
+compile.*
+**`NAMED_PIPES_MISSING` was also wrong**, i.e. bash was told FIFOs
+work: `unistd/mkfifo.c` is a stub returning -1. Defined now. **And the
+stub set `errno = 0` while failing** -- the most common bug shape in
+this tree, here in its purest form: a failure that refuses to say why,
+so `perror` prints whatever the last call left behind. ENOSYS now, as
+`symlink()` gives.
+*Two false claims and fourteen false denials in one config.h: a
+hand-maintained capability file is wrong in BOTH directions, and the
+two kinds fail differently -- a denial costs a feature silently, a
+claim costs a crash.*
+
 **The watchdog now SAYS WHEN IT IS ARMED, and a wasted round is
 why.** A run went out as `APEX__MALLOCMAX=8` -- two underscores, no
 `P` -- so the watchdog never armed, bash ran to full exhaustion and
