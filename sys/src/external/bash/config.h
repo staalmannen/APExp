@@ -624,7 +624,14 @@
 /* Define if the `getpgrp' function takes no argument.  */
 #define GETPGRP_VOID 1
 
-/* #undef NAMED_PIPES_MISSING */
+/*
+ * APEXP: DEFINED -- Plan 9 has no FIFOs in the file system, and
+ * libap's `unistd/mkfifo.c' is a stub that returns -1. (It also sets
+ * `errno = 0' while doing so, which is its own bug and is fixed
+ * separately; a failure that does not say why is worse than one that
+ * does.) This was `#undef', i.e. bash was told named pipes work.
+ */
+#define NAMED_PIPES_MISSING 1
 
 /* #undef OPENDIR_NOT_ROBUST */
 
@@ -651,7 +658,28 @@
 #define HAVE_HASH_BANG_EXEC 1
 
 /* Define if you have the /dev/fd devices to map open files into the file system. */
-#define HAVE_DEV_FD 1
+/*
+ * APEXP: UNDEFINED, and this one was MEASURED rather than reasoned:
+ *
+ *	term% ls /dev/fd
+ *	ls: /dev/fd: file does not exist: '/dev/fd'
+ *	term% ls /fd
+ *	/fd/0  /fd/0ctl  /fd/1  /fd/1ctl  ...
+ *
+ * **Plan 9 binds the fd device at `/fd'.** It was `#define ... 1' --
+ * a capability DECLARED but absent, which is the opposite shape to
+ * the fourteen switches above and reads exactly as dangerous: nothing
+ * fails to build, `redir.c' simply believes `/dev/fd/N' redirections
+ * work and they do not.
+ *
+ * Not re-pointed at `/fd' on purpose. `DEV_FD_PREFIX' below would take
+ * it, but `/fd/N' is NOT the same object: a Plan 9 `/fd' entry is the
+ * descriptor of the process that opens it, so handing the name to a
+ * CHILD -- which is the whole point of `<(...)' -- names the child's
+ * own descriptor, not the parent's. *Do not invent semantics to make a
+ * feature compile.* Making that work is its own round.
+ */
+/* #undef HAVE_DEV_FD */
 
 /* Defined to /dev/fd or /proc/self/fd (linux). */
 #define DEV_FD_PREFIX "/dev/fd/"
