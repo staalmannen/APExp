@@ -6,8 +6,6 @@
 #include <lock.h>
 #include "malloc_impl.h"
 
-extern char **environ;
-
 /*
  * Prototypes copied EXACTLY from ap/include/sys9.h rather than by
  * including it: kencc widens an argument at the call site only when a
@@ -78,34 +76,39 @@ Arena __malloc_arena;
  * Cost when off: one load and one branch per sbrk, which is already
  * two system calls.
  */
+/*
+ * THE LIMIT, THE INIT AND THE TWO STRING HELPERS LIVE IN
+ * `mallocwatch.c', NOT HERE, AND THAT SPLIT IS A BUG FIX.
+ *
+ * `_apemain' calls `_malloc_watchinit()'. While that function lived in
+ * THIS file, the reference pulled this object out of libap.a for every
+ * APE program -- and this object defines `malloc'. So any program
+ * supplying its OWN allocator got
+ *
+ *	malloc: /amd64/lib/ape/libap.a(_malloc_watchinit):
+ *	        redefinition: malloc
+ *
+ * **f2c is such a program**, and it had linked for years: its
+ * `malloc.c' is upstream's optional replacement allocator, enabled by
+ * `mkfile.plan9'. Nothing had ever forced libap's `malloc.$O' to be
+ * pulled, because `malloc' itself was already satisfied by f2c's.
+ * *The watchdog quietly made it impossible for any APE program to
+ * replace malloc* -- and only a full `mk distclean' relink could show
+ * it, which is why it arrived rounds after the change.
+ *
+ * Keeping the state in its own object restores the property: this
+ * file references `_malloc_wdmax', so malloc.$O pulls mallocwatch.$O
+ * and never the other way about. A program with its own allocator
+ * still runs `_malloc_watchinit()' -- it simply sets a variable
+ * nothing reads, which is exactly what "the watchdog is off for this
+ * program" should look like.
+ */
+extern size_t	_malloc_wdmax;		/* 0 means off */
+extern char	*_malloc_wdstr(char *p, char *e, const char *s);
+extern char	*_malloc_wdnum(char *p, char *e, size_t v);
+
 static size_t	wd_got;		/* bytes taken from the break so far */
-static size_t	wd_max;		/* 0 means off */
 static long	wd_calls;
-static int	wd_init;
-
-static char *
-wd_str(char *p, char *e, const char *s)
-{
-	while(*s && p < e)
-		*p++ = *s++;
-	return p;
-}
-
-static char *
-wd_num(char *p, char *e, size_t v)
-{
-	char n[24];
-	int i;
-
-	i = 0;
-	do {
-		n[i++] = '0' + (int)(v%10);
-		v /= 10;
-	} while(v != 0 && i < (int)sizeof n);
-	while(i > 0 && p < e)
-		*p++ = n[--i];
-	return p;
-}
 
 /*
  * Called with the arena LOCKED, and it unlocks before aborting.
@@ -141,26 +144,26 @@ wd_fail(void)
 	 * allocator is re-entered from inside its own abort, fires again,
 	 * and buries the stack it exists to expose.
 	 *
-	 * Clearing wd_max makes every later wd_note() return 0, so the
+	 * Clearing _malloc_wdmax makes every later wd_note() return 0, so the
 	 * abort path allocates freely and the message prints once. The
 	 * limit has already done its job by the time we are here.
 	 */
-	wd_max = 0;
+	_malloc_wdmax = 0;
 
 	unlock(&__malloc_arena);
 
 	p = buf;
 	e = buf + sizeof buf - 2;
-	p = wd_str(p, e, "libap: APEXP_MALLOCMAX exceeded: ");
-	p = wd_num(p, e, wd_got);
-	p = wd_str(p, e, " bytes from the break in ");
-	p = wd_num(p, e, (size_t)wd_calls);
-	p = wd_str(p, e, " sbrk calls.  SLEEPING so a stack can be taken:"
+	p = _malloc_wdstr(p, e, "libap: APEXP_MALLOCMAX exceeded: ");
+	p = _malloc_wdnum(p, e, wd_got);
+	p = _malloc_wdstr(p, e, " bytes from the break in ");
+	p = _malloc_wdnum(p, e, (size_t)wd_calls);
+	p = _malloc_wdstr(p, e, " sbrk calls.  SLEEPING so a stack can be taken:"
 		"  acid ");
-	p = wd_num(p, e, (size_t)getpid());
-	p = wd_str(p, e, "  then stk()  then echo kill > /proc/");
-	p = wd_num(p, e, (size_t)getpid());
-	p = wd_str(p, e, "/ctl");
+	p = _malloc_wdnum(p, e, (size_t)getpid());
+	p = _malloc_wdstr(p, e, "  then stk()  then echo kill > /proc/");
+	p = _malloc_wdnum(p, e, (size_t)getpid());
+	p = _malloc_wdstr(p, e, "/ctl");
 	*p++ = '\r';
 	*p++ = '\n';
 	write(2, buf, p - buf);
@@ -198,75 +201,17 @@ wd_fail(void)
 }
 
 /*
- * Called once from _apemain, after _envsetup() and before main. NOT
- * from inside the allocator -- see above; that is what broke every
- * APE program. Calling it twice is harmless, and never calling it
- * leaves the watchdog off, which is the safe direction.
- */
-void
-_malloc_watchinit(void)
-{
-	const char *s;
-	size_t v;
-
-	if(wd_init)
-		return;
-	wd_init = 1;
-	if(environ == 0)		/* belt and braces: see above */
-		return;
-	s = getenv("APEXP_MALLOCMAX");
-	if(s == 0)
-		return;
-	v = 0;
-	while(*s >= '0' && *s <= '9')
-		v = v*10 + (size_t)(*s++ - '0');
-	wd_max = v * 1024 * 1024;
-
-	/*
-	 * SAY SO, and the reason is a round that was spent on nothing.
-	 *
-	 * A run was made with `APEX__MALLOCMAX=8' -- two underscores, no
-	 * P. The watchdog was simply not armed, bash ran to full
-	 * exhaustion and was killed exactly as it had been for weeks, and
-	 * the output was indistinguishable from a watchdog that had armed
-	 * and never reached its limit. **A misspelled variable name is
-	 * invisible**, and the instrument's silence when unset -- which
-	 * is correct and must stay -- is what makes it so.
-	 *
-	 * One line when it IS set repairs that: no line means not armed,
-	 * so "nothing happened" can be told from "nothing happened yet".
-	 * Silent when unset, so it costs no program anything.
-	 *
-	 * Same family as every other lesson in this hunt: *an instrument
-	 * has to say whether it is running*, or a null result has two
-	 * explanations.
-	 */
-	if(wd_max != 0){
-		char buf[100], *p, *e;
-
-		p = buf;
-		e = buf + sizeof buf - 2;
-		p = wd_str(p, e, "libap: heap watchdog ARMED at ");
-		p = wd_num(p, e, v);
-		p = wd_str(p, e, " MB");
-		*p++ = '\r';
-		*p++ = '\n';
-		write(2, buf, p - buf);
-	}
-}
-
-/*
  * Returns non-zero when the limit has been passed. Touches nothing
  * outside this file and calls nothing at all -- the whole point.
  */
 static int
 wd_note(size_t n)
 {
-	if(wd_max == 0)
+	if(_malloc_wdmax == 0)
 		return 0;
 	wd_calls++;
 	wd_got += n;
-	return wd_got > wd_max;
+	return wd_got > _malloc_wdmax;
 }
 
 /*

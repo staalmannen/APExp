@@ -3005,3 +3005,96 @@ library bug that the suite *found*; it is not why any test fails.
 
 It is also **not** `date`'s crash — `gnulib/strftime.c` and `time_rz.c`
 use none of these modifiers (the one grep hit there is a comment).
+
+## malloc/ — the watchdog made `malloc` unreplaceable, and f2c found it
+
+A `mk distclean` and full rebuild, the first since the heap watchdog
+went in:
+
+```
+pcc -c ... external/f2c/src/malloc.c
+6l -o 6.out main.6 init.6 ... malloc.6
+malloc: /amd64/lib/ape/libap.a(_malloc_watchinit): redefinition: malloc
+(2416)  TEXT   malloc+0(SB),$72
+mk: 6l -o ... : exit status=6l 7334524: error
+```
+
+### The mechanism, and it is a dependency direction
+
+`plan9/callmain.c`'s `_apemain` calls `_malloc_watchinit()` once, after
+`_envsetup()` and before `main`. That function lived in
+`malloc/malloc.c` — **which also defines `malloc`, `free`'s arena, and
+`wd_fail`.** A reference from `_apemain` is a reference in *every* APE
+binary, so the linker pulled `malloc.$O` out of `libap.a` for every
+program in the tree.
+
+**f2c supplies its own allocator.** `external/f2c/src/malloc.c` is
+upstream's optional replacement; upstream's `makefile.u` ships it OFF —
+
+```
+MALLOC =
+# To use the malloc whose source accompanies the f2c source, add malloc.o
+# ... some other systems do not tolerate replacement of the system's malloc.
+```
+
+— and `mkfile.plan9`, which APExp's mkfile follows, turns it on. That
+had been fine for years, because **nothing in libap had ever referenced
+a symbol only `malloc.$O` defines**, so the linker took f2c's `malloc`
+and never looked at libap's object at all.
+
+*The watchdog silently removed the ability of any APE program to supply
+its own allocator.* Eleventh time in this campaign an instrument has
+been the visible fault, and the first whose damage was to the BUILD
+rather than to a measurement.
+
+### Why it arrived rounds late
+
+**`mk install` rebuilds `libap.a` without relinking programs already
+built against it.** That rule is already in `CLAUDE.md` as "a libap fix
+can sit unused for rounds" — and it has a second edge nobody had
+written down: *so can a libap BREAKAGE.* Only a full `distclean` relink
+could surface this, and by then the change that caused it was many
+rounds back with nothing nearby to blame.
+
+### The fix
+
+`malloc/mallocwatch.c` now owns `_malloc_wdmax`, `_malloc_watchinit()`
+and the two hand-rolled formatting helpers; `malloc.c` keeps `wd_got`,
+`wd_calls`, `wd_note()` and `wd_fail()` and declares the shared three
+`extern`. The arrows now read
+
+```
+callmain.$O    -> mallocwatch.$O          (and no further)
+malloc.$O      -> mallocwatch.$O          (reads _malloc_wdmax)
+mallocwatch.$O -> getenv, write           (never malloc)
+```
+
+**A program with its own allocator still runs `_malloc_watchinit()`** —
+it sets a variable nothing in that program reads, which is exactly what
+"the watchdog is off here" should look like, rather than a link error.
+`mallocwatch.c` must never call `malloc`, directly or otherwise, or the
+cycle returns; `getenv` is a plain scan of `environ` and `write` is a
+system call, which is the whole of what it uses.
+
+**f2c's own malloc is left ON, deliberately.** Turning it off would
+also make the error go away, and would be the wrong fix: it would hide
+the regression instead of repairing it, and would leave the tree in a
+state where *no* program may replace the allocator. The split restores
+a property; disabling f2c's module would only dodge one instance of
+losing it.
+
+### The sweep
+
+Three files in `external/` define `malloc` at column 0:
+
+| file | built? |
+|---|---|
+| `f2c/src/malloc.c` | **yes**, via `mkfile`'s OFILES |
+| `bash/lib/malloc/malloc.c` | no — `USING_BASH_MALLOC` is `#undef` and it is not in OFILES |
+| `libzip/regress/malloc.c` | no — `regress/` is not built |
+
+And the other direction is exhaustive by inspection: `_apemain`
+references exactly **two** symbols, `_envsetup` and
+`_malloc_watchinit`. `_envsetup.c` defines nothing a program would
+replace, so f2c was the only casualty and there is no second one
+waiting.
