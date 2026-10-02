@@ -3028,6 +3028,10 @@ used to KILL rather than fail**, so reaching section 3 at all is the
 result; **section 4 is the control** (`getcwd(buf,0)` must be EINVAL),
 since an implementation that allocated unconditionally would pass
 everything else. 0 failures on glibc.
+**CONFIRMED ON THE VM**: `_getcwdmark = 1`, all four sections PASS,
+0 failures -- and section 2 is bash's exact `getcwd(NULL, PATH_MAX)`,
+which used to kill the process rather than fail, so reaching section 3
+was itself the result.
 **Why it had not bitten before is NOT settled and is not worth a
 round**: `set_pwd` reaches `get_working_directory` only when `PWD` is
 absent from the environment or does not match `.`, so the path was
@@ -3085,6 +3089,125 @@ this needs no `distclean` of its own. `getcwd.c` takes
 `<sys/limits.h>` as `at_functions.c` beside it already does -- *the
 include with a working neighbour under the same flags beats the one
 that only ought to work*.
+
+**AND THE SUITE NOW MEASURES REAL THINGS -- then STOPS at
+`run-jobs`.** The diffs are genuine at last: `< 1.0000` against
+`> 1,0000` (a decimal comma, so `LC_NUMERIC`), and `Passed all 1318
+Unicode tests` against `1770`. That shape is only possible with
+`THIS_SH` resolving and the fourteen features compiled in, so the
+config change reached the shell.
+**`run-jobs` is the stop**, and the log stood still for four minutes
+while the longest thing in `jobs.tests` is `sleep 30`. The file is
+`sleep N &` and `wait` throughout -- `wait %1`, `kill -n9 $pid; wait
+$pid`, `kill -sHUP $pid2; wait $pid2`, and two bare `wait`s with
+several children outstanding. **This tree already records a
+never-measured bug exactly there**: `wait4`'s `WNOHANG` path falls
+through to the BLOCKING `_WAIT()` when `_dirstat` returns nil, and
+again when the pending message belongs to a different pid -- which is
+what `wait -n` and a bare `wait` do. *A live suspect rather than a
+guess, but `ps` decides it, not the reading.*
+**AND THE KERNEL'S fd WARNINGS NOW CORRUPT TEST OUTPUT, which is new
+and is NOT a new bug.** `< bash NNNN: warning: process exceeds 100
+file descriptors` appears as a diff line in `run-invert`,
+`run-invocation` and `run-iquote` -- files with nothing to do with
+descriptors. The mechanism was settled two rounds ago and is
+`move_to_high_fd` (`general.c:681`): with `maxfd < 20` it takes
+`getdtablesize()`, capped by `HIGH_FD_MAX` **256**, and libap reports
+`OPEN_MAX` 256, so bash `dup2`s its script to ~254 and Plan 9's fd
+table grows past both thresholds. **Recorded, not fixed**:
+`getdtablesize()` is telling the truth, and shrinking it to dodge a
+kernel message is the "invent semantics" shape. *The warnings were
+proven HARMLESS by the empty-script case; what is new is that they are
+now LOUD -- a harmless message that lands in a captured stream stops
+being harmless to the measurement.* Size it from the harness summary
+before touching anything.
+
+**`date` CRASHES, and `/proc/n/ppid` is what stopped me blaming it.**
+The full `ps` -- ungrepped, after two rounds of grep hiding things --
+showed **two `Broken date` processes** beside the stalled harness, and
+a `Broken` process is ALIVE to the kernel (stopped at a fault), so
+`await` on one can never return. That fit the `Await` perfectly and
+was wrong: `ppid` says 7273473 and 7287195, **both gone**, so the two
+dates are ORPHANS and nothing waits on them. The actual child of
+`bash-runtests` is an **`awk` in `Pwrite`** -- my own summary, so that
+stall is mine. *Three mechanisms offered, the right one not among
+them: a list of alternatives is only exhaustive over what you thought
+of.* **`ppid` costs nothing and would have saved the whole detour.**
+**The crash itself is real and new**, with a complete stack:
+
+```
+save_abbr(...)+0x3d        gnulib/time_rz.c:127
+mktime_z(tm=.., tz=0x43f480) gnulib/time_rz.c:310
+__strftime_internal(...)   gnulib/strftime.c:2092   <- the %s arm
+fprintftime(...)           gnulib/strftime.c:1198
+show_date(...)             coreutils/src/show-date.c:32
+show_date_helper(...)      coreutils/src/date.c:397
+main                       coreutils/src/date.c:709
+```
+
+`time_rz.c:127` is `char const *zone = tm->tm_zone;` and the only
+dereference below it is `if (*zone)`, guarded by `if (!zone || zone
+points INSIDE tm) return true;`. **So the fault is `*zone` with a
+non-null `tm_zone` that is neither NULL nor internal** -- a stale or
+invalid pointer.
+**Sitting directly under it: libap's `mktime` never writes
+`tm_zone`, `tm_gmtoff` or `tm_isdst` back into `*t`.** It is 132
+lines and only normalises the date fields. glibc and the BSDs set all
+three, and `mktime_z` is written around that -- it does
+`struct tm tm_1 = *tm; mktime(&tm_1); save_abbr(tz, &tm_1);`.
+*Recorded as a conformance gap, NOT as the diagnosis*: `localtime_rz`
+should already have repointed `tm_zone` into the `tz` object, so the
+chain is not closed.
+**It prints correct output and THEN dies** -- both manual runs showed
+the right time -- which points at teardown or at a later `%`
+conversion rather than at the formatting that produced the visible
+line. *A program that answers correctly and then faults is reporting
+something after the answer.*
+**Next, and cheap, because a Broken process keeps everything**:
+`acid <pid>` then `lstk()` prints the LOCALS, so `zone`'s actual
+value is one command away -- NULL, inside-tm, or garbage are three
+different bugs. And `date` twice in a row with `ps | grep date`
+between says whether it leaves a corpse every time.
+
+**THE FIRST VALID COMPLETE RUN OF BASH'S SUITE: `lines mentioning
+../bash (MUST be 0): 0`, `COMPLETE` marker, ~85 files with a
+non-empty diff and NONE passing.** The harness's own validity line is
+what makes that readable at all.
+**But about 35 of those files show exactly `3`, and 3 is one diff
+position header plus the two kernel fd warnings.** They agree with
+their `.right` in every respect except a message from the KERNEL --
+`pprint` sends it to the process's own fd 2, and every `run-<name>`
+captures stderr with `2>&1`, so it lands inside the comparison. *So
+the single largest entry in the failure list is not bash and not
+libap.*
+**The harness now buckets three ways** -- REAL diff / warnings-only /
+passed -- and that is a MEASUREMENT, not a fix: nothing is suppressed
+or rewritten, the noise is counted apart so the remaining list is the
+one worth reading. **Position lines (`2,3d1`) are skipped** as
+structure rather than content, and a real file's number is now its
+differing lines with the warnings subtracted. *Lumping ~35 noise
+entries in with the real ones makes every later per-file comparison
+unreadable, and comparing per file is this tree's rule.*
+**`run-jobs` WAS NEVER A STOP, and I spent a round on it.** It shows
+`231` in the list, so it ran to completion; the log looked static
+because `jobs.tests` legitimately sleeps for minutes. *I had even
+computed its longest sleep and still read "the log stopped changing
+for four minutes" as a hang.* **A log that is not growing is not a
+stopped run when the test it is inside is a sleep** -- the `ps` STATE
+would have said so, and the one I took was of the wrong process.
+**The real stall was my own `awk`, at the very end**, blocked in
+`Pwrite` with `bash-runtests` waiting on it; killing it let the
+summary print. *Ninth instrument fault.* **Why an awk writing to the
+terminal blocked is UNEXPLAINED** -- the committed harness has no pipe
+-- and the evidence is gone, because the `/proc/<pid>/fd` listing was
+not taken before the kill. *Take the cheap reading BEFORE the
+remedy; a kill destroys the only copy.*
+**And `lstk()` named `date`'s bad pointer exactly: `zone =
+0x834383635`.** Bytes `34 38 36 35` are ASCII **`4865`** -- a `char *`
+holding digit TEXT, which is the `ifs_value` shape a second time, and
+the fault is in strftime's **`%s` arm**, the one conversion that
+formats a number. *Two independent bugs in this tree have now been a
+pointer containing characters.*
 
 **The watchdog now SAYS WHEN IT IS ARMED, and a wasted round is
 why.** A run went out as `APEX__MALLOCMAX=8` -- two underscores, no
