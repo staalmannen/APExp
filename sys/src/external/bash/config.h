@@ -32,18 +32,52 @@
    BSD-like job control. */
 /* #undef JOB_CONTROL */
 
+/*
+ * APEXP: THE FEATURE SWITCHES BELOW WERE ALL OFF, AND IT IS THE
+ * `READLINE' BUG ELEVEN TIMES OVER.
+ *
+ * bash ships config.h with every optional feature `#undef'-ed and
+ * `configure' turns them on; APExp hand-maintains this file (as it
+ * does perl's), so each one stayed at upstream's unconfigured
+ * default. **Nothing was missing from the build**: alias.c, array.c,
+ * arrayfunc.c, assoc.c, braces.c, pcomplete.c and pcomplib.c are all
+ * in the mkfile's OFILES, and bi-alias, bi-pushd, bi-declare, bi-test,
+ * bi-let, bi-shopt and bi-complete are all in OBJBUILTINS. The entire
+ * apparatus was compiled, linked, and switched off by commented-out
+ * lines -- *a capability present and not declared*, the same shape as
+ * READLINE below and as zipfs's two missing `file stat' keys.
+ *
+ * WHAT NAMED IT: bash's own suite HUNG for 1h36m in `set-e.tests'
+ * line 66, `until (( x == 4 )); do', printing
+ * `x: command not found' for ever. Without DPAREN_ARITHMETIC `((' is
+ * not an arithmetic command, so `(( x == 4 ))' parses as two nested
+ * SUBSHELLS running the command `x' -- which is never found, so the
+ * `until' condition never succeeds. **An infinite loop, not a
+ * freeze.**
+ *
+ * The suite had been saying so all along, in warnings I read as
+ * boilerplate: "all of these tests will fail if arrays have not been
+ * compiled into the shell", "...if the conditional command has not
+ * been compiled", "...if extended pattern matching has not been".
+ * They were accurate.
+ *
+ * Each switch below is turned on only where the code it gates is
+ * already built and needs nothing the platform lacks. The ones left
+ * OFF say why at their own entry.
+ */
+
 /* Define ALIAS if you want the alias features. */
-/* #undef ALIAS */
+#define ALIAS 1
 
 /* Define PUSHD_AND_POPD if you want those commands to be compiled in.
    (Also the `dirs' commands.) */
-/* #undef PUSHD_AND_POPD */
+#define PUSHD_AND_POPD 1
 
 /* Define BRACE_EXPANSION if you want curly brace expansion a la Csh:
    foo{a,b} -> fooa foob.  Even if this is compiled in (the default) you
    can turn it off at shell startup with `-nobraceexpansion', or during
    shell execution with `set +o braceexpand'. */
-/* #undef BRACE_EXPANSION */
+#define BRACE_EXPANSION 1
 
 /* Define READLINE to get the nifty/glitzy editing features.
    This is on by default.  You can turn it off interactively
@@ -114,37 +148,53 @@
 
 /* Define DISABLED_BUILTINS if you want "builtin foo" to always run the
    shell builtin "foo", even if it has been disabled with "enable -n foo". */
-/* #undef DISABLED_BUILTINS */
+#define DISABLED_BUILTINS 1
 
 /* Define PROCESS_SUBSTITUTION if you want the K*rn shell-like process
    substitution features "<(file)". */
 /* Right now, you cannot do this on machines without fully operational
    FIFO support.  This currently include NeXT and Alliant. */
+/*
+ * APEXP: DELIBERATELY LEFT OFF, pending a probe rather than an
+ * argument. Process substitution needs `/dev/fd' or named pipes, and
+ * **`HAVE_DEV_FD 1' below is a CLAIM nothing here has checked**:
+ * Plan 9 binds the fd device at `/fd', not `/dev/fd'. That is the
+ * opposite shape to the switches above -- a capability DECLARED but
+ * possibly not present -- and declaring a second one on top of it
+ * would make a failure unattributable. `ls /dev/fd' settles it.
+ */
 /* #undef PROCESS_SUBSTITUTION */
 
 /* Define PROMPT_STRING_DECODE if you want the backslash-escaped special
    characters in PS1 and PS2 expanded.  Variable expansion will still be
    performed. */
-/* #undef PROMPT_STRING_DECODE */
+/* APEXP: ON. This is why the prompt was a bare `$' -- \u, \h, \w and
+   the rest were being left as literal text. */
+#define PROMPT_STRING_DECODE 1
 
 /* Define SELECT_COMMAND if you want the Korn-shell style `select' command:
 	select word in word_list; do command_list; done */
-/* #undef SELECT_COMMAND */
+#define SELECT_COMMAND 1
 
 /* Define COMMAND_TIMING of you want the ksh-style `time' reserved word and
    the ability to time pipelines, functions, and builtins. */
-/* #undef COMMAND_TIMING */
+/* APEXP: ON -- libap has times() (time/times.c) and getrusage()
+   (misc/getrusage.c), and config.h already declares HAVE_TIMES,
+   HAVE_GETRUSAGE and HAVE_WAIT3. */
+#define COMMAND_TIMING 1
 
 /* Define ARRAY_VARS if you want ksh-style one-dimensional array variables. */
-/* #undef ARRAY_VARS */
+/* APEXP: ON -- array.c, arrayfunc.c and assoc.c are already in OFILES. */
+#define ARRAY_VARS 1
 
 /* Define DPAREN_ARITHMETIC if you want the ksh-style ((...)) arithmetic
    evaluation command. */
-/* #undef DPAREN_ARITHMETIC */
+/* APEXP: ON. This is the one that HUNG the suite; see the note above. */
+#define DPAREN_ARITHMETIC 1
 
 /* Define EXTENDED_GLOB if you want the ksh-style [*+@?!](patlist) extended
    pattern matching. */
-/* #undef EXTENDED_GLOB */
+#define EXTENDED_GLOB 1
 
 /* Define EXTGLOB_DEFAULT to the value you'd like the extglob shell option
    to have by default */
@@ -152,7 +202,10 @@
 
 /* Define COND_COMMAND if you want the ksh-style [[...]] conditional
    command. */
-/* #undef COND_COMMAND */
+/* APEXP: ON, and it was INCOHERENT before: COND_REGEXP just below was
+   defined while COND_COMMAND was not, and COND_REGEXP does nothing
+   except extend `[[ ... ]]' with `=~'. APE has <regex.h>. */
+#define COND_COMMAND 1
 
 /* Define COND_REGEXP if you want extended regular expression matching and the
    =~ binary operator in the [[...]] conditional command. */
@@ -165,7 +218,7 @@
 /* Define ARITH_FOR_COMMAND if you want the ksh93-style
 	for (( init; test; step )) do list; done
    arithmetic for command. */
-/* #undef ARITH_FOR_COMMAND */
+#define ARITH_FOR_COMMAND 1
 
 /* Define NETWORK_REDIRECTIONS if you want /dev/(tcp|udp)/host/port to open
    socket connections when used in redirections */
@@ -173,7 +226,11 @@
 
 /* Define PROGRAMMABLE_COMPLETION for the programmable completion features
    and the complete builtin. */
-/* #undef PROGRAMMABLE_COMPLETION */
+/* APEXP: ON -- pcomplete.c and pcomplib.c are already in OFILES and
+   bi-complete in OBJBUILTINS. Note this is NOT what made Tab work:
+   that is readline's own filename completion, which needs nothing
+   here. This is the `complete'/`compgen' builtins. */
+#define PROGRAMMABLE_COMPLETION 1
 
 /* Define NO_MULTIBYTE_SUPPORT to not compile in support for multibyte
    characters, even if the OS supports them. */
@@ -193,10 +250,10 @@
 
 /* Define for case-modifying variable attributes; variables modified on
    assignment */
-/* #undef CASEMOD_ATTRS */
+#define CASEMOD_ATTRS 1
 
 /* Define for case-modifying word expansions */
-/* #undef CASEMOD_EXPANSIONS */
+#define CASEMOD_EXPANSIONS 1
 
 /* Define to make the `direxpand' shopt option enabled by default. */
 /* #undef DIRCOMPLETE_EXPAND_DEFAULT */

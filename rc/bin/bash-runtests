@@ -46,7 +46,19 @@
 #
 # A fault, a kill and a clean finish all just give the prompt back, so
 # the log ends with `bash-runtests: COMPLETE'. **No marker means the
-# run did not finish, whatever the log's last line says.** It also
+# run did not finish, whatever the log's last line says.**
+#
+# **`run-all' HAS NO TIMEOUT, so one looping test stops everything.**
+# That is not hypothetical: with DPAREN_ARITHMETIC off, `set-e.tests'
+# line 66 (`until (( x == 4 ))') looped for 1h36m printing
+# `x: command not found', because `((' parsed as nested subshells and
+# the `until' condition could never succeed. **The way to read a run
+# that seems stuck is `tail /tmp/bash-suite.log'** -- the repeating
+# line names the test, and `grep -n "^run-" ' on the log names the
+# file it belongs to. An infinite loop and a blocked process look the
+# same from the prompt; `ps' separates them (see CLAUDE.md).
+#
+# It also
 # prints the count of `../bash' complaints, which must be 0; a non-zero
 # count means condition 1 was not met after all and nothing below it
 # should be read.
