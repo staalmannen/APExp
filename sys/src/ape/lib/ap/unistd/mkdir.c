@@ -16,7 +16,8 @@ mkdir(const char *name, mode_t mode)
 		errno = EEXIST;
 		return -1;
 	}
-	n = _CREATE(name, 0, 0x80000000|(mode&0777));
+	/* POSIX: the file-creation mask applies to mkdir too. */
+	n = _CREATE(name, 0, 0x80000000|((mode&0777) & ~_umaskbits()));
 	if(n < 0)
 		_syserrno();
 	else{

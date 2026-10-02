@@ -205,6 +205,14 @@ extern int  _bufmark(void);		/* ditto, for plan9/_buf.c */
 extern void _malloc_watchinit(void);
 
 /* ap/plan9/_apdbg.c -- one debug line, under $APEXP_DEBUG. Labels may be 0. */
+/*
+ * The process file-creation mask. umask() owns it; open() and mkdir()
+ * are the only two callers, which is why it is here rather than in
+ * <sys/stat.h> -- it is libap's own state, not a POSIX interface.
+ */
+extern mode_t _umaskbits(void);
+extern int _umaskmark(void);		/* which libap is linked in */
+
 extern int _apdbgon(void);
 extern void _apdbg(const char *msg, const char *l1, int v1,
 	const char *l2, int v2);

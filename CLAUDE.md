@@ -206,7 +206,8 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
 `copyfile-test.c`, `deeppath-test.c`, `bufexec-test.c`,
-`mkstemp-test.c`, `printfmod-test.c` and `stdio-test.c`.
+`mkstemp-test.c`, `printfmod-test.c`, `umask-test.c` and
+`stdio-test.c`.
 **`ctype-xcheck.c` is a HOST program** like `tz-xcheck.c`: it links
 libap's own `_ctype[]` into a glibc program and sweeps **256 values
 by 12 classifications**, printing every disagreement. It needs TWO
@@ -3386,6 +3387,86 @@ rather than a shared cause.
 **The fd warnings are CLOSED as an item** (see the top of this
 section): they were the largest single entry in the failure list and
 they went without one line of libap changing.
+
+**AND THE TWO BIGGEST REAL FILES ARE THREE SWITCHES AND ONE STUB.**
+`run-histexpand` 287 and `run-builtins` 225 are 512 of the remaining
+~1500 differing lines, and reading them cost one round rather than
+several because each partitions cleanly.
+- **`run-histexpand` is `BANG_HISTORY`, ALL 287 lines of it.**
+  `set: -H: invalid option` and `!!: command not found` throughout;
+  the switch is `#undef` and gates **43 sites**, `set -H`
+  (`flags.c:199`, `histexp_flag`) among them. **The file's own first
+  line says so** -- *"warning: all of these tests will fail if history
+  has not been compiled into the shell"* -- which is the third time a
+  suite's unconditional warning turned out to be accurate.
+  **LEFT OFF, and it is a DECISION rather than an oversight**: it
+  changes what `!` means in every interactive line, where `READLINE`
+  and `HISTORY` only changed how a line is edited. The code is already
+  compiled and linked, so it is one `#define` whenever that trade is
+  wanted.
+- **`run-builtins` 225 partitions 175 / 42 / 6 / 2**, and only the
+  second is ours:
+  **175 are `HELP_BUILTIN`** -- `help: command not found`,
+  `builtin: help: not a shell builtin`, and pages of `help <name>`
+  usage on the expected side. `bi-help.$O` is already in OBJBUILTINS
+  and `help.def` in DEFFILES, and `help.def` opens `$DEPENDS_ON
+  HELP_BUILTIN`, so mkbuiltins emitted no builtin. **A capability
+  present and not declared, for the FIFTH time** (READLINE, zipfs's
+  two `file stat` keys, the fourteen features, this). **Turned ON.**
+  **42 are `umask` and they ARE ours** -- see below.
+  **6 are `enable -f`** (dynamic loading; Plan 9 has no dlopen, the
+  same wall as perl's XS) and **2 are process substitution**, off
+  deliberately because `/dev/fd` does not exist.
+- **gcc-swept before shipping, and the control was VACUOUS the first
+  time.** `help.c` and `builtins.c` give **0 errors** in the class 6c
+  treats as fatal (`-Werror=incompatible-pointer-types`,
+  `implicit-function-declaration`, `int-conversion`) -- gcc's own
+  `-Wparentheses` and `-Wdiscarded-qualifiers` complaints are
+  upstream's style. But my first control compared `-DHELP_BUILTIN`
+  against nothing *while `-DHAVE_CONFIG_H` was supplying the define
+  from the header both ways*, and reported 5537 lines twice.
+  Preprocessed against a `config.h` with the line reverted it is
+  **625 -> 5537**. *A control that cannot differ is not a control* --
+  the same trap as the check that cannot fail, met from a new angle.
+
+**`umask()` DISCARDED ITS ARGUMENT AND ALWAYS ANSWERED 0 -- FIXED.**
+The whole of `ap/stat/umask.c` was `mode_t umask(mode_t){ return 0; }`
+under the comment *"No such concept in plan9, but supposed to be
+always successful"*. The first half is true of the KERNEL and false of
+this library; the second half is not what the call is for. **This is
+the most common bug shape in this tree** -- a stub answering the wrong
+thing rather than "nothing to do" -- and the rule it breaks is already
+written down: *a platform having nothing to DISPLAY is no reason for a
+value not to read back.*
+**Storing it is not "inventing semantics", for a locatable reason**:
+libap is the code that chooses the permission it hands `_CREATE`, at
+exactly **two** user-facing sites (`fcntl/open.c`'s O_CREAT arm and
+`unistd/mkdir.c`). The other `_CREATE` callers are internal
+(`/env/_fdinfo`, `/env/_sighdlr`, `tmpfile`, `access`'s probe) or copy
+an existing mode (`rename`), and POSIX puts no umask on any of them.
+**And it composes with the file server rather than fighting it**: Plan
+9 already hands out `perm & (dirperm | ~0666)`, so the result is the
+intersection -- a umask may only ever REMOVE bits, which is exactly
+its contract.
+**Two limits, both deliberate and both recorded**: the initial mask is
+**0, not 022**, so by default nothing differs and only a program that
+calls `umask()` sees any change -- *a conformance fix should not also
+be a default change*; and it does **not survive `exec`**, since the
+static lives in the process image and carrying it over means another
+`/env/` variable beside `_fdinfo` and `_sighdlr`. `umask-test.c`
+**section 4 is a PROBE that measures that gap** rather than asserting
+it, so the next reader gets a number instead of this paragraph.
+**Section 3 is the one that matters**: an implementation that stored
+the mask and never applied it -- *a value that reads back and does
+nothing* -- passes sections 1 and 2 and fails only there. It asserts
+only that the masked bits are ABSENT, never that the others are
+present, because the latter would be a test of the file server.
+**Measured old beside new**: 0 failures on glibc, and the old stub
+replicated beside it gives **5**, with section 3 printing `0755` under
+mask 027. `_umaskmark()` is the version marker. NOT YET MEASURED ON
+THE VM; predict `run-builtins` 225 -> ~8, and refuted if the umask
+block survives or if `help` output differs from `.right` in ways that
+are not just presence.
 
 **The watchdog now SAYS WHEN IT IS ARMED, and a wasted round is
 why.** A run went out as `APEX__MALLOCMAX=8` -- two underscores, no
