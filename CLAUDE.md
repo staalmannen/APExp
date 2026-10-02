@@ -567,6 +567,23 @@ in the topic file.
   rebuilds `libap.a` without relinking programs already built against
   it, so a libap fix can sit unused for rounds. Prefer `distclean` to
   `nuke` (see the Build System section).
+- **A symbol `_apemain` references is in EVERY APE binary, and so is
+  the whole OBJECT that defines it.** `plan9/callmain.c` names exactly
+  two, `_envsetup` and `_malloc_watchinit` -- and while the second
+  lived in `malloc/malloc.c`, that reference pulled libap's ALLOCATOR
+  into every program in the tree. **f2c supplies its own `malloc`**
+  (upstream's optional replacement, off by default in `makefile.u`, on
+  in `mkfile.plan9`) and stopped linking: `redefinition: malloc`. So an
+  object on that path must define nothing a program might reasonably
+  replace; the watchdog's state and init are in `malloc/mallocwatch.c`
+  for that reason alone. *The dependency has to run malloc.$O ->
+  mallocwatch.$O and never back.*
+- **And only `mk distclean` could ever have shown it.** `mk install`
+  rebuilds `libap.a` without relinking existing binaries, so a libap
+  change that breaks a LINK sits invisible until something forces the
+  relink -- rounds later, with nothing nearby to blame. *The rule that
+  a library fix can sit unused for rounds has a second edge: so can a
+  library BREAKAGE.*
 - **Check every object built against a library for the flags that library
   was built with**, not just the ones the linker complained about.
   `nm -g --defined-only x.o | wc -l` is a one-second check.
@@ -3249,7 +3266,12 @@ on glibc; **its section 4 is the one that matters**, putting a second
 conversion after the first and asking what THAT printed, because an
 implementation with the number right and the argument wrong passes
 everything else. `_printfmark()` is the marker. `vfwprintf` needs no
-change -- it narrows and calls `vfprintf`. NOT YET MEASURED ON THE VM.
+change -- it narrows and calls `vfprintf`.
+**CONFIRMED ON THE VM**: `_printfmark = 1`, all six sections PASS,
+**0 failures** -- and the marker is what makes that readable, since the
+test could not have LINKED against the libap that had the bug. The
+idiom has now paid five times (`_sock_listenmark`, `_execmark`,
+`_ttymark`, `_getcwdmark`, this).
 **It changes NO test result** -- diff's exit status and its `<`/`>`
 lines were always right -- and it is **not** `date`'s crash, since
 `strftime.c`/`time_rz.c` use none of these modifiers. *The suite's

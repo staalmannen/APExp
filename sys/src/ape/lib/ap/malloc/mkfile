@@ -17,6 +17,11 @@ HFILES=\
 OFILES=\
 	calloc.$O\
 	malloc.$O\
+# the heap watchdog's state and init, SEPARATE from malloc.$O on\
+# purpose: _apemain references _malloc_watchinit, and while that lived\
+# in malloc.c the reference pulled libap's allocator into every APE\
+# program -- so f2c, which supplies its own malloc, could not link\
+	mallocwatch.$O\
 	free.$O\
 	realloc.$O\
 	setmalloctag.$O\
