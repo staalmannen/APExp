@@ -3050,6 +3050,42 @@ hand-maintained capability file is wrong in BOTH directions, and the
 two kinds fail differently -- a denial costs a feature silently, a
 claim costs a crash.*
 
+**AND THE libap REBUILD WOULD NOT COMPILE, which found a THIRD
+constant with two definitions.**
+
+```
+cpp: limits_generic.h:137 /amd64/include/ape/limits.h:30 getcwd.c:6
+     Macro redefinition of NGROUPS_MAX
+cpp: limits_generic.h:143 ... Macro redefinition of PIPE_BUF
+cc: 6c: cpp errors
+```
+
+`limits_generic.h` said `NGROUPS_MAX 10` and `PIPE_BUF
+_POSIX_PIPE_BUF`; `sys/limits.h` says **32** and **8192**. **Neither
+value in `limits_generic.h` was ever in effect**: that file ends with
+`#include <sys/limits.h>`, `sys/limits.h` `#undef`s before every
+`#define`, and it has **no include guard**, so it is re-read and wins
+every time. The two dead values existed only to break any translation
+unit that reached `<sys/limits.h>` FIRST and `<limits.h>` second --
+i.e. one `#include <unistd.h>` before `#include <limits.h>`.
+**The other shared names did not fail because their values AGREE**
+(`NAME_MAX` 255, `PATH_MAX` 4096, `MAXPATHLEN`), and an identical
+redefinition is legal. *That is why the trap was invisible: the same
+file is both correct and fatal depending on include order, and only
+the two disagreeing macros say so.*
+**This is `PATH_MAX` for the third time** -- two definitions in two
+files that include each other -- and the rule written after the first
+one is the rule that found it: **when a constant is wrong, grep for
+EVERY definition of it.** Applied properly this round rather than
+trusting the two cpp happened to name, since **cpp stops at the first
+errors**: the full overlap of the two files is now exactly three
+macros and all three agree.
+*No effective value changes*, so stale objects stay consistent and
+this needs no `distclean` of its own. `getcwd.c` takes
+`<sys/limits.h>` as `at_functions.c` beside it already does -- *the
+include with a working neighbour under the same flags beats the one
+that only ought to work*.
+
 **The watchdog now SAYS WHEN IT IS ARMED, and a wasted round is
 why.** A run went out as `APEX__MALLOCMAX=8` -- two underscores, no
 `P` -- so the watchdog never armed, bash ran to full exhaustion and

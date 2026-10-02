@@ -134,13 +134,39 @@
  * expanded to it would break every use of NAME_MAX without that
  * header. Keep the two in step by hand. */
 #define NAME_MAX 255
-#define NGROUPS_MAX 10
+/*
+ * NGROUPS_MAX and PIPE_BUF ARE NOT DEFINED HERE, AND THE REASON IS A
+ * BUILD FAILURE RATHER THAN TIDINESS.
+ *
+ * This file used to say `#define NGROUPS_MAX 10' and
+ * `#define PIPE_BUF _POSIX_PIPE_BUF', while <sys/limits.h> -- which
+ * this file includes at its very END, and which `#undef's before every
+ * `#define' -- says 32 and 8192. **So neither value here was ever in
+ * effect.** <sys/limits.h> has no include guard, so it is re-read and
+ * wins every time; see the note there.
+ *
+ * What they DID do was break any translation unit that reached
+ * <sys/limits.h> FIRST and <limits.h> second, because the second
+ * definition then differed from the first:
+ *
+ *	cpp: limits_generic.h:137 .../limits.h:30 getcwd.c:6
+ *	     Macro redefinition of NGROUPS_MAX
+ *	cpp: limits_generic.h:143 ... Macro redefinition of PIPE_BUF
+ *	cc: 6c: cpp errors
+ *
+ * and that is one `#include <unistd.h>' before `#include <limits.h>'
+ * in any libap file. **The other shared names did not fail because
+ * their values AGREE** -- NAME_MAX 255, PATH_MAX 4096, MAXPATHLEN --
+ * and an identical redefinition is legal. *Two macros with two values
+ * in two files is the PATH_MAX trap again*, and the rule it cost a
+ * round to write is in <sys/limits.h>: when a constant is wrong, grep
+ * for EVERY definition of it. The repair is to have ONE.
+ */
 /*#define OPEN_MAX _POSIX_OPEN_MAX */
 /*#define PAGESIZE 1 */
 #define PASS_MAX 64
 #define PATH_MAX 4096
 #define MAXPATHLEN PATH_MAX
-#define PIPE_BUF _POSIX_PIPE_BUF
 /*#define RTSIG_MAX _POSIX_RTSIG_MAX */
 /*#define SEM_NSEMS_MAX _POSIX_SEM_NSEMS_MAX */
 /*#define SEM_VALUE_MAX _POSIX_SEM_VALUE_MAX */
