@@ -2855,3 +2855,146 @@ before any reading:
 So: `ps | grep -e bash -e diff -e ' sh'`, read the state and the CPU
 column, and only then decide whether `acid` wants a stack or the
 question is which call is blocked.
+
+## stdio/ — printf did not know `%td`, `%jd` or `%hhd`, and said nothing
+
+Found through bash's own test suite, in the one place where the damage
+was arithmetically decodable.
+
+`stdio/vfprintf.c` cracks a conversion with two lookup tables, `lflag`
+for the leading flags and `tflag` for the length modifiers. `tflag` had
+`h` (SHORT), `l` (LONG), `L` (LDBL) and `z` (LONG, promoted to VLONG at
+run time when pointers are 64-bit). It did **not** have:
+
+- **`t`** — `ptrdiff_t`, C99 7.19.6.1
+- **`j`** — `intmax_t`
+- **`hh`** — `char`; a second `h` just set SHORT again, so no
+  truncation happened at all
+
+### The failure mode is the whole finding
+
+An unrecognised conversion falls out of the `while(tfl = tflag[...])`
+loop with `s` still pointing at the modifier letter, and reaches
+
+```c
+if(ocvt[*s]) nprint += (*ocvt[*s++])(f, &args, flags, width, precision);
+else if(*s){
+	_putc_impl(*s++, f);
+	nprint++;
+}
+```
+
+so it prints the letter and moves on **without consuming an argument**.
+`printf("%td", n)` therefore did not print a wrong number. It printed
+the literal text `td`, and left `n` in the `va_list` — so **every
+conversion after it in the same format string took the wrong
+argument**. A `%s` after a `%td` reads a string from an integer.
+
+*A conversion that prints garbage is a bug in one value. A conversion
+that eats no argument is a bug in every value after it.*
+
+### How it surfaced: every diff on the system was corrupt
+
+GNU diffutils prints every line number through its own macro:
+
+```c
+src/system.h:115   #define pI "t"
+src/util.c:1223    fprintf (outfile, "%"pI"d%c%"pI"d", trans_a, sepchar, trans_b);
+```
+
+so `print_number_range` is `"%td%c%td"`. Every position line in every
+diff this system has ever produced came out as garbage. In bash's suite
+log, `1,2d0` reads
+
+```
+t d \x01 t d d t d
+```
+
+— `td` for each of the three numbers, the literal `d` surviving as the
+change letter, and the `%c` separator receiving `trans_a` (1) instead
+of `','`, so it printed `chr(1)`.
+
+**The corruption was arithmetically checkable, and that is the only
+reason it could be read at all.** Three hunks decode exactly:
+
+| in the log | `%c` byte | so `trans_a` was | and the hunk starts at |
+|---|---|---|---|
+| `td^Atddtd` | 0x01 | 1 | line 1 |
+| `td(tdctd,td` | 0x28 / 0x2C | 40 / 44 | lines 40 and 44 |
+| `tdM-9tdctdM-;td` | 0xB9 / 0xBB | 185 / 187 | lines 185 and 187 |
+
+Each one matches the first `<` line of its own hunk. *A wrong value
+that can be decoded back to the right one names the mechanism, not just
+the fault.*
+
+### Size
+
+`grep` over `sys/src/external` for literal uses:
+
+```
+1439  %z*     <- already worked
+ 156  %td      196  %t*  total
+  97  %jd      167  %j*  total
+  36  %hhx      46  %hh* total
+```
+
+So roughly **370 broken conversion sites** across coreutils, gnulib,
+diffutils, patch, bison, tar, flex, pcre2, grep and sed.
+
+**Two things kept it hidden.** First, `z` — by far the commonest — was
+the one modifier someone had already added, so `size_t` printing never
+misled anyone. Second, **the `PRI*` macros dodge it entirely**:
+`sys/include/ape/inttypes.h` spells `PRIdMAX` as `"lld"` and `PRIdPTR`
+as `"lld"`, not `"jd"`/`"td"`, so only a literal `%j`/`%t`/`%hh` in
+source was affected.
+
+### And the library already knew
+
+**`stdio/vfscanf.c` has handled all three since it was written** — its
+switch carries `case 'j'`, `case 'z'` and `case 't'`, with the right
+pointer types. The library understood these modifiers on the *input*
+side and not on the output side. Third time in this tree the library
+contained a working version of the thing it could not do, after
+`mktemp` ignoring `__randname` in its own directory and `getcwd` beside
+`get_current_dir_name`.
+
+### The fix
+
+`tflag['j'] = VLONG` statically (`intmax_t` is `long long` on every
+target here); `tflag['t'] = LONG` statically and promoted beside `z` in
+the same `sizeof(void*) == sizeof(long long)` test, because kencc's
+`long` is 32-bit on amd64 while `ptrdiff_t` is 64; and a `CHAR` flag
+with an `hh` rule mirroring the existing `ll` rule, read in `ocvt_n`
+and both arms of `ocvt_fixed`.
+
+`vfwprintf.c` needs no change — it narrows the format and calls
+`vfprintf`.
+
+`_printfmark()` is the version marker, so `printfmod-test` will not
+link against a libap predating this.
+
+### Measured, not argued
+
+`sys/lib/tests/printfmod-test.c`: six sections, 0 failures on glibc.
+**Section 4 is the one that matters** — it puts a second conversion
+after the first and asks what *that* one printed, because an
+implementation that got the number right and the argument wrong passes
+every other section. Section 6 is the regression control: `%zu` already
+worked, so a fix that rebuilt the table wrongly would show up there and
+nowhere else.
+
+And the tables and the cracking loop were lifted verbatim into a host
+program and **run**, old beside new: **5 failures before, 0 after**,
+with `%zu`, `%hd`, `%lld`, `%ld`, `%Lf` and plain `%d` identical both
+ways. The old run reports `conv='t'` — the conversion character *being*
+the modifier letter, which is exactly the `td` on screen.
+
+### What it does NOT explain
+
+**No test result changes.** `diff`'s exit status and its `<`/`>` lines
+were always right; only the position headers were garbage, and the
+suite compares by whether the diff is empty. This is a real and broad
+library bug that the suite *found*; it is not why any test fails.
+
+It is also **not** `date`'s crash — `gnulib/strftime.c` and `time_rz.c`
+use none of these modifiers (the one grep hit there is a comment).
