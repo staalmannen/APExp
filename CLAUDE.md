@@ -3169,6 +3169,46 @@ value is one command away -- NULL, inside-tm, or garbage are three
 different bugs. And `date` twice in a row with `ps | grep date`
 between says whether it leaves a corpse every time.
 
+**THE FIRST VALID COMPLETE RUN OF BASH'S SUITE: `lines mentioning
+../bash (MUST be 0): 0`, `COMPLETE` marker, ~85 files with a
+non-empty diff and NONE passing.** The harness's own validity line is
+what makes that readable at all.
+**But about 35 of those files show exactly `3`, and 3 is one diff
+position header plus the two kernel fd warnings.** They agree with
+their `.right` in every respect except a message from the KERNEL --
+`pprint` sends it to the process's own fd 2, and every `run-<name>`
+captures stderr with `2>&1`, so it lands inside the comparison. *So
+the single largest entry in the failure list is not bash and not
+libap.*
+**The harness now buckets three ways** -- REAL diff / warnings-only /
+passed -- and that is a MEASUREMENT, not a fix: nothing is suppressed
+or rewritten, the noise is counted apart so the remaining list is the
+one worth reading. **Position lines (`2,3d1`) are skipped** as
+structure rather than content, and a real file's number is now its
+differing lines with the warnings subtracted. *Lumping ~35 noise
+entries in with the real ones makes every later per-file comparison
+unreadable, and comparing per file is this tree's rule.*
+**`run-jobs` WAS NEVER A STOP, and I spent a round on it.** It shows
+`231` in the list, so it ran to completion; the log looked static
+because `jobs.tests` legitimately sleeps for minutes. *I had even
+computed its longest sleep and still read "the log stopped changing
+for four minutes" as a hang.* **A log that is not growing is not a
+stopped run when the test it is inside is a sleep** -- the `ps` STATE
+would have said so, and the one I took was of the wrong process.
+**The real stall was my own `awk`, at the very end**, blocked in
+`Pwrite` with `bash-runtests` waiting on it; killing it let the
+summary print. *Ninth instrument fault.* **Why an awk writing to the
+terminal blocked is UNEXPLAINED** -- the committed harness has no pipe
+-- and the evidence is gone, because the `/proc/<pid>/fd` listing was
+not taken before the kill. *Take the cheap reading BEFORE the
+remedy; a kill destroys the only copy.*
+**And `lstk()` named `date`'s bad pointer exactly: `zone =
+0x834383635`.** Bytes `34 38 36 35` are ASCII **`4865`** -- a `char *`
+holding digit TEXT, which is the `ifs_value` shape a second time, and
+the fault is in strftime's **`%s` arm**, the one conversion that
+formats a number. *Two independent bugs in this tree have now been a
+pointer containing characters.*
+
 **The watchdog now SAYS WHEN IT IS ARMED, and a wasted round is
 why.** A run went out as `APEX__MALLOCMAX=8` -- two underscores, no
 `P` -- so the watchdog never armed, bash ran to full exhaustion and

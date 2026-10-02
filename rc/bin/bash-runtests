@@ -139,29 +139,73 @@ if(! ~ $nbad 0){
 	echo 'bash-runtests: the log below measures nothing -- do not read it.'
 }
 
-# --- per-file summary ---
-echo
-echo '==== files whose diff was NOT empty (lines, name) ===='
+# --- per-file summary, in THREE buckets ---
+#
+# The third bucket is the point, and it was measured rather than
+# guessed. The first complete valid run listed ~85 files with a
+# non-empty diff and NONE passing -- but about 35 of them showed
+# exactly `3', which is one diff position header plus
+#
+#	< bash NNNN: warning: process exceeds 100 file descriptors
+#	< bash NNNN: warning: process exceeds 200 file descriptors
+#
+# **and nothing else.** Those files agree with their `.right' in every
+# respect except a message from the KERNEL. The mechanism is settled
+# (see CLAUDE.md): `move_to_high_fd' takes `getdtablesize()' capped by
+# HIGH_FD_MAX 256, libap honestly reports OPEN_MAX 256, so bash dup2s
+# its script descriptor to ~255 and Plan 9's fd table passes both
+# warning thresholds. Plan 9's `pprint' sends those to the process's
+# own fd 2, and every `run-<name>' captures stderr with `2>&1', so
+# they land inside the comparison.
+#
+# **Separating them is a MEASUREMENT, not a fix.** Nothing here is
+# suppressed or rewritten: the files are counted apart so the
+# remaining list is the one worth reading. Lumping ~35 noise entries
+# in with the real ones makes every future per-file comparison
+# unreadable -- and this tree's rule is to compare per file, never by
+# total.
+#
 # The header regex is ANCHORED AT BOTH ENDS on purpose. `run-all'
 # echoes the bare file name, so a header is exactly that and nothing
 # else -- while a plain /^run-/ also matches an ERROR line such as
 # `run-rhs-exp: 1: ../bash: not found', which then reads as a section
 # header with no output after it, i.e. as a PASS. That is precisely the
 # file the first summary reported as the only one passing.
+#
+# Diff POSITION lines (`2,3d1', `5c6') are skipped: they are structure
+# rather than content, so a file's size is counted in the lines that
+# actually differ.
+echo
+echo '==== files whose diff is REAL (differing lines, name) ===='
 awk '
-/^run-[-A-Za-z0-9_.]+$/ { if (n != "" && c > 0) print c"\t"n; n = $0; c = 0; next }
-/^warning:/ { next }
-       { if (n != "") c++ }
-END    { if (n != "" && c > 0) print c"\t"n }
+function bucket(   ) {
+    if (n == "") return
+    if (c == 0)      p++
+    else if (c == w) { q++; qn = qn " " n }
+    else             { r++; printf "%d\t%s\n", c - w, n }
+}
+/^run-[-A-Za-z0-9_.]+$/                            { bucket(); n = $0; c = 0; w = 0; next }
+/^warning:/                                        { next }
+/^[0-9]/                                           { next }
+/warning: process exceeds [0-9]+ file descriptors/ { if (n != "") { c++; w++ } ; next }
+                                                   { if (n != "") c++ }
+END {
+    bucket()
+    printf "\n==== files differing ONLY by the kernel fd warnings ====\n"
+    printf "%d:%s\n", q, qn
+    printf "\n==== files with an EMPTY diff (these passed) ====\n"
+    printf "(count %d; names below)\n", p
+}
 ' $log
 
-echo
-echo '==== files with an EMPTY diff (these passed) ===='
+# the passing names, separately, so the bucket counts above stay on
+# one screen
 awk '
-/^run-[-A-Za-z0-9_.]+$/ { if (n != "" && c == 0) print n; n = $0; c = 0; next }
+/^run-[-A-Za-z0-9_.]+$/ { if (n != "" && c == 0) print "   " n; n = $0; c = 0; next }
 /^warning:/ { next }
+/^[0-9]/    { next }
        { if (n != "") c++ }
-END    { if (n != "" && c == 0) print n }
+END    { if (n != "" && c == 0) print "   " n }
 ' $log
 
 echo
