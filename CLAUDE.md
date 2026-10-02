@@ -2141,13 +2141,28 @@ REFUTED.** Its old failures were `chgrp: missing operand`,
 first reading was litter in `/tmp` from the storm-era aborted runs,
 with the refutation condition "it fails on a second consecutive run".
 **Two runs back to back give the same count**, so that is refuted.
-*And the replacement reading does not survive either*: `getgroups()`
-is a stub returning -1 (one definition in the tree), so bash's
-`get_groupset` leaves `GROUPS` empty, `${GROUPS[0]}` expands to
-nothing, `chgrp` should STILL get one operand -- and `test.right` does
-not expect that error. **So something I can show must fail is
-passing.** Next step is `echo ${#GROUPS[@]}` in bash on the VM, not a
-third story. `run-trap` 16 -> 14 is unattributed too.
+*And the replacement reading was REFUTED BY THE MACHINE*, which is
+what the probe was for. I argued that `getgroups()` being a stub
+returning -1 leaves `GROUPS` empty, so `chgrp ${GROUPS[0]} <file>`
+gets one operand and must still fail. **`echo ${#GROUPS[@]}
+"[${GROUPS[0]}]"` answers `0 [0]`** -- the element expands to **`0`**,
+so chgrp gets two operands and never prints `missing operand`.
+**bash seeds the array from `getgid()` when `getgroups()` reports
+nothing** (`general.c:1341`, `get_group_list`), and I had read
+`get_groupset` and stopped one function short. *A grep hit is a name,
+not an implementation* -- a rule quoted in this file two rounds
+earlier.
+**And the probe found something nobody asked for**: `${#GROUPS[@]}` is
+**0** while `${GROUPS[0]}` has a value, so the count and the element
+disagree -- the dynamic getter fills the element but not the array the
+count reads. Recorded, not chased.
+**What is still unexplained is the REST of run-test**: `t -t 0 <
+/dev/tty` sits OUTSIDE both `(( $UID != 0 ))` guards, so neither it
+nor the `ln: ... Too many links` line was gated, and both are gone
+too. The chgrp family is accounted for and the other two are not.
+`run-trap` 16 -> 14 is unattributed as well. *Stop here rather than
+offer a fourth story: the pass is stable over two runs and the real
+list is where the work is.*
 *Everything from here to the ratrace histogram is the record of how it
 was found; the standing lesson is the instrument tally, not the bug.*
 
