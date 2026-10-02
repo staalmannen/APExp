@@ -1,5 +1,5 @@
-bash 7293657: warning: process exceeds 100 file descriptors
-bash 7293657: warning: process exceeds 200 file descriptors
+bash 7342986: warning: process exceeds 100 file descriptors
+bash 7342986: warning: process exceeds 200 file descriptors
 declare -r SHELLOPTS="braceexpand:hashall:interactive-comments"
 Testing /bin/bash
 version: 5.3.0(2)-release
@@ -9,75 +9,45 @@ OSTYPE = plan9
 MACHTYPE = amd64-apexp-plan9
 Any output from any test, unless otherwise noted, indicates a possible anomaly
 run-alias
-tdtddtd
-< bash 7293662: warning: process exceeds 100 file descriptors
-< bash 7293662: warning: process exceeds 200 file descriptors
 run-appendop
-tdtddtd
-< bash 7293698: warning: process exceeds 100 file descriptors
-< bash 7293698: warning: process exceeds 200 file descriptors
 run-arith
-tdtddtd
-< bash 7293708: warning: process exceeds 100 file descriptors
-< bash 7293708: warning: process exceeds 200 file descriptors
 run-arith-for
-tdtddtd
-< bash 7293767: warning: process exceeds 100 file descriptors
-< bash 7293767: warning: process exceeds 200 file descriptors
 run-array
 warning: all of these tests will fail if arrays have not
 warning: been compiled into the shell
 warning: the BASH_ARGC and BASH_ARGV tests will fail if debugging support
 warning: has not been compiled into the shell
-tdtddtd
-< bash 7293977: warning: process exceeds 100 file descriptors
-< bash 7293977: warning: process exceeds 200 file descriptors
-tdctd
+822c822
 < wait: usage: wait [pid ...]
 ---
 > ./array32.sub: line 50: $(echo INJECTION! >&2 ; echo 0): arithmetic syntax error: operand expected (error token is "$(echo INJECTION! >&2 ; echo 0)")
 run-array2
 warning: all of these tests will fail if arrays have not
 warning: been compiled into the shell
-tdtddtd
-< bash 7294202: warning: process exceeds 100 file descriptors
-< bash 7294202: warning: process exceeds 200 file descriptors
 run-assoc
 warning: all of these tests will fail if arrays have not
 warning: been compiled into the shell
-tdtddtd
-< bash 7294262: warning: process exceeds 100 file descriptors
-< bash 7294262: warning: process exceeds 200 file descriptors
-tdctd4td
+52c52,53
 < ./assoc.tests: line 132: recho: command not found
 ---
 > argv[1] = <6>
 > argv[2] = <flix>
-tdìtdctd
+401,402c402
 < wait: usage: wait [pid ...]
 < bad 1
 ---
 > 5: ok 1
 run-attr
-tdtddtd
-< bash 7294358: warning: process exceeds 100 file descriptors
-< bash 7294358: warning: process exceeds 200 file descriptors
-tdctd
+15c15
 < declare -rx p="1"
 ---
 > declare -r p="1"
 run-braces
-tdtddtd
-< bash 7294365: warning: process exceeds 100 file descriptors
-< bash 7294365: warning: process exceeds 200 file descriptors
 run-builtins
 warning: some of these tests may fail if process substitution has not
 warning: been compiled into the shell or if the OS does not provide
 warning: /dev/fd.
-tdtddtd
-< bash 7294377: warning: process exceeds 100 file descriptors
-< bash 7294377: warning: process exceeds 200 file descriptors
-td0tdctd.td
+46,51c46,51
 < 0000
 < u=rwx,g=rwx,o=rwx
 < 0000
@@ -91,13 +61,13 @@ td0tdctd.td
 > u=rwx,g=rwx,o=rx
 > umask 0002
 > umask -S u=rwx,g=rwx,o=rx
-tdZtdctdXtd
+88,89c88,89
 < enable: usage: enable [-a] [-dnps] [-f filename] [name ...]
 < enable: usage: enable [-a] [-dnps] [-f filename] [name ...]
 ---
 > ./builtins.tests: line 126: enable: notbuiltin: not a shell builtin
 > ./builtins.tests: line 127: enable: test: not dynamically loaded
-tdytdctdwtd
+119,120c119,124
 < ./source6.sub: line 31: syntax error near unexpected token `('
 < ./source6.sub: line 31: `. <(echo "echo two - OK")'
 ---
@@ -107,7 +77,7 @@ tdytdctdwtd
 > 0
 > four - OK
 > 0
-tdπtdctdªtd
+183,184c187,190
 < ./builtins4.sub: line 42: syntax error near unexpected token `<'
 < ./builtins4.sub: line 42: `read -a c < <(echo 1 2 3)'
 ---
@@ -115,7 +85,7 @@ tdπtdctdªtd
 > declare -a c=([0]="1" [1]="2" [2]="3")
 > unset
 > unset
-td(tdctd,td
+294,311c300,317
 < u=rwx,g=rwx,o=rwx
 < u=rwx,g=rwx,o=rwx
 < u=rwx,g=rwx,o=rwx
@@ -153,7 +123,7 @@ td(tdctd,td
 > u=rwx,g=rx,o=rx
 > u=rwx,g=rx,o=rx
 > u=rwx,g=rx,o=x
-tdLtdctdPtd
+330,341c336,477
 < ./builtins10.sub: line 17: help: command not found
 < ./builtins10.sub: line 19: help: command not found
 < ./builtins10.sub: line 21: help: command not found
@@ -309,97 +279,76 @@ tdLtdctdPtd
 >  hash [-lr] [-p pathname] [-dt] [name >  { COMMANDS ; }
 >  help [-dms] [pattern ...]
 > ./builtins10.sub: line 39: help: no help topics match `bash'.  Try `help help' or `man -k bash' or `info bash'.
-td[tdctd·td
+345,346c481,482
 < unlimited
 < unlimited
 ---
 > 0
 > 0
-tdatd
+348a485
 > ./builtins11.sub: line 39: ulimit: max user processes: cannot modify limit: Operation not permitted
 run-case
-tdtddtd
-< bash 7294489: warning: process exceeds 100 file descriptors
-< bash 7294489: warning: process exceeds 200 file descriptors
 run-casemod
-tdtddtd
-< bash 7294509: warning: process exceeds 100 file descriptors
-< bash 7294509: warning: process exceeds 200 file descriptors
 run-complete
-tdtddtd
-< bash 7294513: warning: process exceeds 100 file descriptors
-< bash 7294513: warning: process exceeds 200 file descriptors
-tdatd
+78a79
 > bg
-tdatd
+92a94
 > disown
-tdatd
+100a103
 > fg
-tdatd
+105a109
 > help
-tdatd
+107a112
 > jobs
-tdatd
+125a131
 > suspend
-tdatd
+148a155
 > histexpand
-tdatd
+152a160
 > monitor
-tdatd
+156a165
 > notify
-tdatd
+172a182
 > checkjobs
-tdatd
+218a229
 > restricted_shell
-tdatd
+226a238
 > bg
-tdatd
+238a251
 > disown
-tdatd
+246a260
 > fg
-tdatd
+248a263
 > help
-tdatd
+249a265
 > jobs
-tdatd
+266a283
 > suspend
-tdatd
+281a299
 > bg
-tdatd
+293a312
 > disown
-tdatd
+301a321
 > fg
-tdatd
+303a324
 > help
-tdatd
+304a326
 > jobs
-tdatd
+321a344
 > suspend
 run-comsub
-tdtddtd
-< bash 7294517: warning: process exceeds 100 file descriptors
-< bash 7294517: warning: process exceeds 200 file descriptors
 run-comsub-eof
-tdtddtd
-< bash 7294638: warning: process exceeds 100 file descriptors
-< bash 7294638: warning: process exceeds 200 file descriptors
 run-comsub-posix
-tdtddtd
-< bash 7294664: warning: process exceeds 100 file descriptors
-< bash 7294664: warning: process exceeds 200 file descriptors
 run-comsub2
-tdtddtd
-< bash 7294810: warning: process exceeds 100 file descriptors
-< bash 7294810: warning: process exceeds 200 file descriptors
-tdtddtd
+21,22d20
 < ./comsub2.tests: line 63: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
-tdtdctd
+24,25c22
 < ./comsub2.tests: line 65: set: +m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 ---
 > ./comsub2.tests: line 68: p: command not found
-tdtdctdtd
+27,30c24,25
 < p: can't open %s\n - file does not exist: '%s\n'
 < p: can't open 1 - file does not exist: '1'
 < p: can't open %s\n - file does not exist: '%s\n'
@@ -407,7 +356,7 @@ tdtdctdtd
 ---
 > ./comsub2.tests: line 75: p: command not found
 > ./comsub2.tests: line 75: p: command not found
-td`tdctdYtd
+94,97c89,92
 < ./comsub23.sub: line 52: jobs: command not found
 < 
 < ./comsub23.sub: line 55: jobs: command not found
@@ -424,10 +373,7 @@ warning: some of these tests will fail if extended pattern matching has not
 warning: been compiled into the shell
 warning: the text of system error messages may vary between systems and
 warning: produce diff output.
-tdtddtd
-< bash 7294907: warning: process exceeds 100 file descriptors
-< bash 7294907: warning: process exceeds 200 file descriptors
-tdYtdctdWtd
+87,91c87,91
 < ./cond-regexp2.sub: line 54: [[: invalid regular expression `[[=d=]]..': Unknown collating element
 < ./cond-regexp2.sub: line 55: [[: invalid regular expression `[[=d=]]\.\.': Unknown collating element
 < ./cond-regexp2.sub: line 56: [[: invalid regular expression `[[=d=]]..': Unknown collating element
@@ -439,7 +385,7 @@ tdYtdctdWtd
 > ok 3
 > ok 4
 > ok 4a
-td_tdctd]td
+93,96c93,96
 < ./cond-regexp2.sub: line 63: [[: invalid regular expression `[[.d.][.D.]]o.': Unknown collating element
 < ./cond-regexp2.sub: line 65: [[: invalid regular expression `([[.d.][.D.]])o(.)': Unknown collating element
 < ./cond-regexp2.sub: line 66: [[: invalid regular expression `d([[.o.][.O.]])(.)': Unknown collating element
@@ -450,34 +396,19 @@ td_tdctd]td
 > ok 8 -- o
 > ok 9
 run-coproc
-tdtddtd
-< bash 7294939: warning: process exceeds 100 file descriptors
-< bash 7294939: warning: process exceeds 200 file descriptors
-tdctd
+5c5
 < coproc.tests: REFLECT: status 1
 ---
 > coproc.tests: REFLECT: status 143
-tdctd
+9c9
 < cat: /etc/passwd: No such file or directory
 ---
 > root
 run-cprint
-tdtddtd
-< bash 7294959: warning: process exceeds 100 file descriptors
-< bash 7294959: warning: process exceeds 200 file descriptors
 run-dbg-support
-tdtddtd
-< bash 7294968: warning: process exceeds 100 file descriptors
-< bash 7294968: warning: process exceeds 200 file descriptors
 run-dbg-support2
-tdtddtd
-< bash 7294991: warning: process exceeds 100 file descriptors
-< bash 7294991: warning: process exceeds 200 file descriptors
 run-dirstack
-tdtddtd
-< bash 7294995: warning: process exceeds 100 file descriptors
-< bash 7294995: warning: process exceeds 200 file descriptors
-tdtdctdtd
+21,28c21,29
 < ./dstack.tests: line 56: pushd: /etc: No such file or directory
 < /usr /
 < /usr /
@@ -496,13 +427,13 @@ tdtdctdtd
 > /usr /etc /
 > /etc /usr /
 > /tmp /etc /usr /
-td!tdctd td
+31,32c32,33
 < /
 < /
 ---
 > /usr
 > /usr
-td)tdctd(td
+39,54c40,55
 < /tmp /usr
 < /tmp /usr
 < /tmp /usr
@@ -536,30 +467,18 @@ td)tdctd(td
 > /bin / /tmp
 > /bin
 > /bin
-tdtddtd
-< bash 7294997: warning: process exceeds 100 file descriptors
-< bash 7294997: warning: process exceeds 200 file descriptors
 run-dollars
-tdtddtd
-< bash 7295001: warning: process exceeds 100 file descriptors
-< bash 7295001: warning: process exceeds 200 file descriptors
 run-dynvar
-tdtddtd
-< bash 7295424: warning: process exceeds 100 file descriptors
-< bash 7295424: warning: process exceeds 200 file descriptors
 run-errors
-tdtddtd
-< bash 7295441: warning: process exceeds 100 file descriptors
-< bash 7295441: warning: process exceeds 200 file descriptors
-tdctd
+102c102
 < ./errors.tests: line 267: read: 42: invalid file descriptor: Bad file number
 ---
 > ./errors.tests: line 267: read: 42: invalid file descriptor: Bad file descriptor
-tdctd
+104c104
 < ./errors.tests: line 271: mapfile: 42: invalid file descriptor: Bad file number
 ---
 > ./errors.tests: line 271: mapfile: 42: invalid file descriptor: Bad file descriptor
-td~tdctd|td
+124,125c124,125
 < ./errors.tests: line 319: bg: command not found
 < ./errors.tests: line 320: fg: command not found
 ---
@@ -576,100 +495,80 @@ warning: `/tmp/bash-notthere' not being found or `/' being a directory
 warning: produce diff output, please do not consider this a test failure
 warning: if diff output differing only in the location of the bash
 warning: binary appears, please do not consider this a test failure
-tdtddtd
-< bash 7295578: warning: process exceeds 100 file descriptors
-< bash 7295578: warning: process exceeds 200 file descriptors
-tdctd
+11c11
 < /bin/bash: notthere: No such file or directory
 ---
 > /tmp/bash: notthere: No such file or directory
-tddtd
+35d34
 < ./exec3.sub: E2BIG: error message mismatch: exec3.sub: getconf ARG_MAX failed, skipping E2BIG test
-td√tdctd¿td
+193,194c192,193
 < /bin/bash: -c: line 1: syntax error near unexpected token `('
 < /bin/bash: -c: line 1: `(. <(echo ": && env echo Darwin"); echo x)'
 ---
 > Darwin
 > x
-tdtdctdˇtd
+256,257c255,256
 < ./exec17.sub: line 37: echo: write error: Permission denied
 < ./exec17.sub: line 40: .: is a directory
 ---
 > ./exec17.sub: line 37: 4: Bad file descriptor
 > ./exec17.sub: line 40: .: Is a directory
-tdtdctd
-td
+267,268c266,267
 < ./exec17.sub: line 61: echo: write error: Permission denied
 < ./exec17.sub: line 64: .: is a directory
 ---
 > ./exec17.sub: line 61: 4: Bad file descriptor
 > ./exec17.sub: line 64: .: Is a directory
 run-exp-tests
-tdtddtd
-< bash 7295865: warning: process exceeds 100 file descriptors
-< bash 7295865: warning: process exceeds 200 file descriptors
 run-exportfunc
-tdtddtd
-< bash 7296118: warning: process exceeds 100 file descriptors
-< bash 7296118: warning: process exceeds 200 file descriptors
 run-extglob
-tdtddtd
-< bash 7296152: warning: process exceeds 100 file descriptors
-< bash 7296152: warning: process exceeds 200 file descriptors
-tdctd
+141c141
 < .a .foo
 ---
 > . .. .a .foo
-tdctd
+143c143
 < .a .foo
 ---
 > . .. .a .foo
-tdctd
+162c162
 < .a
 ---
 > .. .a
-tdctd
+164c164
 < .a
 ---
 > .. .a
-tdctd
+169c169
 < .a
 ---
 > .. .a
-tdctd
+171c171
 < .a .foo
 ---
 > . .. .a .foo
-tdctd
+173c173
 < ? .a .foo
 ---
 > ? . .. .a .foo
-tdctd
+178c178
 < .a
 ---
 > .. .a
-tdctd
+180c180
 < .a .foo
 ---
 > . .. .a .foo
-tdctd
+182c182
 < ? .a .foo
 ---
 > ? . .. .a .foo
 run-extglob2
-bash 7296211: warning: process exceeds 100 file descriptors
-bash 7296211: warning: process exceeds 200 file descriptors
 run-extglob3
-bash 7296218: warning: process exceeds 100 file descriptors
-bash 7296218: warning: process exceeds 200 file descriptors
 run-func
 warning: if you have exported functions defined in your environment,
 warning: they may show up as diff output.
 warning: if so, please do not consider this a test failure
-tdtddtd
-< bash 7296223: warning: process exceeds 100 file descriptors
-< bash 7296223: warning: process exceeds 200 file descriptors
-tdΩtdctdªtd
+187,188c187,254
 < ./func5.sub: line 41: syntax error near unexpected token `('
 < ./func5.sub: line 41: `<(:) ()'
 ---
@@ -742,15 +641,10 @@ tdΩtdctdªtd
 >     fc -s "$@"
 > }
 run-getopts
-tdtddtd
-< bash 7296257: warning: process exceeds 100 file descriptors
-< bash 7296257: warning: process exceeds 200 file descriptors
 run-glob-bracket
-bash 7296280: warning: process exceeds 100 file descriptors
-bash 7296280: warning: process exceeds 200 file descriptors
 grep: ../examples/loadables/Makefile: No such file or directory
 glob-bracket: shared objects not supported, cannot continue
-tdatdtd
+0a1,103
 > --- $GLOBIGNORE vs fnmatch(3) ---
 > #1: pat=ab/cd/efg        yes/yes
 > #2: pat=ab[/]cd/efg      no/no
@@ -855,14 +749,11 @@ tdatdtd
 > --- MISC tests ---
 > #86: pat=a\                   str=a\               yes/yes
 run-glob-test
-tdtddtd
-< bash 7296291: warning: process exceeds 100 file descriptors
-< bash 7296291: warning: process exceeds 200 file descriptors
-tdtddtd
+2,4d1
 < ./glob2.sub: line 17: locale: command not found
 < glob2.sub: warning: you do not have the zh_TW.big5 locale installed;
 < glob2.sub: warning: that may cause some of these tests to fail.
-tdtdctd
+11,37c8
 < argv[1] = <AŒ±B>
 < argv[1] = <A>
 < argv[1] = <B>
@@ -918,31 +809,31 @@ ok 2
 ok 2.1
 ok 3
 ok 4
-td=tdctdtd
+59,60c30,31
 < bad 1
 < bad 2
 ---
 > ok 1
 > ok 2
-td@tdctd!td
+62,63c33,34
 < bad 4
 < bad 5
 ---
 > ok 4
 > ok 5
-tdCtdctd$td
+65,66c36,37
 < bad 1
 < bad 2
 ---
 > ok 1
 > ok 2
-tdFtdctd'td
+68,69c39,40
 < bad 4
 < bad 5
 ---
 > ok 4
 > ok 5
-tdttdctdUtd
+114,116c85,87
 < readable/. searchable/.
 < readable/. searchable/.
 < readable/. searchable/.
@@ -950,27 +841,24 @@ tdttdctdUtd
 > searchable/.
 > searchable/.
 > searchable/.
-tdctd
+130c101
 < .a .aa .b .bb
 ---
 > . .. .a .aa .b .bb
-tdçtdctdntd
+139,140c110,111
 < mailcheck.o make_cmd.o mksignames mksignames.o mksyntax mksyntax.dSYM
 < mksyntax.dSYM mksyntax mksignames.o mksignames make_cmd.o mailcheck.o
 ---
 > mksyntax mksignames make_cmd.o mailcheck.o mksignames.o mksyntax.dSYM
 > mksyntax.dSYM mksignames.o mailcheck.o make_cmd.o mksignames mksyntax
-tdêtdctdqtd
+142,143c113,114
 < mailcheck.o make_cmd.o mksignames mksignames.o mksyntax mksyntax.dSYM
 < mksyntax.dSYM mksyntax mksignames.o mksignames make_cmd.o mailcheck.o
 ---
 > mksyntax mksignames make_cmd.o mailcheck.o mksignames.o mksyntax.dSYM
 > mksyntax.dSYM mksignames.o mailcheck.o make_cmd.o mksignames mksyntax
 run-globstar
-tdtddtd
-< bash 7296458: warning: process exceeds 100 file descriptors
-< bash 7296458: warning: process exceeds 200 file descriptors
-tdKtdctdItd
+585,587c585,586
 < ln: failed to create symbolic link 'c': No such system call
 < a a/aa a/ab b b/bb b/bc
 < a/ b/
@@ -981,10 +869,7 @@ run-heredoc
 warning: UNIX versions number signals and schedule processes differently.
 warning: If output differing only in line numbers is produced, please
 warning: do not consider this a test failure.
-tdtddtd
-< bash 7296495: warning: process exceeds 100 file descriptors
-< bash 7296495: warning: process exceeds 200 file descriptors
-tdttdctdrtd
+114,116c114,116
 < 1: no	OK
 < 2: no	OK
 < 3: Ono	OK
@@ -992,26 +877,21 @@ tdttdctdrtd
 > 1: OK
 > 2: OK
 > 3: OK
-tdctd
+118c118
 < 5: notOK
 ---
 > 5: OK
 run-herestr
-tdtddtd
-< bash 7296602: warning: process exceeds 100 file descriptors
-< bash 7296602: warning: process exceeds 200 file descriptors
 run-histexpand
 warning: all of these tests will fail if history has not been compiled
 warning: into the shell
-tdtdctdtd
-< bash 7296623: warning: process exceeds 100 file descriptors
-< bash 7296623: warning: process exceeds 200 file descriptors
+1,2c1,2
 < ./histexp.tests: line 34: history: !!: numeric argument required
 < ./histexp.tests: line 37: history: !!:z: numeric argument required
 ---
 > echo $BASH_VERSION
 > ./histexp.tests: line 37: history: !!:z: history expansion failed
-tdtdctdtd
+13,18c13,17
 < ./histexp.tests: line 48: history: !e: numeric argument required
 < ./histexp.tests: line 49: history: !!: numeric argument required
 < ./histexp.tests: line 51: set: -H: invalid option
@@ -1024,12 +904,12 @@ tdtdctdtd
 > set -H
 > echo line 2 for history
 > line 2 for history
-tdtdctd
+26,27c25
 <     8  !!
 <     9  !e
 ---
 >     8  echo line 2 for history
-tdtdctdtd
+29,41c27,51
 < ./histexp.tests: line 58: !?ch?: command not found
 < ./histexp.tests: line 59: !-2: command not found
 < ./histexp.tests: line 60: ^2^8: command not found
@@ -1069,7 +949,7 @@ tdtdctdtd
 > d e
 > echo b c d
 > b c d
-td-tdctd5td
+43,45c53,58
 < !!:$:r
 < !-2:$:e
 < !-3:$:r:q
@@ -1080,7 +960,7 @@ td-tdctd5td
 > .c
 > echo 'file'
 > file
-td1tdctd<td
+47,49c60,69
 < !!:$:r
 < !-2:^:e
 < !-3:$:r:q
@@ -1095,16 +975,16 @@ td1tdctd<td
 > echo 'a' 'b' 'c' 'd' 'e'
 > a b c d e
 > echo 'a b c d e'
-td5tddtd
+51,52d70
 < !!:1-$:x
 < !-2:1-$:q
-td8tdctdHtd
+54,96c72,122
 < ./histexp.tests: line 94: !!:s/foo/bar/: No such file or directory
 < ./histexp.tests: line 95: !-2:gs/foo/bar/: No such file or directory
 < ./histexp.tests: line 96: /: Is a directory
 < ./histexp.tests: line 96: !!:gs/bar/x: No such file or directory
-< ./histexp.tests: line ./histexp.tests: line 97: !-2:g: command not found100: !!:gs+bar+whix+: command not found
-< 
+< ./histexp.tests: line 97: !-2:g: command not found
+< ./histexp.tests: line 100: !!:gs+bar+whix+: command not found
 < ./histexp.tests: line 102: !!:p: command not found
 < !?.o?:%:r:q
 < ./histexp.tests: line 107: !!:0: command not found
@@ -1194,12 +1074,12 @@ td8tdctdHtd
 >    36  echo xwhix.c xwhix.o xwhix.html xwhix.h
 >    37  echo 'xwhix'
 >    38  echo 'xwhix.h'
-tdctd}td
+99c125,126
 < !! !!:*
 ---
 > echo '!!' \!\!
 > !! !!
-tditdctdÇtd
+103,104c130,133
 < !shopt-1
 < !shopt*
 ---
@@ -1207,77 +1087,77 @@ tditdctdÇtd
 > shopt a
 > echo a b c d 2> /dev/null
 > a b c d
-tdltdctd
+106,107c135
 < !:2:p
 < !$
 ---
 > echo two ; echo four  
-tdotdctdâtd
+109,110c137,139
 < !$
 < !:2:p
 ---
 > echo four ; echo two
 > 3
 > echo $((1+2))
-tdrtddtd
+112,114d140
 < !!:1
 < ./histexp1.sub: line 18: set: -H: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
-tdâtdctd°td
+135,136c161,162
 < ./histexp2.sub: line 8: set: histexpand: invalid option name
 < #!/bin/bash !!
 ---
 > echo "#!/bin/bash" set -o posix
 > #!/bin/bash set -o posix
-tddtd
+139d164
 < ./histexp3.sub: line 17: set: histexpand: invalid option name
-tdctd¶td
+141c166,167
 < !!
 ---
 > echo $(echo echo a)
 > echo a
-tdctd©td
+143c169,170
 < !! !!
 ---
 > echo echo a $(echo echo a)
 > echo a echo a
-tdctdÆtd
+147c174,175
 < !! !!
 ---
 > echo "echo c" "$(echo echo c)"
 > echo c echo c
-tdctd±td
+149c177,178
 < !! !!
 ---
 > echo "echo d" $(echo "echo d")
 > echo d echo d
-tdctd∫td
+157c186,187
 < !!
 ---
 > echo "echo g"
 > echo g
-tdctdΩtd
+159c189,190
 < !!
 ---
 > eval echo "echo g"
 > echo g
-tdctd¿td
+161c192,193
 < !! !!
 ---
 > echo \!\! `echo echo h`
 > !! echo h
-tdctd√td
+163c195,196
 < !! !!
 ---
 > echo echo i `echo echo i`
 > echo i echo i
-tdßtdctd∆td
+165,166c198,199
 < j !!
 < ./histexp4.sub: line 17: set: histexpand: invalid option name
 ---
 > echo `echo j` echo j
 > j echo j
-td™tdctd…td
+168,170c201,212
 < ./histexp4.sub: line 20: syntax error near unexpected token `<'
 < ./histexp4.sub: line 20: `cat < <(echo !!)'
 < ./histexp5.sub: line 15: set: histexpand: invalid option name
@@ -1294,7 +1174,7 @@ td™tdctd…td
 > e
 > ! !
 > ./histexp4.sub: line 33: !': event not found
-tdÆtdctd÷td
+172,175c214,232
 < !:*
 < ./histexp5.sub: line 20: syntax error near unexpected token `('
 < ./histexp5.sub: line 20: `echo /<(echo tmp)/Step1 >/dev/null'
@@ -1319,7 +1199,7 @@ tdÆtdctd÷td
 > *(/tmp|/dev|/usr)/Step1
 > echo *(/tmp|/dev|/usr)/Step1
 > *(/tmp|/dev|/usr)/Step1
-td≥tdctdÍtd
+177,179c234,237
 < !!
 < !!
 < !!
@@ -1328,11 +1208,11 @@ td≥tdctdÍtd
 > echo one
 > echo one
 > echo one
-tdctd
+182c240
 <     3  for f in a b c; do 	echo !!; done
 ---
 >     3  for f in a b c; do 	echo echo one; done
-tdªtdctdÛtd
+185,187c243,246
 < !-1
 < !-1
 < !-1
@@ -1341,13 +1221,13 @@ tdªtdctdÛtd
 > echo two
 > echo two
 > echo two
-tdctd
+189c248
 <     2  for f in a b c; do 	echo !-1; done
 ---
 >     2  for f in a b c; do 	echo echo two; done
-tddtd
+191d249
 < ./histexp7.sub: line 5: set: histexpand: invalid option name
-td≈tdctd
+195,196c253
 < ./histexp7.sub: line 15: syntax error near unexpected token `('
 < ./histexp7.sub: line 15: `cat <( cat <<'EOF''
 ---
@@ -1355,10 +1235,7 @@ td≈tdctd
 run-history
 warning: all of these tests will fail if history has not been compiled
 warning: into the shell
-tdtddtd
-< bash 7296674: warning: process exceeds 100 file descriptors
-< bash 7296674: warning: process exceeds 200 file descriptors
-td!tdctd
+31,36c31
 < ./history.tests: line 52: history: !!: numeric argument required
 <     1  for i in one two three; do echo $i; done
 <     2  /bin/sh -c 'echo this is $0'
@@ -1367,13 +1244,13 @@ td!tdctd
 <     5  echo line for history
 ---
 > echo line for history
-tdHtdctdAtd
+70,71c65,66
 < ./history.tests: line 68: history: !e: numeric argument required
 < ./history.tests: line 69: history: !!: numeric argument required
 ---
 > echo line 2 for history
 > echo line 2 for history
-tdUtdctdNtd
+83,86c78,80
 < ./history.tests: line 80: set: -H: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 < ./history.tests: line 81: !!: command not found
@@ -1382,7 +1259,7 @@ tdUtdctdNtd
 > set -H
 > echo line 2 for history
 > line 2 for history
-tddtdctd\td
+98,101c92,94
 < 15	 !!
 < 16	 !e
 < 17	 unset HISTSIZE
@@ -1391,7 +1268,7 @@ tddtdctd\td
 > 15	 echo line 2 for history
 > 16	 unset HISTSIZE
 > 17	 unset HISTFILE
-tdntdctdetd
+108,111c101,104
 <    16  !e
 <    17  unset HISTSIZE
 <    18  unset HISTFILE
@@ -1402,25 +1279,17 @@ tdntdctdetd
 >    17  unset HISTFILE
 >    18  # now an out-of-range error because of the one=two not found in history
 run-ifs
-tdtddtd
-< bash 7296776: warning: process exceeds 100 file descriptors
-< bash 7296776: warning: process exceeds 200 file descriptors
-tdtdctdtd
+11,12c11,12
 < ./ifs1.sub: line 9: recho: command not found
 < ./ifs1.sub: line 11: recho: command not found
 ---
 > argv[1] = <file>
 > argv[1] = <*>
 run-ifs-posix
-tdtddtd
-< bash 7296788: warning: process exceeds 100 file descriptors
-< bash 7296788: warning: process exceeds 200 file descriptors
 run-input-test
-bash 7307081: warning: process exceeds 100 file descriptors
-bash 7307081: warning: process exceeds 200 file descriptors
+bash 7356452: warning: process exceeds 100 file descriptors
+bash 7356452: warning: process exceeds 200 file descriptors
 run-intl
-bash 7307088: warning: process exceeds 100 file descriptors
-bash 7307088: warning: process exceeds 200 file descriptors
 ./intl2.sub: line 16: locale: command not found
 intl2.sub: warning: you do not have the de_DE.UTF-8 locale installed;
 intl2.sub: that will cause some of these tests to fail.
@@ -1434,55 +1303,44 @@ unicode1.sub: that will cause some of these tests to be skipped.
 ./unicode1.sub: line 321: locale: command not found
 unicode1.sub: warning: you do not have the ja_JP.SJIS locale installed;
 unicode1.sub: that will cause some of these tests to be skipped.
-tdatd
+13a14
 > 1,0000
-tdctd
+18c19
 < 1.0000
 ---
 > 1,0000
-tdctd
+23c24
 < Passed all 1318 Unicode tests
 ---
 > Passed all 1770 Unicode tests
 run-invert
-tdtddtd
-< bash 7307178: warning: process exceeds 100 file descriptors
-< bash 7307178: warning: process exceeds 200 file descriptors
 run-invocation
-tdtddtd
-< bash 7307200: warning: process exceeds 100 file descriptors
-< bash 7307200: warning: process exceeds 200 file descriptors
-tdatd	td
+8a9,10
 > 	--dump-po-strings
 > 	--dump-strings
-tdatd
+17a20
 > 	--restricted
-tdatd td
+28a32,33
 > 	--dump-po-strings
 > 	--dump-strings
-tdatd
+37a43
 > 	--restricted
-tdatd7td
+48a55,56
 > 	--dump-po-strings
 > 	--dump-strings
-tdatd
+57a66
 > 	--restricted
 run-iquote
-tdtddtd
-< bash 7307252: warning: process exceeds 100 file descriptors
-< bash 7307252: warning: process exceeds 200 file descriptors
 run-jobs
 warning: some of these tests may fail if job control has not been compiled
 warning: into the shell
 warning: there may be a message regarding a cat process dying due to a
 warning: SIGHUP.  Please disregard.
-tdtdctdtd
-< bash 7307353: warning: process exceeds 100 file descriptors
-< bash 7307353: warning: process exceeds 200 file descriptors
+1,9c1,2
 < ./jobs1.sub: line 15: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 < ./jobs1.sub: line 21: jobs: command not found
-< ./jobs1.sub: line 25: [: 7307355: unary operator expected
+< ./jobs1.sub: line 25: [: 7356729: unary operator expected
 < ./jobs2.sub: line 3: set: monitor: invalid option name
 < ./jobs2.sub: line 8: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
@@ -1491,7 +1349,7 @@ tdtdctdtd
 ---
 > ./jobs2.sub: line 9: fg: job 1 started without job control
 > fg: 1
-tdtdctdtd
+26,50c19,34
 < ./jobs4.sub: line 24: jobs: command not found
 < ./jobs4.sub: line 26: wait: `%%': not a pid or valid job spec
 < 1
@@ -1534,13 +1392,13 @@ tdtdctdtd
 > 2: ok 2
 > 2: ok 3
 > 127
-td6tdctd$td
+52,68c36,41
 < wait: usage: wait [pid ...]
 < wait: usage: wait [pid ...]
 < ./jobs6.sub: line 2: set: monitor: invalid option name
 < wait: usage: wait [pid ...]
 < child1 exit status 2
-< ./jobs6.sub: line 6: kill: (7307419) - No such process
+< ./jobs6.sub: line 6: kill: (7356799) - No such process
 < ./jobs7.sub: line 2: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 < ./jobs7.sub: line 4: jobs: command not found
@@ -1559,7 +1417,7 @@ td6tdctd$td
 > [1]+ Running sleep 20 &
 > ./jobs7.sub: line 5: fg: no current jobs
 > [1]+ Running sleep 20 &
-tdHtdctd+td
+70,73c43,45
 < ./jobs.tests: line 41: jobs: command not found
 < 127
 < ./jobs.tests: line 45: wait: `%1': not a pid or valid job spec
@@ -1568,44 +1426,44 @@ tdHtdctd+td
 > 0
 > ./jobs.tests: line 45: wait: %1: no such job
 > ./jobs.tests: line 50: fg: no job control
-tdVtdctd
+84,86c56
 < /bin/bash: line 1: jobs: command not found
 < ./jobs.tests: line 92: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 ---
 > [1]+  Done                       sleep 1
-tdZtdctd:td
+88,90c58,59
 < ./jobs.tests: line 96: wait: `%2': not a pid or valid job spec
 < 1
 < ./jobs.tests: line 98: wait: `%1': not a pid or valid job spec
 ---
 > ./jobs.tests: line 96: wait: %2: no such job
 > 127
-tddtd
+93d61
 < ./jobs.tests: line 102: wait: `%1': not a pid or valid job spec
-tdctd
+95c63
 < ./jobs.tests: line 106: %1: command not found
 ---
 > sleep 2
-tdctd
+97c65
 < ./jobs.tests: line 110: fg: command not found
 ---
 > sleep 2
-tdctd
+99c67
 < ./jobs.tests: line 114: fg: command not found
 ---
 > sleep 2
-tdctd
+101c69
 < ./jobs.tests: line 118: fg: command not found
 ---
 > sleep 2
-tditdctdGtd
+103,104c71,72
 < ./jobs.tests: line 123: fg: command not found
 < ./jobs.tests: line 124: bg: command not found
 ---
 > ./jobs.tests: line 123: fg: %2: no such job
 > ./jobs.tests: line 124: bg: job 1 already in background
-tdltdctdJtd
+106,111c74,83
 < ./jobs.tests: line 131: fg: command not found
 < ./jobs.tests: line 132: bg: command not found
 < ./jobs.tests: line 137: disown: command not found
@@ -1623,7 +1481,7 @@ tdltdctdJtd
 > ./jobs.tests: line 144: disown: %2: no such job
 > ./jobs.tests: line 147: disown: warning: @12: job specification requires leading `%'
 > ./jobs.tests: line 147: disown: @12: no such job
-tdutdctdWtd
+115,116c87,90
 < 3 -- 0 -- 0 - -
 < ./jobs.tests: line 161: jobs: command not found
 ---
@@ -1631,7 +1489,7 @@ tdutdctdWtd
 > [1]   Running                    sleep 300 &
 > [2]-  Running                    sleep 350 &
 > [3]+  Running                    sleep 400 &
-tdxtdctd\td
+118,120c92,96
 < ./jobs.tests: line 164: jobs: command not found
 < ./jobs.tests: line 167: kill: `%4': not a pid or valid job spec
 < ./jobs.tests: line 169: jobs: command not found
@@ -1641,59 +1499,59 @@ tdxtdctd\td
 > [3]+  Running                    sleep 400 &
 > ./jobs.tests: line 167: kill: %4: no such job
 > ./jobs.tests: line 169: jobs: %4: no such job
-tdctd
+122c98
 < ./jobs.tests: line 171: jobs: command not found
 ---
 > [3]+  Running                    sleep 400 &
-td~tdctd
+124,125c100
 < ./jobs.tests: line 173: jobs: command not found
 < ./jobs.tests: line 175: kill: `%2': not a pid or valid job spec
 ---
 > [2]-  Running                    sleep 350 &
-tdctdgtd
+128c103,104
 < ./jobs.tests: line 179: jobs: command not found
 ---
 > [1]   Running                    sleep 300 &
 > [3]-  Running                    sleep 400 &
-tdÑtdctd
+130,131c106
 < ./jobs.tests: line 181: jobs: command not found
 < ./jobs.tests: line 183: disown: command not found
 ---
 > [2]+  Stopped                    sleep 350
-tdctdltd
+133c108,109
 < ./jobs.tests: line 186: jobs: command not found
 ---
 > [2]+  Stopped                    sleep 350
 > [3]-  Running                    sleep 400 &
-tdctd
+135c111
 < ./jobs.tests: line 188: jobs: command not found
 ---
 > [3]-  Running                    sleep 400 &
-tdãtdctd
+137,138c113
 < ./jobs.tests: line 190: jobs: command not found
 < ./jobs.tests: line 192: kill: `%2': not a pid or valid job spec
 ---
 > [2]+  Stopped                    sleep 350
-tdctdttd
+141c116,117
 < ./jobs.tests: line 195: jobs: command not found
 ---
 > [2]+  Running                    sleep 350 &
 > [3]-  Running                    sleep 400 &
-tdëtddtd
+143,144d118
 < ./jobs.tests: line 197: jobs: command not found
 < ./jobs.tests: line 199: kill: `%3': not a pid or valid job spec
-tdîtdctd
+146,147c120
 < ./jobs.tests: line 202: bg: command not found
 < ./jobs.tests: line 204: disown: command not found
 ---
 > [3]+ sleep 400 &
-tddtd
+150d122
 < ./jobs.tests: line 219: kill: `%1': not a pid or valid job spec
-tdctd
+152c124
 < ./jobs.tests: line 222: fg: command not found
 ---
 > sleep 4
-tdútdctd~td
+154,159c126,131
 < ./jobs.tests: line 227: set: +m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 < ./jobs.tests: line 229: jobs: command not found
@@ -1708,10 +1566,7 @@ tdútdctd~td
 > ./jobs.tests: line 232: suspend: cannot suspend: no job control
 > ./jobs.tests: line 233: suspend: cannot suspend: no job control
 run-lastpipe
-tdtddtd
-< bash 7308743: warning: process exceeds 100 file descriptors
-< bash 7308743: warning: process exceeds 200 file descriptors
-tdtdctdtd
+5,10c5,10
 < 1 -- 1
 < 0 -- 0
 < 1 -- 1
@@ -1725,25 +1580,16 @@ tdtdctdtd
 > 1 -- 0 0 1
 > 1 -- 0 1 0
 > 1 42
-tdctd
+21c21
 < HI -- 42 -- 42
 ---
 > HI -- 42 -- 0 42
 run-mapfile
-tdtddtd
-< bash 7308798: warning: process exceeds 100 file descriptors
-< bash 7308798: warning: process exceeds 200 file descriptors
 run-more-exp
-tdtddtd
-< bash 7308807: warning: process exceeds 100 file descriptors
-< bash 7308807: warning: process exceeds 200 file descriptors
 run-nameref
 warning: some of these tests will fail if arrays have not
 warning: been compiled into the shell
-tdtddtd
-< bash 7309007: warning: process exceeds 100 file descriptors
-< bash 7309007: warning: process exceeds 200 file descriptors
-tddtd
+471d470
 < declare -x vgasize="1920x1080x32"
 run-new-exp
 warning: two of these tests will fail if your OS does not support
@@ -1753,17 +1599,14 @@ warning: this a test failure
 warning: if you have exported variables beginning with the string _Q,
 warning: diff output may be generated.  If so, please do not consider
 warning: this a test failure
-tdtddtd
-< bash 7309089: warning: process exceeds 100 file descriptors
-< bash 7309089: warning: process exceeds 200 file descriptors
-td≠tdctd´td
+171,172c171,173
 < ./new-exp1.sub: line 21: syntax error near unexpected token `('
 < ./new-exp1.sub: line 21: `cat <(echo this is a test of proc subst)'
 ---
 > this is a test of proc subst
 > this is test 2
 > a
-td2tdctd1td
+560,561c561,575
 < ./new-exp7.sub: line 3: syntax error near unexpected token `<'
 < ./new-exp7.sub: line 3: `	echo < <(cat x1)'
 ---
@@ -1782,7 +1625,7 @@ td2tdctd1td
 > { 
 >     echo < <(cat x1)
 > }
-tdÇtdctdétd
+640,645c654,659
 < ./new-exp10.sub: line 127: recho: command not found
 < ./new-exp10.sub: line 130: recho: command not found
 < ./new-exp10.sub: line 133: recho: command not found
@@ -1797,10 +1640,7 @@ tdÇtdctdétd
 > argv[1] = </ bash$ >
 > argv[1] = <1^J/ bash$ >
 run-nquote
-tdtddtd
-< bash 7309367: warning: process exceeds 100 file descriptors
-< bash 7309367: warning: process exceeds 200 file descriptors
-td	tdctdtd
+7,10c7,10
 < argv[1] = <$hello,>
 < argv[2] = <$world>
 < argv[1] = <$hello, $world>
@@ -1810,7 +1650,7 @@ td	tdctdtd
 > argv[2] = <world>
 > argv[1] = <hello, world>
 > argv[1] = <>
-tdtdctdtd
+12,14c12,14
 < argv[1] = <$hello, $world>
 < argv[1] = <$hello, "world">
 < argv[1] = <$hello, $"world">
@@ -1818,72 +1658,43 @@ tdtdctdtd
 > argv[1] = <hello, $world>
 > argv[1] = <hello, "world">
 > argv[1] = <hello, $"world">
-tdctd
+17c17
 < argv[1] = <$hello, chet>
 ---
 > argv[1] = <hello, chet>
-td,tddtd
+42,43d41
 < ./nquote1.sub: line 2: set: -H: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 run-nquote1
 warning: several of these tests will fail if arrays have not
 warning: been compiled into the shell.
-tdtddtd
-< bash 7309436: warning: process exceeds 100 file descriptors
-< bash 7309436: warning: process exceeds 200 file descriptors
 run-nquote2
 warning: several of these tests will fail if arrays have not
 warning: been compiled into the shell.
-tdtddtd
-< bash 7309500: warning: process exceeds 100 file descriptors
-< bash 7309500: warning: process exceeds 200 file descriptors
 run-nquote3
 warning: several of these tests will fail if arrays have not
 warning: been compiled into the shell.
-tdtddtd
-< bash 7309561: warning: process exceeds 100 file descriptors
-< bash 7309561: warning: process exceeds 200 file descriptors
 run-nquote4
 warning: some of these tests will fail if you do not have UTF-8
 warning: locales installed on your system
-tdtddtd
-< bash 7309615: warning: process exceeds 100 file descriptors
-< bash 7309615: warning: process exceeds 200 file descriptors
 run-nquote5
-tdtddtd
-< bash 7309637: warning: process exceeds 100 file descriptors
-< bash 7309637: warning: process exceeds 200 file descriptors
 run-parser
-tdtddtd
-< bash 7309683: warning: process exceeds 100 file descriptors
-< bash 7309683: warning: process exceeds 200 file descriptors
 run-posix2
-tdtddtd
-< bash 7309701: warning: process exceeds 100 file descriptors
-< bash 7309701: warning: process exceeds 200 file descriptors
 run-posixexp
-tdtddtd
-< bash 7309740: warning: process exceeds 100 file descriptors
-< bash 7309740: warning: process exceeds 200 file descriptors
 run-posixexp2
-tdtddtd
-< bash 7310233: warning: process exceeds 100 file descriptors
-< bash 7310233: warning: process exceeds 200 file descriptors
 run-posixpat
-bash 7310286: warning: process exceeds 100 file descriptors
-bash 7310286: warning: process exceeds 200 file descriptors
-tdatdtd
+23a24,28
 > ok 1
 > ok 2
 > ok 3
 > ok 4
 > ok 5
-tdatd
+24a30
 > ok 7
-tdatd td
+25a32,33
 > ok 9
 > ok 10
-tdtdctd#td
+27,28c35,39
 < oops -- bad range 2
 < oops -- bad range 3
 ---
@@ -1893,37 +1704,29 @@ tdtdctd#td
 > ok 15
 > ok 16
 run-posixpipe
-tdtddtd
-< bash 7310290: warning: process exceeds 100 file descriptors
-< bash 7310290: warning: process exceeds 200 file descriptors
 run-precedence
-bash 7310298: warning: process exceeds 100 file descriptors
-bash 7310298: warning: process exceeds 200 file descriptors
 run-printf
-tdtddtd
-< bash 7310326: warning: process exceeds 100 file descriptors
-< bash 7310326: warning: process exceeds 200 file descriptors
-tddtd
+133d132
 < F
-tdctdÜtd
+135c134,135
 < F
 ---
 > 0.000000
 > 0.00
-tddtd
+137d136
 < F
-tdctdätd
+139c138,139
 < F
 ---
 > 4.000000
 > 4.00
-tdctd
+149c149
 < FFFFFFFF9B3A59A5
 ---
 > 9B3A59A5
-tdtdctdtd
+283,291c283,290
 < e-May-2010 T
-< current time mismatch:1790949425|s|
+< current time mismatch:1790954909|s|
 < Sun May 30, 2010 15:09:15
 < current time: F r
 < epoch time: F r -0500
@@ -1940,7 +1743,7 @@ tdtdctdtd
 > local time: Sun May 30 16:09:15 EDT 2010
 > Sun May 30 16:09:15 EDT 2010             date-style time
 > 05/30/10 (foo) 16:09:15                  date-style time
-td6tdctd3td
+308,315c307,314
 < x+000000123x
 < x+000000123x
 < x+000000123x
@@ -1958,7 +1761,7 @@ td6tdctd3td
 > x      +123x
 > x        7bx
 > x        7bx
-td\tdctdYtd
+346,359c345,373
 < ./printf6.sub: line 19: hexdump: command not found
 < ./printf6.sub: line 22: hexdump: command not found
 < ./printf6.sub: line 30: hexdump: command not found
@@ -2008,9 +1811,7 @@ warning: all of these tests will fail if process substitution has not
 warning: been compiled into the shell or if the OS does not provide
 warning: FIFOs or /dev/fd. Some tests may fail if the OS does not
 warning: provide FIFOs.
-tdtdctdtd
-< bash 7310417: warning: process exceeds 100 file descriptors
-< bash 7310417: warning: process exceeds 200 file descriptors
+1,2c1,33
 < ./procsub.tests: line 17: syntax error near unexpected token `('
 < ./procsub.tests: line 17: `eval cat <(echo test1)'
 ---
@@ -2048,14 +1849,8 @@ tdtdctdtd
 > foo
 > subshell
 run-quote
-tdtddtd
-< bash 7310421: warning: process exceeds 100 file descriptors
-< bash 7310421: warning: process exceeds 200 file descriptors
 run-quotearray
-tdtddtd
-< bash 7310553: warning: process exceeds 100 file descriptors
-< bash 7310553: warning: process exceeds 200 file descriptors
-td+tdctd)td
+41,43c41,64
 < ./quotearray1.sub: line 49: unexpected argument `(' to conditional binary operator
 < ./quotearray1.sub: line 49: syntax error near `index[7<(4'
 < ./quotearray1.sub: line 49: `[[ index[7<(4+2)] -le assoc[0] ]]'
@@ -2087,10 +1882,7 @@ td+tdctd)td
 run-read
 warning: please do not consider output differing only in the amount of
 warning: white space to be an error.
-tdtddtd
-< bash 7310564: warning: process exceeds 100 file descriptors
-< bash 7310564: warning: process exceeds 200 file descriptors
-td9tdctd7td
+55,60c55,58
 < ./read2.sub: line 18: /dev/tty: No such file or directory
 < 1
 < 4
@@ -2102,34 +1894,34 @@ td9tdctd7td
 > unset or null 1
 > timeout 2: ok
 > unset or null 2
-td@tdctd<td
+62,63c60,61
 < 4
 < ./read2.sub: line 45: /dev/tty: No such file or directory
 ---
 > unset or null 3
 > ./read2.sub: line 45: read: -3: invalid timeout specification
-tdctd
+65c63
 < 4
 ---
 > 
-tddtd
-< mkfifo: cannot create fifo 'a.pipe'
-tdctd
+68d65
+< mkfifo: cannot create fifo 'a.pipe': No such system call
+94c91
 < 0
 ---
 > 1
-tdctd
+97c94
 < 1
 ---
 > timeout 2: ok
-tdetdctd
+99,100c96
 < ./read7.sub: line 37: /dev/tty: No such file or directory
 < 1
 ---
 > timeout 3: ok
-tdjtdctd
+104,107c100
 < ./read7.sub: redirection error: cannot duplicate fd: Unknown error
-< ./read7.sub: line 60: 5112992: Unknown error
+< ./read7.sub: line 60: 5113904: Unknown error
 < 
 < ./read7.sub: line 64: /dev/tty: No such file or directory
 ---
@@ -2140,29 +1932,26 @@ warning: produce diff output.
 warning: if the text of an error message concerning `redir1.*' not being
 warning: found or messages concerning bad file descriptors produce diff
 warning: output, please do not consider it a test failure
-tdtddtd
-< bash 7314729: warning: process exceeds 100 file descriptors
-< bash 7314729: warning: process exceeds 200 file descriptors
-tddtd
+12d11
 < ./redir.tests: line 62: /etc/passwd: No such file or directory
-tdctd
+22c21
 < ./redir.tests: line 83: 6: Bad file number
 ---
 > to c
-tdtdctdtd
+28,30c27,28
 < ./redir3.sub: line 27: 5: Bad file number
 < read line3 "daemon"
 < read line4 ""
 ---
 > read line3 "cd"
 > read line4 "daemon"
-td+tdctd'td
+41,42c39,40
 < 0 -- 0
 < 0 -- 0
 ---
 > 0 -- 3 0
 > 0 -- 4 0
-td8tdctd4td
+54,55c52,95
 < ./redir5.sub: redirection error: cannot duplicate fd: Bad file number
 < ./redir5.sub: line 21: 5: Bad file number
 ---
@@ -2210,47 +1999,43 @@ td8tdctd4td
 > exec 0<&9-
 > read line
 > echo $line
-tddtd
+67d106
 < ./redir6.sub: line 3: help: command not found
-tdztdctd
+120,121c159
 < ./redir10.sub: line 29: syntax error near unexpected token `<'
 < ./redir10.sub: line 29: `	done 3< <(echo x)'
 ---
 > ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-tdtddtd
+125,126d162
 < redir11 bad 3
 < redir11 bad 4
-tdctd
+134c170
 < ./redir12.sub: line 27: unwritable-file: Access denied
 ---
 > ./redir12.sub: line 27: unwritable-file: Permission denied
-tdctd
+138c174
 < ./redir12.sub: line 34: unwritable-file: Access denied
 ---
 > ./redir12.sub: line 34: unwritable-file: Permission denied
-tdétdctd∞td
+140,141c176,177
 < ./redir12.sub: line 38: unreadable-file: Access denied
 < ./redir12.sub: line 44: unwritable-file: Access denied
 ---
 > ./redir12.sub: line 38: unreadable-file: Permission denied
 > ./redir12.sub: line 44: unwritable-file: Permission denied
-tdítdctd¥td
+144,145c180,181
 < ./redir12.sub: line 48: unwritable-file: Access denied
 < ./redir12.sub: line 53: unreadable-file: Access denied
 ---
 > ./redir12.sub: line 48: unwritable-file: Permission denied
 > ./redir12.sub: line 53: unreadable-file: Permission denied
-tdctd
+147c183
 < ./redir12.sub: line 56: unreadable-file: Access denied
 ---
 > ./redir12.sub: line 56: unreadable-file: Permission denied
 run-rhs-exp
-bash 7314889: warning: process exceeds 100 file descriptors
-bash 7314889: warning: process exceeds 200 file descriptors
 run-rsh
-tdtdctdtd
-< bash 7314950: warning: process exceeds 100 file descriptors
-< bash 7314950: warning: process exceeds 200 file descriptors
+1,15c1,15
 < ./rsh1.sub: line 20: set: -r: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 < hello
@@ -2265,7 +2050,7 @@ tdtdctdtd
 < ./rsh.tests: line 31: ./source.sub3: No such file or directory
 < oops 1 -- output
 < oops 2 -- append
-< Fri Oct  2 15:57:09 CES 2026
+< Fri Oct  2 17:28:33 CES 2026
 ---
 > ./rsh1.sub: line 22: /bin/sh: restricted
 > ./rsh1.sub: line 24: sh: not found
@@ -2282,194 +2067,104 @@ tdtdctdtd
 > ./rsh.tests: line 34: /tmp/restricted: restricted: cannot redirect output
 > ./rsh.tests: line 38: /tmp/restricted: restricted: cannot redirect output
 > ./rsh.tests: line 43: command: -p: restricted
-tdctdtd
-< Fri Oct  2 15:57:09 CES 2026
+19c19,20
+< Fri Oct  2 17:28:33 CES 2026
 ---
 > ./rsh.tests: line 48: exec: restricted
 > ./rsh.tests: after exec
 run-set-e
-bash 7314968: warning: process exceeds 100 file descriptors
-bash 7314968: warning: process exceeds 200 file descriptors
 run-set-x
-tdtddtd
-< bash 7315073: warning: process exceeds 100 file descriptors
-< bash 7315073: warning: process exceeds 200 file descriptors
-tdatd
+36a37
 > ./set-x1.sub: line 18: BASH_XTRACEFD: 4: invalid value for trace file descriptor
 run-shopt
-tdtddtd
-< bash 7315082: warning: process exceeds 100 file descriptors
-< bash 7315082: warning: process exceeds 200 file descriptors
-tdatd
+10a11
 > shopt -u checkjobs
-tdatd
+56a58
 > shopt -u restricted_shell
-tdatd
+86a89
 > shopt -u checkjobs
-tdatd
+120a124
 > shopt -u restricted_shell
-tdatd
+130a135
 > checkjobs           	off
-tdatd
+164a170
 > restricted_shell    	off
-td™tddtd
+168,170d173
 < ./shopt.tests: line 63: set: histexpand: invalid option name
 < ./shopt.tests: line 65: set: monitor: invalid option name
 < ./shopt.tests: line 69: set: notify: invalid option name
-tdatd
+178a182
 > set -o histexpand
-tdatd
+182a187
 > set -o monitor
-tdatd
+186a192
 > set +o notify
-tdatd
+203a210
 > histexpand     	on
-tdatd
+207a215
 > monitor        	on
-tdatd
+211a220
 > notify         	off
-tdatd
+228a238
 > set -o histexpand
-tdatd
+232a243
 > set -o monitor
-tdatd
+236a248
 > set +o notify
-tdatd
+252a265
 > set -o histexpand
-tdatd
+254a268
 > set -o monitor
-tdatd
+266a281
 > set +o notify
-tdatd
+285a301
 > notify         	off
-td+tddtd
+297,298d312
 < ./shopt1.sub:44: syntax error near unexpected token `('
 < ./shopt1.sub:44: `diff <("$t1") <("$t2")'
 run-strip
-bash 7315092: warning: process exceeds 100 file descriptors
-bash 7315092: warning: process exceeds 200 file descriptors
 run-test
-tdtddtd
-< bash 7315108: warning: process exceeds 100 file descriptors
-< bash 7315108: warning: process exceeds 200 file descriptors
-tdctd
-< 1
----
-> 0
-tdctd
-< 1
----
-> 0
-td%tddtd
-< chgrp: missing operand after ‚Äò/tmp/test.setgid‚Äô
-< Try 'chgrp --help' for more information.
-tdctd
-< 1
----
-> 0
-tdctd
-< ./test.tests: line 118: /dev/tty: No such file or directory
----
-> 0
-tdctd
-< 1
----
-> 0
-tdctd
-< 1
----
-> 0
-tdctd
-< 1
----
-> 0
-tddtd
-< ln: failed to create hard link to '/tmp/abc': Too many links
-tdütdctd
-< 1
-< rm: cannot remove '/tmp/ghi': No such file or directory
----
-> 0
-tdctd
-< 1
----
-> 0
-tdctd
-< 1
----
-> 0
-tdctd
-< 1
----
-> 0
-tdctd
-< 1
----
-> 0
-tdtddtd
-< chgrp: missing operand after ‚Äò/tmp/test.group‚Äô
-< Try 'chgrp --help' for more information.
-tddtd
-< mkfifo: cannot create fifo '/tmp/pipe'
-tdctd
-< 1
----
-> 0
 run-tilde
-bash 7315159: warning: process exceeds 100 file descriptors
-bash 7315159: warning: process exceeds 200 file descriptors
 run-tilde2
-bash 7315164: warning: process exceeds 100 file descriptors
-bash 7315164: warning: process exceeds 200 file descriptors
 run-trap
 warning: UNIX versions number signals and schedule processes differently.
 warning: If output differing only in line numbers is produced, please
 warning: do not consider this a test failure.
-tdtddtd
-< bash 7315173: warning: process exceeds 100 file descriptors
-< bash 7315173: warning: process exceeds 200 file descriptors
-tdQtdctdOtd
-< +[8] false+[8] false+[8] false
-< 
+79d78
+< +[8] false+[8] false
+81c80,81
 < 
 ---
 > +[8] false
 > +[8] false
-> +[8] false
-tdotddtd
+109,110d108
 < ./trap8.sub: line 3: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
-tdatdotd
+112a111,114
 > CHLD
 > CHLD
 > CHLD
 > CHLD
-tdctd{td
+121c123,125
 < ./trap.tests: line 105: set: monitor: invalid option name
 ---
 > caught a child death
 > caught a child death
 > caught a child death
 run-type
-tdtddtd
-< bash 7315257: warning: process exceeds 100 file descriptors
-< bash 7315257: warning: process exceeds 200 file descriptors
 run-varenv
 warning: some of these tests will fail if arrays have not
 warning: been compiled into the shell
-tdtddtd
-< bash 7315302: warning: process exceeds 100 file descriptors
-< bash 7315302: warning: process exceeds 200 file descriptors
-tddtd
+31d30
 < ./varenv.tests: line 191: set: monitor: invalid option name
-td<tdctd9td
+58,59c57,59
 < ./varenv3.sub: line 26: syntax error near unexpected token `<'
 < ./varenv3.sub: line 26: `	IFS=/ read m v k a < <(IFS=$oifs inner)'
 ---
 > a:b:c:d
 > a-b-c-d
 > a:b:c:d
-td\tdctdZtd
+90,91c90,97
 < ./varenv8.sub: line 1: syntax error near unexpected token `<'
 < ./varenv8.sub: line 1: `FOO=bar cat  < <(echo $FOO:1; echo $FOO:2)'
 ---
@@ -2481,26 +2176,23 @@ td\tdctdZtd
 > after: --global--
 > after: ----
 > x = :1:2
-tdtddtd
+271,272d276
 < ./varenv21.sub: line 35: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 run-vredir
 warning: the text of a system error message may vary between systems and
 warning: produce diff output.
-tdtddtd
-< bash 7315372: warning: process exceeds 100 file descriptors
-< bash 7315372: warning: process exceeds 200 file descriptors
-tdctd
+94c94
 < ./vredir4.sub: line 51: ${output}: Bad file number
 ---
 > ./vredir4.sub: line 51: ${output}: Bad file descriptor
-tdctdktd
+107c107,109
 < 10
 ---
 > ./vredir6.sub: redirection error: cannot duplicate fd: Invalid argument
 > ./vredir6.sub: line 13: /dev/null: Invalid argument
 > unset
-tdztdctdztd
+120,122c122,123
 < ./vredir8.sub: line 30: /dev/tty: Permission denied
 < ./vredir8.sub: line 33: $fd: Bad file number
 < ./vredir8.sub: line 38: $fd: Bad file number
