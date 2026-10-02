@@ -2088,7 +2088,28 @@ finally reaching `tcltest`, which gives the new build rule below.
 mode-0 directory; Plan 9 answers "does not exist". The file server's
 choice, so a probe rather than a library rule.
 
-**bash cannot be `/bin/sh` yet: it dies `Killed: Insufficient physical
+**BASH IS `/bin/sh` AND IT BUILDS APExp. The whole hunt below is
+CLOSED -- read it as history, not as an open problem.** `cmd/bash/mkfile`'s
+`install:V:` adds `cp $BIN/bash $BIN/sh`, `dash` is gone from
+`_CORE_APPS` and from `sys/src/external`, and a full `mk distclean`
+plus `mk install` completes with bash serving every `sh` the build
+asks for. *One shell in the tree instead of two*, which was the goal
+named at the end of the fdwatch round below.
+**What actually got it there, in order**: `isblank('\t')` (the
+allocation storm -- the one that mattered), `getcwd(NULL,n)`, the
+fourteen `config.h` features, the `FD_BUFFEREDX` exec poison, and
+`mktemp`'s 26 names. **Not one of them was the descriptor leak the
+first six rounds were spent on**, and the histogram that ended that
+framing -- 142 opens, 251 dups, 447 closes -- is in the section below.
+**Two things are still open and are NOT blockers**: bash's own suite
+has 40 files with real diffs and 46 that differ only by the kernel's
+fd warnings (see further down), and *the fd warnings now fire for
+every build recipe bash runs*, which is noise rather than failure
+since the build completes.
+*Everything from here to the ratrace histogram is the record of how it
+was found; the standing lesson is the instrument tally, not the bug.*
+
+**(HISTORICAL, now fixed)** **bash could not be `/bin/sh`: it died `Killed: Insufficient physical
 memory` during a full rebuild** -- but the log warns twice first, at
 **100 and then 200 file descriptors**, and a shell running build
 recipes has no business holding 200. So it is a leak with a shape.
@@ -2253,6 +2274,8 @@ the kernel*. Counts at 1, 2, 5, 10, 20, 50, 100, 200 forks, so the
 slope near zero is visible before anything can die. glibc: flat at
 5 throughout.
 Back on dash meanwhile, and the goal is one shell rather than two.
+*(That goal is MET -- bash is `/bin/sh` and dash is out of the tree.
+See the top of this section.)*
 
 **coreutils `sort` COULD NOT MAKE A TEMPORARY FILE, AND IT IS OURS
 -- FIXED, NOT YET MEASURED ON THE VM.** `sort: cannot create

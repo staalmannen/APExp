@@ -10,7 +10,9 @@ APEXPROOT=../../../..
 # Every comment line INSIDE these lists has to end in a backslash, as
 # the ones below do: the list is one continued line, and a comment
 # without it ends the assignment there.
-# for now, we default to bash as sh. We might remove dash as alternative.
+# bash IS sh: cmd/bash/mkfile's install rule does `cp $BIN/bash $BIN/sh',
+# and dash is gone from this list and from sys/src/external. One shell in
+# the tree rather than two -- see CLAUDE.md for what it cost to get here.
 
 _CORE_APPS=\
 # shared gnulib: must be first, several apps below link ../gnulib/libgnu.a \
