@@ -3399,11 +3399,22 @@ several because each partitions cleanly.
   line says so** -- *"warning: all of these tests will fail if history
   has not been compiled into the shell"* -- which is the third time a
   suite's unconditional warning turned out to be accurate.
-  **LEFT OFF, and it is a DECISION rather than an oversight**: it
-  changes what `!` means in every interactive line, where `READLINE`
-  and `HISTORY` only changed how a line is edited. The code is already
-  compiled and linked, so it is one `#define` whenever that trade is
-  wanted.
+  **It was LEFT OFF as a decision rather than an oversight** -- it
+  changes what `!` MEANS in every interactive line, where `READLINE`
+  and `HISTORY` only changed how a line is edited -- **and it is now
+  ON, chosen rather than swept in.** Nothing was missing from the
+  build, as with READLINE before it: `histexpand.$O` is already in
+  `libreadline.a` (lib/readline's HISTOBJ), which `cmd/bash/mkfile`
+  already links, so `history_expand` resolves with no mkfile change.
+  `config-bot.h:104` makes it imply HISTORY, already defined.
+  **NOT YET MEASURED ON THE VM. Predict `run-histexpand` 287 -> near
+  0**; refuted if a large remainder survives, which would mean `!`
+  expansion reaches the shell but something under it is wrong -- a
+  different investigation, as the fourteen features were.
+  ***`mk clean` in `cmd/bash` is NOT needed any more***: the `HFILES`
+  line added this round is exactly what makes `config.h` rebuild it.
+  So this run is also the test of that fix, and **if `run-histexpand`
+  does not move, suspect the rebuild before suspecting bash.**
 - **`run-builtins` 225 partitions 175 / 42 / 6 / 2**, and only the
   second is ours:
   **175 are `HELP_BUILTIN`** -- `help: command not found`,
@@ -3518,6 +3529,31 @@ reading**:
   CFLAGS **continuation** line, so a `^CFLAGS.*-I\.` grep missed it.)
 Every path was verified to exist before writing, because an `HFILES`
 naming a missing file makes `mk` fail outright.
+
+**AND THE gcc SWEEP FOR `BANG_HISTORY` WAS WRONG TWICE BEFORE IT WAS
+RIGHT, in two NEW ways.** The sweep itself came back **0 errors** in
+the class 6c treats as fatal, across all eight `.c` files and the
+generated builtins -- but getting an answer that meant anything took
+three attempts:
+- **`-I` CANNOT override `config.h` for bash's own sources.**
+  `#include "config.h"` searches the INCLUDING FILE'S directory first,
+  and bash's sources sit beside `config.h`, so pointing `-I` at a
+  reverted copy changed nothing and the control reported "same" six
+  times. *It had worked for `HELP_BUILTIN` only because `help.c` is
+  generated into a different directory* -- the same technique, right
+  once by accident. Swapping the real file in place is what works:
+  `bashhist.c` **+115** lines, `flags.c` +50, `shell.c` +6, the rest
+  +3.
+- **A missing file counted as an error.** `reserved.c` showed 1 error
+  OFF *and* ON, which is what flagged it as pre-existing rather than
+  mine -- and it is neither: `reserved.def` has no `$PRODUCES`, so
+  that `.c` is never generated and my sweep was compiling a file that
+  does not exist. *Counting OFF beside ON is what caught it; a
+  one-sided sweep would have reported a real error.*
+- The other two complaints were the recorded harness artefacts
+  (`builtins/builtext.h` needs an `-I` with a `builtins/`
+  subdirectory, and `CONF_MACHTYPE` is a `-D` the mkfile passes).
+  Supplied rather than dismissed, which is what turned 6 into 0.
 
 **The watchdog now SAYS WHEN IT IS ARMED, and a wasted round is
 why.** A run went out as `APEX__MALLOCMAX=8` -- two underscores, no

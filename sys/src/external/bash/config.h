@@ -103,7 +103,34 @@
 
 /* Define BANG_HISTORY if you want to have Csh style "!" history expansion.
    This is unrelated to READLINE. */
-/* #undef BANG_HISTORY */
+/*
+ * ON, by explicit decision rather than as part of a sweep.
+ *
+ * It was deliberately left off when READLINE and HISTORY went on, and
+ * the reason was real: those two change how a line is EDITED, while
+ * this changes what `!' MEANS in every interactive line. That is a
+ * behaviour change for anyone typing at the shell, not a capability
+ * being switched back on, so it was recorded as a trade to be chosen
+ * rather than assumed.
+ *
+ * What it costs on the other side: `run-histexpand' is **287 lines,
+ * ALL of them this switch** -- `set: -H: invalid option' and
+ * `!!: command not found' throughout -- and the file's own first line
+ * has been saying so all along: *"warning: all of these tests will
+ * fail if history has not been compiled into the shell"*.
+ *
+ * Nothing was missing from the build, as with READLINE before it:
+ * `histexpand.$O' is already in `libreadline.a' (lib/readline/mkfile's
+ * HISTOBJ), which `cmd/bash/mkfile' already links, so `history_expand'
+ * resolves without a mkfile change. The switch gates 43 sites across
+ * eight `.c' files and three `.def's, `set -H' (`flags.c:199',
+ * `histexp_flag') among them.
+ *
+ * `config-bot.h:104' makes BANG_HISTORY imply HISTORY, which is
+ * already defined -- so this adds a feature rather than re-deriving
+ * one.
+ */
+#define BANG_HISTORY 1
 
 /* Define HISTORY if you want to have access to previously typed commands.
 
