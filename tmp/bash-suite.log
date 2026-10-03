@@ -1,5 +1,5 @@
-bash 200761: warning: process exceeds 100 file descriptors
-bash 200761: warning: process exceeds 200 file descriptors
+bash 222788: warning: process exceeds 100 file descriptors
+bash 222788: warning: process exceeds 200 file descriptors
 declare -r SHELLOPTS="braceexpand:hashall:interactive-comments"
 Testing /bin/bash
 version: 5.3.0(2)-release
@@ -27,12 +27,7 @@ warning: been compiled into the shell
 run-assoc
 warning: all of these tests will fail if arrays have not
 warning: been compiled into the shell
-52c52,53
-< ./assoc.tests: line 132: recho: command not found
----
-> argv[1] = <6>
-> argv[2] = <flix>
-401,402c402
+402,403c402
 < wait: usage: wait [pid ...]
 < bad 1
 ---
@@ -712,16 +707,10 @@ run-history
 warning: all of these tests will fail if history has not been compiled
 warning: into the shell
 run-ifs
-11,12c11,12
-< ./ifs1.sub: line 9: recho: command not found
-< ./ifs1.sub: line 11: recho: command not found
----
-> argv[1] = <file>
-> argv[1] = <*>
 run-ifs-posix
 run-input-test
-bash 214214: warning: process exceeds 100 file descriptors
-bash 214214: warning: process exceeds 200 file descriptors
+bash 236232: warning: process exceeds 100 file descriptors
+bash 236232: warning: process exceeds 200 file descriptors
 run-intl
 ./intl2.sub: line 16: locale: command not found
 intl2.sub: warning: you do not have the de_DE.UTF-8 locale installed;
@@ -767,7 +756,7 @@ warning: SIGHUP.  Please disregard.
 < ./jobs1.sub: line 15: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 < ./jobs1.sub: line 21: jobs: command not found
-< ./jobs1.sub: line 25: [: 214491: unary operator expected
+< ./jobs1.sub: line 25: [: 236509: unary operator expected
 < ./jobs2.sub: line 3: set: monitor: invalid option name
 < ./jobs2.sub: line 8: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
@@ -825,7 +814,7 @@ warning: SIGHUP.  Please disregard.
 < ./jobs6.sub: line 2: set: monitor: invalid option name
 < wait: usage: wait [pid ...]
 < child1 exit status 2
-< ./jobs6.sub: line 6: kill: (214560) - No such process
+< ./jobs6.sub: line 6: kill: (236578) - No such process
 < ./jobs7.sub: line 2: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 < ./jobs7.sub: line 4: jobs: command not found
@@ -1056,20 +1045,6 @@ warning: this a test failure
 > { 
 >     echo < <(cat x1)
 > }
-640,645c654,659
-< ./new-exp10.sub: line 127: recho: command not found
-< ./new-exp10.sub: line 130: recho: command not found
-< ./new-exp10.sub: line 133: recho: command not found
-< ./new-exp10.sub: line 137: recho: command not found
-< ./new-exp10.sub: line 143: recho: command not found
-< ./new-exp10.sub: line 147: recho: command not found
----
-> argv[1] = <host(2)[5.3]$ >
-> argv[1] = <~$ >
-> argv[1] = <^A[0]~$ >
-> argv[1] = <^A^G^B[0:1]~\$ >
-> argv[1] = </ bash$ >
-> argv[1] = <1^J/ bash$ >
 run-nquote
 7,10c7,10
 < argv[1] = <$hello,>
@@ -1421,12 +1396,11 @@ run-trap
 warning: UNIX versions number signals and schedule processes differently.
 warning: If output differing only in line numbers is produced, please
 warning: do not consider this a test failure.
-79,81c79,81
-< +[8] false+[8] false+[8] false
-< 
+79d78
+< +[8] false+[8] false
+81c80,81
 < 
 ---
-> +[8] false
 > +[8] false
 > +[8] false
 109,110d108

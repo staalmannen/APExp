@@ -124,6 +124,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - an AI-generated GAS-compatible "as" front end to native $Oa assemblers.
 - the utilities like "cut", "ls", "true", "tsort", "xargs" and "yes" *et al.* from GNU coreutils (version 9.11)
 - extra utilities from sbase [15]
+- the "hell" replacement to GNU automake/autoconf
 - steve's mkmk (/n/sources/contrib) imported to APExp
 - a custom debug (adeb) utility based on libdwarf and plan9 /proc
 - samurai (version 1.9) for the ninja build system
