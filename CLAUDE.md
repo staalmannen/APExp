@@ -4256,6 +4256,20 @@ what the machine's `/env/timezone` holds or what `$TZ` says, and
 `cat /env/timezone; echo $TZ` answers it in one command. The line is
 a timestamp and differs between runs anyway, so it costs nothing to
 leave until something else needs that file.
+**ANSWERED, AND IT IS NOT OURS: the FILE says `CES`.**
+`/env/timezone`'s first line is literally
+**`CET 3600 CES 7200`**, followed by its transition times, and
+`$TZ` is empty -- so the chain is `$TZ` unset -> `tzone.c` falls back
+to `/env/timezone` -> the file names the summer zone `CES` -> `%Z`
+prints `CES`. **Every link is behaving correctly**, including ours:
+`Maxname` is 16 and the copy guards at 15, so a four-character `CEST`
+would fit with room to spare -- *the parser was never truncating, and
+the measurement is what turned that from a reading into a fact.*
+Nothing in APExp writes or ships timezone data either (one `git
+ls-files` hit, and it is diffutils' own test fixture), so this is the
+machine's `/adm/timezone` and a fix belongs there rather than here.
+*The probe cost one command and closed an item that three rounds of
+reading could not have.*
 
 **Smaller open items**: `strtol`/`strtoul` have the same
 one-limit-for-both-signs shape as `strtoll` had, so `strtol(LONG_MIN)`
