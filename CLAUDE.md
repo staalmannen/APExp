@@ -277,6 +277,12 @@ parser can be checked without a VM round. It found two bugs that way.
 That pattern -- link the unit under test into a host program beside the
 reference implementation -- is worth reaching for whenever the thing
 being written is a pure function of its input.
+`strftime-xcheck.c` is the newest of them and needs **two compiles**,
+like `ctype-xcheck`: the `-D` that renames libap's `strftime` out of
+glibc's way applies to the checker too if both are in one command,
+and the sweep then compares libap against itself and reports a clean
+number. *Break the unit on purpose and check that the instrument
+notices* -- that is what caught it.
 `sys/src/ape/lib/libressl/test/` is separate: it is
 upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
 
@@ -3407,14 +3413,32 @@ several because each partitions cleanly.
   `libreadline.a` (lib/readline's HISTOBJ), which `cmd/bash/mkfile`
   already links, so `history_expand` resolves with no mkfile change.
   `config-bot.h:104` makes it imply HISTORY, already defined.
-  **NOT YET MEASURED ON THE VM. Predict `run-histexpand` 287 -> near
-  0**; refuted if a large remainder survives, which would mean `!`
-  expansion reaches the shell but something under it is wrong -- a
-  different investigation, as the fourteen features were.
-  ***`mk clean` in `cmd/bash` is NOT needed any more***: the `HFILES`
-  line added this round is exactly what makes `config.h` rebuild it.
-  So this run is also the test of that fix, and **if `run-histexpand`
-  does not move, suspect the rebuild before suspecting bash.**
+  **MEASURED: 287 -> 35, and the 35 are ONE OTHER SWITCH.** Every
+  remaining line is `syntax error near unexpected token '('` on
+  `<(...)` in `histexp4.sub`, `histexp5.sub` and `histexp7.sub` --
+  **process substitution**, off deliberately because `/dev/fd` does
+  not exist. So `run-histexpand` is now accounted for end to end: 252
+  BANG_HISTORY + 35 procsub, nothing unexplained. The prediction said
+  "near 0" and a surviving remainder would mean something *under* `!`
+  was wrong; it is a second known absence instead, which is the
+  better of the two ways to be off.
+  **And `run-history` 33 -> 0: it PASSES.** That file was never read
+  and was not predicted.
+  ***AND THE `HFILES` FIX IS CONFIRMED BY THE SAME RUN***: the user
+  ran `mk install` with no `mk clean` in `cmd/bash`, and a `config.h`
+  edit reached the binary. That was the stated refutation condition --
+  "if `run-histexpand` does not move, suspect the rebuild" -- and it
+  moved.
+  **Per file, nothing else changed in substance.** 39 real -> 38,
+  46 passing -> 47. `run-shopt` 24 -> 19, `run-nquote` 18 -> 16 and
+  `run-complete` 20 -> 19 went with BANG_HISTORY; every other count is
+  identical. **`run-trap` 14 -> 16 is the one that ROSE and it is not
+  a regression**: both runs hold the same two things (JOB_CONTROL's
+  `set -m`, and xtrace lines run together without newlines), and the
+  count moved only because the `+[8] false` hunk regrouped -- two
+  concatenated trace lines in one run, three in the next. *A count
+  that rises because a diff hunk realigns is not a new failure;
+  reading the section is what separates them.*
 - **`run-builtins` 225 partitions 175 / 42 / 6 / 2**, and only the
   second is ours:
   **175 are `HELP_BUILTIN`** -- `help: command not found`,
@@ -3566,8 +3590,109 @@ IS set: `libap: heap watchdog ARMED at N MB`. No line now means not
 armed. *Same family as everything else here -- an instrument has to
 say whether it is running, or a null result has two explanations.*
 
+**THE REMAINING 38 WERE READ IN ONE COMMAND, AND SIX OF THE TEN
+BIGGEST ARE NOT BUGS AT ALL.** Taking the head of each section
+instead of one file at a time:
+- **`run-jobs` 176 -- JOB_CONTROL.** `set: -m: invalid option`,
+  `jobs/fg: command not found`. Out of reach: libap has no
+  `tcsetpgrp`/`tcgetpgrp` and Plan 9 has no foreground process group.
+  The file's own warning says so in its first line.
+- **`run-builtins` 85 -- JOB_CONTROL**, already settled (help's table
+  shifting around five absent entries).
+- **`run-glob-bracket` 103 -- ONE LINE, and not ours**: `glob-bracket:
+  shared objects not supported, cannot continue`. The whole 103 is
+  expected output absent (`0a1,103`) because the test needs a
+  LOADABLE BUILTIN. Plan 9 has no dlopen; the same wall as perl's XS
+  and `enable -f`.
+- **`run-dirstack` 53 -- `/etc` does not exist on 9front.** `pushd
+  /etc` fails and every later line of a stack test shifts. Not ours,
+  and the same shape as `/bin/p`: *a test naming a unix directory.*
+- **`run-glob-test` 63 -- `locale: command not found`** plus absent
+  `zh_TW.big5` and `en_US.UTF-8`. Part missing program, part missing
+  locale data.
+- **`run-func` 70 and `run-procsub` 35 -- process substitution**,
+  joining `run-histexpand`'s 35. **Four files and ~140 lines are one
+  switch**, and it stays off until `/dev/fd` means something here.
+- **`run-redir` 77 -- mixed, and one part IS ours**: `/etc/passwd`
+  missing (not ours), and **`Bad file number` where POSIX says `Bad
+  file descriptor`** -- `string/strerror.c:17`. One string, and it
+  shows up in `run-vredir` too.
+- **`run-printf` 86 -- FOUR causes, three of them libap's**; see
+  below. That makes it the largest genuinely ours.
+*So of the ~1500 differing lines, the share that is a bug in this
+tree is far smaller than the list's shape suggests -- and reading
+eight sections' HEADS cost one command where reading one file at a
+time had been costing a round each.*
+
+**`printf` AGAIN, AND `%F` IS THE `%td` BUG IN A SECOND PLACE.**
+`run-printf` partitions 6 / 8 / 9 / 1 / 28 (hexdump, a program this
+tree has not got):
+- **`%F` was missing from `vfprintf`'s dispatch table**, so it fell
+  through to the arm that prints the conversion character and
+  **consumes no argument** -- the value lost, and every conversion
+  after it in the same format string taking the wrong one.
+  `printf.tests` lines 320 and 325 are literally `printf "%F\n" 0`
+  and `printf "%F\n" 4`, and this tree answered `F`. *The `%td` round
+  fixed the three LENGTH MODIFIERS and did not sweep the CONVERSION
+  table beside them; `A` and `a` are still absent and nothing has
+  measured them.*
+- **`%g` with precision 0.** C99: "if the precision is zero, it is
+  taken as 1". `%+010.0g` of 123 printed `+000000123` where
+  `+00001e+02` is wanted.
+- **The `0` flag with a precision.** C99: for `d i o u x X`, a
+  specified precision makes `0` ignored -- and **a precision of ZERO
+  is specified.** The test read `precision <= 0`, conflating `%.0d`
+  with no precision at all (-1), so `%+010.0d` gave `+000000123` for
+  `      +123`. One character.
+- **Still open, one line, and deliberately a PROBE rather than a
+  guess**: `printf "%08X" 2604292517` gives `FFFFFFFF9B3A59A5` for
+  `9B3A59A5` -- a 32-bit value sign-extended to 64. bash reaches
+  printf with `%08lX` and an `unsigned long` whenever the value fits
+  (`printf.def`'s x/X arm tests `p != pp` first), and kencc's `long`
+  is 32-bit, so either libap's `va_arg` or the caller's promotion is
+  wrong and reading cannot say which. `printfmod-test` section 9
+  prints the same number through four widths and asserts nothing.
+- **Two conformance gaps noticed and NOT fixed**, because nothing
+  measured them: `_dtoa` hands back `"Infinity"` and `"NaN"`, so
+  `printf("%f", INFINITY)` prints `Infinity` where C wants `inf` --
+  which is also why `%F` does not upper-case them here, since that
+  would turn one wrong spelling into another. And `%a`/`%A` do not
+  exist.
+
+**AND `strftime` WAS MISSING FIFTEEN CONVERSIONS, WITH THE SAME
+SILENT FAILURE MODE.** Its `default:` arm writes the conversion
+character out as a literal, so `%F` printed `F`, `%r` printed `r`,
+`%T` printed `T` and `%e` printed `e`. Measured in bash's
+`printf3.sub`, whose `%(...)T` feeds its argument straight to
+strftime: `current time: %(%F %r)T` came out `current time: F r`.
+Absent: **C D e F G g h n r R s t T u V**, and `%%` worked only by
+falling through `default:`. All are POSIX.1 and C99 7.23.3.5.
+**And `%c` and `%x` were WRONG rather than missing**: POSIX fixes
+both in the C locale (`%a %b %e %H:%M:%S %Y` and `%m/%d/%y`) and this
+file had `%a %b %d ...` and `%a %b %d, %Y`. The log is what found the
+second -- `%(%x %X)T` wanted `05/30/10 15:09:15` and gave
+`Sun May 30, 2010 15:09:15`.
+**`strftime-xcheck.c` is a HOST program** on the `tz-xcheck` pattern:
+it links libap's strftime into a glibc program and sweeps 40
+conversions over every day of fourteen years -- **204960 checks, 0
+wrong**. The range is chosen so the ISO-week edges (a January date in
+last year's week 53, a December date in next year's week 1) occur
+hundreds of times rather than by luck.
+**ITS FIRST VERSION WAS VACUOUS AND THE CONTROL IS WHAT SAID SO.**
+`-Dstrftime=ap_strftime` in a single gcc command applies to the
+CHECKER as well, so its own reference call became `ap_strftime` and
+the sweep compared libap against ITSELF -- reporting `204960 checked,
+0 wrong`, which is the same sentence a real run prints. A
+deliberately broken ISO-week branch reported 0 wrong too; with two
+compiles it reports **27**, naming `%G`, `%g` and `%G-W%V-%u` on
+exactly the January dates. *Eleventh instrument fault, and the
+cheapest possible catch: break the thing on purpose and see whether
+the instrument notices.* The command is in the file and it is two
+compiles for the same reason `ctype-xcheck` is.
+
 **Smaller open items**: `unlink()` of a directory reports `EPLAN9`
-where POSIX allows EPERM or EISDIR.
+where POSIX allows EPERM or EISDIR; `strerror(EBADF)` says `Bad file
+number` where POSIX and every GNU test expect `Bad file descriptor`.
 
 **Open hazards recorded but not measured**: the lost wakeup in
 `select()`'s rendezvous (a copy process reaching EOF before the parent

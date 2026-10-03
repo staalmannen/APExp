@@ -160,6 +160,7 @@ SHORT,	0,	VLONG,	0,	LONG,	0,	0,	0,	/*  h  i  j  k  l  m  n  o */
 };
 
 static int ocvt_E(FILE *, va_list *, int, int, int);
+static int ocvt_F(FILE *, va_list *, int, int, int);
 static int ocvt_G(FILE *, va_list *, int, int, int);
 static int ocvt_X(FILE *, va_list *, int, int, int);
 static int ocvt_c(FILE *, va_list *, int, int, int);
@@ -183,7 +184,7 @@ static int(*ocvt[])(FILE *, va_list *, int, int, int) = {
 0,	0,	0,	0,	0,	0,	0,	0,	/*  (  )  *  +  ,  -  .  / */
 0,	0,	0,	0,	0,	0,	0,	0,	/*  0  1  2  3  4  5  6  7 */
 0,	0,	0,	0,	0,	0,	0,	0,	/*  8  9  :  ;  <  =  >  ? */
-0,	0,	0,	0,	0,	ocvt_E,	0,	ocvt_G,	/*  @  A  B  C  D  E  F  G */
+0,	0,	0,	0,	0,	ocvt_E,	ocvt_F,	ocvt_G,	/*  @  A  B  C  D  E  F  G */
 0,	0,	0,	0,	0,	0,	0,	0,	/*  H  I  J  K  L  M  N  O */
 0,	0,	0,	0,	0,	0,	0,	0,	/*  P  Q  R  S  T  U  V  W */
 ocvt_X,	0,	0,	0,	0,	0,	0,	0,	/*  X  Y  Z  [  \  ]  ^  _ */
@@ -498,7 +499,17 @@ ocvt_fixed(FILE *f, va_list *args, int flags, int width, int precision,
 	if(npad < 0) npad = 0;
 	nout += npad;
 	if(!(flags&LEFT)){
-		if(flags&ZPAD && precision <= 0){
+		/*
+		 * C99 7.19.6.1: "For d, i, o, u, x, and X conversions,
+		 * if a precision is specified, the 0 flag is ignored."
+		 * A precision of ZERO is specified -- the test was
+		 * `precision <= 0', which conflates `%.0d' with no
+		 * precision at all (-1). `%+010.0d' of 123 printed
+		 * `+000000123' where `      +123' is wanted, and
+		 * `%+010.0x' gave `000000007b' for `        7b':
+		 * four more lines of bash's `printf4.sub'.
+		 */
+		if(flags&ZPAD && precision < 0){
 			fputs(sign, f);
 			fputs(prefix, f);
 			while(npad){
@@ -580,6 +591,26 @@ ocvt_E(FILE *f, va_list *args, int flags, int width, int precision)
 	return ocvt_flt(f, args, flags, width, precision, 'E');
 }
 
+/*
+ * `%F' was MISSING from the dispatch table, so it fell through to the
+ * arm that prints the conversion character and CONSUMES NO ARGUMENT --
+ * the same shape as the `%td'/`%jd'/`%hhd' gap, and with the same two
+ * costs: the value is lost, and every conversion after it in the same
+ * format string takes the wrong argument.
+ *
+ * `bash''s own `printf.tests' lines 320 and 325 are literally
+ * `printf "%F\n" 0' and `printf "%F\n" 4'; this tree printed `F'.
+ *
+ * C99 7.19.6.1: F is f, except that INFINITY and NAN are spelled in
+ * capitals. `ocvt_flt' prints the string `_dtoa' hands back for those,
+ * so the uppercasing happens there.
+ */
+static int
+ocvt_F(FILE *f, va_list *args, int flags, int width, int precision)
+{
+	return ocvt_flt(f, args, flags, width, precision, 'F');
+}
+
 static int
 ocvt_G(FILE *f, va_list *args, int flags, int width, int precision)
 {
@@ -623,6 +654,16 @@ ocvt_flt(FILE *f, va_list *args, int flags, int width, int precision, char afmt)
 	fmt = afmt;
 	d = va_arg(*args, double);
 	if(precision < 0) precision = 6;
+	/*
+	 * `F' is `f' with INFINITY and NAN in capitals (C99 7.19.6.1).
+	 * The capitals are NOT applied here, and deliberately: `_dtoa'
+	 * hands back "Infinity" and "NaN", where C wants "inf" and
+	 * "nan" for the lower-case conversions in the first place, so
+	 * upper-casing those two strings would turn one non-conforming
+	 * spelling into another. That spelling is a separate open item;
+	 * see CLAUDE.md. What `F' needed was to EXIST.
+	 */
+	if(fmt == 'F') fmt = 'f';
 	switch(fmt){
 	case 'f':
 		digits = _dtoa(d, 3, precision, &exponent, &sign, &edigits);
@@ -638,6 +679,15 @@ ocvt_flt(FILE *f, va_list *args, int flags, int width, int precision, char afmt)
 		echr = 'E';
 		/* fall through */
 	case 'g':
+		/*
+		 * C99 7.19.6.1: "if the precision is zero, it is taken
+		 * as 1". Without this, `%+010.0g' of 123 took the
+		 * shortest-digits arm, came out as `f' with precision 0
+		 * and printed `+000000123' where `+00001e+02' is
+		 * wanted -- four lines of bash's `printf4.sub'.
+		 */
+		if (precision == 0)
+			precision = 1;
 		if (precision > 0)
 			digits = _dtoa(d, 2, precision, &exponent, &sign, &edigits);
 		else {
@@ -735,9 +785,12 @@ ocvt_flt(FILE *f, va_list *args, int flags, int width, int precision, char afmt)
  * from a fresh pull can run days-old library code and report a pass on
  * it. A test that calls this will not LINK against a libap predating
  * the t/j/hh fix, which is the only way to be sure what was measured.
+ *
+ * 1: the t/j/hh length modifiers.
+ * 2: `%F'; `%g' with precision 0; the 0 flag ignored for `%.0d'.
  */
 int
 _printfmark(void)
 {
-	return 1;
+	return 2;
 }
