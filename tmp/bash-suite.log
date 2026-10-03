@@ -1,5 +1,5 @@
-bash 2526: warning: process exceeds 100 file descriptors
-bash 2526: warning: process exceeds 200 file descriptors
+bash 25115: warning: process exceeds 100 file descriptors
+bash 25115: warning: process exceeds 200 file descriptors
 declare -r SHELLOPTS="braceexpand:hashall:interactive-comments"
 Testing /bin/bash
 version: 5.3.0(2)-release
@@ -704,14 +704,14 @@ ok 4
 ---
 > . .. .a .aa .b .bb
 139,140c110,111
-< make_cmd.o mksignames mksyntax mailcheck.o mksignames.o mksyntax.dSYM
-< mksyntax.dSYM mksignames.o mailcheck.o mksyntax mksignames make_cmd.o
+< mailcheck.o make_cmd.o mksignames mksignames.o mksyntax mksyntax.dSYM
+< mksyntax.dSYM mksyntax mksignames.o mksignames make_cmd.o mailcheck.o
 ---
 > mksyntax mksignames make_cmd.o mailcheck.o mksignames.o mksyntax.dSYM
 > mksyntax.dSYM mksignames.o mailcheck.o make_cmd.o mksignames mksyntax
 142,143c113,114
-< make_cmd.o mksignames mksyntax mailcheck.o mksignames.o mksyntax.dSYM
-< mksyntax.dSYM mksignames.o mailcheck.o mksyntax mksignames make_cmd.o
+< mailcheck.o make_cmd.o mksignames mksignames.o mksyntax mksyntax.dSYM
+< mksyntax.dSYM mksyntax mksignames.o mksignames make_cmd.o mailcheck.o
 ---
 > mksyntax mksignames make_cmd.o mailcheck.o mksignames.o mksyntax.dSYM
 > mksyntax.dSYM mksignames.o mailcheck.o make_cmd.o mksignames mksyntax
@@ -796,8 +796,8 @@ run-ifs
 > argv[1] = <*>
 run-ifs-posix
 run-input-test
-bash 15959: warning: process exceeds 100 file descriptors
-bash 15959: warning: process exceeds 200 file descriptors
+bash 38539: warning: process exceeds 100 file descriptors
+bash 38539: warning: process exceeds 200 file descriptors
 run-intl
 ./intl2.sub: line 16: locale: command not found
 intl2.sub: warning: you do not have the de_DE.UTF-8 locale installed;
@@ -849,7 +849,7 @@ warning: SIGHUP.  Please disregard.
 < ./jobs1.sub: line 15: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 < ./jobs1.sub: line 21: jobs: command not found
-< ./jobs1.sub: line 25: [: 16236: unary operator expected
+< ./jobs1.sub: line 25: [: 38815: unary operator expected
 < ./jobs2.sub: line 3: set: monitor: invalid option name
 < ./jobs2.sub: line 8: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
@@ -907,7 +907,7 @@ warning: SIGHUP.  Please disregard.
 < ./jobs6.sub: line 2: set: monitor: invalid option name
 < wait: usage: wait [pid ...]
 < child1 exit status 2
-< ./jobs6.sub: line 6: kill: (16306) - No such process
+< ./jobs6.sub: line 6: kill: (38879) - No such process
 < ./jobs7.sub: line 2: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 < ./jobs7.sub: line 4: jobs: command not found
@@ -1212,62 +1212,11 @@ run-posixpat
 run-posixpipe
 run-precedence
 run-printf
-133d132
-< F
-135c134,135
-< F
----
-> 0.000000
-> 0.00
-137d136
-< F
-139c138,139
-< F
----
-> 4.000000
-> 4.00
 149c149
 < FFFFFFFF9B3A59A5
 ---
 > 9B3A59A5
-283,291c283,290
-< e-May-2010 T
-< current time mismatch:1791001391|s|
-< Sun May 30, 2010 15:09:15
-< current time: F r
-< epoch time: F r -0500
-< random time: F r -0400
-< local time: Sun May e 16:09:15 EDT 2010
-< Sun May e 16:09:15 EDT 2010              date-style time
-< Sun May 30, 2010 (foo) 16:09:15          date-style time
----
-> 30-May-2010 16:09:15
-> 05/30/10 15:09:15
-> current time: 2010-05-30 04:09:15 PM
-> epoch time: 1969-12-31 07:00:00 PM -0500
-> random time: 2010-05-30 04:09:15 PM -0400
-> local time: Sun May 30 16:09:15 EDT 2010
-> Sun May 30 16:09:15 EDT 2010             date-style time
-> 05/30/10 (foo) 16:09:15                  date-style time
-308,315c307,314
-< x+000000123x
-< x+000000123x
-< x+000000123x
-< x+000000123x
-< x+000000123x
-< x+000000123x
-< x000000007bx
-< x000000007bx
----
-> x+00001e+02x
-> x+00001e+02x
-> x      +123x
-> x      +123x
-> x      +123x
-> x      +123x
-> x        7bx
-> x        7bx
-346,359c345,373
+345,358c345,373
 < ./printf6.sub: line 19: hexdump: command not found
 < ./printf6.sub: line 22: hexdump: command not found
 < ./printf6.sub: line 30: hexdump: command not found
@@ -1427,7 +1376,7 @@ warning: white space to be an error.
 > timeout 3: ok
 104,107c100
 < ./read7.sub: redirection error: cannot duplicate fd: Unknown error
-< ./read7.sub: line 60: 5174240: Unknown error
+< ./read7.sub: line 60: 5174320: Unknown error
 < 
 < ./read7.sub: line 64: /dev/tty: No such file or directory
 ---
@@ -1554,7 +1503,7 @@ run-rsh
 < ./rsh.tests: line 31: ./source.sub3: No such file or directory
 < oops 1 -- output
 < oops 2 -- append
-< Sat Oct  3 06:23:15 CES 2026
+< Sat Oct  3 09:15:24 CES 2026
 ---
 > ./rsh1.sub: line 22: /bin/sh: restricted
 > ./rsh1.sub: line 24: sh: not found
@@ -1572,7 +1521,7 @@ run-rsh
 > ./rsh.tests: line 38: /tmp/restricted: restricted: cannot redirect output
 > ./rsh.tests: line 43: command: -p: restricted
 19c19,20
-< Sat Oct  3 06:23:15 CES 2026
+< Sat Oct  3 09:15:24 CES 2026
 ---
 > ./rsh.tests: line 48: exec: restricted
 > ./rsh.tests: after exec
