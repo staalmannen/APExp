@@ -206,7 +206,8 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
 `copyfile-test.c`, `deeppath-test.c`, `bufexec-test.c`,
-`mkstemp-test.c`, `printfmod-test.c`, `umask-test.c` and
+`mkstemp-test.c`, `printfmod-test.c`, `umask-test.c`,
+`dupbuf-test.c` and
 `stdio-test.c`.
 **`ctype-xcheck.c` is a HOST program** like `tz-xcheck.c`: it links
 libap's own `_ctype[]` into a glibc program and sweeps **256 values
@@ -3940,6 +3941,100 @@ the commonest bug shape here -- and it is only legible now because
 the rest of the table stopped saying `Unknown error` by accident.
 Recorded, not fixed: `run-read`'s other 27 lines are `/dev/tty`
 (absent on Plan 9) and the `mkfifo` stub.
+
+**FIXED THE NEXT ROUND, AND IT WAS MUCH WIDER THAN THREE LOG LINES:
+`dup()` AND `dup2()` ARE EACH ONE LINE OF `fcntl(.., F_DUPFD, ..)`,
+so all three refused.** A descriptor becomes buffered the first time
+anything `select()`s it -- libap's select forks a copy process rather
+than polling -- so **any program with an event loop had lost the
+ability to dup the descriptors it was watching**, select() being how
+an event loop works and dup being how a shell redirects. *Three lines
+in one test file, and the reachable surface is most interactive
+programs.* `read7.sub` line 60 is `read -e -t .001 a <<<abcde`,
+counted rather than guessed: `-e` is readline, which select()s fd 0;
+the here-string is a redirection of fd 0, so bash saves the original
+with a dup first.
+**The arm was protecting against something real, which is why the fix
+is two lines and not a deletion.** `Muxbuf` is keyed on the descriptor
+NUMBER (`_buf.c`'s `b->fd`) and `Fdinfo` holds a `buf` POINTER beside
+the flag, so copying `fi->flags` wholesale onto a new number makes
+`_readbuf` find `b->fd != fd` and answer **EBADF on every read** -- a
+dup that succeeds and hands back something broken, which is worse
+than the refusal. **But those two bits are facts about a descriptor
+number in one process image, not about the open file** -- the
+invariant `_fdinfo.c` already states for `FD_BUFFEREDX`, and
+`sfdinit` already scrubs this exact pair on exec in exactly these two
+lines. Copied whole, pointer included; `FD_ISTTY` and `FD_ISREG` are
+facts about the FILE and carry over unchanged. *The second line is
+the one that would have been forgotten.*
+**The limit is recorded rather than hidden**: bytes the copy process
+has already drained into the Muxbuf are not visible through the new
+descriptor, so the two do not share a read position the way POSIX
+says two dups of one open file description do. There is nowhere to
+put them, a reader of the dup was *already* competing with the copy
+process (the measured keystroke-thief hazard), and the dominant use
+of dup -- a shell saving a descriptor to restore later -- never reads
+it.
+**`_dupmark()` is the marker** (sixth use of the idiom), and
+**both controls fire on the host**: replicating the old refusal gives
+**4** failures, replicating the HALF-FIX -- dup succeeds, reads give
+EBADF -- gives **exactly 1**, section 5, which the header says is
+there for it. *A control that fires on one section is better evidence
+than one that fires on four*: it says the section is not decorative.
+0 failures on glibc. NOT YET MEASURED ON THE VM.
+**And `dupbuf-test` HUNG on its first host run, in the way its own
+header had just finished describing** -- section 5 drains the pipe
+through the dup and section 6 then blocks reading the original.
+*Writing the hazard down one paragraph above the bug did not prevent
+the bug*, which is the `abort()`-allocates lesson again. Every read is
+non-blocking now, set once at pipe creation so it is true by
+construction rather than by argument, and stdout is unbuffered so a
+future hang names its section -- the kill took the buffered output
+with it and left nothing at all to read. *Twelfth instrument fault.*
+
+**AND THE REST OF THE REAL LIST WAS SURVEYED IN ONE COMMAND, by
+counting each cause across the whole corpus rather than reading
+files.** 1094 differing lines over 38 files. **The share that is a
+bug in this tree is small, and two of the four are new:**
+- **`. ` and `..` missing from a glob -- OURS, and now measured in a
+  SECOND suite.** `run-extglob` wants `. .. .a .foo` and gets
+  `.a .foo`. This is Tcl's `filename-14.9` exactly -- **Plan 9
+  directories contain neither entry** -- recorded there as wanting
+  its own round because synthesising them in `readdir()` changes
+  what every directory read in every program sees. *One measurement
+  made it a deferred curiosity; a second, independent one makes it
+  the biggest thing here that is ours.*
+- **`[=x=]` and `[.x.]` answer `Unknown collating element`**, 9 lines
+  in `run-cond`. `ap/regex/regcomp.c` is musl's TRE and the line is
+  **musl's own** -- `/* collating symbols and equivalence classes are
+  not supported */` -- so this is a vendored gap, not an APExp
+  regression. **But the C-locale answer is mechanical**: every
+  equivalence class is a singleton there, so `[[=d=]]` IS `[d]`.
+  Accepting the single-character form and keeping `REG_ECOLLATE` for
+  multi-character ones is conformance rather than invention, and
+  small.
+- **`set -r` -- `RESTRICTED_SHELL`, the same switch shape a sixth
+  time.** `run-rsh` 33. Inert unless invoked as `rbash` or with `-r`,
+  so unlike `BANG_HISTORY` it costs nothing to turn on.
+- **`recho: command not found`, 9 lines, identical in both runs.**
+  `bash-runtests` guarantees the four helpers are built, and most
+  files find them -- `run-assoc`, `run-ifs` and `run-new-exp` do not.
+  A precondition question about the harness, like the `../bash`
+  check, and stable rather than flaky.
+**NOT ours, with the arithmetic**: `JOB_CONTROL` **148** lines (no
+`tcsetpgrp`/`tcgetpgrp`, no foreground process group), process
+substitution (`/dev/fd` absent and `/fd` has the wrong semantics for
+a child), `hexdump` 14 and `locale` 1 (programs this tree has not
+got), `/etc` 17, `glob-bracket` 103 (loadable builtin, no dlopen),
+`/bin/p` 3 (a name collision), `run-glob-test` 63 (whole-second
+mtimes, and unstable by construction).
+**One I nearly filed as a bug and did not**: `link()` returns
+**EMLINK**, which reads like the stub-answering-the-wrong-thing
+family -- but `sys/limits.h` declares **`LINK_MAX 1`**, and POSIX
+says EMLINK is exactly what a link past LINK_MAX gives. *It is
+internally consistent and the file's own comment says so.* Checking
+the constant before writing the entry is what separated it from
+`mkfifo`'s `errno = 0`.
 
 **One PROBE, not a claim**: `run-rsh`'s `date` line prints the zone
 as **`CES`**, and Central European Summer Time is `CEST`. It is not
