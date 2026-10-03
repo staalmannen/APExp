@@ -3908,6 +3908,38 @@ and `mkfifo` were not and did not. *That is the rule already in this
 file -- a libap fix can sit unused for rounds -- showing up as two
 lines rather than as a silence*, and `mk distclean` before the next
 `mk install` is what would finish it.
+**IT DID, AND THE WHOLE REBUILD MOVED NOTHING ELSE.** After a full
+`mk distclean` plus `mk install`, both lines read
+`Function not implemented` -- glibc's ENOSYS wording, from the new
+table -- at the same two line numbers in the same two sections.
+*The prediction named the exact two lines and the exact two files,
+and nothing else in 1601 lines changed*, which is as clean a
+confirmation of the static-linking reading as this corpus can give.
+**And that is the more valuable half of the run.** `REAL 38 /
+WARNONLY 1 / PASS 47` are identical to the previous run, and the
+per-file diff is **one line** -- `run-trap` 14 -> 16, the xtrace hunk
+that regroups between identical runs and has already gone back and
+forth twice. So the first relink of the ENTIRE tree since
+`ctype`/`getcwd`/`umask`/`mktemp`/`printf`/`strftime`/`strtoull`/
+`strtoumax`/`strerror` **broke nothing anywhere in bash's suite**.
+*A green run after a distclean is the only control that covers
+programs no test names*, and until now every one of those fixes had
+only ever been measured through a binary that happened to be
+rebuilt. The errno sweep closes with it: `Access denied`,
+`Bad file number`, `Too big`, `Try again`, `No buffers` and
+`Shut down` are **0 in the corpus**, `Operation not permitted` holds
+at 4.
+**And it left one new item, which is the EGREG arm becoming
+visible.** `run-read`'s `read7.sub` prints
+`redirection error: cannot duplicate fd: Unknown error`, and the
+next line is `line 60: 5174752: Unknown error` -- a garbage fd number
+downstream of the failed dup. `Unknown error` is the table's text for
+**EGREG**, which `fcntl.c`'s `F_DUPFD` sets for a buffered
+descriptor. *An errno naming the wrong category, printed to a user* --
+the commonest bug shape here -- and it is only legible now because
+the rest of the table stopped saying `Unknown error` by accident.
+Recorded, not fixed: `run-read`'s other 27 lines are `/dev/tty`
+(absent on Plan 9) and the `mkfifo` stub.
 
 **One PROBE, not a claim**: `run-rsh`'s `date` line prints the zone
 as **`CES`**, and Central European Summer Time is `CEST`. It is not
