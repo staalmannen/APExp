@@ -289,6 +289,13 @@ function that nothing in its include closure declares -- the missing
 prototype invariant in its RETURN-value form. Run it after adding
 files to libap; its limits are in its own header and it is a lower
 bound.
+**`strerror-xcheck.py` is the second host SWEEP**, and it is a
+script for a reason the other xchecks do not have: **APE's errno
+NUMBERS are its own**, so libap's table and glibc's cannot be lined
+up by index at all -- only by NAME. It parses `errno.h` and
+`strerror.c`, asks glibc for each name, and reports every
+disagreement. Re-run it after touching either file; one inserted row
+shifts every entry after it and nothing else would say so.
 `strtoint-xcheck.c` is the same idea for `strtoll` and `strtoull`,
 and needs THREE compiles: libap's prototypes take `char *` where
 glibc's take `const char *`, so even a `-D` rename collides with the
@@ -3653,8 +3660,9 @@ instead of one file at a time:
   switch**, and it stays off until `/dev/fd` means something here.
 - **`run-redir` 77 -- mixed, and one part IS ours**: `/etc/passwd`
   missing (not ours), and **`Bad file number` where POSIX says `Bad
-  file descriptor`** -- `string/strerror.c:17`. One string, and it
-  shows up in `run-vredir` too.
+  file descriptor`** -- `string/strerror.c`. It shows up in
+  `run-vredir` too. **It was NOT one string: 40 of the 76 were
+  wrong** -- see the strerror entry below.
 - **`run-printf` 86 -- FOUR causes, three of them libap's**; see
   below. That makes it the largest genuinely ours.
 *So of the ~1500 differing lines, the share that is a bug in this
@@ -3835,6 +3843,52 @@ whose include path is not the BUILD's include path is measuring a
 different program.* It is a lower bound by construction and says so in
 its own header, like the all-char struct sweep.
 
+**`strerror` WAS WRONG IN 40 OF 76 ENTRIES, AND TWO OF THEM NAMED
+THE WRONG ERROR.** `run-redir`'s `Bad file number` was the way in,
+and reading that one entry would have fixed that one entry. Asking
+the WHOLE table against glibc found 40.
+**The pair that matters is EACCES and EPERM.** The table said
+`EACCES "Access denied"` and `EPERM "Permission denied"` -- and
+`Permission denied` is what every other system prints for **EACCES**.
+So the one message a reader is most likely to recognise named the
+wrong errno: a program failing with EPERM reported EACCES's text, and
+anything matching on it -- a test, a log, a person -- drew the
+opposite conclusion. *A wrong message is a bug in one line; a message
+that is another error's correct message is a bug in the reader.* This
+tree already spent a round on `_errno.c` mapping Plan 9's "permission
+denied" to EPERM where POSIX wants EACCES, and the two errors have
+now been confused at both ends of the same path.
+The other 38 were merely terse -- `Too big`, `Try again`,
+`No buffers`, `Shut down`. **Nothing in POSIX fixes the wording**, so
+this is not conformance: it is that the tree exists to run GNU
+software, whose suites compare against the text glibc produces.
+`EDOM`/`ERANGE` are 1000 and 1001, outside the table, spelled in
+`strerror()`'s own arms -- they had the same defect and are fixed
+with it.
+**Generated rather than transcribed**, which is the part worth
+keeping: the mapping came from parsing `errno.h` for the names and
+asking glibc for each one, so no entry was typed and none can be off
+by a row. **Every line now carries its name**, because a table
+indexed by errno with unnamed rows is exactly how an entry drifts.
+**`strerror-xcheck.py` is the instrument and is checked in.** It
+cannot be a C cross-check like the others, and the reason is the
+whole difficulty: **APE's errno NUMBERS are its own** -- EBADF is 4
+here and 9 on glibc -- so comparing by index would be nonsense
+dressed as a measurement, and only the NAMES line up. **Both controls
+fire**: reverting one word reports 1 and names `EBADF`; inserting one
+row reports **68**, which is the drift case it exists to catch.
+`EGREG` is reported UNCHECKABLE rather than passed over -- it is
+APE's own (`_errno.c` maps Plan 9's "ken has left the building" to
+it), glibc has no such error, and its text is left alone. It reads
+`Unknown error`, which is also what the fallback returns for an errno
+out of range, so the two are indistinguishable from outside.
+*Recorded rather than changed: a new wording would be invented and
+nothing has measured it.*
+**NOT YET MEASURED ON THE VM. Predict `run-redir` 77 -> ~70 and
+`run-vredir` 11 -> ~9**, with nothing else moving. Refuted if some
+other file changes -- which would mean a test was matching on the old
+text, and that is worth knowing rather than assuming.
+
 **One PROBE, not a claim**: `run-rsh`'s `date` line prints the zone
 as **`CES`**, and Central European Summer Time is `CEST`. It is not
 a parser truncation -- `tzone.c`'s `Maxname` is 16 -- so it is either
@@ -3847,8 +3901,8 @@ leave until something else needs that file.
 one-limit-for-both-signs shape as `strtoll` had, so `strtol(LONG_MIN)`
 is likely ERANGE too -- unmeasurable by cross-check for the reason
 above, and untouched for that reason. `unlink()` of a directory reports `EPLAN9`
-where POSIX allows EPERM or EISDIR; `strerror(EBADF)` says `Bad file
-number` where POSIX and every GNU test expect `Bad file descriptor`.
+where POSIX allows EPERM or EISDIR. *(The `strerror(EBADF)` item is
+CLOSED -- it was 40 entries, not one; see above.)*
 
 **Open hazards recorded but not measured**: the lost wakeup in
 `select()`'s rendezvous (a copy process reaching EOF before the parent
