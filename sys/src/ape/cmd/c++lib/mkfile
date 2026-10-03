@@ -31,26 +31,37 @@ CXXINCL=/sys/include/ape/c++
 CC=pcc
 CFLAGS= -c -FV -I$CXXSOURCE/complex/complex -I$CXXSOURCE/stream
 
+# **`-o $target', NOT `> $target', AND THAT IS THE WHOLE POINT OF THIS
+# BLOCK.** With a redirection the shell CREATES the target before c++
+# runs, so a cfront that writes nothing to stdout leaves a zero-byte .c
+# behind and mk goes on to compile it. Forty empty translation units
+# make a libc++.a with no symbols in it, and the build reports success:
+# *a check that cannot fail.* That is exactly the state this directory
+# was committed in. The driver's -F arm only `cp's its output once
+# cfront has returned, so with -o a failure leaves no target at all and
+# mk stops where the fault is.
+#
+# The driver carries the other half: `c++' now REFUSES an empty cfront
+# result, because cfront cannot produce one -- measured on the host, it
+# answers a zero-byte input with 409 bytes and exit 0. So nothing empty
+# can reach this directory silently any more.
+
 %.c: $CXXSOURCE/complex/complex/%.cpp
-	c++ -F -I$CXXINCL -I$CXXSOURCE/complex/complex $prereq > $target
+	c++ -F -I$CXXINCL -I$CXXSOURCE/complex/complex -o $target $prereq
 
 %.c: $CXXSOURCE/generic/%.cpp
-	c++ -F -I$CXXINCL $prereq > $target
+	c++ -F -I$CXXINCL -o $target $prereq
 
 %.c: $CXXSOURCE/new/%.cpp
-	c++ -F -I$CXXINCL $prereq > $target
+	c++ -F -I$CXXINCL -o $target $prereq
 
 %.c: $CXXSOURCE/static/%.cpp
-	c++ -F -I$CXXINCL $prereq > $target
+	c++ -F -I$CXXINCL -o $target $prereq
 
 %.c: $CXXSOURCE/stream/%.cpp
-	c++ -F -I$CXXINCL -I$CXXSOURCE/stream $prereq > $target
+	c++ -F -I$CXXINCL -I$CXXSOURCE/stream -o $target $prereq
 
 %.c: $CXXSOURCE/string/%.cpp
-	c++ -F -I$CXXINCL $prereq > $target
-
-
+	c++ -F -I$CXXINCL -o $target $prereq
 
 CLEANFILES= "*.c"
-
-

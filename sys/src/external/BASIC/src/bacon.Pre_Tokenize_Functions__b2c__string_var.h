@@ -95,7 +95,7 @@ long)( BLOAD(g_SOURCEFILE__b2c__string_var));
 #define __b2c__MEMTYPE unsigned char
 #line 6005 "bacon.bac"
 out = fopen((const char*)SRCARRAYFILE__b2c__string_var, "w");
-if(out == NULL){ ERROR = 2; RUNTIMEERROR("OPEN FOR WRITING", 6005, "../bacon.bac", ERROR, __B2C__PROGRAM__EXIT); }
+if(out == NULL){ ERROR = 2; RUNTIMEERROR("OPEN FOR WRITING", 6005, "bacon.bac", ERROR, __B2C__PROGRAM__EXIT); }
 #line 6006 "bacon.bac"
 __b2c__assign = (char*)"char SOURCE"; if(__b2c__assign != NULL) { fputs(__b2c__assign, out); }
 __b2c__assign = (char*) g_STRINGSIGN__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, out); }
@@ -122,7 +122,7 @@ fputs("\n", out);
 fclose(out);
 #line 6013 "bacon.bac"
 if(!__b2c__memory__check((char *)mem, sizeof(__b2c__MEMTYPE)))
-{ ERROR=1; RUNTIMEERROR("FREE", 6013, "../bacon.bac", ERROR, __B2C__PROGRAM__EXIT); } free((void*)mem);
+{ ERROR=1; RUNTIMEERROR("FREE", 6013, "bacon.bac", ERROR, __B2C__PROGRAM__EXIT); } free((void*)mem);
 #line 6014 "bacon.bac"
 }
 #line 6015 "bacon.bac"

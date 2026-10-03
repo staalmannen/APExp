@@ -1,2 +1,2 @@
-char *b2c_stringarray[] = {
-"" };
+char *__b2c__stringarray[] = {
+ "" };

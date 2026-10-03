@@ -38,3 +38,10 @@ sys/src/cmd2/vts/test/bin/
 
 # Claude Code harness artifacts
 .claude/
+
+# cfront output. `cmd/c++lib/mkfile' generates every .c from the matching
+# .cpp under external/cfront-C4/lib, and its own CLEANFILES says "*.c".
+# All 40 were once COMMITTED AT ZERO BYTES, so a fresh checkout compiled
+# 40 empty translation units into libc++.a and the build reported success
+# -- a check that cannot fail.
+sys/src/ape/cmd/c++lib/*.c

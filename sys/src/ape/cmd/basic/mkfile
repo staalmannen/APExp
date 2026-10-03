@@ -2,14 +2,113 @@ APEXPROOT=../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-LIB=$APEXPROOT/$objtype/lib/ape/liblua.a
 BASICSRC=../../../external/BASIC/src
 
-TARG=bacon 
+TARG=bacon
 
 BIN=$APEXPROOT/$objtype/bin/ape
 
 OFILES= bacon.bac.$O
+
+# **NO `LIB=' LINE, AND ITS ABSENCE IS THE FIX.** This mkfile used to
+# carry `LIB=$APEXPROOT/$objtype/lib/ape/liblua.a', copied from
+# cmd/lua. In `mkone' $LIB is a PREREQUISITE of $O.out and is handed
+# to $LD with the rest of $prereq -- so bacon was linked against Lua's
+# archive and could not be built at all until lua had been. bacon
+# needs nothing but libap, which pcc links by itself.
+
+# **$BASICSRC/*.h ARE GENERATED, AND ALL OF THEM BELONG HERE.**
+# `bacon.bac.c' includes `bacon.bac.h', which includes the other 78 --
+# one per BaCon FUNCTION/SUB -- so a regeneration changes files that
+# appear nowhere in OFILES. Nothing in these mkfiles lists a header as
+# a dependency unless HFILES does (see CLAUDE.md: *a header not in
+# HFILES is a header mk does not rebuild for*, which cost three rounds
+# on tclBinary.c and bash's config.h). They are listed out rather than
+# globbed because mk fails outright on an HFILES naming a file that is
+# not there, and a literal list says exactly which generation this
+# tree expects.
+HFILES=\
+	$BASICSRC/bacon.Assign_To_Number.h \
+	$BASICSRC/bacon.Assign_To_String.h \
+	$BASICSRC/bacon.Assoc_Array.h \
+	$BASICSRC/bacon.Binary_Tree.h \
+	$BASICSRC/bacon.Check_String_Type.h \
+	$BASICSRC/bacon.Debug_Vars.h \
+	$BASICSRC/bacon.Download_File.h \
+	$BASICSRC/bacon.Editor_Handle_Input.h \
+	$BASICSRC/bacon.Editor_Print_Line.h \
+	$BASICSRC/bacon.Editor_Print_Text.h \
+	$BASICSRC/bacon.Editor_Restore_Normal.h \
+	$BASICSRC/bacon.Editor_Show_Help.h \
+	$BASICSRC/bacon.Get_Var__b2c__string_var.h \
+	$BASICSRC/bacon.Handle_Alias.h \
+	$BASICSRC/bacon.Handle_Call.h \
+	$BASICSRC/bacon.Handle_Collect.h \
+	$BASICSRC/bacon.Handle_Color.h \
+	$BASICSRC/bacon.Handle_Const.h \
+	$BASICSRC/bacon.Handle_Copy.h \
+	$BASICSRC/bacon.Handle_Data.h \
+	$BASICSRC/bacon.Handle_Declare.h \
+	$BASICSRC/bacon.Handle_Deffn.h \
+	$BASICSRC/bacon.Handle_Endfunction.h \
+	$BASICSRC/bacon.Handle_Endsub.h \
+	$BASICSRC/bacon.Handle_For.h \
+	$BASICSRC/bacon.Handle_Getbyte.h \
+	$BASICSRC/bacon.Handle_Getfile.h \
+	$BASICSRC/bacon.Handle_Getline.h \
+	$BASICSRC/bacon.Handle_Gotoxy.h \
+	$BASICSRC/bacon.Handle_Import.h \
+	$BASICSRC/bacon.Handle_Input.h \
+	$BASICSRC/bacon.Handle_Join.h \
+	$BASICSRC/bacon.Handle_Let.h \
+	$BASICSRC/bacon.Handle_Local.h \
+	$BASICSRC/bacon.Handle_Lookup.h \
+	$BASICSRC/bacon.Handle_Map.h \
+	$BASICSRC/bacon.Handle_Open.h \
+	$BASICSRC/bacon.Handle_Parse.h \
+	$BASICSRC/bacon.Handle_Print.h \
+	$BASICSRC/bacon.Handle_Pull.h \
+	$BASICSRC/bacon.Handle_Push.h \
+	$BASICSRC/bacon.Handle_Putbyte.h \
+	$BASICSRC/bacon.Handle_Putline.h \
+	$BASICSRC/bacon.Handle_Read.h \
+	$BASICSRC/bacon.Handle_Readln.h \
+	$BASICSRC/bacon.Handle_Receive.h \
+	$BASICSRC/bacon.Handle_Redim.h \
+	$BASICSRC/bacon.Handle_Relate.h \
+	$BASICSRC/bacon.Handle_Rename.h \
+	$BASICSRC/bacon.Handle_Return.h \
+	$BASICSRC/bacon.Handle_Run.h \
+	$BASICSRC/bacon.Handle_Save.h \
+	$BASICSRC/bacon.Handle_Seek.h \
+	$BASICSRC/bacon.Handle_Send.h \
+	$BASICSRC/bacon.Handle_Setserial.h \
+	$BASICSRC/bacon.Handle_Sort.h \
+	$BASICSRC/bacon.Handle_Split.h \
+	$BASICSRC/bacon.Handle_SubFunc.h \
+	$BASICSRC/bacon.Handle_Swap.h \
+	$BASICSRC/bacon.Handle_Tree.h \
+	$BASICSRC/bacon.Handle_Type.h \
+	$BASICSRC/bacon.Handle_While.h \
+	$BASICSRC/bacon.Handle_Writeln.h \
+	$BASICSRC/bacon.Mini_Parser__b2c__string_var.h \
+	$BASICSRC/bacon.Normal_Dyn_Array.h \
+	$BASICSRC/bacon.Parse_Equation__b2c__string_var.h \
+	$BASICSRC/bacon.Parse_Line.h \
+	$BASICSRC/bacon.Pre_Tokenize_Functions__b2c__string_var.h \
+	$BASICSRC/bacon.Print_Element.h \
+	$BASICSRC/bacon.Register_Numeric.h \
+	$BASICSRC/bacon.Register_Pointer.h \
+	$BASICSRC/bacon.Relate_Recurse.h \
+	$BASICSRC/bacon.Save_Func_Var.h \
+	$BASICSRC/bacon.Save_Main_Var.h \
+	$BASICSRC/bacon.Tokenize.h \
+	$BASICSRC/bacon.bac.float.h \
+	$BASICSRC/bacon.bac.functions.h \
+	$BASICSRC/bacon.bac.generic.h \
+	$BASICSRC/bacon.bac.h \
+	$BASICSRC/bacon.bac.string.h \
+	$BASICSRC/bacon.guiGenerate.h
 
 <$APEXPROOT/sys/src/cmd/mkone
 
@@ -18,7 +117,4 @@ LD=pcc
 CFLAGS= -c -I. -I$BASICSRC
 
 %.$O: $BASICSRC/%.c
-    $CC $CFLAGS $BASICSRC/$stem.c
-
-
-
+	$CC $CFLAGS $BASICSRC/$stem.c

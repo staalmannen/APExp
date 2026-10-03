@@ -181,6 +181,26 @@ fn cleanup { rm -rf $tmpdir }
 fn sigint  { cleanup; exit interrupted }
 fn sighup  { cleanup; exit hangup }
 
+# `stages' reports the BYTE COUNT each stage produced, because the
+# pipeline has three of them and "the output is empty" says nothing
+# about which one went quiet. Preprocessing, ns_strip and cfront fail
+# in completely different ways and need completely different fixes;
+# without this, telling them apart costs a round each.
+#
+# It reads $pp/$ns/$cf, which the loop sets. A missing file prints
+# `-' rather than an error: not reaching a stage is itself the answer.
+fn stages {
+	ppn = '-'
+	nsn = '-'
+	cfn = '-'
+	if(test -f $pp) ppn = `{wc -c < $pp}
+	if(test -f $ns) nsn = `{wc -c < $ns}
+	if(test -f $cf) cfn = `{wc -c < $cf}
+	# separate arguments, never `^': a cross product with an empty list
+	# is the EMPTY LIST, so one unset count would silence the whole line.
+	echo 'c++:' $1 'bytes: cpp' $ppn ' ns_strip' $nsn ' cfront' $cfn >/fd/2
+}
+
 # ---- compile each C++ source file ----
 compiled_objects = ()
 
@@ -193,12 +213,20 @@ for(src in $sources) {
 	cf   = $tmpdir/$base.cf.c     # after cfront (generated C)
 
 	# determine .o path: next to source unless -c -o was given
-	if(~ $cflag '' && ~ $fflag '') {
-		# linking: object goes to tmpdir
-		obj = $tmpdir/$base.o
-	}
-	if not {
-		# -c mode: object goes next to source (or to -o if given and single file)
+	#
+	# **-F MUST NEVER REACH THE `obj = $outfile' ARM.** In -F mode
+	# $outfile names the generated .c the caller wants; letting it
+	# become the object path means a later `pcc -c ... -o $outfile'
+	# OVERWRITES the C with an object file. It could not happen while
+	# the -F arm below ended in `continue', because that `continue'
+	# was never reached -- see the note there. Both halves are fixed.
+	# Default: out of the way in $tmpdir. That covers -F (nothing is
+	# compiled at all) and the link case (the object is an intermediate).
+	# Only `-c' WITHOUT -F puts an object beside the source or at -o.
+	# Written as one guarded assignment rather than a chain of `if not',
+	# whose binding to the preceding `if' is not worth relying on.
+	obj = $tmpdir/$base.o
+	if(~ $fflag '' && ! ~ $cflag '') {
 		obj = $base.o
 		if(! ~ $outfile '' && ~ $#sources 1 && ~ $#cfiles 0)
 			obj = $outfile
@@ -225,25 +253,52 @@ for(src in $sources) {
 	# 3. cfront: C++ → C
 	if(! ~ $vflag '') echo $CFRONT +a1 +f$src >/fd/2
 	$CFRONT +a1 +f$src < $ns > $cf
-	if(! ~ $status '') { cleanup; exit $status }
+	if(! ~ $status '') { stages $src; cleanup; exit $status }
 
-	# -F mode: emit C to stdout (or -o file) and stop
-	if(! ~ $fflag '') {
-		if(~ $outfile '') {
-			cat $cf
-		}
-		if not {
-			cp $cf $outfile
-		}
-		continue   # next source file
+	# **AN EMPTY $cf IS A FAILURE, AND cfront CANNOT PRODUCE ONE.**
+	# Measured on the host: cfront fed a ZERO-BYTE input still exits 0
+	# and writes 409 bytes -- its version stamp, the __mptr typedef and
+	# the __ptbl_vec declaration. Fed a TRUNCATED input it exits non-zero
+	# and writes partial output. *So there is no input for which cfront
+	# both succeeds and emits nothing*, and an empty result here means
+	# cfront did not run at all rather than that it had nothing to say.
+	#
+	# This is why it mattered: cmd/c++lib's rules used `> $target', and a
+	# shell redirection creates the file whatever the command does. Forty
+	# zero-byte .c files were committed, forty empty translation units
+	# compiled, and libc++.a built clean with no symbols in it -- a check
+	# that cannot fail. Saying so here is what turns that into a stop.
+	if(! test -s $cf) {
+		echo 'c++: cfront produced NO OUTPUT for '$src >/fd/2
+		echo 'c++: (it exits 0 with 409 bytes even on empty input, so' >/fd/2
+		echo 'c++:  this means it did not run) -- CFRONT is' $CFRONT >/fd/2
+		stages $src
+		cleanup
+		exit cfrontempty
 	}
 
-	# 4. Compile generated C
-	if(! ~ $vflag '') echo $CC -c -I$CINCL $iflags $ccopts $cf -o $obj >/fd/2
-	$CC -c -I$CINCL $iflags $ccopts $cf -o $obj
-	if(! ~ $status '') { cleanup; exit $status }
+	# -F mode: emit C to stdout (or -o file). The rest of the loop body
+	# is skipped by being INSIDE the else arm rather than by `continue':
+	# **rc has no `continue', any more than it has `break'.** The word
+	# was being looked up as an external command, not found, and
+	# execution fell straight through into step 4 below -- so every
+	# `c++ -F' has also been running the C compiler over its own output.
+	# *A flag, or nesting, is how to leave an rc loop.*
+	if(! ~ $fflag '') {
+		if(~ $outfile '')
+			cat $cf
+		if not
+			cp $cf $outfile
+		if(! ~ $vflag '') stages $src
+	}
+	if not {
+		# 4. Compile generated C
+		if(! ~ $vflag '') echo $CC -c -I$CINCL $iflags $ccopts $cf -o $obj >/fd/2
+		$CC -c -I$CINCL $iflags $ccopts $cf -o $obj
+		if(! ~ $status '') { stages $src; cleanup; exit $status }
 
-	compiled_objects = ($compiled_objects $obj)
+		compiled_objects = ($compiled_objects $obj)
+	}
 }
 
 # -F mode done
