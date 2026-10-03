@@ -303,6 +303,18 @@ glibc's take `const char *`, so even a `-D` rename collides with the
 header -- it renames the SOURCE with `sed` into a temporary instead.
 `strtol`/`strtoul` cannot be swept at all here, because kencc's
 `long` is 32-bit and the host's is 64.
+`regcoll-xcheck.c` links libap's `regcomp`/`regexec`/`tre-mem` into a
+glibc program and sweeps collating symbols and equivalence classes
+against glibc's engine. It needs TWO compiles **and a staged
+`regex.h`**: the two libraries disagree about `regex_t`'s layout *and*
+about the REG_* numbers, so one translation unit cannot hold both --
+a SHIM half is built with APE's header and answers in `int` and
+`const char *`. Errors are compared by NAME, as `strerror-xcheck`
+does and for the same reason. `regerror.c` is left out (it pulls
+Plan 9's `u.h`), which is why the shim names the codes itself.
+Its **section 3 is a control of the instrument**, not of the library:
+ordinary brackets with no collation in them, which must stay at 0
+when the collation code changes.
 `sys/src/ape/lib/libressl/test/` is separate: it is
 upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
 
@@ -4013,9 +4025,55 @@ bug in this tree is small, and two of the four are new:**
   Accepting the single-character form and keeping `REG_ECOLLATE` for
   multi-character ones is conformance rather than invention, and
   small.
+  **DONE, and the justification is sharper than "the C locale" alone:
+  there is no collation table anywhere in TRE** -- the engine compares
+  encoded values, as its own `XXX - Should use collation order instead
+  of encoding values` comment says -- so the C locale is what every
+  comparison already implements and no second reading is available.
+  A collating symbol naming one character IS that character in any
+  locale; a multi-character element still answers ECOLLATE, because
+  this locale has none to name. `parse_collating()` is a helper rather
+  than inline code because the construct is legal as a RANGE ENDPOINT
+  too, and the two call sites would otherwise disagree about what a
+  bracket may hold.
+  **THE CROSS-CHECK CORRECTED THE FIX TWICE, and reading alone would
+  have shipped both** -- each agreed with glibc everywhere else:
+  - **`[[=d=]-z]` was accepted and glibc answers `REG_ERANGE`.** An
+    equivalence class names a SET and so has no position in the
+    order; a collating symbol names one element and can bound a
+    range. The helper now reports which it parsed, and both call
+    sites refuse the equivalence class. *The corpus asks all four
+    combinations -- each construct on each side -- for the reason
+    `$@` was asked beside `$*`.*
+  - **`[[.d]]` answered ECOLLATE where glibc says `REG_EBRACK`.** An
+    unterminated `[.` is an unclosed bracket expression; only a
+    TERMINATED one naming something unsupported is ECOLLATE. The
+    helper scans for the closing delimiter FIRST so the two stay
+    distinguishable.
+  **`regcoll-xcheck.c`: 1906 checks, 0 wrong; the old blanket refusal
+  replicated beside it gives 1652** -- and its section 3 (ordinary
+  brackets, no collation) stays at **0 in both runs**, which is the
+  half that matters, since a control that moved with the collation
+  code would not be a control at all. NOT YET MEASURED ON THE VM.
 - **`set -r` -- `RESTRICTED_SHELL`, the same switch shape a sixth
   time.** `run-rsh` 33. Inert unless invoked as `rbash` or with `-r`,
   so unlike `BANG_HISTORY` it costs nothing to turn on.
+  **TURNED ON, gcc-swept, NOT YET MEASURED ON THE VM.** Nothing was
+  missing from the build, as with READLINE, HELP_BUILTIN and
+  BANG_HISTORY before it: the switch gates 55 sites across eight `.c`
+  files and nine `.def` files, every one already in OFILES or
+  DEFFILES, so no mkfile change. **0 errors** in the class 6c treats
+  as fatal, across the six `.c` files and the nine generated
+  builtins. **And the control is the preprocessed line count, not the
+  error count** -- `shell.c` **+93**, `flags.c` +20, `variables.c`
+  +29, `execute_cmd.c` +24, `builtins/common.c` +10, `redir.c` +8 --
+  because 0 errors with the switch off is the same number and says
+  nothing. The real `config.h` is swapped in place to get that:
+  *`-I` cannot override `config.h` for bash's own sources*, which is
+  already recorded here and is still true.
+  **`builtext.h` had to be generated first** or `execute_cmd.c` and
+  `variables.c` report a fatal missing-header "error" and the sweep
+  reads as two real failures. Same harness artefact as last time.
 - **`recho: command not found`, 9 lines, identical in both runs.**
   `bash-runtests` guarantees the four helpers are built, and most
   files find them -- `run-assoc`, `run-ifs` and `run-new-exp` do not.

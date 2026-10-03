@@ -528,13 +528,89 @@ coll_single is a single char collating element but it can be
  '^' anywhere except after the openning '['
 */
 
+/*
+ * COLLATING SYMBOLS `[.X.]' AND EQUIVALENCE CLASSES `[=X=]'.
+ *
+ * Upstream musl returns REG_ECOLLATE for both, unconditionally, under
+ * the comment "collating symbols and equivalence classes are not
+ * supported". That is honest for a general locale and needlessly strict
+ * for the only locale this regex engine actually has.
+ *
+ * **There is no collation data here at all** -- TRE compares encoded
+ * values, as the `XXX - Should use collation order instead of encoding
+ * values in character ranges' comment below says -- so the C locale is
+ * what every comparison already implements. And in the C locale POSIX
+ * fixes the answer: every equivalence class is a SINGLETON, so `[[=d=]]'
+ * is exactly `[d]'. A collating symbol naming one character IS that
+ * character in any locale. *Neither is an invention; both are the only
+ * reading available to an engine with no collation table.*
+ *
+ * A MULTI-character element (`[.ch.]', `[=ch=]') still answers
+ * REG_ECOLLATE, which is correct rather than a shortcut: this locale
+ * has no such collating elements, so there is nothing to name.
+ *
+ * Returns the bytes consumed (> 0), 0 if `s' is not one of these
+ * constructs at all, or the NEGATED reg_errcode_t to fail with. It is a
+ * helper rather than inline code because a collating symbol is legal as
+ * a RANGE ENDPOINT too (`[[.a.]-z]', `[a-[.z.]]'), and the two call
+ * sites below would otherwise disagree about what a bracket may hold.
+ *
+ * `*iseq' says which of the two was parsed, and the caller needs it:
+ * **an equivalence class may not be a range endpoint** and glibc
+ * answers REG_ERANGE for `[[=d=]-z]'. A collating symbol names one
+ * element and so has a position in the order; an equivalence class
+ * names a SET and has none. The cross-check caught this -- my first
+ * version accepted it and agreed with glibc everywhere else.
+ *
+ * Two different errors for two different malformations, also measured
+ * rather than chosen: an unterminated `[.' is REG_EBRACK (the bracket
+ * expression never closes), while a terminated one whose content is
+ * not a single character is REG_ECOLLATE (it closes, and names a
+ * collating element this locale does not have). glibc makes exactly
+ * that distinction -- `[[.d]]' EBRACK, `[[.ch.]]' ECOLLATE -- and
+ * returning ECOLLATE for both is what the first version did.
+ *
+ * Found in bash's suite: `cond-regexp2.sub' lines 54-59 feed `[[=d=]]'
+ * to `[[ =~ ]]' and got `invalid regular expression ... Unknown
+ * collating element', nine differing lines.
+ */
+static int
+parse_collating(const char *s, wchar_t *wc, int *iseq)
+{
+	char delim;
+	const char *p, *q;
+	int len;
+
+	if (s[0] != '[' || (s[1] != '.' && s[1] != '='))
+		return 0;
+	delim = s[1];
+	*iseq = delim == '=';
+	p = s + 2;
+
+	/*
+	 * Find the closing `delim]' first, so that "never closed" and
+	 * "closed around something unsupported" stay distinguishable.
+	 */
+	for (q = p; ; q++) {
+		if (!*q)
+			return -REG_EBRACK;
+		if (*q == delim && q[1] == ']')
+			break;
+	}
+
+	len = mbtowc(wc, p, -1);
+	if (len <= 0 || p + len != q)
+		return -REG_ECOLLATE;	/* empty, or more than one character */
+	return (q + 2) - s;
+}
+
 static reg_errcode_t parse_bracket_terms(tre_parse_ctx_t *ctx, const char *s, struct literals *ls, struct neg *neg)
 {
 	const char *start = s;
 	tre_ctype_t class;
 	int min, max;
 	wchar_t wc;
-	int len;
+	int len, clen, iseq;
 
 	for (;;) {
 		class = 0;
@@ -549,10 +625,25 @@ static reg_errcode_t parse_bracket_terms(tre_parse_ctx_t *ctx, const char *s, st
 		    /* extension: [a-z--@] is accepted as [a-z]|[--@] */
 		    (s[1] != '-' || s[2] == ']'))
 			return REG_ERANGE;
-		if (*s == '[' && (s[1] == '.' || s[1] == '='))
-			/* collating symbols and equivalence classes are not supported */
-			return REG_ECOLLATE;
-		if (*s == '[' && s[1] == ':') {
+		/*
+		 * `len' is what the shared code below adds to `s', and the
+		 * helper has already stepped over the whole construct, so
+		 * zeroing it is how a collating element rejoins the ordinary
+		 * path -- including the `-' test, which makes `[[.a.]-z]' a
+		 * range without a second branch for it.
+		 */
+		clen = parse_collating(s, &wc, &iseq);
+		if (clen < 0)
+			return -clen;
+		if (clen > 0) {
+			s += clen;
+			len = 0;
+			/* an equivalence class names a SET, so it has no
+			   place in a range; glibc answers ERANGE */
+			if (iseq && *s == '-' && s[1] != ']')
+				return REG_ERANGE;
+		}
+		if (clen == 0 && *s == '[' && s[1] == ':') {
 			char tmp[CHARCLASS_NAME_MAX+1];
 			s += 2;
 			for (len=0; len < CHARCLASS_NAME_MAX && s[len]; len++) {
@@ -573,11 +664,21 @@ static reg_errcode_t parse_bracket_terms(tre_parse_ctx_t *ctx, const char *s, st
 			s += len;
 			if (*s == '-' && s[1] != ']') {
 				s++;
-				len = mbtowc(&wc, s, -1);
+				/* the upper bound may be a collating symbol too,
+				   but not an equivalence class -- see above */
+				clen = parse_collating(s, &wc, &iseq);
+				if (clen < 0)
+					return -clen;
+				if (clen > 0) {
+					if (iseq)
+						return REG_ERANGE;
+					len = 0, s += clen;
+				} else
+					len = mbtowc(&wc, s, -1);
 				max = wc;
 				/* XXX - Should use collation order instead of
 				   encoding values in character ranges. */
-				if (len <= 0 || min > max)
+				if ((clen == 0 && len <= 0) || min > max)
 					return REG_ERANGE;
 				s += len;
 			}
