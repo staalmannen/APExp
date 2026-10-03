@@ -283,6 +283,12 @@ glibc's way applies to the checker too if both are in one command,
 and the sweep then compares libap against itself and reports a clean
 number. *Break the unit on purpose and check that the instrument
 notices* -- that is what caught it.
+**`apdecl-sweep.py` is a host SWEEP rather than a test**: it asks
+every `.c` under `lib/ap` whether it calls a non-`int`-returning
+function that nothing in its include closure declares -- the missing
+prototype invariant in its RETURN-value form. Run it after adding
+files to libap; its limits are in its own header and it is a lower
+bound.
 `strtoint-xcheck.c` is the same idea for `strtoll` and `strtoull`,
 and needs THREE compiles: libap's prototypes take `char *` where
 glibc's take `const char *`, so even a `-D` rename collides with the
@@ -672,7 +678,12 @@ the index, so that nothing here is a surprise.
   more. The other seven architectures still claim it, unchecked.
 - `sizeof` is 32-bit, so a call with **no prototype in scope** corrupts
   the argument. An argument that arrives half right means a missing
-  prototype.
+  prototype. **And the RETURN value is the half that bites hardest**:
+  an undeclared function returns implicit `int`, so a `char *`, a
+  `double`, a `size_t` or a `long long` arrives truncated or
+  sign-extended with no diagnostic. `strtoumax` calling `strtoull`
+  without `<stdlib.h>` is what made bash print `FFFFFFFF9B3A59A5`;
+  `sys/lib/tests/apdecl-sweep.py` sweeps libap for the shape.
 - A variadic sentinel must be a pointer, never `0`.
 - `free()` needs exactly the pointer `malloc()` returned.
 - `longjmp` must never write to the stack; `main9.s` must use only
@@ -3650,30 +3661,39 @@ tree has not got):
   is specified.** The test read `precision <= 0`, conflating `%.0d`
   with no precision at all (-1), so `%+010.0d` gave `+000000123` for
   `      +123`. One character.
-- **Still open, one line, and deliberately a PROBE rather than a
-  guess**: `printf "%08X" 2604292517` gives `FFFFFFFF9B3A59A5` for
-  `9B3A59A5` -- a 32-bit value sign-extended to 64. bash reaches
-  printf with `%08lX` and an `unsigned long` whenever the value fits
-  (`printf.def`'s x/X arm tests `p != pp` first), and kencc's `long`
-  is 32-bit. **FOUR mechanisms refuted by reading**: `strtoull`
-  saturating wrongly (2604292517 is nowhere near a threshold);
-  `mklong` building the format wrongly (bash NUL-terminates after
-  the conversion character first, so it really is `%08lX`); amd64's
-  `va_arg` reading the wrong width (`stdarg_arch.h` gives every
-  argument an 8-byte slot and reads a 4-byte type from its low half,
-  which is right); and a missing prototype in bash (`printf.def`
-  includes `<inttypes.h>` under `HAVE_INTTYPES_H`, which is defined,
-  and APE's `<inttypes.h>` declares `strtoumax` unconditionally).
-  *That is the point at which it stops being a reading question.*
-  **And writing the probe REPRODUCED the symptom by accident**:
-  without `<inttypes.h>` there is no prototype for `strtoumax`, so
-  it is assumed to return `int`, the result is sign-extended, and
-  the run printed `FFFFFFFF9B3A59A5` on glibc -- the bash output
-  character for character. That is this tree's own invariant (*a
-  call with no prototype in scope*), and it stays the best-shaped
-  candidate even though bash's path looks clear. `printfmod-test`
-  section 9 now replicates bash's `p = pp = strtoumax(...)` decision
-  line for line and asserts nothing.
+- **`printf "%08X" 2604292517` -> `FFFFFFFF9B3A59A5`: SOLVED by the
+  probe, and libap's printf was INNOCENT.** Section 9 on the VM:
+
+  ```
+    %08X  of unsigned int  -> 9B3A59A5     <- all three widths right
+    %08lX of unsigned long -> 9B3A59A5
+    %08llX of ull          -> 9B3A59A5
+    strtoumax("2604292517") -> FFFFFFFF9B3A59A5
+    assigned to unsigned long -> 9B3A59A5
+    bash takes the PRIdMAX/ll branch (p != pp)
+  ```
+
+  **`string/strtoumax.c` included `<inttypes.h>` and `<stdint.h>` and
+  NOT `<stdlib.h>`**, and neither reaches a declaration of
+  `strtoull` -- so the call had no prototype, returned implicit
+  `int`, and every value with bit 31 set came back sign-extended.
+  `printf.def`'s x/X arm does `p = pp = getuintmax()` and compares
+  them, so `p != pp` sent bash down the `%08llX` branch with the
+  sign-extended value. *Chain closed end to end, one line of output.*
+  **FOUR mechanisms had been refuted by reading first** -- `strtoull`
+  saturating (2604292517 is nowhere near a threshold), `mklong`
+  building the format wrongly (bash NUL-terminates after the
+  conversion character, so it really is `%08lX`), amd64's `va_arg`
+  (`stdarg_arch.h` gives every argument an 8-byte slot and reads a
+  4-byte type from its low half, which is right), and a missing
+  prototype *in bash* (`printf.def` does include `<inttypes.h>`).
+  **The fifth was one level down and reading never reached it.**
+  **And the probe REPRODUCED the bug by accident before it measured
+  it**: its own first version omitted `<inttypes.h>`, so `strtoumax`
+  had no prototype either and it printed `FFFFFFFF9B3A59A5` *on
+  glibc* -- the bash output character for character, from the same
+  cause one level up. *The accident was the diagnosis and I nearly
+  filed it as an instrument fault.*
 - **Two conformance gaps noticed and NOT fixed**, because nothing
   measured them: `_dtoa` hands back `"Infinity"` and `"NaN"`, so
   `printf("%f", INFINITY)` prints `Infinity` where C wants `inf` --
@@ -3765,6 +3785,28 @@ temporary and compiles that. 1419 checks, **0 wrong**, 38 before.
 answer by construction. *A cross-check needs both sides to agree on
 what is being computed* -- they get the `0x` fix and their signed-min
 arithmetic is recorded, unmeasured, rather than rewritten blind.
+
+**AND THE SWEEP THAT FOLLOWED IT FOUND ONE MORE, THEN CAME BACK
+CLEAN.** A missing declaration is never alone, so
+`sys/lib/tests/apdecl-sweep.py` asks every `.c` under `lib/ap` whether
+it calls a function with a NON-`int` return type that no header in its
+include closure declares. It found **`errno/err.c` and
+`errno/warn.c`** calling `strerror` with no `<string.h>`, handing a
+truncated `char *` straight to `%s` -- *in the two functions a program
+reaches once something has already gone wrong*, so the failure lands
+on top of another one. 0 hits now.
+**Three versions of that sweep reported 491, 79 and 2, and the first
+two were almost all NOISE.** The cuts that mattered: strip comments
+and string literals (the first version counted `rendezvous()` named in
+a COMMENT as a call); limit the declaring headers to the standard set
+(the APE include directory also holds `sqlite3ext.h`, `chicken.h`,
+`zlib.h`, `libdwarf.h`); and **put `lib/ap/include` on the search
+path, which is the mkfiles' own `-I../include`** -- without it every
+file under `math/` and `complex/` reads as undeclared, because
+`libm.h` lives there and is what includes `<math.h>`. *An instrument
+whose include path is not the BUILD's include path is measuring a
+different program.* It is a lower bound by construction and says so in
+its own header, like the all-char struct sweep.
 
 **Smaller open items**: `strtol`/`strtoul` have the same
 one-limit-for-both-signs shape as `strtoll` had, so `strtol(LONG_MIN)`

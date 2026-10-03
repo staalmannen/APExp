@@ -35,6 +35,19 @@
 #include <err.h>
 #include <errno.h>
 #include <stdarg.h>
+#include <string.h>	/* strerror -- see below */
+
+/*
+ * `<string.h>' was MISSING, so the `strerror(sverrno)' below had no
+ * prototype in scope: implicit `int' return, and the `char *' it
+ * really returns arrived TRUNCATED before being handed to `%%s'.
+ *
+ * Same defect as `string/strtoumax.c', found by the same sweep in
+ * the same round -- and err()/verr() is the path a program takes
+ * once something has already gone wrong, so the failure lands on
+ * top of another one. (`bsd.h' and `err.h' are included above and
+ * neither declares it.)
+ */
 
 void
 err(int eval, const char *fmt, ...)
