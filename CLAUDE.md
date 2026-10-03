@@ -289,6 +289,13 @@ function that nothing in its include closure declares -- the missing
 prototype invariant in its RETURN-value form. Run it after adding
 files to libap; its limits are in its own header and it is a lower
 bound.
+**`strerror-xcheck.py` is the second host SWEEP**, and it is a
+script for a reason the other xchecks do not have: **APE's errno
+NUMBERS are its own**, so libap's table and glibc's cannot be lined
+up by index at all -- only by NAME. It parses `errno.h` and
+`strerror.c`, asks glibc for each name, and reports every
+disagreement. Re-run it after touching either file; one inserted row
+shifts every entry after it and nothing else would say so.
 `strtoint-xcheck.c` is the same idea for `strtoll` and `strtoull`,
 and needs THREE compiles: libap's prototypes take `char *` where
 glibc's take `const char *`, so even a `-D` rename collides with the
@@ -3456,6 +3463,10 @@ several because each partitions cleanly.
   concatenated trace lines in one run, three in the next. *A count
   that rises because a diff hunk realigns is not a new failure;
   reading the section is what separates them.*
+  **CONFIRMED two runs later: it went back to 14 with nothing
+  touching it**, which is what an unstable hunk does and what a
+  regression does not. *The reading was right and the cheap evidence
+  for it arrived by itself.*
 - **`run-builtins` 225 partitions 175 / 42 / 6 / 2**, and only the
   second is ours:
   **175 are `HELP_BUILTIN`** -- `help: command not found`,
@@ -3627,13 +3638,31 @@ instead of one file at a time:
 - **`run-glob-test` 63 -- `locale: command not found`** plus absent
   `zh_TW.big5` and `en_US.UTF-8`. Part missing program, part missing
   locale data.
+  **AND IT IS THE ONE SECTION WHOSE CONTENT CHANGES BETWEEN
+  IDENTICAL RUNS** -- the count stays 63 and the words move. Not
+  ours, and the cause is one line of arithmetic: `glob11.sub` tests
+  **`GLOBSORT`**, creating six files `sleep 0.1` apart under the
+  comment *"try to impose some kind of testable ordering"*, then
+  sorting them by `+atime`/`-atime` and `+mtime`/`-mtime`.
+  **Plan 9 file times are WHOLE SECONDS** -- 9P's `Dir.mtime`, and
+  `dirtostat.c` sets every `tv_nsec` to 0 -- so six files written
+  within half a second share one timestamp, bash's secondary sort on
+  name takes over, and whether the six straddle a second boundary is
+  luck. That is exactly the shape observed: one run name-sorted all
+  six, the next put `mksyntax` alone in front and name-sorted the
+  rest. *The test cannot pass here and cannot be stable here*, and
+  the `size` pair beside it is unaffected because sizes are real.
+  **The `.right` file settles the rest**: it names `mksyntax.dSYM`,
+  a macOS debug bundle, so the expected output was generated on a Mac
+  against that machine's directory.
 - **`run-func` 70 and `run-procsub` 35 -- process substitution**,
   joining `run-histexpand`'s 35. **Four files and ~140 lines are one
   switch**, and it stays off until `/dev/fd` means something here.
 - **`run-redir` 77 -- mixed, and one part IS ours**: `/etc/passwd`
   missing (not ours), and **`Bad file number` where POSIX says `Bad
-  file descriptor`** -- `string/strerror.c:17`. One string, and it
-  shows up in `run-vredir` too.
+  file descriptor`** -- `string/strerror.c`. It shows up in
+  `run-vredir` too. **It was NOT one string: 40 of the 76 were
+  wrong** -- see the strerror entry below.
 - **`run-printf` 86 -- FOUR causes, three of them libap's**; see
   below. That makes it the largest genuinely ours.
 *So of the ~1500 differing lines, the share that is a bug in this
@@ -3735,10 +3764,16 @@ compiles for the same reason `ctype-xcheck` is.
 **MEASURED: `run-printf` 86 -> 45, AND IT IS THE ONLY FILE THAT
 MOVED.** Per-file diff against the previous run is one line, so the
 three printf fixes and the fifteen strftime conversions are confirmed
-with nothing else disturbed. What is left is exactly **1 + 44**: the
-`%08X` probe above, and `hexdump: command not found` -- a program
-this tree has not got, in `printf6.sub` alone. So `run-printf` is
-accounted for end to end like `run-histexpand` before it.
+with nothing else disturbed. What is left is the `%08X` probe above
+and `hexdump: command not found` -- a program this tree has not got,
+in `printf6.sub` alone. So `run-printf` is accounted for end to end
+like `run-histexpand` before it.
+**AND THE strtoumax FIX IS CONFIRMED: 45 -> 43, `FFFFFFFF9B3A59A5`
+GONE.** *I predicted 44 and the arithmetic was mine, not the
+library's*: the bucket counts a section's `<` AND `>` lines, so
+removing a one-line `149c149` hunk removes **two**. A per-file count
+here is differing LINES, not differing facts, and a `c` hunk always
+costs at least two. **43 is `hexdump` and nothing else.**
 
 **AND READING `strtoull` ON THE WAY FOUND THREE BUGS NOTHING HAD
 MEASURED -- one by eye and TWO by the sweep that was written to
@@ -3808,12 +3843,66 @@ whose include path is not the BUILD's include path is measuring a
 different program.* It is a lower bound by construction and says so in
 its own header, like the all-char struct sweep.
 
+**`strerror` WAS WRONG IN 40 OF 76 ENTRIES, AND TWO OF THEM NAMED
+THE WRONG ERROR.** `run-redir`'s `Bad file number` was the way in,
+and reading that one entry would have fixed that one entry. Asking
+the WHOLE table against glibc found 40.
+**The pair that matters is EACCES and EPERM.** The table said
+`EACCES "Access denied"` and `EPERM "Permission denied"` -- and
+`Permission denied` is what every other system prints for **EACCES**.
+So the one message a reader is most likely to recognise named the
+wrong errno: a program failing with EPERM reported EACCES's text, and
+anything matching on it -- a test, a log, a person -- drew the
+opposite conclusion. *A wrong message is a bug in one line; a message
+that is another error's correct message is a bug in the reader.* This
+tree already spent a round on `_errno.c` mapping Plan 9's "permission
+denied" to EPERM where POSIX wants EACCES, and the two errors have
+now been confused at both ends of the same path.
+The other 38 were merely terse -- `Too big`, `Try again`,
+`No buffers`, `Shut down`. **Nothing in POSIX fixes the wording**, so
+this is not conformance: it is that the tree exists to run GNU
+software, whose suites compare against the text glibc produces.
+`EDOM`/`ERANGE` are 1000 and 1001, outside the table, spelled in
+`strerror()`'s own arms -- they had the same defect and are fixed
+with it.
+**Generated rather than transcribed**, which is the part worth
+keeping: the mapping came from parsing `errno.h` for the names and
+asking glibc for each one, so no entry was typed and none can be off
+by a row. **Every line now carries its name**, because a table
+indexed by errno with unnamed rows is exactly how an entry drifts.
+**`strerror-xcheck.py` is the instrument and is checked in.** It
+cannot be a C cross-check like the others, and the reason is the
+whole difficulty: **APE's errno NUMBERS are its own** -- EBADF is 4
+here and 9 on glibc -- so comparing by index would be nonsense
+dressed as a measurement, and only the NAMES line up. **Both controls
+fire**: reverting one word reports 1 and names `EBADF`; inserting one
+row reports **68**, which is the drift case it exists to catch.
+`EGREG` is reported UNCHECKABLE rather than passed over -- it is
+APE's own (`_errno.c` maps Plan 9's "ken has left the building" to
+it), glibc has no such error, and its text is left alone. It reads
+`Unknown error`, which is also what the fallback returns for an errno
+out of range, so the two are indistinguishable from outside.
+*Recorded rather than changed: a new wording would be invented and
+nothing has measured it.*
+**NOT YET MEASURED ON THE VM. Predict `run-redir` 77 -> ~70 and
+`run-vredir` 11 -> ~9**, with nothing else moving. Refuted if some
+other file changes -- which would mean a test was matching on the old
+text, and that is worth knowing rather than assuming.
+
+**One PROBE, not a claim**: `run-rsh`'s `date` line prints the zone
+as **`CES`**, and Central European Summer Time is `CEST`. It is not
+a parser truncation -- `tzone.c`'s `Maxname` is 16 -- so it is either
+what the machine's `/env/timezone` holds or what `$TZ` says, and
+`cat /env/timezone; echo $TZ` answers it in one command. The line is
+a timestamp and differs between runs anyway, so it costs nothing to
+leave until something else needs that file.
+
 **Smaller open items**: `strtol`/`strtoul` have the same
 one-limit-for-both-signs shape as `strtoll` had, so `strtol(LONG_MIN)`
 is likely ERANGE too -- unmeasurable by cross-check for the reason
 above, and untouched for that reason. `unlink()` of a directory reports `EPLAN9`
-where POSIX allows EPERM or EISDIR; `strerror(EBADF)` says `Bad file
-number` where POSIX and every GNU test expect `Bad file descriptor`.
+where POSIX allows EPERM or EISDIR. *(The `strerror(EBADF)` item is
+CLOSED -- it was 40 entries, not one; see above.)*
 
 **Open hazards recorded but not measured**: the lost wakeup in
 `select()`'s rendezvous (a copy process reaching EOF before the parent
