@@ -3884,10 +3884,30 @@ it), glibc has no such error, and its text is left alone. It reads
 out of range, so the two are indistinguishable from outside.
 *Recorded rather than changed: a new wording would be invented and
 nothing has measured it.*
-**NOT YET MEASURED ON THE VM. Predict `run-redir` 77 -> ~70 and
-`run-vredir` 11 -> ~9**, with nothing else moving. Refuted if some
-other file changes -- which would mean a test was matching on the old
-text, and that is worth knowing rather than assuming.
+**MEASURED, AND BOTH NUMBERS WERE TOO LOW: `run-redir` 77 -> 63
+(predicted ~70) and `run-vredir` 11 -> 5 (predicted ~9).** And the
+refutation condition fired usefully: **`run-errors` 8 -> 4 moved too**
+-- the same two `Bad file number` lines, in a third file I had never
+opened. *Three files, one fix, nothing up.*
+**Why the predictions were low is the same mistake in both**: I sized
+them from the one section head I had read rather than counting the
+string across the whole log. The sweep that settles it takes one
+command and I only ran it AFTER the run -- `Access denied` **7 -> 0**,
+`Bad file number` **9 -> 0**, and `Permission denied` **10 -> 0**
+while `Operation not permitted` went 1 -> 4, which is the EPERM/EACCES
+swap unwinding exactly as read. *Count the string in the corpus, not
+in the paragraph you happened to read.*
+**TWO occurrences of `No such system call` SURVIVE, and they are not
+the table.** They are `ln: failed to create symbolic link` and
+`mkfifo: cannot create fifo` -- ENOSYS from `symlink()` and
+`mkfifo()`, printed by **coreutils binaries that were not relinked**.
+APE is statically linked, so every program carries its own copy of
+`sys_errlist[]`, and `mk install` rebuilds `libap.a` without relinking
+programs already built against it. bash was rebuilt and changed; `ln`
+and `mkfifo` were not and did not. *That is the rule already in this
+file -- a libap fix can sit unused for rounds -- showing up as two
+lines rather than as a silence*, and `mk distclean` before the next
+`mk install` is what would finish it.
 
 **One PROBE, not a claim**: `run-rsh`'s `date` line prints the zone
 as **`CES`**, and Central European Summer Time is `CEST`. It is not
