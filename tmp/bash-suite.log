@@ -1,5 +1,5 @@
-bash 25115: warning: process exceeds 100 file descriptors
-bash 25115: warning: process exceeds 200 file descriptors
+bash 70630: warning: process exceeds 100 file descriptors
+bash 70630: warning: process exceeds 200 file descriptors
 declare -r SHELLOPTS="braceexpand:hashall:interactive-comments"
 Testing /bin/bash
 version: 5.3.0(2)-release
@@ -704,14 +704,14 @@ ok 4
 ---
 > . .. .a .aa .b .bb
 139,140c110,111
-< mailcheck.o make_cmd.o mksignames mksignames.o mksyntax mksyntax.dSYM
-< mksyntax.dSYM mksyntax mksignames.o mksignames make_cmd.o mailcheck.o
+< mksyntax mailcheck.o make_cmd.o mksignames mksignames.o mksyntax.dSYM
+< mksyntax.dSYM mksignames.o mksignames make_cmd.o mailcheck.o mksyntax
 ---
 > mksyntax mksignames make_cmd.o mailcheck.o mksignames.o mksyntax.dSYM
 > mksyntax.dSYM mksignames.o mailcheck.o make_cmd.o mksignames mksyntax
 142,143c113,114
-< mailcheck.o make_cmd.o mksignames mksignames.o mksyntax mksyntax.dSYM
-< mksyntax.dSYM mksyntax mksignames.o mksignames make_cmd.o mailcheck.o
+< mksyntax mailcheck.o make_cmd.o mksignames mksignames.o mksyntax.dSYM
+< mksyntax.dSYM mksignames.o mksignames make_cmd.o mailcheck.o mksyntax
 ---
 > mksyntax mksignames make_cmd.o mailcheck.o mksignames.o mksyntax.dSYM
 > mksyntax.dSYM mksignames.o mailcheck.o make_cmd.o mksignames mksyntax
@@ -796,8 +796,8 @@ run-ifs
 > argv[1] = <*>
 run-ifs-posix
 run-input-test
-bash 38539: warning: process exceeds 100 file descriptors
-bash 38539: warning: process exceeds 200 file descriptors
+bash 84064: warning: process exceeds 100 file descriptors
+bash 84064: warning: process exceeds 200 file descriptors
 run-intl
 ./intl2.sub: line 16: locale: command not found
 intl2.sub: warning: you do not have the de_DE.UTF-8 locale installed;
@@ -849,7 +849,7 @@ warning: SIGHUP.  Please disregard.
 < ./jobs1.sub: line 15: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 < ./jobs1.sub: line 21: jobs: command not found
-< ./jobs1.sub: line 25: [: 38815: unary operator expected
+< ./jobs1.sub: line 25: [: 84341: unary operator expected
 < ./jobs2.sub: line 3: set: monitor: invalid option name
 < ./jobs2.sub: line 8: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
@@ -907,7 +907,7 @@ warning: SIGHUP.  Please disregard.
 < ./jobs6.sub: line 2: set: monitor: invalid option name
 < wait: usage: wait [pid ...]
 < child1 exit status 2
-< ./jobs6.sub: line 6: kill: (38879) - No such process
+< ./jobs6.sub: line 6: kill: (84412) - No such process
 < ./jobs7.sub: line 2: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 < ./jobs7.sub: line 4: jobs: command not found
@@ -1212,10 +1212,6 @@ run-posixpat
 run-posixpipe
 run-precedence
 run-printf
-149c149
-< FFFFFFFF9B3A59A5
----
-> 9B3A59A5
 345,358c345,373
 < ./printf6.sub: line 19: hexdump: command not found
 < ./printf6.sub: line 22: hexdump: command not found
@@ -1503,7 +1499,7 @@ run-rsh
 < ./rsh.tests: line 31: ./source.sub3: No such file or directory
 < oops 1 -- output
 < oops 2 -- append
-< Sat Oct  3 09:15:24 CES 2026
+< Sat Oct  3 10:03:09 CES 2026
 ---
 > ./rsh1.sub: line 22: /bin/sh: restricted
 > ./rsh1.sub: line 24: sh: not found
@@ -1521,7 +1517,7 @@ run-rsh
 > ./rsh.tests: line 38: /tmp/restricted: restricted: cannot redirect output
 > ./rsh.tests: line 43: command: -p: restricted
 19c19,20
-< Sat Oct  3 09:15:24 CES 2026
+< Sat Oct  3 10:03:09 CES 2026
 ---
 > ./rsh.tests: line 48: exec: restricted
 > ./rsh.tests: after exec
@@ -1574,12 +1570,11 @@ run-trap
 warning: UNIX versions number signals and schedule processes differently.
 warning: If output differing only in line numbers is produced, please
 warning: do not consider this a test failure.
-79,81c79,81
-< +[8] false+[8] false+[8] false
-< 
+79d78
+< +[8] false+[8] false
+81c80,81
 < 
 ---
-> +[8] false
 > +[8] false
 > +[8] false
 109,110d108
