@@ -4063,6 +4063,22 @@ bug in this tree is small, and two of the four are new:**
   includes `.` and `..`, while `dirtostat.c` sets `st_nlink = 1`
   always -- so that arithmetic has been giving -1 here all along.
   Recorded, unmeasured, and independent of this change.
+  **MEASURED AFTER A FULL `mk distclean`: `run-extglob` 20 -> 0, it
+  PASSES**, and all twenty lines were the same thing -- ten `c` hunks,
+  each `.a .foo` against `. .. .a .foo`. **`run-glob-test` 63 -> 61 is
+  a SECOND confirmation and was not predicted**: `.a .aa .b .bb`
+  against `. .. .a .aa .b .bb`, in a file whose other 61 lines are the
+  GLOBSORT/locale problems that cannot pass here. **Zero `. ..`
+  expectations remain anywhere in the corpus.**
+  **AND THE SAFETY EVIDENCE IS THE BETTER HALF.** A change that
+  touches every directory read in every program, measured across 86
+  test files, added **SEVEN lines corpus-wide and not one of them is
+  a directory entry**: three are run-to-run noise (the oscillating
+  xtrace hunk, and two `jobs*.sub` lines that carry a pid), four are
+  the run's own environment. *The sweep of libap's six readdir callers
+  predicted exactly this, and "nothing arrived" is the only form the
+  confirmation could take* -- a recursing walker would have hung the
+  suite, and a leaking entry would be a new line somewhere.
 - **`[=x=]` and `[.x.]` answer `Unknown collating element`**, 9 lines
   in `run-cond`. `ap/regex/regcomp.c` is musl's TRE and the line is
   **musl's own** -- `/* collating symbols and equivalence classes are
@@ -4160,11 +4176,98 @@ readable** -- `cannot duplicate fd` went 3 -> 2 and `Unknown error`
 *wants*. *Counting the string beside reading the section is what
 separated a surviving instance of the bug from two things that were
 never it.*
+
+**AND THE NEXT ROUND, AFTER A FULL `mk distclean`: `REAL 37 -> 36`,
+`PASS 48 -> 49`, 1033 -> 1015 lines.** `run-extglob` and
+`run-glob-test` are the readdir fix (above). Two others moved and
+**neither is the tree**:
+- **`run-nameref` 1 -> 5 ROSE, and it is the RUN'S OWN ENVIRONMENT.**
+  The test prints `declare -x` for everything exported, and the new
+  run carries `vts`, `vtsdebug`, `vtslog` and `vtspid` beside the
+  `vgasize` the old one had -- so this suite was run from inside a
+  **vts session** where the previous one was not. `session.c`'s
+  `putenv("vts"...)` and `vts-bash`'s `$vtsdebug` are where they come
+  from. *A test that compares the whole environment measures the
+  environment it was run in*, which joins the harness's own
+  `fconfigure`, the kernel's fd warnings and the `awk` that blocked:
+  **the fifth time something outside the tree has shown up inside a
+  measurement of it.** Nothing to fix, and nothing to read as a
+  regression -- but a run from a plain `apexp-sh` would answer 1.
+- **`run-redir` 63 -> 61 is UNEXPLAINED and recorded as such.** One
+  hunk went: `exec 6<>$TMPDIR/bash-c` at `redir.tests:83` used to
+  answer `6: Bad file descriptor` and now works. Two things changed
+  in this build -- the readdir entries and the first full relink of
+  every binary in the tree -- and *`exec N<>file` is a dup onto a
+  chosen descriptor, which is F_DUPFD's path*, but that fix was
+  already in the previous run's bash and that run still failed here.
+  **So the vehicle is not identified and guessing one would be the
+  third story in a row.** Cheap refutation: if it comes back next
+  run with nothing touching it, it is flaky like `run-trap`'s hunk.
+- `run-trap` 14 -> 16 is that hunk oscillating for the **fifth** time.
+**AND `dotdir-test` IS NOW RUN ON THE VM: `_dotdirmark = 1`, every
+section PASS, 0 failures -- INCLUDING THE TWO THE HOST COULD NOT
+REACH.**
+- **Section 6b answered in the exact shape predicted**, and the
+  output says so rather than leaving it to be argued: it prints
+  **`seekdir(2) -> f0`**. On the host that line read `seekdir(0)`,
+  because glibc put a real entry at position 0 and the seek never
+  crossed the synthetic/real boundary; here the first real entry is
+  at **2**, so `telldir`/`seekdir` are measured ACROSS the boundary
+  for the first time. *The prediction was written into the file
+  before the run and the number in the output is what confirms it.*
+- **Section 7 is the chain end to end, and only here does it mean
+  anything**: `glob("*")` matched 5 with **0** dot entries,
+  `glob(".*")` matched 3 with **2**. glibc's glob does not route
+  through an interposed `readdir`, so its host PASS measured glibc;
+  libap's glob calls libap's readdir directly, so this one measures
+  the thing the two suites compare. *Four independent confirmations
+  now -- `run-extglob`, `run-glob-test`, and both halves of this.*
+- **Section 4 passed for the right reason, which is the half a
+  name-only fix would have failed**: `. d_ino 37897` against
+  `stat(dotdirtest.d) 37897` and `.. d_ino 52201` against
+  `stat(.) 52201`, both `d_type 4`. The inodes are real and they are
+  the right two files.
+**The readdir item is CLOSED**: confirmed from outside in two suite
+files and from inside in all seven sections.
 - **`recho: command not found`, 9 lines, identical in both runs.**
   `bash-runtests` guarantees the four helpers are built, and most
   files find them -- `run-assoc`, `run-ifs` and `run-new-exp` do not.
   A precondition question about the harness, like the `../bash`
   check, and stable rather than flaky.
+  **FOUND AND FIXED, AND IT WAS HIDING TESTS RATHER THAN FAILING
+  THEM.** `run-all` line 29 is `PATH=.:$PATH`, under upstream's own
+  comment *"just to get recho/zecho/printenv if not run via `make
+  tests'"* -- while the real route, `Makefile.in:682`, is
+  `PATH=$(BUILD_DIR)/tests:$$PATH`, an **ABSOLUTE** path. With `.`
+  the helpers are found only while the cwd is still `tests/`, so
+  **every test that `cd`s loses them**. *Fourth silently-failing
+  precondition in this harness, and the same family as `THIS_SH`:
+  upstream's standalone default is a degraded fallback and APExp
+  takes the standalone route.*
+  **What named the cause was one file disagreeing with itself**:
+  `assoc.tests` calls recho at line 63 and it WORKS, then at line 132
+  and it does not -- and `cd ${TMPDIR:=/tmp}` sits between them, at
+  line 128. *A difference inside one file beats a difference between
+  files, because everything else is held constant for free.*
+  **They are HIDDEN rather than failed, which is why this is worth a
+  round**: recho's whole job is to print its arguments visibly, so a
+  missing recho means those assertions are not made at all. `ifs1.sub`
+  cds into `$TMPDIR` to test **IFS field splitting with glob
+  characters in IFS**; `assoc.tests:128` does the same to test
+  associative-array index expansion **against a file literally named
+  `[sfiri]`** -- a bracket expression as a filename, next door to the
+  readdir and regex-bracket work of the last two rounds.
+  **Predict**: `run-ifs` 4 -> 0 (it is recho and nothing else),
+  `run-assoc` 6 -> 2 (the `wait: usage` hunk is a different bug and
+  stays), `run-new-exp` 34 -> ~28. **And the interesting outcome is
+  the other one**: if any of them comes back with DIFFERENT content
+  rather than going away, that is a real bug *newly measured* -- the
+  rule about a rising count after new tests become runnable -- and
+  `assoc.tests:132` is the one to read first.
+  The fix is `PATH` set to this directory absolutely, before
+  `run-all`; `^` is guarded against an empty `$PATH`, since a cross
+  product with the empty list is the EMPTY LIST rather than the other
+  operand.
 **NOT ours, with the arithmetic**: `JOB_CONTROL` **148** lines (no
 `tcsetpgrp`/`tcgetpgrp`, no foreground process group), process
 substitution (`/dev/fd` absent and `/fd` has the wrong semantics for
@@ -4187,6 +4290,62 @@ what the machine's `/env/timezone` holds or what `$TZ` says, and
 `cat /env/timezone; echo $TZ` answers it in one command. The line is
 a timestamp and differs between runs anyway, so it costs nothing to
 leave until something else needs that file.
+**ANSWERED, AND IT IS NOT OURS: the FILE says `CES`.**
+`/env/timezone`'s first line is literally
+**`CET 3600 CES 7200`**, followed by its transition times, and
+`$TZ` is empty -- so the chain is `$TZ` unset -> `tzone.c` falls back
+to `/env/timezone` -> the file names the summer zone `CES` -> `%Z`
+prints `CES`. **Every link is behaving correctly**, including ours:
+`Maxname` is 16 and the copy guards at 15, so a four-character `CEST`
+would fit with room to spare -- *the parser was never truncating, and
+the measurement is what turned that from a reading into a fact.*
+Nothing in APExp writes or ships timezone data either (one `git
+ls-files` hit, and it is diffutils' own test fixture), so this is the
+machine's `/adm/timezone` and a fix belongs there rather than here.
+*The probe cost one command and closed an item that three rounds of
+reading could not have.*
+
+**IS BASH DONE? NOT QUITE, AND THE HONEST ANSWER IS A LIST.** Every
+section was classified in one sweep of the heads -- 36 files, 1015
+lines. **~950 of them are settled**, almost all platform limits:
+JOB_CONTROL (`run-jobs` 176, `run-builtins` 85, `run-complete` 18,
+`run-shopt` 16, `run-trap` 16, `run-errors` 4 -- `bg: command not
+found` against `bg: no job control` is that switch exactly), process
+substitution (`run-func` 70, `run-procsub` 35, `run-histexpand` 35,
+`run-new-exp` 34, `run-quotearray` 27 -- `<(` inside `[[ ]]`),
+no dlopen (`run-glob-bracket` 103), `/etc` absent (`run-dirstack` 53,
+part of `run-coproc`), whole-second mtimes (`run-glob-test` 61),
+`hexdump` (`run-printf` 43), `/dev/tty` and `mkfifo` (`run-read` 27),
+symlinks (`run-globstar` 5), `/bin/p` (`run-comsub2` 19), a hard link
+(`run-rsh` 1), `ulimit -n 6` on the expected side (`run-vredir` 5),
+and the run's own environment (`run-nameref` 5).
+**What is NOT yet attributed is about SEVEN files and ~65 lines**, and
+that is the list the next bash round should start from rather than
+re-deriving:
+- **`run-invocation` 6 -- almost certainly the switch shape a SEVENTH
+  time.** The expected side carries `--dump-po-strings` and
+  `--dump-strings`, which `shell.c:260` gates on
+  **`TRANSLATABLE_STRINGS`**, and `config.h:1425` has it `#undef`.
+  32 sites, and `-I$BASHSRC/lib/intl` is already on CFLAGS. *Needs a
+  decision rather than a sweep-in*, like BANG_HISTORY: it changes what
+  `$"..."` means.
+- **`run-intl` 5 -- locale, and possibly ours.** The test wants
+  `1,0000` and we answer `1.0000`, i.e. **`LC_NUMERIC` is not taking
+  effect**, plus `Passed all 1318 Unicode tests` against 1770.
+- **`run-posixpat` 15 -- every line is `>`**, i.e. expected output
+  ABSENT, which is the shape a missing capability makes. Unread.
+- **`run-nquote` 16, `run-lastpipe` 14, `run-heredoc` 8** -- unread.
+  `run-heredoc`'s `1: no<TAB>OK` against `1: OK` is a field
+  difference rather than a missing feature.
+- **`run-attr` 2 -- `declare -rx p="1"` against `declare -r p="1"`.**
+  A variable marked EXPORTED that should not be; small, specific and
+  plausibly ours.
+- **`wait: usage: wait [pid ...]`** in `run-assoc` and `run-array`:
+  bash's own `wait` refusing its arguments, in two files.
+*So the remaining genuinely-ours surface in bash is small and named,
+and two of the seven have shapes this campaign has repeatedly found
+to be real and cheap.* **The big blocks will not move without
+`tcsetpgrp`, `/dev/fd` or `dlopen`**, none of which Plan 9 has.
 
 **Smaller open items**: `strtol`/`strtoul` have the same
 one-limit-for-both-signs shape as `strtoll` had, so `strtol(LONG_MIN)`

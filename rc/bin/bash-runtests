@@ -122,7 +122,41 @@ for(p in recho zecho printenv xcase)
 	if(! test -f $p)
 		echo 'bash-runtests: WARNING' $p 'is missing; some tests will misreport' >[1=2]
 
+# 3. PATH must name this directory ABSOLUTELY, and that is a fourth
+#    silently-failing precondition rather than a refinement.
+#
+#    `run-all' line 29 is
+#
+#	PATH=.:$PATH	# just to get recho/zecho/printenv if not run
+#			# via `make tests'
+#
+#    -- upstream's own comment calling it the fallback. The real route
+#    is `Makefile.in:682', `PATH=$(BUILD_DIR)/tests:$$PATH', an
+#    ABSOLUTE path. With `.' the helpers are found only while the cwd
+#    is still this directory, so **every test that `cd's loses them**,
+#    and several do: `ifs1.sub' cds into $TMPDIR to glob a real file,
+#    `assoc.tests:128' does the same to test index expansion against a
+#    file named `[sfiri]'.
+#
+#    Measured before fixing: `recho: command not found' 9 times in
+#    exactly three sections, and `assoc.tests' calls recho at line 63
+#    and FAILS at line 132 -- *the same file, either side of a `cd'*,
+#    which is what named the cause. The tests in between assert
+#    nothing at all, so this HIDES them rather than failing them.
+#
+#    Same family as THIS_SH above: upstream's standalone default is a
+#    degraded fallback, and APExp takes the standalone route.
+here = `{pwd}
+if(~ $#PATH 0)
+	PATH = $here
+if not
+	PATH = $here^':'^$PATH
+# `^' is a CROSS PRODUCT, so an empty $PATH would make the whole thing
+# the EMPTY LIST rather than just $here -- hence the test above and not
+# a bare concatenation.
+
 echo 'bash-runtests: THIS_SH=/bin/bash, stdin /dev/null, log' $log
+echo 'bash-runtests: PATH=' $PATH
 echo 'bash-runtests: started' `{date}
 
 THIS_SH=/bin/bash /bin/bash run-all </dev/null >$log >[2=1]
