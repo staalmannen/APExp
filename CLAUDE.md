@@ -3399,11 +3399,22 @@ several because each partitions cleanly.
   line says so** -- *"warning: all of these tests will fail if history
   has not been compiled into the shell"* -- which is the third time a
   suite's unconditional warning turned out to be accurate.
-  **LEFT OFF, and it is a DECISION rather than an oversight**: it
-  changes what `!` means in every interactive line, where `READLINE`
-  and `HISTORY` only changed how a line is edited. The code is already
-  compiled and linked, so it is one `#define` whenever that trade is
-  wanted.
+  **It was LEFT OFF as a decision rather than an oversight** -- it
+  changes what `!` MEANS in every interactive line, where `READLINE`
+  and `HISTORY` only changed how a line is edited -- **and it is now
+  ON, chosen rather than swept in.** Nothing was missing from the
+  build, as with READLINE before it: `histexpand.$O` is already in
+  `libreadline.a` (lib/readline's HISTOBJ), which `cmd/bash/mkfile`
+  already links, so `history_expand` resolves with no mkfile change.
+  `config-bot.h:104` makes it imply HISTORY, already defined.
+  **NOT YET MEASURED ON THE VM. Predict `run-histexpand` 287 -> near
+  0**; refuted if a large remainder survives, which would mean `!`
+  expansion reaches the shell but something under it is wrong -- a
+  different investigation, as the fourteen features were.
+  ***`mk clean` in `cmd/bash` is NOT needed any more***: the `HFILES`
+  line added this round is exactly what makes `config.h` rebuild it.
+  So this run is also the test of that fix, and **if `run-histexpand`
+  does not move, suspect the rebuild before suspecting bash.**
 - **`run-builtins` 225 partitions 175 / 42 / 6 / 2**, and only the
   second is ours:
   **175 are `HELP_BUILTIN`** -- `help: command not found`,
@@ -3463,10 +3474,86 @@ only that the masked bits are ABSENT, never that the others are
 present, because the latter would be a test of the file server.
 **Measured old beside new**: 0 failures on glibc, and the old stub
 replicated beside it gives **5**, with section 3 printing `0755` under
-mask 027. `_umaskmark()` is the version marker. NOT YET MEASURED ON
-THE VM; predict `run-builtins` 225 -> ~8, and refuted if the umask
-block survives or if `help` output differs from `.right` in ways that
-are not just presence.
+mask 027. `_umaskmark()` is the version marker.
+
+**MEASURED, AND THE PREDICTION WAS REFUTED TWICE -- usefully both
+times.** Predicted `run-builtins` 225 -> ~8.
+**Run 1 gave 177**, and the 48 that went were EXACTLY the umask block:
+`umask`-shaped lines **42 -> 0**, so *that fix is CONFIRMED* and
+nothing else in the suite moved. But `help: command not found` was
+still there, with the commit provably in `main`.
+**Because `mk` DOES NOT REBUILD BASH WHEN `config.h` CHANGES.** No
+bash source file changed, and the mkfile names `config.h` nowhere --
+so not one bash object was recompiled, while libap rebuilt only
+because `umask.c`, `open.c` and `mkdir.c` are *sources* that changed.
+**This is `tclBinary.c` for the THIRD time**, and the rule was already
+in this file: *a header not in `HFILES` is a header `mk` does not
+rebuild for.*
+**Run 2, after `mk clean` in `cmd/bash`: 177 -> 85**, and
+`help: command not found` is **0**. `run-complete` 23 -> 20 and
+`run-redir` 78 -> 77 moved with it; nothing else did.
+**The remaining 85 are ONE capability, not 85 faults.** `help`'s
+two-column table lists `bg disown fg jobs suspend` on the expected
+side and not on ours -- **`JOB_CONTROL`** -- and *one missing entry
+shifts every row after it*, so five absences diff most of the table.
+**It is out of reach rather than off**: libap has **no `tcsetpgrp` and
+no `tcgetpgrp` at all** -- absent, not stubbed -- so job control could
+not link, and Plan 9 has no controlling-terminal foreground group to
+give them meaning (`setpgid` answers ESRCH, `setsid` returns
+`getpgrp()`). **`JOB_CONTROL_MISSING` is now DEFINED**: it only undefs
+a switch already undef, so the binary is identical, but the file says
+which kind of "off" it is -- the `NAMED_PIPES_MISSING` precedent.
+*A prediction refuted by a build-system fault and then by a platform
+limit taught more than a correct number would have.*
+
+**AND THE `HFILES` GAP IS TREE-WIDE: THIRTEEN PACKAGES, NOT ONE.**
+Starting from every `sys/src/external/*/config.h` and asking who
+builds it -- rather than from the mkfiles, which name their sources
+through `$BASHSRC`-style variables a grep cannot follow -- gives
+bash, gawk, ggrep, gsed, gtar, libdwarf, libpng, libxml2, patch, perl,
+readline, unace and xz, across **18 mkfiles**. Every one could be
+edited with nothing rebuilt. `HFILES` added to 17 of them.
+**Two traps on the way, both caught by measurement rather than
+reading**:
+- **`tar` was a FALSE POSITIVE of my own sweep.** Its `HFILES` is
+  multi-line and lists `config.h` on a continuation line, which a grep
+  anchored at `^HFILES` cannot see. It was already correct and is left
+  alone.
+- **FOUR packages have a LOCAL `config.h` that SHADOWS the external
+  one** -- grep, sed, tar, patch, each with `-I.` ahead of the package
+  include. tar's are 4512 and 113703 bytes, so they are not the same
+  file at all. I had already written the external path for two of them
+  before checking; reverted. *Name the file that is compiled, not the
+  file with the right name* -- the `PATH_MAX` lesson in a new place.
+  (`patch` nearly slipped through a second time: its `-I.` is on the
+  CFLAGS **continuation** line, so a `^CFLAGS.*-I\.` grep missed it.)
+Every path was verified to exist before writing, because an `HFILES`
+naming a missing file makes `mk` fail outright.
+
+**AND THE gcc SWEEP FOR `BANG_HISTORY` WAS WRONG TWICE BEFORE IT WAS
+RIGHT, in two NEW ways.** The sweep itself came back **0 errors** in
+the class 6c treats as fatal, across all eight `.c` files and the
+generated builtins -- but getting an answer that meant anything took
+three attempts:
+- **`-I` CANNOT override `config.h` for bash's own sources.**
+  `#include "config.h"` searches the INCLUDING FILE'S directory first,
+  and bash's sources sit beside `config.h`, so pointing `-I` at a
+  reverted copy changed nothing and the control reported "same" six
+  times. *It had worked for `HELP_BUILTIN` only because `help.c` is
+  generated into a different directory* -- the same technique, right
+  once by accident. Swapping the real file in place is what works:
+  `bashhist.c` **+115** lines, `flags.c` +50, `shell.c` +6, the rest
+  +3.
+- **A missing file counted as an error.** `reserved.c` showed 1 error
+  OFF *and* ON, which is what flagged it as pre-existing rather than
+  mine -- and it is neither: `reserved.def` has no `$PRODUCES`, so
+  that `.c` is never generated and my sweep was compiling a file that
+  does not exist. *Counting OFF beside ON is what caught it; a
+  one-sided sweep would have reported a real error.*
+- The other two complaints were the recorded harness artefacts
+  (`builtins/builtext.h` needs an `-I` with a `builtins/`
+  subdirectory, and `CONF_MACHTYPE` is a `-D` the mkfile passes).
+  Supplied rather than dismissed, which is what turned 6 into 0.
 
 **The watchdog now SAYS WHEN IT IS ARMED, and a wasted round is
 why.** A run went out as `APEX__MALLOCMAX=8` -- two underscores, no

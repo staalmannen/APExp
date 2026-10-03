@@ -96,6 +96,12 @@ OFILES=\
 	sparc.$O\
 	riscv.$O\
 
+# config.h here is HAND-MAINTAINED, and mk does not scan #includes --
+# so WITHOUT this line, editing it rebuilds NOTHING and the next run
+# measures the old binary. That is how HELP_BUILTIN was turned on and
+# did not reach bash; see CLAUDE.md.
+HFILES=../../../external/xz/config.h
+
 <$APEXPROOT/sys/src/cmd/mksyslib
 
 CC=pcc

@@ -42,6 +42,12 @@ DECFILES=\
 LIB=$APEXPROOT/$objtype/lib/ape/liblzma.a
 BIN=$APEXPROOT/$objtype/bin/ape
 
+# config.h here is HAND-MAINTAINED, and mk does not scan #includes --
+# so WITHOUT this line, editing it rebuilds NOTHING and the next run
+# measures the old binary. That is how HELP_BUILTIN was turned on and
+# did not reach bash; see CLAUDE.md.
+HFILES=../../../external/xz/config.h
+
 <$APEXPROOT/sys/src/cmd/mkmany
 
 XZSRC=../../../external/xz
