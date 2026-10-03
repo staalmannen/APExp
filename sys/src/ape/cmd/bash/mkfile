@@ -87,6 +87,12 @@ LIB= $APEXPROOT/$objtype/lib/ape/libap.a $BASHLIBS $APEXPROOT/$objtype/lib/ape/l
 
 BIN=$APEXPROOT/$objtype/bin/ape
 
+# config.h here is HAND-MAINTAINED, and mk does not scan #includes --
+# so WITHOUT this line, editing it rebuilds NOTHING and the next run
+# measures the old binary. That is how HELP_BUILTIN was turned on and
+# did not reach bash; see CLAUDE.md.
+HFILES=../../../external/bash/config.h ../../../external/bash/config-top.h ../../../external/bash/config-bot.h
+
 <$APEXPROOT/sys/src/cmd/mkone
 
 #during building from scratch, the system pcc may predate patches

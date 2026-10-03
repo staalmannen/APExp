@@ -19,6 +19,12 @@ OFILES=\
 	taint.$O time64.$O toke.$O utf8.$O \
 	util.$O
 
+# config.h here is HAND-MAINTAINED, and mk does not scan #includes --
+# so WITHOUT this line, editing it rebuilds NOTHING and the next run
+# measures the old binary. That is how HELP_BUILTIN was turned on and
+# did not reach bash; see CLAUDE.md.
+HFILES=../../../external/perl/config.h
+
 <$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=-c -I$PERLSRC -D_POSIX_SOURCE -DHAVE_CONFIG_H -D_PLAN9_SOURCE -D_BSD_EXTENSION -DPERL_CORE

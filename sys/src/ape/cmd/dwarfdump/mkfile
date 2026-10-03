@@ -62,6 +62,12 @@ OFILES=\
 	dd_true_section_name.$O \
 	dd_uri.$O dd_utf8.$O
 
+# config.h here is HAND-MAINTAINED, and mk does not scan #includes --
+# so WITHOUT this line, editing it rebuilds NOTHING and the next run
+# measures the old binary. That is how HELP_BUILTIN was turned on and
+# did not reach bash; see CLAUDE.md.
+HFILES=../../../external/libdwarf/config.h
+
 <$APEXPROOT/sys/src/cmd/mkone
 
 CC=pcc

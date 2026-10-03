@@ -1328,7 +1328,28 @@
 /* #undef SVR4 */
 
 /* Define if job control is unusable or unsupported. */
-/* #undef JOB_CONTROL_MISSING */
+/*
+ * DEFINED, and it is a DECLARATION rather than a change: it only
+ * `#undef JOB_CONTROL' (config-bot.h:74), which is already undef, so
+ * the binary is identical. What it buys is that the file now says WHY.
+ *
+ * **libap has no `tcsetpgrp' and no `tcgetpgrp' at all** -- not a stub,
+ * absent -- so bash's job control could not even link, and Plan 9 has
+ * no controlling-terminal foreground process group to give them
+ * meaning: the console is a file. `setpgid' answers ESRCH and `setsid'
+ * returns `getpgrp()'.
+ *
+ * **Measured through `run-builtins`**: with HELP_BUILTIN on, `help`'s
+ * two-column table lists `bg disown fg jobs suspend` on the expected
+ * side and not on ours, and because ONE missing entry shifts every row
+ * after it, five absences produce ~85 differing lines. *That is a
+ * cascade from one capability, not 85 faults.*
+ *
+ * Same shape as NAMED_PIPES_MISSING: say the platform lacks it, rather
+ * than leaving both switches off and letting the next reader guess
+ * which kind of "off" it is.
+ */
+#define JOB_CONTROL_MISSING 1
 
 /* Do we need to define _KERNEL to get the RLIMIT_* defines from
    <sys/resource.h>? */

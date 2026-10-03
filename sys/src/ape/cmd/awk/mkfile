@@ -45,6 +45,12 @@ OFILES=	array.$O\
 #		dynarray_resize_clear.$O\
 		dynarray_finalize.$O\
 
+# config.h here is HAND-MAINTAINED, and mk does not scan #includes --
+# so WITHOUT this line, editing it rebuilds NOTHING and the next run
+# measures the old binary. That is how HELP_BUILTIN was turned on and
+# did not reach bash; see CLAUDE.md.
+HFILES=../../../external/gawk/config.h
+
 <$APEXPROOT/sys/src/cmd/mkone
 
 GAWKSRC=../../../external/gawk
