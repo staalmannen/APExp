@@ -4234,6 +4234,40 @@ files and from inside in all seven sections.
   files find them -- `run-assoc`, `run-ifs` and `run-new-exp` do not.
   A precondition question about the harness, like the `../bash`
   check, and stable rather than flaky.
+  **FOUND AND FIXED, AND IT WAS HIDING TESTS RATHER THAN FAILING
+  THEM.** `run-all` line 29 is `PATH=.:$PATH`, under upstream's own
+  comment *"just to get recho/zecho/printenv if not run via `make
+  tests'"* -- while the real route, `Makefile.in:682`, is
+  `PATH=$(BUILD_DIR)/tests:$$PATH`, an **ABSOLUTE** path. With `.`
+  the helpers are found only while the cwd is still `tests/`, so
+  **every test that `cd`s loses them**. *Fourth silently-failing
+  precondition in this harness, and the same family as `THIS_SH`:
+  upstream's standalone default is a degraded fallback and APExp
+  takes the standalone route.*
+  **What named the cause was one file disagreeing with itself**:
+  `assoc.tests` calls recho at line 63 and it WORKS, then at line 132
+  and it does not -- and `cd ${TMPDIR:=/tmp}` sits between them, at
+  line 128. *A difference inside one file beats a difference between
+  files, because everything else is held constant for free.*
+  **They are HIDDEN rather than failed, which is why this is worth a
+  round**: recho's whole job is to print its arguments visibly, so a
+  missing recho means those assertions are not made at all. `ifs1.sub`
+  cds into `$TMPDIR` to test **IFS field splitting with glob
+  characters in IFS**; `assoc.tests:128` does the same to test
+  associative-array index expansion **against a file literally named
+  `[sfiri]`** -- a bracket expression as a filename, next door to the
+  readdir and regex-bracket work of the last two rounds.
+  **Predict**: `run-ifs` 4 -> 0 (it is recho and nothing else),
+  `run-assoc` 6 -> 2 (the `wait: usage` hunk is a different bug and
+  stays), `run-new-exp` 34 -> ~28. **And the interesting outcome is
+  the other one**: if any of them comes back with DIFFERENT content
+  rather than going away, that is a real bug *newly measured* -- the
+  rule about a rising count after new tests become runnable -- and
+  `assoc.tests:132` is the one to read first.
+  The fix is `PATH` set to this directory absolutely, before
+  `run-all`; `^` is guarded against an empty `$PATH`, since a cross
+  product with the empty list is the EMPTY LIST rather than the other
+  operand.
 **NOT ours, with the arithmetic**: `JOB_CONTROL` **148** lines (no
 `tcsetpgrp`/`tcgetpgrp`, no foreground process group), process
 substitution (`/dev/fd` absent and `/fd` has the wrong semantics for
@@ -4270,6 +4304,48 @@ ls-files` hit, and it is diffutils' own test fixture), so this is the
 machine's `/adm/timezone` and a fix belongs there rather than here.
 *The probe cost one command and closed an item that three rounds of
 reading could not have.*
+
+**IS BASH DONE? NOT QUITE, AND THE HONEST ANSWER IS A LIST.** Every
+section was classified in one sweep of the heads -- 36 files, 1015
+lines. **~950 of them are settled**, almost all platform limits:
+JOB_CONTROL (`run-jobs` 176, `run-builtins` 85, `run-complete` 18,
+`run-shopt` 16, `run-trap` 16, `run-errors` 4 -- `bg: command not
+found` against `bg: no job control` is that switch exactly), process
+substitution (`run-func` 70, `run-procsub` 35, `run-histexpand` 35,
+`run-new-exp` 34, `run-quotearray` 27 -- `<(` inside `[[ ]]`),
+no dlopen (`run-glob-bracket` 103), `/etc` absent (`run-dirstack` 53,
+part of `run-coproc`), whole-second mtimes (`run-glob-test` 61),
+`hexdump` (`run-printf` 43), `/dev/tty` and `mkfifo` (`run-read` 27),
+symlinks (`run-globstar` 5), `/bin/p` (`run-comsub2` 19), a hard link
+(`run-rsh` 1), `ulimit -n 6` on the expected side (`run-vredir` 5),
+and the run's own environment (`run-nameref` 5).
+**What is NOT yet attributed is about SEVEN files and ~65 lines**, and
+that is the list the next bash round should start from rather than
+re-deriving:
+- **`run-invocation` 6 -- almost certainly the switch shape a SEVENTH
+  time.** The expected side carries `--dump-po-strings` and
+  `--dump-strings`, which `shell.c:260` gates on
+  **`TRANSLATABLE_STRINGS`**, and `config.h:1425` has it `#undef`.
+  32 sites, and `-I$BASHSRC/lib/intl` is already on CFLAGS. *Needs a
+  decision rather than a sweep-in*, like BANG_HISTORY: it changes what
+  `$"..."` means.
+- **`run-intl` 5 -- locale, and possibly ours.** The test wants
+  `1,0000` and we answer `1.0000`, i.e. **`LC_NUMERIC` is not taking
+  effect**, plus `Passed all 1318 Unicode tests` against 1770.
+- **`run-posixpat` 15 -- every line is `>`**, i.e. expected output
+  ABSENT, which is the shape a missing capability makes. Unread.
+- **`run-nquote` 16, `run-lastpipe` 14, `run-heredoc` 8** -- unread.
+  `run-heredoc`'s `1: no<TAB>OK` against `1: OK` is a field
+  difference rather than a missing feature.
+- **`run-attr` 2 -- `declare -rx p="1"` against `declare -r p="1"`.**
+  A variable marked EXPORTED that should not be; small, specific and
+  plausibly ours.
+- **`wait: usage: wait [pid ...]`** in `run-assoc` and `run-array`:
+  bash's own `wait` refusing its arguments, in two files.
+*So the remaining genuinely-ours surface in bash is small and named,
+and two of the seven have shapes this campaign has repeatedly found
+to be real and cheap.* **The big blocks will not move without
+`tcsetpgrp`, `/dev/fd` or `dlopen`**, none of which Plan 9 has.
 
 **Smaller open items**: `strtol`/`strtoul` have the same
 one-limit-for-both-signs shape as `strtoll` had, so `strtol(LONG_MIN)`
