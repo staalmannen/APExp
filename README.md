@@ -59,7 +59,9 @@ In addition, several patches from @lufia [9, 10] to build libressl and curl
 sources. To get more C99 compatibility, AI-generated patches have been introduced (VLA, hex float support, complex support, compound literals, division by 0, dropping keywords, etc). C99 support is *pretty much complete* by now, and we have even started adding some C11/C23 features to the compiler. This served as a base to add ports of third party libraries and utilities to enhance compatibility. In addition to the compiler, the linker has been enhanced with DWARF2 support from the old Go compiler (copied from the goken9cc project). This was a bit of a detour because DWARF apparently only works on ELF binaries, but I keep it in just in case someone comes up with a good use case.
 
 
-Install paths have been modified so that libraries and binaries are installed in the local directory structure of APExp. A bind script (apexp-sh) in the root of APExp can be used to overlay APExp over the native system.
+Install paths have been modified so that libraries and binaries are installed in the local directory structure of APExp. A bind script (apexp-sh) in the root of APExp can be used to overlay APExp over the native system. The script apexp-sh can be started with 2 different flags: 
+-r to remain in rc instead of bash. Can be a good fallback if bash is broken. 
+-v to run bash under vt100 emulation (vts/vtwin), which enables tab completion and arrow history etc. The window also turns black, making it easier to see which window is running APExp. 
 
 
 ***Headers***

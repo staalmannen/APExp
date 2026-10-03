@@ -1,5 +1,5 @@
-bash 157806: warning: process exceeds 100 file descriptors
-bash 157806: warning: process exceeds 200 file descriptors
+bash 200761: warning: process exceeds 100 file descriptors
+bash 200761: warning: process exceeds 200 file descriptors
 declare -r SHELLOPTS="braceexpand:hashall:interactive-comments"
 Testing /bin/bash
 version: 5.3.0(2)-release
@@ -348,46 +348,6 @@ warning: binary appears, please do not consider this a test failure
 run-exp-tests
 run-exportfunc
 run-extglob
-141c141
-< .a .foo
----
-> . .. .a .foo
-143c143
-< .a .foo
----
-> . .. .a .foo
-162c162
-< .a
----
-> .. .a
-164c164
-< .a
----
-> .. .a
-169c169
-< .a
----
-> .. .a
-171c171
-< .a .foo
----
-> . .. .a .foo
-173c173
-< ? .a .foo
----
-> ? . .. .a .foo
-178c178
-< .a
----
-> .. .a
-180c180
-< .a .foo
----
-> . .. .a .foo
-182c182
-< ? .a .foo
----
-> ? . .. .a .foo
 run-extglob2
 run-extglob3
 run-func
@@ -667,10 +627,6 @@ ok 4
 > searchable/.
 > searchable/.
 > searchable/.
-130c101
-< .a .aa .b .bb
----
-> . .. .a .aa .b .bb
 139,140c110,111
 < mailcheck.o make_cmd.o mksignames mksignames.o mksyntax mksyntax.dSYM
 < mksyntax.dSYM mksyntax mksignames.o mksignames make_cmd.o mailcheck.o
@@ -764,8 +720,8 @@ run-ifs
 > argv[1] = <*>
 run-ifs-posix
 run-input-test
-bash 171236: warning: process exceeds 100 file descriptors
-bash 171236: warning: process exceeds 200 file descriptors
+bash 214214: warning: process exceeds 100 file descriptors
+bash 214214: warning: process exceeds 200 file descriptors
 run-intl
 ./intl2.sub: line 16: locale: command not found
 intl2.sub: warning: you do not have the de_DE.UTF-8 locale installed;
@@ -811,7 +767,7 @@ warning: SIGHUP.  Please disregard.
 < ./jobs1.sub: line 15: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 < ./jobs1.sub: line 21: jobs: command not found
-< ./jobs1.sub: line 25: [: 171513: unary operator expected
+< ./jobs1.sub: line 25: [: 214491: unary operator expected
 < ./jobs2.sub: line 3: set: monitor: invalid option name
 < ./jobs2.sub: line 8: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
@@ -869,7 +825,7 @@ warning: SIGHUP.  Please disregard.
 < ./jobs6.sub: line 2: set: monitor: invalid option name
 < wait: usage: wait [pid ...]
 < child1 exit status 2
-< ./jobs6.sub: line 6: kill: (171584) - No such process
+< ./jobs6.sub: line 6: kill: (214560) - No such process
 < ./jobs7.sub: line 2: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 < ./jobs7.sub: line 4: jobs: command not found
@@ -1060,8 +1016,12 @@ run-more-exp
 run-nameref
 warning: some of these tests will fail if arrays have not
 warning: been compiled into the shell
-471d470
+471,475d470
 < declare -x vgasize="1920x1080x32"
+< declare -x vts="1"
+< declare -x vtsdebug="1"
+< declare -x vtslog="/tmp/vts.log"
+< declare -x vtspid="200710"
 run-new-exp
 warning: two of these tests will fail if your OS does not support
 warning: named pipes or the /dev/fd filesystem.  If the tests of the
@@ -1345,10 +1305,6 @@ warning: found or messages concerning bad file descriptors produce diff
 warning: output, please do not consider it a test failure
 12d11
 < ./redir.tests: line 62: /etc/passwd: No such file or directory
-22c21
-< ./redir.tests: line 83: 6: Bad file descriptor
----
-> to c
 28,30c27,28
 < ./redir3.sub: line 27: 5: Bad file descriptor
 < read line3 "daemon"
@@ -1465,11 +1421,12 @@ run-trap
 warning: UNIX versions number signals and schedule processes differently.
 warning: If output differing only in line numbers is produced, please
 warning: do not consider this a test failure.
-79d78
-< +[8] false+[8] false
-81c80,81
+79,81c79,81
+< +[8] false+[8] false+[8] false
+< 
 < 
 ---
+> +[8] false
 > +[8] false
 > +[8] false
 109,110d108
