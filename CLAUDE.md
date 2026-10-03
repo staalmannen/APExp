@@ -4204,8 +4204,31 @@ never it.*
   third story in a row.** Cheap refutation: if it comes back next
   run with nothing touching it, it is flaky like `run-trap`'s hunk.
 - `run-trap` 14 -> 16 is that hunk oscillating for the **fifth** time.
-*Still not run on the VM: `dotdir-test`, whose sections 6b and 7 are
-the two the host could not reach.*
+**AND `dotdir-test` IS NOW RUN ON THE VM: `_dotdirmark = 1`, every
+section PASS, 0 failures -- INCLUDING THE TWO THE HOST COULD NOT
+REACH.**
+- **Section 6b answered in the exact shape predicted**, and the
+  output says so rather than leaving it to be argued: it prints
+  **`seekdir(2) -> f0`**. On the host that line read `seekdir(0)`,
+  because glibc put a real entry at position 0 and the seek never
+  crossed the synthetic/real boundary; here the first real entry is
+  at **2**, so `telldir`/`seekdir` are measured ACROSS the boundary
+  for the first time. *The prediction was written into the file
+  before the run and the number in the output is what confirms it.*
+- **Section 7 is the chain end to end, and only here does it mean
+  anything**: `glob("*")` matched 5 with **0** dot entries,
+  `glob(".*")` matched 3 with **2**. glibc's glob does not route
+  through an interposed `readdir`, so its host PASS measured glibc;
+  libap's glob calls libap's readdir directly, so this one measures
+  the thing the two suites compare. *Four independent confirmations
+  now -- `run-extglob`, `run-glob-test`, and both halves of this.*
+- **Section 4 passed for the right reason, which is the half a
+  name-only fix would have failed**: `. d_ino 37897` against
+  `stat(dotdirtest.d) 37897` and `.. d_ino 52201` against
+  `stat(.) 52201`, both `d_type 4`. The inodes are real and they are
+  the right two files.
+**The readdir item is CLOSED**: confirmed from outside in two suite
+files and from inside in all seven sections.
 - **`recho: command not found`, 9 lines, identical in both runs.**
   `bash-runtests` guarantees the four helpers are built, and most
   files find them -- `run-assoc`, `run-ifs` and `run-new-exp` do not.
