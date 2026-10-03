@@ -188,7 +188,27 @@
    ability to be a restricted one.  The shell thus generated can become
    restricted by being run with the name "rbash", or by setting the -r
    flag. */
-/* #undef RESTRICTED_SHELL */
+/*
+ * ON. The sixth of the "capability present and not declared" family in
+ * this file, after READLINE, HISTORY, the fourteen features, HELP_BUILTIN
+ * and BANG_HISTORY -- upstream ships everything off and `configure' turns
+ * it on, and APExp hand-maintains this file.
+ *
+ * Nothing was missing from the build: the switch gates 55 sites across
+ * eight existing .c files and nine .def files, every one of which is
+ * already in OFILES or DEFFILES. No new object, no mkfile change.
+ *
+ * Measured in bash's own suite: `run-rsh' is 33 differing lines, opening
+ * `set: -r: invalid option' in rsh1.sub, rsh2.sub and rsh.tests, with the
+ * rest of each file shifting behind it.
+ *
+ * Unlike BANG_HISTORY -- which changed what `!' MEANS in every
+ * interactive line and so was a decision rather than an omission -- this
+ * one is INERT unless the shell is invoked as `rbash' (config-bot.h:96's
+ * RESTRICTED_SHELL_NAME) or with `-r'. An ordinary `bash' is unchanged,
+ * so there is nothing to weigh.
+ */
+#define RESTRICTED_SHELL 1
 
 /* Define DISABLED_BUILTINS if you want "builtin foo" to always run the
    shell builtin "foo", even if it has been disabled with "enable -n foo". */

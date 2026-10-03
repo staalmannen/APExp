@@ -206,7 +206,8 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `float-overflow-test.c`, `malloc-reuse-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
 `copyfile-test.c`, `deeppath-test.c`, `bufexec-test.c`,
-`mkstemp-test.c`, `printfmod-test.c`, `umask-test.c` and
+`mkstemp-test.c`, `printfmod-test.c`, `umask-test.c`,
+`dupbuf-test.c` and
 `stdio-test.c`.
 **`ctype-xcheck.c` is a HOST program** like `tz-xcheck.c`: it links
 libap's own `_ctype[]` into a glibc program and sweeps **256 values
@@ -302,6 +303,18 @@ glibc's take `const char *`, so even a `-D` rename collides with the
 header -- it renames the SOURCE with `sed` into a temporary instead.
 `strtol`/`strtoul` cannot be swept at all here, because kencc's
 `long` is 32-bit and the host's is 64.
+`regcoll-xcheck.c` links libap's `regcomp`/`regexec`/`tre-mem` into a
+glibc program and sweeps collating symbols and equivalence classes
+against glibc's engine. It needs TWO compiles **and a staged
+`regex.h`**: the two libraries disagree about `regex_t`'s layout *and*
+about the REG_* numbers, so one translation unit cannot hold both --
+a SHIM half is built with APE's header and answers in `int` and
+`const char *`. Errors are compared by NAME, as `strerror-xcheck`
+does and for the same reason. `regerror.c` is left out (it pulls
+Plan 9's `u.h`), which is why the shim names the codes itself.
+Its **section 3 is a control of the instrument**, not of the library:
+ordinary brackets with no collation in them, which must stay at 0
+when the collation code changes.
 `sys/src/ape/lib/libressl/test/` is separate: it is
 upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
 
@@ -3884,10 +3897,202 @@ it), glibc has no such error, and its text is left alone. It reads
 out of range, so the two are indistinguishable from outside.
 *Recorded rather than changed: a new wording would be invented and
 nothing has measured it.*
-**NOT YET MEASURED ON THE VM. Predict `run-redir` 77 -> ~70 and
-`run-vredir` 11 -> ~9**, with nothing else moving. Refuted if some
-other file changes -- which would mean a test was matching on the old
-text, and that is worth knowing rather than assuming.
+**MEASURED, AND BOTH NUMBERS WERE TOO LOW: `run-redir` 77 -> 63
+(predicted ~70) and `run-vredir` 11 -> 5 (predicted ~9).** And the
+refutation condition fired usefully: **`run-errors` 8 -> 4 moved too**
+-- the same two `Bad file number` lines, in a third file I had never
+opened. *Three files, one fix, nothing up.*
+**Why the predictions were low is the same mistake in both**: I sized
+them from the one section head I had read rather than counting the
+string across the whole log. The sweep that settles it takes one
+command and I only ran it AFTER the run -- `Access denied` **7 -> 0**,
+`Bad file number` **9 -> 0**, and `Permission denied` **10 -> 0**
+while `Operation not permitted` went 1 -> 4, which is the EPERM/EACCES
+swap unwinding exactly as read. *Count the string in the corpus, not
+in the paragraph you happened to read.*
+**TWO occurrences of `No such system call` SURVIVE, and they are not
+the table.** They are `ln: failed to create symbolic link` and
+`mkfifo: cannot create fifo` -- ENOSYS from `symlink()` and
+`mkfifo()`, printed by **coreutils binaries that were not relinked**.
+APE is statically linked, so every program carries its own copy of
+`sys_errlist[]`, and `mk install` rebuilds `libap.a` without relinking
+programs already built against it. bash was rebuilt and changed; `ln`
+and `mkfifo` were not and did not. *That is the rule already in this
+file -- a libap fix can sit unused for rounds -- showing up as two
+lines rather than as a silence*, and `mk distclean` before the next
+`mk install` is what would finish it.
+**IT DID, AND THE WHOLE REBUILD MOVED NOTHING ELSE.** After a full
+`mk distclean` plus `mk install`, both lines read
+`Function not implemented` -- glibc's ENOSYS wording, from the new
+table -- at the same two line numbers in the same two sections.
+*The prediction named the exact two lines and the exact two files,
+and nothing else in 1601 lines changed*, which is as clean a
+confirmation of the static-linking reading as this corpus can give.
+**And that is the more valuable half of the run.** `REAL 38 /
+WARNONLY 1 / PASS 47` are identical to the previous run, and the
+per-file diff is **one line** -- `run-trap` 14 -> 16, the xtrace hunk
+that regroups between identical runs and has already gone back and
+forth twice. So the first relink of the ENTIRE tree since
+`ctype`/`getcwd`/`umask`/`mktemp`/`printf`/`strftime`/`strtoull`/
+`strtoumax`/`strerror` **broke nothing anywhere in bash's suite**.
+*A green run after a distclean is the only control that covers
+programs no test names*, and until now every one of those fixes had
+only ever been measured through a binary that happened to be
+rebuilt. The errno sweep closes with it: `Access denied`,
+`Bad file number`, `Too big`, `Try again`, `No buffers` and
+`Shut down` are **0 in the corpus**, `Operation not permitted` holds
+at 4.
+**And it left one new item, which is the EGREG arm becoming
+visible.** `run-read`'s `read7.sub` prints
+`redirection error: cannot duplicate fd: Unknown error`, and the
+next line is `line 60: 5174752: Unknown error` -- a garbage fd number
+downstream of the failed dup. `Unknown error` is the table's text for
+**EGREG**, which `fcntl.c`'s `F_DUPFD` sets for a buffered
+descriptor. *An errno naming the wrong category, printed to a user* --
+the commonest bug shape here -- and it is only legible now because
+the rest of the table stopped saying `Unknown error` by accident.
+Recorded, not fixed: `run-read`'s other 27 lines are `/dev/tty`
+(absent on Plan 9) and the `mkfifo` stub.
+
+**FIXED THE NEXT ROUND, AND IT WAS MUCH WIDER THAN THREE LOG LINES:
+`dup()` AND `dup2()` ARE EACH ONE LINE OF `fcntl(.., F_DUPFD, ..)`,
+so all three refused.** A descriptor becomes buffered the first time
+anything `select()`s it -- libap's select forks a copy process rather
+than polling -- so **any program with an event loop had lost the
+ability to dup the descriptors it was watching**, select() being how
+an event loop works and dup being how a shell redirects. *Three lines
+in one test file, and the reachable surface is most interactive
+programs.* `read7.sub` line 60 is `read -e -t .001 a <<<abcde`,
+counted rather than guessed: `-e` is readline, which select()s fd 0;
+the here-string is a redirection of fd 0, so bash saves the original
+with a dup first.
+**The arm was protecting against something real, which is why the fix
+is two lines and not a deletion.** `Muxbuf` is keyed on the descriptor
+NUMBER (`_buf.c`'s `b->fd`) and `Fdinfo` holds a `buf` POINTER beside
+the flag, so copying `fi->flags` wholesale onto a new number makes
+`_readbuf` find `b->fd != fd` and answer **EBADF on every read** -- a
+dup that succeeds and hands back something broken, which is worse
+than the refusal. **But those two bits are facts about a descriptor
+number in one process image, not about the open file** -- the
+invariant `_fdinfo.c` already states for `FD_BUFFEREDX`, and
+`sfdinit` already scrubs this exact pair on exec in exactly these two
+lines. Copied whole, pointer included; `FD_ISTTY` and `FD_ISREG` are
+facts about the FILE and carry over unchanged. *The second line is
+the one that would have been forgotten.*
+**The limit is recorded rather than hidden**: bytes the copy process
+has already drained into the Muxbuf are not visible through the new
+descriptor, so the two do not share a read position the way POSIX
+says two dups of one open file description do. There is nowhere to
+put them, a reader of the dup was *already* competing with the copy
+process (the measured keystroke-thief hazard), and the dominant use
+of dup -- a shell saving a descriptor to restore later -- never reads
+it.
+**`_dupmark()` is the marker** (sixth use of the idiom), and
+**both controls fire on the host**: replicating the old refusal gives
+**4** failures, replicating the HALF-FIX -- dup succeeds, reads give
+EBADF -- gives **exactly 1**, section 5, which the header says is
+there for it. *A control that fires on one section is better evidence
+than one that fires on four*: it says the section is not decorative.
+0 failures on glibc. NOT YET MEASURED ON THE VM.
+**And `dupbuf-test` HUNG on its first host run, in the way its own
+header had just finished describing** -- section 5 drains the pipe
+through the dup and section 6 then blocks reading the original.
+*Writing the hazard down one paragraph above the bug did not prevent
+the bug*, which is the `abort()`-allocates lesson again. Every read is
+non-blocking now, set once at pipe creation so it is true by
+construction rather than by argument, and stdout is unbuffered so a
+future hang names its section -- the kill took the buffered output
+with it and left nothing at all to read. *Twelfth instrument fault.*
+
+**AND THE REST OF THE REAL LIST WAS SURVEYED IN ONE COMMAND, by
+counting each cause across the whole corpus rather than reading
+files.** 1094 differing lines over 38 files. **The share that is a
+bug in this tree is small, and two of the four are new:**
+- **`. ` and `..` missing from a glob -- OURS, and now measured in a
+  SECOND suite.** `run-extglob` wants `. .. .a .foo` and gets
+  `.a .foo`. This is Tcl's `filename-14.9` exactly -- **Plan 9
+  directories contain neither entry** -- recorded there as wanting
+  its own round because synthesising them in `readdir()` changes
+  what every directory read in every program sees. *One measurement
+  made it a deferred curiosity; a second, independent one makes it
+  the biggest thing here that is ours.*
+- **`[=x=]` and `[.x.]` answer `Unknown collating element`**, 9 lines
+  in `run-cond`. `ap/regex/regcomp.c` is musl's TRE and the line is
+  **musl's own** -- `/* collating symbols and equivalence classes are
+  not supported */` -- so this is a vendored gap, not an APExp
+  regression. **But the C-locale answer is mechanical**: every
+  equivalence class is a singleton there, so `[[=d=]]` IS `[d]`.
+  Accepting the single-character form and keeping `REG_ECOLLATE` for
+  multi-character ones is conformance rather than invention, and
+  small.
+  **DONE, and the justification is sharper than "the C locale" alone:
+  there is no collation table anywhere in TRE** -- the engine compares
+  encoded values, as its own `XXX - Should use collation order instead
+  of encoding values` comment says -- so the C locale is what every
+  comparison already implements and no second reading is available.
+  A collating symbol naming one character IS that character in any
+  locale; a multi-character element still answers ECOLLATE, because
+  this locale has none to name. `parse_collating()` is a helper rather
+  than inline code because the construct is legal as a RANGE ENDPOINT
+  too, and the two call sites would otherwise disagree about what a
+  bracket may hold.
+  **THE CROSS-CHECK CORRECTED THE FIX TWICE, and reading alone would
+  have shipped both** -- each agreed with glibc everywhere else:
+  - **`[[=d=]-z]` was accepted and glibc answers `REG_ERANGE`.** An
+    equivalence class names a SET and so has no position in the
+    order; a collating symbol names one element and can bound a
+    range. The helper now reports which it parsed, and both call
+    sites refuse the equivalence class. *The corpus asks all four
+    combinations -- each construct on each side -- for the reason
+    `$@` was asked beside `$*`.*
+  - **`[[.d]]` answered ECOLLATE where glibc says `REG_EBRACK`.** An
+    unterminated `[.` is an unclosed bracket expression; only a
+    TERMINATED one naming something unsupported is ECOLLATE. The
+    helper scans for the closing delimiter FIRST so the two stay
+    distinguishable.
+  **`regcoll-xcheck.c`: 1906 checks, 0 wrong; the old blanket refusal
+  replicated beside it gives 1652** -- and its section 3 (ordinary
+  brackets, no collation) stays at **0 in both runs**, which is the
+  half that matters, since a control that moved with the collation
+  code would not be a control at all. NOT YET MEASURED ON THE VM.
+- **`set -r` -- `RESTRICTED_SHELL`, the same switch shape a sixth
+  time.** `run-rsh` 33. Inert unless invoked as `rbash` or with `-r`,
+  so unlike `BANG_HISTORY` it costs nothing to turn on.
+  **TURNED ON, gcc-swept, NOT YET MEASURED ON THE VM.** Nothing was
+  missing from the build, as with READLINE, HELP_BUILTIN and
+  BANG_HISTORY before it: the switch gates 55 sites across eight `.c`
+  files and nine `.def` files, every one already in OFILES or
+  DEFFILES, so no mkfile change. **0 errors** in the class 6c treats
+  as fatal, across the six `.c` files and the nine generated
+  builtins. **And the control is the preprocessed line count, not the
+  error count** -- `shell.c` **+93**, `flags.c` +20, `variables.c`
+  +29, `execute_cmd.c` +24, `builtins/common.c` +10, `redir.c` +8 --
+  because 0 errors with the switch off is the same number and says
+  nothing. The real `config.h` is swapped in place to get that:
+  *`-I` cannot override `config.h` for bash's own sources*, which is
+  already recorded here and is still true.
+  **`builtext.h` had to be generated first** or `execute_cmd.c` and
+  `variables.c` report a fatal missing-header "error" and the sweep
+  reads as two real failures. Same harness artefact as last time.
+- **`recho: command not found`, 9 lines, identical in both runs.**
+  `bash-runtests` guarantees the four helpers are built, and most
+  files find them -- `run-assoc`, `run-ifs` and `run-new-exp` do not.
+  A precondition question about the harness, like the `../bash`
+  check, and stable rather than flaky.
+**NOT ours, with the arithmetic**: `JOB_CONTROL` **148** lines (no
+`tcsetpgrp`/`tcgetpgrp`, no foreground process group), process
+substitution (`/dev/fd` absent and `/fd` has the wrong semantics for
+a child), `hexdump` 14 and `locale` 1 (programs this tree has not
+got), `/etc` 17, `glob-bracket` 103 (loadable builtin, no dlopen),
+`/bin/p` 3 (a name collision), `run-glob-test` 63 (whole-second
+mtimes, and unstable by construction).
+**One I nearly filed as a bug and did not**: `link()` returns
+**EMLINK**, which reads like the stub-answering-the-wrong-thing
+family -- but `sys/limits.h` declares **`LINK_MAX 1`**, and POSIX
+says EMLINK is exactly what a link past LINK_MAX gives. *It is
+internally consistent and the file's own comment says so.* Checking
+the constant before writing the entry is what separated it from
+`mkfifo`'s `errno = 0`.
 
 **One PROBE, not a claim**: `run-rsh`'s `date` line prints the zone
 as **`CES`**, and Central European Summer Time is `CEST`. It is not

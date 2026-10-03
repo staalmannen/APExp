@@ -29,10 +29,66 @@ fcntl(int fd, int cmd, ...)
 	else switch(cmd){
 		case F_DUPFD_CLOEXEC:
 		case F_DUPFD:
-			if(fi->flags&(FD_BUFFERED|FD_BUFFEREDX)){
-				err = EGREG;	/* dup of buffered fd not implemented */
-				break;
-			}
+			/*
+			 * A BUFFERED DESCRIPTOR USED TO BE UNDUPLICATABLE,
+			 * and the arm that refused it answered `EGREG'.
+			 *
+			 * Two separate faults. The errno first: EGREG is
+			 * APE's own, `_errno.c' maps Plan 9's "ken has left
+			 * the building" to it, and `strerror' prints
+			 * `Unknown error' -- which is also what an errno out
+			 * of range gives, so the two are indistinguishable
+			 * from outside. bash's `read7.sub' line 60 is
+			 * `read -e -t .001 a <<<abcde': `-e' makes readline
+			 * `select()' fd 0, which BUFFERS it, and the
+			 * here-string then makes bash save fd 0 with a dup.
+			 * It printed `cannot duplicate fd: Unknown error'.
+			 *
+			 * And the scope is far wider than fcntl, because
+			 * `dup()' and `dup2()' are both one line of
+			 * `fcntl(.., F_DUPFD, ..)'. So **any APE program that
+			 * had ever select()ed a descriptor could no longer
+			 * dup it** -- which, since select() is how an event
+			 * loop works and dup is how a shell redirects, is a
+			 * good deal of ordinary code.
+			 *
+			 * WHY IT WAS REFUSED, AND WHY CLEARING THE BITS IS
+			 * THE ANSWER RATHER THAN AN INVENTION.
+			 *
+			 * `Muxbuf' is keyed on the descriptor NUMBER
+			 * (`_buf.c''s `b->fd'), and `Fdinfo' carries a `buf'
+			 * pointer beside the flag. Copy `fi->flags' wholesale
+			 * onto a new number and `_readbuf' finds
+			 * `b->fd != fd' and answers EBADF on every read --
+			 * so simply deleting the arm would trade a refusal
+			 * for a descriptor that reads as broken, which is
+			 * worse. That is what the arm was protecting against.
+			 *
+			 * But those two bits are **facts about a descriptor
+			 * number in one process image, not about the open
+			 * file** -- which is the invariant `_fdinfo.c' already
+			 * states for FD_BUFFEREDX, and `sfdinit' already
+			 * scrubs exactly this pair on exec for exactly this
+			 * reason, in exactly these two lines. The kernel's
+			 * `_DUP' gives a real second descriptor on the same
+			 * open file; what it does not give is a second
+			 * Muxbuf, and the new number must not claim one.
+			 * FD_ISTTY and FD_ISREG are facts about the FILE and
+			 * are carried over unchanged.
+			 *
+			 * THE LIMIT, recorded rather than hidden: bytes the
+			 * copy process has already drained into the Muxbuf
+			 * are not visible through the new descriptor, so the
+			 * two do not share a read position the way POSIX says
+			 * two dups of one open file description do. There is
+			 * nowhere to put them -- a Muxbuf cannot be split --
+			 * and a reader of the dup was already competing with
+			 * the copy process, which is the keystroke-thief
+			 * hazard this tree has measured. Losing that is
+			 * strictly better than failing the dup, and the
+			 * overwhelming use of dup here (a shell saving a
+			 * descriptor to restore later) never reads it at all.
+			 */
 			oflags = fi->oflags;
 			/*
 			 * THE KERNEL PICKS THE DESCRIPTOR, NOT `_fdinfo[]`.
@@ -95,6 +151,16 @@ fcntl(int fd, int cmd, ...)
 			fans->flags = fi->flags&~FD_CLOEXEC;
 			if(cmd == F_DUPFD_CLOEXEC)
 				fans->flags |= FD_CLOEXEC;
+			/*
+			 * The two lines from `_fdinfo.c''s exec scrub, and
+			 * the SECOND one is the one that would be forgotten:
+			 * clearing the flag without clearing the pointer
+			 * leaves a stale `Muxbuf *' behind a bit that says
+			 * not to look at it, which is one edit away from
+			 * being believed again.
+			 */
+			fans->flags &= ~(FD_BUFFERED|FD_BUFFEREDX);
+			fans->buf = 0;
 			fans->oflags = oflags;
 			fans->uid = fi->uid;
 			fans->gid = fi->gid;
@@ -122,4 +188,18 @@ fcntl(int fd, int cmd, ...)
 		ans = -1;
 	}
 	return ans;
+}
+
+/*
+ * Version marker for `dupbuf-test.c'. `pcc -o x x.c' relinks against the
+ * INSTALLED libap, so a test built from a fresh pull can run days-old
+ * library code and report a pass on it; a test that calls this will not
+ * LINK against a libap predating the F_DUPFD fix above. The idiom has
+ * paid five times already (`_sock_listenmark', `_execmark', `_ttymark',
+ * `_getcwdmark', `_printfmark').
+ */
+int
+_dupmark(void)
+{
+	return 1;
 }
