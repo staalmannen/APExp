@@ -4063,6 +4063,22 @@ bug in this tree is small, and two of the four are new:**
   includes `.` and `..`, while `dirtostat.c` sets `st_nlink = 1`
   always -- so that arithmetic has been giving -1 here all along.
   Recorded, unmeasured, and independent of this change.
+  **MEASURED AFTER A FULL `mk distclean`: `run-extglob` 20 -> 0, it
+  PASSES**, and all twenty lines were the same thing -- ten `c` hunks,
+  each `.a .foo` against `. .. .a .foo`. **`run-glob-test` 63 -> 61 is
+  a SECOND confirmation and was not predicted**: `.a .aa .b .bb`
+  against `. .. .a .aa .b .bb`, in a file whose other 61 lines are the
+  GLOBSORT/locale problems that cannot pass here. **Zero `. ..`
+  expectations remain anywhere in the corpus.**
+  **AND THE SAFETY EVIDENCE IS THE BETTER HALF.** A change that
+  touches every directory read in every program, measured across 86
+  test files, added **SEVEN lines corpus-wide and not one of them is
+  a directory entry**: three are run-to-run noise (the oscillating
+  xtrace hunk, and two `jobs*.sub` lines that carry a pid), four are
+  the run's own environment. *The sweep of libap's six readdir callers
+  predicted exactly this, and "nothing arrived" is the only form the
+  confirmation could take* -- a recursing walker would have hung the
+  suite, and a leaking entry would be a new line somewhere.
 - **`[=x=]` and `[.x.]` answer `Unknown collating element`**, 9 lines
   in `run-cond`. `ap/regex/regcomp.c` is musl's TRE and the line is
   **musl's own** -- `/* collating symbols and equivalence classes are
@@ -4160,6 +4176,36 @@ readable** -- `cannot duplicate fd` went 3 -> 2 and `Unknown error`
 *wants*. *Counting the string beside reading the section is what
 separated a surviving instance of the bug from two things that were
 never it.*
+
+**AND THE NEXT ROUND, AFTER A FULL `mk distclean`: `REAL 37 -> 36`,
+`PASS 48 -> 49`, 1033 -> 1015 lines.** `run-extglob` and
+`run-glob-test` are the readdir fix (above). Two others moved and
+**neither is the tree**:
+- **`run-nameref` 1 -> 5 ROSE, and it is the RUN'S OWN ENVIRONMENT.**
+  The test prints `declare -x` for everything exported, and the new
+  run carries `vts`, `vtsdebug`, `vtslog` and `vtspid` beside the
+  `vgasize` the old one had -- so this suite was run from inside a
+  **vts session** where the previous one was not. `session.c`'s
+  `putenv("vts"...)` and `vts-bash`'s `$vtsdebug` are where they come
+  from. *A test that compares the whole environment measures the
+  environment it was run in*, which joins the harness's own
+  `fconfigure`, the kernel's fd warnings and the `awk` that blocked:
+  **the fifth time something outside the tree has shown up inside a
+  measurement of it.** Nothing to fix, and nothing to read as a
+  regression -- but a run from a plain `apexp-sh` would answer 1.
+- **`run-redir` 63 -> 61 is UNEXPLAINED and recorded as such.** One
+  hunk went: `exec 6<>$TMPDIR/bash-c` at `redir.tests:83` used to
+  answer `6: Bad file descriptor` and now works. Two things changed
+  in this build -- the readdir entries and the first full relink of
+  every binary in the tree -- and *`exec N<>file` is a dup onto a
+  chosen descriptor, which is F_DUPFD's path*, but that fix was
+  already in the previous run's bash and that run still failed here.
+  **So the vehicle is not identified and guessing one would be the
+  third story in a row.** Cheap refutation: if it comes back next
+  run with nothing touching it, it is flaky like `run-trap`'s hunk.
+- `run-trap` 14 -> 16 is that hunk oscillating for the **fifth** time.
+*Still not run on the VM: `dotdir-test`, whose sections 6b and 7 are
+the two the host could not reach.*
 - **`recho: command not found`, 9 lines, identical in both runs.**
   `bash-runtests` guarantees the four helpers are built, and most
   files find them -- `run-assoc`, `run-ifs` and `run-new-exp` do not.
