@@ -63,6 +63,7 @@
 #include <string.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <inttypes.h>	/* strtoumax; section 9 needs the PROTOTYPE -- see there */
 
 extern int _printfmark(void);
 
@@ -203,6 +204,9 @@ main(void)
 	{
 		unsigned long ul = 2604292517UL;
 		unsigned int ui = 2604292517U;
+		uintmax_t pp;
+		unsigned long p;
+		char *ep;
 
 		printf("   sizeof(long)=%d  sizeof(void*)=%d\n",
 			(int)sizeof(long), (int)sizeof(void *));
@@ -213,6 +217,41 @@ main(void)
 		sprintf(b, "%08X", -1);	 printf("   %%08X  of (int)-1       -> %s\n", b);
 		printf("   all four should end 9B3A59A5 except the last "
 			"(FFFFFFFF)\n");
+
+		/*
+		 * bash's own decision, replicated line for line from
+		 * builtins/printf.def's x/X arm. It is HERE rather than
+		 * argued from the source because three mechanisms have
+		 * now been refuted by reading -- strtoull saturating
+		 * wrongly, mklong building the format wrongly, and
+		 * amd64's va_arg reading the wrong width (it reads a
+		 * 4-byte type from the low half of an 8-byte slot, which
+		 * is right). Whichever of these two lines disagrees with
+		 * the one above it names the side.
+		 *
+		 * **And writing this probe REPRODUCED the symptom
+		 * exactly, by accident.** Without <inttypes.h> there is
+		 * no prototype for strtoumax, so it is assumed to return
+		 * int, the result is SIGN-EXTENDED, and the run printed
+		 * `FFFFFFFF9B3A59A5' on glibc -- the bash output,
+		 * character for character. That is this tree's own
+		 * invariant (a call with no prototype in scope), and it
+		 * remains the best-shaped candidate even though bash's
+		 * own path looks clear: `printf.def' includes
+		 * <inttypes.h> under HAVE_INTTYPES_H, which is defined,
+		 * and APE's <inttypes.h> declares strtoumax
+		 * unconditionally. *Four mechanisms refuted by reading
+		 * now, which is the point at which this stops being a
+		 * reading question.*
+		 */
+		pp = strtoumax("2604292517", &ep, 0);
+		p = pp;
+		printf("   strtoumax(\"2604292517\") -> %08llX\n",
+			(unsigned long long)pp);
+		printf("   assigned to unsigned long -> %08lX\n", p);
+		printf("   bash takes the %s branch (p %s pp)\n",
+			p != pp ? "PRIdMAX/ll" : "\"l\"",
+			p != pp ? "!=" : "==");
 	}
 	printf("\n");
 

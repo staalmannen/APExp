@@ -5,11 +5,12 @@
 long
 strtol(const char *nptr, char **endptr, int base)
 {
-	const char *p;
+	const char *p, *zero;
 	long n, nn;
 	int c, ovfl, v, neg, ndig;
 
 	p = nptr;
+	zero = 0;
 	neg = 0;
 	n = 0;
 	ndig = 0;
@@ -47,13 +48,16 @@ strtol(const char *nptr, char **endptr, int base)
 		else{
 			base = 8;
 			if(p[1]=='x' || p[1]=='X'){
+				zero = p;	/* see Return: */
 				p += 2;
 				base = 16;
 			}
 		}
 	}else if(base==16 && *p=='0'){
-		if(p[1]=='x' || p[1]=='X')
+		if(p[1]=='x' || p[1]=='X'){
+			zero = p;
 			p += 2;
+		}
 	}else if(base<0 || 36<base)
 		goto Return;
 
@@ -78,8 +82,19 @@ strtol(const char *nptr, char **endptr, int base)
 	}
 
     Return:
+	/*
+	 * "0x" with no hex digit after it: C says the subject
+	 * sequence is the longest INITIAL subsequence of the
+	 * expected form, so this converts the `0' and leaves
+	 * endptr on the `x'. It used to consume the `0x' and then
+	 * report no conversion at all, so a caller testing
+	 * `endptr == nptr' rejected a valid zero. Same fix in all
+	 * four strto* files; swept against glibc for the two that
+	 * can be (see strtoint-xcheck.c -- `long' is 32-bit here
+	 * and 64 on the host, so these two cannot be).
+	 */
 	if(ndig == 0)
-		p = nptr;
+		p = zero ? zero + 1 : nptr;
 	if(endptr)
 		*endptr = (char *)p;
 	if(ovfl){

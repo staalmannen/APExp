@@ -9,11 +9,12 @@
 long long
 strtoll(char *nptr, char **endptr, int base)
 {
-	char *p;
-	long long n, nn, m;
+	char *p, *zero;
+	unsigned long long n, m, cutoff, lastv;
 	int c, ovfl, v, neg, ndig;
 
 	p = nptr;
+	zero = 0;
 	neg = 0;
 	n = 0;
 	ndig = 0;
@@ -50,14 +51,17 @@ strtoll(char *nptr, char **endptr, int base)
 		if(*p == '0') {
 			base = 8;
 			if(p[1]=='x' || p[1]=='X') {
+				zero = p;	/* see Return: */
 				p += 2;
 				base = 16;
 			}
 		}
 	} else
 	if(base==16 && *p=='0') {
-		if(p[1]=='x' || p[1]=='X')
+		if(p[1]=='x' || p[1]=='X') {
+			zero = p;
 			p += 2;
+		}
 	} else
 	if(base<0 || 36<base)
 		goto Return;
@@ -65,7 +69,20 @@ strtoll(char *nptr, char **endptr, int base)
 	/*
 	 * Non-empty sequence of digits
 	 */
-	m = VLONG_MAX/base;
+	/*
+	 * Accumulated UNSIGNED, against a limit that depends on the
+	 * sign. The magnitude of LLONG_MIN is one MORE than LLONG_MAX,
+	 * and the old loop accumulated into a signed `long long'
+	 * against `VLONG_MAX/base' either way -- so
+	 * `strtoll("-9223372036854775808")' answered ERANGE for a value
+	 * that is exactly representable. Measured against glibc by
+	 * `sys/lib/tests/strtoint-xcheck.c', which is also what says
+	 * the rewrite below did not break the other 1418 cases.
+	 */
+	cutoff = neg ? (unsigned long long)VLONG_MAX + 1
+		     : (unsigned long long)VLONG_MAX;
+	m = cutoff/base;
+	lastv = cutoff%base;
 	for(;; p++,ndig++) {
 		c = *p;
 		v = base;
@@ -79,17 +96,25 @@ strtoll(char *nptr, char **endptr, int base)
 			v = c - 'A' + 10;
 		if(v >= base)
 			break;
-		if(n > m)
+		if(n > m || (n == m && (unsigned long long)v > lastv))
 			ovfl = 1;
-		nn = n*base + v;
-		if(nn < n)
-			ovfl = 1;
-		n = nn;
+		else
+			n = n*base + v;
 	}
 
 Return:
+	/*
+	 * `ndig == 0' with `zero' set is the "0x" case: C says the
+	 * subject sequence is the longest INITIAL subsequence of the
+	 * expected form, so `strtol("0x", &e, 16)' converts the `0'
+	 * and leaves `e' on the `x' -- it is a successful conversion
+	 * of zero, not a failure. This consumed the `0x' and then
+	 * reported no conversion at all, so a caller testing
+	 * `endptr == nptr' rejected a valid number. glibc, musl and
+	 * the BSDs all answer 0 with endptr at nptr+1.
+	 */
 	if(ndig == 0)
-		p = nptr;
+		p = zero ? zero + 1 : nptr;
 	if(endptr)
 		*endptr = p;
 	if(ovfl){
@@ -99,8 +124,8 @@ Return:
 		return VLONG_MAX;
 	}
 	if(neg)
-		return -n;
-	return n;
+		return (long long)(0ULL - n);
+	return (long long)n;
 }
 
 intmax_t
