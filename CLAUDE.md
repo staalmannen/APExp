@@ -283,6 +283,12 @@ glibc's way applies to the checker too if both are in one command,
 and the sweep then compares libap against itself and reports a clean
 number. *Break the unit on purpose and check that the instrument
 notices* -- that is what caught it.
+`strtoint-xcheck.c` is the same idea for `strtoll` and `strtoull`,
+and needs THREE compiles: libap's prototypes take `char *` where
+glibc's take `const char *`, so even a `-D` rename collides with the
+header -- it renames the SOURCE with `sed` into a temporary instead.
+`strtol`/`strtoul` cannot be swept at all here, because kencc's
+`long` is 32-bit and the host's is 64.
 `sys/src/ape/lib/libressl/test/` is separate: it is
 upstream's own ML-KEM and SHA-3 vectors, run by `mk test` there.
 
@@ -3649,9 +3655,25 @@ tree has not got):
   `9B3A59A5` -- a 32-bit value sign-extended to 64. bash reaches
   printf with `%08lX` and an `unsigned long` whenever the value fits
   (`printf.def`'s x/X arm tests `p != pp` first), and kencc's `long`
-  is 32-bit, so either libap's `va_arg` or the caller's promotion is
-  wrong and reading cannot say which. `printfmod-test` section 9
-  prints the same number through four widths and asserts nothing.
+  is 32-bit. **FOUR mechanisms refuted by reading**: `strtoull`
+  saturating wrongly (2604292517 is nowhere near a threshold);
+  `mklong` building the format wrongly (bash NUL-terminates after
+  the conversion character first, so it really is `%08lX`); amd64's
+  `va_arg` reading the wrong width (`stdarg_arch.h` gives every
+  argument an 8-byte slot and reads a 4-byte type from its low half,
+  which is right); and a missing prototype in bash (`printf.def`
+  includes `<inttypes.h>` under `HAVE_INTTYPES_H`, which is defined,
+  and APE's `<inttypes.h>` declares `strtoumax` unconditionally).
+  *That is the point at which it stops being a reading question.*
+  **And writing the probe REPRODUCED the symptom by accident**:
+  without `<inttypes.h>` there is no prototype for `strtoumax`, so
+  it is assumed to return `int`, the result is sign-extended, and
+  the run printed `FFFFFFFF9B3A59A5` on glibc -- the bash output
+  character for character. That is this tree's own invariant (*a
+  call with no prototype in scope*), and it stays the best-shaped
+  candidate even though bash's path looks clear. `printfmod-test`
+  section 9 now replicates bash's `p = pp = strtoumax(...)` decision
+  line for line and asserts nothing.
 - **Two conformance gaps noticed and NOT fixed**, because nothing
   measured them: `_dtoa` hands back `"Infinity"` and `"NaN"`, so
   `printf("%f", INFINITY)` prints `Infinity` where C wants `inf` --
@@ -3690,7 +3712,64 @@ cheapest possible catch: break the thing on purpose and see whether
 the instrument notices.* The command is in the file and it is two
 compiles for the same reason `ctype-xcheck` is.
 
-**Smaller open items**: `unlink()` of a directory reports `EPLAN9`
+**MEASURED: `run-printf` 86 -> 45, AND IT IS THE ONLY FILE THAT
+MOVED.** Per-file diff against the previous run is one line, so the
+three printf fixes and the fifteen strftime conversions are confirmed
+with nothing else disturbed. What is left is exactly **1 + 44**: the
+`%08X` probe above, and `hexdump: command not found` -- a program
+this tree has not got, in `printf6.sub` alone. So `run-printf` is
+accounted for end to end like `run-histexpand` before it.
+
+**AND READING `strtoull` ON THE WAY FOUND THREE BUGS NOTHING HAD
+MEASURED -- one by eye and TWO by the sweep that was written to
+confirm the first.** None of them is the `%08X` question; they were
+found looking for it, and saying so matters, because a fix found
+beside a bug is not a fix for it.
+- **`strtoull.c` opened `#define UVLONG_MAX (1LL<<63)`**, which is
+  not the largest `unsigned long long` -- while `strtoul.c` in the
+  same directory uses `ULONG_MAX`. *The library held a correct
+  version of the thing it got wrong, for the fourth time* (after
+  `mktemp`/`__randname`, `getcwd`/`get_current_dir_name`, and
+  `vfscanf` knowing `t`/`j`/`z` while `vfprintf` did not).
+  **And my first comment on it was wrong in a way the control
+  caught.** I wrote that the overflow threshold was "halved" and
+  predicted a band of false ERANGEs. The literal is **signed**:
+  `1LL<<63` is LLONG_MIN, `UVLONG_MAX/base` is a signed division, and
+  the negative quotient converts to an unsigned value just under
+  ULLONG_MAX -- so the threshold was effectively **disabled**, not
+  halved, and detection fell back on a `nn < n` wrap test that misses
+  a multi-wrap. `strtoull("0777777777777777777777", 16)` returned
+  8608480567731124087 and no error. *An expression read rather than
+  evaluated is a guess*, and restoring the exact original line is
+  what said so: 28 wrong against 0.
+- **`strtoll(LLONG_MIN)` answered ERANGE** for a value that is
+  exactly representable -- its magnitude is one MORE than LLONG_MAX
+  and the loop used one limit for both signs. Now accumulated
+  unsigned against a sign-dependent cutoff.
+- **`strtoX("0x")` with no hex digit reported NO CONVERSION.** C says
+  the subject sequence is the longest *initial* subsequence of the
+  expected form, so `strtol("0x", &e, 16)` converts the `0` and
+  leaves `e` on the `x`; this consumed the `0x` and then set
+  `endptr = nptr`, so a caller testing `endptr == nptr` rejected a
+  valid zero. Fixed in **all four** files -- the defect is one shape
+  copied four times, and leaving two of them wrong would be worse
+  than either state.
+**`strtoint-xcheck.c` is the host cross-check**, and it carries the
+`strftime-xcheck` lesson forward: the rename must not reach the
+checker, and here even `-D` cannot do it (libap's prototypes take
+`char *` where glibc's take `const char *`, so the renamed
+declaration conflicts) -- so it renames the SOURCE with `sed` into a
+temporary and compiles that. 1419 checks, **0 wrong**, 38 before.
+**`strtol`/`strtoul` are deliberately NOT swept**: kencc's `long` is
+32-bit and the host's is 64, so the two disagree about the right
+answer by construction. *A cross-check needs both sides to agree on
+what is being computed* -- they get the `0x` fix and their signed-min
+arithmetic is recorded, unmeasured, rather than rewritten blind.
+
+**Smaller open items**: `strtol`/`strtoul` have the same
+one-limit-for-both-signs shape as `strtoll` had, so `strtol(LONG_MIN)`
+is likely ERANGE too -- unmeasurable by cross-check for the reason
+above, and untouched for that reason. `unlink()` of a directory reports `EPLAN9`
 where POSIX allows EPERM or EISDIR; `strerror(EBADF)` says `Bad file
 number` where POSIX and every GNU test expect `Bad file descriptor`.
 
