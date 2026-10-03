@@ -207,7 +207,7 @@ itself are `bool-test.c`, `bitfield-test.c`, `compound-assign-test.c`,
 `socket-server-test.c`, `dup-fdinfo-test.c`, `rmdir-test.c`,
 `copyfile-test.c`, `deeppath-test.c`, `bufexec-test.c`,
 `mkstemp-test.c`, `printfmod-test.c`, `umask-test.c`,
-`dupbuf-test.c` and
+`dupbuf-test.c`, `dotdir-test.c` and
 `stdio-test.c`.
 **`ctype-xcheck.c` is a HOST program** like `tz-xcheck.c`: it links
 libap's own `_ctype[]` into a glibc program and sweeps **256 values
@@ -4016,6 +4016,53 @@ bug in this tree is small, and two of the four are new:**
   what every directory read in every program sees. *One measurement
   made it a deferred curiosity; a second, independent one makes it
   the biggest thing here that is ours.*
+  **DONE, NOT YET MEASURED ON THE VM. The sweep came before the code**,
+  because the risk is not whether POSIX wants the entries -- it does --
+  but whether anything here walks a directory WITHOUT skipping them,
+  since such a caller recurses for ever. All six `readdir()` callers in
+  libap were read: `rmdir.c` (strcmp), `fts.c` (`ISDOT` unless
+  `FTS_SEEDOT`), `nftw.c` (open-coded ISDOT) and `seekdir.c` (replays
+  readdir) are safe; `scandir.c` does not skip and is **correct** not
+  to, since scandir reports everything and the caller's filter decides.
+  **Two of them were WRITTEN EXPECTING these entries**, which is the
+  strongest evidence available that their absence is the anomaly:
+  `rmdir.c` spends a strcmp per entry skipping names Plan 9 never
+  produced, and musl's `glob` does not skip them at all -- it relies on
+  `fnmatch` with `FNM_PERIOD`, so `*` excludes them and `.*` matches
+  them. **That is exactly what both failing tests ask for, so glob
+  needs no change and starts answering correctly on its own.**
+  **`d_ino` is real, not 0**: `.` is `fstat`ed from the stream's own
+  descriptor and `..` stat'ed through `fd2path` + `/..`, two stats per
+  directory TRAVERSAL rather than per entry. Zero would be the zipfs
+  `st_rdev` trap -- *a field that is always zero reads as information
+  and is not* -- and `find`'s loop detection, the classic `getcwd` and
+  `du`'s hard-link check all read it. At the root `/..` is `/` here as
+  on a unix, so no special case; if the parent cannot be stat'ed the
+  directory's own identity is used rather than a zero.
+  **NO NEW FIELD, so `sizeof(DIR)` does not move and this is NOT an
+  ABI change.** `dd_seek` is already the stream's entry counter and
+  the synthetic entries genuinely ARE entries 0 and 1, so the counter
+  describing them is the same fact rather than a second one -- and
+  `telldir`/`seekdir` come right for nothing, since seekdir rewinds and
+  replays `readdir()`. **A full rebuild is still needed, for the OTHER
+  reason**: a libap fix does not reach binaries already linked.
+  **`_dotdirmark()` is the marker** (seventh use). `dotdir-test.c` is
+  0 failures on glibc, and the host control -- an `LD_PRELOAD` readdir
+  dropping both entries -- gives **5**, naming sections 3, 4a, 4b, 4c
+  and 6a, with section 5 correctly unmoved.
+  **But the host control did NOT cover section 7, and that is written
+  in the file rather than left to be assumed**: glibc's `glob` does not
+  route through an interposed `readdir`, so section 7's host PASS
+  measures glibc and says nothing about the chain. *On Plan 9 it is the
+  only section that asks the question the two suites actually compare*
+  -- `glob("*")` must not match them and `glob(".*")` must. Section 6b
+  likewise never crossed the synthetic/real boundary on the host,
+  because glibc put a real entry at position 0.
+  **`fts.c:600` is a pre-existing oddity found on the way and NOT
+  touched**: `nlinks = fts_nlink - 2` assumes a directory's link count
+  includes `.` and `..`, while `dirtostat.c` sets `st_nlink = 1`
+  always -- so that arithmetic has been giving -1 here all along.
+  Recorded, unmeasured, and independent of this change.
 - **`[=x=]` and `[.x.]` answer `Unknown collating element`**, 9 lines
   in `run-cond`. `ap/regex/regcomp.c` is musl's TRE and the line is
   **musl's own** -- `/* collating symbols and equivalence classes are
@@ -4054,7 +4101,17 @@ bug in this tree is small, and two of the four are new:**
   replicated beside it gives 1652** -- and its section 3 (ordinary
   brackets, no collation) stays at **0 in both runs**, which is the
   half that matters, since a control that moved with the collation
-  code would not be a control at all. NOT YET MEASURED ON THE VM.
+  code would not be a control at all.
+  **MEASURED: `run-cond` 18 -> 0, it PASSES**, and the `ok 1`..`ok 9`
+  lines on the expected side now match -- so the fix produces correct
+  MATCHING, not merely a non-error. `[[.d.][.D.]]o.` answering
+  `ok 7 -- d` is the chain end to end.
+  ***And my "drop by 9" prediction was wrong by arithmetic I had
+  already recorded once***: 9 is the count of lines mentioning
+  `collating element`, and the bucket counts a section's `<` AND `>`
+  lines, so two `c` hunks of 5 and 4 cost **18**. *A `c` hunk always
+  costs at least two* -- written down after `run-printf` predicted 44
+  and gave 43, and repeated here anyway.
 - **`set -r` -- `RESTRICTED_SHELL`, the same switch shape a sixth
   time.** `run-rsh` 33. Inert unless invoked as `rbash` or with `-r`,
   so unlike `BANG_HISTORY` it costs nothing to turn on.
@@ -4074,6 +4131,35 @@ bug in this tree is small, and two of the four are new:**
   **`builtext.h` had to be generated first** or `execute_cmd.c` and
   `variables.c` report a fatal missing-header "error" and the sweep
   reads as two real failures. Same harness artefact as last time.
+  **MEASURED: `run-rsh` 33 -> 1, and THREE files moved that were not
+  predicted** -- `run-shopt` 19 -> 16 (`restricted_shell` now in the
+  `shopt` table), `run-invocation` 9 -> 6 (`--restricted` in the long
+  options) and `run-complete` 19 -> 18 (`restricted_shell` in the
+  completion list). Each attributed by diffing the section's own lines
+  rather than inferred: `restricted` across the corpus goes **17 -> 0**.
+  **The one line left in `run-rsh` is `ln: failed to create hard link
+  to 'sh': Too many links`** -- the test makes `rbash` with a hard
+  link, and Plan 9 has none. *That is the `link()`/`LINK_MAX 1` item
+  examined and deliberately NOT filed as a bug last round, and the
+  reading holds*: the errno is internally consistent, the capability
+  is simply absent, and the test cannot pass here.
+
+**THE WHOLE ROUND MEASURED, AND THE F_DUPFD FIX CAME WITH IT.**
+`REAL 38 -> 37`, `PASS 47 -> 48`, 1094 -> 1033 differing lines,
+**nothing rose**. Everything is attributed:
+RESTRICTED_SHELL 39 lines, collating 18 (`run-cond` passes),
+**F_DUPFD 2** -- and `run-trap` 16 -> 14, the xtrace hunk oscillating
+for the fourth time, which is not a change.
+**`read7.sub`'s two lines are gone exactly**: `cannot duplicate fd:
+Unknown error` and the garbage-fd line below it, so the dup fix is
+confirmed where it was found. **The corpus count is what made that
+readable** -- `cannot duplicate fd` went 3 -> 2 and `Unknown error`
+2 -> 0, and the two survivors were always different cases:
+`redir5.sub`'s is `Bad file descriptor` and unchanged, and
+`vredir6.sub`'s is on the `>` side, the `ulimit -n 6` line the suite
+*wants*. *Counting the string beside reading the section is what
+separated a surviving instance of the bug from two things that were
+never it.*
 - **`recho: command not found`, 9 lines, identical in both runs.**
   `bash-runtests` guarantees the four helpers are built, and most
   files find them -- `run-assoc`, `run-ifs` and `run-new-exp` do not.
