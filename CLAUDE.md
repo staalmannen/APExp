@@ -3456,6 +3456,10 @@ several because each partitions cleanly.
   concatenated trace lines in one run, three in the next. *A count
   that rises because a diff hunk realigns is not a new failure;
   reading the section is what separates them.*
+  **CONFIRMED two runs later: it went back to 14 with nothing
+  touching it**, which is what an unstable hunk does and what a
+  regression does not. *The reading was right and the cheap evidence
+  for it arrived by itself.*
 - **`run-builtins` 225 partitions 175 / 42 / 6 / 2**, and only the
   second is ours:
   **175 are `HELP_BUILTIN`** -- `help: command not found`,
@@ -3627,6 +3631,23 @@ instead of one file at a time:
 - **`run-glob-test` 63 -- `locale: command not found`** plus absent
   `zh_TW.big5` and `en_US.UTF-8`. Part missing program, part missing
   locale data.
+  **AND IT IS THE ONE SECTION WHOSE CONTENT CHANGES BETWEEN
+  IDENTICAL RUNS** -- the count stays 63 and the words move. Not
+  ours, and the cause is one line of arithmetic: `glob11.sub` tests
+  **`GLOBSORT`**, creating six files `sleep 0.1` apart under the
+  comment *"try to impose some kind of testable ordering"*, then
+  sorting them by `+atime`/`-atime` and `+mtime`/`-mtime`.
+  **Plan 9 file times are WHOLE SECONDS** -- 9P's `Dir.mtime`, and
+  `dirtostat.c` sets every `tv_nsec` to 0 -- so six files written
+  within half a second share one timestamp, bash's secondary sort on
+  name takes over, and whether the six straddle a second boundary is
+  luck. That is exactly the shape observed: one run name-sorted all
+  six, the next put `mksyntax` alone in front and name-sorted the
+  rest. *The test cannot pass here and cannot be stable here*, and
+  the `size` pair beside it is unaffected because sizes are real.
+  **The `.right` file settles the rest**: it names `mksyntax.dSYM`,
+  a macOS debug bundle, so the expected output was generated on a Mac
+  against that machine's directory.
 - **`run-func` 70 and `run-procsub` 35 -- process substitution**,
   joining `run-histexpand`'s 35. **Four files and ~140 lines are one
   switch**, and it stays off until `/dev/fd` means something here.
@@ -3735,10 +3756,16 @@ compiles for the same reason `ctype-xcheck` is.
 **MEASURED: `run-printf` 86 -> 45, AND IT IS THE ONLY FILE THAT
 MOVED.** Per-file diff against the previous run is one line, so the
 three printf fixes and the fifteen strftime conversions are confirmed
-with nothing else disturbed. What is left is exactly **1 + 44**: the
-`%08X` probe above, and `hexdump: command not found` -- a program
-this tree has not got, in `printf6.sub` alone. So `run-printf` is
-accounted for end to end like `run-histexpand` before it.
+with nothing else disturbed. What is left is the `%08X` probe above
+and `hexdump: command not found` -- a program this tree has not got,
+in `printf6.sub` alone. So `run-printf` is accounted for end to end
+like `run-histexpand` before it.
+**AND THE strtoumax FIX IS CONFIRMED: 45 -> 43, `FFFFFFFF9B3A59A5`
+GONE.** *I predicted 44 and the arithmetic was mine, not the
+library's*: the bucket counts a section's `<` AND `>` lines, so
+removing a one-line `149c149` hunk removes **two**. A per-file count
+here is differing LINES, not differing facts, and a `c` hunk always
+costs at least two. **43 is `hexdump` and nothing else.**
 
 **AND READING `strtoull` ON THE WAY FOUND THREE BUGS NOTHING HAD
 MEASURED -- one by eye and TWO by the sweep that was written to
@@ -3807,6 +3834,14 @@ file under `math/` and `complex/` reads as undeclared, because
 whose include path is not the BUILD's include path is measuring a
 different program.* It is a lower bound by construction and says so in
 its own header, like the all-char struct sweep.
+
+**One PROBE, not a claim**: `run-rsh`'s `date` line prints the zone
+as **`CES`**, and Central European Summer Time is `CEST`. It is not
+a parser truncation -- `tzone.c`'s `Maxname` is 16 -- so it is either
+what the machine's `/env/timezone` holds or what `$TZ` says, and
+`cat /env/timezone; echo $TZ` answers it in one command. The line is
+a timestamp and differs between runs anyway, so it costs nothing to
+leave until something else needs that file.
 
 **Smaller open items**: `strtol`/`strtoul` have the same
 one-limit-for-both-signs shape as `strtoll` had, so `strtol(LONG_MIN)`
