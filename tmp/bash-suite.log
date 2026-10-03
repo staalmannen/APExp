@@ -1,5 +1,5 @@
-bash 7407659: warning: process exceeds 100 file descriptors
-bash 7407659: warning: process exceeds 200 file descriptors
+bash 2526: warning: process exceeds 100 file descriptors
+bash 2526: warning: process exceeds 200 file descriptors
 declare -r SHELLOPTS="braceexpand:hashall:interactive-comments"
 Testing /bin/bash
 version: 5.3.0(2)-release
@@ -166,35 +166,33 @@ run-complete
 > jobs
 126a131
 > suspend
-149a155
-> histexpand
-153a160
+154a160
 > monitor
-157a165
+158a165
 > notify
-173a182
+174a182
 > checkjobs
-219a229
+220a229
 > restricted_shell
-227a238
+228a238
 > bg
-239a251
+240a251
 > disown
-247a260
+248a260
 > fg
-251a265
+252a265
 > jobs
-268a283
+269a283
 > suspend
-283a299
+284a299
 > bg
-295a312
+296a312
 > disown
-303a321
+304a321
 > fg
-307a326
+308a326
 > jobs
-324a344
+325a344
 > suspend
 run-comsub
 run-comsub-eof
@@ -706,14 +704,14 @@ ok 4
 ---
 > . .. .a .aa .b .bb
 139,140c110,111
-< mailcheck.o make_cmd.o mksignames mksyntax mksignames.o mksyntax.dSYM
-< mksyntax.dSYM mksignames.o mksyntax mksignames make_cmd.o mailcheck.o
+< make_cmd.o mksignames mksyntax mailcheck.o mksignames.o mksyntax.dSYM
+< mksyntax.dSYM mksignames.o mailcheck.o mksyntax mksignames make_cmd.o
 ---
 > mksyntax mksignames make_cmd.o mailcheck.o mksignames.o mksyntax.dSYM
 > mksyntax.dSYM mksignames.o mailcheck.o make_cmd.o mksignames mksyntax
 142,143c113,114
-< mailcheck.o make_cmd.o mksignames mksyntax mksignames.o mksyntax.dSYM
-< mksyntax.dSYM mksignames.o mksyntax mksignames make_cmd.o mailcheck.o
+< make_cmd.o mksignames mksyntax mailcheck.o mksignames.o mksyntax.dSYM
+< mksyntax.dSYM mksignames.o mailcheck.o mksyntax mksignames make_cmd.o
 ---
 > mksyntax mksignames make_cmd.o mailcheck.o mksignames.o mksyntax.dSYM
 > mksyntax.dSYM mksignames.o mailcheck.o make_cmd.o mksignames mksyntax
@@ -745,284 +743,10 @@ run-herestr
 run-histexpand
 warning: all of these tests will fail if history has not been compiled
 warning: into the shell
-1,2c1,2
-< ./histexp.tests: line 34: history: !!: numeric argument required
-< ./histexp.tests: line 37: history: !!:z: numeric argument required
----
-> echo $BASH_VERSION
-> ./histexp.tests: line 37: history: !!:z: history expansion failed
-13,18c13,17
-< ./histexp.tests: line 48: history: !e: numeric argument required
-< ./histexp.tests: line 49: history: !!: numeric argument required
-< ./histexp.tests: line 51: set: -H: invalid option
-< set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
-< ./histexp.tests: line 52: !!: command not found
-< ./histexp.tests: line 53: !e: command not found
----
-> echo line 2 for history
-> echo line 2 for history
-> set -H
-> echo line 2 for history
-> line 2 for history
-26,27c25
-<     8  !!
-<     9  !e
----
->     8  echo line 2 for history
-29,41c27,51
-< ./histexp.tests: line 58: !?ch?: command not found
-< ./histexp.tests: line 59: !-2: command not found
-< ./histexp.tests: line 60: ^2^8: command not found
-< ./histexp.tests: line 62: !2: command not found
-< !-1:0:t
-< !-2:0:h
-< !?d?:5
-< a b c d e
-< !-1:2-$
-< !-2:2-4
-< !-2:3*
-< !!:*
-< !?a?:2-
----
-> echo a b c d e
-> a b c d e
-> echo line 2 for history
-> line 2 for history
-> echo line 8 for history
-> line 8 for history
-> /bin/sh -c 'echo this is $0'
-> this is /bin/sh
-> echo sh
-> sh
-> echo /bin
-> /bin
-> echo e
-> e
-> a b c d e
-> echo b c d e
-> b c d e
-> echo b c d
-> b c d
-> echo d e
-> d e
-> echo d e
-> d e
-> echo b c d
-> b c d
-43,45c53,58
-< !!:$:r
-< !-2:$:e
-< !-3:$:r:q
----
-> echo file
-> file
-> echo .c
-> .c
-> echo 'file'
-> file
-47,49c60,69
-< !!:$:r
-< !-2:^:e
-< !-3:$:r:q
----
-> echo $file
-> bax
-> echo .c
-> .c
-> echo '$file'
-> $file
-> a b c d e
-> echo 'a' 'b' 'c' 'd' 'e'
-> a b c d e
-> echo 'a b c d e'
-51,52d70
-< !!:1-$:x
-< !-2:1-$:q
-54,96c72,122
-< ./histexp.tests: line 94: !!:s/foo/bar/: No such file or directory
-< ./histexp.tests: line 95: !-2:gs/foo/bar/: No such file or directory
-< ./histexp.tests: line 96: /: Is a directory
-< ./histexp.tests: line 96: !!:gs/bar/x: No such file or directory
-< ./histexp.tests: line 97: !-2:g: command not found
-< ./histexp.tests: line 100: !!:gs+bar+whix+: command not found
-< ./histexp.tests: line 102: !!:p: command not found
-< !?.o?:%:r:q
-< ./histexp.tests: line 107: !!:0: command not found
-< ./histexp.tests: line 108: !!:-$: command not found
-< ./histexp.tests: line 109: !:-$: command not found
-<    14  !2
-<    15  echo !-1:0:t
-<    16  echo !-2:0:h
-<    17  echo !?d?:5
-<    18  echo a b c d e
-<    19  echo !-1:2-$
-<    20  echo !-2:2-4
-<    21  echo !-2:3*
-<    22  echo !!:*
-<    23  echo !?a?:2-
-<    24  echo file.c
-<    25  echo !!:$:r
-<    26  echo !-2:$:e
-<    27  echo !-3:$:r:q
-<    28  echo $file.c
-<    29  echo !!:$:r
-<    30  echo !-2:^:e
-<    31  echo !-3:$:r:q
-<    32  echo a b c d e
-<    33  echo !!:1-$:x
-<    34  echo !-2:1-$:q
-<    35  echo foo.c foo.o foo.html foo.h
-<    36  !!:s/foo/bar/
-<    37  !-2:gs/foo/bar/
-<    38  !!:gs/bar/x&/
-<    39  !-2:g&
-<    40  !!:gs+bar+whix+
-<    41  !!:p
-<    42  echo !?.o?:%:r:q
-<    43  !!:0 !?.h?:%:q
-<    44  !!:-$
-<    45  !:-$
----
-> echo bar.c foo.o foo.html foo.h
-> bar.c foo.o foo.html foo.h
-> echo bar.c bar.o bar.html bar.h
-> bar.c bar.o bar.html bar.h
-> echo xbar.c xbar.o xbar.html xbar.h
-> xbar.c xbar.o xbar.html xbar.h
-> echo xbar.c xbar.o xbar.html xbar.h
-> xbar.c xbar.o xbar.html xbar.h
-> echo xwhix.c xwhix.o xwhix.html xwhix.h
-> xwhix.c xwhix.o xwhix.html xwhix.h
-> echo xwhix.c xwhix.o xwhix.html xwhix.h
-> echo 'xwhix'
-> xwhix
-> echo 'xwhix.h'
-> xwhix.h
-> echo 'xwhix.h'
-> xwhix.h
-> echo 'xwhix.h'
-> xwhix.h
->     7  set -H
->     8  echo line 2 for history
->     9  echo a b c d e
->    10  echo line 2 for history
->    11  echo line 8 for history
->    12  /bin/sh -c 'echo this is $0'
->    13  echo sh
->    14  echo /bin
->    15  echo e
->    16  echo a b c d e
->    17  echo b c d e
->    18  echo b c d
->    19  echo d e
->    20  echo b c d
->    21  echo file.c
->    22  echo file
->    23  echo .c
->    24  echo 'file'
->    25  echo $file.c
->    26  echo $file
->    27  echo .c
->    28  echo '$file'
->    29  echo a b c d e
->    30  echo 'a' 'b' 'c' 'd' 'e'
->    31  echo 'a b c d e'
->    32  echo foo.c foo.o foo.html foo.h
->    33  echo bar.c foo.o foo.html foo.h
->    34  echo bar.c bar.o bar.html bar.h
->    35  echo xbar.c xbar.o xbar.html xbar.h
->    36  echo xwhix.c xwhix.o xwhix.html xwhix.h
->    37  echo 'xwhix'
->    38  echo 'xwhix.h'
-99c125,126
-< !! !!:*
----
-> echo '!!' \!\!
-> !! !!
-103,104c130,133
-< !shopt-1
-< !shopt*
----
-> echo shopt a
-> shopt a
-> echo a b c d 2> /dev/null
-> a b c d
-106,107c135
-< !:2:p
-< !$
----
-> echo two ; echo four  
-109,110c137,139
-< !$
-< !:2:p
----
-> echo four ; echo two
-> 3
-> echo $((1+2))
-112,114d140
-< !!:1
-< ./histexp1.sub: line 18: set: -H: invalid option
-< set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
-135,136c161,162
-< ./histexp2.sub: line 8: set: histexpand: invalid option name
-< #!/bin/bash !!
----
-> echo "#!/bin/bash" set -o posix
-> #!/bin/bash set -o posix
-139d164
-< ./histexp3.sub: line 17: set: histexpand: invalid option name
-141c166,167
-< !!
----
-> echo $(echo echo a)
-> echo a
-143c169,170
-< !! !!
----
-> echo echo a $(echo echo a)
-> echo a echo a
-147c174,175
-< !! !!
----
-> echo "echo c" "$(echo echo c)"
-> echo c echo c
-149c177,178
-< !! !!
----
-> echo "echo d" $(echo "echo d")
-> echo d echo d
-157c186,187
-< !!
----
-> echo "echo g"
-> echo g
-159c189,190
-< !!
----
-> eval echo "echo g"
-> echo g
-161c192,193
-< !! !!
----
-> echo \!\! `echo echo h`
-> !! echo h
-163c195,196
-< !! !!
----
-> echo echo i `echo echo i`
-> echo i echo i
-165,166c198,199
-< j !!
-< ./histexp4.sub: line 17: set: histexpand: invalid option name
----
-> echo `echo j` echo j
-> j echo j
-168,170c201,212
+202,203c202,212
 < ./histexp4.sub: line 20: syntax error near unexpected token `<'
-< ./histexp4.sub: line 20: `cat < <(echo !!)'
-< ./histexp5.sub: line 15: set: histexpand: invalid option name
+< ./histexp4.sub: line 20: `cat < <(echo echo a)'
 ---
-> cat < <(echo echo a)
 > echo a
 > b
 > echo echo b `echo echo b`
@@ -1034,14 +758,10 @@ warning: into the shell
 > e
 > ! !
 > ./histexp4.sub: line 33: !': event not found
-172,175c214,232
-< !:*
+207,208c216,232
 < ./histexp5.sub: line 20: syntax error near unexpected token `('
 < ./histexp5.sub: line 20: `echo /<(echo tmp)/Step1 >/dev/null'
-< ./histexp6.sub: line 18: set: histexpand: invalid option name
 ---
-> echo /$(echo tmp)/Step1
-> /tmp/Step1
 > echo /<(echo tmp)/Step1 > /dev/null
 > /tmp/Step1
 > echo $(echo /tmp)/Step1
@@ -1059,35 +779,7 @@ warning: into the shell
 > *(/tmp|/dev|/usr)/Step1
 > echo *(/tmp|/dev|/usr)/Step1
 > *(/tmp|/dev|/usr)/Step1
-177,179c234,237
-< !!
-< !!
-< !!
----
-> 	echo echo one
-> echo one
-> echo one
-> echo one
-182c240
-<     3  for f in a b c; do 	echo !!; done
----
->     3  for f in a b c; do 	echo echo one; done
-185,187c243,246
-< !-1
-< !-1
-< !-1
----
-> 	echo echo two
-> echo two
-> echo two
-> echo two
-189c248
-<     2  for f in a b c; do 	echo !-1; done
----
->     2  for f in a b c; do 	echo echo two; done
-191d249
-< ./histexp7.sub: line 5: set: histexpand: invalid option name
-195,196c253
+229,230c253
 < ./histexp7.sub: line 15: syntax error near unexpected token `('
 < ./histexp7.sub: line 15: `cat <( cat <<'EOF''
 ---
@@ -1095,49 +787,6 @@ warning: into the shell
 run-history
 warning: all of these tests will fail if history has not been compiled
 warning: into the shell
-31,36c31
-< ./history.tests: line 52: history: !!: numeric argument required
-<     1  for i in one two three; do echo $i; done
-<     2  /bin/sh -c 'echo this is $0'
-<     3  ls
-<     4  echo $BASH_VERSION
-<     5  echo line for history
----
-> echo line for history
-70,71c65,66
-< ./history.tests: line 68: history: !e: numeric argument required
-< ./history.tests: line 69: history: !!: numeric argument required
----
-> echo line 2 for history
-> echo line 2 for history
-83,86c78,80
-< ./history.tests: line 80: set: -H: invalid option
-< set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
-< ./history.tests: line 81: !!: command not found
-< ./history.tests: line 82: !e: command not found
----
-> set -H
-> echo line 2 for history
-> line 2 for history
-98,101c92,94
-< 15	 !!
-< 16	 !e
-< 17	 unset HISTSIZE
-< 18	 unset HISTFILE
----
-> 15	 echo line 2 for history
-> 16	 unset HISTSIZE
-> 17	 unset HISTFILE
-108,111c101,104
-<    16  !e
-<    17  unset HISTSIZE
-<    18  unset HISTFILE
-<    19  # now an out-of-range error because of the one=two not found in history
----
->    15  echo line 2 for history
->    16  unset HISTSIZE
->    17  unset HISTFILE
->    18  # now an out-of-range error because of the one=two not found in history
 run-ifs
 11,12c11,12
 < ./ifs1.sub: line 9: recho: command not found
@@ -1147,8 +796,8 @@ run-ifs
 > argv[1] = <*>
 run-ifs-posix
 run-input-test
-bash 7421107: warning: process exceeds 100 file descriptors
-bash 7421107: warning: process exceeds 200 file descriptors
+bash 15959: warning: process exceeds 100 file descriptors
+bash 15959: warning: process exceeds 200 file descriptors
 run-intl
 ./intl2.sub: line 16: locale: command not found
 intl2.sub: warning: you do not have the de_DE.UTF-8 locale installed;
@@ -1200,7 +849,7 @@ warning: SIGHUP.  Please disregard.
 < ./jobs1.sub: line 15: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 < ./jobs1.sub: line 21: jobs: command not found
-< ./jobs1.sub: line 25: [: 7421384: unary operator expected
+< ./jobs1.sub: line 25: [: 16236: unary operator expected
 < ./jobs2.sub: line 3: set: monitor: invalid option name
 < ./jobs2.sub: line 8: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
@@ -1258,7 +907,7 @@ warning: SIGHUP.  Please disregard.
 < ./jobs6.sub: line 2: set: monitor: invalid option name
 < wait: usage: wait [pid ...]
 < child1 exit status 2
-< ./jobs6.sub: line 6: kill: (7421454) - No such process
+< ./jobs6.sub: line 6: kill: (16306) - No such process
 < ./jobs7.sub: line 2: set: -m: invalid option
 < set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 < ./jobs7.sub: line 4: jobs: command not found
@@ -1522,9 +1171,6 @@ run-nquote
 < argv[1] = <$hello, chet>
 ---
 > argv[1] = <hello, chet>
-42,43d41
-< ./nquote1.sub: line 2: set: -H: invalid option
-< set: usage: set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [arg ...]
 run-nquote1
 warning: several of these tests will fail if arrays have not
 warning: been compiled into the shell.
@@ -1586,7 +1232,7 @@ run-printf
 > 9B3A59A5
 283,291c283,290
 < e-May-2010 T
-< current time mismatch:1790960820|s|
+< current time mismatch:1791001391|s|
 < Sun May 30, 2010 15:09:15
 < current time: F r
 < epoch time: F r -0500
@@ -1781,7 +1427,7 @@ warning: white space to be an error.
 > timeout 3: ok
 104,107c100
 < ./read7.sub: redirection error: cannot duplicate fd: Unknown error
-< ./read7.sub: line 60: 5173888: Unknown error
+< ./read7.sub: line 60: 5174240: Unknown error
 < 
 < ./read7.sub: line 64: /dev/tty: No such file or directory
 ---
@@ -1908,7 +1554,7 @@ run-rsh
 < ./rsh.tests: line 31: ./source.sub3: No such file or directory
 < oops 1 -- output
 < oops 2 -- append
-< Fri Oct  2 19:07:04 CES 2026
+< Sat Oct  3 06:23:15 CES 2026
 ---
 > ./rsh1.sub: line 22: /bin/sh: restricted
 > ./rsh1.sub: line 24: sh: not found
@@ -1926,7 +1572,7 @@ run-rsh
 > ./rsh.tests: line 38: /tmp/restricted: restricted: cannot redirect output
 > ./rsh.tests: line 43: command: -p: restricted
 19c19,20
-< Fri Oct  2 19:07:04 CES 2026
+< Sat Oct  3 06:23:15 CES 2026
 ---
 > ./rsh.tests: line 48: exec: restricted
 > ./rsh.tests: after exec
@@ -1947,37 +1593,28 @@ run-shopt
 > checkjobs           	off
 164a170
 > restricted_shell    	off
-168,170d173
-< ./shopt.tests: line 63: set: histexpand: invalid option name
+168,169d173
 < ./shopt.tests: line 65: set: monitor: invalid option name
 < ./shopt.tests: line 69: set: notify: invalid option name
-178a182
-> set -o histexpand
 182a187
 > set -o monitor
 186a192
 > set +o notify
-203a210
-> histexpand     	on
-207a215
+208a215
 > monitor        	on
-211a220
+212a220
 > notify         	off
-228a238
-> set -o histexpand
-232a243
+234a243
 > set -o monitor
-236a248
+238a248
 > set +o notify
-252a265
-> set -o histexpand
-254a268
+257a268
 > set -o monitor
-266a281
+269a281
 > set +o notify
-285a301
+288a301
 > notify         	off
-297,298d312
+300,301d312
 < ./shopt1.sub:44: syntax error near unexpected token `('
 < ./shopt1.sub:44: `diff <("$t1") <("$t2")'
 run-strip
@@ -1988,11 +1625,12 @@ run-trap
 warning: UNIX versions number signals and schedule processes differently.
 warning: If output differing only in line numbers is produced, please
 warning: do not consider this a test failure.
-79d78
-< +[8] false+[8] false
-81c80,81
+79,81c79,81
+< +[8] false+[8] false+[8] false
+< 
 < 
 ---
+> +[8] false
 > +[8] false
 > +[8] false
 109,110d108
