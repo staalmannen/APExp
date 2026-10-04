@@ -95,6 +95,10 @@ main(int argc, char *argv[])
 		outfile = ARGF();
 		break;
 
+	case 'J':			/* conforming struct layout; see cc.h */
+		conformalign = 1;
+		break;
+
 	case 'D':
 		p = ARGF();
 		if(p) {

@@ -303,6 +303,11 @@ glibc's take `const char *`, so even a `-D` rename collides with the
 header -- it renames the SOURCE with `sed` into a temporary instead.
 `strtol`/`strtoul` cannot be swept at all here, because kencc's
 `long` is 32-bit and the host's is 64.
+`structalign-test.c` measures `pcc -J`, conforming struct layout, and
+**needs three runs** -- gcc, then `pcc -DPLAN9` WITHOUT `-J` (which
+must fail ~12 checks), then with it. *The middle run is the control*:
+a pass under `-J` alone cannot distinguish a working flag from a
+compiler that never had the bug.
 `random-xcheck.c` is the same idea for `random`/`srandom`/
 `initstate`/`setstate`, and needs TWO compiles for the
 `strftime-xcheck` reason. Its **section 0 is a control of the
@@ -790,6 +795,101 @@ the state already in use is a no-op in glibc, so that version asserted
 nothing. Switching away to a second state of a *different size* and
 back is what asks the question.
 
+**AND THE PROBE'S OWN ANSWER WAS SEVEN-EIGHTHS NOT ABOUT kencc.**
+The VM run said `8 of 47 disagree with the translator', and the
+recorded sizes are the **generating machine's**: cfront's C was
+produced on Linux, so every system type in it carries glibc's answer.
+`__sigset_t` 128 against APE's 64, `_fpstate`/`_libc_fpstate` 512
+against 504, `_xsave_hdr` 64 against 32, `__pthread_rwlock_arch_t` 56
+against 48 -- *differences APE is not obliged to match and mostly
+should not*. Two more are kencc's 32-bit `long` showing through a
+`__clock_t` and an `si_band`. **The oracle is an oracle only for the
+translator's OWN structs**, and exactly one of those disagrees:
+`node`, 3 against 8, the case predicted before the run.
+**And `node` cannot be the crash**: `struct name` **inlines** node's
+three fields (`base__4node`, `permanent__4node`, `baseclass__4node`)
+rather than embedding a `struct node`, because cfront's C flattens
+inheritance -- so node's size never enters name's layout.
+**BUT THE PROBE WAS ASKING THE WRONG 47 TYPES, AND ITS CONTROL COULD
+NOT SEE THAT.** It extracted main.c's PREAMBLE -- everything above
+the first function definition -- and cfront's generated C
+**interleaves** declarations with definitions, so it got 47 of
+main.c's **97**. The gcc control reproduced all 47 and reported 0
+disagreements, which was *true*. **Correctness and completeness are
+different properties and only one of them was being checked.** Among
+the fifty left out were `name`, `expr` and the whole
+`__Q2_4expr4__C*` family -- **the exact types the faulting line
+dereferences**. *The probe ran, passed its control, and could not
+have answered the question it was built for.* Extraction skips
+function bodies now, and the missing half of the control is one line:
+every tagged type in the file must survive into the probe. 97 of 97.
+
+**AND `-P` WAS ALREADY TAKEN, WHICH THIS FILE'S OWN PLAN DID NOT
+NOTICE.** The recorded plan said "`-P` in `sys/src/ape/config`'s
+CFLAGS" and justified it with *"the flag costs nothing to parse:
+`cc/lex.c`'s ARGBEGIN `default:` arm does `debug[c]++` for any unknown
+letter"* -- true, and `P` is not unknown. **Every backend's `peep.c`
+uses `debug['P']` for peephole tracing and `reg.c` reads it to
+disable register allocation**, so `-P` would have changed CODE
+GENERATION while claiming to change layout. *A flag one letter from
+another flag is checked, not recalled* -- the rule was already in this
+file, and the plan it would have caught was also already in this file.
+**It is `-J` now, and a NAMED global `conformalign` rather than a
+debug letter**, so the collision cannot recur by someone counting
+free letters again. Free uppercase were E, J, O: `E` is `pcc -E`, `O`
+reads as an optimisation flag.
+**AND pcc HAD TO BE TAUGHT IT EXPLICITLY.** `sys/src/cmd/pcc.c`'s
+`ARGBEGIN` has **no `default:`**, so a flag it does not name is
+silently dropped -- the build would look exactly right and the layout
+would not change. *For a layout flag that is the worst available
+failure*, and it would have read as "the compiler change did not
+work".
+**THE CHANGE IS SMALLER THAN THE SLOGAN.** "kencc aligns everything
+to 8" is not what the code does: `Ael1` already answers
+`ewidth[etype]` for scalars, which IS their natural alignment on
+these targets. The defect is two cases -- `Asu2`'s unconditional
+`SZ_VLONG` tail padding, and `Ael1`'s `w <= 0` arm, which catches
+struct and union members because `ewidth[TSTRUCT]` is negative. So
+`-J` is two lines in each of the ten backends plus one computation in
+the shared front end: `sualign()` now records each struct's own
+alignment in `Type.talign`, as the max over its members of
+`align(1, member, Ael1)` -- *the same identity `__alignof__` already
+uses*, rather than a second expression of the same fact that could
+drift from it. It follows `packflg` for free, since under
+`#pragma pack on` every member aligns to 1.
+**IT IS NOT A PER-PACKAGE FLAG, which is the opposite of how it is
+natural to reach for it.** -J changes every struct the translation
+unit sees, `<stdio.h>`'s and `<sys/stat.h>`'s included, so one package
+built with it against a libap built without it disagrees about
+`FILE`, `struct stat` and `DIR` -- **silently, with no link error,
+because every symbol still resolves.** The safe unit is a whole
+self-consistent world: all of APE after a `distclean`, or nothing.
+For a few on-disk structs in one package `#pragma pack` is still the
+right tool and costs no rebuild. **It is therefore NOT enabled in
+`sys/src/ape/config`.**
+**`structalign-test.c` is the instrument and it needs THREE runs**:
+gcc (0 failures, and the numbers in the file came from that run --
+my own arithmetic said 149 where gcc says 150), then `pcc -DPLAN9`
+**without** `-J`, which must FAIL about twelve checks, then with it,
+which must pass. *The middle run is the whole point*: a test that
+passes under `-J` looks identical whether the flag works or the
+compiler was always conforming. It checks **offsets as well as
+sizes** -- a wrong size breaks a stride, a wrong offset puts one
+member's bytes where another is read, which is the shape of a
+`const char *` holding the text `precisio`. `-DPLAN9` is not
+decoration: section 5's `#pragma pack` is behind it exactly as
+tar.h's is.
+**One non-conformance `-J` does NOT fix, reported as a PROBE rather
+than asserted**: kencc allocates bit fields in whole `tfield` units,
+so `struct{unsigned x:3; unsigned y:5; char c;}` is 8 here and 4 on
+gcc. Different code, different question; asserting it would make the
+test report a failure the flag never promised.
+**NOT COMPILED ANYWHERE YET.** kencc's sources need Plan 9's `<u.h>`
+and `<libc.h>`, so the gcc sweep this tree uses before shipping
+cannot be run on them -- the first build is the VM's. *That is a
+weaker position than every other change this round and is worth
+saying rather than leaving to be discovered.*
+
 **AND THE cfront SIZE PROBE WAS `.gitignore'd, SO THE VM NEVER GOT
 IT.** `pcc ... cfrontsz-probe.c` answered `Can't open input file` and
 `ls cfront*.c` showed only the two stub files. **git is the only
@@ -1220,7 +1320,11 @@ the index, so that nothing here is a surprise.
   a pointer to the type, or writing it as an on-disk record.
   `#pragma pack on`/`off` is the override (both cases read `packflg`),
   spelled `on` and not `1`. This made `union block` 520 and every
-  archive GNU tar wrote malformed.
+  archive GNU tar wrote malformed. **`pcc -J` is the tree-wide
+  override** (`conformalign`, not `-P` -- that is the peephole debug
+  flag): tail padding to the struct's own alignment and a nested
+  struct member to its own. It is all-or-nothing for a linked world,
+  since it moves `FILE` and `struct stat` too, and is OFF by default.
 - **kencc's type signatures follow POINTERS into the struct they point
   at**, and 9front's `CFLAGS=-FTVw` turns them on for every native
   build. So a struct that is opaque in a public header and completed in

@@ -899,11 +899,40 @@ newlist(Node *l, Node *r)
 	return new(OLIST, l, r);
 }
 
+/*
+ * The alignment one member imposes on the struct containing it.
+ *
+ * `align(1, t, Ael1)' rounds 1 up to the next multiple of that
+ * member's alignment, which IS that alignment -- the same identity
+ * `__alignof__' already uses at com.c:907, rather than a second
+ * expression of the same fact that could drift from it.
+ *
+ * It follows packflg for free: inside `#pragma pack on' every member
+ * aligns to 1, so the struct's own alignment comes out 1 and its tail
+ * padding with it, which is what packing means.
+ */
+static int
+memberalign(Type *l)
+{
+	int a;
+
+	if(l->nbits)
+		a = align(1, tfield, Ael1);
+	else
+		a = align(1, l, Ael1);
+	if(l->alignas_req > a)
+		a = l->alignas_req;
+	if(a < 1)
+		a = 1;
+	return a;
+}
+
 void
 sualign(Type *t)
 {
 	Type *l;
 	long o, w;
+	int a;
 
 	o = 0;
 	switch(t->etype) {
@@ -911,6 +940,7 @@ sualign(Type *t)
 	case TSTRUCT:
 		t->offset = 0;
 		w = 0;
+		a = 1;
 		for(l = t->link; l != T; l = l->down) {
 			if(l->nbits) {
 				if(l->shift <= 0) {
@@ -934,7 +964,11 @@ sualign(Type *t)
 				l->offset = w;
 				w = align(w, l, Ael2);
 			}
+			o = memberalign(l);
+			if(o > a)
+				a = o;
 		}
+		t->talign = a;
 		w = align(w, t, Asu2);
 		t->width = w;
 		acidtype(t);
@@ -944,6 +978,7 @@ sualign(Type *t)
 	case TUNION:
 		t->offset = 0;
 		w = 0;
+		a = 1;
 		for(l = t->link; l != T; l = l->down) {
 			if(l->width <= 0)
 				if(l->sym)
@@ -956,7 +991,11 @@ sualign(Type *t)
 			o = align(align(0, l, Ael1), l, Ael2);
 			if(o > w)
 				w = o;
+			o = memberalign(l);
+			if(o > a)
+				a = o;
 		}
+		t->talign = a;
 		w = align(w, t, Asu2);
 		t->width = w;
 		acidtype(t);

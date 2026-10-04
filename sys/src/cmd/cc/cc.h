@@ -129,6 +129,7 @@ struct	Type
 	char	isbool;		/* declared bool/_Bool; see typebool */
 	Node*	vlasizevar;	/* hidden auto holding runtime byte count (VLA only) */
 	short	alignas_req;	/* _Alignas() override; 0 = use type's natural alignment */
+	short	talign;		/* struct/union natural alignment; 0 = not computed. See -P. */
 };
 
 #define	T	((Type*)0)
@@ -499,6 +500,36 @@ EXTERN	Node*	initlist;
 EXTERN	Term	term[NTERM];
 EXTERN	int	nterm;
 EXTERN	int	packflg;
+/*
+ * -J: lay structs out the way every other C compiler does -- tail
+ * padding to the struct's OWN alignment rather than always 8, and a
+ * nested struct member aligned to ITS own alignment rather than
+ * always 8. Off by default, because the 9front ABI is the other rule
+ * and everything native is already built to it.
+ *
+ * **It is NOT `-P', which the recorded plan named.** Every backend's
+ * peep.c uses `debug['P']' for peephole tracing and reg.c reads it to
+ * disable register allocation, so -P would have changed code
+ * generation while claiming to change layout. *A flag one letter from
+ * another flag is checked, not recalled* -- and the plan had argued
+ * from `ARGBEGIN's default arm takes any unknown letter', which is
+ * true and did not make P unknown. A named global rather than a
+ * debug letter so the next reader cannot repeat it.
+ *
+ * **IT IS NOT A PER-PACKAGE FLAG, and that is the opposite of how it
+ * is natural to reach for it.** -J changes the layout of EVERY struct
+ * the translation unit sees, including the ones in <stdio.h> and
+ * <sys/stat.h>. Build one package with it against a libap built
+ * without it and the two disagree about `FILE', `struct stat' and
+ * `DIR' -- silently, with no link error, because the symbols all
+ * resolve. The unit it is safe over is a whole self-consistent world:
+ * all of APE, after `mk distclean', or nothing.
+ *
+ * For a handful of on-disk structs in one package, `#pragma pack
+ * on'/`off' is still the right tool and costs no rebuild -- that is
+ * what tar.h carries, and tar is the reason this flag exists.
+ */
+EXTERN	int	conformalign;
 EXTERN	int	alignasval;	/* pending _Alignas() requirement; 0 = none */
 EXTERN	int	fproundflg;
 EXTERN	int	profileflg;

@@ -459,6 +459,9 @@ align(long i, Type *t, int op)
 
 	case Asu2:	/* padding at end of a struct */
 		w = SZ_LONG;
+		/* -P: conforming layout; see sys/src/cmd/cc/dcl.c sualign() */
+		if(conformalign && t->talign > 0)
+			w = t->talign;
 		if(packflg)
 			w = packflg;
 		break;
@@ -469,6 +472,9 @@ align(long i, Type *t, int op)
 		w = ewidth[v->etype];
 		if(w <= 0 || w >= SZ_LONG)
 			w = SZ_LONG;
+		/* -P: conforming layout; see sys/src/cmd/cc/dcl.c sualign() */
+		if(conformalign && typesu[v->etype] && v->talign > 0)
+			w = v->talign;
 		if(packflg)
 			w = packflg;
 		break;
