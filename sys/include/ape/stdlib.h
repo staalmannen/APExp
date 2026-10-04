@@ -94,8 +94,30 @@ extern char *ecvt(double, int, int *, int *);
 extern char *fcvt(double, int, int *, int *);
 extern char *gcvt(double, int n, char *buf);
 
-extern int getrusage(int who, struct rusage *usage);          /* misc/getrusage.c */
-extern int uname(struct utsname *buf);                        /* misc/uname.c */
+/*
+ * `getrusage' and `uname' USED TO BE DECLARED HERE, and the two
+ * declarations were worse than useless.
+ *
+ * <stdlib.h> defines neither `struct rusage' nor `struct utsname' and
+ * includes neither header, so each struct named in those parameter
+ * lists was a NEW, incomplete type scoped to the declaration --
+ * distinct from the real one in <sys/resource.h> / <sys/utsname.h>.
+ * Any translation unit that included <stdlib.h> and then the right
+ * header got `conflicting types', and a C compiler stricter than
+ * kencc refuses it outright. bacon includes both and that is what
+ * stopped its build.
+ *
+ * POSIX puts them in <sys/resource.h> and <sys/utsname.h>, where both
+ * are already declared correctly beside the struct they take, and
+ * where libap's own `misc/getrusage.c' and `misc/uname.c' already get
+ * them from. Nothing in the tree depended on this file for either.
+ *
+ * *This is the `Lock' bug in <qlock.h> a second time*: one name
+ * declared twice, the two spellings not compatible, and kencc
+ * tolerating what the standard forbids -- which is exactly why it
+ * survived. `apehdr-sweep.py' cannot see this one: each header is
+ * fine ALONE and only the COMBINATION conflicts.
+ */
 
 #include <sys/ioctl.h> /* ioctl */
 

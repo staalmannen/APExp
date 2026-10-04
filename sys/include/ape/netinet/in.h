@@ -219,6 +219,39 @@ struct ip_opts {
 #define	IP_TOS		8	/* int; IP type of service and precedence */
 #define	IP_TTL		9	/* int; IP time to live */
 
+/*
+ * IPv4 multicast. These were MISSING while the IPv6 spellings below
+ * were all present -- `setsockopt' already accepts
+ * IPV6_MULTICAST_HOPS, _IF and _LOOP and had no IPv4 counterpart at
+ * all, so a program could name the v6 option and not the v4 one.
+ * bacon's `__b2c__net_open' is what found it: it opens a MULTICAST
+ * socket with IP_MULTICAST_LOOP and IP_MULTICAST_TTL and the build
+ * stopped at `name not declared'.
+ *
+ * THE NUMBERS ARE THIS FILE'S OWN, and that is worth stating rather
+ * than leaving to be assumed. 1/7/8/9 above match neither 4.4BSD
+ * (1/2/3/4) nor Linux (4/3/1/2), so there is no external numbering to
+ * be consistent with -- and none is needed: nothing transmits these,
+ * Plan 9's kernel never sees them, and `network/socket.c' is the only
+ * consumer in the tree. The one requirement is that they not collide
+ * with the four above, so they continue from 10.
+ *
+ * `struct ip_mreq' comes with them deliberately. Defining
+ * IP_ADD_MEMBERSHIP without the type of its argument would be the
+ * gap this header just had for tcflush in <termios.h>: an option a
+ * program can name and cannot call.
+ */
+#define	IP_MULTICAST_IF		10	/* struct in_addr; outgoing interface */
+#define	IP_MULTICAST_TTL	11	/* u_char; hop limit for multicast */
+#define	IP_MULTICAST_LOOP	12	/* u_char; loop back to this host */
+#define	IP_ADD_MEMBERSHIP	13	/* struct ip_mreq; join a group */
+#define	IP_DROP_MEMBERSHIP	14	/* struct ip_mreq; leave a group */
+
+struct ip_mreq {
+	struct	in_addr imr_multiaddr;	/* IP address of the group */
+	struct	in_addr imr_interface;	/* local interface, or INADDR_ANY */
+};
+
 /* Options for use with [gs]etsockopt at the IPPROTO_IPV6 level. */
 #define	IPV6_V6ONLY		26	/* int; only bind IPv6 addrs (RFC 3493) */
 #define	IPV6_MULTICAST_HOPS	18

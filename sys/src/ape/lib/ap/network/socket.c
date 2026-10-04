@@ -424,8 +424,49 @@ setsockopt(int fd, int level, int opt, void *v, int len)
 		case IP_TOS:
 		case IP_HDRINCL:
 		case IP_OPTIONS:
+		case IP_MULTICAST_IF:
+		case IP_MULTICAST_TTL:
 			/* Plan9 kernel manages these; accept silently */
 			return 0;
+
+		/*
+		 * IP_MULTICAST_LOOP gets a DIFFERENT answer from its two
+		 * neighbours above, and the asymmetry is the point.
+		 *
+		 * Loopback of one's own multicast is ON by default here as
+		 * everywhere, so a caller ENABLING it is asking for the state
+		 * the socket is already in: that is "nothing to do", and 0 is
+		 * the true answer. A caller DISABLING it is asking for
+		 * something this stack cannot do, and answering 0 would tell
+		 * it the packets have stopped coming back when they have not.
+		 *
+		 * *A stub that answers "failure" is not the same as one that
+		 * answers "nothing to do"* -- the commonest bug shape in this
+		 * tree -- and the two halves of this option fall on opposite
+		 * sides of that line, so they are answered separately rather
+		 * than lumped in above.
+		 */
+		case IP_MULTICAST_LOOP:
+			if(ival)
+				return 0;
+			errno = ENOPROTOOPT;
+			return -1;
+
+		/*
+		 * IP_ADD_MEMBERSHIP / IP_DROP_MEMBERSHIP are deliberately NOT
+		 * listed, so they reach the default below and answer
+		 * ENOPROTOOPT.
+		 *
+		 * Plan 9 CAN do this -- `/net/udp/N/ctl' takes `addmulti' and
+		 * `remmulti' -- so this is a gap rather than a limit, and it
+		 * wants its own round with something that measures it.
+		 * Accepting silently in the meantime would be the worst of
+		 * the three options available: a program would believe it had
+		 * joined a group and then receive nothing, with no error
+		 * anywhere to say why. The names are declared in
+		 * <netinet/in.h> so that such a program COMPILES and gets a
+		 * truthful refusal at run time.
+		 */
 		default:
 			errno = ENOPROTOOPT;
 			return -1;
