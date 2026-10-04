@@ -918,6 +918,50 @@ identifier or '(' before 'int'`, `'<='`, `'>='`, a numeric constant,
 a `[`) which have the shape of one header's MACRO breaking a later
 one.
 
+**EDG'S FRONT END IS OPEN SOURCE NOW, AND IT IS THE RIGHT SHAPE OF
+TOOL -- investigated, not started.** `github.com/edgcpp/compiler`,
+**Apache 2.0 with LLVM exceptions**, so the licence is no obstacle.
+The three facts that decide feasibility were measured rather than
+assumed, by reading the repository:
+- **The `.c` files ARE C++14**, which is the confusing part:
+  `BUILD.md` says `g++ -std=c++14 *.c`, and EDG keeps the `.c`
+  extension from the decades when the front end really was C. Hosts:
+  g++ 5.2, clang 3.4, MSVC 2017.
+- **`src/c_gen_be.c` is in the tree** -- the C-generating back end,
+  which is the whole reason this is interesting: it emits C SOURCE,
+  so kencc decides the layout and the ABI rather than inheriting
+  someone else's. *That is exactly the problem EDG's C back end was
+  built for -- a target with only a C compiler -- which is APExp.*
+- **IT DOES NOT USE THE C++ STANDARD LIBRARY**, and that is the one
+  that matters. `basic_hdrs.h` includes only EDG's own headers;
+  `host_envir.h`'s only system include is `<locale.h>`. *The thing
+  that kills every source-to-source C++ bootstrap is the standard
+  library*, because libstdc++ is GCC-specific and libc++ needs C++
+  to build -- and EDG sidesteps it by never having used one.
+**So the bootstrap has a shape**: build EDG on the host with g++,
+run EDG's own `c_gen_be` over EDG's own 150 sources, carry the C to
+the VM, build it with pcc. **Two risks worth naming before anyone
+starts.** (1) `targ_def.h` has to describe kencc: `int` 4, `long`
+**4**, pointer **8** -- and that unusual combination is exactly
+LLP64, which EDG must already support because it supports MSVC. (2)
+whether EDG's C back end handles the C++ subset EDG itself is
+written in, which is the classic self-translation question and is
+one host afternoon to answer, with no VM.
+**AND `llvm-cbe` IS THE WORSE VERSION OF THE SAME IDEA.** LLVM's own
+C backend was **removed in 3.1**; the maintained revival is
+out-of-tree and converts **LLVM IR**, not C++ source -- so every C++
+semantic has already been lowered against one target's data layout
+and calling convention, and you would be recompiling x86-64 SysV
+decisions with a compiler whose struct layout this tree has just
+spent a round on. It also does not remove the runtime question for
+ordinary C++ programs. *EDG's back end works at the SOURCE level,
+which is the property that makes the layout kencc's to decide.*
+**NOT a reason to stop cfront**, and the reason is this tree's own:
+cfront is close (the driver works, mk stops at the fault, five files
+convert cleanly) and **its crash is currently flushing out kencc and
+libap bugs, which is where every large find here has come from**.
+EDG would run on the same libap and want the same bugs fixed.
+
 **NEITHER IS ENABLED IN `cmd/mkfile' YET, deliberately**: one failing
 entry aborts the whole tree's `mk', and bacon has never been through
 pcc. Build `cmd/basic' by hand first; the line is one character from
