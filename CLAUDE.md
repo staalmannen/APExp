@@ -303,6 +303,12 @@ glibc's take `const char *`, so even a `-D` rename collides with the
 header -- it renames the SOURCE with `sed` into a temporary instead.
 `strtol`/`strtoul` cannot be swept at all here, because kencc's
 `long` is 32-bit and the host's is 64.
+`random-xcheck.c` is the same idea for `random`/`srandom`/
+`initstate`/`setstate`, and needs TWO compiles for the
+`strftime-xcheck` reason. Its **section 0 is a control of the
+instrument**: it asks whether `random` and `ap_random` are the same
+address, and whether the comparison reports anything at all for two
+different seeds.
 `regcoll-xcheck.c` links libap's `regcomp`/`regexec`/`tre-mem` into a
 glibc program and sweeps collating symbols and equivalence classes
 against glibc's engine. It needs TWO compiles **and a staged
@@ -724,6 +730,76 @@ POSIX puts them in `<sys/resource.h>` and `<sys/utsname.h>`, both
 already declare them correctly beside the struct, and the only caller
 in the tree (`plan9/__p9_syscall.c`) includes `<sys/resource.h>`
 itself. **bacon's undeclared count is now 0.**
+
+**AND THE SAME QUESTION AT THE LINK STAGE GAVE THE SAME SHAPE OF
+ANSWER: `random' AND `srandom' DID NOT EXIST.** With the undeclared
+count at 0 bacon compiled and then failed to link --
+`Handle_Tree: undefined: random', `main: undefined: srandom in main'.
+**Asked all at once rather than one per round**, as the header gap
+was: compile `bacon.bac.c` on the host, take `nm -u`, and subtract
+every name libap defines. 120 undefined symbols, and after those two
+the remainder is **nine glibc artefacts of the host compile**
+(`__errno_location`, `__isoc99_sscanf`, `__stack_chk_fail`,
+`__xpg_basename`, `_setjmp`) and four VARIABLES my function-shaped
+grep could not match (`optind`, `opterr`, `optarg`, `stdin`), all of
+which are present. *So the link gap was exactly two names, and that
+is a complete answer rather than the first of a series.*
+**`rand.c` was NOT reusable, which is the one case in this tree where
+reaching for the neighbour would have been wrong.** It is Mitchell &
+Reeds with a state of 607 longs -- **2428 bytes** -- and
+`initstate()` is handed 8 to 256 bytes and must keep the generator's
+whole state INSIDE it. There is no arrangement under which that fits.
+*Four times now the library has held a working version of the thing
+it could not do; this is the fifth look and the first where the
+answer is no.*
+**BIT-COMPATIBLE WITH glibc AND 4.4BSD, deliberately.** A seeded
+sequence is something programs reproduce across machines, so "a
+generator with the right distribution" is not the specification --
+the numbers are.
+**AND THE DEFAULT STREAM COSTS NO TABLE.** glibc ships 31 magic words
+for the unseeded state; 4.3BSD's own comment says that table is the
+state `initstate(1, randtbl, 128)` leaves, the rear pointer returning
+to 0 because srandom discards exactly `10*deg` values. So `srandom(1)`
+on first use reproduces it, and **section 1 of the cross-check
+measures that claim rather than assuming it** -- a 31-word table typed
+by hand would have been this tree's fourth duplicated constant, and
+its failure would arrive as a wrong number rather than a diagnostic.
+**`random-xcheck.c` is the instrument** (host program, TWO compiles,
+the `strftime-xcheck` rule): 2000 default draws, 400 seeds x 50, all
+**five** `initstate` sizes including the state word each writes, a
+`setstate` round trip, the previous-state return value and the
+under-8-bytes refusal. **0 failures**, and section 4 **found the one
+real bug**: `setstate` read word 0 BEFORE saving the old state, so
+handing it the state already in use rewound to the last `srandom()`
+where glibc continues. Every other section passed. *The ordering is
+the whole content of that function and reading alone would have
+shipped it backwards.*
+**TWO CONTROLS, AND THE FIRST VERSION OF THE SECOND WAS WORTHLESS.**
+Section 0 asks the MACHINE whether `random` and `ap_random` are the
+same address, since the vacuous-rename trap is what strftime-xcheck
+fell into; then it asks whether the comparison can report anything at
+all. That second control was first written as `b & 0x7fffffff` for the
+"wrong" value -- and `random()` never returns anything above 2^31, so
+the mask was a no-op and the broken number was the right one. It
+printed a note and passed. *A control whose wrong answer is the right
+answer is not a control* -- thirteenth instrument fault, and the only
+one so far caught before it shipped. It is two different seeds now,
+and it reports 32/32.
+**Section 4 had the same defect and the fix found the bug**: restoring
+the state already in use is a no-op in glibc, so that version asserted
+nothing. Switching away to a second state of a *different size* and
+back is what asks the question.
+
+**AND THE cfront SIZE PROBE WAS `.gitignore'd, SO THE VM NEVER GOT
+IT.** `pcc ... cfrontsz-probe.c` answered `Can't open input file` and
+`ls cfront*.c` showed only the two stub files. **git is the only
+channel to that machine** -- 9front has no python3 -- so an ignored
+generated file is a file the VM cannot see. Both generated files are
+committed now. *It is not the shape of the forty zero-byte `c++lib`
+files*: those were an INPUT to `mk`, which therefore never regenerated
+them, while these two appear in nobody's OFILES and mk never compiles
+them. The rule is about what reads the file, not about how it was
+made.
 
 **SO `apehdr-sweep.py` GAINED A "TOGETHER" CASE, because compiling
 each header ALONE cannot see this class at all** -- each file is fine

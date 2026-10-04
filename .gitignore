@@ -46,6 +46,11 @@ sys/src/cmd2/vts/test/bin/
 # -- a check that cannot fail.
 sys/src/ape/cmd/c++lib/*.c
 
-# cfrontsz-probe generates these; see sys/lib/tests/cfrontsz-probe.py
-sys/src/external/cfront-C4/src/cfrontsz-decls.h
-sys/src/external/cfront-C4/src/cfrontsz-probe.c
+# cfrontsz-probe's two generated files were ignored here and that was
+# wrong: git IS the only channel to the VM, and the probe exists to be
+# run under pcc there. An ignored generated file is a file the VM never
+# sees, which is exactly what happened -- `pcc ... cfrontsz-probe.c'
+# answered `Can't open input file'. They are committed now; regenerate
+# and re-commit when cfront's main.c changes.  (Not the same shape as
+# the 40 zero-byte c++lib files above: those were an INPUT to mk, which
+# therefore never regenerated them. These two are in nobody's OFILES.)

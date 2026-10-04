@@ -29,6 +29,17 @@ extern long long int strtoll(const char *, char **, int);
 extern unsigned long long int strtoull(const char *, char **, int);
 extern int rand(void);
 extern void srand(unsigned int seed);
+/*
+ * POSIX/XSI. A different generator from rand() above, not a wider
+ * spelling of it: see `lib/ap/prng/random.c'. bacon is what found
+ * them missing, at the LINK rather than the compile, because an
+ * undeclared function returning `long' is one this header's own
+ * missing-prototype invariant would have truncated in silence.
+ */
+extern long random(void);
+extern void srandom(unsigned int seed);
+extern char *initstate(unsigned int, char *, size_t);
+extern char *setstate(char *);
 extern void *calloc(size_t, size_t);
 extern void free(void *);
 extern void *malloc(size_t);

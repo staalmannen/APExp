@@ -6,7 +6,15 @@ TRANSLATOR said it would?
     python3 sys/lib/tests/cfrontsz-probe.py       # from the repo root
 
 It GENERATES two files into sys/src/external/cfront-C4/src and runs
-the gcc control itself. Then, on the VM:
+the gcc control itself. **Both generated files are COMMITTED**, which
+looks wrong and is not: git is the only channel to the VM, 9front has
+no python3, and the whole point of the probe is to be compiled by pcc
+there. They were `.gitignore'd at first and the VM answered
+`cpp: Can't open input file cfrontsz-probe.c'. Regenerate and
+re-commit whenever cfront's `main.c' changes. Nothing in
+`cmd/cfront/mkfile' lists either file, so mk never compiles them.
+
+Then, on the VM:
 
     cd sys/src/external/cfront-C4/src
     pcc -B -D_POSIX_SOURCE -D_BSD_EXTENSION -D__cfront_have_bool \\
