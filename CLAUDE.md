@@ -411,6 +411,48 @@ not be built until lua had been. Removed; bacon needs only libap.
 `bacon.bac.h', which includes the other 78, so a regeneration changes
 files that appear nowhere in OFILES. *The `tclBinary.c'/`config.h'
 rule for the fourth time.*
+**TK'S HEADERS ARE INSTALLED NOW -- AND DOING IT FOUND THAT `tcl.h'
+HAS NEVER BEEN USABLE.** `sys/include/ape/tcl.h' was installed ALONE,
+and its line 2433 is `#include "tclDecls.h"', which was not installed
+at all. So `#include <tcl.h>` from anything outside Tcl's own build
+has always been a fatal error on the first line -- *the `#pragma lib'
+in it has never once been reached*, and the convention bacon's Tk
+support was to be modelled on did not work. **The control fires
+exactly**: with the old set staged, `tcl.h` alone gives
+`fatal error: tclDecls.h: No such file or directory`; with the new
+set, 0 errors.
+**The closure was MEASURED rather than reasoned**: a `#include <tk.h>`
+probe compiled against a staged copy, files added until it was clean,
+then `gcc -M` asked which of them were actually reached. Twelve:
+`tcl.h`, `tclDecls.h`, `tclPlatDecls.h`, `tk.h`, `tkDecls.h`,
+`tkIntXlibDecls.h` and `X11/{X,Xfuncproto,Xlib,Xutil,keysym,keysymdef}.h`.
+**Tk bundles its own X11** in `external/tk/xlib/X11` (the stub set it
+uses where there is no X server), and `Xlib.h` there ends by including
+**`tkIntXlibDecls.h`** -- an *internal* Tk header reached from a public
+one, which is upstream's design on a non-X platform and not something
+to tidy away. All 15 of the bundled X11 headers are installed, not
+just the six: a Tk client that uses an atom or a cursor reaches
+`Xatom.h`/`cursorfont.h` directly, and six would make that fail for no
+reason. *The six are a measurement; the other nine are a judgement and
+are marked as one.*
+**`#pragma lib` placement is load-bearing.** `tk.h`'s goes BEFORE its
+`#include <tcl.h>`, because a kencc static link resolves archives in
+the order recorded and libtk needs libtcl -- tcl.h carries its own
+pragma, so putting libtk's first is what makes the order libtk, libtcl
+rather than the reverse. **And it names four libraries where the rest
+of `sys/include/ape` names one**, which is a deliberate departure:
+`cmd/wish/mkfile` links `libtk libtcl libdraw libpng libz libap` in
+that order, because Tk's Plan 9 backend draws through libdraw and its
+photo reader uses libpng. With `libtk.a` alone a program that includes
+the header compiles and then fails to link.
+**Verified against the REAL include tree, not a staging guess**:
+`Tk_Window` and `Display *` both resolve, 0 errors, with the APE
+headers staged and their `"/sys/include/ape/..."` absolute includes
+sed'ed out -- the same host wall `readdir.c` hit, and the same way
+round it. **The Tcl and Tk builds are untouched**: both mkfiles put
+`-I$TCLSRC/generic`/`-I$TKSRC/generic` ahead of `sys/include/ape`, so
+each still compiles its own copy.
+
 **NEITHER IS ENABLED IN `cmd/mkfile' YET, deliberately**: one failing
 entry aborts the whole tree's `mk', and bacon has never been through
 pcc. Build `cmd/basic' by hand first; the line is one character from
