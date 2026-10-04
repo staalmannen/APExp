@@ -1,0 +1,182 @@
+#!/usr/bin/env python3
+"""
+apehdr-sweep -- can each header in sys/include/ape be included ALONE?
+
+    python3 sys/lib/tests/apehdr-sweep.py          # from the repo root
+
+Third host SWEEP in this directory, after `apdecl-sweep.py` (missing
+prototypes in libap) and `strerror-xcheck.py` (the errno table).
+
+------------------------------------------------------------------
+WHY IT EXISTS: TWO BUGS IN ONE SESSION, NEITHER FOUND BY A BUILD.
+
+A header is only exercised by whatever happens to include it, so a
+header that is broken for everyone else compiles fine for the tree
+that ships it. Both of these shipped:
+
+  * `tcl.h' was installed ALONE and its line 2433 is
+    `#include "tclDecls.h"', which was not installed at all. So
+    `#include <tcl.h>' from anything outside Tcl's own build had
+    always been a fatal error on the first line -- the `#pragma lib'
+    in it was never once reached. Nothing in the tree noticed,
+    because Tcl's own build puts `-I$TCLSRC/generic' first.
+
+  * `qlock.h' carried a SECOND `typedef struct { int val; } Lock;'
+    beside the one it already got from `<lock.h>', guarded with
+    `#ifndef Lock'. **Lock is a typedef, not a macro**, so that test
+    is always true and the duplicate was always emitted. Two
+    anonymous structs are distinct types, so it is a constraint
+    violation; gcc refuses, and `<pthread.h>' includes both files, so
+    SIXTEEN of the 149 headers here could not be compiled by a
+    standards-strict compiler. kencc tolerated it, which is exactly
+    why it survived.
+
+A third, mine, would also have been caught in one run: a comment
+added to `<termios.h>' contained a star followed by a slash, closed
+itself mid-sentence, and broke every translation unit that includes
+it. I shipped it without compiling the header once.
+
+------------------------------------------------------------------
+WHAT IT MEASURES, AND WHAT IT CANNOT.
+
+For each `sys/include/ape/*.h' it compiles a file whose entire
+content is `#include <that header>'. The include path is the BUILD's,
+in the build's ORDER -- `$objtype/include/ape' BEFORE
+`sys/include/ape', which is a documented invariant of this tree and
+not a detail: flattening the two into one directory made the first
+version of this sweep report 16 false `Lock' conflicts of its own
+making. *An instrument whose include path is not the build's include
+path is measuring a different program*, which is the lesson
+`apdecl-sweep` learned the same way.
+
+The two trees are STAGED into a scratch directory first, because
+several arch headers reach their counterpart through an ABSOLUTE
+`#include "/sys/include/ape/..."' that does not exist on the build
+host. The staging rewrites those to relative; it is the same
+workaround `readdir.c`'s gcc check needed.
+
+**It is gcc, not kencc, so some failures are the HOST's and not the
+tree's.** Those are listed in EXPECTED below with the reason, and the
+sweep reports only what is NOT on that list. The largest group is
+`bool`: kencc has it as a C23 keyword and gcc in C mode does not, so
+four headers that are perfectly fine under pcc fail here. *Reporting
+them would make the sweep unreadable, and suppressing them silently
+would make it dishonest* -- it prints the expected count too.
+
+It is a LOWER BOUND. A header that compiles alone can still be wrong:
+this asks whether the include closure is complete and the syntax is
+valid, not whether anything it declares is correct.
+"""
+
+import os, re, shutil, subprocess, sys, tempfile
+
+# header -> why it is not expected to compile standalone on the HOST.
+# Anything not in here that fails is a finding.
+EXPECTED = {
+    # Plan 9 extension headers: they need <u.h> first, by design, and
+    # `This' is u.h's. Including them bare is not how they are used.
+    "ar.h": "needs <u.h> first (Plan 9 extension header)",
+    "auth.h": "needs <u.h> first",
+    "bio.h": "needs <u.h> first",
+    "cursor.h": "needs <u.h> first",
+    "draw.h": "needs <u.h> first",
+    "event.h": "needs <u.h> first",
+    "keyboard.h": "needs <u.h> first",
+    "libsec.h": "needs <u.h> first",
+    "mouse.h": "needs <u.h> first",
+    "plumb.h": "needs <u.h> first",
+    "select.h": "needs <u.h> first",
+    # kencc has `bool' as a C23 keyword; gcc in C mode does not.
+    # These compile under pcc. HOST ARTEFACT, not a tree bug.
+    "curses.h": "uses bool, a kencc keyword gcc lacks in C mode",
+    "panel.h": "uses bool, a kencc keyword gcc lacks in C mode",
+    "term.h": "uses bool, a kencc keyword gcc lacks in C mode",
+    "menu.h": "uses bool, a kencc keyword gcc lacks in C mode",
+    "textstyle.h": "uses bool, a kencc keyword gcc lacks in C mode",
+    "form.h": "uses bool, a kencc keyword gcc lacks in C mode",
+    # Not standalone by design: included from their public header.
+    "tclDecls.h": "internal, included from <tcl.h>",
+    "tkDecls.h": "internal, included from <tk.h>",
+    # Need a build-generated header or a width selected first.
+    "png.h": "needs pnglibconf.h, generated by libpng's build",
+    "pngconf.h": "needs pnglibconf.h, generated by libpng's build",
+    "lz4file.h": "needs lz4frame_static.h",
+    "pcre2.h": "requires PCRE2_CODE_UNIT_WIDTH defined first",
+    "libdwarfp.h": "needs <libdwarf.h> first",
+    # Small real gaps, recorded rather than fixed: they want one more
+    # include of their own. Harmless because every real caller has it.
+    "fts.h": "uses dev_t without <sys/types.h>",
+    "dlfcn.h": "uses NULL without <stddef.h>",
+}
+
+
+def stage(root, dst):
+    """Copy the two include trees, rewriting absolute self-includes."""
+    arch, sysd = os.path.join(dst, "arch"), os.path.join(dst, "sys")
+    shutil.copytree(os.path.join(root, "amd64/include/ape"), arch)
+    shutil.copytree(os.path.join(root, "sys/include/ape"), sysd)
+    for d in (arch, sysd):
+        for dirpath, _, names in os.walk(d):
+            for n in names:
+                if not n.endswith((".h", ".H")):
+                    continue
+                f = os.path.join(dirpath, n)
+                try:
+                    t = open(f, encoding="utf-8", errors="replace").read()
+                except OSError:
+                    continue
+                if '"/sys/include/ape/' in t:
+                    open(f, "w", encoding="utf-8").write(
+                        t.replace('"/sys/include/ape/', '"'))
+    return arch, sysd
+
+
+def main():
+    root = os.getcwd()
+    hdrdir = os.path.join(root, "sys/include/ape")
+    if not os.path.isdir(hdrdir):
+        sys.exit("apehdr-sweep: run me from the repo root")
+
+    tmp = tempfile.mkdtemp(prefix="apehdr.")
+    try:
+        arch, sysd = stage(root, tmp)
+        src = os.path.join(tmp, "probe.c")
+        headers = sorted(f for f in os.listdir(hdrdir) if f.endswith(".h"))
+
+        findings, expected_hit = [], 0
+        for h in headers:
+            open(src, "w").write("#include <%s>\n" % h)
+            # -nostdinc: the host's own headers must not paper over a
+            # gap in APE's. Without it a missing <stddef.h> is invisible.
+            p = subprocess.run(
+                ["gcc", "-fsyntax-only", "-nostdinc", "-I", arch, "-I", sysd, src],
+                capture_output=True, text=True)
+            if p.returncode == 0:
+                if h in EXPECTED:
+                    findings.append((h, "EXPECTED TO FAIL AND DID NOT: "
+                                        + EXPECTED[h]))
+                continue
+            m = re.search(r"error: (.*)", p.stderr)
+            msg = m.group(1).strip() if m else "(no error: line; see stderr)"
+            if h in EXPECTED:
+                expected_hit += 1
+            else:
+                findings.append((h, msg))
+
+        print("apehdr-sweep: %d headers, %d known-not-standalone (see "
+              "EXPECTED), %d findings" % (len(headers), expected_hit,
+                                          len(findings)))
+        for h, msg in findings:
+            print("  %-24s %s" % (h, msg))
+        if not findings:
+            print("  none -- every other header compiles on its own.")
+        # An entry in EXPECTED that starts passing is reported above
+        # rather than quietly dropped: a list of excuses that nobody
+        # ever shortens is how a sweep stops meaning anything.
+        return 1 if findings else 0
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

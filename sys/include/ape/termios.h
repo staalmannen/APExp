@@ -51,14 +51,27 @@
 #define TCION 3
 
 /*
- * tcflush. These were MISSING while `tcflush(int, int)' was declared
+ * tcflush. These were MISSING while tcflush(int, int) was declared
  * below -- a function this header promises, whose second argument
- * could not be named. Of the four POSIX groups here (tcsetattr's
- * TCSA*, tcflow's TC*O*/TC*ON above, and these) it was the only one
- * absent, so the gap read as nothing at all until a program used it:
- * bacon's `__b2c__getch' opens with
- * `tcflush(STDIN_FILENO, TCIFLUSH)' and the build stopped at
- * `name not declared: TCIFLUSH'.
+ * could not be named. POSIX has four groups of these: TCSANOW and
+ * friends for tcsetattr, TCOOFF and friends for tcflow just above,
+ * and this one. It was the only one absent, so the gap read as
+ * nothing at all until a program used it: bacon's __b2c__getch
+ * opens with tcflush(STDIN_FILENO, TCIFLUSH) and the build stopped
+ * at "name not declared: TCIFLUSH".
+ *
+ * NOTE TO WHOEVER EDITS THIS COMMENT NEXT: the first version of it
+ * named the tcflow group with a glob rather than spelling the macros
+ * out, and that glob happened to contain a star followed by a slash
+ * -- the two characters that END a C comment. The comment closed
+ * itself in the middle of a sentence, everything after became code,
+ * and the apostrophes in the prose then read as unterminated
+ * character constants. cpp reported four "Unterminated string or
+ * char const" and a "syntax error, last name: TC", not one of which
+ * mentions a comment. A comment containing the close sequence is not
+ * a comment, and a header is the one kind of file where that breaks
+ * every translation unit including it rather than one. Spell macro
+ * names out here; do not abbreviate them with a pattern.
  *
  * 0/1/2 is the glibc and musl assignment, not the BSD 1/2/3 one.
  * Nothing in libap reads the value -- `termios/tcgetattr.c' casts
