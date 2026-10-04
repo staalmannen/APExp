@@ -529,6 +529,86 @@ FIXED**: that no-op is right for the KERNEL and questionable for this
 LIBRARY, whose select() copy process does hold unread bytes a
 conforming TCIFLUSH would discard. Nothing has measured it.
 
+**THE TERMIOS FIX BROKE EVERY APE BUILD, AND IT WAS A COMMENT.** The
+block added beside `TCIFLUSH` named the tcflow group with a glob
+rather than spelling the macros out, and that glob contained a star
+followed by a slash -- **the two characters that END a C comment**.
+It closed itself mid-sentence, everything after became code, and the
+apostrophes in the prose then read as character constants: four
+`Unterminated string or char const` and a
+`syntax error, last name: TC`, *not one of which mentions a comment*.
+*A comment containing the close sequence is not a comment*, and a
+header is the one file where that breaks every translation unit
+rather than one. **I had compile-verified `values.h` in the same
+commit and not `termios.h`** -- the check existed and was not applied
+to both.
+
+**SO `apehdr-sweep.py` EXISTS NOW, AND IT PAID BEFORE IT WAS
+FINISHED.** It compiles a file whose whole content is
+`#include <that header>` for each of the 149 in `sys/include/ape`,
+with the BUILD's include path in the BUILD's order. **149 headers,
+23 known-not-standalone, 0 findings** -- and the control fires:
+reintroducing the comment bug reports `termios.h: unknown type name
+'TC'` and nothing else.
+**Its first version reported 39 failures and 16 of them were ITS
+OWN**: it flattened `$objtype/include/ape` and `sys/include/ape` into
+one directory, where the two collide, instead of passing them as two
+`-I` in order. *An instrument whose include path is not the build's
+include path is measuring a different program* -- `apdecl-sweep`
+learned that exact lesson the exact same way, and I made the mistake
+again in the next sweep I wrote.
+**THE OTHER 16 WERE REAL: `Lock` IS DEFINED TWICE.**
+`qlock.h` includes `<lock.h>`, which typedefs `Lock`, and then
+carries its own copy guarded by **`#ifndef Lock`** -- and `Lock` is a
+TYPEDEF, not a macro, so the preprocessor has never heard of it and
+that test is always true. The duplicate was always emitted. Textually
+identical is not compatible: each `typedef struct { int val; } Lock;`
+defines its own ANONYMOUS struct, so they are distinct types sharing
+a name, which C forbids. `<pthread.h>` includes both files, so
+**sixteen of the 149 headers could not be compiled by a
+standards-strict compiler at all**; kencc tolerated it, which is
+exactly why it survived. *This is the `PATH_MAX`/`NGROUPS_MAX` rule
+-- when a name is wrong, grep for EVERY definition of it -- arriving
+for a TYPE, where the cost is a layout rather than a value.*
+**And three entries of the sweep's own exemption list were WRONG**,
+which it reported rather than hid: `qlock.h`, `tclPlatDecls.h` and
+`tkIntXlibDecls.h` were listed as not-standalone and all three
+compile. An exemption that starts passing is a finding too, or the
+list becomes a set of excuses nobody shortens.
+
+**cfront: THE DRIVER WORKS NOW AND mk STOPS AT THE FAULT.** The run
+reads `c++: FAILED at cfront on arg.cpp -- cfront 250970: sys: trap:
+general protection violation pc=0x280db8` followed by `cpp 25897
+ns_strip 25897 cfront 1265`, and `mk` exits `cxxfail` on the FIRST
+file instead of marching through forty. *The `$status` fix is
+confirmed where it was found.*
+**The crash is ONE LINE: `table.c:1455`, `while ((*__2p))`** --
+`table::grow` walking its name array and dereferencing
+`np[j]->expr.string`. **One line above it sits a hand-added guard,
+`if ((long long)__2s < 0x200000) continue;`** -- so a garbage string
+pointer in this table is a phenomenon this fork already knew about
+and papered over with a magic number rather than diagnosed.
+**TWO MECHANISMS OFFERED BY THE STACK AND BOTH REFUTED BEFORE BEING
+BUILT ON.** `acid` showed
+`insert__5tableFP4nameUc(__1nn=.., __0this=.., __1k=0x7fff00000000)`,
+and `0x7fff00000000` is a 64-bit slot holding the high half of a
+stack address with the low half zeroed -- the exact shape of this
+tree's 32-bit-`long` invariant. **But the real declaration is
+`(__0this, __1nx, __1k)`, `this` FIRST**, and acid printed `__1nn`
+first: *its argument order does not match the declaration, so its
+value-to-name assignment cannot be trusted here*, and the lead
+dissolves. The second was the build-flag difference -- the host
+passes `-D__HAVE_SIZE_T` and the mkfile does not: **referenced
+nowhere in the sources**, inert. `-D__cfront_have_bool` likewise
+changes nothing the host does not already get, since the `enum bool`
+it suppresses is already behind `!defined(__GNUC__)`.
+**So the decisive experiment is still the one `-K` was built for**,
+and it is now one file: the VM's own `$pp` through the host's ASAN
+cfront. **And `lstk()` rather than `stk()` is the better command**
+-- it prints LOCALS, so `__1j`, `__2s` and `__2p` say directly
+whether the index is in range and what the pointer holds, where the
+arguments have already proved misleading once.
+
 **NEITHER IS ENABLED IN `cmd/mkfile' YET, deliberately**: one failing
 entry aborts the whole tree's `mk', and bacon has never been through
 pcc. Build `cmd/basic' by hand first; the line is one character from

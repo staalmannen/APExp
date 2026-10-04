@@ -5,12 +5,29 @@
 #include <u.h>
 #include <lock.h>
 
-#ifndef Lock
-typedef struct
-{
-	int	val;
-} Lock;
-#endif
+/*
+ * `Lock' comes from <lock.h>, included directly above, and the
+ * duplicate that used to sit here could never be suppressed.
+ *
+ * It was guarded with `#ifndef Lock' -- and **Lock is a typedef, not
+ * a macro**, so the preprocessor has never heard of it and that test
+ * is ALWAYS TRUE. The second definition was emitted every time.
+ *
+ * Textually identical is not the same as compatible: each
+ * `typedef struct { ... } Lock;' defines its own ANONYMOUS struct, so
+ * the two were distinct types sharing a name. C permits a repeated
+ * typedef only for compatible types, so this is a constraint
+ * violation -- gcc says `conflicting types for Lock' and refuses, and
+ * <pthread.h> includes both files, so SIXTEEN of the 149 headers in
+ * sys/include/ape could not be compiled by a standards-strict C
+ * compiler at all. kencc tolerated it, which is why it survived.
+ *
+ * Found by `sys/lib/tests/apehdr-sweep.py', which exists because of
+ * it. See also the `PATH_MAX'/`NGROUPS_MAX' rounds: *when a name is
+ * wrong, grep for EVERY definition of it* -- this is that rule for a
+ * TYPE rather than a constant, where the cost is a layout rather than
+ * a value.
+ */
 
 
 typedef struct QLp QLp;
