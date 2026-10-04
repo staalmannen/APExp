@@ -9,6 +9,7 @@
 #   c++ -c [flags] file.cpp ...     compile to .o, do not link
 #   c++ -E [flags] file.cpp         preprocessed C++ to stdout
 #   c++ -F [flags] file.cpp ...     cfront only: emit C to stdout (for mkfile rules)
+#   c++ -K [flags] file.cpp ...     keep the .pp.c/.ns.c/.cf.c intermediates
 #   c++ -o out [flags] file.cpp ... compile, link, write to out
 #
 # Environment overrides:
@@ -37,7 +38,7 @@ if(~ $nsstrip '') {
 }
 
 fn usage {
-	echo 'usage: c++ [-cEFvN] [-o out] [-I dir] [-D sym] [-U sym] [-l lib] [-L dir] file.cpp ...' >/fd/2
+	echo 'usage: c++ [-cEFvNK] [-o out] [-I dir] [-D sym] [-U sym] [-l lib] [-L dir] file.cpp ...' >/fd/2
 	exit usage
 }
 
@@ -47,6 +48,7 @@ eflag = ''   # -E: preprocess only
 fflag = ''   # -F: cfront only, emit C to stdout
 vflag = ''   # -v: verbose (echo each command)
 nflag = ''   # -N: skip ns_strip even if available
+kflag = ''   # -K: keep $tmpdir and say where it is
 outfile = '' # -o <file>
 
 iflags  = ()  # -I... (for preprocessor and C compiler)
@@ -73,6 +75,8 @@ while(! ~ $#args 0) {
 		vflag = 1
 	case -N
 		nflag = 1
+	case -K
+		kflag = 1
 	case -o
 		if(~ $#args 0) { echo 'c++: -o requires an argument' >/fd/2; exit 1 }
 		outfile = $args(1)
@@ -168,8 +172,16 @@ if(! ~ $eflag '') {
 		if(! ~ $vflag '')
 			echo $CC -E -I$CXXINCL $iflags $dflags '-D__cplusplus=1' '-Dc_plusplus=1' $src >/fd/2
 		$CC -E -I$CXXINCL $iflags $dflags '-D__cplusplus=1' '-Dc_plusplus=1' $tmpc
+		st = $status
 		rm -f $tmpc
-		if(! ~ $status '') exit $status
+		# not `die' -- that is defined further down, with $tmpdir,
+		# and neither exists yet on this path. rc resolves a function
+		# name when the call runs, so calling it here would find
+		# nothing.
+		if(! ~ $st ''){
+			echo 'c++: FAILED at preprocess on' $src '--' $st >/fd/2
+			exit cxxfail
+		}
 	}
 	exit 0
 }
@@ -177,9 +189,59 @@ if(! ~ $eflag '') {
 # ---- set up temp directory ----
 tmpdir = /tmp/cxx.$pid
 mkdir -p $tmpdir
-fn cleanup { rm -rf $tmpdir }
+# `-K' KEEPS the intermediates, and it exists for one experiment.
+# cfront crashes on 9front (`suicide: sys: trap: general protection
+# violation', the same pc across every file of a directory) and does
+# NOT crash on the build host -- same cfront source, same library
+# sources, 0 AddressSanitizer findings over all of lib/. The two runs
+# differ in exactly two ways: the compiler that built cfront (kencc
+# against gcc), and the PREPROCESSED INPUT, since kencc's cpp and
+# gcc's do not emit the same bytes (25768 against 26557 for abs.cpp).
+#
+# Running the VM's own $pp through the host's ASAN cfront separates
+# them in one go: a crash there means the input, and no crash means
+# the code generation. Nothing else available is that cheap, and it
+# needs the intermediate file to survive -- hence this flag.
+#
+#	c++ -K -F -I/sys/include/ape/c++ -o x.c foo.cpp
+#
+# prints the directory and leaves <base>.pp.c, <base>.ns.c and
+# <base>.cf.c in it.
+fn cleanup {
+	if(~ $kflag '')
+		rm -rf $tmpdir
+	if not
+		echo 'c++: -K: intermediates kept in' $tmpdir >/fd/2
+}
 fn sigint  { cleanup; exit interrupted }
 fn sighup  { cleanup; exit hangup }
+
+# **`$status' IS CLOBBERED BY THE VERY NEXT COMMAND, AND THAT IS WHY
+# THIS DRIVER HAS NEVER REPORTED A FAILURE.** Every arm here used to
+# read
+#
+#	if(! ~ $status '') { cleanup; exit $status }
+#
+# and `cleanup' is `rm -rf', which SUCCEEDS -- so by the time `exit'
+# evaluated `$status' it was the empty string, and `exit ''' is exit
+# 0. Seven arms, every one of them, since the file was written.
+#
+# That is the whole explanation of the forty zero-byte .c files: mk
+# saw a recipe that "succeeded" and went on to the next. It is also
+# why a run with cfront crashing on thirty files walked through all
+# thirty and only stopped later, at `pcc: Can't open input file
+# abs.c' -- a message about the consequence, two steps from the cause.
+#
+# So: capture $status into a variable BEFORE anything else runs, and
+# exit with a fixed one-word token. The real status is PRINTED rather
+# than passed to `exit', because a Plan 9 trap status is several words
+# (`sys: trap: general protection violation') and `exit' takes one.
+fn die {
+	echo 'c++: FAILED at' $1 'on' $2 '--' $st >/fd/2
+	stages $2
+	cleanup
+	exit cxxfail
+}
 
 # `stages' reports the BYTE COUNT each stage produced, because the
 # pipeline has three of them and "the output is empty" says nothing
@@ -239,13 +301,15 @@ for(src in $sources) {
 	if(! ~ $vflag '')
 		echo $CC -E -I$CXXINCL $iflags $dflags '-D__cplusplus=1' '-Dc_plusplus=1' $src >/fd/2
 	$CC -E -I$CXXINCL $iflags $dflags '-D__cplusplus=1' '-Dc_plusplus=1' $csrc > $pp
-	if(! ~ $status '') { cleanup; exit $status }
+	st = $status
+	if(! ~ $st '') die preprocess $src
 
 	# 2. ns_strip (namespace preprocessor)
 	if(~ $nflag '' && ! ~ $nsstrip '') {
 		if(! ~ $vflag '') echo $nsstrip >/fd/2
 		$nsstrip < $pp > $ns
-		if(! ~ $status '') { cleanup; exit $status }
+		st = $status
+		if(! ~ $st '') die ns_strip $src
 	}
 	if not
 		ns = $pp
@@ -253,7 +317,8 @@ for(src in $sources) {
 	# 3. cfront: C++ → C
 	if(! ~ $vflag '') echo $CFRONT +a1 +f$src >/fd/2
 	$CFRONT +a1 +f$src < $ns > $cf
-	if(! ~ $status '') { stages $src; cleanup; exit $status }
+	st = $status
+	if(! ~ $st '') die cfront $src
 
 	# **AN EMPTY $cf IS A FAILURE, AND cfront CANNOT PRODUCE ONE.**
 	# Measured on the host: cfront fed a ZERO-BYTE input still exits 0
@@ -295,7 +360,8 @@ for(src in $sources) {
 		# 4. Compile generated C
 		if(! ~ $vflag '') echo $CC -c -I$CINCL $iflags $ccopts $cf -o $obj >/fd/2
 		$CC -c -I$CINCL $iflags $ccopts $cf -o $obj
-		if(! ~ $status '') { stages $src; cleanup; exit $status }
+		st = $status
+		if(! ~ $st '') die compile $src
 
 		compiled_objects = ($compiled_objects $obj)
 	}
@@ -317,7 +383,8 @@ for(src in $cfiles) {
 	}
 	if(! ~ $vflag '') echo $CC -c -I$CINCL $iflags $ccopts $src -o $obj >/fd/2
 	$CC -c -I$CINCL $iflags $ccopts $src -o $obj
-	if(! ~ $status '') { cleanup; exit $status }
+	st = $status
+	if(! ~ $st '') die compile $src
 	compiled_objects = ($compiled_objects $obj)
 }
 
@@ -337,7 +404,8 @@ if(! ~ $#sources 0 && test -f $CXXLIB)
 if(! ~ $vflag '')
 	echo $CC $ccopts $all_objects $cxxlib_arg $lflags -o $outfile >/fd/2
 $CC $ccopts $all_objects $cxxlib_arg $lflags -o $outfile
-if(! ~ $status '') { cleanup; exit $status }
+st = $status
+if(! ~ $st '') die link $outfile
 
 cleanup
 exit 0

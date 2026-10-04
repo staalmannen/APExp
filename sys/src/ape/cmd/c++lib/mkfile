@@ -64,4 +64,14 @@ CFLAGS= -c -FV -I$CXXSOURCE/complex/complex -I$CXXSOURCE/stream
 %.c: $CXXSOURCE/string/%.cpp
 	c++ -F -I$CXXINCL -o $target $prereq
 
-CLEANFILES= "*.c"
+# `*.c' UNQUOTED. It was `"*.c"', and mk has no special meaning for
+# double quotes -- it passes them through, so the recipe ran
+#
+#	rm -f *.[056789qvt] [056789qvt].out '"*.c"'
+#
+# and rc looked for one file whose name is literally `"*.c"'. So
+# `mk clean' left every generated .c in place, which is how a stale
+# or empty generation survives a clean and gets compiled again.
+# cmd/perl/mkfile has had it right (`CLEANFILES = *.c') all along.
+# mk does not glob in an assignment; rc globs when the recipe runs.
+CLEANFILES=*.c

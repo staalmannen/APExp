@@ -50,6 +50,32 @@
 #define TCIOFF 2
 #define TCION 3
 
+/*
+ * tcflush. These were MISSING while `tcflush(int, int)' was declared
+ * below -- a function this header promises, whose second argument
+ * could not be named. Of the four POSIX groups here (tcsetattr's
+ * TCSA*, tcflow's TC*O*/TC*ON above, and these) it was the only one
+ * absent, so the gap read as nothing at all until a program used it:
+ * bacon's `__b2c__getch' opens with
+ * `tcflush(STDIN_FILENO, TCIFLUSH)' and the build stopped at
+ * `name not declared: TCIFLUSH'.
+ *
+ * 0/1/2 is the glibc and musl assignment, not the BSD 1/2/3 one.
+ * Nothing in libap reads the value -- `termios/tcgetattr.c' casts
+ * `queue_selector' to void -- so the numbers are free, and this tree
+ * exists to run GNU software.
+ *
+ * NOTICED, NOT FIXED: that no-op is defensible for the KERNEL, which
+ * has no input queue to drop, and questionable for this LIBRARY,
+ * whose select() copy process does hold unread bytes in a Muxbuf. A
+ * conforming TCIFLUSH would discard those. Nothing has measured it
+ * and bacon does not depend on it, so it is recorded rather than
+ * changed.
+ */
+#define TCIFLUSH  0
+#define TCOFLUSH  1
+#define TCIOFLUSH 2
+
 /* control modes */
 #define CLOCAL	0x001
 #define CREAD	0x002

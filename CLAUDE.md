@@ -453,6 +453,82 @@ round it. **The Tcl and Tk builds are untouched**: both mkfiles put
 `-I$TCLSRC/generic`/`-I$TKSRC/generic` ahead of `sys/include/ape`, so
 each still compiles its own copy.
 
+**THE VM RUN FOUND THE REAL CAUSE OF THE SILENCE, AND IT WAS MINE TO
+FIND EARLIER: `$status' IS CLOBBERED BY THE VERY NEXT COMMAND.**
+Every failure arm of `rc/bin/ape/c++' read
+`if(! ~ $status ''){ cleanup; exit $status }' -- and `cleanup' is
+`rm -rf', which SUCCEEDS, so `$status' was the empty string by the
+time `exit' evaluated it, and `exit '''` is exit 0. **Seven arms,
+every one, since the file was written.** *That is the complete
+explanation of the forty zero-byte `.c' files*: mk saw a recipe that
+had "succeeded" and went on. It is also why the run with cfront
+crashing on thirty files walked through all thirty and only stopped
+afterwards at `pcc: Can't open input file abs.c' -- a message about
+the consequence, two steps from the cause. `$status' is captured into
+a variable first now and `die' exits a fixed one-word token, because
+a Plan 9 trap status is several words and `exit' takes one. *I had
+named `continue' and the `> $target' redirection as the mechanism and
+both were real, but neither was load-bearing: this was.*
+**`mk clean' DID NOT CLEAN, for a third reason**: `CLEANFILES= "*.c"'
+-- mk gives double quotes no meaning and passes them through, so the
+recipe asked rc to remove one file literally named `"*.c"'. So a
+stale or empty generation survived every clean and was compiled
+again. `cmd/perl/mkfile' has had `CLEANFILES = *.c' right all along.
+**THE INSTRUMENT PAID IMMEDIATELY**: every line of the run reads
+`c++: <file> bytes: cpp N ns_strip N cfront N', and cfront's column
+is 1200-3500 rather than 0 -- so **cfront runs, parses, emits its
+preamble and then dies**, which is a completely different problem
+from the one the empty files suggested. The crashes group by
+DIRECTORY and each group shares one pc exactly: `complex/` 13 files
+at `general protection violation pc=0x280db8`, `stream/` 16 files at
+`fault write addr=0x480010 pc=0x200ed6`, `in`/`intin` at
+`fault read addr=0x0 pc=0x297a82`. *A fixed faulting ADDRESS across
+sixteen different inputs is a fixed object, not a wandering pointer.*
+Five files already convert cleanly (`_ctor`, `_delete`, `_dtor`,
+`_handler`, `pure`), which are the ones with no class member
+functions.
+**AND THE HOST DOES NOT CRASH AT ALL.** cfront built with gcc and
+**AddressSanitizer** (`src/cfront_stubs_asan.c`, which needed one
+missing `__cfront_pre_main` added locally) was run over EVERY source
+in `lib/`: **0 ASAN findings, no crash, exit 5 or 14 with real C++
+diagnostics instead.** So the two runs differ in exactly two things
+-- the compiler that built cfront (kencc against gcc) and the
+PREPROCESSED INPUT, since the two cpps do not emit the same bytes
+(25768 against 26557 for `abs.cpp`). **`c++ -K' keeps the
+intermediates** so the VM's own `$pp` can be run through the host's
+ASAN cfront: a crash there means the input, no crash means the code
+generation. *One file settles a question that reading cfront cannot.*
+**The host diagnostics are worth their own round and need no VM**:
+`sys/include/ape/c++/iostream.h:224` gives
+`ostream::operator <<() cannot be redeclared in class declaration`
+four times, `_arr_map.cpp` gives
+`operator delete()'s 2nd argument must be a size_t`, `placenew.cpp`
+`two definitions of operator new()`, `abs.cpp` `two definitions of
+norm()`. Several of these are cfront failing to tell two OVERLOADS
+apart, which on a 64-bit target is the shape of a type-signature
+comparison that collapses `int` and `long`.
+**`<values.h>` DID NOT EXIST and fourteen files include it.** Three
+use its macros for real (`perl/pp_sys.c`, `p2c/src/trans.h`,
+Devel-PPPort's `limits`), and `cfront-C4/lib/new/_arr_map.cpp` -- in
+cmd/c++lib's OFILES -- includes it and uses NOTHING from it, so a
+whole object failed over a vestigial line. Written now, and **every
+value is DERIVED from `<limits.h>`/`<float.h>` rather than
+transcribed**: kencc's `long` is 32-bit where the host's is 64, and
+this tree has already spent three rounds on constants that existed
+twice and disagreed. One definition, and it is somewhere else. With
+it `_arr_map` preprocesses and reaches real diagnostics.
+**`TCIFLUSH`, `TCOFLUSH` and `TCIOFLUSH` were missing from
+`<termios.h>`** while `tcflush(int, int)' was declared in it -- a
+function the header promises whose second argument could not be
+named. Of POSIX's four groups it was the only one absent, so the gap
+read as nothing at all until bacon's `__b2c__getch' used it and the
+build stopped at `name not declared: TCIFLUSH'. 0/1/2, the glibc and
+musl assignment; nothing in libap reads the value, since
+`termios/tcgetattr.c' casts `queue_selector' to void. **NOTICED, NOT
+FIXED**: that no-op is right for the KERNEL and questionable for this
+LIBRARY, whose select() copy process does hold unread bytes a
+conforming TCIFLUSH would discard. Nothing has measured it.
+
 **NEITHER IS ENABLED IN `cmd/mkfile' YET, deliberately**: one failing
 entry aborts the whole tree's `mk', and bacon has never been through
 pcc. Build `cmd/basic' by hand first; the line is one character from
