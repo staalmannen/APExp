@@ -609,6 +609,71 @@ cfront. **And `lstk()` rather than `stk()` is the better command**
 whether the index is in range and what the pointer holds, where the
 arguments have already proved misleading once.
 
+**AND `lstk()` NAMED IT: A `const char *` HOLDING ITS OWN TEXT.**
+`__2s = 0x6f69736963657270` and those eight bytes little-endian are
+**"precisio"** -- the first eight characters of the identifier
+`precision`. `table.c:1450` is
+`__2s = (__1np[__1j])->__O2__4expr.string;` and 1455 dereferences it.
+*Third time in this tree a pointer has contained characters*, after
+bash's `ifs_value` holding `'.'` and `date`'s `tm_zone` holding
+`4865`.
+**AND acid HAD TO BE CALIBRATED FIRST, which is what stopped a fourth
+false lead.** Every int local looked like garbage -- until the pairs
+line up:
+
+```
+  __1j = 0x474c200000001a      __1hash = 0x474c20
+  __1i = 0x2b2cfb00000003      __1sick = 0x2b2cfb
+  __2oerror_count = 0x47552000000000   __1n = 0x475520
+```
+
+**In every pair the HIGH half of the "garbage" IS the neighbouring
+variable**: acid reads eight bytes for a four-byte `int`, so the low
+half is the value and the high half is the next slot. `__1mx` reads
+`0xa5` = **165**, and `(g*3)/2` for `g = 0x6e` is 165 exactly. *So
+every int in that dump is correct and merely mis-printed, and `__2s`
+-- a genuine eight-byte pointer slot -- is the one value that is
+really wrong.* Three independent pairs agree on the artefact before
+anything was built on the one that did not. This is the `stk()`
+lesson again one level down: **acid's own display is a claim like any
+other.**
+**THE TRANSLATOR WROTE ITS OWN ANSWER INTO THE SOURCE, AND THAT IS AN
+ORACLE THIS TREE HAS USED BEFORE.** Every generated struct in
+cfront's C carries the size the translator computed --
+`struct expr { /* sizeof expr == 40 */`, `name == 144`,
+`node == 3` -- **132 of them across the `.c` files**, against tar's
+nine. GNU tar's `union block` was 520 here where everything else says
+512, because `6c/swt.c`'s `align()` rounds every struct up to 8
+(`Asu2`) and aligns a nested struct member to 8 (`Ael1`). *A wrong
+field OFFSET is exactly what puts an identifier's text where a
+pointer should be*, so the sizes are the cheapest proxy for the
+question the crash asks.
+**`struct node` is already a guaranteed disagreement**: `TOK` and
+`bit` are both `unsigned char` (`typedef.h:19-20`), so it is **3 on
+gcc and 8 under kencc**. Whether that matters depends on whether
+anything strides over a `node`; field offsets stay right and what
+breaks is `sizeof` used as a stride. *The probe reports the fact and
+does not decide the consequence.*
+**`sys/lib/tests/cfrontsz-probe.py` is the instrument**, the
+`tarblock-probe` idiom generalised: it extracts `main.c`'s preamble
+(the file whose declarations are the largest superset, 47 tagged
+types), emits a probe asking `sizeof` for each beside the recorded
+number, and **runs the gcc control itself** -- 47 of 47, **0
+disagreements**, which is what says the extraction is right. *An
+instrument that cannot reproduce the known answer has not earned the
+right to report an unknown one*, and a bad extraction would otherwise
+produce a probe that compiles and measures nothing. It refuses to
+print the VM command unless the control passes. The pcc flags are
+cfront's own from `cmd/cfront/mkfile`, for the reason `tarblock-probe`
+records: built with different flags it measures a different header.
+Each type is asked with the KEYWORD it was declared with, since the
+`__Q2_4expr4__C1` family are unions.
+**TWO cfront HYPOTHESES REFUTED BEFORE THIS ONE**, both cheaply: the
+host passes `-D__HAVE_SIZE_T` and the mkfile does not -- **referenced
+nowhere in the sources**, inert; and `-D__cfront_have_bool` suppresses
+an `enum bool` that is already behind `!defined(__GNUC__)`, so the
+host gets the same thing.
+
 **NEITHER IS ENABLED IN `cmd/mkfile' YET, deliberately**: one failing
 entry aborts the whole tree's `mk', and bacon has never been through
 pcc. Build `cmd/basic' by hand first; the line is one character from

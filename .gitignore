@@ -45,3 +45,7 @@ sys/src/cmd2/vts/test/bin/
 # 40 empty translation units into libc++.a and the build reported success
 # -- a check that cannot fail.
 sys/src/ape/cmd/c++lib/*.c
+
+# cfrontsz-probe generates these; see sys/lib/tests/cfrontsz-probe.py
+sys/src/external/cfront-C4/src/cfrontsz-decls.h
+sys/src/external/cfront-C4/src/cfrontsz-probe.c
