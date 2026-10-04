@@ -89,19 +89,60 @@ the one value that is genuinely wrong. Three independent pairs agree
 on the artefact before anything was built on the one that did not.
 
 ------------------------------------------------------------------
+WHAT THE FIRST VM RUN SAID, AND WHY IT IS NOT WHAT IT LOOKED LIKE.
+
+`8 of 47 disagree with the translator' -- and SEVEN of the eight are
+nothing to do with kencc's padding:
+
+    __sigset_t          64 here, 128 recorded   Linux's 1024-bit set
+    _fpstate           504 here, 512 recorded   x86 FP save area
+    _libc_fpstate      504 here, 512 recorded
+    _xsave_hdr          32 here,  64 recorded
+    __pthread_rwlock_arch_t  48 here, 56        glibc's layout
+    __Q3_5__C144__C14__C4    24 here, 32        __clock_t: long
+    __Q3_5__C144__C14__C6     8 here, 16        si_band:   long
+    node                 8 here,   3 recorded   *** kencc padding ***
+
+**The recorded sizes are the GENERATING machine's**, and cfront's C
+was generated on Linux -- so every system type in it carries glibc's
+answer, which APE is not obliged to match and mostly should not. Two
+more are kencc's 32-bit `long' showing through a `__clock_t'. *The
+oracle is only an oracle for the translator's OWN structs.*
+**So exactly ONE padding disagreement, and it is the predicted one.**
+**And `node' cannot be the crash**: `struct name' INLINES node's
+three fields (`base__4node', `permanent__4node', `baseclass__4node')
+rather than embedding a `struct node', so node's size never enters
+name's layout. cfront's C flattens inheritance.
+
+------------------------------------------------------------------
 THE CONTROL IS NOT OPTIONAL AND RUNS AUTOMATICALLY.
 
-The declarations are EXTRACTED from `main.c`'s preamble -- the text
-before its first function definition -- so a bad extraction would
-produce a probe that measures nothing. gcc must therefore reproduce
-**every** recorded size: 47 of 47, 0 disagreements. If the gcc run
-reports even one, the extraction is wrong and the pcc number means
-nothing. *An instrument that cannot reproduce the known answer has
-not earned the right to report an unknown one.*
+The declarations are EXTRACTED from the source file with its function
+BODIES removed, so a bad extraction would produce a probe that
+measures nothing. gcc must therefore reproduce **every** recorded
+size: 97 of 97, 0 disagreements. If the gcc run reports even one, the
+extraction is wrong and the pcc number means nothing. *An instrument
+that cannot reproduce the known answer has not earned the right to
+report an unknown one.*
 
-`main.c` is chosen because its preamble declares the most tagged
-types of any file (47); the other `.c` files emit subsets of the same
-generated declarations.
+**AND THAT CONTROL IS NOT ENOUGH ON ITS OWN, which cost the first VM
+round.** The first version took main.c's PREAMBLE -- everything above
+the first function definition -- and cfront's generated C INTERLEAVES
+declarations with definitions, so it got **47 of main.c's 97 tagged
+types**. The control reproduced all 47 and reported 0 disagreements,
+which was true. *Correctness and completeness are different
+properties and only one of them was being checked.* Among the fifty
+left out were `name', `expr' and the whole `__Q2_4expr4__C*' family
+-- **the exact types the faulting line dereferences**, so the probe
+ran, passed its control, and could not have answered the question it
+was built for. The extraction skips function bodies now, and the
+count assertion is the other half of the control: every tagged type
+in the file must survive into the probe. One line.
+
+`main.c` is chosen because it declares the most tagged types of any
+file (97); the others emit subsets of the same generated
+declarations. Pass a different file name as the one argument to ask
+about that one instead.
 
 Only TAGGED definitions are asked about (`struct X {` / `union X {`
 carrying their own size comment), and each is asked with the keyword
@@ -116,39 +157,85 @@ SRC = "sys/src/external/cfront-C4/src"
 PCC_FLAGS = "-B -D_POSIX_SOURCE -D_BSD_EXTENSION -D__cfront_have_bool -I."
 
 
-def preamble(path):
-    """main.c up to its first function definition: the declarations."""
+TAGGED = re.compile(r"^(struct|union)\s+([A-Za-z_]\w*)\s*\{\s*"
+                    r"/\*\s*sizeof\s+\2\s*==\s*(\d+)\s*\*/", re.M)
+FUNCDEF = re.compile(r"^[A-Za-z_][A-Za-z_0-9 *]*\(.*\{\s*$")
+
+
+def declarations(path):
+    """Every top-level declaration in the file, function BODIES removed.
+
+    The first version of this took the file's PREAMBLE -- everything
+    before the first function definition -- and that was wrong in a way
+    the gcc control could not see. cfront's generated C INTERLEAVES
+    declarations with definitions, so main.c's preamble held 47 of its
+    97 tagged types and the other 50 were never asked about. Among the
+    missing were `name', `expr' and the whole `__Q2_4expr4__C*' family
+    -- *the exact types the crash dereferences*.
+
+    The control reproduced all 47 and reported 0 disagreements, which
+    is true and was read as "the extraction is right". **Correctness
+    and completeness are different properties and only one of them was
+    being checked.** The count assertion below is the other one, and it
+    is one line.
+    """
     lines = open(path, encoding="latin1").read().split("\n")
-    for i, l in enumerate(lines):
-        if re.match(r"^[A-Za-z_][A-Za-z_0-9 *]*\(.*\{\s*$", l):
-            return "\n".join(lines[:i]) + "\n"
-    sys.exit("cfrontsz-probe: no function definition found in " + path)
+    out, i, n = [], 0, len(lines)
+    while i < n:
+        if FUNCDEF.match(lines[i]):
+            # skip the body: count braces from this line to depth 0
+            depth = 0
+            while i < n:
+                depth += lines[i].count("{") - lines[i].count("}")
+                i += 1
+                if depth <= 0:
+                    break
+            continue
+        out.append(lines[i])
+        i += 1
+    return "\n".join(out) + "\n"
 
 
 def main():
     if not os.path.isdir(SRC):
         sys.exit("cfrontsz-probe: run me from the repo root")
-    decls = preamble(os.path.join(SRC, "main.c"))
+    srcfile = os.path.join(SRC, sys.argv[1] if len(sys.argv) > 1 else "main.c")
+    decls = declarations(srcfile)
     open(os.path.join(SRC, "cfrontsz-decls.h"), "w").write(decls)
 
     ents = {}
-    for m in re.finditer(
-            r"\b(struct|union)\s+([A-Za-z_]\w*)\s*\{\s*"
-            r"/\*\s*sizeof\s+\2\s*==\s*(\d+)\s*\*/", decls):
+    for m in TAGGED.finditer(decls):
         ents[m.group(2)] = (m.group(1), int(m.group(3)))
+
+    # COMPLETENESS, which the gcc control cannot check: every tagged
+    # type in the file must survive into the extraction. The preamble
+    # version silently dropped 50 of main.c's 97 and still reported a
+    # clean control.
+    whole = len(set(m.group(2) for m in
+                    TAGGED.finditer(open(srcfile, encoding="latin1").read())))
+    if len(ents) != whole:
+        print("cfrontsz-probe: INCOMPLETE EXTRACTION -- %d of %d tagged "
+              "types in %s. The ones left out are not measured and the "
+              "control cannot tell." % (len(ents), whole, srcfile))
+        return 2
 
     out = ['/* GENERATED by sys/lib/tests/cfrontsz-probe.py -- do not edit. */',
            '#include "cfrontsz-decls.h"',
            "extern int printf(const char*, ...);",
-           "int main(void){ int bad=0, n=0;"]
+           "int main(void){ int bad=0, n=0, same=0;"]
     for name, (kw, sz) in sorted(ents.items()):
         out.append('  n++; if(sizeof(%s %s)!=%d){ printf('
                    '"  %%-26s here %%4d   translator %%4d   *** DIFFERENT ***\\n",'
                    '"%s",(int)sizeof(%s %s),%d); bad++; }'
                    % (kw, name, sz, name, kw, name, sz))
-        out.append('  else printf("  %%-26s %%4d  same\\n","%s",'
-                   "(int)sizeof(%s %s));" % (name, kw, name))
-    out.append('  printf("\\n%d of %d disagree with the translator\\n", bad, n);')
+        # The agreements are NOT printed: at 97 types the table no
+        # longer fits a screen, and a screenshot that scrolls off the
+        # top is how a reading gets lost. The tally below says how many
+        # agreed, so "nothing printed" is still distinguishable from
+        # "did not run".
+        out.append("  else same++;")
+    out.append('  printf("\\n%d of %d disagree, %d agree '
+               '(agreements not listed)\\n", bad, n, same);')
     out.append("  return bad; }")
     cfile = os.path.join(SRC, "cfrontsz-probe.c")
     open(cfile, "w").write("\n".join(out) + "\n")

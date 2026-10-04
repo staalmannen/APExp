@@ -1,0 +1,209 @@
+/*
+ * structalign-test -- does `pcc -J' lay structs out the way every
+ * other C compiler does, and does plain `pcc' still lay them out the
+ * 9front way?
+ *
+ * THREE RUNS, and the middle one is the control:
+ *
+ *   gcc           -o /tmp/sa structalign-test.c && /tmp/sa   0 failures
+ *   pcc    -DPLAN9 -o sa structalign-test.c && ./sa          FAILURES
+ *   pcc -J -DPLAN9 -o sa structalign-test.c && ./sa          0 failures
+ *
+ * `-DPLAN9' is not decoration: section 5's `#pragma pack' is behind
+ * it, exactly as `cmd/tar/mkfile' guards tar.h's, so without the
+ * define that section compiles as ordinary structs and measures
+ * nothing. gcc is run without it for the same reason.
+ *
+ * **The plain-pcc run is not a formality.** A test that passes under
+ * -J tells you nothing on its own: it looks identical whether the
+ * flag works or the compiler was always conforming. Only the run
+ * WITHOUT the flag says the test can see the difference at all --
+ * *a check that cannot fail is not a check*, which this tree has
+ * now paid for in `strftime-xcheck', `ctype-xcheck' and twice in
+ * `random-xcheck'. Expect section 1 and section 2 to fail without
+ * -J; if they pass, something is wrong with the test, not with the
+ * compiler.
+ *
+ * ------------------------------------------------------------------
+ * WHAT -J CHANGES, AND IT IS EXACTLY TWO LINES OF `align()'.
+ *
+ *   Asu2  tail padding: was always SZ_VLONG, now the struct's own
+ *         alignment. `struct{char a[3];}' is 3 rather than 8.
+ *   Ael1  a nested struct/union MEMBER: was always SZ_VLONG because
+ *         `ewidth[TSTRUCT]' is negative and the ceiling test caught
+ *         it, now that member type's own alignment.
+ *
+ * Scalars were never wrong: `Ael1' already answers `ewidth[etype]'
+ * for them, which is their natural alignment on these targets. *The
+ * defect was narrower than "kencc aligns everything to 8" and this
+ * test is built around the two cases rather than around the slogan.*
+ *
+ * ------------------------------------------------------------------
+ * WHY IT MATTERS, MEASURED RATHER THAN ASSERTED.
+ *
+ * GNU tar's `union block' came out 520 here where every other system
+ * says 512, and since tar walks its archive with `union block *'
+ * arithmetic, every block after the first landed eight bytes late --
+ * both when tar WROTE an archive and when it READ one. The tree
+ * carries `#pragma pack on' around tar.h's on-disk structs for that,
+ * and section 5 checks the pragma still behaves with -J, since the
+ * two mechanisms now touch the same code.
+ *
+ * ------------------------------------------------------------------
+ * OFFSETS, NOT ONLY SIZES, and section 3 is the reason.
+ *
+ * A wrong `sizeof' breaks a stride. A wrong OFFSET puts one member's
+ * bytes where another member is read, which is how a `const char *'
+ * comes to hold the text `precisio' -- the cfront crash this round
+ * started from. Sizes alone would pass a compiler that padded the
+ * tail correctly and still misplaced an interior member.
+ *
+ * The expected numbers are gcc's, and gcc is the oracle because the
+ * question IS "what does everyone else do". They are not transcribed
+ * from a standard: the file was compiled with gcc and the numbers
+ * taken from the run.
+ */
+#include <stdio.h>
+#include <stddef.h>
+
+static int failures;
+
+static void
+eq(const char *what, long got, long want)
+{
+	if(got == want)
+		printf("PASS %-34s %ld\n", what, got);
+	else {
+		printf("FAIL %-34s got %ld, want %ld\n", what, got, want);
+		failures++;
+	}
+}
+
+/* ---- section 1: tail padding (Asu2) ---- */
+struct c3  { char a[3]; };
+struct c5  { char a[5]; };
+struct c500{ char a[500]; };
+struct sc  { short s; char c; };
+struct ic  { int i; char c; };
+struct dc  { double d; char c; };	/* alignment 8 already: must NOT move */
+
+/* ---- section 2: a nested struct member (Ael1) ---- */
+struct inner3 { char a[3]; };
+struct outer3 { char c; struct inner3 i; char d; };
+struct arr3   { char c; struct inner3 i[4]; };
+
+/* ---- section 3: interior offsets ---- */
+struct mixed {
+	char		tag;
+	struct inner3	n;
+	short		s;
+	char		trail;
+};
+
+/* ---- section 4: unions and bitfields ---- */
+union  u3  { char a[3]; short s; };
+struct bits { unsigned x : 3; unsigned y : 5; char c; };
+
+/* ---- section 5: #pragma pack must still win ---- */
+#ifdef PLAN9
+#pragma pack on
+#endif
+struct packed3 { char a[3]; };
+struct packedn { char c; struct inner3 i; char d; };
+#ifdef PLAN9
+#pragma pack off
+#endif
+
+/* ---- section 6: the shape that broke tar ---- */
+struct sparse_t { char offs[12]; char numbytes[12]; };
+struct oldgnu   {
+	char	atime[12];
+	char	ctime[12];
+	char	offset[12];
+	char	longnames[4];
+	char	pad;
+	struct sparse_t sp[4];
+	char	isextended;
+	char	realsize[12];
+};
+
+int
+main(void)
+{
+	printf("structalign-test: struct layout, with and without -J\n");
+
+	printf("\nSection 1: tail padding -- the struct's own alignment\n");
+	eq("sizeof struct{char a[3];}", (long)sizeof(struct c3), 3);
+	eq("sizeof struct{char a[5];}", (long)sizeof(struct c5), 5);
+	eq("sizeof struct{char a[500];}", (long)sizeof(struct c500), 500);
+	eq("sizeof struct{short;char;}", (long)sizeof(struct sc), 4);
+	eq("sizeof struct{int;char;}", (long)sizeof(struct ic), 8);
+	/*
+	 * The CONTROL of this section: its alignment is already 8, so a
+	 * conforming compiler and this one agree. It must pass in all
+	 * three runs -- if it moves under -J the flag is over-reaching.
+	 */
+	eq("sizeof struct{double;char;} (control)", (long)sizeof(struct dc), 16);
+
+	printf("\nSection 2: a nested struct member takes ITS alignment\n");
+	eq("sizeof struct inner3", (long)sizeof(struct inner3), 3);
+	eq("sizeof struct outer3", (long)sizeof(struct outer3), 5);
+	eq("sizeof struct arr3", (long)sizeof(struct arr3), 13);
+
+	printf("\nSection 3: interior OFFSETS, not just sizes\n");
+	/*
+	 * A compiler that padded tails correctly and still aligned the
+	 * nested member to 8 passes every size above and fails here.
+	 */
+	eq("offsetof(mixed, tag)", (long)offsetof(struct mixed, tag), 0);
+	eq("offsetof(mixed, n)", (long)offsetof(struct mixed, n), 1);
+	eq("offsetof(mixed, s)", (long)offsetof(struct mixed, s), 4);
+	eq("offsetof(mixed, trail)", (long)offsetof(struct mixed, trail), 6);
+	eq("sizeof struct mixed", (long)sizeof(struct mixed), 8);
+
+	printf("\nSection 4: unions, and a bit-field PROBE\n");
+	eq("sizeof union{char a[3];short;}", (long)sizeof(union u3), 4);
+	/*
+	 * A PROBE, not a check, and the distinction is the point: -J
+	 * does not claim to fix this and asserting it would make the
+	 * test report a failure for something the flag never promised.
+	 *
+	 * gcc answers 4 -- it puts the two bit fields in one byte of the
+	 * storage unit and places `c' in the next. kencc allocates bit
+	 * fields in whole `tfield' units (dcl.c: `w += tfield->width'),
+	 * so `c' lands at offset 4 and the struct is 8. That is a
+	 * SEPARATE non-conformance, in different code, and it is
+	 * recorded here rather than silently folded into this flag's
+	 * result.
+	 */
+	printf("     %-34s %ld   (gcc says 4; kencc allocates bit fields\n"
+	       "     %-34s      in whole int units, so 8 is expected here\n"
+	       "     %-34s      and -J does not change it)\n",
+	    "sizeof struct{u:3;u:5;char;}", (long)sizeof(struct bits), "", "");
+
+	printf("\nSection 5: #pragma pack still wins over -J\n");
+	/*
+	 * Both mechanisms now read the same two lines of align(), so a
+	 * -J that ignored packflg -- or a packflg the new code stepped
+	 * on -- would show here and nowhere else. Under gcc the pragma
+	 * is absent and these are the ordinary conforming answers, which
+	 * happen to be the same; that is why the Plan 9 run is the one
+	 * that carries this section.
+	 */
+	eq("sizeof packed struct{char a[3];}", (long)sizeof(struct packed3), 3);
+	eq("sizeof packed nested", (long)sizeof(struct packedn), 5);
+
+	printf("\nSection 6: the shape that made every tar archive wrong\n");
+	eq("sizeof struct sparse_t", (long)sizeof(struct sparse_t), 24);
+	/*
+	 * 150, and that number came from RUNNING this under gcc rather
+	 * than from adding the fields up: my own arithmetic said 149.
+	 * *An expected value computed by hand is a guess written as
+	 * though measured* -- the same slip as `40.3' being recorded as
+	 * 0664 before the log was read.
+	 */
+	eq("sizeof struct oldgnu", (long)sizeof(struct oldgnu), 150);
+
+	printf("\n%d failures\n", failures);
+	return failures;
+}

@@ -123,6 +123,14 @@ main(int argc, char *argv[])
 		case 'T':
 		case 'w':
 		case 'F':
+		/*
+		 * -J is conforming struct layout (cc/cc.h). It MUST be
+		 * listed here: this ARGBEGIN has no `default:', so a flag
+		 * it does not name is silently dropped -- the build would
+		 * look exactly right and the layout would not change,
+		 * which for a layout flag is the worst way to fail.
+		 */
+		case 'J':
 			append(&cc, smprint("-%c", ARGC()));
 			break;
 		case 'B':

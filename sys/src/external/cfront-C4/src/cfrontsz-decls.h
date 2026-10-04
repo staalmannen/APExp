@@ -1087,3 +1087,1279 @@ struct ptr { /* sizeof ptr == 88 */
 };
 extern Pptr ptr_free__3ptr;
 
+
+Ptype skiptypedefs__4typeFv(struct type *__0this);
+
+extern int ref_initializer;
+extern int ntok;
+union __Q2_4expr4__C1;
+union __Q2_4expr4__C2;
+union __Q2_4expr4__C3;
+union __Q2_4expr4__C4;
+
+union __Q2_4expr4__C1 { /* sizeof __Q2_4expr4__C1 == 8 */
+    Ptype tp;
+    char *string4;
+};
+union __Q2_4expr4__C2 { /* sizeof __Q2_4expr4__C2 == 8 */
+    Pexpr e1;
+    long long i1;
+    const char *string;
+};
+union __Q2_4expr4__C3 { /* sizeof __Q2_4expr4__C3 == 8 */
+    Pexpr e2;
+    int i2;
+    const char *string2;
+    Pexpr n_initializer;
+    Ptype tpdef;
+};
+union __Q2_4expr4__C4 { /* sizeof __Q2_4expr4__C4 == 8 */
+    Ptype tp2;
+    Pname fct_name;
+    Pexpr cond;
+    Pexpr mem;
+    Ptype as_type;
+    Ptable n_table;
+    Pin il;
+    Pname query_this;
+};
+
+void *__nw__4exprSFUl(size_t);
+void __dl__4exprSFPvUl(void *, size_t);
+
+struct expr { /* sizeof expr == 40 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    union __Q2_4expr4__C1 __O1__4expr;
+
+    union __Q2_4expr4__C2 __O2__4expr;
+
+    union __Q2_4expr4__C3 __O3__4expr;
+
+    union __Q2_4expr4__C4 __O4__4expr;
+};
+extern Pexpr expr_free__4expr;
+
+struct expr *__ct__4exprFUcP4exprT2(struct expr *__0this, TOK, Pexpr, Pexpr);
+
+struct texpr { /* sizeof texpr == 40 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    union __Q2_4expr4__C1 __O1__4expr;
+
+    union __Q2_4expr4__C2 __O2__4expr;
+
+    union __Q2_4expr4__C3 __O3__4expr;
+
+    union __Q2_4expr4__C4 __O4__4expr;
+};
+
+struct cast;
+
+struct cast { /* sizeof cast == 40 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    union __Q2_4expr4__C1 __O1__4expr;
+
+    union __Q2_4expr4__C2 __O2__4expr;
+
+    union __Q2_4expr4__C3 __O3__4expr;
+
+    union __Q2_4expr4__C4 __O4__4expr;
+};
+
+struct ival;
+
+struct ival { /* sizeof ival == 40 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    union __Q2_4expr4__C1 __O1__4expr;
+
+    union __Q2_4expr4__C2 __O2__4expr;
+
+    union __Q2_4expr4__C3 __O3__4expr;
+
+    union __Q2_4expr4__C4 __O4__4expr;
+};
+
+struct call { /* sizeof call == 40 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    union __Q2_4expr4__C1 __O1__4expr;
+
+    union __Q2_4expr4__C2 __O2__4expr;
+
+    union __Q2_4expr4__C3 __O3__4expr;
+
+    union __Q2_4expr4__C4 __O4__4expr;
+};
+
+struct qexpr { /* sizeof qexpr == 40 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    union __Q2_4expr4__C1 __O1__4expr;
+
+    union __Q2_4expr4__C2 __O2__4expr;
+
+    union __Q2_4expr4__C3 __O3__4expr;
+
+    union __Q2_4expr4__C4 __O4__4expr;
+};
+
+struct ref { /* sizeof ref == 40 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    union __Q2_4expr4__C1 __O1__4expr;
+
+    union __Q2_4expr4__C2 __O2__4expr;
+
+    union __Q2_4expr4__C3 __O3__4expr;
+
+    union __Q2_4expr4__C4 __O4__4expr;
+};
+
+struct mdot;
+
+struct mdot { /* sizeof mdot == 40 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    union __Q2_4expr4__C1 __O1__4expr;
+
+    union __Q2_4expr4__C2 __O2__4expr;
+
+    union __Q2_4expr4__C3 __O3__4expr;
+
+    union __Q2_4expr4__C4 __O4__4expr;
+};
+
+struct text_expr;
+
+struct text_expr { /* sizeof text_expr == 40 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    union __Q2_4expr4__C1 __O1__4expr;
+
+    union __Q2_4expr4__C2 __O2__4expr;
+
+    union __Q2_4expr4__C3 __O3__4expr;
+
+    union __Q2_4expr4__C4 __O4__4expr;
+};
+
+struct basecl { /* sizeof basecl == 48 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    TOK ppp__6basecl;
+    bit allocated__6basecl;
+    bit promoted__6basecl;
+    Pclass bclass__6basecl;
+    Pexpr init__6basecl;
+    int ptr_offset__6basecl;
+    int obj_offset__6basecl;
+    Pname *virt_init__6basecl;
+    struct basecl *next__6basecl;
+};
+enum template_formal_types {
+    template_type_formal = 1,
+    template_expr_formal = 2,
+    template_actual_arg_dummy = 3
+};
+
+extern TOK ppbase;
+union __Q2_4name4__C1;
+union __Q2_4name4__C2;
+
+union __Q2_4name4__C1 { /* sizeof __Q2_4name4__C1 == 8 */
+    Pname n_list;
+    Pname n_hidden;
+    Pname n_dtag;
+};
+
+union __Q2_4name4__C2 { /* sizeof __Q2_4name4__C2 == 8 */
+
+    Pname n_qualifier;
+    Ptable n_realscope;
+    int syn_class;
+};
+
+void *__nw__4nameSFUl(size_t);
+void __dl__4nameSFPvUl(void *, size_t);
+
+struct name { /* sizeof name == 144 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    union __Q2_4expr4__C1 __O1__4expr;
+
+    union __Q2_4expr4__C2 __O2__4expr;
+
+    union __Q2_4expr4__C3 __O3__4expr;
+
+    union __Q2_4expr4__C4 __O4__4expr;
+
+    TOK n_oper__4name;
+    TOK n_sto__4name;
+    TOK n_stclass__4name;
+    TOK n_scope__4name;
+    TOK n_key__4name;
+    bit n_evaluated__4name;
+    bit n_xref__4name;
+    unsigned char lex_level__4name;
+    TOK n_protect__4name;
+    bit n_dcl_printed__4name;
+
+    char n_template_arg__4name;
+    bit n_template_fct__4name;
+    bit n_redefined__4name;
+
+    short n_addr_taken__4name;
+    short n_used__4name;
+    short n_assigned_to__4name;
+    struct loc where__4name;
+    int n_offset__4name;
+    const char *n_anon__4name;
+
+    union __Q2_4name4__C1 __O1__4name;
+    Pname n_tbl_list__4name;
+    const char *n_gen_fct_name__4name;
+    char *n_template_arg_string__4name;
+    Pktab n_ktable__4name;
+
+    union __Q2_4name4__C2 __O2__4name;
+
+    long long n_val__4name;
+
+    int argno__4name;
+};
+
+extern Pname name_free__4name;
+
+extern int friend_in_class;
+extern int in_class_dcl;
+
+extern int in_class_decl;
+extern int parsing_class_members;
+extern int in_mem_fct;
+extern int in_arg_list;
+extern Ptype in_typedef;
+extern int defer_check;
+extern int declTag;
+extern Pname in_tag;
+extern int DECL_TYPE;
+union __Q2_4stmt4__C1;
+union __Q2_4stmt4__C2;
+union __Q2_4stmt4__C3;
+
+union __Q2_4stmt4__C1 { /* sizeof __Q2_4stmt4__C1 == 8 */
+    Pname d;
+    Pexpr e2;
+    Pstmt has_default;
+    int case_value;
+    Ptype ret_tp;
+};
+union __Q2_4stmt4__C2 { /* sizeof __Q2_4stmt4__C2 == 8 */
+    Pexpr e;
+    bit own_tbl;
+    Pstmt s2;
+};
+
+union __Q2_4stmt4__C3 { /* sizeof __Q2_4stmt4__C3 == 8 */
+    Pstmt for_init;
+    Pstmt else_stmt;
+    Pstmt case_list;
+    struct loc where2;
+};
+
+void *__nw__4stmtSFUl(size_t);
+void __dl__4stmtSFPvUl(void *, size_t);
+
+struct stmt { /* sizeof stmt == 80 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    Pstmt s__4stmt;
+    Pstmt s_list__4stmt;
+    Pstmt gt__4stmt;
+    struct loc where__4stmt;
+
+    union __Q2_4stmt4__C1 __O1__4stmt;
+
+    union __Q2_4stmt4__C2 __O2__4stmt;
+    Ptable memtbl__4stmt;
+    Pktab k_tbl__4stmt;
+
+    union __Q2_4stmt4__C3 __O3__4stmt;
+};
+extern Pstmt stmt_free__4stmt;
+
+extern const char *Neval;
+extern Ptable scope;
+extern Ptable expand_tbl;
+extern Pname expand_fn;
+
+struct stmt *__ct__4stmtFUc3locP4stmt(struct stmt *__0this, TOK, struct loc, Pstmt);
+
+struct estmt { /* sizeof estmt == 80 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    Pstmt s__4stmt;
+    Pstmt s_list__4stmt;
+    Pstmt gt__4stmt;
+    struct loc where__4stmt;
+
+    union __Q2_4stmt4__C1 __O1__4stmt;
+
+    union __Q2_4stmt4__C2 __O2__4stmt;
+    Ptable memtbl__4stmt;
+    Pktab k_tbl__4stmt;
+
+    union __Q2_4stmt4__C3 __O3__4stmt;
+};
+
+struct ifstmt;
+
+struct ifstmt { /* sizeof ifstmt == 80 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    Pstmt s__4stmt;
+    Pstmt s_list__4stmt;
+    Pstmt gt__4stmt;
+    struct loc where__4stmt;
+
+    union __Q2_4stmt4__C1 __O1__4stmt;
+
+    union __Q2_4stmt4__C2 __O2__4stmt;
+    Ptable memtbl__4stmt;
+    Pktab k_tbl__4stmt;
+
+    union __Q2_4stmt4__C3 __O3__4stmt;
+};
+
+struct lstmt;
+
+struct lstmt { /* sizeof lstmt == 80 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    Pstmt s__4stmt;
+    Pstmt s_list__4stmt;
+    Pstmt gt__4stmt;
+    struct loc where__4stmt;
+
+    union __Q2_4stmt4__C1 __O1__4stmt;
+
+    union __Q2_4stmt4__C2 __O2__4stmt;
+    Ptable memtbl__4stmt;
+    Pktab k_tbl__4stmt;
+
+    union __Q2_4stmt4__C3 __O3__4stmt;
+};
+
+struct forstmt;
+
+struct forstmt { /* sizeof forstmt == 80 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    Pstmt s__4stmt;
+    Pstmt s_list__4stmt;
+    Pstmt gt__4stmt;
+    struct loc where__4stmt;
+
+    union __Q2_4stmt4__C1 __O1__4stmt;
+
+    union __Q2_4stmt4__C2 __O2__4stmt;
+    Ptable memtbl__4stmt;
+    Pktab k_tbl__4stmt;
+
+    union __Q2_4stmt4__C3 __O3__4stmt;
+};
+
+struct block { /* sizeof block == 80 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    Pstmt s__4stmt;
+    Pstmt s_list__4stmt;
+    Pstmt gt__4stmt;
+    struct loc where__4stmt;
+
+    union __Q2_4stmt4__C1 __O1__4stmt;
+
+    union __Q2_4stmt4__C2 __O2__4stmt;
+    Ptable memtbl__4stmt;
+    Pktab k_tbl__4stmt;
+
+    union __Q2_4stmt4__C3 __O3__4stmt;
+};
+
+struct handler;
+
+struct handler { /* sizeof handler == 80 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    Pstmt s__4stmt;
+    Pstmt s_list__4stmt;
+    Pstmt gt__4stmt;
+    struct loc where__4stmt;
+
+    union __Q2_4stmt4__C1 __O1__4stmt;
+
+    union __Q2_4stmt4__C2 __O2__4stmt;
+    Ptable memtbl__4stmt;
+    Pktab k_tbl__4stmt;
+
+    union __Q2_4stmt4__C3 __O3__4stmt;
+};
+
+struct pair;
+
+struct pair { /* sizeof pair == 80 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    Pstmt s__4stmt;
+    Pstmt s_list__4stmt;
+    Pstmt gt__4stmt;
+    struct loc where__4stmt;
+
+    union __Q2_4stmt4__C1 __O1__4stmt;
+
+    union __Q2_4stmt4__C2 __O2__4stmt;
+    Ptable memtbl__4stmt;
+    Pktab k_tbl__4stmt;
+
+    union __Q2_4stmt4__C3 __O3__4stmt;
+};
+
+struct nlist { /* sizeof nlist == 16 */
+    Pname head__5nlist;
+    Pname tail__5nlist;
+};
+
+struct slist { /* sizeof slist == 16 */
+    Pstmt head__5slist;
+    Pstmt tail__5slist;
+};
+
+struct elist { /* sizeof elist == 16 */
+    Pexpr head__5elist;
+    Pexpr tail__5elist;
+};
+struct dcl_context;
+
+extern struct dcl_context *cc;
+
+extern struct dcl_context *ccvec_end;
+
+struct dcl_context { /* sizeof dcl_context == 48 */
+    Pname c_this__11dcl_context;
+    Ptype tot__11dcl_context;
+    Pname not4__11dcl_context;
+    Pclass cot__11dcl_context;
+    Ptable ftbl__11dcl_context;
+    Pname nof__11dcl_context;
+};
+
+extern int error__FiPCc(int, const char *);
+
+extern const char *line_format;
+
+extern Plist stat_mem_list;
+extern Plist isf_list;
+extern Pstmt st_ilist;
+extern Pstmt st_dlist;
+extern Ptable sti_tbl;
+extern Ptable std_tbl;
+
+extern bit enum_promote;
+extern int suppress_error;
+
+extern Pname overFound;
+extern Pname Nover;
+extern Pname Ncoerce;
+extern int Nover_coerce;
+
+struct ia { /* sizeof ia == 32 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    Pname local__2ia;
+    Pexpr arg__2ia;
+    Ptype tp__2ia;
+};
+
+struct iline { /* sizeof iline == 48 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    Pname fct_name__5iline;
+    Pin i_next__5iline;
+    Ptable i_table__5iline;
+    int i_slots__5iline;
+    Pia i_args__5iline;
+};
+struct con_dtor;
+
+struct con_dtor { /* sizeof con_dtor == 24 */
+    Pname tn__8con_dtor;
+    Pexpr condition__8con_dtor;
+    struct con_dtor *next__8con_dtor;
+};
+
+extern struct con_dtor *pdlist;
+extern Pexpr curr_expr;
+extern Pin curr_icall;
+
+extern Pstmt curr_loop;
+extern Pblock curr_block;
+extern Pstmt curr_switch;
+extern struct loc last_line;
+extern int last_ll;
+extern bit Cast;
+extern bit TCast;
+extern bit simpl_friend;
+extern bit in_return;
+extern struct loc no_where;
+
+extern Pname vec_new_fct;
+extern Pname new_fct;
+extern Pname del_fct;
+extern Pname vec_del_fct;
+
+extern int Nstd;
+
+extern int stcount;
+
+extern int Pchecked;
+
+extern Pname Ntmp;
+extern Pname Ntmp_refd;
+extern Pname Ntmp_flag;
+extern Pexpr Ntmp_dtor;
+
+extern Pclass Mptr;
+
+extern bit fake_sizeof;
+
+struct basetype { /* sizeof basetype == 112 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    bit defined__4type;
+
+    bit lex_level__4type;
+    int templ_base__4type;
+    Pclass in_class__4type;
+    Pname in_fct__4type;
+    char *nested_sig__4type;
+    char *local_sig__4type;
+    bit b_const__4type;
+    bit ansi_const__4type;
+
+    Ptype tlist__4type;
+
+    bit b_unsigned__8basetype;
+    bit b_signed__8basetype;
+    bit b_volatile__8basetype;
+    bit b_typedef__8basetype;
+    bit b_inline__8basetype;
+    bit b_virtual__8basetype;
+    bit b_short__8basetype;
+    bit b_long__8basetype;
+    bit b_bits__8basetype;
+    bit b_offset__8basetype;
+    TOK b_sto__8basetype;
+    Pname b_name__8basetype;
+    Ptable b_table__8basetype;
+    Pname b_xname__8basetype;
+
+    union __Q2_8basetype4__C1 __O1__8basetype;
+};
+
+extern int error__FiPCcRC2eaN33(int, const char *, const struct ea *, const struct ea *,
+                                const struct ea *, const struct ea *);
+
+struct name_list { /* sizeof name_list == 24 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    Pname f__9name_list;
+    Plist l__9name_list;
+};
+
+struct name *__ct__4nameFPCc(struct name *__0this, const char *);
+
+Pname insert__5tableFP4nameUc(struct table *__0this, Pname, TOK);
+
+extern Pclass current_instantiation;
+extern Pfct current_fct_instantiation;
+struct templ;
+
+typedef struct templ *Ptempl;
+struct funct_inst;
+typedef struct funct_inst *Pfunct_inst;
+struct templ_inst;
+typedef struct templ_inst *Ptempl_inst;
+struct basic_inst;
+typedef struct basic_inst *Pbase_inst;
+struct function_template;
+
+typedef struct function_template *Pfunt;
+struct data_template;
+typedef struct data_template *Pdata;
+struct templ_state;
+typedef struct templ_state *Ptstate;
+struct templ_classdef;
+typedef struct templ_classdef *Ptclass;
+struct templ_fct;
+typedef struct templ_fct *Ptfct;
+struct Pslot;
+typedef struct Pslot *Pbinding;
+
+struct cons { /* sizeof cons == 16 */
+
+    void *car__4cons;
+    struct cons *cdr__4cons;
+};
+struct templ_compilation;
+
+extern struct templ_compilation *templp;
+
+struct basic_template { /* sizeof basic_template == 48 */
+
+    Plist formals__14basic_template;
+    Pcons templ_refs__14basic_template;
+
+    Pname Cdcl__14basic_template;
+    Pstmt Cstmt__14basic_template;
+
+    int open_instantiations__14basic_template;
+    int extrapolated__14basic_template;
+
+    struct __mptr *__vptr__14basic_template;
+};
+struct templ { /* sizeof templ == 128 */
+
+    Plist formals__14basic_template;
+    Pcons templ_refs__14basic_template;
+
+    Pname Cdcl__14basic_template;
+    Pstmt Cstmt__14basic_template;
+
+    int open_instantiations__14basic_template;
+    int extrapolated__14basic_template;
+
+    struct __mptr *__vptr__14basic_template;
+
+    Ptempl_inst insts__5templ;
+    Pbase basep__5templ;
+    Pfunt fns__5templ;
+    Pfunt fns_end__5templ;
+    Pdata data__5templ;
+    Pdata data_end__5templ;
+
+    Ptempl next__5templ;
+    Pname namep__5templ;
+    int defined__5templ;
+    Pname members__5templ;
+};
+
+struct function_template { /* sizeof function_template == 80 */
+
+    Plist formals__14basic_template;
+    Pcons templ_refs__14basic_template;
+
+    Pname Cdcl__14basic_template;
+    Pstmt Cstmt__14basic_template;
+
+    int open_instantiations__14basic_template;
+    int extrapolated__14basic_template;
+
+    struct __mptr *__vptr__14basic_template;
+
+    Pname fn__17function_template;
+    Pfunt next__17function_template;
+    Pfunt gen_list__17function_template;
+
+    Pfunct_inst insts__17function_template;
+};
+struct state;
+
+struct state { /* sizeof state == 88 */
+
+    Pname Cdcl__5state;
+    Pstmt Cstmt__5state;
+    Pname dcl_list__5state;
+    struct loc curloc__5state;
+
+    int curr_file__5state;
+    Pexpr curr_expr__5state;
+    Pin curr_icall__5state;
+    Pstmt curr_loop__5state;
+    Pblock curr_block__5state;
+    Pstmt curr_switch__5state;
+
+    int bound__5state;
+    int inline_restr__5state;
+    struct loc last_line__5state;
+};
+struct pointer_hash;
+struct tree_copy_info;
+enum inst_status {
+    uninstantiated = 0,
+    function_instantiated = 1,
+    data_instantiated = 2,
+    class_instantiated = 3,
+    body_instantiated = 4
+};
+struct template_instantiation;
+
+struct basic_inst { /* sizeof basic_inst == 168 */
+
+    Pexpr actuals__10basic_inst;
+
+    Plist inst_formals__10basic_inst;
+
+    TOK isa__10basic_inst;
+    Pname tname__10basic_inst;
+    Pname namep__10basic_inst;
+    struct state context__10basic_inst;
+    Plist hidden_globals__10basic_inst;
+
+    int status__10basic_inst;
+    Pbase_inst next_active__10basic_inst;
+
+    struct pointer_hash *corr__10basic_inst;
+
+    struct __mptr *__vptr__10basic_inst;
+};
+
+extern Pbase_inst head__10basic_inst;
+
+struct templ_inst { /* sizeof templ_inst == 200 */
+
+    Pexpr actuals__10basic_inst;
+
+    Plist inst_formals__10basic_inst;
+
+    TOK isa__10basic_inst;
+    Pname tname__10basic_inst;
+    Pname namep__10basic_inst;
+    struct state context__10basic_inst;
+    Plist hidden_globals__10basic_inst;
+
+    int status__10basic_inst;
+    Pbase_inst next_active__10basic_inst;
+
+    struct pointer_hash *corr__10basic_inst;
+
+    struct __mptr *__vptr__10basic_inst;
+
+    Ptempl_inst next__10templ_inst;
+    Ptempl_inst forward__10templ_inst;
+
+    Ptempl def__10templ_inst;
+
+    int refp__10templ_inst;
+
+    int friend_refp__10templ_inst;
+};
+
+extern int zdebug;
+
+struct templ_classdef { /* sizeof templ_classdef == 248 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    bit defined__4type;
+
+    bit lex_level__4type;
+    int templ_base__4type;
+    Pclass in_class__4type;
+    Pname in_fct__4type;
+    char *nested_sig__4type;
+    char *local_sig__4type;
+    bit b_const__4type;
+    bit ansi_const__4type;
+
+    Ptype tlist__4type;
+
+    int class_base__8classdef;
+    bit c_body__8classdef;
+    TOK csu__8classdef;
+    bit obj_align__8classdef;
+    bit c_xref__8classdef;
+
+    short virt_count__8classdef;
+
+    bit virt_merge__8classdef;
+
+    bit has_vvtab__8classdef;
+    unsigned short c_strlen__8classdef;
+    Pbcl baselist__8classdef;
+    const char *string__8classdef;
+    Pname c_abstract__8classdef;
+    Pname mem_list__8classdef;
+    Ptable memtbl__8classdef;
+    Pktab k_tbl__8classdef;
+    Ptable c_context__8classdef;
+    int obj_size__8classdef;
+    int real_size__8classdef;
+    Pcons templ_friends__8classdef;
+    Plist friend_list__8classdef;
+    Pname pubdef__8classdef;
+    Ptype this_type__8classdef;
+    Pvirt virt_list__8classdef;
+    Pname c_ctor__8classdef;
+    Pname c_dtor__8classdef;
+    Pname c_itor__8classdef;
+    Pname c_vtor__8classdef;
+    Pname conv__8classdef;
+    struct toknode *c_funqf__8classdef;
+
+    struct toknode *c_funqr__8classdef;
+
+    Ptempl_inst inst__14templ_classdef;
+};
+
+void __dt__8classdefFv(struct classdef *__0this, int);
+
+extern void __dl__FPv(void *);
+
+void *__nw__9templ_fctSFUl(size_t);
+void __dl__9templ_fctSFPvUl(void *, size_t);
+
+struct templ_fct { /* sizeof templ_fct == 216 */
+
+    TOK base__4node;
+    bit permanent__4node;
+    bit baseclass__4node;
+
+    bit defined__4type;
+
+    bit lex_level__4type;
+    int templ_base__4type;
+    Pclass in_class__4type;
+    Pname in_fct__4type;
+    char *nested_sig__4type;
+    char *local_sig__4type;
+    bit b_const__4type;
+    bit ansi_const__4type;
+
+    Ptype tlist__4type;
+
+    int fct_base__3fct;
+    TOK nargs__3fct;
+    TOK nargs_known__3fct;
+    bit last_stmt__3fct;
+    bit f_vdef__3fct;
+
+    bit f_inline__3fct;
+    bit f_is_inline__3fct;
+
+    bit f_const__3fct;
+
+    bit f_static__3fct;
+    short f_virtual__3fct;
+    short f_imeasure__3fct;
+    Ptype returns__3fct;
+    Pname argtype__3fct;
+    Ptype s_returns__3fct;
+    Pname f_this__3fct;
+    Pclass memof__3fct;
+    Pclass def_context__3fct;
+    Pblock body__3fct;
+    Pname f_init__3fct;
+    Pexpr f_expr__3fct;
+    Pexpr last_expanded__3fct;
+    Pname nrv__3fct;
+    Pname f_result__3fct;
+    Pname f_args__3fct;
+    int f_linkage__3fct;
+    const char *f_signature__3fct;
+    Plist local_class__3fct;
+
+    Pfunct_inst inst__9templ_fct;
+};
+
+extern Ptfct ptfct_free__9templ_fct;
+
+struct funct_inst { /* sizeof funct_inst == 200 */
+
+    Pexpr actuals__10basic_inst;
+
+    Plist inst_formals__10basic_inst;
+
+    TOK isa__10basic_inst;
+    Pname tname__10basic_inst;
+    Pname namep__10basic_inst;
+    struct state context__10basic_inst;
+    Plist hidden_globals__10basic_inst;
+
+    int status__10basic_inst;
+    Pbase_inst next_active__10basic_inst;
+
+    struct pointer_hash *corr__10basic_inst;
+
+    struct __mptr *__vptr__10basic_inst;
+
+    Pfunct_inst next__10funct_inst;
+
+    Pfunt def__10funct_inst;
+    int refp__10funct_inst;
+    int friend_refp__10funct_inst;
+    Pbinding binding__10funct_inst;
+};
+
+#pragma lib "ape/libap.a"
+
+typedef int (*GPT)(int, char *);
+struct Block_CPchar;
+
+struct Block_CPchar { /* sizeof Block_CPchar == 16 */
+
+    CPchar *p__12Block_CPchar;
+
+    size_t n__12Block_CPchar;
+};
+
+void move__12Block_CPcharFPPCcUl(struct Block_CPchar *__0this, CPchar *, size_t);
+
+void copy__12Block_CPcharFRC12Block_CPchar(struct Block_CPchar *__0this,
+                                           const struct Block_CPchar *);
+
+size_t grow__12Block_CPcharFUl(struct Block_CPchar *__0this, size_t);
+struct Block_Pchar;
+struct Block_Pchar { /* sizeof Block_Pchar == 16 */
+
+    Pchar *p__11Block_Pchar;
+
+    size_t n__11Block_Pchar;
+};
+
+void move__11Block_PcharFPPcUl(struct Block_Pchar *__0this, Pchar *, size_t);
+
+void copy__11Block_PcharFRC11Block_Pchar(struct Block_Pchar *__0this, const struct Block_Pchar *);
+
+size_t grow__11Block_PcharFUl(struct Block_Pchar *__0this, size_t);
+extern struct Block_Pchar instfct;
+extern int noinst;
+extern struct Block_Pchar instdata;
+extern int nodatainst;
+extern bit tempdcl;
+extern bit mk_zero_init_flag;
+extern int first_file;
+extern bit all_flag;
+
+extern bit alltc_flag;
+
+extern bit data_flag;
+
+extern bit ft_flag;
+
+extern bit none_flag;
+
+extern Pname righttname;
+
+const char *prog_name = (const char *)"<<AT&T C++ Language System <3.0.3> 05/05/94>>";
+static const char *prog_vers = (const char *)"__cfront_version_303_xxxxxxxx";
+const char *src_file_name = (const char *)"";
+const char *line_format = (const char *)"\n# %d \"%s\"\n";
+
+struct Block_Pchar instfct = {0};
+
+struct Block_Pchar instdata = {0};
+bit all_flag = 0;
+
+bit alltc_flag = 0;
+
+bit data_flag = 0;
+
+bit ft_flag = 0;
+
+bit none_flag = 0;
+int noinst = 0;
+
+int nodatainst = 0;
+
+extern void *_get_stderr(void);
+
+extern int fprintf(void *, const char *, ...);
+
+extern void ext__Fi(int);
+
+
+Plist isf_list = 0;
+Pstmt st_ilist = 0;
+Pstmt st_dlist = 0;
+Ptable sti_tbl = 0;
+Ptable std_tbl = 0;
+Plist stat_mem_list = 0;
+
+int vtbl_opt = -1;
+
+int debug_opt = 0;
+static int gplus_opt;
+int ansi_opt = 1;
+int strict_opt = 0;
+
+int warning_opt = 0;
+int dem_opt_local = 0;
+int dem_opt_mem = 0;
+int perf_opt = 0;
+
+int pt_opt = 0;
+int dtpt_opt = 0;
+int se_opt = 0;
+bit stmtno = 0;
+
+int inline_opt = 0;
+
+Pname def_name = 0;
+Pname pdef_name = 0;
+
+int syn_count = 0;
+
+extern Pname syn__Fv(void);
+
+struct templ_compilation { /* sizeof templ_compilation == 1 */
+
+    char __W29__17templ_compilation;
+};
+
+extern Plist param_end__17templ_compilation;
+extern Ptempl list__17templ_compilation;
+extern Pfunt f_list__17templ_compilation;
+extern Pfunt f_owner__17templ_compilation;
+extern Ptempl owner__17templ_compilation;
+extern Ptempl_base parsed_template__17templ_compilation;
+
+extern Plist params__17templ_compilation;
+extern Pexpr actuals__17templ_compilation;
+extern Ptable templates__17templ_compilation;
+
+extern int in_progress__17templ_compilation;
+extern Ptstate save_templ__17templ_compilation;
+
+extern int parameters_in_progress__17templ_compilation;
+extern int formals_in_progress__17templ_compilation;
+
+extern Pcons templ_refs__17templ_compilation;
+extern Pcons friend_templ_refs__17templ_compilation;
+extern Pcons last_cons__17templ_compilation;
+extern Pcons last_friend_cons__17templ_compilation;
+
+void instantiate_ref_templ__17templ_compilationFv(struct templ_compilation *__0this);
+
+Pname dcl__4nameFP5tableUc(struct name *__0this, Ptable, TOK);
+
+void simpl__4nameFv(struct name *__0this);
+
+void dcl_print__4nameFUc(struct name *__0this, TOK);
+
+void dcl_print__7enumdefFP4name(struct enumdef *__0this, Pname);
+
+extern int strcmp(const char *, const char *);
+
+void dcl_print__8classdefFP4name(struct classdef *__0this, Pname);
+
+void del__4exprFv(struct expr *__0this);
+
+extern void delete_local__Fv(void);
+
+void del__4stmtFv(struct stmt *__0this);
+
+void del__4nameFv(struct name *__0this);
+
+extern void lex_clear__Fv(void);
+
+void end_of_compilation__17templ_compilationFv(struct templ_compilation *__0this);
+
+bit tconst__4typeFv(struct type *__0this);
+
+extern int error__FiP3locPCcRC2eaN34(int, struct loc *, const char *, const struct ea *,
+                                     const struct ea *, const struct ea *, const struct ea *);
+
+extern char *st_name__FPCc(const char *);
+
+struct fct *__ct__3fctFP4typeP4nameUc(struct fct *__0this, Ptype, Pname, TOK);
+
+void sign__3fctFv(struct fct *__0this);
+
+void really_print__8classdefFP4virt(struct classdef *__0this, Pvirt);
+
+extern int ispt_data__FP4name(Pname);
+
+Pname is_cl_obj__4typeFv(struct type *__0this);
+
+int tsizeof__4typeFi(struct type *__0this, int);
+
+Pptr is_ref__4typeFv(struct type *__0this);
+
+extern size_t strlen(const char *);
+
+extern char *strncpy(char *, const char *, size_t);
+
+extern void ptbl_add_pair__FPCcT1(const char *, const char *);
+
+extern void ptbl_init__Fi(int);
+
+void putline__3locFv(struct loc *__0this);
+
+
+
+extern __sighandler_t signal(int __0__sig, __sighandler_t __0__handler);
+
+extern void error_init__Fv(void);
+
+extern int atoi(const char *);
+
+extern int read_align__FPCc(const char *);
+
+extern void exit(int);
+
+extern void *fopen(const char *, const char *);
+
+extern int fscanf(void *, const char *, ...);
+
+extern char *strcpy(char *, const char *);
+
+extern int fflush(void *__0stream);
+
+extern void otbl_init__Fv(void);
+
+extern void lex_init__Fv(void);
+
+extern void syn_init__Fv(void);
+
+extern void typ_init__Fv(void);
+
+extern void simpl_init__Fv(void);
+
+extern int error__FPCc(const char *);
+
+extern int isalpha(int);
+
+extern int isdigit(int);
+
+
+
+
+extern Ptfct ptfct_free__9templ_fct;
+
+extern Pbase_inst head__10basic_inst;
+
+extern Pcons last_friend_cons__17templ_compilation;
+
+extern Pcons last_cons__17templ_compilation;
+
+extern Pcons friend_templ_refs__17templ_compilation;
+
+extern Pcons templ_refs__17templ_compilation;
+
+extern int formals_in_progress__17templ_compilation;
+
+extern int parameters_in_progress__17templ_compilation;
+
+extern Ptstate save_templ__17templ_compilation;
+
+extern int in_progress__17templ_compilation;
+
+extern Ptable templates__17templ_compilation;
+
+extern Pexpr actuals__17templ_compilation;
+
+extern Plist params__17templ_compilation;
+
+extern Ptempl_base parsed_template__17templ_compilation;
+
+extern Ptempl owner__17templ_compilation;
+
+extern Pfunt f_owner__17templ_compilation;
+
+extern Pfunt f_list__17templ_compilation;
+
+extern Ptempl list__17templ_compilation;
+
+extern Plist param_end__17templ_compilation;
+
+extern Pstmt stmt_free__4stmt;
+
+extern Pname name_free__4name;
+
+extern Pexpr expr_free__4expr;
+
+extern Pptr ptr_free__3ptr;
+
+extern Pvec vec_free__3vec;
+
+extern Pfct fct_free__3fct;
+
+extern Pktab table_free__6ktable;
+
+extern Ptable table_free__5table;
+
+/* the end */
+
