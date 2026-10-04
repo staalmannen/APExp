@@ -609,6 +609,139 @@ cfront. **And `lstk()` rather than `stk()` is the better command**
 whether the index is in range and what the pointer holds, where the
 arguments have already proved misleading once.
 
+**AND `lstk()` NAMED IT: A `const char *` HOLDING ITS OWN TEXT.**
+`__2s = 0x6f69736963657270` and those eight bytes little-endian are
+**"precisio"** -- the first eight characters of the identifier
+`precision`. `table.c:1450` is
+`__2s = (__1np[__1j])->__O2__4expr.string;` and 1455 dereferences it.
+*Third time in this tree a pointer has contained characters*, after
+bash's `ifs_value` holding `'.'` and `date`'s `tm_zone` holding
+`4865`.
+**AND acid HAD TO BE CALIBRATED FIRST, which is what stopped a fourth
+false lead.** Every int local looked like garbage -- until the pairs
+line up:
+
+```
+  __1j = 0x474c200000001a      __1hash = 0x474c20
+  __1i = 0x2b2cfb00000003      __1sick = 0x2b2cfb
+  __2oerror_count = 0x47552000000000   __1n = 0x475520
+```
+
+**In every pair the HIGH half of the "garbage" IS the neighbouring
+variable**: acid reads eight bytes for a four-byte `int`, so the low
+half is the value and the high half is the next slot. `__1mx` reads
+`0xa5` = **165**, and `(g*3)/2` for `g = 0x6e` is 165 exactly. *So
+every int in that dump is correct and merely mis-printed, and `__2s`
+-- a genuine eight-byte pointer slot -- is the one value that is
+really wrong.* Three independent pairs agree on the artefact before
+anything was built on the one that did not. This is the `stk()`
+lesson again one level down: **acid's own display is a claim like any
+other.**
+**THE TRANSLATOR WROTE ITS OWN ANSWER INTO THE SOURCE, AND THAT IS AN
+ORACLE THIS TREE HAS USED BEFORE.** Every generated struct in
+cfront's C carries the size the translator computed --
+`struct expr { /* sizeof expr == 40 */`, `name == 144`,
+`node == 3` -- **132 of them across the `.c` files**, against tar's
+nine. GNU tar's `union block` was 520 here where everything else says
+512, because `6c/swt.c`'s `align()` rounds every struct up to 8
+(`Asu2`) and aligns a nested struct member to 8 (`Ael1`). *A wrong
+field OFFSET is exactly what puts an identifier's text where a
+pointer should be*, so the sizes are the cheapest proxy for the
+question the crash asks.
+**`struct node` is already a guaranteed disagreement**: `TOK` and
+`bit` are both `unsigned char` (`typedef.h:19-20`), so it is **3 on
+gcc and 8 under kencc**. Whether that matters depends on whether
+anything strides over a `node`; field offsets stay right and what
+breaks is `sizeof` used as a stride. *The probe reports the fact and
+does not decide the consequence.*
+**`sys/lib/tests/cfrontsz-probe.py` is the instrument**, the
+`tarblock-probe` idiom generalised: it extracts `main.c`'s preamble
+(the file whose declarations are the largest superset, 47 tagged
+types), emits a probe asking `sizeof` for each beside the recorded
+number, and **runs the gcc control itself** -- 47 of 47, **0
+disagreements**, which is what says the extraction is right. *An
+instrument that cannot reproduce the known answer has not earned the
+right to report an unknown one*, and a bad extraction would otherwise
+produce a probe that compiles and measures nothing. It refuses to
+print the VM command unless the control passes. The pcc flags are
+cfront's own from `cmd/cfront/mkfile`, for the reason `tarblock-probe`
+records: built with different flags it measures a different header.
+Each type is asked with the KEYWORD it was declared with, since the
+`__Q2_4expr4__C1` family are unions.
+**TWO cfront HYPOTHESES REFUTED BEFORE THIS ONE**, both cheaply: the
+host passes `-D__HAVE_SIZE_T` and the mkfile does not -- **referenced
+nowhere in the sources**, inert; and `-D__cfront_have_bool` suppresses
+an `enum bool` that is already behind `!defined(__GNUC__)`, so the
+host gets the same thing.
+
+**bacon's REMAINING GAP WAS ASKED ALL AT ONCE RATHER THAN ONE PER
+ROUND, and the answer was TWO names.** Preprocessing the whole of
+`bacon.bac.c` against the staged APE headers and collecting every
+`undeclared` identifier gives exactly `IP_MULTICAST_LOOP` and
+`IP_MULTICAST_TTL` -- *a complete answer where `TCIFLUSH` had been a
+sample of one*. One command instead of one round each, which is the
+rule this file already carries for counting a string in the corpus.
+**The IPv6 spellings were all there and the IPv4 ones were not**:
+`network/socket.c` already accepts `IPV6_MULTICAST_HOPS`, `_IF` and
+`_LOOP` and had no IPv4 counterpart at all, so a program could name
+the v6 option and not the v4 one. Added with `IP_MULTICAST_IF`,
+`IP_ADD_MEMBERSHIP`, `IP_DROP_MEMBERSHIP` and **`struct ip_mreq`** --
+the struct deliberately, because declaring `IP_ADD_MEMBERSHIP`
+without the type of its argument is the gap `<termios.h>` had for
+`tcflush` one round earlier: an option a program can name and cannot
+call.
+**The NUMBERS are this file's own and the comment says so.** 1/7/8/9
+match neither 4.4BSD nor Linux, so there is no external numbering to
+be consistent with and none is needed -- nothing transmits these and
+`socket.c` is the only consumer in the tree. Distinctness is the only
+requirement.
+**AND THE THREE OPTIONS GET THREE DIFFERENT ANSWERS, which is the
+whole content of the change.** `IP_MULTICAST_IF`/`_TTL` join the
+accept-silently list beside `IP_TTL`. **`IP_MULTICAST_LOOP` is split
+by its VALUE**: enabling it asks for the state the socket is already
+in, so 0 is true; disabling it asks for something this stack cannot
+do, and 0 would say the packets had stopped coming back when they had
+not -- ENOPROTOOPT. *A stub that answers "failure" is not the same as
+one that answers "nothing to do", and the two halves of this one
+option fall on opposite sides of that line.* And
+`IP_ADD_MEMBERSHIP`/`IP_DROP_MEMBERSHIP` are deliberately NOT listed,
+so they reach the default and refuse: Plan 9 **can** do this
+(`/net/udp/N/ctl` takes `addmulti`/`remmulti`), so it is a gap rather
+than a limit, and accepting silently would be the worst of the three
+-- a program would believe it had joined a group and then receive
+nothing, with no error anywhere to say why.
+
+**AND THAT RUN FOUND A SECOND BUG THE PER-HEADER SWEEP CANNOT SEE:
+`<stdlib.h>` DECLARED `uname` AND `getrusage`.** It defines neither
+`struct utsname` nor `struct rusage` and includes neither header, so
+each struct named in those parameter lists was a **new, incomplete
+type scoped to the declaration** -- distinct from the real one. Any
+translation unit including `<stdlib.h>` and then the right header got
+`conflicting types`, and bacon includes both. *This is the `Lock`
+bug a second time*: one name declared twice, the two spellings not
+compatible, kencc tolerating what the standard forbids. Removed --
+POSIX puts them in `<sys/resource.h>` and `<sys/utsname.h>`, both
+already declare them correctly beside the struct, and the only caller
+in the tree (`plan9/__p9_syscall.c`) includes `<sys/resource.h>`
+itself. **bacon's undeclared count is now 0.**
+
+**SO `apehdr-sweep.py` GAINED A "TOGETHER" CASE, because compiling
+each header ALONE cannot see this class at all** -- each file is fine
+by itself and only the COMBINATION conflicts. A pairwise sweep is
+149x148/2 compiles; including everything in ONE translation unit is
+one, and catches the same class. **Its first run reports 12 errors**,
+and they are NOT yet triaged, so it prints them and does **not** gate
+the exit status: *failing on an untriaged list makes a sweep cry
+wolf, and suppressing the list wastes it.* Some are real
+(`uname`/`getrusage` was) and some are design intent -- `<regex.h>`
+and `<pcre2posix.h>` both define `regex_t` because they are
+ALTERNATIVES and no program includes both. **The twelve, for the next
+round**: conflicting `accept`, `listen`, `getopt`, `regex_t`,
+`regmatch_t`, and seven syntax errors (`_Complex`, two `expected
+identifier or '(' before 'int'`, `'<='`, `'>='`, a numeric constant,
+a `[`) which have the shape of one header's MACRO breaking a later
+one.
+
 **NEITHER IS ENABLED IN `cmd/mkfile' YET, deliberately**: one failing
 entry aborts the whole tree's `mk', and bacon has never been through
 pcc. Build `cmd/basic' by hand first; the line is one character from

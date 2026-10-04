@@ -163,9 +163,43 @@ def main():
             else:
                 findings.append((h, msg))
 
+        # ---- the TOGETHER case: one TU including everything ----
+        #
+        # Compiling each header ALONE cannot see a name declared twice
+        # in two different headers, because each file is fine by
+        # itself and only the COMBINATION conflicts. That is not
+        # hypothetical: <stdlib.h> declared `uname(struct utsname *)'
+        # and `getrusage(int, struct rusage *)' without defining or
+        # including either struct, so each was a fresh incomplete type
+        # scoped to the declaration -- and any program including
+        # <stdlib.h> and then the real header got `conflicting types'.
+        # bacon is what hit it.
+        #
+        # A pairwise sweep is 149*148/2 compiles; including everything
+        # at once is ONE, and it catches the same class. It cannot say
+        # WHICH pair, but the error names the symbol and both sites.
+        together = [h for h in headers if h not in EXPECTED]
+        open(src, "w").write("".join("#include <%s>\n" % h for h in together))
+        p = subprocess.run(
+            ["gcc", "-fsyntax-only", "-nostdinc", "-I", arch, "-I", sysd, src],
+            capture_output=True, text=True)
+        tog = [l for l in p.stderr.splitlines() if " error: " in l]
+
         print("apehdr-sweep: %d headers, %d known-not-standalone (see "
               "EXPECTED), %d findings" % (len(headers), expected_hit,
                                           len(findings)))
+        print("apehdr-sweep: all %d together in one translation unit: %d "
+              "errors" % (len(together), len(tog)))
+        for l in tog[:10]:
+            print("  " + l.split(" error: ", 1)[1][:70])
+        # NOT added to `findings', so they do not gate the exit status.
+        # This check is new and its results are NOT yet triaged: some
+        # are real (uname/getrusage was), and some are design intent --
+        # <regex.h> and <pcre2posix.h> both define `regex_t' because
+        # they are ALTERNATIVES, and no program includes both. Failing
+        # the sweep on an untriaged list would make it cry wolf, and
+        # suppressing the list would waste it. So it prints and the
+        # next round triages. See CLAUDE.md for the twelve.
         for h, msg in findings:
             print("  %-24s %s" % (h, msg))
         if not findings:
