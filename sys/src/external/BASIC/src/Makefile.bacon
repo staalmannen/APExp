@@ -7,4 +7,4 @@ bacon.bac.o: bacon.bac.c
 
 .PHONY: clean
 clean:
-	rm -f *.o *.c ../bacon ../bacon.*.* Makefile.bacon
+	rm -f *.o *.c bacon bacon.*.* Makefile.bacon

@@ -328,6 +328,136 @@ APExp and see whether it builds and runs.
 - C11/C23 compiler features — `_Generic`, and `bool` as a real type
 - perl 5.42.2 — see the section below
 
+## The 0.6 ports: cfront and bacon
+
+**BOTH WERE "BUILDING FINE" AND NEITHER WAS BUILDING ANYTHING, AND THE
+TWO FAILURES ARE THE SAME SHAPE FROM OPPOSITE ENDS**: generated C
+checked into git, so `mk' never regenerated it and never had to.
+
+**cfront/c++lib: ALL FORTY `.c' WERE COMMITTED AT ZERO BYTES.** So
+`mk install' in `cmd/c++lib' compiled forty empty translation units,
+`libc++.a' built clean with no symbols in it, and the build reported
+success -- *a check that cannot fail*, and one that reads exactly like
+a port that has started working. The user's memory of "a crash here
+before" was right and the crash had become a silent pass.
+**The mechanism is the rule, `> $target'.** Every `%.c:' rule was
+`c++ -F ... > $target', and a shell redirection CREATES the file
+whatever the command then does. They are `-o $target' now: the
+driver's -F arm only `cp's once cfront has returned, so a failure
+leaves no target and mk stops where the fault is. The forty files are
+`git rm --cached' and `.gitignore'd -- the mkfile's own `CLEANFILES'
+says `"*.c"', so they were build output all along.
+**cfront CANNOT produce an empty file, which is what makes the empty
+files evidence rather than a symptom.** Built on the host with gcc
+(`make -C src', first try, no patches) and measured: fed a ZERO-BYTE
+input it exits **0 and writes 409 bytes** -- version stamp, `__mptr'
+typedef, `__ptbl_vec' declaration; fed a TRUNCATED input it exits
+**14** and writes partial output. *There is no input for which cfront
+both succeeds and emits nothing.* So an empty result means cfront did
+not run, and `c++' now refuses it by name instead of passing it on.
+**AND READING THE DRIVER FOUND A SECOND BUG THAT HAS ALWAYS BEEN
+THERE: `rc' HAS NO `continue'.** The -F arm ended in `continue', which
+rc looked up as an external command, did not find, and fell straight
+through into step 4 -- so **every `c++ -F' has also been running `pcc
+-c' over its own output.** Worse with `-o': the `obj' chain put
+`$outfile' on the object path in -F mode, so the fix to `-o $target'
+would have had pcc OVERWRITE the generated C with an object file. Both
+halves are fixed, and the `if not' chain became one guarded
+assignment. *This is the recorded "rc has no `break'" rule arriving in
+its other spelling, in a file written after that rule was written
+down.*
+**WHICH STAGE IS NOW ONE RUN RATHER THAN ONE ROUND EACH.** The
+pipeline is `pcc -E' -> `ns_strip' -> `cfront', and "the output is
+empty" says nothing about which of the three went quiet; they fail
+differently and need different fixes. `fn stages' prints the byte
+count of all three, always on a failure and under `-v' otherwise, with
+`-' for a stage not reached. *Not reaching a stage is itself the
+answer.* **The host cannot settle it**: a host `pcc -E' dies in
+`amd64/include/ape/stddef_arch.h' on `#include "/sys/include/ape/..."',
+the same absolute-path wall the `readdir.c' syntax check hit, so the
+preprocessing half is only measurable on the VM.
+
+**bacon/BASIC: THE COMMITTED GENERATED C WAS A TRUNCATED CONVERSION,
+AND gcc SAYS SO -- 50 ERRORS.** Not a kencc question and not a libap
+question: `src/bacon.bac.c' was **276KB against a correct 531KB**, and
+the damage is what half a transpilation looks like -- `char*
+b2c_loop_result` immediately followed by `long b2c_loop_result`,
+`FILE* g_CFILE` three lines above `char* g_CFILE`, `IIF`, `INDEX`,
+`LOOP`, `MAX`, `MIN` and `MONTH` each `#define`d twice with different
+bodies, and string literals cut open mid-escape. *The one-command
+check against gcc is what separated "kencc cannot build this" from
+"nothing could build this", and the screenful of `Macro redefinition'
+and `external redeclaration' from pcc reads exactly like a kencc
+complaint.*
+**REGENERATED with the tree's own `bacon.sh' (shell BaCon, bash
+5.2.21) from the tree's own `bacon.bac', and the new output is
+clean**: `gcc -fsyntax-only` **0 errors, 0 warnings**, 0 in the
+classes 6c treats as fatal (`incompatible-pointer-types',
+`implicit-function-declaration', `int-conversion'), and **every header
+it includes exists under `sys/include/ape' or `amd64/include/ape'** --
+nothing missing, including `sys/socket.h', `netdb.h', `arpa/inet.h',
+`sys/utsname.h' and `wctype.h'. Four stale per-function headers
+(`Get_Var', `Mini_Parser', `Parse_Equation',
+`Pre_Tokenize_Functions') are gone; they are inlined now.
+**And it is not only a compile**: built on the host it answers
+`BaCon version 5.0.3` and converts a `FOR`/`PRINT` program, so the
+generated converter runs. *That is the control a syntax check cannot
+give.*
+**`cmd/basic/mkfile` carried `LIB=.../liblua.a'**, copy-pasted from
+`cmd/lua'. In `mkone' `$LIB' is a PREREQUISITE of `$O.out' handed
+straight to `$LD', so bacon was linked against Lua's archive and could
+not be built until lua had been. Removed; bacon needs only libap.
+`HFILES' now lists all 81 generated headers -- `bacon.bac.c' includes
+`bacon.bac.h', which includes the other 78, so a regeneration changes
+files that appear nowhere in OFILES. *The `tclBinary.c'/`config.h'
+rule for the fourth time.*
+**TK'S HEADERS ARE INSTALLED NOW -- AND DOING IT FOUND THAT `tcl.h'
+HAS NEVER BEEN USABLE.** `sys/include/ape/tcl.h' was installed ALONE,
+and its line 2433 is `#include "tclDecls.h"', which was not installed
+at all. So `#include <tcl.h>` from anything outside Tcl's own build
+has always been a fatal error on the first line -- *the `#pragma lib'
+in it has never once been reached*, and the convention bacon's Tk
+support was to be modelled on did not work. **The control fires
+exactly**: with the old set staged, `tcl.h` alone gives
+`fatal error: tclDecls.h: No such file or directory`; with the new
+set, 0 errors.
+**The closure was MEASURED rather than reasoned**: a `#include <tk.h>`
+probe compiled against a staged copy, files added until it was clean,
+then `gcc -M` asked which of them were actually reached. Twelve:
+`tcl.h`, `tclDecls.h`, `tclPlatDecls.h`, `tk.h`, `tkDecls.h`,
+`tkIntXlibDecls.h` and `X11/{X,Xfuncproto,Xlib,Xutil,keysym,keysymdef}.h`.
+**Tk bundles its own X11** in `external/tk/xlib/X11` (the stub set it
+uses where there is no X server), and `Xlib.h` there ends by including
+**`tkIntXlibDecls.h`** -- an *internal* Tk header reached from a public
+one, which is upstream's design on a non-X platform and not something
+to tidy away. All 15 of the bundled X11 headers are installed, not
+just the six: a Tk client that uses an atom or a cursor reaches
+`Xatom.h`/`cursorfont.h` directly, and six would make that fail for no
+reason. *The six are a measurement; the other nine are a judgement and
+are marked as one.*
+**`#pragma lib` placement is load-bearing.** `tk.h`'s goes BEFORE its
+`#include <tcl.h>`, because a kencc static link resolves archives in
+the order recorded and libtk needs libtcl -- tcl.h carries its own
+pragma, so putting libtk's first is what makes the order libtk, libtcl
+rather than the reverse. **And it names four libraries where the rest
+of `sys/include/ape` names one**, which is a deliberate departure:
+`cmd/wish/mkfile` links `libtk libtcl libdraw libpng libz libap` in
+that order, because Tk's Plan 9 backend draws through libdraw and its
+photo reader uses libpng. With `libtk.a` alone a program that includes
+the header compiles and then fails to link.
+**Verified against the REAL include tree, not a staging guess**:
+`Tk_Window` and `Display *` both resolve, 0 errors, with the APE
+headers staged and their `"/sys/include/ape/..."` absolute includes
+sed'ed out -- the same host wall `readdir.c` hit, and the same way
+round it. **The Tcl and Tk builds are untouched**: both mkfiles put
+`-I$TCLSRC/generic`/`-I$TKSRC/generic` ahead of `sys/include/ape`, so
+each still compiles its own copy.
+
+**NEITHER IS ENABLED IN `cmd/mkfile' YET, deliberately**: one failing
+entry aborts the whole tree's `mk', and bacon has never been through
+pcc. Build `cmd/basic' by hand first; the line is one character from
+live either way.
+
 **Queued after Tcl/Tk: two more ports, chosen as stress tests.**
 **`tkblt` was one of three and is GONE from the tree**: 3.2 is C++, 48
 `.C` files with `namespace Blt {` and `#include <cfloat>`, and kencc
