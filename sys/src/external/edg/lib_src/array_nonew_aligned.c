@@ -1,21 +1,21 @@
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
-/* Wed Oct  7 03:19:04 2026 */
+/* Wed Oct  7 07:14:41 2026 */
 extern int __EDGCPFE__7_0;
-void *memcpy(void *,const void *,unsigned long);
-void *memset(void *,int,unsigned long);
+void *memcpy(void *,const void *,unsigned long long);
+void *memset(void *,int,unsigned long long);
 
-# 1 "lib_src/array_nonew_aligned.c"
-# 61 "include_c++/new.stdh" 3
+#line 1 "lib_src/array_nonew_aligned.c"
+#line 61 "include_c++/new.stdh"
 struct _ZSt9nothrow_t;
-# 214 "/usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h" 3
-typedef unsigned long size_t;
-# 110 "include_c++/new.stdh" 3
-extern __attribute__((__nothrow__)) void *_ZnwmSt11align_val_tRKSt9nothrow_t(size_t, unsigned long, const struct _ZSt9nothrow_t *);
-# 21 "lib_src/array_nonew_aligned.c"
-extern __attribute__((__nothrow__)) void *_ZnamSt11align_val_tRKSt9nothrow_t(size_t size, unsigned long align, const struct _ZSt9nothrow_t *nothrow_arg); __attribute__((__nothrow__)) void *_ZnamSt11align_val_tRKSt9nothrow_t( size_t __11010_36_size, 
-unsigned long __11011_54_align, 
-const struct _ZSt9nothrow_t *__11012_54_nothrow_arg)
-# 29
-{ auto size_t __T543770272; auto unsigned long __T543770920; auto const struct _ZSt9nothrow_t *__T543771656; auto void *__T543772568;  {
-__T543772568 = ((((__T543770272 = __11010_36_size) , (__T543770920 = __11011_54_align)) , (__T543771656 = __11012_54_nothrow_arg)) , (_ZnwmSt11align_val_tRKSt9nothrow_t(__T543770272, __T543770920, __T543771656))); return __T543772568; }
+#line 10 "ape-arch/stddef_arch.h"
+typedef unsigned long long size_t;
+#line 110 "include_c++/new.stdh"
+extern void *_ZnwySt11align_val_tRKSt9nothrow_t(size_t, unsigned long long, const struct _ZSt9nothrow_t *);
+#line 21 "lib_src/array_nonew_aligned.c"
+extern void *_ZnaySt11align_val_tRKSt9nothrow_t(size_t size, unsigned long long align, const struct _ZSt9nothrow_t *nothrow_arg); void *_ZnaySt11align_val_tRKSt9nothrow_t( size_t __2991_36_size, 
+unsigned long long __2992_54_align, 
+const struct _ZSt9nothrow_t *__2993_54_nothrow_arg)
+#line 29
+{ auto size_t __T998447776; auto unsigned long long __T998448424; auto const struct _ZSt9nothrow_t *__T998449160; auto void *__T998450072;  {
+__T998450072 = ((((__T998447776 = __2991_36_size) , (__T998448424 = __2992_54_align)) , (__T998449160 = __2993_54_nothrow_arg)) , (_ZnwySt11align_val_tRKSt9nothrow_t(__T998447776, __T998448424, __T998449160))); return __T998450072; }
 }

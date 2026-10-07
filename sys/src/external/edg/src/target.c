@@ -1,19 +1,19 @@
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
-/* Wed Oct  7 03:17:16 2026 */
+/* Wed Oct  7 07:13:57 2026 */
 extern int __EDGCPFE__7_0;
-void *memcpy(void *,const void *,unsigned long);
-void *memset(void *,int,unsigned long);
+void *memcpy(void *,const void *,unsigned long long);
+void *memset(void *,int,unsigned long long);
 
-# 1 "src/target.c"
-# 49 "/usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h" 3
+#line 1 "src/target.c"
+#line 56 "ape-sys/_iofile.h"
 struct _IO_FILE;
-# 3966 "src/util.h"
+#line 3966 "src/util.h"
 enum _ZN3edg6detail16a_text_alignmentE {
 _ZN3edg6detail7ta_leftE,
 _ZN3edg6detail8ta_rightE};
-# 897 "src/basics.h"
+#line 897 "src/basics.h"
 struct _ZN3edg17a_source_positionE;
-# 437 "src/il_def.h"
+#line 437 "src/il_def.h"
 enum _ZN3edg14an_opname_kindE {
 _ZN3edg8onk_noneE,
 _ZN3edg7onk_newE, _ZN3edg10onk_deleteE,
@@ -41,7 +41,7 @@ _ZN3edg13onk_subscriptE,
 _ZN3edg12onk_questionE,
 _ZN3edg11onk_gnu_minE, _ZN3edg11onk_gnu_maxE,
 _ZN3edg9onk_awaitE, _ZN3edg8onk_lastE};
-# 1030
+#line 1030
 enum _ZN3edg12a_token_kindE {
 
 _ZN3edg9tok_errorE,
@@ -99,7 +99,7 @@ _ZN3edg12tok_ifc_declE,
 
 
 _ZN3edg25tok_unresolved_ud_literalE,
-# 1099
+#line 1099
 _ZN3edg17tok_unimplementedE,
 
 _ZN3edg22tok_last_complex_tokenE = 27U,
@@ -374,7 +374,7 @@ _ZN3edg10tok_typeofE,
 _ZN3edg17tok_typeof_unqualE,
 
 _ZN3edg12tok_overloadE,
-# 1379
+#line 1379
 _ZN3edg10tok_threadE,
 _ZN3edg16tok_thread_localE,
 _ZN3edg20tok_c11_thread_localE,
@@ -584,7 +584,7 @@ _ZN3edg41tok_builtin_ge_synthesizes_from_spaceshipE,
 _ZN3edg25tok_builtin_is_structuralE,
 
 _ZN3edg8tok_lastE};
-# 281 "src/lexical.h"
+#line 281 "src/lexical.h"
 enum _ZN3edg23a_token_extra_info_kindE {
 
 _ZN3edg9teik_noneE,
@@ -601,13 +601,13 @@ _ZN3edg22teik_unresolved_ud_litE,
 
 
 _ZN3edg14teik_ifc_indexE};
-# 1075 "src/basics.h"
+#line 1075 "src/basics.h"
 enum _ZN3edg11a_C_dialectE {
 
 _ZN3edg14C_dialect_ANSIE,
 _ZN3edg13C_dialect_pccE,
 _ZN3edg19C_dialect_cplusplusE};
-# 3732 "src/host_envir.h"
+#line 3732 "src/host_envir.h"
 enum _ZN3edg17an_error_severityE {
 _ZN3edg10es_defaultE,
 _ZN3edg7es_onceE,
@@ -621,7 +621,7 @@ _ZN3edg8es_errorE,
 _ZN3edg14es_catastropheE,
 _ZN3edg21es_command_line_errorE,
 _ZN3edg17es_internal_errorE};
-# 19 "build/gcc-release/src/includes/err_codes.h"
+#line 19 "build/kencc/src/includes/err_codes.h"
 enum _ZN3edg13an_error_codeE {
 _ZN3edg11ec_no_errorE,
 _ZN3edg23ec_last_line_incompleteE,
@@ -4224,15 +4224,15 @@ _ZN3edg36ec_interpolated_id_is_not_identifierE,
 _ZN3edg45ec_interpolated_operand_is_not_token_sequenceE,
 _ZN3edg28ec_tag_redefined_differentlyE,
 _ZN3edg7ec_lastE};
-# 81 "src/mem_tables.h"
+#line 81 "src/mem_tables.h"
 struct _ZN3edg20a_function_def_descrE;
-# 137 "src/il_def.h"
+#line 137 "src/il_def.h"
 struct _ZN3edg13a_source_fileE;
-# 260
+#line 260
 struct _ZN3edg25a_seq_number_lookup_entryE;
-# 338
+#line 338
 struct _ZN3edg19a_cli_metadata_fileE;
-# 604
+#line 604
 enum _ZN3edg16an_il_entry_kindE {
 _ZN3edg8iek_noneE,
 _ZN3edg15iek_source_fileE,
@@ -4330,9 +4330,9 @@ _ZN3edg20iek_gcnew_supplementE,
 
 _ZN3edg20iek_throw_supplementE,
 _ZN3edg24iek_condition_supplementE,
-# 722
+#line 722
 _ZN3edg30iek_scope_orphaned_list_headerE,
-# 728
+#line 728
 _ZN3edg10iek_pragmaE,
 _ZN3edg12iek_templateE,
 
@@ -4368,11 +4368,11 @@ _ZN3edg22iek_generic_constraintE,
 
 
 _ZN3edg27iek_seq_number_lookup_entryE,
-# 771
+#line 771
 _ZN3edg23iek_local_expr_node_refE,
 
 _ZN3edg20iek_static_assertionE,
-# 781
+#line 781
 _ZN3edg19iek_local_scope_refE,
 _ZN3edg24iek_il_entity_list_entryE,
 
@@ -4409,7 +4409,7 @@ _ZN3edg24iek_token_sequence_entryE,
 _ZN3edg21iek_scoped_expressionE,
 _ZN3edg20iek_data_member_specE,
 _ZN3edg8iek_lastE};
-# 1913
+#line 1913
 enum _ZN3edg13a_vector_kindE {
 _ZN3edg6vk_gnuE,
 _ZN3edg6vk_extE,
@@ -4418,13 +4418,13 @@ _ZN3edg12vk_neon_polyE,
 _ZN3edg15vk_neon_builtinE,
 
 _ZN3edg7vk_lastE};
-# 1946
+#line 1946
 struct _ZN3edg26a_decl_position_supplementE;
-# 2052
+#line 2052
 struct _ZN3edg23an_il_entity_list_entryE;
-# 2514
+#line 2514
 struct _ZN3edg38a_per_instantiation_needed_flags_entryE;
-# 2573
+#line 2573
 enum _ZN3edg23a_special_function_kindE {
 _ZN3edg8sfk_noneE,
 _ZN3edg15sfk_constructorE,
@@ -4433,7 +4433,7 @@ _ZN3edg14sfk_conversionE,
 _ZN3edg16sfk_udl_operatorE,
 _ZN3edg12sfk_operatorE,
 _ZN3edg22sfk_lambda_entry_pointE,
-# 2586
+#line 2586
 _ZN3edg19sfk_deduction_guideE,
 
 
@@ -4457,9 +4457,9 @@ _ZN3edg17sfk_last_accessorE = 17U,
 
 
 _ZN3edg30sfk_gnu_sync_concrete_functionE,
-# 2614
+#line 2614
 _ZN3edg34sfk_gnu_atomic_nongeneric_functionE,
-# 2620
+#line 2620
 _ZN3edg31sfk_gnu_atomic_generic_functionE,
 
 
@@ -4472,13 +4472,13 @@ _ZN3edg27sfk_builtin_operator_deleteE,
 
 
 _ZN3edg8sfk_lastE};
-# 2638
+#line 2638
 struct _ZN3edg16a_name_referenceE;
-# 3157
+#line 3157
 struct _ZN3edg12an_attributeE;
-# 3261
+#line 3261
 struct _ZN3edg23a_source_correspondenceE;
-# 4543
+#line 4543
 enum _ZN3edg16a_character_kindE {
 
 
@@ -4499,9 +4499,9 @@ _ZN3edg12chk_char32_tE,
 
 
 _ZN3edg8chk_lastE};
-# 4741
+#line 4741
 struct _ZN3edg10a_constantE;
-# 5573
+#line 5573
 enum _ZN3edg11a_type_kindE {
 
 _ZN3edg8tk_errorE,
@@ -4509,7 +4509,7 @@ _ZN3edg7tk_voidE,
 _ZN3edg10tk_integerE,
 _ZN3edg7tk_enumE = 2U,
 
-_ZN3edg14tk_fixed_pointE,
+
 
 _ZN3edg8tk_floatE,
 
@@ -4534,9 +4534,9 @@ _ZN3edg17tk_template_paramE,
 
 _ZN3edg9tk_vectorE,
 _ZN3edg18tk_scalable_vectorE,
-# 5610
+#line 5610
 _ZN3edg24tk_scalable_vector_countE,
-# 5616
+#line 5616
 _ZN3edg15tk_riscv_vectorE,
 
 
@@ -4551,7 +4551,7 @@ _ZN3edg13tk_float8e5m2E,
 
 
 _ZN3edg10tk_nullptrE,
-# 5640
+#line 5640
 _ZN3edg13tk_reflectionE,
 
 _ZN3edg10tk_unknownE};
@@ -4559,7 +4559,7 @@ _ZN3edg10tk_unknownE};
 
 
 enum _ZN3edg15an_integer_kindE {
-# 5654
+#line 5654
 _ZN3edg7ik_charE,
 
 
@@ -4583,21 +4583,9 @@ _ZN3edg14ik_bit_preciseE,
 _ZN3edg23ik_unsigned_bit_preciseE,
 _ZN3edg7ik_lastE,
 _ZN3edg7ik_noneE = 15U};
-# 5738
-enum _ZN3edg23a_fixed_point_precisionE {
-
-
-_ZN3edg9fpp_shortE,
-_ZN3edg11fpp_defaultE,
-_ZN3edg8fpp_longE,
-_ZN3edg8fpp_lastE};
-
-
-
-struct _ZN3edg24a_fixed_point_type_descrE;
-# 5769
+#line 5769
 enum _ZN3edg12a_float_kindE {
-# 5794
+#line 5794
 _ZN3edg10fk_float16E,
 _ZN3edg7fk_fp16E,
 
@@ -4617,7 +4605,7 @@ _ZN3edg14fk_std_float32E,
 _ZN3edg14fk_std_float64E,
 _ZN3edg15fk_std_float128E,
 _ZN3edg7fk_lastE};
-# 5828
+#line 5828
 enum _ZN3edg16a_type_mode_kindE {
 _ZN3edg9tmk_errorE,
 _ZN3edg9tmk_firstE,
@@ -4636,7 +4624,7 @@ _ZN3edg6tmk_XCE,
 _ZN3edg6tmk_TCE,
 _ZN3edg8tmk_noneE,
 _ZN3edg8tmk_lastE = 14U};
-# 6244
+#line 6244
 enum _ZN3edg16a_type_qualifierE {
 _ZN3edg9tqt_constE,
 _ZN3edg12tqt_volatileE,
@@ -4667,30 +4655,30 @@ _ZN3edg27tqt_msb_named_address_spaceE,
 
 
 _ZN3edg8tqt_lastE};
-# 7394
+#line 7394
 struct _ZN3edg25a_routine_type_supplementE;
-# 8741
+#line 8741
 struct _ZN3edg23a_class_type_supplementE;
-# 9286
+#line 9286
 enum _ZN3edg26a_template_param_type_kindE {
 
 
 _ZN3edg10tptk_paramE,
-# 9295
+#line 9295
 _ZN3edg11tptk_memberE,
-# 9303
+#line 9303
 _ZN3edg12tptk_unknownE,
-# 9318
+#line 9318
 _ZN3edg20tptk_bit_precise_intE};
-# 9330
+#line 9330
 struct _ZN3edg32a_template_param_type_supplementE;
-# 9422
+#line 9422
 struct _ZN3edg25a_typeref_type_supplementE;
-# 9503
+#line 9503
 struct _ZN3edg26an_integer_type_supplementE;
-# 9625
+#line 9625
 struct _ZN3edg24a_based_type_list_memberE;
-# 9692
+#line 9692
 enum _ZN3edg14a_typeref_kindE {
 _ZN3edg8trk_noneE,
 
@@ -4751,47 +4739,47 @@ _ZN3edg21trk_template_arg_listE,
 _ZN3edg18trk_name_qualifierE,
 
 _ZN3edg14trk_pack_indexE};
-# 10142
+#line 10142
 union _ZN3edg6a_typeUt_Ut_Ut_E;
-# 10045
+#line 10045
 struct _ZN3edg6a_typeUt_Ut_E;
-# 10185
+#line 10185
 struct _ZN3edg6a_typeUt_Ut0_E;
-# 10233
+#line 10233
 struct _ZN3edg6a_typeUt_Ut1_E;
-# 10326
+#line 10326
 union _ZN3edg6a_typeUt_Ut2_Ut_E;
-# 10257
+#line 10257
 struct _ZN3edg6a_typeUt_Ut2_E;
-# 10356
+#line 10356
 struct _ZN3edg6a_typeUt_Ut3_E;
-# 10733
+#line 10733
 struct _ZN3edg6a_typeUt_Ut4_E;
-# 10869
+#line 10869
 struct _ZN3edg6a_typeUt_Ut5_E;
-# 10898
+#line 10898
 struct _ZN3edg6a_typeUt_Ut6_E;
-# 10949
+#line 10949
 struct _ZN3edg6a_typeUt_Ut7_E;
-# 10973
+#line 10973
 struct _ZN3edg6a_typeUt_Ut8_E;
-# 10981
+#line 10981
 struct _ZN3edg6a_typeUt_Ut9_E;
-# 10041
+#line 10041
 union _ZN3edg6a_typeUt_E;
-# 9768
+#line 9768
 struct _ZN3edg6a_typeE;
-# 11210
+#line 11210
 struct _ZN3edg10a_variableE;
-# 11898
+#line 11898
 struct _ZN3edg7a_fieldE;
-# 12228
+#line 12228
 struct _ZN3edg9a_routineE;
-# 14906
+#line 14906
 struct _ZN3edg12an_expr_nodeE;
-# 16958
+#line 16958
 struct _ZN3edg28a_scope_orphaned_list_headerE;
-# 18205
+#line 18205
 enum _ZN3edg12a_scope_kindE {
 
 _ZN3edg8sck_fileE,
@@ -4808,23 +4796,23 @@ _ZN3edg13sck_namespaceE,
 
 
 _ZN3edg23sck_namespace_extensionE,
-# 18231
+#line 18231
 _ZN3edg26sck_namespace_reactivationE,
-# 18239
+#line 18239
 _ZN3edg22sck_class_struct_unionE,
 
 
 
 _ZN3edg22sck_class_reactivationE,
-# 18249
+#line 18249
 _ZN3edg24sck_template_declarationE,
-# 18255
+#line 18255
 _ZN3edg26sck_template_instantiationE,
 
 
 
 _ZN3edg25sck_instantiation_contextE,
-# 18268
+#line 18268
 _ZN3edg22sck_module_decl_importE,
 
 
@@ -4853,9 +4841,9 @@ _ZN3edg8sck_noneE};
 
 
 struct _ZN3edg7a_scopeE;
-# 18722
+#line 18722
 struct _ZN3edg20a_module_import_declE;
-# 18790
+#line 18790
 enum _ZN3edg17a_source_languageE {
 
 _ZN3edg12sl_CplusplusE,
@@ -4863,42 +4851,36 @@ _ZN3edg4sl_CE};
 
 
 struct _ZN3edg12an_il_headerE;
-# 4316 "src/symbol_tbl.h"
+#line 4316 "src/symbol_tbl.h"
 enum _ZN3edg27a_module_entry_locator_kindE {
 _ZN3edg9melk_noneE,
 _ZN3edg8melk_ifcE};
-# 198 "src/trans_unit.h"
+#line 198 "src/trans_unit.h"
 struct _ZN3edg20a_trans_unit_correspE;
-# 31 "src/modules.h"
+#line 31 "src/modules.h"
 struct _ZN3edg15a_module_entityE;
-# 129 "src/target.c"
+#line 129 "src/target.c"
 struct _ZN3edg22a_target_configurationE;
-# 37 "/usr/include/x86_64-linux-gnu/bits/types.h" 3
-typedef signed char __int8_t;
-typedef unsigned char __uint8_t;
+#line 91 "ape-sys/stdint_generic.h"
+typedef char int8_t;
+
+typedef int int32_t;
 
 
-typedef signed int __int32_t;
-typedef unsigned __uint32_t;
-# 24 "/usr/include/x86_64-linux-gnu/bits/stdint-intn.h" 3
-typedef __int8_t int8_t;
+typedef unsigned char uint8_t;
 
-typedef __int32_t int32_t;
-# 24 "/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h" 3
-typedef __uint8_t uint8_t;
-
-typedef __uint32_t uint32_t;
-# 214 "/usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h" 3
-typedef unsigned long size_t;
-# 7 "/usr/include/x86_64-linux-gnu/bits/types/FILE.h" 3
+typedef unsigned uint32_t;
+#line 10 "ape-arch/stddef_arch.h"
+typedef unsigned long long size_t;
+#line 21 "ape-sys/stdio.h"
 typedef struct _IO_FILE FILE;
-# 937 "src/basics.h"
+#line 937 "src/basics.h"
 typedef struct _ZN3edg17a_source_positionE _ZN3edg17a_source_positionE;
-# 875
+#line 875
 typedef uint32_t _ZN3edg12a_seq_numberE;
-# 863
+#line 863
 typedef unsigned short _ZN3edg15a_column_numberE;
-# 897
+#line 897
 struct _ZN3edg17a_source_positionE {
 
 
@@ -4907,58 +4889,58 @@ struct _ZN3edg17a_source_positionE {
 _ZN3edg12a_seq_numberE seq;
 
 _ZN3edg15a_column_numberE column;char __dummy[2];};
-# 526
+#line 526
 typedef unsigned _ZN3edg11a_bit_fieldE;
-# 55 "src/il_def.h"
+#line 55 "src/il_def.h"
 typedef struct _ZN3edg6a_typeE *_ZN3edg10a_type_ptrE;
-# 53
+#line 53
 typedef struct _ZN3edg10a_constantE *_ZN3edg14a_constant_ptrE;
-# 215 "src/basics.h"
+#line 215 "src/basics.h"
 typedef _Bool _ZN3edg14a_byte_booleanE;
-# 515
+#line 515
 typedef const char _ZN3edg12a_const_charE;
-# 200
+#line 200
 typedef unsigned char _ZN3edg6a_byteE;
-# 214
+#line 214
 typedef _Bool _ZN3edg9a_booleanE;
-# 541
+#line 541
 typedef size_t _ZN3edg8sizeof_tE;
-# 3475 "src/host_envir.h"
+#line 3475 "src/host_envir.h"
 typedef struct _ZN3edg13a_source_fileE *_ZN3edg17a_source_file_ptrE;
-# 1628 "src/targ_def.h"
+#line 1628 "src/targ_def.h"
 typedef _ZN3edg8sizeof_tE _ZN3edg21a_host_large_unsignedE;
-# 2183
+#line 2183
 typedef _ZN3edg21a_host_large_unsignedE _ZN3edg13a_targ_size_tE;
-# 2238
+#line 2238
 typedef unsigned short _ZN3edg16a_targ_alignmentE;
-# 94 "src/mem_tables.h"
+#line 94 "src/mem_tables.h"
 typedef struct _ZN3edg20a_function_def_descrE _ZN3edg20a_function_def_descrE;
-# 56 "src/il_def.h"
+#line 56 "src/il_def.h"
 typedef struct _ZN3edg10a_variableE *_ZN3edg14a_variable_ptrE;
 
 typedef struct _ZN3edg7a_fieldE *_ZN3edg11a_field_ptrE;
 typedef struct _ZN3edg9a_routineE *_ZN3edg13a_routine_ptrE;
 
 typedef struct _ZN3edg12an_expr_nodeE *_ZN3edg16an_expr_node_ptrE;
-# 67
+#line 67
 typedef struct _ZN3edg7a_scopeE *_ZN3edg11a_scope_ptrE;
-# 104
+#line 104
 typedef struct _ZN3edg15a_module_entityE *_ZN3edg19a_module_entity_ptrE;
-# 259
+#line 259
 typedef struct _ZN3edg25a_seq_number_lookup_entryE *_ZN3edg29a_seq_number_lookup_entry_ptrE;
-# 337
+#line 337
 typedef struct _ZN3edg19a_cli_metadata_fileE *_ZN3edg23a_cli_metadata_file_ptrE;
-# 1945
+#line 1945
 typedef struct _ZN3edg26a_decl_position_supplementE *_ZN3edg30a_decl_position_supplement_ptrE;
-# 2000
+#line 2000
 typedef struct _ZN3edg16a_name_referenceE *_ZN3edg20a_name_reference_ptrE;
-# 2006
+#line 2006
 typedef struct _ZN3edg12an_attributeE *_ZN3edg16an_attribute_ptrE;
-# 2051
+#line 2051
 typedef struct _ZN3edg23an_il_entity_list_entryE *_ZN3edg27an_il_entity_list_entry_ptrE;
-# 2513
+#line 2513
 typedef struct _ZN3edg38a_per_instantiation_needed_flags_entryE *_ZN3edg42a_per_instantiation_needed_flags_entry_ptrE;
-# 3261
+#line 3261
 struct _ZN3edg23a_source_correspondenceE {
 
 
@@ -4972,34 +4954,34 @@ _ZN3edg12a_const_charE *name;
 
 
 _ZN3edg12a_const_charE *unmangled_name_or_mangled_encoding;
-# 3284
+#line 3284
 struct _ZN3edg20a_trans_unit_correspE *trans_unit_corresp;
-# 3297
+#line 3297
 _ZN3edg11a_scope_ptrE parent_scope;
-# 3312
+#line 3312
 _ZN3edg13a_routine_ptrE enclosing_routine;
 
 
 
 
 _ZN3edg19a_module_entity_ptrE module_entity;
-# 3327
+#line 3327
 _ZN3edg17a_source_positionE decl_position;
-# 3335
+#line 3335
 _ZN3edg30a_decl_position_supplement_ptrE decl_pos_info;
-# 3341
+#line 3341
 _ZN3edg20a_name_reference_ptrE name_references;
-# 3350
+#line 3350
 unsigned int access: 2;
-# 3357
+#line 3357
 unsigned int assembly_access: 2;
 
 
 
 unsigned int referenced: 1;
-# 3371
+#line 3371
 unsigned int needed: 1;
-# 3383
+#line 3383
 unsigned int name_linkage: 3;
 
 
@@ -5009,14 +4991,14 @@ unsigned int has_associated_pragma: 1;
 
 
 unsigned int is_local_to_function: 1;
-# 3399
+#line 3399
 unsigned int parent_via_local_scope_ref: 1;
 
 
 
 
 unsigned int is_class_member: 1;
-# 3410
+#line 3410
 unsigned int has_associated_attribute: 1;
 
 
@@ -5026,103 +5008,84 @@ unsigned int name_has_been_mangled: 1;
 
 
 unsigned int mangled_name_cannot_be_included_in_other_name: 1;
-# 3424
+#line 3424
 unsigned int final_name_mangling_pending: 1;
-# 3431
+#line 3431
 unsigned int unnamed_entity_given_fabricated_name: 1;
-# 3438
+#line 3438
 unsigned int entity_marked: 1;
-# 3482
+#line 3482
 unsigned int static_used_by_instantiation: 1;
-# 3492
+#line 3492
 unsigned int duplicate_static_in_instantiation_slices: 1;
-# 3500
+#line 3500
 unsigned int okay_to_walk_subtree_of_local_entity: 1;
-# 3507
+#line 3507
 unsigned int copied_from_secondary_trans_unit: 1;
-# 3513
+#line 3513
 unsigned int same_name_as_external_entity_in_secondary_trans_unit: 1;
-# 3519
+#line 3519
 unsigned int member_of_unknown_base: 1;
-# 3531
+#line 3531
 unsigned int qualified_unknown_base_member: 1;
-# 3546
+#line 3546
 unsigned int member_of_unknown_super: 1;
-# 3553
+#line 3553
 unsigned int microsoft_identifier_used: 1;
-# 3564
+#line 3564
 unsigned int is_deprecated_or_unavailable: 1;
 
 
 unsigned int externalized: 1;
-# 3573
+#line 3573
 unsigned int on_mangling_substitution_list: 1;
 
 
 
 unsigned int maybe_unused: 1;
-# 3602
+#line 3602
 _ZN3edg42a_per_instantiation_needed_flags_entry_ptrE per_instantiation_needed_flags;
-# 3610
+#line 3610
 _ZN3edg16an_attribute_ptrE attributes;};
 
 typedef struct _ZN3edg23a_source_correspondenceE _ZN3edg23a_source_correspondenceE;
-# 5748
-struct _ZN3edg24a_fixed_point_type_descrE {
-
-
-unsigned char precision;
-
-
-
-unsigned int is_unsigned: 1;
-
-
-unsigned int is_fract_type: 1;
-
-
-
-unsigned int saturating: 1;char __dummy[2];};
-
-
-typedef struct _ZN3edg24a_fixed_point_type_descrE _ZN3edg24a_fixed_point_type_descrE;
-# 6238
+#line 6238
 typedef unsigned _ZN3edg20a_type_qualifier_setE;
-# 7393
+#line 7393
 typedef struct _ZN3edg25a_routine_type_supplementE *_ZN3edg29a_routine_type_supplement_ptrE;
-# 8740
+#line 8740
 typedef struct _ZN3edg23a_class_type_supplementE *_ZN3edg27a_class_type_supplement_ptrE;
-# 9329
+#line 9329
 typedef struct _ZN3edg32a_template_param_type_supplementE *_ZN3edg36a_template_param_type_supplement_ptrE;
-# 9421
+#line 9421
 typedef struct _ZN3edg25a_typeref_type_supplementE *_ZN3edg29a_typeref_type_supplement_ptrE;
-# 9502
+#line 9502
 typedef struct _ZN3edg26an_integer_type_supplementE *_ZN3edg30an_integer_type_supplement_ptrE;
-# 9624
+#line 9624
 typedef struct _ZN3edg24a_based_type_list_memberE *_ZN3edg28a_based_type_list_member_ptrE;
-# 9646
+#line 9646
 typedef _ZN3edg6a_byteE _ZN3edg22a_pointer_modifier_setE;
-# 10142
+#line 10142
 union _ZN3edg6a_typeUt_Ut_Ut_E {
 
 
 _ZN3edg14a_constant_ptrE constant_list;
-# 10152
+#line 10152
 _ZN3edg11a_scope_ptrE assoc_scope;
 
 
 
 _ZN3edg10a_type_ptrE affiliated_type;};
-# 10045
+#line 10045
 struct _ZN3edg6a_typeUt_Ut_E {
 
 unsigned char int_kind;
 
 
 unsigned int explicitly_signed: 1;
-# 10058
+#line 10058
 unsigned int microsoft_sized_int_type: 1;
-# 10064
+#line 10064
 unsigned int has_explicit_enum_base: 1;
 
 
@@ -5138,9 +5101,9 @@ unsigned int is_scoped_enum: 1;
 
 
 unsigned int packed: 1;
-# 10086
+#line 10086
 unsigned int wchar_t_type: 1;
-# 10092
+#line 10092
 unsigned int char8_t_type: 1;
 
 
@@ -5157,7 +5120,7 @@ unsigned int bool_type: 1;
 
 
 unsigned int originally_unnamed: 1;
-# 10113
+#line 10113
 unsigned int is_template_enum: 1;
 
 
@@ -5177,13 +5140,13 @@ unsigned int is_specialized: 1;
 
 
 unsigned int is_ms_instantiated_nonreal_enum: 1;
-# 10139
+#line 10139
 unsigned int ELF_visibility: 3;
-# 10163
+#line 10163
 union _ZN3edg6a_typeUt_Ut_Ut_E enum_info;
 
 _ZN3edg30an_integer_type_supplement_ptrE extra_info;};
-# 10185
+#line 10185
 struct _ZN3edg6a_typeUt_Ut0_E {
 
 _ZN3edg10a_type_ptrE type;
@@ -5191,7 +5154,7 @@ _ZN3edg10a_type_ptrE type;
 
 
 _ZN3edg14a_variable_ptrE base_variable;
-# 10198
+#line 10198
 unsigned int is_reference: 1;
 
 
@@ -5208,11 +5171,11 @@ unsigned int is_handle: 1;
 
 
 unsigned int is_interior_ptr: 1;
-# 10220
+#line 10220
 unsigned int is_pin_ptr: 1;
-# 10227
+#line 10227
 _ZN3edg22a_pointer_modifier_setE modifiers;char __dummy[6];};
-# 10233
+#line 10233
 struct _ZN3edg6a_typeUt_Ut1_E {
 
 _ZN3edg10a_type_ptrE return_type;
@@ -5226,7 +5189,7 @@ _ZN3edg29a_routine_type_supplement_ptrE extra_info;
 
 
 _ZN3edg10a_type_ptrE unlowered_type;};
-# 10326
+#line 10326
 union _ZN3edg6a_typeUt_Ut2_Ut_E {
 
 
@@ -5237,26 +5200,26 @@ _ZN3edg13a_targ_size_tE number_of_elements;
 
 
 _ZN3edg16an_expr_node_ptrE element_count_expr;
-# 10342
+#line 10342
 _ZN3edg14a_constant_ptrE element_count_constant;};
-# 10257
+#line 10257
 struct _ZN3edg6a_typeUt_Ut2_E {
 
 _ZN3edg10a_type_ptrE element_type;
 
 
 unsigned int qualifiers: 15;
-# 10268
+#line 10268
 unsigned int is_template_dependent_size_array: 1;
-# 10275
+#line 10275
 unsigned int is_variable_size_array: 1;
-# 10282
+#line 10282
 unsigned int is_vla: 1;
-# 10288
+#line 10288
 unsigned int constant_bound_expr_in_local_expr_node_ref: 1;
-# 10297
+#line 10297
 unsigned int dep_constant_bound_expr_in_local_expr_node_ref: 1;
-# 10305
+#line 10305
 unsigned int has_assoc_vla_dimension: 1;
 
 
@@ -5268,13 +5231,13 @@ unsigned int bound_is_zero: 1;
 
 
 unsigned int is_static: 1;
-# 10322
+#line 10322
 unsigned int is_threads_dimension: 1;
-# 10347
+#line 10347
 union _ZN3edg6a_typeUt_Ut2_Ut_E variant;
 
 _ZN3edg14a_constant_ptrE bound_constant;};
-# 10356
+#line 10356
 struct _ZN3edg6a_typeUt_Ut3_E {
 
 _ZN3edg11a_field_ptrE field_list;
@@ -5287,28 +5250,28 @@ _ZN3edg27a_class_type_supplement_ptrE extra_info;
 
 
 unsigned int is_interface: 1;
-# 10374
+#line 10374
 unsigned int is_interface_like: 1;
-# 10381
+#line 10381
 unsigned int is_delegate_class: 1;
 
 
 
 unsigned int is_generic_definition: 1;
-# 10392
+#line 10392
 unsigned int is_generic_instance: 1;
 
 
 
 unsigned int is_open_constructed_type: 1;
-# 10402
+#line 10402
 unsigned int is_generic_constraint: 1;
 
 
 
 
 unsigned int is_hybrid_constraint: 1;
-# 10413
+#line 10413
 unsigned int any_interface_constraints: 1;
 
 
@@ -5320,9 +5283,9 @@ unsigned int unconstrained: 1;
 
 
 unsigned int sealed: 1;
-# 10435
+#line 10435
 unsigned int final: 1;
-# 10441
+#line 10441
 unsigned int any_const_member: 1;
 
 
@@ -5342,11 +5305,11 @@ unsigned int any_virtual_base_classes: 1;
 
 
 unsigned int abstract: 1;
-# 10468
+#line 10468
 unsigned int any_virtual_functions: 1;
-# 10475
+#line 10475
 unsigned int any_pure_virtual_functions: 1;
-# 10484
+#line 10484
 unsigned int any_virtual_functions_including_in_base_classes: 1;
 
 
@@ -5357,80 +5320,80 @@ unsigned int nested_class_defined_outside_of_parent: 1;
 
 
 unsigned int originally_unnamed: 1;
-# 10499
+#line 10499
 unsigned int is_nonstd_anonymous_union_type: 1;
-# 10509
+#line 10509
 unsigned int is_template_class: 1;
-# 10515
+#line 10515
 unsigned int is_nonreal_class: 1;
-# 10528
+#line 10528
 unsigned int is_ms_instantiated_nonreal_class: 1;
-# 10534
+#line 10534
 unsigned int is_prototype_instantiation: 1;
-# 10540
+#line 10540
 unsigned int is_specialized: 1;
-# 10549
+#line 10549
 unsigned int specialized_with_old_syntax: 1;
 
 
 
 
 unsigned int is_in_class_specialization: 1;
-# 10560
+#line 10560
 unsigned int explicitly_instantiated: 1;
 
 
 
 
 unsigned int do_not_instantiate: 1;
-# 10571
+#line 10571
 unsigned int proxy_class: 1;
-# 10578
+#line 10578
 unsigned int definition_needed: 1;
-# 10584
+#line 10584
 unsigned int keep_definition_in_il: 1;
-# 10591
+#line 10591
 unsigned int is_empty_class: 1;
-# 10599
+#line 10599
 unsigned int no_proper_data: 1;
 
 
 
 
 unsigned int has_zero_init_component: 1;
-# 10611
+#line 10611
 unsigned int has_pointer_component: 1;
 
 
 
 unsigned int contains_flexible_array_member: 1;
-# 10622
+#line 10622
 unsigned int is_transparent: 1;
-# 10629
+#line 10629
 unsigned int is_packed: 1;
 
 
 
 unsigned int has_internal_linkage_attribute: 1;
-# 10639
+#line 10639
 unsigned int has_operator_ampersand: 1;
 
 
 
 unsigned int virtual_functions_marked_as_required: 1;
-# 10649
+#line 10649
 unsigned int copy_assignment_decl_suppressed: 1;
-# 10660
+#line 10660
 unsigned int copy_ctor_decl_suppressed: 1;
-# 10669
+#line 10669
 unsigned int default_ctor_decl_suppressed: 1;
-# 10676
+#line 10676
 unsigned int dtor_decl_suppressed: 1;
-# 10684
+#line 10684
 unsigned int inc_class_used_in_array_type: 1;
-# 10694
+#line 10694
 _ZN3edg16a_targ_alignmentE max_member_alignment;char __dummy[6];};
-# 10733
+#line 10733
 struct _ZN3edg6a_typeUt_Ut4_E {
 
 _ZN3edg10a_type_ptrE type;
@@ -5442,7 +5405,7 @@ _ZN3edg29a_typeref_type_supplement_ptrE extra_info;
 
 
 _ZN3edg10a_type_ptrE orig_type;
-# 10752
+#line 10752
 unsigned char kind;
 
 unsigned int qualifiers: 15;
@@ -5455,22 +5418,22 @@ unsigned int predeclared: 1;
 
 
 unsigned int explicit_memory_attribute_made_implicit: 1;
-# 10770
+#line 10770
 unsigned int has_variably_modified_type: 1;
 
 
 
 
 unsigned int is_lowered_variably_modified_type: 1;
-# 10796
+#line 10796
 unsigned int decltype_expr_not_parenthesized: 1;
-# 10807
+#line 10807
 unsigned int is_dependent_type_operator: 1;
-# 10814
+#line 10814
 unsigned int is_nonreal: 1;
-# 10821
+#line 10821
 unsigned int is_dependent: 1;
-# 10829
+#line 10829
 unsigned int is_prototype_instantiation: 1;
 
 
@@ -5482,7 +5445,7 @@ unsigned int is_lowered_complex_type: 1;
 
 
 unsigned int embedded_source_sequence_entries: 1;
-# 10850
+#line 10850
 unsigned int added_to_record_name: 1;
 
 
@@ -5496,11 +5459,11 @@ unsigned int is_global_qualified_name: 1;
 
 
 unsigned int is_intrinsic_member: 1;char __dummy[3];};
-# 10869
+#line 10869
 struct _ZN3edg6a_typeUt_Ut5_E {
 
 _ZN3edg10a_type_ptrE class_of_which_a_member;
-# 10877
+#line 10877
 _ZN3edg10a_type_ptrE orig_class_of_which_a_member;
 
 
@@ -5511,7 +5474,7 @@ _ZN3edg10a_type_ptrE type;
 
 
 _ZN3edg22a_pointer_modifier_setE modifiers;char __dummy[7];};
-# 10898
+#line 10898
 struct _ZN3edg6a_typeUt_Ut6_E {
 
 unsigned char kind;
@@ -5537,29 +5500,29 @@ unsigned int is_generic_function_param: 1;
 
 
 unsigned int is_auto_param: 1;
-# 10928
+#line 10928
 unsigned int is_decltype_auto: 1;
 
 
 
 unsigned int originally_class_template_param: 1;
-# 10938
+#line 10938
 unsigned int is_unsigned_bit_precise_int: 1;
 
 
 
 
 _ZN3edg36a_template_param_type_supplement_ptrE extra_info;};
-# 10949
+#line 10949
 struct _ZN3edg6a_typeUt_Ut7_E {
 
 _ZN3edg10a_type_ptrE element_type;
 
 
 _ZN3edg14a_constant_ptrE size_constant;
-# 10963
+#line 10963
 unsigned int is_boolean_vector: 1;
-# 10970
+#line 10970
 unsigned char kind;char __dummy[6];};
 
 
@@ -5579,37 +5542,33 @@ int8_t length_multiplier;
 
 
 uint8_t tuple_elements;char __dummy[6];};
-# 10041
+#line 10041
 union _ZN3edg6a_typeUt_E {
-# 10168
+#line 10168
 struct _ZN3edg6a_typeUt_Ut_E integer;
-
-
-
-_ZN3edg24a_fixed_point_type_descrE fixed_point;
-# 10182
+#line 10182
 unsigned char float_kind;
-# 10231
+#line 10231
 struct _ZN3edg6a_typeUt_Ut0_E pointer;
-# 10255
+#line 10255
 struct _ZN3edg6a_typeUt_Ut1_E routine;
-# 10354
+#line 10354
 struct _ZN3edg6a_typeUt_Ut2_E array;
-# 10731
+#line 10731
 struct _ZN3edg6a_typeUt_Ut3_E class_struct_union;
-# 10867
+#line 10867
 struct _ZN3edg6a_typeUt_Ut4_E typeref;
-# 10895
+#line 10895
 struct _ZN3edg6a_typeUt_Ut5_E ptr_to_member;
-# 10946
+#line 10946
 struct _ZN3edg6a_typeUt_Ut6_E template_param;
-# 10971
+#line 10971
 struct _ZN3edg6a_typeUt_Ut7_E vector;
-# 10979
+#line 10979
 struct _ZN3edg6a_typeUt_Ut8_E scalable_vector;
-# 10990
+#line 10990
 struct _ZN3edg6a_typeUt_Ut9_E riscv_vector;};
-# 9768
+#line 9768
 struct _ZN3edg6a_typeE {
 
 
@@ -5623,9 +5582,9 @@ _ZN3edg10a_type_ptrE next;
 
 
 _ZN3edg28a_based_type_list_member_ptrE based_types;
-# 9788
+#line 9788
 _ZN3edg13a_targ_size_tE size;
-# 9797
+#line 9797
 _ZN3edg16a_targ_alignmentE alignment;
 
 
@@ -5633,35 +5592,35 @@ _ZN3edg16a_targ_alignmentE alignment;
 unsigned char kind;
 
 unsigned int incomplete: 1;
-# 9810
+#line 9810
 unsigned int used_in_exception_or_rtti: 1;
-# 9817
+#line 9817
 unsigned int declared_in_function_prototype: 1;
 
 
 unsigned int is_tag_redefinition: 1;
-# 9828
+#line 9828
 unsigned int is_instantiation_dependent: 1;
 
 
 
 
 unsigned int is_instantiation_dependent_cached: 1;
-# 9846
+#line 9846
 unsigned int prototype_scope_types_if_any_promoted: 1;
 
 
 
 unsigned int typedef_pending: 1;
-# 9861
+#line 9861
 unsigned int generated_as_empty_struct: 1;
-# 9867
+#line 9867
 unsigned int has_been_defined: 1;
 
 
 
 unsigned int typedef_definition_has_been_put_out: 1;
-# 9934
+#line 9934
 unsigned int alignment_set_explicitly: 1;
 
 
@@ -5677,13 +5636,13 @@ unsigned int may_alias: 1;
 
 
 unsigned int has_microsoft_w64_specifier: 1;
-# 9955
+#line 9955
 unsigned int is_microsoft_intrinsic: 1;
-# 9974
+#line 9974
 unsigned int is_builtin_va_list: 1;
-# 9980
+#line 9980
 unsigned int is_builtin_va_list_from_cstdarg: 1;
-# 9996
+#line 9996
 unsigned int has_gnu_abi_tag_attribute: 1;
 
 
@@ -5702,28 +5661,28 @@ unsigned int process_for_ordering: 1;
 
 
 unsigned int type_processed_for_ordering: 1;
-# 10021
+#line 10021
 unsigned int type_processed_as_complete_for_ordering: 1;
-# 10029
+#line 10029
 unsigned int visited_for_vla_lowering: 1;
-# 10035
+#line 10035
 _ZN3edg14a_variable_ptrE typeinfo_var;
-# 10992
+#line 10992
 union _ZN3edg6a_typeUt_E variant;};
-# 16957
+#line 16957
 typedef struct _ZN3edg28a_scope_orphaned_list_headerE *_ZN3edg32a_scope_orphaned_list_header_ptrE;
-# 18721
+#line 18721
 typedef struct _ZN3edg20a_module_import_declE *_ZN3edg24a_module_import_decl_ptrE;
-# 18796
+#line 18796
 struct _ZN3edg12an_il_headerE {
 
 _ZN3edg17a_source_file_ptrE primary_source_file;
-# 18804
+#line 18804
 _ZN3edg11a_scope_ptrE primary_scope;
 
 
 _ZN3edg27an_il_entity_list_entry_ptrE file_scope_statements;
-# 18814
+#line 18814
 _ZN3edg13a_routine_ptrE main_routine;
 
 
@@ -5736,19 +5695,19 @@ _ZN3edg12a_const_charE *time_of_compilation;
 _ZN3edg14a_byte_booleanE plain_chars_are_signed;
 
 _ZN3edg11a_scope_ptrE *region_scope_entry;
-# 18841
+#line 18841
 _ZN3edg20a_function_def_descrE *function_def_table;
-# 18852
+#line 18852
 _ZN3edg32a_scope_orphaned_list_header_ptrE scope_orphaned_list_headers;
-# 18859
+#line 18859
 enum _ZN3edg17a_source_languageE source_language;
 
 
 
 uint32_t std_version;
-# 18876
+#line 18876
 _ZN3edg23a_cli_metadata_file_ptrE cli_metadata_files;
-# 18886
+#line 18886
 _ZN3edg14a_byte_booleanE pcc_compatibility_mode;
 
 
@@ -5759,7 +5718,7 @@ _ZN3edg14a_byte_booleanE enum_type_is_integral;
 
 
 _ZN3edg16a_targ_alignmentE default_max_member_alignment;
-# 18909
+#line 18909
 _ZN3edg14a_byte_booleanE microsoft_mode;
 
 
@@ -5773,9 +5732,9 @@ _ZN3edg14a_byte_booleanE cppcx_enabled;
 
 
 unsigned long microsoft_version;
-# 18929
+#line 18929
 _ZN3edg14a_byte_booleanE default_upc_strict_access;
-# 18937
+#line 18937
 _ZN3edg14a_byte_booleanE gcc_mode;
 
 
@@ -5785,7 +5744,7 @@ _ZN3edg14a_byte_booleanE gpp_mode;
 
 
 _ZN3edg14a_byte_booleanE clang_mode;
-# 18951
+#line 18951
 unsigned long gnu_version;
 
 
@@ -5801,20 +5760,20 @@ _ZN3edg14a_byte_booleanE short_enums;
 
 
 _ZN3edg14a_byte_booleanE default_nocommon;
-# 18972
+#line 18972
 _ZN3edg14a_byte_booleanE gnu_c89_inlining;
-# 18978
+#line 18978
 _ZN3edg14a_byte_booleanE near_and_far_are_enabled;
 
 
 
 
 _ZN3edg14a_byte_booleanE far_data_pointers;
-# 18989
+#line 18989
 _ZN3edg14a_byte_booleanE far_code_pointers;
-# 18996
+#line 18996
 _ZN3edg14a_byte_booleanE UCN_identifiers_used;
-# 19009
+#line 19009
 _ZN3edg14a_byte_booleanE vla_used;
 
 
@@ -5824,15 +5783,15 @@ _ZN3edg14a_byte_booleanE any_templates_seen;
 
 
 _ZN3edg14a_byte_booleanE prototype_instantiations_in_il;
-# 19023
+#line 19023
 _ZN3edg14a_byte_booleanE il_has_all_prototype_instantiations;
-# 19033
+#line 19033
 _ZN3edg14a_byte_booleanE il_has_C_semantics;
-# 19039
+#line 19039
 _ZN3edg12a_const_charE *instantiation_dir_name;
-# 19045
+#line 19045
 unsigned long number_of_external_nonclass_template_entities;
-# 19051
+#line 19051
 _ZN3edg10a_type_ptrE nontag_types_used_in_exception_or_rtti;
 
 
@@ -5843,13 +5802,13 @@ _ZN3edg29a_seq_number_lookup_entry_ptrE seq_number_lookup_entries;
 
 
 unsigned long num_seq_number_lookup_entries;
-# 19106
+#line 19106
 int32_t target_configuration_index;
-# 19113
+#line 19113
 _ZN3edg24a_module_import_decl_ptrE imported_modules;};
 
 typedef struct _ZN3edg12an_il_headerE _ZN3edg12an_il_headerE;
-# 129 "src/target.c"
+#line 129 "src/target.c"
 struct _ZN3edg22a_target_configurationE {
 _ZN3edg12a_const_charE *name;
 void (*set_target_config)(void);
@@ -5858,135 +5817,136 @@ void (*set_target_config)(void);
 
 
 void (*dump_target_config)(void);};
-# 142
+#line 142
 typedef struct _ZN3edg22a_target_configurationE _ZN3edg22a_target_configurationE;
-# 357 "/usr/include/stdio.h" 3
-extern int fprintf(FILE *__stream, const char *__format, ...);
-# 141 "/usr/include/string.h" 3
-extern char *strcpy(char *__dest, const char *__src);
-# 149
-extern char *strcat(char *__dest, const char *__src);
-# 156
-extern __attribute__((__pure__)) int strcmp(const char *__s1, const char *__s2);
-# 407
-extern __attribute__((__pure__)) size_t strlen(const char *__s);
-# 22 "src/checking.h"
-extern __attribute__((__noreturn__)) void _ZN3edg16assertion_failedEPKciS1_S1_S1_(_ZN3edg12a_const_charE *filename, int line_number, _ZN3edg12a_const_charE *function, _ZN3edg12a_const_charE *string1, _ZN3edg12a_const_charE *string2);
-# 353 "src/error.h"
-extern __attribute__((__noreturn__)) void _ZN3edg14internal_errorEPKc(_ZN3edg12a_const_charE *error_message);
-# 36 "src/util.h"
-extern char *_ZN3edg13alloc_generalEm(_ZN3edg8sizeof_tE size);
-# 327 "src/const_ints.h"
-extern void _ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPmPt(unsigned char ikind, _ZN3edg13a_targ_size_tE *p_size, _ZN3edg16a_targ_alignmentE *p_alignment);
-# 357
+#line 71 "ape-sys/stdio.h"
+extern int fprintf(FILE *, const char *, ...);
+#line 14 "ape-sys/string.h"
+extern char *strcpy(char *, const char *);
+
+extern char *strcat(char *, const char *);
+
+
+extern int strcmp(const char *, const char *);
+#line 36
+extern size_t strlen(const char *);
+#line 22 "src/checking.h"
+extern void _ZN3edg16assertion_failedEPKciS1_S1_S1_(_ZN3edg12a_const_charE *filename, int line_number, _ZN3edg12a_const_charE *function, _ZN3edg12a_const_charE *string1, _ZN3edg12a_const_charE *string2);
+#line 353 "src/error.h"
+extern void _ZN3edg14internal_errorEPKc(_ZN3edg12a_const_charE *error_message);
+#line 36 "src/util.h"
+extern char *_ZN3edg13alloc_generalEy(_ZN3edg8sizeof_tE size);
+#line 327 "src/const_ints.h"
+extern void _ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(unsigned char ikind, _ZN3edg13a_targ_size_tE *p_size, _ZN3edg16a_targ_alignmentE *p_alignment);
+#line 357
 extern unsigned char _ZN3edg21int_kind_for_bit_sizeEjb(unsigned number_of_bits, _ZN3edg9a_booleanE is_signed);
-# 38 "src/types.h"
-extern  /* COMDAT group: _ZN3edg13skip_typerefsEPNS_6a_typeE */ __inline__ __attribute__((__always_inline__)) _ZN3edg10a_type_ptrE _ZN3edg13skip_typerefsEPNS_6a_typeE(_ZN3edg10a_type_ptrE type_ptr);
-# 411
+#line 38 "src/types.h"
+extern  /* COMDAT group: _ZN3edg13skip_typerefsEPNS_6a_typeE */ _ZN3edg10a_type_ptrE _ZN3edg13skip_typerefsEPNS_6a_typeE(_ZN3edg10a_type_ptrE type_ptr);
+#line 411
 extern _ZN3edg10a_type_ptrE _ZN3edg29underlying_array_element_typeEPNS_6a_typeE(_ZN3edg10a_type_ptrE array_type);
-# 790
+#line 790
 extern _ZN3edg16a_targ_alignmentE _ZN3edg19f_alignment_of_typeEPNS_6a_typeE(_ZN3edg10a_type_ptrE tp);
-# 962
+#line 962
 extern _ZN3edg9a_booleanE _ZN3edg11is_far_typeEPNS_6a_typeE(_ZN3edg10a_type_ptrE tp);
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg28set_target_config_linux_i686Ev(void);
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg29dump_target_config_linux_i686Ev(void);
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg23set_target_config_win64Ev(void);
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg24dump_target_config_win64Ev(void);
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg23set_target_config_win32Ev(void);
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg24dump_target_config_win32Ev(void);
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg31set_target_config_linux_aarch64Ev(void);
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg32dump_target_config_linux_aarch64Ev(void);
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg29set_target_config_linux_armv7Ev(void);
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg30dump_target_config_linux_armv7Ev(void);
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg31set_target_config_linux_riscv64Ev(void);
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg32dump_target_config_linux_riscv64Ev(void);
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg31set_target_config_linux_riscv32Ev(void);
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg32dump_target_config_linux_riscv32Ev(void);
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg24set_legacy_target_configEv(void);
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg21dump_as_target_configEPKc(_ZN3edg12a_const_charE *suffix);
-# 246 "src/target.c"
+#line 246 "src/target.c"
 extern void _ZN3edg35dump_legacy_config_as_target_configEPKc(_ZN3edg12a_const_charE *config);
-# 267
+#line 267
 extern int32_t _ZN3edg25find_target_configurationEPKc(_ZN3edg12a_const_charE *config);
-# 287
+#line 287
 extern void _ZN3edg24set_target_configurationEi(int32_t target_index);
-# 333
+#line 333
 extern void _ZN3edg26dump_target_configurationsEv(void);
-# 368
+#line 368
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg23set_plain_char_int_kindEb(_ZN3edg9a_booleanE plain_chars_are_signed);
-# 391
+#line 391
 extern void _ZN3edg30init_microsoft_sized_int_typesEv(void);
-# 436
+#line 436
 extern _ZN3edg13a_targ_size_tE _ZN3edg18size_of_pointer_toEPNS_6a_typeEPt(_ZN3edg10a_type_ptrE tp, _ZN3edg16a_targ_alignmentE *alignment);
-# 482
+#line 482
 extern void _ZN3edg26check_target_configurationEv(void);
-# 715
+#line 715
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg20init_character_sizesEv(void);
-# 805
+#line 805
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg27init_field_alignment_tablesEv(void);
-# 868
+#line 868
 extern _ZN3edg16a_targ_alignmentE _ZN3edg19field_alignment_forEPNS_6a_typeE(_ZN3edg10a_type_ptrE type);
-# 933
+#line 933
 extern void _ZN3edg17target_early_initEv(void);
-# 1033
+#line 1033
 extern void _ZN3edg20target_one_time_initEv(void);
-# 1066
-extern void _ZN3edg11target_initEv(void); static const char __T152563104[25]; static const char __T152569568[27]; static const char __T152572200[31]; static const char __T152580040[27]; static const char __T153248416[28];
-# 1084 "src/basics.h"
+#line 1066
+extern void _ZN3edg11target_initEv(void); static const char __T618979472[25]; static const char __T618985936[27]; static const char __T618988568[31]; static const char __T618996408[27]; static const char __T619786256[28];
+#line 1084 "src/basics.h"
 extern enum _ZN3edg11a_C_dialectE _ZN3edg9C_dialectE;
-# 1265 "src/lang_feat.h"
+#line 1265 "src/lang_feat.h"
 extern _ZN3edg9a_booleanE _ZN3edg8gnu_modeE;
 
 
 extern _ZN3edg9a_booleanE _ZN3edg10clang_modeE;
-# 1288
+#line 1288
 extern unsigned long _ZN3edg11gnu_versionE;
-# 1309
+#line 1309
 extern _ZN3edg9a_booleanE _ZN3edg14microsoft_modeE;
-# 1407
+#line 1407
 extern unsigned long _ZN3edg17microsoft_versionE;
-# 4234 "src/host_envir.h"
+#line 4234 "src/host_envir.h"
 extern _ZN3edg9a_booleanE _ZN3edg18host_little_endianE;
-# 91 "src/error.h"
+#line 91 "src/error.h"
 extern FILE *_ZN3edg7f_errorE;
-# 5681 "src/il_def.h"
+#line 5681 "src/il_def.h"
 extern _ZN3edg14a_byte_booleanE _ZN3edg18int_kind_is_signedE[15];
-# 19117
+#line 19117
 extern _ZN3edg12an_il_headerE _ZN3edg9il_headerE;
-# 40 "src/target.h"
+#line 40 "src/target.h"
 extern int32_t _ZN3edg26target_configuration_indexE;
-# 54
+#line 54
 extern _ZN3edg9a_booleanE _ZN3edg18targ_little_endianE;
-# 62
+#line 62
 extern unsigned _ZN3edg13targ_char_bitE;
 
 
 
 extern unsigned _ZN3edg25targ_host_string_char_bitE;
-# 76
+#line 76
 extern _ZN3edg9a_booleanE _ZN3edg21targ_has_signed_charsE;
 
 
 
 
 extern _ZN3edg9a_booleanE _ZN3edg46targ_char_constant_first_char_most_significantE;
-# 87
+#line 87
 extern unsigned char _ZN3edg21targ_wchar_t_int_kindE;
 
 
@@ -6028,7 +5988,7 @@ extern unsigned char _ZN3edg18targ_bool_int_kindE;
 
 
 extern unsigned char _ZN3edg20targ_c_bool_int_kindE;
-# 140
+#line 140
 extern _ZN3edg13a_targ_size_tE _ZN3edg17targ_sizeof_shortE;
 
 
@@ -6055,26 +6015,26 @@ extern _ZN3edg13a_targ_size_tE _ZN3edg16targ_sizeof_longE;
 
 
 extern _ZN3edg16a_targ_alignmentE _ZN3edg17targ_alignof_longE;
-# 171
+#line 171
 extern _ZN3edg13a_targ_size_tE _ZN3edg21targ_sizeof_long_longE;
 
 
 
 
 extern _ZN3edg16a_targ_alignmentE _ZN3edg22targ_alignof_long_longE;
-# 182
+#line 182
 extern _ZN3edg13a_targ_size_tE _ZN3edg18targ_sizeof_int128E;
-# 188
+#line 188
 extern _ZN3edg16a_targ_alignmentE _ZN3edg19targ_alignof_int128E;
-# 195
+#line 195
 extern _ZN3edg13a_targ_size_tE _ZN3edg21bitint_maxwidth_valueE;
 
 
 
 extern _ZN3edg13a_targ_size_tE _ZN3edg27targ_sizeof_largest_integerE;
-# 205
+#line 205
 extern _ZN3edg13a_targ_size_tE _ZN3edg26targ_sizeof_largest_atomicE;
-# 212
+#line 212
 extern _ZN3edg9a_booleanE _ZN3edg15is_64bit_targetE;
 
 
@@ -6116,11 +6076,11 @@ extern unsigned char _ZN3edg19targ_int64_int_kindE;
 
 
 extern unsigned char _ZN3edg28targ_unsigned_int64_int_kindE;
-# 258
+#line 258
 extern unsigned char _ZN3edg16targ_intmax_kindE;
-# 264
+#line 264
 extern unsigned char _ZN3edg17targ_uintmax_kindE;
-# 270
+#line 270
 extern _ZN3edg13a_targ_size_tE _ZN3edg26targ_max_class_object_sizeE;
 
 
@@ -6132,34 +6092,34 @@ extern _ZN3edg13a_targ_size_tE _ZN3edg26targ_max_base_class_offsetE;
 
 
 extern _ZN3edg9a_booleanE _ZN3edg37targ_optimize_empty_base_class_layoutE;
-# 286
+#line 286
 extern int _ZN3edg29targ_bit_field_container_sizeE;
-# 295
+#line 295
 extern _ZN3edg9a_booleanE _ZN3edg35targ_microsoft_bit_field_allocationE;
-# 307
+#line 307
 extern _ZN3edg9a_booleanE _ZN3edg36targ_plain_int_bit_field_is_unsignedE;
-# 313
+#line 313
 extern _ZN3edg9a_booleanE _ZN3edg43targ_force_one_bit_bit_field_to_be_unsignedE;
-# 321
+#line 321
 extern _ZN3edg9a_booleanE _ZN3edg40targ_enum_bit_fields_are_always_unsignedE;
-# 332
+#line 332
 extern _ZN3edg9a_booleanE _ZN3edg43targ_nonnegative_enum_bit_field_is_unsignedE;
-# 340
+#line 340
 extern int _ZN3edg35targ_zero_width_bit_field_alignmentE;
-# 352
+#line 352
 extern int _ZN3edg50targ_zero_width_bit_field_affects_struct_alignmentE;
-# 359
+#line 359
 extern int _ZN3edg47targ_unnamed_bit_field_affects_struct_alignmentE;
-# 366
+#line 366
 extern _ZN3edg9a_booleanE _ZN3edg38targ_bit_field_affects_union_alignmentE;
 
 
 
 
 extern int _ZN3edg54targ_user_control_of_struct_packing_affects_bit_fieldsE;
-# 378
+#line 378
 extern int _ZN3edg41targ_pad_bit_fields_larger_than_base_typeE;
-# 387
+#line 387
 extern _ZN3edg9a_booleanE _ZN3edg20targ_supports_x86_64E;
 
 
@@ -6180,42 +6140,34 @@ extern _ZN3edg9a_booleanE _ZN3edg21targ_supports_riscv64E;
 
 
 extern _ZN3edg9a_booleanE _ZN3edg21targ_supports_riscv32E;
-# 473
+#line 473
 extern _ZN3edg9a_booleanE _ZN3edg31packing_applies_to_base_classesE;
-# 483
+#line 483
 extern _ZN3edg9a_booleanE _ZN3edg27targ_all_pointers_same_sizeE;
 
 
 
 
 extern _ZN3edg13a_targ_size_tE _ZN3edg19targ_sizeof_pointerE;
-# 494
+#line 494
 extern _ZN3edg16a_targ_alignmentE _ZN3edg20targ_alignof_pointerE;
-# 501
+#line 501
 extern _ZN3edg13a_targ_size_tE _ZN3edg23targ_sizeof_far_pointerE;
-# 508
+#line 508
 extern _ZN3edg16a_targ_alignmentE _ZN3edg24targ_alignof_far_pointerE;
-# 514
+#line 514
 extern _ZN3edg13a_targ_size_tE _ZN3edg24targ_sizeof_near_pointerE;
-# 521
+#line 521
 extern _ZN3edg16a_targ_alignmentE _ZN3edg25targ_alignof_near_pointerE;
-# 529
+#line 529
 extern unsigned char _ZN3edg23targ_ptrdiff_t_int_kindE;
-# 535
+#line 535
 extern _ZN3edg13a_targ_size_tE _ZN3edg15targ_size_t_maxE;
-# 543
+#line 543
 extern unsigned char _ZN3edg20targ_size_t_int_kindE;
-# 550
+#line 550
 extern unsigned char _ZN3edg21targ_ssize_t_int_kindE;
-# 560
-extern _ZN3edg13a_targ_size_tE _ZN3edg23targ_sizeof_fixed_pointE[2][3][2];
-# 580
-extern _ZN3edg16a_targ_alignmentE _ZN3edg24targ_alignof_fixed_pointE[2][3][2];
-# 600
-extern _ZN3edg16a_targ_alignmentE _ZN3edg36targ_fractional_bits_for_fixed_pointE[2][3][2];
-# 619
-extern _ZN3edg13a_targ_size_tE _ZN3edg31targ_sizeof_largest_fixed_pointE;
-# 630
+#line 630
 extern _ZN3edg13a_targ_size_tE _ZN3edg17targ_sizeof_floatE;
 
 
@@ -6262,17 +6214,17 @@ extern _ZN3edg13a_targ_size_tE _ZN3edg20targ_sizeof_float128E;
 
 
 extern _ZN3edg16a_targ_alignmentE _ZN3edg21targ_alignof_float128E;
-# 703
+#line 703
 extern unsigned char _ZN3edg14targ_word_modeE;
-# 709
+#line 709
 extern unsigned char _ZN3edg21targ_unwind_word_modeE;
-# 716
+#line 716
 extern unsigned char _ZN3edg27targ_libgcc_cmp_return_modeE;
-# 722
+#line 722
 extern unsigned char _ZN3edg28targ_libgcc_shift_count_modeE;
-# 728
+#line 728
 extern unsigned char _ZN3edg17targ_pointer_modeE;
-# 735
+#line 735
 extern _ZN3edg9a_booleanE _ZN3edg38targ_dual_alignments_for_builtin_typesE;
 
 
@@ -6292,9 +6244,9 @@ extern _ZN3edg16a_targ_alignmentE _ZN3edg25targ_long_field_alignmentE;
 
 
 extern _ZN3edg16a_targ_alignmentE _ZN3edg30targ_long_long_field_alignmentE;
-# 759
+#line 759
 extern _ZN3edg16a_targ_alignmentE _ZN3edg27targ_int128_field_alignmentE;
-# 765
+#line 765
 extern _ZN3edg16a_targ_alignmentE _ZN3edg26targ_float_field_alignmentE;
 
 
@@ -6312,7 +6264,7 @@ extern _ZN3edg16a_targ_alignmentE _ZN3edg28targ_float80_field_alignmentE;
 
 
 extern _ZN3edg16a_targ_alignmentE _ZN3edg29targ_float128_field_alignmentE;
-# 789
+#line 789
 extern _ZN3edg13a_targ_size_tE _ZN3edg30targ_sizeof_ptr_to_data_memberE;
 
 
@@ -6329,37 +6281,37 @@ extern _ZN3edg13a_targ_size_tE _ZN3edg34targ_sizeof_ptr_to_member_functionE;
 
 
 extern _ZN3edg16a_targ_alignmentE _ZN3edg35targ_alignof_ptr_to_member_functionE;
-# 810
+#line 810
 extern _ZN3edg9a_booleanE _ZN3edg35targ_microsoft_ptr_to_member_sizingE;
-# 821
+#line 821
 extern _ZN3edg13a_targ_size_tE _ZN3edg33targ_sizeof_virtual_function_infoE;
-# 827
+#line 827
 extern _ZN3edg16a_targ_alignmentE _ZN3edg34targ_alignof_virtual_function_infoE;
-# 853
+#line 853
 extern _ZN3edg9a_booleanE _ZN3edg39targ_enum_types_can_be_smaller_than_intE;
-# 861
+#line 861
 extern _ZN3edg9a_booleanE _ZN3edg30targ_right_shift_is_arithmeticE;
-# 867
+#line 867
 extern _ZN3edg9a_booleanE _ZN3edg47targ_too_large_shift_count_is_taken_modulo_sizeE;
-# 873
+#line 873
 extern _ZN3edg16a_targ_alignmentE _ZN3edg29targ_minimum_struct_alignmentE;
-# 880
+#line 880
 extern _ZN3edg9a_booleanE _ZN3edg46targ_field_alloc_sequence_equals_decl_sequenceE;
-# 887
+#line 887
 extern _ZN3edg16a_targ_alignmentE _ZN3edg27targ_minimum_pack_alignmentE;
-# 893
+#line 893
 extern _ZN3edg16a_targ_alignmentE _ZN3edg27targ_maximum_pack_alignmentE;
-# 899
+#line 899
 extern _ZN3edg16a_targ_alignmentE _ZN3edg32targ_maximum_intrinsic_alignmentE;
-# 905
+#line 905
 extern _ZN3edg16a_targ_alignmentE _ZN3edg26targ_default_new_alignmentE;
-# 915
+#line 915
 extern _ZN3edg9a_booleanE _ZN3edg28distinct_template_signaturesE;
-# 921
+#line 921
 extern _ZN3edg9a_booleanE _ZN3edg21exc_spec_in_func_typeE;
-# 936
+#line 936
 extern _ZN3edg9a_booleanE _ZN3edg32assume_references_cannot_be_nullE;
-# 945
+#line 945
 extern _ZN3edg9a_booleanE _ZN3edg37force_variable_definition_via_zeroingE;
 
 
@@ -6371,7 +6323,7 @@ extern _ZN3edg9a_booleanE _ZN3edg31make_all_functions_unprototypedE;
 
 
 extern _ZN3edg9a_booleanE _ZN3edg51assume_this_cannot_be_null_in_conditional_operatorsE;
-# 964
+#line 964
 extern unsigned _ZN3edg25targ_jmp_buf_num_elementsE;
 
 
@@ -6392,9 +6344,9 @@ extern unsigned char _ZN3edg31targ_jmp_buf_element_float_kindE;
 
 
 extern _ZN3edg12a_const_charE *_ZN3edg16targ_setjmp_funcE;
-# 992
+#line 992
 extern unsigned char _ZN3edg24targ_var_handle_int_kindE;
-# 999
+#line 999
 extern _ZN3edg13a_targ_size_tE _ZN3edg17targ_flt_mant_digE;
 
 
@@ -6459,9 +6411,9 @@ extern int _ZN3edg19targ_flt128_max_expE;
 
 
 extern _ZN3edg9a_booleanE _ZN3edg34remove_qualifiers_from_param_typesE;
-# 1074
+#line 1074
 extern _ZN3edg9a_booleanE _ZN3edg37c_and_cpp_function_types_are_distinctE;
-# 1093
+#line 1093
 extern _ZN3edg9a_booleanE _ZN3edg26type_info_in_namespace_stdE;
 
 
@@ -6473,20 +6425,20 @@ extern _ZN3edg9a_booleanE _ZN3edg40pass_stdarg_references_to_generated_codeE;
 
 
 extern _ZN3edg9a_booleanE _ZN3edg24va_list_in_std_namespaceE;
-# 1109
+#line 1109
 extern _ZN3edg9a_booleanE _ZN3edg41va_list_using_using_decl_in_std_namespaceE;
-# 1122
+#line 1122
 extern _ZN3edg9a_booleanE _ZN3edg25instantiate_extern_inlineE;
 
 
 
 
 extern _ZN3edg9a_booleanE _ZN3edg28instantiate_inline_variablesE;
-# 1134
+#line 1134
 extern _ZN3edg9a_booleanE _ZN3edg28sun_is_generated_code_targetE;
-# 1146
+#line 1146
 extern _ZN3edg9a_booleanE _ZN3edg28gcc_is_generated_code_targetE;
-# 1152
+#line 1152
 extern unsigned long _ZN3edg25gnu_target_version_numberE;
 
 
@@ -6498,7 +6450,7 @@ extern _ZN3edg9a_booleanE _ZN3edg37gcc_builtin_varargs_in_generated_codeE;
 
 
 extern _ZN3edg9a_booleanE _ZN3edg30clang_is_generated_code_targetE;
-# 1173
+#line 1173
 extern _ZN3edg9a_booleanE _ZN3edg37gcc_or_clang_is_generated_code_targetE;
 
 
@@ -6515,90 +6467,90 @@ extern unsigned long _ZN3edg26msvc_target_version_numberE;
 
 
 extern _ZN3edg9a_booleanE _ZN3edg42microsoft_dialect_is_generated_code_targetE;
-# 1195
+#line 1195
 extern _ZN3edg9a_booleanE _ZN3edg39always_fold_calls_to_builtin_constant_pE;
-# 1210
+#line 1210
 extern unsigned char _ZN3edg19plain_char_int_kindE;
 
 
 
 
 extern _ZN3edg9a_booleanE _ZN3edg22string_literals_sharedE;
-# 1229
+#line 1229
 extern _ZN3edg9a_booleanE _ZN3edg23targ_reuse_tail_paddingE;
-# 1243
+#line 1243
 extern _ZN3edg9a_booleanE _ZN3edg31use_empty_struct_in_generated_cE;
-# 1251
+#line 1251
 extern char *_ZN3edg23auxiliary_info_dir_nameE;
-# 1259
+#line 1259
 extern unsigned char _ZN3edg19targ_delta_int_kindE;
-# 1266
+#line 1266
 extern unsigned char _ZN3edg36targ_virtual_function_index_int_kindE;
 
 
 
 
 extern _ZN3edg9a_booleanE _ZN3edg17ctors_return_thisE;
-# 1277
+#line 1277
 extern _ZN3edg9a_booleanE _ZN3edg17dtors_return_thisE;
-# 1284
+#line 1284
 extern _ZN3edg9a_booleanE _ZN3edg39targ_ia64_abi_use_guard_acquire_releaseE;
-# 1292
+#line 1292
 extern _ZN3edg9a_booleanE _ZN3edg39targ_ia64_abi_use_int_static_init_guardE;
-# 1301
+#line 1301
 extern _ZN3edg9a_booleanE _ZN3edg39targ_ia64_abi_use_variant_array_cookiesE;
-# 1309
+#line 1309
 extern _ZN3edg9a_booleanE _ZN3edg53targ_ia64_abi_use_variant_ptr_to_member_function_reprE;
 
 
 
 extern _ZN3edg9a_booleanE _ZN3edg49targ_ia64_abi_variant_ctors_and_dtors_return_thisE;
-# 1321
+#line 1321
 extern _ZN3edg9a_booleanE _ZN3edg34targ_ia64_abi_variant_key_functionE;
-# 1327
+#line 1327
 extern unsigned char _ZN3edg31targ_ia64_vtable_entry_int_kindE;
-# 1335
+#line 1335
 extern unsigned char _ZN3edg27targ_region_number_int_kindE;
 
 
 
 extern unsigned char _ZN3edg27targ_ets_flag_type_int_kindE;
-# 184 "src/target.c"
+#line 184 "src/target.c"
 static _ZN3edg22a_target_configurationE _ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE[8];
-# 800
+#line 800
 static _ZN3edg16a_targ_alignmentE _ZN29_INTERNAL_8_target_c_946d5afe3edg20int_field_alignmentsE[15];
 
-static _ZN3edg16a_targ_alignmentE _ZN29_INTERNAL_8_target_c_946d5afe3edg22float_field_alignmentsE[14]; static const char __T152563104[25] = "set_target_configuration"; static const char __T152569568[27] = "dump_target_configurations"; static const char __T152572200[31] = "init_microsoft_sized_int_types"
-# 802
-; static const char __T152580040[27] = "check_target_configuration"; static const char __T153248416[28] = "init_field_alignment_tables";
-# 184
+static _ZN3edg16a_targ_alignmentE _ZN29_INTERNAL_8_target_c_946d5afe3edg22float_field_alignmentsE[14]; static const char __T618979472[25] = "set_target_configuration"; static const char __T618985936[27] = "dump_target_configurations"; static const char __T618988568[31] = "init_microsoft_sized_int_types"
+#line 802
+; static const char __T618996408[27] = "check_target_configuration"; static const char __T619786256[28] = "init_field_alignment_tables";
+#line 184
 static _ZN3edg22a_target_configurationE _ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE[8] = {{((const char *)"linux_x86_64"),(&_ZN29_INTERNAL_8_target_c_946d5afe3edg24set_legacy_target_configEv),((void (*)(void))0)},{((const char *)"linux_i686"),(&
-# 184
+#line 184
 _ZN29_INTERNAL_8_target_c_946d5afe3edg28set_target_config_linux_i686Ev),(&_ZN29_INTERNAL_8_target_c_946d5afe3edg29dump_target_config_linux_i686Ev)},{((const char *)"win64"),(&_ZN29_INTERNAL_8_target_c_946d5afe3edg23set_target_config_win64Ev),(&
-# 184
+#line 184
 _ZN29_INTERNAL_8_target_c_946d5afe3edg24dump_target_config_win64Ev)},{((const char *)"win32"),(&_ZN29_INTERNAL_8_target_c_946d5afe3edg23set_target_config_win32Ev),(&_ZN29_INTERNAL_8_target_c_946d5afe3edg24dump_target_config_win32Ev)},{((const char *)"linux_aarch64"),(&
-# 184
+#line 184
 _ZN29_INTERNAL_8_target_c_946d5afe3edg31set_target_config_linux_aarch64Ev),(&_ZN29_INTERNAL_8_target_c_946d5afe3edg32dump_target_config_linux_aarch64Ev)},{((const char *)"linux_armv7"),(&_ZN29_INTERNAL_8_target_c_946d5afe3edg29set_target_config_linux_armv7Ev),(&
-# 184
+#line 184
 _ZN29_INTERNAL_8_target_c_946d5afe3edg30dump_target_config_linux_armv7Ev)},{((const char *)"linux_riscv64"),(&_ZN29_INTERNAL_8_target_c_946d5afe3edg31set_target_config_linux_riscv64Ev),(&_ZN29_INTERNAL_8_target_c_946d5afe3edg32dump_target_config_linux_riscv64Ev)},{((const char *)"linux_riscv32"),(&
-# 184
+#line 184
 _ZN29_INTERNAL_8_target_c_946d5afe3edg31set_target_config_linux_riscv32Ev),(&_ZN29_INTERNAL_8_target_c_946d5afe3edg32dump_target_config_linux_riscv32Ev)}};
-# 38 "src/types.h"
- /* COMDAT group: _ZN3edg13skip_typerefsEPNS_6a_typeE */ __inline__ __attribute__((__always_inline__)) _ZN3edg10a_type_ptrE _ZN3edg13skip_typerefsEPNS_6a_typeE( _ZN3edg10a_type_ptrE __112336_44_type_ptr)
-# 45
+#line 38 "src/types.h"
+ /* COMDAT group: _ZN3edg13skip_typerefsEPNS_6a_typeE */ _ZN3edg10a_type_ptrE _ZN3edg13skip_typerefsEPNS_6a_typeE( _ZN3edg10a_type_ptrE __100929_44_type_ptr)
+#line 45
 {
-while (((int)(__112336_44_type_ptr->kind)) == 13) {
-__112336_44_type_ptr = (((__112336_44_type_ptr->variant).typeref).type);
+while (((int)(__100929_44_type_ptr->kind)) == 12) {
+__100929_44_type_ptr = (((__100929_44_type_ptr->variant).typeref).type);
 
 
 
 
 }
-return __112336_44_type_ptr;
+return __100929_44_type_ptr;
 }
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg28set_target_config_linux_i686Ev(void)
-# 78
+#line 78
 {
 _ZN3edg19targ_alignof_doubleE = ((_ZN3edg16a_targ_alignmentE)8U);
 
@@ -6625,34 +6577,9 @@ _ZN3edg31targ_alignof_ptr_to_data_memberE = ((_ZN3edg16a_targ_alignmentE)4U);
 _ZN3edg35targ_alignof_ptr_to_member_functionE = ((_ZN3edg16a_targ_alignmentE)4U);
 
 _ZN3edg35targ_microsoft_ptr_to_member_sizingE = ((_ZN3edg9a_booleanE)0);
-# 109
+#line 109
 _ZN3edg18targ_alignof_shortE = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)1U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)1U);
-
-
+#line 136
 _ZN3edg34targ_alignof_virtual_function_infoE = ((_ZN3edg16a_targ_alignmentE)4U);
 
 _ZN3edg27targ_all_pointers_same_sizeE = ((_ZN3edg9a_booleanE)1);
@@ -6668,7 +6595,7 @@ _ZN3edg22targ_char32_t_int_kindE = _ZN3edg15ik_unsigned_intE;
 _ZN3edg13targ_char_bitE = 8U;
 _ZN3edg46targ_char_constant_first_char_most_significantE = ((_ZN3edg9a_booleanE)1);
 
-_ZN3edg17targ_dbl_mant_digE = 53UL;
+_ZN3edg17targ_dbl_mant_digE = 53ULL;
 _ZN3edg16targ_dbl_max_expE = 1024;
 _ZN3edg16targ_dbl_min_expE = (-1021);
 _ZN3edg26targ_default_new_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
@@ -6685,7 +6612,7 @@ _ZN3edg39targ_enum_types_can_be_smaller_than_intE = ((_ZN3edg9a_booleanE)0);
 
 _ZN3edg46targ_field_alloc_sequence_equals_decl_sequenceE = ((_ZN3edg9a_booleanE)1);
 
-_ZN3edg17targ_flt_mant_digE = 24UL;
+_ZN3edg17targ_flt_mant_digE = 24ULL;
 _ZN3edg16targ_flt_max_expE = 128;
 _ZN3edg16targ_flt_min_expE = (-125);
 _ZN3edg26targ_float_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)4U);
@@ -6693,48 +6620,14 @@ _ZN3edg29targ_float128_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
 
 _ZN3edg28targ_float80_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)4U);
 
-_ZN3edg20targ_flt128_mant_digE = 113UL;
+_ZN3edg20targ_flt128_mant_digE = 113ULL;
 _ZN3edg19targ_flt128_max_expE = 16384;
 _ZN3edg19targ_flt128_min_expE = (-16381);
-_ZN3edg19targ_flt80_mant_digE = 64UL;
+_ZN3edg19targ_flt80_mant_digE = 64ULL;
 _ZN3edg18targ_flt80_max_expE = 16384;
 _ZN3edg18targ_flt80_min_expE = (-16381);
 _ZN3edg43targ_force_one_bit_bit_field_to_be_unsignedE = ((_ZN3edg9a_booleanE)0);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)15U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)15U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)31U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)31U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)7U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)7U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)16U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)16U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)32U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)32U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-
-
+#line 218
 _ZN3edg21targ_has_signed_charsE = ((_ZN3edg9a_booleanE)1);
 _ZN3edg25targ_host_string_char_bitE = 8U;
 
@@ -6769,7 +6662,7 @@ _ZN3edg25targ_jmp_buf_num_elementsE = 39U;
 
 _ZN3edg16targ_setjmp_funcE = ((const char *)"_setjmp");
 
-_ZN3edg18targ_ldbl_mant_digE = 64UL;
+_ZN3edg18targ_ldbl_mant_digE = 64ULL;
 _ZN3edg17targ_ldbl_max_expE = 16384;
 _ZN3edg17targ_ldbl_min_expE = (-16381);
 
@@ -6788,8 +6681,8 @@ _ZN3edg30targ_long_long_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)4U);
 
 _ZN3edg32targ_maximum_intrinsic_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
 
-_ZN3edg26targ_max_base_class_offsetE = 0UL;
-_ZN3edg26targ_max_class_object_sizeE = 0UL;
+_ZN3edg26targ_max_base_class_offsetE = 0ULL;
+_ZN3edg26targ_max_class_object_sizeE = 0ULL;
 _ZN3edg35targ_microsoft_bit_field_allocationE = ((_ZN3edg9a_booleanE)0);
 
 _ZN3edg29targ_minimum_struct_alignmentE = ((_ZN3edg16a_targ_alignmentE)1U);
@@ -6817,70 +6710,41 @@ _ZN3edg27targ_ets_flag_type_int_kindE = _ZN3edg15ik_unsigned_intE;
 _ZN3edg23targ_reuse_tail_paddingE = ((_ZN3edg9a_booleanE)1);
 
 _ZN3edg30targ_right_shift_is_arithmeticE = ((_ZN3edg9a_booleanE)1);
-# 305
+#line 305
 _ZN3edg26targ_short_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)2U);
-_ZN3edg18targ_sizeof_doubleE = 8UL;
+_ZN3edg18targ_sizeof_doubleE = 8ULL;
 
-_ZN3edg23targ_sizeof_far_pointerE = 4UL;
+_ZN3edg23targ_sizeof_far_pointerE = 4ULL;
 
-_ZN3edg17targ_sizeof_floatE = 4UL;
-_ZN3edg20targ_sizeof_float128E = 16UL;
-_ZN3edg19targ_sizeof_float80E = 12UL;
-_ZN3edg15targ_sizeof_intE = 4UL;
+_ZN3edg17targ_sizeof_floatE = 4ULL;
+_ZN3edg20targ_sizeof_float128E = 16ULL;
+_ZN3edg19targ_sizeof_float80E = 12ULL;
+_ZN3edg15targ_sizeof_intE = 4ULL;
 
-_ZN3edg18targ_sizeof_int128E = 16UL;
+_ZN3edg18targ_sizeof_int128E = 16ULL;
+#line 321
+_ZN3edg16targ_sizeof_longE = 4ULL;
+_ZN3edg23targ_sizeof_long_doubleE = 12ULL;
 
-
-_ZN3edg31targ_sizeof_largest_fixed_pointE = 8UL;
-
-
-_ZN3edg16targ_sizeof_longE = 4UL;
-_ZN3edg23targ_sizeof_long_doubleE = 12UL;
-
-_ZN3edg21targ_sizeof_long_longE = 8UL;
+_ZN3edg21targ_sizeof_long_longE = 8ULL;
 
 
-_ZN3edg26targ_sizeof_largest_atomicE = 8UL;
+_ZN3edg26targ_sizeof_largest_atomicE = 8ULL;
 
 
-_ZN3edg24targ_sizeof_near_pointerE = 2UL;
+_ZN3edg24targ_sizeof_near_pointerE = 2ULL;
 
-_ZN3edg19targ_sizeof_pointerE = 4UL;
-_ZN3edg30targ_sizeof_ptr_to_data_memberE = 4UL;
+_ZN3edg19targ_sizeof_pointerE = 4ULL;
+_ZN3edg30targ_sizeof_ptr_to_data_memberE = 4ULL;
 
-_ZN3edg34targ_sizeof_ptr_to_member_functionE = 8UL;
-# 341
-_ZN3edg17targ_sizeof_shortE = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[1]))[0]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[1]))[1]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[2]))[0]) = 8UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[2]))[1]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[0]))[0]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[0]))[1]) = 1UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[1]))[0]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[1]))[1]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[2]))[0]) = 8UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[2]))[1]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[0]))[0]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[0]))[1]) = 1UL;
-
-
-_ZN3edg33targ_sizeof_virtual_function_infoE = 4UL;
+_ZN3edg34targ_sizeof_ptr_to_member_functionE = 8ULL;
+#line 341
+_ZN3edg17targ_sizeof_shortE = 2ULL;
+#line 368
+_ZN3edg33targ_sizeof_virtual_function_infoE = 4ULL;
 
 _ZN3edg20targ_size_t_int_kindE = _ZN3edg15ik_unsigned_intE;
-_ZN3edg15targ_size_t_maxE = 4294967295UL;
+_ZN3edg15targ_size_t_maxE = 4294967295ULL;
 
 _ZN3edg21targ_ssize_t_int_kindE = _ZN3edg6ik_intE;
 
@@ -6917,9 +6781,9 @@ _ZN3edg50targ_zero_width_bit_field_affects_struct_alignmentE = 1;
 _ZN3edg35targ_zero_width_bit_field_alignmentE = (-1); 
 
 }
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg29dump_target_config_linux_i686Ev(void)
-# 78
+#line 78
 {
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_DOUBLE_linux_i686")), ((const char *)("8")));
 
@@ -6946,34 +6810,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_PTR_TO_MEMBER_FUNCTION_linux_i686")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_MICROSOFT_PTR_TO_MEMBER_SIZING_linux_i686")), ((const char *)("0")));
-# 109
+#line 109
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SHORT_linux_i686")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_ACCUM_linux_i686")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_FRACT_linux_i686")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_LONG_ACCUM_linux_i686")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_LONG_FRACT_linux_i686")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_SHORT_ACCUM_linux_i686")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_SHORT_FRACT_linux_i686")), ((const char *)("1")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_ACCUM_linux_i686")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_FRACT_linux_i686")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_LONG_ACCUM_linux_i686")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_LONG_FRACT_linux_i686")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_SHORT_ACCUM_linux_i686")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_SHORT_FRACT_linux_i686")), ((const char *)("1")));
-
-
+#line 136
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_VIRTUAL_FUNCTION_INFO_linux_i686")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALL_POINTERS_SAME_SIZE_linux_i686")), ((const char *)("1")));
@@ -7021,41 +6860,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FLT80_MAX_EXP_linux_i686")), ((const char *)("(16384)")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FLT80_MIN_EXP_linux_i686")), ((const char *)("(-16381)")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FORCE_ONE_BIT_BIT_FIELD_TO_BE_UNSIGNED_linux_i686")), ((const char *)("0")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_ACCUM_linux_i686")), ((const char *)("15")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_FRACT_linux_i686")), ((const char *)("15")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_LONG_ACCUM_linux_i686")), ((const char *)("31")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_LONG_FRACT_linux_i686")), ((const char *)("31")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_SHORT_ACCUM_linux_i686")), ((const char *)("7")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_SHORT_FRACT_linux_i686")), ((const char *)("7")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_ACCUM_linux_i686")), ((const char *)("16")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_FRACT_linux_i686")), ((const char *)("16")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_LONG_ACCUM_linux_i686")), ((const char *)("32")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_LONG_FRACT_linux_i686")), ((const char *)("32")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_SHORT_ACCUM_linux_i686")), ((const char *)("8")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_SHORT_FRACT_linux_i686")), ((const char *)("8")));
-
-
-
+#line 218
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_HAS_SIGNED_CHARS_linux_i686")), ((const char *)("1")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_HOST_STRING_CHAR_BIT_linux_i686")), ((const char *)("8")));
 
@@ -7138,7 +6943,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_REUSE_TAIL_PADDING_linux_i686")), ((const char *)("1")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_RIGHT_SHIFT_IS_ARITHMETIC_linux_i686")), ((const char *)("1")));
-# 305
+#line 305
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SHORT_FIELD_ALIGNMENT_linux_i686")), ((const char *)("2")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_DOUBLE_linux_i686")), ((const char *)("8")));
 
@@ -7150,11 +6955,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_INT_linux_i686")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_INT128_linux_i686")), ((const char *)("16")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LARGEST_FIXED_POINT_linux_i686")), ((const char *)("8")));
-
-
+#line 321
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LONG_linux_i686")), ((const char *)("4")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LONG_DOUBLE_linux_i686")), ((const char *)("12")));
 
@@ -7170,34 +6971,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_DATA_MEMBER_linux_i686")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_MEMBER_FUNCTION_linux_i686")), ((const char *)("(4+4)")));
-# 341
+#line 341
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SHORT_linux_i686")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_ACCUM_linux_i686")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_FRACT_linux_i686")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_LONG_ACCUM_linux_i686")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_LONG_FRACT_linux_i686")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_SHORT_ACCUM_linux_i686")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_SHORT_FRACT_linux_i686")), ((const char *)("1")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_ACCUM_linux_i686")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_FRACT_linux_i686")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_LONG_ACCUM_linux_i686")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_LONG_FRACT_linux_i686")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_SHORT_ACCUM_linux_i686")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_SHORT_FRACT_linux_i686")), ((const char *)("1")));
-
-
+#line 368
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_VIRTUAL_FUNCTION_INFO_linux_i686")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZE_T_INT_KIND_linux_i686")), ((const char *)("((an_integer_kind)ik_unsigned_int)")));
@@ -7238,9 +7014,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ZERO_WIDTH_BIT_FIELD_ALIGNMENT_linux_i686")), ((const char *)("(-1)"))); 
 
 }
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg23set_target_config_win64Ev(void)
-# 78
+#line 78
 {
 _ZN3edg19targ_alignof_doubleE = ((_ZN3edg16a_targ_alignmentE)8U);
 
@@ -7267,34 +7043,9 @@ _ZN3edg31targ_alignof_ptr_to_data_memberE = ((_ZN3edg16a_targ_alignmentE)4U);
 _ZN3edg35targ_alignof_ptr_to_member_functionE = ((_ZN3edg16a_targ_alignmentE)8U);
 
 _ZN3edg35targ_microsoft_ptr_to_member_sizingE = ((_ZN3edg9a_booleanE)0);
-# 109
+#line 109
 _ZN3edg18targ_alignof_shortE = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)1U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)1U);
-
-
+#line 136
 _ZN3edg34targ_alignof_virtual_function_infoE = ((_ZN3edg16a_targ_alignmentE)8U);
 
 _ZN3edg27targ_all_pointers_same_sizeE = ((_ZN3edg9a_booleanE)1);
@@ -7310,7 +7061,7 @@ _ZN3edg22targ_char32_t_int_kindE = _ZN3edg15ik_unsigned_intE;
 _ZN3edg13targ_char_bitE = 8U;
 _ZN3edg46targ_char_constant_first_char_most_significantE = ((_ZN3edg9a_booleanE)1);
 
-_ZN3edg17targ_dbl_mant_digE = 53UL;
+_ZN3edg17targ_dbl_mant_digE = 53ULL;
 _ZN3edg16targ_dbl_max_expE = 1024;
 _ZN3edg16targ_dbl_min_expE = (-1021);
 _ZN3edg26targ_default_new_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
@@ -7327,7 +7078,7 @@ _ZN3edg39targ_enum_types_can_be_smaller_than_intE = ((_ZN3edg9a_booleanE)0);
 
 _ZN3edg46targ_field_alloc_sequence_equals_decl_sequenceE = ((_ZN3edg9a_booleanE)1);
 
-_ZN3edg17targ_flt_mant_digE = 24UL;
+_ZN3edg17targ_flt_mant_digE = 24ULL;
 _ZN3edg16targ_flt_max_expE = 128;
 _ZN3edg16targ_flt_min_expE = (-125);
 _ZN3edg26targ_float_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)4U);
@@ -7335,48 +7086,14 @@ _ZN3edg29targ_float128_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
 
 _ZN3edg28targ_float80_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)4U);
 
-_ZN3edg20targ_flt128_mant_digE = 113UL;
+_ZN3edg20targ_flt128_mant_digE = 113ULL;
 _ZN3edg19targ_flt128_max_expE = 16384;
 _ZN3edg19targ_flt128_min_expE = (-16381);
-_ZN3edg19targ_flt80_mant_digE = 64UL;
+_ZN3edg19targ_flt80_mant_digE = 64ULL;
 _ZN3edg18targ_flt80_max_expE = 16384;
 _ZN3edg18targ_flt80_min_expE = (-16381);
 _ZN3edg43targ_force_one_bit_bit_field_to_be_unsignedE = ((_ZN3edg9a_booleanE)1);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)15U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)15U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)31U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)31U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)7U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)7U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)16U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)16U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)32U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)32U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-
-
+#line 218
 _ZN3edg21targ_has_signed_charsE = ((_ZN3edg9a_booleanE)1);
 _ZN3edg25targ_host_string_char_bitE = 8U;
 
@@ -7411,7 +7128,7 @@ _ZN3edg25targ_jmp_buf_num_elementsE = 39U;
 
 _ZN3edg16targ_setjmp_funcE = ((const char *)"setjmp");
 
-_ZN3edg18targ_ldbl_mant_digE = 53UL;
+_ZN3edg18targ_ldbl_mant_digE = 53ULL;
 _ZN3edg17targ_ldbl_max_expE = 1024;
 _ZN3edg17targ_ldbl_min_expE = (-1021);
 
@@ -7430,8 +7147,8 @@ _ZN3edg30targ_long_long_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)8U);
 
 _ZN3edg32targ_maximum_intrinsic_alignmentE = ((_ZN3edg16a_targ_alignmentE)8U);
 
-_ZN3edg26targ_max_base_class_offsetE = 0UL;
-_ZN3edg26targ_max_class_object_sizeE = 0UL;
+_ZN3edg26targ_max_base_class_offsetE = 0ULL;
+_ZN3edg26targ_max_class_object_sizeE = 0ULL;
 _ZN3edg35targ_microsoft_bit_field_allocationE = ((_ZN3edg9a_booleanE)0);
 
 _ZN3edg29targ_minimum_struct_alignmentE = ((_ZN3edg16a_targ_alignmentE)1U);
@@ -7459,70 +7176,41 @@ _ZN3edg27targ_ets_flag_type_int_kindE = _ZN3edg15ik_unsigned_intE;
 _ZN3edg23targ_reuse_tail_paddingE = ((_ZN3edg9a_booleanE)1);
 
 _ZN3edg30targ_right_shift_is_arithmeticE = ((_ZN3edg9a_booleanE)1);
-# 305
+#line 305
 _ZN3edg26targ_short_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)2U);
-_ZN3edg18targ_sizeof_doubleE = 8UL;
+_ZN3edg18targ_sizeof_doubleE = 8ULL;
 
-_ZN3edg23targ_sizeof_far_pointerE = 4UL;
+_ZN3edg23targ_sizeof_far_pointerE = 4ULL;
 
-_ZN3edg17targ_sizeof_floatE = 4UL;
-_ZN3edg20targ_sizeof_float128E = 16UL;
-_ZN3edg19targ_sizeof_float80E = 12UL;
-_ZN3edg15targ_sizeof_intE = 4UL;
+_ZN3edg17targ_sizeof_floatE = 4ULL;
+_ZN3edg20targ_sizeof_float128E = 16ULL;
+_ZN3edg19targ_sizeof_float80E = 12ULL;
+_ZN3edg15targ_sizeof_intE = 4ULL;
 
-_ZN3edg18targ_sizeof_int128E = 16UL;
+_ZN3edg18targ_sizeof_int128E = 16ULL;
+#line 321
+_ZN3edg16targ_sizeof_longE = 4ULL;
+_ZN3edg23targ_sizeof_long_doubleE = 8ULL;
 
-
-_ZN3edg31targ_sizeof_largest_fixed_pointE = 8UL;
-
-
-_ZN3edg16targ_sizeof_longE = 4UL;
-_ZN3edg23targ_sizeof_long_doubleE = 8UL;
-
-_ZN3edg21targ_sizeof_long_longE = 8UL;
+_ZN3edg21targ_sizeof_long_longE = 8ULL;
 
 
-_ZN3edg26targ_sizeof_largest_atomicE = 16UL;
+_ZN3edg26targ_sizeof_largest_atomicE = 16ULL;
 
 
-_ZN3edg24targ_sizeof_near_pointerE = 2UL;
+_ZN3edg24targ_sizeof_near_pointerE = 2ULL;
 
-_ZN3edg19targ_sizeof_pointerE = 8UL;
-_ZN3edg30targ_sizeof_ptr_to_data_memberE = 4UL;
+_ZN3edg19targ_sizeof_pointerE = 8ULL;
+_ZN3edg30targ_sizeof_ptr_to_data_memberE = 4ULL;
 
-_ZN3edg34targ_sizeof_ptr_to_member_functionE = 16UL;
-# 341
-_ZN3edg17targ_sizeof_shortE = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[1]))[0]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[1]))[1]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[2]))[0]) = 8UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[2]))[1]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[0]))[0]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[0]))[1]) = 1UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[1]))[0]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[1]))[1]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[2]))[0]) = 8UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[2]))[1]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[0]))[0]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[0]))[1]) = 1UL;
-
-
-_ZN3edg33targ_sizeof_virtual_function_infoE = 8UL;
+_ZN3edg34targ_sizeof_ptr_to_member_functionE = 16ULL;
+#line 341
+_ZN3edg17targ_sizeof_shortE = 2ULL;
+#line 368
+_ZN3edg33targ_sizeof_virtual_function_infoE = 8ULL;
 
 _ZN3edg20targ_size_t_int_kindE = _ZN3edg21ik_unsigned_long_longE;
-_ZN3edg15targ_size_t_maxE = 18446744073709551615UL;
+_ZN3edg15targ_size_t_maxE = 18446744073709551615ULL;
 
 _ZN3edg21targ_ssize_t_int_kindE = _ZN3edg12ik_long_longE;
 
@@ -7559,9 +7247,9 @@ _ZN3edg50targ_zero_width_bit_field_affects_struct_alignmentE = 1;
 _ZN3edg35targ_zero_width_bit_field_alignmentE = 4; 
 
 }
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg24dump_target_config_win64Ev(void)
-# 78
+#line 78
 {
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_DOUBLE_win64")), ((const char *)("8")));
 
@@ -7588,34 +7276,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_PTR_TO_MEMBER_FUNCTION_win64")), ((const char *)("8")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_MICROSOFT_PTR_TO_MEMBER_SIZING_win64")), ((const char *)("(0!=0)")));
-# 109
+#line 109
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SHORT_win64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_ACCUM_win64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_FRACT_win64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_LONG_ACCUM_win64")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_LONG_FRACT_win64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_SHORT_ACCUM_win64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_SHORT_FRACT_win64")), ((const char *)("1")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_ACCUM_win64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_FRACT_win64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_LONG_ACCUM_win64")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_LONG_FRACT_win64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_SHORT_ACCUM_win64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_SHORT_FRACT_win64")), ((const char *)("1")));
-
-
+#line 136
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_VIRTUAL_FUNCTION_INFO_win64")), ((const char *)("8")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALL_POINTERS_SAME_SIZE_win64")), ((const char *)("1")));
@@ -7663,41 +7326,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FLT80_MAX_EXP_win64")), ((const char *)("(16384)")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FLT80_MIN_EXP_win64")), ((const char *)("(-16381)")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FORCE_ONE_BIT_BIT_FIELD_TO_BE_UNSIGNED_win64")), ((const char *)("1")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_ACCUM_win64")), ((const char *)("15")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_FRACT_win64")), ((const char *)("15")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_LONG_ACCUM_win64")), ((const char *)("31")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_LONG_FRACT_win64")), ((const char *)("31")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_SHORT_ACCUM_win64")), ((const char *)("7")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_SHORT_FRACT_win64")), ((const char *)("7")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_ACCUM_win64")), ((const char *)("16")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_FRACT_win64")), ((const char *)("16")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_LONG_ACCUM_win64")), ((const char *)("32")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_LONG_FRACT_win64")), ((const char *)("32")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_SHORT_ACCUM_win64")), ((const char *)("8")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_SHORT_FRACT_win64")), ((const char *)("8")));
-
-
-
+#line 218
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_HAS_SIGNED_CHARS_win64")), ((const char *)("1")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_HOST_STRING_CHAR_BIT_win64")), ((const char *)("8")));
 
@@ -7780,7 +7409,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_REUSE_TAIL_PADDING_win64")), ((const char *)("1")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_RIGHT_SHIFT_IS_ARITHMETIC_win64")), ((const char *)("1")));
-# 305
+#line 305
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SHORT_FIELD_ALIGNMENT_win64")), ((const char *)("2")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_DOUBLE_win64")), ((const char *)("8")));
 
@@ -7792,11 +7421,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_INT_win64")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_INT128_win64")), ((const char *)("16")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LARGEST_FIXED_POINT_win64")), ((const char *)("8")));
-
-
+#line 321
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LONG_win64")), ((const char *)("4")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LONG_DOUBLE_win64")), ((const char *)("8")));
 
@@ -7812,34 +7437,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_DATA_MEMBER_win64")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_MEMBER_FUNCTION_win64")), ((const char *)("16")));
-# 341
+#line 341
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SHORT_win64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_ACCUM_win64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_FRACT_win64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_LONG_ACCUM_win64")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_LONG_FRACT_win64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_SHORT_ACCUM_win64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_SHORT_FRACT_win64")), ((const char *)("1")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_ACCUM_win64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_FRACT_win64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_LONG_ACCUM_win64")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_LONG_FRACT_win64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_SHORT_ACCUM_win64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_SHORT_FRACT_win64")), ((const char *)("1")));
-
-
+#line 368
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_VIRTUAL_FUNCTION_INFO_win64")), ((const char *)("8")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZE_T_INT_KIND_win64")), ((const char *)("((an_integer_kind)ik_unsigned_long_long)")));
@@ -7880,9 +7480,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ZERO_WIDTH_BIT_FIELD_ALIGNMENT_win64")), ((const char *)("4"))); 
 
 }
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg23set_target_config_win32Ev(void)
-# 78
+#line 78
 {
 _ZN3edg19targ_alignof_doubleE = ((_ZN3edg16a_targ_alignmentE)8U);
 
@@ -7909,34 +7509,9 @@ _ZN3edg31targ_alignof_ptr_to_data_memberE = ((_ZN3edg16a_targ_alignmentE)4U);
 _ZN3edg35targ_alignof_ptr_to_member_functionE = ((_ZN3edg16a_targ_alignmentE)4U);
 
 _ZN3edg35targ_microsoft_ptr_to_member_sizingE = ((_ZN3edg9a_booleanE)0);
-# 109
+#line 109
 _ZN3edg18targ_alignof_shortE = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)1U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)1U);
-
-
+#line 136
 _ZN3edg34targ_alignof_virtual_function_infoE = ((_ZN3edg16a_targ_alignmentE)4U);
 
 _ZN3edg27targ_all_pointers_same_sizeE = ((_ZN3edg9a_booleanE)1);
@@ -7952,7 +7527,7 @@ _ZN3edg22targ_char32_t_int_kindE = _ZN3edg15ik_unsigned_intE;
 _ZN3edg13targ_char_bitE = 8U;
 _ZN3edg46targ_char_constant_first_char_most_significantE = ((_ZN3edg9a_booleanE)1);
 
-_ZN3edg17targ_dbl_mant_digE = 53UL;
+_ZN3edg17targ_dbl_mant_digE = 53ULL;
 _ZN3edg16targ_dbl_max_expE = 1024;
 _ZN3edg16targ_dbl_min_expE = (-1021);
 _ZN3edg26targ_default_new_alignmentE = ((_ZN3edg16a_targ_alignmentE)8U);
@@ -7969,7 +7544,7 @@ _ZN3edg39targ_enum_types_can_be_smaller_than_intE = ((_ZN3edg9a_booleanE)0);
 
 _ZN3edg46targ_field_alloc_sequence_equals_decl_sequenceE = ((_ZN3edg9a_booleanE)1);
 
-_ZN3edg17targ_flt_mant_digE = 24UL;
+_ZN3edg17targ_flt_mant_digE = 24ULL;
 _ZN3edg16targ_flt_max_expE = 128;
 _ZN3edg16targ_flt_min_expE = (-125);
 _ZN3edg26targ_float_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)4U);
@@ -7977,48 +7552,14 @@ _ZN3edg29targ_float128_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
 
 _ZN3edg28targ_float80_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)4U);
 
-_ZN3edg20targ_flt128_mant_digE = 113UL;
+_ZN3edg20targ_flt128_mant_digE = 113ULL;
 _ZN3edg19targ_flt128_max_expE = 16384;
 _ZN3edg19targ_flt128_min_expE = (-16381);
-_ZN3edg19targ_flt80_mant_digE = 64UL;
+_ZN3edg19targ_flt80_mant_digE = 64ULL;
 _ZN3edg18targ_flt80_max_expE = 16384;
 _ZN3edg18targ_flt80_min_expE = (-16381);
 _ZN3edg43targ_force_one_bit_bit_field_to_be_unsignedE = ((_ZN3edg9a_booleanE)1);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)15U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)15U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)31U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)31U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)7U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)7U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)16U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)16U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)32U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)32U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-
-
+#line 218
 _ZN3edg21targ_has_signed_charsE = ((_ZN3edg9a_booleanE)1);
 _ZN3edg25targ_host_string_char_bitE = 8U;
 
@@ -8053,7 +7594,7 @@ _ZN3edg25targ_jmp_buf_num_elementsE = 16U;
 
 _ZN3edg16targ_setjmp_funcE = ((const char *)"setjmp");
 
-_ZN3edg18targ_ldbl_mant_digE = 53UL;
+_ZN3edg18targ_ldbl_mant_digE = 53ULL;
 _ZN3edg17targ_ldbl_max_expE = 1024;
 _ZN3edg17targ_ldbl_min_expE = (-1021);
 
@@ -8072,8 +7613,8 @@ _ZN3edg30targ_long_long_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)8U);
 
 _ZN3edg32targ_maximum_intrinsic_alignmentE = ((_ZN3edg16a_targ_alignmentE)8U);
 
-_ZN3edg26targ_max_base_class_offsetE = 0UL;
-_ZN3edg26targ_max_class_object_sizeE = 0UL;
+_ZN3edg26targ_max_base_class_offsetE = 0ULL;
+_ZN3edg26targ_max_class_object_sizeE = 0ULL;
 _ZN3edg35targ_microsoft_bit_field_allocationE = ((_ZN3edg9a_booleanE)1);
 
 _ZN3edg29targ_minimum_struct_alignmentE = ((_ZN3edg16a_targ_alignmentE)1U);
@@ -8101,70 +7642,41 @@ _ZN3edg27targ_ets_flag_type_int_kindE = _ZN3edg15ik_unsigned_intE;
 _ZN3edg23targ_reuse_tail_paddingE = ((_ZN3edg9a_booleanE)1);
 
 _ZN3edg30targ_right_shift_is_arithmeticE = ((_ZN3edg9a_booleanE)1);
-# 305
+#line 305
 _ZN3edg26targ_short_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)2U);
-_ZN3edg18targ_sizeof_doubleE = 8UL;
+_ZN3edg18targ_sizeof_doubleE = 8ULL;
 
-_ZN3edg23targ_sizeof_far_pointerE = 4UL;
+_ZN3edg23targ_sizeof_far_pointerE = 4ULL;
 
-_ZN3edg17targ_sizeof_floatE = 4UL;
-_ZN3edg20targ_sizeof_float128E = 16UL;
-_ZN3edg19targ_sizeof_float80E = 12UL;
-_ZN3edg15targ_sizeof_intE = 4UL;
+_ZN3edg17targ_sizeof_floatE = 4ULL;
+_ZN3edg20targ_sizeof_float128E = 16ULL;
+_ZN3edg19targ_sizeof_float80E = 12ULL;
+_ZN3edg15targ_sizeof_intE = 4ULL;
 
-_ZN3edg18targ_sizeof_int128E = 16UL;
+_ZN3edg18targ_sizeof_int128E = 16ULL;
+#line 321
+_ZN3edg16targ_sizeof_longE = 4ULL;
+_ZN3edg23targ_sizeof_long_doubleE = 8ULL;
 
-
-_ZN3edg31targ_sizeof_largest_fixed_pointE = 8UL;
-
-
-_ZN3edg16targ_sizeof_longE = 4UL;
-_ZN3edg23targ_sizeof_long_doubleE = 8UL;
-
-_ZN3edg21targ_sizeof_long_longE = 8UL;
+_ZN3edg21targ_sizeof_long_longE = 8ULL;
 
 
-_ZN3edg26targ_sizeof_largest_atomicE = 8UL;
+_ZN3edg26targ_sizeof_largest_atomicE = 8ULL;
 
 
-_ZN3edg24targ_sizeof_near_pointerE = 2UL;
+_ZN3edg24targ_sizeof_near_pointerE = 2ULL;
 
-_ZN3edg19targ_sizeof_pointerE = 4UL;
-_ZN3edg30targ_sizeof_ptr_to_data_memberE = 4UL;
+_ZN3edg19targ_sizeof_pointerE = 4ULL;
+_ZN3edg30targ_sizeof_ptr_to_data_memberE = 4ULL;
 
-_ZN3edg34targ_sizeof_ptr_to_member_functionE = 8UL;
-# 341
-_ZN3edg17targ_sizeof_shortE = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[1]))[0]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[1]))[1]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[2]))[0]) = 8UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[2]))[1]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[0]))[0]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[0]))[1]) = 1UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[1]))[0]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[1]))[1]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[2]))[0]) = 8UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[2]))[1]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[0]))[0]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[0]))[1]) = 1UL;
-
-
-_ZN3edg33targ_sizeof_virtual_function_infoE = 4UL;
+_ZN3edg34targ_sizeof_ptr_to_member_functionE = 8ULL;
+#line 341
+_ZN3edg17targ_sizeof_shortE = 2ULL;
+#line 368
+_ZN3edg33targ_sizeof_virtual_function_infoE = 4ULL;
 
 _ZN3edg20targ_size_t_int_kindE = _ZN3edg15ik_unsigned_intE;
-_ZN3edg15targ_size_t_maxE = 4294967295UL;
+_ZN3edg15targ_size_t_maxE = 4294967295ULL;
 
 _ZN3edg21targ_ssize_t_int_kindE = _ZN3edg6ik_intE;
 
@@ -8201,9 +7713,9 @@ _ZN3edg50targ_zero_width_bit_field_affects_struct_alignmentE = 1;
 _ZN3edg35targ_zero_width_bit_field_alignmentE = (-1); 
 
 }
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg24dump_target_config_win32Ev(void)
-# 78
+#line 78
 {
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_DOUBLE_win32")), ((const char *)("8")));
 
@@ -8230,34 +7742,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_PTR_TO_MEMBER_FUNCTION_win32")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_MICROSOFT_PTR_TO_MEMBER_SIZING_win32")), ((const char *)("(0!=0)")));
-# 109
+#line 109
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SHORT_win32")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_ACCUM_win32")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_FRACT_win32")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_LONG_ACCUM_win32")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_LONG_FRACT_win32")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_SHORT_ACCUM_win32")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_SHORT_FRACT_win32")), ((const char *)("1")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_ACCUM_win32")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_FRACT_win32")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_LONG_ACCUM_win32")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_LONG_FRACT_win32")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_SHORT_ACCUM_win32")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_SHORT_FRACT_win32")), ((const char *)("1")));
-
-
+#line 136
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_VIRTUAL_FUNCTION_INFO_win32")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALL_POINTERS_SAME_SIZE_win32")), ((const char *)("1")));
@@ -8305,41 +7792,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FLT80_MAX_EXP_win32")), ((const char *)("(16384)")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FLT80_MIN_EXP_win32")), ((const char *)("(-16381)")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FORCE_ONE_BIT_BIT_FIELD_TO_BE_UNSIGNED_win32")), ((const char *)("1")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_ACCUM_win32")), ((const char *)("15")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_FRACT_win32")), ((const char *)("15")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_LONG_ACCUM_win32")), ((const char *)("31")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_LONG_FRACT_win32")), ((const char *)("31")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_SHORT_ACCUM_win32")), ((const char *)("7")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_SHORT_FRACT_win32")), ((const char *)("7")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_ACCUM_win32")), ((const char *)("16")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_FRACT_win32")), ((const char *)("16")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_LONG_ACCUM_win32")), ((const char *)("32")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_LONG_FRACT_win32")), ((const char *)("32")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_SHORT_ACCUM_win32")), ((const char *)("8")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_SHORT_FRACT_win32")), ((const char *)("8")));
-
-
-
+#line 218
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_HAS_SIGNED_CHARS_win32")), ((const char *)("1")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_HOST_STRING_CHAR_BIT_win32")), ((const char *)("8")));
 
@@ -8422,7 +7875,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_REUSE_TAIL_PADDING_win32")), ((const char *)("1")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_RIGHT_SHIFT_IS_ARITHMETIC_win32")), ((const char *)("1")));
-# 305
+#line 305
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SHORT_FIELD_ALIGNMENT_win32")), ((const char *)("2")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_DOUBLE_win32")), ((const char *)("8")));
 
@@ -8434,11 +7887,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_INT_win32")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_INT128_win32")), ((const char *)("16")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LARGEST_FIXED_POINT_win32")), ((const char *)("8")));
-
-
+#line 321
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LONG_win32")), ((const char *)("4")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LONG_DOUBLE_win32")), ((const char *)("8")));
 
@@ -8454,34 +7903,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_DATA_MEMBER_win32")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_MEMBER_FUNCTION_win32")), ((const char *)("((((2*2+4-1)/4)+1)* 4)")));
-# 341
+#line 341
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SHORT_win32")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_ACCUM_win32")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_FRACT_win32")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_LONG_ACCUM_win32")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_LONG_FRACT_win32")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_SHORT_ACCUM_win32")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_SHORT_FRACT_win32")), ((const char *)("1")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_ACCUM_win32")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_FRACT_win32")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_LONG_ACCUM_win32")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_LONG_FRACT_win32")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_SHORT_ACCUM_win32")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_SHORT_FRACT_win32")), ((const char *)("1")));
-
-
+#line 368
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_VIRTUAL_FUNCTION_INFO_win32")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZE_T_INT_KIND_win32")), ((const char *)("((an_integer_kind)ik_unsigned_int)")));
@@ -8522,9 +7946,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ZERO_WIDTH_BIT_FIELD_ALIGNMENT_win32")), ((const char *)("(-1)"))); 
 
 }
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg31set_target_config_linux_aarch64Ev(void)
-# 78
+#line 78
 {
 _ZN3edg19targ_alignof_doubleE = ((_ZN3edg16a_targ_alignmentE)8U);
 
@@ -8551,34 +7975,9 @@ _ZN3edg31targ_alignof_ptr_to_data_memberE = ((_ZN3edg16a_targ_alignmentE)8U);
 _ZN3edg35targ_alignof_ptr_to_member_functionE = ((_ZN3edg16a_targ_alignmentE)8U);
 
 _ZN3edg35targ_microsoft_ptr_to_member_sizingE = ((_ZN3edg9a_booleanE)0);
-# 109
+#line 109
 _ZN3edg18targ_alignof_shortE = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)1U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)1U);
-
-
+#line 136
 _ZN3edg34targ_alignof_virtual_function_infoE = ((_ZN3edg16a_targ_alignmentE)8U);
 
 _ZN3edg27targ_all_pointers_same_sizeE = ((_ZN3edg9a_booleanE)1);
@@ -8594,7 +7993,7 @@ _ZN3edg22targ_char32_t_int_kindE = _ZN3edg15ik_unsigned_intE;
 _ZN3edg13targ_char_bitE = 8U;
 _ZN3edg46targ_char_constant_first_char_most_significantE = ((_ZN3edg9a_booleanE)1);
 
-_ZN3edg17targ_dbl_mant_digE = 53UL;
+_ZN3edg17targ_dbl_mant_digE = 53ULL;
 _ZN3edg16targ_dbl_max_expE = 1024;
 _ZN3edg16targ_dbl_min_expE = (-1021);
 _ZN3edg26targ_default_new_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
@@ -8611,7 +8010,7 @@ _ZN3edg39targ_enum_types_can_be_smaller_than_intE = ((_ZN3edg9a_booleanE)0);
 
 _ZN3edg46targ_field_alloc_sequence_equals_decl_sequenceE = ((_ZN3edg9a_booleanE)1);
 
-_ZN3edg17targ_flt_mant_digE = 24UL;
+_ZN3edg17targ_flt_mant_digE = 24ULL;
 _ZN3edg16targ_flt_max_expE = 128;
 _ZN3edg16targ_flt_min_expE = (-125);
 _ZN3edg26targ_float_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)4U);
@@ -8619,48 +8018,14 @@ _ZN3edg29targ_float128_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
 
 _ZN3edg28targ_float80_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
 
-_ZN3edg20targ_flt128_mant_digE = 113UL;
+_ZN3edg20targ_flt128_mant_digE = 113ULL;
 _ZN3edg19targ_flt128_max_expE = 16384;
 _ZN3edg19targ_flt128_min_expE = (-16381);
-_ZN3edg19targ_flt80_mant_digE = 64UL;
+_ZN3edg19targ_flt80_mant_digE = 64ULL;
 _ZN3edg18targ_flt80_max_expE = 16384;
 _ZN3edg18targ_flt80_min_expE = (-16381);
 _ZN3edg43targ_force_one_bit_bit_field_to_be_unsignedE = ((_ZN3edg9a_booleanE)1);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)15U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)15U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)31U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)31U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)7U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)7U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)16U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)16U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)32U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)32U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-
-
+#line 218
 _ZN3edg21targ_has_signed_charsE = ((_ZN3edg9a_booleanE)1);
 _ZN3edg25targ_host_string_char_bitE = 8U;
 
@@ -8695,7 +8060,7 @@ _ZN3edg25targ_jmp_buf_num_elementsE = 25U;
 
 _ZN3edg16targ_setjmp_funcE = ((const char *)"_setjmp");
 
-_ZN3edg18targ_ldbl_mant_digE = 64UL;
+_ZN3edg18targ_ldbl_mant_digE = 64ULL;
 _ZN3edg17targ_ldbl_max_expE = 16384;
 _ZN3edg17targ_ldbl_min_expE = (-16381);
 
@@ -8714,8 +8079,8 @@ _ZN3edg30targ_long_long_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)8U);
 
 _ZN3edg32targ_maximum_intrinsic_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
 
-_ZN3edg26targ_max_base_class_offsetE = 0UL;
-_ZN3edg26targ_max_class_object_sizeE = 0UL;
+_ZN3edg26targ_max_base_class_offsetE = 0ULL;
+_ZN3edg26targ_max_class_object_sizeE = 0ULL;
 _ZN3edg35targ_microsoft_bit_field_allocationE = ((_ZN3edg9a_booleanE)0);
 
 _ZN3edg29targ_minimum_struct_alignmentE = ((_ZN3edg16a_targ_alignmentE)1U);
@@ -8743,70 +8108,41 @@ _ZN3edg27targ_ets_flag_type_int_kindE = _ZN3edg15ik_unsigned_intE;
 _ZN3edg23targ_reuse_tail_paddingE = ((_ZN3edg9a_booleanE)1);
 
 _ZN3edg30targ_right_shift_is_arithmeticE = ((_ZN3edg9a_booleanE)1);
-# 305
+#line 305
 _ZN3edg26targ_short_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)2U);
-_ZN3edg18targ_sizeof_doubleE = 8UL;
+_ZN3edg18targ_sizeof_doubleE = 8ULL;
 
-_ZN3edg23targ_sizeof_far_pointerE = 4UL;
+_ZN3edg23targ_sizeof_far_pointerE = 4ULL;
 
-_ZN3edg17targ_sizeof_floatE = 4UL;
-_ZN3edg20targ_sizeof_float128E = 16UL;
-_ZN3edg19targ_sizeof_float80E = 12UL;
-_ZN3edg15targ_sizeof_intE = 4UL;
+_ZN3edg17targ_sizeof_floatE = 4ULL;
+_ZN3edg20targ_sizeof_float128E = 16ULL;
+_ZN3edg19targ_sizeof_float80E = 12ULL;
+_ZN3edg15targ_sizeof_intE = 4ULL;
 
-_ZN3edg18targ_sizeof_int128E = 16UL;
+_ZN3edg18targ_sizeof_int128E = 16ULL;
+#line 321
+_ZN3edg16targ_sizeof_longE = 8ULL;
+_ZN3edg23targ_sizeof_long_doubleE = 16ULL;
 
-
-_ZN3edg31targ_sizeof_largest_fixed_pointE = 8UL;
-
-
-_ZN3edg16targ_sizeof_longE = 8UL;
-_ZN3edg23targ_sizeof_long_doubleE = 16UL;
-
-_ZN3edg21targ_sizeof_long_longE = 8UL;
+_ZN3edg21targ_sizeof_long_longE = 8ULL;
 
 
-_ZN3edg26targ_sizeof_largest_atomicE = 16UL;
+_ZN3edg26targ_sizeof_largest_atomicE = 16ULL;
 
 
-_ZN3edg24targ_sizeof_near_pointerE = 2UL;
+_ZN3edg24targ_sizeof_near_pointerE = 2ULL;
 
-_ZN3edg19targ_sizeof_pointerE = 8UL;
-_ZN3edg30targ_sizeof_ptr_to_data_memberE = 8UL;
+_ZN3edg19targ_sizeof_pointerE = 8ULL;
+_ZN3edg30targ_sizeof_ptr_to_data_memberE = 8ULL;
 
-_ZN3edg34targ_sizeof_ptr_to_member_functionE = 16UL;
-# 341
-_ZN3edg17targ_sizeof_shortE = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[1]))[0]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[1]))[1]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[2]))[0]) = 8UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[2]))[1]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[0]))[0]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[0]))[1]) = 1UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[1]))[0]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[1]))[1]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[2]))[0]) = 8UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[2]))[1]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[0]))[0]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[0]))[1]) = 1UL;
-
-
-_ZN3edg33targ_sizeof_virtual_function_infoE = 8UL;
+_ZN3edg34targ_sizeof_ptr_to_member_functionE = 16ULL;
+#line 341
+_ZN3edg17targ_sizeof_shortE = 2ULL;
+#line 368
+_ZN3edg33targ_sizeof_virtual_function_infoE = 8ULL;
 
 _ZN3edg20targ_size_t_int_kindE = _ZN3edg16ik_unsigned_longE;
-_ZN3edg15targ_size_t_maxE = 18446744073709551615UL;
+_ZN3edg15targ_size_t_maxE = 18446744073709551615ULL;
 
 _ZN3edg21targ_ssize_t_int_kindE = _ZN3edg7ik_longE;
 
@@ -8843,9 +8179,9 @@ _ZN3edg50targ_zero_width_bit_field_affects_struct_alignmentE = 1;
 _ZN3edg35targ_zero_width_bit_field_alignmentE = 4; 
 
 }
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg32dump_target_config_linux_aarch64Ev(void)
-# 78
+#line 78
 {
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_DOUBLE_linux_aarch64")), ((const char *)("8")));
 
@@ -8872,34 +8208,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_PTR_TO_MEMBER_FUNCTION_linux_aarch64")), ((const char *)("8")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_MICROSOFT_PTR_TO_MEMBER_SIZING_linux_aarch64")), ((const char *)("(0!=0)")));
-# 109
+#line 109
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SHORT_linux_aarch64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_ACCUM_linux_aarch64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_FRACT_linux_aarch64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_LONG_ACCUM_linux_aarch64")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_LONG_FRACT_linux_aarch64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_SHORT_ACCUM_linux_aarch64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_SHORT_FRACT_linux_aarch64")), ((const char *)("1")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_ACCUM_linux_aarch64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_FRACT_linux_aarch64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_LONG_ACCUM_linux_aarch64")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_LONG_FRACT_linux_aarch64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_SHORT_ACCUM_linux_aarch64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_SHORT_FRACT_linux_aarch64")), ((const char *)("1")));
-
-
+#line 136
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_VIRTUAL_FUNCTION_INFO_linux_aarch64")), ((const char *)("8")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALL_POINTERS_SAME_SIZE_linux_aarch64")), ((const char *)("1")));
@@ -8947,41 +8258,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FLT80_MAX_EXP_linux_aarch64")), ((const char *)("(16384)")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FLT80_MIN_EXP_linux_aarch64")), ((const char *)("(-16381)")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FORCE_ONE_BIT_BIT_FIELD_TO_BE_UNSIGNED_linux_aarch64")), ((const char *)("1")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_ACCUM_linux_aarch64")), ((const char *)("15")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_FRACT_linux_aarch64")), ((const char *)("15")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_LONG_ACCUM_linux_aarch64")), ((const char *)("31")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_LONG_FRACT_linux_aarch64")), ((const char *)("31")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_SHORT_ACCUM_linux_aarch64")), ((const char *)("7")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_SHORT_FRACT_linux_aarch64")), ((const char *)("7")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_ACCUM_linux_aarch64")), ((const char *)("16")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_FRACT_linux_aarch64")), ((const char *)("16")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_LONG_ACCUM_linux_aarch64")), ((const char *)("32")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_LONG_FRACT_linux_aarch64")), ((const char *)("32")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_SHORT_ACCUM_linux_aarch64")), ((const char *)("8")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_SHORT_FRACT_linux_aarch64")), ((const char *)("8")));
-
-
-
+#line 218
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_HAS_SIGNED_CHARS_linux_aarch64")), ((const char *)("1")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_HOST_STRING_CHAR_BIT_linux_aarch64")), ((const char *)("8")));
 
@@ -9064,7 +8341,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_REUSE_TAIL_PADDING_linux_aarch64")), ((const char *)("1")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_RIGHT_SHIFT_IS_ARITHMETIC_linux_aarch64")), ((const char *)("1")));
-# 305
+#line 305
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SHORT_FIELD_ALIGNMENT_linux_aarch64")), ((const char *)("2")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_DOUBLE_linux_aarch64")), ((const char *)("8")));
 
@@ -9076,11 +8353,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_INT_linux_aarch64")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_INT128_linux_aarch64")), ((const char *)("16")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LARGEST_FIXED_POINT_linux_aarch64")), ((const char *)("8")));
-
-
+#line 321
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LONG_linux_aarch64")), ((const char *)("8")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LONG_DOUBLE_linux_aarch64")), ((const char *)("16")));
 
@@ -9096,34 +8369,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_DATA_MEMBER_linux_aarch64")), ((const char *)("8")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_MEMBER_FUNCTION_linux_aarch64")), ((const char *)("((((2*2+8-1)/8)+1)* 8)")));
-# 341
+#line 341
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SHORT_linux_aarch64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_ACCUM_linux_aarch64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_FRACT_linux_aarch64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_LONG_ACCUM_linux_aarch64")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_LONG_FRACT_linux_aarch64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_SHORT_ACCUM_linux_aarch64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_SHORT_FRACT_linux_aarch64")), ((const char *)("1")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_ACCUM_linux_aarch64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_FRACT_linux_aarch64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_LONG_ACCUM_linux_aarch64")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_LONG_FRACT_linux_aarch64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_SHORT_ACCUM_linux_aarch64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_SHORT_FRACT_linux_aarch64")), ((const char *)("1")));
-
-
+#line 368
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_VIRTUAL_FUNCTION_INFO_linux_aarch64")), ((const char *)("8")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZE_T_INT_KIND_linux_aarch64")), ((const char *)("((an_integer_kind)ik_unsigned_long)")));
@@ -9164,9 +8412,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ZERO_WIDTH_BIT_FIELD_ALIGNMENT_linux_aarch64")), ((const char *)("4"))); 
 
 }
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg29set_target_config_linux_armv7Ev(void)
-# 78
+#line 78
 {
 _ZN3edg19targ_alignof_doubleE = ((_ZN3edg16a_targ_alignmentE)8U);
 
@@ -9193,34 +8441,9 @@ _ZN3edg31targ_alignof_ptr_to_data_memberE = ((_ZN3edg16a_targ_alignmentE)4U);
 _ZN3edg35targ_alignof_ptr_to_member_functionE = ((_ZN3edg16a_targ_alignmentE)4U);
 
 _ZN3edg35targ_microsoft_ptr_to_member_sizingE = ((_ZN3edg9a_booleanE)0);
-# 109
+#line 109
 _ZN3edg18targ_alignof_shortE = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)1U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)1U);
-
-
+#line 136
 _ZN3edg34targ_alignof_virtual_function_infoE = ((_ZN3edg16a_targ_alignmentE)4U);
 
 _ZN3edg27targ_all_pointers_same_sizeE = ((_ZN3edg9a_booleanE)1);
@@ -9236,7 +8459,7 @@ _ZN3edg22targ_char32_t_int_kindE = _ZN3edg15ik_unsigned_intE;
 _ZN3edg13targ_char_bitE = 8U;
 _ZN3edg46targ_char_constant_first_char_most_significantE = ((_ZN3edg9a_booleanE)1);
 
-_ZN3edg17targ_dbl_mant_digE = 53UL;
+_ZN3edg17targ_dbl_mant_digE = 53ULL;
 _ZN3edg16targ_dbl_max_expE = 1024;
 _ZN3edg16targ_dbl_min_expE = (-1021);
 _ZN3edg26targ_default_new_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
@@ -9253,7 +8476,7 @@ _ZN3edg39targ_enum_types_can_be_smaller_than_intE = ((_ZN3edg9a_booleanE)0);
 
 _ZN3edg46targ_field_alloc_sequence_equals_decl_sequenceE = ((_ZN3edg9a_booleanE)1);
 
-_ZN3edg17targ_flt_mant_digE = 24UL;
+_ZN3edg17targ_flt_mant_digE = 24ULL;
 _ZN3edg16targ_flt_max_expE = 128;
 _ZN3edg16targ_flt_min_expE = (-125);
 _ZN3edg26targ_float_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)4U);
@@ -9261,48 +8484,14 @@ _ZN3edg29targ_float128_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
 
 _ZN3edg28targ_float80_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
 
-_ZN3edg20targ_flt128_mant_digE = 113UL;
+_ZN3edg20targ_flt128_mant_digE = 113ULL;
 _ZN3edg19targ_flt128_max_expE = 16384;
 _ZN3edg19targ_flt128_min_expE = (-16381);
-_ZN3edg19targ_flt80_mant_digE = 64UL;
+_ZN3edg19targ_flt80_mant_digE = 64ULL;
 _ZN3edg18targ_flt80_max_expE = 16384;
 _ZN3edg18targ_flt80_min_expE = (-16381);
 _ZN3edg43targ_force_one_bit_bit_field_to_be_unsignedE = ((_ZN3edg9a_booleanE)1);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)15U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)15U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)31U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)31U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)7U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)7U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)16U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)16U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)32U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)32U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-
-
+#line 218
 _ZN3edg21targ_has_signed_charsE = ((_ZN3edg9a_booleanE)1);
 _ZN3edg25targ_host_string_char_bitE = 8U;
 
@@ -9337,7 +8526,7 @@ _ZN3edg25targ_jmp_buf_num_elementsE = 25U;
 
 _ZN3edg16targ_setjmp_funcE = ((const char *)"_setjmp");
 
-_ZN3edg18targ_ldbl_mant_digE = 53UL;
+_ZN3edg18targ_ldbl_mant_digE = 53ULL;
 _ZN3edg17targ_ldbl_max_expE = 1024;
 _ZN3edg17targ_ldbl_min_expE = (-1021);
 
@@ -9356,8 +8545,8 @@ _ZN3edg30targ_long_long_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)8U);
 
 _ZN3edg32targ_maximum_intrinsic_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
 
-_ZN3edg26targ_max_base_class_offsetE = 0UL;
-_ZN3edg26targ_max_class_object_sizeE = 0UL;
+_ZN3edg26targ_max_base_class_offsetE = 0ULL;
+_ZN3edg26targ_max_class_object_sizeE = 0ULL;
 _ZN3edg35targ_microsoft_bit_field_allocationE = ((_ZN3edg9a_booleanE)0);
 
 _ZN3edg29targ_minimum_struct_alignmentE = ((_ZN3edg16a_targ_alignmentE)1U);
@@ -9385,70 +8574,41 @@ _ZN3edg27targ_ets_flag_type_int_kindE = _ZN3edg15ik_unsigned_intE;
 _ZN3edg23targ_reuse_tail_paddingE = ((_ZN3edg9a_booleanE)1);
 
 _ZN3edg30targ_right_shift_is_arithmeticE = ((_ZN3edg9a_booleanE)1);
-# 305
+#line 305
 _ZN3edg26targ_short_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)2U);
-_ZN3edg18targ_sizeof_doubleE = 8UL;
+_ZN3edg18targ_sizeof_doubleE = 8ULL;
 
-_ZN3edg23targ_sizeof_far_pointerE = 4UL;
+_ZN3edg23targ_sizeof_far_pointerE = 4ULL;
 
-_ZN3edg17targ_sizeof_floatE = 4UL;
-_ZN3edg20targ_sizeof_float128E = 16UL;
-_ZN3edg19targ_sizeof_float80E = 12UL;
-_ZN3edg15targ_sizeof_intE = 4UL;
+_ZN3edg17targ_sizeof_floatE = 4ULL;
+_ZN3edg20targ_sizeof_float128E = 16ULL;
+_ZN3edg19targ_sizeof_float80E = 12ULL;
+_ZN3edg15targ_sizeof_intE = 4ULL;
 
-_ZN3edg18targ_sizeof_int128E = 16UL;
+_ZN3edg18targ_sizeof_int128E = 16ULL;
+#line 321
+_ZN3edg16targ_sizeof_longE = 4ULL;
+_ZN3edg23targ_sizeof_long_doubleE = 8ULL;
 
-
-_ZN3edg31targ_sizeof_largest_fixed_pointE = 8UL;
-
-
-_ZN3edg16targ_sizeof_longE = 4UL;
-_ZN3edg23targ_sizeof_long_doubleE = 8UL;
-
-_ZN3edg21targ_sizeof_long_longE = 8UL;
+_ZN3edg21targ_sizeof_long_longE = 8ULL;
 
 
-_ZN3edg26targ_sizeof_largest_atomicE = 8UL;
+_ZN3edg26targ_sizeof_largest_atomicE = 8ULL;
 
 
-_ZN3edg24targ_sizeof_near_pointerE = 2UL;
+_ZN3edg24targ_sizeof_near_pointerE = 2ULL;
 
-_ZN3edg19targ_sizeof_pointerE = 4UL;
-_ZN3edg30targ_sizeof_ptr_to_data_memberE = 4UL;
+_ZN3edg19targ_sizeof_pointerE = 4ULL;
+_ZN3edg30targ_sizeof_ptr_to_data_memberE = 4ULL;
 
-_ZN3edg34targ_sizeof_ptr_to_member_functionE = 8UL;
-# 341
-_ZN3edg17targ_sizeof_shortE = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[1]))[0]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[1]))[1]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[2]))[0]) = 8UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[2]))[1]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[0]))[0]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[0]))[1]) = 1UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[1]))[0]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[1]))[1]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[2]))[0]) = 8UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[2]))[1]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[0]))[0]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[0]))[1]) = 1UL;
-
-
-_ZN3edg33targ_sizeof_virtual_function_infoE = 4UL;
+_ZN3edg34targ_sizeof_ptr_to_member_functionE = 8ULL;
+#line 341
+_ZN3edg17targ_sizeof_shortE = 2ULL;
+#line 368
+_ZN3edg33targ_sizeof_virtual_function_infoE = 4ULL;
 
 _ZN3edg20targ_size_t_int_kindE = _ZN3edg15ik_unsigned_intE;
-_ZN3edg15targ_size_t_maxE = 4294967295UL;
+_ZN3edg15targ_size_t_maxE = 4294967295ULL;
 
 _ZN3edg21targ_ssize_t_int_kindE = _ZN3edg6ik_intE;
 
@@ -9485,9 +8645,9 @@ _ZN3edg50targ_zero_width_bit_field_affects_struct_alignmentE = 1;
 _ZN3edg35targ_zero_width_bit_field_alignmentE = 4; 
 
 }
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg30dump_target_config_linux_armv7Ev(void)
-# 78
+#line 78
 {
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_DOUBLE_linux_armv7")), ((const char *)("8")));
 
@@ -9514,34 +8674,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_PTR_TO_MEMBER_FUNCTION_linux_armv7")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_MICROSOFT_PTR_TO_MEMBER_SIZING_linux_armv7")), ((const char *)("(0!=0)")));
-# 109
+#line 109
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SHORT_linux_armv7")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_ACCUM_linux_armv7")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_FRACT_linux_armv7")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_LONG_ACCUM_linux_armv7")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_LONG_FRACT_linux_armv7")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_SHORT_ACCUM_linux_armv7")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_SHORT_FRACT_linux_armv7")), ((const char *)("1")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_ACCUM_linux_armv7")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_FRACT_linux_armv7")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_LONG_ACCUM_linux_armv7")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_LONG_FRACT_linux_armv7")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_SHORT_ACCUM_linux_armv7")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_SHORT_FRACT_linux_armv7")), ((const char *)("1")));
-
-
+#line 136
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_VIRTUAL_FUNCTION_INFO_linux_armv7")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALL_POINTERS_SAME_SIZE_linux_armv7")), ((const char *)("1")));
@@ -9589,41 +8724,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FLT80_MAX_EXP_linux_armv7")), ((const char *)("(16384)")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FLT80_MIN_EXP_linux_armv7")), ((const char *)("(-16381)")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FORCE_ONE_BIT_BIT_FIELD_TO_BE_UNSIGNED_linux_armv7")), ((const char *)("1")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_ACCUM_linux_armv7")), ((const char *)("15")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_FRACT_linux_armv7")), ((const char *)("15")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_LONG_ACCUM_linux_armv7")), ((const char *)("31")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_LONG_FRACT_linux_armv7")), ((const char *)("31")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_SHORT_ACCUM_linux_armv7")), ((const char *)("7")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_SHORT_FRACT_linux_armv7")), ((const char *)("7")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_ACCUM_linux_armv7")), ((const char *)("16")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_FRACT_linux_armv7")), ((const char *)("16")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_LONG_ACCUM_linux_armv7")), ((const char *)("32")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_LONG_FRACT_linux_armv7")), ((const char *)("32")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_SHORT_ACCUM_linux_armv7")), ((const char *)("8")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_SHORT_FRACT_linux_armv7")), ((const char *)("8")));
-
-
-
+#line 218
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_HAS_SIGNED_CHARS_linux_armv7")), ((const char *)("1")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_HOST_STRING_CHAR_BIT_linux_armv7")), ((const char *)("8")));
 
@@ -9706,7 +8807,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_REUSE_TAIL_PADDING_linux_armv7")), ((const char *)("1")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_RIGHT_SHIFT_IS_ARITHMETIC_linux_armv7")), ((const char *)("1")));
-# 305
+#line 305
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SHORT_FIELD_ALIGNMENT_linux_armv7")), ((const char *)("2")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_DOUBLE_linux_armv7")), ((const char *)("8")));
 
@@ -9718,11 +8819,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_INT_linux_armv7")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_INT128_linux_armv7")), ((const char *)("16")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LARGEST_FIXED_POINT_linux_armv7")), ((const char *)("8")));
-
-
+#line 321
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LONG_linux_armv7")), ((const char *)("4")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LONG_DOUBLE_linux_armv7")), ((const char *)("8")));
 
@@ -9738,34 +8835,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_DATA_MEMBER_linux_armv7")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_MEMBER_FUNCTION_linux_armv7")), ((const char *)("((((2*2+4-1)/4)+1)* 4)")));
-# 341
+#line 341
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SHORT_linux_armv7")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_ACCUM_linux_armv7")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_FRACT_linux_armv7")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_LONG_ACCUM_linux_armv7")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_LONG_FRACT_linux_armv7")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_SHORT_ACCUM_linux_armv7")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_SHORT_FRACT_linux_armv7")), ((const char *)("1")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_ACCUM_linux_armv7")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_FRACT_linux_armv7")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_LONG_ACCUM_linux_armv7")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_LONG_FRACT_linux_armv7")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_SHORT_ACCUM_linux_armv7")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_SHORT_FRACT_linux_armv7")), ((const char *)("1")));
-
-
+#line 368
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_VIRTUAL_FUNCTION_INFO_linux_armv7")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZE_T_INT_KIND_linux_armv7")), ((const char *)("((an_integer_kind)ik_unsigned_int)")));
@@ -9806,9 +8878,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ZERO_WIDTH_BIT_FIELD_ALIGNMENT_linux_armv7")), ((const char *)("4"))); 
 
 }
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg31set_target_config_linux_riscv64Ev(void)
-# 78
+#line 78
 {
 _ZN3edg19targ_alignof_doubleE = ((_ZN3edg16a_targ_alignmentE)8U);
 
@@ -9835,34 +8907,9 @@ _ZN3edg31targ_alignof_ptr_to_data_memberE = ((_ZN3edg16a_targ_alignmentE)8U);
 _ZN3edg35targ_alignof_ptr_to_member_functionE = ((_ZN3edg16a_targ_alignmentE)8U);
 
 _ZN3edg35targ_microsoft_ptr_to_member_sizingE = ((_ZN3edg9a_booleanE)0);
-# 109
+#line 109
 _ZN3edg18targ_alignof_shortE = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)1U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)1U);
-
-
+#line 136
 _ZN3edg34targ_alignof_virtual_function_infoE = ((_ZN3edg16a_targ_alignmentE)8U);
 
 _ZN3edg27targ_all_pointers_same_sizeE = ((_ZN3edg9a_booleanE)1);
@@ -9878,7 +8925,7 @@ _ZN3edg22targ_char32_t_int_kindE = _ZN3edg15ik_unsigned_intE;
 _ZN3edg13targ_char_bitE = 8U;
 _ZN3edg46targ_char_constant_first_char_most_significantE = ((_ZN3edg9a_booleanE)1);
 
-_ZN3edg17targ_dbl_mant_digE = 53UL;
+_ZN3edg17targ_dbl_mant_digE = 53ULL;
 _ZN3edg16targ_dbl_max_expE = 1024;
 _ZN3edg16targ_dbl_min_expE = (-1021);
 _ZN3edg26targ_default_new_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
@@ -9895,7 +8942,7 @@ _ZN3edg39targ_enum_types_can_be_smaller_than_intE = ((_ZN3edg9a_booleanE)0);
 
 _ZN3edg46targ_field_alloc_sequence_equals_decl_sequenceE = ((_ZN3edg9a_booleanE)1);
 
-_ZN3edg17targ_flt_mant_digE = 24UL;
+_ZN3edg17targ_flt_mant_digE = 24ULL;
 _ZN3edg16targ_flt_max_expE = 128;
 _ZN3edg16targ_flt_min_expE = (-125);
 _ZN3edg26targ_float_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)4U);
@@ -9903,48 +8950,14 @@ _ZN3edg29targ_float128_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
 
 _ZN3edg28targ_float80_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
 
-_ZN3edg20targ_flt128_mant_digE = 113UL;
+_ZN3edg20targ_flt128_mant_digE = 113ULL;
 _ZN3edg19targ_flt128_max_expE = 16384;
 _ZN3edg19targ_flt128_min_expE = (-16381);
-_ZN3edg19targ_flt80_mant_digE = 64UL;
+_ZN3edg19targ_flt80_mant_digE = 64ULL;
 _ZN3edg18targ_flt80_max_expE = 16384;
 _ZN3edg18targ_flt80_min_expE = (-16381);
 _ZN3edg43targ_force_one_bit_bit_field_to_be_unsignedE = ((_ZN3edg9a_booleanE)1);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)15U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)15U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)31U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)31U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)7U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)7U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)16U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)16U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)32U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)32U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-
-
+#line 218
 _ZN3edg21targ_has_signed_charsE = ((_ZN3edg9a_booleanE)0);
 _ZN3edg25targ_host_string_char_bitE = 8U;
 
@@ -9979,7 +8992,7 @@ _ZN3edg25targ_jmp_buf_num_elementsE = 43U;
 
 _ZN3edg16targ_setjmp_funcE = ((const char *)"_setjmp");
 
-_ZN3edg18targ_ldbl_mant_digE = 113UL;
+_ZN3edg18targ_ldbl_mant_digE = 113ULL;
 _ZN3edg17targ_ldbl_max_expE = 16384;
 _ZN3edg17targ_ldbl_min_expE = (-16381);
 
@@ -9998,8 +9011,8 @@ _ZN3edg30targ_long_long_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)8U);
 
 _ZN3edg32targ_maximum_intrinsic_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
 
-_ZN3edg26targ_max_base_class_offsetE = 0UL;
-_ZN3edg26targ_max_class_object_sizeE = 0UL;
+_ZN3edg26targ_max_base_class_offsetE = 0ULL;
+_ZN3edg26targ_max_class_object_sizeE = 0ULL;
 _ZN3edg35targ_microsoft_bit_field_allocationE = ((_ZN3edg9a_booleanE)0);
 
 _ZN3edg29targ_minimum_struct_alignmentE = ((_ZN3edg16a_targ_alignmentE)1U);
@@ -10027,70 +9040,41 @@ _ZN3edg27targ_ets_flag_type_int_kindE = _ZN3edg15ik_unsigned_intE;
 _ZN3edg23targ_reuse_tail_paddingE = ((_ZN3edg9a_booleanE)1);
 
 _ZN3edg30targ_right_shift_is_arithmeticE = ((_ZN3edg9a_booleanE)1);
-# 305
+#line 305
 _ZN3edg26targ_short_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)2U);
-_ZN3edg18targ_sizeof_doubleE = 8UL;
+_ZN3edg18targ_sizeof_doubleE = 8ULL;
 
-_ZN3edg23targ_sizeof_far_pointerE = 4UL;
+_ZN3edg23targ_sizeof_far_pointerE = 4ULL;
 
-_ZN3edg17targ_sizeof_floatE = 4UL;
-_ZN3edg20targ_sizeof_float128E = 16UL;
-_ZN3edg19targ_sizeof_float80E = 12UL;
-_ZN3edg15targ_sizeof_intE = 4UL;
+_ZN3edg17targ_sizeof_floatE = 4ULL;
+_ZN3edg20targ_sizeof_float128E = 16ULL;
+_ZN3edg19targ_sizeof_float80E = 12ULL;
+_ZN3edg15targ_sizeof_intE = 4ULL;
 
-_ZN3edg18targ_sizeof_int128E = 16UL;
+_ZN3edg18targ_sizeof_int128E = 16ULL;
+#line 321
+_ZN3edg16targ_sizeof_longE = 8ULL;
+_ZN3edg23targ_sizeof_long_doubleE = 16ULL;
 
-
-_ZN3edg31targ_sizeof_largest_fixed_pointE = 8UL;
-
-
-_ZN3edg16targ_sizeof_longE = 8UL;
-_ZN3edg23targ_sizeof_long_doubleE = 16UL;
-
-_ZN3edg21targ_sizeof_long_longE = 8UL;
+_ZN3edg21targ_sizeof_long_longE = 8ULL;
 
 
-_ZN3edg26targ_sizeof_largest_atomicE = 16UL;
+_ZN3edg26targ_sizeof_largest_atomicE = 16ULL;
 
 
-_ZN3edg24targ_sizeof_near_pointerE = 2UL;
+_ZN3edg24targ_sizeof_near_pointerE = 2ULL;
 
-_ZN3edg19targ_sizeof_pointerE = 8UL;
-_ZN3edg30targ_sizeof_ptr_to_data_memberE = 8UL;
+_ZN3edg19targ_sizeof_pointerE = 8ULL;
+_ZN3edg30targ_sizeof_ptr_to_data_memberE = 8ULL;
 
-_ZN3edg34targ_sizeof_ptr_to_member_functionE = 16UL;
-# 341
-_ZN3edg17targ_sizeof_shortE = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[1]))[0]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[1]))[1]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[2]))[0]) = 8UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[2]))[1]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[0]))[0]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[0]))[1]) = 1UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[1]))[0]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[1]))[1]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[2]))[0]) = 8UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[2]))[1]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[0]))[0]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[0]))[1]) = 1UL;
-
-
-_ZN3edg33targ_sizeof_virtual_function_infoE = 8UL;
+_ZN3edg34targ_sizeof_ptr_to_member_functionE = 16ULL;
+#line 341
+_ZN3edg17targ_sizeof_shortE = 2ULL;
+#line 368
+_ZN3edg33targ_sizeof_virtual_function_infoE = 8ULL;
 
 _ZN3edg20targ_size_t_int_kindE = _ZN3edg16ik_unsigned_longE;
-_ZN3edg15targ_size_t_maxE = 18446744073709551615UL;
+_ZN3edg15targ_size_t_maxE = 18446744073709551615ULL;
 
 _ZN3edg21targ_ssize_t_int_kindE = _ZN3edg7ik_longE;
 
@@ -10127,9 +9111,9 @@ _ZN3edg50targ_zero_width_bit_field_affects_struct_alignmentE = 1;
 _ZN3edg35targ_zero_width_bit_field_alignmentE = 4; 
 
 }
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg32dump_target_config_linux_riscv64Ev(void)
-# 78
+#line 78
 {
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_DOUBLE_linux_riscv64")), ((const char *)("8")));
 
@@ -10156,34 +9140,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_PTR_TO_MEMBER_FUNCTION_linux_riscv64")), ((const char *)("8")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_MICROSOFT_PTR_TO_MEMBER_SIZING_linux_riscv64")), ((const char *)("(0!=0)")));
-# 109
+#line 109
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SHORT_linux_riscv64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_ACCUM_linux_riscv64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_FRACT_linux_riscv64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_LONG_ACCUM_linux_riscv64")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_LONG_FRACT_linux_riscv64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_SHORT_ACCUM_linux_riscv64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_SHORT_FRACT_linux_riscv64")), ((const char *)("1")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_ACCUM_linux_riscv64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_FRACT_linux_riscv64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_LONG_ACCUM_linux_riscv64")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_LONG_FRACT_linux_riscv64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_SHORT_ACCUM_linux_riscv64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_SHORT_FRACT_linux_riscv64")), ((const char *)("1")));
-
-
+#line 136
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_VIRTUAL_FUNCTION_INFO_linux_riscv64")), ((const char *)("8")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALL_POINTERS_SAME_SIZE_linux_riscv64")), ((const char *)("1")));
@@ -10231,41 +9190,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FLT80_MAX_EXP_linux_riscv64")), ((const char *)("(16384)")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FLT80_MIN_EXP_linux_riscv64")), ((const char *)("(-16381)")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FORCE_ONE_BIT_BIT_FIELD_TO_BE_UNSIGNED_linux_riscv64")), ((const char *)("1")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_ACCUM_linux_riscv64")), ((const char *)("15")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_FRACT_linux_riscv64")), ((const char *)("15")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_LONG_ACCUM_linux_riscv64")), ((const char *)("31")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_LONG_FRACT_linux_riscv64")), ((const char *)("31")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_SHORT_ACCUM_linux_riscv64")), ((const char *)("7")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_SHORT_FRACT_linux_riscv64")), ((const char *)("7")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_ACCUM_linux_riscv64")), ((const char *)("16")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_FRACT_linux_riscv64")), ((const char *)("16")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_LONG_ACCUM_linux_riscv64")), ((const char *)("32")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_LONG_FRACT_linux_riscv64")), ((const char *)("32")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_SHORT_ACCUM_linux_riscv64")), ((const char *)("8")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_SHORT_FRACT_linux_riscv64")), ((const char *)("8")));
-
-
-
+#line 218
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_HAS_SIGNED_CHARS_linux_riscv64")), ((const char *)("0")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_HOST_STRING_CHAR_BIT_linux_riscv64")), ((const char *)("8")));
 
@@ -10348,7 +9273,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_REUSE_TAIL_PADDING_linux_riscv64")), ((const char *)("1")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_RIGHT_SHIFT_IS_ARITHMETIC_linux_riscv64")), ((const char *)("1")));
-# 305
+#line 305
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SHORT_FIELD_ALIGNMENT_linux_riscv64")), ((const char *)("2")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_DOUBLE_linux_riscv64")), ((const char *)("8")));
 
@@ -10360,11 +9285,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_INT_linux_riscv64")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_INT128_linux_riscv64")), ((const char *)("16")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LARGEST_FIXED_POINT_linux_riscv64")), ((const char *)("8")));
-
-
+#line 321
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LONG_linux_riscv64")), ((const char *)("8")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LONG_DOUBLE_linux_riscv64")), ((const char *)("16")));
 
@@ -10380,34 +9301,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_DATA_MEMBER_linux_riscv64")), ((const char *)("8")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_MEMBER_FUNCTION_linux_riscv64")), ((const char *)("((((2*2+8-1)/8)+1)* 8)")));
-# 341
+#line 341
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SHORT_linux_riscv64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_ACCUM_linux_riscv64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_FRACT_linux_riscv64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_LONG_ACCUM_linux_riscv64")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_LONG_FRACT_linux_riscv64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_SHORT_ACCUM_linux_riscv64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_SHORT_FRACT_linux_riscv64")), ((const char *)("1")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_ACCUM_linux_riscv64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_FRACT_linux_riscv64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_LONG_ACCUM_linux_riscv64")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_LONG_FRACT_linux_riscv64")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_SHORT_ACCUM_linux_riscv64")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_SHORT_FRACT_linux_riscv64")), ((const char *)("1")));
-
-
+#line 368
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_VIRTUAL_FUNCTION_INFO_linux_riscv64")), ((const char *)("8")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZE_T_INT_KIND_linux_riscv64")), ((const char *)("((an_integer_kind)ik_unsigned_long)")));
@@ -10448,9 +9344,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ZERO_WIDTH_BIT_FIELD_ALIGNMENT_linux_riscv64")), ((const char *)("4"))); 
 
 }
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg31set_target_config_linux_riscv32Ev(void)
-# 78
+#line 78
 {
 _ZN3edg19targ_alignof_doubleE = ((_ZN3edg16a_targ_alignmentE)8U);
 
@@ -10477,34 +9373,9 @@ _ZN3edg31targ_alignof_ptr_to_data_memberE = ((_ZN3edg16a_targ_alignmentE)4U);
 _ZN3edg35targ_alignof_ptr_to_member_functionE = ((_ZN3edg16a_targ_alignmentE)4U);
 
 _ZN3edg35targ_microsoft_ptr_to_member_sizingE = ((_ZN3edg9a_booleanE)0);
-# 109
+#line 109
 _ZN3edg18targ_alignof_shortE = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)1U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)1U);
-
-
+#line 136
 _ZN3edg34targ_alignof_virtual_function_infoE = ((_ZN3edg16a_targ_alignmentE)4U);
 
 _ZN3edg27targ_all_pointers_same_sizeE = ((_ZN3edg9a_booleanE)1);
@@ -10520,7 +9391,7 @@ _ZN3edg22targ_char32_t_int_kindE = _ZN3edg15ik_unsigned_intE;
 _ZN3edg13targ_char_bitE = 8U;
 _ZN3edg46targ_char_constant_first_char_most_significantE = ((_ZN3edg9a_booleanE)1);
 
-_ZN3edg17targ_dbl_mant_digE = 53UL;
+_ZN3edg17targ_dbl_mant_digE = 53ULL;
 _ZN3edg16targ_dbl_max_expE = 1024;
 _ZN3edg16targ_dbl_min_expE = (-1021);
 _ZN3edg26targ_default_new_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
@@ -10537,7 +9408,7 @@ _ZN3edg39targ_enum_types_can_be_smaller_than_intE = ((_ZN3edg9a_booleanE)0);
 
 _ZN3edg46targ_field_alloc_sequence_equals_decl_sequenceE = ((_ZN3edg9a_booleanE)1);
 
-_ZN3edg17targ_flt_mant_digE = 24UL;
+_ZN3edg17targ_flt_mant_digE = 24ULL;
 _ZN3edg16targ_flt_max_expE = 128;
 _ZN3edg16targ_flt_min_expE = (-125);
 _ZN3edg26targ_float_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)4U);
@@ -10545,48 +9416,14 @@ _ZN3edg29targ_float128_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
 
 _ZN3edg28targ_float80_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
 
-_ZN3edg20targ_flt128_mant_digE = 113UL;
+_ZN3edg20targ_flt128_mant_digE = 113ULL;
 _ZN3edg19targ_flt128_max_expE = 16384;
 _ZN3edg19targ_flt128_min_expE = (-16381);
-_ZN3edg19targ_flt80_mant_digE = 64UL;
+_ZN3edg19targ_flt80_mant_digE = 64ULL;
 _ZN3edg18targ_flt80_max_expE = 16384;
 _ZN3edg18targ_flt80_min_expE = (-16381);
 _ZN3edg43targ_force_one_bit_bit_field_to_be_unsignedE = ((_ZN3edg9a_booleanE)1);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)15U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)15U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)31U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)31U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)7U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)7U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)16U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)16U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)32U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)32U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-
-
+#line 218
 _ZN3edg21targ_has_signed_charsE = ((_ZN3edg9a_booleanE)0);
 _ZN3edg25targ_host_string_char_bitE = 8U;
 
@@ -10621,7 +9458,7 @@ _ZN3edg25targ_jmp_buf_num_elementsE = 36U;
 
 _ZN3edg16targ_setjmp_funcE = ((const char *)"_setjmp");
 
-_ZN3edg18targ_ldbl_mant_digE = 113UL;
+_ZN3edg18targ_ldbl_mant_digE = 113ULL;
 _ZN3edg17targ_ldbl_max_expE = 16384;
 _ZN3edg17targ_ldbl_min_expE = (-16381);
 
@@ -10640,8 +9477,8 @@ _ZN3edg30targ_long_long_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)8U);
 
 _ZN3edg32targ_maximum_intrinsic_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
 
-_ZN3edg26targ_max_base_class_offsetE = 0UL;
-_ZN3edg26targ_max_class_object_sizeE = 0UL;
+_ZN3edg26targ_max_base_class_offsetE = 0ULL;
+_ZN3edg26targ_max_class_object_sizeE = 0ULL;
 _ZN3edg35targ_microsoft_bit_field_allocationE = ((_ZN3edg9a_booleanE)0);
 
 _ZN3edg29targ_minimum_struct_alignmentE = ((_ZN3edg16a_targ_alignmentE)1U);
@@ -10669,70 +9506,41 @@ _ZN3edg27targ_ets_flag_type_int_kindE = _ZN3edg15ik_unsigned_intE;
 _ZN3edg23targ_reuse_tail_paddingE = ((_ZN3edg9a_booleanE)1);
 
 _ZN3edg30targ_right_shift_is_arithmeticE = ((_ZN3edg9a_booleanE)1);
-# 305
+#line 305
 _ZN3edg26targ_short_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)2U);
-_ZN3edg18targ_sizeof_doubleE = 8UL;
+_ZN3edg18targ_sizeof_doubleE = 8ULL;
 
-_ZN3edg23targ_sizeof_far_pointerE = 4UL;
+_ZN3edg23targ_sizeof_far_pointerE = 4ULL;
 
-_ZN3edg17targ_sizeof_floatE = 4UL;
-_ZN3edg20targ_sizeof_float128E = 16UL;
-_ZN3edg19targ_sizeof_float80E = 12UL;
-_ZN3edg15targ_sizeof_intE = 4UL;
+_ZN3edg17targ_sizeof_floatE = 4ULL;
+_ZN3edg20targ_sizeof_float128E = 16ULL;
+_ZN3edg19targ_sizeof_float80E = 12ULL;
+_ZN3edg15targ_sizeof_intE = 4ULL;
 
-_ZN3edg18targ_sizeof_int128E = 16UL;
+_ZN3edg18targ_sizeof_int128E = 16ULL;
+#line 321
+_ZN3edg16targ_sizeof_longE = 4ULL;
+_ZN3edg23targ_sizeof_long_doubleE = 16ULL;
 
-
-_ZN3edg31targ_sizeof_largest_fixed_pointE = 8UL;
-
-
-_ZN3edg16targ_sizeof_longE = 4UL;
-_ZN3edg23targ_sizeof_long_doubleE = 16UL;
-
-_ZN3edg21targ_sizeof_long_longE = 8UL;
+_ZN3edg21targ_sizeof_long_longE = 8ULL;
 
 
-_ZN3edg26targ_sizeof_largest_atomicE = 8UL;
+_ZN3edg26targ_sizeof_largest_atomicE = 8ULL;
 
 
-_ZN3edg24targ_sizeof_near_pointerE = 2UL;
+_ZN3edg24targ_sizeof_near_pointerE = 2ULL;
 
-_ZN3edg19targ_sizeof_pointerE = 4UL;
-_ZN3edg30targ_sizeof_ptr_to_data_memberE = 4UL;
+_ZN3edg19targ_sizeof_pointerE = 4ULL;
+_ZN3edg30targ_sizeof_ptr_to_data_memberE = 4ULL;
 
-_ZN3edg34targ_sizeof_ptr_to_member_functionE = 8UL;
-# 341
-_ZN3edg17targ_sizeof_shortE = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[1]))[0]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[1]))[1]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[2]))[0]) = 8UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[2]))[1]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[0]))[0]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[0]))[1]) = 1UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[1]))[0]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[1]))[1]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[2]))[0]) = 8UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[2]))[1]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[0]))[0]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[0]))[1]) = 1UL;
-
-
-_ZN3edg33targ_sizeof_virtual_function_infoE = 4UL;
+_ZN3edg34targ_sizeof_ptr_to_member_functionE = 8ULL;
+#line 341
+_ZN3edg17targ_sizeof_shortE = 2ULL;
+#line 368
+_ZN3edg33targ_sizeof_virtual_function_infoE = 4ULL;
 
 _ZN3edg20targ_size_t_int_kindE = _ZN3edg15ik_unsigned_intE;
-_ZN3edg15targ_size_t_maxE = 4294967295UL;
+_ZN3edg15targ_size_t_maxE = 4294967295ULL;
 
 _ZN3edg21targ_ssize_t_int_kindE = _ZN3edg6ik_intE;
 
@@ -10769,9 +9577,9 @@ _ZN3edg50targ_zero_width_bit_field_affects_struct_alignmentE = 1;
 _ZN3edg35targ_zero_width_bit_field_alignmentE = 4; 
 
 }
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg32dump_target_config_linux_riscv32Ev(void)
-# 78
+#line 78
 {
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_DOUBLE_linux_riscv32")), ((const char *)("8")));
 
@@ -10798,34 +9606,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_PTR_TO_MEMBER_FUNCTION_linux_riscv32")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_MICROSOFT_PTR_TO_MEMBER_SIZING_linux_riscv32")), ((const char *)("(0!=0)")));
-# 109
+#line 109
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SHORT_linux_riscv32")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_ACCUM_linux_riscv32")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_FRACT_linux_riscv32")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_LONG_ACCUM_linux_riscv32")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_LONG_FRACT_linux_riscv32")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_SHORT_ACCUM_linux_riscv32")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_SHORT_FRACT_linux_riscv32")), ((const char *)("1")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_ACCUM_linux_riscv32")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_FRACT_linux_riscv32")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_LONG_ACCUM_linux_riscv32")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_LONG_FRACT_linux_riscv32")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_SHORT_ACCUM_linux_riscv32")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_SHORT_FRACT_linux_riscv32")), ((const char *)("1")));
-
-
+#line 136
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALIGNOF_VIRTUAL_FUNCTION_INFO_linux_riscv32")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ALL_POINTERS_SAME_SIZE_linux_riscv32")), ((const char *)("1")));
@@ -10873,41 +9656,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FLT80_MAX_EXP_linux_riscv32")), ((const char *)("(16384)")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FLT80_MIN_EXP_linux_riscv32")), ((const char *)("(-16381)")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FORCE_ONE_BIT_BIT_FIELD_TO_BE_UNSIGNED_linux_riscv32")), ((const char *)("1")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_ACCUM_linux_riscv32")), ((const char *)("15")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_FRACT_linux_riscv32")), ((const char *)("15")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_LONG_ACCUM_linux_riscv32")), ((const char *)("31")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_LONG_FRACT_linux_riscv32")), ((const char *)("31")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_SHORT_ACCUM_linux_riscv32")), ((const char *)("7")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_SHORT_FRACT_linux_riscv32")), ((const char *)("7")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_ACCUM_linux_riscv32")), ((const char *)("16")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_FRACT_linux_riscv32")), ((const char *)("16")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_LONG_ACCUM_linux_riscv32")), ((const char *)("32")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_LONG_FRACT_linux_riscv32")), ((const char *)("32")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_SHORT_ACCUM_linux_riscv32")), ((const char *)("8")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_SHORT_FRACT_linux_riscv32")), ((const char *)("8")));
-
-
-
+#line 218
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_HAS_SIGNED_CHARS_linux_riscv32")), ((const char *)("0")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_HOST_STRING_CHAR_BIT_linux_riscv32")), ((const char *)("8")));
 
@@ -10990,7 +9739,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_REUSE_TAIL_PADDING_linux_riscv32")), ((const char *)("1")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_RIGHT_SHIFT_IS_ARITHMETIC_linux_riscv32")), ((const char *)("1")));
-# 305
+#line 305
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SHORT_FIELD_ALIGNMENT_linux_riscv32")), ((const char *)("2")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_DOUBLE_linux_riscv32")), ((const char *)("8")));
 
@@ -11002,11 +9751,7 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_INT_linux_riscv32")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_INT128_linux_riscv32")), ((const char *)("16")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LARGEST_FIXED_POINT_linux_riscv32")), ((const char *)("8")));
-
-
+#line 321
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LONG_linux_riscv32")), ((const char *)("4")));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_LONG_DOUBLE_linux_riscv32")), ((const char *)("16")));
 
@@ -11022,34 +9767,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_DATA_MEMBER_linux_riscv32")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_MEMBER_FUNCTION_linux_riscv32")), ((const char *)("((((2*2+4-1)/4)+1)* 4)")));
-# 341
+#line 341
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SHORT_linux_riscv32")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_ACCUM_linux_riscv32")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_FRACT_linux_riscv32")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_LONG_ACCUM_linux_riscv32")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_LONG_FRACT_linux_riscv32")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_SHORT_ACCUM_linux_riscv32")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_SHORT_FRACT_linux_riscv32")), ((const char *)("1")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_ACCUM_linux_riscv32")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_FRACT_linux_riscv32")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_LONG_ACCUM_linux_riscv32")), ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_LONG_FRACT_linux_riscv32")), ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_SHORT_ACCUM_linux_riscv32")), ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_SHORT_FRACT_linux_riscv32")), ((const char *)("1")));
-
-
+#line 368
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZEOF_VIRTUAL_FUNCTION_INFO_linux_riscv32")), ((const char *)("4")));
 
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_SIZE_T_INT_KIND_linux_riscv32")), ((const char *)("((an_integer_kind)ik_unsigned_int)")));
@@ -11090,9 +9810,9 @@ fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TA
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s %s\n"), ((const char *)("TARG_ZERO_WIDTH_BIT_FIELD_ALIGNMENT_linux_riscv32")), ((const char *)("4"))); 
 
 }
-# 62 "src/target_map.h"
+#line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg24set_legacy_target_configEv(void)
-# 78
+#line 78
 {
 _ZN3edg19targ_alignof_doubleE = ((_ZN3edg16a_targ_alignmentE)8U);
 
@@ -11119,34 +9839,9 @@ _ZN3edg31targ_alignof_ptr_to_data_memberE = ((_ZN3edg16a_targ_alignmentE)8U);
 _ZN3edg35targ_alignof_ptr_to_member_functionE = ((_ZN3edg16a_targ_alignmentE)8U);
 
 _ZN3edg35targ_microsoft_ptr_to_member_sizingE = ((_ZN3edg9a_booleanE)0);
-# 109
+#line 109
 _ZN3edg18targ_alignof_shortE = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[0]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)1U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)4U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)2U);
-
-((((((_ZN3edg24targ_alignof_fixed_pointE)[1]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)1U);
-
-
+#line 136
 _ZN3edg34targ_alignof_virtual_function_infoE = ((_ZN3edg16a_targ_alignmentE)8U);
 
 _ZN3edg27targ_all_pointers_same_sizeE = ((_ZN3edg9a_booleanE)1);
@@ -11162,7 +9857,7 @@ _ZN3edg22targ_char32_t_int_kindE = _ZN3edg15ik_unsigned_intE;
 _ZN3edg13targ_char_bitE = 8U;
 _ZN3edg46targ_char_constant_first_char_most_significantE = ((_ZN3edg9a_booleanE)1);
 
-_ZN3edg17targ_dbl_mant_digE = 53UL;
+_ZN3edg17targ_dbl_mant_digE = 53ULL;
 _ZN3edg16targ_dbl_max_expE = 1024;
 _ZN3edg16targ_dbl_min_expE = (-1021);
 _ZN3edg26targ_default_new_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
@@ -11179,7 +9874,7 @@ _ZN3edg39targ_enum_types_can_be_smaller_than_intE = ((_ZN3edg9a_booleanE)0);
 
 _ZN3edg46targ_field_alloc_sequence_equals_decl_sequenceE = ((_ZN3edg9a_booleanE)1);
 
-_ZN3edg17targ_flt_mant_digE = 24UL;
+_ZN3edg17targ_flt_mant_digE = 24ULL;
 _ZN3edg16targ_flt_max_expE = 128;
 _ZN3edg16targ_flt_min_expE = (-125);
 _ZN3edg26targ_float_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)4U);
@@ -11187,48 +9882,14 @@ _ZN3edg29targ_float128_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
 
 _ZN3edg28targ_float80_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
 
-_ZN3edg20targ_flt128_mant_digE = 113UL;
+_ZN3edg20targ_flt128_mant_digE = 113ULL;
 _ZN3edg19targ_flt128_max_expE = 16384;
 _ZN3edg19targ_flt128_min_expE = (-16381);
-_ZN3edg19targ_flt80_mant_digE = 64UL;
+_ZN3edg19targ_flt80_mant_digE = 64ULL;
 _ZN3edg18targ_flt80_max_expE = 16384;
 _ZN3edg18targ_flt80_min_expE = (-16381);
 _ZN3edg43targ_force_one_bit_bit_field_to_be_unsignedE = ((_ZN3edg9a_booleanE)0);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)15U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)15U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)31U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)31U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)7U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[0]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)7U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[1]))[0]) = ((_ZN3edg16a_targ_alignmentE)16U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[1]))[1]) = ((_ZN3edg16a_targ_alignmentE)16U);
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[2]))[0]) = ((_ZN3edg16a_targ_alignmentE)32U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[2]))[1]) = ((_ZN3edg16a_targ_alignmentE)32U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[0]))[0]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-
-((((((_ZN3edg36targ_fractional_bits_for_fixed_pointE)[1]))[0]))[1]) = ((_ZN3edg16a_targ_alignmentE)8U);
-
-
-
+#line 218
 _ZN3edg21targ_has_signed_charsE = ((_ZN3edg9a_booleanE)1);
 _ZN3edg25targ_host_string_char_bitE = 8U;
 
@@ -11263,7 +9924,7 @@ _ZN3edg25targ_jmp_buf_num_elementsE = 25U;
 
 _ZN3edg16targ_setjmp_funcE = ((const char *)"_setjmp");
 
-_ZN3edg18targ_ldbl_mant_digE = 64UL;
+_ZN3edg18targ_ldbl_mant_digE = 64ULL;
 _ZN3edg17targ_ldbl_max_expE = 16384;
 _ZN3edg17targ_ldbl_min_expE = (-16381);
 
@@ -11282,8 +9943,8 @@ _ZN3edg30targ_long_long_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)8U);
 
 _ZN3edg32targ_maximum_intrinsic_alignmentE = ((_ZN3edg16a_targ_alignmentE)16U);
 
-_ZN3edg26targ_max_base_class_offsetE = 0UL;
-_ZN3edg26targ_max_class_object_sizeE = 0UL;
+_ZN3edg26targ_max_base_class_offsetE = 0ULL;
+_ZN3edg26targ_max_class_object_sizeE = 0ULL;
 _ZN3edg35targ_microsoft_bit_field_allocationE = ((_ZN3edg9a_booleanE)0);
 
 _ZN3edg29targ_minimum_struct_alignmentE = ((_ZN3edg16a_targ_alignmentE)1U);
@@ -11311,70 +9972,41 @@ _ZN3edg27targ_ets_flag_type_int_kindE = _ZN3edg15ik_unsigned_intE;
 _ZN3edg23targ_reuse_tail_paddingE = ((_ZN3edg9a_booleanE)1);
 
 _ZN3edg30targ_right_shift_is_arithmeticE = ((_ZN3edg9a_booleanE)1);
-# 305
+#line 305
 _ZN3edg26targ_short_field_alignmentE = ((_ZN3edg16a_targ_alignmentE)2U);
-_ZN3edg18targ_sizeof_doubleE = 8UL;
+_ZN3edg18targ_sizeof_doubleE = 8ULL;
 
-_ZN3edg23targ_sizeof_far_pointerE = 4UL;
+_ZN3edg23targ_sizeof_far_pointerE = 4ULL;
 
-_ZN3edg17targ_sizeof_floatE = 4UL;
-_ZN3edg20targ_sizeof_float128E = 16UL;
-_ZN3edg19targ_sizeof_float80E = 16UL;
-_ZN3edg15targ_sizeof_intE = 4UL;
+_ZN3edg17targ_sizeof_floatE = 4ULL;
+_ZN3edg20targ_sizeof_float128E = 16ULL;
+_ZN3edg19targ_sizeof_float80E = 16ULL;
+_ZN3edg15targ_sizeof_intE = 4ULL;
 
-_ZN3edg18targ_sizeof_int128E = 16UL;
+_ZN3edg18targ_sizeof_int128E = 16ULL;
+#line 321
+_ZN3edg16targ_sizeof_longE = 8ULL;
+_ZN3edg23targ_sizeof_long_doubleE = 16ULL;
 
-
-_ZN3edg31targ_sizeof_largest_fixed_pointE = 8UL;
-
-
-_ZN3edg16targ_sizeof_longE = 8UL;
-_ZN3edg23targ_sizeof_long_doubleE = 16UL;
-
-_ZN3edg21targ_sizeof_long_longE = 8UL;
+_ZN3edg21targ_sizeof_long_longE = 8ULL;
 
 
-_ZN3edg26targ_sizeof_largest_atomicE = 16UL;
+_ZN3edg26targ_sizeof_largest_atomicE = 16ULL;
 
 
-_ZN3edg24targ_sizeof_near_pointerE = 2UL;
+_ZN3edg24targ_sizeof_near_pointerE = 2ULL;
 
-_ZN3edg19targ_sizeof_pointerE = 8UL;
-_ZN3edg30targ_sizeof_ptr_to_data_memberE = 8UL;
+_ZN3edg19targ_sizeof_pointerE = 8ULL;
+_ZN3edg30targ_sizeof_ptr_to_data_memberE = 8ULL;
 
-_ZN3edg34targ_sizeof_ptr_to_member_functionE = 16UL;
-# 341
-_ZN3edg17targ_sizeof_shortE = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[1]))[0]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[1]))[1]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[2]))[0]) = 8UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[2]))[1]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[0]))[0]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[0]))[0]))[1]) = 1UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[1]))[0]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[1]))[1]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[2]))[0]) = 8UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[2]))[1]) = 4UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[0]))[0]) = 2UL;
-
-((((((_ZN3edg23targ_sizeof_fixed_pointE)[1]))[0]))[1]) = 1UL;
-
-
-_ZN3edg33targ_sizeof_virtual_function_infoE = 8UL;
+_ZN3edg34targ_sizeof_ptr_to_member_functionE = 16ULL;
+#line 341
+_ZN3edg17targ_sizeof_shortE = 2ULL;
+#line 368
+_ZN3edg33targ_sizeof_virtual_function_infoE = 8ULL;
 
 _ZN3edg20targ_size_t_int_kindE = _ZN3edg16ik_unsigned_longE;
-_ZN3edg15targ_size_t_maxE = 18446744073709551615UL;
+_ZN3edg15targ_size_t_maxE = 4294967295ULL;
 
 _ZN3edg21targ_ssize_t_int_kindE = _ZN3edg7ik_longE;
 
@@ -11411,379 +10043,291 @@ _ZN3edg50targ_zero_width_bit_field_affects_struct_alignmentE = 0;
 _ZN3edg35targ_zero_width_bit_field_alignmentE = (-1); 
 
 }
-# 62 "src/target_map.h"
-static void _ZN29_INTERNAL_8_target_c_946d5afe3edg21dump_as_target_configEPKc( _ZN3edg12a_const_charE *__161133_13_suffix)
-# 78
+#line 62 "src/target_map.h"
+static void _ZN29_INTERNAL_8_target_c_946d5afe3edg21dump_as_target_configEPKc( _ZN3edg12a_const_charE *__149726_13_suffix)
+#line 78
 {
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_DOUBLE")), __161133_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_DOUBLE")), __149726_13_suffix, ((const char *)("8")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_FAR_POINTER")), __161133_13_suffix, ((const char *)("4")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_FAR_POINTER")), __149726_13_suffix, ((const char *)("4")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_FLOAT")), __161133_13_suffix, ((const char *)("4")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_FLOAT128")), __161133_13_suffix, ((const char *)("16")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_FLOAT80")), __161133_13_suffix, ((const char *)("16")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_INT")), __161133_13_suffix, ((const char *)("4")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_FLOAT")), __149726_13_suffix, ((const char *)("4")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_FLOAT128")), __149726_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_FLOAT80")), __149726_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_INT")), __149726_13_suffix, ((const char *)("4")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_INT128")), __161133_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_INT128")), __149726_13_suffix, ((const char *)("16")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_LONG")), __161133_13_suffix, ((const char *)("8")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_LONG_DOUBLE")), __161133_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_LONG")), __149726_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_LONG_DOUBLE")), __149726_13_suffix, ((const char *)("16")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_LONG_LONG")), __161133_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_LONG_LONG")), __149726_13_suffix, ((const char *)("8")));
 
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_NEAR_POINTER")), __161133_13_suffix, ((const char *)("2")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_NEAR_POINTER")), __149726_13_suffix, ((const char *)("2")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_POINTER")), __161133_13_suffix, ((const char *)("8")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_PTR_TO_DATA_MEMBER")), __161133_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_POINTER")), __149726_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_PTR_TO_DATA_MEMBER")), __149726_13_suffix, ((const char *)("8")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_PTR_TO_MEMBER_FUNCTION")), __161133_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_PTR_TO_MEMBER_FUNCTION")), __149726_13_suffix, ((const char *)("8")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MICROSOFT_PTR_TO_MEMBER_SIZING")), __161133_13_suffix, ((const char *)("(0!=0)")));
-# 109
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_SHORT")), __161133_13_suffix, ((const char *)("2")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MICROSOFT_PTR_TO_MEMBER_SIZING")), __149726_13_suffix, ((const char *)("(0!=0)")));
+#line 109
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_SHORT")), __149726_13_suffix, ((const char *)("2")));
+#line 136
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_VIRTUAL_FUNCTION_INFO")), __149726_13_suffix, ((const char *)("8")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_ACCUM")), __161133_13_suffix, ((const char *)("4")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALL_POINTERS_SAME_SIZE")), __149726_13_suffix, ((const char *)("(0==0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_FRACT")), __161133_13_suffix, ((const char *)("2")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_BIT_FIELD_AFFECTS_UNION_ALIGNMENT")), __149726_13_suffix, ((const char *)("(0==0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_LONG_ACCUM")), __161133_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_BIT_FIELD_CONTAINER_SIZE")), __149726_13_suffix, ((const char *)("(-1)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_LONG_FRACT")), __161133_13_suffix, ((const char *)("4")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_BOOL_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_char)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_C_BOOL_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_char)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_CHAR16_T_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_short)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_CHAR32_T_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_int)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_CHAR_BIT")), __149726_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_CHAR_CONSTANT_FIRST_CHAR_MOST_SIGNIFICANT")), __149726_13_suffix, ((const char *)("1")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_SHORT_ACCUM")), __161133_13_suffix, ((const char *)("2")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DBL_MANT_DIG")), __149726_13_suffix, ((const char *)("53")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DBL_MAX_EXP")), __149726_13_suffix, ((const char *)("1024")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DBL_MIN_EXP")), __149726_13_suffix, ((const char *)("-1021")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DEFAULT_NEW_ALIGNMENT")), __149726_13_suffix, ((const char *)("16")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_SIGNED_SHORT_FRACT")), __161133_13_suffix, ((const char *)("1")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DELTA_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_long)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_ACCUM")), __161133_13_suffix, ((const char *)("4")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DOUBLE_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("8")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_FRACT")), __161133_13_suffix, ((const char *)("2")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DUAL_ALIGNMENTS_FOR_BUILTIN_TYPES")), __149726_13_suffix, ((const char *)("0")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_LONG_ACCUM")), __161133_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ENUM_BIT_FIELDS_ARE_ALWAYS_UNSIGNED")), __149726_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_LONG_FRACT")), __161133_13_suffix, ((const char *)("4")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ENUM_TYPES_CAN_BE_SMALLER_THAN_INT")), __149726_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_SHORT_ACCUM")), __161133_13_suffix, ((const char *)("2")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FIELD_ALLOC_SEQUENCE_EQUALS_DECL_SEQUENCE")), __149726_13_suffix, ((const char *)("(0==0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_UNSIGNED_SHORT_FRACT")), __161133_13_suffix, ((const char *)("1")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT_MANT_DIG")), __149726_13_suffix, ((const char *)("24")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT_MAX_EXP")), __149726_13_suffix, ((const char *)("128")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT_MIN_EXP")), __149726_13_suffix, ((const char *)("-125")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLOAT_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("4")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLOAT128_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("16")));
 
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLOAT80_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("16")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_VIRTUAL_FUNCTION_INFO")), __161133_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT128_MANT_DIG")), __149726_13_suffix, ((const char *)("113")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT128_MAX_EXP")), __149726_13_suffix, ((const char *)("(16384)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT128_MIN_EXP")), __149726_13_suffix, ((const char *)("(-16381)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT80_MANT_DIG")), __149726_13_suffix, ((const char *)("64")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT80_MAX_EXP")), __149726_13_suffix, ((const char *)("(16384)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT80_MIN_EXP")), __149726_13_suffix, ((const char *)("(-16381)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FORCE_ONE_BIT_BIT_FIELD_TO_BE_UNSIGNED")), __149726_13_suffix, ((const char *)("(0!=0)")));
+#line 218
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_HAS_SIGNED_CHARS")), __149726_13_suffix, ((const char *)("(0==0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_HOST_STRING_CHAR_BIT")), __149726_13_suffix, ((const char *)("8")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALL_POINTERS_SAME_SIZE")), __161133_13_suffix, ((const char *)("(0==0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_USE_GUARD_ACQUIRE_RELEASE")), __149726_13_suffix, ((const char *)("(0==0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_BIT_FIELD_AFFECTS_UNION_ALIGNMENT")), __161133_13_suffix, ((const char *)("(0==0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_USE_INT_STATIC_INIT_GUARD")), __149726_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_BIT_FIELD_CONTAINER_SIZE")), __161133_13_suffix, ((const char *)("(-1)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_USE_VARIANT_ARRAY_COOKIES")), __149726_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_BOOL_INT_KIND")), __161133_13_suffix, ((const char *)("((an_integer_kind)ik_char)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_C_BOOL_INT_KIND")), __161133_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_char)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_CHAR16_T_INT_KIND")), __161133_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_short)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_CHAR32_T_INT_KIND")), __161133_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_int)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_CHAR_BIT")), __161133_13_suffix, ((const char *)("8")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_CHAR_CONSTANT_FIRST_CHAR_MOST_SIGNIFICANT")), __161133_13_suffix, ((const char *)("1")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_USE_VARIANT_PTR_TO_MEMBER_FUNCTION_REPR")), __149726_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DBL_MANT_DIG")), __161133_13_suffix, ((const char *)("53")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DBL_MAX_EXP")), __161133_13_suffix, ((const char *)("1024")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DBL_MIN_EXP")), __161133_13_suffix, ((const char *)("(-1021)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DEFAULT_NEW_ALIGNMENT")), __161133_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_VARIANT_CTORS_AND_DTORS_RETURN_THIS")), __149726_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DELTA_INT_KIND")), __161133_13_suffix, ((const char *)("((an_integer_kind)ik_long)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_VARIANT_KEY_FUNCTION")), __149726_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DOUBLE_FIELD_ALIGNMENT")), __161133_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_VTABLE_ENTRY_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_long)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DUAL_ALIGNMENTS_FOR_BUILTIN_TYPES")), __161133_13_suffix, ((const char *)("0")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ENUM_BIT_FIELDS_ARE_ALWAYS_UNSIGNED")), __161133_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_INT_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("4")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ENUM_TYPES_CAN_BE_SMALLER_THAN_INT")), __161133_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_INT128_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("16")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FIELD_ALLOC_SEQUENCE_EQUALS_DECL_SEQUENCE")), __161133_13_suffix, ((const char *)("(0==0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT_MANT_DIG")), __161133_13_suffix, ((const char *)("24")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT_MAX_EXP")), __161133_13_suffix, ((const char *)("128")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT_MIN_EXP")), __161133_13_suffix, ((const char *)("(-125)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLOAT_FIELD_ALIGNMENT")), __161133_13_suffix, ((const char *)("4")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLOAT128_FIELD_ALIGNMENT")), __161133_13_suffix, ((const char *)("16")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLOAT80_FIELD_ALIGNMENT")), __161133_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_JMP_BUF_ELEMENTS_ARE_FLOAT")), __149726_13_suffix, ((const char *)("0")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT128_MANT_DIG")), __161133_13_suffix, ((const char *)("113")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT128_MAX_EXP")), __161133_13_suffix, ((const char *)("(16384)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT128_MIN_EXP")), __161133_13_suffix, ((const char *)("(-16381)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT80_MANT_DIG")), __161133_13_suffix, ((const char *)("64")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT80_MAX_EXP")), __161133_13_suffix, ((const char *)("(16384)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT80_MIN_EXP")), __161133_13_suffix, ((const char *)("(-16381)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FORCE_ONE_BIT_BIT_FIELD_TO_BE_UNSIGNED")), __161133_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_JMP_BUF_ELEMENT_FLOAT_KIND")), __149726_13_suffix, ((const char *)("((a_float_kind)fk_long_double)")));
 
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_JMP_BUF_ELEMENT_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_long)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_ACCUM")), __161133_13_suffix, ((const char *)("15")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_JMP_BUF_NUM_ELEMENTS")), __149726_13_suffix, ((const char *)("25")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_FRACT")), __161133_13_suffix, ((const char *)("15")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SETJMP_FUNC")), __149726_13_suffix, ((const char *)("\"_setjmp\"")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_LONG_ACCUM")), __161133_13_suffix, ((const char *)("31")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LDBL_MANT_DIG")), __149726_13_suffix, ((const char *)("64")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LDBL_MAX_EXP")), __149726_13_suffix, ((const char *)("16384")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LDBL_MIN_EXP")), __149726_13_suffix, ((const char *)("-16381")));
 
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LIBGCC_CMP_RETURN_MODE")), __149726_13_suffix, ((const char *)("((a_type_mode_kind)tmk_DI)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_LONG_FRACT")), __161133_13_suffix, ((const char *)("31")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LIBGCC_SHIFT_COUNT_MODE")), __149726_13_suffix, ((const char *)("((a_type_mode_kind)tmk_DI)")));
 
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_SHORT_ACCUM")), __161133_13_suffix, ((const char *)("7")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LITTLE_ENDIAN")), __149726_13_suffix, ((const char *)("(0==0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LONG_DOUBLE_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("16")));
 
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LONG_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("8")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_SIGNED_SHORT_FRACT")), __161133_13_suffix, ((const char *)("7")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LONG_LONG_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("8")));
 
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_ACCUM")), __161133_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MAXIMUM_INTRINSIC_ALIGNMENT")), __149726_13_suffix, ((const char *)("16")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_FRACT")), __161133_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MAX_BASE_CLASS_OFFSET")), __149726_13_suffix, ((const char *)("0")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MAX_CLASS_OBJECT_SIZE")), __149726_13_suffix, ((const char *)("0")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MICROSOFT_BIT_FIELD_ALLOCATION")), __149726_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_LONG_ACCUM")), __161133_13_suffix, ((const char *)("32")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MINIMUM_STRUCT_ALIGNMENT")), __149726_13_suffix, ((const char *)("1")));
 
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_NONNEGATIVE_ENUM_BIT_FIELD_IS_UNSIGNED")), __149726_13_suffix, ((const char *)("1")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_LONG_FRACT")), __161133_13_suffix, ((const char *)("32")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_OPTIMIZE_EMPTY_BASE_CLASS_LAYOUT")), __149726_13_suffix, ((const char *)("(0==0)")));
 
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_PAD_BIT_FIELDS_LARGER_THAN_BASE_TYPE")), __149726_13_suffix, ((const char *)("(0==0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_SHORT_ACCUM")), __161133_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_PLAIN_INT_BIT_FIELD_IS_UNSIGNED")), __149726_13_suffix, ((const char *)("0")));
 
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FRACTIONAL_BITS_FOR_UNSIGNED_SHORT_FRACT")), __161133_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_POINTER_MODE")), __149726_13_suffix, ((const char *)("((a_type_mode_kind)tmk_DI)")));
 
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_PTRDIFF_T_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_long)")));
 
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_HAS_SIGNED_CHARS")), __161133_13_suffix, ((const char *)("(0==0)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_HOST_STRING_CHAR_BIT")), __161133_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_REGION_NUMBER_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_short)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_USE_GUARD_ACQUIRE_RELEASE")), __161133_13_suffix, ((const char *)("(0==0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ETS_FLAG_TYPE_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_int)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_USE_INT_STATIC_INIT_GUARD")), __161133_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_USE_VARIANT_ARRAY_COOKIES")), __161133_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_USE_VARIANT_PTR_TO_MEMBER_FUNCTION_REPR")), __161133_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_REUSE_TAIL_PADDING")), __149726_13_suffix, ((const char *)("1")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_VARIANT_CTORS_AND_DTORS_RETURN_THIS")), __161133_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_RIGHT_SHIFT_IS_ARITHMETIC")), __149726_13_suffix, ((const char *)("(0==0)")));
+#line 305
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SHORT_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("2")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_DOUBLE")), __149726_13_suffix, ((const char *)("8")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_VARIANT_KEY_FUNCTION")), __161133_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_FAR_POINTER")), __149726_13_suffix, ((const char *)("4")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_VTABLE_ENTRY_INT_KIND")), __161133_13_suffix, ((const char *)("((an_integer_kind)ik_long)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_FLOAT")), __149726_13_suffix, ((const char *)("4")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_FLOAT128")), __149726_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_FLOAT80")), __149726_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_INT")), __149726_13_suffix, ((const char *)("4")));
 
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_INT128")), __149726_13_suffix, ((const char *)("16")));
+#line 321
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_LONG")), __149726_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_LONG_DOUBLE")), __149726_13_suffix, ((const char *)("16")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_INT_FIELD_ALIGNMENT")), __161133_13_suffix, ((const char *)("4")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_LONG_LONG")), __149726_13_suffix, ((const char *)("8")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_INT128_FIELD_ALIGNMENT")), __161133_13_suffix, ((const char *)("16")));
 
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_LARGEST_ATOMIC")), __149726_13_suffix, ((const char *)("(8+8)")));
 
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_JMP_BUF_ELEMENTS_ARE_FLOAT")), __161133_13_suffix, ((const char *)("0")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_NEAR_POINTER")), __149726_13_suffix, ((const char *)("2")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_JMP_BUF_ELEMENT_FLOAT_KIND")), __161133_13_suffix, ((const char *)("((a_float_kind)fk_long_double)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_POINTER")), __149726_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_DATA_MEMBER")), __149726_13_suffix, ((const char *)("8")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_JMP_BUF_ELEMENT_INT_KIND")), __161133_13_suffix, ((const char *)("((an_integer_kind)ik_long)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_MEMBER_FUNCTION")), __149726_13_suffix, ((const char *)("(8+8)")));
+#line 341
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_SHORT")), __149726_13_suffix, ((const char *)("2")));
+#line 368
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_VIRTUAL_FUNCTION_INFO")), __149726_13_suffix, ((const char *)("8")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_JMP_BUF_NUM_ELEMENTS")), __161133_13_suffix, ((const char *)("25")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZE_T_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_long)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZE_T_MAX")), __149726_13_suffix, ((const char *)("((a_targ_size_t)0xffffffffUL)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SETJMP_FUNC")), __161133_13_suffix, ((const char *)("\"_setjmp\"")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SSIZE_T_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_long)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LDBL_MANT_DIG")), __161133_13_suffix, ((const char *)("64")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LDBL_MAX_EXP")), __161133_13_suffix, ((const char *)("16384")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LDBL_MIN_EXP")), __161133_13_suffix, ((const char *)("-16381")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SUPPORTS_ARM32")), __149726_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SUPPORTS_ARM64")), __149726_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SUPPORTS_RISCV32")), __149726_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SUPPORTS_RISCV64")), __149726_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SUPPORTS_X86_64")), __149726_13_suffix, ((const char *)("(0==0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_TOO_LARGE_SHIFT_COUNT_IS_TAKEN_MODULO_SIZE")), __149726_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LIBGCC_CMP_RETURN_MODE")), __161133_13_suffix, ((const char *)("((a_type_mode_kind)tmk_DI)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_UNNAMED_BIT_FIELD_AFFECTS_STRUCT_ALIGNMENT")), __149726_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LIBGCC_SHIFT_COUNT_MODE")), __161133_13_suffix, ((const char *)("((a_type_mode_kind)tmk_DI)")));
 
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_UNWIND_WORD_MODE")), __149726_13_suffix, ((const char *)("((a_type_mode_kind)tmk_DI)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LITTLE_ENDIAN")), __161133_13_suffix, ((const char *)("(0==0)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LONG_DOUBLE_FIELD_ALIGNMENT")), __161133_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_USER_CONTROL_OF_STRUCT_PACKING_AFFECTS_BASE_CLASSES")), __149726_13_suffix, ((const char *)("(0==0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LONG_FIELD_ALIGNMENT")), __161133_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_USER_CONTROL_OF_STRUCT_PACKING_AFFECTS_BIT_FIELDS")), __149726_13_suffix, ((const char *)("(0==0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LONG_LONG_FIELD_ALIGNMENT")), __161133_13_suffix, ((const char *)("8")));
 
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_VAR_HANDLE_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_short)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MAXIMUM_INTRINSIC_ALIGNMENT")), __161133_13_suffix, ((const char *)("16")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MAX_BASE_CLASS_OFFSET")), __161133_13_suffix, ((const char *)("0")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MAX_CLASS_OBJECT_SIZE")), __161133_13_suffix, ((const char *)("0")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MICROSOFT_BIT_FIELD_ALLOCATION")), __161133_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_VIRTUAL_FUNCTION_INDEX_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_short)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MINIMUM_STRUCT_ALIGNMENT")), __161133_13_suffix, ((const char *)("1")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_NONNEGATIVE_ENUM_BIT_FIELD_IS_UNSIGNED")), __161133_13_suffix, ((const char *)("1")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_WCHAR_T_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_int)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_WINT_T_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_int)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_OPTIMIZE_EMPTY_BASE_CLASS_LAYOUT")), __161133_13_suffix, ((const char *)("(0==0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_WORD_MODE")), __149726_13_suffix, ((const char *)("((a_type_mode_kind)tmk_DI)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_PAD_BIT_FIELDS_LARGER_THAN_BASE_TYPE")), __161133_13_suffix, ((const char *)("(0==0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ZERO_WIDTH_BIT_FIELD_AFFECTS_STRUCT_ALIGNMENT")), __149726_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_PLAIN_INT_BIT_FIELD_IS_UNSIGNED")), __161133_13_suffix, ((const char *)("0")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_POINTER_MODE")), __161133_13_suffix, ((const char *)("((a_type_mode_kind)tmk_DI)")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_PTRDIFF_T_INT_KIND")), __161133_13_suffix, ((const char *)("((an_integer_kind)ik_long)")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_REGION_NUMBER_INT_KIND")), __161133_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_short)")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ETS_FLAG_TYPE_INT_KIND")), __161133_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_int)")));
-
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_REUSE_TAIL_PADDING")), __161133_13_suffix, ((const char *)("1")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_RIGHT_SHIFT_IS_ARITHMETIC")), __161133_13_suffix, ((const char *)("(0==0)")));
-# 305
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SHORT_FIELD_ALIGNMENT")), __161133_13_suffix, ((const char *)("2")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_DOUBLE")), __161133_13_suffix, ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_FAR_POINTER")), __161133_13_suffix, ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_FLOAT")), __161133_13_suffix, ((const char *)("4")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_FLOAT128")), __161133_13_suffix, ((const char *)("16")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_FLOAT80")), __161133_13_suffix, ((const char *)("16")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_INT")), __161133_13_suffix, ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_INT128")), __161133_13_suffix, ((const char *)("16")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_LARGEST_FIXED_POINT")), __161133_13_suffix, ((const char *)("8")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_LONG")), __161133_13_suffix, ((const char *)("8")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_LONG_DOUBLE")), __161133_13_suffix, ((const char *)("16")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_LONG_LONG")), __161133_13_suffix, ((const char *)("8")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_LARGEST_ATOMIC")), __161133_13_suffix, ((const char *)("(8+8)")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_NEAR_POINTER")), __161133_13_suffix, ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_POINTER")), __161133_13_suffix, ((const char *)("8")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_DATA_MEMBER")), __161133_13_suffix, ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_MEMBER_FUNCTION")), __161133_13_suffix, ((const char *)("(8+8)")));
-# 341
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_SHORT")), __161133_13_suffix, ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_ACCUM")), __161133_13_suffix, ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_FRACT")), __161133_13_suffix, ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_LONG_ACCUM")), __161133_13_suffix, ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_LONG_FRACT")), __161133_13_suffix, ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_SHORT_ACCUM")), __161133_13_suffix, ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_SIGNED_SHORT_FRACT")), __161133_13_suffix, ((const char *)("1")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_ACCUM")), __161133_13_suffix, ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_FRACT")), __161133_13_suffix, ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_LONG_ACCUM")), __161133_13_suffix, ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_LONG_FRACT")), __161133_13_suffix, ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_SHORT_ACCUM")), __161133_13_suffix, ((const char *)("2")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_UNSIGNED_SHORT_FRACT")), __161133_13_suffix, ((const char *)("1")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_VIRTUAL_FUNCTION_INFO")), __161133_13_suffix, ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZE_T_INT_KIND")), __161133_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_long)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZE_T_MAX")), __161133_13_suffix, ((const char *)("((a_targ_size_t)(0x7fffffffffffffffL * 2UL + 1UL))")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SSIZE_T_INT_KIND")), __161133_13_suffix, ((const char *)("((an_integer_kind)ik_long)")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SUPPORTS_ARM32")), __161133_13_suffix, ((const char *)("(0!=0)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SUPPORTS_ARM64")), __161133_13_suffix, ((const char *)("(0!=0)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SUPPORTS_RISCV32")), __161133_13_suffix, ((const char *)("(0!=0)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SUPPORTS_RISCV64")), __161133_13_suffix, ((const char *)("(0!=0)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SUPPORTS_X86_64")), __161133_13_suffix, ((const char *)("(0==0)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_TOO_LARGE_SHIFT_COUNT_IS_TAKEN_MODULO_SIZE")), __161133_13_suffix, ((const char *)("(0!=0)")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_UNNAMED_BIT_FIELD_AFFECTS_STRUCT_ALIGNMENT")), __161133_13_suffix, ((const char *)("(0!=0)")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_UNWIND_WORD_MODE")), __161133_13_suffix, ((const char *)("((a_type_mode_kind)tmk_DI)")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_USER_CONTROL_OF_STRUCT_PACKING_AFFECTS_BASE_CLASSES")), __161133_13_suffix, ((const char *)("(0==0)")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_USER_CONTROL_OF_STRUCT_PACKING_AFFECTS_BIT_FIELDS")), __161133_13_suffix, ((const char *)("(0==0)")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_VAR_HANDLE_INT_KIND")), __161133_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_short)")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_VIRTUAL_FUNCTION_INDEX_INT_KIND")), __161133_13_suffix, ((const char *)("((an_integer_kind)ik_short)")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_WCHAR_T_INT_KIND")), __161133_13_suffix, ((const char *)("((an_integer_kind)ik_int)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_WINT_T_INT_KIND")), __161133_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_int)")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_WORD_MODE")), __161133_13_suffix, ((const char *)("((a_type_mode_kind)tmk_DI)")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ZERO_WIDTH_BIT_FIELD_AFFECTS_STRUCT_ALIGNMENT")), __161133_13_suffix, ((const char *)("(0!=0)")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ZERO_WIDTH_BIT_FIELD_ALIGNMENT")), __161133_13_suffix, ((const char *)("(-1)"))); 
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ZERO_WIDTH_BIT_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("(-1)"))); 
 
 }
-# 246 "src/target.c"
-void _ZN3edg35dump_legacy_config_as_target_configEPKc( _ZN3edg12a_const_charE *__161508_56_config)
-# 257
+#line 246 "src/target.c"
+void _ZN3edg35dump_legacy_config_as_target_configEPKc( _ZN3edg12a_const_charE *__150101_56_config)
+#line 257
 {
-fprintf(_ZN3edg7f_errorE, ((const char *)"/* Target configuration: %s */\n"), __161508_56_config);
+fprintf(_ZN3edg7f_errorE, ((const char *)"/* Target configuration: %s */\n"), __150101_56_config);
 fprintf(_ZN3edg7f_errorE, ((const char *)"/* NOTE: For multiple target configurations, change _1 below as necessary. */\n"));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define TARGET_CONFIGURATION_1 %s\n"), __161508_56_config);
-_ZN29_INTERNAL_8_target_c_946d5afe3edg21dump_as_target_configEPKc(__161508_56_config); 
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define TARGET_CONFIGURATION_1 %s\n"), __150101_56_config);
+_ZN29_INTERNAL_8_target_c_946d5afe3edg21dump_as_target_configEPKc(__150101_56_config); 
 }
 
 
 
-int32_t _ZN3edg25find_target_configurationEPKc( _ZN3edg12a_const_charE *__161529_49_config)
-# 273
+int32_t _ZN3edg25find_target_configurationEPKc( _ZN3edg12a_const_charE *__150122_49_config)
+#line 273
 {
-auto int32_t __161536_12_i; auto int32_t __161536_15_result = (-1);
+auto int32_t __150129_12_i; auto int32_t __150129_15_result = (-1);
 
-for (__161536_12_i = 0; __161536_12_i < 8; __161536_12_i++) {
-if (((((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__161536_12_i]).name) != ((_ZN3edg12a_const_charE *)0)) && ((strcmp((((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__161536_12_i]).name), __161529_49_config)) == 0))
+for (__150129_12_i = 0; __150129_12_i < 8; __150129_12_i++) {
+if (((((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__150129_12_i]).name) != ((_ZN3edg12a_const_charE *)0)) && ((strcmp((((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__150129_12_i]).name), __150122_49_config)) == 0))
 {
-__161536_15_result = __161536_12_i;
-goto __T153047216;
+__150129_15_result = __150129_12_i;
+goto __T619526648;
 }
-} __T153047216:;
-return __161536_15_result;
+} __T619526648:;
+return __150129_15_result;
 }
 
 
-void _ZN3edg24set_target_configurationEi( int32_t __161549_39_target_index)
-# 298
+void _ZN3edg24set_target_configurationEi( int32_t __150142_39_target_index)
+#line 298
 {
-auto _ZN3edg9a_booleanE __161561_13_unnamed = ((_ZN3edg9a_booleanE)0);
-auto _ZN3edg22a_target_configurationE *__161562_27_target;
+auto _ZN3edg9a_booleanE __150154_13_unnamed = ((_ZN3edg9a_booleanE)0);
+auto _ZN3edg22a_target_configurationE *__150155_27_target;
 
-if (__161549_39_target_index == (-1)) {
+if (__150142_39_target_index == (-1)) {
 
 
 
-__161549_39_target_index = 0;
-__161561_13_unnamed = ((_ZN3edg9a_booleanE)1);
+__150142_39_target_index = 0;
+__150154_13_unnamed = ((_ZN3edg9a_booleanE)1);
 }
-((__161549_39_target_index >= 0) && (__161549_39_target_index < 8)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 310, __T152563104, ((_ZN3edg12a_const_charE *)0), ((
-# 309
+((__150142_39_target_index >= 0) && (__150142_39_target_index < 8)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 310, __T618979472, ((_ZN3edg12a_const_charE *)0), ((
+#line 309
 _ZN3edg12a_const_charE *)0)));
 
-__161562_27_target = ((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE) + __161549_39_target_index);
-((__161562_27_target->set_target_config) != ((void (*)(void))0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 312, __T152563104, ((_ZN3edg12a_const_charE *)0), ((
-# 312
+__150155_27_target = ((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE) + __150142_39_target_index);
+((__150155_27_target->set_target_config) != ((void (*)(void))0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 312, __T618979472, ((_ZN3edg12a_const_charE *)0), ((
+#line 312
 _ZN3edg12a_const_charE *)0)));
-(__161562_27_target->set_target_config)();
-if ((__161561_13_unnamed) || ((__161562_27_target->name) == ((_ZN3edg12a_const_charE *)0))) {
+(__150155_27_target->set_target_config)();
+if ((__150154_13_unnamed) || ((__150155_27_target->name) == ((_ZN3edg12a_const_charE *)0))) {
 
 
 _ZN3edg23auxiliary_info_dir_nameE = "lib";
@@ -11791,58 +10335,58 @@ _ZN3edg23auxiliary_info_dir_nameE = "lib";
 
 
 (void)0;
-_ZN3edg23auxiliary_info_dir_nameE = (_ZN3edg13alloc_generalEm(((3UL + (strlen((__161562_27_target->name)))) + 2UL)));
+_ZN3edg23auxiliary_info_dir_nameE = (_ZN3edg13alloc_generalEy(((3ULL + (strlen((__150155_27_target->name)))) + 2ULL)));
 
 
 strcpy(_ZN3edg23auxiliary_info_dir_nameE, ((const char *)"lib"));
 strcat(_ZN3edg23auxiliary_info_dir_nameE, ((const char *)"_"));
-strcat(_ZN3edg23auxiliary_info_dir_nameE, (__161562_27_target->name));
+strcat(_ZN3edg23auxiliary_info_dir_nameE, (__150155_27_target->name));
 } 
 }
 
 
 
 void _ZN3edg26dump_target_configurationsEv(void)
-# 339
+#line 339
 {
-auto _ZN3edg22a_target_configurationE *__161602_27_legacy = _ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE;
-auto int __161603_26_i;
+auto _ZN3edg22a_target_configurationE *__150195_27_legacy = _ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE;
+auto int __150196_26_i;
 
 
 
 
-if ((__161602_27_legacy->name) == ((_ZN3edg12a_const_charE *)0)) {
+if ((__150195_27_legacy->name) == ((_ZN3edg12a_const_charE *)0)) {
 fprintf(_ZN3edg7f_errorE, ((const char *)"\n/* Legacy configuration: <unnamed> */\n"));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define LEGACY_TARGET_CONFIGURATION_NAME NULL\n"));
 } else  {
-fprintf(_ZN3edg7f_errorE, ((const char *)"\n/* Legacy configuration: %s */\n"), (__161602_27_legacy->name));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define LEGACY_TARGET_CONFIGURATION_NAME \"%s\"\n"), (__161602_27_legacy->name));
+fprintf(_ZN3edg7f_errorE, ((const char *)"\n/* Legacy configuration: %s */\n"), (__150195_27_legacy->name));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define LEGACY_TARGET_CONFIGURATION_NAME \"%s\"\n"), (__150195_27_legacy->name));
 
 }
 
-for (__161603_26_i = 1; __161603_26_i < 8; __161603_26_i++) {
-fprintf(_ZN3edg7f_errorE, ((const char *)"\n/* Target configuration: %s */\n"), (((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__161603_26_i]).name));
+for (__150196_26_i = 1; __150196_26_i < 8; __150196_26_i++) {
+fprintf(_ZN3edg7f_errorE, ((const char *)"\n/* Target configuration: %s */\n"), (((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__150196_26_i]).name));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define TARGET_CONFIGURATION_%d %s\n"), __161603_26_i, (((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__161603_26_i]).name));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define TARGET_CONFIGURATION_%d %s\n"), __150196_26_i, (((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__150196_26_i]).name));
 
-((((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__161603_26_i]).dump_target_config) != ((void (*)(void))0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 361
-# 360
-, __T152569568, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+((((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__150196_26_i]).dump_target_config) != ((void (*)(void))0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 361
+#line 360
+, __T618985936, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
-(((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__161603_26_i]).dump_target_config)();
+(((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__150196_26_i]).dump_target_config)();
 } 
 }
 
 
 
-static void _ZN29_INTERNAL_8_target_c_946d5afe3edg23set_plain_char_int_kindEb( _ZN3edg9a_booleanE __161630_47_plain_chars_are_signed)
-# 374
+static void _ZN29_INTERNAL_8_target_c_946d5afe3edg23set_plain_char_int_kindEb( _ZN3edg9a_booleanE __150223_47_plain_chars_are_signed)
+#line 374
 {
 if ((((int)_ZN3edg9C_dialectE) == 1) || ((_ZN3edg14microsoft_modeE) && (((int)_ZN3edg9C_dialectE) != 2)))
 {
 
 
-_ZN3edg19plain_char_int_kindE = ((__161630_47_plain_chars_are_signed) ? _ZN3edg14ik_signed_charE : _ZN3edg16ik_unsigned_charE);
+_ZN3edg19plain_char_int_kindE = ((__150223_47_plain_chars_are_signed) ? _ZN3edg14ik_signed_charE : _ZN3edg16ik_unsigned_charE);
 
 
 } else  {
@@ -11855,9 +10399,9 @@ _ZN3edg19plain_char_int_kindE = _ZN3edg7ik_charE;
 
 
 void _ZN3edg30init_microsoft_sized_int_typesEv(void)
-# 398
+#line 398
 {
-# 405
+#line 405
 if (_ZN3edg13targ_char_bitE == 8U) {
 _ZN3edg18targ_int8_int_kindE = _ZN3edg19plain_char_int_kindE;
 _ZN3edg27targ_unsigned_int8_int_kindE = _ZN3edg16ik_unsigned_charE;
@@ -11867,8 +10411,8 @@ _ZN3edg27targ_unsigned_int8_int_kindE = _ZN3edg16ik_unsigned_charE;
 _ZN3edg19targ_int16_int_kindE = (_ZN3edg21int_kind_for_bit_sizeEjb(16U, ((_ZN3edg9a_booleanE)1)));
 if (((int)_ZN3edg19targ_int16_int_kindE) != 15) {
 _ZN3edg28targ_unsigned_int16_int_kindE = (_ZN3edg21int_kind_for_bit_sizeEjb(16U, ((_ZN3edg9a_booleanE)0)));
-if (!(((int)_ZN3edg28targ_unsigned_int16_int_kindE) != 15)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 416, __T152572200, ((const char *)"target_init: can\'t set int kind for unsigned __int16"
-# 414
+if (!(((int)_ZN3edg28targ_unsigned_int16_int_kindE) != 15)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 416, __T618988568, ((const char *)"target_init: can\'t set int kind for unsigned __int16"
+#line 414
 ), ((_ZN3edg12a_const_charE *)0)); }
 
 
@@ -11876,8 +10420,8 @@ if (!(((int)_ZN3edg28targ_unsigned_int16_int_kindE) != 15)) { _ZN3edg16assertion
 _ZN3edg19targ_int32_int_kindE = (_ZN3edg21int_kind_for_bit_sizeEjb(32U, ((_ZN3edg9a_booleanE)1)));
 if (((int)_ZN3edg19targ_int32_int_kindE) != 15) {
 _ZN3edg28targ_unsigned_int32_int_kindE = (_ZN3edg21int_kind_for_bit_sizeEjb(32U, ((_ZN3edg9a_booleanE)0)));
-if (!(((int)_ZN3edg28targ_unsigned_int32_int_kindE) != 15)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 423, __T152572200, ((const char *)"target_init: can\'t set int kind for unsigned __int32"
-# 421
+if (!(((int)_ZN3edg28targ_unsigned_int32_int_kindE) != 15)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 423, __T618988568, ((const char *)"target_init: can\'t set int kind for unsigned __int32"
+#line 421
 ), ((_ZN3edg12a_const_charE *)0)); }
 
 
@@ -11885,8 +10429,8 @@ if (!(((int)_ZN3edg28targ_unsigned_int32_int_kindE) != 15)) { _ZN3edg16assertion
 _ZN3edg19targ_int64_int_kindE = (_ZN3edg21int_kind_for_bit_sizeEjb(64U, ((_ZN3edg9a_booleanE)1)));
 if (((int)_ZN3edg19targ_int64_int_kindE) != 15) {
 _ZN3edg28targ_unsigned_int64_int_kindE = (_ZN3edg21int_kind_for_bit_sizeEjb(64U, ((_ZN3edg9a_booleanE)0)));
-if (!(((int)_ZN3edg28targ_unsigned_int64_int_kindE) != 15)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 430, __T152572200, ((const char *)"target_init: can\'t set int kind for unsigned __int64"
-# 428
+if (!(((int)_ZN3edg28targ_unsigned_int64_int_kindE) != 15)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 430, __T618988568, ((const char *)"target_init: can\'t set int kind for unsigned __int64"
+#line 428
 ), ((_ZN3edg12a_const_charE *)0)); }
 
 
@@ -11895,22 +10439,22 @@ if (!(((int)_ZN3edg28targ_unsigned_int64_int_kindE) != 15)) { _ZN3edg16assertion
 
 
 
-_ZN3edg13a_targ_size_tE _ZN3edg18size_of_pointer_toEPNS_6a_typeEPt( _ZN3edg10a_type_ptrE __161698_63_tp __attribute__((__unused__)), 
-_ZN3edg16a_targ_alignmentE *__161699_64_alignment)
-# 443
+_ZN3edg13a_targ_size_tE _ZN3edg18size_of_pointer_toEPNS_6a_typeEPt( _ZN3edg10a_type_ptrE __150291_63_tp, 
+_ZN3edg16a_targ_alignmentE *__150292_64_alignment)
+#line 443
 {
-auto _ZN3edg13a_targ_size_tE __161706_17_size;
+auto _ZN3edg13a_targ_size_tE __150299_17_size;
 
 
 if (_ZN3edg9il_headerE.near_and_far_are_enabled) {
 
 
-if (_ZN3edg11is_far_typeEPNS_6a_typeE(__161698_63_tp)) {
-__161706_17_size = _ZN3edg23targ_sizeof_far_pointerE;
-(*__161699_64_alignment) = _ZN3edg24targ_alignof_far_pointerE;
+if (_ZN3edg11is_far_typeEPNS_6a_typeE(__150291_63_tp)) {
+__150299_17_size = _ZN3edg23targ_sizeof_far_pointerE;
+(*__150292_64_alignment) = _ZN3edg24targ_alignof_far_pointerE;
 } else  {
-__161706_17_size = _ZN3edg24targ_sizeof_near_pointerE;
-(*__161699_64_alignment) = _ZN3edg25targ_alignof_near_pointerE;
+__150299_17_size = _ZN3edg24targ_sizeof_near_pointerE;
+(*__150292_64_alignment) = _ZN3edg25targ_alignof_near_pointerE;
 }
 }
 
@@ -11918,107 +10462,99 @@ __161706_17_size = _ZN3edg24targ_sizeof_near_pointerE;
 else  {
 if (_ZN3edg27targ_all_pointers_same_sizeE) {
 
-__161706_17_size = _ZN3edg19targ_sizeof_pointerE;
-(*__161699_64_alignment) = _ZN3edg20targ_alignof_pointerE;
+__150299_17_size = _ZN3edg19targ_sizeof_pointerE;
+(*__150292_64_alignment) = _ZN3edg20targ_alignof_pointerE;
 } else  {
-# 471
+#line 471
 _ZN3edg14internal_errorEPKc(((const char *)"size_of_pointer_to: unknown pointer size"));
 
 
 
 }
 }
-return __161706_17_size;
+return __150299_17_size;
 }
 
 
 
 void _ZN3edg26check_target_configurationEv(void)
-# 489
+#line 489
 {
-auto _ZN3edg13a_targ_size_tE __161752_20_size; auto _ZN3edg13a_targ_size_tE __161752_26_size_max_value;
-auto _ZN3edg16a_targ_alignmentE __161753_20_alignment;
-auto _ZN3edg9a_booleanE __161754_20_err;
-# 503
-_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPmPt(_ZN3edg7ik_charE, (&__161752_20_size), (&__161753_20_alignment));
+auto _ZN3edg13a_targ_size_tE __150345_20_size; auto _ZN3edg13a_targ_size_tE __150345_26_size_max_value;
+auto _ZN3edg16a_targ_alignmentE __150346_20_alignment;
+auto _ZN3edg9a_booleanE __150347_20_err;
+#line 503
+_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(_ZN3edg7ik_charE, (&__150345_20_size), (&__150346_20_alignment));
 
-if (__161752_20_size > 8UL) {
+if (__150345_20_size > 4ULL) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: target char is too large"));
 }
 
-if (_ZN3edg19targ_sizeof_wchar_tE > 8UL) {
+if (_ZN3edg19targ_sizeof_wchar_tE > 4ULL) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: target wchar_t is too large"));
 }
 
 
-if (_ZN3edg20targ_sizeof_char16_tE > 8UL) {
+if (_ZN3edg20targ_sizeof_char16_tE > 4ULL) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: target char16_t is too large"));
-} else  { if ((_ZN3edg20targ_sizeof_char16_tE * ((unsigned long)_ZN3edg13targ_char_bitE)) < 16UL) {
+} else  { if ((_ZN3edg20targ_sizeof_char16_tE * ((unsigned long long)_ZN3edg13targ_char_bitE)) < 16ULL) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: target char16_t is too small"));
 } }
-if (!(!((_ZN3edg18int_kind_is_signedE)[((int)_ZN3edg22targ_char16_t_int_kindE)]))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 520, __T152580040, ((const char *)"check_target_config: target char16_t must be unsigned"
-# 519
+if (!(!((_ZN3edg18int_kind_is_signedE)[((int)_ZN3edg22targ_char16_t_int_kindE)]))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 520, __T618996408, ((const char *)"check_target_config: target char16_t must be unsigned"
+#line 519
 ), ((_ZN3edg12a_const_charE *)0)); }
 
-if (_ZN3edg20targ_sizeof_char32_tE > 8UL) {
+if (_ZN3edg20targ_sizeof_char32_tE > 4ULL) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: target char32_t is too large"));
-} else  { if ((_ZN3edg20targ_sizeof_char32_tE * ((unsigned long)_ZN3edg13targ_char_bitE)) < 32UL) {
+} else  { if ((_ZN3edg20targ_sizeof_char32_tE * ((unsigned long long)_ZN3edg13targ_char_bitE)) < 32ULL) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: target char32_t is too small"));
 } }
-if (!(!((_ZN3edg18int_kind_is_signedE)[((int)_ZN3edg22targ_char32_t_int_kindE)]))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 527, __T152580040, ((const char *)"check_target_config: target char32_t must be unsigned"
-# 526
+if (!(!((_ZN3edg18int_kind_is_signedE)[((int)_ZN3edg22targ_char32_t_int_kindE)]))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 527, __T618996408, ((const char *)"check_target_config: target char32_t must be unsigned"
+#line 526
 ), ((_ZN3edg12a_const_charE *)0)); }
 
 
 
-_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPmPt(((unsigned char)_ZN3edg20targ_size_t_int_kindE), (&__161752_20_size), (&__161753_20_alignment));
+_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(((unsigned char)_ZN3edg20targ_size_t_int_kindE), (&__150345_20_size), (&__150346_20_alignment));
 
-__161752_20_size *= ((unsigned long)_ZN3edg13targ_char_bitE);
-if (__161752_20_size > 64UL) {
-__161752_20_size = 64UL;
+__150345_20_size *= ((unsigned long long)_ZN3edg13targ_char_bitE);
+if (__150345_20_size > 64ULL) {
+__150345_20_size = 64ULL;
 }
 
-__161752_26_size_max_value = (((1UL << (__161752_20_size - 1UL)) - 1UL) << 1);
+__150345_26_size_max_value = (((1ULL << (__150345_20_size - 1ULL)) - 1ULL) << 1);
 
-__161752_26_size_max_value |= 1UL;
-if (__161752_26_size_max_value < _ZN3edg15targ_size_t_maxE) {
+__150345_26_size_max_value |= 1ULL;
+if (__150345_26_size_max_value < _ZN3edg15targ_size_t_maxE) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: targ_size_t_max is too large"));
 }
-if (_ZN3edg27targ_sizeof_largest_integerE > 16UL) {
+if (_ZN3edg27targ_sizeof_largest_integerE > 16ULL) {
 
 
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: targ_sizeof_largest_integer is too large"));
 
 }
-
-if (_ZN3edg31targ_sizeof_largest_fixed_pointE > 8UL) {
-
-
-_ZN3edg14internal_errorEPKc(((const char *)"check_target_config: targ_sizeof_largest_fixed_point is too large"));
-
-}
-
-
+#line 558
 if (_ZN3edg27targ_sizeof_largest_integerE < _ZN3edg21targ_sizeof_long_longE) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: invalid targ_sizeof_largest_integer"));
 }
-# 582
-__161754_20_err = ((_ZN3edg9a_booleanE)0);
-if (__161754_20_err) {
+#line 582
+__150347_20_err = ((_ZN3edg9a_booleanE)0);
+if (__150347_20_err) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: invalid BITS_IN_HOST_LARGE_INTEGER"));
 }
-__161754_20_err = ((_ZN3edg9a_booleanE)0);
-if (__161754_20_err) {
+__150347_20_err = ((_ZN3edg9a_booleanE)0);
+if (__150347_20_err) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: invalid SIZEOF_INT_VALUE_PART"));
 }
-__161754_20_err = ((_ZN3edg9a_booleanE)0);
+__150347_20_err = ((_ZN3edg9a_booleanE)0);
 
-if (__161754_20_err) {
+if (__150347_20_err) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: invalid BITS_IN_INT_VALUE_PART"));
 }
-__161754_20_err = ((_Bool)(128UL != ((unsigned long)(16U * _ZN3edg13targ_char_bitE))));
+__150347_20_err = ((_Bool)(128ULL != ((unsigned long long)(16U * _ZN3edg13targ_char_bitE))));
 
-if (__161754_20_err) {
+if (__150347_20_err) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: invalid INT_VALUE_PARTS_PER_INTEGER_VALUE"));
 
 }
@@ -12029,9 +10565,9 @@ _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: targ_host_strin
 
 
 
-{ auto _ZN3edg16a_targ_alignmentE __161870_22_temp = ((_ZN3edg16a_targ_alignmentE)255U);
+{ auto _ZN3edg16a_targ_alignmentE __150463_22_temp = ((_ZN3edg16a_targ_alignmentE)255U);
 
-if ((((int)_ZN3edg27targ_minimum_pack_alignmentE) < 1) || (((int)_ZN3edg27targ_minimum_pack_alignmentE) > ((int)__161870_22_temp)))
+if ((((int)_ZN3edg27targ_minimum_pack_alignmentE) < 1) || (((int)_ZN3edg27targ_minimum_pack_alignmentE) > ((int)__150463_22_temp)))
 {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: invalid targ_minimum_pack_alignment"));
 
@@ -12042,27 +10578,27 @@ if ((((int)_ZN3edg27targ_maximum_pack_alignmentE) < ((int)_ZN3edg27targ_minimum_
 {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: invalid targ_maximum_pack_alignment"));
 }
-# 627
-if (!(((_ZN3edg17targ_sizeof_shortE == 2UL) && (_ZN3edg15targ_sizeof_intE == 4UL)) && (_ZN3edg21targ_sizeof_long_longE == 8UL))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 630, 
-# 627
-__T152580040, ((const char *)"check_target_config: invalid integer sizes for"), ((const char *)" GNU IA-32 vector functions")); }
-# 633
+#line 627
+if (!(((_ZN3edg17targ_sizeof_shortE == 2ULL) && (_ZN3edg15targ_sizeof_intE == 4ULL)) && (_ZN3edg21targ_sizeof_long_longE == 8ULL))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 630, 
+#line 627
+__T618996408, ((const char *)"check_target_config: invalid integer sizes for"), ((const char *)" GNU IA-32 vector functions")); }
+#line 633
 {
 
 
 
-auto _ZN3edg13a_targ_size_tE __161899_22_vtbl_entry_size; auto _ZN3edg13a_targ_size_tE __161899_39_delta_int_size;
-auto _ZN3edg16a_targ_alignmentE __161900_22_dummy_alignment;
+auto _ZN3edg13a_targ_size_tE __150492_22_vtbl_entry_size; auto _ZN3edg13a_targ_size_tE __150492_39_delta_int_size;
+auto _ZN3edg16a_targ_alignmentE __150493_22_dummy_alignment;
 
-_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPmPt(_ZN3edg31targ_ia64_vtable_entry_int_kindE, (&__161899_22_vtbl_entry_size), (&__161900_22_dummy_alignment));
+_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(_ZN3edg31targ_ia64_vtable_entry_int_kindE, (&__150492_22_vtbl_entry_size), (&__150493_22_dummy_alignment));
 
-_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPmPt(_ZN3edg19targ_delta_int_kindE, (&__161899_39_delta_int_size), (&__161900_22_dummy_alignment));
+_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(_ZN3edg19targ_delta_int_kindE, (&__150492_39_delta_int_size), (&__150493_22_dummy_alignment));
 
-if ((_ZN3edg19targ_sizeof_pointerE != __161899_22_vtbl_entry_size) && (_ZN3edg27targ_all_pointers_same_sizeE)) {
+if ((_ZN3edg19targ_sizeof_pointerE != __150492_22_vtbl_entry_size) && (_ZN3edg27targ_all_pointers_same_sizeE)) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: targ_ia64_vtable_entry_int_kind wrong size"));
 
 }
-if (__161899_39_delta_int_size > __161899_22_vtbl_entry_size) {
+if (__150492_39_delta_int_size > __150492_22_vtbl_entry_size) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: targ_ia64_vtable_entry_int_kind is too small"));
 
 }
@@ -12081,15 +10617,15 @@ _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: targ_microsoft_
 
 
 
-(_ZN3edg37targ_optimize_empty_base_class_layoutE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 667, __T152580040, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))
-# 667
+(_ZN3edg37targ_optimize_empty_base_class_layoutE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 667, __T618996408, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))
+#line 667
 );
-# 675
+#line 675
 if (!(_ZN3edg46targ_field_alloc_sequence_equals_decl_sequenceE)) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: targ_field_alloc_sequence_equals_decl_sequence must be TRUE"));
 
 }
-# 688
+#line 688
 if (((int)_ZN3edg18targ_little_endianE) != ((int)_ZN3edg18host_little_endianE)) {
 
 
@@ -12099,7 +10635,7 @@ _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: unexpected host
 
 
 
-if (0)
+if ((1) && (_ZN3edg18targ_ldbl_mant_digE == 64ULL))
 {
 
 
@@ -12108,8 +10644,8 @@ _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: must use SoftFl
 }
 
 
-if (!((!(_ZN3edg35targ_microsoft_ptr_to_member_sizingE)) || (_ZN3edg27targ_all_pointers_same_sizeE))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 709, __T152580040, ((const char *)"Microsoft pointer-to-member layout assumes all"
-# 706
+if (!((!(_ZN3edg35targ_microsoft_ptr_to_member_sizingE)) || (_ZN3edg27targ_all_pointers_same_sizeE))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 709, __T618996408, ((const char *)"Microsoft pointer-to-member layout assumes all"
+#line 706
 ), ((const char *)" pointers have the same size")); } 
 
 
@@ -12125,16 +10661,16 @@ static void _ZN29_INTERNAL_8_target_c_946d5afe3edg20init_character_sizesEv(void)
 
 
 {
-auto _ZN3edg16a_targ_alignmentE __161983_21_alignment;
+auto _ZN3edg16a_targ_alignmentE __150576_21_alignment;
 
-_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPmPt(((unsigned char)_ZN3edg21targ_wchar_t_int_kindE), (&_ZN3edg19targ_sizeof_wchar_tE), (&__161983_21_alignment));
+_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(((unsigned char)_ZN3edg21targ_wchar_t_int_kindE), (&_ZN3edg19targ_sizeof_wchar_tE), (&__150576_21_alignment));
 
-_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPmPt(((unsigned char)_ZN3edg22targ_char16_t_int_kindE), (&_ZN3edg20targ_sizeof_char16_tE), (&__161983_21_alignment));
+_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(((unsigned char)_ZN3edg22targ_char16_t_int_kindE), (&_ZN3edg20targ_sizeof_char16_tE), (&__150576_21_alignment));
 
-_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPmPt(((unsigned char)_ZN3edg22targ_char32_t_int_kindE), (&_ZN3edg20targ_sizeof_char32_tE), (&__161983_21_alignment)); 
+_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(((unsigned char)_ZN3edg22targ_char32_t_int_kindE), (&_ZN3edg20targ_sizeof_char32_tE), (&__150576_21_alignment)); 
 
 }
-# 805
+#line 805
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg27init_field_alignment_tablesEv(void)
 
 
@@ -12142,11 +10678,11 @@ static void _ZN29_INTERNAL_8_target_c_946d5afe3edg27init_field_alignment_tablesE
 
 {
 
-auto int __162074_7_k;
+auto int __150667_7_k;
 
 
-(_ZN3edg38targ_dual_alignments_for_builtin_typesE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 815, __T153248416, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)
-# 815
+(_ZN3edg38targ_dual_alignments_for_builtin_typesE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 815, __T619786256, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)
+#line 815
 ));
 ((_ZN29_INTERNAL_8_target_c_946d5afe3edg20int_field_alignmentsE)[0]) = ((_ZN3edg16a_targ_alignmentE)1U);
 ((_ZN29_INTERNAL_8_target_c_946d5afe3edg20int_field_alignmentsE)[1]) = ((_ZN3edg16a_targ_alignmentE)1U);
@@ -12169,9 +10705,9 @@ auto int __162074_7_k;
 ((_ZN29_INTERNAL_8_target_c_946d5afe3edg20int_field_alignmentsE)[_ZN3edg14ik_bit_preciseE]) = _ZN3edg24targ_int_field_alignmentE;
 ((_ZN29_INTERNAL_8_target_c_946d5afe3edg20int_field_alignmentsE)[_ZN3edg23ik_unsigned_bit_preciseE]) = _ZN3edg24targ_int_field_alignmentE;
 
-for (__162074_7_k = 0; __162074_7_k < 15; ++__162074_7_k) {
-if (((int)((_ZN29_INTERNAL_8_target_c_946d5afe3edg20int_field_alignmentsE)[__162074_7_k])) == 0) {
-_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 839, __T153248416, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
+for (__150667_7_k = 0; __150667_7_k < 15; ++__150667_7_k) {
+if (((int)((_ZN29_INTERNAL_8_target_c_946d5afe3edg20int_field_alignmentsE)[__150667_7_k])) == 0) {
+_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 839, __T619786256, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
 }
 }
 
@@ -12191,84 +10727,84 @@ _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 839, __T
 ((_ZN29_INTERNAL_8_target_c_946d5afe3edg22float_field_alignmentsE)[12]) = _ZN3edg27targ_double_field_alignmentE;
 ((_ZN29_INTERNAL_8_target_c_946d5afe3edg22float_field_alignmentsE)[13]) = _ZN3edg29targ_float128_field_alignmentE;
 
-for (__162074_7_k = 0; __162074_7_k < 14; ++__162074_7_k) {
-if (((int)((_ZN29_INTERNAL_8_target_c_946d5afe3edg22float_field_alignmentsE)[__162074_7_k])) == 0) {
-_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 861, __T153248416, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
+for (__150667_7_k = 0; __150667_7_k < 14; ++__150667_7_k) {
+if (((int)((_ZN29_INTERNAL_8_target_c_946d5afe3edg22float_field_alignmentsE)[__150667_7_k])) == 0) {
+_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 861, __T619786256, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
 }
 } 
 
 }
 
 
-_ZN3edg16a_targ_alignmentE _ZN3edg19field_alignment_forEPNS_6a_typeE( _ZN3edg10a_type_ptrE __162130_50_type)
+_ZN3edg16a_targ_alignmentE _ZN3edg19field_alignment_forEPNS_6a_typeE( _ZN3edg10a_type_ptrE __150723_50_type)
 
 
 
 {
-auto _ZN3edg16a_targ_alignmentE __162135_21_result;
+auto _ZN3edg16a_targ_alignmentE __150728_21_result;
 
 if (_ZN3edg38targ_dual_alignments_for_builtin_typesE) {
-switch ((int)(__162130_50_type->kind)) {
+switch ((int)(__150723_50_type->kind)) {
 case 2:
-__162135_21_result = ((_ZN29_INTERNAL_8_target_c_946d5afe3edg20int_field_alignmentsE)[(((__162130_50_type->variant).integer).int_kind)]);
-goto __T153352024;
+__150728_21_result = ((_ZN29_INTERNAL_8_target_c_946d5afe3edg20int_field_alignmentsE)[(((__150723_50_type->variant).integer).int_kind)]);
+goto __T619913536;
+case 3:
+
 case 4:
-
 case 5:
-case 6:
 
-__162135_21_result = ((_ZN29_INTERNAL_8_target_c_946d5afe3edg22float_field_alignmentsE)[((__162130_50_type->variant).float_kind)]);
-goto __T153352024;
-case 13:
+__150728_21_result = ((_ZN29_INTERNAL_8_target_c_946d5afe3edg22float_field_alignmentsE)[((__150723_50_type->variant).float_kind)]);
+goto __T619913536;
+case 12:
 
-if (__162130_50_type->alignment_set_explicitly) {
-__162135_21_result = (__162130_50_type->alignment);
-} else  { if ((_ZN3edg10clang_modeE) && (((((__162130_50_type->variant).typeref).qualifiers) & 8U) != 0U))
+if (__150723_50_type->alignment_set_explicitly) {
+__150728_21_result = (__150723_50_type->alignment);
+} else  { if ((_ZN3edg10clang_modeE) && (((((__150723_50_type->variant).typeref).qualifiers) & 8U) != 0U))
 {
 
-__162135_21_result = ((__162130_50_type->alignment_set_explicitly) ? (__162130_50_type->alignment) : ((((int)(__162130_50_type->kind)) != 13) ? (__162130_50_type->alignment) : (_ZN3edg19f_alignment_of_typeEPNS_6a_typeE(__162130_50_type))));
+__150728_21_result = ((__150723_50_type->alignment_set_explicitly) ? (__150723_50_type->alignment) : ((((int)(__150723_50_type->kind)) != 12) ? (__150723_50_type->alignment) : (_ZN3edg19f_alignment_of_typeEPNS_6a_typeE(__150723_50_type))));
 } else  { if ((!(_ZN3edg8gnu_modeE)) || ((_ZN3edg11gnu_versionE / 100UL) != 303UL)) {
 
 
 
-__162135_21_result = (_ZN3edg19field_alignment_forEPNS_6a_typeE((((__162130_50_type->variant).typeref).type)));
+__150728_21_result = (_ZN3edg19field_alignment_forEPNS_6a_typeE((((__150723_50_type->variant).typeref).type)));
 }
 
 
 else  {
-__162135_21_result = (_ZN3edg19field_alignment_forEPNS_6a_typeE((_ZN3edg13skip_typerefsEPNS_6a_typeE(__162130_50_type))));
+__150728_21_result = (_ZN3edg19field_alignment_forEPNS_6a_typeE((_ZN3edg13skip_typerefsEPNS_6a_typeE(__150723_50_type))));
 } } }
-goto __T153352024;
-case 9:
+goto __T619913536;
+case 8:
 
-if (__162130_50_type->alignment_set_explicitly) {
-
-
+if (__150723_50_type->alignment_set_explicitly) {
 
 
-__162135_21_result = (__162130_50_type->alignment);
+
+
+__150728_21_result = (__150723_50_type->alignment);
 }
 
 
 else  {
-__162135_21_result = (_ZN3edg19field_alignment_forEPNS_6a_typeE((_ZN3edg29underlying_array_element_typeEPNS_6a_typeE(__162130_50_type))));
+__150728_21_result = (_ZN3edg19field_alignment_forEPNS_6a_typeE((_ZN3edg29underlying_array_element_typeEPNS_6a_typeE(__150723_50_type))));
 }
-goto __T153352024;
+goto __T619913536;
 default:
-__162135_21_result = (__162130_50_type->alignment);
-} __T153352024:;
+__150728_21_result = (__150723_50_type->alignment);
+} __T619913536:;
 } else  {
 
-__162135_21_result = ((__162130_50_type->alignment_set_explicitly) ? (__162130_50_type->alignment) : ((((int)(__162130_50_type->kind)) != 13) ? (__162130_50_type->alignment) : (_ZN3edg19f_alignment_of_typeEPNS_6a_typeE(__162130_50_type))));
+__150728_21_result = ((__150723_50_type->alignment_set_explicitly) ? (__150723_50_type->alignment) : ((((int)(__150723_50_type->kind)) != 12) ? (__150723_50_type->alignment) : (_ZN3edg19f_alignment_of_typeEPNS_6a_typeE(__150723_50_type))));
 }
-return __162135_21_result;
+return __150728_21_result;
 }
 
 
 void _ZN3edg17target_early_initEv(void)
-# 942
+#line 942
 {
-# 949
+#line 949
 _ZN3edg26target_configuration_indexE = (-1);
 
 _ZN3edg24set_target_configurationEi(_ZN3edg26target_configuration_indexE);
@@ -12293,11 +10829,11 @@ _ZN3edg51assume_this_cannot_be_null_in_conditional_operatorsE = ((_ZN3edg9a_bool
 
 _ZN3edg17ctors_return_thisE = _ZN3edg49targ_ia64_abi_variant_ctors_and_dtors_return_thisE;
 _ZN3edg17dtors_return_thisE = _ZN3edg49targ_ia64_abi_variant_ctors_and_dtors_return_thisE;
-# 978
+#line 978
 _ZN3edg34remove_qualifiers_from_param_typesE = ((_ZN3edg9a_booleanE)1);
 
 _ZN3edg37c_and_cpp_function_types_are_distinctE = ((_ZN3edg9a_booleanE)1);
-# 986
+#line 986
 _ZN3edg26type_info_in_namespace_stdE = ((_ZN3edg9a_booleanE)1);
 _ZN3edg40pass_stdarg_references_to_generated_codeE = ((_ZN3edg9a_booleanE)1);
 
@@ -12312,32 +10848,32 @@ _ZN3edg28gcc_is_generated_code_targetE = ((_ZN3edg9a_booleanE)1);
 _ZN3edg37gcc_or_clang_is_generated_code_targetE = ((_Bool)((_ZN3edg28gcc_is_generated_code_targetE) || (_ZN3edg30clang_is_generated_code_targetE)));
 
 _ZN3edg25gnu_target_version_numberE = 80100UL;
-# 1006
+#line 1006
 _ZN3edg37gcc_builtin_varargs_in_generated_codeE = ((_ZN3edg9a_booleanE)1);
-# 1013
+#line 1013
 _ZN3edg29msvc_is_generated_code_targetE = ((_ZN3edg9a_booleanE)0);
 
 _ZN3edg26msvc_target_version_numberE = 1926UL;
 _ZN3edg42microsoft_dialect_is_generated_code_targetE = ((_ZN3edg9a_booleanE)0);
-# 1024
+#line 1024
 _ZN3edg31use_empty_struct_in_generated_cE = ((_ZN3edg9a_booleanE)1);
 
 _ZN3edg21exc_spec_in_func_typeE = ((_ZN3edg9a_booleanE)0);
 _ZN3edg27targ_minimum_pack_alignmentE = ((_ZN3edg16a_targ_alignmentE)1U);
 _ZN3edg27targ_maximum_pack_alignmentE = ((_ZN3edg16a_targ_alignmentE)32768U);
-_ZN3edg21bitint_maxwidth_valueE = 65535UL; 
+_ZN3edg21bitint_maxwidth_valueE = 65535ULL; 
 }
 
 
 void _ZN3edg20target_one_time_initEv(void)
-# 1039
+#line 1039
 {
 
 
 _ZN29_INTERNAL_8_target_c_946d5afe3edg20init_character_sizesEv();
-((_ZN3edg14character_sizeE)[0]) = 1UL;
+((_ZN3edg14character_sizeE)[0]) = 1ULL;
 ((_ZN3edg14character_sizeE)[1]) = _ZN3edg19targ_sizeof_wchar_tE;
-((_ZN3edg14character_sizeE)[2]) = 1UL;
+((_ZN3edg14character_sizeE)[2]) = 1ULL;
 ((_ZN3edg14character_sizeE)[3]) = _ZN3edg20targ_sizeof_char16_tE;
 ((_ZN3edg14character_sizeE)[4]) = _ZN3edg20targ_sizeof_char32_tE;
 if (_ZN3edg38targ_dual_alignments_for_builtin_typesE) {
@@ -12345,7 +10881,7 @@ _ZN29_INTERNAL_8_target_c_946d5afe3edg27init_field_alignment_tablesEv();
 }
 
 _ZN3edg27targ_sizeof_largest_integerE = _ZN3edg18targ_sizeof_int128E;
-# 1061
+#line 1061
 _ZN3edg26check_target_configurationEv(); 
 
 }
@@ -12371,49 +10907,49 @@ _ZN3edg22string_literals_sharedE = ((_Bool)((((int)_ZN3edg9C_dialectE) != 1) && 
 
 _ZN3edg16targ_intmax_kindE = _ZN3edg12ik_long_longE;
 _ZN3edg17targ_uintmax_kindE = _ZN3edg21ik_unsigned_long_longE;
-# 1091
-if (_ZN3edg26targ_max_class_object_sizeE == 0UL) {
+#line 1091
+if (_ZN3edg26targ_max_class_object_sizeE == 0ULL) {
 _ZN3edg26targ_max_class_object_sizeE = _ZN3edg15targ_size_t_maxE;
 }
 
-if (_ZN3edg26targ_max_base_class_offsetE == 0UL) {
+if (_ZN3edg26targ_max_base_class_offsetE == 0ULL) {
 _ZN3edg26targ_max_base_class_offsetE = _ZN3edg15targ_size_t_maxE;
 
 } else  {
 
 
-auto _ZN3edg13a_targ_size_tE __162363_20_size;
-auto _ZN3edg21a_host_large_unsignedE __162364_27_temp;
-auto _ZN3edg16a_targ_alignmentE __162365_23_alignment;
-auto _ZN3edg21a_host_large_unsignedE __162366_27_bits;
+auto _ZN3edg13a_targ_size_tE __150956_20_size;
+auto _ZN3edg21a_host_large_unsignedE __150957_27_temp;
+auto _ZN3edg16a_targ_alignmentE __150958_23_alignment;
+auto _ZN3edg21a_host_large_unsignedE __150959_27_bits;
 
 
 
-_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPmPt(_ZN3edg19targ_delta_int_kindE, (&__162363_20_size), (&__162365_23_alignment));
+_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(_ZN3edg19targ_delta_int_kindE, (&__150956_20_size), (&__150958_23_alignment));
 
 
-__162366_27_bits = (__162363_20_size * ((unsigned long)_ZN3edg13targ_char_bitE));
-if ((_ZN3edg18int_kind_is_signedE)[_ZN3edg19targ_delta_int_kindE]) { __162366_27_bits -= 1UL; }
-__162364_27_temp = (~(0xffffffffffffffffUL << __162366_27_bits));
-if (__162364_27_temp > ((_ZN3edg21a_host_large_unsignedE)_ZN3edg15targ_size_t_maxE)) {
+__150959_27_bits = (__150956_20_size * ((unsigned long long)_ZN3edg13targ_char_bitE));
+if ((_ZN3edg18int_kind_is_signedE)[_ZN3edg19targ_delta_int_kindE]) { __150959_27_bits -= 1ULL; }
+__150957_27_temp = (~(0xffffffffffffffffULL << __150959_27_bits));
+if (__150957_27_temp > ((_ZN3edg21a_host_large_unsignedE)_ZN3edg15targ_size_t_maxE)) {
 
-__162364_27_temp = ((_ZN3edg21a_host_large_unsignedE)_ZN3edg15targ_size_t_maxE);
+__150957_27_temp = ((_ZN3edg21a_host_large_unsignedE)_ZN3edg15targ_size_t_maxE);
 }
-if (__162364_27_temp >= _ZN3edg26targ_max_base_class_offsetE) {
+if (__150957_27_temp >= _ZN3edg26targ_max_base_class_offsetE) {
 
 } else  {
 
-_ZN3edg26targ_max_base_class_offsetE = ((_ZN3edg13a_targ_size_tE)__162364_27_temp);
+_ZN3edg26targ_max_base_class_offsetE = ((_ZN3edg13a_targ_size_tE)__150957_27_temp);
 }
 
 }
 
 _ZN3edg30init_microsoft_sized_int_typesEv();
 
-{ auto _ZN3edg13a_targ_size_tE __162391_23_size;
-auto _ZN3edg16a_targ_alignmentE __162392_23_alignment;
-_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPmPt(_ZN3edg20targ_size_t_int_kindE, (&__162391_23_size), (&__162392_23_alignment));
-_ZN3edg15is_64bit_targetE = ((_Bool)((__162391_23_size * ((unsigned long)_ZN3edg13targ_char_bitE)) == 64UL));
+{ auto _ZN3edg13a_targ_size_tE __150984_23_size;
+auto _ZN3edg16a_targ_alignmentE __150985_23_alignment;
+_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(_ZN3edg20targ_size_t_int_kindE, (&__150984_23_size), (&__150985_23_alignment));
+_ZN3edg15is_64bit_targetE = ((_Bool)((__150984_23_size * ((unsigned long long)_ZN3edg13targ_char_bitE)) == 64ULL));
 }
 
 _ZN3edg39always_fold_calls_to_builtin_constant_pE = ((_ZN3edg9a_booleanE)0); 
