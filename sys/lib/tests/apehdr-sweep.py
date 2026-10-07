@@ -190,16 +190,76 @@ def main():
                                           len(findings)))
         print("apehdr-sweep: all %d together in one translation unit: %d "
               "errors" % (len(together), len(tog)))
-        for l in tog[:10]:
+        for l in tog[:14]:
             print("  " + l.split(" error: ", 1)[1][:70])
-        # NOT added to `findings', so they do not gate the exit status.
-        # This check is new and its results are NOT yet triaged: some
-        # are real (uname/getrusage was), and some are design intent --
-        # <regex.h> and <pcre2posix.h> both define `regex_t' because
-        # they are ALTERNATIVES, and no program includes both. Failing
-        # the sweep on an untriaged list would make it cry wolf, and
-        # suppressing the list would waste it. So it prints and the
-        # next round triages. See CLAUDE.md for the twelve.
+
+        # TRIAGED -- and TWELVE ERRORS ARE SIX CAUSES, which is the
+        # whole reason to triage rather than count. Still NOT added to
+        # `findings', so it does not gate: three of the six are design
+        # intent, and a sweep that failed on those would cry wolf.
+        #
+        #  f2c.h           FIVE of the twelve, and one header.
+        #                  `#define min/max/abs' (159-162) collide with
+        #                  <libv.h>'s `extern int min(int,int)', and
+        #                  `typedef struct {real r,i;} complex' (18)
+        #                  collides with <complex.h>'s
+        #                  `#define complex _Complex'. *A transpiler's
+        #                  private runtime header, installed public,
+        #                  owning four names two C standard headers
+        #                  own.* 149 files include it and every one is
+        #                  under external/f2c. RECOMMENDATION: it does
+        #                  not belong in sys/include/ape.
+        #
+        #  regex.h /       THREE, and DESIGN INTENT. pcre2posix spells
+        #  pcre2posix.h    the REG_* codes as an ENUM where regex.h
+        #                  `#define's them, so regex.h:44 turns
+        #                  pcre2posix's enumerator into a numeric
+        #                  constant; the regex_t/regmatch_t pair is the
+        #                  same collision. They are ALTERNATIVES and no
+        #                  program includes both.
+        #
+        #  Plan9libnet.h   TWO, and the tree already fixed it once.
+        #                  It declares Plan 9's `accept(int, char*)'
+        #                  and `listen(char*, char*)' -- different
+        #                  functions wearing POSIX's names -- against
+        #                  <sys/socket.h>. **<libnet.h> beside it is
+        #                  the same interface with `net_' prefixes,
+        #                  and is what all five callers in the tree
+        #                  use.** Nothing includes Plan9libnet.h at
+        #                  all. RECOMMENDATION: delete it; a header
+        #                  that cannot be combined with <sys/socket.h>
+        #                  and that nothing includes is only a trap.
+        #
+        #  bsd.h:47        ONE, REAL, and OURS. `getopt(int, char**,
+        #                  char*)' where POSIX says `(int, char *const
+        #                  *, const char *)' -- and **<unistd.h> does
+        #                  not declare getopt at all**, so this is the
+        #                  tree's only declaration and it is the wrong
+        #                  one. bsd.h is reached from <stdlib.h>,
+        #                  <string.h>, <strings.h>, <unistd.h> and
+        #                  <alltypes.h>.
+        #
+        #  features.h:55   ONE, REAL, OURS, and it HAS A VICTIM.
+        #                  `#define hidden' is musl's internal
+        #                  visibility macro, in a PUBLIC header reached
+        #                  from <byteswap.h>, <endian.h>, <ftw.h>,
+        #                  <glob.h>, <iconv.h> and more -- and
+        #                  `sqlite3.h:10957' declares `unsigned char
+        #                  hidden[48];', which is ERASED wherever
+        #                  features.h was included first. *A silent
+        #                  struct-layout change in a public API.*
+        #                  `weak_alias' (51) is the same shape with no
+        #                  victim found yet.
+        #                  RECOMMENDATION, and it needs care: libap's
+        #                  own `multibyte/internal.c:25' already does
+        #                  `#ifndef hidden / #define hidden' for
+        #                  itself, so the private users can carry their
+        #                  own -- but others (`network/lookup.h:46')
+        #                  rely on the leak, which is the
+        #                  <stdio.h>-leaked-errno shape. Sweep libap
+        #                  before removing it from the public header.
+        #
+        # Six causes, and only two of them are bugs in this tree.
         for h, msg in findings:
             print("  %-24s %s" % (h, msg))
         if not findings:
