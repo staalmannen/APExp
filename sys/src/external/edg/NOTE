@@ -26,7 +26,11 @@ Converted
            cmake --preset linux-gcc-release -B build/kencc \
                  -DCMAKE_CXX_FLAGS="-include <path>/kencc_targ.h"
            ninja cpfe
-         kencc_targ.h is the target configuration; see below.  It is a
+         kencc_targ.h IS COMMITTED BESIDE THIS FILE -- it is the one
+         input to this directory that is neither upstream's nor
+         generated, so a scratch copy of it would have made the whole
+         translation unreproducible once the container went.
+         It is the target configuration; see below.  It is a
          pre-included header rather than a patch: NOTHING IN THE EDG
          TREE IS MODIFIED.
   Driver: dev_tools/bin/eccp, with build/kencc/environment.sh sourced.
@@ -270,31 +274,74 @@ it makes the output DEPEND on a prelink step.
 
 APExp HEADER CHANGES THIS TRANSLATION DEPENDS ON
 ------------------------------------------------
-The headers were STAGED (copied) and edited in the staging copy only.
-NOTHING IN APExp's HEADER TREE WAS MODIFIED.  To reproduce this
-directory those edits have to be repeated, and they are all cases of
-an APE header not being usable from C++:
+At translation time the headers were STAGED (copied) and edited in the
+staging copy only, and NOTHING IN APExp's HEADER TREE WAS MODIFIED.
+Eight edits were needed, every one a case of an APE header not being
+usable from C++.
+
+**ALL EIGHT ARE FIXED IN THE TREE NOW, so a re-translation needs NONE
+of them** -- stage the headers as they stand.  The list is kept
+because it is the record of what a stricter compiler found, and
+because each was fixed on its own evidence rather than to suit EDG.
+
+The last four, each a parameter name or a keyword, so none of them
+changes what a C caller sees:
 
   sys/include/ape/stdlib.h:47,49,87  `_Noreturn` (a C11 keyword that
       does not exist in C++) used unguarded
   sys/include/ape/stdlib.h:69,70     parameter named `template`
   sys/include/ape/unistd.h:186,192   parameter named `new`
-  sys/include/ape/signal.h:132-135   `restrict` as a parameter name;
+  sys/include/ape/signal.h:161-164   `restrict` as a parameter name;
       two per prototype reads as a duplicate parameter name in C++
-  sys/include/ape/signal.h:57        `signal()`'s handler parameter
-      declared `void (*)()` -- unprototyped -- where POSIX says
-      `void (*)(int)`
-  sys/include/ape/signal.h:16-18     SIG_DFL/SIG_ERR/SIG_IGN cast to
-      `void (*)()`, same defect as the declaration beside them
-  sys/include/ape/features.h:55      `#define hidden` -- musl's
-      internal visibility macro, in a PUBLIC header
-  sys/include/ape/bsd.h:47           `getopt(int, char**, char*)`,
-      non-const, where POSIX says `(int, char *const *, const char *)`
+
+And the first four, fixed earlier in the same session for their own
+reasons.  Verified against the tree rather than assumed:
+
+  signal.h   `signal()` is prototyped now --
+             `extern void (*signal(int, void (*)(int)))(int)` at :86
+  signal.h   SIG_DFL/SIG_ERR/SIG_IGN are `(void (*)(int))` at :45-47;
+             they had to move with the declaration, since callers
+             compare the return value against them
+  features.h `#define hidden` is GONE from the public header -- it had
+             a measured victim in `sqlite3.h:10957`'s
+             `unsigned char hidden[48]`
+  bsd.h:53   `getopt(int, char * const [], const char *)`, POSIX's
+             spelling, agreeing with `<getopt.h>` at last
+
+*That is the translation's own staging list working as a to-do list
+for the HEADER TREE*: it was written as eight things EDG could not
+use, and every one turned out to be a defect worth fixing on its own
+evidence, found by a compiler stricter than gcc.
+
+The control is a before-and-after pair on IDENTICAL staging: a C++
+translation unit including <stdlib.h>, <unistd.h> and <signal.h>
+gives 12 errors before and 1 after.  The same unit as C is 0 errors,
+which is the half that could have cost the tree.
+
+THE SURVIVOR IS A NINTH ITEM THIS LIST NEVER NAMED: stddef.h:50
+typedefs `wchar_t', which is a BUILT-IN TYPE in C++.  It is present
+in both runs, so it is pre-existing rather than anything done here,
+and it is recorded and not fixed.  cpfe does not trip on it --
+`--no_standard_includes' plus EDG's own include_c99 is why -- so it
+blocks nothing in this directory.
+
+Two of the four could not be fixed the obvious way.  `#define
+_Noreturn' or `#define restrict' under __cplusplus would put an
+UNRESERVED name in a public APE header that external packages define
+themselves: gnulib ships a whole `_Noreturn.h' and a dozen `config.h'
+here define `restrict'.  That is exactly the collision that broke
+flex over `reject' one round earlier, so the spellings used are all
+in the reserved double-underscore space.  Three of the four need no
+macro at all -- `restrict' becomes `__restrict', which kencc lexes to
+the same LRESTRICT (cc/lex.c:1652,1678-1679), and the two parameters
+are simply renamed.  `__ape_template' is this directory's own
+convention arriving back in the tree: the generated C already carries
+it.
 
 One absolute include also had to be rewritten for a host compile:
 amd64/include/ape/stddef_arch.h's `#include "/sys/include/ape/..."`.
 Four others of the form `#include "/sys/include/..."` name native
 Plan 9 headers and are unreachable from EDG, so they were left.
 
-These are reported as findings in their own right; see the round-2
-report.  They are not EDG's problem and they are not fixed here.
+The four that remain are reported as findings in their own right and
+are not fixed here; they are not EDG's problem either.

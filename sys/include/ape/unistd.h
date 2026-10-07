@@ -183,13 +183,20 @@ int openat(int dirfd, const char *path, int flags, ...); /* unistd/at_functions.
 int fstatat(int dirfd, const char *path, struct stat *buf, int flags);
 int unlinkat(int dirfd, const char *path, int flags);
 int mkdirat(int dirfd, const char *path, mode_t mode);
-int renameat(int olddirfd, const char *old, int newdirfd, const char *new);
+/*
+ * `__ape_new' because `new' is a C++ KEYWORD, so these two lines
+ * could not be read from C++ at all. A parameter name in a prototype
+ * is documentation -- no caller can see it -- so this changes nothing
+ * for C. Same convention as `<stdlib.h>'s `__ape_template'; the
+ * reason both are in the reserved space is recorded there.
+ */
+int renameat(int olddirfd, const char *old, int newdirfd, const char *__ape_new);
 ssize_t readlinkat(int dirfd, const char *path, char *buf, size_t n);
 int symlinkat(const char *target, int dirfd, const char *linkpath);
 int faccessat(int dirfd, const char *path, int mode, int flags);
 int fchownat(int dirfd, const char *path, uid_t uid, gid_t gid, int flags);
 int fchmodat(int dirfd, const char *path, mode_t mode, int flags);
-int linkat(int old_dfd, const char *old, int new_dfd, const char *new, int flags);
+int linkat(int old_dfd, const char *old, int new_dfd, const char *__ape_new, int flags);
 
 /* GNU extensions */
 extern int pipe2(int [2], int);
