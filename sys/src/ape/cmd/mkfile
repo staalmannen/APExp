@@ -67,18 +67,8 @@ _OPTIONAL_APPS=\
 	chicken\
 	objc\
 	cfront\
-# c++lib: cfront emits NOTHING. All 40 `.c' under cmd/c++lib were \
-# committed at ZERO BYTES, so the archive built clean and empty and the \
-# build "succeeded" -- a check that cannot fail. Leave off until a \
-# cfront run produces a non-empty .c. \
 #		c++lib\
-# basic: the generated C in external/BASIC/src was a TRUNCATED bacon.sh \
-# run (276KB against 531KB) and gcc rejected it with 50 errors. It is \
-# regenerated now and gcc gives 0, including the classes 6c treats as \
-# fatal -- but it has never been through pcc. Build it by hand first \
-# (cd basic && mk install); uncomment once that works, because a \
-# failing entry here aborts the whole tree's mk. \
-#	basic\
+	basic\
 # dev tools \
 	adeb\
 	dwarfdump\
