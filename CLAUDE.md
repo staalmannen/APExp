@@ -1232,31 +1232,56 @@ with errors` section is gone**, so this really is the test
 interpreter. *The void run and this one differ in nothing but which
 binary ran them, and that is the cleanest control this suite can
 give.*
-**`socket_inet.test` HAS LEFT THE FAILING-FILE LIST ENTIRELY**, and
-sockets are half of the measured blast radius -- `sockaddr_in`
-24 -> 16, `in_addr` 8 -> 4, `sockaddr_storage` 112 -> 110. *The
-refutation condition was written down before the switch -- "a NEW
-socket failure means something is computing a length it should not"
--- and the opposite happened in the one file named.* `socket.test`
-still fails, which is the `_resettimer`/timer-process story and
-predates this.
+**AND THE SOCKET CONFIRMATION IS WITHDRAWN: THERE IS NO
+`socket_inet.test`.** This round recorded *"`socket_inet.test` has
+left the failing-file list entirely"* as the behavioural evidence that
+`-J` had not broken the socket half of its own blast radius
+(`sockaddr_in` 24 -> 16, `in_addr` 8 -> 4). **That file does not exist
+and never did**: the suite has one `socket.test`, whose body is
+`foreach {af localhost}` with `test socket_$af-1.1 ...`, so every
+`socket_inet-*` name is GENERATED with `$af` = `inet`, and a grep for
+`socket_inet-5.1` matches no file in the tree. *Its absence from the
+list could not have been anything else under any outcome* -- and the
+substance fails too: **`socket_inet` has four failures, 2.11, 5.1,
+5.3, 7.3**, which is exactly the "`socket_inet` 4" already listed as
+unread below. **A name absent from a list is not a measurement until
+you have checked the name could ever have appeared there** -- an
+absence has two explanations, the thing passed or it was never called
+that, and only one is a result.
+*The eighteen stand on `Total` and `Skipped` being identical with
+`Passed` +18, which is sound. The ATTRIBUTION to sockets does not* --
+so with the pthread half already recorded as skipped (`197 thread`,
+`12 testmutex`), the behavioural confirmation of `-J` covers neither
+family it actually moved.
 **THE PTHREAD HALF IS NOT MEASURED HERE, and the skip table says so
 rather than leaving it to be assumed**: `197 thread` and `12
 testmutex` are SKIPPED, so `pthread_mutex_t` 56 -> 40 and
 `pthread_cond_t` 56 -> 48 were barely exercised. *Half the blast
 radius is confirmed and half is untouched*, which is a different
 statement from "the suite is clean".
-**TWO THINGS TO CHECK PER NAME BEFORE THIS IS CLOSED.** The totals
-cannot tell 18 fixed from 20 fixed and 2 broken -- this tree's own
-rule -- and `event.test` and `main.test` appear in the failing list
-where the baseline notes had `event-1.1` and `Tcl_Main-5.10` as
-unread singletons, so they are probably unchanged rather than new.
-**And `socket_inet-5.1`/`5.3` were recorded as tests that SHOULD
-fail** (`notRoot`, and glenda is the host owner): if they are among
-the eighteen, that is the leftover-listener false pass returning, not
-a fix. *A test that newly passes may be passing for the wrong
-reason* -- and this is exactly the file where that has happened
-before.
+**BOTH PER-NAME QUESTIONS ARE NOW ANSWERED, AND A PER-NAME BASELINE
+EXISTS AT LAST** -- `docs/notes/tcl-suite.md` carries all 43 names and
+the extraction command, because *its absence is what kept this open
+for rounds* while every comparison was made by total.
+**`Total 68118  Passed 62159  Skipped 5916  Failed 43`**, marker,
+exit 0, 167 files, four minutes, `tcl::test 9.0.3 present`.
+- **`socket_inet-5.1`/`5.3` were NOT among the eighteen**: both are
+  still failing, so the leftover-listener false pass did NOT return.
+  That was the stated hazard and this is the good answer.
+- **`event.test`/`main.test` were unchanged, not new**: by name they
+  are `event-1.1` and `Tcl_Main-5.10`, the two singletons already on
+  the list.
+**AND 46 -> 43 IS THREE FIXED, NOTHING BROKEN, ALL THREE NAMED**:
+`chan-io-41.8`, `expr-old-37.21` and `unixFCmd-2.2.2`, three entries
+of the eleven unread singletons. *Three gone and the net is three, so
+nothing arrived* -- the only form that confirmation can take, and the
+first time this suite's movement has been attributed by name. **None
+was predicted or being worked on**, so the vehicle is unidentified and
+naming one would be a guess; the baseline makes the next run settle
+it. (`io-6.46` and `chan-io-6.46` now both fail, which is the twins
+rule working as written; zipfs is **five** `zipfs-password-*` cipher
+tests where this file recorded three, one family undercounted from a
+prediction rather than a regression.)
 
 **AND THE FIRST REBUILD STOPPED IN bash -- NOT ON `-J`, ON A SHADOWED
 HEADER.** `/sys/include/ape/qlock.h:44 syntax error, last name: Lock`,
@@ -1983,6 +2008,15 @@ in the topic file.
   `tcl-runall.tcl`; check for it before reading any total.
 - **A marker says the run reached the end, not that it was the run you
   asked for.** Read the `Total` line beside it.
+- **A NAME absent from a list is not a measurement until you have
+  checked that the name could ever have been present.** An absence has
+  at least two explanations -- the thing passed, or it was never called
+  that -- and only one of them is a result. `socket_inet.test` was
+  recorded as having "left the failing-file list" and offered as the
+  behavioural confirmation of `-J`; **there is no such file**, the
+  names are generated inside `socket.test` by a `foreach {af ...}`
+  loop, and `socket_inet`'s four failures never moved. One `ls` would
+  have cleared it.
 - **And check the log's own `Tests ended at` line before reading
   anything from it.** A copied file that was never committed leaves the
   previous run in place, and a stale log reads exactly like a real one.
@@ -2331,8 +2365,12 @@ or a constraint that fails on Linux too). The port's own share is
 `focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
 
 **Tcl's suite**: **it finishes and nothing aborts.**
-**`Total 68118 Passed 62156 Skipped 5916 Failed 46`** under `-J`,
-167 files, marker, exit 0, no `Test files exiting with errors`.
+**`Total 68118 Passed 62159 Skipped 5916 Failed 43`**, 167 files,
+marker, exit 0, no `Test files exiting with errors`, four minutes.
+**All 43 are listed BY NAME in `docs/notes/tcl-suite.md`** with the
+one-command extraction beside them -- the first per-name baseline this
+suite has had, and the thing whose absence made every earlier
+comparison a total. The log is committed at `tmp/tcl-all.out`.
 *(The baseline this is measured against is
 `Passed 62138 Failed 64`, same Total and Skipped; the eighteen are
 discussed in the `-J` section. A run in between reporting `Failed 37`
