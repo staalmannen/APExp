@@ -1197,6 +1197,58 @@ measured from that run.
 **`cd sys/src/cmd && mk install` BEFORE the tree rebuild**, and this
 one matters for every package, not only the ones with `-J` in frame.
 
+**AND `signal()` IS PROTOTYPED NOW -- `void (*signal(int, void
+(*)(int)))(int)`, which is what C and POSIX say.** It had been the
+UNPROTOTYPED `void (*)()` since the file was written, under a comment
+explaining that libap dispatches `void handler(int, char *msg,
+Ureg *u)` -- the Plan 9 note string and the trap frame -- and that a
+prototype would put the extension out of reach.
+**The extension is unchanged and still dispatched**; what went is a
+public declaration that turned off argument checking for EVERY caller
+in the tree to keep it reachable. *This tree's own invariant is that
+a call with no prototype in scope corrupts its arguments under kencc,
+and the thing left unchecked here is a FUNCTION POINTER a program
+installs and the library later calls.*
+**And the header was not even true of libap**: `signal/signal.c`
+defined `signal()` with the three-argument type, so the declaration
+and the definition have always disagreed and only the empty parameter
+list made it legal.
+**Nothing in the tree uses it -- swept rather than assumed.** 56
+distinct handler names reach `signal()`; exactly two take more than
+one argument, and neither is this extension (`diffutils`' own
+`signal_handler(int, sighandler)` wrapper, whose `sighandler` is
+already `void(*)(int)`, and a `muon` TEST using `SA_SIGINFO`). The
+only files outside libap that mention `Ureg` are go1.4's runtime,
+which is not built here.
+**`SIG_DFL`/`SIG_ERR`/`SIG_IGN` and `sa_handler` MOVE WITH IT** and
+could not be left behind: callers compare the return value against
+the macros and assign them to `sa_handler`, so a mismatched pair is a
+diagnostic in every file that mentions them. `_sighdlr[]` holds the
+POSIX type now and **the cast lives at the ONE place that calls a
+handler**, `_notetramp` -- not at each assignment, or `_envsetup.c`
+and `sigwait.c` would each need one and a cast would stop meaning
+"something unusual here". The eleven arch `notetramp.c` are
+untouched. `sigaction.c` loses four casts that existed only because
+nothing had a type to agree with.
+**Measured, with a baseline**: `signal.c`, `sigaction.c`, `sigwait.c`
+and `_envsetup.c` syntax-checked on the host against staged headers
+in the classes 6c treats as fatal -- **1 error before, 1 after, the
+same one** -- and `apehdr-sweep` is 149 headers, 0 findings, with the
+together-case holding at its recorded 12.
+**That surviving error is a REAL pre-existing find, recorded NOT
+fixed**: `lib.h` declares `_notehandler(void *, char *)` and
+`signal.c` defines it `(Ureg *, char *)`. *Both sides are right* --
+the declaration matches `_NOTIFY`, which is Plan 9's own `void *`,
+and the definition matches what the body does -- so narrowing the
+declaration only moves the mismatch to the `_NOTIFY` call, which is
+exactly what happened when I tried it. Whichever side changes, one
+needs a cast. The all-HEAD control is what separates it from this
+round: HEAD's `signal.c` gives this one error against HEAD's own
+headers.
+*(The code for this landed in `6c51444e` by a careless `git add -A`,
+whose message describes only the `sualign` fix. Recorded here rather
+than rewritten, since that commit was already pushed.)*
+
 **AND THE cfront SIZE PROBE WAS `.gitignore'd, SO THE VM NEVER GOT
 IT.** `pcc ... cfrontsz-probe.c` answered `Can't open input file` and
 `ls cfront*.c` showed only the two stub files. **git is the only
