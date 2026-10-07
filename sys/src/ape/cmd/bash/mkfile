@@ -111,7 +111,35 @@ DEFS= 	-DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale" -D_POSIX_SOURCE\
 		-Dbotch=programming_error -DSHELL
 
 
-CFLAGS=	-c -B -I. -I$BASHSRC -I$BASHSRC/include -I$BASHSRC/lib -I$BASHSRC/lib/intl\
+# `-I$BASHSRC/lib/intl' USED TO BE HERE AND BROKE EVERY BASH COMPILE.
+# That directory holds gettext's own `lock.h', and an -I is searched
+# ahead of the system path -- so APE's <pthread.h>, reaching its own
+# `#include <lock.h>', got THAT file. gettext's never typedefs `Lock',
+# so <qlock.h> arrived at `Lock lock;' with no such type:
+#
+#	/sys/include/ape/qlock.h:44 syntax error, last name: Lock
+#
+# **Nothing in that message says `lock.h'.** It names the victim's
+# line in a header this package never mentions. *Name the file that is
+# COMPILED, not the file with the right name* -- the `PATH_MAX' and
+# shadowed-`config.h' lesson, here for a header a SYSTEM header
+# includes rather than one the package does.
+#
+# It was inert for as long as <qlock.h> carried its OWN `Lock' typedef
+# behind an always-true `#ifndef Lock'. Removing that duplicate was
+# right -- two anonymous structs sharing a name is a constraint
+# violation -- but it had been load-bearing for exactly this shadow,
+# so the conformance fix is what made the shadow reachable. *A fix
+# that makes a process reach code it never reached before*, in a
+# header.
+#
+# Removing the -I is MEASURED rather than hopeful: `ENABLE_NLS' is
+# undef in bash's config.h, the only <libintl.h> includes in the
+# compiled set are behind `#if ENABLE_NLS' (include/gettext.h:24 and
+# y.tab.c:835), and nothing compiled here names any other of that
+# directory's 29 headers. `sys/lib/tests/ishadow-sweep.py' is the
+# sweep for the whole class.
+CFLAGS=	-c -B -I. -I$BASHSRC -I$BASHSRC/include -I$BASHSRC/lib\
 		$DEFS
 
 BASHSRC=$APEXPROOT/sys/src/external/bash

@@ -1083,6 +1083,49 @@ are the sharpest instruments the tree has for it -- a clean run there
 is the confirmation, and a NEW socket failure means something is
 computing a length it should not.
 
+**AND THE FIRST REBUILD STOPPED IN bash -- NOT ON `-J`, ON A SHADOWED
+HEADER.** `/sys/include/ape/qlock.h:44 syntax error, last name: Lock`,
+compiling `general.c`. **`-I$BASHSRC/lib/intl` was on bash's CFLAGS
+and that directory holds gettext's own `lock.h`** -- an `-I` is
+searched ahead of the system path, so APE's `<pthread.h>`, reaching
+its own `#include <lock.h>`, got THAT file, which never typedefs
+`Lock`; `<qlock.h>` then hit `Lock lock;` with no such type.
+**Nothing in the message says `lock.h`** -- it names the victim's line
+in a header bash never mentions, which is why the four-screen command
+line was no help. *Name the file that is COMPILED, not the file with
+the right name*, for a header a SYSTEM header includes rather than one
+the package does.
+**AND THE CONFORMANCE FIX IS WHAT MADE IT REACHABLE.** `<qlock.h>`
+used to carry its own `Lock` typedef behind an always-true
+`#ifndef Lock`, so the shadow cost nothing however the name resolved.
+Removing that duplicate was correct -- two anonymous structs sharing a
+name is a constraint violation -- and it had been load-bearing.
+*A fix that makes a process reach code it never reached before can
+expose anything on that path*, this time in a header.
+**Removed, and MEASURED rather than hoped**: `ENABLE_NLS` is undef,
+the only `<libintl.h>` includes in the compiled set are behind
+`#if ENABLE_NLS`, and nothing compiled names any other of that
+directory's 29 headers. **`-J` was never in frame** -- the error is a
+parse of a type name, and the same file fails the same way under `-9`.
+**`sys/lib/tests/ishadow-sweep.py` is the sweep for the class**: which
+package `-I` directories hold a header that an APE header includes
+with `<>`. **31 (mkfile, directory) pairs, 19 names** -- and it
+**gates nothing**, because most are deliberate (Tcl ships `regex.h`
+and `tcl.h`, libressl's `include/compat` exists to replace `<stdio.h>`
+and friends, zlib owns `zconf.h`). *A sweep that failed on those would
+cry wolf*, the rule `apehdr-sweep` already carries. Read a hit as a
+question: does the package MEAN to replace that header, or merely
+happen to own the name? gettext's `lock.h` was the second kind.
+**Its own first version reported 0 of everything and looked healthy**,
+because `sys/lib/tests` is THREE levels below the root and it said
+two. *A sweep rooted in the wrong tree reports an empty one as a clean
+one* -- it now refuses to run unless `sys/include/ape` is under its
+root. Fifteenth instrument fault, caught in one run.
+**And undoing the control edit with `git checkout <file>` reverted the
+FIX in the same file.** *A revert is file-granular and an edit is
+not*; the control has to be made and unmade in a copy, or re-applied
+deliberately.
+
 **AND THE cfront SIZE PROBE WAS `.gitignore'd, SO THE VM NEVER GOT
 IT.** `pcc ... cfrontsz-probe.c` answered `Can't open input file` and
 `ls cfront*.c` showed only the two stub files. **git is the only
