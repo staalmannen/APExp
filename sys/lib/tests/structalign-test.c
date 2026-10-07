@@ -127,10 +127,50 @@ struct oldgnu   {
 	char	realsize[12];
 };
 
+/*
+ * ---- section 7: the two instruments disagreed, so ask both here ----
+ *
+ * `cfrontsz-probe' reported `node' as 8 here against the translator's
+ * 3, and `struct name' as 152 against 144 -- i.e. kencc PADS. The same
+ * `pcc', minutes later, built section 1 of this file and answered 3 for
+ * `struct{char a[3];}' -- i.e. kencc does NOT pad. Both cannot be true
+ * of one compiler, so one of the two runs is not measuring what its
+ * output says.
+ *
+ * cfront's `node' is three TYPEDEF'd unsigned chars where section 1 has
+ * one char ARRAY, and `align()' should not care -- `Ael1' walks through
+ * TARRAY to the element type and a typedef is transparent. Asking both
+ * IN ONE PROGRAM is what turns that "should" into a reading.
+ *
+ * A PROBE: it prints and asserts nothing, because its job is to tell
+ * two instruments apart rather than to judge the compiler.
+ */
+typedef unsigned char TOK;
+typedef unsigned char bit;
+struct cf_node { TOK base; bit permanent; bit baseclass; };
+
 int
 main(void)
 {
 	printf("structalign-test: struct layout, with and without -J\n");
+	/*
+	 * WHICH COMPILER BUILT THIS. `-J' predefines this macro (see
+	 * cc/lex.c), so its absence means the flag was not understood --
+	 * `pcc' silently drops a flag its ARGBEGIN does not name, and
+	 * `6c' turns an unknown letter into a debug counter, so without
+	 * this line a stale compiler and a working one print the same
+	 * thing. *That is the ambiguity the first VM run had.*
+	 */
+#ifdef __APEXP_CONFORMALIGN__
+	printf("build: -J was understood (__APEXP_CONFORMALIGN__ defined)\n");
+#else
+	printf("build: -J NOT in effect (expected for the gcc run, which\n"
+	       "       is the oracle). Under pcc this means either -J was\n"
+	       "       not passed, or this pcc/6c predates the flag -- so\n"
+	       "       if you passed -J and see this line, the compilers\n"
+	       "       were NOT rebuilt and every number below is the old\n"
+	       "       rule.\n");
+#endif
 
 	printf("\nSection 1: tail padding -- the struct's own alignment\n");
 	eq("sizeof struct{char a[3];}", (long)sizeof(struct c3), 3);
@@ -203,6 +243,21 @@ main(void)
 	 * 0664 before the log was read.
 	 */
 	eq("sizeof struct oldgnu", (long)sizeof(struct oldgnu), 150);
+
+	printf("\nSection 7: PROBE -- the shape cfrontsz-probe measured\n");
+	/*
+	 * If these two numbers DIFFER, a typedef'd-char struct and a
+	 * char-array struct are laid out differently and that is a new
+	 * finding. If they AGREE and both are 3, then cfrontsz-probe's
+	 * `node == 8' came from a DIFFERENT compiler than this run --
+	 * cfront's own build, which carries `-B' and its own flags. If
+	 * they agree and both are 8, section 1 above has already failed
+	 * and this run is the old rule throughout.
+	 */
+	printf("     %-34s %ld   (cfront's `node'; its translator says 3,\n",
+	    "sizeof struct{TOK;bit;bit;}", (long)sizeof(struct cf_node));
+	printf("     %-34s %ld    cfrontsz-probe measured 8 on the VM)\n",
+	    "sizeof struct{char a[3];}", (long)sizeof(struct c3));
 
 	printf("\n%d failures\n", failures);
 	return failures;
