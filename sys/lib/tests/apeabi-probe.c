@@ -3,9 +3,16 @@
  *
  * TWO COMPILES AND A DIFF, on the VM:
  *
- *   pcc -c    -a apeabi-probe.c > /tmp/abi-old.acid
- *   pcc -c -J -a apeabi-probe.c > /tmp/abi-new.acid
+ *   pcc -c -9 -a apeabi-probe.c > /tmp/abi-old.acid
+ *   pcc -c    -a apeabi-probe.c > /tmp/abi-new.acid
  *   diff /tmp/abi-old.acid /tmp/abi-new.acid
+ *
+ * **Conforming layout is the DEFAULT now, so the flags have swapped
+ * round**: plain `pcc' conforms and `-9' asks for the 9front rule.
+ * The answer this probe gave when it was first run is recorded in
+ * CLAUDE.md -- sixteen structs, the socket family and the lock family
+ * and `termios', with nothing in the stdio/stat core moving -- and
+ * that diff is what the default was turned on against.
  *
  * `-c' is not optional: with `-a' the compiler writes acid to stdout
  * and never produces the object, so without it pcc goes on to link an

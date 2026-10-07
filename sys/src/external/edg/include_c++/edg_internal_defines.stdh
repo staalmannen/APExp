@@ -1,0 +1,42 @@
+/*
+Part of the EDG Compiler Project, under the Apache License v2.0 with LLVM
+Exceptions.
+See https://edgcpp.org/LICENSE.txt for license information.
+SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*/
+
+/*
+edg_internal_defines -- EDG-specific defines used in standard header files
+*/
+
+#ifndef __EDG_INTERNAL_DEFINES_STDH
+#define __EDG_INTERNAL_DEFINES_STDH
+
+/* C++03 uses "throw(std::bad_alloc)" and "throw()" exception specifications.
+   C++11 uses "noexcept" instead of "throw()" and does not otherwise specify
+   exception specifications.  The Microsoft compiler always sets __cplusplus
+   to reflect C++98, so an alternative mechanism is needed to determine
+   when to use "throw" and "noexcept". */
+#ifdef _MSC_VER
+#if _NOEXCEPT_TYPES_SUPPORTED
+#define __EDG_NEW_THROWS  /* nothing */
+#define __EDG_DOES_NOT_THROW noexcept
+#else /* !_NOEXCEPT_TYPES_SUPPORTED */
+#define __EDG_NEW_THROWS  throw(__EDG_STD_NAMESPACE::bad_alloc)
+#define __EDG_DOES_NOT_THROW throw()
+#endif /* _NOEXCEPT_TYPES_SUPPORTED */
+#define __EDG_NORETURN /* nothing */
+#else /* !defined(_MSC_VER) */
+#if __cplusplus < 201103L
+#define __EDG_NEW_THROWS  throw(__EDG_STD_NAMESPACE::bad_alloc)
+#define __EDG_DOES_NOT_THROW throw()
+#define __EDG_NORETURN /* nothing */
+#else /* !(__cplusplus < 201103L) */
+#define __EDG_NEW_THROWS  /* nothing */
+#define __EDG_DOES_NOT_THROW noexcept
+#define __EDG_NORETURN [[noreturn]]
+#endif /* __cplusplus < 201103L */
+#endif /* ifdef _MSC_VER */
+
+#endif  /* ifndef __EDG_INTERNAL_DEFINES_STDH */
+

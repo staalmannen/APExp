@@ -1,0 +1,15 @@
+This directory contains only those headers that require specific magic
+to work right with the EDG front end.  For the rest, you need only
+what's required in the C and C++ standards.
+
+In the definition of stddef.h, a good version of offsetof is:
+
+#define offsetof(t, memb) ((size_t)__INTADDR__(&(((t *)0)->memb)))
+
+It uses an EDG extension (__INTADDR__) to perform the otherwise nonstandard
+conversion from pointer to integer.  This is not a requirement, but it does
+avoid spurious warnings when the header is compiled in strict mode.
+
+The C99 tgmath.h header can be implemented fairly easily by using the
+EDG extension pseudo-macro __generic.  See its description in the
+External Interface chapter of the internal documentation.

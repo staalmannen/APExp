@@ -1,0 +1,72 @@
+/*
+Part of the EDG Compiler Project, under the Apache License v2.0 with LLVM
+Exceptions.
+See https://edgcpp.org/LICENSE.txt for license information.
+SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*/
+
+/*
+source_location -- Include file for std::source_location support
+                   ([support.srcloc])
+*/
+#ifndef _SOURCE_LOCATION_STDH
+#define _SOURCE_LOCATION_STDH
+
+#include <cstdint>
+
+#if (!defined(__cplusplus) || __cplusplus < 202000L)
+ #error -- <source_location> header requires C++20 mode
+#endif /* ifndef __cplusplus */
+#ifndef __cpp_constexpr
+ #error -- <source_location> requires constexpr support
+#endif /* !defined(__cpp_constexpr) */
+#ifndef __cpp_consteval
+ #error -- <source_location> requires consteval support
+#endif /* !defined(__cpp_consteval) */
+
+namespace std {
+  struct source_location {
+    using uint32_t = std::uint32_t;
+
+    static consteval source_location current(
+                        const char *__file_name = __builtin_FILE(),
+                        const char *__function_name = __builtin_FUNCTION(),
+                        uint32_t   __line_no = __builtin_LINE(),
+                        uint32_t   __column_no = __builtin_COLUMN()) noexcept {
+      source_location loc = {};
+      loc.__file_name = __file_name;
+      loc.__function_name = __function_name;
+      loc.__line_no = __line_no;
+      loc.__column_no = __column_no;
+      return loc;
+    }
+
+    constexpr source_location() noexcept
+    : __file_name{}, __function_name{}, __line_no{}, __column_no{}
+    {}
+
+    constexpr uint32_t line() const noexcept {
+      return __line_no;
+    }
+
+    constexpr uint32_t column() const noexcept {
+      return __column_no;
+    }
+
+    constexpr const char* file_name() const noexcept {
+      return __file_name;
+    }
+
+    constexpr const char* function_name() const noexcept {
+      return __function_name;
+    }
+  private:
+    const char *__file_name;
+    const char *__function_name;
+    uint32_t   __line_no;
+    uint32_t   __column_no;
+  };
+}  /* namespace std */
+
+#endif /* _SOURCE_LOCATION_STDH */
+

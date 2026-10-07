@@ -64,6 +64,7 @@ main(int argc, char *argv[])
 	char *oname, *objext;
 	int haveoname = 0;
 	int i, cppn, ccn;
+	int oldalign = 0;
 	Objtype *ot;
 
 	ot = findoty();
@@ -166,10 +167,36 @@ main(int argc, char *argv[])
 		 *
 		 * *I checked `cc' for a collision and did not check the
 		 * driver that calls it* -- `-P' over again, one level out.
+		 *
+		 * IT IS THE DEFAULT NOW, so this arm does nothing and is
+		 * kept only so that a command line or mkfile carrying -J
+		 * still works. The appends happen once, after ARGEND, for
+		 * every compile -- see there for why it cannot be done
+		 * through CFLAGS or CC.
 		 */
 		case 'J':
-			append(&cc, "-J");
-			append(&cpp, "-D__APEXP_CONFORMALIGN__=1");
+			break;
+		/*
+		 * -9 is the way BACK: lay structs out the 9front way, the
+		 * rule every APE object was built with before conforming
+		 * layout became the default.
+		 *
+		 * It exists for the instruments rather than for the build.
+		 * `structalign-test' needs a run under the OLD rule or its
+		 * control measures nothing -- *a check that cannot fail is
+		 * not a check* -- and `apeabi-probe' is two compiles whose
+		 * whole content is the difference between the two rules.
+		 * With the flag on by default and no way to turn it off,
+		 * neither could ever be taken again. *An irreversible
+		 * default takes the measurement with it.*
+		 *
+		 * Nothing in the tree passes it and nothing should: an
+		 * object built with -9 and linked against a libap built
+		 * without it disagrees about `pthread_mutex_t' and
+		 * `sockaddr_in' silently, with every symbol resolving.
+		 */
+		case '9':
+			oldalign = 1;
 			break;
 		case 'B':
 			append(&cc, "-B");
@@ -312,6 +339,48 @@ main(int argc, char *argv[])
 				}
 			}
 		}
+	}
+	/*
+	 * CONFORMING STRUCT LAYOUT IS THE DEFAULT FOR EVERY APE COMPILE,
+	 * and `pcc' is where it has to be switched on. Not CFLAGS: `-J'
+	 * in `sys/src/ape/config' reaches 32 of 137 mkfiles, since the
+	 * other 105 ASSIGN `CFLAGS=' rather than appending `$CFLAGS' --
+	 * `cmd/cfront/mkfile:52' among them. Not CC either: 59 mkfiles
+	 * reassign that. *Both of the two variables a build system offers
+	 * for exactly this have holes*, and either would have left 32
+	 * packages conforming and 105 not, linking cleanly, disagreeing
+	 * about `pthread_mutex_t' and `sockaddr_in' in silence. Every one
+	 * of those 59 still names `pcc', so this is the one place that
+	 * reaches all of them.
+	 *
+	 * **Here rather than in the ARGBEGIN loop, and unconditional
+	 * rather than under `if(!Aflag)'.** That block does not run when
+	 * -A or -B was given, and `cmd/cfront' passes -B -- so putting it
+	 * there would miss the one package this flag was built for. The
+	 * loop runs once per file argument, which is why the appends are
+	 * out here where they happen exactly once.
+	 *
+	 * Native `6c' is untouched and keeps the 9front rule, which is
+	 * what `cmd2/vts' and `vtwin' need when they link the host's own
+	 * `libc.a': `Lock' is one `int', 4 naturally and 8 under that
+	 * rule, and it sits inside `QLock', `Ref' and `Rendez'.
+	 *
+	 * MEASURED BEFORE IT WAS TURNED ON, by `apeabi-probe' compiled
+	 * twice and diffed: it moves SIXTEEN structs, the network address
+	 * family (`sockaddr_in' 24 -> 16, which is what every other system
+	 * says) and the lock/pthread family (`pthread_mutex_t' 56 -> 40),
+	 * plus `termios'. **`FILE', `struct stat', `DIR', `jmp_buf',
+	 * `fd_set', `tm', `dirent', `passwd', `regex_t' and `sigset_t' do
+	 * not move at all** -- which is the result, since those are the
+	 * types that made this all-or-nothing in the first place.
+	 *
+	 * IT NEEDS `mk distclean' BEFORE `mk install'. No mkfile here
+	 * lists a system header as a dependency, and nothing about this
+	 * change makes a link fail, so a half-rebuilt tree is quiet.
+	 */
+	if(!oldalign) {
+		append(&cc, "-J");
+		append(&cpp, "-D__APEXP_CONFORMALIGN__=1");
 	}
 	if(objs.n == 0)
 		fatal("no files to compile or load");
