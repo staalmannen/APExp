@@ -78,6 +78,37 @@
 package require Tk
 package require tcltest 2.2
 
+# ------------------------------------------------------------------
+# PRECONDITION: THIS MUST BE `tktest', NOT `wish'.
+#
+# Tk's test commands (tkTest.c, tkSquare.c) are linked into
+# cmd/wish/tktest and not into wish. A run under plain wish does not
+# fail -- it DEGRADES: every test constrained on one of those commands
+# SKIPS, so `Skipped' rises, `Failed' FALLS, and nothing in the log
+# says which binary produced it.
+#
+# This is a WARNING rather than a refusal, which is the one place it
+# differs from tcl-runall.tcl: Tcl's mutex.test and brodnik.test ABORT
+# without tcl::test, so a tclsh run there loses whole files, while
+# here everything still runs. The counts are still not comparable, and
+# that is what the banner says.
+#
+# `testbitmap' is the marker because tkTest.c:222 registers it
+# unconditionally -- `testmetrics' and `testmenubar' are behind
+# platform ifdefs, so either would report a missing tktest on a
+# platform that simply has no such command.
+if {[llength [info commands ::testbitmap]] == 0} {
+    puts "tk-runall: WARNING -- Tk's test commands are ABSENT."
+    puts "tk-runall: this looks like plain wish ([info nameofexecutable]),\
+ not tktest. Every tktest-constrained test will SKIP, so Skipped rises\
+ and Failed falls, and these totals are NOT comparable with a tktest\
+ run. Build it with:"
+    puts "tk-runall:     cd sys/src/ape/cmd/wish && mk tktest"
+} else {
+    puts "tk-runall: Tk's test commands are present -- this is tktest."
+}
+flush stdout
+
 # Line buffering, before anything is written. Without this the tail of
 # the log is lost on any abnormal end, and the last file named is
 # wherever the 4 KB boundary fell -- which is indistinguishable from

@@ -27,12 +27,30 @@ tclAppInit.$O: $TCLSRC/unix/tclAppInit.c
 # Test-only interpreter, analogous to Tcl's upstream tcltest target.  It is
 # deliberately not installed as /bin/tclsh; run it from this directory as
 # ./tcltest <...>/tests/all.tcl.
+#
+# IT IS BUILT BY `mk install' NOW, AND A WHOLE SUITE RUN IS WHY. It used
+# to be a `V:' target reachable from nothing, while `CLEANFILES' names it
+# -- so `mk distclean' DELETED it and `mk install' did not put it back.
+# The next whole-suite run then used plain `tclsh', where
+# `package require tcl::test' fails: mutex.test and brodnik.test aborted
+# on that line, every test constrained on a testing command SKIPPED, and
+# the totals moved by thousands in a way that read exactly like a result
+# (Failed 64 -> 37, Skipped 5916 -> 11233). Nothing in the log said which
+# interpreter had produced it.
+#
+# `install:V:' rather than adding it to `$TARG': in Plan 9 mk EVERY `V:'
+# rule for a target runs, so this builds the test interpreter beside the
+# real one without installing it into $BIN -- the same idiom `lib/itcl'
+# uses to install its scripts. And it is a FILE target rather than `V:'
+# so that it relinks only when something it depends on has moved.
+install:V:	tcltest
+
 TESTOFILES=tclTestInit.$O tclTest.$O tclTestObj.$O tclTestProcBodyObj.$O \
 	tclMutexTest.$O tclThreadTest.$O tclUnixTest.$O tclTestABSList.$O \
 	tclStubLib.$O tclStubLibTbl.$O \
 	tclTomMathStubLib.$O tclOOStubLib.$O
 
-tcltest:V: $TESTOFILES $LIB
+tcltest: $TESTOFILES $LIB
 	$LD $LDFLAGS -o $target $prereq
 
 tclTestInit.$O: $TCLSRC/unix/tclAppInit.c

@@ -1092,6 +1092,101 @@ build completing is a precondition for the measurement rather than
 the measurement. **The confirmation is behavioural and is still
 outstanding.**
 
+**`structalign-test`'s THREE RUNS ARE IN, AND THE MIDDLE ONE FINALLY
+FIRED: 14 failures under `pcc -9`, 0 under `pcc`.** That is the first
+time the control has produced the predicted failures -- the two
+earlier attempts were byte for byte the same compile, because `pcc`
+was appending `-J` itself. `struct{char a[3];}` 8 -> 3,
+`struct{char a[500];}` 504 -> 500, `offsetof(mixed,n)` 8 -> 1,
+`sizeof(struct oldgnu)` 160 -> 150, the packed nested case 10 -> 5,
+and section 7's PROBE prints **3** for cfront's own `node` shape. The
+`__APEXP_CONFORMALIGN__` banner is what makes the pair readable:
+`-J NOT in effect` above the failures, `-J was understood` above the
+zero. *A flag, a marker for the flag, and a control run that must
+fail -- and only all three together say anything.*
+**Section 8 PASSES IN BOTH RUNS, which is correct and is the half
+worth checking.** The `sualign` bit-field bug was never gated on
+`conformalign`, so a fix that only worked under `-J` would have shown
+as section 8 failing under `-9` -- it does not, and `type` survives
+every one of the four writes in both runs.
+
+**AND cfront'S CRASH IS GONE -- THE PADDING HYPOTHESIS IS CONFIRMED
+BEHAVIOURALLY.** `rm *.c && mk install` in `cmd/c++lib` no longer
+reports `general protection violation pc=0x280db8`; cfront exits
+**5** with real C++ diagnostics, and its byte column went
+**1265 -> 5747**, so it now parses whole headers instead of dying
+after its preamble:
+
+```
+  iostream.h:224: ostream::operator <<() cannot be redeclared ...
+  abs.src.c:40:   two definitions of norm()
+  c++: FAILED at cfront on .../complex/abs.cpp -- cfront 62022: 5
+  c++: ... bytes: cpp 26553  ns_strip 26553  cfront 5747
+```
+
+*That is exactly the prediction written down before the run*:
+`name` 144 -> 152 moved the second of its four unions, so
+`__O2__4expr.string` read the wrong eight bytes and came back holding
+the text `precisio`. `-J` puts `name` back to 144 and the
+dereference is of a pointer again.
+**NOT CLEANLY ATTRIBUTED, and the separation is now one command.**
+Two things changed between the crashing run and this one -- `-J` by
+default and the `sualign` fix -- and the second was wrong for every
+compile, so either could be the vehicle. **`pcc -9` is what settles
+it**: rebuild cfront with the old rule and the fault should come
+back at `pc=0x280db8`. *The flag exists for the instruments, and
+this is the first instrument that needs it.*
+**The diagnostics that remain need no VM and are already recorded**:
+the four `iostream.h` redeclarations and `two definitions of norm()`
+are character for character what the host ASAN build produced, and
+several of them are cfront failing to tell two OVERLOADS apart --
+the shape of a type-signature comparison that collapses `int` and
+`long` on a 64-bit target.
+
+**AND THE TCL RUN BESIDE THEM IS VOID, FOR A REASON THAT READ EXACTLY
+LIKE A RESULT: `mk distclean` DELETED THE TEST INTERPRETER AND
+`mk install` DID NOT PUT IT BACK.**
+
+```
+  before:  Total 68118  Passed 62138  Skipped  5916  Failed 64
+  after:   Total 66970  Passed 55700  Skipped 11233  Failed 37
+```
+
+**A failure count that falls by 27 while `Skipped` rises by 5317 is
+not an improvement**, and the `Test files exiting with errors:
+brodnik.test, mutex.test` line -- absent from every previous run --
+is what names the cause. Both files stop on
+`package require tcl::test`: mutex.test requires it at the top level,
+and **brodnik.test's `try {package require tcl::test}` has no handler
+clause, so the error propagates just the same**. Two files aborting
+on one line means the package was ABSENT, which means the suite ran
+under plain `tclsh`.
+**`cmd/tclsh/tcltest` was a `V:` target reachable from nothing while
+`CLEANFILES` names it** -- so `clean` removed it and `install` never
+rebuilt it. It is a FILE target with `install:V: tcltest` beside it
+now (every `V:` rule for a target runs in Plan 9 mk, the idiom
+`lib/itcl` already uses), so a distclean plus install leaves the
+suite measurable. **`cmd/wish/tktest` had the same asymmetry and the
+same fix** -- its `clean:V:` removes it too -- and the degradation
+there is milder only because no Tk file aborts: the constrained tests
+skip, `Failed` falls, and nothing says why.
+**AND BOTH HARNESSES NOW SAY WHICH INTERPRETER THEY ARE.**
+`tcl-runall.tcl` REFUSES without `tcl::test`, printing the two
+commands to fix it, with `$APEXP_TCL_ANYSHELL=1` as the escape for
+the one legitimate case (asking what the *installed* tclsh does);
+`tk-runall.tcl` WARNS instead, because there nothing is lost but
+comparability. Its marker is `testbitmap`, which `tkTest.c:222`
+registers unconditionally -- `testmetrics` and `testmenubar` are
+behind platform ifdefs and would report a missing tktest on a
+platform that merely has no such command.
+*This is the `THIS_SH=../bash` precondition for the fourth time, and
+the first time it has been the BUILD SYSTEM rather than a default in
+an upstream script.* **The behavioural confirmation of `-J` --
+`socket.test` and `socket_inet.test`, the sharpest instruments the
+tree has for a struct that moved -- is therefore still outstanding,
+and `socket_inet.test` not appearing in this run's failing list says
+nothing at all.**
+
 **AND THE FIRST REBUILD STOPPED IN bash -- NOT ON `-J`, ON A SHADOWED
 HEADER.** `/sys/include/ape/qlock.h:44 syntax error, last name: Lock`,
 compiling `general.c`. **`-I$BASHSRC/lib/intl` was on bash's CFLAGS
@@ -1665,6 +1760,15 @@ in the topic file.
 - **A header not in `HFILES` is a header `mk` does not rebuild for.** A
   logically inert change followed by broad, unattributable breakage is a
   layout problem; ask which objects were actually recompiled.
+- **A binary that `clean` removes and `install` does not rebuild is a
+  measurement waiting to be lost.** `cmd/tclsh/tcltest` and
+  `cmd/wish/tktest` were both `V:` targets reachable from nothing while
+  each mkfile's `CLEANFILES`/`clean:V:` names them, so `mk distclean`
+  deleted them and the next suite run used the ordinary shell -- where
+  Tcl's suite skips 5317 extra tests and reports **27 FEWER
+  failures**. Grep a mkfile's clean rule against what `install`
+  actually builds; in Plan 9 mk every `V:` rule for a target runs, so
+  `install:V: <thing>` costs one line.
 - **A subdirectory called `test` is a mk directory, whether or not it
   has an mkfile.** `mkone`, `mkmany`, `mkelf`, `mkelves`, `mklib` and
   `mksyslib` all carry `test -d ./test && @{cd test && mk $MKFLAGS
@@ -1844,7 +1948,11 @@ worked without waiting on Tcl -- and Tcl was one of its three items. The remaini
 or a constraint that fails on Linux too). The port's own share is
 `focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
 
-**Tcl's suite**: **it finishes and nothing aborts.**
+**Tcl's suite**: **it finishes and nothing aborts.** *(The numbers
+below are the last VALID ones. A later run reporting `Failed 37` was
+taken under plain `tclsh` after `mk distclean` removed
+`cmd/tclsh/tcltest` -- see the `-J` section. Both harnesses now say
+which interpreter they are.)*
 `Total 68118 Passed 62138 Skipped 5916 Failed 64`, 167 files, marker,
 exit 0, and no `Test files exiting with errors` section. **The whole
 float rewrite -- Gay's `strtod`, `strtof`, `strtold`, and
