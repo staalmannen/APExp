@@ -110,8 +110,20 @@ foreach (@p2cfiles) {
   $cname = "$base$suffix";
   unlink $cname;
   $opts = " $p2copts$checkopt$quietopt @p2cargs $_ -o $cname";
+  # APExp: this said `-H --HOMEDIR--'. Upstream substitutes that token
+  # when it INSTALLS the script -- src/Makefile:113 is
+  # `sed -e "s;--HOMEDIR--;$(ABSHOMEDIR);"' -- and APExp installs p2cc
+  # by hand, filling in $homedir, $incdir and $libdir above and missing
+  # this one. So every translation passed a literal `-H --HOMEDIR--',
+  # p2c looked for `--HOMEDIR--/p2crc', did not find it, fell back to
+  # the cwd, and exited `Unable to find required system p2crc file'
+  # unless one happened to be sitting there.
+  #
+  # The guard above is what made it reachable rather than harmless: it
+  # fires precisely when `$homedir/p2crc' EXISTS -- so the better
+  # configured the tree, the more certainly p2cc added the broken flag.
   if (!($opts =~ / -H/) && (-f "$homedir/p2crc")) {
-    $opts = " -H --HOMEDIR--$opts";
+    $opts = " -H $homedir$opts";
   }
   $cmd = "$p2ccommand$opts";
   $verbose && print "$cmd\n";

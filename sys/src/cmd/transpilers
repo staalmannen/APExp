@@ -1,29 +1,95 @@
-CXX=cfront
+# Pattern rules for non-C sources, included by mkone/mkmany/mklib for
+# every APE package.
+#
+# ------------------------------------------------------------------
+# NOTHING IN THE TREE TRIGGERS THESE TODAY, and that is why three of
+# them were wrong: `find sys/src -name "*.m" -o -name "*.cpp" ...'
+# outside `external/' is ZERO, and everything inside external/ is
+# built by its own package mkfile with its own rules. So these are
+# TRAPS FOR THE NEXT PERSON rather than live bugs -- which is worth
+# stating, because an untriggered rule gets no diagnostic from anyone
+# and the first `.m' added to a package would have inherited all
+# three faults at once.
+#
+# ------------------------------------------------------------------
+# WHAT WAS WRONG, in the order it costs.
+#
+# 1. The C++ rules were `$CXX $stem.cpp > $stem.c' with `CXX=cfront'.
+#    BOTH HALVES ARE THE BUG `cmd/c++lib' ALREADY PAID FOR.
+#
+#    `> $target' is a shell REDIRECTION, which creates the file
+#    whatever the command then does -- that is how forty zero-byte
+#    `.c' files came to be committed and compiled into an empty
+#    `libc++.a' while the build reported success. `-o $target' is the
+#    fix: the driver's -F arm only `cp's once cfront has RETURNED, so
+#    a failure leaves no target and mk stops where the fault is.
+#
+#    And `cfront' is the wrong PROGRAM. cfront is one stage of three
+#    -- `pcc -E' -> `ns_strip' -> `cfront' -- and handed a `.cpp'
+#    directly it sees unpreprocessed source. `rc/bin/ape/c++' is the
+#    driver, it accepts .cpp/.cxx/.cc/.C alike, and `-F' is its
+#    translate-only mode. `cmd/c++lib/mkfile' has used it correctly
+#    since that round; this file did not.
+#
+# 2. `%.c: %.m' with `$OBJC $stem.m' was wrong TWICE OVER, and the
+#    driver script is what says so rather than any guess.
+#    `rc/bin/ape/objc' defaults to `link=y' and `output="a.out"', so
+#    plain `objc foo.m' COMPILES AND LINKS an a.out -- it does not
+#    stop at C. And the `foo.c' it writes on the way is a copy of the
+#    `.m' with a `#line' on the front, listed in its own `junk' and
+#    DELETED at the end; the translated C is `foo.i'. So the rule
+#    named a target the command removes.
+#    Objective C therefore has no honest `%.c:' rule at all. The
+#    driver's own documented stop-at-object mode is `-c', so the rule
+#    produces `$O' directly.
+#
+# 3. `%.c: %.p' with bare `$PC' CANNOT RUN. p2c has no built-in
+#    default output name: `codefnfmt' comes from the `p2crc' file and
+#    `trans.c:717' exits `Unable to find required system p2crc file'
+#    without one. It looks in the directory `-H' names, then the cwd.
+#    `-H $PCHOME' is what makes it find `/sys/lib/pascal/p2crc', whose
+#    `CodeFileName %Rs.c' is what makes `foo.p' answer `foo.c'.
+#
+# 4. `CXXFLAGS' and `FFLAGS' were declared and used by NOTHING. Wired
+#    in, so setting one in a package mkfile does something.
+#
+# f2c and bacon were already right and are unchanged: `f2c foo.f'
+# writes `foo.c' by default, and bacon appends `.c' to the whole input
+# name, which is the `%.bac.c:' target.
+# ------------------------------------------------------------------
+
+CXX=c++
 OBJC=objc
 F77=f2c
 FC=f2c
 PC=p2c
 BASIC=bacon
 
+# p2c's rc directory -- see note 3. `sys/lib/pascal' is where
+# cmd/p2c's install rule puts p2crc.
+PCHOME=/sys/lib/pascal
+
 CXXFLAGS=
 FFLAGS=
+PCFLAGS=
+OBJCFLAGS=
 
 
 %.c:	%.C
-	$CXX $stem.C >$stem.c
+	$CXX -F $CXXFLAGS -o $target $prereq
 
 %.c:	%.cpp
-	$CXX $stem.cpp >$stem.c
+	$CXX -F $CXXFLAGS -o $target $prereq
 
-%.c:	%.m
-	$OBJC $stem.m
+# Objective C stops at the OBJECT, not at C -- see note 2.
+%.$O:	%.m
+	$OBJC -c $OBJCFLAGS -o $target $prereq
 
 %.c:	%.f
-	$F77 $stem.f
+	$F77 $FFLAGS $prereq
 
 %.c:	%.p
-	$PC $stem.p
+	$PC -H $PCHOME $PCFLAGS $prereq
 
 %.bac.c:	%.bac
-	$BASIC $stem.bac
-
+	$BASIC $prereq
