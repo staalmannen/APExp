@@ -1157,11 +1157,17 @@ one-off piece of state. Five were a standalone `goto nxt`/`continue`;
 two-line `||`. **gcc compiles the file before and after -- which is a
 SYNTAX check and not a control**, since both sides pass, and saying
 so is the point: the only thing that can confirm this is the VM.
-*Expect `mk install` in `cmd/c++lib` to print exactly what it prints
-now* -- `cfront 5747`, the four `iostream.h` redeclarations and
-`two definitions of norm()`. Anything else means a guard was
-load-bearing after all, which would be a finding rather than a
-regression.
+**CONFIRMED: byte-identical.** `cpp 26553  ns_strip 26553
+cfront 5747`, the four `iostream.h` redeclarations, `two definitions
+of norm()`, exit 5 -- the prediction was written down before the run
+and every number in it matched. So none of the seven was
+load-bearing, and the garbage pointer they existed for is gone
+rather than hidden.
+**cfront IS CLOSED AS A QUESTION FOR THIS TREE.** What remains is a
+1980s front end that cannot tell two overloads apart on a 64-bit
+target, reproduced character for character by the host's own gcc
+build -- upstream's, not APExp's. The directory stays, off, for the
+three reasons above.
 **The diagnostics that remain need no VM and are already recorded**:
 the four `iostream.h` redeclarations and `two definitions of norm()`
 are character for character what the host ASAN build produced, and
@@ -3145,6 +3151,17 @@ padding breaks. None has been tested since. The `external/` sweep is a
 lower bound by construction (see the note), so *the way to find these
 is to run each archiver on a real archive*, not to grep.
 Detail in `docs/notes/kencc.md` and `docs/notes/libap.md`.
+**AND `-J` LARGELY RETIRES THAT SWEEP, which is a consequence of the
+flag worth stating where the to-do was written.** The tar bug was
+`Asu2`'s unconditional 8-byte tail round plus `Ael1` aligning a
+nested struct member to 8, and **`-J` fixes both for every APE
+compile** -- so an all-char on-disk record now gets its natural size
+without anyone reaching for `#pragma pack`. *The predicted failure
+mode is gone rather than unmeasured.* Running each archiver on a real
+archive is still the only way to know, and is still worth one round,
+but it is now a check rather than a hunt. tar's own `#pragma pack`
+is a no-op under `-J` (both answers are 500 and 495) and **stays**:
+it documents the on-disk intent and keeps the file right under `-9`.
 
 **A DESCRIPTOR ARRIVED POISONED FROM AN EXEC, and it was every APE
 program, not bash and not vts.** bash under vts printed its prompt and
