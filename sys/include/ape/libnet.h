@@ -17,12 +17,27 @@
  * two places for it. That is the `tcflush'/`IP_ADD_MEMBERSHIP' rule
  * with the sign flipped: a name a program can call and cannot link.
  *
- * `reject' is the other half of the same defect and points the other
- * way: `plan9/announce.c:139' DEFINES `reject(int, char*, char*)' and
- * no header declared it, so libap held a function nothing could call
- * with its arguments checked -- the "capability present and not
- * declared" shape this tree has now met six times. Declared here
- * because this is the header its definition's own file includes.
+ * `reject' IS DEFINED BY libap AND IS DELIBERATELY NOT DECLARED HERE,
+ * WHICH COST A BUILD. `plan9/announce.c:139' defines
+ * `reject(int, char*, char*)' and no header names it, so it is the
+ * "capability present and not declared" shape -- and declaring it
+ * broke flex at once:
+ *
+ *	flexdef.h:366 external redeclaration of: reject
+ *	    EXTERN INT reject
+ *	    EXTERN FUNC(INT, IND CHAR, IND CHAR) INT  libnet.h:36
+ *
+ * flex has `extern int reject;', a VARIABLE. **This header is reached
+ * from <sys/socket.h>**, so anything it declares is surface for every
+ * networked program in the tree, and `reject' is a name 210 files
+ * under `external/' use -- gnulib spells two PARAMETERS with it
+ * (`mbsspn(const char*, const char *reject)', `u8_strcspn').
+ *
+ * *The sweep that cleared it looked for `reject(' and could not match
+ * a variable* -- which is the mistake this tree has already recorded
+ * once, when a function-shaped grep missed `optind', `opterr',
+ * `optarg' and `stdin'. **Sweep for the NAME, not for the shape you
+ * expect it to have.**
  *
  * There is no Plan 9 `accept(int, char*)' or `listen(char*, char*)'
  * in libap: `network/accept.c' and `network/listen.c' are POSIX's,
@@ -33,7 +48,6 @@ extern	int	announce(char*, char*);
 extern	int	dial(char*, char*, char*, int*);
 extern	int	hangup(int);
 extern	char*	netmkaddr(char*, char*, char*);
-extern	int	reject(int, char*, char*);
 
 extern char    dialerrstr[64];
 
