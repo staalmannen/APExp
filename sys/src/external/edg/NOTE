@@ -1,0 +1,199 @@
+EDG C++ front end -- C-CONVERTED FORK
+=====================================
+
+This is NOT upstream EDG.  It is EDG's own C++ sources after being run
+through EDG's own C-generating back end, so that a target with a C
+compiler and no C++ compiler (APExp/kencc) can build a C++ front end.
+
+Upstream
+--------
+  https://github.com/edgcpp/compiler
+  commit f0e30b65f  ("Implement full support for CWG 2355 (\"Deducing
+  noexcept-specifiers\"). [GH #197]")
+
+Licence
+-------
+  Apache License v2.0 with LLVM Exceptions.  LICENSE.txt is copied
+  across verbatim from upstream and applies to everything here,
+  generated or not.  The generated C is a mechanical translation of
+  upstream's own sources and carries upstream's licence.
+
+Converted
+---------
+  Date:  2026-10-07
+  Host:  x86_64 Linux, gcc 13.3.0 (Ubuntu 13.3.0-6ubuntu2~24.04.1)
+  Tool:  cpfe built from the same commit, via
+           cmake --preset linux-gcc-release && ninja cpfe
+         The linux-gcc-release preset's default already defines
+         BACK_END_IS_C_GEN_BE=1 and DO_IL_LOWERING=1, so the DEFAULT
+         build IS the C-generating one.  cpfe is 23,118,552 bytes.
+         Driver: dev_tools/bin/eccp, with build/gcc-release/
+         environment.sh sourced.
+
+  src/   (75 files, from upstream src/*.c)
+
+    eccp -S --g++ --c++14 --no_exceptions --no_rtti \
+      -DBACK_END_IS_C_GEN_BE=1 -DCOMPILE_MULTIPLE_TRANSLATION_UNITS=1 \
+      -DDO_IL_LOWERING=1 -DLOWER_FIXED_POINT=1 -DLOWER_IFUNC=1 \
+      -DNEED_IL_DISPLAY=1 -DRECORD_BACKING_EXPRS_WITH_IL_LOWERING=1 \
+      -DUSE_CMAKE_DEFINES -DHOST_HAS_FLOAT16_TYPE=0 \
+      -I<build>/src/includes -I<edg>/src \
+      --sys_include=/usr/lib/gcc/x86_64-linux-gnu/13/include \
+      --sys_include=/usr/local/include \
+      --sys_include=/usr/include/x86_64-linux-gnu \
+      --sys_include=/usr/include \
+      <edg>/src/<file>.c
+
+    The -D set is upstream's own cpfe compile line, taken from
+    `ninja -t commands` rather than recalled.  -I<build>/src/includes
+    is where the build generates err_codes.h and err_data.h from
+    src/error_msg.txt and src/error_tag.txt via util/mk_errinfo.
+
+  lib_src/  (51 files, EDG's own C++ runtime -- new/delete, vtbl,
+             static init, pure virtual, rtti.  NOT libstdc++.)
+
+    eccp -S --building_runtime --c++23 -DUSE_STDINT_HEADER \
+      -DSYSTEM_RUNTIME_HAS_IA64_THREAD_ATEXIT=0 --no_standard_includes \
+      --sys_include=<edg>/include_c++ --sys_include=<edg>/include_c99 \
+      --sys_include=... (as above) --g++ <edg>/lib_src/<file>.c
+
+  util/  (7 files: decode, dettarg, edg_decode, edg_munch,
+          edg_prelink, make_win_predef_macro, mk_errinfo)
+
+    eccp -S --g++ --c++14 -I<edg>/src -I<build>/src/includes \
+      --sys_include=... <edg>/util/<file>.c
+
+  Output files are eccp's *.int.c renamed to *.c.  The only edit
+  applied afterwards is a sed removing the absolute scratchpad path
+  prefix from the `# NNN "file"` line markers; nothing else was
+  touched by hand.
+
+Two flags that are not upstream's
+---------------------------------
+  -DHOST_HAS_FLOAT16_TYPE=0  on src/.  Without it src/float_pt.c is
+  the one file that will not translate:
+
+      float_pt.c, line 253: error: identifier "_Float16" is undefined
+        typedef _Float16 EDG_float16_t;
+
+  cpfe in --g++ mode predefines __FLT16_MANT_DIG__ (mimicking gcc) but
+  does not itself implement the _Float16 type, and targ_def.h:2599
+  keys HOST_HAS_FLOAT16_TYPE off that macro.  Forcing it to 0 selects
+  upstream's own documented fallback -- _Float16 values represented
+  internally using the host `float` type.  targ_def.h guards it with
+  #ifndef, so this is a supported configuration and not a patch.
+  It is passed to ALL 75 files, not just float_pt.c, because
+  float_pt.h and float_type.h both branch on it: one translation unit
+  disagreeing would be a silent ABI split.
+
+  EDG_GCC_VER_SCRAPE=130000 when building upstream's own runtime on
+  the host (`ninja lib/libC.a`).  bases/docker/dev-env/gcc/
+  edg_eccp_config defaults that variable to 140000 and then adds
+  -Wno-error=return-mismatch, which is a gcc-14 flag that gcc 13 does
+  not have.  Setting the variable to the real host version drops the
+  four gcc-14-only -Wno-error= flags.  This affects the HOST build
+  only and nothing in this directory; it is recorded here because it
+  is the wall a previous attempt stopped at.  Upstream's file is not
+  edited -- the variable is already the documented override.
+
+What is here, and what is deliberately absent
+---------------------------------------------
+  Here:
+    src/          133 generated C files in total, across the three
+    lib_src/      directories.  ~2.92M lines, 160 MB.
+    util/
+    include_c++/  EDG's own 18 headers, copied VERBATIM, not
+    include_c99/  translated.  These are what cpfe hands to the
+                  programs IT compiles; they are inputs at run time,
+                  not part of the front end's own build.
+    LICENSE.txt
+
+  NO HEADERS from upstream src/ are carried across, and none are
+  needed: eccp's output is a whole preprocessed translation unit
+  lowered to C, so each .c here is self-contained and compiles with
+  no -I at all.  The upstream .h files are C++ and nothing here
+  reads them.  err_codes.h / err_data.h are likewise already inlined,
+  so util/mk_errinfo is carried for completeness rather than because
+  a build step needs it.
+
+  Deliberately absent, per the conversion brief:
+    CMakeLists.txt, CMakePresets.json, cmake/, lib_src/cmake/,
+    src/cmake/     -- build system; a Plan 9 mkfile will replace it
+    dev_tools/     -- the eccp driver and cmakedef machinery; a host
+                      tool, used to produce this directory, not part
+                      of it
+    benchmarks/, tests/, doc/, dev_annex/, bases/, nt_util/
+    README.md      -- replaced by this file
+    util/eccp.sh, util/make_g++_incl_paths,
+      util/make_predef_macro_table  -- shell/driver, not C
+
+  Absent because it would not translate:
+    util/cfe_daemon_client.c  -- the only file in the whole tree that
+    needs a real C++ standard library:
+
+      src/cfe_daemon_common.h, line 80: catastrophic error: cannot
+      open source file "cstddef"
+        #include <cstddef>
+
+    It also wants <cstring>, <cstdlib>, <cstdio>, <sys/socket.h> and
+    <sys/un.h>.  It is the unix-domain-socket client for the
+    compile daemon; Plan 9 has no unix sockets, so it is out of scope
+    twice over.  src/cfe_daemon.c (the server side) DID translate --
+    its use of those headers is behind a configuration guard.
+
+  NO MKFILE YET.  Nothing here has been built with pcc.
+
+State of the generated C
+------------------------
+  gcc -fsyntax-only over all 133 files:  0 errors, 0 warnings.
+  (Verified on the host; it says nothing about kencc.)
+
+  gcc attributes the generated C carries, and kencc has none of them:
+
+      __attribute__((__weak__))            26712   in 66 files
+      __attribute__((__always_inline__))   10035
+      __attribute__((__unused__))            820
+      __attribute__((__noreturn__))          267
+      __attribute__((__nothrow__))           227   in 44 files
+      __attribute__((__pure__))              143
+      __attribute__((__malloc__))             17
+      __attribute__((__alloc_size__(n)))      13
+      __attribute__((__const__))               7
+      __attribute__((__constructor__))         2
+      __attribute__((section(".ctors.")))      1
+      __attribute__((__cold__))                1
+
+  These are NOT fixed here, by instruction.  Two different origins,
+  and they want different answers:
+
+  - __nothrow__, __always_inline__, __pure__, __malloc__,
+    __alloc_size__, __const__ and most __noreturn__ come from the
+    GLIBC HEADERS that were inlined into each translation unit.  On
+    Plan 9 those declarations will come from APE's headers instead,
+    so most of this class disappears by retranslating against APE's
+    include tree rather than by defining anything away.
+
+  - __weak__ is EDG'S OWN, and it is the load-bearing one.  It is
+    emitted by src/c_gen_be.c:8806 and :11103 under the comment
+    "GCC does not support COMDAT, but it does support weak, which
+    provides a sufficient approximation" -- i.e. it is how the C back
+    end gives vague linkage to inline functions and template
+    instantiations.  26712 sites means 26712 symbols that are DEFINED
+    IN MORE THAN ONE OBJECT.  Defining the attribute away would turn
+    every one into a duplicate-definition link error; this is not a
+    cosmetic problem.
+
+    Upstream already has the answer for a target without weak
+    symbols, and it is a BUILD-TIME CONFIGURATION rather than a
+    source edit:
+      * both emission sites are gated on
+        `gcc_or_clang_is_generated_code_target`, and
+      * src/host_envir.h:1159 and src/defines.h:389 carry
+        ONE_INSTANTIATION_PER_OBJECT, the alternative model, which is
+        what util/edg_prelink and util/edg_munch exist to drive --
+        each template instantiation is assigned to exactly one object
+        at prelink time instead of being emitted everywhere and
+        merged by the linker.
+    A kencc-targeted conversion should build cpfe with that
+    configuration and retranslate, NOT patch 26712 attributes out of
+    the C in this directory.  That has not been attempted.

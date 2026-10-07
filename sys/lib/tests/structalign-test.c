@@ -6,8 +6,12 @@
  * THREE RUNS, and the middle one is the control:
  *
  *   gcc           -o /tmp/sa structalign-test.c && /tmp/sa   0 failures
- *   pcc    -DPLAN9 -o sa structalign-test.c && ./sa          FAILURES
- *   pcc -J -DPLAN9 -o sa structalign-test.c && ./sa          0 failures
+ *   pcc -9 -DPLAN9 -o sa structalign-test.c && ./sa          FAILURES
+ *   pcc    -DPLAN9 -o sa structalign-test.c && ./sa          0 failures
+ *
+ * **Conforming layout is now the DEFAULT, so the flags have swapped
+ * round**: a plain `pcc' conforms and `-9' is the way back to the
+ * 9front rule. `-J' is still accepted and now does nothing.
  *
  * `-DPLAN9' is not decoration: section 5's `#pragma pack' is behind
  * it, exactly as `cmd/tar/mkfile' guards tar.h's, so without the
@@ -27,9 +31,12 @@
  * one below it. `cfrontsz-probe' ran with cfront's own `-B', kept
  * the old rule, and disagreed on fourteen types in the same minute
  * -- which is the whole of the "two instruments disagree about one
- * compiler" puzzle section 7 below was added for. pcc no longer
- * does it. *If this control passes again, suspect the driver before
- * the compiler.*
+ * compiler" puzzle section 7 below was added for. *If this control
+ * passes again, suspect the driver before the compiler.*
+ *
+ * `-9' exists for this run and essentially only for this run. Without
+ * a way back from a default, the control cannot be taken at all --
+ * *an irreversible default takes the measurement with it.*
  *
  * *a check that cannot fail is not a check*, which this tree has
  * now paid for in `strftime-xcheck', `ctype-xcheck' and twice in

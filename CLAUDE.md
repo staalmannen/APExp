@@ -1060,6 +1060,28 @@ there is no cross-`exec` layout hazard there; the one shared BINARY
 object is `_buf.c`'s `Muxseg`, between a process and its own copy
 process, which `mk distclean` already covers for the reason that
 section records.
+**SO IT IS ON BY DEFAULT NOW, in `pcc` and nowhere else.** Not CFLAGS
+(32 of 137) and not CC (59 reassign it): *both of the two variables a
+build system offers for exactly this have holes*, and all 59 still
+name `pcc`. **Unconditional, and NOT inside the `if(!Aflag)` block**
+-- that block does not run when `-A` or `-B` was given, and
+`cmd/cfront` passes `-B`, so putting it there would have missed the
+one package the flag was built for. Native `6c` is untouched.
+**`pcc -9` is the way BACK**, and it exists for the instruments
+rather than for the build: `structalign-test`'s control run and
+`apeabi-probe`'s two compiles are both *differences between the two
+rules*, and with no way to ask for the old one neither could ever be
+taken again. *An irreversible default takes the measurement with it.*
+Nothing in the tree passes `-9` and nothing should. `-J` is still
+accepted and now does nothing.
+**`mk distclean` BEFORE `mk install`**, and the usual reason with an
+extra edge: no mkfile lists a system header as a dependency, and
+nothing here makes a link fail, so a half-rebuilt tree is silent.
+**What to watch, written down before the run**: sockets and threads
+are the whole blast radius, so Tcl's `socket.test`/`socket_inet.test`
+are the sharpest instruments the tree has for it -- a clean run there
+is the confirmation, and a NEW socket failure means something is
+computing a length it should not.
 
 **AND THE cfront SIZE PROBE WAS `.gitignore'd, SO THE VM NEVER GOT
 IT.** `pcc ... cfrontsz-probe.c` answered `Can't open input file` and
@@ -1556,19 +1578,25 @@ the index, so that nothing here is a surprise.
 - `RFCENVG`, `RFCNAMEG` and `RFCFDG` create **empty** groups; the `C` is
   *clear*. `RFENVG`, `RFNAMEG` and `RFFDG` are the ones that copy. So
   `execve` has no environment at all after its first line.
-- **kencc rounds EVERY struct's size up to 8, and aligns a nested
-  struct member to 8 too** (`6c/swt.c`'s `align()`, cases `Asu2` and
-  `Ael1`). So `sizeof(struct{char a[500];})` is **504**, not 500.
+- **NATIVE kencc rounds EVERY struct's size up to 8, and aligns a
+  nested struct member to 8 too** (`6c/swt.c`'s `align()`, cases
+  `Asu2` and `Ael1`), so `sizeof(struct{char a[500];})` is **504**.
   Field offsets are still right, so a `memcpy` into a local is fine --
   **what breaks is `sizeof` used as a STRIDE or a LENGTH**: `p + 1` on
-  a pointer to the type, or writing it as an on-disk record.
-  `#pragma pack on`/`off` is the override (both cases read `packflg`),
-  spelled `on` and not `1`. This made `union block` 520 and every
-  archive GNU tar wrote malformed. **`pcc -J` is the tree-wide
-  override** (`conformalign`, not `-P` -- that is the peephole debug
-  flag): tail padding to the struct's own alignment and a nested
-  struct member to its own. It is all-or-nothing for a linked world,
-  since it moves `FILE` and `struct stat` too, and is OFF by default.
+  a pointer to the type, or writing it as an on-disk record. This made
+  `union block` 520 and every archive GNU tar wrote malformed.
+  `#pragma pack on`/`off` is the per-struct override (both cases read
+  `packflg`), spelled `on` and not `1`.
+  **APE IS NOT ON THAT RULE ANY MORE**: `pcc` passes `-J`
+  (`conformalign`, not `-P` -- that is the peephole debug flag) on
+  every compile, so tail padding is the struct's own alignment and a
+  nested struct member takes its own. `pcc -9` is the way back and is
+  for the instruments only; `6c` keeps the 9front rule, which is what
+  `cmd2/vts` and `vtwin` need against the host's `libc.a`. The switch
+  moves sixteen APE structs, all sockets and locks (`sockaddr_in`
+  24 -> 16, `pthread_mutex_t` 56 -> 40) plus `termios` -- **and NOT
+  `FILE`, `struct stat`, `DIR`, `jmp_buf` or `fd_set`, which the
+  earlier warning here asserted and the acid diff refuted.**
 - **kencc's type signatures follow POINTERS into the struct they point
   at**, and 9front's `CFLAGS=-FTVw` turns them on for every native
   build. So a struct that is opaque in a public header and completed in
