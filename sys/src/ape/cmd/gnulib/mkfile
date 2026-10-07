@@ -432,7 +432,7 @@ OFILES=\
 
 #during building from scratch, the new pcc is not picked up and compilation
 #fails on include_next
-CC=$APEXPROOT/$objtype/bin/pcc
+CC=pcc
 
 # There is deliberately no -Drpl_xxx=xxx mapping here.
 #

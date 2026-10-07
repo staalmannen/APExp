@@ -98,7 +98,7 @@ HFILES=../../../external/bash/config.h ../../../external/bash/config-top.h ../..
 #during building from scratch, the system pcc may predate patches
 #(e.g. C23 bool keyword, include_next behaviour) that bash needs.
 #Use the APExp-local pcc that just got rebuilt.
-CC=$APEXPROOT/$objtype/bin/pcc
+CC=pcc
 LD=$APEXPROOT/$objtype/bin/pcc
 YACC=bison
 

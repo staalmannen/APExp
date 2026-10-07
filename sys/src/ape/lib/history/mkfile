@@ -30,7 +30,7 @@ RLSRC=../../../external/readline
 
 #during building from scratch, the new pcc is not picked up and compilation
 #fails on include_next
-CC=$APEXPROOT/$objtype/bin/pcc
+CC=pcc
 
 CFLAGS=-c -DHAVE_CONFIG_H -D_POSIX_SOURCE -DHAVE_CURSES_H -DHAVE_STDLIB_H\
 	-I$RLSRC -DRL_LIBRARY_VERSION='"8.3"' -DBRACKETED_PASTE_DEFAULT=1

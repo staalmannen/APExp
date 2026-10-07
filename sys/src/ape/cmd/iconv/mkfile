@@ -11,7 +11,7 @@ BIN=$APEXPROOT/$objtype/bin/ape
 
 #during building from scratch, the new pcc is not picked up and compilation
 #fails on include_next
-CC=$APEXPROOT/$objtype/bin/pcc
+CC=pcc
 
 CFLAGS=-c -D_POSIX_SOURCE -D_BSD_EXTENSION\
 		-DLOCALEDIR="/sys/lib/ape/locale"\

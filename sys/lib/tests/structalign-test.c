@@ -18,6 +18,19 @@
  * -J tells you nothing on its own: it looks identical whether the
  * flag works or the compiler was always conforming. Only the run
  * WITHOUT the flag says the test can see the difference at all --
+ *
+ * **AND THAT MIDDLE RUN REPORTED 0 FAILURES ONCE, FOR A REASON THAT
+ * WAS NOT THE COMPILER.** `pcc' appended `-J' to the compiler on
+ * every invocation that passed neither -A nor -B (an ancient no-op
+ * in stock cc, since nothing reads debug['J']), so the command
+ * written above as the control was silently the same compile as the
+ * one below it. `cfrontsz-probe' ran with cfront's own `-B', kept
+ * the old rule, and disagreed on fourteen types in the same minute
+ * -- which is the whole of the "two instruments disagree about one
+ * compiler" puzzle section 7 below was added for. pcc no longer
+ * does it. *If this control passes again, suspect the driver before
+ * the compiler.*
+ *
  * *a check that cannot fail is not a check*, which this tree has
  * now paid for in `strftime-xcheck', `ctype-xcheck' and twice in
  * `random-xcheck'. Expect section 1 and section 2 to fail without
