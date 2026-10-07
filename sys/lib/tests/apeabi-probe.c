@@ -3,9 +3,17 @@
  *
  * TWO COMPILES AND A DIFF, on the VM:
  *
- *   pcc    -a apeabi-probe.c > /tmp/abi-old.acid
- *   pcc -J -a apeabi-probe.c > /tmp/abi-new.acid
+ *   pcc -c    -a apeabi-probe.c > /tmp/abi-old.acid
+ *   pcc -c -J -a apeabi-probe.c > /tmp/abi-new.acid
  *   diff /tmp/abi-old.acid /tmp/abi-new.acid
+ *
+ * `-c' is not optional: with `-a' the compiler writes acid to stdout
+ * and never produces the object, so without it pcc goes on to link an
+ * object that does not exist. And `-a' itself only reaches the
+ * compiler on a pcc that names the letter -- the first attempt at
+ * this answered **`cc: flag -a ignored`** and quietly compiled
+ * normally, because pcc's ARGBEGIN listed neither `a' nor `Z'. On an
+ * older pcc, `pcc -c -W0,-a' passes it through by hand.
  *
  * `-a' makes the compiler emit acid definitions, which carry each
  * struct's SIZE and every member's OFFSET -- it is what `mkone's
@@ -23,6 +31,16 @@
  * **silently, with no link error, because every symbol still
  * resolves**. The failure arrives as a wrong field, later, somewhere
  * else.
+ *
+ * AND THE FIRST ATTEMPT AT THE `old' SIDE OF THIS DIFF WOULD HAVE
+ * MEASURED NOTHING, which is worth more than the diff. `pcc' used to
+ * append `-J' to the compiler UNCONDITIONALLY (commented `old/new
+ * decl mixture hack', a no-op in stock cc because nothing reads
+ * debug['J']), so once -J meant conforming layout, the `without'
+ * compile had it on too and the diff would have come back EMPTY --
+ * reading exactly like a flag that costs nothing. Fixed in pcc.c;
+ * **a run of this probe on a pcc predating that fix is void**, and
+ * the two files being byte-identical is how it would show.
  *
  * AND THE OBVIOUS WAY TO TURN IT ON DOES NOT WORK. Putting `-J' in
  * `sys/src/ape/config's CFLAGS reaches **32 of 137** mkfiles: the

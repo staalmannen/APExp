@@ -77,7 +77,7 @@ OFILES=\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CC=$APEXPROOT/$objtype/bin/pcc
+CC=pcc
 
 CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape \
 	-I$APEXPROOT/$objtype/include/ape\

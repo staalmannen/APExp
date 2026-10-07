@@ -63,7 +63,7 @@ BISONSRC=../../../external/bison
 
 #during building from scratch, the new pcc is not picked up and compilation
 #fails on include_next
-CC=$APEXPROOT/$objtype/bin/pcc
+CC=pcc
 
 # Include order matters here, and each position is load bearing.
 #

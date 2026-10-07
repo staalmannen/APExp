@@ -27,7 +27,7 @@ GREPSRC=../../../external/ggrep
 
 #during building from scratch, the new pcc is not picked up and compilation
 #fails on include_next
-CC=$APEXPROOT/$objtype/bin/pcc
+CC=pcc
 
 # -I. finds this directory's config.h, which layers grep's identity over
 # config-common.h. -I$GNUSRC comes before grep's own lib directory so the

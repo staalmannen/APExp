@@ -983,6 +983,51 @@ world. An empty diff would mean the flag is free; a long one is the
 cost named struct by struct before a single object is rebuilt. 0
 errors against the staged headers on the host.
 
+**AND `-J` WAS ALREADY ON FOR MOST OF THE TREE -- `pcc` ITSELF WAS
+PASSING IT, AND HAS BEEN SINCE THE FLAG LANDED.** `pcc.c`'s
+`if(!Aflag)` block appended **`-J` to the compiler on every
+invocation**, commented *"old/new decl mixture hack"* -- a comment
+describing a hack that had stopped existing, because **stock `cc`
+names no `-J` at all**: it fell to ARGBEGIN's default, set
+`debug['J']`, and **nothing in the whole tree reads `debug['J']`**
+(grep: zero hits). A pure no-op for its entire life. Giving the
+letter a MEANING therefore turned conforming layout on for every APE
+compile that passed neither `-A` nor `-B` -- *the silent ABI split
+the flag was built to avoid, created by the flag, live in the tree
+for three commits.* **`-P` over again, one level out: I checked `cc`
+for a collision and did not check the DRIVER that calls it.**
+**It explains both of the round's loose ends with no slack left
+over.** `structalign-test` was run as `pcc -DPLAN9` -- no `-A`, no
+`-B` -- so the command written down as *the control* was byte for
+byte the same compile as the one below it, which is why the twelve
+predicted failures did not fire. `cfrontsz-probe` carries cfront's
+own flags, which include **`-B`**, so `Aflag` was set, no `-J` was
+appended, and it kept the old rule and disagreed on fourteen types
+in the same minute. *Two instruments, two layout rules, one `pcc`,
+and neither command line said which it was getting.* The earlier
+reading -- "one was compiled with `-J` and the other without" -- was
+right about the fact and wrong about the cause, and the cause is the
+half that needed fixing.
+**Removed from the default, so `-J` now means exactly what it says**,
+and that makes the tree-wide decision **one line in `pcc.c`** rather
+than 137 mkfile edits.
+**AND `pcc` NAMED NEITHER `-a` NOR `-Z`, so the probe could not be
+taken at all**: `pcc -a apeabi-probe.c` answers `cc: flag -a ignored`
+and compiles normally. Both are forwarded now; **`-c` is required
+with them** (with `-a` the compiler writes acid to stdout and makes
+no object, so pcc would otherwise go on to link one that is not
+there). On an older pcc, `pcc -c -W0,-a` passes it by hand. *A driver
+that dropped the flag for READING a layout, standing next to one that
+dropped the flag for CHANGING it.*
+**A run of `apeabi-probe` on a pcc predating this is VOID** -- both
+sides would have had `-J` and the diff would come back EMPTY, reading
+exactly like a flag that costs nothing.
+**Twelve mkfiles said `CC=$APEXPROOT/$objtype/bin/pcc`** where 48
+others say plain `pcc`; normalised, since the tree already depends on
+`pcc` resolving. *Inconsistent rather than load-bearing* -- and it
+does not bear on `-J` either way, since all twelve named the same
+program.
+
 **AND THE cfront SIZE PROBE WAS `.gitignore'd, SO THE VM NEVER GOT
 IT.** `pcc ... cfrontsz-probe.c` answered `Can't open input file` and
 `ls cfront*.c` showed only the two stub files. **git is the only

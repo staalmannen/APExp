@@ -144,6 +144,28 @@ main(int argc, char *argv[])
 		 * *Name the preprocessor that runs, not the one with the
 		 * right name* -- the shadowed-config.h lesson, a third
 		 * time, and it cost two VM rounds.
+		 *
+		 * AND THE LETTER WAS ALREADY TAKEN -- BY THIS FILE.
+		 * The `if(!Aflag)' block below used to append `-J' to cc
+		 * unconditionally, commented `old/new decl mixture hack'.
+		 * In stock kencc `cc' names no `-J' at all, so it fell to
+		 * ARGBEGIN's default arm, set debug['J'], and **nothing in
+		 * the tree has ever read debug['J']** -- it was a pure
+		 * no-op, and the comment describes a hack that had stopped
+		 * existing. Giving the letter a MEANING in cc therefore
+		 * turned conforming layout ON for every APE compile that
+		 * did not pass -A or -B, which is exactly the silent ABI
+		 * split this flag was built to avoid. `cmd/cfront' passes
+		 * -B, so cfront alone kept the old layout -- which is the
+		 * whole of why `structalign-test' reported 0 failures in
+		 * the run that was predicted to fail about twelve checks,
+		 * while `cfrontsz-probe', built with cfront's own -B,
+		 * disagreed on fourteen types in the same minute. *The two
+		 * instruments were measuring two different layout rules and
+		 * neither command said so.*
+		 *
+		 * *I checked `cc' for a collision and did not check the
+		 * driver that calls it* -- `-P' over again, one level out.
 		 */
 		case 'J':
 			append(&cc, "-J");
@@ -152,6 +174,26 @@ main(int argc, char *argv[])
 		case 'B':
 			append(&cc, "-B");
 			Aflag = 1;
+			break;
+		/*
+		 * -a and -Z make `cc' write acid definitions, or a pickle,
+		 * to standard output instead of an object (lex.c:255 sets
+		 * `outfile = 0' and rebinds outbuf to fd 1, so the `-o'
+		 * appended below is simply overridden). It is the same
+		 * mechanism `mkone's `%.acid' rule uses, and an acid dump
+		 * is the only complete, compiler-authored list of struct
+		 * SIZES and member OFFSETS available -- which is what
+		 * `sys/lib/tests/apeabi-probe.c' is compiled twice to get.
+		 *
+		 * pcc did not name either letter, so `pcc -a x.c' answered
+		 * `cc: flag -a ignored' and compiled normally: the probe
+		 * could not be taken at all. *A driver that drops the flag
+		 * for reading a layout, next to one that dropped the flag
+		 * for changing it.*
+		 */
+		case 'a':
+		case 'Z':
+			append(&cc, smprint("-%c", ARGC()));
 			break;
 		case 'O':
 			break;
@@ -217,7 +259,16 @@ main(int argc, char *argv[])
 			break;
 		} ARGEND
 		if(!Aflag) {
-			append(&cc, "-J");		/* old/new decl mixture hack */
+			/*
+			 * `-J' USED TO BE APPENDED HERE and is not any more.
+			 * It is safe to drop because it never did anything:
+			 * stock `cc' names no -J, so it reached ARGBEGIN's
+			 * default and set debug['J'], which no file in this
+			 * tree reads. Now that -J means conforming struct
+			 * layout, leaving it here would make that the
+			 * DEFAULT for every APE compile without -A or -B --
+			 * see the case 'J' arm above.
+			 */
 			append(&cc, "-B");		/* turn off non-prototype warnings */
 			Aflag = 1;
 		}
