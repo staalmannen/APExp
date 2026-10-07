@@ -1028,6 +1028,39 @@ others say plain `pcc`; normalised, since the tree already depends on
 does not bear on `-J` either way, since all twelve named the same
 program.
 
+**AND THE ACID DIFF IS IN: `-J` MOVES SIXTEEN STRUCTS AND NOT ONE OF
+THEM IS IN THE STDIO/STAT CORE.** Two compiles of `apeabi-probe`,
+~1400 lines of acid each, and the whole diff is twenty-four hunks
+over **two families**:
+- **Network addresses**, every one of which becomes the number every
+  other system says: `in_addr` 8 -> **4**, `sockaddr_in` 24 -> **16**
+  (`sin_addr` 8 -> 4, `sin_zero` 16 -> 8), `sockaddr_in6` 32 -> 28,
+  `ip_opts` 48 -> 44, `ip_mreq` 16 -> 8, `sockproto` 8 -> 4,
+  `sockaddr`/`sockaddr_storage` 112 -> 110.
+- **Locks and pthreads**: `QLock` 32 -> 24, `Rendez` 32 -> 24,
+  `pthread_mutex_t` 56 -> **40**, `pthread_cond_t` 56 -> 48,
+  `pthread_rwlock_t`'s members, `pthread_once_t` 16 -> 8, and the two
+  anonymous lock types `_8_`/`_10_` 8 -> 4. **That is the recorded
+  `Lock`-is-one-`int` invariant arriving from the other side** -- the
+  very structs the two-stage-bootstrap note said would disagree with
+  a native `libc.a`, which is exactly why this stays inside APE.
+- Plus `termios` 32 -> 28, on its own.
+**WHAT IS ABSENT IS THE RESULT.** `FILE`, `struct stat`, `DIR`,
+`jmp_buf`, `sigjmp_buf`, `fd_set`, `tm`, `timeval`, `timespec`,
+`dirent`, `passwd`, `group`, `rusage`, `utsname`, `hostent`,
+`addrinfo`, `sigaction`, `lconv`, `regex_t`, `mbstate_t`, `sigset_t`
+-- **every one unchanged**, and they are the types the flag's own
+warning named as the reason it is all-or-nothing. *The feared cost
+and the measured cost are different sizes, and only the probe could
+have said so.*
+**So the blast radius is sockets and threads**, both entirely inside
+libap, neither written to disk nor shared with native code.
+`/env/_fdinfo` was checked rather than assumed and is **TEXT**, so
+there is no cross-`exec` layout hazard there; the one shared BINARY
+object is `_buf.c`'s `Muxseg`, between a process and its own copy
+process, which `mk distclean` already covers for the reason that
+section records.
+
 **AND THE cfront SIZE PROBE WAS `.gitignore'd, SO THE VM NEVER GOT
 IT.** `pcc ... cfrontsz-probe.c` answered `Can't open input file` and
 `ls cfront*.c` showed only the two stub files. **git is the only

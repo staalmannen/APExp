@@ -1,0 +1,82 @@
+/*
+Part of the EDG Compiler Project, under the Apache License v2.0 with LLVM
+Exceptions.
+See https://edgcpp.org/LICENSE.txt for license information.
+SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*/
+
+/*
+exception -- Include file for exception handling (see 18.6)
+*/
+#ifndef _EXCEPTION_STDH
+#define _EXCEPTION_STDH
+
+#include <edg_internal_defines>
+
+/* This lets users disable the EDG supplied exception classes. */
+#ifndef __NO_EDG_EXCEPTION_CLASSES
+
+#ifdef __EDG_RUNTIME_USES_NAMESPACES
+namespace std {
+#endif /* ifdef __EDG_RUNTIME_USES_NAMESPACES */
+  class exception {
+  public:
+    exception() __EDG_DOES_NOT_THROW;
+    exception(const exception&) __EDG_DOES_NOT_THROW;
+    exception& operator=(const exception&) __EDG_DOES_NOT_THROW;
+    virtual ~exception() __EDG_DOES_NOT_THROW;
+    virtual const char* what() const __EDG_DOES_NOT_THROW;
+  };
+
+  /*
+  If bool is not supported, use a typedef for bool.
+  */
+  #ifdef _BOOL
+  typedef bool __bool;
+  #else /* ifndef _BOOL */
+  typedef int __bool;
+  #endif /* ifdef _BOOL */
+
+  class bad_exception : public exception {
+  public:
+    bad_exception() __EDG_DOES_NOT_THROW;
+    bad_exception(const bad_exception&) __EDG_DOES_NOT_THROW;
+    bad_exception& operator=(const bad_exception&) __EDG_DOES_NOT_THROW;
+    virtual ~bad_exception() __EDG_DOES_NOT_THROW;
+    virtual const char* what() const __EDG_DOES_NOT_THROW;
+  };
+
+  typedef void (*terminate_handler)();
+  extern terminate_handler set_terminate(terminate_handler)
+                                                          __EDG_DOES_NOT_THROW;
+  extern terminate_handler get_terminate() __EDG_DOES_NOT_THROW;
+
+  /* Note that get_unexpected and set_unexpected were added in C++11 and
+     removed in C++17. */
+  typedef void (*unexpected_handler)();
+  extern unexpected_handler set_unexpected(unexpected_handler)
+                                                          __EDG_DOES_NOT_THROW;
+
+  __EDG_NORETURN void terminate() __EDG_DOES_NOT_THROW;
+  __EDG_NORETURN void unexpected() __EDG_DOES_NOT_THROW;
+
+  /* std::uncaught_exception is deprecated in C++17; use
+     std::uncaught_exceptions. */
+  extern __bool uncaught_exception() __EDG_DOES_NOT_THROW;
+  extern int uncaught_exceptions() __EDG_DOES_NOT_THROW;
+
+#ifdef __EDG_RUNTIME_USES_NAMESPACES
+}  /* namespace std */
+
+#ifdef __EDG_IMPLICIT_USING_STD
+/* Implicitly include a using directive for the STD namespace when this
+   preprocessing flag is TRUE. */
+using namespace std;
+#endif /* ifdef __EDG_IMPLICIT_USING_STD */
+
+#endif /* ifdef __EDG_RUNTIME_USES_NAMESPACES */
+
+#endif /* ifndef __NO_EDG_EXCEPTION_CLASSES */
+
+#endif /* _EXCEPTION_STDH */
+

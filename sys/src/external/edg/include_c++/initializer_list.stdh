@@ -1,0 +1,80 @@
+/*
+Part of the EDG Compiler Project, under the Apache License v2.0 with LLVM
+Exceptions.
+See https://edgcpp.org/LICENSE.txt for license information.
+SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+*/
+
+/*
+initializer_list -- Include file for std::initializer_list (18.9)
+*/
+#ifndef _INITIALIZER_LIST_STDH
+#define _INITIALIZER_LIST_STDH
+
+#ifndef __cplusplus
+ #error -- <initializer_list> header requires C++ mode
+#endif /* ifndef __cplusplus */
+#ifdef __EDG_CONSTEXPR_ENABLED__
+#define __EDG_CONSTEXPR constexpr
+#else /* !defined(__EDG_CONSTEXPR_ENABLED) */
+#define __EDG_CONSTEXPR
+#endif /* ifdef __EDG_CONSTEXPR_ENABLED__ */
+
+namespace std {
+  typedef __EDG_SIZE_TYPE__ size_t;
+
+  template<typename _E> struct initializer_list {
+    typedef _E value_type;
+    typedef _E const &reference;
+    typedef _E const &const_reference;
+    typedef _E const *iterator;
+    typedef _E const *const_iterator;
+    typedef std::size_t size_type;
+
+    __EDG_CONSTEXPR initializer_list(): __array(0), __length((size_t)0) {}
+    /* Default copy constructor. */
+    /* Default destructor. */
+    /* Default copy assignment operator. */
+    __EDG_CONSTEXPR size_type size() const { return this->__length; }
+    __EDG_CONSTEXPR iterator begin() const { return this->__array; }
+    __EDG_CONSTEXPR iterator end() const {
+      return this->__length == 0 ? this->__array
+                                 : this->__array + this->__length;
+    }
+  private:
+    iterator __array;
+    size_type __length;
+#ifdef _MSC_VER
+    /* Microsoft's compiler uses a different internal constructor and makes it
+       public.  The front end can handle either one.  Define a Microsoft-like
+       constructor when compiling in Microsoft mode. */
+  public:
+    __EDG_CONSTEXPR initializer_list(iterator __b, iterator __e)
+                                    : __array(__b), __length(__e - __b) {}
+  private:
+#else /* !defined(_MSC_VER) */
+    __EDG_CONSTEXPR initializer_list(_E const __a[], std::size_t __l)
+                                    : __array(__a), __length(__l) {}
+#endif /* ifdef _MSC_VER */
+  };
+
+  template<typename _E> __EDG_CONSTEXPR
+    typename initializer_list<_E>::iterator begin(initializer_list<_E> il) {
+      return il.begin();
+    }  /* initializer_list<_E>::begin */
+
+  template<typename _E> __EDG_CONSTEXPR
+    typename initializer_list<_E>::iterator end(initializer_list<_E> il) {
+      return il.end();
+    }  /* initializer_list<_E>::end */
+
+}  /* namespace std */
+
+#ifdef __EDG_IMPLICIT_USING_STD
+/* Implicitly include a using directive for the STD namespace when this
+   preprocessing flag is TRUE. */
+using namespace std;
+#endif /* ifdef __EDG_IMPLICIT_USING_STD */
+
+#endif /* _INITIALIZER_LIST_STDH */
+
