@@ -1148,9 +1148,20 @@ They catch only the case where the misread eight bytes happen to be
 a SMALL number, and the one that actually crashed held
 `0x6f69736963657270` -- the text `precisio`, far above the
 threshold. *A workaround whose own threshold the real case steps
-over*, and seven copies of it meant nobody ever asked why. They are
-removable under `-J` and the removal is a second independent check:
-identical behaviour with `-J`, a worse crash with `-9`.
+over*, and seven copies of it meant nobody ever asked why.
+**REMOVED, and the A/B was confirmed in BOTH directions first**: the
+`-J` rebuild was run a second time and gave the same `cfront 5747`
+and the same five diagnostics, so neither side of the pair was a
+one-off piece of state. Five were a standalone `goto nxt`/`continue`;
+`look__6ktable`'s was half of an `&&`; `insert__6ktable`'s was a
+two-line `||`. **gcc compiles the file before and after -- which is a
+SYNTAX check and not a control**, since both sides pass, and saying
+so is the point: the only thing that can confirm this is the VM.
+*Expect `mk install` in `cmd/c++lib` to print exactly what it prints
+now* -- `cfront 5747`, the four `iostream.h` redeclarations and
+`two definitions of norm()`. Anything else means a guard was
+load-bearing after all, which would be a finding rather than a
+regression.
 **The diagnostics that remain need no VM and are already recorded**:
 the four `iostream.h` redeclarations and `two definitions of norm()`
 are character for character what the host ASAN build produced, and
