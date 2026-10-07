@@ -1181,11 +1181,50 @@ behind platform ifdefs and would report a missing tktest on a
 platform that merely has no such command.
 *This is the `THIS_SH=../bash` precondition for the fourth time, and
 the first time it has been the BUILD SYSTEM rather than a default in
-an upstream script.* **The behavioural confirmation of `-J` --
-`socket.test` and `socket_inet.test`, the sharpest instruments the
-tree has for a struct that moved -- is therefore still outstanding,
-and `socket_inet.test` not appearing in this run's failing list says
-nothing at all.**
+an upstream script.*
+
+**AND THE RE-RUN UNDER `tcltest` IS THE BEHAVIOURAL CONFIRMATION OF
+`-J`: EIGHTEEN FIXED, NOTHING BROKEN, NOTHING EVEN MOVED.**
+
+```
+  baseline:  Total 68118  Passed 62138  Skipped 5916  Failed 64
+  with -J:   Total 68118  Passed 62156  Skipped 5916  Failed 46
+```
+
+**`Total` and `Skipped` are IDENTICAL to the digit**, which is what
+makes the comparison sound at all: nothing became unrunnable, nothing
+newly skipped, no file aborted -- so `Passed` +18 and `Failed` -18 is
+one arithmetic statement about the same 68118 executions. The marker
+is present, `exit called (code 0)`, and **the `Test files exiting
+with errors` section is gone**, so this really is the test
+interpreter. *The void run and this one differ in nothing but which
+binary ran them, and that is the cleanest control this suite can
+give.*
+**`socket_inet.test` HAS LEFT THE FAILING-FILE LIST ENTIRELY**, and
+sockets are half of the measured blast radius -- `sockaddr_in`
+24 -> 16, `in_addr` 8 -> 4, `sockaddr_storage` 112 -> 110. *The
+refutation condition was written down before the switch -- "a NEW
+socket failure means something is computing a length it should not"
+-- and the opposite happened in the one file named.* `socket.test`
+still fails, which is the `_resettimer`/timer-process story and
+predates this.
+**THE PTHREAD HALF IS NOT MEASURED HERE, and the skip table says so
+rather than leaving it to be assumed**: `197 thread` and `12
+testmutex` are SKIPPED, so `pthread_mutex_t` 56 -> 40 and
+`pthread_cond_t` 56 -> 48 were barely exercised. *Half the blast
+radius is confirmed and half is untouched*, which is a different
+statement from "the suite is clean".
+**TWO THINGS TO CHECK PER NAME BEFORE THIS IS CLOSED.** The totals
+cannot tell 18 fixed from 20 fixed and 2 broken -- this tree's own
+rule -- and `event.test` and `main.test` appear in the failing list
+where the baseline notes had `event-1.1` and `Tcl_Main-5.10` as
+unread singletons, so they are probably unchanged rather than new.
+**And `socket_inet-5.1`/`5.3` were recorded as tests that SHOULD
+fail** (`notRoot`, and glenda is the host owner): if they are among
+the eighteen, that is the leftover-listener false pass returning, not
+a fix. *A test that newly passes may be passing for the wrong
+reason* -- and this is exactly the file where that has happened
+before.
 
 **AND THE FIRST REBUILD STOPPED IN bash -- NOT ON `-J`, ON A SHADOWED
 HEADER.** `/sys/include/ape/qlock.h:44 syntax error, last name: Lock`,
@@ -1948,13 +1987,15 @@ worked without waiting on Tcl -- and Tcl was one of its three items. The remaini
 or a constraint that fails on Linux too). The port's own share is
 `focus-6.1`, `geometry-4.7`, `event-9.13`/`9.14` and `visual-3.1`.
 
-**Tcl's suite**: **it finishes and nothing aborts.** *(The numbers
-below are the last VALID ones. A later run reporting `Failed 37` was
-taken under plain `tclsh` after `mk distclean` removed
-`cmd/tclsh/tcltest` -- see the `-J` section. Both harnesses now say
-which interpreter they are.)*
-`Total 68118 Passed 62138 Skipped 5916 Failed 64`, 167 files, marker,
-exit 0, and no `Test files exiting with errors` section. **The whole
+**Tcl's suite**: **it finishes and nothing aborts.**
+**`Total 68118 Passed 62156 Skipped 5916 Failed 46`** under `-J`,
+167 files, marker, exit 0, no `Test files exiting with errors`.
+*(The baseline this is measured against is
+`Passed 62138 Failed 64`, same Total and Skipped; the eighteen are
+discussed in the `-J` section. A run in between reporting `Failed 37`
+was taken under plain `tclsh` after `mk distclean` removed
+`cmd/tclsh/tcltest` and is VOID -- both harnesses now say which
+interpreter they are.)* The entries below are written against the 64. **The whole
 float rewrite -- Gay's `strtod`, `strtof`, `strtold`, and
 `Sudden_Underflow` off for amd64, which switches `_dtoa` to its
 gradual arm -- moved NOTHING: identical totals, empty per-name diff
