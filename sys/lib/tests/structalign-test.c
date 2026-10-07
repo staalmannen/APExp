@@ -85,6 +85,7 @@
  */
 #include <stdio.h>
 #include <stddef.h>
+#include <string.h>
 
 static int failures;
 
@@ -123,6 +124,43 @@ struct mixed {
 /* ---- section 4: unions and bitfields ---- */
 union  u3  { char a[3]; short s; };
 struct bits { unsigned x : 3; unsigned y : 5; char c; };
+
+/*
+ * ---- section 8: a BIT-FIELD GROUP after a member ----
+ *
+ * GNU make's `struct command_switch', trimmed to the shape that
+ * matters. It is here because this exact struct found a bug the rest
+ * of this file could not: `sualign()' carried the current bit-field
+ * UNIT's offset in `o', and the max-member-alignment loop added for
+ * -J overwrote `o' with its own result -- so the SECOND and later
+ * fields of every bit-field group were placed at the previous
+ * member's ALIGNMENT instead of at the unit's offset. Here that put
+ * `toenv', `no_makefile' and `specified' at offset 4, on top of
+ * `type', and `6l' refused the link with `multiple initialization'
+ * for every array entry whose two writes to those four bytes were
+ * both non-zero.
+ *
+ * **Section 4's `struct bits' could never have caught it**: its two
+ * bit fields are the FIRST members, so the clobbered `o' happened to
+ * be the alignment of nothing and the offsets came out right anyway.
+ * *A bit-field group needs a member in front of it before a wrong
+ * unit offset is visible at all*, which is why this section is a
+ * separate shape rather than a line added to that one.
+ *
+ * It asserts OFFSETS, not just the size: the size was right in both
+ * builds -- 56 either way, since it is already a multiple of 8 -- so
+ * a size-only check passes against the bug.
+ */
+struct cs {
+	int		c;
+	int		type;
+	void		*value_ptr;
+	unsigned int	env : 1;
+	unsigned int	toenv : 1;
+	unsigned int	no_makefile : 1;
+	unsigned int	specified : 1;
+	const void	*noarg_value;
+};
 
 /* ---- section 5: #pragma pack must still win ---- */
 #ifdef PLAN9
@@ -278,6 +316,55 @@ main(void)
 	    "sizeof struct{TOK;bit;bit;}", (long)sizeof(struct cf_node));
 	printf("     %-34s %ld    cfrontsz-probe measured 8 on the VM)\n",
 	    "sizeof struct{char a[3];}", (long)sizeof(struct c3));
+
+	printf("\nSection 8: a bit-field GROUP after a member\n");
+	/*
+	 * The numbers came from RUNNING this under gcc, not from adding
+	 * the fields up -- the rule section 6 records after my own
+	 * arithmetic said 149 where gcc said 150.
+	 *
+	 * `env' is the one that would still pass against the bug: it is
+	 * the FIRST field of the group, the one that sets the unit
+	 * offset rather than reading it back. The three after it are
+	 * the check.
+	 */
+	/*
+	 * `offsetof' CANNOT NAME A BIT FIELD -- C forbids taking its
+	 * address, and gcc says so -- so the check is the COLLISION
+	 * itself rather than the offsets: set each field of the group
+	 * in turn and ask whether an earlier member survived it. That
+	 * is the same question the linker asked, and it is the one the
+	 * failure actually consists of.
+	 */
+	{
+		struct cs s;
+		long bad;
+
+		memset(&s, 0, sizeof s);
+		s.c = 0x11111111;
+		s.type = 0x22222222;
+		s.value_ptr = (void *)0;
+
+		s.env = 1;
+		eq("env=1 leaves type intact", (long)s.type, 0x22222222);
+		s.toenv = 1;
+		eq("toenv=1 leaves type intact", (long)s.type, 0x22222222);
+		s.no_makefile = 1;
+		eq("no_makefile=1 leaves type intact", (long)s.type, 0x22222222);
+		s.specified = 1;
+		eq("specified=1 leaves type intact", (long)s.type, 0x22222222);
+		eq("...and c intact", (long)s.c, 0x11111111);
+
+		/* all four are distinct bits of ONE unit */
+		bad = (s.env != 1) + (s.toenv != 1) +
+		      (s.no_makefile != 1) + (s.specified != 1);
+		eq("all four bits read back as 1", bad, 0);
+
+		eq("offsetof(cs, type)", (long)offsetof(struct cs, type), 4);
+		eq("offsetof(cs, noarg_value)",
+		    (long)offsetof(struct cs, noarg_value), 24);
+		eq("sizeof struct cs", (long)sizeof(struct cs), 32);
+	}
 
 	printf("\n%d failures\n", failures);
 	return failures;

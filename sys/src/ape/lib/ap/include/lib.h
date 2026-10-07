@@ -146,7 +146,7 @@ extern Fdinfo	_fdinfo[];
 
 extern int	_finishing;
 extern int	_sessleader;
-extern void	(*_sighdlr[])(int, char*, Ureg*);
+extern void	(*_sighdlr[])(int);
 extern char	*_sigstring(int);
 extern int	_stringsig(char *);
 extern long	_psigblocked;
@@ -157,6 +157,21 @@ extern int _readbuf(int, void*, int, int);
 extern void	_detachbuf(void);
 extern void	_finish(int, char *);
 extern char	*_ultoa(char *, unsigned long);
+/*
+ * NOTICED, NOT FIXED, and the reason is that both sides are right.
+ * signal/signal.c defines `int _notehandler(Ureg *u, char *msg)' --
+ * gcc calls that a conflicting type against this line -- but
+ * `_envsetup.c' hands `_notehandler' to `_NOTIFY', whose argument is
+ * Plan 9's own `void *'. So the declaration agrees with the SYSCALL
+ * and disagrees with the DEFINITION, and narrowing it here only
+ * moves the mismatch to the `_NOTIFY' call. Whichever side is
+ * changed, one of the two needs a cast.
+ *
+ * Found by syntax-checking signal.c on the host while prototyping
+ * `signal()'. It is OLDER than that change and independent of it:
+ * HEAD's signal.c gives exactly this one error against HEAD's own
+ * headers, which is the control that separates them.
+ */
 extern int	_notehandler(void *, char *);
 extern void	_notetramp(int, void (*)(int, char*, Ureg*), Ureg*, char*);
 extern void	_syserrno(void);

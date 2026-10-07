@@ -7,15 +7,44 @@
 typedef int sig_atomic_t;
 
 /*
- * We don't give arg types for signal handlers, in spite of ANSI requirement
- * that it be 'int' (the signal number), because some programs need an
- * additional context argument.  So the real type of signal handlers is
- *      void handler(int sig, char *, struct Ureg *)
- * where the char * is the Plan 9 message and Ureg is defined in <ureg.h>
+ * A HANDLER IS `void (*)(int)', WHICH IS WHAT C AND POSIX SAY.
+ *
+ * It used to be the UNPROTOTYPED `void (*)()' here, under a comment
+ * explaining that libap dispatches
+ *
+ *	void handler(int sig, char *msg, struct Ureg *u)
+ *
+ * -- the Plan 9 note string and the trap frame -- and that a
+ * prototype would stop a program from asking for them.
+ *
+ * **The extension is still there and still dispatched**; what changed
+ * is that the public declaration no longer LIES to every ordinary
+ * caller to keep it reachable. An empty parameter list turns off
+ * checking for everybody: this tree's own invariant is that a call
+ * with no prototype in scope corrupts its arguments under kencc,
+ * since `sizeof' is 32-bit and the return value is worse -- and here
+ * the thing left unchecked is a FUNCTION POINTER a program installs
+ * and the library later calls.
+ *
+ * *It was also not even true of libap*: `signal/signal.c' defines
+ * `signal()' with the three-argument type, so the header and the
+ * definition have always disagreed, and only the empty parameter
+ * list made that legal.
+ *
+ * **Nothing in this tree uses the extension** -- swept: the only
+ * files mentioning `Ureg' outside libap are go1.4's own runtime,
+ * which is not built here and does not go through this `signal()'.
+ * A program that wants the extra arguments casts, which is what it
+ * would have to do on any other system anyway.
+ *
+ * The three macros move WITH the declaration and cannot be left
+ * behind: they are what callers compare the return value against and
+ * assign to `sa_handler', so a mismatched pair is a diagnostic in
+ * every file that mentions them.
  */
-#define SIG_DFL ((void (*)())0)
-#define SIG_ERR ((void (*)())-1)
-#define SIG_IGN ((void (*)())1)
+#define SIG_DFL ((void (*)(int))0)
+#define SIG_ERR ((void (*)(int))-1)
+#define SIG_IGN ((void (*)(int))1)
 
 #define	SIGHUP	1	/* hangup */
 #define	SIGINT	2	/* interrupt */
@@ -54,7 +83,7 @@ typedef int sig_atomic_t;
 extern "C" {
 #endif
 
-extern void (*signal(int, void (*)()))();
+extern void (*signal(int, void (*)(int)))(int);
 extern int raise(int);
 extern char *strsignal(int);
 extern void psignal(int, const char *);
@@ -87,7 +116,7 @@ typedef struct {
 
 struct sigaction {
 	union {
-		void		(*sa_handler)();
+		void		(*sa_handler)(int);
 		void		(*sa_sigaction)(int, siginfo_t *, void *);
 	};
 	sigset_t	sa_mask;

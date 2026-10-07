@@ -932,8 +932,33 @@ sualign(Type *t)
 {
 	Type *l;
 	long o, w;
-	int a;
+	int a, ma;
 
+	/*
+	 * `ma' EXISTS BECAUSE `o' IS CARRIED ACROSS ITERATIONS.
+	 *
+	 * In the TSTRUCT loop `o' holds the offset of the CURRENT
+	 * BIT-FIELD UNIT: the first field of a group (`l->shift <= 0')
+	 * sets it, and every later field of the same group reads it
+	 * back. The max-member-alignment loop added for -J first wrote
+	 * its result into `o' as well, which destroyed that offset --
+	 * so the second and later fields of every bit-field group were
+	 * placed at the ALIGNMENT of the previous member rather than at
+	 * the unit's offset, landing on top of an earlier member.
+	 *
+	 * It cost a link failure three commits later, and it was NOT
+	 * gated on `conformalign': the line runs on every compile, so
+	 * it broke plain builds too. GNU make's `struct command_switch'
+	 * is the one that named it -- `int c; enum type; void *; then
+	 * env:1, toenv:1, no_makefile:1, specified:1' -- where the
+	 * three later bits moved to offset 4, on top of `type', and
+	 * `6l' answered `multiple initialization' for every entry whose
+	 * two writes to those four bytes were both non-zero.
+	 *
+	 * *A variable reused for a second purpose in the same loop is a
+	 * variable with one purpose too many*, and the compiler cannot
+	 * warn: both uses are a `long' holding a small number.
+	 */
 	o = 0;
 	switch(t->etype) {
 
@@ -964,9 +989,9 @@ sualign(Type *t)
 				l->offset = w;
 				w = align(w, l, Ael2);
 			}
-			o = memberalign(l);
-			if(o > a)
-				a = o;
+			ma = memberalign(l);
+			if(ma > a)
+				a = ma;
 		}
 		t->talign = a;
 		w = align(w, t, Asu2);
@@ -991,9 +1016,9 @@ sualign(Type *t)
 			o = align(align(0, l, Ael1), l, Ael2);
 			if(o > w)
 				w = o;
-			o = memberalign(l);
-			if(o > a)
-				a = o;
+			ma = memberalign(l);
+			if(ma > a)
+				a = ma;
 		}
 		t->talign = a;
 		w = align(w, t, Asu2);
