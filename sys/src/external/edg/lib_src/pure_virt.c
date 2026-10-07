@@ -1,11 +1,11 @@
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
-/* Wed Oct  7 03:19:06 2026 */
+/* Wed Oct  7 07:14:43 2026 */
 extern int __EDGCPFE__7_0;
-void *memcpy(void *,const void *,unsigned long);
-void *memset(void *,int,unsigned long);
+void *memcpy(void *,const void *,unsigned long long);
+void *memset(void *,int,unsigned long long);
 
-# 1 "lib_src/pure_virt.c"
-# 17 "lib_src/error.h"
+#line 1 "lib_src/pure_virt.c"
+#line 17 "lib_src/error.h"
 enum an_error_code {
 ec_none,
 ec_abort_header,
@@ -25,8 +25,8 @@ ec_thread_registration_failed,
 ec_last};
 
 
-extern __attribute__((__noreturn__)) void __abort_execution(enum an_error_code err_code);
-# 25 "lib_src/pure_virt.c"
+extern void __abort_execution(enum an_error_code err_code);
+#line 25 "lib_src/pure_virt.c"
 extern void __cxa_pure_virtual(void); void __cxa_pure_virtual(void)
 
 

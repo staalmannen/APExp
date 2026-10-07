@@ -1,11 +1,11 @@
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
-/* Wed Oct  7 03:16:51 2026 */
+/* Wed Oct  7 07:13:33 2026 */
 extern int __EDGCPFE__7_0;
-void *memcpy(void *,const void *,unsigned long);
-void *memset(void *,int,unsigned long);
+void *memcpy(void *,const void *,unsigned long long);
+void *memset(void *,int,unsigned long long);
 
-# 1 "src/ifc_map_functions_dbg.c"
-# 49 "src/ifc_map.h"
+#line 1 "src/ifc_map_functions_dbg.c"
+#line 49 "src/ifc_map.h"
 enum _ZN3edg18a_byte_buffer_kindE {
 _ZN3edg8bbk_noneE,
 _ZN3edg9bbk_localE,
@@ -15,7 +15,7 @@ _ZN3edg14bbk_direct_ptrE,
 
 
 _ZN3edg16bbk_indirect_ptrE};
-# 2191
+#line 2191
 enum _ZN3edg24an_ifc_architecture_sortE {
 _ZN3edg12ifc_as_arm32E,
 _ZN3edg12ifc_as_arm64E,
@@ -23,7 +23,7 @@ _ZN3edg23ifc_as_hybrid_x86_arm64E,
 _ZN3edg14ifc_as_unknownE,
 _ZN3edg10ifc_as_x64E,
 _ZN3edg10ifc_as_x86E};
-# 2214
+#line 2214
 enum _ZN3edg16an_ifc_attr_sortE {
 _ZN3edg17ifc_as_attr_basicE,
 _ZN3edg18ifc_as_attr_calledE,
@@ -34,7 +34,7 @@ _ZN3edg19ifc_as_attr_labeledE,
 _ZN3edg19ifc_as_attr_nothingE,
 _ZN3edg18ifc_as_attr_scopedE,
 _ZN3edg17ifc_as_attr_tupleE};
-# 2238
+#line 2238
 enum _ZN3edg30an_ifc_calling_convention_sortE {
 _ZN3edg13ifc_ccs_cdeclE,
 _ZN3edg11ifc_ccs_clrE,
@@ -43,12 +43,12 @@ _ZN3edg12ifc_ccs_fastE,
 _ZN3edg11ifc_ccs_stdE,
 _ZN3edg12ifc_ccs_thisE,
 _ZN3edg14ifc_ccs_vectorE};
-# 2256
+#line 2256
 enum _ZN3edg17an_ifc_chart_sortE {
 _ZN3edg23ifc_cs_chart_multilevelE,
 _ZN3edg17ifc_cs_chart_noneE,
 _ZN3edg21ifc_cs_chart_unilevelE};
-# 2405
+#line 2405
 enum _ZN3edg16an_ifc_decl_sortE {
 _ZN3edg17ifc_ds_decl_aliasE,
 _ZN3edg18ifc_ds_decl_barrenE,
@@ -85,12 +85,12 @@ _ZN3edg29ifc_ds_decl_using_declarationE,
 _ZN3edg27ifc_ds_decl_using_directiveE,
 _ZN3edg20ifc_ds_decl_variableE,
 _ZN3edg28ifc_ds_decl_vendor_extensionE};
-# 2451
+#line 2451
 enum _ZN3edg21an_ifc_delimiter_sortE {
 _ZN3edg12ifc_ds_braceE,
 _ZN3edg18ifc_ds_parenthesisE,
 _ZN3edg14ifc_ds_unknownE};
-# 2472
+#line 2472
 enum _ZN3edg15an_ifc_dir_sortE {
 _ZN3edg20ifc_ds_dir_attributeE,
 _ZN3edg19ifc_ds_dir_decl_useE,
@@ -102,7 +102,7 @@ _ZN3edg29ifc_ds_dir_structured_bindingE,
 _ZN3edg16ifc_ds_dir_tupleE,
 _ZN3edg16ifc_ds_dir_usingE,
 _ZN3edg27ifc_ds_dir_vendor_extensionE};
-# 2767
+#line 2767
 enum _ZN3edg27an_ifc_dyadic_operator_sortE {
 _ZN3edg15ifc_dos_addressE,
 _ZN3edg13ifc_dos_applyE,
@@ -196,31 +196,31 @@ _ZN3edg19ifc_dos_static_castE,
 _ZN3edg15ifc_dos_unknownE,
 _ZN3edg13ifc_dos_widenE,
 _ZN3edg23ifc_dos_zero_initializeE};
-# 3198
+#line 3198
 enum _ZN3edg29an_ifc_edg_complex_token_sortE {
 _ZN3edg27ifc_ects_edg_token_constantE,
 _ZN3edg29ifc_ects_edg_token_identifierE,
 _ZN3edg26ifc_ects_edg_token_textualE};
-# 3210
+#line 3210
 enum _ZN3edg24an_ifc_edg_constant_sortE {
 _ZN3edg28ifc_ecs_edg_constant_integerE};
-# 3239
+#line 3239
 enum _ZN3edg20an_ifc_edg_expr_sortE {
 _ZN3edg34ifc_ees_edg_expr_template_argumentE,
 _ZN3edg23ifc_ees_edg_token_cacheE};
-# 3252
+#line 3252
 enum _ZN3edg33an_ifc_edg_template_argument_sortE {
 _ZN3edg39ifc_etas_edg_template_argument_non_typeE,
 _ZN3edg39ifc_etas_edg_template_argument_templateE,
 _ZN3edg35ifc_etas_edg_template_argument_typeE};
-# 3264
+#line 3264
 enum _ZN3edg20an_ifc_edg_type_sortE {
 _ZN3edg28ifc_ets_edg_type_substitutedE};
-# 3275
+#line 3275
 enum _ZN3edg26an_ifc_expansion_mode_sortE {
 _ZN3edg12ifc_ems_fullE,
 _ZN3edg15ifc_ems_partialE};
-# 3409
+#line 3409
 enum _ZN3edg16an_ifc_expr_sortE {
 _ZN3edg19ifc_es_expr_alignofE,
 _ZN3edg23ifc_es_expr_array_valueE,
@@ -284,12 +284,12 @@ _ZN3edg26ifc_es_expr_unqualified_idE,
 _ZN3edg25ifc_es_expr_unresolved_idE,
 _ZN3edg28ifc_es_expr_vendor_extensionE,
 _ZN3edg39ifc_es_expr_virtual_function_conversionE};
-# 3482
+#line 3482
 enum _ZN3edg26an_ifc_fold_direction_sortE {
 _ZN3edg12ifc_fds_leftE,
 _ZN3edg13ifc_fds_rightE,
 _ZN3edg15ifc_fds_unknownE};
-# 3508
+#line 3508
 enum _ZN3edg16an_ifc_form_sortE {
 _ZN3edg20ifc_fs_form_catenateE,
 _ZN3edg21ifc_fs_form_characterE,
@@ -306,7 +306,7 @@ _ZN3edg18ifc_fs_form_stringE,
 _ZN3edg21ifc_fs_form_stringizeE,
 _ZN3edg17ifc_fs_form_tupleE,
 _ZN3edg22ifc_fs_form_whitespaceE};
-# 3558
+#line 3558
 enum _ZN3edg19an_ifc_keyword_sortE {
 _ZN3edg12ifc_ks_classE,
 _ZN3edg16ifc_ks_constevalE,
@@ -321,16 +321,16 @@ _ZN3edg13ifc_ks_publicE,
 _ZN3edg13ifc_ks_structE,
 _ZN3edg15ifc_ks_typenameE,
 _ZN3edg12ifc_ks_unionE};
-# 3598
+#line 3598
 enum _ZN3edg15an_ifc_lit_sortE {
 _ZN3edg21ifc_ls_floating_pointE,
 _ZN3edg16ifc_ls_immediateE,
 _ZN3edg14ifc_ls_integerE};
-# 3611
+#line 3611
 enum _ZN3edg17an_ifc_macro_sortE {
 _ZN3edg26ifc_ms_macro_function_likeE,
 _ZN3edg24ifc_ms_macro_object_likeE};
-# 3882
+#line 3882
 enum _ZN3edg28an_ifc_monadic_operator_sortE {
 _ZN3edg15ifc_mos_addressE,
 _ZN3edg15ifc_mos_alignasE,
@@ -419,7 +419,7 @@ _ZN3edg16ifc_mos_truncateE,
 _ZN3edg14ifc_mos_typeidE,
 _ZN3edg15ifc_mos_unknownE,
 _ZN3edg13ifc_mos_yieldE};
-# 3985
+#line 3985
 enum _ZN3edg16an_ifc_name_sortE {
 _ZN3edg22ifc_ns_name_conversionE,
 _ZN3edg17ifc_ns_name_guideE,
@@ -429,7 +429,7 @@ _ZN3edg23ifc_ns_name_source_fileE,
 _ZN3edg26ifc_ns_name_specializationE,
 _ZN3edg20ifc_ns_name_templateE,
 _ZN3edg18ifc_ns_text_offsetE};
-# 4008
+#line 4008
 enum _ZN3edg28an_ifc_niladic_operator_sortE {
 _ZN3edg16ifc_nos_constantE,
 _ZN3edg12ifc_nos_msvcE,
@@ -438,7 +438,7 @@ _ZN3edg19ifc_nos_msvc_lambdaE,
 _ZN3edg11ifc_nos_nilE,
 _ZN3edg15ifc_nos_phantomE,
 _ZN3edg15ifc_nos_unknownE};
-# 4049
+#line 4049
 enum _ZN3edg20an_ifc_operator_sortE {
 _ZN3edg22ifc_os_dyadic_operatorE,
 _ZN3edg23ifc_os_monadic_operatorE,
@@ -446,10 +446,10 @@ _ZN3edg23ifc_os_niladic_operatorE,
 _ZN3edg35ifc_os_storage_instruction_operatorE,
 _ZN3edg23ifc_os_triadic_operatorE,
 _ZN3edg24ifc_os_variadic_operatorE};
-# 4098
+#line 4098
 enum _ZN3edg18an_ifc_pragma_sortE {
 _ZN3edg23ifc_ps_vendor_extensionE};
-# 4195
+#line 4195
 enum _ZN3edg28an_ifc_source_directive_sortE {
 _ZN3edg12ifc_sds_msvcE,
 _ZN3edg26ifc_sds_msvc_directive_endE,
@@ -509,7 +509,7 @@ _ZN3edg33ifc_sds_msvc_pragma_system_headerE,
 _ZN3edg29ifc_sds_msvc_pragma_unmanagedE,
 _ZN3edg28ifc_sds_msvc_pragma_vtordispE,
 _ZN3edg27ifc_sds_msvc_pragma_warningE};
-# 4269
+#line 4269
 enum _ZN3edg29an_ifc_source_identifier_sortE {
 _ZN3edg12ifc_sis_msvcE,
 _ZN3edg29ifc_sis_msvc_builtin_huge_valE,
@@ -519,7 +519,7 @@ _ZN3edg25ifc_sis_msvc_builtin_nanfE,
 _ZN3edg25ifc_sis_msvc_builtin_nansE,
 _ZN3edg26ifc_sis_msvc_builtin_nansfE,
 _ZN3edg13ifc_sis_plainE};
-# 4666
+#line 4666
 enum _ZN3edg26an_ifc_source_keyword_sortE {
 _ZN3edg15ifc_sks_alignasE,
 _ZN3edg15ifc_sks_alignofE,
@@ -711,7 +711,7 @@ _ZN3edg12ifc_sks_voidE,
 _ZN3edg16ifc_sks_volatileE,
 _ZN3edg15ifc_sks_wchar_tE,
 _ZN3edg13ifc_sks_whileE};
-# 4875
+#line 4875
 enum _ZN3edg26an_ifc_source_literal_sortE {
 _ZN3edg22ifc_sls_defined_stringE,
 _ZN3edg12ifc_sls_msvcE,
@@ -724,7 +724,7 @@ _ZN3edg32ifc_sls_msvc_string_prefix_macroE,
 _ZN3edg14ifc_sls_scalarE,
 _ZN3edg14ifc_sls_stringE,
 _ZN3edg15ifc_sls_unknownE};
-# 4935
+#line 4935
 enum _ZN3edg27an_ifc_source_operator_sortE {
 _ZN3edg17ifc_sos_ampersandE,
 _ZN3edg27ifc_sos_ampersand_ampersandE,
@@ -767,7 +767,7 @@ _ZN3edg12ifc_sos_starE,
 _ZN3edg18ifc_sos_star_equalE,
 _ZN3edg13ifc_sos_tildeE,
 _ZN3edg15ifc_sos_unknownE};
-# 5003
+#line 5003
 enum _ZN3edg29an_ifc_source_punctuator_sortE {
 _ZN3edg13ifc_sps_colonE,
 _ZN3edg19ifc_sps_colon_colonE,
@@ -788,7 +788,7 @@ _ZN3edg21ifc_sps_right_bracketE,
 _ZN3edg25ifc_sps_right_parenthesisE,
 _ZN3edg17ifc_sps_semicolonE,
 _ZN3edg15ifc_sps_unknownE};
-# 5084
+#line 5084
 enum _ZN3edg16an_ifc_stmt_sortE {
 _ZN3edg17ifc_ss_stmt_blockE,
 _ZN3edg17ifc_ss_stmt_breakE,
@@ -813,7 +813,7 @@ _ZN3edg17ifc_ss_stmt_tupleE,
 _ZN3edg25ifc_ss_stmt_variable_declE,
 _ZN3edg28ifc_ss_stmt_vendor_extensionE,
 _ZN3edg17ifc_ss_stmt_whileE};
-# 5121
+#line 5121
 enum _ZN3edg40an_ifc_storage_instruction_operator_sortE {
 _ZN3edg23ifc_sios_allocate_arrayE,
 _ZN3edg24ifc_sios_allocate_singleE,
@@ -821,14 +821,14 @@ _ZN3edg25ifc_sios_deallocate_arrayE,
 _ZN3edg26ifc_sios_deallocate_singleE,
 _ZN3edg13ifc_sios_msvcE,
 _ZN3edg16ifc_sios_unknownE};
-# 5140
+#line 5140
 enum _ZN3edg18an_ifc_string_sortE {
 _ZN3edg13ifc_ss_char16E,
 _ZN3edg13ifc_ss_char32E,
 _ZN3edg15ifc_ss_ordinaryE,
 _ZN3edg11ifc_ss_utf8E,
 _ZN3edg11ifc_ss_wideE};
-# 5263
+#line 5263
 enum _ZN3edg18an_ifc_syntax_sortE {
 _ZN3edg30ifc_ss_syntax_access_specifierE,
 _ZN3edg31ifc_ss_syntax_alias_declarationE,
@@ -940,7 +940,7 @@ _ZN3edg36ifc_ss_syntax_using_enum_declarationE,
 _ZN3edg30ifc_ss_syntax_vendor_extensionE,
 _ZN3edg35ifc_ss_syntax_virtual_specifier_seqE,
 _ZN3edg29ifc_ss_syntax_while_statementE};
-# 5398
+#line 5398
 enum _ZN3edg28an_ifc_triadic_operator_sortE {
 _ZN3edg14ifc_tos_choiceE,
 _ZN3edg20ifc_tos_construct_atE,
@@ -950,7 +950,7 @@ _ZN3edg28ifc_tos_msvc_confused_choiceE,
 _ZN3edg32ifc_tos_msvc_confused_push_stateE,
 _ZN3edg22ifc_tos_msvc_confusionE,
 _ZN3edg15ifc_tos_unknownE};
-# 5438
+#line 5438
 enum _ZN3edg22an_ifc_type_basis_sortE {
 _ZN3edg12ifc_tbs_autoE,
 _ZN3edg12ifc_tbs_boolE,
@@ -976,7 +976,7 @@ _ZN3edg13ifc_tbs_unionE,
 _ZN3edg25ifc_tbs_variable_templateE,
 _ZN3edg12ifc_tbs_voidE,
 _ZN3edg15ifc_tbs_wchar_tE};
-# 5478
+#line 5478
 enum _ZN3edg26an_ifc_type_precision_sortE {
 _ZN3edg14ifc_tps_bit128E,
 _ZN3edg13ifc_tps_bit16E,
@@ -986,12 +986,12 @@ _ZN3edg12ifc_tps_bit8E,
 _ZN3edg15ifc_tps_defaultE,
 _ZN3edg12ifc_tps_longE,
 _ZN3edg13ifc_tps_shortE};
-# 5497
+#line 5497
 enum _ZN3edg21an_ifc_type_sign_sortE {
 _ZN3edg13ifc_tss_plainE,
 _ZN3edg14ifc_tss_signedE,
 _ZN3edg16ifc_tss_unsignedE};
-# 5530
+#line 5530
 enum _ZN3edg16an_ifc_type_sortE {
 _ZN3edg17ifc_ts_type_arrayE,
 _ZN3edg16ifc_ts_type_baseE,
@@ -1015,7 +1015,7 @@ _ZN3edg17ifc_ts_type_tupleE,
 _ZN3edg20ifc_ts_type_typenameE,
 _ZN3edg21ifc_ts_type_unalignedE,
 _ZN3edg28ifc_ts_type_vendor_extensionE};
-# 5575
+#line 5575
 enum _ZN3edg16an_ifc_unit_sortE {
 _ZN3edg14ifc_us_archiveE,
 _ZN3edg18ifc_us_exported_tuE,
@@ -1023,7 +1023,7 @@ _ZN3edg13ifc_us_headerE,
 _ZN3edg16ifc_us_partitionE,
 _ZN3edg14ifc_us_primaryE,
 _ZN3edg13ifc_us_sourceE};
-# 5597
+#line 5597
 enum _ZN3edg29an_ifc_variadic_operator_sortE {
 _ZN3edg18ifc_vos_collectionE,
 _ZN3edg12ifc_vos_msvcE,
@@ -1033,7 +1033,7 @@ _ZN3edg37ifc_vos_msvc_is_nothrow_constructibleE,
 _ZN3edg39ifc_vos_msvc_is_trivially_constructibleE,
 _ZN3edg16ifc_vos_sequenceE,
 _ZN3edg15ifc_vos_unknownE};
-# 5620
+#line 5620
 enum _ZN3edg16an_ifc_word_sortE {
 _ZN3edg23ifc_ws_source_directiveE,
 _ZN3edg24ifc_ws_source_identifierE,
@@ -1042,7 +1042,7 @@ _ZN3edg21ifc_ws_source_literalE,
 _ZN3edg22ifc_ws_source_operatorE,
 _ZN3edg24ifc_ws_source_punctuatorE,
 _ZN3edg14ifc_ws_unknownE};
-# 6642
+#line 6642
 enum _ZN3edg38an_ifc_basic_specifiers_bitfield_queryE {
 _ZN3edg9ifc_bsb_cE = 1U,
 _ZN3edg11ifc_bsb_cxxE,
@@ -1053,7 +1053,7 @@ _ZN3edg16ifc_bsb_internalE = 32U,
 _ZN3edg34ifc_bsb_is_member_of_global_moduleE = 64U,
 _ZN3edg20ifc_bsb_non_exportedE = 128U,
 _ZN3edg13ifc_bsb_vagueE = 256U};
-# 6685
+#line 6685
 enum _ZN3edg37an_ifc_function_traits_bitfield_queryE {
 _ZN3edg17ifc_ftb_constexprE = 1U,
 _ZN3edg19ifc_ftb_constrainedE,
@@ -1067,14 +1067,14 @@ _ZN3edg17ifc_ftb_no_returnE = 256U,
 _ZN3edg12ifc_ftb_noneE = 512U,
 _ZN3edg20ifc_ftb_pure_virtualE = 1024U,
 _ZN3edg15ifc_ftb_virtualE = 2048U};
-# 6724
+#line 6724
 enum _ZN3edg42an_ifc_function_type_traits_bitfield_queryE {
 _ZN3edg14ifc_fttb_constE = 1U,
 _ZN3edg15ifc_fttb_lvalueE,
 _ZN3edg13ifc_fttb_noneE = 4U,
 _ZN3edg15ifc_fttb_rvalueE = 8U,
 _ZN3edg17ifc_fttb_volatileE = 16U};
-# 6769
+#line 6769
 enum _ZN3edg33an_ifc_msvc_traits_bitfield_queryE {
 _ZN3edg16ifc_mtb_allocateE = 1U,
 _ZN3edg20ifc_mtb_code_segmentE,
@@ -1094,7 +1094,7 @@ _ZN3edg16ifc_mtb_restrictE = 16384U,
 _ZN3edg20ifc_mtb_safe_buffersE = 32768U,
 _ZN3edg18ifc_mtb_select_anyE = 65536U,
 _ZN3edg12ifc_mtb_uuidE = 131072U};
-# 6816
+#line 6816
 enum _ZN3edg35an_ifc_object_traits_bitfield_queryE {
 _ZN3edg17ifc_otb_constexprE = 1U,
 _ZN3edg28ifc_otb_initializer_exportedE,
@@ -1103,7 +1103,7 @@ _ZN3edg15ifc_otb_mutableE = 8U,
 _ZN3edg12ifc_otb_noneE = 16U,
 _ZN3edg20ifc_otb_thread_localE = 32U,
 _ZN3edg14ifc_otb_vendorE = 64U};
-# 6859
+#line 6859
 enum _ZN3edg28an_ifc_phases_bitfield_queryE {
 _ZN3edg15ifc_pb_analysisE = 1U,
 _ZN3edg22ifc_pb_code_generationE,
@@ -1120,20 +1120,20 @@ _ZN3edg20ifc_pb_preprocessingE = 2048U,
 _ZN3edg14ifc_pb_readingE = 4096U,
 _ZN3edg13ifc_pb_typingE = 8192U,
 _ZN3edg14ifc_pb_unknownE = 16384U};
-# 6900
+#line 6900
 enum _ZN3edg31an_ifc_qualifier_bitfield_queryE {
 _ZN3edg12ifc_qb_constE = 1U,
 _ZN3edg11ifc_qb_noneE,
 _ZN3edg15ifc_qb_restrictE = 4U,
 _ZN3edg15ifc_qb_volatileE = 8U};
-# 6931
+#line 6931
 enum _ZN3edg42an_ifc_reachable_properties_bitfield_queryE {
 _ZN3edg11ifc_rpb_allE = 1U,
 _ZN3edg18ifc_rpb_attributesE,
 _ZN3edg25ifc_rpb_default_argumentsE = 4U,
 _ZN3edg19ifc_rpb_initializerE = 8U,
 _ZN3edg12ifc_rpb_noneE = 16U};
-# 6965
+#line 6965
 enum _ZN3edg34an_ifc_scope_traits_bitfield_queryE {
 _ZN3edg20ifc_stb_closure_typeE = 1U,
 _ZN3edg13ifc_stb_finalE,
@@ -1142,7 +1142,7 @@ _ZN3edg14ifc_stb_inlineE = 8U,
 _ZN3edg12ifc_stb_noneE = 16U,
 _ZN3edg15ifc_stb_unnamedE = 32U,
 _ZN3edg14ifc_stb_vendorE = 64U};
-# 23146
+#line 23146
 enum _ZN3edg21an_ifc_partition_kindE {
 _ZN3edg11ifc_pk_noneE,
 _ZN3edg27ifc_pk_edg_constant_integerE,
@@ -1482,7 +1482,5 @@ _ZN3edg15ifc_pk_type_torE,
 _ZN3edg17ifc_pk_type_tupleE,
 _ZN3edg20ifc_pk_type_typenameE,
 _ZN3edg21ifc_pk_type_unalignedE};
-# 42 "/usr/include/x86_64-linux-gnu/bits/types.h" 3
-typedef unsigned __uint32_t;
-# 26 "/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h" 3
-typedef __uint32_t uint32_t;
+#line 98 "ape-sys/stdint_generic.h"
+typedef unsigned uint32_t;

@@ -1126,6 +1126,39 @@ FIX in the same file.** *A revert is file-granular and an edit is
 not*; the control has to be made and unmade in a copy, or re-applied
 deliberately.
 
+**AND THE NEXT STOP WAS `mk: mkfile:96: syntax error; expected one of
+:<=` -- IN `cmd/mkfile`, WHICH DOCUMENTS THIS EXACT HAZARD IN ITS OWN
+HEADER.** *"Every comment line INSIDE these lists has to end in a
+backslash: the list is one continued line, and a comment without it
+ends the assignment there."* The block added this round to explain why
+`c++lib` and `basic` are off has **four comment lines without one**, so
+`_OPTIONAL_APPS` ended at `cfront` and everything from `adeb` to `curl`
+became a fresh logical line starting with a bare word. *A rule written
+down in a file is not a rule the file obeys* -- and I wrote both.
+**THE REPORTED LINE IS WHERE THE RUNAWAY LINE ENDS, NOT WHERE IT
+STARTS.** Line 96 is an ordinary `DIRS=\`; the fault is 26 lines
+earlier, in a comment. Same shape as the `lock.h` shadow one commit
+before -- *the message names the victim* -- and it is why four
+hypotheses about the bash mkfile were all wrong: **it was not bash's
+mkfile at all**, and every construct in the comment I had suspected
+(a lone `#`, `#`+TAB, `<pthread.h>`, an `#include` inside a comment)
+has a working precedent elsewhere in the tree. *Checking whether the
+suspect construct exists ANYWHERE that already works is one grep and
+would have cleared it first.*
+**The sweep found it where four readings did not**: every mkfile, every
+comment that ends a continuation, reporting only those where the next
+logical line is a bare word. `sys/lib/tests/mkcont-sweep.py`, and it
+**gates** -- unlike `ishadow-sweep`, each hit is a real break.
+**Its discriminator is the whole instrument**: a comment ending a
+continuation is usually DELIBERATE (`lib/png/mkfile:42` is the tail of
+an OFILES list commented out on purpose), so the naive check is almost
+all false positives. 1 finding, 0 after the fix, and the control fires
+when one backslash is removed again.
+**Watch the first run after this**: ten packages (`adeb`, `dwarfdump`,
+`hell`, `pcregrep`, `diff`, `patch`, `mkmk`, `samurai`, `openssl`,
+`curl`) re-enter `_OPTIONAL_APPS`. Anything they report is *newly
+measured*, not newly broken.
+
 **AND THE cfront SIZE PROBE WAS `.gitignore'd, SO THE VM NEVER GOT
 IT.** `pcc ... cfrontsz-probe.c` answered `Can't open input file` and
 `ls cfront*.c` showed only the two stub files. **git is the only

@@ -1,19 +1,19 @@
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
-/* Wed Oct  7 03:16:47 2026 */
+/* Wed Oct  7 07:13:28 2026 */
 extern int __EDGCPFE__7_0;
-void *memcpy(void *,const void *,unsigned long);
-void *memset(void *,int,unsigned long);
+void *memcpy(void *,const void *,unsigned long long);
+void *memset(void *,int,unsigned long long);
 
-# 1 "src/fe_wrapup.c"
-# 49 "/usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h" 3
+#line 1 "src/fe_wrapup.c"
+#line 56 "ape-sys/_iofile.h"
 struct _IO_FILE;
-# 3966 "src/util.h"
+#line 3966 "src/util.h"
 enum _ZN3edg6detail16a_text_alignmentE {
 _ZN3edg6detail7ta_leftE,
 _ZN3edg6detail8ta_rightE};
-# 897 "src/basics.h"
+#line 897 "src/basics.h"
 struct _ZN3edg17a_source_positionE;
-# 437 "src/il_def.h"
+#line 437 "src/il_def.h"
 enum _ZN3edg14an_opname_kindE {
 _ZN3edg8onk_noneE,
 _ZN3edg7onk_newE, _ZN3edg10onk_deleteE,
@@ -41,9 +41,9 @@ _ZN3edg13onk_subscriptE,
 _ZN3edg12onk_questionE,
 _ZN3edg11onk_gnu_minE, _ZN3edg11onk_gnu_maxE,
 _ZN3edg9onk_awaitE, _ZN3edg8onk_lastE};
-# 1625 "src/util.h"
+#line 1625 "src/util.h"
 struct _ZN3edg9Dyn_arrayINS_10Shared_objINS_16a_pending_pragmaENS_12FE_allocatorEEES3_EE;
-# 1030 "src/il_def.h"
+#line 1030 "src/il_def.h"
 enum _ZN3edg12a_token_kindE {
 
 _ZN3edg9tok_errorE,
@@ -101,7 +101,7 @@ _ZN3edg12tok_ifc_declE,
 
 
 _ZN3edg25tok_unresolved_ud_literalE,
-# 1099
+#line 1099
 _ZN3edg17tok_unimplementedE,
 
 _ZN3edg22tok_last_complex_tokenE = 27U,
@@ -376,7 +376,7 @@ _ZN3edg10tok_typeofE,
 _ZN3edg17tok_typeof_unqualE,
 
 _ZN3edg12tok_overloadE,
-# 1379
+#line 1379
 _ZN3edg10tok_threadE,
 _ZN3edg16tok_thread_localE,
 _ZN3edg20tok_c11_thread_localE,
@@ -586,7 +586,7 @@ _ZN3edg41tok_builtin_ge_synthesizes_from_spaceshipE,
 _ZN3edg25tok_builtin_is_structuralE,
 
 _ZN3edg8tok_lastE};
-# 281 "src/lexical.h"
+#line 281 "src/lexical.h"
 enum _ZN3edg23a_token_extra_info_kindE {
 
 _ZN3edg9teik_noneE,
@@ -603,13 +603,13 @@ _ZN3edg22teik_unresolved_ud_litE,
 
 
 _ZN3edg14teik_ifc_indexE};
-# 1075 "src/basics.h"
+#line 1075 "src/basics.h"
 enum _ZN3edg11a_C_dialectE {
 
 _ZN3edg14C_dialect_ANSIE,
 _ZN3edg13C_dialect_pccE,
 _ZN3edg19C_dialect_cplusplusE};
-# 3732 "src/host_envir.h"
+#line 3732 "src/host_envir.h"
 enum _ZN3edg17an_error_severityE {
 _ZN3edg10es_defaultE,
 _ZN3edg7es_onceE,
@@ -623,7 +623,7 @@ _ZN3edg8es_errorE,
 _ZN3edg14es_catastropheE,
 _ZN3edg21es_command_line_errorE,
 _ZN3edg17es_internal_errorE};
-# 19 "build/gcc-release/src/includes/err_codes.h"
+#line 19 "build/kencc/src/includes/err_codes.h"
 enum _ZN3edg13an_error_codeE {
 _ZN3edg11ec_no_errorE,
 _ZN3edg23ec_last_line_incompleteE,
@@ -4226,30 +4226,30 @@ _ZN3edg36ec_interpolated_id_is_not_identifierE,
 _ZN3edg45ec_interpolated_operand_is_not_token_sequenceE,
 _ZN3edg28ec_tag_redefined_differentlyE,
 _ZN3edg7ec_lastE};
-# 107 "src/error.h"
+#line 107 "src/error.h"
 struct _ZN3edg20a_diagnostic_counterE;
-# 127
+#line 127
 struct _ZN3edg24a_diagnostic_counter_setE;
-# 81 "src/mem_tables.h"
+#line 81 "src/mem_tables.h"
 struct _ZN3edg20a_function_def_descrE;
-# 115
+#line 115
 struct _ZN3edg18a_mem_block_headerE;
-# 143
+#line 143
 struct _ZN3edg18an_il_entry_prefixE;
-# 68 "src/il_def.h"
+#line 68 "src/il_def.h"
 struct _ZN3edg15a_routine_fixupE;
-# 74
+#line 74
 struct _ZN3edg33a_variable_remapping_for_inliningE;
-# 137
+#line 137
 struct _ZN3edg13a_source_fileE;
-# 260
+#line 260
 struct _ZN3edg25a_seq_number_lookup_entryE;
-# 338
+#line 338
 struct _ZN3edg19a_cli_metadata_fileE;
-# 408
+#line 408
 enum _ZN3edg15a_storage_classE {
 _ZN3edg14sc_unspecifiedE,
-# 417
+#line 417
 _ZN3edg9sc_externE,
 
 _ZN3edg9sc_staticE,
@@ -4262,7 +4262,7 @@ _ZN3edg11sc_registerE,
 _ZN3edg6sc_asmE,
 
 _ZN3edg7sc_lastE};
-# 604
+#line 604
 enum _ZN3edg16an_il_entry_kindE {
 _ZN3edg8iek_noneE,
 _ZN3edg15iek_source_fileE,
@@ -4360,9 +4360,9 @@ _ZN3edg20iek_gcnew_supplementE,
 
 _ZN3edg20iek_throw_supplementE,
 _ZN3edg24iek_condition_supplementE,
-# 722
+#line 722
 _ZN3edg30iek_scope_orphaned_list_headerE,
-# 728
+#line 728
 _ZN3edg10iek_pragmaE,
 _ZN3edg12iek_templateE,
 
@@ -4398,11 +4398,11 @@ _ZN3edg22iek_generic_constraintE,
 
 
 _ZN3edg27iek_seq_number_lookup_entryE,
-# 771
+#line 771
 _ZN3edg23iek_local_expr_node_refE,
 
 _ZN3edg20iek_static_assertionE,
-# 781
+#line 781
 _ZN3edg19iek_local_scope_refE,
 _ZN3edg24iek_il_entity_list_entryE,
 
@@ -4439,9 +4439,9 @@ _ZN3edg24iek_token_sequence_entryE,
 _ZN3edg21iek_scoped_expressionE,
 _ZN3edg20iek_data_member_specE,
 _ZN3edg8iek_lastE};
-# 1864
+#line 1864
 struct _ZN3edg14a_source_rangeE;
-# 1913
+#line 1913
 enum _ZN3edg13a_vector_kindE {
 _ZN3edg6vk_gnuE,
 _ZN3edg6vk_extE,
@@ -4450,20 +4450,20 @@ _ZN3edg12vk_neon_polyE,
 _ZN3edg15vk_neon_builtinE,
 
 _ZN3edg7vk_lastE};
-# 1946
+#line 1946
 struct _ZN3edg26a_decl_position_supplementE;
-# 2020
+#line 2020
 enum _ZN3edg22an_ELF_visibility_kindE {
 _ZN3edg15evk_unspecifiedE,
 _ZN3edg10evk_hiddenE,
 _ZN3edg13evk_protectedE,
 _ZN3edg12evk_internalE,
 _ZN3edg11evk_defaultE};
-# 2052
+#line 2052
 struct _ZN3edg23an_il_entity_list_entryE;
-# 2514
+#line 2514
 struct _ZN3edg38a_per_instantiation_needed_flags_entryE;
-# 2573
+#line 2573
 enum _ZN3edg23a_special_function_kindE {
 _ZN3edg8sfk_noneE,
 _ZN3edg15sfk_constructorE,
@@ -4472,7 +4472,7 @@ _ZN3edg14sfk_conversionE,
 _ZN3edg16sfk_udl_operatorE,
 _ZN3edg12sfk_operatorE,
 _ZN3edg22sfk_lambda_entry_pointE,
-# 2586
+#line 2586
 _ZN3edg19sfk_deduction_guideE,
 
 
@@ -4496,9 +4496,9 @@ _ZN3edg17sfk_last_accessorE = 17U,
 
 
 _ZN3edg30sfk_gnu_sync_concrete_functionE,
-# 2614
+#line 2614
 _ZN3edg34sfk_gnu_atomic_nongeneric_functionE,
-# 2620
+#line 2620
 _ZN3edg31sfk_gnu_atomic_generic_functionE,
 
 
@@ -4511,25 +4511,25 @@ _ZN3edg27sfk_builtin_operator_deleteE,
 
 
 _ZN3edg8sfk_lastE};
-# 2638
+#line 2638
 struct _ZN3edg16a_name_referenceE;
-# 3157
+#line 3157
 struct _ZN3edg12an_attributeE;
-# 3261
+#line 3261
 struct _ZN3edg23a_source_correspondenceE;
-# 3770
+#line 3770
 union _ZN3edg11a_namespaceUt_E;
-# 3720
+#line 3720
 struct _ZN3edg11a_namespaceE;
-# 3796
+#line 3796
 struct _ZN3edg12a_using_declE;
-# 3993
+#line 3993
 struct _ZN3edg14a_dynamic_initE;
-# 4526
+#line 4526
 struct _ZN3edg27a_template_param_coordinateE;
-# 4741
+#line 4741
 struct _ZN3edg10a_constantE;
-# 5573
+#line 5573
 enum _ZN3edg11a_type_kindE {
 
 _ZN3edg8tk_errorE,
@@ -4537,7 +4537,7 @@ _ZN3edg7tk_voidE,
 _ZN3edg10tk_integerE,
 _ZN3edg7tk_enumE = 2U,
 
-_ZN3edg14tk_fixed_pointE,
+
 
 _ZN3edg8tk_floatE,
 
@@ -4562,9 +4562,9 @@ _ZN3edg17tk_template_paramE,
 
 _ZN3edg9tk_vectorE,
 _ZN3edg18tk_scalable_vectorE,
-# 5610
+#line 5610
 _ZN3edg24tk_scalable_vector_countE,
-# 5616
+#line 5616
 _ZN3edg15tk_riscv_vectorE,
 
 
@@ -4579,7 +4579,7 @@ _ZN3edg13tk_float8e5m2E,
 
 
 _ZN3edg10tk_nullptrE,
-# 5640
+#line 5640
 _ZN3edg13tk_reflectionE,
 
 _ZN3edg10tk_unknownE};
@@ -4587,7 +4587,7 @@ _ZN3edg10tk_unknownE};
 
 
 enum _ZN3edg15an_integer_kindE {
-# 5654
+#line 5654
 _ZN3edg7ik_charE,
 
 
@@ -4611,21 +4611,9 @@ _ZN3edg14ik_bit_preciseE,
 _ZN3edg23ik_unsigned_bit_preciseE,
 _ZN3edg7ik_lastE,
 _ZN3edg7ik_noneE = 15U};
-# 5738
-enum _ZN3edg23a_fixed_point_precisionE {
-
-
-_ZN3edg9fpp_shortE,
-_ZN3edg11fpp_defaultE,
-_ZN3edg8fpp_longE,
-_ZN3edg8fpp_lastE};
-
-
-
-struct _ZN3edg24a_fixed_point_type_descrE;
-# 5769
+#line 5769
 enum _ZN3edg12a_float_kindE {
-# 5794
+#line 5794
 _ZN3edg10fk_float16E,
 _ZN3edg7fk_fp16E,
 
@@ -4645,7 +4633,7 @@ _ZN3edg14fk_std_float32E,
 _ZN3edg14fk_std_float64E,
 _ZN3edg15fk_std_float128E,
 _ZN3edg7fk_lastE};
-# 6069
+#line 6069
 enum _ZN3edg16a_named_registerE {
 _ZN3edg11anr_invalidE,
 _ZN3edg10anr_memoryE,
@@ -4665,9 +4653,9 @@ _ZN3edg7anr_f12E, _ZN3edg7anr_f13E, _ZN3edg7anr_f14E, _ZN3edg7anr_f15E,
 _ZN3edg9anr_flagsE, _ZN3edg8anr_fpsrE, _ZN3edg11anr_dirflagE,
 _ZN3edg6anr_16E, _ZN3edg6anr_17E, _ZN3edg6anr_18E, _ZN3edg6anr_19E,
 _ZN3edg6anr_20E,
-# 6095
+#line 6095
 _ZN3edg8anr_lastE};
-# 6244
+#line 6244
 enum _ZN3edg16a_type_qualifierE {
 _ZN3edg9tqt_constE,
 _ZN3edg12tqt_volatileE,
@@ -4698,26 +4686,26 @@ _ZN3edg27tqt_msb_named_address_spaceE,
 
 
 _ZN3edg8tqt_lastE};
-# 6385
+#line 6385
 struct _ZN3edg12a_param_typeE;
-# 6935
+#line 6935
 struct _ZN3edg8a_pragmaE;
-# 7394
+#line 7394
 struct _ZN3edg25a_routine_type_supplementE;
-# 7683
+#line 7683
 struct _ZN3edg14a_template_argE;
-# 8018
+#line 8018
 struct _ZN3edg12a_base_classE;
-# 8317
+#line 8317
 struct _ZN3edg18a_class_list_entryE;
-# 8330
+#line 8330
 struct _ZN3edg20a_routine_list_entryE;
-# 8362
+#line 8362
 enum _ZN3edg23an_anonymous_union_kindE {
 _ZN3edg8auk_noneE,
 _ZN3edg12auk_variableE,
 _ZN3edg9auk_fieldE};
-# 8377
+#line 8377
 enum _ZN3edg19an_inheritance_kindE {
 _ZN3edg8ihk_noneE,
 _ZN3edg10ihk_singleE,
@@ -4727,40 +4715,40 @@ _ZN3edg14ihk_incompleteE,
 
 
 _ZN3edg8ihk_lastE = 4U};
-# 8446
+#line 8446
 struct _ZN3edg25a_property_or_event_descrE;
-# 8589
+#line 8589
 struct _ZN3edg20a_vcall_offset_entryE;
-# 8626
+#line 8626
 struct _ZN3edg20a_partial_class_bodyE;
-# 8711
+#line 8711
 struct _ZN3edg21an_ms_attribute_usageE;
-# 8726
+#line 8726
 struct _ZN3edg18an_event_interfaceE;
-# 9204
+#line 9204
 union _ZN3edg23a_class_type_supplementUt_E;
-# 8741
+#line 8741
 struct _ZN3edg23a_class_type_supplementE;
-# 9286
+#line 9286
 enum _ZN3edg26a_template_param_type_kindE {
 
 
 _ZN3edg10tptk_paramE,
-# 9295
+#line 9295
 _ZN3edg11tptk_memberE,
-# 9303
+#line 9303
 _ZN3edg12tptk_unknownE,
-# 9318
+#line 9318
 _ZN3edg20tptk_bit_precise_intE};
-# 9330
+#line 9330
 struct _ZN3edg32a_template_param_type_supplementE;
-# 9422
+#line 9422
 struct _ZN3edg25a_typeref_type_supplementE;
-# 9503
+#line 9503
 struct _ZN3edg26an_integer_type_supplementE;
-# 9625
+#line 9625
 struct _ZN3edg24a_based_type_list_memberE;
-# 9692
+#line 9692
 enum _ZN3edg14a_typeref_kindE {
 _ZN3edg8trk_noneE,
 
@@ -4821,37 +4809,37 @@ _ZN3edg21trk_template_arg_listE,
 _ZN3edg18trk_name_qualifierE,
 
 _ZN3edg14trk_pack_indexE};
-# 10142
+#line 10142
 union _ZN3edg6a_typeUt_Ut_Ut_E;
-# 10045
+#line 10045
 struct _ZN3edg6a_typeUt_Ut_E;
-# 10185
+#line 10185
 struct _ZN3edg6a_typeUt_Ut0_E;
-# 10233
+#line 10233
 struct _ZN3edg6a_typeUt_Ut1_E;
-# 10326
+#line 10326
 union _ZN3edg6a_typeUt_Ut2_Ut_E;
-# 10257
+#line 10257
 struct _ZN3edg6a_typeUt_Ut2_E;
-# 10356
+#line 10356
 struct _ZN3edg6a_typeUt_Ut3_E;
-# 10733
+#line 10733
 struct _ZN3edg6a_typeUt_Ut4_E;
-# 10869
+#line 10869
 struct _ZN3edg6a_typeUt_Ut5_E;
-# 10898
+#line 10898
 struct _ZN3edg6a_typeUt_Ut6_E;
-# 10949
+#line 10949
 struct _ZN3edg6a_typeUt_Ut7_E;
-# 10973
+#line 10973
 struct _ZN3edg6a_typeUt_Ut8_E;
-# 10981
+#line 10981
 struct _ZN3edg6a_typeUt_Ut9_E;
-# 10041
+#line 10041
 union _ZN3edg6a_typeUt_E;
-# 9768
+#line 9768
 struct _ZN3edg6a_typeE;
-# 11009
+#line 11009
 enum _ZN3edg12an_init_kindE {
 
 _ZN3edg10initk_noneE,
@@ -4866,59 +4854,59 @@ _ZN3edg20initk_function_localE,
 
 
 _ZN3edg13initk_bindingE};
-# 11029
+#line 11029
 union _ZN3edg14an_initializerE;
-# 11067
+#line 11067
 struct _ZN3edg28a_local_static_variable_initE;
-# 11102
+#line 11102
 struct _ZN3edg15a_vla_dimensionE;
-# 11183
+#line 11183
 struct _ZN3edg24a_variable_template_infoE;
-# 11224
+#line 11224
 union _ZN3edg10a_variableUt_E;
-# 11285
+#line 11285
 union _ZN3edg10a_variableUt0_E;
-# 11846
+#line 11846
 struct _ZN3edg10a_variableUt1_Ut_E;
-# 11835
+#line 11835
 union _ZN3edg10a_variableUt1_E;
-# 11210
+#line 11210
 struct _ZN3edg10a_variableE;
-# 11898
+#line 11898
 struct _ZN3edg7a_fieldE;
-# 12215
+#line 12215
 struct _ZN3edg17a_requires_clauseE;
-# 12315
+#line 12315
 struct _ZN3edg9a_routineUt_Ut_E;
-# 12297
+#line 12297
 union _ZN3edg9a_routineUt_E;
-# 13113
+#line 13113
 union _ZN3edg9a_routineUt0_E;
-# 13145
+#line 13145
 union _ZN3edg9a_routineUt1_E;
-# 12228
+#line 12228
 struct _ZN3edg9a_routineE;
-# 13284
+#line 13284
 struct _ZN3edg24a_gnu_routine_supplementE;
-# 13425
+#line 13425
 struct _ZN3edg12an_asm_entryE;
-# 13489
+#line 13489
 struct _ZN3edg7a_labelE;
-# 14862
+#line 14862
 struct _ZN3edg21a_local_expr_node_refE;
-# 14906
+#line 14906
 struct _ZN3edg12an_expr_nodeE;
-# 16316
+#line 16316
 struct _ZN3edg9a_handlerE;
-# 16516
+#line 16516
 struct _ZN3edg11a_statementE;
-# 16878
+#line 16878
 struct _ZN3edg18a_constructor_initE;
-# 16958
+#line 16958
 struct _ZN3edg28a_scope_orphaned_list_headerE;
-# 17208
+#line 17208
 struct _ZN3edg15a_template_declE;
-# 17258
+#line 17258
 enum _ZN3edg15a_template_kindE {
 _ZN3edg11templk_noneE,
 _ZN3edg12templk_classE,
@@ -4936,17 +4924,17 @@ _ZN3edg30templk_template_template_paramE,
 
 
 _ZN3edg14templk_conceptE};
-# 17387
+#line 17387
 union _ZN3edg10a_templateUt_E;
-# 17287
+#line 17287
 struct _ZN3edg10a_templateE;
-# 17646
+#line 17646
 struct _ZN3edg18an_object_lifetimeE;
-# 17848
+#line 17848
 struct _ZN3edg15an_ms_attributeE;
-# 18179
+#line 18179
 struct _ZN3edg17a_local_scope_refE;
-# 18205
+#line 18205
 enum _ZN3edg12a_scope_kindE {
 
 _ZN3edg8sck_fileE,
@@ -4963,23 +4951,23 @@ _ZN3edg13sck_namespaceE,
 
 
 _ZN3edg23sck_namespace_extensionE,
-# 18231
+#line 18231
 _ZN3edg26sck_namespace_reactivationE,
-# 18239
+#line 18239
 _ZN3edg22sck_class_struct_unionE,
 
 
 
 _ZN3edg22sck_class_reactivationE,
-# 18249
+#line 18249
 _ZN3edg24sck_template_declarationE,
-# 18255
+#line 18255
 _ZN3edg26sck_template_instantiationE,
 
 
 
 _ZN3edg25sck_instantiation_contextE,
-# 18268
+#line 18268
 _ZN3edg22sck_module_decl_importE,
 
 
@@ -5004,17 +4992,17 @@ _ZN3edg8sck_enumE,
 
 _ZN3edg12sck_functionE,
 _ZN3edg8sck_noneE};
-# 18402
+#line 18402
 struct _ZN3edg7a_scopeUt_Ut_E;
-# 18376
+#line 18376
 union _ZN3edg7a_scopeUt_E;
-# 18295
+#line 18295
 struct _ZN3edg7a_scopeE;
-# 18655
+#line 18655
 struct _ZN3edg8a_moduleE;
-# 18722
+#line 18722
 struct _ZN3edg20a_module_import_declE;
-# 18790
+#line 18790
 enum _ZN3edg17a_source_languageE {
 
 _ZN3edg12sl_CplusplusE,
@@ -5022,83 +5010,83 @@ _ZN3edg4sl_CE};
 
 
 struct _ZN3edg12an_il_headerE;
-# 352 "src/il.h"
+#line 352 "src/il.h"
 struct _ZN3edg25an_orphaned_il_entry_listE;
-# 57 "src/symbol_tbl.h"
+#line 57 "src/symbol_tbl.h"
 struct _ZN3edg20an_initializer_fixupE;
-# 2448 "src/util.h"
+#line 2448 "src/util.h"
 struct _ZN3edg10Shared_objINS_16a_pending_pragmaENS_12FE_allocatorEEE;
-# 3208 "src/lexical.h"
+#line 3208 "src/lexical.h"
 struct _ZN3edg24a_stop_token_stack_entryE;
-# 26 "src/scope_stk.h"
+#line 26 "src/scope_stk.h"
 struct _ZN3edg19an_expr_stack_entryE;
 struct _ZN3edg17a_class_def_stateE;
 struct _ZN3edg13a_class_fixupE;
-# 137
+#line 137
 struct _ZN3edg36a_function_shareable_constants_tableE;
-# 154
+#line 154
 struct _ZN3edg20a_class_fixup_headerE;
-# 199
+#line 199
 struct _ZN3edg22a_scope_pointers_blockE;
-# 345
+#line 345
 struct _ZN3edg16a_pack_referenceE;
-# 457
+#line 457
 struct _ZN3edg22a_pack_expansion_descrE;
-# 567
+#line 567
 struct _ZN3edg28a_pack_expansion_stack_entryE;
-# 667
+#line 667
 struct _ZN3edg29a_name_hidden_by_old_for_initE;
-# 691
+#line 691
 struct _ZN3edg24a_generated_entity_blockE;
-# 719
+#line 719
 union _ZN3edg17a_collision_tableE;
-# 727
+#line 727
 struct _ZN3edg22a_string_literal_tableE;
-# 1625 "src/util.h"
+#line 1625 "src/util.h"
 struct _ZN3edg9Dyn_arrayIPNS_24a_template_cache_segmentENS_12FE_allocatorEEE;
-# 1682 "src/scope_stk.h"
+#line 1682 "src/scope_stk.h"
 union _ZN3edg19a_scope_stack_entryUt_E;
-# 738
+#line 738
 struct _ZN3edg19a_scope_stack_entryE;
-# 846 "src/symbol_tbl.h"
+#line 846 "src/symbol_tbl.h"
 struct _ZN3edg19a_symbol_list_entryE;
-# 861
+#line 861
 struct _ZN3edg17a_type_list_entryE;
-# 940
+#line 940
 struct _ZN3edg22a_namespace_list_entryE;
-# 1671
+#line 1671
 struct _ZN3edg10a_param_idE;
-# 1934
+#line 1934
 struct _ZN3edg20a_template_decl_infoE;
-# 2070
+#line 2070
 struct _ZN3edg24a_nondependent_call_infoE;
-# 2327
+#line 2327
 struct _ZN3edg25an_exported_template_fileE;
-# 2605
+#line 2605
 struct _ZN3edg24a_template_cache_segmentE;
-# 2698
+#line 2698
 struct _ZN3edg28a_template_symbol_supplementE;
-# 3331
+#line 3331
 struct _ZN3edg25an_active_using_directiveE;
-# 3456
+#line 3456
 struct _ZN3edg8a_symbolE;
-# 4316
+#line 4316
 enum _ZN3edg27a_module_entry_locator_kindE {
 _ZN3edg9melk_noneE,
 _ZN3edg8melk_ifcE};
-# 4773
+#line 4773
 struct _ZN3edg11a_vla_fixupE;
-# 4807
+#line 4807
 struct _ZN3edg20an_extern_type_fixupE;
-# 4842
+#line 4842
 struct _ZN3edg21an_access_error_descrE;
-# 5420 "src/util.h"
+#line 5420 "src/util.h"
 struct _ZN3edg7Ptr_mapIPNS_8a_moduleEPNS_12a_hash_tableENS_12FE_allocatorEEE;
-# 7922 "src/symbol_tbl.h"
+#line 7922 "src/symbol_tbl.h"
 struct _ZN3edg12a_hash_tableE;
-# 1247 "src/cmd_line.h"
+#line 1247 "src/cmd_line.h"
 enum _ZN3edg29a_template_instantiation_modeE {
-# 1254
+#line 1254
 _ZN3edg8tim_noneE,
 _ZN3edg7tim_allE,
 
@@ -5110,60 +5098,56 @@ _ZN3edg9tim_localE,
 
 
 _ZN3edg19tim_can_instantiateE};
-# 758 "src/decls.h"
+#line 758 "src/decls.h"
 struct _ZN3edg18a_decl_parse_stateE;
-# 25 "src/trans_unit.h"
+#line 25 "src/trans_unit.h"
 struct _ZN3edg18a_based_type_fixupE;
-# 39
+#line 39
 struct _ZN3edg18a_translation_unitE;
-# 198
+#line 198
 struct _ZN3edg20a_trans_unit_correspE;
-# 31 "src/modules.h"
+#line 31 "src/modules.h"
 struct _ZN3edg15a_module_entityE;
-# 60 "src/templates.h"
+#line 60 "src/templates.h"
 struct _ZN3edg17a_tmpl_decl_stateE;
-# 1499
+#line 1499
 struct _ZN3edg27a_deferred_constraint_checkE;
-# 250 "src/pragma.h"
+#line 250 "src/pragma.h"
 struct _ZN3edg16a_pending_pragmaE;
-# 713 "src/lower_il.h"
+#line 713 "src/lower_il.h"
 struct _ZN3edg19a_construction_vtblE;
-# 37 "/usr/include/x86_64-linux-gnu/bits/types.h" 3
-typedef signed char __int8_t;
-typedef unsigned char __uint8_t;
+#line 91 "ape-sys/stdint_generic.h"
+typedef char int8_t;
+
+typedef int int32_t;
 
 
-typedef signed int __int32_t;
-typedef unsigned __uint32_t;
-# 24 "/usr/include/x86_64-linux-gnu/bits/stdint-intn.h" 3
-typedef __int8_t int8_t;
+typedef unsigned char uint8_t;
 
-typedef __int32_t int32_t;
-# 24 "/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h" 3
-typedef __uint8_t uint8_t;
-
-typedef __uint32_t uint32_t;
-# 145 "/usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h" 3
-typedef long ptrdiff_t;
-# 214
-typedef unsigned long size_t;
-# 7 "/usr/include/x86_64-linux-gnu/bits/types/FILE.h" 3
+typedef unsigned uint32_t;
+#line 4 "ape-arch/stddef_arch.h"
+typedef long long _ptrdiff_t;
+#line 10
+typedef unsigned long long size_t;
+#line 20 "ape-sys/stddef.h"
+typedef _ptrdiff_t ptrdiff_t;
+#line 21 "ape-sys/stdio.h"
 typedef struct _IO_FILE FILE;
-# 499 "src/basics.h"
+#line 499 "src/basics.h"
 typedef void *_ZN3edg10a_void_ptrE;
-# 184 "src/scope_stk.h"
+#line 184 "src/scope_stk.h"
 typedef struct _ZN3edg7Ptr_mapIPNS_8a_moduleEPNS_12a_hash_tableENS_12FE_allocatorEEE _ZN3edg25a_module_lookup_table_mapE;
-# 45 "src/symbol_tbl.h"
+#line 45 "src/symbol_tbl.h"
 typedef struct _ZN3edg12a_hash_tableE *_ZN3edg16a_hash_table_ptrE;
-# 100 "src/il_def.h"
+#line 100 "src/il_def.h"
 typedef struct _ZN3edg8a_moduleE *_ZN3edg12a_module_ptrE;
-# 937 "src/basics.h"
+#line 937 "src/basics.h"
 typedef struct _ZN3edg17a_source_positionE _ZN3edg17a_source_positionE;
-# 875
+#line 875
 typedef uint32_t _ZN3edg12a_seq_numberE;
-# 863
+#line 863
 typedef unsigned short _ZN3edg15a_column_numberE;
-# 897
+#line 897
 struct _ZN3edg17a_source_positionE {
 
 
@@ -5172,64 +5156,64 @@ struct _ZN3edg17a_source_positionE {
 _ZN3edg12a_seq_numberE seq;
 
 _ZN3edg15a_column_numberE column;char __dummy[2];};
-# 526
+#line 526
 typedef unsigned _ZN3edg11a_bit_fieldE;
-# 26 "src/symbol_tbl.h"
+#line 26 "src/symbol_tbl.h"
 typedef struct _ZN3edg8a_symbolE *_ZN3edg12a_symbol_ptrE;
-# 55 "src/il_def.h"
+#line 55 "src/il_def.h"
 typedef struct _ZN3edg6a_typeE *_ZN3edg10a_type_ptrE;
-# 66
+#line 66
 typedef struct _ZN3edg11a_namespaceE *_ZN3edg15a_namespace_ptrE;
-# 44 "src/error.h"
+#line 44 "src/error.h"
 typedef struct _ZN3edg14a_template_argE *_ZN3edg18a_template_arg_ptrE;
-# 53 "src/il_def.h"
+#line 53 "src/il_def.h"
 typedef struct _ZN3edg10a_constantE *_ZN3edg14a_constant_ptrE;
-# 76 "src/symbol_tbl.h"
+#line 76 "src/symbol_tbl.h"
 typedef struct _ZN3edg9Dyn_arrayINS_10Shared_objINS_16a_pending_pragmaENS_12FE_allocatorEEES3_EE _ZN3edg21a_pending_pragma_listE;
-# 72
+#line 72
 typedef struct _ZN3edg10Shared_objINS_16a_pending_pragmaENS_12FE_allocatorEEE _ZN3edg23a_shared_pending_pragmaE;
-# 215 "src/basics.h"
+#line 215 "src/basics.h"
 typedef _Bool _ZN3edg14a_byte_booleanE;
-# 515
+#line 515
 typedef const char _ZN3edg12a_const_charE;
-# 139 "src/host_envir.h"
+#line 139 "src/host_envir.h"
 typedef uint32_t _ZN3edg23a_token_sequence_numberE;
-# 200 "src/basics.h"
+#line 200 "src/basics.h"
 typedef unsigned char _ZN3edg6a_byteE;
-# 214
+#line 214
 typedef _Bool _ZN3edg9a_booleanE;
-# 541
+#line 541
 typedef size_t _ZN3edg8sizeof_tE;
-# 554
+#line 554
 typedef ptrdiff_t _ZN3edg9a_ptrdiffE;
-# 1160
+#line 1160
 typedef uint32_t _ZN3edg12a_hash_valueE;
-# 3475 "src/host_envir.h"
+#line 3475 "src/host_envir.h"
 typedef struct _ZN3edg13a_source_fileE *_ZN3edg17a_source_file_ptrE;
-# 1627 "src/targ_def.h"
+#line 1627 "src/targ_def.h"
 typedef _ZN3edg9a_ptrdiffE _ZN3edg20a_host_large_integerE;
 typedef _ZN3edg8sizeof_tE _ZN3edg21a_host_large_unsignedE;
-# 2156
+#line 2156
 typedef _ZN3edg20a_host_large_integerE _ZN3edg16a_targ_ptrdiff_tE;
-# 2183
+#line 2183
 typedef _ZN3edg21a_host_large_unsignedE _ZN3edg13a_targ_size_tE;
-# 2238
+#line 2238
 typedef unsigned short _ZN3edg16a_targ_alignmentE;
-# 2946
+#line 2946
 typedef unsigned short _ZN3edg25a_virtual_function_numberE;
-# 2990
+#line 2990
 typedef _ZN3edg16a_targ_ptrdiff_tE _ZN3edg21a_virtual_table_indexE;
-# 5664
+#line 5664
 typedef int _ZN3edg19a_named_register_idE;
-# 107 "src/error.h"
+#line 107 "src/error.h"
 struct _ZN3edg20a_diagnostic_counterE {
 unsigned long remarks;
 unsigned long warnings;
 unsigned long errors;
 unsigned long catastrophes;};
-# 121
+#line 121
 typedef struct _ZN3edg20a_diagnostic_counterE *_ZN3edg24a_diagnostic_counter_ptrE;
-# 127
+#line 127
 struct _ZN3edg24a_diagnostic_counter_setE {
 
 struct _ZN3edg20a_diagnostic_counterE total;
@@ -5243,17 +5227,17 @@ struct _ZN3edg20a_diagnostic_counterE suppressed;
 
 
 _ZN3edg24a_diagnostic_counter_ptrE local;
-# 146
+#line 146
 struct _ZN3edg20a_diagnostic_counterE repeated;};
-# 29 "src/mem_tables.h"
+#line 29 "src/mem_tables.h"
 typedef int _ZN3edg22a_memory_region_numberE;
-# 71
+#line 71
 typedef int _ZN3edg21a_function_def_numberE;
-# 94
+#line 94
 typedef struct _ZN3edg20a_function_def_descrE _ZN3edg20a_function_def_descrE;
-# 114
+#line 114
 typedef struct _ZN3edg18a_mem_block_headerE *_ZN3edg22a_mem_block_header_ptrE;
-# 142
+#line 142
 typedef struct _ZN3edg18an_il_entry_prefixE *_ZN3edg22an_il_entry_prefix_ptrE;
 struct _ZN3edg18an_il_entry_prefixE {
 
@@ -5271,9 +5255,9 @@ unsigned int il_walk_flag: 1;
 
 
 unsigned int il_lowering_flag: 1;
-# 166
+#line 166
 unsigned int keep_in_il: 1;char __dummy[3];};
-# 56 "src/il_def.h"
+#line 56 "src/il_def.h"
 typedef struct _ZN3edg10a_variableE *_ZN3edg14a_variable_ptrE;
 typedef struct _ZN3edg12a_base_classE *_ZN3edg16a_base_class_ptrE;
 typedef struct _ZN3edg7a_fieldE *_ZN3edg11a_field_ptrE;
@@ -5286,27 +5270,27 @@ typedef struct _ZN3edg9a_handlerE *_ZN3edg13a_handler_ptrE;
 typedef struct _ZN3edg18an_object_lifetimeE *_ZN3edg22an_object_lifetime_ptrE;
 
 typedef struct _ZN3edg7a_scopeE *_ZN3edg11a_scope_ptrE;
-# 77
+#line 77
 typedef struct _ZN3edg15a_template_declE *_ZN3edg19a_template_decl_ptrE;
 typedef struct _ZN3edg10a_templateE *_ZN3edg14a_template_ptrE;
 typedef struct _ZN3edg15an_ms_attributeE *_ZN3edg19an_ms_attribute_ptrE;
-# 98
+#line 98
 typedef struct _ZN3edg24a_gnu_routine_supplementE *_ZN3edg28a_gnu_routine_supplement_ptrE;
-# 104
+#line 104
 typedef struct _ZN3edg15a_module_entityE *_ZN3edg19a_module_entity_ptrE;
-# 131
+#line 131
 typedef struct _ZN3edg25a_property_or_event_descrE *_ZN3edg29a_property_or_event_descr_ptrE;
-# 259
+#line 259
 typedef struct _ZN3edg25a_seq_number_lookup_entryE *_ZN3edg29a_seq_number_lookup_entry_ptrE;
-# 296
+#line 296
 typedef unsigned _ZN3edg15a_cpp_cli_tokenE;
-# 308
+#line 308
 typedef unsigned _ZN3edg23an_assembly_scope_indexE;
-# 337
+#line 337
 typedef struct _ZN3edg19a_cli_metadata_fileE *_ZN3edg23a_cli_metadata_file_ptrE;
-# 389
+#line 389
 typedef int _ZN3edg13a_scope_depthE;
-# 1864
+#line 1864
 struct _ZN3edg14a_source_rangeE {
 
 _ZN3edg17a_source_positionE start;
@@ -5315,21 +5299,21 @@ _ZN3edg17a_source_positionE start;
 _ZN3edg17a_source_positionE end;};
 
 typedef struct _ZN3edg14a_source_rangeE _ZN3edg14a_source_rangeE;
-# 1945
+#line 1945
 typedef struct _ZN3edg26a_decl_position_supplementE *_ZN3edg30a_decl_position_supplement_ptrE;
-# 2000
+#line 2000
 typedef struct _ZN3edg16a_name_referenceE *_ZN3edg20a_name_reference_ptrE;
-# 2006
+#line 2006
 typedef struct _ZN3edg12an_attributeE *_ZN3edg16an_attribute_ptrE;
-# 2012
+#line 2012
 typedef unsigned short _ZN3edg19a_gnu_init_priorityE;
-# 2051
+#line 2051
 typedef struct _ZN3edg23an_il_entity_list_entryE *_ZN3edg27an_il_entity_list_entry_ptrE;
-# 2064
+#line 2064
 typedef struct _ZN3edg23an_il_entity_list_entryE _ZN3edg23an_il_entity_list_entryE;
-# 2513
+#line 2513
 typedef struct _ZN3edg38a_per_instantiation_needed_flags_entryE *_ZN3edg42a_per_instantiation_needed_flags_entry_ptrE;
-# 3261
+#line 3261
 struct _ZN3edg23a_source_correspondenceE {
 
 
@@ -5343,34 +5327,34 @@ _ZN3edg12a_const_charE *name;
 
 
 _ZN3edg12a_const_charE *unmangled_name_or_mangled_encoding;
-# 3284
+#line 3284
 struct _ZN3edg20a_trans_unit_correspE *trans_unit_corresp;
-# 3297
+#line 3297
 _ZN3edg11a_scope_ptrE parent_scope;
-# 3312
+#line 3312
 _ZN3edg13a_routine_ptrE enclosing_routine;
 
 
 
 
 _ZN3edg19a_module_entity_ptrE module_entity;
-# 3327
+#line 3327
 _ZN3edg17a_source_positionE decl_position;
-# 3335
+#line 3335
 _ZN3edg30a_decl_position_supplement_ptrE decl_pos_info;
-# 3341
+#line 3341
 _ZN3edg20a_name_reference_ptrE name_references;
-# 3350
+#line 3350
 unsigned int access: 2;
-# 3357
+#line 3357
 unsigned int assembly_access: 2;
 
 
 
 unsigned int referenced: 1;
-# 3371
+#line 3371
 unsigned int needed: 1;
-# 3383
+#line 3383
 unsigned int name_linkage: 3;
 
 
@@ -5380,14 +5364,14 @@ unsigned int has_associated_pragma: 1;
 
 
 unsigned int is_local_to_function: 1;
-# 3399
+#line 3399
 unsigned int parent_via_local_scope_ref: 1;
 
 
 
 
 unsigned int is_class_member: 1;
-# 3410
+#line 3410
 unsigned int has_associated_attribute: 1;
 
 
@@ -5397,48 +5381,48 @@ unsigned int name_has_been_mangled: 1;
 
 
 unsigned int mangled_name_cannot_be_included_in_other_name: 1;
-# 3424
+#line 3424
 unsigned int final_name_mangling_pending: 1;
-# 3431
+#line 3431
 unsigned int unnamed_entity_given_fabricated_name: 1;
-# 3438
+#line 3438
 unsigned int entity_marked: 1;
-# 3482
+#line 3482
 unsigned int static_used_by_instantiation: 1;
-# 3492
+#line 3492
 unsigned int duplicate_static_in_instantiation_slices: 1;
-# 3500
+#line 3500
 unsigned int okay_to_walk_subtree_of_local_entity: 1;
-# 3507
+#line 3507
 unsigned int copied_from_secondary_trans_unit: 1;
-# 3513
+#line 3513
 unsigned int same_name_as_external_entity_in_secondary_trans_unit: 1;
-# 3519
+#line 3519
 unsigned int member_of_unknown_base: 1;
-# 3531
+#line 3531
 unsigned int qualified_unknown_base_member: 1;
-# 3546
+#line 3546
 unsigned int member_of_unknown_super: 1;
-# 3553
+#line 3553
 unsigned int microsoft_identifier_used: 1;
-# 3564
+#line 3564
 unsigned int is_deprecated_or_unavailable: 1;
 
 
 unsigned int externalized: 1;
-# 3573
+#line 3573
 unsigned int on_mangling_substitution_list: 1;
 
 
 
 unsigned int maybe_unused: 1;
-# 3602
+#line 3602
 _ZN3edg42a_per_instantiation_needed_flags_entry_ptrE per_instantiation_needed_flags;
-# 3610
+#line 3610
 _ZN3edg16an_attribute_ptrE attributes;};
 
 typedef struct _ZN3edg23a_source_correspondenceE _ZN3edg23a_source_correspondenceE;
-# 3770
+#line 3770
 union _ZN3edg11a_namespaceUt_E {
 
 _ZN3edg11a_scope_ptrE assoc_scope;
@@ -5447,7 +5431,7 @@ _ZN3edg11a_scope_ptrE assoc_scope;
 
 
 _ZN3edg15a_namespace_ptrE assoc_namespace;};
-# 3720
+#line 3720
 struct _ZN3edg11a_namespaceE {
 
 
@@ -5460,7 +5444,7 @@ _ZN3edg15a_namespace_ptrE next;
 
 
 _ZN3edg10a_type_ptrE proxy_class;
-# 3742
+#line 3742
 _ZN3edg12a_hash_valueE hash_value;
 
 
@@ -5476,22 +5460,22 @@ unsigned int named_in_strong_using: 1;
 
 
 unsigned int is_std: 1;
-# 3766
+#line 3766
 unsigned int has_gnu_abi_tag_attribute: 1;
-# 3781
+#line 3781
 union _ZN3edg11a_namespaceUt_E variant;};
-# 3795
+#line 3795
 typedef struct _ZN3edg12a_using_declE *_ZN3edg16a_using_decl_ptrE;
-# 3992
+#line 3992
 typedef struct _ZN3edg14a_dynamic_initE *_ZN3edg18a_dynamic_init_ptrE;
-# 4474
+#line 4474
 typedef uint32_t _ZN3edg25a_template_param_list_posE;
 
 
 
 
 typedef int32_t _ZN3edg24a_template_nesting_depthE;
-# 4526
+#line 4526
 struct _ZN3edg27a_template_param_coordinateE {
 
 
@@ -5507,48 +5491,29 @@ _ZN3edg24a_template_nesting_depthE depth;};
 
 
 typedef struct _ZN3edg27a_template_param_coordinateE _ZN3edg27a_template_param_coordinateE;
-# 4662
+#line 4662
 typedef int32_t _ZN3edg14a_scope_numberE;
-# 5748
-struct _ZN3edg24a_fixed_point_type_descrE {
-
-
-unsigned char precision;
-
-
-
-unsigned int is_unsigned: 1;
-
-
-unsigned int is_fract_type: 1;
-
-
-
-unsigned int saturating: 1;char __dummy[2];};
-
-
-typedef struct _ZN3edg24a_fixed_point_type_descrE _ZN3edg24a_fixed_point_type_descrE;
-# 6384
+#line 6384
 typedef struct _ZN3edg12a_param_typeE *_ZN3edg16a_param_type_ptrE;
-# 6934
+#line 6934
 typedef struct _ZN3edg8a_pragmaE *_ZN3edg12a_pragma_ptrE;
-# 7310
+#line 7310
 typedef unsigned _ZN3edg19a_decl_modifier_setE;
-# 7393
+#line 7393
 typedef struct _ZN3edg25a_routine_type_supplementE *_ZN3edg29a_routine_type_supplement_ptrE;
-# 8010
+#line 8010
 typedef struct _ZN3edg19a_construction_vtblE *_ZN3edg23a_construction_vtbl_ptrE;
-# 8316
+#line 8316
 typedef struct _ZN3edg18a_class_list_entryE *_ZN3edg22a_class_list_entry_ptrE;
-# 8329
+#line 8329
 typedef struct _ZN3edg20a_routine_list_entryE *_ZN3edg24a_routine_list_entry_ptrE;
-# 8588
+#line 8588
 typedef struct _ZN3edg20a_vcall_offset_entryE *_ZN3edg24a_vcall_offset_entry_ptrE;
-# 8625
+#line 8625
 typedef struct _ZN3edg20a_partial_class_bodyE *_ZN3edg24a_partial_class_body_ptrE;
-# 8653
+#line 8653
 typedef unsigned _ZN3edg22an_ms_attribute_targetE;
-# 8711
+#line 8711
 struct _ZN3edg21an_ms_attribute_usageE {
 
 _ZN3edg22an_ms_attribute_targetE valid_on;
@@ -5564,19 +5529,19 @@ typedef struct _ZN3edg21an_ms_attribute_usageE _ZN3edg21an_ms_attribute_usageE;
 
 
 typedef struct _ZN3edg18an_event_interfaceE *_ZN3edg22an_event_interface_ptrE;
-# 8740
+#line 8740
 typedef struct _ZN3edg23a_class_type_supplementE *_ZN3edg27a_class_type_supplement_ptrE;
-# 9204
+#line 9204
 union _ZN3edg23a_class_type_supplementUt_E {
 
 
 
 _ZN3edg13a_routine_ptrE routine;
-# 9214
+#line 9214
 _ZN3edg14a_variable_ptrE variable;
-# 9222
+#line 9222
 _ZN3edg11a_field_ptrE field;};
-# 8741
+#line 8741
 struct _ZN3edg23a_class_type_supplementE {
 
 _ZN3edg16a_base_class_ptrE base_classes;
@@ -5590,9 +5555,9 @@ _ZN3edg16a_base_class_ptrE direct_base_classes;
 
 
 _ZN3edg16a_base_class_ptrE preorder_base_classes;
-# 8759
+#line 8759
 _ZN3edg16a_base_class_ptrE primary_base_class;
-# 8767
+#line 8767
 _ZN3edg13a_targ_size_tE size_without_virtual_base_classes;
 
 
@@ -5603,27 +5568,27 @@ _ZN3edg16a_targ_alignmentE alignment_without_virtual_base_classes;
 
 
 _ZN3edg25a_virtual_function_numberE highest_virtual_function_number;
-# 8793
+#line 8793
 _ZN3edg21a_virtual_table_indexE next_negative_virtual_table_index;
-# 8799
+#line 8799
 _ZN3edg21a_virtual_table_indexE first_vcall_offset_index;
 
 
 
 _ZN3edg24a_vcall_offset_entry_ptrE vcall_offsets;
-# 8811
+#line 8811
 _ZN3edg13a_targ_size_tE virtual_function_info_offset;
-# 8822
+#line 8822
 _ZN3edg16a_base_class_ptrE virtual_function_info_base_class;
-# 8831
+#line 8831
 _ZN3edg12a_const_charE *uuid_string;
-# 8837
+#line 8837
 _ZN3edg19a_decl_modifier_setE decl_modifiers;
-# 8844
+#line 8844
 unsigned char orig_type_kind;
-# 8852
+#line 8852
 unsigned char inheritance_kind;
-# 8861
+#line 8861
 unsigned int inheritance_kind_is_explicit: 1;
 
 
@@ -5633,7 +5598,7 @@ unsigned int has_direct_property_or_event: 1;
 
 
 unsigned int declared_assembly_visibility: 2;
-# 8875
+#line 8875
 unsigned int assembly_visibility: 2;
 
 
@@ -5663,17 +5628,17 @@ unsigned int has_coclass_attribute: 1;
 
 
 unsigned int has_explicitly_aligned_subobject: 1;
-# 8911
+#line 8911
 unsigned int ELF_visibility: 3;
-# 8917
+#line 8917
 unsigned int qualifiers: 15;
-# 8929
+#line 8929
 unsigned int compiler_generated: 1;
 
 
 
 unsigned int has_subobject_type: 1;
-# 8956
+#line 8956
 unsigned int is_lambda_closure_class: 1;
 
 
@@ -5694,7 +5659,7 @@ unsigned int has_anonymous_union_member: 1;
 
 
 unsigned int defined_in_variable_initializer: 1;
-# 8981
+#line 8981
 unsigned int defined_in_field_initializer: 1;
 
 
@@ -5706,7 +5671,7 @@ unsigned int named_in_inline_template_directive: 1;
 
 
 unsigned int is_va_list_tag: 1;
-# 8998
+#line 8998
 unsigned int defined_in_parent_class: 1;
 
 
@@ -5734,7 +5699,7 @@ unsigned int contains_local_type_cached: 1;
 
 
 unsigned int contains_unnamed_namespace_type: 1;
-# 9030
+#line 9030
 unsigned int contains_unnamed_namespace_type_cached: 1;
 
 
@@ -5751,40 +5716,40 @@ unsigned char anonymous_union_kind;
 
 
 _ZN3edg11a_field_ptrE anonymous_union_field;
-# 9051
+#line 9051
 _ZN3edg22a_class_list_entry_ptrE befriending_classes;
-# 9061
+#line 9061
 _ZN3edg27an_il_entity_list_entry_ptrE friends;
-# 9085
+#line 9085
 _ZN3edg11a_scope_ptrE assoc_scope;
-# 9101
+#line 9101
 _ZN3edg14a_template_ptrE assoc_template;
 
 
 
 
 _ZN3edg18a_template_arg_ptrE template_arg_list;
-# 9116
+#line 9116
 _ZN3edg18a_template_arg_ptrE partial_spec_template_arg_list;
-# 9127
+#line 9127
 _ZN3edg24a_partial_class_body_ptrE partial_class_bodies;
-# 9139
+#line 9139
 _ZN3edg13a_routine_ptrE assoc_operator_delete_routine;
-# 9147
+#line 9147
 _ZN3edg14a_variable_ptrE virtual_function_table_var;
-# 9154
+#line 9154
 _ZN3edg14a_variable_ptrE virtual_table_table_var;
-# 9160
+#line 9160
 _ZN3edg10a_type_ptrE subobject_partner;
-# 9170
+#line 9170
 _ZN3edg14a_variable_ptrE uuid_variable;
-# 9177
+#line 9177
 _ZN3edg10a_type_ptrE promoted_local_types;
-# 9186
+#line 9186
 _ZN3edg23a_construction_vtbl_ptrE construction_vtbls;
-# 9198
+#line 9198
 int32_t min_template_arguments;
-# 9226
+#line 9226
 union _ZN3edg23a_class_type_supplementUt_E lambda_parent;
 
 _ZN3edg12a_hash_valueE hash_value;
@@ -5806,50 +5771,50 @@ _ZN3edg15a_cpp_cli_tokenE metadata_type_def_token;
 
 
 _ZN3edg13a_routine_ptrE base_dispose_bool_routine;
-# 9252
+#line 9252
 _ZN3edg13a_routine_ptrE base_idisposable_dispose_routine;
 _ZN3edg13a_routine_ptrE base_object_finalize_routine;
-# 9261
+#line 9261
 _ZN3edg10a_type_ptrE invocation_type;
-# 9267
+#line 9267
 _ZN3edg22an_event_interface_ptrE event_interfaces;
 
 
 
 _ZN3edg21an_ms_attribute_usageE attribute_usage;
-# 9279
+#line 9279
 _ZN3edg10a_type_ptrE proxy_of_type;};
-# 9329
+#line 9329
 typedef struct _ZN3edg32a_template_param_type_supplementE *_ZN3edg36a_template_param_type_supplement_ptrE;
-# 9421
+#line 9421
 typedef struct _ZN3edg25a_typeref_type_supplementE *_ZN3edg29a_typeref_type_supplement_ptrE;
-# 9502
+#line 9502
 typedef struct _ZN3edg26an_integer_type_supplementE *_ZN3edg30an_integer_type_supplement_ptrE;
-# 9624
+#line 9624
 typedef struct _ZN3edg24a_based_type_list_memberE *_ZN3edg28a_based_type_list_member_ptrE;
-# 9646
+#line 9646
 typedef _ZN3edg6a_byteE _ZN3edg22a_pointer_modifier_setE;
-# 10142
+#line 10142
 union _ZN3edg6a_typeUt_Ut_Ut_E {
 
 
 _ZN3edg14a_constant_ptrE constant_list;
-# 10152
+#line 10152
 _ZN3edg11a_scope_ptrE assoc_scope;
 
 
 
 _ZN3edg10a_type_ptrE affiliated_type;};
-# 10045
+#line 10045
 struct _ZN3edg6a_typeUt_Ut_E {
 
 unsigned char int_kind;
 
 
 unsigned int explicitly_signed: 1;
-# 10058
+#line 10058
 unsigned int microsoft_sized_int_type: 1;
-# 10064
+#line 10064
 unsigned int has_explicit_enum_base: 1;
 
 
@@ -5865,9 +5830,9 @@ unsigned int is_scoped_enum: 1;
 
 
 unsigned int packed: 1;
-# 10086
+#line 10086
 unsigned int wchar_t_type: 1;
-# 10092
+#line 10092
 unsigned int char8_t_type: 1;
 
 
@@ -5884,7 +5849,7 @@ unsigned int bool_type: 1;
 
 
 unsigned int originally_unnamed: 1;
-# 10113
+#line 10113
 unsigned int is_template_enum: 1;
 
 
@@ -5904,13 +5869,13 @@ unsigned int is_specialized: 1;
 
 
 unsigned int is_ms_instantiated_nonreal_enum: 1;
-# 10139
+#line 10139
 unsigned int ELF_visibility: 3;
-# 10163
+#line 10163
 union _ZN3edg6a_typeUt_Ut_Ut_E enum_info;
 
 _ZN3edg30an_integer_type_supplement_ptrE extra_info;};
-# 10185
+#line 10185
 struct _ZN3edg6a_typeUt_Ut0_E {
 
 _ZN3edg10a_type_ptrE type;
@@ -5918,7 +5883,7 @@ _ZN3edg10a_type_ptrE type;
 
 
 _ZN3edg14a_variable_ptrE base_variable;
-# 10198
+#line 10198
 unsigned int is_reference: 1;
 
 
@@ -5935,11 +5900,11 @@ unsigned int is_handle: 1;
 
 
 unsigned int is_interior_ptr: 1;
-# 10220
+#line 10220
 unsigned int is_pin_ptr: 1;
-# 10227
+#line 10227
 _ZN3edg22a_pointer_modifier_setE modifiers;char __dummy[6];};
-# 10233
+#line 10233
 struct _ZN3edg6a_typeUt_Ut1_E {
 
 _ZN3edg10a_type_ptrE return_type;
@@ -5953,7 +5918,7 @@ _ZN3edg29a_routine_type_supplement_ptrE extra_info;
 
 
 _ZN3edg10a_type_ptrE unlowered_type;};
-# 10326
+#line 10326
 union _ZN3edg6a_typeUt_Ut2_Ut_E {
 
 
@@ -5964,26 +5929,26 @@ _ZN3edg13a_targ_size_tE number_of_elements;
 
 
 _ZN3edg16an_expr_node_ptrE element_count_expr;
-# 10342
+#line 10342
 _ZN3edg14a_constant_ptrE element_count_constant;};
-# 10257
+#line 10257
 struct _ZN3edg6a_typeUt_Ut2_E {
 
 _ZN3edg10a_type_ptrE element_type;
 
 
 unsigned int qualifiers: 15;
-# 10268
+#line 10268
 unsigned int is_template_dependent_size_array: 1;
-# 10275
+#line 10275
 unsigned int is_variable_size_array: 1;
-# 10282
+#line 10282
 unsigned int is_vla: 1;
-# 10288
+#line 10288
 unsigned int constant_bound_expr_in_local_expr_node_ref: 1;
-# 10297
+#line 10297
 unsigned int dep_constant_bound_expr_in_local_expr_node_ref: 1;
-# 10305
+#line 10305
 unsigned int has_assoc_vla_dimension: 1;
 
 
@@ -5995,13 +5960,13 @@ unsigned int bound_is_zero: 1;
 
 
 unsigned int is_static: 1;
-# 10322
+#line 10322
 unsigned int is_threads_dimension: 1;
-# 10347
+#line 10347
 union _ZN3edg6a_typeUt_Ut2_Ut_E variant;
 
 _ZN3edg14a_constant_ptrE bound_constant;};
-# 10356
+#line 10356
 struct _ZN3edg6a_typeUt_Ut3_E {
 
 _ZN3edg11a_field_ptrE field_list;
@@ -6014,28 +5979,28 @@ _ZN3edg27a_class_type_supplement_ptrE extra_info;
 
 
 unsigned int is_interface: 1;
-# 10374
+#line 10374
 unsigned int is_interface_like: 1;
-# 10381
+#line 10381
 unsigned int is_delegate_class: 1;
 
 
 
 unsigned int is_generic_definition: 1;
-# 10392
+#line 10392
 unsigned int is_generic_instance: 1;
 
 
 
 unsigned int is_open_constructed_type: 1;
-# 10402
+#line 10402
 unsigned int is_generic_constraint: 1;
 
 
 
 
 unsigned int is_hybrid_constraint: 1;
-# 10413
+#line 10413
 unsigned int any_interface_constraints: 1;
 
 
@@ -6047,9 +6012,9 @@ unsigned int unconstrained: 1;
 
 
 unsigned int sealed: 1;
-# 10435
+#line 10435
 unsigned int final: 1;
-# 10441
+#line 10441
 unsigned int any_const_member: 1;
 
 
@@ -6069,11 +6034,11 @@ unsigned int any_virtual_base_classes: 1;
 
 
 unsigned int abstract: 1;
-# 10468
+#line 10468
 unsigned int any_virtual_functions: 1;
-# 10475
+#line 10475
 unsigned int any_pure_virtual_functions: 1;
-# 10484
+#line 10484
 unsigned int any_virtual_functions_including_in_base_classes: 1;
 
 
@@ -6084,80 +6049,80 @@ unsigned int nested_class_defined_outside_of_parent: 1;
 
 
 unsigned int originally_unnamed: 1;
-# 10499
+#line 10499
 unsigned int is_nonstd_anonymous_union_type: 1;
-# 10509
+#line 10509
 unsigned int is_template_class: 1;
-# 10515
+#line 10515
 unsigned int is_nonreal_class: 1;
-# 10528
+#line 10528
 unsigned int is_ms_instantiated_nonreal_class: 1;
-# 10534
+#line 10534
 unsigned int is_prototype_instantiation: 1;
-# 10540
+#line 10540
 unsigned int is_specialized: 1;
-# 10549
+#line 10549
 unsigned int specialized_with_old_syntax: 1;
 
 
 
 
 unsigned int is_in_class_specialization: 1;
-# 10560
+#line 10560
 unsigned int explicitly_instantiated: 1;
 
 
 
 
 unsigned int do_not_instantiate: 1;
-# 10571
+#line 10571
 unsigned int proxy_class: 1;
-# 10578
+#line 10578
 unsigned int definition_needed: 1;
-# 10584
+#line 10584
 unsigned int keep_definition_in_il: 1;
-# 10591
+#line 10591
 unsigned int is_empty_class: 1;
-# 10599
+#line 10599
 unsigned int no_proper_data: 1;
 
 
 
 
 unsigned int has_zero_init_component: 1;
-# 10611
+#line 10611
 unsigned int has_pointer_component: 1;
 
 
 
 unsigned int contains_flexible_array_member: 1;
-# 10622
+#line 10622
 unsigned int is_transparent: 1;
-# 10629
+#line 10629
 unsigned int is_packed: 1;
 
 
 
 unsigned int has_internal_linkage_attribute: 1;
-# 10639
+#line 10639
 unsigned int has_operator_ampersand: 1;
 
 
 
 unsigned int virtual_functions_marked_as_required: 1;
-# 10649
+#line 10649
 unsigned int copy_assignment_decl_suppressed: 1;
-# 10660
+#line 10660
 unsigned int copy_ctor_decl_suppressed: 1;
-# 10669
+#line 10669
 unsigned int default_ctor_decl_suppressed: 1;
-# 10676
+#line 10676
 unsigned int dtor_decl_suppressed: 1;
-# 10684
+#line 10684
 unsigned int inc_class_used_in_array_type: 1;
-# 10694
+#line 10694
 _ZN3edg16a_targ_alignmentE max_member_alignment;char __dummy[6];};
-# 10733
+#line 10733
 struct _ZN3edg6a_typeUt_Ut4_E {
 
 _ZN3edg10a_type_ptrE type;
@@ -6169,7 +6134,7 @@ _ZN3edg29a_typeref_type_supplement_ptrE extra_info;
 
 
 _ZN3edg10a_type_ptrE orig_type;
-# 10752
+#line 10752
 unsigned char kind;
 
 unsigned int qualifiers: 15;
@@ -6182,22 +6147,22 @@ unsigned int predeclared: 1;
 
 
 unsigned int explicit_memory_attribute_made_implicit: 1;
-# 10770
+#line 10770
 unsigned int has_variably_modified_type: 1;
 
 
 
 
 unsigned int is_lowered_variably_modified_type: 1;
-# 10796
+#line 10796
 unsigned int decltype_expr_not_parenthesized: 1;
-# 10807
+#line 10807
 unsigned int is_dependent_type_operator: 1;
-# 10814
+#line 10814
 unsigned int is_nonreal: 1;
-# 10821
+#line 10821
 unsigned int is_dependent: 1;
-# 10829
+#line 10829
 unsigned int is_prototype_instantiation: 1;
 
 
@@ -6209,7 +6174,7 @@ unsigned int is_lowered_complex_type: 1;
 
 
 unsigned int embedded_source_sequence_entries: 1;
-# 10850
+#line 10850
 unsigned int added_to_record_name: 1;
 
 
@@ -6223,11 +6188,11 @@ unsigned int is_global_qualified_name: 1;
 
 
 unsigned int is_intrinsic_member: 1;char __dummy[3];};
-# 10869
+#line 10869
 struct _ZN3edg6a_typeUt_Ut5_E {
 
 _ZN3edg10a_type_ptrE class_of_which_a_member;
-# 10877
+#line 10877
 _ZN3edg10a_type_ptrE orig_class_of_which_a_member;
 
 
@@ -6238,7 +6203,7 @@ _ZN3edg10a_type_ptrE type;
 
 
 _ZN3edg22a_pointer_modifier_setE modifiers;char __dummy[7];};
-# 10898
+#line 10898
 struct _ZN3edg6a_typeUt_Ut6_E {
 
 unsigned char kind;
@@ -6264,29 +6229,29 @@ unsigned int is_generic_function_param: 1;
 
 
 unsigned int is_auto_param: 1;
-# 10928
+#line 10928
 unsigned int is_decltype_auto: 1;
 
 
 
 unsigned int originally_class_template_param: 1;
-# 10938
+#line 10938
 unsigned int is_unsigned_bit_precise_int: 1;
 
 
 
 
 _ZN3edg36a_template_param_type_supplement_ptrE extra_info;};
-# 10949
+#line 10949
 struct _ZN3edg6a_typeUt_Ut7_E {
 
 _ZN3edg10a_type_ptrE element_type;
 
 
 _ZN3edg14a_constant_ptrE size_constant;
-# 10963
+#line 10963
 unsigned int is_boolean_vector: 1;
-# 10970
+#line 10970
 unsigned char kind;char __dummy[6];};
 
 
@@ -6306,37 +6271,33 @@ int8_t length_multiplier;
 
 
 uint8_t tuple_elements;char __dummy[6];};
-# 10041
+#line 10041
 union _ZN3edg6a_typeUt_E {
-# 10168
+#line 10168
 struct _ZN3edg6a_typeUt_Ut_E integer;
-
-
-
-_ZN3edg24a_fixed_point_type_descrE fixed_point;
-# 10182
+#line 10182
 unsigned char float_kind;
-# 10231
+#line 10231
 struct _ZN3edg6a_typeUt_Ut0_E pointer;
-# 10255
+#line 10255
 struct _ZN3edg6a_typeUt_Ut1_E routine;
-# 10354
+#line 10354
 struct _ZN3edg6a_typeUt_Ut2_E array;
-# 10731
+#line 10731
 struct _ZN3edg6a_typeUt_Ut3_E class_struct_union;
-# 10867
+#line 10867
 struct _ZN3edg6a_typeUt_Ut4_E typeref;
-# 10895
+#line 10895
 struct _ZN3edg6a_typeUt_Ut5_E ptr_to_member;
-# 10946
+#line 10946
 struct _ZN3edg6a_typeUt_Ut6_E template_param;
-# 10971
+#line 10971
 struct _ZN3edg6a_typeUt_Ut7_E vector;
-# 10979
+#line 10979
 struct _ZN3edg6a_typeUt_Ut8_E scalable_vector;
-# 10990
+#line 10990
 struct _ZN3edg6a_typeUt_Ut9_E riscv_vector;};
-# 9768
+#line 9768
 struct _ZN3edg6a_typeE {
 
 
@@ -6350,9 +6311,9 @@ _ZN3edg10a_type_ptrE next;
 
 
 _ZN3edg28a_based_type_list_member_ptrE based_types;
-# 9788
+#line 9788
 _ZN3edg13a_targ_size_tE size;
-# 9797
+#line 9797
 _ZN3edg16a_targ_alignmentE alignment;
 
 
@@ -6360,35 +6321,35 @@ _ZN3edg16a_targ_alignmentE alignment;
 unsigned char kind;
 
 unsigned int incomplete: 1;
-# 9810
+#line 9810
 unsigned int used_in_exception_or_rtti: 1;
-# 9817
+#line 9817
 unsigned int declared_in_function_prototype: 1;
 
 
 unsigned int is_tag_redefinition: 1;
-# 9828
+#line 9828
 unsigned int is_instantiation_dependent: 1;
 
 
 
 
 unsigned int is_instantiation_dependent_cached: 1;
-# 9846
+#line 9846
 unsigned int prototype_scope_types_if_any_promoted: 1;
 
 
 
 unsigned int typedef_pending: 1;
-# 9861
+#line 9861
 unsigned int generated_as_empty_struct: 1;
-# 9867
+#line 9867
 unsigned int has_been_defined: 1;
 
 
 
 unsigned int typedef_definition_has_been_put_out: 1;
-# 9934
+#line 9934
 unsigned int alignment_set_explicitly: 1;
 
 
@@ -6404,13 +6365,13 @@ unsigned int may_alias: 1;
 
 
 unsigned int has_microsoft_w64_specifier: 1;
-# 9955
+#line 9955
 unsigned int is_microsoft_intrinsic: 1;
-# 9974
+#line 9974
 unsigned int is_builtin_va_list: 1;
-# 9980
+#line 9980
 unsigned int is_builtin_va_list_from_cstdarg: 1;
-# 9996
+#line 9996
 unsigned int has_gnu_abi_tag_attribute: 1;
 
 
@@ -6429,62 +6390,62 @@ unsigned int process_for_ordering: 1;
 
 
 unsigned int type_processed_for_ordering: 1;
-# 10021
+#line 10021
 unsigned int type_processed_as_complete_for_ordering: 1;
-# 10029
+#line 10029
 unsigned int visited_for_vla_lowering: 1;
-# 10035
+#line 10035
 _ZN3edg14a_variable_ptrE typeinfo_var;
-# 10992
+#line 10992
 union _ZN3edg6a_typeUt_E variant;};
-# 11029
+#line 11029
 union _ZN3edg14an_initializerE {
-# 11037
+#line 11037
 _ZN3edg14a_constant_ptrE constant;
-# 11045
+#line 11045
 _ZN3edg18a_dynamic_init_ptrE dynamic;
-# 11055
+#line 11055
 _ZN3edg16an_expr_node_ptrE bound_expr;};
-# 11063
+#line 11063
 typedef union _ZN3edg14an_initializerE _ZN3edg14an_initializerE;
 
 
 typedef struct _ZN3edg28a_local_static_variable_initE *_ZN3edg32a_local_static_variable_init_ptrE;
-# 11101
+#line 11101
 typedef struct _ZN3edg15a_vla_dimensionE *_ZN3edg19a_vla_dimension_ptrE;
-# 11182
+#line 11182
 typedef struct _ZN3edg24a_variable_template_infoE *_ZN3edg28a_variable_template_info_ptrE;
-# 11224
+#line 11224
 union _ZN3edg10a_variableUt_E {
 
 
 _ZN3edg16a_param_type_ptrE assoc_param_type;
-# 11237
+#line 11237
 _ZN3edg14a_variable_ptrE container;
 
 
 
 
 _ZN3edg27an_il_entity_list_entry_ptrE bindings;};
-# 11285
+#line 11285
 union _ZN3edg10a_variableUt0_E {
 
 _ZN3edg12a_const_charE *name;
-# 11293
+#line 11293
 unsigned char reg;
-# 11300
+#line 11300
 _ZN3edg19a_named_register_idE id;};
-# 11846
+#line 11846
 struct _ZN3edg10a_variableUt1_Ut_E {
 
 _ZN3edg13a_routine_ptrE init_routine;
-# 11854
+#line 11854
 _ZN3edg13a_routine_ptrE wrapper;};
-# 11835
+#line 11835
 union _ZN3edg10a_variableUt1_E {
-# 11858
+#line 11858
 struct _ZN3edg10a_variableUt1_Ut_E thread;};
-# 11210
+#line 11210
 struct _ZN3edg10a_variableE {
 
 
@@ -6498,22 +6459,22 @@ _ZN3edg14a_variable_ptrE next;
 
 
 _ZN3edg10a_type_ptrE type;
-# 11245
+#line 11245
 union _ZN3edg10a_variableUt_E variant;
 
 unsigned char storage_class;
-# 11277
+#line 11277
 _ZN3edg19a_decl_modifier_setE decl_modifiers;
-# 11305
+#line 11305
 union _ZN3edg10a_variableUt0_E asm_name_or_reg;
 
 
 _ZN3edg16a_targ_alignmentE alignment;
-# 11315
+#line 11315
 _ZN3edg19a_gnu_init_priorityE init_priority;
-# 11322
+#line 11322
 _ZN3edg13a_routine_ptrE cleanup_routine;
-# 11329
+#line 11329
 unsigned int ELF_visibility: 3;
 
 
@@ -6535,7 +6496,7 @@ unsigned int has_gnu_abi_tag_attribute: 1;
 
 
 unsigned int is_not_common: 1;
-# 11358
+#line 11358
 unsigned int is_common: 1;
 
 
@@ -6550,7 +6511,7 @@ unsigned int asm_name_is_valid: 1;
 
 
 unsigned int has_named_register_storage_class: 1;
-# 11378
+#line 11378
 unsigned int used: 1;
 
 
@@ -6561,7 +6522,7 @@ unsigned int address_taken: 1;
 unsigned int is_parameter: 1;
 
 unsigned int is_struct_binding: 1;
-# 11393
+#line 11393
 unsigned int is_struct_binding_container: 1;
 
 
@@ -6571,17 +6532,17 @@ unsigned int referenced_non_locally: 1;
 
 
 unsigned int modified_within_try_block: 1;
-# 11407
+#line 11407
 unsigned int is_template_variable: 1;
-# 11417
+#line 11417
 unsigned int is_prototype_instantiation: 1;
-# 11424
+#line 11424
 unsigned int is_nonreal: 1;
 
 
 
 unsigned int is_specialized: 1;
-# 11437
+#line 11437
 unsigned int specialized_with_old_syntax: 1;
 
 
@@ -6600,13 +6561,13 @@ unsigned int explicit_do_not_instantiate: 1;
 
 
 unsigned int can_be_instantiated: 1;
-# 11464
+#line 11464
 unsigned int do_not_instantiate: 1;
-# 11474
+#line 11474
 unsigned int instance_required: 1;
-# 11489
+#line 11489
 unsigned int param_value_has_been_changed: 1;
-# 11495
+#line 11495
 unsigned int param_used_as_lvalue: 1;
 
 
@@ -6623,9 +6584,9 @@ unsigned int is_this_parameter: 1;
 
 
 unsigned int is_anonymous_parent_object: 1;
-# 11518
+#line 11518
 unsigned int is_member_constant: 1;
-# 11528
+#line 11528
 unsigned int is_constexpr: 1;
 
 
@@ -6641,13 +6602,13 @@ unsigned int on_inline_variable_list: 1;
 
 
 unsigned int suppress_inline_definition: 1;
-# 11557
+#line 11557
 unsigned int superseded_external: 1;
-# 11563
+#line 11563
 unsigned int has_variably_modified_type: 1;
-# 11569
+#line 11569
 unsigned int is_vla: 1;
-# 11578
+#line 11578
 unsigned int initialization_rewritten_as_assignment: 1;
 
 
@@ -6671,7 +6632,7 @@ unsigned int promoted_local_static: 1;
 
 
 unsigned int is_optional_vtable: 1;
-# 11607
+#line 11607
 unsigned int vtable_defined: 1;
 
 
@@ -6691,9 +6652,9 @@ unsigned int has_parenthesized_initializer: 1;
 
 
 unsigned int has_direct_braced_initializer: 1;
-# 11631
+#line 11631
 unsigned int has_flexible_array_initializer: 1;
-# 11639
+#line 11639
 unsigned int uninitialized: 1;
 
 
@@ -6706,7 +6667,7 @@ unsigned int declared_with_decltype_auto: 1;
 
 
 unsigned int declared_with_class_template_placeholder: 1;
-# 11678
+#line 11678
 unsigned int declared_using_type_without_linkage: 1;
 
 
@@ -6716,9 +6677,9 @@ unsigned int is_pack: 1;
 
 
 unsigned int is_pack_element: 1;
-# 11692
+#line 11692
 unsigned int is_initonly: 1;
-# 11698
+#line 11698
 unsigned int is_enhanced_for_iterator: 1;
 
 
@@ -6727,12 +6688,12 @@ unsigned int initializer_in_class: 1;
 
 
 unsigned int constant_valued: 1;
-# 11712
+#line 11712
 unsigned int is_immutable: 1;
 
 
 unsigned int is_thread_local: 1;
-# 11724
+#line 11724
 unsigned int extends_lifetime: 1;
 
 
@@ -6750,80 +6711,80 @@ unsigned int is_in_class_specialization: 1;
 
 
 unsigned char init_kind;
-# 11748
+#line 11748
 _ZN3edg14an_initializerE initializer;
 
 
 
 
 _ZN3edg14a_source_rangeE initializer_range;
-# 11761
+#line 11761
 _ZN3edg27an_il_entity_list_entry_ptrE entities_defined_in_initializer;
-# 11768
+#line 11768
 _ZN3edg29a_property_or_event_descr_ptrE property_or_event_descr;
-# 11774
+#line 11774
 _ZN3edg28a_variable_template_info_ptrE template_info;
 
 
 
 
 _ZN3edg12a_const_charE *section;
-# 11787
+#line 11787
 _ZN3edg14a_variable_ptrE aliased_variable;
-# 11793
+#line 11793
 _ZN3edg12a_const_charE *comdat_group;
-# 11800
+#line 11800
 _ZN3edg14a_variable_ptrE vla_element_count_variable;
-# 11820
+#line 11820
 unsigned long instantiation_needed_bit_number;
-# 11828
+#line 11828
 struct _ZN3edg33a_variable_remapping_for_inliningE *remapping_for_inlining;
-# 11860
+#line 11860
 union _ZN3edg10a_variableUt1_E init_routine;};
-# 12176
+#line 12176
 typedef unsigned short _ZN3edg23a_builtin_function_kindE;
-# 12214
+#line 12214
 typedef struct _ZN3edg17a_requires_clauseE *_ZN3edg21a_requires_clause_ptrE;
-# 12315
+#line 12315
 struct _ZN3edg9a_routineUt_Ut_E {
 
 _ZN3edg24a_routine_list_entry_ptrE alternate_entry_points;
-# 12323
+#line 12323
 _ZN3edg8sizeof_tE base_name_offset;};
-# 12297
+#line 12297
 union _ZN3edg9a_routineUt_E {
 
 
 
 unsigned char opname_kind;
-# 12308
+#line 12308
 _ZN3edg23a_builtin_function_kindE builtin_function_kind;
-# 12330
+#line 12330
 struct _ZN3edg9a_routineUt_Ut_E ctor_dtor;
-# 12336
+#line 12336
 _ZN3edg29a_property_or_event_descr_ptrE property_or_event_descr;
-# 12342
+#line 12342
 _ZN3edg13a_routine_ptrE lambda_call_operator;
 
 
 
 
 _ZN3edg14a_template_ptrE class_template;};
-# 13113
+#line 13113
 union _ZN3edg9a_routineUt0_E {
 
 
 _ZN3edg25a_virtual_function_numberE virtual_function;
-# 13123
+#line 13123
 int32_t constexpr_intrinsic;};
-# 13145
+#line 13145
 union _ZN3edg9a_routineUt1_E {
 
 
 _ZN3edg22a_class_list_entry_ptrE befriending_classes;
-# 13161
+#line 13161
 _ZN3edg13a_routine_ptrE inherited_routine;};
-# 12228
+#line 12228
 struct _ZN3edg9a_routineE {
 
 
@@ -6837,9 +6798,9 @@ _ZN3edg13a_routine_ptrE next;
 
 
 _ZN3edg10a_type_ptrE type;
-# 12246
+#line 12246
 _ZN3edg21a_function_def_numberE function_def_number;
-# 12260
+#line 12260
 _ZN3edg22a_memory_region_numberE memory_region;
 
 
@@ -6850,15 +6811,15 @@ _ZN3edg12a_hash_valueE hash_value;
 
 
 unsigned char storage_class;
-# 12291
+#line 12291
 unsigned char special_kind;
-# 12350
+#line 12350
 union _ZN3edg9a_routineUt_E variant;
 unsigned int address_taken: 1;
 
 
 unsigned int is_virtual: 1;
-# 12360
+#line 12360
 unsigned int overrides_base_member: 1;
 
 
@@ -6889,20 +6850,20 @@ unsigned int new_member: 1;
 
 
 unsigned int interface_slot: 1;
-# 12401
+#line 12401
 unsigned int definition_cannot_be_generated: 1;
-# 12410
+#line 12410
 unsigned int covariant_return_virtual_override: 1;
 
 
 
 unsigned int is_inline: 1;
-# 12430
+#line 12430
 unsigned int is_declared_constexpr: 1;
 
 
 unsigned int is_constexpr: 1;
-# 12443
+#line 12443
 unsigned int is_consteval: 1;
 
 
@@ -6912,16 +6873,16 @@ unsigned int is_constexpr_intrinsic: 1;
 
 
 unsigned int compiler_generated: 1;
-# 12460
+#line 12460
 unsigned int defined: 1;
-# 12468
+#line 12468
 unsigned int called: 1;
 
 
 
 
 unsigned int is_explicit_constructor: 1;
-# 12480
+#line 12480
 unsigned int is_explicit_conversion_function: 1;
 
 
@@ -6957,19 +6918,19 @@ unsigned int inherits_virtually: 1;
 
 
 unsigned int is_deduction_guide_from_inheriting_ctor: 1;
-# 12523
+#line 12523
 unsigned int is_template_function: 1;
-# 12533
+#line 12533
 unsigned int is_specialized: 1;
-# 12542
+#line 12542
 unsigned int specialized_with_old_syntax: 1;
 
 
 
 unsigned int is_prototype_instantiation: 1;
-# 12555
+#line 12555
 unsigned int never_throws: 1;
-# 12561
+#line 12561
 unsigned int is_in_class_specialization: 1;
 
 
@@ -7000,7 +6961,7 @@ unsigned int is_pure: 1;
 
 
 unsigned int is_naked: 1;
-# 12598
+#line 12598
 unsigned int declared_only_as_friend: 1;
 
 
@@ -7012,15 +6973,15 @@ unsigned int explicit_extern_inline: 1;
 
 
 unsigned int direct_linkage_specifier_on_nondef_decl: 1;
-# 12617
+#line 12617
 unsigned int is_reverse_conversion_function: 1;
 
 
 
 unsigned int is_generic_definition: 1;
-# 12627
+#line 12627
 unsigned int is_generic_instance: 1;
-# 12634
+#line 12634
 unsigned int ELF_visibility: 3;
 
 
@@ -7041,7 +7002,7 @@ unsigned int is_gnu_alias: 1;
 
 
 unsigned int is_ifunc: 1;
-# 12662
+#line 12662
 unsigned int has_gnu_used_attribute: 1;
 
 
@@ -7076,18 +7037,18 @@ unsigned int gnu_c89_inline: 1;
 
 
 unsigned int implicit_alias: 1;
-# 12701
+#line 12701
 unsigned int has_internal_linkage_attribute: 1;
 
 
 
 
 unsigned int can_be_instantiated: 1;
-# 12716
+#line 12716
 unsigned int do_not_instantiate: 1;
-# 12726
+#line 12726
 unsigned int instance_required: 1;
-# 12742
+#line 12742
 unsigned int contains_try_block: 1;
 
 
@@ -7097,57 +7058,41 @@ unsigned int contains_local_class_type: 1;
 
 
 unsigned int superseded_external: 1;
-# 12756
+#line 12756
 unsigned int defined_in_friend_decl: 1;
 
 
 
 
 unsigned int defined_outside_of_parent: 1;
-# 12769
+#line 12769
 unsigned int inlinable: 1;
-# 12779
+#line 12779
 unsigned int definition_needed: 1;
-# 12785
+#line 12785
 unsigned int keep_definition_in_il: 1;
-# 12791
+#line 12791
 unsigned int expl_template_arg_list_used: 1;
-# 12849
+#line 12849
 unsigned int definition_for_inlining_only: 1;
-# 12873
+#line 12873
 unsigned int suppress_inline_body: 1;
-# 12883
+#line 12883
 unsigned int on_inline_function_list: 1;
 
 
 unsigned int need_out_of_line_copy: 1;
-# 12892
-unsigned int fp_contract: 3;
+#line 12892
+unsigned int fp_contract: 2;
 
 
 
-unsigned int fenv_access: 3;
+unsigned int fenv_access: 2;
 
 
 
-unsigned int cx_limited_range: 3;
-
-
-
-
-unsigned int fx_full_precision: 3;
-
-
-
-unsigned int fx_fract_overflow: 3;
-
-
-
-unsigned int fx_accum_overflow: 3;
-
-
-
-
+unsigned int cx_limited_range: 2;
+#line 12918
 unsigned int upc_access_method: 2;
 
 
@@ -7158,19 +7103,19 @@ unsigned int contains_statement_expression: 1;
 
 
 unsigned int inline_in_class_definition: 1;
-# 12933
+#line 12933
 unsigned int use_comdat: 1;
-# 12940
+#line 12940
 unsigned int ctor_dtor_kind: 3;
-# 12949
+#line 12949
 unsigned int is_alias_entry: 1;
-# 12958
+#line 12958
 unsigned int lowering_delayed_on_nested_function: 1;
 
 
 
 unsigned int has_no_effect: 1;
-# 12971
+#line 12971
 unsigned int statics_have_been_promoted: 1;
 
 
@@ -7183,13 +7128,13 @@ unsigned int declared_using_type_without_linkage: 1;
 
 
 unsigned int is_defaulted: 1;
-# 12992
+#line 12992
 unsigned int is_deleted: 1;
-# 12999
+#line 12999
 unsigned int contains_local_static_variable: 1;
-# 13016
+#line 13016
 unsigned int considered_decider_function_at_some_point: 1;
-# 13024
+#line 13024
 unsigned int is_raw_literal_operator: 1;
 
 
@@ -7201,11 +7146,11 @@ unsigned int is_tls_init_alias: 1;
 
 
 unsigned int is_tls_init_routine: 1;
-# 13042
+#line 13042
 unsigned int has_ctor_priority: 1;
-# 13049
+#line 13049
 unsigned int has_dtor_priority: 1;
-# 13057
+#line 13057
 unsigned int has_deducible_return_type: 1;
 
 
@@ -7218,16 +7163,16 @@ unsigned int contains_generic_lambda: 1;
 
 
 unsigned int is_coroutine: 1;
-# 13074
+#line 13074
 unsigned int is_top_level_in_mem_region: 1;
 
 
 
 
 unsigned int friend_defined_in_instantiation: 1;
-# 13087
+#line 13087
 unsigned int is_ineligible: 1;
-# 13093
+#line 13093
 unsigned int has_pass_object_size_attr: 1;
 
 
@@ -7237,25 +7182,25 @@ unsigned int from_injected_tokens: 1;
 
 
 _ZN3edg19a_decl_modifier_setE decl_modifiers;
-# 13108
+#line 13108
 _ZN3edg21a_requires_clause_ptrE trailing_requires_clause;
-# 13126
+#line 13126
 union _ZN3edg9a_routineUt0_E number;
 
 
 _ZN3edg27an_il_entity_list_entry_ptrE overridden_functions;
-# 13165
+#line 13165
 union _ZN3edg9a_routineUt1_E friends_or_originator;
 
 _ZN3edg18a_template_arg_ptrE template_arg_list;
-# 13176
+#line 13176
 _ZN3edg14a_template_ptrE assoc_template;
-# 13182
+#line 13182
 _ZN3edg28a_gnu_routine_supplement_ptrE gnu_extra_info;
-# 13195
+#line 13195
 _ZN3edg13a_routine_ptrE overriding_function_for_wrapper;
 _ZN3edg13a_routine_ptrE overridden_function_for_wrapper;
-# 13210
+#line 13210
 _ZN3edg16a_targ_ptrdiff_tE delta;
 
 
@@ -7266,27 +7211,27 @@ _ZN3edg21a_virtual_table_indexE vcall_index;
 
 
 _ZN3edg16a_targ_ptrdiff_tE return_delta;
-# 13225
+#line 13225
 _ZN3edg21a_virtual_table_indexE vbase_index;
-# 13233
+#line 13233
 _ZN3edg13a_routine_ptrE primary_ctor_or_dtor;
-# 13241
+#line 13241
 unsigned long instantiation_needed_bit_number;
-# 13248
+#line 13248
 struct _ZN3edg15a_routine_fixupE *routine_fixup;
-# 13256
+#line 13256
 _ZN3edg19a_gnu_init_priorityE init_priority;
-# 13263
+#line 13263
 _ZN3edg16a_using_decl_ptrE generating_using_decl;};
-# 13424
+#line 13424
 typedef struct _ZN3edg12an_asm_entryE *_ZN3edg16an_asm_entry_ptrE;
-# 14861
+#line 14861
 typedef struct _ZN3edg21a_local_expr_node_refE *_ZN3edg25a_local_expr_node_ref_ptrE;
-# 16877
+#line 16877
 typedef struct _ZN3edg18a_constructor_initE *_ZN3edg22a_constructor_init_ptrE;
-# 16957
+#line 16957
 typedef struct _ZN3edg28a_scope_orphaned_list_headerE *_ZN3edg32a_scope_orphaned_list_header_ptrE;
-# 17387
+#line 17387
 union _ZN3edg10a_templateUt_E {
 
 
@@ -7296,11 +7241,11 @@ _ZN3edg13a_routine_ptrE routine;
 
 
 _ZN3edg10a_type_ptrE type;
-# 17401
+#line 17401
 _ZN3edg14a_variable_ptrE variable;
-# 17407
+#line 17407
 _ZN3edg16an_expr_node_ptrE constraint;};
-# 17287
+#line 17287
 struct _ZN3edg10a_templateE {
 
 
@@ -7316,32 +7261,32 @@ unsigned char kind;
 
 
 unsigned int is_exported: 1;
-# 17308
+#line 17308
 unsigned int ignore_export: 1;
-# 17315
+#line 17315
 unsigned int is_pack: 1;
 
 
 
 unsigned int is_friend_template: 1;
-# 17344
+#line 17344
 uint32_t cache_checksum;
 
 
 
 _ZN3edg27a_template_param_coordinateE coordinates;
-# 17354
+#line 17354
 _ZN3edg17a_source_positionE export_position;
 
 
 
 
 _ZN3edg14a_source_rangeE definition_range;
-# 17371
+#line 17371
 struct _ZN3edg28a_template_symbol_supplementE *template_info;
-# 17377
+#line 17377
 _ZN3edg19a_template_decl_ptrE template_decl;
-# 17410
+#line 17410
 union _ZN3edg10a_templateUt_E prototype_instantiation;
 
 _ZN3edg14a_template_ptrE canonical_template;
@@ -7350,11 +7295,11 @@ _ZN3edg14a_template_ptrE canonical_template;
 
 
 _ZN3edg14a_template_ptrE definition_template;
-# 17424
+#line 17424
 _ZN3edg14a_template_ptrE prototype_template;};
-# 18178
+#line 18178
 typedef struct _ZN3edg17a_local_scope_refE *_ZN3edg21a_local_scope_ref_ptrE;
-# 18402
+#line 18402
 struct _ZN3edg7a_scopeUt_Ut_E {
 
 _ZN3edg13a_routine_ptrE ptr;
@@ -7366,36 +7311,36 @@ _ZN3edg14a_variable_ptrE parameters;
 
 
 _ZN3edg22a_constructor_init_ptrE constructor_inits;
-# 18422
+#line 18422
 _ZN3edg22an_object_lifetime_ptrE lifetime_of_local_static_vars;
-# 18428
+#line 18428
 _ZN3edg14a_variable_ptrE this_param_variable;
 
 
 
 
 _ZN3edg14a_variable_ptrE return_value_variable;};
-# 18376
+#line 18376
 union _ZN3edg7a_scopeUt_E {
 
 
 
 
 _ZN3edg13a_handler_ptrE assoc_handler;
-# 18387
+#line 18387
 _ZN3edg10a_type_ptrE assoc_type;
 
 
 
 
 _ZN3edg15a_statement_ptrE assoc_statement;
-# 18398
+#line 18398
 _ZN3edg15a_namespace_ptrE assoc_namespace;
-# 18441
+#line 18441
 struct _ZN3edg7a_scopeUt_Ut_E routine;};
-# 18295
+#line 18295
 struct _ZN3edg7a_scopeE {
-# 18315
+#line 18315
 _ZN3edg11a_scope_ptrE next;
 
 
@@ -7405,18 +7350,18 @@ _ZN3edg11a_scope_ptrE prev;
 
 
 _ZN3edg11a_scope_ptrE parent;
-# 18336
+#line 18336
 _ZN3edg14a_scope_numberE number;
 unsigned char kind;
 
 
 
 unsigned int function_body_processing_finished: 1;
-# 18347
+#line 18347
 unsigned int do_not_free_memory_region: 1;
-# 18353
+#line 18353
 unsigned int scope_orphaned_list_header_generated: 1;
-# 18359
+#line 18359
 unsigned int is_constexpr_routine: 1;
 
 
@@ -7426,15 +7371,15 @@ unsigned int is_stmt_expr_block: 1;
 
 
 unsigned int is_placeholder_scope: 1;
-# 18373
+#line 18373
 unsigned int needed_walk_done: 1;
-# 18442
+#line 18442
 union _ZN3edg7a_scopeUt_E variant;
 
 _ZN3edg15a_statement_ptrE assoc_block;
-# 18462
+#line 18462
 _ZN3edg22an_object_lifetime_ptrE lifetime;
-# 18468
+#line 18468
 _ZN3edg14a_constant_ptrE constants;
 
 
@@ -7442,7 +7387,7 @@ _ZN3edg10a_type_ptrE types;
 
 
 _ZN3edg14a_variable_ptrE variables;
-# 18483
+#line 18483
 _ZN3edg14a_variable_ptrE nonstatic_variables;
 
 
@@ -7453,53 +7398,53 @@ _ZN3edg11a_label_ptrE labels;
 
 
 _ZN3edg13a_routine_ptrE routines;
-# 18500
+#line 18500
 _ZN3edg16an_asm_entry_ptrE asm_entries;
-# 18507
+#line 18507
 _ZN3edg11a_scope_ptrE scopes;
-# 18516
+#line 18516
 _ZN3edg15a_namespace_ptrE namespaces;
-# 18523
+#line 18523
 _ZN3edg16a_using_decl_ptrE using_declarations;
 _ZN3edg16a_using_decl_ptrE using_directives;
-# 18533
+#line 18533
 _ZN3edg18a_dynamic_init_ptrE dynamic_inits;
-# 18542
+#line 18542
 _ZN3edg32a_local_static_variable_init_ptrE local_static_variable_inits;
-# 18549
+#line 18549
 _ZN3edg19a_vla_dimension_ptrE vla_dimensions;
-# 18555
+#line 18555
 _ZN3edg25a_local_expr_node_ref_ptrE expr_node_refs;
-# 18562
+#line 18562
 _ZN3edg21a_local_scope_ref_ptrE scope_refs;
-# 18568
+#line 18568
 _ZN3edg12a_pragma_ptrE pragmas;
 
 
 
 
 _ZN3edg13a_scope_depthE depth_in_scope_stack;
-# 18584
+#line 18584
 struct _ZN3edg8a_symbolE *symbols;
-# 18616
+#line 18616
 _ZN3edg14a_template_ptrE templates;
 
 
 
 
 _ZN3edg19an_ms_attribute_ptrE ms_attributes;};
-# 18721
+#line 18721
 typedef struct _ZN3edg20a_module_import_declE *_ZN3edg24a_module_import_decl_ptrE;
-# 18796
+#line 18796
 struct _ZN3edg12an_il_headerE {
 
 _ZN3edg17a_source_file_ptrE primary_source_file;
-# 18804
+#line 18804
 _ZN3edg11a_scope_ptrE primary_scope;
 
 
 _ZN3edg27an_il_entity_list_entry_ptrE file_scope_statements;
-# 18814
+#line 18814
 _ZN3edg13a_routine_ptrE main_routine;
 
 
@@ -7512,19 +7457,19 @@ _ZN3edg12a_const_charE *time_of_compilation;
 _ZN3edg14a_byte_booleanE plain_chars_are_signed;
 
 _ZN3edg11a_scope_ptrE *region_scope_entry;
-# 18841
+#line 18841
 _ZN3edg20a_function_def_descrE *function_def_table;
-# 18852
+#line 18852
 _ZN3edg32a_scope_orphaned_list_header_ptrE scope_orphaned_list_headers;
-# 18859
+#line 18859
 enum _ZN3edg17a_source_languageE source_language;
 
 
 
 uint32_t std_version;
-# 18876
+#line 18876
 _ZN3edg23a_cli_metadata_file_ptrE cli_metadata_files;
-# 18886
+#line 18886
 _ZN3edg14a_byte_booleanE pcc_compatibility_mode;
 
 
@@ -7535,7 +7480,7 @@ _ZN3edg14a_byte_booleanE enum_type_is_integral;
 
 
 _ZN3edg16a_targ_alignmentE default_max_member_alignment;
-# 18909
+#line 18909
 _ZN3edg14a_byte_booleanE microsoft_mode;
 
 
@@ -7549,9 +7494,9 @@ _ZN3edg14a_byte_booleanE cppcx_enabled;
 
 
 unsigned long microsoft_version;
-# 18929
+#line 18929
 _ZN3edg14a_byte_booleanE default_upc_strict_access;
-# 18937
+#line 18937
 _ZN3edg14a_byte_booleanE gcc_mode;
 
 
@@ -7561,7 +7506,7 @@ _ZN3edg14a_byte_booleanE gpp_mode;
 
 
 _ZN3edg14a_byte_booleanE clang_mode;
-# 18951
+#line 18951
 unsigned long gnu_version;
 
 
@@ -7577,20 +7522,20 @@ _ZN3edg14a_byte_booleanE short_enums;
 
 
 _ZN3edg14a_byte_booleanE default_nocommon;
-# 18972
+#line 18972
 _ZN3edg14a_byte_booleanE gnu_c89_inlining;
-# 18978
+#line 18978
 _ZN3edg14a_byte_booleanE near_and_far_are_enabled;
 
 
 
 
 _ZN3edg14a_byte_booleanE far_data_pointers;
-# 18989
+#line 18989
 _ZN3edg14a_byte_booleanE far_code_pointers;
-# 18996
+#line 18996
 _ZN3edg14a_byte_booleanE UCN_identifiers_used;
-# 19009
+#line 19009
 _ZN3edg14a_byte_booleanE vla_used;
 
 
@@ -7600,15 +7545,15 @@ _ZN3edg14a_byte_booleanE any_templates_seen;
 
 
 _ZN3edg14a_byte_booleanE prototype_instantiations_in_il;
-# 19023
+#line 19023
 _ZN3edg14a_byte_booleanE il_has_all_prototype_instantiations;
-# 19033
+#line 19033
 _ZN3edg14a_byte_booleanE il_has_C_semantics;
-# 19039
+#line 19039
 _ZN3edg12a_const_charE *instantiation_dir_name;
-# 19045
+#line 19045
 unsigned long number_of_external_nonclass_template_entities;
-# 19051
+#line 19051
 _ZN3edg10a_type_ptrE nontag_types_used_in_exception_or_rtti;
 
 
@@ -7619,17 +7564,17 @@ _ZN3edg29a_seq_number_lookup_entry_ptrE seq_number_lookup_entries;
 
 
 unsigned long num_seq_number_lookup_entries;
-# 19106
+#line 19106
 int32_t target_configuration_index;
-# 19113
+#line 19113
 _ZN3edg24a_module_import_decl_ptrE imported_modules;};
 
 typedef struct _ZN3edg12an_il_headerE _ZN3edg12an_il_headerE;
-# 357 "src/il.h"
+#line 357 "src/il.h"
 typedef struct _ZN3edg25an_orphaned_il_entry_listE _ZN3edg25an_orphaned_il_entry_listE;
-# 2377
+#line 2377
 typedef struct _ZN3edg19a_scope_stack_entryE *_ZN3edg23a_scope_stack_entry_ptrE;
-# 30 "src/symbol_tbl.h"
+#line 30 "src/symbol_tbl.h"
 typedef struct _ZN3edg11a_vla_fixupE *_ZN3edg15a_vla_fixup_ptrE;
 typedef struct _ZN3edg20an_extern_type_fixupE *_ZN3edg24an_extern_type_fixup_ptrE;
 
@@ -7638,27 +7583,27 @@ typedef struct _ZN3edg24a_template_cache_segmentE *_ZN3edg28a_template_cache_seg
 typedef struct _ZN3edg20a_template_decl_infoE *_ZN3edg24a_template_decl_info_ptrE;
 
 typedef struct _ZN3edg24a_nondependent_call_infoE *_ZN3edg28a_nondependent_call_info_ptrE;
-# 44
+#line 44
 typedef struct _ZN3edg19a_symbol_list_entryE *_ZN3edg23a_symbol_list_entry_ptrE;
 
 typedef struct _ZN3edg10a_param_idE *_ZN3edg14a_param_id_ptrE;
 typedef struct _ZN3edg28a_pack_expansion_stack_entryE *_ZN3edg32a_pack_expansion_stack_entry_ptrE;
 typedef struct _ZN3edg17a_type_list_entryE *_ZN3edg21a_type_list_entry_ptrE;
 typedef struct _ZN3edg22a_namespace_list_entryE *_ZN3edg26a_namespace_list_entry_ptrE;
-# 56
+#line 56
 typedef struct _ZN3edg15a_routine_fixupE *_ZN3edg19a_routine_fixup_ptrE;
 typedef struct _ZN3edg20an_initializer_fixupE *_ZN3edg24an_initializer_fixup_ptrE;
 
 typedef struct _ZN3edg27a_deferred_constraint_checkE *_ZN3edg31a_deferred_constraint_check_ptrE;
-# 83
+#line 83
 typedef struct _ZN3edg18a_translation_unitE *_ZN3edg22a_translation_unit_ptrE;
-# 94
+#line 94
 typedef uint32_t _ZN3edg22a_decl_sequence_numberE;
-# 3193 "src/lexical.h"
+#line 3193 "src/lexical.h"
 typedef unsigned char _ZN3edg25a_token_set_array_elementE;
 
 typedef _ZN3edg25a_token_set_array_elementE _ZN3edg17a_token_set_arrayE[453];
-# 3207
+#line 3207
 typedef struct _ZN3edg24a_stop_token_stack_entryE *_ZN3edg28a_stop_token_stack_entry_ptrE;
 struct _ZN3edg24a_stop_token_stack_entryE {
 
@@ -7668,19 +7613,19 @@ _ZN3edg28a_stop_token_stack_entry_ptrE next;
 
 
 _ZN3edg17a_token_set_arrayE stop_tokens;char __dummy[3];};
-# 25 "src/scope_stk.h"
+#line 25 "src/scope_stk.h"
 typedef struct _ZN3edg25an_active_using_directiveE *_ZN3edg29an_active_using_directive_ptrE;
 
 
 typedef struct _ZN3edg13a_class_fixupE *_ZN3edg17a_class_fixup_ptrE;
 typedef struct _ZN3edg22a_pack_expansion_descrE *_ZN3edg26a_pack_expansion_descr_ptrE;
-# 36
+#line 36
 typedef int _ZN3edg24a_push_scope_options_setE;
-# 136
+#line 136
 typedef struct _ZN3edg36a_function_shareable_constants_tableE *_ZN3edg40a_function_shareable_constants_table_ptrE;
-# 146
+#line 146
 typedef unsigned long _ZN3edg32a_pending_class_definition_countE;
-# 154
+#line 154
 struct _ZN3edg20a_class_fixup_headerE {
 unsigned defer_inline_function_fixups;
 
@@ -7692,7 +7637,7 @@ _ZN3edg32a_pending_class_definition_countE pending_class_definitions;
 
 
 _ZN3edg17a_class_fixup_ptrE fixup_list;
-# 170
+#line 170
 _ZN3edg17a_class_fixup_ptrE fixup_list_tail;
 
 
@@ -7702,9 +7647,9 @@ _ZN3edg21a_type_list_entry_ptrE classes_that_may_need_fixups;};
 
 
 typedef struct _ZN3edg20a_class_fixup_headerE _ZN3edg20a_class_fixup_headerE;
-# 185
+#line 185
 typedef _ZN3edg25a_module_lookup_table_mapE *_ZN3edg29a_module_lookup_table_map_ptrE;
-# 198
+#line 198
 typedef struct _ZN3edg22a_scope_pointers_blockE *_ZN3edg26a_scope_pointers_block_ptrE;
 struct _ZN3edg22a_scope_pointers_blockE {
 _ZN3edg12a_symbol_ptrE symbols;
@@ -7731,7 +7676,7 @@ _ZN3edg14a_variable_ptrE last_variable;
 
 
 _ZN3edg13a_routine_ptrE last_routine;
-# 229
+#line 229
 _ZN3edg16an_asm_entry_ptrE last_asm_entry;
 
 
@@ -7751,23 +7696,23 @@ _ZN3edg16a_using_decl_ptrE last_using_directive;
 
 
 _ZN3edg12a_pragma_ptrE last_pragma;
-# 257
+#line 257
 _ZN3edg14a_template_ptrE last_template;
 
 
 
 
 _ZN3edg19an_ms_attribute_ptrE last_ms_attribute;
-# 284
+#line 284
 _ZN3edg12a_symbol_ptrE unnamed_namespace_sym;
 
 
 
 
 _ZN3edg26a_namespace_list_entry_ptrE inline_namespaces;
-# 297
+#line 297
 _ZN3edg16a_hash_table_ptrE lookup_table;
-# 306
+#line 306
 _ZN3edg29a_module_lookup_table_map_ptrE module_lookup_table_map;
 
 
@@ -7779,31 +7724,31 @@ unsigned int add_symbols_to_inactive_list: 1;char __dummy[7];};
 
 
 typedef struct _ZN3edg22a_scope_pointers_blockE _ZN3edg22a_scope_pointers_blockE;
-# 344
+#line 344
 typedef struct _ZN3edg16a_pack_referenceE *_ZN3edg20a_pack_reference_ptrE;
-# 666
+#line 666
 typedef struct _ZN3edg29a_name_hidden_by_old_for_initE *_ZN3edg33a_name_hidden_by_old_for_init_ptrE;
-# 690
+#line 690
 typedef struct _ZN3edg24a_generated_entity_blockE *_ZN3edg28a_generated_entity_block_ptrE;
-# 713
+#line 713
 typedef unsigned long _ZN3edg15a_discriminatorE;
-# 719
+#line 719
 typedef union _ZN3edg17a_collision_tableE *_ZN3edg21a_collision_table_ptrE;
-# 727
+#line 727
 typedef struct _ZN3edg22a_string_literal_tableE *_ZN3edg26a_string_literal_table_ptrE;
 
 
 
 
 typedef struct _ZN3edg9Dyn_arrayIPNS_24a_template_cache_segmentENS_12FE_allocatorEEE _ZN3edg29a_template_cache_segment_listE;
-# 1682
+#line 1682
 union _ZN3edg19a_scope_stack_entryUt_E {
 
 
 _ZN3edg21a_collision_table_ptrE local_name_collision_table;
-# 1694
+#line 1694
 _ZN3edg15a_discriminatorE last_unnamed_type_number;};
-# 738
+#line 738
 struct _ZN3edg19a_scope_stack_entryE {
 
 _ZN3edg14a_scope_numberE number;
@@ -7814,9 +7759,9 @@ unsigned char kind;
 
 
 unsigned int current_access: 2;
-# 758
+#line 758
 unsigned int current_assembly_access: 2;
-# 764
+#line 764
 unsigned int defer_constraint_checks: 1;
 
 
@@ -7827,9 +7772,9 @@ unsigned int scanning_cli_delegate_definition: 1;
 
 
 unsigned int inactive_symbols_may_be_visible: 1;
-# 779
+#line 779
 unsigned int inside_local_class: 1;
-# 787
+#line 787
 unsigned int template_param_decl_scope: 1;
 
 
@@ -7839,14 +7784,14 @@ unsigned int is_loop_scope: 1;
 
 
 unsigned int is_dissociated_from_loop_scope: 1;
-# 801
+#line 801
 unsigned int slow_lookup_required: 1;
 
 
 
 
 unsigned int return_value_optimization_possible: 1;
-# 812
+#line 812
 unsigned int in_prototype_instantiation: 1;
 
 
@@ -7878,11 +7823,11 @@ unsigned int instantiation_from_metadata: 1;
 
 
 unsigned int in_generic_instantiation: 1;
-# 849
+#line 849
 unsigned int in_class_specialization: 1;
-# 856
+#line 856
 unsigned int in_template_deduction_context: 1;
-# 862
+#line 862
 unsigned int in_variadic_template: 1;
 
 
@@ -7897,9 +7842,9 @@ unsigned int record_dependent_name_references: 1;
 
 
 unsigned int defer_access_checks: 1;
-# 904
+#line 904
 unsigned int nested_instantiation: 1;
-# 913
+#line 913
 unsigned int is_compound_statement_block: 1;
 
 
@@ -7921,7 +7866,7 @@ unsigned int within_unnamed_namespace: 1;
 
 
 unsigned int reactivated_class_being_defined: 1;
-# 939
+#line 939
 unsigned int is_for_init_block: 1;
 
 
@@ -7929,7 +7874,7 @@ unsigned int namespace_pushed: 1;
 
 
 unsigned int exclude_from_context_output: 1;
-# 951
+#line 951
 unsigned int instantiation_scope_pushed: 1;
 
 
@@ -7940,9 +7885,9 @@ unsigned int microsoft_specialization_scope_pushed: 1;
 
 
 unsigned int lexical_state_stack_pushed: 1;
-# 967
+#line 967
 unsigned int default_name_linkage: 3;
-# 976
+#line 976
 unsigned int name_linkage_is_explicit: 1;
 
 
@@ -7951,16 +7896,16 @@ unsigned int explicitly_declared_namespace_extension: 1;
 
 
 unsigned int microsoft_specialization_instantiation_scope: 1;
-# 989
+#line 989
 unsigned int is_instantiation_context: 1;
-# 995
+#line 995
 unsigned int pragma_pack_is_local: 1;
 
 
 
 
 unsigned int is_reactivation: 1;
-# 1006
+#line 1006
 unsigned int assign_string_literal_sequence_numbers: 1;
 
 
@@ -7974,35 +7919,29 @@ unsigned int discard_when_popped: 1;
 unsigned int in_base_specifier_list: 1;
 
 
-unsigned int fp_contract_state: 3;
+unsigned int fp_contract_state: 2;
 
-unsigned int fenv_access_state: 3;
+unsigned int fenv_access_state: 2;
 
-unsigned int cx_limited_range_state: 3;
-# 1029
-unsigned int fx_full_precision_state: 3;
-
-unsigned int fx_fract_overflow_state: 3;
-
-unsigned int fx_accum_overflow_state: 3;
-# 1039
+unsigned int cx_limited_range_state: 2;
+#line 1039
 unsigned int qualified_conversion_operator: 1;
 
 
 
 unsigned int initial_decl_of_namespace_std: 1;
-# 1050
+#line 1050
 unsigned int ignore_during_normal_lookup: 1;
 
 
 unsigned int force_decl_seq_check: 1;
-# 1059
+#line 1059
 unsigned int outside_parameter_list: 1;
-# 1065
+#line 1065
 unsigned int in_field_initializer: 1;
-# 1073
+#line 1073
 unsigned int in_template_arg_list: 1;
-# 1079
+#line 1079
 unsigned int implicit_typename: 1;
 
 
@@ -8052,20 +7991,20 @@ unsigned int constexpr_ruled_out: 1;
 
 
 unsigned int in_consteval_context: 1;
-# 1133
+#line 1133
 unsigned int make_access_errors_warnings: 1;
 
 
 
 unsigned int in_gnu_abi_tag_namespace: 1;
-# 1144
+#line 1144
 unsigned int treat_as_specialization: 1;
-# 1150
+#line 1150
 unsigned int in_discarded_statement: 1;
 
 
 unsigned int is_generic_lambda: 1;
-# 1159
+#line 1159
 unsigned int in_ctor_initializer: 1;
 
 
@@ -8085,51 +8024,51 @@ _ZN3edg17a_source_positionE export_pos;
 
 
 _ZN3edg26a_scope_pointers_block_ptrE assoc_pointers_block;
-# 1186
+#line 1186
 _ZN3edg22a_scope_pointers_blockE pointers_block;
-# 1192
+#line 1192
 _ZN3edg11a_scope_ptrE il_scope;
-# 1206
+#line 1206
 _ZN3edg22a_memory_region_numberE il_memory_region;
-# 1214
+#line 1214
 _ZN3edg22a_memory_region_numberE prev_il_memory_region;
 
 
 
 int module_load_context_count;
-# 1226
+#line 1226
 _ZN3edg10a_type_ptrE assoc_type;
-# 1237
+#line 1237
 _ZN3edg13a_routine_ptrE assoc_routine;
-# 1244
+#line 1244
 _ZN3edg15a_namespace_ptrE assoc_namespace;
 
 
 
 
 _ZN3edg15a_vla_fixup_ptrE vla_fixup_list;
-# 1255
+#line 1255
 _ZN3edg24an_extern_type_fixup_ptrE extern_type_fixup_list;
-# 1263
+#line 1263
 _ZN3edg28a_generated_entity_block_ptrE generated_entities;
 
 
 
 _ZN3edg40a_function_shareable_constants_table_ptrE shareable_constants_table;
-# 1274
+#line 1274
 _ZN3edg19a_routine_fixup_ptrE last_routine_fixup;
-# 1281
+#line 1281
 _ZN3edg24an_initializer_fixup_ptrE last_initializer_fixup;
-# 1288
+#line 1288
 _ZN3edg31a_deferred_constraint_check_ptrE deferred_constraint_checks;
 
 
 
 
 _ZN3edg21a_type_list_entry_ptrE types_using_pending_constraints;
-# 1301
+#line 1301
 uint32_t pending_dependent_if_exists;
-# 1319
+#line 1319
 _ZN3edg14a_variable_ptrE last_parameter;
 
 
@@ -8143,7 +8082,7 @@ _ZN3edg11a_label_ptrE last_label;
 
 _ZN3edg11a_scope_ptrE first_scope;
 _ZN3edg11a_scope_ptrE last_scope;
-# 1379
+#line 1379
 _ZN3edg13a_scope_depthE decl_scope_level;
 
 
@@ -8161,43 +8100,43 @@ _ZN3edg12a_symbol_ptrE instance_sym;
 
 
 _ZN3edg12a_symbol_ptrE template_sym;
-# 1408
+#line 1408
 _ZN3edg18a_template_arg_ptrE template_arg_list;
 
 
 
 _ZN3edg18a_template_arg_ptrE deduced_template_args;
-# 1418
+#line 1418
 _ZN3edg17a_source_positionE source_position;
 
 
 _ZN3edg13a_scope_depthE depth_innermost_function_scope;
-# 1428
+#line 1428
 _ZN3edg24a_template_decl_info_ptrE template_decl_info;
-# 1438
+#line 1438
 _ZN3edg22a_decl_sequence_numberE last_label_decl_seq;
-# 1445
+#line 1445
 _ZN3edg22a_decl_sequence_numberE exception_spec_decl_seq;
-# 1451
+#line 1451
 _ZN3edg22a_decl_sequence_numberE decl_seq_for_lookup;
 
 
 
 _ZN3edg21a_pending_pragma_listE *pending_pragmas;
-# 1461
+#line 1461
 _ZN3edg21a_pending_pragma_listE *curr_construct_pragmas;
-# 1467
+#line 1467
 _ZN3edg13a_scope_depthE next_scope_that_affects_access_control;
-# 1475
+#line 1475
 _ZN3edg13a_scope_depthE orig_access_depth;
-# 1483
+#line 1483
 _ZN3edg25an_access_error_descr_ptrE deferred_access_checks;
-# 1489
+#line 1489
 _ZN3edg25an_access_error_descr_ptrE last_deferred_access_check;
 
 
 _ZN3edg13a_scope_depthE saved_curr_deferred_access_scope;
-# 1498
+#line 1498
 struct _ZN3edg19an_expr_stack_entryE *saved_expr_stack;
 
 
@@ -8218,13 +8157,13 @@ _ZN3edg22an_object_lifetime_ptrE object_lifetime_avail_list;
 
 
 _ZN3edg12a_symbol_ptrE templ_member_class_sym;
-# 1524
+#line 1524
 _ZN3edg13a_scope_depthE depth_innermost_namespace_scope;
 
 
 
 long num_of_extra_times_pushed;
-# 1539
+#line 1539
 _ZN3edg29an_active_using_directive_ptrE active_using_directives;
 
 
@@ -8236,7 +8175,7 @@ _ZN3edg29an_active_using_directive_ptrE using_directives_that_apply_here;
 
 
 _ZN3edg13a_scope_depthE previous_scope;
-# 1555
+#line 1555
 _ZN3edg13a_scope_depthE instantiation_context_depth;
 
 
@@ -8258,48 +8197,48 @@ uint32_t empty_contexts_pushed;
 
 
 _ZN3edg13a_scope_depthE orig_depth;
-# 1581
+#line 1581
 _ZN3edg13a_scope_depthE saved_innermost_scope_that_affects_access;
-# 1592
+#line 1592
 _ZN3edg29a_template_cache_segment_listE *template_cache_segment_list;
-# 1599
+#line 1599
 struct _ZN3edg17a_class_def_stateE *class_def_state;
-# 1605
+#line 1605
 _ZN3edg33a_name_hidden_by_old_for_init_ptrE names_hidden_by_old_for_init;
-# 1614
+#line 1614
 struct _ZN3edg17a_tmpl_decl_stateE *tmpl_decl_state;
 
 
 
 
 struct _ZN3edg18a_decl_parse_stateE *decl_parse_state;
-# 1630
+#line 1630
 unsigned long pending_templ_arg_lists;
-# 1637
+#line 1637
 _ZN3edg28a_nondependent_call_info_ptrE next_nondependent_call;
-# 1645
+#line 1645
 _ZN3edg26a_pack_expansion_descr_ptrE last_pack_expansion_used;
-# 1654
+#line 1654
 _ZN3edg26a_pack_expansion_descr_ptrE saved_last_pack_expansion_used;
-# 1662
+#line 1662
 _ZN3edg20a_pack_reference_ptrE packs_referenced;
-# 1671
+#line 1671
 _ZN3edg32a_pack_expansion_stack_entry_ptrE pack_expansion_stack;
 
 
 
 _ZN3edg10a_type_ptrE conversion_parent_type;
-# 1697
+#line 1697
 union _ZN3edg19a_scope_stack_entryUt_E name_discr;
 
 _ZN3edg15a_discriminatorE last_closure_type_number;
-# 1706
+#line 1706
 _ZN3edg26a_string_literal_table_ptrE string_literal_table;
-# 1712
+#line 1712
 unsigned long string_literal_sequence_number;
-# 1719
+#line 1719
 unsigned char ELF_visibility;
-# 1726
+#line 1726
 _ZN3edg20a_class_fixup_headerE class_fixup_header;
 
 
@@ -8314,13 +8253,13 @@ _ZN3edg10a_type_ptrE orig_return_type;
 
 
 _ZN3edg23a_token_sequence_numberE var_templ_decl_name_tsn;
-# 1745
+#line 1745
 _ZN3edg23an_il_entity_list_entryE *injections;};
-# 2326 "src/symbol_tbl.h"
+#line 2326 "src/symbol_tbl.h"
 typedef struct _ZN3edg25an_exported_template_fileE *_ZN3edg29an_exported_template_file_ptrE;
-# 25 "src/trans_unit.h"
+#line 25 "src/trans_unit.h"
 typedef struct _ZN3edg18a_based_type_fixupE *_ZN3edg22a_based_type_fixup_ptrE;
-# 39
+#line 39
 struct _ZN3edg18a_translation_unitE {
 
 _ZN3edg22a_translation_unit_ptrE next;
@@ -8334,18 +8273,18 @@ _ZN3edg10a_void_ptrE variables_block;
 
 
 _ZN3edg22a_scope_pointers_blockE file_scope_pointers_block;
-# 58
+#line 58
 _ZN3edg17a_source_file_ptrE source_file;
 
 
 _ZN3edg12an_il_headerE il_header;
-# 68
+#line 68
 _ZN3edg32a_scope_orphaned_list_header_ptrE last_scope_orphaned_list_header;
-# 78
+#line 78
 _ZN3edg22a_based_type_fixup_ptrE based_type_fixup_list;
-# 86
+#line 86
 _ZN3edg29an_exported_template_file_ptrE exported_template_file;
-# 97
+#line 97
 _ZN3edg25an_orphaned_il_entry_listE *orphaned_file_scope_il_entries;
 
 
@@ -8357,7 +8296,7 @@ _ZN3edg14a_byte_booleanE specified_on_command_line;
 
 
 _ZN3edg14a_byte_booleanE additional_instantiation_wrapup_required;
-# 113
+#line 113
 char **module_id_ptr;
 
 
@@ -8369,11 +8308,11 @@ _ZN3edg22a_memory_region_numberE file_scope_region_number;
 
 
 _ZN3edg15a_namespace_ptrE individuated_namespace;};
-# 197
+#line 197
 typedef struct _ZN3edg20a_trans_unit_correspE *_ZN3edg24a_trans_unit_corresp_ptrE;
 struct _ZN3edg20a_trans_unit_correspE {
 char *canonical;
-# 207
+#line 207
 char *primary;
 
 
@@ -8381,46 +8320,46 @@ unsigned count;
 
 
 unsigned char kind;char __dummy[3];};
-# 178 "src/il_walk.h"
+#line 178 "src/il_walk.h"
 typedef void _ZN3edg30a_type_list_processing_routineE(_ZN3edg10a_type_ptrE type_list);
 typedef _ZN3edg30a_type_list_processing_routineE *_ZN3edg34a_type_list_processing_routine_ptrE;
-# 3759 "src/host_envir.h"
+#line 3759 "src/host_envir.h"
 extern void _ZN3edg13write_signoffEv(void);
-# 3920
+#line 3920
 extern _ZN3edg12a_const_charE *_ZN3edg14make_module_idEPKc(_ZN3edg12a_const_charE *external_name);
-# 22 "src/checking.h"
-extern __attribute__((__noreturn__)) void _ZN3edg16assertion_failedEPKciS1_S1_S1_(_ZN3edg12a_const_charE *filename, int line_number, _ZN3edg12a_const_charE *function, _ZN3edg12a_const_charE *string1, _ZN3edg12a_const_charE *string2);
-# 361 "src/error.h"
+#line 22 "src/checking.h"
+extern void _ZN3edg16assertion_failedEPKciS1_S1_S1_(_ZN3edg12a_const_charE *filename, int line_number, _ZN3edg12a_const_charE *function, _ZN3edg12a_const_charE *string1, _ZN3edg12a_const_charE *string2);
+#line 361 "src/error.h"
 extern void _ZN3edg21check_expected_errorsEv(void);
-# 425
+#line 425
 extern void _ZN3edg21clear_file_index_listEv(void);
-# 810
+#line 810
 extern void _ZN3edg37close_output_file_with_error_handlingEPP8_IO_FILENS_13an_error_codeE(FILE **f_output, enum _ZN3edg13an_error_codeE file_kind);
-# 856 "src/il.h"
+#line 856 "src/il.h"
 extern _ZN3edg9a_booleanE _ZN3edg15type_is_nonrealEPNS_6a_typeE(_ZN3edg10a_type_ptrE type);
-# 1614
+#line 1614
 extern void _ZN3edg19do_based_type_fixupEv(void);
-# 2393
+#line 2393
 extern void _ZN3edg31empty_shareable_constants_tableEv(void);
-# 3283
+#line 3283
 extern _ZN3edg9a_booleanE _ZN3edg23has_nonreal_parent_typeEPNS_23a_source_correspondenceE(_ZN3edg23a_source_correspondenceE *scp);
-# 3400
+#line 3400
 extern _ZN3edg9a_booleanE _ZN3edg24pop_object_lifetime_fullEb(_ZN3edg9a_booleanE unbound_okay);
-# 4175
+#line 4175
 extern void _ZN3edg38eliminate_bodies_of_unneeded_functionsEv(void);
-# 4188
+#line 4188
 extern void _ZN3edg29eliminate_unneeded_il_entriesEPNS_7a_scopeE(_ZN3edg11a_scope_ptrE scope);
-# 4208
+#line 4208
 extern _ZN3edg9a_booleanE _ZN3edg53routine_should_be_externalized_for_exported_templatesEPNS_9a_routineE(_ZN3edg13a_routine_ptrE rout);
 
 extern _ZN3edg9a_booleanE _ZN3edg54variable_should_be_externalized_for_exported_templatesEPNS_10a_variableE(_ZN3edg14a_variable_ptrE var);
-# 4304
+#line 4304
 extern void _ZN3edg31fix_type_list_ordering_problemsEv(void);
-# 4347
+#line 4347
 extern void _ZN3edg49clear_instantiation_required_on_unneeded_entitiesEPNS_7a_scopeE(_ZN3edg11a_scope_ptrE scope);
-# 87 "src/il_alloc.h"
+#line 87 "src/il_alloc.h"
 extern void _ZN3edg24check_local_constant_useEv(void);
-# 494 "src/mem_manage.h"
+#line 494 "src/mem_manage.h"
 extern void _ZN3edg33check_for_done_with_memory_regionEi(_ZN3edg22a_memory_region_numberE region_number);
 
 
@@ -8430,75 +8369,75 @@ extern void _ZN3edg47check_for_done_with_all_function_memory_regionsEv(void);
 extern void _ZN3edg18free_memory_regionEi(_ZN3edg22a_memory_region_numberE region_number);
 
 extern void _ZN3edg23free_all_memory_regionsEv(void);
-# 5030 "src/lexical.h"
+#line 5030 "src/lexical.h"
 extern void _ZN3edg38check_all_stop_token_entries_are_resetEPh(_ZN3edg25a_token_set_array_elementE *stop_tokens);
-# 5042
+#line 5042
 extern void _ZN3edg25lexical_trans_unit_wrapupEv(void);
-# 2343 "src/scope_stk.h"
+#line 2343 "src/scope_stk.h"
 extern void _ZN3edg15push_file_scopeEb(_ZN3edg9a_booleanE is_reactivation);
-# 2456
+#line 2456
 extern void _ZN3edg43finish_function_processing_for_function_defEib(_ZN3edg21a_function_def_numberE n, _ZN3edg9a_booleanE only_inline);
 
 
 
 
 extern void _ZN3edg9pop_scopeEv(void);
-# 2536
+#line 2536
 extern void _ZN3edg37set_needed_flags_at_end_of_file_scopeEPNS_7a_scopeE(_ZN3edg11a_scope_ptrE scope);
-# 2547
+#line 2547
 extern void _ZN3edg23wrapup_namespace_scopesEPNS_7a_scopeE(_ZN3edg11a_scope_ptrE scope_ptr);
 
 
 extern void _ZN3edg12wrapup_scopeEPNS_7a_scopeENS_12a_scope_kindEPNS_22a_scope_pointers_blockEbbi(_ZN3edg11a_scope_ptrE scope_ptr, unsigned char kind, _ZN3edg26a_scope_pointers_block_ptrE pointers_block, _ZN3edg9a_booleanE is_namespace_wrapup, _ZN3edg9a_booleanE is_local_reactivation, 
-# 2550
+#line 2550
 _ZN3edg24a_push_scope_options_setE options);
-# 2772
+#line 2772
 extern void _ZN3edg37lower_functions_waiting_for_module_idEv(void);
-# 7767 "src/symbol_tbl.h"
+#line 7767 "src/symbol_tbl.h"
 extern void _ZN3edg18show_top_templatesEj(unsigned n);
-# 74 "src/ms_metadata.h"
+#line 74 "src/ms_metadata.h"
 extern void _ZN3edg29ms_metadata_trans_unit_wrapupEv(void);
 extern void _ZN3edg19ms_metadata_cleanupEv(void);
-# 223 "src/trans_unit.h"
+#line 223 "src/trans_unit.h"
 extern void _ZN3edg23switch_translation_unitEPNS_18a_translation_unitE(_ZN3edg22a_translation_unit_ptrE tup);
-# 292
+#line 292
 extern _ZN3edg24a_trans_unit_corresp_ptrE _ZN3edg24alloc_trans_unit_correspEv(void);
-# 254 "src/trans_corresp.h"
+#line 254 "src/trans_corresp.h"
 extern void _ZN3edg30set_trans_unit_correspondencesEv(void);
-# 872 "src/modules.h"
+#line 872 "src/modules.h"
 extern void _ZN3edg35modules_check_for_suppressed_errorsEv(void);
-# 882
+#line 882
 extern void _ZN3edg32modules_trans_unit_wrapup_part_1Ev(void);
 
 extern void _ZN3edg32modules_trans_unit_wrapup_part_2Ev(void);
-# 388 "src/class_decl.h"
+#line 388 "src/class_decl.h"
 extern void _ZN3edg19check_class_linkageEv(void);
-# 425 "src/interpret.h"
+#line 425 "src/interpret.h"
 extern void _ZN3edg20clean_up_interpreterEv(void);
-# 179 "src/macro.h"
+#line 179 "src/macro.h"
 extern void _ZN3edg35gen_pp_output_for_macro_definitionsEv(void);
-# 1311 "src/templates.h"
+#line 1311 "src/templates.h"
 extern void _ZN3edg31set_master_instance_informationEv(void);
-# 1319
+#line 1319
 extern void _ZN3edg33template_and_inline_entity_wrapupEv(void);
 
 extern void _ZN3edg30remove_unneeded_instantiationsEv(void);
-# 1327
+#line 1327
 extern void _ZN3edg27add_to_inline_function_listEPNS_9a_routineE(_ZN3edg13a_routine_ptrE rout_ptr);
-# 1386
+#line 1386
 extern void _ZN3edg37wrapup_auto_instantiation_informationEv(void);
 extern void _ZN3edg31update_auto_instantiation_flagsEv(void);
 extern void _ZN3edg26update_inline_entity_flagsEv(void);
-# 23 "src/trans_copy.h"
+#line 23 "src/trans_copy.h"
 extern void _ZN3edg39copy_secondary_trans_unit_IL_to_primaryEv(void);
 
 
 extern void _ZN3edg65mark_secondary_trans_unit_IL_entities_used_from_primary_as_neededEv(void);
-# 275 "src/pch.h"
+#line 275 "src/pch.h"
 extern void _ZN3edg29check_create_pch_file_createdEv(void);
-# 892 "src/lower_il.h"
+#line 892 "src/lower_il.h"
 extern _ZN3edg9a_booleanE _ZN3edg18il_lowering_neededEv(void);
-# 1352
+#line 1352
 extern void _ZN3edg33externalize_source_correspondenceEPNS_23a_source_correspondenceEb(_ZN3edg23a_source_correspondenceE *scp, _ZN3edg9a_booleanE is_variable);
 
 
@@ -8508,91 +8447,91 @@ extern void _ZN3edg52make_statics_referenced_from_instantiations_externalEv(void
 
 
 extern void _ZN3edg16lower_file_scopeEv(void);
-# 1367
+#line 1367
 extern void _ZN3edg29clean_up_all_object_lifetimesEPNS_7a_scopeE(_ZN3edg11a_scope_ptrE scope);
-# 1389
+#line 1389
 extern void _ZN3edg24clear_parent_informationEv(void);
-# 140 "src/lower_name.h"
+#line 140 "src/lower_name.h"
 extern void _ZN3edg20do_all_name_manglingEb(_ZN3edg9a_booleanE mangling_pre_pass);
 
 extern void _ZN3edg22do_final_name_manglingEv(void);
-# 113 "src/il_walk.h"
+#line 113 "src/il_walk.h"
 extern void _ZN3edg14mark_as_neededEPcNS_16an_il_entry_kindE(char *entry_ptr, unsigned char entry_kind);
-# 124
+#line 124
 extern void _ZN3edg18mark_to_keep_in_ilEPcNS_16an_il_entry_kindE(char *entry_ptr, unsigned char entry_kind);
-# 181
+#line 181
 extern void _ZN3edg19process_local_typesEPNS_7a_scopeEPFvPNS_6a_typeEE(_ZN3edg11a_scope_ptrE scope, _ZN3edg34a_type_list_processing_routine_ptrE list_processing_routine);
-# 30 "src/il_display.h"
+#line 30 "src/il_display.h"
 extern void _ZN3edg13do_il_displayEPc(char *filename);
-# 95 "src/fe_wrapup.c"
+#line 95 "src/fe_wrapup.c"
 extern void _ZN3edg23translation_unit_wrapupEv(void);
-# 158
+#line 158
 static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg41externalize_entity_for_exported_templatesEPNS0_23a_source_correspondenceENS0_16an_il_entry_kindE(_ZN3edg23a_source_correspondenceE *scp, unsigned char kind);
-# 227
+#line 227
 static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg52externalize_type_list_statics_for_exported_templatesEPNS0_6a_typeE(_ZN3edg10a_type_ptrE type_list);
-# 248
+#line 248
 static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg42externalize_statics_for_exported_templatesEPNS0_7a_scopeE(_ZN3edg11a_scope_ptrE scope);
-# 291
+#line 291
 static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg26reset_template_parent_infoEPNS0_7a_scopeE(_ZN3edg11a_scope_ptrE il_scope);
-# 311
+#line 311
 static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg27file_scope_il_wrapup_part_1Ev(void);
-# 390
+#line 390
 static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg43file_scope_il_wrapup_needed_flag_processingEv(void);
-# 429
+#line 429
 static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg42file_scope_il_wrapup_keep_in_il_processingEv(void);
-# 449
+#line 449
 static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg39file_scope_il_wrapup_remove_unneeded_ilEv(void);
-# 477
+#line 477
 static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg27file_scope_il_wrapup_part_2Ev(void);
-# 520
+#line 520
 static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg27file_scope_il_wrapup_part_3Ev(void);
-# 644
+#line 644
 static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg37finish_processing_for_function_bodiesEv(void);
-# 672
+#line 672
 static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg19wrap_up_file_scopesEv(void);
-# 749
+#line 749
 extern void _ZN3edg9fe_wrapupEv(void);
-# 865
-extern void _ZN3edg16fe_wrapup_part_2Ev(void); static const char __T154857936[42]; static const char __T154863760[43]; static const char __T154877168[28]; static const char __T154885240[10];
-# 1084 "src/basics.h"
+#line 865
+extern void _ZN3edg16fe_wrapup_part_2Ev(void); static const char __T601471232[42]; static const char __T601476832[43]; static const char __T602100944[28]; static const char __T602109016[10];
+#line 1084 "src/basics.h"
 extern enum _ZN3edg11a_C_dialectE _ZN3edg9C_dialectE;
-# 1341 "src/lang_feat.h"
+#line 1341 "src/lang_feat.h"
 extern _ZN3edg9a_booleanE _ZN3edg17cli_or_cx_enabledE;
-# 4209 "src/host_envir.h"
+#line 4209 "src/host_envir.h"
 extern _ZN3edg9a_booleanE _ZN3edg30prototype_instantiations_in_ilE;
-# 4220
+#line 4220
 extern _ZN3edg9a_booleanE _ZN3edg12in_front_endE;
-# 158 "src/error.h"
+#line 158 "src/error.h"
 extern struct _ZN3edg24a_diagnostic_counter_setE _ZN3edg19diagnostic_countersE;
-# 49 "src/mem_tables.h"
+#line 49 "src/mem_tables.h"
 extern _ZN3edg22a_memory_region_numberE _ZN3edg24file_scope_region_numberE;
-# 455
+#line 455
 extern _ZN3edg22a_mem_block_header_ptrE *_ZN3edg16mem_region_tableE;
-# 464
+#line 464
 extern _ZN3edg22a_memory_region_numberE _ZN3edg26highest_used_region_numberE;
-# 472
+#line 472
 extern _ZN3edg21a_function_def_numberE _ZN3edg32highest_used_function_def_numberE;
-# 19117 "src/il_def.h"
+#line 19117 "src/il_def.h"
 extern _ZN3edg12an_il_headerE _ZN3edg9il_headerE;
-# 486 "src/il.h"
+#line 486 "src/il.h"
 extern _ZN3edg9a_booleanE _ZN3edg37okay_to_eliminate_unneeded_il_entriesE;
-# 3342
+#line 3342
 extern _ZN3edg22an_object_lifetime_ptrE _ZN3edg20curr_object_lifetimeE;
-# 1122 "src/target.h"
+#line 1122 "src/target.h"
 extern _ZN3edg9a_booleanE _ZN3edg25instantiate_extern_inlineE;
-# 3222 "src/lexical.h"
+#line 3222 "src/lexical.h"
 extern _ZN3edg28a_stop_token_stack_entry_ptrE _ZN3edg27curr_stop_token_stack_entryE;
-# 1751 "src/scope_stk.h"
+#line 1751 "src/scope_stk.h"
 extern _ZN3edg23a_scope_stack_entry_ptrE _ZN3edg11scope_stackE;
-# 1761
+#line 1761
 extern _ZN3edg13a_scope_depthE _ZN3edg17depth_scope_stackE;
-# 2299
+#line 2299
 extern _ZN3edg9a_booleanE _ZN3edg59function_body_processing_delayed_on_some_func_in_primary_ilE;
-# 7754 "src/symbol_tbl.h"
+#line 7754 "src/symbol_tbl.h"
 extern _ZN3edg9a_booleanE _ZN3edg21collect_top_templatesE;
-# 7760
+#line 7760
 extern unsigned _ZN3edg19top_templates_countE;
-# 401 "src/cmd_line.h"
+#line 401 "src/cmd_line.h"
 extern _ZN3edg9a_booleanE _ZN3edg15cfront_2_1_modeE;
 
 
@@ -8603,49 +8542,49 @@ extern _ZN3edg9a_booleanE _ZN3edg15cfront_3_0_modeE;
 
 
 extern _ZN3edg9a_booleanE _ZN3edg20trans_unit_test_modeE;
-# 446
+#line 446
 extern _ZN3edg9a_booleanE _ZN3edg21do_preprocessing_onlyE;
-# 477
+#line 477
 extern FILE *_ZN3edg11f_pp_outputE;
-# 495
+#line 495
 extern _ZN3edg9a_booleanE _ZN3edg22list_macro_definitionsE;
 
 
 
 extern FILE *_ZN3edg13f_raw_listingE;
-# 505
+#line 505
 extern FILE *_ZN3edg11f_xref_infoE;
-# 517
+#line 517
 extern _ZN3edg9a_booleanE _ZN3edg20suppress_il_loweringE;
 
 
 
 
 extern _ZN3edg9a_booleanE _ZN3edg10il_displayE;
-# 1274
+#line 1274
 extern enum _ZN3edg29a_template_instantiation_modeE _ZN3edg18instantiation_modeE;
-# 2293
+#line 2293
 extern _ZN3edg9a_booleanE _ZN3edg28one_instantiation_per_objectE;
-# 239 "src/trans_unit.h"
+#line 239 "src/trans_unit.h"
 extern _ZN3edg22a_translation_unit_ptrE _ZN3edg21curr_translation_unitE;
-# 246
+#line 246
 extern _ZN3edg9a_booleanE _ZN3edg27is_primary_translation_unitE;
-# 270
+#line 270
 extern _ZN3edg22a_translation_unit_ptrE _ZN3edg17translation_unitsE;
-# 1421 "src/templates.h"
+#line 1421 "src/templates.h"
 extern _ZN3edg23a_symbol_list_entry_ptrE _ZN3edg23exported_templates_listE;
-# 77 "src/lower_il.h"
+#line 77 "src/lower_il.h"
 extern _ZN3edg9a_booleanE _ZN3edg26perform_type_list_orderingE;
-# 140 "src/il_walk.h"
-extern _ZN3edg9a_booleanE _ZN3edg36end_of_file_scope_needed_flags_phaseE; static const char __T154857936[42] = "externalize_entity_for_exported_templates"; static const char __T154863760[43] = "externalize_statics_for_exported_templates"; static const char __T154877168[28] = "file_scope_il_wrapup_part_3"
-# 140
-; static const char __T154885240[10] = "fe_wrapup";
-# 95 "src/fe_wrapup.c"
+#line 140 "src/il_walk.h"
+extern _ZN3edg9a_booleanE _ZN3edg36end_of_file_scope_needed_flags_phaseE; static const char __T601471232[42] = "externalize_entity_for_exported_templates"; static const char __T601476832[43] = "externalize_statics_for_exported_templates"; static const char __T602100944[28] = "file_scope_il_wrapup_part_3"
+#line 140
+; static const char __T602109016[10] = "fe_wrapup";
+#line 95 "src/fe_wrapup.c"
 void _ZN3edg23translation_unit_wrapupEv(void)
-# 102
+#line 102
 {
 ;
-# 110
+#line 110
 _ZN3edg38check_all_stop_token_entries_are_resetEPh(((_ZN3edg27curr_stop_token_stack_entryE->stop_tokens)));
 
 
@@ -8667,7 +8606,7 @@ _ZN3edg15push_file_scopeEb(((_ZN3edg9a_booleanE)1));
 if (!(_ZN3edg21do_preprocessing_onlyE)) {
 _ZN3edg30set_trans_unit_correspondencesEv();
 }
-# 137
+#line 137
 _ZN3edg14make_module_idEPKc(((_ZN3edg12a_const_charE *)0));
 
 
@@ -8690,149 +8629,149 @@ _ZN3edg29check_create_pch_file_createdEv();
 
 
 static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg41externalize_entity_for_exported_templatesEPNS0_23a_source_correspondenceENS0_16an_il_entry_kindE(
-_ZN3edg23a_source_correspondenceE *__160235_76_scp, 
-unsigned char __160236_75_kind)
+_ZN3edg23a_source_correspondenceE *__148828_76_scp, 
+unsigned char __148829_75_kind)
 
 
 
 
 {
-auto _ZN3edg9a_booleanE __160242_28_is_variable;
-auto _ZN3edg14a_variable_ptrE __160243_28_var;
-auto _ZN3edg13a_routine_ptrE __160244_28_rout = ((_ZN3edg13a_routine_ptrE)0);
-auto _ZN3edg24a_trans_unit_corresp_ptrE __160245_28_tucp;
-# 166
-__160242_28_is_variable = ((_Bool)(((int)__160236_75_kind) == 7));
-# 177
-_ZN3edg33externalize_source_correspondenceEPNS_23a_source_correspondenceEb(__160235_76_scp, __160242_28_is_variable);
-if (__160242_28_is_variable) {
-__160243_28_var = ((_ZN3edg14a_variable_ptrE)__160235_76_scp);
-(__160243_28_var->storage_class) = _ZN3edg14sc_unspecifiedE;
+auto _ZN3edg9a_booleanE __148835_28_is_variable;
+auto _ZN3edg14a_variable_ptrE __148836_28_var;
+auto _ZN3edg13a_routine_ptrE __148837_28_rout = ((_ZN3edg13a_routine_ptrE)0);
+auto _ZN3edg24a_trans_unit_corresp_ptrE __148838_28_tucp;
+#line 166
+__148835_28_is_variable = ((_Bool)(((int)__148829_75_kind) == 7));
+#line 177
+_ZN3edg33externalize_source_correspondenceEPNS_23a_source_correspondenceEb(__148828_76_scp, __148835_28_is_variable);
+if (__148835_28_is_variable) {
+__148836_28_var = ((_ZN3edg14a_variable_ptrE)__148828_76_scp);
+(__148836_28_var->storage_class) = _ZN3edg14sc_unspecifiedE;
 } else  {
-(((int)__160236_75_kind) == 11) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_wrapup.c"), 182, __T154857936, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-__160244_28_rout = ((_ZN3edg13a_routine_ptrE)__160235_76_scp);
-(__160244_28_rout->storage_class) = _ZN3edg14sc_unspecifiedE;
+(((int)__148829_75_kind) == 11) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_wrapup.c"), 182, __T601471232, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+__148837_28_rout = ((_ZN3edg13a_routine_ptrE)__148828_76_scp);
+(__148837_28_rout->storage_class) = _ZN3edg14sc_unspecifiedE;
 }
 
 
-__160245_28_tucp = (_ZN3edg24alloc_trans_unit_correspEv());
-(__160245_28_tucp->kind) = __160236_75_kind;
-(__160245_28_tucp->canonical) = ((char *)__160235_76_scp);
-if (!(((_ZN3edg22an_il_entry_prefix_ptrE)(((char *)__160235_76_scp) - 8UL))->secondary_trans_unit)) { (__160245_28_tucp->primary) = ((char *)__160235_76_scp); }
-(__160235_76_scp->trans_unit_corresp) = __160245_28_tucp;
-if (!(__160242_28_is_variable)) {
+__148838_28_tucp = (_ZN3edg24alloc_trans_unit_correspEv());
+(__148838_28_tucp->kind) = __148829_75_kind;
+(__148838_28_tucp->canonical) = ((char *)__148828_76_scp);
+if (!(((_ZN3edg22an_il_entry_prefix_ptrE)(((char *)__148828_76_scp) - 8ULL))->secondary_trans_unit)) { (__148838_28_tucp->primary) = ((char *)__148828_76_scp); }
+(__148828_76_scp->trans_unit_corresp) = __148838_28_tucp;
+if (!(__148835_28_is_variable)) {
 
-auto _ZN3edg9a_booleanE __160271_15_is_template; __160271_15_is_template = ((_Bool)((__160244_28_rout->is_template_function) && (!(__160244_28_rout->is_specialized))));
+auto _ZN3edg9a_booleanE __148864_15_is_template; __148864_15_is_template = ((_Bool)((__148837_28_rout->is_template_function) && (!(__148837_28_rout->is_specialized))));
 
-if ((!(__160244_28_rout->is_inline)) && (!(__160271_15_is_template))) {
-
-
-} else  {
-
-
-if ((!(__160244_28_rout->is_inline)) && (__160271_15_is_template)) {
+if ((!(__148837_28_rout->is_inline)) && (!(__148864_15_is_template))) {
 
 
 } else  {
 
-(__160244_28_rout->is_inline) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_wrapup.c"), 208, __T154857936, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-if (((_ZN3edg25instantiate_extern_inlineE) && (!(__160244_28_rout->is_consteval))) && (!(__160244_28_rout->on_inline_function_list)))
+
+if ((!(__148837_28_rout->is_inline)) && (__148864_15_is_template)) {
+
+
+} else  {
+
+(__148837_28_rout->is_inline) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_wrapup.c"), 208, __T601471232, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+if (((_ZN3edg25instantiate_extern_inlineE) && (!(__148837_28_rout->is_consteval))) && (!(__148837_28_rout->on_inline_function_list)))
 {
 
 
-_ZN3edg27add_to_inline_function_listEPNS_9a_routineE(__160244_28_rout);
+_ZN3edg27add_to_inline_function_listEPNS_9a_routineE(__148837_28_rout);
 }
 }
 }
 }
 
-_ZN3edg14mark_as_neededEPcNS_16an_il_entry_kindE(((char *)__160235_76_scp), __160236_75_kind); 
+_ZN3edg14mark_as_neededEPcNS_16an_il_entry_kindE(((char *)__148828_76_scp), __148829_75_kind); 
 
 }
-# 227
+#line 227
 static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg52externalize_type_list_statics_for_exported_templatesEPNS0_6a_typeE(
-_ZN3edg10a_type_ptrE __160304_70_type_list)
+_ZN3edg10a_type_ptrE __148897_70_type_list)
 
 
 
 
 {
-auto _ZN3edg10a_type_ptrE __160310_14_type;
+auto _ZN3edg10a_type_ptrE __148903_14_type;
 
-for (__160310_14_type = __160304_70_type_list; __160310_14_type != ((_ZN3edg10a_type_ptrE)0); __160310_14_type = (__160310_14_type->next)) {
-if ((((((int)(__160310_14_type->kind)) == 10) || (((int)(__160310_14_type->kind)) == 11)) || (((int)(__160310_14_type->kind)) == 12)) && (!(_ZN3edg15type_is_nonrealEPNS_6a_typeE(__160310_14_type)))) {
-auto _ZN3edg11a_scope_ptrE __160314_19_scope; __160314_19_scope = ((((__160310_14_type->variant).class_struct_union).extra_info)->assoc_scope);
+for (__148903_14_type = __148897_70_type_list; __148903_14_type != ((_ZN3edg10a_type_ptrE)0); __148903_14_type = (__148903_14_type->next)) {
+if ((((((int)(__148903_14_type->kind)) == 9) || (((int)(__148903_14_type->kind)) == 10)) || (((int)(__148903_14_type->kind)) == 11)) && (!(_ZN3edg15type_is_nonrealEPNS_6a_typeE(__148903_14_type)))) {
+auto _ZN3edg11a_scope_ptrE __148907_19_scope; __148907_19_scope = ((((__148903_14_type->variant).class_struct_union).extra_info)->assoc_scope);
 
-if (!((_Bool)((__160314_19_scope == ((_ZN3edg11a_scope_ptrE)0)) || (__160314_19_scope->is_placeholder_scope)))) {
-_ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg42externalize_statics_for_exported_templatesEPNS0_7a_scopeE(__160314_19_scope);
+if (!((_Bool)((__148907_19_scope == ((_ZN3edg11a_scope_ptrE)0)) || (__148907_19_scope->is_placeholder_scope)))) {
+_ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg42externalize_statics_for_exported_templatesEPNS0_7a_scopeE(__148907_19_scope);
 }
 }
 } 
 }
 
 
-static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg42externalize_statics_for_exported_templatesEPNS0_7a_scopeE( _ZN3edg11a_scope_ptrE __160324_68_scope)
-# 254
+static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg42externalize_statics_for_exported_templatesEPNS0_7a_scopeE( _ZN3edg11a_scope_ptrE __148917_68_scope)
+#line 254
 {
-auto _ZN3edg13a_routine_ptrE __160331_19_rout;
-auto _ZN3edg14a_variable_ptrE __160332_19_var;
-auto _ZN3edg15a_namespace_ptrE __160333_19_nsp;
+auto _ZN3edg13a_routine_ptrE __148924_19_rout;
+auto _ZN3edg14a_variable_ptrE __148925_19_var;
+auto _ZN3edg15a_namespace_ptrE __148926_19_nsp;
 
-(((((int)(__160324_68_scope->kind)) == 0) || (((int)(__160324_68_scope->kind)) == 3)) || (((int)(__160324_68_scope->kind)) == 6)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_wrapup.c"
-# 259
-), 261, __T154863760, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(((((int)(__148917_68_scope->kind)) == 0) || (((int)(__148917_68_scope->kind)) == 3)) || (((int)(__148917_68_scope->kind)) == 6)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_wrapup.c"
+#line 259
+), 261, __T601476832, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
 
-_ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg52externalize_type_list_statics_for_exported_templatesEPNS0_6a_typeE((__160324_68_scope->types));
-for (__160331_19_rout = (__160324_68_scope->routines); __160331_19_rout != ((_ZN3edg13a_routine_ptrE)0); __160331_19_rout = (__160331_19_rout->next)) {
-if ((!(((__160331_19_rout->is_prototype_instantiation) || (((int)(__160331_19_rout->special_kind)) == 7)) || (__160331_19_rout->is_consteval))) && (_ZN3edg53routine_should_be_externalized_for_exported_templatesEPNS_9a_routineE(__160331_19_rout)))
+_ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg52externalize_type_list_statics_for_exported_templatesEPNS0_6a_typeE((__148917_68_scope->types));
+for (__148924_19_rout = (__148917_68_scope->routines); __148924_19_rout != ((_ZN3edg13a_routine_ptrE)0); __148924_19_rout = (__148924_19_rout->next)) {
+if ((!(((__148924_19_rout->is_prototype_instantiation) || (((int)(__148924_19_rout->special_kind)) == 7)) || (__148924_19_rout->is_consteval))) && (_ZN3edg53routine_should_be_externalized_for_exported_templatesEPNS_9a_routineE(__148924_19_rout)))
 {
-_ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg41externalize_entity_for_exported_templatesEPNS0_23a_source_correspondenceENS0_16an_il_entry_kindE((&(__160331_19_rout->source_corresp)), _ZN3edg11iek_routineE);
+_ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg41externalize_entity_for_exported_templatesEPNS0_23a_source_correspondenceENS0_16an_il_entry_kindE((&(__148924_19_rout->source_corresp)), _ZN3edg11iek_routineE);
 
 }
 }
-for (__160332_19_var = (__160324_68_scope->variables); __160332_19_var != ((_ZN3edg14a_variable_ptrE)0); __160332_19_var = (__160332_19_var->next)) {
-if ((!(((__160332_19_var->is_prototype_instantiation) || (__160332_19_var->is_nonreal)) || (((int)(__160332_19_var->init_kind)) == 5))) && (_ZN3edg54variable_should_be_externalized_for_exported_templatesEPNS_10a_variableE(__160332_19_var)))
+for (__148925_19_var = (__148917_68_scope->variables); __148925_19_var != ((_ZN3edg14a_variable_ptrE)0); __148925_19_var = (__148925_19_var->next)) {
+if ((!(((__148925_19_var->is_prototype_instantiation) || (__148925_19_var->is_nonreal)) || (((int)(__148925_19_var->init_kind)) == 5))) && (_ZN3edg54variable_should_be_externalized_for_exported_templatesEPNS_10a_variableE(__148925_19_var)))
 {
-_ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg41externalize_entity_for_exported_templatesEPNS0_23a_source_correspondenceENS0_16an_il_entry_kindE((&(__160332_19_var->source_corresp)), _ZN3edg12iek_variableE);
+_ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg41externalize_entity_for_exported_templatesEPNS0_23a_source_correspondenceENS0_16an_il_entry_kindE((&(__148925_19_var->source_corresp)), _ZN3edg12iek_variableE);
 
 }
 }
-for (__160333_19_nsp = (__160324_68_scope->namespaces); __160333_19_nsp != ((_ZN3edg15a_namespace_ptrE)0); __160333_19_nsp = (__160333_19_nsp->next)) {
-if (!(__160333_19_nsp->is_namespace_alias)) {
-_ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg42externalize_statics_for_exported_templatesEPNS0_7a_scopeE(((__160333_19_nsp->variant).assoc_scope));
+for (__148926_19_nsp = (__148917_68_scope->namespaces); __148926_19_nsp != ((_ZN3edg15a_namespace_ptrE)0); __148926_19_nsp = (__148926_19_nsp->next)) {
+if (!(__148926_19_nsp->is_namespace_alias)) {
+_ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg42externalize_statics_for_exported_templatesEPNS0_7a_scopeE(((__148926_19_nsp->variant).assoc_scope));
 }
 }
-if (((int)(__160324_68_scope->kind)) == 0) {
+if (((int)(__148917_68_scope->kind)) == 0) {
 
-_ZN3edg19process_local_typesEPNS_7a_scopeEPFvPNS_6a_typeEE(__160324_68_scope, (&_ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg52externalize_type_list_statics_for_exported_templatesEPNS0_6a_typeE));
+_ZN3edg19process_local_typesEPNS_7a_scopeEPFvPNS_6a_typeEE(__148917_68_scope, (&_ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg52externalize_type_list_statics_for_exported_templatesEPNS0_6a_typeE));
 
 } 
 }
 
 
 
-static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg26reset_template_parent_infoEPNS0_7a_scopeE( _ZN3edg11a_scope_ptrE __160367_52_il_scope)
-# 298
+static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg26reset_template_parent_infoEPNS0_7a_scopeE( _ZN3edg11a_scope_ptrE __148960_52_il_scope)
+#line 298
 {
-auto _ZN3edg14a_template_ptrE __160375_18_templ;
+auto _ZN3edg14a_template_ptrE __148968_18_templ;
 
-for (__160375_18_templ = (__160367_52_il_scope->templates); __160375_18_templ != ((_ZN3edg14a_template_ptrE)0); __160375_18_templ = (__160375_18_templ->next)) {
-if (((__160375_18_templ->source_corresp).is_class_member) && (_ZN3edg23has_nonreal_parent_typeEPNS_23a_source_correspondenceE((&(__160375_18_templ->source_corresp)))))
+for (__148968_18_templ = (__148960_52_il_scope->templates); __148968_18_templ != ((_ZN3edg14a_template_ptrE)0); __148968_18_templ = (__148968_18_templ->next)) {
+if (((__148968_18_templ->source_corresp).is_class_member) && (_ZN3edg23has_nonreal_parent_typeEPNS_23a_source_correspondenceE((&(__148968_18_templ->source_corresp)))))
 {
-((__160375_18_templ->source_corresp).parent_scope) = ((_ZN3edg11a_scope_ptrE)0);
-((__160375_18_templ->source_corresp).is_class_member) = 0U;
+((__148968_18_templ->source_corresp).parent_scope) = ((_ZN3edg11a_scope_ptrE)0);
+((__148968_18_templ->source_corresp).is_class_member) = 0U;
 }
 } 
 }
 
 
 static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg27file_scope_il_wrapup_part_1Ev(void)
-# 323
+#line 323
 {
-auto _ZN3edg11a_scope_ptrE __160400_15_il_scope;
+auto _ZN3edg11a_scope_ptrE __148993_15_il_scope;
 
-__160400_15_il_scope = (_ZN3edg21curr_translation_unitE->primary_scope);
+__148993_15_il_scope = (_ZN3edg21curr_translation_unitE->primary_scope);
 
 
 
@@ -8849,21 +8788,21 @@ _ZN3edg19check_class_linkageEv();
 }
 
 
-_ZN3edg12wrapup_scopeEPNS_7a_scopeENS_12a_scope_kindEPNS_22a_scope_pointers_blockEbbi(__160400_15_il_scope, _ZN3edg8sck_fileE, (&(_ZN3edg21curr_translation_unitE->file_scope_pointers_block)), ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)0), 0x0);
+_ZN3edg12wrapup_scopeEPNS_7a_scopeENS_12a_scope_kindEPNS_22a_scope_pointers_blockEbbi(__148993_15_il_scope, _ZN3edg8sck_fileE, (&(_ZN3edg21curr_translation_unitE->file_scope_pointers_block)), ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)0), 0x0);
 
 
 
-_ZN3edg23wrapup_namespace_scopesEPNS_7a_scopeE(__160400_15_il_scope);
+_ZN3edg23wrapup_namespace_scopesEPNS_7a_scopeE(__148993_15_il_scope);
 
 if (!(((int)_ZN3edg9C_dialectE) != 2)) {
-# 355
+#line 355
 _ZN3edg19do_based_type_fixupEv();
 }
 
 _ZN3edg32modules_trans_unit_wrapup_part_2Ev();
 
 if (_ZN3edg18il_lowering_neededEv()) {
-# 366
+#line 366
 _ZN3edg20do_all_name_manglingEb(((_ZN3edg9a_booleanE)0));
 
 if (_ZN3edg23exported_templates_listE != ((_ZN3edg23a_symbol_list_entry_ptrE)0)) {
@@ -8879,7 +8818,7 @@ if (!(((int)_ZN3edg9C_dialectE) != 2)) {
 if (!(_ZN3edg30prototype_instantiations_in_ilE)) {
 
 
-_ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg26reset_template_parent_infoEPNS0_7a_scopeE(__160400_15_il_scope);
+_ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg26reset_template_parent_infoEPNS0_7a_scopeE(__148993_15_il_scope);
 }
 }
 
@@ -8889,7 +8828,7 @@ _ZN3edg20clean_up_interpreterEv();
 
 
 static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg43file_scope_il_wrapup_needed_flag_processingEv(void)
-# 396
+#line 396
 {
 if (!((_Bool)(((_ZN3edg19diagnostic_countersE.total).errors) > 0UL))) {
 
@@ -8902,7 +8841,7 @@ _ZN3edg37set_needed_flags_at_end_of_file_scopeEPNS_7a_scopeE((_ZN3edg21curr_tran
 
 if (((_ZN3edg28one_instantiation_per_objectE) && (_ZN3edg27is_primary_translation_unitE)) && (_ZN3edg18il_lowering_neededEv()))
 {
-# 416
+#line 416
 _ZN3edg36end_of_file_scope_needed_flags_phaseE = ((_ZN3edg9a_booleanE)1);
 
 _ZN3edg52make_statics_referenced_from_instantiations_externalEv();
@@ -8923,13 +8862,13 @@ static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg42file_scope_il_wrapup_kee
 
 {
 
-auto _ZN3edg11a_scope_ptrE __160512_15_il_scope; __160512_15_il_scope = (_ZN3edg21curr_translation_unitE->primary_scope);
+auto _ZN3edg11a_scope_ptrE __149105_15_il_scope; __149105_15_il_scope = (_ZN3edg21curr_translation_unitE->primary_scope);
 
 if (!((_Bool)(((_ZN3edg19diagnostic_countersE.total).errors) > 0UL))) {
 
 
 _ZN3edg36end_of_file_scope_needed_flags_phaseE = ((_ZN3edg9a_booleanE)1);
-_ZN3edg18mark_to_keep_in_ilEPcNS_16an_il_entry_kindE(((char *)__160512_15_il_scope), _ZN3edg9iek_scopeE);
+_ZN3edg18mark_to_keep_in_ilEPcNS_16an_il_entry_kindE(((char *)__149105_15_il_scope), _ZN3edg9iek_scopeE);
 _ZN3edg36end_of_file_scope_needed_flags_phaseE = ((_ZN3edg9a_booleanE)0);
 } 
 
@@ -8943,14 +8882,14 @@ static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg39file_scope_il_wrapup_rem
 
 {
 
-auto _ZN3edg11a_scope_ptrE __160532_15_il_scope; __160532_15_il_scope = (_ZN3edg21curr_translation_unitE->primary_scope);
+auto _ZN3edg11a_scope_ptrE __149125_15_il_scope; __149125_15_il_scope = (_ZN3edg21curr_translation_unitE->primary_scope);
 
 
 if ((_Bool)(((_ZN3edg19diagnostic_countersE.total).errors) > 0UL)) { _ZN3edg37okay_to_eliminate_unneeded_il_entriesE = ((_ZN3edg9a_booleanE)0); }
 if ((!(((int)_ZN3edg9C_dialectE) != 2)) && (!((_Bool)(((_ZN3edg19diagnostic_countersE.total).errors) > 0UL)))) {
 
 
-_ZN3edg49clear_instantiation_required_on_unneeded_entitiesEPNS_7a_scopeE(__160532_15_il_scope);
+_ZN3edg49clear_instantiation_required_on_unneeded_entitiesEPNS_7a_scopeE(__149125_15_il_scope);
 }
 if (_ZN3edg37okay_to_eliminate_unneeded_il_entriesE) {
 
@@ -8958,34 +8897,34 @@ if (_ZN3edg37okay_to_eliminate_unneeded_il_entriesE) {
 _ZN3edg38eliminate_bodies_of_unneeded_functionsEv();
 
 
-_ZN3edg29eliminate_unneeded_il_entriesEPNS_7a_scopeE(__160532_15_il_scope);
+_ZN3edg29eliminate_unneeded_il_entriesEPNS_7a_scopeE(__149125_15_il_scope);
 } 
 
 }
 
 
 static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg27file_scope_il_wrapup_part_2Ev(void)
-# 483
+#line 483
 {
-auto _ZN3edg22a_translation_unit_ptrE __160560_26_tup;
-# 496
+auto _ZN3edg22a_translation_unit_ptrE __149153_26_tup;
+#line 496
 if (!((_Bool)(((_ZN3edg19diagnostic_countersE.total).errors) > 0UL))) {
 
 
 
 _ZN3edg65mark_secondary_trans_unit_IL_entities_used_from_primary_as_neededEv();
 }
-for (__160560_26_tup = (_ZN3edg17translation_unitsE->next); __160560_26_tup != ((_ZN3edg22a_translation_unit_ptrE)0); __160560_26_tup = (__160560_26_tup->next)) {
-_ZN3edg23switch_translation_unitEPNS_18a_translation_unitE(__160560_26_tup);
+for (__149153_26_tup = (_ZN3edg17translation_unitsE->next); __149153_26_tup != ((_ZN3edg22a_translation_unit_ptrE)0); __149153_26_tup = (__149153_26_tup->next)) {
+_ZN3edg23switch_translation_unitEPNS_18a_translation_unitE(__149153_26_tup);
 _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg43file_scope_il_wrapup_needed_flag_processingEv();
 }
-for (__160560_26_tup = (_ZN3edg17translation_unitsE->next); __160560_26_tup != ((_ZN3edg22a_translation_unit_ptrE)0); __160560_26_tup = (__160560_26_tup->next)) {
-_ZN3edg23switch_translation_unitEPNS_18a_translation_unitE(__160560_26_tup);
+for (__149153_26_tup = (_ZN3edg17translation_unitsE->next); __149153_26_tup != ((_ZN3edg22a_translation_unit_ptrE)0); __149153_26_tup = (__149153_26_tup->next)) {
+_ZN3edg23switch_translation_unitEPNS_18a_translation_unitE(__149153_26_tup);
 _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg42file_scope_il_wrapup_keep_in_il_processingEv();
 }
 
-for (__160560_26_tup = (_ZN3edg17translation_unitsE->next); __160560_26_tup != ((_ZN3edg22a_translation_unit_ptrE)0); __160560_26_tup = (__160560_26_tup->next)) {
-_ZN3edg23switch_translation_unitEPNS_18a_translation_unitE(__160560_26_tup);
+for (__149153_26_tup = (_ZN3edg17translation_unitsE->next); __149153_26_tup != ((_ZN3edg22a_translation_unit_ptrE)0); __149153_26_tup = (__149153_26_tup->next)) {
+_ZN3edg23switch_translation_unitEPNS_18a_translation_unitE(__149153_26_tup);
 
 _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg39file_scope_il_wrapup_remove_unneeded_ilEv();
 
@@ -8994,7 +8933,7 @@ _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg39file_scope_il_wrapup_remove_unneeded
 
 
 static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg27file_scope_il_wrapup_part_3Ev(void)
-# 531
+#line 531
 {
 
 
@@ -9013,8 +8952,8 @@ if ((_ZN3edg27is_primary_translation_unitE) && (!(((int)_ZN3edg9C_dialectE) != 2
 
 
 (_ZN3edg20curr_object_lifetimeE == ((_ZN3edg11scope_stackE[_ZN3edg17depth_scope_stackE]).curr_scope_object_lifetime)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_wrapup.c"), 549, 
-# 548
-__T154877168, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+#line 548
+__T602100944, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
 _ZN3edg24pop_object_lifetime_fullEb(((_ZN3edg9a_booleanE)0));
 
@@ -9036,7 +8975,7 @@ _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg43file_scope_il_wrapup_needed_flag_pro
 _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg42file_scope_il_wrapup_keep_in_il_processingEv();
 
 if (_ZN3edg18il_lowering_neededEv()) {
-# 576
+#line 576
 _ZN3edg22do_final_name_manglingEv();
 }
 
@@ -9049,12 +8988,12 @@ if ((_ZN3edg18il_lowering_neededEv()) && (_ZN3edg26perform_type_list_orderingE))
 
 _ZN3edg31fix_type_list_ordering_problemsEv();
 }
-# 593
+#line 593
 _ZN3edg47check_for_done_with_all_function_memory_regionsEv();
 
 if (!(((int)_ZN3edg9C_dialectE) != 2)) {
 if (!((_Bool)(((_ZN3edg19diagnostic_countersE.total).errors) > 0UL))) {
-# 606
+#line 606
 _ZN3edg31update_auto_instantiation_flagsEv();
 
 
@@ -9067,10 +9006,10 @@ _ZN3edg37wrapup_auto_instantiation_informationEv();
 
 
 if (_ZN3edg18il_lowering_neededEv()) {
-# 623
+#line 623
 _ZN3edg24clear_parent_informationEv();
 }
-# 632
+#line 632
 _ZN3edg21check_expected_errorsEv();
 
 _ZN3edg33check_for_done_with_memory_regionEi(_ZN3edg24file_scope_region_numberE);
@@ -9084,22 +9023,22 @@ _ZN3edg29ms_metadata_trans_unit_wrapupEv();
 
 
 static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg37finish_processing_for_function_bodiesEv(void)
-# 652
+#line 652
 {
 if (_ZN3edg59function_body_processing_delayed_on_some_func_in_primary_ilE) {
 
 
-auto _ZN3edg9a_booleanE __160732_15_inline_pass = ((_ZN3edg9a_booleanE)1);
+auto _ZN3edg9a_booleanE __149325_15_inline_pass = ((_ZN3edg9a_booleanE)1);
 for (; ; ) {
-auto _ZN3edg21a_function_def_numberE __160734_29_n;
-for (__160734_29_n = 1; __160734_29_n <= _ZN3edg32highest_used_function_def_numberE; __160734_29_n++)
+auto _ZN3edg21a_function_def_numberE __149327_29_n;
+for (__149327_29_n = 1; __149327_29_n <= _ZN3edg32highest_used_function_def_numberE; __149327_29_n++)
 
 {
-_ZN3edg43finish_function_processing_for_function_defEib(__160734_29_n, __160732_15_inline_pass);
+_ZN3edg43finish_function_processing_for_function_defEib(__149327_29_n, __149325_15_inline_pass);
 }
-if (!(__160732_15_inline_pass)) { goto __T155467096; }
-__160732_15_inline_pass = ((_ZN3edg9a_booleanE)0);
-} __T155467096:;
+if (!(__149325_15_inline_pass)) { goto __T602185912; }
+__149325_15_inline_pass = ((_ZN3edg9a_booleanE)0);
+} __T602185912:;
 _ZN3edg59function_body_processing_delayed_on_some_func_in_primary_ilE = ((_ZN3edg9a_booleanE)0);
 } 
 }
@@ -9110,11 +9049,11 @@ static void _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg19wrap_up_file_scopesEv(vo
 
 
 {
-auto _ZN3edg22a_translation_unit_ptrE __160753_26_tup;
-# 683
-__160753_26_tup = (_ZN3edg17translation_unitsE->next);
-for (; __160753_26_tup != ((_ZN3edg22a_translation_unit_ptrE)0); __160753_26_tup = (__160753_26_tup->next)) {
-_ZN3edg23switch_translation_unitEPNS_18a_translation_unitE(__160753_26_tup);
+auto _ZN3edg22a_translation_unit_ptrE __149346_26_tup;
+#line 683
+__149346_26_tup = (_ZN3edg17translation_unitsE->next);
+for (; __149346_26_tup != ((_ZN3edg22a_translation_unit_ptrE)0); __149346_26_tup = (__149346_26_tup->next)) {
+_ZN3edg23switch_translation_unitEPNS_18a_translation_unitE(__149346_26_tup);
 _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg27file_scope_il_wrapup_part_1Ev();
 }
 
@@ -9126,9 +9065,9 @@ _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg27file_scope_il_wrapup_part_1Ev();
 _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg27file_scope_il_wrapup_part_2Ev();
 
 
-__160753_26_tup = (_ZN3edg17translation_unitsE->next);
-for (; __160753_26_tup != ((_ZN3edg22a_translation_unit_ptrE)0); __160753_26_tup = (__160753_26_tup->next)) {
-_ZN3edg23switch_translation_unitEPNS_18a_translation_unitE(__160753_26_tup);
+__149346_26_tup = (_ZN3edg17translation_unitsE->next);
+for (; __149346_26_tup != ((_ZN3edg22a_translation_unit_ptrE)0); __149346_26_tup = (__149346_26_tup->next)) {
+_ZN3edg23switch_translation_unitEPNS_18a_translation_unitE(__149346_26_tup);
 _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg27file_scope_il_wrapup_part_3Ev();
 }
 
@@ -9147,7 +9086,7 @@ _ZN3edg59function_body_processing_delayed_on_some_func_in_primary_ilE = ((_ZN3ed
 }
 
 _ZN3edg23switch_translation_unitEPNS_18a_translation_unitE(_ZN3edg17translation_unitsE);
-# 725
+#line 725
 _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg37finish_processing_for_function_bodiesEv();
 
 
@@ -9159,13 +9098,13 @@ _ZN3edg30remove_unneeded_instantiationsEv();
 _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg27file_scope_il_wrapup_part_3Ev();
 
 if ((_ZN3edg17translation_unitsE->next) != ((_ZN3edg22a_translation_unit_ptrE)0)) {
-auto _ZN3edg22a_memory_region_numberE __160812_28_n;
-for (__160812_28_n = 2; __160812_28_n <= _ZN3edg26highest_used_region_numberE; __160812_28_n++)
+auto _ZN3edg22a_memory_region_numberE __149405_28_n;
+for (__149405_28_n = 2; __149405_28_n <= _ZN3edg26highest_used_region_numberE; __149405_28_n++)
 
 {
-if (((_ZN3edg16mem_region_tableE[__160812_28_n]) != ((_ZN3edg22a_mem_block_header_ptrE)0)) && (((int)(((_ZN3edg9il_headerE.region_scope_entry)[__160812_28_n])->kind)) == 0))
+if (((_ZN3edg16mem_region_tableE[__149405_28_n]) != ((_ZN3edg22a_mem_block_header_ptrE)0)) && (((int)(((_ZN3edg9il_headerE.region_scope_entry)[__149405_28_n])->kind)) == 0))
 {
-_ZN3edg18free_memory_regionEi(__160812_28_n);
+_ZN3edg18free_memory_regionEi(__149405_28_n);
 }
 }
 } 
@@ -9185,8 +9124,8 @@ void _ZN3edg9fe_wrapupEv(void)
 _ZN3edg23switch_translation_unitEPNS_18a_translation_unitE(_ZN3edg17translation_unitsE);
 
 
-if (!(_ZN3edg27is_primary_translation_unitE)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_wrapup.c"), 763, __T154885240, ((const char *)"fe_wrapup:"), ((const char *)"bad translation unit in fe_wrapup"
-# 762
+if (!(_ZN3edg27is_primary_translation_unitE)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_wrapup.c"), 763, __T602109016, ((const char *)"fe_wrapup:"), ((const char *)"bad translation unit in fe_wrapup"
+#line 762
 )); }
 
 
@@ -9206,7 +9145,7 @@ if (_ZN3edg22list_macro_definitionsE) {
 
 _ZN3edg35gen_pp_output_for_macro_definitionsEv();
 }
-# 796
+#line 796
 _ZN33_INTERNAL_11_fe_wrapup_c_07eaca023edg19wrap_up_file_scopesEv();
 
 _ZN3edg12in_front_endE = ((_ZN3edg9a_booleanE)0);
@@ -9217,7 +9156,7 @@ if ((_ZN3edg10il_displayE) && (!((_Bool)(((_ZN3edg19diagnostic_countersE.total).
 
 _ZN3edg13do_il_displayEPc(((char *)0));
 }
-# 814
+#line 814
 _ZN3edg37close_output_file_with_error_handlingEPP8_IO_FILENS_13an_error_codeE((&_ZN3edg11f_pp_outputE), _ZN3edg23ec_preprocessing_outputE);
 
 
@@ -9225,14 +9164,14 @@ _ZN3edg37close_output_file_with_error_handlingEPP8_IO_FILENS_13an_error_codeE((&
 
 
 _ZN3edg37close_output_file_with_error_handlingEPP8_IO_FILENS_13an_error_codeE((&_ZN3edg11f_xref_infoE), _ZN3edg18ec_cross_referenceE);
-# 837
+#line 837
 _ZN3edg24check_local_constant_useEv();
 
 
 
 
 _ZN3edg27curr_stop_token_stack_entryE = ((_ZN3edg28a_stop_token_stack_entry_ptrE)0);
-# 854
+#line 854
 _ZN3edg18free_memory_regionEi(0);
 
 
@@ -9252,8 +9191,8 @@ void _ZN3edg16fe_wrapup_part_2Ev(void)
 {
 
 if (_ZN3edg17cli_or_cx_enabledE) { _ZN3edg19ms_metadata_cleanupEv(); }
-# 879
+#line 879
 _ZN3edg13write_signoffEv();
-# 885
+#line 885
 _ZN3edg23free_all_memory_regionsEv(); 
 }

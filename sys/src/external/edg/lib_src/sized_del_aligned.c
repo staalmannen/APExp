@@ -1,21 +1,21 @@
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
-/* Wed Oct  7 03:19:07 2026 */
+/* Wed Oct  7 07:14:43 2026 */
 extern int __EDGCPFE__7_0;
-void *memcpy(void *,const void *,unsigned long);
-void *memset(void *,int,unsigned long);
+void *memcpy(void *,const void *,unsigned long long);
+void *memset(void *,int,unsigned long long);
 
-# 1 "lib_src/sized_del_aligned.c"
-# 214 "/usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h" 3
-typedef unsigned long size_t;
-# 112 "include_c++/new.stdh" 3
-extern __attribute__((__nothrow__)) void _ZdlPvSt11align_val_t(void *, unsigned long);
-# 20 "lib_src/sized_del_aligned.c"
-extern __attribute__((__nothrow__)) void _ZdlPvmSt11align_val_t(void *ptr, size_t size, unsigned long align); __attribute__((__nothrow__)) void _ZdlPvmSt11align_val_t( void *__11009_28_ptr,  size_t __11009_40_size, 
-unsigned long __11010_49_align)
-
-
+#line 1 "lib_src/sized_del_aligned.c"
+#line 10 "ape-arch/stddef_arch.h"
+typedef unsigned long long size_t;
+#line 112 "include_c++/new.stdh"
+extern void _ZdlPvSt11align_val_t(void *, unsigned long long);
+#line 20 "lib_src/sized_del_aligned.c"
+extern void _ZdlPvySt11align_val_t(void *ptr, size_t size, unsigned long long align); void _ZdlPvySt11align_val_t( void *__2990_28_ptr,  size_t __2990_40_size, 
+unsigned long long __2991_49_align)
 
 
-{ auto void *__T595228144; auto unsigned long __T595228792;
-((__T595228144 = __11009_28_ptr) , (__T595228792 = __11010_49_align)) , (_ZdlPvSt11align_val_t(__T595228144, __T595228792)); 
+
+
+{ auto void *__T198842864; auto unsigned long long __T198843512;
+((__T198842864 = __2990_28_ptr) , (__T198843512 = __2991_49_align)) , (_ZdlPvSt11align_val_t(__T198842864, __T198843512)); 
 }

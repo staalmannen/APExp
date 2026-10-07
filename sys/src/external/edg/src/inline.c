@@ -1,19 +1,19 @@
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
-/* Wed Oct  7 03:17:00 2026 */
+/* Wed Oct  7 07:13:42 2026 */
 extern int __EDGCPFE__7_0;
-void *memcpy(void *,const void *,unsigned long);
-void *memset(void *,int,unsigned long);
+void *memcpy(void *,const void *,unsigned long long);
+void *memset(void *,int,unsigned long long);
 
-# 1 "src/inline.c"
-# 3966 "src/util.h"
+#line 1 "src/inline.c"
+#line 3966 "src/util.h"
 enum _ZN3edg6detail16a_text_alignmentE {
 _ZN3edg6detail7ta_leftE,
 _ZN3edg6detail8ta_rightE};
-# 897 "src/basics.h"
+#line 897 "src/basics.h"
 struct _ZN3edg17a_source_positionE;
-# 2478 "src/il_def.h"
+#line 2478 "src/il_def.h"
 union _ZN3edg27a_parent_class_or_namespaceE;
-# 437
+#line 437
 enum _ZN3edg14an_opname_kindE {
 _ZN3edg8onk_noneE,
 _ZN3edg7onk_newE, _ZN3edg10onk_deleteE,
@@ -41,9 +41,9 @@ _ZN3edg13onk_subscriptE,
 _ZN3edg12onk_questionE,
 _ZN3edg11onk_gnu_minE, _ZN3edg11onk_gnu_maxE,
 _ZN3edg9onk_awaitE, _ZN3edg8onk_lastE};
-# 1625 "src/util.h"
+#line 1625 "src/util.h"
 struct _ZN3edg9Dyn_arrayINS_10Shared_objINS_16a_pending_pragmaENS_12FE_allocatorEEES3_EE;
-# 1030 "src/il_def.h"
+#line 1030 "src/il_def.h"
 enum _ZN3edg12a_token_kindE {
 
 _ZN3edg9tok_errorE,
@@ -101,7 +101,7 @@ _ZN3edg12tok_ifc_declE,
 
 
 _ZN3edg25tok_unresolved_ud_literalE,
-# 1099
+#line 1099
 _ZN3edg17tok_unimplementedE,
 
 _ZN3edg22tok_last_complex_tokenE = 27U,
@@ -376,7 +376,7 @@ _ZN3edg10tok_typeofE,
 _ZN3edg17tok_typeof_unqualE,
 
 _ZN3edg12tok_overloadE,
-# 1379
+#line 1379
 _ZN3edg10tok_threadE,
 _ZN3edg16tok_thread_localE,
 _ZN3edg20tok_c11_thread_localE,
@@ -586,7 +586,7 @@ _ZN3edg41tok_builtin_ge_synthesizes_from_spaceshipE,
 _ZN3edg25tok_builtin_is_structuralE,
 
 _ZN3edg8tok_lastE};
-# 281 "src/lexical.h"
+#line 281 "src/lexical.h"
 enum _ZN3edg23a_token_extra_info_kindE {
 
 _ZN3edg9teik_noneE,
@@ -603,13 +603,13 @@ _ZN3edg22teik_unresolved_ud_litE,
 
 
 _ZN3edg14teik_ifc_indexE};
-# 1075 "src/basics.h"
+#line 1075 "src/basics.h"
 enum _ZN3edg11a_C_dialectE {
 
 _ZN3edg14C_dialect_ANSIE,
 _ZN3edg13C_dialect_pccE,
 _ZN3edg19C_dialect_cplusplusE};
-# 3732 "src/host_envir.h"
+#line 3732 "src/host_envir.h"
 enum _ZN3edg17an_error_severityE {
 _ZN3edg10es_defaultE,
 _ZN3edg7es_onceE,
@@ -623,11 +623,11 @@ _ZN3edg8es_errorE,
 _ZN3edg14es_catastropheE,
 _ZN3edg21es_command_line_errorE,
 _ZN3edg17es_internal_errorE};
-# 1673 "src/targ_def.h"
+#line 1673 "src/targ_def.h"
 struct _ZN3edg16an_integer_valueE;
-# 2617
+#line 2617
 struct _ZN3edg23an_internal_float_valueE;
-# 19 "build/gcc-release/src/includes/err_codes.h"
+#line 19 "build/kencc/src/includes/err_codes.h"
 enum _ZN3edg13an_error_codeE {
 _ZN3edg11ec_no_errorE,
 _ZN3edg23ec_last_line_incompleteE,
@@ -4230,26 +4230,26 @@ _ZN3edg36ec_interpolated_id_is_not_identifierE,
 _ZN3edg45ec_interpolated_operand_is_not_token_sequenceE,
 _ZN3edg28ec_tag_redefined_differentlyE,
 _ZN3edg7ec_lastE};
-# 81 "src/mem_tables.h"
+#line 81 "src/mem_tables.h"
 struct _ZN3edg20a_function_def_descrE;
-# 115
+#line 115
 struct _ZN3edg18a_mem_block_headerE;
-# 143
+#line 143
 struct _ZN3edg18an_il_entry_prefixE;
-# 68 "src/il_def.h"
+#line 68 "src/il_def.h"
 struct _ZN3edg15a_routine_fixupE;
-# 118
+#line 118
 struct _ZN3edg25an_expr_rescan_info_entryE;
-# 137
+#line 137
 struct _ZN3edg13a_source_fileE;
-# 260
+#line 260
 struct _ZN3edg25a_seq_number_lookup_entryE;
-# 338
+#line 338
 struct _ZN3edg19a_cli_metadata_fileE;
-# 408
+#line 408
 enum _ZN3edg15a_storage_classE {
 _ZN3edg14sc_unspecifiedE,
-# 417
+#line 417
 _ZN3edg9sc_externE,
 
 _ZN3edg9sc_staticE,
@@ -4262,7 +4262,7 @@ _ZN3edg11sc_registerE,
 _ZN3edg6sc_asmE,
 
 _ZN3edg7sc_lastE};
-# 604
+#line 604
 enum _ZN3edg16an_il_entry_kindE {
 _ZN3edg8iek_noneE,
 _ZN3edg15iek_source_fileE,
@@ -4360,9 +4360,9 @@ _ZN3edg20iek_gcnew_supplementE,
 
 _ZN3edg20iek_throw_supplementE,
 _ZN3edg24iek_condition_supplementE,
-# 722
+#line 722
 _ZN3edg30iek_scope_orphaned_list_headerE,
-# 728
+#line 728
 _ZN3edg10iek_pragmaE,
 _ZN3edg12iek_templateE,
 
@@ -4398,11 +4398,11 @@ _ZN3edg22iek_generic_constraintE,
 
 
 _ZN3edg27iek_seq_number_lookup_entryE,
-# 771
+#line 771
 _ZN3edg23iek_local_expr_node_refE,
 
 _ZN3edg20iek_static_assertionE,
-# 781
+#line 781
 _ZN3edg19iek_local_scope_refE,
 _ZN3edg24iek_il_entity_list_entryE,
 
@@ -4439,9 +4439,9 @@ _ZN3edg24iek_token_sequence_entryE,
 _ZN3edg21iek_scoped_expressionE,
 _ZN3edg20iek_data_member_specE,
 _ZN3edg8iek_lastE};
-# 1864
+#line 1864
 struct _ZN3edg14a_source_rangeE;
-# 1913
+#line 1913
 enum _ZN3edg13a_vector_kindE {
 _ZN3edg6vk_gnuE,
 _ZN3edg6vk_extE,
@@ -4450,22 +4450,22 @@ _ZN3edg12vk_neon_polyE,
 _ZN3edg15vk_neon_builtinE,
 
 _ZN3edg7vk_lastE};
-# 1946
+#line 1946
 struct _ZN3edg26a_decl_position_supplementE;
-# 2020
+#line 2020
 enum _ZN3edg22an_ELF_visibility_kindE {
 _ZN3edg15evk_unspecifiedE,
 _ZN3edg10evk_hiddenE,
 _ZN3edg13evk_protectedE,
 _ZN3edg12evk_internalE,
 _ZN3edg11evk_defaultE};
-# 2042
+#line 2042
 struct _ZN3edg16a_tagged_pointerE;
-# 2052
+#line 2052
 struct _ZN3edg23an_il_entity_list_entryE;
-# 2514
+#line 2514
 struct _ZN3edg38a_per_instantiation_needed_flags_entryE;
-# 2573
+#line 2573
 enum _ZN3edg23a_special_function_kindE {
 _ZN3edg8sfk_noneE,
 _ZN3edg15sfk_constructorE,
@@ -4474,7 +4474,7 @@ _ZN3edg14sfk_conversionE,
 _ZN3edg16sfk_udl_operatorE,
 _ZN3edg12sfk_operatorE,
 _ZN3edg22sfk_lambda_entry_pointE,
-# 2586
+#line 2586
 _ZN3edg19sfk_deduction_guideE,
 
 
@@ -4498,9 +4498,9 @@ _ZN3edg17sfk_last_accessorE = 17U,
 
 
 _ZN3edg30sfk_gnu_sync_concrete_functionE,
-# 2614
+#line 2614
 _ZN3edg34sfk_gnu_atomic_nongeneric_functionE,
-# 2620
+#line 2620
 _ZN3edg31sfk_gnu_atomic_generic_functionE,
 
 
@@ -4513,21 +4513,19 @@ _ZN3edg27sfk_builtin_operator_deleteE,
 
 
 _ZN3edg8sfk_lastE};
-# 2638
+#line 2638
 struct _ZN3edg16a_name_referenceE;
-# 3157
+#line 3157
 struct _ZN3edg12an_attributeE;
-# 3261
+#line 3261
 struct _ZN3edg23a_source_correspondenceE;
-# 3618
+#line 3618
 enum _ZN3edg20a_constant_repr_kindE {
 
 
 _ZN3edg8ck_errorE,
 _ZN3edg10ck_integerE,
-# 3631
-_ZN3edg14ck_fixed_pointE,
-
+#line 3633
 _ZN3edg9ck_stringE,
 
 _ZN3edg8ck_floatE,
@@ -4539,7 +4537,7 @@ _ZN3edg10ck_addressE,
 _ZN3edg16ck_ptr_to_memberE,
 
 _ZN3edg19ck_label_differenceE,
-# 3651
+#line 3651
 _ZN3edg15ck_dynamic_initE,
 
 
@@ -4591,13 +4589,13 @@ _ZN3edg9abk_labelE,
 _ZN3edg13abk_param_refE,
 
 _ZN3edg8abk_lastE};
-# 3707
+#line 3707
 struct _ZN3edg25an_internal_complex_valueE;
-# 3720
+#line 3720
 struct _ZN3edg11a_namespaceE;
-# 3796
+#line 3796
 struct _ZN3edg12a_using_declE;
-# 3957
+#line 3957
 enum _ZN3edg19a_dynamic_init_kindE {
 _ZN3edg8dik_noneE,
 _ZN3edg8dik_zeroE,
@@ -4609,42 +4607,42 @@ _ZN3edg12dik_constantE,
 _ZN3edg14dik_expressionE,
 
 _ZN3edg25dik_class_result_via_ctorE,
-# 3973
+#line 3973
 _ZN3edg34dik_call_returning_class_via_cctorE = 4U,
 
 
 _ZN3edg15dik_constructorE,
 
 _ZN3edg25dik_nonconstant_aggregateE,
-# 3984
+#line 3984
 _ZN3edg16dik_bitwise_copyE,
 
 
 
 _ZN3edg10dik_lambdaE};
-# 4246
+#line 4246
 struct _ZN3edg14a_dynamic_initUt_Ut_E;
-# 4276
+#line 4276
 struct _ZN3edg14a_dynamic_initUt_Ut0_E;
-# 4339
+#line 4339
 struct _ZN3edg14a_dynamic_initUt_Ut1_E;
-# 4243
+#line 4243
 union _ZN3edg14a_dynamic_initUt_E;
-# 3993
+#line 3993
 struct _ZN3edg14a_dynamic_initE;
-# 4397
+#line 4397
 enum _ZN3edg30a_template_param_constant_kindE {
 
 
 
 _ZN3edg10tpck_paramE,
-# 4408
+#line 4408
 _ZN3edg15tpck_expressionE,
-# 4414
+#line 4414
 _ZN3edg11tpck_memberE,
-# 4422
+#line 4422
 _ZN3edg21tpck_unknown_functionE,
-# 4430
+#line 4430
 _ZN3edg12tpck_addressE,
 
 _ZN3edg11tpck_sizeofE,
@@ -4661,7 +4659,7 @@ _ZN3edg11tpck_uuidofE,
 
 
 _ZN3edg11tpck_typeidE,
-# 4451
+#line 4451
 _ZN3edg13tpck_noexceptE,
 
 
@@ -4679,57 +4677,57 @@ _ZN3edg23tpck_dependent_constantE,
 
 
 _ZN3edg27tpck_concat_string_literalsE};
-# 4526
+#line 4526
 struct _ZN3edg27a_template_param_coordinateE;
-# 4606
+#line 4606
 struct _ZN3edg16a_subobject_pathE;
-# 4694
+#line 4694
 struct _ZN3edg16a_token_sequenceE;
-# 4710
+#line 4710
 struct _ZN3edg18a_reflection_valueE;
-# 4731
+#line 4731
 union _ZN3edg15a_field_or_baseE;
-# 5051
+#line 5051
 struct _ZN3edg10a_constantUt_Ut_E;
-# 5203
+#line 5203
 struct _ZN3edg10a_constantUt_Ut0_Ut_Ut_E;
-# 5156
+#line 5156
 union _ZN3edg10a_constantUt_Ut0_Ut_E;
-# 5137
+#line 5137
 struct _ZN3edg10a_constantUt_Ut0_E;
-# 5245
+#line 5245
 union _ZN3edg10a_constantUt_Ut1_Ut_E;
-# 5220
+#line 5220
 struct _ZN3edg10a_constantUt_Ut1_E;
-# 5259
+#line 5259
 struct _ZN3edg10a_constantUt_Ut2_E;
-# 5285
+#line 5285
 struct _ZN3edg10a_constantUt_Ut3_E;
-# 5303
+#line 5303
 struct _ZN3edg10a_constantUt_Ut4_E;
-# 5338
+#line 5338
 struct _ZN3edg10a_constantUt_Ut5_E;
-# 5431
+#line 5431
 struct _ZN3edg10a_constantUt_Ut6_Ut_Ut_E;
-# 5481
+#line 5481
 struct _ZN3edg10a_constantUt_Ut6_Ut_Ut0_E;
-# 5497
+#line 5497
 struct _ZN3edg10a_constantUt_Ut6_Ut_Ut1_E;
-# 5509
+#line 5509
 struct _ZN3edg10a_constantUt_Ut6_Ut_Ut2_E;
-# 5412
+#line 5412
 union _ZN3edg10a_constantUt_Ut6_Ut_E;
-# 5366
+#line 5366
 struct _ZN3edg10a_constantUt_Ut6_E;
-# 5541
+#line 5541
 union _ZN3edg10a_constantUt_Ut7_Ut_E;
-# 5528
+#line 5528
 struct _ZN3edg10a_constantUt_Ut7_E;
-# 5027
+#line 5027
 union _ZN3edg10a_constantUt_E;
-# 4741
+#line 4741
 struct _ZN3edg10a_constantE;
-# 5573
+#line 5573
 enum _ZN3edg11a_type_kindE {
 
 _ZN3edg8tk_errorE,
@@ -4737,7 +4735,7 @@ _ZN3edg7tk_voidE,
 _ZN3edg10tk_integerE,
 _ZN3edg7tk_enumE = 2U,
 
-_ZN3edg14tk_fixed_pointE,
+
 
 _ZN3edg8tk_floatE,
 
@@ -4762,9 +4760,9 @@ _ZN3edg17tk_template_paramE,
 
 _ZN3edg9tk_vectorE,
 _ZN3edg18tk_scalable_vectorE,
-# 5610
+#line 5610
 _ZN3edg24tk_scalable_vector_countE,
-# 5616
+#line 5616
 _ZN3edg15tk_riscv_vectorE,
 
 
@@ -4779,7 +4777,7 @@ _ZN3edg13tk_float8e5m2E,
 
 
 _ZN3edg10tk_nullptrE,
-# 5640
+#line 5640
 _ZN3edg13tk_reflectionE,
 
 _ZN3edg10tk_unknownE};
@@ -4787,7 +4785,7 @@ _ZN3edg10tk_unknownE};
 
 
 enum _ZN3edg15an_integer_kindE {
-# 5654
+#line 5654
 _ZN3edg7ik_charE,
 
 
@@ -4811,21 +4809,9 @@ _ZN3edg14ik_bit_preciseE,
 _ZN3edg23ik_unsigned_bit_preciseE,
 _ZN3edg7ik_lastE,
 _ZN3edg7ik_noneE = 15U};
-# 5738
-enum _ZN3edg23a_fixed_point_precisionE {
-
-
-_ZN3edg9fpp_shortE,
-_ZN3edg11fpp_defaultE,
-_ZN3edg8fpp_longE,
-_ZN3edg8fpp_lastE};
-
-
-
-struct _ZN3edg24a_fixed_point_type_descrE;
-# 5769
+#line 5769
 enum _ZN3edg12a_float_kindE {
-# 5794
+#line 5794
 _ZN3edg10fk_float16E,
 _ZN3edg7fk_fp16E,
 
@@ -4845,7 +4831,7 @@ _ZN3edg14fk_std_float32E,
 _ZN3edg14fk_std_float64E,
 _ZN3edg15fk_std_float128E,
 _ZN3edg7fk_lastE};
-# 6069
+#line 6069
 enum _ZN3edg16a_named_registerE {
 _ZN3edg11anr_invalidE,
 _ZN3edg10anr_memoryE,
@@ -4865,9 +4851,9 @@ _ZN3edg7anr_f12E, _ZN3edg7anr_f13E, _ZN3edg7anr_f14E, _ZN3edg7anr_f15E,
 _ZN3edg9anr_flagsE, _ZN3edg8anr_fpsrE, _ZN3edg11anr_dirflagE,
 _ZN3edg6anr_16E, _ZN3edg6anr_17E, _ZN3edg6anr_18E, _ZN3edg6anr_19E,
 _ZN3edg6anr_20E,
-# 6095
+#line 6095
 _ZN3edg8anr_lastE};
-# 6244
+#line 6244
 enum _ZN3edg16a_type_qualifierE {
 _ZN3edg9tqt_constE,
 _ZN3edg12tqt_volatileE,
@@ -4898,14 +4884,14 @@ _ZN3edg27tqt_msb_named_address_spaceE,
 
 
 _ZN3edg8tqt_lastE};
-# 6363
+#line 6363
 enum _ZN3edg19a_upc_access_methodE {
 _ZN3edg22upc_access_unspecifiedE,
 _ZN3edg17upc_access_strictE,
 _ZN3edg18upc_access_relaxedE};
-# 6385
+#line 6385
 struct _ZN3edg12a_param_typeE;
-# 6652
+#line 6652
 enum _ZN3edg13a_pragma_kindE {
 _ZN3edg7pk_noneE,
 _ZN3edg14pk_printf_argsE,
@@ -4929,7 +4915,7 @@ _ZN3edg18pk_can_instantiateE,
 
 
 _ZN3edg18pk_inline_templateE,
-# 6681
+#line 6681
 _ZN3edg7pk_packE,
 
 
@@ -4940,7 +4926,7 @@ _ZN3edg15pk_ident_pragmaE,
 _ZN3edg18pk_ident_directiveE,
 
 _ZN3edg8pk_identE = 12U,
-# 6697
+#line 6697
 _ZN3edg7pk_onceE,
 
 _ZN3edg10pk_hdrstopE,
@@ -4961,7 +4947,7 @@ _ZN3edg6pk_upcE,
 
 
 _ZN3edg19pk_redefine_extnameE,
-# 6724
+#line 6724
 _ZN3edg16pk_gcc_immediateE,
 _ZN3edg17pk_gcc_next_tokenE,
 
@@ -4976,9 +4962,9 @@ _ZN3edg13pk_diag_errorE,
 _ZN3edg12pk_diag_onceE,
 _ZN3edg15pk_diag_defaultE,
 _ZN3edg13pk_diagnosticE,
-# 6757
+#line 6757
 _ZN3edg13pk_il_displayE,
-# 6763
+#line 6763
 _ZN3edg13pk_push_macroE,
 _ZN3edg12pk_pop_macroE,
 
@@ -4990,13 +4976,13 @@ _ZN3edg18pk_stop_map_regionE,
 _ZN3edg10pk_commentE,
 _ZN3edg10pk_conformE,
 _ZN3edg16pk_include_aliasE,
-# 6794
+#line 6794
 _ZN3edg7pk_lastE};
-# 6935
+#line 6935
 struct _ZN3edg8a_pragmaE;
-# 7129
+#line 7129
 struct _ZN3edg26an_exception_specificationE;
-# 7215
+#line 7215
 enum _ZN3edg20a_calling_conventionE {
 
 _ZN3edg10cc_defaultE,
@@ -5009,40 +4995,40 @@ _ZN3edg11cc_thiscallE,
 _ZN3edg13cc_vectorcallE,
 _ZN3edg10cc_clrcallE,
 _ZN3edg7cc_lastE};
-# 7394
+#line 7394
 struct _ZN3edg25a_routine_type_supplementE;
-# 7683
+#line 7683
 struct _ZN3edg14a_template_argE;
-# 8018
+#line 8018
 struct _ZN3edg12a_base_classE;
-# 8317
+#line 8317
 struct _ZN3edg18a_class_list_entryE;
-# 8330
+#line 8330
 struct _ZN3edg20a_routine_list_entryE;
-# 8446
+#line 8446
 struct _ZN3edg25a_property_or_event_descrE;
-# 8741
+#line 8741
 struct _ZN3edg23a_class_type_supplementE;
-# 9286
+#line 9286
 enum _ZN3edg26a_template_param_type_kindE {
 
 
 _ZN3edg10tptk_paramE,
-# 9295
+#line 9295
 _ZN3edg11tptk_memberE,
-# 9303
+#line 9303
 _ZN3edg12tptk_unknownE,
-# 9318
+#line 9318
 _ZN3edg20tptk_bit_precise_intE};
-# 9330
+#line 9330
 struct _ZN3edg32a_template_param_type_supplementE;
-# 9422
+#line 9422
 struct _ZN3edg25a_typeref_type_supplementE;
-# 9503
+#line 9503
 struct _ZN3edg26an_integer_type_supplementE;
-# 9625
+#line 9625
 struct _ZN3edg24a_based_type_list_memberE;
-# 9692
+#line 9692
 enum _ZN3edg14a_typeref_kindE {
 _ZN3edg8trk_noneE,
 
@@ -5103,37 +5089,37 @@ _ZN3edg21trk_template_arg_listE,
 _ZN3edg18trk_name_qualifierE,
 
 _ZN3edg14trk_pack_indexE};
-# 10142
+#line 10142
 union _ZN3edg6a_typeUt_Ut_Ut_E;
-# 10045
+#line 10045
 struct _ZN3edg6a_typeUt_Ut_E;
-# 10185
+#line 10185
 struct _ZN3edg6a_typeUt_Ut0_E;
-# 10233
+#line 10233
 struct _ZN3edg6a_typeUt_Ut1_E;
-# 10326
+#line 10326
 union _ZN3edg6a_typeUt_Ut2_Ut_E;
-# 10257
+#line 10257
 struct _ZN3edg6a_typeUt_Ut2_E;
-# 10356
+#line 10356
 struct _ZN3edg6a_typeUt_Ut3_E;
-# 10733
+#line 10733
 struct _ZN3edg6a_typeUt_Ut4_E;
-# 10869
+#line 10869
 struct _ZN3edg6a_typeUt_Ut5_E;
-# 10898
+#line 10898
 struct _ZN3edg6a_typeUt_Ut6_E;
-# 10949
+#line 10949
 struct _ZN3edg6a_typeUt_Ut7_E;
-# 10973
+#line 10973
 struct _ZN3edg6a_typeUt_Ut8_E;
-# 10981
+#line 10981
 struct _ZN3edg6a_typeUt_Ut9_E;
-# 10041
+#line 10041
 union _ZN3edg6a_typeUt_E;
-# 9768
+#line 9768
 struct _ZN3edg6a_typeE;
-# 11009
+#line 11009
 enum _ZN3edg12an_init_kindE {
 
 _ZN3edg10initk_noneE,
@@ -5148,45 +5134,45 @@ _ZN3edg20initk_function_localE,
 
 
 _ZN3edg13initk_bindingE};
-# 11029
+#line 11029
 union _ZN3edg14an_initializerE;
-# 11067
+#line 11067
 struct _ZN3edg28a_local_static_variable_initE;
-# 11102
+#line 11102
 struct _ZN3edg15a_vla_dimensionE;
-# 11183
+#line 11183
 struct _ZN3edg24a_variable_template_infoE;
-# 11224
+#line 11224
 union _ZN3edg10a_variableUt_E;
-# 11285
+#line 11285
 union _ZN3edg10a_variableUt0_E;
-# 11846
+#line 11846
 struct _ZN3edg10a_variableUt1_Ut_E;
-# 11835
+#line 11835
 union _ZN3edg10a_variableUt1_E;
-# 11210
+#line 11210
 struct _ZN3edg10a_variableE;
-# 11898
+#line 11898
 struct _ZN3edg7a_fieldE;
-# 12215
+#line 12215
 struct _ZN3edg17a_requires_clauseE;
-# 12315
+#line 12315
 struct _ZN3edg9a_routineUt_Ut_E;
-# 12297
+#line 12297
 union _ZN3edg9a_routineUt_E;
-# 13113
+#line 13113
 union _ZN3edg9a_routineUt0_E;
-# 13145
+#line 13145
 union _ZN3edg9a_routineUt1_E;
-# 12228
+#line 12228
 struct _ZN3edg9a_routineE;
-# 13284
+#line 13284
 struct _ZN3edg24a_gnu_routine_supplementE;
-# 13425
+#line 13425
 struct _ZN3edg12an_asm_entryE;
-# 13489
+#line 13489
 struct _ZN3edg7a_labelE;
-# 13570
+#line 13570
 enum _ZN3edg17an_expr_node_kindE {
 _ZN3edg9enk_errorE,
 _ZN3edg13enk_operationE,
@@ -5210,14 +5196,14 @@ _ZN3edg13enk_conditionE,
 
 
 _ZN3edg19enk_object_lifetimeE,
-# 13600
+#line 13600
 _ZN3edg10enk_typeidE,
 
 
 
 _ZN3edg10enk_sizeofE,
 _ZN3edg18enk_runtime_sizeofE = 13U,
-# 13613
+#line 13613
 _ZN3edg15enk_sizeof_packE,
 
 _ZN3edg11enk_alignofE,
@@ -5233,9 +5219,9 @@ _ZN3edg23enk_address_of_ellipsisE,
 
 _ZN3edg13enk_statementE,
 _ZN3edg15enk_reuse_valueE,
-# 13641
+#line 13641
 _ZN3edg33enk_result_of_overriding_functionE,
-# 13650
+#line 13650
 _ZN3edg11enk_routineE,
 
 _ZN3edg15enk_vla_deallocE,
@@ -5249,7 +5235,7 @@ _ZN3edg21enk_builtin_operationE,
 
 
 _ZN3edg13enk_param_refE,
-# 13671
+#line 13671
 _ZN3edg20enk_braced_init_listE,
 _ZN3edg15enk_c11_genericE,
 
@@ -5280,7 +5266,7 @@ _ZN3edg13enk_reclaimedE,
 
 _ZN3edg14enk_pack_indexE,
 _ZN3edg8enk_lastE};
-# 13855
+#line 13855
 enum _ZN3edg21an_expr_operator_kindE {
 
 _ZN3edg14eok_address_ofE,
@@ -5297,15 +5283,15 @@ _ZN3edg16eok_ref_indirectE,
 
 
 _ZN3edg8eok_castE,
-# 13879
+#line 13879
 _ZN3edg15eok_lvalue_castE,
-# 13889
+#line 13889
 _ZN3edg12eok_ref_castE,
-# 13902
+#line 13902
 _ZN3edg17eok_lvalue_adjustE,
-# 13919
+#line 13919
 _ZN3edg23eok_class_rvalue_adjustE,
-# 13929
+#line 13929
 _ZN3edg7eok_boxE,
 
 
@@ -5315,13 +5301,13 @@ _ZN3edg17eok_handle_to_boxE,
 
 
 _ZN3edg9eok_unboxE,
-# 13950
+#line 13950
 _ZN3edg16eok_unbox_lvalueE,
-# 13959
+#line 13959
 _ZN3edg19eok_base_class_castE,
-# 13966
+#line 13966
 _ZN3edg22eok_derived_class_castE,
-# 13975
+#line 13975
 _ZN3edg22eok_pm_base_class_castE,
 
 
@@ -5346,7 +5332,7 @@ _ZN3edg20eok_array_to_pointerE,
 
 
 _ZN3edg31eok_dot_vacuous_destructor_callE,
-# 14007
+#line 14007
 _ZN3edg37eok_points_to_vacuous_destructor_callE,
 
 
@@ -5356,7 +5342,7 @@ _ZN3edg10eok_assumeE,
 
 
 _ZN3edg12eok_noexceptE,
-# 14021
+#line 14021
 _ZN3edg10eok_parensE,
 _ZN3edg10eok_negateE,
 _ZN3edg14eok_unary_plusE,
@@ -5450,7 +5436,7 @@ _ZN3edg11eok_gnu_minE,
 _ZN3edg11eok_gnu_maxE,
 
 _ZN3edg10eok_assignE,
-# 14124
+#line 14124
 _ZN3edg14eok_add_assignE,
 _ZN3edg19eok_subtract_assignE,
 _ZN3edg19eok_multiply_assignE,
@@ -5469,7 +5455,7 @@ _ZN3edg15eok_padd_assignE,
 
 _ZN3edg20eok_psubtract_assignE,
 _ZN3edg11eok_bassignE,
-# 14153
+#line 14153
 _ZN3edg8eok_landE,
 
 
@@ -5505,38 +5491,38 @@ _ZN3edg12eok_pm_fieldE,
 
 
 _ZN3edg22eok_pm_points_to_fieldE,
-# 14193
+#line 14193
 _ZN3edg19eok_dot_pm_func_ptrE,
-# 14199
+#line 14199
 _ZN3edg25eok_points_to_pm_func_ptrE,
-# 14206
+#line 14206
 _ZN3edg14eok_dot_staticE,
-# 14217
+#line 14217
 _ZN3edg20eok_points_to_staticE,
-# 14228
+#line 14228
 _ZN3edg24eok_virtual_function_ptrE,
-# 14237
+#line 14237
 _ZN3edg12eok_questionE,
-# 14243
+#line 14243
 _ZN3edg19eok_vector_questionE,
 
 
 
 
 _ZN3edg8eok_callE,
-# 14256
+#line 14256
 _ZN3edg19eok_dot_member_callE,
-# 14264
+#line 14264
 _ZN3edg25eok_points_to_member_callE,
-# 14274
+#line 14274
 _ZN3edg15eok_dot_pm_callE,
-# 14283
+#line 14283
 _ZN3edg21eok_points_to_pm_callE,
-# 14293
+#line 14293
 _ZN3edg17eok_cli_subscriptE,
-# 14299
+#line 14299
 _ZN3edg12eok_va_startE,
-# 14306
+#line 14306
 _ZN3edg10eok_va_argE,
 
 
@@ -5549,7 +5535,7 @@ _ZN3edg11eok_va_copyE,
 
 
 _ZN3edg27eok_va_start_single_operandE,
-# 14323
+#line 14323
 _ZN3edg10eok_lvalueE,
 
 
@@ -5566,9 +5552,9 @@ _ZN3edg10eok_spliceE,
 
 
 _ZN3edg9eok_errorE,
-# 14344
+#line 14344
 _ZN3edg8eok_lastE};
-# 14367
+#line 14367
 enum _ZN3edg24a_builtin_operation_kindE {
 _ZN3edg12bok_offsetofE,
 
@@ -5787,84 +5773,84 @@ _ZN3edg41bok_builtin_ge_synthesizes_from_spaceshipE,
 _ZN3edg25bok_builtin_is_structuralE,
 
 _ZN3edg8bok_lastE};
-# 14609
+#line 14609
 struct _ZN3edg18a_throw_supplementE;
-# 14642
+#line 14642
 struct _ZN3edg22a_condition_supplementE;
-# 14677
+#line 14677
 struct _ZN3edg23a_new_delete_supplementE;
-# 14766
+#line 14766
 struct _ZN3edg18a_gcnew_supplementE;
-# 14862
+#line 14862
 struct _ZN3edg21a_local_expr_node_refE;
-# 14895
+#line 14895
 struct _ZN3edg28a_const_eval_reattempt_stateE;
-# 15122
+#line 15122
 struct _ZN3edg12an_expr_nodeUt_Ut_E;
-# 15340
+#line 15340
 struct _ZN3edg12an_expr_nodeUt_Ut0_E;
-# 15352
+#line 15352
 struct _ZN3edg12an_expr_nodeUt_Ut1_E;
-# 15363
+#line 15363
 struct _ZN3edg12an_expr_nodeUt_Ut2_E;
-# 15376
+#line 15376
 struct _ZN3edg12an_expr_nodeUt_Ut3_E;
-# 15402
+#line 15402
 union _ZN3edg12an_expr_nodeUt_Ut4_Ut_E;
-# 15391
+#line 15391
 struct _ZN3edg12an_expr_nodeUt_Ut4_E;
-# 15446
+#line 15446
 struct _ZN3edg12an_expr_nodeUt_Ut5_E;
-# 15457
+#line 15457
 struct _ZN3edg12an_expr_nodeUt_Ut6_E;
-# 15485
+#line 15485
 union _ZN3edg12an_expr_nodeUt_Ut7_Ut_E;
-# 15475
+#line 15475
 struct _ZN3edg12an_expr_nodeUt_Ut7_E;
-# 15504
+#line 15504
 union _ZN3edg12an_expr_nodeUt_Ut8_Ut_E;
-# 15495
+#line 15495
 struct _ZN3edg12an_expr_nodeUt_Ut8_E;
-# 15591
+#line 15591
 struct _ZN3edg12an_expr_nodeUt_Ut9_E;
-# 15603
+#line 15603
 struct _ZN3edg12an_expr_nodeUt_Ut10_E;
-# 15611
+#line 15611
 struct _ZN3edg12an_expr_nodeUt_Ut11_E;
-# 15648
+#line 15648
 struct _ZN3edg12an_expr_nodeUt_Ut12_E;
-# 15663
+#line 15663
 struct _ZN3edg12an_expr_nodeUt_Ut13_E;
-# 15677
+#line 15677
 struct _ZN3edg12an_expr_nodeUt_Ut14_E;
-# 15690
+#line 15690
 struct _ZN3edg12an_expr_nodeUt_Ut15_E;
-# 15705
+#line 15705
 struct _ZN3edg12an_expr_nodeUt_Ut16_E;
-# 15711
+#line 15711
 struct _ZN3edg12an_expr_nodeUt_Ut17_E;
-# 15724
+#line 15724
 struct _ZN3edg12an_expr_nodeUt_Ut18_E;
-# 15736
+#line 15736
 struct _ZN3edg12an_expr_nodeUt_Ut19_E;
-# 15749
+#line 15749
 struct _ZN3edg12an_expr_nodeUt_Ut20_E;
-# 15763
+#line 15763
 struct _ZN3edg12an_expr_nodeUt_Ut21_E;
 
 
 
 
 struct _ZN3edg12an_expr_nodeUt_Ut22_E;
-# 15777
+#line 15777
 struct _ZN3edg12an_expr_nodeUt_Ut23_E;
-# 15119
+#line 15119
 union _ZN3edg12an_expr_nodeUt_E;
-# 15785
+#line 15785
 union _ZN3edg12an_expr_nodeUt0_E;
-# 14906
+#line 14906
 struct _ZN3edg12an_expr_nodeE;
-# 15802
+#line 15802
 enum _ZN3edg16a_statement_kindE {
 
 _ZN3edg9stmk_exprE,
@@ -5922,73 +5908,73 @@ _ZN3edg21stmk_stmt_expr_resultE,
 
 
 _ZN3edg9stmk_lastE};
-# 15864
+#line 15864
 struct _ZN3edg7a_blockE;
-# 15911
+#line 15911
 struct _ZN3edg10a_for_loopE;
-# 15975
+#line 15975
 struct _ZN3edg22a_range_based_for_loopE;
-# 16116
+#line 16116
 struct _ZN3edg15a_for_each_loopE;
-# 16246
+#line 16246
 struct _ZN3edg19a_switch_case_entryE;
-# 16300
+#line 16300
 struct _ZN3edg19a_switch_stmt_descrE;
-# 16316
+#line 16316
 struct _ZN3edg9a_handlerE;
-# 16356
+#line 16356
 struct _ZN3edg16a_try_supplementE;
-# 16385
+#line 16385
 struct _ZN3edg26a_microsoft_try_supplementE;
-# 16410
+#line 16410
 struct _ZN3edg17a_coroutine_descrE;
-# 16488
+#line 16488
 struct _ZN3edg14a_constexpr_ifE;
-# 16621
+#line 16621
 struct _ZN3edg11a_statementUt_Ut_E;
-# 16654
+#line 16654
 struct _ZN3edg11a_statementUt_Ut0_E;
-# 16669
+#line 16669
 struct _ZN3edg11a_statementUt_Ut1_E;
-# 16684
+#line 16684
 struct _ZN3edg11a_statementUt_Ut2_E;
-# 16699
+#line 16699
 struct _ZN3edg11a_statementUt_Ut3_E;
-# 16709
+#line 16709
 struct _ZN3edg11a_statementUt_Ut4_E;
-# 16723
+#line 16723
 struct _ZN3edg11a_statementUt_Ut5_E;
-# 16745
+#line 16745
 struct _ZN3edg11a_statementUt_Ut6_E;
-# 16752
+#line 16752
 struct _ZN3edg11a_statementUt_Ut7_E;
-# 16795
+#line 16795
 struct _ZN3edg11a_statementUt_Ut8_E;
-# 16824
+#line 16824
 union _ZN3edg11a_statementUt_Ut9_Ut_E;
-# 16815
+#line 16815
 struct _ZN3edg11a_statementUt_Ut9_E;
-# 16839
+#line 16839
 struct _ZN3edg11a_statementUt_Ut10_E;
-# 16610
+#line 16610
 union _ZN3edg11a_statementUt_E;
-# 16516
+#line 16516
 struct _ZN3edg11a_statementE;
-# 16878
+#line 16878
 struct _ZN3edg18a_constructor_initE;
-# 16958
+#line 16958
 struct _ZN3edg28a_scope_orphaned_list_headerE;
-# 17287
+#line 17287
 struct _ZN3edg10a_templateE;
-# 17646
+#line 17646
 struct _ZN3edg18an_object_lifetimeE;
-# 17848
+#line 17848
 struct _ZN3edg15an_ms_attributeE;
-# 17937
+#line 17937
 struct _ZN3edg8a_lambdaE;
-# 18179
+#line 18179
 struct _ZN3edg17a_local_scope_refE;
-# 18205
+#line 18205
 enum _ZN3edg12a_scope_kindE {
 
 _ZN3edg8sck_fileE,
@@ -6005,23 +5991,23 @@ _ZN3edg13sck_namespaceE,
 
 
 _ZN3edg23sck_namespace_extensionE,
-# 18231
+#line 18231
 _ZN3edg26sck_namespace_reactivationE,
-# 18239
+#line 18239
 _ZN3edg22sck_class_struct_unionE,
 
 
 
 _ZN3edg22sck_class_reactivationE,
-# 18249
+#line 18249
 _ZN3edg24sck_template_declarationE,
-# 18255
+#line 18255
 _ZN3edg26sck_template_instantiationE,
 
 
 
 _ZN3edg25sck_instantiation_contextE,
-# 18268
+#line 18268
 _ZN3edg22sck_module_decl_importE,
 
 
@@ -6046,17 +6032,17 @@ _ZN3edg8sck_enumE,
 
 _ZN3edg12sck_functionE,
 _ZN3edg8sck_noneE};
-# 18402
+#line 18402
 struct _ZN3edg7a_scopeUt_Ut_E;
-# 18376
+#line 18376
 union _ZN3edg7a_scopeUt_E;
-# 18295
+#line 18295
 struct _ZN3edg7a_scopeE;
-# 18655
+#line 18655
 struct _ZN3edg8a_moduleE;
-# 18722
+#line 18722
 struct _ZN3edg20a_module_import_declE;
-# 18790
+#line 18790
 enum _ZN3edg17a_source_languageE {
 
 _ZN3edg12sl_CplusplusE,
@@ -6064,66 +6050,66 @@ _ZN3edg4sl_CE};
 
 
 struct _ZN3edg12an_il_headerE;
-# 1063 "src/util.h"
+#line 1063 "src/util.h"
 struct _ZN3edg12FE_allocatorIPvEE;
-# 1379
-union __C1;
-# 1336
+#line 1379
+union __C2;
+#line 1336
 struct _ZN3edg18Buffered_allocatorILj50ENS_12FE_allocatorEPvEE;
-# 1572
+#line 1572
 struct _ZN3edg27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaIPvEE;
-# 1570
+#line 1570
 struct _ZN3edg27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEEE;
-# 1175
-struct _ZN3edg17General_allocatorINS_13Ptr_map_entryImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEEEE;
-# 5420
-struct _ZN3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEEE;
-# 1175
+#line 1175
+struct _ZN3edg17General_allocatorINS_13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEEEE;
+#line 5420
+struct _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEEE;
+#line 1175
 struct _ZN3edg17General_allocatorINS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEE;
-# 5972
-struct _ZN3edg13Ptr_multi_mapImPvLj50ENS_17General_allocatorEEE;
-# 1625
+#line 5972
+struct _ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEEE;
+#line 1625
 struct _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEE;
-# 39 "src/symbol_tbl.h"
+#line 39 "src/symbol_tbl.h"
 struct _ZN3edg20a_control_flow_descrE;
 struct _ZN3edg17a_tmpl_decl_stateE;
-# 57
+#line 57
 struct _ZN3edg20an_initializer_fixupE;
 
 struct _ZN3edg27a_deferred_constraint_checkE;
-# 2448 "src/util.h"
+#line 2448 "src/util.h"
 struct _ZN3edg10Shared_objINS_16a_pending_pragmaENS_12FE_allocatorEEE;
-# 26 "src/scope_stk.h"
+#line 26 "src/scope_stk.h"
 struct _ZN3edg19an_expr_stack_entryE;
 struct _ZN3edg17a_class_def_stateE;
 struct _ZN3edg13a_class_fixupE;
-# 137
+#line 137
 struct _ZN3edg36a_function_shareable_constants_tableE;
-# 154
+#line 154
 struct _ZN3edg20a_class_fixup_headerE;
-# 199
+#line 199
 struct _ZN3edg22a_scope_pointers_blockE;
-# 345
+#line 345
 struct _ZN3edg16a_pack_referenceE;
-# 457
+#line 457
 struct _ZN3edg22a_pack_expansion_descrE;
-# 567
+#line 567
 struct _ZN3edg28a_pack_expansion_stack_entryE;
-# 667
+#line 667
 struct _ZN3edg29a_name_hidden_by_old_for_initE;
-# 691
+#line 691
 struct _ZN3edg24a_generated_entity_blockE;
-# 719
+#line 719
 union _ZN3edg17a_collision_tableE;
-# 727
+#line 727
 struct _ZN3edg22a_string_literal_tableE;
-# 1625 "src/util.h"
+#line 1625 "src/util.h"
 struct _ZN3edg9Dyn_arrayIPNS_24a_template_cache_segmentENS_12FE_allocatorEEE;
-# 1682 "src/scope_stk.h"
+#line 1682 "src/scope_stk.h"
 union _ZN3edg19a_scope_stack_entryUt_E;
-# 738
+#line 738
 struct _ZN3edg19a_scope_stack_entryE;
-# 472 "src/symbol_tbl.h"
+#line 472 "src/symbol_tbl.h"
 enum _ZN3edg13a_symbol_kindE {
 _ZN3edg10sk_keywordE,
 _ZN3edg8sk_macroE,
@@ -6172,111 +6158,111 @@ _ZN3edg17sk_named_registerE,
 
 
 _ZN3edg15sk_property_setE,
-# 525
+#line 525
 _ZN3edg7sk_lastE};
-# 611
+#line 611
 struct _ZN3edg11a_macro_defE;
-# 861
+#line 861
 struct _ZN3edg17a_type_list_entryE;
-# 897
+#line 897
 struct _ZN3edg24a_hide_by_sig_list_entryE;
-# 940
+#line 940
 struct _ZN3edg22a_namespace_list_entryE;
-# 957
+#line 957
 struct _ZN3edg25a_class_symbol_supplementE;
-# 1509
+#line 1509
 struct _ZN3edg25an_enum_symbol_supplementE;
-# 1583
+#line 1583
 struct _ZN3edg25a_field_symbol_supplementE;
-# 1637
+#line 1637
 struct _ZN3edg31a_static_data_member_supplementE;
-# 1671
+#line 1671
 struct _ZN3edg10a_param_idE;
-# 1934
+#line 1934
 struct _ZN3edg20a_template_decl_infoE;
-# 2070
+#line 2070
 struct _ZN3edg24a_nondependent_call_infoE;
-# 2423
+#line 2423
 struct _ZN3edg19a_template_instanceE;
-# 2605
+#line 2605
 struct _ZN3edg24a_template_cache_segmentE;
-# 2698
+#line 2698
 struct _ZN3edg28a_template_symbol_supplementE;
-# 3270
+#line 3270
 struct _ZN3edg29a_namespace_symbol_supplementE;
-# 3331
+#line 3331
 struct _ZN3edg25an_active_using_directiveE;
-# 3371
+#line 3371
 struct _ZN3edg22an_extern_symbol_descrE;
-# 3404
+#line 3404
 struct _ZN3edg18a_projection_descrE;
-# 3432
+#line 3432
 struct _ZN3edg32a_property_set_symbol_supplementE;
-# 3755
+#line 3755
 struct _ZN3edg8a_symbolUt_Ut_E;
-# 3779
+#line 3779
 struct _ZN3edg8a_symbolUt_Ut0_E;
-# 3796
+#line 3796
 struct _ZN3edg8a_symbolUt_Ut1_E;
-# 3806
+#line 3806
 struct _ZN3edg8a_symbolUt_Ut2_E;
-# 3816
+#line 3816
 struct _ZN3edg8a_symbolUt_Ut3_E;
-# 3836
+#line 3836
 struct _ZN3edg8a_symbolUt_Ut4_E;
-# 3853
+#line 3853
 struct _ZN3edg8a_symbolUt_Ut5_E;
-# 3876
+#line 3876
 struct _ZN3edg8a_symbolUt_Ut6_E;
-# 3898
+#line 3898
 struct _ZN3edg8a_symbolUt_Ut7_E;
-# 3916
+#line 3916
 struct _ZN3edg8a_symbolUt_Ut8_E;
-# 3967
+#line 3967
 struct _ZN3edg8a_symbolUt_Ut9_E;
-# 4010
+#line 4010
 struct _ZN3edg8a_symbolUt_Ut10_E;
-# 4021
+#line 4021
 struct _ZN3edg8a_symbolUt_Ut11_E;
-# 4050
+#line 4050
 struct _ZN3edg8a_symbolUt_Ut12_E;
-# 4069
+#line 4069
 struct _ZN3edg8a_symbolUt_Ut13_E;
-# 4078
+#line 4078
 struct _ZN3edg8a_symbolUt_Ut14_E;
-# 3752
+#line 3752
 union _ZN3edg8a_symbolUt_E;
-# 3456
+#line 3456
 struct _ZN3edg8a_symbolE;
-# 4316
+#line 4316
 enum _ZN3edg27a_module_entry_locator_kindE {
 _ZN3edg9melk_noneE,
 _ZN3edg8melk_ifcE};
-# 4474
+#line 4474
 struct _ZN3edg15a_symbol_headerE;
-# 4773
+#line 4773
 struct _ZN3edg11a_vla_fixupE;
-# 4827
+#line 4827
 union _ZN3edg20an_extern_type_fixupUt_E;
-# 4807
+#line 4807
 struct _ZN3edg20an_extern_type_fixupE;
-# 4842
+#line 4842
 struct _ZN3edg21an_access_error_descrE;
-# 5420 "src/util.h"
+#line 5420 "src/util.h"
 struct _ZN3edg7Ptr_mapIPNS_8a_moduleEPNS_12a_hash_tableENS_12FE_allocatorEEE;
-# 7922 "src/symbol_tbl.h"
+#line 7922 "src/symbol_tbl.h"
 struct _ZN3edg12a_hash_tableE;
-# 758 "src/decls.h"
+#line 758 "src/decls.h"
 struct _ZN3edg18a_decl_parse_stateE;
-# 198 "src/trans_unit.h"
+#line 198 "src/trans_unit.h"
 struct _ZN3edg20a_trans_unit_correspE;
-# 31 "src/modules.h"
+#line 31 "src/modules.h"
 struct _ZN3edg15a_module_entityE;
-# 184 "src/lower_il.h"
+#line 184 "src/lower_il.h"
 struct _ZN3edg17an_init_pos_descrE;
-# 254
+#line 254
 struct _ZN3edg27a_destructible_entity_descrE;
-# 424
+#line 424
 enum _ZN3edg23an_insert_location_kindE {
 
 _ZN3edg19ilk_after_statementE,
@@ -6287,83 +6273,81 @@ _ZN3edg22ilk_statement_creationE,
 _ZN3edg15ilk_before_exprE,
 _ZN3edg14ilk_after_exprE,
 _ZN3edg17ilk_expr_creationE};
-# 459
+#line 459
 struct _ZN3edg18an_insert_locationUt_Ut_E;
-# 455
+#line 455
 union _ZN3edg18an_insert_locationUt_E;
-# 451
+#line 451
 struct _ZN3edg18an_insert_locationE;
-# 486
+#line 486
 struct _ZN3edg22a_temporary_list_entryE;
-# 35 "src/inline.h"
+#line 35 "src/inline.h"
 enum _ZN3edg25a_variable_remapping_kindE {
 _ZN3edg8vrk_noneE,
 _ZN3edg13vrk_temporaryE,
 _ZN3edg17vrk_constant_exprE};
-# 53
+#line 53
 union _ZN3edg33a_variable_remapping_for_inliningUt_E;
-# 43
+#line 43
 struct _ZN3edg33a_variable_remapping_for_inliningE;
-# 250 "src/pragma.h"
+#line 250 "src/pragma.h"
 struct _ZN3edg16a_pending_pragmaE;
-# 118 "src/pch.h"
+#line 118 "src/pch.h"
 struct _ZN3edg20a_pch_saved_variableE;
-# 5366 "src/util.h"
-union __C7;
-# 5327
-struct _ZN3edg13Ptr_map_entryImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEE;
-# 437
+#line 5366 "src/util.h"
+union __C8;
+#line 5327
+struct _ZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEE;
+#line 437
 struct _ZN3edg17Remove_ref_helperIRPvEE;
-# 37 "/usr/include/x86_64-linux-gnu/bits/types.h" 3
-typedef signed char __int8_t;
-typedef unsigned char __uint8_t;
+#line 5 "ape-arch/stdint_arch.h"
+typedef unsigned long long _uintptr_t;
+#line 91 "ape-sys/stdint_generic.h"
+typedef char int8_t;
+
+typedef int int32_t;
 
 
-typedef signed int __int32_t;
-typedef unsigned __uint32_t;
-# 24 "/usr/include/x86_64-linux-gnu/bits/stdint-intn.h" 3
-typedef __int8_t int8_t;
+typedef unsigned char uint8_t;
 
-typedef __int32_t int32_t;
-# 24 "/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h" 3
-typedef __uint8_t uint8_t;
-
-typedef __uint32_t uint32_t;
-# 79 "/usr/include/stdint.h" 3
-typedef unsigned long uintptr_t;
-# 145 "/usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h" 3
-typedef long ptrdiff_t;
-# 214
-typedef unsigned long size_t;
-# 499 "src/basics.h"
+typedef unsigned uint32_t;
+#line 123
+typedef _uintptr_t uintptr_t;
+#line 4 "ape-arch/stddef_arch.h"
+typedef long long _ptrdiff_t;
+#line 10
+typedef unsigned long long size_t;
+#line 20 "ape-sys/stddef.h"
+typedef _ptrdiff_t ptrdiff_t;
+#line 499 "src/basics.h"
 typedef void *_ZN3edg10a_void_ptrE;
-# 1627 "src/util.h"
+#line 1627 "src/util.h"
 typedef _ZN3edg10a_void_ptrE _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE7an_elemE;
-# 444
+#line 444
 typedef _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE7an_elemE _ZN3edg17Remove_ref_helperIRPvE9an_objectE;
-# 454
+#line 454
 typedef _ZN3edg17Remove_ref_helperIRPvE9an_objectE _ZN3edg10Remove_refIRPvEE;
-# 470
+#line 470
 typedef _ZN3edg10Remove_refIRPvEE _ZN3edg13Value_for_ptrIPPvEE;
-# 539
+#line 539
 typedef _ZN3edg13Value_for_ptrIPPvEE _ZZN3edg7destroyIPPvEEvT_E9an_object;
-# 184 "src/scope_stk.h"
+#line 184 "src/scope_stk.h"
 typedef struct _ZN3edg7Ptr_mapIPNS_8a_moduleEPNS_12a_hash_tableENS_12FE_allocatorEEE _ZN3edg25a_module_lookup_table_mapE;
-# 45 "src/symbol_tbl.h"
+#line 45 "src/symbol_tbl.h"
 typedef struct _ZN3edg12a_hash_tableE *_ZN3edg16a_hash_table_ptrE;
-# 100 "src/il_def.h"
+#line 100 "src/il_def.h"
 typedef struct _ZN3edg8a_moduleE *_ZN3edg12a_module_ptrE;
-# 280 "src/mem_manage.h"
-typedef struct _ZN3edg13Ptr_multi_mapImPvLj50ENS_17General_allocatorEEE _ZN3edg6detail17a_size_to_ptr_mapE;
-# 27 "src/symbol_tbl.h"
+#line 280 "src/mem_manage.h"
+typedef struct _ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEEE _ZN3edg6detail17a_size_to_ptr_mapE;
+#line 27 "src/symbol_tbl.h"
 typedef struct _ZN3edg15a_symbol_headerE *_ZN3edg19a_symbol_header_ptrE;
-# 937 "src/basics.h"
+#line 937 "src/basics.h"
 typedef struct _ZN3edg17a_source_positionE _ZN3edg17a_source_positionE;
-# 875
+#line 875
 typedef uint32_t _ZN3edg12a_seq_numberE;
-# 863
+#line 863
 typedef unsigned short _ZN3edg15a_column_numberE;
-# 897
+#line 897
 struct _ZN3edg17a_source_positionE {
 
 
@@ -6372,89 +6356,87 @@ struct _ZN3edg17a_source_positionE {
 _ZN3edg12a_seq_numberE seq;
 
 _ZN3edg15a_column_numberE column;char __dummy[2];};
-# 526
+#line 526
 typedef unsigned _ZN3edg11a_bit_fieldE;
-# 26 "src/symbol_tbl.h"
+#line 26 "src/symbol_tbl.h"
 typedef struct _ZN3edg8a_symbolE *_ZN3edg12a_symbol_ptrE;
-# 2498 "src/il_def.h"
+#line 2498 "src/il_def.h"
 typedef union _ZN3edg27a_parent_class_or_namespaceE _ZN3edg27a_parent_class_or_namespaceE;
-# 55
+#line 55
 typedef struct _ZN3edg6a_typeE *_ZN3edg10a_type_ptrE;
-# 66
+#line 66
 typedef struct _ZN3edg11a_namespaceE *_ZN3edg15a_namespace_ptrE;
-# 2478
+#line 2478
 union _ZN3edg27a_parent_class_or_namespaceE {
-# 2488
+#line 2488
 _ZN3edg10a_type_ptrE class_type;
-# 2494
+#line 2494
 _ZN3edg15a_namespace_ptrE namespace_ptr;};
-# 44 "src/error.h"
+#line 44 "src/error.h"
 typedef struct _ZN3edg14a_template_argE *_ZN3edg18a_template_arg_ptrE;
-# 53 "src/il_def.h"
+#line 53 "src/il_def.h"
 typedef struct _ZN3edg10a_constantE *_ZN3edg14a_constant_ptrE;
-# 76 "src/symbol_tbl.h"
+#line 76 "src/symbol_tbl.h"
 typedef struct _ZN3edg9Dyn_arrayINS_10Shared_objINS_16a_pending_pragmaENS_12FE_allocatorEEES3_EE _ZN3edg21a_pending_pragma_listE;
-# 72
+#line 72
 typedef struct _ZN3edg10Shared_objINS_16a_pending_pragmaENS_12FE_allocatorEEE _ZN3edg23a_shared_pending_pragmaE;
-# 215 "src/basics.h"
+#line 215 "src/basics.h"
 typedef _Bool _ZN3edg14a_byte_booleanE;
-# 515
+#line 515
 typedef const char _ZN3edg12a_const_charE;
-# 139 "src/host_envir.h"
+#line 139 "src/host_envir.h"
 typedef uint32_t _ZN3edg23a_token_sequence_numberE;
-# 200 "src/basics.h"
+#line 200 "src/basics.h"
 typedef unsigned char _ZN3edg6a_byteE;
-# 214
+#line 214
 typedef _Bool _ZN3edg9a_booleanE;
-# 541
+#line 541
 typedef size_t _ZN3edg8sizeof_tE;
-# 554
+#line 554
 typedef ptrdiff_t _ZN3edg9a_ptrdiffE;
-# 1160
+#line 1160
 typedef uint32_t _ZN3edg12a_hash_valueE;
-# 3475 "src/host_envir.h"
+#line 3475 "src/host_envir.h"
 typedef struct _ZN3edg13a_source_fileE *_ZN3edg17a_source_file_ptrE;
-# 1611 "src/targ_def.h"
+#line 1611 "src/targ_def.h"
 typedef unsigned short _ZN3edg17an_int_value_partE;
-# 1627
+#line 1627
 typedef _ZN3edg9a_ptrdiffE _ZN3edg20a_host_large_integerE;
 typedef _ZN3edg8sizeof_tE _ZN3edg21a_host_large_unsignedE;
-# 1673
+#line 1673
 struct _ZN3edg16an_integer_valueE {
 _ZN3edg17an_int_value_partE part[8];};
 typedef struct _ZN3edg16an_integer_valueE _ZN3edg16an_integer_valueE;
-# 1693
-typedef _ZN3edg16an_integer_valueE _ZN3edg19a_fixed_point_valueE;
-# 2156
+#line 2156
 typedef _ZN3edg20a_host_large_integerE _ZN3edg16a_targ_ptrdiff_tE;
-# 2183
+#line 2183
 typedef _ZN3edg21a_host_large_unsignedE _ZN3edg13a_targ_size_tE;
-# 2238
+#line 2238
 typedef unsigned short _ZN3edg16a_targ_alignmentE;
-# 2617
+#line 2617
 struct _ZN3edg23an_internal_float_valueE {
 
 
 
 
-_ZN3edg6a_byteE bytes[16];};
+_ZN3edg6a_byteE bytes[8];};
 
 typedef struct _ZN3edg23an_internal_float_valueE _ZN3edg23an_internal_float_valueE;
-# 2946
+#line 2946
 typedef unsigned short _ZN3edg25a_virtual_function_numberE;
-# 2990
+#line 2990
 typedef _ZN3edg16a_targ_ptrdiff_tE _ZN3edg21a_virtual_table_indexE;
-# 5593
+#line 5593
 typedef int _ZN3edg24a_named_address_space_idE;
-# 5664
+#line 5664
 typedef int _ZN3edg19a_named_register_idE;
-# 29 "src/mem_tables.h"
+#line 29 "src/mem_tables.h"
 typedef int _ZN3edg22a_memory_region_numberE;
-# 71
+#line 71
 typedef int _ZN3edg21a_function_def_numberE;
-# 94
+#line 94
 typedef struct _ZN3edg20a_function_def_descrE _ZN3edg20a_function_def_descrE;
-# 114
+#line 114
 typedef struct _ZN3edg18a_mem_block_headerE *_ZN3edg22a_mem_block_header_ptrE;
 struct _ZN3edg18a_mem_block_headerE {
 
@@ -6470,9 +6452,9 @@ char *next_avail_in_block;
 char *after_end_of_block;
 
 _ZN3edg8sizeof_tE malloc_size;
-# 134
+#line 134
 _ZN3edg14a_byte_booleanE trimmed;char __dummy[7];};
-# 142
+#line 142
 typedef struct _ZN3edg18an_il_entry_prefixE *_ZN3edg22an_il_entry_prefix_ptrE;
 struct _ZN3edg18an_il_entry_prefixE {
 
@@ -6490,9 +6472,9 @@ unsigned int il_walk_flag: 1;
 
 
 unsigned int il_lowering_flag: 1;
-# 166
+#line 166
 unsigned int keep_in_il: 1;char __dummy[3];};
-# 56 "src/il_def.h"
+#line 56 "src/il_def.h"
 typedef struct _ZN3edg10a_variableE *_ZN3edg14a_variable_ptrE;
 typedef struct _ZN3edg12a_base_classE *_ZN3edg16a_base_class_ptrE;
 typedef struct _ZN3edg7a_fieldE *_ZN3edg11a_field_ptrE;
@@ -6508,10 +6490,10 @@ typedef struct _ZN3edg7a_scopeE *_ZN3edg11a_scope_ptrE;
 
 
 typedef struct _ZN3edg8a_lambdaE *_ZN3edg12a_lambda_ptrE;
-# 78
+#line 78
 typedef struct _ZN3edg10a_templateE *_ZN3edg14a_template_ptrE;
 typedef struct _ZN3edg15an_ms_attributeE *_ZN3edg19an_ms_attribute_ptrE;
-# 91
+#line 91
 typedef struct _ZN3edg23a_new_delete_supplementE *_ZN3edg27a_new_delete_supplement_ptrE;
 
 
@@ -6520,23 +6502,23 @@ typedef struct _ZN3edg18a_gcnew_supplementE *_ZN3edg22a_gcnew_supplement_ptrE;
 
 
 typedef struct _ZN3edg24a_gnu_routine_supplementE *_ZN3edg28a_gnu_routine_supplement_ptrE;
-# 104
+#line 104
 typedef struct _ZN3edg15a_module_entityE *_ZN3edg19a_module_entity_ptrE;
-# 118
+#line 118
 typedef struct _ZN3edg25an_expr_rescan_info_entryE *_ZN3edg29an_expr_rescan_info_entry_ptrE;
 
 
 
 typedef int _ZN3edg29a_string_or_char_literal_kindE;
-# 131
+#line 131
 typedef struct _ZN3edg25a_property_or_event_descrE *_ZN3edg29a_property_or_event_descr_ptrE;
-# 259
+#line 259
 typedef struct _ZN3edg25a_seq_number_lookup_entryE *_ZN3edg29a_seq_number_lookup_entry_ptrE;
-# 337
+#line 337
 typedef struct _ZN3edg19a_cli_metadata_fileE *_ZN3edg23a_cli_metadata_file_ptrE;
-# 389
+#line 389
 typedef int _ZN3edg13a_scope_depthE;
-# 1864
+#line 1864
 struct _ZN3edg14a_source_rangeE {
 
 _ZN3edg17a_source_positionE start;
@@ -6545,15 +6527,15 @@ _ZN3edg17a_source_positionE start;
 _ZN3edg17a_source_positionE end;};
 
 typedef struct _ZN3edg14a_source_rangeE _ZN3edg14a_source_rangeE;
-# 1945
+#line 1945
 typedef struct _ZN3edg26a_decl_position_supplementE *_ZN3edg30a_decl_position_supplement_ptrE;
-# 2000
+#line 2000
 typedef struct _ZN3edg16a_name_referenceE *_ZN3edg20a_name_reference_ptrE;
-# 2006
+#line 2006
 typedef struct _ZN3edg12an_attributeE *_ZN3edg16an_attribute_ptrE;
-# 2012
+#line 2012
 typedef unsigned short _ZN3edg19a_gnu_init_priorityE;
-# 2042
+#line 2042
 struct _ZN3edg16a_tagged_pointerE {
 
 unsigned char kind;
@@ -6564,11 +6546,11 @@ typedef struct _ZN3edg16a_tagged_pointerE _ZN3edg16a_tagged_pointerE;
 
 
 typedef struct _ZN3edg23an_il_entity_list_entryE *_ZN3edg27an_il_entity_list_entry_ptrE;
-# 2064
+#line 2064
 typedef struct _ZN3edg23an_il_entity_list_entryE _ZN3edg23an_il_entity_list_entryE;
-# 2513
+#line 2513
 typedef struct _ZN3edg38a_per_instantiation_needed_flags_entryE *_ZN3edg42a_per_instantiation_needed_flags_entry_ptrE;
-# 3261
+#line 3261
 struct _ZN3edg23a_source_correspondenceE {
 
 
@@ -6582,34 +6564,34 @@ _ZN3edg12a_const_charE *name;
 
 
 _ZN3edg12a_const_charE *unmangled_name_or_mangled_encoding;
-# 3284
+#line 3284
 struct _ZN3edg20a_trans_unit_correspE *trans_unit_corresp;
-# 3297
+#line 3297
 _ZN3edg11a_scope_ptrE parent_scope;
-# 3312
+#line 3312
 _ZN3edg13a_routine_ptrE enclosing_routine;
 
 
 
 
 _ZN3edg19a_module_entity_ptrE module_entity;
-# 3327
+#line 3327
 _ZN3edg17a_source_positionE decl_position;
-# 3335
+#line 3335
 _ZN3edg30a_decl_position_supplement_ptrE decl_pos_info;
-# 3341
+#line 3341
 _ZN3edg20a_name_reference_ptrE name_references;
-# 3350
+#line 3350
 unsigned int access: 2;
-# 3357
+#line 3357
 unsigned int assembly_access: 2;
 
 
 
 unsigned int referenced: 1;
-# 3371
+#line 3371
 unsigned int needed: 1;
-# 3383
+#line 3383
 unsigned int name_linkage: 3;
 
 
@@ -6619,14 +6601,14 @@ unsigned int has_associated_pragma: 1;
 
 
 unsigned int is_local_to_function: 1;
-# 3399
+#line 3399
 unsigned int parent_via_local_scope_ref: 1;
 
 
 
 
 unsigned int is_class_member: 1;
-# 3410
+#line 3410
 unsigned int has_associated_attribute: 1;
 
 
@@ -6636,97 +6618,97 @@ unsigned int name_has_been_mangled: 1;
 
 
 unsigned int mangled_name_cannot_be_included_in_other_name: 1;
-# 3424
+#line 3424
 unsigned int final_name_mangling_pending: 1;
-# 3431
+#line 3431
 unsigned int unnamed_entity_given_fabricated_name: 1;
-# 3438
+#line 3438
 unsigned int entity_marked: 1;
-# 3482
+#line 3482
 unsigned int static_used_by_instantiation: 1;
-# 3492
+#line 3492
 unsigned int duplicate_static_in_instantiation_slices: 1;
-# 3500
+#line 3500
 unsigned int okay_to_walk_subtree_of_local_entity: 1;
-# 3507
+#line 3507
 unsigned int copied_from_secondary_trans_unit: 1;
-# 3513
+#line 3513
 unsigned int same_name_as_external_entity_in_secondary_trans_unit: 1;
-# 3519
+#line 3519
 unsigned int member_of_unknown_base: 1;
-# 3531
+#line 3531
 unsigned int qualified_unknown_base_member: 1;
-# 3546
+#line 3546
 unsigned int member_of_unknown_super: 1;
-# 3553
+#line 3553
 unsigned int microsoft_identifier_used: 1;
-# 3564
+#line 3564
 unsigned int is_deprecated_or_unavailable: 1;
 
 
 unsigned int externalized: 1;
-# 3573
+#line 3573
 unsigned int on_mangling_substitution_list: 1;
 
 
 
 unsigned int maybe_unused: 1;
-# 3602
+#line 3602
 _ZN3edg42a_per_instantiation_needed_flags_entry_ptrE per_instantiation_needed_flags;
-# 3610
+#line 3610
 _ZN3edg16an_attribute_ptrE attributes;};
 
 typedef struct _ZN3edg23a_source_correspondenceE _ZN3edg23a_source_correspondenceE;
-# 3706
+#line 3706
 typedef struct _ZN3edg25an_internal_complex_valueE *_ZN3edg29an_internal_complex_value_ptrE;
-# 3795
+#line 3795
 typedef struct _ZN3edg12a_using_declE *_ZN3edg16a_using_decl_ptrE;
-# 3992
+#line 3992
 typedef struct _ZN3edg14a_dynamic_initE *_ZN3edg18a_dynamic_init_ptrE;
-# 4246
+#line 4246
 struct _ZN3edg14a_dynamic_initUt_Ut_E {
 
 _ZN3edg14a_constant_ptrE ptr;
-# 4256
+#line 4256
 _ZN3edg12a_lambda_ptrE lambda;
 
 
 unsigned int non_constant: 1;char __dummy[7];};
-# 4276
+#line 4276
 struct _ZN3edg14a_dynamic_initUt_Ut0_E {
 
 _ZN3edg13a_routine_ptrE ptr;
-# 4285
+#line 4285
 _ZN3edg16an_expr_node_ptrE args;
-# 4298
+#line 4298
 unsigned int is_copy_constructor_with_implied_source: 1;
-# 4313
+#line 4313
 unsigned int is_implicit_copy_for_copy_initialization: 1;
 
 
 
 
 unsigned int value_initialization: 1;
-# 4324
+#line 4324
 unsigned int has_sequenced_arguments: 1;
-# 4330
+#line 4330
 unsigned int is_array_copy: 1;char __dummy[7];};
-# 4339
+#line 4339
 struct _ZN3edg14a_dynamic_initUt_Ut1_E {
 
 _ZN3edg16an_expr_node_ptrE source;};
-# 4243
+#line 4243
 union _ZN3edg14a_dynamic_initUt_E {
-# 4263
+#line 4263
 struct _ZN3edg14a_dynamic_initUt_Ut_E constant;
 
 
 _ZN3edg16an_expr_node_ptrE expression;
-# 4337
+#line 4337
 struct _ZN3edg14a_dynamic_initUt_Ut0_E constructor;
-# 4350
+#line 4350
 struct _ZN3edg14a_dynamic_initUt_Ut1_E bitwise_copy;};
-# 3993
+#line 3993
 struct _ZN3edg14a_dynamic_initE {
 
 _ZN3edg18a_dynamic_init_ptrE next;
@@ -6735,28 +6717,28 @@ _ZN3edg18a_dynamic_init_ptrE next;
 
 
 _ZN3edg14a_variable_ptrE variable;
-# 4007
+#line 4007
 _ZN3edg13a_routine_ptrE destructor;
-# 4020
+#line 4020
 _ZN3edg22an_object_lifetime_ptrE lifetime;
-# 4028
+#line 4028
 _ZN3edg18a_dynamic_init_ptrE next_in_destruction_list;
-# 4041
+#line 4041
 _ZN3edg22an_object_lifetime_ptrE init_expr_lifetime;
-# 4051
+#line 4051
 unsigned char kind;
 
 unsigned int static_temp: 1;
-# 4065
+#line 4065
 unsigned int follows_an_exec_statement: 1;
-# 4075
+#line 4075
 unsigned int inside_conditional_expression: 1;
 
 
 unsigned int unordered: 1;
-# 4088
+#line 4088
 unsigned int has_temporary_lifetime: 1;
-# 4094
+#line 4094
 unsigned int is_constructor_init: 1;
 
 
@@ -6771,13 +6753,13 @@ unsigned int is_array_freeing: 1;
 
 
 unsigned int destruction_is_for_partially_constructed_aggregate: 1;
-# 4114
+#line 4114
 unsigned int is_guard_var_for_local_static_var_init: 1;
-# 4122
+#line 4122
 unsigned int overlaps_temps_in_inner_lifetime: 1;
-# 4134
+#line 4134
 unsigned int included_in_slice: 1;
-# 4140
+#line 4140
 unsigned int is_explicit_cast: 1;
 
 
@@ -6788,13 +6770,13 @@ unsigned int is_braced_initializer: 1;
 
 
 unsigned int is_partially_initialized: 1;
-# 4165
+#line 4165
 unsigned int is_result_for_class_rvalue_question_mark: 1;
 
 
 
 unsigned int class_rvalue_initialized_through_master_entry: 1;
-# 4182
+#line 4182
 unsigned int is_result_for_comma_operator: 1;
 
 
@@ -6804,40 +6786,40 @@ unsigned int is_reused_value: 1;
 
 
 unsigned int is_vla_deallocation: 1;
-# 4204
+#line 4204
 unsigned int is_freeing_of_exception_object: 1;
-# 4211
+#line 4211
 unsigned int is_creation_of_initializer_list_object: 1;
-# 4217
+#line 4217
 unsigned int is_array_for_initializer_list_object: 1;
 
 
 unsigned int is_top_temporary_for_constexpr_reference_param: 1;
-# 4351
+#line 4351
 union _ZN3edg14a_dynamic_initUt_E variant;
 
 
 struct _ZN3edg27a_destructible_entity_descrE *destructible_entity_descr;
-# 4360
+#line 4360
 struct _ZN3edg17an_init_pos_descrE *init_destination;
-# 4367
+#line 4367
 _ZN3edg27a_new_delete_supplement_ptrE assoc_new;
-# 4376
+#line 4376
 _ZN3edg22an_object_lifetime_ptrE lifetime_of_overlapping_temps;
 
 
 
 _ZN3edg18a_dynamic_init_ptrE master_entry;
-# 4389
+#line 4389
 _ZN3edg29an_expr_rescan_info_entry_ptrE rescan_info;};
-# 4474
+#line 4474
 typedef uint32_t _ZN3edg25a_template_param_list_posE;
 
 
 
 
 typedef int32_t _ZN3edg24a_template_nesting_depthE;
-# 4526
+#line 4526
 struct _ZN3edg27a_template_param_coordinateE {
 
 
@@ -6853,42 +6835,42 @@ _ZN3edg24a_template_nesting_depthE depth;};
 
 
 typedef struct _ZN3edg27a_template_param_coordinateE _ZN3edg27a_template_param_coordinateE;
-# 4605
+#line 4605
 typedef struct _ZN3edg16a_subobject_pathE *_ZN3edg20a_subobject_path_ptrE;
-# 4662
+#line 4662
 typedef int32_t _ZN3edg14a_scope_numberE;
-# 4710
+#line 4710
 struct _ZN3edg18a_reflection_valueE {
 
 _ZN3edg16a_tagged_pointerE entity;
 
 
 _ZN3edg14a_scope_numberE local_scope_number;char __dummy[4];};
-# 4731
+#line 4731
 union _ZN3edg15a_field_or_baseE {
 _ZN3edg11a_field_ptrE field;
 
 
 _ZN3edg16a_base_class_ptrE base;};
-# 5051
+#line 5051
 struct _ZN3edg10a_constantUt_Ut_E {
 
 _ZN3edg13a_targ_size_tE length;
-# 5059
+#line 5059
 _ZN3edg12a_const_charE *value;
-# 5079
+#line 5079
 unsigned long sequence_number;
-# 5094
+#line 5094
 _ZN3edg29a_string_or_char_literal_kindE literal_kind;
-# 5102
+#line 5102
 unsigned int func_name_tok: 1;
-# 5111
-unsigned int embed_expansion: 1;char __dummy[3];};
-# 5203
+#line 5111
+unsigned int embed_expansion: 1;char __dummy[7];};
+#line 5203
 struct _ZN3edg10a_constantUt_Ut0_Ut_Ut_E {
 
 unsigned param_num;};
-# 5156
+#line 5156
 union _ZN3edg10a_constantUt_Ut0_Ut_E {
 
 
@@ -6898,15 +6880,15 @@ _ZN3edg13a_routine_ptrE routine;
 
 
 _ZN3edg14a_variable_ptrE variable;
-# 5184
+#line 5184
 _ZN3edg14a_constant_ptrE constant;
-# 5190
+#line 5190
 _ZN3edg10a_type_ptrE type;
-# 5201
+#line 5201
 _ZN3edg11a_label_ptrE label;
-# 5208
+#line 5208
 struct _ZN3edg10a_constantUt_Ut0_Ut_Ut_E param_ref;};
-# 5137
+#line 5137
 struct _ZN3edg10a_constantUt_Ut0_E {
 
 unsigned char kind;
@@ -6916,14 +6898,14 @@ unsigned int one_past_the_end: 1;
 
 
 unsigned int is_object_reflection: 1;
-# 5209
+#line 5209
 union _ZN3edg10a_constantUt_Ut0_Ut_E variant;
 
 _ZN3edg16a_targ_ptrdiff_tE offset;
 
 
 _ZN3edg20a_subobject_path_ptrE subobject_path;};
-# 5245
+#line 5245
 union _ZN3edg10a_constantUt_Ut1_Ut_E {
 
 
@@ -6933,22 +6915,22 @@ _ZN3edg13a_routine_ptrE routine;
 
 
 _ZN3edg11a_field_ptrE field;};
-# 5220
+#line 5220
 struct _ZN3edg10a_constantUt_Ut1_E {
 
 
 
 
 _ZN3edg16a_base_class_ptrE casting_base_class;
-# 5231
+#line 5231
 _ZN3edg20a_name_reference_ptrE name_reference;
 
 
 
 unsigned int cast_to_base: 1;
-# 5242
+#line 5242
 unsigned int is_function_ptr: 1;
-# 5255
+#line 5255
 union _ZN3edg10a_constantUt_Ut1_Ut_E variant;};
 
 
@@ -6960,13 +6942,13 @@ _ZN3edg14a_constant_ptrE from_address;
 
 
 _ZN3edg14a_constant_ptrE to_address;};
-# 5285
+#line 5285
 struct _ZN3edg10a_constantUt_Ut3_E {
 
 _ZN3edg18a_dynamic_init_ptrE ptr;
-# 5294
+#line 5294
 union _ZN3edg15a_field_or_baseE field_or_base;};
-# 5303
+#line 5303
 struct _ZN3edg10a_constantUt_Ut4_E {
 
 _ZN3edg14a_constant_ptrE first_constant;
@@ -6980,33 +6962,33 @@ unsigned int has_dynamic_init_component: 1;
 
 
 unsigned int added_const_for_template_param: 1;
-# 5321
+#line 5321
 union _ZN3edg15a_field_or_baseE field_or_base;};
-# 5338
+#line 5338
 struct _ZN3edg10a_constantUt_Ut5_E {
 
 _ZN3edg14a_constant_ptrE constant;
 
 
 _ZN3edg13a_targ_size_tE count;
-# 5350
+#line 5350
 _ZN3edg14a_byte_booleanE multidimensional_aggr_tail_not_repeated;char __dummy[7];};
-# 5431
+#line 5431
 struct _ZN3edg10a_constantUt_Ut6_Ut_Ut_E {
 
 _ZN3edg10a_type_ptrE conversion_type;
-# 5439
+#line 5439
 _ZN3edg29a_property_or_event_descr_ptrE property_or_event_descr;
-# 5445
+#line 5445
 struct _ZN3edg8a_symbolE *symbol;
-# 5454
+#line 5454
 unsigned char opname_kind;
 
 
 
 
 unsigned char special_kind;char __dummy[6];};
-# 5481
+#line 5481
 struct _ZN3edg10a_constantUt_Ut6_Ut_Ut0_E {
 
 _ZN3edg10a_type_ptrE type;
@@ -7030,13 +7012,13 @@ _ZN3edg14a_constant_ptrE con;
 
 
 _ZN3edg18a_template_arg_ptrE arg_list;};
-# 5509
+#line 5509
 struct _ZN3edg10a_constantUt_Ut6_Ut_Ut2_E {
 
 _ZN3edg10a_type_ptrE type;
 
 unsigned int unqualified: 1;char __dummy[7];};
-# 5412
+#line 5412
 union _ZN3edg10a_constantUt_Ut6_Ut_E {
 
 
@@ -7046,24 +7028,24 @@ _ZN3edg27a_template_param_coordinateE coordinates;
 
 
 _ZN3edg16an_expr_node_ptrE expr;
-# 5464
+#line 5464
 struct _ZN3edg10a_constantUt_Ut6_Ut_Ut_E unknown_function;
 
 
 
 _ZN3edg14a_constant_ptrE constant;
-# 5474
+#line 5474
 _ZN3edg14a_constant_ptrE string_literal_list;
-# 5495
+#line 5495
 struct _ZN3edg10a_constantUt_Ut6_Ut_Ut0_E templ_sizeof;
-# 5507
+#line 5507
 struct _ZN3edg10a_constantUt_Ut6_Ut_Ut1_E template_ref;
-# 5516
+#line 5516
 struct _ZN3edg10a_constantUt_Ut6_Ut_Ut2_E destructor;
 
 
 _ZN3edg14a_constant_ptrE bound;};
-# 5366
+#line 5366
 struct _ZN3edg10a_constantUt_Ut6_E {
 
 unsigned char kind;
@@ -7074,18 +7056,18 @@ unsigned int is_qualified_name: 1;
 
 
 unsigned int has_address_of: 1;
-# 5386
+#line 5386
 unsigned int is_pack: 1;
 
 
 unsigned int has_generic_cast_for_nontype_template_param: 1;
-# 5397
+#line 5397
 unsigned int local_expr_ref: 1;
-# 5407
+#line 5407
 unsigned int do_not_rescan: 1;
-# 5522
+#line 5522
 union _ZN3edg10a_constantUt_Ut6_Ut_E variant;};
-# 5541
+#line 5541
 union _ZN3edg10a_constantUt_Ut7_Ut_E {
 
 
@@ -7102,7 +7084,7 @@ _ZN3edg12a_const_charE *field_name;
 
 
 _ZN3edg14a_constant_ptrE subscript;};
-# 5528
+#line 5528
 struct _ZN3edg10a_constantUt_Ut7_E {
 
 unsigned int is_field_designator: 1;
@@ -7113,51 +7095,49 @@ unsigned int is_generic: 1;
 
 
 unsigned int uses_direct_init_syntax: 1;
-# 5560
+#line 5560
 union _ZN3edg10a_constantUt_Ut7_Ut_E variant;};
-# 5027
+#line 5027
 union _ZN3edg10a_constantUt_E {
-# 5036
+#line 5036
 _ZN3edg16an_integer_valueE integer_value;
-# 5047
-_ZN3edg19a_fixed_point_valueE fixed_point_value;
-# 5120
+#line 5120
 struct _ZN3edg10a_constantUt_Ut_E string;
-# 5126
+#line 5126
 _ZN3edg23an_internal_float_valueE float_value;
-# 5132
+#line 5132
 _ZN3edg29an_internal_complex_value_ptrE complex_value;
-# 5218
+#line 5218
 struct _ZN3edg10a_constantUt_Ut0_E address;
-# 5256
+#line 5256
 struct _ZN3edg10a_constantUt_Ut1_E ptr_to_member;
-# 5268
+#line 5268
 struct _ZN3edg10a_constantUt_Ut2_E label_difference;
-# 5299
+#line 5299
 struct _ZN3edg10a_constantUt_Ut3_E dynamic_init;
-# 5326
+#line 5326
 struct _ZN3edg10a_constantUt_Ut4_E aggregate;
-# 5363
+#line 5363
 struct _ZN3edg10a_constantUt_Ut5_E init_repeat;
-# 5523
+#line 5523
 struct _ZN3edg10a_constantUt_Ut6_E template_param;
-# 5561
+#line 5561
 struct _ZN3edg10a_constantUt_Ut7_E designator;
 
 
 struct _ZN3edg18a_reflection_valueE reflection;};
-# 4741
+#line 4741
 struct _ZN3edg10a_constantE {
-# 4747
+#line 4747
 _ZN3edg23a_source_correspondenceE source_corresp;
 
 
 
 
 _ZN3edg17a_source_positionE end_position;
-# 4762
+#line 4762
 _ZN3edg14a_constant_ptrE next;
-# 4768
+#line 4768
 _ZN3edg10a_type_ptrE type;
 
 
@@ -7168,15 +7148,15 @@ _ZN3edg10a_type_ptrE orig_type;
 
 
 _ZN3edg16an_expr_node_ptrE expr;
-# 4790
+#line 4790
 _ZN3edg29an_expr_rescan_info_entry_ptrE rescan_info;
-# 4798
+#line 4798
 _ZN3edg14a_variable_ptrE assoc_var;
-# 4808
+#line 4808
 unsigned int character_kind: 3;
-# 4814
+#line 4814
 unsigned int implicit_cast: 1;
-# 4825
+#line 4825
 unsigned int explicit_cast_applied: 1;
 
 
@@ -7187,19 +7167,19 @@ unsigned int is_reinterpret_cast: 1;
 
 
 unsigned int is_reinterpret_like_cast: 1;
-# 4841
+#line 4841
 unsigned int non_arithmetic: 1;
-# 4848
+#line 4848
 unsigned int is_simple_zero: 1;
 
 
 
 unsigned int null_pointer_constant_ruled_out: 1;
-# 4858
+#line 4858
 unsigned int null_keyword: 1;
-# 4864
+#line 4864
 unsigned int nullptr_keyword: 1;
-# 4874
+#line 4874
 unsigned int native_nullptr_keyword: 1;
 
 
@@ -7230,14 +7210,14 @@ unsigned int flexible_array_initializer: 1;
 
 
 unsigned int uses_designated_initializers: 1;
-# 4909
+#line 4909
 unsigned int is_literal_field: 1;
 
 
 
 
 unsigned int is_pack_expansion: 1;
-# 4921
+#line 4921
 unsigned int elide_aggregate_braces: 1;
 
 
@@ -7253,7 +7233,7 @@ unsigned int partial_aggr_value: 1;
 
 
 unsigned int is_partially_initialized: 1;
-# 4941
+#line 4941
 unsigned int implicit_aggr_element: 1;
 
 
@@ -7263,19 +7243,19 @@ unsigned int is_compound_literal: 1;
 
 
 unsigned int is_result_of_constexpr_call: 1;
-# 4957
+#line 4957
 unsigned int is_generic_initializer: 1;
-# 4964
+#line 4964
 unsigned int has_been_prelowered: 1;
 
 
 
 unsigned int vptr_has_been_lowered: 1;
-# 4974
+#line 4974
 unsigned int initializes_empty_object: 1;
-# 4981
+#line 4981
 unsigned int is_implicit_initialization: 1;
-# 4987
+#line 4987
 unsigned int constant_for_base_class: 1;
 
 
@@ -7284,57 +7264,38 @@ unsigned int constant_for_base_class_from_constexpr_folding: 1;
 
 
 unsigned int part_of_constexpr_master_expr: 1;
-# 5000
+#line 5000
 unsigned int local_expr_ref: 1;
-# 5007
+#line 5007
 unsigned int folded_statement_expression: 1;
 
 
 
 
 unsigned int formed_from_promoted_storage: 1;
-# 5025
+#line 5025
 unsigned char kind;
-# 5567
+#line 5567
 union _ZN3edg10a_constantUt_E variant;};
 typedef struct _ZN3edg10a_constantE _ZN3edg10a_constantE;
-# 5748
-struct _ZN3edg24a_fixed_point_type_descrE {
-
-
-unsigned char precision;
-
-
-
-unsigned int is_unsigned: 1;
-
-
-unsigned int is_fract_type: 1;
-
-
-
-unsigned int saturating: 1;char __dummy[2];};
-
-
-typedef struct _ZN3edg24a_fixed_point_type_descrE _ZN3edg24a_fixed_point_type_descrE;
-# 6384
+#line 6384
 typedef struct _ZN3edg12a_param_typeE *_ZN3edg16a_param_type_ptrE;
-# 6934
+#line 6934
 typedef struct _ZN3edg8a_pragmaE *_ZN3edg12a_pragma_ptrE;
-# 7086
+#line 7086
 typedef short _ZN3edg20a_lint_varargs_countE;
-# 7128
+#line 7128
 typedef struct _ZN3edg26an_exception_specificationE *_ZN3edg30an_exception_specification_ptrE;
-# 7310
+#line 7310
 typedef unsigned _ZN3edg19a_decl_modifier_setE;
-# 7393
+#line 7393
 typedef struct _ZN3edg25a_routine_type_supplementE *_ZN3edg29a_routine_type_supplement_ptrE;
 struct _ZN3edg25a_routine_type_supplementE {
 
 _ZN3edg16a_param_type_ptrE param_type_list;
-# 7416
+#line 7416
 _ZN3edg13a_routine_ptrE assoc_routine;
-# 7422
+#line 7422
 unsigned int has_ellipsis: 1;
 
 
@@ -7343,20 +7304,20 @@ unsigned int prototyped: 1;
 
 
 unsigned int old_style_params_scanned: 1;
-# 7441
+#line 7441
 unsigned int trailing_return_type: 1;
-# 7447
+#line 7447
 unsigned int lint_argsused_flag: 1;
 
 
 
 
 unsigned int value_returned_by_cctor: 1;
-# 7460
+#line 7460
 unsigned int value_returned_as_parameter: 1;
-# 7469
+#line 7469
 unsigned int return_value_parameter_follows_this: 1;
-# 7479
+#line 7479
 unsigned int assoc_routine_is_ctor: 1;
 
 
@@ -7369,16 +7330,16 @@ unsigned int assoc_routine_is_lambda_body: 1;
 
 
 unsigned int suppress_diagnostic_on_incomplete_return_type: 1;
-# 7498
+#line 7498
 unsigned int routine_name_linkage: 3;
-# 7513
+#line 7513
 unsigned int routine_name_linkage_is_explicit: 1;
 
 
 unsigned int qualifiers: 15;
-# 7522
+#line 7522
 unsigned int this_qualifiers: 15;
-# 7531
+#line 7531
 unsigned int ref_qualifiers: 2;
 
 
@@ -7396,7 +7357,7 @@ unsigned int result_should_be_used: 1;
 
 
 unsigned int is_const: 1;
-# 7553
+#line 7553
 unsigned int is_variadic_instance: 1;
 
 
@@ -7406,68 +7367,68 @@ unsigned int explicit_calling_convention: 1;
 
 
 unsigned int had_been_implicitly_const: 1;
-# 7568
+#line 7568
 unsigned int is_conditionally_explicit: 1;
-# 7575
+#line 7575
 unsigned int has_this_param: 1;
-# 7581
+#line 7581
 _ZN3edg20a_lint_varargs_countE lint_varargs_count;
-# 7587
+#line 7587
 unsigned char arg_pragma;
-# 7593
+#line 7593
 unsigned char calling_convention;
 
 
 
 
 int fmt_arg;
-# 7608
+#line 7608
 int format_first_subst_arg;
-# 7619
+#line 7619
 int sentinel_pos;
-# 7628
+#line 7628
 _ZN3edg10a_type_ptrE this_class;
-# 7634
+#line 7634
 _ZN3edg11a_scope_ptrE prototype_scope;
-# 7656
+#line 7656
 _ZN3edg30an_exception_specification_ptrE exception_specification;};
-# 8316
+#line 8316
 typedef struct _ZN3edg18a_class_list_entryE *_ZN3edg22a_class_list_entry_ptrE;
-# 8329
+#line 8329
 typedef struct _ZN3edg20a_routine_list_entryE *_ZN3edg24a_routine_list_entry_ptrE;
-# 8740
+#line 8740
 typedef struct _ZN3edg23a_class_type_supplementE *_ZN3edg27a_class_type_supplement_ptrE;
-# 9329
+#line 9329
 typedef struct _ZN3edg32a_template_param_type_supplementE *_ZN3edg36a_template_param_type_supplement_ptrE;
-# 9421
+#line 9421
 typedef struct _ZN3edg25a_typeref_type_supplementE *_ZN3edg29a_typeref_type_supplement_ptrE;
-# 9502
+#line 9502
 typedef struct _ZN3edg26an_integer_type_supplementE *_ZN3edg30an_integer_type_supplement_ptrE;
-# 9624
+#line 9624
 typedef struct _ZN3edg24a_based_type_list_memberE *_ZN3edg28a_based_type_list_member_ptrE;
-# 9646
+#line 9646
 typedef _ZN3edg6a_byteE _ZN3edg22a_pointer_modifier_setE;
-# 10142
+#line 10142
 union _ZN3edg6a_typeUt_Ut_Ut_E {
 
 
 _ZN3edg14a_constant_ptrE constant_list;
-# 10152
+#line 10152
 _ZN3edg11a_scope_ptrE assoc_scope;
 
 
 
 _ZN3edg10a_type_ptrE affiliated_type;};
-# 10045
+#line 10045
 struct _ZN3edg6a_typeUt_Ut_E {
 
 unsigned char int_kind;
 
 
 unsigned int explicitly_signed: 1;
-# 10058
+#line 10058
 unsigned int microsoft_sized_int_type: 1;
-# 10064
+#line 10064
 unsigned int has_explicit_enum_base: 1;
 
 
@@ -7483,9 +7444,9 @@ unsigned int is_scoped_enum: 1;
 
 
 unsigned int packed: 1;
-# 10086
+#line 10086
 unsigned int wchar_t_type: 1;
-# 10092
+#line 10092
 unsigned int char8_t_type: 1;
 
 
@@ -7502,7 +7463,7 @@ unsigned int bool_type: 1;
 
 
 unsigned int originally_unnamed: 1;
-# 10113
+#line 10113
 unsigned int is_template_enum: 1;
 
 
@@ -7522,13 +7483,13 @@ unsigned int is_specialized: 1;
 
 
 unsigned int is_ms_instantiated_nonreal_enum: 1;
-# 10139
+#line 10139
 unsigned int ELF_visibility: 3;
-# 10163
+#line 10163
 union _ZN3edg6a_typeUt_Ut_Ut_E enum_info;
 
 _ZN3edg30an_integer_type_supplement_ptrE extra_info;};
-# 10185
+#line 10185
 struct _ZN3edg6a_typeUt_Ut0_E {
 
 _ZN3edg10a_type_ptrE type;
@@ -7536,7 +7497,7 @@ _ZN3edg10a_type_ptrE type;
 
 
 _ZN3edg14a_variable_ptrE base_variable;
-# 10198
+#line 10198
 unsigned int is_reference: 1;
 
 
@@ -7553,11 +7514,11 @@ unsigned int is_handle: 1;
 
 
 unsigned int is_interior_ptr: 1;
-# 10220
+#line 10220
 unsigned int is_pin_ptr: 1;
-# 10227
+#line 10227
 _ZN3edg22a_pointer_modifier_setE modifiers;char __dummy[6];};
-# 10233
+#line 10233
 struct _ZN3edg6a_typeUt_Ut1_E {
 
 _ZN3edg10a_type_ptrE return_type;
@@ -7571,7 +7532,7 @@ _ZN3edg29a_routine_type_supplement_ptrE extra_info;
 
 
 _ZN3edg10a_type_ptrE unlowered_type;};
-# 10326
+#line 10326
 union _ZN3edg6a_typeUt_Ut2_Ut_E {
 
 
@@ -7582,26 +7543,26 @@ _ZN3edg13a_targ_size_tE number_of_elements;
 
 
 _ZN3edg16an_expr_node_ptrE element_count_expr;
-# 10342
+#line 10342
 _ZN3edg14a_constant_ptrE element_count_constant;};
-# 10257
+#line 10257
 struct _ZN3edg6a_typeUt_Ut2_E {
 
 _ZN3edg10a_type_ptrE element_type;
 
 
 unsigned int qualifiers: 15;
-# 10268
+#line 10268
 unsigned int is_template_dependent_size_array: 1;
-# 10275
+#line 10275
 unsigned int is_variable_size_array: 1;
-# 10282
+#line 10282
 unsigned int is_vla: 1;
-# 10288
+#line 10288
 unsigned int constant_bound_expr_in_local_expr_node_ref: 1;
-# 10297
+#line 10297
 unsigned int dep_constant_bound_expr_in_local_expr_node_ref: 1;
-# 10305
+#line 10305
 unsigned int has_assoc_vla_dimension: 1;
 
 
@@ -7613,13 +7574,13 @@ unsigned int bound_is_zero: 1;
 
 
 unsigned int is_static: 1;
-# 10322
+#line 10322
 unsigned int is_threads_dimension: 1;
-# 10347
+#line 10347
 union _ZN3edg6a_typeUt_Ut2_Ut_E variant;
 
 _ZN3edg14a_constant_ptrE bound_constant;};
-# 10356
+#line 10356
 struct _ZN3edg6a_typeUt_Ut3_E {
 
 _ZN3edg11a_field_ptrE field_list;
@@ -7632,28 +7593,28 @@ _ZN3edg27a_class_type_supplement_ptrE extra_info;
 
 
 unsigned int is_interface: 1;
-# 10374
+#line 10374
 unsigned int is_interface_like: 1;
-# 10381
+#line 10381
 unsigned int is_delegate_class: 1;
 
 
 
 unsigned int is_generic_definition: 1;
-# 10392
+#line 10392
 unsigned int is_generic_instance: 1;
 
 
 
 unsigned int is_open_constructed_type: 1;
-# 10402
+#line 10402
 unsigned int is_generic_constraint: 1;
 
 
 
 
 unsigned int is_hybrid_constraint: 1;
-# 10413
+#line 10413
 unsigned int any_interface_constraints: 1;
 
 
@@ -7665,9 +7626,9 @@ unsigned int unconstrained: 1;
 
 
 unsigned int sealed: 1;
-# 10435
+#line 10435
 unsigned int final: 1;
-# 10441
+#line 10441
 unsigned int any_const_member: 1;
 
 
@@ -7687,11 +7648,11 @@ unsigned int any_virtual_base_classes: 1;
 
 
 unsigned int abstract: 1;
-# 10468
+#line 10468
 unsigned int any_virtual_functions: 1;
-# 10475
+#line 10475
 unsigned int any_pure_virtual_functions: 1;
-# 10484
+#line 10484
 unsigned int any_virtual_functions_including_in_base_classes: 1;
 
 
@@ -7702,80 +7663,80 @@ unsigned int nested_class_defined_outside_of_parent: 1;
 
 
 unsigned int originally_unnamed: 1;
-# 10499
+#line 10499
 unsigned int is_nonstd_anonymous_union_type: 1;
-# 10509
+#line 10509
 unsigned int is_template_class: 1;
-# 10515
+#line 10515
 unsigned int is_nonreal_class: 1;
-# 10528
+#line 10528
 unsigned int is_ms_instantiated_nonreal_class: 1;
-# 10534
+#line 10534
 unsigned int is_prototype_instantiation: 1;
-# 10540
+#line 10540
 unsigned int is_specialized: 1;
-# 10549
+#line 10549
 unsigned int specialized_with_old_syntax: 1;
 
 
 
 
 unsigned int is_in_class_specialization: 1;
-# 10560
+#line 10560
 unsigned int explicitly_instantiated: 1;
 
 
 
 
 unsigned int do_not_instantiate: 1;
-# 10571
+#line 10571
 unsigned int proxy_class: 1;
-# 10578
+#line 10578
 unsigned int definition_needed: 1;
-# 10584
+#line 10584
 unsigned int keep_definition_in_il: 1;
-# 10591
+#line 10591
 unsigned int is_empty_class: 1;
-# 10599
+#line 10599
 unsigned int no_proper_data: 1;
 
 
 
 
 unsigned int has_zero_init_component: 1;
-# 10611
+#line 10611
 unsigned int has_pointer_component: 1;
 
 
 
 unsigned int contains_flexible_array_member: 1;
-# 10622
+#line 10622
 unsigned int is_transparent: 1;
-# 10629
+#line 10629
 unsigned int is_packed: 1;
 
 
 
 unsigned int has_internal_linkage_attribute: 1;
-# 10639
+#line 10639
 unsigned int has_operator_ampersand: 1;
 
 
 
 unsigned int virtual_functions_marked_as_required: 1;
-# 10649
+#line 10649
 unsigned int copy_assignment_decl_suppressed: 1;
-# 10660
+#line 10660
 unsigned int copy_ctor_decl_suppressed: 1;
-# 10669
+#line 10669
 unsigned int default_ctor_decl_suppressed: 1;
-# 10676
+#line 10676
 unsigned int dtor_decl_suppressed: 1;
-# 10684
+#line 10684
 unsigned int inc_class_used_in_array_type: 1;
-# 10694
+#line 10694
 _ZN3edg16a_targ_alignmentE max_member_alignment;char __dummy[6];};
-# 10733
+#line 10733
 struct _ZN3edg6a_typeUt_Ut4_E {
 
 _ZN3edg10a_type_ptrE type;
@@ -7787,7 +7748,7 @@ _ZN3edg29a_typeref_type_supplement_ptrE extra_info;
 
 
 _ZN3edg10a_type_ptrE orig_type;
-# 10752
+#line 10752
 unsigned char kind;
 
 unsigned int qualifiers: 15;
@@ -7800,22 +7761,22 @@ unsigned int predeclared: 1;
 
 
 unsigned int explicit_memory_attribute_made_implicit: 1;
-# 10770
+#line 10770
 unsigned int has_variably_modified_type: 1;
 
 
 
 
 unsigned int is_lowered_variably_modified_type: 1;
-# 10796
+#line 10796
 unsigned int decltype_expr_not_parenthesized: 1;
-# 10807
+#line 10807
 unsigned int is_dependent_type_operator: 1;
-# 10814
+#line 10814
 unsigned int is_nonreal: 1;
-# 10821
+#line 10821
 unsigned int is_dependent: 1;
-# 10829
+#line 10829
 unsigned int is_prototype_instantiation: 1;
 
 
@@ -7827,7 +7788,7 @@ unsigned int is_lowered_complex_type: 1;
 
 
 unsigned int embedded_source_sequence_entries: 1;
-# 10850
+#line 10850
 unsigned int added_to_record_name: 1;
 
 
@@ -7841,11 +7802,11 @@ unsigned int is_global_qualified_name: 1;
 
 
 unsigned int is_intrinsic_member: 1;char __dummy[3];};
-# 10869
+#line 10869
 struct _ZN3edg6a_typeUt_Ut5_E {
 
 _ZN3edg10a_type_ptrE class_of_which_a_member;
-# 10877
+#line 10877
 _ZN3edg10a_type_ptrE orig_class_of_which_a_member;
 
 
@@ -7856,7 +7817,7 @@ _ZN3edg10a_type_ptrE type;
 
 
 _ZN3edg22a_pointer_modifier_setE modifiers;char __dummy[7];};
-# 10898
+#line 10898
 struct _ZN3edg6a_typeUt_Ut6_E {
 
 unsigned char kind;
@@ -7882,29 +7843,29 @@ unsigned int is_generic_function_param: 1;
 
 
 unsigned int is_auto_param: 1;
-# 10928
+#line 10928
 unsigned int is_decltype_auto: 1;
 
 
 
 unsigned int originally_class_template_param: 1;
-# 10938
+#line 10938
 unsigned int is_unsigned_bit_precise_int: 1;
 
 
 
 
 _ZN3edg36a_template_param_type_supplement_ptrE extra_info;};
-# 10949
+#line 10949
 struct _ZN3edg6a_typeUt_Ut7_E {
 
 _ZN3edg10a_type_ptrE element_type;
 
 
 _ZN3edg14a_constant_ptrE size_constant;
-# 10963
+#line 10963
 unsigned int is_boolean_vector: 1;
-# 10970
+#line 10970
 unsigned char kind;char __dummy[6];};
 
 
@@ -7924,37 +7885,33 @@ int8_t length_multiplier;
 
 
 uint8_t tuple_elements;char __dummy[6];};
-# 10041
+#line 10041
 union _ZN3edg6a_typeUt_E {
-# 10168
+#line 10168
 struct _ZN3edg6a_typeUt_Ut_E integer;
-
-
-
-_ZN3edg24a_fixed_point_type_descrE fixed_point;
-# 10182
+#line 10182
 unsigned char float_kind;
-# 10231
+#line 10231
 struct _ZN3edg6a_typeUt_Ut0_E pointer;
-# 10255
+#line 10255
 struct _ZN3edg6a_typeUt_Ut1_E routine;
-# 10354
+#line 10354
 struct _ZN3edg6a_typeUt_Ut2_E array;
-# 10731
+#line 10731
 struct _ZN3edg6a_typeUt_Ut3_E class_struct_union;
-# 10867
+#line 10867
 struct _ZN3edg6a_typeUt_Ut4_E typeref;
-# 10895
+#line 10895
 struct _ZN3edg6a_typeUt_Ut5_E ptr_to_member;
-# 10946
+#line 10946
 struct _ZN3edg6a_typeUt_Ut6_E template_param;
-# 10971
+#line 10971
 struct _ZN3edg6a_typeUt_Ut7_E vector;
-# 10979
+#line 10979
 struct _ZN3edg6a_typeUt_Ut8_E scalable_vector;
-# 10990
+#line 10990
 struct _ZN3edg6a_typeUt_Ut9_E riscv_vector;};
-# 9768
+#line 9768
 struct _ZN3edg6a_typeE {
 
 
@@ -7968,9 +7925,9 @@ _ZN3edg10a_type_ptrE next;
 
 
 _ZN3edg28a_based_type_list_member_ptrE based_types;
-# 9788
+#line 9788
 _ZN3edg13a_targ_size_tE size;
-# 9797
+#line 9797
 _ZN3edg16a_targ_alignmentE alignment;
 
 
@@ -7978,35 +7935,35 @@ _ZN3edg16a_targ_alignmentE alignment;
 unsigned char kind;
 
 unsigned int incomplete: 1;
-# 9810
+#line 9810
 unsigned int used_in_exception_or_rtti: 1;
-# 9817
+#line 9817
 unsigned int declared_in_function_prototype: 1;
 
 
 unsigned int is_tag_redefinition: 1;
-# 9828
+#line 9828
 unsigned int is_instantiation_dependent: 1;
 
 
 
 
 unsigned int is_instantiation_dependent_cached: 1;
-# 9846
+#line 9846
 unsigned int prototype_scope_types_if_any_promoted: 1;
 
 
 
 unsigned int typedef_pending: 1;
-# 9861
+#line 9861
 unsigned int generated_as_empty_struct: 1;
-# 9867
+#line 9867
 unsigned int has_been_defined: 1;
 
 
 
 unsigned int typedef_definition_has_been_put_out: 1;
-# 9934
+#line 9934
 unsigned int alignment_set_explicitly: 1;
 
 
@@ -8022,13 +7979,13 @@ unsigned int may_alias: 1;
 
 
 unsigned int has_microsoft_w64_specifier: 1;
-# 9955
+#line 9955
 unsigned int is_microsoft_intrinsic: 1;
-# 9974
+#line 9974
 unsigned int is_builtin_va_list: 1;
-# 9980
+#line 9980
 unsigned int is_builtin_va_list_from_cstdarg: 1;
-# 9996
+#line 9996
 unsigned int has_gnu_abi_tag_attribute: 1;
 
 
@@ -8047,62 +8004,62 @@ unsigned int process_for_ordering: 1;
 
 
 unsigned int type_processed_for_ordering: 1;
-# 10021
+#line 10021
 unsigned int type_processed_as_complete_for_ordering: 1;
-# 10029
+#line 10029
 unsigned int visited_for_vla_lowering: 1;
-# 10035
+#line 10035
 _ZN3edg14a_variable_ptrE typeinfo_var;
-# 10992
+#line 10992
 union _ZN3edg6a_typeUt_E variant;};
-# 11029
+#line 11029
 union _ZN3edg14an_initializerE {
-# 11037
+#line 11037
 _ZN3edg14a_constant_ptrE constant;
-# 11045
+#line 11045
 _ZN3edg18a_dynamic_init_ptrE dynamic;
-# 11055
+#line 11055
 _ZN3edg16an_expr_node_ptrE bound_expr;};
-# 11063
+#line 11063
 typedef union _ZN3edg14an_initializerE _ZN3edg14an_initializerE;
 
 
 typedef struct _ZN3edg28a_local_static_variable_initE *_ZN3edg32a_local_static_variable_init_ptrE;
-# 11101
+#line 11101
 typedef struct _ZN3edg15a_vla_dimensionE *_ZN3edg19a_vla_dimension_ptrE;
-# 11182
+#line 11182
 typedef struct _ZN3edg24a_variable_template_infoE *_ZN3edg28a_variable_template_info_ptrE;
-# 11224
+#line 11224
 union _ZN3edg10a_variableUt_E {
 
 
 _ZN3edg16a_param_type_ptrE assoc_param_type;
-# 11237
+#line 11237
 _ZN3edg14a_variable_ptrE container;
 
 
 
 
 _ZN3edg27an_il_entity_list_entry_ptrE bindings;};
-# 11285
+#line 11285
 union _ZN3edg10a_variableUt0_E {
 
 _ZN3edg12a_const_charE *name;
-# 11293
+#line 11293
 unsigned char reg;
-# 11300
+#line 11300
 _ZN3edg19a_named_register_idE id;};
-# 11846
+#line 11846
 struct _ZN3edg10a_variableUt1_Ut_E {
 
 _ZN3edg13a_routine_ptrE init_routine;
-# 11854
+#line 11854
 _ZN3edg13a_routine_ptrE wrapper;};
-# 11835
+#line 11835
 union _ZN3edg10a_variableUt1_E {
-# 11858
+#line 11858
 struct _ZN3edg10a_variableUt1_Ut_E thread;};
-# 11210
+#line 11210
 struct _ZN3edg10a_variableE {
 
 
@@ -8116,22 +8073,22 @@ _ZN3edg14a_variable_ptrE next;
 
 
 _ZN3edg10a_type_ptrE type;
-# 11245
+#line 11245
 union _ZN3edg10a_variableUt_E variant;
 
 unsigned char storage_class;
-# 11277
+#line 11277
 _ZN3edg19a_decl_modifier_setE decl_modifiers;
-# 11305
+#line 11305
 union _ZN3edg10a_variableUt0_E asm_name_or_reg;
 
 
 _ZN3edg16a_targ_alignmentE alignment;
-# 11315
+#line 11315
 _ZN3edg19a_gnu_init_priorityE init_priority;
-# 11322
+#line 11322
 _ZN3edg13a_routine_ptrE cleanup_routine;
-# 11329
+#line 11329
 unsigned int ELF_visibility: 3;
 
 
@@ -8153,7 +8110,7 @@ unsigned int has_gnu_abi_tag_attribute: 1;
 
 
 unsigned int is_not_common: 1;
-# 11358
+#line 11358
 unsigned int is_common: 1;
 
 
@@ -8168,7 +8125,7 @@ unsigned int asm_name_is_valid: 1;
 
 
 unsigned int has_named_register_storage_class: 1;
-# 11378
+#line 11378
 unsigned int used: 1;
 
 
@@ -8179,7 +8136,7 @@ unsigned int address_taken: 1;
 unsigned int is_parameter: 1;
 
 unsigned int is_struct_binding: 1;
-# 11393
+#line 11393
 unsigned int is_struct_binding_container: 1;
 
 
@@ -8189,17 +8146,17 @@ unsigned int referenced_non_locally: 1;
 
 
 unsigned int modified_within_try_block: 1;
-# 11407
+#line 11407
 unsigned int is_template_variable: 1;
-# 11417
+#line 11417
 unsigned int is_prototype_instantiation: 1;
-# 11424
+#line 11424
 unsigned int is_nonreal: 1;
 
 
 
 unsigned int is_specialized: 1;
-# 11437
+#line 11437
 unsigned int specialized_with_old_syntax: 1;
 
 
@@ -8218,13 +8175,13 @@ unsigned int explicit_do_not_instantiate: 1;
 
 
 unsigned int can_be_instantiated: 1;
-# 11464
+#line 11464
 unsigned int do_not_instantiate: 1;
-# 11474
+#line 11474
 unsigned int instance_required: 1;
-# 11489
+#line 11489
 unsigned int param_value_has_been_changed: 1;
-# 11495
+#line 11495
 unsigned int param_used_as_lvalue: 1;
 
 
@@ -8241,9 +8198,9 @@ unsigned int is_this_parameter: 1;
 
 
 unsigned int is_anonymous_parent_object: 1;
-# 11518
+#line 11518
 unsigned int is_member_constant: 1;
-# 11528
+#line 11528
 unsigned int is_constexpr: 1;
 
 
@@ -8259,13 +8216,13 @@ unsigned int on_inline_variable_list: 1;
 
 
 unsigned int suppress_inline_definition: 1;
-# 11557
+#line 11557
 unsigned int superseded_external: 1;
-# 11563
+#line 11563
 unsigned int has_variably_modified_type: 1;
-# 11569
+#line 11569
 unsigned int is_vla: 1;
-# 11578
+#line 11578
 unsigned int initialization_rewritten_as_assignment: 1;
 
 
@@ -8289,7 +8246,7 @@ unsigned int promoted_local_static: 1;
 
 
 unsigned int is_optional_vtable: 1;
-# 11607
+#line 11607
 unsigned int vtable_defined: 1;
 
 
@@ -8309,9 +8266,9 @@ unsigned int has_parenthesized_initializer: 1;
 
 
 unsigned int has_direct_braced_initializer: 1;
-# 11631
+#line 11631
 unsigned int has_flexible_array_initializer: 1;
-# 11639
+#line 11639
 unsigned int uninitialized: 1;
 
 
@@ -8324,7 +8281,7 @@ unsigned int declared_with_decltype_auto: 1;
 
 
 unsigned int declared_with_class_template_placeholder: 1;
-# 11678
+#line 11678
 unsigned int declared_using_type_without_linkage: 1;
 
 
@@ -8334,9 +8291,9 @@ unsigned int is_pack: 1;
 
 
 unsigned int is_pack_element: 1;
-# 11692
+#line 11692
 unsigned int is_initonly: 1;
-# 11698
+#line 11698
 unsigned int is_enhanced_for_iterator: 1;
 
 
@@ -8345,12 +8302,12 @@ unsigned int initializer_in_class: 1;
 
 
 unsigned int constant_valued: 1;
-# 11712
+#line 11712
 unsigned int is_immutable: 1;
 
 
 unsigned int is_thread_local: 1;
-# 11724
+#line 11724
 unsigned int extends_lifetime: 1;
 
 
@@ -8368,80 +8325,80 @@ unsigned int is_in_class_specialization: 1;
 
 
 unsigned char init_kind;
-# 11748
+#line 11748
 _ZN3edg14an_initializerE initializer;
 
 
 
 
 _ZN3edg14a_source_rangeE initializer_range;
-# 11761
+#line 11761
 _ZN3edg27an_il_entity_list_entry_ptrE entities_defined_in_initializer;
-# 11768
+#line 11768
 _ZN3edg29a_property_or_event_descr_ptrE property_or_event_descr;
-# 11774
+#line 11774
 _ZN3edg28a_variable_template_info_ptrE template_info;
 
 
 
 
 _ZN3edg12a_const_charE *section;
-# 11787
+#line 11787
 _ZN3edg14a_variable_ptrE aliased_variable;
-# 11793
+#line 11793
 _ZN3edg12a_const_charE *comdat_group;
-# 11800
+#line 11800
 _ZN3edg14a_variable_ptrE vla_element_count_variable;
-# 11820
+#line 11820
 unsigned long instantiation_needed_bit_number;
-# 11828
+#line 11828
 struct _ZN3edg33a_variable_remapping_for_inliningE *remapping_for_inlining;
-# 11860
+#line 11860
 union _ZN3edg10a_variableUt1_E init_routine;};
-# 12176
+#line 12176
 typedef unsigned short _ZN3edg23a_builtin_function_kindE;
-# 12214
+#line 12214
 typedef struct _ZN3edg17a_requires_clauseE *_ZN3edg21a_requires_clause_ptrE;
-# 12315
+#line 12315
 struct _ZN3edg9a_routineUt_Ut_E {
 
 _ZN3edg24a_routine_list_entry_ptrE alternate_entry_points;
-# 12323
+#line 12323
 _ZN3edg8sizeof_tE base_name_offset;};
-# 12297
+#line 12297
 union _ZN3edg9a_routineUt_E {
 
 
 
 unsigned char opname_kind;
-# 12308
+#line 12308
 _ZN3edg23a_builtin_function_kindE builtin_function_kind;
-# 12330
+#line 12330
 struct _ZN3edg9a_routineUt_Ut_E ctor_dtor;
-# 12336
+#line 12336
 _ZN3edg29a_property_or_event_descr_ptrE property_or_event_descr;
-# 12342
+#line 12342
 _ZN3edg13a_routine_ptrE lambda_call_operator;
 
 
 
 
 _ZN3edg14a_template_ptrE class_template;};
-# 13113
+#line 13113
 union _ZN3edg9a_routineUt0_E {
 
 
 _ZN3edg25a_virtual_function_numberE virtual_function;
-# 13123
+#line 13123
 int32_t constexpr_intrinsic;};
-# 13145
+#line 13145
 union _ZN3edg9a_routineUt1_E {
 
 
 _ZN3edg22a_class_list_entry_ptrE befriending_classes;
-# 13161
+#line 13161
 _ZN3edg13a_routine_ptrE inherited_routine;};
-# 12228
+#line 12228
 struct _ZN3edg9a_routineE {
 
 
@@ -8455,9 +8412,9 @@ _ZN3edg13a_routine_ptrE next;
 
 
 _ZN3edg10a_type_ptrE type;
-# 12246
+#line 12246
 _ZN3edg21a_function_def_numberE function_def_number;
-# 12260
+#line 12260
 _ZN3edg22a_memory_region_numberE memory_region;
 
 
@@ -8468,15 +8425,15 @@ _ZN3edg12a_hash_valueE hash_value;
 
 
 unsigned char storage_class;
-# 12291
+#line 12291
 unsigned char special_kind;
-# 12350
+#line 12350
 union _ZN3edg9a_routineUt_E variant;
 unsigned int address_taken: 1;
 
 
 unsigned int is_virtual: 1;
-# 12360
+#line 12360
 unsigned int overrides_base_member: 1;
 
 
@@ -8507,20 +8464,20 @@ unsigned int new_member: 1;
 
 
 unsigned int interface_slot: 1;
-# 12401
+#line 12401
 unsigned int definition_cannot_be_generated: 1;
-# 12410
+#line 12410
 unsigned int covariant_return_virtual_override: 1;
 
 
 
 unsigned int is_inline: 1;
-# 12430
+#line 12430
 unsigned int is_declared_constexpr: 1;
 
 
 unsigned int is_constexpr: 1;
-# 12443
+#line 12443
 unsigned int is_consteval: 1;
 
 
@@ -8530,16 +8487,16 @@ unsigned int is_constexpr_intrinsic: 1;
 
 
 unsigned int compiler_generated: 1;
-# 12460
+#line 12460
 unsigned int defined: 1;
-# 12468
+#line 12468
 unsigned int called: 1;
 
 
 
 
 unsigned int is_explicit_constructor: 1;
-# 12480
+#line 12480
 unsigned int is_explicit_conversion_function: 1;
 
 
@@ -8575,19 +8532,19 @@ unsigned int inherits_virtually: 1;
 
 
 unsigned int is_deduction_guide_from_inheriting_ctor: 1;
-# 12523
+#line 12523
 unsigned int is_template_function: 1;
-# 12533
+#line 12533
 unsigned int is_specialized: 1;
-# 12542
+#line 12542
 unsigned int specialized_with_old_syntax: 1;
 
 
 
 unsigned int is_prototype_instantiation: 1;
-# 12555
+#line 12555
 unsigned int never_throws: 1;
-# 12561
+#line 12561
 unsigned int is_in_class_specialization: 1;
 
 
@@ -8618,7 +8575,7 @@ unsigned int is_pure: 1;
 
 
 unsigned int is_naked: 1;
-# 12598
+#line 12598
 unsigned int declared_only_as_friend: 1;
 
 
@@ -8630,15 +8587,15 @@ unsigned int explicit_extern_inline: 1;
 
 
 unsigned int direct_linkage_specifier_on_nondef_decl: 1;
-# 12617
+#line 12617
 unsigned int is_reverse_conversion_function: 1;
 
 
 
 unsigned int is_generic_definition: 1;
-# 12627
+#line 12627
 unsigned int is_generic_instance: 1;
-# 12634
+#line 12634
 unsigned int ELF_visibility: 3;
 
 
@@ -8659,7 +8616,7 @@ unsigned int is_gnu_alias: 1;
 
 
 unsigned int is_ifunc: 1;
-# 12662
+#line 12662
 unsigned int has_gnu_used_attribute: 1;
 
 
@@ -8694,18 +8651,18 @@ unsigned int gnu_c89_inline: 1;
 
 
 unsigned int implicit_alias: 1;
-# 12701
+#line 12701
 unsigned int has_internal_linkage_attribute: 1;
 
 
 
 
 unsigned int can_be_instantiated: 1;
-# 12716
+#line 12716
 unsigned int do_not_instantiate: 1;
-# 12726
+#line 12726
 unsigned int instance_required: 1;
-# 12742
+#line 12742
 unsigned int contains_try_block: 1;
 
 
@@ -8715,57 +8672,41 @@ unsigned int contains_local_class_type: 1;
 
 
 unsigned int superseded_external: 1;
-# 12756
+#line 12756
 unsigned int defined_in_friend_decl: 1;
 
 
 
 
 unsigned int defined_outside_of_parent: 1;
-# 12769
+#line 12769
 unsigned int inlinable: 1;
-# 12779
+#line 12779
 unsigned int definition_needed: 1;
-# 12785
+#line 12785
 unsigned int keep_definition_in_il: 1;
-# 12791
+#line 12791
 unsigned int expl_template_arg_list_used: 1;
-# 12849
+#line 12849
 unsigned int definition_for_inlining_only: 1;
-# 12873
+#line 12873
 unsigned int suppress_inline_body: 1;
-# 12883
+#line 12883
 unsigned int on_inline_function_list: 1;
 
 
 unsigned int need_out_of_line_copy: 1;
-# 12892
-unsigned int fp_contract: 3;
+#line 12892
+unsigned int fp_contract: 2;
 
 
 
-unsigned int fenv_access: 3;
+unsigned int fenv_access: 2;
 
 
 
-unsigned int cx_limited_range: 3;
-
-
-
-
-unsigned int fx_full_precision: 3;
-
-
-
-unsigned int fx_fract_overflow: 3;
-
-
-
-unsigned int fx_accum_overflow: 3;
-
-
-
-
+unsigned int cx_limited_range: 2;
+#line 12918
 unsigned int upc_access_method: 2;
 
 
@@ -8776,19 +8717,19 @@ unsigned int contains_statement_expression: 1;
 
 
 unsigned int inline_in_class_definition: 1;
-# 12933
+#line 12933
 unsigned int use_comdat: 1;
-# 12940
+#line 12940
 unsigned int ctor_dtor_kind: 3;
-# 12949
+#line 12949
 unsigned int is_alias_entry: 1;
-# 12958
+#line 12958
 unsigned int lowering_delayed_on_nested_function: 1;
 
 
 
 unsigned int has_no_effect: 1;
-# 12971
+#line 12971
 unsigned int statics_have_been_promoted: 1;
 
 
@@ -8801,13 +8742,13 @@ unsigned int declared_using_type_without_linkage: 1;
 
 
 unsigned int is_defaulted: 1;
-# 12992
+#line 12992
 unsigned int is_deleted: 1;
-# 12999
+#line 12999
 unsigned int contains_local_static_variable: 1;
-# 13016
+#line 13016
 unsigned int considered_decider_function_at_some_point: 1;
-# 13024
+#line 13024
 unsigned int is_raw_literal_operator: 1;
 
 
@@ -8819,11 +8760,11 @@ unsigned int is_tls_init_alias: 1;
 
 
 unsigned int is_tls_init_routine: 1;
-# 13042
+#line 13042
 unsigned int has_ctor_priority: 1;
-# 13049
+#line 13049
 unsigned int has_dtor_priority: 1;
-# 13057
+#line 13057
 unsigned int has_deducible_return_type: 1;
 
 
@@ -8836,16 +8777,16 @@ unsigned int contains_generic_lambda: 1;
 
 
 unsigned int is_coroutine: 1;
-# 13074
+#line 13074
 unsigned int is_top_level_in_mem_region: 1;
 
 
 
 
 unsigned int friend_defined_in_instantiation: 1;
-# 13087
+#line 13087
 unsigned int is_ineligible: 1;
-# 13093
+#line 13093
 unsigned int has_pass_object_size_attr: 1;
 
 
@@ -8855,25 +8796,25 @@ unsigned int from_injected_tokens: 1;
 
 
 _ZN3edg19a_decl_modifier_setE decl_modifiers;
-# 13108
+#line 13108
 _ZN3edg21a_requires_clause_ptrE trailing_requires_clause;
-# 13126
+#line 13126
 union _ZN3edg9a_routineUt0_E number;
 
 
 _ZN3edg27an_il_entity_list_entry_ptrE overridden_functions;
-# 13165
+#line 13165
 union _ZN3edg9a_routineUt1_E friends_or_originator;
 
 _ZN3edg18a_template_arg_ptrE template_arg_list;
-# 13176
+#line 13176
 _ZN3edg14a_template_ptrE assoc_template;
-# 13182
+#line 13182
 _ZN3edg28a_gnu_routine_supplement_ptrE gnu_extra_info;
-# 13195
+#line 13195
 _ZN3edg13a_routine_ptrE overriding_function_for_wrapper;
 _ZN3edg13a_routine_ptrE overridden_function_for_wrapper;
-# 13210
+#line 13210
 _ZN3edg16a_targ_ptrdiff_tE delta;
 
 
@@ -8884,23 +8825,23 @@ _ZN3edg21a_virtual_table_indexE vcall_index;
 
 
 _ZN3edg16a_targ_ptrdiff_tE return_delta;
-# 13225
+#line 13225
 _ZN3edg21a_virtual_table_indexE vbase_index;
-# 13233
+#line 13233
 _ZN3edg13a_routine_ptrE primary_ctor_or_dtor;
-# 13241
+#line 13241
 unsigned long instantiation_needed_bit_number;
-# 13248
+#line 13248
 struct _ZN3edg15a_routine_fixupE *routine_fixup;
-# 13256
+#line 13256
 _ZN3edg19a_gnu_init_priorityE init_priority;
-# 13263
+#line 13263
 _ZN3edg16a_using_decl_ptrE generating_using_decl;};
-# 13424
+#line 13424
 typedef struct _ZN3edg12an_asm_entryE *_ZN3edg16an_asm_entry_ptrE;
-# 13489
+#line 13489
 struct _ZN3edg7a_labelE {
-# 13495
+#line 13495
 _ZN3edg23a_source_correspondenceE source_corresp;
 
 
@@ -8951,30 +8892,30 @@ _ZN3edg15a_statement_ptrE exec_stmt;
 
 
 
-unsigned long num_microsoft_trys_inside_of;};
-# 14608
+unsigned long num_microsoft_trys_inside_of;char __dummy[4];};
+#line 14608
 typedef struct _ZN3edg18a_throw_supplementE *_ZN3edg22a_throw_supplement_ptrE;
-# 14641
+#line 14641
 typedef struct _ZN3edg22a_condition_supplementE *_ZN3edg26a_condition_supplement_ptrE;
-# 14861
+#line 14861
 typedef struct _ZN3edg21a_local_expr_node_refE *_ZN3edg25a_local_expr_node_ref_ptrE;
-# 14895
+#line 14895
 struct _ZN3edg28a_const_eval_reattempt_stateE {
 unsigned int default_arg: 1;
 
 
 
 unsigned int default_mem_init: 1;char __dummy[3];};
-# 15122
+#line 15122
 struct _ZN3edg12an_expr_nodeUt_Ut_E {
 
 unsigned char kind;
 
 
 unsigned char type_kind;
-# 15146
+#line 15146
 unsigned int returns_lvalue_instead_of_usual_rvalue: 1;
-# 15161
+#line 15161
 unsigned int is_reinterpret_cast: 1;
 
 
@@ -8989,51 +8930,51 @@ unsigned int is_const_cast: 1;
 
 
 unsigned int is_reference_cast: 1;
-# 15183
+#line 15183
 unsigned int is_rvalue_reference_cast: 1;
-# 15190
+#line 15190
 unsigned int is_tracking_reference_cast: 1;
-# 15196
+#line 15196
 unsigned int implicit_in_member_naming: 1;
 
 
 
 unsigned int implicit_step_of_explicit_cast: 1;
-# 15206
+#line 15206
 unsigned int is_conversion_call: 1;
 
 
 
 
 unsigned int arg_dependent_lookup_suppressed_on_call: 1;
-# 15220
+#line 15220
 unsigned int call_with_qualified_function_name: 1;
-# 15236
+#line 15236
 unsigned int call_uses_operator_syntax: 1;
-# 15251
+#line 15251
 unsigned int is_gnu_two_operand_question_mark: 1;
-# 15258
+#line 15258
 unsigned int pointer_operand_is_second: 1;
 
 
 
 unsigned int is_virtual_call: 1;
-# 15271
+#line 15271
 unsigned int rewritten_property_reference_kind: 3;
-# 15287
+#line 15287
 unsigned int requires_runtime_cast_check: 1;
-# 15296
+#line 15296
 unsigned int has_deferred_ampersand: 1;
-# 15311
+#line 15311
 unsigned int eval_left_to_right: 1;
-# 15319
+#line 15319
 unsigned int eval_right_to_left: 1;
 
 
 
 
 unsigned int is_consteval_call: 1;
-# 15335
+#line 15335
 _ZN3edg16an_expr_node_ptrE operands;};
 
 
@@ -9046,14 +8987,14 @@ _ZN3edg14a_constant_ptrE ptr;
 
 
 _ZN3edg20a_name_reference_ptrE name_reference;};
-# 15352
+#line 15352
 struct _ZN3edg12an_expr_nodeUt_Ut1_E {
 
 _ZN3edg14a_variable_ptrE ptr;
 
 
 _ZN3edg20a_name_reference_ptrE name_reference;};
-# 15363
+#line 15363
 struct _ZN3edg12an_expr_nodeUt_Ut2_E {
 
 _ZN3edg13a_routine_ptrE ptr;
@@ -9062,7 +9003,7 @@ _ZN3edg13a_routine_ptrE ptr;
 
 
 _ZN3edg20a_name_reference_ptrE name_reference;};
-# 15376
+#line 15376
 struct _ZN3edg12an_expr_nodeUt_Ut3_E {
 
 _ZN3edg11a_field_ptrE ptr;
@@ -9070,33 +9011,33 @@ _ZN3edg11a_field_ptrE ptr;
 
 
 _ZN3edg20a_name_reference_ptrE name_reference;};
-# 15402
+#line 15402
 union _ZN3edg12an_expr_nodeUt_Ut4_Ut_E {
 
 
 _ZN3edg10a_type_ptrE type;
-# 15417
+#line 15417
 _ZN3edg12a_lambda_ptrE lambda;};
-# 15391
+#line 15391
 struct _ZN3edg12an_expr_nodeUt_Ut4_E {
 
 _ZN3edg18a_dynamic_init_ptrE dynamic_init;
-# 15419
+#line 15419
 union _ZN3edg12an_expr_nodeUt_Ut4_Ut_E source;};
-# 15446
+#line 15446
 struct _ZN3edg12an_expr_nodeUt_Ut5_E {
 
 _ZN3edg16an_expr_node_ptrE expr;
-# 15454
+#line 15454
 _ZN3edg22an_object_lifetime_ptrE ptr;};
 
 
 struct _ZN3edg12an_expr_nodeUt_Ut6_E {
 
 _ZN3edg16an_expr_node_ptrE type_with_opt_expr;
-# 15469
+#line 15469
 unsigned int is_dynamic: 1;char __dummy[7];};
-# 15485
+#line 15485
 union _ZN3edg12an_expr_nodeUt_Ut7_Ut_E {
 
 
@@ -9104,7 +9045,7 @@ _ZN3edg10a_type_ptrE type;
 
 
 _ZN3edg16an_expr_node_ptrE expr;};
-# 15475
+#line 15475
 struct _ZN3edg12an_expr_nodeUt_Ut7_E {
 
 _ZN3edg14a_byte_booleanE is_type;
@@ -9113,9 +9054,9 @@ _ZN3edg14a_byte_booleanE is_type;
 
 
 _ZN3edg14a_byte_booleanE is_std_alignof;
-# 15492
+#line 15492
 union _ZN3edg12an_expr_nodeUt_Ut7_Ut_E variant;};
-# 15504
+#line 15504
 union _ZN3edg12an_expr_nodeUt_Ut8_Ut_E {
 
 
@@ -9126,7 +9067,7 @@ _ZN3edg16an_expr_node_ptrE expr;
 
 
 _ZN3edg14a_template_ptrE templ;};
-# 15495
+#line 15495
 struct _ZN3edg12an_expr_nodeUt_Ut8_E {
 
 _ZN3edg14a_byte_booleanE is_type;
@@ -9134,9 +9075,9 @@ _ZN3edg14a_byte_booleanE is_type;
 
 
 _ZN3edg14a_byte_booleanE is_template_template;
-# 15514
+#line 15514
 union _ZN3edg12an_expr_nodeUt_Ut8_Ut_E variant;};
-# 15591
+#line 15591
 struct _ZN3edg12an_expr_nodeUt_Ut9_E {
 
 _ZN3edg10a_type_ptrE type;
@@ -9144,7 +9085,7 @@ _ZN3edg10a_type_ptrE type;
 
 
 _ZN3edg20a_name_reference_ptrE name_reference;};
-# 15603
+#line 15603
 struct _ZN3edg12an_expr_nodeUt_Ut10_E {
 
 unsigned char kind;
@@ -9156,15 +9097,15 @@ _ZN3edg16an_expr_node_ptrE operands;};
 struct _ZN3edg12an_expr_nodeUt_Ut11_E {
 
 unsigned param_num;
-# 15619
+#line 15619
 unsigned levels_up;};
-# 15648
+#line 15648
 struct _ZN3edg12an_expr_nodeUt_Ut12_E {
 
 _ZN3edg16an_expr_node_ptrE operands;
-# 15657
+#line 15657
 _ZN3edg16an_expr_node_ptrE result;};
-# 15663
+#line 15663
 struct _ZN3edg12an_expr_nodeUt_Ut13_E {
 
 _ZN3edg16an_expr_node_ptrE operands;
@@ -9172,7 +9113,7 @@ _ZN3edg16an_expr_node_ptrE operands;
 
 
 unsigned int choose_first: 1;char __dummy[7];};
-# 15677
+#line 15677
 struct _ZN3edg12an_expr_nodeUt_Ut14_E {
 
 _ZN3edg16an_expr_node_ptrE operand;
@@ -9181,11 +9122,11 @@ _ZN3edg16an_expr_node_ptrE operand;
 
 
 _ZN3edg16an_expr_node_ptrE ready_resume_suspend;};
-# 15690
+#line 15690
 struct _ZN3edg12an_expr_nodeUt_Ut15_E {
 
 _ZN3edg16an_expr_node_ptrE operands;
-# 15698
+#line 15698
 unsigned short operator_token;
 
 
@@ -9205,7 +9146,7 @@ _ZN3edg14a_template_ptrE concept_template;
 
 
 _ZN3edg18a_template_arg_ptrE args;};
-# 15724
+#line 15724
 struct _ZN3edg12an_expr_nodeUt_Ut18_E {
 
 struct _ZN3edg12an_expr_nodeE *interpolations;
@@ -9213,11 +9154,11 @@ struct _ZN3edg12an_expr_nodeE *interpolations;
 
 
 struct _ZN3edg16a_token_sequenceE *tokens;};
-# 15736
+#line 15736
 struct _ZN3edg12an_expr_nodeUt_Ut19_E {
 
 _ZN3edg16an_expr_node_ptrE requirements;
-# 15745
+#line 15745
 _ZN3edg16a_param_type_ptrE parameters;};
 
 
@@ -9225,9 +9166,9 @@ _ZN3edg16a_param_type_ptrE parameters;};
 struct _ZN3edg12an_expr_nodeUt_Ut20_E {
 
 _ZN3edg16an_expr_node_ptrE expr_and_constraint;
-# 15757
+#line 15757
 unsigned int is_noexcept: 1;char __dummy[7];};
-# 15763
+#line 15763
 struct _ZN3edg12an_expr_nodeUt_Ut21_E {
 
 _ZN3edg16an_expr_node_ptrE constraint;};
@@ -9247,36 +9188,36 @@ struct _ZN3edg12an_expr_nodeUt_Ut23_E {
 _ZN3edg16an_expr_node_ptrE expr;
 
 _ZN3edg16an_expr_node_ptrE index_expr;};
-# 15119
+#line 15119
 union _ZN3edg12an_expr_nodeUt_E {
-# 15337
+#line 15337
 struct _ZN3edg12an_expr_nodeUt_Ut_E operation;
-# 15350
+#line 15350
 struct _ZN3edg12an_expr_nodeUt_Ut0_E constant;
-# 15361
+#line 15361
 struct _ZN3edg12an_expr_nodeUt_Ut1_E variable;
-# 15374
+#line 15374
 struct _ZN3edg12an_expr_nodeUt_Ut2_E routine;
-# 15386
+#line 15386
 struct _ZN3edg12an_expr_nodeUt_Ut3_E field;
-# 15420
+#line 15420
 struct _ZN3edg12an_expr_nodeUt_Ut4_E init;
 
 
 _ZN3edg27a_new_delete_supplement_ptrE new_delete;
-# 15429
+#line 15429
 _ZN3edg22a_gcnew_supplement_ptrE gcnew_info;
-# 15435
+#line 15435
 _ZN3edg22a_throw_supplement_ptrE throw_info;
-# 15442
+#line 15442
 _ZN3edg26a_condition_supplement_ptrE condition;
-# 15455
+#line 15455
 struct _ZN3edg12an_expr_nodeUt_Ut5_E object_lifetime;
-# 15472
+#line 15472
 struct _ZN3edg12an_expr_nodeUt_Ut6_E typeid_info;
-# 15493
+#line 15493
 struct _ZN3edg12an_expr_nodeUt_Ut7_E sizeof_info;
-# 15515
+#line 15515
 struct _ZN3edg12an_expr_nodeUt_Ut8_E sizeof_pack;
 
 
@@ -9285,60 +9226,60 @@ _ZN3edg15a_statement_ptrE statement;
 
 
 _ZN3edg18a_dynamic_init_ptrE reused_value_init;
-# 15584
+#line 15584
 _ZN3edg14a_variable_ptrE vla_variable;
-# 15601
+#line 15601
 struct _ZN3edg12an_expr_nodeUt_Ut9_E type_operand;
-# 15609
+#line 15609
 struct _ZN3edg12an_expr_nodeUt_Ut10_E builtin_operation;
-# 15637
+#line 15637
 struct _ZN3edg12an_expr_nodeUt_Ut11_E param_ref;
 
 
 _ZN3edg16an_expr_node_ptrE braced_init_list;
-# 15660
+#line 15660
 struct _ZN3edg12an_expr_nodeUt_Ut12_E c11_generic;
-# 15674
+#line 15674
 struct _ZN3edg12an_expr_nodeUt_Ut13_E builtin_choose_expr;
-# 15688
+#line 15688
 struct _ZN3edg12an_expr_nodeUt_Ut14_E await_info;
-# 15703
+#line 15703
 struct _ZN3edg12an_expr_nodeUt_Ut15_E fold;
-# 15709
+#line 15709
 struct _ZN3edg12an_expr_nodeUt_Ut16_E initializer;
-# 15718
+#line 15718
 struct _ZN3edg12an_expr_nodeUt_Ut17_E concept_id;
 
 
 _ZN3edg14a_template_ptrE template_name;
-# 15734
+#line 15734
 struct _ZN3edg12an_expr_nodeUt_Ut18_E token_sequence;
-# 15747
+#line 15747
 struct _ZN3edg12an_expr_nodeUt_Ut19_E requires_expr;
-# 15761
+#line 15761
 struct _ZN3edg12an_expr_nodeUt_Ut20_E compound_req;
 
 
 
 
 struct _ZN3edg12an_expr_nodeUt_Ut21_E nested_req;
-# 15775
+#line 15775
 struct _ZN3edg12an_expr_nodeUt_Ut22_E const_eval_deferred;
-# 15783
+#line 15783
 struct _ZN3edg12an_expr_nodeUt_Ut23_E pack_index;};
 
 union _ZN3edg12an_expr_nodeUt0_E {
 
 _ZN3edg29an_expr_rescan_info_entry_ptrE rescan_info;
-# 15793
+#line 15793
 _ZN3edg16an_expr_node_ptrE next_avail;};
-# 14906
+#line 14906
 struct _ZN3edg12an_expr_nodeE {
 
 _ZN3edg10a_type_ptrE type;
 
 _ZN3edg10a_type_ptrE orig_lvalue_type;
-# 14927
+#line 14927
 _ZN3edg16an_expr_node_ptrE next;
 
 
@@ -9348,13 +9289,13 @@ unsigned int kind: 8;
 
 
 unsigned int is_lvalue: 1;
-# 14946
+#line 14946
 unsigned int is_xvalue: 1;
-# 14956
+#line 14956
 unsigned int result_is_not_used: 1;
-# 14969
+#line 14969
 unsigned int is_initialization_guard: 1;
-# 14975
+#line 14975
 unsigned int generated_default_arg: 1;
 
 
@@ -9364,7 +9305,7 @@ unsigned int marked_as_gnu_extension: 1;
 
 
 unsigned int is_static_cast: 1;
-# 14990
+#line 14990
 unsigned int is_functional_notation_cast: 1;
 
 
@@ -9378,7 +9319,7 @@ unsigned int is_objectless_nonstatic_data_mem_ref: 1;
 
 
 unsigned int is_pack_expansion: 1;
-# 15013
+#line 15013
 unsigned int is_shallow_copy: 1;
 
 
@@ -9392,11 +9333,11 @@ unsigned int element_of_cli_param_array_arg: 1;
 
 
 unsigned int is_cli_typeid: 1;
-# 15036
+#line 15036
 unsigned int is_non_normalized_boolean_controlling_expr: 1;
-# 15068
+#line 15068
 unsigned int is_parenthesized: 1;
-# 15075
+#line 15075
 unsigned int type_definition_needed: 1;
 
 
@@ -9410,7 +9351,7 @@ unsigned int do_not_interpret: 1;
 
 
 unsigned int compiler_generated: 1;
-# 15095
+#line 15095
 unsigned int is_type_constraint: 1;
 
 
@@ -9421,13 +9362,13 @@ unsigned int was_lvalue_temp_initializer: 1;
 
 
 _ZN3edg17a_source_positionE position;
-# 15112
+#line 15112
 _ZN3edg14a_source_rangeE expr_range;
-# 15784
+#line 15784
 union _ZN3edg12an_expr_nodeUt_E variant;
-# 15796
+#line 15796
 union _ZN3edg12an_expr_nodeUt0_E extra;};
-# 15863
+#line 15863
 typedef struct _ZN3edg7a_blockE *_ZN3edg11a_block_ptrE;
 struct _ZN3edg7a_blockE {
 
@@ -9435,9 +9376,9 @@ _ZN3edg17a_source_positionE final_position;
 
 
 _ZN3edg11a_scope_ptrE assoc_scope;
-# 15878
+#line 15878
 _ZN3edg22an_object_lifetime_ptrE lifetime;
-# 15884
+#line 15884
 unsigned int end_of_block_reachable: 1;
 
 
@@ -9445,61 +9386,61 @@ unsigned int is_statement_expression: 1;
 
 
 unsigned int implicit_scope_not_allowed: 1;
-# 15897
+#line 15897
 unsigned char upc_access_method;char __dummy[6];};
-# 15910
+#line 15910
 typedef struct _ZN3edg10a_for_loopE *_ZN3edg14a_for_loop_ptrE;
 struct _ZN3edg10a_for_loopE {
 
 _ZN3edg15a_statement_ptrE initialization;
-# 15919
+#line 15919
 _ZN3edg16an_expr_node_ptrE increment;
 
 
 
 _ZN3edg11a_scope_ptrE for_init_scope;
-# 15931
+#line 15931
 _ZN3edg16an_expr_node_ptrE affinity;};
-# 15974
+#line 15974
 typedef struct _ZN3edg22a_range_based_for_loopE *_ZN3edg26a_range_based_for_loop_ptrE;
-# 16115
+#line 16115
 typedef struct _ZN3edg15a_for_each_loopE *_ZN3edg19a_for_each_loop_ptrE;
-# 16245
+#line 16245
 typedef struct _ZN3edg19a_switch_case_entryE *_ZN3edg23a_switch_case_entry_ptrE;
-# 16299
+#line 16299
 typedef struct _ZN3edg19a_switch_stmt_descrE *_ZN3edg23a_switch_stmt_descr_ptrE;
-# 16384
+#line 16384
 typedef struct _ZN3edg26a_microsoft_try_supplementE *_ZN3edg30a_microsoft_try_supplement_ptrE;
-# 16409
+#line 16409
 typedef struct _ZN3edg17a_coroutine_descrE *_ZN3edg21a_coroutine_descr_ptrE;
-# 16487
+#line 16487
 typedef struct _ZN3edg14a_constexpr_ifE *_ZN3edg18a_constexpr_if_ptrE;
-# 16621
+#line 16621
 struct _ZN3edg11a_statementUt_Ut_E {
 
 _ZN3edg15a_statement_ptrE then_statement;
 _ZN3edg15a_statement_ptrE else_statement;
-# 16633
+#line 16633
 _ZN3edg17a_source_positionE else_position;};
-# 16654
+#line 16654
 struct _ZN3edg11a_statementUt_Ut0_E {
 
 _ZN3edg15a_statement_ptrE statement;
-# 16662
+#line 16662
 _ZN3edg14a_for_loop_ptrE extra_info;};
-# 16669
+#line 16669
 struct _ZN3edg11a_statementUt_Ut1_E {
 
 _ZN3edg15a_statement_ptrE statement;
-# 16677
+#line 16677
 _ZN3edg26a_range_based_for_loop_ptrE extra_info;};
-# 16684
+#line 16684
 struct _ZN3edg11a_statementUt_Ut2_E {
 
 _ZN3edg15a_statement_ptrE statement;
-# 16692
+#line 16692
 _ZN3edg19a_for_each_loop_ptrE extra_info;};
-# 16699
+#line 16699
 struct _ZN3edg11a_statementUt_Ut3_E {
 
 _ZN3edg15a_statement_ptrE switch_statement;
@@ -9513,15 +9454,15 @@ _ZN3edg23a_switch_case_entry_ptrE extra_info;};
 struct _ZN3edg11a_statementUt_Ut4_E {
 
 _ZN3edg15a_statement_ptrE body_statement;
-# 16717
+#line 16717
 _ZN3edg23a_switch_stmt_descr_ptrE extra_info;};
-# 16723
+#line 16723
 struct _ZN3edg11a_statementUt_Ut5_E {
 
 _ZN3edg11a_label_ptrE ptr;
 
 _ZN3edg22an_object_lifetime_ptrE lifetime;};
-# 16745
+#line 16745
 struct _ZN3edg11a_statementUt_Ut6_E {
 
 _ZN3edg21a_coroutine_descr_ptrE descr;};
@@ -9536,13 +9477,13 @@ _ZN3edg15a_statement_ptrE statements;
 
 
 _ZN3edg11a_block_ptrE extra_info;};
-# 16795
+#line 16795
 struct _ZN3edg11a_statementUt_Ut8_E {
 
 _ZN3edg27an_il_entity_list_entry_ptrE entities;
-# 16805
+#line 16805
 unsigned int has_static_or_thread_variable: 1;char __dummy[7];};
-# 16824
+#line 16824
 union _ZN3edg11a_statementUt_Ut9_Ut_E {
 
 
@@ -9552,44 +9493,44 @@ _ZN3edg10a_type_ptrE typedef_type;
 
 
 _ZN3edg14a_variable_ptrE variable;};
-# 16815
+#line 16815
 struct _ZN3edg11a_statementUt_Ut9_E {
 
 _ZN3edg14a_byte_booleanE is_typedef_decl;
-# 16836
+#line 16836
 union _ZN3edg11a_statementUt_Ut9_Ut_E variant;};
 
 
 struct _ZN3edg11a_statementUt_Ut10_E {
 
 _ZN3edg18a_dynamic_init_ptrE dynamic_init;};
-# 16610
+#line 16610
 union _ZN3edg11a_statementUt_E {
-# 16636
+#line 16636
 struct _ZN3edg11a_statementUt_Ut_E if_stmt;
 
 
 _ZN3edg18a_constexpr_if_ptrE constexpr_if;
-# 16645
+#line 16645
 _ZN3edg15a_statement_ptrE loop_statement;
-# 16667
+#line 16667
 struct _ZN3edg11a_statementUt_Ut0_E for_loop;
-# 16681
+#line 16681
 struct _ZN3edg11a_statementUt_Ut1_E range_based_for_loop;
-# 16696
+#line 16696
 struct _ZN3edg11a_statementUt_Ut2_E for_each_loop;
-# 16707
+#line 16707
 struct _ZN3edg11a_statementUt_Ut3_E switch_case;
-# 16721
+#line 16721
 struct _ZN3edg11a_statementUt_Ut4_E switch_stmt;
-# 16735
+#line 16735
 struct _ZN3edg11a_statementUt_Ut5_E label;
 
 
 _ZN3edg18a_dynamic_init_ptrE return_dynamic_init;
-# 16750
+#line 16750
 struct _ZN3edg11a_statementUt_Ut6_E coroutine;
-# 16762
+#line 16762
 struct _ZN3edg11a_statementUt_Ut7_E block;
 
 
@@ -9599,24 +9540,24 @@ _ZN3edg18a_dynamic_init_ptrE dynamic_init;
 
 
 _ZN3edg16an_asm_entry_ptrE asm_entry;
-# 16777
+#line 16777
 _ZN3edg12a_const_charE *asm_func_body;
-# 16788
+#line 16788
 _ZN3edg20a_try_supplement_ptrE try_block;
 
 
 
 _ZN3edg30a_microsoft_try_supplement_ptrE microsoft_try;
-# 16808
+#line 16808
 struct _ZN3edg11a_statementUt_Ut8_E decl;
 
 
 _ZN3edg19a_vla_dimension_ptrE vla_dimension;
-# 16837
+#line 16837
 struct _ZN3edg11a_statementUt_Ut9_E vla;
-# 16848
+#line 16848
 struct _ZN3edg11a_statementUt_Ut10_E stmt_expr_result;};
-# 16516
+#line 16516
 struct _ZN3edg11a_statementE {
 
 
@@ -9636,7 +9577,7 @@ _ZN3edg15a_statement_ptrE next;
 
 
 _ZN3edg15a_statement_ptrE parent;
-# 16541
+#line 16541
 _ZN3edg16an_attribute_ptrE attributes;
 
 
@@ -9648,7 +9589,7 @@ unsigned int has_associated_pragma: 1;
 
 
 unsigned int is_initialization_guard: 1;
-# 16557
+#line 16557
 unsigned int compiler_generated: 1;
 
 
@@ -9657,7 +9598,7 @@ unsigned int lowering_generated: 1;
 
 
 unsigned int is_lowering_boilerplate: 1;
-# 16572
+#line 16572
 unsigned int is_fallthrough_statement: 1;
 
 
@@ -9673,16 +9614,16 @@ unsigned int is_unlikely: 1;
 
 
 _ZN3edg16an_expr_node_ptrE expr;
-# 16849
+#line 16849
 union _ZN3edg11a_statementUt_E variant;};
 typedef struct _ZN3edg11a_statementE _ZN3edg11a_statementE;
-# 16877
+#line 16877
 typedef struct _ZN3edg18a_constructor_initE *_ZN3edg22a_constructor_init_ptrE;
-# 16957
+#line 16957
 typedef struct _ZN3edg28a_scope_orphaned_list_headerE *_ZN3edg32a_scope_orphaned_list_header_ptrE;
-# 18178
+#line 18178
 typedef struct _ZN3edg17a_local_scope_refE *_ZN3edg21a_local_scope_ref_ptrE;
-# 18402
+#line 18402
 struct _ZN3edg7a_scopeUt_Ut_E {
 
 _ZN3edg13a_routine_ptrE ptr;
@@ -9694,36 +9635,36 @@ _ZN3edg14a_variable_ptrE parameters;
 
 
 _ZN3edg22a_constructor_init_ptrE constructor_inits;
-# 18422
+#line 18422
 _ZN3edg22an_object_lifetime_ptrE lifetime_of_local_static_vars;
-# 18428
+#line 18428
 _ZN3edg14a_variable_ptrE this_param_variable;
 
 
 
 
 _ZN3edg14a_variable_ptrE return_value_variable;};
-# 18376
+#line 18376
 union _ZN3edg7a_scopeUt_E {
 
 
 
 
 _ZN3edg13a_handler_ptrE assoc_handler;
-# 18387
+#line 18387
 _ZN3edg10a_type_ptrE assoc_type;
 
 
 
 
 _ZN3edg15a_statement_ptrE assoc_statement;
-# 18398
+#line 18398
 _ZN3edg15a_namespace_ptrE assoc_namespace;
-# 18441
+#line 18441
 struct _ZN3edg7a_scopeUt_Ut_E routine;};
-# 18295
+#line 18295
 struct _ZN3edg7a_scopeE {
-# 18315
+#line 18315
 _ZN3edg11a_scope_ptrE next;
 
 
@@ -9733,18 +9674,18 @@ _ZN3edg11a_scope_ptrE prev;
 
 
 _ZN3edg11a_scope_ptrE parent;
-# 18336
+#line 18336
 _ZN3edg14a_scope_numberE number;
 unsigned char kind;
 
 
 
 unsigned int function_body_processing_finished: 1;
-# 18347
+#line 18347
 unsigned int do_not_free_memory_region: 1;
-# 18353
+#line 18353
 unsigned int scope_orphaned_list_header_generated: 1;
-# 18359
+#line 18359
 unsigned int is_constexpr_routine: 1;
 
 
@@ -9754,15 +9695,15 @@ unsigned int is_stmt_expr_block: 1;
 
 
 unsigned int is_placeholder_scope: 1;
-# 18373
+#line 18373
 unsigned int needed_walk_done: 1;
-# 18442
+#line 18442
 union _ZN3edg7a_scopeUt_E variant;
 
 _ZN3edg15a_statement_ptrE assoc_block;
-# 18462
+#line 18462
 _ZN3edg22an_object_lifetime_ptrE lifetime;
-# 18468
+#line 18468
 _ZN3edg14a_constant_ptrE constants;
 
 
@@ -9770,7 +9711,7 @@ _ZN3edg10a_type_ptrE types;
 
 
 _ZN3edg14a_variable_ptrE variables;
-# 18483
+#line 18483
 _ZN3edg14a_variable_ptrE nonstatic_variables;
 
 
@@ -9781,53 +9722,53 @@ _ZN3edg11a_label_ptrE labels;
 
 
 _ZN3edg13a_routine_ptrE routines;
-# 18500
+#line 18500
 _ZN3edg16an_asm_entry_ptrE asm_entries;
-# 18507
+#line 18507
 _ZN3edg11a_scope_ptrE scopes;
-# 18516
+#line 18516
 _ZN3edg15a_namespace_ptrE namespaces;
-# 18523
+#line 18523
 _ZN3edg16a_using_decl_ptrE using_declarations;
 _ZN3edg16a_using_decl_ptrE using_directives;
-# 18533
+#line 18533
 _ZN3edg18a_dynamic_init_ptrE dynamic_inits;
-# 18542
+#line 18542
 _ZN3edg32a_local_static_variable_init_ptrE local_static_variable_inits;
-# 18549
+#line 18549
 _ZN3edg19a_vla_dimension_ptrE vla_dimensions;
-# 18555
+#line 18555
 _ZN3edg25a_local_expr_node_ref_ptrE expr_node_refs;
-# 18562
+#line 18562
 _ZN3edg21a_local_scope_ref_ptrE scope_refs;
-# 18568
+#line 18568
 _ZN3edg12a_pragma_ptrE pragmas;
 
 
 
 
 _ZN3edg13a_scope_depthE depth_in_scope_stack;
-# 18584
+#line 18584
 struct _ZN3edg8a_symbolE *symbols;
-# 18616
+#line 18616
 _ZN3edg14a_template_ptrE templates;
 
 
 
 
 _ZN3edg19an_ms_attribute_ptrE ms_attributes;};
-# 18721
+#line 18721
 typedef struct _ZN3edg20a_module_import_declE *_ZN3edg24a_module_import_decl_ptrE;
-# 18796
+#line 18796
 struct _ZN3edg12an_il_headerE {
 
 _ZN3edg17a_source_file_ptrE primary_source_file;
-# 18804
+#line 18804
 _ZN3edg11a_scope_ptrE primary_scope;
 
 
 _ZN3edg27an_il_entity_list_entry_ptrE file_scope_statements;
-# 18814
+#line 18814
 _ZN3edg13a_routine_ptrE main_routine;
 
 
@@ -9840,19 +9781,19 @@ _ZN3edg12a_const_charE *time_of_compilation;
 _ZN3edg14a_byte_booleanE plain_chars_are_signed;
 
 _ZN3edg11a_scope_ptrE *region_scope_entry;
-# 18841
+#line 18841
 _ZN3edg20a_function_def_descrE *function_def_table;
-# 18852
+#line 18852
 _ZN3edg32a_scope_orphaned_list_header_ptrE scope_orphaned_list_headers;
-# 18859
+#line 18859
 enum _ZN3edg17a_source_languageE source_language;
 
 
 
 uint32_t std_version;
-# 18876
+#line 18876
 _ZN3edg23a_cli_metadata_file_ptrE cli_metadata_files;
-# 18886
+#line 18886
 _ZN3edg14a_byte_booleanE pcc_compatibility_mode;
 
 
@@ -9863,7 +9804,7 @@ _ZN3edg14a_byte_booleanE enum_type_is_integral;
 
 
 _ZN3edg16a_targ_alignmentE default_max_member_alignment;
-# 18909
+#line 18909
 _ZN3edg14a_byte_booleanE microsoft_mode;
 
 
@@ -9877,9 +9818,9 @@ _ZN3edg14a_byte_booleanE cppcx_enabled;
 
 
 unsigned long microsoft_version;
-# 18929
+#line 18929
 _ZN3edg14a_byte_booleanE default_upc_strict_access;
-# 18937
+#line 18937
 _ZN3edg14a_byte_booleanE gcc_mode;
 
 
@@ -9889,7 +9830,7 @@ _ZN3edg14a_byte_booleanE gpp_mode;
 
 
 _ZN3edg14a_byte_booleanE clang_mode;
-# 18951
+#line 18951
 unsigned long gnu_version;
 
 
@@ -9905,20 +9846,20 @@ _ZN3edg14a_byte_booleanE short_enums;
 
 
 _ZN3edg14a_byte_booleanE default_nocommon;
-# 18972
+#line 18972
 _ZN3edg14a_byte_booleanE gnu_c89_inlining;
-# 18978
+#line 18978
 _ZN3edg14a_byte_booleanE near_and_far_are_enabled;
 
 
 
 
 _ZN3edg14a_byte_booleanE far_data_pointers;
-# 18989
+#line 18989
 _ZN3edg14a_byte_booleanE far_code_pointers;
-# 18996
+#line 18996
 _ZN3edg14a_byte_booleanE UCN_identifiers_used;
-# 19009
+#line 19009
 _ZN3edg14a_byte_booleanE vla_used;
 
 
@@ -9928,15 +9869,15 @@ _ZN3edg14a_byte_booleanE any_templates_seen;
 
 
 _ZN3edg14a_byte_booleanE prototype_instantiations_in_il;
-# 19023
+#line 19023
 _ZN3edg14a_byte_booleanE il_has_all_prototype_instantiations;
-# 19033
+#line 19033
 _ZN3edg14a_byte_booleanE il_has_C_semantics;
-# 19039
+#line 19039
 _ZN3edg12a_const_charE *instantiation_dir_name;
-# 19045
+#line 19045
 unsigned long number_of_external_nonclass_template_entities;
-# 19051
+#line 19051
 _ZN3edg10a_type_ptrE nontag_types_used_in_exception_or_rtti;
 
 
@@ -9947,83 +9888,83 @@ _ZN3edg29a_seq_number_lookup_entry_ptrE seq_number_lookup_entries;
 
 
 unsigned long num_seq_number_lookup_entries;
-# 19106
+#line 19106
 int32_t target_configuration_index;
-# 19113
+#line 19113
 _ZN3edg24a_module_import_decl_ptrE imported_modules;};
 
 typedef struct _ZN3edg12an_il_headerE _ZN3edg12an_il_headerE;
-# 2205 "src/il.h"
+#line 2205 "src/il.h"
 typedef int _ZN3edg24an_expr_copy_options_setE;
-# 2377
+#line 2377
 typedef struct _ZN3edg19a_scope_stack_entryE *_ZN3edg23a_scope_stack_entry_ptrE;
-# 1339 "src/util.h"
+#line 1339 "src/util.h"
 typedef struct _ZN3edg12FE_allocatorIPvEE _ZN3edg18Buffered_allocatorILj50ENS_12FE_allocatorEPvE20a_fallback_allocatorE;
-# 1063
-struct _ZN3edg12FE_allocatorIPvEE {};
-# 1379
-union __C1 {
+#line 1063
+struct _ZN3edg12FE_allocatorIPvEE {char __dummy;};
+#line 1379
+union __C2 {
 
 
 
 _ZN3edg10a_void_ptrE local[50];};
-# 1336
+#line 1336
 struct _ZN3edg18Buffered_allocatorILj50ENS_12FE_allocatorEPvEE {
-# 1369
-_ZN3edg18Buffered_allocatorILj50ENS_12FE_allocatorEPvE20a_fallback_allocatorE fallback_allocator;char __dummy_empty1;
+#line 1369
+_ZN3edg18Buffered_allocatorILj50ENS_12FE_allocatorEPvE20a_fallback_allocatorE fallback_allocator;
 
 
 _ZN3edg9a_booleanE local_used;
-# 1379
-union __C1 __T683417984;};
-# 1572
+#line 1379
+union __C2 __T805045216;};
+#line 1572
 struct _ZN3edg27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaIPvEE { struct _ZN3edg18Buffered_allocatorILj50ENS_12FE_allocatorEPvEE __b_N3edg18Buffered_allocatorILj50ENS_12FE_allocatorEPvEE;};
-# 1570
-struct _ZN3edg27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEEE {};
-# 1711
+#line 1570
+struct _ZN3edg27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEEE {char __dummy;};
+#line 1711
 typedef struct _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEE _ZN3edg15Small_dyn_arrayIPvLj50ENS_12FE_allocatorEEE;
-# 1175
-struct _ZN3edg17General_allocatorINS_13Ptr_map_entryImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEEEE {};
-# 5426
-typedef _ZN3edg8sizeof_tE _ZN3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE5a_keyE;
-# 5975
-typedef _ZN3edg15Small_dyn_arrayIPvLj50ENS_12FE_allocatorEEE _ZN3edg13Ptr_multi_mapImPvLj50ENS_17General_allocatorEE13a_multi_valueE;
-# 5427
-typedef _ZN3edg13Ptr_multi_mapImPvLj50ENS_17General_allocatorEE13a_multi_valueE *_ZN3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE7a_valueE;
+#line 1175
+struct _ZN3edg17General_allocatorINS_13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEEEE {char __dummy;};
+#line 5426
+typedef _ZN3edg8sizeof_tE _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE5a_keyE;
+#line 5975
+typedef _ZN3edg15Small_dyn_arrayIPvLj50ENS_12FE_allocatorEEE _ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE13a_multi_valueE;
+#line 5427
+typedef _ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE13a_multi_valueE *_ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE7a_valueE;
 
-typedef struct _ZN3edg13Ptr_map_entryImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEE _ZN3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE8an_entryE;
-# 5420
-struct _ZN3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEEE {
-# 5475
-_ZN3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE8an_entryE *table;
+typedef struct _ZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEE _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE8an_entryE;
+#line 5420
+struct _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEEE {
+#line 5475
+_ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE8an_entryE *table;
 
 size_t hash_mask;
 
 
 
 size_t n_elements;};
-# 1175
-struct _ZN3edg17General_allocatorINS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEE {};
-# 5976
-typedef struct _ZN3edg17General_allocatorINS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEE _ZN3edg13Ptr_multi_mapImPvLj50ENS_17General_allocatorEE17a_value_allocatorE;
-# 5972
-struct _ZN3edg13Ptr_multi_mapImPvLj50ENS_17General_allocatorEEE {
-# 6002
-struct _ZN3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEEE backing_map;
+#line 1175
+struct _ZN3edg17General_allocatorINS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEE {char __dummy;};
+#line 5976
+typedef struct _ZN3edg17General_allocatorINS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEE _ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE17a_value_allocatorE;
+#line 5972
+struct _ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEEE {
+#line 6002
+struct _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEEE backing_map;
 
 
 
-_ZN3edg13Ptr_multi_mapImPvLj50ENS_17General_allocatorEE17a_value_allocatorE multi_value_allocator;char __dummy_empty25;char __dummy[7];};
-# 1625
+_ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE17a_value_allocatorE multi_value_allocator;char __dummy[7];};
+#line 1625
 struct _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEE { struct _ZN3edg27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaIPvEE __b_N3edg27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaIPvEE;
-# 1693
+#line 1693
 _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE7an_elemE *elems;
 
 size_t n_allocated;
 
 
 size_t n_elems;};
-# 29 "src/symbol_tbl.h"
+#line 29 "src/symbol_tbl.h"
 typedef struct _ZN3edg11a_macro_defE *_ZN3edg15a_macro_def_ptrE;
 typedef struct _ZN3edg11a_vla_fixupE *_ZN3edg15a_vla_fixup_ptrE;
 typedef struct _ZN3edg20an_extern_type_fixupE *_ZN3edg24an_extern_type_fixup_ptrE;
@@ -10033,29 +9974,29 @@ typedef struct _ZN3edg24a_template_cache_segmentE *_ZN3edg28a_template_cache_seg
 typedef struct _ZN3edg20a_template_decl_infoE *_ZN3edg24a_template_decl_info_ptrE;
 typedef struct _ZN3edg19a_template_instanceE *_ZN3edg23a_template_instance_ptrE;
 typedef struct _ZN3edg24a_nondependent_call_infoE *_ZN3edg28a_nondependent_call_info_ptrE;
-# 46
+#line 46
 typedef struct _ZN3edg10a_param_idE *_ZN3edg14a_param_id_ptrE;
 typedef struct _ZN3edg28a_pack_expansion_stack_entryE *_ZN3edg32a_pack_expansion_stack_entry_ptrE;
 typedef struct _ZN3edg17a_type_list_entryE *_ZN3edg21a_type_list_entry_ptrE;
 typedef struct _ZN3edg22a_namespace_list_entryE *_ZN3edg26a_namespace_list_entry_ptrE;
-# 56
+#line 56
 typedef struct _ZN3edg15a_routine_fixupE *_ZN3edg19a_routine_fixup_ptrE;
 typedef struct _ZN3edg20an_initializer_fixupE *_ZN3edg24an_initializer_fixup_ptrE;
 
 typedef struct _ZN3edg27a_deferred_constraint_checkE *_ZN3edg31a_deferred_constraint_check_ptrE;
-# 94
+#line 94
 typedef uint32_t _ZN3edg22a_decl_sequence_numberE;
-# 25 "src/scope_stk.h"
+#line 25 "src/scope_stk.h"
 typedef struct _ZN3edg25an_active_using_directiveE *_ZN3edg29an_active_using_directive_ptrE;
 
 
 typedef struct _ZN3edg13a_class_fixupE *_ZN3edg17a_class_fixup_ptrE;
 typedef struct _ZN3edg22a_pack_expansion_descrE *_ZN3edg26a_pack_expansion_descr_ptrE;
-# 136
+#line 136
 typedef struct _ZN3edg36a_function_shareable_constants_tableE *_ZN3edg40a_function_shareable_constants_table_ptrE;
-# 146
+#line 146
 typedef unsigned long _ZN3edg32a_pending_class_definition_countE;
-# 154
+#line 154
 struct _ZN3edg20a_class_fixup_headerE {
 unsigned defer_inline_function_fixups;
 
@@ -10067,7 +10008,7 @@ _ZN3edg32a_pending_class_definition_countE pending_class_definitions;
 
 
 _ZN3edg17a_class_fixup_ptrE fixup_list;
-# 170
+#line 170
 _ZN3edg17a_class_fixup_ptrE fixup_list_tail;
 
 
@@ -10077,9 +10018,9 @@ _ZN3edg21a_type_list_entry_ptrE classes_that_may_need_fixups;};
 
 
 typedef struct _ZN3edg20a_class_fixup_headerE _ZN3edg20a_class_fixup_headerE;
-# 185
+#line 185
 typedef _ZN3edg25a_module_lookup_table_mapE *_ZN3edg29a_module_lookup_table_map_ptrE;
-# 198
+#line 198
 typedef struct _ZN3edg22a_scope_pointers_blockE *_ZN3edg26a_scope_pointers_block_ptrE;
 struct _ZN3edg22a_scope_pointers_blockE {
 _ZN3edg12a_symbol_ptrE symbols;
@@ -10106,7 +10047,7 @@ _ZN3edg14a_variable_ptrE last_variable;
 
 
 _ZN3edg13a_routine_ptrE last_routine;
-# 229
+#line 229
 _ZN3edg16an_asm_entry_ptrE last_asm_entry;
 
 
@@ -10126,23 +10067,23 @@ _ZN3edg16a_using_decl_ptrE last_using_directive;
 
 
 _ZN3edg12a_pragma_ptrE last_pragma;
-# 257
+#line 257
 _ZN3edg14a_template_ptrE last_template;
 
 
 
 
 _ZN3edg19an_ms_attribute_ptrE last_ms_attribute;
-# 284
+#line 284
 _ZN3edg12a_symbol_ptrE unnamed_namespace_sym;
 
 
 
 
 _ZN3edg26a_namespace_list_entry_ptrE inline_namespaces;
-# 297
+#line 297
 _ZN3edg16a_hash_table_ptrE lookup_table;
-# 306
+#line 306
 _ZN3edg29a_module_lookup_table_map_ptrE module_lookup_table_map;
 
 
@@ -10154,31 +10095,31 @@ unsigned int add_symbols_to_inactive_list: 1;char __dummy[7];};
 
 
 typedef struct _ZN3edg22a_scope_pointers_blockE _ZN3edg22a_scope_pointers_blockE;
-# 344
+#line 344
 typedef struct _ZN3edg16a_pack_referenceE *_ZN3edg20a_pack_reference_ptrE;
-# 666
+#line 666
 typedef struct _ZN3edg29a_name_hidden_by_old_for_initE *_ZN3edg33a_name_hidden_by_old_for_init_ptrE;
-# 690
+#line 690
 typedef struct _ZN3edg24a_generated_entity_blockE *_ZN3edg28a_generated_entity_block_ptrE;
-# 713
+#line 713
 typedef unsigned long _ZN3edg15a_discriminatorE;
-# 719
+#line 719
 typedef union _ZN3edg17a_collision_tableE *_ZN3edg21a_collision_table_ptrE;
-# 727
+#line 727
 typedef struct _ZN3edg22a_string_literal_tableE *_ZN3edg26a_string_literal_table_ptrE;
 
 
 
 
 typedef struct _ZN3edg9Dyn_arrayIPNS_24a_template_cache_segmentENS_12FE_allocatorEEE _ZN3edg29a_template_cache_segment_listE;
-# 1682
+#line 1682
 union _ZN3edg19a_scope_stack_entryUt_E {
 
 
 _ZN3edg21a_collision_table_ptrE local_name_collision_table;
-# 1694
+#line 1694
 _ZN3edg15a_discriminatorE last_unnamed_type_number;};
-# 738
+#line 738
 struct _ZN3edg19a_scope_stack_entryE {
 
 _ZN3edg14a_scope_numberE number;
@@ -10189,9 +10130,9 @@ unsigned char kind;
 
 
 unsigned int current_access: 2;
-# 758
+#line 758
 unsigned int current_assembly_access: 2;
-# 764
+#line 764
 unsigned int defer_constraint_checks: 1;
 
 
@@ -10202,9 +10143,9 @@ unsigned int scanning_cli_delegate_definition: 1;
 
 
 unsigned int inactive_symbols_may_be_visible: 1;
-# 779
+#line 779
 unsigned int inside_local_class: 1;
-# 787
+#line 787
 unsigned int template_param_decl_scope: 1;
 
 
@@ -10214,14 +10155,14 @@ unsigned int is_loop_scope: 1;
 
 
 unsigned int is_dissociated_from_loop_scope: 1;
-# 801
+#line 801
 unsigned int slow_lookup_required: 1;
 
 
 
 
 unsigned int return_value_optimization_possible: 1;
-# 812
+#line 812
 unsigned int in_prototype_instantiation: 1;
 
 
@@ -10253,11 +10194,11 @@ unsigned int instantiation_from_metadata: 1;
 
 
 unsigned int in_generic_instantiation: 1;
-# 849
+#line 849
 unsigned int in_class_specialization: 1;
-# 856
+#line 856
 unsigned int in_template_deduction_context: 1;
-# 862
+#line 862
 unsigned int in_variadic_template: 1;
 
 
@@ -10272,9 +10213,9 @@ unsigned int record_dependent_name_references: 1;
 
 
 unsigned int defer_access_checks: 1;
-# 904
+#line 904
 unsigned int nested_instantiation: 1;
-# 913
+#line 913
 unsigned int is_compound_statement_block: 1;
 
 
@@ -10296,7 +10237,7 @@ unsigned int within_unnamed_namespace: 1;
 
 
 unsigned int reactivated_class_being_defined: 1;
-# 939
+#line 939
 unsigned int is_for_init_block: 1;
 
 
@@ -10304,7 +10245,7 @@ unsigned int namespace_pushed: 1;
 
 
 unsigned int exclude_from_context_output: 1;
-# 951
+#line 951
 unsigned int instantiation_scope_pushed: 1;
 
 
@@ -10315,9 +10256,9 @@ unsigned int microsoft_specialization_scope_pushed: 1;
 
 
 unsigned int lexical_state_stack_pushed: 1;
-# 967
+#line 967
 unsigned int default_name_linkage: 3;
-# 976
+#line 976
 unsigned int name_linkage_is_explicit: 1;
 
 
@@ -10326,16 +10267,16 @@ unsigned int explicitly_declared_namespace_extension: 1;
 
 
 unsigned int microsoft_specialization_instantiation_scope: 1;
-# 989
+#line 989
 unsigned int is_instantiation_context: 1;
-# 995
+#line 995
 unsigned int pragma_pack_is_local: 1;
 
 
 
 
 unsigned int is_reactivation: 1;
-# 1006
+#line 1006
 unsigned int assign_string_literal_sequence_numbers: 1;
 
 
@@ -10349,35 +10290,29 @@ unsigned int discard_when_popped: 1;
 unsigned int in_base_specifier_list: 1;
 
 
-unsigned int fp_contract_state: 3;
+unsigned int fp_contract_state: 2;
 
-unsigned int fenv_access_state: 3;
+unsigned int fenv_access_state: 2;
 
-unsigned int cx_limited_range_state: 3;
-# 1029
-unsigned int fx_full_precision_state: 3;
-
-unsigned int fx_fract_overflow_state: 3;
-
-unsigned int fx_accum_overflow_state: 3;
-# 1039
+unsigned int cx_limited_range_state: 2;
+#line 1039
 unsigned int qualified_conversion_operator: 1;
 
 
 
 unsigned int initial_decl_of_namespace_std: 1;
-# 1050
+#line 1050
 unsigned int ignore_during_normal_lookup: 1;
 
 
 unsigned int force_decl_seq_check: 1;
-# 1059
+#line 1059
 unsigned int outside_parameter_list: 1;
-# 1065
+#line 1065
 unsigned int in_field_initializer: 1;
-# 1073
+#line 1073
 unsigned int in_template_arg_list: 1;
-# 1079
+#line 1079
 unsigned int implicit_typename: 1;
 
 
@@ -10427,20 +10362,20 @@ unsigned int constexpr_ruled_out: 1;
 
 
 unsigned int in_consteval_context: 1;
-# 1133
+#line 1133
 unsigned int make_access_errors_warnings: 1;
 
 
 
 unsigned int in_gnu_abi_tag_namespace: 1;
-# 1144
+#line 1144
 unsigned int treat_as_specialization: 1;
-# 1150
+#line 1150
 unsigned int in_discarded_statement: 1;
 
 
 unsigned int is_generic_lambda: 1;
-# 1159
+#line 1159
 unsigned int in_ctor_initializer: 1;
 
 
@@ -10460,51 +10395,51 @@ _ZN3edg17a_source_positionE export_pos;
 
 
 _ZN3edg26a_scope_pointers_block_ptrE assoc_pointers_block;
-# 1186
+#line 1186
 _ZN3edg22a_scope_pointers_blockE pointers_block;
-# 1192
+#line 1192
 _ZN3edg11a_scope_ptrE il_scope;
-# 1206
+#line 1206
 _ZN3edg22a_memory_region_numberE il_memory_region;
-# 1214
+#line 1214
 _ZN3edg22a_memory_region_numberE prev_il_memory_region;
 
 
 
 int module_load_context_count;
-# 1226
+#line 1226
 _ZN3edg10a_type_ptrE assoc_type;
-# 1237
+#line 1237
 _ZN3edg13a_routine_ptrE assoc_routine;
-# 1244
+#line 1244
 _ZN3edg15a_namespace_ptrE assoc_namespace;
 
 
 
 
 _ZN3edg15a_vla_fixup_ptrE vla_fixup_list;
-# 1255
+#line 1255
 _ZN3edg24an_extern_type_fixup_ptrE extern_type_fixup_list;
-# 1263
+#line 1263
 _ZN3edg28a_generated_entity_block_ptrE generated_entities;
 
 
 
 _ZN3edg40a_function_shareable_constants_table_ptrE shareable_constants_table;
-# 1274
+#line 1274
 _ZN3edg19a_routine_fixup_ptrE last_routine_fixup;
-# 1281
+#line 1281
 _ZN3edg24an_initializer_fixup_ptrE last_initializer_fixup;
-# 1288
+#line 1288
 _ZN3edg31a_deferred_constraint_check_ptrE deferred_constraint_checks;
 
 
 
 
 _ZN3edg21a_type_list_entry_ptrE types_using_pending_constraints;
-# 1301
+#line 1301
 uint32_t pending_dependent_if_exists;
-# 1319
+#line 1319
 _ZN3edg14a_variable_ptrE last_parameter;
 
 
@@ -10518,7 +10453,7 @@ _ZN3edg11a_label_ptrE last_label;
 
 _ZN3edg11a_scope_ptrE first_scope;
 _ZN3edg11a_scope_ptrE last_scope;
-# 1379
+#line 1379
 _ZN3edg13a_scope_depthE decl_scope_level;
 
 
@@ -10536,43 +10471,43 @@ _ZN3edg12a_symbol_ptrE instance_sym;
 
 
 _ZN3edg12a_symbol_ptrE template_sym;
-# 1408
+#line 1408
 _ZN3edg18a_template_arg_ptrE template_arg_list;
 
 
 
 _ZN3edg18a_template_arg_ptrE deduced_template_args;
-# 1418
+#line 1418
 _ZN3edg17a_source_positionE source_position;
 
 
 _ZN3edg13a_scope_depthE depth_innermost_function_scope;
-# 1428
+#line 1428
 _ZN3edg24a_template_decl_info_ptrE template_decl_info;
-# 1438
+#line 1438
 _ZN3edg22a_decl_sequence_numberE last_label_decl_seq;
-# 1445
+#line 1445
 _ZN3edg22a_decl_sequence_numberE exception_spec_decl_seq;
-# 1451
+#line 1451
 _ZN3edg22a_decl_sequence_numberE decl_seq_for_lookup;
 
 
 
 _ZN3edg21a_pending_pragma_listE *pending_pragmas;
-# 1461
+#line 1461
 _ZN3edg21a_pending_pragma_listE *curr_construct_pragmas;
-# 1467
+#line 1467
 _ZN3edg13a_scope_depthE next_scope_that_affects_access_control;
-# 1475
+#line 1475
 _ZN3edg13a_scope_depthE orig_access_depth;
-# 1483
+#line 1483
 _ZN3edg25an_access_error_descr_ptrE deferred_access_checks;
-# 1489
+#line 1489
 _ZN3edg25an_access_error_descr_ptrE last_deferred_access_check;
 
 
 _ZN3edg13a_scope_depthE saved_curr_deferred_access_scope;
-# 1498
+#line 1498
 struct _ZN3edg19an_expr_stack_entryE *saved_expr_stack;
 
 
@@ -10593,13 +10528,13 @@ _ZN3edg22an_object_lifetime_ptrE object_lifetime_avail_list;
 
 
 _ZN3edg12a_symbol_ptrE templ_member_class_sym;
-# 1524
+#line 1524
 _ZN3edg13a_scope_depthE depth_innermost_namespace_scope;
 
 
 
 long num_of_extra_times_pushed;
-# 1539
+#line 1539
 _ZN3edg29an_active_using_directive_ptrE active_using_directives;
 
 
@@ -10611,7 +10546,7 @@ _ZN3edg29an_active_using_directive_ptrE using_directives_that_apply_here;
 
 
 _ZN3edg13a_scope_depthE previous_scope;
-# 1555
+#line 1555
 _ZN3edg13a_scope_depthE instantiation_context_depth;
 
 
@@ -10633,48 +10568,48 @@ uint32_t empty_contexts_pushed;
 
 
 _ZN3edg13a_scope_depthE orig_depth;
-# 1581
+#line 1581
 _ZN3edg13a_scope_depthE saved_innermost_scope_that_affects_access;
-# 1592
+#line 1592
 _ZN3edg29a_template_cache_segment_listE *template_cache_segment_list;
-# 1599
+#line 1599
 struct _ZN3edg17a_class_def_stateE *class_def_state;
-# 1605
+#line 1605
 _ZN3edg33a_name_hidden_by_old_for_init_ptrE names_hidden_by_old_for_init;
-# 1614
+#line 1614
 struct _ZN3edg17a_tmpl_decl_stateE *tmpl_decl_state;
 
 
 
 
 struct _ZN3edg18a_decl_parse_stateE *decl_parse_state;
-# 1630
+#line 1630
 unsigned long pending_templ_arg_lists;
-# 1637
+#line 1637
 _ZN3edg28a_nondependent_call_info_ptrE next_nondependent_call;
-# 1645
+#line 1645
 _ZN3edg26a_pack_expansion_descr_ptrE last_pack_expansion_used;
-# 1654
+#line 1654
 _ZN3edg26a_pack_expansion_descr_ptrE saved_last_pack_expansion_used;
-# 1662
+#line 1662
 _ZN3edg20a_pack_reference_ptrE packs_referenced;
-# 1671
+#line 1671
 _ZN3edg32a_pack_expansion_stack_entry_ptrE pack_expansion_stack;
 
 
 
 _ZN3edg10a_type_ptrE conversion_parent_type;
-# 1697
+#line 1697
 union _ZN3edg19a_scope_stack_entryUt_E name_discr;
 
 _ZN3edg15a_discriminatorE last_closure_type_number;
-# 1706
+#line 1706
 _ZN3edg26a_string_literal_table_ptrE string_literal_table;
-# 1712
+#line 1712
 unsigned long string_literal_sequence_number;
-# 1719
+#line 1719
 unsigned char ELF_visibility;
-# 1726
+#line 1726
 _ZN3edg20a_class_fixup_headerE class_fixup_header;
 
 
@@ -10689,30 +10624,30 @@ _ZN3edg10a_type_ptrE orig_return_type;
 
 
 _ZN3edg23a_token_sequence_numberE var_templ_decl_name_tsn;
-# 1745
+#line 1745
 _ZN3edg23an_il_entity_list_entryE *injections;};
-# 896 "src/symbol_tbl.h"
+#line 896 "src/symbol_tbl.h"
 typedef struct _ZN3edg24a_hide_by_sig_list_entryE *_ZN3edg28a_hide_by_sig_list_entry_ptrE;
-# 953
+#line 953
 typedef struct _ZN3edg28a_template_symbol_supplementE *_ZN3edg32a_template_symbol_supplement_ptrE;
 
 
 typedef struct _ZN3edg25a_class_symbol_supplementE *_ZN3edg29a_class_symbol_supplement_ptrE;
-# 1508
+#line 1508
 typedef struct _ZN3edg25an_enum_symbol_supplementE *_ZN3edg29an_enum_symbol_supplement_ptrE;
-# 1582
+#line 1582
 typedef struct _ZN3edg25a_field_symbol_supplementE *_ZN3edg29a_field_symbol_supplement_ptrE;
-# 1636
+#line 1636
 typedef struct _ZN3edg31a_static_data_member_supplementE *_ZN3edg35a_static_data_member_supplement_ptrE;
-# 3269
+#line 3269
 typedef struct _ZN3edg29a_namespace_symbol_supplementE *_ZN3edg33a_namespace_symbol_supplement_ptrE;
-# 3370
+#line 3370
 typedef struct _ZN3edg22an_extern_symbol_descrE *_ZN3edg26an_extern_symbol_descr_ptrE;
-# 3403
+#line 3403
 typedef struct _ZN3edg18a_projection_descrE *_ZN3edg22a_projection_descr_ptrE;
-# 3431
+#line 3431
 typedef struct _ZN3edg32a_property_set_symbol_supplementE *_ZN3edg36a_property_set_symbol_supplement_ptrE;
-# 3755
+#line 3755
 struct _ZN3edg8a_symbolUt_Ut_E {
 
 unsigned short token;
@@ -10723,7 +10658,7 @@ unsigned int is_preprocessing_op_or_punc: 1;
 
 
 enum _ZN3edg13an_error_codeE diagnostic_issued_if_used;};
-# 3779
+#line 3779
 struct _ZN3edg8a_symbolUt_Ut0_E {
 
 _ZN3edg10a_type_ptrE ptr;
@@ -10731,8 +10666,8 @@ _ZN3edg10a_type_ptrE ptr;
 
 
 _ZN3edg15a_discriminatorE discriminator;
-# 3791
-_ZN3edg14a_byte_booleanE is_injected_class_name;char __dummy[7];};
+#line 3791
+_ZN3edg14a_byte_booleanE is_injected_class_name;char __dummy[3];};
 
 
 
@@ -10763,16 +10698,16 @@ _ZN3edg14a_variable_ptrE ptr;
 
 
 _ZN3edg23a_template_instance_ptrE instance_ptr;
-# 3829
-_ZN3edg15a_discriminatorE discriminator;};
-# 3836
+#line 3829
+_ZN3edg15a_discriminatorE discriminator;char __dummy[4];};
+#line 3836
 struct _ZN3edg8a_symbolUt_Ut4_E {
 
 _ZN3edg14a_variable_ptrE variable;
 
 
 _ZN3edg23a_template_instance_ptrE instance_ptr;
-# 3848
+#line 3848
 _ZN3edg35a_static_data_member_supplement_ptrE extra_info;};
 
 
@@ -10784,7 +10719,7 @@ _ZN3edg11a_field_ptrE ptr;
 
 
 _ZN3edg12a_symbol_ptrE anonymous_parent_object;
-# 3871
+#line 3871
 _ZN3edg29a_field_symbol_supplement_ptrE extra_info;};
 
 
@@ -10806,21 +10741,21 @@ unsigned int pending_trailing_requires_clause: 1;
 
 
 unsigned int pending_mapped_exc_spec: 1;char __dummy[7];};
-# 3898
+#line 3898
 struct _ZN3edg8a_symbolUt_Ut7_E {
 
 _ZN3edg11a_label_ptrE ptr;
 
 
 struct _ZN3edg20a_control_flow_descrE *assoc_control_flow_descr;};
-# 3916
+#line 3916
 struct _ZN3edg8a_symbolUt_Ut8_E {
 
 _ZN3edg22a_projection_descr_ptrE extra_info;
 
 
 unsigned int access: 2;
-# 3935
+#line 3935
 unsigned int is_using_decl: 1;
 
 
@@ -10831,28 +10766,28 @@ unsigned int any_intervening_using_decl: 1;
 
 
 unsigned int fund_sym_is_nonreal_member: 1;
-# 3953
+#line 3953
 unsigned int injected_class_template_name_is_unambiguous: 1;char __dummy[7];};
-# 3967
+#line 3967
 struct _ZN3edg8a_symbolUt_Ut9_E {
 
 _ZN3edg12a_symbol_ptrE symbols;
-# 3992
+#line 3992
 _ZN3edg14a_byte_booleanE mixed_static_nonstatic;char __dummy[7];};
-# 4010
+#line 4010
 struct _ZN3edg8a_symbolUt_Ut10_E {
 
 _ZN3edg15a_namespace_ptrE ptr;
 
 
 _ZN3edg33a_namespace_symbol_supplement_ptrE extra_info;};
-# 4021
+#line 4021
 struct _ZN3edg8a_symbolUt_Ut11_E {
 
 _ZN3edg12a_symbol_ptrE fundamental_symbol;
-# 4039
+#line 4039
 unsigned int access: 2;
-# 4045
+#line 4045
 unsigned int is_using_decl: 1;char __dummy[7];};
 
 
@@ -10880,13 +10815,13 @@ unsigned int is_header_unit: 1;char __dummy[7];};
 struct _ZN3edg8a_symbolUt_Ut13_E {
 
 _ZN3edg24a_named_address_space_idE id;};
-# 4078
+#line 4078
 struct _ZN3edg8a_symbolUt_Ut14_E {
 
 _ZN3edg19a_named_register_idE id;};
-# 3752
+#line 3752
 union _ZN3edg8a_symbolUt_E {
-# 3769
+#line 3769
 struct _ZN3edg8a_symbolUt_Ut_E keyword;
 
 
@@ -10895,57 +10830,57 @@ _ZN3edg15a_macro_def_ptrE macro_def;
 
 
 _ZN3edg14a_constant_ptrE constant;
-# 3794
+#line 3794
 struct _ZN3edg8a_symbolUt_Ut0_E type;
-# 3804
+#line 3804
 struct _ZN3edg8a_symbolUt_Ut1_E enumeration;
-# 3814
+#line 3814
 struct _ZN3edg8a_symbolUt_Ut2_E class_struct_union;
-# 3834
+#line 3834
 struct _ZN3edg8a_symbolUt_Ut3_E variable;
-# 3851
+#line 3851
 struct _ZN3edg8a_symbolUt_Ut4_E static_data_member;
-# 3874
+#line 3874
 struct _ZN3edg8a_symbolUt_Ut5_E field;
-# 3896
+#line 3896
 struct _ZN3edg8a_symbolUt_Ut6_E routine;
-# 3910
+#line 3910
 struct _ZN3edg8a_symbolUt_Ut7_E label;
 
 
 _ZN3edg26an_extern_symbol_descr_ptrE extern_symbol_descr;
-# 3965
+#line 3965
 struct _ZN3edg8a_symbolUt_Ut8_E projection;
-# 3996
+#line 3996
 struct _ZN3edg8a_symbolUt_Ut9_E overloaded_function;
 
 
 _ZN3edg14a_param_id_ptrE param_id;
-# 4005
+#line 4005
 _ZN3edg32a_template_symbol_supplement_ptrE template_info;
-# 4019
+#line 4019
 struct _ZN3edg8a_symbolUt_Ut10_E namespace_info;
-# 4048
+#line 4048
 struct _ZN3edg8a_symbolUt_Ut11_E namespace_projection;
-# 4066
+#line 4066
 struct _ZN3edg8a_symbolUt_Ut12_E module_info;
-# 4074
+#line 4074
 struct _ZN3edg8a_symbolUt_Ut13_E named_address_space;
-# 4083
+#line 4083
 struct _ZN3edg8a_symbolUt_Ut14_E named_register;
 
 
 
 
 _ZN3edg36a_property_set_symbol_supplement_ptrE property_info;};
-# 3456
+#line 3456
 struct _ZN3edg8a_symbolE {
 
 
 
 
 _ZN3edg19a_symbol_header_ptrE header;
-# 3467
+#line 3467
 _ZN3edg12a_symbol_ptrE next;
 
 
@@ -10966,21 +10901,21 @@ _ZN3edg14a_scope_numberE decl_scope;
 
 
 _ZN3edg22a_decl_sequence_numberE decl_seq;
-# 3493
+#line 3493
 _ZN3edg17a_source_positionE decl_position;
 
 
 
 _ZN3edg23a_token_sequence_numberE token_sequence_number;
-# 3503
+#line 3503
 _ZN3edg27a_parent_class_or_namespaceE parent;
-# 3512
+#line 3512
 _ZN3edg19a_module_entity_ptrE module_entity;
-# 3520
+#line 3520
 _ZN3edg12a_symbol_ptrE corresp_nonreal_or_nested_type;
-# 3533
+#line 3533
 _ZN3edg28a_hide_by_sig_list_entry_ptrE hide_by_sig_lookup_result;
-# 3541
+#line 3541
 unsigned char kind;
 
 unsigned int referenced: 1;
@@ -11010,19 +10945,19 @@ unsigned int is_template_param: 1;
 
 
 unsigned int is_nonreal_nested_type: 1;
-# 3575
+#line 3575
 unsigned int template_param_not_visible: 1;
 
 
 
 unsigned int force_external_linkage: 1;
-# 3585
+#line 3585
 unsigned int ambiguous: 1;
-# 3595
+#line 3595
 unsigned int synthesized_namespace_projection: 1;
-# 3603
+#line 3603
 unsigned int qualified_lookup: 1;
-# 3609
+#line 3609
 unsigned int must_be_class_or_namespace_lookup: 1;
 
 
@@ -11052,14 +10987,14 @@ unsigned int must_be_namespace_lookup: 1;
 
 
 unsigned int hidden_by_old_for_init: 1;
-# 3657
+#line 3657
 unsigned int overload_set_member: 1;
 
 
 unsigned int is_invisible: 1;
-# 3674
+#line 3674
 unsigned int ignore_in_decl_scope: 1;
-# 3681
+#line 3681
 unsigned int is_unknown_function: 1;
 
 
@@ -11067,20 +11002,20 @@ unsigned int is_nonreal_member: 1;
 
 
 unsigned int potentially_overloaded: 1;
-# 3695
+#line 3695
 unsigned int is_super_reference: 1;
 
 
 
 unsigned int is_microsoft_invisible_operator: 1;
-# 3705
+#line 3705
 unsigned int hide_by_sig_lookup_done: 1;
 
 
 
 
 unsigned int suppress_hide_by_sig_lookup: 1;
-# 3716
+#line 3716
 unsigned int declared_in_for_init: 1;
 
 
@@ -11104,11 +11039,11 @@ unsigned int is_nondeducible_pack: 1;
 
 
 unsigned int value_has_been_set: 1;
-# 3749
+#line 3749
 unsigned int from_module_code: 1;
-# 4090
+#line 4090
 union _ZN3edg8a_symbolUt_E variant;};
-# 4827
+#line 4827
 union _ZN3edg20an_extern_type_fixupUt_E {
 
 
@@ -11117,45 +11052,45 @@ _ZN3edg14a_variable_ptrE variable;
 
 
 _ZN3edg13a_routine_ptrE routine;};
-# 4807
+#line 4807
 struct _ZN3edg20an_extern_type_fixupE {
-# 4822
+#line 4822
 _ZN3edg24an_extern_type_fixup_ptrE next;
 
 _ZN3edg10a_type_ptrE type;
 _ZN3edg9a_booleanE is_routine;
-# 4836
+#line 4836
 union _ZN3edg20an_extern_type_fixupUt_E variant;};
-# 1084 "src/types.h"
+#line 1084 "src/types.h"
 typedef unsigned _ZN3edg15an_itf_flag_setE;
-# 450 "src/lower_il.h"
+#line 450 "src/lower_il.h"
 typedef struct _ZN3edg18an_insert_locationE *_ZN3edg22an_insert_location_ptrE;
-# 459
+#line 459
 struct _ZN3edg18an_insert_locationUt_Ut_E {
 
 _ZN3edg15a_statement_ptrE stmt;
-# 467
+#line 467
 _ZN3edg15a_statement_ptrE marker;
 
 
 _ZN3edg14a_byte_booleanE is_marked;char __dummy[7];};
-# 455
+#line 455
 union _ZN3edg18an_insert_locationUt_E {
-# 472
+#line 472
 struct _ZN3edg18an_insert_locationUt_Ut_E statement;
 
 
 
 
 _ZN3edg16an_expr_node_ptrE expr;};
-# 451
+#line 451
 struct _ZN3edg18an_insert_locationE {
 
 enum _ZN3edg23an_insert_location_kindE kind;
-# 478
+#line 478
 union _ZN3edg18an_insert_locationUt_E variant;};
 typedef struct _ZN3edg18an_insert_locationE _ZN3edg18an_insert_locationE;
-# 485
+#line 485
 typedef struct _ZN3edg22a_temporary_list_entryE *_ZN3edg26a_temporary_list_entry_ptrE;
 struct _ZN3edg22a_temporary_list_entryE {
 
@@ -11166,9 +11101,9 @@ _ZN3edg26a_temporary_list_entry_ptrE next;
 _ZN3edg14a_variable_ptrE var;
 
 _ZN3edg14a_byte_booleanE in_use;char __dummy[7];};
-# 42 "src/inline.h"
+#line 42 "src/inline.h"
 typedef struct _ZN3edg33a_variable_remapping_for_inliningE *_ZN3edg37a_variable_remapping_for_inlining_ptrE;
-# 53
+#line 53
 union _ZN3edg33a_variable_remapping_for_inliningUt_E {
 
 
@@ -11177,7 +11112,7 @@ _ZN3edg14a_variable_ptrE variable;
 
 
 _ZN3edg16an_expr_node_ptrE expr;};
-# 43
+#line 43
 struct _ZN3edg33a_variable_remapping_for_inliningE {
 
 _ZN3edg37a_variable_remapping_for_inlining_ptrE next;
@@ -11187,13 +11122,13 @@ _ZN3edg14a_variable_ptrE orig_variable;
 
 
 enum _ZN3edg25a_variable_remapping_kindE kind;
-# 61
+#line 61
 union _ZN3edg33a_variable_remapping_for_inliningUt_E variant;
 
 _ZN3edg16an_expr_node_ptrE arg_expr;
-# 70
+#line 70
 _ZN3edg16an_expr_node_ptrE arg_side_effect_expr;
-# 80
+#line 80
 _ZN3edg14a_variable_ptrE orig_temporary;
 
 
@@ -11213,7 +11148,7 @@ _ZN3edg14a_byte_booleanE local_temporary_okay;
 
 
 _ZN3edg14a_byte_booleanE local_temporary_reused;char __dummy[4];};
-# 118 "src/pch.h"
+#line 118 "src/pch.h"
 struct _ZN3edg20a_pch_saved_variableE {
 _ZN3edg10a_void_ptrE var_address;
 
@@ -11223,586 +11158,584 @@ _ZN3edg8sizeof_tE var_size;
 
 
 _ZN3edg14a_byte_booleanE indirect;char __dummy[7];};
-# 135
+#line 135
 typedef struct _ZN3edg20a_pch_saved_variableE _ZN3edg20a_pch_saved_variableE;
-# 5328 "src/util.h"
-typedef _ZN3edg8sizeof_tE _ZN3edg13Ptr_map_entryImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5a_keyE;
-typedef _ZN3edg13Ptr_multi_mapImPvLj50ENS_17General_allocatorEE13a_multi_valueE *_ZN3edg13Ptr_map_entryImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE7a_valueE;
-# 5366
-union __C7 {
-_ZN3edg13Ptr_multi_mapImPvLj50ENS_17General_allocatorEE13a_multi_valueE *stored_value;};
-# 5327
-struct _ZN3edg13Ptr_map_entryImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEE {
-# 5359
-_ZN3edg13Ptr_map_entryImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5a_keyE stored_key;
-# 5366
-union __C7 __T719939480;};
-# 437
-struct _ZN3edg17Remove_ref_helperIRPvEE {};
-# 5535
-extern  /* COMDAT group: _ZNK3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKmm */ __inline__ __attribute__((__always_inline__)) 
-# 5535
-_ZN3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE7a_valueE _ZNK3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKmm(const struct 
-# 5535
-_ZN3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEEE *const, const _ZN3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE5a_keyE *key, uintptr_t hash);
-# 6042
-extern  /* COMDAT group: _ZN3edg13Ptr_multi_mapImPvLj50ENS_17General_allocatorEE3getEm */ __inline__ __attribute__((__always_inline__)) _ZN3edg13Ptr_multi_mapImPvLj50ENS_17General_allocatorEE13a_multi_valueE *_ZN3edg13Ptr_multi_mapImPvLj50ENS_17General_allocatorEE3getEm(struct 
-# 6042
-_ZN3edg13Ptr_multi_mapImPvLj50ENS_17General_allocatorEEE *const, _ZN3edg8sizeof_tE key);
-# 1643
-extern  /* COMDAT group: _ZNK3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE6lengthEv */ __inline__ __attribute__((__always_inline__)) size_t _ZNK3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE6lengthEv(const struct 
-# 1643
+#line 5328 "src/util.h"
+typedef _ZN3edg8sizeof_tE _ZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5a_keyE;
+typedef _ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE13a_multi_valueE *_ZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE7a_valueE;
+#line 5366
+union __C8 {
+_ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE13a_multi_valueE *stored_value;};
+#line 5327
+struct _ZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEE {
+#line 5359
+_ZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5a_keyE stored_key;
+#line 5366
+union __C8 __T842444384;};
+#line 437
+struct _ZN3edg17Remove_ref_helperIRPvEE {char __dummy;};
+#line 5535
+extern  /* COMDAT group: _ZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyy */ 
+#line 5535
+_ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE7a_valueE _ZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyy(const struct 
+#line 5535
+_ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEEE *const, const _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE5a_keyE *key, uintptr_t hash);
+#line 6042
+extern  /* COMDAT group: _ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE3getEy */ _ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE13a_multi_valueE *_ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE3getEy(struct _ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEEE *const, 
+#line 6042
+_ZN3edg8sizeof_tE key);
+#line 1643
+extern  /* COMDAT group: _ZNK3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE6lengthEv */ size_t _ZNK3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE6lengthEv(const struct 
+#line 1643
 _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEE *const);
-# 1651
-extern  /* COMDAT group: _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE9back_elemEv */ __inline__ __attribute__((__always_inline__)) _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE7an_elemE *
-# 1651
+#line 1651
+extern  /* COMDAT group: _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE9back_elemEv */ _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE7an_elemE *
+#line 1651
 _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE9back_elemEv(struct _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEE *const);
-# 1662
-extern  /* COMDAT group: _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE8pop_backEv */ __inline__ __attribute__((__always_inline__)) void _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE8pop_backEv(struct 
-# 1662
+#line 1662
+extern  /* COMDAT group: _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE8pop_backEv */ void _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE8pop_backEv(struct 
+#line 1662
 _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEE *const);
-# 22 "src/checking.h"
-extern __attribute__((__noreturn__)) void _ZN3edg16assertion_failedEPKciS1_S1_S1_(_ZN3edg12a_const_charE *filename, int line_number, _ZN3edg12a_const_charE *function, _ZN3edg12a_const_charE *string1, _ZN3edg12a_const_charE *string2);
-# 590 "src/error.h"
+#line 22 "src/checking.h"
+extern void _ZN3edg16assertion_failedEPKciS1_S1_S1_(_ZN3edg12a_const_charE *filename, int line_number, _ZN3edg12a_const_charE *function, _ZN3edg12a_const_charE *string1, _ZN3edg12a_const_charE *string2);
+#line 590 "src/error.h"
 extern void _ZN3edg13pos_sy_remarkENS_13an_error_codeEPNS_17a_source_positionEPNS_8a_symbolE(enum _ZN3edg13an_error_codeE error_code, _ZN3edg17a_source_positionE *error_pos, struct _ZN3edg8a_symbolE *symbol);
 
 
 extern void _ZN3edg10sym_remarkENS_13an_error_codeEPNS_8a_symbolE(enum _ZN3edg13an_error_codeE error_code, struct _ZN3edg8a_symbolE *symbol);
-# 922 "src/il.h"
+#line 922 "src/il.h"
 extern _ZN3edg13a_routine_ptrE _ZN3edg35routine_and_node_from_function_exprEPNS_12an_expr_nodeEPS1_(_ZN3edg16an_expr_node_ptrE expr, _ZN3edg16an_expr_node_ptrE *node);
-# 1620
+#line 1620
 extern _ZN3edg10a_type_ptrE _ZN3edg12integer_typeENS_15an_integer_kindE(unsigned char kind);
-# 1701
+#line 1701
 extern _ZN3edg10a_type_ptrE _ZN3edg9void_typeEv(void);
-# 1791
+#line 1791
 extern _ZN3edg10a_type_ptrE _ZN3edg22make_pointer_type_fullEPNS_6a_typeEh(_ZN3edg10a_type_ptrE pointed_to_type, _ZN3edg22a_pointer_modifier_setE modifiers);
-# 1966
+#line 1966
 extern _ZN3edg9a_booleanE _ZN3edg21node_has_side_effectsEPNS_12an_expr_nodeEPb(_ZN3edg16an_expr_node_ptrE node, _ZN3edg9a_booleanE *suppress_warning);
-# 2295
+#line 2295
 extern _ZN3edg14a_constant_ptrE _ZN3edg18copy_constant_fullEPNS_10a_constantES1_i(_ZN3edg14a_constant_ptrE old_constant, _ZN3edg14a_constant_ptrE new_constant, _ZN3edg24an_expr_copy_options_setE options);
-# 2368
+#line 2368
 extern _ZN3edg14a_constant_ptrE _ZN3edg24alloc_shareable_constantEPNS_10a_constantE(_ZN3edg10a_constantE *cp);
-# 2397
-extern void _ZN3edg20set_integer_constantEPNS_10a_constantElNS_15an_integer_kindE(_ZN3edg10a_constantE *cp, _ZN3edg20a_host_large_integerE value, unsigned char kind);
-# 2433
+#line 2397
+extern void _ZN3edg20set_integer_constantEPNS_10a_constantExNS_15an_integer_kindE(_ZN3edg10a_constantE *cp, _ZN3edg20a_host_large_integerE value, unsigned char kind);
+#line 2433
 extern void _ZN3edg24make_zero_of_proper_typeEPNS_6a_typeEPNS_10a_constantE(_ZN3edg10a_type_ptrE desired_type, _ZN3edg10a_constantE *zero_constant);
-# 2633
+#line 2633
 extern void _ZN3edg14copy_statementEPNS_11a_statementES1_(_ZN3edg11a_statementE *from, _ZN3edg11a_statementE *to);
-# 2639
+#line 2639
 extern void _ZN3edg24set_expr_result_not_usedEPNS_12an_expr_nodeE(_ZN3edg16an_expr_node_ptrE node);
-# 2656
+#line 2656
 extern _ZN3edg16an_expr_node_ptrE _ZN3edg18make_operator_nodeENS_21an_expr_operator_kindEPNS_6a_typeEPNS_12an_expr_nodeE(unsigned char kind, _ZN3edg10a_type_ptrE type, _ZN3edg16an_expr_node_ptrE operands);
-# 2671
+#line 2671
 extern void _ZN3edg14overwrite_nodeEPNS_12an_expr_nodeES1_(_ZN3edg16an_expr_node_ptrE node, _ZN3edg16an_expr_node_ptrE source_node);
-# 2678
+#line 2678
 extern _ZN3edg16an_expr_node_ptrE _ZN3edg23alloc_node_for_constantEPNS_10a_constantE(_ZN3edg10a_constantE *constant);
 
 
 
 
 extern _ZN3edg16an_expr_node_ptrE _ZN3edg25node_for_integer_constantElNS_15an_integer_kindE(long value, unsigned char kind);
-# 2692
+#line 2692
 extern _ZN3edg9a_booleanE _ZN3edg22is_cast_operation_nodeEPNS_12an_expr_nodeE(_ZN3edg16an_expr_node_ptrE expr);
-# 3146
+#line 3146
 extern _ZN3edg16an_expr_node_ptrE _ZN3edg8add_castEPNS_12an_expr_nodeEPNS_6a_typeE(_ZN3edg16an_expr_node_ptrE node, _ZN3edg10a_type_ptrE new_type);
 
 
 extern _ZN3edg16an_expr_node_ptrE _ZN3edg21add_cast_if_necessaryEPNS_12an_expr_nodeEPNS_6a_typeE(_ZN3edg16an_expr_node_ptrE node, _ZN3edg10a_type_ptrE new_type);
-# 3172
+#line 3172
 extern _ZN3edg16an_expr_node_ptrE _ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(_ZN3edg16an_expr_node_ptrE expr, _ZN3edg9a_booleanE *inlining_failed);
-# 3200
+#line 3200
 extern _ZN3edg16an_expr_node_ptrE _ZN3edg15var_lvalue_exprEPNS_10a_variableE(_ZN3edg14a_variable_ptrE var);
-# 3216
+#line 3216
 extern _ZN3edg16an_expr_node_ptrE _ZN3edg23add_indirection_to_nodeEPNS_12an_expr_nodeE(_ZN3edg16an_expr_node_ptrE node);
-# 3992
+#line 3992
 extern _ZN3edg11a_scope_ptrE _ZN3edg17scope_for_routineEPNS_9a_routineE(_ZN3edg13a_routine_ptrE rout);
-# 82 "src/il_alloc.h"
+#line 82 "src/il_alloc.h"
 extern _ZN3edg14a_constant_ptrE _ZN3edg14local_constantEv(void);
 
 extern void _ZN3edg22release_local_constantEPPNS_10a_constantE(_ZN3edg14a_constant_ptrE *cpp);
-# 256
+#line 256
 extern void _ZN3edg18set_expr_node_kindEPNS_12an_expr_nodeENS_17an_expr_node_kindE(_ZN3edg16an_expr_node_ptrE node, unsigned kind);
-# 309
+#line 309
 extern _ZN3edg15a_statement_ptrE _ZN3edg15alloc_statementENS_16a_statement_kindEb(unsigned char stmt_kind, _ZN3edg9a_booleanE compiler_generated);
-# 111 "src/mem_manage.h"
-extern _ZN3edg22a_mem_block_header_ptrE _ZN3edg15alloc_mem_blockEimPcb(_ZN3edg22a_memory_region_numberE region_number, _ZN3edg8sizeof_tE min_size, char *desired_addr, _ZN3edg9a_booleanE small_extension);
-# 117
+#line 111 "src/mem_manage.h"
+extern _ZN3edg22a_mem_block_header_ptrE _ZN3edg15alloc_mem_blockEiyPcb(_ZN3edg22a_memory_region_numberE region_number, _ZN3edg8sizeof_tE min_size, char *desired_addr, _ZN3edg9a_booleanE small_extension);
+#line 117
 extern void _ZN3edg14trim_mem_blockEPNS_18a_mem_block_headerE(_ZN3edg22a_mem_block_header_ptrE hdr);
-# 132
-extern  /* COMDAT group: _ZN3edg15alloc_in_regionEim */ __inline__ __attribute__((__always_inline__)) char *_ZN3edg15alloc_in_regionEim(_ZN3edg22a_memory_region_numberE region_number, _ZN3edg8sizeof_tE size);
-# 2731 "src/util.h"
-extern  /* COMDAT group: _ZN3edg7max_valImEET_RKS1_S3_ */ __inline__ __attribute__((__always_inline__)) _ZN3edg8sizeof_tE _ZN3edg7max_valImEET_RKS1_S3_(const _ZN3edg8sizeof_tE *x, const _ZN3edg8sizeof_tE *y);
-# 78 "src/mem_manage.h"
-extern  __attribute__((__weak__)) /* COMDAT group: _ZN3edg17do_host_alignmentImEEvPT_ */ void _ZN3edg17do_host_alignmentImEEvPT_(_ZN3edg8sizeof_tE *size);
-# 328
-extern  __attribute__((__weak__)) /* COMDAT group: _ZN3edg8alloc_feEm */ char *_ZN3edg8alloc_feEm(_ZN3edg8sizeof_tE size);
-# 38 "src/types.h"
-extern  /* COMDAT group: _ZN3edg13skip_typerefsEPNS_6a_typeE */ __inline__ __attribute__((__always_inline__)) _ZN3edg10a_type_ptrE _ZN3edg13skip_typerefsEPNS_6a_typeE(_ZN3edg10a_type_ptrE type_ptr);
-# 138
+#line 132
+extern  /* COMDAT group: _ZN3edg15alloc_in_regionEiy */ char *_ZN3edg15alloc_in_regionEiy(_ZN3edg22a_memory_region_numberE region_number, _ZN3edg8sizeof_tE size);
+#line 2731 "src/util.h"
+extern  /* COMDAT group: _ZN3edg7max_valIyEET_RKS1_S3_ */ _ZN3edg8sizeof_tE _ZN3edg7max_valIyEET_RKS1_S3_(const _ZN3edg8sizeof_tE *x, const _ZN3edg8sizeof_tE *y);
+#line 78 "src/mem_manage.h"
+extern  /* COMDAT group: _ZN3edg17do_host_alignmentIyEEvPT_ */ void _ZN3edg17do_host_alignmentIyEEvPT_(_ZN3edg8sizeof_tE *size);
+#line 328
+extern  /* COMDAT group: _ZN3edg8alloc_feEy */ char *_ZN3edg8alloc_feEy(_ZN3edg8sizeof_tE size);
+#line 38 "src/types.h"
+extern  /* COMDAT group: _ZN3edg13skip_typerefsEPNS_6a_typeE */ _ZN3edg10a_type_ptrE _ZN3edg13skip_typerefsEPNS_6a_typeE(_ZN3edg10a_type_ptrE type_ptr);
+#line 138
 extern _ZN3edg9a_booleanE _ZN3edg16is_function_typeEPNS_6a_typeE(_ZN3edg10a_type_ptrE tp);
-# 151
+#line 151
 extern _ZN3edg9a_booleanE _ZN3edg12is_void_typeEPNS_6a_typeE(_ZN3edg10a_type_ptrE tp);
-# 221
+#line 221
 extern _ZN3edg9a_booleanE _ZN3edg15is_pointer_typeEPNS_6a_typeE(_ZN3edg10a_type_ptrE tp);
-# 354
+#line 354
 extern _ZN3edg9a_booleanE _ZN3edg13is_array_typeEPNS_6a_typeE(_ZN3edg10a_type_ptrE tp);
-# 370
+#line 370
 extern _ZN3edg9a_booleanE _ZN3edg26is_class_struct_union_typeEPNS_6a_typeE(_ZN3edg10a_type_ptrE tp);
-# 385
+#line 385
 extern _ZN3edg9a_booleanE _ZN3edg21is_ptr_to_member_typeEPNS_6a_typeE(_ZN3edg10a_type_ptrE tp);
-# 420
+#line 420
 extern _ZN3edg10a_type_ptrE _ZN3edg15type_pointed_toEPNS_6a_typeE(_ZN3edg10a_type_ptrE pointer_type);
-# 1185
+#line 1185
 extern _ZN3edg9a_booleanE _ZN3edg17f_identical_typesEPNS_6a_typeES1_j(_ZN3edg10a_type_ptrE type_1, _ZN3edg10a_type_ptrE type_2, _ZN3edg15an_itf_flag_setE flags);
-# 56 "src/folding.h"
+#line 56 "src/folding.h"
 extern _ZN3edg9a_booleanE _ZN3edg41constant_bool_value_known_at_compile_timeEPNS_10a_constantE(_ZN3edg14a_constant_ptrE con);
-# 71
+#line 71
 extern void _ZN3edg15unary_operationENS_21an_expr_operator_kindEPNS_10a_constantEPNS_6a_typeES2_bbPbS5_PNS_13an_error_codeEPNS_17a_source_positionE(unsigned char op, _ZN3edg10a_constantE *constant, _ZN3edg10a_type_ptrE result_type, _ZN3edg10a_constantE *result, _ZN3edg9a_booleanE constant_context, 
-# 71
+#line 71
 _ZN3edg9a_booleanE evaluated_context, _ZN3edg9a_booleanE *did_not_fold, _ZN3edg9a_booleanE *template_constant, enum _ZN3edg13an_error_codeE *error_detected, _ZN3edg17a_source_positionE *err_pos);
-# 82
+#line 82
 extern void _ZN3edg16binary_operationENS_21an_expr_operator_kindEPNS_10a_constantES2_PNS_6a_typeES2_bbPbS5_PNS_13an_error_codeEPNS_17a_source_positionE(unsigned char op, _ZN3edg10a_constantE *constant_1, _ZN3edg10a_constantE *constant_2, _ZN3edg10a_type_ptrE result_type, _ZN3edg10a_constantE *result
-# 82
+#line 82
 , _ZN3edg9a_booleanE constant_context, _ZN3edg9a_booleanE evaluated_context, _ZN3edg9a_booleanE *did_not_fold, _ZN3edg9a_booleanE *template_constant, enum _ZN3edg13an_error_codeE *error_detected, _ZN3edg17a_source_positionE *err_pos);
-# 145
+#line 145
 extern _ZN3edg9a_booleanE _ZN3edg17is_false_constantEPNS_10a_constantE(_ZN3edg10a_constantE *constant);
-# 910 "src/lower_il.h"
+#line 910 "src/lower_il.h"
 extern void _ZN3edg31set_block_start_insert_locationEPNS_11a_statementEPNS_18an_insert_locationE(_ZN3edg15a_statement_ptrE stmt, _ZN3edg18an_insert_locationE *insert_location);
 
 
 extern void _ZN3edg38set_statement_creation_insert_locationEPNS_18an_insert_locationE(_ZN3edg18an_insert_locationE *insert_location);
-# 919
+#line 919
 extern void _ZN3edg33set_expr_creation_insert_locationEPNS_18an_insert_locationE(_ZN3edg18an_insert_locationE *insert_location);
-# 1032
+#line 1032
 extern void _ZN3edg11insert_exprEPNS_12an_expr_nodeEPNS_18an_insert_locationE(_ZN3edg16an_expr_node_ptrE inserted_expr, _ZN3edg22an_insert_location_ptrE insert_location);
-# 1045
+#line 1045
 extern void _ZN3edg21insert_statement_fullEPNS_11a_statementEPNS_18an_insert_locationEb(_ZN3edg15a_statement_ptrE statement, _ZN3edg22an_insert_location_ptrE insert_location, _ZN3edg9a_booleanE perform_post_pass);
-# 1053
+#line 1053
 extern _ZN3edg15a_statement_ptrE _ZN3edg21insert_expr_statementEPNS_12an_expr_nodeEPNS_18an_insert_locationE(_ZN3edg16an_expr_node_ptrE node, _ZN3edg22an_insert_location_ptrE insert_location);
-# 1070
+#line 1070
 extern _ZN3edg15a_statement_ptrE _ZN3edg31insert_var_assignment_statementEPNS_10a_variableEPNS_12an_expr_nodeEPNS_18an_insert_locationE(_ZN3edg14a_variable_ptrE lvalue_var, _ZN3edg16an_expr_node_ptrE rvalue_expr, _ZN3edg22an_insert_location_ptrE insert_location);
-# 1079
+#line 1079
 extern _ZN3edg15a_statement_ptrE _ZN3edg23last_statement_in_blockEPNS_11a_statementE(_ZN3edg15a_statement_ptrE block_statement);
-# 1108
+#line 1108
 extern void _ZN3edg22add_temporary_to_scopeEPNS_10a_variableEPNS_7a_scopeEb(_ZN3edg14a_variable_ptrE temp, _ZN3edg11a_scope_ptrE scope, _ZN3edg9a_booleanE promote_if_necessary);
 
 
 
 extern _ZN3edg14a_variable_ptrE _ZN3edg14make_temporaryEPNS_6a_typeEb(_ZN3edg10a_type_ptrE temp_type, _ZN3edg9a_booleanE force_static);
-# 1125
+#line 1125
 extern _ZN3edg14a_variable_ptrE _ZN3edg23find_reusable_temporaryEPNS_6a_typeEPPNS_22a_temporary_list_entryE(_ZN3edg10a_type_ptrE temp_type, _ZN3edg26a_temporary_list_entry_ptrE *ptlep);
 
 
 
 extern void _ZN3edg32add_to_reusable_temporaries_listEPNS_10a_variableE(_ZN3edg14a_variable_ptrE temp_var);
-# 1251
+#line 1251
 extern _ZN3edg9a_booleanE _ZN3edg39is_ptr_to_member_function_constant_exprEPNS_12an_expr_nodeE(_ZN3edg16an_expr_node_ptrE expr);
 
 
 extern _ZN3edg9a_booleanE _ZN3edg29is_constant_valued_expressionEPNS_12an_expr_nodeEbbbPb(_ZN3edg16an_expr_node_ptrE expr, _ZN3edg9a_booleanE local_vars_change, _ZN3edg9a_booleanE other_vars_change, _ZN3edg9a_booleanE this_cannot_be_null, _ZN3edg9a_booleanE *is_non_null);
-# 1261
+#line 1261
 extern _ZN3edg9a_booleanE _ZN3edg35bool_value_is_known_at_compile_timeEPNS_12an_expr_nodeEbPb(_ZN3edg16an_expr_node_ptrE expr, _ZN3edg9a_booleanE this_cannot_be_null, _ZN3edg9a_booleanE *value);
-# 174 "src/pch.h"
+#line 174 "src/pch.h"
 extern void _ZN3edg28register_pch_saved_variablesEPNS_20a_pch_saved_variableE(_ZN3edg20a_pch_saved_variableE *array);
-# 63 "src/inline.c"
+#line 63 "src/inline.c"
 static void _ZN29_INTERNAL_8_inline_c_502890ee3edg30set_inline_statement_positionsEPNS0_11a_statementES2_(_ZN3edg15a_statement_ptrE statement, _ZN3edg15a_statement_ptrE original_statement);
-# 92
+#line 92
 static _ZN3edg37a_variable_remapping_for_inlining_ptrE _ZN29_INTERNAL_8_inline_c_502890ee3edg37alloc_variable_remapping_for_inliningEPNS0_10a_variableEbPPNS0_33a_variable_remapping_for_inliningE(_ZN3edg14a_variable_ptrE var, _ZN3edg9a_booleanE eval_right_to_left, 
-# 92
+#line 92
 _ZN3edg37a_variable_remapping_for_inlining_ptrE *p_last_remap);
-# 160
+#line 160
 static void _ZN29_INTERNAL_8_inline_c_502890ee3edg37free_variable_remappings_for_inliningEv(void);
-# 212
+#line 212
 static void _ZN29_INTERNAL_8_inline_c_502890ee3edg24make_remapping_temporaryEPNS0_33a_variable_remapping_for_inliningEbb(_ZN3edg37a_variable_remapping_for_inlining_ptrE vrip, _ZN3edg9a_booleanE is_temp_for_constructor_this_inlined_param, _ZN3edg9a_booleanE is_temp_for_unmodified_inlined_param);
-# 293
+#line 293
 static _ZN3edg9a_booleanE _ZN29_INTERNAL_8_inline_c_502890ee3edg26func_body_has_side_effectsEPNS0_9a_routineE(_ZN3edg13a_routine_ptrE routine);
-# 340
+#line 340
 static void _ZN29_INTERNAL_8_inline_c_502890ee3edg38set_up_variable_remapping_for_inliningEPNS0_7a_scopeEbPNS0_12an_expr_nodeE(_ZN3edg11a_scope_ptrE scope, _ZN3edg9a_booleanE eval_right_to_left, _ZN3edg16an_expr_node_ptrE arg_expr_list);
-# 570
+#line 570
 static void _ZN29_INTERNAL_8_inline_c_502890ee3edg28restore_mapping_to_temporaryEPNS0_33a_variable_remapping_for_inliningE(_ZN3edg37a_variable_remapping_for_inlining_ptrE vrip);
-# 585
+#line 585
 static void _ZN29_INTERNAL_8_inline_c_502890ee3edg38finish_variable_remapping_for_inliningEPNS0_11a_statementEPNS0_18an_insert_locationE(_ZN3edg15a_statement_ptrE block_stmt, _ZN3edg18an_insert_locationE *insert_location);
-# 682
+#line 682
 static _ZN3edg37a_variable_remapping_for_inlining_ptrE _ZN29_INTERNAL_8_inline_c_502890ee3edg30get_var_remapping_for_inliningEPNS0_10a_variableE(_ZN3edg14a_variable_ptrE var);
-# 699
+#line 699
 extern _ZN3edg14a_variable_ptrE _ZN3edg22remap_var_for_inliningEPNS_10a_variableE(_ZN3edg14a_variable_ptrE var);
-# 732
+#line 732
 extern void _ZN3edg37adjust_copied_expression_for_inliningEPNS_12an_expr_nodeEPb(_ZN3edg16an_expr_node_ptrE expr, _ZN3edg9a_booleanE *inlining_failed);
-# 4364 "src/host_envir.h"
-extern  __attribute__((__weak__)) /* COMDAT group: _ZN3edg9enum_castINS_17an_expr_node_kindEjEET_T0_ */ unsigned _ZN3edg9enum_castINS_17an_expr_node_kindEjEET_T0_(_ZN3edg11a_bit_fieldE val);
-# 976 "src/inline.c"
+#line 4364 "src/host_envir.h"
+extern  /* COMDAT group: _ZN3edg9enum_castINS_17an_expr_node_kindEjEET_T0_ */ unsigned _ZN3edg9enum_castINS_17an_expr_node_kindEjEET_T0_(_ZN3edg11a_bit_fieldE val);
+#line 976 "src/inline.c"
 extern _ZN3edg9a_booleanE _ZN3edg43copy_and_simplify_short_circuited_operationEPNS_12an_expr_nodeEPb(_ZN3edg16an_expr_node_ptrE expr, _ZN3edg9a_booleanE *inlining_failed);
-# 1135
+#line 1135
 static _ZN3edg15a_statement_ptrE _ZN29_INTERNAL_8_inline_c_502890ee3edg22copy_inlined_statementEPNS0_11a_statementEPNS0_18an_insert_locationE(_ZN3edg15a_statement_ptrE statement, _ZN3edg18an_insert_locationE *insert_location);
-# 1170
-static void _ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPmPbS6_S6_(_ZN3edg15a_statement_ptrE statement, _ZN3edg18an_insert_locationE *insert_location, _ZN3edg21a_host_large_unsignedE *statement_count, _ZN3edg9a_booleanE *is_too_large, 
-# 1170
+#line 1170
+static void _ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPyPbS6_S6_(_ZN3edg15a_statement_ptrE statement, _ZN3edg18an_insert_locationE *insert_location, _ZN3edg21a_host_large_unsignedE *statement_count, _ZN3edg9a_booleanE *is_too_large, 
+#line 1170
 _ZN3edg9a_booleanE *inlinable, _ZN3edg9a_booleanE *failed);
-# 1673
+#line 1673
 static void _ZN29_INTERNAL_8_inline_c_502890ee3edg33issue_inlining_failure_diagnosticEPNS0_9a_routineEb(_ZN3edg13a_routine_ptrE routine, _ZN3edg9a_booleanE is_too_large);
-# 1695
+#line 1695
 static _ZN3edg9a_booleanE _ZN29_INTERNAL_8_inline_c_502890ee3edg35routine_type_is_temporarily_alteredEPNS0_9a_routineE(_ZN3edg13a_routine_ptrE routine);
-# 1725
+#line 1725
 extern void _ZN3edg19do_inlining_of_callEPNS_12an_expr_nodeEPNS_11a_statementEPb(_ZN3edg16an_expr_node_ptrE expr, _ZN3edg15a_statement_ptrE statement, _ZN3edg9a_booleanE *expr_has_been_detached);
-# 1927
+#line 1927
 extern void _ZN3edg27set_up_routine_for_inliningEPNS_7a_scopeE(_ZN3edg11a_scope_ptrE scope);
-# 1999
+#line 1999
 extern void _ZN3edg37mark_inlined_routines_as_unreferencedEv(void);
-# 2033
+#line 2033
 extern void _ZN3edg20inline_one_time_initEv(void);
-# 2055
-extern void _ZN3edg11inline_initEv(void); static const char __T683092696[9]; extern  __attribute__((__weak__)) /* COMDAT group: _ZZN3edg8alloc_feEmEs */ char _ZZN3edg8alloc_feEmEs[100]; extern  __attribute__((__weak__)) /* COMDAT group: _ZZN3edg8alloc_feEmEs_0 */ char _ZZN3edg8alloc_feEmEs_0[77]; 
-# 2055
-static const char __T718395992[31]; static const char __T718399392[38]; static const char __T718402672[25]; static const char __T718405744[27]; static const char __T718408744[39]; static const char __T718416624[39]; static const char __T718419496[31]; static const char __T719032880[38]; static const
-# 2055
- char __T719038304[44]; static const char __T719044520[24]; static const char __T719891856[20]; static const char __T719898080[28];
-# 2043
-static _ZN3edg20a_pch_saved_variableE _ZZN3edg20inline_one_time_initEvE10saved_vars[2]; static const char __T719945952[6]; extern  __attribute__((__weak__)) /* COMDAT group: _ZZN3edg13Ptr_map_entryImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5valueEvEs */ char
-# 2043
- _ZZN3edg13Ptr_map_entryImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5valueEvEs[94]; static const char __T719918008[14]; extern  __attribute__((__weak__)) /* COMDAT group:  */
-# 2043
-/* _ZZNK3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKmmEs */ char 
-# 2043
-_ZZNK3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKmmEs[94];
-# 285 "src/mem_manage.h"
+#line 2055
+extern void _ZN3edg11inline_initEv(void); static const char __T804719600[9]; extern  /* COMDAT group: _ZZN3edg8alloc_feEyEs */ char _ZZN3edg8alloc_feEyEs[100]; extern  /* COMDAT group: _ZZN3edg8alloc_feEyEs_0 */ char _ZZN3edg8alloc_feEyEs_0[77]; static const char __T840087624[31]; static const char 
+#line 2055
+__T840091024[38]; static const char __T840094304[25]; static const char __T840097376[27]; static const char __T840100376[39]; static const char __T840108256[39]; static const char __T840111128[31]; static const char __T840727840[38]; static const char __T841594816[44]; static const char __T841601032
+#line 2055
+[24]; static const char __T841610064[20]; static const char __T841616288[28];
+#line 2043
+static _ZN3edg20a_pch_saved_variableE _ZZN3edg20inline_one_time_initEvE10saved_vars[2]; static const char __T842450856[6]; extern  /* COMDAT group: _ZZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5valueEvEs */ char 
+#line 2043
+_ZZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5valueEvEs[94]; static const char __T841636216[14]; extern  /* COMDAT group:  */
+#line 2043
+/* _ZZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyyEs */ char 
+#line 2043
+_ZZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyyEs[94];
+#line 285 "src/mem_manage.h"
 extern _ZN3edg6detail17a_size_to_ptr_mapE *_ZN3edg6detail12freed_fe_mapE;
-# 1084 "src/basics.h"
+#line 1084 "src/basics.h"
 extern enum _ZN3edg11a_C_dialectE _ZN3edg9C_dialectE;
-# 1256 "src/lang_feat.h"
+#line 1256 "src/lang_feat.h"
 extern _ZN3edg9a_booleanE _ZN3edg8gcc_modeE;
-# 2543
+#line 2543
 extern uint32_t _ZN3edg11std_versionE;
-# 4220 "src/host_envir.h"
+#line 4220 "src/host_envir.h"
 extern _ZN3edg9a_booleanE _ZN3edg12in_front_endE;
-# 455 "src/mem_tables.h"
+#line 455 "src/mem_tables.h"
 extern _ZN3edg22a_mem_block_header_ptrE *_ZN3edg16mem_region_tableE;
-# 19117 "src/il_def.h"
+#line 19117 "src/il_def.h"
 extern _ZN3edg12an_il_headerE _ZN3edg9il_headerE;
-# 955 "src/target.h"
+#line 955 "src/target.h"
 extern _ZN3edg9a_booleanE _ZN3edg51assume_this_cannot_be_null_in_conditional_operatorsE;
-# 1122
+#line 1122
 extern _ZN3edg9a_booleanE _ZN3edg25instantiate_extern_inlineE;
-# 1173
+#line 1173
 extern _ZN3edg9a_booleanE _ZN3edg37gcc_or_clang_is_generated_code_targetE;
-# 1751 "src/scope_stk.h"
+#line 1751 "src/scope_stk.h"
 extern _ZN3edg23a_scope_stack_entry_ptrE _ZN3edg11scope_stackE;
-# 1761
+#line 1761
 extern _ZN3edg13a_scope_depthE _ZN3edg17depth_scope_stackE;
-# 1377 "src/cmd_line.h"
+#line 1377 "src/cmd_line.h"
 extern _ZN3edg9a_booleanE _ZN3edg38precompiled_header_processing_requiredE;
-# 2074
+#line 2074
 extern _ZN3edg21a_host_large_unsignedE _ZN3edg22inline_statement_limitE;
-# 57 "src/lower_il.h"
+#line 57 "src/lower_il.h"
 extern _ZN3edg9a_booleanE _ZN3edg20il_lowering_underwayE;
-# 116
+#line 116
 extern unsigned char _ZN3edg32targ_ptr_to_data_member_int_kindE;
-# 666
+#line 666
 extern _ZN3edg17a_source_positionE _ZN3edg21code_pos_for_loweringE;
-# 105 "src/inline.h"
+#line 105 "src/inline.h"
 extern _ZN3edg37a_variable_remapping_for_inlining_ptrE _ZN3edg38avail_variable_remappings_for_inliningE;
-# 51 "src/inline.c"
+#line 51 "src/inline.c"
 static _ZN3edg37a_variable_remapping_for_inlining_ptrE _ZN29_INTERNAL_8_inline_c_502890ee3edg32variable_remappings_for_inliningE;
-# 58
-static _ZN3edg11a_scope_ptrE _ZN29_INTERNAL_8_inline_c_502890ee3edg27routine_scope_being_inlinedE; static const char __T683092696[9] = "alloc_fe";  __attribute__((__weak__)) /* COMDAT group: _ZZN3edg8alloc_feEmEs */ char _ZZN3edg8alloc_feEmEs[100] = "src/mem_manage.h"
-# 58
-;  __attribute__((__weak__)) /* COMDAT group: _ZZN3edg8alloc_feEmEs_0 */ char _ZZN3edg8alloc_feEmEs_0[77] = "memory region allocation must not occur after front end processing has ended"; static const char __T718395992[31] = "set_inline_statement_positions"; static const char __T718399392[38] = "alloc_variable_remapping_for_inlining"
-# 58
-; static const char __T718402672[25] = "make_remapping_temporary"; static const char __T718405744[27] = "func_body_has_side_effects"; static const char __T718408744[39] = "set_up_variable_remapping_for_inlining"; static const char __T718416624[39] = "finish_variable_remapping_for_inlining"; static 
-# 58
-const char __T718419496[31] = "get_var_remapping_for_inlining"; static const char __T719032880[38] = "adjust_copied_expression_for_inlining"; static const char __T719038304[44] = "copy_and_simplify_short_circuited_operation"; static const char __T719044520[24] = "expand_statement_inline"; static 
-# 58
-const char __T719891856[20] = "do_inlining_of_call"; static const char __T719898080[28] = "set_up_routine_for_inlining";
-# 2043
-static _ZN3edg20a_pch_saved_variableE _ZZN3edg20inline_one_time_initEvE10saved_vars[2] = {{((void *)(&_ZN3edg38avail_variable_remappings_for_inliningE)),8UL,((_ZN3edg14a_byte_booleanE)0)},{((_ZN3edg10a_void_ptrE)0),0UL,((_ZN3edg14a_byte_booleanE)0)}}; static const char __T719945952[6] = "value"; 
-# 2043
- __attribute__((__weak__)) /* COMDAT group: _ZZN3edg13Ptr_map_entryImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5valueEvEs */ char _ZZN3edg13Ptr_map_entryImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5valueEvEs[94] = "src/util.h"
-# 2043
-; static const char __T719918008[14] = "get_with_hash";  __attribute__((__weak__)) /* COMDAT group: _ZZNK3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKmmEs */ char 
-# 2043
-_ZZNK3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKmmEs[94] = "src/util.h";__asm__(".align 2");
-# 5535 "src/util.h"
- /* COMDAT group: _ZNK3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKmm */ __inline__ __attribute__((__always_inline__)) 
-# 5535
-_ZN3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE7a_valueE _ZNK3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKmm( const struct 
-# 5535
-_ZN3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEEE *const this, 
-const _ZN3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE5a_keyE *__50409_70_key, 
-uintptr_t __50410_69_hash)
-# 5543
+#line 58
+static _ZN3edg11a_scope_ptrE _ZN29_INTERNAL_8_inline_c_502890ee3edg27routine_scope_being_inlinedE; static const char __T804719600[9] = "alloc_fe";  /* COMDAT group: _ZZN3edg8alloc_feEyEs */ char _ZZN3edg8alloc_feEyEs[100] = "src/mem_manage.h"
+#line 58
+;  /* COMDAT group: _ZZN3edg8alloc_feEyEs_0 */ char _ZZN3edg8alloc_feEyEs_0[77] = "memory region allocation must not occur after front end processing has ended"; static const char __T840087624[31] = "set_inline_statement_positions"; static const char __T840091024[38] = "alloc_variable_remapping_for_inlining"
+#line 58
+; static const char __T840094304[25] = "make_remapping_temporary"; static const char __T840097376[27] = "func_body_has_side_effects"; static const char __T840100376[39] = "set_up_variable_remapping_for_inlining"; static const char __T840108256[39] = "finish_variable_remapping_for_inlining"; static 
+#line 58
+const char __T840111128[31] = "get_var_remapping_for_inlining"; static const char __T840727840[38] = "adjust_copied_expression_for_inlining"; static const char __T841594816[44] = "copy_and_simplify_short_circuited_operation"; static const char __T841601032[24] = "expand_statement_inline"; static 
+#line 58
+const char __T841610064[20] = "do_inlining_of_call"; static const char __T841616288[28] = "set_up_routine_for_inlining";
+#line 2043
+static _ZN3edg20a_pch_saved_variableE _ZZN3edg20inline_one_time_initEvE10saved_vars[2] = {{((void *)(&_ZN3edg38avail_variable_remappings_for_inliningE)),8ULL,((_ZN3edg14a_byte_booleanE)0)},{((_ZN3edg10a_void_ptrE)0),0ULL,((_ZN3edg14a_byte_booleanE)0)}}; static const char __T842450856[6] = "value";  /* */
+#line 2043
+/*  COMDAT group: _ZZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5valueEvEs */ char _ZZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5valueEvEs[94] = "src/util.h"
+#line 2043
+; static const char __T841636216[14] = "get_with_hash";  /* COMDAT group: _ZZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyyEs */ char 
+#line 2043
+_ZZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyyEs[94] = "src/util.h";
+#line 5535 "src/util.h"
+ /* COMDAT group: _ZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyy */ _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE7a_valueE 
+#line 5535
+_ZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyy( const struct _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEEE *const this, 
+const _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE5a_keyE *__39132_70_key, 
+uintptr_t __39133_69_hash)
+#line 5543
 {
-auto size_t __50417_12_mask;
-auto size_t __50418_12_idx;
-auto _ZN3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE8an_entryE *__50419_13_tbl;
-auto _ZN3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE7a_valueE __50420_12_result = ((_ZN3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE7a_valueE)0);
-# 5544
-__50417_12_mask = (this->hash_mask);
-__50418_12_idx = (__50410_69_hash & __50417_12_mask);
-__50419_13_tbl = (this->table);
+auto size_t __39140_12_mask;
+auto size_t __39141_12_idx;
+auto _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE8an_entryE *__39142_13_tbl;
+auto _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE7a_valueE __39143_12_result = ((_ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE7a_valueE)0);
+#line 5544
+__39140_12_mask = (this->hash_mask);
+__39141_12_idx = (__39133_69_hash & __39140_12_mask);
+__39142_13_tbl = (this->table);
 
 
 
 
-((*__50409_70_key) != 0UL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZNK3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKmmEs), 5551, __T719918008, ((_ZN3edg12a_const_charE *)0), ((
-# 5551
-_ZN3edg12a_const_charE *)0)));
+((*__39132_70_key) != 0ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyyEs), 5551, __T841636216, ((_ZN3edg12a_const_charE *)0), (
+#line 5551
+(_ZN3edg12a_const_charE *)0)));
 for (; ; ) {
-auto _ZN3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE8an_entryE *__50426_15_entry; __50426_15_entry = (__50419_13_tbl + __50418_12_idx);
+auto _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE8an_entryE *__39149_15_entry; __39149_15_entry = (__39142_13_tbl + __39141_12_idx);
 
-if ((__50426_15_entry->stored_key) == (*__50409_70_key)) {
-__50420_12_result = (*((((_Bool)((((const struct _ZN3edg13Ptr_map_entryImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEE *)(__50419_13_tbl + __50418_12_idx))->stored_key) != 0UL)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)
-# 5556
-_ZZN3edg13Ptr_map_entryImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5valueEvEs), 5352, __T719945952, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (&(((__50419_13_tbl + __50418_12_idx)->__T719939480).stored_value))));
-goto __T720442128;
-} else  { if (!((_Bool)((((const struct _ZN3edg13Ptr_map_entryImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEE *)__50426_15_entry)->stored_key) != 0UL))) {
-goto __T720442128;
+if ((__39149_15_entry->stored_key) == (*__39132_70_key)) {
+__39143_12_result = (*((((_Bool)((((const struct _ZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEE *)(__39142_13_tbl + __39141_12_idx))->stored_key) != 0ULL)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)
+#line 5556
+_ZZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5valueEvEs), 5352, __T842450856, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (&(((__39142_13_tbl + __39141_12_idx)->__T842444384).stored_value))));
+goto __T842400048;
+} else  { if (!((_Bool)((((const struct _ZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEE *)__39149_15_entry)->stored_key) != 0ULL))) {
+goto __T842400048;
 } }
-__50418_12_idx = ((__50418_12_idx + 1UL) & __50417_12_mask);
-} __T720442128:;
-return __50420_12_result;
-}__asm__(".align 2");
-# 6042
- /* COMDAT group: _ZN3edg13Ptr_multi_mapImPvLj50ENS_17General_allocatorEE3getEm */ __inline__ __attribute__((__always_inline__)) _ZN3edg13Ptr_multi_mapImPvLj50ENS_17General_allocatorEE13a_multi_valueE *_ZN3edg13Ptr_multi_mapImPvLj50ENS_17General_allocatorEE3getEm( struct 
-# 6042
-_ZN3edg13Ptr_multi_mapImPvLj50ENS_17General_allocatorEEE *const this,  _ZN3edg8sizeof_tE __50915_73_key)
-# 6048
+__39141_12_idx = ((__39141_12_idx + 1ULL) & __39140_12_mask);
+} __T842400048:;
+return __39143_12_result;
+}
+#line 6042
+ /* COMDAT group: _ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE3getEy */ _ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE13a_multi_valueE *_ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE3getEy( struct _ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEEE *const this,  
+#line 6042
+_ZN3edg8sizeof_tE __39638_73_key)
+#line 6048
 {
-return _ZNK3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKmm((((const struct _ZN3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEEE *)&(
-# 6049
-this->backing_map))), (((const _ZN3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE5a_keyE *)&__50915_73_key)), ((uintptr_t)(*(((const 
-# 6049
-_ZN3edg7Ptr_mapImPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE5a_keyE *)&__50915_73_key)))));
-}__asm__(".align 2");
-# 1643
- /* COMDAT group: _ZNK3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE6lengthEv */ __inline__ __attribute__((__always_inline__)) size_t _ZNK3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE6lengthEv( const struct 
-# 1643
+return _ZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyy((((const struct _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEEE *)&(
+#line 6049
+this->backing_map))), (((const _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE5a_keyE *)&__39638_73_key)), ((uintptr_t)(*(((const 
+#line 6049
+_ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE5a_keyE *)&__39638_73_key)))));
+}
+#line 1643
+ /* COMDAT group: _ZNK3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE6lengthEv */ size_t _ZNK3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE6lengthEv( const struct 
+#line 1643
 _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEE *const this)
-{ return this->n_elems; }__asm__(".align 2");
-# 1651
- /* COMDAT group: _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE9back_elemEv */ __inline__ __attribute__((__always_inline__)) _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE7an_elemE *
-# 1651
+{ return this->n_elems; }
+#line 1651
+ /* COMDAT group: _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE9back_elemEv */ _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE7an_elemE *
+#line 1651
 _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE9back_elemEv( struct _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEE *const this)
-{ return (this->elems) + ((this->n_elems) - 1UL); }__asm__(".align 2");
-# 1662
- /* COMDAT group: _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE8pop_backEv */ __inline__ __attribute__((__always_inline__)) void _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE8pop_backEv( struct 
-# 1662
+{ return (this->elems) + ((this->n_elems) - 1ULL); }
+#line 1662
+ /* COMDAT group: _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE8pop_backEv */ void _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE8pop_backEv( struct 
+#line 1662
 _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEE *const this)
-{ auto _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE7an_elemE *__T720342512; { __T720342512 = ((this->elems) + ((this->n_elems) - 1UL)); { (void)__T720342512; } } --(this->n_elems);  }
-# 132 "src/mem_manage.h"
- /* COMDAT group: _ZN3edg15alloc_in_regionEim */ __inline__ __attribute__((__always_inline__)) char *_ZN3edg15alloc_in_regionEim( _ZN3edg22a_memory_region_numberE __78719_53_region_number, 
-_ZN3edg8sizeof_tE __78720_53_size)
-# 140
-{ auto _ZN3edg8sizeof_tE __T683071920;
-auto char *__78728_27_temp_ptr;
-auto _ZN3edg22a_mem_block_header_ptrE __78729_26_hdr;
-# 165
-auto _ZN3edg8sizeof_tE __78752_13_true_size;
-auto _ZN3edg9a_booleanE __78753_13_use_dedicated_mem_block;
-auto _ZN3edg9a_booleanE __78754_13_small_extension;
-auto _ZN3edg9a_booleanE __78755_13_region_trimmed;
-# 146
-__78720_53_size = (_ZN3edg7max_valImEET_RKS1_S3_((((const _ZN3edg8sizeof_tE *)&__78720_53_size)), ((((*(_ZN3edg8sizeof_tE *)&__T683071920)) = 1UL) , (&__T683071920))));
-# 155
-_ZN3edg17do_host_alignmentImEEvPT_((&__78720_53_size));
-# 163
-__78729_26_hdr = (_ZN3edg16mem_region_tableE[__78719_53_region_number]);
+{ auto _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE7an_elemE *__T842297976; { __T842297976 = ((this->elems) + ((this->n_elems) - 1ULL)); { (void)__T842297976; } } --(this->n_elems);  }
+#line 132 "src/mem_manage.h"
+ /* COMDAT group: _ZN3edg15alloc_in_regionEiy */ char *_ZN3edg15alloc_in_regionEiy( _ZN3edg22a_memory_region_numberE __67442_53_region_number, 
+_ZN3edg8sizeof_tE __67443_53_size)
+#line 140
+{ auto _ZN3edg8sizeof_tE __T804756880;
+auto char *__67451_27_temp_ptr;
+auto _ZN3edg22a_mem_block_header_ptrE __67452_26_hdr;
+#line 165
+auto _ZN3edg8sizeof_tE __67475_13_true_size;
+auto _ZN3edg9a_booleanE __67476_13_use_dedicated_mem_block;
+auto _ZN3edg9a_booleanE __67477_13_small_extension;
+auto _ZN3edg9a_booleanE __67478_13_region_trimmed;
+#line 146
+__67443_53_size = (_ZN3edg7max_valIyEET_RKS1_S3_((((const _ZN3edg8sizeof_tE *)&__67443_53_size)), ((((*(_ZN3edg8sizeof_tE *)&__T804756880)) = 1ULL) , (&__T804756880))));
+#line 155
+_ZN3edg17do_host_alignmentIyEEvPT_((&__67443_53_size));
+#line 163
+__67452_26_hdr = (_ZN3edg16mem_region_tableE[__67442_53_region_number]);
 
-__78752_13_true_size = (__78720_53_size + 8UL);
-__78753_13_use_dedicated_mem_block = ((_Bool)(__78752_13_true_size >= 2096UL));
-__78754_13_small_extension = ((_ZN3edg9a_booleanE)0);
-__78755_13_region_trimmed = (__78729_26_hdr->trimmed);
-if (__78753_13_use_dedicated_mem_block) {
-
-
+__67475_13_true_size = (__67443_53_size + 8ULL);
+__67476_13_use_dedicated_mem_block = ((_Bool)(__67475_13_true_size >= 2096ULL));
+__67477_13_small_extension = ((_ZN3edg9a_booleanE)0);
+__67478_13_region_trimmed = (__67452_26_hdr->trimmed);
+if (__67476_13_use_dedicated_mem_block) {
 
 
-_ZN3edg14trim_mem_blockEPNS_18a_mem_block_headerE(__78729_26_hdr);
-__78754_13_small_extension = ((_ZN3edg9a_booleanE)1);
-__78729_26_hdr = (_ZN3edg15alloc_mem_blockEimPcb(__78719_53_region_number, __78752_13_true_size, ((char *)0), ((_ZN3edg9a_booleanE)1)));
+
+
+_ZN3edg14trim_mem_blockEPNS_18a_mem_block_headerE(__67452_26_hdr);
+__67477_13_small_extension = ((_ZN3edg9a_booleanE)1);
+__67452_26_hdr = (_ZN3edg15alloc_mem_blockEiyPcb(__67442_53_region_number, __67475_13_true_size, ((char *)0), ((_ZN3edg9a_booleanE)1)));
 
 } else  {
 
 
 
 
-auto _ZN3edg8sizeof_tE __78770_14_remaining_space; __78770_14_remaining_space = ((_ZN3edg8sizeof_tE)((__78729_26_hdr->after_end_of_block) - (__78729_26_hdr->next_avail_in_block)));
+auto _ZN3edg8sizeof_tE __67493_14_remaining_space; __67493_14_remaining_space = ((_ZN3edg8sizeof_tE)((__67452_26_hdr->after_end_of_block) - (__67452_26_hdr->next_avail_in_block)));
 
-if (__78752_13_true_size > __78770_14_remaining_space) {
-# 191
-__78754_13_small_extension = __78755_13_region_trimmed;
-if (!(__78729_26_hdr->trimmed)) {
-_ZN3edg14trim_mem_blockEPNS_18a_mem_block_headerE(__78729_26_hdr);
+if (__67475_13_true_size > __67493_14_remaining_space) {
+#line 191
+__67477_13_small_extension = __67478_13_region_trimmed;
+if (!(__67452_26_hdr->trimmed)) {
+_ZN3edg14trim_mem_blockEPNS_18a_mem_block_headerE(__67452_26_hdr);
 }
-__78729_26_hdr = (_ZN3edg15alloc_mem_blockEimPcb(__78719_53_region_number, __78752_13_true_size, ((char *)0), __78754_13_small_extension));
+__67452_26_hdr = (_ZN3edg15alloc_mem_blockEiyPcb(__67442_53_region_number, __67475_13_true_size, ((char *)0), __67477_13_small_extension));
 
-}
-}
-
-__78728_27_temp_ptr = (__78729_26_hdr->next_avail_in_block);
-(__78729_26_hdr->next_avail_in_block) += __78720_53_size;
-if (__78754_13_small_extension) {
-auto _ZN3edg8sizeof_tE __78790_14_remaining_space; __78790_14_remaining_space = ((_ZN3edg8sizeof_tE)((__78729_26_hdr->after_end_of_block) - (__78729_26_hdr->next_avail_in_block)));
-
-
-if (__78790_14_remaining_space >= 2096UL) {
-# 214
-_ZN3edg14trim_mem_blockEPNS_18a_mem_block_headerE(__78729_26_hdr);
-
-
-
-
-(__78729_26_hdr->trimmed) = ((_ZN3edg14a_byte_booleanE)(((int)__78755_13_region_trimmed) != 0));
 }
 }
-if (__78753_13_use_dedicated_mem_block) {
-# 232
-(__78729_26_hdr->next_avail_in_block) = (__78729_26_hdr->after_end_of_block);
+
+__67451_27_temp_ptr = (__67452_26_hdr->next_avail_in_block);
+(__67452_26_hdr->next_avail_in_block) += __67443_53_size;
+if (__67477_13_small_extension) {
+auto _ZN3edg8sizeof_tE __67513_14_remaining_space; __67513_14_remaining_space = ((_ZN3edg8sizeof_tE)((__67452_26_hdr->after_end_of_block) - (__67452_26_hdr->next_avail_in_block)));
+
+
+if (__67513_14_remaining_space >= 2096ULL) {
+#line 214
+_ZN3edg14trim_mem_blockEPNS_18a_mem_block_headerE(__67452_26_hdr);
+
+
+
+
+(__67452_26_hdr->trimmed) = ((_ZN3edg14a_byte_booleanE)(((int)__67478_13_region_trimmed) != 0));
 }
-# 242
-return __78728_27_temp_ptr;
 }
-# 2731 "src/util.h"
- /* COMDAT group: _ZN3edg7max_valImEET_RKS1_S3_ */ __inline__ __attribute__((__always_inline__)) _ZN3edg8sizeof_tE _ZN3edg7max_valImEET_RKS1_S3_( const _ZN3edg8sizeof_tE *__47604_43_x, 
-const _ZN3edg8sizeof_tE *__47605_43_y)
+if (__67476_13_use_dedicated_mem_block) {
+#line 232
+(__67452_26_hdr->next_avail_in_block) = (__67452_26_hdr->after_end_of_block);
+}
+#line 242
+return __67451_27_temp_ptr;
+}
+#line 2731 "src/util.h"
+ /* COMDAT group: _ZN3edg7max_valIyEET_RKS1_S3_ */ _ZN3edg8sizeof_tE _ZN3edg7max_valIyEET_RKS1_S3_( const _ZN3edg8sizeof_tE *__36327_43_x, 
+const _ZN3edg8sizeof_tE *__36328_43_y)
 
 
 
 
 {
-return ((*__47604_43_x) < (*__47605_43_y)) ? (*__47605_43_y) : (*__47604_43_x);
+return ((*__36327_43_x) < (*__36328_43_y)) ? (*__36328_43_y) : (*__36327_43_x);
 }
-# 78 "src/mem_manage.h"
- __attribute__((__weak__)) /* COMDAT group: _ZN3edg17do_host_alignmentImEEvPT_ */ void _ZN3edg17do_host_alignmentImEEvPT_( _ZN3edg8sizeof_tE *__78665_55_size __attribute__((__unused__)))
+#line 78 "src/mem_manage.h"
+ /* COMDAT group: _ZN3edg17do_host_alignmentIyEEvPT_ */ void _ZN3edg17do_host_alignmentIyEEvPT_( _ZN3edg8sizeof_tE *__67388_55_size)
 
 
 
 
 {
 
-auto _ZN3edg8sizeof_tE __78672_15_excess_bytes; __78672_15_excess_bytes = ((*__78665_55_size) & 7UL);
+auto _ZN3edg8sizeof_tE __67395_15_excess_bytes; __67395_15_excess_bytes = ((*__67388_55_size) & 7ULL);
 
-if (__78672_15_excess_bytes != 0UL) {
-(*__78665_55_size) += (8UL - __78672_15_excess_bytes);
+if (__67395_15_excess_bytes != 0ULL) {
+(*__67388_55_size) += (8ULL - __67395_15_excess_bytes);
 } 
 
 }
-# 328
- __attribute__((__weak__)) /* COMDAT group: _ZN3edg8alloc_feEm */ char *_ZN3edg8alloc_feEm( _ZN3edg8sizeof_tE __78915_36_size)
-# 337
-{ auto _ZN3edg8sizeof_tE __T718755760;
+#line 328
+ /* COMDAT group: _ZN3edg8alloc_feEy */ char *_ZN3edg8alloc_feEy( _ZN3edg8sizeof_tE __67638_36_size)
+#line 337
+{ auto _ZN3edg8sizeof_tE __T840458008;
 
 
 
-auto void *__78928_9_ptr;
-# 338
-if (!(_ZN3edg12in_front_endE)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg8alloc_feEmEs), 340, __T683092696, ((const char *)_ZZN3edg8alloc_feEmEs_0), ((_ZN3edg12a_const_charE *)0)); }
+auto void *__67651_9_ptr;
+#line 338
+if (!(_ZN3edg12in_front_endE)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg8alloc_feEyEs), 340, __T804719600, ((const char *)_ZZN3edg8alloc_feEyEs_0), ((_ZN3edg12a_const_charE *)0)); }
 
 
-__78928_9_ptr = ((void *)0);
+__67651_9_ptr = ((void *)0);
 
 
 
-__78915_36_size = (_ZN3edg7max_valImEET_RKS1_S3_((((const _ZN3edg8sizeof_tE *)&__78915_36_size)), ((((*(_ZN3edg8sizeof_tE *)&__T718755760)) = 1UL) , (&__T718755760))));
-if ((__78915_36_size < 2096UL) && (_ZN3edg6detail12freed_fe_mapE != ((_ZN3edg6detail17a_size_to_ptr_mapE *)0))) {
+__67638_36_size = (_ZN3edg7max_valIyEET_RKS1_S3_((((const _ZN3edg8sizeof_tE *)&__67638_36_size)), ((((*(_ZN3edg8sizeof_tE *)&__T840458008)) = 1ULL) , (&__T840458008))));
+if ((__67638_36_size < 2096ULL) && (_ZN3edg6detail12freed_fe_mapE != ((_ZN3edg6detail17a_size_to_ptr_mapE *)0))) {
 
-auto _ZN3edg13Ptr_multi_mapImPvLj50ENS_17General_allocatorEE13a_multi_valueE *__78935_10_freed_blocks; __78935_10_freed_blocks = (_ZN3edg13Ptr_multi_mapImPvLj50ENS_17General_allocatorEE3getEm(_ZN3edg6detail12freed_fe_mapE, __78915_36_size));
-if ((__78935_10_freed_blocks != ((_ZN3edg13Ptr_multi_mapImPvLj50ENS_17General_allocatorEE13a_multi_valueE *)0)) && ((_ZNK3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE6lengthEv(((const struct 
-# 349
-_ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEE *)__78935_10_freed_blocks))) > 0UL)) {
+auto _ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE13a_multi_valueE *__67658_10_freed_blocks; __67658_10_freed_blocks = (_ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE3getEy(_ZN3edg6detail12freed_fe_mapE, __67638_36_size));
+if ((__67658_10_freed_blocks != ((_ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE13a_multi_valueE *)0)) && ((_ZNK3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE6lengthEv(((const struct 
+#line 349
+_ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEE *)__67658_10_freed_blocks))) > 0ULL)) {
 
-__78928_9_ptr = (*(_ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE9back_elemEv(__78935_10_freed_blocks)));
-_ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE8pop_backEv(__78935_10_freed_blocks);
+__67651_9_ptr = (*(_ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE9back_elemEv(__67658_10_freed_blocks)));
+_ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE8pop_backEv(__67658_10_freed_blocks);
 }
 }
-if (__78928_9_ptr == ((void *)0)) {
+if (__67651_9_ptr == ((void *)0)) {
 
-__78928_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEim(0, __78915_36_size)));
+__67651_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67638_36_size)));
 }
-return (char *)__78928_9_ptr;
+return (char *)__67651_9_ptr;
 }
-# 38 "src/types.h"
- /* COMDAT group: _ZN3edg13skip_typerefsEPNS_6a_typeE */ __inline__ __attribute__((__always_inline__)) _ZN3edg10a_type_ptrE _ZN3edg13skip_typerefsEPNS_6a_typeE( _ZN3edg10a_type_ptrE __112328_44_type_ptr)
-# 45
+#line 38 "src/types.h"
+ /* COMDAT group: _ZN3edg13skip_typerefsEPNS_6a_typeE */ _ZN3edg10a_type_ptrE _ZN3edg13skip_typerefsEPNS_6a_typeE( _ZN3edg10a_type_ptrE __100921_44_type_ptr)
+#line 45
 {
-while (((int)(__112328_44_type_ptr->kind)) == 13) {
-__112328_44_type_ptr = (((__112328_44_type_ptr->variant).typeref).type);
+while (((int)(__100921_44_type_ptr->kind)) == 12) {
+__100921_44_type_ptr = (((__100921_44_type_ptr->variant).typeref).type);
 
 
 
 
 }
-return __112328_44_type_ptr;
+return __100921_44_type_ptr;
 }
-# 63 "src/inline.c"
+#line 63 "src/inline.c"
 static void _ZN29_INTERNAL_8_inline_c_502890ee3edg30set_inline_statement_positionsEPNS0_11a_statementES2_(
-_ZN3edg15a_statement_ptrE __158458_61_statement, 
-_ZN3edg15a_statement_ptrE __158459_61_original_statement __attribute__((__unused__)))
-# 76
+_ZN3edg15a_statement_ptrE __147051_61_statement, 
+_ZN3edg15a_statement_ptrE __147052_61_original_statement)
+#line 76
 {
-if (__158458_61_statement != ((_ZN3edg15a_statement_ptrE)0)) {
+if (__147051_61_statement != ((_ZN3edg15a_statement_ptrE)0)) {
 
-{ if (__158458_61_statement != ((_ZN3edg15a_statement_ptrE)0)) { ((__158458_61_statement->compiler_generated) && (__158458_61_statement->lowering_generated)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"
-# 79
-), 79, __T718395992, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))); (__158458_61_statement->position) = _ZN3edg21code_pos_for_loweringE; (__158458_61_statement->end_position) = _ZN3edg21code_pos_for_loweringE; } } ;
-# 88
+{ if (__147051_61_statement != ((_ZN3edg15a_statement_ptrE)0)) { ((__147051_61_statement->compiler_generated) && (__147051_61_statement->lowering_generated)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"
+#line 79
+), 79, __T840087624, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))); (__147051_61_statement->position) = _ZN3edg21code_pos_for_loweringE; (__147051_61_statement->end_position) = _ZN3edg21code_pos_for_loweringE; } } ;
+#line 88
 } 
 }
 
 
 static _ZN3edg37a_variable_remapping_for_inlining_ptrE _ZN29_INTERNAL_8_inline_c_502890ee3edg37alloc_variable_remapping_for_inliningEPNS0_10a_variableEbPPNS0_33a_variable_remapping_for_inliningE(
-_ZN3edg14a_variable_ptrE __158487_61_var, 
-_ZN3edg9a_booleanE __158488_61_eval_right_to_left, 
-_ZN3edg37a_variable_remapping_for_inlining_ptrE *__158489_62_p_last_remap)
-# 105
+_ZN3edg14a_variable_ptrE __147080_61_var, 
+_ZN3edg9a_booleanE __147081_61_eval_right_to_left, 
+_ZN3edg37a_variable_remapping_for_inlining_ptrE *__147082_62_p_last_remap)
+#line 105
 {
-auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __158500_41_vrip; auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __158500_47_last_remap; __158500_47_last_remap = (*__158489_62_p_last_remap);
+auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __147093_41_vrip; auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __147093_47_last_remap; __147093_47_last_remap = (*__147082_62_p_last_remap);
 
 if (_ZN3edg38avail_variable_remappings_for_inliningE != ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0)) {
 
-__158500_41_vrip = _ZN3edg38avail_variable_remappings_for_inliningE;
-_ZN3edg38avail_variable_remappings_for_inliningE = (__158500_41_vrip->next);
+__147093_41_vrip = _ZN3edg38avail_variable_remappings_for_inliningE;
+_ZN3edg38avail_variable_remappings_for_inliningE = (__147093_41_vrip->next);
 } else  {
 
-__158500_41_vrip = ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)(_ZN3edg8alloc_feEm(64UL)));
+__147093_41_vrip = ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)(_ZN3edg8alloc_feEy(64ULL)));
 
 
 
 
 }
-# 125
-if (__158488_61_eval_right_to_left) {
-(__158500_41_vrip->next) = _ZN29_INTERNAL_8_inline_c_502890ee3edg32variable_remappings_for_inliningE;
-_ZN29_INTERNAL_8_inline_c_502890ee3edg32variable_remappings_for_inliningE = __158500_41_vrip;
+#line 125
+if (__147081_61_eval_right_to_left) {
+(__147093_41_vrip->next) = _ZN29_INTERNAL_8_inline_c_502890ee3edg32variable_remappings_for_inliningE;
+_ZN29_INTERNAL_8_inline_c_502890ee3edg32variable_remappings_for_inliningE = __147093_41_vrip;
 } else  {
-if (__158500_47_last_remap == ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0)) {
+if (__147093_47_last_remap == ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0)) {
 
-__158500_47_last_remap = _ZN29_INTERNAL_8_inline_c_502890ee3edg32variable_remappings_for_inliningE;
-if (__158500_47_last_remap != ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0)) {
-while ((__158500_47_last_remap->next) != ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0)) { __158500_47_last_remap = (__158500_47_last_remap->next); }
+__147093_47_last_remap = _ZN29_INTERNAL_8_inline_c_502890ee3edg32variable_remappings_for_inliningE;
+if (__147093_47_last_remap != ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0)) {
+while ((__147093_47_last_remap->next) != ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0)) { __147093_47_last_remap = (__147093_47_last_remap->next); }
 }
 } else  {
-((__158500_47_last_remap->next) == ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 136, __T718399392, ((
-# 136
+((__147093_47_last_remap->next) == ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 136, __T840091024, ((
+#line 136
 _ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 }
-if (__158500_47_last_remap == ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0)) {
-_ZN29_INTERNAL_8_inline_c_502890ee3edg32variable_remappings_for_inliningE = __158500_41_vrip;
+if (__147093_47_last_remap == ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0)) {
+_ZN29_INTERNAL_8_inline_c_502890ee3edg32variable_remappings_for_inliningE = __147093_41_vrip;
 } else  {
-(__158500_47_last_remap->next) = __158500_41_vrip;
+(__147093_47_last_remap->next) = __147093_41_vrip;
 }
-(__158500_41_vrip->next) = ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0);
-(*__158489_62_p_last_remap) = __158500_41_vrip;
+(__147093_41_vrip->next) = ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0);
+(*__147082_62_p_last_remap) = __147093_41_vrip;
 }
-(__158500_41_vrip->orig_variable) = __158487_61_var;
-(__158487_61_var->remapping_for_inlining) = __158500_41_vrip;
-(__158500_41_vrip->kind) = _ZN3edg8vrk_noneE;
-(__158500_41_vrip->arg_expr) = ((_ZN3edg16an_expr_node_ptrE)0);
-(__158500_41_vrip->arg_side_effect_expr) = ((_ZN3edg16an_expr_node_ptrE)0);
-(__158500_41_vrip->orig_temporary) = ((_ZN3edg14a_variable_ptrE)0);
-(__158500_41_vrip->temporary_used) = ((_ZN3edg14a_byte_booleanE)0);
-(__158500_41_vrip->remapping_used) = ((_ZN3edg14a_byte_booleanE)0);
-(__158500_41_vrip->local_temporary_okay) = ((_ZN3edg14a_byte_booleanE)0);
-(__158500_41_vrip->local_temporary_reused) = ((_ZN3edg14a_byte_booleanE)0);
-return __158500_41_vrip;
+(__147093_41_vrip->orig_variable) = __147080_61_var;
+(__147080_61_var->remapping_for_inlining) = __147093_41_vrip;
+(__147093_41_vrip->kind) = _ZN3edg8vrk_noneE;
+(__147093_41_vrip->arg_expr) = ((_ZN3edg16an_expr_node_ptrE)0);
+(__147093_41_vrip->arg_side_effect_expr) = ((_ZN3edg16an_expr_node_ptrE)0);
+(__147093_41_vrip->orig_temporary) = ((_ZN3edg14a_variable_ptrE)0);
+(__147093_41_vrip->temporary_used) = ((_ZN3edg14a_byte_booleanE)0);
+(__147093_41_vrip->remapping_used) = ((_ZN3edg14a_byte_booleanE)0);
+(__147093_41_vrip->local_temporary_okay) = ((_ZN3edg14a_byte_booleanE)0);
+(__147093_41_vrip->local_temporary_reused) = ((_ZN3edg14a_byte_booleanE)0);
+return __147093_41_vrip;
 }
 
 
@@ -11812,555 +11745,555 @@ static void _ZN29_INTERNAL_8_inline_c_502890ee3edg37free_variable_remappings_for
 
 
 {
-auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __158560_41_vrip; auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __158560_47_vrip_next;
+auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __147153_41_vrip; auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __147153_47_vrip_next;
 
-for (__158560_41_vrip = _ZN29_INTERNAL_8_inline_c_502890ee3edg32variable_remappings_for_inliningE; __158560_41_vrip != ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0); __158560_41_vrip = __158560_47_vrip_next)
+for (__147153_41_vrip = _ZN29_INTERNAL_8_inline_c_502890ee3edg32variable_remappings_for_inliningE; __147153_41_vrip != ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0); __147153_41_vrip = __147153_47_vrip_next)
 
 {
-__158560_47_vrip_next = (__158560_41_vrip->next);
-(__158560_41_vrip->next) = _ZN3edg38avail_variable_remappings_for_inliningE;
-_ZN3edg38avail_variable_remappings_for_inliningE = __158560_41_vrip;
-((__158560_41_vrip->orig_variable)->remapping_for_inlining) = ((struct _ZN3edg33a_variable_remapping_for_inliningE *)0);
+__147153_47_vrip_next = (__147153_41_vrip->next);
+(__147153_41_vrip->next) = _ZN3edg38avail_variable_remappings_for_inliningE;
+_ZN3edg38avail_variable_remappings_for_inliningE = __147153_41_vrip;
+((__147153_41_vrip->orig_variable)->remapping_for_inlining) = ((struct _ZN3edg33a_variable_remapping_for_inliningE *)0);
 }
 _ZN29_INTERNAL_8_inline_c_502890ee3edg32variable_remappings_for_inliningE = ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0); 
 }
-# 212
+#line 212
 static void _ZN29_INTERNAL_8_inline_c_502890ee3edg24make_remapping_temporaryEPNS0_33a_variable_remapping_for_inliningEbb(
 
-_ZN3edg37a_variable_remapping_for_inlining_ptrE __158608_37_vrip, 
-_ZN3edg9a_booleanE __158609_37_is_temp_for_constructor_this_inlined_param, 
-_ZN3edg9a_booleanE __158610_37_is_temp_for_unmodified_inlined_param)
-# 222
+_ZN3edg37a_variable_remapping_for_inlining_ptrE __147201_37_vrip, 
+_ZN3edg9a_booleanE __147202_37_is_temp_for_constructor_this_inlined_param, 
+_ZN3edg9a_booleanE __147203_37_is_temp_for_unmodified_inlined_param)
+#line 222
 {
-auto _ZN3edg14a_variable_ptrE __158617_30_orig_var;
-auto _ZN3edg14a_variable_ptrE __158618_30_temp_var = ((_ZN3edg14a_variable_ptrE)0);
-auto _ZN3edg26a_temporary_list_entry_ptrE __158619_30_tlep = ((_ZN3edg26a_temporary_list_entry_ptrE)0);
-auto _ZN3edg9a_booleanE __158620_30_is_register_mapped = ((_ZN3edg9a_booleanE)0);
-# 223
-__158617_30_orig_var = (__158608_37_vrip->orig_variable);
-# 233
-(!(__158617_30_orig_var->has_named_register_storage_class)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 233, __T718402672, ((_ZN3edg12a_const_charE *)0), ((
-# 233
+auto _ZN3edg14a_variable_ptrE __147210_30_orig_var;
+auto _ZN3edg14a_variable_ptrE __147211_30_temp_var = ((_ZN3edg14a_variable_ptrE)0);
+auto _ZN3edg26a_temporary_list_entry_ptrE __147212_30_tlep = ((_ZN3edg26a_temporary_list_entry_ptrE)0);
+auto _ZN3edg9a_booleanE __147213_30_is_register_mapped = ((_ZN3edg9a_booleanE)0);
+#line 223
+__147210_30_orig_var = (__147201_37_vrip->orig_variable);
+#line 233
+(!(__147210_30_orig_var->has_named_register_storage_class)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 233, __T840094304, ((_ZN3edg12a_const_charE *)0), ((
+#line 233
 _ZN3edg12a_const_charE *)0)));
 
 
-if (__158617_30_orig_var->asm_name_is_valid) {
-(((__158617_30_orig_var->asm_name_or_reg).name) == ((_ZN3edg12a_const_charE *)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 237, __T718402672, ((_ZN3edg12a_const_charE *)0)
-# 237
+if (__147210_30_orig_var->asm_name_is_valid) {
+(((__147210_30_orig_var->asm_name_or_reg).name) == ((_ZN3edg12a_const_charE *)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 237, __T840094304, ((_ZN3edg12a_const_charE *)0)
+#line 237
 , ((_ZN3edg12a_const_charE *)0)));
 } else  {
-__158620_30_is_register_mapped = ((_ZN3edg9a_booleanE)1);
+__147213_30_is_register_mapped = ((_ZN3edg9a_booleanE)1);
 }
 
 
 
-if (((((!(__158617_30_orig_var->address_taken)) && (!(__158617_30_orig_var->initialization_rewritten_as_assignment))) && (!((((int)(__158617_30_orig_var->init_kind)) == 2) && (((__158617_30_orig_var->initializer).dynamic)->is_partially_initialized)))) && (!(((int)(__158617_30_orig_var->init_kind)) 
-# 244
-== 3))) && (!(__158620_30_is_register_mapped)))
+if (((((!(__147210_30_orig_var->address_taken)) && (!(__147210_30_orig_var->initialization_rewritten_as_assignment))) && (!((((int)(__147210_30_orig_var->init_kind)) == 2) && (((__147210_30_orig_var->initializer).dynamic)->is_partially_initialized)))) && (!(((int)(__147210_30_orig_var->init_kind)) 
+#line 244
+== 3))) && (!(__147213_30_is_register_mapped)))
 
 
 
 
 {
-(__158608_37_vrip->local_temporary_okay) = ((_ZN3edg14a_byte_booleanE)1);
+(__147201_37_vrip->local_temporary_okay) = ((_ZN3edg14a_byte_booleanE)1);
 do {
-__158618_30_temp_var = (_ZN3edg23find_reusable_temporaryEPNS_6a_typeEPPNS_22a_temporary_list_entryE((__158617_30_orig_var->type), (&__158619_30_tlep)));
-if (__158618_30_temp_var == ((_ZN3edg14a_variable_ptrE)0)) { goto __T718527360; }
+__147211_30_temp_var = (_ZN3edg23find_reusable_temporaryEPNS_6a_typeEPPNS_22a_temporary_list_entryE((__147210_30_orig_var->type), (&__147212_30_tlep)));
+if (__147211_30_temp_var == ((_ZN3edg14a_variable_ptrE)0)) { goto __T840217536; }
 
 
-} while ((((int)__158609_37_is_temp_for_constructor_this_inlined_param) != ((int)(__158618_30_temp_var->is_temp_for_constructor_this_inlined_param))) || (((int)__158610_37_is_temp_for_unmodified_inlined_param) != ((int)(__158618_30_temp_var->is_temp_for_unmodified_inlined_param)))); __T718527360:;
+} while ((((int)__147202_37_is_temp_for_constructor_this_inlined_param) != ((int)(__147211_30_temp_var->is_temp_for_constructor_this_inlined_param))) || (((int)__147203_37_is_temp_for_unmodified_inlined_param) != ((int)(__147211_30_temp_var->is_temp_for_unmodified_inlined_param)))); __T840217536:;
 
 
 
 }
-if (__158618_30_temp_var != ((_ZN3edg14a_variable_ptrE)0)) {
-(__158619_30_tlep->in_use) = ((_ZN3edg14a_byte_booleanE)1);
-(__158608_37_vrip->local_temporary_reused) = ((_ZN3edg14a_byte_booleanE)1);
+if (__147211_30_temp_var != ((_ZN3edg14a_variable_ptrE)0)) {
+(__147212_30_tlep->in_use) = ((_ZN3edg14a_byte_booleanE)1);
+(__147201_37_vrip->local_temporary_reused) = ((_ZN3edg14a_byte_booleanE)1);
 } else  {
 
-__158618_30_temp_var = (_ZN3edg14make_temporaryEPNS_6a_typeEb((__158617_30_orig_var->type), ((_ZN3edg9a_booleanE)0)));
+__147211_30_temp_var = (_ZN3edg14make_temporaryEPNS_6a_typeEb((__147210_30_orig_var->type), ((_ZN3edg9a_booleanE)0)));
 }
-(__158608_37_vrip->kind) = _ZN3edg13vrk_temporaryE;
-((__158608_37_vrip->variant).variable) = __158618_30_temp_var;
-if (__158617_30_orig_var->address_taken) { (__158618_30_temp_var->address_taken) = 1U; }
-if (__158617_30_orig_var->initialization_rewritten_as_assignment) {
-(__158618_30_temp_var->initialization_rewritten_as_assignment) = 1U;
+(__147201_37_vrip->kind) = _ZN3edg13vrk_temporaryE;
+((__147201_37_vrip->variant).variable) = __147211_30_temp_var;
+if (__147210_30_orig_var->address_taken) { (__147211_30_temp_var->address_taken) = 1U; }
+if (__147210_30_orig_var->initialization_rewritten_as_assignment) {
+(__147211_30_temp_var->initialization_rewritten_as_assignment) = 1U;
 }
 
-if (((int)(__158617_30_orig_var->init_kind)) == 3) {
-(__158618_30_temp_var->init_kind) = _ZN3edg10initk_zeroE;
+if (((int)(__147210_30_orig_var->init_kind)) == 3) {
+(__147211_30_temp_var->init_kind) = _ZN3edg10initk_zeroE;
 }
-(__158618_30_temp_var->is_temp_for_constructor_this_inlined_param) = ((_ZN3edg11a_bit_fieldE)__158609_37_is_temp_for_constructor_this_inlined_param);
+(__147211_30_temp_var->is_temp_for_constructor_this_inlined_param) = ((_ZN3edg11a_bit_fieldE)__147202_37_is_temp_for_constructor_this_inlined_param);
 
-(__158618_30_temp_var->is_temp_for_unmodified_inlined_param) = ((_ZN3edg11a_bit_fieldE)__158610_37_is_temp_for_unmodified_inlined_param);
-
-
-if (__158620_30_is_register_mapped) {
+(__147211_30_temp_var->is_temp_for_unmodified_inlined_param) = ((_ZN3edg11a_bit_fieldE)__147203_37_is_temp_for_unmodified_inlined_param);
 
 
-(__158618_30_temp_var->asm_name_is_valid) = 0U;
-((__158618_30_temp_var->asm_name_or_reg).reg) = ((__158617_30_orig_var->asm_name_or_reg).reg);
+if (__147213_30_is_register_mapped) {
+
+
+(__147211_30_temp_var->asm_name_is_valid) = 0U;
+((__147211_30_temp_var->asm_name_or_reg).reg) = ((__147210_30_orig_var->asm_name_or_reg).reg);
 } 
 
 }
 
 
-static _ZN3edg9a_booleanE _ZN29_INTERNAL_8_inline_c_502890ee3edg26func_body_has_side_effectsEPNS0_9a_routineE( _ZN3edg13a_routine_ptrE __158687_59_routine)
-# 299
+static _ZN3edg9a_booleanE _ZN29_INTERNAL_8_inline_c_502890ee3edg26func_body_has_side_effectsEPNS0_9a_routineE( _ZN3edg13a_routine_ptrE __147280_59_routine)
+#line 299
 {
-auto _ZN3edg9a_booleanE __158694_19_has_side_effects = ((_ZN3edg9a_booleanE)1);
-auto _ZN3edg11a_scope_ptrE __158695_19_scope;
-auto _ZN3edg15a_statement_ptrE __158696_19_stmt;
-# 301
-__158695_19_scope = (_ZN3edg17scope_for_routineEPNS_9a_routineE(__158687_59_routine));
-__158696_19_stmt = (__158695_19_scope->assoc_block);
+auto _ZN3edg9a_booleanE __147287_19_has_side_effects = ((_ZN3edg9a_booleanE)1);
+auto _ZN3edg11a_scope_ptrE __147288_19_scope;
+auto _ZN3edg15a_statement_ptrE __147289_19_stmt;
+#line 301
+__147288_19_scope = (_ZN3edg17scope_for_routineEPNS_9a_routineE(__147280_59_routine));
+__147289_19_stmt = (__147288_19_scope->assoc_block);
 
 
 
-if (((int)(__158696_19_stmt->kind)) == 11) {
-__158696_19_stmt = (((__158696_19_stmt->variant).block).statements);
-if (((__158696_19_stmt != ((_ZN3edg15a_statement_ptrE)0)) && (((int)(__158696_19_stmt->kind)) == 8)) && ((__158696_19_stmt->next) == ((_ZN3edg15a_statement_ptrE)0)))
+if (((int)(__147289_19_stmt->kind)) == 11) {
+__147289_19_stmt = (((__147289_19_stmt->variant).block).statements);
+if (((__147289_19_stmt != ((_ZN3edg15a_statement_ptrE)0)) && (((int)(__147289_19_stmt->kind)) == 8)) && ((__147289_19_stmt->next) == ((_ZN3edg15a_statement_ptrE)0)))
 
 {
-(((__158696_19_stmt->variant).return_dynamic_init) == ((_ZN3edg18a_dynamic_init_ptrE)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 311, __T718405744, ((
-# 311
+(((__147289_19_stmt->variant).return_dynamic_init) == ((_ZN3edg18a_dynamic_init_ptrE)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 311, __T840097376, ((
+#line 311
 _ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-if ((__158696_19_stmt->expr) != ((_ZN3edg16an_expr_node_ptrE)0)) {
-auto _ZN3edg16an_expr_node_ptrE __158707_26_expr; __158707_26_expr = (__158696_19_stmt->expr);
-# 319
-if ((__158707_26_expr->kind) == 1U) {
-auto unsigned char __158714_33_op; __158714_33_op = (((__158707_26_expr->variant).operation).kind);
-if (((int)__158714_33_op) == 74) {
-auto _ZN3edg16an_expr_node_ptrE __158716_30_op1; __158716_30_op1 = (((__158707_26_expr->variant).operation).operands);
-if (!(_ZN3edg21node_has_side_effectsEPNS_12an_expr_nodeEPb(__158716_30_op1, ((_ZN3edg9a_booleanE *)0)))) {
-__158707_26_expr = (__158716_30_op1->next);
+if ((__147289_19_stmt->expr) != ((_ZN3edg16an_expr_node_ptrE)0)) {
+auto _ZN3edg16an_expr_node_ptrE __147300_26_expr; __147300_26_expr = (__147289_19_stmt->expr);
+#line 319
+if ((__147300_26_expr->kind) == 1U) {
+auto unsigned char __147307_33_op; __147307_33_op = (((__147300_26_expr->variant).operation).kind);
+if (((int)__147307_33_op) == 74) {
+auto _ZN3edg16an_expr_node_ptrE __147309_30_op1; __147309_30_op1 = (((__147300_26_expr->variant).operation).operands);
+if (!(_ZN3edg21node_has_side_effectsEPNS_12an_expr_nodeEPb(__147309_30_op1, ((_ZN3edg9a_booleanE *)0)))) {
+__147300_26_expr = (__147309_30_op1->next);
 
 }
 }
 }
-__158694_19_has_side_effects = (_ZN3edg21node_has_side_effectsEPNS_12an_expr_nodeEPb(__158707_26_expr, ((_ZN3edg9a_booleanE *)0)));
+__147287_19_has_side_effects = (_ZN3edg21node_has_side_effectsEPNS_12an_expr_nodeEPb(__147300_26_expr, ((_ZN3edg9a_booleanE *)0)));
 
 } else  {
-__158694_19_has_side_effects = ((_ZN3edg9a_booleanE)0);
+__147287_19_has_side_effects = ((_ZN3edg9a_booleanE)0);
 }
 }
 }
-return __158694_19_has_side_effects;
+return __147287_19_has_side_effects;
 }
 
 
 static void _ZN29_INTERNAL_8_inline_c_502890ee3edg38set_up_variable_remapping_for_inliningEPNS0_7a_scopeEbPNS0_12an_expr_nodeE(
-_ZN3edg11a_scope_ptrE __158735_61_scope, 
-_ZN3edg9a_booleanE __158736_61_eval_right_to_left, 
-_ZN3edg16an_expr_node_ptrE __158737_61_arg_expr_list)
-# 353
+_ZN3edg11a_scope_ptrE __147328_61_scope, 
+_ZN3edg9a_booleanE __147329_61_eval_right_to_left, 
+_ZN3edg16an_expr_node_ptrE __147330_61_arg_expr_list)
+#line 353
 {
-auto _ZN3edg14a_variable_ptrE __158748_20_param_var; auto _ZN3edg14a_variable_ptrE __158748_31_var;
-auto _ZN3edg16an_expr_node_ptrE __158749_20_arg;
+auto _ZN3edg14a_variable_ptrE __147341_20_param_var; auto _ZN3edg14a_variable_ptrE __147341_31_var;
+auto _ZN3edg16an_expr_node_ptrE __147342_20_arg;
 
-auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __158751_20_vrip; auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __158751_26_last_remap = ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0);
-auto _ZN3edg13a_routine_ptrE __158752_20_routine;
+auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __147344_20_vrip; auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __147344_26_last_remap = ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0);
+auto _ZN3edg13a_routine_ptrE __147345_20_routine;
 
 
 
-auto _ZN3edg9a_booleanE __158756_20_call_has_side_effects; auto _ZN3edg9a_booleanE __158756_43_arg_list_has_side_effects;
-# 358
-__158752_20_routine = (((__158735_61_scope->variant).routine).ptr);
-# 367
-__158756_20_call_has_side_effects = (_ZN29_INTERNAL_8_inline_c_502890ee3edg26func_body_has_side_effectsEPNS0_9a_routineE(__158752_20_routine));
-__158756_43_arg_list_has_side_effects = ((_ZN3edg9a_booleanE)0);
-for (__158749_20_arg = __158737_61_arg_expr_list; __158749_20_arg != ((_ZN3edg16an_expr_node_ptrE)0); __158749_20_arg = (__158749_20_arg->next)) {
-if (_ZN3edg21node_has_side_effectsEPNS_12an_expr_nodeEPb(__158749_20_arg, ((_ZN3edg9a_booleanE *)0))) {
-__158756_20_call_has_side_effects = ((_ZN3edg9a_booleanE)1);
-__158756_43_arg_list_has_side_effects = ((_ZN3edg9a_booleanE)1);
-goto __T718589488;
+auto _ZN3edg9a_booleanE __147349_20_call_has_side_effects; auto _ZN3edg9a_booleanE __147349_43_arg_list_has_side_effects;
+#line 358
+__147345_20_routine = (((__147328_61_scope->variant).routine).ptr);
+#line 367
+__147349_20_call_has_side_effects = (_ZN29_INTERNAL_8_inline_c_502890ee3edg26func_body_has_side_effectsEPNS0_9a_routineE(__147345_20_routine));
+__147349_43_arg_list_has_side_effects = ((_ZN3edg9a_booleanE)0);
+for (__147342_20_arg = __147330_61_arg_expr_list; __147342_20_arg != ((_ZN3edg16an_expr_node_ptrE)0); __147342_20_arg = (__147342_20_arg->next)) {
+if (_ZN3edg21node_has_side_effectsEPNS_12an_expr_nodeEPb(__147342_20_arg, ((_ZN3edg9a_booleanE *)0))) {
+__147349_20_call_has_side_effects = ((_ZN3edg9a_booleanE)1);
+__147349_43_arg_list_has_side_effects = ((_ZN3edg9a_booleanE)1);
+goto __T840282216;
 }
-} __T718589488:;
+} __T840282216:;
 
-for ((__158748_20_param_var = (((__158735_61_scope->variant).routine).parameters)) , (__158749_20_arg = __158737_61_arg_expr_list); __158748_20_param_var != ((_ZN3edg14a_variable_ptrE)0); (__158748_20_param_var = (__158748_20_param_var->next)) , (__158749_20_arg = (__158749_20_arg->next)))
+for ((__147341_20_param_var = (((__147328_61_scope->variant).routine).parameters)) , (__147342_20_arg = __147330_61_arg_expr_list); __147341_20_param_var != ((_ZN3edg14a_variable_ptrE)0); (__147341_20_param_var = (__147341_20_param_var->next)) , (__147342_20_arg = (__147342_20_arg->next)))
 
 {
-if (!(__158749_20_arg != ((_ZN3edg16an_expr_node_ptrE)0))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 381, __T718408744, ((const char *)"set_up_variable_remapping_...: too few args"), ((
-# 380
+if (!(__147342_20_arg != ((_ZN3edg16an_expr_node_ptrE)0))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 381, __T840100376, ((const char *)"set_up_variable_remapping_...: too few args"), ((
+#line 380
 _ZN3edg12a_const_charE *)0)); }
 
 
-__158751_20_vrip = (_ZN29_INTERNAL_8_inline_c_502890ee3edg37alloc_variable_remapping_for_inliningEPNS0_10a_variableEbPPNS0_33a_variable_remapping_for_inliningE(__158748_20_param_var, __158736_61_eval_right_to_left, (&__158751_26_last_remap)));
+__147344_20_vrip = (_ZN29_INTERNAL_8_inline_c_502890ee3edg37alloc_variable_remapping_for_inliningEPNS0_10a_variableEbPPNS0_33a_variable_remapping_for_inliningE(__147341_20_param_var, __147329_61_eval_right_to_left, (&__147344_26_last_remap)));
 
-(__158751_20_vrip->arg_expr) = __158749_20_arg;
-if (!((__158748_20_param_var->source_corresp).referenced)) {
-
-
-if (_ZN3edg21node_has_side_effectsEPNS_12an_expr_nodeEPb(__158749_20_arg, ((_ZN3edg9a_booleanE *)0))) {
+(__147344_20_vrip->arg_expr) = __147342_20_arg;
+if (!((__147341_20_param_var->source_corresp).referenced)) {
 
 
-(__158751_20_vrip->arg_side_effect_expr) = __158749_20_arg;
+if (_ZN3edg21node_has_side_effectsEPNS_12an_expr_nodeEPb(__147342_20_arg, ((_ZN3edg9a_booleanE *)0))) {
+
+
+(__147344_20_vrip->arg_side_effect_expr) = __147342_20_arg;
 }
 } else  {
 
 
 
-auto _ZN3edg9a_booleanE __158792_17_is_non_null;
-auto _ZN3edg9a_booleanE __158793_17_arg_is_constant;
-# 406
-auto _ZN3edg9a_booleanE __158800_17_param_is_unmodified = ((_ZN3edg9a_booleanE)0);
-auto _ZN3edg9a_booleanE __158801_17_param_is_constructor_this = ((_ZN3edg9a_booleanE)0);
-# 399
-__158793_17_arg_is_constant = (_ZN3edg29is_constant_valued_expressionEPNS_12an_expr_nodeEbbbPb(__158749_20_arg, __158756_43_arg_list_has_side_effects, __158756_20_call_has_side_effects, ((_ZN3edg9a_booleanE)1), (&__158792_17_is_non_null)));
-# 408
-if ((!(__158748_20_param_var->param_value_has_been_changed)) && (!(__158748_20_param_var->param_used_as_lvalue)))
+auto _ZN3edg9a_booleanE __147385_17_is_non_null;
+auto _ZN3edg9a_booleanE __147386_17_arg_is_constant;
+#line 406
+auto _ZN3edg9a_booleanE __147393_17_param_is_unmodified = ((_ZN3edg9a_booleanE)0);
+auto _ZN3edg9a_booleanE __147394_17_param_is_constructor_this = ((_ZN3edg9a_booleanE)0);
+#line 399
+__147386_17_arg_is_constant = (_ZN3edg29is_constant_valued_expressionEPNS_12an_expr_nodeEbbbPb(__147342_20_arg, __147349_43_arg_list_has_side_effects, __147349_20_call_has_side_effects, ((_ZN3edg9a_booleanE)1), (&__147385_17_is_non_null)));
+#line 408
+if ((!(__147341_20_param_var->param_value_has_been_changed)) && (!(__147341_20_param_var->param_used_as_lvalue)))
 {
 
 
-__158800_17_param_is_unmodified = ((_ZN3edg9a_booleanE)1);
-} else  { if ((__158748_20_param_var->is_this_parameter) && (((int)(__158752_20_routine->special_kind)) == 1))
-# 422
+__147393_17_param_is_unmodified = ((_ZN3edg9a_booleanE)1);
+} else  { if ((__147341_20_param_var->is_this_parameter) && (((int)(__147345_20_routine->special_kind)) == 1))
+#line 422
 {
-# 430
-__158801_17_param_is_constructor_this = ((_ZN3edg9a_booleanE)1);
-if (__158792_17_is_non_null) { __158800_17_param_is_unmodified = ((_ZN3edg9a_booleanE)1); }
+#line 430
+__147394_17_param_is_constructor_this = ((_ZN3edg9a_booleanE)1);
+if (__147385_17_is_non_null) { __147393_17_param_is_unmodified = ((_ZN3edg9a_booleanE)1); }
 } }
-if ((!(__158793_17_arg_is_constant)) && (!(__158756_20_call_has_side_effects))) {
+if ((!(__147386_17_arg_is_constant)) && (!(__147349_20_call_has_side_effects))) {
 
 
 
 
-if ((!(__158748_20_param_var->param_used_more_than_once)) && (((__158748_20_param_var->source_corresp).name) != ((_ZN3edg12a_const_charE *)0)))
+if ((!(__147341_20_param_var->param_used_more_than_once)) && (((__147341_20_param_var->source_corresp).name) != ((_ZN3edg12a_const_charE *)0)))
 
 
 {
-__158793_17_arg_is_constant = ((_ZN3edg9a_booleanE)1);
+__147386_17_arg_is_constant = ((_ZN3edg9a_booleanE)1);
 }
 }
-if (((__158800_17_param_is_unmodified) && (__158793_17_arg_is_constant)) && ((!(_ZN3edg26is_class_struct_union_typeEPNS_6a_typeE((__158748_20_param_var->type)))) || (_ZN3edg39is_ptr_to_member_function_constant_exprEPNS_12an_expr_nodeE(__158749_20_arg))))
-# 451
+if (((__147393_17_param_is_unmodified) && (__147386_17_arg_is_constant)) && ((!(_ZN3edg26is_class_struct_union_typeEPNS_6a_typeE((__147341_20_param_var->type)))) || (_ZN3edg39is_ptr_to_member_function_constant_exprEPNS_12an_expr_nodeE(__147342_20_arg))))
+#line 451
 {
-auto _ZN3edg10a_type_ptrE __158846_20_arg_type; __158846_20_arg_type = (_ZN3edg13skip_typerefsEPNS_6a_typeE((__158749_20_arg->type)));
+auto _ZN3edg10a_type_ptrE __147439_20_arg_type; __147439_20_arg_type = (_ZN3edg13skip_typerefsEPNS_6a_typeE((__147342_20_arg->type)));
 
-if ((((((_ZN3edg37gcc_or_clang_is_generated_code_targetE) && (_ZN3edg22is_cast_operation_nodeEPNS_12an_expr_nodeE(__158749_20_arg))) && (_ZN3edg15is_pointer_typeEPNS_6a_typeE(__158846_20_arg_type))) && (_ZN3edg15is_pointer_typeEPNS_6a_typeE(((((__158749_20_arg->variant).operation).operands)->type)))
-# 454
-) && (_ZN3edg16is_function_typeEPNS_6a_typeE((_ZN3edg15type_pointed_toEPNS_6a_typeE(__158846_20_arg_type))))) && (!(_ZN3edg17f_identical_typesEPNS_6a_typeES1_j((_ZN3edg15type_pointed_toEPNS_6a_typeE(__158846_20_arg_type)), (_ZN3edg15type_pointed_toEPNS_6a_typeE(((((__158749_20_arg->variant).
-# 454
+if ((((((_ZN3edg37gcc_or_clang_is_generated_code_targetE) && (_ZN3edg22is_cast_operation_nodeEPNS_12an_expr_nodeE(__147342_20_arg))) && (_ZN3edg15is_pointer_typeEPNS_6a_typeE(__147439_20_arg_type))) && (_ZN3edg15is_pointer_typeEPNS_6a_typeE(((((__147342_20_arg->variant).operation).operands)->type)))
+#line 454
+) && (_ZN3edg16is_function_typeEPNS_6a_typeE((_ZN3edg15type_pointed_toEPNS_6a_typeE(__147439_20_arg_type))))) && (!(_ZN3edg17f_identical_typesEPNS_6a_typeES1_j((_ZN3edg15type_pointed_toEPNS_6a_typeE(__147439_20_arg_type)), (_ZN3edg15type_pointed_toEPNS_6a_typeE(((((__147342_20_arg->variant).
+#line 454
 operation).operands)->type))), 0x0U))))
-# 462
+#line 462
 {
-# 470
+#line 470
 }
 
 
 else  {
 
 
-(__158751_20_vrip->kind) = _ZN3edg17vrk_constant_exprE;
-((__158751_20_vrip->variant).expr) = __158749_20_arg;
+(__147344_20_vrip->kind) = _ZN3edg17vrk_constant_exprE;
+((__147344_20_vrip->variant).expr) = __147342_20_arg;
 }
-} else  { if ((__158800_17_param_is_unmodified) && ((__158749_20_arg->kind) == 1U)) {
-# 488
-if (((__158749_20_arg->kind) == 1U) && (((int)(((__158749_20_arg->variant).operation).kind)) == 92)) {
-auto _ZN3edg16an_expr_node_ptrE __158883_28_first_op;
-auto _ZN3edg16an_expr_node_ptrE __158884_28_second_op;
-# 489
-__158883_28_first_op = (((__158749_20_arg->variant).operation).operands);
-__158884_28_second_op = (__158883_28_first_op->next);
-if ((_ZN3edg29is_constant_valued_expressionEPNS_12an_expr_nodeEbbbPb(__158884_28_second_op, __158756_43_arg_list_has_side_effects, __158756_20_call_has_side_effects, ((_ZN3edg9a_booleanE)1), (&__158792_17_is_non_null))) && ((!(_ZN3edg26is_class_struct_union_typeEPNS_6a_typeE((__158748_20_param_var->
-# 491
-type)))) || (_ZN3edg39is_ptr_to_member_function_constant_exprEPNS_12an_expr_nodeE(__158884_28_second_op))))
-# 501
+} else  { if ((__147393_17_param_is_unmodified) && ((__147342_20_arg->kind) == 1U)) {
+#line 488
+if (((__147342_20_arg->kind) == 1U) && (((int)(((__147342_20_arg->variant).operation).kind)) == 92)) {
+auto _ZN3edg16an_expr_node_ptrE __147476_28_first_op;
+auto _ZN3edg16an_expr_node_ptrE __147477_28_second_op;
+#line 489
+__147476_28_first_op = (((__147342_20_arg->variant).operation).operands);
+__147477_28_second_op = (__147476_28_first_op->next);
+if ((_ZN3edg29is_constant_valued_expressionEPNS_12an_expr_nodeEbbbPb(__147477_28_second_op, __147349_43_arg_list_has_side_effects, __147349_20_call_has_side_effects, ((_ZN3edg9a_booleanE)1), (&__147385_17_is_non_null))) && ((!(_ZN3edg26is_class_struct_union_typeEPNS_6a_typeE((__147341_20_param_var->
+#line 491
+type)))) || (_ZN3edg39is_ptr_to_member_function_constant_exprEPNS_12an_expr_nodeE(__147477_28_second_op))))
+#line 501
 {
-# 511
-(__158751_20_vrip->kind) = _ZN3edg17vrk_constant_exprE;
-((__158751_20_vrip->variant).expr) = __158884_28_second_op;
-if (_ZN3edg21node_has_side_effectsEPNS_12an_expr_nodeEPb(__158883_28_first_op, ((_ZN3edg9a_booleanE *)0))) {
+#line 511
+(__147344_20_vrip->kind) = _ZN3edg17vrk_constant_exprE;
+((__147344_20_vrip->variant).expr) = __147477_28_second_op;
+if (_ZN3edg21node_has_side_effectsEPNS_12an_expr_nodeEPb(__147476_28_first_op, ((_ZN3edg9a_booleanE *)0))) {
 
 
-(__158751_20_vrip->arg_side_effect_expr) = __158883_28_first_op;
+(__147344_20_vrip->arg_side_effect_expr) = __147476_28_first_op;
 }
 }
 }
 } }
-if (((int)(__158751_20_vrip->kind)) == 0) {
+if (((int)(__147344_20_vrip->kind)) == 0) {
 
-_ZN29_INTERNAL_8_inline_c_502890ee3edg24make_remapping_temporaryEPNS0_33a_variable_remapping_for_inliningEbb(__158751_20_vrip, __158801_17_param_is_constructor_this, __158800_17_param_is_unmodified);
+_ZN29_INTERNAL_8_inline_c_502890ee3edg24make_remapping_temporaryEPNS0_33a_variable_remapping_for_inliningEbb(__147344_20_vrip, __147394_17_param_is_constructor_this, __147393_17_param_is_unmodified);
 
 
 
 
 }
-# 538
+#line 538
 }
 }
 
 
 
 
-for (__158748_31_var = (__158735_61_scope->nonstatic_variables); __158748_31_var != ((_ZN3edg14a_variable_ptrE)0); __158748_31_var = (__158748_31_var->next))
+for (__147341_31_var = (__147328_61_scope->nonstatic_variables); __147341_31_var != ((_ZN3edg14a_variable_ptrE)0); __147341_31_var = (__147341_31_var->next))
 
 {
 
-if ((__158748_31_var->source_corresp).referenced) {
+if ((__147341_31_var->source_corresp).referenced) {
 
-__158751_20_vrip = (_ZN29_INTERNAL_8_inline_c_502890ee3edg37alloc_variable_remapping_for_inliningEPNS0_10a_variableEbPPNS0_33a_variable_remapping_for_inliningE(__158748_31_var, __158736_61_eval_right_to_left, (&__158751_26_last_remap)));
+__147344_20_vrip = (_ZN29_INTERNAL_8_inline_c_502890ee3edg37alloc_variable_remapping_for_inliningEPNS0_10a_variableEbPPNS0_33a_variable_remapping_for_inliningE(__147341_31_var, __147329_61_eval_right_to_left, (&__147344_26_last_remap)));
 
-_ZN29_INTERNAL_8_inline_c_502890ee3edg24make_remapping_temporaryEPNS0_33a_variable_remapping_for_inliningEbb(__158751_20_vrip, ((_ZN3edg9a_booleanE)(((int)(__158748_31_var->is_temp_for_constructor_this_inlined_param)) != 0)), ((_ZN3edg9a_booleanE)(((int)(__158748_31_var->
-# 552
+_ZN29_INTERNAL_8_inline_c_502890ee3edg24make_remapping_temporaryEPNS0_33a_variable_remapping_for_inliningEbb(__147344_20_vrip, ((_ZN3edg9a_booleanE)(((int)(__147341_31_var->is_temp_for_constructor_this_inlined_param)) != 0)), ((_ZN3edg9a_booleanE)(((int)(__147341_31_var->
+#line 552
 is_temp_for_unmodified_inlined_param)) != 0)));
-# 565
+#line 565
 }
 } 
 }
 
 
 static void _ZN29_INTERNAL_8_inline_c_502890ee3edg28restore_mapping_to_temporaryEPNS0_33a_variable_remapping_for_inliningE(
-_ZN3edg37a_variable_remapping_for_inlining_ptrE __158965_75_vrip)
+_ZN3edg37a_variable_remapping_for_inlining_ptrE __147558_75_vrip)
 
 
 
 
 {
-if ((((int)(__158965_75_vrip->kind)) != 1) && ((__158965_75_vrip->orig_temporary) != ((_ZN3edg14a_variable_ptrE)0))) {
-(__158965_75_vrip->kind) = _ZN3edg13vrk_temporaryE;
-((__158965_75_vrip->variant).variable) = (__158965_75_vrip->orig_temporary);
-(__158965_75_vrip->orig_temporary) = ((_ZN3edg14a_variable_ptrE)0);
+if ((((int)(__147558_75_vrip->kind)) != 1) && ((__147558_75_vrip->orig_temporary) != ((_ZN3edg14a_variable_ptrE)0))) {
+(__147558_75_vrip->kind) = _ZN3edg13vrk_temporaryE;
+((__147558_75_vrip->variant).variable) = (__147558_75_vrip->orig_temporary);
+(__147558_75_vrip->orig_temporary) = ((_ZN3edg14a_variable_ptrE)0);
 } 
 }
 
 
 static void _ZN29_INTERNAL_8_inline_c_502890ee3edg38finish_variable_remapping_for_inliningEPNS0_11a_statementEPNS0_18an_insert_locationE(
-_ZN3edg15a_statement_ptrE __158980_63_block_stmt, 
-_ZN3edg18an_insert_locationE *__158981_64_insert_location)
-# 599
+_ZN3edg15a_statement_ptrE __147573_63_block_stmt, 
+_ZN3edg18an_insert_locationE *__147574_64_insert_location)
+#line 599
 {
-auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __158994_41_vrip;
-auto _ZN3edg15a_statement_ptrE __158995_41_stmt;
-auto _ZN3edg18an_insert_locationE __158996_41_local_insert_location;
-auto _ZN3edg9a_booleanE __158997_41_any_code_inserted = ((_ZN3edg9a_booleanE)0);
+auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __147587_41_vrip;
+auto _ZN3edg15a_statement_ptrE __147588_41_stmt;
+auto _ZN3edg18an_insert_locationE __147589_41_local_insert_location;
+auto _ZN3edg9a_booleanE __147590_41_any_code_inserted = ((_ZN3edg9a_booleanE)0);
 
 
-for (__158994_41_vrip = _ZN29_INTERNAL_8_inline_c_502890ee3edg32variable_remappings_for_inliningE; __158994_41_vrip != ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0); __158994_41_vrip = (__158994_41_vrip->next))
+for (__147587_41_vrip = _ZN29_INTERNAL_8_inline_c_502890ee3edg32variable_remappings_for_inliningE; __147587_41_vrip != ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0); __147587_41_vrip = (__147587_41_vrip->next))
 
 {
-if (__158994_41_vrip->temporary_used) {
+if (__147587_41_vrip->temporary_used) {
 
 
 
-_ZN29_INTERNAL_8_inline_c_502890ee3edg28restore_mapping_to_temporaryEPNS0_33a_variable_remapping_for_inliningE(__158994_41_vrip);
+_ZN29_INTERNAL_8_inline_c_502890ee3edg28restore_mapping_to_temporaryEPNS0_33a_variable_remapping_for_inliningE(__147587_41_vrip);
 }
-if ((((__158994_41_vrip->arg_expr) != ((_ZN3edg16an_expr_node_ptrE)0)) && (((int)(__158994_41_vrip->kind)) == 1)) || ((__158994_41_vrip->arg_side_effect_expr) != ((_ZN3edg16an_expr_node_ptrE)0)))
+if ((((__147587_41_vrip->arg_expr) != ((_ZN3edg16an_expr_node_ptrE)0)) && (((int)(__147587_41_vrip->kind)) == 1)) || ((__147587_41_vrip->arg_side_effect_expr) != ((_ZN3edg16an_expr_node_ptrE)0)))
 
 {
 
 
-if (!(__158997_41_any_code_inserted)) {
-__158997_41_any_code_inserted = ((_ZN3edg9a_booleanE)1);
-if (__158980_63_block_stmt != ((_ZN3edg15a_statement_ptrE)0)) {
-_ZN3edg31set_block_start_insert_locationEPNS_11a_statementEPNS_18an_insert_locationE(__158980_63_block_stmt, (&__158996_41_local_insert_location));
+if (!(__147590_41_any_code_inserted)) {
+__147590_41_any_code_inserted = ((_ZN3edg9a_booleanE)1);
+if (__147573_63_block_stmt != ((_ZN3edg15a_statement_ptrE)0)) {
+_ZN3edg31set_block_start_insert_locationEPNS_11a_statementEPNS_18an_insert_locationE(__147573_63_block_stmt, (&__147589_41_local_insert_location));
 } else  {
 
 
-_ZN3edg33set_expr_creation_insert_locationEPNS_18an_insert_locationE((&__158996_41_local_insert_location));
+_ZN3edg33set_expr_creation_insert_locationEPNS_18an_insert_locationE((&__147589_41_local_insert_location));
 }
 }
 }
-if (((int)(__158994_41_vrip->kind)) == 1) {
+if (((int)(__147587_41_vrip->kind)) == 1) {
 
-auto _ZN3edg14a_variable_ptrE __159027_22_temp_var; __159027_22_temp_var = ((__158994_41_vrip->variant).variable);
-if (__158994_41_vrip->local_temporary_reused) {
+auto _ZN3edg14a_variable_ptrE __147620_22_temp_var; __147620_22_temp_var = ((__147587_41_vrip->variant).variable);
+if (__147587_41_vrip->local_temporary_reused) {
 
 
 } else  {
 
-_ZN3edg22add_temporary_to_scopeEPNS_10a_variableEPNS_7a_scopeEb(__159027_22_temp_var, ((_ZN3edg11a_scope_ptrE)0), ((_ZN3edg9a_booleanE)0));
+_ZN3edg22add_temporary_to_scopeEPNS_10a_variableEPNS_7a_scopeEb(__147620_22_temp_var, ((_ZN3edg11a_scope_ptrE)0), ((_ZN3edg9a_booleanE)0));
 
-if (__158994_41_vrip->local_temporary_okay) {
+if (__147587_41_vrip->local_temporary_okay) {
 
 
 
-_ZN3edg32add_to_reusable_temporaries_listEPNS_10a_variableE(__159027_22_temp_var);
+_ZN3edg32add_to_reusable_temporaries_listEPNS_10a_variableE(__147620_22_temp_var);
 }
 }
-if ((__158994_41_vrip->arg_expr) != ((_ZN3edg16an_expr_node_ptrE)0)) {
+if ((__147587_41_vrip->arg_expr) != ((_ZN3edg16an_expr_node_ptrE)0)) {
 
 
-((__158994_41_vrip->arg_expr)->next) = ((_ZN3edg16an_expr_node_ptrE)0);
-__158995_41_stmt = (_ZN3edg31insert_var_assignment_statementEPNS_10a_variableEPNS_12an_expr_nodeEPNS_18an_insert_locationE(__159027_22_temp_var, (__158994_41_vrip->arg_expr), (&__158996_41_local_insert_location)));
+((__147587_41_vrip->arg_expr)->next) = ((_ZN3edg16an_expr_node_ptrE)0);
+__147588_41_stmt = (_ZN3edg31insert_var_assignment_statementEPNS_10a_variableEPNS_12an_expr_nodeEPNS_18an_insert_locationE(__147620_22_temp_var, (__147587_41_vrip->arg_expr), (&__147589_41_local_insert_location)));
 
-{ if (__158995_41_stmt != ((_ZN3edg15a_statement_ptrE)0)) { ((__158995_41_stmt->compiler_generated) && (__158995_41_stmt->lowering_generated)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"
-# 654
-), 654, __T718416624, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))); (__158995_41_stmt->position) = _ZN3edg21code_pos_for_loweringE; (__158995_41_stmt->end_position) = _ZN3edg21code_pos_for_loweringE; } } ;
-(__159027_22_temp_var->initialization_rewritten_as_assignment) = 1U;
+{ if (__147588_41_stmt != ((_ZN3edg15a_statement_ptrE)0)) { ((__147588_41_stmt->compiler_generated) && (__147588_41_stmt->lowering_generated)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"
+#line 654
+), 654, __T840108256, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))); (__147588_41_stmt->position) = _ZN3edg21code_pos_for_loweringE; (__147588_41_stmt->end_position) = _ZN3edg21code_pos_for_loweringE; } } ;
+(__147620_22_temp_var->initialization_rewritten_as_assignment) = 1U;
 }
 }
-if ((__158994_41_vrip->arg_side_effect_expr) != ((_ZN3edg16an_expr_node_ptrE)0)) {
-# 665
-((__158994_41_vrip->arg_side_effect_expr)->next) = ((_ZN3edg16an_expr_node_ptrE)0);
-__158995_41_stmt = (_ZN3edg21insert_expr_statementEPNS_12an_expr_nodeEPNS_18an_insert_locationE((__158994_41_vrip->arg_side_effect_expr), (&__158996_41_local_insert_location)));
+if ((__147587_41_vrip->arg_side_effect_expr) != ((_ZN3edg16an_expr_node_ptrE)0)) {
+#line 665
+((__147587_41_vrip->arg_side_effect_expr)->next) = ((_ZN3edg16an_expr_node_ptrE)0);
+__147588_41_stmt = (_ZN3edg21insert_expr_statementEPNS_12an_expr_nodeEPNS_18an_insert_locationE((__147587_41_vrip->arg_side_effect_expr), (&__147589_41_local_insert_location)));
 
-{ if (__158995_41_stmt != ((_ZN3edg15a_statement_ptrE)0)) { ((__158995_41_stmt->compiler_generated) && (__158995_41_stmt->lowering_generated)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"
-# 668
-), 668, __T718416624, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))); (__158995_41_stmt->position) = _ZN3edg21code_pos_for_loweringE; (__158995_41_stmt->end_position) = _ZN3edg21code_pos_for_loweringE; } } ;
+{ if (__147588_41_stmt != ((_ZN3edg15a_statement_ptrE)0)) { ((__147588_41_stmt->compiler_generated) && (__147588_41_stmt->lowering_generated)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"
+#line 668
+), 668, __T840108256, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))); (__147588_41_stmt->position) = _ZN3edg21code_pos_for_loweringE; (__147588_41_stmt->end_position) = _ZN3edg21code_pos_for_loweringE; } } ;
 }
 }
-if ((__158997_41_any_code_inserted) && (__158980_63_block_stmt == ((_ZN3edg15a_statement_ptrE)0))) {
+if ((__147590_41_any_code_inserted) && (__147573_63_block_stmt == ((_ZN3edg15a_statement_ptrE)0))) {
 
 
-(((((int)(__158981_64_insert_location->kind)) == 3) || (((int)(__158981_64_insert_location->kind)) == 4)) || (((int)(__158981_64_insert_location->kind)) == 5)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"
-# 674
-), 674, __T718416624, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN3edg11insert_exprEPNS_12an_expr_nodeEPNS_18an_insert_locationE(((__158981_64_insert_location->variant).expr), (&__158996_41_local_insert_location));
-(*__158981_64_insert_location) = __158996_41_local_insert_location;
+(((((int)(__147574_64_insert_location->kind)) == 3) || (((int)(__147574_64_insert_location->kind)) == 4)) || (((int)(__147574_64_insert_location->kind)) == 5)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"
+#line 674
+), 674, __T840108256, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN3edg11insert_exprEPNS_12an_expr_nodeEPNS_18an_insert_locationE(((__147574_64_insert_location->variant).expr), (&__147589_41_local_insert_location));
+(*__147574_64_insert_location) = __147589_41_local_insert_location;
 } 
 }
 
 
 
-static _ZN3edg37a_variable_remapping_for_inlining_ptrE _ZN29_INTERNAL_8_inline_c_502890ee3edg30get_var_remapping_for_inliningEPNS0_10a_variableE( _ZN3edg14a_variable_ptrE __159076_76_var)
+static _ZN3edg37a_variable_remapping_for_inlining_ptrE _ZN29_INTERNAL_8_inline_c_502890ee3edg30get_var_remapping_for_inliningEPNS0_10a_variableE( _ZN3edg14a_variable_ptrE __147669_76_var)
 
 
 
 
 {
-auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __159082_41_vrip;
+auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __147675_41_vrip;
 
-__159082_41_vrip = (__159076_76_var->remapping_for_inlining);
-if (__159082_41_vrip != ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0)) {
-((__159082_41_vrip->orig_variable) == __159076_76_var) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 692, __T718419496, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE 
-# 692
+__147675_41_vrip = (__147669_76_var->remapping_for_inlining);
+if (__147675_41_vrip != ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0)) {
+((__147675_41_vrip->orig_variable) == __147669_76_var) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 692, __T840111128, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE 
+#line 692
 *)0)));
-if (((int)(__159082_41_vrip->kind)) == 0) { __159082_41_vrip = ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0); }
+if (((int)(__147675_41_vrip->kind)) == 0) { __147675_41_vrip = ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0); }
 }
-return __159082_41_vrip;
+return __147675_41_vrip;
 }
 
 
-_ZN3edg14a_variable_ptrE _ZN3edg22remap_var_for_inliningEPNS_10a_variableE( _ZN3edg14a_variable_ptrE __159093_54_var)
-# 706
+_ZN3edg14a_variable_ptrE _ZN3edg22remap_var_for_inliningEPNS_10a_variableE( _ZN3edg14a_variable_ptrE __147686_54_var)
+#line 706
 {
-auto _ZN3edg14a_variable_ptrE __159101_41_new_var;
-auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __159102_41_vrip;
+auto _ZN3edg14a_variable_ptrE __147694_41_new_var;
+auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __147695_41_vrip;
 
-__159102_41_vrip = (_ZN29_INTERNAL_8_inline_c_502890ee3edg30get_var_remapping_for_inliningEPNS0_10a_variableE(__159093_54_var));
-if (__159102_41_vrip != ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0)) {
+__147695_41_vrip = (_ZN29_INTERNAL_8_inline_c_502890ee3edg30get_var_remapping_for_inliningEPNS0_10a_variableE(__147686_54_var));
+if (__147695_41_vrip != ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0)) {
 
-if (((int)(__159102_41_vrip->kind)) == 1) {
-__159101_41_new_var = ((__159102_41_vrip->variant).variable);
-(__159102_41_vrip->remapping_used) = ((_ZN3edg14a_byte_booleanE)1);
-(__159102_41_vrip->temporary_used) = ((_ZN3edg14a_byte_booleanE)1);
+if (((int)(__147695_41_vrip->kind)) == 1) {
+__147694_41_new_var = ((__147695_41_vrip->variant).variable);
+(__147695_41_vrip->remapping_used) = ((_ZN3edg14a_byte_booleanE)1);
+(__147695_41_vrip->temporary_used) = ((_ZN3edg14a_byte_booleanE)1);
 } else  {
 
 
 
 
-__159101_41_new_var = ((_ZN3edg14a_variable_ptrE)0);
+__147694_41_new_var = ((_ZN3edg14a_variable_ptrE)0);
 }
 } else  {
 
-__159101_41_new_var = __159093_54_var;
+__147694_41_new_var = __147686_54_var;
 }
-return __159101_41_new_var;
+return __147694_41_new_var;
 }
 
 
-void _ZN3edg37adjust_copied_expression_for_inliningEPNS_12an_expr_nodeEPb( _ZN3edg16an_expr_node_ptrE __159126_61_expr, 
-_ZN3edg9a_booleanE *__159127_62_inlining_failed)
-# 740
+void _ZN3edg37adjust_copied_expression_for_inliningEPNS_12an_expr_nodeEPb( _ZN3edg16an_expr_node_ptrE __147719_61_expr, 
+_ZN3edg9a_booleanE *__147720_62_inlining_failed)
+#line 740
 {
-auto unsigned __159135_25_kind;
-auto _ZN3edg10a_type_ptrE __159136_25_expr_type;
+auto unsigned __147728_25_kind;
+auto _ZN3edg10a_type_ptrE __147729_25_expr_type;
 
-auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __159138_25_vrip;
-auto _ZN3edg14a_constant_ptrE __159139_25_con;
-auto _ZN3edg16an_expr_node_ptrE __159140_25_constant_expr;
-auto _ZN3edg14a_constant_ptrE __159141_25_constant;
-auto _ZN3edg9a_booleanE __159142_25_is_non_null; auto _ZN3edg9a_booleanE __159142_38_has_constant_value = ((_ZN3edg9a_booleanE)0);
-# 741
-__159135_25_kind = (_ZN3edg9enum_castINS_17an_expr_node_kindEjEET_T0_(((_ZN3edg11a_bit_fieldE)(__159126_61_expr->kind))));
-__159136_25_expr_type = (__159126_61_expr->type);
-
-
+auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __147731_25_vrip;
+auto _ZN3edg14a_constant_ptrE __147732_25_con;
+auto _ZN3edg16an_expr_node_ptrE __147733_25_constant_expr;
+auto _ZN3edg14a_constant_ptrE __147734_25_constant;
+auto _ZN3edg9a_booleanE __147735_25_is_non_null; auto _ZN3edg9a_booleanE __147735_38_has_constant_value = ((_ZN3edg9a_booleanE)0);
+#line 741
+__147728_25_kind = (_ZN3edg9enum_castINS_17an_expr_node_kindEjEET_T0_(((_ZN3edg11a_bit_fieldE)(__147719_61_expr->kind))));
+__147729_25_expr_type = (__147719_61_expr->type);
 
 
-__159141_25_constant = (_ZN3edg14local_constantEv());
 
 
-if (((unsigned)__159135_25_kind) == 3U) {
-if (__159126_61_expr->is_lvalue) {
+__147734_25_constant = (_ZN3edg14local_constantEv());
 
-auto _ZN3edg14a_variable_ptrE __159147_22_var; __159147_22_var = (_ZN3edg22remap_var_for_inliningEPNS_10a_variableE((((__159126_61_expr->variant).variable).ptr)));
-if (__159147_22_var != ((_ZN3edg14a_variable_ptrE)0)) {
-(((__159126_61_expr->variant).variable).ptr) = __159147_22_var;
+
+if (((unsigned)__147728_25_kind) == 3U) {
+if (__147719_61_expr->is_lvalue) {
+
+auto _ZN3edg14a_variable_ptrE __147740_22_var; __147740_22_var = (_ZN3edg22remap_var_for_inliningEPNS_10a_variableE((((__147719_61_expr->variant).variable).ptr)));
+if (__147740_22_var != ((_ZN3edg14a_variable_ptrE)0)) {
+(((__147719_61_expr->variant).variable).ptr) = __147740_22_var;
 } else  {
 
-(*__159127_62_inlining_failed) = ((_ZN3edg9a_booleanE)1);
+(*__147720_62_inlining_failed) = ((_ZN3edg9a_booleanE)1);
 }
 } else  {
 
-__159138_25_vrip = (_ZN29_INTERNAL_8_inline_c_502890ee3edg30get_var_remapping_for_inliningEPNS0_10a_variableE((((__159126_61_expr->variant).variable).ptr)));
-if (__159138_25_vrip != ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0)) {
+__147731_25_vrip = (_ZN29_INTERNAL_8_inline_c_502890ee3edg30get_var_remapping_for_inliningEPNS0_10a_variableE((((__147719_61_expr->variant).variable).ptr)));
+if (__147731_25_vrip != ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0)) {
 
-switch ((int)(__159138_25_vrip->kind)) {
+switch ((int)(__147731_25_vrip->kind)) {
 case 1:
 
-(((__159126_61_expr->variant).variable).ptr) = ((__159138_25_vrip->variant).variable);
-(__159138_25_vrip->temporary_used) = ((_ZN3edg14a_byte_booleanE)1);
-goto __T719516656;
+(((__147719_61_expr->variant).variable).ptr) = ((__147731_25_vrip->variant).variable);
+(__147731_25_vrip->temporary_used) = ((_ZN3edg14a_byte_booleanE)1);
+goto __T841474144;
 case 2:
 
 
-__159140_25_constant_expr = ((__159138_25_vrip->variant).expr);
-if ((__159140_25_constant_expr->kind) == 2U) {
+__147733_25_constant_expr = ((__147731_25_vrip->variant).expr);
+if ((__147733_25_constant_expr->kind) == 2U) {
 
 
-auto _ZN3edg10a_type_ptrE __159172_27_orig_lvalue_type; __159172_27_orig_lvalue_type = (__159126_61_expr->orig_lvalue_type);
-_ZN3edg18set_expr_node_kindEPNS_12an_expr_nodeENS_17an_expr_node_kindE(__159126_61_expr, _ZN3edg12enk_constantE);
-(((__159126_61_expr->variant).constant).ptr) = (((__159140_25_constant_expr->variant).constant).ptr);
-(__159126_61_expr->orig_lvalue_type) = __159172_27_orig_lvalue_type;
+auto _ZN3edg10a_type_ptrE __147765_27_orig_lvalue_type; __147765_27_orig_lvalue_type = (__147719_61_expr->orig_lvalue_type);
+_ZN3edg18set_expr_node_kindEPNS_12an_expr_nodeENS_17an_expr_node_kindE(__147719_61_expr, _ZN3edg12enk_constantE);
+(((__147719_61_expr->variant).constant).ptr) = (((__147733_25_constant_expr->variant).constant).ptr);
+(__147719_61_expr->orig_lvalue_type) = __147765_27_orig_lvalue_type;
 } else  {
 
-_ZN3edg14overwrite_nodeEPNS_12an_expr_nodeES1_(__159126_61_expr, (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__159140_25_constant_expr, __159127_62_inlining_failed)));
+_ZN3edg14overwrite_nodeEPNS_12an_expr_nodeES1_(__147719_61_expr, (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__147733_25_constant_expr, __147720_62_inlining_failed)));
 
 
-if (_ZN3edg21is_ptr_to_member_typeEPNS_6a_typeE(__159136_25_expr_type)) {
+if (_ZN3edg21is_ptr_to_member_typeEPNS_6a_typeE(__147729_25_expr_type)) {
 
 
-(__159126_61_expr->type) = __159136_25_expr_type;
+(__147719_61_expr->type) = __147729_25_expr_type;
 }
 }
-goto __T719516656;
+goto __T841474144;
 default:
-_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 796, __T719032880, ((const char *)"adjust_copied_expression_for_inlining: bad remap kind"), ((_ZN3edg12a_const_charE *)0));
+_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 796, __T840727840, ((const char *)"adjust_copied_expression_for_inlining: bad remap kind"), ((_ZN3edg12a_const_charE *)0));
 
-} __T719516656:;
-(__159138_25_vrip->remapping_used) = ((_ZN3edg14a_byte_booleanE)1);
+} __T841474144:;
+(__147731_25_vrip->remapping_used) = ((_ZN3edg14a_byte_booleanE)1);
 }
 }
-} else  { if (((unsigned)__159135_25_kind) == 2U) {
-# 810
-__159139_25_con = (((__159126_61_expr->variant).constant).ptr);
-if (!(((_ZN3edg22an_il_entry_prefix_ptrE)(((char *)__159139_25_con) - 8UL))->file_scope)) {
-(((__159126_61_expr->variant).constant).ptr) = (_ZN3edg24alloc_shareable_constantEPNS_10a_constantE(__159139_25_con));
+} else  { if (((unsigned)__147728_25_kind) == 2U) {
+#line 810
+__147732_25_con = (((__147719_61_expr->variant).constant).ptr);
+if (!(((_ZN3edg22an_il_entry_prefix_ptrE)(((char *)__147732_25_con) - 8ULL))->file_scope)) {
+(((__147719_61_expr->variant).constant).ptr) = (_ZN3edg24alloc_shareable_constantEPNS_10a_constantE(__147732_25_con));
 
-((((__159126_61_expr->variant).constant).ptr)->expr) = ((_ZN3edg16an_expr_node_ptrE)0);
+((((__147719_61_expr->variant).constant).ptr)->expr) = ((_ZN3edg16an_expr_node_ptrE)0);
 }
-} else  { if (((unsigned)__159135_25_kind) == 1U) {
+} else  { if (((unsigned)__147728_25_kind) == 1U) {
 
 
-auto unsigned char __159213_27_op;
-auto _ZN3edg16an_expr_node_ptrE __159214_27_operand;
-auto _ZN3edg16an_expr_node_ptrE __159215_27_operand2;
-auto _ZN3edg14a_constant_ptrE __159216_27_con2 = ((_ZN3edg14a_constant_ptrE)0);
-# 819
-__159213_27_op = (((__159126_61_expr->variant).operation).kind);
-__159214_27_operand = (((__159126_61_expr->variant).operation).operands);
-__159215_27_operand2 = (__159214_27_operand->next);
+auto unsigned char __147806_27_op;
+auto _ZN3edg16an_expr_node_ptrE __147807_27_operand;
+auto _ZN3edg16an_expr_node_ptrE __147808_27_operand2;
+auto _ZN3edg14a_constant_ptrE __147809_27_con2 = ((_ZN3edg14a_constant_ptrE)0);
+#line 819
+__147806_27_op = (((__147719_61_expr->variant).operation).kind);
+__147807_27_operand = (((__147719_61_expr->variant).operation).operands);
+__147808_27_operand2 = (__147807_27_operand->next);
 
-if (((__159214_27_operand->kind) == 2U) && ((__159215_27_operand2 == ((_ZN3edg16an_expr_node_ptrE)0)) || ((__159215_27_operand2->kind) == 2U)))
+if (((__147807_27_operand->kind) == 2U) && ((__147808_27_operand2 == ((_ZN3edg16an_expr_node_ptrE)0)) || ((__147808_27_operand2->kind) == 2U)))
 {
 
-auto _ZN3edg9a_booleanE __159220_17_did_not_fold = ((_ZN3edg9a_booleanE)1); auto _ZN3edg9a_booleanE __159220_38_template_constant = ((_ZN3edg9a_booleanE)0);
-__159139_25_con = (((__159214_27_operand->variant).constant).ptr);
-if (__159215_27_operand2 != ((_ZN3edg16an_expr_node_ptrE)0)) { __159216_27_con2 = (((__159215_27_operand2->variant).constant).ptr); }
-# 835
-switch ((int)__159213_27_op) {
+auto _ZN3edg9a_booleanE __147813_17_did_not_fold = ((_ZN3edg9a_booleanE)1); auto _ZN3edg9a_booleanE __147813_38_template_constant = ((_ZN3edg9a_booleanE)0);
+__147732_25_con = (((__147807_27_operand->variant).constant).ptr);
+if (__147808_27_operand2 != ((_ZN3edg16an_expr_node_ptrE)0)) { __147809_27_con2 = (((__147808_27_operand2->variant).constant).ptr); }
+#line 835
+switch ((int)__147806_27_op) {
 case 40:
 case 41:
 case 42:
@@ -12380,751 +12313,751 @@ case 61:
 case 62:
 case 63:
 case 64:
-# 860
-(__159216_27_con2 != ((_ZN3edg14a_constant_ptrE)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 860, __T719032880, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0
-# 860
+#line 860
+(__147809_27_con2 != ((_ZN3edg14a_constant_ptrE)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 860, __T840727840, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0
+#line 860
 )));
-if (((((int)(__159139_25_con->kind)) != 1) && (((int)(__159139_25_con->kind)) != 7)) || ((((int)(__159216_27_con2->kind)) != 1) && (((int)(__159216_27_con2->kind)) != 7)))
+if (((((int)(__147732_25_con->kind)) != 1) && (((int)(__147732_25_con->kind)) != 6)) || ((((int)(__147809_27_con2->kind)) != 1) && (((int)(__147809_27_con2->kind)) != 6)))
 
 
 {
 
 } else  {
-if (_ZN3edg21is_ptr_to_member_typeEPNS_6a_typeE(__159136_25_expr_type)) {
+if (_ZN3edg21is_ptr_to_member_typeEPNS_6a_typeE(__147729_25_expr_type)) {
 
 
-__159136_25_expr_type = (_ZN3edg12integer_typeENS_15an_integer_kindE(_ZN3edg32targ_ptr_to_data_member_int_kindE));
+__147729_25_expr_type = (_ZN3edg12integer_typeENS_15an_integer_kindE(_ZN3edg32targ_ptr_to_data_member_int_kindE));
 }
 
 
 
-_ZN3edg16binary_operationENS_21an_expr_operator_kindEPNS_10a_constantES2_PNS_6a_typeES2_bbPbS5_PNS_13an_error_codeEPNS_17a_source_positionE(__159213_27_op, __159139_25_con, __159216_27_con2, __159136_25_expr_type, __159141_25_constant, ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)0), (&
-# 875
-__159220_17_did_not_fold), (&__159220_38_template_constant), ((enum _ZN3edg13an_error_codeE *)0), (&_ZN3edg21code_pos_for_loweringE));
-# 882
+_ZN3edg16binary_operationENS_21an_expr_operator_kindEPNS_10a_constantES2_PNS_6a_typeES2_bbPbS5_PNS_13an_error_codeEPNS_17a_source_positionE(__147806_27_op, __147732_25_con, __147809_27_con2, __147729_25_expr_type, __147734_25_constant, ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)0), (&
+#line 875
+__147813_17_did_not_fold), (&__147813_38_template_constant), ((enum _ZN3edg13an_error_codeE *)0), (&_ZN3edg21code_pos_for_loweringE));
+#line 882
 }
-goto __T719586768;
+goto __T841546216;
 case 27:
-if (!(((int)(((__159126_61_expr->variant).operation).type_kind)) == 2)) { goto __T719586768; }
+if (!(((int)(((__147719_61_expr->variant).operation).type_kind)) == 2)) { goto __T841546216; }
 ;
 case 29:
 case 30:
 
 
-if ((((int)(__159139_25_con->kind)) != 1) && (((int)(__159139_25_con->kind)) != 7))
+if ((((int)(__147732_25_con->kind)) != 1) && (((int)(__147732_25_con->kind)) != 6))
 {
 
 } else  {
 
 
 
-_ZN3edg15unary_operationENS_21an_expr_operator_kindEPNS_10a_constantEPNS_6a_typeES2_bbPbS5_PNS_13an_error_codeEPNS_17a_source_positionE(__159213_27_op, __159139_25_con, __159136_25_expr_type, __159141_25_constant, ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)0), (&__159220_17_did_not_fold), (&
-# 898
-__159220_38_template_constant), ((enum _ZN3edg13an_error_codeE *)0), (&_ZN3edg21code_pos_for_loweringE));
-# 905
+_ZN3edg15unary_operationENS_21an_expr_operator_kindEPNS_10a_constantEPNS_6a_typeES2_bbPbS5_PNS_13an_error_codeEPNS_17a_source_positionE(__147806_27_op, __147732_25_con, __147729_25_expr_type, __147734_25_constant, ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)0), (&__147813_17_did_not_fold), (&
+#line 898
+__147813_38_template_constant), ((enum _ZN3edg13an_error_codeE *)0), (&_ZN3edg21code_pos_for_loweringE));
+#line 905
 }
-goto __T719586768;
+goto __T841546216;
 default:
 
-goto __T719586768;
-} __T719586768:;
-(!(__159220_38_template_constant)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 911, __T719032880, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-if (!(__159220_17_did_not_fold)) {
+goto __T841546216;
+} __T841546216:;
+(!(__147813_38_template_constant)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 911, __T840727840, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+if (!(__147813_17_did_not_fold)) {
 
-__159142_38_has_constant_value = ((_ZN3edg9a_booleanE)1);
+__147735_38_has_constant_value = ((_ZN3edg9a_booleanE)1);
 }
-} else  { if (((((int)__159213_27_op) == 60) || (((int)__159213_27_op) == 59)) && (((int)(((__159126_61_expr->variant).operation).type_kind)) == 7))
+} else  { if (((((int)__147806_27_op) == 60) || (((int)__147806_27_op) == 59)) && (((int)(((__147719_61_expr->variant).operation).type_kind)) == 6))
 
 {
 
 
 
-if ((_ZN3edg29is_constant_valued_expressionEPNS_12an_expr_nodeEbbbPb(__159214_27_operand, ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), (&__159142_25_is_non_null))) && (__159142_25_is_non_null))
+if ((_ZN3edg29is_constant_valued_expressionEPNS_12an_expr_nodeEbbbPb(__147807_27_operand, ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), (&__147735_25_is_non_null))) && (__147735_25_is_non_null))
 
 
 
 
 {
-__159214_27_operand = (__159214_27_operand->next);
-if ((((__159214_27_operand->kind) == 2U) && (_ZN3edg41constant_bool_value_known_at_compile_timeEPNS_10a_constantE((((__159214_27_operand->variant).constant).ptr)))) && (_ZN3edg17is_false_constantEPNS_10a_constantE((((__159214_27_operand->variant).constant).ptr))))
+__147807_27_operand = (__147807_27_operand->next);
+if ((((__147807_27_operand->kind) == 2U) && (_ZN3edg41constant_bool_value_known_at_compile_timeEPNS_10a_constantE((((__147807_27_operand->variant).constant).ptr)))) && (_ZN3edg17is_false_constantEPNS_10a_constantE((((__147807_27_operand->variant).constant).ptr))))
 
 
 {
 
 
-auto _ZN3edg20a_host_large_integerE __159329_32_temp_value;
-__159142_38_has_constant_value = ((_ZN3edg9a_booleanE)1);
-__159329_32_temp_value = ((_ZN3edg20a_host_large_integerE)((((int)__159213_27_op) == 60) ? 1L : 0x0L));
+auto _ZN3edg20a_host_large_integerE __147922_32_temp_value;
+__147735_38_has_constant_value = ((_ZN3edg9a_booleanE)1);
+__147922_32_temp_value = ((_ZN3edg20a_host_large_integerE)((((int)__147806_27_op) == 60) ? 1L : 0x0L));
 
-_ZN3edg20set_integer_constantEPNS_10a_constantElNS_15an_integer_kindE(__159141_25_constant, __159329_32_temp_value, _ZN3edg6ik_intE);
+_ZN3edg20set_integer_constantEPNS_10a_constantExNS_15an_integer_kindE(__147734_25_constant, __147922_32_temp_value, _ZN3edg6ik_intE);
 
 }
 }
 } }
 } } }
-if (__159126_61_expr->is_non_normalized_boolean_controlling_expr) {
-# 952
-if ((_ZN3edg29is_constant_valued_expressionEPNS_12an_expr_nodeEbbbPb(__159126_61_expr, ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), (&__159142_25_is_non_null))) && (__159142_25_is_non_null))
+if (__147719_61_expr->is_non_normalized_boolean_controlling_expr) {
+#line 952
+if ((_ZN3edg29is_constant_valued_expressionEPNS_12an_expr_nodeEbbbPb(__147719_61_expr, ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), (&__147735_25_is_non_null))) && (__147735_25_is_non_null))
 
 
 
 
 {
-__159142_38_has_constant_value = ((_ZN3edg9a_booleanE)1);
-_ZN3edg20set_integer_constantEPNS_10a_constantElNS_15an_integer_kindE(__159141_25_constant, 1L, _ZN3edg6ik_intE);
+__147735_38_has_constant_value = ((_ZN3edg9a_booleanE)1);
+_ZN3edg20set_integer_constantEPNS_10a_constantExNS_15an_integer_kindE(__147734_25_constant, 1LL, _ZN3edg6ik_intE);
 
 }
 }
-if (__159142_38_has_constant_value) {
+if (__147735_38_has_constant_value) {
 
-(__159141_25_constant->type) = __159136_25_expr_type;
+(__147734_25_constant->type) = __147729_25_expr_type;
 
 
-(__159141_25_constant->expr) = ((_ZN3edg16an_expr_node_ptrE)0);
-_ZN3edg18set_expr_node_kindEPNS_12an_expr_nodeENS_17an_expr_node_kindE(__159126_61_expr, _ZN3edg12enk_constantE);
-(((__159126_61_expr->variant).constant).ptr) = (_ZN3edg24alloc_shareable_constantEPNS_10a_constantE(__159141_25_constant));
+(__147734_25_constant->expr) = ((_ZN3edg16an_expr_node_ptrE)0);
+_ZN3edg18set_expr_node_kindEPNS_12an_expr_nodeENS_17an_expr_node_kindE(__147719_61_expr, _ZN3edg12enk_constantE);
+(((__147719_61_expr->variant).constant).ptr) = (_ZN3edg24alloc_shareable_constantEPNS_10a_constantE(__147734_25_constant));
 }
-_ZN3edg22release_local_constantEPPNS_10a_constantE((&__159141_25_constant)); 
+_ZN3edg22release_local_constantEPPNS_10a_constantE((&__147734_25_constant)); 
 }
-# 4364 "src/host_envir.h"
- __attribute__((__weak__)) /* COMDAT group: _ZN3edg9enum_castINS_17an_expr_node_kindEjEET_T0_ */ unsigned _ZN3edg9enum_castINS_17an_expr_node_kindEjEET_T0_( _ZN3edg11a_bit_fieldE __31545_42_val)
-# 4371
+#line 4364 "src/host_envir.h"
+ /* COMDAT group: _ZN3edg9enum_castINS_17an_expr_node_kindEjEET_T0_ */ unsigned _ZN3edg9enum_castINS_17an_expr_node_kindEjEET_T0_( _ZN3edg11a_bit_fieldE __21132_42_val)
+#line 4371
 {
-return (unsigned)__31545_42_val;
+return (unsigned)__21132_42_val;
 }
-# 976 "src/inline.c"
+#line 976 "src/inline.c"
 _ZN3edg9a_booleanE _ZN3edg43copy_and_simplify_short_circuited_operationEPNS_12an_expr_nodeEPb(
-_ZN3edg16an_expr_node_ptrE __159371_63_expr, 
-_ZN3edg9a_booleanE *__159372_64_inlining_failed)
-# 987
+_ZN3edg16an_expr_node_ptrE __147964_63_expr, 
+_ZN3edg9a_booleanE *__147965_64_inlining_failed)
+#line 987
 {
-auto _ZN3edg9a_booleanE __159382_25_processed = ((_ZN3edg9a_booleanE)0);
-auto unsigned char __159383_25_op;
-auto _ZN3edg16an_expr_node_ptrE __159384_25_operand; auto _ZN3edg16an_expr_node_ptrE __159384_34_operand2; auto _ZN3edg16an_expr_node_ptrE __159384_44_operand3;
-# 989
-__159383_25_op = (((__159371_63_expr->variant).operation).kind);
+auto _ZN3edg9a_booleanE __147975_25_processed = ((_ZN3edg9a_booleanE)0);
+auto unsigned char __147976_25_op;
+auto _ZN3edg16an_expr_node_ptrE __147977_25_operand; auto _ZN3edg16an_expr_node_ptrE __147977_34_operand2; auto _ZN3edg16an_expr_node_ptrE __147977_44_operand3;
+#line 989
+__147976_25_op = (((__147964_63_expr->variant).operation).kind);
 
 
-if (((((int)__159383_25_op) == 104) || (((int)__159383_25_op) == 89)) || (((int)__159383_25_op) == 88))
-
-{
-
-auto _ZN3edg9a_booleanE __159390_16_op1_value;
-__159382_25_processed = ((_ZN3edg9a_booleanE)1);
-__159384_25_operand = (((__159371_63_expr->variant).operation).operands);
-__159384_34_operand2 = (__159384_25_operand->next);
-__159384_44_operand3 = (__159384_34_operand2->next);
-
-
-__159384_25_operand = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__159384_25_operand, __159372_64_inlining_failed));
-if (_ZN3edg35bool_value_is_known_at_compile_timeEPNS_12an_expr_nodeEbPb(__159384_25_operand, _ZN3edg51assume_this_cannot_be_null_in_conditional_operatorsE, (&__159390_16_op1_value)))
+if (((((int)__147976_25_op) == 104) || (((int)__147976_25_op) == 89)) || (((int)__147976_25_op) == 88))
 
 {
 
+auto _ZN3edg9a_booleanE __147983_16_op1_value;
+__147975_25_processed = ((_ZN3edg9a_booleanE)1);
+__147977_25_operand = (((__147964_63_expr->variant).operation).operands);
+__147977_34_operand2 = (__147977_25_operand->next);
+__147977_44_operand3 = (__147977_34_operand2->next);
 
-if (((int)__159383_25_op) == 104) {
+
+__147977_25_operand = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__147977_25_operand, __147965_64_inlining_failed));
+if (_ZN3edg35bool_value_is_known_at_compile_timeEPNS_12an_expr_nodeEbPb(__147977_25_operand, _ZN3edg51assume_this_cannot_be_null_in_conditional_operatorsE, (&__147983_16_op1_value)))
+
+{
 
 
-if (__159390_16_op1_value) {
+if (((int)__147976_25_op) == 104) {
 
-__159384_34_operand2 = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__159384_34_operand2, __159372_64_inlining_failed));
-_ZN3edg14overwrite_nodeEPNS_12an_expr_nodeES1_(__159371_63_expr, __159384_34_operand2);
+
+if (__147983_16_op1_value) {
+
+__147977_34_operand2 = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__147977_34_operand2, __147965_64_inlining_failed));
+_ZN3edg14overwrite_nodeEPNS_12an_expr_nodeES1_(__147964_63_expr, __147977_34_operand2);
 } else  {
 
-__159384_44_operand3 = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__159384_44_operand3, __159372_64_inlining_failed));
-_ZN3edg14overwrite_nodeEPNS_12an_expr_nodeES1_(__159371_63_expr, __159384_44_operand3);
+__147977_44_operand3 = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__147977_44_operand3, __147965_64_inlining_failed));
+_ZN3edg14overwrite_nodeEPNS_12an_expr_nodeES1_(__147964_63_expr, __147977_44_operand3);
 }
-} else  { if (((int)__159383_25_op) == 89) {
+} else  { if (((int)__147976_25_op) == 89) {
 
-if (__159390_16_op1_value) {
+if (__147983_16_op1_value) {
 
 
-_ZN3edg14overwrite_nodeEPNS_12an_expr_nodeES1_(__159371_63_expr, __159384_25_operand);
+_ZN3edg14overwrite_nodeEPNS_12an_expr_nodeES1_(__147964_63_expr, __147977_25_operand);
 } else  {
 
 
-__159384_34_operand2 = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__159384_34_operand2, __159372_64_inlining_failed));
-_ZN3edg14overwrite_nodeEPNS_12an_expr_nodeES1_(__159371_63_expr, __159384_34_operand2);
+__147977_34_operand2 = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__147977_34_operand2, __147965_64_inlining_failed));
+_ZN3edg14overwrite_nodeEPNS_12an_expr_nodeES1_(__147964_63_expr, __147977_34_operand2);
 }
-} else  { if (((int)__159383_25_op) == 88) {
+} else  { if (((int)__147976_25_op) == 88) {
 
-if (__159390_16_op1_value) {
+if (__147983_16_op1_value) {
 
 
-__159384_34_operand2 = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__159384_34_operand2, __159372_64_inlining_failed));
-_ZN3edg14overwrite_nodeEPNS_12an_expr_nodeES1_(__159371_63_expr, __159384_34_operand2);
+__147977_34_operand2 = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__147977_34_operand2, __147965_64_inlining_failed));
+_ZN3edg14overwrite_nodeEPNS_12an_expr_nodeES1_(__147964_63_expr, __147977_34_operand2);
 } else  {
 
 
-_ZN3edg14overwrite_nodeEPNS_12an_expr_nodeES1_(__159371_63_expr, __159384_25_operand);
+_ZN3edg14overwrite_nodeEPNS_12an_expr_nodeES1_(__147964_63_expr, __147977_25_operand);
 }
 } else  {
-_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1046, __T719038304, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
+_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1046, __T841594816, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
 } } }
 } else  {
 
 
-__159384_34_operand2 = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__159384_34_operand2, __159372_64_inlining_failed));
-if (__159384_44_operand3 != ((_ZN3edg16an_expr_node_ptrE)0)) {
-__159384_44_operand3 = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__159384_44_operand3, __159372_64_inlining_failed));
+__147977_34_operand2 = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__147977_34_operand2, __147965_64_inlining_failed));
+if (__147977_44_operand3 != ((_ZN3edg16an_expr_node_ptrE)0)) {
+__147977_44_operand3 = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__147977_44_operand3, __147965_64_inlining_failed));
 }
 
-(((__159371_63_expr->variant).operation).operands) = __159384_25_operand;
-(__159384_25_operand->next) = __159384_34_operand2;
-(__159384_34_operand2->next) = __159384_44_operand3;
+(((__147964_63_expr->variant).operation).operands) = __147977_25_operand;
+(__147977_25_operand->next) = __147977_34_operand2;
+(__147977_34_operand2->next) = __147977_44_operand3;
 }
-} else  { if ((((int)__159383_25_op) == 74) && ((((int)(((__159371_63_expr->variant).operation).type_kind)) == 2) || (((int)(((__159371_63_expr->variant).operation).type_kind)) == 7)))
+} else  { if ((((int)__147976_25_op) == 74) && ((((int)(((__147964_63_expr->variant).operation).type_kind)) == 2) || (((int)(((__147964_63_expr->variant).operation).type_kind)) == 6)))
 
 {
 
 
 
-__159384_25_operand = (((__159371_63_expr->variant).operation).operands);
-__159384_34_operand2 = (__159384_25_operand->next);
-if ((__159384_25_operand->kind) == 3U) {
-auto _ZN3edg14a_variable_ptrE __159463_22_var; __159463_22_var = (((__159384_25_operand->variant).variable).ptr);
-if ((__159463_22_var->is_temp_for_constructor_this_inlined_param) || (__159463_22_var->is_temp_for_unmodified_inlined_param))
+__147977_25_operand = (((__147964_63_expr->variant).operation).operands);
+__147977_34_operand2 = (__147977_25_operand->next);
+if ((__147977_25_operand->kind) == 3U) {
+auto _ZN3edg14a_variable_ptrE __148056_22_var; __148056_22_var = (((__147977_25_operand->variant).variable).ptr);
+if ((__148056_22_var->is_temp_for_constructor_this_inlined_param) || (__148056_22_var->is_temp_for_unmodified_inlined_param))
 {
-auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __159466_47_vrip;
-auto _ZN3edg9a_booleanE __159467_47_temp_elim_possible = ((_ZN3edg9a_booleanE)0);
-# 1080
-auto _ZN3edg9a_booleanE __159474_19_is_non_null;
-__159466_47_vrip = (_ZN29_INTERNAL_8_inline_c_502890ee3edg30get_var_remapping_for_inliningEPNS0_10a_variableE(__159463_22_var));
-(__159466_47_vrip != ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1082, __T719038304, ((_ZN3edg12a_const_charE *)0), ((
-# 1082
+auto _ZN3edg37a_variable_remapping_for_inlining_ptrE __148059_47_vrip;
+auto _ZN3edg9a_booleanE __148060_47_temp_elim_possible = ((_ZN3edg9a_booleanE)0);
+#line 1080
+auto _ZN3edg9a_booleanE __148067_19_is_non_null;
+__148059_47_vrip = (_ZN29_INTERNAL_8_inline_c_502890ee3edg30get_var_remapping_for_inliningEPNS0_10a_variableE(__148056_22_var));
+(__148059_47_vrip != ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1082, __T841594816, ((_ZN3edg12a_const_charE *)0), ((
+#line 1082
 _ZN3edg12a_const_charE *)0)));
 
 
-_ZN29_INTERNAL_8_inline_c_502890ee3edg28restore_mapping_to_temporaryEPNS0_33a_variable_remapping_for_inliningE(__159466_47_vrip);
-(((int)(__159466_47_vrip->kind)) == 1) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1086, __T719038304, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN29_INTERNAL_8_inline_c_502890ee3edg28restore_mapping_to_temporaryEPNS0_33a_variable_remapping_for_inliningE(__148059_47_vrip);
+(((int)(__148059_47_vrip->kind)) == 1) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1086, __T841594816, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
 
-__159384_34_operand2 = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__159384_34_operand2, __159372_64_inlining_failed));
-__159382_25_processed = ((_ZN3edg9a_booleanE)1);
-if ((_ZN3edg29is_constant_valued_expressionEPNS_12an_expr_nodeEbbbPb(__159384_34_operand2, ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), (&__159474_19_is_non_null))) && ((!(__159463_22_var->is_temp_for_constructor_this_inlined_param)) || (__159474_19_is_non_null)))
-# 1097
+__147977_34_operand2 = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__147977_34_operand2, __147965_64_inlining_failed));
+__147975_25_processed = ((_ZN3edg9a_booleanE)1);
+if ((_ZN3edg29is_constant_valued_expressionEPNS_12an_expr_nodeEbbbPb(__147977_34_operand2, ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), (&__148067_19_is_non_null))) && ((!(__148056_22_var->is_temp_for_constructor_this_inlined_param)) || (__148067_19_is_non_null)))
+#line 1097
 {
 
 
-if (!(__159466_47_vrip->remapping_used)) { __159467_47_temp_elim_possible = ((_ZN3edg9a_booleanE)1); }
+if (!(__148059_47_vrip->remapping_used)) { __148060_47_temp_elim_possible = ((_ZN3edg9a_booleanE)1); }
 }
-if (__159467_47_temp_elim_possible) {
-auto _ZN3edg14a_constant_ptrE __159497_26_constant; __159497_26_constant = (_ZN3edg14local_constantEv());
-# 1112
-(__159466_47_vrip->orig_temporary) = ((__159466_47_vrip->variant).variable);
-(__159466_47_vrip->kind) = _ZN3edg17vrk_constant_exprE;
-((__159466_47_vrip->variant).expr) = __159384_34_operand2;
+if (__148060_47_temp_elim_possible) {
+auto _ZN3edg14a_constant_ptrE __148090_26_constant; __148090_26_constant = (_ZN3edg14local_constantEv());
+#line 1112
+(__148059_47_vrip->orig_temporary) = ((__148059_47_vrip->variant).variable);
+(__148059_47_vrip->kind) = _ZN3edg17vrk_constant_exprE;
+((__148059_47_vrip->variant).expr) = __147977_34_operand2;
 
 
-_ZN3edg24make_zero_of_proper_typeEPNS_6a_typeEPNS_10a_constantE((__159371_63_expr->type), __159497_26_constant);
-_ZN3edg18set_expr_node_kindEPNS_12an_expr_nodeENS_17an_expr_node_kindE(__159371_63_expr, _ZN3edg12enk_constantE);
-(((__159371_63_expr->variant).constant).ptr) = (_ZN3edg24alloc_shareable_constantEPNS_10a_constantE(__159497_26_constant));
-_ZN3edg22release_local_constantEPPNS_10a_constantE((&__159497_26_constant));
+_ZN3edg24make_zero_of_proper_typeEPNS_6a_typeEPNS_10a_constantE((__147964_63_expr->type), __148090_26_constant);
+_ZN3edg18set_expr_node_kindEPNS_12an_expr_nodeENS_17an_expr_node_kindE(__147964_63_expr, _ZN3edg12enk_constantE);
+(((__147964_63_expr->variant).constant).ptr) = (_ZN3edg24alloc_shareable_constantEPNS_10a_constantE(__148090_26_constant));
+_ZN3edg22release_local_constantEPPNS_10a_constantE((&__148090_26_constant));
 } else  {
 
 
-__159384_25_operand = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__159384_25_operand, __159372_64_inlining_failed));
-(__159384_25_operand->next) = __159384_34_operand2;
-(((__159371_63_expr->variant).operation).operands) = __159384_25_operand;
+__147977_25_operand = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__147977_25_operand, __147965_64_inlining_failed));
+(__147977_25_operand->next) = __147977_34_operand2;
+(((__147964_63_expr->variant).operation).operands) = __147977_25_operand;
 }
 }
 }
 } }
-return __159382_25_processed;
+return __147975_25_processed;
 }
 
 
 static _ZN3edg15a_statement_ptrE _ZN29_INTERNAL_8_inline_c_502890ee3edg22copy_inlined_statementEPNS0_11a_statementEPNS0_18an_insert_locationE(
-_ZN3edg15a_statement_ptrE __159530_63_statement, 
-_ZN3edg18an_insert_locationE *__159531_64_insert_location)
-# 1146
+_ZN3edg15a_statement_ptrE __148123_63_statement, 
+_ZN3edg18an_insert_locationE *__148124_64_insert_location)
+#line 1146
 {
-auto _ZN3edg15a_statement_ptrE __159541_19_new_statement; __159541_19_new_statement = (_ZN3edg15alloc_statementENS_16a_statement_kindEb((__159530_63_statement->kind), ((_ZN3edg9a_booleanE)1)));
+auto _ZN3edg15a_statement_ptrE __148134_19_new_statement; __148134_19_new_statement = (_ZN3edg15alloc_statementENS_16a_statement_kindEb((__148123_63_statement->kind), ((_ZN3edg9a_booleanE)1)));
 
 
 
 
-(*__159541_19_new_statement) = (*__159530_63_statement);
-(__159541_19_new_statement->next) = ((_ZN3edg15a_statement_ptrE)0);
-(__159541_19_new_statement->parent) = ((_ZN3edg15a_statement_ptrE)0);
-(__159541_19_new_statement->compiler_generated) = 1U;
+(*__148134_19_new_statement) = (*__148123_63_statement);
+(__148134_19_new_statement->next) = ((_ZN3edg15a_statement_ptrE)0);
+(__148134_19_new_statement->parent) = ((_ZN3edg15a_statement_ptrE)0);
+(__148134_19_new_statement->compiler_generated) = 1U;
 
-(__159541_19_new_statement->lowering_generated) = ((_ZN3edg11a_bit_fieldE)_ZN3edg20il_lowering_underwayE);
+(__148134_19_new_statement->lowering_generated) = ((_ZN3edg11a_bit_fieldE)_ZN3edg20il_lowering_underwayE);
 
-_ZN29_INTERNAL_8_inline_c_502890ee3edg30set_inline_statement_positionsEPNS0_11a_statementES2_(__159541_19_new_statement, __159530_63_statement);
-(__159541_19_new_statement->has_associated_pragma) = 0U;
+_ZN29_INTERNAL_8_inline_c_502890ee3edg30set_inline_statement_positionsEPNS0_11a_statementES2_(__148134_19_new_statement, __148123_63_statement);
+(__148134_19_new_statement->has_associated_pragma) = 0U;
 
 
 
-_ZN3edg21insert_statement_fullEPNS_11a_statementEPNS_18an_insert_locationEb(__159541_19_new_statement, __159531_64_insert_location, ((_ZN3edg9a_booleanE)0));
+_ZN3edg21insert_statement_fullEPNS_11a_statementEPNS_18an_insert_locationEb(__148134_19_new_statement, __148124_64_insert_location, ((_ZN3edg9a_booleanE)0));
 
-return __159541_19_new_statement;
+return __148134_19_new_statement;
 }
 
 
-static void _ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPmPbS6_S6_( _ZN3edg15a_statement_ptrE __159564_59_statement, 
-_ZN3edg18an_insert_locationE *__159565_60_insert_location, 
-_ZN3edg21a_host_large_unsignedE *__159566_60_statement_count, 
-_ZN3edg9a_booleanE *__159567_60_is_too_large, 
-_ZN3edg9a_booleanE *__159568_60_inlinable, 
-_ZN3edg9a_booleanE *__159569_60_failed)
-# 1194
+static void _ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPyPbS6_S6_( _ZN3edg15a_statement_ptrE __148157_59_statement, 
+_ZN3edg18an_insert_locationE *__148158_60_insert_location, 
+_ZN3edg21a_host_large_unsignedE *__148159_60_statement_count, 
+_ZN3edg9a_booleanE *__148160_60_is_too_large, 
+_ZN3edg9a_booleanE *__148161_60_inlinable, 
+_ZN3edg9a_booleanE *__148162_60_failed)
+#line 1194
 {
-auto _ZN3edg16an_expr_node_ptrE __159589_22_stmt_expr; auto _ZN3edg16an_expr_node_ptrE __159589_33_expr;
-auto _ZN3edg15a_statement_ptrE __159590_22_new_statement; auto _ZN3edg15a_statement_ptrE __159590_37_stmt; auto _ZN3edg15a_statement_ptrE __159590_43_prev_stmt;
-auto _ZN3edg11a_label_ptrE __159591_22_label;
-auto _ZN3edg18an_insert_locationE __159592_22_sub_insert_location;
-auto _ZN3edg9a_booleanE __159593_22_result_is_then; auto _ZN3edg9a_booleanE __159593_38_result_is_else;
+auto _ZN3edg16an_expr_node_ptrE __148182_22_stmt_expr; auto _ZN3edg16an_expr_node_ptrE __148182_33_expr;
+auto _ZN3edg15a_statement_ptrE __148183_22_new_statement; auto _ZN3edg15a_statement_ptrE __148183_37_stmt; auto _ZN3edg15a_statement_ptrE __148183_43_prev_stmt;
+auto _ZN3edg11a_label_ptrE __148184_22_label;
+auto _ZN3edg18an_insert_locationE __148185_22_sub_insert_location;
+auto _ZN3edg9a_booleanE __148186_22_result_is_then; auto _ZN3edg9a_booleanE __148186_38_result_is_else;
 
-if (__159564_59_statement == ((_ZN3edg15a_statement_ptrE)0)) {
+if (__148157_59_statement == ((_ZN3edg15a_statement_ptrE)0)) {
 
-} else  { if (__159564_59_statement->has_associated_pragma) {
+} else  { if (__148157_59_statement->has_associated_pragma) {
 
-goto __160055_1_cannot_inline_ever;
-} else  { if ((((*__159566_60_statement_count)++) > _ZN3edg22inline_statement_limitE) && (_ZN3edg22inline_statement_limitE != 0UL))
+goto __148648_1_cannot_inline_ever;
+} else  { if ((((*__148159_60_statement_count)++) > _ZN3edg22inline_statement_limitE) && (_ZN3edg22inline_statement_limitE != 0ULL))
 {
-# 1213
-(*__159567_60_is_too_large) = ((_ZN3edg9a_booleanE)1);
-(*__159569_60_failed) = ((_ZN3edg9a_booleanE)1);
-(*__159568_60_inlinable) = ((_ZN3edg9a_booleanE)0);
+#line 1213
+(*__148160_60_is_too_large) = ((_ZN3edg9a_booleanE)1);
+(*__148162_60_failed) = ((_ZN3edg9a_booleanE)1);
+(*__148161_60_inlinable) = ((_ZN3edg9a_booleanE)0);
 } else  {
-__159589_22_stmt_expr = (__159564_59_statement->expr);
-if (__159589_22_stmt_expr != ((_ZN3edg16an_expr_node_ptrE)0)) {
+__148182_22_stmt_expr = (__148157_59_statement->expr);
+if (__148182_22_stmt_expr != ((_ZN3edg16an_expr_node_ptrE)0)) {
 
 
-__159589_22_stmt_expr = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__159589_22_stmt_expr, __159569_60_failed));
+__148182_22_stmt_expr = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__148182_22_stmt_expr, __148162_60_failed));
 }
-switch ((int)(__159564_59_statement->kind)) {
+switch ((int)(__148157_59_statement->kind)) {
 case 32:
 
 
 
-if (!(((((int)(__159565_60_insert_location->kind)) == 3) || (((int)(__159565_60_insert_location->kind)) == 4)) || (((int)(__159565_60_insert_location->kind)) == 5))) {
-_ZN29_INTERNAL_8_inline_c_502890ee3edg22copy_inlined_statementEPNS0_11a_statementEPNS0_18an_insert_locationE(__159564_59_statement, __159565_60_insert_location);
+if (!(((((int)(__148158_60_insert_location->kind)) == 3) || (((int)(__148158_60_insert_location->kind)) == 4)) || (((int)(__148158_60_insert_location->kind)) == 5))) {
+_ZN29_INTERNAL_8_inline_c_502890ee3edg22copy_inlined_statementEPNS0_11a_statementEPNS0_18an_insert_locationE(__148157_59_statement, __148158_60_insert_location);
 }
-goto __T719739992;
+goto __T841755696;
 case 0:
-if (((((int)(__159565_60_insert_location->kind)) == 3) || (((int)(__159565_60_insert_location->kind)) == 4)) || (((int)(__159565_60_insert_location->kind)) == 5)) {
+if (((((int)(__148158_60_insert_location->kind)) == 3) || (((int)(__148158_60_insert_location->kind)) == 4)) || (((int)(__148158_60_insert_location->kind)) == 5)) {
 
-_ZN3edg11insert_exprEPNS_12an_expr_nodeEPNS_18an_insert_locationE(__159589_22_stmt_expr, __159565_60_insert_location);
+_ZN3edg11insert_exprEPNS_12an_expr_nodeEPNS_18an_insert_locationE(__148182_22_stmt_expr, __148158_60_insert_location);
 } else  {
 
-__159590_22_new_statement = (_ZN29_INTERNAL_8_inline_c_502890ee3edg22copy_inlined_statementEPNS0_11a_statementEPNS0_18an_insert_locationE(__159564_59_statement, __159565_60_insert_location));
-(__159590_22_new_statement->expr) = __159589_22_stmt_expr;
-(__159589_22_stmt_expr != ((_ZN3edg16an_expr_node_ptrE)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1240, __T719044520, ((_ZN3edg12a_const_charE *)0), ((
-# 1240
+__148183_22_new_statement = (_ZN29_INTERNAL_8_inline_c_502890ee3edg22copy_inlined_statementEPNS0_11a_statementEPNS0_18an_insert_locationE(__148157_59_statement, __148158_60_insert_location));
+(__148183_22_new_statement->expr) = __148182_22_stmt_expr;
+(__148182_22_stmt_expr != ((_ZN3edg16an_expr_node_ptrE)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1240, __T841601032, ((_ZN3edg12a_const_charE *)0), ((
+#line 1240
 _ZN3edg12a_const_charE *)0)));
-_ZN3edg24set_expr_result_not_usedEPNS_12an_expr_nodeE(__159589_22_stmt_expr);
+_ZN3edg24set_expr_result_not_usedEPNS_12an_expr_nodeE(__148182_22_stmt_expr);
 }
-goto __T719739992;
+goto __T841755696;
 case 6:
 
 
 
-__159591_22_label = (((__159564_59_statement->variant).label).ptr);
-__159590_37_stmt = ((((_ZN29_INTERNAL_8_inline_c_502890ee3edg27routine_scope_being_inlinedE->assoc_block)->variant).block).statements);
+__148184_22_label = (((__148157_59_statement->variant).label).ptr);
+__148183_37_stmt = ((((_ZN29_INTERNAL_8_inline_c_502890ee3edg27routine_scope_being_inlinedE->assoc_block)->variant).block).statements);
 
 
-__159590_43_prev_stmt = ((_ZN3edg15a_statement_ptrE)0);
-for (; (__159590_37_stmt != ((_ZN3edg15a_statement_ptrE)0)) && (__159590_37_stmt != (__159591_22_label->exec_stmt)); (__159590_43_prev_stmt = __159590_37_stmt) , (__159590_37_stmt = (__159590_37_stmt->next)))
+__148183_43_prev_stmt = ((_ZN3edg15a_statement_ptrE)0);
+for (; (__148183_37_stmt != ((_ZN3edg15a_statement_ptrE)0)) && (__148183_37_stmt != (__148184_22_label->exec_stmt)); (__148183_43_prev_stmt = __148183_37_stmt) , (__148183_37_stmt = (__148183_37_stmt->next)))
 { }
-if ((__159590_37_stmt != ((_ZN3edg15a_statement_ptrE)0)) && (__159590_43_prev_stmt != ((_ZN3edg15a_statement_ptrE)0))) {
+if ((__148183_37_stmt != ((_ZN3edg15a_statement_ptrE)0)) && (__148183_43_prev_stmt != ((_ZN3edg15a_statement_ptrE)0))) {
 
 
 
-if (((int)(__159590_43_prev_stmt->kind)) == 11) {
-__159590_43_prev_stmt = (_ZN3edg23last_statement_in_blockEPNS_11a_statementE(__159590_43_prev_stmt));
+if (((int)(__148183_43_prev_stmt->kind)) == 11) {
+__148183_43_prev_stmt = (_ZN3edg23last_statement_in_blockEPNS_11a_statementE(__148183_43_prev_stmt));
 }
-if (__159590_43_prev_stmt == __159564_59_statement) {
+if (__148183_43_prev_stmt == __148157_59_statement) {
 
-goto __T719739992;
+goto __T841755696;
 }
 }
-goto __160055_1_cannot_inline_ever;
+goto __148648_1_cannot_inline_ever;
 case 7:
 
-if ((((__159564_59_statement->variant).label).ptr)->address_taken) {
+if ((((__148157_59_statement->variant).label).ptr)->address_taken) {
 
 
-goto __160055_1_cannot_inline_ever;
+goto __148648_1_cannot_inline_ever;
 }
 
 
 
-goto __T719739992;
+goto __T841755696;
 case 8:
-# 1285
-__159590_37_stmt = (_ZN29_INTERNAL_8_inline_c_502890ee3edg27routine_scope_being_inlinedE->assoc_block);
+#line 1285
+__148183_37_stmt = (_ZN29_INTERNAL_8_inline_c_502890ee3edg27routine_scope_being_inlinedE->assoc_block);
 do {
-__159590_37_stmt = (_ZN3edg23last_statement_in_blockEPNS_11a_statementE(__159590_37_stmt));
-} while ((__159590_37_stmt != ((_ZN3edg15a_statement_ptrE)0)) && (((int)(__159590_37_stmt->kind)) == 11));
-if (__159590_37_stmt == __159564_59_statement) {
+__148183_37_stmt = (_ZN3edg23last_statement_in_blockEPNS_11a_statementE(__148183_37_stmt));
+} while ((__148183_37_stmt != ((_ZN3edg15a_statement_ptrE)0)) && (((int)(__148183_37_stmt->kind)) == 11));
+if (__148183_37_stmt == __148157_59_statement) {
 
 
-if (((((int)(__159565_60_insert_location->kind)) == 3) || (((int)(__159565_60_insert_location->kind)) == 4)) || (((int)(__159565_60_insert_location->kind)) == 5)) {
+if (((((int)(__148158_60_insert_location->kind)) == 3) || (((int)(__148158_60_insert_location->kind)) == 4)) || (((int)(__148158_60_insert_location->kind)) == 5)) {
 
-if (__159589_22_stmt_expr != ((_ZN3edg16an_expr_node_ptrE)0)) {
-_ZN3edg11insert_exprEPNS_12an_expr_nodeEPNS_18an_insert_locationE(__159589_22_stmt_expr, __159565_60_insert_location);
+if (__148182_22_stmt_expr != ((_ZN3edg16an_expr_node_ptrE)0)) {
+_ZN3edg11insert_exprEPNS_12an_expr_nodeEPNS_18an_insert_locationE(__148182_22_stmt_expr, __148158_60_insert_location);
 } else  {
 
-auto _ZN3edg10a_type_ptrE __159692_26_routine_type; __159692_26_routine_type = (_ZN3edg13skip_typerefsEPNS_6a_typeE(((((_ZN29_INTERNAL_8_inline_c_502890ee3edg27routine_scope_being_inlinedE->variant).routine).ptr)->type)));
+auto _ZN3edg10a_type_ptrE __148285_26_routine_type; __148285_26_routine_type = (_ZN3edg13skip_typerefsEPNS_6a_typeE(((((_ZN29_INTERNAL_8_inline_c_502890ee3edg27routine_scope_being_inlinedE->variant).routine).ptr)->type)));
 
 
-if ((((__159692_26_routine_type->variant).routine).extra_info)->value_returned_as_parameter)
+if ((((__148285_26_routine_type->variant).routine).extra_info)->value_returned_as_parameter)
 {
 
 
 
 } else  {
-auto _ZN3edg10a_type_ptrE __159701_28_routine_return_type; __159701_28_routine_return_type = (((__159692_26_routine_type->variant).routine).return_type);
+auto _ZN3edg10a_type_ptrE __148294_28_routine_return_type; __148294_28_routine_return_type = (((__148285_26_routine_type->variant).routine).return_type);
 
-if (!(_ZN3edg12is_void_typeEPNS_6a_typeE(__159701_28_routine_return_type))) {
+if (!(_ZN3edg12is_void_typeEPNS_6a_typeE(__148294_28_routine_return_type))) {
 
 
 
-goto __160055_1_cannot_inline_ever;
+goto __148648_1_cannot_inline_ever;
 }
 }
 }
 } else  {
-# 1323
-if ((__159589_22_stmt_expr != ((_ZN3edg16an_expr_node_ptrE)0)) && ((!(__159589_22_stmt_expr->result_is_not_used)) || (_ZN3edg21node_has_side_effectsEPNS_12an_expr_nodeEPb(__159589_22_stmt_expr, ((_ZN3edg9a_booleanE *)0)))))
+#line 1323
+if ((__148182_22_stmt_expr != ((_ZN3edg16an_expr_node_ptrE)0)) && ((!(__148182_22_stmt_expr->result_is_not_used)) || (_ZN3edg21node_has_side_effectsEPNS_12an_expr_nodeEPb(__148182_22_stmt_expr, ((_ZN3edg9a_booleanE *)0)))))
 
 {
-if (__159589_22_stmt_expr->result_is_not_used) {
-__159589_22_stmt_expr = (_ZN3edg8add_castEPNS_12an_expr_nodeEPNS_6a_typeE(__159589_22_stmt_expr, (_ZN3edg9void_typeEv())));
+if (__148182_22_stmt_expr->result_is_not_used) {
+__148182_22_stmt_expr = (_ZN3edg8add_castEPNS_12an_expr_nodeEPNS_6a_typeE(__148182_22_stmt_expr, (_ZN3edg9void_typeEv())));
 }
-__159590_37_stmt = (_ZN3edg21insert_expr_statementEPNS_12an_expr_nodeEPNS_18an_insert_locationE(__159589_22_stmt_expr, __159565_60_insert_location));
-_ZN29_INTERNAL_8_inline_c_502890ee3edg30set_inline_statement_positionsEPNS0_11a_statementES2_(__159590_37_stmt, __159564_59_statement);
+__148183_37_stmt = (_ZN3edg21insert_expr_statementEPNS_12an_expr_nodeEPNS_18an_insert_locationE(__148182_22_stmt_expr, __148158_60_insert_location));
+_ZN29_INTERNAL_8_inline_c_502890ee3edg30set_inline_statement_positionsEPNS0_11a_statementES2_(__148183_37_stmt, __148157_59_statement);
 }
 }
-goto __T719739992;
+goto __T841755696;
 }
-goto __160055_1_cannot_inline_ever;
+goto __148648_1_cannot_inline_ever;
 case 1:
-# 1344
-__159593_22_result_is_then = (__159593_38_result_is_else = ((_ZN3edg9a_booleanE)0));
-(__159589_22_stmt_expr != ((_ZN3edg16an_expr_node_ptrE)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1345, __T719044520, ((_ZN3edg12a_const_charE *)0), ((
-# 1345
+#line 1344
+__148186_22_result_is_then = (__148186_38_result_is_else = ((_ZN3edg9a_booleanE)0));
+(__148182_22_stmt_expr != ((_ZN3edg16an_expr_node_ptrE)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1345, __T841601032, ((_ZN3edg12a_const_charE *)0), ((
+#line 1345
 _ZN3edg12a_const_charE *)0)));
-if (((int)(__159564_59_statement->kind)) == 4) {
-__159593_22_result_is_then = ((_ZN3edg9a_booleanE)1);
-} else  { if (((int)(__159564_59_statement->kind)) == 3) {
-__159593_38_result_is_else = ((_ZN3edg9a_booleanE)1);
-} else  { if (((__159589_22_stmt_expr->kind) == 2U) && (_ZN3edg41constant_bool_value_known_at_compile_timeEPNS_10a_constantE((((__159589_22_stmt_expr->variant).constant).ptr))))
+if (((int)(__148157_59_statement->kind)) == 4) {
+__148186_22_result_is_then = ((_ZN3edg9a_booleanE)1);
+} else  { if (((int)(__148157_59_statement->kind)) == 3) {
+__148186_38_result_is_else = ((_ZN3edg9a_booleanE)1);
+} else  { if (((__148182_22_stmt_expr->kind) == 2U) && (_ZN3edg41constant_bool_value_known_at_compile_timeEPNS_10a_constantE((((__148182_22_stmt_expr->variant).constant).ptr))))
 
 {
-if (_ZN3edg17is_false_constantEPNS_10a_constantE((((__159589_22_stmt_expr->variant).constant).ptr))) {
-__159593_38_result_is_else = ((_ZN3edg9a_booleanE)1);
+if (_ZN3edg17is_false_constantEPNS_10a_constantE((((__148182_22_stmt_expr->variant).constant).ptr))) {
+__148186_38_result_is_else = ((_ZN3edg9a_booleanE)1);
 } else  {
-__159593_22_result_is_then = ((_ZN3edg9a_booleanE)1);
+__148186_22_result_is_then = ((_ZN3edg9a_booleanE)1);
 }
 } } }
-if (((((int)(__159565_60_insert_location->kind)) == 3) || (((int)(__159565_60_insert_location->kind)) == 4)) || (((int)(__159565_60_insert_location->kind)) == 5)) {
-auto _ZN3edg16an_expr_node_ptrE __159754_28_then_expr = ((_ZN3edg16an_expr_node_ptrE)0); auto _ZN3edg16an_expr_node_ptrE __159754_46_else_expr = ((_ZN3edg16an_expr_node_ptrE)0);
+if (((((int)(__148158_60_insert_location->kind)) == 3) || (((int)(__148158_60_insert_location->kind)) == 4)) || (((int)(__148158_60_insert_location->kind)) == 5)) {
+auto _ZN3edg16an_expr_node_ptrE __148347_28_then_expr = ((_ZN3edg16an_expr_node_ptrE)0); auto _ZN3edg16an_expr_node_ptrE __148347_46_else_expr = ((_ZN3edg16an_expr_node_ptrE)0);
 
-if (!(__159593_38_result_is_else)) {
+if (!(__148186_38_result_is_else)) {
 
-_ZN3edg33set_expr_creation_insert_locationEPNS_18an_insert_locationE((&__159592_22_sub_insert_location));
-_ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPmPbS6_S6_((((__159564_59_statement->variant).if_stmt).then_statement), (&__159592_22_sub_insert_location), __159566_60_statement_count, __159567_60_is_too_large, __159568_60_inlinable, 
-# 1365
-__159569_60_failed);
+_ZN3edg33set_expr_creation_insert_locationEPNS_18an_insert_locationE((&__148185_22_sub_insert_location));
+_ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPyPbS6_S6_((((__148157_59_statement->variant).if_stmt).then_statement), (&__148185_22_sub_insert_location), __148159_60_statement_count, __148160_60_is_too_large, __148161_60_inlinable, 
+#line 1365
+__148162_60_failed);
 
 
-if (!(*__159569_60_failed)) {
-__159754_28_then_expr = ((__159592_22_sub_insert_location.variant).expr);
-if (__159754_28_then_expr == ((_ZN3edg16an_expr_node_ptrE)0)) {
+if (!(*__148162_60_failed)) {
+__148347_28_then_expr = ((__148185_22_sub_insert_location.variant).expr);
+if (__148347_28_then_expr == ((_ZN3edg16an_expr_node_ptrE)0)) {
 
-__159754_28_then_expr = (_ZN3edg25node_for_integer_constantElNS_15an_integer_kindE(0x0L, _ZN3edg6ik_intE));
+__148347_28_then_expr = (_ZN3edg25node_for_integer_constantElNS_15an_integer_kindE(0x0L, _ZN3edg6ik_intE));
 
 }
-__159754_28_then_expr = (_ZN3edg21add_cast_if_necessaryEPNS_12an_expr_nodeEPNS_6a_typeE(__159754_28_then_expr, (_ZN3edg9void_typeEv())));
+__148347_28_then_expr = (_ZN3edg21add_cast_if_necessaryEPNS_12an_expr_nodeEPNS_6a_typeE(__148347_28_then_expr, (_ZN3edg9void_typeEv())));
 }
 }
-if (!(__159593_22_result_is_then)) {
-if ((((__159564_59_statement->variant).if_stmt).else_statement) != ((_ZN3edg15a_statement_ptrE)0)) {
+if (!(__148186_22_result_is_then)) {
+if ((((__148157_59_statement->variant).if_stmt).else_statement) != ((_ZN3edg15a_statement_ptrE)0)) {
 
-_ZN3edg33set_expr_creation_insert_locationEPNS_18an_insert_locationE((&__159592_22_sub_insert_location));
-_ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPmPbS6_S6_((((__159564_59_statement->variant).if_stmt).else_statement), (&__159592_22_sub_insert_location), __159566_60_statement_count, __159567_60_is_too_large, __159568_60_inlinable, 
-# 1382
-__159569_60_failed);
+_ZN3edg33set_expr_creation_insert_locationEPNS_18an_insert_locationE((&__148185_22_sub_insert_location));
+_ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPyPbS6_S6_((((__148157_59_statement->variant).if_stmt).else_statement), (&__148185_22_sub_insert_location), __148159_60_statement_count, __148160_60_is_too_large, __148161_60_inlinable, 
+#line 1382
+__148162_60_failed);
 
 
 
-if (!(*__159569_60_failed)) {
-__159754_46_else_expr = ((__159592_22_sub_insert_location.variant).expr);
-__159754_46_else_expr = (_ZN3edg21add_cast_if_necessaryEPNS_12an_expr_nodeEPNS_6a_typeE(__159754_46_else_expr, (_ZN3edg9void_typeEv())));
+if (!(*__148162_60_failed)) {
+__148347_46_else_expr = ((__148185_22_sub_insert_location.variant).expr);
+__148347_46_else_expr = (_ZN3edg21add_cast_if_necessaryEPNS_12an_expr_nodeEPNS_6a_typeE(__148347_46_else_expr, (_ZN3edg9void_typeEv())));
 }
 } else  {
 
-__159754_46_else_expr = (_ZN3edg8add_castEPNS_12an_expr_nodeEPNS_6a_typeE((_ZN3edg25node_for_integer_constantElNS_15an_integer_kindE(0x0L, _ZN3edg6ik_intE)), (_ZN3edg9void_typeEv())));
+__148347_46_else_expr = (_ZN3edg8add_castEPNS_12an_expr_nodeEPNS_6a_typeE((_ZN3edg25node_for_integer_constantElNS_15an_integer_kindE(0x0L, _ZN3edg6ik_intE)), (_ZN3edg9void_typeEv())));
 
 
 
 }
 }
-if (!(*__159569_60_failed)) {
-if (__159593_22_result_is_then) {
+if (!(*__148162_60_failed)) {
+if (__148186_22_result_is_then) {
 
-__159589_33_expr = __159754_28_then_expr;
-} else  { if (__159593_38_result_is_else) {
+__148182_33_expr = __148347_28_then_expr;
+} else  { if (__148186_38_result_is_else) {
 
-__159589_33_expr = __159754_46_else_expr;
+__148182_33_expr = __148347_46_else_expr;
 } else  {
 
-(__159589_22_stmt_expr->next) = __159754_28_then_expr;
-(__159754_28_then_expr->next) = __159754_46_else_expr;
-__159589_33_expr = (_ZN3edg18make_operator_nodeENS_21an_expr_operator_kindEPNS_6a_typeEPNS_12an_expr_nodeE(_ZN3edg12eok_questionE, (_ZN3edg9void_typeEv()), __159589_22_stmt_expr));
+(__148182_22_stmt_expr->next) = __148347_28_then_expr;
+(__148347_28_then_expr->next) = __148347_46_else_expr;
+__148182_33_expr = (_ZN3edg18make_operator_nodeENS_21an_expr_operator_kindEPNS_6a_typeEPNS_12an_expr_nodeE(_ZN3edg12eok_questionE, (_ZN3edg9void_typeEv()), __148182_22_stmt_expr));
 
 
-(__159589_33_expr->is_initialization_guard) = ((_ZN3edg11a_bit_fieldE)(__159564_59_statement->is_initialization_guard));
+(__148182_33_expr->is_initialization_guard) = ((_ZN3edg11a_bit_fieldE)(__148157_59_statement->is_initialization_guard));
 } }
-_ZN3edg11insert_exprEPNS_12an_expr_nodeEPNS_18an_insert_locationE(__159589_33_expr, __159565_60_insert_location);
+_ZN3edg11insert_exprEPNS_12an_expr_nodeEPNS_18an_insert_locationE(__148182_33_expr, __148158_60_insert_location);
 }
 } else  {
-auto _ZN3edg15a_statement_ptrE __159811_27_then_stmt = ((_ZN3edg15a_statement_ptrE)0); auto _ZN3edg15a_statement_ptrE __159811_45_else_stmt = ((_ZN3edg15a_statement_ptrE)0);
+auto _ZN3edg15a_statement_ptrE __148404_27_then_stmt = ((_ZN3edg15a_statement_ptrE)0); auto _ZN3edg15a_statement_ptrE __148404_45_else_stmt = ((_ZN3edg15a_statement_ptrE)0);
 
-if (!(__159593_38_result_is_else)) {
+if (!(__148186_38_result_is_else)) {
 
-_ZN3edg38set_statement_creation_insert_locationEPNS_18an_insert_locationE((&__159592_22_sub_insert_location));
-_ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPmPbS6_S6_((((__159564_59_statement->variant).if_stmt).then_statement), (&__159592_22_sub_insert_location), __159566_60_statement_count, __159567_60_is_too_large, __159568_60_inlinable, 
-# 1422
-__159569_60_failed);
+_ZN3edg38set_statement_creation_insert_locationEPNS_18an_insert_locationE((&__148185_22_sub_insert_location));
+_ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPyPbS6_S6_((((__148157_59_statement->variant).if_stmt).then_statement), (&__148185_22_sub_insert_location), __148159_60_statement_count, __148160_60_is_too_large, __148161_60_inlinable, 
+#line 1422
+__148162_60_failed);
 
 
-if (!(*__159569_60_failed)) {
-__159811_27_then_stmt = (((__159592_22_sub_insert_location.variant).statement).stmt);
+if (!(*__148162_60_failed)) {
+__148404_27_then_stmt = (((__148185_22_sub_insert_location.variant).statement).stmt);
 }
 }
-if (!(__159593_22_result_is_then)) {
-if ((((__159564_59_statement->variant).if_stmt).else_statement) != ((_ZN3edg15a_statement_ptrE)0)) {
+if (!(__148186_22_result_is_then)) {
+if ((((__148157_59_statement->variant).if_stmt).else_statement) != ((_ZN3edg15a_statement_ptrE)0)) {
 
-_ZN3edg38set_statement_creation_insert_locationEPNS_18an_insert_locationE((&__159592_22_sub_insert_location));
-_ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPmPbS6_S6_((((__159564_59_statement->variant).if_stmt).else_statement), (&__159592_22_sub_insert_location), __159566_60_statement_count, __159567_60_is_too_large, __159568_60_inlinable, 
-# 1433
-__159569_60_failed);
+_ZN3edg38set_statement_creation_insert_locationEPNS_18an_insert_locationE((&__148185_22_sub_insert_location));
+_ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPyPbS6_S6_((((__148157_59_statement->variant).if_stmt).else_statement), (&__148185_22_sub_insert_location), __148159_60_statement_count, __148160_60_is_too_large, __148161_60_inlinable, 
+#line 1433
+__148162_60_failed);
 
 
 
-if (!(*__159569_60_failed)) {
-__159811_45_else_stmt = (((__159592_22_sub_insert_location.variant).statement).stmt);
+if (!(*__148162_60_failed)) {
+__148404_45_else_stmt = (((__148185_22_sub_insert_location.variant).statement).stmt);
 }
 } else  {
-__159811_45_else_stmt = ((_ZN3edg15a_statement_ptrE)0);
+__148404_45_else_stmt = ((_ZN3edg15a_statement_ptrE)0);
 }
 }
-if (!(*__159569_60_failed)) {
-if (((__159593_22_result_is_then) && (__159811_27_then_stmt == ((_ZN3edg15a_statement_ptrE)0))) || ((((!(__159593_22_result_is_then)) && (!(__159593_38_result_is_else))) && (__159811_27_then_stmt == ((_ZN3edg15a_statement_ptrE)0))) && (__159811_45_else_stmt == ((_ZN3edg15a_statement_ptrE)0))))
+if (!(*__148162_60_failed)) {
+if (((__148186_22_result_is_then) && (__148404_27_then_stmt == ((_ZN3edg15a_statement_ptrE)0))) || ((((!(__148186_22_result_is_then)) && (!(__148186_38_result_is_else))) && (__148404_27_then_stmt == ((_ZN3edg15a_statement_ptrE)0))) && (__148404_45_else_stmt == ((_ZN3edg15a_statement_ptrE)0))))
 
 {
 
 
 
 
-_ZN3edg24set_expr_result_not_usedEPNS_12an_expr_nodeE(__159589_22_stmt_expr);
-__159590_22_new_statement = (_ZN3edg15alloc_statementENS_16a_statement_kindEb(_ZN3edg9stmk_exprE, ((_ZN3edg9a_booleanE)1)));
+_ZN3edg24set_expr_result_not_usedEPNS_12an_expr_nodeE(__148182_22_stmt_expr);
+__148183_22_new_statement = (_ZN3edg15alloc_statementENS_16a_statement_kindEb(_ZN3edg9stmk_exprE, ((_ZN3edg9a_booleanE)1)));
 
-(__159590_22_new_statement->expr) = __159589_22_stmt_expr;
-_ZN29_INTERNAL_8_inline_c_502890ee3edg30set_inline_statement_positionsEPNS0_11a_statementES2_(__159590_22_new_statement, __159564_59_statement);
-_ZN3edg21insert_statement_fullEPNS_11a_statementEPNS_18an_insert_locationEb(__159590_22_new_statement, __159565_60_insert_location, ((_ZN3edg9a_booleanE)0));
+(__148183_22_new_statement->expr) = __148182_22_stmt_expr;
+_ZN29_INTERNAL_8_inline_c_502890ee3edg30set_inline_statement_positionsEPNS0_11a_statementES2_(__148183_22_new_statement, __148157_59_statement);
+_ZN3edg21insert_statement_fullEPNS_11a_statementEPNS_18an_insert_locationEb(__148183_22_new_statement, __148158_60_insert_location, ((_ZN3edg9a_booleanE)0));
 
-} else  { if (__159593_22_result_is_then) {
+} else  { if (__148186_22_result_is_then) {
 
-_ZN3edg21insert_statement_fullEPNS_11a_statementEPNS_18an_insert_locationEb(__159811_27_then_stmt, __159565_60_insert_location, ((_ZN3edg9a_booleanE)0));
+_ZN3edg21insert_statement_fullEPNS_11a_statementEPNS_18an_insert_locationEb(__148404_27_then_stmt, __148158_60_insert_location, ((_ZN3edg9a_booleanE)0));
 
-} else  { if (__159593_38_result_is_else) {
+} else  { if (__148186_38_result_is_else) {
 
-if (__159811_45_else_stmt != ((_ZN3edg15a_statement_ptrE)0)) {
-_ZN3edg21insert_statement_fullEPNS_11a_statementEPNS_18an_insert_locationEb(__159811_45_else_stmt, __159565_60_insert_location, ((_ZN3edg9a_booleanE)0));
+if (__148404_45_else_stmt != ((_ZN3edg15a_statement_ptrE)0)) {
+_ZN3edg21insert_statement_fullEPNS_11a_statementEPNS_18an_insert_locationEb(__148404_45_else_stmt, __148158_60_insert_location, ((_ZN3edg9a_booleanE)0));
 
 }
 } else  {
 
-if (__159811_27_then_stmt == ((_ZN3edg15a_statement_ptrE)0)) {
+if (__148404_27_then_stmt == ((_ZN3edg15a_statement_ptrE)0)) {
 
-__159811_27_then_stmt = (_ZN3edg15alloc_statementENS_16a_statement_kindEb(_ZN3edg10stmk_emptyE, ((_ZN3edg9a_booleanE)1)));
+__148404_27_then_stmt = (_ZN3edg15alloc_statementENS_16a_statement_kindEb(_ZN3edg10stmk_emptyE, ((_ZN3edg9a_booleanE)1)));
 
 }
-__159590_22_new_statement = (_ZN29_INTERNAL_8_inline_c_502890ee3edg22copy_inlined_statementEPNS0_11a_statementEPNS0_18an_insert_locationE(__159564_59_statement, __159565_60_insert_location));
+__148183_22_new_statement = (_ZN29_INTERNAL_8_inline_c_502890ee3edg22copy_inlined_statementEPNS0_11a_statementEPNS0_18an_insert_locationE(__148157_59_statement, __148158_60_insert_location));
 
-(__159590_22_new_statement->expr) = __159589_22_stmt_expr;
-(((__159590_22_new_statement->variant).if_stmt).then_statement) = __159811_27_then_stmt;
-(((__159590_22_new_statement->variant).if_stmt).else_statement) = __159811_45_else_stmt;
-(__159811_27_then_stmt->parent) = __159590_22_new_statement;
-if (__159811_45_else_stmt != ((_ZN3edg15a_statement_ptrE)0)) { (__159811_45_else_stmt->parent) = __159590_22_new_statement; }
+(__148183_22_new_statement->expr) = __148182_22_stmt_expr;
+(((__148183_22_new_statement->variant).if_stmt).then_statement) = __148404_27_then_stmt;
+(((__148183_22_new_statement->variant).if_stmt).else_statement) = __148404_45_else_stmt;
+(__148404_27_then_stmt->parent) = __148183_22_new_statement;
+if (__148404_45_else_stmt != ((_ZN3edg15a_statement_ptrE)0)) { (__148404_45_else_stmt->parent) = __148183_22_new_statement; }
 } } }
 }
 }
-goto __T719739992;
+goto __T841755696;
 case 11:
-if (((((int)(__159565_60_insert_location->kind)) == 3) || (((int)(__159565_60_insert_location->kind)) == 4)) || (((int)(__159565_60_insert_location->kind)) == 5)) {
+if (((((int)(__148158_60_insert_location->kind)) == 3) || (((int)(__148158_60_insert_location->kind)) == 4)) || (((int)(__148158_60_insert_location->kind)) == 5)) {
 
 
-_ZN3edg33set_expr_creation_insert_locationEPNS_18an_insert_locationE((&__159592_22_sub_insert_location));
+_ZN3edg33set_expr_creation_insert_locationEPNS_18an_insert_locationE((&__148185_22_sub_insert_location));
 } else  {
 
 
 
-__159590_22_new_statement = (_ZN3edg15alloc_statementENS_16a_statement_kindEb(_ZN3edg10stmk_blockE, ((_ZN3edg9a_booleanE)1)));
+__148183_22_new_statement = (_ZN3edg15alloc_statementENS_16a_statement_kindEb(_ZN3edg10stmk_blockE, ((_ZN3edg9a_booleanE)1)));
 
-_ZN29_INTERNAL_8_inline_c_502890ee3edg30set_inline_statement_positionsEPNS0_11a_statementES2_(__159590_22_new_statement, __159564_59_statement);
-
-
-
-
-_ZN3edg21insert_statement_fullEPNS_11a_statementEPNS_18an_insert_locationEb(__159590_22_new_statement, __159565_60_insert_location, ((_ZN3edg9a_booleanE)0));
+_ZN29_INTERNAL_8_inline_c_502890ee3edg30set_inline_statement_positionsEPNS0_11a_statementES2_(__148183_22_new_statement, __148157_59_statement);
 
 
 
-_ZN3edg31set_block_start_insert_locationEPNS_11a_statementEPNS_18an_insert_locationE(__159590_22_new_statement, (&__159592_22_sub_insert_location));
+
+_ZN3edg21insert_statement_fullEPNS_11a_statementEPNS_18an_insert_locationEb(__148183_22_new_statement, __148158_60_insert_location, ((_ZN3edg9a_booleanE)0));
+
+
+
+_ZN3edg31set_block_start_insert_locationEPNS_11a_statementEPNS_18an_insert_locationE(__148183_22_new_statement, (&__148185_22_sub_insert_location));
 }
 
-for (__159590_37_stmt = (((__159564_59_statement->variant).block).statements); __159590_37_stmt != ((_ZN3edg15a_statement_ptrE)0); __159590_37_stmt = (__159590_37_stmt->next))
+for (__148183_37_stmt = (((__148157_59_statement->variant).block).statements); __148183_37_stmt != ((_ZN3edg15a_statement_ptrE)0); __148183_37_stmt = (__148183_37_stmt->next))
 
 {
-_ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPmPbS6_S6_(__159590_37_stmt, (&__159592_22_sub_insert_location), __159566_60_statement_count, __159567_60_is_too_large, __159568_60_inlinable, __159569_60_failed);
+_ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPyPbS6_S6_(__148183_37_stmt, (&__148185_22_sub_insert_location), __148159_60_statement_count, __148160_60_is_too_large, __148161_60_inlinable, __148162_60_failed);
 
 
-if (*__159569_60_failed) { goto __T719869704; }
-} __T719869704:;
-if ((!(*__159569_60_failed)) && (((((int)(__159565_60_insert_location->kind)) == 3) || (((int)(__159565_60_insert_location->kind)) == 4)) || (((int)(__159565_60_insert_location->kind)) == 5))) {
+if (*__148162_60_failed) { goto __T841891760; }
+} __T841891760:;
+if ((!(*__148162_60_failed)) && (((((int)(__148158_60_insert_location->kind)) == 3) || (((int)(__148158_60_insert_location->kind)) == 4)) || (((int)(__148158_60_insert_location->kind)) == 5))) {
 
 
-__159589_33_expr = ((__159592_22_sub_insert_location.variant).expr);
-if (__159589_33_expr == ((_ZN3edg16an_expr_node_ptrE)0)) {
+__148182_33_expr = ((__148185_22_sub_insert_location.variant).expr);
+if (__148182_33_expr == ((_ZN3edg16an_expr_node_ptrE)0)) {
 
 
-__159589_33_expr = (_ZN3edg8add_castEPNS_12an_expr_nodeEPNS_6a_typeE((_ZN3edg25node_for_integer_constantElNS_15an_integer_kindE(0x0L, _ZN3edg6ik_intE)), (_ZN3edg9void_typeEv())));
+__148182_33_expr = (_ZN3edg8add_castEPNS_12an_expr_nodeEPNS_6a_typeE((_ZN3edg25node_for_integer_constantElNS_15an_integer_kindE(0x0L, _ZN3edg6ik_intE)), (_ZN3edg9void_typeEv())));
 
 
 }
-_ZN3edg11insert_exprEPNS_12an_expr_nodeEPNS_18an_insert_locationE(__159589_33_expr, __159565_60_insert_location);
+_ZN3edg11insert_exprEPNS_12an_expr_nodeEPNS_18an_insert_locationE(__148182_33_expr, __148158_60_insert_location);
 }
-goto __T719739992;
+goto __T841755696;
 case 18:
-{ auto _ZN3edg18a_dynamic_init_ptrE __159927_30_dip;
-auto _ZN3edg16an_expr_node_ptrE __159928_30_var_expr; auto _ZN3edg16an_expr_node_ptrE __159928_40_init_expr;
-auto _ZN3edg14a_variable_ptrE __159929_30_var;
-# 1533
-__159927_30_dip = ((__159564_59_statement->variant).dynamic_init);
+{ auto _ZN3edg18a_dynamic_init_ptrE __148520_30_dip;
+auto _ZN3edg16an_expr_node_ptrE __148521_30_var_expr; auto _ZN3edg16an_expr_node_ptrE __148521_40_init_expr;
+auto _ZN3edg14a_variable_ptrE __148522_30_var;
+#line 1533
+__148520_30_dip = ((__148157_59_statement->variant).dynamic_init);
 
-__159929_30_var = (_ZN3edg22remap_var_for_inliningEPNS_10a_variableE((__159927_30_dip->variable)));
-(__159929_30_var != ((_ZN3edg14a_variable_ptrE)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1536, __T719044520, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0
-# 1536
+__148522_30_var = (_ZN3edg22remap_var_for_inliningEPNS_10a_variableE((__148520_30_dip->variable)));
+(__148522_30_var != ((_ZN3edg14a_variable_ptrE)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1536, __T841601032, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0
+#line 1536
 )));
-# 1542
-if (_ZN3edg13is_array_typeEPNS_6a_typeE((__159929_30_var->type))) {
+#line 1542
+if (_ZN3edg13is_array_typeEPNS_6a_typeE((__148522_30_var->type))) {
 
-goto __160055_1_cannot_inline_ever;
-} else  { if (((int)(__159927_30_dip->kind)) == 2) {
-if (((int)((((__159927_30_dip->variant).constant).ptr)->kind)) == 11) {
+goto __148648_1_cannot_inline_ever;
+} else  { if (((int)(__148520_30_dip->kind)) == 2) {
+if (((int)((((__148520_30_dip->variant).constant).ptr)->kind)) == 10) {
 
 
-if (((((((__159927_30_dip->variant).constant).ptr)->variant).aggregate).first_constant) != ((_ZN3edg14a_constant_ptrE)0))
+if (((((((__148520_30_dip->variant).constant).ptr)->variant).aggregate).first_constant) != ((_ZN3edg14a_constant_ptrE)0))
 {
-goto __160055_1_cannot_inline_ever;
+goto __148648_1_cannot_inline_ever;
 }
-goto __T719739992;
+goto __T841755696;
 }
 
 
 
-__159928_40_init_expr = (_ZN3edg23alloc_node_for_constantEPNS_10a_constantE((_ZN3edg18copy_constant_fullEPNS_10a_constantES1_i((((__159927_30_dip->variant).constant).ptr), ((_ZN3edg14a_constant_ptrE)0), 0x1))));
+__148521_40_init_expr = (_ZN3edg23alloc_node_for_constantEPNS_10a_constantE((_ZN3edg18copy_constant_fullEPNS_10a_constantES1_i((((__148520_30_dip->variant).constant).ptr), ((_ZN3edg14a_constant_ptrE)0), 0x1))));
 
 
 
-} else  { if (((int)(__159927_30_dip->kind)) == 3) {
-__159928_40_init_expr = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(((__159927_30_dip->variant).expression), __159569_60_failed));
+} else  { if (((int)(__148520_30_dip->kind)) == 3) {
+__148521_40_init_expr = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(((__148520_30_dip->variant).expression), __148162_60_failed));
 
 } else  {
 
 
-goto __160055_1_cannot_inline_ever;
+goto __148648_1_cannot_inline_ever;
 } } }
 
-__159928_30_var_expr = (_ZN3edg15var_lvalue_exprEPNS_10a_variableE(__159929_30_var));
-(__159928_30_var_expr->next) = __159928_40_init_expr;
-__159589_33_expr = (_ZN3edg18make_operator_nodeENS_21an_expr_operator_kindEPNS_6a_typeEPNS_12an_expr_nodeE(_ZN3edg10eok_assignE, (_ZN3edg13skip_typerefsEPNS_6a_typeE((__159929_30_var->type))), __159928_30_var_expr));
+__148521_30_var_expr = (_ZN3edg15var_lvalue_exprEPNS_10a_variableE(__148522_30_var));
+(__148521_30_var_expr->next) = __148521_40_init_expr;
+__148182_33_expr = (_ZN3edg18make_operator_nodeENS_21an_expr_operator_kindEPNS_6a_typeEPNS_12an_expr_nodeE(_ZN3edg10eok_assignE, (_ZN3edg13skip_typerefsEPNS_6a_typeE((__148522_30_var->type))), __148521_30_var_expr));
 
 
-__159590_37_stmt = (_ZN3edg21insert_expr_statementEPNS_12an_expr_nodeEPNS_18an_insert_locationE(__159589_33_expr, __159565_60_insert_location));
-_ZN29_INTERNAL_8_inline_c_502890ee3edg30set_inline_statement_positionsEPNS0_11a_statementES2_(__159590_37_stmt, __159564_59_statement);
-(__159929_30_var->initialization_rewritten_as_assignment) = 1U;
+__148183_37_stmt = (_ZN3edg21insert_expr_statementEPNS_12an_expr_nodeEPNS_18an_insert_locationE(__148182_33_expr, __148158_60_insert_location));
+_ZN29_INTERNAL_8_inline_c_502890ee3edg30set_inline_statement_positionsEPNS0_11a_statementES2_(__148183_37_stmt, __148157_59_statement);
+(__148522_30_var->initialization_rewritten_as_assignment) = 1U;
 }
-goto __T719739992;
+goto __T841755696;
 case 5:
 case 12:
-if (((((int)(__159565_60_insert_location->kind)) == 3) || (((int)(__159565_60_insert_location->kind)) == 4)) || (((int)(__159565_60_insert_location->kind)) == 5)) {
+if (((((int)(__148158_60_insert_location->kind)) == 3) || (((int)(__148158_60_insert_location->kind)) == 4)) || (((int)(__148158_60_insert_location->kind)) == 5)) {
 
-goto __160058_1_cannot_inline;
+goto __148651_1_cannot_inline;
 }
 
-_ZN3edg38set_statement_creation_insert_locationEPNS_18an_insert_locationE((&__159592_22_sub_insert_location));
-_ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPmPbS6_S6_(((__159564_59_statement->variant).loop_statement), (&__159592_22_sub_insert_location), __159566_60_statement_count, __159567_60_is_too_large, __159568_60_inlinable, 
-# 1589
-__159569_60_failed);
+_ZN3edg38set_statement_creation_insert_locationEPNS_18an_insert_locationE((&__148185_22_sub_insert_location));
+_ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPyPbS6_S6_(((__148157_59_statement->variant).loop_statement), (&__148185_22_sub_insert_location), __148159_60_statement_count, __148160_60_is_too_large, __148161_60_inlinable, 
+#line 1589
+__148162_60_failed);
 
 
-if (*__159569_60_failed) { goto __T719739992; }
-__159590_37_stmt = (((__159592_22_sub_insert_location.variant).statement).stmt);
+if (*__148162_60_failed) { goto __T841755696; }
+__148183_37_stmt = (((__148185_22_sub_insert_location.variant).statement).stmt);
 
-__159590_22_new_statement = (_ZN29_INTERNAL_8_inline_c_502890ee3edg22copy_inlined_statementEPNS0_11a_statementEPNS0_18an_insert_locationE(__159564_59_statement, __159565_60_insert_location));
-(__159590_22_new_statement->expr) = __159589_22_stmt_expr;
-((__159590_22_new_statement->variant).loop_statement) = __159590_37_stmt;
-(__159590_37_stmt->parent) = __159590_22_new_statement;
-goto __T719739992;
+__148183_22_new_statement = (_ZN29_INTERNAL_8_inline_c_502890ee3edg22copy_inlined_statementEPNS0_11a_statementEPNS0_18an_insert_locationE(__148157_59_statement, __148158_60_insert_location));
+(__148183_22_new_statement->expr) = __148182_22_stmt_expr;
+((__148183_22_new_statement->variant).loop_statement) = __148183_37_stmt;
+(__148183_37_stmt->parent) = __148183_22_new_statement;
+goto __T841755696;
 case 13:
-{ auto _ZN3edg15a_statement_ptrE __159995_28_init_stmt;
-auto _ZN3edg16an_expr_node_ptrE __159996_28_increment_expr;
-if (((((int)(__159565_60_insert_location->kind)) == 3) || (((int)(__159565_60_insert_location->kind)) == 4)) || (((int)(__159565_60_insert_location->kind)) == 5)) {
+{ auto _ZN3edg15a_statement_ptrE __148588_28_init_stmt;
+auto _ZN3edg16an_expr_node_ptrE __148589_28_increment_expr;
+if (((((int)(__148158_60_insert_location->kind)) == 3) || (((int)(__148158_60_insert_location->kind)) == 4)) || (((int)(__148158_60_insert_location->kind)) == 5)) {
 
-goto __160058_1_cannot_inline;
+goto __148651_1_cannot_inline;
 }
 
-_ZN3edg38set_statement_creation_insert_locationEPNS_18an_insert_locationE((&__159592_22_sub_insert_location));
-_ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPmPbS6_S6_(((((__159564_59_statement->variant).for_loop).extra_info)->initialization), (&__159592_22_sub_insert_location), __159566_60_statement_count, __159567_60_is_too_large, 
-# 1609
-__159568_60_inlinable, __159569_60_failed);
+_ZN3edg38set_statement_creation_insert_locationEPNS_18an_insert_locationE((&__148185_22_sub_insert_location));
+_ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPyPbS6_S6_(((((__148157_59_statement->variant).for_loop).extra_info)->initialization), (&__148185_22_sub_insert_location), __148159_60_statement_count, __148160_60_is_too_large, 
+#line 1609
+__148161_60_inlinable, __148162_60_failed);
 
 
 
-if (*__159569_60_failed) { goto __T719739992; }
-__159995_28_init_stmt = (((__159592_22_sub_insert_location.variant).statement).stmt);
+if (*__148162_60_failed) { goto __T841755696; }
+__148588_28_init_stmt = (((__148185_22_sub_insert_location.variant).statement).stmt);
 
-_ZN3edg38set_statement_creation_insert_locationEPNS_18an_insert_locationE((&__159592_22_sub_insert_location));
-_ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPmPbS6_S6_((((__159564_59_statement->variant).for_loop).statement), (&__159592_22_sub_insert_location), __159566_60_statement_count, __159567_60_is_too_large, __159568_60_inlinable, 
-# 1617
-__159569_60_failed);
+_ZN3edg38set_statement_creation_insert_locationEPNS_18an_insert_locationE((&__148185_22_sub_insert_location));
+_ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPyPbS6_S6_((((__148157_59_statement->variant).for_loop).statement), (&__148185_22_sub_insert_location), __148159_60_statement_count, __148160_60_is_too_large, __148161_60_inlinable, 
+#line 1617
+__148162_60_failed);
 
 
-if (*__159569_60_failed) { goto __T719739992; }
-__159590_37_stmt = (((__159592_22_sub_insert_location.variant).statement).stmt);
+if (*__148162_60_failed) { goto __T841755696; }
+__148183_37_stmt = (((__148185_22_sub_insert_location.variant).statement).stmt);
 
-__159996_28_increment_expr = ((((__159564_59_statement->variant).for_loop).extra_info)->increment);
-if (__159996_28_increment_expr != ((_ZN3edg16an_expr_node_ptrE)0)) {
-__159996_28_increment_expr = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__159996_28_increment_expr, __159569_60_failed));
+__148589_28_increment_expr = ((((__148157_59_statement->variant).for_loop).extra_info)->increment);
+if (__148589_28_increment_expr != ((_ZN3edg16an_expr_node_ptrE)0)) {
+__148589_28_increment_expr = (_ZN3edg27copy_expr_tree_for_inliningEPNS_12an_expr_nodeEPb(__148589_28_increment_expr, __148162_60_failed));
 
-_ZN3edg24set_expr_result_not_usedEPNS_12an_expr_nodeE(__159996_28_increment_expr);
+_ZN3edg24set_expr_result_not_usedEPNS_12an_expr_nodeE(__148589_28_increment_expr);
 }
 
 
 
-__159590_22_new_statement = (_ZN3edg15alloc_statementENS_16a_statement_kindEb(_ZN3edg8stmk_forE, ((_ZN3edg9a_booleanE)1)));
+__148183_22_new_statement = (_ZN3edg15alloc_statementENS_16a_statement_kindEb(_ZN3edg8stmk_forE, ((_ZN3edg9a_booleanE)1)));
 
-_ZN29_INTERNAL_8_inline_c_502890ee3edg30set_inline_statement_positionsEPNS0_11a_statementES2_(__159590_22_new_statement, __159564_59_statement);
-(__159590_22_new_statement->expr) = __159589_22_stmt_expr;
-(((__159590_22_new_statement->variant).for_loop).statement) = __159590_37_stmt;
-(__159590_37_stmt->parent) = __159590_22_new_statement;
-((((__159590_22_new_statement->variant).for_loop).extra_info)->initialization) = __159995_28_init_stmt;
-if (__159995_28_init_stmt != ((_ZN3edg15a_statement_ptrE)0)) { (__159995_28_init_stmt->parent) = __159590_22_new_statement; }
-((((__159590_22_new_statement->variant).for_loop).extra_info)->increment) = __159996_28_increment_expr;
-_ZN3edg21insert_statement_fullEPNS_11a_statementEPNS_18an_insert_locationEb(__159590_22_new_statement, __159565_60_insert_location, ((_ZN3edg9a_booleanE)0));
+_ZN29_INTERNAL_8_inline_c_502890ee3edg30set_inline_statement_positionsEPNS0_11a_statementES2_(__148183_22_new_statement, __148157_59_statement);
+(__148183_22_new_statement->expr) = __148182_22_stmt_expr;
+(((__148183_22_new_statement->variant).for_loop).statement) = __148183_37_stmt;
+(__148183_37_stmt->parent) = __148183_22_new_statement;
+((((__148183_22_new_statement->variant).for_loop).extra_info)->initialization) = __148588_28_init_stmt;
+if (__148588_28_init_stmt != ((_ZN3edg15a_statement_ptrE)0)) { (__148588_28_init_stmt->parent) = __148183_22_new_statement; }
+((((__148183_22_new_statement->variant).for_loop).extra_info)->increment) = __148589_28_increment_expr;
+_ZN3edg21insert_statement_fullEPNS_11a_statementEPNS_18an_insert_locationEb(__148183_22_new_statement, __148158_60_insert_location, ((_ZN3edg9a_booleanE)0));
 
 }
-goto __T719739992;
+goto __T841755696;
 case 23:
 
-goto __T719739992;
+goto __T841755696;
 case 19:
 case 16:
 case 17:
@@ -13138,255 +13071,255 @@ case 25:
 case 31:
 
 default:
-__160055_1_cannot_inline_ever:;
+__148648_1_cannot_inline_ever:;
 
-(*__159568_60_inlinable) = ((_ZN3edg9a_booleanE)0);
-__160058_1_cannot_inline:;
+(*__148161_60_inlinable) = ((_ZN3edg9a_booleanE)0);
+__148651_1_cannot_inline:;
 
-(*__159569_60_failed) = ((_ZN3edg9a_booleanE)1);
-goto __T719739992;
-} __T719739992:;
+(*__148162_60_failed) = ((_ZN3edg9a_booleanE)1);
+goto __T841755696;
+} __T841755696:;
 } } } 
 }
 
 
-static void _ZN29_INTERNAL_8_inline_c_502890ee3edg33issue_inlining_failure_diagnosticEPNS0_9a_routineEb( _ZN3edg13a_routine_ptrE __160067_61_routine, 
-_ZN3edg9a_booleanE __160068_61_is_too_large)
+static void _ZN29_INTERNAL_8_inline_c_502890ee3edg33issue_inlining_failure_diagnosticEPNS0_9a_routineEb( _ZN3edg13a_routine_ptrE __148660_61_routine, 
+_ZN3edg9a_booleanE __148661_61_is_too_large)
 
 
 
 {
-auto _ZN3edg12a_symbol_ptrE __160073_16_sym; __160073_16_sym = ((_ZN3edg12a_symbol_ptrE)((__160067_61_routine->source_corresp).assoc_info));
+auto _ZN3edg12a_symbol_ptrE __148666_16_sym; __148666_16_sym = ((_ZN3edg12a_symbol_ptrE)((__148660_61_routine->source_corresp).assoc_info));
 
-if (__160073_16_sym != ((_ZN3edg12a_symbol_ptrE)0)) {
-if (!(__160067_61_routine->inlinable)) {
+if (__148666_16_sym != ((_ZN3edg12a_symbol_ptrE)0)) {
+if (!(__148660_61_routine->inlinable)) {
 
-_ZN3edg13pos_sy_remarkENS_13an_error_codeEPNS_17a_source_positionEPNS_8a_symbolE(((__160068_61_is_too_large) ? _ZN3edg22ec_too_large_to_inlineE : _ZN3edg16ec_cannot_inlineE), (&(__160073_16_sym->decl_position)), __160073_16_sym);
+_ZN3edg13pos_sy_remarkENS_13an_error_codeEPNS_17a_source_positionEPNS_8a_symbolE(((__148661_61_is_too_large) ? _ZN3edg22ec_too_large_to_inlineE : _ZN3edg16ec_cannot_inlineE), (&(__148666_16_sym->decl_position)), __148666_16_sym);
 
 
 } else  {
 
-_ZN3edg10sym_remarkENS_13an_error_codeEPNS_8a_symbolE(_ZN3edg21ec_cannot_inline_callE, __160073_16_sym);
+_ZN3edg10sym_remarkENS_13an_error_codeEPNS_8a_symbolE(_ZN3edg21ec_cannot_inline_callE, __148666_16_sym);
 }
 } 
 }
 
 
-static _ZN3edg9a_booleanE _ZN29_INTERNAL_8_inline_c_502890ee3edg35routine_type_is_temporarily_alteredEPNS0_9a_routineE( _ZN3edg13a_routine_ptrE __160089_68_routine)
+static _ZN3edg9a_booleanE _ZN29_INTERNAL_8_inline_c_502890ee3edg35routine_type_is_temporarily_alteredEPNS0_9a_routineE( _ZN3edg13a_routine_ptrE __148682_68_routine)
 
 
 
 
 {
-auto _ZN3edg9a_booleanE __160095_28_altered = ((_ZN3edg9a_booleanE)0);
-auto _ZN3edg24an_extern_type_fixup_ptrE __160096_28_etfp;
-auto _ZN3edg13a_scope_depthE __160097_28_scope_depth;
+auto _ZN3edg9a_booleanE __148688_28_altered = ((_ZN3edg9a_booleanE)0);
+auto _ZN3edg24an_extern_type_fixup_ptrE __148689_28_etfp;
+auto _ZN3edg13a_scope_depthE __148690_28_scope_depth;
 
 if (_ZN3edg12in_front_endE) {
-for (__160097_28_scope_depth = _ZN3edg17depth_scope_stackE; __160097_28_scope_depth != (-1); __160097_28_scope_depth--)
+for (__148690_28_scope_depth = _ZN3edg17depth_scope_stackE; __148690_28_scope_depth != (-1); __148690_28_scope_depth--)
 
 {
-for (__160096_28_etfp = ((_ZN3edg11scope_stackE[__160097_28_scope_depth]).extern_type_fixup_list); __160096_28_etfp != ((_ZN3edg24an_extern_type_fixup_ptrE)0); __160096_28_etfp = (__160096_28_etfp->next))
+for (__148689_28_etfp = ((_ZN3edg11scope_stackE[__148690_28_scope_depth]).extern_type_fixup_list); __148689_28_etfp != ((_ZN3edg24an_extern_type_fixup_ptrE)0); __148689_28_etfp = (__148689_28_etfp->next))
 
 {
-if ((__160096_28_etfp->is_routine) && (((__160096_28_etfp->variant).routine) == __160089_68_routine))
+if ((__148689_28_etfp->is_routine) && (((__148689_28_etfp->variant).routine) == __148682_68_routine))
 {
-__160095_28_altered = ((_ZN3edg9a_booleanE)1);
-goto __160114_1_end_of_routine;
+__148688_28_altered = ((_ZN3edg9a_booleanE)1);
+goto __148707_1_end_of_routine;
 }
 }
 }
 }
-__160114_1_end_of_routine:;
-return __160095_28_altered;
+__148707_1_end_of_routine:;
+return __148688_28_altered;
 }
 
 
-void _ZN3edg19do_inlining_of_callEPNS_12an_expr_nodeEPNS_11a_statementEPb( _ZN3edg16an_expr_node_ptrE __160119_43_expr, 
-_ZN3edg15a_statement_ptrE __160120_43_statement, 
-_ZN3edg9a_booleanE *__160121_44_expr_has_been_detached)
-# 1737
+void _ZN3edg19do_inlining_of_callEPNS_12an_expr_nodeEPNS_11a_statementEPb( _ZN3edg16an_expr_node_ptrE __148712_43_expr, 
+_ZN3edg15a_statement_ptrE __148713_43_statement, 
+_ZN3edg9a_booleanE *__148714_44_expr_has_been_detached)
+#line 1737
 {
-auto _ZN3edg16an_expr_node_ptrE __160132_25_arg;
-auto _ZN3edg13a_routine_ptrE __160133_25_routine;
-auto _ZN3edg15a_statement_ptrE __160134_25_block_stmt;
-auto _ZN3edg21a_host_large_unsignedE __160135_25_statement_count = 0UL;
-auto _ZN3edg9a_booleanE __160136_25_is_too_large = ((_ZN3edg9a_booleanE)0);
+auto _ZN3edg16an_expr_node_ptrE __148725_25_arg;
+auto _ZN3edg13a_routine_ptrE __148726_25_routine;
+auto _ZN3edg15a_statement_ptrE __148727_25_block_stmt;
+auto _ZN3edg21a_host_large_unsignedE __148728_25_statement_count = 0ULL;
+auto _ZN3edg9a_booleanE __148729_25_is_too_large = ((_ZN3edg9a_booleanE)0);
 
 ;
 
 
-(((__160119_43_expr->kind) == 1U) && (((int)(((__160119_43_expr->variant).operation).kind)) == 106)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1748, __T719891856, ((
-# 1747
+(((__148712_43_expr->kind) == 1U) && (((int)(((__148712_43_expr->variant).operation).kind)) == 106)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1748, __T841610064, ((
+#line 1747
 _ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
-if (__160121_44_expr_has_been_detached != ((_ZN3edg9a_booleanE *)0)) { (*__160121_44_expr_has_been_detached) = ((_ZN3edg9a_booleanE)0); }
-__160132_25_arg = (((__160119_43_expr->variant).operation).operands);
-__160133_25_routine = (_ZN3edg35routine_and_node_from_function_exprEPNS_12an_expr_nodeEPS1_(__160132_25_arg, ((_ZN3edg16an_expr_node_ptrE *)0)));
-if (__160133_25_routine != ((_ZN3edg13a_routine_ptrE)0)) {
+if (__148714_44_expr_has_been_detached != ((_ZN3edg9a_booleanE *)0)) { (*__148714_44_expr_has_been_detached) = ((_ZN3edg9a_booleanE)0); }
+__148725_25_arg = (((__148712_43_expr->variant).operation).operands);
+__148726_25_routine = (_ZN3edg35routine_and_node_from_function_exprEPNS_12an_expr_nodeEPS1_(__148725_25_arg, ((_ZN3edg16an_expr_node_ptrE *)0)));
+if (__148726_25_routine != ((_ZN3edg13a_routine_ptrE)0)) {
 
-if (!(__160133_25_routine->is_inline)) {
-
-
-(__160133_25_routine->need_out_of_line_copy) = 1U;
-} else  { if ((((int)_ZN3edg9C_dialectE) != 2) && (_ZN29_INTERNAL_8_inline_c_502890ee3edg35routine_type_is_temporarily_alteredEPNS0_9a_routineE(__160133_25_routine))) {
+if (!(__148726_25_routine->is_inline)) {
 
 
+(__148726_25_routine->need_out_of_line_copy) = 1U;
+} else  { if ((((int)_ZN3edg9C_dialectE) != 2) && (_ZN29_INTERNAL_8_inline_c_502890ee3edg35routine_type_is_temporarily_alteredEPNS0_9a_routineE(__148726_25_routine))) {
 
 
-(__160133_25_routine->need_out_of_line_copy) = 1U;
+
+
+(__148726_25_routine->need_out_of_line_copy) = 1U;
 } else  {
-if (!(__160133_25_routine->inlinable)) {
+if (!(__148726_25_routine->inlinable)) {
 
 
 
 
-(__160133_25_routine->need_out_of_line_copy) = 1U;
+(__148726_25_routine->need_out_of_line_copy) = 1U;
 } else  {
-auto _ZN3edg9a_booleanE __160166_28_failed = ((_ZN3edg9a_booleanE)0); auto _ZN3edg9a_booleanE __160166_44_inlinable = ((_ZN3edg9a_booleanE)1);
-auto _ZN3edg18an_insert_locationE __160167_28_insert_location;
-auto _ZN3edg11a_scope_ptrE __160168_28_scope;
+auto _ZN3edg9a_booleanE __148759_28_failed = ((_ZN3edg9a_booleanE)0); auto _ZN3edg9a_booleanE __148759_44_inlinable = ((_ZN3edg9a_booleanE)1);
+auto _ZN3edg18an_insert_locationE __148760_28_insert_location;
+auto _ZN3edg11a_scope_ptrE __148761_28_scope;
 
 
-(__160133_25_routine->inlinable) = 0U;
-# 1785
-__160168_28_scope = (_ZN3edg17scope_for_routineEPNS_9a_routineE(__160133_25_routine));
-_ZN29_INTERNAL_8_inline_c_502890ee3edg27routine_scope_being_inlinedE = __160168_28_scope;
-# 1793
-if (__160120_43_statement != ((_ZN3edg15a_statement_ptrE)0)) {
+(__148726_25_routine->inlinable) = 0U;
+#line 1785
+__148761_28_scope = (_ZN3edg17scope_for_routineEPNS_9a_routineE(__148726_25_routine));
+_ZN29_INTERNAL_8_inline_c_502890ee3edg27routine_scope_being_inlinedE = __148761_28_scope;
+#line 1793
+if (__148713_43_statement != ((_ZN3edg15a_statement_ptrE)0)) {
 
 
 
-__160134_25_block_stmt = (_ZN3edg15alloc_statementENS_16a_statement_kindEb(_ZN3edg10stmk_blockE, ((_ZN3edg9a_booleanE)1)));
-_ZN3edg31set_block_start_insert_locationEPNS_11a_statementEPNS_18an_insert_locationE(__160134_25_block_stmt, (&__160167_28_insert_location));
+__148727_25_block_stmt = (_ZN3edg15alloc_statementENS_16a_statement_kindEb(_ZN3edg10stmk_blockE, ((_ZN3edg9a_booleanE)1)));
+_ZN3edg31set_block_start_insert_locationEPNS_11a_statementEPNS_18an_insert_locationE(__148727_25_block_stmt, (&__148760_28_insert_location));
 } else  {
-__160134_25_block_stmt = ((_ZN3edg15a_statement_ptrE)0);
-_ZN3edg33set_expr_creation_insert_locationEPNS_18an_insert_locationE((&__160167_28_insert_location));
+__148727_25_block_stmt = ((_ZN3edg15a_statement_ptrE)0);
+_ZN3edg33set_expr_creation_insert_locationEPNS_18an_insert_locationE((&__148760_28_insert_location));
 }
 if (!(_ZN29_INTERNAL_8_inline_c_502890ee3edg32variable_remappings_for_inliningE == ((_ZN3edg37a_variable_remapping_for_inlining_ptrE)0))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1804, 
-# 1803
-__T719891856, ((const char *)"do_inlining_of_call: remappings list is non-NULL"), ((_ZN3edg12a_const_charE *)0)); }
+#line 1803
+__T841610064, ((const char *)"do_inlining_of_call: remappings list is non-NULL"), ((_ZN3edg12a_const_charE *)0)); }
 
 
-__160132_25_arg = (__160132_25_arg->next);
-_ZN29_INTERNAL_8_inline_c_502890ee3edg38set_up_variable_remapping_for_inliningEPNS0_7a_scopeEbPNS0_12an_expr_nodeE(__160168_28_scope, ((_ZN3edg9a_booleanE)(((int)(((__160119_43_expr->variant).operation).eval_right_to_left)) != 0)), __160132_25_arg);
-# 1813
-_ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPmPbS6_S6_((__160168_28_scope->assoc_block), (&__160167_28_insert_location), (&__160135_25_statement_count), (&__160136_25_is_too_large), (&__160166_44_inlinable), (&__160166_28_failed));
+__148725_25_arg = (__148725_25_arg->next);
+_ZN29_INTERNAL_8_inline_c_502890ee3edg38set_up_variable_remapping_for_inliningEPNS0_7a_scopeEbPNS0_12an_expr_nodeE(__148761_28_scope, ((_ZN3edg9a_booleanE)(((int)(((__148712_43_expr->variant).operation).eval_right_to_left)) != 0)), __148725_25_arg);
+#line 1813
+_ZN29_INTERNAL_8_inline_c_502890ee3edg23expand_statement_inlineEPNS0_11a_statementEPNS0_18an_insert_locationEPyPbS6_S6_((__148761_28_scope->assoc_block), (&__148760_28_insert_location), (&__148728_25_statement_count), (&__148729_25_is_too_large), (&__148759_44_inlinable), (&__148759_28_failed));
 
 
-if (__160166_28_failed) {
+if (__148759_28_failed) {
 
 
 
-(__160133_25_routine->need_out_of_line_copy) = 1U;
+(__148726_25_routine->need_out_of_line_copy) = 1U;
 } else  {
 
 
 
-_ZN29_INTERNAL_8_inline_c_502890ee3edg38finish_variable_remapping_for_inliningEPNS0_11a_statementEPNS0_18an_insert_locationE(__160134_25_block_stmt, (&__160167_28_insert_location));
-if (__160120_43_statement != ((_ZN3edg15a_statement_ptrE)0)) {
+_ZN29_INTERNAL_8_inline_c_502890ee3edg38finish_variable_remapping_for_inliningEPNS0_11a_statementEPNS0_18an_insert_locationE(__148727_25_block_stmt, (&__148760_28_insert_location));
+if (__148713_43_statement != ((_ZN3edg15a_statement_ptrE)0)) {
 
 
-auto _ZN3edg15a_statement_ptrE __160223_29_inner_stmt;
+auto _ZN3edg15a_statement_ptrE __148816_29_inner_stmt;
 for (; ; ) {
-__160223_29_inner_stmt = (((__160134_25_block_stmt->variant).block).statements);
-if ((((__160223_29_inner_stmt != ((_ZN3edg15a_statement_ptrE)0)) && (((int)(__160223_29_inner_stmt->kind)) == 11)) && ((__160223_29_inner_stmt->next) == ((_ZN3edg15a_statement_ptrE)0))) && (((((__160134_25_block_stmt->variant).block).extra_info)->assoc_scope) == ((_ZN3edg11a_scope_ptrE)0)))
+__148816_29_inner_stmt = (((__148727_25_block_stmt->variant).block).statements);
+if ((((__148816_29_inner_stmt != ((_ZN3edg15a_statement_ptrE)0)) && (((int)(__148816_29_inner_stmt->kind)) == 11)) && ((__148816_29_inner_stmt->next) == ((_ZN3edg15a_statement_ptrE)0))) && (((((__148727_25_block_stmt->variant).block).extra_info)->assoc_scope) == ((_ZN3edg11a_scope_ptrE)0)))
 
 
 {
-__160134_25_block_stmt = __160223_29_inner_stmt;
+__148727_25_block_stmt = __148816_29_inner_stmt;
 } else  {
-goto __T720090088;
+goto __T842047488;
 }
-} __T720090088:;
+} __T842047488:;
 
 
 
-{ auto _ZN3edg17a_source_positionE __160238_34_saved_position;
-auto _ZN3edg15a_statement_ptrE __160239_34_saved_parent;
+{ auto _ZN3edg17a_source_positionE __148831_34_saved_position;
+auto _ZN3edg15a_statement_ptrE __148832_34_saved_parent;
 
-auto _ZN3edg17a_source_positionE __160241_34_saved_end_position;
-# 1845
-__160239_34_saved_parent = (__160120_43_statement->parent);
+auto _ZN3edg17a_source_positionE __148834_34_saved_end_position;
+#line 1845
+__148832_34_saved_parent = (__148713_43_statement->parent);
 
 
-__160241_34_saved_end_position = (__160120_43_statement->end_position);
+__148834_34_saved_end_position = (__148713_43_statement->end_position);
 
-__160238_34_saved_position = (__160120_43_statement->position);
-_ZN3edg14copy_statementEPNS_11a_statementES1_(__160134_25_block_stmt, __160120_43_statement);
-(__160120_43_statement->parent) = __160239_34_saved_parent;
-(__160120_43_statement->position) = __160238_34_saved_position;
+__148831_34_saved_position = (__148713_43_statement->position);
+_ZN3edg14copy_statementEPNS_11a_statementES1_(__148727_25_block_stmt, __148713_43_statement);
+(__148713_43_statement->parent) = __148832_34_saved_parent;
+(__148713_43_statement->position) = __148831_34_saved_position;
 
-(__160120_43_statement->end_position) = __160241_34_saved_end_position;
+(__148713_43_statement->end_position) = __148834_34_saved_end_position;
 
-((((__160120_43_statement->variant).block).extra_info)->final_position) = __160238_34_saved_position;
+((((__148713_43_statement->variant).block).extra_info)->final_position) = __148831_34_saved_position;
 
 }
 
 
-(__160121_44_expr_has_been_detached != ((_ZN3edg9a_booleanE *)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1862, __T719891856, ((_ZN3edg12a_const_charE *)0), ((
-# 1862
+(__148714_44_expr_has_been_detached != ((_ZN3edg9a_booleanE *)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1862, __T841610064, ((_ZN3edg12a_const_charE *)0), ((
+#line 1862
 _ZN3edg12a_const_charE *)0)));
-(*__160121_44_expr_has_been_detached) = ((_ZN3edg9a_booleanE)1);
+(*__148714_44_expr_has_been_detached) = ((_ZN3edg9a_booleanE)1);
 } else  {
-auto _ZN3edg16an_expr_node_ptrE __160259_30_inlined_call_expr; __160259_30_inlined_call_expr = ((__160167_28_insert_location.variant).expr);
-(__160259_30_inlined_call_expr != ((_ZN3edg16an_expr_node_ptrE)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1866, __T719891856, ((_ZN3edg12a_const_charE *)0), ((
-# 1866
+auto _ZN3edg16an_expr_node_ptrE __148852_30_inlined_call_expr; __148852_30_inlined_call_expr = ((__148760_28_insert_location.variant).expr);
+(__148852_30_inlined_call_expr != ((_ZN3edg16an_expr_node_ptrE)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1866, __T841610064, ((_ZN3edg12a_const_charE *)0), ((
+#line 1866
 _ZN3edg12a_const_charE *)0)));
 
-if (_ZN3edg12is_void_typeEPNS_6a_typeE((__160119_43_expr->type))) {
+if (_ZN3edg12is_void_typeEPNS_6a_typeE((__148712_43_expr->type))) {
 
 
 
-__160259_30_inlined_call_expr = (_ZN3edg21add_cast_if_necessaryEPNS_12an_expr_nodeEPNS_6a_typeE(__160259_30_inlined_call_expr, (__160119_43_expr->type)));
+__148852_30_inlined_call_expr = (_ZN3edg21add_cast_if_necessaryEPNS_12an_expr_nodeEPNS_6a_typeE(__148852_30_inlined_call_expr, (__148712_43_expr->type)));
 
 } else  {
 
 
 
 
-if (!(((__160119_43_expr->type) == (__160259_30_inlined_call_expr->type)) || (_ZN3edg17f_identical_typesEPNS_6a_typeES1_j((__160119_43_expr->type), (__160259_30_inlined_call_expr->type), 0x1U)))) {
-auto _ZN3edg14a_constant_ptrE __160274_34_zero_constant;
-auto _ZN3edg10a_type_ptrE __160275_34_needed_type;
-auto _ZN3edg16an_expr_node_ptrE __160276_34_zero_node;
-auto _ZN3edg9a_booleanE __160277_34_class_case;
-# 1880
-__160274_34_zero_constant = (_ZN3edg14local_constantEv());
-__160275_34_needed_type = (__160119_43_expr->type);
+if (!(((__148712_43_expr->type) == (__148852_30_inlined_call_expr->type)) || (_ZN3edg17f_identical_typesEPNS_6a_typeES1_j((__148712_43_expr->type), (__148852_30_inlined_call_expr->type), 0x1U)))) {
+auto _ZN3edg14a_constant_ptrE __148867_34_zero_constant;
+auto _ZN3edg10a_type_ptrE __148868_34_needed_type;
+auto _ZN3edg16an_expr_node_ptrE __148869_34_zero_node;
+auto _ZN3edg9a_booleanE __148870_34_class_case;
+#line 1880
+__148867_34_zero_constant = (_ZN3edg14local_constantEv());
+__148868_34_needed_type = (__148712_43_expr->type);
 
-__160277_34_class_case = (_ZN3edg26is_class_struct_union_typeEPNS_6a_typeE(__160275_34_needed_type));
+__148870_34_class_case = (_ZN3edg26is_class_struct_union_typeEPNS_6a_typeE(__148868_34_needed_type));
 
-if (!(!(((((__160168_28_scope->assoc_block)->variant).block).extra_info)->end_of_block_reachable))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1887, __T719891856, ((const char *)"do_inlining_of_call: incorrect result type"
-# 1885
+if (!(!(((((__148761_28_scope->assoc_block)->variant).block).extra_info)->end_of_block_reachable))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1887, __T841610064, ((const char *)"do_inlining_of_call: incorrect result type"
+#line 1885
 ), ((_ZN3edg12a_const_charE *)0)); }
 
 
-if (__160277_34_class_case) {
+if (__148870_34_class_case) {
 
 
-__160275_34_needed_type = (_ZN3edg22make_pointer_type_fullEPNS_6a_typeEh(__160275_34_needed_type, ((_ZN3edg22a_pointer_modifier_setE)0U)));
+__148868_34_needed_type = (_ZN3edg22make_pointer_type_fullEPNS_6a_typeEh(__148868_34_needed_type, ((_ZN3edg22a_pointer_modifier_setE)0U)));
 }
-_ZN3edg24make_zero_of_proper_typeEPNS_6a_typeEPNS_10a_constantE(__160275_34_needed_type, __160274_34_zero_constant);
-__160276_34_zero_node = (_ZN3edg23alloc_node_for_constantEPNS_10a_constantE(__160274_34_zero_constant));
-if (__160277_34_class_case) { __160276_34_zero_node = (_ZN3edg23add_indirection_to_nodeEPNS_12an_expr_nodeE(__160276_34_zero_node)); }
-_ZN3edg11insert_exprEPNS_12an_expr_nodeEPNS_18an_insert_locationE(__160276_34_zero_node, (&__160167_28_insert_location));
-__160259_30_inlined_call_expr = ((__160167_28_insert_location.variant).expr);
-_ZN3edg22release_local_constantEPPNS_10a_constantE((&__160274_34_zero_constant));
+_ZN3edg24make_zero_of_proper_typeEPNS_6a_typeEPNS_10a_constantE(__148868_34_needed_type, __148867_34_zero_constant);
+__148869_34_zero_node = (_ZN3edg23alloc_node_for_constantEPNS_10a_constantE(__148867_34_zero_constant));
+if (__148870_34_class_case) { __148869_34_zero_node = (_ZN3edg23add_indirection_to_nodeEPNS_12an_expr_nodeE(__148869_34_zero_node)); }
+_ZN3edg11insert_exprEPNS_12an_expr_nodeEPNS_18an_insert_locationE(__148869_34_zero_node, (&__148760_28_insert_location));
+__148852_30_inlined_call_expr = ((__148760_28_insert_location.variant).expr);
+_ZN3edg22release_local_constantEPPNS_10a_constantE((&__148867_34_zero_constant));
 }
 }
 
 
-_ZN3edg14overwrite_nodeEPNS_12an_expr_nodeES1_(__160119_43_expr, __160259_30_inlined_call_expr);
+_ZN3edg14overwrite_nodeEPNS_12an_expr_nodeES1_(__148712_43_expr, __148852_30_inlined_call_expr);
 }
 }
 
 _ZN29_INTERNAL_8_inline_c_502890ee3edg37free_variable_remappings_for_inliningEv();
 
 
-(__160133_25_routine->inlinable) = ((_ZN3edg11a_bit_fieldE)__160166_44_inlinable);
-if (__160166_28_failed) { _ZN29_INTERNAL_8_inline_c_502890ee3edg33issue_inlining_failure_diagnosticEPNS0_9a_routineEb(__160133_25_routine, __160136_25_is_too_large); }
+(__148726_25_routine->inlinable) = ((_ZN3edg11a_bit_fieldE)__148759_44_inlinable);
+if (__148759_28_failed) { _ZN29_INTERNAL_8_inline_c_502890ee3edg33issue_inlining_failure_diagnosticEPNS0_9a_routineEb(__148726_25_routine, __148729_25_is_too_large); }
 _ZN29_INTERNAL_8_inline_c_502890ee3edg27routine_scope_being_inlinedE = ((_ZN3edg11a_scope_ptrE)0);
-# 1920
+#line 1920
 }
 } }
 }
@@ -13394,77 +13327,77 @@ _ZN29_INTERNAL_8_inline_c_502890ee3edg27routine_scope_being_inlinedE = ((_ZN3edg
 }
 
 
-void _ZN3edg27set_up_routine_for_inliningEPNS_7a_scopeE( _ZN3edg11a_scope_ptrE __160321_46_scope)
-# 1933
+void _ZN3edg27set_up_routine_for_inliningEPNS_7a_scopeE( _ZN3edg11a_scope_ptrE __148914_46_scope)
+#line 1933
 {
-auto _ZN3edg13a_routine_ptrE __160328_17_routine;
-auto _ZN3edg10a_type_ptrE __160329_17_routine_type;
+auto _ZN3edg13a_routine_ptrE __148921_17_routine;
+auto _ZN3edg10a_type_ptrE __148922_17_routine_type;
 
-auto _ZN3edg29a_routine_type_supplement_ptrE __160331_17_rtsp;
-# 1934
-__160328_17_routine = (((__160321_46_scope->variant).routine).ptr);
-__160329_17_routine_type = (_ZN3edg13skip_typerefsEPNS_6a_typeE((__160328_17_routine->type)));
+auto _ZN3edg29a_routine_type_supplement_ptrE __148924_17_rtsp;
+#line 1934
+__148921_17_routine = (((__148914_46_scope->variant).routine).ptr);
+__148922_17_routine_type = (_ZN3edg13skip_typerefsEPNS_6a_typeE((__148921_17_routine->type)));
 
-__160331_17_rtsp = (((__160329_17_routine_type->variant).routine).extra_info);
-# 1944
-(__160328_17_routine->is_inline) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1944, __T719898080, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+__148924_17_rtsp = (((__148922_17_routine_type->variant).routine).extra_info);
+#line 1944
+(__148921_17_routine->is_inline) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/inline.c"), 1944, __T841616288, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
-if ((__160321_46_scope->variables) != ((_ZN3edg14a_variable_ptrE)0)) {
+if ((__148914_46_scope->variables) != ((_ZN3edg14a_variable_ptrE)0)) {
 
-} else  { if ((__160321_46_scope->constants) != ((_ZN3edg14a_constant_ptrE)0)) {
+} else  { if ((__148914_46_scope->constants) != ((_ZN3edg14a_constant_ptrE)0)) {
 
-} else  { if ((__160321_46_scope->types) != ((_ZN3edg10a_type_ptrE)0)) {
+} else  { if ((__148914_46_scope->types) != ((_ZN3edg10a_type_ptrE)0)) {
 
-} else  { if ((__160321_46_scope->scopes) != ((_ZN3edg11a_scope_ptrE)0)) {
+} else  { if ((__148914_46_scope->scopes) != ((_ZN3edg11a_scope_ptrE)0)) {
 
-} else  { if ((__160321_46_scope->pragmas) != ((_ZN3edg12a_pragma_ptrE)0)) {
+} else  { if ((__148914_46_scope->pragmas) != ((_ZN3edg12a_pragma_ptrE)0)) {
 
-} else  { if (__160331_17_rtsp->has_ellipsis) {
-
-
-} else  { if (((int)(__160328_17_routine->storage_class)) == 6) {
-# 1968
-} else  { if (__160328_17_routine->contains_statement_expression) {
-# 1974
-} else  { if (__160328_17_routine->never_inline) {
+} else  { if (__148924_17_rtsp->has_ellipsis) {
 
 
-} else  { if ((!(__160331_17_rtsp->prototyped)) && ((__160331_17_rtsp->param_type_list) != ((_ZN3edg16a_param_type_ptrE)0))) {
-# 1989
+} else  { if (((int)(__148921_17_routine->storage_class)) == 6) {
+#line 1968
+} else  { if (__148921_17_routine->contains_statement_expression) {
+#line 1974
+} else  { if (__148921_17_routine->never_inline) {
+
+
+} else  { if ((!(__148924_17_rtsp->prototyped)) && ((__148924_17_rtsp->param_type_list) != ((_ZN3edg16a_param_type_ptrE)0))) {
+#line 1989
 } else  {
 
-(__160328_17_routine->inlinable) = 1U;
+(__148921_17_routine->inlinable) = 1U;
 } } } } } } } } } }
-if (!(__160328_17_routine->inlinable)) {
-_ZN29_INTERNAL_8_inline_c_502890ee3edg33issue_inlining_failure_diagnosticEPNS0_9a_routineEb(__160328_17_routine, ((_ZN3edg9a_booleanE)0));
+if (!(__148921_17_routine->inlinable)) {
+_ZN29_INTERNAL_8_inline_c_502890ee3edg33issue_inlining_failure_diagnosticEPNS0_9a_routineEb(__148921_17_routine, ((_ZN3edg9a_booleanE)0));
 } 
 }
 
 
 void _ZN3edg37mark_inlined_routines_as_unreferencedEv(void)
-# 2005
+#line 2005
 {
-auto _ZN3edg13a_routine_ptrE __160400_17_routine;
+auto _ZN3edg13a_routine_ptrE __148993_17_routine;
 
-for (__160400_17_routine = ((_ZN3edg9il_headerE.primary_scope)->routines); __160400_17_routine != ((_ZN3edg13a_routine_ptrE)0); __160400_17_routine = (__160400_17_routine->next))
-
-{
-if ((__160400_17_routine->is_inline) && (__160400_17_routine->inlinable)) {
-
-if (__160400_17_routine->address_taken) { (__160400_17_routine->need_out_of_line_copy) = 1U; }
-if (((((int)(__160400_17_routine->storage_class)) == 0) && (((_ZN3edg25instantiate_extern_inlineE) || ((((int)_ZN3edg9C_dialectE) != 2) && (_ZN3edg11std_versionE >= 199901U))) || (_ZN3edg8gcc_modeE))) && (!(__160400_17_routine->suppress_inline_body)))
+for (__148993_17_routine = ((_ZN3edg9il_headerE.primary_scope)->routines); __148993_17_routine != ((_ZN3edg13a_routine_ptrE)0); __148993_17_routine = (__148993_17_routine->next))
 
 {
+if ((__148993_17_routine->is_inline) && (__148993_17_routine->inlinable)) {
+
+if (__148993_17_routine->address_taken) { (__148993_17_routine->need_out_of_line_copy) = 1U; }
+if (((((int)(__148993_17_routine->storage_class)) == 0) && (((_ZN3edg25instantiate_extern_inlineE) || ((((int)_ZN3edg9C_dialectE) != 2) && (_ZN3edg11std_versionE >= 199901U))) || (_ZN3edg8gcc_modeE))) && (!(__148993_17_routine->suppress_inline_body)))
+
+{
 
 
 
 
-(__160400_17_routine->need_out_of_line_copy) = 1U;
+(__148993_17_routine->need_out_of_line_copy) = 1U;
 }
-if (!(__160400_17_routine->need_out_of_line_copy)) {
+if (!(__148993_17_routine->need_out_of_line_copy)) {
 
 
-((__160400_17_routine->source_corresp).referenced) = 0U;
+((__148993_17_routine->source_corresp).referenced) = 0U;
 }
 }
 } 
@@ -13472,12 +13405,12 @@ if (!(__160400_17_routine->need_out_of_line_copy)) {
 
 
 void _ZN3edg20inline_one_time_initEv(void)
-# 2039
+#line 2039
 {
 
 
 if (_ZN3edg38precompiled_header_processing_requiredE) {
-# 2050
+#line 2050
 _ZN3edg28register_pch_saved_variablesEPNS_20a_pch_saved_variableE(_ZZN3edg20inline_one_time_initEvE10saved_vars);
 } 
 }
