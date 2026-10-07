@@ -37,22 +37,36 @@
 
 #define __REDIR(x,y) __typeof__(x) x __asm__(#y)
 
-/* Plan9 kencc has no weak symbol support; weak_alias is a no-op here.
- * Explicit strong forwarders are provided in network/res_aliases.c.
+/*
+ * `hidden' AND `weak_alias' USED TO BE DEFINED HERE AND ARE NOT ANY
+ * MORE. They are musl's INTERNAL markers, and this is a PUBLIC header
+ * -- reached from <byteswap.h>, <endian.h>, <ftw.h>, <glob.h>,
+ * <iconv.h> and more -- so every program that included any of those
+ * got them whether it wanted them or not.
  *
- * The parameter names are glibc's, and gnulib's libc-config.h:204 uses
- * the same ones. That matters: libc-config.h defines weak_alias with no
- * guard of its own, so whenever a header pulls this one in first, cpp
- * sees a second definition -- and comparetokens() in cpp/macro.c
- * compares the parameter lists as well as the bodies, so "(old, new)"
- * would be a redefinition error where "(name, aliasname)" is the
- * identical definition C allows. */
-#ifndef weak_alias
-#define weak_alias(name, aliasname) /* no weak alias on Plan9 */
-#endif
-
-#ifndef hidden
-#define hidden
-#endif
+ * `hidden' HAD A VICTIM, which is why this moved. It expanded to
+ * nothing, and `sqlite3.h:10957' declares
+ *
+ *	unsigned char hidden[48];
+ *
+ * so wherever this header came first that member was ERASED: a silent
+ * struct-layout change in a public API, with no diagnostic anywhere.
+ * `apehdr-sweep.py's together-case is what reported it.
+ *
+ * `weak_alias' had no victim found, and went for a different reason
+ * recorded in its own former comment: it had no guard in gnulib's
+ * `libc-config.h', so the two definitions had to agree token for
+ * token -- cpp/macro.c's comparetokens() compares PARAMETER NAMES as
+ * well as bodies -- and this file's parameter names were chosen to
+ * match an external package's. *A public macro that is only safe
+ * because it was spelled like someone else's is safe by coincidence.*
+ *
+ * Every private user now carries `#ifndef <name> / #define' itself,
+ * which is what `include/libm.h' and `multibyte/internal.c' already
+ * did: sixteen files for `hidden', five under `network/' for
+ * `weak_alias'. Nothing outside libap needed either -- every external
+ * package that uses `weak_alias' ships its own `libc-config.h', and
+ * bash's `lib/intl' (the one exception) is not compiled.
+ */
 
 #endif

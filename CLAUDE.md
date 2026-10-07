@@ -1157,11 +1157,17 @@ one-off piece of state. Five were a standalone `goto nxt`/`continue`;
 two-line `||`. **gcc compiles the file before and after -- which is a
 SYNTAX check and not a control**, since both sides pass, and saying
 so is the point: the only thing that can confirm this is the VM.
-*Expect `mk install` in `cmd/c++lib` to print exactly what it prints
-now* -- `cfront 5747`, the four `iostream.h` redeclarations and
-`two definitions of norm()`. Anything else means a guard was
-load-bearing after all, which would be a finding rather than a
-regression.
+**CONFIRMED: byte-identical.** `cpp 26553  ns_strip 26553
+cfront 5747`, the four `iostream.h` redeclarations, `two definitions
+of norm()`, exit 5 -- the prediction was written down before the run
+and every number in it matched. So none of the seven was
+load-bearing, and the garbage pointer they existed for is gone
+rather than hidden.
+**cfront IS CLOSED AS A QUESTION FOR THIS TREE.** What remains is a
+1980s front end that cannot tell two overloads apart on a 64-bit
+target, reproduced character for character by the host's own gcc
+build -- upstream's, not APExp's. The directory stays, off, for the
+three reasons above.
 **The diagnostics that remain need no VM and are already recorded**:
 the four `iostream.h` redeclarations and `two definitions of norm()`
 are character for character what the host ASAN build produced, and
@@ -1489,6 +1495,118 @@ unread for rounds. Only TWO of the six are bugs in this tree:
 *The sweep PRINTS the triage now rather than the raw lines, and still
 does not gate -- three of the six are intent.*
 
+**THE TRIAGE IS WORKED NOW: 12 ERRORS -> 8, AND THE EIGHT THAT REMAIN
+ARE THE TWO INTENT CASES.** Each drop was measured by re-running the
+sweep rather than argued, and each named its own error.
+- **`f2c.h`: RECOMMENDATION WITHDRAWN, and the withdrawal is the
+  finding.** The installed copy is byte-identical to the build's own
+  `external/f2c/lib/f2c.h` **except for two added lines** --
+  `#pragma lib "/$M/lib/ape/libf2c.a"` and a blank. *That is the whole
+  reason it exists*: a user compiling `f2c`'s output gets libf2c
+  linked, which is the APE convention working as designed. The 149
+  includers sit beside their own copy and never see this one, so
+  *where the includers live was the wrong question* -- diffing the
+  INSTALLED copy against the one next door settles it in one command.
+  Its five errors join `regex.h`/`pcre2posix.h` as design intent.
+- **`Plan9libnet.h`: DELETED, for a better reason than the one
+  recorded.** Nothing includes it, and **it shares the include guard
+  `__LIBNET_H` with `libnet.h`**, so the two could never be combined
+  anyway. What decides it is that two of its three distinctive
+  declarations name functions that DO NOT EXIST: there is no Plan 9
+  `accept(int, char*)` or `listen(char*, char*)` in libap, only
+  POSIX's.
+- **AND `libnet.h` -- the one `<sys/socket.h>` ITSELF INCLUDES -- was
+  wrong in both directions.** `net_accept`, `net_listen` and
+  `net_reject` were declared here and **defined nowhere and called
+  nowhere** (grep: zero hits outside the header), so every program
+  including `<sys/socket.h>` carried three promises libap cannot keep
+  -- failing at the LINK rather than at the call, which is the later
+  and worse of the two places. Removed. **`reject` is the same defect
+  pointing the other way**: `plan9/announce.c:139` DEFINES
+  `reject(int, char*, char*)` and no header declared it, so libap held
+  a function nothing could call with its arguments checked. Declared
+  now. *The note said `libnet.h` was "the same interface that all five
+  callers use" -- they include it and call `announce`/`dial`/`hangup`/
+  `netmkaddr`, never the three `net_` names.*
+- **`getopt`: TWO INSTALLED HEADERS DECLARED IT INCOMPATIBLY, and my
+  note said there was only one.** `bsd.h:47` had
+  `(int, char**, char*)` while **`getopt.h:8` has had POSIX's
+  `(int, char * const [], const char *)` all along**. `bsd.h` and the
+  definition in `misc/getopt.c` now match `getopt.h`. Callers are
+  unaffected: `char **` converts to `char * const *` because the const
+  is at the FIRST level of the pointed-to type (C11 6.5.16.1), which
+  is why every program everywhere passes `main`'s `argv` to glibc's
+  identically-declared getopt.
+- **`features.h`: `hidden` AND `weak_alias` ARE OUT OF THE PUBLIC
+  HEADER.** `hidden` had the measured victim -- it expands to nothing
+  and `sqlite3.h:10957` declares `unsigned char hidden[48];`, erased
+  wherever features.h came first. `weak_alias` had no victim and went
+  for a different reason, recorded in its own former comment: gnulib's
+  `libc-config.h` defines it with no guard, so the two had to agree
+  token for token -- `cpp/macro.c`'s `comparetokens()` compares
+  PARAMETER NAMES as well as bodies -- and this file's parameter names
+  were chosen to match an external package's. *A public macro that is
+  only safe because it was spelled like someone else's is safe by
+  coincidence.*
+  **Sixteen private files gain the `#ifndef hidden` guard and five
+  under `network/` the `weak_alias` one**, which is the idiom
+  `include/libm.h` and `multibyte/internal.c` ALREADY used -- copy the
+  library's own idiom rather than invent a placement. **Nothing
+  outside libap needed either**: every external package using
+  `weak_alias` ships its own `libc-config.h`, and bash's `lib/intl`
+  (the one exception) is not compiled -- `ENABLE_NLS` is undef and the
+  `-I` was removed earlier this session.
+**The controls**: `apehdr-sweep` 149 -> 148 headers with **0
+standalone findings** throughout, together-case **12 -> 10 -> 9 -> 8**
+across the three fixes; `apdecl-sweep` 0. And the twelve touched libap
+sources give **3 host errors before and the same 3 after** -- a
+pre-existing `FILE *const stdin` qualifier mismatch, unrelated. *The
+before-and-after pair is what makes that a control rather than a
+syntax check.*
+**`sys/include/ape/stdio_impl.h` is the SAME SHAPE and is NOT
+touched**: musl's internal stdio header, installed public, reached by
+six `stdio/*.c`. No victim has been found for it, so it is recorded
+rather than moved.
+
+**AND THE SHARED TRANSPILER RULES CARRIED THE `> $target` BUG THAT
+`cmd/c++lib` HAD ALREADY PAID FOR.** `sys/src/cmd/transpilers` is
+included by `mkone`/`mkmany`/`mklib` for **every** APE package, and
+three of its six rules were wrong.
+**NOTHING IN THE TREE TRIGGERS IT, which is why.** There is no `.m`,
+`.cpp`, `.p` or `.f` outside `external/`, and everything inside is
+built by its own package mkfile -- so these were **traps for the next
+person** rather than live bugs. *An untriggered rule gets no
+diagnostic from anyone*, and the first `.m` added to a package would
+have inherited all three faults at once.
+- **The C++ rules were `cfront $stem.cpp > $stem.c`, both halves of
+  the c++lib bug.** The redirection creates the target whatever the
+  command does; and **cfront is one stage of three** -- handed a
+  `.cpp` directly it sees unpreprocessed source. `rc/bin/ape/c++` is
+  the driver, takes `.cpp/.cxx/.cc/.C` alike, and `-F` is its
+  translate-only mode. `c++ -F -o $target` now.
+- **`%.c: %.m` was wrong TWICE, and the driver script says so rather
+  than any guess.** `rc/bin/ape/objc` defaults to `link=y` and
+  `output="a.out"`, so plain `objc foo.m` compiles **and links**; and
+  the `foo.c` it writes on the way is the `.m` with a `#line` on the
+  front, listed in its own `junk` and **deleted** -- the translated C
+  is `foo.i`. *The rule named a target the command removes.*
+  Objective C has no honest `%.c:` rule; it stops at the object.
+- **`%.c: %.p` could not run at all.** p2c has no built-in output
+  name: `codefnfmt` comes from the `p2crc` file and `trans.c:717`
+  exits `Unable to find required system p2crc file` without one.
+  `-H $PCHOME` finds `/sys/lib/pascal/p2crc`, whose
+  `CodeFileName %Rs.c` is what makes `foo.p` answer `foo.c`.
+- `CXXFLAGS` and `FFLAGS` were declared and used by nothing. f2c and
+  bacon were already right and are unchanged.
+**AND `rc/bin/ape/p2cc` HELD A LIVE BUG FOUND ON THE WAY: it passed
+`-H --HOMEDIR--`.** Upstream substitutes that token when it INSTALLS
+the script (`src/Makefile:113` is a `sed`); APExp installs it by hand,
+and `$homedir`, `$incdir` and `$libdir` were filled in while this one
+was not. **The guard is what made it reachable rather than
+harmless**: it fires precisely when `$homedir/p2crc` EXISTS, so *the
+better configured the tree, the more certainly p2cc added the broken
+flag*. `perl -c` passes.
+
 **EDG'S FRONT END IS OPEN SOURCE NOW, AND IT IS THE RIGHT SHAPE OF
 TOOL -- investigated, not started.** `github.com/edgcpp/compiler`,
 **Apache 2.0 with LLVM exceptions**, so the licence is no obstacle.
@@ -1601,6 +1719,34 @@ Plan 9 one.
 entry aborts the whole tree's `mk', and bacon has never been through
 pcc. Build `cmd/basic' by hand first; the line is one character from
 live either way.
+
+## What is open, as a list
+
+**Ports not started**, in the order their risk was last measured:
+- **EDG** -- investigated and measured on the host (it builds, the
+  default build IS the C-generating one, `eccp -S` translates a toy
+  with templates and virtual bases into C that gcc compiles). Two
+  named risks remain and both are one host afternoon: `targ_def.h`
+  describing kencc (`int` 4, `long` **4**, pointer 8 -- LLP64, which
+  EDG supports for MSVC), and whether its C back end handles the C++
+  subset EDG itself is written in. No mkfile written.
+- **muon** -- in `_OPTIONAL_APPS` commented out. Never built here.
+- **go** -- `go1.4` is in the tree, commented out of `_CORE_APPS`,
+  and is the only thing that mentions `Ureg` outside libap.
+
+**Ports built but never exercised**, which is a different and cheaper
+item -- *a port that builds and has never run is not a port*:
+- **chicken** (Scheme) -- `lib/chicken` builds and `cmd/chicken` is in
+  `_OPTIONAL_APPS`. Nothing has run a Scheme program.
+- **bacon** (BASIC) -- the generated C is clean on gcc and the
+  converter RUNS on the host (it answers `BaCon version 5.0.3` and
+  converts a `FOR`/`PRINT` program), but **it has never been through
+  pcc**. `cmd/basic` is still commented out of `_OPTIONAL_APPS` for
+  that reason; build it by hand first.
+- **the archivers** -- bzip2, xz, unrar, unace, unarj, clzip. See the
+  tar section: `-J` retires the padding hunt, so this is now a check
+  rather than a hunt, and the way to do it is to run each one on a
+  real archive.
 
 **Queued after Tcl/Tk: two more ports, chosen as stress tests.**
 **`tkblt` was one of three and is GONE from the tree**: 3.2 is C++, 48
@@ -3145,6 +3291,17 @@ padding breaks. None has been tested since. The `external/` sweep is a
 lower bound by construction (see the note), so *the way to find these
 is to run each archiver on a real archive*, not to grep.
 Detail in `docs/notes/kencc.md` and `docs/notes/libap.md`.
+**AND `-J` LARGELY RETIRES THAT SWEEP, which is a consequence of the
+flag worth stating where the to-do was written.** The tar bug was
+`Asu2`'s unconditional 8-byte tail round plus `Ael1` aligning a
+nested struct member to 8, and **`-J` fixes both for every APE
+compile** -- so an all-char on-disk record now gets its natural size
+without anyone reaching for `#pragma pack`. *The predicted failure
+mode is gone rather than unmeasured.* Running each archiver on a real
+archive is still the only way to know, and is still worth one round,
+but it is now a check rather than a hunt. tar's own `#pragma pack`
+is a no-op under `-J` (both answers are 500 and 495) and **stays**:
+it documents the on-disk intent and keeps the file right under `-9`.
 
 **A DESCRIPTOR ARRIVED POISONED FROM AN EXEC, and it was every APE
 program, not bash and not vts.** bash under vts printed its prompt and

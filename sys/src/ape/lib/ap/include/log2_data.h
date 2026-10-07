@@ -10,6 +10,14 @@
 #define LOG2_TABLE_BITS 6
 #define LOG2_POLY_ORDER 7
 #define LOG2_POLY1_ORDER 11
+/* `hidden' is musl's internal visibility marker. It used to come
+ * from the PUBLIC <features.h>, which also erased sqlite3.h's own
+ * `unsigned char hidden[48];' member wherever that header came
+ * second. Supplied here instead, the way `include/libm.h' and
+ * `multibyte/internal.c' already did. */
+#ifndef hidden
+#define hidden
+#endif
 extern hidden const struct log2_data {
 	double invln2hi;
 	double invln2lo;

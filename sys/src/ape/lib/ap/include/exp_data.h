@@ -12,6 +12,14 @@
 #define EXP_POLY_ORDER 5
 #define EXP_USE_TOINT_NARROW 0
 #define EXP2_POLY_ORDER 5
+/* `hidden' is musl's internal visibility marker. It used to come
+ * from the PUBLIC <features.h>, which also erased sqlite3.h's own
+ * `unsigned char hidden[48];' member wherever that header came
+ * second. Supplied here instead, the way `include/libm.h' and
+ * `multibyte/internal.c' already did. */
+#ifndef hidden
+#define hidden
+#endif
 extern hidden const struct exp_data {
 	double invln2N;
 	double shift;
