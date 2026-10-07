@@ -32,7 +32,16 @@ siginfo_trampoline(int sig)
 int
 sigaction(int signum, const struct sigaction *act, struct sigaction *oldact)
 {
-	void (*old)(void);
+	/*
+	 * `void (*old)(void)' with casts to `void(*)()' on every line
+	 * that touched it -- four of them -- because `<signal.h>'
+	 * declared `signal()' with an empty parameter list and
+	 * `sa_handler' the same way, so nothing here had a type to
+	 * agree with. Both are `void (*)(int)' now and the casts are
+	 * gone: *a cast that exists to silence a declaration nobody
+	 * believed is not a cast, it is the declaration's receipt.*
+	 */
+	void (*old)(int);
 
 	if(signum <= 0 || signum >= NSIG){
 		errno = EINVAL;
@@ -49,15 +58,15 @@ sigaction(int signum, const struct sigaction *act, struct sigaction *oldact)
 
 	if(act->sa_flags & SA_SIGINFO){
 		siginfo_handlers[signum] = act->sa_sigaction;
-		old = (void(*)(void))signal(signum, (void(*)())siginfo_trampoline);
+		old = signal(signum, siginfo_trampoline);
 	} else {
 		siginfo_handlers[signum] = NULL;
-		old = (void(*)(void))signal(signum, (void(*)())act->sa_handler);
+		old = signal(signum, act->sa_handler);
 	}
 
 	if(oldact != NULL){
 		memset(oldact, 0, sizeof *oldact);
-		oldact->sa_handler = (void(*)())old;
+		oldact->sa_handler = old;
 	}
 	return 0;
 }

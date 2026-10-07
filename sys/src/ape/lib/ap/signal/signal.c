@@ -36,12 +36,31 @@ static struct {
 };
 #define NSIGTAB ((sizeof sigtab)/(sizeof (sigtab[0])))
 
-void	(*_sighdlr[MAXSIG+1])(int, char*, Ureg*); /* 0 initialized: SIG_DFL */
+/*
+ * `_sighdlr[]' HOLDS THE POSIX TYPE NOW, and the three-argument
+ * Plan 9 form is reached by a cast at the ONE place that calls a
+ * handler -- `_notetramp' below.
+ *
+ * It used to hold `void (*)(int, char*, Ureg*)' everywhere, which
+ * made `<signal.h>' declare `signal()' with an EMPTY parameter list
+ * so that an ordinary `void f(int)' could still be installed. That
+ * turned off argument checking for every caller in the tree to keep
+ * an extension reachable that nothing in the tree uses. The header
+ * says `void (*)(int)' now; the extension is unchanged and still
+ * dispatched, and a program that wants `msg' and `Ureg*' casts.
+ *
+ * Keeping the casts HERE rather than at each assignment is the half
+ * that matters: `_envsetup.c' and `sigwait.c' store SIG_IGN and
+ * saved handlers into this array, and every one of those would
+ * otherwise need a cast of its own -- which is how a cast stops
+ * being a note that something unusual is happening.
+ */
+void	(*_sighdlr[MAXSIG+1])(int);	/* 0 initialized: SIG_DFL */
 
 void
-(*signal(int sig, void (*func)(int, char*, Ureg*)))(int, char*, Ureg*)
+(*signal(int sig, void (*func)(int)))(int)
 {
-	void(*oldf)(int, char*, Ureg*);
+	void(*oldf)(int);
 
 	if(sig <= 0 || sig > MAXSIG){
 		errno = EINVAL;
@@ -79,7 +98,7 @@ int
 _notehandler(Ureg *u, char *msg)
 {
 	int i;
-	void (*f)(int, char*, Ureg*);
+	void (*f)(int);
 	extern void _doatexits(void);
 	extern void _notetramp(int, void(*)(int, char*, Ureg*), Ureg*, char*);
 
@@ -91,7 +110,15 @@ _notehandler(Ureg *u, char *msg)
 			if(f == SIG_DFL || f == SIG_ERR)
 				break;
 			if(f != SIG_IGN){
-				_notetramp(sigtab[i].num, f, u, msg);
+				/*
+				 * THE CAST IS THE EXTENSION. `_notetramp'
+				 * hands the handler (sig, msg, Ureg*); a
+				 * handler declared `void f(int)' simply
+				 * ignores the two it did not ask for, which
+				 * is what every caller in this tree does.
+				 */
+				_notetramp(sigtab[i].num,
+					(void(*)(int, char*, Ureg*))f, u, msg);
 				/* _notetramp doesn't return */
 			}
 			_NOTED(0);	/* NCONT */

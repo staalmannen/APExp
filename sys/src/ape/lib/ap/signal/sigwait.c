@@ -4,7 +4,7 @@
 #include <errno.h>
 #include <time.h>
 
-extern void (*_sighdlr[MAXSIG+1])(int, char *, Ureg*);
+extern void (*_sighdlr[MAXSIG+1])(int);
 
 /*
  * sigwait: wait for one of the signals in set to be delivered.
@@ -25,7 +25,7 @@ sigwait_handler(int sig)
 
 static void
 install_handlers(const sigset_t *set,
-                 void (**saved)(int, char*, Ureg*))
+                 void (**saved)(int))
 {
 	int i;
 	for(i = 1; i < NSIG; i++) {
@@ -40,7 +40,7 @@ install_handlers(const sigset_t *set,
 
 static void
 restore_handlers(const sigset_t *set,
-                 void (**saved)(int, char*, Ureg*))
+                 void (**saved)(int))
 {
 	int i;
 	for(i = 1; i < NSIG; i++) {
@@ -52,7 +52,7 @@ restore_handlers(const sigset_t *set,
 int
 sigwait(const sigset_t *restrict set, int *restrict sig)
 {
-	void (*saved[NSIG])(int, char *, Ureg*);
+	void (*saved[NSIG])(int);
 
 	if(set == NULL || sig == NULL) {
 		errno = EINVAL;
@@ -92,7 +92,7 @@ int
 sigtimedwait(const sigset_t *restrict set, siginfo_t *restrict info,
              const struct timespec *restrict timeout)
 {
-	void (*saved[NSIG])(int, char *, Ureg*);
+	void (*saved[NSIG])(int);
 	struct timespec now;
 	long long deadline_ms, now_ms;
 	int sig;

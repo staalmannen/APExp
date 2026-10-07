@@ -1159,6 +1159,44 @@ when one backslash is removed again.
 `curl`) re-enter `_OPTIONAL_APPS`. Anything they report is *newly
 measured*, not newly broken.
 
+**AND THEN gmake WOULD NOT LINK -- `_convM2D: multiple initialization`
+-- AND IT WAS NOT `-J`, IT WAS A REUSED VARIABLE IN `sualign()`.**
+`o` is carried ACROSS iterations of the TSTRUCT loop: it holds the
+offset of the current BIT-FIELD UNIT, set by the first field of a
+group (`l->shift <= 0`) and read back by every later field. The
+max-member-alignment loop added for `-J` wrote ITS result into `o`
+too -- so **the second and later fields of every bit-field group were
+placed at the previous member's ALIGNMENT instead of at the unit's
+offset.** `ma` now, in both the TSTRUCT and TUNION arms.
+**It was NOT gated on `conformalign`**: that line runs on every
+compile, so plain builds were wrong as well, and it has been so since
+`81a59a1d`. *A one-line addition to a loop that was already using its
+variables for two things.* **No compiler can warn**: both uses are a
+`long` holding a small number.
+**GNU make's `struct command_switch` is what named it** -- `int c`,
+`enum type`, `void *`, then `env:1 toenv:1 no_makefile:1
+specified:1` -- so the three later bits moved to offset 4, on top of
+`type`, and `6l` answered `multiple initialization` for every array
+entry whose two writes to those four bytes were both non-zero. **The
+value in the message is the evidence**: `$2` at `+4` with a 56-byte
+stride is the bit-field word with `toenv` set, and `string` is also
+2, so only entries with both are loud. *The struct's SIZE was 56
+either way -- already a multiple of 8 -- so `-J` changed nothing
+about it and a size-only check would have passed.*
+**`structalign-test.c` SECTION 8 is the regression test**, and it had
+to be a new shape rather than a line in section 4: **section 4's
+`struct bits` could never have caught this**, because its bit fields
+are the FIRST members, so the clobbered `o` was the alignment of
+nothing and the offsets came out right anyway. *A bit-field group
+needs a member in front of it before a wrong unit offset is visible.*
+It also **cannot use `offsetof`** -- C forbids taking a bit field's
+address and gcc says so -- so it asserts the COLLISION instead: set
+each field of the group in turn and ask whether `type` survived,
+which is the question the linker asked. 0 failures on gcc, numbers
+measured from that run.
+**`cd sys/src/cmd && mk install` BEFORE the tree rebuild**, and this
+one matters for every package, not only the ones with `-J` in frame.
+
 **AND THE cfront SIZE PROBE WAS `.gitignore'd, SO THE VM NEVER GOT
 IT.** `pcc ... cfrontsz-probe.c` answered `Can't open input file` and
 `ls cfront*.c` showed only the two stub files. **git is the only
