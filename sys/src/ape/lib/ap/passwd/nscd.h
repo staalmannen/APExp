@@ -39,6 +39,14 @@
 #define INITGRNGRPS 2
 #define INITGR_LEN 3
 
+/* `hidden' is musl's internal visibility marker. It used to come
+ * from the PUBLIC <features.h>, which also erased sqlite3.h's own
+ * `unsigned char hidden[48];' member wherever that header came
+ * second. Supplied here instead, the way `include/libm.h' and
+ * `multibyte/internal.c' already did. */
+#ifndef hidden
+#define hidden
+#endif
 hidden FILE *__nscd_query(int32_t req, const char *key, int32_t *buf, size_t len, int *swap);
 
 #endif

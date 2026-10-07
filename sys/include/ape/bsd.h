@@ -44,7 +44,13 @@ extern int	getentropy(void*, size_t);
 extern const char*	getprogname(void);
 extern void	setprogname(const char*);
 
-extern int	getopt(int, char**, char*);
+/*
+ * POSIX's spelling, and <getopt.h> has had it right all along --
+ * this line said `(int, char**, char*)' and the two headers could
+ * not be included together. The definition in `ap/misc/getopt.c'
+ * matched THIS one and now matches both.
+ */
+extern int	getopt(int, char * const [], const char *);
 extern int	opterr;
 extern int	optind;
 extern int	optopt;

@@ -7,8 +7,24 @@ int     optind = 1;
 int	optopt;
 char    *optarg;
 
+/*
+ * POSIX: int getopt(int, char * const [], const char *).
+ *
+ * This definition was `(int, char **, char *)', which agreed with
+ * <bsd.h> and disagreed with <getopt.h>, where the same function was
+ * already declared correctly. TWO declarations of one name that do
+ * not match, in two installed headers -- the `Lock' and `PATH_MAX'
+ * shape, and the together-case of `apehdr-sweep' is what reported it.
+ *
+ * Callers are unaffected: `char **' converts to `char * const *'
+ * because the const is at the FIRST level of the pointed-to type
+ * (C11 6.5.16.1), which is why every program on every system passes
+ * main's `argv' to glibc's identically-declared getopt. The body
+ * never writes through argv -- `&argv[i][j]' through `char * const'
+ * is still a `char *', which is what `optarg' wants.
+ */
 int
-getopt (int argc, char **argv, char *opts)
+getopt(int argc, char * const argv[], const char *opts)
 {
 	static int sp = 1;
 	register c;

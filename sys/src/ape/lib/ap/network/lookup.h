@@ -43,6 +43,14 @@ struct resolvconf {
 #define MAXADDRS 48
 #define MAXSERVS 2
 
+/* `hidden' is musl's internal visibility marker. It used to come
+ * from the PUBLIC <features.h>, which also erased sqlite3.h's own
+ * `unsigned char hidden[48];' member wherever that header came
+ * second. Supplied here instead, the way `include/libm.h' and
+ * `multibyte/internal.c' already did. */
+#ifndef hidden
+#define hidden
+#endif
 hidden int __lookup_serv(struct service buf[MAXSERVS], const char *name, int proto, int socktype, int flags);
 hidden int __lookup_name(struct address buf[MAXADDRS], char canon[256], const char *name, int family, int flags);
 hidden int __lookup_ipliteral(struct address buf[1], const char *name, int family);
