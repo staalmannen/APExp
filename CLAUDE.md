@@ -303,6 +303,10 @@ glibc's take `const char *`, so even a `-D` rename collides with the
 header -- it renames the SOURCE with `sed` into a temporary instead.
 `strtol`/`strtoul` cannot be swept at all here, because kencc's
 `long` is 32-bit and the host's is 64.
+`apeabi-probe.c` is a PROBE and is never run: it is compiled TWICE,
+`pcc -a` and `pcc -J -a`, and the DIFF of the two acid dumps names
+every APE struct whose layout `-J` moves. Take it before any
+tree-wide rebuild.
 `structalign-test.c` measures `pcc -J`, conforming struct layout, and
 **needs three runs** -- gcc, then `pcc -DPLAN9` WITHOUT `-J` (which
 must fail ~12 checks), then with it. *The middle run is the control*:
@@ -928,6 +932,56 @@ TYPEDEF'd unsigned chars -- beside the char ARRAY section 1 uses, so
 one run tells the two instruments apart rather than two rounds.
 *The predicted failure did not fire and the prediction was written
 down; that is the condition doing its job, not the flag.*
+
+**AND `-J` WAS WORKING THE WHOLE TIME -- 14 of 97 -> 7, EXACTLY THE
+PREDICTION.** All seven of cfront's OWN types fall into line under
+`pcc -J`: `node` 3, **`name` 144**, `basic_inst` 168, `funct_inst`
+200, `state` 88, `templ_compilation` 1, `templ_inst` 200. What is
+left is the seven glibc types, which `-J` cannot touch because they
+describe the machine that GENERATED the C -- and the two `__Q3_`
+entries confirm the reading rather than merely vanishing: `_C4` is
+**20** (`__clock_t` four times over at 4 bytes) against Linux's 32,
+`_C6` is 8 (`long si_band` + `int si_fd`) against 16. *The 32-bit
+`long` invariant showing through, not padding.*
+**THE "FLAG NOT PICKED UP" MESSAGE WAS THE MARKER, NOT THE FLAG, AND
+IT COST THREE REBUILDS.** `pcc` runs **`/bin/cpp` ITSELF** and pipes
+it into `cc` (`pcc.c:299`'s `dopipe`), so the source reaches `cc`
+**already preprocessed** -- and neither `dodefine()` in `cc`'s own
+symbol table nor `cc`'s `defs[]` can define a macro the source will
+ever see. *There are THREE preprocessors in play and only the one
+`pcc` spawns actually runs*; the first two attempts configured the
+other two. **Name the preprocessor that RUNS, not the one with the
+right name** -- the shadowed-`config.h` lesson a third time.
+**And the two instruments never disagreed.** `structalign-test` was
+compiled **with** `-J` and `cfrontsz-probe` **without** it, and I
+read them as the same compile for two rounds. Everything else was
+cleared locally first: preprocessing the probe's own translation unit
+with cfront's exact flags gives ONE `struct node`, `TOK` and `bit`
+both `unsigned char`, and gcc computing 3; `cfront_translated.h`
+defines none of the seven; `-B` touches only undeclared-function
+diagnostics. *Two compiles differing in one flag is not two compilers
+disagreeing, and the flag was in the command line both times.*
+
+**THE OBVIOUS WAY TO TURN `-J` ON TREE-WIDE DOES NOT WORK, and that
+is the finding to carry.** `-J` in `sys/src/ape/config`'s CFLAGS
+reaches **32 of 137** mkfiles -- the other **105 ASSIGN `CFLAGS=`**
+rather than appending `$CFLAGS`, and `cmd/cfront/mkfile:52` is one of
+them. `CC` is no better: **59** mkfiles reassign it. *Both of the two
+variables a build system offers for exactly this have holes, and
+either would have produced the silent ABI split rather than a clean
+change* -- 32 packages conforming, 105 not, every symbol still
+resolving. **The only mechanism that reaches every APE compile is
+`pcc` itself**, since all 59 reassignments still name `pcc`; native
+`6c` builds stay on the 9front rule, which is what `cmd2/vts` and
+`vtwin` need when they link the host's own `libc.a`.
+**`apeabi-probe.c` is what to run BEFORE deciding that**: two
+compiles and a diff, `pcc -a` against `pcc -J -a`. `-a` emits acid
+definitions carrying every struct's size and every member's offset
+(it is `mkone`'s own `%.acid` rule), so the diff is a complete list,
+**from the compiler itself**, of everything `-J` moves inside the APE
+world. An empty diff would mean the flag is free; a long one is the
+cost named struct by struct before a single object is rebuilt. 0
+errors against the staged headers on the host.
 
 **AND THE cfront SIZE PROBE WAS `.gitignore'd, SO THE VM NEVER GOT
 IT.** `pcc ... cfrontsz-probe.c` answered `Can't open input file` and
