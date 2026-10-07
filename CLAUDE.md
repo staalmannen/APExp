@@ -1835,8 +1835,63 @@ live either way.
     is reachable by regenerating the macro configuration rather than
     by setting switches, and it changes mangling, the ctor/dtor model
     and vtable layout. Its own round.
-  - **NO MKFILE, AND NOTHING HERE HAS BEEN THROUGH pcc.** That is the
-    next step and the link model is what it will run into.
+  - **THE MKFILES ARE WRITTEN AND NOTHING HAS BEEN THROUGH pcc YET.**
+    **It is THREE products, not one**, which `main` settles rather than
+    taste: `src`'s 75 files hold exactly one (`cfe.c`) so they are one
+    binary, `cpfe`; `util`'s seven hold six, plus `decode.c` with none
+    (it is `edg_decode`'s second object); `lib_src`'s 51 hold none, so
+    they are a LIBRARY. Hence `sys/src/ape/lib/edg` -> `libedg.a`
+    (`mksyslib`) and `sys/src/ape/cmd/edg` -> `cpfe` (`mkone`); `util`
+    is six small binaries and blocks nothing.
+    **DELIBERATELY NOT IN `cmd/mkfile`'s lists** -- one failing entry
+    aborts the whole tree's `mk`, as `basic` and `c++lib` already
+    record. By hand first.
+    **ORDER IS A DEPENDENCY RATHER THAN A PREFERENCE.** lib/edg first,
+    because an archive sidesteps the link model entirely -- `ar` takes
+    duplicate members and the clash only arrives at a LINK -- so it
+    answers "does pcc compile EDG's generated C" with nothing else in
+    frame. Then cmd/edg, where both remaining questions land.
+    **AND `mk -k`, NOT `mk`**: Plan 9 mk stops at the first failing
+    recipe, so a plain run costs one round per bad file across 75;
+    -k names them all at once. *That is the rule bacon's missing
+    headers and bacon's missing link symbols both paid for.*
+    **`src/sys_predef.c` IS 315,616 LINES IN ONE TRANSLATION UNIT**
+    (`ifc_modules_read.c` 130,330, `expr.c` 120,824; 2.9M lines over
+    the 133). A `6c` table limit is the likeliest first answer, and it
+    would be kencc's rather than the port's -- worth knowing before
+    anything is blamed on EDG.
+    **`cpfe` HAS NO `LIB=`, AND THAT IS A QUESTION, NOT A CLAIM.**
+    cpfe is itself a translated C++ program so it may want EDG's own
+    runtime, and *reading cannot settle it*: `src` holds 145,752
+    distinct `_Z`-prefixed tokens, nearly all names it defines itself,
+    with ordinary identifiers like `_ZERO` among them. Only the link
+    says which are undefined. It is not obviously needed -- EDG is
+    built `-fno-exceptions -fno-rtti` and `src` references none of
+    `_Znwm`/`_Znam`/`_ZdlPv`/`_ZdaPv`, `__memzero` or
+    `__abort_execution` -- so the first link is the measurement and
+    the fix, if any, is one line naming `libedg.a`.
+  - **AND THE RUNTIME ADDS NOTHING libap ALREADY PROVIDES, checked
+    rather than assumed.** `lib_src` holds `exit.c`, `main.c`,
+    `error.c` and `memzero.c`, which is the shape that cost this tree
+    the gnulib `strerror` round -- but **every DEFINITION there is
+    `_Z`-mangled or `__`-prefixed**: `exit.c` defines `_Z4exiti`,
+    `memzero.c` defines `__memzero`. The plain C names (`memset`,
+    `memcpy`, `malloc`, `free`, `abort`, `exit`) appear only as
+    DECLARATIONS and resolve to libap rather than replacing it.
+    *The filenames read alarmingly and the definitions do not* --
+    the declaration/definition distinction the `reject` round cost a
+    build over, asked the right way round this time.
+    **And EDG bakes in NO struct sizes**, which is the other thing
+    cfront's C did and the reason its oracle existed: zero
+    `sizeof X == N` markers against cfront's 132, because EDG emits
+    real `sizeof` expressions. *kencc computes every layout here*, so
+    conforming `-J` is exactly what the generated code wants and
+    `cfrontsz-probe`'s whole class of problem does not recur.
+    **Both OFILES lists are sound AND complete** -- 51 and 75, no
+    name missing a file and no file missing from a list, which are
+    different properties and only one of them was checked the time
+    the 47-of-97 probe passed its control and measured the wrong
+    types. `mkcont-sweep` 0.
   - **Its staging list doubled as a to-do list for our own headers.**
     Eight APE headers could not be included from C++; **four were
     fixed on their own evidence** later in the same session
