@@ -192,6 +192,64 @@ set skipfiles {l.*.test}
 # ------------------------------------------------------------------
 package require tcltest 2.5
 
+# ------------------------------------------------------------------
+# PRECONDITION: THIS MUST BE THE `tcltest' INTERPRETER, NOT `tclsh'.
+#
+# Tcl's suite is built around `package require tcl::test', which is the
+# test-only extension (tclTest.c and friends) linked into
+# `cmd/tclsh/tcltest' and deliberately NOT into the installed tclsh. A
+# run under plain tclsh does not fail -- it DEGRADES, and the shape of
+# the degradation reads exactly like a result:
+#
+#	mutex.test requires it at the top level and ABORTS
+#	brodnik.test's `try {package require tcl::test}' has no handler
+#	   clause, so the error propagates and it aborts too
+#	every test constrained on a testing command SKIPS
+#
+# That happened: `Total 68118 Passed 62138 Skipped 5916 Failed 64'
+# became `Total 66970 Passed 55700 Skipped 11233 Failed 37' -- 5317
+# tests moved into Skipped, ~1100 were never reached, and the FAILURE
+# COUNT FELL BY 27. A round was nearly spent reading that as the
+# measurement of a compiler change. The cause was `mk distclean'
+# removing `tcltest' (it is in that mkfile's CLEANFILES) while
+# `mk install' did not rebuild it; the mkfile does now.
+#
+# So this refuses, the way `rc/bin/bash-runtests' refuses a log that
+# mentions `../bash'. THREE preconditions that fail silently are three
+# ways to spend a round on a worthless log, and this is the fourth
+# harness in this tree to learn it.
+#
+# $APEXP_TCL_ANYSHELL=1 overrides, for the one legitimate case: asking
+# what the INSTALLED tclsh does, where the skips are the answer rather
+# than the problem.
+# The PLAIN form, not mutex.test's `-exact ... [info patchlevel]': the
+# exact spelling can fail on a tcltest whose version string differs,
+# and a precondition that refuses a usable interpreter is worse than no
+# precondition at all.
+if {[catch {package require tcl::test} tclTestWhy]} {
+    puts "tcl-runall: tcl::test is NOT available -- [info nameofexecutable]"
+    puts "tcl-runall: ($tclTestWhy)"
+    if {![info exists ::env(APEXP_TCL_ANYSHELL)]} {
+	puts "tcl-runall: REFUSING. A run without it skips thousands of\
+ tests and LOWERS the failure count, which is indistinguishable from an\
+ improvement. Build the test interpreter and use it:"
+	puts "tcl-runall:     cd sys/src/ape/cmd/tclsh && mk tcltest"
+	puts "tcl-runall:     cd sys/src/external/tcl/tests && \\"
+	puts "tcl-runall:         ../../../ape/cmd/tclsh/tcltest\
+ <...>/tcl-runall.tcl"
+	puts "tcl-runall: set \$APEXP_TCL_ANYSHELL=1 to run anyway, and do\
+ not compare the totals with any other run."
+	flush stdout
+	exit 2
+    }
+    puts "tcl-runall: \$APEXP_TCL_ANYSHELL is set -- CONTINUING, and this\
+ run's totals are NOT comparable with a tcltest run."
+} else {
+    puts "tcl-runall: tcl::test [package provide tcl::test] present --\
+ this is the test interpreter."
+}
+flush stdout
+
 # Line buffering, before anything is written. Without it the tail of
 # the log is lost on any abnormal end and the last file named is an
 # upper bound on progress rather than the truth.

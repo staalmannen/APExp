@@ -63,8 +63,14 @@ tkAppInit.$O: $TKSRC/unix/tkAppInit.c
 # block -- including the -DWCHAR=char note above, which is load-bearing
 # -- and a copy of a build rule is a copy that silently stops matching.
 #
-# It is a ":V:" target and not "default", so "mk" and "mk install" here
-# still build and install wish alone; tktest is never installed.
+# It is not "default", so "mk" here still builds wish alone and tktest
+# is never installed into $BIN -- but "mk install" DOES build it, which
+# it did not used to, and the reason is ../tclsh/mkfile's: the clean
+# rule below removes tktest and nothing put it back, so a distclean
+# followed by an install left the suite to be run under plain "wish".
+# That does not fail, it DEGRADES -- the tktest-constrained tests skip
+# and the failure count FALLS -- and nothing in the log says which
+# binary produced it. It cost a near-miss on Tcl's side; see CLAUDE.md.
 #
 #	cd sys/src/ape/cmd/wish && mk tktest
 #	./tktest $home/APExp/sys/lib/tests/tk-runall.tcl >/tmp/tk-all.out >[2=1]
@@ -131,7 +137,11 @@ tkAppInit.$O: $TKSRC/unix/tkAppInit.c
 
 TESTOFILES=tkTestInit.$O tkTest.$O tkSquare.$O tclStubLib.$O tkStubLib.$O
 
-tktest:V: $TESTOFILES $LIB
+# A FILE target, not ":V:", so "mk install" relinks it only when
+# something it depends on has moved.
+install:V:	tktest
+
+tktest: $TESTOFILES $LIB
 	$LD $LDFLAGS -o $target $prereq
 
 # Named tkTestInit rather than tkAppInit because it is the SAME source
