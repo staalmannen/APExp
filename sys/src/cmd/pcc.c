@@ -123,15 +123,31 @@ main(int argc, char *argv[])
 		case 'T':
 		case 'w':
 		case 'F':
+			append(&cc, smprint("-%c", ARGC()));
+			break;
+
 		/*
 		 * -J is conforming struct layout (cc/cc.h). It MUST be
-		 * listed here: this ARGBEGIN has no `default:', so a flag
-		 * it does not name is silently dropped -- the build would
-		 * look exactly right and the layout would not change,
-		 * which for a layout flag is the worst way to fail.
+		 * named here: this ARGBEGIN has no `default:', so a flag it
+		 * does not name is silently dropped -- the build would look
+		 * exactly right and the layout would not change, which for
+		 * a layout flag is the worst way to fail.
+		 *
+		 * AND ITS MARKER BELONGS ON THE `cpp' LIST, which took two
+		 * wrong guesses to find. There are THREE preprocessors in
+		 * play and only one of them runs here: `cc' has a built-in
+		 * one, `cc' can fork an external one from its own defs[],
+		 * and `pcc' runs `/bin/cpp' ITSELF and pipes it into `cc'
+		 * (the dopipe() below). The source therefore arrives at
+		 * `cc' ALREADY PREPROCESSED, so neither dodefine() nor
+		 * cc's defs[] can ever define a macro the source will see.
+		 * *Name the preprocessor that runs, not the one with the
+		 * right name* -- the shadowed-config.h lesson, a third
+		 * time, and it cost two VM rounds.
 		 */
 		case 'J':
-			append(&cc, smprint("-%c", ARGC()));
+			append(&cc, "-J");
+			append(&cpp, "-D__APEXP_CONFORMALIGN__=1");
 			break;
 		case 'B':
 			append(&cc, "-B");
