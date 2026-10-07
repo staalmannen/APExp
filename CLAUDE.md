@@ -1082,6 +1082,15 @@ are the whole blast radius, so Tcl's `socket.test`/`socket_inet.test`
 are the sharpest instruments the tree has for it -- a clean run there
 is the confirmation, and a NEW socket failure means something is
 computing a length it should not.
+**THE TREE BUILDS: `mk distclean` plus `mk install` COMPLETED with
+conforming layout everywhere.** *That is the weakest useful result
+and is worth saying so plainly*: it confirms nothing fails to compile
+or link, and the hazard this flag carries is one that produces
+NEITHER. `sockaddr_in` 24 -> 16 and `pthread_mutex_t` 56 -> 40 are
+silent by construction -- every symbol resolves either way -- so the
+build completing is a precondition for the measurement rather than
+the measurement. **The confirmation is behavioural and is still
+outstanding.**
 
 **AND THE FIRST REBUILD STOPPED IN bash -- NOT ON `-J`, ON A SHADOWED
 HEADER.** `/sys/include/ape/qlock.h:44 syntax error, last name: Lock`,
@@ -1270,12 +1279,55 @@ the exit status: *failing on an untriaged list makes a sweep cry
 wolf, and suppressing the list wastes it.* Some are real
 (`uname`/`getrusage` was) and some are design intent -- `<regex.h>`
 and `<pcre2posix.h>` both define `regex_t` because they are
-ALTERNATIVES and no program includes both. **The twelve, for the next
-round**: conflicting `accept`, `listen`, `getopt`, `regex_t`,
-`regmatch_t`, and seven syntax errors (`_Complex`, two `expected
-identifier or '(' before 'int'`, `'<='`, `'>='`, a numeric constant,
-a `[`) which have the shape of one header's MACRO breaking a later
-one.
+ALTERNATIVES and no program includes both.
+**TRIAGED NOW, AND TWELVE ERRORS ARE SIX CAUSES** -- which is the
+whole reason to triage rather than count, and why the raw list sat
+unread for rounds. Only TWO of the six are bugs in this tree:
+- **`f2c.h` is FIVE of the twelve, on its own.** `#define min/max/abs`
+  collide with `<libv.h>`'s `extern int min(int,int)`, and
+  `typedef struct {real r,i;} complex` collides with `<complex.h>`'s
+  `#define complex _Complex`. *A transpiler's private runtime header,
+  installed PUBLIC, owning four names two C standard headers own.*
+  **149 files include it and every one is under `external/f2c`** --
+  so it does not belong in `sys/include/ape`. Recommendation, not
+  done.
+- **`regex.h`/`pcre2posix.h` is THREE, and DESIGN INTENT.** pcre2posix
+  spells the `REG_*` codes as an ENUM where `regex.h` `#define`s them,
+  so `regex.h:44` turns pcre2posix's enumerator into a numeric
+  constant -- the `regex_t`/`regmatch_t` pair is the same collision
+  seen twice more. *The "numeric constant" error and the two
+  conflicting-struct errors were never three findings.*
+- **`Plan9libnet.h` is TWO, and the tree ALREADY FIXED IT ONCE.** It
+  declares Plan 9's `accept(int, char*)` and `listen(char*, char*)` --
+  different functions wearing POSIX's names -- against
+  `<sys/socket.h>`. **`libnet.h` beside it is the same interface with
+  `net_` prefixes, and is what all five callers in the tree use;
+  NOTHING includes `Plan9libnet.h` at all.** *The library holding a
+  working version of the thing it got wrong, for the sixth time, and
+  the first time it is a HEADER.* Recommendation: delete it -- a
+  header that cannot be combined with `<sys/socket.h>` and that
+  nothing includes is only a trap. Not done unasked.
+- **`bsd.h:47` is ONE, REAL and OURS**: `getopt(int, char**, char*)`
+  where POSIX says `(int, char *const *, const char *)` -- and
+  **`<unistd.h>` does not declare `getopt` at all**, so this is the
+  tree's only declaration and it is the wrong one. Found
+  independently by EDG, which is a stricter compiler than gcc.
+- **`features.h:55` is ONE, REAL, OURS, AND IT HAS A VICTIM.**
+  `#define hidden` is musl's internal visibility macro **in a public
+  header**, reached from `<byteswap.h>`, `<endian.h>`, `<ftw.h>`,
+  `<glob.h>`, `<iconv.h>` and more -- and `sqlite3.h:10957` declares
+  `unsigned char hidden[48];`, **erased wherever `features.h` came
+  first.** *A silent struct-layout change in a public API*, which is
+  the `-J` hazard arriving from the preprocessor instead of the
+  compiler. `weak_alias` beside it is the same shape with no victim
+  found yet.
+  **The fix needs care and the care is measurable**: libap's own
+  `multibyte/internal.c:25` already carries `#ifndef hidden / #define
+  hidden`, so private users can supply their own -- but
+  `network/lookup.h:46` relies on the leak, which is the
+  `<stdio.h>`-leaked-errno shape. Sweep libap before removing it.
+*The sweep PRINTS the triage now rather than the raw lines, and still
+does not gate -- three of the six are intent.*
 
 **EDG'S FRONT END IS OPEN SOURCE NOW, AND IT IS THE RIGHT SHAPE OF
 TOOL -- investigated, not started.** `github.com/edgcpp/compiler`,
