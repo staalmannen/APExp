@@ -97,6 +97,17 @@ main(int argc, char *argv[])
 
 	case 'J':			/* conforming struct layout; see cc.h */
 		conformalign = 1;
+		/*
+		 * And SAY SO to the source being compiled. A layout flag
+		 * that a stale compiler silently ignores -- `pcc' drops an
+		 * unnamed flag, and `6c' turns an unknown letter into
+		 * debug['J'] -- produces a run indistinguishable from one
+		 * where the flag worked and changed nothing. *A null result
+		 * with two explanations is not a measurement*, which is the
+		 * rule `_ttymark' and `_getcwdmark' already exist for; this
+		 * is the same idiom for a COMPILER rather than a library.
+		 */
+		dodefine("__APEXP_CONFORMALIGN__");
 		break;
 
 	case 'D':

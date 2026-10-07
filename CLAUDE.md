@@ -890,6 +890,45 @@ cannot be run on them -- the first build is the VM's. *That is a
 weaker position than every other change this round and is worth
 saying rather than leaving to be discovered.*
 
+**THE 97-TYPE PROBE RAN, AND `name` -- THE CRASH'S OWN STRUCT -- IS
+EIGHT BYTES TOO BIG.** `14 of 97 disagree, 83 agree`, and seven of
+the fourteen are cfront's own types rather than glibc's:
+`node` 3 -> **8**, **`name` 144 -> 152**, `basic_inst` 168 -> 176,
+`funct_inst` 200 -> 208, `state` 88 -> 96, `templ_compilation`
+1 -> 8, `templ_inst` 200 -> 208. The other seven are the platform
+types already accounted for.
+**`name` is the type `table.c:1450` dereferences** --
+`__2s = (__1np[__1j])->__O2__4expr.string` -- and `__O2__4expr` is
+the SECOND of four unions inside it, so a member that grows ahead of
+it moves that union's offset and `.string` reads the wrong eight
+bytes. *That is exactly a `const char *` holding the identifier's own
+text.* **The padding hypothesis is live again**, and the 47-type run
+could not have seen it: `name` was one of the fifty types the
+preamble extraction dropped.
+
+**BUT THE TWO INSTRUMENTS DISAGREE ABOUT THE SAME COMPILER, AND THAT
+IS THE ROUND'S REAL FINDING.** Minutes apart, same `pcc`:
+`cfrontsz-probe` says kencc PADS (`node` 8, `name` 152), and
+`structalign-test` says it does NOT -- `struct{char a[3];}` is **3**,
+`struct{char a[500];}` is **500**, and **all three runs report 0
+failures, including the one without `-J` that was predicted to fail
+about twelve checks.** `round()` and `SZ_VLONG` are exactly as read,
+so the old rule must answer 8. **Both cannot be true of one
+compiler**, so one run is not measuring what its output says -- and
+*neither instrument recorded which compiler built its binary*.
+**`-J` NOW PREDEFINES `__APEXP_CONFORMALIGN__`**, because `pcc` drops
+a flag its ARGBEGIN does not name and `6c` turns an unknown letter
+into a debug counter, so **a stale compiler and a working one print
+the same thing**. *A null result with two explanations is not a
+measurement* -- the `_ttymark`/`_getcwdmark` idiom, for a COMPILER
+rather than a library, and the first thing this flag should have had.
+`structalign-test` prints it before anything else and gained a
+**section 7 PROBE** carrying cfront's own `node` shape -- three
+TYPEDEF'd unsigned chars -- beside the char ARRAY section 1 uses, so
+one run tells the two instruments apart rather than two rounds.
+*The predicted failure did not fire and the prediction was written
+down; that is the condition doing its job, not the flag.*
+
 **AND THE cfront SIZE PROBE WAS `.gitignore'd, SO THE VM NEVER GOT
 IT.** `pcc ... cfrontsz-probe.c` answered `Can't open input file` and
 `ls cfront*.c` showed only the two stub files. **git is the only
@@ -956,6 +995,35 @@ decisions with a compiler whose struct layout this tree has just
 spent a round on. It also does not remove the runtime question for
 ordinary C++ programs. *EDG's back end works at the SOURCE level,
 which is the property that makes the layout kencc's to decide.*
+**IT BUILDS AND IT TRANSLATES -- MEASURED ON THE HOST, NOT ARGUED.**
+`cmake --preset linux-gcc-release` then `ninja` produces **`cpfe`**
+(23 MB), and `cmake/macro-conf/default/cpfe.cmakedef` is literally
+`BACK_END_IS_C_GEN_BE=1` / `DO_IL_LOWERING=1` -- **the DEFAULT build
+is the C-generating one**, which is better than the README promised.
+*(I first read `defines.h`, found `BACK_END_IS_C_GEN_BE` set to 1
+nowhere, and reported that the release ships the back end with no
+configuration. Wrong: the switch arrives as a cmake `-D`, and the
+compile line says `-DBACK_END_IS_C_GEN_BE=1`. **Read the command the
+build runs, not the header it might have come from** -- the
+`config.h`-that-is-shadowed lesson in a new place.)*
+**`eccp -S --g++ --sys_include=...` IS THE TRANSLATOR**: a toy with a
+virtual base, an override, a template and `new`/`delete` came out as
+86 lines of ordinary C -- templates instantiated, inheritance
+flattened to `struct Derived { struct Base __b_4Base; }`, dispatch
+through a `__vptr`, Itanium-mangled names -- and **`gcc -c` compiled
+it with no errors**. Linking needs EDG's OWN runtime (`lib_src/`:
+`new`, `delete`, `vtbl`, `static_init`, `pure_virt`, `rtti`), not
+libstdc++, which is the whole reason this is tractable.
+**Two obstacles named from the output rather than guessed**: the
+generated C carries `__attribute__((__weak__))` and
+`((__nothrow__))`, which kencc has not and which will need defining
+away or an EDG option; and the host's own runtime build stopped on
+`-Wno-error=return-mismatch`, a **gcc 14** flag this box's gcc 13
+lacks -- *the driver's flag list, not the translation*.
+**EDG is compiled `-fno-exceptions -fno-rtti`**, so the front end
+itself needs no unwinder -- the self-translation's runtime surface is
+smaller than the general case.
+
 **NOT a reason to stop cfront**, and the reason is this tree's own:
 cfront is close (the driver works, mk stops at the fault, five files
 convert cleanly) and **its crash is currently flushing out kencc and
