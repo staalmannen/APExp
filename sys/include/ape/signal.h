@@ -158,10 +158,25 @@ extern int sigaction(int, const struct sigaction *, struct sigaction *);
 extern int sigprocmask(int, sigset_t *, sigset_t *);
 extern int sigpending(sigset_t *);
 extern int sigsuspend(const sigset_t *);
-extern int sigwait(const sigset_t *restrict, int *restrict);
-extern int sigwaitinfo(const sigset_t *restrict, siginfo_t *restrict);
+/*
+ * `__restrict' RATHER THAN `restrict', AND IT COSTS NOTHING: kencc
+ * lexes all three spellings to the same LRESTRICT (`cc/lex.c:1652,
+ * 1678-1679'). `restrict' is a C keyword and NOT a C++ one, so in C++
+ * these read as PARAMETER NAMES -- and two per prototype is then a
+ * duplicate parameter name, which is why a C++ compiler could not
+ * read these three lines at all.
+ *
+ * `#define restrict' away for C++ would be the wrong fix twice over:
+ * it is an unreserved name, and gnulib's `config.h' already defines
+ * it in a dozen packages here. `__restrict' is reserved, so nothing
+ * outside an implementation may define it -- and where a package's
+ * own `cdefs.h' does (twelve do), it expands to the qualifier or to
+ * nothing, which is correct either way.
+ */
+extern int sigwait(const sigset_t *__restrict, int *__restrict);
+extern int sigwaitinfo(const sigset_t *__restrict, siginfo_t *__restrict);
 struct timespec;	/* avoid pulling in time.h */
-extern int sigtimedwait(const sigset_t *restrict, siginfo_t *restrict, const struct timespec *restrict);
+extern int sigtimedwait(const sigset_t *__restrict, siginfo_t *__restrict, const struct timespec *__restrict);
 extern int sigqueue(pid_t, int, const union sigval);
 
 /*

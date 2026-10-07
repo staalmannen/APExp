@@ -12,6 +12,28 @@
 typedef struct { int quot, rem; } div_t;
 typedef struct { long quot, rem; } ldiv_t;
 
+/*
+ * `_Noreturn' IS A C11 KEYWORD AND C++ HAS NO SUCH SPELLING, so the
+ * three declarations using it below could not be read by a C++
+ * compiler at all. Found by EDG, which is stricter than gcc: its own
+ * sources had to be translated against a STAGED copy of this header,
+ * and the staging list is in `sys/src/external/edg/NOTE'.
+ *
+ * **The obvious fix is the one this tree has just been burned by.**
+ * `#define _Noreturn' under __cplusplus would be a public APE header
+ * defining a name ten external packages define themselves -- gnulib
+ * ships a whole `_Noreturn.h' -- which is the `reject' collision
+ * waiting for the next build. The spelling used instead is in the
+ * RESERVED double-underscore space, which nothing outside an
+ * implementation may define, and `__ape_template' below is the same
+ * convention; EDG's generated C already carries that one.
+ */
+#if defined(__cplusplus)
+#define __ape_Noreturn
+#else
+#define __ape_Noreturn _Noreturn
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -44,9 +66,9 @@ extern void *calloc(size_t, size_t);
 extern void free(void *);
 extern void *malloc(size_t);
 extern void *realloc(void *, size_t);
-extern _Noreturn void abort(void);
+extern __ape_Noreturn void abort(void);
 extern int atexit(void (*func)(void));
-extern _Noreturn void exit(int);
+extern __ape_Noreturn void exit(int);
 extern char *getenv(const char *);
 extern int putenv(char *);
 extern int system(const char *);
@@ -66,8 +88,8 @@ extern size_t wcstombs(char *, const wchar_t *, size_t);
 #include <bsd.h>
 
 extern char *mktemp(char *);
-extern int mkstemp(char *template);
-extern int mkostemp(char *template, int);
+extern int mkstemp(char *__ape_template);
+extern int mkostemp(char *__ape_template, int);
 
 /* from musl */
 typedef struct { long long quot, rem; } lldiv_t;
@@ -84,7 +106,7 @@ extern long long llabs(long long);
 extern lldiv_t lldiv(long long, long long);
 
 extern int at_quick_exit(void (*)(void));
-extern _Noreturn void quick_exit(int);
+extern __ape_Noreturn void quick_exit(int);
 
 /* musl and other ports */
 

@@ -1817,11 +1817,45 @@ live either way.
     fixed on their own evidence** later in the same session
     (`signal()`'s prototype, the `SIG_*` casts, `features.h`'s
     `hidden`, `bsd.h`'s `getopt`) and a re-translation need not repeat
-    them. Four remain, every one a parameter name or a keyword and so
-    invisible to a C caller: `stdlib.h`'s unguarded `_Noreturn`, a
-    parameter named `template`, `unistd.h`'s parameter named `new`,
-    and `signal.h`'s `restrict` read as a duplicate parameter name.
+    them. **The other four are fixed now too, so the staging list is
+    closed**: `stdlib.h`'s unguarded `_Noreturn`, its parameter named
+    `template`, `unistd.h`'s parameter named `new`, and `signal.h`'s
+    `restrict` read as a duplicate parameter name -- every one a
+    parameter name or a keyword, so invisible to a C caller.
     *EDG is a stricter compiler than gcc, and that is what it bought.*
+  - **AND THE OBVIOUS FIX FOR TWO OF THEM WAS THE ONE THAT HAD JUST
+    BROKEN THE BUILD.** `#define _Noreturn` or `#define restrict`
+    under `__cplusplus` would put an UNRESERVED name in a public APE
+    header that external packages define themselves -- gnulib ships a
+    whole `_Noreturn.h`, and a dozen `config.h` here define
+    `restrict` -- which is `reject` again, one round later. **The
+    bare-word sweep was run FIRST this time**, and it is what chose
+    the spellings: everything used is in the reserved
+    double-underscore space, which nothing outside an implementation
+    may define.
+    **Three of the four need no macro at all.** `restrict` becomes
+    `__restrict`, which costs nothing because *kencc lexes all three
+    spellings to the same `LRESTRICT`* (`cc/lex.c:1652,1678-1679`) --
+    and where a package's own `cdefs.h` defines `__restrict` (twelve
+    do) it expands to the qualifier or to nothing, correct either way.
+    The two parameters are renamed, which no caller can see.
+    `__ape_template` was not invented here: **EDG's generated C
+    already carries it**, so the staged edit had used this convention
+    and the tree now matches its own output.
+  - **The control is a before-and-after pair on IDENTICAL staging, and
+    it found a FIFTH item.** A C++ translation unit including
+    `<stdlib.h>`, `<unistd.h>` and `<signal.h>` gives **12 errors
+    before and 1 after** -- and the survivor is `stddef.h:50`
+    typedef'ing **`wchar_t`, which is a built-in type in C++**,
+    present in BOTH runs and named nowhere in the NOTE's list of
+    eight. *Recorded, not fixed.* The half that could have cost the
+    tree is the other one: the same unit compiled as **C is 0
+    errors**. `apehdr-sweep` 148 headers / 0 findings with the
+    together-case holding at its recorded 8; `apdecl-sweep` 0.
+    *The first staging recipe differed slightly between the two runs
+    and the after-count was re-taken with the before's exact
+    commands* -- two compiles differing in anything but the change
+    are not a control, which this file records from the `-J` round.
 - **muon** -- in `_OPTIONAL_APPS` commented out. Never built here.
 - **go** -- `go1.4` is in the tree, commented out of `_CORE_APPS`,
   and is the only thing that mentions `Ureg` outside libap.
