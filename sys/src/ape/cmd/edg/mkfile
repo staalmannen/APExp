@@ -1,0 +1,182 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+EDGSRC=../../../external/edg/src
+
+# cpfe -- EDG's C++ front end, built from EDG's own C.  One binary from
+# 75 translation units; `src/cfe.c' is the only one with a `main'.
+# See sys/src/external/edg/NOTE for how the C was produced and for the
+# target configuration, `kencc_targ.h', which is committed beside it.
+#
+# DELIBERATELY NOT IN `sys/src/cmd/mkfile''s app lists, and the reason
+# is this tree's own: ONE FAILING ENTRY ABORTS THE WHOLE TREE'S `mk',
+# which is why `basic' and `c++lib' are commented out there too.  Build
+# this directory BY HAND until it comes back clean.
+#
+# TWO THINGS ARE EXPECTED TO BE MEASURED HERE, in this order, and they
+# are different questions with different answers.
+#
+# 1. DOES pcc COMPILE IT.  Nothing in this directory has ever been
+#    through pcc.  `src/sys_predef.c' is **315,616 lines in one
+#    translation unit** (`ifc_modules_read.c' is 130,330 and
+#    `expr.c' 120,824), so a compiler table limit is the first thing
+#    likely to answer, and it would be kencc's answer rather than the
+#    port's -- worth knowing before anything is blamed on EDG.
+#    **RUN IT AS `mk -k'.** Plan 9 mk stops at the first failing
+#    recipe, so a plain `mk' costs one round per bad file across 75
+#    files; -k compiles the rest and the run names every one at once.
+#    That is the rule this tree has paid for twice -- bacon's missing
+#    header names and bacon's missing link symbols were both asked all
+#    at once rather than one per round, and both came back complete.
+#
+# 2. THEN THE LINK, WHICH IS THE KNOWN WALL.  `mkone' compiles every
+#    OFILE before it links, so a compile pass followed by a link
+#    failure is the expected shape and is TWO results rather than one.
+#    EDG emulates COMDAT for vague linkage -- inline functions,
+#    template instantiations, vtables, typeinfo -- and with the kencc
+#    target that emulation emits no `__weak__' at all (38,245 applied
+#    attributes went to 0), so the duplicates are now plain. Measured
+#    on two trivial translation units sharing one header: they collide
+#    on **10 symbols**; across these 75 files **3,094 COMDAT symbols
+#    are named in more than one**.  `6l' will say which, and its list
+#    is worth more than that grep -- the grep counts annotations, some
+#    of which are declarations rather than definitions, so 3,094 is an
+#    UPPER bound on colliding definitions.
+#    Neither answer to that is reached by editing this mkfile:
+#    `--one_instantiation_per_object' covers only the template share
+#    (3 of the 10) and makes the output depend on an `edg_prelink'
+#    phase, and upstream's answer for a target without COMDAT is the
+#    Cfront-like ABI, which was attempted and backed out.  The NOTE
+#    carries both and where each stops.
+#
+# NO -I AND NO -D: each file declares everything it uses, including its
+# own `void *memcpy(void *, const void *, unsigned long long)', where
+# the `unsigned long long' is kencc's size_t from `kencc_targ.h'.
+# CFLAGS is `-c' alone so that nothing is quieted on the first run.
+#
+# AND NO `LIB=' -- which is a QUESTION rather than a claim, and it is
+# why `sys/src/ape/lib/edg' should be built first.  cpfe is itself a
+# C++ program translated to C, so it may want EDG's own runtime
+# (`lib_src': new, delete, vtable support, static init, pure-virtual,
+# RTTI -- NOT libstdc++).  Reading cannot settle it: `src' holds
+# 145,752 distinct `_Z'-prefixed tokens and nearly all are names it
+# defines itself, with ordinary identifiers like `_ZERO' among them, so
+# a grep over them measures nothing.  *Only the link says which are
+# undefined.*  It is not obviously needed -- EDG is compiled
+# `-fno-exceptions -fno-rtti' and `src' references none of
+# `_Znwm'/`_Znam'/`_ZdlPv'/`_ZdaPv', nor `__memzero' or
+# `__abort_execution' -- so the first link is the measurement, and if
+# it names undefined `_Z' symbols the fix is one line:
+#	LIB=$APEXPROOT/$objtype/lib/ape/libedg.a
+# **Build lib/edg before this directory so that line is available
+# rather than blocking a round.**
+#
+# One thing the runtime does NOT do, checked rather than assumed,
+# because this tree has paid for it once: it adds nothing libap
+# already provides.  Every DEFINITION under `lib_src' is `_Z'-mangled
+# or `__'-prefixed -- `exit.c' defines `_Z4exiti', `memzero.c' defines
+# `__memzero' -- and the plain C names (`memset', `memcpy', `malloc',
+# `free', `abort', `exit') appear only as DECLARATIONS, so they resolve
+# to libap rather than replacing it.  *The filenames read alarmingly
+# and the definitions do not*, which is the declaration/definition
+# distinction the `reject' round cost a build over.
+
+TARG=cpfe
+
+BIN=$APEXPROOT/$objtype/bin/ape
+
+OFILES=\
+	attribute.$O\
+	c_gen_be.$O\
+	cfe.$O\
+	cfe_daemon.$O\
+	class_decl.$O\
+	cmd_line.$O\
+	const_ints.$O\
+	cp_gen_be.$O\
+	debug.$O\
+	decl_inits.$O\
+	decl_spec.$O\
+	declarator.$O\
+	decls.$O\
+	def_arg.$O\
+	disambig.$O\
+	error.$O\
+	expr.$O\
+	exprutil.$O\
+	extasm.$O\
+	fe_init.$O\
+	fe_wrapup.$O\
+	fixed_pt.$O\
+	float_pt.$O\
+	floating.$O\
+	folding.$O\
+	func_def.$O\
+	host_envir.$O\
+	ifc_map_functions.$O\
+	ifc_map_functions_acc.$O\
+	ifc_map_functions_dbg.$O\
+	ifc_map_functions_mut.$O\
+	ifc_map_functions_val.$O\
+	ifc_modules.$O\
+	ifc_modules_read.$O\
+	ifc_modules_templ.$O\
+	ifc_modules_write.$O\
+	il.$O\
+	il_alloc.$O\
+	il_display.$O\
+	il_read.$O\
+	il_to_str.$O\
+	il_walk.$O\
+	il_write.$O\
+	inline.$O\
+	interpret.$O\
+	layout.$O\
+	lexical.$O\
+	literals.$O\
+	lookup.$O\
+	lower_c99.$O\
+	lower_eh.$O\
+	lower_il.$O\
+	lower_init.$O\
+	lower_name.$O\
+	macro.$O\
+	mem_manage.$O\
+	modules.$O\
+	ms_attrib.$O\
+	overload.$O\
+	pch.$O\
+	pragma.$O\
+	preproc.$O\
+	scope_stk.$O\
+	src_seq.$O\
+	statements.$O\
+	symbol_ref.$O\
+	symbol_tbl.$O\
+	sys_predef.$O\
+	target.$O\
+	templates.$O\
+	trans_copy.$O\
+	trans_corresp.$O\
+	trans_unit.$O\
+	types.$O\
+	unicode_name_fsm.$O\
+
+UPDATE=\
+	mkfile\
+	${OFILES:%.$O=%.c}\
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+CC=pcc
+LD=pcc
+CFLAGS= -c
+
+%.$O: $EDGSRC/%.c
+	$CC $CFLAGS $EDGSRC/$stem.c
+
+install:V:
+	cp $O.out $BIN/cpfe
+
+nuke:V:
+	rm -f $BIN/cpfe

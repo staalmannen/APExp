@@ -1,0 +1,104 @@
+</$objtype/mkfile
+APEXPROOT=../../../../..
+LIB=$APEXPROOT/$objtype/lib/ape/libedg.a
+EDGSRC=../../../external/edg/lib_src
+
+# EDG's OWN C++ runtime -- operator new/delete, vtable support, static
+# initialisation, pure-virtual, RTTI -- as C, translated by EDG's own
+# C-generating back end.  See sys/src/external/edg/NOTE.
+#
+# NOT libstdc++ and nothing like it: that is the whole reason this path
+# is tractable on a target with no C++ compiler, and it is why this is
+# 51 small files rather than a port.
+#
+# THE ARCHIVE IS WHY THIS GOES FIRST.  The recorded open problem is the
+# LINK model -- EDG's COMDAT emulation for vague linkage, with 3,094
+# symbols named in more than one of `src''s 75 files -- and an archive
+# does not have that problem: `ar' takes duplicate members happily and
+# the clash only arrives when something LINKS them.  So this directory
+# answers the question nothing has answered yet, "does pcc compile
+# EDG's generated C at all", without the link model in the way.
+#
+# NO -I AND NO -D, deliberately and measured rather than assumed: each
+# file here is a WHOLE LOWERED TRANSLATION UNIT and declares everything
+# it uses, down to `void *memcpy(void *, const void *, unsigned long
+# long)' -- that `unsigned long long' is kencc's own size_t, from
+# `kencc_targ.h', so the declarations already describe this target.
+# The NOTE records `gcc -fsyntax-only' over all 133 files at 0 errors
+# and 0 warnings, which says the sources are clean and says nothing
+# about kencc.
+#
+# CFLAGS is `-c' alone on purpose: every diagnostic is wanted on the
+# first run through pcc, and a flag added to quiet one would hide the
+# rest.  `-J' arrives from pcc itself and is correct here -- EDG emits
+# real `sizeof' expressions rather than the 132 baked-in sizes cfront's
+# C carried, so kencc computes every layout and conforming layout is
+# exactly what the generated code wants.
+
+OFILES=\
+	array_del.$O\
+	array_del_aligned.$O\
+	array_new.$O\
+	array_new_aligned.$O\
+	array_nodel.$O\
+	array_nodel_aligned.$O\
+	array_nonew.$O\
+	array_nonew_aligned.$O\
+	array_pdel.$O\
+	array_pnew.$O\
+	bad_alloc.$O\
+	c99_complex.$O\
+	del_virt.$O\
+	delete.$O\
+	delete_aligned.$O\
+	delnothrow.$O\
+	delnothrow_aligned.$O\
+	dtor_list.$O\
+	edg_exit.$O\
+	eh_util.$O\
+	error.$O\
+	exception.$O\
+	exit.$O\
+	guard.$O\
+	main.$O\
+	memzero.$O\
+	munch_ctors.$O\
+	munch_dtors.$O\
+	new.$O\
+	new_aligned.$O\
+	newhandler.$O\
+	newnothrow.$O\
+	newnothrow_aligned.$O\
+	placedel.$O\
+	placenew.$O\
+	pure_virt.$O\
+	rtti.$O\
+	set_new.$O\
+	sized_array_del.$O\
+	sized_array_del_aligned.$O\
+	sized_del.$O\
+	sized_del_aligned.$O\
+	static_init.$O\
+	stdexcept.$O\
+	thread_dtor.$O\
+	throw.$O\
+	typeinfo.$O\
+	vars.$O\
+	vec_cctor.$O\
+	vec_newdel.$O\
+	vla_alloc.$O\
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CC=pcc
+LD=pcc
+CFLAGS= -c
+
+%.$O: $EDGSRC/%.c
+	$CC $CFLAGS $EDGSRC/$stem.c
+
+clean:V:
+	rm -f *.[$OS]
+
+nuke:V:
+	rm -f $LIB

@@ -7185,3 +7185,143 @@ multiplication's range, so `scalbn`'s broken arm was never involved.
 Run it with `pcc -o binfloat-test binfloat-test.c && ./binfloat-test`
 and read which section fails; that names the cause in one run instead
 of by elimination.
+
+---
+
+## The per-name baseline: 43 failing tests, 2026-10-07
+
+**This list exists because its ABSENCE kept one question open for
+rounds.** This file's own rule is *compare runs per file, never by
+total* -- and every Tcl round so far has been compared by total,
+because no per-name list was ever written down. `Failed 46 -> 43`
+cannot tell three fixed from five fixed and two broken; the names can.
+
+Provenance, which has to be read before anything else here (the stale
+log and the void `tclsh` run are both recorded above):
+
+```
+tcl-runall: tcl::test 9.0.3 present -- this is the test interpreter.
+Tests began at 2026-10-07 17:50:49 +0200
+Tests ended at 2026-10-07 17:54:57 +0200
+all.tcl:  Total 68118  Passed 62159  Skipped 5916  Failed 43
+Sourced 167 Test Files.
+tcl-runall: exit called (code 0)
+```
+
+The log is committed at `tmp/tcl-all.out`. **It does NOT contain the
+four C++-usability header fixes** (`_Noreturn`, `template`, `new`,
+`restrict`), which landed after this rebuild; it does contain the
+`features.h`, `getopt` and `libnet.h` changes.
+
+The 43, sorted, every one of which already appears somewhere in this
+file or in CLAUDE.md:
+
+```
+Tcl_Main-5.10  chan-io-28.7  chan-io-40.3  chan-io-6.31  chan-io-6.43
+chan-io-6.44  chan-io-6.45  chan-io-6.46  cmdAH-20.5  cmdAH-25.3
+env-2.1  env-2.2  env-2.3  env-2.4  env-3.1  env-4.1  env-4.3
+env-4.4  env-4.5  event-1.1  exec-19.1  io-29.33b  io-40.3
+io-52.22.1  io-6.31  io-6.43  io-6.44  io-6.45  io-6.46  lseq-4.21.4
+scan-15.1  socket-14.19  socket_inet-2.11  socket_inet-5.1
+socket_inet-5.3  socket_inet-7.3  unixFCmd-1.1  unixInit-1.2
+zipfs-password-read-cipher-2  zipfs-password-write-cipher-w-2
+zipfs-password-write-cipher-deflate-w
+zipfs-password-write-cipher-deflate-w+
+zipfs-password-write-cipher-deflate-a+
+```
+
+To compare the next run, extract the same way rather than by eye --
+`grep -oE '^==== [^ ]+ FAILED' <log> | awk '{print $2}' | sort -u` --
+and diff against the block above.
+
+### THREE FIXED, NOTHING BROKEN, ALL THREE NAMED
+
+`Failed 46 -> 43` with **`Total` and `Skipped` identical to the
+digit**, which is what makes the arithmetic a statement about the same
+68118 executions rather than about a different suite. And the three
+are exactly three entries of the recorded eleven unread singletons:
+
+```
+  chan-io-41.8      GONE
+  expr-old-37.21    GONE
+  unixFCmd-2.2.2    GONE
+```
+
+*Three gone and the net is three, so nothing arrived* -- which is the
+only form that confirmation can take, and it is the first time this
+suite's movement has been attributed by name instead of by total.
+**None of the three was predicted and none was being worked on**, so
+which change carried them is unidentified; guessing a vehicle would be
+the third such story in this file. The cheap discriminator is the next
+run, now that a baseline exists.
+
+### THE TWO QUESTIONS THE `-J` ROUND LEFT OPEN ARE BOTH ANSWERED
+
+- **`socket_inet-5.1`/`5.3` were NOT among the eighteen.** Both are
+  still failing, so *the leftover-listener false pass did not return*
+  -- which was the stated hazard, since those two want a port bind
+  refused and a stale listener had been refusing it. The prediction
+  was written down before the run and the answer is the good one.
+- **`event.test` and `main.test` were unchanged, not new.** Read by
+  name they are `event-1.1` and `Tcl_Main-5.10`, exactly the two
+  singletons the baseline already carried.
+
+### AND A CORRECTION THAT MATTERS MORE THAN THE THREE: THERE IS NO `socket_inet.test`
+
+The `-J` round recorded *"`socket_inet.test` HAS LEFT THE FAILING-FILE
+LIST ENTIRELY"* and offered it as the behavioural confirmation that
+`-J` had not broken the socket half of its measured blast radius
+(`sockaddr_in` 24 -> 16, `in_addr` 8 -> 4).
+
+**That file does not exist and never did.** `ls` over the suite shows
+one `socket.test`, and its body is a loop --
+`foreach {af localhost} {...}` with `test socket_$af-1.1 ...` -- so
+every `socket_inet-*` name is GENERATED inside `socket.test`, with
+`$af` taking the value `inet`. A grep for `socket_inet-5.1` matches no
+file in the tree at all.
+
+So the absence of `socket_inet.test` from `Files with failing tests`
+was never evidence of anything: it could not have appeared there under
+any outcome. And the substance does not hold either -- **`socket_inet`
+has four failures in this run, 2.11, 5.1, 5.3 and 7.3**, which is
+exactly the "`socket_inet` 4" this file already listed as unread. They
+did not go away and they have not moved.
+
+*The eighteen-test improvement under `-J` stands: it rests on `Total`
+and `Skipped` being identical with `Passed` +18, which is sound. What
+does not stand is the attribution of it to sockets.* The socket half
+of the blast radius is **unmeasured**, not confirmed -- and the
+pthread half was already recorded as unmeasured, because `197 thread`
+and `12 testmutex` are skipped. So the behavioural confirmation of
+`-J` covers neither family it actually moved.
+
+**The rule this breaks is one already in this file**: *a marker says
+the run reached the end, not that it was the run you asked for* -- and
+its sharper form, which is new. **A file name absent from a list is
+not a measurement until you have checked that the name could ever have
+been present.** An absence has at least two explanations -- the thing
+passed, or the thing was never named that way -- and only one of them
+is a result. Same family as *a check whose negative result has two
+explanations*, arriving for a FILE NAME rather than a test.
+
+### Still true, and worth keeping beside the list
+
+- **`io-6.46` and `chan-io-6.46` now BOTH fail**, which is the twins
+  rule working: `io-6.46` was recorded as *flaky not fixed* precisely
+  because its twin still failed, with "count that group by whether the
+  twins agree" written down. They agree.
+- **`socket_inet-2.11` FAILS rather than hanging**, so the
+  `_resettimer` repair is still holding -- the suite completed in four
+  minutes with no file aborting.
+- **`chan-io-40.3`/`io-40.3` still fail with `umask()` now working**,
+  which is correct rather than surprising: the initial mask is
+  deliberately 0, the file server hands out `perm & (dirperm | ~0666)`
+  regardless, and the test computes 0666. *A conformance fix that was
+  deliberately not a default change does not move a test that measures
+  the default.*
+- **zipfs is FIVE, where this file records three.** All five are
+  `zipfs-password-*` cipher tests with `errorCode TCL ZIPFS PASSWORD`
+  -- one family, zipfs's own, so the "13 -> 3 CONFIRMED" undercounted
+  a single cluster by two rather than anything regressing. *A cluster
+  sized from a prediction rather than counted from the names, which is
+  the same error as sizing `run-redir` from one section head.*
