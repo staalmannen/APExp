@@ -1521,13 +1521,44 @@ sweep rather than argued, and each named its own error.
   nowhere** (grep: zero hits outside the header), so every program
   including `<sys/socket.h>` carried three promises libap cannot keep
   -- failing at the LINK rather than at the call, which is the later
-  and worse of the two places. Removed. **`reject` is the same defect
-  pointing the other way**: `plan9/announce.c:139` DEFINES
-  `reject(int, char*, char*)` and no header declared it, so libap held
-  a function nothing could call with its arguments checked. Declared
-  now. *The note said `libnet.h` was "the same interface that all five
-  callers use" -- they include it and call `announce`/`dial`/`hangup`/
-  `netmkaddr`, never the three `net_` names.*
+  and worse of the two places. Removed. *The note said `libnet.h` was
+  "the same interface that all five callers use" -- they include it
+  and call `announce`/`dial`/`hangup`/`netmkaddr`, never the three
+  `net_` names.*
+  **AND THE OTHER HALF -- DECLARING `reject` -- BROKE THE BUILD AND
+  IS REVERTED.** `plan9/announce.c:139` defines
+  `reject(int, char*, char*)` and no header named it, so it looked
+  like the "capability present and not declared" shape. flex said
+  otherwise on the first compile after it:
+
+  ```
+    flexdef.h:366 external redeclaration of: reject
+        EXTERN INT reject
+        EXTERN FUNC(INT, IND CHAR, IND CHAR) INT   libnet.h:36
+  ```
+
+  **flex has `extern int reject;` -- a VARIABLE.** And because this
+  header is reached from `<sys/socket.h>`, anything it declares is
+  surface for every networked program in the tree: **210 files under
+  `external/` use the name**, gnulib spelling two PARAMETERS with it
+  (`mbsspn(const char*, const char *reject)`, `u8_strcspn`).
+  ***MY SWEEP LOOKED FOR `reject(` AND SO COULD NOT MATCH A
+  VARIABLE*** -- which is the mistake this file ALREADY RECORDS, from
+  the bacon link round: *"four VARIABLES my function-shaped grep
+  could not match (`optind`, `opterr`, `optarg`, `stdin`)"*. Same
+  error, two sections apart, in the same session. **Sweep for the
+  NAME, not for the shape you expect it to have.**
+  **The control fires and is a real one**: a translation unit holding
+  `#include <sys/socket.h>` and `extern int reject;` gives 0 errors
+  against the fixed header and `redeclared as different kind of
+  symbol` with the declaration put back -- gcc's wording for exactly
+  what 6c printed.
+  **And `apehdr-sweep` could not have caught this, which is a limit
+  worth stating**: it compiles APE headers against *each other*, and
+  `flexdef.h` is a package's own header. *A public header's real
+  blast radius is every package in the tree, and no instrument here
+  measures that* -- the cheap guard is to grep `external/` for the
+  bare word before adding any name to `sys/include/ape`.
 - **`getopt`: TWO INSTALLED HEADERS DECLARED IT INCOMPATIBLY, and my
   note said there was only one.** `bsd.h:47` had
   `(int, char**, char*)` while **`getopt.h:8` has had POSIX's
@@ -2066,6 +2097,16 @@ in the topic file.
 - **A macro's identity includes whether there is white space.** Copy an
   upstream spelling character for character, and guard it; and grep the
   mkfiles for `-D<name>=` before adding a name to an APE header.
+- **Before adding ANY name to a public APE header, grep `external/`
+  for the BARE WORD** -- not for `name(`, not for `extern int name`.
+  A public header's blast radius is every package in the tree, and
+  `apehdr-sweep` cannot see it: that sweep compiles APE headers
+  against each other, while the collision arrives from a package's
+  own header. Declaring `reject` in `libnet.h` -- which
+  `<sys/socket.h>` includes -- broke flex, whose `flexdef.h:366` has
+  `extern int reject;`, a VARIABLE. **A function-shaped grep cannot
+  match a variable**, which is the same miss that let `optind`,
+  `opterr`, `optarg` and `stdin` through one round earlier.
 - **Syntax-check vendored backends on the host with gcc before shipping**
   (the command is in `docs/notes/tk-plan9.md`); gcc is stricter than pcc
   and a round trip to the VM costs a full rebuild.
