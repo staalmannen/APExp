@@ -1129,13 +1129,28 @@ after its preamble:
 `__O2__4expr.string` read the wrong eight bytes and came back holding
 the text `precisio`. `-J` puts `name` back to 144 and the
 dereference is of a pointer again.
-**NOT CLEANLY ATTRIBUTED, and the separation is now one command.**
-Two things changed between the crashing run and this one -- `-J` by
-default and the `sualign` fix -- and the second was wrong for every
-compile, so either could be the vehicle. **`pcc -9` is what settles
-it**: rebuild cfront with the old rule and the fault should come
-back at `pc=0x280db8`. *The flag exists for the instruments, and
-this is the first instrument that needs it.*
+**AND `pcc -9` SETTLED THE ATTRIBUTION EXACTLY AS ASKED.** cfront
+rebuilt with the old layout rule crashes again on the same file at
+**`pc=0x280db8`** -- the same address to the digit -- with
+`cfront 1265` bytes, byte for byte the pre-`-J` run. **The
+`sualign` fix is in BOTH builds**, since that line was never gated on
+`conformalign`, so it is excluded and `-J` is the vehicle with
+nothing left over. *One flag, one rebuild, two numbers that were
+written down before the run* -- and it is the first time this tree
+has produced an A/B where the only difference is a layout rule and
+the observable is a faulting address.
+**THE SEVEN MAGIC GUARDS WERE NEVER WORKING, which is the finding
+the pair hands over for free.** `table.c` carries
+`if ((long long)...string < 0x200000) continue;` at **1245, 1351,
+1451, 1470, 1607, 1671 and 1672** -- this fork papering over a
+garbage `const char *` in seven places rather than diagnosing it.
+They catch only the case where the misread eight bytes happen to be
+a SMALL number, and the one that actually crashed held
+`0x6f69736963657270` -- the text `precisio`, far above the
+threshold. *A workaround whose own threshold the real case steps
+over*, and seven copies of it meant nobody ever asked why. They are
+removable under `-J` and the removal is a second independent check:
+identical behaviour with `-J`, a worse crash with `-9`.
 **The diagnostics that remain need no VM and are already recorded**:
 the four `iostream.h` redeclarations and `two definitions of norm()`
 are character for character what the host ASAN build produced, and
@@ -1535,6 +1550,41 @@ cfront is close (the driver works, mk stops at the fault, five files
 convert cleanly) and **its crash is currently flushing out kencc and
 libap bugs, which is where every large find here has come from**.
 EDG would run on the same libap and want the same bugs fixed.
+
+**THAT REASON HAS NOW EXPIRED, AND SAYING SO IS THE POINT.** The
+crash was the last kencc bug cfront had to give, and **the HOST
+settles that it is the last**: cfront built with gcc, where `long` is
+64-bit and the layout is conforming by construction, produces the
+diagnostics that remain **character for character** -- the four
+`iostream.h:224/228/266/269` redeclarations, `two definitions of
+norm()`, `operator delete()'s 2nd argument must be a size_t`,
+`placenew.cpp two definitions of operator new()`. *A fault both
+compilers reproduce is upstream's, not this tree's.* So cfront has
+stopped being a bug-finder for APExp, and the thing to stop is
+**spending rounds on it**, not the directory.
+**KEEP IT, OFF, for three reasons that are not sentiment.** (1) The
+`-9`/`-J` pair is now the only END-TO-END regression instrument for
+the layout rule this tree has: `structalign-test` measures sizes and
+offsets, while this measures a *program that behaves differently* --
+same input, one flag, `pc=0x280db8` or no fault. Nothing else
+reproduces that. (2) `cfrontsz-probe.py` reads cfront's generated C
+for its 97 recorded struct sizes, and that oracle is the generated
+files. (3) The EDG path, if it is ever taken, wants the same `c++`
+driver, the same `ns_strip`, the same `<values.h>` and the c++lib
+mkfile; deleting now and rewriting later is strictly worse than
+leaving a directory nothing builds. **`c++lib` is already commented
+out of `_OPTIONAL_APPS` and stays out; `cfront` itself stays in**,
+because building the translator is cheap and is what keeps the
+instrument alive.
+**The ONE experiment left, and it is bounded**: remove the seven
+`< 0x200000` guards and run `cmd/c++lib` by hand under each rule.
+Identical output under `-J` plus a worse crash under `-9` is a
+second, independent confirmation of the layout fix and removes seven
+lines that would MASK a recurrence of exactly the bug `-J` repaired.
+*If that comes back clean, cfront is finished as a question for this
+tree* -- what remains is a 1980s front end that cannot tell two
+overloads apart on a 64-bit target, which is a C++ problem and not a
+Plan 9 one.
 
 **NEITHER IS ENABLED IN `cmd/mkfile' YET, deliberately**: one failing
 entry aborts the whole tree's `mk', and bacon has never been through
@@ -5231,7 +5281,16 @@ it.
 EBADF -- gives **exactly 1**, section 5, which the header says is
 there for it. *A control that fires on one section is better evidence
 than one that fires on four*: it says the section is not decorative.
-0 failures on glibc. NOT YET MEASURED ON THE VM.
+0 failures on glibc.
+**CONFIRMED ON THE VM: `_dupmark = 1`, all seven sections PASS, 0
+failures** -- and the two lines that carry it are section 4b,
+`fcntl(buffered, F_DUPFD, 25)` answering **>= 25** where it used to
+refuse, and section 5, `read(dup) -> -1, errno 3` rather than EBADF.
+*Errno 3 is EWOULDBLOCK, which is the test's own non-blocking reads
+and not a failure*: the bytes are in the copy process, which is the
+limit the header records rather than a defect. Section 6 then reads
+all eight from the original, so the dup did not cost the original
+its data.
 **And `dupbuf-test` HUNG on its first host run, in the way its own
 header had just finished describing** -- section 5 drains the pipe
 through the dup and section 6 then blocks reading the original.
