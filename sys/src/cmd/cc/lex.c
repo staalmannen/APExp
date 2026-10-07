@@ -106,7 +106,22 @@ main(int argc, char *argv[])
 		 * with two explanations is not a measurement*, which is the
 		 * rule `_ttymark' and `_getcwdmark' already exist for; this
 		 * is the same idiom for a COMPILER rather than a library.
+		 *
+		 * AND IT HAS TO GO IN `defs[]', NOT ONLY THROUGH
+		 * dodefine(). `compile()' FORKS AN EXTERNAL cpp and hands
+		 * it `-D%s' for each entry of `defs[]' (lex.c:289), so a
+		 * macro defined here in `cc's own symbol table is not seen
+		 * by the preprocessor that actually runs. The first version
+		 * called dodefine() alone, the macro was invisible, and the
+		 * test reported `-J NOT in effect' for a flag whose real
+		 * state it had not measured -- *an instrument that reports
+		 * the ABSENCE of a thing it never had access to*. Both, so
+		 * the name is defined whichever preprocessor runs.
 		 */
+		if((ndef & 15) == 0)
+			defs = allocn(defs, ndef*sizeof(defs[0]),
+				16*sizeof(defs[0]));
+		defs[ndef++] = "__APEXP_CONFORMALIGN__";
 		dodefine("__APEXP_CONFORMALIGN__");
 		break;
 
