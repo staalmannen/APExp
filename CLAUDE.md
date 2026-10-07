@@ -1559,6 +1559,12 @@ sweep rather than argued, and each named its own error.
   blast radius is every package in the tree, and no instrument here
   measures that* -- the cheap guard is to grep `external/` for the
   bare word before adding any name to `sys/include/ape`.
+  **CONFIRMED ON THE VM: the revert builds.** `mk distclean` plus
+  `mk install` completes, so the tree gets past `lex` and the whole
+  order after it was reached for the first time since the header
+  changed. *That is the weakest useful result and is worth saying so*
+  -- it confirms the collision is gone, and the `net_*` removal
+  beside it costs no link, which is all a completed build can say.
 - **`getopt`: TWO INSTALLED HEADERS DECLARED IT INCOMPATIBLY, and my
   note said there was only one.** `bsd.h:47` had
   `(int, char**, char*)` while **`getopt.h:8` has had POSIX's
@@ -1754,13 +1760,68 @@ live either way.
 ## What is open, as a list
 
 **Ports not started**, in the order their risk was last measured:
-- **EDG** -- investigated and measured on the host (it builds, the
-  default build IS the C-generating one, `eccp -S` translates a toy
-  with templates and virtual bases into C that gcc compiles). Two
-  named risks remain and both are one host afternoon: `targ_def.h`
-  describing kencc (`int` 4, `long` **4**, pointer 8 -- LLP64, which
-  EDG supports for MSVC), and whether its C back end handles the C++
-  subset EDG itself is written in. No mkfile written.
+- **EDG** -- **BOTH NAMED RISKS ARE CLOSED AND THE SELF-TRANSLATION IS
+  IN THE TREE.** `sys/src/external/edg` holds **133 generated C files,
+  ~2.90M lines**: all 75 `src/`, 7 `util/` and 51 `lib_src/`, produced
+  by a `cpfe` built from the same commit with a kencc target, plus
+  EDG's own 17 C++ headers verbatim. `gcc -fsyntax-only` over all 133
+  is **0 errors, 0 warnings** -- which is the host's answer and says
+  nothing about kencc. Full detail in `sys/src/external/edg/NOTE`;
+  only the consequences are here.
+  - **Risk 1, the target description: answered by EDG's own `win64`.**
+    kencc on amd64 is LLP64 and win64 is EDG's LLP64 configuration, so
+    the values were taken from the build's generated
+    `cmake_defines.h` rather than invented. Every scalar width
+    matches, **including `long double` 8** -- win64 says 8 because
+    MSVC has no extended precision and kencc says 8 because
+    `cc/sub.c`'s `simplet()` maps `BDOUBLE|BLONG` to `types[TDOUBLE]`,
+    which was not predicted. `size_t`/`ssize_t`/`ptrdiff_t` are
+    win64's kinds too, read out of `stddef_arch.h`; **`wchar_t` is the
+    one place the two differ** (`unsigned int` here, `unsigned short`
+    there). `kencc_targ.h`, committed beside the NOTE, is the whole
+    configuration -- a **pre-included header**, so nothing in the EDG
+    tree is modified.
+  - **Risk 2, self-translation: it translates.** One file does not and
+    it is the right one -- `util/cfe_daemon_client.c`, the only file
+    in the tree needing a real C++ standard library, and a
+    unix-domain-socket client is out of scope here twice over.
+  - **The target was inferred from the compiler that BUILT cpfe, which
+    is the finding of the round.** `targ_def.h:3505` derives
+    `GCC_IS_GENERATED_CODE_TARGET` from `defined(__GNUC__)`, and that
+    one variable is the sole gate on both `__weak__` emission sites --
+    so cpfe built by g++ decided its OUTPUT was for gcc and emitted
+    **26,712 `__attribute__((__weak__))`**, which kencc has not. A
+    first round also baked in LP64 and glibc's headers. Setting it to
+    0 and staging APExp's own headers takes the applied-attribute
+    count **38,245 -> 0**; the 11 textual occurrences left are all
+    inside string literals, EDG's own emitter text.
+  - **THE LINK MODEL IS THE OPEN PROBLEM, and removing `__weak__`
+    exposed it rather than solving it.** Those attributes were COMDAT
+    emulation for vague linkage. Measured: two trivial TUs sharing one
+    header collide on **10 symbols**, and across `src/` there are
+    **3,094 COMDAT symbols named in more than one of the 75 files**.
+    `--one_instantiation_per_object` is deliberately NOT used -- it
+    covers only the template instantiations (3 of the 10) and makes
+    the output depend on an `edg_prelink` phase mk cannot naturally
+    express. Upstream's answer for a target without COMDAT is the
+    **Cfront-like ABI**, and that was attempted and **backed out**:
+    `IA64_ABI=0` makes cpfe fail to *compile* on three
+    `TARGET_CONFIGURATION`-suffixed macros the Cfront ABI needs, so it
+    is reachable by regenerating the macro configuration rather than
+    by setting switches, and it changes mangling, the ctor/dtor model
+    and vtable layout. Its own round.
+  - **NO MKFILE, AND NOTHING HERE HAS BEEN THROUGH pcc.** That is the
+    next step and the link model is what it will run into.
+  - **Its staging list doubled as a to-do list for our own headers.**
+    Eight APE headers could not be included from C++; **four were
+    fixed on their own evidence** later in the same session
+    (`signal()`'s prototype, the `SIG_*` casts, `features.h`'s
+    `hidden`, `bsd.h`'s `getopt`) and a re-translation need not repeat
+    them. Four remain, every one a parameter name or a keyword and so
+    invisible to a C caller: `stdlib.h`'s unguarded `_Noreturn`, a
+    parameter named `template`, `unistd.h`'s parameter named `new`,
+    and `signal.h`'s `restrict` read as a duplicate parameter name.
+    *EDG is a stricter compiler than gcc, and that is what it bought.*
 - **muon** -- in `_OPTIONAL_APPS` commented out. Never built here.
 - **go** -- `go1.4` is in the tree, commented out of `_CORE_APPS`,
   and is the only thing that mentions `Ureg` outside libap.

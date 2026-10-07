@@ -26,7 +26,11 @@ Converted
            cmake --preset linux-gcc-release -B build/kencc \
                  -DCMAKE_CXX_FLAGS="-include <path>/kencc_targ.h"
            ninja cpfe
-         kencc_targ.h is the target configuration; see below.  It is a
+         kencc_targ.h IS COMMITTED BESIDE THIS FILE -- it is the one
+         input to this directory that is neither upstream's nor
+         generated, so a scratch copy of it would have made the whole
+         translation unreproducible once the container went.
+         It is the target configuration; see below.  It is a
          pre-included header rather than a patch: NOTHING IN THE EDG
          TREE IS MODIFIED.
   Driver: dev_tools/bin/eccp, with build/kencc/environment.sh sourced.
@@ -275,26 +279,41 @@ NOTHING IN APExp's HEADER TREE WAS MODIFIED.  To reproduce this
 directory those edits have to be repeated, and they are all cases of
 an APE header not being usable from C++:
 
+STILL NEEDED -- four, and all four are a parameter name or a keyword,
+so none of them changes what a C caller sees:
+
   sys/include/ape/stdlib.h:47,49,87  `_Noreturn` (a C11 keyword that
       does not exist in C++) used unguarded
   sys/include/ape/stdlib.h:69,70     parameter named `template`
   sys/include/ape/unistd.h:186,192   parameter named `new`
-  sys/include/ape/signal.h:132-135   `restrict` as a parameter name;
+  sys/include/ape/signal.h:161-164   `restrict` as a parameter name;
       two per prototype reads as a duplicate parameter name in C++
-  sys/include/ape/signal.h:57        `signal()`'s handler parameter
-      declared `void (*)()` -- unprototyped -- where POSIX says
-      `void (*)(int)`
-  sys/include/ape/signal.h:16-18     SIG_DFL/SIG_ERR/SIG_IGN cast to
-      `void (*)()`, same defect as the declaration beside them
-  sys/include/ape/features.h:55      `#define hidden` -- musl's
-      internal visibility macro, in a PUBLIC header
-  sys/include/ape/bsd.h:47           `getopt(int, char**, char*)`,
-      non-const, where POSIX says `(int, char *const *, const char *)`
+
+NO LONGER NEEDED -- four of the original eight were fixed in APExp's
+own header tree later in the same session, for their own reasons, and
+a re-translation does NOT have to repeat them.  Verified against the
+tree rather than assumed:
+
+  signal.h   `signal()` is prototyped now --
+             `extern void (*signal(int, void (*)(int)))(int)` at :86
+  signal.h   SIG_DFL/SIG_ERR/SIG_IGN are `(void (*)(int))` at :45-47;
+             they had to move with the declaration, since callers
+             compare the return value against them
+  features.h `#define hidden` is GONE from the public header -- it had
+             a measured victim in `sqlite3.h:10957`'s
+             `unsigned char hidden[48]`
+  bsd.h:53   `getopt(int, char * const [], const char *)`, POSIX's
+             spelling, agreeing with `<getopt.h>` at last
+
+*That is the translation's own staging list working as a to-do list
+for the HEADER TREE*: it was written as eight things EDG could not
+use, and half of them turned out to be defects worth fixing on their
+own evidence, found by a stricter compiler than gcc.
 
 One absolute include also had to be rewritten for a host compile:
 amd64/include/ape/stddef_arch.h's `#include "/sys/include/ape/..."`.
 Four others of the form `#include "/sys/include/..."` name native
 Plan 9 headers and are unreachable from EDG, so they were left.
 
-These are reported as findings in their own right; see the round-2
-report.  They are not EDG's problem and they are not fixed here.
+The four that remain are reported as findings in their own right and
+are not fixed here; they are not EDG's problem either.
