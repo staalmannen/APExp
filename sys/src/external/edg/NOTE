@@ -698,3 +698,340 @@ mkfile.  Quoted.  Every other `-D' in the tree arrives through an
 expanded `$CFLAGS', where mk substitutes after rc has parsed, so this
 is the first LITERAL one here and had no working precedent in the
 directory to copy from.
+
+CONFIRMED: cpfe RUNS ON 9front.  After the rename it reaches its own
+command-line parser and answers with its own diagnostics:
+
+	$ cpfe --help
+	Command-line error: invalid option: --help
+	1 catastrophic error detected in this compilation.
+	$ cpfe -V
+	Command-line error: missing source file name
+
+THAT IS THE ENTRY-POINT DIAGNOSIS CONFIRMED BEHAVIOURALLY, and both
+messages are cpfe working rather than refusing.  `--help' and `-V' are
+`eccp' DRIVER options; cpfe's own table (src/cmd_line.c) has no `help'
+entry at all and spells the other one `--version'.  `-V' reaching
+"missing source file name" means it was ACCEPTED and only the operand
+was absent.
+
+AND `--no_standard_includes' IS THE DRIVER'S TOO, which matters for
+anyone writing the first command by hand: it is not in cpfe's option
+table, because the driver implements it by simply not passing its
+default --sys_include list.  cpfe has no standard include path of its
+own -- it searches exactly what it is given -- so there is nothing to
+suppress.
+
+THE FIRST TRANSLATION ON 9front, as a command (from bash inside
+apexp-sh; the `=' needs no quoting there, only in an mkfile recipe,
+where rc parses it):
+
+	cpfe --c++14 --no_exceptions --no_rtti \
+	     --sys_include=<edg>/include_c++ \
+	     --sys_include=<edg>/include_c99 \
+	     --sys_include=/amd64/include/ape \
+	     --sys_include=/sys/include/ape \
+	     --gen_c_file_name=/tmp/t.c /tmp/t.cpp
+
+Start with a toy that uses NO `new' and no static constructors: those
+are the two places the runtime is reached, and the static-init gap
+above is open.  `pcc -c /tmp/t.c' is the half that matters -- cpfe
+emitting C says the front end runs, and pcc accepting it says the
+target configuration in kencc_targ.h describes this machine.
+
+
+THE C++ STANDARD LIBRARY: WHAT EDG GIVES AND WHAT IT DOES NOT
+-------------------------------------------------------------
+
+Asked as soon as cpfe ran, and worth settling before anyone starts: no,
+EDG ships no standard library, and this directory contains none.
+
+WHAT IS HERE, MEASURED.  `include_c++' holds ELEVEN headers and its own
+README says exactly why: "only those headers that require specific
+magic to work right with the EDG front end."  They are the
+LANGUAGE-SUPPORT set -- <new>, <typeinfo>, <exception>, <stdexcept>,
+<initializer_list>, <compare>, <coroutine>, <source_location>,
+<stdfloat>, plus cxxabi.h and edg_internal_defines.  A grep across all
+of them for `basic_string|vector|iostream|ostream' is EMPTY.
+`include_c99' holds one file, `iso646.h'.
+
+`lib_src' (51 files, 7191 lines) is the matching RUNTIME: the operator
+new/delete families, vtables, RTTI, static initialisation,
+pure-virtual, exception support.  **That is the libsupc++ / libc++abi
+layer, not libstdc++.**  The distinction is the whole answer: EDG
+supplies the compiler and the ABI runtime, and the standard library
+proper is absent.
+
+WHAT WORKS WITH NO LIBRARY AT ALL is more than it sounds, and the
+evidence is this directory: classes, templates, inheritance, virtual
+dispatch, operator overloading, RAII, new/delete, references,
+namespaces, plus std::bad_alloc, type_info and initializer_list from
+the headers above.  **That is the subset EDG ITSELF is written in**,
+which is why the self-translation worked at all -- EDG has never used a
+standard library, and `basic_hdrs.h' includes only EDG's own headers.
+
+AND THE EXCEPTION MODEL IS THE FINDING THAT DECIDES THE REST.
+EDG's EH here is **setjmp/longjmp with its own region bookkeeping** --
+`__eh_curr_region' 138 occurrences, `an_eh_stack_entry' 99, `setjmp'
+19, `longjmp' 2, and **ZERO references to `_Unwind_' anything** across
+all 51 files.
+  - GOOD: exceptions need no libgcc, no libunwind, no `.eh_frame' and
+    no personality routine.  On a target that has none of those this is
+    the only model that could work, and it is why EDG's C back end
+    exists at all.
+  - BAD FOR libc++: libc++'s EH integration assumes the ITANIUM ABI.
+    So this is NOT the usual "drop libc++ onto a conforming ABI layer"
+    arrangement that the libsupc++-shaped `lib_src' makes it look like
+    -- the two EH halves genuinely disagree.  `-fno-exceptions' would
+    sidestep it, at the price of a standard library that cannot throw.
+*The layering LOOKS standard and the EH model is not, and only the
+grep says so.*
+
+NOT AN OBSTACLE, checked rather than assumed: the type-trait builtins a
+modern STL needs are in cpfe's table -- `__is_trivially_copyable',
+`__is_trivially_destructible', `__is_constructible', `__is_base_of',
+`__underlying_type', `__is_aggregate', `__has_trivial_destructor' and
+`__builtin_va_arg' all resolve.
+
+THE CANDIDATES, AND THE AXIS THAT MATTERS IS NOT MAINTENANCE
+------------------------------------------------------------
+**APExp's stated goal is building existing UNIX software with minimal
+modification.**  Against that goal the decisive property is the
+NAMESPACE, not how alive the project is: software written against
+`std::vector' and `std::string' does not compile against `etl::' or
+`eastl::' however good those libraries are.  A renamed STL serves NEW
+code written for it; only a `std::' implementation serves a PORT.
+*That is a reasoning point and holds regardless of which project is
+picked.*
+
+  STLport      -- designed for weak compilers, EDG-based ones named
+                  among them, which is the one axis where it is the
+                  best fit here.  ABANDONED since 2008.
+  ETL          -- actively maintained; EMBEDDED target, and its
+                  containers are fixed-capacity (`etl::vector<T,N>'),
+                  so it is a different API rather than a thin
+                  substitute.  Own namespace.
+  EASTL        -- more complete on containers and algorithms than ETL.
+                  Own namespace; iostreams believed absent.
+  uClibc++     -- the one candidate reported to use the `std::'
+                  NAMESPACE and to carry iostreams, LGPL, aimed at
+                  small systems and at compilers without full template
+                  support -- which describes this target.  Open Hub
+                  marks it INACTIVE at 0.2.5, and a 2009 Gentoo
+                  developer post calls it broken and a source of
+                  security problems.
+  libstdc++    -- GCC-specific, built on GCC internals.  Worse than
+                  any of the above here.
+
+**PROVENANCE, because it decides how much weight each line carries.**
+Everything above the candidate list is MEASURED in this tree by grep
+and is reliable.  The candidate list is NOT: STLport's 2008 abandonment
+and ETL's embedded fixed-capacity design are recalled and were not
+re-verified; uClibc++'s status, licence and the 2009 criticism come
+from one web search; and EASTL's namespace and missing iostreams were
+NOT confirmed by search -- the result said "from general knowledge, not
+from these results", so treat that line as unchecked.  *Anyone acting
+on this list should re-check the project they choose rather than trust
+this paragraph*, which is the same rule this tree applies to a stale
+suite log.
+
+THE HONEST ORDERING
+-------------------
+  1. NOTHING.  Treat APExp C++ as "C with classes and templates".
+     Already reachable, needs no new code, and is strictly more than
+     cfront ever delivered here.  Everything cpfe itself is written in
+     works today.
+  2. A SMALL STL in its own namespace (EASTL or ETL).  Buys containers
+     and algorithms for NEW code; buys nothing for porting existing
+     software, which is the project's stated purpose.
+  3. A `std::'-namespace library (uClibc++, or STLport despite its
+     age).  The only option that helps a PORT, and the one whose
+     candidates are in the worst condition.
+  4. libc++.  Large, C++20-era, wants <atomic>, threading and locale,
+     and the EH model above is a real obstacle rather than a detail.
+
+*Nothing here is started and none of it is a prerequisite for anything
+already working.*  The next EDG step is still the one in the section
+above: cpfe translating a toy and `pcc -c' accepting the C.
+
+
+cpfe's TARGET IS NOT kencc's, AND kencc_targ.h NEVER REACHED target.c
+----------------------------------------------------------------------
+
+`cpfe --c++14 ... t.cpp' answers
+
+	Internal error: check_target_config: must use SoftFloat library
+	    for this configuration
+
+and that is cpfe refusing its OWN configuration, not anything about the
+input.  `src/target.c:10642' fires when `targ_ldbl_mant_dig == 64', an
+80-bit x87 long double, which cpfe cannot constant-fold without a
+SoftFloat library it was not built with.
+
+cpfe IS MULTI-TARGET.  `target.c:6525' holds a table of EIGHT
+configurations -- linux_x86_64, linux_i686, win64, win32,
+linux_aarch64, linux_armv7, linux_riscv64, linux_riscv32 --
+`fe_init.c:49180' defaults the index to 0, and `--target <name>'
+(cmd_line.c) selects by name.  **Entry 0, labelled `linux_x86_64',
+points at `set_legacy_target_config'** -- the configuration built from
+the UNSUFFIXED TARG_* macros, which is exactly the set `kencc_targ.h'
+overrides.
+
+AND IT CARRIES THE HOST'S VALUES, measured from the generated C:
+
+	set_legacy_target_config:  long 8  long double 16  mant_dig 64
+	set_target_config_win64:   long 4  long double  8  mant_dig 53
+
+So `kencc_targ.h' did not reach the translation of `target.c'.  **That
+is a DIFFERENT macro environment from the one the NOTE above measured.**
+The `__weak__' suppression (38,245 -> 0) is a property of the cpfe
+BUILD -- how the host cpfe behaved; the TARG_* widths are read when
+`target.c' is TRANSLATED, and only the second bakes into the committed
+C.  The two were treated as one.
+*Which mechanism is NOT settled*: the pre-include may have been absent
+from the translation command, or present and then overridden by
+`cmake_defines.h' included after it.  One look at the host build's
+translation line separates them, and nobody should act on a guess here.
+
+win64 IS kencc's INTEGER AND FLOAT MODEL EXACTLY, AND THE DIFF IS THE
+WHOLE COST
+---------------------------------------------------------------------
+Both configurations are in the generated source, so their diff is a
+COMPLETE list rather than a reading -- the `apeabi-probe' idiom again.
+126 `targ_*' assignments each, **36 differ**, and they partition:
+
+RIGHT for kencc, and legacy had them wrong:
+  targ_sizeof_long 4, alignof_long 4          kencc long IS 32-bit
+  targ_sizeof_long_double 8, ldbl_mant_dig 53,
+    ldbl_max_exp 1024, ldbl_min_exp -1021     long double IS double
+  targ_size_t_int_kind unsigned long long     APE stddef_arch.h
+  targ_ssize_t_int_kind long long             APE stddef_arch.h
+  targ_ptrdiff_t_int_kind long long           APE stddef_arch.h
+  targ_setjmp_func "setjmp"                   <-- see below
+
+**`targ_setjmp_func' is the corroboration.**  The NOTE above records
+`_setjmp' as the one undefined symbol at the link and calls it "a
+missed line in kencc_targ.h"; legacy says `_setjmp' and win64 says
+`setjmp'.  *That the diff independently reproduces a bug found at the
+LINK, from a completely different direction, is what says the diff is
+measuring the right thing.*
+
+WRONG for kencc -- the "windows baggage", and it is FOUR families and
+one stray, not a vague risk:
+  1. wchar_t / wint_t = unsigned short.  APE's `stddef.h:50' says
+     unsigned INT.  Two bytes against four; definite mismatch, and it
+     corrupts every L"..." literal and wchar_t layout.
+  2. FIELD ALIGNMENT, five variables: double_field_alignment 4 (legacy
+     8), long_field_alignment 4, long_double_field_alignment 4,
+     dual_alignments_for_builtin_types 1, maximum_intrinsic_alignment
+     8 (legacy 16).  **This is MSVC struct layout and it is the thing
+     most likely to bite**, because kencc under `-J' aligns a double
+     to 8.  Not yet measured; `structalign-test' is the instrument
+     shape for it once anything compiles.
+  3. BIT FIELDS: force_one_bit_bit_field_to_be_unsigned 1,
+     zero_width_bit_field_affects_struct_alignment 1,
+     zero_width_bit_field_alignment 4.
+  4. POINTER-TO-MEMBER: sizeof_ptr_to_data_member 4 (legacy 8),
+     alignof 4, delta_int_kind `short' (legacy `long').
+  5. The one NON-`targ_' global the win64 config sets:
+     `packing_applies_to_base_classes = 1'.
+
+AND THE TWO MICROSOFT SWITCHES ARE OFF, checked because the name
+invites the worry: `targ_microsoft_bit_field_allocation' and
+`targ_microsoft_ptr_to_member_sizing' are both explicitly 0 in win64,
+and the configuration sets NO mode flags at all -- 126 `targ_*'
+assignments plus that one.  *`--microsoft' is a separate command-line
+option and `--target win64' does not imply it.*
+
+Watch `jmp_buf' too, recorded rather than resolved: win64 says 39
+elements of `int', legacy 25 of `long', and APE's own is neither.
+It matters here more than it would elsewhere because **EDG's exception
+model is setjmp-based** (see the standard-library section above).
+
+THE PREDEFINED MACRO FILE IS WHERE THE REST OF THE WINDOWS-NESS LIVES
+---------------------------------------------------------------------
+With `--target win64' the SoftFloat check passes and the next stop is
+
+	catastrophic error: cannot open predefined macro file
+	    "lib_win64/predefined_macros.txt"
+
+`macro.c:19726''s `open_predefined_macro_file' builds
+`edg_base_directory' + `auxiliary_info_dir_name' + the file name, so
+the directory is per-target and we ship none of them.
+**`--clear_flag=use_predefined_macro_file' is the answer, and it is not
+a workaround**: that file is where a win64 build's `_WIN32' and
+`_MSC_VER' would come from, so suppressing it is precisely "LLP64
+without the Windows macros".  It is also the flag the NOTE's own
+translation recipe already uses.
+
+	cpfe --target win64 --clear_flag=use_predefined_macro_file \
+	     --c++14 --no_exceptions --no_rtti \
+	     --sys_include=<edg>/include_c++ \
+	     --sys_include=<edg>/include_c99 \
+	     --sys_include=/amd64/include/ape \
+	     --sys_include=/sys/include/ape \
+	     --gen_c_file_name=/tmp/t.c /tmp/t.cpp
+
+THE REAL FIX IS THE LEGACY ENTRY, NOT win64.  `--target win64' is a
+BRIDGE to a first translation with four named divergences; the correct
+end state is index 0 carrying kencc's own values, which is what
+`kencc_targ.h' was written for and demonstrably did not do.  That is a
+re-translation with the pre-include actually in effect for `target.c',
+and it would fix `wchar_t', the field alignments, pointer-to-member,
+`jmp_buf' and `setjmp' in one go -- *every item on the list above is a
+symptom of the same miss*.
+
+
+AND THAT COMMAND FAULTS ON THE VM -- `fault read addr=0x68
+pc=0x7e2d88' -- WHICH IS NOT A CONFIGURATION PROBLEM AT ALL
+----------------------------------------------------------------
+
+With the flag in place cpfe no longer refuses: it accepts the target,
+accepts the option, and then dies inside real work.  *Which is itself
+the first piece of information*: with `--target win64' alone the same
+cpfe gave a clean `catastrophic error' about the macro file, so option
+parsing and target selection are both past, and the fault is
+downstream of them.
+
+**THE HOST DOES NOT CRASH ON THE SAME COMMAND, which puts this on the
+kencc/libap side rather than on EDG's.**  The host `cpfe' built from
+the same commit with the same target configuration, given the same
+flags and the same four `--sys_include' directories (APE's headers
+staged), exits **0** and writes the expected C:
+
+	/* Translated by the Edison Design Group C++/C front end */
+	extern int __EDGCPFE__7_0;
+	struct S; struct S { int x;};
+	extern int _Z1fP1S(struct S *s); ...
+
+So the two runs differ in the compiler that built cpfe and in nothing
+else that has been identified.  *That is the same partition cfront's
+crash had*, and there the answer was a layout rule.
+
+THE STATIC-INIT GAP IS NOT THIS, AND IT IS NOW MEASURED RATHER THAN
+ASSUMED.  It was the obvious suspect: `-D_main=__edg_main' means
+nothing calls `_Z12__call_ctorsv', so a C++ global needing dynamic
+initialisation would stay zero and be dereferenced -- exactly the
+shape of a read at a small offset from null.  **One grep settles it:
+the whole 133-file corpus contains exactly ONE static-init routine**,
+`__sti___9_fe_init_c_2cbd8fba' in `src/fe_init.c:55031', and its whole
+body assigns **0** to the sixteen members of
+`edg::diagnostic_counters' -- values a BSS global already has.  So not
+calling it costs cpfe nothing.  *The gap is real for programs cpfe
+TRANSLATES and inert for cpfe itself*, and those are two different
+claims; this one is now the measured half.
+
+WHAT TO ASK NEXT, in order, because a `sys:' trap leaves the process
+BROKEN and therefore readable:
+
+  1. `ps | grep cpfe' -- it should still be there.
+  2. `acid <pid>' then **`lstk()'**, not `stk()': this tree has twice
+     had `stk()''s arguments name the wrong mechanism while the
+     LOCALS named the right one.  Then `echo kill > /proc/<pid>/ctl',
+     since a Broken process keeps its memory.
+  3. `ls -l /tmp/t.c'.  If cpfe wrote any C before dying it reached
+     the back end and the fault is in wrap-up; an absent or empty file
+     puts it in the front end.
+  4. The same command on an EMPTY `.cpp'.  Same `pc' means the input
+     is irrelevant and the fault is in start-up; a different outcome
+     means it is in translating this particular source.

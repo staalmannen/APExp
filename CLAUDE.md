@@ -2131,7 +2131,125 @@ live either way.
     working precedent in the directory to copy. *The rule was already
     written down here, in its `awk -v name=$name` spelling, and a
     rule recorded for one program's arguments did not transfer to a
-    compiler's.*
+    compiler's.
+    **CONFIRMED: cpfe RUNS.** It reaches its own command-line parser
+    and answers with its own diagnostics -- `invalid option: --help`,
+    and `-V` giving `missing source file name`. *That is the
+    entry-point diagnosis confirmed behaviourally*, and **both
+    messages are cpfe working rather than refusing**: `--help` and
+    `-V` are **`eccp` DRIVER** options, cpfe's own table has no
+    `help` entry at all and spells the other `--version`, and `-V`
+    reaching "missing source file name" means it was ACCEPTED with
+    only the operand absent. **`--no_standard_includes` is the
+    driver's too** and must not go in a hand-written command: cpfe
+    has no standard include path of its own, so there is nothing to
+    suppress. The first translation command is in the NOTE; the half
+    that matters is **`pcc -c` on the generated C**, since cpfe
+    emitting C says the front end runs while pcc accepting it says
+    `kencc_targ.h` describes this machine. Use a toy with **no `new`
+    and no static constructors** -- those are the two places the
+    runtime is reached and the static-init gap above is open.*
+  - **AND cpfe'S TARGET IS NOT kencc'S -- `kencc_targ.h` NEVER REACHED
+    `target.c`.** The first translation attempt answered
+    `check_target_config: must use SoftFloat library`, which is cpfe
+    refusing **its own configuration**: `target.c:10642` fires when
+    `targ_ldbl_mant_dig == 64`, an 80-bit long double it cannot fold
+    without a SoftFloat library it was not built with. **cpfe is
+    MULTI-TARGET** -- `target.c:6525` holds EIGHT configurations,
+    `fe_init.c:49180` defaults the index to **0**, and entry 0
+    (labelled `linux_x86_64`) is `set_legacy_target_config`, built
+    from the UNSUFFIXED `TARG_*` macros `kencc_targ.h` overrides.
+    **It carries the HOST's values**: `long 8`, `long double 16`,
+    `mant_dig 64`. *The `__weak__` suppression (38,245 -> 0) is a
+    property of the cpfe BUILD; the `TARG_*` widths are read when
+    `target.c` is TRANSLATED, and only the second bakes into the
+    committed C.* **Two different macro environments, treated as
+    one.** Which mechanism -- absent from the translation command, or
+    overridden by `cmake_defines.h` after it -- is NOT settled.
+    **AND `--target win64` IS kencc's MODEL EXACTLY, with the cost
+    enumerated rather than feared.** Both configurations are in the
+    generated source, so their diff is COMPLETE (the `apeabi-probe`
+    idiom): **126 `targ_*` assignments, 36 differ.** win64 gets
+    right what legacy got wrong -- `long 4`, `long double 8`/53,
+    `size_t`/`ssize_t`/`ptrdiff_t` as `long long`, and
+    **`targ_setjmp_func "setjmp"`**, which is the exact undefined
+    symbol the link reported and the NOTE called "a missed line in
+    `kencc_targ.h`". *A diff reproducing, from a different
+    direction, a bug found at the LINK is what says it measures the
+    right thing.* The windows baggage is **four families and one
+    stray**: `wchar_t`/`wint_t` unsigned SHORT (APE says unsigned
+    int); five FIELD-ALIGNMENT variables (`double_field_alignment` 4
+    against kencc's 8 under `-J` -- *the one most likely to bite,
+    unmeasured*); three bit-field rules; pointer-to-member 4 bytes
+    with a `short` delta; and `packing_applies_to_base_classes`.
+    **Both `targ_microsoft_*` switches are 0 and the config sets no
+    mode flags at all** -- `--microsoft` is a separate option that
+    `--target win64` does not imply. Watch `jmp_buf` (39 ints
+    against legacy's 25 longs, APE's being neither), which matters
+    here because **EDG's EH is setjmp-based**.
+    **AND THE PREDEFINED MACRO FILE IS WHERE THE REST OF THE
+    WINDOWS-NESS LIVES**: with the target set, cpfe next wants
+    `lib_win64/predefined_macros.txt`, which we ship for no target.
+    **`--clear_flag=use_predefined_macro_file` is not a workaround**
+    -- that file is where a win64 build's `_WIN32` and `_MSC_VER`
+    come from, so suppressing it is precisely *LLP64 without the
+    Windows macros*, and it is the flag this tree's own translation
+    recipe already uses. **`--target win64` is a BRIDGE**; the end
+    state is entry 0 carrying kencc's values, and *every item on the
+    divergence list is a symptom of the same miss*. Command and full
+    diff in the NOTE.
+  - **AND WITH THAT FLAG cpfe FAULTS -- `fault read addr=0x68
+    pc=0x7e2d88` -- WHICH IS NOT A CONFIGURATION PROBLEM.** Option
+    parsing and target selection are both past (the same cpfe gave a
+    clean `catastrophic error` one flag earlier), so it dies in real
+    work. **The HOST cpfe, same commit, same flags, same four
+    `--sys_include` directories, exits 0 and writes the expected C** --
+    so this is the kencc/libap side, the cfront partition again.
+    **The static-init gap is NOT it, and that is measured rather than
+    assumed**: the whole 133-file corpus holds exactly ONE
+    `__sti__` routine (`fe_init.c:55031`) and its body assigns **0** to
+    sixteen members of `diagnostic_counters` -- values a BSS global
+    already has. *The gap is real for what cpfe TRANSLATES and inert
+    for cpfe itself; two different claims.* A `sys:` trap leaves the
+    process **Broken and readable**, so the next step is `acid <pid>`
+    and **`lstk()`** (locals, not `stk()`'s arguments -- twice burnt),
+    then whether `/tmp/t.c` exists and whether an EMPTY input faults at
+    the same `pc`.
+  - **THERE IS NO C++ STANDARD LIBRARY HERE AND EDG SHIPS NONE, and
+    the EXCEPTION MODEL decides what could fill the gap.** `lib_src`
+    is the **libsupc++/libc++abi layer** -- new/delete, vtables, RTTI,
+    static init, pure-virtual -- and `include_c++`'s eleven headers
+    are the LANGUAGE-SUPPORT set, its own README saying *"only those
+    headers that require specific magic"*. A grep for
+    `basic_string|vector|iostream` across all of them is **empty**.
+    **What works with no library at all is the subset EDG ITSELF is
+    written in** -- classes, templates, virtual dispatch, RAII,
+    `new`/`delete`, plus `bad_alloc`/`type_info`/`initializer_list` --
+    which is why the self-translation worked.
+    **AND THE LAYERING LOOKS STANDARD WHILE THE EH MODEL IS NOT.**
+    EDG's exceptions are **setjmp/longjmp with its own regions**
+    (`__eh_curr_region` 138, `an_eh_stack_entry` 99, `setjmp` 19) and
+    there are **ZERO `_Unwind_` references in all 51 files**. *Good*:
+    no libgcc, no libunwind, no `.eh_frame`, no personality routine --
+    the only model that could work on a target with none of those, and
+    the reason EDG's C back end exists. *Bad*: **libc++'s EH assumes
+    the ITANIUM ABI**, so this is not the usual drop-libc++-onto-a-
+    conforming-ABI arrangement the libsupc++ shape suggests. Only the
+    grep says so. The type-trait builtins a modern STL needs ARE in
+    cpfe's table, checked (`__is_trivially_copyable`,
+    `__is_constructible`, `__is_base_of`, `__underlying_type`, ...).
+    **AND THE AXIS THAT DECIDES A CANDIDATE IS THE NAMESPACE, NOT
+    MAINTENANCE**: APExp exists to build existing software with
+    minimal modification, and code written against `std::vector` does
+    not compile against `etl::` or `eastl::` however good they are.
+    *A renamed STL serves NEW code; only a `std::` one serves a PORT.*
+    STLport fits this compiler best and died in 2008; ETL is
+    maintained but embedded and fixed-capacity; EASTL is more
+    complete; **uClibc++ is the one reported to be `std::` with
+    iostreams**, and is inactive at 0.2.5. Ordering, candidates and
+    **a provenance paragraph saying which lines are measured and
+    which are only recalled or searched** are in the NOTE. *Nothing
+    started; none of it blocks anything already working.*
   - **AND THE RUNTIME ADDS NOTHING libap ALREADY PROVIDES, checked
     rather than assumed.** `lib_src` holds `exit.c`, `main.c`,
     `error.c` and `memzero.c`, which is the shape that cost this tree
