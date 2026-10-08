@@ -2073,6 +2073,53 @@ live either way.
       cpfe EMITS references to it in the C it generates.
       `cxaatexit-test.c` is the instrument and runs on both machines
       unchanged, 0 failures on gcc.
+  - **AND THEN cpfe LINKED AND CRASHED ON EVERY RUN -- `fault read
+    addr=0x2 pc=0x2` -- AND THE FAULTING ADDRESS IS `argc`.**
+    `lib_src/main.c` defines `void _main(void)`, EDG's static-init
+    helper, and **`_main` is `6l`'s DEFAULT ENTRY POINT**
+    (`6l/obj.c:305` is `INITENTRY = "_main"`;
+    `arch/amd64/main9.s:3` is `TEXT _main(SB), 1, $0`). `6l` makes
+    that name an SXREF at startup and takes it from the **first
+    archive on the link line** that defines it -- and `cmd/edg`
+    names `libedg.a` ahead of libap. So the entry became EDG's
+    helper: it ran `_Z12__call_ctorsv`, which returns at once
+    (`vars.c:49` has `__head` null and `munch_ctors.c` defines
+    `_ctors[1] = {0}`), and then executed a plain `RET`. **`main9.s`
+    reads the kernel's argument block at `0(SP)`, so `0(SP)` at entry
+    holds argc** -- which is what that `RET` popped and jumped to.
+    `cpfe --help` is **argc 2**. *A faulting pc equal to the argument
+    count could not have arisen any other way*, and it is falsifiable
+    with no rebuild: `cpfe` alone must have given `pc=0x1`,
+    `cpfe a b c` `pc=0x4`.
+    **`-C` IS NOT IMPLICATED, checked rather than assumed of the
+    blunt flag standing next to it.** There was no duplicate for
+    `dupokall` to silence: `main9.$O` is pulled only to satisfy the
+    entry symbol, its other global `_tos` being referenced from
+    `profile.c` alone, so with `libedg.a` answering first that member
+    never reached the link. *First-archive-wins, and no linker has a
+    diagnostic for it.*
+    **RENAMED, NOT DROPPED FROM OFILES** -- one file compiled with
+    `-D_main=__edg_main`. Nothing anywhere references `_main`, so
+    removing the member would link equally well and would throw away
+    the only entry point into EDG's static-initialisation machinery.
+    **THE STATIC-INIT GAP IS REAL AND RECORDED, NOT FIXED**: nothing
+    now calls `_Z12__call_ctorsv`, so a C++ program cpfe translates
+    would not run its static constructors. cpfe itself does not need
+    it, and does not emit a call to `_main` either -- the name occurs
+    in the 133-file corpus exactly twice, both in `lib_src/main.c`,
+    with no string literal of it in the emitter. Upstream's
+    convention is a crt that calls it; this target's crt
+    (`main9.s` -> `_callmain` -> `_apemain` -> `main`) does not.
+    **AND ONE `nm` SAYS `_main` IS ALONE, where reading 51 files
+    costs a round**: all of `lib_src` through gcc, then
+    `nm --defined-only -g`, gives exactly FOUR external definitions
+    that are neither `_Z`-mangled nor `__`-prefixed -- `_ctors`,
+    `_dtors`, `_main`, `_new_handler` -- and the other three collide
+    with nothing. ***`cmd/edg/mkfile` ASSERTED THAT EVERY DEFINITION
+    UNDER `lib_src` IS `_Z`-MANGLED OR `__`-PREFIXED, AND THAT
+    SENTENCE IS THE ONE THAT WOULD HAVE FOUND THIS.*** It was a
+    reading presented as a check; *an almost-true claim is worse than
+    none, because it reads as having been verified.* Corrected there.
   - **AND THE RUNTIME ADDS NOTHING libap ALREADY PROVIDES, checked
     rather than assumed.** `lib_src` holds `exit.c`, `main.c`,
     `error.c` and `memzero.c`, which is the shape that cost this tree

@@ -209,6 +209,71 @@ CFLAGS= -c -C
 %.$O: $EDGSRC/%.c
 	$CC $CFLAGS $EDGSRC/$stem.c
 
+# `main.c' IS RENAMED, AND IT IS WHY cpfe CRASHED ON EVERY RUN.
+# `lib_src/main.c' defines `void _main(void)' -- EDG's static-init
+# helper, the one a target's own crt is expected to call -- and
+# **`_main' IS `6l''s DEFAULT ENTRY POINT**: `6l/obj.c:305' is
+# `INITENTRY = "_main"', and `sys/src/ape/lib/ap/arch/amd64/main9.s:3'
+# is `TEXT _main(SB), 1, $0'.  `6l' creates that name as an SXREF at
+# startup and satisfies it from the FIRST archive on the link line
+# that defines it -- `libedg.a', which `cmd/edg/mkfile' names ahead of
+# libap.  So the program's entry became EDG's helper: it ran
+# `_Z12__call_ctorsv' (which returns at once -- `__head' is null in
+# `vars.c:49' and `munch_ctors.c' defines `_ctors[1] = {0}') and then
+# executed a plain `RET'.
+#
+# **AND THE FAULTING ADDRESS IS `argc'.**  `main9.s' reads the kernel's
+# argument block at `0(SP)', so `0(SP)' at entry holds argc -- which is
+# exactly what that `RET' popped and jumped to.  `cpfe --help' is
+# **argc 2** and answered
+#
+#	cpfe 78213: suicide: sys: trap: fault read addr=0x2 pc=0x2
+#
+# *A faulting pc equal to the argument count is not a coincidence that
+# could have arisen any other way*, and it is checkable without a
+# rebuild: `cpfe' alone must have said `pc=0x1' and `cpfe a b c'
+# `pc=0x4'.
+#
+# NOTHING HID IT AND `-C' IS NOT IMPLICATED, which was worth checking
+# before blaming the blunt flag standing next to it.  There was no
+# duplicate to silence: `main9.$O' is pulled ONLY to satisfy the entry
+# symbol (its other global, `_tos', is referenced from `profile.c'
+# alone), so with `libedg.a' answering first that member never
+# reached the link at all.  First-archive-wins, no diagnostic
+# available from any linker.
+#
+# RENAMED RATHER THAN DROPPED FROM OFILES, and the choice is this
+# tree's own rule about capabilities.  Nothing anywhere references
+# `_main' -- the sweep below is complete -- so removing the member
+# would link just as well and would throw away the only entry point
+# into EDG's static-initialisation machinery.  `__edg_main' keeps it,
+# in the reserved double-underscore space, inside an archive and not a
+# public header, so the `reject' hazard does not apply.
+#
+# **THE STATIC-INIT GAP IS REAL AND IS RECORDED, NOT FIXED**: with
+# `_main' no longer the entry, NOTHING CALLS `_Z12__call_ctorsv', so a
+# C++ program cpfe translates would not run its static constructors.
+# That costs cpfe nothing (it is translated C++ with no dynamic
+# initialisation that reaches this path -- it runs, which is the
+# measurement) and it is the next thing to answer for translated
+# programs.  cpfe does not emit a call to `_main' either: the name
+# occurs in the whole 133-file corpus exactly twice, both in
+# `lib_src/main.c', with no string literal of it in the emitter -- so
+# upstream's convention here is a crt that calls it, and this target's
+# crt (`main9.s' -> `_callmain' -> `_apemain' -> `main') does not.
+#
+# AND THE SWEEP IS WHAT SAYS `_main' IS ALONE.  All 51 files compiled
+# with gcc and `nm --defined-only -g' taken over the objects gives
+# exactly FOUR external definitions that are neither `_Z'-mangled nor
+# `__'-prefixed: `_ctors', `_dtors', `_main' and `_new_handler'.  The
+# other three collide with nothing in libap or kencc.  *`cmd/edg/mkfile'
+# records that "every DEFINITION under lib_src is `_Z'-mangled or
+# `__'-prefixed" -- that is wrong, and it is the sentence that would
+# have found this.*  Asking the linker's own answer costs one command
+# where reading 51 files costs a round.
+main.$O: $EDGSRC/main.c
+	$CC $CFLAGS -D_main=__edg_main $EDGSRC/main.c
+
 cxa_atexit.$O: cxa_atexit.c
 	$CC -c cxa_atexit.c
 
