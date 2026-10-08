@@ -1985,6 +1985,21 @@ live either way.
     **NOT COMPILED ANYWHERE: kencc needs Plan 9's `<u.h>`/`<libc.h>`,
     so the first build is the VM's** -- the same weaker position `-J`
     shipped from.
+    **`-C` WORKS AND THE LINK MODEL'S TWO HALVES ARE NOW BOTH
+    MEASURED AT THE LINK.** With `-C` every `redefinition:` is gone,
+    and what is underneath is `undefined:` on `_ZN3edg...I...E` names
+    -- **template instantiations, every one**, with no vtable, no
+    typeinfo, no guard variable and no plain C function among them.
+    *That is the prediction written down before the run.*
+    **And `LIB=` had to go BEFORE the `<mkone` include**, which is
+    load-bearing rather than stylistic: `mkone`'s rule is
+    `$O.out: $OFILES $LIB` and mk binds a rule's prerequisites when it
+    READS the rule, so an assignment after the include expands to
+    nothing. It fails in the quietest way available -- the link runs,
+    looks right, and reports the archive's symbols as undefined. The
+    link line now ends `.../amd64/lib/ape/libedg.a` and `_ZnwyPv` has
+    left the undefined list, which is the confirmation; every other
+    `cmd` mkfile here (tclsh, wish, itclsh) already did it this way.
     **AND THE LINK MODEL IS TWO HALVES, WHICH READING THEM AS ONE GOT
     WRONG.** 556 of the 558 `_Z` names are **template instantiations
     emitted NOWHERE**, with **zero** vtables, typeinfo, guard
