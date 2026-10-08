@@ -1,5 +1,5 @@
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
-/* Wed Oct  7 07:13:19 2026 */
+/* Thu Oct  8 07:52:57 2026 */
 extern int __EDGCPFE__7_0;
 void *memcpy(void *,const void *,unsigned long long);
 void *memset(void *,int,unsigned long long);
@@ -4601,24 +4601,24 @@ extern _ZN3edg9a_booleanE _ZN3edg24display_compilation_timeE;
 #line 1441
 extern _ZN3edg9a_booleanE _ZN3edg18create_module_unitE;
 #line 65 "src/cfe.c"
-static void _ZN22_INTERNAL_5_cfe_c_main8cfe_mainEiPPc( int __142677_35_argc,  char **__142677_47_argv)
+static void _ZN22_INTERNAL_5_cfe_c_main8cfe_mainEiPPc( int __142809_35_argc,  char **__142809_47_argv)
 #line 71
 {
-auto unsigned char __142684_21_most_severe_diagnostic; auto unsigned char __142684_45_diagnostic_level;
-auto _ZN3edg7a_timerE __142685_15_start_time;
-auto _ZN3edg7a_timerE __142686_15_fe_start_time;
-auto _ZN3edg7a_timerE __142687_15_fe_end_time;
+auto unsigned char __142816_21_most_severe_diagnostic; auto unsigned char __142816_45_diagnostic_level;
+auto _ZN3edg7a_timerE __142817_15_start_time;
+auto _ZN3edg7a_timerE __142818_15_fe_start_time;
+auto _ZN3edg7a_timerE __142819_15_fe_end_time;
 
 
 
 
-auto _ZN3edg7a_timerE __142692_15_module_start_time;
-auto _ZN3edg7a_timerE __142693_15_module_end_time;
+auto _ZN3edg7a_timerE __142824_15_module_start_time;
+auto _ZN3edg7a_timerE __142825_15_module_end_time;
 
-auto _ZN3edg7a_timerE __142695_15_be_start_time;
-auto _ZN3edg7a_timerE __142696_15_be_end_time;
+auto _ZN3edg7a_timerE __142827_15_be_start_time;
+auto _ZN3edg7a_timerE __142828_15_be_end_time;
 
-auto _ZN3edg7a_timerE __142698_15_end_time;
+auto _ZN3edg7a_timerE __142830_15_end_time;
 
 
 
@@ -4627,14 +4627,14 @@ _ZN3edg7f_errorE = (_ZN3edg25default_error_output_fileEv());
 #line 98
 _ZN3edg13fe_early_initEv();
 #line 110
-_ZN3edg9get_timerEPNS_7a_timerE((&__142685_15_start_time));
+_ZN3edg9get_timerEPNS_7a_timerE((&__142817_15_start_time));
 
-_ZN3edg17proc_command_lineEiPPc(__142677_35_argc, __142677_47_argv);
+_ZN3edg17proc_command_lineEiPPc(__142809_35_argc, __142809_47_argv);
 
 
 _ZN3edg16fe_one_time_initEv();
 #line 122
-if (_ZN3edg24display_compilation_timeE) { _ZN3edg9get_timerEPNS_7a_timerE((&__142686_15_fe_start_time)); }
+if (_ZN3edg24display_compilation_timeE) { _ZN3edg9get_timerEPNS_7a_timerE((&__142818_15_fe_start_time)); }
 
 
 _ZN3edg15trans_unit_initEv();
@@ -4643,13 +4643,13 @@ _ZN3edg24process_translation_unitEPKcbPNS_25an_exported_template_fileE(_ZN3edg24
 
 
 if (_ZN3edg18create_module_unitE) {
-if (_ZN3edg24display_compilation_timeE) { _ZN3edg9get_timerEPNS_7a_timerE((&__142692_15_module_start_time)); }
+if (_ZN3edg24display_compilation_timeE) { _ZN3edg9get_timerEPNS_7a_timerE((&__142824_15_module_start_time)); }
 _ZN3edg17modules_write_outEv();
 if (_ZN3edg24display_compilation_timeE) {
-_ZN3edg9get_timerEPNS_7a_timerE((&__142693_15_module_end_time));
+_ZN3edg9get_timerEPNS_7a_timerE((&__142825_15_module_end_time));
 
 
-_ZN3edg17display_time_usedEPKcPNS_7a_timerES3_(((const char *)"Module file generation"), (&__142692_15_module_start_time), (&__142693_15_module_end_time));
+_ZN3edg17display_time_usedEPKcPNS_7a_timerES3_(((const char *)"Module file generation"), (&__142824_15_module_start_time), (&__142825_15_module_end_time));
 
 }
 }
@@ -4657,9 +4657,9 @@ _ZN3edg17display_time_usedEPKcPNS_7a_timerES3_(((const char *)"Module file gener
 _ZN3edg9fe_wrapupEv();
 if (_ZN3edg24display_compilation_timeE) {
 
-_ZN3edg9get_timerEPNS_7a_timerE((&__142687_15_fe_end_time));
+_ZN3edg9get_timerEPNS_7a_timerE((&__142819_15_fe_end_time));
 
-_ZN3edg17display_time_usedEPKcPNS_7a_timerES3_(((const char *)"Front end time"), (&__142686_15_fe_start_time), (&__142687_15_fe_end_time));
+_ZN3edg17display_time_usedEPKcPNS_7a_timerES3_(((const char *)"Front end time"), (&__142818_15_fe_start_time), (&__142819_15_fe_end_time));
 }
 
 
@@ -4669,13 +4669,13 @@ if ((_Bool)(((_ZN3edg19diagnostic_countersE.total).errors) > 0UL)) { _ZN3edg17su
 
 if (!(_ZN3edg17suppress_back_endE)) {
 #line 169
-if (_ZN3edg24display_compilation_timeE) { _ZN3edg9get_timerEPNS_7a_timerE((&__142695_15_be_start_time)); }
+if (_ZN3edg24display_compilation_timeE) { _ZN3edg9get_timerEPNS_7a_timerE((&__142827_15_be_start_time)); }
 _ZN3edg8back_endEv();
 if (_ZN3edg24display_compilation_timeE) {
 
-_ZN3edg9get_timerEPNS_7a_timerE((&__142696_15_be_end_time));
+_ZN3edg9get_timerEPNS_7a_timerE((&__142828_15_be_end_time));
 
-_ZN3edg17display_time_usedEPKcPNS_7a_timerES3_(((const char *)"Back end time"), (&__142695_15_be_start_time), (&__142696_15_be_end_time));
+_ZN3edg17display_time_usedEPKcPNS_7a_timerES3_(((const char *)"Back end time"), (&__142827_15_be_start_time), (&__142828_15_be_end_time));
 }
 }
 
@@ -4687,32 +4687,32 @@ _ZN3edg16fe_wrapup_part_2Ev();
 
 
 if ((_Bool)(((_ZN3edg19diagnostic_countersE.total).errors) > 0UL)) {
-__142684_45_diagnostic_level = _ZN3edg8es_errorE;
+__142816_45_diagnostic_level = _ZN3edg8es_errorE;
 } else  { if ((_Bool)(((_ZN3edg19diagnostic_countersE.total).warnings) > 0UL)) {
-__142684_45_diagnostic_level = _ZN3edg10es_warningE;
+__142816_45_diagnostic_level = _ZN3edg10es_warningE;
 } else  {
-__142684_45_diagnostic_level = _ZN3edg7es_noneE;
+__142816_45_diagnostic_level = _ZN3edg7es_noneE;
 } }
 #line 201
-__142684_21_most_severe_diagnostic = __142684_45_diagnostic_level;
+__142816_21_most_severe_diagnostic = __142816_45_diagnostic_level;
 
 
 if (_ZN3edg24display_compilation_timeE) {
 
-_ZN3edg9get_timerEPNS_7a_timerE((&__142698_15_end_time));
+_ZN3edg9get_timerEPNS_7a_timerE((&__142830_15_end_time));
 
-_ZN3edg17display_time_usedEPKcPNS_7a_timerES3_(((const char *)"Total compilation time"), (&__142685_15_start_time), (&__142698_15_end_time));
+_ZN3edg17display_time_usedEPKcPNS_7a_timerES3_(((const char *)"Total compilation time"), (&__142817_15_start_time), (&__142830_15_end_time));
 }
 
 
 
-_ZN3edg16exit_compilationENS_17an_error_severityE(__142684_21_most_severe_diagnostic); 
+_ZN3edg16exit_compilationENS_17an_error_severityE(__142816_21_most_severe_diagnostic); 
 }
 #line 220
-int main( int __142832_18_argc,  char **__142832_30_argv)
+int main( int __142964_18_argc,  char **__142964_30_argv)
 #line 229
 {
 
-_ZN22_INTERNAL_5_cfe_c_main8cfe_mainEiPPc(__142832_18_argc, __142832_30_argv); return 0;
+_ZN22_INTERNAL_5_cfe_c_main8cfe_mainEiPPc(__142964_18_argc, __142964_30_argv); return 0;
 #line 240
 }

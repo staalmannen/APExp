@@ -531,7 +531,32 @@ void *alloca ();
 #define C_char                    char
 #define C_uchar                   unsigned C_char
 #define C_byte                    char
-#define C_uword                   unsigned C_word
+/*
+ * APExp: `unsigned C_word' CANNOT WORK ON A NON-MinGW LLP64 TARGET.
+ * Under C_SIXTY_FOUR + C_LLP, `C_word' is `C_s64' -- and `C_s64' is
+ * the keyword-ish `__int64' only on MinGW (:505), where
+ * `unsigned __int64' is valid.  Everywhere else `C_s64' is the
+ * TYPEDEF `int64_t', and `unsigned int64_t' is not C: it stops
+ * `C_header' (:536) being a type and gcc reports eight errors inside
+ * this header, the first of them on `C_SCHEME_BLOCK' at :755 and
+ * none of them mentioning the cause.
+ *
+ * Upstream never meets it because its only LLP64 targets are
+ * __MINGW64__ and _WIN64 (:109).  kencc on amd64 is the third kind.
+ * `C_u64' is already the right answer and is spelled correctly in
+ * both arms, so this needs no new macro and is a strict improvement
+ * on MinGW too, where it expands to the same `unsigned __int64'.
+ *
+ * `C_uchar', `C_uhword' and `C_ulong' beside it are UNAFFECTED and
+ * were checked rather than assumed: C_char is `char', C_hword is
+ * `long' under this combination and C_long is `long long' (:558), so
+ * all three are `unsigned <keyword>' and legal.
+ */
+#if defined(C_SIXTY_FOUR) && defined(C_LLP)
+# define C_uword                  C_u64
+#else
+# define C_uword                  unsigned C_word
+#endif
 #define C_uhword                  unsigned C_hword
 #define C_header                  C_uword
 

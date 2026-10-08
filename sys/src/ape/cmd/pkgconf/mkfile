@@ -31,7 +31,7 @@ CFLAGS=-Fp -c -I$PCSRC -I$PCSRC/libpkgconf\
 		-DHAVE_CONFIG_H -DPKGCONFIG_IS_STATIC\
 		-DSYSTEM_INCLUDEDIR="/sys/include/ape"\
 		-DSYSTEM_LIBDIR="/$objtype/lib/ape"\
-		-DPKG_DEFAULT_PATH="/bin"\
+		-DPKG_DEFAULT_PATH="/sys/lib/ape/pkgconfig"\
 		-DPERSONALITY_PATH="/sys/lib/ape/pkgconfig/personality.d"
 
 %.$O: $PCSRC/cli/%.c

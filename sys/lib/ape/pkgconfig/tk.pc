@@ -1,0 +1,20 @@
+# Tk, for APExp.  See tcl.pc beside this file for why Cflags and Libs
+# are empty; the reasoning is identical.
+#
+# `Requires: tcl' is real rather than decorative: tk.h's own
+# `#pragma lib' block names libtk BEFORE it includes <tcl.h>, because
+# a kencc static link resolves archives in the order recorded and
+# libtk needs libtcl.  So the dependency exists either way and saying
+# it here keeps `pkg-config --exists tk' honest about what it implies.
+#
+# Tk also needs libdraw, libpng and libz -- its Plan 9 backend draws
+# through libdraw and its photo reader uses libpng -- and all three
+# are likewise named by tk.h's pragma block, which is why there is
+# still nothing to put in Libs.
+
+Name: Tk
+Description: Tk toolkit (APExp, Plan 9 backend)
+Version: 9.0.3
+Requires: tcl
+Cflags:
+Libs:

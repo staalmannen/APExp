@@ -36,8 +36,48 @@ OFILES=\
 
 CC=pcc
 LD=pcc
+# -DC_SIXTY_FOUR IS NOT OPTIONAL AND `-DC_LLP' ALONE IS WORSE THAN
+# NEITHER.  `chicken.h:81' is
+#
+#	#if defined(__LP64__) || defined(_LP64) || \
+#	    defined(__MINGW64__) || defined(_WIN64)
+#	# define C_SIXTY_FOUR
+#	#endif
+#
+# and kencc on amd64 is LLP64 while that list names LP64 and the two
+# WINDOWS LLP64 spellings -- so none of the four is defined (kencc
+# predefines only __STDC__, _POSIX_SOURCE and the two __APEXP_*
+# markers) and C_SIXTY_FOUR was never set.
+#
+# `C_LLP' IS ONLY CONSULTED INSIDE `#ifdef C_SIXTY_FOUR' at
+# `chicken.h:515', so the flag this mkfile already passed was INERT
+# for the word-size decision and the `#else' arm ran: **C_word was
+# `int', 32 bits, on a machine with 64-bit pointers.**  CHICKEN stores
+# pointers in C_word.  That is `chicken compiler-test.scm' answering
+# `suicide: sys: trap: fault read addr=0xfffffffffffefa6'.
+#
+# AND THE STATE WAS ONE UPSTREAM CANNOT PRODUCE, which is why it is
+# not an upstream bug: upstream sets C_LLP only at `chicken.h:109'
+# for `__MINGW64__'/`_WIN64', and both of those are ALSO in the
+# C_SIXTY_FOUR list, so upstream's LLP64 targets always get both.
+# Passing C_LLP by hand without C_SIXTY_FOUR gave a MIXED build --
+# `C_long' was `long long' and `C_strtow' was `strtoll' (both read
+# C_LLP outside the C_SIXTY_FOUR block, at :557 and :999) while
+# `C_word' stayed 32-bit.  *Half the configuration took and half did
+# not*, which is a worse place than either end.
+#
+# With both, `:515' selects `C_word = int64_t' and `C_hword = long',
+# and under kencc that is 8 and 4 -- exactly LLP64.
+#
+# ONE THING THIS DOES NOT FIX, checked rather than assumed:
+# `chicken.h:813-815' define C_WORD_MIN/C_WORD_MAX/C_UWORD_MAX as
+# LONG_MIN/LONG_MAX/ULONG_MAX inside the C_SIXTY_FOUR block with no
+# C_LLP arm, so under kencc they would be 32-bit limits for a 64-bit
+# word.  **They are defined and never used** -- zero uses anywhere in
+# the tree -- so it is latent rather than live, and upstream carries
+# the same latent bug on MinGW64.  Recorded, not patched.
 CFLAGS= -c -I$CHCSRC -DHAVE_CHICKEN_CONFIG_H -DHAVE_ALLOCA_H -DC_BUILDING_LIBCHICKEN\
-	-UPIC -DC_ENABLE_PTABLES -DC_LLP -DSIGIO=SIGURG
+	-UPIC -DC_ENABLE_PTABLES -DC_SIXTY_FOUR -DC_LLP -DSIGIO=SIGURG
 
 %.$O: $CHCSRC/%.c
 	$CC $CFLAGS $CHCSRC/$stem.c

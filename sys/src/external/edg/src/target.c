@@ -1,5 +1,5 @@
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
-/* Wed Oct  7 07:13:57 2026 */
+/* Thu Oct  8 07:53:09 2026 */
 extern int __EDGCPFE__7_0;
 void *memcpy(void *,const void *,unsigned long long);
 void *memset(void *,int,unsigned long long);
@@ -5907,7 +5907,7 @@ extern void _ZN3edg17target_early_initEv(void);
 #line 1033
 extern void _ZN3edg20target_one_time_initEv(void);
 #line 1066
-extern void _ZN3edg11target_initEv(void); static const char __T618979472[25]; static const char __T618985936[27]; static const char __T618988568[31]; static const char __T618996408[27]; static const char __T619786256[28];
+extern void _ZN3edg11target_initEv(void); static const char __T126776408[25]; static const char __T126782896[27]; static const char __T126785536[31]; static const char __T126793400[27]; static const char __T127527312[28];
 #line 1084 "src/basics.h"
 extern enum _ZN3edg11a_C_dialectE _ZN3edg9C_dialectE;
 #line 1265 "src/lang_feat.h"
@@ -6520,9 +6520,9 @@ static _ZN3edg22a_target_configurationE _ZN29_INTERNAL_8_target_c_946d5afe3edg21
 #line 800
 static _ZN3edg16a_targ_alignmentE _ZN29_INTERNAL_8_target_c_946d5afe3edg20int_field_alignmentsE[15];
 
-static _ZN3edg16a_targ_alignmentE _ZN29_INTERNAL_8_target_c_946d5afe3edg22float_field_alignmentsE[14]; static const char __T618979472[25] = "set_target_configuration"; static const char __T618985936[27] = "dump_target_configurations"; static const char __T618988568[31] = "init_microsoft_sized_int_types"
+static _ZN3edg16a_targ_alignmentE _ZN29_INTERNAL_8_target_c_946d5afe3edg22float_field_alignmentsE[14]; static const char __T126776408[25] = "set_target_configuration"; static const char __T126782896[27] = "dump_target_configurations"; static const char __T126785536[31] = "init_microsoft_sized_int_types"
 #line 802
-; static const char __T618996408[27] = "check_target_configuration"; static const char __T619786256[28] = "init_field_alignment_tables";
+; static const char __T126793400[27] = "check_target_configuration"; static const char __T127527312[28] = "init_field_alignment_tables";
 #line 184
 static _ZN3edg22a_target_configurationE _ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE[8] = {{((const char *)"linux_x86_64"),(&_ZN29_INTERNAL_8_target_c_946d5afe3edg24set_legacy_target_configEv),((void (*)(void))0)},{((const char *)"linux_i686"),(&
 #line 184
@@ -6536,17 +6536,17 @@ _ZN29_INTERNAL_8_target_c_946d5afe3edg30dump_target_config_linux_armv7Ev)},{((co
 #line 184
 _ZN29_INTERNAL_8_target_c_946d5afe3edg31set_target_config_linux_riscv32Ev),(&_ZN29_INTERNAL_8_target_c_946d5afe3edg32dump_target_config_linux_riscv32Ev)}};
 #line 38 "src/types.h"
- /* COMDAT group: _ZN3edg13skip_typerefsEPNS_6a_typeE */ _ZN3edg10a_type_ptrE _ZN3edg13skip_typerefsEPNS_6a_typeE( _ZN3edg10a_type_ptrE __100929_44_type_ptr)
+ /* COMDAT group: _ZN3edg13skip_typerefsEPNS_6a_typeE */ _ZN3edg10a_type_ptrE _ZN3edg13skip_typerefsEPNS_6a_typeE( _ZN3edg10a_type_ptrE __101061_44_type_ptr)
 #line 45
 {
-while (((int)(__100929_44_type_ptr->kind)) == 12) {
-__100929_44_type_ptr = (((__100929_44_type_ptr->variant).typeref).type);
+while (((int)(__101061_44_type_ptr->kind)) == 12) {
+__101061_44_type_ptr = (((__101061_44_type_ptr->variant).typeref).type);
 
 
 
 
 }
-return __100929_44_type_ptr;
+return __101061_44_type_ptr;
 }
 #line 62 "src/target_map.h"
 static void _ZN29_INTERNAL_8_target_c_946d5afe3edg28set_target_config_linux_i686Ev(void)
@@ -10044,290 +10044,290 @@ _ZN3edg35targ_zero_width_bit_field_alignmentE = (-1);
 
 }
 #line 62 "src/target_map.h"
-static void _ZN29_INTERNAL_8_target_c_946d5afe3edg21dump_as_target_configEPKc( _ZN3edg12a_const_charE *__149726_13_suffix)
+static void _ZN29_INTERNAL_8_target_c_946d5afe3edg21dump_as_target_configEPKc( _ZN3edg12a_const_charE *__149858_13_suffix)
 #line 78
 {
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_DOUBLE")), __149726_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_DOUBLE")), __149858_13_suffix, ((const char *)("8")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_FAR_POINTER")), __149726_13_suffix, ((const char *)("4")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_FAR_POINTER")), __149858_13_suffix, ((const char *)("4")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_FLOAT")), __149726_13_suffix, ((const char *)("4")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_FLOAT128")), __149726_13_suffix, ((const char *)("16")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_FLOAT80")), __149726_13_suffix, ((const char *)("16")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_INT")), __149726_13_suffix, ((const char *)("4")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_FLOAT")), __149858_13_suffix, ((const char *)("4")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_FLOAT128")), __149858_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_FLOAT80")), __149858_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_INT")), __149858_13_suffix, ((const char *)("4")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_INT128")), __149726_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_INT128")), __149858_13_suffix, ((const char *)("16")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_LONG")), __149726_13_suffix, ((const char *)("8")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_LONG_DOUBLE")), __149726_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_LONG")), __149858_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_LONG_DOUBLE")), __149858_13_suffix, ((const char *)("16")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_LONG_LONG")), __149726_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_LONG_LONG")), __149858_13_suffix, ((const char *)("8")));
 
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_NEAR_POINTER")), __149726_13_suffix, ((const char *)("2")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_NEAR_POINTER")), __149858_13_suffix, ((const char *)("2")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_POINTER")), __149726_13_suffix, ((const char *)("8")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_PTR_TO_DATA_MEMBER")), __149726_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_POINTER")), __149858_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_PTR_TO_DATA_MEMBER")), __149858_13_suffix, ((const char *)("8")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_PTR_TO_MEMBER_FUNCTION")), __149726_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_PTR_TO_MEMBER_FUNCTION")), __149858_13_suffix, ((const char *)("8")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MICROSOFT_PTR_TO_MEMBER_SIZING")), __149726_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MICROSOFT_PTR_TO_MEMBER_SIZING")), __149858_13_suffix, ((const char *)("(0!=0)")));
 #line 109
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_SHORT")), __149726_13_suffix, ((const char *)("2")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_SHORT")), __149858_13_suffix, ((const char *)("2")));
 #line 136
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_VIRTUAL_FUNCTION_INFO")), __149726_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALIGNOF_VIRTUAL_FUNCTION_INFO")), __149858_13_suffix, ((const char *)("8")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALL_POINTERS_SAME_SIZE")), __149726_13_suffix, ((const char *)("(0==0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ALL_POINTERS_SAME_SIZE")), __149858_13_suffix, ((const char *)("(0==0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_BIT_FIELD_AFFECTS_UNION_ALIGNMENT")), __149726_13_suffix, ((const char *)("(0==0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_BIT_FIELD_AFFECTS_UNION_ALIGNMENT")), __149858_13_suffix, ((const char *)("(0==0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_BIT_FIELD_CONTAINER_SIZE")), __149726_13_suffix, ((const char *)("(-1)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_BIT_FIELD_CONTAINER_SIZE")), __149858_13_suffix, ((const char *)("(-1)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_BOOL_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_char)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_C_BOOL_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_char)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_CHAR16_T_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_short)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_CHAR32_T_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_int)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_CHAR_BIT")), __149726_13_suffix, ((const char *)("8")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_CHAR_CONSTANT_FIRST_CHAR_MOST_SIGNIFICANT")), __149726_13_suffix, ((const char *)("1")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_BOOL_INT_KIND")), __149858_13_suffix, ((const char *)("((an_integer_kind)ik_char)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_C_BOOL_INT_KIND")), __149858_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_char)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_CHAR16_T_INT_KIND")), __149858_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_short)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_CHAR32_T_INT_KIND")), __149858_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_int)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_CHAR_BIT")), __149858_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_CHAR_CONSTANT_FIRST_CHAR_MOST_SIGNIFICANT")), __149858_13_suffix, ((const char *)("1")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DBL_MANT_DIG")), __149726_13_suffix, ((const char *)("53")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DBL_MAX_EXP")), __149726_13_suffix, ((const char *)("1024")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DBL_MIN_EXP")), __149726_13_suffix, ((const char *)("-1021")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DEFAULT_NEW_ALIGNMENT")), __149726_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DBL_MANT_DIG")), __149858_13_suffix, ((const char *)("53")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DBL_MAX_EXP")), __149858_13_suffix, ((const char *)("1024")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DBL_MIN_EXP")), __149858_13_suffix, ((const char *)("-1021")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DEFAULT_NEW_ALIGNMENT")), __149858_13_suffix, ((const char *)("16")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DELTA_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_long)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DELTA_INT_KIND")), __149858_13_suffix, ((const char *)("((an_integer_kind)ik_long)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DOUBLE_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DOUBLE_FIELD_ALIGNMENT")), __149858_13_suffix, ((const char *)("8")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DUAL_ALIGNMENTS_FOR_BUILTIN_TYPES")), __149726_13_suffix, ((const char *)("0")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_DUAL_ALIGNMENTS_FOR_BUILTIN_TYPES")), __149858_13_suffix, ((const char *)("0")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ENUM_BIT_FIELDS_ARE_ALWAYS_UNSIGNED")), __149726_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ENUM_BIT_FIELDS_ARE_ALWAYS_UNSIGNED")), __149858_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ENUM_TYPES_CAN_BE_SMALLER_THAN_INT")), __149726_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ENUM_TYPES_CAN_BE_SMALLER_THAN_INT")), __149858_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FIELD_ALLOC_SEQUENCE_EQUALS_DECL_SEQUENCE")), __149726_13_suffix, ((const char *)("(0==0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FIELD_ALLOC_SEQUENCE_EQUALS_DECL_SEQUENCE")), __149858_13_suffix, ((const char *)("(0==0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT_MANT_DIG")), __149726_13_suffix, ((const char *)("24")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT_MAX_EXP")), __149726_13_suffix, ((const char *)("128")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT_MIN_EXP")), __149726_13_suffix, ((const char *)("-125")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLOAT_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("4")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLOAT128_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT_MANT_DIG")), __149858_13_suffix, ((const char *)("24")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT_MAX_EXP")), __149858_13_suffix, ((const char *)("128")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT_MIN_EXP")), __149858_13_suffix, ((const char *)("-125")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLOAT_FIELD_ALIGNMENT")), __149858_13_suffix, ((const char *)("4")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLOAT128_FIELD_ALIGNMENT")), __149858_13_suffix, ((const char *)("16")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLOAT80_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLOAT80_FIELD_ALIGNMENT")), __149858_13_suffix, ((const char *)("16")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT128_MANT_DIG")), __149726_13_suffix, ((const char *)("113")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT128_MAX_EXP")), __149726_13_suffix, ((const char *)("(16384)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT128_MIN_EXP")), __149726_13_suffix, ((const char *)("(-16381)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT80_MANT_DIG")), __149726_13_suffix, ((const char *)("64")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT80_MAX_EXP")), __149726_13_suffix, ((const char *)("(16384)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT80_MIN_EXP")), __149726_13_suffix, ((const char *)("(-16381)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FORCE_ONE_BIT_BIT_FIELD_TO_BE_UNSIGNED")), __149726_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT128_MANT_DIG")), __149858_13_suffix, ((const char *)("113")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT128_MAX_EXP")), __149858_13_suffix, ((const char *)("(16384)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT128_MIN_EXP")), __149858_13_suffix, ((const char *)("(-16381)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT80_MANT_DIG")), __149858_13_suffix, ((const char *)("64")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT80_MAX_EXP")), __149858_13_suffix, ((const char *)("(16384)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FLT80_MIN_EXP")), __149858_13_suffix, ((const char *)("(-16381)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_FORCE_ONE_BIT_BIT_FIELD_TO_BE_UNSIGNED")), __149858_13_suffix, ((const char *)("(0!=0)")));
 #line 218
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_HAS_SIGNED_CHARS")), __149726_13_suffix, ((const char *)("(0==0)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_HOST_STRING_CHAR_BIT")), __149726_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_HAS_SIGNED_CHARS")), __149858_13_suffix, ((const char *)("(0==0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_HOST_STRING_CHAR_BIT")), __149858_13_suffix, ((const char *)("8")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_USE_GUARD_ACQUIRE_RELEASE")), __149726_13_suffix, ((const char *)("(0==0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_USE_GUARD_ACQUIRE_RELEASE")), __149858_13_suffix, ((const char *)("(0==0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_USE_INT_STATIC_INIT_GUARD")), __149726_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_USE_INT_STATIC_INIT_GUARD")), __149858_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_USE_VARIANT_ARRAY_COOKIES")), __149726_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_USE_VARIANT_ARRAY_COOKIES")), __149858_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_USE_VARIANT_PTR_TO_MEMBER_FUNCTION_REPR")), __149726_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_USE_VARIANT_PTR_TO_MEMBER_FUNCTION_REPR")), __149858_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_VARIANT_CTORS_AND_DTORS_RETURN_THIS")), __149726_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_VARIANT_CTORS_AND_DTORS_RETURN_THIS")), __149858_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_VARIANT_KEY_FUNCTION")), __149726_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_ABI_VARIANT_KEY_FUNCTION")), __149858_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_VTABLE_ENTRY_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_long)")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_INT_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("4")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_INT128_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_IA64_VTABLE_ENTRY_INT_KIND")), __149858_13_suffix, ((const char *)("((an_integer_kind)ik_long)")));
 
 
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_INT_FIELD_ALIGNMENT")), __149858_13_suffix, ((const char *)("4")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_JMP_BUF_ELEMENTS_ARE_FLOAT")), __149726_13_suffix, ((const char *)("0")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_JMP_BUF_ELEMENT_FLOAT_KIND")), __149726_13_suffix, ((const char *)("((a_float_kind)fk_long_double)")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_JMP_BUF_ELEMENT_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_long)")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_JMP_BUF_NUM_ELEMENTS")), __149726_13_suffix, ((const char *)("25")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SETJMP_FUNC")), __149726_13_suffix, ((const char *)("\"_setjmp\"")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LDBL_MANT_DIG")), __149726_13_suffix, ((const char *)("64")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LDBL_MAX_EXP")), __149726_13_suffix, ((const char *)("16384")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LDBL_MIN_EXP")), __149726_13_suffix, ((const char *)("-16381")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LIBGCC_CMP_RETURN_MODE")), __149726_13_suffix, ((const char *)("((a_type_mode_kind)tmk_DI)")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LIBGCC_SHIFT_COUNT_MODE")), __149726_13_suffix, ((const char *)("((a_type_mode_kind)tmk_DI)")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LITTLE_ENDIAN")), __149726_13_suffix, ((const char *)("(0==0)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LONG_DOUBLE_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("16")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LONG_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("8")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LONG_LONG_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("8")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MAXIMUM_INTRINSIC_ALIGNMENT")), __149726_13_suffix, ((const char *)("16")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MAX_BASE_CLASS_OFFSET")), __149726_13_suffix, ((const char *)("0")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MAX_CLASS_OBJECT_SIZE")), __149726_13_suffix, ((const char *)("0")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MICROSOFT_BIT_FIELD_ALLOCATION")), __149726_13_suffix, ((const char *)("(0!=0)")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MINIMUM_STRUCT_ALIGNMENT")), __149726_13_suffix, ((const char *)("1")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_NONNEGATIVE_ENUM_BIT_FIELD_IS_UNSIGNED")), __149726_13_suffix, ((const char *)("1")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_OPTIMIZE_EMPTY_BASE_CLASS_LAYOUT")), __149726_13_suffix, ((const char *)("(0==0)")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_PAD_BIT_FIELDS_LARGER_THAN_BASE_TYPE")), __149726_13_suffix, ((const char *)("(0==0)")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_PLAIN_INT_BIT_FIELD_IS_UNSIGNED")), __149726_13_suffix, ((const char *)("0")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_POINTER_MODE")), __149726_13_suffix, ((const char *)("((a_type_mode_kind)tmk_DI)")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_PTRDIFF_T_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_long)")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_REGION_NUMBER_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_short)")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ETS_FLAG_TYPE_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_int)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_INT128_FIELD_ALIGNMENT")), __149858_13_suffix, ((const char *)("16")));
 
 
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_REUSE_TAIL_PADDING")), __149726_13_suffix, ((const char *)("1")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_JMP_BUF_ELEMENTS_ARE_FLOAT")), __149858_13_suffix, ((const char *)("0")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_RIGHT_SHIFT_IS_ARITHMETIC")), __149726_13_suffix, ((const char *)("(0==0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_JMP_BUF_ELEMENT_FLOAT_KIND")), __149858_13_suffix, ((const char *)("((a_float_kind)fk_long_double)")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_JMP_BUF_ELEMENT_INT_KIND")), __149858_13_suffix, ((const char *)("((an_integer_kind)ik_long)")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_JMP_BUF_NUM_ELEMENTS")), __149858_13_suffix, ((const char *)("25")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SETJMP_FUNC")), __149858_13_suffix, ((const char *)("\"_setjmp\"")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LDBL_MANT_DIG")), __149858_13_suffix, ((const char *)("64")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LDBL_MAX_EXP")), __149858_13_suffix, ((const char *)("16384")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LDBL_MIN_EXP")), __149858_13_suffix, ((const char *)("-16381")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LIBGCC_CMP_RETURN_MODE")), __149858_13_suffix, ((const char *)("((a_type_mode_kind)tmk_DI)")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LIBGCC_SHIFT_COUNT_MODE")), __149858_13_suffix, ((const char *)("((a_type_mode_kind)tmk_DI)")));
+
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LITTLE_ENDIAN")), __149858_13_suffix, ((const char *)("(0==0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LONG_DOUBLE_FIELD_ALIGNMENT")), __149858_13_suffix, ((const char *)("16")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LONG_FIELD_ALIGNMENT")), __149858_13_suffix, ((const char *)("8")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_LONG_LONG_FIELD_ALIGNMENT")), __149858_13_suffix, ((const char *)("8")));
+
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MAXIMUM_INTRINSIC_ALIGNMENT")), __149858_13_suffix, ((const char *)("16")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MAX_BASE_CLASS_OFFSET")), __149858_13_suffix, ((const char *)("0")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MAX_CLASS_OBJECT_SIZE")), __149858_13_suffix, ((const char *)("0")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MICROSOFT_BIT_FIELD_ALLOCATION")), __149858_13_suffix, ((const char *)("(0!=0)")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_MINIMUM_STRUCT_ALIGNMENT")), __149858_13_suffix, ((const char *)("1")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_NONNEGATIVE_ENUM_BIT_FIELD_IS_UNSIGNED")), __149858_13_suffix, ((const char *)("1")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_OPTIMIZE_EMPTY_BASE_CLASS_LAYOUT")), __149858_13_suffix, ((const char *)("(0==0)")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_PAD_BIT_FIELDS_LARGER_THAN_BASE_TYPE")), __149858_13_suffix, ((const char *)("(0==0)")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_PLAIN_INT_BIT_FIELD_IS_UNSIGNED")), __149858_13_suffix, ((const char *)("0")));
+
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_POINTER_MODE")), __149858_13_suffix, ((const char *)("((a_type_mode_kind)tmk_DI)")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_PTRDIFF_T_INT_KIND")), __149858_13_suffix, ((const char *)("((an_integer_kind)ik_long)")));
+
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_REGION_NUMBER_INT_KIND")), __149858_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_short)")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ETS_FLAG_TYPE_INT_KIND")), __149858_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_int)")));
+
+
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_REUSE_TAIL_PADDING")), __149858_13_suffix, ((const char *)("1")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_RIGHT_SHIFT_IS_ARITHMETIC")), __149858_13_suffix, ((const char *)("(0==0)")));
 #line 305
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SHORT_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("2")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_DOUBLE")), __149726_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SHORT_FIELD_ALIGNMENT")), __149858_13_suffix, ((const char *)("2")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_DOUBLE")), __149858_13_suffix, ((const char *)("8")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_FAR_POINTER")), __149726_13_suffix, ((const char *)("4")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_FAR_POINTER")), __149858_13_suffix, ((const char *)("4")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_FLOAT")), __149726_13_suffix, ((const char *)("4")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_FLOAT128")), __149726_13_suffix, ((const char *)("16")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_FLOAT80")), __149726_13_suffix, ((const char *)("16")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_INT")), __149726_13_suffix, ((const char *)("4")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_FLOAT")), __149858_13_suffix, ((const char *)("4")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_FLOAT128")), __149858_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_FLOAT80")), __149858_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_INT")), __149858_13_suffix, ((const char *)("4")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_INT128")), __149726_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_INT128")), __149858_13_suffix, ((const char *)("16")));
 #line 321
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_LONG")), __149726_13_suffix, ((const char *)("8")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_LONG_DOUBLE")), __149726_13_suffix, ((const char *)("16")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_LONG")), __149858_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_LONG_DOUBLE")), __149858_13_suffix, ((const char *)("16")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_LONG_LONG")), __149726_13_suffix, ((const char *)("8")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_LARGEST_ATOMIC")), __149726_13_suffix, ((const char *)("(8+8)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_LONG_LONG")), __149858_13_suffix, ((const char *)("8")));
 
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_NEAR_POINTER")), __149726_13_suffix, ((const char *)("2")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_LARGEST_ATOMIC")), __149858_13_suffix, ((const char *)("(8+8)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_POINTER")), __149726_13_suffix, ((const char *)("8")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_DATA_MEMBER")), __149726_13_suffix, ((const char *)("8")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_MEMBER_FUNCTION")), __149726_13_suffix, ((const char *)("(8+8)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_NEAR_POINTER")), __149858_13_suffix, ((const char *)("2")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_POINTER")), __149858_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_DATA_MEMBER")), __149858_13_suffix, ((const char *)("8")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_PTR_TO_MEMBER_FUNCTION")), __149858_13_suffix, ((const char *)("(8+8)")));
 #line 341
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_SHORT")), __149726_13_suffix, ((const char *)("2")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_SHORT")), __149858_13_suffix, ((const char *)("2")));
 #line 368
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_VIRTUAL_FUNCTION_INFO")), __149726_13_suffix, ((const char *)("8")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZEOF_VIRTUAL_FUNCTION_INFO")), __149858_13_suffix, ((const char *)("8")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZE_T_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_long)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZE_T_MAX")), __149726_13_suffix, ((const char *)("((a_targ_size_t)0xffffffffUL)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZE_T_INT_KIND")), __149858_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_long)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SIZE_T_MAX")), __149858_13_suffix, ((const char *)("((a_targ_size_t)0xffffffffUL)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SSIZE_T_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_long)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SSIZE_T_INT_KIND")), __149858_13_suffix, ((const char *)("((an_integer_kind)ik_long)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SUPPORTS_ARM32")), __149726_13_suffix, ((const char *)("(0!=0)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SUPPORTS_ARM64")), __149726_13_suffix, ((const char *)("(0!=0)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SUPPORTS_RISCV32")), __149726_13_suffix, ((const char *)("(0!=0)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SUPPORTS_RISCV64")), __149726_13_suffix, ((const char *)("(0!=0)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SUPPORTS_X86_64")), __149726_13_suffix, ((const char *)("(0==0)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_TOO_LARGE_SHIFT_COUNT_IS_TAKEN_MODULO_SIZE")), __149726_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SUPPORTS_ARM32")), __149858_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SUPPORTS_ARM64")), __149858_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SUPPORTS_RISCV32")), __149858_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SUPPORTS_RISCV64")), __149858_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_SUPPORTS_X86_64")), __149858_13_suffix, ((const char *)("(0==0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_TOO_LARGE_SHIFT_COUNT_IS_TAKEN_MODULO_SIZE")), __149858_13_suffix, ((const char *)("(0!=0)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_UNNAMED_BIT_FIELD_AFFECTS_STRUCT_ALIGNMENT")), __149726_13_suffix, ((const char *)("(0!=0)")));
-
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_UNWIND_WORD_MODE")), __149726_13_suffix, ((const char *)("((a_type_mode_kind)tmk_DI)")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_USER_CONTROL_OF_STRUCT_PACKING_AFFECTS_BASE_CLASSES")), __149726_13_suffix, ((const char *)("(0==0)")));
-
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_USER_CONTROL_OF_STRUCT_PACKING_AFFECTS_BIT_FIELDS")), __149726_13_suffix, ((const char *)("(0==0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_UNNAMED_BIT_FIELD_AFFECTS_STRUCT_ALIGNMENT")), __149858_13_suffix, ((const char *)("(0!=0)")));
 
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_VAR_HANDLE_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_short)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_UNWIND_WORD_MODE")), __149858_13_suffix, ((const char *)("((a_type_mode_kind)tmk_DI)")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_USER_CONTROL_OF_STRUCT_PACKING_AFFECTS_BASE_CLASSES")), __149858_13_suffix, ((const char *)("(0==0)")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_USER_CONTROL_OF_STRUCT_PACKING_AFFECTS_BIT_FIELDS")), __149858_13_suffix, ((const char *)("(0==0)")));
 
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_VIRTUAL_FUNCTION_INDEX_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_short)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_VAR_HANDLE_INT_KIND")), __149858_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_short)")));
 
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_WCHAR_T_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_int)")));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_WINT_T_INT_KIND")), __149726_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_int)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_VIRTUAL_FUNCTION_INDEX_INT_KIND")), __149858_13_suffix, ((const char *)("((an_integer_kind)ik_short)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_WORD_MODE")), __149726_13_suffix, ((const char *)("((a_type_mode_kind)tmk_DI)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ZERO_WIDTH_BIT_FIELD_AFFECTS_STRUCT_ALIGNMENT")), __149726_13_suffix, ((const char *)("(0!=0)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_WCHAR_T_INT_KIND")), __149858_13_suffix, ((const char *)("((an_integer_kind)ik_int)")));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_WINT_T_INT_KIND")), __149858_13_suffix, ((const char *)("((an_integer_kind)ik_unsigned_int)")));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ZERO_WIDTH_BIT_FIELD_ALIGNMENT")), __149726_13_suffix, ((const char *)("(-1)"))); 
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_WORD_MODE")), __149858_13_suffix, ((const char *)("((a_type_mode_kind)tmk_DI)")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ZERO_WIDTH_BIT_FIELD_AFFECTS_STRUCT_ALIGNMENT")), __149858_13_suffix, ((const char *)("(0!=0)")));
+
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define %s_%s %s\n"), ((const char *)("TARG_ZERO_WIDTH_BIT_FIELD_ALIGNMENT")), __149858_13_suffix, ((const char *)("(-1)"))); 
 
 }
 #line 246 "src/target.c"
-void _ZN3edg35dump_legacy_config_as_target_configEPKc( _ZN3edg12a_const_charE *__150101_56_config)
+void _ZN3edg35dump_legacy_config_as_target_configEPKc( _ZN3edg12a_const_charE *__150233_56_config)
 #line 257
 {
-fprintf(_ZN3edg7f_errorE, ((const char *)"/* Target configuration: %s */\n"), __150101_56_config);
+fprintf(_ZN3edg7f_errorE, ((const char *)"/* Target configuration: %s */\n"), __150233_56_config);
 fprintf(_ZN3edg7f_errorE, ((const char *)"/* NOTE: For multiple target configurations, change _1 below as necessary. */\n"));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define TARGET_CONFIGURATION_1 %s\n"), __150101_56_config);
-_ZN29_INTERNAL_8_target_c_946d5afe3edg21dump_as_target_configEPKc(__150101_56_config); 
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define TARGET_CONFIGURATION_1 %s\n"), __150233_56_config);
+_ZN29_INTERNAL_8_target_c_946d5afe3edg21dump_as_target_configEPKc(__150233_56_config); 
 }
 
 
 
-int32_t _ZN3edg25find_target_configurationEPKc( _ZN3edg12a_const_charE *__150122_49_config)
+int32_t _ZN3edg25find_target_configurationEPKc( _ZN3edg12a_const_charE *__150254_49_config)
 #line 273
 {
-auto int32_t __150129_12_i; auto int32_t __150129_15_result = (-1);
+auto int32_t __150261_12_i; auto int32_t __150261_15_result = (-1);
 
-for (__150129_12_i = 0; __150129_12_i < 8; __150129_12_i++) {
-if (((((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__150129_12_i]).name) != ((_ZN3edg12a_const_charE *)0)) && ((strcmp((((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__150129_12_i]).name), __150122_49_config)) == 0))
+for (__150261_12_i = 0; __150261_12_i < 8; __150261_12_i++) {
+if (((((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__150261_12_i]).name) != ((_ZN3edg12a_const_charE *)0)) && ((strcmp((((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__150261_12_i]).name), __150254_49_config)) == 0))
 {
-__150129_15_result = __150129_12_i;
-goto __T619526648;
+__150261_15_result = __150261_12_i;
+goto __T127326600;
 }
-} __T619526648:;
-return __150129_15_result;
+} __T127326600:;
+return __150261_15_result;
 }
 
 
-void _ZN3edg24set_target_configurationEi( int32_t __150142_39_target_index)
+void _ZN3edg24set_target_configurationEi( int32_t __150274_39_target_index)
 #line 298
 {
-auto _ZN3edg9a_booleanE __150154_13_unnamed = ((_ZN3edg9a_booleanE)0);
-auto _ZN3edg22a_target_configurationE *__150155_27_target;
+auto _ZN3edg9a_booleanE __150286_13_unnamed = ((_ZN3edg9a_booleanE)0);
+auto _ZN3edg22a_target_configurationE *__150287_27_target;
 
-if (__150142_39_target_index == (-1)) {
+if (__150274_39_target_index == (-1)) {
 
 
 
-__150142_39_target_index = 0;
-__150154_13_unnamed = ((_ZN3edg9a_booleanE)1);
+__150274_39_target_index = 0;
+__150286_13_unnamed = ((_ZN3edg9a_booleanE)1);
 }
-((__150142_39_target_index >= 0) && (__150142_39_target_index < 8)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 310, __T618979472, ((_ZN3edg12a_const_charE *)0), ((
+((__150274_39_target_index >= 0) && (__150274_39_target_index < 8)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 310, __T126776408, ((_ZN3edg12a_const_charE *)0), ((
 #line 309
 _ZN3edg12a_const_charE *)0)));
 
-__150155_27_target = ((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE) + __150142_39_target_index);
-((__150155_27_target->set_target_config) != ((void (*)(void))0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 312, __T618979472, ((_ZN3edg12a_const_charE *)0), ((
+__150287_27_target = ((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE) + __150274_39_target_index);
+((__150287_27_target->set_target_config) != ((void (*)(void))0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 312, __T126776408, ((_ZN3edg12a_const_charE *)0), ((
 #line 312
 _ZN3edg12a_const_charE *)0)));
-(__150155_27_target->set_target_config)();
-if ((__150154_13_unnamed) || ((__150155_27_target->name) == ((_ZN3edg12a_const_charE *)0))) {
+(__150287_27_target->set_target_config)();
+if ((__150286_13_unnamed) || ((__150287_27_target->name) == ((_ZN3edg12a_const_charE *)0))) {
 
 
 _ZN3edg23auxiliary_info_dir_nameE = "lib";
@@ -10335,12 +10335,12 @@ _ZN3edg23auxiliary_info_dir_nameE = "lib";
 
 
 (void)0;
-_ZN3edg23auxiliary_info_dir_nameE = (_ZN3edg13alloc_generalEy(((3ULL + (strlen((__150155_27_target->name)))) + 2ULL)));
+_ZN3edg23auxiliary_info_dir_nameE = (_ZN3edg13alloc_generalEy(((3ULL + (strlen((__150287_27_target->name)))) + 2ULL)));
 
 
 strcpy(_ZN3edg23auxiliary_info_dir_nameE, ((const char *)"lib"));
 strcat(_ZN3edg23auxiliary_info_dir_nameE, ((const char *)"_"));
-strcat(_ZN3edg23auxiliary_info_dir_nameE, (__150155_27_target->name));
+strcat(_ZN3edg23auxiliary_info_dir_nameE, (__150287_27_target->name));
 } 
 }
 
@@ -10349,44 +10349,44 @@ strcat(_ZN3edg23auxiliary_info_dir_nameE, (__150155_27_target->name));
 void _ZN3edg26dump_target_configurationsEv(void)
 #line 339
 {
-auto _ZN3edg22a_target_configurationE *__150195_27_legacy = _ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE;
-auto int __150196_26_i;
+auto _ZN3edg22a_target_configurationE *__150327_27_legacy = _ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE;
+auto int __150328_26_i;
 
 
 
 
-if ((__150195_27_legacy->name) == ((_ZN3edg12a_const_charE *)0)) {
+if ((__150327_27_legacy->name) == ((_ZN3edg12a_const_charE *)0)) {
 fprintf(_ZN3edg7f_errorE, ((const char *)"\n/* Legacy configuration: <unnamed> */\n"));
 fprintf(_ZN3edg7f_errorE, ((const char *)"#define LEGACY_TARGET_CONFIGURATION_NAME NULL\n"));
 } else  {
-fprintf(_ZN3edg7f_errorE, ((const char *)"\n/* Legacy configuration: %s */\n"), (__150195_27_legacy->name));
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define LEGACY_TARGET_CONFIGURATION_NAME \"%s\"\n"), (__150195_27_legacy->name));
+fprintf(_ZN3edg7f_errorE, ((const char *)"\n/* Legacy configuration: %s */\n"), (__150327_27_legacy->name));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define LEGACY_TARGET_CONFIGURATION_NAME \"%s\"\n"), (__150327_27_legacy->name));
 
 }
 
-for (__150196_26_i = 1; __150196_26_i < 8; __150196_26_i++) {
-fprintf(_ZN3edg7f_errorE, ((const char *)"\n/* Target configuration: %s */\n"), (((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__150196_26_i]).name));
+for (__150328_26_i = 1; __150328_26_i < 8; __150328_26_i++) {
+fprintf(_ZN3edg7f_errorE, ((const char *)"\n/* Target configuration: %s */\n"), (((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__150328_26_i]).name));
 
-fprintf(_ZN3edg7f_errorE, ((const char *)"#define TARGET_CONFIGURATION_%d %s\n"), __150196_26_i, (((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__150196_26_i]).name));
+fprintf(_ZN3edg7f_errorE, ((const char *)"#define TARGET_CONFIGURATION_%d %s\n"), __150328_26_i, (((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__150328_26_i]).name));
 
-((((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__150196_26_i]).dump_target_config) != ((void (*)(void))0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 361
+((((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__150328_26_i]).dump_target_config) != ((void (*)(void))0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"
 #line 360
-, __T618985936, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+), 361, __T126782896, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
-(((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__150196_26_i]).dump_target_config)();
+(((_ZN29_INTERNAL_8_target_c_946d5afe3edg21target_configurationsE)[__150328_26_i]).dump_target_config)();
 } 
 }
 
 
 
-static void _ZN29_INTERNAL_8_target_c_946d5afe3edg23set_plain_char_int_kindEb( _ZN3edg9a_booleanE __150223_47_plain_chars_are_signed)
+static void _ZN29_INTERNAL_8_target_c_946d5afe3edg23set_plain_char_int_kindEb( _ZN3edg9a_booleanE __150355_47_plain_chars_are_signed)
 #line 374
 {
 if ((((int)_ZN3edg9C_dialectE) == 1) || ((_ZN3edg14microsoft_modeE) && (((int)_ZN3edg9C_dialectE) != 2)))
 {
 
 
-_ZN3edg19plain_char_int_kindE = ((__150223_47_plain_chars_are_signed) ? _ZN3edg14ik_signed_charE : _ZN3edg16ik_unsigned_charE);
+_ZN3edg19plain_char_int_kindE = ((__150355_47_plain_chars_are_signed) ? _ZN3edg14ik_signed_charE : _ZN3edg16ik_unsigned_charE);
 
 
 } else  {
@@ -10411,7 +10411,7 @@ _ZN3edg27targ_unsigned_int8_int_kindE = _ZN3edg16ik_unsigned_charE;
 _ZN3edg19targ_int16_int_kindE = (_ZN3edg21int_kind_for_bit_sizeEjb(16U, ((_ZN3edg9a_booleanE)1)));
 if (((int)_ZN3edg19targ_int16_int_kindE) != 15) {
 _ZN3edg28targ_unsigned_int16_int_kindE = (_ZN3edg21int_kind_for_bit_sizeEjb(16U, ((_ZN3edg9a_booleanE)0)));
-if (!(((int)_ZN3edg28targ_unsigned_int16_int_kindE) != 15)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 416, __T618988568, ((const char *)"target_init: can\'t set int kind for unsigned __int16"
+if (!(((int)_ZN3edg28targ_unsigned_int16_int_kindE) != 15)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 416, __T126785536, ((const char *)"target_init: can\'t set int kind for unsigned __int16"
 #line 414
 ), ((_ZN3edg12a_const_charE *)0)); }
 
@@ -10420,7 +10420,7 @@ if (!(((int)_ZN3edg28targ_unsigned_int16_int_kindE) != 15)) { _ZN3edg16assertion
 _ZN3edg19targ_int32_int_kindE = (_ZN3edg21int_kind_for_bit_sizeEjb(32U, ((_ZN3edg9a_booleanE)1)));
 if (((int)_ZN3edg19targ_int32_int_kindE) != 15) {
 _ZN3edg28targ_unsigned_int32_int_kindE = (_ZN3edg21int_kind_for_bit_sizeEjb(32U, ((_ZN3edg9a_booleanE)0)));
-if (!(((int)_ZN3edg28targ_unsigned_int32_int_kindE) != 15)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 423, __T618988568, ((const char *)"target_init: can\'t set int kind for unsigned __int32"
+if (!(((int)_ZN3edg28targ_unsigned_int32_int_kindE) != 15)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 423, __T126785536, ((const char *)"target_init: can\'t set int kind for unsigned __int32"
 #line 421
 ), ((_ZN3edg12a_const_charE *)0)); }
 
@@ -10429,7 +10429,7 @@ if (!(((int)_ZN3edg28targ_unsigned_int32_int_kindE) != 15)) { _ZN3edg16assertion
 _ZN3edg19targ_int64_int_kindE = (_ZN3edg21int_kind_for_bit_sizeEjb(64U, ((_ZN3edg9a_booleanE)1)));
 if (((int)_ZN3edg19targ_int64_int_kindE) != 15) {
 _ZN3edg28targ_unsigned_int64_int_kindE = (_ZN3edg21int_kind_for_bit_sizeEjb(64U, ((_ZN3edg9a_booleanE)0)));
-if (!(((int)_ZN3edg28targ_unsigned_int64_int_kindE) != 15)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 430, __T618988568, ((const char *)"target_init: can\'t set int kind for unsigned __int64"
+if (!(((int)_ZN3edg28targ_unsigned_int64_int_kindE) != 15)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 430, __T126785536, ((const char *)"target_init: can\'t set int kind for unsigned __int64"
 #line 428
 ), ((_ZN3edg12a_const_charE *)0)); }
 
@@ -10439,22 +10439,22 @@ if (!(((int)_ZN3edg28targ_unsigned_int64_int_kindE) != 15)) { _ZN3edg16assertion
 
 
 
-_ZN3edg13a_targ_size_tE _ZN3edg18size_of_pointer_toEPNS_6a_typeEPt( _ZN3edg10a_type_ptrE __150291_63_tp, 
-_ZN3edg16a_targ_alignmentE *__150292_64_alignment)
+_ZN3edg13a_targ_size_tE _ZN3edg18size_of_pointer_toEPNS_6a_typeEPt( _ZN3edg10a_type_ptrE __150423_63_tp, 
+_ZN3edg16a_targ_alignmentE *__150424_64_alignment)
 #line 443
 {
-auto _ZN3edg13a_targ_size_tE __150299_17_size;
+auto _ZN3edg13a_targ_size_tE __150431_17_size;
 
 
 if (_ZN3edg9il_headerE.near_and_far_are_enabled) {
 
 
-if (_ZN3edg11is_far_typeEPNS_6a_typeE(__150291_63_tp)) {
-__150299_17_size = _ZN3edg23targ_sizeof_far_pointerE;
-(*__150292_64_alignment) = _ZN3edg24targ_alignof_far_pointerE;
+if (_ZN3edg11is_far_typeEPNS_6a_typeE(__150423_63_tp)) {
+__150431_17_size = _ZN3edg23targ_sizeof_far_pointerE;
+(*__150424_64_alignment) = _ZN3edg24targ_alignof_far_pointerE;
 } else  {
-__150299_17_size = _ZN3edg24targ_sizeof_near_pointerE;
-(*__150292_64_alignment) = _ZN3edg25targ_alignof_near_pointerE;
+__150431_17_size = _ZN3edg24targ_sizeof_near_pointerE;
+(*__150424_64_alignment) = _ZN3edg25targ_alignof_near_pointerE;
 }
 }
 
@@ -10462,8 +10462,8 @@ __150299_17_size = _ZN3edg24targ_sizeof_near_pointerE;
 else  {
 if (_ZN3edg27targ_all_pointers_same_sizeE) {
 
-__150299_17_size = _ZN3edg19targ_sizeof_pointerE;
-(*__150292_64_alignment) = _ZN3edg20targ_alignof_pointerE;
+__150431_17_size = _ZN3edg19targ_sizeof_pointerE;
+(*__150424_64_alignment) = _ZN3edg20targ_alignof_pointerE;
 } else  {
 #line 471
 _ZN3edg14internal_errorEPKc(((const char *)"size_of_pointer_to: unknown pointer size"));
@@ -10472,7 +10472,7 @@ _ZN3edg14internal_errorEPKc(((const char *)"size_of_pointer_to: unknown pointer 
 
 }
 }
-return __150299_17_size;
+return __150431_17_size;
 }
 
 
@@ -10480,13 +10480,13 @@ return __150299_17_size;
 void _ZN3edg26check_target_configurationEv(void)
 #line 489
 {
-auto _ZN3edg13a_targ_size_tE __150345_20_size; auto _ZN3edg13a_targ_size_tE __150345_26_size_max_value;
-auto _ZN3edg16a_targ_alignmentE __150346_20_alignment;
-auto _ZN3edg9a_booleanE __150347_20_err;
+auto _ZN3edg13a_targ_size_tE __150477_20_size; auto _ZN3edg13a_targ_size_tE __150477_26_size_max_value;
+auto _ZN3edg16a_targ_alignmentE __150478_20_alignment;
+auto _ZN3edg9a_booleanE __150479_20_err;
 #line 503
-_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(_ZN3edg7ik_charE, (&__150345_20_size), (&__150346_20_alignment));
+_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(_ZN3edg7ik_charE, (&__150477_20_size), (&__150478_20_alignment));
 
-if (__150345_20_size > 4ULL) {
+if (__150477_20_size > 4ULL) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: target char is too large"));
 }
 
@@ -10500,7 +10500,7 @@ _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: target char16_t
 } else  { if ((_ZN3edg20targ_sizeof_char16_tE * ((unsigned long long)_ZN3edg13targ_char_bitE)) < 16ULL) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: target char16_t is too small"));
 } }
-if (!(!((_ZN3edg18int_kind_is_signedE)[((int)_ZN3edg22targ_char16_t_int_kindE)]))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 520, __T618996408, ((const char *)"check_target_config: target char16_t must be unsigned"
+if (!(!((_ZN3edg18int_kind_is_signedE)[((int)_ZN3edg22targ_char16_t_int_kindE)]))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 520, __T126793400, ((const char *)"check_target_config: target char16_t must be unsigned"
 #line 519
 ), ((_ZN3edg12a_const_charE *)0)); }
 
@@ -10509,23 +10509,23 @@ _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: target char32_t
 } else  { if ((_ZN3edg20targ_sizeof_char32_tE * ((unsigned long long)_ZN3edg13targ_char_bitE)) < 32ULL) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: target char32_t is too small"));
 } }
-if (!(!((_ZN3edg18int_kind_is_signedE)[((int)_ZN3edg22targ_char32_t_int_kindE)]))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 527, __T618996408, ((const char *)"check_target_config: target char32_t must be unsigned"
+if (!(!((_ZN3edg18int_kind_is_signedE)[((int)_ZN3edg22targ_char32_t_int_kindE)]))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 527, __T126793400, ((const char *)"check_target_config: target char32_t must be unsigned"
 #line 526
 ), ((_ZN3edg12a_const_charE *)0)); }
 
 
 
-_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(((unsigned char)_ZN3edg20targ_size_t_int_kindE), (&__150345_20_size), (&__150346_20_alignment));
+_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(((unsigned char)_ZN3edg20targ_size_t_int_kindE), (&__150477_20_size), (&__150478_20_alignment));
 
-__150345_20_size *= ((unsigned long long)_ZN3edg13targ_char_bitE);
-if (__150345_20_size > 64ULL) {
-__150345_20_size = 64ULL;
+__150477_20_size *= ((unsigned long long)_ZN3edg13targ_char_bitE);
+if (__150477_20_size > 64ULL) {
+__150477_20_size = 64ULL;
 }
 
-__150345_26_size_max_value = (((1ULL << (__150345_20_size - 1ULL)) - 1ULL) << 1);
+__150477_26_size_max_value = (((1ULL << (__150477_20_size - 1ULL)) - 1ULL) << 1);
 
-__150345_26_size_max_value |= 1ULL;
-if (__150345_26_size_max_value < _ZN3edg15targ_size_t_maxE) {
+__150477_26_size_max_value |= 1ULL;
+if (__150477_26_size_max_value < _ZN3edg15targ_size_t_maxE) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: targ_size_t_max is too large"));
 }
 if (_ZN3edg27targ_sizeof_largest_integerE > 16ULL) {
@@ -10539,22 +10539,22 @@ if (_ZN3edg27targ_sizeof_largest_integerE < _ZN3edg21targ_sizeof_long_longE) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: invalid targ_sizeof_largest_integer"));
 }
 #line 582
-__150347_20_err = ((_ZN3edg9a_booleanE)0);
-if (__150347_20_err) {
+__150479_20_err = ((_ZN3edg9a_booleanE)0);
+if (__150479_20_err) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: invalid BITS_IN_HOST_LARGE_INTEGER"));
 }
-__150347_20_err = ((_ZN3edg9a_booleanE)0);
-if (__150347_20_err) {
+__150479_20_err = ((_ZN3edg9a_booleanE)0);
+if (__150479_20_err) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: invalid SIZEOF_INT_VALUE_PART"));
 }
-__150347_20_err = ((_ZN3edg9a_booleanE)0);
+__150479_20_err = ((_ZN3edg9a_booleanE)0);
 
-if (__150347_20_err) {
+if (__150479_20_err) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: invalid BITS_IN_INT_VALUE_PART"));
 }
-__150347_20_err = ((_Bool)(128ULL != ((unsigned long long)(16U * _ZN3edg13targ_char_bitE))));
+__150479_20_err = ((_Bool)(128ULL != ((unsigned long long)(16U * _ZN3edg13targ_char_bitE))));
 
-if (__150347_20_err) {
+if (__150479_20_err) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: invalid INT_VALUE_PARTS_PER_INTEGER_VALUE"));
 
 }
@@ -10565,9 +10565,9 @@ _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: targ_host_strin
 
 
 
-{ auto _ZN3edg16a_targ_alignmentE __150463_22_temp = ((_ZN3edg16a_targ_alignmentE)255U);
+{ auto _ZN3edg16a_targ_alignmentE __150595_22_temp = ((_ZN3edg16a_targ_alignmentE)255U);
 
-if ((((int)_ZN3edg27targ_minimum_pack_alignmentE) < 1) || (((int)_ZN3edg27targ_minimum_pack_alignmentE) > ((int)__150463_22_temp)))
+if ((((int)_ZN3edg27targ_minimum_pack_alignmentE) < 1) || (((int)_ZN3edg27targ_minimum_pack_alignmentE) > ((int)__150595_22_temp)))
 {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: invalid targ_minimum_pack_alignment"));
 
@@ -10579,26 +10579,26 @@ if ((((int)_ZN3edg27targ_maximum_pack_alignmentE) < ((int)_ZN3edg27targ_minimum_
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: invalid targ_maximum_pack_alignment"));
 }
 #line 627
-if (!(((_ZN3edg17targ_sizeof_shortE == 2ULL) && (_ZN3edg15targ_sizeof_intE == 4ULL)) && (_ZN3edg21targ_sizeof_long_longE == 8ULL))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 630, 
+if (!(((_ZN3edg17targ_sizeof_shortE == 2ULL) && (_ZN3edg15targ_sizeof_intE == 4ULL)) && (_ZN3edg21targ_sizeof_long_longE == 8ULL))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 630
 #line 627
-__T618996408, ((const char *)"check_target_config: invalid integer sizes for"), ((const char *)" GNU IA-32 vector functions")); }
+, __T126793400, ((const char *)"check_target_config: invalid integer sizes for"), ((const char *)" GNU IA-32 vector functions")); }
 #line 633
 {
 
 
 
-auto _ZN3edg13a_targ_size_tE __150492_22_vtbl_entry_size; auto _ZN3edg13a_targ_size_tE __150492_39_delta_int_size;
-auto _ZN3edg16a_targ_alignmentE __150493_22_dummy_alignment;
+auto _ZN3edg13a_targ_size_tE __150624_22_vtbl_entry_size; auto _ZN3edg13a_targ_size_tE __150624_39_delta_int_size;
+auto _ZN3edg16a_targ_alignmentE __150625_22_dummy_alignment;
 
-_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(_ZN3edg31targ_ia64_vtable_entry_int_kindE, (&__150492_22_vtbl_entry_size), (&__150493_22_dummy_alignment));
+_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(_ZN3edg31targ_ia64_vtable_entry_int_kindE, (&__150624_22_vtbl_entry_size), (&__150625_22_dummy_alignment));
 
-_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(_ZN3edg19targ_delta_int_kindE, (&__150492_39_delta_int_size), (&__150493_22_dummy_alignment));
+_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(_ZN3edg19targ_delta_int_kindE, (&__150624_39_delta_int_size), (&__150625_22_dummy_alignment));
 
-if ((_ZN3edg19targ_sizeof_pointerE != __150492_22_vtbl_entry_size) && (_ZN3edg27targ_all_pointers_same_sizeE)) {
+if ((_ZN3edg19targ_sizeof_pointerE != __150624_22_vtbl_entry_size) && (_ZN3edg27targ_all_pointers_same_sizeE)) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: targ_ia64_vtable_entry_int_kind wrong size"));
 
 }
-if (__150492_39_delta_int_size > __150492_22_vtbl_entry_size) {
+if (__150624_39_delta_int_size > __150624_22_vtbl_entry_size) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: targ_ia64_vtable_entry_int_kind is too small"));
 
 }
@@ -10617,9 +10617,9 @@ _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: targ_microsoft_
 
 
 
-(_ZN3edg37targ_optimize_empty_base_class_layoutE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 667, __T618996408, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))
+(_ZN3edg37targ_optimize_empty_base_class_layoutE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 667, __T126793400, ((_ZN3edg12a_const_charE *)0), ((
 #line 667
-);
+_ZN3edg12a_const_charE *)0)));
 #line 675
 if (!(_ZN3edg46targ_field_alloc_sequence_equals_decl_sequenceE)) {
 _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: targ_field_alloc_sequence_equals_decl_sequence must be TRUE"));
@@ -10644,9 +10644,9 @@ _ZN3edg14internal_errorEPKc(((const char *)"check_target_config: must use SoftFl
 }
 
 
-if (!((!(_ZN3edg35targ_microsoft_ptr_to_member_sizingE)) || (_ZN3edg27targ_all_pointers_same_sizeE))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 709, __T618996408, ((const char *)"Microsoft pointer-to-member layout assumes all"
+if (!((!(_ZN3edg35targ_microsoft_ptr_to_member_sizingE)) || (_ZN3edg27targ_all_pointers_same_sizeE))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 709, __T126793400, ((const char *
 #line 706
-), ((const char *)" pointers have the same size")); } 
+)"Microsoft pointer-to-member layout assumes all"), ((const char *)" pointers have the same size")); } 
 
 
 
@@ -10661,13 +10661,13 @@ static void _ZN29_INTERNAL_8_target_c_946d5afe3edg20init_character_sizesEv(void)
 
 
 {
-auto _ZN3edg16a_targ_alignmentE __150576_21_alignment;
+auto _ZN3edg16a_targ_alignmentE __150708_21_alignment;
 
-_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(((unsigned char)_ZN3edg21targ_wchar_t_int_kindE), (&_ZN3edg19targ_sizeof_wchar_tE), (&__150576_21_alignment));
+_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(((unsigned char)_ZN3edg21targ_wchar_t_int_kindE), (&_ZN3edg19targ_sizeof_wchar_tE), (&__150708_21_alignment));
 
-_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(((unsigned char)_ZN3edg22targ_char16_t_int_kindE), (&_ZN3edg20targ_sizeof_char16_tE), (&__150576_21_alignment));
+_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(((unsigned char)_ZN3edg22targ_char16_t_int_kindE), (&_ZN3edg20targ_sizeof_char16_tE), (&__150708_21_alignment));
 
-_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(((unsigned char)_ZN3edg22targ_char32_t_int_kindE), (&_ZN3edg20targ_sizeof_char32_tE), (&__150576_21_alignment)); 
+_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(((unsigned char)_ZN3edg22targ_char32_t_int_kindE), (&_ZN3edg20targ_sizeof_char32_tE), (&__150708_21_alignment)); 
 
 }
 #line 805
@@ -10678,12 +10678,12 @@ static void _ZN29_INTERNAL_8_target_c_946d5afe3edg27init_field_alignment_tablesE
 
 {
 
-auto int __150667_7_k;
+auto int __150799_7_k;
 
 
-(_ZN3edg38targ_dual_alignments_for_builtin_typesE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 815, __T619786256, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)
+(_ZN3edg38targ_dual_alignments_for_builtin_typesE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 815, __T127527312, ((_ZN3edg12a_const_charE *)0), ((
 #line 815
-));
+_ZN3edg12a_const_charE *)0)));
 ((_ZN29_INTERNAL_8_target_c_946d5afe3edg20int_field_alignmentsE)[0]) = ((_ZN3edg16a_targ_alignmentE)1U);
 ((_ZN29_INTERNAL_8_target_c_946d5afe3edg20int_field_alignmentsE)[1]) = ((_ZN3edg16a_targ_alignmentE)1U);
 ((_ZN29_INTERNAL_8_target_c_946d5afe3edg20int_field_alignmentsE)[2]) = ((_ZN3edg16a_targ_alignmentE)1U);
@@ -10705,9 +10705,9 @@ auto int __150667_7_k;
 ((_ZN29_INTERNAL_8_target_c_946d5afe3edg20int_field_alignmentsE)[_ZN3edg14ik_bit_preciseE]) = _ZN3edg24targ_int_field_alignmentE;
 ((_ZN29_INTERNAL_8_target_c_946d5afe3edg20int_field_alignmentsE)[_ZN3edg23ik_unsigned_bit_preciseE]) = _ZN3edg24targ_int_field_alignmentE;
 
-for (__150667_7_k = 0; __150667_7_k < 15; ++__150667_7_k) {
-if (((int)((_ZN29_INTERNAL_8_target_c_946d5afe3edg20int_field_alignmentsE)[__150667_7_k])) == 0) {
-_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 839, __T619786256, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
+for (__150799_7_k = 0; __150799_7_k < 15; ++__150799_7_k) {
+if (((int)((_ZN29_INTERNAL_8_target_c_946d5afe3edg20int_field_alignmentsE)[__150799_7_k])) == 0) {
+_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 839, __T127527312, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
 }
 }
 
@@ -10727,77 +10727,77 @@ _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 839, __T
 ((_ZN29_INTERNAL_8_target_c_946d5afe3edg22float_field_alignmentsE)[12]) = _ZN3edg27targ_double_field_alignmentE;
 ((_ZN29_INTERNAL_8_target_c_946d5afe3edg22float_field_alignmentsE)[13]) = _ZN3edg29targ_float128_field_alignmentE;
 
-for (__150667_7_k = 0; __150667_7_k < 14; ++__150667_7_k) {
-if (((int)((_ZN29_INTERNAL_8_target_c_946d5afe3edg22float_field_alignmentsE)[__150667_7_k])) == 0) {
-_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 861, __T619786256, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
+for (__150799_7_k = 0; __150799_7_k < 14; ++__150799_7_k) {
+if (((int)((_ZN29_INTERNAL_8_target_c_946d5afe3edg22float_field_alignmentsE)[__150799_7_k])) == 0) {
+_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/target.c"), 861, __T127527312, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
 }
 } 
 
 }
 
 
-_ZN3edg16a_targ_alignmentE _ZN3edg19field_alignment_forEPNS_6a_typeE( _ZN3edg10a_type_ptrE __150723_50_type)
+_ZN3edg16a_targ_alignmentE _ZN3edg19field_alignment_forEPNS_6a_typeE( _ZN3edg10a_type_ptrE __150855_50_type)
 
 
 
 {
-auto _ZN3edg16a_targ_alignmentE __150728_21_result;
+auto _ZN3edg16a_targ_alignmentE __150860_21_result;
 
 if (_ZN3edg38targ_dual_alignments_for_builtin_typesE) {
-switch ((int)(__150723_50_type->kind)) {
+switch ((int)(__150855_50_type->kind)) {
 case 2:
-__150728_21_result = ((_ZN29_INTERNAL_8_target_c_946d5afe3edg20int_field_alignmentsE)[(((__150723_50_type->variant).integer).int_kind)]);
-goto __T619913536;
+__150860_21_result = ((_ZN29_INTERNAL_8_target_c_946d5afe3edg20int_field_alignmentsE)[(((__150855_50_type->variant).integer).int_kind)]);
+goto __T127636936;
 case 3:
 
 case 4:
 case 5:
 
-__150728_21_result = ((_ZN29_INTERNAL_8_target_c_946d5afe3edg22float_field_alignmentsE)[((__150723_50_type->variant).float_kind)]);
-goto __T619913536;
+__150860_21_result = ((_ZN29_INTERNAL_8_target_c_946d5afe3edg22float_field_alignmentsE)[((__150855_50_type->variant).float_kind)]);
+goto __T127636936;
 case 12:
 
-if (__150723_50_type->alignment_set_explicitly) {
-__150728_21_result = (__150723_50_type->alignment);
-} else  { if ((_ZN3edg10clang_modeE) && (((((__150723_50_type->variant).typeref).qualifiers) & 8U) != 0U))
+if (__150855_50_type->alignment_set_explicitly) {
+__150860_21_result = (__150855_50_type->alignment);
+} else  { if ((_ZN3edg10clang_modeE) && (((((__150855_50_type->variant).typeref).qualifiers) & 8U) != 0U))
 {
 
-__150728_21_result = ((__150723_50_type->alignment_set_explicitly) ? (__150723_50_type->alignment) : ((((int)(__150723_50_type->kind)) != 12) ? (__150723_50_type->alignment) : (_ZN3edg19f_alignment_of_typeEPNS_6a_typeE(__150723_50_type))));
+__150860_21_result = ((__150855_50_type->alignment_set_explicitly) ? (__150855_50_type->alignment) : ((((int)(__150855_50_type->kind)) != 12) ? (__150855_50_type->alignment) : (_ZN3edg19f_alignment_of_typeEPNS_6a_typeE(__150855_50_type))));
 } else  { if ((!(_ZN3edg8gnu_modeE)) || ((_ZN3edg11gnu_versionE / 100UL) != 303UL)) {
 
 
 
-__150728_21_result = (_ZN3edg19field_alignment_forEPNS_6a_typeE((((__150723_50_type->variant).typeref).type)));
+__150860_21_result = (_ZN3edg19field_alignment_forEPNS_6a_typeE((((__150855_50_type->variant).typeref).type)));
 }
 
 
 else  {
-__150728_21_result = (_ZN3edg19field_alignment_forEPNS_6a_typeE((_ZN3edg13skip_typerefsEPNS_6a_typeE(__150723_50_type))));
+__150860_21_result = (_ZN3edg19field_alignment_forEPNS_6a_typeE((_ZN3edg13skip_typerefsEPNS_6a_typeE(__150855_50_type))));
 } } }
-goto __T619913536;
+goto __T127636936;
 case 8:
 
-if (__150723_50_type->alignment_set_explicitly) {
+if (__150855_50_type->alignment_set_explicitly) {
 
 
 
 
-__150728_21_result = (__150723_50_type->alignment);
+__150860_21_result = (__150855_50_type->alignment);
 }
 
 
 else  {
-__150728_21_result = (_ZN3edg19field_alignment_forEPNS_6a_typeE((_ZN3edg29underlying_array_element_typeEPNS_6a_typeE(__150723_50_type))));
+__150860_21_result = (_ZN3edg19field_alignment_forEPNS_6a_typeE((_ZN3edg29underlying_array_element_typeEPNS_6a_typeE(__150855_50_type))));
 }
-goto __T619913536;
+goto __T127636936;
 default:
-__150728_21_result = (__150723_50_type->alignment);
-} __T619913536:;
+__150860_21_result = (__150855_50_type->alignment);
+} __T127636936:;
 } else  {
 
-__150728_21_result = ((__150723_50_type->alignment_set_explicitly) ? (__150723_50_type->alignment) : ((((int)(__150723_50_type->kind)) != 12) ? (__150723_50_type->alignment) : (_ZN3edg19f_alignment_of_typeEPNS_6a_typeE(__150723_50_type))));
+__150860_21_result = ((__150855_50_type->alignment_set_explicitly) ? (__150855_50_type->alignment) : ((((int)(__150855_50_type->kind)) != 12) ? (__150855_50_type->alignment) : (_ZN3edg19f_alignment_of_typeEPNS_6a_typeE(__150855_50_type))));
 }
-return __150728_21_result;
+return __150860_21_result;
 }
 
 
@@ -10918,38 +10918,38 @@ _ZN3edg26targ_max_base_class_offsetE = _ZN3edg15targ_size_t_maxE;
 } else  {
 
 
-auto _ZN3edg13a_targ_size_tE __150956_20_size;
-auto _ZN3edg21a_host_large_unsignedE __150957_27_temp;
-auto _ZN3edg16a_targ_alignmentE __150958_23_alignment;
-auto _ZN3edg21a_host_large_unsignedE __150959_27_bits;
+auto _ZN3edg13a_targ_size_tE __151088_20_size;
+auto _ZN3edg21a_host_large_unsignedE __151089_27_temp;
+auto _ZN3edg16a_targ_alignmentE __151090_23_alignment;
+auto _ZN3edg21a_host_large_unsignedE __151091_27_bits;
 
 
 
-_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(_ZN3edg19targ_delta_int_kindE, (&__150956_20_size), (&__150958_23_alignment));
+_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(_ZN3edg19targ_delta_int_kindE, (&__151088_20_size), (&__151090_23_alignment));
 
 
-__150959_27_bits = (__150956_20_size * ((unsigned long long)_ZN3edg13targ_char_bitE));
-if ((_ZN3edg18int_kind_is_signedE)[_ZN3edg19targ_delta_int_kindE]) { __150959_27_bits -= 1ULL; }
-__150957_27_temp = (~(0xffffffffffffffffULL << __150959_27_bits));
-if (__150957_27_temp > ((_ZN3edg21a_host_large_unsignedE)_ZN3edg15targ_size_t_maxE)) {
+__151091_27_bits = (__151088_20_size * ((unsigned long long)_ZN3edg13targ_char_bitE));
+if ((_ZN3edg18int_kind_is_signedE)[_ZN3edg19targ_delta_int_kindE]) { __151091_27_bits -= 1ULL; }
+__151089_27_temp = (~(0xffffffffffffffffULL << __151091_27_bits));
+if (__151089_27_temp > ((_ZN3edg21a_host_large_unsignedE)_ZN3edg15targ_size_t_maxE)) {
 
-__150957_27_temp = ((_ZN3edg21a_host_large_unsignedE)_ZN3edg15targ_size_t_maxE);
+__151089_27_temp = ((_ZN3edg21a_host_large_unsignedE)_ZN3edg15targ_size_t_maxE);
 }
-if (__150957_27_temp >= _ZN3edg26targ_max_base_class_offsetE) {
+if (__151089_27_temp >= _ZN3edg26targ_max_base_class_offsetE) {
 
 } else  {
 
-_ZN3edg26targ_max_base_class_offsetE = ((_ZN3edg13a_targ_size_tE)__150957_27_temp);
+_ZN3edg26targ_max_base_class_offsetE = ((_ZN3edg13a_targ_size_tE)__151089_27_temp);
 }
 
 }
 
 _ZN3edg30init_microsoft_sized_int_typesEv();
 
-{ auto _ZN3edg13a_targ_size_tE __150984_23_size;
-auto _ZN3edg16a_targ_alignmentE __150985_23_alignment;
-_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(_ZN3edg20targ_size_t_int_kindE, (&__150984_23_size), (&__150985_23_alignment));
-_ZN3edg15is_64bit_targetE = ((_Bool)((__150984_23_size * ((unsigned long long)_ZN3edg13targ_char_bitE)) == 64ULL));
+{ auto _ZN3edg13a_targ_size_tE __151116_23_size;
+auto _ZN3edg16a_targ_alignmentE __151117_23_alignment;
+_ZN3edg30get_integer_size_and_alignmentENS_15an_integer_kindEPyPt(_ZN3edg20targ_size_t_int_kindE, (&__151116_23_size), (&__151117_23_alignment));
+_ZN3edg15is_64bit_targetE = ((_Bool)((__151116_23_size * ((unsigned long long)_ZN3edg13targ_char_bitE)) == 64ULL));
 }
 
 _ZN3edg39always_fold_calls_to_builtin_constant_pE = ((_ZN3edg9a_booleanE)0); 

@@ -1,5 +1,5 @@
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
-/* Wed Oct  7 07:14:42 2026 */
+/* Thu Oct  8 07:53:17 2026 */
 extern int __EDGCPFE__7_0;
 void *memcpy(void *,const void *,unsigned long long);
 void *memset(void *,int,unsigned long long);
@@ -151,7 +151,7 @@ typedef _Bool _ZSt6__bool;
 struct _ZSt13bad_exception { struct _ZSt9exception __b_St9exception;};
 #line 49
 typedef void (*_ZSt17terminate_handler)(void);
-#line 47 "ape-sys/stdlib.h"
+#line 69 "ape-sys/stdlib.h"
 extern void abort(void);
 #line 36 "lib_src/error.h"
 extern void __abort_execution(enum an_error_code err_code);
@@ -169,9 +169,9 @@ extern an_eh_stack_entry_ptr __get_curr_eh_stack_entry(void);
 #line 53 "lib_src/eh_util.c"
 extern void __default_terminate(void);
 #line 152
-extern void __call_unexpected(void); extern int _setjmp(long [25]); extern void __destroy_exception_object(void); extern void __exception_caught(void); extern void __rethrow(void); extern void *__throw_setup_dtor(const void *, unsigned long long, unsigned, void (*)(void *)); extern void __throw(void
+extern void __call_unexpected(void); extern int setjmp(long [25]); extern void __destroy_exception_object(void); extern void __exception_caught(void); extern void __rethrow(void); extern void *__throw_setup_dtor(const void *, unsigned long long, unsigned, void (*)(void *)); extern void __throw(void)
 #line 152
-);
+;
 #line 205
 extern void __call_terminate(void);
 #line 42 "include_c++/exception.stdh"
@@ -216,50 +216,50 @@ __abort_execution(ec_terminate_called);
 #line 152
 void __call_unexpected(void)
 #line 163
-{ static struct __C5 __T35846608[1] = {{((const struct __EDG_type_info *)0),48U,((unsigned *)0)}}; static struct __C2 __T35850504[1] = {{((void (*)())(&__destroy_exception_object)),((unsigned short)0U),((unsigned short)65535U),((unsigned char)0U)}}; auto struct __C8 __T35809376; auto struct __C8 
+{ static struct __C5 __T217645056[1] = {{((const struct __EDG_type_info *)0),48U,((unsigned *)0)}}; static struct __C2 __T217648928[1] = {{((void (*)())(&__destroy_exception_object)),((unsigned short)0U),((unsigned short)65535U),((unsigned char)0U)}}; auto struct __C8 __T217602512; auto struct __C8 
 #line 163
-__T35824072;  (__T35824072.next) = __curr_eh_stack_entry; __curr_eh_stack_entry = (&__T35824072); (__T35824072.kind) = ((unsigned char)1U); (((__T35824072.variant).function).regions) = (__T35850504); (((__T35824072.variant).function).saved_region_number) = __eh_curr_region; __eh_curr_region = ((
+__T217617208;  (__T217617208.next) = __curr_eh_stack_entry; __curr_eh_stack_entry = (&__T217617208); (__T217617208.kind) = ((unsigned char)1U); (((__T217617208.variant).function).regions) = (__T217648928); (((__T217617208.variant).function).saved_region_number) = __eh_curr_region; __eh_curr_region = 
 #line 163
-unsigned short)65535U); { (__T35809376.next) = __curr_eh_stack_entry; __curr_eh_stack_entry = (&__T35809376); (__T35809376.kind) = ((unsigned char)5U); (((__T35809376.variant).try_block).catch_entries) = (__T35846608); (((__T35809376.variant).try_block).rtinfo) = ((void *)0); (((__T35809376.variant)
+((unsigned short)65535U); { (__T217602512.next) = __curr_eh_stack_entry; __curr_eh_stack_entry = (&__T217602512); (__T217602512.kind) = ((unsigned char)5U); (((__T217602512.variant).try_block).catch_entries) = (__T217645056); (((__T217602512.variant).try_block).rtinfo) = ((void *)0); (((__T217602512
 #line 163
-.try_block).region_number) = __eh_curr_region;
+.variant).try_block).region_number) = __eh_curr_region;
 
-if ((_setjmp(((((__T35809376.variant).try_block).setjmp_buffer)))) == 0) {;
+if ((setjmp(((((__T217602512.variant).try_block).setjmp_buffer)))) == 0) {;
 _ZSt10unexpectedv();
 }
-else  { auto a_type_info_impl_ptr __T35818488; auto an_ETS_flag_set __T35819136; auto an_ETS_flag_set *__T35819872;
-auto a_type_info_impl_ptr __3894_26_thrown_type;
-auto an_ETS_flag_set __3895_22_thrown_flags;
-auto an_ETS_flag_set *__3896_23_thrown_ptr_flags;
+else  { auto a_type_info_impl_ptr __T217611624; auto an_ETS_flag_set __T217612272; auto an_ETS_flag_set *__T217613008;
+auto a_type_info_impl_ptr __3922_26_thrown_type;
+auto an_ETS_flag_set __3923_22_thrown_flags;
+auto an_ETS_flag_set *__3924_23_thrown_ptr_flags;
 #line 168
 __eh_curr_region = ((unsigned short)0U); __exception_caught();
 
 
 
-__type_of_thrown_object((&__3894_26_thrown_type), (&__3895_22_thrown_flags), (&__3896_23_thrown_ptr_flags));
-if ((((__T35818488 = __3894_26_thrown_type) , (__T35819136 = __3895_22_thrown_flags)) , (__T35819872 = __3896_23_thrown_ptr_flags)) , (__can_throw_type(__T35818488, __T35819136, __T35819872))) {
+__type_of_thrown_object((&__3922_26_thrown_type), (&__3923_22_thrown_flags), (&__3924_23_thrown_ptr_flags));
+if ((((__T217611624 = __3922_26_thrown_type) , (__T217612272 = __3923_22_thrown_flags)) , (__T217613008 = __3924_23_thrown_ptr_flags)) , (__can_throw_type(__T217611624, __T217612272, __T217613008))) {
 
 
 __rethrow();
 } else  {
-auto a_type_info_impl_ptr __3903_28_bad_exception_type;
-__3903_28_bad_exception_type = ((const struct _ZSt9type_info *)(&_ZTISt13bad_exception));
+auto a_type_info_impl_ptr __3931_28_bad_exception_type;
+__3931_28_bad_exception_type = ((const struct _ZSt9type_info *)(&_ZTISt13bad_exception));
 
-if (__can_throw_type(__3903_28_bad_exception_type, 0U, ((an_ETS_flag_set *)0)))
+if (__can_throw_type(__3931_28_bad_exception_type, 0U, ((an_ETS_flag_set *)0)))
 
-{ auto struct _ZSt13bad_exception *__T35820960;
+{ auto struct _ZSt13bad_exception *__T217614096;
 
 
-(__T35820960 = ((struct _ZSt13bad_exception *)(__throw_setup_dtor(((const void *)(&_ZTISt13bad_exception)), 8ULL, 0U, ((void (*)(void *))_ZNSt13bad_exceptionD1Ev))))) , ((_ZNSt13bad_exceptionC1Ev(__T35820960)) , (__throw()));
+(__T217614096 = ((struct _ZSt13bad_exception *)(__throw_setup_dtor(((const void *)(&_ZTISt13bad_exception)), 8ULL, 0U, ((void (*)(void *))_ZNSt13bad_exceptionD1Ev))))) , ((_ZNSt13bad_exceptionC1Ev(__T217614096)) , (__throw()));
 } else  {
 
 
 __call_terminate();
 }
 } __eh_curr_region = ((unsigned short)65535U);
-__destroy_exception_object(); } __curr_eh_stack_entry = (__T35809376.next); }
+__destroy_exception_object(); } __curr_eh_stack_entry = (__T217602512.next); }
 #line 201
-abort(); { __eh_curr_region = (((__T35824072.variant).function).saved_region_number); __curr_eh_stack_entry = (__T35824072.next);  }
+abort(); { __eh_curr_region = (((__T217617208.variant).function).saved_region_number); __curr_eh_stack_entry = (__T217617208.next);  }
 }
 
 
@@ -288,15 +288,15 @@ __abort_execution(ec_terminate_returned);
 }
 #line 62
 _ZSt17terminate_handler _ZSt13set_terminatePFvvE(
-_ZSt17terminate_handler __3788_55_new_func)
+_ZSt17terminate_handler __3816_55_new_func)
 
 
 
 
-{ auto _ZSt17terminate_handler __T35781984;
-auto _ZSt17terminate_handler __3794_36_old_func; __3794_36_old_func = __default_terminate_routine;
-__default_terminate_routine = __3788_55_new_func; {
-__T35781984 = __3794_36_old_func; return __T35781984; }
+{ auto _ZSt17terminate_handler __T217575120;
+auto _ZSt17terminate_handler __3822_36_old_func; __3822_36_old_func = __default_terminate_routine;
+__default_terminate_routine = __3816_55_new_func; {
+__T217575120 = __3822_36_old_func; return __T217575120; }
 }
 
 
@@ -304,8 +304,8 @@ _ZSt17terminate_handler _ZSt13get_terminatev(void)
 
 
 
-{ auto a_void_function_ptr __T35783528;  {
-__T35783528 = __default_terminate_routine; return __T35783528; }
+{ auto a_void_function_ptr __T217576664;  {
+__T217576664 = __default_terminate_routine; return __T217576664; }
 }
 
 
@@ -319,12 +319,12 @@ _ZSt9terminatev();
 }
 
 
-a_void_function_ptr _ZSt14set_unexpectedPFvvE( a_void_function_ptr __3819_56_new_func)
+a_void_function_ptr _ZSt14set_unexpectedPFvvE( a_void_function_ptr __3847_56_new_func)
 #line 100
-{ auto a_void_function_ptr __T35789016;
-auto a_void_function_ptr __3826_23_old_func; __3826_23_old_func = __default_unexpected_routine;
-__default_unexpected_routine = __3819_56_new_func; {
-__T35789016 = __3826_23_old_func; return __T35789016; }
+{ auto a_void_function_ptr __T217582152;
+auto a_void_function_ptr __3854_23_old_func; __3854_23_old_func = __default_unexpected_routine;
+__default_unexpected_routine = __3847_56_new_func; {
+__T217582152 = __3854_23_old_func; return __T217582152; }
 }
 
 
@@ -332,27 +332,27 @@ int _ZSt19uncaught_exceptionsv(void)
 
 
 
-{ auto int __T35796064;
-auto an_eh_stack_entry_ptr __3837_25_ehsep;
-auto int __3838_9_result = 0;
+{ auto int __T217589200;
+auto an_eh_stack_entry_ptr __3865_25_ehsep;
+auto int __3866_9_result = 0;
 
 
 if (!(terminate_called_by_runtime)) {
 
 
 
-__3837_25_ehsep = (__get_curr_eh_stack_entry());
-for (; __3837_25_ehsep != ((an_eh_stack_entry_ptr)0); __3837_25_ehsep = (__3837_25_ehsep->next)) {
-if (((int)(__3837_25_ehsep->kind)) == 3) {
+__3865_25_ehsep = (__get_curr_eh_stack_entry());
+for (; __3865_25_ehsep != ((an_eh_stack_entry_ptr)0); __3865_25_ehsep = (__3865_25_ehsep->next)) {
+if (((int)(__3865_25_ehsep->kind)) == 3) {
 
 
 
 
-__3838_9_result++;
+__3866_9_result++;
 }
 }
 } {
-__T35796064 = __3838_9_result; return __T35796064; }
+__T217589200 = __3866_9_result; return __T217589200; }
 }
 
 
@@ -360,6 +360,6 @@ _ZSt6__bool _ZSt18uncaught_exceptionv(void)
 
 
 
-{ auto _Bool __T35798176;  {
-__T35798176 = ((_Bool)((_ZSt19uncaught_exceptionsv()) > 0)); return __T35798176; }
+{ auto _Bool __T217591312;  {
+__T217591312 = ((_Bool)((_ZSt19uncaught_exceptionsv()) > 0)); return __T217591312; }
 }
