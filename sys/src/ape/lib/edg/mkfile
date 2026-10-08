@@ -107,6 +107,7 @@ OFILES=\
 	array_pdel.$O\
 	array_pnew.$O\
 	bad_alloc.$O\
+#	c99_complex.$O\
 	del_virt.$O\
 	delete.$O\
 	delete_aligned.$O\
