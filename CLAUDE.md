@@ -1882,6 +1882,52 @@ live either way.
     `adecl` 417 and `forexpr` 517 -- each lose their LTYPE and `(`
     shifts, 4 -> 2. *The same production appears in two places, which
     is why a 26 -> 24 prediction was two short.*
+    **AND THE WHOLE CORPUS WAS THEN SWEPT AT ONCE, which named three
+    bad files and two missing symbols before the VM reached either.**
+    *The stripping is the measurement*: with comments, string and
+    character literals and `#line` removed first, every C11/C23
+    construct kencc lacks counts **zero** -- where a raw grep reports
+    `alignof` 2343, `static_assert` 1156, `_Complex` 702 and `typeof`
+    425, all of them the word inside EDG's own mangled names and
+    diagnostic text. The exceptions are **`lib_src/c99_complex.c`**
+    (`_Float16`, `__bf16`, `__float80`, `__float128`) and
+    **`thread_dtor.c`/`dtor_list.c`** (`__thread`) -- all three a
+    feature of the HOST compiler rather than of EDG, *which is exactly
+    why `gcc -fsyntax-only` reports 0 errors over them*. Left in
+    OFILES so `mk -k` names them. **CONFIRMED on the first VM run**:
+    eleven files compiled and `c99_complex.c` stopped on `_Float16`,
+    the predicted file and the predicted token.
+    **And the limits were asked rather than assumed**: longest line
+    430 bytes against cpp's `INS` 32768, longest identifier 295
+    against `cc`'s `NSYMB` 1500, 7204 `case` in one file where `6c`'s
+    `Case` is a linked list, and **`6c`'s `NSYM 50` is a CACHE, not a
+    cap** -- `swt.c:229` wraps the slot to 1 and re-emits the ANAME.
+    **The libap half of the link is answered and it is TWO NAMES.**
+    All 133 compiled with gcc, then nm's defined set subtracted from
+    its undefined set: 679 external, 121 of them plain C names, and
+    libap defines every one but `_setjmp` and `__cxa_finalize`.
+    `_setjmp` is a **missed line in `kencc_targ.h`** rather than a
+    libap gap -- EDG's `TARG_SETJMP_FUNC` defaults to `"_setjmp"` and
+    **win64, the same configuration every other value came from, says
+    `"setjmp"`** -- and adding the name to a public APE header would
+    be `reject` again, since `lua/ldo.c:80` uses it under
+    `LUA_USE_POSIX`. `__cxa_finalize` is EDG's own runtime's, not
+    libap's. *The first version of that sweep reported two dozen
+    absent, because its regex required a character before the name and
+    a definition starting in column 0 has none -- the function-shaped
+    grep in a new spelling.*
+    **AND THE LINK MODEL IS TWO HALVES, WHICH READING THEM AS ONE GOT
+    WRONG.** 556 of the 558 `_Z` names are **template instantiations
+    emitted NOWHERE**, with **zero** vtables, typeinfo, guard
+    variables or thunks among them -- so the output is not
+    self-contained for templates *independently of
+    `--one_instantiation_per_object`*, and the default already needs a
+    prelink step for the very entities OIPO was being weighed for. The
+    duplicate half is separate and is now measured from OBJECTS rather
+    than annotations: **3124 symbols defined in more than one object,
+    6410 surplus definitions**, against the 3094 counted from COMDAT
+    annotations -- *two routes to the same number, which is better
+    evidence than either alone*.
     **`src/sys_predef.c` IS 315,616 LINES IN ONE TRANSLATION UNIT**
     (`ifc_modules_read.c` 130,330, `expr.c` 120,824; 2.9M lines over
     the 133). A `6c` table limit is the likeliest first answer, and it

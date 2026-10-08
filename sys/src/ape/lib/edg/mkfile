@@ -34,6 +34,54 @@ EDGSRC=../../../external/edg/lib_src
 # real `sizeof' expressions rather than the 132 baked-in sizes cfront's
 # C carried, so kencc computes every layout and conforming layout is
 # exactly what the generated code wants.
+#
+# THREE OF THESE FILES ARE PREDICTED TO FAIL, and the prediction is
+# written here BEFORE the first run so that the result is a measurement
+# rather than a discovery.  All three use a feature of the HOST
+# compiler rather than anything of EDG's, which is why `gcc
+# -fsyntax-only' could never have reported them -- *the host compiler
+# is exactly the one that put them there.*  The corpus was swept for
+# the whole class at once, with string literals and `#line' stripped
+# first (a raw grep counts EDG's own diagnostic text and mangled names:
+# `alignof', `typeof', `static_assert' and `_Complex' all appear
+# hundreds of times INSIDE identifiers like
+# `_ZN3edg27ec_wrong_entity_for_alignasE' and none of them is a
+# keyword use).  After stripping, the count of every C11/C23 construct
+# kencc lacks is ZERO except these:
+#
+#	c99_complex.$O	`_Float16', `__bf16', `__float80', `__float128'
+#	thread_dtor.$O	`__thread'
+#	dtor_list.$O	`__thread'
+#
+# `c99_complex.c' is the C99 `_Complex' runtime and declares its own
+# `struct _Complex_float16 { _Float16 _Vals[2]; }' and so on; the four
+# types are gcc's extended floats and kencc has none of them.  The
+# other two are thread-local destructor registration for C++ objects
+# with static storage, and kencc has no TLS at all.
+#
+# LEFT IN OFILES DELIBERATELY, not commented out.  With `mk -k' the
+# other 48 build and the archive is made from them, and the three
+# failures are INFORMATION -- they confirm the sweep named the whole
+# class, where removing them first would have made a clean run say
+# nothing.  Nothing is known to need them: cpfe is built
+# `-fno-exceptions -fno-rtti', is single-threaded, and a C++ front end
+# has no use for a `_Complex' runtime -- but *only the link says which
+# members are referenced*, so that stays a question until cmd/edg is
+# linked.  If it names them, each needs its own answer and neither is
+# this mkfile's: extended floats would be a kencc question and TLS a
+# libap one.
+#
+# Two things the same sweep CONFIRMED rather than found, and both are
+# about the translation having really used this tree:
+# `extern unsigned char _ctype[];' appears in nine of `src''s files,
+# byte for byte what APE's own <ctype.h> declares -- so the staged
+# headers were APExp's and not glibc's, independently of the NOTE
+# saying so.  *It also pins this generated C to this tree's `_ctype'
+# BIT LAYOUT*, which the `_ISblank' round changed, so a re-translation
+# is the price of changing it again.  And `6c/6.out.h''s `NSYM 50' is
+# NOT a cap on symbols per object: `swt.c:229' wraps the slot back to 1
+# and re-emits the name, so a 315,616-line translation unit costs
+# repeated ANAME records rather than hitting a wall.
 
 OFILES=\
 	array_del.$O\

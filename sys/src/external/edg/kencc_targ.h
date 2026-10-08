@@ -177,5 +177,38 @@
 #define TARG_PTRDIFF_T_INT_KIND ((an_integer_kind)ik_long_long)
 #define TARG_WCHAR_T_INT_KIND   ((an_integer_kind)ik_unsigned_int)
 
+/*
+ * THE NAME OF setjmp, AND THIS ONE WAS MISSED -- the committed
+ * generated C is the version WITHOUT it, so this takes effect only on
+ * a re-translation.
+ *
+ * EDG's generic default is `"_setjmp"' and win64's is `"setjmp"'
+ * (`src/target.c:7362' against `cmd_line.c:19494'), so the same source
+ * every other value here came from already answers it and the setting
+ * is a correction rather than a choice.  APE has `setjmp' and NOT
+ * `_setjmp'; the two differ only in whether the signal mask is saved,
+ * which Plan 9's setjmp does not do either way, so the distinction has
+ * no content on this target and the plain name is the one that links.
+ *
+ * What the miss costs today: `lib_src/eh_util.c' and
+ * `lib_src/newnothrow.c' each declare `extern int _setjmp(long [25]);'
+ * and call it, so both are undefined at a link that needs them.  The
+ * BUFFER is adequate either way and was checked rather than assumed --
+ * `long [25]' is 100 bytes under kencc's 4-byte long, against
+ * `jmp_buf''s `int[20]' = 80 and the 64 amd64 actually writes.  *That
+ * is the half that would have been silent*: a buffer EDG sized from
+ * the host's 8-byte long and APE's sized for amd64 could have
+ * disagreed, and a setjmp writing past its buffer is a stack
+ * overwrite with no diagnostic anywhere.
+ *
+ * Do NOT answer this by adding `_setjmp' to a public APE header
+ * without the bare-word sweep first.  It was run: five files under
+ * `external/' use the name, and `lua/ldo.c:80' is a real consumer --
+ * `#define LUAI_TRY(L,c,a) if (_setjmp((c)->b) == 0) { a }' under
+ * `LUA_USE_POSIX', which this tree does not define, so Lua takes the
+ * plain-`setjmp' arm at line 87 today and is not yet affected.
+ */
+#define TARG_SETJMP_FUNC        "setjmp"
+
 #endif /* defined(USE_CMAKE_DEFINES) */
 #endif /* APEXP_KENCC_TARG_H */
