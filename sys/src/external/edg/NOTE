@@ -684,3 +684,17 @@ that every definition under `lib_src' is `_Z'-mangled or
 `__'-prefixed, and that sentence is the one that would have found
 this.**  It was a reading presented as a check, and an almost-true
 claim is worse than none because it reads as having been verified.
+
+AND THE FIRST BUILD OF THAT FIX DID NOT RUN: `=' IS AN rc SYNTAX
+CHARACTER.  mk hands a recipe to `rc', where `=' is legal only as an
+assignment at the start of a command or inside quotes, so a bare
+`-D_main=__edg_main' is a parse error rather than an argument:
+
+	/rc/lib/rcmain:24 *eval*:1: token '=': syntax error
+	mk: pcc -c -C ...  : exit status=rc 79720: rc 79720: exit
+
+The message names rcmain and a token and says nothing about this
+mkfile.  Quoted.  Every other `-D' in the tree arrives through an
+expanded `$CFLAGS', where mk substitutes after rc has parsed, so this
+is the first LITERAL one here and had no working precedent in the
+directory to copy from.
