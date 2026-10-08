@@ -177,6 +177,30 @@ main(int argc, char *argv[])
 		case 'J':
 			break;
 		/*
+		 * -C: COMDAT -- mark every TEXT and GLOBL in the translation
+		 * unit `dupok', so the linker keeps the first definition and
+		 * discards duplicates instead of saying `redefinition:'.
+		 * The full account is in `cc/cc.h'; in one line, `6l' has
+		 * implemented this since forever and nothing could ask it.
+		 *
+		 * IT HAS TO BE NAMED HERE OR IT DOES NOT EXIST. pcc's
+		 * ARGBEGIN has NO `default:' arm, so a flag it does not know
+		 * is dropped on the floor -- the build looks exactly right,
+		 * the bit is never set, and the link fails as though the
+		 * flag had been understood and had not helped. That is the
+		 * trap `-J' paid three rebuilds for and the reason `-a' and
+		 * `-Z' had to be added by hand later.
+		 *
+		 * `-D__APEXP_DUPOK__=1' goes to the preprocessor that
+		 * actually RUNS -- pcc spawns `/bin/cpp' itself and pipes it
+		 * into `cc', so a macro `cc' defines internally reaches
+		 * nothing. Same reason, same place, as CONFORMALIGN below.
+		 */
+		case 'C':
+			append(&cc, "-C");
+			append(&cpp, "-D__APEXP_DUPOK__=1");
+			break;
+		/*
 		 * -9 is the way BACK: lay structs out the 9front way, the
 		 * rule every APE object was built with before conforming
 		 * layout became the default.

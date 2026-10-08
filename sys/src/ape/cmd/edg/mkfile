@@ -54,22 +54,66 @@ EDGSRC=../../../external/edg/src
 # the `unsigned long long' is kencc's size_t from `kencc_targ.h'.
 # CFLAGS is `-c' alone so that nothing is quieted on the first run.
 #
-# AND NO `LIB=' -- which is a QUESTION rather than a claim, and it is
-# why `sys/src/ape/lib/edg' should be built first.  cpfe is itself a
-# C++ program translated to C, so it may want EDG's own runtime
-# (`lib_src': new, delete, vtable support, static init, pure-virtual,
-# RTTI -- NOT libstdc++).  Reading cannot settle it: `src' holds
-# 145,752 distinct `_Z'-prefixed tokens and nearly all are names it
-# defines itself, with ordinary identifiers like `_ZERO' among them, so
-# a grep over them measures nothing.  *Only the link says which are
-# undefined.*  It is not obviously needed -- EDG is compiled
-# `-fno-exceptions -fno-rtti' and `src' references none of
-# `_Znwm'/`_Znam'/`_ZdlPv'/`_ZdaPv', nor `__memzero' or
-# `__abort_execution' -- so the first link is the measurement, and if
-# it names undefined `_Z' symbols the fix is one line:
-#	LIB=$APEXPROOT/$objtype/lib/ape/libedg.a
-# **Build lib/edg before this directory so that line is available
-# rather than blocking a round.**
+# `LIB=' IS ANSWERED, AND cpfe NEEDS EXACTLY ONE SYMBOL FROM libedg.a.
+# This was left as a question here -- "only the link says which are
+# undefined" -- on the grounds that `src' holds 145,752 distinct
+# `_Z'-prefixed tokens and a grep over them measures nothing.  That is
+# still true of a grep; it is not true of the LINKER'S OWN ANSWER,
+# which can be had on the host without a VM: compile all 133 files with
+# gcc, take `nm -u' over `src''s 75 objects, and subtract both what
+# those objects define and what `lib_src''s 51 define.
+#
+#	src/ externals                               629
+#	  satisfied by libedg.a                        1   `_ZnwyPv'
+#	  plain C names, all present in libap         70
+#	  gcc artefacts, absent under pcc              2
+#	  template instantiations, defined NOWHERE   556
+#
+# The one is `_ZnwyPv' -- `operator new(unsigned long long, void *)',
+# PLACEMENT new -- from `lib_src/placenew.c'.  So the line below is
+# needed and it is needed for one small member, which is also why
+# lib/edg must be built first: in `mkone' `$LIB' is a PREREQUISITE of
+# `$O.out' handed straight to `$LD', the dependency that had `bacon'
+# unbuildable until lua was.
+#
+# *A host measurement, with the caveat said rather than left out*: it
+# measures the NAMES in the C, which pcc and gcc must agree on because
+# the C is the same text.  What it cannot speak for is whether `6l'
+# reports the same SET -- an archive is pulled member by member, so the
+# order and the reachability are the linker's.
+#
+# THE PREDICTION FOR THE FIRST LINK, written before it is run: `6l'
+# reports undefined `_ZN3edg...I...E' names and nothing else -- around
+# 556 of them, every one a TEMPLATE INSTANTIATION that no translation
+# unit emitted.  Zero vtables, zero typeinfo, zero guard variables,
+# zero thunks; those are all on the DUPLICATE side of the problem
+# (3,124 symbols defined in more than one object), not this one.  If
+# `6l' instead names a plain C function, or a vtable, the instantiation
+# reading is wrong and the NOTE's link-model section needs re-reading
+# rather than this mkfile.
+#
+# `-C' IS WHY THIS LINKS AT ALL, AND IT IS IN CFLAGS ABOVE.  The first
+# link reported `redefinition:' until `too many errors' -- NOT the
+# undefined names predicted here, because `6l' catches duplicates as it
+# LOADS each object and only reports undefined symbols at the end, so
+# it never reached the pass that prediction was about.  The symbols it
+# named are the ones the host sweep had already measured:
+# `edg::max_val<unsigned long long>' and `edg::skip_typerefs', both at
+# 41 copies, and `Ptr_map<...>::get_with_hash' at 39.
+#
+# `-C' marks every TEXT and GLOBL in the translation unit `dupok', so
+# `6l' keeps the first definition and discards the rest -- COMDAT,
+# which it has implemented since forever behind a bit nothing in C
+# could set.  The full account is in `cc/cc.h'.  It is blunt (every
+# symbol, not just the vague-linkage ones) and that is safe HERE and
+# only here, because every duplicate in generated C is the same entity
+# by construction.  Nothing else in the tree passes it.
+#
+# And the fix for that is NOT here: it is an instantiation-mode flag at
+# the next TRANSLATION, so cpfe emits the definitions.  The NOTE says
+# why `--one_instantiation_per_object' is the wrong lever -- it covers
+# only part of the set and makes the output depend on an `edg_prelink'
+# phase that mk cannot naturally express.
 #
 # One thing the runtime does NOT do, checked rather than assumed,
 # because this tree has paid for it once: it adds nothing libap
@@ -170,7 +214,8 @@ UPDATE=\
 
 CC=pcc
 LD=pcc
-CFLAGS= -c
+CFLAGS= -c -C
+LIB=$APEXPROOT/$objtype/lib/ape/libedg.a
 
 %.$O: $EDGSRC/%.c
 	$CC $CFLAGS $EDGSRC/$stem.c

@@ -1369,6 +1369,17 @@ gpseudo(int a, Sym *s, Node *n)
 	p->from.type = D_EXTERN;
 	p->from.sym = s;
 	p->from.scale = (profileflg ? 0 : NOPROF);
+	/*
+	 * -C: COMDAT. `from.scale' is the flags field for ATEXT and
+	 * AGLOBL on this target -- `8l/obj.c' tests `p->from.scale &
+	 * DUPOK' in both cases -- so one OR covers functions and data.
+	 * ADATA is untouched in effect: every ADATA caller in swt.c
+	 * overwrites `from.scale' with the datum's WIDTH straight after
+	 * this call, which is the whole reason the bit can be set here
+	 * unconditionally. See cc/cc.h.
+	 */
+	if(dupokall)
+		p->from.scale |= DUPOK;
 	if(s->class == CSTATIC || s->class == CLOCAL)
 		p->from.type = D_STATIC;
 	naddr(n, &p->to);

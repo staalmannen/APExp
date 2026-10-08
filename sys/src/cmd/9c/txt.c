@@ -1278,7 +1278,6 @@ gbranch(int o)
 	}
 	p->as = a;
 }
-
 void
 patch(Prog *op, long pc)
 {
@@ -1286,6 +1285,8 @@ patch(Prog *op, long pc)
 	op->to.offset = pc;
 	op->to.type = D_BRANCH;
 }
+
+static int dupokwarned;	/* -C is not honoured here; warn once */
 
 void
 gpseudo(int a, Sym *s, Node *n)
@@ -1297,6 +1298,27 @@ gpseudo(int a, Sym *s, Node *n)
 	p->from.sym = s;
 	if(a == ATEXT)
 		p->reg = (profileflg ? 0 : NOPROF);
+	/*
+	 * -C: NOT HONOURED ON THIS TARGET, and it says so rather than
+	 * setting a bit that goes nowhere. `9l/l.h' DECLARES `char
+	 * dupok' on Sym and `9l' never reads it -- zero hits in its
+	 * `.c' -- where every other linker here has two, in `obj.c' (set
+	 * it from the ATEXT/AGLOBL flags, skip the duplicate) and in
+	 * `asm.c' (suppress `multiple initialization' for duplicate
+	 * DATA). A pre-existing gap found by this change, recorded and
+	 * not fixed: porting it is ~6 lines mirroring `ql/obj.c', but
+	 * nothing here builds power64 and an untested linker change is
+	 * worse than a named limit.
+	 *
+	 * The diagnostic is the point. A flag silently doing nothing
+	 * produces a link failure that reads like the flag having been
+	 * understood and not having helped -- which is the shape this
+	 * tree has paid for in `pcc's missing ARGBEGIN default twice.
+	 */
+	if(dupokall && (a == ATEXT || a == AGLOBL) && !dupokwarned) {
+		dupokwarned = 1;
+		diag(Z, "-C: 9l has no dupok support; see cc/cc.h");
+	}
 	p->from.name = D_EXTERN;
 	if(s->class == CSTATIC || s->class == CLOCAL)
 		p->from.name = D_STATIC;

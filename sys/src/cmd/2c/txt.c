@@ -824,7 +824,6 @@ fpbranch(void)
 	}
 	p->as = a;
 }
-
 void
 patch(Prog *op, long pc)
 {
@@ -833,11 +832,25 @@ patch(Prog *op, long pc)
 	op->to.type = D_BRANCH;
 }
 
+static int dupokwarned;	/* -C is not honoured here; warn once */
+
 void
 gpseudo(int a, Sym *s, int g, long v)
 {
 
 	nextpc();
+	/*
+	 * -C: NOT HONOURED ON THIS TARGET. `2l' has no `dupok' field
+	 * at all -- neither in `l.h' nor in any `.c' -- and `2.out.h' does
+	 * not define DUPOK, so there is nothing to set and nothing that
+	 * would read it. Diagnosed rather than ignored, for the reason
+	 * in cc/cc.h: a flag that quietly does nothing turns into a link
+	 * failure that looks like a different bug.
+	 */
+	if(dupokall && (a == ATEXT || a == AGLOBL) && !dupokwarned) {
+		dupokwarned = 1;
+		diag(Z, "-C: 2l has no dupok support; see cc/cc.h");
+	}
 	if(a == ADATA)
 		pc--;
 	p->as = a;
