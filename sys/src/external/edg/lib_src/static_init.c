@@ -1,5 +1,5 @@
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
-/* Wed Oct  7 07:14:43 2026 */
+/* Thu Oct  8 07:53:17 2026 */
 extern int __EDGCPFE__7_0;
 void *memcpy(void *,const void *,unsigned long long);
 void *memset(void *,int,unsigned long long);
@@ -19,7 +19,7 @@ struct __linkl *next;
 void (*ctor)(void);
 
 void (*dtor)(void);};
-#line 48 "ape-sys/stdlib.h"
+#line 70 "ape-sys/stdlib.h"
 extern int atexit(void (*func)(void));
 #line 184 "include_c++/cxxabi.h"
 extern void __cxa_finalize(void *);
@@ -68,9 +68,9 @@ atexit((&_Z12__call_dtorsv));
 void _Z12__call_ctorsv(void)
 #line 148
 {
-auto struct __linkl *__3298_19_link_ptr;
-auto struct __linkl *__3299_19_reverse_ptr;
-auto struct __linkl *__3300_19_next_ptr;
+auto struct __linkl *__3326_19_link_ptr;
+auto struct __linkl *__3327_19_reverse_ptr;
+auto struct __linkl *__3328_19_next_ptr;
 #line 158
 use_patch_info = ((int)(__head != ((struct __linkl *)0)));
 if (use_patch_info) {
@@ -78,31 +78,31 @@ if (use_patch_info) {
 
 
 
-for ((__3298_19_link_ptr = __head) , (__3299_19_reverse_ptr = ((struct __linkl *)0)); __3298_19_link_ptr != ((struct __linkl *)0); __3298_19_link_ptr = __3300_19_next_ptr)
+for ((__3326_19_link_ptr = __head) , (__3327_19_reverse_ptr = ((struct __linkl *)0)); __3326_19_link_ptr != ((struct __linkl *)0); __3326_19_link_ptr = __3328_19_next_ptr)
 
 {
 
 
-__3300_19_next_ptr = (__3298_19_link_ptr->next);
+__3328_19_next_ptr = (__3326_19_link_ptr->next);
 
 
 
-if ((__3298_19_link_ptr->ctor) != ((void (*)(void))0)) {
-(*(__3298_19_link_ptr->ctor))();
+if ((__3326_19_link_ptr->ctor) != ((void (*)(void))0)) {
+(*(__3326_19_link_ptr->ctor))();
 }
 
 
 
-(__3298_19_link_ptr->next) = __3299_19_reverse_ptr;
-__3299_19_reverse_ptr = __3298_19_link_ptr;
+(__3326_19_link_ptr->next) = __3327_19_reverse_ptr;
+__3327_19_reverse_ptr = __3326_19_link_ptr;
 }
 
 
-__head = __3299_19_reverse_ptr;
+__head = __3327_19_reverse_ptr;
 } else  {
 
 
-auto int __3337_11_pos = 0;
-while ((_ctors)[__3337_11_pos]) { (*((_ctors)[(__3337_11_pos++)]))(); }
+auto int __3365_11_pos = 0;
+while ((_ctors)[__3365_11_pos]) { (*((_ctors)[(__3365_11_pos++)]))(); }
 } 
 }

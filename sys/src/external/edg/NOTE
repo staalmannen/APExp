@@ -300,6 +300,77 @@ STATE OF THE GENERATED C
     il_to_str.c's form_simple_attribute("__weak__")), correctly
     carried across.  Nothing in the generated C is decorated.
 
+REGENERATED WITH --instantiate=used --no_auto_instantiation
+-----------------------------------------------------------
+The committed C is now a SECOND translation, from the same commit and
+the same cpfe recipe plus two flags.  What it fixes is the 556
+template instantiations 6l reported undefined.
+
+  WHY THEY WERE MISSING, from EDG's own source rather than from a
+  guess: `DEFAULT_INSTANTIATION_MODE' resolves to `tim_none' here,
+  because the build never defines INSTANTIATE_TEMPLATES_EVERYWHERE_USED
+  -- and host_envir.h's own comment says the mode controls what is
+  instantiated "without a specific request from the prelinker".
+  DEFAULT_AUTOMATIC_INSTANTIATION_MODE is TRUE.  So cpfe was told to
+  instantiate NOTHING and wait for an edg_prelink phase that this
+  build never runs.  *That is a configuration assuming a two-phase
+  build, not a limitation of the C back end* -- and it retires the
+  recorded worry that `--one_instantiation_per_object' would be what
+  introduced a prelink dependency: the default already had one.
+
+  -tused emits every used template in every translation unit with
+  EXTERNAL linkage, so it produces duplicates -- which is exactly what
+  `pcc -C' now discards.  The two go together and neither is
+  sufficient alone.  (-tlocal would give internal-linkage copies and
+  need no -C, at a copy per unit; -C is needed either way for the
+  non-template duplicates, which no instantiation mode touches.)
+
+  MEASURED ON ONE FILE FIRST, because a full regeneration that changed
+  nothing would have cost a round to discover.  src/interpret.c:
+
+                          undefined templates   defined _Z
+    committed recipe              39               226
+    with the two flags             6               261
+
+  and `edg::count_ones<unsigned int>' -- the exact symbol 6l named --
+  goes from U to T.  All six survivors are DEFINED in other
+  translation units (ordinary cross-TU references whose parameter
+  types are templates), so the gap closes across the set.
+
+  THEN THE WHOLE SET, the same sweep that reported 679:
+
+                      before    after
+    external            679       123
+    _Z-prefixed         558         2
+    template insts      556         0
+
+  133 of 133 compile with gcc, 0 failures.  The two surviving _Z are
+  the same non-template pair as before, a TLS init thunk and
+  `operator new(size_t, align_val_t, nothrow_t const&)'.
+  And `setjmp' rather than `_setjmp' now appears in the undefined set,
+  so kencc_targ.h's TARG_SETJMP_FUNC line is confirmed and that gap
+  closed with the same run.
+
+  lib_src/ KEEPS ITS RECORDED RECIPE EXACTLY and is regenerated only
+  so TARG_SETJMP_FUNC reaches eh_util.c and newnothrow.c.  It had no
+  missing instantiations, `--building_runtime' is a different mode,
+  and adding -tused there would be an unmeasured change to the
+  runtime.  util/ gets the flags, being the same kind of program.
+
+  util/cfe_daemon_client.c still does not translate and it is still
+  the only one -- 133 produced, 1 failure, predicted by name before
+  the run.
+
+  AND THE FIRST ATTEMPT MEASURED NOTHING, for a reason worth keeping:
+  the driver ran its workers under `xargs ... bash -c', and **bash
+  cannot export an array**.  `export INC CPPDEF' was silently a no-op,
+  every `--sys_include' vanished inside the subshell, and all 134
+  files died at `bits/libc-header-start.h' -- glibc's headers, exit 4.
+  The single-file test had passed minutes earlier in the shell that
+  DEFINED the arrays.  *An instrument whose environment is not the
+  build's environment is measuring a different program*, which is the
+  include-path lesson arriving for a shell rather than a compiler.
+
 THE LIBAP HALF OF THE LINK IS ANSWERED, AND IT IS TWO NAMES
 -----------------------------------------------------------
 Asked all at once rather than one per round, which is the rule bacon's

@@ -1,5 +1,5 @@
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
-/* Wed Oct  7 07:14:43 2026 */
+/* Thu Oct  8 07:53:17 2026 */
 extern int __EDGCPFE__7_0;
 void *memcpy(void *,const void *,unsigned long long);
 void *memset(void *,int,unsigned long long);
@@ -33,9 +33,9 @@ extern void _ZNSt20bad_array_new_lengthD1Ev(struct _ZSt20bad_array_new_length *c
 #line 17 "lib_src/newhandler.c"
 void _Z21__default_new_handlerv(void)
 #line 25
-{ auto struct _ZSt9bad_alloc *__T867472728;
+{ auto struct _ZSt9bad_alloc *__T988067528;
 
-(__T867472728 = ((struct _ZSt9bad_alloc *)(__throw_setup_dtor(((const void *)(&_ZTISt9bad_alloc)), 8ULL, 0U, ((void (*)(void *))_ZNSt9bad_allocD1Ev))))) , ((_ZNSt9bad_allocC1Ev(__T867472728)) , (__throw()));
+(__T988067528 = ((struct _ZSt9bad_alloc *)(__throw_setup_dtor(((const void *)(&_ZTISt9bad_alloc)), 8ULL, 0U, ((void (*)(void *))_ZNSt9bad_allocD1Ev))))) , ((_ZNSt9bad_allocC1Ev(__T988067528)) , (__throw()));
 
 
 
@@ -45,6 +45,6 @@ void _Z21__default_new_handlerv(void)
 
 void __throw_bad_array_new_length(void)
 #line 41
-{ auto struct _ZSt20bad_array_new_length *__T867475720;
-(__T867475720 = ((struct _ZSt20bad_array_new_length *)(__throw_setup_dtor(((const void *)(&_ZTISt20bad_array_new_length)), 8ULL, 0U, ((void (*)(void *))_ZNSt20bad_array_new_lengthD1Ev))))) , ((_ZNSt20bad_array_new_lengthC1Ev(__T867475720)) , (__throw()));
+{ auto struct _ZSt20bad_array_new_length *__T988070520;
+(__T988070520 = ((struct _ZSt20bad_array_new_length *)(__throw_setup_dtor(((const void *)(&_ZTISt20bad_array_new_length)), 8ULL, 0U, ((void (*)(void *))_ZNSt20bad_array_new_lengthD1Ev))))) , ((_ZNSt20bad_array_new_lengthC1Ev(__T988070520)) , (__throw()));
 }

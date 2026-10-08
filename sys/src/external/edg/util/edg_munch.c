@@ -1,5 +1,5 @@
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
-/* Wed Oct  7 07:15:23 2026 */
+/* Thu Oct  8 07:53:16 2026 */
 extern int __EDGCPFE__7_0;
 void *memcpy(void *,const void *,unsigned long long);
 void *memset(void *,int,unsigned long long);
@@ -43,9 +43,9 @@ extern int fprintf(FILE *, const char *, ...);
 extern int printf(const char *, ...);
 #line 87
 extern int getc(FILE *);
-#line 20 "ape-sys/stdlib.h"
+#line 42 "ape-sys/stdlib.h"
 extern int atoi(const char *);
-#line 45
+#line 67
 extern void *malloc(size_t);
 
 
@@ -111,40 +111,40 @@ static _ZN3edg9a_booleanE skip_underscore_prefix = ((_ZN3edg9a_booleanE)0);
 static _ZN3edg8sizeof_tE _ZZN31_INTERNAL_11_edg_munch_c_optind23check_type_and_get_nameEPPcPiPbE18ctor_prefix_length = 0ULL;
 static _ZN3edg8sizeof_tE _ZZN31_INTERNAL_11_edg_munch_c_optind23check_type_and_get_nameEPPcPiPbE18dtor_prefix_length = 0ULL;
 #line 57 "util/getopt.h"
-int getopt( int __27401_16_argc,  char *const *__27401_37_argv,  const char *__27401_55_optstring)
+int getopt( int __27533_16_argc,  char *const *__27533_37_argv,  const char *__27533_55_optstring)
 #line 73
 {
-auto int __27418_15_return_value;
-auto char *__27419_16_optpos;
+auto int __27550_15_return_value;
+auto char *__27551_16_optpos;
 #line 83
 if (_ZZ6getoptE7optchar == ((char *)0)) {
-__27428_1_start_new_argument:;
-if (optind >= __27401_16_argc) {
+__27560_1_start_new_argument:;
+if (optind >= __27533_16_argc) {
 
-__27418_15_return_value = (-1);
-goto __27506_1_end_of_routine;
+__27550_15_return_value = (-1);
+goto __27638_1_end_of_routine;
 } else  {
-_ZZ6getoptE7optchar = (__27401_37_argv[optind]);
+_ZZ6getoptE7optchar = (__27533_37_argv[optind]);
 if (((int)(*_ZZ6getoptE7optchar)) != 45) {
 
-__27418_15_return_value = (-1);
-goto __27506_1_end_of_routine;
+__27550_15_return_value = (-1);
+goto __27638_1_end_of_routine;
 } else  { if (((int)(*(_ZZ6getoptE7optchar + 1))) == 45) {
 if (((int)(*(_ZZ6getoptE7optchar + 2))) == 0) {
 
 
 optind++;
-__27418_15_return_value = (-1);
+__27550_15_return_value = (-1);
 } else  {
 
-__27418_15_return_value = 63;
+__27550_15_return_value = 63;
 }
-goto __27506_1_end_of_routine;
+goto __27638_1_end_of_routine;
 } else  { if (((int)(*(_ZZ6getoptE7optchar + 1))) == 0) {
 
 
-__27418_15_return_value = (-1);
-goto __27506_1_end_of_routine;
+__27550_15_return_value = (-1);
+goto __27638_1_end_of_routine;
 } } }
 
 _ZZ6getoptE7optchar++;
@@ -155,34 +155,34 @@ _ZZ6getoptE7optchar++;
 if (((int)(*_ZZ6getoptE7optchar)) == 0) {
 
 optind++;
-goto __27428_1_start_new_argument;
+goto __27560_1_start_new_argument;
 }
 
-__27419_16_optpos = (strchr(((const char *)((char *)__27401_55_optstring)), ((int)(*_ZZ6getoptE7optchar))));
-if (__27419_16_optpos == ((char *)0)) {
+__27551_16_optpos = (strchr(((const char *)((char *)__27533_55_optstring)), ((int)(*_ZZ6getoptE7optchar))));
+if (__27551_16_optpos == ((char *)0)) {
 
-if (opterr) { fprintf(stderr, ((const char *)"%s: illegal option -- %c\n"), (__27401_37_argv[0]), ((int)(*_ZZ6getoptE7optchar))); }
+if (opterr) { fprintf(stderr, ((const char *)"%s: illegal option -- %c\n"), (__27533_37_argv[0]), ((int)(*_ZZ6getoptE7optchar))); }
 
-__27418_15_return_value = 63;
-goto __27506_1_end_of_routine;
+__27550_15_return_value = 63;
+goto __27638_1_end_of_routine;
 }
 
-__27418_15_return_value = ((int)(*_ZZ6getoptE7optchar));
+__27550_15_return_value = ((int)(*_ZZ6getoptE7optchar));
 
-if (((int)(*(__27419_16_optpos + 1))) == 58) {
+if (((int)(*(__27551_16_optpos + 1))) == 58) {
 if (((int)(*(_ZZ6getoptE7optchar + 1))) == 0) {
 
 
 optind++;
-if (optind >= __27401_16_argc) {
+if (optind >= __27533_16_argc) {
 
 
-if (opterr) { fprintf(stderr, ((const char *)"%s: option requires an argument -- %c\n"), (__27401_37_argv[0]), ((int)(*_ZZ6getoptE7optchar))); }
+if (opterr) { fprintf(stderr, ((const char *)"%s: option requires an argument -- %c\n"), (__27533_37_argv[0]), ((int)(*_ZZ6getoptE7optchar))); }
 
-__27418_15_return_value = 63;
-goto __27506_1_end_of_routine;
+__27550_15_return_value = 63;
+goto __27638_1_end_of_routine;
 }
-optarg = (__27401_37_argv[optind]);
+optarg = (__27533_37_argv[optind]);
 } else  {
 
 
@@ -196,84 +196,84 @@ optind++;
 _ZZ6getoptE7optchar++;
 optarg = ((char *)0);
 }
-__27506_1_end_of_routine:;
-return __27418_15_return_value;
+__27638_1_end_of_routine:;
+return __27550_15_return_value;
 }
 #line 81 "util/edg_munch.c"
-static void _ZN31_INTERNAL_11_edg_munch_c_optind10error_utilEPKc( _ZN3edg12a_const_charE *__27544_38_error_string)
+static void _ZN31_INTERNAL_11_edg_munch_c_optind10error_utilEPKc( _ZN3edg12a_const_charE *__27676_38_error_string)
 
 
 
 {
-fprintf(stderr, ((const char *)"edg_munch: %s\n"), __27544_38_error_string);
+fprintf(stderr, ((const char *)"edg_munch: %s\n"), __27676_38_error_string);
 exit(2); 
 }
 
 
-static void _ZN31_INTERNAL_11_edg_munch_c_optind19internal_error_utilEPKc( _ZN3edg12a_const_charE *__27554_47_error_string)
+static void _ZN31_INTERNAL_11_edg_munch_c_optind19internal_error_utilEPKc( _ZN3edg12a_const_charE *__27686_47_error_string)
 
 
 
 
 {
-fprintf(stderr, ((const char *)"edg_munch: %s\n"), __27554_47_error_string);
+fprintf(stderr, ((const char *)"edg_munch: %s\n"), __27686_47_error_string);
 exit(4); 
 }
 
 
-static _ZN3edg10a_void_ptrE _ZN31_INTERNAL_11_edg_munch_c_optind17malloc_with_checkEy( _ZN3edg8sizeof_tE __27565_46_size)
+static _ZN3edg10a_void_ptrE _ZN31_INTERNAL_11_edg_munch_c_optind17malloc_with_checkEy( _ZN3edg8sizeof_tE __27697_46_size)
 
 
 
 
 {
-auto _ZN3edg10a_void_ptrE __27571_14_ptr;
+auto _ZN3edg10a_void_ptrE __27703_14_ptr;
 
-if ((__27571_14_ptr = ((_ZN3edg10a_void_ptrE)(malloc(__27565_46_size)))) == ((_ZN3edg10a_void_ptrE)0)) {
+if ((__27703_14_ptr = ((_ZN3edg10a_void_ptrE)(malloc(__27697_46_size)))) == ((_ZN3edg10a_void_ptrE)0)) {
 _ZN31_INTERNAL_11_edg_munch_c_optind10error_utilEPKc(((const char *)"out of memory"));
 }
-return __27571_14_ptr;
+return __27703_14_ptr;
 }
 
 
 static int _ZN31_INTERNAL_11_edg_munch_c_optind15read_input_lineEv(void)
 #line 123
 {
-auto char *__27587_10_buffer_pos = input_line_buffer;
-auto int __27588_10_size = 0;
-auto int __27589_10_ch;
-auto int __27590_10_result;
+auto char *__27719_10_buffer_pos = input_line_buffer;
+auto int __27720_10_size = 0;
+auto int __27721_10_ch;
+auto int __27722_10_result;
 
-while ((__27589_10_ch = (getc(stdin))) , ((__27589_10_ch != (-1)) && (__27589_10_ch != 10))) {
-if ((++__27588_10_size) > 32767) {
+while ((__27721_10_ch = (getc(stdin))) , ((__27721_10_ch != (-1)) && (__27721_10_ch != 10))) {
+if ((++__27720_10_size) > 32767) {
 _ZN31_INTERNAL_11_edg_munch_c_optind19internal_error_utilEPKc(((const char *)"read_input_line: input line too long."));
 }
-(*(__27587_10_buffer_pos++)) = ((char)__27589_10_ch);
+(*(__27719_10_buffer_pos++)) = ((char)__27721_10_ch);
 }
 
 
-(*(__27587_10_buffer_pos++)) = ((char)0);
+(*(__27719_10_buffer_pos++)) = ((char)0);
 
 
-__27590_10_result = 1;
-if ((__27589_10_ch == (-1)) && (__27588_10_size == 0)) { __27590_10_result = 0; }
+__27722_10_result = 1;
+if ((__27721_10_ch == (-1)) && (__27720_10_size == 0)) { __27722_10_result = 0; }
 
 
-line_size = __27588_10_size;
-return __27590_10_result;
+line_size = __27720_10_size;
+return __27722_10_result;
 }
 
 
-static int _ZN31_INTERNAL_11_edg_munch_c_optind23check_type_and_get_nameEPPcPiPb( char **__27612_46_name_pos, 
-int *__27613_47_name_length, 
-_ZN3edg9a_booleanE *__27614_47_is_ctor)
+static int _ZN31_INTERNAL_11_edg_munch_c_optind23check_type_and_get_nameEPPcPiPb( char **__27744_46_name_pos, 
+int *__27745_47_name_length, 
+_ZN3edg9a_booleanE *__27746_47_is_ctor)
 #line 159
 {
-auto int __27623_19_result = 0;
-auto char *__27624_19_pos = input_line_buffer;
-auto char __27625_19_ch;
-auto char *__27626_19_local_name_pos;
-auto char __27627_19_type;
+auto int __27755_19_result = 0;
+auto char *__27756_19_pos = input_line_buffer;
+auto char __27757_19_ch;
+auto char *__27758_19_local_name_pos;
+auto char __27759_19_type;
 
 
 
@@ -284,61 +284,61 @@ _ZZN31_INTERNAL_11_edg_munch_c_optind23check_type_and_get_nameEPPcPiPbE18dtor_pr
 }
 
 
-if (line_size < 12) { goto __27692_1_invalid_input; }
+if (line_size < 12) { goto __27824_1_invalid_input; }
 
 
 
-while ((__27625_19_ch = (*__27624_19_pos)) , ((((int)__27625_19_ch) != 32) && (((int)__27625_19_ch) != 0))) { __27624_19_pos++; }
+while ((__27757_19_ch = (*__27756_19_pos)) , ((((int)__27757_19_ch) != 32) && (((int)__27757_19_ch) != 0))) { __27756_19_pos++; }
 
 
-if (((int)(*(__27624_19_pos++))) != 32) { goto __27692_1_invalid_input; }
+if (((int)(*(__27756_19_pos++))) != 32) { goto __27824_1_invalid_input; }
 
 
-while (((int)(*__27624_19_pos)) == 32) { __27624_19_pos++; }
+while (((int)(*__27756_19_pos)) == 32) { __27756_19_pos++; }
 
 
-__27627_19_type = (*(__27624_19_pos++));
-if (!(((int)((_ctype)[((unsigned char)((unsigned char)__27627_19_type))])) & 0x3)) { goto __27692_1_invalid_input; }
+__27759_19_type = (*(__27756_19_pos++));
+if (!(((int)((_ctype)[((unsigned char)((unsigned char)__27759_19_type))])) & 0x3)) { goto __27824_1_invalid_input; }
 
 
-if (((int)(*(__27624_19_pos++))) != 32) { goto __27692_1_invalid_input; }
+if (((int)(*(__27756_19_pos++))) != 32) { goto __27824_1_invalid_input; }
 
 
-while (((int)(*__27624_19_pos)) == 32) { __27624_19_pos++; }
+while (((int)(*__27756_19_pos)) == 32) { __27756_19_pos++; }
 
 
 
-if ((skip_underscore_prefix) && (((int)(*__27624_19_pos)) == 95)) { __27624_19_pos++; }
+if ((skip_underscore_prefix) && (((int)(*__27756_19_pos)) == 95)) { __27756_19_pos++; }
 
 
-__27626_19_local_name_pos = __27624_19_pos;
+__27758_19_local_name_pos = __27756_19_pos;
 
 
-if (((int)__27627_19_type) == 84) {
+if (((int)__27759_19_type) == 84) {
 
 
-if ((strncmp(((const char *)__27624_19_pos), ((const char *)"__sti__"), _ZZN31_INTERNAL_11_edg_munch_c_optind23check_type_and_get_nameEPPcPiPbE18ctor_prefix_length)) == 0) {
-__27623_19_result = 1;
-(*__27614_47_is_ctor) = ((_ZN3edg9a_booleanE)1);
-} else  { if ((strncmp(((const char *)__27624_19_pos), ((const char *)"__std__"), _ZZN31_INTERNAL_11_edg_munch_c_optind23check_type_and_get_nameEPPcPiPbE18dtor_prefix_length)) == 0) {
-__27623_19_result = 1;
-(*__27614_47_is_ctor) = ((_ZN3edg9a_booleanE)0);
+if ((strncmp(((const char *)__27756_19_pos), ((const char *)"__sti__"), _ZZN31_INTERNAL_11_edg_munch_c_optind23check_type_and_get_nameEPPcPiPbE18ctor_prefix_length)) == 0) {
+__27755_19_result = 1;
+(*__27746_47_is_ctor) = ((_ZN3edg9a_booleanE)1);
+} else  { if ((strncmp(((const char *)__27756_19_pos), ((const char *)"__std__"), _ZZN31_INTERNAL_11_edg_munch_c_optind23check_type_and_get_nameEPPcPiPbE18dtor_prefix_length)) == 0) {
+__27755_19_result = 1;
+(*__27746_47_is_ctor) = ((_ZN3edg9a_booleanE)0);
 } }
 
 
-if (__27623_19_result) {
+if (__27755_19_result) {
 
-auto int __27682_11_length = 0;
-while ((__27625_19_ch = (*(__27624_19_pos++))) , (((((int)__27625_19_ch) != 32) && (((int)__27625_19_ch) != 9)) && (((int)__27625_19_ch) != 0))) { ++__27682_11_length; }
-(*__27613_47_name_length) = __27682_11_length;
+auto int __27814_11_length = 0;
+while ((__27757_19_ch = (*(__27756_19_pos++))) , (((((int)__27757_19_ch) != 32) && (((int)__27757_19_ch) != 9)) && (((int)__27757_19_ch) != 0))) { ++__27814_11_length; }
+(*__27745_47_name_length) = __27814_11_length;
 
-(*__27612_46_name_pos) = __27626_19_local_name_pos;
+(*__27744_46_name_pos) = __27758_19_local_name_pos;
 }
 }
 
-return __27623_19_result;
+return __27755_19_result;
 
-__27692_1_invalid_input:;
+__27824_1_invalid_input:;
 _ZN31_INTERNAL_11_edg_munch_c_optind10error_utilEPKc(((const char *)"invalid input format"));
 
 return 0;
@@ -346,28 +346,28 @@ return 0;
 
 
 
-static void _ZN31_INTERNAL_11_edg_munch_c_optind13create_outputEP12a_list_entryPKc( a_list_entry_ptr __27700_44_list_ptr, 
-_ZN3edg12a_const_charE *__27701_45_array_name)
+static void _ZN31_INTERNAL_11_edg_munch_c_optind13create_outputEP12a_list_entryPKc( a_list_entry_ptr __27832_44_list_ptr, 
+_ZN3edg12a_const_charE *__27833_45_array_name)
 
 
 
 {
-auto a_list_entry_ptr __27706_23_entry;
+auto a_list_entry_ptr __27838_23_entry;
 
 
-__27706_23_entry = __27700_44_list_ptr;
-while (__27706_23_entry) {
-printf(((const char *)"%s %s();\n"), ((const char *)("void")), (__27706_23_entry->name));
-__27706_23_entry = (__27706_23_entry->next);
+__27838_23_entry = __27832_44_list_ptr;
+while (__27838_23_entry) {
+printf(((const char *)"%s %s();\n"), ((const char *)("void")), (__27838_23_entry->name));
+__27838_23_entry = (__27838_23_entry->next);
 }
 printf(((const char *)"\n"));
 
 
-printf(((const char *)"%s %s[] = {\n"), ((const char *)("func_ptr")), __27701_45_array_name);
-__27706_23_entry = __27700_44_list_ptr;
-while (__27706_23_entry) {
-printf(((const char *)"\t%s,\n"), (__27706_23_entry->name));
-__27706_23_entry = (__27706_23_entry->next);
+printf(((const char *)"%s %s[] = {\n"), ((const char *)("func_ptr")), __27833_45_array_name);
+__27838_23_entry = __27832_44_list_ptr;
+while (__27838_23_entry) {
+printf(((const char *)"\t%s,\n"), (__27838_23_entry->name));
+__27838_23_entry = (__27838_23_entry->next);
 }
 
 
@@ -376,89 +376,89 @@ printf(((const char *)"\t0\n};\n"));
 
 
 
-int main( int __27730_14_argc,  char **__27730_26_argv)
+int main( int __27862_14_argc,  char **__27862_26_argv)
 {
-auto a_list_entry_ptr __27732_24_ctor_list = ((a_list_entry_ptr)0);
-auto a_list_entry_ptr __27733_24_dtor_list = ((a_list_entry_ptr)0);
-auto a_list_entry_ptr __27734_24_entry;
-auto a_list_entry_ptr __27735_24_last_entry = ((a_list_entry_ptr)0);
-auto char *__27736_24_name_pos;
-auto char *__27737_24_name_string;
-auto int __27738_24_name_length;
-auto _ZN3edg9a_booleanE __27739_24_is_ctor;
-auto int __27740_15_optchar;
-auto int __27741_15_lines_to_skip = 0;
+auto a_list_entry_ptr __27864_24_ctor_list = ((a_list_entry_ptr)0);
+auto a_list_entry_ptr __27865_24_dtor_list = ((a_list_entry_ptr)0);
+auto a_list_entry_ptr __27866_24_entry;
+auto a_list_entry_ptr __27867_24_last_entry = ((a_list_entry_ptr)0);
+auto char *__27868_24_name_pos;
+auto char *__27869_24_name_string;
+auto int __27870_24_name_length;
+auto _ZN3edg9a_booleanE __27871_24_is_ctor;
+auto int __27872_15_optchar;
+auto int __27873_15_lines_to_skip = 0;
 
 
 
 opterr = 0;
 
-while ((__27740_15_optchar = (getopt(__27730_14_argc, ((char *const *)__27730_26_argv), ((const char *)"ui:")))) != (-1)) {
-switch (__27740_15_optchar) {
+while ((__27872_15_optchar = (getopt(__27862_14_argc, ((char *const *)__27862_26_argv), ((const char *)"ui:")))) != (-1)) {
+switch (__27872_15_optchar) {
 case 105:
 
 
 
-__27741_15_lines_to_skip = (atoi(((const char *)optarg)));
-goto __T943516200;
+__27873_15_lines_to_skip = (atoi(((const char *)optarg)));
+goto __T147801296;
 case 117:
 
 
 skip_underscore_prefix = ((_ZN3edg9a_booleanE)1);
-goto __T943516200;
+goto __T147801296;
 default:
-if (optind >= __27730_14_argc) { optind = (__27730_14_argc - 1); }
-optarg = (__27730_26_argv[optind]);
+if (optind >= __27862_14_argc) { optind = (__27862_14_argc - 1); }
+optarg = (__27862_26_argv[optind]);
 fprintf(stderr, ((const char *)"Unrecognized option: %s\n"), optarg);
 _ZN31_INTERNAL_11_edg_munch_c_optind10error_utilEPKc(((const char *)"command line error"));
-goto __T943516200;
-} __T943516200:;
+goto __T147801296;
+} __T147801296:;
 }
 
-for (; __27741_15_lines_to_skip > 0; __27741_15_lines_to_skip--) { _ZN31_INTERNAL_11_edg_munch_c_optind15read_input_lineEv(); }
+for (; __27873_15_lines_to_skip > 0; __27873_15_lines_to_skip--) { _ZN31_INTERNAL_11_edg_munch_c_optind15read_input_lineEv(); }
 while (_ZN31_INTERNAL_11_edg_munch_c_optind15read_input_lineEv()) {
 
-if (line_size == 0) { goto __T943525088; }
-if (_ZN31_INTERNAL_11_edg_munch_c_optind23check_type_and_get_nameEPPcPiPb((&__27736_24_name_pos), (&__27738_24_name_length), (&__27739_24_is_ctor))) {
+if (line_size == 0) { goto __T147809928; }
+if (_ZN31_INTERNAL_11_edg_munch_c_optind23check_type_and_get_nameEPPcPiPb((&__27868_24_name_pos), (&__27870_24_name_length), (&__27871_24_is_ctor))) {
 
 
-if (((__27735_24_last_entry != ((a_list_entry_ptr)0)) && (__27738_24_name_length == ((int)(strlen(((const char *)(__27735_24_last_entry->name))))))) && ((strncmp(((const char *)(__27735_24_last_entry->name)), ((const char *)__27736_24_name_pos), ((size_t)__27738_24_name_length))) == 0)) {
+if (((__27867_24_last_entry != ((a_list_entry_ptr)0)) && (__27870_24_name_length == ((int)(strlen(((const char *)(__27867_24_last_entry->name))))))) && ((strncmp(((const char *)(__27867_24_last_entry->name)), ((const char *)__27868_24_name_pos), ((size_t)__27870_24_name_length))) == 0)) {
 
-goto __T943525088; }
+goto __T147809928; }
 
-__27737_24_name_string = ((char *)(_ZN31_INTERNAL_11_edg_munch_c_optind17malloc_with_checkEy(((size_t)(__27738_24_name_length + 1)))));
-strncpy(__27737_24_name_string, ((const char *)__27736_24_name_pos), ((size_t)__27738_24_name_length));
+__27869_24_name_string = ((char *)(_ZN31_INTERNAL_11_edg_munch_c_optind17malloc_with_checkEy(((size_t)(__27870_24_name_length + 1)))));
+strncpy(__27869_24_name_string, ((const char *)__27868_24_name_pos), ((size_t)__27870_24_name_length));
 
-(__27737_24_name_string[__27738_24_name_length]) = ((char)0);
+(__27869_24_name_string[__27870_24_name_length]) = ((char)0);
 
-__27734_24_entry = ((a_list_entry_ptr)(_ZN31_INTERNAL_11_edg_munch_c_optind17malloc_with_checkEy(16ULL)));
-(__27734_24_entry->name) = __27737_24_name_string;
-(__27734_24_entry->next) = ((a_list_entry_ptr)0);
-__27735_24_last_entry = __27734_24_entry;
+__27866_24_entry = ((a_list_entry_ptr)(_ZN31_INTERNAL_11_edg_munch_c_optind17malloc_with_checkEy(16ULL)));
+(__27866_24_entry->name) = __27869_24_name_string;
+(__27866_24_entry->next) = ((a_list_entry_ptr)0);
+__27867_24_last_entry = __27866_24_entry;
 
 
 
-if (__27739_24_is_ctor) {
+if (__27871_24_is_ctor) {
 
-(__27734_24_entry->next) = __27732_24_ctor_list;
-__27732_24_ctor_list = __27734_24_entry;
+(__27866_24_entry->next) = __27864_24_ctor_list;
+__27864_24_ctor_list = __27866_24_entry;
 } else  {
 
-(__27734_24_entry->next) = __27733_24_dtor_list;
-__27733_24_dtor_list = __27734_24_entry;
+(__27866_24_entry->next) = __27865_24_dtor_list;
+__27865_24_dtor_list = __27866_24_entry;
 }
-} __T943525088:;
+} __T147809928:;
 }
 #line 351
 printf(((const char *)"typedef %s (*%s)();\n"), ((const char *)("void")), ((const char *)("func_ptr")));
 
 
 
-if (__27732_24_ctor_list) { _ZN31_INTERNAL_11_edg_munch_c_optind13create_outputEP12a_list_entryPKc(__27732_24_ctor_list, ((const char *)"_ctors")); }
+if (__27864_24_ctor_list) { _ZN31_INTERNAL_11_edg_munch_c_optind13create_outputEP12a_list_entryPKc(__27864_24_ctor_list, ((const char *)"_ctors")); }
 printf(((const char *)"\n"));
 
 
-if (__27733_24_dtor_list) { _ZN31_INTERNAL_11_edg_munch_c_optind13create_outputEP12a_list_entryPKc(__27733_24_dtor_list, ((const char *)"_dtors")); }
+if (__27865_24_dtor_list) { _ZN31_INTERNAL_11_edg_munch_c_optind13create_outputEP12a_list_entryPKc(__27865_24_dtor_list, ((const char *)"_dtors")); }
 
 return 0;
 }

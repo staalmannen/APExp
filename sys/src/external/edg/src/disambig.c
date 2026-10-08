@@ -1,5 +1,5 @@
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
-/* Wed Oct  7 07:13:24 2026 */
+/* Thu Oct  8 07:53:00 2026 */
 extern int __EDGCPFE__7_0;
 void *memcpy(void *,const void *,unsigned long long);
 void *memset(void *,int,unsigned long long);
@@ -5318,10 +5318,12 @@ struct _ZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocator
 struct _ZN3edg17Remove_ref_helperIRPvEE; struct _ZN3edg17Remove_ref_helperIRNS_6detail21a_reusable_allocationEEE;
 #line 72
 struct _ZN3edg16Enable_if_helperILb1EvEE;
+#line 1031
+struct _ZN3edg10AllocationINS_6detail21a_reusable_allocationEEE; struct _ZN3edg10AllocationIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEEE;
 #line 437
 struct _ZN3edg17Remove_ref_helperIRPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEEE;
 #line 1031
-struct _ZN3edg10AllocationINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEEEE;
+struct _ZN3edg10AllocationINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEEEE; struct _ZN3edg10AllocationIPNS_13a_token_cacheEEE;
 #line 437
 struct _ZN3edg17Remove_ref_helperIRPNS_13a_token_cacheEEE;
 #line 5 "ape-arch/stdint_arch.h"
@@ -6996,7 +6998,7 @@ _ZN3edg18Buffered_allocatorILj50ENS_12FE_allocatorEPvE20a_fallback_allocatorE fa
 
 _ZN3edg9a_booleanE local_used;
 #line 1379
-union __C2 __T88023488;};
+union __C2 __T893488112;};
 #line 1572
 struct _ZN3edg27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaIPvEE { struct _ZN3edg18Buffered_allocatorILj50ENS_12FE_allocatorEPvEE __b_N3edg18Buffered_allocatorILj50ENS_12FE_allocatorEPvEE;};
 #line 1570
@@ -7044,8 +7046,13 @@ size_t n_allocated;
 
 
 size_t n_elems;};
+#line 1178
+typedef struct _ZN3edg6detail21a_reusable_allocationE _ZN3edg17General_allocatorINS_6detail21a_reusable_allocationEE7an_elemE;
+typedef struct _ZN3edg10AllocationINS_6detail21a_reusable_allocationEEE _ZN3edg17General_allocatorINS_6detail21a_reusable_allocationEE13an_allocationE;
 #line 1175
 struct _ZN3edg17General_allocatorINS_6detail21a_reusable_allocationEEE {char __dummy;};
+#line 1692
+typedef _ZN3edg17General_allocatorINS_6detail21a_reusable_allocationEE13an_allocationE _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE13an_allocationE;
 #line 1625
 struct _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEEE {
 #line 1693
@@ -7100,8 +7107,13 @@ _ZN3edg10AllocationINS_6detail24Shared_obj_control_blockINS_25an_immutable_cache
 
 
 size_t n_bytes_allocated;};
+#line 1064
+typedef _ZN3edg25a_shared_token_ctrl_blockE *_ZN3edg12FE_allocatorIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7an_elemE;
+typedef struct _ZN3edg10AllocationIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEEE _ZN3edg12FE_allocatorIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE13an_allocationE;
 #line 1063
 struct _ZN3edg12FE_allocatorIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEEE {char __dummy;};
+#line 1692
+typedef _ZN3edg12FE_allocatorIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE13an_allocationE _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE13an_allocationE;
 #line 1625
 struct _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEEE {
 #line 1693
@@ -7144,8 +7156,13 @@ struct _ZN3edg13a_token_cacheE *backing_cache;};
 struct _ZN3edg27a_tiny_scanning_token_cacheE {
 #line 1293
 struct _ZN3edg13a_token_cacheE *backing_cache;};
-#line 1063 "src/util.h"
+#line 1064 "src/util.h"
+typedef struct _ZN3edg13a_token_cacheE *_ZN3edg12FE_allocatorIPNS_13a_token_cacheEE7an_elemE;
+typedef struct _ZN3edg10AllocationIPNS_13a_token_cacheEEE _ZN3edg12FE_allocatorIPNS_13a_token_cacheEE13an_allocationE;
+#line 1063
 struct _ZN3edg12FE_allocatorIPNS_13a_token_cacheEEE {char __dummy;};
+#line 1692
+typedef _ZN3edg12FE_allocatorIPNS_13a_token_cacheEE13an_allocationE _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE13an_allocationE;
 #line 1625
 struct _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEEE {
 #line 1693
@@ -7170,7 +7187,7 @@ struct _ZN3edg3OptINS_22a_scanning_token_cacheEEE {
 #line 126
 _ZN3edg9a_booleanE storing_value;
 #line 132
-union __C4 __T91662928;
+union __C4 __T897070400;
 #line 143
 _ZN3edg9a_booleanE value_presence_checked;char __dummy[7];};
 #line 3233 "src/lexical.h"
@@ -8757,7 +8774,7 @@ struct _ZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocator
 #line 5359
 _ZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5a_keyE stored_key;
 #line 5366
-union __C8 __T125366456;};
+union __C8 __T931089920;};
 #line 437
 struct _ZN3edg17Remove_ref_helperIRPvEE {char __dummy;}; struct _ZN3edg17Remove_ref_helperIRNS_6detail21a_reusable_allocationEEE {char __dummy;};
 #line 77
@@ -8766,6 +8783,26 @@ typedef void _ZN3edg16Enable_if_helperILb1EvE7a_thingE;
 struct _ZN3edg16Enable_if_helperILb1EvEE {char __dummy;};
 #line 81
 typedef _ZN3edg16Enable_if_helperILb1EvE7a_thingE _ZN3edg9Enable_ifILb1EvEE;
+#line 1035
+typedef _ZN3edg17General_allocatorINS_6detail21a_reusable_allocationEE7an_elemE _ZN3edg10AllocationINS_6detail21a_reusable_allocationEE7an_elemE;
+#line 1031
+struct _ZN3edg10AllocationINS_6detail21a_reusable_allocationEEE {
+#line 1037
+_ZN3edg10AllocationINS_6detail21a_reusable_allocationEE7an_elemE *start;
+
+
+
+size_t n_bytes_allocated;};
+#line 1035
+typedef _ZN3edg12FE_allocatorIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7an_elemE _ZN3edg10AllocationIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7an_elemE;
+#line 1031
+struct _ZN3edg10AllocationIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEEE {
+#line 1037
+_ZN3edg10AllocationIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7an_elemE *start;
+
+
+
+size_t n_bytes_allocated;};
 #line 437
 struct _ZN3edg17Remove_ref_helperIRPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEEE {char __dummy;};
 #line 1035
@@ -8774,6 +8811,16 @@ typedef _ZN3edg12FE_allocatorINS_10Shared_objINS_25an_immutable_cached_tokenES0_
 struct _ZN3edg10AllocationINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEEEE {
 #line 1037
 _ZN3edg10AllocationINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEEE7an_elemE *start;
+
+
+
+size_t n_bytes_allocated;};
+#line 1035
+typedef _ZN3edg12FE_allocatorIPNS_13a_token_cacheEE7an_elemE _ZN3edg10AllocationIPNS_13a_token_cacheEE7an_elemE;
+#line 1031
+struct _ZN3edg10AllocationIPNS_13a_token_cacheEEE {
+#line 1037
+_ZN3edg10AllocationIPNS_13a_token_cacheEE7an_elemE *start;
 
 
 
@@ -8822,8 +8869,8 @@ extern  /* COMDAT group: _ZNK3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS
 extern  /* COMDAT group: _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE6removeEy */ void _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE6removeEy(struct _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEEE *const, 
 #line 2082
 size_t i);
-#line 1701
-extern void _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE4growEv(struct _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEEE *const);
+#line 2218
+extern  /* COMDAT group: _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE4growEv */ void _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE4growEv(struct _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEEE *const);
 #line 1661
 extern  /* COMDAT group: _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE12emplace_backIJRPvRyEEEvDpOT_ */ void _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE12emplace_backIJRPvRyEEEvDpOT_(struct 
 #line 1661
@@ -8832,8 +8879,10 @@ _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEEE *c
 extern  /* COMDAT group: _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE9push_backERKS5_ */ void _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE9push_backERKS5_(struct 
 #line 1912
 _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEEE *const, const _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE7an_elemE *value);
-#line 1701
-extern void _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE4growEv(struct _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEEE *const);
+#line 2218
+extern  /* COMDAT group: _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE4growEv */ void _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE4growEv(struct 
+#line 2218
+_ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEEE *const);
 #line 1717
 extern  /* COMDAT group: _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_EC1EyRKNS3_IS4_EE */ void _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_EC1EyRKNS3_IS4_EE(struct 
 #line 1717
@@ -8890,8 +8939,8 @@ extern  /* COMDAT group: _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocator
 extern  /* COMDAT group: _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE6insertEyRKS2_ */ void _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE6insertEyRKS2_(struct _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEEE *const, size_t i, const 
 #line 1964
 _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *value);
-#line 1701
-extern void _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE4growEv(struct _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEEE *const);
+#line 2218
+extern  /* COMDAT group: _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE4growEv */ void _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE4growEv(struct _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEEE *const);
 #line 194 "src/header_util.h"
 extern  /* COMDAT group: _ZNK3edg3OptINS_22a_scanning_token_cacheEE9has_valueEv */ _ZN3edg9a_booleanE _ZNK3edg3OptINS_22a_scanning_token_cacheEE9has_valueEv(const struct _ZN3edg3OptINS_22a_scanning_token_cacheEEE *const);
 #line 209
@@ -8921,6 +8970,10 @@ extern void _ZN3edg16assertion_failedEPKciS1_S1_S1_(_ZN3edg12a_const_charE *file
 extern void _ZN3edg26insufficient_address_spaceEv(void);
 #line 704
 extern void _ZN3edg12pos_sy_errorENS_13an_error_codeEPNS_17a_source_positionEPNS_8a_symbolE(enum _ZN3edg13an_error_codeE error_code, _ZN3edg17a_source_positionE *error_pos, struct _ZN3edg8a_symbolE *symbol);
+#line 36 "src/util.h"
+extern char *_ZN3edg13alloc_generalEy(_ZN3edg8sizeof_tE size);
+
+extern void _ZN3edg12free_generalEPvy(_ZN3edg10a_void_ptrE ptr, _ZN3edg8sizeof_tE size);
 #line 111 "src/mem_manage.h"
 extern _ZN3edg22a_mem_block_header_ptrE _ZN3edg15alloc_mem_blockEiyPcb(_ZN3edg22a_memory_region_numberE region_number, _ZN3edg8sizeof_tE min_size, char *desired_addr, _ZN3edg9a_booleanE small_extension);
 #line 117
@@ -9073,29 +9126,29 @@ extern  /* COMDAT group: _ZN3edg16destroy_elementsINS_10Shared_objINS_25an_immut
 #line 888
 _ZN3edg16destroy_elementsINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEEPS4_EENS_16Enable_if_helperIXntsr3edg6detail32Is_trivially_destructible_helperIT_EE5valueEvE7a_thingERT0_y(_ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E7an_elemE *
 #line 888
-*array, size_t num_to_destroy); static const char __T87760096[9]; extern  /* COMDAT group: _ZZN3edg8alloc_feEyEs */ char _ZZN3edg8alloc_feEyEs[100]; extern  /* COMDAT group: _ZZN3edg8alloc_feEyEs_0 */ char _ZZN3edg8alloc_feEyEs_0[77]; static const char __T88154040[18]; extern  /* COMDAT group:  */
+*array, size_t num_to_destroy); static const char __T893228240[9]; extern  /* COMDAT group: _ZZN3edg8alloc_feEyEs */ char _ZZN3edg8alloc_feEyEs[108]; extern  /* COMDAT group: _ZZN3edg8alloc_feEyEs_0 */ char _ZZN3edg8alloc_feEyEs_0[77]; static const char __T893553256[18]; extern  /* COMDAT group:  */
 #line 888
-/* _ZZN3edg17alloc_fe_var_sizeEyPyEs */ char _ZZN3edg17alloc_fe_var_sizeEyPyEs[100]; extern  /* COMDAT group: _ZZN3edg17alloc_fe_var_sizeEyPyEs_0 */ char _ZZN3edg17alloc_fe_var_sizeEyPyEs_0[77]; static const char __T88304048[8]; extern  /* COMDAT group: _ZZN3edg7free_feEPvyEs */ char 
+/* _ZZN3edg17alloc_fe_var_sizeEyPyEs */ char _ZZN3edg17alloc_fe_var_sizeEyPyEs[108]; extern  /* COMDAT group: _ZZN3edg17alloc_fe_var_sizeEyPyEs_0 */ char _ZZN3edg17alloc_fe_var_sizeEyPyEs_0[77]; static const char __T893692232[8]; extern  /* COMDAT group: _ZZN3edg7free_feEPvyEs */ char 
 #line 888
-_ZZN3edg7free_feEPvyEs[100]; static const char __T88306744[17]; extern  /* COMDAT group: _ZZN3edg16free_fe_var_sizeEPvyEs */ char _ZZN3edg16free_fe_var_sizeEPvyEs[100]; static const char __T90309680[21]; extern  /* COMDAT group: _ZZN3edg6detail19a_cached_token_baseD1EvEs */ char 
+_ZZN3edg7free_feEPvyEs[108]; static const char __T893694936[17]; extern  /* COMDAT group: _ZZN3edg16free_fe_var_sizeEPvyEs */ char _ZZN3edg16free_fe_var_sizeEPvyEs[108]; static const char __T895722456[21]; extern  /* COMDAT group: _ZZN3edg6detail19a_cached_token_baseD1EvEs */ char 
 #line 888
-_ZZN3edg6detail19a_cached_token_baseD1EvEs[97]; static const char __T90726744[8]; extern  /* COMDAT group: _ZZN3edg12FE_allocatorINS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7deallocENS_10AllocationIS4_EEEs */ char 
+_ZZN3edg6detail19a_cached_token_baseD1EvEs[105]; static const char __T896138992[8]; extern  /* COMDAT group: _ZZN3edg12FE_allocatorINS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7deallocENS_10AllocationIS4_EEEs */ char 
 #line 888
-_ZZN3edg12FE_allocatorINS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7deallocENS_10AllocationIS4_EEEs[97]; static const char __T91675704[25]; extern  /* COMDAT group: _ZZN3edg24curr_lexical_state_cacheEvEs */ char _ZZN3edg24curr_lexical_state_cacheEvEs[97]; static const char
+_ZZN3edg12FE_allocatorINS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7deallocENS_10AllocationIS4_EEEs[105]; static const char __T897083184[25]; extern  /* COMDAT group: _ZZN3edg24curr_lexical_state_cacheEvEs */ char _ZZN3edg24curr_lexical_state_cacheEvEs[105]; static const 
 #line 888
- __T123257480[22]; static const char __T123259528[22]; static const char __T123261320[23]; static const char __T123267144[22]; static const char __T123270944[24]; static const char __T123283552[19]; static const char __T124613328[24]; static const char __T124616872[27]; static const char 
+char __T928580216[22]; static const char __T928582272[22]; static const char __T928584072[23]; static const char __T928589904[22]; static const char __T928856008[24]; static const char __T928868624[19]; static const char __T930078736[24]; static const char __T930082288[27]; static const char 
 #line 888
-__T125372928[6]; extern  /* COMDAT group: _ZZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5valueEvEs */ char _ZZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5valueEvEs[94]; static 
+__T931096392[6]; extern  /* COMDAT group: _ZZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5valueEvEs */ char _ZZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5valueEvEs[102]; static 
 #line 888
-const char __T125345056[14]; extern  /* COMDAT group: _ZZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyyEs */ char 
+const char __T930097056[14]; extern  /* COMDAT group: _ZZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyyEs */ char 
 #line 888
-_ZZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyyEs[94]; static const char __T125544072[7]; extern  /* COMDAT group:  */
+_ZZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyyEs[102]; static const char __T931124832[7]; extern  /* COMDAT group:  */
 #line 888
-/* _ZZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE6removeEyEs */ char _ZZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE6removeEyEs[94]; static const char __T127044984[7]; extern  /* COMDAT group:  */
+/* _ZZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE6removeEyEs */ char _ZZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE6removeEyEs[102]; static const char __T932866152[7]; extern  /* COMDAT group:  */
 #line 888
-/* _ZZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE6insertEyRKS2_Es */ char _ZZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE6insertEyRKS2_Es[94]; static const char __T127091272[11]; extern  /* COMDAT group: _ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs */ char 
+/* _ZZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE6insertEyRKS2_Es */ char _ZZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE6insertEyRKS2_Es[102]; static const char __T933046968[11]; extern  /* COMDAT group: _ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs */ char 
 #line 888
-_ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs[101]; extern  /* COMDAT group: _ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs_0 */ char _ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs_0[26]; extern  /* COMDAT group: _ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs_1 */ char 
+_ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs[109]; extern  /* COMDAT group: _ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs_0 */ char _ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs_0[26]; extern  /* COMDAT group: _ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs_1 */ char 
 #line 888
 _ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs_1[23];
 #line 285 "src/mem_manage.h"
@@ -9193,37 +9246,37 @@ extern _ZN3edg9a_booleanE _ZN3edg18reflection_enabledE;
 #line 3001
 extern _ZN3edg9a_booleanE _ZN3edg17auto_cast_enabledE;
 #line 3016
-extern _ZN3edg9a_booleanE _ZN3edg21pack_indexing_enabledE; static const char __T87760096[9] = "alloc_fe";  /* COMDAT group: _ZZN3edg8alloc_feEyEs */ char _ZZN3edg8alloc_feEyEs[100] = "src/mem_manage.h";  /* */
+extern _ZN3edg9a_booleanE _ZN3edg21pack_indexing_enabledE; static const char __T893228240[9] = "alloc_fe";  /* COMDAT group: _ZZN3edg8alloc_feEyEs */ char _ZZN3edg8alloc_feEyEs[108] = "src/mem_manage.h";  /* */
 #line 3016
-/*  COMDAT group: _ZZN3edg8alloc_feEyEs_0 */ char _ZZN3edg8alloc_feEyEs_0[77] = "memory region allocation must not occur after front end processing has ended"; static const char __T88154040[18] = "alloc_fe_var_size";  /* COMDAT group: _ZZN3edg17alloc_fe_var_sizeEyPyEs */ char 
+/*  COMDAT group: _ZZN3edg8alloc_feEyEs_0 */ char _ZZN3edg8alloc_feEyEs_0[77] = "memory region allocation must not occur after front end processing has ended"; static const char __T893553256[18] = "alloc_fe_var_size";  /* COMDAT group: _ZZN3edg17alloc_fe_var_sizeEyPyEs */ char 
 #line 3016
-_ZZN3edg17alloc_fe_var_sizeEyPyEs[100] = "src/mem_manage.h";  /* COMDAT group: _ZZN3edg17alloc_fe_var_sizeEyPyEs_0 */ char _ZZN3edg17alloc_fe_var_sizeEyPyEs_0[77] = "memory region allocation must not occur after front end processing has ended"
+_ZZN3edg17alloc_fe_var_sizeEyPyEs[108] = "src/mem_manage.h";  /* COMDAT group: _ZZN3edg17alloc_fe_var_sizeEyPyEs_0 */ char _ZZN3edg17alloc_fe_var_sizeEyPyEs_0[77] = "memory region allocation must not occur after front end processing has ended"
 #line 3016
-; static const char __T88304048[8] = "free_fe";  /* COMDAT group: _ZZN3edg7free_feEPvyEs */ char _ZZN3edg7free_feEPvyEs[100] = "src/mem_manage.h"; static const char __T88306744[17] = "free_fe_var_size";  /* */
+; static const char __T893692232[8] = "free_fe";  /* COMDAT group: _ZZN3edg7free_feEPvyEs */ char _ZZN3edg7free_feEPvyEs[108] = "src/mem_manage.h"; static const char __T893694936[17] = "free_fe_var_size";  /* */
 #line 3016
-/*  COMDAT group: _ZZN3edg16free_fe_var_sizeEPvyEs */ char _ZZN3edg16free_fe_var_sizeEPvyEs[100] = "src/mem_manage.h"; static const char __T90309680[21] = "~a_cached_token_base";  /* COMDAT group:  */
+/*  COMDAT group: _ZZN3edg16free_fe_var_sizeEPvyEs */ char _ZZN3edg16free_fe_var_sizeEPvyEs[108] = "src/mem_manage.h"; static const char __T895722456[21] = "~a_cached_token_base";  /* COMDAT group:  */
 #line 3016
-/* _ZZN3edg6detail19a_cached_token_baseD1EvEs */ char _ZZN3edg6detail19a_cached_token_baseD1EvEs[97] = "src/lexical.h"; static const char __T90726744[8] = "dealloc";  /* COMDAT group:  */
+/* _ZZN3edg6detail19a_cached_token_baseD1EvEs */ char _ZZN3edg6detail19a_cached_token_baseD1EvEs[105] = "src/lexical.h"; static const char __T896138992[8] = "dealloc";  /* COMDAT group:  */
 #line 3016
-/* _ZZN3edg12FE_allocatorINS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7deallocENS_10AllocationIS4_EEEs */ char _ZZN3edg12FE_allocatorINS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7deallocENS_10AllocationIS4_EEEs[97] = "src/lexical.h"
+/* _ZZN3edg12FE_allocatorINS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7deallocENS_10AllocationIS4_EEEs */ char _ZZN3edg12FE_allocatorINS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7deallocENS_10AllocationIS4_EEEs[105] = "src/lexical.h"
 #line 3016
-; static const char __T91675704[25] = "curr_lexical_state_cache";  /* COMDAT group: _ZZN3edg24curr_lexical_state_cacheEvEs */ char _ZZN3edg24curr_lexical_state_cacheEvEs[97] = "src/lexical.h"; static const char 
+; static const char __T897083184[25] = "curr_lexical_state_cache";  /* COMDAT group: _ZZN3edg24curr_lexical_state_cacheEvEs */ char _ZZN3edg24curr_lexical_state_cacheEvEs[105] = "src/lexical.h"; static const 
 #line 3016
-__T123257480[22] = "prescan_std_attribute"; static const char __T123259528[22] = "prescan_gnu_attribute"; static const char __T123261320[23] = "prescan_based_modifier"; static const char __T123267144[22] = "prescan_type_operator"; static const char __T123270944[24] = "prescan_decl_specifiers"; 
+char __T928580216[22] = "prescan_std_attribute"; static const char __T928582272[22] = "prescan_gnu_attribute"; static const char __T928584072[23] = "prescan_based_modifier"; static const char __T928589904[22] = "prescan_type_operator"; static const char __T928856008[24] = "prescan_decl_specifiers"; 
 #line 3016
-static const char __T123283552[19] = "prescan_declarator"; static const char __T124613328[24] = "find_for_loop_separator"; static const char __T124616872[27] = "elaborated_cli_typeid_next"; static const char __T125372928[6] = "value";  /* COMDAT group:  */
+static const char __T928868624[19] = "prescan_declarator"; static const char __T930078736[24] = "find_for_loop_separator"; static const char __T930082288[27] = "elaborated_cli_typeid_next"; static const char __T931096392[6] = "value";  /* COMDAT group:  */
 #line 3016
-/* _ZZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5valueEvEs */ char _ZZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5valueEvEs[94] = "src/util.h"
+/* _ZZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5valueEvEs */ char _ZZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5valueEvEs[102] = "src/util.h"
 #line 3016
-; static const char __T125345056[14] = "get_with_hash";  /* COMDAT group: _ZZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyyEs */ char 
+; static const char __T930097056[14] = "get_with_hash";  /* COMDAT group: _ZZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyyEs */ char 
 #line 3016
-_ZZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyyEs[94] = "src/util.h"; static const char __T125544072[7] = "remove";  /* */
+_ZZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyyEs[102] = "src/util.h"; static const char __T931124832[7] = "remove"
 #line 3016
-/*  COMDAT group: _ZZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE6removeEyEs */ char _ZZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE6removeEyEs[94] = "src/util.h"
+;  /* COMDAT group: _ZZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE6removeEyEs */ char _ZZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE6removeEyEs[102] = "src/util.h"
 #line 3016
-; static const char __T127044984[7] = "insert";  /* COMDAT group: _ZZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE6insertEyRKS2_Es */ char _ZZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE6insertEyRKS2_Es[94] = "src/util.h"
+; static const char __T932866152[7] = "insert";  /* COMDAT group: _ZZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE6insertEyRKS2_Es */ char _ZZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE6insertEyRKS2_Es[102] = "src/util.h"
 #line 3016
-; static const char __T127091272[11] = "operator->";  /* COMDAT group: _ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs */ char _ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs[101] = "src/header_util.h";  /* */
+; static const char __T933046968[11] = "operator->";  /* COMDAT group: _ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs */ char _ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs[109] = "src/header_util.h";  /* */
 #line 3016
 /*  COMDAT group: _ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs_0 */ char _ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs_0[26] = "missing call to has_value";  /* COMDAT group: _ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs_1 */ char _ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs_1[23] = "the optional was empty"
 #line 3016
@@ -9232,51 +9285,51 @@ _ZZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12F
  /* COMDAT group: _ZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyy */ _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE7a_valueE 
 #line 5535
 _ZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyy( const struct _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEEE *const this, 
-const _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE5a_keyE *__39125_70_key, 
-uintptr_t __39126_69_hash)
+const _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE5a_keyE *__39257_70_key, 
+uintptr_t __39258_69_hash)
 #line 5543
 {
-auto size_t __39133_12_mask;
-auto size_t __39134_12_idx;
-auto _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE8an_entryE *__39135_13_tbl;
-auto _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE7a_valueE __39136_12_result = ((_ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE7a_valueE)0);
+auto size_t __39265_12_mask;
+auto size_t __39266_12_idx;
+auto _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE8an_entryE *__39267_13_tbl;
+auto _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE7a_valueE __39268_12_result = ((_ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE7a_valueE)0);
 #line 5544
-__39133_12_mask = (this->hash_mask);
-__39134_12_idx = (__39126_69_hash & __39133_12_mask);
-__39135_13_tbl = (this->table);
+__39265_12_mask = (this->hash_mask);
+__39266_12_idx = (__39258_69_hash & __39265_12_mask);
+__39267_13_tbl = (this->table);
 
 
 
 
-((*__39125_70_key) != 0ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyyEs), 5551, __T125345056, ((_ZN3edg12a_const_charE *)0), (
+((*__39257_70_key) != 0ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyyEs), 5551, __T930097056, ((_ZN3edg12a_const_charE *)0), (
 #line 5551
 (_ZN3edg12a_const_charE *)0)));
 for (; ; ) {
-auto _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE8an_entryE *__39142_15_entry; __39142_15_entry = (__39135_13_tbl + __39134_12_idx);
+auto _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE8an_entryE *__39274_15_entry; __39274_15_entry = (__39267_13_tbl + __39266_12_idx);
 
-if ((__39142_15_entry->stored_key) == (*__39125_70_key)) {
-__39136_12_result = (*((((_Bool)((((const struct _ZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEE *)(__39135_13_tbl + __39134_12_idx))->stored_key) != 0ULL)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)
+if ((__39274_15_entry->stored_key) == (*__39257_70_key)) {
+__39268_12_result = (*((((_Bool)((((const struct _ZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEE *)(__39267_13_tbl + __39266_12_idx))->stored_key) != 0ULL)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)
 #line 5556
-_ZZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5valueEvEs), 5352, __T125372928, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (&(((__39135_13_tbl + __39134_12_idx)->__T125366456).stored_value))));
-goto __T125628064;
-} else  { if (!((_Bool)((((const struct _ZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEE *)__39142_15_entry)->stored_key) != 0ULL))) {
-goto __T125628064;
+_ZZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEE5valueEvEs), 5352, __T931096392, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (&(((__39267_13_tbl + __39266_12_idx)->__T931089920).stored_value))));
+goto __T931041680;
+} else  { if (!((_Bool)((((const struct _ZN3edg13Ptr_map_entryIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEEEE *)__39274_15_entry)->stored_key) != 0ULL))) {
+goto __T931041680;
 } }
-__39134_12_idx = ((__39134_12_idx + 1ULL) & __39133_12_mask);
-} __T125628064:;
-return __39136_12_result;
+__39266_12_idx = ((__39266_12_idx + 1ULL) & __39265_12_mask);
+} __T931041680:;
+return __39268_12_result;
 }
 #line 6042
  /* COMDAT group: _ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE3getEy */ _ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE13a_multi_valueE *_ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE3getEy( struct _ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEEE *const this,  
 #line 6042
-_ZN3edg8sizeof_tE __39631_73_key)
+_ZN3edg8sizeof_tE __39763_73_key)
 #line 6048
 {
 return _ZNK3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE13get_with_hashERKyy((((const struct _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEEE *)&(
 #line 6049
-this->backing_map))), (((const _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE5a_keyE *)&__39631_73_key)), ((uintptr_t)(*(((const 
+this->backing_map))), (((const _ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE5a_keyE *)&__39763_73_key)), ((uintptr_t)(*(((const 
 #line 6049
-_ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE5a_keyE *)&__39631_73_key)))));
+_ZN3edg7Ptr_mapIyPNS_9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEENS_17General_allocatorEE5a_keyE *)&__39763_73_key)))));
 }
 #line 1643
  /* COMDAT group: _ZNK3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE6lengthEv */ size_t _ZNK3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE6lengthEv( const struct 
@@ -9292,11 +9345,11 @@ _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4Me
  /* COMDAT group: _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE8pop_backEv */ void _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE8pop_backEv( struct 
 #line 1662
 _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEE *const this)
-{ auto _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE7an_elemE *__T125485952; { __T125485952 = ((this->elems) + ((this->n_elems) - 1ULL)); { (void)__T125485952; } } --(this->n_elems);  }
+{ auto _ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE7an_elemE *__T930899568; { __T930899568 = ((this->elems) + ((this->n_elems) - 1ULL)); { (void)__T930899568; } } --(this->n_elems);  }
 #line 1867
  /* COMDAT group: _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEEixEy */ _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE7an_elemE *_ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEEixEy( struct 
 #line 1867
-_ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEEE *const this,  size_t __35456_55_i)
+_ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEEE *const this,  size_t __35588_55_i)
 
 
 
@@ -9305,7 +9358,7 @@ _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEEE *c
 
 
 
-return (this->elems) + __35456_55_i;
+return (this->elems) + __35588_55_i;
 
 }
 #line 1643
@@ -9316,105 +9369,179 @@ return (this->elems) + __35456_55_i;
 #line 2082
  /* COMDAT group: _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE6removeEy */ void _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE6removeEy( struct _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEEE *const this,  
 #line 2082
-size_t __35671_52_i)
+size_t __35803_52_i)
 
 
 
 
-{ auto size_t __T125517704;
+{ auto size_t __T930931320;
 
-auto size_t __35678_12_orig_count;
-auto _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE7an_elemE *__35679_13_arr_elems;
+auto size_t __35810_12_orig_count;
+auto _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE7an_elemE *__35811_13_arr_elems;
 
 
 
-auto _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE7an_elemE *__35683_12_move_dest;
-auto _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE7an_elemE *__35684_12_move_src;
-auto size_t __35685_12_num_to_move;
+auto _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE7an_elemE *__35815_12_move_dest;
+auto _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE7an_elemE *__35816_12_move_src;
+auto size_t __35817_12_num_to_move;
 #line 2088
-(__35671_52_i < (this->n_elems)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE6removeEyEs), 2088, __T125544072, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-__35678_12_orig_count = (this->n_elems);
-__35679_13_arr_elems = (this->elems);
+(__35803_52_i < (this->n_elems)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE6removeEyEs), 2088, __T931124832, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+__35810_12_orig_count = (this->n_elems);
+__35811_13_arr_elems = (this->elems);
 
-{ (void)(__35679_13_arr_elems + __35671_52_i); }
+{ (void)(__35811_13_arr_elems + __35803_52_i); }
 
-__35683_12_move_dest = (__35679_13_arr_elems + __35671_52_i);
-__35684_12_move_src = (__35683_12_move_dest + 1);
-__35685_12_num_to_move = (__35678_12_orig_count - (__35671_52_i + 1ULL));
-{ __T125517704 = (__35685_12_num_to_move * 16ULL); if (__T125517704 > 9223372036854775807ULL) { _ZN3edg26insufficient_address_spaceEv(); } memmove(((void *)(__35683_12_move_dest + 0)), ((const void *)(__35684_12_move_src + 0)), __T125517704); }
+__35815_12_move_dest = (__35811_13_arr_elems + __35803_52_i);
+__35816_12_move_src = (__35815_12_move_dest + 1);
+__35817_12_num_to_move = (__35810_12_orig_count - (__35803_52_i + 1ULL));
+{ __T930931320 = (__35817_12_num_to_move * 16ULL); if (__T930931320 > 9223372036854775807ULL) { _ZN3edg26insufficient_address_spaceEv(); } memmove(((void *)(__35815_12_move_dest + 0)), ((const void *)(__35816_12_move_src + 0)), __T930931320); }
 --(this->n_elems); 
+}
+#line 2218
+ /* COMDAT group: _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE4growEv */ void _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE4growEv( struct _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEEE *const this)
+
+
+
+
+{ auto _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE13an_allocationE __T931177912; auto _ZN3edg17General_allocatorINS_6detail21a_reusable_allocationEE13an_allocationE __T931179088; auto size_t __T931179384; auto size_t __T931179680; auto size_t __T931179976; auto 
+#line 2223
+struct _ZN3edg10AllocationINS_6detail21a_reusable_allocationEEE __T931180272; auto _ZN3edg8sizeof_tE __T931180568; auto _ZN3edg17General_allocatorINS_6detail21a_reusable_allocationEE7an_elemE *__T931180864; auto _ZN3edg17General_allocatorINS_6detail21a_reusable_allocationEE7an_elemE *__T931181160;
+auto size_t __35945_18_old_cap;
+auto size_t __35946_18_new_cap;
+auto _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE13an_allocationE __35947_18_a;
+#line 2224
+__35945_18_old_cap = (this->n_allocated);
+__35946_18_new_cap = ((__35945_18_old_cap < 2ULL) ? 2ULL : ((__35945_18_old_cap + (__35945_18_old_cap / 2ULL)) + 1ULL));
+__35947_18_a = ((((__T931179088 = (((__T931177912.start) = (this->elems)) , (((__T931177912.n_bytes_allocated) = (__35945_18_old_cap * 16ULL)) , __T931177912))) , (__T931179384 = __35946_18_new_cap)) , (__T931179680 = (this->n_elems))) , ((((((__T931180568 = (__T931179384 * 16ULL)) , (__T931180864 = 
+#line 2226
+(__T931179088.start))) , (__T931181160 = ((_ZN3edg17General_allocatorINS_6detail21a_reusable_allocationEE7an_elemE *)(_ZN3edg13alloc_generalEy(__T931180568))))) , (((__T931179976 = (__T931179680 * 16ULL)) , ((__T931179976 > 9223372036854775807ULL) ? (_ZN3edg26insufficient_address_spaceEv()) : ((void
+#line 2226
+)0))) , (memmove(((void *)(__T931181160 + 0)), ((const void *)(__T931180864 + 0)), __T931179976)))) , (_ZN3edg12free_generalEPvy(((_ZN3edg10a_void_ptrE)__T931180864), (__T931179088.n_bytes_allocated)))) , ((((__T931180272.start) = __T931181160) , ((__T931180272.n_bytes_allocated) = __T931180568)) , 
+#line 2226
+__T931180272)));
+
+
+
+(this->elems) = (__35947_18_a.start);
+(this->n_allocated) = ((__35947_18_a.n_bytes_allocated) / 16ULL); 
 }
 #line 1661
  /* COMDAT group: _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE12emplace_backIJRPvRyEEEvDpOT_ */ void _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE12emplace_backIJRPvRyEEEvDpOT_( struct 
 #line 1661
 _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEEE *const this, 
 #line 1947
-_ZN3edg10a_void_ptrE *__2_35536_67_args,  _ZN3edg8sizeof_tE *__1_35536_67_args)
+_ZN3edg10a_void_ptrE *__2_35668_67_args,  _ZN3edg8sizeof_tE *__1_35668_67_args)
 
 
 
 
-{ auto _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE7an_elemE *__T125757584; auto unsigned long long __T125757880; auto _ZZN3edg9constructIPNS_6detail21a_reusable_allocationEJRPvRyEEEvT_DpOT0_E9an_object *__T125758176; auto _ZN3edg10a_void_ptrE __T125758472; auto 
+{ auto _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE7an_elemE *__T931229832; auto unsigned long long __T931230128; auto _ZZN3edg9constructIPNS_6detail21a_reusable_allocationEJRPvRyEEEvT_DpOT0_E9an_object *__T931230424; auto _ZN3edg10a_void_ptrE __T931230720; auto 
 #line 1952
-_ZN3edg8sizeof_tE __T125758768;
-auto size_t __35542_11_n; __35542_11_n = (this->n_elems);
+_ZN3edg8sizeof_tE __T931231016;
+auto size_t __35674_11_n; __35674_11_n = (this->n_elems);
 
-if (__35542_11_n == (this->n_allocated)) {
+if (__35674_11_n == (this->n_allocated)) {
 _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE4growEv(this);
 }
-{ __T125757584 = ((this->elems) + __35542_11_n); { (_ZZN3edg9constructIPNS_6detail21a_reusable_allocationEJRPvRyEEEvT_DpOT0_E9an_object *)((__T125757880 = 16ULL) , ((__T125758176 = ((_ZZN3edg9constructIPNS_6detail21a_reusable_allocationEJRPvRyEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T125757880, ((void *
+{ __T931229832 = ((this->elems) + __35674_11_n); { (_ZZN3edg9constructIPNS_6detail21a_reusable_allocationEJRPvRyEEEvT_DpOT0_E9an_object *)((__T931230128 = 16ULL) , ((__T931230424 = ((_ZZN3edg9constructIPNS_6detail21a_reusable_allocationEJRPvRyEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T931230128, ((void *
 #line 1958
-)__T125757584))))) , (((void)(((__T125758472 = (*((_ZN3edg10a_void_ptrE *)((_ZN3edg10a_void_ptrE *)__2_35536_67_args)))) , (__T125758768 = (*((_ZN3edg8sizeof_tE *)((_ZN3edg8sizeof_tE *)__1_35536_67_args))))) , (((__T125758176->ptr) = __T125758472) , ((__T125758176->size) = __T125758768)))) , 
+)__T931229832))))) , (((void)(((__T931230720 = (*((_ZN3edg10a_void_ptrE *)((_ZN3edg10a_void_ptrE *)__2_35668_67_args)))) , (__T931231016 = (*((_ZN3edg8sizeof_tE *)((_ZN3edg8sizeof_tE *)__1_35668_67_args))))) , (((__T931230424->ptr) = __T931230720) , ((__T931230424->size) = __T931231016)))) , 
 #line 1958
-__T125758176))); } }
-(this->n_elems) = (__35542_11_n + 1ULL); 
+__T931230424))); } }
+(this->n_elems) = (__35674_11_n + 1ULL); 
 }
 #line 1912
  /* COMDAT group: _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE9push_backERKS5_ */ void _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE9push_backERKS5_( struct 
 #line 1912
-_ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEEE *const this,  const _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE7an_elemE *__35501_62_value)
+_ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEEE *const this,  const _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE7an_elemE *__35633_62_value)
 
 
 
 
-{ auto _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE7an_elemE *__T126270576; auto unsigned long long __T126270872; auto 
+{ auto _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE7an_elemE *__T931756944; auto unsigned long long __T931757240; auto 
 #line 1917
-_ZZN3edg9constructIPPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEJRKS5_EEEvT_DpOT0_E9an_object *__T126271168;
-auto size_t __35507_11_n; __35507_11_n = (this->n_elems);
+_ZZN3edg9constructIPPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEJRKS5_EEEvT_DpOT0_E9an_object *__T931757536;
+auto size_t __35639_11_n; __35639_11_n = (this->n_elems);
 
-if (__35507_11_n == (this->n_allocated)) {
+if (__35639_11_n == (this->n_allocated)) {
 _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE4growEv(this);
 }
-{ __T126270576 = ((this->elems) + __35507_11_n); { (_ZZN3edg9constructIPPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEJRKS5_EEEvT_DpOT0_E9an_object *)((__T126270872 = 8ULL) , ((__T126271168 = ((
+{ __T931756944 = ((this->elems) + __35639_11_n); { (_ZZN3edg9constructIPPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEJRKS5_EEEvT_DpOT0_E9an_object *)((__T931757240 = 8ULL) , ((__T931757536 = ((
 #line 1923
-_ZZN3edg9constructIPPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEJRKS5_EEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T126270872, ((void *)__T126270576))))) , (((*__T126271168) = (*((const 
+_ZZN3edg9constructIPPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEJRKS5_EEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T931757240, ((void *)__T931756944))))) , (((*__T931757536) = (*((const 
 #line 1923
-_ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE7an_elemE *)__35501_62_value))) , __T126271168))); } }
-(this->n_elems) = (__35507_11_n + 1ULL); 
+_ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE7an_elemE *)__35633_62_value))) , __T931757536))); } }
+(this->n_elems) = (__35639_11_n + 1ULL); 
+}
+#line 2218
+ /* COMDAT group: _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE4growEv */ void _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE4growEv( struct 
+#line 2218
+_ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEEE *const this)
+
+
+
+
+{ auto _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE13an_allocationE __T931810056; auto _ZN3edg12FE_allocatorIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE13an_allocationE __T931811232; auto size_t __T931811528
+#line 2223
+; auto size_t __T931811824; auto struct _ZN3edg10AllocationIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEEE __T931812120; auto _ZN3edg8sizeof_tE __T931812416; auto char *__T931812712; auto size_t __T931813008; auto 
+#line 2223
+_ZN3edg12FE_allocatorIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE13an_allocationE __T931813304; auto _ZN3edg10a_void_ptrE __T931813600; auto _ZN3edg8sizeof_tE __T931813896; auto _ZN3edg10a_void_ptrE __T931814192; auto _ZN3edg8sizeof_tE __T931814488; auto struct 
+#line 2223
+_ZN3edg10AllocationIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEEE __T931814784; auto _ZN3edg12FE_allocatorIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE13an_allocationE __T931815080; auto 
+#line 2223
+_ZN3edg12FE_allocatorIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7an_elemE *__T931815376; auto _ZN3edg12FE_allocatorIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7an_elemE *__T931815672;
+auto size_t __35945_18_old_cap;
+auto size_t __35946_18_new_cap;
+auto _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE13an_allocationE __35947_18_a;
+#line 2224
+__35945_18_old_cap = (this->n_allocated);
+__35946_18_new_cap = ((__35945_18_old_cap < 2ULL) ? 2ULL : ((__35945_18_old_cap + (__35945_18_old_cap / 2ULL)) + 1ULL));
+__35947_18_a = ((((__T931811232 = (((__T931810056.start) = (this->elems)) , (((__T931810056.n_bytes_allocated) = (__35945_18_old_cap * 8ULL)) , __T931810056))) , (__T931811528 = __35946_18_new_cap)) , (__T931811824 = (this->n_elems))) , ((((((__T931815080 = (((__T931811528 <= 1ULL) ? ((void)((
+#line 2226
+__T931812416 = 8ULL) , (__T931812712 = (_ZN3edg8alloc_feEy(8ULL))))) : ((void)(__T931812712 = (_ZN3edg17alloc_fe_var_sizeEyPy((__T931811528 * 8ULL), (&__T931812416)))))) , ((((__T931812120.start) = ((
+#line 2226
+_ZN3edg12FE_allocatorIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7an_elemE *)__T931812712)) , ((__T931812120.n_bytes_allocated) = __T931812416)) , __T931812120))) , (__T931815376 = (__T931811232.start))) , (__T931815672 = (__T931815080.start))) , (((__T931813008 = (
+#line 2226
+__T931811824 * 8ULL)) , ((__T931813008 > 9223372036854775807ULL) ? (_ZN3edg26insufficient_address_spaceEv()) : ((void)0))) , (memmove(((void *)(__T931815672 + 0)), ((const void *)(__T931815376 + 0)), __T931813008)))) , ((__T931813304 = __T931811232) , ((((__T931813304.start) == ((
+#line 2226
+_ZN3edg10AllocationIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7an_elemE *)0)) || ((__T931813304.n_bytes_allocated) == 8ULL)) ? (((__T931813600 = ((void *)(__T931813304.start))) , (__T931813896 = (__T931813304.n_bytes_allocated))) , ((__T931813600 == ((
+#line 2226
+_ZN3edg10a_void_ptrE)0)) ? ((__T931813896 == 0ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg7free_feEPvyEs), 427, __T893692232, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) : ((__T931813896 >= 2096ULL) ? (_ZN3edg6detail12free_fe_hugeEPvy(
+#line 2226
+__T931813600, __T931813896)) : (_ZN3edg6detail14free_fe_normalEPvy(__T931813600, __T931813896))))) : (((__T931814192 = ((_ZN3edg10a_void_ptrE)(__T931813304.start))) , (__T931814488 = (__T931813304.n_bytes_allocated))) , ((__T931814192 == ((_ZN3edg10a_void_ptrE)0)) ? ((__T931814488 == 0ULL) ? ((void)0
+#line 2226
+) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg16free_fe_var_sizeEPvyEs), 447, __T893694936, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) : ((__T931814488 >= 2096ULL) ? (_ZN3edg6detail12free_fe_hugeEPvy(__T931814192, __T931814488)) : (
+#line 2226
+_ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE12emplace_backIJRPvRyEEEvDpOT_(_ZN3edg6detail16reusable_fe_listE, (&__T931814192), (&__T931814488))))))))) , ((__T931814784 = __T931815080) , __T931814784)));
+
+
+
+(this->elems) = (__35947_18_a.start);
+(this->n_allocated) = ((__35947_18_a.n_bytes_allocated) / 8ULL); 
 }
 #line 1717
  /* COMDAT group: _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_EC1EyRKNS3_IS4_EE */ void _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_EC1EyRKNS3_IS4_EE( struct 
 #line 1717
-_ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_EE *const this,  size_t __35306_61_cap, 
-const _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E12an_allocatorE *__35307_62_a)
+_ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_EE *const this,  size_t __35438_61_cap, 
+const _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E12an_allocatorE *__35439_62_a)
 #line 1727
-{ auto struct _ZN3edg10AllocationINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEEEE __T126367656; auto _ZN3edg8sizeof_tE __T126367952; auto char *__T126368248;
-auto _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E13an_allocationE __35317_18_allocation;
+{ auto struct _ZN3edg10AllocationINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEEEE __T932071240; auto _ZN3edg8sizeof_tE __T932071536; auto char *__T932071832;
+auto _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E13an_allocationE __35449_18_allocation;
 #line 1724
 (this->elems) = ((_ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E7an_elemE *)0);
 (this->n_allocated) = 0ULL;
 (this->n_elems) = 0ULL;
 
-__35317_18_allocation = (((__35306_61_cap <= 1ULL) ? ((void)((__T126367952 = 8ULL) , (__T126368248 = (_ZN3edg8alloc_feEy(8ULL))))) : ((void)(__T126368248 = (_ZN3edg17alloc_fe_var_sizeEyPy((__35306_61_cap * 8ULL), (&__T126367952)))))) , ((((__T126367656.start) = ((
+__35449_18_allocation = (((__35438_61_cap <= 1ULL) ? ((void)((__T932071536 = 8ULL) , (__T932071832 = (_ZN3edg8alloc_feEy(8ULL))))) : ((void)(__T932071832 = (_ZN3edg17alloc_fe_var_sizeEyPy((__35438_61_cap * 8ULL), (&__T932071536)))))) , ((((__T932071240.start) = ((
 #line 1728
-_ZN3edg12FE_allocatorINS_10Shared_objINS_25an_immutable_cached_tokenES0_EEE7an_elemE *)__T126368248)) , ((__T126367656.n_bytes_allocated) = __T126367952)) , __T126367656));
-(this->elems) = (__35317_18_allocation.start);
-(this->n_allocated) = ((__35317_18_allocation.n_bytes_allocated) / 8ULL); 
+_ZN3edg12FE_allocatorINS_10Shared_objINS_25an_immutable_cached_tokenES0_EEE7an_elemE *)__T932071832)) , ((__T932071240.n_bytes_allocated) = __T932071536)) , __T932071240));
+(this->elems) = (__35449_18_allocation.start);
+(this->n_allocated) = ((__35449_18_allocation.n_bytes_allocated) / 8ULL); 
 }  /* COMDAT group: _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_EC2EyRKNS3_IS4_EE */ void _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_EC2EyRKNS3_IS4_EE( struct 
 #line 1731
-_ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_EE *const this,  size_t __T126464432,  const _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E12an_allocatorE *__T126464816) {  
+_ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_EE *const this,  size_t __T932246640,  const _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E12an_allocatorE *__T932247024) {  
 #line 1731
-_ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_EC1EyRKNS3_IS4_EE(this, __T126464432, __T126464816);  }
+_ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_EC1EyRKNS3_IS4_EE(this, __T932246640, __T932247024);  }
 #line 1804
  /* COMDAT group: _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_ED1Ev */ void _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_ED1Ev( struct 
 #line 1804
@@ -9422,40 +9549,40 @@ _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocat
 
 
 
-{ auto _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E13an_allocationE __T126377768; auto _ZN3edg12FE_allocatorINS_10Shared_objINS_25an_immutable_cached_tokenES0_EEE13an_allocationE __T126379072; auto _ZN3edg10a_void_ptrE __T126379368; auto _ZN3edg8sizeof_tE
+{ auto _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E13an_allocationE __T932081352; auto _ZN3edg12FE_allocatorINS_10Shared_objINS_25an_immutable_cached_tokenES0_EEE13an_allocationE __T932082656; auto _ZN3edg10a_void_ptrE __T932082952; auto _ZN3edg8sizeof_tE
 #line 1808
- __T126379664; auto _ZN3edg10a_void_ptrE __T126379960; auto _ZN3edg8sizeof_tE __T126380256;
+ __T932083248; auto _ZN3edg10a_void_ptrE __T932083544; auto _ZN3edg8sizeof_tE __T932083840;
 _ZN3edg16destroy_elementsINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEEPS4_EENS_16Enable_if_helperIXntsr3edg6detail32Is_trivially_destructible_helperIT_EE5valueEvE7a_thingERT0_y((&(this->elems)), (this->n_elems));
-{ __T126379072 = (((__T126377768.start) = (this->elems)) , (((__T126377768.n_bytes_allocated) = ((this->n_allocated) * 8ULL)) , __T126377768)); { if (((__T126379072.start) == ((_ZN3edg10AllocationINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEEE7an_elemE *)0)) || ((__T126379072.
+{ __T932082656 = (((__T932081352.start) = (this->elems)) , (((__T932081352.n_bytes_allocated) = ((this->n_allocated) * 8ULL)) , __T932081352)); { if (((__T932082656.start) == ((_ZN3edg10AllocationINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEEE7an_elemE *)0)) || ((__T932082656.
 #line 1810
-n_bytes_allocated) == 8ULL)) { { __T126379368 = ((void *)(__T126379072.start)); __T126379664 = (__T126379072.n_bytes_allocated); { if (__T126379368 == ((_ZN3edg10a_void_ptrE)0)) { (__T126379664 == 0ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg7free_feEPvyEs), 427
+n_bytes_allocated) == 8ULL)) { { __T932082952 = ((void *)(__T932082656.start)); __T932083248 = (__T932082656.n_bytes_allocated); { if (__T932082952 == ((_ZN3edg10a_void_ptrE)0)) { (__T932083248 == 0ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg7free_feEPvyEs), 427
 #line 1810
-, __T88304048, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))); } else  { if (__T126379664 >= 2096ULL) { _ZN3edg6detail12free_fe_hugeEPvy(__T126379368, __T126379664); } else  { _ZN3edg6detail14free_fe_normalEPvy(__T126379368, __T126379664); } } } } } else  { { __T126379960 = ((
+, __T893692232, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))); } else  { if (__T932083248 >= 2096ULL) { _ZN3edg6detail12free_fe_hugeEPvy(__T932082952, __T932083248); } else  { _ZN3edg6detail14free_fe_normalEPvy(__T932082952, __T932083248); } } } } } else  { { __T932083544 = ((
 #line 1810
-_ZN3edg10a_void_ptrE)(__T126379072.start)); __T126380256 = (__T126379072.n_bytes_allocated); { if (__T126379960 == ((_ZN3edg10a_void_ptrE)0)) { (__T126380256 == 0ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg16free_fe_var_sizeEPvyEs), 447, __T88306744, ((
+_ZN3edg10a_void_ptrE)(__T932082656.start)); __T932083840 = (__T932082656.n_bytes_allocated); { if (__T932083544 == ((_ZN3edg10a_void_ptrE)0)) { (__T932083840 == 0ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg16free_fe_var_sizeEPvyEs), 447, __T893694936, ((
 #line 1810
-_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))); } else  { if (__T126380256 >= 2096ULL) { _ZN3edg6detail12free_fe_hugeEPvy(__T126379960, __T126380256); } else  { _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE12emplace_backIJRPvRyEEEvDpOT_(
+_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))); } else  { if (__T932083840 >= 2096ULL) { _ZN3edg6detail12free_fe_hugeEPvy(__T932083544, __T932083840); } else  { _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE12emplace_backIJRPvRyEEEvDpOT_(
 #line 1810
-_ZN3edg6detail16reusable_fe_listE, (&__T126379960), (&__T126380256)); } } } } } } }
+_ZN3edg6detail16reusable_fe_listE, (&__T932083544), (&__T932083840)); } } } } } } }
 
 (this->elems) = ((_ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E7an_elemE *)0); 
 }  /* COMDAT group: _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_ED2Ev */ void _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_ED2Ev( struct 
 #line 1813
-_ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_EE *const this) { auto _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E13an_allocationE __T126579376; auto 
+_ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_EE *const this) { auto _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E13an_allocationE __T932280024; auto 
 #line 1813
-_ZN3edg12FE_allocatorINS_10Shared_objINS_25an_immutable_cached_tokenES0_EEE13an_allocationE __T126579672; auto _ZN3edg10a_void_ptrE __T126579968; auto _ZN3edg8sizeof_tE __T126580264; auto _ZN3edg10a_void_ptrE __T126580560; auto _ZN3edg8sizeof_tE __T126580856;  (void)(((
+_ZN3edg12FE_allocatorINS_10Shared_objINS_25an_immutable_cached_tokenES0_EEE13an_allocationE __T932280320; auto _ZN3edg10a_void_ptrE __T932280616; auto _ZN3edg8sizeof_tE __T932280912; auto _ZN3edg10a_void_ptrE __T932281208; auto _ZN3edg8sizeof_tE __T932281504;  (void)(((
 #line 1813
-_ZN3edg16destroy_elementsINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEEPS4_EENS_16Enable_if_helperIXntsr3edg6detail32Is_trivially_destructible_helperIT_EE5valueEvE7a_thingERT0_y((&(this->elems)), (this->n_elems))) , ((__T126579672 = (((__T126579376.start) = (this->elems)) , (((
+_ZN3edg16destroy_elementsINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEEPS4_EENS_16Enable_if_helperIXntsr3edg6detail32Is_trivially_destructible_helperIT_EE5valueEvE7a_thingERT0_y((&(this->elems)), (this->n_elems))) , ((__T932280320 = (((__T932280024.start) = (this->elems)) , (((
 #line 1813
-__T126579376.n_bytes_allocated) = ((this->n_allocated) * 8ULL)) , __T126579376))) , ((((__T126579672.start) == ((_ZN3edg10AllocationINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEEE7an_elemE *)0)) || ((__T126579672.n_bytes_allocated) == 8ULL)) ? (((__T126579968 = ((void *)(
+__T932280024.n_bytes_allocated) = ((this->n_allocated) * 8ULL)) , __T932280024))) , ((((__T932280320.start) == ((_ZN3edg10AllocationINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEEE7an_elemE *)0)) || ((__T932280320.n_bytes_allocated) == 8ULL)) ? (((__T932280616 = ((void *)(
 #line 1813
-__T126579672.start))) , (__T126580264 = (__T126579672.n_bytes_allocated))) , ((__T126579968 == ((_ZN3edg10a_void_ptrE)0)) ? ((__T126580264 == 0ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg7free_feEPvyEs), 427, __T88304048, ((_ZN3edg12a_const_charE *)0), ((
+__T932280320.start))) , (__T932280912 = (__T932280320.n_bytes_allocated))) , ((__T932280616 == ((_ZN3edg10a_void_ptrE)0)) ? ((__T932280912 == 0ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg7free_feEPvyEs), 427, __T893692232, ((_ZN3edg12a_const_charE *)0), ((
 #line 1813
-_ZN3edg12a_const_charE *)0)))) : ((__T126580264 >= 2096ULL) ? (_ZN3edg6detail12free_fe_hugeEPvy(__T126579968, __T126580264)) : (_ZN3edg6detail14free_fe_normalEPvy(__T126579968, __T126580264))))) : (((__T126580560 = ((_ZN3edg10a_void_ptrE)(__T126579672.start))) , (__T126580856 = (__T126579672.
+_ZN3edg12a_const_charE *)0)))) : ((__T932280912 >= 2096ULL) ? (_ZN3edg6detail12free_fe_hugeEPvy(__T932280616, __T932280912)) : (_ZN3edg6detail14free_fe_normalEPvy(__T932280616, __T932280912))))) : (((__T932281208 = ((_ZN3edg10a_void_ptrE)(__T932280320.start))) , (__T932281504 = (__T932280320.
 #line 1813
-n_bytes_allocated))) , ((__T126580560 == ((_ZN3edg10a_void_ptrE)0)) ? ((__T126580856 == 0ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg16free_fe_var_sizeEPvyEs), 447, __T88306744, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) : ((__T126580856 >= 2096ULL
+n_bytes_allocated))) , ((__T932281208 == ((_ZN3edg10a_void_ptrE)0)) ? ((__T932281504 == 0ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg16free_fe_var_sizeEPvyEs), 447, __T893694936, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) : ((__T932281504 
 #line 1813
-) ? (_ZN3edg6detail12free_fe_hugeEPvy(__T126580560, __T126580856)) : (_ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE12emplace_backIJRPvRyEEEvDpOT_(_ZN3edg6detail16reusable_fe_listE, (&__T126580560), (&__T126580856))))))))) , ((this->elems) = ((
+>= 2096ULL) ? (_ZN3edg6detail12free_fe_hugeEPvy(__T932281208, __T932281504)) : (_ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE12emplace_backIJRPvRyEEEvDpOT_(_ZN3edg6detail16reusable_fe_listE, (&__T932281208), (&__T932281504))))))))) , ((this->elems) = ((
 #line 1813
 _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E7an_elemE *)0)));  }
 #line 1645
@@ -9479,21 +9606,21 @@ _ZN3edg16destroy_elementsINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE
 } 
 }
 #line 1298 "src/lexical.h"
- /* COMDAT group: _ZN3edg22a_scanning_token_cacheC1Eb */ void _ZN3edg22a_scanning_token_cacheC1Eb( struct _ZN3edg22a_scanning_token_cacheE *const this,  _ZN3edg9a_booleanE __72343_58_is_reusable)
+ /* COMDAT group: _ZN3edg22a_scanning_token_cacheC1Eb */ void _ZN3edg22a_scanning_token_cacheC1Eb( struct _ZN3edg22a_scanning_token_cacheE *const this,  _ZN3edg9a_booleanE __72475_58_is_reusable)
 
 
 
 
 {
-if (_ZNK3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE8is_emptyEv(((const struct _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEEE *)_ZN3edg27avail_scanning_token_cachesE))) { auto unsigned __T91277416;
-(this->backing_cache) = (_ZN3edg6new_feINS_13a_token_cacheEJRbjEEEPT_DpOT0_((&__72343_58_is_reusable), ((__T91277416 = 50U) , (&__T91277416))));
+if (_ZNK3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE8is_emptyEv(((const struct _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEEE *)_ZN3edg27avail_scanning_token_cachesE))) { auto unsigned __T896734032;
+(this->backing_cache) = (_ZN3edg6new_feINS_13a_token_cacheEJRbjEEEPT_DpOT0_((&__72475_58_is_reusable), ((__T896734032 = 50U) , (&__T896734032))));
 
 } else  {
 (this->backing_cache) = (*(_ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE9back_elemEv(_ZN3edg27avail_scanning_token_cachesE)));
-((this->backing_cache)->is_reusable) = ((_ZN3edg11a_bit_fieldE)__72343_58_is_reusable);
+((this->backing_cache)->is_reusable) = ((_ZN3edg11a_bit_fieldE)__72475_58_is_reusable);
 _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE8pop_backEv(_ZN3edg27avail_scanning_token_cachesE);
 } 
-}  /* COMDAT group: _ZN3edg22a_scanning_token_cacheC2Eb */ void _ZN3edg22a_scanning_token_cacheC2Eb( struct _ZN3edg22a_scanning_token_cacheE *const this,  _ZN3edg9a_booleanE __T91504312) {  _ZN3edg22a_scanning_token_cacheC1Eb(this, __T91504312);  }
+}  /* COMDAT group: _ZN3edg22a_scanning_token_cacheC2Eb */ void _ZN3edg22a_scanning_token_cacheC2Eb( struct _ZN3edg22a_scanning_token_cacheE *const this,  _ZN3edg9a_booleanE __T896852440) {  _ZN3edg22a_scanning_token_cacheC1Eb(this, __T896852440);  }
 #line 1325
  /* COMDAT group: _ZN3edg22a_scanning_token_cacheD1Ev */ void _ZN3edg22a_scanning_token_cacheD1Ev( struct _ZN3edg22a_scanning_token_cacheE *const this)
 
@@ -9501,44 +9628,44 @@ _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE8pop_backEv(_ZN3edg27av
 
 
 {
-if ((this->backing_cache) != ((struct _ZN3edg13a_token_cacheE *)0)) { auto struct _ZN3edg13a_token_cacheE *__T91291168; auto const struct _ZN3edg13a_token_cacheE *__T91292560; auto const struct _ZN3edg13a_token_cacheE *__T91293648;
-auto size_t __72377_12_insertion_point; __72377_12_insertion_point = (_ZNK3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE6lengthEv(((const struct _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEEE *)_ZN3edg27avail_scanning_token_cachesE)));
+if ((this->backing_cache) != ((struct _ZN3edg13a_token_cacheE *)0)) { auto struct _ZN3edg13a_token_cacheE *__T896747784; auto const struct _ZN3edg13a_token_cacheE *__T896749176; auto const struct _ZN3edg13a_token_cacheE *__T896750264;
+auto size_t __72509_12_insertion_point; __72509_12_insertion_point = (_ZNK3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE6lengthEv(((const struct _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEEE *)_ZN3edg27avail_scanning_token_cachesE)));
 
-{ __T91291168 = (this->backing_cache); { _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E5clearEv((&(__T91291168->tokens))); } }
-for (; __72377_12_insertion_point != 0ULL; --__72377_12_insertion_point) {
-if (((__T91292560 = ((const struct _ZN3edg13a_token_cacheE *)(*(_ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEEixEy(_ZN3edg27avail_scanning_token_cachesE, (__72377_12_insertion_point - 1ULL)))))) , (
+{ __T896747784 = (this->backing_cache); { _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E5clearEv((&(__T896747784->tokens))); } }
+for (; __72509_12_insertion_point != 0ULL; --__72509_12_insertion_point) {
+if (((__T896749176 = ((const struct _ZN3edg13a_token_cacheE *)(*(_ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEEixEy(_ZN3edg27avail_scanning_token_cachesE, (__72509_12_insertion_point - 1ULL)))))) , (
 #line 1336
-_ZNK3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E8capacityEv((&(__T91292560->tokens))))) <= ((__T91293648 = ((const struct _ZN3edg13a_token_cacheE *)(this->backing_cache))) , (
+_ZNK3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E8capacityEv((&(__T896749176->tokens))))) <= ((__T896750264 = ((const struct _ZN3edg13a_token_cacheE *)(this->backing_cache))) , (
 #line 1336
-_ZNK3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E8capacityEv((&(__T91293648->tokens))))))
+_ZNK3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E8capacityEv((&(__T896750264->tokens))))))
 {
-goto __T91289720;
+goto __T896746336;
 }
-} __T91289720:;
-_ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE6insertEyRKS2_(_ZN3edg27avail_scanning_token_cachesE, __72377_12_insertion_point, (((const _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *)&(this->backing_cache))));
+} __T896746336:;
+_ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE6insertEyRKS2_(_ZN3edg27avail_scanning_token_cachesE, __72509_12_insertion_point, (((const _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *)&(this->backing_cache))));
 
 } 
 }  /* COMDAT group: _ZN3edg22a_scanning_token_cacheD2Ev */ void _ZN3edg22a_scanning_token_cacheD2Ev( struct _ZN3edg22a_scanning_token_cacheE *const this) {  _ZN3edg22a_scanning_token_cacheD1Ev(this);  }
 #line 1360
- /* COMDAT group: _ZN3edg27a_tiny_scanning_token_cacheC1Eb */ void _ZN3edg27a_tiny_scanning_token_cacheC1Eb( struct _ZN3edg27a_tiny_scanning_token_cacheE *const this,  _ZN3edg9a_booleanE __72405_68_is_reusable)
+ /* COMDAT group: _ZN3edg27a_tiny_scanning_token_cacheC1Eb */ void _ZN3edg27a_tiny_scanning_token_cacheC1Eb( struct _ZN3edg27a_tiny_scanning_token_cacheE *const this,  _ZN3edg9a_booleanE __72537_68_is_reusable)
 
 
 
 
 {
-if (_ZNK3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE8is_emptyEv(((const struct _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEEE *)_ZN3edg32avail_tiny_scanning_token_cachesE))) { auto unsigned __T91303368;
-(this->backing_cache) = (_ZN3edg6new_feINS_13a_token_cacheEJRbjEEEPT_DpOT0_((&__72405_68_is_reusable), ((__T91303368 = 10U) , (&__T91303368))));
+if (_ZNK3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE8is_emptyEv(((const struct _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEEE *)_ZN3edg32avail_tiny_scanning_token_cachesE))) { auto unsigned __T896759984;
+(this->backing_cache) = (_ZN3edg6new_feINS_13a_token_cacheEJRbjEEEPT_DpOT0_((&__72537_68_is_reusable), ((__T896759984 = 10U) , (&__T896759984))));
 
 } else  {
 (this->backing_cache) = (*(_ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE9back_elemEv(_ZN3edg32avail_tiny_scanning_token_cachesE)));
-((this->backing_cache)->is_reusable) = ((_ZN3edg11a_bit_fieldE)__72405_68_is_reusable);
+((this->backing_cache)->is_reusable) = ((_ZN3edg11a_bit_fieldE)__72537_68_is_reusable);
 _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE8pop_backEv(_ZN3edg32avail_tiny_scanning_token_cachesE);
 } 
-}  /* COMDAT group: _ZN3edg27a_tiny_scanning_token_cacheC2Eb */ void _ZN3edg27a_tiny_scanning_token_cacheC2Eb( struct _ZN3edg27a_tiny_scanning_token_cacheE *const this,  _ZN3edg9a_booleanE __T91510776) {  _ZN3edg27a_tiny_scanning_token_cacheC1Eb(this, __T91510776);  }
+}  /* COMDAT group: _ZN3edg27a_tiny_scanning_token_cacheC2Eb */ void _ZN3edg27a_tiny_scanning_token_cacheC2Eb( struct _ZN3edg27a_tiny_scanning_token_cacheE *const this,  _ZN3edg9a_booleanE __T896919248) {  _ZN3edg27a_tiny_scanning_token_cacheC1Eb(this, __T896919248);  }
 #line 1867 "src/util.h"
  /* COMDAT group: _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEEixEy */ _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *_ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEEixEy( struct _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEEE *const this,  size_t
 #line 1867
- __35456_55_i)
+ __35588_55_i)
 
 
 
@@ -9547,7 +9674,7 @@ _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE8pop_backEv(_ZN3edg32av
 
 
 
-return (this->elems) + __35456_55_i;
+return (this->elems) + __35588_55_i;
 
 }
 #line 1641
@@ -9563,59 +9690,99 @@ const this)
 #line 1912
  /* COMDAT group: _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE9push_backERKS2_ */ void _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE9push_backERKS2_( struct _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEEE *const this,  const 
 #line 1912
-_ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *__35501_62_value)
+_ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *__35633_62_value)
 
 
 
 
-{ auto _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *__T127027048; auto unsigned long long __T127027344; auto _ZZN3edg9constructIPPNS_13a_token_cacheEJRKS2_EEEvT_DpOT0_E9an_object *__T127027640;
-auto size_t __35507_11_n; __35507_11_n = (this->n_elems);
+{ auto _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *__T932735736; auto unsigned long long __T932736032; auto _ZZN3edg9constructIPPNS_13a_token_cacheEJRKS2_EEEvT_DpOT0_E9an_object *__T932736328;
+auto size_t __35639_11_n; __35639_11_n = (this->n_elems);
 
-if (__35507_11_n == (this->n_allocated)) {
+if (__35639_11_n == (this->n_allocated)) {
 _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE4growEv(this);
 }
-{ __T127027048 = ((this->elems) + __35507_11_n); { (_ZZN3edg9constructIPPNS_13a_token_cacheEJRKS2_EEEvT_DpOT0_E9an_object *)((__T127027344 = 8ULL) , ((__T127027640 = ((_ZZN3edg9constructIPPNS_13a_token_cacheEJRKS2_EEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T127027344, ((void *)__T127027048))))) , (((*
+{ __T932735736 = ((this->elems) + __35639_11_n); { (_ZZN3edg9constructIPPNS_13a_token_cacheEJRKS2_EEEvT_DpOT0_E9an_object *)((__T932736032 = 8ULL) , ((__T932736328 = ((_ZZN3edg9constructIPPNS_13a_token_cacheEJRKS2_EEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T932736032, ((void *)__T932735736))))) , (((*
 #line 1923
-__T127027640) = (*((const _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *)__35501_62_value))) , __T127027640))); } }
-(this->n_elems) = (__35507_11_n + 1ULL); 
+__T932736328) = (*((const _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *)__35633_62_value))) , __T932736328))); } }
+(this->n_elems) = (__35639_11_n + 1ULL); 
 }
 #line 1662
  /* COMDAT group: _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE8pop_backEv */ void _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE8pop_backEv( struct _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEEE *const this)
-{ auto _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *__T127034880; { __T127034880 = ((this->elems) + ((this->n_elems) - 1ULL)); { (void)__T127034880; } } --(this->n_elems);  }
+{ auto _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *__T932743568; { __T932743568 = ((this->elems) + ((this->n_elems) - 1ULL)); { (void)__T932743568; } } --(this->n_elems);  }
 #line 1964
- /* COMDAT group: _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE6insertEyRKS2_ */ void _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE6insertEyRKS2_( struct _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEEE *const this,  size_t __35553_58_i, 
-const _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *__35554_59_value)
+ /* COMDAT group: _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE6insertEyRKS2_ */ void _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE6insertEyRKS2_( struct _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEEE *const this,  size_t __35685_58_i, 
+const _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *__35686_59_value)
 
 
 
 
-{ auto size_t __T127120352; auto unsigned long long __T127124712; auto _ZZN3edg9constructIPPNS_13a_token_cacheEJRKS2_EEEvT_DpOT0_E9an_object *__T127125008;
+{ auto size_t __T932759216; auto unsigned long long __T932817112; auto _ZZN3edg9constructIPPNS_13a_token_cacheEJRKS2_EEEvT_DpOT0_E9an_object *__T932817408;
 
-auto size_t __35561_10_orig_count;
+auto size_t __35693_10_orig_count;
 #line 1979
-auto _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *__35568_13_arr_elems;
-auto _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *__35569_13_move_src;
-auto _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *__35570_13_move_dest;
-auto size_t __35571_12_num_to_move;
+auto _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *__35700_13_arr_elems;
+auto _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *__35701_13_move_src;
+auto _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *__35702_13_move_dest;
+auto size_t __35703_12_num_to_move;
 #line 1971
-(__35553_58_i <= (this->n_elems)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE6insertEyRKS2_Es), 1971, __T127044984, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-__35561_10_orig_count = (this->n_elems);
+(__35685_58_i <= (this->n_elems)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE6insertEyRKS2_Es), 1971, __T932866152, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+__35693_10_orig_count = (this->n_elems);
 
-if (__35561_10_orig_count == (this->n_allocated)) {
+if (__35693_10_orig_count == (this->n_allocated)) {
 _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE4growEv(this);
 }
 
 
-__35568_13_arr_elems = (this->elems);
-__35569_13_move_src = (__35568_13_arr_elems + __35553_58_i);
-__35570_13_move_dest = (__35569_13_move_src + 1);
-__35571_12_num_to_move = (__35561_10_orig_count - __35553_58_i);
-{ __T127120352 = (__35571_12_num_to_move * 8ULL); if (__T127120352 > 9223372036854775807ULL) { _ZN3edg26insufficient_address_spaceEv(); } memmove(((void *)(__35570_13_move_dest + 0)), ((const void *)(__35569_13_move_src + 0)), __T127120352); }
+__35700_13_arr_elems = (this->elems);
+__35701_13_move_src = (__35700_13_arr_elems + __35685_58_i);
+__35702_13_move_dest = (__35701_13_move_src + 1);
+__35703_12_num_to_move = (__35693_10_orig_count - __35685_58_i);
+{ __T932759216 = (__35703_12_num_to_move * 8ULL); if (__T932759216 > 9223372036854775807ULL) { _ZN3edg26insufficient_address_spaceEv(); } memmove(((void *)(__35702_13_move_dest + 0)), ((const void *)(__35701_13_move_src + 0)), __T932759216); }
 
-{ (_ZZN3edg9constructIPPNS_13a_token_cacheEJRKS2_EEEvT_DpOT0_E9an_object *)((__T127124712 = 8ULL) , ((__T127125008 = ((_ZZN3edg9constructIPPNS_13a_token_cacheEJRKS2_EEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T127124712, ((void *)(__35568_13_arr_elems + __35553_58_i)))))) , (((*__T127125008) = (*((const 
+{ (_ZZN3edg9constructIPPNS_13a_token_cacheEJRKS2_EEEvT_DpOT0_E9an_object *)((__T932817112 = 8ULL) , ((__T932817408 = ((_ZZN3edg9constructIPPNS_13a_token_cacheEJRKS2_EEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T932817112, ((void *)(__35700_13_arr_elems + __35685_58_i)))))) , (((*__T932817408) = (*((const 
 #line 1985
-_ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *)__35554_59_value))) , __T127125008))); }
+_ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *)__35686_59_value))) , __T932817408))); }
 ++(this->n_elems); 
+}
+#line 2218
+ /* COMDAT group: _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE4growEv */ void _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE4growEv( struct _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEEE *const this)
+
+
+
+
+{ auto _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE13an_allocationE __T932778568; auto _ZN3edg12FE_allocatorIPNS_13a_token_cacheEE13an_allocationE __T932779744; auto size_t __T932780040; auto size_t __T932780336; auto struct _ZN3edg10AllocationIPNS_13a_token_cacheEEE __T932780632; auto 
+#line 2223
+_ZN3edg8sizeof_tE __T932780928; auto char *__T932781224; auto size_t __T932781520; auto _ZN3edg12FE_allocatorIPNS_13a_token_cacheEE13an_allocationE __T932781816; auto _ZN3edg10a_void_ptrE __T932782112; auto _ZN3edg8sizeof_tE __T932782408; auto _ZN3edg10a_void_ptrE __T932782704; auto 
+#line 2223
+_ZN3edg8sizeof_tE __T932783000; auto struct _ZN3edg10AllocationIPNS_13a_token_cacheEEE __T932783296; auto _ZN3edg12FE_allocatorIPNS_13a_token_cacheEE13an_allocationE __T932783592; auto _ZN3edg12FE_allocatorIPNS_13a_token_cacheEE7an_elemE *__T932783888; auto 
+#line 2223
+_ZN3edg12FE_allocatorIPNS_13a_token_cacheEE7an_elemE *__T932784184;
+auto size_t __35945_18_old_cap;
+auto size_t __35946_18_new_cap;
+auto _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE13an_allocationE __35947_18_a;
+#line 2224
+__35945_18_old_cap = (this->n_allocated);
+__35946_18_new_cap = ((__35945_18_old_cap < 2ULL) ? 2ULL : ((__35945_18_old_cap + (__35945_18_old_cap / 2ULL)) + 1ULL));
+__35947_18_a = ((((__T932779744 = (((__T932778568.start) = (this->elems)) , (((__T932778568.n_bytes_allocated) = (__35945_18_old_cap * 8ULL)) , __T932778568))) , (__T932780040 = __35946_18_new_cap)) , (__T932780336 = (this->n_elems))) , ((((((__T932783592 = (((__T932780040 <= 1ULL) ? ((void)((
+#line 2226
+__T932780928 = 8ULL) , (__T932781224 = (_ZN3edg8alloc_feEy(8ULL))))) : ((void)(__T932781224 = (_ZN3edg17alloc_fe_var_sizeEyPy((__T932780040 * 8ULL), (&__T932780928)))))) , ((((__T932780632.start) = ((_ZN3edg12FE_allocatorIPNS_13a_token_cacheEE7an_elemE *)__T932781224)) , ((__T932780632.
+#line 2226
+n_bytes_allocated) = __T932780928)) , __T932780632))) , (__T932783888 = (__T932779744.start))) , (__T932784184 = (__T932783592.start))) , (((__T932781520 = (__T932780336 * 8ULL)) , ((__T932781520 > 9223372036854775807ULL) ? (_ZN3edg26insufficient_address_spaceEv()) : ((void)0))) , (memmove(((void *)
+#line 2226
+(__T932784184 + 0)), ((const void *)(__T932783888 + 0)), __T932781520)))) , ((__T932781816 = __T932779744) , ((((__T932781816.start) == ((_ZN3edg10AllocationIPNS_13a_token_cacheEE7an_elemE *)0)) || ((__T932781816.n_bytes_allocated) == 8ULL)) ? (((__T932782112 = ((void *)(__T932781816.start))) , (
+#line 2226
+__T932782408 = (__T932781816.n_bytes_allocated))) , ((__T932782112 == ((_ZN3edg10a_void_ptrE)0)) ? ((__T932782408 == 0ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg7free_feEPvyEs), 427, __T893692232, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))))
+#line 2226
+ : ((__T932782408 >= 2096ULL) ? (_ZN3edg6detail12free_fe_hugeEPvy(__T932782112, __T932782408)) : (_ZN3edg6detail14free_fe_normalEPvy(__T932782112, __T932782408))))) : (((__T932782704 = ((_ZN3edg10a_void_ptrE)(__T932781816.start))) , (__T932783000 = (__T932781816.n_bytes_allocated))) , ((__T932782704 
+#line 2226
+== ((_ZN3edg10a_void_ptrE)0)) ? ((__T932783000 == 0ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg16free_fe_var_sizeEPvyEs), 447, __T893694936, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) : ((__T932783000 >= 2096ULL) ? (
+#line 2226
+_ZN3edg6detail12free_fe_hugeEPvy(__T932782704, __T932783000)) : (_ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE12emplace_backIJRPvRyEEEvDpOT_(_ZN3edg6detail16reusable_fe_listE, (&__T932782704), (&__T932783000))))))))) , ((__T932783296 = __T932783592) , __T932783296)));
+
+
+
+(this->elems) = (__35947_18_a.start);
+(this->n_allocated) = ((__35947_18_a.n_bytes_allocated) / 8ULL); 
 }
 #line 194 "src/header_util.h"
  /* COMDAT group: _ZNK3edg3OptINS_22a_scanning_token_cacheEE9has_valueEv */ _ZN3edg9a_booleanE _ZNK3edg3OptINS_22a_scanning_token_cacheEE9has_valueEv( const struct _ZN3edg3OptINS_22a_scanning_token_cacheEEE *const this)
@@ -9640,10 +9807,10 @@ return this->storing_value;
 
 {
 
-if (!(this->value_presence_checked)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs), 216, __T127091272, ((const char *)_ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs_0), ((_ZN3edg12a_const_charE *)0)); }
+if (!(this->value_presence_checked)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs), 216, __T933046968, ((const char *)_ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs_0), ((_ZN3edg12a_const_charE *)0)); }
 
-if (!(this->storing_value)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs), 218, __T127091272, ((const char *)_ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs_1), ((_ZN3edg12a_const_charE *)0)); }
-return &((this->__T91662928).stored_value);
+if (!(this->storing_value)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs), 218, __T933046968, ((const char *)_ZZN3edg3OptINS_22a_scanning_token_cacheEEptEvEs_1), ((_ZN3edg12a_const_charE *)0)); }
+return &((this->__T897070400).stored_value);
 }
 #line 2546 "src/util.h"
  /* COMDAT group: _ZN3edg10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEED1Ev */ void _ZN3edg10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEED1Ev( struct _ZN3edg10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEE *const this)
@@ -9668,15 +9835,15 @@ _ZN3edg10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEE19decremen
 
 
 if ((this->ctrl_block) != ((_ZN3edg10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEE15a_control_blockE *)0)) {
-if ((--((this->ctrl_block)->ref_counter)) == 0U) { auto _ZN3edg10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEE15a_control_blockE *__T127784696; auto _ZN3edg12FE_allocatorINS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE13an_allocationE __T127786432;
-auto _ZN3edg10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEE13an_allocationE __36256_21_allocation = {((_ZN3edg10AllocationINS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7an_elemE *const)0),128ULL}; (__36256_21_allocation.start) = (this->ctrl_block);
+if ((--((this->ctrl_block)->ref_counter)) == 0U) { auto _ZN3edg10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEE15a_control_blockE *__T933705672; auto _ZN3edg12FE_allocatorINS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE13an_allocationE __T933707408;
+auto _ZN3edg10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEE13an_allocationE __36388_21_allocation = {((_ZN3edg10AllocationINS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7an_elemE *const)0),128ULL}; (__36388_21_allocation.start) = (this->ctrl_block);
 
-{ __T127784696 = (this->ctrl_block); { { _ZN3edg6detail19a_cached_token_baseD2Ev((&((__T127784696->object).__b_N3edg6detail19a_cached_token_baseE))); } } }
-{ __T127786432 = __36256_21_allocation; { (((__T127786432.start) != ((_ZN3edg10AllocationINS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7an_elemE *)0)) && ((__T127786432.n_bytes_allocated) == 128ULL)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)
+{ __T933705672 = (this->ctrl_block); { { _ZN3edg6detail19a_cached_token_baseD2Ev((&((__T933705672->object).__b_N3edg6detail19a_cached_token_baseE))); } } }
+{ __T933707408 = __36388_21_allocation; { (((__T933707408.start) != ((_ZN3edg10AllocationINS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7an_elemE *)0)) && ((__T933707408.n_bytes_allocated) == 128ULL)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)
 #line 2670
-_ZZN3edg12FE_allocatorINS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7deallocENS_10AllocationIS4_EEEs), 985, __T90726744, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))); 
+_ZZN3edg12FE_allocatorINS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7deallocENS_10AllocationIS4_EEEs), 985, __T896138992, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))); 
 #line 2670
-_ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE9push_backERKS5_(_ZN3edg23avail_token_ctrl_blocksE, ((_ZN3edg10AllocationINS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7an_elemE *const *)&(__T127786432.start))); } }
+_ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEENS_12FE_allocatorEE9push_backERKS5_(_ZN3edg23avail_token_ctrl_blocksE, ((_ZN3edg10AllocationINS_6detail24Shared_obj_control_blockINS_25an_immutable_cached_tokenEEEE7an_elemE *const *)&(__T933707408.start))); } }
 (this->ctrl_block) = ((_ZN3edg10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEE15a_control_blockE *)0);
 }
 } 
@@ -9691,230 +9858,230 @@ _ZN3edg9Dyn_arrayIPNS_6detail24Shared_obj_control_blockINS_25an_immutable_cached
 switch ((int)(this->extra_info_kind)) {
 case 0:
 case 8:
-goto __T90404976;
+goto __T895753104;
 case 1:
 (void)0;
-goto __T90404976;
+goto __T895753104;
 case 2:
 _ZN3edg26free_cached_token_constantEPNS_10a_constantE(((this->extra_info).constant));
-goto __T90404976;
+goto __T895753104;
 case 3:
 _ZN3edg6detail27destroy_pending_pragma_listEPNS_9Dyn_arrayINS_10Shared_objINS_16a_pending_pragmaENS_12FE_allocatorEEES4_EE((&((this->extra_info).pragmas)));
-goto __T90404976;
+goto __T895753104;
 case 4:
 (void)0;
-goto __T90404976;
+goto __T895753104;
 case 5:
 (void)0;
-goto __T90404976;
+goto __T895753104;
 case 6:
 { _ZN3edg9delete_feINS_13a_token_cacheEEEvPPT_((&(((this->extra_info).removed_expr).cache))); }
-goto __T90404976;
+goto __T895753104;
 case 7:
-goto __T90404976;
+goto __T895753104;
 case 9:
 { _ZN3edg26free_cached_token_constantEPNS_10a_constantE((((this->extra_info).ud_lit).value_con)); _ZN3edg26free_cached_token_constantEPNS_10a_constantE((((this->extra_info).ud_lit).spelling_con)); }
-goto __T90404976;
+goto __T895753104;
 case 10:
 { _ZN3edg26free_cached_token_constantEPNS_10a_constantE((((this->extra_info).unresolved_ud_lit).value_con)); _ZN3edg26free_cached_token_constantEPNS_10a_constantE((((this->extra_info).unresolved_ud_lit).spelling_con)); }
-goto __T90404976;
+goto __T895753104;
 case 11:
 (void)0;
-goto __T90404976;
-default: _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg6detail19a_cached_token_baseD1EvEs), 837, __T90309680, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
-} __T90404976:; 
+goto __T895753104;
+default: _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg6detail19a_cached_token_baseD1EvEs), 837, __T895722456, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
+} __T895753104:; 
 }  /* COMDAT group: _ZN3edg6detail19a_cached_token_baseD2Ev */ void _ZN3edg6detail19a_cached_token_baseD2Ev( struct _ZN3edg6detail19a_cached_token_baseE *const this) {  _ZN3edg6detail19a_cached_token_baseD1Ev(this);  }
 #line 132 "src/mem_manage.h"
- /* COMDAT group: _ZN3edg15alloc_in_regionEiy */ char *_ZN3edg15alloc_in_regionEiy( _ZN3edg22a_memory_region_numberE __67435_53_region_number, 
-_ZN3edg8sizeof_tE __67436_53_size)
+ /* COMDAT group: _ZN3edg15alloc_in_regionEiy */ char *_ZN3edg15alloc_in_regionEiy( _ZN3edg22a_memory_region_numberE __67567_53_region_number, 
+_ZN3edg8sizeof_tE __67568_53_size)
 #line 140
-{ auto _ZN3edg8sizeof_tE __T87791360;
-auto char *__67444_27_temp_ptr;
-auto _ZN3edg22a_mem_block_header_ptrE __67445_26_hdr;
+{ auto _ZN3edg8sizeof_tE __T893203296;
+auto char *__67576_27_temp_ptr;
+auto _ZN3edg22a_mem_block_header_ptrE __67577_26_hdr;
 #line 165
-auto _ZN3edg8sizeof_tE __67468_13_true_size;
-auto _ZN3edg9a_booleanE __67469_13_use_dedicated_mem_block;
-auto _ZN3edg9a_booleanE __67470_13_small_extension;
-auto _ZN3edg9a_booleanE __67471_13_region_trimmed;
+auto _ZN3edg8sizeof_tE __67600_13_true_size;
+auto _ZN3edg9a_booleanE __67601_13_use_dedicated_mem_block;
+auto _ZN3edg9a_booleanE __67602_13_small_extension;
+auto _ZN3edg9a_booleanE __67603_13_region_trimmed;
 #line 146
-__67436_53_size = (_ZN3edg7max_valIyEET_RKS1_S3_((((const _ZN3edg8sizeof_tE *)&__67436_53_size)), ((((*(_ZN3edg8sizeof_tE *)&__T87791360)) = 1ULL) , (&__T87791360))));
+__67568_53_size = (_ZN3edg7max_valIyEET_RKS1_S3_((((const _ZN3edg8sizeof_tE *)&__67568_53_size)), ((((*(_ZN3edg8sizeof_tE *)&__T893203296)) = 1ULL) , (&__T893203296))));
 #line 155
-_ZN3edg17do_host_alignmentIyEEvPT_((&__67436_53_size));
+_ZN3edg17do_host_alignmentIyEEvPT_((&__67568_53_size));
 #line 163
-__67445_26_hdr = (_ZN3edg16mem_region_tableE[__67435_53_region_number]);
+__67577_26_hdr = (_ZN3edg16mem_region_tableE[__67567_53_region_number]);
 
-__67468_13_true_size = (__67436_53_size + 8ULL);
-__67469_13_use_dedicated_mem_block = ((_Bool)(__67468_13_true_size >= 2096ULL));
-__67470_13_small_extension = ((_ZN3edg9a_booleanE)0);
-__67471_13_region_trimmed = (__67445_26_hdr->trimmed);
-if (__67469_13_use_dedicated_mem_block) {
-
-
+__67600_13_true_size = (__67568_53_size + 8ULL);
+__67601_13_use_dedicated_mem_block = ((_Bool)(__67600_13_true_size >= 2096ULL));
+__67602_13_small_extension = ((_ZN3edg9a_booleanE)0);
+__67603_13_region_trimmed = (__67577_26_hdr->trimmed);
+if (__67601_13_use_dedicated_mem_block) {
 
 
-_ZN3edg14trim_mem_blockEPNS_18a_mem_block_headerE(__67445_26_hdr);
-__67470_13_small_extension = ((_ZN3edg9a_booleanE)1);
-__67445_26_hdr = (_ZN3edg15alloc_mem_blockEiyPcb(__67435_53_region_number, __67468_13_true_size, ((char *)0), ((_ZN3edg9a_booleanE)1)));
+
+
+_ZN3edg14trim_mem_blockEPNS_18a_mem_block_headerE(__67577_26_hdr);
+__67602_13_small_extension = ((_ZN3edg9a_booleanE)1);
+__67577_26_hdr = (_ZN3edg15alloc_mem_blockEiyPcb(__67567_53_region_number, __67600_13_true_size, ((char *)0), ((_ZN3edg9a_booleanE)1)));
 
 } else  {
 
 
 
 
-auto _ZN3edg8sizeof_tE __67486_14_remaining_space; __67486_14_remaining_space = ((_ZN3edg8sizeof_tE)((__67445_26_hdr->after_end_of_block) - (__67445_26_hdr->next_avail_in_block)));
+auto _ZN3edg8sizeof_tE __67618_14_remaining_space; __67618_14_remaining_space = ((_ZN3edg8sizeof_tE)((__67577_26_hdr->after_end_of_block) - (__67577_26_hdr->next_avail_in_block)));
 
-if (__67468_13_true_size > __67486_14_remaining_space) {
+if (__67600_13_true_size > __67618_14_remaining_space) {
 #line 191
-__67470_13_small_extension = __67471_13_region_trimmed;
-if (!(__67445_26_hdr->trimmed)) {
-_ZN3edg14trim_mem_blockEPNS_18a_mem_block_headerE(__67445_26_hdr);
+__67602_13_small_extension = __67603_13_region_trimmed;
+if (!(__67577_26_hdr->trimmed)) {
+_ZN3edg14trim_mem_blockEPNS_18a_mem_block_headerE(__67577_26_hdr);
 }
-__67445_26_hdr = (_ZN3edg15alloc_mem_blockEiyPcb(__67435_53_region_number, __67468_13_true_size, ((char *)0), __67470_13_small_extension));
+__67577_26_hdr = (_ZN3edg15alloc_mem_blockEiyPcb(__67567_53_region_number, __67600_13_true_size, ((char *)0), __67602_13_small_extension));
 
 }
 }
 
-__67444_27_temp_ptr = (__67445_26_hdr->next_avail_in_block);
-(__67445_26_hdr->next_avail_in_block) += __67436_53_size;
-if (__67470_13_small_extension) {
-auto _ZN3edg8sizeof_tE __67506_14_remaining_space; __67506_14_remaining_space = ((_ZN3edg8sizeof_tE)((__67445_26_hdr->after_end_of_block) - (__67445_26_hdr->next_avail_in_block)));
+__67576_27_temp_ptr = (__67577_26_hdr->next_avail_in_block);
+(__67577_26_hdr->next_avail_in_block) += __67568_53_size;
+if (__67602_13_small_extension) {
+auto _ZN3edg8sizeof_tE __67638_14_remaining_space; __67638_14_remaining_space = ((_ZN3edg8sizeof_tE)((__67577_26_hdr->after_end_of_block) - (__67577_26_hdr->next_avail_in_block)));
 
 
-if (__67506_14_remaining_space >= 2096ULL) {
+if (__67638_14_remaining_space >= 2096ULL) {
 #line 214
-_ZN3edg14trim_mem_blockEPNS_18a_mem_block_headerE(__67445_26_hdr);
+_ZN3edg14trim_mem_blockEPNS_18a_mem_block_headerE(__67577_26_hdr);
 
 
 
 
-(__67445_26_hdr->trimmed) = ((_ZN3edg14a_byte_booleanE)(((int)__67471_13_region_trimmed) != 0));
+(__67577_26_hdr->trimmed) = ((_ZN3edg14a_byte_booleanE)(((int)__67603_13_region_trimmed) != 0));
 }
 }
-if (__67469_13_use_dedicated_mem_block) {
+if (__67601_13_use_dedicated_mem_block) {
 #line 232
-(__67445_26_hdr->next_avail_in_block) = (__67445_26_hdr->after_end_of_block);
+(__67577_26_hdr->next_avail_in_block) = (__67577_26_hdr->after_end_of_block);
 }
 #line 242
-return __67444_27_temp_ptr;
+return __67576_27_temp_ptr;
 }
 #line 2731 "src/util.h"
- /* COMDAT group: _ZN3edg7max_valIyEET_RKS1_S3_ */ _ZN3edg8sizeof_tE _ZN3edg7max_valIyEET_RKS1_S3_( const _ZN3edg8sizeof_tE *__36320_43_x, 
-const _ZN3edg8sizeof_tE *__36321_43_y)
+ /* COMDAT group: _ZN3edg7max_valIyEET_RKS1_S3_ */ _ZN3edg8sizeof_tE _ZN3edg7max_valIyEET_RKS1_S3_( const _ZN3edg8sizeof_tE *__36452_43_x, 
+const _ZN3edg8sizeof_tE *__36453_43_y)
 
 
 
 
 {
-return ((*__36320_43_x) < (*__36321_43_y)) ? (*__36321_43_y) : (*__36320_43_x);
+return ((*__36452_43_x) < (*__36453_43_y)) ? (*__36453_43_y) : (*__36452_43_x);
 }
 #line 78 "src/mem_manage.h"
- /* COMDAT group: _ZN3edg17do_host_alignmentIyEEvPT_ */ void _ZN3edg17do_host_alignmentIyEEvPT_( _ZN3edg8sizeof_tE *__67381_55_size)
+ /* COMDAT group: _ZN3edg17do_host_alignmentIyEEvPT_ */ void _ZN3edg17do_host_alignmentIyEEvPT_( _ZN3edg8sizeof_tE *__67513_55_size)
 
 
 
 
 {
 
-auto _ZN3edg8sizeof_tE __67388_15_excess_bytes; __67388_15_excess_bytes = ((*__67381_55_size) & 7ULL);
+auto _ZN3edg8sizeof_tE __67520_15_excess_bytes; __67520_15_excess_bytes = ((*__67513_55_size) & 7ULL);
 
-if (__67388_15_excess_bytes != 0ULL) {
-(*__67381_55_size) += (8ULL - __67388_15_excess_bytes);
+if (__67520_15_excess_bytes != 0ULL) {
+(*__67513_55_size) += (8ULL - __67520_15_excess_bytes);
 } 
 
 }
 #line 328
- /* COMDAT group: _ZN3edg8alloc_feEy */ char *_ZN3edg8alloc_feEy( _ZN3edg8sizeof_tE __67631_36_size)
+ /* COMDAT group: _ZN3edg8alloc_feEy */ char *_ZN3edg8alloc_feEy( _ZN3edg8sizeof_tE __67763_36_size)
 #line 337
-{ auto _ZN3edg8sizeof_tE __T124334976;
+{ auto _ZN3edg8sizeof_tE __T929755504;
 
 
 
-auto void *__67644_9_ptr;
+auto void *__67776_9_ptr;
 #line 338
-if (!(_ZN3edg12in_front_endE)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg8alloc_feEyEs), 340, __T87760096, ((const char *)_ZZN3edg8alloc_feEyEs_0), ((_ZN3edg12a_const_charE *)0)); }
+if (!(_ZN3edg12in_front_endE)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg8alloc_feEyEs), 340, __T893228240, ((const char *)_ZZN3edg8alloc_feEyEs_0), ((_ZN3edg12a_const_charE *)0)); }
 
 
-__67644_9_ptr = ((void *)0);
+__67776_9_ptr = ((void *)0);
 
 
 
-__67631_36_size = (_ZN3edg7max_valIyEET_RKS1_S3_((((const _ZN3edg8sizeof_tE *)&__67631_36_size)), ((((*(_ZN3edg8sizeof_tE *)&__T124334976)) = 1ULL) , (&__T124334976))));
-if ((__67631_36_size < 2096ULL) && (_ZN3edg6detail12freed_fe_mapE != ((_ZN3edg6detail17a_size_to_ptr_mapE *)0))) {
+__67763_36_size = (_ZN3edg7max_valIyEET_RKS1_S3_((((const _ZN3edg8sizeof_tE *)&__67763_36_size)), ((((*(_ZN3edg8sizeof_tE *)&__T929755504)) = 1ULL) , (&__T929755504))));
+if ((__67763_36_size < 2096ULL) && (_ZN3edg6detail12freed_fe_mapE != ((_ZN3edg6detail17a_size_to_ptr_mapE *)0))) {
 
-auto _ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE13a_multi_valueE *__67651_10_freed_blocks; __67651_10_freed_blocks = (_ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE3getEy(_ZN3edg6detail12freed_fe_mapE, __67631_36_size));
-if ((__67651_10_freed_blocks != ((_ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE13a_multi_valueE *)0)) && ((_ZNK3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE6lengthEv(((const struct 
+auto _ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE13a_multi_valueE *__67783_10_freed_blocks; __67783_10_freed_blocks = (_ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE3getEy(_ZN3edg6detail12freed_fe_mapE, __67763_36_size));
+if ((__67783_10_freed_blocks != ((_ZN3edg13Ptr_multi_mapIyPvLj50ENS_17General_allocatorEE13a_multi_valueE *)0)) && ((_ZNK3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE6lengthEv(((const struct 
 #line 349
-_ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEE *)__67651_10_freed_blocks))) > 0ULL)) {
+_ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEEE *)__67783_10_freed_blocks))) > 0ULL)) {
 
-__67644_9_ptr = (*(_ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE9back_elemEv(__67651_10_freed_blocks)));
-_ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE8pop_backEv(__67651_10_freed_blocks);
+__67776_9_ptr = (*(_ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE9back_elemEv(__67783_10_freed_blocks)));
+_ZN3edg9Dyn_arrayIPvNS_27Delegate_buffered_allocatorILj50ENS_12FE_allocatorEE4MetaEE8pop_backEv(__67783_10_freed_blocks);
 }
 }
-if (__67644_9_ptr == ((void *)0)) {
+if (__67776_9_ptr == ((void *)0)) {
 
-__67644_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67631_36_size)));
+__67776_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67763_36_size)));
 }
-return (char *)__67644_9_ptr;
+return (char *)__67776_9_ptr;
 }
 
 
- /* COMDAT group: _ZN3edg17alloc_fe_var_sizeEyPy */ char *_ZN3edg17alloc_fe_var_sizeEyPy( _ZN3edg8sizeof_tE __67666_41_size, 
-_ZN3edg8sizeof_tE *__67667_42_actual_size)
+ /* COMDAT group: _ZN3edg17alloc_fe_var_sizeEyPy */ char *_ZN3edg17alloc_fe_var_sizeEyPy( _ZN3edg8sizeof_tE __67798_41_size, 
+_ZN3edg8sizeof_tE *__67799_42_actual_size)
 #line 374
-{ auto _ZN3edg8sizeof_tE __T124336192;
+{ auto _ZN3edg8sizeof_tE __T929756720;
 
 
 
-auto void *__67681_9_ptr;
+auto void *__67813_9_ptr;
 #line 375
-if (!(_ZN3edg12in_front_endE)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg17alloc_fe_var_sizeEyPyEs), 377, __T88154040, ((const char *)_ZZN3edg17alloc_fe_var_sizeEyPyEs_0), ((_ZN3edg12a_const_charE *)0)); }
+if (!(_ZN3edg12in_front_endE)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg17alloc_fe_var_sizeEyPyEs), 377, __T893553256, ((const char *)_ZZN3edg17alloc_fe_var_sizeEyPyEs_0), ((_ZN3edg12a_const_charE *)0)); }
 
 
-__67681_9_ptr = ((void *)0);
+__67813_9_ptr = ((void *)0);
 
 
 
-__67666_41_size = (_ZN3edg7max_valIyEET_RKS1_S3_((((const _ZN3edg8sizeof_tE *)&__67666_41_size)), ((((*(_ZN3edg8sizeof_tE *)&__T124336192)) = 1ULL) , (&__T124336192))));
-if ((__67666_41_size < 2096ULL) && (_ZN3edg6detail16reusable_fe_listE != ((_ZN3edg6detail26a_reusable_allocation_listE *)0))) {  {
+__67798_41_size = (_ZN3edg7max_valIyEET_RKS1_S3_((((const _ZN3edg8sizeof_tE *)&__67798_41_size)), ((((*(_ZN3edg8sizeof_tE *)&__T929756720)) = 1ULL) , (&__T929756720))));
+if ((__67798_41_size < 2096ULL) && (_ZN3edg6detail16reusable_fe_listE != ((_ZN3edg6detail26a_reusable_allocation_listE *)0))) {  {
 
-auto size_t __67688_17_i; __67688_17_i = (_ZNK3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE6lengthEv(((const struct _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEEE *)_ZN3edg6detail16reusable_fe_listE))); for (; __67688_17_i != 0ULL; --
+auto size_t __67820_17_i; __67820_17_i = (_ZNK3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE6lengthEv(((const struct _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEEE *)_ZN3edg6detail16reusable_fe_listE))); for (; __67820_17_i != 0ULL; --
 #line 385
-__67688_17_i) {
-auto _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE7an_elemE *__67689_13_alloc; __67689_13_alloc = (_ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEEixEy(_ZN3edg6detail16reusable_fe_listE, (__67688_17_i - 1ULL)));
-if ((__67689_13_alloc->size) >= __67666_41_size) {
-__67681_9_ptr = (__67689_13_alloc->ptr);
-(*__67667_42_actual_size) = (__67689_13_alloc->size);
-_ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE6removeEy(_ZN3edg6detail16reusable_fe_listE, (__67688_17_i - 1ULL));
-goto __T88296800;
+__67820_17_i) {
+auto _ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE7an_elemE *__67821_13_alloc; __67821_13_alloc = (_ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEEixEy(_ZN3edg6detail16reusable_fe_listE, (__67820_17_i - 1ULL)));
+if ((__67821_13_alloc->size) >= __67798_41_size) {
+__67813_9_ptr = (__67821_13_alloc->ptr);
+(*__67799_42_actual_size) = (__67821_13_alloc->size);
+_ZN3edg9Dyn_arrayINS_6detail21a_reusable_allocationENS_17General_allocatorEE6removeEy(_ZN3edg6detail16reusable_fe_listE, (__67820_17_i - 1ULL));
+goto __T893283240;
 }
-} __T88296800:; }
+} __T893283240:; }
 }
-if (__67681_9_ptr == ((void *)0)) {
+if (__67813_9_ptr == ((void *)0)) {
 
-__67681_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67666_41_size)));
-(*__67667_42_actual_size) = __67666_41_size;
+__67813_9_ptr = ((void *)(_ZN3edg15alloc_in_regionEiy(0, __67798_41_size)));
+(*__67799_42_actual_size) = __67798_41_size;
 }
-return (char *)__67681_9_ptr;
+return (char *)__67813_9_ptr;
 }
 #line 1146 "src/util.h"
- /* COMDAT group: _ZN3edg6new_feINS_13a_token_cacheEJRbjEEEPT_DpOT0_ */ struct _ZN3edg13a_token_cacheE *_ZN3edg6new_feINS_13a_token_cacheEJRbjEEEPT_DpOT0_( _ZN3edg9a_booleanE *__2_34735_43_args,  unsigned *__1_34735_43_args)
+ /* COMDAT group: _ZN3edg6new_feINS_13a_token_cacheEJRbjEEEPT_DpOT0_ */ struct _ZN3edg13a_token_cacheE *_ZN3edg6new_feINS_13a_token_cacheEJRbjEEEPT_DpOT0_( _ZN3edg9a_booleanE *__2_34867_43_args,  unsigned *__1_34867_43_args)
 
 
 
 
-{ auto unsigned long long __T127136360; auto _ZZN3edg9constructIPNS_13a_token_cacheEJRbjEEEvT_DpOT0_E9an_object *__T127136656; auto _ZN3edg9a_booleanE __T127136952; auto size_t __T127137248; auto _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E12an_allocatorE
+{ auto unsigned long long __T932989472; auto _ZZN3edg9constructIPNS_13a_token_cacheEJRbjEEEvT_DpOT0_E9an_object *__T932989768; auto _ZN3edg9a_booleanE __T932990064; auto size_t __T932990360; auto _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E12an_allocatorE
 #line 1151
- __T127137544;
-auto struct _ZN3edg13a_token_cacheE *__34741_15_p; __34741_15_p = ((struct _ZN3edg13a_token_cacheE *)(_ZN3edg8alloc_feEy(32ULL)));
+ __T932990656;
+auto struct _ZN3edg13a_token_cacheE *__34873_15_p; __34873_15_p = ((struct _ZN3edg13a_token_cacheE *)(_ZN3edg8alloc_feEy(32ULL)));
 
-{ (_ZZN3edg9constructIPNS_13a_token_cacheEJRbjEEEvT_DpOT0_E9an_object *)((__T127136360 = 32ULL) , ((__T127136656 = ((_ZZN3edg9constructIPNS_13a_token_cacheEJRbjEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T127136360, ((void *)__34741_15_p))))) , ((((__T127136952 = (*((_ZN3edg9a_booleanE *)((
+{ (_ZZN3edg9constructIPNS_13a_token_cacheEJRbjEEEvT_DpOT0_E9an_object *)((__T932989472 = 32ULL) , ((__T932989768 = ((_ZZN3edg9constructIPNS_13a_token_cacheEJRbjEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T932989472, ((void *)__34873_15_p))))) , ((((__T932990064 = (*((_ZN3edg9a_booleanE *)((
 #line 1154
-_ZN3edg9a_booleanE *)__2_34735_43_args)))) , (__T127137248 = ((size_t)(*((unsigned *)((unsigned *)__1_34735_43_args)))))) , (((__T127136656->is_reusable) = ((_ZN3edg11a_bit_fieldE)__T127136952)) , (
+_ZN3edg9a_booleanE *)__2_34867_43_args)))) , (__T932990360 = ((size_t)(*((unsigned *)((unsigned *)__1_34867_43_args)))))) , (((__T932989768->is_reusable) = ((_ZN3edg11a_bit_fieldE)__T932990064)) , (
 #line 1154
-_ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_EC1EyRKNS3_IS4_EE((&(__T127136656->tokens)), __T127137248, (((const _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E12an_allocatorE *)&__T127137544)))))) , __T127136656)))
+_ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_EC1EyRKNS3_IS4_EE((&(__T932989768->tokens)), __T932990360, (((const _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E12an_allocatorE *)&__T932990656)))))) , __T932989768)))
 #line 1154
 ; }
-return __34741_15_p;
+return __34873_15_p;
 }
 #line 3275 "src/lexical.h"
  /* COMDAT group: _ZN3edg24curr_lexical_state_cacheEv */ _ZN3edg17a_token_cache_ptrE _ZN3edg24curr_lexical_state_cacheEv(void)
@@ -9922,38 +10089,38 @@ return __34741_15_p;
 
 
 
-{ auto const struct _ZN3edg22a_scanning_token_cacheE *__T124623592;
+{ auto const struct _ZN3edg22a_scanning_token_cacheE *__T929971656;
 
-(_ZNK3edg3OptINS_22a_scanning_token_cacheEE9has_valueEv((((const struct _ZN3edg3OptINS_22a_scanning_token_cacheEEE *)&(_ZN3edg30curr_lexical_state_stack_entryE->cache))))) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg24curr_lexical_state_cacheEvEs), 3282, __T91675704
+(_ZNK3edg3OptINS_22a_scanning_token_cacheEE9has_valueEv((((const struct _ZN3edg3OptINS_22a_scanning_token_cacheEEE *)&(_ZN3edg30curr_lexical_state_stack_entryE->cache))))) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg24curr_lexical_state_cacheEvEs), 3282, 
 #line 3282
-, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-return (__T124623592 = ((const struct _ZN3edg22a_scanning_token_cacheE *)(_ZN3edg3OptINS_22a_scanning_token_cacheEEptEv((&(_ZN3edg30curr_lexical_state_stack_entryE->cache)))))) , (__T124623592->backing_cache);
+__T897083184, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+return (__T929971656 = ((const struct _ZN3edg22a_scanning_token_cacheE *)(_ZN3edg3OptINS_22a_scanning_token_cacheEEptEv((&(_ZN3edg30curr_lexical_state_stack_entryE->cache)))))) , (__T929971656->backing_cache);
 }
 #line 1160 "src/util.h"
- /* COMDAT group: _ZN3edg9delete_feINS_13a_token_cacheEEEvPPT_ */ void _ZN3edg9delete_feINS_13a_token_cacheEEEvPPT_( struct _ZN3edg13a_token_cacheE **__34749_35_p)
+ /* COMDAT group: _ZN3edg9delete_feINS_13a_token_cacheEEEvPPT_ */ void _ZN3edg9delete_feINS_13a_token_cacheEEEvPPT_( struct _ZN3edg13a_token_cacheE **__34881_35_p)
 
 
 
 
-{ auto struct _ZN3edg13a_token_cacheE *__T127593632; auto _ZN3edg10a_void_ptrE __T127595192;
-if ((*__34749_35_p) != ((struct _ZN3edg13a_token_cacheE *)0)) {
-{ __T127593632 = (*__34749_35_p); { { _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_ED1Ev((&(__T127593632->tokens))); } } }
-{ __T127595192 = ((_ZN3edg10a_void_ptrE)(*__34749_35_p)); { if (__T127595192 == ((_ZN3edg10a_void_ptrE)0)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg7free_feEPvyEs), 427, __T88304048, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)); } else  { { 
+{ auto struct _ZN3edg13a_token_cacheE *__T933501976; auto _ZN3edg10a_void_ptrE __T933503536;
+if ((*__34881_35_p) != ((struct _ZN3edg13a_token_cacheE *)0)) {
+{ __T933501976 = (*__34881_35_p); { { _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_ED1Ev((&(__T933501976->tokens))); } } }
+{ __T933503536 = ((_ZN3edg10a_void_ptrE)(*__34881_35_p)); { if (__T933503536 == ((_ZN3edg10a_void_ptrE)0)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg7free_feEPvyEs), 427, __T893692232, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)); } else  { { 
 #line 1168
-_ZN3edg6detail14free_fe_normalEPvy(__T127595192, 32ULL); } } } }
-(*__34749_35_p) = ((struct _ZN3edg13a_token_cacheE *)0);
+_ZN3edg6detail14free_fe_normalEPvy(__T933503536, 32ULL); } } } }
+(*__34881_35_p) = ((struct _ZN3edg13a_token_cacheE *)0);
 } 
 }
 #line 11979 "src/lexical.h"
- /* COMDAT group: _ZN3edg28is_type_returning_type_traitENS_12a_token_kindE */ _ZN3edg9a_booleanE _ZN3edg28is_type_returning_type_traitENS_12a_token_kindE( unsigned short __83024_60_token)
+ /* COMDAT group: _ZN3edg28is_type_returning_type_traitENS_12a_token_kindE */ _ZN3edg9a_booleanE _ZN3edg28is_type_returning_type_traitENS_12a_token_kindE( unsigned short __83156_60_token)
 
 
 
 
 {
-auto _ZN3edg9a_booleanE __83030_13_result;
+auto _ZN3edg9a_booleanE __83162_13_result;
 
-switch ((int)__83024_60_token) {
+switch ((int)__83156_60_token) {
 case 318:
 case 425:
 case 426:
@@ -9971,56 +10138,56 @@ case 437:
 case 438:
 case 439:
 case 440:
-__83030_13_result = ((_ZN3edg9a_booleanE)1);
-goto __T93089440;
+__83162_13_result = ((_ZN3edg9a_booleanE)1);
+goto __T898503056;
 default:
-__83030_13_result = ((_ZN3edg9a_booleanE)0);
-goto __T93089440;
-} __T93089440:;
-return __83030_13_result;
+__83162_13_result = ((_ZN3edg9a_booleanE)0);
+goto __T898503056;
+} __T898503056:;
+return __83162_13_result;
 }
 #line 38 "src/types.h"
- /* COMDAT group: _ZN3edg13skip_typerefsEPNS_6a_typeE */ _ZN3edg10a_type_ptrE _ZN3edg13skip_typerefsEPNS_6a_typeE( _ZN3edg10a_type_ptrE __100914_44_type_ptr)
+ /* COMDAT group: _ZN3edg13skip_typerefsEPNS_6a_typeE */ _ZN3edg10a_type_ptrE _ZN3edg13skip_typerefsEPNS_6a_typeE( _ZN3edg10a_type_ptrE __101046_44_type_ptr)
 #line 45
 {
-while (((int)(__100914_44_type_ptr->kind)) == 12) {
-__100914_44_type_ptr = (((__100914_44_type_ptr->variant).typeref).type);
+while (((int)(__101046_44_type_ptr->kind)) == 12) {
+__101046_44_type_ptr = (((__101046_44_type_ptr->variant).typeref).type);
 
 
 
 
 }
-return __100914_44_type_ptr;
+return __101046_44_type_ptr;
 }
 #line 90 "src/disambig.c"
-static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19init_disambig_stateEPNS0_16a_disambig_stateEbbb( _ZN3edg20a_disambig_state_ptrE __147554_54_dsp, 
-_ZN3edg9a_booleanE __147555_16_check_if_is_decl, 
-_ZN3edg9a_booleanE __147556_16_suppress_packs, 
-_ZN3edg9a_booleanE __147557_16_cache_tokens)
+static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19init_disambig_stateEPNS0_16a_disambig_stateEbbb( _ZN3edg20a_disambig_state_ptrE __147686_54_dsp, 
+_ZN3edg9a_booleanE __147687_16_check_if_is_decl, 
+_ZN3edg9a_booleanE __147688_16_suppress_packs, 
+_ZN3edg9a_booleanE __147689_16_cache_tokens)
 #line 102
 {
-(__147554_54_dsp->check_if_is_decl) = __147555_16_check_if_is_decl;
-(__147554_54_dsp->decl_class_type) = ((_ZN3edg10a_type_ptrE)0);
-(__147554_54_dsp->may_be_decl) = ((_ZN3edg9a_booleanE)1);
-(__147554_54_dsp->terminate) = ((_ZN3edg9a_booleanE)0);
-(__147554_54_dsp->set_decl_class_type) = ((_ZN3edg9a_booleanE)0);
-(__147554_54_dsp->friend_encountered) = ((_ZN3edg9a_booleanE)0);
+(__147686_54_dsp->check_if_is_decl) = __147687_16_check_if_is_decl;
+(__147686_54_dsp->decl_class_type) = ((_ZN3edg10a_type_ptrE)0);
+(__147686_54_dsp->may_be_decl) = ((_ZN3edg9a_booleanE)1);
+(__147686_54_dsp->terminate) = ((_ZN3edg9a_booleanE)0);
+(__147686_54_dsp->set_decl_class_type) = ((_ZN3edg9a_booleanE)0);
+(__147686_54_dsp->friend_encountered) = ((_ZN3edg9a_booleanE)0);
 
-(__147554_54_dsp->cache_tokens) = __147557_16_cache_tokens;
+(__147686_54_dsp->cache_tokens) = __147689_16_cache_tokens;
 
 
 
-(__147554_54_dsp->find_static_specifier_only) = ((_ZN3edg9a_booleanE)0);
-(__147554_54_dsp->static_specifier_seen) = ((_ZN3edg9a_booleanE)0);
+(__147686_54_dsp->find_static_specifier_only) = ((_ZN3edg9a_booleanE)0);
+(__147686_54_dsp->static_specifier_seen) = ((_ZN3edg9a_booleanE)0);
 
-(__147554_54_dsp->suppress_packs) = __147556_16_suppress_packs;
-(__147554_54_dsp->first_tsn) = _ZN3edg26curr_token_sequence_numberE;
+(__147686_54_dsp->suppress_packs) = __147688_16_suppress_packs;
+(__147686_54_dsp->first_tsn) = _ZN3edg26curr_token_sequence_numberE;
 
-if (__147557_16_cache_tokens) {
+if (__147689_16_cache_tokens) {
 _ZN3edg28begin_caching_fetched_tokensEb(((_ZN3edg9a_booleanE)1));
 }
 
-_ZN3edg21begin_prescan_contextEbPbPPNS_28a_pack_expansion_stack_entryES0_S0_(__147556_16_suppress_packs, (&(__147554_54_dsp->variadic_prototype_instantiation)), (&(__147554_54_dsp->pack_expansion_stack_entry)), (&(__147554_54_dsp->saved_in_disambiguation)), (&(__147554_54_dsp->
+_ZN3edg21begin_prescan_contextEbPbPPNS_28a_pack_expansion_stack_entryES0_S0_(__147688_16_suppress_packs, (&(__147686_54_dsp->variadic_prototype_instantiation)), (&(__147686_54_dsp->pack_expansion_stack_entry)), (&(__147686_54_dsp->saved_in_disambiguation)), (&(__147686_54_dsp->
 #line 124
 saved_source_sequence_entries_disallowed))); 
 
@@ -10029,54 +10196,54 @@ saved_source_sequence_entries_disallowed)));
 }
 
 
-static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21wrapup_disambig_stateEPNS0_16a_disambig_stateE( _ZN3edg20a_disambig_state_ptrE __147595_56_dsp)
+static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21wrapup_disambig_stateEPNS0_16a_disambig_stateE( _ZN3edg20a_disambig_state_ptrE __147727_56_dsp)
 
 
 
 {
 #line 141
-if (__147595_56_dsp->cache_tokens) {
+if (__147727_56_dsp->cache_tokens) {
 _ZN3edg26end_caching_fetched_tokensEv();
-if (((_ZN3edg30curr_lexical_state_stack_entryE->last_tsn_in_cache) != (__147595_56_dsp->first_tsn)) || (((int)_ZN3edg10curr_tokenE) == 9))
+if (((_ZN3edg30curr_lexical_state_stack_entryE->last_tsn_in_cache) != (__147727_56_dsp->first_tsn)) || (((int)_ZN3edg10curr_tokenE) == 9))
 {
-auto struct _ZN3edg22a_scanning_token_cacheE __147609_30_cache; _ZN3edg22a_scanning_token_cacheC1Eb((&__147609_30_cache), ((_ZN3edg9a_booleanE)0));
+auto struct _ZN3edg22a_scanning_token_cacheE __147741_30_cache; _ZN3edg22a_scanning_token_cacheC1Eb((&__147741_30_cache), ((_ZN3edg9a_booleanE)0));
 
 
 
-_ZN3edg22copy_tokens_from_cacheEPKNS_13a_token_cacheEjjbPS0_(((const struct _ZN3edg13a_token_cacheE *)(_ZN3edg24curr_lexical_state_cacheEv())), (__147595_56_dsp->first_tsn), _ZN3edg35last_token_sequence_number_of_tokenE, ((_ZN3edg9a_booleanE)1), (((*(const struct _ZN3edg22a_scanning_token_cacheE *)&
+_ZN3edg22copy_tokens_from_cacheEPKNS_13a_token_cacheEjjbPS0_(((const struct _ZN3edg13a_token_cacheE *)(_ZN3edg24curr_lexical_state_cacheEv())), (__147727_56_dsp->first_tsn), _ZN3edg35last_token_sequence_number_of_tokenE, ((_ZN3edg9a_booleanE)1), (((*(const struct _ZN3edg22a_scanning_token_cacheE *)&
 #line 149
-__147609_30_cache)).backing_cache));
+__147741_30_cache)).backing_cache));
 
 
-_ZN3edg20rescan_cached_tokensEPNS_13a_token_cacheEb((((*(const struct _ZN3edg22a_scanning_token_cacheE *)&__147609_30_cache)).backing_cache), ((_Bool)(((int)_ZN3edg10curr_tokenE) != 9)));
+_ZN3edg20rescan_cached_tokensEPNS_13a_token_cacheEb((((*(const struct _ZN3edg22a_scanning_token_cacheE *)&__147741_30_cache)).backing_cache), ((_Bool)(((int)_ZN3edg10curr_tokenE) != 9)));
 
 
-_ZN3edg22a_scanning_token_cacheD1Ev((&__147609_30_cache)); }
+_ZN3edg22a_scanning_token_cacheD1Ev((&__147741_30_cache)); }
 }
 
-_ZN3edg19end_prescan_contextEbPNS_28a_pack_expansion_stack_entryEbb((__147595_56_dsp->variadic_prototype_instantiation), (__147595_56_dsp->pack_expansion_stack_entry), (__147595_56_dsp->saved_in_disambiguation), (__147595_56_dsp->saved_source_sequence_entries_disallowed)); 
+_ZN3edg19end_prescan_contextEbPNS_28a_pack_expansion_stack_entryEbb((__147727_56_dsp->variadic_prototype_instantiation), (__147727_56_dsp->pack_expansion_stack_entry), (__147727_56_dsp->saved_in_disambiguation), (__147727_56_dsp->saved_source_sequence_entries_disallowed)); 
 
 
 
 }
 #line 227
-static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg18cache_tokens_untilENS0_12a_token_kindEb( unsigned short __147691_46_stop_token, 
-_ZN3edg9a_booleanE __147692_22_coalesce)
+static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg18cache_tokens_untilENS0_12a_token_kindEb( unsigned short __147823_46_stop_token, 
+_ZN3edg9a_booleanE __147824_22_coalesce)
 #line 234
 {
-auto _ZN3edg17a_token_set_arrayE __147699_22_stop_token_array;
-auto _ZN3edg14a_cts_flag_setE __147700_22_options = 4U;
+auto _ZN3edg17a_token_set_arrayE __147831_22_stop_token_array;
+auto _ZN3edg14a_cts_flag_setE __147832_22_options = 4U;
 
-if (__147692_22_coalesce) {
-__147700_22_options |= 1U;
+if (__147824_22_coalesce) {
+__147832_22_options |= 1U;
 }
-memset(((void *)((char *)(__147699_22_stop_token_array))), 0, 453ULL);
-((__147699_22_stop_token_array)[((int)__147691_46_stop_token)])++;
+memset(((void *)((char *)(__147831_22_stop_token_array))), 0, 453ULL);
+((__147831_22_stop_token_array)[((int)__147823_46_stop_token)])++;
 
 
-((__147699_22_stop_token_array)[77])++;
-((__147699_22_stop_token_array)[81])++;
-_ZN3edg23cache_token_stream_fullEPNS_13a_token_cacheEPhj(((_ZN3edg17a_token_cache_ptrE)0), (__147699_22_stop_token_array), __147700_22_options); 
+((__147831_22_stop_token_array)[77])++;
+((__147831_22_stop_token_array)[81])++;
+_ZN3edg23cache_token_stream_fullEPNS_13a_token_cacheEPhj(((_ZN3edg17a_token_cache_ptrE)0), (__147831_22_stop_token_array), __147832_22_options); 
 }
 
 
@@ -10086,13 +10253,13 @@ static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19prescan_initializerEv(voi
 
 
 {
-auto _ZN3edg17a_token_set_arrayE __147721_22_stop_token_array;
+auto _ZN3edg17a_token_set_arrayE __147853_22_stop_token_array;
 
-memset(((void *)((char *)(__147721_22_stop_token_array))), 0, 453ULL);
-((__147721_22_stop_token_array)[71])++;
-((__147721_22_stop_token_array)[81])++;
-((__147721_22_stop_token_array)[31])++;
-_ZN3edg39cache_token_stream_coalesce_identifiersEPNS_13a_token_cacheEPh(((_ZN3edg17a_token_cache_ptrE)0), (__147721_22_stop_token_array)); 
+memset(((void *)((char *)(__147853_22_stop_token_array))), 0, 453ULL);
+((__147853_22_stop_token_array)[71])++;
+((__147853_22_stop_token_array)[81])++;
+((__147853_22_stop_token_array)[31])++;
+_ZN3edg39cache_token_stream_coalesce_identifiersEPNS_13a_token_cacheEPh(((_ZN3edg17a_token_cache_ptrE)0), (__147853_22_stop_token_array)); 
 
 }
 
@@ -10109,50 +10276,50 @@ if (((int)_ZN3edg10curr_tokenE) == 77) { _ZN3edg9get_tokenEv(); }
 
 
 static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(
-_ZN3edg19a_disambig_flag_setE __147744_26_flags, 
-_ZN3edg25an_identifier_options_setE __147745_31_gid_flags)
+_ZN3edg19a_disambig_flag_setE __147876_26_flags, 
+_ZN3edg25an_identifier_options_setE __147877_31_gid_flags)
 #line 289
 {
 _ZN3edg9get_tokenEv();
-(((int)_ZN3edg9C_dialectE) != 2) ? ((_Bool)(((int)_ZN3edg10curr_tokenE) == 1)) : (((((int)_ZN3edg10curr_tokenE) == 1) && (_ZN3edg19locator_for_curr_idE.has_been_coalesced)) ? ((_Bool)1) : (_ZN3edg33f_is_generalized_identifier_startEjPNS_6a_typeE(((0x4001U | ((((((int)__147744_26_flags) & 0x40) != 0)
+(((int)_ZN3edg9C_dialectE) != 2) ? ((_Bool)(((int)_ZN3edg10curr_tokenE) == 1)) : (((((int)_ZN3edg10curr_tokenE) == 1) && (_ZN3edg19locator_for_curr_idE.has_been_coalesced)) ? ((_Bool)1) : (_ZN3edg33f_is_generalized_identifier_startEjPNS_6a_typeE(((0x4001U | ((((((int)__147876_26_flags) & 0x40) != 0)
 #line 291
- && ((__147745_31_gid_flags & 0x800U) == 0U)) ? 0x400U : 0x0U)) | __147745_31_gid_flags), ((_ZN3edg10a_type_ptrE)0)))); 
+ && ((__147877_31_gid_flags & 0x800U) == 0U)) ? 0x400U : 0x0U)) | __147877_31_gid_flags), ((_ZN3edg10a_type_ptrE)0)))); 
 
 
 
 
 }
 #line 308
-static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg27prescan_until_closing_parenEt( _ZN3edg19a_disambig_flag_setE __147772_63_flags)
+static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg27prescan_until_closing_parenEt( _ZN3edg19a_disambig_flag_setE __147904_63_flags)
 #line 314
 {
-auto int __147779_7_paren_count = 0;
+auto int __147911_7_paren_count = 0;
 
 for (; ; ) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__147772_63_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__147904_63_flags, 0x0U);
 if (((int)_ZN3edg10curr_tokenE) == 31) {
 
 
-if (__147779_7_paren_count == 0) { goto __T123373656; }
-__147779_7_paren_count--;
+if (__147911_7_paren_count == 0) { goto __T928729656; }
+__147911_7_paren_count--;
 } else  { if (((int)_ZN3edg10curr_tokenE) == 30) {
-__147779_7_paren_count++;
+__147911_7_paren_count++;
 } else  { if (((((int)_ZN3edg10curr_tokenE) == 81) || (((int)_ZN3edg10curr_tokenE) == 9)) || (((int)_ZN3edg10curr_tokenE) == 76))
 
 {
-goto __T123373656;
+goto __T928729656;
 } } }
-} __T123373656:; 
+} __T928729656:; 
 }
 #line 339
-static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg31prescan_extended_decl_modifiersEt( _ZN3edg19a_disambig_flag_setE __147803_67_flags)
+static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg31prescan_extended_decl_modifiersEt( _ZN3edg19a_disambig_flag_setE __147935_67_flags)
 #line 353
 {
 for (; ; ) { {
 
 if ((((int)_ZN3edg10curr_tokenE) == 209) || (((int)_ZN3edg10curr_tokenE) == 210)) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__147803_67_flags, 0x0U);
-goto __T123382472;
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__147935_67_flags, 0x0U);
+goto __T928738392;
 #line 365
 }
 
@@ -10162,44 +10329,44 @@ if (((int)_ZN3edg10curr_tokenE) == 139) {
 _ZN3edg9get_tokenEv();
 if (((int)_ZN3edg10curr_tokenE) == 30) {
 #line 377
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg27prescan_until_closing_parenEt(__147803_67_flags);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg27prescan_until_closing_parenEt(__147935_67_flags);
 if (((int)_ZN3edg10curr_tokenE) == 31) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__147803_67_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__147935_67_flags, 0x0U);
 }
 }
 } else  {
 #line 388
-auto _ZN3edg9a_booleanE __147852_17_done = ((_ZN3edg9a_booleanE)1);
+auto _ZN3edg9a_booleanE __147984_17_done = ((_ZN3edg9a_booleanE)1);
 if ((((int)_ZN3edg10curr_tokenE) == 1) && ((_ZN3edg19locator_for_curr_idE.symbol_header) != ((_ZN3edg19a_symbol_header_ptrE)0)))
 {
-auto _ZN3edg12a_const_charE *__147855_23_name; __147855_23_name = ((_ZN3edg19locator_for_curr_idE.symbol_header)->identifier);
-if (((int)(*(__147855_23_name++))) == 95) {
-if (((int)(*__147855_23_name)) == 95) { __147855_23_name++; }
+auto _ZN3edg12a_const_charE *__147987_23_name; __147987_23_name = ((_ZN3edg19locator_for_curr_idE.symbol_header)->identifier);
+if (((int)(*(__147987_23_name++))) == 95) {
+if (((int)(*__147987_23_name)) == 95) { __147987_23_name++; }
 
-if ((((strcmp(__147855_23_name, ((const char *)"single_inheritance"))) == 0) || ((strcmp(__147855_23_name, ((const char *)"multiple_inheritance"))) == 0)) || ((strcmp(__147855_23_name, ((const char *)"virtual_inheritance"))) == 0))
+if ((((strcmp(__147987_23_name, ((const char *)"single_inheritance"))) == 0) || ((strcmp(__147987_23_name, ((const char *)"multiple_inheritance"))) == 0)) || ((strcmp(__147987_23_name, ((const char *)"virtual_inheritance"))) == 0))
 
 {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__147803_67_flags, 0x0U);
-__147852_17_done = ((_ZN3edg9a_booleanE)0);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__147935_67_flags, 0x0U);
+__147984_17_done = ((_ZN3edg9a_booleanE)0);
 }
 }
 }
-if (__147852_17_done) { goto __T123401928; }
-}
-
-} __T123382472:; } __T123401928:; 
+if (__147984_17_done) { goto __T928757848; }
 }
 
+} __T928738392:; } __T928757848:; 
+}
 
 
-static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_std_attributeEt( _ZN3edg19a_disambig_flag_setE __147875_57_flags)
+
+static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_std_attributeEt( _ZN3edg19a_disambig_flag_setE __148007_57_flags)
 #line 422
 {
-(((int)_ZN3edg10curr_tokenE) == 28) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/disambig.c"), 423, __T123257480, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(((int)_ZN3edg10curr_tokenE) == 28) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/disambig.c"), 423, __T928580216, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
 _ZN3edg9get_tokenEv();
 if (((int)_ZN3edg10curr_tokenE) == 28) {
-auto int __147891_10_bracket_count = 0;
+auto int __148023_10_bracket_count = 0;
 
 _ZN3edg9get_tokenEv();
 
@@ -10207,19 +10374,19 @@ for (; ; ) {
 _ZN3edg9get_tokenEv();
 if (((int)_ZN3edg10curr_tokenE) == 29) {
 
-if (__147891_10_bracket_count == 0) { goto __T123413536; }
-__147891_10_bracket_count--;
+if (__148023_10_bracket_count == 0) { goto __T928769456; }
+__148023_10_bracket_count--;
 } else  { if (((int)_ZN3edg10curr_tokenE) == 28) {
-__147891_10_bracket_count++;
+__148023_10_bracket_count++;
 } else  { if (((int)_ZN3edg10curr_tokenE) == 9) {
-goto __T123413536;
+goto __T928769456;
 } } }
-} __T123413536:;
+} __T928769456:;
 
 if (((int)_ZN3edg10curr_tokenE) == 29) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__147875_57_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148007_57_flags, 0x0U);
 if (((int)_ZN3edg10curr_tokenE) == 29) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__147875_57_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148007_57_flags, 0x0U);
 }
 }
 } 
@@ -10227,10 +10394,10 @@ _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifie
 
 
 
-static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_gnu_attributeEt( _ZN3edg19a_disambig_flag_setE __147919_57_flags)
+static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_gnu_attributeEt( _ZN3edg19a_disambig_flag_setE __148051_57_flags)
 #line 466
 {
-(((int)_ZN3edg10curr_tokenE) == 211) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/disambig.c"), 467, __T123259528, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(((int)_ZN3edg10curr_tokenE) == 211) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/disambig.c"), 467, __T928582272, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
 _ZN3edg9get_tokenEv();
 if (((int)_ZN3edg10curr_tokenE) == 30) {
@@ -10240,22 +10407,22 @@ if (((int)_ZN3edg10curr_tokenE) == 30) {
 
 _ZN3edg9get_tokenEv();
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg27prescan_until_closing_parenEt(__147919_57_flags);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg27prescan_until_closing_parenEt(__148051_57_flags);
 
 if (((int)_ZN3edg10curr_tokenE) == 31) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__147919_57_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148051_57_flags, 0x0U);
 }
 }
 if (((int)_ZN3edg10curr_tokenE) == 31) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__147919_57_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148051_57_flags, 0x0U);
 }
 } 
 }
 #line 493
-static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg22prescan_based_modifierEt( _ZN3edg19a_disambig_flag_setE __147957_63_flags)
+static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg22prescan_based_modifierEt( _ZN3edg19a_disambig_flag_setE __148089_63_flags)
 #line 502
 {
-if (!(((int)_ZN3edg10curr_tokenE) == 159)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/disambig.c"), 505, __T123261320, ((const char *)"prescan_based_modifier:"), ((const char *)"curr_token not tok_based"
+if (!(((int)_ZN3edg10curr_tokenE) == 159)) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/disambig.c"), 505, __T928584072, ((const char *)"prescan_based_modifier:"), ((const char *)"curr_token not tok_based"
 #line 503
 )); }
 
@@ -10264,13 +10431,13 @@ if (!(((int)_ZN3edg10curr_tokenE) == 159)) { _ZN3edg16assertion_failedEPKciS1_S1
 _ZN3edg9get_tokenEv();
 if (((int)_ZN3edg10curr_tokenE) == 30) {
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__147957_63_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148089_63_flags, 0x0U);
 if (((int)_ZN3edg10curr_tokenE) == 1) {
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__147957_63_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148089_63_flags, 0x0U);
 if (((int)_ZN3edg10curr_tokenE) == 31) {
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__147957_63_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148089_63_flags, 0x0U);
 }
 }
 } 
@@ -10279,20 +10446,20 @@ _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifie
 
 
 static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg39prescan_any_prefix_bracketed_attributesEt(
-_ZN3edg19a_disambig_flag_setE __147989_73_flags)
+_ZN3edg19a_disambig_flag_setE __148121_73_flags)
 #line 531
 {
 while ((((int)_ZN3edg10curr_tokenE) == 28) && (!(((int)_ZN3edg9C_dialectE) != 2))) {
-auto _ZN3edg9a_booleanE __147997_16_attr_next; __147997_16_attr_next = ((_Bool)(((((int)_ZN3edg10curr_tokenE) == 28) && (_ZN3edg22std_attributes_enabledE)) && (((int)(_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)
+auto _ZN3edg9a_booleanE __148129_16_attr_next; __148129_16_attr_next = ((_Bool)(((((int)_ZN3edg10curr_tokenE) == 28) && (_ZN3edg22std_attributes_enabledE)) && (((int)(_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)
 #line 533
 ))) == 28)));
 
-if (((!(__147997_16_attr_next)) && (_ZN3edg13ms_extensionsE)) && (!(_ZN3edg9is_lambdaEv()))) {
-__147997_16_attr_next = ((_ZN3edg9a_booleanE)1);
+if (((!(__148129_16_attr_next)) && (_ZN3edg13ms_extensionsE)) && (!(_ZN3edg9is_lambdaEv()))) {
+__148129_16_attr_next = ((_ZN3edg9a_booleanE)1);
 }
 
 
-if (!(__147997_16_attr_next)) { goto __T123452496; }
+if (!(__148129_16_attr_next)) { goto __T928808424; }
 
 
 
@@ -10300,45 +10467,45 @@ _ZN3edg9get_tokenEv();
 
 _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg18cache_tokens_untilENS0_12a_token_kindEb(_ZN3edg12tok_rbracketE, ((_ZN3edg9a_booleanE)0));
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__147989_73_flags, 0x0U);
-} __T123452496:; 
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148121_73_flags, 0x0U);
+} __T928808424:; 
 }
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg29is_token_allowed_after_typeofENS0_12a_token_kindE( unsigned short __148017_61_token)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg29is_token_allowed_after_typeofENS0_12a_token_kindE( unsigned short __148149_61_token)
 
 
 
 {
-auto _ZN3edg9a_booleanE __148022_13_result = ((_ZN3edg9a_booleanE)0);
+auto _ZN3edg9a_booleanE __148154_13_result = ((_ZN3edg9a_booleanE)0);
 
-switch ((int)__148017_61_token) {
+switch ((int)__148149_61_token) {
 case 34:
 case 35:
 case 28:
 case 32:
 case 33:
 case 30:
-__148022_13_result = ((_ZN3edg9a_booleanE)1);
-goto __T123463040;
+__148154_13_result = ((_ZN3edg9a_booleanE)1);
+goto __T928818968;
 default:
-goto __T123463040;
-} __T123463040:;
-return __148022_13_result;
+goto __T928818968;
+} __T928818968:;
+return __148154_13_result;
 }
 
 
-static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_type_operatorEPNS0_16a_disambig_stateEt( _ZN3edg20a_disambig_state_ptrE __148040_62_state, 
-_ZN3edg19a_disambig_flag_setE __148041_34_flags)
+static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_type_operatorEPNS0_16a_disambig_stateEt( _ZN3edg20a_disambig_state_ptrE __148172_62_state, 
+_ZN3edg19a_disambig_flag_setE __148173_34_flags)
 #line 584
 {
-auto _ZN3edg9a_booleanE __148049_13_is_typeof; __148049_13_is_typeof = ((_Bool)(((int)_ZN3edg10curr_tokenE) == 258));
+auto _ZN3edg9a_booleanE __148181_13_is_typeof; __148181_13_is_typeof = ((_Bool)(((int)_ZN3edg10curr_tokenE) == 258));
 
 _ZN3edg9get_tokenEv();
 if (((int)_ZN3edg10curr_tokenE) == 30) {
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148041_34_flags, 0x0U);
-if ((((__148049_13_is_typeof) && (_ZN3edg8gpp_modeE)) && (_ZN3edg11gnu_versionE >= 30400UL)) && (!(_ZN3edg16is_decl_not_exprEt(((_ZN3edg19a_disambig_flag_setE)3U)))))
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148173_34_flags, 0x0U);
+if ((((__148181_13_is_typeof) && (_ZN3edg8gpp_modeE)) && (_ZN3edg11gnu_versionE >= 30400UL)) && (!(_ZN3edg16is_decl_not_exprEt(((_ZN3edg19a_disambig_flag_setE)3U)))))
 
 {
 
@@ -10348,10 +10515,12 @@ if (_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg29is_token_allowed_after_typeofENS0
 
 
 
-(__148040_62_state->may_be_decl) = ((_ZN3edg9a_booleanE)1);
-(__148040_62_state->terminate) = ((_ZN3edg9a_booleanE)1);
+(__148172_62_state->may_be_decl) = ((_ZN3edg9a_booleanE)1);
+(__148172_62_state->terminate) = ((_ZN3edg9a_booleanE)1);
 
-(!(__148040_62_state->set_decl_class_type)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/disambig.c"), 604, __T123267144, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(!(__148172_62_state->set_decl_class_type)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/disambig.c"), 604, __T928589904, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *
+#line 604
+)0)));
 }
 } else  {
 
@@ -10367,38 +10536,38 @@ static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg25is_ctor_dto
 
 
 {
-auto _ZN3edg9a_booleanE __148084_13_result = ((_ZN3edg9a_booleanE)0);
-auto _ZN3edg9a_booleanE __148085_13_err;
+auto _ZN3edg9a_booleanE __148216_13_result = ((_ZN3edg9a_booleanE)0);
+auto _ZN3edg9a_booleanE __148217_13_err;
 
 if (_ZN3edg19locator_for_curr_idE.is_qualified_name) {
 if (_ZN3edg19locator_for_curr_idE.is_destructor_name) {
 
-__148084_13_result = ((_ZN3edg9a_booleanE)1);
+__148216_13_result = ((_ZN3edg9a_booleanE)1);
 
 } else  { if ((_ZN3edg17cli_or_cx_enabledE) && (_ZN3edg19locator_for_curr_idE.is_finalizer_name)) {
 
-__148084_13_result = ((_ZN3edg9a_booleanE)1);
+__148216_13_result = ((_ZN3edg9a_booleanE)1);
 
 
 } else  {
 
 
 
-auto _ZN3edg12a_symbol_ptrE __148101_20_sym;
-_ZN3edg34coalesce_and_lookup_qualified_nameEjNS_25an_identifier_lookup_modeEPb(0x1U, _ZN3edg18ilm_tentative_typeE, (&__148085_13_err));
+auto _ZN3edg12a_symbol_ptrE __148233_20_sym;
+_ZN3edg34coalesce_and_lookup_qualified_nameEjNS_25an_identifier_lookup_modeEPb(0x1U, _ZN3edg18ilm_tentative_typeE, (&__148217_13_err));
 
 
-__148101_20_sym = (_ZN3edg19locator_for_curr_idE.specific_symbol);
-if (__148101_20_sym != ((_ZN3edg12a_symbol_ptrE)0)) {
-if (((int)(_ZN3edg32special_function_kind_for_symbolEPNS_8a_symbolE(__148101_20_sym))) == 1) {
-__148084_13_result = ((_ZN3edg9a_booleanE)1);
-} else  { if (((((_ZN3edg8gpp_modeE) && ((((int)(__148101_20_sym->kind)) == 3) && (((__148101_20_sym->variant).type).is_injected_class_name))) && (_ZN3edg19locator_for_curr_idE.is_qualified_name)) && (_ZN3edg19locator_for_curr_idE.is_class_member)) && ((((_ZN3edg19locator_for_curr_idE.
+__148233_20_sym = (_ZN3edg19locator_for_curr_idE.specific_symbol);
+if (__148233_20_sym != ((_ZN3edg12a_symbol_ptrE)0)) {
+if (((int)(_ZN3edg32special_function_kind_for_symbolEPNS_8a_symbolE(__148233_20_sym))) == 1) {
+__148216_13_result = ((_ZN3edg9a_booleanE)1);
+} else  { if (((((_ZN3edg8gpp_modeE) && ((((int)(__148233_20_sym->kind)) == 3) && (((__148233_20_sym->variant).type).is_injected_class_name))) && (_ZN3edg19locator_for_curr_idE.is_qualified_name)) && (_ZN3edg19locator_for_curr_idE.is_class_member)) && ((((_ZN3edg19locator_for_curr_idE.
 #line 645
-is_class_member) ? ((_ZN3edg19locator_for_curr_idE.parent).class_type) : ((_ZN3edg10a_type_ptrE)0)) == ((__148101_20_sym->parent).class_type)) || ((((((_ZN3edg19locator_for_curr_idE.is_class_member) ? ((_ZN3edg19locator_for_curr_idE.parent).class_type) : ((_ZN3edg10a_type_ptrE)0)) != ((
+is_class_member) ? ((_ZN3edg19locator_for_curr_idE.parent).class_type) : ((_ZN3edg10a_type_ptrE)0)) == ((__148233_20_sym->parent).class_type)) || ((((((_ZN3edg19locator_for_curr_idE.is_class_member) ? ((_ZN3edg19locator_for_curr_idE.parent).class_type) : ((_ZN3edg10a_type_ptrE)0)) != ((
 #line 645
-_ZN3edg10a_type_ptrE)0)) && (((__148101_20_sym->parent).class_type) != ((_ZN3edg10a_type_ptrE)0))) && (_ZN3edg12in_front_endE)) && ((((((_ZN3edg19locator_for_curr_idE.is_class_member) ? ((_ZN3edg19locator_for_curr_idE.parent).class_type) : ((_ZN3edg10a_type_ptrE)0))->source_corresp).
+_ZN3edg10a_type_ptrE)0)) && (((__148233_20_sym->parent).class_type) != ((_ZN3edg10a_type_ptrE)0))) && (_ZN3edg12in_front_endE)) && ((((((_ZN3edg19locator_for_curr_idE.is_class_member) ? ((_ZN3edg19locator_for_curr_idE.parent).class_type) : ((_ZN3edg10a_type_ptrE)0))->source_corresp).
 #line 645
-trans_unit_corresp) == ((((__148101_20_sym->parent).class_type)->source_corresp).trans_unit_corresp)) && (((((_ZN3edg19locator_for_curr_idE.is_class_member) ? ((_ZN3edg19locator_for_curr_idE.parent).class_type) : ((_ZN3edg10a_type_ptrE)0))->source_corresp).trans_unit_corresp) != ((struct 
+trans_unit_corresp) == ((((__148233_20_sym->parent).class_type)->source_corresp).trans_unit_corresp)) && (((((_ZN3edg19locator_for_curr_idE.is_class_member) ? ((_ZN3edg19locator_for_curr_idE.parent).class_type) : ((_ZN3edg10a_type_ptrE)0))->source_corresp).trans_unit_corresp) != ((struct 
 #line 645
 _ZN3edg20a_trans_unit_correspE *)0))))))
 
@@ -10408,53 +10577,53 @@ _ZN3edg20a_trans_unit_correspE *)0))))))
 
 
 
-__148084_13_result = ((_ZN3edg9a_booleanE)1);
+__148216_13_result = ((_ZN3edg9a_booleanE)1);
 } }
 }
 } }
 }
-return __148084_13_result;
+return __148216_13_result;
 }
 
 
-static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg23prescan_decl_specifiersEPNS0_16a_disambig_stateEt( _ZN3edg20a_disambig_state_ptrE __148126_64_state, 
-_ZN3edg19a_disambig_flag_setE __148127_64_flags)
+static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg23prescan_decl_specifiersEPNS0_16a_disambig_stateEt( _ZN3edg20a_disambig_state_ptrE __148258_64_state, 
+_ZN3edg19a_disambig_flag_setE __148259_64_flags)
 
 
 
 {
-auto _ZN3edg9a_booleanE __148132_17_is_decl_specifier_token = ((_ZN3edg9a_booleanE)1);
-auto _ZN3edg9a_booleanE __148133_17_any_decl_specifiers = ((_ZN3edg9a_booleanE)0);
-auto _ZN3edg9a_booleanE __148134_17_type_specifier_seen = ((_ZN3edg9a_booleanE)0);
-auto _ZN3edg9a_booleanE __148135_17_is_ctor_dtor_or_finalizer_name = ((_ZN3edg9a_booleanE)0);
-auto _ZN3edg9a_booleanE __148136_17_is_typename = ((_ZN3edg9a_booleanE)0);
-auto _ZN3edg12a_symbol_ptrE __148137_17_sym;
+auto _ZN3edg9a_booleanE __148264_17_is_decl_specifier_token = ((_ZN3edg9a_booleanE)1);
+auto _ZN3edg9a_booleanE __148265_17_any_decl_specifiers = ((_ZN3edg9a_booleanE)0);
+auto _ZN3edg9a_booleanE __148266_17_type_specifier_seen = ((_ZN3edg9a_booleanE)0);
+auto _ZN3edg9a_booleanE __148267_17_is_ctor_dtor_or_finalizer_name = ((_ZN3edg9a_booleanE)0);
+auto _ZN3edg9a_booleanE __148268_17_is_typename = ((_ZN3edg9a_booleanE)0);
+auto _ZN3edg12a_symbol_ptrE __148269_17_sym;
 
 
 
-(!(((int)_ZN3edg9C_dialectE) != 2)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/disambig.c"), 677, __T123270944, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(!(((int)_ZN3edg9C_dialectE) != 2)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/disambig.c"), 677, __T928856008, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 for (; ; ) {
-auto _ZN3edg9a_booleanE __148143_15_next_token_fetched = ((_ZN3edg9a_booleanE)0);
+auto _ZN3edg9a_booleanE __148275_15_next_token_fetched = ((_ZN3edg9a_booleanE)0);
 switch ((int)_ZN3edg10curr_tokenE) {
 
 case 83:
-if (_ZN3edg27auto_type_specifier_enabledE) { __148134_17_type_specifier_seen = ((_ZN3edg9a_booleanE)1); }
-goto __T123534952;
+if (_ZN3edg27auto_type_specifier_enabledE) { __148266_17_type_specifier_seen = ((_ZN3edg9a_booleanE)1); }
+goto __T928956456;
 case 350:
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148127_64_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148259_64_flags, 0x0U);
 if (((int)_ZN3edg10curr_tokenE) == 30) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148127_64_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148259_64_flags, 0x0U);
 _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg18cache_tokens_untilENS0_12a_token_kindEb(_ZN3edg10tok_rparenE, ((_ZN3edg9a_booleanE)1));
-__148134_17_type_specifier_seen = ((_ZN3edg9a_booleanE)1);
+__148266_17_type_specifier_seen = ((_ZN3edg9a_booleanE)1);
 } else  {
-__148143_15_next_token_fetched = ((_ZN3edg9a_booleanE)1);
+__148275_15_next_token_fetched = ((_ZN3edg9a_booleanE)1);
 }
-goto __T123534952;
+goto __T928956456;
 
 case 107:
 
-(__148126_64_state->static_specifier_seen) = ((_ZN3edg9a_booleanE)1);
-if (__148126_64_state->find_static_specifier_only) { goto __148521_1_done; }
+(__148258_64_state->static_specifier_seen) = ((_ZN3edg9a_booleanE)1);
+if (__148258_64_state->find_static_specifier_only) { goto __148653_1_done; }
 ;
 
 case 102:
@@ -10478,75 +10647,75 @@ case 237:
 case 337:
 case 338:
 case 339:
-goto __T123534952;
+goto __T928956456;
 
 case 222:
-(__148126_64_state->friend_encountered) = ((_ZN3edg9a_booleanE)1);
-goto __T123534952;
+(__148258_64_state->friend_encountered) = ((_ZN3edg9a_booleanE)1);
+goto __T928956456;
 case 110:
-goto __T123534952;
+goto __T928956456;
 
 case 139:
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg31prescan_extended_decl_modifiersEt(__148127_64_flags);
-__148143_15_next_token_fetched = ((_ZN3edg9a_booleanE)1);
-goto __T123534952;
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg31prescan_extended_decl_modifiersEt(__148259_64_flags);
+__148275_15_next_token_fetched = ((_ZN3edg9a_booleanE)1);
+goto __T928956456;
 
 
 case 211:
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_gnu_attributeEt(__148127_64_flags);
-__148143_15_next_token_fetched = ((_ZN3edg9a_booleanE)1);
-goto __T123534952;
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_gnu_attributeEt(__148259_64_flags);
+__148275_15_next_token_fetched = ((_ZN3edg9a_booleanE)1);
+goto __T928956456;
 #line 755
 case 1:
 if ((((_ZN3edg19locator_for_curr_idE.symbol_header) != ((_ZN3edg19a_symbol_header_ptrE)0)) && ((_ZN3edg19locator_for_curr_idE.symbol_header)->has_intrinsic_name)) && (((int)(_ZN3edg25check_type_transform_nameEv())) != 0))
 
 {
-goto __148471_1_type_operator_case;
+goto __148603_1_type_operator_case;
 }
-__148137_17_sym = (_ZN3edg19locator_for_curr_idE.specific_symbol);
+__148269_17_sym = (_ZN3edg19locator_for_curr_idE.specific_symbol);
 #line 767
-__148135_17_is_ctor_dtor_or_finalizer_name = ((_Bool)(((((int)__148127_64_flags) & 0x40) != 0) && (_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg25is_ctor_dtor_or_finalizerEv())));
+__148267_17_is_ctor_dtor_or_finalizer_name = ((_Bool)(((((int)__148259_64_flags) & 0x40) != 0) && (_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg25is_ctor_dtor_or_finalizerEv())));
 
-if (((!(__148134_17_type_specifier_seen)) && (!(__148135_17_is_ctor_dtor_or_finalizer_name))) && (((_ZN3edg16curr_type_symbolEbbbbbb(((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)0), ((_Bool)(((((int)__148127_64_flags) & 0x800) != 0) && (_ZN3edg24relaxed_typename_enabledE)))
+if (((!(__148266_17_type_specifier_seen)) && (!(__148267_17_is_ctor_dtor_or_finalizer_name))) && (((_ZN3edg16curr_type_symbolEbbbbbb(((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)0), ((_Bool)(((((int)__148259_64_flags) & 0x800) != 0) && (_ZN3edg24relaxed_typename_enabledE)))
 #line 769
-, ((_ZN3edg9a_booleanE)0), _ZN3edg16concepts_enabledE)) != ((_ZN3edg12a_symbol_ptrE)0)) || ((__148137_17_sym != ((_ZN3edg12a_symbol_ptrE)0)) && (((int)(__148137_17_sym->kind)) == 19))))
+, ((_ZN3edg9a_booleanE)0), _ZN3edg16concepts_enabledE)) != ((_ZN3edg12a_symbol_ptrE)0)) || ((__148269_17_sym != ((_ZN3edg12a_symbol_ptrE)0)) && (((int)(__148269_17_sym->kind)) == 19))))
 
 
 {
 
 
 
-__148134_17_type_specifier_seen = ((_ZN3edg9a_booleanE)1);
+__148266_17_type_specifier_seen = ((_ZN3edg9a_booleanE)1);
 } else  {
-__148132_17_is_decl_specifier_token = ((_ZN3edg9a_booleanE)0);
+__148264_17_is_decl_specifier_token = ((_ZN3edg9a_booleanE)0);
 }
-if ((__148137_17_sym != ((_ZN3edg12a_symbol_ptrE)0)) && (!(((((int)(__148137_17_sym->kind)) == 4) || (((int)(__148137_17_sym->kind)) == 5)) && (((((__148137_17_sym->variant).class_struct_union).extra_info)->class_template) != ((_ZN3edg12a_symbol_ptrE)0))))) {
+if ((__148269_17_sym != ((_ZN3edg12a_symbol_ptrE)0)) && (!(((((int)(__148269_17_sym->kind)) == 4) || (((int)(__148269_17_sym->kind)) == 5)) && (((((__148269_17_sym->variant).class_struct_union).extra_info)->class_template) != ((_ZN3edg12a_symbol_ptrE)0))))) {
 
 
 
 { if (!(_ZN3edg19locator_for_curr_idE.do_not_clear_specific_symbol)) { (_ZN3edg19locator_for_curr_idE.specific_symbol) = ((_ZN3edg12a_symbol_ptrE)0); (_ZN3edg19locator_for_curr_idE.is_semivisible_nested_type) = 0U; } } ;
 }
-if (((((((_ZN3edg21pack_indexing_enabledE) || (((_ZN3edg8gpp_modeE) && (!(_ZN3edg10clang_modeE))) && (_ZN3edg11gnu_versionE >= 150000UL))) || (((_ZN3edg10clang_modeE) && (!(((int)_ZN3edg9C_dialectE) != 2))) && (_ZN3edg13clang_versionE >= 190000UL))) && (__148132_17_is_decl_specifier_token)) && (
+if (((((((_ZN3edg21pack_indexing_enabledE) || (((_ZN3edg8gpp_modeE) && (!(_ZN3edg10clang_modeE))) && (_ZN3edg11gnu_versionE >= 150000UL))) || (((_ZN3edg10clang_modeE) && (!(((int)_ZN3edg9C_dialectE) != 2))) && (_ZN3edg13clang_versionE >= 190000UL))) && (__148264_17_is_decl_specifier_token)) && (
 #line 786
-__148134_17_type_specifier_seen)) && (!(_ZN3edg19locator_for_curr_idE.is_qualified_name))) && (((int)(_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)))) == 82))
+__148266_17_type_specifier_seen)) && (!(_ZN3edg19locator_for_curr_idE.is_qualified_name))) && (((int)(_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)))) == 82))
 
 {
 #line 796
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148127_64_flags, 0x0U);
-__148143_15_next_token_fetched = ((_ZN3edg9a_booleanE)1);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148259_64_flags, 0x0U);
+__148275_15_next_token_fetched = ((_ZN3edg9a_booleanE)1);
 if ((((int)_ZN3edg10curr_tokenE) == 82) && (((int)(_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)))) == 28)) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148127_64_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148259_64_flags, 0x0U);
 if (((int)_ZN3edg10curr_tokenE) == 28) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148127_64_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148259_64_flags, 0x0U);
 _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg18cache_tokens_untilENS0_12a_token_kindEb(_ZN3edg12tok_rbracketE, ((_ZN3edg9a_booleanE)1));
 if (((int)_ZN3edg10curr_tokenE) == 29) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148127_64_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148259_64_flags, 0x0U);
 }
 }
 }
 }
-goto __T123534952;
+goto __T928956456;
 
 case 86:
 case 104:
@@ -10582,22 +10751,22 @@ case 366:
 case 367:
 case 368:
 case 369:
-__148134_17_type_specifier_seen = ((_ZN3edg9a_booleanE)1);
-goto __T123534952;
+__148266_17_type_specifier_seen = ((_ZN3edg9a_booleanE)1);
+goto __T928956456;
 case 100:
-__148134_17_type_specifier_seen = ((_ZN3edg9a_booleanE)1);
+__148266_17_type_specifier_seen = ((_ZN3edg9a_booleanE)1);
 if (((int)(_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)))) == 30) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148127_64_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148259_64_flags, 0x0U);
 if (((int)_ZN3edg10curr_tokenE) == 30) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148127_64_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148259_64_flags, 0x0U);
 _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg18cache_tokens_untilENS0_12a_token_kindEb(_ZN3edg10tok_rparenE, ((_ZN3edg9a_booleanE)1));
 if (((int)_ZN3edg10curr_tokenE) == 31) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148127_64_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148259_64_flags, 0x0U);
 }
 }
-__148143_15_next_token_fetched = ((_ZN3edg9a_booleanE)1);
+__148275_15_next_token_fetched = ((_ZN3edg9a_booleanE)1);
 }
-goto __T123534952;
+goto __T928956456;
 
 case 87:
 case 114:
@@ -10615,13 +10784,13 @@ case 210:
 case 150:
 case 174:
 
-goto __T123534952;
+goto __T928956456;
 case 252:
 if ((((int)(_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)))) == 78) && (_ZN3edg18reflection_enabledE)) {
 
 
-__148132_17_is_decl_specifier_token = ((_ZN3edg9a_booleanE)1);
-__148134_17_type_specifier_seen = ((_ZN3edg9a_booleanE)1);
+__148264_17_is_decl_specifier_token = ((_ZN3edg9a_booleanE)1);
+__148266_17_type_specifier_seen = ((_ZN3edg9a_booleanE)1);
 
 _ZN3edg9get_tokenEv();
 if (!(_ZN3edg39cache_token_stream_until_matching_tokenEPNS_13a_token_cacheEj(((struct _ZN3edg13a_token_cacheE *)0), 0U)))
@@ -10631,20 +10800,20 @@ if (((int)(_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token
 
 
 _ZN3edg9get_tokenEv();
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148127_64_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148259_64_flags, 0x0U);
 }
 } else  {
 
-(__148126_64_state->terminate) = ((_ZN3edg9a_booleanE)1);
+(__148258_64_state->terminate) = ((_ZN3edg9a_booleanE)1);
 }
-goto __T123534952;
+goto __T928956456;
 }
-goto __148393_1_elaborated_type_case;
+goto __148525_1_elaborated_type_case;
 case 93:
 
 
-{ auto unsigned short __148370_25_next_tok; __148370_25_next_tok = (_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)));
-if ((((int)__148370_25_next_tok) == 220) || (((int)__148370_25_next_tok) == 108)) {
+{ auto unsigned short __148502_25_next_tok; __148502_25_next_tok = (_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)));
+if ((((int)__148502_25_next_tok) == 220) || (((int)__148502_25_next_tok) == 108)) {
 _ZN3edg9get_tokenEv();
 _ZN3edg10curr_tokenE = _ZN3edg8tok_enumE;
 }
@@ -10666,14 +10835,14 @@ case 192:
 case 197:
 case 196:
 
-__148393_1_elaborated_type_case:;
+__148525_1_elaborated_type_case:;
 #line 936
-__148136_17_is_typename = ((_Bool)(((int)_ZN3edg10curr_tokenE) == 252));
+__148268_17_is_typename = ((_Bool)(((int)_ZN3edg10curr_tokenE) == 252));
 
 
 
 do {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148127_64_flags, ((((int)_ZN3edg10curr_tokenE) == 252) ? 0x800U : 0x0U));
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148259_64_flags, ((((int)_ZN3edg10curr_tokenE) == 252) ? 0x800U : 0x0U));
 
 
 } while (((0) || (_ZN3edg14microsoft_bugsE)) && (((int)_ZN3edg10curr_tokenE) == 252));
@@ -10681,39 +10850,39 @@ _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifie
 if ((_ZN3edg13ms_extensionsE) || (_ZN3edg9il_headerE.near_and_far_are_enabled)) {
 
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg31prescan_extended_decl_modifiersEt(__148127_64_flags);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg31prescan_extended_decl_modifiersEt(__148259_64_flags);
 }
 
-if (((__148136_17_is_typename) && (_ZN3edg14microsoft_modeE)) && (((int)_ZN3edg10curr_tokenE) != 1)) {
+if (((__148268_17_is_typename) && (_ZN3edg14microsoft_modeE)) && (((int)_ZN3edg10curr_tokenE) != 1)) {
 
-} else  { if (__148134_17_type_specifier_seen) {
+} else  { if (__148266_17_type_specifier_seen) {
 
 
-__148132_17_is_decl_specifier_token = ((_ZN3edg9a_booleanE)0);
+__148264_17_is_decl_specifier_token = ((_ZN3edg9a_booleanE)0);
 } else  {
 
 
 if (((int)_ZN3edg10curr_tokenE) != 1) {
-__148132_17_is_decl_specifier_token = ((_ZN3edg9a_booleanE)0);
+__148264_17_is_decl_specifier_token = ((_ZN3edg9a_booleanE)0);
 } else  {
-__148134_17_type_specifier_seen = ((_ZN3edg9a_booleanE)1);
+__148266_17_type_specifier_seen = ((_ZN3edg9a_booleanE)1);
 }
 } }
-if ((((int)__148127_64_flags) & 0x100) != 0) {
-auto unsigned short __148432_24_next_tok; __148432_24_next_tok = (_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)));
-if ((((int)__148432_24_next_tok) == 76) || (((int)__148432_24_next_tok) == 81)) {
+if ((((int)__148259_64_flags) & 0x100) != 0) {
+auto unsigned short __148564_24_next_tok; __148564_24_next_tok = (_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)));
+if ((((int)__148564_24_next_tok) == 76) || (((int)__148564_24_next_tok) == 81)) {
 
 
-(__148126_64_state->terminate) = ((_ZN3edg9a_booleanE)1);
+(__148258_64_state->terminate) = ((_ZN3edg9a_booleanE)1);
 }
 }
-goto __T123534952;
+goto __T928956456;
 case 82:
 
 
 
 
-goto __T123534952;
+goto __T928956456;
 case 254:
 case 318:
 case 258:
@@ -10739,163 +10908,163 @@ case 437:
 case 438:
 case 439:
 case 440:
-__148471_1_type_operator_case:;
-__148132_17_is_decl_specifier_token = ((_ZN3edg9a_booleanE)1);
-__148134_17_type_specifier_seen = ((_ZN3edg9a_booleanE)1);
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_type_operatorEPNS0_16a_disambig_stateEt(__148126_64_state, __148127_64_flags);
-goto __T123534952;
+__148603_1_type_operator_case:;
+__148264_17_is_decl_specifier_token = ((_ZN3edg9a_booleanE)1);
+__148266_17_type_specifier_seen = ((_ZN3edg9a_booleanE)1);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_type_operatorEPNS0_16a_disambig_stateEt(__148258_64_state, __148259_64_flags);
+goto __T928956456;
 case 23:
 case 19:
-__148132_17_is_decl_specifier_token = ((_ZN3edg9a_booleanE)1);
-__148134_17_type_specifier_seen = ((_ZN3edg9a_booleanE)1);
-goto __T123534952;
+__148264_17_is_decl_specifier_token = ((_ZN3edg9a_booleanE)1);
+__148266_17_type_specifier_seen = ((_ZN3edg9a_booleanE)1);
+goto __T928956456;
 case 341:
-__148132_17_is_decl_specifier_token = ((_ZN3edg9a_booleanE)1);
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_type_operatorEPNS0_16a_disambig_stateEt(__148126_64_state, __148127_64_flags);
-goto __T123534952;
+__148264_17_is_decl_specifier_token = ((_ZN3edg9a_booleanE)1);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_type_operatorEPNS0_16a_disambig_stateEt(__148258_64_state, __148259_64_flags);
+goto __T928956456;
 case 28:
 if (((((int)_ZN3edg10curr_tokenE) == 28) && (_ZN3edg22std_attributes_enabledE)) && (((int)(_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)))) == 28)) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_std_attributeEt(__148127_64_flags);
-__148143_15_next_token_fetched = ((_ZN3edg9a_booleanE)1);
-goto __T123534952;
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_std_attributeEt(__148259_64_flags);
+__148275_15_next_token_fetched = ((_ZN3edg9a_booleanE)1);
+goto __T928956456;
 }
 ;
 default:
-__148132_17_is_decl_specifier_token = ((_ZN3edg9a_booleanE)0);
-goto __T123534952;
-} __T123534952:;
+__148264_17_is_decl_specifier_token = ((_ZN3edg9a_booleanE)0);
+goto __T928956456;
+} __T928956456:;
 
-if (!(__148132_17_is_decl_specifier_token)) { goto __T123718848; }
-__148133_17_any_decl_specifiers = ((_ZN3edg9a_booleanE)1);
-if (!(__148143_15_next_token_fetched)) {
+if (!(__148264_17_is_decl_specifier_token)) { goto __T929140192; }
+__148265_17_any_decl_specifiers = ((_ZN3edg9a_booleanE)1);
+if (!(__148275_15_next_token_fetched)) {
 
-if (((__148126_64_state->find_static_specifier_only) && (__148134_17_type_specifier_seen)) && (((int)(_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)))) == 1))
+if (((__148258_64_state->find_static_specifier_only) && (__148266_17_type_specifier_seen)) && (((int)(_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)))) == 1))
 {
 
 
 
 
-goto __148521_1_done;
+goto __148653_1_done;
 }
 
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148127_64_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148259_64_flags, 0x0U);
 }
-} __T123718848:;
-if ((!(__148133_17_any_decl_specifiers)) && (!(__148135_17_is_ctor_dtor_or_finalizer_name))) {
+} __T929140192:;
+if ((!(__148265_17_any_decl_specifiers)) && (!(__148267_17_is_ctor_dtor_or_finalizer_name))) {
 
 
 
-(__148126_64_state->may_be_decl) = ((_Bool)((((int)__148127_64_flags) & 0x40) != 0));
+(__148258_64_state->may_be_decl) = ((_Bool)((((int)__148259_64_flags) & 0x40) != 0));
 }
 
-__148521_1_done:;
+__148653_1_done:;
 
 return;
 }
 #line 1068
-static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg28prescan_trailing_return_typeEPNS0_16a_disambig_stateE( _ZN3edg20a_disambig_state_ptrE __148532_64_state)
+static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg28prescan_trailing_return_typeEPNS0_16a_disambig_stateE( _ZN3edg20a_disambig_state_ptrE __148664_64_state)
 
 
 
 
 {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19prescan_declarationEPNS0_16a_disambig_stateEtb(__148532_64_state, ((_ZN3edg19a_disambig_flag_setE)1U), ((_ZN3edg9a_booleanE)0)); 
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19prescan_declarationEPNS0_16a_disambig_stateEtb(__148664_64_state, ((_ZN3edg19a_disambig_flag_setE)1U), ((_ZN3edg9a_booleanE)0)); 
 
 }
 
 
 static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg27prescan_function_declaratorEPNS0_16a_disambig_stateEt(
-_ZN3edg20a_disambig_state_ptrE __148544_60_state, 
-_ZN3edg19a_disambig_flag_setE __148545_36_flags)
+_ZN3edg20a_disambig_state_ptrE __148676_60_state, 
+_ZN3edg19a_disambig_flag_setE __148677_36_flags)
 #line 1087
 {
 
 while (((int)_ZN3edg10curr_tokenE) != 31) {
-auto _ZN3edg32a_pack_expansion_stack_entry_ptrE __148554_38_pesep = ((_ZN3edg32a_pack_expansion_stack_entry_ptrE)0);
-auto _ZN3edg9a_booleanE __148555_18_any_more = ((_ZN3edg9a_booleanE)1);
-if (!(__148544_60_state->suppress_packs)) {
+auto _ZN3edg32a_pack_expansion_stack_entry_ptrE __148686_38_pesep = ((_ZN3edg32a_pack_expansion_stack_entry_ptrE)0);
+auto _ZN3edg9a_booleanE __148687_18_any_more = ((_ZN3edg9a_booleanE)1);
+if (!(__148676_60_state->suppress_packs)) {
 
 
 
 
-__148555_18_any_more = (_ZN3edg38begin_potential_pack_expansion_contextEPPNS_28a_pack_expansion_stack_entryE((&__148554_38_pesep)));
+__148687_18_any_more = (_ZN3edg38begin_potential_pack_expansion_contextEPPNS_28a_pack_expansion_stack_entryE((&__148686_38_pesep)));
 }
-while (__148555_18_any_more) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg39prescan_any_prefix_bracketed_attributesEt(__148545_36_flags);
+while (__148687_18_any_more) {
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg39prescan_any_prefix_bracketed_attributesEt(__148677_36_flags);
 if (((int)_ZN3edg10curr_tokenE) == 82) {
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148545_36_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148677_36_flags, 0x0U);
 } else  {
 
-auto _ZN3edg19a_disambig_flag_setE __148570_30_param_flags = ((_ZN3edg19a_disambig_flag_setE)7U);
+auto _ZN3edg19a_disambig_flag_setE __148702_30_param_flags = ((_ZN3edg19a_disambig_flag_setE)7U);
 
 
 if (_ZN3edg24relaxed_typename_enabledE) {
-__148570_30_param_flags |= 0x800;
+__148702_30_param_flags |= 0x800;
 }
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19prescan_declarationEPNS0_16a_disambig_stateEtb(__148544_60_state, __148570_30_param_flags, ((_ZN3edg9a_booleanE)0));
-if ((!(__148544_60_state->may_be_decl)) || (__148544_60_state->terminate)) {
-_ZN3edg40abandon_potential_pack_expansion_contextEPNS_28a_pack_expansion_stack_entryE(__148554_38_pesep);
-goto __148648_1_done;
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19prescan_declarationEPNS0_16a_disambig_stateEtb(__148676_60_state, __148702_30_param_flags, ((_ZN3edg9a_booleanE)0));
+if ((!(__148676_60_state->may_be_decl)) || (__148676_60_state->terminate)) {
+_ZN3edg40abandon_potential_pack_expansion_contextEPNS_28a_pack_expansion_stack_entryE(__148686_38_pesep);
+goto __148780_1_done;
 }
 }
 if (((int)_ZN3edg10curr_tokenE) == 71) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148545_36_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148677_36_flags, 0x0U);
 } else  { if ((((int)_ZN3edg10curr_tokenE) != 31) && (((int)_ZN3edg10curr_tokenE) != 82)) {
 
 
 
 
-(__148544_60_state->may_be_decl) = ((_ZN3edg9a_booleanE)0);
-_ZN3edg40abandon_potential_pack_expansion_contextEPNS_28a_pack_expansion_stack_entryE(__148554_38_pesep);
-goto __148648_1_done;
+(__148676_60_state->may_be_decl) = ((_ZN3edg9a_booleanE)0);
+_ZN3edg40abandon_potential_pack_expansion_contextEPNS_28a_pack_expansion_stack_entryE(__148686_38_pesep);
+goto __148780_1_done;
 } }
-_ZN3edg36end_potential_pack_expansion_contextEPNS_28a_pack_expansion_stack_entryEb(__148554_38_pesep, ((_ZN3edg9a_booleanE)1));
+_ZN3edg36end_potential_pack_expansion_contextEPNS_28a_pack_expansion_stack_entryEb(__148686_38_pesep, ((_ZN3edg9a_booleanE)1));
 
-__148555_18_any_more = (_ZN3edg28advance_to_next_pack_elementEPNS_28a_pack_expansion_stack_entryE(__148554_38_pesep));
+__148687_18_any_more = (_ZN3edg28advance_to_next_pack_elementEPNS_28a_pack_expansion_stack_entryE(__148686_38_pesep));
 }
 }
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148545_36_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148677_36_flags, 0x0U);
 
 while (((((((((((((((int)_ZN3edg10curr_tokenE) == 87) || (((int)_ZN3edg10curr_tokenE) == 114)) || ((((int)_ZN3edg10curr_tokenE) == 125) || (((int)_ZN3edg10curr_tokenE) == 126))) || (((int)_ZN3edg10curr_tokenE) == 350)) || (((int)_ZN3edg10curr_tokenE) == 351)) || (((int)_ZN3edg10curr_tokenE) == 352))
 #line 1137
  || (((int)_ZN3edg10curr_tokenE) == 353)) || (((int)_ZN3edg10curr_tokenE) == 150)) || (((int)_ZN3edg10curr_tokenE) == 266)) || (((int)_ZN3edg10curr_tokenE) == 264)) || (((int)_ZN3edg10curr_tokenE) == 265)) || (((_ZN3edg28named_address_spaces_enabledE) && (((int)_ZN3edg10curr_tokenE) == 1)) && (
 #line 1137
 _ZN3edg30curr_id_is_named_address_spaceEv()))) || ((((int)_ZN3edg10curr_tokenE) == 209) || (((int)_ZN3edg10curr_tokenE) == 210))) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148545_36_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148677_36_flags, 0x0U);
 }
 if ((((int)_ZN3edg10curr_tokenE) == 36) || (((int)_ZN3edg10curr_tokenE) == 56)) {
 
 
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148545_36_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148677_36_flags, 0x0U);
 }
 #line 1152
 if (((((int)_ZN3edg10curr_tokenE) == 231) || (((int)_ZN3edg10curr_tokenE) == 370)) || (((int)_ZN3edg10curr_tokenE) == 336))
 {
 
-auto _ZN3edg9a_booleanE __148619_16_arg_optional; __148619_16_arg_optional = ((_Bool)(((int)_ZN3edg10curr_tokenE) == 336));
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148545_36_flags, 0x0U);
+auto _ZN3edg9a_booleanE __148751_16_arg_optional; __148751_16_arg_optional = ((_Bool)(((int)_ZN3edg10curr_tokenE) == 336));
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148677_36_flags, 0x0U);
 if (((int)_ZN3edg10curr_tokenE) != 30) {
-if (!(__148619_16_arg_optional)) {
+if (!(__148751_16_arg_optional)) {
 
 
-(__148544_60_state->may_be_decl) = ((_ZN3edg9a_booleanE)0);
-goto __148648_1_done;
+(__148676_60_state->may_be_decl) = ((_ZN3edg9a_booleanE)0);
+goto __148780_1_done;
 }
 } else  {
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148545_36_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148677_36_flags, 0x0U);
 _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg18cache_tokens_untilENS0_12a_token_kindEb(_ZN3edg10tok_rparenE, ((_ZN3edg9a_booleanE)1));
 if (((int)_ZN3edg10curr_tokenE) == 31) {
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148545_36_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148677_36_flags, 0x0U);
 }
 }
 }
-if (((_ZN3edg29trailing_return_types_enabledE) && (((int)_ZN3edg10curr_tokenE) == 33)) && ((((int)__148545_36_flags) & 0x3) != 0))
+if (((_ZN3edg29trailing_return_types_enabledE) && (((int)_ZN3edg10curr_tokenE) == 33)) && ((((int)__148677_36_flags) & 0x3) != 0))
 
 {
 
@@ -10903,21 +11072,21 @@ if (((_ZN3edg29trailing_return_types_enabledE) && (((int)_ZN3edg10curr_tokenE) =
 
 
 _ZN3edg9get_tokenEv();
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg28prescan_trailing_return_typeEPNS0_16a_disambig_stateE(__148544_60_state);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg28prescan_trailing_return_typeEPNS0_16a_disambig_stateE(__148676_60_state);
 }
-__148648_1_done:;
+__148780_1_done:;
 return;
 }
 
 
-static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg18prescan_declaratorEPNS0_16a_disambig_stateEtbb( _ZN3edg20a_disambig_state_ptrE __148653_53_state, 
-_ZN3edg19a_disambig_flag_setE __148654_32_flags, 
-_ZN3edg9a_booleanE __148655_32_paren_initializer_allowed, 
-_ZN3edg9a_booleanE __148656_32_is_top_level)
+static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg18prescan_declaratorEPNS0_16a_disambig_stateEtbb( _ZN3edg20a_disambig_state_ptrE __148785_53_state, 
+_ZN3edg19a_disambig_flag_setE __148786_32_flags, 
+_ZN3edg9a_booleanE __148787_32_paren_initializer_allowed, 
+_ZN3edg9a_booleanE __148788_32_is_top_level)
 #line 1198
 {
-auto _ZN3edg9a_booleanE __148663_19_paren_initializer_seen = ((_ZN3edg9a_booleanE)0);
-auto _ZN3edg9a_booleanE __148664_19_pointer_operator_seen = ((_ZN3edg9a_booleanE)0);
+auto _ZN3edg9a_booleanE __148795_19_paren_initializer_seen = ((_ZN3edg9a_booleanE)0);
+auto _ZN3edg9a_booleanE __148796_19_pointer_operator_seen = ((_ZN3edg9a_booleanE)0);
 #line 1215
 for (; ; ) {
 if ((((((int)_ZN3edg10curr_tokenE) == 37) || (((int)_ZN3edg10curr_tokenE) == 36)) || ((_ZN3edg25rvalue_references_enabledE) && (((int)_ZN3edg10curr_tokenE) == 56))) || ((_ZN3edg17cli_or_cx_enabledE) && (((((int)_ZN3edg10curr_tokenE) == 54) || (((int)_ZN3edg10curr_tokenE) == 53)) || (((int)
@@ -10927,16 +11096,16 @@ _ZN3edg10curr_tokenE) == 43))))
 {
 
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148654_32_flags, 0x0U);
-__148664_19_pointer_operator_seen = ((_ZN3edg9a_booleanE)1);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148786_32_flags, 0x0U);
+__148796_19_pointer_operator_seen = ((_ZN3edg9a_booleanE)1);
 if (((((int)_ZN3edg10curr_tokenE) == 28) && (_ZN3edg22std_attributes_enabledE)) && (((int)(_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)))) == 28)) {
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_std_attributeEt(__148654_32_flags);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_std_attributeEt(__148786_32_flags);
 }
 
 } else  { if (((int)_ZN3edg10curr_tokenE) == 159) {
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg22prescan_based_modifierEt(__148654_32_flags);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg22prescan_based_modifierEt(__148786_32_flags);
 } else  { if (((((((int)_ZN3edg10curr_tokenE) == 174) || (((int)_ZN3edg10curr_tokenE) == 172)) || (((int)_ZN3edg10curr_tokenE) == 173)) || (((int)_ZN3edg10curr_tokenE) == 170)) || (((int)_ZN3edg10curr_tokenE) == 171))
 
 
@@ -10945,7 +11114,7 @@ _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg22prescan_based_modifierEt(__148654_32_
 
 
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148654_32_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148786_32_flags, 0x0U);
 
 } else  { if (((((((((((((((((int)_ZN3edg10curr_tokenE) == 87) || (((int)_ZN3edg10curr_tokenE) == 114)) || ((((int)_ZN3edg10curr_tokenE) == 125) || (((int)_ZN3edg10curr_tokenE) == 126))) || (((int)_ZN3edg10curr_tokenE) == 350)) || (((int)_ZN3edg10curr_tokenE) == 351)) || (((int)_ZN3edg10curr_tokenE) 
 #line 1241
@@ -10961,39 +11130,39 @@ _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifie
 
 
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148654_32_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148786_32_flags, 0x0U);
 if (((((int)_ZN3edg10curr_tokenE) == 28) && (_ZN3edg22std_attributes_enabledE)) && (((int)(_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)))) == 28)) {
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_std_attributeEt(__148654_32_flags);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_std_attributeEt(__148786_32_flags);
 }
 } else  {
 
-goto __T123834576;
+goto __T929255832;
 } } } }
-} __T123834576:;
+} __T929255832:;
 
 if (((int)_ZN3edg10curr_tokenE) == 211) {
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_gnu_attributeEt(__148654_32_flags);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_gnu_attributeEt(__148786_32_flags);
 }
 
 if (((int)_ZN3edg10curr_tokenE) == 30) {
 #line 1271
-auto _ZN3edg9a_booleanE __148735_15_treat_as_expr = ((_ZN3edg9a_booleanE)0);
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148654_32_flags, 0x0U);
-if ((((_ZN3edg15cfront_2_1_modeE) || (_ZN3edg15cfront_3_0_modeE)) && (__148656_32_is_top_level)) && (!((((int)__148654_32_flags) & 0x40) != 0))) {
+auto _ZN3edg9a_booleanE __148867_15_treat_as_expr = ((_ZN3edg9a_booleanE)0);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148786_32_flags, 0x0U);
+if ((((_ZN3edg15cfront_2_1_modeE) || (_ZN3edg15cfront_3_0_modeE)) && (__148788_32_is_top_level)) && (!((((int)__148786_32_flags) & 0x40) != 0))) {
 #line 1305
-auto unsigned short __148769_20_token_2;
-if ((((int)_ZN3edg10curr_tokenE) == 1) && (((int)(_ZN3edg15next_two_tokensENS_12a_token_kindEPS0_(_ZN3edg10tok_rparenE, (&__148769_20_token_2)))) == 31))
+auto unsigned short __148901_20_token_2;
+if ((((int)_ZN3edg10curr_tokenE) == 1) && (((int)(_ZN3edg15next_two_tokensENS_12a_token_kindEPS0_(_ZN3edg10tok_rparenE, (&__148901_20_token_2)))) == 31))
 {
-if (((int)__148769_20_token_2) != 30) {
+if (((int)__148901_20_token_2) != 30) {
 
-__148735_15_treat_as_expr = ((_ZN3edg9a_booleanE)1);
+__148867_15_treat_as_expr = ((_ZN3edg9a_booleanE)1);
 }
 } else  { if (((int)_ZN3edg10curr_tokenE) == 31) {
 
-__148735_15_treat_as_expr = ((_ZN3edg9a_booleanE)1);
-} else  { if (((((int)__148654_32_flags) & 0x1) != 0) && (!(__148664_19_pointer_operator_seen)))
+__148867_15_treat_as_expr = ((_ZN3edg9a_booleanE)1);
+} else  { if (((((int)__148786_32_flags) & 0x1) != 0) && (!(__148796_19_pointer_operator_seen)))
 {
 if (((((((((((((((((((((((((((((((((((((((int)_ZN3edg10curr_tokenE) == 113) || (((int)_ZN3edg10curr_tokenE) == 86)) || (((int)_ZN3edg10curr_tokenE) == 104)) || (((int)_ZN3edg10curr_tokenE) == 99)) || (((int)_ZN3edg10curr_tokenE) == 101)) || (((int)_ZN3edg10curr_tokenE) == 95)) || (((int)
 #line 1317
@@ -11017,16 +11186,16 @@ _ZN3edg10curr_tokenE) == 194)) || (((int)_ZN3edg10curr_tokenE) == 187)) || (((in
 #line 1317
 _ZN3edg10curr_tokenE) == 228) || (((int)_ZN3edg10curr_tokenE) == 226)))) || (((int)_ZN3edg10curr_tokenE) == 1)) {
 
-__148735_15_treat_as_expr = ((_ZN3edg9a_booleanE)1);
+__148867_15_treat_as_expr = ((_ZN3edg9a_booleanE)1);
 }
 } } }
-if (__148735_15_treat_as_expr) {
-(__148653_53_state->may_be_decl) = ((_ZN3edg9a_booleanE)0);
-goto __148972_1_done;
+if (__148867_15_treat_as_expr) {
+(__148785_53_state->may_be_decl) = ((_ZN3edg9a_booleanE)0);
+goto __149104_1_done;
 }
 }
 
-if ((((_ZN3edg14microsoft_bugsE) && (_ZN3edg17microsoft_versionE < 1300UL)) && (__148656_32_is_top_level)) && (!((((int)__148654_32_flags) & 0x40) != 0)))
+if ((((_ZN3edg14microsoft_bugsE) && (_ZN3edg17microsoft_versionE < 1300UL)) && (__148788_32_is_top_level)) && (!((((int)__148786_32_flags) & 0x40) != 0)))
 {
 
 
@@ -11034,8 +11203,8 @@ if ((((_ZN3edg14microsoft_bugsE) && (_ZN3edg17microsoft_versionE < 1300UL)) && (
 
 if (((int)_ZN3edg10curr_tokenE) == 31) {
 
-__148735_15_treat_as_expr = ((_ZN3edg9a_booleanE)1);
-} else  { if (((((int)__148654_32_flags) & 0x1) != 0) && (!(__148664_19_pointer_operator_seen)))
+__148867_15_treat_as_expr = ((_ZN3edg9a_booleanE)1);
+} else  { if (((((int)__148786_32_flags) & 0x1) != 0) && (!(__148796_19_pointer_operator_seen)))
 {
 if (((((((((((((((((((((((((((((((((((((((int)_ZN3edg10curr_tokenE) == 113) || (((int)_ZN3edg10curr_tokenE) == 86)) || (((int)_ZN3edg10curr_tokenE) == 104)) || (((int)_ZN3edg10curr_tokenE) == 99)) || (((int)_ZN3edg10curr_tokenE) == 101)) || (((int)_ZN3edg10curr_tokenE) == 95)) || (((int)
 #line 1339
@@ -11060,90 +11229,90 @@ _ZN3edg10curr_tokenE) == 194)) || (((int)_ZN3edg10curr_tokenE) == 187)) || (((in
 _ZN3edg10curr_tokenE) == 228) || (((int)_ZN3edg10curr_tokenE) == 226)))) || (((int)_ZN3edg10curr_tokenE) == 1)) {
 
 
-auto unsigned short __148806_24_token_2;
-_ZN3edg15next_two_tokensENS_12a_token_kindEPS0_(_ZN3edg10tok_lparenE, (&__148806_24_token_2));
-if (((int)__148806_24_token_2) == 31) {
-__148735_15_treat_as_expr = ((_ZN3edg9a_booleanE)1);
+auto unsigned short __148938_24_token_2;
+_ZN3edg15next_two_tokensENS_12a_token_kindEPS0_(_ZN3edg10tok_lparenE, (&__148938_24_token_2));
+if (((int)__148938_24_token_2) == 31) {
+__148867_15_treat_as_expr = ((_ZN3edg9a_booleanE)1);
 }
 }
 } }
-if (__148735_15_treat_as_expr) {
-(__148653_53_state->may_be_decl) = ((_ZN3edg9a_booleanE)0);
-goto __148972_1_done;
+if (__148867_15_treat_as_expr) {
+(__148785_53_state->may_be_decl) = ((_ZN3edg9a_booleanE)0);
+goto __149104_1_done;
 }
 }
 
-if ((((int)__148654_32_flags) & 0x1) != 0) {
+if ((((int)__148786_32_flags) & 0x1) != 0) {
 if (((((int)_ZN3edg10curr_tokenE) == 31) || (_ZN3edg13is_decl_startEi(0x6))) || ((((int)_ZN3edg10curr_tokenE) == 82) && (((int)(_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)))) == 31)))
 
 
 {
 
-goto __148923_1_function_lparen;
+goto __149055_1_function_lparen;
 }
 }
 
 
 if (((int)_ZN3edg10curr_tokenE) == 211) {
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_gnu_attributeEt(__148654_32_flags);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_gnu_attributeEt(__148786_32_flags);
 }
 
-if ((((((int)_ZN3edg10curr_tokenE) == 1) && (_ZN3edg19locator_for_curr_idE.is_template_id)) && (_ZN3edg8gnu_modeE)) && ((((int)__148654_32_flags) & 0x40) == 0))
+if ((((((int)_ZN3edg10curr_tokenE) == 1) && (_ZN3edg19locator_for_curr_idE.is_template_id)) && (_ZN3edg8gnu_modeE)) && ((((int)__148786_32_flags) & 0x40) == 0))
 {
 
 
 
 
-(__148653_53_state->may_be_decl) = ((_ZN3edg9a_booleanE)0);
-goto __148972_1_done;
+(__148785_53_state->may_be_decl) = ((_ZN3edg9a_booleanE)0);
+goto __149104_1_done;
 }
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg18prescan_declaratorEPNS0_16a_disambig_stateEtbb(__148653_53_state, __148654_32_flags, ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)0));
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg18prescan_declaratorEPNS0_16a_disambig_stateEtbb(__148785_53_state, __148786_32_flags, ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)0));
 
 
-if ((!(__148653_53_state->may_be_decl)) || (__148653_53_state->terminate)) { goto __148972_1_done; }
+if ((!(__148785_53_state->may_be_decl)) || (__148785_53_state->terminate)) { goto __149104_1_done; }
 
 if (((int)_ZN3edg10curr_tokenE) != 31) {
-(__148653_53_state->may_be_decl) = ((_ZN3edg9a_booleanE)0);
-goto __148972_1_done;
+(__148785_53_state->may_be_decl) = ((_ZN3edg9a_booleanE)0);
+goto __149104_1_done;
 }
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148654_32_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148786_32_flags, 0x0U);
 } else  {
-auto _ZN3edg9a_booleanE __148855_15_is_name_start;
+auto _ZN3edg9a_booleanE __148987_15_is_name_start;
 
 if ((((int)_ZN3edg10curr_tokenE) == 82) && (_ZN3edg26variadic_templates_enabledE)) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148654_32_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148786_32_flags, 0x0U);
 }
 #line 1404
-__148855_15_is_name_start = ((_Bool)(((((int)_ZN3edg10curr_tokenE) == 1) && ((!(_ZN3edg19locator_for_curr_idE.is_global_qualified_name)) || ((((int)__148654_32_flags) & 0x40) != 0))) && (!((((__148653_53_state->check_if_is_decl) && (_ZN3edg8gpp_modeE)) && (!(__148656_32_is_top_level))) && (
+__148987_15_is_name_start = ((_Bool)(((((int)_ZN3edg10curr_tokenE) == 1) && ((!(_ZN3edg19locator_for_curr_idE.is_global_qualified_name)) || ((((int)__148786_32_flags) & 0x40) != 0))) && (!((((__148785_53_state->check_if_is_decl) && (_ZN3edg8gpp_modeE)) && (!(__148788_32_is_top_level))) && (
 #line 1404
 _ZN3edg19locator_for_curr_idE.is_qualified_name)))));
 
 
 
 
-if ((!((((int)__148654_32_flags) & 0x2) != 0)) || (((((int)__148654_32_flags) & 0x1) != 0) && (!(__148855_15_is_name_start))))
+if ((!((((int)__148786_32_flags) & 0x2) != 0)) || (((((int)__148786_32_flags) & 0x1) != 0) && (!(__148987_15_is_name_start))))
 {
 
-} else  { if (!(__148855_15_is_name_start)) {
+} else  { if (!(__148987_15_is_name_start)) {
 
-(__148653_53_state->may_be_decl) = ((_ZN3edg9a_booleanE)0);
-goto __148972_1_done;
+(__148785_53_state->may_be_decl) = ((_ZN3edg9a_booleanE)0);
+goto __149104_1_done;
 } else  {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148654_32_flags, 0x0U);
-if (__148653_53_state->set_decl_class_type) {
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148786_32_flags, 0x0U);
+if (__148785_53_state->set_decl_class_type) {
 
 
-(__148653_53_state->decl_class_type) = ((_ZN3edg19locator_for_curr_idE.is_class_member) ? ((_ZN3edg19locator_for_curr_idE.parent).class_type) : ((_ZN3edg10a_type_ptrE)0));
+(__148785_53_state->decl_class_type) = ((_ZN3edg19locator_for_curr_idE.is_class_member) ? ((_ZN3edg19locator_for_curr_idE.parent).class_type) : ((_ZN3edg10a_type_ptrE)0));
 
-(__148653_53_state->may_be_decl) = ((_ZN3edg9a_booleanE)0);
-goto __148972_1_done;
+(__148785_53_state->may_be_decl) = ((_ZN3edg9a_booleanE)0);
+goto __149104_1_done;
 }
 } }
 }
 if (((((int)_ZN3edg10curr_tokenE) == 28) && (_ZN3edg22std_attributes_enabledE)) && (((int)(_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)))) == 28)) {
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_std_attributeEt(__148654_32_flags);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_std_attributeEt(__148786_32_flags);
 }
 
 
@@ -11154,48 +11323,48 @@ if (((int)_ZN3edg10curr_tokenE) == 30) {
 
 
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148654_32_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148786_32_flags, 0x0U);
 if ((((int)_ZN3edg10curr_tokenE) != 31) && (((int)_ZN3edg10curr_tokenE) != 82)) {
 
 
-if ((__148655_32_paren_initializer_allowed) && (!(_ZN3edg16is_decl_not_exprEt(((_ZN3edg19a_disambig_flag_setE)3U)))))
+if ((__148787_32_paren_initializer_allowed) && (!(_ZN3edg16is_decl_not_exprEt(((_ZN3edg19a_disambig_flag_setE)3U)))))
 
 {
 
 
-__148663_19_paren_initializer_seen = ((_ZN3edg9a_booleanE)1);
+__148795_19_paren_initializer_seen = ((_ZN3edg9a_booleanE)1);
 _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg18cache_tokens_untilENS0_12a_token_kindEb(_ZN3edg10tok_rparenE, ((_ZN3edg9a_booleanE)1));
 if (((int)_ZN3edg10curr_tokenE) == 31) {
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148654_32_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148786_32_flags, 0x0U);
 }
-goto __T124028064;
+goto __T929449384;
 }
 }
-__148923_1_function_lparen:;
+__149055_1_function_lparen:;
 
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg27prescan_function_declaratorEPNS0_16a_disambig_stateEt(__148653_53_state, __148654_32_flags);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg27prescan_function_declaratorEPNS0_16a_disambig_stateEt(__148785_53_state, __148786_32_flags);
 } else  {
 
-(((int)_ZN3edg10curr_tokenE) == 28) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/disambig.c"), 1465, __T123283552, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(((int)_ZN3edg10curr_tokenE) == 28) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/disambig.c"), 1465, __T928868624, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148654_32_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148786_32_flags, 0x0U);
 _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg18cache_tokens_untilENS0_12a_token_kindEb(_ZN3edg12tok_rbracketE, ((_ZN3edg9a_booleanE)1));
 
 if (((int)_ZN3edg10curr_tokenE) == 29) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148654_32_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148786_32_flags, 0x0U);
 }
 }
-} __T124028064:;
+} __T929449384:;
 
 if (((int)_ZN3edg10curr_tokenE) == 211) {
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_gnu_attributeEt(__148654_32_flags);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21prescan_gnu_attributeEt(__148786_32_flags);
 }
 
 
-if ((!(__148663_19_paren_initializer_seen)) && ((((int)_ZN3edg10curr_tokenE) == 60) || ((((__148656_32_is_top_level) && (((int)_ZN3edg10curr_tokenE) == 76)) && (_ZN3edg17list_init_enabledE)) && ((((int)__148654_32_flags) & 0x2) != 0))))
+if ((!(__148795_19_paren_initializer_seen)) && ((((int)_ZN3edg10curr_tokenE) == 60) || ((((__148788_32_is_top_level) && (((int)_ZN3edg10curr_tokenE) == 76)) && (_ZN3edg17list_init_enabledE)) && ((((int)__148786_32_flags) & 0x2) != 0))))
 
 
 {
@@ -11206,8 +11375,8 @@ if ((!(__148663_19_paren_initializer_seen)) && ((((int)_ZN3edg10curr_tokenE) == 
 if (((int)_ZN3edg10curr_tokenE) == 60) {
 
 
-if ((__148656_32_is_top_level) && ((((int)__148654_32_flags) & (-4)) == 0)) {
-(__148653_53_state->terminate) = ((_ZN3edg9a_booleanE)1);
+if ((__148788_32_is_top_level) && ((((int)__148786_32_flags) & (-4)) == 0)) {
+(__148785_53_state->terminate) = ((_ZN3edg9a_booleanE)1);
 } else  {
 _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19prescan_initializerEv();
 }
@@ -11219,18 +11388,18 @@ _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg17prescan_init_listEv();
 
 
 
-if ((__148656_32_is_top_level) && ((((int)__148654_32_flags) & 0x8) != 0)) { (__148653_53_state->may_be_decl) = ((_ZN3edg9a_booleanE)0); }
+if ((__148788_32_is_top_level) && ((((int)__148786_32_flags) & 0x8) != 0)) { (__148785_53_state->may_be_decl) = ((_ZN3edg9a_booleanE)0); }
 }
-__148972_1_done:; ; 
+__149104_1_done:; ; 
 }
 
 
-static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19prescan_declarationEPNS0_16a_disambig_stateEtb( _ZN3edg20a_disambig_state_ptrE __148976_54_state, 
-_ZN3edg19a_disambig_flag_setE __148977_54_flags, 
-_ZN3edg9a_booleanE __148978_33_is_top_level)
+static void _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19prescan_declarationEPNS0_16a_disambig_stateEtb( _ZN3edg20a_disambig_state_ptrE __149108_54_state, 
+_ZN3edg19a_disambig_flag_setE __149109_54_flags, 
+_ZN3edg9a_booleanE __149110_33_is_top_level)
 #line 1524
 {
-auto _ZN3edg25an_identifier_options_setE __148989_29_gid_flags = 0x4001U;
+auto _ZN3edg25an_identifier_options_setE __149121_29_gid_flags = 0x4001U;
 
 
 
@@ -11239,186 +11408,186 @@ if (((int)_ZN3edg10curr_tokenE) == 256) {
 
 _ZN3edg9get_tokenEv();
 }
-if ((((int)__148977_54_flags) & 0x800) != 0) {
-__148989_29_gid_flags |= 0x4000000U;
+if ((((int)__149109_54_flags) & 0x800) != 0) {
+__149121_29_gid_flags |= 0x4000000U;
 }
 
-(((int)_ZN3edg9C_dialectE) != 2) ? ((_Bool)(((int)_ZN3edg10curr_tokenE) == 1)) : (((((int)_ZN3edg10curr_tokenE) == 1) && (_ZN3edg19locator_for_curr_idE.has_been_coalesced)) ? ((_Bool)1) : (_ZN3edg33f_is_generalized_identifier_startEjPNS_6a_typeE((__148989_29_gid_flags | ((((((int)__148977_54_flags) 
+(((int)_ZN3edg9C_dialectE) != 2) ? ((_Bool)(((int)_ZN3edg10curr_tokenE) == 1)) : (((((int)_ZN3edg10curr_tokenE) == 1) && (_ZN3edg19locator_for_curr_idE.has_been_coalesced)) ? ((_Bool)1) : (_ZN3edg33f_is_generalized_identifier_startEjPNS_6a_typeE((__149121_29_gid_flags | ((((((int)__149109_54_flags) 
 #line 1538
 & 0x40) != 0) && (1)) ? 0x400U : 0x0U)), ((_ZN3edg10a_type_ptrE)0))));
 
 
 for (; ; ) {
-auto _ZN3edg19a_disambig_flag_setE __149006_26_decl_spec_flags; __149006_26_decl_spec_flags = __148977_54_flags;
+auto _ZN3edg19a_disambig_flag_setE __149138_26_decl_spec_flags; __149138_26_decl_spec_flags = __149109_54_flags;
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg39prescan_any_prefix_bracketed_attributesEt(__148977_54_flags);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg39prescan_any_prefix_bracketed_attributesEt(__149109_54_flags);
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg23prescan_decl_specifiersEPNS0_16a_disambig_stateEt(__148976_54_state, __149006_26_decl_spec_flags);
-if ((((int)__148977_54_flags) & 0x100) != 0) {
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg23prescan_decl_specifiersEPNS0_16a_disambig_stateEt(__149108_54_state, __149138_26_decl_spec_flags);
+if ((((int)__149109_54_flags) & 0x100) != 0) {
 
 
 
 if ((((int)_ZN3edg10curr_tokenE) != 76) && (((int)_ZN3edg10curr_tokenE) != 81)) {
-(__148976_54_state->may_be_decl) = ((_ZN3edg9a_booleanE)0);
+(__149108_54_state->may_be_decl) = ((_ZN3edg9a_booleanE)0);
 }
-(__148976_54_state->terminate) = ((_ZN3edg9a_booleanE)1);
+(__149108_54_state->terminate) = ((_ZN3edg9a_booleanE)1);
 } else  { if (((int)_ZN3edg10curr_tokenE) == 76) {
 
 
 
-(__148976_54_state->may_be_decl) = ((_ZN3edg9a_booleanE)0);
+(__149108_54_state->may_be_decl) = ((_ZN3edg9a_booleanE)0);
 } }
-if ((!(__148976_54_state->may_be_decl)) || (__148976_54_state->terminate)) { goto __149059_1_done; }
+if ((!(__149108_54_state->may_be_decl)) || (__149108_54_state->terminate)) { goto __149191_1_done; }
 
-if (__148976_54_state->find_static_specifier_only) { goto __149059_1_done; }
+if (__149108_54_state->find_static_specifier_only) { goto __149191_1_done; }
 
 for (; ; ) {
 
 
 
-auto _ZN3edg9a_booleanE __149033_17_paren_initializer_allowed;
-__149033_17_paren_initializer_allowed = ((_Bool)((!((((int)__148977_54_flags) & 0x1) != 0)) && (!((((int)__148977_54_flags) & 0x8) != 0))));
+auto _ZN3edg9a_booleanE __149165_17_paren_initializer_allowed;
+__149165_17_paren_initializer_allowed = ((_Bool)((!((((int)__149109_54_flags) & 0x1) != 0)) && (!((((int)__149109_54_flags) & 0x8) != 0))));
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg18prescan_declaratorEPNS0_16a_disambig_stateEtbb(__148976_54_state, __148977_54_flags, __149033_17_paren_initializer_allowed, __148978_33_is_top_level);
-
-
-if ((!(__148976_54_state->may_be_decl)) || (__148976_54_state->terminate)) { goto __149059_1_done; }
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg18prescan_declaratorEPNS0_16a_disambig_stateEtbb(__149108_54_state, __149109_54_flags, __149165_17_paren_initializer_allowed, __149110_33_is_top_level);
 
 
-if ((((((int)__148977_54_flags) & 0x1) != 0) || ((((int)__148977_54_flags) & 0x8) != 0)) || (((int)_ZN3edg10curr_tokenE) != 71)) {
-
-goto __T124087008; }
-
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148977_54_flags, 0x0U);
-} __T124087008:;
+if ((!(__149108_54_state->may_be_decl)) || (__149108_54_state->terminate)) { goto __149191_1_done; }
 
 
-if (((((int)__148977_54_flags) & 0x4) != 0) || ((((int)_ZN3edg10curr_tokenE) != 71) && (((int)_ZN3edg10curr_tokenE) != 82)))
+if ((((((int)__149109_54_flags) & 0x1) != 0) || ((((int)__149109_54_flags) & 0x8) != 0)) || (((int)_ZN3edg10curr_tokenE) != 71)) {
+
+goto __T929508208; }
+
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__149109_54_flags, 0x0U);
+} __T929508208:;
+
+
+if (((((int)__149109_54_flags) & 0x4) != 0) || ((((int)_ZN3edg10curr_tokenE) != 71) && (((int)_ZN3edg10curr_tokenE) != 82)))
 {
-goto __T124090824;
+goto __T929512152;
 }
 
 if (((int)_ZN3edg10curr_tokenE) != 82) {
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__148977_54_flags, 0x0U);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(__149109_54_flags, 0x0U);
 }
-} __T124090824:;
-__149059_1_done:;
+} __T929512152:;
+__149191_1_done:;
 ; 
 }
 #line 1610
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21is_decl_not_expr_fullEt( _ZN3edg19a_disambig_flag_setE __149074_60_flags)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21is_decl_not_expr_fullEt( _ZN3edg19a_disambig_flag_setE __149206_60_flags)
 #line 1675
 {
-auto _ZN3edg9a_booleanE __149140_19_prev_do_not_clear_specific_symbol = ((_ZN3edg9a_booleanE)0);
-auto _ZN3edg16a_disambig_stateE __149141_23_state;
-auto _ZN3edg9a_booleanE __149142_19_result = ((_ZN3edg9a_booleanE)1);
-auto _ZN3edg9a_booleanE __149143_19_is_implicit_template_type;
-auto _ZN3edg12a_symbol_ptrE __149144_22_specific_sym;
-auto unsigned short __149145_22_next_tok;
-auto _ZN3edg9a_booleanE __149146_19_is_start_of_type;
+auto _ZN3edg9a_booleanE __149272_19_prev_do_not_clear_specific_symbol = ((_ZN3edg9a_booleanE)0);
+auto _ZN3edg16a_disambig_stateE __149273_23_state;
+auto _ZN3edg9a_booleanE __149274_19_result = ((_ZN3edg9a_booleanE)1);
+auto _ZN3edg9a_booleanE __149275_19_is_implicit_template_type;
+auto _ZN3edg12a_symbol_ptrE __149276_22_specific_sym;
+auto unsigned short __149277_22_next_tok;
+auto _ZN3edg9a_booleanE __149278_19_is_start_of_type;
 #line 1680
-__149144_22_specific_sym = (_ZN3edg19locator_for_curr_idE.specific_symbol);
+__149276_22_specific_sym = (_ZN3edg19locator_for_curr_idE.specific_symbol);
 
 
 
 ;
-if (((int)_ZN3edg10curr_tokenE) == 256) { auto struct _ZN3edg13a_token_cacheE *__T124277496;
+if (((int)_ZN3edg10curr_tokenE) == 256) { auto struct _ZN3edg13a_token_cacheE *__T929697256;
 
 
 
-auto struct _ZN3edg27a_tiny_scanning_token_cacheE __149153_33_cache; _ZN3edg27a_tiny_scanning_token_cacheC1Eb((&__149153_33_cache), ((_ZN3edg9a_booleanE)0));
+auto struct _ZN3edg27a_tiny_scanning_token_cacheE __149285_33_cache; _ZN3edg27a_tiny_scanning_token_cacheC1Eb((&__149285_33_cache), ((_ZN3edg9a_booleanE)0));
 
-_ZN3edg16cache_curr_tokenEPNS_13a_token_cacheE((((*(const struct _ZN3edg27a_tiny_scanning_token_cacheE *)&__149153_33_cache)).backing_cache));
+_ZN3edg16cache_curr_tokenEPNS_13a_token_cacheE((((*(const struct _ZN3edg27a_tiny_scanning_token_cacheE *)&__149285_33_cache)).backing_cache));
 _ZN3edg9get_tokenEv();
-__149142_19_result = (_ZN3edg16is_decl_not_exprEt(__149074_60_flags));
-_ZN3edg20rescan_cached_tokensEPNS_13a_token_cacheEb((((*(const struct _ZN3edg27a_tiny_scanning_token_cacheE *)&__149153_33_cache)).backing_cache), ((_ZN3edg9a_booleanE)0)); {
-{ { __T124277496 = (__149153_33_cache.backing_cache); { _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E5clearEv((&(__T124277496->tokens))); } } _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE9push_backERKS2_(
+__149274_19_result = (_ZN3edg16is_decl_not_exprEt(__149206_60_flags));
+_ZN3edg20rescan_cached_tokensEPNS_13a_token_cacheEb((((*(const struct _ZN3edg27a_tiny_scanning_token_cacheE *)&__149285_33_cache)).backing_cache), ((_ZN3edg9a_booleanE)0)); {
+{ { __T929697256 = (__149285_33_cache.backing_cache); { _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E5clearEv((&(__T929697256->tokens))); } } _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE9push_backERKS2_(
 #line 1695
-_ZN3edg32avail_tiny_scanning_token_cachesE, (((const _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *)&(__149153_33_cache.backing_cache)))); } goto __149371_1_done; }
+_ZN3edg32avail_tiny_scanning_token_cachesE, (((const _ZN3edg9Dyn_arrayIPNS_13a_token_cacheENS_12FE_allocatorEE7an_elemE *)&(__149285_33_cache.backing_cache)))); } goto __149503_1_done; }
 }
 #line 1702
-__149143_19_is_implicit_template_type = ((_Bool)((((((((int)_ZN3edg10curr_tokenE) == 1) && ((_ZN3edg17depth_scope_stackE != (-1)) ? ((int)((_ZN3edg11scope_stackE[_ZN3edg17depth_scope_stackE]).implicit_typename)) : 0)) && (__149144_22_specific_sym != ((_ZN3edg12a_symbol_ptrE)0))) && (((int)(
+__149275_19_is_implicit_template_type = ((_Bool)((((((((int)_ZN3edg10curr_tokenE) == 1) && ((_ZN3edg17depth_scope_stackE != (-1)) ? ((int)((_ZN3edg11scope_stackE[_ZN3edg17depth_scope_stackE]).implicit_typename)) : 0)) && (__149276_22_specific_sym != ((_ZN3edg12a_symbol_ptrE)0))) && (((int)(
 #line 1702
-__149144_22_specific_sym->kind)) == 3)) && (((int)((((__149144_22_specific_sym->variant).type).ptr)->kind)) == 14)) && (((int)((((((__149144_22_specific_sym->variant).type).ptr)->variant).template_param).kind)) == 1)));
+__149276_22_specific_sym->kind)) == 3)) && (((int)((((__149276_22_specific_sym->variant).type).ptr)->kind)) == 14)) && (((int)((((((__149276_22_specific_sym->variant).type).ptr)->variant).template_param).kind)) == 1)));
 #line 1712
-__149145_22_next_tok = (_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)));
-__149146_19_is_start_of_type = (_ZN3edg18is_type_start_fullEbbi(((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), 0x0));
+__149277_22_next_tok = (_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)));
+__149278_19_is_start_of_type = (_ZN3edg18is_type_start_fullEbbi(((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), 0x0));
 
-if ((((((_ZN3edg21pack_indexing_enabledE) || (((_ZN3edg8gpp_modeE) && (!(_ZN3edg10clang_modeE))) && (_ZN3edg11gnu_versionE >= 150000UL))) || (((_ZN3edg10clang_modeE) && (!(((int)_ZN3edg9C_dialectE) != 2))) && (_ZN3edg13clang_versionE >= 190000UL))) && (__149146_19_is_start_of_type)) && (((int)
+if ((((((_ZN3edg21pack_indexing_enabledE) || (((_ZN3edg8gpp_modeE) && (!(_ZN3edg10clang_modeE))) && (_ZN3edg11gnu_versionE >= 150000UL))) || (((_ZN3edg10clang_modeE) && (!(((int)_ZN3edg9C_dialectE) != 2))) && (_ZN3edg13clang_versionE >= 190000UL))) && (__149278_19_is_start_of_type)) && (((int)
 #line 1715
-_ZN3edg10curr_tokenE) == 1)) && (((int)__149145_22_next_tok) == 82))
+_ZN3edg10curr_tokenE) == 1)) && (((int)__149277_22_next_tok) == 82))
 {
-auto unsigned short __149181_19_pack_index_next_tok; __149181_19_pack_index_next_tok = (_ZN3edg41token_kind_following_pack_index_specifierEv());
+auto unsigned short __149313_19_pack_index_next_tok; __149313_19_pack_index_next_tok = (_ZN3edg41token_kind_following_pack_index_specifierEv());
 
-if ((((int)__149181_19_pack_index_next_tok) == 30) || (((((int)__149074_60_flags) & 0x80) != 0) && (((int)__149181_19_pack_index_next_tok) == 76)))
+if ((((int)__149313_19_pack_index_next_tok) == 30) || (((((int)__149206_60_flags) & 0x80) != 0) && (((int)__149313_19_pack_index_next_tok) == 76)))
 {
 
 
-__149145_22_next_tok = __149181_19_pack_index_next_tok;
+__149277_22_next_tok = __149313_19_pack_index_next_tok;
 }
 }
-if ((((((_ZN3edg14microsoft_modeE) && (__149146_19_is_start_of_type)) && (((int)_ZN3edg10curr_tokenE) != 1)) && (((int)__149145_22_next_tok) != 30)) && (((int)__149145_22_next_tok) != 139)) && (((int)__149145_22_next_tok) != 341))
+if ((((((_ZN3edg14microsoft_modeE) && (__149278_19_is_start_of_type)) && (((int)_ZN3edg10curr_tokenE) != 1)) && (((int)__149277_22_next_tok) != 30)) && (((int)__149277_22_next_tok) != 139)) && (((int)__149277_22_next_tok) != 341))
 
 {
-auto struct _ZN3edg22a_scanning_token_cacheE __149193_28_cache;
-auto unsigned short __149194_28_next_2_tok;
-auto _ZN3edg9a_booleanE __149195_28_any_tokens_fetched;
+auto struct _ZN3edg22a_scanning_token_cacheE __149325_28_cache;
+auto unsigned short __149326_28_next_2_tok;
+auto _ZN3edg9a_booleanE __149327_28_any_tokens_fetched;
 #line 1729
-_ZN3edg22a_scanning_token_cacheC1Eb((&__149193_28_cache), ((_ZN3edg9a_booleanE)0));
+_ZN3edg22a_scanning_token_cacheC1Eb((&__149325_28_cache), ((_ZN3edg9a_booleanE)0));
 
-__149195_28_any_tokens_fetched = ((_ZN3edg9a_booleanE)0);
+__149327_28_any_tokens_fetched = ((_ZN3edg9a_booleanE)0);
 
-_ZN3edg15next_two_tokensENS_12a_token_kindEPS0_(__149145_22_next_tok, (&__149194_28_next_2_tok));
-while ((((((((((((((((((((((((((((int)__149145_22_next_tok) == 113) || (((int)__149145_22_next_tok) == 86)) || (((int)__149145_22_next_tok) == 104)) || (((int)__149145_22_next_tok) == 99)) || (((int)__149145_22_next_tok) == 101)) || (((int)__149145_22_next_tok) == 95)) || (((int)
+_ZN3edg15next_two_tokensENS_12a_token_kindEPS0_(__149277_22_next_tok, (&__149326_28_next_2_tok));
+while ((((((((((((((((((((((((((((int)__149277_22_next_tok) == 113) || (((int)__149277_22_next_tok) == 86)) || (((int)__149277_22_next_tok) == 104)) || (((int)__149277_22_next_tok) == 99)) || (((int)__149277_22_next_tok) == 101)) || (((int)__149277_22_next_tok) == 95)) || (((int)
 #line 1734
-__149145_22_next_tok) == 91)) || (((int)__149145_22_next_tok) == 105)) || (((int)__149145_22_next_tok) == 112)) || (((int)__149145_22_next_tok) == 234)) || (((int)__149145_22_next_tok) == 249)) || (((int)__149145_22_next_tok) == 135)) || (((int)__149145_22_next_tok) == 417)) || (((int)
+__149277_22_next_tok) == 91)) || (((int)__149277_22_next_tok) == 105)) || (((int)__149277_22_next_tok) == 112)) || (((int)__149277_22_next_tok) == 234)) || (((int)__149277_22_next_tok) == 249)) || (((int)__149277_22_next_tok) == 135)) || (((int)__149277_22_next_tok) == 417)) || (((int)
 #line 1734
-__149145_22_next_tok) == 418)) || (((int)__149145_22_next_tok) == 419)) || (((int)__149145_22_next_tok) == 420)) || (((int)__149145_22_next_tok) == 421)) || (((int)__149145_22_next_tok) == 442)) || ((((int)__149145_22_next_tok) == 127) || ((((int)__149145_22_next_tok) == 128) || (((int)
+__149277_22_next_tok) == 418)) || (((int)__149277_22_next_tok) == 419)) || (((int)__149277_22_next_tok) == 420)) || (((int)__149277_22_next_tok) == 421)) || (((int)__149277_22_next_tok) == 442)) || ((((int)__149277_22_next_tok) == 127) || ((((int)__149277_22_next_tok) == 128) || (((int)
 #line 1734
-__149145_22_next_tok) == 129)))) || (((((int)__149145_22_next_tok) == 133) || (((int)__149145_22_next_tok) == 134)) || (((int)__149145_22_next_tok) == 19))) || ((_ZN3edg13ms_extensionsE) && ((((((int)__149145_22_next_tok) == 155) || (((int)__149145_22_next_tok) == 156)) || (((int)
+__149277_22_next_tok) == 129)))) || (((((int)__149277_22_next_tok) == 133) || (((int)__149277_22_next_tok) == 134)) || (((int)__149277_22_next_tok) == 19))) || ((_ZN3edg13ms_extensionsE) && ((((((int)__149277_22_next_tok) == 155) || (((int)__149277_22_next_tok) == 156)) || (((int)
 #line 1734
-__149145_22_next_tok) == 157)) || (((int)__149145_22_next_tok) == 158)))) || (((int)__149145_22_next_tok) == 332)) || (((((((((((int)__149145_22_next_tok) == 366) || (((int)__149145_22_next_tok) == 367)) || (((int)__149145_22_next_tok) == 368)) || (((int)__149145_22_next_tok) == 369)) || (((int)
+__149277_22_next_tok) == 157)) || (((int)__149277_22_next_tok) == 158)))) || (((int)__149277_22_next_tok) == 332)) || (((((((((((int)__149277_22_next_tok) == 366) || (((int)__149277_22_next_tok) == 367)) || (((int)__149277_22_next_tok) == 368)) || (((int)__149277_22_next_tok) == 369)) || (((int)
 #line 1734
-__149145_22_next_tok) == 362)) || (((int)__149145_22_next_tok) == 363)) || (((int)__149145_22_next_tok) == 364)) || (((int)__149145_22_next_tok) == 365)) || (((int)__149145_22_next_tok) == 361))) || ((_ZN3edg10clang_modeE) && (_ZN3edg28is_type_returning_type_traitENS_12a_token_kindE(
+__149277_22_next_tok) == 362)) || (((int)__149277_22_next_tok) == 363)) || (((int)__149277_22_next_tok) == 364)) || (((int)__149277_22_next_tok) == 365)) || (((int)__149277_22_next_tok) == 361))) || ((_ZN3edg10clang_modeE) && (_ZN3edg28is_type_returning_type_traitENS_12a_token_kindE(
 #line 1734
-__149145_22_next_tok)))) || (((((((((((((int)__149145_22_next_tok) == 87) || (((int)__149145_22_next_tok) == 114)) || ((((int)__149145_22_next_tok) == 125) || (((int)__149145_22_next_tok) == 126))) || (((int)__149145_22_next_tok) == 350)) || (((int)__149145_22_next_tok) == 351)) || (((int)
+__149277_22_next_tok)))) || (((((((((((((int)__149277_22_next_tok) == 87) || (((int)__149277_22_next_tok) == 114)) || ((((int)__149277_22_next_tok) == 125) || (((int)__149277_22_next_tok) == 126))) || (((int)__149277_22_next_tok) == 350)) || (((int)__149277_22_next_tok) == 351)) || (((int)
 #line 1734
-__149145_22_next_tok) == 352)) || (((int)__149145_22_next_tok) == 353)) || (((int)__149145_22_next_tok) == 150)) || (((int)__149145_22_next_tok) == 266)) || (((int)__149145_22_next_tok) == 264)) || (((int)__149145_22_next_tok) == 265))) && (((int)__149194_28_next_2_tok) != 30))
+__149277_22_next_tok) == 352)) || (((int)__149277_22_next_tok) == 353)) || (((int)__149277_22_next_tok) == 150)) || (((int)__149277_22_next_tok) == 266)) || (((int)__149277_22_next_tok) == 264)) || (((int)__149277_22_next_tok) == 265))) && (((int)__149326_28_next_2_tok) != 30))
 {
-_ZN3edg16cache_curr_tokenEPNS_13a_token_cacheE((((*(const struct _ZN3edg22a_scanning_token_cacheE *)&__149193_28_cache)).backing_cache));
+_ZN3edg16cache_curr_tokenEPNS_13a_token_cacheE((((*(const struct _ZN3edg22a_scanning_token_cacheE *)&__149325_28_cache)).backing_cache));
 _ZN3edg9get_tokenEv();
-__149195_28_any_tokens_fetched = ((_ZN3edg9a_booleanE)1);
-__149145_22_next_tok = (_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)));
-_ZN3edg15next_two_tokensENS_12a_token_kindEPS0_(__149145_22_next_tok, (&__149194_28_next_2_tok));
+__149327_28_any_tokens_fetched = ((_ZN3edg9a_booleanE)1);
+__149277_22_next_tok = (_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0)));
+_ZN3edg15next_two_tokensENS_12a_token_kindEPS0_(__149277_22_next_tok, (&__149326_28_next_2_tok));
 }
 
 
-if (((int)__149145_22_next_tok) == 159) {
-__149146_19_is_start_of_type = ((_ZN3edg9a_booleanE)1);
+if (((int)__149277_22_next_tok) == 159) {
+__149278_19_is_start_of_type = ((_ZN3edg9a_booleanE)1);
 } else  {
 
 
-if (__149195_28_any_tokens_fetched) {
+if (__149327_28_any_tokens_fetched) {
 
 
 
-__149146_19_is_start_of_type = (_ZN3edg18is_type_start_fullEbbi(((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), 0x0));
+__149278_19_is_start_of_type = (_ZN3edg18is_type_start_fullEbbi(((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), 0x0));
 
 
-} else  { if (((int)__149194_28_next_2_tok) != 30) {
+} else  { if (((int)__149326_28_next_2_tok) != 30) {
 
-} else  { if (((int)__149145_22_next_tok) == 1) {
+} else  { if (((int)__149277_22_next_tok) == 1) {
 
-_ZN3edg16cache_curr_tokenEPNS_13a_token_cacheE((((*(const struct _ZN3edg22a_scanning_token_cacheE *)&__149193_28_cache)).backing_cache));
+_ZN3edg16cache_curr_tokenEPNS_13a_token_cacheE((((*(const struct _ZN3edg22a_scanning_token_cacheE *)&__149325_28_cache)).backing_cache));
 _ZN3edg9get_tokenEv();
-__149195_28_any_tokens_fetched = ((_ZN3edg9a_booleanE)1);
-__149146_19_is_start_of_type = (_ZN3edg18is_type_start_fullEbbi(((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), 0x0));
+__149327_28_any_tokens_fetched = ((_ZN3edg9a_booleanE)1);
+__149278_19_is_start_of_type = (_ZN3edg18is_type_start_fullEbbi(((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), 0x0));
 
 
 } } } }
-__149145_22_next_tok = __149194_28_next_2_tok;
-if (__149195_28_any_tokens_fetched) { _ZN3edg20rescan_cached_tokensEPNS_13a_token_cacheEb((((*(const struct _ZN3edg22a_scanning_token_cacheE *)&__149193_28_cache)).backing_cache), ((_ZN3edg9a_booleanE)0)); }
-_ZN3edg22a_scanning_token_cacheD1Ev((&__149193_28_cache)); }
+__149277_22_next_tok = __149326_28_next_2_tok;
+if (__149327_28_any_tokens_fetched) { _ZN3edg20rescan_cached_tokensEPNS_13a_token_cacheEb((((*(const struct _ZN3edg22a_scanning_token_cacheE *)&__149325_28_cache)).backing_cache), ((_ZN3edg9a_booleanE)0)); }
+_ZN3edg22a_scanning_token_cacheD1Ev((&__149325_28_cache)); }
 #line 1780
 if (((((int)_ZN3edg10curr_tokenE) == 83) && (!((_ZN3edg17auto_cast_enabledE) || (((_ZN3edg8gpp_modeE) && (!(_ZN3edg10clang_modeE))) && (_ZN3edg11gnu_versionE >= 120000UL))))) || (((int)_ZN3edg10curr_tokenE) == 350))
 
@@ -11427,9 +11596,9 @@ if (((((int)_ZN3edg10curr_tokenE) == 83) && (!((_ZN3edg17auto_cast_enabledE) || 
 
 
 
-} else  { if ((((int)_ZN3edg10curr_tokenE) == 252) || ((((((int)__149145_22_next_tok) == 30) || (((((int)__149074_60_flags) & 0x80) != 0) && (((int)__149145_22_next_tok) == 76))) || (((((int)__149074_60_flags) & 0x20) != 0) && (__149143_19_is_implicit_template_type))) && (
+} else  { if ((((int)_ZN3edg10curr_tokenE) == 252) || ((((((int)__149277_22_next_tok) == 30) || (((((int)__149206_60_flags) & 0x80) != 0) && (((int)__149277_22_next_tok) == 76))) || (((((int)__149206_60_flags) & 0x20) != 0) && (__149275_19_is_implicit_template_type))) && (
 #line 1787
-__149146_19_is_start_of_type)))
+__149278_19_is_start_of_type)))
 
 
 
@@ -11440,9 +11609,9 @@ if (((int)_ZN3edg10curr_tokenE) == 1) {
 
 
 
-__149140_19_prev_do_not_clear_specific_symbol = ((_ZN3edg9a_booleanE)(((int)(_ZN3edg19locator_for_curr_idE.do_not_clear_specific_symbol)) != 0));
+__149272_19_prev_do_not_clear_specific_symbol = ((_ZN3edg9a_booleanE)(((int)(_ZN3edg19locator_for_curr_idE.do_not_clear_specific_symbol)) != 0));
 
-if (!(__149143_19_is_implicit_template_type)) {
+if (!(__149275_19_is_implicit_template_type)) {
 
 
 
@@ -11452,51 +11621,51 @@ if (!(__149143_19_is_implicit_template_type)) {
 { if (!(_ZN3edg19locator_for_curr_idE.do_not_clear_specific_symbol)) { (_ZN3edg19locator_for_curr_idE.specific_symbol) = ((_ZN3edg12a_symbol_ptrE)0); (_ZN3edg19locator_for_curr_idE.is_semivisible_nested_type) = 0U; } } ;
 }
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19init_disambig_stateEPNS0_16a_disambig_stateEbbb((&__149141_23_state), ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1));
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19init_disambig_stateEPNS0_16a_disambig_stateEbbb((&__149273_23_state), ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1));
 #line 1816
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19prescan_declarationEPNS0_16a_disambig_stateEtb((&__149141_23_state), __149074_60_flags, ((_ZN3edg9a_booleanE)1));
-if ((!(__149141_23_state.may_be_decl)) || (__149141_23_state.terminate)) { goto __149361_1_restore_token_sequence; }
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19prescan_declarationEPNS0_16a_disambig_stateEtb((&__149273_23_state), __149206_60_flags, ((_ZN3edg9a_booleanE)1));
+if ((!(__149273_23_state.may_be_decl)) || (__149273_23_state.terminate)) { goto __149493_1_restore_token_sequence; }
 #line 1826
-if ((((int)__149074_60_flags) & 0x2) != 0) {
-if ((((int)__149074_60_flags) & 0x1) != 0) {
+if ((((int)__149206_60_flags) & 0x2) != 0) {
+if ((((int)__149206_60_flags) & 0x1) != 0) {
 
 
-if (((int)_ZN3edg10curr_tokenE) != 31) { (__149141_23_state.may_be_decl) = ((_ZN3edg9a_booleanE)0); }
+if (((int)_ZN3edg10curr_tokenE) != 31) { (__149273_23_state.may_be_decl) = ((_ZN3edg9a_booleanE)0); }
 } else  {
 
 
-if (((((int)__149074_60_flags) & 0x8) != 0) && (_ZN3edg30selection_initializers_enabledE)) {
+if (((((int)__149206_60_flags) & 0x8) != 0) && (_ZN3edg30selection_initializers_enabledE)) {
 
 
 if ((((int)_ZN3edg10curr_tokenE) != 31) && (((int)_ZN3edg10curr_tokenE) != 81)) {
-(__149141_23_state.may_be_decl) = ((_ZN3edg9a_booleanE)0);
+(__149273_23_state.may_be_decl) = ((_ZN3edg9a_booleanE)0);
 }
-} else  { if (((((int)__149074_60_flags) & 0x8) != 0) && (!((((int)__149074_60_flags) & 0x10) != 0))) {
+} else  { if (((((int)__149206_60_flags) & 0x8) != 0) && (!((((int)__149206_60_flags) & 0x10) != 0))) {
 
 
-if (((int)_ZN3edg10curr_tokenE) != 31) { (__149141_23_state.may_be_decl) = ((_ZN3edg9a_booleanE)0); }
+if (((int)_ZN3edg10curr_tokenE) != 31) { (__149273_23_state.may_be_decl) = ((_ZN3edg9a_booleanE)0); }
 } else  {
 
-if (((int)_ZN3edg10curr_tokenE) != 81) { (__149141_23_state.may_be_decl) = ((_ZN3edg9a_booleanE)0); }
+if (((int)_ZN3edg10curr_tokenE) != 81) { (__149273_23_state.may_be_decl) = ((_ZN3edg9a_booleanE)0); }
 } }
 }
-} else  { if ((((int)__149074_60_flags) & 0x80) != 0) {
+} else  { if ((((int)__149206_60_flags) & 0x80) != 0) {
 
 if (((((int)_ZN3edg10curr_tokenE) != 71) && (((int)_ZN3edg10curr_tokenE) != 47)) && ((!((_ZN3edg11scope_stackE[_ZN3edg17depth_scope_stackE]).in_template_arg_list)) || (((int)_ZN3edg10curr_tokenE) != 45)))
 
 {
-(__149141_23_state.may_be_decl) = ((_ZN3edg9a_booleanE)0);
+(__149273_23_state.may_be_decl) = ((_ZN3edg9a_booleanE)0);
 }
-} else  { if (((int)__149074_60_flags) & 0x1000) {
+} else  { if (((int)__149206_60_flags) & 0x1000) {
 
 } else  {
 
 
 if (((((int)_ZN3edg10curr_tokenE) != 31) && (((int)_ZN3edg10curr_tokenE) != 77)) && (((int)_ZN3edg10curr_tokenE) != 29))
 {
-(__149141_23_state.may_be_decl) = ((_ZN3edg9a_booleanE)0);
+(__149273_23_state.may_be_decl) = ((_ZN3edg9a_booleanE)0);
 }
-if ((__149141_23_state.may_be_decl) && ((((int)__149074_60_flags) & 0x20) != 0)) {
+if ((__149273_23_state.may_be_decl) && ((((int)__149206_60_flags) & 0x20) != 0)) {
 
 
 
@@ -11507,58 +11676,58 @@ if ((((!(_ZN3edg19is_expr_start_tokenENS_12a_token_kindE(_ZN3edg10curr_tokenE)))
 #line 1883
 _ZN3edg10curr_tokenE) == 34) ? ((_Bool)(!(_ZN3edg19is_expr_start_tokenENS_12a_token_kindE((_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0))))))) : ((((int)_ZN3edg10curr_tokenE) == 35) ? ((_Bool)(!(
 #line 1883
-_ZN3edg19is_expr_start_tokenENS_12a_token_kindE((_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0))))))) : ((_Bool)0))))) || ((__149143_19_is_implicit_template_type) && ((((((int)_ZN3edg10curr_tokenE) == 38) || (((
+_ZN3edg19is_expr_start_tokenENS_12a_token_kindE((_ZN3edg15next_token_fullEPjPPNS_15a_symbol_headerE(((_ZN3edg23a_token_sequence_numberE *)0), ((struct _ZN3edg15a_symbol_headerE **)0))))))) : ((_Bool)0))))) || ((__149275_19_is_implicit_template_type) && ((((((int)_ZN3edg10curr_tokenE) == 38) || (((
 #line 1883
 int)_ZN3edg10curr_tokenE) == 39)) || (((int)_ZN3edg10curr_tokenE) == 37)) || (((int)_ZN3edg10curr_tokenE) == 36)))) && ((!(_ZN3edg25compound_literals_allowedE)) || (((int)_ZN3edg10curr_tokenE) != 76)))
 #line 1892
 {
-(__149141_23_state.may_be_decl) = ((_ZN3edg9a_booleanE)0);
+(__149273_23_state.may_be_decl) = ((_ZN3edg9a_booleanE)0);
 }
 }
 } } }
-__149361_1_restore_token_sequence:;
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21wrapup_disambig_stateEPNS0_16a_disambig_stateE((&__149141_23_state));
+__149493_1_restore_token_sequence:;
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21wrapup_disambig_stateEPNS0_16a_disambig_stateE((&__149273_23_state));
 if ((((int)_ZN3edg10curr_tokenE) == 1) || (((int)_ZN3edg10curr_tokenE) == 22)) {
 
 
-(_ZN3edg19locator_for_curr_idE.do_not_clear_specific_symbol) = ((_ZN3edg11a_bit_fieldE)__149140_19_prev_do_not_clear_specific_symbol);
+(_ZN3edg19locator_for_curr_idE.do_not_clear_specific_symbol) = ((_ZN3edg11a_bit_fieldE)__149272_19_prev_do_not_clear_specific_symbol);
 
 }
-__149142_19_result = (__149141_23_state.may_be_decl);
+__149274_19_result = (__149273_23_state.may_be_decl);
 } }
-__149371_1_done:;
+__149503_1_done:;
 ;
-return __149142_19_result;
+return __149274_19_result;
 }
 
 
-_ZN3edg9a_booleanE _ZN3edg16is_decl_not_exprEt( _ZN3edg19a_disambig_flag_setE __149377_48_flags)
+_ZN3edg9a_booleanE _ZN3edg16is_decl_not_exprEt( _ZN3edg19a_disambig_flag_setE __149509_48_flags)
 #line 1920
 {
-auto _ZN3edg28an_is_decl_start_options_setE __149385_32_is_decl_start_options;
-auto _ZN3edg9a_booleanE __149386_15_result = ((_ZN3edg9a_booleanE)0);
+auto _ZN3edg28an_is_decl_start_options_setE __149517_32_is_decl_start_options;
+auto _ZN3edg9a_booleanE __149518_15_result = ((_ZN3edg9a_booleanE)0);
 
 
 
-__149385_32_is_decl_start_options = ((((((int)__149377_48_flags) & 0x100) == 0) ? 0x1 : 0x0) | (((((int)__149377_48_flags) & 0x400) != 0) ? 0x8 : 0x0));
+__149517_32_is_decl_start_options = ((((((int)__149509_48_flags) & 0x100) == 0) ? 0x1 : 0x0) | (((((int)__149509_48_flags) & 0x400) != 0) ? 0x8 : 0x0));
 
 
 
-if ((((int)__149377_48_flags) & 0x2) != 0) {
-__149385_32_is_decl_start_options |= 0x2;
+if ((((int)__149509_48_flags) & 0x2) != 0) {
+__149517_32_is_decl_start_options |= 0x2;
 }
 if (!(((int)_ZN3edg9C_dialectE) != 2)) {
-if (_ZN3edg13is_decl_startEi(__149385_32_is_decl_start_options)) {
-__149386_15_result = (_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21is_decl_not_expr_fullEt(__149377_48_flags));
+if (_ZN3edg13is_decl_startEi(__149517_32_is_decl_start_options)) {
+__149518_15_result = (_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21is_decl_not_expr_fullEt(__149509_48_flags));
 } else  {
 
 
-__149386_15_result = ((_Bool)(((int)_ZN3edg10curr_tokenE) == 260));
+__149518_15_result = ((_Bool)(((int)_ZN3edg10curr_tokenE) == 260));
 }
 } else  {
-__149386_15_result = (_ZN3edg13is_decl_startEi(__149385_32_is_decl_start_options));
+__149518_15_result = (_ZN3edg13is_decl_startEi(__149517_32_is_decl_start_options));
 }
-return __149386_15_result;
+return __149518_15_result;
 }
 
 
@@ -11567,89 +11736,89 @@ _ZN3edg9a_booleanE _ZN3edg24is_func_declarator_startEv(void)
 
 
 {
-auto _ZN3edg9a_booleanE __149417_14_result;
+auto _ZN3edg9a_booleanE __149549_14_result;
 
 if (((int)_ZN3edg10curr_tokenE) != 30) {
-__149417_14_result = ((_ZN3edg9a_booleanE)0);
+__149549_14_result = ((_ZN3edg9a_booleanE)0);
 } else  {
-auto _ZN3edg16a_disambig_stateE __149422_23_state;
+auto _ZN3edg16a_disambig_stateE __149554_23_state;
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19init_disambig_stateEPNS0_16a_disambig_stateEbbb((&__149422_23_state), ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1));
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19init_disambig_stateEPNS0_16a_disambig_stateEbbb((&__149554_23_state), ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1));
 
 
 _ZN32_INTERNAL_10_disambig_c_5f3c0e863edg38f_get_token_and_coalesce_if_identifierEtj(((_ZN3edg19a_disambig_flag_setE)0U), 0x0U);
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg27prescan_function_declaratorEPNS0_16a_disambig_stateEt((&__149422_23_state), ((_ZN3edg19a_disambig_flag_setE)0U));
-__149417_14_result = (__149422_23_state.may_be_decl);
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21wrapup_disambig_stateEPNS0_16a_disambig_stateE((&__149422_23_state));
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg27prescan_function_declaratorEPNS0_16a_disambig_stateEt((&__149554_23_state), ((_ZN3edg19a_disambig_flag_setE)0U));
+__149549_14_result = (__149554_23_state.may_be_decl);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21wrapup_disambig_stateEPNS0_16a_disambig_stateE((&__149554_23_state));
 }
-return __149417_14_result;
+return __149549_14_result;
 }
 
 
-_ZN3edg10a_type_ptrE _ZN3edg27prescan_and_find_declaratorEPb( _ZN3edg9a_booleanE *__149436_55_is_friend_decl)
+_ZN3edg10a_type_ptrE _ZN3edg27prescan_and_find_declaratorEPb( _ZN3edg9a_booleanE *__149568_55_is_friend_decl)
 #line 1983
 {
-auto _ZN3edg16a_disambig_stateE __149448_23_state;
+auto _ZN3edg16a_disambig_stateE __149580_23_state;
 
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19init_disambig_stateEPNS0_16a_disambig_stateEbbb((&__149448_23_state), ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1));
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19init_disambig_stateEPNS0_16a_disambig_stateEbbb((&__149580_23_state), ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)1), ((_ZN3edg9a_booleanE)1));
 
 
-(__149448_23_state.set_decl_class_type) = ((_ZN3edg9a_booleanE)1);
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19prescan_declarationEPNS0_16a_disambig_stateEtb((&__149448_23_state), ((_ZN3edg19a_disambig_flag_setE)66U), ((_ZN3edg9a_booleanE)1));
+(__149580_23_state.set_decl_class_type) = ((_ZN3edg9a_booleanE)1);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19prescan_declarationEPNS0_16a_disambig_stateEtb((&__149580_23_state), ((_ZN3edg19a_disambig_flag_setE)66U), ((_ZN3edg9a_booleanE)1));
 
 
-(*__149436_55_is_friend_decl) = (__149448_23_state.friend_encountered);
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21wrapup_disambig_stateEPNS0_16a_disambig_stateE((&__149448_23_state));
-return __149448_23_state.decl_class_type;
+(*__149568_55_is_friend_decl) = (__149580_23_state.friend_encountered);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21wrapup_disambig_stateEPNS0_16a_disambig_stateE((&__149580_23_state));
+return __149580_23_state.decl_class_type;
 }
 
 
 unsigned short _ZN3edg23find_for_loop_separatorEv(void)
 #line 2006
 {
-auto _ZN3edg17a_token_set_arrayE __149471_21_stop_token_array;
-auto unsigned __149472_17_question_count = 0U;
-auto unsigned short __149473_17_result;
-auto _ZN3edg16a_disambig_stateE __149474_20_state;
+auto _ZN3edg17a_token_set_arrayE __149603_21_stop_token_array;
+auto unsigned __149604_17_question_count = 0U;
+auto unsigned short __149605_17_result;
+auto _ZN3edg16a_disambig_stateE __149606_20_state;
 
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19init_disambig_stateEPNS0_16a_disambig_stateEbbb((&__149474_20_state), ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)1));
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19init_disambig_stateEPNS0_16a_disambig_stateEbbb((&__149606_20_state), ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)1));
 
 
-memset(((void *)((char *)(__149471_21_stop_token_array))), 0, 453ULL);
-((__149471_21_stop_token_array)[58])++;
-((__149471_21_stop_token_array)[59])++;
-((__149471_21_stop_token_array)[81])++;
+memset(((void *)((char *)(__149603_21_stop_token_array))), 0, 453ULL);
+((__149603_21_stop_token_array)[58])++;
+((__149603_21_stop_token_array)[59])++;
+((__149603_21_stop_token_array)[81])++;
 for (; ; ) {
-_ZN3edg23cache_token_stream_fullEPNS_13a_token_cacheEPhj(((_ZN3edg17a_token_cache_ptrE)0), (__149471_21_stop_token_array), 0U);
+_ZN3edg23cache_token_stream_fullEPNS_13a_token_cacheEPhj(((_ZN3edg17a_token_cache_ptrE)0), (__149603_21_stop_token_array), 0U);
 
 if (((int)_ZN3edg10curr_tokenE) == 58) {
-__149472_17_question_count++;
+__149604_17_question_count++;
 } else  { if (((int)_ZN3edg10curr_tokenE) == 59) {
-if (__149472_17_question_count > 0U) {
-__149472_17_question_count--;
+if (__149604_17_question_count > 0U) {
+__149604_17_question_count--;
 } else  {
-__149473_17_result = _ZN3edg9tok_colonE;
-goto __T125244608;
+__149605_17_result = _ZN3edg9tok_colonE;
+goto __T930658224;
 }
 } else  { if (((int)_ZN3edg10curr_tokenE) == 9) {
-__149473_17_result = _ZN3edg17tok_end_of_sourceE;
-goto __T125244608;
+__149605_17_result = _ZN3edg17tok_end_of_sourceE;
+goto __T930658224;
 } else  {
-(((int)_ZN3edg10curr_tokenE) == 81) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/disambig.c"), 2036, __T124613328, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-if (__149472_17_question_count == 0U) {
-__149473_17_result = _ZN3edg13tok_semicolonE;
-goto __T125244608;
+(((int)_ZN3edg10curr_tokenE) == 81) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/disambig.c"), 2036, __T930078736, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+if (__149604_17_question_count == 0U) {
+__149605_17_result = _ZN3edg13tok_semicolonE;
+goto __T930658224;
 } else  {
-__149473_17_result = _ZN3edg9tok_errorE;
-goto __T125244608;
+__149605_17_result = _ZN3edg9tok_errorE;
+goto __T930658224;
 }
 } } }
 _ZN3edg9get_tokenEv();
-} __T125244608:;
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21wrapup_disambig_stateEPNS0_16a_disambig_stateE((&__149474_20_state));
-return __149473_17_result;
+} __T930658224:;
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21wrapup_disambig_stateEPNS0_16a_disambig_stateE((&__149606_20_state));
+return __149605_17_result;
 }
 
 
@@ -11672,40 +11841,40 @@ _ZN3edg9a_booleanE _ZN3edg18static_member_nextEv(void)
 
 
 {
-auto _ZN3edg16a_disambig_stateE __149535_21_state;
+auto _ZN3edg16a_disambig_stateE __149667_21_state;
 
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19init_disambig_stateEPNS0_16a_disambig_stateEbbb((&__149535_21_state), ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)1));
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19init_disambig_stateEPNS0_16a_disambig_stateEbbb((&__149667_21_state), ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)1));
 
 
-(__149535_21_state.find_static_specifier_only) = ((_ZN3edg9a_booleanE)1);
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19prescan_declarationEPNS0_16a_disambig_stateEtb((&__149535_21_state), ((_ZN3edg19a_disambig_flag_setE)2U), ((_ZN3edg9a_booleanE)1));
+(__149667_21_state.find_static_specifier_only) = ((_ZN3edg9a_booleanE)1);
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19prescan_declarationEPNS0_16a_disambig_stateEtb((&__149667_21_state), ((_ZN3edg19a_disambig_flag_setE)2U), ((_ZN3edg9a_booleanE)1));
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21wrapup_disambig_stateEPNS0_16a_disambig_stateE((&__149535_21_state));
-return __149535_21_state.static_specifier_seen;
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21wrapup_disambig_stateEPNS0_16a_disambig_stateE((&__149667_21_state));
+return __149667_21_state.static_specifier_seen;
 }
 
 
 _ZN3edg9a_booleanE _ZN3edg26elaborated_cli_typeid_nextEv(void)
 #line 2093
 {
-auto _ZN3edg9a_booleanE __149558_14_result = ((_ZN3edg9a_booleanE)0);
+auto _ZN3edg9a_booleanE __149690_14_result = ((_ZN3edg9a_booleanE)0);
 
 if ((((((((int)_ZN3edg10curr_tokenE) == 108) || (((int)_ZN3edg10curr_tokenE) == 111)) || (((int)_ZN3edg10curr_tokenE) == 220)) || (((int)_ZN3edg10curr_tokenE) == 168)) || ((_ZN3edg17cli_or_cx_enabledE) && ((((((((int)_ZN3edg10curr_tokenE) == 193) || (((int)_ZN3edg10curr_tokenE) == 194)) || (((int)
 #line 2096
 _ZN3edg10curr_tokenE) == 187)) || (((int)_ZN3edg10curr_tokenE) == 188)) || (((int)_ZN3edg10curr_tokenE) == 189)) || (((int)_ZN3edg10curr_tokenE) == 190)))) || ((_ZN3edg13cppcx_enabledE) && ((((int)_ZN3edg10curr_tokenE) == 196) || (((int)_ZN3edg10curr_tokenE) == 197)))) {
-auto _ZN3edg17a_source_positionE __149561_24_pos_class_key;
-auto unsigned short __149562_24_class_key;
-auto _ZN3edg16a_disambig_stateE __149563_24_state;
+auto _ZN3edg17a_source_positionE __149693_24_pos_class_key;
+auto unsigned short __149694_24_class_key;
+auto _ZN3edg16a_disambig_stateE __149695_24_state;
 #line 2098
-__149562_24_class_key = _ZN3edg10curr_tokenE;
+__149694_24_class_key = _ZN3edg10curr_tokenE;
 
 
 
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19init_disambig_stateEPNS0_16a_disambig_stateEbbb((&__149563_24_state), ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)1));
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg19init_disambig_stateEPNS0_16a_disambig_stateEbbb((&__149695_24_state), ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)1));
 
 
-__149561_24_pos_class_key = _ZN3edg14pos_curr_tokenE;
+__149693_24_pos_class_key = _ZN3edg14pos_curr_tokenE;
 
 _ZN3edg9get_tokenEv();
 
@@ -11714,54 +11883,54 @@ if ((((((int)_ZN3edg10curr_tokenE) == 1) || (((int)_ZN3edg10curr_tokenE) == 215)
 _ZN3edg33f_is_generalized_identifier_startEjPNS_6a_typeE(0x240001U, ((_ZN3edg10a_type_ptrE)0))))))) && (((int)_ZN3edg10curr_tokenE) == 18))
 
 {
-auto _ZN3edg10a_type_ptrE __149576_19_tp; __149576_19_tp = (_ZN3edg13skip_typerefsEPNS_6a_typeE(((_ZN3edg19locator_for_curr_idE.parent).class_type)));
+auto _ZN3edg10a_type_ptrE __149708_19_tp; __149708_19_tp = (_ZN3edg13skip_typerefsEPNS_6a_typeE(((_ZN3edg19locator_for_curr_idE.parent).class_type)));
 
 
-if (_ZN3edg26is_class_struct_union_typeEPNS_6a_typeE(__149576_19_tp)) {
-auto _ZN3edg9a_booleanE __149580_20_mismatch = ((_ZN3edg9a_booleanE)0);
-switch ((int)((((__149576_19_tp->variant).class_struct_union).extra_info)->cli_class_type_kind)) {
+if (_ZN3edg26is_class_struct_union_typeEPNS_6a_typeE(__149708_19_tp)) {
+auto _ZN3edg9a_booleanE __149712_20_mismatch = ((_ZN3edg9a_booleanE)0);
+switch ((int)((((__149708_19_tp->variant).class_struct_union).extra_info)->cli_class_type_kind)) {
 case 0:
-__149580_20_mismatch = ((_Bool)((((((int)__149562_24_class_key) != 220) && (((int)__149562_24_class_key) != 108)) && (((int)__149562_24_class_key) != 111)) && (((int)__149562_24_class_key) != 168)));
+__149712_20_mismatch = ((_Bool)((((((int)__149694_24_class_key) != 220) && (((int)__149694_24_class_key) != 108)) && (((int)__149694_24_class_key) != 111)) && (((int)__149694_24_class_key) != 168)));
 
-goto __T125302544;
+goto __T930716160;
 case 1:
-__149580_20_mismatch = ((_Bool)((((int)__149562_24_class_key) != 189) && (((int)__149562_24_class_key) != 190)));
+__149712_20_mismatch = ((_Bool)((((int)__149694_24_class_key) != 189) && (((int)__149694_24_class_key) != 190)));
 
-goto __T125302544;
+goto __T930716160;
 case 2:
-__149580_20_mismatch = ((_Bool)((((int)__149562_24_class_key) != 187) && (((int)__149562_24_class_key) != 188)));
+__149712_20_mismatch = ((_Bool)((((int)__149694_24_class_key) != 187) && (((int)__149694_24_class_key) != 188)));
 
-goto __T125302544;
+goto __T930716160;
 case 3:
-__149580_20_mismatch = ((_Bool)((((int)__149562_24_class_key) != 193) && (((int)__149562_24_class_key) != 194)));
+__149712_20_mismatch = ((_Bool)((((int)__149694_24_class_key) != 193) && (((int)__149694_24_class_key) != 194)));
 
-goto __T125302544;
+goto __T930716160;
 default:
-_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/disambig.c"), 2135, __T124616872, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
-} __T125302544:;
-if (__149580_20_mismatch) {
-_ZN3edg12pos_sy_errorENS_13an_error_codeEPNS_17a_source_positionEPNS_8a_symbolE(_ZN3edg35ec_conflicting_cli_class_type_kindsE, (&__149561_24_pos_class_key), ((_ZN3edg12a_symbol_ptrE)((__149576_19_tp->source_corresp).assoc_info)));
+_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/disambig.c"), 2135, __T930082288, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
+} __T930716160:;
+if (__149712_20_mismatch) {
+_ZN3edg12pos_sy_errorENS_13an_error_codeEPNS_17a_source_positionEPNS_8a_symbolE(_ZN3edg35ec_conflicting_cli_class_type_kindsE, (&__149693_24_pos_class_key), ((_ZN3edg12a_symbol_ptrE)((__149708_19_tp->source_corresp).assoc_info)));
 
 }
-__149558_14_result = ((_ZN3edg9a_booleanE)1);
-} else  { if (_ZN3edg22is_template_param_typeEPNS_6a_typeE(__149576_19_tp)) {
-__149558_14_result = ((_ZN3edg9a_booleanE)1);
+__149690_14_result = ((_ZN3edg9a_booleanE)1);
+} else  { if (_ZN3edg22is_template_param_typeEPNS_6a_typeE(__149708_19_tp)) {
+__149690_14_result = ((_ZN3edg9a_booleanE)1);
 } }
 }
-_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21wrapup_disambig_stateEPNS0_16a_disambig_stateE((&__149563_24_state));
+_ZN32_INTERNAL_10_disambig_c_5f3c0e863edg21wrapup_disambig_stateEPNS0_16a_disambig_stateE((&__149695_24_state));
 }
-return __149558_14_result;
+return __149690_14_result;
 }
 #line 888 "src/util.h"
  /* COMDAT group: _ZN3edg16destroy_elementsINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEEPS4_EENS_16Enable_if_helperIXntsr3edg6detail32Is_trivially_destructible_helperIT_EE5valueEvE7a_thingERT0_y */ _ZN3edg9Enable_ifILb1EvEE 
 #line 888
 _ZN3edg16destroy_elementsINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEEPS4_EENS_16Enable_if_helperIXntsr3edg6detail32Is_trivially_destructible_helperIT_EE5valueEvE7a_thingERT0_y( _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E7an_elemE 
 #line 888
-**__34477_28_array, 
-size_t __34478_27_num_to_destroy)
+**__34609_28_array, 
+size_t __34610_27_num_to_destroy)
 #line 897
-{  { auto _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E7an_elemE *__T126475552;
-auto size_t __34487_15_i; __34487_15_i = 0ULL; for (; __34487_15_i < __34478_27_num_to_destroy; ++__34487_15_i) {
-{ __T126475552 = ((*__34477_28_array) + __34487_15_i); { _ZN3edg10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEED1Ev(__T126475552); } }
+{  { auto _ZN3edg9Dyn_arrayINS_10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEEES3_E7an_elemE *__T932257760;
+auto size_t __34619_15_i; __34619_15_i = 0ULL; for (; __34619_15_i < __34610_27_num_to_destroy; ++__34619_15_i) {
+{ __T932257760 = ((*__34609_28_array) + __34619_15_i); { _ZN3edg10Shared_objINS_25an_immutable_cached_tokenENS_12FE_allocatorEED1Ev(__T932257760); } }
 } } 
 }

@@ -1,5 +1,5 @@
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
-/* Wed Oct  7 07:14:44 2026 */
+/* Thu Oct  8 07:53:17 2026 */
 extern int __EDGCPFE__7_0;
 void *memcpy(void *,const void *,unsigned long long);
 void *memset(void *,int,unsigned long long);
@@ -75,7 +75,7 @@ a_byte *spare_block;};
 
 
 typedef struct a_vla_pool a_vla_pool;
-#line 44 "ape-sys/stdlib.h"
+#line 66 "ape-sys/stdlib.h"
 extern void free(void *);
 extern void *malloc(size_t);
 extern void *realloc(void *, size_t);
@@ -128,9 +128,9 @@ static void _ZN33_INTERNAL_11_vla_alloc_c_be8bd49b31increase_curr_vla_pool_capac
 
 
 
-{ auto void *__T1032708392; auto unsigned long long __T1032709040;
+{ auto void *__T505762456; auto unsigned long long __T505763104;
 (curr_vla_pool->capacity) *= 2LL;
-(curr_vla_pool->allocations) = ((a_vla_allocation_ptr)(((__T1032708392 = ((void *)(curr_vla_pool->allocations))) , (__T1032709040 = (((unsigned long long)(curr_vla_pool->capacity)) * 24ULL))) , (realloc(__T1032708392, __T1032709040))));
+(curr_vla_pool->allocations) = ((a_vla_allocation_ptr)(((__T505762456 = ((void *)(curr_vla_pool->allocations))) , (__T505763104 = (((unsigned long long)(curr_vla_pool->capacity)) * 24ULL))) , (realloc(__T505762456, __T505763104))));
 
 
 if ((curr_vla_pool->allocations) == ((a_vla_allocation_ptr)0)) {
@@ -139,76 +139,76 @@ __abort_execution(ec_vla_allocation_failed);
 }
 
 
-static void _ZN33_INTERNAL_11_vla_alloc_c_be8bd49b21free_dead_allocationsEPv( void *__3128_42_ptr)
+static void _ZN33_INTERNAL_11_vla_alloc_c_be8bd49b21free_dead_allocationsEPv( void *__3156_42_ptr)
 #line 141
 {
-auto ptrdiff_t __3137_14_alloc_idx; __3137_14_alloc_idx = (curr_vla_pool->last_allocation);
+auto ptrdiff_t __3165_14_alloc_idx; __3165_14_alloc_idx = (curr_vla_pool->last_allocation);
 
 
-for (; __3137_14_alloc_idx >= 0LL; --__3137_14_alloc_idx) {
-auto a_vla_allocation_ptr __3141_27_allocation; __3141_27_allocation = ((curr_vla_pool->allocations) + __3137_14_alloc_idx);
-if (((char *)(&__3137_14_alloc_idx)) > ((char *)__3128_42_ptr)) {
+for (; __3165_14_alloc_idx >= 0LL; --__3165_14_alloc_idx) {
+auto a_vla_allocation_ptr __3169_27_allocation; __3169_27_allocation = ((curr_vla_pool->allocations) + __3165_14_alloc_idx);
+if (((char *)(&__3165_14_alloc_idx)) > ((char *)__3156_42_ptr)) {
 
-if (((char *)(__3141_27_allocation->frame_marker)) < ((char *)__3128_42_ptr)) {
-goto __T1032716472;
+if (((char *)(__3169_27_allocation->frame_marker)) < ((char *)__3156_42_ptr)) {
+goto __T505770536;
 }
 } else  {
 
-if (((char *)(__3141_27_allocation->frame_marker)) > ((char *)__3128_42_ptr)) {
-goto __T1032716472;
+if (((char *)(__3169_27_allocation->frame_marker)) > ((char *)__3156_42_ptr)) {
+goto __T505770536;
 }
 }
-if ((__3141_27_allocation->block) == ((a_byte *)0)) {
+if ((__3169_27_allocation->block) == ((a_byte *)0)) {
 
-free(((void *)(__3141_27_allocation->storage)));
+free(((void *)(__3169_27_allocation->storage)));
 } else  {
 
 
-auto ptrdiff_t __3159_18_offset; __3159_18_offset = ((__3141_27_allocation->storage) - (__3141_27_allocation->block));
-if (__3159_18_offset == 0LL) {
+auto ptrdiff_t __3187_18_offset; __3187_18_offset = ((__3169_27_allocation->storage) - (__3169_27_allocation->block));
+if (__3187_18_offset == 0LL) {
 
 
 
 
 if ((curr_vla_pool->spare_block) == ((a_byte *)0)) {
-(curr_vla_pool->spare_block) = (__3141_27_allocation->block);
+(curr_vla_pool->spare_block) = (__3169_27_allocation->block);
 } else  {
-free(((void *)(__3141_27_allocation->block)));
+free(((void *)(__3169_27_allocation->block)));
 }
 (curr_vla_pool->normal_block) = ((a_byte *)0);
 (curr_vla_pool->normal_offset) = 32700LL;
 } else  {
-(curr_vla_pool->normal_offset) = __3159_18_offset;
+(curr_vla_pool->normal_offset) = __3187_18_offset;
 }
-(curr_vla_pool->normal_offset) = __3159_18_offset;
+(curr_vla_pool->normal_offset) = __3187_18_offset;
 }
-} __T1032716472:;
-(curr_vla_pool->last_allocation) = __3137_14_alloc_idx; 
+} __T505770536:;
+(curr_vla_pool->last_allocation) = __3165_14_alloc_idx; 
 }
 
 
-void __vla_alloc( void *__3182_39_ptr, 
-ptrdiff_t __3183_38_n_bytes)
+void __vla_alloc( void *__3210_39_ptr, 
+ptrdiff_t __3211_38_n_bytes)
 
 
 
 
 {
-auto ptrdiff_t __3189_25_alloc_idx; auto ptrdiff_t __3189_36_padding;
-auto a_vla_allocation_ptr __3190_25_allocation;
+auto ptrdiff_t __3217_25_alloc_idx; auto ptrdiff_t __3217_36_padding;
+auto a_vla_allocation_ptr __3218_25_allocation;
 
-if (__3183_38_n_bytes == 0LL) {
+if (__3211_38_n_bytes == 0LL) {
 
 
-__3183_38_n_bytes = 1LL;
-} else  { if (__3183_38_n_bytes < 0LL) {
+__3211_38_n_bytes = 1LL;
+} else  { if (__3211_38_n_bytes < 0LL) {
 __abort_execution(ec_negative_vla_size);
 } }
-__3189_36_padding = (8LL - (__3183_38_n_bytes % 8LL));
-if (__3189_36_padding != 8LL) {
+__3217_36_padding = (8LL - (__3211_38_n_bytes % 8LL));
+if (__3217_36_padding != 8LL) {
 
 
-__3183_38_n_bytes += __3189_36_padding;
+__3211_38_n_bytes += __3217_36_padding;
 }
 if (curr_vla_pool == ((a_vla_pool_ptr)0)) {
 
@@ -217,43 +217,43 @@ _ZN33_INTERNAL_11_vla_alloc_c_be8bd49b18init_curr_vla_poolEv();
 
 
 
-auto ptrdiff_t __3212_16_last_idx; __3212_16_last_idx = (curr_vla_pool->last_allocation);
-if (__3212_16_last_idx >= 0LL) {
-if (((char *)(&__3212_16_last_idx)) > ((char *)__3182_39_ptr)) {
+auto ptrdiff_t __3240_16_last_idx; __3240_16_last_idx = (curr_vla_pool->last_allocation);
+if (__3240_16_last_idx >= 0LL) {
+if (((char *)(&__3240_16_last_idx)) > ((char *)__3210_39_ptr)) {
 
-if (((char *)(((curr_vla_pool->allocations)[__3212_16_last_idx]).frame_marker)) > ((char *)(&__3189_25_alloc_idx)))
+if (((char *)(((curr_vla_pool->allocations)[__3240_16_last_idx]).frame_marker)) > ((char *)(&__3217_25_alloc_idx)))
 {
-_ZN33_INTERNAL_11_vla_alloc_c_be8bd49b21free_dead_allocationsEPv(((void *)(&__3189_25_alloc_idx)));
+_ZN33_INTERNAL_11_vla_alloc_c_be8bd49b21free_dead_allocationsEPv(((void *)(&__3217_25_alloc_idx)));
 }
 } else  {
 
-if (((char *)(((curr_vla_pool->allocations)[__3212_16_last_idx]).frame_marker)) < ((char *)(&__3189_25_alloc_idx)))
+if (((char *)(((curr_vla_pool->allocations)[__3240_16_last_idx]).frame_marker)) < ((char *)(&__3217_25_alloc_idx)))
 {
-_ZN33_INTERNAL_11_vla_alloc_c_be8bd49b21free_dead_allocationsEPv(((void *)(&__3189_25_alloc_idx)));
+_ZN33_INTERNAL_11_vla_alloc_c_be8bd49b21free_dead_allocationsEPv(((void *)(&__3217_25_alloc_idx)));
 }
 }
 }
 }
-__3189_25_alloc_idx = (++(curr_vla_pool->last_allocation));
-if (__3189_25_alloc_idx == (curr_vla_pool->capacity)) {
+__3217_25_alloc_idx = (++(curr_vla_pool->last_allocation));
+if (__3217_25_alloc_idx == (curr_vla_pool->capacity)) {
 
 _ZN33_INTERNAL_11_vla_alloc_c_be8bd49b31increase_curr_vla_pool_capacityEv();
 }
-__3190_25_allocation = ((curr_vla_pool->allocations) + __3189_25_alloc_idx);
-(__3190_25_allocation->frame_marker) = ((void *)(&__3189_25_alloc_idx));
-if (__3183_38_n_bytes >= 4096LL) {
+__3218_25_allocation = ((curr_vla_pool->allocations) + __3217_25_alloc_idx);
+(__3218_25_allocation->frame_marker) = ((void *)(&__3217_25_alloc_idx));
+if (__3211_38_n_bytes >= 4096LL) {
 
-auto a_byte *__3238_14_special_block; __3238_14_special_block = ((a_byte *)(malloc(((size_t)__3183_38_n_bytes))));
-if (__3238_14_special_block == ((a_byte *)0)) {
+auto a_byte *__3266_14_special_block; __3266_14_special_block = ((a_byte *)(malloc(((size_t)__3211_38_n_bytes))));
+if (__3266_14_special_block == ((a_byte *)0)) {
 __abort_execution(ec_vla_allocation_failed);
 }
-(__3190_25_allocation->storage) = ((*((a_byte **)__3182_39_ptr)) = __3238_14_special_block);
+(__3218_25_allocation->storage) = ((*((a_byte **)__3210_39_ptr)) = __3266_14_special_block);
 
 
-(__3190_25_allocation->block) = ((a_byte *)0);
+(__3218_25_allocation->block) = ((a_byte *)0);
 } else  {
 
-if (((curr_vla_pool->normal_block) == ((a_byte *)0)) || ((32700LL - (curr_vla_pool->normal_offset)) < (__3183_38_n_bytes - 1LL)))
+if (((curr_vla_pool->normal_block) == ((a_byte *)0)) || ((32700LL - (curr_vla_pool->normal_offset)) < (__3211_38_n_bytes - 1LL)))
 {
 
 
@@ -269,67 +269,67 @@ __abort_execution(ec_vla_allocation_failed);
 }
 (curr_vla_pool->normal_offset) = 0LL;
 }
-(__3190_25_allocation->storage) = ((*((a_byte **)__3182_39_ptr)) = ((a_byte *)((curr_vla_pool->normal_block) + (curr_vla_pool->normal_offset))));
+(__3218_25_allocation->storage) = ((*((a_byte **)__3210_39_ptr)) = ((a_byte *)((curr_vla_pool->normal_block) + (curr_vla_pool->normal_offset))));
 
 
-(__3190_25_allocation->block) = (curr_vla_pool->normal_block);
-(curr_vla_pool->normal_offset) += __3183_38_n_bytes;
+(__3218_25_allocation->block) = (curr_vla_pool->normal_block);
+(curr_vla_pool->normal_offset) += __3211_38_n_bytes;
 } 
 }
 
 
-void __vla_dealloc( void *__3273_36_ptr)
+void __vla_dealloc( void *__3301_36_ptr)
 
 
 
 {
-auto ptrdiff_t __3278_14_alloc_idx; __3278_14_alloc_idx = (curr_vla_pool->last_allocation);
+auto ptrdiff_t __3306_14_alloc_idx; __3306_14_alloc_idx = (curr_vla_pool->last_allocation);
 
 
 
-for (; ; --__3278_14_alloc_idx) {
-auto a_vla_allocation_ptr __3283_27_allocation; __3283_27_allocation = ((curr_vla_pool->allocations) + __3278_14_alloc_idx);
+for (; ; --__3306_14_alloc_idx) {
+auto a_vla_allocation_ptr __3311_27_allocation; __3311_27_allocation = ((curr_vla_pool->allocations) + __3306_14_alloc_idx);
 
-if (!(__3278_14_alloc_idx >= 0LL)) { { fprintf(stderr, ((const char *)"Assertion failed in file \"%s\", line %d\n"), ((const char *)("lib_src/vla_alloc.c")), 290); abort(); } } ;
-if ((__3283_27_allocation->block) == ((a_byte *)0)) {
+if (!(__3306_14_alloc_idx >= 0LL)) { { fprintf(stderr, ((const char *)"Assertion failed in file \"%s\", line %d\n"), ((const char *)("lib_src/vla_alloc.c")), 290); abort(); } } ;
+if ((__3311_27_allocation->block) == ((a_byte *)0)) {
 
-free(((void *)(__3283_27_allocation->storage)));
-if ((__3283_27_allocation->storage) == (*((a_byte **)__3273_36_ptr))) {
-goto __T1032780224;
+free(((void *)(__3311_27_allocation->storage)));
+if ((__3311_27_allocation->storage) == (*((a_byte **)__3301_36_ptr))) {
+goto __T505839104;
 }
 } else  {
 
 
-auto ptrdiff_t __3295_18_offset; __3295_18_offset = ((__3283_27_allocation->storage) - (__3283_27_allocation->block));
-if (__3295_18_offset == 0LL) {
+auto ptrdiff_t __3323_18_offset; __3323_18_offset = ((__3311_27_allocation->storage) - (__3311_27_allocation->block));
+if (__3323_18_offset == 0LL) {
 
 
 
 
 if ((curr_vla_pool->spare_block) == ((a_byte *)0)) {
-(curr_vla_pool->spare_block) = (__3283_27_allocation->block);
+(curr_vla_pool->spare_block) = (__3311_27_allocation->block);
 } else  {
-free(((void *)(__3283_27_allocation->block)));
+free(((void *)(__3311_27_allocation->block)));
 }
 (curr_vla_pool->normal_block) = ((a_byte *)0);
 (curr_vla_pool->normal_offset) = 32700LL;
 } else  {
-(curr_vla_pool->normal_offset) = __3295_18_offset;
+(curr_vla_pool->normal_offset) = __3323_18_offset;
 }
-if ((__3283_27_allocation->storage) == (*((a_byte **)__3273_36_ptr))) {
-goto __T1032780224;
+if ((__3311_27_allocation->storage) == (*((a_byte **)__3301_36_ptr))) {
+goto __T505839104;
 }
 }
-} __T1032780224:;
-(curr_vla_pool->last_allocation) = (__3278_14_alloc_idx - 1LL); 
+} __T505839104:;
+(curr_vla_pool->last_allocation) = (__3306_14_alloc_idx - 1LL); 
 }
 
 
-void __vla_dealloc_eh( void *__3320_39_ptr)
+void __vla_dealloc_eh( void *__3348_39_ptr)
 
 
 
 
 {
-__vla_dealloc(((void *)(&__3320_39_ptr))); 
+__vla_dealloc(((void *)(&__3348_39_ptr))); 
 }

@@ -1,5 +1,5 @@
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
-/* Wed Oct  7 07:13:27 2026 */
+/* Thu Oct  8 07:53:01 2026 */
 extern int __EDGCPFE__7_0;
 void *memcpy(void *,const void *,unsigned long long);
 void *memset(void *,int,unsigned long long);
@@ -48705,9 +48705,9 @@ extern void _ZN3edg14fe_init_part_2Ev(void);
 #line 2197
 extern void _ZN3edg24fe_translation_unit_initEv(void);
 #line 2312
-extern void _ZN3edg23initialize_opname_namesEv(void); extern void __sti___9_fe_init_c_2cbd8fba(void); static const char __T953474544[26]; static const char __T953478232[18]; static const char __T953504888[13]; static const char __T954243560[22]; static const char __T954262576[15]; static const char 
+extern void _ZN3edg23initialize_opname_namesEv(void); extern void __sti___9_fe_init_c_2cbd8fba(void); static const char __T599904872[26]; static const char __T599908576[18]; static const char __T599935248[13]; static const char __T599940536[22]; static const char __T600746416[15]; static const char 
 #line 2312
-__T954284608[25];
+__T600768456[25];
 #line 285 "src/mem_manage.h"
 _ZN3edg6detail17a_size_to_ptr_mapE *_ZN3edg6detail12freed_fe_mapE = 0;
 #line 315
@@ -51693,9 +51693,9 @@ _ZN3edg37a_variable_remapping_for_inlining_ptrE _ZN3edg38avail_variable_remappin
 #line 206 "src/fe_init.c"
 extern _ZN3edg18a_function_pointerE _ZN3edg17function_pointersE[56];
 #line 323
-static char _ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg14curr_date_timeE[128]; static const char __T953474544[26] = "enter_underscore_keywords"; static const char __T953478232[18] = "enter_gnu_keyword"; static const char __T953504888[13] = "keyword_init"; static const char __T954243560[22] = "check_int_type_config"
+static char _ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg14curr_date_timeE[128]; static const char __T599904872[26] = "enter_underscore_keywords"; static const char __T599908576[18] = "enter_gnu_keyword"; static const char __T599935248[13] = "keyword_init"; static const char __T599940536[22] = "check_int_type_config"
 #line 323
-; static const char __T954262576[15] = "fe_init_part_1"; static const char __T954284608[25] = "fe_translation_unit_init";
+; static const char __T600746416[15] = "fe_init_part_1"; static const char __T600768456[25] = "fe_translation_unit_init";
 #line 1009 "src/basics.h"
 _ZN3edg17a_source_positionE _ZN3edg20null_source_positionE = {0U,((_ZN3edg15a_column_numberE)0U)};
 #line 1024
@@ -51709,9 +51709,9 @@ _ZN3edg9a_booleanE _ZN3edg51lowering_normalizes_boolean_controlling_expressionsE
 #line 4308
 _ZN3edg9a_booleanE _ZN3edg30record_unrecognized_attributesE = ((_ZN3edg9a_booleanE)0);
 #line 50 "src/version.h"
-_ZN3edg12a_const_charE *_ZN3edg10build_dateE = ((_ZN3edg12a_const_charE *)"Oct  7 2026");
+_ZN3edg12a_const_charE *_ZN3edg10build_dateE = ((_ZN3edg12a_const_charE *)"Oct  8 2026");
 #line 57
-_ZN3edg12a_const_charE *_ZN3edg10build_timeE = ((_ZN3edg12a_const_charE *)"07:13:27");
+_ZN3edg12a_const_charE *_ZN3edg10build_timeE = ((_ZN3edg12a_const_charE *)"07:53:01");
 #line 579 "src/il_def.h"
 _ZN3edg12a_const_charE *_ZN3edg23name_linkage_kind_namesE[5] = {((const char *)"no"),((const char *)"internal"),((const char *)"C++"),((const char *)"C"),((const char *)"last")};
 #line 828
@@ -53319,10 +53319,10 @@ static void _ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg9host_initEv(void)
 {
 
 
-{ auto char __182037_10_c;
+{ auto char __182169_10_c;
 #line 340
-__182037_10_c = ((char)(-1));
-if (((int)__182037_10_c) > 0) {
+__182169_10_c = ((char)(-1));
+if (((int)__182169_10_c) > 0) {
 _ZN3edg14internal_errorEPKc(((const char *)"host_init: CHAR_MIN in basics.h is set wrong"));
 }
 
@@ -53339,57 +53339,57 @@ static _ZN3edg10a_type_ptrE _ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg29make_and_en
 
 
 {
-auto _ZN3edg10a_type_ptrE __182070_20_type;
-auto _ZN3edg16a_symbol_locatorE __182071_20_loc;
-auto _ZN3edg12a_symbol_ptrE __182072_20_sym;
-auto _ZN3edg12a_const_charE *__182073_21_name = ((const char *)"align_val_t");
-auto _ZN3edg15a_namespace_ptrE __182074_20_std_namespace;
-auto _ZN3edg10a_type_ptrE __182075_20_size_t_type; __182075_20_size_t_type = (_ZN3edg12integer_typeENS_15an_integer_kindE(_ZN3edg20targ_size_t_int_kindE));
+auto _ZN3edg10a_type_ptrE __182202_20_type;
+auto _ZN3edg16a_symbol_locatorE __182203_20_loc;
+auto _ZN3edg12a_symbol_ptrE __182204_20_sym;
+auto _ZN3edg12a_const_charE *__182205_21_name = ((const char *)"align_val_t");
+auto _ZN3edg15a_namespace_ptrE __182206_20_std_namespace;
+auto _ZN3edg10a_type_ptrE __182207_20_size_t_type; __182207_20_size_t_type = (_ZN3edg12integer_typeENS_15an_integer_kindE(_ZN3edg20targ_size_t_int_kindE));
 
 
-__182070_20_type = (_ZN3edg10alloc_typeENS_11a_type_kindE(_ZN3edg10tk_integerE));
-((__182070_20_type->source_corresp).name_linkage) = 2U;
+__182202_20_type = (_ZN3edg10alloc_typeENS_11a_type_kindE(_ZN3edg10tk_integerE));
+((__182202_20_type->source_corresp).name_linkage) = 2U;
 
-(__182070_20_type->size) = (__182075_20_size_t_type->size);
-(((__182070_20_type->variant).integer).int_kind) = _ZN3edg20targ_size_t_int_kindE;
-(((__182070_20_type->variant).integer).enum_type) = 1U;
-(((__182070_20_type->variant).integer).is_scoped_enum) = 1U;
-(((__182070_20_type->variant).integer).has_explicit_enum_base) = 1U;
-((((__182070_20_type->variant).integer).extra_info)->base_type) = __182075_20_size_t_type;
+(__182202_20_type->size) = (__182207_20_size_t_type->size);
+(((__182202_20_type->variant).integer).int_kind) = _ZN3edg20targ_size_t_int_kindE;
+(((__182202_20_type->variant).integer).enum_type) = 1U;
+(((__182202_20_type->variant).integer).is_scoped_enum) = 1U;
+(((__182202_20_type->variant).integer).has_explicit_enum_base) = 1U;
+((((__182202_20_type->variant).integer).extra_info)->base_type) = __182207_20_size_t_type;
 
-{ __182071_20_loc = _ZN3edg15cleared_locatorE; (__182071_20_loc.source_position) = _ZN3edg20null_source_positionE; } ;
-_ZN3edg11find_symbolEPKcyPNS_16a_symbol_locatorE(__182073_21_name, ((_ZN3edg8sizeof_tE)(strlen(__182073_21_name))), (&__182071_20_loc));
-__182072_20_sym = (_ZN3edg12alloc_symbolENS_13a_symbol_kindEPNS_15a_symbol_headerEPNS_17a_source_positionE(_ZN3edg11sk_enum_tagE, (__182071_20_loc.symbol_header), (&_ZN3edg20null_source_positionE)));
+{ __182203_20_loc = _ZN3edg15cleared_locatorE; (__182203_20_loc.source_position) = _ZN3edg20null_source_positionE; } ;
+_ZN3edg11find_symbolEPKcyPNS_16a_symbol_locatorE(__182205_21_name, ((_ZN3edg8sizeof_tE)(strlen(__182205_21_name))), (&__182203_20_loc));
+__182204_20_sym = (_ZN3edg12alloc_symbolENS_13a_symbol_kindEPNS_15a_symbol_headerEPNS_17a_source_positionE(_ZN3edg11sk_enum_tagE, (__182203_20_loc.symbol_header), (&_ZN3edg20null_source_positionE)));
 
-_ZN3edg18set_source_correspEPNS_23a_source_correspondenceEPNS_8a_symbolE((&(__182070_20_type->source_corresp)), __182072_20_sym);
-(((__182072_20_sym->variant).enumeration).type) = __182070_20_type;
+_ZN3edg18set_source_correspEPNS_23a_source_correspondenceEPNS_8a_symbolE((&(__182202_20_type->source_corresp)), __182204_20_sym);
+(((__182204_20_sym->variant).enumeration).type) = __182202_20_type;
 
-__182074_20_std_namespace = (((_ZN3edg24symbol_for_namespace_stdE->variant).namespace_info).ptr);
-_ZN3edg20push_namespace_scopeENS_12a_scope_kindEPNS_11a_namespaceE(_ZN3edg23sck_namespace_extensionE, __182074_20_std_namespace);
+__182206_20_std_namespace = (((_ZN3edg24symbol_for_namespace_stdE->variant).namespace_info).ptr);
+_ZN3edg20push_namespace_scopeENS_12a_scope_kindEPNS_11a_namespaceE(_ZN3edg23sck_namespace_extensionE, __182206_20_std_namespace);
 
-_ZN3edg23enter_predeclared_classEPNS_6a_typeEiPNS_17a_source_positionE(__182070_20_type, _ZN3edg17depth_scope_stackE, (&_ZN3edg20null_source_positionE));
+_ZN3edg23enter_predeclared_classEPNS_6a_typeEiPNS_17a_source_positionE(__182202_20_type, _ZN3edg17depth_scope_stackE, (&_ZN3edg20null_source_positionE));
 _ZN3edg19pop_namespace_scopeEv();
 
 
 
-(__182072_20_sym->is_invisible) = ((_ZN3edg11a_bit_fieldE)(!((_ZN3edg8gpp_modeE) || (_ZN3edg14microsoft_modeE))));
-return __182070_20_type;
+(__182204_20_sym->is_invisible) = ((_ZN3edg11a_bit_fieldE)(!((_ZN3edg8gpp_modeE) || (_ZN3edg14microsoft_modeE))));
+return __182202_20_type;
 }
 #line 418
 static void _ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg19predeclare_entitiesEv(void)
 #line 426
 {
 if (!(((int)_ZN3edg9C_dialectE) != 2)) {
-auto _ZN3edg9a_booleanE __182132_15_need_std;
-auto int __182133_15_i;
+auto _ZN3edg9a_booleanE __182264_15_need_std;
+auto int __182265_15_i;
 #line 428
-__182132_15_need_std = ((_Bool)((_ZN3edg18namespaces_enabledE) || (_ZN3edg26type_info_in_namespace_stdE)));
+__182264_15_need_std = ((_Bool)((_ZN3edg18namespaces_enabledE) || (_ZN3edg26type_info_in_namespace_stdE)));
 
 
-__182132_15_need_std = ((_ZN3edg9a_booleanE)1);
+__182264_15_need_std = ((_ZN3edg9a_booleanE)1);
 
 
-if (((__182132_15_need_std) || (_ZN3edg20ignore_std_namespaceE)) || (_ZN3edg24va_list_in_std_namespaceE))
+if (((__182264_15_need_std) || (_ZN3edg20ignore_std_namespaceE)) || (_ZN3edg24va_list_in_std_namespaceE))
 {
 
 
@@ -53416,9 +53416,9 @@ _ZN3edg30enter_symbol_for_namespace_abiEPNS_16a_symbol_locatorE((&_ZN3edg19locat
 
 
 
-for (__182133_15_i = 0; __182133_15_i < 11; ++__182133_15_i) {
-if (((_ZN3edg15type_info_namesE)[__182133_15_i]) != ((_ZN3edg12a_const_charE *)0)) {
-((_ZN3edg18types_of_type_infoE)[__182133_15_i]) = (_ZN3edg22init_predeclared_classENS_11a_type_kindEPKc(_ZN3edg8tk_classE, ((_ZN3edg15type_info_namesE)[__182133_15_i])));
+for (__182265_15_i = 0; __182265_15_i < 11; ++__182265_15_i) {
+if (((_ZN3edg15type_info_namesE)[__182265_15_i]) != ((_ZN3edg12a_const_charE *)0)) {
+((_ZN3edg18types_of_type_infoE)[__182265_15_i]) = (_ZN3edg22init_predeclared_classENS_11a_type_kindEPKc(_ZN3edg8tk_classE, ((_ZN3edg15type_info_namesE)[__182265_15_i])));
 
 }
 }
@@ -53456,9 +53456,9 @@ if (_ZN3edg20ignore_std_namespaceE) {
 
 _ZN3edg23enter_predeclared_classEPNS_6a_typeEiPNS_17a_source_positionE(_ZN3edg17type_of_type_infoE, 0, (&_ZN3edg20null_source_positionE));
 
-} else  { auto _ZN3edg15a_namespace_ptrE __T953613616;
+} else  { auto _ZN3edg15a_namespace_ptrE __T600058016;
 
-{ __T953613616 = (((_ZN3edg24symbol_for_namespace_stdE->variant).namespace_info).ptr); _ZN3edg20push_namespace_scopeENS_12a_scope_kindEPNS_11a_namespaceE(_ZN3edg23sck_namespace_extensionE, __T953613616); _ZN3edg23enter_predeclared_classEPNS_6a_typeEiPNS_17a_source_positionE(
+{ __T600058016 = (((_ZN3edg24symbol_for_namespace_stdE->variant).namespace_info).ptr); _ZN3edg20push_namespace_scopeENS_12a_scope_kindEPNS_11a_namespaceE(_ZN3edg23sck_namespace_extensionE, __T600058016); _ZN3edg23enter_predeclared_classEPNS_6a_typeEiPNS_17a_source_positionE(
 #line 507
 _ZN3edg17type_of_type_infoE, _ZN3edg17depth_scope_stackE, (&_ZN3edg20null_source_positionE)); _ZN3edg19pop_namespace_scopeEv(); }
 }
@@ -53567,92 +53567,92 @@ _ZN3edg45init_templ_type_member_intrinsic_descriptionsEv();
 
 
 
-static void _ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg25enter_underscore_keywordsENS0_12a_token_kindEPKc( unsigned short __182318_52_token, 
-_ZN3edg12a_const_charE *__182319_53_keyword)
+static void _ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg25enter_underscore_keywordsENS0_12a_token_kindEPKc( unsigned short __182450_52_token, 
+_ZN3edg12a_const_charE *__182451_53_keyword)
 #line 622
 {
-(_ZN3edg13ms_extensionsE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 623, __T953474544, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-if (!((((int)(__182319_53_keyword[0])) == 95) && (((int)(__182319_53_keyword[1])) == 95))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 625, __T953474544, ((const char *)"enter_underscore_keywords: expected \"__\" prefix"
+(_ZN3edg13ms_extensionsE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 623, __T599904872, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+if (!((((int)(__182451_53_keyword[0])) == 95) && (((int)(__182451_53_keyword[1])) == 95))) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 625, __T599904872, ((const char *)"enter_underscore_keywords: expected \"__\" prefix"
 #line 624
 ), ((_ZN3edg12a_const_charE *)0)); }
 
-_ZN3edg13enter_keywordENS_12a_token_kindEPKc(__182318_52_token, __182319_53_keyword);
-_ZN3edg13enter_keywordENS_12a_token_kindEPKc(__182318_52_token, (++__182319_53_keyword)); 
+_ZN3edg13enter_keywordENS_12a_token_kindEPKc(__182450_52_token, __182451_53_keyword);
+_ZN3edg13enter_keywordENS_12a_token_kindEPKc(__182450_52_token, (++__182451_53_keyword)); 
 }
 
 
 
 
-static void _ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg17enter_gnu_keywordENS0_12a_token_kindEPKc( unsigned short __182337_44_token, 
-_ZN3edg12a_const_charE *__182338_45_keyword)
+static void _ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg17enter_gnu_keywordENS0_12a_token_kindEPKc( unsigned short __182469_44_token, 
+_ZN3edg12a_const_charE *__182470_45_keyword)
 #line 648
 {
-auto char __182353_12_buffer[50];
-auto _ZN3edg8sizeof_tE __182354_12_length;
+auto char __182485_12_buffer[50];
+auto _ZN3edg8sizeof_tE __182486_12_length;
 
-if ((((int)(__182338_45_keyword[0])) != 95) && (!(_ZN3edg27nonstd_gnu_keywords_enabledE))) {
+if ((((int)(__182470_45_keyword[0])) != 95) && (!(_ZN3edg27nonstd_gnu_keywords_enabledE))) {
 
 
 } else  {
 
-_ZN3edg13enter_keywordENS_12a_token_kindEPKc(__182337_44_token, __182338_45_keyword);
+_ZN3edg13enter_keywordENS_12a_token_kindEPKc(__182469_44_token, __182470_45_keyword);
 }
-if (((int)(__182338_45_keyword[0])) != 95) {
+if (((int)(__182470_45_keyword[0])) != 95) {
 
 
 
-__182354_12_length = ((_ZN3edg8sizeof_tE)(strlen(__182338_45_keyword)));
-((__182354_12_length + 5ULL) < 50ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 664, __T953478232, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+__182486_12_length = ((_ZN3edg8sizeof_tE)(strlen(__182470_45_keyword)));
+((__182486_12_length + 5ULL) < 50ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 664, __T599908576, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
-((__182353_12_buffer)[0]) = (((__182353_12_buffer)[1]) = ((char)95));
-strcpy(((__182353_12_buffer) + 2), __182338_45_keyword);
-_ZN3edg13enter_keywordENS_12a_token_kindEPKc(__182337_44_token, ((_ZN3edg12a_const_charE *)(__182353_12_buffer)));
+((__182485_12_buffer)[0]) = (((__182485_12_buffer)[1]) = ((char)95));
+strcpy(((__182485_12_buffer) + 2), __182470_45_keyword);
+_ZN3edg13enter_keywordENS_12a_token_kindEPKc(__182469_44_token, ((_ZN3edg12a_const_charE *)(__182485_12_buffer)));
 
-((__182353_12_buffer)[(__182354_12_length + 2ULL)]) = (((__182353_12_buffer)[(__182354_12_length + 3ULL)]) = ((char)95));
-((__182353_12_buffer)[(__182354_12_length + 4ULL)]) = ((char)0);
+((__182485_12_buffer)[(__182486_12_length + 2ULL)]) = (((__182485_12_buffer)[(__182486_12_length + 3ULL)]) = ((char)95));
+((__182485_12_buffer)[(__182486_12_length + 4ULL)]) = ((char)0);
 } else  {
 
 
 
-__182354_12_length = ((_ZN3edg8sizeof_tE)(strlen(__182338_45_keyword)));
-((__182354_12_length + 3ULL) < 50ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 677, __T953478232, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-strcpy((__182353_12_buffer), __182338_45_keyword);
-((__182353_12_buffer)[__182354_12_length]) = (((__182353_12_buffer)[(__182354_12_length + 1ULL)]) = ((char)95));
-((__182353_12_buffer)[(__182354_12_length + 2ULL)]) = ((char)0);
+__182486_12_length = ((_ZN3edg8sizeof_tE)(strlen(__182470_45_keyword)));
+((__182486_12_length + 3ULL) < 50ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 677, __T599908576, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+strcpy((__182485_12_buffer), __182470_45_keyword);
+((__182485_12_buffer)[__182486_12_length]) = (((__182485_12_buffer)[(__182486_12_length + 1ULL)]) = ((char)95));
+((__182485_12_buffer)[(__182486_12_length + 2ULL)]) = ((char)0);
 }
-_ZN3edg13enter_keywordENS_12a_token_kindEPKc(__182337_44_token, ((_ZN3edg12a_const_charE *)(__182353_12_buffer))); 
+_ZN3edg13enter_keywordENS_12a_token_kindEPKc(__182469_44_token, ((_ZN3edg12a_const_charE *)(__182485_12_buffer))); 
 }
 
 
-static void _ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg27enter_unimplemented_keywordEPKcNS0_13an_error_codeE( _ZN3edg12a_const_charE *__182390_56_keyword, 
-enum _ZN3edg13an_error_codeE __182391_20_error_code)
+static void _ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg27enter_unimplemented_keywordEPKcNS0_13an_error_codeE( _ZN3edg12a_const_charE *__182522_56_keyword, 
+enum _ZN3edg13an_error_codeE __182523_20_error_code)
 
 
 
 
 {
-auto _ZN3edg12a_symbol_ptrE __182397_16_sym_ptr;
+auto _ZN3edg12a_symbol_ptrE __182529_16_sym_ptr;
 
-__182397_16_sym_ptr = (_ZN3edg17full_enter_symbolEPKcyNS_13a_symbol_kindEi(__182390_56_keyword, ((_ZN3edg8sizeof_tE)(strlen(__182390_56_keyword))), _ZN3edg10sk_keywordE, (-1)));
+__182529_16_sym_ptr = (_ZN3edg17full_enter_symbolEPKcyNS_13a_symbol_kindEi(__182522_56_keyword, ((_ZN3edg8sizeof_tE)(strlen(__182522_56_keyword))), _ZN3edg10sk_keywordE, (-1)));
 
-(((__182397_16_sym_ptr->variant).keyword).token) = _ZN3edg17tok_unimplementedE;
-(((__182397_16_sym_ptr->variant).keyword).diagnostic_issued_if_used) = __182391_20_error_code; 
+(((__182529_16_sym_ptr->variant).keyword).token) = _ZN3edg17tok_unimplementedE;
+(((__182529_16_sym_ptr->variant).keyword).diagnostic_issued_if_used) = __182523_20_error_code; 
 }
 
 
-static void _ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg24enter_preproc_op_keywordENS0_12a_token_kindEPKc( unsigned short __182406_51_token, 
-_ZN3edg12a_const_charE *__182407_52_keyword)
+static void _ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg24enter_preproc_op_keywordENS0_12a_token_kindEPKc( unsigned short __182538_51_token, 
+_ZN3edg12a_const_charE *__182539_52_keyword)
 
 
 
 
 {
-auto _ZN3edg12a_symbol_ptrE __182413_16_sym_ptr;
+auto _ZN3edg12a_symbol_ptrE __182545_16_sym_ptr;
 
-__182413_16_sym_ptr = (_ZN3edg17full_enter_symbolEPKcyNS_13a_symbol_kindEi(__182407_52_keyword, ((_ZN3edg8sizeof_tE)(strlen(__182407_52_keyword))), _ZN3edg10sk_keywordE, (-1)));
+__182545_16_sym_ptr = (_ZN3edg17full_enter_symbolEPKcyNS_13a_symbol_kindEi(__182539_52_keyword, ((_ZN3edg8sizeof_tE)(strlen(__182539_52_keyword))), _ZN3edg10sk_keywordE, (-1)));
 
-(((__182413_16_sym_ptr->variant).keyword).token) = __182406_51_token;
-(((__182413_16_sym_ptr->variant).keyword).is_preprocessing_op_or_punc) = 1U; 
+(((__182545_16_sym_ptr->variant).keyword).token) = __182538_51_token;
+(((__182545_16_sym_ptr->variant).keyword).is_preprocessing_op_or_punc) = 1U; 
 }
 
 
@@ -53828,14 +53828,14 @@ _ZN3edg13enter_keywordENS_12a_token_kindEPKc(_ZN3edg20tok_edg_is_deducibleE, ((c
 }
 
 
-static void _ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg17enter_c23_keywordENS0_12a_token_kindEPKcS3_( unsigned short __182604_44_token, 
-_ZN3edg12a_const_charE *__182605_45_old_keyword, 
-_ZN3edg12a_const_charE *__182606_45_new_keyword)
+static void _ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg17enter_c23_keywordENS0_12a_token_kindEPKcS3_( unsigned short __182736_44_token, 
+_ZN3edg12a_const_charE *__182737_45_old_keyword, 
+_ZN3edg12a_const_charE *__182738_45_new_keyword)
 #line 909
 {
-_ZN3edg13enter_keywordENS_12a_token_kindEPKc(__182604_44_token, __182605_45_old_keyword);
+_ZN3edg13enter_keywordENS_12a_token_kindEPKc(__182736_44_token, __182737_45_old_keyword);
 if ((((int)_ZN3edg9C_dialectE) != 2) && (_ZN3edg11std_versionE >= 202311U)) {
-_ZN3edg13enter_keywordENS_12a_token_kindEPKc(__182604_44_token, __182606_45_new_keyword);
+_ZN3edg13enter_keywordENS_12a_token_kindEPKc(__182736_44_token, __182738_45_new_keyword);
 } 
 }
 
@@ -54120,10 +54120,10 @@ _ZN3edg13enter_keywordENS_12a_token_kindEPKc(_ZN3edg18tok_prefix_partialE, ((con
 
 _ZN3edg13enter_keywordENS_12a_token_kindEPKc(_ZN3edg9tok_gcnewE, ((const char *)"gcnew"));
 }
-{ auto _ZN3edg16a_symbol_locatorE __182926_24_locator;
+{ auto _ZN3edg16a_symbol_locatorE __183058_24_locator;
 
-{ __182926_24_locator = _ZN3edg15cleared_locatorE; (__182926_24_locator.source_position) = _ZN3edg20null_source_positionE; } ;
-_ZN3edg23safe_cast_symbol_headerE = (_ZN3edg18find_symbol_headerEPKcyPNS_16a_symbol_locatorE(((const char *)"safe_cast"), 9ULL, (&__182926_24_locator)));
+{ __183058_24_locator = _ZN3edg15cleared_locatorE; (__183058_24_locator.source_position) = _ZN3edg20null_source_positionE; } ;
+_ZN3edg23safe_cast_symbol_headerE = (_ZN3edg18find_symbol_headerEPKcyPNS_16a_symbol_locatorE(((const char *)"safe_cast"), 9ULL, (&__183058_24_locator)));
 
 
 }
@@ -54406,9 +54406,9 @@ _ZN3edg13enter_keywordENS_12a_token_kindEPKc(_ZN3edg12tok_explicitE, ((const cha
 
 
 
-(!((_ZN3edg22export_keyword_enabledE) && (_ZN3edg23module_keywords_enabledE))) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 1531, __T953504888, ((_ZN3edg12a_const_charE *)0), 
+(!((_ZN3edg22export_keyword_enabledE) && (_ZN3edg23module_keywords_enabledE))) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 1531, __T599935248, ((
 #line 1531
-((_ZN3edg12a_const_charE *)0)));
+_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 if (_ZN3edg23module_keywords_enabledE) {
 _ZN3edg13enter_keywordENS_12a_token_kindEPKc(_ZN3edg10tok_exportE, ((const char *)"export"));
 } else  { if (_ZN3edg22export_keyword_enabledE) {
@@ -54551,17 +54551,17 @@ static void _ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg21check_int_type_configEv(voi
 
 
 {
-if (0) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 1737, __T954243560, ((const char *)"check_int_type_config:"), ((const char *)"int8_t not defined correctly")); }
+if (0) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 1737, __T599940536, ((const char *)"check_int_type_config:"), ((const char *)"int8_t not defined correctly")); }
 
-if (0) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 1739, __T954243560, ((const char *)"check_int_type_config:"), ((const char *)"uint8_t not defined correctly")); }
+if (0) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 1739, __T599940536, ((const char *)"check_int_type_config:"), ((const char *)"uint8_t not defined correctly")); }
 
-if (0) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 1741, __T954243560, ((const char *)"check_int_type_config:"), ((const char *)"int16_t not defined correctly")); }
+if (0) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 1741, __T599940536, ((const char *)"check_int_type_config:"), ((const char *)"int16_t not defined correctly")); }
 
-if (0) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 1743, __T954243560, ((const char *)"check_int_type_config:"), ((const char *)"uint16_t not defined correctly")); }
+if (0) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 1743, __T599940536, ((const char *)"check_int_type_config:"), ((const char *)"uint16_t not defined correctly")); }
 
-if (0) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 1745, __T954243560, ((const char *)"check_int_type_config:"), ((const char *)"int32_t not defined correctly")); }
+if (0) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 1745, __T599940536, ((const char *)"check_int_type_config:"), ((const char *)"int32_t not defined correctly")); }
 
-if (0) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 1747, __T954243560, ((const char *)"check_int_type_config:"), ((const char *)"uint32_t not defined correctly")); } 
+if (0) { _ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 1747, __T599940536, ((const char *)"check_int_type_config:"), ((const char *)"uint32_t not defined correctly")); } 
 
 }
 
@@ -54689,25 +54689,25 @@ _ZN3edg14internal_errorEPKc(((const char *)"a_function_number is too small"));
 void _ZN3edg14fe_init_part_1Ev(void)
 #line 1892
 {
-auto time_t __183597_11_timer;
-auto char *__183598_12_time_str;
+auto time_t __183729_11_timer;
+auto char *__183730_12_time_str;
 #line 1903
 ;
 
 
 
-time((&__183597_11_timer));
-__183598_12_time_str = (ctime(((const time_t *)(&__183597_11_timer))));
-if (__183598_12_time_str == ((char *)0)) {
+time((&__183729_11_timer));
+__183730_12_time_str = (ctime(((const time_t *)(&__183729_11_timer))));
+if (__183730_12_time_str == ((char *)0)) {
 
 
 
-__183598_12_time_str = "Sun Jan 01 00:00:00 1900\n";
+__183730_12_time_str = "Sun Jan 01 00:00:00 1900\n";
 }
-((strlen(((const char *)__183598_12_time_str))) < 128ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 1915, __T954262576, ((_ZN3edg12a_const_charE *)0), ((
+((strlen(((const char *)__183730_12_time_str))) < 128ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 1915, __T600746416, ((_ZN3edg12a_const_charE *)0), ((
 #line 1915
 _ZN3edg12a_const_charE *)0)));
-strcpy(_ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg14curr_date_timeE, ((const char *)__183598_12_time_str));
+strcpy(_ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg14curr_date_timeE, ((const char *)__183730_12_time_str));
 
 _ZN3edg12in_front_endE = ((_ZN3edg9a_booleanE)1);
 
@@ -54823,7 +54823,7 @@ _ZN3edg10write_initEv();
 }
 
 
-static void _ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg24open_primary_source_fileEb( _ZN3edg9a_booleanE __183783_48_pch_prefix_scan)
+static void _ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg24open_primary_source_fileEb( _ZN3edg9a_booleanE __183915_48_pch_prefix_scan)
 #line 2088
 {
 if (_ZN3edg27is_primary_translation_unitE) {
@@ -54838,7 +54838,7 @@ _ZN3edg30open_file_and_push_input_stackEPKcbbbbbbbbPb(((_ZN3edg12a_const_charE *
 _ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE)0), ((_ZN3edg9a_booleanE *)0));
 #line 2110
 (_ZN3edg21curr_translation_unitE->source_file) = (_ZN3edg8curr_iseE->assoc_actual_il_file);
-if ((!(__183783_48_pch_prefix_scan)) && (!(_ZN3edg16using_a_pch_fileE))) {
+if ((!(__183915_48_pch_prefix_scan)) && (!(_ZN3edg16using_a_pch_fileE))) {
 
 if ((_ZN3edg17cli_or_cx_enabledE) && (!(_ZN3edg21do_preprocessing_onlyE))) {
 
@@ -54959,7 +54959,7 @@ _ZN3edg22init_predefined_macrosEPc(_ZN30_INTERNAL_9_fe_init_c_2cbd8fba3edg14curr
 
 
 _ZN3edg15push_file_scopeEb(((_ZN3edg9a_booleanE)0));
-(((_ZN3edg21curr_translation_unitE->primary_scope)->number) == _ZN3edg17file_scope_numberE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 2280, __T954284608, ((
+(((_ZN3edg21curr_translation_unitE->primary_scope)->number) == _ZN3edg17file_scope_numberE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/fe_init.c"), 2280, __T600768456, ((
 #line 2279
 _ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
@@ -54997,22 +54997,22 @@ _ZN3edg21do_preprocessing_onlyE = ((_ZN3edg9a_booleanE)0);
 void _ZN3edg23initialize_opname_namesEv(void)
 #line 2320
 {
-auto int __184025_16_tok_kind; auto int __184025_26_opname_kind;
-auto _ZN3edg12a_const_charE *__184026_17_str;
+auto int __184157_16_tok_kind; auto int __184157_26_opname_kind;
+auto _ZN3edg12a_const_charE *__184158_17_str;
 
 memset(((void *)((char *)_ZN3edg12opname_namesE)), 0, 384ULL);
-for (__184025_16_tok_kind = 0; __184025_16_tok_kind < 452; __184025_16_tok_kind++) {
-__184025_26_opname_kind = ((int)((_ZN3edg21opname_kind_for_tokenE)[__184025_16_tok_kind]));
-if (__184025_26_opname_kind != 0) {
-__184026_17_str = ((_ZN3edg11token_namesE)[__184025_16_tok_kind]);
+for (__184157_16_tok_kind = 0; __184157_16_tok_kind < 452; __184157_16_tok_kind++) {
+__184157_26_opname_kind = ((int)((_ZN3edg21opname_kind_for_tokenE)[__184157_16_tok_kind]));
+if (__184157_26_opname_kind != 0) {
+__184158_17_str = ((_ZN3edg11token_namesE)[__184157_16_tok_kind]);
 
 
-if (__184025_26_opname_kind == 42) {
-__184026_17_str = ((const char *)"()");
-} else  { if (__184025_26_opname_kind == 43) {
-__184026_17_str = ((const char *)"[]");
+if (__184157_26_opname_kind == 42) {
+__184158_17_str = ((const char *)"()");
+} else  { if (__184157_26_opname_kind == 43) {
+__184158_17_str = ((const char *)"[]");
 } }
-((_ZN3edg12opname_namesE)[__184025_26_opname_kind]) = __184026_17_str;
+((_ZN3edg12opname_namesE)[__184157_26_opname_kind]) = __184158_17_str;
 }
 }
 
@@ -55020,10 +55020,10 @@ __184026_17_str = ((const char *)"[]");
 ((_ZN3edg12opname_namesE)[4]) = ((const char *)"delete[]");
 
 
-for (__184025_26_opname_kind = 1; __184025_26_opname_kind < 48; __184025_26_opname_kind++)
+for (__184157_26_opname_kind = 1; __184157_26_opname_kind < 48; __184157_26_opname_kind++)
 
 {
-if (((_ZN3edg12opname_namesE)[__184025_26_opname_kind]) == ((_ZN3edg12a_const_charE *)0)) {
+if (((_ZN3edg12opname_namesE)[__184157_26_opname_kind]) == ((_ZN3edg12a_const_charE *)0)) {
 _ZN3edg14internal_errorEPKc(((const char *)"initialize_opname_kinds: bad init of opname_names"));
 }
 } 

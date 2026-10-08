@@ -1,5 +1,5 @@
 /* Translated by the Edison Design Group C++/C front end (version 7.0) */
-/* Wed Oct  7 07:13:29 2026 */
+/* Thu Oct  8 07:53:02 2026 */
 extern int __EDGCPFE__7_0;
 void *memcpy(void *,const void *,unsigned long long);
 void *memset(void *,int,unsigned long long);
@@ -4615,7 +4615,7 @@ typedef _ZN3edg10Remove_refIRcEE _ZN3edg13Value_for_ptrIPcEE;
 #line 513
 typedef _ZN3edg13Value_for_ptrIPcEE _ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object;
 #line 4953
-struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_EUlyE_ { struct _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T559053200;};
+struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_EUlyE_ { struct _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T826529256;};
 #line 5088
 struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_EUlyE_ { struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *backing;}; struct 
 #line 5088
@@ -4660,7 +4660,7 @@ _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE20a_fallback_allocator
 
 _ZN3edg9a_booleanE local_used;
 #line 1379
-union __C8 __T542979000;};
+union __C8 __T810345960;};
 #line 1572
 struct _ZN3edg27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaIcEE { struct _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE __b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE;};
 #line 1570
@@ -4776,7 +4776,7 @@ _ZN3edg10AllocationIcE7an_elemE *start;
 size_t n_bytes_allocated;};
 #line 437
 struct _ZN3edg17Remove_ref_helperIRcEE {char __dummy;};
-#line 24 "ape-sys/stdlib.h"
+#line 46 "ape-sys/stdlib.h"
 extern long strtol(const char *, char **, int);
 #line 11 "ape-sys/string.h"
 extern void *memcpy(void *, const void *, size_t);
@@ -4822,8 +4822,10 @@ _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorE
 extern  /* COMDAT group: _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7reserveEy */ void _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7reserveEy(struct 
 #line 2198
 _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const, size_t new_cap);
-#line 1701
-extern void _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE4growEv(struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const);
+#line 2218
+extern  /* COMDAT group: _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE4growEv */ void _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE4growEv(struct 
+#line 2218
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const);
 #line 1667
 extern  /* COMDAT group: _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_y */ void _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_y(struct 
 #line 1667
@@ -4869,7 +4871,7 @@ extern  /* COMDAT group: _ZN3edg6detail20Signed_int_formatterIiLi10EE11append_in
 #line 4624
 _ZN3edg6detail20Signed_int_formatterIiLi10EE11append_intoINS_9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEEEEvRT_iy(struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *underlying_array, int value, size_t size_hint);
 #line 4798
-extern size_t _ZN3edg6detail28estimate_byte_count_for_initIJEEEyDpT_(void);
+extern  /* COMDAT group: _ZN3edg6detail28estimate_byte_count_for_initIJEEEyDpT_ */ size_t _ZN3edg6detail28estimate_byte_count_for_initIJEEEyDpT_(void);
 #line 4827
 extern  /* COMDAT group: _ZN3edg6detail26append_with_custom_reserveIZNS_16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS6_IcEEDpT_EUlyE_JEEEvT_DpT0_ */ void 
 #line 4827
@@ -5239,45 +5241,45 @@ extern void _ZN3edg22floating_one_time_initEv(void);
 #line 4139 "src/util.h"
 extern  /* COMDAT group: _ZN3edg15integral_digitsIiEENS_16Enable_if_helperIXsr3edg16Is_signed_helperIT_EE5valueEyE7a_thingES2_i */ _ZN3edg9Enable_ifILb1EyEE _ZN3edg15integral_digitsIiEENS_16Enable_if_helperIXsr3edg16Is_signed_helperIT_EE5valueEyE7a_thingES2_i(int value, int base);
 #line 39 "ape-sys/ctype.h"
-extern unsigned char _ctype[]; static const char __T492135224[14]; extern  /* COMDAT group: _ZZN3edg13a_string_viewC1EPKcyEs */ char _ZZN3edg13a_string_viewC1EPKcyEs[101]; static const char __T540682416[13]; static const char __T540962440[19]; static const char __T540964424[19]; static const char 
+extern unsigned char _ctype[]; static const char __T759438896[14]; extern  /* COMDAT group: _ZZN3edg13a_string_viewC1EPKcyEs */ char _ZZN3edg13a_string_viewC1EPKcyEs[109]; static const char __T807930424[13]; static const char __T807937048[19]; static const char __T807939040[19]; static const char 
 #line 39
-__T540966720[20]; static const char __T540975680[15]; static const char __T540981056[34]; static const char __T540983464[19]; static const char __T540985960[16]; static const char __T540988760[23]; static const char __T540991800[16]; static const char __T540995560[16]; static const char __T540997736
+__T807941352[20]; static const char __T808311424[15]; static const char __T808316808[34]; static const char __T808319224[19]; static const char __T808321736[16]; static const char __T808324560[23]; static const char __T808327624[16]; static const char __T808331400[16]; static const char __T808333584
 #line 39
-[17]; static const char __T541002432[14]; static const char __T541004560[11]; static const char __T541010632[17]; static const char __T541012872[19]; static const char __T541541712[16]; static const char __T541543992[15]; static const char __T541550072[17]; static const char __T541552992[18]; static 
+[17]; static const char __T808661408[14]; static const char __T808663552[11]; static const char __T808692536[17]; static const char __T808694784[19]; static const char __T808696832[16]; static const char __T808699128[15]; static const char __T808705216[17]; static const char __T808708168[18]; static 
 #line 39
-const char __T541555440[18]; static const char __T541557448[19]; static const char __T541560536[15]; static const char __T541566592[13]; static const char __T541576120[11]; static const char __T541578424[11]; static const char __T541583472[14]; static const char __T542326256[22]; static const char 
+const char __T808710624[18]; static const char __T808712640[19]; static const char __T808715736[15]; static const char __T808721816[13]; static const char __T809321472[11]; static const char __T809323792[11]; static const char __T809328880[14]; static const char __T809350528[22]; static const char 
 #line 39
-__T542342648[12]; static const char __T542354128[13]; static const char __T542378376[16]; static const char __T542381328[8]; static const char __T545276584[13]; static const char __T545622784[21]; static const char __T545629648[21]; static const char __T545632424[23]; static const char __T545639896[
+__T809366928[12]; static const char __T809378416[13]; static const char __T809810712[16]; static const char __T809813672[8]; static const char __T811790376[13]; static const char __T812693936[21]; static const char __T812700856[21]; static const char __T812703648[23]; static const char __T812711128[
 #line 39
-13]; static const char __T545657832[14]; static const char __T547561664[22]; static const char __T547566592[22]; static const char __T547569312[24]; static const char __T548230992[14]; static const char __T548248664[11]; static const char __T549559704[19]; static const char __T549564632[19]; static 
+13]; static const char __T814367976[14]; static const char __T814698528[22]; static const char __T814703512[22]; static const char __T814706248[24]; static const char __T814712160[14]; static const char __T814729856[11]; static const char __T816633544[19]; static const char __T816638528[19]; static 
 #line 39
-const char __T549567344[21]; static const char __T549573232[11]; static const char __T549590904[12]; static const char __T551520760[20]; static const char __T551525688[20]; static const char __T551528400[22]; static const char __T551534296[12]; static const char __T551552096[17]; static const char 
+const char __T816641256[21]; static const char __T816647152[11]; static const char __T818193560[12]; static const char __T818658104[20]; static const char __T818663088[20]; static const char __T818665816[22]; static const char __T818671720[12]; static const char __T820273784[17]; static const char 
 #line 39
-__T553574608[25]; static const char __T553579552[25]; static const char __T553582288[27]; static const char __T553588200[17]; static const char __T558814112[16]; extern  /* COMDAT group:  */
+__T820675296[25]; static const char __T820680296[25]; static const char __T820683048[27]; static const char __T820688968[17]; static const char __T826492424[16]; extern  /* COMDAT group:  */
 #line 39
-/* _ZZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE15write_to_bufferEPcyEs */ char _ZZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE15write_to_bufferEPcyEs[94]; static const char __T559044512[12]; extern  /* */
+/* _ZZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE15write_to_bufferEPcyEs */ char _ZZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE15write_to_bufferEPcyEs[102]; static const char __T826520568[12]; extern  /* */
 #line 39
-/*  COMDAT group: _ZZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE11local_allocEyEs */ char _ZZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE11local_allocEyEs[94]; static const char __T559054856[11]; extern  /* COMDAT group:  */
+/*  COMDAT group: _ZZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE11local_allocEyEs */ char _ZZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE11local_allocEyEs[102]; static const char __T826530912[11]; extern  /* COMDAT group:  */
 #line 39
-/* _ZZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_ENKUlyE_clEyEs */ char _ZZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_ENKUlyE_clEyEs[94]; static const char 
+/* _ZZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_ENKUlyE_clEyEs */ char _ZZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_ENKUlyE_clEyEs[102]; static const char 
 #line 39
-__T559410840[7]; extern  /* COMDAT group: _ZZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_yEs */ char _ZZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_yEs[94]; static const char 
+__T826980440[7]; extern  /* COMDAT group: _ZZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_yEs */ char _ZZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_yEs[102]; static const char 
 #line 39
-__T559625072[7]; extern  /* COMDAT group: _ZZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPcEEvyT_yEs */ char _ZZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPcEEvyT_yEs[94]; extern  /* COMDAT group:  */
+__T827142120[7]; extern  /* COMDAT group: _ZZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPcEEvyT_yEs */ char _ZZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPcEEvyT_yEs[102]; extern  /* COMDAT group:  */
 #line 39
 /* _ZZN3edg6detail20Signed_int_formatterIiLi10EE11append_intoINS_9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEEEEvRT_iyEs_0 */ char 
 #line 39
-_ZZN3edg6detail20Signed_int_formatterIiLi10EE11append_intoINS_9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEEEEvRT_iyEs_0[17]; static const char __T559375208[9]; extern  /* COMDAT group:  */
+_ZZN3edg6detail20Signed_int_formatterIiLi10EE11append_intoINS_9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEEEEvRT_iyEs_0[17]; static const char __T826656144[9]; extern  /* COMDAT group:  */
 #line 39
-/* _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_Es */ char _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_Es[94]; static const char __T559636616[9]; 
+/* _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_Es */ char _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_Es[102]; static const char __T827153664[9]; 
 #line 39
 extern  /* COMDAT group: _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_Es */ char 
 #line 39
-_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_Es[94]; static const char __T559679184[9]; extern  /* COMDAT group:  */
+_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_Es[102]; static const char __T827524248[9]; extern  /* COMDAT group:  */
 #line 39
 /* _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcS9_iEEEvDpT_Es */ char _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcS9_iEEEvDpT_Es[
 #line 39
-94];
+102];
 #line 4234 "src/host_envir.h"
 extern _ZN3edg9a_booleanE _ZN3edg18host_little_endianE;
 #line 657 "src/floating.h"
@@ -5377,57 +5379,57 @@ static const char _ZN32_INTERNAL_10_floating_c_7968bde93edg15one_long_doubleE[2]
 
 
 
-static _ZN3edg19an_fp_decimal_inputE _ZN32_INTERNAL_10_floating_c_7968bde93edg15dec_long_doubleE; static const char __T492135224[14] = "a_string_view";  /* COMDAT group: _ZZN3edg13a_string_viewC1EPKcyEs */ char _ZZN3edg13a_string_viewC1EPKcyEs[101] = "src/header_util.h"
+static _ZN3edg19an_fp_decimal_inputE _ZN32_INTERNAL_10_floating_c_7968bde93edg15dec_long_doubleE; static const char __T759438896[14] = "a_string_view";  /* COMDAT group: _ZZN3edg13a_string_viewC1EPKcyEs */ char _ZZN3edg13a_string_viewC1EPKcyEs[109] = "src/header_util.h"
 #line 864
-; static const char __T540682416[13] = "split_string"; static const char __T540962440[19] = "fp_frac_set_to_min"; static const char __T540964424[19] = "fp_frac_set_to_max"; static const char __T540966720[20] = "fp_frac_eq_min_frac"; static const char __T540975680[15] = "do_shift_right"; static const
+; static const char __T807930424[13] = "split_string"; static const char __T807937048[19] = "fp_frac_set_to_min"; static const char __T807939040[19] = "fp_frac_set_to_max"; static const char __T807941352[20] = "fp_frac_eq_min_frac"; static const char __T808311424[15] = "do_shift_right"; static const
 #line 864
- char __T540981056[34] = "fp_frac_shift_right_with_high_bit"; static const char __T540983464[19] = "fp_frac_shift_left"; static const char __T540985960[16] = "fp_frac_add_int"; static const char __T540988760[23] = "fp_frac_add_one_at_pos"; static const char __T540991800[16] = "fp_frac_sub_int"; 
+ char __T808316808[34] = "fp_frac_shift_right_with_high_bit"; static const char __T808319224[19] = "fp_frac_shift_left"; static const char __T808321736[16] = "fp_frac_add_int"; static const char __T808324560[23] = "fp_frac_add_one_at_pos"; static const char __T808327624[16] = "fp_frac_sub_int"; 
 #line 864
-static const char __T540995560[16] = "fp_frac_div_int"; static const char __T540997736[17] = "fp_frac_mult_int"; static const char __T541002432[14] = "delete_bigint"; static const char __T541004560[11] = "new_bigint"; static const char __T541010632[17] = "bigint_from_uint"; static const char 
+static const char __T808331400[16] = "fp_frac_div_int"; static const char __T808333584[17] = "fp_frac_mult_int"; static const char __T808661408[14] = "delete_bigint"; static const char __T808663552[11] = "new_bigint"; static const char __T808692536[17] = "bigint_from_uint"; static const char 
 #line 864
-__T541012872[19] = "bigint_from_fp_int"; static const char __T541541712[16] = "bigint_mult_int"; static const char __T541543992[15] = "bigint_add_int"; static const char __T541550072[17] = "small_shift_left"; static const char __T541552992[18] = "bigint_shift_left"; static const char __T541555440[18
+__T808694784[19] = "bigint_from_fp_int"; static const char __T808696832[16] = "bigint_mult_int"; static const char __T808699128[15] = "bigint_add_int"; static const char __T808705216[17] = "small_shift_left"; static const char __T808708168[18] = "bigint_shift_left"; static const char __T808710624[18
 #line 864
-] = "small_shift_right"; static const char __T541557448[19] = "bigint_shift_right"; static const char __T541560536[15] = "do_bigint_mult"; static const char __T541566592[13] = "bigint_5_2_n"; static const char __T541576120[11] = "bigint_add"; static const char __T541578424[11] = "bigint_sub"; static 
+] = "small_shift_right"; static const char __T808712640[19] = "bigint_shift_right"; static const char __T808715736[15] = "do_bigint_mult"; static const char __T808721816[13] = "bigint_5_2_n"; static const char __T809321472[11] = "bigint_add"; static const char __T809323792[11] = "bigint_sub"; static 
 #line 864
-const char __T541583472[14] = "bigint_divmod"; static const char __T542326256[22] = "fp_emul_scale_and_add"; static const char __T542342648[12] = "fp_emul_sub"; static const char __T542354128[13] = "fp_emul_mult"; static const char __T542378376[16] = "bigint_div_ceil"; static const char __T542381328
+const char __T809328880[14] = "bigint_divmod"; static const char __T809350528[22] = "fp_emul_scale_and_add"; static const char __T809366928[12] = "fp_emul_sub"; static const char __T809378416[13] = "fp_emul_mult"; static const char __T809810712[16] = "bigint_div_ceil"; static const char __T809813672
 #line 864
-[8] = "bin2dec"; static const char __T545276584[13] = "make_float16"; static const char __T545622784[21] = "fast_dec2bin_float16"; static const char __T545629648[21] = "fast_bin2dec_float16"; static const char __T545632424[23] = "write_float16_internal"; static const char __T545639896[13] = "read_float16"
+[8] = "bin2dec"; static const char __T811790376[13] = "make_float16"; static const char __T812693936[21] = "fast_dec2bin_float16"; static const char __T812700856[21] = "fast_bin2dec_float16"; static const char __T812703648[23] = "write_float16_internal"; static const char __T812711128[13] = "read_float16"
 #line 864
-; static const char __T545657832[14] = "make_bfloat16"; static const char __T547561664[22] = "fast_dec2bin_bfloat16"; static const char __T547566592[22] = "fast_bin2dec_bfloat16"; static const char __T547569312[24] = "write_bfloat16_internal"; static const char __T548230992[14] = "read_bfloat16"; 
+; static const char __T814367976[14] = "make_bfloat16"; static const char __T814698528[22] = "fast_dec2bin_bfloat16"; static const char __T814703512[22] = "fast_bin2dec_bfloat16"; static const char __T814706248[24] = "write_bfloat16_internal"; static const char __T814712160[14] = "read_bfloat16"; 
 #line 864
-static const char __T548248664[11] = "make_float"; static const char __T549559704[19] = "fast_dec2bin_float"; static const char __T549564632[19] = "fast_bin2dec_float"; static const char __T549567344[21] = "write_float_internal"; static const char __T549573232[11] = "read_float"; static const char 
+static const char __T814729856[11] = "make_float"; static const char __T816633544[19] = "fast_dec2bin_float"; static const char __T816638528[19] = "fast_bin2dec_float"; static const char __T816641256[21] = "write_float_internal"; static const char __T816647152[11] = "read_float"; static const char 
 #line 864
-__T549590904[12] = "make_double"; static const char __T551520760[20] = "fast_dec2bin_double"; static const char __T551525688[20] = "fast_bin2dec_double"; static const char __T551528400[22] = "write_double_internal"; static const char __T551534296[12] = "read_double"; static const char __T551552096[
+__T818193560[12] = "make_double"; static const char __T818658104[20] = "fast_dec2bin_double"; static const char __T818663088[20] = "fast_bin2dec_double"; static const char __T818665816[22] = "write_double_internal"; static const char __T818671720[12] = "read_double"; static const char __T820273784[
 #line 864
-17] = "make_long_double"; static const char __T553574608[25] = "fast_dec2bin_long_double"; static const char __T553579552[25] = "fast_bin2dec_long_double"; static const char __T553582288[27] = "write_long_double_internal"; static const char __T553588200[17] = "read_long_double"; static const char 
+17] = "make_long_double"; static const char __T820675296[25] = "fast_dec2bin_long_double"; static const char __T820680296[25] = "fast_bin2dec_long_double"; static const char __T820683048[27] = "write_long_double_internal"; static const char __T820688968[17] = "read_long_double"; static const char 
 #line 864
-__T558814112[16] = "write_to_buffer";  /* COMDAT group: _ZZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE15write_to_bufferEPcyEs */ char 
+__T826492424[16] = "write_to_buffer";  /* COMDAT group: _ZZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE15write_to_bufferEPcyEs */ char 
 #line 864
-_ZZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE15write_to_bufferEPcyEs[94] = "src/util.h"; static const char __T559044512[12] = "local_alloc";  /* COMDAT group:  */
+_ZZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE15write_to_bufferEPcyEs[102] = "src/util.h"; static const char __T826520568[12] = "local_alloc";  /* */
 #line 864
-/* _ZZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE11local_allocEyEs */ char _ZZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE11local_allocEyEs[94] = "src/util.h"; static const char __T559054856[11]
+/*  COMDAT group: _ZZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE11local_allocEyEs */ char _ZZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE11local_allocEyEs[102] = "src/util.h"; static 
 #line 864
- = "operator()";  /* COMDAT group: _ZZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_ENKUlyE_clEyEs */ char 
+const char __T826530912[11] = "operator()";  /* COMDAT group: _ZZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_ENKUlyE_clEyEs */ char 
 #line 864
-_ZZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_ENKUlyE_clEyEs[94] = "src/util.h"; static const char __T559410840[7] = "insert";  /* COMDAT group:  */
+_ZZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_ENKUlyE_clEyEs[102] = "src/util.h"; static const char __T826980440[7] = "insert";  /* */
 #line 864
-/* _ZZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_yEs */ char _ZZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_yEs[94] = "src/util.h"
+/*  COMDAT group: _ZZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_yEs */ char _ZZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_yEs[102] = "src/util.h"
 #line 864
-; static const char __T559625072[7] = "insert";  /* COMDAT group: _ZZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPcEEvyT_yEs */ char _ZZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPcEEvyT_yEs[94] = "src/util.h"
+; static const char __T827142120[7] = "insert";  /* COMDAT group: _ZZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPcEEvyT_yEs */ char _ZZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPcEEvyT_yEs[102] = "src/util.h"
 #line 864
 ;  /* COMDAT group: _ZZN3edg6detail20Signed_int_formatterIiLi10EE11append_intoINS_9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEEEEvRT_iyEs_0 */ char 
 #line 864
-_ZZN3edg6detail20Signed_int_formatterIiLi10EE11append_intoINS_9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEEEEvRT_iyEs_0[17] = "0123456789abcdef"; static const char __T559375208[9] = "reset_to";  /* COMDAT group:  */
+_ZZN3edg6detail20Signed_int_formatterIiLi10EE11append_intoINS_9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEEEEvRT_iyEs_0[17] = "0123456789abcdef"; static const char __T826656144[9] = "reset_to";  /* COMDAT group:  */
 #line 864
-/* _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_Es */ char _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_Es[94] = "src/util.h"
+/* _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_Es */ char _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_Es[102] = "src/util.h"
 #line 864
-; static const char __T559636616[9] = "reset_to";  /* COMDAT group: _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_Es */ char 
+; static const char __T827153664[9] = "reset_to";  /* COMDAT group: _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_Es */ char 
 #line 864
-_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_Es[94] = "src/util.h"; static const char __T559679184[9] = "reset_to";  /* */
+_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_Es[102] = "src/util.h"; static const char __T827524248[9] = "reset_to";  /* */
 #line 864
 /*  COMDAT group: _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcS9_iEEEvDpT_Es */ char 
 #line 864
-_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcS9_iEEEvDpT_Es[94] = "src/util.h";
+_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcS9_iEEEvDpT_Es[102] = "src/util.h";
 #line 1380 "src/floating.c"
 static const int _ZN32_INTERNAL_10_floating_c_7968bde93edg5pow5sE[4] = {1,5,25,125};
 #line 2614
@@ -5473,83 +5475,83 @@ static _ZN3edg19an_fp_decimal_inputE _ZN32_INTERNAL_10_floating_c_7968bde93edg15
 #line 864
 _ZN32_INTERNAL_10_floating_c_7968bde93edg15one_long_doubleE,_ZN32_INTERNAL_10_floating_c_7968bde93edg15one_long_doubleE,1};
 #line 388 "src/header_util.h"
- /* COMDAT group: _ZN3edg13a_string_viewC1EPKcy */ void _ZN3edg13a_string_viewC1EPKcy( struct _ZN3edg13a_string_viewE *const this,  _ZN3edg12a_const_charE *__31516_38_start_val,  size_t __31516_56_length_val)
+ /* COMDAT group: _ZN3edg13a_string_viewC1EPKcy */ void _ZN3edg13a_string_viewC1EPKcy( struct _ZN3edg13a_string_viewE *const this,  _ZN3edg12a_const_charE *__31648_38_start_val,  size_t __31648_56_length_val)
 
 {
 #line 389
-(this->str_start) = __31516_38_start_val; (this->str_length) = __31516_56_length_val;
-(__31516_38_start_val != ((_ZN3edg12a_const_charE *)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg13a_string_viewC1EPKcyEs), 390, __T492135224, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));  }  /* COMDAT group: _ZN3edg13a_string_viewC2EPKcy */ 
+(this->str_start) = __31648_38_start_val; (this->str_length) = __31648_56_length_val;
+(__31648_38_start_val != ((_ZN3edg12a_const_charE *)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg13a_string_viewC1EPKcyEs), 390, __T759438896, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));  }  /* COMDAT group: _ZN3edg13a_string_viewC2EPKcy */ 
 #line 390
-void _ZN3edg13a_string_viewC2EPKcy( struct _ZN3edg13a_string_viewE *const this,  _ZN3edg12a_const_charE *__T544182568,  size_t __T544182952) {  (((this->str_start) = __T544182568) , ((this->str_length) = __T544182952)) , ((__T544182568 != ((_ZN3edg12a_const_charE *)0)) ? ((void)0) : (
+void _ZN3edg13a_string_viewC2EPKcy( struct _ZN3edg13a_string_viewE *const this,  _ZN3edg12a_const_charE *__T811417992,  size_t __T811418376) {  (((this->str_start) = __T811417992) , ((this->str_length) = __T811418376)) , ((__T811417992 != ((_ZN3edg12a_const_charE *)0)) ? ((void)0) : (
 #line 390
-_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg13a_string_viewC1EPKcyEs), 390, __T492135224, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))));  }
+_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg13a_string_viewC1EPKcyEs), 390, __T759438896, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))));  }
 #line 1345 "src/util.h"
  /* COMDAT group: _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEC1ERKNS1_IcEE */ void _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEC1ERKNS1_IcEE( struct _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE *const this,  const 
 #line 1345
-_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE20a_fallback_allocatorE *__34934_50_a)
+_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE20a_fallback_allocatorE *__35066_50_a)
 
 {
 #line 1346
 (this->local_used) = ((_ZN3edg9a_booleanE)0); 
 }  /* COMDAT group: _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEC2ERKNS1_IcEE */ void _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEC2ERKNS1_IcEE( struct _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE *const this,  const 
 #line 1347
-_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE20a_fallback_allocatorE *__T559090728) {  _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEC1ERKNS1_IcEE(this, __T559090728);  }
+_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE20a_fallback_allocatorE *__T826732344) {  _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEC1ERKNS1_IcEE(this, __T826732344);  }
 #line 1439
  /* COMDAT group: _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE5allocEy */ _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE13an_allocationE _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE5allocEy( struct _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE *
 #line 1439
 const this, 
-size_t __35029_75_n)
+size_t __35161_75_n)
 #line 1446
-{ auto struct _ZN3edg10AllocationIcEE __T559229144; auto struct _ZN3edg10AllocationIcEE __T559229568; auto _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE7an_elemE *__T559229864; auto size_t __T559230160; auto struct _ZN3edg10AllocationIcEE __T559237984; auto struct 
+{ auto struct _ZN3edg10AllocationIcEE __T826741296; auto struct _ZN3edg10AllocationIcEE __T826741720; auto _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE7an_elemE *__T826742016; auto size_t __T826742312; auto struct _ZN3edg10AllocationIcEE __T826750136; auto struct 
 #line 1446
-_ZN3edg10AllocationIcEE __T559238408; auto _ZN3edg8sizeof_tE __T559238704; auto struct _ZN3edg10AllocationIcEE __T559239000; auto _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE13an_allocationE __T559239296; auto _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE7an_elemE *
+_ZN3edg10AllocationIcEE __T826750560; auto _ZN3edg8sizeof_tE __T826750856; auto struct _ZN3edg10AllocationIcEE __T826751152; auto _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE13an_allocationE __T826751448; auto _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE7an_elemE *
 #line 1446
-__T559239592; auto _ZN3edg8sizeof_tE __T559239888;
-if ((!(this->local_used)) && (__35029_75_n <= 50ULL)) { {
-__T559229144 = (((((((!(this->local_used)) && (__35029_75_n <= 50ULL)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE11local_allocEyEs), 1404, __T559044512, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)
+__T826751744; auto _ZN3edg8sizeof_tE __T826752040;
+if ((!(this->local_used)) && (__35161_75_n <= 50ULL)) { {
+__T826741296 = (((((((!(this->local_used)) && (__35161_75_n <= 50ULL)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE11local_allocEyEs), 1404, __T826520568, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)
 #line 1448
-))) , (__T559229864 = (((this->__T542979000).local)))) , (__T559230160 = 50ULL)) , ((this->local_used) = ((_ZN3edg9a_booleanE)1))) , ((((__T559229568.start) = __T559229864) , ((__T559229568.n_bytes_allocated) = (__T559230160 * 1ULL))) , __T559229568)); return __T559229144; }
+))) , (__T826742016 = (((this->__T810345960).local)))) , (__T826742312 = 50ULL)) , ((this->local_used) = ((_ZN3edg9a_booleanE)1))) , ((((__T826741720.start) = __T826742016) , ((__T826741720.n_bytes_allocated) = (__T826742312 * 1ULL))) , __T826741720)); return __T826741296; }
 } else  { {
-__T559237984 = ((((__T559239296 = ((__T559238704 = (__35029_75_n * 1ULL)) , ((((__T559238408.start) = ((_ZN3edg17General_allocatorIcE7an_elemE *)(_ZN3edg13alloc_generalEy(__T559238704)))) , ((__T559238408.n_bytes_allocated) = __T559238704)) , __T559238408))) , (__T559239592 = (__T559239296.start))) 
+__T826750136 = ((((__T826751448 = ((__T826750856 = (__35161_75_n * 1ULL)) , ((((__T826750560.start) = ((_ZN3edg17General_allocatorIcE7an_elemE *)(_ZN3edg13alloc_generalEy(__T826750856)))) , ((__T826750560.n_bytes_allocated) = __T826750856)) , __T826750560))) , (__T826751744 = (__T826751448.start))) 
 #line 1450
-, (__T559239888 = (__T559239296.n_bytes_allocated))) , ((((__T559239000.start) = __T559239592) , ((__T559239000.n_bytes_allocated) = __T559239888)) , __T559239000)); return __T559237984; }
+, (__T826752040 = (__T826751448.n_bytes_allocated))) , ((((__T826751152.start) = __T826751744) , ((__T826751152.n_bytes_allocated) = __T826752040)) , __T826751152)); return __T826750136; }
 }
 }
 #line 1459
  /* COMDAT group: _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE13replace_allocENS_10AllocationIcEEyy */ _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE13an_allocationE _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE13replace_allocENS_10AllocationIcEEyy( struct 
 #line 1459
 _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE *const this, 
-_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE13an_allocationE __35049_67_a, 
-size_t __35050_67_new_capacity, 
-size_t __35051_67_n_to_move)
+_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE13an_allocationE __35181_67_a, 
+size_t __35182_67_new_capacity, 
+size_t __35183_67_n_to_move)
 #line 1470
-{ auto size_t __T559341032; auto _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE13an_allocationE __T559345392; auto _ZN3edg17General_allocatorIcE13an_allocationE __T559345688; auto struct _ZN3edg10AllocationIcEE __T559349792;
-auto _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE7an_elemE *__35060_12_new_start;
-auto size_t __35061_11_new_num_allocated;
-auto _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE7an_elemE *__35062_12_old_start; __35062_12_old_start = (__35049_67_a.start);
+{ auto size_t __T827011904; auto _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE13an_allocationE __T827016264; auto _ZN3edg17General_allocatorIcE13an_allocationE __T827016560; auto struct _ZN3edg10AllocationIcEE __T827020664;
+auto _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE7an_elemE *__35192_12_new_start;
+auto size_t __35193_11_new_num_allocated;
+auto _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE7an_elemE *__35194_12_old_start; __35194_12_old_start = (__35181_67_a.start);
 
-if (((!(this->local_used)) || (__35062_12_old_start == (((this->__T542979000).local)))) && (__35050_67_new_capacity <= 50ULL))
+if (((!(this->local_used)) || (__35194_12_old_start == (((this->__T810345960).local)))) && (__35182_67_new_capacity <= 50ULL))
 {
 
 
 (this->local_used) = ((_ZN3edg9a_booleanE)1);
-__35060_12_new_start = (((this->__T542979000).local));
-__35061_11_new_num_allocated = (__35050_67_new_capacity * 1ULL);
-} else  { auto struct _ZN3edg10AllocationIcEE __T559338288; auto _ZN3edg8sizeof_tE __T559338584;
-auto _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE13an_allocationE __35072_19_alloced; __35072_19_alloced = ((__T559338584 = (__35050_67_new_capacity * 1ULL)) , ((((__T559338288.start) = ((_ZN3edg17General_allocatorIcE7an_elemE *)(_ZN3edg13alloc_generalEy(__T559338584)))) , ((
+__35192_12_new_start = (((this->__T810345960).local));
+__35193_11_new_num_allocated = (__35182_67_new_capacity * 1ULL);
+} else  { auto struct _ZN3edg10AllocationIcEE __T827009160; auto _ZN3edg8sizeof_tE __T827009456;
+auto _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE13an_allocationE __35204_19_alloced; __35204_19_alloced = ((__T827009456 = (__35182_67_new_capacity * 1ULL)) , ((((__T827009160.start) = ((_ZN3edg17General_allocatorIcE7an_elemE *)(_ZN3edg13alloc_generalEy(__T827009456)))) , ((
 #line 1483
-__T559338288.n_bytes_allocated) = __T559338584)) , __T559338288));
+__T827009160.n_bytes_allocated) = __T827009456)) , __T827009160));
 
-__35060_12_new_start = (__35072_19_alloced.start);
-__35061_11_new_num_allocated = (__35072_19_alloced.n_bytes_allocated);
+__35192_12_new_start = (__35204_19_alloced.start);
+__35193_11_new_num_allocated = (__35204_19_alloced.n_bytes_allocated);
 }
 
 
-if (__35062_12_old_start != __35060_12_new_start) {
-{ __T559341032 = (__35051_67_n_to_move * 1ULL); if (__T559341032 > 9223372036854775807ULL) { _ZN3edg26insufficient_address_spaceEv(); } memmove(((void *)(__35060_12_new_start + 0)), ((const void *)(__35062_12_old_start + 0)), __T559341032); }
-{ __T559345392 = __35049_67_a; { if ((__T559345392.start) == (((this->__T542979000).local))) { (this->local_used) = ((_ZN3edg9a_booleanE)0); } else  { { __T559345688 = __T559345392; { _ZN3edg12free_generalEPvy(((_ZN3edg10a_void_ptrE)(__T559345688.start)), (__T559345688.n_bytes_allocated)); } } } } }
+if (__35194_12_old_start != __35192_12_new_start) {
+{ __T827011904 = (__35183_67_n_to_move * 1ULL); if (__T827011904 > 9223372036854775807ULL) { _ZN3edg26insufficient_address_spaceEv(); } memmove(((void *)(__35192_12_new_start + 0)), ((const void *)(__35194_12_old_start + 0)), __T827011904); }
+{ __T827016264 = __35181_67_a; { if ((__T827016264.start) == (((this->__T810345960).local))) { (this->local_used) = ((_ZN3edg9a_booleanE)0); } else  { { __T827016560 = __T827016264; { _ZN3edg12free_generalEPvy(((_ZN3edg10a_void_ptrE)(__T827016560.start)), (__T827016560.n_bytes_allocated)); } } } } }
 } {
-(__T559349792.start) = __35060_12_new_start; (__T559349792.n_bytes_allocated) = __35061_11_new_num_allocated; return __T559349792; }
+(__T827020664.start) = __35192_12_new_start; (__T827020664.n_bytes_allocated) = __35193_11_new_num_allocated; return __T827020664; }
 }
 #line 1804
  /* COMDAT group: _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEED1Ev */ void _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEED1Ev( struct 
@@ -5558,59 +5560,59 @@ _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorE
 
 
 
-{ auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE13an_allocationE __T558743976; auto _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE13an_allocationE __T558745280; auto _ZN3edg17General_allocatorIcE13an_allocationE __T558745576;
+{ auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE13an_allocationE __T826331432; auto _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE13an_allocationE __T826332736; auto _ZN3edg17General_allocatorIcE13an_allocationE __T826333032;
 { }
-{ __T558745280 = (((__T558743976.start) = (this->elems)) , (((__T558743976.n_bytes_allocated) = ((this->n_allocated) * 1ULL)) , __T558743976)); { if ((__T558745280.start) == (((((this->__b_N3edg27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaIcEE).
+{ __T826332736 = (((__T826331432.start) = (this->elems)) , (((__T826331432.n_bytes_allocated) = ((this->n_allocated) * 1ULL)) , __T826331432)); { if ((__T826332736.start) == (((((this->__b_N3edg27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaIcEE).
 #line 1810
-__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE).__T542979000).local))) { (((this->__b_N3edg27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaIcEE).__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE).local_used) = ((_ZN3edg9a_booleanE)0); } else  { { 
+__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE).__T810345960).local))) { (((this->__b_N3edg27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaIcEE).__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE).local_used) = ((_ZN3edg9a_booleanE)0); } else  { { 
 #line 1810
-__T558745576 = __T558745280; { _ZN3edg12free_generalEPvy(((_ZN3edg10a_void_ptrE)(__T558745576.start)), (__T558745576.n_bytes_allocated)); } } } } }
+__T826333032 = __T826332736; { _ZN3edg12free_generalEPvy(((_ZN3edg10a_void_ptrE)(__T826333032.start)), (__T826333032.n_bytes_allocated)); } } } } }
 
 (this->elems) = ((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *)0); 
 }  /* COMDAT group: _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEED2Ev */ void _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEED2Ev( struct 
 #line 1813
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const this) { auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE13an_allocationE __T558872592; auto 
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const this) { auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE13an_allocationE __T826546312; auto 
 #line 1813
-_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE13an_allocationE __T558872888; auto _ZN3edg17General_allocatorIcE13an_allocationE __T558873184;  (void)((((void)0) , ((__T558872888 = (((__T558872592.start) = (this->elems)) , (((__T558872592.n_bytes_allocated) = ((this->n_allocated) * 1ULL)) 
+_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE13an_allocationE __T826546608; auto _ZN3edg17General_allocatorIcE13an_allocationE __T826546904;  (void)((((void)0) , ((__T826546608 = (((__T826546312.start) = (this->elems)) , (((__T826546312.n_bytes_allocated) = ((this->n_allocated) * 1ULL)) 
 #line 1813
-, __T558872592))) , (((__T558872888.start) == (((((this->__b_N3edg27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaIcEE).__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE).__T542979000).local))) ? ((void)((((this->
+, __T826546312))) , (((__T826546608.start) == (((((this->__b_N3edg27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaIcEE).__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE).__T810345960).local))) ? ((void)((((this->
 #line 1813
-__b_N3edg27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaIcEE).__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE).local_used) = ((_ZN3edg9a_booleanE)0))) : ((__T558873184 = __T558872888) , (_ZN3edg12free_generalEPvy(((_ZN3edg10a_void_ptrE)(__T558873184.start)), (
+__b_N3edg27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaIcEE).__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE).local_used) = ((_ZN3edg9a_booleanE)0))) : ((__T826546904 = __T826546608) , (_ZN3edg12free_generalEPvy(((_ZN3edg10a_void_ptrE)(__T826546904.start)), (
 #line 1813
-__T558873184.n_bytes_allocated))))))) , ((this->elems) = ((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *)0)));  }
+__T826546904.n_bytes_allocated))))))) , ((this->elems) = ((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *)0)));  }
 #line 2171
  /* COMDAT group: _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6resizeEyRKc */ void _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6resizeEyRKc( struct 
 #line 2171
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const this,  size_t __35760_58_new_n, 
-const _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35761_59_value)
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const this,  size_t __35892_58_new_n, 
+const _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35893_59_value)
 
 
 
 
 {
-auto size_t __35767_11_old_n; __35767_11_old_n = (this->n_elems);
+auto size_t __35899_11_old_n; __35899_11_old_n = (this->n_elems);
 
-if (__35760_58_new_n > __35767_11_old_n) { auto char __T559845744;
+if (__35892_58_new_n > __35899_11_old_n) { auto char __T827476984;
 
 
-auto size_t __35772_13_num_copies;
-auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35773_14_insert_start;
+auto size_t __35904_13_num_copies;
+auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35905_14_insert_start;
 #line 2181
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7reserveEy(this, __35760_58_new_n);
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7reserveEy(this, __35892_58_new_n);
 
-__35772_13_num_copies = (__35760_58_new_n - __35767_11_old_n);
-__35773_14_insert_start = ((this->elems) + __35767_11_old_n);
-{ __T559845744 = (*__35761_59_value); { memset(((void *)(__35773_14_insert_start + 0)), ((int)__T559845744), __35772_13_num_copies); } }
-(this->n_elems) += __35772_13_num_copies;
-} else  { if (__35760_58_new_n < __35767_11_old_n) {
-auto size_t __35777_13_num_to_destroy;
-auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35778_14_removal_start;
+__35904_13_num_copies = (__35892_58_new_n - __35899_11_old_n);
+__35905_14_insert_start = ((this->elems) + __35899_11_old_n);
+{ __T827476984 = (*__35893_59_value); { memset(((void *)(__35905_14_insert_start + 0)), ((int)__T827476984), __35904_13_num_copies); } }
+(this->n_elems) += __35904_13_num_copies;
+} else  { if (__35892_58_new_n < __35899_11_old_n) {
+auto size_t __35909_13_num_to_destroy;
+auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35910_14_removal_start;
 #line 2188
-__35777_13_num_to_destroy = (__35767_11_old_n - __35760_58_new_n);
-__35778_14_removal_start = (((this->elems) + __35767_11_old_n) - __35777_13_num_to_destroy);
+__35909_13_num_to_destroy = (__35899_11_old_n - __35892_58_new_n);
+__35910_14_removal_start = (((this->elems) + __35899_11_old_n) - __35909_13_num_to_destroy);
 
 { }
-(this->n_elems) -= __35777_13_num_to_destroy;
+(this->n_elems) -= __35909_13_num_to_destroy;
 } } 
 }
 
@@ -5618,124 +5620,150 @@ __35778_14_removal_start = (((this->elems) + __35767_11_old_n) - __35777_13_num_
 
  /* COMDAT group: _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7reserveEy */ void _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7reserveEy( struct 
 #line 2198
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const this,  size_t __35787_53_new_cap)
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const this,  size_t __35919_53_new_cap)
 
 
 
 
 {
-auto size_t __35793_11_old_cap; __35793_11_old_cap = (this->n_allocated);
+auto size_t __35925_11_old_cap; __35925_11_old_cap = (this->n_allocated);
 
-if (__35787_53_new_cap > __35793_11_old_cap) { auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE13an_allocationE __T559016640;
-auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE13an_allocationE __35796_20_a; __35796_20_a = (_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE13replace_allocENS_10AllocationIcEEyy((&((this->
+if (__35919_53_new_cap > __35925_11_old_cap) { auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE13an_allocationE __T826965704;
+auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE13an_allocationE __35928_20_a; __35928_20_a = (_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE13replace_allocENS_10AllocationIcEEyy((&((this->
 #line 2207
-__b_N3edg27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaIcEE).__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE)), (((__T559016640.start) = (this->elems)) , (((__T559016640.n_bytes_allocated) = (__35793_11_old_cap * 1ULL)) , __T559016640)), __35787_53_new_cap, (this->
+__b_N3edg27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaIcEE).__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE)), (((__T826965704.start) = (this->elems)) , (((__T826965704.n_bytes_allocated) = (__35925_11_old_cap * 1ULL)) , __T826965704)), __35919_53_new_cap, (this->
 #line 2207
 n_elems)));
 
 
 
-(this->elems) = (__35796_20_a.start);
-(this->n_allocated) = ((__35796_20_a.n_bytes_allocated) / 1ULL);
+(this->elems) = (__35928_20_a.start);
+(this->n_allocated) = ((__35928_20_a.n_bytes_allocated) / 1ULL);
 } 
+}
+
+
+
+ /* COMDAT group: _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE4growEv */ void _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE4growEv( struct 
+#line 2218
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const this)
+
+
+
+
+{ auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE13an_allocationE __T826940504;
+auto size_t __35945_18_old_cap;
+auto size_t __35946_18_new_cap;
+auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE13an_allocationE __35947_18_a;
+#line 2224
+__35945_18_old_cap = (this->n_allocated);
+__35946_18_new_cap = ((__35945_18_old_cap < 2ULL) ? 2ULL : ((__35945_18_old_cap + (__35945_18_old_cap / 2ULL)) + 1ULL));
+__35947_18_a = (_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE13replace_allocENS_10AllocationIcEEyy((&((this->__b_N3edg27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaIcEE).__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE)), (((__T826940504.start) = (this->
+#line 2226
+elems)) , (((__T826940504.n_bytes_allocated) = (__35945_18_old_cap * 1ULL)) , __T826940504)), __35946_18_new_cap, (this->n_elems)));
+
+
+
+(this->elems) = (__35947_18_a.start);
+(this->n_allocated) = ((__35947_18_a.n_bytes_allocated) / 1ULL); 
 }
 #line 1667
  /* COMDAT group: _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_y */ void _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_y( struct 
 #line 1667
 _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const this, 
 #line 2019
-size_t __35608_62_i, 
-_ZN3edg12a_const_charE *__35609_62_start, 
-size_t __35610_62_len)
+size_t __35740_62_i, 
+_ZN3edg12a_const_charE *__35741_62_start, 
+size_t __35742_62_len)
 #line 2027
-{ auto size_t __T559586264;
+{ auto size_t __T827227880;
 
-auto size_t __35618_10_orig_count;
-
-
+auto size_t __35750_10_orig_count;
 
 
-auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35623_12_arr_elems;
 
-auto size_t __35625_11_num_to_move;
+
+auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35755_12_arr_elems;
+
+auto size_t __35757_11_num_to_move;
 #line 2045
-auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35634_12_insert_dest;
+auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35766_12_insert_dest;
 #line 2028
-(__35608_62_i <= (this->n_elems)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_yEs), 2028, __T559410840, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-__35618_10_orig_count = (this->n_elems);
+(__35740_62_i <= (this->n_elems)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_yEs), 2028, __T826980440, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+__35750_10_orig_count = (this->n_elems);
 
 
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7reserveEy(this, (__35618_10_orig_count + __35610_62_len));
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7reserveEy(this, (__35750_10_orig_count + __35742_62_len));
 
-__35623_12_arr_elems = (this->elems);
+__35755_12_arr_elems = (this->elems);
 
-__35625_11_num_to_move = (__35618_10_orig_count - __35608_62_i);
-if (__35625_11_num_to_move != 0ULL) { auto size_t __T559581904;
-auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35627_14_move_src;
-auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35628_14_move_dest;
+__35757_11_num_to_move = (__35750_10_orig_count - __35740_62_i);
+if (__35757_11_num_to_move != 0ULL) { auto size_t __T827223520;
+auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35759_14_move_src;
+auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35760_14_move_dest;
 #line 2038
-__35627_14_move_src = (__35623_12_arr_elems + __35608_62_i);
-__35628_14_move_dest = (__35627_14_move_src + __35610_62_len);
+__35759_14_move_src = (__35755_12_arr_elems + __35740_62_i);
+__35760_14_move_dest = (__35759_14_move_src + __35742_62_len);
 
-{ __T559581904 = (__35625_11_num_to_move * 1ULL); if (__T559581904 > 9223372036854775807ULL) { _ZN3edg26insufficient_address_spaceEv(); } memmove(((void *)(__35628_14_move_dest + 0)), ((const void *)(__35627_14_move_src + 0)), __T559581904); }
+{ __T827223520 = (__35757_11_num_to_move * 1ULL); if (__T827223520 > 9223372036854775807ULL) { _ZN3edg26insufficient_address_spaceEv(); } memmove(((void *)(__35760_14_move_dest + 0)), ((const void *)(__35759_14_move_src + 0)), __T827223520); }
 }
 
 
-__35634_12_insert_dest = (__35623_12_arr_elems + __35608_62_i);
-{ __T559586264 = (__35610_62_len * 1ULL); if (__T559586264 > 9223372036854775807ULL) { _ZN3edg26insufficient_address_spaceEv(); } memcpy(((void *)(__35634_12_insert_dest + 0)), ((const void *)((*(((_ZN3edg12a_const_charE *const *)&__35609_62_start))) + 0)), __T559586264); }
-(this->n_elems) += __35610_62_len; 
+__35766_12_insert_dest = (__35755_12_arr_elems + __35740_62_i);
+{ __T827227880 = (__35742_62_len * 1ULL); if (__T827227880 > 9223372036854775807ULL) { _ZN3edg26insufficient_address_spaceEv(); } memcpy(((void *)(__35766_12_insert_dest + 0)), ((const void *)((*(((_ZN3edg12a_const_charE *const *)&__35741_62_start))) + 0)), __T827227880); }
+(this->n_elems) += __35742_62_len; 
 }
 #line 1667
  /* COMDAT group: _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPcEEvyT_y */ void _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPcEEvyT_y( struct 
 #line 1667
 _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const this, 
 #line 2019
-size_t __35608_62_i, 
-char *__35609_62_start, 
-size_t __35610_62_len)
+size_t __35740_62_i, 
+char *__35741_62_start, 
+size_t __35742_62_len)
 #line 2027
-{ auto size_t __T559611880;
+{ auto size_t __T827283624;
 
-auto size_t __35618_10_orig_count;
-
-
+auto size_t __35750_10_orig_count;
 
 
-auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35623_12_arr_elems;
 
-auto size_t __35625_11_num_to_move;
+
+auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35755_12_arr_elems;
+
+auto size_t __35757_11_num_to_move;
 #line 2045
-auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35634_12_insert_dest;
+auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35766_12_insert_dest;
 #line 2028
-(__35608_62_i <= (this->n_elems)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPcEEvyT_yEs), 2028, __T559625072, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-__35618_10_orig_count = (this->n_elems);
+(__35740_62_i <= (this->n_elems)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPcEEvyT_yEs), 2028, __T827142120, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+__35750_10_orig_count = (this->n_elems);
 
 
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7reserveEy(this, (__35618_10_orig_count + __35610_62_len));
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7reserveEy(this, (__35750_10_orig_count + __35742_62_len));
 
-__35623_12_arr_elems = (this->elems);
+__35755_12_arr_elems = (this->elems);
 
-__35625_11_num_to_move = (__35618_10_orig_count - __35608_62_i);
-if (__35625_11_num_to_move != 0ULL) { auto size_t __T559607520;
-auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35627_14_move_src;
-auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35628_14_move_dest;
+__35757_11_num_to_move = (__35750_10_orig_count - __35740_62_i);
+if (__35757_11_num_to_move != 0ULL) { auto size_t __T827279264;
+auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35759_14_move_src;
+auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__35760_14_move_dest;
 #line 2038
-__35627_14_move_src = (__35623_12_arr_elems + __35608_62_i);
-__35628_14_move_dest = (__35627_14_move_src + __35610_62_len);
+__35759_14_move_src = (__35755_12_arr_elems + __35740_62_i);
+__35760_14_move_dest = (__35759_14_move_src + __35742_62_len);
 
-{ __T559607520 = (__35625_11_num_to_move * 1ULL); if (__T559607520 > 9223372036854775807ULL) { _ZN3edg26insufficient_address_spaceEv(); } memmove(((void *)(__35628_14_move_dest + 0)), ((const void *)(__35627_14_move_src + 0)), __T559607520); }
+{ __T827279264 = (__35757_11_num_to_move * 1ULL); if (__T827279264 > 9223372036854775807ULL) { _ZN3edg26insufficient_address_spaceEv(); } memmove(((void *)(__35760_14_move_dest + 0)), ((const void *)(__35759_14_move_src + 0)), __T827279264); }
 }
 
 
-__35634_12_insert_dest = (__35623_12_arr_elems + __35608_62_i);
-{ __T559611880 = (__35610_62_len * 1ULL); if (__T559611880 > 9223372036854775807ULL) { _ZN3edg26insufficient_address_spaceEv(); } memcpy(((void *)(__35634_12_insert_dest + 0)), ((const void *)((*(((char *const *)&__35609_62_start))) + 0)), __T559611880); }
-(this->n_elems) += __35610_62_len; 
+__35766_12_insert_dest = (__35755_12_arr_elems + __35740_62_i);
+{ __T827283624 = (__35742_62_len * 1ULL); if (__T827283624 > 9223372036854775807ULL) { _ZN3edg26insufficient_address_spaceEv(); } memcpy(((void *)(__35766_12_insert_dest + 0)), ((const void *)((*(((char *const *)&__35741_62_start))) + 0)), __T827283624); }
+(this->n_elems) += __35742_62_len; 
 }
 #line 4977
  /* COMDAT group: _ZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE15write_to_bufferEPcy */ void _ZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE15write_to_bufferEPcy( const struct 
 #line 4977
-_ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const this,  char *__38566_70_buffer, 
-size_t __38567_69_buffer_len)
+_ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const this,  char *__38698_70_buffer, 
+size_t __38699_69_buffer_len)
 
 
 
@@ -5743,12 +5771,12 @@ size_t __38567_69_buffer_len)
 {
 (((int)(*(((const _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *)&(((this->backing_array).elems)[(((this->backing_array).n_elems) - 1ULL)]))))) == 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)
 #line 4984
-_ZZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE15write_to_bufferEPcyEs), 4984, __T558814112, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-(((size_t)((this->backing_array).n_elems)) <= __38567_69_buffer_len) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE15write_to_bufferEPcyEs), 4985, __T558814112, ((
+_ZZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE15write_to_bufferEPcyEs), 4984, __T826492424, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(((size_t)((this->backing_array).n_elems)) <= __38699_69_buffer_len) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE15write_to_bufferEPcyEs), 4985, __T826492424, ((
 #line 4985
 _ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
-memcpy(((void *)__38566_70_buffer), ((const void *)((const _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *)((this->backing_array).elems))), ((this->backing_array).n_elems)); 
+memcpy(((void *)__38698_70_buffer), ((const void *)((const _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *)((this->backing_array).elems))), ((this->backing_array).n_elems)); 
 }
 #line 4920
  /* COMDAT group: _ZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6lengthEv */ size_t _ZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6lengthEv( const struct 
@@ -5760,1233 +5788,1252 @@ _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_all
 #line 4904
 _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const this)
 
-{ auto _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE12an_allocatorE __T558922224; auto _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE20a_fallback_allocatorE __T558923664;
+{ auto _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE12an_allocatorE __T826592648; auto _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE20a_fallback_allocatorE __T826594088;
 #line 4905
-_ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_(this, ((memset(((void *)(&__T558922224)), 0, 52ULL)) , ((_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEC1ERKNS1_IcEE((&(__T558922224.
+_ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_(this, ((memset(((void *)(&__T826592648)), 0, 52ULL)) , ((_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEC1ERKNS1_IcEE((&(__T826592648.
 #line 4905
-__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE)), (((const _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE20a_fallback_allocatorE *)&__T558923664)))) , (((const _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE12an_allocatorE *)
+__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE)), (((const _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE20a_fallback_allocatorE *)&__T826594088)))) , (((const _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE12an_allocatorE *)
 #line 4905
-&__T558922224))))); 
+&__T826592648))))); 
 }  /* COMDAT group: _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC2IJEEEDpT_ */ void _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC2IJEEEDpT_( struct 
 #line 4906
-_ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const this) { auto _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE12an_allocatorE __T558996120; auto 
+_ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const this) { auto _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE12an_allocatorE __T826891792; auto 
 #line 4906
-_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE20a_fallback_allocatorE __T558996416;  _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_(this, ((memset(((void *)(&__T558996120)), 0, 52ULL)) , ((
+_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE20a_fallback_allocatorE __T826892088;  _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_(this, ((memset(((void *)(&__T826891792)), 0, 52ULL)) , ((
 #line 4906
-_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEC1ERKNS1_IcEE((&(__T558996120.__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE)), (((const _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE20a_fallback_allocatorE *)&__T558996416)))) , (((const 
+_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEC1ERKNS1_IcEE((&(__T826891792.__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE)), (((const _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE20a_fallback_allocatorE *)&__T826892088)))) , (((const 
 #line 4906
-_ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE12an_allocatorE *)&__T558996120)))));  }
+_ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE12an_allocatorE *)&__T826891792)))));  }
 #line 4932
  /* COMDAT group: _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_ */ void _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_( struct 
 #line 4932
 _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const this, 
 #line 5076
-const char *__3_38665_71_args,  _ZN3edg12a_const_charE *__2_38665_71_args,  char *__1_38665_71_args)
+const char *__3_38797_71_args,  _ZN3edg12a_const_charE *__2_38797_71_args,  char *__1_38797_71_args)
 
 
 
 
 {
-auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__38671_32_backing;
+auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__38803_32_backing;
 #line 5088
-auto struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_EUlyE_ __38677_8_reserve_func;
+auto struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_EUlyE_ __38809_8_reserve_func;
 #line 5082
-__38671_32_backing = (&(this->backing_array));
+__38803_32_backing = (&(this->backing_array));
 
 
-(((int)(*((__38671_32_backing->elems) + ((__38671_32_backing->n_elems) - 1ULL)))) == 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_Es), 5085, 
+(((int)(*((__38803_32_backing->elems) + ((__38803_32_backing->n_elems) - 1ULL)))) == 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_Es), 5085, 
 #line 5085
-__T559375208, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-{ if ((__38671_32_backing->n_elems) != 0ULL) { { } (__38671_32_backing->n_elems) = 0ULL; } }
+__T826656144, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+{ if ((__38803_32_backing->n_elems) != 0ULL) { { } (__38803_32_backing->n_elems) = 0ULL; } }
 
-(__38677_8_reserve_func.backing) = __38671_32_backing;
+(__38809_8_reserve_func.backing) = __38803_32_backing;
 
 
 
-_ZN3edg6detail26append_with_custom_reserveIZNS_16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcSA_PcEEEvDpT_EUlyE_JSA_SA_SB_EEEvT_DpT0_(__38677_8_reserve_func, __3_38665_71_args, __2_38665_71_args, __1_38665_71_args); 
+_ZN3edg6detail26append_with_custom_reserveIZNS_16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcSA_PcEEEvDpT_EUlyE_JSA_SA_SB_EEEvT_DpT0_(__38809_8_reserve_func, __3_38797_71_args, __2_38797_71_args, __1_38797_71_args); 
 }
 #line 4932
  /* COMDAT group: _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_ */ void 
 #line 4932
 _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_( struct _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const this, 
 #line 5076
-struct _ZN3edg13a_string_viewE __3_38665_71_args,  const char *__2_38665_71_args,  int __1_38665_71_args)
+struct _ZN3edg13a_string_viewE __3_38797_71_args,  const char *__2_38797_71_args,  int __1_38797_71_args)
 
 
 
 
 {
-auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__38671_32_backing;
+auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__38803_32_backing;
 #line 5088
-auto struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_EUlyE_ __38677_8_reserve_func;
+auto struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_EUlyE_ __38809_8_reserve_func;
 #line 5082
-__38671_32_backing = (&(this->backing_array));
+__38803_32_backing = (&(this->backing_array));
 
 
-(((int)(*((__38671_32_backing->elems) + ((__38671_32_backing->n_elems) - 1ULL)))) == 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_Es), 5085
+(((int)(*((__38803_32_backing->elems) + ((__38803_32_backing->n_elems) - 1ULL)))) == 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_Es), 5085
 #line 5085
-, __T559636616, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-{ if ((__38671_32_backing->n_elems) != 0ULL) { { } (__38671_32_backing->n_elems) = 0ULL; } }
+, __T827153664, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+{ if ((__38803_32_backing->n_elems) != 0ULL) { { } (__38803_32_backing->n_elems) = 0ULL; } }
 
-(__38677_8_reserve_func.backing) = __38671_32_backing;
+(__38809_8_reserve_func.backing) = __38803_32_backing;
 
 
 
-_ZN3edg6detail26append_with_custom_reserveIZNS_16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_EUlyE_JS9_SB_iEEEvT_DpT0_(__38677_8_reserve_func, __3_38665_71_args, __2_38665_71_args, __1_38665_71_args); 
+_ZN3edg6detail26append_with_custom_reserveIZNS_16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_EUlyE_JS9_SB_iEEEvT_DpT0_(__38809_8_reserve_func, __3_38797_71_args, __2_38797_71_args, __1_38797_71_args); 
 }
 #line 4932
  /* COMDAT group: _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcS9_iEEEvDpT_ */ void 
 #line 4932
 _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcS9_iEEEvDpT_( struct _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const this, 
 #line 5076
-struct _ZN3edg13a_string_viewE __5_38665_71_args,  const char *__4_38665_71_args,  char *__3_38665_71_args,  const char *__2_38665_71_args,  int __1_38665_71_args)
+struct _ZN3edg13a_string_viewE __5_38797_71_args,  const char *__4_38797_71_args,  char *__3_38797_71_args,  const char *__2_38797_71_args,  int __1_38797_71_args)
 
 
 
 
 {
-auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__38671_32_backing;
+auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__38803_32_backing;
 #line 5088
-auto struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcS9_iEEEvDpT_EUlyE_ __38677_8_reserve_func;
+auto struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcS9_iEEEvDpT_EUlyE_ __38809_8_reserve_func;
 #line 5082
-__38671_32_backing = (&(this->backing_array));
+__38803_32_backing = (&(this->backing_array));
 
 
-(((int)(*((__38671_32_backing->elems) + ((__38671_32_backing->n_elems) - 1ULL)))) == 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)
+(((int)(*((__38803_32_backing->elems) + ((__38803_32_backing->n_elems) - 1ULL)))) == 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)
 #line 5085
-_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcS9_iEEEvDpT_Es), 5085, __T559679184, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-{ if ((__38671_32_backing->n_elems) != 0ULL) { { } (__38671_32_backing->n_elems) = 0ULL; } }
+_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcS9_iEEEvDpT_Es), 5085, __T827524248, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+{ if ((__38803_32_backing->n_elems) != 0ULL) { { } (__38803_32_backing->n_elems) = 0ULL; } }
 
-(__38677_8_reserve_func.backing) = __38671_32_backing;
+(__38809_8_reserve_func.backing) = __38803_32_backing;
 
 
 
-_ZN3edg6detail26append_with_custom_reserveIZNS_16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcSB_iEEEvDpT_EUlyE_JS9_SB_SC_SB_iEEEvT_DpT0_(__38677_8_reserve_func, __5_38665_71_args, __4_38665_71_args, __3_38665_71_args, 
+_ZN3edg6detail26append_with_custom_reserveIZNS_16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcSB_iEEEvDpT_EUlyE_JS9_SB_SC_SB_iEEEvT_DpT0_(__38809_8_reserve_func, __5_38797_71_args, __4_38797_71_args, __3_38797_71_args, 
 #line 5092
-__2_38665_71_args, __1_38665_71_args); 
+__2_38797_71_args, __1_38797_71_args); 
 }
 #line 4901
  /* COMDAT group: _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_ */ void _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_( struct 
 #line 4901
 _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const this, 
 #line 4943
-const _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE12an_allocatorE *__38532_75_a)
+const _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE12an_allocatorE *__38664_75_a)
 #line 4950
-{ auto size_t __T563153752; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE13an_allocationE __T485438440;
+{ auto size_t __T830863592; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE13an_allocationE __T830863936;
 
 
-auto struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_EUlyE_ __38542_8_reserve_func;
+auto struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_EUlyE_ __38674_8_reserve_func;
 #line 4949
-{ __T563153752 = (_ZN3edg6detail28estimate_byte_count_for_initIJEEEyDpT_()); { { _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEC1ERKNS1_IcEE((&(((this->backing_array).__b_N3edg27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaIcEE).
+{ __T830863592 = (_ZN3edg6detail28estimate_byte_count_for_initIJEEEyDpT_()); { { _ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEC1ERKNS1_IcEE((&(((this->backing_array).__b_N3edg27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaIcEE).
 #line 4949
-__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE)), (&((__38532_75_a->__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE).fallback_allocator))); } ((this->backing_array).elems) = ((
+__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE)), (&((__38664_75_a->__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE).fallback_allocator))); } ((this->backing_array).elems) = ((
 #line 4949
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *)0); ((this->backing_array).n_allocated) = 0ULL; ((this->backing_array).n_elems) = 0ULL; __T485438440 = (_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE5allocEy((&(((this->backing_array).
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *)0); ((this->backing_array).n_allocated) = 0ULL; ((this->backing_array).n_elems) = 0ULL; __T830863936 = (_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE5allocEy((&(((this->backing_array).
 #line 4949
-__b_N3edg27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaIcEE).__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE)), __T563153752)); ((this->backing_array).elems) = (__T485438440.start); ((this->backing_array).n_allocated) = ((__T485438440.n_bytes_allocated) / 1ULL); } }
+__b_N3edg27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaIcEE).__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE)), __T830863592)); ((this->backing_array).elems) = (__T830863936.start); ((this->backing_array).n_allocated) = ((__T830863936.n_bytes_allocated) / 1ULL); } }
 
 
 
-(__38542_8_reserve_func.__T559053200) = this;
+(__38674_8_reserve_func.__T826529256) = this;
 
 
 
-_ZN3edg6detail26append_with_custom_reserveIZNS_16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS6_IcEEDpT_EUlyE_JEEEvT_DpT0_(__38542_8_reserve_func); 
+_ZN3edg6detail26append_with_custom_reserveIZNS_16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS6_IcEEDpT_EUlyE_JEEEvT_DpT0_(__38674_8_reserve_func); 
 }  /* COMDAT group: _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC2IJEEERKNS4_IcEEDpT_ */ void _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC2IJEEERKNS4_IcEEDpT_( struct 
 #line 4958
-_ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const this,  const _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE12an_allocatorE *__T563286056) { auto size_t __T563286704; auto 
+_ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *const this,  const _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE12an_allocatorE *__T830879712) { auto size_t __T830880360; auto 
 #line 4958
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE13an_allocationE __T563287000; auto struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_EUlyE_ __T563287296;  (((__T563286704 = (
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE13an_allocationE __T830880656; auto struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_EUlyE_ __T830880952;  (((__T830880360 = (
 #line 4958
 _ZN3edg6detail28estimate_byte_count_for_initIJEEEyDpT_())) , (((((((_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEC1ERKNS1_IcEE((&(((this->backing_array).__b_N3edg27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaIcEE).
 #line 4958
-__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE)), (&((__T563286056->__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE).fallback_allocator)))) , (((this->backing_array).elems) = ((
+__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE)), (&((__T830879712->__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE).fallback_allocator)))) , (((this->backing_array).elems) = ((
 #line 4958
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *)0))) , (((this->backing_array).n_allocated) = 0ULL)) , (((this->backing_array).n_elems) = 0ULL)) , (__T563287000 = (_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE5allocEy((&(((this->
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *)0))) , (((this->backing_array).n_allocated) = 0ULL)) , (((this->backing_array).n_elems) = 0ULL)) , (__T830880656 = (_ZN3edg18Buffered_allocatorILj50ENS_17General_allocatorEcE5allocEy((&(((this->
 #line 4958
-backing_array).__b_N3edg27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaIcEE).__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE)), __T563286704)))) , (((this->backing_array).elems) = (__T563287000.start))) , (((this->backing_array).n_allocated) = ((__T563287000.
+backing_array).__b_N3edg27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaIcEE).__b_N3edg18Buffered_allocatorILj50ENS_17General_allocatorEcEE)), __T830880360)))) , (((this->backing_array).elems) = (__T830880656.start))) , (((this->backing_array).n_allocated) = ((__T830880656.
 #line 4958
-n_bytes_allocated) / 1ULL)))) , ((__T563287296.__T559053200) = this)) , (_ZN3edg6detail26append_with_custom_reserveIZNS_16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS6_IcEEDpT_EUlyE_JEEEvT_DpT0_(__T563287296));  }
+n_bytes_allocated) / 1ULL)))) , ((__T830880952.__T826529256) = this)) , (_ZN3edg6detail26append_with_custom_reserveIZNS_16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS6_IcEEDpT_EUlyE_JEEEvT_DpT0_(__T830880952));  }
 #line 4624
  /* COMDAT group: _ZN3edg6detail20Signed_int_formatterIiLi10EE11append_intoINS_9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEEEEvRT_iy */ void 
 #line 4624
 _ZN3edg6detail20Signed_int_formatterIiLi10EE11append_intoINS_9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEEEEvRT_iy(
 #line 4651
-struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__38240_63_underlying_array, 
-int __38241_62_value, 
-size_t __38242_62_size_hint)
+struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__38372_63_underlying_array, 
+int __38373_62_value, 
+size_t __38374_62_size_hint)
 #line 4660
-{ auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE __T559848840;
-auto int __38250_7_sign_negation = 1;
+{ auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE __T827385488;
+auto int __38382_7_sign_negation = 1;
 #line 4670
-auto size_t __38259_10_orig_size;
+auto size_t __38391_10_orig_size;
 #line 4663
-if (__38241_62_value < 0) { auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE __T559802112; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__T559802800; auto 
+if (__38373_62_value < 0) { auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE __T827376208; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__T827376896; auto 
 #line 4663
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__T559803096; auto unsigned long long __T559803392; auto _ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *__T559803688; auto size_t __T559803984;
-__38250_7_sign_negation = (-1);
-{ __T559802800 = ((__T559802112 = ((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE)45)) , (&__T559802112)); { __T559803984 = (__38240_63_underlying_array->n_elems); if (__T559803984 == (__38240_63_underlying_array->n_allocated)) { 
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__T827377192; auto unsigned long long __T827377488; auto _ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *__T827377784; auto size_t __T827378080;
+__38382_7_sign_negation = (-1);
+{ __T827376896 = ((__T827376208 = ((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE)45)) , (&__T827376208)); { __T827378080 = (__38372_63_underlying_array->n_elems); if (__T827378080 == (__38372_63_underlying_array->n_allocated)) { 
 #line 4665
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE4growEv(__38240_63_underlying_array); } { __T559803096 = ((__38240_63_underlying_array->elems) + __T559803984); { (_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *)((__T559803392 = 1ULL) , ((__T559803688 = ((
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE4growEv(__38372_63_underlying_array); } { __T827377192 = ((__38372_63_underlying_array->elems) + __T827378080); { (_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *)((__T827377488 = 1ULL) , ((__T827377784 = ((
 #line 4665
-_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T559803392, ((void *)__T559803096))))) , (((*__T559803688) = (*((_ZN3edg13Value_for_ptrIPcEE *)((_ZN3edg13Value_for_ptrIPcEE *)__T559802800)))) , __T559803688))); } } (__38240_63_underlying_array->n_elems) = (__T559803984 + 1ULL); } }
---__38242_62_size_hint;
+_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T827377488, ((void *)__T827377192))))) , (((*__T827377784) = (*((_ZN3edg13Value_for_ptrIPcEE *)((_ZN3edg13Value_for_ptrIPcEE *)__T827376896)))) , __T827377784))); } } (__38372_63_underlying_array->n_elems) = (__T827378080 + 1ULL); } }
+--__38374_62_size_hint;
 }
 
 
-__38259_10_orig_size = (((const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)__38240_63_underlying_array)->n_elems);
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6resizeEyRKc(__38240_63_underlying_array, (__38259_10_orig_size + __38242_62_size_hint), ((((*(_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *)&__T559848840)) = 
+__38391_10_orig_size = (((const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)__38372_63_underlying_array)->n_elems);
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6resizeEyRKc(__38372_63_underlying_array, (__38391_10_orig_size + __38374_62_size_hint), ((((*(_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *)&__T827385488)) = 
 #line 4671
-((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE)0)) , (&__T559848840))); {
-auto size_t __38261_15_i; __38261_15_i = __38242_62_size_hint; for (; __38261_15_i != 0ULL; --__38261_15_i) {
+((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE)0)) , (&__T827385488))); {
+auto size_t __38393_15_i; __38393_15_i = __38374_62_size_hint; for (; __38393_15_i != 0ULL; --__38393_15_i) {
 
-auto char __38263_10_c; __38263_10_c = (((const char *)(_ZZN3edg6detail20Signed_int_formatterIiLi10EE11append_intoINS_9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEEEEvRT_iyEs_0))[((__38241_62_value % 10) * __38250_7_sign_negation)]);
+auto char __38395_10_c; __38395_10_c = (((const char *)(_ZZN3edg6detail20Signed_int_formatterIiLi10EE11append_intoINS_9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEEEEvRT_iyEs_0))[((__38373_62_value % 10) * __38382_7_sign_negation)]);
 
-(*((__38240_63_underlying_array->elems) + (__38259_10_orig_size + (__38261_15_i - 1ULL)))) = __38263_10_c;
-__38241_62_value /= 10;
+(*((__38372_63_underlying_array->elems) + (__38391_10_orig_size + (__38393_15_i - 1ULL)))) = __38395_10_c;
+__38373_62_value /= 10;
 } } 
 }
-#line 4827
+#line 4798
+ /* COMDAT group: _ZN3edg6detail28estimate_byte_count_for_initIJEEEyDpT_ */ size_t _ZN3edg6detail28estimate_byte_count_for_initIJEEEyDpT_(void)
+#line 4804
+{
+
+auto size_t __38527_10_element_sizes[1] = {0ULL};
+#line 4812
+auto size_t __38533_10_total_size = 1ULL; {
+#line 4818
+auto size_t __38539_15_i; __38539_15_i = 0ULL; for (; __38539_15_i != 0ULL; ++__38539_15_i) {
+
+__38533_10_total_size += ((__38527_10_element_sizes)[__38539_15_i]);
+} }
+return __38533_10_total_size;
+}
+
+
+
  /* COMDAT group: _ZN3edg6detail26append_with_custom_reserveIZNS_16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS6_IcEEDpT_EUlyE_JEEEvT_DpT0_ */ void 
 #line 4827
 _ZN3edg6detail26append_with_custom_reserveIZNS_16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS6_IcEEDpT_EUlyE_JEEEvT_DpT0_( struct 
 #line 4827
-_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_EUlyE_ __38416_67_reserve_func)
+_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_EUlyE_ __38548_67_reserve_func)
 #line 4841
-{ auto const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T559213608; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE __T559219064; auto struct 
+{ auto const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T826793344; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE __T826882192; auto struct 
 #line 4841
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T559219752; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__T559220048; auto 
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T826882880; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__T826883176; auto 
 #line 4841
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__T559220344; auto unsigned long long __T559220640; auto _ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *__T559264048; auto size_t __T559264344;
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__T826883472; auto unsigned long long __T826883768; auto _ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *__T826884064; auto size_t __T826884360;
 
-auto size_t __38432_10_element_sizes[1] = {0ULL};
+auto size_t __38564_10_element_sizes[1] = {0ULL};
 #line 4849
-auto size_t __38438_10_total_size = 1ULL;
+auto size_t __38570_10_total_size = 1ULL;
 #line 4860
-auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__38449_11_backing_array;
-auto size_t __38450_10_counter; {
+auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__38581_11_backing_array;
+auto size_t __38582_10_counter; {
 #line 4855
-auto size_t __38444_15_i; __38444_15_i = 0ULL; for (; __38444_15_i != 0ULL; ++__38444_15_i) {
+auto size_t __38576_15_i; __38576_15_i = 0ULL; for (; __38576_15_i != 0ULL; ++__38576_15_i) {
 
-__38438_10_total_size += ((__38432_10_element_sizes)[__38444_15_i]);
+__38570_10_total_size += ((__38564_10_element_sizes)[__38576_15_i]);
 } }
 
-__38449_11_backing_array = (((((__T559213608 = (((const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)&((((*(const struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_EUlyE_ *
+__38581_11_backing_array = (((((__T826793344 = (((const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)&((((*(const struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_EUlyE_ *
 #line 4860
-)&__38416_67_reserve_func)).__T559053200)->backing_array)))) , (__T559213608->n_allocated)) >= __38438_10_total_size) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)
+)&__38548_67_reserve_func)).__T826529256)->backing_array)))) , (__T826793344->n_allocated)) >= __38570_10_total_size) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)
 #line 4860
-_ZZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_ENKUlyE_clEyEs), 4954, __T559054856, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (&((((*(const struct 
+_ZZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_ENKUlyE_clEyEs), 4954, __T826530912, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (&((((*(const struct 
 #line 4860
-_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_EUlyE_ *)&__38416_67_reserve_func)).__T559053200)->backing_array)));
-__38450_10_counter = 0ULL;
+_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEERKNS4_IcEEDpT_EUlyE_ *)&__38548_67_reserve_func)).__T826529256)->backing_array)));
+__38582_10_counter = 0ULL;
 #line 4875
-{ auto unsigned __38464_3__[1] = {0x0U}; }
+{ auto unsigned __38596_3__[1] = {0x0U}; }
 #line 4881
-{ __T559219752 = __38449_11_backing_array; __T559220048 = ((__T559219064 = ((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE)0)) , (&__T559219064)); { __T559264344 = (__T559219752->n_elems); if (__T559264344 == (__T559219752->n_allocated)) { 
+{ __T826882880 = __38581_11_backing_array; __T826883176 = ((__T826882192 = ((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE)0)) , (&__T826882192)); { __T826884360 = (__T826882880->n_elems); if (__T826884360 == (__T826882880->n_allocated)) { 
 #line 4881
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE4growEv(__T559219752); } { __T559220344 = ((__T559219752->elems) + __T559264344); { (_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *)((__T559220640 = 1ULL) , ((__T559264048 = ((
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE4growEv(__T826882880); } { __T826883472 = ((__T826882880->elems) + __T826884360); { (_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *)((__T826883768 = 1ULL) , ((__T826884064 = ((
 #line 4881
-_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T559220640, ((void *)__T559220344))))) , (((*__T559264048) = (*((_ZN3edg13Value_for_ptrIPcEE *)((_ZN3edg13Value_for_ptrIPcEE *)__T559220048)))) , __T559264048))); } } (__T559219752->n_elems) = (__T559264344 + 1ULL); } } 
+_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T826883768, ((void *)__T826883472))))) , (((*__T826884064) = (*((_ZN3edg13Value_for_ptrIPcEE *)((_ZN3edg13Value_for_ptrIPcEE *)__T826883176)))) , __T826884064))); } } (__T826882880->n_elems) = (__T826884360 + 1ULL); } } 
 }
 #line 4827
  /* COMDAT group: _ZN3edg6detail26append_with_custom_reserveIZNS_16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcSA_PcEEEvDpT_EUlyE_JSA_SA_SB_EEEvT_DpT0_ */ void 
 #line 4827
 _ZN3edg6detail26append_with_custom_reserveIZNS_16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcSA_PcEEEvDpT_EUlyE_JSA_SA_SB_EEEvT_DpT0_( struct 
 #line 4827
-_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_EUlyE_ __38416_67_reserve_func, 
-const char *__3_38417_67_args,  _ZN3edg12a_const_charE *__2_38417_67_args,  char *__1_38417_67_args)
+_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_EUlyE_ __38548_67_reserve_func, 
+const char *__3_38549_67_args,  _ZN3edg12a_const_charE *__2_38549_67_args,  char *__1_38549_67_args)
 #line 4841
-{ auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE __T559449976; auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T559450664; auto 
+{ auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE __T827057624; auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T827058312; auto 
 #line 4841
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__T559450960; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__T559451256; auto unsigned long long __T559451552; auto 
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__T827058608; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__T827058904; auto unsigned long long __T827238848; auto 
 #line 4841
-_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *__T559451848; auto size_t __T559452144;
+_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *__T827239144; auto size_t __T827239440;
 
-auto size_t __38432_10_element_sizes[4] = {0ULL,0ULL,0ULL,0ULL};
+auto size_t __38564_10_element_sizes[4] = {0ULL,0ULL,0ULL,0ULL};
 #line 4849
-auto size_t __38438_10_total_size;
+auto size_t __38570_10_total_size;
 #line 4860
-auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__38449_11_backing_array;
-auto size_t __38450_10_counter;
+auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__38581_11_backing_array;
+auto size_t __38582_10_counter;
 #line 4843
-(*(__38432_10_element_sizes)) = (strlen(__3_38417_67_args)); ((__38432_10_element_sizes)[1ULL]) = (strlen(__2_38417_67_args)); ((__38432_10_element_sizes)[2ULL]) = (strlen(((const char *)__1_38417_67_args)));
+(*(__38564_10_element_sizes)) = (strlen(__3_38549_67_args)); ((__38564_10_element_sizes)[1ULL]) = (strlen(__2_38549_67_args)); ((__38564_10_element_sizes)[2ULL]) = (strlen(((const char *)__1_38549_67_args)));
 #line 4849
-__38438_10_total_size = 1ULL; {
+__38570_10_total_size = 1ULL; {
 #line 4855
-auto size_t __38444_15_i; __38444_15_i = 0ULL; for (; __38444_15_i != 3ULL; ++__38444_15_i) {
+auto size_t __38576_15_i; __38576_15_i = 0ULL; for (; __38576_15_i != 3ULL; ++__38576_15_i) {
 
-__38438_10_total_size += ((__38432_10_element_sizes)[__38444_15_i]);
+__38570_10_total_size += ((__38564_10_element_sizes)[__38576_15_i]);
 } }
 
-__38449_11_backing_array = ((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7reserveEy(((struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)(((*(const struct 
+__38581_11_backing_array = ((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7reserveEy(((struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)(((*(const struct 
 #line 4860
-_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_EUlyE_ *)&__38416_67_reserve_func)).backing)), __38438_10_total_size)) , ((struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)(((
+_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_EUlyE_ *)&__38548_67_reserve_func)).backing)), __38570_10_total_size)) , ((struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)(((
 #line 4860
-*(const struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_EUlyE_ *)&__38416_67_reserve_func)).backing)));
-__38450_10_counter = 0ULL;
+*(const struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_EUlyE_ *)&__38548_67_reserve_func)).backing)));
+__38582_10_counter = 0ULL;
 #line 4875
-{ auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T559442480; auto size_t __T559442776; auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T559444920; auto size_t __T559445216; auto struct 
+{ auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T827050128; auto size_t __T827050424; auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T827052568; auto size_t __T827052864; auto struct 
 #line 4875
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T559447448; auto size_t __T559447744; auto unsigned __38464_3__[4] = {0U,0U,0U,0x0U}; (*(__38464_3__)) = ((((__T559442480 = __38449_11_backing_array) , (__T559442776 = ((__38432_10_element_sizes)[(
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T827055096; auto size_t __T827055392; auto unsigned __38596_3__[4] = {0U,0U,0U,0x0U}; (*(__38596_3__)) = ((((__T827050128 = __38581_11_backing_array) , (__T827050424 = ((__38564_10_element_sizes)[(
 #line 4875
-__38450_10_counter++)]))) , (_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_y(__T559442480, (((const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)__T559442480)->n_elems), 
+__38582_10_counter++)]))) , (_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_y(__T827050128, (((const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)__T827050128)->n_elems), 
 #line 4875
-__3_38417_67_args, __T559442776))) , 0x0U); ((__38464_3__)[1ULL]) = ((((__T559444920 = __38449_11_backing_array) , (__T559445216 = ((__38432_10_element_sizes)[(__38450_10_counter++)]))) , (_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_y(
+__3_38549_67_args, __T827050424))) , 0x0U); ((__38596_3__)[1ULL]) = ((((__T827052568 = __38581_11_backing_array) , (__T827052864 = ((__38564_10_element_sizes)[(__38582_10_counter++)]))) , (_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_y(
 #line 4875
-__T559444920, (((const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)__T559444920)->n_elems), __2_38417_67_args, __T559445216))) , 0x0U); ((__38464_3__)[2ULL]) = ((((__T559447448 = __38449_11_backing_array) , (__T559447744 = ((
+__T827052568, (((const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)__T827052568)->n_elems), __2_38549_67_args, __T827052864))) , 0x0U); ((__38596_3__)[2ULL]) = ((((__T827055096 = __38581_11_backing_array) , (__T827055392 = ((
 #line 4875
-__38432_10_element_sizes)[(__38450_10_counter++)]))) , (_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPcEEvyT_y(__T559447448, (((const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)__T559447448)->
+__38564_10_element_sizes)[(__38582_10_counter++)]))) , (_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPcEEvyT_y(__T827055096, (((const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)__T827055096)->
 #line 4875
-n_elems), __1_38417_67_args, __T559447744))) , 0x0U); }
+n_elems), __1_38549_67_args, __T827055392))) , 0x0U); }
 #line 4881
-{ __T559450664 = __38449_11_backing_array; __T559450960 = ((__T559449976 = ((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE)0)) , (&__T559449976)); { __T559452144 = (__T559450664->n_elems); if (__T559452144 == (__T559450664->n_allocated)) { 
+{ __T827058312 = __38581_11_backing_array; __T827058608 = ((__T827057624 = ((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE)0)) , (&__T827057624)); { __T827239440 = (__T827058312->n_elems); if (__T827239440 == (__T827058312->n_allocated)) { 
 #line 4881
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE4growEv(__T559450664); } { __T559451256 = ((__T559450664->elems) + __T559452144); { (_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *)((__T559451552 = 1ULL) , ((__T559451848 = ((
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE4growEv(__T827058312); } { __T827058904 = ((__T827058312->elems) + __T827239440); { (_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *)((__T827238848 = 1ULL) , ((__T827239144 = ((
 #line 4881
-_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T559451552, ((void *)__T559451256))))) , (((*__T559451848) = (*((_ZN3edg13Value_for_ptrIPcEE *)((_ZN3edg13Value_for_ptrIPcEE *)__T559450960)))) , __T559451848))); } } (__T559450664->n_elems) = (__T559452144 + 1ULL); } } 
+_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T827238848, ((void *)__T827058904))))) , (((*__T827239144) = (*((_ZN3edg13Value_for_ptrIPcEE *)((_ZN3edg13Value_for_ptrIPcEE *)__T827058608)))) , __T827239144))); } } (__T827058312->n_elems) = (__T827239440 + 1ULL); } } 
 }
 #line 4827
  /* COMDAT group: _ZN3edg6detail26append_with_custom_reserveIZNS_16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_EUlyE_JS9_SB_iEEEvT_DpT0_ */ void 
 #line 4827
 _ZN3edg6detail26append_with_custom_reserveIZNS_16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_EUlyE_JS9_SB_iEEEvT_DpT0_( struct 
 #line 4827
-_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_EUlyE_ __38416_67_reserve_func, 
-struct _ZN3edg13a_string_viewE __3_38417_67_args,  const char *__2_38417_67_args,  int __1_38417_67_args)
+_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_EUlyE_ __38548_67_reserve_func, 
+struct _ZN3edg13a_string_viewE __3_38549_67_args,  const char *__2_38549_67_args,  int __1_38549_67_args)
 #line 4841
-{ auto struct _ZN3edg13a_string_viewE __T559516496; auto size_t __T559518728; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE __T559530216; auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *
+{ auto struct _ZN3edg13a_string_viewE __T827308016; auto size_t __T827310248; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE __T827480744; auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *
 #line 4841
-__T559530904; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__T559531200; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__T559531496; auto unsigned long long __T559531792; auto 
+__T827481432; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__T827481728; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__T827482024; auto unsigned long long __T827482320; auto 
 #line 4841
-_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *__T559532088;
+_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *__T827482616;
 
-auto size_t __38432_10_element_sizes[4] = {0ULL,0ULL,0ULL,0ULL};
+auto size_t __38564_10_element_sizes[4] = {0ULL,0ULL,0ULL,0ULL};
 #line 4849
-auto size_t __38438_10_total_size;
+auto size_t __38570_10_total_size;
 #line 4860
-auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__38449_11_backing_array;
-auto size_t __38450_10_counter;
+auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__38581_11_backing_array;
+auto size_t __38582_10_counter;
 #line 4843
-(*(__38432_10_element_sizes)) = ((__T559516496 = __3_38417_67_args) , (((*(const struct _ZN3edg13a_string_viewE *)&__T559516496)).str_length)); ((__38432_10_element_sizes)[1ULL]) = (strlen(__2_38417_67_args)); ((__38432_10_element_sizes)[2ULL]) = (((__T559518728 = (
+(*(__38564_10_element_sizes)) = ((__T827308016 = __3_38549_67_args) , (((*(const struct _ZN3edg13a_string_viewE *)&__T827308016)).str_length)); ((__38564_10_element_sizes)[1ULL]) = (strlen(__2_38549_67_args)); ((__38564_10_element_sizes)[2ULL]) = (((__T827310248 = (
 #line 4843
-_ZN3edg15integral_digitsIiEENS_16Enable_if_helperIXsr3edg16Is_signed_helperIT_EE5valueEyE7a_thingES2_i(__1_38417_67_args, 10))) , ((__1_38417_67_args < 0) ? ((void)(++__T559518728)) : ((void)0))) , __T559518728);
+_ZN3edg15integral_digitsIiEENS_16Enable_if_helperIXsr3edg16Is_signed_helperIT_EE5valueEyE7a_thingES2_i(__1_38549_67_args, 10))) , ((__1_38549_67_args < 0) ? ((void)(++__T827310248)) : ((void)0))) , __T827310248);
 #line 4849
-__38438_10_total_size = 1ULL; {
+__38570_10_total_size = 1ULL; {
 #line 4855
-auto size_t __38444_15_i; __38444_15_i = 0ULL; for (; __38444_15_i != 3ULL; ++__38444_15_i) {
+auto size_t __38576_15_i; __38576_15_i = 0ULL; for (; __38576_15_i != 3ULL; ++__38576_15_i) {
 
-__38438_10_total_size += ((__38432_10_element_sizes)[__38444_15_i]);
+__38570_10_total_size += ((__38564_10_element_sizes)[__38576_15_i]);
 } }
 
-__38449_11_backing_array = ((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7reserveEy(((struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)(((*(const struct 
+__38581_11_backing_array = ((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7reserveEy(((struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)(((*(const struct 
 #line 4860
-_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_EUlyE_ *)&__38416_67_reserve_func)).backing)), __38438_10_total_size)) , ((struct 
+_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_EUlyE_ *)&__38548_67_reserve_func)).backing)), __38570_10_total_size)) , ((struct 
 #line 4860
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)(((*(const struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_EUlyE_ *)&__38416_67_reserve_func)).backing)));
-__38450_10_counter = 0ULL;
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)(((*(const struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_EUlyE_ *)&__38548_67_reserve_func)).backing)));
+__38582_10_counter = 0ULL;
 #line 4875
-{ auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T559524192; auto struct _ZN3edg13a_string_viewE __T559524488; auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T559527160; auto size_t 
+{ auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T827315712; auto struct _ZN3edg13a_string_viewE __T827316008; auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T827318680; auto size_t 
 #line 4875
-__T559527456; auto unsigned __38464_3__[4] = {0U,0U,0U,0x0U}; (*(__38464_3__)) = (((((__T559524192 = __38449_11_backing_array) , (__T559524488 = __3_38417_67_args)) , ((__38432_10_element_sizes)[(__38450_10_counter++)])) , (
+__T827318976; auto unsigned __38596_3__[4] = {0U,0U,0U,0x0U}; (*(__38596_3__)) = (((((__T827315712 = __38581_11_backing_array) , (__T827316008 = __3_38549_67_args)) , ((__38564_10_element_sizes)[(__38582_10_counter++)])) , (
 #line 4875
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_y(__T559524192, (((const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)__T559524192)->n_elems), (((*(const struct _ZN3edg13a_string_viewE *)&
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_y(__T827315712, (((const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)__T827315712)->n_elems), (((*(const struct _ZN3edg13a_string_viewE *)&
 #line 4875
-__T559524488)).str_start), (((*(const struct _ZN3edg13a_string_viewE *)&__T559524488)).str_length)))) , 0x0U); ((__38464_3__)[1ULL]) = ((((__T559527160 = __38449_11_backing_array) , (__T559527456 = ((__38432_10_element_sizes)[(__38450_10_counter++)]))) , (
+__T827316008)).str_start), (((*(const struct _ZN3edg13a_string_viewE *)&__T827316008)).str_length)))) , 0x0U); ((__38596_3__)[1ULL]) = ((((__T827318680 = __38581_11_backing_array) , (__T827318976 = ((__38564_10_element_sizes)[(__38582_10_counter++)]))) , (
 #line 4875
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_y(__T559527160, (((const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)__T559527160)->n_elems), __2_38417_67_args, __T559527456))) , 0x0U); ((
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_y(__T827318680, (((const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)__T827318680)->n_elems), __2_38549_67_args, __T827318976))) , 0x0U); ((
 #line 4875
-__38464_3__)[2ULL]) = ((_ZN3edg6detail20Signed_int_formatterIiLi10EE11append_intoINS_9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEEEEvRT_iy(__38449_11_backing_array, __1_38417_67_args, ((__38432_10_element_sizes)[(__38450_10_counter++)]))) , 0x0U); }
+__38596_3__)[2ULL]) = ((_ZN3edg6detail20Signed_int_formatterIiLi10EE11append_intoINS_9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEEEEvRT_iy(__38581_11_backing_array, __1_38549_67_args, ((__38564_10_element_sizes)[(__38582_10_counter++)]))) , 0x0U); }
 #line 4881
-{ __T559530904 = __38449_11_backing_array; __T559531200 = ((__T559530216 = ((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE)0)) , (&__T559530216)); { __T559518728 = (__T559530904->n_elems); if (__T559518728 == (__T559530904->n_allocated)) { 
+{ __T827481432 = __38581_11_backing_array; __T827481728 = ((__T827480744 = ((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE)0)) , (&__T827480744)); { __T827310248 = (__T827481432->n_elems); if (__T827310248 == (__T827481432->n_allocated)) { 
 #line 4881
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE4growEv(__T559530904); } { __T559531496 = ((__T559530904->elems) + __T559518728); { (_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *)((__T559531792 = 1ULL) , ((__T559532088 = ((
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE4growEv(__T827481432); } { __T827482024 = ((__T827481432->elems) + __T827310248); { (_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *)((__T827482320 = 1ULL) , ((__T827482616 = ((
 #line 4881
-_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T559531792, ((void *)__T559531496))))) , (((*__T559532088) = (*((_ZN3edg13Value_for_ptrIPcEE *)((_ZN3edg13Value_for_ptrIPcEE *)__T559531200)))) , __T559532088))); } } (__T559530904->n_elems) = (__T559518728 + 1ULL); } } 
+_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T827482320, ((void *)__T827482024))))) , (((*__T827482616) = (*((_ZN3edg13Value_for_ptrIPcEE *)((_ZN3edg13Value_for_ptrIPcEE *)__T827481728)))) , __T827482616))); } } (__T827481432->n_elems) = (__T827310248 + 1ULL); } } 
 }
 #line 4827
  /* COMDAT group: _ZN3edg6detail26append_with_custom_reserveIZNS_16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcSB_iEEEvDpT_EUlyE_JS9_SB_SC_SB_iEEEvT_DpT0_ */ void 
 #line 4827
 _ZN3edg6detail26append_with_custom_reserveIZNS_16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcSB_iEEEvDpT_EUlyE_JS9_SB_SC_SB_iEEEvT_DpT0_( struct 
 #line 4827
-_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcS9_iEEEvDpT_EUlyE_ __38416_67_reserve_func, 
-struct _ZN3edg13a_string_viewE __5_38417_67_args,  const char *__4_38417_67_args,  char *__3_38417_67_args,  const char *__2_38417_67_args,  int __1_38417_67_args)
+_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcS9_iEEEvDpT_EUlyE_ __38548_67_reserve_func, 
+struct _ZN3edg13a_string_viewE __5_38549_67_args,  const char *__4_38549_67_args,  char *__3_38549_67_args,  const char *__2_38549_67_args,  int __1_38549_67_args)
 #line 4841
-{ auto struct _ZN3edg13a_string_viewE __T559967536; auto size_t __T559971616; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE __T559988160; auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *
+{ auto struct _ZN3edg13a_string_viewE __T827615344; auto size_t __T827619424; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE __T827635968; auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *
 #line 4841
-__T559988848; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__T559989144; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__T559989440; auto unsigned long long __T559989736; auto 
+__T827636656; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__T827636952; auto _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE *__T827637248; auto unsigned long long __T827637544; auto 
 #line 4841
-_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *__T559990032;
+_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *__T827637840;
 
-auto size_t __38432_10_element_sizes[6] = {0ULL,0ULL,0ULL,0ULL,0ULL,0ULL};
+auto size_t __38564_10_element_sizes[6] = {0ULL,0ULL,0ULL,0ULL,0ULL,0ULL};
 #line 4849
-auto size_t __38438_10_total_size;
+auto size_t __38570_10_total_size;
 #line 4860
-auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__38449_11_backing_array;
-auto size_t __38450_10_counter;
+auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__38581_11_backing_array;
+auto size_t __38582_10_counter;
 #line 4843
-(*(__38432_10_element_sizes)) = ((__T559967536 = __5_38417_67_args) , (((*(const struct _ZN3edg13a_string_viewE *)&__T559967536)).str_length)); ((__38432_10_element_sizes)[1ULL]) = (strlen(__4_38417_67_args)); ((__38432_10_element_sizes)[2ULL]) = (strlen(((const char *)__3_38417_67_args))); ((
+(*(__38564_10_element_sizes)) = ((__T827615344 = __5_38549_67_args) , (((*(const struct _ZN3edg13a_string_viewE *)&__T827615344)).str_length)); ((__38564_10_element_sizes)[1ULL]) = (strlen(__4_38549_67_args)); ((__38564_10_element_sizes)[2ULL]) = (strlen(((const char *)__3_38549_67_args))); ((
 #line 4843
-__38432_10_element_sizes)[3ULL]) = (strlen(__2_38417_67_args)); ((__38432_10_element_sizes)[4ULL]) = (((__T559971616 = (_ZN3edg15integral_digitsIiEENS_16Enable_if_helperIXsr3edg16Is_signed_helperIT_EE5valueEyE7a_thingES2_i(__1_38417_67_args, 10))) , ((__1_38417_67_args < 0) ? ((void)(++__T559971616)
+__38564_10_element_sizes)[3ULL]) = (strlen(__2_38549_67_args)); ((__38564_10_element_sizes)[4ULL]) = (((__T827619424 = (_ZN3edg15integral_digitsIiEENS_16Enable_if_helperIXsr3edg16Is_signed_helperIT_EE5valueEyE7a_thingES2_i(__1_38549_67_args, 10))) , ((__1_38549_67_args < 0) ? ((void)(++__T827619424)
 #line 4843
-) : ((void)0))) , __T559971616);
+) : ((void)0))) , __T827619424);
 #line 4849
-__38438_10_total_size = 1ULL; {
+__38570_10_total_size = 1ULL; {
 #line 4855
-auto size_t __38444_15_i; __38444_15_i = 0ULL; for (; __38444_15_i != 5ULL; ++__38444_15_i) {
+auto size_t __38576_15_i; __38576_15_i = 0ULL; for (; __38576_15_i != 5ULL; ++__38576_15_i) {
 
-__38438_10_total_size += ((__38432_10_element_sizes)[__38444_15_i]);
+__38570_10_total_size += ((__38564_10_element_sizes)[__38576_15_i]);
 } }
 
-__38449_11_backing_array = ((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7reserveEy(((struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)(((*(const struct 
+__38581_11_backing_array = ((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7reserveEy(((struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)(((*(const struct 
 #line 4860
-_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcS9_iEEEvDpT_EUlyE_ *)&__38416_67_reserve_func)).backing)), __38438_10_total_size)) , ((struct 
+_ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcS9_iEEEvDpT_EUlyE_ *)&__38548_67_reserve_func)).backing)), __38570_10_total_size)) , ((struct 
 #line 4860
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)(((*(const struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcS9_iEEEvDpT_EUlyE_ *)&__38416_67_reserve_func)).backing)));
-__38450_10_counter = 0ULL;
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)(((*(const struct _ZZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcS9_iEEEvDpT_EUlyE_ *)&__38548_67_reserve_func)).backing)));
+__38582_10_counter = 0ULL;
 #line 4875
-{ auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T559977080; auto struct _ZN3edg13a_string_viewE __T559977376; auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T559980048; auto size_t 
+{ auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T827624888; auto struct _ZN3edg13a_string_viewE __T827625184; auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T827627856; auto size_t 
 #line 4875
-__T559980344; auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T559982576; auto size_t __T559982872; auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T559985104; auto size_t __T559985400; 
+__T827628152; auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T827630384; auto size_t __T827630680; auto struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *__T827632912; auto size_t __T827633208; 
 #line 4875
-auto unsigned __38464_3__[6] = {0U,0U,0U,0U,0U,0x0U}; (*(__38464_3__)) = (((((__T559977080 = __38449_11_backing_array) , (__T559977376 = __5_38417_67_args)) , ((__38432_10_element_sizes)[(__38450_10_counter++)])) , (
+auto unsigned __38596_3__[6] = {0U,0U,0U,0U,0U,0x0U}; (*(__38596_3__)) = (((((__T827624888 = __38581_11_backing_array) , (__T827625184 = __5_38549_67_args)) , ((__38564_10_element_sizes)[(__38582_10_counter++)])) , (
 #line 4875
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_y(__T559977080, (((const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)__T559977080)->n_elems), (((*(const struct _ZN3edg13a_string_viewE *)&
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_y(__T827624888, (((const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)__T827624888)->n_elems), (((*(const struct _ZN3edg13a_string_viewE *)&
 #line 4875
-__T559977376)).str_start), (((*(const struct _ZN3edg13a_string_viewE *)&__T559977376)).str_length)))) , 0x0U); ((__38464_3__)[1ULL]) = ((((__T559980048 = __38449_11_backing_array) , (__T559980344 = ((__38432_10_element_sizes)[(__38450_10_counter++)]))) , (
+__T827625184)).str_start), (((*(const struct _ZN3edg13a_string_viewE *)&__T827625184)).str_length)))) , 0x0U); ((__38596_3__)[1ULL]) = ((((__T827627856 = __38581_11_backing_array) , (__T827628152 = ((__38564_10_element_sizes)[(__38582_10_counter++)]))) , (
 #line 4875
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_y(__T559980048, (((const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)__T559980048)->n_elems), __4_38417_67_args, __T559980344))) , 0x0U); ((
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_y(__T827627856, (((const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)__T827627856)->n_elems), __4_38549_67_args, __T827628152))) , 0x0U); ((
 #line 4875
-__38464_3__)[2ULL]) = ((((__T559982576 = __38449_11_backing_array) , (__T559982872 = ((__38432_10_element_sizes)[(__38450_10_counter++)]))) , (_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPcEEvyT_y(__T559982576, (((const struct 
+__38596_3__)[2ULL]) = ((((__T827630384 = __38581_11_backing_array) , (__T827630680 = ((__38564_10_element_sizes)[(__38582_10_counter++)]))) , (_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPcEEvyT_y(__T827630384, (((const struct 
 #line 4875
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)__T559982576)->n_elems), __3_38417_67_args, __T559982872))) , 0x0U); ((__38464_3__)[3ULL]) = ((((__T559985104 = __38449_11_backing_array) , (__T559985400 = ((__38432_10_element_sizes)[(__38450_10_counter++)])
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)__T827630384)->n_elems), __3_38549_67_args, __T827630680))) , 0x0U); ((__38596_3__)[3ULL]) = ((((__T827632912 = __38581_11_backing_array) , (__T827633208 = ((__38564_10_element_sizes)[(__38582_10_counter++)])
 #line 4875
-)) , (_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_y(__T559985104, (((const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)__T559985104)->n_elems), __2_38417_67_args, __T559985400))) , 0x0U
+)) , (_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6insertIPKcEEvyT_y(__T827632912, (((const struct _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)__T827632912)->n_elems), __2_38549_67_args, __T827633208))) , 0x0U
 #line 4875
-); ((__38464_3__)[4ULL]) = ((_ZN3edg6detail20Signed_int_formatterIiLi10EE11append_intoINS_9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEEEEvRT_iy(__38449_11_backing_array, __1_38417_67_args, ((__38432_10_element_sizes)[(__38450_10_counter++)]))) , 0x0U); }
+); ((__38596_3__)[4ULL]) = ((_ZN3edg6detail20Signed_int_formatterIiLi10EE11append_intoINS_9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEEEEvRT_iy(__38581_11_backing_array, __1_38549_67_args, ((__38564_10_element_sizes)[(__38582_10_counter++)]))) , 0x0U); }
 #line 4881
-{ __T559988848 = __38449_11_backing_array; __T559989144 = ((__T559988160 = ((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE)0)) , (&__T559988160)); { __T559971616 = (__T559988848->n_elems); if (__T559971616 == (__T559988848->n_allocated)) { 
+{ __T827636656 = __38581_11_backing_array; __T827636952 = ((__T827635968 = ((_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE7an_elemE)0)) , (&__T827635968)); { __T827619424 = (__T827636656->n_elems); if (__T827619424 == (__T827636656->n_allocated)) { 
 #line 4881
-_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE4growEv(__T559988848); } { __T559989440 = ((__T559988848->elems) + __T559971616); { (_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *)((__T559989736 = 1ULL) , ((__T559990032 = ((
+_ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE4growEv(__T827636656); } { __T827637248 = ((__T827636656->elems) + __T827619424); { (_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *)((__T827637544 = 1ULL) , ((__T827637840 = ((
 #line 4881
-_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T559989736, ((void *)__T559989440))))) , (((*__T559990032) = (*((_ZN3edg13Value_for_ptrIPcEE *)((_ZN3edg13Value_for_ptrIPcEE *)__T559989144)))) , __T559990032))); } } (__T559988848->n_elems) = (__T559971616 + 1ULL); } } 
+_ZZN3edg9constructIPcJcEEEvT_DpOT0_E9an_object *)(_ZnwyPv(__T827637544, ((void *)__T827637248))))) , (((*__T827637840) = (*((_ZN3edg13Value_for_ptrIPcEE *)((_ZN3edg13Value_for_ptrIPcEE *)__T827636952)))) , __T827637840))); } } (__T827636656->n_elems) = (__T827619424 + 1ULL); } } 
 }
 #line 75 "src/floating.c"
-static int _ZN32_INTERNAL_10_floating_c_7968bde93edg5matchEPKcS2_S2_S2_( _ZN3edg12a_const_charE *__142556_32_str, 
-_ZN3edg12a_const_charE *__142557_32_end, 
-_ZN3edg12a_const_charE *__142558_32_lc_tgt, 
-_ZN3edg12a_const_charE *__142559_32_uc_tgt)
+static int _ZN32_INTERNAL_10_floating_c_7968bde93edg5matchEPKcS2_S2_S2_( _ZN3edg12a_const_charE *__142688_32_str, 
+_ZN3edg12a_const_charE *__142689_32_end, 
+_ZN3edg12a_const_charE *__142690_32_lc_tgt, 
+_ZN3edg12a_const_charE *__142691_32_uc_tgt)
 #line 86
 {
-auto int __142568_7_len = 0;
-while ((((long long)__142568_7_len) < (__142557_32_end - __142556_32_str)) && ((((int)(__142556_32_str[__142568_7_len])) == ((int)(__142558_32_lc_tgt[__142568_7_len]))) || (((int)(__142556_32_str[__142568_7_len])) == ((int)(__142559_32_uc_tgt[__142568_7_len])))))
+auto int __142700_7_len = 0;
+while ((((long long)__142700_7_len) < (__142689_32_end - __142688_32_str)) && ((((int)(__142688_32_str[__142700_7_len])) == ((int)(__142690_32_lc_tgt[__142700_7_len]))) || (((int)(__142688_32_str[__142700_7_len])) == ((int)(__142691_32_uc_tgt[__142700_7_len])))))
 {
-++__142568_7_len;
+++__142700_7_len;
 }
-return ((__142568_7_len == 3) || (((int)(__142559_32_uc_tgt[__142568_7_len])) == 0)) ? __142568_7_len : 0;
+return ((__142700_7_len == 3) || (((int)(__142691_32_uc_tgt[__142700_7_len])) == 0)) ? __142700_7_len : 0;
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg9parse_nanEPNS0_19an_fp_decimal_inputEPKcS4_( _ZN3edg19an_fp_decimal_inputE *__142577_44_dec, 
-_ZN3edg12a_const_charE *__142578_44_str, 
-_ZN3edg12a_const_charE *__142579_44_end)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg9parse_nanEPNS0_19an_fp_decimal_inputEPKcS4_( _ZN3edg19an_fp_decimal_inputE *__142709_44_dec, 
+_ZN3edg12a_const_charE *__142710_44_str, 
+_ZN3edg12a_const_charE *__142711_44_end)
 
 
 
 
 {
-auto int __142585_13_len; __142585_13_len = (_ZN32_INTERNAL_10_floating_c_7968bde93edg5matchEPKcS2_S2_S2_(__142578_44_str, __142579_44_end, ((_ZN3edg12a_const_charE *)"nan"), ((_ZN3edg12a_const_charE *)"NAN")));
+auto int __142717_13_len; __142717_13_len = (_ZN32_INTERNAL_10_floating_c_7968bde93edg5matchEPKcS2_S2_S2_(__142710_44_str, __142711_44_end, ((_ZN3edg12a_const_charE *)"nan"), ((_ZN3edg12a_const_charE *)"NAN")));
 
-if (((long long)__142585_13_len) == (__142579_44_end - __142578_44_str)) {
-(__142577_44_dec->type) = _ZN3edg7fpt_nanE;
-} else  { if (((__142585_13_len == 3) && (((int)(__142578_44_str[3])) == 40)) && (((const char *)(strchr((__142578_44_str + 4), 41))) == (__142579_44_end - 1)))
+if (((long long)__142717_13_len) == (__142711_44_end - __142710_44_str)) {
+(__142709_44_dec->type) = _ZN3edg7fpt_nanE;
+} else  { if (((__142717_13_len == 3) && (((int)(__142710_44_str[3])) == 40)) && (((const char *)(strchr((__142710_44_str + 4), 41))) == (__142711_44_end - 1)))
 
 {
-(__142577_44_dec->type) = _ZN3edg7fpt_nanE;
+(__142709_44_dec->type) = _ZN3edg7fpt_nanE;
 } else  {
-(__142577_44_dec->type) = _ZN3edg11fpt_invalidE;
+(__142709_44_dec->type) = _ZN3edg11fpt_invalidE;
 } } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg14parse_infinityEPNS0_19an_fp_decimal_inputEPKcS4_( _ZN3edg19an_fp_decimal_inputE *__142599_49_dec, 
-_ZN3edg12a_const_charE *__142600_49_str, 
-_ZN3edg12a_const_charE *__142601_49_end)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg14parse_infinityEPNS0_19an_fp_decimal_inputEPKcS4_( _ZN3edg19an_fp_decimal_inputE *__142731_49_dec, 
+_ZN3edg12a_const_charE *__142732_49_str, 
+_ZN3edg12a_const_charE *__142733_49_end)
 
 
 
 
 {
-auto int __142607_13_len; __142607_13_len = (_ZN32_INTERNAL_10_floating_c_7968bde93edg5matchEPKcS2_S2_S2_(__142600_49_str, __142601_49_end, ((_ZN3edg12a_const_charE *)"infinity"), ((_ZN3edg12a_const_charE *)"INFINITY")));
+auto int __142739_13_len; __142739_13_len = (_ZN32_INTERNAL_10_floating_c_7968bde93edg5matchEPKcS2_S2_S2_(__142732_49_str, __142733_49_end, ((_ZN3edg12a_const_charE *)"infinity"), ((_ZN3edg12a_const_charE *)"INFINITY")));
 
-if (((long long)__142607_13_len) == (__142601_49_end - __142600_49_str)) {
-(__142599_49_dec->type) = _ZN3edg12fpt_infinityE;
+if (((long long)__142739_13_len) == (__142733_49_end - __142732_49_str)) {
+(__142731_49_dec->type) = _ZN3edg12fpt_infinityE;
 } else  {
-(__142599_49_dec->type) = _ZN3edg11fpt_invalidE;
+(__142731_49_dec->type) = _ZN3edg11fpt_invalidE;
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg12split_stringEPNS0_19an_fp_decimal_inputEPKcS4_( _ZN3edg19an_fp_decimal_inputE *__142617_47_dec, 
-_ZN3edg12a_const_charE *__142618_47_str, 
-_ZN3edg12a_const_charE *__142619_47_end)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg12split_stringEPNS0_19an_fp_decimal_inputEPKcS4_( _ZN3edg19an_fp_decimal_inputE *__142749_47_dec, 
+_ZN3edg12a_const_charE *__142750_47_str, 
+_ZN3edg12a_const_charE *__142751_47_end)
 
 
 
 {
-auto int __142624_13_precision = 0;
-auto _ZN3edg9a_booleanE __142625_13_seen_digit = ((_ZN3edg9a_booleanE)0);
+auto int __142756_13_precision = 0;
+auto _ZN3edg9a_booleanE __142757_13_seen_digit = ((_ZN3edg9a_booleanE)0);
 
-(__142617_47_dec->first_frac) = ((__142617_47_dec->last_frac) = __142618_47_str);
-(__142617_47_dec->is_negative) = ((_ZN3edg9a_booleanE)0);
-(__142617_47_dec->type) = _ZN3edg10fpt_numberE;
+(__142749_47_dec->first_frac) = ((__142749_47_dec->last_frac) = __142750_47_str);
+(__142749_47_dec->is_negative) = ((_ZN3edg9a_booleanE)0);
+(__142749_47_dec->type) = _ZN3edg10fpt_numberE;
 
-while ((*__142618_47_str) && (((int)((_ctype)[((unsigned char)((unsigned char)(*__142618_47_str)))])) & 8)) {
-++__142618_47_str;
+while ((*__142750_47_str) && (((int)((_ctype)[((unsigned char)((unsigned char)(*__142750_47_str)))])) & 8)) {
+++__142750_47_str;
 }
-if (((int)(*__142618_47_str)) == 45) {
-(__142617_47_dec->is_negative) = ((_ZN3edg9a_booleanE)1);
-++__142618_47_str;
-} else  { if (((int)(*__142618_47_str)) == 43) {
-++__142618_47_str;
+if (((int)(*__142750_47_str)) == 45) {
+(__142749_47_dec->is_negative) = ((_ZN3edg9a_booleanE)1);
+++__142750_47_str;
+} else  { if (((int)(*__142750_47_str)) == 43) {
+++__142750_47_str;
 } }
-if ((((int)(*__142618_47_str)) == 110) || (((int)(*__142618_47_str)) == 78)) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg9parse_nanEPNS0_19an_fp_decimal_inputEPKcS4_(__142617_47_dec, __142618_47_str, __142619_47_end);
-goto __142763_1_end_of_routine;
-} else  { if ((((int)(*__142618_47_str)) == 105) || (((int)(*__142618_47_str)) == 73)) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg14parse_infinityEPNS0_19an_fp_decimal_inputEPKcS4_(__142617_47_dec, __142618_47_str, __142619_47_end);
-goto __142763_1_end_of_routine;
+if ((((int)(*__142750_47_str)) == 110) || (((int)(*__142750_47_str)) == 78)) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg9parse_nanEPNS0_19an_fp_decimal_inputEPKcS4_(__142749_47_dec, __142750_47_str, __142751_47_end);
+goto __142895_1_end_of_routine;
+} else  { if ((((int)(*__142750_47_str)) == 105) || (((int)(*__142750_47_str)) == 73)) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg14parse_infinityEPNS0_19an_fp_decimal_inputEPKcS4_(__142749_47_dec, __142750_47_str, __142751_47_end);
+goto __142895_1_end_of_routine;
 } }
-while (((int)(*__142618_47_str)) == 48) {
-__142625_13_seen_digit = ((_ZN3edg9a_booleanE)1);
-++__142618_47_str;
+while (((int)(*__142750_47_str)) == 48) {
+__142757_13_seen_digit = ((_ZN3edg9a_booleanE)1);
+++__142750_47_str;
 }
 
 
 
-(__142617_47_dec->first_int) = __142618_47_str;
-while ((((int)((_ctype)[((unsigned char)((unsigned char)(*__142618_47_str)))])) & 4) && (((long)__142624_13_precision) < 4960L))
+(__142749_47_dec->first_int) = __142750_47_str;
+while ((((int)((_ctype)[((unsigned char)((unsigned char)(*__142750_47_str)))])) & 4) && (((long)__142756_13_precision) < 4960L))
 {
-++__142624_13_precision;
-__142625_13_seen_digit = ((_ZN3edg9a_booleanE)1);
-++__142618_47_str;
+++__142756_13_precision;
+__142757_13_seen_digit = ((_ZN3edg9a_booleanE)1);
+++__142750_47_str;
 }
-(__142617_47_dec->last_int) = __142618_47_str;
-while (((int)((_ctype)[((unsigned char)((unsigned char)(*__142618_47_str)))])) & 4) {
+(__142749_47_dec->last_int) = __142750_47_str;
+while (((int)((_ctype)[((unsigned char)((unsigned char)(*__142750_47_str)))])) & 4) {
 
-++__142618_47_str;
+++__142750_47_str;
 }
-(__142617_47_dec->exponent) = ((int)(__142618_47_str - (__142617_47_dec->first_int)));
+(__142749_47_dec->exponent) = ((int)(__142750_47_str - (__142749_47_dec->first_int)));
 #line 191
-if (((int)(*__142618_47_str)) == 46) {
-++__142618_47_str;
-if ((__142617_47_dec->first_int) == (__142617_47_dec->last_int)) {
-while (((int)(*__142618_47_str)) == 48) {
-__142625_13_seen_digit = ((_ZN3edg9a_booleanE)1);
-++__142618_47_str;
---(__142617_47_dec->exponent);
+if (((int)(*__142750_47_str)) == 46) {
+++__142750_47_str;
+if ((__142749_47_dec->first_int) == (__142749_47_dec->last_int)) {
+while (((int)(*__142750_47_str)) == 48) {
+__142757_13_seen_digit = ((_ZN3edg9a_booleanE)1);
+++__142750_47_str;
+--(__142749_47_dec->exponent);
 }
 }
-(__142617_47_dec->first_frac) = __142618_47_str;
-while (((*__142618_47_str) && (((int)((_ctype)[((unsigned char)((unsigned char)(*__142618_47_str)))])) & 4)) && (((long)__142624_13_precision) < 4960L))
+(__142749_47_dec->first_frac) = __142750_47_str;
+while (((*__142750_47_str) && (((int)((_ctype)[((unsigned char)((unsigned char)(*__142750_47_str)))])) & 4)) && (((long)__142756_13_precision) < 4960L))
 {
-++__142624_13_precision;
-__142625_13_seen_digit = ((_ZN3edg9a_booleanE)1);
-++__142618_47_str;
+++__142756_13_precision;
+__142757_13_seen_digit = ((_ZN3edg9a_booleanE)1);
+++__142750_47_str;
 }
-(__142617_47_dec->last_frac) = __142618_47_str;
+(__142749_47_dec->last_frac) = __142750_47_str;
 
-while (((__142617_47_dec->last_frac) != (__142617_47_dec->first_frac)) && (((int)(*((__142617_47_dec->last_frac) - 1))) == 48)) {
---__142624_13_precision;
---(__142617_47_dec->last_frac);
+while (((__142749_47_dec->last_frac) != (__142749_47_dec->first_frac)) && (((int)(*((__142749_47_dec->last_frac) - 1))) == 48)) {
+--__142756_13_precision;
+--(__142749_47_dec->last_frac);
 }
-while ((*__142618_47_str) && (((int)((_ctype)[((unsigned char)((unsigned char)(*__142618_47_str)))])) & 4)) {
+while ((*__142750_47_str) && (((int)((_ctype)[((unsigned char)((unsigned char)(*__142750_47_str)))])) & 4)) {
 
-++__142618_47_str;
+++__142750_47_str;
 }
 }
-if ((__142617_47_dec->last_frac) == (__142617_47_dec->first_frac)) {
-while (((__142617_47_dec->last_int) != (__142617_47_dec->first_int)) && (((int)(*((__142617_47_dec->last_int) - 1))) == 48)) {
---__142624_13_precision;
---(__142617_47_dec->last_int);
+if ((__142749_47_dec->last_frac) == (__142749_47_dec->first_frac)) {
+while (((__142749_47_dec->last_int) != (__142749_47_dec->first_int)) && (((int)(*((__142749_47_dec->last_int) - 1))) == 48)) {
+--__142756_13_precision;
+--(__142749_47_dec->last_int);
 }
 }
-(__142617_47_dec->precision) = (((int)((__142617_47_dec->last_int) - (__142617_47_dec->first_int))) + ((int)((__142617_47_dec->last_frac) - (__142617_47_dec->first_frac))));
+(__142749_47_dec->precision) = (((int)((__142749_47_dec->last_int) - (__142749_47_dec->first_int))) + ((int)((__142749_47_dec->last_frac) - (__142749_47_dec->first_frac))));
 
-(__142624_13_precision == (__142617_47_dec->precision)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 226, __T540682416, ((_ZN3edg12a_const_charE *)0), ((
+(__142756_13_precision == (__142749_47_dec->precision)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 226, __T807930424, ((_ZN3edg12a_const_charE *)0), ((
 #line 226
 _ZN3edg12a_const_charE *)0)));
-if (__142624_13_precision == 0) {
-(__142617_47_dec->type) = _ZN3edg8fpt_zeroE;
+if (__142756_13_precision == 0) {
+(__142749_47_dec->type) = _ZN3edg8fpt_zeroE;
 }
 
-if (!(__142625_13_seen_digit)) {
-(__142617_47_dec->type) = _ZN3edg11fpt_invalidE;
-} else  { if ((((int)(*__142618_47_str)) == 101) || (((int)(*__142618_47_str)) == 69)) {
-auto char *__142715_11_str_end;
-auto long __142716_10_tmp;
-auto int __142717_9_neg = 0;
+if (!(__142757_13_seen_digit)) {
+(__142749_47_dec->type) = _ZN3edg11fpt_invalidE;
+} else  { if ((((int)(*__142750_47_str)) == 101) || (((int)(*__142750_47_str)) == 69)) {
+auto char *__142847_11_str_end;
+auto long __142848_10_tmp;
+auto int __142849_9_neg = 0;
 
-++__142618_47_str;
-if (((int)(*__142618_47_str)) == 45) {
-++__142618_47_str;
-__142717_9_neg = 1;
-} else  { if (((int)(*__142618_47_str)) == 43) {
-++__142618_47_str;
+++__142750_47_str;
+if (((int)(*__142750_47_str)) == 45) {
+++__142750_47_str;
+__142849_9_neg = 1;
+} else  { if (((int)(*__142750_47_str)) == 43) {
+++__142750_47_str;
 } }
-if (!(((int)((_ctype)[((unsigned char)((unsigned char)(*__142618_47_str)))])) & 4)) {
-(__142617_47_dec->type) = _ZN3edg11fpt_invalidE;
+if (!(((int)((_ctype)[((unsigned char)((unsigned char)(*__142750_47_str)))])) & 4)) {
+(__142749_47_dec->type) = _ZN3edg11fpt_invalidE;
 } else  {
-__142716_10_tmp = (strtol(__142618_47_str, (&__142715_11_str_end), 10));
-if (((const char *)__142715_11_str_end) == __142618_47_str) {
+__142848_10_tmp = (strtol(__142750_47_str, (&__142847_11_str_end), 10));
+if (((const char *)__142847_11_str_end) == __142750_47_str) {
 
-(__142617_47_dec->type) = _ZN3edg11fpt_invalidE;
-} else  { if (((int)(__142617_47_dec->type)) == 6) {
+(__142749_47_dec->type) = _ZN3edg11fpt_invalidE;
+} else  { if (((int)(__142749_47_dec->type)) == 6) {
 
-} else  { if ((2147483647L <= __142716_10_tmp) || ((0 < (__142617_47_dec->exponent)) && ((0x7fffffffL - ((long)(__142617_47_dec->exponent))) < __142716_10_tmp)))
+} else  { if ((2147483647L <= __142848_10_tmp) || ((0 < (__142749_47_dec->exponent)) && ((0x7fffffffL - ((long)(__142749_47_dec->exponent))) < __142848_10_tmp)))
 {
 
-(__142617_47_dec->type) = ((__142717_9_neg) ? _ZN3edg13fpt_underflowE : _ZN3edg12fpt_overflowE);
+(__142749_47_dec->type) = ((__142849_9_neg) ? _ZN3edg13fpt_underflowE : _ZN3edg12fpt_overflowE);
 } else  {
-if (__142717_9_neg) {
-(__142617_47_dec->exponent) -= ((int)__142716_10_tmp);
+if (__142849_9_neg) {
+(__142749_47_dec->exponent) -= ((int)__142848_10_tmp);
 } else  {
-(__142617_47_dec->exponent) += ((int)__142716_10_tmp);
+(__142749_47_dec->exponent) += ((int)__142848_10_tmp);
 }
 } } }
-__142618_47_str = ((_ZN3edg12a_const_charE *)__142715_11_str_end);
+__142750_47_str = ((_ZN3edg12a_const_charE *)__142847_11_str_end);
 }
 } }
 
-if ((((int)(__142617_47_dec->type)) == 2) && (__142624_13_precision == 0)) {
-(__142617_47_dec->type) = _ZN3edg8fpt_zeroE;
+if ((((int)(__142749_47_dec->type)) == 2) && (__142756_13_precision == 0)) {
+(__142749_47_dec->type) = _ZN3edg8fpt_zeroE;
 }
-if (((int)(__142617_47_dec->type)) != 2) {
+if (((int)(__142749_47_dec->type)) != 2) {
 
-} else  { if (4970L < ((long)((__142617_47_dec->precision) + (__142617_47_dec->exponent)))) {
-(__142617_47_dec->precision) = ((int)(4970L - ((long)(__142617_47_dec->exponent))));
-} else  { if (4970L < ((long)((__142617_47_dec->precision) - (__142617_47_dec->exponent)))) {
-(__142617_47_dec->precision) = ((int)(4970L + ((long)(__142617_47_dec->exponent))));
+} else  { if (4970L < ((long)((__142749_47_dec->precision) + (__142749_47_dec->exponent)))) {
+(__142749_47_dec->precision) = ((int)(4970L - ((long)(__142749_47_dec->exponent))));
+} else  { if (4970L < ((long)((__142749_47_dec->precision) - (__142749_47_dec->exponent)))) {
+(__142749_47_dec->precision) = ((int)(4970L + ((long)(__142749_47_dec->exponent))));
 } } }
-if (__142618_47_str != __142619_47_end) {
-(__142617_47_dec->type) = _ZN3edg11fpt_invalidE;
+if (__142750_47_str != __142751_47_end) {
+(__142749_47_dec->type) = _ZN3edg11fpt_invalidE;
 }
-__142763_1_end_of_routine:; ; 
+__142895_1_end_of_routine:; ; 
 }
 
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_frac_set_from_uintEPhiy( unsigned char *__142768_50_frac, 
-int __142769_49_width, 
-_ZN3edg10an_fp_uintE __142770_49_val)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_frac_set_from_uintEPhiy( unsigned char *__142900_50_frac, 
+int __142901_49_width, 
+_ZN3edg10an_fp_uintE __142902_49_val)
 #line 295
 {
-auto int __142777_7_i;
-auto int __142778_7_bytes; __142778_7_bytes = (((__142769_49_width + 8) - 1) / 8);
+auto int __142909_7_i;
+auto int __142910_7_bytes; __142910_7_bytes = (((__142901_49_width + 8) - 1) / 8);
 
-for (__142777_7_i = 0; (__142777_7_i < __142778_7_bytes) && (__142770_49_val != 0ULL); ++__142777_7_i) {
-(__142768_50_frac[__142777_7_i]) = ((unsigned char)__142770_49_val);
-__142770_49_val >>= 8;
+for (__142909_7_i = 0; (__142909_7_i < __142910_7_bytes) && (__142902_49_val != 0ULL); ++__142909_7_i) {
+(__142900_50_frac[__142909_7_i]) = ((unsigned char)__142902_49_val);
+__142902_49_val >>= 8;
 }
-for (; __142777_7_i < __142778_7_bytes; ++__142777_7_i) {
-(__142768_50_frac[__142777_7_i]) = ((unsigned char)0U);
+for (; __142909_7_i < __142910_7_bytes; ++__142909_7_i) {
+(__142900_50_frac[__142909_7_i]) = ((unsigned char)0U);
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_frac_copyEPhS1_i( unsigned char *__142790_41_left, 
-unsigned char *__142791_41_right, 
-int __142792_40_width)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_frac_copyEPhS1_i( unsigned char *__142922_41_left, 
+unsigned char *__142923_41_right, 
+int __142924_40_width)
 
 
 
 
 {
-memcpy(((void *)__142790_41_left), ((const void *)__142791_41_right), ((size_t)(((__142792_40_width + 8) - 1) / 8))); 
+memcpy(((void *)__142922_41_left), ((const void *)__142923_41_right), ((size_t)(((__142924_40_width + 8) - 1) / 8))); 
 }
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_frac_ltEPhS1_i( unsigned char *__142802_44_left, 
-unsigned char *__142803_44_right, 
-int __142804_43_width)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_frac_ltEPhS1_i( unsigned char *__142934_44_left, 
+unsigned char *__142935_44_right, 
+int __142936_43_width)
 #line 329
 {
-auto int __142811_13_i;
-auto _ZN3edg9a_booleanE __142812_13_res = ((_ZN3edg9a_booleanE)0);
+auto int __142943_13_i;
+auto _ZN3edg9a_booleanE __142944_13_res = ((_ZN3edg9a_booleanE)0);
 
-for (__142811_13_i = (((__142804_43_width + 8) - 1) / 8); 0 < __142811_13_i; ) {
---__142811_13_i;
-if (((int)(__142802_44_left[__142811_13_i])) != ((int)(__142803_44_right[__142811_13_i]))) {
-__142812_13_res = ((_ZN3edg9a_booleanE)(((int)((_Bool)(((int)(__142802_44_left[__142811_13_i])) < ((int)(__142803_44_right[__142811_13_i]))))) != 0));
-goto __T541022712;
+for (__142943_13_i = (((__142936_43_width + 8) - 1) / 8); 0 < __142943_13_i; ) {
+--__142943_13_i;
+if (((int)(__142934_44_left[__142943_13_i])) != ((int)(__142935_44_right[__142943_13_i]))) {
+__142944_13_res = ((_ZN3edg9a_booleanE)(((int)((_Bool)(((int)(__142934_44_left[__142943_13_i])) < ((int)(__142935_44_right[__142943_13_i]))))) != 0));
+goto __T808224848;
 }
-} __T541022712:;
-return __142812_13_res;
+} __T808224848:;
+return __142944_13_res;
 }
 
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_minEPhi( unsigned char *__142826_47_frac, 
-int __142827_46_width)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_minEPhi( unsigned char *__142958_47_frac, 
+int __142959_46_width)
 #line 353
 {
-auto int __142835_7_i;
-auto int __142836_7_bytes; __142836_7_bytes = (((__142827_46_width + 8) - 1) / 8);
+auto int __142967_7_i;
+auto int __142968_7_bytes; __142968_7_bytes = (((__142959_46_width + 8) - 1) / 8);
 
-for (__142835_7_i = 0; __142835_7_i < (__142836_7_bytes - 1); ++__142835_7_i) {
-(__142826_47_frac[__142835_7_i]) = ((unsigned char)0U);
+for (__142967_7_i = 0; __142967_7_i < (__142968_7_bytes - 1); ++__142967_7_i) {
+(__142958_47_frac[__142967_7_i]) = ((unsigned char)0U);
 }
-(__142826_47_frac[__142835_7_i]) = ((unsigned char)(((((__142827_46_width % 8) ? (__142827_46_width % 8) : 8) >= 1) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 360, 
+(__142958_47_frac[__142967_7_i]) = ((unsigned char)(((((__142959_46_width % 8) ? (__142959_46_width % 8) : 8) >= 1) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 360, 
 #line 360
-__T540962440, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (1U << (((__142827_46_width % 8) ? (__142827_46_width % 8) : 8) - 1)))); 
+__T807937048, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (1U << (((__142959_46_width % 8) ? (__142959_46_width % 8) : 8) - 1)))); 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_maxEPhi( unsigned char *__142845_47_frac, 
-int __142846_46_width)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_maxEPhi( unsigned char *__142977_47_frac, 
+int __142978_46_width)
 #line 371
 {
-auto int __142853_7_i;
-auto int __142854_7_bytes; __142854_7_bytes = (((__142846_46_width + 8) - 1) / 8);
+auto int __142985_7_i;
+auto int __142986_7_bytes; __142986_7_bytes = (((__142978_46_width + 8) - 1) / 8);
 
-for (__142853_7_i = 0; __142853_7_i < (__142854_7_bytes - 1); ++__142853_7_i) {
-(__142845_47_frac[__142853_7_i]) = ((unsigned char)(0 , 0xffU));
+for (__142985_7_i = 0; __142985_7_i < (__142986_7_bytes - 1); ++__142985_7_i) {
+(__142977_47_frac[__142985_7_i]) = ((unsigned char)(0 , 0xffU));
 }
-(__142845_47_frac[__142853_7_i]) = ((unsigned char)(((((__142846_46_width % 8) ? (__142846_46_width % 8) : 8) >= 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 378, 
+(__142977_47_frac[__142985_7_i]) = ((unsigned char)(((((__142978_46_width % 8) ? (__142978_46_width % 8) : 8) >= 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 378, 
 #line 378
-__T540964424, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (~(4294967295U << ((__142846_46_width % 8) ? (__142846_46_width % 8) : 8))))); 
+__T807939040, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (~(4294967295U << ((__142978_46_width % 8) ? (__142978_46_width % 8) : 8))))); 
 }
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_frac_eq_min_fracEPhi( unsigned char *__142863_53_frac, 
-int __142864_52_width)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_frac_eq_min_fracEPhi( unsigned char *__142995_53_frac, 
+int __142996_52_width)
 #line 389
 {
-auto int __142871_13_i;
-auto int __142872_13_bytes;
-auto _ZN3edg9a_booleanE __142873_13_res;
+auto int __143003_13_i;
+auto int __143004_13_bytes;
+auto _ZN3edg9a_booleanE __143005_13_res;
 #line 391
-__142872_13_bytes = (((__142864_52_width + 8) - 1) / 8);
+__143004_13_bytes = (((__142996_52_width + 8) - 1) / 8);
 
 
-for (__142871_13_i = 0; __142871_13_i < (__142872_13_bytes - 1); ++__142871_13_i) {
-if (((int)(__142863_53_frac[__142871_13_i])) != 0) {
-__142873_13_res = ((_ZN3edg9a_booleanE)0);
-goto __142886_1_end_of_routine;
+for (__143003_13_i = 0; __143003_13_i < (__143004_13_bytes - 1); ++__143003_13_i) {
+if (((int)(__142995_53_frac[__143003_13_i])) != 0) {
+__143005_13_res = ((_ZN3edg9a_booleanE)0);
+goto __143018_1_end_of_routine;
 }
 }
-if (((unsigned)(__142863_53_frac[__142871_13_i])) == (((((__142864_52_width % 8) ? (__142864_52_width % 8) : 8) >= 1) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 400, 
+if (((unsigned)(__142995_53_frac[__143003_13_i])) == (((((__142996_52_width % 8) ? (__142996_52_width % 8) : 8) >= 1) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 400
 #line 400
-__T540966720, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (1U << (((__142864_52_width % 8) ? (__142864_52_width % 8) : 8) - 1)))) {
-__142873_13_res = ((_ZN3edg9a_booleanE)1);
+, __T807941352, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (1U << (((__142996_52_width % 8) ? (__142996_52_width % 8) : 8) - 1)))) {
+__143005_13_res = ((_ZN3edg9a_booleanE)1);
 } else  {
-__142873_13_res = ((_ZN3edg9a_booleanE)0);
+__143005_13_res = ((_ZN3edg9a_booleanE)0);
 }
-__142886_1_end_of_routine:;
-return __142873_13_res;
+__143018_1_end_of_routine:;
+return __143005_13_res;
 }
 
 
-static int _ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_frac_low_zero_bitsEPhi( unsigned char *__142891_49_frac, 
-int __142892_48_width)
+static int _ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_frac_low_zero_bitsEPhi( unsigned char *__143023_49_frac, 
+int __143024_48_width)
 
 
 
 
 {
-auto int __142898_17_i;
-auto unsigned char __142899_17_the_byte = ((unsigned char)0U);
-auto int __142900_17_zbits = 0;
+auto int __143030_17_i;
+auto unsigned char __143031_17_the_byte = ((unsigned char)0U);
+auto int __143032_17_zbits = 0;
 
-for (__142898_17_i = 0; (__142898_17_i < (((__142892_48_width + 8) - 1) / 8)) && (((int)(__142899_17_the_byte = (__142891_49_frac[__142898_17_i]))) == 0); ++__142898_17_i) {
-__142900_17_zbits += 8;
+for (__143030_17_i = 0; (__143030_17_i < (((__143024_48_width + 8) - 1) / 8)) && (((int)(__143031_17_the_byte = (__143023_49_frac[__143030_17_i]))) == 0); ++__143030_17_i) {
+__143032_17_zbits += 8;
 }
-if (((int)__142899_17_the_byte) != 0) {
+if (((int)__143031_17_the_byte) != 0) {
 #line 443
-if ((((int)__142899_17_the_byte) & 0xf) == 0) {
-__142900_17_zbits += 4;
-__142899_17_the_byte >>= 4;
+if ((((int)__143031_17_the_byte) & 0xf) == 0) {
+__143032_17_zbits += 4;
+__143031_17_the_byte >>= 4;
 }
-if ((((int)__142899_17_the_byte) & 0x3) == 0) {
-__142900_17_zbits += 2;
-__142899_17_the_byte >>= 2;
+if ((((int)__143031_17_the_byte) & 0x3) == 0) {
+__143032_17_zbits += 2;
+__143031_17_the_byte >>= 2;
 }
-if ((((int)__142899_17_the_byte) & 0x1) == 0) {
-++__142900_17_zbits;
+if ((((int)__143031_17_the_byte) & 0x1) == 0) {
+++__143032_17_zbits;
 }
 }
-return __142900_17_zbits;
+return __143032_17_zbits;
 }
 
 
-static int _ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_high_zero_bitsEPhi( unsigned char *__142940_50_frac, 
-int __142941_49_width)
+static int _ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_high_zero_bitsEPhi( unsigned char *__143072_50_frac, 
+int __143073_49_width)
 
 
 
 
 {
-auto int __142947_17_zbits;
-auto unsigned char *__142948_18_pos;
-auto unsigned char __142949_17_the_byte;
+auto int __143079_17_zbits;
+auto unsigned char *__143080_18_pos;
+auto unsigned char __143081_17_the_byte;
 
-__142948_18_pos = (__142940_50_frac + (((__142941_49_width + 8) - 1) / 8));
-__142947_17_zbits = (__142941_49_width % 8);
-if (__142947_17_zbits != 0) {
+__143080_18_pos = (__143072_50_frac + (((__143073_49_width + 8) - 1) / 8));
+__143079_17_zbits = (__143073_49_width % 8);
+if (__143079_17_zbits != 0) {
 
-} else  { if (__142948_18_pos == __142940_50_frac) {
-__142947_17_zbits = 0;
-goto __143005_1_end_of_routine;
+} else  { if (__143080_18_pos == __143072_50_frac) {
+__143079_17_zbits = 0;
+goto __143137_1_end_of_routine;
 } else  {
-__142947_17_zbits = 8;
+__143079_17_zbits = 8;
 } }
-__142949_17_the_byte = ((unsigned char)(((int)(*(__142948_18_pos - 1))) & ((int)((unsigned char)((1U << __142947_17_zbits) - 1U)))));
-while ((__142948_18_pos != __142940_50_frac) && (((int)(*(--__142948_18_pos))) == 0)) {
-__142947_17_zbits += 8;
-if (__142948_18_pos != __142940_50_frac) {
+__143081_17_the_byte = ((unsigned char)(((int)(*(__143080_18_pos - 1))) & ((int)((unsigned char)((1U << __143079_17_zbits) - 1U)))));
+while ((__143080_18_pos != __143072_50_frac) && (((int)(*(--__143080_18_pos))) == 0)) {
+__143079_17_zbits += 8;
+if (__143080_18_pos != __143072_50_frac) {
 
-__142949_17_the_byte = (*(__142948_18_pos - 1));
+__143081_17_the_byte = (*(__143080_18_pos - 1));
 }
 }
-if (((int)(*__142948_18_pos)) == 0) {
+if (((int)(*__143080_18_pos)) == 0) {
 
-__142947_17_zbits -= 8;
+__143079_17_zbits -= 8;
 } else  {
 #line 508
-if ((((int)__142949_17_the_byte) & 0xf0) != 0) {
-__142949_17_the_byte >>= 4;
-__142947_17_zbits -= 4;
+if ((((int)__143081_17_the_byte) & 0xf0) != 0) {
+__143081_17_the_byte >>= 4;
+__143079_17_zbits -= 4;
 }
-if ((((int)__142949_17_the_byte) & 0xc) != 0) {
-__142949_17_the_byte >>= 2;
-__142947_17_zbits -= 2;
+if ((((int)__143081_17_the_byte) & 0xc) != 0) {
+__143081_17_the_byte >>= 2;
+__143079_17_zbits -= 2;
 }
-if ((((int)__142949_17_the_byte) & 0x2) != 0) {
-__142949_17_the_byte >>= 1;
-__142947_17_zbits -= 1;
+if ((((int)__143081_17_the_byte) & 0x2) != 0) {
+__143081_17_the_byte >>= 1;
+__143079_17_zbits -= 1;
 }
-if (((int)__142949_17_the_byte) != 0) {
---__142947_17_zbits;
+if (((int)__143081_17_the_byte) != 0) {
+--__143079_17_zbits;
 }
 }
-__143005_1_end_of_routine:;
-return __142947_17_zbits;
+__143137_1_end_of_routine:;
+return __143079_17_zbits;
 }
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg18has_one_bits_belowEPhi( unsigned char *__143010_52_frac, 
-int __143011_51_bit_pos)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg18has_one_bits_belowEPhi( unsigned char *__143142_52_frac, 
+int __143143_51_bit_pos)
 
 
 
 
 {
-auto _ZN3edg9a_booleanE __143017_13_res = ((_ZN3edg9a_booleanE)0);
-auto int __143018_13_byte_pos;
-auto unsigned __143019_13_bit_mask;
+auto _ZN3edg9a_booleanE __143149_13_res = ((_ZN3edg9a_booleanE)0);
+auto int __143150_13_byte_pos;
+auto unsigned __143151_13_bit_mask;
 #line 537
-__143018_13_byte_pos = (__143011_51_bit_pos / 8);
-__143019_13_bit_mask = ((1U << (__143011_51_bit_pos % 8)) - 1U);
+__143150_13_byte_pos = (__143143_51_bit_pos / 8);
+__143151_13_bit_mask = ((1U << (__143143_51_bit_pos % 8)) - 1U);
 
-if ((((unsigned)(__143010_52_frac[__143018_13_byte_pos])) & __143019_13_bit_mask) != 0U) {
-__143017_13_res = ((_ZN3edg9a_booleanE)1);
+if ((((unsigned)(__143142_52_frac[__143150_13_byte_pos])) & __143151_13_bit_mask) != 0U) {
+__143149_13_res = ((_ZN3edg9a_booleanE)1);
 }
-while ((((int)__143017_13_res) == 0) && (__143018_13_byte_pos != 0)) {
-if (((int)(__143010_52_frac[(--__143018_13_byte_pos)])) != 0) {
-__143017_13_res = ((_ZN3edg9a_booleanE)1);
+while ((((int)__143149_13_res) == 0) && (__143150_13_byte_pos != 0)) {
+if (((int)(__143142_52_frac[(--__143150_13_byte_pos)])) != 0) {
+__143149_13_res = ((_ZN3edg9a_booleanE)1);
 }
 }
-return __143017_13_res;
+return __143149_13_res;
 }
 
 
-static int _ZN32_INTERNAL_10_floating_c_7968bde93edg24fp_frac_cmp_tail_to_halfEPhii( unsigned char *__143033_52_frac, 
-int __143034_51_width, 
-int __143035_51_low_bit_pos)
+static int _ZN32_INTERNAL_10_floating_c_7968bde93edg24fp_frac_cmp_tail_to_halfEPhii( unsigned char *__143165_52_frac, 
+int __143166_51_width, 
+int __143167_51_low_bit_pos)
 
 
 
 {
-auto int __143040_7_res = 0;
+auto int __143172_7_res = 0;
 
-if (__143035_51_low_bit_pos <= 0) {
-__143040_7_res = 0;
-} else  { if (((__143034_51_width <= (__143035_51_low_bit_pos - 1)) ? 0U : (((unsigned)(*(__143033_52_frac + ((__143035_51_low_bit_pos - 1) / 8)))) & (1U << ((__143035_51_low_bit_pos - 1) % 8)))) == 0U) {
-__143040_7_res = (-1);
-} else  { if (_ZN32_INTERNAL_10_floating_c_7968bde93edg18has_one_bits_belowEPhi(__143033_52_frac, (__143035_51_low_bit_pos - 1))) {
-__143040_7_res = 1;
+if (__143167_51_low_bit_pos <= 0) {
+__143172_7_res = 0;
+} else  { if (((__143166_51_width <= (__143167_51_low_bit_pos - 1)) ? 0U : (((unsigned)(*(__143165_52_frac + ((__143167_51_low_bit_pos - 1) / 8)))) & (1U << ((__143167_51_low_bit_pos - 1) % 8)))) == 0U) {
+__143172_7_res = (-1);
+} else  { if (_ZN32_INTERNAL_10_floating_c_7968bde93edg18has_one_bits_belowEPhi(__143165_52_frac, (__143167_51_low_bit_pos - 1))) {
+__143172_7_res = 1;
 } } }
-return __143040_7_res;
+return __143172_7_res;
 }
 
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg20fp_frac_should_roundEPhii( unsigned char *__143054_54_frac, 
-int __143055_53_width, 
-int __143056_53_low_bit_pos)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg20fp_frac_should_roundEPhii( unsigned char *__143186_54_frac, 
+int __143187_53_width, 
+int __143188_53_low_bit_pos)
 
 
 
 
 {
-auto int __143062_7_res = 0;
+auto int __143194_7_res = 0;
 
-if (__143056_53_low_bit_pos <= 0) {
+if (__143188_53_low_bit_pos <= 0) {
 
-} else  { if (((__143055_53_width <= (__143056_53_low_bit_pos - 1)) ? 0U : (((unsigned)(*(__143054_54_frac + ((__143056_53_low_bit_pos - 1) / 8)))) & (1U << ((__143056_53_low_bit_pos - 1) % 8)))) == 0U) {
+} else  { if (((__143187_53_width <= (__143188_53_low_bit_pos - 1)) ? 0U : (((unsigned)(*(__143186_54_frac + ((__143188_53_low_bit_pos - 1) / 8)))) & (1U << ((__143188_53_low_bit_pos - 1) % 8)))) == 0U) {
 
-} else  { if (_ZN32_INTERNAL_10_floating_c_7968bde93edg18has_one_bits_belowEPhi(__143054_54_frac, (__143056_53_low_bit_pos - 1))) {
-__143062_7_res = 1;
-} else  { if (__143055_53_width == __143056_53_low_bit_pos) {
-__143062_7_res = 0;
-} else  { if (((__143055_53_width <= __143056_53_low_bit_pos) ? 0U : (((unsigned)(*(__143054_54_frac + (__143056_53_low_bit_pos / 8)))) & (1U << (__143056_53_low_bit_pos % 8)))) != 0U) {
-__143062_7_res = 1;
+} else  { if (_ZN32_INTERNAL_10_floating_c_7968bde93edg18has_one_bits_belowEPhi(__143186_54_frac, (__143188_53_low_bit_pos - 1))) {
+__143194_7_res = 1;
+} else  { if (__143187_53_width == __143188_53_low_bit_pos) {
+__143194_7_res = 0;
+} else  { if (((__143187_53_width <= __143188_53_low_bit_pos) ? 0U : (((unsigned)(*(__143186_54_frac + (__143188_53_low_bit_pos / 8)))) & (1U << (__143188_53_low_bit_pos % 8)))) != 0U) {
+__143194_7_res = 1;
 } } } } }
-return (_ZN3edg9a_booleanE)(__143062_7_res != 0);
+return (_ZN3edg9a_booleanE)(__143194_7_res != 0);
 }
 
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg14do_shift_rightEPhiib( unsigned char *__143080_43_frac, 
-int __143081_42_width, 
-int __143082_42_shift, 
-_ZN3edg9a_booleanE __143083_42_should_round)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg14do_shift_rightEPhiib( unsigned char *__143212_43_frac, 
+int __143213_42_width, 
+int __143214_42_shift, 
+_ZN3edg9a_booleanE __143215_42_should_round)
 
 
 
 
 {
-auto int __143089_7_bytes; __143089_7_bytes = (((__143081_42_width + 8) - 1) / 8);
+auto int __143221_7_bytes; __143221_7_bytes = (((__143213_42_width + 8) - 1) / 8);
 
-(0 <= __143082_42_shift) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 610, __T540975680, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-if (__143081_42_width < __143082_42_shift) {
-auto int __143093_9_pos;
-for (__143093_9_pos = 0; __143093_9_pos < __143089_7_bytes; ++__143093_9_pos) {
-(__143080_43_frac[__143093_9_pos]) = ((unsigned char)0U);
+(0 <= __143214_42_shift) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 610, __T808311424, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+if (__143213_42_width < __143214_42_shift) {
+auto int __143225_9_pos;
+for (__143225_9_pos = 0; __143225_9_pos < __143221_7_bytes; ++__143225_9_pos) {
+(__143212_43_frac[__143225_9_pos]) = ((unsigned char)0U);
 }
-} else  { if (__143082_42_shift != 0) {
-auto int __143098_9_byte_shift;
-auto int __143099_9_bit_shift;
-auto int __143100_9_src_pos;
-auto int __143101_9_tgt_pos = 0;
+} else  { if (__143214_42_shift != 0) {
+auto int __143230_9_byte_shift;
+auto int __143231_9_bit_shift;
+auto int __143232_9_src_pos;
+auto int __143233_9_tgt_pos = 0;
 #line 617
-__143098_9_byte_shift = (__143082_42_shift / 8);
-__143099_9_bit_shift = (__143082_42_shift % 8);
-__143100_9_src_pos = __143098_9_byte_shift;
+__143230_9_byte_shift = (__143214_42_shift / 8);
+__143231_9_bit_shift = (__143214_42_shift % 8);
+__143232_9_src_pos = __143230_9_byte_shift;
 
 
-for (; __143100_9_src_pos < __143089_7_bytes; (++__143100_9_src_pos) , (++__143101_9_tgt_pos)) {
-(__143080_43_frac[__143101_9_tgt_pos]) = ((unsigned char)(((int)(__143080_43_frac[__143100_9_src_pos])) >> __143099_9_bit_shift));
-if (__143100_9_src_pos < (__143089_7_bytes - 1)) {
-(__143080_43_frac[__143101_9_tgt_pos]) += ((int)((unsigned char)(((int)(__143080_43_frac[(__143100_9_src_pos + 1)])) << (8 - __143099_9_bit_shift))));
+for (; __143232_9_src_pos < __143221_7_bytes; (++__143232_9_src_pos) , (++__143233_9_tgt_pos)) {
+(__143212_43_frac[__143233_9_tgt_pos]) = ((unsigned char)(((int)(__143212_43_frac[__143232_9_src_pos])) >> __143231_9_bit_shift));
+if (__143232_9_src_pos < (__143221_7_bytes - 1)) {
+(__143212_43_frac[__143233_9_tgt_pos]) += ((int)((unsigned char)(((int)(__143212_43_frac[(__143232_9_src_pos + 1)])) << (8 - __143231_9_bit_shift))));
 
 }
-if (!(__143083_42_should_round)) {
+if (!(__143215_42_should_round)) {
 
-} else  { if (((int)(__143080_43_frac[__143101_9_tgt_pos])) == 0xff) {
-(__143080_43_frac[__143101_9_tgt_pos]) = ((unsigned char)0U);
+} else  { if (((int)(__143212_43_frac[__143233_9_tgt_pos])) == 0xff) {
+(__143212_43_frac[__143233_9_tgt_pos]) = ((unsigned char)0U);
 } else  {
-++(__143080_43_frac[__143101_9_tgt_pos]);
-__143083_42_should_round = ((_ZN3edg9a_booleanE)0);
+++(__143212_43_frac[__143233_9_tgt_pos]);
+__143215_42_should_round = ((_ZN3edg9a_booleanE)0);
 } }
 }
-if (__143083_42_should_round) {
-(__143080_43_frac[(__143101_9_tgt_pos++)]) = ((unsigned char)1U);
+if (__143215_42_should_round) {
+(__143212_43_frac[(__143233_9_tgt_pos++)]) = ((unsigned char)1U);
 }
-for (; __143101_9_tgt_pos < __143089_7_bytes; ++__143101_9_tgt_pos) {
-(__143080_43_frac[__143101_9_tgt_pos]) = ((unsigned char)0U);
+for (; __143233_9_tgt_pos < __143221_7_bytes; ++__143233_9_tgt_pos) {
+(__143212_43_frac[__143233_9_tgt_pos]) = ((unsigned char)0U);
 }
 } } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg23fp_frac_shift_right_rawEPhii( unsigned char *__143128_52_frac, 
-int __143129_51_width, 
-int __143130_51_shift)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg23fp_frac_shift_right_rawEPhii( unsigned char *__143260_52_frac, 
+int __143261_51_width, 
+int __143262_51_shift)
 
 
 
 
 {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg14do_shift_rightEPhiib(__143128_52_frac, __143129_51_width, __143130_51_shift, ((_ZN3edg9a_booleanE)0)); 
+_ZN32_INTERNAL_10_floating_c_7968bde93edg14do_shift_rightEPhiib(__143260_52_frac, __143261_51_width, __143262_51_shift, ((_ZN3edg9a_booleanE)0)); 
 }
 
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_frac_shift_rightEPhii( unsigned char *__143141_48_frac, 
-int __143142_47_width, 
-int __143143_47_shift)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_frac_shift_rightEPhii( unsigned char *__143273_48_frac, 
+int __143274_47_width, 
+int __143275_47_shift)
 
 
 
 
 {
-auto _ZN3edg9a_booleanE __143149_13_should_round; __143149_13_should_round = (_ZN32_INTERNAL_10_floating_c_7968bde93edg20fp_frac_should_roundEPhii(__143141_48_frac, __143142_47_width, __143143_47_shift));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg14do_shift_rightEPhiib(__143141_48_frac, __143142_47_width, __143143_47_shift, __143149_13_should_round); 
+auto _ZN3edg9a_booleanE __143281_13_should_round; __143281_13_should_round = (_ZN32_INTERNAL_10_floating_c_7968bde93edg20fp_frac_should_roundEPhii(__143273_48_frac, __143274_47_width, __143275_47_shift));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg14do_shift_rightEPhiib(__143273_48_frac, __143274_47_width, __143275_47_shift, __143281_13_should_round); 
 }
 
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg33fp_frac_shift_right_with_high_bitEPhi( unsigned char *__143155_62_frac, 
-int __143156_61_width)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg33fp_frac_shift_right_with_high_bitEPhi( unsigned char *__143287_62_frac, 
+int __143288_61_width)
 
 
 
 
 {
-auto int __143162_7_bytes;
-auto int __143163_7_pos = 0;
-auto _ZN3edg10an_fp_uintE __143164_14_tmp;
+auto int __143294_7_bytes;
+auto int __143295_7_pos = 0;
+auto _ZN3edg10an_fp_uintE __143296_14_tmp;
 #line 681
-__143162_7_bytes = (((__143156_61_width + 8) - 1) / 8);
+__143294_7_bytes = (((__143288_61_width + 8) - 1) / 8);
 
 
 
-__143164_14_tmp = ((_ZN3edg10an_fp_uintE)(__143155_62_frac[__143163_7_pos]));
-(__143155_62_frac[__143163_7_pos]) = ((unsigned char)(__143164_14_tmp >> 1));
-++__143163_7_pos;
-for (; __143163_7_pos < __143162_7_bytes; ++__143163_7_pos) {
-(__143155_62_frac[(__143163_7_pos - 1)]) |= ((((int)(__143155_62_frac[__143163_7_pos])) & 0x1) << 7);
-__143164_14_tmp = ((_ZN3edg10an_fp_uintE)(__143155_62_frac[__143163_7_pos]));
-(__143155_62_frac[__143163_7_pos]) = ((unsigned char)(__143164_14_tmp >> 1));
+__143296_14_tmp = ((_ZN3edg10an_fp_uintE)(__143287_62_frac[__143295_7_pos]));
+(__143287_62_frac[__143295_7_pos]) = ((unsigned char)(__143296_14_tmp >> 1));
+++__143295_7_pos;
+for (; __143295_7_pos < __143294_7_bytes; ++__143295_7_pos) {
+(__143287_62_frac[(__143295_7_pos - 1)]) |= ((((int)(__143287_62_frac[__143295_7_pos])) & 0x1) << 7);
+__143296_14_tmp = ((_ZN3edg10an_fp_uintE)(__143287_62_frac[__143295_7_pos]));
+(__143287_62_frac[__143295_7_pos]) = ((unsigned char)(__143296_14_tmp >> 1));
 }
-(__143155_62_frac[(__143163_7_pos - 1)]) |= ((int)((unsigned char)(((((__143156_61_width % 8) ? (__143156_61_width % 8) : 8) >= 1) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"
+(__143287_62_frac[(__143295_7_pos - 1)]) |= ((int)((unsigned char)(((((__143288_61_width % 8) ? (__143288_61_width % 8) : 8) >= 1) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"
 #line 693
-), 693, __T540981056, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (1U << (((__143156_61_width % 8) ? (__143156_61_width % 8) : 8) - 1))))); 
+), 693, __T808316808, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (1U << (((__143288_61_width % 8) ? (__143288_61_width % 8) : 8) - 1))))); 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii( unsigned char *__143178_47_frac, 
-int __143179_46_width, 
-int __143180_46_shift)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii( unsigned char *__143310_47_frac, 
+int __143311_46_width, 
+int __143312_46_shift)
 
 
 
 
 {
-auto int __143186_7_bytes; __143186_7_bytes = (((__143179_46_width + 8) - 1) / 8);
+auto int __143318_7_bytes; __143318_7_bytes = (((__143311_46_width + 8) - 1) / 8);
 
-(0 <= __143180_46_shift) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 707, __T540983464, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-if (__143179_46_width <= __143180_46_shift) {
-auto int __143190_9_pos;
-for (__143190_9_pos = 0; __143190_9_pos < __143186_7_bytes; ++__143190_9_pos) {
-(__143178_47_frac[__143190_9_pos]) = ((unsigned char)0U);
+(0 <= __143312_46_shift) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 707, __T808319224, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+if (__143311_46_width <= __143312_46_shift) {
+auto int __143322_9_pos;
+for (__143322_9_pos = 0; __143322_9_pos < __143318_7_bytes; ++__143322_9_pos) {
+(__143310_47_frac[__143322_9_pos]) = ((unsigned char)0U);
 }
-} else  { if (__143180_46_shift != 0) {
-auto int __143195_9_byte_shift;
-auto int __143196_9_bit_shift;
-auto int __143197_9_src_pos;
-auto int __143198_9_tgt_pos;
+} else  { if (__143312_46_shift != 0) {
+auto int __143327_9_byte_shift;
+auto int __143328_9_bit_shift;
+auto int __143329_9_src_pos;
+auto int __143330_9_tgt_pos;
 #line 714
-__143195_9_byte_shift = (__143180_46_shift / 8);
-__143196_9_bit_shift = (__143180_46_shift % 8);
-__143197_9_src_pos = ((__143186_7_bytes - __143195_9_byte_shift) - 1);
-__143198_9_tgt_pos = (__143186_7_bytes - 1);
+__143327_9_byte_shift = (__143312_46_shift / 8);
+__143328_9_bit_shift = (__143312_46_shift % 8);
+__143329_9_src_pos = ((__143318_7_bytes - __143327_9_byte_shift) - 1);
+__143330_9_tgt_pos = (__143318_7_bytes - 1);
 
-(__143178_47_frac[__143198_9_tgt_pos]) = ((unsigned char)(((int)(__143178_47_frac[__143197_9_src_pos])) << __143196_9_bit_shift));
-for (; __143197_9_src_pos != 0; ) {
---__143197_9_src_pos;
---__143198_9_tgt_pos;
-(__143178_47_frac[(__143198_9_tgt_pos + 1)]) |= (((int)(__143178_47_frac[__143197_9_src_pos])) >> (8 - __143196_9_bit_shift));
-if (__143198_9_tgt_pos >= 0) {
-(__143178_47_frac[__143198_9_tgt_pos]) = ((unsigned char)(((int)(__143178_47_frac[__143197_9_src_pos])) << __143196_9_bit_shift));
+(__143310_47_frac[__143330_9_tgt_pos]) = ((unsigned char)(((int)(__143310_47_frac[__143329_9_src_pos])) << __143328_9_bit_shift));
+for (; __143329_9_src_pos != 0; ) {
+--__143329_9_src_pos;
+--__143330_9_tgt_pos;
+(__143310_47_frac[(__143330_9_tgt_pos + 1)]) |= (((int)(__143310_47_frac[__143329_9_src_pos])) >> (8 - __143328_9_bit_shift));
+if (__143330_9_tgt_pos >= 0) {
+(__143310_47_frac[__143330_9_tgt_pos]) = ((unsigned char)(((int)(__143310_47_frac[__143329_9_src_pos])) << __143328_9_bit_shift));
 }
 }
-for (; __143198_9_tgt_pos != 0; ) {
---__143198_9_tgt_pos;
-(__143178_47_frac[__143198_9_tgt_pos]) = ((unsigned char)0U);
+for (; __143330_9_tgt_pos != 0; ) {
+--__143330_9_tgt_pos;
+(__143310_47_frac[__143330_9_tgt_pos]) = ((unsigned char)0U);
 }
-(__143178_47_frac[(__143186_7_bytes - 1)]) &= ((int)((unsigned char)(((((__143179_46_width % 8) ? (__143179_46_width % 8) : 8) >= 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"
+(__143310_47_frac[(__143318_7_bytes - 1)]) &= ((int)((unsigned char)(((((__143311_46_width % 8) ? (__143311_46_width % 8) : 8) >= 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"
 #line 732
-), 732, __T540983464, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (~(4294967295U << ((__143179_46_width % 8) ? (__143179_46_width % 8) : 8))))));
+), 732, __T808319224, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (~(4294967295U << ((__143311_46_width % 8) ? (__143311_46_width % 8) : 8))))));
 } } 
 }
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_add_intEPhii( unsigned char *__143218_49_frac, 
-int __143219_48_width, 
-int __143220_48_val)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_add_intEPhii( unsigned char *__143350_49_frac, 
+int __143351_48_width, 
+int __143352_48_val)
 
 
 
 
 {
-auto int __143226_13_i;
-auto int __143227_13_bytes;
-auto int __143228_13_carry;
+auto int __143358_13_i;
+auto int __143359_13_bytes;
+auto int __143360_13_carry;
 #line 746
-__143227_13_bytes = (((__143219_48_width + 8) - 1) / 8);
-__143228_13_carry = __143220_48_val;
+__143359_13_bytes = (((__143351_48_width + 8) - 1) / 8);
+__143360_13_carry = __143352_48_val;
 
-for (__143226_13_i = 0; (__143226_13_i < (__143227_13_bytes - 1)) && (__143228_13_carry != 0); ++__143226_13_i) {
-__143228_13_carry += ((int)(__143218_49_frac[__143226_13_i]));
-(__143218_49_frac[__143226_13_i]) = ((unsigned char)__143228_13_carry);
-__143228_13_carry /= 256;
+for (__143358_13_i = 0; (__143358_13_i < (__143359_13_bytes - 1)) && (__143360_13_carry != 0); ++__143358_13_i) {
+__143360_13_carry += ((int)(__143350_49_frac[__143358_13_i]));
+(__143350_49_frac[__143358_13_i]) = ((unsigned char)__143360_13_carry);
+__143360_13_carry /= 256;
 }
-if (__143228_13_carry != 0) {
-__143228_13_carry += (((int)((unsigned char)(((((__143219_48_width % 8) ? (__143219_48_width % 8) : 8) >= 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 755, __T540985960, 
+if (__143360_13_carry != 0) {
+__143360_13_carry += (((int)((unsigned char)(((((__143351_48_width % 8) ? (__143351_48_width % 8) : 8) >= 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 755, 
 #line 755
-((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (~(4294967295U << ((__143219_48_width % 8) ? (__143219_48_width % 8) : 8)))))) & ((int)(__143218_49_frac[(__143227_13_bytes - 1)])));
-(__143218_49_frac[(__143227_13_bytes - 1)]) = ((unsigned char)(__143228_13_carry & ((int)((unsigned char)(((((__143219_48_width % 8) ? (__143219_48_width % 8) : 8) >= 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"
+__T808321736, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (~(4294967295U << ((__143351_48_width % 8) ? (__143351_48_width % 8) : 8)))))) & ((int)(__143350_49_frac[(__143359_13_bytes - 1)])));
+(__143350_49_frac[(__143359_13_bytes - 1)]) = ((unsigned char)(__143360_13_carry & ((int)((unsigned char)(((((__143351_48_width % 8) ? (__143351_48_width % 8) : 8) >= 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"
 #line 756
-), 756, __T540985960, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (~(4294967295U << ((__143219_48_width % 8) ? (__143219_48_width % 8) : 8))))))));
-__143228_13_carry &= (~((int)((unsigned char)(((((__143219_48_width % 8) ? (__143219_48_width % 8) : 8) >= 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 757, __T540985960, 
+), 756, __T808321736, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (~(4294967295U << ((__143351_48_width % 8) ? (__143351_48_width % 8) : 8))))))));
+__143360_13_carry &= (~((int)((unsigned char)(((((__143351_48_width % 8) ? (__143351_48_width % 8) : 8) >= 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 757, 
 #line 757
-((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (~(4294967295U << ((__143219_48_width % 8) ? (__143219_48_width % 8) : 8)))))));
+__T808321736, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (~(4294967295U << ((__143351_48_width % 8) ? (__143351_48_width % 8) : 8)))))));
 }
-return (__143228_13_carry != 0) ? ((_Bool)1) : ((_Bool)0);
+return (__143360_13_carry != 0) ? ((_Bool)1) : ((_Bool)0);
 }
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_add_one_at_posEPhii( unsigned char *__143244_56_frac, 
-int __143245_55_width, 
-int __143246_55_pos)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_add_one_at_posEPhii( unsigned char *__143376_56_frac, 
+int __143377_55_width, 
+int __143378_55_pos)
 
 
 
 
 {
-auto int __143252_7_i;
-auto int __143253_7_bytes;
-auto int __143254_7_carry;
+auto int __143384_7_i;
+auto int __143385_7_bytes;
+auto int __143386_7_carry;
 #line 772
-__143253_7_bytes = (((__143245_55_width + 8) - 1) / 8);
-__143254_7_carry = (1 << (__143246_55_pos % 8));
+__143385_7_bytes = (((__143377_55_width + 8) - 1) / 8);
+__143386_7_carry = (1 << (__143378_55_pos % 8));
 
-for (__143252_7_i = (__143246_55_pos / 8); (__143252_7_i < (__143253_7_bytes - 1)) && (__143254_7_carry != 0); ++__143252_7_i) {
-__143254_7_carry += ((int)(__143244_56_frac[__143252_7_i]));
-(__143244_56_frac[__143252_7_i]) = ((unsigned char)__143254_7_carry);
-__143254_7_carry /= 256;
+for (__143384_7_i = (__143378_55_pos / 8); (__143384_7_i < (__143385_7_bytes - 1)) && (__143386_7_carry != 0); ++__143384_7_i) {
+__143386_7_carry += ((int)(__143376_56_frac[__143384_7_i]));
+(__143376_56_frac[__143384_7_i]) = ((unsigned char)__143386_7_carry);
+__143386_7_carry /= 256;
 }
-if (__143254_7_carry != 0) {
-__143254_7_carry += (((int)((unsigned char)(((((__143245_55_width % 8) ? (__143245_55_width % 8) : 8) >= 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 781, __T540988760, (
+if (__143386_7_carry != 0) {
+__143386_7_carry += (((int)((unsigned char)(((((__143377_55_width % 8) ? (__143377_55_width % 8) : 8) >= 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 781, 
 #line 781
-(_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (~(4294967295U << ((__143245_55_width % 8) ? (__143245_55_width % 8) : 8)))))) & ((int)(__143244_56_frac[(__143253_7_bytes - 1)])));
-(__143244_56_frac[(__143253_7_bytes - 1)]) = ((unsigned char)(__143254_7_carry & ((int)((unsigned char)(((((__143245_55_width % 8) ? (__143245_55_width % 8) : 8) >= 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"
+__T808324560, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (~(4294967295U << ((__143377_55_width % 8) ? (__143377_55_width % 8) : 8)))))) & ((int)(__143376_56_frac[(__143385_7_bytes - 1)])));
+(__143376_56_frac[(__143385_7_bytes - 1)]) = ((unsigned char)(__143386_7_carry & ((int)((unsigned char)(((((__143377_55_width % 8) ? (__143377_55_width % 8) : 8) >= 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"
 #line 782
-), 782, __T540988760, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (~(4294967295U << ((__143245_55_width % 8) ? (__143245_55_width % 8) : 8))))))));
-__143254_7_carry &= (~((int)((unsigned char)(((((__143245_55_width % 8) ? (__143245_55_width % 8) : 8) >= 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 783, __T540988760, 
+), 782, __T808324560, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (~(4294967295U << ((__143377_55_width % 8) ? (__143377_55_width % 8) : 8))))))));
+__143386_7_carry &= (~((int)((unsigned char)(((((__143377_55_width % 8) ? (__143377_55_width % 8) : 8) >= 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 783, 
 #line 783
-((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (~(4294967295U << ((__143245_55_width % 8) ? (__143245_55_width % 8) : 8)))))));
+__T808324560, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (~(4294967295U << ((__143377_55_width % 8) ? (__143377_55_width % 8) : 8)))))));
 }
-return (__143254_7_carry != 0) ? ((_Bool)1) : ((_Bool)0);
+return (__143386_7_carry != 0) ? ((_Bool)1) : ((_Bool)0);
 }
 
 
-static int _ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_sub_intEPhii( unsigned char *__143270_43_frac, 
-int __143271_42_width, 
-int __143272_42_val)
+static int _ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_sub_intEPhii( unsigned char *__143402_43_frac, 
+int __143403_42_width, 
+int __143404_42_val)
 #line 798
 {
-auto int __143280_7_i;
-auto int __143281_7_bytes;
-auto int __143282_7_borrow;
-auto int __143283_7_res = 0;
+auto int __143412_7_i;
+auto int __143413_7_bytes;
+auto int __143414_7_borrow;
+auto int __143415_7_res = 0;
 #line 800
-__143281_7_bytes = (((__143271_42_width + 8) - 1) / 8);
-__143282_7_borrow = __143272_42_val;
+__143413_7_bytes = (((__143403_42_width + 8) - 1) / 8);
+__143414_7_borrow = __143404_42_val;
 
 
-((0 <= __143272_42_val) && (__143272_42_val < 256)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 804, __T540991800, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *
+((0 <= __143404_42_val) && (__143404_42_val < 256)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 804, __T808327624, ((_ZN3edg12a_const_charE *)0), ((
 #line 804
-)0)));
-for (__143280_7_i = 0; (__143280_7_i < __143281_7_bytes) && (__143282_7_borrow != 0); ++__143280_7_i) {
-auto int __143287_9_tmp; __143287_9_tmp = (((int)(__143270_43_frac[__143280_7_i])) - __143282_7_borrow);
-if (0 <= __143287_9_tmp) {
-__143282_7_borrow = 0;
+_ZN3edg12a_const_charE *)0)));
+for (__143412_7_i = 0; (__143412_7_i < __143413_7_bytes) && (__143414_7_borrow != 0); ++__143412_7_i) {
+auto int __143419_9_tmp; __143419_9_tmp = (((int)(__143402_43_frac[__143412_7_i])) - __143414_7_borrow);
+if (0 <= __143419_9_tmp) {
+__143414_7_borrow = 0;
 } else  {
-__143287_9_tmp += 256;
-__143282_7_borrow = 1;
+__143419_9_tmp += 256;
+__143414_7_borrow = 1;
 }
-(__143270_43_frac[__143280_7_i]) = ((unsigned char)__143287_9_tmp);
+(__143402_43_frac[__143412_7_i]) = ((unsigned char)__143419_9_tmp);
 }
-if ((__143282_7_borrow != 0) || (((((((__143271_42_width % 8) ? (__143271_42_width % 8) : 8) >= 1) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 815, __T540991800, ((
+if ((__143414_7_borrow != 0) || (((((((__143403_42_width % 8) ? (__143403_42_width % 8) : 8) >= 1) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 815, __T808327624, ((
 #line 815
-_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (1U << (((__143271_42_width % 8) ? (__143271_42_width % 8) : 8) - 1))) & ((unsigned)(__143270_43_frac[(__143281_7_bytes - 1)]))) == 0U)) {
-__143283_7_res = (256 - ((int)(__143270_43_frac[0])));
+_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))) , (1U << (((__143403_42_width % 8) ? (__143403_42_width % 8) : 8) - 1))) & ((unsigned)(__143402_43_frac[(__143413_7_bytes - 1)]))) == 0U)) {
+__143415_7_res = (256 - ((int)(__143402_43_frac[0])));
 }
-return __143283_7_res;
+return __143415_7_res;
 }
 
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_frac_subEPhS1_i( unsigned char *__143304_40_left, 
-unsigned char *__143305_40_right, 
-int __143306_39_width)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_frac_subEPhS1_i( unsigned char *__143436_40_left, 
+unsigned char *__143437_40_right, 
+int __143438_39_width)
 
 
 
 {
-auto int __143311_7_i;
-auto int __143312_7_tmp = 0;
-auto int __143313_7_bytes; __143313_7_bytes = (((__143306_39_width + 8) - 1) / 8);
+auto int __143443_7_i;
+auto int __143444_7_tmp = 0;
+auto int __143445_7_bytes; __143445_7_bytes = (((__143438_39_width + 8) - 1) / 8);
 
-for (__143311_7_i = 0; __143311_7_i < __143313_7_bytes; ++__143311_7_i) {
-auto int __143316_9_borrow = 0;
-__143312_7_tmp += ((int)(__143304_40_left[__143311_7_i]));
-__143312_7_tmp -= ((int)(__143305_40_right[__143311_7_i]));
-if (__143312_7_tmp < 0) {
-__143312_7_tmp += 256;
-__143316_9_borrow = (-1);
+for (__143443_7_i = 0; __143443_7_i < __143445_7_bytes; ++__143443_7_i) {
+auto int __143448_9_borrow = 0;
+__143444_7_tmp += ((int)(__143436_40_left[__143443_7_i]));
+__143444_7_tmp -= ((int)(__143437_40_right[__143443_7_i]));
+if (__143444_7_tmp < 0) {
+__143444_7_tmp += 256;
+__143448_9_borrow = (-1);
 }
-(__143304_40_left[__143311_7_i]) = ((unsigned char)__143312_7_tmp);
-__143312_7_tmp = __143316_9_borrow;
+(__143436_40_left[__143443_7_i]) = ((unsigned char)__143444_7_tmp);
+__143444_7_tmp = __143448_9_borrow;
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_div_intEPhii( unsigned char *__143329_44_frac, 
-int __143330_43_width, 
-int __143331_43_val)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_div_intEPhii( unsigned char *__143461_44_frac, 
+int __143462_43_width, 
+int __143463_43_val)
 
 
 
 {
-auto int __143336_7_i;
-auto int __143337_7_tmp = 0;
-auto int __143338_7_bytes; __143338_7_bytes = (((__143330_43_width + 8) - 1) / 8);
+auto int __143468_7_i;
+auto int __143469_7_tmp = 0;
+auto int __143470_7_bytes; __143470_7_bytes = (((__143462_43_width + 8) - 1) / 8);
 
-for (__143336_7_i = __143338_7_bytes; 0 < __143336_7_i; ) {
---__143336_7_i;
-__143337_7_tmp += ((int)(__143329_44_frac[__143336_7_i]));
-(__143329_44_frac[__143336_7_i]) = ((unsigned char)(__143337_7_tmp / __143331_43_val));
-__143337_7_tmp <<= 8;
+for (__143468_7_i = __143470_7_bytes; 0 < __143468_7_i; ) {
+--__143468_7_i;
+__143469_7_tmp += ((int)(__143461_44_frac[__143468_7_i]));
+(__143461_44_frac[__143468_7_i]) = ((unsigned char)(__143469_7_tmp / __143463_43_val));
+__143469_7_tmp <<= 8;
 }
-(__143337_7_tmp == 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 865, __T540995560, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))); 
+(__143469_7_tmp == 0) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 865, __T808331400, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))); 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_frac_mult_intEPhii( unsigned char *__143350_45_frac, 
-int __143351_44_width, 
-int __143352_44_val)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_frac_mult_intEPhii( unsigned char *__143482_45_frac, 
+int __143483_44_width, 
+int __143484_44_val)
 
 
 
 
 {
-auto int __143358_7_i;
-auto int __143359_7_carry = 0;
+auto int __143490_7_i;
+auto int __143491_7_carry = 0;
 
-(0 <= __143352_44_val) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 880, __T540997736, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-for (__143358_7_i = 0; __143358_7_i < (((__143351_44_width + 8) - 1) / 8); ++__143358_7_i) {
-__143359_7_carry += (((int)(__143350_45_frac[__143358_7_i])) * __143352_44_val);
-(__143350_45_frac[__143358_7_i]) = ((unsigned char)__143359_7_carry);
-__143359_7_carry /= 256;
+(0 <= __143484_44_val) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 880, __T808333584, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+for (__143490_7_i = 0; __143490_7_i < (((__143483_44_width + 8) - 1) / 8); ++__143490_7_i) {
+__143491_7_carry += (((int)(__143482_45_frac[__143490_7_i])) * __143484_44_val);
+(__143482_45_frac[__143490_7_i]) = ((unsigned char)__143491_7_carry);
+__143491_7_carry /= 256;
 }
-((__143358_7_i < (((__143351_44_width + 8) - 1) / 8)) || (__143359_7_carry == 0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 886, __T540997736, ((_ZN3edg12a_const_charE *)0
+((__143490_7_i < (((__143483_44_width + 8) - 1) / 8)) || (__143491_7_carry == 0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 886, __T808333584, ((
 #line 886
-), ((_ZN3edg12a_const_charE *)0))); 
+_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))); 
 }
 #line 901
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE( _ZN3edg8a_bigintE *__143382_37_ptr)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE( _ZN3edg8a_bigintE *__143514_37_ptr)
 
 
 
 {
-(__143382_37_ptr != ((_ZN3edg8a_bigintE *)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 906, __T541002432, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-((_ZN32_INTERNAL_10_floating_c_7968bde93edg7bigintsE <= __143382_37_ptr) && (__143382_37_ptr < (_ZN32_INTERNAL_10_floating_c_7968bde93edg7bigintsE + 8))) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"
+(__143514_37_ptr != ((_ZN3edg8a_bigintE *)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 906, __T808661408, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE
+#line 906
+ *)0)));
+((_ZN32_INTERNAL_10_floating_c_7968bde93edg7bigintsE <= __143514_37_ptr) && (__143514_37_ptr < (_ZN32_INTERNAL_10_floating_c_7968bde93edg7bigintsE + 8))) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"
 #line 907
-), 907, __T541002432, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-(__143382_37_ptr->next) = _ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_headE;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_headE = __143382_37_ptr; 
+), 907, __T808661408, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(__143514_37_ptr->next) = _ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_headE;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_headE = __143514_37_ptr; 
 }
 
 
@@ -6995,16 +7042,16 @@ static _ZN3edg8a_bigintE *_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintE
 
 
 {
-auto _ZN3edg8a_bigintE *__143399_13_res = ((_ZN3edg8a_bigintE *)0);
+auto _ZN3edg8a_bigintE *__143531_13_res = ((_ZN3edg8a_bigintE *)0);
 
 
-__143399_13_res = _ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_headE;
-(_ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_headE != ((_ZN3edg8a_bigintE *)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 922, __T541004560, ((
+__143531_13_res = _ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_headE;
+(_ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_headE != ((_ZN3edg8a_bigintE *)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 922, __T808663552, ((
 #line 922
 _ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 _ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_headE = (_ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_headE->next);
-(__143399_13_res->num_words) = 0U;
-return __143399_13_res;
+(__143531_13_res->num_words) = 0U;
+return __143531_13_res;
 }
 
 
@@ -7014,1768 +7061,1782 @@ static void _ZN32_INTERNAL_10_floating_c_7968bde93edg12init_bigintsEv(void)
 
 {
 
-auto int __143416_7_i;
+auto int __143548_7_i;
 (void)0;
 (void)0;
 (void)0;
 (void)0;
 
-for (__143416_7_i = 0; __143416_7_i < 8; ++__143416_7_i) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(((_ZN32_INTERNAL_10_floating_c_7968bde93edg7bigintsE) + __143416_7_i));
+for (__143548_7_i = 0; __143548_7_i < 8; ++__143548_7_i) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(((_ZN32_INTERNAL_10_floating_c_7968bde93edg7bigintsE) + __143548_7_i));
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_( _ZN3edg8a_bigintE *__143428_42_tgt, 
-_ZN3edg8a_bigintE *__143429_42_val)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_( _ZN3edg8a_bigintE *__143560_42_tgt, 
+_ZN3edg8a_bigintE *__143561_42_val)
 
 
 
 {
-(__143428_42_tgt->num_words) = (__143429_42_val->num_words);
-memcpy(((void *)((__143428_42_tgt->words))), ((const void *)((__143429_42_val->words))), (((unsigned long long)(__143429_42_val->num_words)) * 4ULL)); 
+(__143560_42_tgt->num_words) = (__143561_42_val->num_words);
+memcpy(((void *)((__143560_42_tgt->words))), ((const void *)((__143561_42_val->words))), (((unsigned long long)(__143561_42_val->num_words)) * 4ULL)); 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg16bigint_from_uintEPNS0_8a_bigintEy( _ZN3edg8a_bigintE *__143439_42_tgt, 
-_ZN3edg10an_fp_uintE __143440_41_val)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg16bigint_from_uintEPNS0_8a_bigintEy( _ZN3edg8a_bigintE *__143571_42_tgt, 
+_ZN3edg10an_fp_uintE __143572_41_val)
 
 
 
 {
-(__143439_42_tgt->num_words) = 0U;
-while (__143440_41_val != 0ULL) {
-((__143439_42_tgt->num_words) < 516U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 966, __T541010632, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-(((__143439_42_tgt->words))[(__143439_42_tgt->num_words)]) = ((_ZN3edg13a_bigint_wordE)(__143440_41_val & 4294967295ULL));
-++(__143439_42_tgt->num_words);
-__143440_41_val >>= 32;
+(__143571_42_tgt->num_words) = 0U;
+while (__143572_41_val != 0ULL) {
+((__143571_42_tgt->num_words) < 516U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 966, __T808692536, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(((__143571_42_tgt->words))[(__143571_42_tgt->num_words)]) = ((_ZN3edg13a_bigint_wordE)(__143572_41_val & 4294967295ULL));
+++(__143571_42_tgt->num_words);
+__143572_41_val >>= 32;
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_fp_intEPNS0_8a_bigintEPhi( _ZN3edg8a_bigintE *__143455_47_tgt, 
-unsigned char *__143456_47_val, 
-int __143457_46_width)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_fp_intEPNS0_8a_bigintEPhi( _ZN3edg8a_bigintE *__143587_47_tgt, 
+unsigned char *__143588_47_val, 
+int __143589_46_width)
 
 
 
 
 {
-auto _ZN3edg13a_bigint_uintE __143463_17_tmp = 0ULL;
-auto int __143464_17_cur_word = 0;
-auto int __143465_17_cur_byte;
+auto _ZN3edg13a_bigint_uintE __143595_17_tmp = 0ULL;
+auto int __143596_17_cur_word = 0;
+auto int __143597_17_cur_byte;
 
-for (__143465_17_cur_byte = 0; __143465_17_cur_byte < (((__143457_46_width + 8) - 1) / 8); ) {
-__143463_17_tmp += (((_ZN3edg13a_bigint_uintE)(__143456_47_val[__143465_17_cur_byte])) << (8ULL * (((unsigned long long)((unsigned)__143465_17_cur_byte)) % 4ULL)));
+for (__143597_17_cur_byte = 0; __143597_17_cur_byte < (((__143589_46_width + 8) - 1) / 8); ) {
+__143595_17_tmp += (((_ZN3edg13a_bigint_uintE)(__143588_47_val[__143597_17_cur_byte])) << (8ULL * (((unsigned long long)((unsigned)__143597_17_cur_byte)) % 4ULL)));
 
-if ((((unsigned long long)((unsigned)(++__143465_17_cur_byte))) % 4ULL) == 0ULL) {
-(((__143455_47_tgt->words))[(__143464_17_cur_word++)]) = ((_ZN3edg13a_bigint_wordE)__143463_17_tmp);
-if (__143463_17_tmp != 0ULL) {
-(__143455_47_tgt->num_words) = ((unsigned)__143464_17_cur_word);
+if ((((unsigned long long)((unsigned)(++__143597_17_cur_byte))) % 4ULL) == 0ULL) {
+(((__143587_47_tgt->words))[(__143596_17_cur_word++)]) = ((_ZN3edg13a_bigint_wordE)__143595_17_tmp);
+if (__143595_17_tmp != 0ULL) {
+(__143587_47_tgt->num_words) = ((unsigned)__143596_17_cur_word);
 }
-__143463_17_tmp = 0ULL;
+__143595_17_tmp = 0ULL;
 }
 }
-if (__143463_17_tmp != 0ULL) {
-(((__143455_47_tgt->words))[(__143464_17_cur_word++)]) = ((_ZN3edg13a_bigint_wordE)__143463_17_tmp);
-(__143455_47_tgt->num_words) = ((unsigned)__143464_17_cur_word);
+if (__143595_17_tmp != 0ULL) {
+(((__143587_47_tgt->words))[(__143596_17_cur_word++)]) = ((_ZN3edg13a_bigint_wordE)__143595_17_tmp);
+(__143587_47_tgt->num_words) = ((unsigned)__143596_17_cur_word);
 }
-((__143455_47_tgt->num_words) < 516U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1001, __T541012872, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))); 
+((__143587_47_tgt->num_words) < 516U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1001, __T808694784, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))
+#line 1001
+; 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_mult_intEPNS0_8a_bigintEi( _ZN3edg8a_bigintE *__143486_39_tgt, 
-int __143487_38_mult)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_mult_intEPNS0_8a_bigintEi( _ZN3edg8a_bigintE *__143618_39_tgt, 
+int __143619_38_mult)
 
 
 
 
 {
-auto unsigned __143493_17_i;
-auto unsigned __143494_17_tnum;
-auto _ZN3edg13a_bigint_wordE *__143495_18_twords;
-auto _ZN3edg13a_bigint_uintE __143496_17_tmp = 0ULL;
+auto unsigned __143625_17_i;
+auto unsigned __143626_17_tnum;
+auto _ZN3edg13a_bigint_wordE *__143627_18_twords;
+auto _ZN3edg13a_bigint_uintE __143628_17_tmp = 0ULL;
 #line 1013
-__143494_17_tnum = (__143486_39_tgt->num_words);
-__143495_18_twords = ((__143486_39_tgt->words));
+__143626_17_tnum = (__143618_39_tgt->num_words);
+__143627_18_twords = ((__143618_39_tgt->words));
 
 
-((0 <= __143487_38_mult) && (1)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1019, __T541541712, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+((0 <= __143619_38_mult) && (1)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1019, __T808696832, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
 
-if (__143487_38_mult == 0) {
-__143494_17_tnum = 0U;
-} else  { if (__143487_38_mult == 1) {
+if (__143619_38_mult == 0) {
+__143626_17_tnum = 0U;
+} else  { if (__143619_38_mult == 1) {
 
 } else  {
-for (__143493_17_i = 0U; __143493_17_i < __143494_17_tnum; ++__143493_17_i) {
-__143496_17_tmp += (((unsigned long long)(__143495_18_twords[__143493_17_i])) * ((_ZN3edg13a_bigint_uintE)__143487_38_mult));
-(__143495_18_twords[__143493_17_i]) = ((_ZN3edg13a_bigint_wordE)(__143496_17_tmp & 4294967295ULL));
-__143496_17_tmp >>= 32;
+for (__143625_17_i = 0U; __143625_17_i < __143626_17_tnum; ++__143625_17_i) {
+__143628_17_tmp += (((unsigned long long)(__143627_18_twords[__143625_17_i])) * ((_ZN3edg13a_bigint_uintE)__143619_38_mult));
+(__143627_18_twords[__143625_17_i]) = ((_ZN3edg13a_bigint_wordE)(__143628_17_tmp & 4294967295ULL));
+__143628_17_tmp >>= 32;
 }
-if (__143496_17_tmp != 0ULL) {
-(__143494_17_tnum < 516U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1031, __T541541712, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-(__143495_18_twords[__143494_17_tnum]) = ((_ZN3edg13a_bigint_wordE)__143496_17_tmp);
-++__143494_17_tnum;
+if (__143628_17_tmp != 0ULL) {
+(__143626_17_tnum < 516U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1031, __T808696832, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(__143627_18_twords[__143626_17_tnum]) = ((_ZN3edg13a_bigint_wordE)__143628_17_tmp);
+++__143626_17_tnum;
 }
 } }
-(__143486_39_tgt->num_words) = __143494_17_tnum; 
+(__143618_39_tgt->num_words) = __143626_17_tnum; 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_add_intEPNS0_8a_bigintEj( _ZN3edg8a_bigintE *__143521_43_tgt, 
-_ZN3edg13a_bigint_wordE __143522_42_add)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_add_intEPNS0_8a_bigintEj( _ZN3edg8a_bigintE *__143653_43_tgt, 
+_ZN3edg13a_bigint_wordE __143654_42_add)
 
 
 
 {
-auto unsigned __143527_17_i;
-auto unsigned __143528_17_tnum;
-auto _ZN3edg13a_bigint_wordE *__143529_18_twords;
-auto _ZN3edg13a_bigint_uintE __143530_17_tmp;
+auto unsigned __143659_17_i;
+auto unsigned __143660_17_tnum;
+auto _ZN3edg13a_bigint_wordE *__143661_18_twords;
+auto _ZN3edg13a_bigint_uintE __143662_17_tmp;
 #line 1047
-__143528_17_tnum = (__143521_43_tgt->num_words);
-__143529_18_twords = ((__143521_43_tgt->words));
-__143530_17_tmp = ((_ZN3edg13a_bigint_uintE)__143522_42_add);
+__143660_17_tnum = (__143653_43_tgt->num_words);
+__143661_18_twords = ((__143653_43_tgt->words));
+__143662_17_tmp = ((_ZN3edg13a_bigint_uintE)__143654_42_add);
 
-for (__143527_17_i = 0U; (__143527_17_i < __143528_17_tnum) && (__143530_17_tmp != 0ULL); ++__143527_17_i) {
-__143530_17_tmp += ((unsigned long long)(__143529_18_twords[__143527_17_i]));
-(__143529_18_twords[__143527_17_i]) = ((_ZN3edg13a_bigint_wordE)(__143530_17_tmp & 4294967295ULL));
-__143530_17_tmp >>= 32;
+for (__143659_17_i = 0U; (__143659_17_i < __143660_17_tnum) && (__143662_17_tmp != 0ULL); ++__143659_17_i) {
+__143662_17_tmp += ((unsigned long long)(__143661_18_twords[__143659_17_i]));
+(__143661_18_twords[__143659_17_i]) = ((_ZN3edg13a_bigint_wordE)(__143662_17_tmp & 4294967295ULL));
+__143662_17_tmp >>= 32;
 }
-if (__143530_17_tmp != 0ULL) {
-(__143528_17_tnum < 516U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1057, __T541543992, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-(__143529_18_twords[__143528_17_tnum]) = ((_ZN3edg13a_bigint_wordE)__143530_17_tmp);
-++__143528_17_tnum;
+if (__143662_17_tmp != 0ULL) {
+(__143660_17_tnum < 516U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1057, __T808699128, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(__143661_18_twords[__143660_17_tnum]) = ((_ZN3edg13a_bigint_wordE)__143662_17_tmp);
+++__143660_17_tnum;
 }
-(__143521_43_tgt->num_words) = __143528_17_tnum; 
+(__143653_43_tgt->num_words) = __143660_17_tnum; 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg20bigint_from_dec_mantEPNS0_8a_bigintEPNS0_19an_fp_decimal_inputE( _ZN3edg8a_bigintE *__143546_55_tgt, 
-_ZN3edg19an_fp_decimal_inputE *__143547_55_dec)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg20bigint_from_dec_mantEPNS0_8a_bigintEPNS0_19an_fp_decimal_inputE( _ZN3edg8a_bigintE *__143678_55_tgt, 
+_ZN3edg19an_fp_decimal_inputE *__143679_55_dec)
 
 
 
 {
-auto _ZN3edg13a_bigint_wordE __143552_19_dec_fraction = 0U;
-auto int __143553_19_mult = 1;
-auto _ZN3edg12a_const_charE *__143554_20_cur;
-auto int __143555_19_digits; __143555_19_digits = (__143547_55_dec->precision);
+auto _ZN3edg13a_bigint_wordE __143684_19_dec_fraction = 0U;
+auto int __143685_19_mult = 1;
+auto _ZN3edg12a_const_charE *__143686_20_cur;
+auto int __143687_19_digits; __143687_19_digits = (__143679_55_dec->precision);
 
 
 
-for (__143554_20_cur = (__143547_55_dec->first_int); (__143554_20_cur != (__143547_55_dec->last_int)) && (__143555_19_digits != 0); ((++__143554_20_cur) , (--__143555_19_digits)) , (__143553_19_mult *= 10))
-
-{
-if (429496729ULL <= ((unsigned long long)((unsigned)__143553_19_mult))) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_mult_intEPNS0_8a_bigintEi(__143546_55_tgt, __143553_19_mult);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_add_intEPNS0_8a_bigintEj(__143546_55_tgt, __143552_19_dec_fraction);
-__143552_19_dec_fraction = 0U;
-__143553_19_mult = 1;
-}
-__143552_19_dec_fraction *= 10U;
-__143552_19_dec_fraction += ((_ZN3edg13a_bigint_wordE)(((int)(*__143554_20_cur)) - 48));
-}
-
-
-for (__143554_20_cur = (__143547_55_dec->first_frac); (__143554_20_cur != (__143547_55_dec->last_frac)) && (__143555_19_digits != 0); ((++__143554_20_cur) , (--__143555_19_digits)) , (__143553_19_mult *= 10))
+for (__143686_20_cur = (__143679_55_dec->first_int); (__143686_20_cur != (__143679_55_dec->last_int)) && (__143687_19_digits != 0); ((++__143686_20_cur) , (--__143687_19_digits)) , (__143685_19_mult *= 10))
 
 {
-if (429496729ULL <= ((unsigned long long)((unsigned)__143553_19_mult))) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_mult_intEPNS0_8a_bigintEi(__143546_55_tgt, __143553_19_mult);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_add_intEPNS0_8a_bigintEj(__143546_55_tgt, __143552_19_dec_fraction);
-__143552_19_dec_fraction = 0U;
-__143553_19_mult = 1;
+if (429496729ULL <= ((unsigned long long)((unsigned)__143685_19_mult))) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_mult_intEPNS0_8a_bigintEi(__143678_55_tgt, __143685_19_mult);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_add_intEPNS0_8a_bigintEj(__143678_55_tgt, __143684_19_dec_fraction);
+__143684_19_dec_fraction = 0U;
+__143685_19_mult = 1;
 }
-__143552_19_dec_fraction *= 10U;
-__143552_19_dec_fraction += ((_ZN3edg13a_bigint_wordE)(((int)(*__143554_20_cur)) - 48));
+__143684_19_dec_fraction *= 10U;
+__143684_19_dec_fraction += ((_ZN3edg13a_bigint_wordE)(((int)(*__143686_20_cur)) - 48));
 }
-if (__143553_19_mult != 1) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_mult_intEPNS0_8a_bigintEi(__143546_55_tgt, __143553_19_mult);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_add_intEPNS0_8a_bigintEj(__143546_55_tgt, __143552_19_dec_fraction);
+
+
+for (__143686_20_cur = (__143679_55_dec->first_frac); (__143686_20_cur != (__143679_55_dec->last_frac)) && (__143687_19_digits != 0); ((++__143686_20_cur) , (--__143687_19_digits)) , (__143685_19_mult *= 10))
+
+{
+if (429496729ULL <= ((unsigned long long)((unsigned)__143685_19_mult))) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_mult_intEPNS0_8a_bigintEi(__143678_55_tgt, __143685_19_mult);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_add_intEPNS0_8a_bigintEj(__143678_55_tgt, __143684_19_dec_fraction);
+__143684_19_dec_fraction = 0U;
+__143685_19_mult = 1;
+}
+__143684_19_dec_fraction *= 10U;
+__143684_19_dec_fraction += ((_ZN3edg13a_bigint_wordE)(((int)(*__143686_20_cur)) - 48));
+}
+if (__143685_19_mult != 1) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_mult_intEPNS0_8a_bigintEi(__143678_55_tgt, __143685_19_mult);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_add_intEPNS0_8a_bigintEj(__143678_55_tgt, __143684_19_dec_fraction);
 } 
 }
 
 
-static int _ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_( _ZN3edg8a_bigintE *__143592_33_left, 
-_ZN3edg8a_bigintE *__143593_33_right)
+static int _ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_( _ZN3edg8a_bigintE *__143724_33_left, 
+_ZN3edg8a_bigintE *__143725_33_right)
 
 
 
 
 {
-auto int __143599_7_res; __143599_7_res = (((int)(__143592_33_left->num_words)) - ((int)(__143593_33_right->num_words)));
+auto int __143731_7_res; __143731_7_res = (((int)(__143724_33_left->num_words)) - ((int)(__143725_33_right->num_words)));
 
-if ((__143599_7_res == 0) && ((__143592_33_left->num_words) != 0U)) {
-auto _ZN3edg13a_bigint_wordE *__143602_20_lbegin;
-auto _ZN3edg13a_bigint_wordE *__143603_20_lend;
-auto _ZN3edg13a_bigint_wordE *__143604_20_rend;
+if ((__143731_7_res == 0) && ((__143724_33_left->num_words) != 0U)) {
+auto _ZN3edg13a_bigint_wordE *__143734_20_lbegin;
+auto _ZN3edg13a_bigint_wordE *__143735_20_lend;
+auto _ZN3edg13a_bigint_wordE *__143736_20_rend;
 #line 1121
-__143602_20_lbegin = ((__143592_33_left->words));
-__143603_20_lend = (__143602_20_lbegin + (__143592_33_left->num_words));
-__143604_20_rend = (((__143593_33_right->words)) + (__143593_33_right->num_words));
-while ((__143603_20_lend != __143602_20_lbegin) && (__143599_7_res == 0)) {
-if ((*(--__143603_20_lend)) != (*(--__143604_20_rend))) {
-__143599_7_res = (((*__143603_20_lend) < (*__143604_20_rend)) ? (-1) : 1);
+__143734_20_lbegin = ((__143724_33_left->words));
+__143735_20_lend = (__143734_20_lbegin + (__143724_33_left->num_words));
+__143736_20_rend = (((__143725_33_right->words)) + (__143725_33_right->num_words));
+while ((__143735_20_lend != __143734_20_lbegin) && (__143731_7_res == 0)) {
+if ((*(--__143735_20_lend)) != (*(--__143736_20_rend))) {
+__143731_7_res = (((*__143735_20_lend) < (*__143736_20_rend)) ? (-1) : 1);
 }
 }
 }
-return __143599_7_res;
+return __143731_7_res;
 }
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_is_zeroEPNS0_8a_bigintE( _ZN3edg8a_bigintE *__143615_43_val)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_is_zeroEPNS0_8a_bigintE( _ZN3edg8a_bigintE *__143747_43_val)
 
 
 
 {
-return (_ZN3edg9a_booleanE)(((int)((_Bool)((__143615_43_val->num_words) == 0U))) != 0);
+return (_ZN3edg9a_booleanE)(((int)((_Bool)((__143747_43_val->num_words) == 0U))) != 0);
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg16small_shift_leftEPNS0_8a_bigintEii( _ZN3edg8a_bigintE *__143624_40_tgt, 
-int __143625_39_shift, 
-int __143626_39_pos)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg16small_shift_leftEPNS0_8a_bigintEii( _ZN3edg8a_bigintE *__143756_40_tgt, 
+int __143757_39_shift, 
+int __143758_39_pos)
 
 
 
 
 {
-((0 <= __143625_39_shift) && (__143625_39_shift < 32)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1151, __T541550072, ((_ZN3edg12a_const_charE *)0), ((
+((0 <= __143757_39_shift) && (__143757_39_shift < 32)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1151, __T808705216, ((_ZN3edg12a_const_charE *)0), ((
 #line 1151
 _ZN3edg12a_const_charE *)0)));
-(((unsigned)__143626_39_pos) < (__143624_40_tgt->num_words)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1152, __T541550072, ((_ZN3edg12a_const_charE *)0), ((
+(((unsigned)__143758_39_pos) < (__143756_40_tgt->num_words)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1152, __T808705216, ((_ZN3edg12a_const_charE *)0), ((
 #line 1152
 _ZN3edg12a_const_charE *)0)));
-((__143625_39_shift == 0) || ((__143626_39_pos + 1) <= 516)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1153, __T541550072, ((_ZN3edg12a_const_charE *)0), ((
+((__143757_39_shift == 0) || ((__143758_39_pos + 1) <= 516)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1153, __T808705216, ((_ZN3edg12a_const_charE *)0), ((
 #line 1153
 _ZN3edg12a_const_charE *)0)));
-if ((__143625_39_shift != 0) && ((__143624_40_tgt->num_words) != 0U)) {
-auto _ZN3edg13a_bigint_uintE __143636_19_tmp = 0ULL;
-while (((unsigned)__143626_39_pos) < (__143624_40_tgt->num_words)) {
-__143636_19_tmp |= (((_ZN3edg13a_bigint_uintE)(((__143624_40_tgt->words))[__143626_39_pos])) << __143625_39_shift);
-(((__143624_40_tgt->words))[__143626_39_pos]) = ((_ZN3edg13a_bigint_wordE)(__143636_19_tmp & 4294967295ULL));
-__143636_19_tmp >>= 32;
-++__143626_39_pos;
+if ((__143757_39_shift != 0) && ((__143756_40_tgt->num_words) != 0U)) {
+auto _ZN3edg13a_bigint_uintE __143768_19_tmp = 0ULL;
+while (((unsigned)__143758_39_pos) < (__143756_40_tgt->num_words)) {
+__143768_19_tmp |= (((_ZN3edg13a_bigint_uintE)(((__143756_40_tgt->words))[__143758_39_pos])) << __143757_39_shift);
+(((__143756_40_tgt->words))[__143758_39_pos]) = ((_ZN3edg13a_bigint_wordE)(__143768_19_tmp & 4294967295ULL));
+__143768_19_tmp >>= 32;
+++__143758_39_pos;
 }
-if (__143636_19_tmp != 0ULL) {
-((__143624_40_tgt->num_words) < 516U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1163, __T541550072, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-(((__143624_40_tgt->words))[(__143624_40_tgt->num_words)]) = ((_ZN3edg13a_bigint_wordE)__143636_19_tmp);
-++(__143624_40_tgt->num_words);
+if (__143768_19_tmp != 0ULL) {
+((__143756_40_tgt->num_words) < 516U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1163, __T808705216, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))
+#line 1163
+;
+(((__143756_40_tgt->words))[(__143756_40_tgt->num_words)]) = ((_ZN3edg13a_bigint_wordE)__143768_19_tmp);
+++(__143756_40_tgt->num_words);
 }
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi( _ZN3edg8a_bigintE *__143652_41_tgt, 
-int __143653_40_shift)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi( _ZN3edg8a_bigintE *__143784_41_tgt, 
+int __143785_40_shift)
 
 
 
 {
-if ((__143653_40_shift != 0) && ((__143652_41_tgt->num_words) != 0U)) {
-auto int __143659_9_offset; __143659_9_offset = (__143653_40_shift / 32);
-(((__143652_41_tgt->num_words) + ((unsigned)__143659_9_offset)) <= 516U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1179, __T541552992, ((_ZN3edg12a_const_charE *)0), ((
+if ((__143785_40_shift != 0) && ((__143784_41_tgt->num_words) != 0U)) {
+auto int __143791_9_offset; __143791_9_offset = (__143785_40_shift / 32);
+(((__143784_41_tgt->num_words) + ((unsigned)__143791_9_offset)) <= 516U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1179, __T808708168, ((_ZN3edg12a_const_charE *)0
 #line 1179
-_ZN3edg12a_const_charE *)0)));
-if (__143659_9_offset != 0) {
-memmove(((void *)(((__143652_41_tgt->words)) + __143659_9_offset)), ((const void *)(((__143652_41_tgt->words)) + 0)), (((unsigned long long)(__143652_41_tgt->num_words)) * 4ULL));
+), ((_ZN3edg12a_const_charE *)0)));
+if (__143791_9_offset != 0) {
+memmove(((void *)(((__143784_41_tgt->words)) + __143791_9_offset)), ((const void *)(((__143784_41_tgt->words)) + 0)), (((unsigned long long)(__143784_41_tgt->num_words)) * 4ULL));
 
-memset(((void *)(((__143652_41_tgt->words)) + 0)), 0, (((size_t)__143659_9_offset) * 4ULL));
-(__143652_41_tgt->num_words) += ((unsigned)__143659_9_offset);
+memset(((void *)(((__143784_41_tgt->words)) + 0)), 0, (((size_t)__143791_9_offset) * 4ULL));
+(__143784_41_tgt->num_words) += ((unsigned)__143791_9_offset);
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_shift_leftEPNS0_8a_bigintEii(__143652_41_tgt, (__143653_40_shift % 32), __143659_9_offset);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_shift_leftEPNS0_8a_bigintEii(__143784_41_tgt, (__143785_40_shift % 32), __143791_9_offset);
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg17small_shift_rightEPNS0_8a_bigintEi( _ZN3edg8a_bigintE *__143672_41_tgt, 
-int __143673_40_shift)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg17small_shift_rightEPNS0_8a_bigintEi( _ZN3edg8a_bigintE *__143804_41_tgt, 
+int __143805_40_shift)
 
 
 
 
 {
-((0 <= __143673_40_shift) && (__143673_40_shift < 32)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1198, __T541555440, ((_ZN3edg12a_const_charE *)0), ((
+((0 <= __143805_40_shift) && (__143805_40_shift < 32)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1198, __T808710624, ((_ZN3edg12a_const_charE *)0), ((
 #line 1198
 _ZN3edg12a_const_charE *)0)));
-if ((__143673_40_shift != 0) && ((__143672_41_tgt->num_words) != 0U)) {
-auto _ZN3edg13a_bigint_uintE __143681_19_tmp = 0ULL;
-auto unsigned __143682_19_pos; __143682_19_pos = (__143672_41_tgt->num_words);
-while (__143682_19_pos != 0U) {
-auto _ZN3edg13a_bigint_uintE __143684_21_tmp0;
---__143682_19_pos;
-__143681_19_tmp |= ((unsigned long long)((((__143672_41_tgt->words))[__143682_19_pos]) >> __143673_40_shift));
-__143684_21_tmp0 = ((_ZN3edg13a_bigint_uintE)(((__143672_41_tgt->words))[__143682_19_pos]));
-(((__143672_41_tgt->words))[__143682_19_pos]) = ((_ZN3edg13a_bigint_wordE)(__143681_19_tmp & 4294967295ULL));
-__143681_19_tmp = ((__143684_21_tmp0 << (32 - __143673_40_shift)) & 4294967295ULL);
+if ((__143805_40_shift != 0) && ((__143804_41_tgt->num_words) != 0U)) {
+auto _ZN3edg13a_bigint_uintE __143813_19_tmp = 0ULL;
+auto unsigned __143814_19_pos; __143814_19_pos = (__143804_41_tgt->num_words);
+while (__143814_19_pos != 0U) {
+auto _ZN3edg13a_bigint_uintE __143816_21_tmp0;
+--__143814_19_pos;
+__143813_19_tmp |= ((unsigned long long)((((__143804_41_tgt->words))[__143814_19_pos]) >> __143805_40_shift));
+__143816_21_tmp0 = ((_ZN3edg13a_bigint_uintE)(((__143804_41_tgt->words))[__143814_19_pos]));
+(((__143804_41_tgt->words))[__143814_19_pos]) = ((_ZN3edg13a_bigint_wordE)(__143813_19_tmp & 4294967295ULL));
+__143813_19_tmp = ((__143816_21_tmp0 << (32 - __143805_40_shift)) & 4294967295ULL);
 }
-if ((((__143672_41_tgt->words))[((__143672_41_tgt->num_words) - 1U)]) == 0U) {
---(__143672_41_tgt->num_words);
+if ((((__143804_41_tgt->words))[((__143804_41_tgt->num_words) - 1U)]) == 0U) {
+--(__143804_41_tgt->num_words);
 }
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_shift_rightEPNS0_8a_bigintEi( _ZN3edg8a_bigintE *__143698_42_tgt, 
-int __143699_41_shift)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_shift_rightEPNS0_8a_bigintEi( _ZN3edg8a_bigintE *__143830_42_tgt, 
+int __143831_41_shift)
 
 
 
 {
-if ((__143699_41_shift != 0) && ((__143698_42_tgt->num_words) != 0U)) {
-auto int __143705_9_offset; __143705_9_offset = (__143699_41_shift / 32);
-(((unsigned)__143705_9_offset) < (__143698_42_tgt->num_words)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1225, __T541557448, ((_ZN3edg12a_const_charE *)0), ((
+if ((__143831_41_shift != 0) && ((__143830_42_tgt->num_words) != 0U)) {
+auto int __143837_9_offset; __143837_9_offset = (__143831_41_shift / 32);
+(((unsigned)__143837_9_offset) < (__143830_42_tgt->num_words)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1225, __T808712640, ((_ZN3edg12a_const_charE *)0), ((
 #line 1225
 _ZN3edg12a_const_charE *)0)));
-if (__143705_9_offset != 0) {
-memmove(((void *)(((__143698_42_tgt->words)) + 0)), ((const void *)(((__143698_42_tgt->words)) + __143705_9_offset)), (((unsigned long long)((__143698_42_tgt->num_words) - ((unsigned)__143705_9_offset))) * 4ULL));
+if (__143837_9_offset != 0) {
+memmove(((void *)(((__143830_42_tgt->words)) + 0)), ((const void *)(((__143830_42_tgt->words)) + __143837_9_offset)), (((unsigned long long)((__143830_42_tgt->num_words) - ((unsigned)__143837_9_offset))) * 4ULL));
 
-(__143698_42_tgt->num_words) -= ((unsigned)__143705_9_offset);
-while (((__143698_42_tgt->num_words) != 0U) && ((((__143698_42_tgt->words))[((__143698_42_tgt->num_words) - 1U)]) == 0U)) {
---(__143698_42_tgt->num_words);
+(__143830_42_tgt->num_words) -= ((unsigned)__143837_9_offset);
+while (((__143830_42_tgt->num_words) != 0U) && ((((__143830_42_tgt->words))[((__143830_42_tgt->num_words) - 1U)]) == 0U)) {
+--(__143830_42_tgt->num_words);
 }
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_shift_rightEPNS0_8a_bigintEi(__143698_42_tgt, (__143699_41_shift % 32));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_shift_rightEPNS0_8a_bigintEi(__143830_42_tgt, (__143831_41_shift % 32));
 } 
 }
 
 
-static int _ZN32_INTERNAL_10_floating_c_7968bde93edg14do_bigint_multEPjS1_iS1_ii( _ZN3edg13a_bigint_wordE *__143720_42_twords, 
-_ZN3edg13a_bigint_wordE *__143721_42_lwords, 
-int __143722_41_lnum, 
-_ZN3edg13a_bigint_wordE *__143723_42_rwords, 
-int __143724_41_rnum, 
-int __143725_41_tsize)
+static int _ZN32_INTERNAL_10_floating_c_7968bde93edg14do_bigint_multEPjS1_iS1_ii( _ZN3edg13a_bigint_wordE *__143852_42_twords, 
+_ZN3edg13a_bigint_wordE *__143853_42_lwords, 
+int __143854_41_lnum, 
+_ZN3edg13a_bigint_wordE *__143855_42_rwords, 
+int __143856_41_rnum, 
+int __143857_41_tsize)
 #line 1251
 {
 
-auto _ZN3edg13a_bigint_wordE *__143734_18_lbegin;
-auto _ZN3edg13a_bigint_wordE *__143735_18_lend;
-auto int __143736_17_tnum;
+auto _ZN3edg13a_bigint_wordE *__143866_18_lbegin;
+auto _ZN3edg13a_bigint_wordE *__143867_18_lend;
+auto int __143868_17_tnum;
 #line 1253
-__143734_18_lbegin = __143721_42_lwords;
-__143735_18_lend = (__143734_18_lbegin + __143722_41_lnum);
-__143736_17_tnum = (__143722_41_lnum + __143724_41_rnum);
+__143866_18_lbegin = __143853_42_lwords;
+__143867_18_lend = (__143866_18_lbegin + __143854_41_lnum);
+__143868_17_tnum = (__143854_41_lnum + __143856_41_rnum);
 
-(__143736_17_tnum <= __143725_41_tsize) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1257, __T541560536, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-memset(((void *)__143720_42_twords), 0, (((size_t)__143736_17_tnum) * 4ULL));
-while (__143734_18_lbegin != __143735_18_lend) {
-auto _ZN3edg13a_bigint_uintE __143741_19_fact; __143741_19_fact = ((_ZN3edg13a_bigint_uintE)(*__143734_18_lbegin));
-if (__143741_19_fact != 0ULL) {
-auto _ZN3edg13a_bigint_uintE __143743_21_tmp = 0ULL;
-auto _ZN3edg13a_bigint_wordE *__143744_22_rbegin;
-auto _ZN3edg13a_bigint_wordE *__143745_22_rend;
-auto _ZN3edg13a_bigint_wordE *__143746_22_cur;
+(__143868_17_tnum <= __143857_41_tsize) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1257, __T808715736, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)
+#line 1257
+));
+memset(((void *)__143852_42_twords), 0, (((size_t)__143868_17_tnum) * 4ULL));
+while (__143866_18_lbegin != __143867_18_lend) {
+auto _ZN3edg13a_bigint_uintE __143873_19_fact; __143873_19_fact = ((_ZN3edg13a_bigint_uintE)(*__143866_18_lbegin));
+if (__143873_19_fact != 0ULL) {
+auto _ZN3edg13a_bigint_uintE __143875_21_tmp = 0ULL;
+auto _ZN3edg13a_bigint_wordE *__143876_22_rbegin;
+auto _ZN3edg13a_bigint_wordE *__143877_22_rend;
+auto _ZN3edg13a_bigint_wordE *__143878_22_cur;
 #line 1263
-__143744_22_rbegin = __143723_42_rwords;
-__143745_22_rend = (__143744_22_rbegin + __143724_41_rnum);
-__143746_22_cur = (__143720_42_twords + (__143734_18_lbegin - __143721_42_lwords));
-while (__143744_22_rbegin != __143745_22_rend) {
-__143743_21_tmp += (((unsigned long long)(*__143746_22_cur)) + (__143741_19_fact * ((unsigned long long)(*__143744_22_rbegin))));
-(*__143746_22_cur) = ((_ZN3edg13a_bigint_wordE)(__143743_21_tmp & 4294967295ULL));
-__143743_21_tmp >>= 32;
-++__143746_22_cur;
-++__143744_22_rbegin;
+__143876_22_rbegin = __143855_42_rwords;
+__143877_22_rend = (__143876_22_rbegin + __143856_41_rnum);
+__143878_22_cur = (__143852_42_twords + (__143866_18_lbegin - __143853_42_lwords));
+while (__143876_22_rbegin != __143877_22_rend) {
+__143875_21_tmp += (((unsigned long long)(*__143878_22_cur)) + (__143873_19_fact * ((unsigned long long)(*__143876_22_rbegin))));
+(*__143878_22_cur) = ((_ZN3edg13a_bigint_wordE)(__143875_21_tmp & 4294967295ULL));
+__143875_21_tmp >>= 32;
+++__143878_22_cur;
+++__143876_22_rbegin;
 }
-if (__143743_21_tmp != 0ULL) {
-if ((__143746_22_cur - __143720_42_twords) == ((long long)__143736_17_tnum)) {
-(__143736_17_tnum < __143725_41_tsize) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1275, __T541560536, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-++__143736_17_tnum;
-(*__143746_22_cur) = 0U;
+if (__143875_21_tmp != 0ULL) {
+if ((__143878_22_cur - __143852_42_twords) == ((long long)__143868_17_tnum)) {
+(__143868_17_tnum < __143857_41_tsize) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1275, __T808715736, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))
+#line 1275
+);
+++__143868_17_tnum;
+(*__143878_22_cur) = 0U;
 }
-__143743_21_tmp += ((unsigned long long)(*__143746_22_cur));
-(*__143746_22_cur) = ((_ZN3edg13a_bigint_wordE)(__143743_21_tmp & 4294967295ULL));
-((__143743_21_tmp >> 32) == 0ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1281, __T541560536, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+__143875_21_tmp += ((unsigned long long)(*__143878_22_cur));
+(*__143878_22_cur) = ((_ZN3edg13a_bigint_wordE)(__143875_21_tmp & 4294967295ULL));
+((__143875_21_tmp >> 32) == 0ULL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1281, __T808715736, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 }
 }
-++__143734_18_lbegin;
+++__143866_18_lbegin;
 }
-while ((__143736_17_tnum != 0) && ((__143720_42_twords[(__143736_17_tnum - 1)]) == 0U)) {
---__143736_17_tnum;
+while ((__143868_17_tnum != 0) && ((__143852_42_twords[(__143868_17_tnum - 1)]) == 0U)) {
+--__143868_17_tnum;
 }
-return __143736_17_tnum;
+return __143868_17_tnum;
 }
 
 
-static _ZN3edg8a_bigintE *_ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_multEPNS0_8a_bigintES2_( _ZN3edg8a_bigintE *__143774_40_left, 
-_ZN3edg8a_bigintE *__143775_40_right)
+static _ZN3edg8a_bigintE *_ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_multEPNS0_8a_bigintES2_( _ZN3edg8a_bigintE *__143906_40_left, 
+_ZN3edg8a_bigintE *__143907_40_right)
 
 
 
 {
-auto _ZN3edg8a_bigintE *__143780_13_res; __143780_13_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
+auto _ZN3edg8a_bigintE *__143912_13_res; __143912_13_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
 
-if (((__143774_40_left->num_words) == 0U) || ((__143775_40_right->num_words) == 0U)) {
+if (((__143906_40_left->num_words) == 0U) || ((__143907_40_right->num_words) == 0U)) {
 
 } else  {
-if ((__143774_40_left->num_words) < (__143775_40_right->num_words)) {
-auto _ZN3edg8a_bigintE *__143786_17_tmp; __143786_17_tmp = __143774_40_left;
-__143774_40_left = __143775_40_right;
-__143775_40_right = __143786_17_tmp;
+if ((__143906_40_left->num_words) < (__143907_40_right->num_words)) {
+auto _ZN3edg8a_bigintE *__143918_17_tmp; __143918_17_tmp = __143906_40_left;
+__143906_40_left = __143907_40_right;
+__143907_40_right = __143918_17_tmp;
 }
-(__143780_13_res->num_words) = ((unsigned)(_ZN32_INTERNAL_10_floating_c_7968bde93edg14do_bigint_multEPjS1_iS1_ii(((__143780_13_res->words)), ((__143774_40_left->words)), ((int)(__143774_40_left->num_words)), ((__143775_40_right->words)), ((int)(__143775_40_right->num_words)), 516)));
+(__143912_13_res->num_words) = ((unsigned)(_ZN32_INTERNAL_10_floating_c_7968bde93edg14do_bigint_multEPjS1_iS1_ii(((__143912_13_res->words)), ((__143906_40_left->words)), ((int)(__143906_40_left->num_words)), ((__143907_40_right->words)), ((int)(__143907_40_right->num_words)), 516)));
 #line 1315
 }
-return __143780_13_res;
+return __143912_13_res;
 }
 #line 1337
-static _ZN3edg8a_bigintE *_ZN32_INTERNAL_10_floating_c_7968bde93edg12bigint_5_2_nEi( int __143818_35_n)
+static _ZN3edg8a_bigintE *_ZN32_INTERNAL_10_floating_c_7968bde93edg12bigint_5_2_nEi( int __143950_35_n)
 #line 1344
 {
-auto _ZN3edg8a_bigintE *__143826_13_res = ((_ZN3edg8a_bigintE *)0);
-auto _ZN3edg8a_bigintE *__143827_13_tmp;
+auto _ZN3edg8a_bigintE *__143958_13_res = ((_ZN3edg8a_bigintE *)0);
+auto _ZN3edg8a_bigintE *__143959_13_tmp;
 
-(0 <= __143818_35_n) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1348, __T541566592, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(0 <= __143950_35_n) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1348, __T808721816, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 if (_ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_initedE == 0) {
 _ZN32_INTERNAL_10_floating_c_7968bde93edg16bigint_from_uintEPNS0_8a_bigintEy(_ZN32_INTERNAL_10_floating_c_7968bde93edg11large_fivesE, 625ULL);
 _ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_initedE = 1;
 }
-while ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_initedE < 12) && (_ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_initedE <= __143818_35_n)) {
-__143827_13_tmp = (_ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_multEPNS0_8a_bigintES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg11large_fivesE) + (_ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_initedE - 1)), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg11large_fivesE) + (
+while ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_initedE < 12) && (_ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_initedE <= __143950_35_n)) {
+__143959_13_tmp = (_ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_multEPNS0_8a_bigintES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg11large_fivesE) + (_ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_initedE - 1)), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg11large_fivesE) + (
 #line 1354
 _ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_initedE - 1))));
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg11large_fivesE) + _ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_initedE), __143827_13_tmp);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__143827_13_tmp);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg11large_fivesE) + _ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_initedE), __143959_13_tmp);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__143959_13_tmp);
 ++_ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_initedE;
 }
-if (__143818_35_n < _ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_initedE) {
-__143826_13_res = ((_ZN32_INTERNAL_10_floating_c_7968bde93edg11large_fivesE) + __143818_35_n);
+if (__143950_35_n < _ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_initedE) {
+__143958_13_res = ((_ZN32_INTERNAL_10_floating_c_7968bde93edg11large_fivesE) + __143950_35_n);
 } else  {
 
 _ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_((&_ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_staticE), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg11large_fivesE) + (_ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_initedE - 1)));
 
-__143818_35_n -= (_ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_initedE - 1);
-while ((__143818_35_n--) != 0) {
-__143827_13_tmp = (_ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_multEPNS0_8a_bigintES2_((&_ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_staticE), (&_ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_staticE)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_((&_ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_staticE), __143827_13_tmp);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__143827_13_tmp);
+__143950_35_n -= (_ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_initedE - 1);
+while ((__143950_35_n--) != 0) {
+__143959_13_tmp = (_ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_multEPNS0_8a_bigintES2_((&_ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_staticE), (&_ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_staticE)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_((&_ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_staticE), __143959_13_tmp);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__143959_13_tmp);
 }
-__143826_13_res = (&_ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_staticE);
+__143958_13_res = (&_ZN32_INTERNAL_10_floating_c_7968bde93edg18large_fives_staticE);
 }
-(__143826_13_res != ((_ZN3edg8a_bigintE *)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1374, __T541566592, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))
+(__143958_13_res != ((_ZN3edg8a_bigintE *)0)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1374, __T808721816, ((_ZN3edg12a_const_charE *)0), ((
 #line 1374
-;
-return __143826_13_res;
+_ZN3edg12a_const_charE *)0)));
+return __143958_13_res;
 }
 #line 1389
-static _ZN3edg8a_bigintE *_ZN32_INTERNAL_10_floating_c_7968bde93edg19bigint_do_mult_pow5EPNS0_8a_bigintEi( _ZN3edg8a_bigintE *__143870_48_val, 
-int __143871_47_pow5)
+static _ZN3edg8a_bigintE *_ZN32_INTERNAL_10_floating_c_7968bde93edg19bigint_do_mult_pow5EPNS0_8a_bigintEi( _ZN3edg8a_bigintE *__144002_48_val, 
+int __144003_47_pow5)
 
 
 
 
 {
-auto int __143877_12_large_five;
-auto _ZN3edg8a_bigintE *__143878_13_res; __143878_13_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
+auto int __144009_12_large_five;
+auto _ZN3edg8a_bigintE *__144010_13_res; __144010_13_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_(__143878_13_res, __143870_48_val);
-if ((__143871_47_pow5 & 0x3) != 0) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_mult_intEPNS0_8a_bigintEi(__143878_13_res, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg5pow5sE)[(__143871_47_pow5 & 0x3)]));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_(__144010_13_res, __144002_48_val);
+if ((__144003_47_pow5 & 0x3) != 0) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_mult_intEPNS0_8a_bigintEi(__144010_13_res, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg5pow5sE)[(__144003_47_pow5 & 0x3)]));
 }
-__143871_47_pow5 >>= 2;
-__143877_12_large_five = 0;
-for (; __143871_47_pow5 != 0; (__143871_47_pow5 >>= 1) , (++__143877_12_large_five)) {
-if (__143871_47_pow5 & 1) {
-auto _ZN3edg8a_bigintE *__143888_17_tmp; __143888_17_tmp = (_ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_multEPNS0_8a_bigintES2_(__143878_13_res, (_ZN32_INTERNAL_10_floating_c_7968bde93edg12bigint_5_2_nEi(__143877_12_large_five))));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__143878_13_res);
-__143878_13_res = __143888_17_tmp;
+__144003_47_pow5 >>= 2;
+__144009_12_large_five = 0;
+for (; __144003_47_pow5 != 0; (__144003_47_pow5 >>= 1) , (++__144009_12_large_five)) {
+if (__144003_47_pow5 & 1) {
+auto _ZN3edg8a_bigintE *__144020_17_tmp; __144020_17_tmp = (_ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_multEPNS0_8a_bigintES2_(__144010_13_res, (_ZN32_INTERNAL_10_floating_c_7968bde93edg12bigint_5_2_nEi(__144009_12_large_five))));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__144010_13_res);
+__144010_13_res = __144020_17_tmp;
 }
 }
-return __143878_13_res;
+return __144010_13_res;
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg16bigint_mult_pow5EPNS0_8a_bigintEi( _ZN3edg8a_bigintE *__143897_40_tgt, 
-int __143898_39_pow5)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg16bigint_mult_pow5EPNS0_8a_bigintEi( _ZN3edg8a_bigintE *__144029_40_tgt, 
+int __144030_39_pow5)
 
 
 
 {
-if (__143898_39_pow5 != 0) {
-auto _ZN3edg8a_bigintE *__143904_15_res; __143904_15_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg19bigint_do_mult_pow5EPNS0_8a_bigintEi(__143897_40_tgt, __143898_39_pow5));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_(__143897_40_tgt, __143904_15_res);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__143904_15_res);
+if (__144030_39_pow5 != 0) {
+auto _ZN3edg8a_bigintE *__144036_15_res; __144036_15_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg19bigint_do_mult_pow5EPNS0_8a_bigintEi(__144029_40_tgt, __144030_39_pow5));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_(__144029_40_tgt, __144036_15_res);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__144036_15_res);
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_addEPNS0_8a_bigintES2_( _ZN3edg8a_bigintE *__143911_34_tgt, 
-_ZN3edg8a_bigintE *__143912_34_val)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_addEPNS0_8a_bigintES2_( _ZN3edg8a_bigintE *__144043_34_tgt, 
+_ZN3edg8a_bigintE *__144044_34_val)
 
 
 
 {
-auto unsigned __143917_17_i;
-auto _ZN3edg13a_bigint_uintE __143918_17_tmp = 0ULL;
+auto unsigned __144049_17_i;
+auto _ZN3edg13a_bigint_uintE __144050_17_tmp = 0ULL;
 
-(__143911_34_tgt != __143912_34_val) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1439, __T541576120, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-if ((__143911_34_tgt->num_words) < (__143912_34_val->num_words)) {
-memset(((void *)(((__143911_34_tgt->words)) + (__143911_34_tgt->num_words))), 0, (((unsigned long long)((__143912_34_val->num_words) - (__143911_34_tgt->num_words))) * 4ULL));
+(__144043_34_tgt != __144044_34_val) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1439, __T809321472, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+if ((__144043_34_tgt->num_words) < (__144044_34_val->num_words)) {
+memset(((void *)(((__144043_34_tgt->words)) + (__144043_34_tgt->num_words))), 0, (((unsigned long long)((__144044_34_val->num_words) - (__144043_34_tgt->num_words))) * 4ULL));
 
-(__143911_34_tgt->num_words) = (__143912_34_val->num_words);
+(__144043_34_tgt->num_words) = (__144044_34_val->num_words);
 }
-for (__143917_17_i = 0U; __143917_17_i < (__143912_34_val->num_words); ++__143917_17_i) {
-__143918_17_tmp += (((_ZN3edg13a_bigint_uintE)(((__143911_34_tgt->words))[__143917_17_i])) + ((unsigned long long)(((__143912_34_val->words))[__143917_17_i])));
-(((__143911_34_tgt->words))[__143917_17_i]) = ((_ZN3edg13a_bigint_wordE)(__143918_17_tmp & 4294967295ULL));
-__143918_17_tmp >>= 32;
+for (__144049_17_i = 0U; __144049_17_i < (__144044_34_val->num_words); ++__144049_17_i) {
+__144050_17_tmp += (((_ZN3edg13a_bigint_uintE)(((__144043_34_tgt->words))[__144049_17_i])) + ((unsigned long long)(((__144044_34_val->words))[__144049_17_i])));
+(((__144043_34_tgt->words))[__144049_17_i]) = ((_ZN3edg13a_bigint_wordE)(__144050_17_tmp & 4294967295ULL));
+__144050_17_tmp >>= 32;
 }
-for (; __143917_17_i < (__143911_34_tgt->num_words); ++__143917_17_i) {
-__143918_17_tmp += ((unsigned long long)(((__143911_34_tgt->words))[__143917_17_i]));
-(((__143911_34_tgt->words))[__143917_17_i]) = ((_ZN3edg13a_bigint_wordE)(__143918_17_tmp & 4294967295ULL));
-__143918_17_tmp >>= 32;
+for (; __144049_17_i < (__144043_34_tgt->num_words); ++__144049_17_i) {
+__144050_17_tmp += ((unsigned long long)(((__144043_34_tgt->words))[__144049_17_i]));
+(((__144043_34_tgt->words))[__144049_17_i]) = ((_ZN3edg13a_bigint_wordE)(__144050_17_tmp & 4294967295ULL));
+__144050_17_tmp >>= 32;
 }
-if (__143918_17_tmp != 0ULL) {
-((__143911_34_tgt->num_words) < 516U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1456, __T541576120, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-(((__143911_34_tgt->words))[(__143911_34_tgt->num_words)]) = ((_ZN3edg13a_bigint_wordE)__143918_17_tmp);
-++(__143911_34_tgt->num_words);
+if (__144050_17_tmp != 0ULL) {
+((__144043_34_tgt->num_words) < 516U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1456, __T809321472, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))
+#line 1456
+;
+(((__144043_34_tgt->words))[(__144043_34_tgt->num_words)]) = ((_ZN3edg13a_bigint_wordE)__144050_17_tmp);
+++(__144043_34_tgt->num_words);
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_subEPNS0_8a_bigintES2_( _ZN3edg8a_bigintE *__143944_34_tgt, 
-_ZN3edg8a_bigintE *__143945_34_sub)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_subEPNS0_8a_bigintES2_( _ZN3edg8a_bigintE *__144076_34_tgt, 
+_ZN3edg8a_bigintE *__144077_34_sub)
 
 
 
 
 {
-auto unsigned __143951_16_i;
-auto _ZN3edg12a_bigint_intE __143952_16_tmp = 0LL;
-auto int __143953_16_borrow;
+auto unsigned __144083_16_i;
+auto _ZN3edg12a_bigint_intE __144084_16_tmp = 0LL;
+auto int __144085_16_borrow;
 
-(__143944_34_tgt != __143945_34_sub) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1474, __T541578424, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-((__143945_34_sub->num_words) <= (__143944_34_tgt->num_words)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1475, __T541578424, ((_ZN3edg12a_const_charE *)0), ((
+(__144076_34_tgt != __144077_34_sub) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1474, __T809323792, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+((__144077_34_sub->num_words) <= (__144076_34_tgt->num_words)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1475, __T809323792, ((_ZN3edg12a_const_charE *)0), ((
 #line 1475
 _ZN3edg12a_const_charE *)0)));
-for (__143951_16_i = 0U; __143951_16_i < (__143945_34_sub->num_words); ++__143951_16_i) {
-__143953_16_borrow = 0;
-__143952_16_tmp += ((long long)(((__143944_34_tgt->words))[__143951_16_i]));
-__143952_16_tmp -= ((long long)(((__143945_34_sub->words))[__143951_16_i]));
-if (__143952_16_tmp < 0LL) {
+for (__144083_16_i = 0U; __144083_16_i < (__144077_34_sub->num_words); ++__144083_16_i) {
+__144085_16_borrow = 0;
+__144084_16_tmp += ((long long)(((__144076_34_tgt->words))[__144083_16_i]));
+__144084_16_tmp -= ((long long)(((__144077_34_sub->words))[__144083_16_i]));
+if (__144084_16_tmp < 0LL) {
 
-__143952_16_tmp += 4294967296LL;
-__143953_16_borrow = (-1);
+__144084_16_tmp += 4294967296LL;
+__144085_16_borrow = (-1);
 }
-(0LL <= __143952_16_tmp) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1485, __T541578424, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-(((__143944_34_tgt->words))[__143951_16_i]) = ((_ZN3edg13a_bigint_wordE)(((unsigned long long)((_ZN3edg13a_bigint_wordE)__143952_16_tmp)) & 4294967295ULL));
-__143952_16_tmp >>= 32;
-__143952_16_tmp += ((long long)__143953_16_borrow);
+(0LL <= __144084_16_tmp) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1485, __T809323792, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(((__144076_34_tgt->words))[__144083_16_i]) = ((_ZN3edg13a_bigint_wordE)(((unsigned long long)((_ZN3edg13a_bigint_wordE)__144084_16_tmp)) & 4294967295ULL));
+__144084_16_tmp >>= 32;
+__144084_16_tmp += ((long long)__144085_16_borrow);
 }
-for (; __143952_16_tmp != 0LL; ++__143951_16_i) {
-__143953_16_borrow = 0;
-(__143951_16_i < (__143944_34_tgt->num_words)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1492, __T541578424, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0))
+for (; __144084_16_tmp != 0LL; ++__144083_16_i) {
+__144085_16_borrow = 0;
+(__144083_16_i < (__144076_34_tgt->num_words)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1492, __T809323792, ((_ZN3edg12a_const_charE *)0), ((
 #line 1492
-);
-__143952_16_tmp += ((long long)(((__143944_34_tgt->words))[__143951_16_i]));
-if (__143952_16_tmp < 0LL) {
+_ZN3edg12a_const_charE *)0)));
+__144084_16_tmp += ((long long)(((__144076_34_tgt->words))[__144083_16_i]));
+if (__144084_16_tmp < 0LL) {
 
-__143952_16_tmp += 4294967296LL;
-__143953_16_borrow = (-1);
+__144084_16_tmp += 4294967296LL;
+__144085_16_borrow = (-1);
 }
-(0LL <= __143952_16_tmp) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1499, __T541578424, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-(((__143944_34_tgt->words))[__143951_16_i]) = ((_ZN3edg13a_bigint_wordE)(((unsigned long long)((_ZN3edg13a_bigint_wordE)__143952_16_tmp)) & 4294967295ULL));
-__143952_16_tmp >>= 32;
-__143952_16_tmp += ((long long)__143953_16_borrow);
+(0LL <= __144084_16_tmp) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1499, __T809323792, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(((__144076_34_tgt->words))[__144083_16_i]) = ((_ZN3edg13a_bigint_wordE)(((unsigned long long)((_ZN3edg13a_bigint_wordE)__144084_16_tmp)) & 4294967295ULL));
+__144084_16_tmp >>= 32;
+__144084_16_tmp += ((long long)__144085_16_borrow);
 }
 
-while (((__143944_34_tgt->num_words) != 0U) && ((((__143944_34_tgt->words))[((__143944_34_tgt->num_words) - 1U)]) == 0U)) {
---(__143944_34_tgt->num_words);
+while (((__144076_34_tgt->num_words) != 0U) && ((((__144076_34_tgt->words))[((__144076_34_tgt->num_words) - 1U)]) == 0U)) {
+--(__144076_34_tgt->num_words);
 } 
 }
 
 
-static int _ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_abs_diffEPNS0_8a_bigintES2_S2_( _ZN3edg8a_bigintE *__143992_38_tgt, 
-_ZN3edg8a_bigintE *__143993_38_left, 
-_ZN3edg8a_bigintE *__143994_38_right)
+static int _ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_abs_diffEPNS0_8a_bigintES2_S2_( _ZN3edg8a_bigintE *__144124_38_tgt, 
+_ZN3edg8a_bigintE *__144125_38_left, 
+_ZN3edg8a_bigintE *__144126_38_right)
 #line 1519
 {
-auto int __144001_7_sgn; __144001_7_sgn = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__143993_38_left, __143994_38_right));
+auto int __144133_7_sgn; __144133_7_sgn = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__144125_38_left, __144126_38_right));
 
-if (__144001_7_sgn < 0) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_(__143992_38_tgt, __143994_38_right);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_subEPNS0_8a_bigintES2_(__143992_38_tgt, __143993_38_left);
-} else  { if (0 < __144001_7_sgn) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_(__143992_38_tgt, __143993_38_left);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_subEPNS0_8a_bigintES2_(__143992_38_tgt, __143994_38_right);
+if (__144133_7_sgn < 0) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_(__144124_38_tgt, __144126_38_right);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_subEPNS0_8a_bigintES2_(__144124_38_tgt, __144125_38_left);
+} else  { if (0 < __144133_7_sgn) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_(__144124_38_tgt, __144125_38_left);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_subEPNS0_8a_bigintES2_(__144124_38_tgt, __144126_38_right);
 } else  {
-(__143992_38_tgt->num_words) = 0U;
+(__144124_38_tgt->num_words) = 0U;
 } }
-return __144001_7_sgn;
+return __144133_7_sgn;
 }
 
 
-static int _ZN32_INTERNAL_10_floating_c_7968bde93edg13bigint_divmodEPNS0_8a_bigintES2_( _ZN3edg8a_bigintE *__144016_36_tgt, 
-_ZN3edg8a_bigintE *__144017_36_divisor)
+static int _ZN32_INTERNAL_10_floating_c_7968bde93edg13bigint_divmodEPNS0_8a_bigintES2_( _ZN3edg8a_bigintE *__144148_36_tgt, 
+_ZN3edg8a_bigintE *__144149_36_divisor)
 
 
 
 
 {
-auto unsigned __144023_17_i;
-auto _ZN3edg13a_bigint_wordE __144024_17_trial_quotient;
-auto _ZN3edg12a_bigint_intE __144025_17_tmp = 0LL;
+auto unsigned __144155_17_i;
+auto _ZN3edg13a_bigint_wordE __144156_17_trial_quotient;
+auto _ZN3edg12a_bigint_intE __144157_17_tmp = 0LL;
 
-(__144016_36_tgt != __144017_36_divisor) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1546, __T541583472, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-((__144017_36_divisor->num_words) != 0U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1547, __T541583472, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-if (((__144016_36_tgt->num_words) < (__144017_36_divisor->num_words)) || (((__144016_36_tgt->num_words) == (__144017_36_divisor->num_words)) && ((((__144016_36_tgt->words))[((__144016_36_tgt->num_words) - 1U)]) < (((__144017_36_divisor->words))[((__144017_36_divisor->num_words) - 1U)]))))
+(__144148_36_tgt != __144149_36_divisor) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1546, __T809328880, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0
+#line 1546
+)));
+((__144149_36_divisor->num_words) != 0U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1547, __T809328880, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0
+#line 1547
+)));
+if (((__144148_36_tgt->num_words) < (__144149_36_divisor->num_words)) || (((__144148_36_tgt->num_words) == (__144149_36_divisor->num_words)) && ((((__144148_36_tgt->words))[((__144148_36_tgt->num_words) - 1U)]) < (((__144149_36_divisor->words))[((__144149_36_divisor->num_words) - 1U)]))))
 
 
 {
-__144024_17_trial_quotient = 0U;
-goto __144070_1_end_of_routine;
+__144156_17_trial_quotient = 0U;
+goto __144202_1_end_of_routine;
 }
-(((__144016_36_tgt->num_words) - (__144017_36_divisor->num_words)) < 2U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1555, __T541583472, ((_ZN3edg12a_const_charE *)0), ((
+(((__144148_36_tgt->num_words) - (__144149_36_divisor->num_words)) < 2U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1555, __T809328880, ((_ZN3edg12a_const_charE *)0
 #line 1555
-_ZN3edg12a_const_charE *)0)));
+), ((_ZN3edg12a_const_charE *)0)));
 
 
-__144024_17_trial_quotient = ((((__144016_36_tgt->words))[((__144016_36_tgt->num_words) - 1U)]) / ((((__144017_36_divisor->words))[((__144017_36_divisor->num_words) - 1U)]) + 1U));
+__144156_17_trial_quotient = ((((__144148_36_tgt->words))[((__144148_36_tgt->num_words) - 1U)]) / ((((__144149_36_divisor->words))[((__144149_36_divisor->num_words) - 1U)]) + 1U));
 
 
-if (__144024_17_trial_quotient != 0U) {
+if (__144156_17_trial_quotient != 0U) {
 
-__144025_17_tmp = 0LL;
-for (__144023_17_i = 0U; __144023_17_i < (__144017_36_divisor->num_words); ++__144023_17_i) {
-auto int __144046_11_borrow = 0;
-__144025_17_tmp += (((_ZN3edg12a_bigint_intE)(((__144016_36_tgt->words))[__144023_17_i])) - (((_ZN3edg12a_bigint_intE)(((__144017_36_divisor->words))[__144023_17_i])) * ((long long)__144024_17_trial_quotient)));
+__144157_17_tmp = 0LL;
+for (__144155_17_i = 0U; __144155_17_i < (__144149_36_divisor->num_words); ++__144155_17_i) {
+auto int __144178_11_borrow = 0;
+__144157_17_tmp += (((_ZN3edg12a_bigint_intE)(((__144148_36_tgt->words))[__144155_17_i])) - (((_ZN3edg12a_bigint_intE)(((__144149_36_divisor->words))[__144155_17_i])) * ((long long)__144156_17_trial_quotient)));
 
-if (__144025_17_tmp < 0LL) {
-__144046_11_borrow = (-1);
-__144025_17_tmp += 4294967296LL;
+if (__144157_17_tmp < 0LL) {
+__144178_11_borrow = (-1);
+__144157_17_tmp += 4294967296LL;
 }
-(((__144016_36_tgt->words))[__144023_17_i]) = ((_ZN3edg13a_bigint_wordE)(((unsigned long long)((_ZN3edg13a_bigint_wordE)__144025_17_tmp)) & 4294967295ULL));
-__144025_17_tmp >>= 32;
-__144025_17_tmp += ((long long)__144046_11_borrow);
+(((__144148_36_tgt->words))[__144155_17_i]) = ((_ZN3edg13a_bigint_wordE)(((unsigned long long)((_ZN3edg13a_bigint_wordE)__144157_17_tmp)) & 4294967295ULL));
+__144157_17_tmp >>= 32;
+__144157_17_tmp += ((long long)__144178_11_borrow);
 }
 }
-(__144025_17_tmp == 0LL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1577, __T541583472, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(__144157_17_tmp == 0LL) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1577, __T809328880, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
-while (((__144016_36_tgt->num_words) != 0U) && ((((__144016_36_tgt->words))[((__144016_36_tgt->num_words) - 1U)]) == 0U)) {
---(__144016_36_tgt->num_words);
-}
-
-while ((_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__144016_36_tgt, __144017_36_divisor)) >= 0) {
-++__144024_17_trial_quotient;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_subEPNS0_8a_bigintES2_(__144016_36_tgt, __144017_36_divisor);
+while (((__144148_36_tgt->num_words) != 0U) && ((((__144148_36_tgt->words))[((__144148_36_tgt->num_words) - 1U)]) == 0U)) {
+--(__144148_36_tgt->num_words);
 }
 
-
-__144070_1_end_of_routine:;
-return (int)__144024_17_trial_quotient;
+while ((_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__144148_36_tgt, __144149_36_divisor)) >= 0) {
+++__144156_17_trial_quotient;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_subEPNS0_8a_bigintES2_(__144148_36_tgt, __144149_36_divisor);
 }
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_eq_zeroEPhi( unsigned char *__144075_49_frac, 
-int __144076_48_width)
+__144202_1_end_of_routine:;
+return (int)__144156_17_trial_quotient;
+}
+
+
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_eq_zeroEPhi( unsigned char *__144207_49_frac, 
+int __144208_48_width)
 
 
 
 {
-return (_ZN3edg9a_booleanE)(((int)((_Bool)((_ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_high_zero_bitsEPhi(__144075_49_frac, __144076_48_width)) == __144076_48_width))) != 0);
+return (_ZN3edg9a_booleanE)(((int)((_Bool)((_ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_high_zero_bitsEPhi(__144207_49_frac, __144208_48_width)) == __144208_48_width))) != 0);
 }
 #line 1618
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg24copy_accum_and_normalizeEPNS0_12an_fp_binaryEPhi( _ZN3edg12an_fp_binaryE *__144099_53_tgt, 
-unsigned char *__144100_53_accum, 
-int __144101_52_acc_bits)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg24copy_accum_and_normalizeEPNS0_12an_fp_binaryEPhi( _ZN3edg12an_fp_binaryE *__144231_53_tgt, 
+unsigned char *__144232_53_accum, 
+int __144233_52_acc_bits)
 #line 1626
 {
-auto int __144108_7_hi_z_bits;
-auto int __144109_7_low_bit_pos;
-auto int __144110_7_adjust;
+auto int __144240_7_hi_z_bits;
+auto int __144241_7_low_bit_pos;
+auto int __144242_7_adjust;
 #line 1627
-__144108_7_hi_z_bits = (_ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_high_zero_bitsEPhi(__144100_53_accum, __144101_52_acc_bits));
-__144109_7_low_bit_pos = ((__144101_52_acc_bits - __144108_7_hi_z_bits) - (__144099_53_tgt->precision));
-__144110_7_adjust = __144108_7_hi_z_bits;
+__144240_7_hi_z_bits = (_ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_high_zero_bitsEPhi(__144232_53_accum, __144233_52_acc_bits));
+__144241_7_low_bit_pos = ((__144233_52_acc_bits - __144240_7_hi_z_bits) - (__144231_53_tgt->precision));
+__144242_7_adjust = __144240_7_hi_z_bits;
 
-if (__144101_52_acc_bits == __144108_7_hi_z_bits) {
-(__144099_53_tgt->type) = _ZN3edg8fpt_zeroE;
-} else  { if (__144109_7_low_bit_pos < 0) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii(__144100_53_accum, __144101_52_acc_bits, (-__144109_7_low_bit_pos));
-} else  { if (0 < __144109_7_low_bit_pos) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_frac_shift_rightEPhii(__144100_53_accum, __144101_52_acc_bits, __144109_7_low_bit_pos);
-if (((__144101_52_acc_bits <= (__144099_53_tgt->precision)) ? 0U : (((unsigned)(*(__144100_53_accum + ((__144099_53_tgt->precision) / 8)))) & (1U << ((__144099_53_tgt->precision) % 8)))) != 0U) {
+if (__144233_52_acc_bits == __144240_7_hi_z_bits) {
+(__144231_53_tgt->type) = _ZN3edg8fpt_zeroE;
+} else  { if (__144241_7_low_bit_pos < 0) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii(__144232_53_accum, __144233_52_acc_bits, (-__144241_7_low_bit_pos));
+} else  { if (0 < __144241_7_low_bit_pos) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_frac_shift_rightEPhii(__144232_53_accum, __144233_52_acc_bits, __144241_7_low_bit_pos);
+if (((__144233_52_acc_bits <= (__144231_53_tgt->precision)) ? 0U : (((unsigned)(*(__144232_53_accum + ((__144231_53_tgt->precision) / 8)))) & (1U << ((__144231_53_tgt->precision) % 8)))) != 0U) {
 
 
-if (((__144099_53_tgt->precision) % 8) == 0) {
-(__144100_53_accum[(((__144099_53_tgt->precision) - 1) / 8)]) = ((unsigned char)128U);
+if (((__144231_53_tgt->precision) % 8) == 0) {
+(__144232_53_accum[(((__144231_53_tgt->precision) - 1) / 8)]) = ((unsigned char)128U);
 } else  {
-(__144100_53_accum[((__144099_53_tgt->precision) / 8)]) >>= 1;
+(__144232_53_accum[((__144231_53_tgt->precision) / 8)]) >>= 1;
 }
---__144110_7_adjust;
+--__144242_7_adjust;
 }
 } } }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_frac_copyEPhS1_i(((__144099_53_tgt->frac)), __144100_53_accum, (__144099_53_tgt->precision));
-(__144099_53_tgt->exponent) -= __144110_7_adjust; 
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_frac_copyEPhS1_i(((__144231_53_tgt->frac)), __144232_53_accum, (__144231_53_tgt->precision));
+(__144231_53_tgt->exponent) -= __144242_7_adjust; 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__144134_47_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__144266_47_bin)
 
 
 
 {
-(__144134_47_bin->type) = _ZN3edg8fpt_zeroE; 
+(__144266_47_bin->type) = _ZN3edg8fpt_zeroE; 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_( _ZN3edg12an_fp_binaryE *__144143_40_left, 
-_ZN3edg12an_fp_binaryE *__144144_40_right)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_( _ZN3edg12an_fp_binaryE *__144275_40_left, 
+_ZN3edg12an_fp_binaryE *__144276_40_right)
 
 
 
 {
-memcpy(((void *)__144143_40_left), ((const void *)__144144_40_right), 28ULL); 
+memcpy(((void *)__144275_40_left), ((const void *)__144276_40_right), 28ULL); 
 }
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_( _ZN3edg12an_fp_binaryE *__144153_43_left, 
-_ZN3edg12an_fp_binaryE *__144154_43_right)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_( _ZN3edg12an_fp_binaryE *__144285_43_left, 
+_ZN3edg12an_fp_binaryE *__144286_43_right)
 
 
 
 
 {
-auto _ZN3edg9a_booleanE __144160_13_res;
+auto _ZN3edg9a_booleanE __144292_13_res;
 
-if (((int)(__144154_43_right->type)) == 6) {
-__144160_13_res = ((_ZN3edg9a_booleanE)0);
-} else  { if (((int)(__144153_43_left->type)) == 6) {
-__144160_13_res = ((_ZN3edg9a_booleanE)1);
-} else  { if ((__144153_43_left->exponent) != (__144154_43_right->exponent)) {
-__144160_13_res = ((_ZN3edg9a_booleanE)(((int)((_Bool)((__144153_43_left->exponent) < (__144154_43_right->exponent)))) != 0));
+if (((int)(__144286_43_right->type)) == 6) {
+__144292_13_res = ((_ZN3edg9a_booleanE)0);
+} else  { if (((int)(__144285_43_left->type)) == 6) {
+__144292_13_res = ((_ZN3edg9a_booleanE)1);
+} else  { if ((__144285_43_left->exponent) != (__144286_43_right->exponent)) {
+__144292_13_res = ((_ZN3edg9a_booleanE)(((int)((_Bool)((__144285_43_left->exponent) < (__144286_43_right->exponent)))) != 0));
 } else  {
-__144160_13_res = ((_ZN3edg9a_booleanE)(((int)(_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_frac_ltEPhS1_i(((__144153_43_left->frac)), ((__144154_43_right->frac)), (__144153_43_left->precision)))) != 0));
+__144292_13_res = ((_ZN3edg9a_booleanE)(((int)(_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_frac_ltEPhS1_i(((__144285_43_left->frac)), ((__144286_43_right->frac)), (__144285_43_left->precision)))) != 0));
 } } }
-return __144160_13_res;
+return __144292_13_res;
 }
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__144175_48_bin)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__144307_48_bin)
 
 
 
 {
-return (_ZN3edg9a_booleanE)(((int)((_Bool)(((int)(__144175_48_bin->type)) == 6))) != 0);
+return (_ZN3edg9a_booleanE)(((int)((_Bool)(((int)(__144307_48_bin->type)) == 6))) != 0);
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_absEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__144184_39_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_absEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__144316_39_bin)
 
 
 
 {
-(__144184_39_bin->is_negative) = ((_ZN3edg9a_booleanE)0); 
+(__144316_39_bin->is_negative) = ((_ZN3edg9a_booleanE)0); 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_negateEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__144193_42_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_negateEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__144325_42_bin)
 
 
 
 {
-(__144193_42_bin->is_negative) = ((_Bool)(!(__144193_42_bin->is_negative))); 
+(__144325_42_bin->is_negative) = ((_Bool)(!(__144325_42_bin->is_negative))); 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_emul_scale_and_addEPNS0_12an_fp_binaryES2_S2_( _ZN3edg12an_fp_binaryE *__144202_49_tgt, 
-_ZN3edg12an_fp_binaryE *__144203_49_left, 
-_ZN3edg12an_fp_binaryE *__144204_49_right)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_emul_scale_and_addEPNS0_12an_fp_binaryES2_S2_( _ZN3edg12an_fp_binaryE *__144334_49_tgt, 
+_ZN3edg12an_fp_binaryE *__144335_49_left, 
+_ZN3edg12an_fp_binaryE *__144336_49_right)
 
 
 
 
 {
-auto int __144210_17_rbytes;
-auto int __144211_17_lbytes;
-auto int __144212_17_abytes;
-auto unsigned char __144213_17_accum[19] = {((unsigned char)0U)};
-auto unsigned char __144214_17_shifted_left[8] = {((unsigned char)0U)};
-auto unsigned char *__144215_18_left_frac;
-auto unsigned __144216_17_tmp;
-auto int __144217_17_i;
+auto int __144342_17_rbytes;
+auto int __144343_17_lbytes;
+auto int __144344_17_abytes;
+auto unsigned char __144345_17_accum[19] = {((unsigned char)0U)};
+auto unsigned char __144346_17_shifted_left[8] = {((unsigned char)0U)};
+auto unsigned char *__144347_18_left_frac;
+auto unsigned __144348_17_tmp;
+auto int __144349_17_i;
 #line 1729
-__144210_17_rbytes = ((((__144204_49_right->precision) + 8) - 1) / 8);
-__144211_17_lbytes = ((((__144203_49_left->precision) + 8) - 1) / 8);
-__144212_17_abytes = (__144210_17_rbytes + __144211_17_lbytes);
+__144342_17_rbytes = ((((__144336_49_right->precision) + 8) - 1) / 8);
+__144343_17_lbytes = ((((__144335_49_left->precision) + 8) - 1) / 8);
+__144344_17_abytes = (__144342_17_rbytes + __144343_17_lbytes);
 #line 1738
-for (__144217_17_i = 0; __144217_17_i < __144210_17_rbytes; ++__144217_17_i) {
-((__144213_17_accum)[(__144211_17_lbytes + __144217_17_i)]) = (((__144204_49_right->frac))[__144217_17_i]);
+for (__144349_17_i = 0; __144349_17_i < __144342_17_rbytes; ++__144349_17_i) {
+((__144345_17_accum)[(__144343_17_lbytes + __144349_17_i)]) = (((__144336_49_right->frac))[__144349_17_i]);
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_frac_shift_rightEPhii((__144213_17_accum), (__144212_17_abytes * 8), ((__144203_49_left->exponent) - (__144204_49_right->exponent)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_frac_shift_rightEPhii((__144345_17_accum), (__144344_17_abytes * 8), ((__144335_49_left->exponent) - (__144336_49_right->exponent)));
 
-if (((__144203_49_left->precision) % 8) == 0) {
-__144215_18_left_frac = ((__144203_49_left->frac));
+if (((__144335_49_left->precision) % 8) == 0) {
+__144347_18_left_frac = ((__144335_49_left->frac));
 } else  {
-for (__144217_17_i = 0; __144217_17_i < __144211_17_lbytes; ++__144217_17_i) {
-((__144214_17_shifted_left)[__144217_17_i]) = (((__144203_49_left->frac))[__144217_17_i]);
+for (__144349_17_i = 0; __144349_17_i < __144343_17_lbytes; ++__144349_17_i) {
+((__144346_17_shifted_left)[__144349_17_i]) = (((__144335_49_left->frac))[__144349_17_i]);
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii((__144214_17_shifted_left), (__144211_17_lbytes * 8), (8 - ((__144203_49_left->precision) % 8)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii((__144346_17_shifted_left), (__144343_17_lbytes * 8), (8 - ((__144335_49_left->precision) % 8)));
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii((__144213_17_accum), (__144212_17_abytes * 8), (8 - ((__144203_49_left->precision) % 8)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii((__144345_17_accum), (__144344_17_abytes * 8), (8 - ((__144335_49_left->precision) % 8)));
 
-__144215_18_left_frac = (__144214_17_shifted_left);
+__144347_18_left_frac = (__144346_17_shifted_left);
 }
-__144216_17_tmp = 0U;
-for (__144217_17_i = 0; __144217_17_i < __144211_17_lbytes; ++__144217_17_i) {
-__144216_17_tmp += ((unsigned)((__144213_17_accum)[(__144210_17_rbytes + __144217_17_i)]));
-__144216_17_tmp += ((unsigned)(__144215_18_left_frac[__144217_17_i]));
-((__144213_17_accum)[(__144210_17_rbytes + __144217_17_i)]) = ((unsigned char)(__144216_17_tmp & 255U));
-__144216_17_tmp >>= 8;
+__144348_17_tmp = 0U;
+for (__144349_17_i = 0; __144349_17_i < __144343_17_lbytes; ++__144349_17_i) {
+__144348_17_tmp += ((unsigned)((__144345_17_accum)[(__144342_17_rbytes + __144349_17_i)]));
+__144348_17_tmp += ((unsigned)(__144347_18_left_frac[__144349_17_i]));
+((__144345_17_accum)[(__144342_17_rbytes + __144349_17_i)]) = ((unsigned char)(__144348_17_tmp & 255U));
+__144348_17_tmp >>= 8;
 }
-(__144202_49_tgt->exponent) = (__144203_49_left->exponent);
-if (__144216_17_tmp != 0U) {
-((__144213_17_accum)[__144212_17_abytes]) = ((unsigned char)(__144216_17_tmp & 255U));
-++__144212_17_abytes;
-(__144202_49_tgt->exponent) += 8;
-((__144216_17_tmp >> 8) == 0U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1767, __T542326256, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(__144334_49_tgt->exponent) = (__144335_49_left->exponent);
+if (__144348_17_tmp != 0U) {
+((__144345_17_accum)[__144344_17_abytes]) = ((unsigned char)(__144348_17_tmp & 255U));
+++__144344_17_abytes;
+(__144334_49_tgt->exponent) += 8;
+((__144348_17_tmp >> 8) == 0U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1767, __T809350528, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg24copy_accum_and_normalizeEPNS0_12an_fp_binaryEPhi(__144202_49_tgt, (__144213_17_accum), (__144212_17_abytes * 8)); 
+_ZN32_INTERNAL_10_floating_c_7968bde93edg24copy_accum_and_normalizeEPNS0_12an_fp_binaryEPhi(__144334_49_tgt, (__144345_17_accum), (__144344_17_abytes * 8)); 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_addEPNS0_12an_fp_binaryES2_( _ZN3edg12an_fp_binaryE *__144254_39_left, 
-_ZN3edg12an_fp_binaryE *__144255_39_right)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_addEPNS0_12an_fp_binaryES2_( _ZN3edg12an_fp_binaryE *__144386_39_left, 
+_ZN3edg12an_fp_binaryE *__144387_39_right)
 
 
 
 {
-if (((int)(__144255_39_right->type)) == 6) {
+if (((int)(__144387_39_right->type)) == 6) {
 
-} else  { if (((int)(__144254_39_left->type)) == 6) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(__144254_39_left, __144255_39_right);
-} else  { if ((__144254_39_left->exponent) < (__144255_39_right->exponent)) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_emul_scale_and_addEPNS0_12an_fp_binaryES2_S2_(__144254_39_left, __144255_39_right, __144254_39_left);
+} else  { if (((int)(__144386_39_left->type)) == 6) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(__144386_39_left, __144387_39_right);
+} else  { if ((__144386_39_left->exponent) < (__144387_39_right->exponent)) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_emul_scale_and_addEPNS0_12an_fp_binaryES2_S2_(__144386_39_left, __144387_39_right, __144386_39_left);
 } else  {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_emul_scale_and_addEPNS0_12an_fp_binaryES2_S2_(__144254_39_left, __144254_39_left, __144255_39_right);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_emul_scale_and_addEPNS0_12an_fp_binaryES2_S2_(__144386_39_left, __144386_39_left, __144387_39_right);
 } } } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm( _ZN3edg12an_fp_binaryE *__144272_44_left, 
-unsigned long __144273_43_right)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm( _ZN3edg12an_fp_binaryE *__144404_44_left, 
+unsigned long __144405_43_right)
 
 
 
 {
-if (__144273_43_right != 0UL) {
-auto _ZN3edg12an_fp_binaryE __144279_19_bin = {0};
-auto int __144280_19_i;
-auto unsigned long __144281_19_high_bits_mask;
-auto unsigned long __144282_19_over;
+if (__144405_43_right != 0UL) {
+auto _ZN3edg12an_fp_binaryE __144411_19_bin = {0};
+auto int __144412_19_i;
+auto unsigned long __144413_19_high_bits_mask;
+auto unsigned long __144414_19_over;
 #line 1800
-__144281_19_high_bits_mask = ((unsigned long)(~((1U << (__144272_44_left->precision)) - 1U)));
+__144413_19_high_bits_mask = ((unsigned long)(~((1U << (__144404_44_left->precision)) - 1U)));
 
 
-(__144279_19_bin.type) = _ZN3edg10fpt_numberE;
-(__144279_19_bin.is_negative) = ((_ZN3edg9a_booleanE)0);
-(__144279_19_bin.precision) = (__144272_44_left->precision);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_frac_set_from_uintEPhiy(((__144279_19_bin.frac)), (__144279_19_bin.precision), ((_ZN3edg10an_fp_uintE)__144273_43_right));
+(__144411_19_bin.type) = _ZN3edg10fpt_numberE;
+(__144411_19_bin.is_negative) = ((_ZN3edg9a_booleanE)0);
+(__144411_19_bin.precision) = (__144404_44_left->precision);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_frac_set_from_uintEPhiy(((__144411_19_bin.frac)), (__144411_19_bin.precision), ((_ZN3edg10an_fp_uintE)__144405_43_right));
 
-if (((__144279_19_bin.precision) < 32) && (__144273_43_right >= (1UL << (__144279_19_bin.precision))))
+if (((__144411_19_bin.precision) < 32) && (__144405_43_right >= (1UL << (__144411_19_bin.precision))))
 {
 
 
-__144280_19_i = 0;
+__144412_19_i = 0;
 } else  {
-__144280_19_i = (_ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_high_zero_bitsEPhi(((__144279_19_bin.frac)), (__144279_19_bin.precision)));
+__144412_19_i = (_ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_high_zero_bitsEPhi(((__144411_19_bin.frac)), (__144411_19_bin.precision)));
 }
-if (((__144280_19_i == 0) && ((__144279_19_bin.precision) < 32)) && ((__144282_19_over = ((__144273_43_right & __144281_19_high_bits_mask) >> (__144279_19_bin.precision))) != 0UL))
+if (((__144412_19_i == 0) && ((__144411_19_bin.precision) < 32)) && ((__144414_19_over = ((__144405_43_right & __144413_19_high_bits_mask) >> (__144411_19_bin.precision))) != 0UL))
 {
 #line 1823
-while (__144282_19_over != 0UL) {
-++__144280_19_i;
-__144282_19_over >>= 1;
+while (__144414_19_over != 0UL) {
+++__144412_19_i;
+__144414_19_over >>= 1;
 }
 
 
 
 
-(__144279_19_bin.exponent) = (((__144279_19_bin.precision) + __144280_19_i) - 1);
+(__144411_19_bin.exponent) = (((__144411_19_bin.precision) + __144412_19_i) - 1);
 } else  {
 
 
-(__144279_19_bin.exponent) = ((__144279_19_bin.precision) - __144280_19_i);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii(((__144279_19_bin.frac)), (__144279_19_bin.precision), __144280_19_i);
+(__144411_19_bin.exponent) = ((__144411_19_bin.precision) - __144412_19_i);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii(((__144411_19_bin.frac)), (__144411_19_bin.precision), __144412_19_i);
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_addEPNS0_12an_fp_binaryES2_(__144272_44_left, (&__144279_19_bin));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_addEPNS0_12an_fp_binaryES2_(__144404_44_left, (&__144411_19_bin));
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_( _ZN3edg12an_fp_binaryE *__144324_39_left, 
-_ZN3edg12an_fp_binaryE *__144325_39_right)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_( _ZN3edg12an_fp_binaryE *__144456_39_left, 
+_ZN3edg12an_fp_binaryE *__144457_39_right)
 
 
 
 
 {
-auto int __144331_17_rbytes;
-auto int __144332_17_lbytes;
-auto int __144333_17_abytes;
-auto unsigned char __144334_17_accum[19] = {((unsigned char)0U)};
-auto unsigned char __144335_17_sub[19] = {((unsigned char)0U)};
-auto int __144336_17_i;
-auto unsigned __144337_17_tmp;
+auto int __144463_17_rbytes;
+auto int __144464_17_lbytes;
+auto int __144465_17_abytes;
+auto unsigned char __144466_17_accum[19] = {((unsigned char)0U)};
+auto unsigned char __144467_17_sub[19] = {((unsigned char)0U)};
+auto int __144468_17_i;
+auto unsigned __144469_17_tmp;
 #line 1850
-__144331_17_rbytes = ((((__144325_39_right->precision) + 8) - 1) / 8);
-__144332_17_lbytes = ((((__144324_39_left->precision) + 8) - 1) / 8);
-__144333_17_abytes = (__144331_17_rbytes + __144332_17_lbytes);
+__144463_17_rbytes = ((((__144457_39_right->precision) + 8) - 1) / 8);
+__144464_17_lbytes = ((((__144456_39_left->precision) + 8) - 1) / 8);
+__144465_17_abytes = (__144463_17_rbytes + __144464_17_lbytes);
 #line 1858
-if (((int)(__144325_39_right->type)) != 6) {
-for (__144336_17_i = 0; __144336_17_i < __144331_17_rbytes; ++__144336_17_i) {
-((__144335_17_sub)[(__144332_17_lbytes + __144336_17_i)]) = (((__144325_39_right->frac))[__144336_17_i]);
+if (((int)(__144457_39_right->type)) != 6) {
+for (__144468_17_i = 0; __144468_17_i < __144463_17_rbytes; ++__144468_17_i) {
+((__144467_17_sub)[(__144464_17_lbytes + __144468_17_i)]) = (((__144457_39_right->frac))[__144468_17_i]);
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_frac_shift_rightEPhii((__144335_17_sub), ((__144332_17_lbytes + __144336_17_i) * 8), ((__144324_39_left->exponent) - (__144325_39_right->exponent)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_frac_shift_rightEPhii((__144467_17_sub), ((__144464_17_lbytes + __144468_17_i) * 8), ((__144456_39_left->exponent) - (__144457_39_right->exponent)));
 
 
-for (__144336_17_i = 0; __144336_17_i < __144332_17_lbytes; ++__144336_17_i) {
-((__144334_17_accum)[(__144331_17_rbytes + __144336_17_i)]) = (((__144324_39_left->frac))[__144336_17_i]);
+for (__144468_17_i = 0; __144468_17_i < __144464_17_lbytes; ++__144468_17_i) {
+((__144466_17_accum)[(__144463_17_rbytes + __144468_17_i)]) = (((__144456_39_left->frac))[__144468_17_i]);
 }
-if (((__144324_39_left->precision) % 8) != 0) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii((__144334_17_accum), (__144333_17_abytes * 8), (8 - ((__144324_39_left->precision) % 8)));
+if (((__144456_39_left->precision) % 8) != 0) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii((__144466_17_accum), (__144465_17_abytes * 8), (8 - ((__144456_39_left->precision) % 8)));
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii((__144335_17_sub), (__144333_17_abytes * 8), (8 - ((__144324_39_left->precision) % 8)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii((__144467_17_sub), (__144465_17_abytes * 8), (8 - ((__144456_39_left->precision) % 8)));
 
 }
-__144337_17_tmp = 0U;
-for (__144336_17_i = 0; __144336_17_i < 19; ++__144336_17_i) {
-__144337_17_tmp += ((unsigned)((__144335_17_sub)[__144336_17_i]));
-if (__144337_17_tmp <= ((unsigned)((__144334_17_accum)[__144336_17_i]))) {
-((__144334_17_accum)[__144336_17_i]) -= ((int)((unsigned char)__144337_17_tmp));
-__144337_17_tmp = 0U;
+__144469_17_tmp = 0U;
+for (__144468_17_i = 0; __144468_17_i < 19; ++__144468_17_i) {
+__144469_17_tmp += ((unsigned)((__144467_17_sub)[__144468_17_i]));
+if (__144469_17_tmp <= ((unsigned)((__144466_17_accum)[__144468_17_i]))) {
+((__144466_17_accum)[__144468_17_i]) -= ((int)((unsigned char)__144469_17_tmp));
+__144469_17_tmp = 0U;
 } else  {
-((__144334_17_accum)[__144336_17_i]) -= ((int)((unsigned char)__144337_17_tmp));
-__144337_17_tmp = 1U;
+((__144466_17_accum)[__144468_17_i]) -= ((int)((unsigned char)__144469_17_tmp));
+__144469_17_tmp = 1U;
 }
 }
-(__144337_17_tmp == 0U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1885, __T542342648, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg24copy_accum_and_normalizeEPNS0_12an_fp_binaryEPhi(__144324_39_left, (__144334_17_accum), ((__144332_17_lbytes + __144331_17_rbytes) * 8));
+(__144469_17_tmp == 0U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1885, __T809366928, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg24copy_accum_and_normalizeEPNS0_12an_fp_binaryEPhi(__144456_39_left, (__144466_17_accum), ((__144464_17_lbytes + __144463_17_rbytes) * 8));
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj( _ZN3edg12an_fp_binaryE *__144372_45_left, 
-unsigned __144373_44_right)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj( _ZN3edg12an_fp_binaryE *__144504_45_left, 
+unsigned __144505_44_right)
 
 
 
 {
-if (__144373_44_right == 0U) {
-(__144372_45_left->type) = _ZN3edg8fpt_zeroE;
-} else  { if (((int)(__144372_45_left->type)) == 6) {
+if (__144505_44_right == 0U) {
+(__144504_45_left->type) = _ZN3edg8fpt_zeroE;
+} else  { if (((int)(__144504_45_left->type)) == 6) {
 
 } else  {
-auto int __144383_19_i;
-auto unsigned char __144384_19_accum[9] = {((unsigned char)0U)};
-auto int __144385_19_bytes;
-auto unsigned __144386_19_tmp = 0U;
+auto int __144515_19_i;
+auto unsigned char __144516_19_accum[9] = {((unsigned char)0U)};
+auto int __144517_19_bytes;
+auto unsigned __144518_19_tmp = 0U;
 #line 1904
-__144385_19_bytes = ((((__144372_45_left->precision) + 8) - 1) / 8);
+__144517_19_bytes = ((((__144504_45_left->precision) + 8) - 1) / 8);
 
 
-for (__144383_19_i = 0; __144383_19_i < __144385_19_bytes; ++__144383_19_i) {
-__144386_19_tmp += (((unsigned)(((__144372_45_left->frac))[__144383_19_i])) * __144373_44_right);
-((__144384_19_accum)[__144383_19_i]) = ((unsigned char)(__144386_19_tmp & 255U));
-__144386_19_tmp >>= 8;
+for (__144515_19_i = 0; __144515_19_i < __144517_19_bytes; ++__144515_19_i) {
+__144518_19_tmp += (((unsigned)(((__144504_45_left->frac))[__144515_19_i])) * __144505_44_right);
+((__144516_19_accum)[__144515_19_i]) = ((unsigned char)(__144518_19_tmp & 255U));
+__144518_19_tmp >>= 8;
 }
-((__144384_19_accum)[__144383_19_i]) = ((unsigned char)__144386_19_tmp);
-(__144372_45_left->exponent) += 8;
-if (((__144372_45_left->precision) % 8) != 0) {
-(__144372_45_left->exponent) += (8 - ((__144372_45_left->precision) % 8)); }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg24copy_accum_and_normalizeEPNS0_12an_fp_binaryEPhi(__144372_45_left, (__144384_19_accum), ((__144385_19_bytes + 1) * 8));
+((__144516_19_accum)[__144515_19_i]) = ((unsigned char)__144518_19_tmp);
+(__144504_45_left->exponent) += 8;
+if (((__144504_45_left->precision) % 8) != 0) {
+(__144504_45_left->exponent) += (8 - ((__144504_45_left->precision) % 8)); }
+_ZN32_INTERNAL_10_floating_c_7968bde93edg24copy_accum_and_normalizeEPNS0_12an_fp_binaryEPhi(__144504_45_left, (__144516_19_accum), ((__144517_19_bytes + 1) * 8));
 } } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_( _ZN3edg12an_fp_binaryE *__144402_40_left, 
-_ZN3edg12an_fp_binaryE *__144403_40_right)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_( _ZN3edg12an_fp_binaryE *__144534_40_left, 
+_ZN3edg12an_fp_binaryE *__144535_40_right)
 
 
 
 {
-auto unsigned char __144408_17_accum[17] = {((unsigned char)0U)};
-auto int __144409_17_lbytes;
-auto int __144410_17_rbytes;
-auto int __144411_17_i;
-auto int __144412_17_j;
-auto unsigned __144413_17_tmp;
+auto unsigned char __144540_17_accum[17] = {((unsigned char)0U)};
+auto int __144541_17_lbytes;
+auto int __144542_17_rbytes;
+auto int __144543_17_i;
+auto int __144544_17_j;
+auto unsigned __144545_17_tmp;
 #line 1928
-__144409_17_lbytes = ((((__144402_40_left->precision) + 8) - 1) / 8);
-__144410_17_rbytes = ((((__144403_40_right->precision) + 8) - 1) / 8);
+__144541_17_lbytes = ((((__144534_40_left->precision) + 8) - 1) / 8);
+__144542_17_rbytes = ((((__144535_40_right->precision) + 8) - 1) / 8);
 
 
 
 
-if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__144402_40_left)) {
+if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__144534_40_left)) {
 
-} else  { if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__144403_40_right)) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE(__144402_40_left);
+} else  { if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__144535_40_right)) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE(__144534_40_left);
 } else  {
-for (__144411_17_i = 0; __144411_17_i < __144409_17_lbytes; ++__144411_17_i) {
-if (((int)(((__144402_40_left->frac))[__144411_17_i])) != 0) {
-__144413_17_tmp = 0U;
-for (__144412_17_j = 0; __144412_17_j < __144410_17_rbytes; ++__144412_17_j) {
-__144413_17_tmp += (((unsigned)((__144408_17_accum)[(__144411_17_i + __144412_17_j)])) + ((unsigned)(((int)(((__144402_40_left->frac))[__144411_17_i])) * ((int)(((__144403_40_right->frac))[__144412_17_j])))));
-((__144408_17_accum)[(__144411_17_i + __144412_17_j)]) = ((unsigned char)(__144413_17_tmp & 255U));
-__144413_17_tmp >>= 8;
+for (__144543_17_i = 0; __144543_17_i < __144541_17_lbytes; ++__144543_17_i) {
+if (((int)(((__144534_40_left->frac))[__144543_17_i])) != 0) {
+__144545_17_tmp = 0U;
+for (__144544_17_j = 0; __144544_17_j < __144542_17_rbytes; ++__144544_17_j) {
+__144545_17_tmp += (((unsigned)((__144540_17_accum)[(__144543_17_i + __144544_17_j)])) + ((unsigned)(((int)(((__144534_40_left->frac))[__144543_17_i])) * ((int)(((__144535_40_right->frac))[__144544_17_j])))));
+((__144540_17_accum)[(__144543_17_i + __144544_17_j)]) = ((unsigned char)(__144545_17_tmp & 255U));
+__144545_17_tmp >>= 8;
 }
-((__144408_17_accum)[(__144411_17_i + __144412_17_j)]) = ((unsigned char)(__144413_17_tmp & 255U));
-((__144413_17_tmp >> 8) == 0U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1948, __T542354128, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+((__144540_17_accum)[(__144543_17_i + __144544_17_j)]) = ((unsigned char)(__144545_17_tmp & 255U));
+((__144545_17_tmp >> 8) == 0U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 1948, __T809378416, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 }
 }
-(__144402_40_left->exponent) += (__144403_40_right->exponent);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg24copy_accum_and_normalizeEPNS0_12an_fp_binaryEPhi(__144402_40_left, (__144408_17_accum), ((__144402_40_left->precision) + (__144403_40_right->precision)));
+(__144534_40_left->exponent) += (__144535_40_right->exponent);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg24copy_accum_and_normalizeEPNS0_12an_fp_binaryEPhi(__144534_40_left, (__144540_17_accum), ((__144534_40_left->precision) + (__144535_40_right->precision)));
 } } 
 }
 
 
-static int _ZN32_INTERNAL_10_floating_c_7968bde93edg26fp_emul_get_quotient_digitEPhS1_ii( unsigned char *__144438_54_u, 
-unsigned char *__144439_54_v, 
-int __144440_53_j, 
-int __144441_53_n)
+static int _ZN32_INTERNAL_10_floating_c_7968bde93edg26fp_emul_get_quotient_digitEPhS1_ii( unsigned char *__144570_54_u, 
+unsigned char *__144571_54_v, 
+int __144572_53_j, 
+int __144573_53_n)
 #line 1968
 {
-auto int __144450_17_qh;
-auto int __144451_17_rh;
-auto int __144452_17_b = 256;
-auto unsigned char __144453_17_intermediate[9] = {((unsigned char)0U)};
+auto int __144582_17_qh;
+auto int __144583_17_rh;
+auto int __144584_17_b = 256;
+auto unsigned char __144585_17_intermediate[9] = {((unsigned char)0U)};
 
-__144450_17_qh = (((((int)(__144438_54_u[(__144440_53_j + __144441_53_n)])) * __144452_17_b) + ((int)(__144438_54_u[((__144440_53_j + __144441_53_n) - 1)]))) / ((int)(__144439_54_v[(__144441_53_n - 1)])));
-__144451_17_rh = (((((int)(__144438_54_u[(__144440_53_j + __144441_53_n)])) * __144452_17_b) + ((int)(__144438_54_u[((__144440_53_j + __144441_53_n) - 1)]))) % ((int)(__144439_54_v[(__144441_53_n - 1)])));
-__144457_1_rpt:;
-if ((__144450_17_qh == __144452_17_b) || (((__144452_17_b * __144451_17_rh) + ((int)(__144438_54_u[((__144440_53_j + __144441_53_n) - 2)]))) < (__144450_17_qh * ((int)(__144439_54_v[(__144441_53_n - 2)]))))) {
---__144450_17_qh;
-__144451_17_rh += ((int)(__144439_54_v[(__144441_53_n - 1)]));
-if (__144451_17_rh < __144452_17_b) {
-goto __144457_1_rpt;
+__144582_17_qh = (((((int)(__144570_54_u[(__144572_53_j + __144573_53_n)])) * __144584_17_b) + ((int)(__144570_54_u[((__144572_53_j + __144573_53_n) - 1)]))) / ((int)(__144571_54_v[(__144573_53_n - 1)])));
+__144583_17_rh = (((((int)(__144570_54_u[(__144572_53_j + __144573_53_n)])) * __144584_17_b) + ((int)(__144570_54_u[((__144572_53_j + __144573_53_n) - 1)]))) % ((int)(__144571_54_v[(__144573_53_n - 1)])));
+__144589_1_rpt:;
+if ((__144582_17_qh == __144584_17_b) || (((__144584_17_b * __144583_17_rh) + ((int)(__144570_54_u[((__144572_53_j + __144573_53_n) - 2)]))) < (__144582_17_qh * ((int)(__144571_54_v[(__144573_53_n - 2)]))))) {
+--__144582_17_qh;
+__144583_17_rh += ((int)(__144571_54_v[(__144573_53_n - 1)]));
+if (__144583_17_rh < __144584_17_b) {
+goto __144589_1_rpt;
 }
 }
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_frac_copyEPhS1_i((__144453_17_intermediate), __144439_54_v, (__144441_53_n * 8));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_frac_mult_intEPhii((__144453_17_intermediate), ((__144441_53_n + 1) * 8), __144450_17_qh);
-if (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_frac_ltEPhS1_i((__144438_54_u + __144440_53_j), (__144453_17_intermediate), ((__144441_53_n + 1) * 8))) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_frac_copyEPhS1_i((__144585_17_intermediate), __144571_54_v, (__144573_53_n * 8));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_frac_mult_intEPhii((__144585_17_intermediate), ((__144573_53_n + 1) * 8), __144582_17_qh);
+if (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_frac_ltEPhS1_i((__144570_54_u + __144572_53_j), (__144585_17_intermediate), ((__144573_53_n + 1) * 8))) {
 
---__144450_17_qh;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_frac_subEPhS1_i((__144453_17_intermediate), __144439_54_v, ((__144441_53_n + 1) * 8));
+--__144582_17_qh;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_frac_subEPhS1_i((__144585_17_intermediate), __144571_54_v, ((__144573_53_n + 1) * 8));
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_frac_subEPhS1_i((__144438_54_u + __144440_53_j), (__144453_17_intermediate), ((__144441_53_n + 1) * 8));
-return __144450_17_qh;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_frac_subEPhS1_i((__144570_54_u + __144572_53_j), (__144585_17_intermediate), ((__144573_53_n + 1) * 8));
+return __144582_17_qh;
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_( _ZN3edg12an_fp_binaryE *__144479_39_num, 
-_ZN3edg12an_fp_binaryE *__144480_39_den)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_( _ZN3edg12an_fp_binaryE *__144611_39_num, 
+_ZN3edg12an_fp_binaryE *__144612_39_den)
 #line 2006
 {
-auto int __144488_17_j;
-auto unsigned char __144489_17_u[18] = {((unsigned char)0U)};
-auto unsigned char __144490_17_result[10] = {((unsigned char)0U)};
-auto int __144491_17_dbytes;
-auto int __144492_17_rwidth;
-auto int __144493_17_d;
-auto int __144494_17_b = 256;
-auto unsigned char *__144495_18_v;
-auto unsigned char __144496_17_shifted_den[9] = {((unsigned char)0U)};
-auto int __144497_17_m;
-auto int __144498_17_n;
+auto int __144620_17_j;
+auto unsigned char __144621_17_u[18] = {((unsigned char)0U)};
+auto unsigned char __144622_17_result[10] = {((unsigned char)0U)};
+auto int __144623_17_dbytes;
+auto int __144624_17_rwidth;
+auto int __144625_17_d;
+auto int __144626_17_b = 256;
+auto unsigned char *__144627_18_v;
+auto unsigned char __144628_17_shifted_den[9] = {((unsigned char)0U)};
+auto int __144629_17_m;
+auto int __144630_17_n;
 #line 2010
-__144491_17_dbytes = ((((__144480_39_den->precision) + 8) - 1) / 8);
-__144492_17_rwidth = ((__144491_17_dbytes + 2) * 8);
+__144623_17_dbytes = ((((__144612_39_den->precision) + 8) - 1) / 8);
+__144624_17_rwidth = ((__144623_17_dbytes + 2) * 8);
 
 
-__144495_18_v = ((__144480_39_den->frac));
+__144627_18_v = ((__144612_39_den->frac));
 
-__144497_17_m = (((((__144479_39_num->precision) + 8) - 1) / 8) + 1);
-__144498_17_n = __144491_17_dbytes;
+__144629_17_m = (((((__144611_39_num->precision) + 8) - 1) / 8) + 1);
+__144630_17_n = __144623_17_dbytes;
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_frac_copyEPhS1_i((((__144489_17_u) + __144498_17_n) + 1), ((__144479_39_num->frac)), (__144479_39_num->precision));
-if (((__144480_39_den->precision) % 8) != 0) {
-for (__144488_17_j = 0; __144488_17_j < __144498_17_n; ++__144488_17_j) {
-((__144496_17_shifted_den)[__144488_17_j]) = (((__144480_39_den->frac))[__144488_17_j]);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_frac_copyEPhS1_i((((__144621_17_u) + __144630_17_n) + 1), ((__144611_39_num->frac)), (__144611_39_num->precision));
+if (((__144612_39_den->precision) % 8) != 0) {
+for (__144620_17_j = 0; __144620_17_j < __144630_17_n; ++__144620_17_j) {
+((__144628_17_shifted_den)[__144620_17_j]) = (((__144612_39_den->frac))[__144620_17_j]);
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii((__144489_17_u), ((__144497_17_m + __144498_17_n) * 8), (8 - ((__144480_39_den->precision) % 8)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii((__144621_17_u), ((__144629_17_m + __144630_17_n) * 8), (8 - ((__144612_39_den->precision) % 8)));
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii((__144496_17_shifted_den), (__144498_17_n * 8), (8 - ((__144480_39_den->precision) % 8)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii((__144628_17_shifted_den), (__144630_17_n * 8), (8 - ((__144612_39_den->precision) % 8)));
 
-__144495_18_v = (__144496_17_shifted_den);
-}
-
-__144493_17_d = (__144494_17_b / (((int)(__144495_18_v[(__144498_17_n - 1)])) + 1));
-if (1 < __144493_17_d) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_frac_mult_intEPhii((__144489_17_u), ((__144497_17_m + __144498_17_n) - 1), __144493_17_d);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_frac_mult_intEPhii(__144495_18_v, __144498_17_n, __144493_17_d);
+__144627_18_v = (__144628_17_shifted_den);
 }
 
-for (__144488_17_j = __144497_17_m; 0 <= __144488_17_j; --__144488_17_j) {
-((__144490_17_result)[__144488_17_j]) = ((unsigned char)(_ZN32_INTERNAL_10_floating_c_7968bde93edg26fp_emul_get_quotient_digitEPhS1_ii((__144489_17_u), __144495_18_v, __144488_17_j, __144498_17_n)));
+__144625_17_d = (__144626_17_b / (((int)(__144627_18_v[(__144630_17_n - 1)])) + 1));
+if (1 < __144625_17_d) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_frac_mult_intEPhii((__144621_17_u), ((__144629_17_m + __144630_17_n) - 1), __144625_17_d);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_frac_mult_intEPhii(__144627_18_v, __144630_17_n, __144625_17_d);
+}
+
+for (__144620_17_j = __144629_17_m; 0 <= __144620_17_j; --__144620_17_j) {
+((__144622_17_result)[__144620_17_j]) = ((unsigned char)(_ZN32_INTERNAL_10_floating_c_7968bde93edg26fp_emul_get_quotient_digitEPhS1_ii((__144621_17_u), __144627_18_v, __144620_17_j, __144630_17_n)));
 
 }
-if ((((int)(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_eq_zeroEPhi((__144489_17_u), (((__144497_17_m + __144498_17_n) - 1) * 8)))) == 0) && ((((unsigned)((__144490_17_result)[0])) == 128U) || (((int)((__144490_17_result)[0])) == 0)))
+if ((((int)(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_eq_zeroEPhi((__144621_17_u), (((__144629_17_m + __144630_17_n) - 1) * 8)))) == 0) && ((((unsigned)((__144622_17_result)[0])) == 128U) || (((int)((__144622_17_result)[0])) == 0)))
 {
 
 
-++((__144490_17_result)[0]);
+++((__144622_17_result)[0]);
 }
 
-if (1 < __144493_17_d) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_div_intEPhii(__144495_18_v, __144498_17_n, __144493_17_d);
+if (1 < __144625_17_d) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_div_intEPhii(__144627_18_v, __144630_17_n, __144625_17_d);
 }
-(__144479_39_num->exponent) -= (__144480_39_den->exponent);
-(__144479_39_num->exponent) += 8;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg24copy_accum_and_normalizeEPNS0_12an_fp_binaryEPhi(__144479_39_num, (__144490_17_result), __144492_17_rwidth); 
+(__144611_39_num->exponent) -= (__144612_39_den->exponent);
+(__144611_39_num->exponent) += 8;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg24copy_accum_and_normalizeEPNS0_12an_fp_binaryEPhi(__144611_39_num, (__144622_17_result), __144624_17_rwidth); 
 }
 
 
-static int _ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_to_intEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__144538_41_val)
+static int _ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_to_intEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__144670_41_val)
 
 
 
 
 {
-auto int __144544_7_res = 0;
-if ((__144538_41_val->exponent) <= 0) {
+auto int __144676_7_res = 0;
+if ((__144670_41_val->exponent) <= 0) {
 
-} else  { if ((__144538_41_val->exponent) <= (((__144538_41_val->precision) % 8) ? ((__144538_41_val->precision) % 8) : 8)) {
+} else  { if ((__144670_41_val->exponent) <= (((__144670_41_val->precision) % 8) ? ((__144670_41_val->precision) % 8) : 8)) {
 
-__144544_7_res = (((int)(((__144538_41_val->frac))[(((((__144538_41_val->precision) + 8) - 1) / 8) - 1)])) >> ((((__144538_41_val->precision) % 8) ? ((__144538_41_val->precision) % 8) : 8) - (__144538_41_val->exponent)));
+__144676_7_res = (((int)(((__144670_41_val->frac))[(((((__144670_41_val->precision) + 8) - 1) / 8) - 1)])) >> ((((__144670_41_val->precision) % 8) ? ((__144670_41_val->precision) % 8) : 8) - (__144670_41_val->exponent)));
 
 } else  {
 
 
-__144544_7_res = (((int)(((__144538_41_val->frac))[(((((__144538_41_val->precision) + 8) - 1) / 8) - 1)])) << ((__144538_41_val->exponent) - (((__144538_41_val->precision) % 8) ? ((__144538_41_val->precision) % 8) : 8)));
+__144676_7_res = (((int)(((__144670_41_val->frac))[(((((__144670_41_val->precision) + 8) - 1) / 8) - 1)])) << ((__144670_41_val->exponent) - (((__144670_41_val->precision) % 8) ? ((__144670_41_val->precision) % 8) : 8)));
 
-__144544_7_res += (((int)(((__144538_41_val->frac))[(((((__144538_41_val->precision) + 8) - 1) / 8) - 2)])) >> (8 - ((__144538_41_val->exponent) - (((__144538_41_val->precision) % 8) ? ((__144538_41_val->precision) % 8) : 8))));
+__144676_7_res += (((int)(((__144670_41_val->frac))[(((((__144670_41_val->precision) + 8) - 1) / 8) - 2)])) >> (8 - ((__144670_41_val->exponent) - (((__144670_41_val->precision) % 8) ? ((__144670_41_val->precision) % 8) : 8))));
 
 } }
-return __144544_7_res;
+return __144676_7_res;
 }
 #line 2099
-static int _ZN32_INTERNAL_10_floating_c_7968bde93edg8do_roundEiPc( int __144580_26_idx, 
-char *__144581_27_digits)
+static int _ZN32_INTERNAL_10_floating_c_7968bde93edg8do_roundEiPc( int __144712_26_idx, 
+char *__144713_27_digits)
 #line 2108
 {
-while ((1 <= __144580_26_idx) && (((int)((__144581_27_digits[(__144580_26_idx - 1)])++)) == 57)) {
---__144580_26_idx;
+while ((1 <= __144712_26_idx) && (((int)((__144713_27_digits[(__144712_26_idx - 1)])++)) == 57)) {
+--__144712_26_idx;
 }
-if (__144580_26_idx == 0) {
-(__144581_27_digits[0]) = ((char)49);
+if (__144712_26_idx == 0) {
+(__144713_27_digits[0]) = ((char)49);
 }
-return __144580_26_idx;
+return __144712_26_idx;
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_div_ceilEPNS0_8a_bigintEj( _ZN3edg8a_bigintE *__144600_43_tgt, 
-unsigned __144601_42_divisor)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_div_ceilEPNS0_8a_bigintEj( _ZN3edg8a_bigintE *__144732_43_tgt, 
+unsigned __144733_42_divisor)
 
 
 
 {
-auto unsigned __144606_17_i;
-auto _ZN3edg13a_bigint_uintE __144607_17_tmp = 0ULL;
+auto unsigned __144738_17_i;
+auto _ZN3edg13a_bigint_uintE __144739_17_tmp = 0ULL;
 
-(__144601_42_divisor != 0U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 2128, __T542378376, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-for (__144606_17_i = (__144600_43_tgt->num_words); __144606_17_i != 0U; ) {
---__144606_17_i;
-__144607_17_tmp |= ((unsigned long long)(((__144600_43_tgt->words))[__144606_17_i]));
-(((__144600_43_tgt->words))[__144606_17_i]) = ((_ZN3edg13a_bigint_wordE)(__144607_17_tmp / ((unsigned long long)__144601_42_divisor)));
-__144607_17_tmp = ((__144607_17_tmp % ((unsigned long long)__144601_42_divisor)) << 32);
+(__144733_42_divisor != 0U) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 2128, __T809810712, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+for (__144738_17_i = (__144732_43_tgt->num_words); __144738_17_i != 0U; ) {
+--__144738_17_i;
+__144739_17_tmp |= ((unsigned long long)(((__144732_43_tgt->words))[__144738_17_i]));
+(((__144732_43_tgt->words))[__144738_17_i]) = ((_ZN3edg13a_bigint_wordE)(__144739_17_tmp / ((unsigned long long)__144733_42_divisor)));
+__144739_17_tmp = ((__144739_17_tmp % ((unsigned long long)__144733_42_divisor)) << 32);
 }
 
-if (__144607_17_tmp != 0ULL) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_add_intEPNS0_8a_bigintEj(__144600_43_tgt, 1U);
+if (__144739_17_tmp != 0ULL) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_add_intEPNS0_8a_bigintEj(__144732_43_tgt, 1U);
 }
 
-while (((__144600_43_tgt->num_words) != 0U) && ((((__144600_43_tgt->words))[((__144600_43_tgt->num_words) - 1U)]) == 0U)) {
---(__144600_43_tgt->num_words);
+while (((__144732_43_tgt->num_words) != 0U) && ((((__144732_43_tgt->words))[((__144732_43_tgt->num_words) - 1U)]) == 0U)) {
+--(__144732_43_tgt->num_words);
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg7bin2decEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEii( _ZN3edg13an_fp_decimalE *__144627_36_dec, 
-_ZN3edg12an_fp_binaryE *__144628_36_bin, 
-int __144629_35_ndigits, 
-int __144630_35_scale)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg7bin2decEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEii( _ZN3edg13an_fp_decimalE *__144759_36_dec, 
+_ZN3edg12an_fp_binaryE *__144760_36_bin, 
+int __144761_35_ndigits, 
+int __144762_35_scale)
 #line 2160
 {
-auto int __144642_12_digit;
-auto int __144643_12_bin_exp;
-auto int __144644_12_conv_finished = 0;
-auto long __144645_12_result_scale = 0L;
-auto int __144646_12_dig_pos = 0;
-auto int __144647_12_adjust_upper_delta = 0;
-auto long __144648_12_r2 = 0L; auto long __144648_20_r5 = 0L; auto long __144648_28_s2 = 0L; auto long __144648_36_s5 = 0L;
-auto int __144649_12_min_digits = 0;
-auto _ZN3edg8a_bigintE *__144650_13_residual;
-auto _ZN3edg8a_bigintE *__144651_13_divisor;
-auto _ZN3edg8a_bigintE *__144652_13_delta;
-auto _ZN3edg8a_bigintE *__144653_13_temp0;
-auto _ZN3edg8a_bigintE *__144654_13_temp1;
-auto _ZN3edg8a_bigintE *__144655_13_tmp = ((_ZN3edg8a_bigintE *)0);
+auto int __144774_12_digit;
+auto int __144775_12_bin_exp;
+auto int __144776_12_conv_finished = 0;
+auto long __144777_12_result_scale = 0L;
+auto int __144778_12_dig_pos = 0;
+auto int __144779_12_adjust_upper_delta = 0;
+auto long __144780_12_r2 = 0L; auto long __144780_20_r5 = 0L; auto long __144780_28_s2 = 0L; auto long __144780_36_s5 = 0L;
+auto int __144781_12_min_digits = 0;
+auto _ZN3edg8a_bigintE *__144782_13_residual;
+auto _ZN3edg8a_bigintE *__144783_13_divisor;
+auto _ZN3edg8a_bigintE *__144784_13_delta;
+auto _ZN3edg8a_bigintE *__144785_13_temp0;
+auto _ZN3edg8a_bigintE *__144786_13_temp1;
+auto _ZN3edg8a_bigintE *__144787_13_tmp = ((_ZN3edg8a_bigintE *)0);
 #line 2169
-__144650_13_residual = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
-__144651_13_divisor = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
-__144652_13_delta = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
-__144653_13_temp0 = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
-__144654_13_temp1 = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
+__144782_13_residual = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
+__144783_13_divisor = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
+__144784_13_delta = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
+__144785_13_temp0 = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
+__144786_13_temp1 = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
 
 
-(!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_eq_zeroEPhi(((__144628_36_bin->frac)), (__144628_36_bin->precision)))) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 2176
+(!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_eq_zeroEPhi(((__144760_36_bin->frac)), (__144760_36_bin->precision)))) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"
 #line 2176
-, __T542381328, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+), 2176, __T809813672, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
 
-__144643_12_bin_exp = ((__144628_36_bin->exponent) - (__144628_36_bin->precision));
-if (__144643_12_bin_exp == 0) {
+__144775_12_bin_exp = ((__144760_36_bin->exponent) - (__144760_36_bin->precision));
+if (__144775_12_bin_exp == 0) {
 
-} else  { if (__144643_12_bin_exp < 0) {
+} else  { if (__144775_12_bin_exp < 0) {
 
-__144648_28_s2 += ((long)(-__144643_12_bin_exp));
+__144780_28_s2 += ((long)(-__144775_12_bin_exp));
 } else  {
 
-__144648_12_r2 += ((long)__144643_12_bin_exp);
-if ((__144628_36_bin->precision) == 11) {
+__144780_12_r2 += ((long)__144775_12_bin_exp);
+if ((__144760_36_bin->precision) == 11) {
 
 
 
-__144649_12_min_digits = (((__144628_36_bin->exponent) > 13) ? 5 : 4);
+__144781_12_min_digits = (((__144760_36_bin->exponent) > 13) ? 5 : 4);
 }
 } }
 
 
-__144645_12_result_scale = ((30103L * ((long)(__144628_36_bin->exponent))) / 100000L);
-if (__144645_12_result_scale == 0L) {
+__144777_12_result_scale = ((30103L * ((long)(__144760_36_bin->exponent))) / 100000L);
+if (__144777_12_result_scale == 0L) {
 
-} else  { if (__144645_12_result_scale < 0L) {
-__144648_12_r2 += (-__144645_12_result_scale);
-__144648_20_r5 += (-__144645_12_result_scale);
+} else  { if (__144777_12_result_scale < 0L) {
+__144780_12_r2 += (-__144777_12_result_scale);
+__144780_20_r5 += (-__144777_12_result_scale);
 } else  {
-__144648_28_s2 += __144645_12_result_scale;
-__144648_36_s5 += __144645_12_result_scale;
+__144780_28_s2 += __144777_12_result_scale;
+__144780_36_s5 += __144777_12_result_scale;
 } }
 
-if (__144648_12_r2 == __144648_28_s2) {
+if (__144780_12_r2 == __144780_28_s2) {
 
-} else  { if (__144648_12_r2 < __144648_28_s2) {
-__144648_28_s2 -= __144648_12_r2;
-__144648_12_r2 = 0L;
+} else  { if (__144780_12_r2 < __144780_28_s2) {
+__144780_28_s2 -= __144780_12_r2;
+__144780_12_r2 = 0L;
 } else  {
-__144648_12_r2 -= __144648_28_s2;
-__144648_28_s2 = 0L;
+__144780_12_r2 -= __144780_28_s2;
+__144780_28_s2 = 0L;
 } }
 
 
 
 
-if (_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_frac_eq_min_fracEPhi(((__144628_36_bin->frac)), (__144628_36_bin->precision))) {
-__144647_12_adjust_upper_delta = 1;
+if (_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_frac_eq_min_fracEPhi(((__144760_36_bin->frac)), (__144760_36_bin->precision))) {
+__144779_12_adjust_upper_delta = 1;
 }
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16bigint_from_uintEPNS0_8a_bigintEy(__144652_13_delta, 1ULL);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16bigint_mult_pow5EPNS0_8a_bigintEi(__144652_13_delta, ((int)__144648_20_r5));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi(__144652_13_delta, ((int)__144648_12_r2));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16bigint_from_uintEPNS0_8a_bigintEy(__144784_13_delta, 1ULL);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16bigint_mult_pow5EPNS0_8a_bigintEi(__144784_13_delta, ((int)__144780_20_r5));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi(__144784_13_delta, ((int)__144780_12_r2));
 
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_fp_intEPNS0_8a_bigintEPhi(__144650_13_residual, ((__144628_36_bin->frac)), (__144628_36_bin->precision));
-__144655_13_tmp = (_ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_multEPNS0_8a_bigintES2_(__144650_13_residual, __144652_13_delta));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi(__144655_13_tmp, (1 + __144647_12_adjust_upper_delta));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__144650_13_residual);
-__144650_13_residual = __144655_13_tmp;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_fp_intEPNS0_8a_bigintEPhi(__144782_13_residual, ((__144760_36_bin->frac)), (__144760_36_bin->precision));
+__144787_13_tmp = (_ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_multEPNS0_8a_bigintES2_(__144782_13_residual, __144784_13_delta));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi(__144787_13_tmp, (1 + __144779_12_adjust_upper_delta));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__144782_13_residual);
+__144782_13_residual = __144787_13_tmp;
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16bigint_from_uintEPNS0_8a_bigintEy(__144651_13_divisor, 1ULL);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16bigint_mult_pow5EPNS0_8a_bigintEi(__144651_13_divisor, ((int)__144648_36_s5));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi(__144651_13_divisor, ((int)((__144648_28_s2 + 1L) + ((long)__144647_12_adjust_upper_delta))));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16bigint_from_uintEPNS0_8a_bigintEy(__144783_13_divisor, 1ULL);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16bigint_mult_pow5EPNS0_8a_bigintEi(__144783_13_divisor, ((int)__144780_36_s5));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi(__144783_13_divisor, ((int)((__144780_28_s2 + 1L) + ((long)__144779_12_adjust_upper_delta))));
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_(__144653_13_temp0, __144651_13_divisor);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_div_ceilEPNS0_8a_bigintEj(__144653_13_temp0, 10U);
-while ((_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__144650_13_residual, __144653_13_temp0)) < 0) {
---__144645_12_result_scale;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_mult_intEPNS0_8a_bigintEi(__144650_13_residual, 10);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_mult_intEPNS0_8a_bigintEi(__144652_13_delta, 10);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_(__144785_13_temp0, __144783_13_divisor);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_div_ceilEPNS0_8a_bigintEj(__144785_13_temp0, 10U);
+while ((_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__144782_13_residual, __144785_13_temp0)) < 0) {
+--__144777_12_result_scale;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_mult_intEPNS0_8a_bigintEi(__144782_13_residual, 10);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_mult_intEPNS0_8a_bigintEi(__144784_13_delta, 10);
 }
 
-while ((_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__144651_13_divisor, __144650_13_residual)) <= 0) {
-++__144645_12_result_scale;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_mult_intEPNS0_8a_bigintEi(__144651_13_divisor, 10);
+while ((_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__144783_13_divisor, __144782_13_residual)) <= 0) {
+++__144777_12_result_scale;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_mult_intEPNS0_8a_bigintEi(__144783_13_divisor, 10);
 }
 
-if (__144630_35_scale != 0) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi(__144652_13_delta, __144630_35_scale);
+if (__144762_35_scale != 0) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi(__144784_13_delta, __144762_35_scale);
 }
 
 
-while (!(__144644_12_conv_finished)) {
+while (!(__144776_12_conv_finished)) {
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_mult_intEPNS0_8a_bigintEi(__144650_13_residual, 10);
-__144642_12_digit = (_ZN32_INTERNAL_10_floating_c_7968bde93edg13bigint_divmodEPNS0_8a_bigintES2_(__144650_13_residual, __144651_13_divisor));
-(((((long)__144646_12_dig_pos) < 23L) && (__144642_12_digit >= 0)) && (__144642_12_digit <= 9)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 2263, __T542381328, ((
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_mult_intEPNS0_8a_bigintEi(__144782_13_residual, 10);
+__144774_12_digit = (_ZN32_INTERNAL_10_floating_c_7968bde93edg13bigint_divmodEPNS0_8a_bigintES2_(__144782_13_residual, __144783_13_divisor));
+(((((long)__144778_12_dig_pos) < 23L) && (__144774_12_digit >= 0)) && (__144774_12_digit <= 9)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/floating.c"), 2263, __T809813672, ((
 #line 2263
 _ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-(((__144627_36_dec->digits))[(__144646_12_dig_pos++)]) = ((char)(48 + ((int)((char)__144642_12_digit))));
+(((__144759_36_dec->digits))[(__144778_12_dig_pos++)]) = ((char)(48 + ((int)((char)__144774_12_digit))));
 
-if (__144629_35_ndigits == 0x7fffffff) {
+if (__144761_35_ndigits == 0x7fffffff) {
 
-auto int __144749_11_cmp;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_mult_intEPNS0_8a_bigintEi(__144652_13_delta, 10);
-__144749_11_cmp = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__144650_13_residual, __144652_13_delta));
+auto int __144881_11_cmp;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_mult_intEPNS0_8a_bigintEi(__144784_13_delta, 10);
+__144881_11_cmp = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__144782_13_residual, __144784_13_delta));
 
-if (__144646_12_dig_pos == 1) {
+if (__144778_12_dig_pos == 1) {
 
 }
 
 
 else  {
-if ((__144749_11_cmp < 0) || ((__144749_11_cmp == 0) && ((((int)(((__144628_36_bin->frac))[0])) % 2) == 0))) {
-__144644_12_conv_finished = ((int)(__144646_12_dig_pos >= __144649_12_min_digits));
-if (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_is_zeroEPNS0_8a_bigintE(__144650_13_residual))) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_(__144653_13_temp0, __144650_13_residual);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi(__144653_13_temp0, 1);
+if ((__144881_11_cmp < 0) || ((__144881_11_cmp == 0) && ((((int)(((__144760_36_bin->frac))[0])) % 2) == 0))) {
+__144776_12_conv_finished = ((int)(__144778_12_dig_pos >= __144781_12_min_digits));
+if (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_is_zeroEPNS0_8a_bigintE(__144782_13_residual))) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_(__144785_13_temp0, __144782_13_residual);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi(__144785_13_temp0, 1);
 
-__144749_11_cmp = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__144651_13_divisor, __144653_13_temp0));
-if ((__144749_11_cmp < 0) || ((__144749_11_cmp == 0) && ((__144642_12_digit % 2) != 0))) {
-__144646_12_dig_pos = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8do_roundEiPc(__144646_12_dig_pos, ((__144627_36_dec->digits))));
+__144881_11_cmp = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__144783_13_divisor, __144785_13_temp0));
+if ((__144881_11_cmp < 0) || ((__144881_11_cmp == 0) && ((__144774_12_digit % 2) != 0))) {
+__144778_12_dig_pos = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8do_roundEiPc(__144778_12_dig_pos, ((__144759_36_dec->digits))));
 }
 }
 } else  {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_(__144653_13_temp0, __144650_13_residual);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_addEPNS0_8a_bigintES2_(__144653_13_temp0, __144652_13_delta);
-if (__144647_12_adjust_upper_delta) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_addEPNS0_8a_bigintES2_(__144653_13_temp0, __144652_13_delta);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_bigintEPNS0_8a_bigintES2_(__144785_13_temp0, __144782_13_residual);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_addEPNS0_8a_bigintES2_(__144785_13_temp0, __144784_13_delta);
+if (__144779_12_adjust_upper_delta) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_addEPNS0_8a_bigintES2_(__144785_13_temp0, __144784_13_delta);
 }
 
-__144749_11_cmp = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__144651_13_divisor, __144653_13_temp0));
-if ((__144749_11_cmp < 0) || ((__144749_11_cmp == 0) && ((((int)(((__144628_36_bin->frac))[0])) % 2) == 0))) {
-__144644_12_conv_finished = 1;
-if (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_is_zeroEPNS0_8a_bigintE(__144650_13_residual))) {
-__144646_12_dig_pos = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8do_roundEiPc(__144646_12_dig_pos, ((__144627_36_dec->digits))));
+__144881_11_cmp = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__144783_13_divisor, __144785_13_temp0));
+if ((__144881_11_cmp < 0) || ((__144881_11_cmp == 0) && ((((int)(((__144760_36_bin->frac))[0])) % 2) == 0))) {
+__144776_12_conv_finished = 1;
+if (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_is_zeroEPNS0_8a_bigintE(__144782_13_residual))) {
+__144778_12_dig_pos = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8do_roundEiPc(__144778_12_dig_pos, ((__144759_36_dec->digits))));
 }
 }
 }
 }
-} else  { if (__144646_12_dig_pos == (__144629_35_ndigits + 1)) {
+} else  { if (__144778_12_dig_pos == (__144761_35_ndigits + 1)) {
 
-__144644_12_conv_finished = 1;
---__144646_12_dig_pos;
-if (((int)(((__144627_36_dec->digits))[__144646_12_dig_pos])) < 53) {
+__144776_12_conv_finished = 1;
+--__144778_12_dig_pos;
+if (((int)(((__144759_36_dec->digits))[__144778_12_dig_pos])) < 53) {
 
-} else  { if (((53 < ((int)(((__144627_36_dec->digits))[__144646_12_dig_pos]))) || (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_is_zeroEPNS0_8a_bigintE(__144650_13_residual)))) || (((((int)(((__144627_36_dec->digits))[(__144646_12_dig_pos - 1)])) - 48) % 2) != 0))
+} else  { if (((53 < ((int)(((__144759_36_dec->digits))[__144778_12_dig_pos]))) || (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_is_zeroEPNS0_8a_bigintE(__144782_13_residual)))) || (((((int)(((__144759_36_dec->digits))[(__144778_12_dig_pos - 1)])) - 48) % 2) != 0))
 
 {
-__144646_12_dig_pos = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8do_roundEiPc(__144646_12_dig_pos, ((__144627_36_dec->digits))));
+__144778_12_dig_pos = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8do_roundEiPc(__144778_12_dig_pos, ((__144759_36_dec->digits))));
 } }
 } }
 }
-if (__144646_12_dig_pos == 0) {
-__144646_12_dig_pos = 1;
-++__144645_12_result_scale;
+if (__144778_12_dig_pos == 0) {
+__144778_12_dig_pos = 1;
+++__144777_12_result_scale;
 }
 
-while ((1 < __144646_12_dig_pos) && (((int)(((__144627_36_dec->digits))[(__144646_12_dig_pos - 1)])) == 48)) {
---__144646_12_dig_pos;
+while ((1 < __144778_12_dig_pos) && (((int)(((__144759_36_dec->digits))[(__144778_12_dig_pos - 1)])) == 48)) {
+--__144778_12_dig_pos;
 }
 
-(__144627_36_dec->is_negative) = (__144628_36_bin->is_negative);
-(__144627_36_dec->exponent) = ((int)__144645_12_result_scale);
-(((__144627_36_dec->digits))[__144646_12_dig_pos]) = ((char)0);
-(__144627_36_dec->ndigits) = __144646_12_dig_pos;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__144654_13_temp1);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__144653_13_temp0);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__144652_13_delta);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__144651_13_divisor);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__144650_13_residual); 
+(__144759_36_dec->is_negative) = (__144760_36_bin->is_negative);
+(__144759_36_dec->exponent) = ((int)__144777_12_result_scale);
+(((__144759_36_dec->digits))[__144778_12_dig_pos]) = ((char)0);
+(__144759_36_dec->ndigits) = __144778_12_dig_pos;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__144786_13_temp1);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__144785_13_temp0);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__144784_13_delta);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__144783_13_divisor);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__144782_13_residual); 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg11adjust_downEPNS0_12an_fp_binaryEPNS0_8a_bigintES4_i( _ZN3edg12an_fp_binaryE *__144820_39_bin, 
-_ZN3edg8a_bigintE *__144821_39_err, 
-_ZN3edg8a_bigintE *__144822_39_eps, 
-int __144823_38_scale)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg11adjust_downEPNS0_12an_fp_binaryEPNS0_8a_bigintES4_i( _ZN3edg12an_fp_binaryE *__144952_39_bin, 
+_ZN3edg8a_bigintE *__144953_39_err, 
+_ZN3edg8a_bigintE *__144954_39_eps, 
+int __144955_38_scale)
 #line 2349
 {
-auto int __144831_7_adjust;
-auto int __144832_7_underflow;
+auto int __144963_7_adjust;
+auto int __144964_7_underflow;
 #line 2350
-__144831_7_adjust = (_ZN32_INTERNAL_10_floating_c_7968bde93edg13bigint_divmodEPNS0_8a_bigintES2_(__144821_39_err, __144822_39_eps));
-__144832_7_underflow = (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_sub_intEPhii(((__144820_39_bin->frac)), (__144820_39_bin->precision), (__144831_7_adjust / 2)));
+__144963_7_adjust = (_ZN32_INTERNAL_10_floating_c_7968bde93edg13bigint_divmodEPNS0_8a_bigintES2_(__144953_39_err, __144954_39_eps));
+__144964_7_underflow = (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_sub_intEPhii(((__144952_39_bin->frac)), (__144952_39_bin->precision), (__144963_7_adjust / 2)));
 
-if (__144832_7_underflow != 0) {
+if (__144964_7_underflow != 0) {
 #line 2363
-__144831_7_adjust = ((2 * __144832_7_underflow) + (__144831_7_adjust % 2));
+__144963_7_adjust = ((2 * __144964_7_underflow) + (__144963_7_adjust % 2));
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_shift_rightEPNS0_8a_bigintEi(__144822_39_eps, 1);
-if (0 < (_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__144821_39_err, __144822_39_eps))) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_subEPNS0_8a_bigintES2_(__144821_39_err, __144822_39_eps);
-++__144831_7_adjust;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_shift_rightEPNS0_8a_bigintEi(__144954_39_eps, 1);
+if (0 < (_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__144953_39_err, __144954_39_eps))) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_subEPNS0_8a_bigintES2_(__144953_39_err, __144954_39_eps);
+++__144963_7_adjust;
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_maxEPhi(((__144820_39_bin->frac)), (__144820_39_bin->precision));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_maxEPhi(((__144952_39_bin->frac)), (__144952_39_bin->precision));
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_sub_intEPhii(((__144820_39_bin->frac)), (__144820_39_bin->precision), (__144831_7_adjust - 1));
-__144831_7_adjust = 0;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_sub_intEPhii(((__144952_39_bin->frac)), (__144952_39_bin->precision), (__144963_7_adjust - 1));
+__144963_7_adjust = 0;
 }
-if (__144823_38_scale != 0) {
-auto int __144859_9_tail_to_half; __144859_9_tail_to_half = (_ZN32_INTERNAL_10_floating_c_7968bde93edg24fp_frac_cmp_tail_to_halfEPhii(((__144820_39_bin->frac)), (__144820_39_bin->precision), __144823_38_scale));
+if (__144955_38_scale != 0) {
+auto int __144991_9_tail_to_half; __144991_9_tail_to_half = (_ZN32_INTERNAL_10_floating_c_7968bde93edg24fp_frac_cmp_tail_to_halfEPhii(((__144952_39_bin->frac)), (__144952_39_bin->precision), __144955_38_scale));
 
-if ((0 < __144859_9_tail_to_half) || ((((__144859_9_tail_to_half == 0) && (_ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_is_zeroEPNS0_8a_bigintE(__144821_39_err))) && ((__144831_7_adjust % 2) == 0)) && ((((__144820_39_bin->precision) <= __144823_38_scale) ? 0U : (((unsigned)(*(((
+if ((0 < __144991_9_tail_to_half) || ((((__144991_9_tail_to_half == 0) && (_ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_is_zeroEPNS0_8a_bigintE(__144953_39_err))) && ((__144963_7_adjust % 2) == 0)) && ((((__144952_39_bin->precision) <= __144955_38_scale) ? 0U : (((unsigned)(*(((
 #line 2380
-__144820_39_bin->frac)) + (__144823_38_scale / 8)))) & (1U << (__144823_38_scale % 8)))) != 0U)))
+__144952_39_bin->frac)) + (__144955_38_scale / 8)))) & (1U << (__144955_38_scale % 8)))) != 0U)))
 
 
 
 {
-if (__144823_38_scale == (__144820_39_bin->precision)) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_maxEPhi(((__144820_39_bin->frac)), (__144820_39_bin->precision));
-__144832_7_underflow = 1;
-} else  { if (_ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_add_one_at_posEPhii(((__144820_39_bin->frac)), (__144820_39_bin->precision), __144823_38_scale)) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg33fp_frac_shift_right_with_high_bitEPhi(((__144820_39_bin->frac)), (__144820_39_bin->precision));
---__144823_38_scale;
+if (__144955_38_scale == (__144952_39_bin->precision)) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_maxEPhi(((__144952_39_bin->frac)), (__144952_39_bin->precision));
+__144964_7_underflow = 1;
+} else  { if (_ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_add_one_at_posEPhii(((__144952_39_bin->frac)), (__144952_39_bin->precision), __144955_38_scale)) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg33fp_frac_shift_right_with_high_bitEPhi(((__144952_39_bin->frac)), (__144952_39_bin->precision));
+--__144955_38_scale;
 } }
 }
-} else  { if (_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_frac_eq_min_fracEPhi(((__144820_39_bin->frac)), (__144820_39_bin->precision))) {
-auto int __144875_9_error_to_eps;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi(__144821_39_err, 1);
-__144875_9_error_to_eps = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__144821_39_err, __144822_39_eps));
-if (((__144831_7_adjust % 2) != 0) || (0 < __144875_9_error_to_eps)) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_maxEPhi(((__144820_39_bin->frac)), (__144820_39_bin->precision));
---(__144820_39_bin->exponent);
-if (((__144831_7_adjust % 2) != 0) && (0 <= __144875_9_error_to_eps)) {
---(((__144820_39_bin->frac))[0]);
+} else  { if (_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_frac_eq_min_fracEPhi(((__144952_39_bin->frac)), (__144952_39_bin->precision))) {
+auto int __145007_9_error_to_eps;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi(__144953_39_err, 1);
+__145007_9_error_to_eps = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__144953_39_err, __144954_39_eps));
+if (((__144963_7_adjust % 2) != 0) || (0 < __145007_9_error_to_eps)) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_maxEPhi(((__144952_39_bin->frac)), (__144952_39_bin->precision));
+--(__144952_39_bin->exponent);
+if (((__144963_7_adjust % 2) != 0) && (0 <= __145007_9_error_to_eps)) {
+--(((__144952_39_bin->frac))[0]);
 }
 }
-} else  { if ((((__144820_39_bin->precision) <= 0) ? 0U : (((unsigned)(*(((__144820_39_bin->frac)) + 0))) & 1U)) == 0U) {
-if (((__144831_7_adjust % 2) != 0) && (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_is_zeroEPNS0_8a_bigintE(__144821_39_err)))) {
-if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_sub_intEPhii(((__144820_39_bin->frac)), (__144820_39_bin->precision), 1)) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_maxEPhi(((__144820_39_bin->frac)), (__144820_39_bin->precision));
-__144832_7_underflow = 1;
+} else  { if ((((__144952_39_bin->precision) <= 0) ? 0U : (((unsigned)(*(((__144952_39_bin->frac)) + 0))) & 1U)) == 0U) {
+if (((__144963_7_adjust % 2) != 0) && (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_is_zeroEPNS0_8a_bigintE(__144953_39_err)))) {
+if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_sub_intEPhii(((__144952_39_bin->frac)), (__144952_39_bin->precision), 1)) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_maxEPhi(((__144952_39_bin->frac)), (__144952_39_bin->precision));
+__144964_7_underflow = 1;
 }
 }
-} else  { if ((__144831_7_adjust % 2) != 0) {
---(((__144820_39_bin->frac))[0]);
+} else  { if ((__144963_7_adjust % 2) != 0) {
+--(((__144952_39_bin->frac))[0]);
 } } } }
-if (__144832_7_underflow == 0) {
+if (__144964_7_underflow == 0) {
 
-} else  { if (__144823_38_scale != 0) {
---__144823_38_scale;
+} else  { if (__144955_38_scale != 0) {
+--__144955_38_scale;
 } else  {
---(__144820_39_bin->exponent);
+--(__144952_39_bin->exponent);
 } }
-(__144820_39_bin->exponent) -= __144823_38_scale; 
+(__144952_39_bin->exponent) -= __144955_38_scale; 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg9adjust_upEPNS0_12an_fp_binaryEPNS0_8a_bigintES4_i( _ZN3edg12an_fp_binaryE *__144906_37_bin, 
-_ZN3edg8a_bigintE *__144907_37_err, 
-_ZN3edg8a_bigintE *__144908_37_eps, 
-int __144909_36_scale)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg9adjust_upEPNS0_12an_fp_binaryEPNS0_8a_bigintES4_i( _ZN3edg12an_fp_binaryE *__145038_37_bin, 
+_ZN3edg8a_bigintE *__145039_37_err, 
+_ZN3edg8a_bigintE *__145040_37_eps, 
+int __145041_36_scale)
 #line 2435
 {
-auto int __144917_7_tail_to_half;
-auto int __144918_7_adjust;
-auto int __144919_7_overflow;
+auto int __145049_7_tail_to_half;
+auto int __145050_7_adjust;
+auto int __145051_7_overflow;
 #line 2437
-__144918_7_adjust = (_ZN32_INTERNAL_10_floating_c_7968bde93edg13bigint_divmodEPNS0_8a_bigintES2_(__144907_37_err, __144908_37_eps));
-__144919_7_overflow = ((int)(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_add_intEPhii(((__144906_37_bin->frac)), (__144906_37_bin->precision), (__144918_7_adjust / 2))));
+__145050_7_adjust = (_ZN32_INTERNAL_10_floating_c_7968bde93edg13bigint_divmodEPNS0_8a_bigintES2_(__145039_37_err, __145040_37_eps));
+__145051_7_overflow = ((int)(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_add_intEPhii(((__145038_37_bin->frac)), (__145038_37_bin->precision), (__145050_7_adjust / 2))));
 
 
 
-if (__144909_36_scale != 0) {
-if ((__144919_7_overflow != 0) && ((__144906_37_bin->precision) < __144909_36_scale)) {
-__144917_7_tail_to_half = ((_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_eq_zeroEPhi(((__144906_37_bin->frac)), (__144906_37_bin->precision))) ? 0 : 1);
+if (__145041_36_scale != 0) {
+if ((__145051_7_overflow != 0) && ((__145038_37_bin->precision) < __145041_36_scale)) {
+__145049_7_tail_to_half = ((_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_frac_eq_zeroEPhi(((__145038_37_bin->frac)), (__145038_37_bin->precision))) ? 0 : 1);
 } else  {
-__144917_7_tail_to_half = (_ZN32_INTERNAL_10_floating_c_7968bde93edg24fp_frac_cmp_tail_to_halfEPhii(((__144906_37_bin->frac)), (__144906_37_bin->precision), __144909_36_scale));
+__145049_7_tail_to_half = (_ZN32_INTERNAL_10_floating_c_7968bde93edg24fp_frac_cmp_tail_to_halfEPhii(((__145038_37_bin->frac)), (__145038_37_bin->precision), __145041_36_scale));
 
 }
-if ((__144917_7_tail_to_half == 0) && ((__144918_7_adjust % 2) != 0)) {
-__144917_7_tail_to_half = 1;
+if ((__145049_7_tail_to_half == 0) && ((__145050_7_adjust % 2) != 0)) {
+__145049_7_tail_to_half = 1;
 }
-} else  { if (__144919_7_overflow != 0) {
-__144917_7_tail_to_half = (_ZN32_INTERNAL_10_floating_c_7968bde93edg24fp_frac_cmp_tail_to_halfEPhii(((__144906_37_bin->frac)), (__144906_37_bin->precision), __144919_7_overflow));
+} else  { if (__145051_7_overflow != 0) {
+__145049_7_tail_to_half = (_ZN32_INTERNAL_10_floating_c_7968bde93edg24fp_frac_cmp_tail_to_halfEPhii(((__145038_37_bin->frac)), (__145038_37_bin->precision), __145051_7_overflow));
 
-if ((__144917_7_tail_to_half == 0) && ((__144918_7_adjust % 2) != 0)) {
-__144917_7_tail_to_half = 1;
+if ((__145049_7_tail_to_half == 0) && ((__145050_7_adjust % 2) != 0)) {
+__145049_7_tail_to_half = 1;
 }
-} else  { if ((__144918_7_adjust % 2) == 0) {
-__144917_7_tail_to_half = (-1);
+} else  { if ((__145050_7_adjust % 2) == 0) {
+__145049_7_tail_to_half = (-1);
 } else  {
-__144917_7_tail_to_half = 0;
+__145049_7_tail_to_half = 0;
 } } }
-if ((0 < __144917_7_tail_to_half) || ((__144917_7_tail_to_half == 0) && ((!(_ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_is_zeroEPNS0_8a_bigintE(__144907_37_err))) || ((((__144906_37_bin->precision) <= (__144909_36_scale + __144919_7_overflow)) ? 0U : (((unsigned)(*(((__144906_37_bin->frac)) + 
+if ((0 < __145049_7_tail_to_half) || ((__145049_7_tail_to_half == 0) && ((!(_ZN32_INTERNAL_10_floating_c_7968bde93edg14bigint_is_zeroEPNS0_8a_bigintE(__145039_37_err))) || ((((__145038_37_bin->precision) <= (__145041_36_scale + __145051_7_overflow)) ? 0U : (((unsigned)(*(((__145038_37_bin->frac)) + 
 #line 2463
-((__144909_36_scale + __144919_7_overflow) / 8)))) & (1U << ((__144909_36_scale + __144919_7_overflow) % 8)))) != 0U))))
+((__145041_36_scale + __145051_7_overflow) / 8)))) & (1U << ((__145041_36_scale + __145051_7_overflow) % 8)))) != 0U))))
 
 
 {
 
 
 
-if ((__144906_37_bin->precision) <= __144909_36_scale) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_minEPhi(((__144906_37_bin->frac)), (__144906_37_bin->precision));
---__144909_36_scale;
-} else  { if (_ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_add_one_at_posEPhii(((__144906_37_bin->frac)), (__144906_37_bin->precision), __144909_36_scale)) {
-++__144919_7_overflow;
+if ((__145038_37_bin->precision) <= __145041_36_scale) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_minEPhi(((__145038_37_bin->frac)), (__145038_37_bin->precision));
+--__145041_36_scale;
+} else  { if (_ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_add_one_at_posEPhii(((__145038_37_bin->frac)), (__145038_37_bin->precision), __145041_36_scale)) {
+++__145051_7_overflow;
 } }
 }
-while ((__144919_7_overflow--) != 0) {
+while ((__145051_7_overflow--) != 0) {
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg33fp_frac_shift_right_with_high_bitEPhi(((__144906_37_bin->frac)), (__144906_37_bin->precision));
-++(__144906_37_bin->exponent);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg33fp_frac_shift_right_with_high_bitEPhi(((__145038_37_bin->frac)), (__145038_37_bin->precision));
+++(__145038_37_bin->exponent);
 }
-(__144906_37_bin->exponent) -= __144909_36_scale; 
+(__145038_37_bin->exponent) -= __145041_36_scale; 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi( _ZN3edg12an_fp_binaryE *__144968_42_bin, 
-_ZN3edg19an_fp_decimal_inputE *__144969_42_dec, 
-int __144970_41_scale)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi( _ZN3edg12an_fp_binaryE *__145100_42_bin, 
+_ZN3edg19an_fp_decimal_inputE *__145101_42_dec, 
+int __145102_41_scale)
 #line 2498
 {
-auto int __144980_12_exp;
-auto int __144981_12_decimal_to_binary;
-auto int __144982_12_error_to_eps;
-auto int __144983_12_b2 = 0; auto int __144983_20_b5 = 0; auto int __144983_28_d2; auto int __144983_40_d5 = 0;
-auto _ZN3edg8a_bigintE *__144984_13_tmp;
-auto _ZN3edg8a_bigintE *__144985_13_decimal;
-auto _ZN3edg8a_bigintE *__144986_13_binary;
-auto _ZN3edg8a_bigintE *__144987_13_eps;
-auto _ZN3edg8a_bigintE *__144988_13_err;
+auto int __145112_12_exp;
+auto int __145113_12_decimal_to_binary;
+auto int __145114_12_error_to_eps;
+auto int __145115_12_b2 = 0; auto int __145115_20_b5 = 0; auto int __145115_28_d2; auto int __145115_40_d5 = 0;
+auto _ZN3edg8a_bigintE *__145116_13_tmp;
+auto _ZN3edg8a_bigintE *__145117_13_decimal;
+auto _ZN3edg8a_bigintE *__145118_13_binary;
+auto _ZN3edg8a_bigintE *__145119_13_eps;
+auto _ZN3edg8a_bigintE *__145120_13_err;
 #line 2502
-__144983_28_d2 = __144970_41_scale;
+__145115_28_d2 = __145102_41_scale;
 
-__144985_13_decimal = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
-__144986_13_binary = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
-__144987_13_eps = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
-__144988_13_err = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
+__145117_13_decimal = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
+__145118_13_binary = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
+__145119_13_eps = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
+__145120_13_err = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10new_bigintEv());
 
 
-__144980_12_exp = ((__144969_42_dec->exponent) - (__144969_42_dec->precision));
-if (__144980_12_exp < 0) {
-__144983_12_b2 = (__144983_20_b5 = (-__144980_12_exp));
-} else  { if (0 < __144980_12_exp) {
-__144983_28_d2 += __144980_12_exp;
-__144983_40_d5 += __144980_12_exp;
+__145112_12_exp = ((__145101_42_dec->exponent) - (__145101_42_dec->precision));
+if (__145112_12_exp < 0) {
+__145115_12_b2 = (__145115_20_b5 = (-__145112_12_exp));
+} else  { if (0 < __145112_12_exp) {
+__145115_28_d2 += __145112_12_exp;
+__145115_40_d5 += __145112_12_exp;
 } }
-__144980_12_exp = ((__144968_42_bin->exponent) - (__144968_42_bin->precision));
-if (__144980_12_exp < 0) {
-__144983_28_d2 += (-__144980_12_exp);
-} else  { if (0 < __144980_12_exp) {
-__144983_12_b2 += __144980_12_exp;
-if (((__144968_42_bin->precision) == 11) && ((__144969_42_dec->exponent) == (__144969_42_dec->precision))) {
-__144983_28_d2 += __144980_12_exp;
+__145112_12_exp = ((__145100_42_bin->exponent) - (__145100_42_bin->precision));
+if (__145112_12_exp < 0) {
+__145115_28_d2 += (-__145112_12_exp);
+} else  { if (0 < __145112_12_exp) {
+__145115_12_b2 += __145112_12_exp;
+if (((__145100_42_bin->precision) == 11) && ((__145101_42_dec->exponent) == (__145101_42_dec->precision))) {
+__145115_28_d2 += __145112_12_exp;
 }
 } }
 
-if (__144983_12_b2 <= __144983_28_d2) {
-__144983_28_d2 -= __144983_12_b2;
-__144983_12_b2 = 0;
+if (__145115_12_b2 <= __145115_28_d2) {
+__145115_28_d2 -= __145115_12_b2;
+__145115_12_b2 = 0;
 } else  {
-__144983_12_b2 -= __144983_28_d2;
-__144983_28_d2 = 0;
+__145115_12_b2 -= __145115_28_d2;
+__145115_28_d2 = 0;
 }
 
-++__144983_12_b2;
-++__144983_28_d2;
+++__145115_12_b2;
+++__145115_28_d2;
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16bigint_from_uintEPNS0_8a_bigintEy(__144987_13_eps, 1ULL);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16bigint_mult_pow5EPNS0_8a_bigintEi(__144987_13_eps, __144983_20_b5);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi(__144987_13_eps, (__144983_12_b2 - 1));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_fp_intEPNS0_8a_bigintEPhi(__144986_13_binary, ((__144968_42_bin->frac)), (__144968_42_bin->precision));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi(__144986_13_binary, 1);
-__144984_13_tmp = (_ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_multEPNS0_8a_bigintES2_(__144986_13_binary, __144987_13_eps));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__144986_13_binary);
-__144986_13_binary = __144984_13_tmp;
-__144984_13_tmp = ((_ZN3edg8a_bigintE *)0);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg20bigint_from_dec_mantEPNS0_8a_bigintEPNS0_19an_fp_decimal_inputE(__144985_13_decimal, __144969_42_dec);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16bigint_mult_pow5EPNS0_8a_bigintEi(__144985_13_decimal, __144983_40_d5);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi(__144985_13_decimal, __144983_28_d2);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16bigint_from_uintEPNS0_8a_bigintEy(__145119_13_eps, 1ULL);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16bigint_mult_pow5EPNS0_8a_bigintEi(__145119_13_eps, __145115_20_b5);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi(__145119_13_eps, (__145115_12_b2 - 1));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18bigint_from_fp_intEPNS0_8a_bigintEPhi(__145118_13_binary, ((__145100_42_bin->frac)), (__145100_42_bin->precision));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi(__145118_13_binary, 1);
+__145116_13_tmp = (_ZN32_INTERNAL_10_floating_c_7968bde93edg11bigint_multEPNS0_8a_bigintES2_(__145118_13_binary, __145119_13_eps));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__145118_13_binary);
+__145118_13_binary = __145116_13_tmp;
+__145116_13_tmp = ((_ZN3edg8a_bigintE *)0);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg20bigint_from_dec_mantEPNS0_8a_bigintEPNS0_19an_fp_decimal_inputE(__145117_13_decimal, __145101_42_dec);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16bigint_mult_pow5EPNS0_8a_bigintEi(__145117_13_decimal, __145115_40_d5);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi(__145117_13_decimal, __145115_28_d2);
 
-__144981_12_decimal_to_binary = (_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_abs_diffEPNS0_8a_bigintES2_S2_(__144988_13_err, __144985_13_decimal, __144986_13_binary));
-__144982_12_error_to_eps = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__144988_13_err, __144987_13_eps));
-if ((__144982_12_error_to_eps < 0) && (__144970_41_scale == 0)) {
+__145113_12_decimal_to_binary = (_ZN32_INTERNAL_10_floating_c_7968bde93edg15bigint_abs_diffEPNS0_8a_bigintES2_S2_(__145120_13_err, __145117_13_decimal, __145118_13_binary));
+__145114_12_error_to_eps = (_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__145120_13_err, __145119_13_eps));
+if ((__145114_12_error_to_eps < 0) && (__145102_41_scale == 0)) {
 
 
-if ((__144981_12_decimal_to_binary < 0) && (((int)(_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_frac_eq_min_fracEPhi(((__144968_42_bin->frac)), (__144968_42_bin->precision)))) != 0))
+if ((__145113_12_decimal_to_binary < 0) && (((int)(_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_frac_eq_min_fracEPhi(((__145100_42_bin->frac)), (__145100_42_bin->precision)))) != 0))
 {
 
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi(__144988_13_err, 1);
-if (0 < (_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__144988_13_err, __144987_13_eps))) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_maxEPhi(((__144968_42_bin->frac)), (__144968_42_bin->precision));
---(__144968_42_bin->exponent);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg17bigint_shift_leftEPNS0_8a_bigintEi(__145120_13_err, 1);
+if (0 < (_ZN32_INTERNAL_10_floating_c_7968bde93edg10bigint_cmpEPNS0_8a_bigintES2_(__145120_13_err, __145119_13_eps))) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_maxEPhi(((__145100_42_bin->frac)), (__145100_42_bin->precision));
+--(__145100_42_bin->exponent);
 }
 }
 } else  {
 #line 2573
-if (__144981_12_decimal_to_binary < 0) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11adjust_downEPNS0_12an_fp_binaryEPNS0_8a_bigintES4_i(__144968_42_bin, __144988_13_err, __144987_13_eps, __144970_41_scale);
-} else  { if (0 < __144981_12_decimal_to_binary) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg9adjust_upEPNS0_12an_fp_binaryEPNS0_8a_bigintES4_i(__144968_42_bin, __144988_13_err, __144987_13_eps, __144970_41_scale);
+if (__145113_12_decimal_to_binary < 0) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11adjust_downEPNS0_12an_fp_binaryEPNS0_8a_bigintES4_i(__145100_42_bin, __145120_13_err, __145119_13_eps, __145102_41_scale);
+} else  { if (0 < __145113_12_decimal_to_binary) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg9adjust_upEPNS0_12an_fp_binaryEPNS0_8a_bigintES4_i(__145100_42_bin, __145120_13_err, __145119_13_eps, __145102_41_scale);
 } else  {
-(__144968_42_bin->exponent) -= __144970_41_scale;
+(__145100_42_bin->exponent) -= __145102_41_scale;
 } }
 }
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__144988_13_err);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__144987_13_eps);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__144986_13_binary);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__144985_13_decimal); 
+_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__145120_13_err);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__145119_13_eps);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__145118_13_binary);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg13delete_bigintEPNS0_8a_bigintE(__145117_13_decimal); 
 }
 
 
-static enum _ZN3edg17an_fp_return_typeE _ZN32_INTERNAL_10_floating_c_7968bde93edg8n_strcpyEPcPKcy( char *__145070_49_tgt, 
-_ZN3edg12a_const_charE *__145071_49_src, 
-size_t __145072_48_size)
+static enum _ZN3edg17an_fp_return_typeE _ZN32_INTERNAL_10_floating_c_7968bde93edg8n_strcpyEPcPKcy( char *__145202_49_tgt, 
+_ZN3edg12a_const_charE *__145203_49_src, 
+size_t __145204_48_size)
 
 
 
 
 {
-auto char *__145078_22_last;
-auto enum _ZN3edg17an_fp_return_typeE __145079_21_res;
+auto char *__145210_22_last;
+auto enum _ZN3edg17an_fp_return_typeE __145211_21_res;
 #line 2597
-__145078_22_last = (__145070_49_tgt + __145072_48_size);
+__145210_22_last = (__145202_49_tgt + __145204_48_size);
 
 
-while ((__145070_49_tgt < __145078_22_last) && (((int)(*__145071_49_src)) != 0)) {
-(*(__145070_49_tgt++)) = (*(__145071_49_src++));
+while ((__145202_49_tgt < __145210_22_last) && (((int)(*__145203_49_src)) != 0)) {
+(*(__145202_49_tgt++)) = (*(__145203_49_src++));
 }
-if (__145070_49_tgt < __145078_22_last) {
-(*__145070_49_tgt) = ((char)0);
-__145079_21_res = _ZN3edg12fp_ret_validE;
+if (__145202_49_tgt < __145210_22_last) {
+(*__145202_49_tgt) = ((char)0);
+__145211_21_res = _ZN3edg12fp_ret_validE;
 } else  {
-__145079_21_res = _ZN3edg16fp_ret_too_smallE;
+__145211_21_res = _ZN3edg16fp_ret_too_smallE;
 }
-return __145079_21_res;
+return __145211_21_res;
 }
 #line 2618
-static enum _ZN3edg17an_fp_return_typeE _ZN32_INTERNAL_10_floating_c_7968bde93edg6formatEPcyPNS0_13an_fp_decimalE( char *__145099_48_tgt, 
-size_t __145100_47_size, 
-_ZN3edg13an_fp_decimalE *__145101_48_dec)
+static enum _ZN3edg17an_fp_return_typeE _ZN32_INTERNAL_10_floating_c_7968bde93edg6formatEPcyPNS0_13an_fp_decimalE( char *__145231_48_tgt, 
+size_t __145232_47_size, 
+_ZN3edg13an_fp_decimalE *__145233_48_dec)
 #line 2628
 {
-auto enum _ZN3edg17an_fp_return_typeE __145110_21_res = _ZN3edg12fp_ret_validE;
+auto enum _ZN3edg17an_fp_return_typeE __145242_21_res = _ZN3edg12fp_ret_validE;
 
-if (((__145101_48_dec->exponent) <= 0) && ((-3) < (__145101_48_dec->exponent))) {
+if (((__145233_48_dec->exponent) <= 0) && ((-3) < (__145233_48_dec->exponent))) {
 
-auto _ZN3edg15a_number_bufferE __145114_21_tmp_buff; _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEEDpT_((&__145114_21_tmp_buff));
+auto _ZN3edg15a_number_bufferE __145246_21_tmp_buff; _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEEDpT_((&__145246_21_tmp_buff));
 
-_ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_((&__145114_21_tmp_buff), ((const char *)"0."), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg5zerosE) + (8 + (__145101_48_dec->exponent))), ((__145101_48_dec->digits)));
-if (((_ZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6lengthEv((((const struct _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)&__145114_21_tmp_buff)))) + 1ULL) < __145100_47_size) {
-_ZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE15write_to_bufferEPcy((((const struct _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)&__145114_21_tmp_buff)), __145099_48_tgt, __145100_47_size);
+_ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJPKcS8_PcEEEvDpT_((&__145246_21_tmp_buff), ((const char *)"0."), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg5zerosE) + (8 + (__145233_48_dec->exponent))), ((__145233_48_dec->digits)));
+if (((_ZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6lengthEv((((const struct _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)&__145246_21_tmp_buff)))) + 1ULL) < __145232_47_size) {
+_ZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE15write_to_bufferEPcy((((const struct _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)&__145246_21_tmp_buff)), __145231_48_tgt, __145232_47_size);
 } else  {
-__145110_21_res = _ZN3edg16fp_ret_too_smallE;
+__145242_21_res = _ZN3edg16fp_ret_too_smallE;
 }
-{ _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEED1Ev((&(__145114_21_tmp_buff.backing_array))); } } else  { if ((0 < (__145101_48_dec->exponent)) && ((__145101_48_dec->exponent) < 8)) {
+{ _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEED1Ev((&(__145246_21_tmp_buff.backing_array))); } } else  { if ((0 < (__145233_48_dec->exponent)) && ((__145233_48_dec->exponent) < 8)) {
 
-auto long __145124_10_nchars;
-if ((__145101_48_dec->ndigits) <= (__145101_48_dec->exponent)) {
-
-
-
-__145124_10_nchars = ((long)((__145101_48_dec->exponent) + 3));
-} else  {
+auto long __145256_10_nchars;
+if ((__145233_48_dec->ndigits) <= (__145233_48_dec->exponent)) {
 
 
-__145124_10_nchars = ((long)((__145101_48_dec->ndigits) + 2));
-}
-if (__145100_47_size < ((size_t)__145124_10_nchars)) {
-__145110_21_res = _ZN3edg16fp_ret_too_smallE;
-} else  {
-auto int __145138_11_pos;
-for (__145138_11_pos = 0; (__145138_11_pos < (__145101_48_dec->exponent)) && (__145138_11_pos < (__145101_48_dec->ndigits)); ++__145138_11_pos) {
-(*(__145099_48_tgt++)) = (((__145101_48_dec->digits))[__145138_11_pos]);
-}
-for (; __145138_11_pos < (__145101_48_dec->exponent); ++__145138_11_pos) {
-(*(__145099_48_tgt++)) = ((char)48);
-}
-(*(__145099_48_tgt++)) = ((char)46);
-if ((__145101_48_dec->ndigits) <= __145138_11_pos) {
-(*(__145099_48_tgt++)) = ((char)48);
-++__145138_11_pos;
-}
-for (; __145138_11_pos < (__145101_48_dec->ndigits); ++__145138_11_pos) {
-(*(__145099_48_tgt++)) = (((__145101_48_dec->digits))[__145138_11_pos]);
-}
-(*__145099_48_tgt) = ((char)0);
-}
+
+__145256_10_nchars = ((long)((__145233_48_dec->exponent) + 3));
 } else  {
 
-auto _ZN3edg15a_number_bufferE __145157_21_tmp_buff; _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEEDpT_((&__145157_21_tmp_buff));
 
-if ((__145101_48_dec->ndigits) == 1) { auto struct _ZN3edg13a_string_viewE __T543043864;
-_ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_((&__145157_21_tmp_buff), ((_ZN3edg13a_string_viewC1EPKcy((&__T543043864), ((_ZN3edg12a_const_charE *)((__145101_48_dec->digits))), 1ULL)) , __T543043864), ((const
+__145256_10_nchars = ((long)((__145233_48_dec->ndigits) + 2));
+}
+if (__145232_47_size < ((size_t)__145256_10_nchars)) {
+__145242_21_res = _ZN3edg16fp_ret_too_smallE;
+} else  {
+auto int __145270_11_pos;
+for (__145270_11_pos = 0; (__145270_11_pos < (__145233_48_dec->exponent)) && (__145270_11_pos < (__145233_48_dec->ndigits)); ++__145270_11_pos) {
+(*(__145231_48_tgt++)) = (((__145233_48_dec->digits))[__145270_11_pos]);
+}
+for (; __145270_11_pos < (__145233_48_dec->exponent); ++__145270_11_pos) {
+(*(__145231_48_tgt++)) = ((char)48);
+}
+(*(__145231_48_tgt++)) = ((char)46);
+if ((__145233_48_dec->ndigits) <= __145270_11_pos) {
+(*(__145231_48_tgt++)) = ((char)48);
+++__145270_11_pos;
+}
+for (; __145270_11_pos < (__145233_48_dec->ndigits); ++__145270_11_pos) {
+(*(__145231_48_tgt++)) = (((__145233_48_dec->digits))[__145270_11_pos]);
+}
+(*__145231_48_tgt) = ((char)0);
+}
+} else  {
+
+auto _ZN3edg15a_number_bufferE __145289_21_tmp_buff; _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEC1IJEEEDpT_((&__145289_21_tmp_buff));
+
+if ((__145233_48_dec->ndigits) == 1) { auto struct _ZN3edg13a_string_viewE __T810504064;
+_ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKciEEEvDpT_((&__145289_21_tmp_buff), ((_ZN3edg13a_string_viewC1EPKcy((&__T810504064), ((_ZN3edg12a_const_charE *)((__145233_48_dec->digits))), 1ULL)) , __T810504064), ((const
 #line 2679
- char *)".0E"), ((__145101_48_dec->exponent) - 1));
+ char *)".0E"), ((__145233_48_dec->exponent) - 1));
 
-} else  { auto struct _ZN3edg13a_string_viewE __T543044776;
-_ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcS9_iEEEvDpT_((&__145157_21_tmp_buff), ((_ZN3edg13a_string_viewC1EPKcy((&__T543044776), ((_ZN3edg12a_const_charE *)((__145101_48_dec->digits))), 1ULL)) , __T543044776), ((
+} else  { auto struct _ZN3edg13a_string_viewE __T810504976;
+_ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE8reset_toIJNS_13a_string_viewEPKcPcS9_iEEEvDpT_((&__145289_21_tmp_buff), ((_ZN3edg13a_string_viewC1EPKcy((&__T810504976), ((_ZN3edg12a_const_charE *)((__145233_48_dec->digits))), 1ULL)) , __T810504976), ((
 #line 2682
-const char *)"."), (((__145101_48_dec->digits)) + 1), ((const char *)"E"), ((__145101_48_dec->exponent) - 1));
+const char *)"."), (((__145233_48_dec->digits)) + 1), ((const char *)"E"), ((__145233_48_dec->exponent) - 1));
 
 
 }
-if (((_ZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6lengthEv((((const struct _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)&__145157_21_tmp_buff)))) + 1ULL) < __145100_47_size) {
-_ZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE15write_to_bufferEPcy((((const struct _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)&__145157_21_tmp_buff)), __145099_48_tgt, __145100_47_size);
+if (((_ZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE6lengthEv((((const struct _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)&__145289_21_tmp_buff)))) + 1ULL) < __145232_47_size) {
+_ZNK3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEE15write_to_bufferEPcy((((const struct _ZN3edg16Allocated_stringINS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEEE *)&__145289_21_tmp_buff)), __145231_48_tgt, __145232_47_size);
 } else  {
-__145110_21_res = _ZN3edg16fp_ret_too_smallE;
+__145242_21_res = _ZN3edg16fp_ret_too_smallE;
 }
-{ _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEED1Ev((&(__145157_21_tmp_buff.backing_array))); } } }
-return __145110_21_res;
+{ _ZN3edg9Dyn_arrayIcNS_27Delegate_buffered_allocatorILj50ENS_17General_allocatorEE4MetaEED1Ev((&(__145289_21_tmp_buff.backing_array))); } } }
+return __145242_21_res;
 }
 
 
-static enum _ZN3edg17an_fp_return_typeE _ZN32_INTERNAL_10_floating_c_7968bde93edg18convert_and_formatEPcyPNS0_12an_fp_binaryE( char *__145177_59_tgt, 
-size_t __145178_58_size, 
-_ZN3edg12an_fp_binaryE *__145179_59_bin)
+static enum _ZN3edg17an_fp_return_typeE _ZN32_INTERNAL_10_floating_c_7968bde93edg18convert_and_formatEPcyPNS0_12an_fp_binaryE( char *__145309_59_tgt, 
+size_t __145310_58_size, 
+_ZN3edg12an_fp_binaryE *__145311_59_bin)
 #line 2708
 {
-auto enum _ZN3edg17an_fp_return_typeE __145190_21_res = _ZN3edg12fp_ret_validE;
-if (((int)(__145179_59_bin->type)) == 0) {
-__145190_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8n_strcpyEPcPKcy(__145177_59_tgt, ((const char *)"<invalid floating-point value>"), __145178_58_size));
-if (((int)__145190_21_res) == 0) {
-__145190_21_res = _ZN3edg14fp_ret_invalidE;
+auto enum _ZN3edg17an_fp_return_typeE __145322_21_res = _ZN3edg12fp_ret_validE;
+if (((int)(__145311_59_bin->type)) == 0) {
+__145322_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8n_strcpyEPcPKcy(__145309_59_tgt, ((const char *)"<invalid floating-point value>"), __145310_58_size));
+if (((int)__145322_21_res) == 0) {
+__145322_21_res = _ZN3edg14fp_ret_invalidE;
 }
-} else  { if (((int)(__145179_59_bin->type)) == 3) {
-__145190_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8n_strcpyEPcPKcy(__145177_59_tgt, ((const char *)"NaN"), __145178_58_size));
-if (((int)__145190_21_res) == 0) { __145190_21_res = _ZN3edg10fp_ret_nanE; }
-} else  { if (((int)(__145179_59_bin->type)) == 4) {
-__145190_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8n_strcpyEPcPKcy(__145177_59_tgt, ((const char *)"Infinity"), __145178_58_size));
-if (((int)__145190_21_res) == 0) {
-if (__145179_59_bin->is_negative) {
-__145190_21_res = _ZN3edg19fp_ret_neg_infinityE;
+} else  { if (((int)(__145311_59_bin->type)) == 3) {
+__145322_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8n_strcpyEPcPKcy(__145309_59_tgt, ((const char *)"NaN"), __145310_58_size));
+if (((int)__145322_21_res) == 0) { __145322_21_res = _ZN3edg10fp_ret_nanE; }
+} else  { if (((int)(__145311_59_bin->type)) == 4) {
+__145322_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8n_strcpyEPcPKcy(__145309_59_tgt, ((const char *)"Infinity"), __145310_58_size));
+if (((int)__145322_21_res) == 0) {
+if (__145311_59_bin->is_negative) {
+__145322_21_res = _ZN3edg19fp_ret_neg_infinityE;
 } else  {
-__145190_21_res = _ZN3edg19fp_ret_pos_infinityE;
+__145322_21_res = _ZN3edg19fp_ret_pos_infinityE;
 }
 }
-} else  { if (((int)(__145179_59_bin->type)) == 6) {
-__145190_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8n_strcpyEPcPKcy(__145177_59_tgt, ((const char *)"0.0"), __145178_58_size));
+} else  { if (((int)(__145311_59_bin->type)) == 6) {
+__145322_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8n_strcpyEPcPKcy(__145309_59_tgt, ((const char *)"0.0"), __145310_58_size));
 } else  {
-__145190_21_res = _ZN3edg20fp_ret_not_formattedE;
+__145322_21_res = _ZN3edg20fp_ret_not_formattedE;
 } } } }
-return __145190_21_res;
+return __145322_21_res;
 }
 #line 411 "src/float_type.h"
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg20set_fraction_float16EPhS1_( unsigned char *__145635_41_tgt, 
-unsigned char *__145636_41_frac)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg20set_fraction_float16EPhS1_( unsigned char *__145767_41_tgt, 
+unsigned char *__145768_41_frac)
 
 
 
 
 {
-auto int __145642_7_i;
+auto int __145774_7_i;
 
-for (__145642_7_i = 0; __145642_7_i < 2; ++__145642_7_i) {
-(__145635_41_tgt[((_ZN3edg18host_little_endianE) ? __145642_7_i : (3 - __145642_7_i))]) = (__145636_41_frac[(__145642_7_i - 0)]);
+for (__145774_7_i = 0; __145774_7_i < 2; ++__145774_7_i) {
+(__145767_41_tgt[((_ZN3edg18host_little_endianE) ? __145774_7_i : (3 - __145774_7_i))]) = (__145768_41_frac[(__145774_7_i - 0)]);
 }
-(__145635_41_tgt[((_ZN3edg18host_little_endianE) ? __145642_7_i : (3 - __145642_7_i))]) &= 128;
+(__145767_41_tgt[((_ZN3edg18host_little_endianE) ? __145774_7_i : (3 - __145774_7_i))]) &= 128;
 
-(__145635_41_tgt[((_ZN3edg18host_little_endianE) ? __145642_7_i : (3 - __145642_7_i))]) |= ((((unsigned)(__145636_41_frac[(__145642_7_i - 0)])) & 127U) & 0xffffff7fU); 
+(__145767_41_tgt[((_ZN3edg18host_little_endianE) ? __145774_7_i : (3 - __145774_7_i))]) |= ((((unsigned)(__145768_41_frac[(__145774_7_i - 0)])) & 127U) & 0xffffff7fU); 
 
 
 
@@ -8783,245 +8844,245 @@ for (__145642_7_i = 0; __145642_7_i < 2; ++__145642_7_i) {
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg27set_biased_exponent_float16EPhj( unsigned char *__145657_48_tgt, 
-unsigned __145658_47_biased_exponent)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg27set_biased_exponent_float16EPhj( unsigned char *__145789_48_tgt, 
+unsigned __145790_47_biased_exponent)
 
 
 
 {
-auto int __145663_7_i;
+auto int __145795_7_i;
 
-__145663_7_i = 2;
-(__145657_48_tgt[((_ZN3edg18host_little_endianE) ? __145663_7_i : (3 - __145663_7_i))]) &= 127;
-(__145657_48_tgt[((_ZN3edg18host_little_endianE) ? __145663_7_i : (3 - __145663_7_i))]) |= ((__145658_47_biased_exponent << 7) & 128U);
-__145658_47_biased_exponent >>= 1;
+__145795_7_i = 2;
+(__145789_48_tgt[((_ZN3edg18host_little_endianE) ? __145795_7_i : (3 - __145795_7_i))]) &= 127;
+(__145789_48_tgt[((_ZN3edg18host_little_endianE) ? __145795_7_i : (3 - __145795_7_i))]) |= ((__145790_47_biased_exponent << 7) & 128U);
+__145790_47_biased_exponent >>= 1;
 
-++__145663_7_i;
+++__145795_7_i;
 #line 453
-(__145657_48_tgt[((_ZN3edg18host_little_endianE) ? __145663_7_i : (3 - __145663_7_i))]) &= 128;
-(__145657_48_tgt[((_ZN3edg18host_little_endianE) ? __145663_7_i : (3 - __145663_7_i))]) |= (__145658_47_biased_exponent & 127U); 
+(__145789_48_tgt[((_ZN3edg18host_little_endianE) ? __145795_7_i : (3 - __145795_7_i))]) &= 128;
+(__145789_48_tgt[((_ZN3edg18host_little_endianE) ? __145795_7_i : (3 - __145795_7_i))]) |= (__145790_47_biased_exponent & 127U); 
 
 }
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg20get_fraction_float16EPhS1_( unsigned char *__145683_46_frac, 
-unsigned char *__145684_46_val)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg20get_fraction_float16EPhS1_( unsigned char *__145815_46_frac, 
+unsigned char *__145816_46_val)
 #line 467
 {
-auto int __145692_13_i;
-auto _ZN3edg9a_booleanE __145693_13_res = ((_ZN3edg9a_booleanE)0);
+auto int __145824_13_i;
+auto _ZN3edg9a_booleanE __145825_13_res = ((_ZN3edg9a_booleanE)0);
 
-for (__145692_13_i = 0; __145692_13_i < 2; ++__145692_13_i) {
-(__145683_46_frac[(__145692_13_i - 0)]) = (__145684_46_val[((_ZN3edg18host_little_endianE) ? __145692_13_i : (3 - __145692_13_i))]);
-if (((int)(__145684_46_val[((_ZN3edg18host_little_endianE) ? __145692_13_i : (3 - __145692_13_i))])) != 0) {
-__145693_13_res = ((_ZN3edg9a_booleanE)1);
+for (__145824_13_i = 0; __145824_13_i < 2; ++__145824_13_i) {
+(__145815_46_frac[(__145824_13_i - 0)]) = (__145816_46_val[((_ZN3edg18host_little_endianE) ? __145824_13_i : (3 - __145824_13_i))]);
+if (((int)(__145816_46_val[((_ZN3edg18host_little_endianE) ? __145824_13_i : (3 - __145824_13_i))])) != 0) {
+__145825_13_res = ((_ZN3edg9a_booleanE)1);
 }
 }
-(__145683_46_frac[(__145692_13_i - 0)]) = ((unsigned char)(((unsigned)(__145684_46_val[((_ZN3edg18host_little_endianE) ? __145692_13_i : (3 - __145692_13_i))])) & 127U));
+(__145815_46_frac[(__145824_13_i - 0)]) = ((unsigned char)(((unsigned)(__145816_46_val[((_ZN3edg18host_little_endianE) ? __145824_13_i : (3 - __145824_13_i))])) & 127U));
 
-(__145683_46_frac[2]) |= 128U;
+(__145815_46_frac[2]) |= 128U;
 
-if ((((unsigned)(__145684_46_val[((_ZN3edg18host_little_endianE) ? __145692_13_i : (3 - __145692_13_i))])) & 127U) != 0U) {
-__145693_13_res = ((_ZN3edg9a_booleanE)1);
+if ((((unsigned)(__145816_46_val[((_ZN3edg18host_little_endianE) ? __145824_13_i : (3 - __145824_13_i))])) & 127U) != 0U) {
+__145825_13_res = ((_ZN3edg9a_booleanE)1);
 }
 #line 490
-return __145693_13_res;
+return __145825_13_res;
 }
 
 
-static int _ZN32_INTERNAL_10_floating_c_7968bde93edg27get_biased_exponent_float16EPh( unsigned char *__145718_47_val)
+static int _ZN32_INTERNAL_10_floating_c_7968bde93edg27get_biased_exponent_float16EPh( unsigned char *__145850_47_val)
 
 
 
 {
-auto int __145723_7_i = 3;
-auto int __145724_7_biased_exponent = 0;
+auto int __145855_7_i = 3;
+auto int __145856_7_biased_exponent = 0;
 
 
-__145724_7_biased_exponent = ((int)(((unsigned)(__145718_47_val[((_ZN3edg18host_little_endianE) ? __145723_7_i : (3 - __145723_7_i))])) & 127U));
---__145723_7_i;
-for (; __145723_7_i > 2; --__145723_7_i) {
-__145724_7_biased_exponent <<= 8;
-__145724_7_biased_exponent += ((int)(__145718_47_val[((_ZN3edg18host_little_endianE) ? __145723_7_i : (3 - __145723_7_i))]));
+__145856_7_biased_exponent = ((int)(((unsigned)(__145850_47_val[((_ZN3edg18host_little_endianE) ? __145855_7_i : (3 - __145855_7_i))])) & 127U));
+--__145855_7_i;
+for (; __145855_7_i > 2; --__145855_7_i) {
+__145856_7_biased_exponent <<= 8;
+__145856_7_biased_exponent += ((int)(__145850_47_val[((_ZN3edg18host_little_endianE) ? __145855_7_i : (3 - __145855_7_i))]));
 }
-__145724_7_biased_exponent <<= 1;
+__145856_7_biased_exponent <<= 1;
 
-__145724_7_biased_exponent |= ((int)((((unsigned)(__145718_47_val[((_ZN3edg18host_little_endianE) ? __145723_7_i : (3 - __145723_7_i))])) & 128U) >> 7));
+__145856_7_biased_exponent |= ((int)((((unsigned)(__145850_47_val[((_ZN3edg18host_little_endianE) ? __145855_7_i : (3 - __145855_7_i))])) & 128U) >> 7));
 
-return __145724_7_biased_exponent;
+return __145856_7_biased_exponent;
 }
 #line 524
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg13split_float16EPNS0_12an_fp_binaryEPh( _ZN3edg12an_fp_binaryE *__145748_37_bin, 
-unsigned char *__145749_37_val)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg13split_float16EPNS0_12an_fp_binaryEPh( _ZN3edg12an_fp_binaryE *__145880_37_bin, 
+unsigned char *__145881_37_val)
 
 
 
 {
-auto int __145754_13_biased_exponent;
-auto _ZN3edg9a_booleanE __145755_13_saw_nz;
+auto int __145886_13_biased_exponent;
+auto _ZN3edg9a_booleanE __145887_13_saw_nz;
 
 
 
 
-(((__145748_37_bin->frac))[2]) = ((unsigned char)0U);
-__145755_13_saw_nz = (_ZN32_INTERNAL_10_floating_c_7968bde93edg20get_fraction_float16EPhS1_(((__145748_37_bin->frac)), __145749_37_val));
-__145754_13_biased_exponent = (_ZN32_INTERNAL_10_floating_c_7968bde93edg27get_biased_exponent_float16EPh(__145749_37_val));
-(__145748_37_bin->is_negative) = ((_ZN3edg9a_booleanE)(((((int)(__145749_37_val[((_ZN3edg18host_little_endianE) ? 3 : 0)])) & 128) ? 1 : 0) != 0));
+(((__145880_37_bin->frac))[2]) = ((unsigned char)0U);
+__145887_13_saw_nz = (_ZN32_INTERNAL_10_floating_c_7968bde93edg20get_fraction_float16EPhS1_(((__145880_37_bin->frac)), __145881_37_val));
+__145886_13_biased_exponent = (_ZN32_INTERNAL_10_floating_c_7968bde93edg27get_biased_exponent_float16EPh(__145881_37_val));
+(__145880_37_bin->is_negative) = ((_ZN3edg9a_booleanE)(((((int)(__145881_37_val[((_ZN3edg18host_little_endianE) ? 3 : 0)])) & 128) ? 1 : 0) != 0));
 #line 550
 {
-if (__145754_13_biased_exponent == 255) {
-if (((int)__145755_13_saw_nz) == 0) {
-(__145748_37_bin->type) = _ZN3edg12fpt_infinityE;
+if (__145886_13_biased_exponent == 255) {
+if (((int)__145887_13_saw_nz) == 0) {
+(__145880_37_bin->type) = _ZN3edg12fpt_infinityE;
 } else  {
-(__145748_37_bin->type) = _ZN3edg7fpt_nanE;
+(__145880_37_bin->type) = _ZN3edg7fpt_nanE;
 }
-} else  { if (__145754_13_biased_exponent == 0) {
-if (((int)__145755_13_saw_nz) == 0) {
-(__145748_37_bin->type) = _ZN3edg8fpt_zeroE;
+} else  { if (__145886_13_biased_exponent == 0) {
+if (((int)__145887_13_saw_nz) == 0) {
+(__145880_37_bin->type) = _ZN3edg8fpt_zeroE;
 } else  {
 
 
-auto int __145787_13_high_bits;
-(((__145748_37_bin->frac))[2]) &= 127;
-__145787_13_high_bits = (_ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_high_zero_bitsEPhi(((__145748_37_bin->frac)), 24));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii(((__145748_37_bin->frac)), 24, __145787_13_high_bits);
-__145754_13_biased_exponent -= __145787_13_high_bits;
-++__145754_13_biased_exponent;
-(__145748_37_bin->type) = _ZN3edg10fpt_numberE;
+auto int __145919_13_high_bits;
+(((__145880_37_bin->frac))[2]) &= 127;
+__145919_13_high_bits = (_ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_high_zero_bitsEPhi(((__145880_37_bin->frac)), 24));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii(((__145880_37_bin->frac)), 24, __145919_13_high_bits);
+__145886_13_biased_exponent -= __145919_13_high_bits;
+++__145886_13_biased_exponent;
+(__145880_37_bin->type) = _ZN3edg10fpt_numberE;
 }
 } else  {
-(__145748_37_bin->type) = _ZN3edg10fpt_numberE;
+(__145880_37_bin->type) = _ZN3edg10fpt_numberE;
 } }
 }
-(__145748_37_bin->exponent) = ((__145754_13_biased_exponent - 127) + 1);
-(__145748_37_bin->precision) = 24; 
+(__145880_37_bin->exponent) = ((__145886_13_biased_exponent - 127) + 1);
+(__145880_37_bin->precision) = 24; 
 }
 
 
-void _ZN3edg27normalize_and_round_float16EPNS_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__145804_40_bin)
+void _ZN3edg27normalize_and_round_float16EPNS_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__145936_40_bin)
 #line 586
 {
 if (0) {
 
 
 
-auto union _ZZN3edg27normalize_and_round_float16EPNS_12an_fp_binaryEEUt_ __145815_7_u;
-auto unsigned short __145816_20_mask = ((unsigned short)2047U);
+auto union _ZZN3edg27normalize_and_round_float16EPNS_12an_fp_binaryEEUt_ __145947_7_u;
+auto unsigned short __145948_20_mask = ((unsigned short)2047U);
 
-memcpy(((void *)((__145815_7_u.bytes))), ((const void *)(&(__145804_40_bin->frac))), 2ULL);
-if (((__145804_40_bin->exponent) > 23) && ((((int)(__145815_7_u.val)) & ((int)__145816_20_mask)) != ((int)(__145815_7_u.val)))) {
+memcpy(((void *)((__145947_7_u.bytes))), ((const void *)(&(__145936_40_bin->frac))), 2ULL);
+if (((__145936_40_bin->exponent) > 23) && ((((int)(__145947_7_u.val)) & ((int)__145948_20_mask)) != ((int)(__145947_7_u.val)))) {
 
 
 
-auto int __145823_22_num_bits;
-auto unsigned short __145824_22_rounding_bit;
+auto int __145955_22_num_bits;
+auto unsigned short __145956_22_rounding_bit;
 #line 599
-__145823_22_num_bits = ((__145804_40_bin->exponent) - 23);
-__145824_22_rounding_bit = ((unsigned short)(((int)(__145815_7_u.val)) & (1 << (__145823_22_num_bits - 1))));
+__145955_22_num_bits = ((__145936_40_bin->exponent) - 23);
+__145956_22_rounding_bit = ((unsigned short)(((int)(__145947_7_u.val)) & (1 << (__145955_22_num_bits - 1))));
 
-(__145815_7_u.val) = ((unsigned short)((((int)(__145815_7_u.val)) + ((int)__145824_22_rounding_bit)) >> __145823_22_num_bits));
-if ((((int)(__145815_7_u.val)) & ((int)__145816_20_mask)) != ((int)(__145815_7_u.val))) {
+(__145947_7_u.val) = ((unsigned short)((((int)(__145947_7_u.val)) + ((int)__145956_22_rounding_bit)) >> __145955_22_num_bits));
+if ((((int)(__145947_7_u.val)) & ((int)__145948_20_mask)) != ((int)(__145947_7_u.val))) {
 
-(__145815_7_u.val) >>= 1;
-++(__145804_40_bin->exponent);
+(__145947_7_u.val) >>= 1;
+++(__145936_40_bin->exponent);
 }
-memcpy(((void *)(&(__145804_40_bin->frac))), ((const void *)((__145815_7_u.bytes))), 2ULL);
-++(__145804_40_bin->exponent);
+memcpy(((void *)(&(__145936_40_bin->frac))), ((const void *)((__145947_7_u.bytes))), 2ULL);
+++(__145936_40_bin->exponent);
 }
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg12make_float16EPhPNS0_12an_fp_binaryE( unsigned char *__145839_36_tgt, 
-_ZN3edg12an_fp_binaryE *__145840_36_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg12make_float16EPhPNS0_12an_fp_binaryE( unsigned char *__145971_36_tgt, 
+_ZN3edg12an_fp_binaryE *__145972_36_bin)
 #line 622
 {
-auto unsigned char __145847_17_fraction[3];
-auto int __145848_17_biased_exponent = 0;
+auto unsigned char __145979_17_fraction[3];
+auto int __145980_17_biased_exponent = 0;
 
 
-if (((int)(__145840_36_bin->type)) == 2) {
-_ZN3edg27normalize_and_round_float16EPNS_12an_fp_binaryE(__145840_36_bin);
-memcpy(((void *)(__145847_17_fraction)), ((const void *)((__145840_36_bin->frac))), 3ULL);
-__145848_17_biased_exponent = (((__145840_36_bin->exponent) + 127) - 1);
-if ((__145840_36_bin->exponent) < ((-125) - (__145840_36_bin->precision))) {
-(__145840_36_bin->type) = _ZN3edg8fpt_zeroE;
-} else  { if (128 < (__145840_36_bin->exponent)) {
-(__145840_36_bin->type) = _ZN3edg12fpt_infinityE;
-} else  { if (__145848_17_biased_exponent <= 0) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg23fp_frac_shift_right_rawEPhii((__145847_17_fraction), (__145840_36_bin->precision), ((-__145848_17_biased_exponent) + 1));
-__145848_17_biased_exponent = 0;
+if (((int)(__145972_36_bin->type)) == 2) {
+_ZN3edg27normalize_and_round_float16EPNS_12an_fp_binaryE(__145972_36_bin);
+memcpy(((void *)(__145979_17_fraction)), ((const void *)((__145972_36_bin->frac))), 3ULL);
+__145980_17_biased_exponent = (((__145972_36_bin->exponent) + 127) - 1);
+if ((__145972_36_bin->exponent) < ((-125) - (__145972_36_bin->precision))) {
+(__145972_36_bin->type) = _ZN3edg8fpt_zeroE;
+} else  { if (128 < (__145972_36_bin->exponent)) {
+(__145972_36_bin->type) = _ZN3edg12fpt_infinityE;
+} else  { if (__145980_17_biased_exponent <= 0) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg23fp_frac_shift_right_rawEPhii((__145979_17_fraction), (__145972_36_bin->precision), ((-__145980_17_biased_exponent) + 1));
+__145980_17_biased_exponent = 0;
 } } }
 }
-if (((int)(__145840_36_bin->type)) != 2) {
-memset(((void *)(__145847_17_fraction)), 0, 3ULL);
-switch ((int)(__145840_36_bin->type)) {
+if (((int)(__145972_36_bin->type)) != 2) {
+memset(((void *)(__145979_17_fraction)), 0, 3ULL);
+switch ((int)(__145972_36_bin->type)) {
 case 3:
 
-((__145847_17_fraction)[0]) = ((unsigned char)1U);
-__145848_17_biased_exponent = 255;
+((__145979_17_fraction)[0]) = ((unsigned char)1U);
+__145980_17_biased_exponent = 255;
 
-((__145847_17_fraction)[2]) = ((unsigned char)0U);
-((__145847_17_fraction)[2]) |= 64;
-goto __T545377424;
+((__145979_17_fraction)[2]) = ((unsigned char)0U);
+((__145979_17_fraction)[2]) |= 64;
+goto __T812429072;
 case 4:
 
-__145848_17_biased_exponent = 255;
-((__145847_17_fraction)[2]) = ((unsigned char)0U);
-goto __T545377424;
+__145980_17_biased_exponent = 255;
+((__145979_17_fraction)[2]) = ((unsigned char)0U);
+goto __T812429072;
 case 6:
 
-__145848_17_biased_exponent = 0;
-goto __T545377424;
+__145980_17_biased_exponent = 0;
+goto __T812429072;
 default:
-_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 661, __T545276584, ((const char *)"invalid floating-point value"), ((_ZN3edg12a_const_charE *)0));
-} __T545377424:;
+_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 661, __T811790376, ((const char *)"invalid floating-point value"), ((_ZN3edg12a_const_charE *)0));
+} __T812429072:;
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg20set_fraction_float16EPhS1_(__145839_36_tgt, (__145847_17_fraction));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg27set_biased_exponent_float16EPhj(__145839_36_tgt, ((unsigned)__145848_17_biased_exponent));
-if (((int)(__145840_36_bin->is_negative)) == 0) {
-(__145839_36_tgt[((_ZN3edg18host_little_endianE) ? 3 : 0)]) &= 127;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg20set_fraction_float16EPhS1_(__145971_36_tgt, (__145979_17_fraction));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg27set_biased_exponent_float16EPhj(__145971_36_tgt, ((unsigned)__145980_17_biased_exponent));
+if (((int)(__145972_36_bin->is_negative)) == 0) {
+(__145971_36_tgt[((_ZN3edg18host_little_endianE) ? 3 : 0)]) &= 127;
 } else  {
-(__145839_36_tgt[((_ZN3edg18host_little_endianE) ? 3 : 0)]) |= 128;
+(__145971_36_tgt[((_ZN3edg18host_little_endianE) ? 3 : 0)]) |= 128;
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg16float16_make_minEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__145898_36_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg16float16_make_minEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__146030_36_bin)
 
 
 
 {
-(__145898_36_bin->type) = _ZN3edg10fpt_numberE;
-(__145898_36_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
-(__145898_36_bin->exponent) = (-125);
-memset(((void *)((__145898_36_bin->frac))), 0, 9ULL);
-(((__145898_36_bin->frac))[2]) |= 128U;
-(__145898_36_bin->precision) = 24; 
+(__146030_36_bin->type) = _ZN3edg10fpt_numberE;
+(__146030_36_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
+(__146030_36_bin->exponent) = (-125);
+memset(((void *)((__146030_36_bin->frac))), 0, 9ULL);
+(((__146030_36_bin->frac))[2]) |= 128U;
+(__146030_36_bin->precision) = 24; 
 }
 
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg21make_float16_bin_zeroEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__145913_44_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg21make_float16_bin_zeroEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__146045_44_bin)
 
 
 
 {
-(__145913_44_bin->type) = _ZN3edg8fpt_zeroE;
-(__145913_44_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
-(__145913_44_bin->precision) = 24; 
+(__146045_44_bin->type) = _ZN3edg8fpt_zeroE;
+(__146045_44_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
+(__146045_44_bin->precision) = 24; 
 }
 #line 724
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg26float16_make_min_subnormalEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__145948_46_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg26float16_make_min_subnormalEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__146080_46_bin)
 
 
 
 {
-(__145948_46_bin->type) = _ZN3edg10fpt_numberE;
-(__145948_46_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
-(__145948_46_bin->exponent) = (-148);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_minEPhi(((__145948_46_bin->frac)), 24);
-(__145948_46_bin->precision) = 24; 
+(__146080_46_bin->type) = _ZN3edg10fpt_numberE;
+(__146080_46_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
+(__146080_46_bin->exponent) = (-148);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_minEPhi(((__146080_46_bin->frac)), 24);
+(__146080_46_bin->precision) = 24; 
 }
 #line 870
 static void _ZN32_INTERNAL_10_floating_c_7968bde93edg23initialize_tens_float16Ev(void)
@@ -9029,7 +9090,7 @@ static void _ZN32_INTERNAL_10_floating_c_7968bde93edg23initialize_tens_float16Ev
 
 
 {
-auto int __146099_16_i;
+auto int __146231_16_i;
 #line 881
 (_ZN32_INTERNAL_10_floating_c_7968bde93edg11dec_float16E.exponent) = 9;
 
@@ -9039,20 +9100,20 @@ _ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm
 
 
 
-for (__146099_16_i = 1; ((long)__146099_16_i) < 11L; ++__146099_16_i) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146099_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + (__146099_16_i - 1)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj(((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146099_16_i), 10U);
+for (__146231_16_i = 1; ((long)__146231_16_i) < 11L; ++__146231_16_i) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146231_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + (__146231_16_i - 1)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj(((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146231_16_i), 10U);
 }
 
 _ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(_ZN32_INTERNAL_10_floating_c_7968bde93edg16big_tens_float16E, (_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E + 8));
 
-for (__146099_16_i = 1; __146099_16_i < 3; ++__146099_16_i) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg16big_tens_float16E) + __146099_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16big_tens_float16E) + (__146099_16_i - 1)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg16big_tens_float16E) + __146099_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16big_tens_float16E) + __146099_16_i));
+for (__146231_16_i = 1; __146231_16_i < 3; ++__146231_16_i) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg16big_tens_float16E) + __146231_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16big_tens_float16E) + (__146231_16_i - 1)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg16big_tens_float16E) + __146231_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16big_tens_float16E) + __146231_16_i));
 
 (_ZN32_INTERNAL_10_floating_c_7968bde93edg11dec_float16E.exponent) = ((2 * (_ZN32_INTERNAL_10_floating_c_7968bde93edg11dec_float16E.exponent)) - 1);
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi(((_ZN32_INTERNAL_10_floating_c_7968bde93edg16big_tens_float16E) + __146099_16_i), (&_ZN32_INTERNAL_10_floating_c_7968bde93edg11dec_float16E), 0);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi(((_ZN32_INTERNAL_10_floating_c_7968bde93edg16big_tens_float16E) + __146231_16_i), (&_ZN32_INTERNAL_10_floating_c_7968bde93edg11dec_float16E), 0);
 #line 908
 } 
 
@@ -9060,17 +9121,17 @@ _ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg20fast_dec2bin_float16EPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEPi( _ZN3edg12an_fp_binaryE *__146138_53_bin, 
-_ZN3edg19an_fp_decimal_inputE *__146139_53_dec, 
-int *__146140_53_pscale)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg20fast_dec2bin_float16EPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEPi( _ZN3edg12an_fp_binaryE *__146270_53_bin, 
+_ZN3edg19an_fp_decimal_inputE *__146271_53_dec, 
+int *__146272_53_pscale)
 #line 953
 {
-auto int __146178_29_exp;
-auto int __146179_29_first_exp = 0;
-auto int __146180_29_exp_is_negative = 0;
-auto int __146181_29_sig_dig = 7;
+auto int __146310_29_exp;
+auto int __146311_29_first_exp = 0;
+auto int __146312_29_exp_is_negative = 0;
+auto int __146313_29_sig_dig = 7;
 #line 954
-__146178_29_exp = (__146139_53_dec->exponent);
+__146310_29_exp = (__146271_53_dec->exponent);
 
 
 
@@ -9078,471 +9139,473 @@ __146178_29_exp = (__146139_53_dec->exponent);
 (void)0;
 (void)0;
 
-if ((__146139_53_dec->precision) < __146181_29_sig_dig) {
-__146181_29_sig_dig = (__146139_53_dec->precision);
+if ((__146271_53_dec->precision) < __146313_29_sig_dig) {
+__146313_29_sig_dig = (__146271_53_dec->precision);
 #line 971
 }
 
-__146178_29_exp -= __146181_29_sig_dig;
+__146310_29_exp -= __146313_29_sig_dig;
 
-if (__146178_29_exp < 0) {
-__146180_29_exp_is_negative = 1;
-__146178_29_exp = (-__146178_29_exp);
+if (__146310_29_exp < 0) {
+__146312_29_exp_is_negative = 1;
+__146310_29_exp = (-__146310_29_exp);
 }
-(*__146140_53_pscale) = 0;
+(*__146272_53_pscale) = 0;
 
-if (39L < ((long)(__146139_53_dec->exponent))) {
-(__146139_53_dec->type) = _ZN3edg12fpt_overflowE;
-} else  { if (((long)(__146139_53_dec->exponent)) < (-45L)) {
+if (39L < ((long)(__146271_53_dec->exponent))) {
+(__146271_53_dec->type) = _ZN3edg12fpt_overflowE;
+} else  { if (((long)(__146271_53_dec->exponent)) < (-45L)) {
 
-(__146139_53_dec->type) = _ZN3edg13fpt_underflowE;
-} else  { if (6L < ((long)(__146139_53_dec->precision))) {
+(__146271_53_dec->type) = _ZN3edg13fpt_underflowE;
+} else  { if (6L < ((long)(__146271_53_dec->precision))) {
 
-(__146139_53_dec->type) = _ZN3edg10fpt_approxE;
-} else  { if (__146178_29_exp <= 10) {
+(__146271_53_dec->type) = _ZN3edg10fpt_approxE;
+} else  { if (__146310_29_exp <= 10) {
 
-(__146139_53_dec->type) = _ZN3edg10fpt_numberE;
-} else  { if ((!(__146180_29_exp_is_negative)) && (((long)__146178_29_exp) <= (16L - ((long)(__146139_53_dec->precision)))))
+(__146271_53_dec->type) = _ZN3edg10fpt_numberE;
+} else  { if ((!(__146312_29_exp_is_negative)) && (((long)__146310_29_exp) <= (16L - ((long)(__146271_53_dec->precision)))))
 {
 
-__146179_29_first_exp = ((int)(6L - ((long)(__146139_53_dec->precision))));
-__146178_29_exp -= __146179_29_first_exp;
-(__146139_53_dec->type) = _ZN3edg10fpt_numberE;
+__146311_29_first_exp = ((int)(6L - ((long)(__146271_53_dec->precision))));
+__146310_29_exp -= __146311_29_first_exp;
+(__146271_53_dec->type) = _ZN3edg10fpt_numberE;
 } else  {
 
-(__146139_53_dec->type) = _ZN3edg10fpt_approxE;
+(__146271_53_dec->type) = _ZN3edg10fpt_approxE;
 } } } } }
 
-if (((int)(__146139_53_dec->type)) == 1) {
+if (((int)(__146271_53_dec->type)) == 1) {
 
-__146179_29_first_exp = ((int)(((unsigned)__146178_29_exp) & 7U));
-__146178_29_exp -= __146179_29_first_exp;
+__146311_29_first_exp = ((int)(((unsigned)__146310_29_exp) & 7U));
+__146310_29_exp -= __146311_29_first_exp;
 }
-(__146179_29_first_exp <= 10) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1008, __T545622784, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(__146311_29_first_exp <= 10) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1008, __T812693936, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
-if ((((int)(__146139_53_dec->type)) == 2) || (((int)(__146139_53_dec->type)) == 1)) {
+if ((((int)(__146271_53_dec->type)) == 2) || (((int)(__146271_53_dec->type)) == 1)) {
 
-auto unsigned long __146236_19_fraction = 0UL;
-auto int __146237_19_digits = 0;
-auto _ZN3edg12a_const_charE *__146238_20_cur;
+auto unsigned long __146368_19_fraction = 0UL;
+auto int __146369_19_digits = 0;
+auto _ZN3edg12a_const_charE *__146370_20_cur;
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE(__146138_53_bin);
-for (__146238_20_cur = (__146139_53_dec->first_int); (__146238_20_cur != (__146139_53_dec->last_int)) && (__146181_29_sig_dig != 0); ((++__146238_20_cur) , (--__146181_29_sig_dig)) , (++__146237_19_digits))
+_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE(__146270_53_bin);
+for (__146370_20_cur = (__146271_53_dec->first_int); (__146370_20_cur != (__146271_53_dec->last_int)) && (__146313_29_sig_dig != 0); ((++__146370_20_cur) , (--__146313_29_sig_dig)) , (++__146369_19_digits))
 
 {
-if (__146237_19_digits == 9) {
-(((long)__146237_19_digits) < 11L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1021, __T545622784, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__146138_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146237_19_digits));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__146138_53_bin, __146236_19_fraction);
-__146236_19_fraction = 0UL;
-__146237_19_digits = 0;
+if (__146369_19_digits == 9) {
+(((long)__146369_19_digits) < 11L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1021, __T812693936, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__146270_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146369_19_digits));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__146270_53_bin, __146368_19_fraction);
+__146368_19_fraction = 0UL;
+__146369_19_digits = 0;
 }
-__146236_19_fraction *= 10UL;
-__146236_19_fraction += ((unsigned long)(((int)(*__146238_20_cur)) - 48));
+__146368_19_fraction *= 10UL;
+__146368_19_fraction += ((unsigned long)(((int)(*__146370_20_cur)) - 48));
 }
-for (__146238_20_cur = (__146139_53_dec->first_frac); (__146238_20_cur != (__146139_53_dec->last_frac)) && (__146181_29_sig_dig != 0); ((++__146238_20_cur) , (--__146181_29_sig_dig)) , (++__146237_19_digits))
+for (__146370_20_cur = (__146271_53_dec->first_frac); (__146370_20_cur != (__146271_53_dec->last_frac)) && (__146313_29_sig_dig != 0); ((++__146370_20_cur) , (--__146313_29_sig_dig)) , (++__146369_19_digits))
 
 {
-if (__146237_19_digits == 9) {
-(((long)__146237_19_digits) < 11L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1034, __T545622784, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__146138_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146237_19_digits));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__146138_53_bin, __146236_19_fraction);
-__146236_19_fraction = 0UL;
-__146237_19_digits = 0;
+if (__146369_19_digits == 9) {
+(((long)__146369_19_digits) < 11L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1034, __T812693936, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__146270_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146369_19_digits));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__146270_53_bin, __146368_19_fraction);
+__146368_19_fraction = 0UL;
+__146369_19_digits = 0;
 }
-__146236_19_fraction *= 10UL;
-__146236_19_fraction += ((unsigned long)(((int)(*__146238_20_cur)) - 48));
+__146368_19_fraction *= 10UL;
+__146368_19_fraction += ((unsigned long)(((int)(*__146370_20_cur)) - 48));
 }
-if (__146237_19_digits != 0) {
-(((long)__146237_19_digits) < 11L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1044, __T545622784, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__146138_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146237_19_digits));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__146138_53_bin, __146236_19_fraction);
+if (__146369_19_digits != 0) {
+(((long)__146369_19_digits) < 11L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1044, __T812693936, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__146270_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146369_19_digits));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__146270_53_bin, __146368_19_fraction);
 }
-if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__146138_53_bin)) {
-(__146139_53_dec->type) = _ZN3edg13fpt_underflowE;
-} else  { if (__146180_29_exp_is_negative) {
-_ZN3edg27normalize_and_round_float16EPNS_12an_fp_binaryE(__146138_53_bin);
+if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__146270_53_bin)) {
+(__146271_53_dec->type) = _ZN3edg13fpt_underflowE;
+} else  { if (__146312_29_exp_is_negative) {
+_ZN3edg27normalize_and_round_float16EPNS_12an_fp_binaryE(__146270_53_bin);
 
-if (__146179_29_first_exp != 0) {
+if (__146311_29_first_exp != 0) {
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__146138_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146179_29_first_exp));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__146270_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146311_29_first_exp));
 }
-if (__146178_29_exp == 0) {
+if (__146310_29_exp == 0) {
 
-} else  { if (((long)__146178_29_exp) < 11L) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__146138_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146178_29_exp));
+} else  { if (((long)__146310_29_exp) < 11L) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__146270_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146310_29_exp));
 } else  {
 
-auto int __146287_13_idx = 0;
-__146178_29_exp >>= 3;
+auto int __146419_13_idx = 0;
+__146310_29_exp >>= 3;
 
-for (__146287_13_idx = 0; (__146178_29_exp != 0) && (__146287_13_idx < 2); (++__146287_13_idx) , (__146178_29_exp >>= 1)) {
-if ((__146178_29_exp & 0x1) != 0) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__146138_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16big_tens_float16E) + __146287_13_idx));
+for (__146419_13_idx = 0; (__146310_29_exp != 0) && (__146419_13_idx < 2); (++__146419_13_idx) , (__146310_29_exp >>= 1)) {
+if ((__146310_29_exp & 0x1) != 0) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__146270_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16big_tens_float16E) + __146419_13_idx));
 }
 }
 
-if (__146178_29_exp != 0) {
+if (__146310_29_exp != 0) {
 
-auto _ZN3edg12an_fp_binaryE __146298_37_old_value;
-auto _ZN3edg12an_fp_binaryE __146299_37_fp_min;
+auto _ZN3edg12an_fp_binaryE __146430_37_old_value;
+auto _ZN3edg12an_fp_binaryE __146431_37_fp_min;
 #line 1074
-__146298_37_old_value = (*__146138_53_bin);
+__146430_37_old_value = (*__146270_53_bin);
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16float16_make_minEPNS0_12an_fp_binaryE((&__146299_37_fp_min));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16float16_make_minEPNS0_12an_fp_binaryE((&__146431_37_fp_min));
 
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__146138_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16big_tens_float16E) + __146287_13_idx));
-while (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_(__146138_53_bin, (&__146299_37_fp_min))) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__146270_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16big_tens_float16E) + __146419_13_idx));
+while (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_(__146270_53_bin, (&__146431_37_fp_min))) {
 
-auto int __146308_17_adjust;
-if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__146138_53_bin)) {
+auto int __146440_17_adjust;
+if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__146270_53_bin)) {
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg26float16_make_min_subnormalEPNS0_12an_fp_binaryE(__146138_53_bin);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg26float16_make_min_subnormalEPNS0_12an_fp_binaryE(__146270_53_bin);
 
 
 
 }
 
-__146308_17_adjust = ((__146299_37_fp_min.exponent) - (__146138_53_bin->exponent));
+__146440_17_adjust = ((__146431_37_fp_min.exponent) - (__146270_53_bin->exponent));
 
 
 
 
-(*__146138_53_bin) = __146298_37_old_value;
-(*__146140_53_pscale) += __146308_17_adjust;
+(*__146270_53_bin) = __146430_37_old_value;
+(*__146272_53_pscale) += __146440_17_adjust;
 
-(__146138_53_bin->exponent) += __146308_17_adjust;
-
-
+(__146270_53_bin->exponent) += __146440_17_adjust;
 
 
-__146298_37_old_value = (*__146138_53_bin);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__146138_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16big_tens_float16E) + __146287_13_idx));
+
+
+__146430_37_old_value = (*__146270_53_bin);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__146270_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16big_tens_float16E) + __146419_13_idx));
 }
 }
 } }
 } else  {
 
-if (__146179_29_first_exp != 0) {
+if (__146311_29_first_exp != 0) {
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__146138_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146179_29_first_exp));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__146270_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146311_29_first_exp));
 }
-if (__146178_29_exp == 0) {
+if (__146310_29_exp == 0) {
 
-} else  { if (((long)__146178_29_exp) < 11L) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__146138_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146178_29_exp));
+} else  { if (((long)__146310_29_exp) < 11L) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__146270_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146310_29_exp));
 } else  {
 
-auto int __146348_13_idx;
-__146178_29_exp >>= 3;
-for (__146348_13_idx = 0; __146178_29_exp != 0; (++__146348_13_idx) , (__146178_29_exp >>= 1)) {
-if ((__146178_29_exp & 0x1) != 0) {
-(__146348_13_idx < 3) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1128, __T545622784, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__146138_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16big_tens_float16E) + __146348_13_idx));
+auto int __146480_13_idx;
+__146310_29_exp >>= 3;
+for (__146480_13_idx = 0; __146310_29_exp != 0; (++__146480_13_idx) , (__146310_29_exp >>= 1)) {
+if ((__146310_29_exp & 0x1) != 0) {
+(__146480_13_idx < 3) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1128, __T812693936, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__146270_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16big_tens_float16E) + __146480_13_idx));
 }
 }
 } }
 } }
-if (__146139_53_dec->is_negative) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_negateEPNS0_12an_fp_binaryE(__146138_53_bin);
+if (__146271_53_dec->is_negative) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_negateEPNS0_12an_fp_binaryE(__146270_53_bin);
 }
 } 
 }
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg20fast_bin2dec_float16EPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEPvi( _ZN3edg13an_fp_decimalE *__146365_58_dec, 
-_ZN3edg12an_fp_binaryE *__146366_58_bin, 
-void *__146367_58_val, 
-int __146368_57_ndigits)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg20fast_bin2dec_float16EPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEPvi( _ZN3edg13an_fp_decimalE *__146497_58_dec, 
+_ZN3edg12an_fp_binaryE *__146498_58_bin, 
+void *__146499_58_val, 
+int __146500_57_ndigits)
 #line 1153
 {
-auto _ZN3edg12an_fp_binaryE __146378_29_d;
-auto _ZN3edg12an_fp_binaryE __146379_29_ds;
-auto int __146380_29_k;
-auto int __146381_29_dig_pos;
-auto _ZN3edg9a_booleanE __146382_29_res;
+auto _ZN3edg12an_fp_binaryE __146510_29_d;
+auto _ZN3edg12an_fp_binaryE __146511_29_ds;
+auto int __146512_29_k;
+auto int __146513_29_dig_pos;
+auto _ZN3edg9a_booleanE __146514_29_res;
 
-if (((__146366_58_bin->exponent) <= 0) || ((__146366_58_bin->exponent) < ((__146366_58_bin->precision) - (_ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_frac_low_zero_bitsEPhi(((__146366_58_bin->frac)), (__146366_58_bin->precision))))))
+if (((__146498_58_bin->exponent) <= 0) || ((__146498_58_bin->exponent) < ((__146498_58_bin->precision) - (_ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_frac_low_zero_bitsEPhi(((__146498_58_bin->frac)), (__146498_58_bin->precision))))))
 
 {
 
-__146382_29_res = ((_ZN3edg9a_booleanE)0);
-goto __146463_1_end_of_routine;
+__146514_29_res = ((_ZN3edg9a_booleanE)0);
+goto __146595_1_end_of_routine;
 }
-__146380_29_k = ((int)((30103L * ((long)(__146366_58_bin->exponent))) / 100000L));
-if (11L <= ((long)__146380_29_k)) {
+__146512_29_k = ((int)((30103L * ((long)(__146498_58_bin->exponent))) / 100000L));
+if (11L <= ((long)__146512_29_k)) {
 
-__146382_29_res = ((_ZN3edg9a_booleanE)0);
-goto __146463_1_end_of_routine;
+__146514_29_res = ((_ZN3edg9a_booleanE)0);
+goto __146595_1_end_of_routine;
 }
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__146378_29_d), __146366_58_bin);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__146510_29_d), __146498_58_bin);
 
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_absEPNS0_12an_fp_binaryE((&__146378_29_d));
-while ((0 < __146380_29_k) && (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_((&__146378_29_d), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146380_29_k)))) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_absEPNS0_12an_fp_binaryE((&__146510_29_d));
+while ((0 < __146512_29_k) && (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_((&__146510_29_d), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146512_29_k)))) {
 
---__146380_29_k;
+--__146512_29_k;
 }
-if ((__146380_29_k < 0) || (((30103L * ((long)(__146366_58_bin->precision))) / 100000L) <= ((long)__146380_29_k))) {
+if ((__146512_29_k < 0) || (((30103L * ((long)(__146498_58_bin->precision))) / 100000L) <= ((long)__146512_29_k))) {
 
-__146382_29_res = ((_ZN3edg9a_booleanE)0);
-goto __146463_1_end_of_routine;
+__146514_29_res = ((_ZN3edg9a_booleanE)0);
+goto __146595_1_end_of_routine;
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__146379_29_ds), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146380_29_k));
-for (__146381_29_dig_pos = 0; (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE((&__146378_29_d)))) && (__146381_29_dig_pos <= __146368_57_ndigits); (_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj((&__146378_29_d), 10U)) , (++
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__146511_29_ds), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg18small_tens_float16E) + __146512_29_k));
+for (__146513_29_dig_pos = 0; (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE((&__146510_29_d)))) && (__146513_29_dig_pos <= __146500_57_ndigits); (_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj((&__146510_29_d), 10U)) , (++
 #line 1189
-__146381_29_dig_pos))
+__146513_29_dig_pos))
 
 {
-auto int __146416_31_digit;
-auto _ZN3edg12an_fp_binaryE __146417_31_tmp;
+auto int __146548_31_digit;
+auto _ZN3edg12an_fp_binaryE __146549_31_tmp;
 #line 1200
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__146417_31_tmp), (&__146378_29_d));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_((&__146417_31_tmp), (&__146379_29_ds));
-__146416_31_digit = (_ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_to_intEPNS0_12an_fp_binaryE((&__146417_31_tmp)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__146417_31_tmp), (&__146379_29_ds));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj((&__146417_31_tmp), ((unsigned)__146416_31_digit));
-if (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_((&__146378_29_d), (&__146417_31_tmp))) {
---__146416_31_digit;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_((&__146417_31_tmp), (&__146379_29_ds));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__146549_31_tmp), (&__146510_29_d));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_((&__146549_31_tmp), (&__146511_29_ds));
+__146548_31_digit = (_ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_to_intEPNS0_12an_fp_binaryE((&__146549_31_tmp)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__146549_31_tmp), (&__146511_29_ds));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj((&__146549_31_tmp), ((unsigned)__146548_31_digit));
+if (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_((&__146510_29_d), (&__146549_31_tmp))) {
+--__146548_31_digit;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_((&__146549_31_tmp), (&__146511_29_ds));
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_((&__146378_29_d), (&__146417_31_tmp));
-(((((long)__146381_29_dig_pos) < 23L) && (0 <= __146416_31_digit)) && (__146416_31_digit < 10)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1210, __T545629648, ((
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_((&__146510_29_d), (&__146549_31_tmp));
+(((((long)__146513_29_dig_pos) < 23L) && (0 <= __146548_31_digit)) && (__146548_31_digit < 10)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1210, __T812700856, ((
 #line 1210
 _ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-(((__146365_58_dec->digits))[__146381_29_dig_pos]) = ((char)(48 + ((int)((char)__146416_31_digit))));
+(((__146497_58_dec->digits))[__146513_29_dig_pos]) = ((char)(48 + ((int)((char)__146548_31_digit))));
 }
-if (__146368_57_ndigits < __146381_29_dig_pos) {
+if (__146500_57_ndigits < __146513_29_dig_pos) {
 
---__146381_29_dig_pos;
-if (((int)(((__146365_58_dec->digits))[__146381_29_dig_pos])) < 53) {
+--__146513_29_dig_pos;
+if (((int)(((__146497_58_dec->digits))[__146513_29_dig_pos])) < 53) {
 
-} else  { if (((53 < ((int)(((__146365_58_dec->digits))[__146381_29_dig_pos]))) || (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE((&__146378_29_d))))) || (((((int)(((__146365_58_dec->digits))[(__146381_29_dig_pos - 1)])) - 48) % 2) != 0))
+} else  { if (((53 < ((int)(((__146497_58_dec->digits))[__146513_29_dig_pos]))) || (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE((&__146510_29_d))))) || (((((int)(((__146497_58_dec->digits))[(__146513_29_dig_pos - 1)])) - 48) % 2) != 0))
 
 {
-__146381_29_dig_pos = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8do_roundEiPc(__146381_29_dig_pos, ((__146365_58_dec->digits))));
-if (__146381_29_dig_pos == 0) {
-__146381_29_dig_pos = 1;
-++__146380_29_k;
+__146513_29_dig_pos = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8do_roundEiPc(__146513_29_dig_pos, ((__146497_58_dec->digits))));
+if (__146513_29_dig_pos == 0) {
+__146513_29_dig_pos = 1;
+++__146512_29_k;
 }
 } }
 }
 
-while ((1 < __146381_29_dig_pos) && (((int)(((__146365_58_dec->digits))[(__146381_29_dig_pos - 1)])) == 48)) {
---__146381_29_dig_pos;
+while ((1 < __146513_29_dig_pos) && (((int)(((__146497_58_dec->digits))[(__146513_29_dig_pos - 1)])) == 48)) {
+--__146513_29_dig_pos;
 }
 
-(__146365_58_dec->is_negative) = (__146366_58_bin->is_negative);
-(__146365_58_dec->exponent) = (__146380_29_k + 1);
-(((long)__146381_29_dig_pos) < 23L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1235, __T545629648, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-(((__146365_58_dec->digits))[__146381_29_dig_pos]) = ((char)0);
-(__146365_58_dec->ndigits) = __146381_29_dig_pos;
-__146382_29_res = ((_ZN3edg9a_booleanE)1);
-__146463_1_end_of_routine:;
-return __146382_29_res;
+(__146497_58_dec->is_negative) = (__146498_58_bin->is_negative);
+(__146497_58_dec->exponent) = (__146512_29_k + 1);
+(((long)__146513_29_dig_pos) < 23L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1235, __T812700856, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))
+#line 1235
+;
+(((__146497_58_dec->digits))[__146513_29_dig_pos]) = ((char)0);
+(__146497_58_dec->ndigits) = __146513_29_dig_pos;
+__146514_29_res = ((_ZN3edg9a_booleanE)1);
+__146595_1_end_of_routine:;
+return __146514_29_res;
 }
 
 
-static enum _ZN3edg17an_fp_return_typeE _ZN32_INTERNAL_10_floating_c_7968bde93edg22write_float16_internalEPciPhi( char *__146468_59_tgt, 
-int __146469_58_size, 
-unsigned char *__146470_59_val, 
-int __146471_58_ndigits)
+static enum _ZN3edg17an_fp_return_typeE _ZN32_INTERNAL_10_floating_c_7968bde93edg22write_float16_internalEPciPhi( char *__146600_59_tgt, 
+int __146601_58_size, 
+unsigned char *__146602_59_val, 
+int __146603_58_ndigits)
 #line 1258
 {
-auto enum _ZN3edg17an_fp_return_typeE __146483_21_res = _ZN3edg12fp_ret_validE;
+auto enum _ZN3edg17an_fp_return_typeE __146615_21_res = _ZN3edg12fp_ret_validE;
 
-(_ZN3edg20floating_init_calledE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1261, __T545632424, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-if ((__146468_59_tgt == ((char *)0)) || (__146469_58_size <= 0)) {
-__146483_21_res = _ZN3edg16fp_ret_too_smallE;
-} else  { if ((__146470_59_val == ((unsigned char *)0)) || (__146469_58_size < 0)) {
-__146483_21_res = _ZN3edg14fp_ret_invalidE;
+(_ZN3edg20floating_init_calledE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1261, __T812703648, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+if ((__146600_59_tgt == ((char *)0)) || (__146601_58_size <= 0)) {
+__146615_21_res = _ZN3edg16fp_ret_too_smallE;
+} else  { if ((__146602_59_val == ((unsigned char *)0)) || (__146601_58_size < 0)) {
+__146615_21_res = _ZN3edg14fp_ret_invalidE;
 } else  {
-auto _ZN3edg12an_fp_binaryE __146491_18_bin;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg13split_float16EPNS0_12an_fp_binaryEPh((&__146491_18_bin), __146470_59_val);
-if (((__146491_18_bin.is_negative) && (((int)(__146491_18_bin.type)) != 3)) && (((int)(__146491_18_bin.type)) != 0)) {
-(*(__146468_59_tgt++)) = ((char)45);
---__146469_58_size;
+auto _ZN3edg12an_fp_binaryE __146623_18_bin;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg13split_float16EPNS0_12an_fp_binaryEPh((&__146623_18_bin), __146602_59_val);
+if (((__146623_18_bin.is_negative) && (((int)(__146623_18_bin.type)) != 3)) && (((int)(__146623_18_bin.type)) != 0)) {
+(*(__146600_59_tgt++)) = ((char)45);
+--__146601_58_size;
 }
 
 
-__146483_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg18convert_and_formatEPcyPNS0_12an_fp_binaryE(__146468_59_tgt, ((size_t)__146469_58_size), (&__146491_18_bin)));
-if (((int)__146483_21_res) == (-1)) {
-auto _ZN3edg13an_fp_decimalE __146501_21_dec;
+__146615_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg18convert_and_formatEPcyPNS0_12an_fp_binaryE(__146600_59_tgt, ((size_t)__146601_58_size), (&__146623_18_bin)));
+if (((int)__146615_21_res) == (-1)) {
+auto _ZN3edg13an_fp_decimalE __146633_21_dec;
 
 
-if (((int)(_ZN32_INTERNAL_10_floating_c_7968bde93edg20fast_bin2dec_float16EPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEPvi((&__146501_21_dec), (&__146491_18_bin), ((void *)__146470_59_val), __146471_58_ndigits))) == 0) {
+if (((int)(_ZN32_INTERNAL_10_floating_c_7968bde93edg20fast_bin2dec_float16EPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEPvi((&__146633_21_dec), (&__146623_18_bin), ((void *)__146602_59_val), __146603_58_ndigits))) == 0) {
 
 
 
-auto int __146508_13_adjust = 0;
-if ((__146491_18_bin.exponent) < (-125)) {
-__146508_13_adjust = ((-125) - (__146491_18_bin.exponent));
+auto int __146640_13_adjust = 0;
+if ((__146623_18_bin.exponent) < (-125)) {
+__146640_13_adjust = ((-125) - (__146623_18_bin.exponent));
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg7bin2decEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEii((&__146501_21_dec), (&__146491_18_bin), __146471_58_ndigits, __146508_13_adjust);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg7bin2decEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEii((&__146633_21_dec), (&__146623_18_bin), __146603_58_ndigits, __146640_13_adjust);
 }
 
 
 
-__146483_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg6formatEPcyPNS0_13an_fp_decimalE(__146468_59_tgt, ((size_t)__146469_58_size), (&__146501_21_dec)));
+__146615_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg6formatEPcyPNS0_13an_fp_decimalE(__146600_59_tgt, ((size_t)__146601_58_size), (&__146633_21_dec)));
 }
 } }
-return __146483_21_res;
+return __146615_21_res;
 }
 
 
-enum _ZN3edg17an_fp_return_typeE _ZN3edg13write_float16EPciPh( char *__146524_43_tgt, 
-int __146525_42_size, 
-unsigned char *__146526_43_val)
+enum _ZN3edg17an_fp_return_typeE _ZN3edg13write_float16EPciPh( char *__146656_43_tgt, 
+int __146657_42_size, 
+unsigned char *__146658_43_val)
 #line 1316
 {
-auto int __146541_7_ndigits;
+auto int __146673_7_ndigits;
 #line 1329
-__146541_7_ndigits = 0x7fffffff;
+__146673_7_ndigits = 0x7fffffff;
 
 
-return _ZN32_INTERNAL_10_floating_c_7968bde93edg22write_float16_internalEPciPhi(__146524_43_tgt, __146525_42_size, __146526_43_val, __146541_7_ndigits);
+return _ZN32_INTERNAL_10_floating_c_7968bde93edg22write_float16_internalEPciPhi(__146656_43_tgt, __146657_42_size, __146658_43_val, __146673_7_ndigits);
 }
 
 
-enum _ZN3edg17an_fp_return_typeE _ZN3edg15write_float16_nEPciPhi( char *__146560_45_tgt, 
-int __146561_44_size, 
-unsigned char *__146562_45_val, 
-int __146563_44_ndigits)
+enum _ZN3edg17an_fp_return_typeE _ZN3edg15write_float16_nEPciPhi( char *__146692_45_tgt, 
+int __146693_44_size, 
+unsigned char *__146694_45_val, 
+int __146695_44_ndigits)
 #line 1356
 {
-if (__146563_44_ndigits <= 0) {
-__146563_44_ndigits = 1;
-} else  { if (23L <= ((long)__146563_44_ndigits)) {
+if (__146695_44_ndigits <= 0) {
+__146695_44_ndigits = 1;
+} else  { if (23L <= ((long)__146695_44_ndigits)) {
 
 
-__146563_44_ndigits = 22;
+__146695_44_ndigits = 22;
 } }
-return _ZN32_INTERNAL_10_floating_c_7968bde93edg22write_float16_internalEPciPhi(__146560_45_tgt, __146561_44_size, __146562_45_val, __146563_44_ndigits);
+return _ZN32_INTERNAL_10_floating_c_7968bde93edg22write_float16_internalEPciPhi(__146692_45_tgt, __146693_44_size, __146694_45_val, __146695_44_ndigits);
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg15convert_float16EPhPNS0_19an_fp_decimal_inputE( unsigned char *__146592_45_val, 
-_ZN3edg19an_fp_decimal_inputE *__146593_45_dec)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg15convert_float16EPhPNS0_19an_fp_decimal_inputE( unsigned char *__146724_45_val, 
+_ZN3edg19an_fp_decimal_inputE *__146725_45_dec)
 
 
 
 {
-auto _ZN3edg12an_fp_binaryE __146598_16_bin;
-auto int __146599_16_scale = 0;
+auto _ZN3edg12an_fp_binaryE __146730_16_bin;
+auto int __146731_16_scale = 0;
 #line 1383
-(__146598_16_bin.precision) = 24;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE((&__146598_16_bin));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg20fast_dec2bin_float16EPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEPi((&__146598_16_bin), __146593_45_dec, (&__146599_16_scale));
+(__146730_16_bin.precision) = 24;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE((&__146730_16_bin));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg20fast_dec2bin_float16EPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEPi((&__146730_16_bin), __146725_45_dec, (&__146731_16_scale));
 
 
 
 
-if (((int)(__146593_45_dec->type)) == 1) {
+if (((int)(__146725_45_dec->type)) == 1) {
 #line 1399
-if ((((int)(__146598_16_bin.type)) == 6) || (((int)(__146598_16_bin.type)) == 7)) {
+if ((((int)(__146730_16_bin.type)) == 6) || (((int)(__146730_16_bin.type)) == 7)) {
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg26float16_make_min_subnormalEPNS0_12an_fp_binaryE((&__146598_16_bin));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg26float16_make_min_subnormalEPNS0_12an_fp_binaryE((&__146730_16_bin));
 }
-if (((int)(__146598_16_bin.type)) == 2) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi((&__146598_16_bin), __146593_45_dec, __146599_16_scale);
+if (((int)(__146730_16_bin.type)) == 2) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi((&__146730_16_bin), __146725_45_dec, __146731_16_scale);
 }
-if (128 < (__146598_16_bin.exponent)) {
-(__146593_45_dec->type) = _ZN3edg12fpt_overflowE;
-} else  { if ((__146598_16_bin.exponent) < (-148)) {
-(__146593_45_dec->type) = _ZN3edg13fpt_underflowE;
+if (128 < (__146730_16_bin.exponent)) {
+(__146725_45_dec->type) = _ZN3edg12fpt_overflowE;
+} else  { if ((__146730_16_bin.exponent) < (-148)) {
+(__146725_45_dec->type) = _ZN3edg13fpt_underflowE;
 } else  {
-(__146598_16_bin.is_negative) = (__146593_45_dec->is_negative);
+(__146730_16_bin.is_negative) = (__146725_45_dec->is_negative);
 
 
 
 } }
 }
 
-if ((((int)(__146593_45_dec->type)) == 1) || (((int)(__146593_45_dec->type)) == 2)) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12make_float16EPhPNS0_12an_fp_binaryE(__146592_45_val, (&__146598_16_bin));
+if ((((int)(__146725_45_dec->type)) == 1) || (((int)(__146725_45_dec->type)) == 2)) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12make_float16EPhPNS0_12an_fp_binaryE(__146724_45_val, (&__146730_16_bin));
 } 
 
 }
 
 
-enum _ZN3edg17an_fp_return_typeE _ZN3edg12read_float16EPhPKci( unsigned char *__146650_42_val, 
-_ZN3edg12a_const_charE *__146651_42_str, 
-int __146652_41_len)
+enum _ZN3edg17an_fp_return_typeE _ZN3edg12read_float16EPhPKci( unsigned char *__146782_42_val, 
+_ZN3edg12a_const_charE *__146783_42_str, 
+int __146784_41_len)
 #line 1441
 {
-auto _ZN3edg19an_fp_decimal_inputE __146666_23_dec;
-auto enum _ZN3edg17an_fp_return_typeE __146667_23_res = _ZN3edg14fp_ret_invalidE;
+auto _ZN3edg19an_fp_decimal_inputE __146798_23_dec;
+auto enum _ZN3edg17an_fp_return_typeE __146799_23_res = _ZN3edg14fp_ret_invalidE;
 
-(_ZN3edg20floating_init_calledE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1445, __T545639896, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-if (((__146650_42_val == ((unsigned char *)0)) || (__146651_42_str == ((_ZN3edg12a_const_charE *)0))) || (__146652_41_len <= 0)) {
-(__146666_23_dec.type) = _ZN3edg11fpt_invalidE;
+(_ZN3edg20floating_init_calledE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1445, __T812711128, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+if (((__146782_42_val == ((unsigned char *)0)) || (__146783_42_str == ((_ZN3edg12a_const_charE *)0))) || (__146784_41_len <= 0)) {
+(__146798_23_dec.type) = _ZN3edg11fpt_invalidE;
 } else  {
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12split_stringEPNS0_19an_fp_decimal_inputEPKcS4_((&__146666_23_dec), __146651_42_str, (__146651_42_str + __146652_41_len));
-if (((int)(__146666_23_dec.type)) == 2) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15convert_float16EPhPNS0_19an_fp_decimal_inputE(__146650_42_val, (&__146666_23_dec));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12split_stringEPNS0_19an_fp_decimal_inputEPKcS4_((&__146798_23_dec), __146783_42_str, (__146783_42_str + __146784_41_len));
+if (((int)(__146798_23_dec.type)) == 2) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15convert_float16EPhPNS0_19an_fp_decimal_inputE(__146782_42_val, (&__146798_23_dec));
 }
 }
-if (((int)(__146666_23_dec.type)) == 0) {
-__146667_23_res = _ZN3edg14fp_ret_invalidE;
-} else  { if ((((int)(__146666_23_dec.type)) == 1) || (((int)(__146666_23_dec.type)) == 2)) {
-__146667_23_res = _ZN3edg12fp_ret_validE;
+if (((int)(__146798_23_dec.type)) == 0) {
+__146799_23_res = _ZN3edg14fp_ret_invalidE;
+} else  { if ((((int)(__146798_23_dec.type)) == 1) || (((int)(__146798_23_dec.type)) == 2)) {
+__146799_23_res = _ZN3edg12fp_ret_validE;
 } else  {
-auto _ZN3edg12an_fp_binaryE __146685_18_bin;
-(__146685_18_bin.precision) = 24;
-(__146685_18_bin.is_negative) = (__146666_23_dec.is_negative);
-switch ((int)(__146666_23_dec.type)) {
+auto _ZN3edg12an_fp_binaryE __146817_18_bin;
+(__146817_18_bin.precision) = 24;
+(__146817_18_bin.is_negative) = (__146798_23_dec.is_negative);
+switch ((int)(__146798_23_dec.type)) {
 case 3:
-(__146685_18_bin.type) = _ZN3edg7fpt_nanE;
-__146667_23_res = _ZN3edg10fp_ret_nanE;
-goto __T546381248;
+(__146817_18_bin.type) = _ZN3edg7fpt_nanE;
+__146799_23_res = _ZN3edg10fp_ret_nanE;
+goto __T813432896;
 case 4:
-(__146685_18_bin.type) = _ZN3edg12fpt_infinityE;
-__146667_23_res = ((__146685_18_bin.is_negative) ? _ZN3edg19fp_ret_neg_infinityE : _ZN3edg19fp_ret_pos_infinityE);
-goto __T546381248;
+(__146817_18_bin.type) = _ZN3edg12fpt_infinityE;
+__146799_23_res = ((__146817_18_bin.is_negative) ? _ZN3edg19fp_ret_neg_infinityE : _ZN3edg19fp_ret_pos_infinityE);
+goto __T813432896;
 case 5:
-(__146685_18_bin.type) = _ZN3edg12fpt_infinityE;
-__146667_23_res = _ZN3edg15fp_ret_overflowE;
-goto __T546381248;
+(__146817_18_bin.type) = _ZN3edg12fpt_infinityE;
+__146799_23_res = _ZN3edg15fp_ret_overflowE;
+goto __T813432896;
 case 6:
-(__146685_18_bin.type) = _ZN3edg8fpt_zeroE;
-__146667_23_res = _ZN3edg12fp_ret_validE;
-goto __T546381248;
+(__146817_18_bin.type) = _ZN3edg8fpt_zeroE;
+__146799_23_res = _ZN3edg12fp_ret_validE;
+goto __T813432896;
 case 7:
-(__146685_18_bin.type) = _ZN3edg8fpt_zeroE;
-__146667_23_res = _ZN3edg16fp_ret_underflowE;
-goto __T546381248;
+(__146817_18_bin.type) = _ZN3edg8fpt_zeroE;
+__146799_23_res = _ZN3edg16fp_ret_underflowE;
+goto __T813432896;
 default:
-_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1486, __T545639896, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
-} __T546381248:;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12make_float16EPhPNS0_12an_fp_binaryE(__146650_42_val, (&__146685_18_bin));
+_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1486, __T812711128, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
+} __T813432896:;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12make_float16EPhPNS0_12an_fp_binaryE(__146782_42_val, (&__146817_18_bin));
 } }
-return __146667_23_res;
+return __146799_23_res;
 }
 #line 411 "src/float_type.h"
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg21set_fraction_bfloat16EPhS1_( unsigned char *__147233_41_tgt, 
-unsigned char *__147234_41_frac)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg21set_fraction_bfloat16EPhS1_( unsigned char *__147365_41_tgt, 
+unsigned char *__147366_41_frac)
 
 
 
 
 {
-auto int __147240_7_i;
+auto int __147372_7_i;
 
-for (__147240_7_i = 0; __147240_7_i < 2; ++__147240_7_i) {
-(__147233_41_tgt[((_ZN3edg18host_little_endianE) ? __147240_7_i : (3 - __147240_7_i))]) = (__147234_41_frac[(__147240_7_i - 0)]);
+for (__147372_7_i = 0; __147372_7_i < 2; ++__147372_7_i) {
+(__147365_41_tgt[((_ZN3edg18host_little_endianE) ? __147372_7_i : (3 - __147372_7_i))]) = (__147366_41_frac[(__147372_7_i - 0)]);
 }
-(__147233_41_tgt[((_ZN3edg18host_little_endianE) ? __147240_7_i : (3 - __147240_7_i))]) &= 128;
+(__147365_41_tgt[((_ZN3edg18host_little_endianE) ? __147372_7_i : (3 - __147372_7_i))]) &= 128;
 
-(__147233_41_tgt[((_ZN3edg18host_little_endianE) ? __147240_7_i : (3 - __147240_7_i))]) |= ((((unsigned)(__147234_41_frac[(__147240_7_i - 0)])) & 127U) & 0xffffff7fU); 
+(__147365_41_tgt[((_ZN3edg18host_little_endianE) ? __147372_7_i : (3 - __147372_7_i))]) |= ((((unsigned)(__147366_41_frac[(__147372_7_i - 0)])) & 127U) & 0xffffff7fU); 
 
 
 
@@ -9550,245 +9613,245 @@ for (__147240_7_i = 0; __147240_7_i < 2; ++__147240_7_i) {
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg28set_biased_exponent_bfloat16EPhj( unsigned char *__147255_48_tgt, 
-unsigned __147256_47_biased_exponent)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg28set_biased_exponent_bfloat16EPhj( unsigned char *__147387_48_tgt, 
+unsigned __147388_47_biased_exponent)
 
 
 
 {
-auto int __147261_7_i;
+auto int __147393_7_i;
 
-__147261_7_i = 2;
-(__147255_48_tgt[((_ZN3edg18host_little_endianE) ? __147261_7_i : (3 - __147261_7_i))]) &= 127;
-(__147255_48_tgt[((_ZN3edg18host_little_endianE) ? __147261_7_i : (3 - __147261_7_i))]) |= ((__147256_47_biased_exponent << 7) & 128U);
-__147256_47_biased_exponent >>= 1;
+__147393_7_i = 2;
+(__147387_48_tgt[((_ZN3edg18host_little_endianE) ? __147393_7_i : (3 - __147393_7_i))]) &= 127;
+(__147387_48_tgt[((_ZN3edg18host_little_endianE) ? __147393_7_i : (3 - __147393_7_i))]) |= ((__147388_47_biased_exponent << 7) & 128U);
+__147388_47_biased_exponent >>= 1;
 
-++__147261_7_i;
+++__147393_7_i;
 #line 453
-(__147255_48_tgt[((_ZN3edg18host_little_endianE) ? __147261_7_i : (3 - __147261_7_i))]) &= 128;
-(__147255_48_tgt[((_ZN3edg18host_little_endianE) ? __147261_7_i : (3 - __147261_7_i))]) |= (__147256_47_biased_exponent & 127U); 
+(__147387_48_tgt[((_ZN3edg18host_little_endianE) ? __147393_7_i : (3 - __147393_7_i))]) &= 128;
+(__147387_48_tgt[((_ZN3edg18host_little_endianE) ? __147393_7_i : (3 - __147393_7_i))]) |= (__147388_47_biased_exponent & 127U); 
 
 }
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg21get_fraction_bfloat16EPhS1_( unsigned char *__147281_46_frac, 
-unsigned char *__147282_46_val)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg21get_fraction_bfloat16EPhS1_( unsigned char *__147413_46_frac, 
+unsigned char *__147414_46_val)
 #line 467
 {
-auto int __147290_13_i;
-auto _ZN3edg9a_booleanE __147291_13_res = ((_ZN3edg9a_booleanE)0);
+auto int __147422_13_i;
+auto _ZN3edg9a_booleanE __147423_13_res = ((_ZN3edg9a_booleanE)0);
 
-for (__147290_13_i = 0; __147290_13_i < 2; ++__147290_13_i) {
-(__147281_46_frac[(__147290_13_i - 0)]) = (__147282_46_val[((_ZN3edg18host_little_endianE) ? __147290_13_i : (3 - __147290_13_i))]);
-if (((int)(__147282_46_val[((_ZN3edg18host_little_endianE) ? __147290_13_i : (3 - __147290_13_i))])) != 0) {
-__147291_13_res = ((_ZN3edg9a_booleanE)1);
+for (__147422_13_i = 0; __147422_13_i < 2; ++__147422_13_i) {
+(__147413_46_frac[(__147422_13_i - 0)]) = (__147414_46_val[((_ZN3edg18host_little_endianE) ? __147422_13_i : (3 - __147422_13_i))]);
+if (((int)(__147414_46_val[((_ZN3edg18host_little_endianE) ? __147422_13_i : (3 - __147422_13_i))])) != 0) {
+__147423_13_res = ((_ZN3edg9a_booleanE)1);
 }
 }
-(__147281_46_frac[(__147290_13_i - 0)]) = ((unsigned char)(((unsigned)(__147282_46_val[((_ZN3edg18host_little_endianE) ? __147290_13_i : (3 - __147290_13_i))])) & 127U));
+(__147413_46_frac[(__147422_13_i - 0)]) = ((unsigned char)(((unsigned)(__147414_46_val[((_ZN3edg18host_little_endianE) ? __147422_13_i : (3 - __147422_13_i))])) & 127U));
 
-(__147281_46_frac[2]) |= 128U;
+(__147413_46_frac[2]) |= 128U;
 
-if ((((unsigned)(__147282_46_val[((_ZN3edg18host_little_endianE) ? __147290_13_i : (3 - __147290_13_i))])) & 127U) != 0U) {
-__147291_13_res = ((_ZN3edg9a_booleanE)1);
+if ((((unsigned)(__147414_46_val[((_ZN3edg18host_little_endianE) ? __147422_13_i : (3 - __147422_13_i))])) & 127U) != 0U) {
+__147423_13_res = ((_ZN3edg9a_booleanE)1);
 }
 #line 490
-return __147291_13_res;
+return __147423_13_res;
 }
 
 
-static int _ZN32_INTERNAL_10_floating_c_7968bde93edg28get_biased_exponent_bfloat16EPh( unsigned char *__147316_47_val)
+static int _ZN32_INTERNAL_10_floating_c_7968bde93edg28get_biased_exponent_bfloat16EPh( unsigned char *__147448_47_val)
 
 
 
 {
-auto int __147321_7_i = 3;
-auto int __147322_7_biased_exponent = 0;
+auto int __147453_7_i = 3;
+auto int __147454_7_biased_exponent = 0;
 
 
-__147322_7_biased_exponent = ((int)(((unsigned)(__147316_47_val[((_ZN3edg18host_little_endianE) ? __147321_7_i : (3 - __147321_7_i))])) & 127U));
---__147321_7_i;
-for (; __147321_7_i > 2; --__147321_7_i) {
-__147322_7_biased_exponent <<= 8;
-__147322_7_biased_exponent += ((int)(__147316_47_val[((_ZN3edg18host_little_endianE) ? __147321_7_i : (3 - __147321_7_i))]));
+__147454_7_biased_exponent = ((int)(((unsigned)(__147448_47_val[((_ZN3edg18host_little_endianE) ? __147453_7_i : (3 - __147453_7_i))])) & 127U));
+--__147453_7_i;
+for (; __147453_7_i > 2; --__147453_7_i) {
+__147454_7_biased_exponent <<= 8;
+__147454_7_biased_exponent += ((int)(__147448_47_val[((_ZN3edg18host_little_endianE) ? __147453_7_i : (3 - __147453_7_i))]));
 }
-__147322_7_biased_exponent <<= 1;
+__147454_7_biased_exponent <<= 1;
 
-__147322_7_biased_exponent |= ((int)((((unsigned)(__147316_47_val[((_ZN3edg18host_little_endianE) ? __147321_7_i : (3 - __147321_7_i))])) & 128U) >> 7));
+__147454_7_biased_exponent |= ((int)((((unsigned)(__147448_47_val[((_ZN3edg18host_little_endianE) ? __147453_7_i : (3 - __147453_7_i))])) & 128U) >> 7));
 
-return __147322_7_biased_exponent;
+return __147454_7_biased_exponent;
 }
 #line 524
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg14split_bfloat16EPNS0_12an_fp_binaryEPh( _ZN3edg12an_fp_binaryE *__147346_37_bin, 
-unsigned char *__147347_37_val)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg14split_bfloat16EPNS0_12an_fp_binaryEPh( _ZN3edg12an_fp_binaryE *__147478_37_bin, 
+unsigned char *__147479_37_val)
 
 
 
 {
-auto int __147352_13_biased_exponent;
-auto _ZN3edg9a_booleanE __147353_13_saw_nz;
+auto int __147484_13_biased_exponent;
+auto _ZN3edg9a_booleanE __147485_13_saw_nz;
 
 
 
 
-(((__147346_37_bin->frac))[2]) = ((unsigned char)0U);
-__147353_13_saw_nz = (_ZN32_INTERNAL_10_floating_c_7968bde93edg21get_fraction_bfloat16EPhS1_(((__147346_37_bin->frac)), __147347_37_val));
-__147352_13_biased_exponent = (_ZN32_INTERNAL_10_floating_c_7968bde93edg28get_biased_exponent_bfloat16EPh(__147347_37_val));
-(__147346_37_bin->is_negative) = ((_ZN3edg9a_booleanE)(((((int)(__147347_37_val[((_ZN3edg18host_little_endianE) ? 3 : 0)])) & 128) ? 1 : 0) != 0));
+(((__147478_37_bin->frac))[2]) = ((unsigned char)0U);
+__147485_13_saw_nz = (_ZN32_INTERNAL_10_floating_c_7968bde93edg21get_fraction_bfloat16EPhS1_(((__147478_37_bin->frac)), __147479_37_val));
+__147484_13_biased_exponent = (_ZN32_INTERNAL_10_floating_c_7968bde93edg28get_biased_exponent_bfloat16EPh(__147479_37_val));
+(__147478_37_bin->is_negative) = ((_ZN3edg9a_booleanE)(((((int)(__147479_37_val[((_ZN3edg18host_little_endianE) ? 3 : 0)])) & 128) ? 1 : 0) != 0));
 #line 550
 {
-if (__147352_13_biased_exponent == 255) {
-if (((int)__147353_13_saw_nz) == 0) {
-(__147346_37_bin->type) = _ZN3edg12fpt_infinityE;
+if (__147484_13_biased_exponent == 255) {
+if (((int)__147485_13_saw_nz) == 0) {
+(__147478_37_bin->type) = _ZN3edg12fpt_infinityE;
 } else  {
-(__147346_37_bin->type) = _ZN3edg7fpt_nanE;
+(__147478_37_bin->type) = _ZN3edg7fpt_nanE;
 }
-} else  { if (__147352_13_biased_exponent == 0) {
-if (((int)__147353_13_saw_nz) == 0) {
-(__147346_37_bin->type) = _ZN3edg8fpt_zeroE;
+} else  { if (__147484_13_biased_exponent == 0) {
+if (((int)__147485_13_saw_nz) == 0) {
+(__147478_37_bin->type) = _ZN3edg8fpt_zeroE;
 } else  {
 
 
-auto int __147385_13_high_bits;
-(((__147346_37_bin->frac))[2]) &= 127;
-__147385_13_high_bits = (_ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_high_zero_bitsEPhi(((__147346_37_bin->frac)), 24));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii(((__147346_37_bin->frac)), 24, __147385_13_high_bits);
-__147352_13_biased_exponent -= __147385_13_high_bits;
-++__147352_13_biased_exponent;
-(__147346_37_bin->type) = _ZN3edg10fpt_numberE;
+auto int __147517_13_high_bits;
+(((__147478_37_bin->frac))[2]) &= 127;
+__147517_13_high_bits = (_ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_high_zero_bitsEPhi(((__147478_37_bin->frac)), 24));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii(((__147478_37_bin->frac)), 24, __147517_13_high_bits);
+__147484_13_biased_exponent -= __147517_13_high_bits;
+++__147484_13_biased_exponent;
+(__147478_37_bin->type) = _ZN3edg10fpt_numberE;
 }
 } else  {
-(__147346_37_bin->type) = _ZN3edg10fpt_numberE;
+(__147478_37_bin->type) = _ZN3edg10fpt_numberE;
 } }
 }
-(__147346_37_bin->exponent) = ((__147352_13_biased_exponent - 127) + 1);
-(__147346_37_bin->precision) = 24; 
+(__147478_37_bin->exponent) = ((__147484_13_biased_exponent - 127) + 1);
+(__147478_37_bin->precision) = 24; 
 }
 
 
-void _ZN3edg28normalize_and_round_bfloat16EPNS_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__147402_40_bin)
+void _ZN3edg28normalize_and_round_bfloat16EPNS_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__147534_40_bin)
 #line 586
 {
 if (0) {
 
 
 
-auto union _ZZN3edg28normalize_and_round_bfloat16EPNS_12an_fp_binaryEEUt_ __147413_7_u;
-auto unsigned short __147414_20_mask = ((unsigned short)2047U);
+auto union _ZZN3edg28normalize_and_round_bfloat16EPNS_12an_fp_binaryEEUt_ __147545_7_u;
+auto unsigned short __147546_20_mask = ((unsigned short)2047U);
 
-memcpy(((void *)((__147413_7_u.bytes))), ((const void *)(&(__147402_40_bin->frac))), 2ULL);
-if (((__147402_40_bin->exponent) > 23) && ((((int)(__147413_7_u.val)) & ((int)__147414_20_mask)) != ((int)(__147413_7_u.val)))) {
+memcpy(((void *)((__147545_7_u.bytes))), ((const void *)(&(__147534_40_bin->frac))), 2ULL);
+if (((__147534_40_bin->exponent) > 23) && ((((int)(__147545_7_u.val)) & ((int)__147546_20_mask)) != ((int)(__147545_7_u.val)))) {
 
 
 
-auto int __147421_22_num_bits;
-auto unsigned short __147422_22_rounding_bit;
+auto int __147553_22_num_bits;
+auto unsigned short __147554_22_rounding_bit;
 #line 599
-__147421_22_num_bits = ((__147402_40_bin->exponent) - 23);
-__147422_22_rounding_bit = ((unsigned short)(((int)(__147413_7_u.val)) & (1 << (__147421_22_num_bits - 1))));
+__147553_22_num_bits = ((__147534_40_bin->exponent) - 23);
+__147554_22_rounding_bit = ((unsigned short)(((int)(__147545_7_u.val)) & (1 << (__147553_22_num_bits - 1))));
 
-(__147413_7_u.val) = ((unsigned short)((((int)(__147413_7_u.val)) + ((int)__147422_22_rounding_bit)) >> __147421_22_num_bits));
-if ((((int)(__147413_7_u.val)) & ((int)__147414_20_mask)) != ((int)(__147413_7_u.val))) {
+(__147545_7_u.val) = ((unsigned short)((((int)(__147545_7_u.val)) + ((int)__147554_22_rounding_bit)) >> __147553_22_num_bits));
+if ((((int)(__147545_7_u.val)) & ((int)__147546_20_mask)) != ((int)(__147545_7_u.val))) {
 
-(__147413_7_u.val) >>= 1;
-++(__147402_40_bin->exponent);
+(__147545_7_u.val) >>= 1;
+++(__147534_40_bin->exponent);
 }
-memcpy(((void *)(&(__147402_40_bin->frac))), ((const void *)((__147413_7_u.bytes))), 2ULL);
-++(__147402_40_bin->exponent);
+memcpy(((void *)(&(__147534_40_bin->frac))), ((const void *)((__147545_7_u.bytes))), 2ULL);
+++(__147534_40_bin->exponent);
 }
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg13make_bfloat16EPhPNS0_12an_fp_binaryE( unsigned char *__147437_36_tgt, 
-_ZN3edg12an_fp_binaryE *__147438_36_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg13make_bfloat16EPhPNS0_12an_fp_binaryE( unsigned char *__147569_36_tgt, 
+_ZN3edg12an_fp_binaryE *__147570_36_bin)
 #line 622
 {
-auto unsigned char __147445_17_fraction[3];
-auto int __147446_17_biased_exponent = 0;
+auto unsigned char __147577_17_fraction[3];
+auto int __147578_17_biased_exponent = 0;
 
 
-if (((int)(__147438_36_bin->type)) == 2) {
-_ZN3edg28normalize_and_round_bfloat16EPNS_12an_fp_binaryE(__147438_36_bin);
-memcpy(((void *)(__147445_17_fraction)), ((const void *)((__147438_36_bin->frac))), 3ULL);
-__147446_17_biased_exponent = (((__147438_36_bin->exponent) + 127) - 1);
-if ((__147438_36_bin->exponent) < ((-125) - (__147438_36_bin->precision))) {
-(__147438_36_bin->type) = _ZN3edg8fpt_zeroE;
-} else  { if (128 < (__147438_36_bin->exponent)) {
-(__147438_36_bin->type) = _ZN3edg12fpt_infinityE;
-} else  { if (__147446_17_biased_exponent <= 0) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg23fp_frac_shift_right_rawEPhii((__147445_17_fraction), (__147438_36_bin->precision), ((-__147446_17_biased_exponent) + 1));
-__147446_17_biased_exponent = 0;
+if (((int)(__147570_36_bin->type)) == 2) {
+_ZN3edg28normalize_and_round_bfloat16EPNS_12an_fp_binaryE(__147570_36_bin);
+memcpy(((void *)(__147577_17_fraction)), ((const void *)((__147570_36_bin->frac))), 3ULL);
+__147578_17_biased_exponent = (((__147570_36_bin->exponent) + 127) - 1);
+if ((__147570_36_bin->exponent) < ((-125) - (__147570_36_bin->precision))) {
+(__147570_36_bin->type) = _ZN3edg8fpt_zeroE;
+} else  { if (128 < (__147570_36_bin->exponent)) {
+(__147570_36_bin->type) = _ZN3edg12fpt_infinityE;
+} else  { if (__147578_17_biased_exponent <= 0) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg23fp_frac_shift_right_rawEPhii((__147577_17_fraction), (__147570_36_bin->precision), ((-__147578_17_biased_exponent) + 1));
+__147578_17_biased_exponent = 0;
 } } }
 }
-if (((int)(__147438_36_bin->type)) != 2) {
-memset(((void *)(__147445_17_fraction)), 0, 3ULL);
-switch ((int)(__147438_36_bin->type)) {
+if (((int)(__147570_36_bin->type)) != 2) {
+memset(((void *)(__147577_17_fraction)), 0, 3ULL);
+switch ((int)(__147570_36_bin->type)) {
 case 3:
 
-((__147445_17_fraction)[0]) = ((unsigned char)1U);
-__147446_17_biased_exponent = 255;
+((__147577_17_fraction)[0]) = ((unsigned char)1U);
+__147578_17_biased_exponent = 255;
 
-((__147445_17_fraction)[2]) = ((unsigned char)0U);
-((__147445_17_fraction)[2]) |= 64;
-goto __T547330584;
+((__147577_17_fraction)[2]) = ((unsigned char)0U);
+((__147577_17_fraction)[2]) |= 64;
+goto __T814513336;
 case 4:
 
-__147446_17_biased_exponent = 255;
-((__147445_17_fraction)[2]) = ((unsigned char)0U);
-goto __T547330584;
+__147578_17_biased_exponent = 255;
+((__147577_17_fraction)[2]) = ((unsigned char)0U);
+goto __T814513336;
 case 6:
 
-__147446_17_biased_exponent = 0;
-goto __T547330584;
+__147578_17_biased_exponent = 0;
+goto __T814513336;
 default:
-_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 661, __T545657832, ((const char *)"invalid floating-point value"), ((_ZN3edg12a_const_charE *)0));
-} __T547330584:;
+_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 661, __T814367976, ((const char *)"invalid floating-point value"), ((_ZN3edg12a_const_charE *)0));
+} __T814513336:;
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg21set_fraction_bfloat16EPhS1_(__147437_36_tgt, (__147445_17_fraction));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg28set_biased_exponent_bfloat16EPhj(__147437_36_tgt, ((unsigned)__147446_17_biased_exponent));
-if (((int)(__147438_36_bin->is_negative)) == 0) {
-(__147437_36_tgt[((_ZN3edg18host_little_endianE) ? 3 : 0)]) &= 127;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg21set_fraction_bfloat16EPhS1_(__147569_36_tgt, (__147577_17_fraction));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg28set_biased_exponent_bfloat16EPhj(__147569_36_tgt, ((unsigned)__147578_17_biased_exponent));
+if (((int)(__147570_36_bin->is_negative)) == 0) {
+(__147569_36_tgt[((_ZN3edg18host_little_endianE) ? 3 : 0)]) &= 127;
 } else  {
-(__147437_36_tgt[((_ZN3edg18host_little_endianE) ? 3 : 0)]) |= 128;
+(__147569_36_tgt[((_ZN3edg18host_little_endianE) ? 3 : 0)]) |= 128;
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg17bfloat16_make_minEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__147496_36_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg17bfloat16_make_minEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__147628_36_bin)
 
 
 
 {
-(__147496_36_bin->type) = _ZN3edg10fpt_numberE;
-(__147496_36_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
-(__147496_36_bin->exponent) = (-125);
-memset(((void *)((__147496_36_bin->frac))), 0, 9ULL);
-(((__147496_36_bin->frac))[2]) |= 128U;
-(__147496_36_bin->precision) = 24; 
+(__147628_36_bin->type) = _ZN3edg10fpt_numberE;
+(__147628_36_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
+(__147628_36_bin->exponent) = (-125);
+memset(((void *)((__147628_36_bin->frac))), 0, 9ULL);
+(((__147628_36_bin->frac))[2]) |= 128U;
+(__147628_36_bin->precision) = 24; 
 }
 
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg22make_bfloat16_bin_zeroEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__147511_44_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg22make_bfloat16_bin_zeroEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__147643_44_bin)
 
 
 
 {
-(__147511_44_bin->type) = _ZN3edg8fpt_zeroE;
-(__147511_44_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
-(__147511_44_bin->precision) = 24; 
+(__147643_44_bin->type) = _ZN3edg8fpt_zeroE;
+(__147643_44_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
+(__147643_44_bin->precision) = 24; 
 }
 #line 724
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg27bfloat16_make_min_subnormalEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__147546_46_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg27bfloat16_make_min_subnormalEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__147678_46_bin)
 
 
 
 {
-(__147546_46_bin->type) = _ZN3edg10fpt_numberE;
-(__147546_46_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
-(__147546_46_bin->exponent) = (-148);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_minEPhi(((__147546_46_bin->frac)), 24);
-(__147546_46_bin->precision) = 24; 
+(__147678_46_bin->type) = _ZN3edg10fpt_numberE;
+(__147678_46_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
+(__147678_46_bin->exponent) = (-148);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_minEPhi(((__147678_46_bin->frac)), 24);
+(__147678_46_bin->precision) = 24; 
 }
 #line 870
 static void _ZN32_INTERNAL_10_floating_c_7968bde93edg24initialize_tens_bfloat16Ev(void)
@@ -9796,7 +9859,7 @@ static void _ZN32_INTERNAL_10_floating_c_7968bde93edg24initialize_tens_bfloat16E
 
 
 {
-auto int __147697_16_i;
+auto int __147829_16_i;
 #line 881
 (_ZN32_INTERNAL_10_floating_c_7968bde93edg12dec_bfloat16E.exponent) = 9;
 
@@ -9806,20 +9869,20 @@ _ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm
 
 
 
-for (__147697_16_i = 1; ((long)__147697_16_i) < 11L; ++__147697_16_i) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __147697_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + (__147697_16_i - 1)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj(((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __147697_16_i), 10U);
+for (__147829_16_i = 1; ((long)__147829_16_i) < 11L; ++__147829_16_i) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __147829_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + (__147829_16_i - 1)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj(((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __147829_16_i), 10U);
 }
 
 _ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(_ZN32_INTERNAL_10_floating_c_7968bde93edg17big_tens_bfloat16E, (_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E + 8));
 
-for (__147697_16_i = 1; __147697_16_i < 3; ++__147697_16_i) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg17big_tens_bfloat16E) + __147697_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17big_tens_bfloat16E) + (__147697_16_i - 1)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg17big_tens_bfloat16E) + __147697_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17big_tens_bfloat16E) + __147697_16_i));
+for (__147829_16_i = 1; __147829_16_i < 3; ++__147829_16_i) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg17big_tens_bfloat16E) + __147829_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17big_tens_bfloat16E) + (__147829_16_i - 1)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg17big_tens_bfloat16E) + __147829_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17big_tens_bfloat16E) + __147829_16_i));
 
 (_ZN32_INTERNAL_10_floating_c_7968bde93edg12dec_bfloat16E.exponent) = ((2 * (_ZN32_INTERNAL_10_floating_c_7968bde93edg12dec_bfloat16E.exponent)) - 1);
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi(((_ZN32_INTERNAL_10_floating_c_7968bde93edg17big_tens_bfloat16E) + __147697_16_i), (&_ZN32_INTERNAL_10_floating_c_7968bde93edg12dec_bfloat16E), 0);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi(((_ZN32_INTERNAL_10_floating_c_7968bde93edg17big_tens_bfloat16E) + __147829_16_i), (&_ZN32_INTERNAL_10_floating_c_7968bde93edg12dec_bfloat16E), 0);
 #line 908
 } 
 
@@ -9827,17 +9890,17 @@ _ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg21fast_dec2bin_bfloat16EPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEPi( _ZN3edg12an_fp_binaryE *__147736_53_bin, 
-_ZN3edg19an_fp_decimal_inputE *__147737_53_dec, 
-int *__147738_53_pscale)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg21fast_dec2bin_bfloat16EPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEPi( _ZN3edg12an_fp_binaryE *__147868_53_bin, 
+_ZN3edg19an_fp_decimal_inputE *__147869_53_dec, 
+int *__147870_53_pscale)
 #line 953
 {
-auto int __147776_29_exp;
-auto int __147777_29_first_exp = 0;
-auto int __147778_29_exp_is_negative = 0;
-auto int __147779_29_sig_dig = 7;
+auto int __147908_29_exp;
+auto int __147909_29_first_exp = 0;
+auto int __147910_29_exp_is_negative = 0;
+auto int __147911_29_sig_dig = 7;
 #line 954
-__147776_29_exp = (__147737_53_dec->exponent);
+__147908_29_exp = (__147869_53_dec->exponent);
 
 
 
@@ -9845,471 +9908,473 @@ __147776_29_exp = (__147737_53_dec->exponent);
 (void)0;
 (void)0;
 
-if ((__147737_53_dec->precision) < __147779_29_sig_dig) {
-__147779_29_sig_dig = (__147737_53_dec->precision);
+if ((__147869_53_dec->precision) < __147911_29_sig_dig) {
+__147911_29_sig_dig = (__147869_53_dec->precision);
 #line 971
 }
 
-__147776_29_exp -= __147779_29_sig_dig;
+__147908_29_exp -= __147911_29_sig_dig;
 
-if (__147776_29_exp < 0) {
-__147778_29_exp_is_negative = 1;
-__147776_29_exp = (-__147776_29_exp);
+if (__147908_29_exp < 0) {
+__147910_29_exp_is_negative = 1;
+__147908_29_exp = (-__147908_29_exp);
 }
-(*__147738_53_pscale) = 0;
+(*__147870_53_pscale) = 0;
 
-if (39L < ((long)(__147737_53_dec->exponent))) {
-(__147737_53_dec->type) = _ZN3edg12fpt_overflowE;
-} else  { if (((long)(__147737_53_dec->exponent)) < (-45L)) {
+if (39L < ((long)(__147869_53_dec->exponent))) {
+(__147869_53_dec->type) = _ZN3edg12fpt_overflowE;
+} else  { if (((long)(__147869_53_dec->exponent)) < (-45L)) {
 
-(__147737_53_dec->type) = _ZN3edg13fpt_underflowE;
-} else  { if (6L < ((long)(__147737_53_dec->precision))) {
+(__147869_53_dec->type) = _ZN3edg13fpt_underflowE;
+} else  { if (6L < ((long)(__147869_53_dec->precision))) {
 
-(__147737_53_dec->type) = _ZN3edg10fpt_approxE;
-} else  { if (__147776_29_exp <= 10) {
+(__147869_53_dec->type) = _ZN3edg10fpt_approxE;
+} else  { if (__147908_29_exp <= 10) {
 
-(__147737_53_dec->type) = _ZN3edg10fpt_numberE;
-} else  { if ((!(__147778_29_exp_is_negative)) && (((long)__147776_29_exp) <= (16L - ((long)(__147737_53_dec->precision)))))
+(__147869_53_dec->type) = _ZN3edg10fpt_numberE;
+} else  { if ((!(__147910_29_exp_is_negative)) && (((long)__147908_29_exp) <= (16L - ((long)(__147869_53_dec->precision)))))
 {
 
-__147777_29_first_exp = ((int)(6L - ((long)(__147737_53_dec->precision))));
-__147776_29_exp -= __147777_29_first_exp;
-(__147737_53_dec->type) = _ZN3edg10fpt_numberE;
+__147909_29_first_exp = ((int)(6L - ((long)(__147869_53_dec->precision))));
+__147908_29_exp -= __147909_29_first_exp;
+(__147869_53_dec->type) = _ZN3edg10fpt_numberE;
 } else  {
 
-(__147737_53_dec->type) = _ZN3edg10fpt_approxE;
+(__147869_53_dec->type) = _ZN3edg10fpt_approxE;
 } } } } }
 
-if (((int)(__147737_53_dec->type)) == 1) {
+if (((int)(__147869_53_dec->type)) == 1) {
 
-__147777_29_first_exp = ((int)(((unsigned)__147776_29_exp) & 7U));
-__147776_29_exp -= __147777_29_first_exp;
+__147909_29_first_exp = ((int)(((unsigned)__147908_29_exp) & 7U));
+__147908_29_exp -= __147909_29_first_exp;
 }
-(__147777_29_first_exp <= 10) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1008, __T547561664, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(__147909_29_first_exp <= 10) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1008, __T814698528, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
-if ((((int)(__147737_53_dec->type)) == 2) || (((int)(__147737_53_dec->type)) == 1)) {
+if ((((int)(__147869_53_dec->type)) == 2) || (((int)(__147869_53_dec->type)) == 1)) {
 
-auto unsigned long __147834_19_fraction = 0UL;
-auto int __147835_19_digits = 0;
-auto _ZN3edg12a_const_charE *__147836_20_cur;
+auto unsigned long __147966_19_fraction = 0UL;
+auto int __147967_19_digits = 0;
+auto _ZN3edg12a_const_charE *__147968_20_cur;
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE(__147736_53_bin);
-for (__147836_20_cur = (__147737_53_dec->first_int); (__147836_20_cur != (__147737_53_dec->last_int)) && (__147779_29_sig_dig != 0); ((++__147836_20_cur) , (--__147779_29_sig_dig)) , (++__147835_19_digits))
+_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE(__147868_53_bin);
+for (__147968_20_cur = (__147869_53_dec->first_int); (__147968_20_cur != (__147869_53_dec->last_int)) && (__147911_29_sig_dig != 0); ((++__147968_20_cur) , (--__147911_29_sig_dig)) , (++__147967_19_digits))
 
 {
-if (__147835_19_digits == 9) {
-(((long)__147835_19_digits) < 11L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1021, __T547561664, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__147736_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __147835_19_digits));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__147736_53_bin, __147834_19_fraction);
-__147834_19_fraction = 0UL;
-__147835_19_digits = 0;
+if (__147967_19_digits == 9) {
+(((long)__147967_19_digits) < 11L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1021, __T814698528, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__147868_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __147967_19_digits));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__147868_53_bin, __147966_19_fraction);
+__147966_19_fraction = 0UL;
+__147967_19_digits = 0;
 }
-__147834_19_fraction *= 10UL;
-__147834_19_fraction += ((unsigned long)(((int)(*__147836_20_cur)) - 48));
+__147966_19_fraction *= 10UL;
+__147966_19_fraction += ((unsigned long)(((int)(*__147968_20_cur)) - 48));
 }
-for (__147836_20_cur = (__147737_53_dec->first_frac); (__147836_20_cur != (__147737_53_dec->last_frac)) && (__147779_29_sig_dig != 0); ((++__147836_20_cur) , (--__147779_29_sig_dig)) , (++__147835_19_digits))
+for (__147968_20_cur = (__147869_53_dec->first_frac); (__147968_20_cur != (__147869_53_dec->last_frac)) && (__147911_29_sig_dig != 0); ((++__147968_20_cur) , (--__147911_29_sig_dig)) , (++__147967_19_digits))
 
 {
-if (__147835_19_digits == 9) {
-(((long)__147835_19_digits) < 11L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1034, __T547561664, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__147736_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __147835_19_digits));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__147736_53_bin, __147834_19_fraction);
-__147834_19_fraction = 0UL;
-__147835_19_digits = 0;
+if (__147967_19_digits == 9) {
+(((long)__147967_19_digits) < 11L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1034, __T814698528, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__147868_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __147967_19_digits));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__147868_53_bin, __147966_19_fraction);
+__147966_19_fraction = 0UL;
+__147967_19_digits = 0;
 }
-__147834_19_fraction *= 10UL;
-__147834_19_fraction += ((unsigned long)(((int)(*__147836_20_cur)) - 48));
+__147966_19_fraction *= 10UL;
+__147966_19_fraction += ((unsigned long)(((int)(*__147968_20_cur)) - 48));
 }
-if (__147835_19_digits != 0) {
-(((long)__147835_19_digits) < 11L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1044, __T547561664, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__147736_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __147835_19_digits));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__147736_53_bin, __147834_19_fraction);
+if (__147967_19_digits != 0) {
+(((long)__147967_19_digits) < 11L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1044, __T814698528, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__147868_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __147967_19_digits));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__147868_53_bin, __147966_19_fraction);
 }
-if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__147736_53_bin)) {
-(__147737_53_dec->type) = _ZN3edg13fpt_underflowE;
-} else  { if (__147778_29_exp_is_negative) {
-_ZN3edg28normalize_and_round_bfloat16EPNS_12an_fp_binaryE(__147736_53_bin);
+if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__147868_53_bin)) {
+(__147869_53_dec->type) = _ZN3edg13fpt_underflowE;
+} else  { if (__147910_29_exp_is_negative) {
+_ZN3edg28normalize_and_round_bfloat16EPNS_12an_fp_binaryE(__147868_53_bin);
 
-if (__147777_29_first_exp != 0) {
+if (__147909_29_first_exp != 0) {
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__147736_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __147777_29_first_exp));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__147868_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __147909_29_first_exp));
 }
-if (__147776_29_exp == 0) {
+if (__147908_29_exp == 0) {
 
-} else  { if (((long)__147776_29_exp) < 11L) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__147736_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __147776_29_exp));
+} else  { if (((long)__147908_29_exp) < 11L) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__147868_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __147908_29_exp));
 } else  {
 
-auto int __147885_13_idx = 0;
-__147776_29_exp >>= 3;
+auto int __148017_13_idx = 0;
+__147908_29_exp >>= 3;
 
-for (__147885_13_idx = 0; (__147776_29_exp != 0) && (__147885_13_idx < 2); (++__147885_13_idx) , (__147776_29_exp >>= 1)) {
-if ((__147776_29_exp & 0x1) != 0) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__147736_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17big_tens_bfloat16E) + __147885_13_idx));
+for (__148017_13_idx = 0; (__147908_29_exp != 0) && (__148017_13_idx < 2); (++__148017_13_idx) , (__147908_29_exp >>= 1)) {
+if ((__147908_29_exp & 0x1) != 0) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__147868_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17big_tens_bfloat16E) + __148017_13_idx));
 }
 }
 
-if (__147776_29_exp != 0) {
+if (__147908_29_exp != 0) {
 
-auto _ZN3edg12an_fp_binaryE __147896_37_old_value;
-auto _ZN3edg12an_fp_binaryE __147897_37_fp_min;
+auto _ZN3edg12an_fp_binaryE __148028_37_old_value;
+auto _ZN3edg12an_fp_binaryE __148029_37_fp_min;
 #line 1074
-__147896_37_old_value = (*__147736_53_bin);
+__148028_37_old_value = (*__147868_53_bin);
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg17bfloat16_make_minEPNS0_12an_fp_binaryE((&__147897_37_fp_min));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg17bfloat16_make_minEPNS0_12an_fp_binaryE((&__148029_37_fp_min));
 
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__147736_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17big_tens_bfloat16E) + __147885_13_idx));
-while (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_(__147736_53_bin, (&__147897_37_fp_min))) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__147868_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17big_tens_bfloat16E) + __148017_13_idx));
+while (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_(__147868_53_bin, (&__148029_37_fp_min))) {
 
-auto int __147906_17_adjust;
-if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__147736_53_bin)) {
+auto int __148038_17_adjust;
+if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__147868_53_bin)) {
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg27bfloat16_make_min_subnormalEPNS0_12an_fp_binaryE(__147736_53_bin);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg27bfloat16_make_min_subnormalEPNS0_12an_fp_binaryE(__147868_53_bin);
 
 
 
 }
 
-__147906_17_adjust = ((__147897_37_fp_min.exponent) - (__147736_53_bin->exponent));
+__148038_17_adjust = ((__148029_37_fp_min.exponent) - (__147868_53_bin->exponent));
 
 
 
 
-(*__147736_53_bin) = __147896_37_old_value;
-(*__147738_53_pscale) += __147906_17_adjust;
+(*__147868_53_bin) = __148028_37_old_value;
+(*__147870_53_pscale) += __148038_17_adjust;
 
-(__147736_53_bin->exponent) += __147906_17_adjust;
-
-
+(__147868_53_bin->exponent) += __148038_17_adjust;
 
 
-__147896_37_old_value = (*__147736_53_bin);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__147736_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17big_tens_bfloat16E) + __147885_13_idx));
+
+
+__148028_37_old_value = (*__147868_53_bin);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__147868_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17big_tens_bfloat16E) + __148017_13_idx));
 }
 }
 } }
 } else  {
 
-if (__147777_29_first_exp != 0) {
+if (__147909_29_first_exp != 0) {
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__147736_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __147777_29_first_exp));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__147868_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __147909_29_first_exp));
 }
-if (__147776_29_exp == 0) {
+if (__147908_29_exp == 0) {
 
-} else  { if (((long)__147776_29_exp) < 11L) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__147736_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __147776_29_exp));
+} else  { if (((long)__147908_29_exp) < 11L) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__147868_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __147908_29_exp));
 } else  {
 
-auto int __147946_13_idx;
-__147776_29_exp >>= 3;
-for (__147946_13_idx = 0; __147776_29_exp != 0; (++__147946_13_idx) , (__147776_29_exp >>= 1)) {
-if ((__147776_29_exp & 0x1) != 0) {
-(__147946_13_idx < 3) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1128, __T547561664, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__147736_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17big_tens_bfloat16E) + __147946_13_idx));
+auto int __148078_13_idx;
+__147908_29_exp >>= 3;
+for (__148078_13_idx = 0; __147908_29_exp != 0; (++__148078_13_idx) , (__147908_29_exp >>= 1)) {
+if ((__147908_29_exp & 0x1) != 0) {
+(__148078_13_idx < 3) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1128, __T814698528, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__147868_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17big_tens_bfloat16E) + __148078_13_idx));
 }
 }
 } }
 } }
-if (__147737_53_dec->is_negative) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_negateEPNS0_12an_fp_binaryE(__147736_53_bin);
+if (__147869_53_dec->is_negative) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_negateEPNS0_12an_fp_binaryE(__147868_53_bin);
 }
 } 
 }
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg21fast_bin2dec_bfloat16EPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEPvi( _ZN3edg13an_fp_decimalE *__147963_58_dec, 
-_ZN3edg12an_fp_binaryE *__147964_58_bin, 
-void *__147965_58_val, 
-int __147966_57_ndigits)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg21fast_bin2dec_bfloat16EPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEPvi( _ZN3edg13an_fp_decimalE *__148095_58_dec, 
+_ZN3edg12an_fp_binaryE *__148096_58_bin, 
+void *__148097_58_val, 
+int __148098_57_ndigits)
 #line 1153
 {
-auto _ZN3edg12an_fp_binaryE __147976_29_d;
-auto _ZN3edg12an_fp_binaryE __147977_29_ds;
-auto int __147978_29_k;
-auto int __147979_29_dig_pos;
-auto _ZN3edg9a_booleanE __147980_29_res;
+auto _ZN3edg12an_fp_binaryE __148108_29_d;
+auto _ZN3edg12an_fp_binaryE __148109_29_ds;
+auto int __148110_29_k;
+auto int __148111_29_dig_pos;
+auto _ZN3edg9a_booleanE __148112_29_res;
 
-if (((__147964_58_bin->exponent) <= 0) || ((__147964_58_bin->exponent) < ((__147964_58_bin->precision) - (_ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_frac_low_zero_bitsEPhi(((__147964_58_bin->frac)), (__147964_58_bin->precision))))))
+if (((__148096_58_bin->exponent) <= 0) || ((__148096_58_bin->exponent) < ((__148096_58_bin->precision) - (_ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_frac_low_zero_bitsEPhi(((__148096_58_bin->frac)), (__148096_58_bin->precision))))))
 
 {
 
-__147980_29_res = ((_ZN3edg9a_booleanE)0);
-goto __148061_1_end_of_routine;
+__148112_29_res = ((_ZN3edg9a_booleanE)0);
+goto __148193_1_end_of_routine;
 }
-__147978_29_k = ((int)((30103L * ((long)(__147964_58_bin->exponent))) / 100000L));
-if (11L <= ((long)__147978_29_k)) {
+__148110_29_k = ((int)((30103L * ((long)(__148096_58_bin->exponent))) / 100000L));
+if (11L <= ((long)__148110_29_k)) {
 
-__147980_29_res = ((_ZN3edg9a_booleanE)0);
-goto __148061_1_end_of_routine;
+__148112_29_res = ((_ZN3edg9a_booleanE)0);
+goto __148193_1_end_of_routine;
 }
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__147976_29_d), __147964_58_bin);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__148108_29_d), __148096_58_bin);
 
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_absEPNS0_12an_fp_binaryE((&__147976_29_d));
-while ((0 < __147978_29_k) && (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_((&__147976_29_d), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __147978_29_k)))) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_absEPNS0_12an_fp_binaryE((&__148108_29_d));
+while ((0 < __148110_29_k) && (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_((&__148108_29_d), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __148110_29_k)))) {
 
---__147978_29_k;
+--__148110_29_k;
 }
-if ((__147978_29_k < 0) || (((30103L * ((long)(__147964_58_bin->precision))) / 100000L) <= ((long)__147978_29_k))) {
+if ((__148110_29_k < 0) || (((30103L * ((long)(__148096_58_bin->precision))) / 100000L) <= ((long)__148110_29_k))) {
 
-__147980_29_res = ((_ZN3edg9a_booleanE)0);
-goto __148061_1_end_of_routine;
+__148112_29_res = ((_ZN3edg9a_booleanE)0);
+goto __148193_1_end_of_routine;
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__147977_29_ds), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __147978_29_k));
-for (__147979_29_dig_pos = 0; (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE((&__147976_29_d)))) && (__147979_29_dig_pos <= __147966_57_ndigits); (_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj((&__147976_29_d), 10U)) , (++
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__148109_29_ds), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg19small_tens_bfloat16E) + __148110_29_k));
+for (__148111_29_dig_pos = 0; (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE((&__148108_29_d)))) && (__148111_29_dig_pos <= __148098_57_ndigits); (_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj((&__148108_29_d), 10U)) , (++
 #line 1189
-__147979_29_dig_pos))
+__148111_29_dig_pos))
 
 {
-auto int __148014_31_digit;
-auto _ZN3edg12an_fp_binaryE __148015_31_tmp;
+auto int __148146_31_digit;
+auto _ZN3edg12an_fp_binaryE __148147_31_tmp;
 #line 1200
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__148015_31_tmp), (&__147976_29_d));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_((&__148015_31_tmp), (&__147977_29_ds));
-__148014_31_digit = (_ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_to_intEPNS0_12an_fp_binaryE((&__148015_31_tmp)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__148015_31_tmp), (&__147977_29_ds));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj((&__148015_31_tmp), ((unsigned)__148014_31_digit));
-if (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_((&__147976_29_d), (&__148015_31_tmp))) {
---__148014_31_digit;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_((&__148015_31_tmp), (&__147977_29_ds));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__148147_31_tmp), (&__148108_29_d));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_((&__148147_31_tmp), (&__148109_29_ds));
+__148146_31_digit = (_ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_to_intEPNS0_12an_fp_binaryE((&__148147_31_tmp)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__148147_31_tmp), (&__148109_29_ds));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj((&__148147_31_tmp), ((unsigned)__148146_31_digit));
+if (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_((&__148108_29_d), (&__148147_31_tmp))) {
+--__148146_31_digit;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_((&__148147_31_tmp), (&__148109_29_ds));
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_((&__147976_29_d), (&__148015_31_tmp));
-(((((long)__147979_29_dig_pos) < 23L) && (0 <= __148014_31_digit)) && (__148014_31_digit < 10)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1210, __T547566592, ((
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_((&__148108_29_d), (&__148147_31_tmp));
+(((((long)__148111_29_dig_pos) < 23L) && (0 <= __148146_31_digit)) && (__148146_31_digit < 10)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1210, __T814703512, ((
 #line 1210
 _ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-(((__147963_58_dec->digits))[__147979_29_dig_pos]) = ((char)(48 + ((int)((char)__148014_31_digit))));
+(((__148095_58_dec->digits))[__148111_29_dig_pos]) = ((char)(48 + ((int)((char)__148146_31_digit))));
 }
-if (__147966_57_ndigits < __147979_29_dig_pos) {
+if (__148098_57_ndigits < __148111_29_dig_pos) {
 
---__147979_29_dig_pos;
-if (((int)(((__147963_58_dec->digits))[__147979_29_dig_pos])) < 53) {
+--__148111_29_dig_pos;
+if (((int)(((__148095_58_dec->digits))[__148111_29_dig_pos])) < 53) {
 
-} else  { if (((53 < ((int)(((__147963_58_dec->digits))[__147979_29_dig_pos]))) || (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE((&__147976_29_d))))) || (((((int)(((__147963_58_dec->digits))[(__147979_29_dig_pos - 1)])) - 48) % 2) != 0))
+} else  { if (((53 < ((int)(((__148095_58_dec->digits))[__148111_29_dig_pos]))) || (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE((&__148108_29_d))))) || (((((int)(((__148095_58_dec->digits))[(__148111_29_dig_pos - 1)])) - 48) % 2) != 0))
 
 {
-__147979_29_dig_pos = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8do_roundEiPc(__147979_29_dig_pos, ((__147963_58_dec->digits))));
-if (__147979_29_dig_pos == 0) {
-__147979_29_dig_pos = 1;
-++__147978_29_k;
+__148111_29_dig_pos = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8do_roundEiPc(__148111_29_dig_pos, ((__148095_58_dec->digits))));
+if (__148111_29_dig_pos == 0) {
+__148111_29_dig_pos = 1;
+++__148110_29_k;
 }
 } }
 }
 
-while ((1 < __147979_29_dig_pos) && (((int)(((__147963_58_dec->digits))[(__147979_29_dig_pos - 1)])) == 48)) {
---__147979_29_dig_pos;
+while ((1 < __148111_29_dig_pos) && (((int)(((__148095_58_dec->digits))[(__148111_29_dig_pos - 1)])) == 48)) {
+--__148111_29_dig_pos;
 }
 
-(__147963_58_dec->is_negative) = (__147964_58_bin->is_negative);
-(__147963_58_dec->exponent) = (__147978_29_k + 1);
-(((long)__147979_29_dig_pos) < 23L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1235, __T547566592, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-(((__147963_58_dec->digits))[__147979_29_dig_pos]) = ((char)0);
-(__147963_58_dec->ndigits) = __147979_29_dig_pos;
-__147980_29_res = ((_ZN3edg9a_booleanE)1);
-__148061_1_end_of_routine:;
-return __147980_29_res;
+(__148095_58_dec->is_negative) = (__148096_58_bin->is_negative);
+(__148095_58_dec->exponent) = (__148110_29_k + 1);
+(((long)__148111_29_dig_pos) < 23L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1235, __T814703512, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))
+#line 1235
+;
+(((__148095_58_dec->digits))[__148111_29_dig_pos]) = ((char)0);
+(__148095_58_dec->ndigits) = __148111_29_dig_pos;
+__148112_29_res = ((_ZN3edg9a_booleanE)1);
+__148193_1_end_of_routine:;
+return __148112_29_res;
 }
 
 
-static enum _ZN3edg17an_fp_return_typeE _ZN32_INTERNAL_10_floating_c_7968bde93edg23write_bfloat16_internalEPciPhi( char *__148066_59_tgt, 
-int __148067_58_size, 
-unsigned char *__148068_59_val, 
-int __148069_58_ndigits)
+static enum _ZN3edg17an_fp_return_typeE _ZN32_INTERNAL_10_floating_c_7968bde93edg23write_bfloat16_internalEPciPhi( char *__148198_59_tgt, 
+int __148199_58_size, 
+unsigned char *__148200_59_val, 
+int __148201_58_ndigits)
 #line 1258
 {
-auto enum _ZN3edg17an_fp_return_typeE __148081_21_res = _ZN3edg12fp_ret_validE;
+auto enum _ZN3edg17an_fp_return_typeE __148213_21_res = _ZN3edg12fp_ret_validE;
 
-(_ZN3edg20floating_init_calledE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1261, __T547569312, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-if ((__148066_59_tgt == ((char *)0)) || (__148067_58_size <= 0)) {
-__148081_21_res = _ZN3edg16fp_ret_too_smallE;
-} else  { if ((__148068_59_val == ((unsigned char *)0)) || (__148067_58_size < 0)) {
-__148081_21_res = _ZN3edg14fp_ret_invalidE;
+(_ZN3edg20floating_init_calledE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1261, __T814706248, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+if ((__148198_59_tgt == ((char *)0)) || (__148199_58_size <= 0)) {
+__148213_21_res = _ZN3edg16fp_ret_too_smallE;
+} else  { if ((__148200_59_val == ((unsigned char *)0)) || (__148199_58_size < 0)) {
+__148213_21_res = _ZN3edg14fp_ret_invalidE;
 } else  {
-auto _ZN3edg12an_fp_binaryE __148089_18_bin;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg14split_bfloat16EPNS0_12an_fp_binaryEPh((&__148089_18_bin), __148068_59_val);
-if (((__148089_18_bin.is_negative) && (((int)(__148089_18_bin.type)) != 3)) && (((int)(__148089_18_bin.type)) != 0)) {
-(*(__148066_59_tgt++)) = ((char)45);
---__148067_58_size;
+auto _ZN3edg12an_fp_binaryE __148221_18_bin;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg14split_bfloat16EPNS0_12an_fp_binaryEPh((&__148221_18_bin), __148200_59_val);
+if (((__148221_18_bin.is_negative) && (((int)(__148221_18_bin.type)) != 3)) && (((int)(__148221_18_bin.type)) != 0)) {
+(*(__148198_59_tgt++)) = ((char)45);
+--__148199_58_size;
 }
 
 
-__148081_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg18convert_and_formatEPcyPNS0_12an_fp_binaryE(__148066_59_tgt, ((size_t)__148067_58_size), (&__148089_18_bin)));
-if (((int)__148081_21_res) == (-1)) {
-auto _ZN3edg13an_fp_decimalE __148099_21_dec;
+__148213_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg18convert_and_formatEPcyPNS0_12an_fp_binaryE(__148198_59_tgt, ((size_t)__148199_58_size), (&__148221_18_bin)));
+if (((int)__148213_21_res) == (-1)) {
+auto _ZN3edg13an_fp_decimalE __148231_21_dec;
 
 
-if (((int)(_ZN32_INTERNAL_10_floating_c_7968bde93edg21fast_bin2dec_bfloat16EPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEPvi((&__148099_21_dec), (&__148089_18_bin), ((void *)__148068_59_val), __148069_58_ndigits))) == 0) {
+if (((int)(_ZN32_INTERNAL_10_floating_c_7968bde93edg21fast_bin2dec_bfloat16EPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEPvi((&__148231_21_dec), (&__148221_18_bin), ((void *)__148200_59_val), __148201_58_ndigits))) == 0) {
 
 
 
-auto int __148106_13_adjust = 0;
-if ((__148089_18_bin.exponent) < (-125)) {
-__148106_13_adjust = ((-125) - (__148089_18_bin.exponent));
+auto int __148238_13_adjust = 0;
+if ((__148221_18_bin.exponent) < (-125)) {
+__148238_13_adjust = ((-125) - (__148221_18_bin.exponent));
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg7bin2decEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEii((&__148099_21_dec), (&__148089_18_bin), __148069_58_ndigits, __148106_13_adjust);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg7bin2decEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEii((&__148231_21_dec), (&__148221_18_bin), __148201_58_ndigits, __148238_13_adjust);
 }
 
 
 
-__148081_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg6formatEPcyPNS0_13an_fp_decimalE(__148066_59_tgt, ((size_t)__148067_58_size), (&__148099_21_dec)));
+__148213_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg6formatEPcyPNS0_13an_fp_decimalE(__148198_59_tgt, ((size_t)__148199_58_size), (&__148231_21_dec)));
 }
 } }
-return __148081_21_res;
+return __148213_21_res;
 }
 
 
-enum _ZN3edg17an_fp_return_typeE _ZN3edg14write_bfloat16EPciPh( char *__148122_43_tgt, 
-int __148123_42_size, 
-unsigned char *__148124_43_val)
+enum _ZN3edg17an_fp_return_typeE _ZN3edg14write_bfloat16EPciPh( char *__148254_43_tgt, 
+int __148255_42_size, 
+unsigned char *__148256_43_val)
 #line 1316
 {
-auto int __148139_7_ndigits;
+auto int __148271_7_ndigits;
 #line 1329
-__148139_7_ndigits = 0x7fffffff;
+__148271_7_ndigits = 0x7fffffff;
 
 
-return _ZN32_INTERNAL_10_floating_c_7968bde93edg23write_bfloat16_internalEPciPhi(__148122_43_tgt, __148123_42_size, __148124_43_val, __148139_7_ndigits);
+return _ZN32_INTERNAL_10_floating_c_7968bde93edg23write_bfloat16_internalEPciPhi(__148254_43_tgt, __148255_42_size, __148256_43_val, __148271_7_ndigits);
 }
 
 
-enum _ZN3edg17an_fp_return_typeE _ZN3edg16write_bfloat16_nEPciPhi( char *__148158_45_tgt, 
-int __148159_44_size, 
-unsigned char *__148160_45_val, 
-int __148161_44_ndigits)
+enum _ZN3edg17an_fp_return_typeE _ZN3edg16write_bfloat16_nEPciPhi( char *__148290_45_tgt, 
+int __148291_44_size, 
+unsigned char *__148292_45_val, 
+int __148293_44_ndigits)
 #line 1356
 {
-if (__148161_44_ndigits <= 0) {
-__148161_44_ndigits = 1;
-} else  { if (23L <= ((long)__148161_44_ndigits)) {
+if (__148293_44_ndigits <= 0) {
+__148293_44_ndigits = 1;
+} else  { if (23L <= ((long)__148293_44_ndigits)) {
 
 
-__148161_44_ndigits = 22;
+__148293_44_ndigits = 22;
 } }
-return _ZN32_INTERNAL_10_floating_c_7968bde93edg23write_bfloat16_internalEPciPhi(__148158_45_tgt, __148159_44_size, __148160_45_val, __148161_44_ndigits);
+return _ZN32_INTERNAL_10_floating_c_7968bde93edg23write_bfloat16_internalEPciPhi(__148290_45_tgt, __148291_44_size, __148292_45_val, __148293_44_ndigits);
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg16convert_bfloat16EPhPNS0_19an_fp_decimal_inputE( unsigned char *__148190_45_val, 
-_ZN3edg19an_fp_decimal_inputE *__148191_45_dec)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg16convert_bfloat16EPhPNS0_19an_fp_decimal_inputE( unsigned char *__148322_45_val, 
+_ZN3edg19an_fp_decimal_inputE *__148323_45_dec)
 
 
 
 {
-auto _ZN3edg12an_fp_binaryE __148196_16_bin;
-auto int __148197_16_scale = 0;
+auto _ZN3edg12an_fp_binaryE __148328_16_bin;
+auto int __148329_16_scale = 0;
 #line 1383
-(__148196_16_bin.precision) = 24;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE((&__148196_16_bin));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg21fast_dec2bin_bfloat16EPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEPi((&__148196_16_bin), __148191_45_dec, (&__148197_16_scale));
+(__148328_16_bin.precision) = 24;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE((&__148328_16_bin));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg21fast_dec2bin_bfloat16EPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEPi((&__148328_16_bin), __148323_45_dec, (&__148329_16_scale));
 
 
 
 
-if (((int)(__148191_45_dec->type)) == 1) {
+if (((int)(__148323_45_dec->type)) == 1) {
 #line 1399
-if ((((int)(__148196_16_bin.type)) == 6) || (((int)(__148196_16_bin.type)) == 7)) {
+if ((((int)(__148328_16_bin.type)) == 6) || (((int)(__148328_16_bin.type)) == 7)) {
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg27bfloat16_make_min_subnormalEPNS0_12an_fp_binaryE((&__148196_16_bin));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg27bfloat16_make_min_subnormalEPNS0_12an_fp_binaryE((&__148328_16_bin));
 }
-if (((int)(__148196_16_bin.type)) == 2) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi((&__148196_16_bin), __148191_45_dec, __148197_16_scale);
+if (((int)(__148328_16_bin.type)) == 2) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi((&__148328_16_bin), __148323_45_dec, __148329_16_scale);
 }
-if (128 < (__148196_16_bin.exponent)) {
-(__148191_45_dec->type) = _ZN3edg12fpt_overflowE;
-} else  { if ((__148196_16_bin.exponent) < (-148)) {
-(__148191_45_dec->type) = _ZN3edg13fpt_underflowE;
+if (128 < (__148328_16_bin.exponent)) {
+(__148323_45_dec->type) = _ZN3edg12fpt_overflowE;
+} else  { if ((__148328_16_bin.exponent) < (-148)) {
+(__148323_45_dec->type) = _ZN3edg13fpt_underflowE;
 } else  {
-(__148196_16_bin.is_negative) = (__148191_45_dec->is_negative);
+(__148328_16_bin.is_negative) = (__148323_45_dec->is_negative);
 
 
 
 } }
 }
 
-if ((((int)(__148191_45_dec->type)) == 1) || (((int)(__148191_45_dec->type)) == 2)) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg13make_bfloat16EPhPNS0_12an_fp_binaryE(__148190_45_val, (&__148196_16_bin));
+if ((((int)(__148323_45_dec->type)) == 1) || (((int)(__148323_45_dec->type)) == 2)) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg13make_bfloat16EPhPNS0_12an_fp_binaryE(__148322_45_val, (&__148328_16_bin));
 } 
 
 }
 
 
-enum _ZN3edg17an_fp_return_typeE _ZN3edg13read_bfloat16EPhPKci( unsigned char *__148248_42_val, 
-_ZN3edg12a_const_charE *__148249_42_str, 
-int __148250_41_len)
+enum _ZN3edg17an_fp_return_typeE _ZN3edg13read_bfloat16EPhPKci( unsigned char *__148380_42_val, 
+_ZN3edg12a_const_charE *__148381_42_str, 
+int __148382_41_len)
 #line 1441
 {
-auto _ZN3edg19an_fp_decimal_inputE __148264_23_dec;
-auto enum _ZN3edg17an_fp_return_typeE __148265_23_res = _ZN3edg14fp_ret_invalidE;
+auto _ZN3edg19an_fp_decimal_inputE __148396_23_dec;
+auto enum _ZN3edg17an_fp_return_typeE __148397_23_res = _ZN3edg14fp_ret_invalidE;
 
-(_ZN3edg20floating_init_calledE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1445, __T548230992, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-if (((__148248_42_val == ((unsigned char *)0)) || (__148249_42_str == ((_ZN3edg12a_const_charE *)0))) || (__148250_41_len <= 0)) {
-(__148264_23_dec.type) = _ZN3edg11fpt_invalidE;
+(_ZN3edg20floating_init_calledE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1445, __T814712160, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+if (((__148380_42_val == ((unsigned char *)0)) || (__148381_42_str == ((_ZN3edg12a_const_charE *)0))) || (__148382_41_len <= 0)) {
+(__148396_23_dec.type) = _ZN3edg11fpt_invalidE;
 } else  {
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12split_stringEPNS0_19an_fp_decimal_inputEPKcS4_((&__148264_23_dec), __148249_42_str, (__148249_42_str + __148250_41_len));
-if (((int)(__148264_23_dec.type)) == 2) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16convert_bfloat16EPhPNS0_19an_fp_decimal_inputE(__148248_42_val, (&__148264_23_dec));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12split_stringEPNS0_19an_fp_decimal_inputEPKcS4_((&__148396_23_dec), __148381_42_str, (__148381_42_str + __148382_41_len));
+if (((int)(__148396_23_dec.type)) == 2) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16convert_bfloat16EPhPNS0_19an_fp_decimal_inputE(__148380_42_val, (&__148396_23_dec));
 }
 }
-if (((int)(__148264_23_dec.type)) == 0) {
-__148265_23_res = _ZN3edg14fp_ret_invalidE;
-} else  { if ((((int)(__148264_23_dec.type)) == 1) || (((int)(__148264_23_dec.type)) == 2)) {
-__148265_23_res = _ZN3edg12fp_ret_validE;
+if (((int)(__148396_23_dec.type)) == 0) {
+__148397_23_res = _ZN3edg14fp_ret_invalidE;
+} else  { if ((((int)(__148396_23_dec.type)) == 1) || (((int)(__148396_23_dec.type)) == 2)) {
+__148397_23_res = _ZN3edg12fp_ret_validE;
 } else  {
-auto _ZN3edg12an_fp_binaryE __148283_18_bin;
-(__148283_18_bin.precision) = 24;
-(__148283_18_bin.is_negative) = (__148264_23_dec.is_negative);
-switch ((int)(__148264_23_dec.type)) {
+auto _ZN3edg12an_fp_binaryE __148415_18_bin;
+(__148415_18_bin.precision) = 24;
+(__148415_18_bin.is_negative) = (__148396_23_dec.is_negative);
+switch ((int)(__148396_23_dec.type)) {
 case 3:
-(__148283_18_bin.type) = _ZN3edg7fpt_nanE;
-__148265_23_res = _ZN3edg10fp_ret_nanE;
-goto __T548347808;
+(__148415_18_bin.type) = _ZN3edg7fpt_nanE;
+__148397_23_res = _ZN3edg10fp_ret_nanE;
+goto __T815465008;
 case 4:
-(__148283_18_bin.type) = _ZN3edg12fpt_infinityE;
-__148265_23_res = ((__148283_18_bin.is_negative) ? _ZN3edg19fp_ret_neg_infinityE : _ZN3edg19fp_ret_pos_infinityE);
-goto __T548347808;
+(__148415_18_bin.type) = _ZN3edg12fpt_infinityE;
+__148397_23_res = ((__148415_18_bin.is_negative) ? _ZN3edg19fp_ret_neg_infinityE : _ZN3edg19fp_ret_pos_infinityE);
+goto __T815465008;
 case 5:
-(__148283_18_bin.type) = _ZN3edg12fpt_infinityE;
-__148265_23_res = _ZN3edg15fp_ret_overflowE;
-goto __T548347808;
+(__148415_18_bin.type) = _ZN3edg12fpt_infinityE;
+__148397_23_res = _ZN3edg15fp_ret_overflowE;
+goto __T815465008;
 case 6:
-(__148283_18_bin.type) = _ZN3edg8fpt_zeroE;
-__148265_23_res = _ZN3edg12fp_ret_validE;
-goto __T548347808;
+(__148415_18_bin.type) = _ZN3edg8fpt_zeroE;
+__148397_23_res = _ZN3edg12fp_ret_validE;
+goto __T815465008;
 case 7:
-(__148283_18_bin.type) = _ZN3edg8fpt_zeroE;
-__148265_23_res = _ZN3edg16fp_ret_underflowE;
-goto __T548347808;
+(__148415_18_bin.type) = _ZN3edg8fpt_zeroE;
+__148397_23_res = _ZN3edg16fp_ret_underflowE;
+goto __T815465008;
 default:
-_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1486, __T548230992, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
-} __T548347808:;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg13make_bfloat16EPhPNS0_12an_fp_binaryE(__148248_42_val, (&__148283_18_bin));
+_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1486, __T814712160, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
+} __T815465008:;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg13make_bfloat16EPhPNS0_12an_fp_binaryE(__148380_42_val, (&__148415_18_bin));
 } }
-return __148265_23_res;
+return __148397_23_res;
 }
 #line 411 "src/float_type.h"
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg18set_fraction_floatEPhS1_( unsigned char *__148831_41_tgt, 
-unsigned char *__148832_41_frac)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg18set_fraction_floatEPhS1_( unsigned char *__148963_41_tgt, 
+unsigned char *__148964_41_frac)
 
 
 
 
 {
-auto int __148838_7_i;
+auto int __148970_7_i;
 
-for (__148838_7_i = 0; __148838_7_i < 2; ++__148838_7_i) {
-(__148831_41_tgt[((_ZN3edg18host_little_endianE) ? __148838_7_i : (3 - __148838_7_i))]) = (__148832_41_frac[(__148838_7_i - 0)]);
+for (__148970_7_i = 0; __148970_7_i < 2; ++__148970_7_i) {
+(__148963_41_tgt[((_ZN3edg18host_little_endianE) ? __148970_7_i : (3 - __148970_7_i))]) = (__148964_41_frac[(__148970_7_i - 0)]);
 }
-(__148831_41_tgt[((_ZN3edg18host_little_endianE) ? __148838_7_i : (3 - __148838_7_i))]) &= 128;
+(__148963_41_tgt[((_ZN3edg18host_little_endianE) ? __148970_7_i : (3 - __148970_7_i))]) &= 128;
 
-(__148831_41_tgt[((_ZN3edg18host_little_endianE) ? __148838_7_i : (3 - __148838_7_i))]) |= ((((unsigned)(__148832_41_frac[(__148838_7_i - 0)])) & 127U) & 0xffffff7fU); 
+(__148963_41_tgt[((_ZN3edg18host_little_endianE) ? __148970_7_i : (3 - __148970_7_i))]) |= ((((unsigned)(__148964_41_frac[(__148970_7_i - 0)])) & 127U) & 0xffffff7fU); 
 
 
 
@@ -10317,245 +10382,245 @@ for (__148838_7_i = 0; __148838_7_i < 2; ++__148838_7_i) {
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg25set_biased_exponent_floatEPhj( unsigned char *__148853_48_tgt, 
-unsigned __148854_47_biased_exponent)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg25set_biased_exponent_floatEPhj( unsigned char *__148985_48_tgt, 
+unsigned __148986_47_biased_exponent)
 
 
 
 {
-auto int __148859_7_i;
+auto int __148991_7_i;
 
-__148859_7_i = 2;
-(__148853_48_tgt[((_ZN3edg18host_little_endianE) ? __148859_7_i : (3 - __148859_7_i))]) &= 127;
-(__148853_48_tgt[((_ZN3edg18host_little_endianE) ? __148859_7_i : (3 - __148859_7_i))]) |= ((__148854_47_biased_exponent << 7) & 128U);
-__148854_47_biased_exponent >>= 1;
+__148991_7_i = 2;
+(__148985_48_tgt[((_ZN3edg18host_little_endianE) ? __148991_7_i : (3 - __148991_7_i))]) &= 127;
+(__148985_48_tgt[((_ZN3edg18host_little_endianE) ? __148991_7_i : (3 - __148991_7_i))]) |= ((__148986_47_biased_exponent << 7) & 128U);
+__148986_47_biased_exponent >>= 1;
 
-++__148859_7_i;
+++__148991_7_i;
 #line 453
-(__148853_48_tgt[((_ZN3edg18host_little_endianE) ? __148859_7_i : (3 - __148859_7_i))]) &= 128;
-(__148853_48_tgt[((_ZN3edg18host_little_endianE) ? __148859_7_i : (3 - __148859_7_i))]) |= (__148854_47_biased_exponent & 127U); 
+(__148985_48_tgt[((_ZN3edg18host_little_endianE) ? __148991_7_i : (3 - __148991_7_i))]) &= 128;
+(__148985_48_tgt[((_ZN3edg18host_little_endianE) ? __148991_7_i : (3 - __148991_7_i))]) |= (__148986_47_biased_exponent & 127U); 
 
 }
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg18get_fraction_floatEPhS1_( unsigned char *__148879_46_frac, 
-unsigned char *__148880_46_val)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg18get_fraction_floatEPhS1_( unsigned char *__149011_46_frac, 
+unsigned char *__149012_46_val)
 #line 467
 {
-auto int __148888_13_i;
-auto _ZN3edg9a_booleanE __148889_13_res = ((_ZN3edg9a_booleanE)0);
+auto int __149020_13_i;
+auto _ZN3edg9a_booleanE __149021_13_res = ((_ZN3edg9a_booleanE)0);
 
-for (__148888_13_i = 0; __148888_13_i < 2; ++__148888_13_i) {
-(__148879_46_frac[(__148888_13_i - 0)]) = (__148880_46_val[((_ZN3edg18host_little_endianE) ? __148888_13_i : (3 - __148888_13_i))]);
-if (((int)(__148880_46_val[((_ZN3edg18host_little_endianE) ? __148888_13_i : (3 - __148888_13_i))])) != 0) {
-__148889_13_res = ((_ZN3edg9a_booleanE)1);
+for (__149020_13_i = 0; __149020_13_i < 2; ++__149020_13_i) {
+(__149011_46_frac[(__149020_13_i - 0)]) = (__149012_46_val[((_ZN3edg18host_little_endianE) ? __149020_13_i : (3 - __149020_13_i))]);
+if (((int)(__149012_46_val[((_ZN3edg18host_little_endianE) ? __149020_13_i : (3 - __149020_13_i))])) != 0) {
+__149021_13_res = ((_ZN3edg9a_booleanE)1);
 }
 }
-(__148879_46_frac[(__148888_13_i - 0)]) = ((unsigned char)(((unsigned)(__148880_46_val[((_ZN3edg18host_little_endianE) ? __148888_13_i : (3 - __148888_13_i))])) & 127U));
+(__149011_46_frac[(__149020_13_i - 0)]) = ((unsigned char)(((unsigned)(__149012_46_val[((_ZN3edg18host_little_endianE) ? __149020_13_i : (3 - __149020_13_i))])) & 127U));
 
-(__148879_46_frac[2]) |= 128U;
+(__149011_46_frac[2]) |= 128U;
 
-if ((((unsigned)(__148880_46_val[((_ZN3edg18host_little_endianE) ? __148888_13_i : (3 - __148888_13_i))])) & 127U) != 0U) {
-__148889_13_res = ((_ZN3edg9a_booleanE)1);
+if ((((unsigned)(__149012_46_val[((_ZN3edg18host_little_endianE) ? __149020_13_i : (3 - __149020_13_i))])) & 127U) != 0U) {
+__149021_13_res = ((_ZN3edg9a_booleanE)1);
 }
 #line 490
-return __148889_13_res;
+return __149021_13_res;
 }
 
 
-static int _ZN32_INTERNAL_10_floating_c_7968bde93edg25get_biased_exponent_floatEPh( unsigned char *__148914_47_val)
+static int _ZN32_INTERNAL_10_floating_c_7968bde93edg25get_biased_exponent_floatEPh( unsigned char *__149046_47_val)
 
 
 
 {
-auto int __148919_7_i = 3;
-auto int __148920_7_biased_exponent = 0;
+auto int __149051_7_i = 3;
+auto int __149052_7_biased_exponent = 0;
 
 
-__148920_7_biased_exponent = ((int)(((unsigned)(__148914_47_val[((_ZN3edg18host_little_endianE) ? __148919_7_i : (3 - __148919_7_i))])) & 127U));
---__148919_7_i;
-for (; __148919_7_i > 2; --__148919_7_i) {
-__148920_7_biased_exponent <<= 8;
-__148920_7_biased_exponent += ((int)(__148914_47_val[((_ZN3edg18host_little_endianE) ? __148919_7_i : (3 - __148919_7_i))]));
+__149052_7_biased_exponent = ((int)(((unsigned)(__149046_47_val[((_ZN3edg18host_little_endianE) ? __149051_7_i : (3 - __149051_7_i))])) & 127U));
+--__149051_7_i;
+for (; __149051_7_i > 2; --__149051_7_i) {
+__149052_7_biased_exponent <<= 8;
+__149052_7_biased_exponent += ((int)(__149046_47_val[((_ZN3edg18host_little_endianE) ? __149051_7_i : (3 - __149051_7_i))]));
 }
-__148920_7_biased_exponent <<= 1;
+__149052_7_biased_exponent <<= 1;
 
-__148920_7_biased_exponent |= ((int)((((unsigned)(__148914_47_val[((_ZN3edg18host_little_endianE) ? __148919_7_i : (3 - __148919_7_i))])) & 128U) >> 7));
+__149052_7_biased_exponent |= ((int)((((unsigned)(__149046_47_val[((_ZN3edg18host_little_endianE) ? __149051_7_i : (3 - __149051_7_i))])) & 128U) >> 7));
 
-return __148920_7_biased_exponent;
+return __149052_7_biased_exponent;
 }
 #line 524
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg11split_floatEPNS0_12an_fp_binaryEPh( _ZN3edg12an_fp_binaryE *__148944_37_bin, 
-unsigned char *__148945_37_val)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg11split_floatEPNS0_12an_fp_binaryEPh( _ZN3edg12an_fp_binaryE *__149076_37_bin, 
+unsigned char *__149077_37_val)
 
 
 
 {
-auto int __148950_13_biased_exponent;
-auto _ZN3edg9a_booleanE __148951_13_saw_nz;
+auto int __149082_13_biased_exponent;
+auto _ZN3edg9a_booleanE __149083_13_saw_nz;
 
 
 
 
-(((__148944_37_bin->frac))[2]) = ((unsigned char)0U);
-__148951_13_saw_nz = (_ZN32_INTERNAL_10_floating_c_7968bde93edg18get_fraction_floatEPhS1_(((__148944_37_bin->frac)), __148945_37_val));
-__148950_13_biased_exponent = (_ZN32_INTERNAL_10_floating_c_7968bde93edg25get_biased_exponent_floatEPh(__148945_37_val));
-(__148944_37_bin->is_negative) = ((_ZN3edg9a_booleanE)(((((int)(__148945_37_val[((_ZN3edg18host_little_endianE) ? 3 : 0)])) & 128) ? 1 : 0) != 0));
+(((__149076_37_bin->frac))[2]) = ((unsigned char)0U);
+__149083_13_saw_nz = (_ZN32_INTERNAL_10_floating_c_7968bde93edg18get_fraction_floatEPhS1_(((__149076_37_bin->frac)), __149077_37_val));
+__149082_13_biased_exponent = (_ZN32_INTERNAL_10_floating_c_7968bde93edg25get_biased_exponent_floatEPh(__149077_37_val));
+(__149076_37_bin->is_negative) = ((_ZN3edg9a_booleanE)(((((int)(__149077_37_val[((_ZN3edg18host_little_endianE) ? 3 : 0)])) & 128) ? 1 : 0) != 0));
 #line 550
 {
-if (__148950_13_biased_exponent == 255) {
-if (((int)__148951_13_saw_nz) == 0) {
-(__148944_37_bin->type) = _ZN3edg12fpt_infinityE;
+if (__149082_13_biased_exponent == 255) {
+if (((int)__149083_13_saw_nz) == 0) {
+(__149076_37_bin->type) = _ZN3edg12fpt_infinityE;
 } else  {
-(__148944_37_bin->type) = _ZN3edg7fpt_nanE;
+(__149076_37_bin->type) = _ZN3edg7fpt_nanE;
 }
-} else  { if (__148950_13_biased_exponent == 0) {
-if (((int)__148951_13_saw_nz) == 0) {
-(__148944_37_bin->type) = _ZN3edg8fpt_zeroE;
+} else  { if (__149082_13_biased_exponent == 0) {
+if (((int)__149083_13_saw_nz) == 0) {
+(__149076_37_bin->type) = _ZN3edg8fpt_zeroE;
 } else  {
 
 
-auto int __148983_13_high_bits;
-(((__148944_37_bin->frac))[2]) &= 127;
-__148983_13_high_bits = (_ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_high_zero_bitsEPhi(((__148944_37_bin->frac)), 24));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii(((__148944_37_bin->frac)), 24, __148983_13_high_bits);
-__148950_13_biased_exponent -= __148983_13_high_bits;
-++__148950_13_biased_exponent;
-(__148944_37_bin->type) = _ZN3edg10fpt_numberE;
+auto int __149115_13_high_bits;
+(((__149076_37_bin->frac))[2]) &= 127;
+__149115_13_high_bits = (_ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_high_zero_bitsEPhi(((__149076_37_bin->frac)), 24));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii(((__149076_37_bin->frac)), 24, __149115_13_high_bits);
+__149082_13_biased_exponent -= __149115_13_high_bits;
+++__149082_13_biased_exponent;
+(__149076_37_bin->type) = _ZN3edg10fpt_numberE;
 }
 } else  {
-(__148944_37_bin->type) = _ZN3edg10fpt_numberE;
+(__149076_37_bin->type) = _ZN3edg10fpt_numberE;
 } }
 }
-(__148944_37_bin->exponent) = ((__148950_13_biased_exponent - 127) + 1);
-(__148944_37_bin->precision) = 24; 
+(__149076_37_bin->exponent) = ((__149082_13_biased_exponent - 127) + 1);
+(__149076_37_bin->precision) = 24; 
 }
 
 
-void _ZN3edg25normalize_and_round_floatEPNS_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__149000_40_bin)
+void _ZN3edg25normalize_and_round_floatEPNS_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__149132_40_bin)
 #line 586
 {
 if (0) {
 
 
 
-auto union _ZZN3edg25normalize_and_round_floatEPNS_12an_fp_binaryEEUt_ __149011_7_u;
-auto unsigned short __149012_20_mask = ((unsigned short)2047U);
+auto union _ZZN3edg25normalize_and_round_floatEPNS_12an_fp_binaryEEUt_ __149143_7_u;
+auto unsigned short __149144_20_mask = ((unsigned short)2047U);
 
-memcpy(((void *)((__149011_7_u.bytes))), ((const void *)(&(__149000_40_bin->frac))), 2ULL);
-if (((__149000_40_bin->exponent) > 23) && ((((int)(__149011_7_u.val)) & ((int)__149012_20_mask)) != ((int)(__149011_7_u.val)))) {
+memcpy(((void *)((__149143_7_u.bytes))), ((const void *)(&(__149132_40_bin->frac))), 2ULL);
+if (((__149132_40_bin->exponent) > 23) && ((((int)(__149143_7_u.val)) & ((int)__149144_20_mask)) != ((int)(__149143_7_u.val)))) {
 
 
 
-auto int __149019_22_num_bits;
-auto unsigned short __149020_22_rounding_bit;
+auto int __149151_22_num_bits;
+auto unsigned short __149152_22_rounding_bit;
 #line 599
-__149019_22_num_bits = ((__149000_40_bin->exponent) - 23);
-__149020_22_rounding_bit = ((unsigned short)(((int)(__149011_7_u.val)) & (1 << (__149019_22_num_bits - 1))));
+__149151_22_num_bits = ((__149132_40_bin->exponent) - 23);
+__149152_22_rounding_bit = ((unsigned short)(((int)(__149143_7_u.val)) & (1 << (__149151_22_num_bits - 1))));
 
-(__149011_7_u.val) = ((unsigned short)((((int)(__149011_7_u.val)) + ((int)__149020_22_rounding_bit)) >> __149019_22_num_bits));
-if ((((int)(__149011_7_u.val)) & ((int)__149012_20_mask)) != ((int)(__149011_7_u.val))) {
+(__149143_7_u.val) = ((unsigned short)((((int)(__149143_7_u.val)) + ((int)__149152_22_rounding_bit)) >> __149151_22_num_bits));
+if ((((int)(__149143_7_u.val)) & ((int)__149144_20_mask)) != ((int)(__149143_7_u.val))) {
 
-(__149011_7_u.val) >>= 1;
-++(__149000_40_bin->exponent);
+(__149143_7_u.val) >>= 1;
+++(__149132_40_bin->exponent);
 }
-memcpy(((void *)(&(__149000_40_bin->frac))), ((const void *)((__149011_7_u.bytes))), 2ULL);
-++(__149000_40_bin->exponent);
+memcpy(((void *)(&(__149132_40_bin->frac))), ((const void *)((__149143_7_u.bytes))), 2ULL);
+++(__149132_40_bin->exponent);
 }
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg10make_floatEPhPNS0_12an_fp_binaryE( unsigned char *__149035_36_tgt, 
-_ZN3edg12an_fp_binaryE *__149036_36_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg10make_floatEPhPNS0_12an_fp_binaryE( unsigned char *__149167_36_tgt, 
+_ZN3edg12an_fp_binaryE *__149168_36_bin)
 #line 622
 {
-auto unsigned char __149043_17_fraction[3];
-auto int __149044_17_biased_exponent = 0;
+auto unsigned char __149175_17_fraction[3];
+auto int __149176_17_biased_exponent = 0;
 
 
-if (((int)(__149036_36_bin->type)) == 2) {
-_ZN3edg25normalize_and_round_floatEPNS_12an_fp_binaryE(__149036_36_bin);
-memcpy(((void *)(__149043_17_fraction)), ((const void *)((__149036_36_bin->frac))), 3ULL);
-__149044_17_biased_exponent = (((__149036_36_bin->exponent) + 127) - 1);
-if ((__149036_36_bin->exponent) < ((-125) - (__149036_36_bin->precision))) {
-(__149036_36_bin->type) = _ZN3edg8fpt_zeroE;
-} else  { if (128 < (__149036_36_bin->exponent)) {
-(__149036_36_bin->type) = _ZN3edg12fpt_infinityE;
-} else  { if (__149044_17_biased_exponent <= 0) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg23fp_frac_shift_right_rawEPhii((__149043_17_fraction), (__149036_36_bin->precision), ((-__149044_17_biased_exponent) + 1));
-__149044_17_biased_exponent = 0;
+if (((int)(__149168_36_bin->type)) == 2) {
+_ZN3edg25normalize_and_round_floatEPNS_12an_fp_binaryE(__149168_36_bin);
+memcpy(((void *)(__149175_17_fraction)), ((const void *)((__149168_36_bin->frac))), 3ULL);
+__149176_17_biased_exponent = (((__149168_36_bin->exponent) + 127) - 1);
+if ((__149168_36_bin->exponent) < ((-125) - (__149168_36_bin->precision))) {
+(__149168_36_bin->type) = _ZN3edg8fpt_zeroE;
+} else  { if (128 < (__149168_36_bin->exponent)) {
+(__149168_36_bin->type) = _ZN3edg12fpt_infinityE;
+} else  { if (__149176_17_biased_exponent <= 0) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg23fp_frac_shift_right_rawEPhii((__149175_17_fraction), (__149168_36_bin->precision), ((-__149176_17_biased_exponent) + 1));
+__149176_17_biased_exponent = 0;
 } } }
 }
-if (((int)(__149036_36_bin->type)) != 2) {
-memset(((void *)(__149043_17_fraction)), 0, 3ULL);
-switch ((int)(__149036_36_bin->type)) {
+if (((int)(__149168_36_bin->type)) != 2) {
+memset(((void *)(__149175_17_fraction)), 0, 3ULL);
+switch ((int)(__149168_36_bin->type)) {
 case 3:
 
-((__149043_17_fraction)[0]) = ((unsigned char)1U);
-__149044_17_biased_exponent = 255;
+((__149175_17_fraction)[0]) = ((unsigned char)1U);
+__149176_17_biased_exponent = 255;
 
-((__149043_17_fraction)[2]) = ((unsigned char)0U);
-((__149043_17_fraction)[2]) |= 64;
-goto __T549359736;
+((__149175_17_fraction)[2]) = ((unsigned char)0U);
+((__149175_17_fraction)[2]) |= 64;
+goto __T816414344;
 case 4:
 
-__149044_17_biased_exponent = 255;
-((__149043_17_fraction)[2]) = ((unsigned char)0U);
-goto __T549359736;
+__149176_17_biased_exponent = 255;
+((__149175_17_fraction)[2]) = ((unsigned char)0U);
+goto __T816414344;
 case 6:
 
-__149044_17_biased_exponent = 0;
-goto __T549359736;
+__149176_17_biased_exponent = 0;
+goto __T816414344;
 default:
-_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 661, __T548248664, ((const char *)"invalid floating-point value"), ((_ZN3edg12a_const_charE *)0));
-} __T549359736:;
+_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 661, __T814729856, ((const char *)"invalid floating-point value"), ((_ZN3edg12a_const_charE *)0));
+} __T816414344:;
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18set_fraction_floatEPhS1_(__149035_36_tgt, (__149043_17_fraction));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg25set_biased_exponent_floatEPhj(__149035_36_tgt, ((unsigned)__149044_17_biased_exponent));
-if (((int)(__149036_36_bin->is_negative)) == 0) {
-(__149035_36_tgt[((_ZN3edg18host_little_endianE) ? 3 : 0)]) &= 127;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18set_fraction_floatEPhS1_(__149167_36_tgt, (__149175_17_fraction));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg25set_biased_exponent_floatEPhj(__149167_36_tgt, ((unsigned)__149176_17_biased_exponent));
+if (((int)(__149168_36_bin->is_negative)) == 0) {
+(__149167_36_tgt[((_ZN3edg18host_little_endianE) ? 3 : 0)]) &= 127;
 } else  {
-(__149035_36_tgt[((_ZN3edg18host_little_endianE) ? 3 : 0)]) |= 128;
+(__149167_36_tgt[((_ZN3edg18host_little_endianE) ? 3 : 0)]) |= 128;
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg14float_make_minEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__149094_36_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg14float_make_minEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__149226_36_bin)
 
 
 
 {
-(__149094_36_bin->type) = _ZN3edg10fpt_numberE;
-(__149094_36_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
-(__149094_36_bin->exponent) = (-125);
-memset(((void *)((__149094_36_bin->frac))), 0, 9ULL);
-(((__149094_36_bin->frac))[2]) |= 128U;
-(__149094_36_bin->precision) = 24; 
+(__149226_36_bin->type) = _ZN3edg10fpt_numberE;
+(__149226_36_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
+(__149226_36_bin->exponent) = (-125);
+memset(((void *)((__149226_36_bin->frac))), 0, 9ULL);
+(((__149226_36_bin->frac))[2]) |= 128U;
+(__149226_36_bin->precision) = 24; 
 }
 
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg19make_float_bin_zeroEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__149109_44_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg19make_float_bin_zeroEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__149241_44_bin)
 
 
 
 {
-(__149109_44_bin->type) = _ZN3edg8fpt_zeroE;
-(__149109_44_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
-(__149109_44_bin->precision) = 24; 
+(__149241_44_bin->type) = _ZN3edg8fpt_zeroE;
+(__149241_44_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
+(__149241_44_bin->precision) = 24; 
 }
 #line 724
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg24float_make_min_subnormalEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__149144_46_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg24float_make_min_subnormalEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__149276_46_bin)
 
 
 
 {
-(__149144_46_bin->type) = _ZN3edg10fpt_numberE;
-(__149144_46_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
-(__149144_46_bin->exponent) = (-148);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_minEPhi(((__149144_46_bin->frac)), 24);
-(__149144_46_bin->precision) = 24; 
+(__149276_46_bin->type) = _ZN3edg10fpt_numberE;
+(__149276_46_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
+(__149276_46_bin->exponent) = (-148);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_minEPhi(((__149276_46_bin->frac)), 24);
+(__149276_46_bin->precision) = 24; 
 }
 #line 870
 static void _ZN32_INTERNAL_10_floating_c_7968bde93edg21initialize_tens_floatEv(void)
@@ -10563,7 +10628,7 @@ static void _ZN32_INTERNAL_10_floating_c_7968bde93edg21initialize_tens_floatEv(v
 
 
 {
-auto int __149295_16_i;
+auto int __149427_16_i;
 #line 881
 (_ZN32_INTERNAL_10_floating_c_7968bde93edg9dec_floatE.exponent) = 9;
 
@@ -10573,20 +10638,20 @@ _ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm
 
 
 
-for (__149295_16_i = 1; ((long)__149295_16_i) < 11L; ++__149295_16_i) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149295_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + (__149295_16_i - 1)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj(((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149295_16_i), 10U);
+for (__149427_16_i = 1; ((long)__149427_16_i) < 11L; ++__149427_16_i) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149427_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + (__149427_16_i - 1)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj(((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149427_16_i), 10U);
 }
 
 _ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(_ZN32_INTERNAL_10_floating_c_7968bde93edg14big_tens_floatE, (_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE + 8));
 
-for (__149295_16_i = 1; __149295_16_i < 3; ++__149295_16_i) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg14big_tens_floatE) + __149295_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg14big_tens_floatE) + (__149295_16_i - 1)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg14big_tens_floatE) + __149295_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg14big_tens_floatE) + __149295_16_i));
+for (__149427_16_i = 1; __149427_16_i < 3; ++__149427_16_i) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg14big_tens_floatE) + __149427_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg14big_tens_floatE) + (__149427_16_i - 1)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg14big_tens_floatE) + __149427_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg14big_tens_floatE) + __149427_16_i));
 
 (_ZN32_INTERNAL_10_floating_c_7968bde93edg9dec_floatE.exponent) = ((2 * (_ZN32_INTERNAL_10_floating_c_7968bde93edg9dec_floatE.exponent)) - 1);
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi(((_ZN32_INTERNAL_10_floating_c_7968bde93edg14big_tens_floatE) + __149295_16_i), (&_ZN32_INTERNAL_10_floating_c_7968bde93edg9dec_floatE), 0);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi(((_ZN32_INTERNAL_10_floating_c_7968bde93edg14big_tens_floatE) + __149427_16_i), (&_ZN32_INTERNAL_10_floating_c_7968bde93edg9dec_floatE), 0);
 #line 908
 } 
 
@@ -10594,17 +10659,17 @@ _ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg18fast_dec2bin_floatEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEPi( _ZN3edg12an_fp_binaryE *__149334_53_bin, 
-_ZN3edg19an_fp_decimal_inputE *__149335_53_dec, 
-int *__149336_53_pscale)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg18fast_dec2bin_floatEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEPi( _ZN3edg12an_fp_binaryE *__149466_53_bin, 
+_ZN3edg19an_fp_decimal_inputE *__149467_53_dec, 
+int *__149468_53_pscale)
 #line 953
 {
-auto int __149374_29_exp;
-auto int __149375_29_first_exp = 0;
-auto int __149376_29_exp_is_negative = 0;
-auto int __149377_29_sig_dig = 7;
+auto int __149506_29_exp;
+auto int __149507_29_first_exp = 0;
+auto int __149508_29_exp_is_negative = 0;
+auto int __149509_29_sig_dig = 7;
 #line 954
-__149374_29_exp = (__149335_53_dec->exponent);
+__149506_29_exp = (__149467_53_dec->exponent);
 
 
 
@@ -10612,471 +10677,473 @@ __149374_29_exp = (__149335_53_dec->exponent);
 (void)0;
 (void)0;
 
-if ((__149335_53_dec->precision) < __149377_29_sig_dig) {
-__149377_29_sig_dig = (__149335_53_dec->precision);
+if ((__149467_53_dec->precision) < __149509_29_sig_dig) {
+__149509_29_sig_dig = (__149467_53_dec->precision);
 #line 971
 }
 
-__149374_29_exp -= __149377_29_sig_dig;
+__149506_29_exp -= __149509_29_sig_dig;
 
-if (__149374_29_exp < 0) {
-__149376_29_exp_is_negative = 1;
-__149374_29_exp = (-__149374_29_exp);
+if (__149506_29_exp < 0) {
+__149508_29_exp_is_negative = 1;
+__149506_29_exp = (-__149506_29_exp);
 }
-(*__149336_53_pscale) = 0;
+(*__149468_53_pscale) = 0;
 
-if (39L < ((long)(__149335_53_dec->exponent))) {
-(__149335_53_dec->type) = _ZN3edg12fpt_overflowE;
-} else  { if (((long)(__149335_53_dec->exponent)) < (-45L)) {
+if (39L < ((long)(__149467_53_dec->exponent))) {
+(__149467_53_dec->type) = _ZN3edg12fpt_overflowE;
+} else  { if (((long)(__149467_53_dec->exponent)) < (-45L)) {
 
-(__149335_53_dec->type) = _ZN3edg13fpt_underflowE;
-} else  { if (6L < ((long)(__149335_53_dec->precision))) {
+(__149467_53_dec->type) = _ZN3edg13fpt_underflowE;
+} else  { if (6L < ((long)(__149467_53_dec->precision))) {
 
-(__149335_53_dec->type) = _ZN3edg10fpt_approxE;
-} else  { if (__149374_29_exp <= 10) {
+(__149467_53_dec->type) = _ZN3edg10fpt_approxE;
+} else  { if (__149506_29_exp <= 10) {
 
-(__149335_53_dec->type) = _ZN3edg10fpt_numberE;
-} else  { if ((!(__149376_29_exp_is_negative)) && (((long)__149374_29_exp) <= (16L - ((long)(__149335_53_dec->precision)))))
+(__149467_53_dec->type) = _ZN3edg10fpt_numberE;
+} else  { if ((!(__149508_29_exp_is_negative)) && (((long)__149506_29_exp) <= (16L - ((long)(__149467_53_dec->precision)))))
 {
 
-__149375_29_first_exp = ((int)(6L - ((long)(__149335_53_dec->precision))));
-__149374_29_exp -= __149375_29_first_exp;
-(__149335_53_dec->type) = _ZN3edg10fpt_numberE;
+__149507_29_first_exp = ((int)(6L - ((long)(__149467_53_dec->precision))));
+__149506_29_exp -= __149507_29_first_exp;
+(__149467_53_dec->type) = _ZN3edg10fpt_numberE;
 } else  {
 
-(__149335_53_dec->type) = _ZN3edg10fpt_approxE;
+(__149467_53_dec->type) = _ZN3edg10fpt_approxE;
 } } } } }
 
-if (((int)(__149335_53_dec->type)) == 1) {
+if (((int)(__149467_53_dec->type)) == 1) {
 
-__149375_29_first_exp = ((int)(((unsigned)__149374_29_exp) & 7U));
-__149374_29_exp -= __149375_29_first_exp;
+__149507_29_first_exp = ((int)(((unsigned)__149506_29_exp) & 7U));
+__149506_29_exp -= __149507_29_first_exp;
 }
-(__149375_29_first_exp <= 10) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1008, __T549559704, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(__149507_29_first_exp <= 10) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1008, __T816633544, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
-if ((((int)(__149335_53_dec->type)) == 2) || (((int)(__149335_53_dec->type)) == 1)) {
+if ((((int)(__149467_53_dec->type)) == 2) || (((int)(__149467_53_dec->type)) == 1)) {
 
-auto unsigned long __149432_19_fraction = 0UL;
-auto int __149433_19_digits = 0;
-auto _ZN3edg12a_const_charE *__149434_20_cur;
+auto unsigned long __149564_19_fraction = 0UL;
+auto int __149565_19_digits = 0;
+auto _ZN3edg12a_const_charE *__149566_20_cur;
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE(__149334_53_bin);
-for (__149434_20_cur = (__149335_53_dec->first_int); (__149434_20_cur != (__149335_53_dec->last_int)) && (__149377_29_sig_dig != 0); ((++__149434_20_cur) , (--__149377_29_sig_dig)) , (++__149433_19_digits))
+_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE(__149466_53_bin);
+for (__149566_20_cur = (__149467_53_dec->first_int); (__149566_20_cur != (__149467_53_dec->last_int)) && (__149509_29_sig_dig != 0); ((++__149566_20_cur) , (--__149509_29_sig_dig)) , (++__149565_19_digits))
 
 {
-if (__149433_19_digits == 9) {
-(((long)__149433_19_digits) < 11L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1021, __T549559704, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__149334_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149433_19_digits));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__149334_53_bin, __149432_19_fraction);
-__149432_19_fraction = 0UL;
-__149433_19_digits = 0;
+if (__149565_19_digits == 9) {
+(((long)__149565_19_digits) < 11L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1021, __T816633544, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__149466_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149565_19_digits));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__149466_53_bin, __149564_19_fraction);
+__149564_19_fraction = 0UL;
+__149565_19_digits = 0;
 }
-__149432_19_fraction *= 10UL;
-__149432_19_fraction += ((unsigned long)(((int)(*__149434_20_cur)) - 48));
+__149564_19_fraction *= 10UL;
+__149564_19_fraction += ((unsigned long)(((int)(*__149566_20_cur)) - 48));
 }
-for (__149434_20_cur = (__149335_53_dec->first_frac); (__149434_20_cur != (__149335_53_dec->last_frac)) && (__149377_29_sig_dig != 0); ((++__149434_20_cur) , (--__149377_29_sig_dig)) , (++__149433_19_digits))
+for (__149566_20_cur = (__149467_53_dec->first_frac); (__149566_20_cur != (__149467_53_dec->last_frac)) && (__149509_29_sig_dig != 0); ((++__149566_20_cur) , (--__149509_29_sig_dig)) , (++__149565_19_digits))
 
 {
-if (__149433_19_digits == 9) {
-(((long)__149433_19_digits) < 11L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1034, __T549559704, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__149334_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149433_19_digits));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__149334_53_bin, __149432_19_fraction);
-__149432_19_fraction = 0UL;
-__149433_19_digits = 0;
+if (__149565_19_digits == 9) {
+(((long)__149565_19_digits) < 11L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1034, __T816633544, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__149466_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149565_19_digits));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__149466_53_bin, __149564_19_fraction);
+__149564_19_fraction = 0UL;
+__149565_19_digits = 0;
 }
-__149432_19_fraction *= 10UL;
-__149432_19_fraction += ((unsigned long)(((int)(*__149434_20_cur)) - 48));
+__149564_19_fraction *= 10UL;
+__149564_19_fraction += ((unsigned long)(((int)(*__149566_20_cur)) - 48));
 }
-if (__149433_19_digits != 0) {
-(((long)__149433_19_digits) < 11L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1044, __T549559704, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__149334_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149433_19_digits));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__149334_53_bin, __149432_19_fraction);
+if (__149565_19_digits != 0) {
+(((long)__149565_19_digits) < 11L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1044, __T816633544, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__149466_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149565_19_digits));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__149466_53_bin, __149564_19_fraction);
 }
-if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__149334_53_bin)) {
-(__149335_53_dec->type) = _ZN3edg13fpt_underflowE;
-} else  { if (__149376_29_exp_is_negative) {
-_ZN3edg25normalize_and_round_floatEPNS_12an_fp_binaryE(__149334_53_bin);
+if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__149466_53_bin)) {
+(__149467_53_dec->type) = _ZN3edg13fpt_underflowE;
+} else  { if (__149508_29_exp_is_negative) {
+_ZN3edg25normalize_and_round_floatEPNS_12an_fp_binaryE(__149466_53_bin);
 
-if (__149375_29_first_exp != 0) {
+if (__149507_29_first_exp != 0) {
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__149334_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149375_29_first_exp));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__149466_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149507_29_first_exp));
 }
-if (__149374_29_exp == 0) {
+if (__149506_29_exp == 0) {
 
-} else  { if (((long)__149374_29_exp) < 11L) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__149334_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149374_29_exp));
+} else  { if (((long)__149506_29_exp) < 11L) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__149466_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149506_29_exp));
 } else  {
 
-auto int __149483_13_idx = 0;
-__149374_29_exp >>= 3;
+auto int __149615_13_idx = 0;
+__149506_29_exp >>= 3;
 
-for (__149483_13_idx = 0; (__149374_29_exp != 0) && (__149483_13_idx < 2); (++__149483_13_idx) , (__149374_29_exp >>= 1)) {
-if ((__149374_29_exp & 0x1) != 0) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__149334_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg14big_tens_floatE) + __149483_13_idx));
+for (__149615_13_idx = 0; (__149506_29_exp != 0) && (__149615_13_idx < 2); (++__149615_13_idx) , (__149506_29_exp >>= 1)) {
+if ((__149506_29_exp & 0x1) != 0) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__149466_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg14big_tens_floatE) + __149615_13_idx));
 }
 }
 
-if (__149374_29_exp != 0) {
+if (__149506_29_exp != 0) {
 
-auto _ZN3edg12an_fp_binaryE __149494_37_old_value;
-auto _ZN3edg12an_fp_binaryE __149495_37_fp_min;
+auto _ZN3edg12an_fp_binaryE __149626_37_old_value;
+auto _ZN3edg12an_fp_binaryE __149627_37_fp_min;
 #line 1074
-__149494_37_old_value = (*__149334_53_bin);
+__149626_37_old_value = (*__149466_53_bin);
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg14float_make_minEPNS0_12an_fp_binaryE((&__149495_37_fp_min));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg14float_make_minEPNS0_12an_fp_binaryE((&__149627_37_fp_min));
 
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__149334_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg14big_tens_floatE) + __149483_13_idx));
-while (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_(__149334_53_bin, (&__149495_37_fp_min))) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__149466_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg14big_tens_floatE) + __149615_13_idx));
+while (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_(__149466_53_bin, (&__149627_37_fp_min))) {
 
-auto int __149504_17_adjust;
-if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__149334_53_bin)) {
+auto int __149636_17_adjust;
+if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__149466_53_bin)) {
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg24float_make_min_subnormalEPNS0_12an_fp_binaryE(__149334_53_bin);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg24float_make_min_subnormalEPNS0_12an_fp_binaryE(__149466_53_bin);
 
 
 
 }
 
-__149504_17_adjust = ((__149495_37_fp_min.exponent) - (__149334_53_bin->exponent));
+__149636_17_adjust = ((__149627_37_fp_min.exponent) - (__149466_53_bin->exponent));
 
 
 
 
-(*__149334_53_bin) = __149494_37_old_value;
-(*__149336_53_pscale) += __149504_17_adjust;
+(*__149466_53_bin) = __149626_37_old_value;
+(*__149468_53_pscale) += __149636_17_adjust;
 
-(__149334_53_bin->exponent) += __149504_17_adjust;
-
-
+(__149466_53_bin->exponent) += __149636_17_adjust;
 
 
-__149494_37_old_value = (*__149334_53_bin);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__149334_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg14big_tens_floatE) + __149483_13_idx));
+
+
+__149626_37_old_value = (*__149466_53_bin);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__149466_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg14big_tens_floatE) + __149615_13_idx));
 }
 }
 } }
 } else  {
 
-if (__149375_29_first_exp != 0) {
+if (__149507_29_first_exp != 0) {
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__149334_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149375_29_first_exp));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__149466_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149507_29_first_exp));
 }
-if (__149374_29_exp == 0) {
+if (__149506_29_exp == 0) {
 
-} else  { if (((long)__149374_29_exp) < 11L) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__149334_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149374_29_exp));
+} else  { if (((long)__149506_29_exp) < 11L) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__149466_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149506_29_exp));
 } else  {
 
-auto int __149544_13_idx;
-__149374_29_exp >>= 3;
-for (__149544_13_idx = 0; __149374_29_exp != 0; (++__149544_13_idx) , (__149374_29_exp >>= 1)) {
-if ((__149374_29_exp & 0x1) != 0) {
-(__149544_13_idx < 3) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1128, __T549559704, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__149334_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg14big_tens_floatE) + __149544_13_idx));
+auto int __149676_13_idx;
+__149506_29_exp >>= 3;
+for (__149676_13_idx = 0; __149506_29_exp != 0; (++__149676_13_idx) , (__149506_29_exp >>= 1)) {
+if ((__149506_29_exp & 0x1) != 0) {
+(__149676_13_idx < 3) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1128, __T816633544, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__149466_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg14big_tens_floatE) + __149676_13_idx));
 }
 }
 } }
 } }
-if (__149335_53_dec->is_negative) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_negateEPNS0_12an_fp_binaryE(__149334_53_bin);
+if (__149467_53_dec->is_negative) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_negateEPNS0_12an_fp_binaryE(__149466_53_bin);
 }
 } 
 }
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg18fast_bin2dec_floatEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEPvi( _ZN3edg13an_fp_decimalE *__149561_58_dec, 
-_ZN3edg12an_fp_binaryE *__149562_58_bin, 
-void *__149563_58_val, 
-int __149564_57_ndigits)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg18fast_bin2dec_floatEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEPvi( _ZN3edg13an_fp_decimalE *__149693_58_dec, 
+_ZN3edg12an_fp_binaryE *__149694_58_bin, 
+void *__149695_58_val, 
+int __149696_57_ndigits)
 #line 1153
 {
-auto _ZN3edg12an_fp_binaryE __149574_29_d;
-auto _ZN3edg12an_fp_binaryE __149575_29_ds;
-auto int __149576_29_k;
-auto int __149577_29_dig_pos;
-auto _ZN3edg9a_booleanE __149578_29_res;
+auto _ZN3edg12an_fp_binaryE __149706_29_d;
+auto _ZN3edg12an_fp_binaryE __149707_29_ds;
+auto int __149708_29_k;
+auto int __149709_29_dig_pos;
+auto _ZN3edg9a_booleanE __149710_29_res;
 
-if (((__149562_58_bin->exponent) <= 0) || ((__149562_58_bin->exponent) < ((__149562_58_bin->precision) - (_ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_frac_low_zero_bitsEPhi(((__149562_58_bin->frac)), (__149562_58_bin->precision))))))
+if (((__149694_58_bin->exponent) <= 0) || ((__149694_58_bin->exponent) < ((__149694_58_bin->precision) - (_ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_frac_low_zero_bitsEPhi(((__149694_58_bin->frac)), (__149694_58_bin->precision))))))
 
 {
 
-__149578_29_res = ((_ZN3edg9a_booleanE)0);
-goto __149659_1_end_of_routine;
+__149710_29_res = ((_ZN3edg9a_booleanE)0);
+goto __149791_1_end_of_routine;
 }
-__149576_29_k = ((int)((30103L * ((long)(__149562_58_bin->exponent))) / 100000L));
-if (11L <= ((long)__149576_29_k)) {
+__149708_29_k = ((int)((30103L * ((long)(__149694_58_bin->exponent))) / 100000L));
+if (11L <= ((long)__149708_29_k)) {
 
-__149578_29_res = ((_ZN3edg9a_booleanE)0);
-goto __149659_1_end_of_routine;
+__149710_29_res = ((_ZN3edg9a_booleanE)0);
+goto __149791_1_end_of_routine;
 }
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__149574_29_d), __149562_58_bin);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__149706_29_d), __149694_58_bin);
 
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_absEPNS0_12an_fp_binaryE((&__149574_29_d));
-while ((0 < __149576_29_k) && (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_((&__149574_29_d), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149576_29_k)))) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_absEPNS0_12an_fp_binaryE((&__149706_29_d));
+while ((0 < __149708_29_k) && (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_((&__149706_29_d), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149708_29_k)))) {
 
---__149576_29_k;
+--__149708_29_k;
 }
-if ((__149576_29_k < 0) || (((30103L * ((long)(__149562_58_bin->precision))) / 100000L) <= ((long)__149576_29_k))) {
+if ((__149708_29_k < 0) || (((30103L * ((long)(__149694_58_bin->precision))) / 100000L) <= ((long)__149708_29_k))) {
 
-__149578_29_res = ((_ZN3edg9a_booleanE)0);
-goto __149659_1_end_of_routine;
+__149710_29_res = ((_ZN3edg9a_booleanE)0);
+goto __149791_1_end_of_routine;
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__149575_29_ds), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149576_29_k));
-for (__149577_29_dig_pos = 0; (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE((&__149574_29_d)))) && (__149577_29_dig_pos <= __149564_57_ndigits); (_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj((&__149574_29_d), 10U)) , (++
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__149707_29_ds), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg16small_tens_floatE) + __149708_29_k));
+for (__149709_29_dig_pos = 0; (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE((&__149706_29_d)))) && (__149709_29_dig_pos <= __149696_57_ndigits); (_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj((&__149706_29_d), 10U)) , (++
 #line 1189
-__149577_29_dig_pos))
+__149709_29_dig_pos))
 
 {
-auto int __149612_31_digit;
-auto _ZN3edg12an_fp_binaryE __149613_31_tmp;
+auto int __149744_31_digit;
+auto _ZN3edg12an_fp_binaryE __149745_31_tmp;
 #line 1200
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__149613_31_tmp), (&__149574_29_d));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_((&__149613_31_tmp), (&__149575_29_ds));
-__149612_31_digit = (_ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_to_intEPNS0_12an_fp_binaryE((&__149613_31_tmp)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__149613_31_tmp), (&__149575_29_ds));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj((&__149613_31_tmp), ((unsigned)__149612_31_digit));
-if (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_((&__149574_29_d), (&__149613_31_tmp))) {
---__149612_31_digit;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_((&__149613_31_tmp), (&__149575_29_ds));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__149745_31_tmp), (&__149706_29_d));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_((&__149745_31_tmp), (&__149707_29_ds));
+__149744_31_digit = (_ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_to_intEPNS0_12an_fp_binaryE((&__149745_31_tmp)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__149745_31_tmp), (&__149707_29_ds));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj((&__149745_31_tmp), ((unsigned)__149744_31_digit));
+if (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_((&__149706_29_d), (&__149745_31_tmp))) {
+--__149744_31_digit;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_((&__149745_31_tmp), (&__149707_29_ds));
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_((&__149574_29_d), (&__149613_31_tmp));
-(((((long)__149577_29_dig_pos) < 23L) && (0 <= __149612_31_digit)) && (__149612_31_digit < 10)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1210, __T549564632, ((
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_((&__149706_29_d), (&__149745_31_tmp));
+(((((long)__149709_29_dig_pos) < 23L) && (0 <= __149744_31_digit)) && (__149744_31_digit < 10)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1210, __T816638528, ((
 #line 1210
 _ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-(((__149561_58_dec->digits))[__149577_29_dig_pos]) = ((char)(48 + ((int)((char)__149612_31_digit))));
+(((__149693_58_dec->digits))[__149709_29_dig_pos]) = ((char)(48 + ((int)((char)__149744_31_digit))));
 }
-if (__149564_57_ndigits < __149577_29_dig_pos) {
+if (__149696_57_ndigits < __149709_29_dig_pos) {
 
---__149577_29_dig_pos;
-if (((int)(((__149561_58_dec->digits))[__149577_29_dig_pos])) < 53) {
+--__149709_29_dig_pos;
+if (((int)(((__149693_58_dec->digits))[__149709_29_dig_pos])) < 53) {
 
-} else  { if (((53 < ((int)(((__149561_58_dec->digits))[__149577_29_dig_pos]))) || (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE((&__149574_29_d))))) || (((((int)(((__149561_58_dec->digits))[(__149577_29_dig_pos - 1)])) - 48) % 2) != 0))
+} else  { if (((53 < ((int)(((__149693_58_dec->digits))[__149709_29_dig_pos]))) || (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE((&__149706_29_d))))) || (((((int)(((__149693_58_dec->digits))[(__149709_29_dig_pos - 1)])) - 48) % 2) != 0))
 
 {
-__149577_29_dig_pos = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8do_roundEiPc(__149577_29_dig_pos, ((__149561_58_dec->digits))));
-if (__149577_29_dig_pos == 0) {
-__149577_29_dig_pos = 1;
-++__149576_29_k;
+__149709_29_dig_pos = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8do_roundEiPc(__149709_29_dig_pos, ((__149693_58_dec->digits))));
+if (__149709_29_dig_pos == 0) {
+__149709_29_dig_pos = 1;
+++__149708_29_k;
 }
 } }
 }
 
-while ((1 < __149577_29_dig_pos) && (((int)(((__149561_58_dec->digits))[(__149577_29_dig_pos - 1)])) == 48)) {
---__149577_29_dig_pos;
+while ((1 < __149709_29_dig_pos) && (((int)(((__149693_58_dec->digits))[(__149709_29_dig_pos - 1)])) == 48)) {
+--__149709_29_dig_pos;
 }
 
-(__149561_58_dec->is_negative) = (__149562_58_bin->is_negative);
-(__149561_58_dec->exponent) = (__149576_29_k + 1);
-(((long)__149577_29_dig_pos) < 23L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1235, __T549564632, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-(((__149561_58_dec->digits))[__149577_29_dig_pos]) = ((char)0);
-(__149561_58_dec->ndigits) = __149577_29_dig_pos;
-__149578_29_res = ((_ZN3edg9a_booleanE)1);
-__149659_1_end_of_routine:;
-return __149578_29_res;
+(__149693_58_dec->is_negative) = (__149694_58_bin->is_negative);
+(__149693_58_dec->exponent) = (__149708_29_k + 1);
+(((long)__149709_29_dig_pos) < 23L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1235, __T816638528, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))
+#line 1235
+;
+(((__149693_58_dec->digits))[__149709_29_dig_pos]) = ((char)0);
+(__149693_58_dec->ndigits) = __149709_29_dig_pos;
+__149710_29_res = ((_ZN3edg9a_booleanE)1);
+__149791_1_end_of_routine:;
+return __149710_29_res;
 }
 
 
-static enum _ZN3edg17an_fp_return_typeE _ZN32_INTERNAL_10_floating_c_7968bde93edg20write_float_internalEPciPhi( char *__149664_59_tgt, 
-int __149665_58_size, 
-unsigned char *__149666_59_val, 
-int __149667_58_ndigits)
+static enum _ZN3edg17an_fp_return_typeE _ZN32_INTERNAL_10_floating_c_7968bde93edg20write_float_internalEPciPhi( char *__149796_59_tgt, 
+int __149797_58_size, 
+unsigned char *__149798_59_val, 
+int __149799_58_ndigits)
 #line 1258
 {
-auto enum _ZN3edg17an_fp_return_typeE __149679_21_res = _ZN3edg12fp_ret_validE;
+auto enum _ZN3edg17an_fp_return_typeE __149811_21_res = _ZN3edg12fp_ret_validE;
 
-(_ZN3edg20floating_init_calledE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1261, __T549567344, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-if ((__149664_59_tgt == ((char *)0)) || (__149665_58_size <= 0)) {
-__149679_21_res = _ZN3edg16fp_ret_too_smallE;
-} else  { if ((__149666_59_val == ((unsigned char *)0)) || (__149665_58_size < 0)) {
-__149679_21_res = _ZN3edg14fp_ret_invalidE;
+(_ZN3edg20floating_init_calledE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1261, __T816641256, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+if ((__149796_59_tgt == ((char *)0)) || (__149797_58_size <= 0)) {
+__149811_21_res = _ZN3edg16fp_ret_too_smallE;
+} else  { if ((__149798_59_val == ((unsigned char *)0)) || (__149797_58_size < 0)) {
+__149811_21_res = _ZN3edg14fp_ret_invalidE;
 } else  {
-auto _ZN3edg12an_fp_binaryE __149687_18_bin;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11split_floatEPNS0_12an_fp_binaryEPh((&__149687_18_bin), __149666_59_val);
-if (((__149687_18_bin.is_negative) && (((int)(__149687_18_bin.type)) != 3)) && (((int)(__149687_18_bin.type)) != 0)) {
-(*(__149664_59_tgt++)) = ((char)45);
---__149665_58_size;
+auto _ZN3edg12an_fp_binaryE __149819_18_bin;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11split_floatEPNS0_12an_fp_binaryEPh((&__149819_18_bin), __149798_59_val);
+if (((__149819_18_bin.is_negative) && (((int)(__149819_18_bin.type)) != 3)) && (((int)(__149819_18_bin.type)) != 0)) {
+(*(__149796_59_tgt++)) = ((char)45);
+--__149797_58_size;
 }
 
 
-__149679_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg18convert_and_formatEPcyPNS0_12an_fp_binaryE(__149664_59_tgt, ((size_t)__149665_58_size), (&__149687_18_bin)));
-if (((int)__149679_21_res) == (-1)) {
-auto _ZN3edg13an_fp_decimalE __149697_21_dec;
+__149811_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg18convert_and_formatEPcyPNS0_12an_fp_binaryE(__149796_59_tgt, ((size_t)__149797_58_size), (&__149819_18_bin)));
+if (((int)__149811_21_res) == (-1)) {
+auto _ZN3edg13an_fp_decimalE __149829_21_dec;
 
 
-if (((int)(_ZN32_INTERNAL_10_floating_c_7968bde93edg18fast_bin2dec_floatEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEPvi((&__149697_21_dec), (&__149687_18_bin), ((void *)__149666_59_val), __149667_58_ndigits))) == 0) {
+if (((int)(_ZN32_INTERNAL_10_floating_c_7968bde93edg18fast_bin2dec_floatEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEPvi((&__149829_21_dec), (&__149819_18_bin), ((void *)__149798_59_val), __149799_58_ndigits))) == 0) {
 
 
 
-auto int __149704_13_adjust = 0;
-if ((__149687_18_bin.exponent) < (-125)) {
-__149704_13_adjust = ((-125) - (__149687_18_bin.exponent));
+auto int __149836_13_adjust = 0;
+if ((__149819_18_bin.exponent) < (-125)) {
+__149836_13_adjust = ((-125) - (__149819_18_bin.exponent));
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg7bin2decEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEii((&__149697_21_dec), (&__149687_18_bin), __149667_58_ndigits, __149704_13_adjust);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg7bin2decEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEii((&__149829_21_dec), (&__149819_18_bin), __149799_58_ndigits, __149836_13_adjust);
 }
 
 
 
-__149679_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg6formatEPcyPNS0_13an_fp_decimalE(__149664_59_tgt, ((size_t)__149665_58_size), (&__149697_21_dec)));
+__149811_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg6formatEPcyPNS0_13an_fp_decimalE(__149796_59_tgt, ((size_t)__149797_58_size), (&__149829_21_dec)));
 }
 } }
-return __149679_21_res;
+return __149811_21_res;
 }
 
 
-enum _ZN3edg17an_fp_return_typeE _ZN3edg11write_floatEPciPh( char *__149720_43_tgt, 
-int __149721_42_size, 
-unsigned char *__149722_43_val)
+enum _ZN3edg17an_fp_return_typeE _ZN3edg11write_floatEPciPh( char *__149852_43_tgt, 
+int __149853_42_size, 
+unsigned char *__149854_43_val)
 #line 1316
 {
-auto int __149737_7_ndigits;
+auto int __149869_7_ndigits;
 #line 1329
-__149737_7_ndigits = 0x7fffffff;
+__149869_7_ndigits = 0x7fffffff;
 
 
-return _ZN32_INTERNAL_10_floating_c_7968bde93edg20write_float_internalEPciPhi(__149720_43_tgt, __149721_42_size, __149722_43_val, __149737_7_ndigits);
+return _ZN32_INTERNAL_10_floating_c_7968bde93edg20write_float_internalEPciPhi(__149852_43_tgt, __149853_42_size, __149854_43_val, __149869_7_ndigits);
 }
 
 
-enum _ZN3edg17an_fp_return_typeE _ZN3edg13write_float_nEPciPhi( char *__149756_45_tgt, 
-int __149757_44_size, 
-unsigned char *__149758_45_val, 
-int __149759_44_ndigits)
+enum _ZN3edg17an_fp_return_typeE _ZN3edg13write_float_nEPciPhi( char *__149888_45_tgt, 
+int __149889_44_size, 
+unsigned char *__149890_45_val, 
+int __149891_44_ndigits)
 #line 1356
 {
-if (__149759_44_ndigits <= 0) {
-__149759_44_ndigits = 1;
-} else  { if (23L <= ((long)__149759_44_ndigits)) {
+if (__149891_44_ndigits <= 0) {
+__149891_44_ndigits = 1;
+} else  { if (23L <= ((long)__149891_44_ndigits)) {
 
 
-__149759_44_ndigits = 22;
+__149891_44_ndigits = 22;
 } }
-return _ZN32_INTERNAL_10_floating_c_7968bde93edg20write_float_internalEPciPhi(__149756_45_tgt, __149757_44_size, __149758_45_val, __149759_44_ndigits);
+return _ZN32_INTERNAL_10_floating_c_7968bde93edg20write_float_internalEPciPhi(__149888_45_tgt, __149889_44_size, __149890_45_val, __149891_44_ndigits);
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg13convert_floatEPhPNS0_19an_fp_decimal_inputE( unsigned char *__149788_45_val, 
-_ZN3edg19an_fp_decimal_inputE *__149789_45_dec)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg13convert_floatEPhPNS0_19an_fp_decimal_inputE( unsigned char *__149920_45_val, 
+_ZN3edg19an_fp_decimal_inputE *__149921_45_dec)
 
 
 
 {
-auto _ZN3edg12an_fp_binaryE __149794_16_bin;
-auto int __149795_16_scale = 0;
+auto _ZN3edg12an_fp_binaryE __149926_16_bin;
+auto int __149927_16_scale = 0;
 #line 1383
-(__149794_16_bin.precision) = 24;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE((&__149794_16_bin));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fast_dec2bin_floatEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEPi((&__149794_16_bin), __149789_45_dec, (&__149795_16_scale));
+(__149926_16_bin.precision) = 24;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE((&__149926_16_bin));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fast_dec2bin_floatEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEPi((&__149926_16_bin), __149921_45_dec, (&__149927_16_scale));
 
 
 
 
-if (((int)(__149789_45_dec->type)) == 1) {
+if (((int)(__149921_45_dec->type)) == 1) {
 #line 1399
-if ((((int)(__149794_16_bin.type)) == 6) || (((int)(__149794_16_bin.type)) == 7)) {
+if ((((int)(__149926_16_bin.type)) == 6) || (((int)(__149926_16_bin.type)) == 7)) {
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg24float_make_min_subnormalEPNS0_12an_fp_binaryE((&__149794_16_bin));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg24float_make_min_subnormalEPNS0_12an_fp_binaryE((&__149926_16_bin));
 }
-if (((int)(__149794_16_bin.type)) == 2) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi((&__149794_16_bin), __149789_45_dec, __149795_16_scale);
+if (((int)(__149926_16_bin.type)) == 2) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi((&__149926_16_bin), __149921_45_dec, __149927_16_scale);
 }
-if (128 < (__149794_16_bin.exponent)) {
-(__149789_45_dec->type) = _ZN3edg12fpt_overflowE;
-} else  { if ((__149794_16_bin.exponent) < (-148)) {
-(__149789_45_dec->type) = _ZN3edg13fpt_underflowE;
+if (128 < (__149926_16_bin.exponent)) {
+(__149921_45_dec->type) = _ZN3edg12fpt_overflowE;
+} else  { if ((__149926_16_bin.exponent) < (-148)) {
+(__149921_45_dec->type) = _ZN3edg13fpt_underflowE;
 } else  {
-(__149794_16_bin.is_negative) = (__149789_45_dec->is_negative);
+(__149926_16_bin.is_negative) = (__149921_45_dec->is_negative);
 
 
 
 } }
 }
 
-if ((((int)(__149789_45_dec->type)) == 1) || (((int)(__149789_45_dec->type)) == 2)) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg10make_floatEPhPNS0_12an_fp_binaryE(__149788_45_val, (&__149794_16_bin));
+if ((((int)(__149921_45_dec->type)) == 1) || (((int)(__149921_45_dec->type)) == 2)) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg10make_floatEPhPNS0_12an_fp_binaryE(__149920_45_val, (&__149926_16_bin));
 } 
 
 }
 
 
-enum _ZN3edg17an_fp_return_typeE _ZN3edg10read_floatEPhPKci( unsigned char *__149846_42_val, 
-_ZN3edg12a_const_charE *__149847_42_str, 
-int __149848_41_len)
+enum _ZN3edg17an_fp_return_typeE _ZN3edg10read_floatEPhPKci( unsigned char *__149978_42_val, 
+_ZN3edg12a_const_charE *__149979_42_str, 
+int __149980_41_len)
 #line 1441
 {
-auto _ZN3edg19an_fp_decimal_inputE __149862_23_dec;
-auto enum _ZN3edg17an_fp_return_typeE __149863_23_res = _ZN3edg14fp_ret_invalidE;
+auto _ZN3edg19an_fp_decimal_inputE __149994_23_dec;
+auto enum _ZN3edg17an_fp_return_typeE __149995_23_res = _ZN3edg14fp_ret_invalidE;
 
-(_ZN3edg20floating_init_calledE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1445, __T549573232, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-if (((__149846_42_val == ((unsigned char *)0)) || (__149847_42_str == ((_ZN3edg12a_const_charE *)0))) || (__149848_41_len <= 0)) {
-(__149862_23_dec.type) = _ZN3edg11fpt_invalidE;
+(_ZN3edg20floating_init_calledE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1445, __T816647152, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+if (((__149978_42_val == ((unsigned char *)0)) || (__149979_42_str == ((_ZN3edg12a_const_charE *)0))) || (__149980_41_len <= 0)) {
+(__149994_23_dec.type) = _ZN3edg11fpt_invalidE;
 } else  {
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12split_stringEPNS0_19an_fp_decimal_inputEPKcS4_((&__149862_23_dec), __149847_42_str, (__149847_42_str + __149848_41_len));
-if (((int)(__149862_23_dec.type)) == 2) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg13convert_floatEPhPNS0_19an_fp_decimal_inputE(__149846_42_val, (&__149862_23_dec));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12split_stringEPNS0_19an_fp_decimal_inputEPKcS4_((&__149994_23_dec), __149979_42_str, (__149979_42_str + __149980_41_len));
+if (((int)(__149994_23_dec.type)) == 2) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg13convert_floatEPhPNS0_19an_fp_decimal_inputE(__149978_42_val, (&__149994_23_dec));
 }
 }
-if (((int)(__149862_23_dec.type)) == 0) {
-__149863_23_res = _ZN3edg14fp_ret_invalidE;
-} else  { if ((((int)(__149862_23_dec.type)) == 1) || (((int)(__149862_23_dec.type)) == 2)) {
-__149863_23_res = _ZN3edg12fp_ret_validE;
+if (((int)(__149994_23_dec.type)) == 0) {
+__149995_23_res = _ZN3edg14fp_ret_invalidE;
+} else  { if ((((int)(__149994_23_dec.type)) == 1) || (((int)(__149994_23_dec.type)) == 2)) {
+__149995_23_res = _ZN3edg12fp_ret_validE;
 } else  {
-auto _ZN3edg12an_fp_binaryE __149881_18_bin;
-(__149881_18_bin.precision) = 24;
-(__149881_18_bin.is_negative) = (__149862_23_dec.is_negative);
-switch ((int)(__149862_23_dec.type)) {
+auto _ZN3edg12an_fp_binaryE __150013_18_bin;
+(__150013_18_bin.precision) = 24;
+(__150013_18_bin.is_negative) = (__149994_23_dec.is_negative);
+switch ((int)(__149994_23_dec.type)) {
 case 3:
-(__149881_18_bin.type) = _ZN3edg7fpt_nanE;
-__149863_23_res = _ZN3edg10fp_ret_nanE;
-goto __T550314368;
+(__150013_18_bin.type) = _ZN3edg7fpt_nanE;
+__149995_23_res = _ZN3edg10fp_ret_nanE;
+goto __T817366016;
 case 4:
-(__149881_18_bin.type) = _ZN3edg12fpt_infinityE;
-__149863_23_res = ((__149881_18_bin.is_negative) ? _ZN3edg19fp_ret_neg_infinityE : _ZN3edg19fp_ret_pos_infinityE);
-goto __T550314368;
+(__150013_18_bin.type) = _ZN3edg12fpt_infinityE;
+__149995_23_res = ((__150013_18_bin.is_negative) ? _ZN3edg19fp_ret_neg_infinityE : _ZN3edg19fp_ret_pos_infinityE);
+goto __T817366016;
 case 5:
-(__149881_18_bin.type) = _ZN3edg12fpt_infinityE;
-__149863_23_res = _ZN3edg15fp_ret_overflowE;
-goto __T550314368;
+(__150013_18_bin.type) = _ZN3edg12fpt_infinityE;
+__149995_23_res = _ZN3edg15fp_ret_overflowE;
+goto __T817366016;
 case 6:
-(__149881_18_bin.type) = _ZN3edg8fpt_zeroE;
-__149863_23_res = _ZN3edg12fp_ret_validE;
-goto __T550314368;
+(__150013_18_bin.type) = _ZN3edg8fpt_zeroE;
+__149995_23_res = _ZN3edg12fp_ret_validE;
+goto __T817366016;
 case 7:
-(__149881_18_bin.type) = _ZN3edg8fpt_zeroE;
-__149863_23_res = _ZN3edg16fp_ret_underflowE;
-goto __T550314368;
+(__150013_18_bin.type) = _ZN3edg8fpt_zeroE;
+__149995_23_res = _ZN3edg16fp_ret_underflowE;
+goto __T817366016;
 default:
-_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1486, __T549573232, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
-} __T550314368:;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg10make_floatEPhPNS0_12an_fp_binaryE(__149846_42_val, (&__149881_18_bin));
+_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1486, __T816647152, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
+} __T817366016:;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg10make_floatEPhPNS0_12an_fp_binaryE(__149978_42_val, (&__150013_18_bin));
 } }
-return __149863_23_res;
+return __149995_23_res;
 }
 #line 411 "src/float_type.h"
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg19set_fraction_doubleEPhS1_( unsigned char *__150429_41_tgt, 
-unsigned char *__150430_41_frac)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg19set_fraction_doubleEPhS1_( unsigned char *__150561_41_tgt, 
+unsigned char *__150562_41_frac)
 
 
 
 
 {
-auto int __150436_7_i;
+auto int __150568_7_i;
 
-for (__150436_7_i = 0; __150436_7_i < 6; ++__150436_7_i) {
-(__150429_41_tgt[((_ZN3edg18host_little_endianE) ? __150436_7_i : (7 - __150436_7_i))]) = (__150430_41_frac[(__150436_7_i - 0)]);
+for (__150568_7_i = 0; __150568_7_i < 6; ++__150568_7_i) {
+(__150561_41_tgt[((_ZN3edg18host_little_endianE) ? __150568_7_i : (7 - __150568_7_i))]) = (__150562_41_frac[(__150568_7_i - 0)]);
 }
-(__150429_41_tgt[((_ZN3edg18host_little_endianE) ? __150436_7_i : (7 - __150436_7_i))]) &= 240;
+(__150561_41_tgt[((_ZN3edg18host_little_endianE) ? __150568_7_i : (7 - __150568_7_i))]) &= 240;
 
-(__150429_41_tgt[((_ZN3edg18host_little_endianE) ? __150436_7_i : (7 - __150436_7_i))]) |= ((((unsigned)(__150430_41_frac[(__150436_7_i - 0)])) & 15U) & 0xffffffefU); 
+(__150561_41_tgt[((_ZN3edg18host_little_endianE) ? __150568_7_i : (7 - __150568_7_i))]) |= ((((unsigned)(__150562_41_frac[(__150568_7_i - 0)])) & 15U) & 0xffffffefU); 
 
 
 
@@ -11084,245 +11151,245 @@ for (__150436_7_i = 0; __150436_7_i < 6; ++__150436_7_i) {
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg26set_biased_exponent_doubleEPhj( unsigned char *__150451_48_tgt, 
-unsigned __150452_47_biased_exponent)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg26set_biased_exponent_doubleEPhj( unsigned char *__150583_48_tgt, 
+unsigned __150584_47_biased_exponent)
 
 
 
 {
-auto int __150457_7_i;
+auto int __150589_7_i;
 
-__150457_7_i = 6;
-(__150451_48_tgt[((_ZN3edg18host_little_endianE) ? __150457_7_i : (7 - __150457_7_i))]) &= 15;
-(__150451_48_tgt[((_ZN3edg18host_little_endianE) ? __150457_7_i : (7 - __150457_7_i))]) |= ((__150452_47_biased_exponent << 4) & 240U);
-__150452_47_biased_exponent >>= 4;
+__150589_7_i = 6;
+(__150583_48_tgt[((_ZN3edg18host_little_endianE) ? __150589_7_i : (7 - __150589_7_i))]) &= 15;
+(__150583_48_tgt[((_ZN3edg18host_little_endianE) ? __150589_7_i : (7 - __150589_7_i))]) |= ((__150584_47_biased_exponent << 4) & 240U);
+__150584_47_biased_exponent >>= 4;
 
-++__150457_7_i;
+++__150589_7_i;
 #line 453
-(__150451_48_tgt[((_ZN3edg18host_little_endianE) ? __150457_7_i : (7 - __150457_7_i))]) &= 128;
-(__150451_48_tgt[((_ZN3edg18host_little_endianE) ? __150457_7_i : (7 - __150457_7_i))]) |= (__150452_47_biased_exponent & 127U); 
+(__150583_48_tgt[((_ZN3edg18host_little_endianE) ? __150589_7_i : (7 - __150589_7_i))]) &= 128;
+(__150583_48_tgt[((_ZN3edg18host_little_endianE) ? __150589_7_i : (7 - __150589_7_i))]) |= (__150584_47_biased_exponent & 127U); 
 
 }
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg19get_fraction_doubleEPhS1_( unsigned char *__150477_46_frac, 
-unsigned char *__150478_46_val)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg19get_fraction_doubleEPhS1_( unsigned char *__150609_46_frac, 
+unsigned char *__150610_46_val)
 #line 467
 {
-auto int __150486_13_i;
-auto _ZN3edg9a_booleanE __150487_13_res = ((_ZN3edg9a_booleanE)0);
+auto int __150618_13_i;
+auto _ZN3edg9a_booleanE __150619_13_res = ((_ZN3edg9a_booleanE)0);
 
-for (__150486_13_i = 0; __150486_13_i < 6; ++__150486_13_i) {
-(__150477_46_frac[(__150486_13_i - 0)]) = (__150478_46_val[((_ZN3edg18host_little_endianE) ? __150486_13_i : (7 - __150486_13_i))]);
-if (((int)(__150478_46_val[((_ZN3edg18host_little_endianE) ? __150486_13_i : (7 - __150486_13_i))])) != 0) {
-__150487_13_res = ((_ZN3edg9a_booleanE)1);
+for (__150618_13_i = 0; __150618_13_i < 6; ++__150618_13_i) {
+(__150609_46_frac[(__150618_13_i - 0)]) = (__150610_46_val[((_ZN3edg18host_little_endianE) ? __150618_13_i : (7 - __150618_13_i))]);
+if (((int)(__150610_46_val[((_ZN3edg18host_little_endianE) ? __150618_13_i : (7 - __150618_13_i))])) != 0) {
+__150619_13_res = ((_ZN3edg9a_booleanE)1);
 }
 }
-(__150477_46_frac[(__150486_13_i - 0)]) = ((unsigned char)(((unsigned)(__150478_46_val[((_ZN3edg18host_little_endianE) ? __150486_13_i : (7 - __150486_13_i))])) & 15U));
+(__150609_46_frac[(__150618_13_i - 0)]) = ((unsigned char)(((unsigned)(__150610_46_val[((_ZN3edg18host_little_endianE) ? __150618_13_i : (7 - __150618_13_i))])) & 15U));
 
-(__150477_46_frac[6]) |= 16U;
+(__150609_46_frac[6]) |= 16U;
 
-if ((((unsigned)(__150478_46_val[((_ZN3edg18host_little_endianE) ? __150486_13_i : (7 - __150486_13_i))])) & 15U) != 0U) {
-__150487_13_res = ((_ZN3edg9a_booleanE)1);
+if ((((unsigned)(__150610_46_val[((_ZN3edg18host_little_endianE) ? __150618_13_i : (7 - __150618_13_i))])) & 15U) != 0U) {
+__150619_13_res = ((_ZN3edg9a_booleanE)1);
 }
 #line 490
-return __150487_13_res;
+return __150619_13_res;
 }
 
 
-static int _ZN32_INTERNAL_10_floating_c_7968bde93edg26get_biased_exponent_doubleEPh( unsigned char *__150512_47_val)
+static int _ZN32_INTERNAL_10_floating_c_7968bde93edg26get_biased_exponent_doubleEPh( unsigned char *__150644_47_val)
 
 
 
 {
-auto int __150517_7_i = 7;
-auto int __150518_7_biased_exponent = 0;
+auto int __150649_7_i = 7;
+auto int __150650_7_biased_exponent = 0;
 
 
-__150518_7_biased_exponent = ((int)(((unsigned)(__150512_47_val[((_ZN3edg18host_little_endianE) ? __150517_7_i : (7 - __150517_7_i))])) & 127U));
---__150517_7_i;
-for (; __150517_7_i > 6; --__150517_7_i) {
-__150518_7_biased_exponent <<= 8;
-__150518_7_biased_exponent += ((int)(__150512_47_val[((_ZN3edg18host_little_endianE) ? __150517_7_i : (7 - __150517_7_i))]));
+__150650_7_biased_exponent = ((int)(((unsigned)(__150644_47_val[((_ZN3edg18host_little_endianE) ? __150649_7_i : (7 - __150649_7_i))])) & 127U));
+--__150649_7_i;
+for (; __150649_7_i > 6; --__150649_7_i) {
+__150650_7_biased_exponent <<= 8;
+__150650_7_biased_exponent += ((int)(__150644_47_val[((_ZN3edg18host_little_endianE) ? __150649_7_i : (7 - __150649_7_i))]));
 }
-__150518_7_biased_exponent <<= 4;
+__150650_7_biased_exponent <<= 4;
 
-__150518_7_biased_exponent |= ((int)((((unsigned)(__150512_47_val[((_ZN3edg18host_little_endianE) ? __150517_7_i : (7 - __150517_7_i))])) & 240U) >> 4));
+__150650_7_biased_exponent |= ((int)((((unsigned)(__150644_47_val[((_ZN3edg18host_little_endianE) ? __150649_7_i : (7 - __150649_7_i))])) & 240U) >> 4));
 
-return __150518_7_biased_exponent;
+return __150650_7_biased_exponent;
 }
 #line 524
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg12split_doubleEPNS0_12an_fp_binaryEPh( _ZN3edg12an_fp_binaryE *__150542_37_bin, 
-unsigned char *__150543_37_val)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg12split_doubleEPNS0_12an_fp_binaryEPh( _ZN3edg12an_fp_binaryE *__150674_37_bin, 
+unsigned char *__150675_37_val)
 
 
 
 {
-auto int __150548_13_biased_exponent;
-auto _ZN3edg9a_booleanE __150549_13_saw_nz;
+auto int __150680_13_biased_exponent;
+auto _ZN3edg9a_booleanE __150681_13_saw_nz;
 
 
 
 
-(((__150542_37_bin->frac))[6]) = ((unsigned char)0U);
-__150549_13_saw_nz = (_ZN32_INTERNAL_10_floating_c_7968bde93edg19get_fraction_doubleEPhS1_(((__150542_37_bin->frac)), __150543_37_val));
-__150548_13_biased_exponent = (_ZN32_INTERNAL_10_floating_c_7968bde93edg26get_biased_exponent_doubleEPh(__150543_37_val));
-(__150542_37_bin->is_negative) = ((_ZN3edg9a_booleanE)(((((int)(__150543_37_val[((_ZN3edg18host_little_endianE) ? 7 : 0)])) & 128) ? 1 : 0) != 0));
+(((__150674_37_bin->frac))[6]) = ((unsigned char)0U);
+__150681_13_saw_nz = (_ZN32_INTERNAL_10_floating_c_7968bde93edg19get_fraction_doubleEPhS1_(((__150674_37_bin->frac)), __150675_37_val));
+__150680_13_biased_exponent = (_ZN32_INTERNAL_10_floating_c_7968bde93edg26get_biased_exponent_doubleEPh(__150675_37_val));
+(__150674_37_bin->is_negative) = ((_ZN3edg9a_booleanE)(((((int)(__150675_37_val[((_ZN3edg18host_little_endianE) ? 7 : 0)])) & 128) ? 1 : 0) != 0));
 #line 550
 {
-if (__150548_13_biased_exponent == 2047) {
-if (((int)__150549_13_saw_nz) == 0) {
-(__150542_37_bin->type) = _ZN3edg12fpt_infinityE;
+if (__150680_13_biased_exponent == 2047) {
+if (((int)__150681_13_saw_nz) == 0) {
+(__150674_37_bin->type) = _ZN3edg12fpt_infinityE;
 } else  {
-(__150542_37_bin->type) = _ZN3edg7fpt_nanE;
+(__150674_37_bin->type) = _ZN3edg7fpt_nanE;
 }
-} else  { if (__150548_13_biased_exponent == 0) {
-if (((int)__150549_13_saw_nz) == 0) {
-(__150542_37_bin->type) = _ZN3edg8fpt_zeroE;
+} else  { if (__150680_13_biased_exponent == 0) {
+if (((int)__150681_13_saw_nz) == 0) {
+(__150674_37_bin->type) = _ZN3edg8fpt_zeroE;
 } else  {
 
 
-auto int __150581_13_high_bits;
-(((__150542_37_bin->frac))[6]) &= 239;
-__150581_13_high_bits = (_ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_high_zero_bitsEPhi(((__150542_37_bin->frac)), 53));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii(((__150542_37_bin->frac)), 53, __150581_13_high_bits);
-__150548_13_biased_exponent -= __150581_13_high_bits;
-++__150548_13_biased_exponent;
-(__150542_37_bin->type) = _ZN3edg10fpt_numberE;
+auto int __150713_13_high_bits;
+(((__150674_37_bin->frac))[6]) &= 239;
+__150713_13_high_bits = (_ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_high_zero_bitsEPhi(((__150674_37_bin->frac)), 53));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii(((__150674_37_bin->frac)), 53, __150713_13_high_bits);
+__150680_13_biased_exponent -= __150713_13_high_bits;
+++__150680_13_biased_exponent;
+(__150674_37_bin->type) = _ZN3edg10fpt_numberE;
 }
 } else  {
-(__150542_37_bin->type) = _ZN3edg10fpt_numberE;
+(__150674_37_bin->type) = _ZN3edg10fpt_numberE;
 } }
 }
-(__150542_37_bin->exponent) = ((__150548_13_biased_exponent - 1023) + 1);
-(__150542_37_bin->precision) = 53; 
+(__150674_37_bin->exponent) = ((__150680_13_biased_exponent - 1023) + 1);
+(__150674_37_bin->precision) = 53; 
 }
 
 
-void _ZN3edg26normalize_and_round_doubleEPNS_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__150598_40_bin)
+void _ZN3edg26normalize_and_round_doubleEPNS_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__150730_40_bin)
 #line 586
 {
 if (0) {
 
 
 
-auto union _ZZN3edg26normalize_and_round_doubleEPNS_12an_fp_binaryEEUt_ __150609_7_u;
-auto unsigned short __150610_20_mask = ((unsigned short)2047U);
+auto union _ZZN3edg26normalize_and_round_doubleEPNS_12an_fp_binaryEEUt_ __150741_7_u;
+auto unsigned short __150742_20_mask = ((unsigned short)2047U);
 
-memcpy(((void *)((__150609_7_u.bytes))), ((const void *)(&(__150598_40_bin->frac))), 2ULL);
-if (((__150598_40_bin->exponent) > 52) && ((((int)(__150609_7_u.val)) & ((int)__150610_20_mask)) != ((int)(__150609_7_u.val)))) {
+memcpy(((void *)((__150741_7_u.bytes))), ((const void *)(&(__150730_40_bin->frac))), 2ULL);
+if (((__150730_40_bin->exponent) > 52) && ((((int)(__150741_7_u.val)) & ((int)__150742_20_mask)) != ((int)(__150741_7_u.val)))) {
 
 
 
-auto int __150617_22_num_bits;
-auto unsigned short __150618_22_rounding_bit;
+auto int __150749_22_num_bits;
+auto unsigned short __150750_22_rounding_bit;
 #line 599
-__150617_22_num_bits = ((__150598_40_bin->exponent) - 52);
-__150618_22_rounding_bit = ((unsigned short)(((int)(__150609_7_u.val)) & (1 << (__150617_22_num_bits - 1))));
+__150749_22_num_bits = ((__150730_40_bin->exponent) - 52);
+__150750_22_rounding_bit = ((unsigned short)(((int)(__150741_7_u.val)) & (1 << (__150749_22_num_bits - 1))));
 
-(__150609_7_u.val) = ((unsigned short)((((int)(__150609_7_u.val)) + ((int)__150618_22_rounding_bit)) >> __150617_22_num_bits));
-if ((((int)(__150609_7_u.val)) & ((int)__150610_20_mask)) != ((int)(__150609_7_u.val))) {
+(__150741_7_u.val) = ((unsigned short)((((int)(__150741_7_u.val)) + ((int)__150750_22_rounding_bit)) >> __150749_22_num_bits));
+if ((((int)(__150741_7_u.val)) & ((int)__150742_20_mask)) != ((int)(__150741_7_u.val))) {
 
-(__150609_7_u.val) >>= 1;
-++(__150598_40_bin->exponent);
+(__150741_7_u.val) >>= 1;
+++(__150730_40_bin->exponent);
 }
-memcpy(((void *)(&(__150598_40_bin->frac))), ((const void *)((__150609_7_u.bytes))), 2ULL);
-++(__150598_40_bin->exponent);
+memcpy(((void *)(&(__150730_40_bin->frac))), ((const void *)((__150741_7_u.bytes))), 2ULL);
+++(__150730_40_bin->exponent);
 }
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg11make_doubleEPhPNS0_12an_fp_binaryE( unsigned char *__150633_36_tgt, 
-_ZN3edg12an_fp_binaryE *__150634_36_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg11make_doubleEPhPNS0_12an_fp_binaryE( unsigned char *__150765_36_tgt, 
+_ZN3edg12an_fp_binaryE *__150766_36_bin)
 #line 622
 {
-auto unsigned char __150641_17_fraction[7];
-auto int __150642_17_biased_exponent = 0;
+auto unsigned char __150773_17_fraction[7];
+auto int __150774_17_biased_exponent = 0;
 
 
-if (((int)(__150634_36_bin->type)) == 2) {
-_ZN3edg26normalize_and_round_doubleEPNS_12an_fp_binaryE(__150634_36_bin);
-memcpy(((void *)(__150641_17_fraction)), ((const void *)((__150634_36_bin->frac))), 7ULL);
-__150642_17_biased_exponent = (((__150634_36_bin->exponent) + 1023) - 1);
-if ((__150634_36_bin->exponent) < ((-1021) - (__150634_36_bin->precision))) {
-(__150634_36_bin->type) = _ZN3edg8fpt_zeroE;
-} else  { if (1024 < (__150634_36_bin->exponent)) {
-(__150634_36_bin->type) = _ZN3edg12fpt_infinityE;
-} else  { if (__150642_17_biased_exponent <= 0) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg23fp_frac_shift_right_rawEPhii((__150641_17_fraction), (__150634_36_bin->precision), ((-__150642_17_biased_exponent) + 1));
-__150642_17_biased_exponent = 0;
+if (((int)(__150766_36_bin->type)) == 2) {
+_ZN3edg26normalize_and_round_doubleEPNS_12an_fp_binaryE(__150766_36_bin);
+memcpy(((void *)(__150773_17_fraction)), ((const void *)((__150766_36_bin->frac))), 7ULL);
+__150774_17_biased_exponent = (((__150766_36_bin->exponent) + 1023) - 1);
+if ((__150766_36_bin->exponent) < ((-1021) - (__150766_36_bin->precision))) {
+(__150766_36_bin->type) = _ZN3edg8fpt_zeroE;
+} else  { if (1024 < (__150766_36_bin->exponent)) {
+(__150766_36_bin->type) = _ZN3edg12fpt_infinityE;
+} else  { if (__150774_17_biased_exponent <= 0) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg23fp_frac_shift_right_rawEPhii((__150773_17_fraction), (__150766_36_bin->precision), ((-__150774_17_biased_exponent) + 1));
+__150774_17_biased_exponent = 0;
 } } }
 }
-if (((int)(__150634_36_bin->type)) != 2) {
-memset(((void *)(__150641_17_fraction)), 0, 7ULL);
-switch ((int)(__150634_36_bin->type)) {
+if (((int)(__150766_36_bin->type)) != 2) {
+memset(((void *)(__150773_17_fraction)), 0, 7ULL);
+switch ((int)(__150766_36_bin->type)) {
 case 3:
 
-((__150641_17_fraction)[0]) = ((unsigned char)1U);
-__150642_17_biased_exponent = 2047;
+((__150773_17_fraction)[0]) = ((unsigned char)1U);
+__150774_17_biased_exponent = 2047;
 
-((__150641_17_fraction)[6]) = ((unsigned char)0U);
-((__150641_17_fraction)[6]) |= 8;
-goto __T551263704;
+((__150773_17_fraction)[6]) = ((unsigned char)0U);
+((__150773_17_fraction)[6]) |= 8;
+goto __T818422536;
 case 4:
 
-__150642_17_biased_exponent = 2047;
-((__150641_17_fraction)[6]) = ((unsigned char)0U);
-goto __T551263704;
+__150774_17_biased_exponent = 2047;
+((__150773_17_fraction)[6]) = ((unsigned char)0U);
+goto __T818422536;
 case 6:
 
-__150642_17_biased_exponent = 0;
-goto __T551263704;
+__150774_17_biased_exponent = 0;
+goto __T818422536;
 default:
-_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 661, __T549590904, ((const char *)"invalid floating-point value"), ((_ZN3edg12a_const_charE *)0));
-} __T551263704:;
+_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 661, __T818193560, ((const char *)"invalid floating-point value"), ((_ZN3edg12a_const_charE *)0));
+} __T818422536:;
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg19set_fraction_doubleEPhS1_(__150633_36_tgt, (__150641_17_fraction));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg26set_biased_exponent_doubleEPhj(__150633_36_tgt, ((unsigned)__150642_17_biased_exponent));
-if (((int)(__150634_36_bin->is_negative)) == 0) {
-(__150633_36_tgt[((_ZN3edg18host_little_endianE) ? 7 : 0)]) &= 127;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg19set_fraction_doubleEPhS1_(__150765_36_tgt, (__150773_17_fraction));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg26set_biased_exponent_doubleEPhj(__150765_36_tgt, ((unsigned)__150774_17_biased_exponent));
+if (((int)(__150766_36_bin->is_negative)) == 0) {
+(__150765_36_tgt[((_ZN3edg18host_little_endianE) ? 7 : 0)]) &= 127;
 } else  {
-(__150633_36_tgt[((_ZN3edg18host_little_endianE) ? 7 : 0)]) |= 128;
+(__150765_36_tgt[((_ZN3edg18host_little_endianE) ? 7 : 0)]) |= 128;
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg15double_make_minEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__150692_36_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg15double_make_minEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__150824_36_bin)
 
 
 
 {
-(__150692_36_bin->type) = _ZN3edg10fpt_numberE;
-(__150692_36_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
-(__150692_36_bin->exponent) = (-1021);
-memset(((void *)((__150692_36_bin->frac))), 0, 9ULL);
-(((__150692_36_bin->frac))[6]) |= 16U;
-(__150692_36_bin->precision) = 53; 
+(__150824_36_bin->type) = _ZN3edg10fpt_numberE;
+(__150824_36_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
+(__150824_36_bin->exponent) = (-1021);
+memset(((void *)((__150824_36_bin->frac))), 0, 9ULL);
+(((__150824_36_bin->frac))[6]) |= 16U;
+(__150824_36_bin->precision) = 53; 
 }
 
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg20make_double_bin_zeroEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__150707_44_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg20make_double_bin_zeroEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__150839_44_bin)
 
 
 
 {
-(__150707_44_bin->type) = _ZN3edg8fpt_zeroE;
-(__150707_44_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
-(__150707_44_bin->precision) = 53; 
+(__150839_44_bin->type) = _ZN3edg8fpt_zeroE;
+(__150839_44_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
+(__150839_44_bin->precision) = 53; 
 }
 #line 724
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg25double_make_min_subnormalEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__150742_46_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg25double_make_min_subnormalEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__150874_46_bin)
 
 
 
 {
-(__150742_46_bin->type) = _ZN3edg10fpt_numberE;
-(__150742_46_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
-(__150742_46_bin->exponent) = (-1073);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_minEPhi(((__150742_46_bin->frac)), 53);
-(__150742_46_bin->precision) = 53; 
+(__150874_46_bin->type) = _ZN3edg10fpt_numberE;
+(__150874_46_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
+(__150874_46_bin->exponent) = (-1073);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_minEPhi(((__150874_46_bin->frac)), 53);
+(__150874_46_bin->precision) = 53; 
 }
 #line 870
 static void _ZN32_INTERNAL_10_floating_c_7968bde93edg22initialize_tens_doubleEv(void)
@@ -11330,7 +11397,7 @@ static void _ZN32_INTERNAL_10_floating_c_7968bde93edg22initialize_tens_doubleEv(
 
 
 {
-auto int __150893_16_i;
+auto int __151025_16_i;
 #line 881
 (_ZN32_INTERNAL_10_floating_c_7968bde93edg10dec_doubleE.exponent) = 17;
 
@@ -11340,20 +11407,20 @@ _ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm
 
 
 
-for (__150893_16_i = 1; ((long)__150893_16_i) < 23L; ++__150893_16_i) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __150893_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + (__150893_16_i - 1)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj(((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __150893_16_i), 10U);
+for (__151025_16_i = 1; ((long)__151025_16_i) < 23L; ++__151025_16_i) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __151025_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + (__151025_16_i - 1)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj(((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __151025_16_i), 10U);
 }
 
 _ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(_ZN32_INTERNAL_10_floating_c_7968bde93edg15big_tens_doubleE, (_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE + 16));
 
-for (__150893_16_i = 1; __150893_16_i < 5; ++__150893_16_i) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg15big_tens_doubleE) + __150893_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg15big_tens_doubleE) + (__150893_16_i - 1)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg15big_tens_doubleE) + __150893_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg15big_tens_doubleE) + __150893_16_i));
+for (__151025_16_i = 1; __151025_16_i < 5; ++__151025_16_i) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg15big_tens_doubleE) + __151025_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg15big_tens_doubleE) + (__151025_16_i - 1)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg15big_tens_doubleE) + __151025_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg15big_tens_doubleE) + __151025_16_i));
 
 (_ZN32_INTERNAL_10_floating_c_7968bde93edg10dec_doubleE.exponent) = ((2 * (_ZN32_INTERNAL_10_floating_c_7968bde93edg10dec_doubleE.exponent)) - 1);
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi(((_ZN32_INTERNAL_10_floating_c_7968bde93edg15big_tens_doubleE) + __150893_16_i), (&_ZN32_INTERNAL_10_floating_c_7968bde93edg10dec_doubleE), 0);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi(((_ZN32_INTERNAL_10_floating_c_7968bde93edg15big_tens_doubleE) + __151025_16_i), (&_ZN32_INTERNAL_10_floating_c_7968bde93edg10dec_doubleE), 0);
 #line 908
 } 
 
@@ -11361,17 +11428,17 @@ _ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg19fast_dec2bin_doubleEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEPi( _ZN3edg12an_fp_binaryE *__150932_53_bin, 
-_ZN3edg19an_fp_decimal_inputE *__150933_53_dec, 
-int *__150934_53_pscale)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg19fast_dec2bin_doubleEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEPi( _ZN3edg12an_fp_binaryE *__151064_53_bin, 
+_ZN3edg19an_fp_decimal_inputE *__151065_53_dec, 
+int *__151066_53_pscale)
 #line 953
 {
-auto int __150972_29_exp;
-auto int __150973_29_first_exp = 0;
-auto int __150974_29_exp_is_negative = 0;
-auto int __150975_29_sig_dig = 16;
+auto int __151104_29_exp;
+auto int __151105_29_first_exp = 0;
+auto int __151106_29_exp_is_negative = 0;
+auto int __151107_29_sig_dig = 16;
 #line 954
-__150972_29_exp = (__150933_53_dec->exponent);
+__151104_29_exp = (__151065_53_dec->exponent);
 
 
 
@@ -11379,471 +11446,473 @@ __150972_29_exp = (__150933_53_dec->exponent);
 (void)0;
 (void)0;
 
-if ((__150933_53_dec->precision) < __150975_29_sig_dig) {
-__150975_29_sig_dig = (__150933_53_dec->precision);
+if ((__151065_53_dec->precision) < __151107_29_sig_dig) {
+__151107_29_sig_dig = (__151065_53_dec->precision);
 #line 971
 }
 
-__150972_29_exp -= __150975_29_sig_dig;
+__151104_29_exp -= __151107_29_sig_dig;
 
-if (__150972_29_exp < 0) {
-__150974_29_exp_is_negative = 1;
-__150972_29_exp = (-__150972_29_exp);
+if (__151104_29_exp < 0) {
+__151106_29_exp_is_negative = 1;
+__151104_29_exp = (-__151104_29_exp);
 }
-(*__150934_53_pscale) = 0;
+(*__151066_53_pscale) = 0;
 
-if (309L < ((long)(__150933_53_dec->exponent))) {
-(__150933_53_dec->type) = _ZN3edg12fpt_overflowE;
-} else  { if (((long)(__150933_53_dec->exponent)) < (-324L)) {
+if (309L < ((long)(__151065_53_dec->exponent))) {
+(__151065_53_dec->type) = _ZN3edg12fpt_overflowE;
+} else  { if (((long)(__151065_53_dec->exponent)) < (-324L)) {
 
-(__150933_53_dec->type) = _ZN3edg13fpt_underflowE;
-} else  { if (15L < ((long)(__150933_53_dec->precision))) {
+(__151065_53_dec->type) = _ZN3edg13fpt_underflowE;
+} else  { if (15L < ((long)(__151065_53_dec->precision))) {
 
-(__150933_53_dec->type) = _ZN3edg10fpt_approxE;
-} else  { if (__150972_29_exp <= 22) {
+(__151065_53_dec->type) = _ZN3edg10fpt_approxE;
+} else  { if (__151104_29_exp <= 22) {
 
-(__150933_53_dec->type) = _ZN3edg10fpt_numberE;
-} else  { if ((!(__150974_29_exp_is_negative)) && (((long)__150972_29_exp) <= (37L - ((long)(__150933_53_dec->precision)))))
+(__151065_53_dec->type) = _ZN3edg10fpt_numberE;
+} else  { if ((!(__151106_29_exp_is_negative)) && (((long)__151104_29_exp) <= (37L - ((long)(__151065_53_dec->precision)))))
 {
 
-__150973_29_first_exp = ((int)(15L - ((long)(__150933_53_dec->precision))));
-__150972_29_exp -= __150973_29_first_exp;
-(__150933_53_dec->type) = _ZN3edg10fpt_numberE;
+__151105_29_first_exp = ((int)(15L - ((long)(__151065_53_dec->precision))));
+__151104_29_exp -= __151105_29_first_exp;
+(__151065_53_dec->type) = _ZN3edg10fpt_numberE;
 } else  {
 
-(__150933_53_dec->type) = _ZN3edg10fpt_approxE;
+(__151065_53_dec->type) = _ZN3edg10fpt_approxE;
 } } } } }
 
-if (((int)(__150933_53_dec->type)) == 1) {
+if (((int)(__151065_53_dec->type)) == 1) {
 
-__150973_29_first_exp = ((int)(((unsigned)__150972_29_exp) & 15U));
-__150972_29_exp -= __150973_29_first_exp;
+__151105_29_first_exp = ((int)(((unsigned)__151104_29_exp) & 15U));
+__151104_29_exp -= __151105_29_first_exp;
 }
-(__150973_29_first_exp <= 22) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1008, __T551520760, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(__151105_29_first_exp <= 22) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1008, __T818658104, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
-if ((((int)(__150933_53_dec->type)) == 2) || (((int)(__150933_53_dec->type)) == 1)) {
+if ((((int)(__151065_53_dec->type)) == 2) || (((int)(__151065_53_dec->type)) == 1)) {
 
-auto unsigned long __151030_19_fraction = 0UL;
-auto int __151031_19_digits = 0;
-auto _ZN3edg12a_const_charE *__151032_20_cur;
+auto unsigned long __151162_19_fraction = 0UL;
+auto int __151163_19_digits = 0;
+auto _ZN3edg12a_const_charE *__151164_20_cur;
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE(__150932_53_bin);
-for (__151032_20_cur = (__150933_53_dec->first_int); (__151032_20_cur != (__150933_53_dec->last_int)) && (__150975_29_sig_dig != 0); ((++__151032_20_cur) , (--__150975_29_sig_dig)) , (++__151031_19_digits))
+_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE(__151064_53_bin);
+for (__151164_20_cur = (__151065_53_dec->first_int); (__151164_20_cur != (__151065_53_dec->last_int)) && (__151107_29_sig_dig != 0); ((++__151164_20_cur) , (--__151107_29_sig_dig)) , (++__151163_19_digits))
 
 {
-if (__151031_19_digits == 9) {
-(((long)__151031_19_digits) < 23L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1021, __T551520760, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__150932_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __151031_19_digits));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__150932_53_bin, __151030_19_fraction);
-__151030_19_fraction = 0UL;
-__151031_19_digits = 0;
+if (__151163_19_digits == 9) {
+(((long)__151163_19_digits) < 23L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1021, __T818658104, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__151064_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __151163_19_digits));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__151064_53_bin, __151162_19_fraction);
+__151162_19_fraction = 0UL;
+__151163_19_digits = 0;
 }
-__151030_19_fraction *= 10UL;
-__151030_19_fraction += ((unsigned long)(((int)(*__151032_20_cur)) - 48));
+__151162_19_fraction *= 10UL;
+__151162_19_fraction += ((unsigned long)(((int)(*__151164_20_cur)) - 48));
 }
-for (__151032_20_cur = (__150933_53_dec->first_frac); (__151032_20_cur != (__150933_53_dec->last_frac)) && (__150975_29_sig_dig != 0); ((++__151032_20_cur) , (--__150975_29_sig_dig)) , (++__151031_19_digits))
+for (__151164_20_cur = (__151065_53_dec->first_frac); (__151164_20_cur != (__151065_53_dec->last_frac)) && (__151107_29_sig_dig != 0); ((++__151164_20_cur) , (--__151107_29_sig_dig)) , (++__151163_19_digits))
 
 {
-if (__151031_19_digits == 9) {
-(((long)__151031_19_digits) < 23L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1034, __T551520760, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__150932_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __151031_19_digits));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__150932_53_bin, __151030_19_fraction);
-__151030_19_fraction = 0UL;
-__151031_19_digits = 0;
+if (__151163_19_digits == 9) {
+(((long)__151163_19_digits) < 23L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1034, __T818658104, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__151064_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __151163_19_digits));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__151064_53_bin, __151162_19_fraction);
+__151162_19_fraction = 0UL;
+__151163_19_digits = 0;
 }
-__151030_19_fraction *= 10UL;
-__151030_19_fraction += ((unsigned long)(((int)(*__151032_20_cur)) - 48));
+__151162_19_fraction *= 10UL;
+__151162_19_fraction += ((unsigned long)(((int)(*__151164_20_cur)) - 48));
 }
-if (__151031_19_digits != 0) {
-(((long)__151031_19_digits) < 23L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1044, __T551520760, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__150932_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __151031_19_digits));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__150932_53_bin, __151030_19_fraction);
+if (__151163_19_digits != 0) {
+(((long)__151163_19_digits) < 23L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1044, __T818658104, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__151064_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __151163_19_digits));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__151064_53_bin, __151162_19_fraction);
 }
-if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__150932_53_bin)) {
-(__150933_53_dec->type) = _ZN3edg13fpt_underflowE;
-} else  { if (__150974_29_exp_is_negative) {
-_ZN3edg26normalize_and_round_doubleEPNS_12an_fp_binaryE(__150932_53_bin);
+if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__151064_53_bin)) {
+(__151065_53_dec->type) = _ZN3edg13fpt_underflowE;
+} else  { if (__151106_29_exp_is_negative) {
+_ZN3edg26normalize_and_round_doubleEPNS_12an_fp_binaryE(__151064_53_bin);
 
-if (__150973_29_first_exp != 0) {
+if (__151105_29_first_exp != 0) {
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__150932_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __150973_29_first_exp));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__151064_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __151105_29_first_exp));
 }
-if (__150972_29_exp == 0) {
+if (__151104_29_exp == 0) {
 
-} else  { if (((long)__150972_29_exp) < 23L) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__150932_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __150972_29_exp));
+} else  { if (((long)__151104_29_exp) < 23L) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__151064_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __151104_29_exp));
 } else  {
 
-auto int __151081_13_idx = 0;
-__150972_29_exp >>= 4;
+auto int __151213_13_idx = 0;
+__151104_29_exp >>= 4;
 
-for (__151081_13_idx = 0; (__150972_29_exp != 0) && (__151081_13_idx < 4); (++__151081_13_idx) , (__150972_29_exp >>= 1)) {
-if ((__150972_29_exp & 0x1) != 0) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__150932_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg15big_tens_doubleE) + __151081_13_idx));
+for (__151213_13_idx = 0; (__151104_29_exp != 0) && (__151213_13_idx < 4); (++__151213_13_idx) , (__151104_29_exp >>= 1)) {
+if ((__151104_29_exp & 0x1) != 0) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__151064_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg15big_tens_doubleE) + __151213_13_idx));
 }
 }
 
-if (__150972_29_exp != 0) {
+if (__151104_29_exp != 0) {
 
-auto _ZN3edg12an_fp_binaryE __151092_37_old_value;
-auto _ZN3edg12an_fp_binaryE __151093_37_fp_min;
+auto _ZN3edg12an_fp_binaryE __151224_37_old_value;
+auto _ZN3edg12an_fp_binaryE __151225_37_fp_min;
 #line 1074
-__151092_37_old_value = (*__150932_53_bin);
+__151224_37_old_value = (*__151064_53_bin);
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15double_make_minEPNS0_12an_fp_binaryE((&__151093_37_fp_min));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15double_make_minEPNS0_12an_fp_binaryE((&__151225_37_fp_min));
 
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__150932_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg15big_tens_doubleE) + __151081_13_idx));
-while (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_(__150932_53_bin, (&__151093_37_fp_min))) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__151064_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg15big_tens_doubleE) + __151213_13_idx));
+while (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_(__151064_53_bin, (&__151225_37_fp_min))) {
 
-auto int __151102_17_adjust;
-if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__150932_53_bin)) {
+auto int __151234_17_adjust;
+if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__151064_53_bin)) {
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg25double_make_min_subnormalEPNS0_12an_fp_binaryE(__150932_53_bin);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg25double_make_min_subnormalEPNS0_12an_fp_binaryE(__151064_53_bin);
 
 
 
 }
 
-__151102_17_adjust = ((__151093_37_fp_min.exponent) - (__150932_53_bin->exponent));
+__151234_17_adjust = ((__151225_37_fp_min.exponent) - (__151064_53_bin->exponent));
 
 
 
 
-(*__150932_53_bin) = __151092_37_old_value;
-(*__150934_53_pscale) += __151102_17_adjust;
+(*__151064_53_bin) = __151224_37_old_value;
+(*__151066_53_pscale) += __151234_17_adjust;
 
-(__150932_53_bin->exponent) += __151102_17_adjust;
-
-
+(__151064_53_bin->exponent) += __151234_17_adjust;
 
 
-__151092_37_old_value = (*__150932_53_bin);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__150932_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg15big_tens_doubleE) + __151081_13_idx));
+
+
+__151224_37_old_value = (*__151064_53_bin);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__151064_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg15big_tens_doubleE) + __151213_13_idx));
 }
 }
 } }
 } else  {
 
-if (__150973_29_first_exp != 0) {
+if (__151105_29_first_exp != 0) {
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__150932_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __150973_29_first_exp));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__151064_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __151105_29_first_exp));
 }
-if (__150972_29_exp == 0) {
+if (__151104_29_exp == 0) {
 
-} else  { if (((long)__150972_29_exp) < 23L) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__150932_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __150972_29_exp));
+} else  { if (((long)__151104_29_exp) < 23L) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__151064_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __151104_29_exp));
 } else  {
 
-auto int __151142_13_idx;
-__150972_29_exp >>= 4;
-for (__151142_13_idx = 0; __150972_29_exp != 0; (++__151142_13_idx) , (__150972_29_exp >>= 1)) {
-if ((__150972_29_exp & 0x1) != 0) {
-(__151142_13_idx < 5) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1128, __T551520760, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__150932_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg15big_tens_doubleE) + __151142_13_idx));
+auto int __151274_13_idx;
+__151104_29_exp >>= 4;
+for (__151274_13_idx = 0; __151104_29_exp != 0; (++__151274_13_idx) , (__151104_29_exp >>= 1)) {
+if ((__151104_29_exp & 0x1) != 0) {
+(__151274_13_idx < 5) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1128, __T818658104, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__151064_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg15big_tens_doubleE) + __151274_13_idx));
 }
 }
 } }
 } }
-if (__150933_53_dec->is_negative) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_negateEPNS0_12an_fp_binaryE(__150932_53_bin);
+if (__151065_53_dec->is_negative) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_negateEPNS0_12an_fp_binaryE(__151064_53_bin);
 }
 } 
 }
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg19fast_bin2dec_doubleEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEPvi( _ZN3edg13an_fp_decimalE *__151159_58_dec, 
-_ZN3edg12an_fp_binaryE *__151160_58_bin, 
-void *__151161_58_val, 
-int __151162_57_ndigits)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg19fast_bin2dec_doubleEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEPvi( _ZN3edg13an_fp_decimalE *__151291_58_dec, 
+_ZN3edg12an_fp_binaryE *__151292_58_bin, 
+void *__151293_58_val, 
+int __151294_57_ndigits)
 #line 1153
 {
-auto _ZN3edg12an_fp_binaryE __151172_29_d;
-auto _ZN3edg12an_fp_binaryE __151173_29_ds;
-auto int __151174_29_k;
-auto int __151175_29_dig_pos;
-auto _ZN3edg9a_booleanE __151176_29_res;
+auto _ZN3edg12an_fp_binaryE __151304_29_d;
+auto _ZN3edg12an_fp_binaryE __151305_29_ds;
+auto int __151306_29_k;
+auto int __151307_29_dig_pos;
+auto _ZN3edg9a_booleanE __151308_29_res;
 
-if (((__151160_58_bin->exponent) <= 0) || ((__151160_58_bin->exponent) < ((__151160_58_bin->precision) - (_ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_frac_low_zero_bitsEPhi(((__151160_58_bin->frac)), (__151160_58_bin->precision))))))
+if (((__151292_58_bin->exponent) <= 0) || ((__151292_58_bin->exponent) < ((__151292_58_bin->precision) - (_ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_frac_low_zero_bitsEPhi(((__151292_58_bin->frac)), (__151292_58_bin->precision))))))
 
 {
 
-__151176_29_res = ((_ZN3edg9a_booleanE)0);
-goto __151257_1_end_of_routine;
+__151308_29_res = ((_ZN3edg9a_booleanE)0);
+goto __151389_1_end_of_routine;
 }
-__151174_29_k = ((int)((30103L * ((long)(__151160_58_bin->exponent))) / 100000L));
-if (23L <= ((long)__151174_29_k)) {
+__151306_29_k = ((int)((30103L * ((long)(__151292_58_bin->exponent))) / 100000L));
+if (23L <= ((long)__151306_29_k)) {
 
-__151176_29_res = ((_ZN3edg9a_booleanE)0);
-goto __151257_1_end_of_routine;
+__151308_29_res = ((_ZN3edg9a_booleanE)0);
+goto __151389_1_end_of_routine;
 }
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__151172_29_d), __151160_58_bin);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__151304_29_d), __151292_58_bin);
 
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_absEPNS0_12an_fp_binaryE((&__151172_29_d));
-while ((0 < __151174_29_k) && (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_((&__151172_29_d), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __151174_29_k)))) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_absEPNS0_12an_fp_binaryE((&__151304_29_d));
+while ((0 < __151306_29_k) && (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_((&__151304_29_d), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __151306_29_k)))) {
 
---__151174_29_k;
+--__151306_29_k;
 }
-if ((__151174_29_k < 0) || (((30103L * ((long)(__151160_58_bin->precision))) / 100000L) <= ((long)__151174_29_k))) {
+if ((__151306_29_k < 0) || (((30103L * ((long)(__151292_58_bin->precision))) / 100000L) <= ((long)__151306_29_k))) {
 
-__151176_29_res = ((_ZN3edg9a_booleanE)0);
-goto __151257_1_end_of_routine;
+__151308_29_res = ((_ZN3edg9a_booleanE)0);
+goto __151389_1_end_of_routine;
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__151173_29_ds), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __151174_29_k));
-for (__151175_29_dig_pos = 0; (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE((&__151172_29_d)))) && (__151175_29_dig_pos <= __151162_57_ndigits); (_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj((&__151172_29_d), 10U)) , (++
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__151305_29_ds), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg17small_tens_doubleE) + __151306_29_k));
+for (__151307_29_dig_pos = 0; (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE((&__151304_29_d)))) && (__151307_29_dig_pos <= __151294_57_ndigits); (_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj((&__151304_29_d), 10U)) , (++
 #line 1189
-__151175_29_dig_pos))
+__151307_29_dig_pos))
 
 {
-auto int __151210_31_digit;
-auto _ZN3edg12an_fp_binaryE __151211_31_tmp;
+auto int __151342_31_digit;
+auto _ZN3edg12an_fp_binaryE __151343_31_tmp;
 #line 1200
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__151211_31_tmp), (&__151172_29_d));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_((&__151211_31_tmp), (&__151173_29_ds));
-__151210_31_digit = (_ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_to_intEPNS0_12an_fp_binaryE((&__151211_31_tmp)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__151211_31_tmp), (&__151173_29_ds));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj((&__151211_31_tmp), ((unsigned)__151210_31_digit));
-if (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_((&__151172_29_d), (&__151211_31_tmp))) {
---__151210_31_digit;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_((&__151211_31_tmp), (&__151173_29_ds));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__151343_31_tmp), (&__151304_29_d));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_((&__151343_31_tmp), (&__151305_29_ds));
+__151342_31_digit = (_ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_to_intEPNS0_12an_fp_binaryE((&__151343_31_tmp)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__151343_31_tmp), (&__151305_29_ds));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj((&__151343_31_tmp), ((unsigned)__151342_31_digit));
+if (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_((&__151304_29_d), (&__151343_31_tmp))) {
+--__151342_31_digit;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_((&__151343_31_tmp), (&__151305_29_ds));
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_((&__151172_29_d), (&__151211_31_tmp));
-(((((long)__151175_29_dig_pos) < 23L) && (0 <= __151210_31_digit)) && (__151210_31_digit < 10)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1210, __T551525688, ((
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_((&__151304_29_d), (&__151343_31_tmp));
+(((((long)__151307_29_dig_pos) < 23L) && (0 <= __151342_31_digit)) && (__151342_31_digit < 10)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1210, __T818663088, ((
 #line 1210
 _ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-(((__151159_58_dec->digits))[__151175_29_dig_pos]) = ((char)(48 + ((int)((char)__151210_31_digit))));
+(((__151291_58_dec->digits))[__151307_29_dig_pos]) = ((char)(48 + ((int)((char)__151342_31_digit))));
 }
-if (__151162_57_ndigits < __151175_29_dig_pos) {
+if (__151294_57_ndigits < __151307_29_dig_pos) {
 
---__151175_29_dig_pos;
-if (((int)(((__151159_58_dec->digits))[__151175_29_dig_pos])) < 53) {
+--__151307_29_dig_pos;
+if (((int)(((__151291_58_dec->digits))[__151307_29_dig_pos])) < 53) {
 
-} else  { if (((53 < ((int)(((__151159_58_dec->digits))[__151175_29_dig_pos]))) || (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE((&__151172_29_d))))) || (((((int)(((__151159_58_dec->digits))[(__151175_29_dig_pos - 1)])) - 48) % 2) != 0))
+} else  { if (((53 < ((int)(((__151291_58_dec->digits))[__151307_29_dig_pos]))) || (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE((&__151304_29_d))))) || (((((int)(((__151291_58_dec->digits))[(__151307_29_dig_pos - 1)])) - 48) % 2) != 0))
 
 {
-__151175_29_dig_pos = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8do_roundEiPc(__151175_29_dig_pos, ((__151159_58_dec->digits))));
-if (__151175_29_dig_pos == 0) {
-__151175_29_dig_pos = 1;
-++__151174_29_k;
+__151307_29_dig_pos = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8do_roundEiPc(__151307_29_dig_pos, ((__151291_58_dec->digits))));
+if (__151307_29_dig_pos == 0) {
+__151307_29_dig_pos = 1;
+++__151306_29_k;
 }
 } }
 }
 
-while ((1 < __151175_29_dig_pos) && (((int)(((__151159_58_dec->digits))[(__151175_29_dig_pos - 1)])) == 48)) {
---__151175_29_dig_pos;
+while ((1 < __151307_29_dig_pos) && (((int)(((__151291_58_dec->digits))[(__151307_29_dig_pos - 1)])) == 48)) {
+--__151307_29_dig_pos;
 }
 
-(__151159_58_dec->is_negative) = (__151160_58_bin->is_negative);
-(__151159_58_dec->exponent) = (__151174_29_k + 1);
-(((long)__151175_29_dig_pos) < 23L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1235, __T551525688, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-(((__151159_58_dec->digits))[__151175_29_dig_pos]) = ((char)0);
-(__151159_58_dec->ndigits) = __151175_29_dig_pos;
-__151176_29_res = ((_ZN3edg9a_booleanE)1);
-__151257_1_end_of_routine:;
-return __151176_29_res;
+(__151291_58_dec->is_negative) = (__151292_58_bin->is_negative);
+(__151291_58_dec->exponent) = (__151306_29_k + 1);
+(((long)__151307_29_dig_pos) < 23L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1235, __T818663088, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))
+#line 1235
+;
+(((__151291_58_dec->digits))[__151307_29_dig_pos]) = ((char)0);
+(__151291_58_dec->ndigits) = __151307_29_dig_pos;
+__151308_29_res = ((_ZN3edg9a_booleanE)1);
+__151389_1_end_of_routine:;
+return __151308_29_res;
 }
 
 
-static enum _ZN3edg17an_fp_return_typeE _ZN32_INTERNAL_10_floating_c_7968bde93edg21write_double_internalEPciPhi( char *__151262_59_tgt, 
-int __151263_58_size, 
-unsigned char *__151264_59_val, 
-int __151265_58_ndigits)
+static enum _ZN3edg17an_fp_return_typeE _ZN32_INTERNAL_10_floating_c_7968bde93edg21write_double_internalEPciPhi( char *__151394_59_tgt, 
+int __151395_58_size, 
+unsigned char *__151396_59_val, 
+int __151397_58_ndigits)
 #line 1258
 {
-auto enum _ZN3edg17an_fp_return_typeE __151277_21_res = _ZN3edg12fp_ret_validE;
+auto enum _ZN3edg17an_fp_return_typeE __151409_21_res = _ZN3edg12fp_ret_validE;
 
-(_ZN3edg20floating_init_calledE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1261, __T551528400, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-if ((__151262_59_tgt == ((char *)0)) || (__151263_58_size <= 0)) {
-__151277_21_res = _ZN3edg16fp_ret_too_smallE;
-} else  { if ((__151264_59_val == ((unsigned char *)0)) || (__151263_58_size < 0)) {
-__151277_21_res = _ZN3edg14fp_ret_invalidE;
+(_ZN3edg20floating_init_calledE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1261, __T818665816, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+if ((__151394_59_tgt == ((char *)0)) || (__151395_58_size <= 0)) {
+__151409_21_res = _ZN3edg16fp_ret_too_smallE;
+} else  { if ((__151396_59_val == ((unsigned char *)0)) || (__151395_58_size < 0)) {
+__151409_21_res = _ZN3edg14fp_ret_invalidE;
 } else  {
-auto _ZN3edg12an_fp_binaryE __151285_18_bin;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12split_doubleEPNS0_12an_fp_binaryEPh((&__151285_18_bin), __151264_59_val);
-if (((__151285_18_bin.is_negative) && (((int)(__151285_18_bin.type)) != 3)) && (((int)(__151285_18_bin.type)) != 0)) {
-(*(__151262_59_tgt++)) = ((char)45);
---__151263_58_size;
+auto _ZN3edg12an_fp_binaryE __151417_18_bin;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12split_doubleEPNS0_12an_fp_binaryEPh((&__151417_18_bin), __151396_59_val);
+if (((__151417_18_bin.is_negative) && (((int)(__151417_18_bin.type)) != 3)) && (((int)(__151417_18_bin.type)) != 0)) {
+(*(__151394_59_tgt++)) = ((char)45);
+--__151395_58_size;
 }
 
 
-__151277_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg18convert_and_formatEPcyPNS0_12an_fp_binaryE(__151262_59_tgt, ((size_t)__151263_58_size), (&__151285_18_bin)));
-if (((int)__151277_21_res) == (-1)) {
-auto _ZN3edg13an_fp_decimalE __151295_21_dec;
+__151409_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg18convert_and_formatEPcyPNS0_12an_fp_binaryE(__151394_59_tgt, ((size_t)__151395_58_size), (&__151417_18_bin)));
+if (((int)__151409_21_res) == (-1)) {
+auto _ZN3edg13an_fp_decimalE __151427_21_dec;
 
 
-if (((int)(_ZN32_INTERNAL_10_floating_c_7968bde93edg19fast_bin2dec_doubleEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEPvi((&__151295_21_dec), (&__151285_18_bin), ((void *)__151264_59_val), __151265_58_ndigits))) == 0) {
+if (((int)(_ZN32_INTERNAL_10_floating_c_7968bde93edg19fast_bin2dec_doubleEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEPvi((&__151427_21_dec), (&__151417_18_bin), ((void *)__151396_59_val), __151397_58_ndigits))) == 0) {
 
 
 
-auto int __151302_13_adjust = 0;
-if ((__151285_18_bin.exponent) < (-1021)) {
-__151302_13_adjust = ((-1021) - (__151285_18_bin.exponent));
+auto int __151434_13_adjust = 0;
+if ((__151417_18_bin.exponent) < (-1021)) {
+__151434_13_adjust = ((-1021) - (__151417_18_bin.exponent));
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg7bin2decEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEii((&__151295_21_dec), (&__151285_18_bin), __151265_58_ndigits, __151302_13_adjust);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg7bin2decEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEii((&__151427_21_dec), (&__151417_18_bin), __151397_58_ndigits, __151434_13_adjust);
 }
 
 
 
-__151277_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg6formatEPcyPNS0_13an_fp_decimalE(__151262_59_tgt, ((size_t)__151263_58_size), (&__151295_21_dec)));
+__151409_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg6formatEPcyPNS0_13an_fp_decimalE(__151394_59_tgt, ((size_t)__151395_58_size), (&__151427_21_dec)));
 }
 } }
-return __151277_21_res;
+return __151409_21_res;
 }
 
 
-enum _ZN3edg17an_fp_return_typeE _ZN3edg12write_doubleEPciPh( char *__151318_43_tgt, 
-int __151319_42_size, 
-unsigned char *__151320_43_val)
+enum _ZN3edg17an_fp_return_typeE _ZN3edg12write_doubleEPciPh( char *__151450_43_tgt, 
+int __151451_42_size, 
+unsigned char *__151452_43_val)
 #line 1316
 {
-auto int __151335_7_ndigits;
+auto int __151467_7_ndigits;
 #line 1329
-__151335_7_ndigits = 0x7fffffff;
+__151467_7_ndigits = 0x7fffffff;
 
 
-return _ZN32_INTERNAL_10_floating_c_7968bde93edg21write_double_internalEPciPhi(__151318_43_tgt, __151319_42_size, __151320_43_val, __151335_7_ndigits);
+return _ZN32_INTERNAL_10_floating_c_7968bde93edg21write_double_internalEPciPhi(__151450_43_tgt, __151451_42_size, __151452_43_val, __151467_7_ndigits);
 }
 
 
-enum _ZN3edg17an_fp_return_typeE _ZN3edg14write_double_nEPciPhi( char *__151354_45_tgt, 
-int __151355_44_size, 
-unsigned char *__151356_45_val, 
-int __151357_44_ndigits)
+enum _ZN3edg17an_fp_return_typeE _ZN3edg14write_double_nEPciPhi( char *__151486_45_tgt, 
+int __151487_44_size, 
+unsigned char *__151488_45_val, 
+int __151489_44_ndigits)
 #line 1356
 {
-if (__151357_44_ndigits <= 0) {
-__151357_44_ndigits = 1;
-} else  { if (23L <= ((long)__151357_44_ndigits)) {
+if (__151489_44_ndigits <= 0) {
+__151489_44_ndigits = 1;
+} else  { if (23L <= ((long)__151489_44_ndigits)) {
 
 
-__151357_44_ndigits = 22;
+__151489_44_ndigits = 22;
 } }
-return _ZN32_INTERNAL_10_floating_c_7968bde93edg21write_double_internalEPciPhi(__151354_45_tgt, __151355_44_size, __151356_45_val, __151357_44_ndigits);
+return _ZN32_INTERNAL_10_floating_c_7968bde93edg21write_double_internalEPciPhi(__151486_45_tgt, __151487_44_size, __151488_45_val, __151489_44_ndigits);
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg14convert_doubleEPhPNS0_19an_fp_decimal_inputE( unsigned char *__151386_45_val, 
-_ZN3edg19an_fp_decimal_inputE *__151387_45_dec)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg14convert_doubleEPhPNS0_19an_fp_decimal_inputE( unsigned char *__151518_45_val, 
+_ZN3edg19an_fp_decimal_inputE *__151519_45_dec)
 
 
 
 {
-auto _ZN3edg12an_fp_binaryE __151392_16_bin;
-auto int __151393_16_scale = 0;
+auto _ZN3edg12an_fp_binaryE __151524_16_bin;
+auto int __151525_16_scale = 0;
 #line 1383
-(__151392_16_bin.precision) = 53;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE((&__151392_16_bin));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg19fast_dec2bin_doubleEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEPi((&__151392_16_bin), __151387_45_dec, (&__151393_16_scale));
+(__151524_16_bin.precision) = 53;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE((&__151524_16_bin));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg19fast_dec2bin_doubleEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEPi((&__151524_16_bin), __151519_45_dec, (&__151525_16_scale));
 
 
 
 
-if (((int)(__151387_45_dec->type)) == 1) {
+if (((int)(__151519_45_dec->type)) == 1) {
 #line 1399
-if ((((int)(__151392_16_bin.type)) == 6) || (((int)(__151392_16_bin.type)) == 7)) {
+if ((((int)(__151524_16_bin.type)) == 6) || (((int)(__151524_16_bin.type)) == 7)) {
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg25double_make_min_subnormalEPNS0_12an_fp_binaryE((&__151392_16_bin));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg25double_make_min_subnormalEPNS0_12an_fp_binaryE((&__151524_16_bin));
 }
-if (((int)(__151392_16_bin.type)) == 2) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi((&__151392_16_bin), __151387_45_dec, __151393_16_scale);
+if (((int)(__151524_16_bin.type)) == 2) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi((&__151524_16_bin), __151519_45_dec, __151525_16_scale);
 }
-if (1024 < (__151392_16_bin.exponent)) {
-(__151387_45_dec->type) = _ZN3edg12fpt_overflowE;
-} else  { if ((__151392_16_bin.exponent) < (-1073)) {
-(__151387_45_dec->type) = _ZN3edg13fpt_underflowE;
+if (1024 < (__151524_16_bin.exponent)) {
+(__151519_45_dec->type) = _ZN3edg12fpt_overflowE;
+} else  { if ((__151524_16_bin.exponent) < (-1073)) {
+(__151519_45_dec->type) = _ZN3edg13fpt_underflowE;
 } else  {
-(__151392_16_bin.is_negative) = (__151387_45_dec->is_negative);
+(__151524_16_bin.is_negative) = (__151519_45_dec->is_negative);
 
 
 
 } }
 }
 
-if ((((int)(__151387_45_dec->type)) == 1) || (((int)(__151387_45_dec->type)) == 2)) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11make_doubleEPhPNS0_12an_fp_binaryE(__151386_45_val, (&__151392_16_bin));
+if ((((int)(__151519_45_dec->type)) == 1) || (((int)(__151519_45_dec->type)) == 2)) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11make_doubleEPhPNS0_12an_fp_binaryE(__151518_45_val, (&__151524_16_bin));
 } 
 
 }
 
 
-enum _ZN3edg17an_fp_return_typeE _ZN3edg11read_doubleEPhPKci( unsigned char *__151444_42_val, 
-_ZN3edg12a_const_charE *__151445_42_str, 
-int __151446_41_len)
+enum _ZN3edg17an_fp_return_typeE _ZN3edg11read_doubleEPhPKci( unsigned char *__151576_42_val, 
+_ZN3edg12a_const_charE *__151577_42_str, 
+int __151578_41_len)
 #line 1441
 {
-auto _ZN3edg19an_fp_decimal_inputE __151460_23_dec;
-auto enum _ZN3edg17an_fp_return_typeE __151461_23_res = _ZN3edg14fp_ret_invalidE;
+auto _ZN3edg19an_fp_decimal_inputE __151592_23_dec;
+auto enum _ZN3edg17an_fp_return_typeE __151593_23_res = _ZN3edg14fp_ret_invalidE;
 
-(_ZN3edg20floating_init_calledE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1445, __T551534296, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-if (((__151444_42_val == ((unsigned char *)0)) || (__151445_42_str == ((_ZN3edg12a_const_charE *)0))) || (__151446_41_len <= 0)) {
-(__151460_23_dec.type) = _ZN3edg11fpt_invalidE;
+(_ZN3edg20floating_init_calledE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1445, __T818671720, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+if (((__151576_42_val == ((unsigned char *)0)) || (__151577_42_str == ((_ZN3edg12a_const_charE *)0))) || (__151578_41_len <= 0)) {
+(__151592_23_dec.type) = _ZN3edg11fpt_invalidE;
 } else  {
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12split_stringEPNS0_19an_fp_decimal_inputEPKcS4_((&__151460_23_dec), __151445_42_str, (__151445_42_str + __151446_41_len));
-if (((int)(__151460_23_dec.type)) == 2) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg14convert_doubleEPhPNS0_19an_fp_decimal_inputE(__151444_42_val, (&__151460_23_dec));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12split_stringEPNS0_19an_fp_decimal_inputEPKcS4_((&__151592_23_dec), __151577_42_str, (__151577_42_str + __151578_41_len));
+if (((int)(__151592_23_dec.type)) == 2) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg14convert_doubleEPhPNS0_19an_fp_decimal_inputE(__151576_42_val, (&__151592_23_dec));
 }
 }
-if (((int)(__151460_23_dec.type)) == 0) {
-__151461_23_res = _ZN3edg14fp_ret_invalidE;
-} else  { if ((((int)(__151460_23_dec.type)) == 1) || (((int)(__151460_23_dec.type)) == 2)) {
-__151461_23_res = _ZN3edg12fp_ret_validE;
+if (((int)(__151592_23_dec.type)) == 0) {
+__151593_23_res = _ZN3edg14fp_ret_invalidE;
+} else  { if ((((int)(__151592_23_dec.type)) == 1) || (((int)(__151592_23_dec.type)) == 2)) {
+__151593_23_res = _ZN3edg12fp_ret_validE;
 } else  {
-auto _ZN3edg12an_fp_binaryE __151479_18_bin;
-(__151479_18_bin.precision) = 53;
-(__151479_18_bin.is_negative) = (__151460_23_dec.is_negative);
-switch ((int)(__151460_23_dec.type)) {
+auto _ZN3edg12an_fp_binaryE __151611_18_bin;
+(__151611_18_bin.precision) = 53;
+(__151611_18_bin.is_negative) = (__151592_23_dec.is_negative);
+switch ((int)(__151592_23_dec.type)) {
 case 3:
-(__151479_18_bin.type) = _ZN3edg7fpt_nanE;
-__151461_23_res = _ZN3edg10fp_ret_nanE;
-goto __T552316088;
+(__151611_18_bin.type) = _ZN3edg7fpt_nanE;
+__151593_23_res = _ZN3edg10fp_ret_nanE;
+goto __T819398128;
 case 4:
-(__151479_18_bin.type) = _ZN3edg12fpt_infinityE;
-__151461_23_res = ((__151479_18_bin.is_negative) ? _ZN3edg19fp_ret_neg_infinityE : _ZN3edg19fp_ret_pos_infinityE);
-goto __T552316088;
+(__151611_18_bin.type) = _ZN3edg12fpt_infinityE;
+__151593_23_res = ((__151611_18_bin.is_negative) ? _ZN3edg19fp_ret_neg_infinityE : _ZN3edg19fp_ret_pos_infinityE);
+goto __T819398128;
 case 5:
-(__151479_18_bin.type) = _ZN3edg12fpt_infinityE;
-__151461_23_res = _ZN3edg15fp_ret_overflowE;
-goto __T552316088;
+(__151611_18_bin.type) = _ZN3edg12fpt_infinityE;
+__151593_23_res = _ZN3edg15fp_ret_overflowE;
+goto __T819398128;
 case 6:
-(__151479_18_bin.type) = _ZN3edg8fpt_zeroE;
-__151461_23_res = _ZN3edg12fp_ret_validE;
-goto __T552316088;
+(__151611_18_bin.type) = _ZN3edg8fpt_zeroE;
+__151593_23_res = _ZN3edg12fp_ret_validE;
+goto __T819398128;
 case 7:
-(__151479_18_bin.type) = _ZN3edg8fpt_zeroE;
-__151461_23_res = _ZN3edg16fp_ret_underflowE;
-goto __T552316088;
+(__151611_18_bin.type) = _ZN3edg8fpt_zeroE;
+__151593_23_res = _ZN3edg16fp_ret_underflowE;
+goto __T819398128;
 default:
-_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1486, __T551534296, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
-} __T552316088:;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11make_doubleEPhPNS0_12an_fp_binaryE(__151444_42_val, (&__151479_18_bin));
+_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1486, __T818671720, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
+} __T819398128:;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11make_doubleEPhPNS0_12an_fp_binaryE(__151576_42_val, (&__151611_18_bin));
 } }
-return __151461_23_res;
+return __151593_23_res;
 }
 #line 411 "src/float_type.h"
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg24set_fraction_long_doubleEPhS1_( unsigned char *__152028_41_tgt, 
-unsigned char *__152029_41_frac)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg24set_fraction_long_doubleEPhS1_( unsigned char *__152160_41_tgt, 
+unsigned char *__152161_41_frac)
 
 
 
 
 {
-auto int __152035_7_i;
+auto int __152167_7_i;
 
-for (__152035_7_i = 0; __152035_7_i < 7; ++__152035_7_i) {
-(__152028_41_tgt[((_ZN3edg18host_little_endianE) ? __152035_7_i : (9 - __152035_7_i))]) = (__152029_41_frac[(__152035_7_i - 0)]);
+for (__152167_7_i = 0; __152167_7_i < 7; ++__152167_7_i) {
+(__152160_41_tgt[((_ZN3edg18host_little_endianE) ? __152167_7_i : (9 - __152167_7_i))]) = (__152161_41_frac[(__152167_7_i - 0)]);
 }
-(__152028_41_tgt[((_ZN3edg18host_little_endianE) ? __152035_7_i : (9 - __152035_7_i))]) &= 0;
+(__152160_41_tgt[((_ZN3edg18host_little_endianE) ? __152167_7_i : (9 - __152167_7_i))]) &= 0;
 
-(__152028_41_tgt[((_ZN3edg18host_little_endianE) ? __152035_7_i : (9 - __152035_7_i))]) |= ((((unsigned)(__152029_41_frac[(__152035_7_i - 0)])) & 255U) & 0xffffffffU); 
+(__152160_41_tgt[((_ZN3edg18host_little_endianE) ? __152167_7_i : (9 - __152167_7_i))]) |= ((((unsigned)(__152161_41_frac[(__152167_7_i - 0)])) & 255U) & 0xffffffffU); 
 
 
 
@@ -11851,252 +11920,252 @@ for (__152035_7_i = 0; __152035_7_i < 7; ++__152035_7_i) {
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg31set_biased_exponent_long_doubleEPhj( unsigned char *__152050_48_tgt, 
-unsigned __152051_47_biased_exponent)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg31set_biased_exponent_long_doubleEPhj( unsigned char *__152182_48_tgt, 
+unsigned __152183_47_biased_exponent)
 
 
 
 {
-auto int __152056_7_i;
+auto int __152188_7_i;
 
-__152056_7_i = 8;
-(__152050_48_tgt[((_ZN3edg18host_little_endianE) ? __152056_7_i : (9 - __152056_7_i))]) &= 0;
-(__152050_48_tgt[((_ZN3edg18host_little_endianE) ? __152056_7_i : (9 - __152056_7_i))]) |= ((__152051_47_biased_exponent << 0) & 255U);
-__152051_47_biased_exponent >>= 8;
+__152188_7_i = 8;
+(__152182_48_tgt[((_ZN3edg18host_little_endianE) ? __152188_7_i : (9 - __152188_7_i))]) &= 0;
+(__152182_48_tgt[((_ZN3edg18host_little_endianE) ? __152188_7_i : (9 - __152188_7_i))]) |= ((__152183_47_biased_exponent << 0) & 255U);
+__152183_47_biased_exponent >>= 8;
 
-++__152056_7_i;
+++__152188_7_i;
 #line 453
-(__152050_48_tgt[((_ZN3edg18host_little_endianE) ? __152056_7_i : (9 - __152056_7_i))]) &= 128;
-(__152050_48_tgt[((_ZN3edg18host_little_endianE) ? __152056_7_i : (9 - __152056_7_i))]) |= (__152051_47_biased_exponent & 127U); 
+(__152182_48_tgt[((_ZN3edg18host_little_endianE) ? __152188_7_i : (9 - __152188_7_i))]) &= 128;
+(__152182_48_tgt[((_ZN3edg18host_little_endianE) ? __152188_7_i : (9 - __152188_7_i))]) |= (__152183_47_biased_exponent & 127U); 
 
 }
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg24get_fraction_long_doubleEPhS1_( unsigned char *__152076_46_frac, 
-unsigned char *__152077_46_val)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg24get_fraction_long_doubleEPhS1_( unsigned char *__152208_46_frac, 
+unsigned char *__152209_46_val)
 #line 467
 {
-auto int __152085_13_i;
-auto _ZN3edg9a_booleanE __152086_13_res = ((_ZN3edg9a_booleanE)0);
+auto int __152217_13_i;
+auto _ZN3edg9a_booleanE __152218_13_res = ((_ZN3edg9a_booleanE)0);
 
-for (__152085_13_i = 0; __152085_13_i < 7; ++__152085_13_i) {
-(__152076_46_frac[(__152085_13_i - 0)]) = (__152077_46_val[((_ZN3edg18host_little_endianE) ? __152085_13_i : (9 - __152085_13_i))]);
-if (((int)(__152077_46_val[((_ZN3edg18host_little_endianE) ? __152085_13_i : (9 - __152085_13_i))])) != 0) {
-__152086_13_res = ((_ZN3edg9a_booleanE)1);
+for (__152217_13_i = 0; __152217_13_i < 7; ++__152217_13_i) {
+(__152208_46_frac[(__152217_13_i - 0)]) = (__152209_46_val[((_ZN3edg18host_little_endianE) ? __152217_13_i : (9 - __152217_13_i))]);
+if (((int)(__152209_46_val[((_ZN3edg18host_little_endianE) ? __152217_13_i : (9 - __152217_13_i))])) != 0) {
+__152218_13_res = ((_ZN3edg9a_booleanE)1);
 }
 }
-(__152076_46_frac[(__152085_13_i - 0)]) = ((unsigned char)(((unsigned)(__152077_46_val[((_ZN3edg18host_little_endianE) ? __152085_13_i : (9 - __152085_13_i))])) & 255U));
+(__152208_46_frac[(__152217_13_i - 0)]) = ((unsigned char)(((unsigned)(__152209_46_val[((_ZN3edg18host_little_endianE) ? __152217_13_i : (9 - __152217_13_i))])) & 255U));
 #line 486
-if ((((unsigned)(__152077_46_val[((_ZN3edg18host_little_endianE) ? __152085_13_i : (9 - __152085_13_i))])) & 127U) != 0U) {
-__152086_13_res = ((_ZN3edg9a_booleanE)1);
+if ((((unsigned)(__152209_46_val[((_ZN3edg18host_little_endianE) ? __152217_13_i : (9 - __152217_13_i))])) & 127U) != 0U) {
+__152218_13_res = ((_ZN3edg9a_booleanE)1);
 }
 
-return __152086_13_res;
+return __152218_13_res;
 }
 
 
-static int _ZN32_INTERNAL_10_floating_c_7968bde93edg31get_biased_exponent_long_doubleEPh( unsigned char *__152111_47_val)
+static int _ZN32_INTERNAL_10_floating_c_7968bde93edg31get_biased_exponent_long_doubleEPh( unsigned char *__152243_47_val)
 
 
 
 {
-auto int __152116_7_i = 9;
-auto int __152117_7_biased_exponent = 0;
+auto int __152248_7_i = 9;
+auto int __152249_7_biased_exponent = 0;
 
 
-__152117_7_biased_exponent = ((int)(((unsigned)(__152111_47_val[((_ZN3edg18host_little_endianE) ? __152116_7_i : (9 - __152116_7_i))])) & 127U));
---__152116_7_i;
-for (; __152116_7_i > 8; --__152116_7_i) {
-__152117_7_biased_exponent <<= 8;
-__152117_7_biased_exponent += ((int)(__152111_47_val[((_ZN3edg18host_little_endianE) ? __152116_7_i : (9 - __152116_7_i))]));
+__152249_7_biased_exponent = ((int)(((unsigned)(__152243_47_val[((_ZN3edg18host_little_endianE) ? __152248_7_i : (9 - __152248_7_i))])) & 127U));
+--__152248_7_i;
+for (; __152248_7_i > 8; --__152248_7_i) {
+__152249_7_biased_exponent <<= 8;
+__152249_7_biased_exponent += ((int)(__152243_47_val[((_ZN3edg18host_little_endianE) ? __152248_7_i : (9 - __152248_7_i))]));
 }
-__152117_7_biased_exponent <<= 8;
+__152249_7_biased_exponent <<= 8;
 
-__152117_7_biased_exponent |= ((int)((((unsigned)(__152111_47_val[((_ZN3edg18host_little_endianE) ? __152116_7_i : (9 - __152116_7_i))])) & 255U) >> 0));
+__152249_7_biased_exponent |= ((int)((((unsigned)(__152243_47_val[((_ZN3edg18host_little_endianE) ? __152248_7_i : (9 - __152248_7_i))])) & 255U) >> 0));
 
-return __152117_7_biased_exponent;
+return __152249_7_biased_exponent;
 }
 #line 524
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg17split_long_doubleEPNS0_12an_fp_binaryEPh( _ZN3edg12an_fp_binaryE *__152141_37_bin, 
-unsigned char *__152142_37_val)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg17split_long_doubleEPNS0_12an_fp_binaryEPh( _ZN3edg12an_fp_binaryE *__152273_37_bin, 
+unsigned char *__152274_37_val)
 
 
 
 {
-auto int __152147_13_biased_exponent;
-auto _ZN3edg9a_booleanE __152148_13_saw_nz;
+auto int __152279_13_biased_exponent;
+auto _ZN3edg9a_booleanE __152280_13_saw_nz;
 
-auto int __152150_13_high_bit_is_zero = 0;
+auto int __152282_13_high_bit_is_zero = 0;
 
 
-(((__152141_37_bin->frac))[7]) = ((unsigned char)0U);
-__152148_13_saw_nz = (_ZN32_INTERNAL_10_floating_c_7968bde93edg24get_fraction_long_doubleEPhS1_(((__152141_37_bin->frac)), __152142_37_val));
-__152147_13_biased_exponent = (_ZN32_INTERNAL_10_floating_c_7968bde93edg31get_biased_exponent_long_doubleEPh(__152142_37_val));
-(__152141_37_bin->is_negative) = ((_ZN3edg9a_booleanE)(((((int)(__152142_37_val[((_ZN3edg18host_little_endianE) ? 9 : 0)])) & 128) ? 1 : 0) != 0));
+(((__152273_37_bin->frac))[7]) = ((unsigned char)0U);
+__152280_13_saw_nz = (_ZN32_INTERNAL_10_floating_c_7968bde93edg24get_fraction_long_doubleEPhS1_(((__152273_37_bin->frac)), __152274_37_val));
+__152279_13_biased_exponent = (_ZN32_INTERNAL_10_floating_c_7968bde93edg31get_biased_exponent_long_doubleEPh(__152274_37_val));
+(__152273_37_bin->is_negative) = ((_ZN3edg9a_booleanE)(((((int)(__152274_37_val[((_ZN3edg18host_little_endianE) ? 9 : 0)])) & 128) ? 1 : 0) != 0));
 
-if ((((unsigned)(((__152141_37_bin->frac))[7])) & 128U) == 0U) {
-__152150_13_high_bit_is_zero = 1;
+if ((((unsigned)(((__152273_37_bin->frac))[7])) & 128U) == 0U) {
+__152282_13_high_bit_is_zero = 1;
 }
-if (((__152150_13_high_bit_is_zero) && (__152147_13_biased_exponent != 0)) || ((!(__152150_13_high_bit_is_zero)) && (__152147_13_biased_exponent == 0)))
+if (((__152282_13_high_bit_is_zero) && (__152279_13_biased_exponent != 0)) || ((!(__152282_13_high_bit_is_zero)) && (__152279_13_biased_exponent == 0)))
 {
-(__152141_37_bin->type) = _ZN3edg11fpt_invalidE;
+(__152273_37_bin->type) = _ZN3edg11fpt_invalidE;
 }
 
 
 else  {
-if (__152147_13_biased_exponent == 32767) {
-if (((int)__152148_13_saw_nz) == 0) {
-(__152141_37_bin->type) = _ZN3edg12fpt_infinityE;
+if (__152279_13_biased_exponent == 32767) {
+if (((int)__152280_13_saw_nz) == 0) {
+(__152273_37_bin->type) = _ZN3edg12fpt_infinityE;
 } else  {
-(__152141_37_bin->type) = _ZN3edg7fpt_nanE;
+(__152273_37_bin->type) = _ZN3edg7fpt_nanE;
 }
-} else  { if (__152147_13_biased_exponent == 0) {
-if (((int)__152148_13_saw_nz) == 0) {
-(__152141_37_bin->type) = _ZN3edg8fpt_zeroE;
+} else  { if (__152279_13_biased_exponent == 0) {
+if (((int)__152280_13_saw_nz) == 0) {
+(__152273_37_bin->type) = _ZN3edg8fpt_zeroE;
 } else  {
 
 
-auto int __152180_13_high_bits;
-(((__152141_37_bin->frac))[7]) &= 255;
-__152180_13_high_bits = (_ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_high_zero_bitsEPhi(((__152141_37_bin->frac)), 64));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii(((__152141_37_bin->frac)), 64, __152180_13_high_bits);
-__152147_13_biased_exponent -= __152180_13_high_bits;
-++__152147_13_biased_exponent;
-(__152141_37_bin->type) = _ZN3edg10fpt_numberE;
+auto int __152312_13_high_bits;
+(((__152273_37_bin->frac))[7]) &= 255;
+__152312_13_high_bits = (_ZN32_INTERNAL_10_floating_c_7968bde93edg22fp_frac_high_zero_bitsEPhi(((__152273_37_bin->frac)), 64));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_shift_leftEPhii(((__152273_37_bin->frac)), 64, __152312_13_high_bits);
+__152279_13_biased_exponent -= __152312_13_high_bits;
+++__152279_13_biased_exponent;
+(__152273_37_bin->type) = _ZN3edg10fpt_numberE;
 }
 } else  {
-(__152141_37_bin->type) = _ZN3edg10fpt_numberE;
+(__152273_37_bin->type) = _ZN3edg10fpt_numberE;
 } }
 }
-(__152141_37_bin->exponent) = ((__152147_13_biased_exponent - 16383) + 1);
-(__152141_37_bin->precision) = 64; 
+(__152273_37_bin->exponent) = ((__152279_13_biased_exponent - 16383) + 1);
+(__152273_37_bin->precision) = 64; 
 }
 
 
-void _ZN3edg31normalize_and_round_long_doubleEPNS_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__152197_40_bin)
+void _ZN3edg31normalize_and_round_long_doubleEPNS_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__152329_40_bin)
 #line 586
 {
 if (0) {
 
 
 
-auto union _ZZN3edg31normalize_and_round_long_doubleEPNS_12an_fp_binaryEEUt_ __152208_7_u;
-auto unsigned short __152209_20_mask = ((unsigned short)2047U);
+auto union _ZZN3edg31normalize_and_round_long_doubleEPNS_12an_fp_binaryEEUt_ __152340_7_u;
+auto unsigned short __152341_20_mask = ((unsigned short)2047U);
 
-memcpy(((void *)((__152208_7_u.bytes))), ((const void *)(&(__152197_40_bin->frac))), 2ULL);
-if (((__152197_40_bin->exponent) > 64) && ((((int)(__152208_7_u.val)) & ((int)__152209_20_mask)) != ((int)(__152208_7_u.val)))) {
+memcpy(((void *)((__152340_7_u.bytes))), ((const void *)(&(__152329_40_bin->frac))), 2ULL);
+if (((__152329_40_bin->exponent) > 64) && ((((int)(__152340_7_u.val)) & ((int)__152341_20_mask)) != ((int)(__152340_7_u.val)))) {
 
 
 
-auto int __152216_22_num_bits;
-auto unsigned short __152217_22_rounding_bit;
+auto int __152348_22_num_bits;
+auto unsigned short __152349_22_rounding_bit;
 #line 599
-__152216_22_num_bits = ((__152197_40_bin->exponent) - 64);
-__152217_22_rounding_bit = ((unsigned short)(((int)(__152208_7_u.val)) & (1 << (__152216_22_num_bits - 1))));
+__152348_22_num_bits = ((__152329_40_bin->exponent) - 64);
+__152349_22_rounding_bit = ((unsigned short)(((int)(__152340_7_u.val)) & (1 << (__152348_22_num_bits - 1))));
 
-(__152208_7_u.val) = ((unsigned short)((((int)(__152208_7_u.val)) + ((int)__152217_22_rounding_bit)) >> __152216_22_num_bits));
-if ((((int)(__152208_7_u.val)) & ((int)__152209_20_mask)) != ((int)(__152208_7_u.val))) {
+(__152340_7_u.val) = ((unsigned short)((((int)(__152340_7_u.val)) + ((int)__152349_22_rounding_bit)) >> __152348_22_num_bits));
+if ((((int)(__152340_7_u.val)) & ((int)__152341_20_mask)) != ((int)(__152340_7_u.val))) {
 
-(__152208_7_u.val) >>= 1;
-++(__152197_40_bin->exponent);
+(__152340_7_u.val) >>= 1;
+++(__152329_40_bin->exponent);
 }
-memcpy(((void *)(&(__152197_40_bin->frac))), ((const void *)((__152208_7_u.bytes))), 2ULL);
-++(__152197_40_bin->exponent);
+memcpy(((void *)(&(__152329_40_bin->frac))), ((const void *)((__152340_7_u.bytes))), 2ULL);
+++(__152329_40_bin->exponent);
 }
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg16make_long_doubleEPhPNS0_12an_fp_binaryE( unsigned char *__152232_36_tgt, 
-_ZN3edg12an_fp_binaryE *__152233_36_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg16make_long_doubleEPhPNS0_12an_fp_binaryE( unsigned char *__152364_36_tgt, 
+_ZN3edg12an_fp_binaryE *__152365_36_bin)
 #line 622
 {
-auto unsigned char __152240_17_fraction[8];
-auto int __152241_17_biased_exponent = 0;
+auto unsigned char __152372_17_fraction[8];
+auto int __152373_17_biased_exponent = 0;
 
 
-if (((int)(__152233_36_bin->type)) == 2) {
-_ZN3edg31normalize_and_round_long_doubleEPNS_12an_fp_binaryE(__152233_36_bin);
-memcpy(((void *)(__152240_17_fraction)), ((const void *)((__152233_36_bin->frac))), 8ULL);
-__152241_17_biased_exponent = (((__152233_36_bin->exponent) + 16383) - 1);
-if ((__152233_36_bin->exponent) < ((-16381) - (__152233_36_bin->precision))) {
-(__152233_36_bin->type) = _ZN3edg8fpt_zeroE;
-} else  { if (16384 < (__152233_36_bin->exponent)) {
-(__152233_36_bin->type) = _ZN3edg12fpt_infinityE;
-} else  { if (__152241_17_biased_exponent <= 0) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg23fp_frac_shift_right_rawEPhii((__152240_17_fraction), (__152233_36_bin->precision), ((-__152241_17_biased_exponent) + 1));
-__152241_17_biased_exponent = 0;
+if (((int)(__152365_36_bin->type)) == 2) {
+_ZN3edg31normalize_and_round_long_doubleEPNS_12an_fp_binaryE(__152365_36_bin);
+memcpy(((void *)(__152372_17_fraction)), ((const void *)((__152365_36_bin->frac))), 8ULL);
+__152373_17_biased_exponent = (((__152365_36_bin->exponent) + 16383) - 1);
+if ((__152365_36_bin->exponent) < ((-16381) - (__152365_36_bin->precision))) {
+(__152365_36_bin->type) = _ZN3edg8fpt_zeroE;
+} else  { if (16384 < (__152365_36_bin->exponent)) {
+(__152365_36_bin->type) = _ZN3edg12fpt_infinityE;
+} else  { if (__152373_17_biased_exponent <= 0) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg23fp_frac_shift_right_rawEPhii((__152372_17_fraction), (__152365_36_bin->precision), ((-__152373_17_biased_exponent) + 1));
+__152373_17_biased_exponent = 0;
 } } }
 }
-if (((int)(__152233_36_bin->type)) != 2) {
-memset(((void *)(__152240_17_fraction)), 0, 8ULL);
-switch ((int)(__152233_36_bin->type)) {
+if (((int)(__152365_36_bin->type)) != 2) {
+memset(((void *)(__152372_17_fraction)), 0, 8ULL);
+switch ((int)(__152365_36_bin->type)) {
 case 3:
 
-((__152240_17_fraction)[0]) = ((unsigned char)1U);
-__152241_17_biased_exponent = 32767;
+((__152372_17_fraction)[0]) = ((unsigned char)1U);
+__152373_17_biased_exponent = 32767;
 
-((__152240_17_fraction)[7]) = ((unsigned char)128U);
-((__152240_17_fraction)[7]) |= 64;
-goto __T553286504;
+((__152372_17_fraction)[7]) = ((unsigned char)128U);
+((__152372_17_fraction)[7]) |= 64;
+goto __T820423632;
 case 4:
 
-__152241_17_biased_exponent = 32767;
-((__152240_17_fraction)[7]) = ((unsigned char)128U);
-goto __T553286504;
+__152373_17_biased_exponent = 32767;
+((__152372_17_fraction)[7]) = ((unsigned char)128U);
+goto __T820423632;
 case 6:
 
-__152241_17_biased_exponent = 0;
-goto __T553286504;
+__152373_17_biased_exponent = 0;
+goto __T820423632;
 default:
-_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 661, __T551552096, ((const char *)"invalid floating-point value"), ((_ZN3edg12a_const_charE *)0));
-} __T553286504:;
+_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 661, __T820273784, ((const char *)"invalid floating-point value"), ((_ZN3edg12a_const_charE *)0));
+} __T820423632:;
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg24set_fraction_long_doubleEPhS1_(__152232_36_tgt, (__152240_17_fraction));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg31set_biased_exponent_long_doubleEPhj(__152232_36_tgt, ((unsigned)__152241_17_biased_exponent));
-if (((int)(__152233_36_bin->is_negative)) == 0) {
-(__152232_36_tgt[((_ZN3edg18host_little_endianE) ? 9 : 0)]) &= 127;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg24set_fraction_long_doubleEPhS1_(__152364_36_tgt, (__152372_17_fraction));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg31set_biased_exponent_long_doubleEPhj(__152364_36_tgt, ((unsigned)__152373_17_biased_exponent));
+if (((int)(__152365_36_bin->is_negative)) == 0) {
+(__152364_36_tgt[((_ZN3edg18host_little_endianE) ? 9 : 0)]) &= 127;
 } else  {
-(__152232_36_tgt[((_ZN3edg18host_little_endianE) ? 9 : 0)]) |= 128;
+(__152364_36_tgt[((_ZN3edg18host_little_endianE) ? 9 : 0)]) |= 128;
 } 
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg20long_double_make_minEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__152291_36_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg20long_double_make_minEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__152423_36_bin)
 
 
 
 {
-(__152291_36_bin->type) = _ZN3edg10fpt_numberE;
-(__152291_36_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
-(__152291_36_bin->exponent) = (-16381);
-memset(((void *)((__152291_36_bin->frac))), 0, 9ULL);
-(((__152291_36_bin->frac))[7]) |= 128U;
-(__152291_36_bin->precision) = 64; 
+(__152423_36_bin->type) = _ZN3edg10fpt_numberE;
+(__152423_36_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
+(__152423_36_bin->exponent) = (-16381);
+memset(((void *)((__152423_36_bin->frac))), 0, 9ULL);
+(((__152423_36_bin->frac))[7]) |= 128U;
+(__152423_36_bin->precision) = 64; 
 }
 
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg25make_long_double_bin_zeroEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__152306_44_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg25make_long_double_bin_zeroEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__152438_44_bin)
 
 
 
 {
-(__152306_44_bin->type) = _ZN3edg8fpt_zeroE;
-(__152306_44_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
-(__152306_44_bin->precision) = 64; 
+(__152438_44_bin->type) = _ZN3edg8fpt_zeroE;
+(__152438_44_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
+(__152438_44_bin->precision) = 64; 
 }
 #line 724
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg30long_double_make_min_subnormalEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__152341_46_bin)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg30long_double_make_min_subnormalEPNS0_12an_fp_binaryE( _ZN3edg12an_fp_binaryE *__152473_46_bin)
 
 
 
 {
-(__152341_46_bin->type) = _ZN3edg10fpt_numberE;
-(__152341_46_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
-(__152341_46_bin->exponent) = (-16444);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_minEPhi(((__152341_46_bin->frac)), 64);
-(__152341_46_bin->precision) = 64; 
+(__152473_46_bin->type) = _ZN3edg10fpt_numberE;
+(__152473_46_bin->is_negative) = ((_ZN3edg9a_booleanE)0);
+(__152473_46_bin->exponent) = (-16444);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg18fp_frac_set_to_minEPhi(((__152473_46_bin->frac)), 64);
+(__152473_46_bin->precision) = 64; 
 }
 #line 870
 static void _ZN32_INTERNAL_10_floating_c_7968bde93edg27initialize_tens_long_doubleEv(void)
@@ -12104,7 +12173,7 @@ static void _ZN32_INTERNAL_10_floating_c_7968bde93edg27initialize_tens_long_doub
 
 
 {
-auto int __152492_16_i;
+auto int __152624_16_i;
 #line 881
 (_ZN32_INTERNAL_10_floating_c_7968bde93edg15dec_long_doubleE.exponent) = 17;
 
@@ -12114,20 +12183,20 @@ _ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm
 
 
 
-for (__152492_16_i = 1; ((long)__152492_16_i) < 28L; ++__152492_16_i) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152492_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + (__152492_16_i - 1)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj(((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152492_16_i), 10U);
+for (__152624_16_i = 1; ((long)__152624_16_i) < 28L; ++__152624_16_i) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152624_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + (__152624_16_i - 1)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj(((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152624_16_i), 10U);
 }
 
 _ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(_ZN32_INTERNAL_10_floating_c_7968bde93edg20big_tens_long_doubleE, (_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE + 16));
 
-for (__152492_16_i = 1; __152492_16_i < 9; ++__152492_16_i) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg20big_tens_long_doubleE) + __152492_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg20big_tens_long_doubleE) + (__152492_16_i - 1)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg20big_tens_long_doubleE) + __152492_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg20big_tens_long_doubleE) + __152492_16_i));
+for (__152624_16_i = 1; __152624_16_i < 9; ++__152624_16_i) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg20big_tens_long_doubleE) + __152624_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg20big_tens_long_doubleE) + (__152624_16_i - 1)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(((_ZN32_INTERNAL_10_floating_c_7968bde93edg20big_tens_long_doubleE) + __152624_16_i), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg20big_tens_long_doubleE) + __152624_16_i));
 
 (_ZN32_INTERNAL_10_floating_c_7968bde93edg15dec_long_doubleE.exponent) = ((2 * (_ZN32_INTERNAL_10_floating_c_7968bde93edg15dec_long_doubleE.exponent)) - 1);
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi(((_ZN32_INTERNAL_10_floating_c_7968bde93edg20big_tens_long_doubleE) + __152492_16_i), (&_ZN32_INTERNAL_10_floating_c_7968bde93edg15dec_long_doubleE), 0);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi(((_ZN32_INTERNAL_10_floating_c_7968bde93edg20big_tens_long_doubleE) + __152624_16_i), (&_ZN32_INTERNAL_10_floating_c_7968bde93edg15dec_long_doubleE), 0);
 #line 908
 } 
 
@@ -12135,17 +12204,17 @@ _ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg24fast_dec2bin_long_doubleEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEPi( _ZN3edg12an_fp_binaryE *__152531_53_bin, 
-_ZN3edg19an_fp_decimal_inputE *__152532_53_dec, 
-int *__152533_53_pscale)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg24fast_dec2bin_long_doubleEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEPi( _ZN3edg12an_fp_binaryE *__152663_53_bin, 
+_ZN3edg19an_fp_decimal_inputE *__152664_53_dec, 
+int *__152665_53_pscale)
 #line 953
 {
-auto int __152571_29_exp;
-auto int __152572_29_first_exp = 0;
-auto int __152573_29_exp_is_negative = 0;
-auto int __152574_29_sig_dig = 19;
+auto int __152703_29_exp;
+auto int __152704_29_first_exp = 0;
+auto int __152705_29_exp_is_negative = 0;
+auto int __152706_29_sig_dig = 19;
 #line 954
-__152571_29_exp = (__152532_53_dec->exponent);
+__152703_29_exp = (__152664_53_dec->exponent);
 
 
 
@@ -12153,454 +12222,456 @@ __152571_29_exp = (__152532_53_dec->exponent);
 (void)0;
 (void)0;
 
-if ((__152532_53_dec->precision) < __152574_29_sig_dig) {
-__152574_29_sig_dig = (__152532_53_dec->precision);
+if ((__152664_53_dec->precision) < __152706_29_sig_dig) {
+__152706_29_sig_dig = (__152664_53_dec->precision);
 #line 971
 }
 
-__152571_29_exp -= __152574_29_sig_dig;
+__152703_29_exp -= __152706_29_sig_dig;
 
-if (__152571_29_exp < 0) {
-__152573_29_exp_is_negative = 1;
-__152571_29_exp = (-__152571_29_exp);
+if (__152703_29_exp < 0) {
+__152705_29_exp_is_negative = 1;
+__152703_29_exp = (-__152703_29_exp);
 }
-(*__152533_53_pscale) = 0;
+(*__152665_53_pscale) = 0;
 
-if (4933L < ((long)(__152532_53_dec->exponent))) {
-(__152532_53_dec->type) = _ZN3edg12fpt_overflowE;
-} else  { if (((long)(__152532_53_dec->exponent)) < (-4951L)) {
+if (4933L < ((long)(__152664_53_dec->exponent))) {
+(__152664_53_dec->type) = _ZN3edg12fpt_overflowE;
+} else  { if (((long)(__152664_53_dec->exponent)) < (-4951L)) {
 
-(__152532_53_dec->type) = _ZN3edg13fpt_underflowE;
-} else  { if (18L < ((long)(__152532_53_dec->precision))) {
+(__152664_53_dec->type) = _ZN3edg13fpt_underflowE;
+} else  { if (18L < ((long)(__152664_53_dec->precision))) {
 
-(__152532_53_dec->type) = _ZN3edg10fpt_approxE;
-} else  { if (__152571_29_exp <= 27) {
+(__152664_53_dec->type) = _ZN3edg10fpt_approxE;
+} else  { if (__152703_29_exp <= 27) {
 
-(__152532_53_dec->type) = _ZN3edg10fpt_numberE;
-} else  { if ((!(__152573_29_exp_is_negative)) && (((long)__152571_29_exp) <= (45L - ((long)(__152532_53_dec->precision)))))
+(__152664_53_dec->type) = _ZN3edg10fpt_numberE;
+} else  { if ((!(__152705_29_exp_is_negative)) && (((long)__152703_29_exp) <= (45L - ((long)(__152664_53_dec->precision)))))
 {
 
-__152572_29_first_exp = ((int)(18L - ((long)(__152532_53_dec->precision))));
-__152571_29_exp -= __152572_29_first_exp;
-(__152532_53_dec->type) = _ZN3edg10fpt_numberE;
+__152704_29_first_exp = ((int)(18L - ((long)(__152664_53_dec->precision))));
+__152703_29_exp -= __152704_29_first_exp;
+(__152664_53_dec->type) = _ZN3edg10fpt_numberE;
 } else  {
 
-(__152532_53_dec->type) = _ZN3edg10fpt_approxE;
+(__152664_53_dec->type) = _ZN3edg10fpt_approxE;
 } } } } }
 
-if (((int)(__152532_53_dec->type)) == 1) {
+if (((int)(__152664_53_dec->type)) == 1) {
 
-__152572_29_first_exp = ((int)(((unsigned)__152571_29_exp) & 15U));
-__152571_29_exp -= __152572_29_first_exp;
+__152704_29_first_exp = ((int)(((unsigned)__152703_29_exp) & 15U));
+__152703_29_exp -= __152704_29_first_exp;
 }
-(__152572_29_first_exp <= 27) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1008, __T553574608, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+(__152704_29_first_exp <= 27) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1008, __T820675296, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
 
-if ((((int)(__152532_53_dec->type)) == 2) || (((int)(__152532_53_dec->type)) == 1)) {
+if ((((int)(__152664_53_dec->type)) == 2) || (((int)(__152664_53_dec->type)) == 1)) {
 
-auto unsigned long __152629_19_fraction = 0UL;
-auto int __152630_19_digits = 0;
-auto _ZN3edg12a_const_charE *__152631_20_cur;
+auto unsigned long __152761_19_fraction = 0UL;
+auto int __152762_19_digits = 0;
+auto _ZN3edg12a_const_charE *__152763_20_cur;
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE(__152531_53_bin);
-for (__152631_20_cur = (__152532_53_dec->first_int); (__152631_20_cur != (__152532_53_dec->last_int)) && (__152574_29_sig_dig != 0); ((++__152631_20_cur) , (--__152574_29_sig_dig)) , (++__152630_19_digits))
+_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE(__152663_53_bin);
+for (__152763_20_cur = (__152664_53_dec->first_int); (__152763_20_cur != (__152664_53_dec->last_int)) && (__152706_29_sig_dig != 0); ((++__152763_20_cur) , (--__152706_29_sig_dig)) , (++__152762_19_digits))
 
 {
-if (__152630_19_digits == 9) {
-(((long)__152630_19_digits) < 28L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1021, __T553574608, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__152531_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152630_19_digits));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__152531_53_bin, __152629_19_fraction);
-__152629_19_fraction = 0UL;
-__152630_19_digits = 0;
+if (__152762_19_digits == 9) {
+(((long)__152762_19_digits) < 28L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1021, __T820675296, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__152663_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152762_19_digits));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__152663_53_bin, __152761_19_fraction);
+__152761_19_fraction = 0UL;
+__152762_19_digits = 0;
 }
-__152629_19_fraction *= 10UL;
-__152629_19_fraction += ((unsigned long)(((int)(*__152631_20_cur)) - 48));
+__152761_19_fraction *= 10UL;
+__152761_19_fraction += ((unsigned long)(((int)(*__152763_20_cur)) - 48));
 }
-for (__152631_20_cur = (__152532_53_dec->first_frac); (__152631_20_cur != (__152532_53_dec->last_frac)) && (__152574_29_sig_dig != 0); ((++__152631_20_cur) , (--__152574_29_sig_dig)) , (++__152630_19_digits))
+for (__152763_20_cur = (__152664_53_dec->first_frac); (__152763_20_cur != (__152664_53_dec->last_frac)) && (__152706_29_sig_dig != 0); ((++__152763_20_cur) , (--__152706_29_sig_dig)) , (++__152762_19_digits))
 
 {
-if (__152630_19_digits == 9) {
-(((long)__152630_19_digits) < 28L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1034, __T553574608, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__152531_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152630_19_digits));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__152531_53_bin, __152629_19_fraction);
-__152629_19_fraction = 0UL;
-__152630_19_digits = 0;
+if (__152762_19_digits == 9) {
+(((long)__152762_19_digits) < 28L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1034, __T820675296, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__152663_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152762_19_digits));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__152663_53_bin, __152761_19_fraction);
+__152761_19_fraction = 0UL;
+__152762_19_digits = 0;
 }
-__152629_19_fraction *= 10UL;
-__152629_19_fraction += ((unsigned long)(((int)(*__152631_20_cur)) - 48));
+__152761_19_fraction *= 10UL;
+__152761_19_fraction += ((unsigned long)(((int)(*__152763_20_cur)) - 48));
 }
-if (__152630_19_digits != 0) {
-(((long)__152630_19_digits) < 28L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1044, __T553574608, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__152531_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152630_19_digits));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__152531_53_bin, __152629_19_fraction);
+if (__152762_19_digits != 0) {
+(((long)__152762_19_digits) < 28L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1044, __T820675296, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__152663_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152762_19_digits));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_add_intEPNS0_12an_fp_binaryEm(__152663_53_bin, __152761_19_fraction);
 }
-if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__152531_53_bin)) {
-(__152532_53_dec->type) = _ZN3edg13fpt_underflowE;
-} else  { if (__152573_29_exp_is_negative) {
-_ZN3edg31normalize_and_round_long_doubleEPNS_12an_fp_binaryE(__152531_53_bin);
+if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__152663_53_bin)) {
+(__152664_53_dec->type) = _ZN3edg13fpt_underflowE;
+} else  { if (__152705_29_exp_is_negative) {
+_ZN3edg31normalize_and_round_long_doubleEPNS_12an_fp_binaryE(__152663_53_bin);
 
-if (__152572_29_first_exp != 0) {
+if (__152704_29_first_exp != 0) {
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__152531_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152572_29_first_exp));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__152663_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152704_29_first_exp));
 }
-if (__152571_29_exp == 0) {
+if (__152703_29_exp == 0) {
 
-} else  { if (((long)__152571_29_exp) < 28L) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__152531_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152571_29_exp));
+} else  { if (((long)__152703_29_exp) < 28L) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__152663_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152703_29_exp));
 } else  {
 
-auto int __152680_13_idx = 0;
-__152571_29_exp >>= 4;
+auto int __152812_13_idx = 0;
+__152703_29_exp >>= 4;
 
-for (__152680_13_idx = 0; (__152571_29_exp != 0) && (__152680_13_idx < 8); (++__152680_13_idx) , (__152571_29_exp >>= 1)) {
-if ((__152571_29_exp & 0x1) != 0) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__152531_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg20big_tens_long_doubleE) + __152680_13_idx));
+for (__152812_13_idx = 0; (__152703_29_exp != 0) && (__152812_13_idx < 8); (++__152812_13_idx) , (__152703_29_exp >>= 1)) {
+if ((__152703_29_exp & 0x1) != 0) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__152663_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg20big_tens_long_doubleE) + __152812_13_idx));
 }
 }
 
-if (__152571_29_exp != 0) {
+if (__152703_29_exp != 0) {
 
-auto _ZN3edg12an_fp_binaryE __152691_37_old_value;
-auto _ZN3edg12an_fp_binaryE __152692_37_fp_min;
+auto _ZN3edg12an_fp_binaryE __152823_37_old_value;
+auto _ZN3edg12an_fp_binaryE __152824_37_fp_min;
 #line 1074
-__152691_37_old_value = (*__152531_53_bin);
+__152823_37_old_value = (*__152663_53_bin);
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg20long_double_make_minEPNS0_12an_fp_binaryE((&__152692_37_fp_min));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg20long_double_make_minEPNS0_12an_fp_binaryE((&__152824_37_fp_min));
 
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__152531_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg20big_tens_long_doubleE) + __152680_13_idx));
-while (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_(__152531_53_bin, (&__152692_37_fp_min))) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__152663_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg20big_tens_long_doubleE) + __152812_13_idx));
+while (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_(__152663_53_bin, (&__152824_37_fp_min))) {
 
-auto int __152701_17_adjust;
-if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__152531_53_bin)) {
+auto int __152833_17_adjust;
+if (_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE(__152663_53_bin)) {
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg30long_double_make_min_subnormalEPNS0_12an_fp_binaryE(__152531_53_bin);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg30long_double_make_min_subnormalEPNS0_12an_fp_binaryE(__152663_53_bin);
 
 
 
 }
 
-__152701_17_adjust = ((__152692_37_fp_min.exponent) - (__152531_53_bin->exponent));
+__152833_17_adjust = ((__152824_37_fp_min.exponent) - (__152663_53_bin->exponent));
 
 
 
 
-(*__152531_53_bin) = __152691_37_old_value;
-(*__152533_53_pscale) += __152701_17_adjust;
+(*__152663_53_bin) = __152823_37_old_value;
+(*__152665_53_pscale) += __152833_17_adjust;
 
-(__152531_53_bin->exponent) += __152701_17_adjust;
-
-
+(__152663_53_bin->exponent) += __152833_17_adjust;
 
 
-__152691_37_old_value = (*__152531_53_bin);
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__152531_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg20big_tens_long_doubleE) + __152680_13_idx));
+
+
+__152823_37_old_value = (*__152663_53_bin);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_(__152663_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg20big_tens_long_doubleE) + __152812_13_idx));
 }
 }
 } }
 } else  {
 
-if (__152572_29_first_exp != 0) {
+if (__152704_29_first_exp != 0) {
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__152531_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152572_29_first_exp));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__152663_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152704_29_first_exp));
 }
-if (__152571_29_exp == 0) {
+if (__152703_29_exp == 0) {
 
-} else  { if (((long)__152571_29_exp) < 28L) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__152531_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152571_29_exp));
+} else  { if (((long)__152703_29_exp) < 28L) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__152663_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152703_29_exp));
 } else  {
 
-auto int __152741_13_idx;
-__152571_29_exp >>= 4;
-for (__152741_13_idx = 0; __152571_29_exp != 0; (++__152741_13_idx) , (__152571_29_exp >>= 1)) {
-if ((__152571_29_exp & 0x1) != 0) {
-(__152741_13_idx < 9) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1128, __T553574608, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__152531_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg20big_tens_long_doubleE) + __152741_13_idx));
+auto int __152873_13_idx;
+__152703_29_exp >>= 4;
+for (__152873_13_idx = 0; __152703_29_exp != 0; (++__152873_13_idx) , (__152703_29_exp >>= 1)) {
+if ((__152703_29_exp & 0x1) != 0) {
+(__152873_13_idx < 9) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1128, __T820675296, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_multEPNS0_12an_fp_binaryES2_(__152663_53_bin, ((_ZN32_INTERNAL_10_floating_c_7968bde93edg20big_tens_long_doubleE) + __152873_13_idx));
 }
 }
 } }
 } }
-if (__152532_53_dec->is_negative) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_negateEPNS0_12an_fp_binaryE(__152531_53_bin);
+if (__152664_53_dec->is_negative) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_negateEPNS0_12an_fp_binaryE(__152663_53_bin);
 }
 } 
 }
 
 
-static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg24fast_bin2dec_long_doubleEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEPvi( _ZN3edg13an_fp_decimalE *__152758_58_dec, 
-_ZN3edg12an_fp_binaryE *__152759_58_bin, 
-void *__152760_58_val, 
-int __152761_57_ndigits)
+static _ZN3edg9a_booleanE _ZN32_INTERNAL_10_floating_c_7968bde93edg24fast_bin2dec_long_doubleEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEPvi( _ZN3edg13an_fp_decimalE *__152890_58_dec, 
+_ZN3edg12an_fp_binaryE *__152891_58_bin, 
+void *__152892_58_val, 
+int __152893_57_ndigits)
 #line 1153
 {
-auto _ZN3edg12an_fp_binaryE __152771_29_d;
-auto _ZN3edg12an_fp_binaryE __152772_29_ds;
-auto int __152773_29_k;
-auto int __152774_29_dig_pos;
-auto _ZN3edg9a_booleanE __152775_29_res;
+auto _ZN3edg12an_fp_binaryE __152903_29_d;
+auto _ZN3edg12an_fp_binaryE __152904_29_ds;
+auto int __152905_29_k;
+auto int __152906_29_dig_pos;
+auto _ZN3edg9a_booleanE __152907_29_res;
 
-if (((__152759_58_bin->exponent) <= 0) || ((__152759_58_bin->exponent) < ((__152759_58_bin->precision) - (_ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_frac_low_zero_bitsEPhi(((__152759_58_bin->frac)), (__152759_58_bin->precision))))))
+if (((__152891_58_bin->exponent) <= 0) || ((__152891_58_bin->exponent) < ((__152891_58_bin->precision) - (_ZN32_INTERNAL_10_floating_c_7968bde93edg21fp_frac_low_zero_bitsEPhi(((__152891_58_bin->frac)), (__152891_58_bin->precision))))))
 
 {
 
-__152775_29_res = ((_ZN3edg9a_booleanE)0);
-goto __152856_1_end_of_routine;
+__152907_29_res = ((_ZN3edg9a_booleanE)0);
+goto __152988_1_end_of_routine;
 }
-__152773_29_k = ((int)((30103L * ((long)(__152759_58_bin->exponent))) / 100000L));
-if (28L <= ((long)__152773_29_k)) {
+__152905_29_k = ((int)((30103L * ((long)(__152891_58_bin->exponent))) / 100000L));
+if (28L <= ((long)__152905_29_k)) {
 
-__152775_29_res = ((_ZN3edg9a_booleanE)0);
-goto __152856_1_end_of_routine;
+__152907_29_res = ((_ZN3edg9a_booleanE)0);
+goto __152988_1_end_of_routine;
 }
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__152771_29_d), __152759_58_bin);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__152903_29_d), __152891_58_bin);
 
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_absEPNS0_12an_fp_binaryE((&__152771_29_d));
-while ((0 < __152773_29_k) && (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_((&__152771_29_d), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152773_29_k)))) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_absEPNS0_12an_fp_binaryE((&__152903_29_d));
+while ((0 < __152905_29_k) && (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_((&__152903_29_d), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152905_29_k)))) {
 
---__152773_29_k;
+--__152905_29_k;
 }
-if ((__152773_29_k < 0) || (((30103L * ((long)(__152759_58_bin->precision))) / 100000L) <= ((long)__152773_29_k))) {
+if ((__152905_29_k < 0) || (((30103L * ((long)(__152891_58_bin->precision))) / 100000L) <= ((long)__152905_29_k))) {
 
-__152775_29_res = ((_ZN3edg9a_booleanE)0);
-goto __152856_1_end_of_routine;
+__152907_29_res = ((_ZN3edg9a_booleanE)0);
+goto __152988_1_end_of_routine;
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__152772_29_ds), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152773_29_k));
-for (__152774_29_dig_pos = 0; (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE((&__152771_29_d)))) && (__152774_29_dig_pos <= __152761_57_ndigits); (_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj((&__152771_29_d), 10U)) , (++
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__152904_29_ds), ((_ZN32_INTERNAL_10_floating_c_7968bde93edg22small_tens_long_doubleE) + __152905_29_k));
+for (__152906_29_dig_pos = 0; (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE((&__152903_29_d)))) && (__152906_29_dig_pos <= __152893_57_ndigits); (_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj((&__152903_29_d), 10U)) , (++
 #line 1189
-__152774_29_dig_pos))
+__152906_29_dig_pos))
 
 {
-auto int __152809_31_digit;
-auto _ZN3edg12an_fp_binaryE __152810_31_tmp;
+auto int __152941_31_digit;
+auto _ZN3edg12an_fp_binaryE __152942_31_tmp;
 #line 1200
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__152810_31_tmp), (&__152771_29_d));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_((&__152810_31_tmp), (&__152772_29_ds));
-__152809_31_digit = (_ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_to_intEPNS0_12an_fp_binaryE((&__152810_31_tmp)));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__152810_31_tmp), (&__152772_29_ds));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj((&__152810_31_tmp), ((unsigned)__152809_31_digit));
-if (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_((&__152771_29_d), (&__152810_31_tmp))) {
---__152809_31_digit;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_((&__152810_31_tmp), (&__152772_29_ds));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__152942_31_tmp), (&__152903_29_d));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_divEPNS0_12an_fp_binaryES2_((&__152942_31_tmp), (&__152904_29_ds));
+__152941_31_digit = (_ZN32_INTERNAL_10_floating_c_7968bde93edg14fp_emul_to_intEPNS0_12an_fp_binaryE((&__152942_31_tmp)));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12fp_emul_copyEPNS0_12an_fp_binaryES2_((&__152942_31_tmp), (&__152904_29_ds));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16fp_emul_mult_intEPNS0_12an_fp_binaryEj((&__152942_31_tmp), ((unsigned)__152941_31_digit));
+if (_ZN32_INTERNAL_10_floating_c_7968bde93edg10fp_emul_ltEPNS0_12an_fp_binaryES2_((&__152903_29_d), (&__152942_31_tmp))) {
+--__152941_31_digit;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_((&__152942_31_tmp), (&__152904_29_ds));
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_((&__152771_29_d), (&__152810_31_tmp));
-(((((long)__152774_29_dig_pos) < 23L) && (0 <= __152809_31_digit)) && (__152809_31_digit < 10)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1210, __T553579552, ((
+_ZN32_INTERNAL_10_floating_c_7968bde93edg11fp_emul_subEPNS0_12an_fp_binaryES2_((&__152903_29_d), (&__152942_31_tmp));
+(((((long)__152906_29_dig_pos) < 23L) && (0 <= __152941_31_digit)) && (__152941_31_digit < 10)) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1210, __T820680296, ((
 #line 1210
 _ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-(((__152758_58_dec->digits))[__152774_29_dig_pos]) = ((char)(48 + ((int)((char)__152809_31_digit))));
+(((__152890_58_dec->digits))[__152906_29_dig_pos]) = ((char)(48 + ((int)((char)__152941_31_digit))));
 }
-if (__152761_57_ndigits < __152774_29_dig_pos) {
+if (__152893_57_ndigits < __152906_29_dig_pos) {
 
---__152774_29_dig_pos;
-if (((int)(((__152758_58_dec->digits))[__152774_29_dig_pos])) < 53) {
+--__152906_29_dig_pos;
+if (((int)(((__152890_58_dec->digits))[__152906_29_dig_pos])) < 53) {
 
-} else  { if (((53 < ((int)(((__152758_58_dec->digits))[__152774_29_dig_pos]))) || (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE((&__152771_29_d))))) || (((((int)(((__152758_58_dec->digits))[(__152774_29_dig_pos - 1)])) - 48) % 2) != 0))
+} else  { if (((53 < ((int)(((__152890_58_dec->digits))[__152906_29_dig_pos]))) || (!(_ZN32_INTERNAL_10_floating_c_7968bde93edg15fp_emul_is_zeroEPNS0_12an_fp_binaryE((&__152903_29_d))))) || (((((int)(((__152890_58_dec->digits))[(__152906_29_dig_pos - 1)])) - 48) % 2) != 0))
 
 {
-__152774_29_dig_pos = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8do_roundEiPc(__152774_29_dig_pos, ((__152758_58_dec->digits))));
-if (__152774_29_dig_pos == 0) {
-__152774_29_dig_pos = 1;
-++__152773_29_k;
+__152906_29_dig_pos = (_ZN32_INTERNAL_10_floating_c_7968bde93edg8do_roundEiPc(__152906_29_dig_pos, ((__152890_58_dec->digits))));
+if (__152906_29_dig_pos == 0) {
+__152906_29_dig_pos = 1;
+++__152905_29_k;
 }
 } }
 }
 
-while ((1 < __152774_29_dig_pos) && (((int)(((__152758_58_dec->digits))[(__152774_29_dig_pos - 1)])) == 48)) {
---__152774_29_dig_pos;
+while ((1 < __152906_29_dig_pos) && (((int)(((__152890_58_dec->digits))[(__152906_29_dig_pos - 1)])) == 48)) {
+--__152906_29_dig_pos;
 }
 
-(__152758_58_dec->is_negative) = (__152759_58_bin->is_negative);
-(__152758_58_dec->exponent) = (__152773_29_k + 1);
-(((long)__152774_29_dig_pos) < 23L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1235, __T553579552, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-(((__152758_58_dec->digits))[__152774_29_dig_pos]) = ((char)0);
-(__152758_58_dec->ndigits) = __152774_29_dig_pos;
-__152775_29_res = ((_ZN3edg9a_booleanE)1);
-__152856_1_end_of_routine:;
-return __152775_29_res;
+(__152890_58_dec->is_negative) = (__152891_58_bin->is_negative);
+(__152890_58_dec->exponent) = (__152905_29_k + 1);
+(((long)__152906_29_dig_pos) < 23L) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1235, __T820680296, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)))
+#line 1235
+;
+(((__152890_58_dec->digits))[__152906_29_dig_pos]) = ((char)0);
+(__152890_58_dec->ndigits) = __152906_29_dig_pos;
+__152907_29_res = ((_ZN3edg9a_booleanE)1);
+__152988_1_end_of_routine:;
+return __152907_29_res;
 }
 
 
-static enum _ZN3edg17an_fp_return_typeE _ZN32_INTERNAL_10_floating_c_7968bde93edg26write_long_double_internalEPciPhi( char *__152861_59_tgt, 
-int __152862_58_size, 
-unsigned char *__152863_59_val, 
-int __152864_58_ndigits)
+static enum _ZN3edg17an_fp_return_typeE _ZN32_INTERNAL_10_floating_c_7968bde93edg26write_long_double_internalEPciPhi( char *__152993_59_tgt, 
+int __152994_58_size, 
+unsigned char *__152995_59_val, 
+int __152996_58_ndigits)
 #line 1258
 {
-auto enum _ZN3edg17an_fp_return_typeE __152876_21_res = _ZN3edg12fp_ret_validE;
+auto enum _ZN3edg17an_fp_return_typeE __153008_21_res = _ZN3edg12fp_ret_validE;
 
-(_ZN3edg20floating_init_calledE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1261, __T553582288, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-if ((__152861_59_tgt == ((char *)0)) || (__152862_58_size <= 0)) {
-__152876_21_res = _ZN3edg16fp_ret_too_smallE;
-} else  { if ((__152863_59_val == ((unsigned char *)0)) || (__152862_58_size < 0)) {
-__152876_21_res = _ZN3edg14fp_ret_invalidE;
+(_ZN3edg20floating_init_calledE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1261, __T820683048, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+if ((__152993_59_tgt == ((char *)0)) || (__152994_58_size <= 0)) {
+__153008_21_res = _ZN3edg16fp_ret_too_smallE;
+} else  { if ((__152995_59_val == ((unsigned char *)0)) || (__152994_58_size < 0)) {
+__153008_21_res = _ZN3edg14fp_ret_invalidE;
 } else  {
-auto _ZN3edg12an_fp_binaryE __152884_18_bin;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg17split_long_doubleEPNS0_12an_fp_binaryEPh((&__152884_18_bin), __152863_59_val);
-if (((__152884_18_bin.is_negative) && (((int)(__152884_18_bin.type)) != 3)) && (((int)(__152884_18_bin.type)) != 0)) {
-(*(__152861_59_tgt++)) = ((char)45);
---__152862_58_size;
+auto _ZN3edg12an_fp_binaryE __153016_18_bin;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg17split_long_doubleEPNS0_12an_fp_binaryEPh((&__153016_18_bin), __152995_59_val);
+if (((__153016_18_bin.is_negative) && (((int)(__153016_18_bin.type)) != 3)) && (((int)(__153016_18_bin.type)) != 0)) {
+(*(__152993_59_tgt++)) = ((char)45);
+--__152994_58_size;
 }
 
 
-__152876_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg18convert_and_formatEPcyPNS0_12an_fp_binaryE(__152861_59_tgt, ((size_t)__152862_58_size), (&__152884_18_bin)));
-if (((int)__152876_21_res) == (-1)) {
-auto _ZN3edg13an_fp_decimalE __152894_21_dec;
+__153008_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg18convert_and_formatEPcyPNS0_12an_fp_binaryE(__152993_59_tgt, ((size_t)__152994_58_size), (&__153016_18_bin)));
+if (((int)__153008_21_res) == (-1)) {
+auto _ZN3edg13an_fp_decimalE __153026_21_dec;
 
 
-if (((int)(_ZN32_INTERNAL_10_floating_c_7968bde93edg24fast_bin2dec_long_doubleEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEPvi((&__152894_21_dec), (&__152884_18_bin), ((void *)__152863_59_val), __152864_58_ndigits))) == 0) {
+if (((int)(_ZN32_INTERNAL_10_floating_c_7968bde93edg24fast_bin2dec_long_doubleEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEPvi((&__153026_21_dec), (&__153016_18_bin), ((void *)__152995_59_val), __152996_58_ndigits))) == 0) {
 
 
 
-auto int __152901_13_adjust = 0;
-if ((__152884_18_bin.exponent) < (-16381)) {
-__152901_13_adjust = ((-16381) - (__152884_18_bin.exponent));
+auto int __153033_13_adjust = 0;
+if ((__153016_18_bin.exponent) < (-16381)) {
+__153033_13_adjust = ((-16381) - (__153016_18_bin.exponent));
 }
-_ZN32_INTERNAL_10_floating_c_7968bde93edg7bin2decEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEii((&__152894_21_dec), (&__152884_18_bin), __152864_58_ndigits, __152901_13_adjust);
+_ZN32_INTERNAL_10_floating_c_7968bde93edg7bin2decEPNS0_13an_fp_decimalEPNS0_12an_fp_binaryEii((&__153026_21_dec), (&__153016_18_bin), __152996_58_ndigits, __153033_13_adjust);
 }
 
 
 
-__152876_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg6formatEPcyPNS0_13an_fp_decimalE(__152861_59_tgt, ((size_t)__152862_58_size), (&__152894_21_dec)));
+__153008_21_res = (_ZN32_INTERNAL_10_floating_c_7968bde93edg6formatEPcyPNS0_13an_fp_decimalE(__152993_59_tgt, ((size_t)__152994_58_size), (&__153026_21_dec)));
 }
 } }
-return __152876_21_res;
+return __153008_21_res;
 }
 
 
-enum _ZN3edg17an_fp_return_typeE _ZN3edg17write_long_doubleEPciPh( char *__152917_43_tgt, 
-int __152918_42_size, 
-unsigned char *__152919_43_val)
+enum _ZN3edg17an_fp_return_typeE _ZN3edg17write_long_doubleEPciPh( char *__153049_43_tgt, 
+int __153050_42_size, 
+unsigned char *__153051_43_val)
 #line 1316
 {
-auto int __152934_7_ndigits;
+auto int __153066_7_ndigits;
 #line 1329
-__152934_7_ndigits = 0x7fffffff;
+__153066_7_ndigits = 0x7fffffff;
 
 
-return _ZN32_INTERNAL_10_floating_c_7968bde93edg26write_long_double_internalEPciPhi(__152917_43_tgt, __152918_42_size, __152919_43_val, __152934_7_ndigits);
+return _ZN32_INTERNAL_10_floating_c_7968bde93edg26write_long_double_internalEPciPhi(__153049_43_tgt, __153050_42_size, __153051_43_val, __153066_7_ndigits);
 }
 
 
-enum _ZN3edg17an_fp_return_typeE _ZN3edg19write_long_double_nEPciPhi( char *__152953_45_tgt, 
-int __152954_44_size, 
-unsigned char *__152955_45_val, 
-int __152956_44_ndigits)
+enum _ZN3edg17an_fp_return_typeE _ZN3edg19write_long_double_nEPciPhi( char *__153085_45_tgt, 
+int __153086_44_size, 
+unsigned char *__153087_45_val, 
+int __153088_44_ndigits)
 #line 1356
 {
-if (__152956_44_ndigits <= 0) {
-__152956_44_ndigits = 1;
-} else  { if (23L <= ((long)__152956_44_ndigits)) {
+if (__153088_44_ndigits <= 0) {
+__153088_44_ndigits = 1;
+} else  { if (23L <= ((long)__153088_44_ndigits)) {
 
 
-__152956_44_ndigits = 22;
+__153088_44_ndigits = 22;
 } }
-return _ZN32_INTERNAL_10_floating_c_7968bde93edg26write_long_double_internalEPciPhi(__152953_45_tgt, __152954_44_size, __152955_45_val, __152956_44_ndigits);
+return _ZN32_INTERNAL_10_floating_c_7968bde93edg26write_long_double_internalEPciPhi(__153085_45_tgt, __153086_44_size, __153087_45_val, __153088_44_ndigits);
 }
 
 
-static void _ZN32_INTERNAL_10_floating_c_7968bde93edg19convert_long_doubleEPhPNS0_19an_fp_decimal_inputE( unsigned char *__152985_45_val, 
-_ZN3edg19an_fp_decimal_inputE *__152986_45_dec)
+static void _ZN32_INTERNAL_10_floating_c_7968bde93edg19convert_long_doubleEPhPNS0_19an_fp_decimal_inputE( unsigned char *__153117_45_val, 
+_ZN3edg19an_fp_decimal_inputE *__153118_45_dec)
 
 
 
 {
-auto _ZN3edg12an_fp_binaryE __152991_16_bin;
-auto int __152992_16_scale = 0;
+auto _ZN3edg12an_fp_binaryE __153123_16_bin;
+auto int __153124_16_scale = 0;
 #line 1383
-(__152991_16_bin.precision) = 64;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE((&__152991_16_bin));
-_ZN32_INTERNAL_10_floating_c_7968bde93edg24fast_dec2bin_long_doubleEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEPi((&__152991_16_bin), __152986_45_dec, (&__152992_16_scale));
+(__153123_16_bin.precision) = 64;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg19fp_emul_set_to_zeroEPNS0_12an_fp_binaryE((&__153123_16_bin));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg24fast_dec2bin_long_doubleEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEPi((&__153123_16_bin), __153118_45_dec, (&__153124_16_scale));
 
 
 
 
-if (((int)(__152986_45_dec->type)) == 1) {
+if (((int)(__153118_45_dec->type)) == 1) {
 #line 1399
-if ((((int)(__152991_16_bin.type)) == 6) || (((int)(__152991_16_bin.type)) == 7)) {
+if ((((int)(__153123_16_bin.type)) == 6) || (((int)(__153123_16_bin.type)) == 7)) {
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg30long_double_make_min_subnormalEPNS0_12an_fp_binaryE((&__152991_16_bin));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg30long_double_make_min_subnormalEPNS0_12an_fp_binaryE((&__153123_16_bin));
 }
-if (((int)(__152991_16_bin.type)) == 2) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi((&__152991_16_bin), __152986_45_dec, __152992_16_scale);
+if (((int)(__153123_16_bin.type)) == 2) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg7dec2binEPNS0_12an_fp_binaryEPNS0_19an_fp_decimal_inputEi((&__153123_16_bin), __153118_45_dec, __153124_16_scale);
 }
-if (16384 < (__152991_16_bin.exponent)) {
-(__152986_45_dec->type) = _ZN3edg12fpt_overflowE;
-} else  { if ((__152991_16_bin.exponent) < (-16444)) {
-(__152986_45_dec->type) = _ZN3edg13fpt_underflowE;
+if (16384 < (__153123_16_bin.exponent)) {
+(__153118_45_dec->type) = _ZN3edg12fpt_overflowE;
+} else  { if ((__153123_16_bin.exponent) < (-16444)) {
+(__153118_45_dec->type) = _ZN3edg13fpt_underflowE;
 } else  {
-(__152991_16_bin.is_negative) = (__152986_45_dec->is_negative);
+(__153123_16_bin.is_negative) = (__153118_45_dec->is_negative);
 
 
 
 } }
 }
 
-if ((((int)(__152986_45_dec->type)) == 1) || (((int)(__152986_45_dec->type)) == 2)) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16make_long_doubleEPhPNS0_12an_fp_binaryE(__152985_45_val, (&__152991_16_bin));
+if ((((int)(__153118_45_dec->type)) == 1) || (((int)(__153118_45_dec->type)) == 2)) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16make_long_doubleEPhPNS0_12an_fp_binaryE(__153117_45_val, (&__153123_16_bin));
 } 
 
 }
 
 
-enum _ZN3edg17an_fp_return_typeE _ZN3edg16read_long_doubleEPhPKci( unsigned char *__153043_42_val, 
-_ZN3edg12a_const_charE *__153044_42_str, 
-int __153045_41_len)
+enum _ZN3edg17an_fp_return_typeE _ZN3edg16read_long_doubleEPhPKci( unsigned char *__153175_42_val, 
+_ZN3edg12a_const_charE *__153176_42_str, 
+int __153177_41_len)
 #line 1441
 {
-auto _ZN3edg19an_fp_decimal_inputE __153059_23_dec;
-auto enum _ZN3edg17an_fp_return_typeE __153060_23_res = _ZN3edg14fp_ret_invalidE;
+auto _ZN3edg19an_fp_decimal_inputE __153191_23_dec;
+auto enum _ZN3edg17an_fp_return_typeE __153192_23_res = _ZN3edg14fp_ret_invalidE;
 
-(_ZN3edg20floating_init_calledE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1445, __T553588200, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
-if (((__153043_42_val == ((unsigned char *)0)) || (__153044_42_str == ((_ZN3edg12a_const_charE *)0))) || (__153045_41_len <= 0)) {
-(__153059_23_dec.type) = _ZN3edg11fpt_invalidE;
+(_ZN3edg20floating_init_calledE) ? ((void)0) : (_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1445, __T820688968, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0)));
+if (((__153175_42_val == ((unsigned char *)0)) || (__153176_42_str == ((_ZN3edg12a_const_charE *)0))) || (__153177_41_len <= 0)) {
+(__153191_23_dec.type) = _ZN3edg11fpt_invalidE;
 } else  {
 
 
-_ZN32_INTERNAL_10_floating_c_7968bde93edg12split_stringEPNS0_19an_fp_decimal_inputEPKcS4_((&__153059_23_dec), __153044_42_str, (__153044_42_str + __153045_41_len));
-if (((int)(__153059_23_dec.type)) == 2) {
-_ZN32_INTERNAL_10_floating_c_7968bde93edg19convert_long_doubleEPhPNS0_19an_fp_decimal_inputE(__153043_42_val, (&__153059_23_dec));
+_ZN32_INTERNAL_10_floating_c_7968bde93edg12split_stringEPNS0_19an_fp_decimal_inputEPKcS4_((&__153191_23_dec), __153176_42_str, (__153176_42_str + __153177_41_len));
+if (((int)(__153191_23_dec.type)) == 2) {
+_ZN32_INTERNAL_10_floating_c_7968bde93edg19convert_long_doubleEPhPNS0_19an_fp_decimal_inputE(__153175_42_val, (&__153191_23_dec));
 }
 }
-if (((int)(__153059_23_dec.type)) == 0) {
-__153060_23_res = _ZN3edg14fp_ret_invalidE;
-} else  { if ((((int)(__153059_23_dec.type)) == 1) || (((int)(__153059_23_dec.type)) == 2)) {
-__153060_23_res = _ZN3edg12fp_ret_validE;
+if (((int)(__153191_23_dec.type)) == 0) {
+__153192_23_res = _ZN3edg14fp_ret_invalidE;
+} else  { if ((((int)(__153191_23_dec.type)) == 1) || (((int)(__153191_23_dec.type)) == 2)) {
+__153192_23_res = _ZN3edg12fp_ret_validE;
 } else  {
-auto _ZN3edg12an_fp_binaryE __153078_18_bin;
-(__153078_18_bin.precision) = 64;
-(__153078_18_bin.is_negative) = (__153059_23_dec.is_negative);
-switch ((int)(__153059_23_dec.type)) {
+auto _ZN3edg12an_fp_binaryE __153210_18_bin;
+(__153210_18_bin.precision) = 64;
+(__153210_18_bin.is_negative) = (__153191_23_dec.is_negative);
+switch ((int)(__153191_23_dec.type)) {
 case 3:
-(__153078_18_bin.type) = _ZN3edg7fpt_nanE;
-__153060_23_res = _ZN3edg10fp_ret_nanE;
-goto __T554378592;
+(__153210_18_bin.type) = _ZN3edg7fpt_nanE;
+__153192_23_res = _ZN3edg10fp_ret_nanE;
+goto __T821495792;
 case 4:
-(__153078_18_bin.type) = _ZN3edg12fpt_infinityE;
-__153060_23_res = ((__153078_18_bin.is_negative) ? _ZN3edg19fp_ret_neg_infinityE : _ZN3edg19fp_ret_pos_infinityE);
-goto __T554378592;
+(__153210_18_bin.type) = _ZN3edg12fpt_infinityE;
+__153192_23_res = ((__153210_18_bin.is_negative) ? _ZN3edg19fp_ret_neg_infinityE : _ZN3edg19fp_ret_pos_infinityE);
+goto __T821495792;
 case 5:
-(__153078_18_bin.type) = _ZN3edg12fpt_infinityE;
-__153060_23_res = _ZN3edg15fp_ret_overflowE;
-goto __T554378592;
+(__153210_18_bin.type) = _ZN3edg12fpt_infinityE;
+__153192_23_res = _ZN3edg15fp_ret_overflowE;
+goto __T821495792;
 case 6:
-(__153078_18_bin.type) = _ZN3edg8fpt_zeroE;
-__153060_23_res = _ZN3edg12fp_ret_validE;
-goto __T554378592;
+(__153210_18_bin.type) = _ZN3edg8fpt_zeroE;
+__153192_23_res = _ZN3edg12fp_ret_validE;
+goto __T821495792;
 case 7:
-(__153078_18_bin.type) = _ZN3edg8fpt_zeroE;
-__153060_23_res = _ZN3edg16fp_ret_underflowE;
-goto __T554378592;
+(__153210_18_bin.type) = _ZN3edg8fpt_zeroE;
+__153192_23_res = _ZN3edg16fp_ret_underflowE;
+goto __T821495792;
 default:
-_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1486, __T553588200, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
-} __T554378592:;
-_ZN32_INTERNAL_10_floating_c_7968bde93edg16make_long_doubleEPhPNS0_12an_fp_binaryE(__153043_42_val, (&__153078_18_bin));
+_ZN3edg16assertion_failedEPKciS1_S1_S1_(((const char *)"src/float_type.h"), 1486, __T820688968, ((_ZN3edg12a_const_charE *)0), ((_ZN3edg12a_const_charE *)0));
+} __T821495792:;
+_ZN32_INTERNAL_10_floating_c_7968bde93edg16make_long_doubleEPhPNS0_12an_fp_binaryE(__153175_42_val, (&__153210_18_bin));
 } }
-return __153060_23_res;
+return __153192_23_res;
 }
 #line 2789 "src/floating.c"
 void _ZN3edg22floating_one_time_initEv(void)
@@ -12624,14 +12695,14 @@ _ZN32_INTERNAL_10_floating_c_7968bde93edg27initialize_tens_long_doubleEv();
 _ZN3edg20floating_init_calledE = ((_ZN3edg9a_booleanE)1); 
 }
 #line 4139 "src/util.h"
- /* COMDAT group: _ZN3edg15integral_digitsIiEENS_16Enable_if_helperIXsr3edg16Is_signed_helperIT_EE5valueEyE7a_thingES2_i */ _ZN3edg9Enable_ifILb1EyEE _ZN3edg15integral_digitsIiEENS_16Enable_if_helperIXsr3edg16Is_signed_helperIT_EE5valueEyE7a_thingES2_i( int __37728_34_value, 
-int __37729_34_base)
+ /* COMDAT group: _ZN3edg15integral_digitsIiEENS_16Enable_if_helperIXsr3edg16Is_signed_helperIT_EE5valueEyE7a_thingES2_i */ _ZN3edg9Enable_ifILb1EyEE _ZN3edg15integral_digitsIiEENS_16Enable_if_helperIXsr3edg16Is_signed_helperIT_EE5valueEyE7a_thingES2_i( int __37860_34_value, 
+int __37861_34_base)
 #line 4146
 {
-auto size_t __37736_10_digits = 1ULL;
+auto size_t __37868_10_digits = 1ULL;
 
-for (; (__37728_34_value != 0) && ((__37728_34_value / __37729_34_base) != 0); ++__37736_10_digits) {
-__37728_34_value = ((int)(__37728_34_value / __37729_34_base));
+for (; (__37860_34_value != 0) && ((__37860_34_value / __37861_34_base) != 0); ++__37868_10_digits) {
+__37860_34_value = ((int)(__37860_34_value / __37861_34_base));
 }
-return __37736_10_digits;
+return __37868_10_digits;
 }
