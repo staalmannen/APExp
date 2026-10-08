@@ -2149,6 +2149,41 @@ live either way.
     `kencc_targ.h` describes this machine. Use a toy with **no `new`
     and no static constructors** -- those are the two places the
     runtime is reached and the static-init gap above is open.*
+  - **THERE IS NO C++ STANDARD LIBRARY HERE AND EDG SHIPS NONE, and
+    the EXCEPTION MODEL decides what could fill the gap.** `lib_src`
+    is the **libsupc++/libc++abi layer** -- new/delete, vtables, RTTI,
+    static init, pure-virtual -- and `include_c++`'s eleven headers
+    are the LANGUAGE-SUPPORT set, its own README saying *"only those
+    headers that require specific magic"*. A grep for
+    `basic_string|vector|iostream` across all of them is **empty**.
+    **What works with no library at all is the subset EDG ITSELF is
+    written in** -- classes, templates, virtual dispatch, RAII,
+    `new`/`delete`, plus `bad_alloc`/`type_info`/`initializer_list` --
+    which is why the self-translation worked.
+    **AND THE LAYERING LOOKS STANDARD WHILE THE EH MODEL IS NOT.**
+    EDG's exceptions are **setjmp/longjmp with its own regions**
+    (`__eh_curr_region` 138, `an_eh_stack_entry` 99, `setjmp` 19) and
+    there are **ZERO `_Unwind_` references in all 51 files**. *Good*:
+    no libgcc, no libunwind, no `.eh_frame`, no personality routine --
+    the only model that could work on a target with none of those, and
+    the reason EDG's C back end exists. *Bad*: **libc++'s EH assumes
+    the ITANIUM ABI**, so this is not the usual drop-libc++-onto-a-
+    conforming-ABI arrangement the libsupc++ shape suggests. Only the
+    grep says so. The type-trait builtins a modern STL needs ARE in
+    cpfe's table, checked (`__is_trivially_copyable`,
+    `__is_constructible`, `__is_base_of`, `__underlying_type`, ...).
+    **AND THE AXIS THAT DECIDES A CANDIDATE IS THE NAMESPACE, NOT
+    MAINTENANCE**: APExp exists to build existing software with
+    minimal modification, and code written against `std::vector` does
+    not compile against `etl::` or `eastl::` however good they are.
+    *A renamed STL serves NEW code; only a `std::` one serves a PORT.*
+    STLport fits this compiler best and died in 2008; ETL is
+    maintained but embedded and fixed-capacity; EASTL is more
+    complete; **uClibc++ is the one reported to be `std::` with
+    iostreams**, and is inactive at 0.2.5. Ordering, candidates and
+    **a provenance paragraph saying which lines are measured and
+    which are only recalled or searched** are in the NOTE. *Nothing
+    started; none of it blocks anything already working.*
   - **AND THE RUNTIME ADDS NOTHING libap ALREADY PROVIDES, checked
     rather than assumed.** `lib_src` holds `exit.c`, `main.c`,
     `error.c` and `memzero.c`, which is the shape that cost this tree

@@ -738,3 +738,118 @@ are the two places the runtime is reached, and the static-init gap
 above is open.  `pcc -c /tmp/t.c' is the half that matters -- cpfe
 emitting C says the front end runs, and pcc accepting it says the
 target configuration in kencc_targ.h describes this machine.
+
+
+THE C++ STANDARD LIBRARY: WHAT EDG GIVES AND WHAT IT DOES NOT
+-------------------------------------------------------------
+
+Asked as soon as cpfe ran, and worth settling before anyone starts: no,
+EDG ships no standard library, and this directory contains none.
+
+WHAT IS HERE, MEASURED.  `include_c++' holds ELEVEN headers and its own
+README says exactly why: "only those headers that require specific
+magic to work right with the EDG front end."  They are the
+LANGUAGE-SUPPORT set -- <new>, <typeinfo>, <exception>, <stdexcept>,
+<initializer_list>, <compare>, <coroutine>, <source_location>,
+<stdfloat>, plus cxxabi.h and edg_internal_defines.  A grep across all
+of them for `basic_string|vector|iostream|ostream' is EMPTY.
+`include_c99' holds one file, `iso646.h'.
+
+`lib_src' (51 files, 7191 lines) is the matching RUNTIME: the operator
+new/delete families, vtables, RTTI, static initialisation,
+pure-virtual, exception support.  **That is the libsupc++ / libc++abi
+layer, not libstdc++.**  The distinction is the whole answer: EDG
+supplies the compiler and the ABI runtime, and the standard library
+proper is absent.
+
+WHAT WORKS WITH NO LIBRARY AT ALL is more than it sounds, and the
+evidence is this directory: classes, templates, inheritance, virtual
+dispatch, operator overloading, RAII, new/delete, references,
+namespaces, plus std::bad_alloc, type_info and initializer_list from
+the headers above.  **That is the subset EDG ITSELF is written in**,
+which is why the self-translation worked at all -- EDG has never used a
+standard library, and `basic_hdrs.h' includes only EDG's own headers.
+
+AND THE EXCEPTION MODEL IS THE FINDING THAT DECIDES THE REST.
+EDG's EH here is **setjmp/longjmp with its own region bookkeeping** --
+`__eh_curr_region' 138 occurrences, `an_eh_stack_entry' 99, `setjmp'
+19, `longjmp' 2, and **ZERO references to `_Unwind_' anything** across
+all 51 files.
+  - GOOD: exceptions need no libgcc, no libunwind, no `.eh_frame' and
+    no personality routine.  On a target that has none of those this is
+    the only model that could work, and it is why EDG's C back end
+    exists at all.
+  - BAD FOR libc++: libc++'s EH integration assumes the ITANIUM ABI.
+    So this is NOT the usual "drop libc++ onto a conforming ABI layer"
+    arrangement that the libsupc++-shaped `lib_src' makes it look like
+    -- the two EH halves genuinely disagree.  `-fno-exceptions' would
+    sidestep it, at the price of a standard library that cannot throw.
+*The layering LOOKS standard and the EH model is not, and only the
+grep says so.*
+
+NOT AN OBSTACLE, checked rather than assumed: the type-trait builtins a
+modern STL needs are in cpfe's table -- `__is_trivially_copyable',
+`__is_trivially_destructible', `__is_constructible', `__is_base_of',
+`__underlying_type', `__is_aggregate', `__has_trivial_destructor' and
+`__builtin_va_arg' all resolve.
+
+THE CANDIDATES, AND THE AXIS THAT MATTERS IS NOT MAINTENANCE
+------------------------------------------------------------
+**APExp's stated goal is building existing UNIX software with minimal
+modification.**  Against that goal the decisive property is the
+NAMESPACE, not how alive the project is: software written against
+`std::vector' and `std::string' does not compile against `etl::' or
+`eastl::' however good those libraries are.  A renamed STL serves NEW
+code written for it; only a `std::' implementation serves a PORT.
+*That is a reasoning point and holds regardless of which project is
+picked.*
+
+  STLport      -- designed for weak compilers, EDG-based ones named
+                  among them, which is the one axis where it is the
+                  best fit here.  ABANDONED since 2008.
+  ETL          -- actively maintained; EMBEDDED target, and its
+                  containers are fixed-capacity (`etl::vector<T,N>'),
+                  so it is a different API rather than a thin
+                  substitute.  Own namespace.
+  EASTL        -- more complete on containers and algorithms than ETL.
+                  Own namespace; iostreams believed absent.
+  uClibc++     -- the one candidate reported to use the `std::'
+                  NAMESPACE and to carry iostreams, LGPL, aimed at
+                  small systems and at compilers without full template
+                  support -- which describes this target.  Open Hub
+                  marks it INACTIVE at 0.2.5, and a 2009 Gentoo
+                  developer post calls it broken and a source of
+                  security problems.
+  libstdc++    -- GCC-specific, built on GCC internals.  Worse than
+                  any of the above here.
+
+**PROVENANCE, because it decides how much weight each line carries.**
+Everything above the candidate list is MEASURED in this tree by grep
+and is reliable.  The candidate list is NOT: STLport's 2008 abandonment
+and ETL's embedded fixed-capacity design are recalled and were not
+re-verified; uClibc++'s status, licence and the 2009 criticism come
+from one web search; and EASTL's namespace and missing iostreams were
+NOT confirmed by search -- the result said "from general knowledge, not
+from these results", so treat that line as unchecked.  *Anyone acting
+on this list should re-check the project they choose rather than trust
+this paragraph*, which is the same rule this tree applies to a stale
+suite log.
+
+THE HONEST ORDERING
+-------------------
+  1. NOTHING.  Treat APExp C++ as "C with classes and templates".
+     Already reachable, needs no new code, and is strictly more than
+     cfront ever delivered here.  Everything cpfe itself is written in
+     works today.
+  2. A SMALL STL in its own namespace (EASTL or ETL).  Buys containers
+     and algorithms for NEW code; buys nothing for porting existing
+     software, which is the project's stated purpose.
+  3. A `std::'-namespace library (uClibc++, or STLport despite its
+     age).  The only option that helps a PORT, and the one whose
+     candidates are in the worst condition.
+  4. libc++.  Large, C++20-era, wants <atomic>, threading and locale,
+     and the EH model above is a real obstacle rather than a detail.
+
+*Nothing here is started and none of it is a prerequisite for anything
+already working.*  The next EDG step is still the one in the section
+above: cpfe translating a toy and `pcc -c' accepting the C.
