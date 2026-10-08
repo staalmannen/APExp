@@ -698,3 +698,43 @@ mkfile.  Quoted.  Every other `-D' in the tree arrives through an
 expanded `$CFLAGS', where mk substitutes after rc has parsed, so this
 is the first LITERAL one here and had no working precedent in the
 directory to copy from.
+
+CONFIRMED: cpfe RUNS ON 9front.  After the rename it reaches its own
+command-line parser and answers with its own diagnostics:
+
+	$ cpfe --help
+	Command-line error: invalid option: --help
+	1 catastrophic error detected in this compilation.
+	$ cpfe -V
+	Command-line error: missing source file name
+
+THAT IS THE ENTRY-POINT DIAGNOSIS CONFIRMED BEHAVIOURALLY, and both
+messages are cpfe working rather than refusing.  `--help' and `-V' are
+`eccp' DRIVER options; cpfe's own table (src/cmd_line.c) has no `help'
+entry at all and spells the other one `--version'.  `-V' reaching
+"missing source file name" means it was ACCEPTED and only the operand
+was absent.
+
+AND `--no_standard_includes' IS THE DRIVER'S TOO, which matters for
+anyone writing the first command by hand: it is not in cpfe's option
+table, because the driver implements it by simply not passing its
+default --sys_include list.  cpfe has no standard include path of its
+own -- it searches exactly what it is given -- so there is nothing to
+suppress.
+
+THE FIRST TRANSLATION ON 9front, as a command (from bash inside
+apexp-sh; the `=' needs no quoting there, only in an mkfile recipe,
+where rc parses it):
+
+	cpfe --c++14 --no_exceptions --no_rtti \
+	     --sys_include=<edg>/include_c++ \
+	     --sys_include=<edg>/include_c99 \
+	     --sys_include=/amd64/include/ape \
+	     --sys_include=/sys/include/ape \
+	     --gen_c_file_name=/tmp/t.c /tmp/t.cpp
+
+Start with a toy that uses NO `new' and no static constructors: those
+are the two places the runtime is reached, and the static-init gap
+above is open.  `pcc -c /tmp/t.c' is the half that matters -- cpfe
+emitting C says the front end runs, and pcc accepting it says the
+target configuration in kencc_targ.h describes this machine.

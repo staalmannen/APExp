@@ -2131,7 +2131,24 @@ live either way.
     working precedent in the directory to copy. *The rule was already
     written down here, in its `awk -v name=$name` spelling, and a
     rule recorded for one program's arguments did not transfer to a
-    compiler's.*
+    compiler's.
+    **CONFIRMED: cpfe RUNS.** It reaches its own command-line parser
+    and answers with its own diagnostics -- `invalid option: --help`,
+    and `-V` giving `missing source file name`. *That is the
+    entry-point diagnosis confirmed behaviourally*, and **both
+    messages are cpfe working rather than refusing**: `--help` and
+    `-V` are **`eccp` DRIVER** options, cpfe's own table has no
+    `help` entry at all and spells the other `--version`, and `-V`
+    reaching "missing source file name" means it was ACCEPTED with
+    only the operand absent. **`--no_standard_includes` is the
+    driver's too** and must not go in a hand-written command: cpfe
+    has no standard include path of its own, so there is nothing to
+    suppress. The first translation command is in the NOTE; the half
+    that matters is **`pcc -c` on the generated C**, since cpfe
+    emitting C says the front end runs while pcc accepting it says
+    `kencc_targ.h` describes this machine. Use a toy with **no `new`
+    and no static constructors** -- those are the two places the
+    runtime is reached and the static-init gap above is open.*
   - **AND THE RUNTIME ADDS NOTHING libap ALREADY PROVIDES, checked
     rather than assumed.** `lib_src` holds `exit.c`, `main.c`,
     `error.c` and `memzero.c`, which is the shape that cost this tree
