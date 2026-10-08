@@ -2099,13 +2099,88 @@ live either way.
 
 **Ports built but never exercised**, which is a different and cheaper
 item -- *a port that builds and has never run is not a port*:
-- **chicken** (Scheme) -- `lib/chicken` builds and `cmd/chicken` is in
-  `_OPTIONAL_APPS`. Nothing has run a Scheme program.
-- **bacon** (BASIC) -- the generated C is clean on gcc and the
-  converter RUNS on the host (it answers `BaCon version 5.0.3` and
-  converts a `FOR`/`PRINT` program), but **it has never been through
-  pcc**. `cmd/basic` is still commented out of `_OPTIONAL_APPS` for
-  that reason; build it by hand first.
+- **chicken** (Scheme) -- **IT CRASHED THE FIRST TIME A SCHEME PROGRAM
+  WAS RUN, AND THE CAUSE IS TWO LINES OF `chicken.h`.**
+  `chicken compiler-test.scm` answers
+  `suicide: sys: trap: fault read addr=0xfffffffffffefa6`.
+  `chicken.h:81` sets `C_SIXTY_FOUR` from
+  `__LP64__`/`_LP64`/`__MINGW64__`/`_WIN64`; **kencc on amd64 is LLP64**
+  and that list names LP64 plus the two WINDOWS LLP64 spellings, and
+  kencc predefines only `__STDC__`, `_POSIX_SOURCE` and the two
+  `__APEXP_*` markers -- so it was never set. **`C_LLP`, which both
+  mkfiles already passed, is read for the word size only INSIDE
+  `#ifdef C_SIXTY_FOUR`** (`:515`), so it was inert and the `#else` arm
+  ran: **`C_word` was `int`, 32 bits, on a machine with 64-bit
+  pointers**, in the type CHICKEN stores pointers in.
+  **The state is one upstream cannot produce**: it sets `C_LLP` only
+  for `__MINGW64__`/`_WIN64`, both of which are also in the
+  `C_SIXTY_FOUR` list, so its LLP64 targets always get both. Passing
+  `C_LLP` alone gave a MIXED build -- `C_long` was `long long` and
+  `C_strtow` was `strtoll`, both read outside the block, while
+  `C_word` stayed 32-bit. *Half the configuration took and half did
+  not.*
+  **AND `-DC_SIXTY_FOUR` ALONE DOES NOT COMPILE, which the gcc check
+  caught before it shipped.** `C_header` is `C_uword` is
+  `unsigned C_word`, and under `C_LLP` `C_word` is `C_s64` -- the
+  keyword-ish `__int64` only on MinGW. Everywhere else it is the
+  TYPEDEF `int64_t`, and `unsigned int64_t` is not C: eight errors
+  inside `chicken.h`, the first on `C_SCHEME_BLOCK` at `:755`, **none
+  of them naming the cause**. `C_uword` is `C_u64` under
+  `C_SIXTY_FOUR && C_LLP` now, which needs no new macro and is the
+  same `unsigned __int64` on MinGW. `C_uchar`, `C_uhword` and
+  `C_ulong` beside it were checked and are all `unsigned <keyword>`.
+  **`chickenword-probe.c` is the instrument and THE HOST RUNS BOTH
+  SIDES**, so this cost no VM round: `-U__LP64__ -U_LP64` reproduces
+  kencc's configuration exactly. Fixed: `C_word` 8, 0 failures.
+  Shipped: `C_SIXTY_FOUR NOT defined`, `C_word` 4, pointer 8, 1
+  failure, exit 1. *Not yet measured on the VM.*
+  Recorded not patched: `chicken.h:813-815` define `C_WORD_MIN`/
+  `C_WORD_MAX`/`C_UWORD_MAX` as the LONG limits with no `C_LLP` arm,
+  so they would be 32-bit limits for a 64-bit word -- **defined and
+  never used, zero uses in the tree**, and upstream carries the same
+  latent bug on MinGW64.
+- **bacon** (BASIC) -- **IT CONVERTS BASIC TO C ON APExp NOW**, 605
+  lines in 0.854s for `bacongui-tk.bac`. What stopped the compile was
+  not bacon: **pkg-config has never worked in this tree.**
+  `cmd/pkgconf/mkfile` built it with `-DPKG_DEFAULT_PATH="/bin"`, a
+  directory with no `.pc` in it, and nothing installed one -- so
+  pkgconf is built, is in `_CORE_APPS`, `rc/bin/ape/pkg-config`
+  forwards to it, and the whole path resolved nothing. *A capability
+  present and not declared, for the sixth time.* `PERSONALITY_PATH`
+  beside it already named the right parent; `PKG_DEFAULT_PATH` is
+  `/sys/lib/ape/pkgconfig` now and `tcl.pc`/`tk.pc` live there.
+  **Their `Cflags` and `Libs` are EMPTY by design**: `/sys/include/ape`
+  is already on pcc's path so a `-I` would be noise and anything else
+  would shadow the real `tcl.h`; and kencc records archives from
+  `#pragma lib`, which both headers carry, while **`6l` resolves `-l`
+  against `/$objtype/lib` rather than `/$objtype/lib/ape`
+  (`6l/obj.c:405`)** so a `-l` would name a file that does not exist.
+  They answer "present, and at what version", which is what `--exists`
+  needs. **`DATA_PATH` is not a bacon problem**: upstream's
+  `Makefile.in:51` passes `-DDATA_PATH='"$(DATADIR)"'`.
+  **`sys/lib/tests/bacon-test.bac` is the first BASIC test, and it had
+  to be written because BaCon SHIPS NONE** -- `bacon.bac` plus the
+  five GUIs is the whole `.bac` corpus. It is aimed rather than
+  general: NUMBER is a C `long`, so sections 1-2 are the 32-bit-`long`
+  invariant, and the rest are FLOATING, strings, arrays and a FUNCTION
+  return. **Validated on the host first and that caught two bugs IN
+  THE TEST** -- a `LOCAL` redeclaring a parameter, and
+  `1000000 * 1000000`, which overflows in `int` on gcc too because
+  BaCon folds bare literals as `int`. 0 failures on gcc; not yet run
+  under pcc.
+  **Two things for anyone automating it**: bacon PROMPTS on a compile
+  error and on leftover temporaries, so **`</dev/null` is required** or
+  a failing conversion hangs rather than reporting -- in a mk recipe, a
+  build that never returns. And **the exit status is NOT the failure
+  count** (BaCon's `END` takes no value, its `EXIT` leaves a SUB), so
+  read the `N failures` line.
+  **The stronger test is SELF-HOSTING and is not that file**:
+  `bacon.bac` is 10,517 lines of BASIC whose output is bacon itself, so
+  `bacon -c pcc bacon.bac` converting, compiling and then converting
+  again is the end-to-end check -- the same shape as EDG's
+  self-translation. Do the small test first, because when self-hosting
+  fails it says nothing about which feature broke.
+  `cmd/basic` is still commented out of `_OPTIONAL_APPS`.
 - **the archivers** -- bzip2, xz, unrar, unace, unarj, clzip. See the
   tar section: `-J` retires the padding hunt, so this is now a check
   rather than a hunt, and the way to do it is to run each one on a
