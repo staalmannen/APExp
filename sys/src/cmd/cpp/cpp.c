@@ -291,7 +291,35 @@ control(Tokenrow *trp)
 			return;
 		}
 		cursource->line = atol((char*)tp->t)-1;
-		if (cursource->line<0 || cursource->line>=32768)
+		/*
+		 * 32768 HERE WAS A STALE LIMIT FROM AN OLDER OBJECT FORMAT,
+		 * and it cost 113,411 warnings on one tree.  EDG's generated
+		 * C carries a `#line' for nearly every statement, pointing
+		 * back at the C++ it was translated from, and 113,411 of
+		 * those are over 32768 -- 100,656 in `src/sys_predef.c'
+		 * alone.  The output was unreadable, which matters for the
+		 * recorded reason: *a harmless message that lands in a
+		 * captured stream stops being harmless to the measurement.*
+		 *
+		 * NOTHING DOWNSTREAM IS 16-BIT, checked end to end rather
+		 * than reasoned: `Source.line' here is an `int', `cc''s
+		 * `lineno' is a `long' (cc.h:459), and EVERY backend writes
+		 * four bytes -- `6c/swt.c:259-262' and `8c' spell it
+		 * `Bputc(b, p->lineno>>24)', while `5c', `7c', `9c', `kc',
+		 * `qc', `vc', `1c' and `2c' use the byte-array form
+		 * `bf[6] = l>>24'.  (A grep for the first idiom alone
+		 * reports six backends as unchecked and is wrong about all
+		 * six: the NAME differs, the WIDTH does not.)  `6l/obj.c:871'
+		 * reads the same four bytes back.
+		 *
+		 * So the bound is INT_MAX, which is what `cursource->line'
+		 * can hold and what the object field carries.  The `<0' arm
+		 * is KEPT and is the half that still does work: this file is
+		 * built by native `6c', where `long' and `int' are both 32
+		 * bits, so a `#line' beyond that range comes back from
+		 * `atol' saturated or wrapped and a wrapped one is negative.
+		 */
+		if (cursource->line<0 || cursource->line>=0x7fffffff)
 			error(WARNING, "#line specifies number out of range");
 		tp = tp+1;
 		if (tp+1<trp->lp)
