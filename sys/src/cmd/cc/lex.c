@@ -1305,8 +1305,30 @@ ncu:
 	w = 32;
 	if((c1 & (Numdec|Numuns)) == Numdec)
 		w = 31;
-	if(c1 & Numvlong || (c1 & Numlong) == 0 && (uvlong)vv >= 1ULL<<w){
-		if((c1&(Numdec|Numvlong)) == Numdec && vv < 1ULL<<32)
+	/*
+	 * A SINGLE `L' DOES NOT CAP THE WIDTH.  C99 6.4.4.1 says a
+	 * constant suffixed `l'/`L' has the first of long, unsigned
+	 * long, long long, unsigned long long IN WHICH ITS VALUE CAN BE
+	 * REPRESENTED -- so `L' is a floor on the type, not a ceiling.
+	 * This used to widen only when no `L' was written, so an
+	 * L-suffixed constant too big for a 32-bit long was silently
+	 * truncated (with a warning nobody reads in a 2000-line header).
+	 *
+	 * It bites here and not on a unix because kencc's long is 32
+	 * bits with 64-bit pointers: upstream code written for LP64
+	 * spells its 64-bit constants with one L, which is correct
+	 * there and arrives here as a value to truncate.  CHICKEN's
+	 * chicken.h is where it was found -- `C_STRING_TYPE' and its
+	 * thirteen neighbours are 0x0n00000000000000L -- and every one
+	 * of them became 0, so runtime.c's two literal-decoding
+	 * switches reported `duplicate cases in switch 0'.  The value
+	 * in that message is the evidence: all the labels were 0.
+	 *
+	 * The threshold is the same `w' as for an unsuffixed constant
+	 * because long and int are both 32 bits here.
+	 */
+	if(c1 & Numvlong || (uvlong)vv >= 1ULL<<w){
+		if((c1&(Numdec|Numlong|Numvlong)) == Numdec && vv < 1ULL<<32)
 			warn(Z, "int constant widened to vlong: %s", symb);
 		if((c1 & Numuns) || convvtox(vv, TVLONG) < 0) {
 			c = LUVLCONST;
