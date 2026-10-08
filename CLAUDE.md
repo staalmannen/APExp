@@ -2167,6 +2167,56 @@ item -- *a port that builds and has never run is not a port*:
   nothing overflows. Section 0 prints `sizeof(long)` so the two runs
   tell themselves apart. *Not compiled anywhere yet -- kencc needs
   Plan 9's `<u.h>`/`<libc.h>`, so the first build is the VM's.*
+  **AND THE REBUILD HALVED IT -- 8 ERRORS -> 4 -- WHICH NAMED A
+  SECOND, UNRELATED KENCC BUG UNDERNEATH.** The four that went were
+  `runtime.c:12578`, the switch on 64-bit `bits`: that is the
+  `L`-suffix fix confirmed exactly where it was predicted. The four
+  that REMAIN are `12525`, the switch on a plain `int`, and they were
+  never the suffix at all -- *the same four were there before, and
+  reading 8 as one cause would have been wrong.* `cc/pswt.c` has two
+  defects, and **only the second is audible**:
+  - **A 64-bit case TYPE is not a 64-bit case VALUE.** `pgen.c:342`
+    sets a case's `isv` from `typev[type]` alone, and `doswit`
+    DISCARDED every such case in a switch whose expression is 32 bits,
+    under the comment *"can never match"* -- a sentence about a VALUE
+    too wide to appear, applied to a small number with a wide type.
+    `chicken.h` writes every immediate as
+    `((C_word)(C_SPECIAL_BITS | 0x10))` and `C_word` is 64 bits here,
+    so **four of `decode_literal2`'s eight labels are 0x0e/0x1e/0x3e/
+    0x4e wearing `int64_t`** and would have fallen to `default` at run
+    time. *Silent: the file compiles.*
+  - **`nc` was counted BEFORE that loop dropped anything, and
+    `alloc()` is a hunk bump allocator that does not zero.** So
+    `qsort` and the duplicate scan ran over `nc` entries of which the
+    last few were never written and compared those against each other
+    -- `duplicate cases in switch 0`, **naming a case the program does
+    not contain**. Five dropped labels, four reports: *the count in
+    the message is the arithmetic of the bug.*
+  **C 6.8.4.2p5 decides the fix and gcc confirmed it in one command**:
+  a label "is converted to the promoted type of the controlling
+  expression", so a wide label is **truncated**, not discarded --
+  `case 0x100000001LL:` in a switch on an `int` is reached by **1**,
+  and a label that truncates onto another is a real duplicate. The
+  `(long)` cast already performed that conversion, so the fix is the
+  deletion of the drop plus `nc = q - iq`.
+  ***MY FIRST FIX AND MY FIRST TEST WERE BOTH THE OTHER RULE***
+  -- "drop only what does not survive truncation" -- and gcc REFUSED
+  TO COMPILE the test that asserted it, because `case 0x100000000LL:`
+  truncates onto `case 0:`. *Checking against the host first changed
+  what the fix should be, not just whether the test was right.*
+  **`switchcase-test.c` is the regression test and its SECTION 2 is
+  the one that matters**: a compiler with only the loud half fixed
+  compiles cleanly and selects the wrong arm, so the error going away
+  is not evidence -- only asking which arm ran separates them.
+  Section 1 is the loud half, since the file not building is its own
+  answer. 0 failures on gcc, where `long` is 64 bits so neither bug
+  can arise -- *the host says the test is written correctly and
+  nothing more.*
+  **Watch the first full rebuild**: a 64-bit-typed label that
+  truncates onto another one used to be dropped silently and is now a
+  `duplicate cases` ERROR, so a package that relied on the old
+  behaviour fails loudly rather than quietly. That is the safe
+  direction and is the refutation condition for this change.
 - **bacon** (BASIC) -- **IT CONVERTS BASIC TO C ON APExp NOW**, 605
   lines in 0.854s for `bacongui-tk.bac`. What stopped the compile was
   not bacon: **pkg-config has never worked in this tree.**

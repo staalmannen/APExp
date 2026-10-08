@@ -32,30 +32,84 @@ doswit(Node *n)
 			def = c->label;
 			continue;
 		}
-		isv |= c->isv;
 		nc++;
 	}
-	if(typev[n->type->etype])
-		isv = 1;
-	else if(isv){
-		warn(n, "32-bit switch expression with 64-bit case constant");
-		isv = 0;
-	}
+	/*
+	 * `isv' is a property of the SWITCH EXPRESSION and of nothing
+	 * else.  It used to be OR'd with every case's own `isv' first
+	 * and then overridden here, which read as though a wide label
+	 * could widen the comparison; it cannot, since C converts
+	 * each label to the expression's promoted type (see below).
+	 */
+	isv = typev[n->type->etype];
 
 	iq = alloc(nc*sizeof(C1));
 	q = iq;
 	for(c = cases; c->link != C; c = c->link) {
 		if(c->def)
 			continue;
-		if(c->isv && !isv)
-			continue;	/* can never match */
 		q->label = c->label;
 		if(isv)
 			q->val = c->val;
 		else
 			q->val = (long)c->val;	/* cast ensures correct value for 32-bit switch on 64-bit architecture */
+		/*
+		 * A 64-bit case TYPE IS NOT A 64-BIT CASE VALUE, and
+		 * this used to `continue' here -- dropping the label
+		 * -- for any case whose TYPE was wide, under the
+		 * comment "can never match".  `pgen.c:342' sets a
+		 * case's `isv' from `typev[type]' alone, so
+		 * `case (int64_t)14:' in a switch on an `int' was
+		 * discarded, and the switch fell to `default' for a
+		 * value it plainly contains.  SILENT: the file
+		 * compiled.
+		 *
+		 * C 6.8.4.2p5 settles it and gcc agrees when asked:
+		 * the constant expression "is converted to the
+		 * promoted type of the controlling expression", so a
+		 * wide label is TRUNCATED and then compared like any
+		 * other -- `case 0x100000001LL:' in a switch on an
+		 * int is reached by 1, and a label that truncates
+		 * onto another one is a genuine duplicate rather than
+		 * something to throw away.  The `(long)' cast above
+		 * already performs exactly that conversion, so the
+		 * rule costs nothing but the deletion.
+		 *
+		 * The warning stays, and is now about the VALUE: it
+		 * fires only where a WIDE label's conversion actually
+		 * changed the constant, which is gcc's `-Woverflow'
+		 * case.  `c->isv' is still in the test and has to be:
+		 * without it an ordinary `case 0xffffffffU:' in a
+		 * switch on an `unsigned' warns, because `(long)'
+		 * sign-extends it to -1 -- correct bits, different
+		 * `vlong', and a warning on code that is right.
+		 *
+		 * CHICKEN's `runtime.c' is where this was found, and
+		 * the spelling is not exotic: `chicken.h' writes
+		 * every immediate as `((C_word)(C_SPECIAL_BITS |
+		 * 0x10))' and `C_word' is 64 bits here, so four of
+		 * `decode_literal2''s eight labels are small numbers
+		 * wearing a wide type.
+		 */
+		if(c->isv && !isv && q->val != c->val)
+			warn(n, "case constant truncated to the switch expression's type");
 		q++;
 	}
+	/*
+	 * AND `nc' IS RECOUNTED, which is the half that was loud.  It
+	 * was the number of non-default cases, counted BEFORE the
+	 * loop above could drop any -- while `alloc()' is a hunk bump
+	 * allocator and does not zero.  So `qsort' and the duplicate
+	 * scan below ran over `nc' entries of which the last few had
+	 * never been written, and reported those against each other:
+	 * **`duplicate cases in switch 0', once per unwritten pair,
+	 * naming a case the program does not contain.**  Five dropped
+	 * labels gave exactly the four reports chicken showed.
+	 * Nothing drops any more, so the two counts agree -- this is
+	 * insurance against the next `continue' added to that loop,
+	 * and it is one line.
+	 */
+	nc = q - iq;
 	qsort(iq, nc, sizeof(C1), swcmp);
 	if(debug['W'])
 	for(i=0; i<nc; i++)
