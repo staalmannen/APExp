@@ -1271,3 +1271,119 @@ cases.
    `sys/src/lib` is native; they differ in the libc *and in the
    preprocessor*. That is now two separate reasons an APE test cannot
    answer for native code -- this one and the CFLAGS one above.
+
+---
+
+## `auto <type> <name>;` did not compile, and `-std=` would not have fixed it
+
+**THE FIRST pcc RUN OVER EDG's GENERATED C STOPPED ON THE FOURTH
+FILE**, three having compiled:
+
+```
+pcc -c ../../../external/edg/lib_src/array_new_aligned.c
+lib_src/array_new_aligned.c:25[stdin:18] syntax error, last name: __T41392176
+```
+
+Line 25 is `{ auto size_t __T41392176; auto unsigned long long __T41392824;`
+-- `auto` as a STORAGE-CLASS SPECIFIER before a typedef name, which is
+ordinary C89 and has been since 1978.
+
+**THE CAUSE IS A SHIFT/REDUCE CONFLICT IN `cc.y`, AND bison PRINTS IT
+EXACTLY.** The C23 auto-type-deduction rule `adecl: LAUTO autoadlist ';'`
+sits beside the storage class `cname: LAUTO`, and `autoadlist` began
+with `xdecor`, which reaches `ltag: LNAME | LTYPE` -- so a TYPEDEF NAME
+could be shifted as the thing being declared:
+
+```
+State 417
+   22 adecl: LAUTO . autoadlist ';'
+  280 cname: LAUTO .
+    '*'  '('  LNAME  LTYPE      shift
+    '*'  '('  LNAME  LTYPE      [reduce using rule 280 (cname)]
+```
+
+**yacc resolves shift/reduce in favour of SHIFT**, so `auto size_t x;`
+took the deduction path, read `size_t` as the variable's NAME, and the
+real name was then a syntax error -- which is why the message names
+`__T41392176` rather than `size_t` or `auto`. *The diagnostic names the
+victim, not the cause*, for the third time in this tree after the
+`lock.h` shadow and `cmd/mkfile`'s runaway continuation.
+**`auto unsigned long long` on the SAME LINE would have been fine**:
+`LUNSIGNED` is not in that shift set, so it reduced to the storage
+class correctly. Only a typedef name collided -- which is why nothing
+in the tree had ever noticed.
+
+**THE BLAST RADIUS IS THE WHOLE EDG PORT**: `auto <type> <name>;` is
+how EDG's C declares every local, **116,079 occurrences across 103 of
+its 133 files**. One conflict, essentially the entire port.
+
+### Why `-std=` is the wrong tool, which is worth more than the fix
+
+The question came up as "is it time to introduce `-std=`". **No, and
+not because it is premature -- because it could not have fixed this.**
+
+1. **The conflict is resolved when yacc BUILDS THE TABLE**, not at
+   runtime. A dialect flag has no say over an action table that was
+   decided at parser-generation time; it would take two parser tables.
+2. **There is no disagreement to arbitrate.** C23 kept `auto` as a
+   storage-class specifier, and its type inference applies only where
+   `auto` is the SOLE type specifier -- so `auto size_t x;` is valid
+   C89 **and** valid C23. *Both standards want the same answer*, and
+   `-std=` is for the cases where they do not.
+3. **The grammar can decide by itself**, because `size_t` is `LTYPE`
+   and `x` is `LNAME` -- different tokens. Nothing needed a flag.
+
+**And the corpus says the tree does not need `-std=` yet either.**
+Sweeping all 2.9M lines of EDG's C with string literals and `#line`
+directives stripped, the number of uses of `bool`, `true`, `false`,
+`nullptr`, `alignas`, `alignof`, `static_assert`, `typeof`,
+`typeof_unqual`, `restrict`, `signof` or `typestr` **as identifiers is
+ZERO** -- every hit is inside EDG's own diagnostic text and option
+tables, which is what a C++ front end's string pool looks like.
+*The stripping is the whole measurement*: the raw counts are 37 for
+`bool` and 16 for `nullptr`, and all of them are strings.
+**`hidden` and `visible` are the shape to copy if it ever is needed**:
+`lex.c:1801-1802` has them in `itab` as **`LNAME`**, with a comment
+saying they are common identifiers -- a per-name escape hatch that
+costs nothing and needs no flag. *(I briefly read EDG's
+`unsigned int hidden: 1;` as a second collision; it is not, because
+`hidden` already lexes as LNAME. Checking the lexical class rather than
+the table membership is what separated them.)*
+**If `-std=` is ever added it needs a marker from the first commit.**
+`pcc`'s ARGBEGIN has no `default:`, so a flag it does not name is
+silently dropped -- for a DIALECT flag that is the worst available
+failure, the same trap `-J` fell into. Use the
+`__APEXP_CONFORMALIGN__` idiom, and remember that `pcc` runs
+`/bin/cpp` itself, so the macro must be defined on the preprocessor
+that actually runs.
+
+### The fix, and its control
+
+`autoadlist`'s FIRST declarator is now `autoxdecor`, rooted at `LNAME`
+with a pointer arm, instead of the general `xdecor`. `LTYPE` therefore
+leaves the shift set and reduces to the storage class.
+`*` still shifts and that is correct rather than left over: `auto *p =
+&x;` is C23 deduction, while `auto *p;` as a storage class would need
+implicit int, gone since C99. Arrays and functions are absent
+deliberately -- C23 does not deduce them.
+
+**Measured with bison, since kencc's own sources cannot be compiled on
+the host** (they need Plan 9's `<u.h>` and `<libc.h>`, so the first
+build is the VM's -- the same weaker position `-J` shipped from):
+
+```
+                      before   after
+  shift/reduce           26      22
+  reduce/reduce           6       6      (pre-existing, LTYPEOF)
+  state 417 (adecl)       4       2      LTYPE and '(' gone
+  state 517 (forexpr)     4       2      same, renumbered from 513
+```
+
+**The prediction was written before the run and was right per state
+and short in total**: I said 26 -> 24, having looked at state 417
+alone, and it went to 22 because **the same production pair appears
+twice** -- `adecl: LAUTO autoadlist ';'` and
+`forexpr: LAUTO autoadlist`, so `for(auto size_t i = 0; ...)` was
+broken identically and is fixed identically. *A conflict counted in
+one state is not the conflict count for a production that appears in
+two*, and the state list before and after is what attributed it.

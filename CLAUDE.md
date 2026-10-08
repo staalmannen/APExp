@@ -1855,6 +1855,33 @@ live either way.
     recipe, so a plain run costs one round per bad file across 75;
     -k names them all at once. *That is the rule bacon's missing
     headers and bacon's missing link symbols both paid for.*
+    **AND THE FIRST pcc RUN STOPPED ON THE FOURTH FILE, FOR A KENCC
+    GRAMMAR BUG RATHER THAN ANYTHING OF EDG'S: `auto size_t x;` DID
+    NOT PARSE.** `autoadlist` began with `xdecor`, which reaches
+    `LNAME | LTYPE`, so after `LAUTO` the parser could SHIFT a typedef
+    name as the variable being declared -- and **yacc resolves
+    shift/reduce in favour of SHIFT**, so the C23 deduction path won
+    over `cname: LAUTO`, the storage class. EDG's C writes
+    `auto <type> <name>;` for every local: **116,079 of them across
+    103 of the 133 files**, so one conflict blocked essentially the
+    whole port.
+    **`-std=` WOULD NOT HAVE FIXED IT, and that is the finding rather
+    than the fix.** The conflict is resolved when yacc BUILDS THE
+    TABLE, so no runtime flag has a say -- and there is no dialect
+    disagreement to arbitrate, since C23 kept `auto` as a
+    storage-class specifier and its type inference applies only where
+    `auto` is the SOLE type specifier. *Both standards want the same
+    answer here*, and the grammar can reach it alone because `size_t`
+    is LTYPE and `x` is LNAME. A new `autoxdecor` roots the first
+    declarator at LNAME; `*` still shifts, because `auto *p = &x;` is
+    deduction while `auto *p;` would need implicit int.
+    **Measured with bison** (kencc's own sources need Plan 9's `<u.h>`
+    and `<libc.h>`, so the first build is the VM's -- the weaker
+    position `-J` also shipped from): shift/reduce **26 -> 22**,
+    reduce/reduce 6 both ways, and the two states that carry it --
+    `adecl` 417 and `forexpr` 517 -- each lose their LTYPE and `(`
+    shifts, 4 -> 2. *The same production appears in two places, which
+    is why a 26 -> 24 prediction was two short.*
     **`src/sys_predef.c` IS 315,616 LINES IN ONE TRANSLATION UNIT**
     (`ifc_modules_read.c` 130,330, `expr.c` 120,824; 2.9M lines over
     the 133). A `6c` table limit is the likeliest first answer, and it
