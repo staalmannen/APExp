@@ -2120,6 +2120,18 @@ live either way.
     SENTENCE IS THE ONE THAT WOULD HAVE FOUND THIS.*** It was a
     reading presented as a check; *an almost-true claim is worse than
     none, because it reads as having been verified.* Corrected there.
+    **AND THE FIRST BUILD OF THAT FIX DID NOT RUN, FOR THE RECORDED
+    rc RULE**: mk hands a recipe to `rc`, where `=` is a SYNTAX
+    CHARACTER, so a bare `-D_main=__edg_main` answers
+    `/rc/lib/rcmain:24 *eval*:1: token '=': syntax error` -- *a
+    message naming rcmain and a token, with nothing in it about this
+    mkfile*. Quoted. **Every other `-D` in the tree arrives through
+    an expanded `$CFLAGS`**, where mk substitutes after rc has
+    parsed, so this is the tree's first LITERAL one and had no
+    working precedent in the directory to copy. *The rule was already
+    written down here, in its `awk -v name=$name` spelling, and a
+    rule recorded for one program's arguments did not transfer to a
+    compiler's.*
   - **AND THE RUNTIME ADDS NOTHING libap ALREADY PROVIDES, checked
     rather than assumed.** `lib_src` holds `exit.c`, `main.c`,
     `error.c` and `memzero.c`, which is the shape that cost this tree

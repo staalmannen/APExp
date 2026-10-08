@@ -271,8 +271,23 @@ CFLAGS= -c -C
 # `__'-prefixed" -- that is wrong, and it is the sentence that would
 # have found this.*  Asking the linker's own answer costs one command
 # where reading 51 files costs a round.
+# **AND THE `-D` IS QUOTED, WHICH IS NOT DECORATION.** mk hands a
+# recipe to `rc`, and in rc `=` is a SYNTAX CHARACTER -- legal only as
+# an assignment at the start of a command or inside quotes -- so a bare
+# `-D_main=__edg_main` is a parse error rather than an argument:
+#
+#	/rc/lib/rcmain:24 *eval*:1: token '=': syntax error
+#	mk: pcc -c -C ...  : exit status=rc 79720: rc 79720: exit
+#
+# *The message names rcmain and a token, and nothing in it is about
+# this mkfile.*  Every other `-D` in the tree arrives through an
+# expanded variable (`$CFLAGS`), where mk substitutes after rc has
+# parsed, so this is the first literal one here -- which is why a rule
+# this file's own CLAUDE.md records (`awk -v name=$name` is a parse
+# error, `'name='^$name` is not) had no precedent to copy in the
+# directory.
 main.$O: $EDGSRC/main.c
-	$CC $CFLAGS -D_main=__edg_main $EDGSRC/main.c
+	$CC $CFLAGS '-D_main=__edg_main' $EDGSRC/main.c
 
 cxa_atexit.$O: cxa_atexit.c
 	$CC -c cxa_atexit.c
