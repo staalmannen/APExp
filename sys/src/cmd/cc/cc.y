@@ -38,7 +38,7 @@ static Type *auto_deduct_type(Node*, Node*);
 %type	<node>	name block stmnt cexpr expr xuexpr pexpr
 %type	<node>	zelist elist adecl slist uexpr string lstring
 %type	<node>	xdecor xdecor2 labels label ulstmnt
-%type	<node>	adlist autoadlist edecor tag qual qlist
+%type	<node>	adlist autoadlist autoxdecor edecor tag qual qlist
 %type	<node>	abdecor abdecor1 abdecor2 abdecor3
 %type	<node>	zexpr lexpr init ilist forexpr
 %type	<node>	generic_assoc_list generic_assoc
@@ -223,14 +223,67 @@ adlist:
  * The variable type is deduced from the initializer expression.
  * Backward compat: auto x; (no init) declares an int, as in C89.
  */
+/*
+ * C23 auto type deduction: the FIRST declarator, and LNAME-rooted.
+ *
+ * THIS EXISTS BECAUSE `auto size_t x;' DID NOT COMPILE, which is
+ * ordinary C89 and also ordinary C23. `autoadlist' used to begin with
+ * `xdecor', and `xdecor -> xdecor2 -> tag -> ltag -> LNAME | LTYPE',
+ * so after LAUTO the parser could SHIFT a typedef name as the
+ * variable being declared. That collided with `cname: LAUTO', the
+ * storage-class reduction, and **yacc resolves shift/reduce in favour
+ * of SHIFT** -- so `auto size_t x;' took the deduction path, read
+ * `size_t' as the NAME, and died on the next token:
+ *
+ *	array_new_aligned.c:25 syntax error, last name: __T41392176
+ *
+ * EDG's generated C writes `auto <type> <name>;' for every local --
+ * **116,079 of them across 103 of its 133 files** -- so one
+ * shift/reduce conflict blocked essentially the whole port.
+ *
+ * `-std=' WOULD NOT HAVE FIXED THIS, and that is the finding rather
+ * than the fix. The conflict is resolved when yacc BUILDS THE TABLE,
+ * so no runtime flag has a say; and there is no dialect disagreement
+ * to arbitrate, because C23 kept `auto' as a storage-class specifier
+ * and its type inference applies only where `auto' is the SOLE type
+ * specifier. **Both standards want the same answer here.**
+ *
+ * The grammar can decide on its own, because `size_t' is LTYPE and
+ * `x' is LNAME -- different tokens. Rooting the first declarator at
+ * LNAME removes LTYPE from the shift set, so that lookahead reduces
+ * to the storage class, which is what both dialects ask for.
+ *
+ * `*' still shifts, and that is CORRECT rather than left over:
+ * `auto *p = &x;' is C23 deduction, while `auto *p;' as a storage
+ * class would need implicit int, gone since C99. Arrays and
+ * functions are absent deliberately -- C23 does not deduce them.
+ */
+autoxdecor:
+	LNAME
+	{
+		$$ = new(ONAME, Z, Z);
+		$$->sym = $1;
+		$$->type = $1->type;
+		$$->etype = TVOID;
+		if($$->type != T)
+			$$->etype = $$->type->etype;
+		$$->xoffset = $1->offset;
+		$$->class = $1->class;
+	}
+|	'*' zgnlist autoxdecor
+	{
+		$$ = new(OIND, $3, Z);
+		$$->garb = simpleg($2);
+	}
+
 autoadlist:
-	xdecor
+	autoxdecor
 	{
 		/* auto x; — C89 compat: declare as int, no initializer */
 		dodecl(adecl, CAUTO, types[TINT], $1);
 		$$ = Z;
 	}
-|	xdecor '=' init
+|	autoxdecor '=' init
 	{
 		/* auto x = expr; — C23 type deduction */
 		Node *initn = $3, *decl;
