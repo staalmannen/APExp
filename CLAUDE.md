@@ -2027,6 +2027,52 @@ live either way.
     `_Znwm`/`_Znam`/`_ZdlPv`/`_ZdaPv`, `__memzero` or
     `__abort_execution` -- so the first link is the measurement and
     the fix, if any, is one line naming `libedg.a`.
+    **AND THE LINK IS DOWN TO TWO THINGS, ONE A FLAG AND ONE A REAL
+    GAP.** With the regenerated corpus the `undefined:` list is a
+    SINGLE name and the rest is a `multiple initialization` family:
+    - **`-C` WAS ON `cmd/edg` AND NOT ON `lib/edg`, and an archive is
+      what hid it.** `ar` takes duplicate members silently, so
+      building `libedg.a` without `-C` looked clean; the clash
+      arrives only when the LINK pulls two members defining one
+      vague-linkage entity. `6l` answered
+      `(295) DATA _ZTSv+0(SB)/1,$118` / `multiple initialization` for
+      `_ZTSv`, `_ZTIv`, `_ZTSDn` and `_ZTIDn` -- the `void` and
+      `decltype(nullptr)` type strings and `type_info` objects --
+      **each defined by BOTH `throw.c` and `typeinfo.c`**, counted
+      rather than guessed. `asm.c:548` suppresses on `sym->dupok` and
+      `obj.c:908` sets that from the AGLOBL's DUPOK bit, which `-C`
+      is the only way to ask for; dupok is a property of the SYM, so
+      one side carrying it would have sufficed and **neither did**.
+      One line. *(The symbol name in that message --
+      `__tourite_needs_stdio_exit:` -- is stale `diag` context and
+      names nothing; read the DATA line above it.)*
+    - **`__cxa_finalize` IS A GAP EDG LEAVES OPEN, not one this tree
+      opened.** `include_c++/cxxabi.h:184` DECLARES the finalization
+      pair and `lib_src` defines neither, because on every platform
+      EDG targets the C++ runtime supplies them. There is none here.
+      `sys/src/ape/lib/edg/cxa_atexit.c` and `dso_handle.c` are the
+      two hand-written files in that directory, **not in libap**: a
+      C++ ABI name in a library every program links is `reject`
+      again, and in `libedg.a` they are members nothing pulls until
+      something asks.
+      **The ABI is the specification and that matters most where the
+      behaviour is easy to approximate.** Itanium 3.3.5.3 wants the
+      entry REMOVED BEFORE it is called and the list RE-SCANNED
+      afterwards, since a destructor may register more. A plain
+      descending `for` loop passes the ordering test and fails both,
+      observably -- `switchcase`-style, the naive version replicated
+      beside it gives **4 failures naming sections 3, 4a, 4b and 5b**
+      while the real one gives 0.
+      **`__dso_handle` IS ITS OWN FILE BECAUSE THE HOST ALREADY HAS
+      ONE**: glibc's `crtbeginS.o` defines it, so with the two in one
+      object the cross-check does not link at all. *That collision is
+      the measurement* -- the handle belongs to the C startup and the
+      finalizers to the C++ runtime, and the host says so by owning
+      exactly one of the two. cpfe references neither: `__dso_handle`
+      appears in `src/lower_init.c` only as a STRING LITERAL, because
+      cpfe EMITS references to it in the C it generates.
+      `cxaatexit-test.c` is the instrument and runs on both machines
+      unchanged, 0 failures on gcc.
   - **AND THE RUNTIME ADDS NOTHING libap ALREADY PROVIDES, checked
     rather than assumed.** `lib_src` holds `exit.c`, `main.c`,
     `error.c` and `memzero.c`, which is the shape that cost this tree
@@ -2217,6 +2263,13 @@ item -- *a port that builds and has never run is not a port*:
   `duplicate cases` ERROR, so a package that relied on the old
   behaviour fails loudly rather than quietly. That is the safe
   direction and is the refutation condition for this change.
+  **BOTH CONFIRMED: APExp BUILDS COMPLETELY AGAIN, chicken included.**
+  The full rebuild after the two compiler fixes completes, which is
+  the weakest useful result and also the only one available for a
+  change in the LEXER and the SWITCH TABLE: nothing downstream of
+  either produces a link error, so a completed build is a precondition
+  rather than a measurement. `longconst-test` and `switchcase-test`
+  are what measure them, and neither has run on the VM yet.
 - **bacon** (BASIC) -- **IT CONVERTS BASIC TO C ON APExp NOW**, 605
   lines in 0.854s for `bacongui-tk.bac`. What stopped the compile was
   not bacon: **pkg-config has never worked in this tree.**
@@ -2246,12 +2299,42 @@ item -- *a port that builds and has never run is not a port*:
   `1000000 * 1000000`, which overflows in `int` on gcc too because
   BaCon folds bare literals as `int`. 0 failures on gcc; not yet run
   under pcc.
-  **Two things for anyone automating it**: bacon PROMPTS on a compile
-  error and on leftover temporaries, so **`</dev/null` is required** or
-  a failing conversion hangs rather than reporting -- in a mk recipe, a
-  build that never returns. And **the exit status is NOT the failure
-  count** (BaCon's `END` takes no value, its `EXIT` leaves a SUB), so
-  read the `N failures` line.
+  **The exit status is NOT the failure count** (BaCon's `END` takes no
+  value, its `EXIT` leaves a SUB), so read the `N failures` line.
+  **AND THE RECIPE THIS FILE RECORDED WAS WRONG IN BOTH HALVES, which
+  the first VM run said in one screen.**
+  - **`-c cc`, not `-c pcc`.** bacon writes a `Makefile.bacon` naming
+    `$stem.o` and links that, so `-c pcc` answers
+    `??none??: cannot open file: bacon-test.bac.o` -- `pcc -c` writes
+    `.6`. *That is not bacon hardcoding something this tree cannot
+    meet*: `pcc.c:75` is
+    `objext = (strcmp(prog,"cc")==0) ? "o" : ot->o` and
+    `sys/src/ape/9src/cc.c` is the single line
+    `#include "../../cmd/pcc.c"` -- **`cc` and `pcc` are one binary
+    and the NAME chooses the extension.** The note here called `cc`
+    "the APE wrapper rather than pcc" and made naming pcc the point of
+    the exercise; `-c cc` is the same compiler under the name that
+    answers in the extension every Makefile expects. `-lm` resolves
+    too (`pcc.c:498` maps it to `libap.a`).
+  - **`BACON_IN_DOCKER=true`, not `</dev/null`.** Both prompt sites
+    (`bacon.bac:8306` and `:10489`) are ALREADY guarded by
+    `IF GETENVIRON$("BACON_IN_DOCKER") = "true"`, which answers `y`
+    without reading -- upstream's own escape for non-interactive use,
+    sitting unused while this file prescribed a worse one. **Closing
+    stdin does not make the prompt take its default, it makes bacon
+    DIE**: the generated `__b2c__input` calls `getdelim`, which
+    answers -1 at EOF, and -1 falls into the arm that raises
+    `Runtime error: function 'INPUT' ...: Error opening file: No such
+    file or directory`. **MEASURED ON glibc** by compiling those four
+    lines verbatim with stdin on `/dev/null` -- `total -1 -> RUNTIME
+    ERROR arm` -- so it is **BaCon's, on every platform**, and
+    `</dev/null` was converting a hang into a different failure rather
+    than into an answer. *An errno printed beside a message about
+    opening a file, when nothing was opened, is the sticky-errstr
+    shape arriving from an upstream runtime instead of from libap.*
+    `-q` is worth adding beside it and is not a substitute: it gates
+    only the error-report prompt (`IF NOT(g_QUIET)`), and the
+    temporary-files one has no such guard.
   **The stronger test is SELF-HOSTING and is not that file**:
   `bacon.bac` is 10,517 lines of BASIC whose output is bacon itself, so
   `bacon -c pcc bacon.bac` converting, compiling and then converting

@@ -28,9 +28,38 @@ EDGSRC=../../../external/edg/lib_src
 # and 0 warnings, which says the sources are clean and says nothing
 # about kencc.
 #
-# CFLAGS is `-c' alone on purpose: every diagnostic is wanted on the
-# first run through pcc, and a flag added to quiet one would hide the
-# rest.  `-J' arrives from pcc itself and is correct here -- EDG emits
+# CFLAGS WAS `-c' ALONE AND IS `-c -C' NOW, and the reason the first
+# spelling existed has expired rather than been overruled: every
+# diagnostic was wanted on the first run through pcc, and a flag added
+# to quiet one would have hidden the rest.  That run happened -- 50 of
+# 51 compile, `c99_complex.c' named by token before it -- so the first
+# run is spent.
+#
+# `-C' IS WHAT THE LINK NEEDS, and the measurement is from the link
+# rather than from reading.  An ARCHIVE takes duplicate members
+# silently, so building `libedg.a' without it looked clean; the clash
+# arrives when `cmd/edg' pulls two members that both define a
+# vague-linkage entity.  `6l' answered
+#
+#	(295) DATA _ZTSv+0(SB)/1,$118
+#	__tourite_needs_stdio_exit: multiple initialization
+#
+# for `_ZTSv', `_ZTIv', `_ZTSDn' and `_ZTIDn' -- the `void' and
+# `decltype(nullptr)' type-name strings and type_info objects --
+# **each of which `throw.c' and `typeinfo.c' both define**, counted
+# rather than guessed.  (The symbol name in that message is stale
+# `diag' context and names nothing: read the DATA line above it.)
+#
+# `6l/asm.c:548' suppresses the diagnostic on `sym->dupok', and
+# `6l/obj.c:908' sets that from the AGLOBL's DUPOK bit -- which `-C'
+# is the only way to ask for.  `cmd/edg' has carried `-C' since the
+# round that found it; **this archive did not, so neither definition
+# carried the bit and the suppression could not fire.**  It is a
+# property of the Sym, so one side carrying it would have been
+# enough, which is why the gap reads as "the flag does not work"
+# rather than as a missing flag.
+#
+# `-J' arrives from pcc itself and is correct here -- EDG emits
 # real `sizeof' expressions rather than the 132 baked-in sizes cfront's
 # C carried, so kencc computes every layout and conforming layout is
 # exactly what the generated code wants.
@@ -147,15 +176,44 @@ OFILES=\
 	vec_cctor.$O\
 	vec_newdel.$O\
 	vla_alloc.$O\
+	cxa_atexit.$O\
+	dso_handle.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
 CC=pcc
 LD=pcc
-CFLAGS= -c
+CFLAGS= -c -C
+
+# THE LAST TWO OFILES ARE OURS AND THE REST ARE EDG'S, which is why
+# they sit after the generated list rather than in alphabetical order
+# among it: `cxa_atexit.c' and `dso_handle.c' live in THIS directory
+# and every other name resolves under `$EDGSRC'.  EDG declares
+# `__cxa_atexit'/`__cxa_finalize' in `include_c++/cxxabi.h' and
+# defines neither, leaving them to the platform's C++ runtime -- so
+# the first link of `cmd/edg' answered
+#
+#	_Z12__call_dtorsv: undefined: __cxa_finalize
+#
+# and that is a gap EDG leaves open rather than one this tree opened.
+# Their own headers say the rest.
+#
+# AND THEY ARE COMPILED WITHOUT `-C', which is the point of the
+# separate rule rather than an accident of writing one.  `-C' marks
+# every TEXT and GLOBL in the translation unit dupok, which is right
+# for generated C where a duplicate is the same entity by
+# construction and wrong for a file somebody wrote: it would turn a
+# second definition of `__cxa_atexit' -- the exact collision these
+# two are placed to avoid -- into first-wins silence.
 
 %.$O: $EDGSRC/%.c
 	$CC $CFLAGS $EDGSRC/$stem.c
+
+cxa_atexit.$O: cxa_atexit.c
+	$CC -c cxa_atexit.c
+
+dso_handle.$O: dso_handle.c
+	$CC -c dso_handle.c
 
 clean:V:
 	rm -f *.[$OS]
