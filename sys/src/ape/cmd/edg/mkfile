@@ -109,11 +109,26 @@ EDGSRC=../../../external/edg/src
 # only here, because every duplicate in generated C is the same entity
 # by construction.  Nothing else in the tree passes it.
 #
-# And the fix for that is NOT here: it is an instantiation-mode flag at
-# the next TRANSLATION, so cpfe emits the definitions.  The NOTE says
-# why `--one_instantiation_per_object' is the wrong lever -- it covers
-# only part of the set and makes the output depend on an `edg_prelink'
-# phase that mk cannot naturally express.
+# CONFIRMED, AND THE PREDICTION HELD THIS TIME: with `-C' the
+# redefinitions are gone and what is underneath is `undefined:' on
+# `_ZN3edg...I...E' names -- template instantiations, every one, with
+# no vtable, no typeinfo and no plain C function among them.
+#
+# AND THE FIX IS A RE-TRANSLATION, NOT ANYTHING HERE.  EDG's own
+# option table (`src/cmd_line.c', readable in the committed corpus)
+# gives `--instantiate' with values `used', `all', `local' and `none',
+# short form `-t'.  The default leaves these to an `edg_prelink' pass
+# that mk cannot naturally express.
+#   `-tused'  emits every used template in EVERY translation unit with
+#             external linkage.  That produces duplicates -- which is
+#             precisely what `-C' now discards, so the two go
+#             together and neither is sufficient alone.
+#   `-tlocal' gives each unit its own INTERNAL-linkage copy and needs
+#             no `-C' at all, at the cost of a copy per unit.
+# `-tused' is the better pair, because `-C' is needed REGARDLESS: the
+# non-template duplicates (inline members such as `edg::skip_typerefs'
+# at 41 copies, and 499 function-local statics) are not touched by any
+# instantiation mode.
 #
 # One thing the runtime does NOT do, checked rather than assumed,
 # because this tree has paid for it once: it adds nothing libap
@@ -210,12 +225,22 @@ UPDATE=\
 	mkfile\
 	${OFILES:%.$O=%.c}\
 
+# BEFORE THE INCLUDE, AND THAT IS LOAD-BEARING.  `mkone''s rule is
+# `$O.out: $OFILES $LIB', and mk binds a rule's prerequisites when it
+# READS the rule -- so `LIB=' written after the include expands to
+# nothing and the archive never reaches the link line.  It fails in
+# the quietest way available: the link runs, looks right, and reports
+# the archive's symbols as undefined.  Measured, not reasoned -- the
+# first run with `LIB=' below the include ended
+# `... types.6 unicode_name_fsm.6' with no archive on it and
+# `undefined: _ZnwyPv', the one symbol this archive is here for.
+LIB=$APEXPROOT/$objtype/lib/ape/libedg.a
+
 <$APEXPROOT/sys/src/cmd/mkone
 
 CC=pcc
 LD=pcc
 CFLAGS= -c -C
-LIB=$APEXPROOT/$objtype/lib/ape/libedg.a
 
 %.$O: $EDGSRC/%.c
 	$CC $CFLAGS $EDGSRC/$stem.c
