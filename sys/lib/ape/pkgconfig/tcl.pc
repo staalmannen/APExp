@@ -1,0 +1,31 @@
+# Tcl, for APExp.  Hand-written: APExp does not run Tcl's configure,
+# so this is the companion to sys/src/ape/lib/tcl/tclConfig.h and has
+# to be kept in step with it -- the same arrangement perl's Config.pm
+# and bacon's config.h already have here.
+#
+# Cflags AND Libs ARE DELIBERATELY EMPTY, and that is the whole design
+# rather than an omission.
+#
+#   Cflags: /sys/include/ape is already on pcc's default include path,
+#   so a -I naming it would be noise, and naming anything else would
+#   put a second copy of tcl.h ahead of the real one -- which is how
+#   the lib/intl `lock.h' shadow broke bash.
+#
+#   Libs: kencc records archives from `#pragma lib', and
+#   /sys/include/ape/tcl.h carries `#pragma lib "/$M/lib/ape/libtcl.a"'
+#   already.  A `-l' here would be worse than useless: 6l resolves -l
+#   against /$objtype/lib (6l/obj.c:405), not /$objtype/lib/ape, so it
+#   would name a file that does not exist.
+#
+# So this file exists to answer the QUESTION "is Tcl present, and at
+# what version" -- which is all `pkg-config --exists' and a configure
+# script actually need -- rather than to carry flags Plan 9 supplies
+# by another route.  A program that includes <tcl.h> is linked
+# correctly with no flags at all; one that does not include it was
+# never going to work here anyway.
+
+Name: Tcl
+Description: Tool Command Language (APExp)
+Version: 9.0.3
+Cflags:
+Libs:

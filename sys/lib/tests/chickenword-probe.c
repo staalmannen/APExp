@@ -37,9 +37,28 @@
  * passes with the flag says nothing on its own -- it looks identical
  * whether the flag works or the header never had the problem.
  *
- * Correct on gcc too, where __LP64__ supplies C_SIXTY_FOUR by itself
- * and C_word is `long' at 8 bytes: 0 failures, and the banner reads
- * LP64 rather than LLP64.
+ * Correct on gcc too, where __LP64__ supplies C_SIXTY_FOUR by itself,
+ * so OMIT -DC_SIXTY_FOUR there or it is a redefinition warning.  That
+ * asymmetry is the finding in miniature: the host needs no flag
+ * precisely because its model is the one chicken.h:81 knows about.
+ *
+ * AND THE HOST RUNS BOTH SIDES, so this needed no VM round at all.
+ * `-U__LP64__ -U_LP64' takes the markers away and reproduces kencc's
+ * configuration exactly:
+ *
+ *   gcc -o cwp -I../../src/external/chicken -DHAVE_CHICKEN_CONFIG_H \
+ *       -DHAVE_ALLOCA_H -DC_LLP chickenword-probe.c          # fixed
+ *   gcc -o cwp -I../../src/external/chicken -DHAVE_CHICKEN_CONFIG_H \
+ *       -DHAVE_ALLOCA_H -DC_LLP -U__LP64__ -U_LP64 \
+ *       chickenword-probe.c                                  # shipped
+ *
+ * Measured:
+ *   fixed    C_SIXTY_FOUR defined, C_word 8, 0 failures
+ *   shipped  C_SIXTY_FOUR NOT defined, C_word 4, pointer 8,
+ *            1 failure, exit 1
+ *
+ * *That pair is the whole diagnosis*, and one of the two is the build
+ * that crashed.
  */
 
 /*

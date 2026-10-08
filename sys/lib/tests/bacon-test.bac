@@ -1,0 +1,190 @@
+' bacon-test.bac -- is the bacon -> pcc chain actually working?
+'
+' WHY THIS FILE EXISTS: BaCon ships NO tests.  `bacon.bac' and the
+' five GUIs are the entire .bac corpus upstream carries, so there was
+' nothing to adopt and "run bacon's test suite" is not an option that
+' exists.  This is written in this directory's own convention instead:
+' print PASS/FAIL per case, exit with the number of failures, and say
+' at the top which bug it came from.
+'
+' AND IT IS AIMED, NOT GENERAL.  A BASIC feature tour would mostly
+' measure BaCon, which upstream already tests by shipping it.  What is
+' untested is the CHAIN -- bacon's generated C compiled by pcc and run
+' on 9front -- so every section below targets something this tree has
+' actually been bitten by:
+'
+'   1-2  INTEGER width.  kencc's `long' is 32-bit with 64-bit
+'        pointers, and BaCon's INTEGER is a C `long' in the generated
+'        source.  This tree has lost rounds to exactly that: tar's
+'        `union block', Gay's strtod bignum word, and CHICKEN's
+'        C_word being `int' on a 64-bit machine.
+'   3    FLOATING.  `long double' is `double' under kencc
+'        (cc/sub.c's simplet maps BDOUBLE|BLONG to TDOUBLE), and
+'        scalbn's `2^1023' typo made every subnormal wrong here.
+'   4    String handling, which is where BaCon does most of its
+'        malloc/free work -- and `free()' needing exactly the pointer
+'        `malloc()' returned is one of this tree's invariants.
+'   5    Arrays and bounds.
+'   6    SUB/FUNCTION, i.e. whether generated prototypes survive.  A
+'        call with no prototype in scope corrupts its arguments under
+'        kencc, which is this tree's single most-repeated invariant.
+'   7    FOR/WHILE/control flow, the cheapest possible smoke test, so
+'        that a total failure still prints something before section 1.
+'
+' RUN IT, on 9front inside apexp-sh:
+'
+'   cd sys/lib/tests
+'   bacon -c pcc bacon-test.bac </dev/null && ./bacon-test
+'
+' `</dev/null' IS NOT DECORATION.  bacon prompts -- "see full error
+' report (y/[n])?" on a compile error, and "N temporary files found!
+' Do you want to delete them ([y]/n)?" when a previous run left any --
+' so without it a failing conversion HANGS rather than reporting, and
+' in a mk recipe that is a build that never returns.  With stdin
+' closed the prompt's own INPUT fails and bacon stops, which is the
+' behaviour a build wants.  Clear `bacon-test.bac.*' and
+' `bacon-test.check.h' between runs or the second prompt fires on
+' files the first run left behind.
+'
+' `bacon -c pcc' is the point of the whole file: bacon's default is
+' `cc', and this tree's `cc' is the APE wrapper rather than pcc, so
+' naming the compiler is what makes this a test of the CHAIN rather
+' than of whatever `cc' happens to resolve to.
+'
+' CHECKED ON THE HOST FIRST, which is this directory's rule and which
+' caught two bugs in this file: build bacon from
+' sys/src/external/BASIC/src/bacon.bac.c with gcc, then
+' `./bacon -c gcc bacon-test.bac </dev/null && ./bacon-test'.
+' **0 failures and no warnings** there, and it took three rounds to
+' get that: a LOCAL redeclaring a FUNCTION parameter, then section 2
+' overflowing in `int' on gcc itself.  A case that fails on the host
+' is a bug in the TEST, not in APExp, and that is the only way to
+' tell the two apart without a VM -- it earned its place twice here
+' before the file was ever carried to 9front.
+'
+' THE STRONGER TEST IS SELF-HOSTING AND IS NOT THIS FILE.  bacon.bac
+' is 10,517 lines of BASIC whose output is bacon itself, so
+' `bacon -c pcc bacon.bac' converting cleanly, compiling, and then
+' converting this file in turn is an end-to-end check nothing here can
+' match -- the same shape as EDG's self-translation.  Do that second;
+' do this first, because when self-hosting fails it says nothing about
+' which feature broke.
+
+OPTION COLLAPSE TRUE
+
+DECLARE fail TYPE NUMBER
+fail = 0
+
+SUB check(STRING nm$, STRING got$, STRING want$)
+    IF got$ = want$ THEN
+        PRINT "PASS ", nm$
+    ELSE
+        PRINT "FAIL ", nm$, " got <", got$, "> want <", want$, ">"
+        INCR fail
+    END IF
+END SUB
+
+PRINT "bacon-test"
+
+' --- section 7 first, on purpose: control flow is what every later
+' --- section needs, so a failure here explains all of them at once.
+DECLARE acc TYPE NUMBER
+acc = 0
+FOR i = 1 TO 10
+    acc = acc + i
+NEXT
+check("7a FOR sums 1..10", STR$(acc), "55")
+
+acc = 0
+WHILE acc < 5 DO
+    INCR acc
+WEND
+check("7b WHILE terminates", STR$(acc), "5")
+
+' --- section 1: INTEGER width.  BaCon's INTEGER is a C `long' in the
+' --- generated source, and kencc's `long' is 32 bits.  If a value
+' --- beyond 2^31 survives, the generated type is wide enough; if it
+' --- wraps, every later arithmetic result in any bacon program on
+' --- this platform is suspect.
+DECLARE big TYPE NUMBER
+big = 2147483647
+check("1a 2^31-1 holds", STR$(big), "2147483647")
+
+big = 2147483647
+big = big + 1
+check("1b 2^31 does not wrap", STR$(big), "2147483648")
+
+' --- section 2: a value needing the full 64 bits.
+'
+' THROUGH VARIABLES, NOT LITERALS, and the host is what taught me the
+' difference.  `huge = 1000000 * 1000000' FAILS ON gcc TOO -- the
+' warning is `integer overflow in expression of type int results in
+' -727379968' -- because BaCon emits bare numeric literals as C `int'
+' constants and the multiply overflows before it is ever assigned to
+' the NUMBER.  *That measures BaCon's constant folding, not this
+' chain*, and by this directory's rule a case that fails on the host
+' is a bug in the test.  Assigning the operands first makes them
+' NUMBER, i.e. C `long', which is the width this section is about.
+DECLARE a TYPE NUMBER
+DECLARE b TYPE NUMBER
+DECLARE huge TYPE NUMBER
+a = 1000000
+b = 1000000
+huge = a * b
+check("2a 10^12 through NUMBER operands", STR$(huge), "1000000000000")
+
+' --- section 3: FLOATING.  Exact small values only -- a test that
+' --- compares formatted floats to many digits measures the FORMATTER
+' --- and would fail on a correct library, which is the trap
+' --- `binary-53.25' cost this tree three rounds.
+DECLARE f TYPE FLOATING
+f = 1.0 / 4.0
+check("3a 1/4 exact", STR$(f), "0.25")
+
+f = 2.0
+f = f * 3.0
+check("3b 2*3", STR$(f), "6")
+
+' --- section 4: strings.  CONCAT$ and MID$ are where BaCon allocates.
+DECLARE s$ TYPE STRING
+s$ = CONCAT$("abc", "def")
+check("4a CONCAT$", s$, "abcdef")
+check("4b MID$", MID$(s$, 2, 3), "bcd")
+check("4c LEN", STR$(LEN(s$)), "6")
+check("4d UCASE$", UCASE$(s$), "ABCDEF")
+
+' --- section 5: arrays.
+DECLARE arr[5] TYPE NUMBER
+FOR i = 0 TO 4
+    arr[i] = i * i
+NEXT
+check("5a arr[4]", STR$(arr[4]), "16")
+check("5b arr[0]", STR$(arr[0]), "0")
+
+' --- section 6: a FUNCTION returning a value, which is the case the
+' --- missing-prototype invariant breaks: an undeclared function
+' --- returns implicit int under kencc, so a non-int return arrives
+' --- truncated with no diagnostic at all.
+FUNCTION twice(NUMBER n)
+    RETURN n * 2
+END FUNCTION
+
+check("6a FUNCTION returns int", STR$(twice(21)), "42")
+
+FUNCTION namestr$(STRING p$)
+    RETURN CONCAT$("<", p$, ">")
+END FUNCTION
+
+check("6b FUNCTION returns STRING", namestr$("x"), "<x>")
+
+PRINT fail, " failures"
+
+' READ THE COUNT, NOT THE EXIT STATUS.  This directory's convention is
+' to exit with the number of failures, and this file CANNOT: BaCon's
+' `END' takes no value, and its `EXIT' leaves a SUB or FUNCTION rather
+' than the process.  So the status is 0 either way and the "N
+' failures" line above is the result.  Said here rather than left to
+' be discovered, because a harness reading `$status' would call a
+' failing run a pass -- which is the same trap `bash-comsub-test.sh'
+' carries a warning for.
+END
