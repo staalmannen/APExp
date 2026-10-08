@@ -132,13 +132,25 @@ EDGSRC=../../../external/edg/src
 #
 # One thing the runtime does NOT do, checked rather than assumed,
 # because this tree has paid for it once: it adds nothing libap
-# already provides.  Every DEFINITION under `lib_src' is `_Z'-mangled
-# or `__'-prefixed -- `exit.c' defines `_Z4exiti', `memzero.c' defines
-# `__memzero' -- and the plain C names (`memset', `memcpy', `malloc',
+# already provides.  `exit.c' defines `_Z4exiti', `memzero.c' defines
+# `__memzero', and the plain C names (`memset', `memcpy', `malloc',
 # `free', `abort', `exit') appear only as DECLARATIONS, so they resolve
 # to libap rather than replacing it.  *The filenames read alarmingly
 # and the definitions do not*, which is the declaration/definition
 # distinction the `reject' round cost a build over.
+#
+# **THIS NOTE USED TO SAY "EVERY definition under lib_src is
+# `_Z'-mangled or `__'-prefixed", AND THAT SENTENCE COST A ROUND.**
+# It is a reading, and the linker's own answer -- all 51 files through
+# gcc, `nm --defined-only -g' over the objects -- is FOUR names that
+# are neither: `_ctors', `_dtors', `_main' and `_new_handler'.  And
+# `_main' IS `6l''s DEFAULT ENTRY POINT (`6l/obj.c:305'), so
+# `libedg.a' standing ahead of libap on this link line hijacked the
+# entry of every cpfe built here and the binary faulted at `pc=argc'
+# before reaching `main'.  `lib/edg/mkfile' carries the full account
+# and the fix.  *A claim about what a corpus defines is one `nm' away
+# from being a measurement, and an almost-true one is worse than
+# none* -- it reads as having been checked.
 
 TARG=cpfe
 

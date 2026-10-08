@@ -618,3 +618,69 @@ Plan 9 headers and are unreachable from EDG, so they were left.
 
 The four that remain are reported as findings in their own right and
 are not fixed here; they are not EDG's problem either.
+
+
+cpfe LINKED AND THEN CRASHED ON EVERY RUN, AND THE FAULTING ADDRESS
+WAS `argc'
+-------------------------------------------------------------------
+
+`cpfe --help' answered
+
+	cpfe 78213: suicide: sys: trap: fault read addr=0x2 pc=0x2
+
+and `pc=0x2' is a JUMP to address 2, i.e. a transfer through a value
+that is not code -- the same family as the recorded bash `pc=0x0'.
+
+THE CAUSE IS A NAME COLLISION WITH THE LINKER'S ENTRY POINT.
+`lib_src/main.c' defines `void _main(void)', EDG's static-init helper,
+the one a target's own crt is expected to call.  `6l/obj.c:305' is
+`INITENTRY = "_main"', and `sys/src/ape/lib/ap/arch/amd64/main9.s:3'
+is `TEXT _main(SB), 1, $0'.  `6l' creates that name as an SXREF at
+startup and satisfies it from the FIRST archive on the link line that
+defines it -- and `cmd/edg/mkfile' names `libedg.a' ahead of libap.
+So the program's entry became EDG's helper, which ran
+`_Z12__call_ctorsv' (returning at once: `vars.c:49' has `__head' null
+and `munch_ctors.c' defines `_ctors[1] = {0}', so the `_ctors' loop
+terminates on its first test) and then executed a plain `RET'.
+
+THE ARITHMETIC IS THE CONFIRMATION.  `main9.s' reads the kernel's
+argument block at `0(SP)', so `0(SP)' at entry holds argc -- and that
+is what the `RET' popped and jumped to.  `cpfe --help' is argc 2.
+*A faulting pc equal to the argument count could not have arisen any
+other way*, and it is falsifiable with no rebuild: `cpfe' alone must
+have given `pc=0x1', `cpfe a b c' `pc=0x4'.
+
+`-C' IS NOT IMPLICATED, which was worth checking rather than assuming
+of the blunt flag standing next to it.  There was no duplicate for
+`dupokall' to silence: `main9.$O' is pulled only to satisfy the entry
+symbol, since its other global `_tos' is referenced from `profile.c'
+alone -- so with `libedg.a' answering first that member never reached
+the link.  First-archive-wins, and no linker has a diagnostic for it.
+
+FIXED BY RENAMING RATHER THAN BY DROPPING THE OBJECT.  `lib/edg/mkfile'
+compiles that one file with `-D_main=__edg_main'; nothing anywhere
+references `_main', so removing the member from OFILES would have
+linked equally well and would have thrown away the only entry point
+into EDG's static-initialisation machinery.
+
+THE STATIC-INIT GAP IS REAL AND IS RECORDED, NOT FIXED.  With `_main'
+no longer the entry, nothing calls `_Z12__call_ctorsv' at all, so a
+C++ program cpfe translates would not run its static constructors.
+cpfe itself does not need it -- it runs, which is the measurement --
+and cpfe does not emit a call to `_main' either: the name occurs in
+the whole 133-file corpus exactly twice, both in `lib_src/main.c',
+with no string literal of it in the emitter.  Upstream's convention is
+a crt that calls it; this target's crt (`main9.s' -> `_callmain' ->
+`_apemain' -> `main') does not.  The eventual answer is the APE
+startup or the generated `main' calling `__edg_main'.
+
+AND THE SWEEP IS WHAT SAYS `_main' IS ALONE -- one command against a
+round of reading.  All 51 `lib_src' files through gcc, then
+`nm --defined-only -g' over the objects, gives exactly FOUR external
+definitions that are neither `_Z'-mangled nor `__'-prefixed:
+`_ctors', `_dtors', `_main' and `_new_handler'.  The other three
+collide with nothing in libap or kencc.  **`cmd/edg/mkfile' asserted
+that every definition under `lib_src' is `_Z'-mangled or
+`__'-prefixed, and that sentence is the one that would have found
+this.**  It was a reading presented as a check, and an almost-true
+claim is worse than none because it reads as having been verified.
