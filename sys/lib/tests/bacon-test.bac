@@ -34,27 +34,66 @@
 ' RUN IT, on 9front inside apexp-sh:
 '
 '   cd sys/lib/tests
-'   bacon -c pcc bacon-test.bac </dev/null && ./bacon-test
+'   BACON_IN_DOCKER=true bacon -q -c cc bacon-test.bac && ./bacon-test
 '
-' `</dev/null' IS NOT DECORATION.  bacon prompts -- "see full error
-' report (y/[n])?" on a compile error, and "N temporary files found!
-' Do you want to delete them ([y]/n)?" when a previous run left any --
-' so without it a failing conversion HANGS rather than reporting, and
-' in a mk recipe that is a build that never returns.  With stdin
-' closed the prompt's own INPUT fails and bacon stops, which is the
-' behaviour a build wants.  Clear `bacon-test.bac.*' and
-' `bacon-test.check.h' between runs or the second prompt fires on
-' files the first run left behind.
+' `-c cc' AND NOT `-c pcc', WHICH IS THE OPPOSITE OF WHAT THIS FILE
+' USED TO SAY.  bacon writes a `Makefile.bacon' whose rules name
+' `$stem.o' (bacon.bac:10440-10442) and then links that object, so
+' with `-c pcc' the run reads
 '
-' `bacon -c pcc' is the point of the whole file: bacon's default is
-' `cc', and this tree's `cc' is the APE wrapper rather than pcc, so
-' naming the compiler is what makes this a test of the CHAIN rather
-' than of whatever `cc' happens to resolve to.
+'   Compiling 'bacon-test.bac'... pcc -c bacon-test.bac.c
+'   pcc -o bacon-test bacon-test.bac.o   -lm
+'   ??none??: cannot open file: bacon-test.bac.o
+'
+' because `pcc -c' writes `bacon-test.bac.6'.  **That is not bacon
+' hardcoding a unix assumption this tree cannot meet**: `pcc.c:75' is
+' `objext = (strcmp(prog, "cc") == 0) ? "o" : ot->o;' and
+' `sys/src/ape/9src/cc.c' is one line, `#include "../../cmd/pcc.c"' --
+' so `cc' and `pcc' are THE SAME BINARY and the name chooses `.o'
+' against `.6'.  The earlier note here called `cc' "the APE wrapper
+' rather than pcc" and argued that naming pcc was what made this a
+' test of the chain; *`cc' is pcc, under the name that answers in the
+' extension every Makefile in the world expects*, so `-c cc' tests
+' exactly the same chain and is the one that links.  `-lm' resolves
+' too: `pcc.c:498' maps it to `libap.a'.
+'
+' `BACON_IN_DOCKER=true' IS UPSTREAM'S OWN ESCAPE AND `</dev/null' IS
+' NOT.  bacon prompts twice -- "N temporary files found! Do you want
+' to delete them ([y]/n)?" (bacon.bac:8309) and "see full error report
+' (y/[n])?" (10492) -- and **both sites are already guarded by
+' `IF GETENVIRON$("BACON_IN_DOCKER") = "true"', which answers `y'
+' without reading anything.**
+'
+' Closing stdin instead does NOT make the prompt take its default; it
+' makes bacon DIE.  The generated `__b2c__input' is
+'
+'   total = getdelim(&(*result), &size, ASC(sep), stdin);
+'   if(total == 0) ... else if(total > 0 && ...) ...
+'   else { ERROR = 2; RUNTIMEFERR("INPUT", ERROR, k, l); }
+'
+' and `getdelim' answers -1 at EOF, which falls into the `else' --
+' `Runtime error: function 'INPUT' ...: Error opening file: No such
+' file or directory', an errno left over from somewhere else dressed
+' up as a cause.  **MEASURED ON glibc**, by compiling those four
+' lines verbatim with stdin on /dev/null: `total -1 -> RUNTIME ERROR
+' arm'.  So it is BaCon's, on every platform, and the `</dev/null'
+' this file used to require was turning a hang into a different
+' failure rather than into an answer.
+'
+' `-q' is worth having beside it but is not a substitute: it gates
+' only the error-report prompt (`IF NOT(g_QUIET)' at 10488), and the
+' temporary-files one at 8306 has no such guard.
+'
+' Clear `bacon-test.bac.*' and `bacon-test.check.h' between runs
+' anyway -- with the prompt answered automatically the leftovers are
+' silently deleted, which is right for a test and surprising if you
+' were keeping them.
 '
 ' CHECKED ON THE HOST FIRST, which is this directory's rule and which
 ' caught two bugs in this file: build bacon from
 ' sys/src/external/BASIC/src/bacon.bac.c with gcc, then
-' `./bacon -c gcc bacon-test.bac </dev/null && ./bacon-test'.
+' `BACON_IN_DOCKER=true ./bacon -q -c gcc bacon-test.bac &&
+' ./bacon-test'.
 ' **0 failures and no warnings** there, and it took three rounds to
 ' get that: a LOCAL redeclaring a FUNCTION parameter, then section 2
 ' overflowing in `int' on gcc itself.  A case that fails on the host
