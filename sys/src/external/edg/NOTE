@@ -980,3 +980,58 @@ re-translation with the pre-include actually in effect for `target.c',
 and it would fix `wchar_t', the field alignments, pointer-to-member,
 `jmp_buf' and `setjmp' in one go -- *every item on the list above is a
 symptom of the same miss*.
+
+
+AND THAT COMMAND FAULTS ON THE VM -- `fault read addr=0x68
+pc=0x7e2d88' -- WHICH IS NOT A CONFIGURATION PROBLEM AT ALL
+----------------------------------------------------------------
+
+With the flag in place cpfe no longer refuses: it accepts the target,
+accepts the option, and then dies inside real work.  *Which is itself
+the first piece of information*: with `--target win64' alone the same
+cpfe gave a clean `catastrophic error' about the macro file, so option
+parsing and target selection are both past, and the fault is
+downstream of them.
+
+**THE HOST DOES NOT CRASH ON THE SAME COMMAND, which puts this on the
+kencc/libap side rather than on EDG's.**  The host `cpfe' built from
+the same commit with the same target configuration, given the same
+flags and the same four `--sys_include' directories (APE's headers
+staged), exits **0** and writes the expected C:
+
+	/* Translated by the Edison Design Group C++/C front end */
+	extern int __EDGCPFE__7_0;
+	struct S; struct S { int x;};
+	extern int _Z1fP1S(struct S *s); ...
+
+So the two runs differ in the compiler that built cpfe and in nothing
+else that has been identified.  *That is the same partition cfront's
+crash had*, and there the answer was a layout rule.
+
+THE STATIC-INIT GAP IS NOT THIS, AND IT IS NOW MEASURED RATHER THAN
+ASSUMED.  It was the obvious suspect: `-D_main=__edg_main' means
+nothing calls `_Z12__call_ctorsv', so a C++ global needing dynamic
+initialisation would stay zero and be dereferenced -- exactly the
+shape of a read at a small offset from null.  **One grep settles it:
+the whole 133-file corpus contains exactly ONE static-init routine**,
+`__sti___9_fe_init_c_2cbd8fba' in `src/fe_init.c:55031', and its whole
+body assigns **0** to the sixteen members of
+`edg::diagnostic_counters' -- values a BSS global already has.  So not
+calling it costs cpfe nothing.  *The gap is real for programs cpfe
+TRANSLATES and inert for cpfe itself*, and those are two different
+claims; this one is now the measured half.
+
+WHAT TO ASK NEXT, in order, because a `sys:' trap leaves the process
+BROKEN and therefore readable:
+
+  1. `ps | grep cpfe' -- it should still be there.
+  2. `acid <pid>' then **`lstk()'**, not `stk()': this tree has twice
+     had `stk()''s arguments name the wrong mechanism while the
+     LOCALS named the right one.  Then `echo kill > /proc/<pid>/ctl',
+     since a Broken process keeps its memory.
+  3. `ls -l /tmp/t.c'.  If cpfe wrote any C before dying it reached
+     the back end and the fault is in wrap-up; an absent or empty file
+     puts it in the front end.
+  4. The same command on an EMPTY `.cpp'.  Same `pc' means the input
+     is irrelevant and the fault is in start-up; a different outcome
+     means it is in translating this particular source.

@@ -2198,6 +2198,23 @@ live either way.
     state is entry 0 carrying kencc's values, and *every item on the
     divergence list is a symptom of the same miss*. Command and full
     diff in the NOTE.
+  - **AND WITH THAT FLAG cpfe FAULTS -- `fault read addr=0x68
+    pc=0x7e2d88` -- WHICH IS NOT A CONFIGURATION PROBLEM.** Option
+    parsing and target selection are both past (the same cpfe gave a
+    clean `catastrophic error` one flag earlier), so it dies in real
+    work. **The HOST cpfe, same commit, same flags, same four
+    `--sys_include` directories, exits 0 and writes the expected C** --
+    so this is the kencc/libap side, the cfront partition again.
+    **The static-init gap is NOT it, and that is measured rather than
+    assumed**: the whole 133-file corpus holds exactly ONE
+    `__sti__` routine (`fe_init.c:55031`) and its body assigns **0** to
+    sixteen members of `diagnostic_counters` -- values a BSS global
+    already has. *The gap is real for what cpfe TRANSLATES and inert
+    for cpfe itself; two different claims.* A `sys:` trap leaves the
+    process **Broken and readable**, so the next step is `acid <pid>`
+    and **`lstk()`** (locals, not `stk()`'s arguments -- twice burnt),
+    then whether `/tmp/t.c` exists and whether an EMPTY input faults at
+    the same `pc`.
   - **THERE IS NO C++ STANDARD LIBRARY HERE AND EDG SHIPS NONE, and
     the EXCEPTION MODEL decides what could fill the gap.** `lib_src`
     is the **libsupc++/libc++abi layer** -- new/delete, vtables, RTTI,
