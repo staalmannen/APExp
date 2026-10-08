@@ -2139,6 +2139,34 @@ item -- *a port that builds and has never run is not a port*:
   so they would be 32-bit limits for a 64-bit word -- **defined and
   never used, zero uses in the tree**, and upstream carries the same
   latent bug on MinGW64.
+  **AND TURNING `C_SIXTY_FOUR` ON EXPOSED A KENCC BUG RATHER THAN A
+  CHICKEN ONE: A SINGLE `L` CAPPED A CONSTANT'S WIDTH.** The rebuild
+  answered `runtime.c:12525 duplicate cases in switch 0` eight times,
+  **and the value in that message is the evidence** -- not a collision
+  between two numbers, every label in both of `decode_literal2`'s
+  switches had become **0**. `chicken.h` spells its fourteen header
+  tags `0x0n00000000000000L`, one `L`, correct on any LP64 system;
+  `cc/lex.c`'s widening path was guarded by `(c1 & Numlong) == 0`, so
+  it ran only for constants with NO suffix, and `convvtox(vv, TLONG)`
+  threw away every significant bit of all fourteen. **C99 6.4.4.1 says
+  the opposite**: an `l`/`L` constant takes the first of long,
+  unsigned long, long long, unsigned long long *in which its value can
+  be represented* -- **`L` is a floor on the type, not a ceiling.**
+  Guard removed; the threshold is the same `w` as for an unsuffixed
+  constant, since `long` and `int` are both 32 bits here.
+  *This is not a chicken fix: it is every LP64 upstream header in the
+  tree that writes a 64-bit constant with one L*, which is the normal
+  spelling there, and kencc has been truncating all of them with a
+  warning nobody reads in a 2000-line header.
+  **`longconst-test.c` is the regression test and its SECTION 3 is the
+  control**: `0x80000000L` must stay 32 bits, because unsigned long
+  can represent it -- a patch that widened on the first `L` passes
+  sections 1 and 2 and fails there. 0 failures on gcc, **and the gcc
+  run says only that the test is written correctly**: the host's
+  `long` is 64 bits, so sections 1 and 2 are true there because
+  nothing overflows. Section 0 prints `sizeof(long)` so the two runs
+  tell themselves apart. *Not compiled anywhere yet -- kencc needs
+  Plan 9's `<u.h>`/`<libc.h>`, so the first build is the VM's.*
 - **bacon** (BASIC) -- **IT CONVERTS BASIC TO C ON APExp NOW**, 605
   lines in 0.854s for `bacongui-tk.bac`. What stopped the compile was
   not bacon: **pkg-config has never worked in this tree.**
