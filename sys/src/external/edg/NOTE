@@ -179,12 +179,78 @@ Absent because it will not translate:
   side) translates: its use of those headers is behind a guard.
   Unchanged from round 1.
 
-NO MKFILE YET.  Nothing here has been built with pcc.
+MKFILES EXIST NOW -- sys/src/ape/lib/edg (libedg.a, mksyslib, 51
+files) and sys/src/ape/cmd/edg (cpfe, mkone, 75 files).  Neither is in
+sys/src/cmd/mkfile's lists, deliberately: one failing entry aborts the
+whole tree's mk.  Build lib/edg first and with `mk -k'; each mkfile's
+header says why.  util/'s six binaries have no mkfile and block
+nothing.
+
+WHAT KENCC IS AND IS NOT EXPECTED TO REFUSE
+-------------------------------------------
+Swept over all 133 files with COMMENTS, STRING AND CHARACTER LITERALS
+AND `#line' STRIPPED FIRST, which is the whole measurement rather than
+a tidying step: a raw grep reports `alignof' 2343 times, `typeof' 425,
+`static_assert' 1156 and `_Complex' 702, and after stripping every one
+of those is ZERO.  They were EDG's own diagnostic text and its own
+mangled names -- `_ZN3edg27ec_wrong_entity_for_alignasE',
+`_ZN3edg16ec_static_assertE' -- i.e. the word inside a longer
+identifier, never a keyword.  (Two different word-boundary mistakes of
+mine produced those numbers before the stripping did; the same trap as
+counting `bool'/`nullptr' in round 1.)
+
+  ZERO, after stripping:  __attribute__, asm/__asm, ({...}) statement
+  expressions, __builtin_*, inline/__inline, restrict/__restrict,
+  _Complex, _Imaginary, _Atomic, _BitInt, _Decimal*, __int128,
+  _Alignas, _Alignof, alignas, alignof, typeof, _Static_assert,
+  static_assert, _Generic, _Noreturn, _Thread_local, nullptr,
+  constexpr, computed goto, #pragma, wide/UTF string literals,
+  __label__, designated initializers, anonymous struct/union members,
+  VLAs, K&R definitions.
+
+  NOT zero, and these three files are PREDICTED TO FAIL:
+
+      lib_src/c99_complex.c   _Float16, __bf16, __float80, __float128
+      lib_src/thread_dtor.c   __thread
+      lib_src/dtor_list.c     __thread
+
+  All three are a feature of the HOST COMPILER rather than anything of
+  EDG's design, which is exactly why `gcc -fsyntax-only' reports 0
+  errors over them: *the host compiler is the one that put them there.*
+  c99_complex.c is the C99 `_Complex' runtime and builds its own
+  `struct _Complex_float16 { _Float16 _Vals[2]; }'; the other two are
+  thread-local destructor registration, and kencc has no TLS.
+  They are LEFT IN OFILES so that `mk -k' names them and confirms the
+  sweep found the whole class.  Nothing is known to need them -- cpfe
+  is `-fno-exceptions -fno-rtti', single-threaded, and a C++ front end
+  has no use for a _Complex runtime -- but only the LINK says which
+  archive members are referenced.
+
+  SIZE LIMITS asked rather than assumed, because a 315,616-line
+  translation unit invites them, and none bites:
+
+      longest line                430 bytes   (cpp INS is 32768)
+      lines over cpp's OBS 4096   0
+      longest identifier          295 chars   (cc's NSYMB is 1500)
+      longest string literal      131 chars
+      most `case' in one file     7204        (6c's Case is a LIST)
+      6c's NSYM 50                NOT a cap -- swt.c:229 wraps the
+                                  slot to 1 and re-emits the ANAME,
+                                  so it is a cache, not a wall
+
+  And one thing the sweep CONFIRMED rather than found: nine of src/'s
+  files carry `extern unsigned char _ctype[];', byte for byte what
+  APE's own <ctype.h> declares -- so the staged headers really were
+  this tree's and not glibc's, independently of this file saying so.
+  It also pins the generated C to this tree's `_ctype' BIT LAYOUT,
+  which the _ISblank round changed: changing it again costs a
+  re-translation.
 
 STATE OF THE GENERATED C
 ------------------------
   gcc -fsyntax-only over all 133 files:  0 errors, 0 warnings.
-  (On the host; it says nothing about kencc.)
+  (On the host; it says nothing about kencc -- and the three files
+  above are precisely why that sentence is not decorative.)
 
   Attribute table, round 1 beside round 2:
 
@@ -210,8 +276,120 @@ STATE OF THE GENERATED C
     il_to_str.c's form_simple_attribute("__weak__")), correctly
     carried across.  Nothing in the generated C is decorated.
 
-THE LINK MODEL IS THE OPEN PROBLEM, AND IT IS NOW EXPLICIT
-----------------------------------------------------------
+THE LIBAP HALF OF THE LINK IS ANSWERED, AND IT IS TWO NAMES
+-----------------------------------------------------------
+Asked all at once rather than one per round, which is the rule bacon's
+missing headers and bacon's missing link symbols both paid for: all
+133 files compiled with `gcc -c' (133 of 133, 0 failures), then
+`nm --defined-only -g' over every object subtracted from `nm -u' over
+every object.
+
+  symbols defined across the 133      22963
+  undefined mentions                   9667
+  TRULY EXTERNAL to the set             679
+    of which `_Z'-prefixed              558   <- the link model, below
+    of which plain C names              121
+
+**Of the 121 plain names, libap already defines every one but two.**
+Each was checked by opening the file, not by a grep hit -- and the
+first sweep reported two dozen absent because its regex required a
+character before the name, which a definition starting in column 0
+does not have.  *That is the function-shaped grep of the `reject'
+round in a new spelling, and it would have manufactured two dozen
+findings.*  Present and verified: mmap/munmap (plan9/mman.c),
+get/setrlimit, popen/pclose, sysconf, setlocale, posix_memalign,
+mkstemp, pthread_key_create/setspecific, clock/ctime/difftime, isatty,
+getcwd, isprint and the whole of stdio/string.
+
+  _setjmp         lib_src/eh_util.c, lib_src/newnothrow.c
+  __cxa_finalize  lib_src/static_init.c
+
+`_setjmp' is a MISSED LINE IN kencc_targ.h rather than a libap gap:
+EDG's `TARG_SETJMP_FUNC' defaults to "_setjmp" and win64 -- the same
+configuration every other value here came from -- says "setjmp".  Set
+now, so it is right at the next translation; the header records what
+the miss costs and why adding `_setjmp' to a public APE header is the
+wrong answer (lua/ldo.c already uses the name under LUA_USE_POSIX).
+
+`__cxa_finalize' is NOT a libap question at all.  It is unconditional
+in EDG's own `include_c++/cxxabi.h:184', nothing in lib_src defines
+it, and `_Z12__call_dtorsv''s entire body is `__cxa_finalize(0)' --
+upstream expects the platform's Itanium-ABI runtime to supply it.  On
+a target that has none, the answer is one small APExp-owned file in
+`sys/src/ape/lib/edg', where the C++ ABI belongs.  Not written: only
+the link says whether cpfe references it.
+
+Two more names are HOST ARTEFACTS and cannot appear from pcc:
+`__stack_chk_fail' and `_GLOBAL_OFFSET_TABLE_'.  And the whole
+libgcc soft-float family -- `__addtf3', `__multf3', `__eqhf2',
+`__extendbfsf2', `__trunctfdf2' and twenty more -- comes from
+`lib_src/c99_complex.c' ALONE, which is already predicted to fail on
+`_Float16'/`__bf16'/`__float80'/`__float128'.  *The extended-float
+types bring a soft-float library with them, and kencc has no libgcc*,
+so that file is doubly out of reach and the count is not two findings.
+
+Two confirmations fell out of the same table, and both say the staging
+really used this tree: `_errnoloc' is undefined in six of src/'s
+files and DEFINED in libap (`plan9/_envsetup.c:22'), which is APE's
+`errno' macro from `<errno.h>' having been expanded; and `isNaN' --
+Plan 9's own capitalisation, from `ap/math/nan.c' -- is referenced by
+`src/float_pt.c'.  Neither name exists on glibc.
+
+THE REMAINING LINK MODEL IS THE OPEN PROBLEM, AND IT IS TWO HALVES
+------------------------------------------------------------------
+**The 558 `_Z' names are NOT the duplicate problem seen from the other
+side, and reading them that way was the round's one wrong sentence.**
+They were demangled and counted rather than assumed:
+
+  556 of the 558 are TEMPLATE FUNCTION INSTANTIATIONS
+      edg::count_ones<unsigned int>, edg::index_to_str<...>,
+      edg::pdqsort_impl::pdqsort_loop<...>, edg::is_named_decl<...>
+  ZERO are vtables (_ZTV), typeinfo (_ZTI), typeinfo names (_ZTS),
+      guard variables (_ZGV) or thunks
+  the other 2 are a TLS init function and
+      operator new(size_t, align_val_t, nothrow_t const&)
+
+`_ZN3edg10count_onesIjEEyT_' appears in `src/interpret.c' as a call
+and an `extern' declaration and **is defined in none of the 133
+files**.  So cpfe emitted these instantiations NOWHERE: the output is
+not self-contained for templates, *independently of
+`--one_instantiation_per_object'*.  The paragraph below says OIPO
+"makes the output DEPEND on a prelink step", which is true and
+incomplete -- the DEFAULT output already does, for exactly the
+entities OIPO was being considered for.  What the next translation
+needs is an instantiation-mode flag (EDG's `-tused'/`--instantiate'
+family) so the definitions are emitted; that will move work from this
+half into the duplicate half below, where `ar' and `6l' semantics
+decide rather than a missing symbol.
+
+AND THE DUPLICATE HALF IS NOW MEASURED FROM OBJECTS RATHER THAN FROM
+ANNOTATIONS, which is what makes the 3,094 below trustworthy:
+
+  symbols DEFINED in more than one of the 133 objects   3124
+  surplus definitions (sum of copies - 1)               6410
+    _ZN... (inlines and emitted template members)       2616
+    _ZZ... (function-local statics, incl. string lits)   499
+    _ZTI/_ZTS (typeinfo and its name)                      4
+    plain C names                                          5
+
+3,124 against the 3,094 counted from COMDAT annotations is an
+independent arrival at the same number by a different route, which is
+better evidence than either alone.  `edg::skip_typerefs' is emitted
+**41 times**, which is the shape: an inline reachable from a common
+header.
+
+  THE FIVE PLAIN NAMES ARE `main', `getopt', `optind', `optarg' and
+  `opterr', and all five are confined to util/ -- `edg_decode',
+  `edg_munch' and `edg_prelink' each bundle their own getopt, and the
+  seven mains are src/cfe.c plus util's six programs, exactly as the
+  file counts said.  **So nothing in src/ or lib_src/ is affected**,
+  and cmd/edg compiles only src/.  But it is recorded because util/ is
+  on the list: libap provides `getopt' and the three variables, so
+  linking any of those three utilities against libap gives
+  `redefinition: getopt' -- the f2c-supplies-its-own-malloc shape, and
+  the reason an object on `_apemain''s path must define nothing a
+  program might reasonably replace.
+
 Removing __weak__ does not make the vague-linkage problem go away; it
 stops hiding it.  Measured on two trivial translation units sharing
 one header: with the kencc target they compile and then collide on 10
