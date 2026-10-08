@@ -66,8 +66,7 @@ _OPTIONAL_APPS=\
 	p2c\
 	chicken\
 	objc\
-	cfront\
-#		c++lib\
+#	edg\
 	basic\
 # dev tools \
 	adeb\

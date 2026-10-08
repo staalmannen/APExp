@@ -154,7 +154,7 @@ C transpilers are fun little proof-of-concept programs, which also open up for m
 - pascal-to-C transpiler p2c (version 2.01)
 - fortran-to-C transpiler f2c (version 20250303)
 - portable ObjC-to-C transpiler (version 3.4.13)
-- C++-to-C transpiler Cfront (version "C4", WIP)
+- C++-to-C transpiler EDG (version 7.0)
 - Scheme-to-C transpiler Chicken (version 5.4.0) 
 
 
