@@ -530,6 +530,57 @@ EXTERN	int	packflg;
  * what tar.h carries, and tar is the reason this flag exists.
  */
 EXTERN	int	conformalign;
+
+/*
+ * -C: MARK EVERY TEXT AND GLOBL IN THIS TRANSLATION UNIT `DUPOK',
+ * so the linker keeps the first definition of a symbol and silently
+ * discards later ones.  That is COMDAT -- what C++ calls vague
+ * linkage and what every other toolchain spells
+ * `__attribute__((weak))' or a .section .gnu.linkonce.
+ *
+ * **THE LINKER ALREADY DOES ALL OF THIS AND NOTHING COULD ASK IT.**
+ * `6l/obj.c:996' is `if(p->from.scale & DUPOK){ skip = 1; goto
+ * casdef; }' on a duplicate ATEXT, and `6l/asm.c:548' uses
+ * `sym->dupok' to suppress `multiple initialization' for duplicate
+ * DATA.  `DUPOK' is `(1<<1)' in eight `*.out.h'.  The one missing
+ * piece was a way for C to set the bit: `gpseudo()' wrote
+ * `p->from.scale = (profileflg ? 0 : NOPROF)' and nothing ever OR'd
+ * anything into it.  *The sixth time this tree has found a working
+ * implementation of the thing it could not do sitting next to the
+ * thing that could not do it.*
+ *
+ * WHY IT EXISTS: EDG's generated C.  A C++ front end lowered to C
+ * emits inline members, template instantiations, vtables and typeinfo
+ * into EVERY translation unit that uses them, because C has no way to
+ * say "one of these, any of them".  Across `sys/src/external/edg/src'
+ * that is **3,124 symbols defined in more than one of 75 objects and
+ * 6,410 surplus definitions** -- `edg::skip_typerefs' alone is
+ * emitted 41 times -- and `6l' answered `redefinition:' until it hit
+ * `too many errors'.  EDG knows exactly which symbols these are and
+ * already has a way to say so (it emits 26,712
+ * `__attribute__((__weak__))' when its target is gcc); kencc had
+ * nowhere to put the answer.
+ *
+ * IT IS PER TRANSLATION UNIT AND BLUNT, which is the honest
+ * description.  It does not mark the vague-linkage entities, it marks
+ * EVERYTHING, so two genuinely different functions with one name
+ * become first-wins instead of a diagnostic.  That is safe for
+ * generated C where every duplicate is the same entity by
+ * construction, and it is not safe as a default -- so nothing in the
+ * tree passes it but `sys/src/ape/cmd/edg'.  The precise version is
+ * to teach `cc' `__attribute__((__weak__))' and set the bit per
+ * symbol; this is the version that needs no re-translation.
+ *
+ * SEVEN TARGETS HONOUR IT, AND THE OTHER FOUR SAY SO RATHER THAN GO
+ * QUIET.  `5l', `6l', `7l', `8l', `kl', `ql' and `vl' read `dupok';
+ * **`9l' DECLARES THE FIELD IN `l.h' AND NEVER READS IT** -- a
+ * pre-existing oversight found by this change and recorded, not fixed
+ * -- and `1l'/`2l' have no such field at all.  On those four the
+ * backend's `gpseudo()' diagnoses instead of setting a bit the linker
+ * will ignore, because a flag that silently does nothing produces a
+ * link failure that looks like something else entirely.
+ */
+EXTERN	int	dupokall;
 EXTERN	int	alignasval;	/* pending _Alignas() requirement; 0 = none */
 EXTERN	int	fproundflg;
 EXTERN	int	profileflg;

@@ -92,6 +92,23 @@ EDGSRC=../../../external/edg/src
 # reading is wrong and the NOTE's link-model section needs re-reading
 # rather than this mkfile.
 #
+# `-C' IS WHY THIS LINKS AT ALL, AND IT IS IN CFLAGS ABOVE.  The first
+# link reported `redefinition:' until `too many errors' -- NOT the
+# undefined names predicted here, because `6l' catches duplicates as it
+# LOADS each object and only reports undefined symbols at the end, so
+# it never reached the pass that prediction was about.  The symbols it
+# named are the ones the host sweep had already measured:
+# `edg::max_val<unsigned long long>' and `edg::skip_typerefs', both at
+# 41 copies, and `Ptr_map<...>::get_with_hash' at 39.
+#
+# `-C' marks every TEXT and GLOBL in the translation unit `dupok', so
+# `6l' keeps the first definition and discards the rest -- COMDAT,
+# which it has implemented since forever behind a bit nothing in C
+# could set.  The full account is in `cc/cc.h'.  It is blunt (every
+# symbol, not just the vague-linkage ones) and that is safe HERE and
+# only here, because every duplicate in generated C is the same entity
+# by construction.  Nothing else in the tree passes it.
+#
 # And the fix for that is NOT here: it is an instantiation-mode flag at
 # the next TRANSLATION, so cpfe emits the definitions.  The NOTE says
 # why `--one_instantiation_per_object' is the wrong lever -- it covers
@@ -197,7 +214,7 @@ UPDATE=\
 
 CC=pcc
 LD=pcc
-CFLAGS= -c
+CFLAGS= -c -C
 LIB=$APEXPROOT/$objtype/lib/ape/libedg.a
 
 %.$O: $EDGSRC/%.c

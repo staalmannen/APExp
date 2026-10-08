@@ -125,6 +125,22 @@ main(int argc, char *argv[])
 		dodefine("__APEXP_CONFORMALIGN__");
 		break;
 
+	case 'C':			/* COMDAT: mark TEXT/GLOBL dupok; see cc.h */
+		dupokall = 1;
+		/*
+		 * Both lists, for the reason spelled out under `-J' above:
+		 * `compile()' FORKS an external cpp and hands it `-D%s' per
+		 * entry of `defs[]', so `dodefine()' alone defines the name
+		 * only in `cc's own table and the preprocessor that actually
+		 * runs never sees it.
+		 */
+		if((ndef & 15) == 0)
+			defs = allocn(defs, ndef*sizeof(defs[0]),
+				16*sizeof(defs[0]));
+		defs[ndef++] = "__APEXP_DUPOK__";
+		dodefine("__APEXP_DUPOK__");
+		break;
+
 	case 'D':
 		p = ARGF();
 		if(p) {

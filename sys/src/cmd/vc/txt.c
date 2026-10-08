@@ -1335,6 +1335,20 @@ gpseudo(int a, Sym *s, Node *n)
 	p->from.sym = s;
 	if(a == ATEXT)
 		p->reg = (profileflg ? 0 : NOPROF);
+	/*
+	 * -C: COMDAT. On this target `reg' is the flags field, not
+	 * `from.scale' -- `vl/obj.c' tests `p->reg & DUPOK' for ATEXT
+	 * and for AGLOBL alike -- so the bit goes here and AGLOBL has to
+	 * be named explicitly, because the assignment above covers only
+	 * ATEXT. OR rather than assign: `zprog.reg' is NREG, so AGLOBL
+	 * reaches the linker carrying it already, and overwriting would
+	 * be a second change hiding inside this one. (NREG is 16 or 32
+	 * on every target here and DUPOK is 1<<1, so nothing was
+	 * accidentally dupok before -- checked, not assumed.) ADATA is
+	 * deliberately excluded. See cc/cc.h.
+	 */
+	if(dupokall && (a == ATEXT || a == AGLOBL))
+		p->reg |= DUPOK;
 	p->from.name = D_EXTERN;
 	if(s->class == CSTATIC || s->class == CLOCAL)
 		p->from.name = D_STATIC;

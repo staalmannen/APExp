@@ -1936,6 +1936,55 @@ live either way.
     absent, because its regex required a character before the name and
     a definition starting in column 0 has none -- the function-shaped
     grep in a new spelling.*
+    **ALL 75 COMPILE -- `sys_predef.c''s 315,616 lines included -- AND
+    THE LINK IS WHERE IT STOPPED.** That was the question with no
+    precedent and it is answered.
+    **AND MY LINK PREDICTION WAS WRONG, ABOUT ORDERING.** I predicted
+    `6l` would report undefined template instantiations; it reports
+    **`redefinition:`** until `too many errors`. `6l` catches
+    duplicates as it LOADS each object and only reports undefined
+    symbols at the end, so it never reached the pass the prediction was
+    about. *What it named was a symbol-for-symbol confirmation of the
+    host sweep*: `edg::max_val<unsigned long long>` and
+    `edg::skip_typerefs`, the two measured at **41 copies each**, and
+    `Ptr_map<...>::get_with_hash` at 39.
+    **AND THE FIX WAS ALREADY IN THE LINKER WITH NO WAY TO ASK FOR IT
+    -- `-C`, COMDAT.** `6l/obj.c:996` is
+    `if(p->from.scale & DUPOK){ skip = 1; goto casdef; }` on a
+    duplicate ATEXT, and `6l/asm.c:548` uses `sym->dupok` to suppress
+    `multiple initialization` for duplicate DATA; `DUPOK` is `(1<<1)`
+    in eight `*.out.h`. **The one missing piece was a way for C to set
+    the bit**: `gpseudo()` wrote `p->from.scale = (profileflg ? 0 :
+    NOPROF)` and nothing ever OR'd into it. *The sixth time this tree
+    has found a working implementation of the thing it could not do
+    sitting next to the thing that could not do it.*
+    **It is blunt and the mkfile says so**: it marks EVERY TEXT and
+    GLOBL in the translation unit, not the vague-linkage ones, so two
+    genuinely different functions of one name become first-wins
+    instead of a diagnostic. Safe for generated C, where every
+    duplicate is the same entity by construction, and nothing else in
+    the tree passes it. The precise version is `cc` learning
+    `__attribute__((__weak__))` -- which EDG already emits, 26,712 of
+    them, when its target is gcc -- and that needs a re-translation.
+    **x86 AND RISC USE DIFFERENT FIELDS, which one patch would have
+    got wrong.** `6c`/`8c` carry TEXT flags in `p->from.scale`;
+    `5c`/`7c`/`kc`/`qc`/`vc` carry them in `p->reg`, assigned only for
+    ATEXT, so AGLOBL had to be named too. *And `zprog.reg` is `NREG`,
+    not 0* -- so every RISC AGLOBL already reaches its linker carrying
+    NREG in the flags field, and whether that was accidentally dupok
+    was **checked rather than assumed** (16 and 32 against `1<<1`:
+    clear).
+    **FOUR TARGETS CANNOT HONOUR IT AND NOW SAY SO.** `9l` **declares
+    `dupok` in `l.h` and never reads it** -- zero hits in its `.c`
+    where every other linker has two -- a pre-existing gap found by
+    this change and recorded, not fixed; `1l`/`2l` have no such field
+    at all. On those the backend diagnoses once instead of setting a
+    bit the linker ignores, *because a flag that silently does nothing
+    produces a link failure that looks like a different bug* -- which
+    is `pcc`'s missing ARGBEGIN `default:` for the third time.
+    **NOT COMPILED ANYWHERE: kencc needs Plan 9's `<u.h>`/`<libc.h>`,
+    so the first build is the VM's** -- the same weaker position `-J`
+    shipped from.
     **AND THE LINK MODEL IS TWO HALVES, WHICH READING THEM AS ONE GOT
     WRONG.** 556 of the 558 `_Z` names are **template instantiations
     emitted NOWHERE**, with **zero** vtables, typeinfo, guard
