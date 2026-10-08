@@ -208,23 +208,47 @@ counting `bool'/`nullptr' in round 1.)
   __label__, designated initializers, anonymous struct/union members,
   VLAs, K&R definitions.
 
-  NOT zero, and these three files are PREDICTED TO FAIL:
+  NOT zero in three files, and `mk -k install' ON THE VM HAS NOW
+  ANSWERED: 50 of lib_src/'s 51 compile and ONE does not.
 
       lib_src/c99_complex.c   _Float16, __bf16, __float80, __float128
-      lib_src/thread_dtor.c   __thread
-      lib_src/dtor_list.c     __thread
+          FAILS, predicted by name and by token:
+          `<noname>:42[stdin:45] syntax error, last name: _Float16'
+          It is the C99 `_Complex' runtime and builds its own
+          `struct _Complex_float16 { _Float16 _Vals[2]; }'.  Those are
+          gcc's extended floats and they bring libgcc's soft-float
+          family with them (__addtf3, __multf3, __eqhf2, ...), so the
+          file is twice out of reach.  Commented out of lib/edg's
+          OFILES now that the measurement is taken: a C++ front end
+          has no use for a _Complex runtime.
 
-  All three are a feature of the HOST COMPILER rather than anything of
-  EDG's design, which is exactly why `gcc -fsyntax-only' reports 0
-  errors over them: *the host compiler is the one that put them there.*
-  c99_complex.c is the C99 `_Complex' runtime and builds its own
-  `struct _Complex_float16 { _Float16 _Vals[2]; }'; the other two are
-  thread-local destructor registration, and kencc has no TLS.
-  They are LEFT IN OFILES so that `mk -k' names them and confirms the
-  sweep found the whole class.  Nothing is known to need them -- cpfe
-  is `-fno-exceptions -fno-rtti', single-threaded, and a C++ front end
-  has no use for a _Complex runtime -- but only the LINK says which
-  archive members are referenced.
+      lib_src/thread_dtor.c   __thread  -- COMPILES
+      lib_src/dtor_list.c     __thread  -- COMPILES
+
+  **THE TWO `__thread' PREDICTIONS WERE WRONG, AND THAT IS THE MORE
+  USEFUL HALF OF THE RUN.**  I checked EDG's constructs against C
+  dialects FROM MEMORY instead of against the compiler in this
+  repository, where `cc/lex.c:1765' has carried `"__thread", LNAME, 0'
+  and a swallow at `:1095' all along, under the comment *"Plan 9 has
+  no TLS; silently drop the qualifier."*  *An instrument whose keyword
+  list is not the COMPILER's keyword list is measuring a different
+  compiler* -- the include-path lesson apdecl-sweep and apehdr-sweep
+  each paid for, arriving one level down for a lexer.  The list to
+  check against is `itab' plus that swallow list, both in the tree,
+  and checking the four float types against it afterwards is what says
+  c99_complex.c really is the only failure.
+
+  AND THAT PASS IS NOT A CLEAN BILL.  `__thread' dropped means
+  `__thread_needed_destruction_head' is one process-wide global shared
+  by every thread rather than one per thread -- this tree's commonest
+  bug shape, a stub answering the wrong thing rather than "nothing to
+  do".  Harmless for cpfe, which is single-threaded; a live hazard for
+  anything else cpfe ever translates.  Recorded, not fixed.
+
+  `gcc -fsyntax-only' could not have reported any of this, and the
+  reason is worth keeping: every one of these is a feature of the HOST
+  COMPILER rather than of EDG's design, so *the host compiler is
+  exactly the one that put them there.*
 
   SIZE LIMITS asked rather than assumed, because a 315,616-line
   translation unit invites them, and none bites:

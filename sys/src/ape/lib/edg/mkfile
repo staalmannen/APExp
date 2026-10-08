@@ -35,41 +35,53 @@ EDGSRC=../../../external/edg/lib_src
 # C carried, so kencc computes every layout and conforming layout is
 # exactly what the generated code wants.
 #
-# THREE OF THESE FILES ARE PREDICTED TO FAIL, and the prediction is
-# written here BEFORE the first run so that the result is a measurement
-# rather than a discovery.  All three use a feature of the HOST
-# compiler rather than anything of EDG's, which is why `gcc
-# -fsyntax-only' could never have reported them -- *the host compiler
-# is exactly the one that put them there.*  The corpus was swept for
-# the whole class at once, with string literals and `#line' stripped
-# first (a raw grep counts EDG's own diagnostic text and mangled names:
-# `alignof', `typeof', `static_assert' and `_Complex' all appear
-# hundreds of times INSIDE identifiers like
-# `_ZN3edg27ec_wrong_entity_for_alignasE' and none of them is a
-# keyword use).  After stripping, the count of every C11/C23 construct
-# kencc lacks is ZERO except these:
+# MEASURED: `mk -k install' COMPILES 50 OF THESE 51 FILES.  The one
+# that does not is `c99_complex.c', and it was predicted by name and
+# by token before the run:
 #
-#	c99_complex.$O	`_Float16', `__bf16', `__float80', `__float128'
-#	thread_dtor.$O	`__thread'
-#	dtor_list.$O	`__thread'
+#	<noname>:42[stdin:45] syntax error, last name: _Float16
 #
-# `c99_complex.c' is the C99 `_Complex' runtime and declares its own
-# `struct _Complex_float16 { _Float16 _Vals[2]; }' and so on; the four
-# types are gcc's extended floats and kencc has none of them.  The
-# other two are thread-local destructor registration for C++ objects
-# with static storage, and kencc has no TLS at all.
+# It is the C99 `_Complex' runtime and builds its own
+# `struct _Complex_float16 { _Float16 _Vals[2]; }', `__bf16',
+# `__float80' and `__float128' -- gcc's extended floats, none of which
+# `cc/lex.c' has ever heard of.  They drag in a whole libgcc soft-float
+# family with them (`__addtf3', `__multf3', `__eqhf2',
+# `__extendbfsf2', ...) which kencc has not got either, so the file is
+# twice out of reach.  COMMENTED OUT of OFILES below now that the
+# measurement has been taken, rather than left to fail: cpfe is a C++
+# front end and has no use for a `_Complex' runtime, and leaving it in
+# makes a plain `mk' stop for a member nothing references.
 #
-# LEFT IN OFILES DELIBERATELY, not commented out.  With `mk -k' the
-# other 48 build and the archive is made from them, and the three
-# failures are INFORMATION -- they confirm the sweep named the whole
-# class, where removing them first would have made a clean run say
-# nothing.  Nothing is known to need them: cpfe is built
-# `-fno-exceptions -fno-rtti', is single-threaded, and a C++ front end
-# has no use for a `_Complex' runtime -- but *only the link says which
-# members are referenced*, so that stays a question until cmd/edg is
-# linked.  If it names them, each needs its own answer and neither is
-# this mkfile's: extended floats would be a kencc question and TLS a
-# libap one.
+# The corpus was swept for the whole class at once, with comments,
+# string and character literals and `#line' stripped FIRST -- and the
+# stripping is the measurement rather than a tidying step.  A raw grep
+# reports `alignof' 2343 times, `typeof' 425, `static_assert' 1156 and
+# `_Complex' 702, and every one of those is ZERO afterwards: they were
+# EDG's own diagnostic text and mangled names like
+# `_ZN3edg27ec_wrong_entity_for_alignasE', the word inside a longer
+# identifier, never a keyword use.
+#
+# **AND THE SWEEP ALSO NAMED TWO FILES THAT COMPILED FINE, WHICH IS
+# THE MORE USEFUL HALF.**  `thread_dtor.c' and `dtor_list.c' use
+# `__thread', and I called them against C dialects FROM MEMORY rather
+# than against the compiler in this repository -- where
+# `cc/lex.c:1765' has carried `"__thread", LNAME, 0' and a swallow at
+# `:1095' all along, under the comment *"Plan 9 has no TLS; silently
+# drop the qualifier."*  *An instrument whose keyword list is not the
+# COMPILER's keyword list is measuring a different compiler*, which is
+# the include-path lesson `apdecl-sweep' and `apehdr-sweep' each paid
+# for, arriving one level down for a lexer.  The list to check against
+# is `cc/lex.c''s `itab' plus that swallow list, and both are in the
+# tree; checking the four float types against it afterwards is what
+# says `c99_complex.c' really is the only one.
+#
+# THAT PASS IS NOT A CLEAN BILL, and this is where it will be read.
+# `__thread' DROPPED means `__thread_needed_destruction_head' is one
+# process-wide global shared by every thread instead of one per thread
+# -- this tree's commonest bug shape, a stub answering the wrong thing
+# rather than "nothing to do".  Harmless for cpfe, which is
+# single-threaded; a live hazard for anything else cpfe ever
+# translates.  Recorded, not fixed, and not this mkfile's to fix.
 #
 # Two things the same sweep CONFIRMED rather than found, and both are
 # about the translation having really used this tree:
@@ -95,7 +107,6 @@ OFILES=\
 	array_pdel.$O\
 	array_pnew.$O\
 	bad_alloc.$O\
-	c99_complex.$O\
 	del_virt.$O\
 	delete.$O\
 	delete_aligned.$O\
