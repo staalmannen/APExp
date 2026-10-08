@@ -853,3 +853,130 @@ THE HONEST ORDERING
 *Nothing here is started and none of it is a prerequisite for anything
 already working.*  The next EDG step is still the one in the section
 above: cpfe translating a toy and `pcc -c' accepting the C.
+
+
+cpfe's TARGET IS NOT kencc's, AND kencc_targ.h NEVER REACHED target.c
+----------------------------------------------------------------------
+
+`cpfe --c++14 ... t.cpp' answers
+
+	Internal error: check_target_config: must use SoftFloat library
+	    for this configuration
+
+and that is cpfe refusing its OWN configuration, not anything about the
+input.  `src/target.c:10642' fires when `targ_ldbl_mant_dig == 64', an
+80-bit x87 long double, which cpfe cannot constant-fold without a
+SoftFloat library it was not built with.
+
+cpfe IS MULTI-TARGET.  `target.c:6525' holds a table of EIGHT
+configurations -- linux_x86_64, linux_i686, win64, win32,
+linux_aarch64, linux_armv7, linux_riscv64, linux_riscv32 --
+`fe_init.c:49180' defaults the index to 0, and `--target <name>'
+(cmd_line.c) selects by name.  **Entry 0, labelled `linux_x86_64',
+points at `set_legacy_target_config'** -- the configuration built from
+the UNSUFFIXED TARG_* macros, which is exactly the set `kencc_targ.h'
+overrides.
+
+AND IT CARRIES THE HOST'S VALUES, measured from the generated C:
+
+	set_legacy_target_config:  long 8  long double 16  mant_dig 64
+	set_target_config_win64:   long 4  long double  8  mant_dig 53
+
+So `kencc_targ.h' did not reach the translation of `target.c'.  **That
+is a DIFFERENT macro environment from the one the NOTE above measured.**
+The `__weak__' suppression (38,245 -> 0) is a property of the cpfe
+BUILD -- how the host cpfe behaved; the TARG_* widths are read when
+`target.c' is TRANSLATED, and only the second bakes into the committed
+C.  The two were treated as one.
+*Which mechanism is NOT settled*: the pre-include may have been absent
+from the translation command, or present and then overridden by
+`cmake_defines.h' included after it.  One look at the host build's
+translation line separates them, and nobody should act on a guess here.
+
+win64 IS kencc's INTEGER AND FLOAT MODEL EXACTLY, AND THE DIFF IS THE
+WHOLE COST
+---------------------------------------------------------------------
+Both configurations are in the generated source, so their diff is a
+COMPLETE list rather than a reading -- the `apeabi-probe' idiom again.
+126 `targ_*' assignments each, **36 differ**, and they partition:
+
+RIGHT for kencc, and legacy had them wrong:
+  targ_sizeof_long 4, alignof_long 4          kencc long IS 32-bit
+  targ_sizeof_long_double 8, ldbl_mant_dig 53,
+    ldbl_max_exp 1024, ldbl_min_exp -1021     long double IS double
+  targ_size_t_int_kind unsigned long long     APE stddef_arch.h
+  targ_ssize_t_int_kind long long             APE stddef_arch.h
+  targ_ptrdiff_t_int_kind long long           APE stddef_arch.h
+  targ_setjmp_func "setjmp"                   <-- see below
+
+**`targ_setjmp_func' is the corroboration.**  The NOTE above records
+`_setjmp' as the one undefined symbol at the link and calls it "a
+missed line in kencc_targ.h"; legacy says `_setjmp' and win64 says
+`setjmp'.  *That the diff independently reproduces a bug found at the
+LINK, from a completely different direction, is what says the diff is
+measuring the right thing.*
+
+WRONG for kencc -- the "windows baggage", and it is FOUR families and
+one stray, not a vague risk:
+  1. wchar_t / wint_t = unsigned short.  APE's `stddef.h:50' says
+     unsigned INT.  Two bytes against four; definite mismatch, and it
+     corrupts every L"..." literal and wchar_t layout.
+  2. FIELD ALIGNMENT, five variables: double_field_alignment 4 (legacy
+     8), long_field_alignment 4, long_double_field_alignment 4,
+     dual_alignments_for_builtin_types 1, maximum_intrinsic_alignment
+     8 (legacy 16).  **This is MSVC struct layout and it is the thing
+     most likely to bite**, because kencc under `-J' aligns a double
+     to 8.  Not yet measured; `structalign-test' is the instrument
+     shape for it once anything compiles.
+  3. BIT FIELDS: force_one_bit_bit_field_to_be_unsigned 1,
+     zero_width_bit_field_affects_struct_alignment 1,
+     zero_width_bit_field_alignment 4.
+  4. POINTER-TO-MEMBER: sizeof_ptr_to_data_member 4 (legacy 8),
+     alignof 4, delta_int_kind `short' (legacy `long').
+  5. The one NON-`targ_' global the win64 config sets:
+     `packing_applies_to_base_classes = 1'.
+
+AND THE TWO MICROSOFT SWITCHES ARE OFF, checked because the name
+invites the worry: `targ_microsoft_bit_field_allocation' and
+`targ_microsoft_ptr_to_member_sizing' are both explicitly 0 in win64,
+and the configuration sets NO mode flags at all -- 126 `targ_*'
+assignments plus that one.  *`--microsoft' is a separate command-line
+option and `--target win64' does not imply it.*
+
+Watch `jmp_buf' too, recorded rather than resolved: win64 says 39
+elements of `int', legacy 25 of `long', and APE's own is neither.
+It matters here more than it would elsewhere because **EDG's exception
+model is setjmp-based** (see the standard-library section above).
+
+THE PREDEFINED MACRO FILE IS WHERE THE REST OF THE WINDOWS-NESS LIVES
+---------------------------------------------------------------------
+With `--target win64' the SoftFloat check passes and the next stop is
+
+	catastrophic error: cannot open predefined macro file
+	    "lib_win64/predefined_macros.txt"
+
+`macro.c:19726''s `open_predefined_macro_file' builds
+`edg_base_directory' + `auxiliary_info_dir_name' + the file name, so
+the directory is per-target and we ship none of them.
+**`--clear_flag=use_predefined_macro_file' is the answer, and it is not
+a workaround**: that file is where a win64 build's `_WIN32' and
+`_MSC_VER' would come from, so suppressing it is precisely "LLP64
+without the Windows macros".  It is also the flag the NOTE's own
+translation recipe already uses.
+
+	cpfe --target win64 --clear_flag=use_predefined_macro_file \
+	     --c++14 --no_exceptions --no_rtti \
+	     --sys_include=<edg>/include_c++ \
+	     --sys_include=<edg>/include_c99 \
+	     --sys_include=/amd64/include/ape \
+	     --sys_include=/sys/include/ape \
+	     --gen_c_file_name=/tmp/t.c /tmp/t.cpp
+
+THE REAL FIX IS THE LEGACY ENTRY, NOT win64.  `--target win64' is a
+BRIDGE to a first translation with four named divergences; the correct
+end state is index 0 carrying kencc's own values, which is what
+`kencc_targ.h' was written for and demonstrably did not do.  That is a
+re-translation with the pre-include actually in effect for `target.c',
+and it would fix `wchar_t', the field alignments, pointer-to-member,
+`jmp_buf' and `setjmp' in one go -- *every item on the list above is a
+symptom of the same miss*.

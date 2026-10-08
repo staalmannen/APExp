@@ -2149,6 +2149,55 @@ live either way.
     `kencc_targ.h` describes this machine. Use a toy with **no `new`
     and no static constructors** -- those are the two places the
     runtime is reached and the static-init gap above is open.*
+  - **AND cpfe'S TARGET IS NOT kencc'S -- `kencc_targ.h` NEVER REACHED
+    `target.c`.** The first translation attempt answered
+    `check_target_config: must use SoftFloat library`, which is cpfe
+    refusing **its own configuration**: `target.c:10642` fires when
+    `targ_ldbl_mant_dig == 64`, an 80-bit long double it cannot fold
+    without a SoftFloat library it was not built with. **cpfe is
+    MULTI-TARGET** -- `target.c:6525` holds EIGHT configurations,
+    `fe_init.c:49180` defaults the index to **0**, and entry 0
+    (labelled `linux_x86_64`) is `set_legacy_target_config`, built
+    from the UNSUFFIXED `TARG_*` macros `kencc_targ.h` overrides.
+    **It carries the HOST's values**: `long 8`, `long double 16`,
+    `mant_dig 64`. *The `__weak__` suppression (38,245 -> 0) is a
+    property of the cpfe BUILD; the `TARG_*` widths are read when
+    `target.c` is TRANSLATED, and only the second bakes into the
+    committed C.* **Two different macro environments, treated as
+    one.** Which mechanism -- absent from the translation command, or
+    overridden by `cmake_defines.h` after it -- is NOT settled.
+    **AND `--target win64` IS kencc's MODEL EXACTLY, with the cost
+    enumerated rather than feared.** Both configurations are in the
+    generated source, so their diff is COMPLETE (the `apeabi-probe`
+    idiom): **126 `targ_*` assignments, 36 differ.** win64 gets
+    right what legacy got wrong -- `long 4`, `long double 8`/53,
+    `size_t`/`ssize_t`/`ptrdiff_t` as `long long`, and
+    **`targ_setjmp_func "setjmp"`**, which is the exact undefined
+    symbol the link reported and the NOTE called "a missed line in
+    `kencc_targ.h`". *A diff reproducing, from a different
+    direction, a bug found at the LINK is what says it measures the
+    right thing.* The windows baggage is **four families and one
+    stray**: `wchar_t`/`wint_t` unsigned SHORT (APE says unsigned
+    int); five FIELD-ALIGNMENT variables (`double_field_alignment` 4
+    against kencc's 8 under `-J` -- *the one most likely to bite,
+    unmeasured*); three bit-field rules; pointer-to-member 4 bytes
+    with a `short` delta; and `packing_applies_to_base_classes`.
+    **Both `targ_microsoft_*` switches are 0 and the config sets no
+    mode flags at all** -- `--microsoft` is a separate option that
+    `--target win64` does not imply. Watch `jmp_buf` (39 ints
+    against legacy's 25 longs, APE's being neither), which matters
+    here because **EDG's EH is setjmp-based**.
+    **AND THE PREDEFINED MACRO FILE IS WHERE THE REST OF THE
+    WINDOWS-NESS LIVES**: with the target set, cpfe next wants
+    `lib_win64/predefined_macros.txt`, which we ship for no target.
+    **`--clear_flag=use_predefined_macro_file` is not a workaround**
+    -- that file is where a win64 build's `_WIN32` and `_MSC_VER`
+    come from, so suppressing it is precisely *LLP64 without the
+    Windows macros*, and it is the flag this tree's own translation
+    recipe already uses. **`--target win64` is a BRIDGE**; the end
+    state is entry 0 carrying kencc's values, and *every item on the
+    divergence list is a symptom of the same miss*. Command and full
+    diff in the NOTE.
   - **THERE IS NO C++ STANDARD LIBRARY HERE AND EDG SHIPS NONE, and
     the EXCEPTION MODEL decides what could fill the gap.** `lib_src`
     is the **libsupc++/libc++abi layer** -- new/delete, vtables, RTTI,
