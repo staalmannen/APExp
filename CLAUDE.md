@@ -1889,14 +1889,34 @@ live either way.
     construct kencc lacks counts **zero** -- where a raw grep reports
     `alignof` 2343, `static_assert` 1156, `_Complex` 702 and `typeof`
     425, all of them the word inside EDG's own mangled names and
-    diagnostic text. The exceptions are **`lib_src/c99_complex.c`**
+    diagnostic text. The exceptions were **`lib_src/c99_complex.c`**
     (`_Float16`, `__bf16`, `__float80`, `__float128`) and
-    **`thread_dtor.c`/`dtor_list.c`** (`__thread`) -- all three a
-    feature of the HOST compiler rather than of EDG, *which is exactly
-    why `gcc -fsyntax-only` reports 0 errors over them*. Left in
-    OFILES so `mk -k` names them. **CONFIRMED on the first VM run**:
-    eleven files compiled and `c99_complex.c` stopped on `_Float16`,
-    the predicted file and the predicted token.
+    **`thread_dtor.c`/`dtor_list.c`** (`__thread`) -- a feature of the
+    HOST compiler rather than of EDG, *which is exactly why `gcc
+    -fsyntax-only` reports 0 errors over them*.
+    **`mk -k install` ANSWERED: 50 OF 51 COMPILE, AND ONLY
+    `c99_complex.c` FAILS** -- predicted by name and by token
+    (`syntax error, last name: _Float16`). Commented out of OFILES
+    now the measurement is taken; a C++ front end has no use for a
+    `_Complex` runtime, and the extended floats drag libgcc's
+    soft-float family in behind them.
+    **AND THE TWO `__thread` PREDICTIONS WERE WRONG, WHICH IS THE MORE
+    USEFUL HALF.** I checked EDG's constructs against C dialects FROM
+    MEMORY rather than against the compiler in this repository, where
+    `cc/lex.c:1765` has carried `"__thread", LNAME, 0` and a swallow
+    at `:1095` all along -- *"Plan 9 has no TLS; silently drop the
+    qualifier."* **An instrument whose keyword list is not the
+    COMPILER's keyword list is measuring a different compiler**: the
+    include-path lesson `apdecl-sweep` and `apehdr-sweep` each paid
+    for, one level down, for a lexer. The list to check against is
+    `itab` plus that swallow list and both are in the tree -- and
+    asking it about the four float types afterwards is what says
+    `c99_complex.c` really is the only one.
+    **That pass is not a clean bill, either**: `__thread` dropped makes
+    `__thread_needed_destruction_head` one process-wide global shared
+    by every thread, which is the stub-answering-the-wrong-thing shape.
+    Harmless for single-threaded cpfe, a live hazard for anything cpfe
+    translates. Recorded, not fixed.
     **And the limits were asked rather than assumed**: longest line
     430 bytes against cpp's `INS` 32768, longest identifier 295
     against `cc`'s `NSYMB` 1500, 7204 `case` in one file where `6c`'s
