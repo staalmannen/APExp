@@ -366,17 +366,17 @@ static const char *
 dump_type(struct workspace *wk, type_tag type)
 {
 	obj types = typechecking_type_to_arr(wk, type);
-	obj typestr, sep = make_str(wk, "|");
-	obj_array_join(wk, false, types, sep, &typestr);
+	obj type_string, sep = make_str(wk, "|");
+	obj_array_join(wk, false, types, sep, &type_string);
 
 	if (type & TYPE_TAG_LISTIFY) {
-		obj_array_push(wk, types, make_strf(wk, "list[%s]", get_cstr(wk, typestr)));
+		obj_array_push(wk, types, make_strf(wk, "list[%s]", get_cstr(wk, type_string)));
 		obj sorted;
 		obj_array_sort(wk, NULL, types, obj_array_sort_by_str, &sorted);
-		obj_array_join(wk, false, sorted, sep, &typestr);
+		obj_array_join(wk, false, sorted, sep, &type_string);
 	}
 
-	return get_cstr(wk, typestr);
+	return get_cstr(wk, type_string);
 }
 
 static int32_t
