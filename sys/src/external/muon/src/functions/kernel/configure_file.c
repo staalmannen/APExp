@@ -461,11 +461,12 @@ generate_config(struct workspace *wk,
 	obj_dict_for(wk, dict, key, val) {
 		enum obj_type t = get_obj_type(wk, val);
 
-		char define_prefix = (char[]){
-			[configure_file_output_format_c] = '#',
-			[configure_file_output_format_nasm] = '%',
-			[configure_file_output_format_json] = 0,
-		}[format];
+		char define_prefix;
+		switch (format) {
+		case configure_file_output_format_c: define_prefix = '#'; break;
+		case configure_file_output_format_nasm: define_prefix = '%'; break;
+		case configure_file_output_format_json: define_prefix = 0; break;
+		}
 
 		if (format == configure_file_output_format_json) {
 			if (!first) {
