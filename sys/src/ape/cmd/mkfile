@@ -77,7 +77,7 @@ _OPTIONAL_APPS=\
 	patch\
 	mkmk\
 	samurai\
-#	muon\
+	muon\
 # TLS and curl \
 	openssl\
 	curl\
