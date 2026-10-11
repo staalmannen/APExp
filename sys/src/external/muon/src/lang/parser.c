@@ -738,18 +738,18 @@ parse_type(struct parser *p, type_tag *type, bool top_level)
 {
 	*type = 0;
 
-	const char *typestr = 0;
+	const char *type_string = 0;
 	if (parse_accept(p, token_type_identifier)) {
-		typestr = get_cstr(p->wk, p->previous.data.str);
+		type_string = get_cstr(p->wk, p->previous.data.str);
 		type_tag t;
-		if (s_to_type_tag(typestr, &t)) {
+		if (s_to_type_tag(type_string, &t)) {
 			*type = t;
 		} else {
-			parse_error(p, NULL, "unknown type %s", typestr);
+			parse_error(p, NULL, "unknown type %s", type_string);
 			return false;
 		}
 	} else if (parse_accept(p, token_type_null)) {
-		typestr = "null";
+		type_string = "null";
 		*type = TYPE_TAG_ALLOW_NULL;
 	} else {
 		return true;
@@ -778,8 +778,8 @@ parse_type(struct parser *p, type_tag *type, bool top_level)
 			parse_error(p,
 				&p->previous.location,
 				"the type %s requires a sub type (e.g. %s[any])",
-				typestr,
-				typestr);
+				type_string,
+				type_string);
 			return false;
 		}
 
