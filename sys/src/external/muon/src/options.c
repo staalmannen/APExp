@@ -1295,20 +1295,21 @@ list_options_iter(struct workspace *wk, void *_ctx, obj key, obj val)
 			selected = make_obj(wk, obj_array);
 			obj_array_push(wk, selected, make_str(wk, get_obj_bool(wk, opt->val) ? "true" : "false"));
 			break;
-		case op_feature:
+		case op_feature: {
+			const char *feature_name;
 			obj_array_push(wk, choices, make_str(wk, "enabled"));
 			obj_array_push(wk, choices, make_str(wk, "disabled"));
 			obj_array_push(wk, choices, make_str(wk, "auto"));
+			switch (get_obj_feature_opt(wk, opt->val)) {
+			case feature_opt_enabled: feature_name = "enabled"; break;
+			case feature_opt_disabled: feature_name = "disabled"; break;
+			case feature_opt_auto: feature_name = "auto"; break;
+			default: feature_name = "auto"; break;
+			}
 			selected = make_obj(wk, obj_array);
-			obj_array_push(wk,
-				selected,
-				make_str(wk,
-					(char *[]){
-						[feature_opt_enabled] = "enabled",
-						[feature_opt_disabled] = "disabled",
-						[feature_opt_auto] = "auto",
-					}[get_obj_feature_opt(wk, opt->val)]));
+			obj_array_push(wk, selected, make_str(wk, feature_name));
 			break;
+		}
 		case op_combo:
 		case op_array:
 		case op_shell_array:
