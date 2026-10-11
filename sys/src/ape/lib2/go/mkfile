@@ -1,0 +1,32 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+GOSRC=../../../external/go1.4
+GOSRCABS=$APEXPROOT/sys/src/external/go1.4
+BIN=$APEXPROOT/$objtype/bin/ape
+GOARCH=$objtype
+GOTOOLDIR=$GOSRCABS/pkg/tool/plan9_$GOARCH
+
+# cmd/go's second bootstrap round leaves go_bootstrap and the Go compiler
+# tools in GOTOOLDIR. This pass runs only after ape/cmd, so it can use
+# those tools to build the standard libraries and the final go command.
+all:V:
+	mk install
+
+install:V:
+	cd $GOSRC/src && $GOTOOLDIR/go_bootstrap install std
+	cd $GOSRC/src && $GOTOOLDIR/go_bootstrap install cmd/go
+	cp $GOTOOLDIR/go_bootstrap $BIN/go
+
+installall:V:
+	mk install
+
+clean:V:
+	if(test -x $GOTOOLDIR/go_bootstrap) @{
+		cd $GOSRC/src && $GOTOOLDIR/go_bootstrap clean -i std
+	}
+	rm -f $BIN/go
+
+nuke:V:
+	mk clean

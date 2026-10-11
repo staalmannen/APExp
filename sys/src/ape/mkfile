@@ -1,5 +1,5 @@
 none:VQ:
-	echo usage: mk all, install, installall, cmd, cmd.install, lib, lib.install
+	echo usage: mk all, install, installall, cmd, cmd.install, lib, lib.install, lib2, lib2.install
 
 all clean nuke install installall:V:
 	chmod +x mount-include
@@ -7,9 +7,14 @@ all clean nuke install installall:V:
 	mk lib.$target
 	mk 9src.$target
 	mk cmd.$target
+	mk lib2.$target
 
 lib.%:V:
 	cd lib
+	mk $stem
+
+lib2.%:V:
+	cd lib2
 	mk $stem
 
 lib.clean:V:

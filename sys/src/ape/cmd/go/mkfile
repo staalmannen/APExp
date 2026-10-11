@@ -1,0 +1,32 @@
+</$objtype/mkfile
+
+# Go 1.4 bootstrap. Stage one builds the C dist driver with pcc. Stage
+# two uses that driver to build the C compiler tools and then the Go
+# compiler, standard libraries, and go command in upstream's dependency
+# order. Keep the rounds sequential: stage two consumes stage one's
+# installed dist executable.
+
+all:V:
+	mk install
+
+install:V:
+	mk $MKFLAGS -f mkfile.bootstrap install
+	mk $MKFLAGS -f mkfile.bootstrap clean
+	mk $MKFLAGS -f mkfile.rebuild install
+
+installall:V:
+	mk $MKFLAGS -f mkfile.bootstrap installall
+	mk $MKFLAGS -f mkfile.bootstrap clean
+	mk $MKFLAGS -f mkfile.rebuild installall
+
+clean:V:
+	mk $MKFLAGS -f mkfile.bootstrap clean
+	mk $MKFLAGS -f mkfile.rebuild clean
+
+nuke:V:
+	mk $MKFLAGS -f mkfile.bootstrap nuke
+	mk $MKFLAGS -f mkfile.rebuild nuke
+
+bootstrap:V:
+	mk $MKFLAGS -f mkfile.bootstrap install
+

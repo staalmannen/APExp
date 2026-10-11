@@ -53,7 +53,7 @@ _OPTIONAL_APPS=\
 	tar\
 	pax\
 # languages \
-#	go\
+	go\
 	lua\
 	sqlite\
 	tclsh\

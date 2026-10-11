@@ -1,0 +1,47 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+GOSRC=../../../external/go1.4
+GODIST=$GOSRC/src/cmd/dist
+BIN=$APEXPROOT/$objtype/bin/ape
+TARG=go-dist
+
+# Keep this list in sync with src/make.rc: the C bootstrap tool is
+# deliberately built from all ten portability and build-driver files.
+OFILES=\
+	arm.$O\
+	buf.$O\
+	build.$O\
+	buildgc.$O\
+	buildgo.$O\
+	buildruntime.$O\
+	main.$O\
+	plan9.$O\
+	unix.$O\
+	windows.$O\
+
+UPDATE=\
+	mkfile\
+	${OFILES:%.$O=$GODIST/%.c}\
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+CC=pcc
+LD=pcc
+CFLAGS=-FTVwp+ -DPLAN9 -DGOROOT_FINAL=\\"$APEXPROOT/sys/src/external/go1.4\\"
+
+# make.rc generates the Plan 9 libc declarations before compiling dist.
+libc_plan9.h:V:
+	cd $GOSRC/src && ../include/plan9/mklibc.rc > ../include/plan9/libc_plan9.h
+
+all: $O.out
+
+$O.out: libc_plan9.h
+
+%.$O: $GODIST/%.c
+	$CC $CFLAGS $prereq
+
+nuke:V:
+	rm -f *.[$OS] [$OS].out
+	rm -f $BIN/go-dist
