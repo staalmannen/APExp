@@ -52,6 +52,7 @@ OFILES=\
 	file.$O\
 	generator.$O\
 	kernel.$O\
+	modules.$O\
 	k-build_target.$O\
 	k-configure_file.$O\
 	k-custom_target.$O\
