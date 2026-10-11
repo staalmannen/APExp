@@ -160,8 +160,8 @@ samu_buildadd(struct samu_ctx *ctx, struct samu_node *n)
 			++e->nblock;
 	}
 	/* all outputs are dirty if any are older than the newest input */
-	generator = samu_edgevar(ctx, e, "generator", true);
-	restat = samu_edgevar(ctx, e, "restat", true);
+	generator = samu_edgevar(ctx, e, "generator", true) != NULL;
+	restat = samu_edgevar(ctx, e, "restat", true) != NULL;
 	for (i = 0; i < e->nout && !(e->flags & FLAG_DIRTY_OUT); ++i) {
 		n = e->out[i];
 		if (samu_isdirty(ctx, n, newest, generator, restat)) {
@@ -366,7 +366,7 @@ samu_edgedone(struct samu_ctx *ctx, const char **filtered_output, struct samu_jo
 
 	e = j->edge;
 
-	restat = samu_edgevar(ctx, e, "restat", true);
+	restat = samu_edgevar(ctx, e, "restat", true) != NULL;
 	for (i = 0; i < e->nout; ++i) {
 		n = e->out[i];
 		old = n->mtime;
