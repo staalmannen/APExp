@@ -868,8 +868,9 @@ func_compiler_has_function(struct workspace *wk, obj self, obj *res)
 	}
 
 	if (!ok) {
-		bool is_builtin = str_startswith(get_str(wk, an[0].val), &STR("__builtin_"));
-		const char *__builtin_ = is_builtin ? "" : "__builtin_";
+		struct str builtin_prefix = STR_static("__builtin_");
+		bool is_builtin = str_startswith(get_str(wk, an[0].val), &builtin_prefix);
+		const char *builtin_prefix_str = is_builtin ? "" : "__builtin_";
 
 		/* With some toolchains (MSYS2/mingw for example) the compiler
 		 * provides various builtins which are not really implemented and
@@ -898,14 +899,14 @@ func_compiler_has_function(struct workspace *wk, obj self, obj *res)
 			!prefix_contains_include,
 			func,
 			is_builtin,
-			__builtin_,
+			builtin_prefix_str,
 			func,
-			__builtin_,
+			builtin_prefix_str,
 			func,
-			__builtin_,
+			builtin_prefix_str,
 			func,
 			func,
-			__builtin_,
+			builtin_prefix_str,
 			func);
 
 		if (!compiler_check(wk, &opts, src, an[0].node, &ok)) {
