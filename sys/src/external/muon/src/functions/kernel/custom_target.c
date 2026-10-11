@@ -97,7 +97,7 @@ format_cmd_arg_cb(struct workspace *wk, uint32_t node, void *_ctx, const struct 
 	};
 
 	const struct {
-		char *key;
+		const char *key;
 		bool valid;
 		bool needs_name;
 	} key_names[cmd_arg_fmt_key_count] = {
