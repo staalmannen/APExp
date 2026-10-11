@@ -605,10 +605,12 @@ az_op_az_branch(struct workspace *wk)
 
 	bool pure = true;
 	obj branch, expr_result = 0;
+	union az_branch_element branch_elem;
 	obj_array_for(wk, branches, branch) {
 		// L("--> branch");
-		cur_branch_group.branch = (union az_branch_element){ .i64 = get_obj_number(wk, branch) }.data;
-		cur_branch_group.result = (struct branch_map_data){ 0 };
+		branch_elem.i64 = get_obj_number(wk, branch);
+		cur_branch_group.branch = branch_elem.data;
+		memset(&cur_branch_group.result, 0, sizeof(cur_branch_group.result));
 		wk->vm.ip = cur_branch_group.branch.ip;
 		vm_push_call_stack_frame(wk, &(struct call_frame){ .type = call_frame_type_eval });
 		push_scope_group_scope(wk);
