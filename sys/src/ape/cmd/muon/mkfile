@@ -161,7 +161,7 @@ LIB=$APEXPROOT/$objtype/lib/ape/libcurl.a\
 HFILES=embedded_files.h
 <$APEXPROOT/sys/src/cmd/mkone
 
-CFLAGS=-c -I$MUSRC/include -I$APE/lib/curl -I$CURLSRC/include -I$CURLSRC/lib\
+CFLAGS=-c -I. -I$MUSRC/include -I$APE/lib/curl -I$CURLSRC/include -I$CURLSRC/lib\
 	-I$SSLSRC/include -DMUON_STATIC -DMUON_PLATFORM_posix\
 	-DHAVE_CONFIG_H -DCURL_STATICLIB -DMUON_BOOTSTRAPPED
 
