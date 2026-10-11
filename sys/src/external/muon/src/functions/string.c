@@ -259,26 +259,26 @@ version_compare(const struct str *ver1, const struct str *_ver2)
 	struct str ver2 = *_ver2;
 
 	enum op_type {
-		op_ge,
-		op_gt,
-		op_eq,
-		op_ne,
-		op_le,
-		op_lt,
+		version_op_ge,
+		version_op_gt,
+		version_op_eq,
+		version_op_ne,
+		version_op_le,
+		version_op_lt,
 	};
-	enum op_type op = op_eq;
+	enum op_type op = version_op_eq;
 
 	struct {
 		const struct str name;
 		enum op_type op;
 	} ops[] = {
-		{ STR(">="), op_ge },
-		{ STR(">"), op_gt },
-		{ STR("=="), op_eq },
-		{ STR("!="), op_ne },
-		{ STR("<="), op_le },
-		{ STR("<"), op_lt },
-		{ STR("="), op_eq },
+		{ STR(">="), version_op_ge },
+		{ STR(">"), version_op_gt },
+		{ STR("=="), version_op_eq },
+		{ STR("!="), version_op_ne },
+		{ STR("<="), version_op_le },
+		{ STR("<"), version_op_lt },
+		{ STR("="), version_op_eq },
 	};
 
 	uint32_t i;
@@ -294,12 +294,12 @@ version_compare(const struct str *ver1, const struct str *_ver2)
 	int8_t cmp = rpmvercmp(ver1, &ver2);
 
 	switch (op) {
-	case op_eq: return cmp == 0; break;
-	case op_ne: return cmp != 0; break;
-	case op_gt: return cmp == 1; break;
-	case op_ge: return cmp >= 0; break;
-	case op_lt: return cmp == -1; break;
-	case op_le: return cmp <= 0; break;
+	case version_op_eq: return cmp == 0; break;
+	case version_op_ne: return cmp != 0; break;
+	case version_op_gt: return cmp == 1; break;
+	case version_op_ge: return cmp >= 0; break;
+	case version_op_lt: return cmp == -1; break;
+	case version_op_le: return cmp <= 0; break;
 	default: UNREACHABLE_RETURN;
 	}
 }
