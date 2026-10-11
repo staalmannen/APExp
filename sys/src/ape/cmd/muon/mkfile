@@ -3,39 +3,39 @@ APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
 MUSRC=$APEXPROOT/sys/src/external/muon
+CURLSRC=$APEXPROOT/sys/src/external/curl
+SSLSRC=$APEXPROOT/sys/src/external/libressl
 
 BIN=$APEXPROOT/$objtype/bin/ape
 TARG=muon
+CLEANFILES=embedder embedded_files.h version.c
 
+# Source list follows the default POSIX Meson build: curl and the embedded
+# Samurai backend are enabled, libarchive and libpkgconf use their null paths,
+# readline is builtin, and the experimental UI is disabled.
 OFILES=\
-# .\
 	version.$O\
-# src/backend\
 	backend.$O\
 	common_args.$O\
 	introspect.$O\
 	output.$O\
 	xcode.$O\
 	ninja.$O\
-# src/backend/ninja\
 	ninja-alias_target.$O\
 	ninja-build_target.$O\
 	ninja-coverage.$O\
 	ninja-custom_target.$O\
 	ninja-rules.$O\
-# src/datastructures\
 	arr.$O\
 	bucket_arr.$O\
 	hash.$O\
 	stack.$O\
-# src/formats\
 	editorconfig.$O\
 	ini.$O\
 	json.$O\
 	lines.$O\
 	tap.$O\
 	xml.$O\
-# src/functions\
 	array.$O\
 	boolean.$O\
 	both_libs.$O\
@@ -51,17 +51,7 @@ OFILES=\
 	feature_opt.$O\
 	file.$O\
 	generator.$O\
-	machine.$O\
-	meson.$O\
-	modules.$O\
-	number.$O\
-	run_result.$O\
-	source_configuration.$O\
-	source_set.$O\
-	string.$O\
-	subproject.$O\
 	kernel.$O\
-# src/functions/kernel\
 	k-build_target.$O\
 	k-configure_file.$O\
 	k-custom_target.$O\
@@ -69,7 +59,6 @@ OFILES=\
 	k-install.$O\
 	k-options.$O\
 	k-subproject.$O\
-# src/functions/modules\
 	mod-curl.$O\
 	mod-fs.$O\
 	mod-getopt.$O\
@@ -80,7 +69,14 @@ OFILES=\
 	mod-sourceset.$O\
 	mod-subprojects.$O\
 	mod-toolchain.$O\
-# src/lang\
+	machine.$O\
+	meson.$O\
+	number.$O\
+	run_result.$O\
+	source_configuration.$O\
+	source_set.$O\
+	string.$O\
+	subproject.$O\
 	l-analyze.$O\
 	l-compiler.$O\
 	l-eval.$O\
@@ -96,7 +92,6 @@ OFILES=\
 	l-typecheck.$O\
 	l-vm.$O\
 	l-workspace.$O\
-# src\
 	args.$O\
 	cmd_install.$O\
 	cmd_subprojects.$O\
@@ -120,36 +115,103 @@ OFILES=\
 	vsenv.$O\
 	wrap.$O\
 	ui_null.$O\
-# src/platform\
-	filesystem.$O\
-	log.$O\
-	os.$O\
-	path.$O\
-	run_cmd.$O\
-	uname.$O\
-# src/platform/posix\
+	plat-assert.$O\
+	plat-filesystem.$O\
+	plat-mem.$O\
+	plat-os.$O\
+	plat-path.$O\
+	plat-run_cmd.$O\
+	plat-uname.$O\
+	p-filesystem.$O\
 	p-init.$O\
+	p-log.$O\
+	p-os.$O\
+	p-path.$O\
+	p-run_cmd.$O\
 	p-term.$O\
 	p-timer.$O\
-# src/platform/null\
-	rpath_fixer.$O\
-# src/external\
+	p-uname.$O\
+	null-rpath_fixer.$O\
 	libcurl.$O\
+	libarchive_null.$O\
+	readline_builtin.$O\
+	pkgconfig.$O\
+	pkgconfig_exec.$O\
 	samurai.$O\
-	pkgconfig.$O
+	samu-build.$O\
+	samu-deps.$O\
+	samu-env.$O\
+	samu-graph.$O\
+	samu-htab.$O\
+	samu-log.$O\
+	samu-parse.$O\
+	samu-samu.$O\
+	samu-scan.$O\
+	samu-tool.$O\
+	samu-tree.$O\
+	samu-util.$O
 
-LIB=
+# Muon's APE curl configuration needs these libraries in this order.
+LIB=$APEXPROOT/$objtype/lib/ape/libcurl.a\
+	$APEXPROOT/$objtype/lib/ape/libressl.a\
+	$APEXPROOT/$objtype/lib/ape/libz.a
 
+# mkone makes every object depend on HFILES. embedded_files.h is generated
+# below and must exist before embedded.c is compiled.
+HFILES=embedded_files.h
 <$APEXPROOT/sys/src/cmd/mkone
 
+CFLAGS=-c -I$MUSRC/include -I$APE/lib/curl -I$CURLSRC/include -I$CURLSRC/lib\
+	-I$SSLSRC/include -DMUON_STATIC -DMUON_PLATFORM_posix\
+	-DHAVE_CONFIG_H -DCURL_STATICLIB -DMUON_BOOTSTRAPPED
 
-CFLAGS=-c -I$MUSRC/include -DMUON_STATIC -DMUON_PLATFORM_posix
+EMBED_SCRIPT_FILES=\
+	$MUSRC/src/script/commands/copyfile.meson\
+	$MUSRC/src/script/commands/coverage.meson\
+	$MUSRC/src/script/commands/delete_suffix.meson\
+	$MUSRC/src/script/commands/i18n/gettext.meson\
+	$MUSRC/src/script/commands/i18n/itstool.meson\
+	$MUSRC/src/script/commands/i18n/msgfmthelper.meson\
+	$MUSRC/src/script/commands/vcs_tagger.meson\
+	$MUSRC/src/script/html/docs.html\
+	$MUSRC/src/script/html/test_out.html\
+	$MUSRC/src/script/lib/cmake_prelude.meson\
+	$MUSRC/src/script/modules/_test.meson\
+	$MUSRC/src/script/modules/gnome.meson\
+	$MUSRC/src/script/modules/i18n.meson\
+	$MUSRC/src/script/options/global.meson\
+	$MUSRC/src/script/options/per_project.meson\
+	$MUSRC/src/script/python/python_info.py\
+	$MUSRC/src/script/runtime/dependencies.meson
+
+embedder: $MUSRC/tools/embedder.c
+	$CC -I$MUSRC/include -o $target $MUSRC/tools/embedder.c
+
+embedded_files.h: embedder $EMBED_SCRIPT_FILES
+	./embedder \
+		$MUSRC/src/script/commands/copyfile.meson commands/copyfile.meson \
+		$MUSRC/src/script/commands/coverage.meson commands/coverage.meson \
+		$MUSRC/src/script/commands/delete_suffix.meson commands/delete_suffix.meson \
+		$MUSRC/src/script/commands/i18n/gettext.meson commands/i18n/gettext.meson \
+		$MUSRC/src/script/commands/i18n/itstool.meson commands/i18n/itstool.meson \
+		$MUSRC/src/script/commands/i18n/msgfmthelper.meson commands/i18n/msgfmthelper.meson \
+		$MUSRC/src/script/commands/vcs_tagger.meson commands/vcs_tagger.meson \
+		$MUSRC/src/script/html/docs.html html/docs.html \
+		$MUSRC/src/script/html/test_out.html html/test_out.html \
+		$MUSRC/src/script/lib/cmake_prelude.meson lib/cmake_prelude.meson \
+		$MUSRC/src/script/modules/_test.meson modules/_test.meson \
+		$MUSRC/src/script/modules/gnome.meson modules/gnome.meson \
+		$MUSRC/src/script/modules/i18n.meson modules/i18n.meson \
+		$MUSRC/src/script/options/global.meson options/global.meson \
+		$MUSRC/src/script/options/per_project.meson options/per_project.meson \
+		$MUSRC/src/script/python/python_info.py python/python_info.py \
+		$MUSRC/src/script/runtime/dependencies.meson runtime/dependencies.meson >$target
+
+version.c: $MUSRC/src/version.c.in
+	sed 's/@version@/0.5.0/; s/@vcs_tag@//; s/@meson_compat@/1.7/' $prereq >$target
 
 %.$O: %.c
 	$CC $CFLAGS $stem.c
-
-%.$O: $MUSRC/tools/%.c
-	$CC $CFLAGS $MUSRC/tools/$stem.c
 
 %.$O: $MUSRC/src/%.c
 	$CC $CFLAGS $MUSRC/src/$stem.c
@@ -178,20 +240,17 @@ mod-%.$O: $MUSRC/src/functions/modules/%.c
 l-%.$O: $MUSRC/src/lang/%.c
 	$CC $CFLAGS $MUSRC/src/lang/$stem.c -o $target
 
-%.$O: $MUSRC/src/platform/%.c
-	$CC $CFLAGS $MUSRC/src/platform/$stem.c
-
-%.$O: $MUSRC/src/platform/null/%.c
-	$CC $CFLAGS $MUSRC/src/platform/null/$stem.c
+plat-%.$O: $MUSRC/src/platform/%.c
+	$CC $CFLAGS $MUSRC/src/platform/$stem.c -o $target
 
 p-%.$O: $MUSRC/src/platform/posix/%.c
 	$CC $CFLAGS $MUSRC/src/platform/posix/$stem.c -o $target
 
+null-%.$O: $MUSRC/src/platform/null/%.c
+	$CC $CFLAGS $MUSRC/src/platform/null/$stem.c -o $target
+
 %.$O: $MUSRC/src/external/%.c
 	$CC $CFLAGS $MUSRC/src/external/$stem.c
 
-
-
-
-
-
+samu-%.$O: $MUSRC/src/external/samurai/%.c
+	$CC $CFLAGS $MUSRC/src/external/samurai/$stem.c -o $target
