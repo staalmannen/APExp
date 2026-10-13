@@ -13,19 +13,23 @@ install:V:
 	mk $MKFLAGS -f mkfile.bootstrap install
 	mk $MKFLAGS -f mkfile.bootstrap clean
 	mk $MKFLAGS -f mkfile.rebuild install
+	mk $MKFLAGS -f mkfile.lib install
 
 installall:V:
 	mk $MKFLAGS -f mkfile.bootstrap installall
 	mk $MKFLAGS -f mkfile.bootstrap clean
 	mk $MKFLAGS -f mkfile.rebuild installall
+	mk $MKFLAGS -f mkfile.lib installall
 
 clean:V:
 	mk $MKFLAGS -f mkfile.bootstrap clean
 	mk $MKFLAGS -f mkfile.rebuild clean
+	mk $MKFLAGS -f mkfile.lib clean
 
 nuke:V:
 	mk $MKFLAGS -f mkfile.bootstrap nuke
 	mk $MKFLAGS -f mkfile.rebuild nuke
+	mk $MKFLAGS -f mkfile.lib nuke
 
 bootstrap:V:
 	mk $MKFLAGS -f mkfile.bootstrap install
